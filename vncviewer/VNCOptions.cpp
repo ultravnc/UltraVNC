@@ -160,7 +160,7 @@ VNCOptions::VNCOptions()
   m_saved_scaling = false;
   
   // sf@2007 - Autoreconnect
-  m_autoReconnect = 10; // Dafault: 10s before reconnecting
+  m_autoReconnect = 10; // Default: 10s before reconnecting
   
 #ifdef UNDER_CE
   m_palmpc = false;
@@ -721,7 +721,7 @@ void VNCOptions::Save(char *fname)
   saveInt("UseDSMPlugin",			m_fUseDSMPlugin,	fname);
   saveInt("UseProxy",				m_fUseProxy,	fname);
   WritePrivateProfileString("options", "DSMPlugin", m_szDSMPluginFilename, fname);
-  saveInt("AutoReconnect", m_autoReconnect,	fname);
+  //saveInt("AutoReconnect", m_autoReconnect,	fname);
  
 }
 
@@ -774,7 +774,7 @@ void VNCOptions::Load(char *fname)
   m_fUseDSMPlugin =		readInt("UseDSMPlugin",		m_fUseDSMPlugin, fname) != 0;
   m_fUseProxy =			readInt("UseProxy",			m_fUseProxy, fname) != 0;
   GetPrivateProfileString("options", "DSMPlugin", "NoPlugin", m_szDSMPluginFilename, MAX_PATH, fname);
-  m_autoReconnect =		readInt("AutoReconnect",	m_autoReconnect, fname) != 0;
+  //m_autoReconnect =		readInt("AutoReconnect",	m_autoReconnect, fname) != 0;
   
 }
 

@@ -133,7 +133,7 @@ public:
 	int m_delay;
 
 	// sf@2007 - AutoReconnect
-	bool	m_autoReconnect;
+	int	m_autoReconnect;
 
 
 #ifdef UNDER_CE
