@@ -38,6 +38,7 @@ class vncPropertiesPoll;
 // Includes
 #include "stdhdrs.h"
 #include "vncServer.h"
+#include "inifile.h"
 
 // The vncPropertiesPoll class itself
 class vncPropertiesPoll
@@ -56,11 +57,10 @@ public:
 	// Display the properties dialog
 	// If usersettings is TRUE then the per-user settings come up
 	// If usersettings is FALSE then the default system settings come up
-	void Show(BOOL show, BOOL usersettings);
+	void Show(BOOL show);
 
 	// Loading & saving of preferences
-	void Load(BOOL usersettings);
-	void ResetRegistry();
+	void Load();
 
 	void Save();
 
@@ -72,23 +72,8 @@ protected:
 	// The server object to which this properties object is attached.
 	vncServer *			m_server;
 
-	// Flag to indicate whether the currently loaded settings are for
-	// the current user, or are default system settings
-	BOOL				m_usersettings;
-
-
-	// String handling
-	char * LoadString(HKEY k, LPCSTR valname);
-	void SaveString(HKEY k, LPCSTR valname, const char *buffer);
-
-	// Manipulate the registry settings
-	LONG LoadInt(HKEY key, LPCSTR valname, LONG defval);
-	void SaveInt(HKEY key, LPCSTR valname, LONG val);
-
-
-	// Loading/saving all the user prefs
-	void LoadUserPrefsPoll(HKEY appkey);
-	void SaveUserPrefsPoll(HKEY appkey);
+	void LoadUserPrefsPoll();
+	void SaveUserPrefsPoll();
 
 
 	// Making the loaded user prefs active
@@ -108,6 +93,7 @@ protected:
 	BOOL m_pref_Driver;
 	BOOL m_pref_Hook;
 	BOOL m_pref_Virtual;
+	IniFile myIniFile;
 
 };
 

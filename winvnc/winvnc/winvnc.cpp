@@ -67,6 +67,96 @@ BOOL		fRunningAsApplication0System=false;
 BOOL		fRunningAsApplication0User=false;
 
 
+void WRITETOLOG(char *szText, int size, DWORD *byteswritten, void *);
+
+bool SelectDesktop();
+bool InputDesktopSelected()
+{
+
+	DWORD dummy;
+	char threadname[256];
+	char inputname[256];
+	bool IsWinNT;
+
+	OSVERSIONINFO WinVer;	
+	WinVer.dwOSVersionInfoSize=sizeof(OSVERSIONINFO);
+	GetVersionEx(&WinVer);
+	if ((WinVer.dwPlatformId==VER_PLATFORM_WIN32_NT)) IsWinNT=1;
+	else IsWinNT=0;
+
+	if (IsWinNT)
+	{
+		HDESK threaddesktop = GetThreadDesktop(GetCurrentThreadId());
+		HDESK inputdesktop = OpenInputDesktop(0, FALSE,
+				DESKTOP_CREATEMENU | DESKTOP_CREATEWINDOW |
+				DESKTOP_ENUMERATE | DESKTOP_HOOKCONTROL |
+				DESKTOP_WRITEOBJECTS | DESKTOP_READOBJECTS |
+				DESKTOP_SWITCHDESKTOP | GENERIC_WRITE);
+
+		if (inputdesktop == NULL) return FALSE;
+
+
+		if (!GetUserObjectInformation(threaddesktop, UOI_NAME, &threadname, 256, &dummy)) {
+			CloseDesktop(inputdesktop);
+			return FALSE;
+		}
+		if (!GetUserObjectInformation(inputdesktop, UOI_NAME, &inputname, 256, &dummy)) {
+			CloseDesktop(inputdesktop);
+			return FALSE;
+		}
+
+		CloseDesktop(inputdesktop);
+		vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - threadname %s\n"),threadname);
+		vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - inputname %s\n"),inputname);
+
+		if (strcmp(threadname, inputname) != 0)
+		{
+			if (strcmp(inputname, "Screen-saver") == 0)
+			{
+				return SelectDesktop();
+			}
+			return FALSE;
+		}
+	}
+	return TRUE;
+}
+
+
+bool SelectDesktop()
+{
+		HDESK desktop;
+		HDESK old_desktop;
+		DWORD dummy;
+		char new_name[256];
+
+		desktop = OpenInputDesktop(0, FALSE,
+				DESKTOP_CREATEMENU | DESKTOP_CREATEWINDOW |
+				DESKTOP_ENUMERATE | DESKTOP_HOOKCONTROL |
+				DESKTOP_WRITEOBJECTS | DESKTOP_READOBJECTS |
+				DESKTOP_SWITCHDESKTOP | GENERIC_WRITE);
+
+		if (desktop == NULL) return FALSE;
+
+
+		old_desktop = GetThreadDesktop(GetCurrentThreadId());
+
+
+		if (!GetUserObjectInformation(desktop, UOI_NAME, &new_name, 256, &dummy)) {
+			CloseDesktop(desktop);
+			return FALSE;
+		}
+
+		if(!SetThreadDesktop(desktop)) {
+			CloseDesktop(desktop);
+			return FALSE;
+		}
+
+		CloseDesktop(old_desktop);
+			
+		return TRUE;
+}
+
+
 // WinMain parses the command line and either calls the main App
 // routine or, under NT, the main service routine.
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow)
@@ -79,6 +169,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 
 	// Configure the log file, in case one is required
 	vnclog.SetFile("WinVNC.log", false);
+	vnclog.SetMode(2);
+	vnclog.SetLevel(10);
 
 #ifdef _DEBUG
 	{
@@ -152,21 +244,21 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 		if (strncmp(&szCmdLine[i], "-0run",  strlen("-0run")) == 0)
 		{
 			fRunningAsApplication0 = true;
-			if (!vncService::InputDesktopSelected()) return 0;
+			if (!InputDesktopSelected()) return 0;
 			return WinVNCAppMain();
 		}
 
-		if (strncmp(&szCmdLine[i], "windesk",  strlen("windesk")) == 0)
+		if (strncmp(&szCmdLine[i], "windesk",  strlen("-windesk")) == 0)
 		{
 			fRunningAsApplication0System = true;
-			if (!vncService::InputDesktopSelected()) return 0;
+			if (!InputDesktopSelected()) return 0;
 			return WinVNCAppMain();
 		}
 
-		if (strncmp(&szCmdLine[i], "defaultdesk",  strlen("defaultdesk")) == 0)
+		if (strncmp(&szCmdLine[i], "defaultdesk",  strlen("-defaultdesk")) == 0)
 		{
 			fRunningAsApplication0User = true;
-			if (!vncService::InputDesktopSelected()) return 0;
+			if (!InputDesktopSelected()) return 0;
 			return WinVNCAppMain();
 		}
 

@@ -58,7 +58,6 @@ vncProperties::vncProperties()
 	m_allowproperties = TRUE;
 	m_allowshutdown = TRUE;
 	m_dlgvisible = FALSE;
-	m_usersettings = TRUE;
 	Lock_service_helper=true;
 }
 
@@ -74,7 +73,7 @@ vncProperties::Init(vncServer *server)
 	m_server = server;
 	
 	// Load the settings from the registry
-	Load(TRUE);
+	Load();
 
 	// If the password is empty then always show a dialog
 	char passwd[MAXPWLEN];
@@ -104,10 +103,10 @@ vncProperties::Init(vncServer *server)
 						MessageBox(NULL, sz_ID_NO_PASSWD_NO_LOGON_WARN,
 									sz_ID_WINVNC_ERROR,
 									MB_OK | MB_ICONEXCLAMATION);
-						ShowAdmin(TRUE, FALSE);
+						ShowAdmin(TRUE);
 						Lock_service_helper=false;
 					} else {
-						ShowAdmin(TRUE, TRUE);
+						ShowAdmin(TRUE);
 					}
 				}
 			}
@@ -120,61 +119,24 @@ vncProperties::Init(vncServer *server)
 
 // Dialog box handling functions
 void
-vncProperties::ShowAdmin(BOOL show, BOOL usersettings)
+vncProperties::ShowAdmin(BOOL show)
 {
 //	if (Lock_service_helper) return;
 	if (!m_allowproperties) return;
 	if (!RunningAsAdministrator ()) return;
-	if (vncService::RunningAsService()) usersettings=false;
-	//usersettings = false;
-	m_usersettings=usersettings;
+	
 	if (show)
 	{
 
-		// Verify that we know who is logged on
-		if (usersettings) {
-			char username[UNLEN+1];
-			if (!vncService::CurrentUser(username, sizeof(username)))
-				return;
-			if (strcmp(username, "") == 0) {
-				MessageBox(NULL, sz_ID_NO_CURRENT_USER_ERR, sz_ID_WINVNC_ERROR, MB_OK | MB_ICONEXCLAMATION);
-				return;
-			}
-		} else {
 			// We're trying to edit the default local settings - verify that we can
-			HKEY hkLocal, hkDefault;
-			BOOL canEditDefaultPrefs = 1;
-			DWORD dw;
-			if (RegCreateKeyEx(HKEY_LOCAL_MACHINE,
-				WINVNC_REGISTRY_KEY,
-				0, REG_NONE, REG_OPTION_NON_VOLATILE,
-				KEY_READ, NULL, &hkLocal, &dw) != ERROR_SUCCESS)
-				canEditDefaultPrefs = 0;
-			else if (RegCreateKeyEx(hkLocal,
-				"Default",
-				0, REG_NONE, REG_OPTION_NON_VOLATILE,
-				KEY_WRITE | KEY_READ, NULL, &hkDefault, &dw) != ERROR_SUCCESS)
-				canEditDefaultPrefs = 0;
-			if (hkLocal) RegCloseKey(hkLocal);
-			if (hkDefault) RegCloseKey(hkDefault);
-
-			if (!canEditDefaultPrefs) {
-				MessageBox(NULL, sz_ID_CANNOT_EDIT_DEFAULT_PREFS, sz_ID_WINVNC_ERROR, MB_OK | MB_ICONEXCLAMATION);
+		if (!myIniFile.WriteInt("dummy", "dummy",1))
+			{
 				return;
 			}
-		}
 
 		// Now, if the dialog is not already displayed, show it!
 		if (!m_dlgvisible)
 		{
-			if (usersettings)
-				vnclog.Print(LL_INTINFO, VNCLOG("show per-user Properties\n"));
-			else
-				vnclog.Print(LL_INTINFO, VNCLOG("show default system Properties\n"));
-
-			// Load in the settings relevant to the user or system
-			//Load(usersettings);
-			m_usersettings=usersettings;
 
 			for (;;)
 			{
@@ -227,7 +189,7 @@ vncProperties::ShowAdmin(BOOL show, BOOL usersettings)
 			}
 
 			// Load in all the settings
-			Load(TRUE);
+			Load();
 		}
 	}
 }
@@ -252,15 +214,11 @@ vncProperties::DialogProc(HWND hwnd,
 			// to the calling vncProperties object
 			SetWindowLong(hwnd, GWL_USERDATA, lParam);
 			_this = (vncProperties *) lParam;
-			_this->Load(_this->m_usersettings);
+			_this->Load();
 			_this->m_dlgvisible = TRUE;
 
 			// Set the dialog box's title to indicate which Properties we're editting
-			if (_this->m_usersettings) {
-				SetWindowText(hwnd, sz_ID_CURRENT_USER_PROP);
-			} else {
-				SetWindowText(hwnd, sz_ID_DEFAULT_SYST_PROP);
-			}
+			SetWindowText(hwnd, sz_ID_DEFAULT_SYST_PROP);
 
 
 			// Initialise the properties controls
@@ -1035,161 +993,8 @@ vncProperties::InitPortSettings(HWND hwnd)
 		bConnectSock && !bAutoPort && !bValidDisplay);
 }
 
-
-// Functions to load & save the settings
-LONG
-vncProperties::LoadInt(HKEY key, LPCSTR valname, LONG defval)
-{
-	LONG pref;
-	ULONG type = REG_DWORD;
-	ULONG prefsize = sizeof(pref);
-
-	if (RegQueryValueEx(key,
-		valname,
-		NULL,
-		&type,
-		(LPBYTE) &pref,
-		&prefsize) != ERROR_SUCCESS)
-		return defval;
-
-	if (type != REG_DWORD)
-		return defval;
-
-	if (prefsize != sizeof(pref))
-		return defval;
-
-	return pref;
-}
-
 void
-vncProperties::LoadPassword(HKEY key, char *buffer)
-{
-	DWORD type = REG_BINARY;
-	int slen=MAXPWLEN;
-	char inouttext[MAXPWLEN];
-
-	// Retrieve the encrypted password
-	if (RegQueryValueEx(key,
-		"Password",
-		NULL,
-		&type,
-		(LPBYTE) &inouttext,
-		(LPDWORD) &slen) != ERROR_SUCCESS)
-		return;
-
-	if (slen > MAXPWLEN)
-		return;
-
-	memcpy(buffer, inouttext, MAXPWLEN);
-}
-
-char *
-vncProperties::LoadString(HKEY key, LPCSTR keyname)
-{
-	DWORD type = REG_SZ;
-	DWORD buflen = 0;
-	BYTE *buffer = 0;
-
-	// Get the length of the AuthHosts string
-	if (RegQueryValueEx(key,
-		keyname,
-		NULL,
-		&type,
-		NULL,
-		&buflen) != ERROR_SUCCESS)
-		return 0;
-
-	if (type != REG_SZ)
-		return 0;
-	buffer = new BYTE[buflen];
-	if (buffer == 0)
-		return 0;
-
-	// Get the AuthHosts string data
-	if (RegQueryValueEx(key,
-		keyname,
-		NULL,
-		&type,
-		buffer,
-		&buflen) != ERROR_SUCCESS) {
-		delete [] buffer;
-		return 0;
-	}
-
-	// Verify the type
-	if (type != REG_SZ) {
-		delete [] buffer;
-		return 0;
-	}
-
-	return (char *)buffer;
-}
-
-
-void
-vncProperties::ResetRegistry()
-{	
-	char username[UNLEN+1];
-	HKEY hkLocal, hkLocalUser, hkDefault;
-	DWORD dw;
-
-	if (!vncService::CurrentUser((char *)&username, sizeof(username)))
-		return;
-
-	// If there is no user logged on them default to SYSTEM
-	if (strcmp(username, "") == 0)
-		strcpy((char *)&username, "SYSTEM");
-
-	// Try to get the machine registry key for WinVNC
-	if (RegCreateKeyEx(HKEY_LOCAL_MACHINE,
-		WINVNC_REGISTRY_KEY,
-		0, REG_NONE, REG_OPTION_NON_VOLATILE,
-		KEY_READ, NULL, &hkLocal, &dw) != ERROR_SUCCESS)
-		{
-		hkLocalUser=NULL;
-		hkDefault=NULL;
-		goto LABELUSERSETTINGS;
-		}
-
-	// Now try to get the per-user local key
-	if (RegOpenKeyEx(hkLocal,
-		username,
-		0, KEY_READ,
-		&hkLocalUser) != ERROR_SUCCESS)
-		hkLocalUser = NULL;
-
-	// Get the default key
-	if (RegCreateKeyEx(hkLocal,
-		"Default",
-		0, REG_NONE, REG_OPTION_NON_VOLATILE,
-		KEY_READ,
-		NULL,
-		&hkDefault,
-		&dw) != ERROR_SUCCESS)
-		hkDefault = NULL;
-
-	if (hkLocalUser != NULL) RegCloseKey(hkLocalUser);
-	if (hkDefault != NULL) RegCloseKey(hkDefault);
-	if (hkLocal != NULL) RegCloseKey(hkLocal);
-	RegCloseKey(HKEY_LOCAL_MACHINE);
-LABELUSERSETTINGS:
-	if ((strcmp(username, "SYSTEM") != 0))
-		{
-			HKEY hkGlobalUser;
-			if (RegCreateKeyEx(HKEY_CURRENT_USER,
-				WINVNC_REGISTRY_KEY,
-				0, REG_NONE, REG_OPTION_NON_VOLATILE,
-				KEY_READ, NULL, &hkGlobalUser, &dw) == ERROR_SUCCESS)
-			{
-				RegCloseKey(hkGlobalUser);
-				RegCloseKey(HKEY_CURRENT_USER);
-			}
-		}
-
-}
-
-void
-vncProperties::Load(BOOL usersettings)
+vncProperties::Load()
 {
 	vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - Entering Load\n"));
 
@@ -1197,39 +1002,11 @@ vncProperties::Load(BOOL usersettings)
 		vnclog.Print(LL_INTWARN, VNCLOG("service helper invoked while Properties panel displayed\n"));
 		return;
 	}
-	ResetRegistry();
 
-	if (vncService::RunningAsService()) usersettings=false;
 
-	// sf@2007 - Vista mode
-	// The WinVNC service mode is not used under Vista (due to Session0 isolation)
-	// Default settings (Service mode) are used when WinVNC app in run under Vista login screen
-	// User settings (loggued user mode) are used when WinVNC app in run in a user session
-	// Todo: Maybe we should additionally check OS version...
-	if (m_server->RunningAsApplication0System())
-		usersettings=false;
-	if (m_server->RunningAsApplication0User())
-		usersettings=true;
-
-	m_usersettings = usersettings;
-
-	if (m_usersettings)
-		vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - User mode\n"));
-	else
-		vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - Service mode\n"));
 	
 	char username[UNLEN+1];
-	HKEY hkLocal, hkLocalUser, hkDefault;
 	DWORD dw;
-	
-	// NEW (R3) PREFERENCES ALGORITHM
-	// 1.	Look in HKEY_LOCAL_MACHINE/Software/ORL/WinVNC3/%username%
-	//		for sysadmin-defined, user-specific settings.
-	// 2.	If not found, fall back to %username%=Default
-	// 3.	If AllowOverrides is set then load settings from
-	//		HKEY_CURRENT_USER/Software/ORL/WinVNC3
-
-	// GET THE CORRECT KEY TO READ FROM
 
 	// Get the user name / service name
 	if (!vncService::CurrentUser((char *)&username, sizeof(username)))
@@ -1245,75 +1022,40 @@ vncProperties::Load(BOOL usersettings)
 		strcpy((char *)&username, "SYSTEM");
 	}
 
-
-	vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - UserName = %s\n"), username);
-
-	// Try to get the machine registry key for WinVNC
-	if (RegCreateKeyEx(HKEY_LOCAL_MACHINE,
-		WINVNC_REGISTRY_KEY,
-		0, REG_NONE, REG_OPTION_NON_VOLATILE,
-		KEY_READ, NULL, &hkLocal, &dw) != ERROR_SUCCESS)
-		{
-		hkLocalUser=NULL;
-		hkDefault=NULL;
-		goto LABELUSERSETTINGS;
-		}
-
-	// Now try to get the per-user local key
-	if (RegOpenKeyEx(hkLocal,
-		username,
-		0, KEY_READ,
-		&hkLocalUser) != ERROR_SUCCESS)
-		hkLocalUser = NULL;
-
-	// Get the default key
-	if (RegCreateKeyEx(hkLocal,
-		"Default",
-		0, REG_NONE, REG_OPTION_NON_VOLATILE,
-		KEY_READ,
-		NULL,
-		&hkDefault,
-		&dw) != ERROR_SUCCESS)
-		hkDefault = NULL;
-
-	// LOAD THE MACHINE-LEVEL PREFS
-
-	vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - Machine level prefs\n"));
-
 	// Logging/debugging prefs
-	vnclog.Print(LL_INTINFO, VNCLOG("loading local-only settings\n"));
-	//vnclog.SetMode(LoadInt(hkLocal, "DebugMode", 0));
-	//vnclog.SetLevel(LoadInt(hkLocal, "DebugLevel", 0));
+	vnclog.SetMode(myIniFile.ReadInt("admin", "DebugMode", 0));
+	vnclog.SetLevel(myIniFile.ReadInt("admin", "DebugLevel", 0));
 
 	// Disable Tray Icon
-	m_server->SetDisableTrayIcon(LoadInt(hkLocal, "DisableTrayIcon", false));
+	m_server->SetDisableTrayIcon(myIniFile.ReadInt("admin", "DisableTrayIcon", false));
 
 	// Authentication required, loopback allowed, loopbackOnly
 
-	m_server->SetLoopbackOnly(LoadInt(hkLocal, "LoopbackOnly", false));
+	m_server->SetLoopbackOnly(myIniFile.ReadInt("admin", "LoopbackOnly", false));
 
 	m_pref_RequireMSLogon=false;
-	m_pref_RequireMSLogon = LoadInt(hkLocal, "MSLogonRequired", m_pref_RequireMSLogon);
+	m_pref_RequireMSLogon = myIniFile.ReadInt("admin", "MSLogonRequired", m_pref_RequireMSLogon);
 	m_server->RequireMSLogon(m_pref_RequireMSLogon);
 
 	// Marscha@2004 - authSSP: added NewMSLogon checkbox to admin props page
 	m_pref_NewMSLogon = false;
-	m_pref_NewMSLogon = LoadInt(hkLocal, "NewMSLogon", m_pref_NewMSLogon);
+	m_pref_NewMSLogon = myIniFile.ReadInt("admin", "NewMSLogon", m_pref_NewMSLogon);
 	m_server->SetNewMSLogon(m_pref_NewMSLogon);
 
 	// sf@2003 - Moved DSM params here
 	m_pref_UseDSMPlugin=false;
-	m_pref_UseDSMPlugin = LoadInt(hkLocal, "UseDSMPlugin", m_pref_UseDSMPlugin);
-	LoadDSMPluginName(hkLocal, m_pref_szDSMPlugin);
+	m_pref_UseDSMPlugin = myIniFile.ReadInt("admin", "UseDSMPlugin", m_pref_UseDSMPlugin);
+	myIniFile.ReadString("admin", "DSMPlugin",m_pref_szDSMPlugin,128);
 
 	if (m_server->LoopbackOnly()) m_server->SetLoopbackOk(true);
-	else m_server->SetLoopbackOk(LoadInt(hkLocal, "AllowLoopback", false));
-	m_server->SetAuthRequired(LoadInt(hkLocal, "AuthRequired", true));
+	else m_server->SetLoopbackOk(myIniFile.ReadInt("admin", "AllowLoopback", false));
+	m_server->SetAuthRequired(myIniFile.ReadInt("admin", "AuthRequired", true));
 
-	m_server->SetConnectPriority(LoadInt(hkLocal, "ConnectPriority", 0));
+	m_server->SetConnectPriority(myIniFile.ReadInt("admin", "ConnectPriority", 0));
 	if (!m_server->LoopbackOnly())
 	{
-		char *authhosts = LoadString(hkLocal, "AuthHosts");
+		char *authhosts=new char[150];
+		myIniFile.ReadString("admin", "AuthHosts",authhosts,150);
 		if (authhosts != 0) {
 			m_server->SetAuthHosts(authhosts);
 			delete [] authhosts;
@@ -1324,9 +1066,6 @@ vncProperties::Load(BOOL usersettings)
 		m_server->SetAuthHosts(0);
 	}
 
-	// If Socket connections are allowed, should the HTTP server be enabled?
-LABELUSERSETTINGS:
-	// LOAD THE USER PREFERENCES
 	vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - Load User Preferences\n"));
 
 	// Set the default user prefs
@@ -1365,123 +1104,61 @@ LABELUSERSETTINGS:
 	m_pref_CaptureAlphaBlending = FALSE; 
 	m_pref_BlackAlphaBlending = FALSE; 
 
+	LoadUserPrefs();
+	m_allowshutdown = myIniFile.ReadInt("admin", "AllowShutdown", m_allowshutdown);
+	m_allowproperties = myIniFile.ReadInt("admin", "AllowProperties", m_allowproperties);
+	m_alloweditclients = myIniFile.ReadInt("admin", "AllowEditClients", m_alloweditclients);
 
-	// Load the local prefs for this user
-	if (hkDefault != NULL)
-	{
-		vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - Local Preferences - Default\n"));
-
-		vnclog.Print(LL_INTINFO, VNCLOG("loading DEFAULT local settings\n"));
-		LoadUserPrefs(hkDefault);
-		m_allowshutdown = LoadInt(hkDefault, "AllowShutdown", m_allowshutdown);
-		m_allowproperties = LoadInt(hkDefault, "AllowProperties", m_allowproperties);
-		m_alloweditclients = LoadInt(hkDefault, "AllowEditClients", m_alloweditclients);
-	}
-
-	// Are we being asked to load the user settings, or just the default local system settings?
-	if (usersettings)
-	{
-		// We want the user settings, so load them!
-		vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - User Settings on\n"));
-
-		if (hkLocalUser != NULL)
-		{
-			vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - LoadUser Preferences\n"));
-
-			vnclog.Print(LL_INTINFO, VNCLOG("loading \"%s\" local settings\n"), username);
-			LoadUserPrefs(hkLocalUser);
-			m_allowshutdown = LoadInt(hkLocalUser, "AllowShutdown", m_allowshutdown);
-			m_allowproperties = LoadInt(hkLocalUser, "AllowProperties", m_allowproperties);
-		  m_alloweditclients = LoadInt(hkLocalUser, "AllowEditClients", m_alloweditclients);
-		}
-
-		// Now override the system settings with the user's settings
-		// If the username is SYSTEM then don't try to load them, because there aren't any...
-		if (m_allowproperties && (strcmp(username, "SYSTEM") != 0))
-		{
-			vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - Override system settings with users settings\n"));
-			HKEY hkGlobalUser;
-			if (RegCreateKeyEx(HKEY_CURRENT_USER,
-				WINVNC_REGISTRY_KEY,
-				0, REG_NONE, REG_OPTION_NON_VOLATILE,
-				KEY_READ, NULL, &hkGlobalUser, &dw) == ERROR_SUCCESS)
-			{
-				vnclog.Print(LL_INTINFO, VNCLOG("loading \"%s\" global settings\n"), username);
-				LoadUserPrefs(hkGlobalUser);
-				RegCloseKey(hkGlobalUser);
-
-				// Close the user registry hive so it can unload if required
-				RegCloseKey(HKEY_CURRENT_USER);
-			}
-		}
-	} else {
-		vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - User Settings off\n"));
-		if (hkLocalUser != NULL)
-		{
-			vnclog.Print(LL_INTINFO, VNCLOG("loading \"%s\" local settings\n"), username);
-			LoadUserPrefs(hkLocalUser);
-			m_allowshutdown = LoadInt(hkLocalUser, "AllowShutdown", m_allowshutdown);
-			m_allowproperties = LoadInt(hkLocalUser, "AllowProperties", m_allowproperties);
-		    m_alloweditclients = LoadInt(hkLocalUser, "AllowEditClients", m_alloweditclients);
-		}
-		vnclog.Print(LL_INTINFO, VNCLOG("bypassing user-specific settings (both local and global)\n"));
-	}
-
-	if (hkLocalUser != NULL) RegCloseKey(hkLocalUser);
-	if (hkDefault != NULL) RegCloseKey(hkDefault);
-	if (hkLocal != NULL) RegCloseKey(hkLocal);
-
-	// Make the loaded settings active..
 	ApplyUserPrefs();
 }
 
 void
-vncProperties::LoadUserPrefs(HKEY appkey)
+vncProperties::LoadUserPrefs()
 {
 	// LOAD USER PREFS FROM THE SELECTED KEY
 
 	// Modif sf@2002
-	m_pref_EnableFileTransfer = LoadInt(appkey, "FileTransferEnabled", m_pref_EnableFileTransfer);
-	m_pref_FTUserImpersonation = LoadInt(appkey, "FTUserImpersonation", m_pref_FTUserImpersonation); // sf@2005
-	m_pref_EnableBlankMonitor = LoadInt(appkey, "BlankMonitorEnabled", m_pref_EnableBlankMonitor);
-	m_pref_DefaultScale = LoadInt(appkey, "DefaultScale", m_pref_DefaultScale);
-	m_pref_CaptureAlphaBlending = LoadInt(appkey, "CaptureAlphaBlending", m_pref_CaptureAlphaBlending); // sf@2005
-	m_pref_BlackAlphaBlending = LoadInt(appkey, "BlackAlphaBlending", m_pref_BlackAlphaBlending); // sf@2005
+	m_pref_EnableFileTransfer = myIniFile.ReadInt("admin", "FileTransferEnabled", m_pref_EnableFileTransfer);
+	m_pref_FTUserImpersonation = myIniFile.ReadInt("admin", "FTUserImpersonation", m_pref_FTUserImpersonation); // sf@2005
+	m_pref_EnableBlankMonitor = myIniFile.ReadInt("admin", "BlankMonitorEnabled", m_pref_EnableBlankMonitor);
+	m_pref_DefaultScale = myIniFile.ReadInt("admin", "DefaultScale", m_pref_DefaultScale);
+	m_pref_CaptureAlphaBlending = myIniFile.ReadInt("admin", "CaptureAlphaBlending", m_pref_CaptureAlphaBlending); // sf@2005
+	m_pref_BlackAlphaBlending = myIniFile.ReadInt("admin", "BlackAlphaBlending", m_pref_BlackAlphaBlending); // sf@2005
 
-	m_pref_UseDSMPlugin = LoadInt(appkey, "UseDSMPlugin", m_pref_UseDSMPlugin);
-	LoadDSMPluginName(appkey, m_pref_szDSMPlugin);
+	m_pref_UseDSMPlugin = myIniFile.ReadInt("admin", "UseDSMPlugin", m_pref_UseDSMPlugin);
+	myIniFile.ReadString("admin", "DSMPlugin",m_pref_szDSMPlugin,128);
 
 	// Connection prefs
-	m_pref_SockConnect=LoadInt(appkey, "SocketConnect", m_pref_SockConnect);
-	m_pref_HTTPConnect=LoadInt(appkey, "HTTPConnect", m_pref_HTTPConnect);
-	m_pref_XDMCPConnect=LoadInt(appkey, "XDMCPConnect", m_pref_XDMCPConnect);
-	m_pref_AutoPortSelect=LoadInt(appkey, "AutoPortSelect", m_pref_AutoPortSelect);
-	m_pref_PortNumber=LoadInt(appkey, "PortNumber", m_pref_PortNumber);
-	m_pref_HttpPortNumber=LoadInt(appkey, "HTTPPortNumber",
+	m_pref_SockConnect=myIniFile.ReadInt("admin", "SocketConnect", m_pref_SockConnect);
+	m_pref_HTTPConnect=myIniFile.ReadInt("admin", "HTTPConnect", m_pref_HTTPConnect);
+	m_pref_XDMCPConnect=myIniFile.ReadInt("admin", "XDMCPConnect", m_pref_XDMCPConnect);
+	m_pref_AutoPortSelect=myIniFile.ReadInt("admin", "AutoPortSelect", m_pref_AutoPortSelect);
+	m_pref_PortNumber=myIniFile.ReadInt("admin", "PortNumber", m_pref_PortNumber);
+	m_pref_HttpPortNumber=myIniFile.ReadInt("admin", "HTTPPortNumber",
 									DISPLAY_TO_HPORT(PORT_TO_DISPLAY(m_pref_PortNumber)));
-	m_pref_IdleTimeout=LoadInt(appkey, "IdleTimeout", m_pref_IdleTimeout);
+	m_pref_IdleTimeout=myIniFile.ReadInt("admin", "IdleTimeout", m_pref_IdleTimeout);
 	
-	m_pref_RemoveWallpaper=LoadInt(appkey, "RemoveWallpaper", m_pref_RemoveWallpaper);
+	m_pref_RemoveWallpaper=myIniFile.ReadInt("admin", "RemoveWallpaper", m_pref_RemoveWallpaper);
 
 	// Connection querying settings
-	m_pref_QuerySetting=LoadInt(appkey, "QuerySetting", m_pref_QuerySetting);
+	m_pref_QuerySetting=myIniFile.ReadInt("admin", "QuerySetting", m_pref_QuerySetting);
 	m_server->SetQuerySetting(m_pref_QuerySetting);
-	m_pref_QueryTimeout=LoadInt(appkey, "QueryTimeout", m_pref_QueryTimeout);
+	m_pref_QueryTimeout=myIniFile.ReadInt("admin", "QueryTimeout", m_pref_QueryTimeout);
 	m_server->SetQueryTimeout(m_pref_QueryTimeout);
-	m_pref_QueryAccept=LoadInt(appkey, "QueryAccept", m_pref_QueryAccept);
+	m_pref_QueryAccept=myIniFile.ReadInt("admin", "QueryAccept", m_pref_QueryAccept);
 	m_server->SetQueryAccept(m_pref_QueryAccept);
 
 	// marscha@2006 - Is AcceptDialog required even if no user is logged on
-	m_pref_QueryIfNoLogon=LoadInt(appkey, "QueryIfNoLogon", m_pref_QueryIfNoLogon);
+	m_pref_QueryIfNoLogon=myIniFile.ReadInt("admin", "QueryIfNoLogon", m_pref_QueryIfNoLogon);
 	m_server->SetQueryIfNoLogon(m_pref_QueryIfNoLogon);
 
 	// Load the password
-	LoadPassword(appkey, m_pref_passwd);
+	myIniFile.ReadPassword(m_pref_passwd,MAXPWLEN);
 
 	// Remote access prefs
-	m_pref_EnableRemoteInputs=LoadInt(appkey, "InputsEnabled", m_pref_EnableRemoteInputs);
-	m_pref_LockSettings=LoadInt(appkey, "LockSetting", m_pref_LockSettings);
-	m_pref_DisableLocalInputs=LoadInt(appkey, "LocalInputsDisabled", m_pref_DisableLocalInputs);
+	m_pref_EnableRemoteInputs=myIniFile.ReadInt("admin", "InputsEnabled", m_pref_EnableRemoteInputs);
+	m_pref_LockSettings=myIniFile.ReadInt("admin", "LockSetting", m_pref_LockSettings);
+	m_pref_DisableLocalInputs=myIniFile.ReadInt("admin", "LocalInputsDisabled", m_pref_DisableLocalInputs);
 }
 
 void
@@ -1544,183 +1221,78 @@ vncProperties::ApplyUserPrefs()
 }
 
 void
-vncProperties::SaveInt(HKEY key, LPCSTR valname, LONG val)
-{
-	RegSetValueEx(key, valname, 0, REG_DWORD, (LPBYTE) &val, sizeof(val));
-}
-
-void
-vncProperties::SavePassword(HKEY key, char *buffer)
-{
-	RegSetValueEx(key, "Password", 0, REG_BINARY, (LPBYTE) buffer, MAXPWLEN);
-}
-
-void
-vncProperties::SaveDSMPluginName(HKEY key, char *buffer)
-{
-	RegSetValueEx(key, "DSMPlugin", 0, REG_BINARY, (LPBYTE) buffer, MAXPATH);
-}
-
-void
-vncProperties::LoadDSMPluginName(HKEY key, char *buffer)
-{
-	DWORD type = REG_BINARY;
-	int slen=MAXPATH;
-	char inouttext[MAXPATH];
-
-	if (RegQueryValueEx(key,
-		"DSMPlugin",
-		NULL,
-		&type,
-		(LPBYTE) &inouttext,
-		(LPDWORD) &slen) != ERROR_SUCCESS)
-		return;
-
-	if (slen > MAXPATH)
-		return;
-
-	memcpy(buffer, inouttext, MAXPATH);
-}
-
-void
 vncProperties::Save()
 {
-	HKEY appkey;
 	DWORD dw;
 
 	if (!m_allowproperties  || !RunningAsAdministrator ())
 		return;
 
-	// NEW (R3) PREFERENCES ALGORITHM
-	// The user's prefs are only saved if the user is allowed to override
-	// the machine-local settings specified for them.  Otherwise, the
-	// properties entry on the tray icon menu will be greyed out.
-
-	// GET THE CORRECT KEY TO READ FROM
-
-	// Have we loaded user settings, or system settings?
-	if (m_usersettings) {
-		// Verify that we know who is logged on
-		char username[UNLEN+1];
-		if (!vncService::CurrentUser((char *)&username, sizeof(username)))
-			return;
-		if (strcmp(username, "") == 0)
-			return;
-
-		// Try to get the per-user, global registry key for WinVNC
-		if (RegCreateKeyEx(HKEY_CURRENT_USER,
-			WINVNC_REGISTRY_KEY,
-			0, REG_NONE, REG_OPTION_NON_VOLATILE,
-			KEY_WRITE | KEY_READ, NULL, &appkey, &dw) != ERROR_SUCCESS)
-			return;
-	} else {
-		// Try to get the default local registry key for WinVNC
-		HKEY hkLocal;
-		if (RegCreateKeyEx(HKEY_LOCAL_MACHINE,
-			WINVNC_REGISTRY_KEY,
-			0, REG_NONE, REG_OPTION_NON_VOLATILE,
-			KEY_READ, NULL, &hkLocal, &dw) != ERROR_SUCCESS) {
-			MessageBox(NULL, sz_ID_MB1, sz_ID_WVNC, MB_OK);
-			return;
-		}
-
-		if (RegCreateKeyEx(hkLocal,
-			"Default",
-			0, REG_NONE, REG_OPTION_NON_VOLATILE,
-			KEY_WRITE | KEY_READ, NULL, &appkey, &dw) != ERROR_SUCCESS) {
-			RegCloseKey(hkLocal);
-			return;
-		}
-		RegCloseKey(hkLocal);
-	}
-
 	// SAVE PER-USER PREFS IF ALLOWED
-	SaveUserPrefs(appkey);
-	RegCloseKey(appkey);
-	RegCloseKey(HKEY_CURRENT_USER);
+	SaveUserPrefs();
+	myIniFile.WriteInt("admin", "DebugMode", vnclog.GetMode());
+	myIniFile.WriteInt("admin", "DebugLevel", vnclog.GetLevel());
+	myIniFile.WriteInt("admin", "AllowLoopback", m_server->LoopbackOk());
+	myIniFile.WriteInt("admin", "LoopbackOnly", m_server->LoopbackOnly());
+	myIniFile.WriteInt("admin", "AllowShutdown", m_allowshutdown);
+	myIniFile.WriteInt("admin", "AllowProperties",  m_allowproperties);
+	myIniFile.WriteInt("admin", "AllowEditClients", m_alloweditclients);
 
-	// Machine Preferences
-	// Get the machine registry key for WinVNC
-	HKEY hkLocal,hkDefault;
-	if (RegCreateKeyEx(HKEY_LOCAL_MACHINE,
-		WINVNC_REGISTRY_KEY,
-		0, REG_NONE, REG_OPTION_NON_VOLATILE,
-		KEY_WRITE | KEY_READ, NULL, &hkLocal, &dw) != ERROR_SUCCESS)
-		return;
-	if (RegCreateKeyEx(hkLocal,
-		"Default",
-		0, REG_NONE, REG_OPTION_NON_VOLATILE,
-		KEY_WRITE | KEY_READ,
-		NULL,
-		&hkDefault,
-		&dw) != ERROR_SUCCESS)
-		hkDefault = NULL;
-	// sf@2003
-	SaveInt(hkLocal, "DebugMode", vnclog.GetMode());
-	SaveInt(hkLocal, "DebugLevel", vnclog.GetLevel());
-	SaveInt(hkLocal, "AllowLoopback", m_server->LoopbackOk());
-	SaveInt(hkLocal, "LoopbackOnly", m_server->LoopbackOnly());
-	if (hkDefault) SaveInt(hkDefault, "AllowShutdown", m_allowshutdown);
-	if (hkDefault) SaveInt(hkDefault, "AllowProperties",  m_allowproperties);
-	if (hkDefault) SaveInt(hkDefault, "AllowEditClients", m_alloweditclients);
-
-	SaveInt(hkLocal, "DisableTrayIcon", m_server->GetDisableTrayIcon());
-	SaveInt(hkLocal, "MSLogonRequired", m_server->MSLogonRequired());
+	myIniFile.WriteInt("admin", "DisableTrayIcon", m_server->GetDisableTrayIcon());
+	myIniFile.WriteInt("admin", "MSLogonRequired", m_server->MSLogonRequired());
 	// Marscha@2004 - authSSP: save "New MS-Logon" state
-	SaveInt(hkLocal, "NewMSLogon", m_server->GetNewMSLogon());
+	myIniFile.WriteInt("admin", "NewMSLogon", m_server->GetNewMSLogon());
 	// sf@2003 - DSM params here
-	SaveInt(hkLocal, "UseDSMPlugin", m_server->IsDSMPluginEnabled());
-	SaveInt(hkLocal, "ConnectPriority", m_server->ConnectPriority());
-	SaveDSMPluginName(hkLocal, m_server->GetDSMPluginName());
-	RegCloseKey(hkDefault);
-	RegCloseKey(hkLocal);
+	myIniFile.WriteInt("admin", "UseDSMPlugin", m_server->IsDSMPluginEnabled());
+	myIniFile.WriteInt("admin", "ConnectPriority", m_server->ConnectPriority());
+	myIniFile.WriteString("admin", "DSMPlugin",m_server->GetDSMPluginName());
 }
 
 void
-vncProperties::SaveUserPrefs(HKEY appkey)
+vncProperties::SaveUserPrefs()
 {
 	// SAVE THE PER USER PREFS
 	vnclog.Print(LL_INTINFO, VNCLOG("saving current settings to registry\n"));
 
 	// Modif sf@2002
-	SaveInt(appkey, "FileTransferEnabled", m_server->FileTransferEnabled());
-	SaveInt(appkey, "FTUserImpersonation", m_server->FTUserImpersonation()); // sf@2005
-	SaveInt(appkey, "BlankMonitorEnabled", m_server->BlankMonitorEnabled());
-	SaveInt(appkey, "CaptureAlphaBlending", m_server->CaptureAlphaBlending()); // sf@2005
-	SaveInt(appkey, "BlackAlphaBlending", m_server->BlackAlphaBlending()); // sf@2005
+	myIniFile.WriteInt("admin", "FileTransferEnabled", m_server->FileTransferEnabled());
+	myIniFile.WriteInt("admin", "FTUserImpersonation", m_server->FTUserImpersonation()); // sf@2005
+	myIniFile.WriteInt("admin", "BlankMonitorEnabled", m_server->BlankMonitorEnabled());
+	myIniFile.WriteInt("admin", "CaptureAlphaBlending", m_server->CaptureAlphaBlending()); // sf@2005
+	myIniFile.WriteInt("admin", "BlackAlphaBlending", m_server->BlackAlphaBlending()); // sf@2005
 
-	SaveInt(appkey, "DefaultScale", m_server->GetDefaultScale());
+	myIniFile.WriteInt("admin", "DefaultScale", m_server->GetDefaultScale());
 
-	SaveInt(appkey, "UseDSMPlugin", m_server->IsDSMPluginEnabled());
-	SaveDSMPluginName(appkey, m_server->GetDSMPluginName());
+	myIniFile.WriteInt("admin", "UseDSMPlugin", m_server->IsDSMPluginEnabled());
+	myIniFile.WriteString("admin", "DSMPlugin",m_server->GetDSMPluginName());
 
 	// Connection prefs
-	SaveInt(appkey, "SocketConnect", m_server->SockConnected());
-	SaveInt(appkey, "HTTPConnect", m_server->HTTPConnectEnabled());
-	SaveInt(appkey, "XDMCPConnect", m_server->XDMCPConnectEnabled());
-	SaveInt(appkey, "AutoPortSelect", m_server->AutoPortSelect());
+	myIniFile.WriteInt("admin", "SocketConnect", m_server->SockConnected());
+	myIniFile.WriteInt("admin", "HTTPConnect", m_server->HTTPConnectEnabled());
+	myIniFile.WriteInt("admin", "XDMCPConnect", m_server->XDMCPConnectEnabled());
+	myIniFile.WriteInt("admin", "AutoPortSelect", m_server->AutoPortSelect());
 	if (!m_server->AutoPortSelect()) {
-		SaveInt(appkey, "PortNumber", m_server->GetPort());
-		SaveInt(appkey, "HTTPPortNumber", m_server->GetHttpPort());
+		myIniFile.WriteInt("admin", "PortNumber", m_server->GetPort());
+		myIniFile.WriteInt("admin", "HTTPPortNumber", m_server->GetHttpPort());
 	}
-	SaveInt(appkey, "InputsEnabled", m_server->RemoteInputsEnabled());
-	SaveInt(appkey, "LocalInputsDisabled", m_server->LocalInputsDisabled());
-	SaveInt(appkey, "IdleTimeout", m_server->AutoIdleDisconnectTimeout());
+	myIniFile.WriteInt("admin", "InputsEnabled", m_server->RemoteInputsEnabled());
+	myIniFile.WriteInt("admin", "LocalInputsDisabled", m_server->LocalInputsDisabled());
+	myIniFile.WriteInt("admin", "IdleTimeout", m_server->AutoIdleDisconnectTimeout());
 
 	// Connection querying settings
-	SaveInt(appkey, "QuerySetting", m_server->QuerySetting());
-	SaveInt(appkey, "QueryTimeout", m_server->QueryTimeout());
-	SaveInt(appkey, "QueryAccept", m_server->QueryAccept());
+	myIniFile.WriteInt("admin", "QuerySetting", m_server->QuerySetting());
+	myIniFile.WriteInt("admin", "QueryTimeout", m_server->QueryTimeout());
+	myIniFile.WriteInt("admin", "QueryAccept", m_server->QueryAccept());
 
 	// Lock settings
-	SaveInt(appkey, "LockSetting", m_server->LockSettings());
+	myIniFile.WriteInt("admin", "LockSetting", m_server->LockSettings());
 
 	// Wallpaper removal
-	SaveInt(appkey, "RemoveWallpaper", m_server->RemoveWallpaperEnabled());
+	myIniFile.WriteInt("admin", "RemoveWallpaper", m_server->RemoveWallpaperEnabled());
 
 	// Save the password
 	char passwd[MAXPWLEN];
 	m_server->GetPassword(passwd);
-	SavePassword(appkey, passwd);
+	myIniFile.WritePassword(passwd);
 }
 

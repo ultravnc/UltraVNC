@@ -163,6 +163,10 @@ SOURCE=.\HideDesktop.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\inifile.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\lzo\minilzo.c
 # End Source File
 # Begin Source File
@@ -491,6 +495,10 @@ SOURCE=..\..\DSMPlugin\DSMPlugin.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\inifile.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\keysymdef.h
 # End Source File
 # Begin Source File
@@ -508,6 +516,10 @@ SOURCE=.\rfb.h
 # Begin Source File
 
 SOURCE=.\rfbMisc.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\rfb\rfbproto.h
 # End Source File
 # Begin Source File
 

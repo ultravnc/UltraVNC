@@ -1201,6 +1201,7 @@ vncServer::SockConnect(BOOL On)
 	else
 	{
 		// *** JNW - Trying to fix up a lock-up when the listening socket closes
+		vnclog.Print(LL_INTINFO, VNCLOG("KillAuthClients() fix up a lock-up \n"));
 		KillAuthClients();
 		KillUnauthClients();
 		WaitUntilAuthEmpty();
