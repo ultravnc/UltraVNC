@@ -1,0 +1,87 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: vncviewer - Win32 Debug--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\Sam\LOCALS~1\Temp\RSPFE4.tmp" with contents
+[
+/nologo /MTd /W3 /Gm /GX /Zi /Od /I "omnithread" /I ".." /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "__NT__" /D "_WINSTATIC" /D "__WIN32__" /FR"Debug/" /Fp"Debug/vncviewer.pch" /YX"stdhdrs.h" /Fo"Debug/" /Fd"Debug/" /FD /c 
+"S:\UltraVNC\vncviewer\FileTransfer.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\Sam\LOCALS~1\Temp\RSPFE4.tmp" 
+Creating temporary file "C:\DOCUME~1\Sam\LOCALS~1\Temp\RSPFE5.bat" with contents
+[
+@echo off
+cl /nologo /MTd /FoDebug\ /FdDebug\ /c buildtime.cpp
+]
+Creating command line "C:\DOCUME~1\Sam\LOCALS~1\Temp\RSPFE5.bat"
+Compiling...
+FileTransfer.cpp
+Creating temporary file "C:\DOCUME~1\Sam\LOCALS~1\Temp\RSPFE6.tmp" with contents
+[
+ole32.lib oleaut32.lib comctl32.lib winmm.lib omnithread.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib uuid.lib wsock32.lib /nologo /subsystem:windows /profile /map:"Debug/vncviewer.map" /debug /machine:I386 /out:"Debug/vncviewer.exe" /libpath:"./omnithread/Debug" 
+.\Debug\AboutBox.obj
+.\Debug\AccelKeys.obj
+.\Debug\AuthDialog.obj
+.\Debug\buildtime.obj
+.\Debug\ClientConnection.obj
+.\Debug\ClientConnectionCacheRect.obj
+.\Debug\ClientConnectionClipboard.obj
+.\Debug\ClientConnectionCopyRect.obj
+.\Debug\ClientConnectionCoRRE.obj
+.\Debug\ClientConnectionCursor.obj
+.\Debug\ClientConnectionFile.obj
+.\Debug\ClientConnectionFullScreen.obj
+.\Debug\ClientConnectionHextile.obj
+.\Debug\ClientConnectionRaw.obj
+.\Debug\ClientConnectionRRE.obj
+.\Debug\ClientConnectionTight.obj
+.\Debug\ClientConnectionUltra.obj
+.\Debug\ClientConnectionZlib.obj
+.\Debug\ClientConnectionZlibHex.obj
+.\Debug\d3des.obj
+.\Debug\dh.obj
+.\Debug\Daemon.obj
+.\Debug\DSMPlugin.obj
+.\Debug\Exception.obj
+.\Debug\FileTransfer.obj
+.\Debug\Flasher.obj
+.\Debug\FullScreenTitleBar.obj
+.\Debug\KeyMap.obj
+.\Debug\Log.obj
+.\Debug\LowLevelHook.obj
+.\Debug\minilzo.obj
+.\Debug\MRU.obj
+.\Debug\SessionDialog.obj
+.\Debug\stdhdrs.obj
+.\Debug\TextChat.obj
+.\Debug\vncauth.obj
+.\Debug\VNCOptions.obj
+.\Debug\vncviewer.obj
+.\Debug\VNCviewerApp.obj
+.\Debug\VNCviewerApp32.obj
+.\Debug\ZipUnzip32.obj
+.\Debug\zrle.obj
+.\Debug\vncviewer.res
+.\omnithread\Debug\omnithread.lib
+\UltraVNC\rdr\Debug\rdr.lib
+\UltraVNC\zlib\Debug\zlib.lib
+\UltraVNC\libjpeg\Debug\libjpeg.lib
+]
+Creating command line "link.exe @C:\DOCUME~1\Sam\LOCALS~1\Temp\RSPFE6.tmp"
+Setting build time...
+buildtime.cpp
+<h3>Output Window</h3>
+Linking...
+LINK : warning LNK4098: defaultlib "LIBCD" conflicts with use of other libs; use /NODEFAULTLIB:library
+
+
+
+<h3>Results</h3>
+vncviewer.exe - 0 error(s), 1 warning(s)
+</pre>
+</body>
+</html>
