@@ -346,10 +346,10 @@ vncPropertiesPoll::Load()
 		return;
 	}
 	
-	m_pref_TurboMode = FALSE;
+	m_pref_TurboMode = TRUE;
 	m_pref_PollUnderCursor=FALSE;
 	m_pref_PollForeground=TRUE;
-	m_pref_PollFullScreen=TRUE;
+	m_pref_PollFullScreen=FALSE;
 	m_pref_PollConsoleOnly=FALSE;
 	m_pref_PollOnEventOnly=TRUE;
 	m_pref_Driver=CheckVideoDriver(0);
