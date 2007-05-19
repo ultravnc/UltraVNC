@@ -641,7 +641,89 @@ public:
           ((GetAsyncKeyState(VK_MENU) & 0x8000) != 0) &&
           vncService::IsWinNT())
       {
-        vncService::SimulateCtrlAltDel();
+
+		if (vncService::VersionMajor()>=6 && vncService::RunningAsApplication0System() )
+		{
+				vncKeymap::ClearShiftKeys();
+				keybd_event( VK_TAB, MapVirtualKey(VK_TAB, 0),0, 0);
+				keybd_event( VK_TAB, MapVirtualKey(VK_TAB, 0),KEYEVENTF_KEYUP, 0);
+
+				keybd_event( 13, MapVirtualKey(13, 0),0, 0);
+				keybd_event( 13, MapVirtualKey(13, 0),KEYEVENTF_KEYUP, 0);
+
+				Sleep(300);
+
+				keybd_event( VK_TAB, MapVirtualKey(VK_TAB, 0),0, 0);
+				keybd_event( VK_TAB, MapVirtualKey(VK_TAB, 0),KEYEVENTF_KEYUP, 0);
+Sleep(50);
+				keybd_event( VK_TAB, MapVirtualKey(VK_TAB, 0),0, 0);
+				keybd_event( VK_TAB, MapVirtualKey(VK_TAB, 0),KEYEVENTF_KEYUP, 0);
+Sleep(50);
+				keybd_event( VK_TAB, MapVirtualKey(VK_TAB, 0),0, 0);
+				keybd_event( VK_TAB, MapVirtualKey(VK_TAB, 0),KEYEVENTF_KEYUP, 0);
+Sleep(50);
+				keybd_event( VK_TAB, MapVirtualKey(VK_TAB, 0),0, 0);
+				keybd_event( VK_TAB, MapVirtualKey(VK_TAB, 0),KEYEVENTF_KEYUP, 0);
+Sleep(50);
+				keybd_event( VK_SPACE, MapVirtualKey(VK_SPACE, 0),0, 0);
+				keybd_event( VK_SPACE, MapVirtualKey(VK_SPACE, 0),KEYEVENTF_KEYUP, 0);
+Sleep(50);
+				keybd_event( 13, MapVirtualKey(13, 0),0, 0);
+				keybd_event( 13, MapVirtualKey(13, 0),KEYEVENTF_KEYUP, 0);
+
+				HWND hOsk = FindWindow("OSKMainClass", NULL);
+				if (hOsk==NULL)
+				{
+					Sleep(1000);
+					hOsk = FindWindow("OSKMainClass", NULL);
+				}
+				if (hOsk==NULL)
+				{
+					Sleep(1000);
+					hOsk = FindWindow("OSKMainClass", NULL);
+				}
+				if (hOsk) 
+				{
+					RECT Rect; 
+					POINT MouseOrigPos; 
+					int nDestx, nDesty; 
+					GetCursorPos(&MouseOrigPos); 
+					GetWindowRect(hOsk, &Rect); 
+					nDestx = Rect.left + 30; 
+					nDesty = Rect.top + 175; 
+					SetCursorPos(nDestx, nDesty); 
+					::mouse_event(MOUSEEVENTF_ABSOLUTE|MOUSEEVENTF_LEFTDOWN, nDestx, nDesty, NULL, NULL); 
+					::mouse_event(MOUSEEVENTF_ABSOLUTE|MOUSEEVENTF_LEFTUP, nDestx, 
+					nDesty, NULL, NULL); 
+					nDestx = Rect.left + 97; 
+					nDesty = Rect.top + 175; 
+					SetCursorPos(nDestx, nDesty); 
+					::mouse_event(MOUSEEVENTF_ABSOLUTE|MOUSEEVENTF_LEFTDOWN, nDestx, nDesty, NULL, NULL); 
+					::mouse_event(MOUSEEVENTF_ABSOLUTE|MOUSEEVENTF_LEFTUP, nDestx, nDesty, NULL, NULL); 
+
+					nDestx = Rect.left + 430; 
+					nDesty = Rect.top + 110; 
+					SetCursorPos(nDestx, nDesty); 
+					::mouse_event(MOUSEEVENTF_ABSOLUTE|MOUSEEVENTF_LEFTDOWN, nDestx, nDesty, NULL, NULL); 
+					::mouse_event(MOUSEEVENTF_ABSOLUTE|MOUSEEVENTF_LEFTUP, nDestx, nDesty, NULL, NULL); 
+
+					SetCursorPos(MouseOrigPos.x, MouseOrigPos.y); 
+					Sleep(250);
+
+					hOsk = FindWindow("OSKMainClass", NULL);
+					DestroyWindow(hOsk);
+					CloseWindow(hOsk);
+					SendMessage(hOsk,WM_CLOSE,0,0);
+				}
+		}
+		else if (vncService::VersionMajor()>=6)
+		{
+			WinExec("taskmgr.exe", SW_SHOWNORMAL);
+		}
+		else
+		{
+			vncService::SimulateCtrlAltDel();
+		}
         return;
       }
 
