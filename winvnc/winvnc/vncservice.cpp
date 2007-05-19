@@ -57,7 +57,7 @@ DWORD	g_platform_id;
 BOOL	g_impersonating_user = 0;
 DWORD	g_version_major;
 DWORD	g_version_minor;
-
+BOOL	m_fRunningAsApplication0System;
 
 
 
@@ -485,7 +485,6 @@ SimulateCtrlAltDelThreadFn(void *context)
 	// Switch back to our original desktop
 	if (old_desktop != NULL)
 		vncService::SelectHDESK(old_desktop);
-
 	return NULL;
 }
 
@@ -1379,5 +1378,18 @@ void LogErrorMsg(char *message)
 
 		DeregisterEventSource(heventsrc);
 	}
+}
+
+BOOL 
+vncService::RunningAsApplication0System()
+{
+	return m_fRunningAsApplication0System;
+}
+
+
+void 
+vncService::RunningAsApplication0System(BOOL fEnabled)
+{
+	m_fRunningAsApplication0System = fEnabled;
 }
 
