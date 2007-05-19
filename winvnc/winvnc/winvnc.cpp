@@ -252,6 +252,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 		{
 			fRunningAsApplication0System = true;
 			if (!InputDesktopSelected()) return 0;
+			vncService::RunningAsApplication0System(true); 
 			return WinVNCAppMain();
 		}
 
@@ -259,6 +260,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 		{
 			fRunningAsApplication0User = true;
 			if (!InputDesktopSelected()) return 0;
+			vncService::RunningAsApplication0System(false); 
 			return WinVNCAppMain();
 		}
 
