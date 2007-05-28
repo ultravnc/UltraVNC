@@ -186,7 +186,7 @@ static void gettimeofday(struct timeval* tv, void*)
   } else {
     struct timeb tb;
     ftime(&tb);
-    tv->tv_sec = tb.time;
+    tv->tv_sec = (long)tb.time;
     tv->tv_usec = tb.millitm * 1000;
   }
 }
