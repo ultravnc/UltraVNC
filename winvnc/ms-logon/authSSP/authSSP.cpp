@@ -106,11 +106,11 @@ BOOL WINAPI SSPLogonUser(LPTSTR szDomain,
 		// but I found no MS documentation for this 'feature'.
 		ZeroMemory(&ai, sizeof(ai));
 #if defined(UNICODE) || defined(_UNICODE)
-		ai.Domain = szDomain;
+		ai.Domain = (unsigned short *)szDomain;
 		ai.DomainLength = lstrlen(szDomain);
-		ai.User = szUser;
+		ai.User = (unsigned short *)szUser;
 		ai.UserLength = lstrlen(szUser);
-		ai.Password = szPassword;
+		ai.Password = (unsigned short *)szPassword;
 		ai.PasswordLength = lstrlen(szPassword);
 		ai.Flags = SEC_WINNT_AUTH_IDENTITY_UNICODE;
 #else      
