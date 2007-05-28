@@ -36,7 +36,9 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include <WinInet.h> // Shell object uses INTERNET_MAX_URL_LENGTH (go figure)
+#if _MSC_VER < 1400
 #define _WIN32_IE 0x0400
+#endif
 #include <atlbase.h> // ATL smart pointers
 #include <shlguid.h> // shell GUIDs
 #include <shlobj.h>  // IActiveDesktop

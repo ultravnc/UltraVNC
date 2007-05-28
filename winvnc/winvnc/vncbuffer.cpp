@@ -839,8 +839,8 @@ void vncBuffer::GreyScaleRect(rfb::Rect &rect)
 			lBlue  = (lPixel >> m_scrinfo.format.blueShift) & m_scrinfo.format.blueMax;
 			lPixel = To8GreyColors(lRed, lGreen, lBlue);
 			
-			for (b = 0; b < nBytesPerPixel; b++)
-				pMain[(x * nBytesPerPixel) + b] = (lPixel >> (8 * b)) & 0xFF;
+			for (int bb = 0; bb < nBytesPerPixel; bb++)
+				pMain[(x * nBytesPerPixel) + bb] = (lPixel >> (8 * bb)) & 0xFF;
 		}
 		pMain += m_bytesPerRow;
 	}

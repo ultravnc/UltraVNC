@@ -205,7 +205,7 @@ BOOL vncService::IsWSLocked()
 
 		CloseDesktop(hDesk);
 
-		if (stricmp(sName,"Default") != 0)
+		if (_stricmp(sName,"Default") != 0)
 			 bLocked = true; // WS is locked or screen saver active
 		else
 			 bLocked = false ;

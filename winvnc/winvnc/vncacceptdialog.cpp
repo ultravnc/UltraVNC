@@ -39,7 +39,7 @@
 vncAcceptDialog::vncAcceptDialog(UINT timeoutSecs,BOOL acceptOnTimeout, const char *ipAddress)
 {
 	m_timeoutSecs = timeoutSecs;
-	m_ipAddress = strdup(ipAddress);
+	m_ipAddress = _strdup(ipAddress);
 	m_foreground_hack=FALSE;
 	m_acceptOnTimeout = acceptOnTimeout;
 }

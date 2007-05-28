@@ -367,7 +367,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 				{
 					strncpy( pszId, &(szCmdLine[start]), end - start );
 					pszId[ end - start ] = 0;
-					pszId = strupr( pszId );
+					pszId = _strupr( pszId );
 				}
 
 				i += strlen( pszId );

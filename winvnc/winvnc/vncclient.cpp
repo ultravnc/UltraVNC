@@ -621,8 +621,8 @@ vncClientThread::InitAuthenticate()
 	// By default we filter out local loop connections, because they're pointless
 	if (!m_server->LoopbackOk())
 	{
-		char *localname = strdup(m_socket->GetSockName());
-		char *remotename = strdup(m_socket->GetPeerName());
+		char *localname = _strdup(m_socket->GetSockName());
+		char *remotename = _strdup(m_socket->GetPeerName());
 
 		// Check that the local & remote names are different!
 		if ((localname != NULL) && (remotename != NULL))
@@ -656,8 +656,8 @@ vncClientThread::InitAuthenticate()
 	}
 	else
 	{
-		char *localname = strdup(m_socket->GetSockName());
-		char *remotename = strdup(m_socket->GetPeerName());
+		char *localname = _strdup(m_socket->GetSockName());
+		char *remotename = _strdup(m_socket->GetPeerName());
 
 		// Check that the local & remote names are different!
 		if ((localname != NULL) && (remotename != NULL))
@@ -2339,11 +2339,11 @@ vncClientThread::run(void *arg)
 									int nFolder = -1;
 									char szP[MAX_PATH + 2];
 									bool fShortError = false;
-									if (!strnicmp(szDir, "My Documents", 11))
+									if (!_strnicmp(szDir, "My Documents", 11))
 										nFolder = CSIDL_PERSONAL;
-									if (!strnicmp(szDir, "Desktop", 7))
+									if (!_strnicmp(szDir, "Desktop", 7))
 										nFolder = CSIDL_DESKTOP;
-									if (!strnicmp(szDir, "Network Favorites", 17))
+									if (!_strnicmp(szDir, "Network Favorites", 17))
 										nFolder = CSIDL_NETHOOD;
 
 									if (nFolder != -1)
@@ -2862,9 +2862,9 @@ vncClient::Init(vncServer *server,
 	// Save the name of the connecting client
 	char *name = m_socket->GetPeerName();
 	if (name != 0)
-		m_client_name = strdup(name);
+		m_client_name = _strdup(name);
 	else
-		m_client_name = strdup("<unknown>");
+		m_client_name = _strdup("<unknown>");
 
 	// Save the client id
 	m_id = newid;
@@ -2952,7 +2952,7 @@ vncClient::UpdateClipText(const char* text)
 		free(m_clipboard_text);
 		m_clipboard_text = 0;
 	}
-	m_clipboard_text = strdup(text);
+	m_clipboard_text = _strdup(text);
 	TriggerUpdateThread();
 }
 

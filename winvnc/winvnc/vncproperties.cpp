@@ -914,7 +914,7 @@ vncProperties::DialogProc(HWND hwnd,
 						// sf@2003 - We check if the loaded plugin is the same than
 						// the currently selected one or not
 						_this->m_server->GetDSMPluginPointer()->DescribePlugin();
-						if (stricmp(_this->m_server->GetDSMPluginPointer()->GetPluginFileName(), szPlugin))
+						if (_stricmp(_this->m_server->GetDSMPluginPointer()->GetPluginFileName(), szPlugin))
 						{
 							_this->m_server->GetDSMPluginPointer()->UnloadPlugin();
 							_this->m_server->GetDSMPluginPointer()->LoadPlugin(szPlugin, false);
@@ -1006,7 +1006,6 @@ vncProperties::Load()
 
 	
 	char username[UNLEN+1];
-	DWORD dw;
 
 	// Get the user name / service name
 	if (!vncService::CurrentUser((char *)&username, sizeof(username)))
@@ -1223,7 +1222,6 @@ vncProperties::ApplyUserPrefs()
 void
 vncProperties::Save()
 {
-	DWORD dw;
 
 	if (!m_allowproperties  || !RunningAsAdministrator ())
 		return;

@@ -66,7 +66,7 @@ namespace rfb {
 	class CpuTime {
 	public:
 		CpuTime(const char *name)
-			: timer_name(strdup(name)),
+			: timer_name(_strdup(name)),
 			  kernel_time(0), user_time(0), max_user_time(0), iterations(0) {}
 		~CpuTime() {
 			vnclog.Print(0, "timer %s : %I64ums (krnl), %I64ums (user), %I64uus (user-max) (%I64u its)\n",

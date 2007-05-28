@@ -704,7 +704,7 @@ BOOL CALLBACK EnumWindowsHnd(HWND hwnd, LPARAM arg)
  nRet = GetWindowText(hwnd, buffer, sizeof(buffer));
  if (nRet > 0)
  {
-  if ( !strnicmp(buffer, szNameAppli, lstrlen(szNameAppli)))
+  if ( !_strnicmp(buffer, szNameAppli, lstrlen(szNameAppli)))
   {
        ((vncDesktop*)arg)->m_Single_hWnd = hwnd;
        return FALSE;
@@ -1382,7 +1382,9 @@ vncDesktop::FillDisplayInfo(rfbServerInitMsg *scrinfo)
 	memcpy(scrinfo, &m_scrinfo, sz_rfbServerInitMsg);
 }
 
+#ifndef CAPTUREBLT
 #define CAPTUREBLT  0x40000000
+#endif
 
 // Function to capture an area of the screen immediately prior to sending
 // an update.
@@ -1876,7 +1878,7 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 					if (clipdata == NULL)
 						cliptext = NULL;
 					else
-						cliptext = strdup(clipdata);
+						cliptext = _strdup(clipdata);
 
 					// Release the buffer and close the clipboard
 					GlobalUnlock(cliphandle);

@@ -44,8 +44,8 @@ public:
 	vncTimedMsgBoxThread(const char *caption, const char *title, UINT type)
 	{
 		m_type = type;
-		m_caption = strdup(caption);
-		m_title = strdup(title);
+		m_caption = _strdup(caption);
+		m_title = _strdup(title);
 	};
 	virtual ~vncTimedMsgBoxThread()
 	{

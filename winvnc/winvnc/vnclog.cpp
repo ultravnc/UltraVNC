@@ -98,7 +98,7 @@ void VNCLog::SetFile(const char* filename, bool append)
 	//SetLevel(10);
 	if (m_filename != NULL)
 		free(m_filename);
-	m_filename = strdup(filename);
+	m_filename = _strdup(filename);
 	m_append = append;
 	if (m_tofile)
 		OpenFile();

@@ -10,9 +10,15 @@
 #include <time.h>
 HWND hwnd;
 HINSTANCE hInst;
+#ifndef LWA_COLORKEY
 # define LWA_COLORKEY 1
+#endif
+#ifndef LWA_ALPHA 
 # define LWA_ALPHA 2
+#endif
+#ifndef WS_EX_LAYERED
 # define WS_EX_LAYERED 0x80000
+#endif
 
 
 int wd=0;

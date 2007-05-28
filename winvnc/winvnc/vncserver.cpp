@@ -507,7 +507,7 @@ void vncServer::KillClient(LPSTR szClientName)
 	for (i = m_authClients.begin(); i != m_authClients.end(); i++)
 	{
 		pClient = GetClient(*i);
-		if (!stricmp(pClient->GetClientName(), szClientName))
+		if (!_stricmp(pClient->GetClientName(), szClientName))
 		{
 			vnclog.Print(LL_INTINFO, VNCLOG("Killing client named: %s\n"), szClientName);
 			pClient->Kill();
@@ -529,7 +529,7 @@ void vncServer::TextChatClient(LPSTR szClientName)
 	for (i = m_authClients.begin(); i != m_authClients.end(); i++)
 	{
 		pClient = GetClient(*i);
-		if (!stricmp(pClient->GetClientName(), szClientName))
+		if (!_stricmp(pClient->GetClientName(), szClientName))
 		{
 			if (!pClient->IsUltraViewer())
 			{
@@ -1037,7 +1037,7 @@ vncServer::SetName(const char * name)
 		m_name = NULL;
 	}
 	
-	m_name = strdup(name);
+	m_name = _strdup(name);
 }
 
 // TightVNC 1.2.7
@@ -1460,7 +1460,7 @@ vncServer::SetAuthHosts(const char*hostlist) {
 	if (m_auth_hosts != 0)
 		free(m_auth_hosts);
 
-	m_auth_hosts = strdup(hostlist);
+	m_auth_hosts = _strdup(hostlist);
 }
 
 char*
@@ -1468,9 +1468,9 @@ vncServer::AuthHosts() {
 	omni_mutex_lock l(m_clientsLock);
 
 	if (m_auth_hosts == 0)
-		return strdup("");
+		return _strdup("");
 	else
-		return strdup(m_auth_hosts);
+		return _strdup(m_auth_hosts);
 }
 
 inline BOOL
@@ -1681,7 +1681,7 @@ vncServer::AddAuthHostsBlacklist(const char *machine) {
 	current->_blocked = FALSE;
 	current->_failureCount = 0;
 	current->_lastRefTime.QuadPart = now.QuadPart + 10;
-	current->_machineName = strdup(machine);
+	current->_machineName = _strdup(machine);
 	current->_next = m_blacklist;
 	m_blacklist = current;
 }
@@ -1865,7 +1865,7 @@ BOOL vncServer::SetDSMPlugin(void)
 		// sf@2003 - We check if the loaded plugin is the same than
 		// the currently selected one or not
 		m_pDSMPlugin->DescribePlugin();
-		if (stricmp(m_pDSMPlugin->GetPluginFileName(), GetDSMPluginName()))
+		if (_stricmp(m_pDSMPlugin->GetPluginFileName(), GetDSMPluginName()))
 		{
 			m_pDSMPlugin->SetEnabled(false);
 			m_pDSMPlugin->UnloadPlugin();
@@ -1888,7 +1888,7 @@ BOOL vncServer::SetDSMPlugin(void)
 		char password[MAXPWLEN];
 		GetPassword(password);
 		// Does the plugin need the VNC password to do its job ?
-		if (!stricmp(m_pDSMPlugin->GetPluginParams(), "VNCPasswordNeeded"))
+		if (!_stricmp(m_pDSMPlugin->GetPluginParams(), "VNCPasswordNeeded"))
 			strcpy(szParams, vncDecryptPasswd((char *)password));
 		else
 			strcpy(szParams, "NoPassword");

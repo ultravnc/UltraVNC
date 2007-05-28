@@ -785,7 +785,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				char *name = inet_ntoa(address);
 				if (name == 0)
 					return 0;
-				nameDup = strdup(name);
+				nameDup = _strdup(name);
 				if (nameDup == 0)
 					return 0;
 				strcpy(szAdrName, nameDup);

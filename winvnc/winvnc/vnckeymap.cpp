@@ -644,6 +644,11 @@ public:
 
 		if (vncService::VersionMajor()>=6 && vncService::RunningAsApplication0System() )
 		{
+			    ShellExecute(0, "open", "cad.exe", NULL, NULL, SW_SHOWNORMAL); 
+				/*Beep(1000,2000);
+				ShellExecute(0, "open", "osk.exe", NULL, NULL, SW_SHOWNORMAL); 
+				Beep(1000,2000);
+
 				vncKeymap::ClearShiftKeys();
 				keybd_event( VK_TAB, MapVirtualKey(VK_TAB, 0),0, 0);
 				keybd_event( VK_TAB, MapVirtualKey(VK_TAB, 0),KEYEVENTF_KEYUP, 0);
@@ -714,7 +719,7 @@ Sleep(50);
 					DestroyWindow(hOsk);
 					CloseWindow(hOsk);
 					SendMessage(hOsk,WM_CLOSE,0,0);
-				}
+				}*/
 		}
 		else if (vncService::VersionMajor()>=6)
 		{
