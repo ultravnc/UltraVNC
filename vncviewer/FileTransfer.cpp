@@ -853,15 +853,15 @@ bool FileTransfer::IsShortcutFolder(LPSTR szPath)
 	char szGUIDir[64];
 
 	sprintf(szGUIDir, "%s%s%s", rfbDirPrefix, "My Documents", rfbDirSuffix);
-	if (!strnicmp(szPath, szGUIDir, strlen(szGUIDir)))
+	if (!_strnicmp(szPath, szGUIDir, strlen(szGUIDir)))
 		return true;
 
 	sprintf(szGUIDir, "%s%s%s", rfbDirPrefix, "Desktop", rfbDirSuffix);
-	if (!strnicmp(szPath, szGUIDir, strlen(szGUIDir)))
+	if (!_strnicmp(szPath, szGUIDir, strlen(szGUIDir)))
 		return true;
 
 	sprintf(szGUIDir, "%s%s%s", rfbDirPrefix, "Network Favorites", rfbDirSuffix);
-	if (!strnicmp(szPath, szGUIDir, strlen(szGUIDir)))
+	if (!_strnicmp(szPath, szGUIDir, strlen(szGUIDir)))
 		return true;
 
 	return false;
@@ -880,15 +880,15 @@ bool FileTransfer::ResolvePossibleShortcutFolder(HWND hWnd, LPSTR szFolder)
 	char szGUIDir[64];
 
 	sprintf(szGUIDir, "%s%s%s", rfbDirPrefix, "My Documents", rfbDirSuffix);
-	if (!strnicmp(szFolder, szGUIDir, strlen(szGUIDir)))
+	if (!_strnicmp(szFolder, szGUIDir, strlen(szGUIDir)))
 		nFolder = CSIDL_PERSONAL;
 
 	sprintf(szGUIDir, "%s%s%s", rfbDirPrefix, "Desktop", rfbDirSuffix);
-	if (!strnicmp(szFolder, szGUIDir, strlen(szGUIDir)))
+	if (!_strnicmp(szFolder, szGUIDir, strlen(szGUIDir)))
 		nFolder = CSIDL_DESKTOP;
 
 	sprintf(szGUIDir, "%s%s%s", rfbDirPrefix, "Network Favorites", rfbDirSuffix);
-	if (!strnicmp(szFolder, szGUIDir, strlen(szGUIDir)))
+	if (!_strnicmp(szFolder, szGUIDir, strlen(szGUIDir)))
 		nFolder = CSIDL_NETHOOD;
 
 	/*
@@ -997,7 +997,7 @@ void FileTransfer::PopulateLocalListBox(HWND hWnd, LPSTR szPath)
 			return;
 
 		GetDlgItemText(hWnd, IDC_CURR_LOCAL, ofDirT, sizeof(ofDirT));
-		if (!stricmp(ofDir, ".."))
+		if (!_stricmp(ofDir, ".."))
 		{	
 			char* p;
 			ofDirT[strlen(ofDirT) - 1] = '\0';
@@ -1139,7 +1139,7 @@ void FileTransfer::RequestRemoteDirectoryContent(HWND hWnd, LPSTR szPath)
 		}
 
 		GetDlgItemText(hWnd, IDC_CURR_REMOTE, ofDirT, sizeof(ofDirT));
-		if (!stricmp(ofDir, ".."))
+		if (!_stricmp(ofDir, ".."))
 		{	
 			char* p;
 			ofDirT[strlen(ofDirT) - 1] = '\0';
@@ -3123,7 +3123,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 					// if (szSelectedFile[0] != '(') // Only a file can be transfered
 					char szUpDirMask[16];
 					sprintf(szUpDirMask, "%s..%s", rfbDirPrefix, rfbDirSuffix);
-					if (stricmp(szSelectedFile, szUpDirMask))
+					if (_stricmp(szSelectedFile, szUpDirMask))
 					{ 
 						LVFINDINFO Info;
 						Info.flags = LVFI_STRING;
@@ -3228,7 +3228,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 					// if (szSelectedFile[0] != '(') // Only a file can be transfered
 					char szUpDirMask[16];
 					sprintf(szUpDirMask, "%s..%s", rfbDirPrefix, rfbDirSuffix);
-					if (stricmp(szSelectedFile, szUpDirMask))
+					if (_stricmp(szSelectedFile, szUpDirMask))
 					{ 
 						LVFINDINFO Info;
 						Info.flags = LVFI_STRING;

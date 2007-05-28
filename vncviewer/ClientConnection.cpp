@@ -1182,7 +1182,7 @@ void ClientConnection::SetDSMPluginStuff()
 		char szParams[256+16];
 
 		// Does the plugin need the VNC password to do its job ?
-		if (!stricmp(m_pDSMPlugin->GetPluginParams(), "VNCPasswordNeeded"))
+		if (!_stricmp(m_pDSMPlugin->GetPluginParams(), "VNCPasswordNeeded"))
 		{
 			// Yes. The user must enter the VNC password
 			// He won't be prompted again for password if ms_logon is not used.
@@ -1694,7 +1694,7 @@ void ClientConnection::NegotiateProxy()
 	if (strcmp(tmphost,"")!=NULL)
 	{
 	_tcscat(tmphost,":");
-	_tcscat(tmphost,itoa(m_port,tmphost2,10));
+	_tcscat(tmphost,_itoa(m_port,tmphost2,10));
 	}
     WriteExactProxy(tmphost,MAX_HOST_NAME_LEN);
 
@@ -2499,12 +2499,12 @@ void ClientConnection::Createdib()
 			rgbQ[i].r = ((((i >> m_myFormat.redShift) & m_myFormat.redMax) * 65535) + m_myFormat.redMax/2) / m_myFormat.redMax;
 		 }
 
-	for (i=0; i<256; i++)
+	for (int ii=0; ii<256; ii++)
 	{
-		bi.color[i].rgbRed      = rgbQ[i].r >> 8;
-		bi.color[i].rgbGreen    = rgbQ[i].g >> 8;
-		bi.color[i].rgbBlue     = rgbQ[i].b >> 8;
-		bi.color[i].rgbReserved = 0;
+		bi.color[ii].rgbRed      = rgbQ[ii].r >> 8;
+		bi.color[ii].rgbGreen    = rgbQ[ii].g >> 8;
+		bi.color[ii].rgbBlue     = rgbQ[ii].b >> 8;
+		bi.color[ii].rgbReserved = 0;
 	}
 	SetDIBColorTable(m_hmemdc, 0, 256, bi.color);
 	}
@@ -3190,7 +3190,7 @@ void ClientConnection::ShowConnInfo()
 		m_desktopName, m_host, m_port,
 		strcmp(m_proxyhost,"") ? m_proxyhost : "", 
 		strcmp(m_proxyhost,"") ? "Port" : "", 
-		strcmp(m_proxyhost,"") ? itoa(m_proxyport, num, 10) : "", 
+		strcmp(m_proxyhost,"") ? _itoa(m_proxyport, num, 10) : "", 
 		m_si.framebufferWidth, m_si.framebufferHeight,
                 m_si.format.depth,
 		m_myFormat.depth, kbitsPerSecond,

@@ -132,7 +132,7 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 			if (strcmp(tmphost,"")!=NULL)
 			{
 			_tcscat(tmphost,":");
-			_tcscat(tmphost,itoa(_this->m_pOpt->m_proxyport,tmphost2,10));
+			_tcscat(tmphost,_itoa(_this->m_pOpt->m_proxyport,tmphost2,10));
 			SetDlgItemText(hwnd, IDC_PROXY_EDIT, tmphost);
 			}
 
@@ -267,7 +267,7 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 					// But we must first check that the loaded plugin is the same that 
 					// the one currently selected...
 					_this->m_pDSMPlugin->DescribePlugin();
-					if (stricmp(_this->m_pDSMPlugin->GetPluginFileName(), szPlugin))
+					if (_stricmp(_this->m_pDSMPlugin->GetPluginFileName(), szPlugin))
 					{
 						// Unload the previous plugin
 						_this->m_pDSMPlugin->UnloadPlugin();
@@ -382,7 +382,7 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 				if (_this->m_pDSMPlugin->IsLoaded())
 				{
 					_this->m_pDSMPlugin->DescribePlugin();
-					if (!stricmp(_this->m_pDSMPlugin->GetPluginFileName(), szPlugin))
+					if (!_stricmp(_this->m_pDSMPlugin->GetPluginFileName(), szPlugin))
 					{
 						fLoadIt = false;
 						_this->m_pDSMPlugin->SetPluginParams(hwnd, szParams);

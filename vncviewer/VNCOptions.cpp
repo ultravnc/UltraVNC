@@ -999,7 +999,7 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 		  char szPer[4];
 		  for (i = 0; i <= 12; i++)
 		  {
-			  itoa(Scales[i], szPer, 10);
+			  _itoa(Scales[i], szPer, 10);
 			  SendMessage(hViewerScale, CB_INSERTSTRING, (WPARAM)i, (LPARAM)(int FAR*)szPer);
 		  }
 		  SetDlgItemInt(hwnd,
