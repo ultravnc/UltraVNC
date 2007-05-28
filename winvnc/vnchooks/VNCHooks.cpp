@@ -874,14 +874,14 @@ char * NameFromPath(const char *path)
 	{
 		if (path[x] == '\\')
 		{
-			temp = strdup(&(path[x+1]));
+			temp = _strdup(&(path[x+1]));
 			break;
 		}
 	}
 
 	// If we didn't fine a \ then just return a copy of the original
 	if (temp == NULL)
-		temp = strdup(path);
+		temp = _strdup(path);
 
 	return temp;
 }
