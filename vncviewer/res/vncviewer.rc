@@ -13,6 +13,25 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
+// German (Germany) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
+#ifdef _WIN32
+LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// 24
+//
+
+IDR_MANIFEST            24      DISCARDABLE     "vncviewer.exe.manifest"
+#endif    // German (Germany) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
 // English (U.S.) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
@@ -27,18 +46,18 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE DISCARDABLE 
+1 TEXTINCLUDE MOVEABLE PURE 
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE DISCARDABLE 
+2 TEXTINCLUDE MOVEABLE PURE 
 BEGIN
     "#include ""afxres.h""\r\n"
     "\0"
 END
 
-3 TEXTINCLUDE DISCARDABLE 
+3 TEXTINCLUDE MOVEABLE PURE 
 BEGIN
     "\r\n"
     "\0"
@@ -46,13 +65,6 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// 24
-//
-
-IDR_MANIFEST            24      DISCARDABLE     "vncviewer.exe.manifest"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -491,7 +503,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO DISCARDABLE 
+GUIDELINES DESIGNINFO MOVEABLE PURE 
 BEGIN
     IDD_OPTIONDIALOG, DIALOG
     BEGIN
@@ -634,23 +646,23 @@ END
 // Bitmap
 //
 
-IDB_BITMAP1             BITMAP  DISCARDABLE     "bitmap1.bmp"
-IDB_BITMAP2             BITMAP  DISCARDABLE     "hoch.bmp"
-IDB_BITMAP3             BITMAP  DISCARDABLE     "quer.bmp"
-IDB_STAT_BACK           BITMAP  DISCARDABLE     "stat\\back.bmp"
-IDB_STAT_BOTH           BITMAP  DISCARDABLE     "stat\\both.bmp"
-IDB_STAT_FRONT          BITMAP  DISCARDABLE     "stat\\front.bmp"
-IDB_STAT_NONE           BITMAP  DISCARDABLE     "stat\\none.bmp"
-IDB_BITMAP8             BITMAP  DISCARDABLE     "stat\\bitmap8.bmp"
-IDB_VNC64               BITMAP  DISCARDABLE     "vnc64.BMP"
-IDB_BITMAP7             BITMAP  DISCARDABLE     "bitmap2.bmp"
-IDB_BITMAP9             BITMAP  DISCARDABLE     "stat\\bitmap9.bmp"
-IDB_CLOSE               BITMAP  DISCARDABLE     "stat\\closeup.bmp"
-IDB_MAXIMIZE            BITMAP  DISCARDABLE     "stat\\maximizeup.bmp"
-IDB_MINIMIZE            BITMAP  DISCARDABLE     "stat\\minimizeup.bmp"
-IDB_PINDOWN             BITMAP  DISCARDABLE     "stat\\pindown.bmp"
-IDB_PINUP               BITMAP  DISCARDABLE     "stat\\pinup.bmp"
-IDB_VNC32               BITMAP  DISCARDABLE     "vnc32.BMP"
+IDB_BITMAP1             BITMAP  MOVEABLE PURE   "bitmap1.bmp"
+IDB_BITMAP2             BITMAP  MOVEABLE PURE   "hoch.bmp"
+IDB_BITMAP3             BITMAP  MOVEABLE PURE   "quer.bmp"
+IDB_STAT_BACK           BITMAP  MOVEABLE PURE   "stat\\back.bmp"
+IDB_STAT_BOTH           BITMAP  MOVEABLE PURE   "stat\\both.bmp"
+IDB_STAT_FRONT          BITMAP  MOVEABLE PURE   "stat\\front.bmp"
+IDB_STAT_NONE           BITMAP  MOVEABLE PURE   "stat\\none.bmp"
+IDB_BITMAP8             BITMAP  MOVEABLE PURE   "stat\\bitmap8.bmp"
+IDB_VNC64               BITMAP  MOVEABLE PURE   "vnc64.BMP"
+IDB_BITMAP7             BITMAP  MOVEABLE PURE   "bitmap2.bmp"
+IDB_BITMAP9             BITMAP  MOVEABLE PURE   "stat\\bitmap9.bmp"
+IDB_CLOSE               BITMAP  MOVEABLE PURE   "stat\\closeup.bmp"
+IDB_MAXIMIZE            BITMAP  MOVEABLE PURE   "stat\\maximizeup.bmp"
+IDB_MINIMIZE            BITMAP  MOVEABLE PURE   "stat\\minimizeup.bmp"
+IDB_PINDOWN             BITMAP  MOVEABLE PURE   "stat\\pindown.bmp"
+IDB_PINUP               BITMAP  MOVEABLE PURE   "stat\\pinup.bmp"
+IDB_VNC32               BITMAP  MOVEABLE PURE   "vnc32.BMP"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -690,9 +702,7 @@ BEGIN
             VALUE "FileVersion", "1.1.0.2\0"
             VALUE "InternalName", "VNCViewer\0"
             VALUE "LegalCopyright", "Copyright © 2002-2006 UltraVNC team members\0"
-            VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "VNCViewer.exe\0"
-            VALUE "PrivateBuild", "\0"
             VALUE "ProductName", "UltraVNC VNCViewer\0"
             VALUE "ProductVersion", "1.1.0.2\0"
             VALUE "SpecialBuild", "1.0.2\0"
