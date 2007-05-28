@@ -686,8 +686,8 @@ if ( isNT )
 								_strupr(groupname);
 								_strupr(groupin);
 #else
-								strupr(groupname);
-								strupr(groupin);
+								_strupr(groupname);
+								_strupr(groupin);
 #endif
 								printf( "compare %s %s\n", groupname, group);
 								if (strcmp(groupname, groupin)==0) 
@@ -736,8 +736,8 @@ if ( isNT )
 								_strupr(groupname);
 								_strupr(groupin);
 #else
-								strupr(groupname);
-								strupr(groupin);
+								_strupr(groupname);
+								_strupr(groupin);
 #endif
 								printf( "compare %s %s\n", groupname, group);
 								if (strcmp(groupname, groupin)==0) 
@@ -790,7 +790,7 @@ if ( isNT )
 #ifdef _MSC_VER
 							_strupr(groupname);
 #else
-							strupr(groupname);
+							_strupr(groupname);
 #endif
 								printf( "%s\n", groupname);
 								if (strcmp(groupname, group)==0) laccess_vnc=TRUE;
@@ -812,7 +812,8 @@ if ( isNT )
 	//check user
 	if (isNT)
 	{
-#ifdef _MSC_VER
+
+#if _MSC_VER < 1400
 		wcstombs( user, (unsigned short *)user, MAXLEN);	
 #else
 		wcstombs( user, (const wchar_t *)user, MAXLEN);	
@@ -824,7 +825,7 @@ if ( isNT )
 #ifdef _MSC_VER
 	_strupr(user);
 #else
-	strupr(user);
+	_strupr(user);
 #endif
 	passwd_OK=false;
 	if (isXP)
