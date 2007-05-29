@@ -57,23 +57,44 @@ public:
 	// Display the properties dialog
 	// If usersettings is TRUE then the per-user settings come up
 	// If usersettings is FALSE then the default system settings come up
-	void Show(BOOL show);
+	void Show(BOOL show, BOOL usersettings);
 
 	// Loading & saving of preferences
-	void Load();
+	void Load(BOOL usersettings);
+	void ResetRegistry();
 
 	void Save();
 
-
-
+	BOOL m_fUseRegistry;
+	// Ini file
+	IniFile myIniFile;
+	void LoadFromIniFile();
+	void LoadUserPrefsPollFromIniFile();
+	void SaveToIniFile();
+	void SaveUserPrefsPollToIniFile();
 
 	// Implementation
 protected:
 	// The server object to which this properties object is attached.
 	vncServer *			m_server;
 
-	void LoadUserPrefsPoll();
-	void SaveUserPrefsPoll();
+	// Flag to indicate whether the currently loaded settings are for
+	// the current user, or are default system settings
+	BOOL				m_usersettings;
+
+
+	// String handling
+	char * LoadString(HKEY k, LPCSTR valname);
+	void SaveString(HKEY k, LPCSTR valname, const char *buffer);
+
+	// Manipulate the registry settings
+	LONG LoadInt(HKEY key, LPCSTR valname, LONG defval);
+	void SaveInt(HKEY key, LPCSTR valname, LONG val);
+
+
+	// Loading/saving all the user prefs
+	void LoadUserPrefsPoll(HKEY appkey);
+	void SaveUserPrefsPoll(HKEY appkey);
 
 
 	// Making the loaded user prefs active
@@ -93,7 +114,6 @@ protected:
 	BOOL m_pref_Driver;
 	BOOL m_pref_Hook;
 	BOOL m_pref_Virtual;
-	IniFile myIniFile;
 
 };
 

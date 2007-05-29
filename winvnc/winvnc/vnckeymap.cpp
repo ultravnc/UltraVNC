@@ -642,84 +642,90 @@ public:
           vncService::IsWinNT())
       {
 
+		// If running under Vista and started from Session0 in Application mode
 		if (vncService::VersionMajor()>=6 && vncService::RunningAsApplication0System() )
 		{
-			    ShellExecute(0, "open", "cad.exe", NULL, NULL, SW_SHOWNORMAL); 
-				/*Beep(1000,2000);
-				ShellExecute(0, "open", "osk.exe", NULL, NULL, SW_SHOWNORMAL); 
-				Beep(1000,2000);
-
-				vncKeymap::ClearShiftKeys();
-				keybd_event( VK_TAB, MapVirtualKey(VK_TAB, 0),0, 0);
-				keybd_event( VK_TAB, MapVirtualKey(VK_TAB, 0),KEYEVENTF_KEYUP, 0);
-
-				keybd_event( 13, MapVirtualKey(13, 0),0, 0);
-				keybd_event( 13, MapVirtualKey(13, 0),KEYEVENTF_KEYUP, 0);
-
-				Sleep(300);
-
-				keybd_event( VK_TAB, MapVirtualKey(VK_TAB, 0),0, 0);
-				keybd_event( VK_TAB, MapVirtualKey(VK_TAB, 0),KEYEVENTF_KEYUP, 0);
-Sleep(50);
-				keybd_event( VK_TAB, MapVirtualKey(VK_TAB, 0),0, 0);
-				keybd_event( VK_TAB, MapVirtualKey(VK_TAB, 0),KEYEVENTF_KEYUP, 0);
-Sleep(50);
-				keybd_event( VK_TAB, MapVirtualKey(VK_TAB, 0),0, 0);
-				keybd_event( VK_TAB, MapVirtualKey(VK_TAB, 0),KEYEVENTF_KEYUP, 0);
-Sleep(50);
-				keybd_event( VK_TAB, MapVirtualKey(VK_TAB, 0),0, 0);
-				keybd_event( VK_TAB, MapVirtualKey(VK_TAB, 0),KEYEVENTF_KEYUP, 0);
-Sleep(50);
-				keybd_event( VK_SPACE, MapVirtualKey(VK_SPACE, 0),0, 0);
-				keybd_event( VK_SPACE, MapVirtualKey(VK_SPACE, 0),KEYEVENTF_KEYUP, 0);
-Sleep(50);
-				keybd_event( 13, MapVirtualKey(13, 0),0, 0);
-				keybd_event( 13, MapVirtualKey(13, 0),KEYEVENTF_KEYUP, 0);
-
-				HWND hOsk = FindWindow("OSKMainClass", NULL);
-				if (hOsk==NULL)
+				// Try to run the special Vista cad.exe file...
+				int ret = (int)ShellExecute(GetDesktopWindow(), "open", "cad.exe", "", 0, SW_SHOWNORMAL);
+				if (false/*ret <= 32*/)
 				{
+					// If cad.exe is not available, run the existing osk.exe
+					ShellExecute(GetDesktopWindow(), "open", "osk.exe", "", 0, SW_SHOWNORMAL);
+					Sleep(2000);
+					
+					/* We could also run the osk by using keyboard events...
+					vncKeymap::ClearShiftKeys();
+					keybd_event( VK_TAB, MapVirtualKey(VK_TAB, 0),0, 0);
+					keybd_event( VK_TAB, MapVirtualKey(VK_TAB, 0),KEYEVENTF_KEYUP, 0);
+					keybd_event( 13, MapVirtualKey(13, 0),0, 0);
+					keybd_event( 13, MapVirtualKey(13, 0),KEYEVENTF_KEYUP, 0);
 					Sleep(1000);
-					hOsk = FindWindow("OSKMainClass", NULL);
+					keybd_event( VK_TAB, MapVirtualKey(VK_TAB, 0),0, 0);
+					keybd_event( VK_TAB, MapVirtualKey(VK_TAB, 0),KEYEVENTF_KEYUP, 0);
+					keybd_event( VK_TAB, MapVirtualKey(VK_TAB, 0),0, 0);
+					keybd_event( VK_TAB, MapVirtualKey(VK_TAB, 0),KEYEVENTF_KEYUP, 0);
+					keybd_event( VK_TAB, MapVirtualKey(VK_TAB, 0),0, 0);
+					keybd_event( VK_TAB, MapVirtualKey(VK_TAB, 0),KEYEVENTF_KEYUP, 0);
+					keybd_event( VK_TAB, MapVirtualKey(VK_TAB, 0),0, 0);
+					keybd_event( VK_TAB, MapVirtualKey(VK_TAB, 0),KEYEVENTF_KEYUP, 0);
+					keybd_event( VK_SPACE, MapVirtualKey(VK_SPACE, 0),0, 0);
+					keybd_event( VK_SPACE, MapVirtualKey(VK_SPACE, 0),KEYEVENTF_KEYUP, 0);
+					keybd_event( 13, MapVirtualKey(13, 0),0, 0);
+					keybd_event( 13, MapVirtualKey(13, 0),KEYEVENTF_KEYUP, 0);
+					Sleep(3000);
+					*/
+
+					// Then we simulate the user's mouse click on the 3 buttons (CTRL, ALT and DEL) ;) 
+					HWND hOsk = FindWindow("OSKMainClass", NULL);
+					if (hOsk==NULL)
+					{
+						Sleep(1000);
+						hOsk = FindWindow("OSKMainClass", NULL);
+					}
+					if (hOsk==NULL)
+					{
+						Sleep(1000);
+						hOsk = FindWindow("OSKMainClass", NULL);
+					}
+					if (hOsk) 
+					{
+						RECT Rect; 
+						POINT MouseOrigPos; 
+						int nDestx, nDesty; 
+						GetCursorPos(&MouseOrigPos); 
+						GetWindowRect(hOsk, &Rect); 
+
+						nDestx = Rect.left + 30; 
+						nDesty = Rect.top + 175; 
+						SetCursorPos(nDestx, nDesty); 
+						::mouse_event(MOUSEEVENTF_ABSOLUTE|MOUSEEVENTF_LEFTDOWN, nDestx, nDesty, NULL, NULL); 
+						::mouse_event(MOUSEEVENTF_ABSOLUTE|MOUSEEVENTF_LEFTUP, nDestx, 
+						nDesty, NULL, NULL); 
+
+						nDestx = Rect.left + 97; 
+						nDesty = Rect.top + 175; 
+						SetCursorPos(nDestx, nDesty); 
+						::mouse_event(MOUSEEVENTF_ABSOLUTE|MOUSEEVENTF_LEFTDOWN, nDestx, nDesty, NULL, NULL); 
+						::mouse_event(MOUSEEVENTF_ABSOLUTE|MOUSEEVENTF_LEFTUP, nDestx, nDesty, NULL, NULL); 
+
+						nDestx = Rect.left + 430; 
+						nDesty = Rect.top + 110; 
+						SetCursorPos(nDestx, nDesty); 
+						::mouse_event(MOUSEEVENTF_ABSOLUTE|MOUSEEVENTF_LEFTDOWN, nDestx, nDesty, NULL, NULL); 
+						::mouse_event(MOUSEEVENTF_ABSOLUTE|MOUSEEVENTF_LEFTUP, nDestx, nDesty, NULL, NULL); 
+
+						SetCursorPos(MouseOrigPos.x, MouseOrigPos.y); 
+						Sleep(250);
+
+						// Killing of the osk window must be done once viewer is reconnected
+						/*
+						hOsk = FindWindow("OSKMainClass", NULL);
+						SendMessage(hOsk,WM_CLOSE,0,0);
+						DestroyWindow(hOsk);
+						CloseWindow(hOsk);
+						*/
+					}
 				}
-				if (hOsk==NULL)
-				{
-					Sleep(1000);
-					hOsk = FindWindow("OSKMainClass", NULL);
-				}
-				if (hOsk) 
-				{
-					RECT Rect; 
-					POINT MouseOrigPos; 
-					int nDestx, nDesty; 
-					GetCursorPos(&MouseOrigPos); 
-					GetWindowRect(hOsk, &Rect); 
-					nDestx = Rect.left + 30; 
-					nDesty = Rect.top + 175; 
-					SetCursorPos(nDestx, nDesty); 
-					::mouse_event(MOUSEEVENTF_ABSOLUTE|MOUSEEVENTF_LEFTDOWN, nDestx, nDesty, NULL, NULL); 
-					::mouse_event(MOUSEEVENTF_ABSOLUTE|MOUSEEVENTF_LEFTUP, nDestx, 
-					nDesty, NULL, NULL); 
-					nDestx = Rect.left + 97; 
-					nDesty = Rect.top + 175; 
-					SetCursorPos(nDestx, nDesty); 
-					::mouse_event(MOUSEEVENTF_ABSOLUTE|MOUSEEVENTF_LEFTDOWN, nDestx, nDesty, NULL, NULL); 
-					::mouse_event(MOUSEEVENTF_ABSOLUTE|MOUSEEVENTF_LEFTUP, nDestx, nDesty, NULL, NULL); 
-
-					nDestx = Rect.left + 430; 
-					nDesty = Rect.top + 110; 
-					SetCursorPos(nDestx, nDesty); 
-					::mouse_event(MOUSEEVENTF_ABSOLUTE|MOUSEEVENTF_LEFTDOWN, nDestx, nDesty, NULL, NULL); 
-					::mouse_event(MOUSEEVENTF_ABSOLUTE|MOUSEEVENTF_LEFTUP, nDestx, nDesty, NULL, NULL); 
-
-					SetCursorPos(MouseOrigPos.x, MouseOrigPos.y); 
-					Sleep(250);
-
-					hOsk = FindWindow("OSKMainClass", NULL);
-					DestroyWindow(hOsk);
-					CloseWindow(hOsk);
-					SendMessage(hOsk,WM_CLOSE,0,0);
-				}*/
 		}
 		else if (vncService::VersionMajor()>=6)
 		{

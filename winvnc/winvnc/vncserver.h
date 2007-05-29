@@ -338,7 +338,7 @@ public:
 	static void CALLBACK _timerRetryHandler( HWND /*hWnd*/, UINT /*uMsg*/, UINT_PTR /*idEvent*/, DWORD /*dwTime*/ );
 	void _actualTimerRetryHandler();
 
-	// sf@2007
+	// sf@2007 - Vista / XP FUS special modes
 	virtual BOOL RunningAsApplication0(){return m_fRunningAsApplication0;};
 	virtual void RunningAsApplication0(BOOL fEnabled){m_fRunningAsApplication0 = fEnabled;};
 
@@ -347,6 +347,9 @@ public:
 
 	virtual BOOL RunningAsApplication0User(){return m_fRunningAsApplication0User;};
 	virtual void RunningAsApplication0User(BOOL fEnabled){m_fRunningAsApplication0User = fEnabled;};
+
+	virtual void AutoRestartFlag(BOOL fOn){m_fAutoRestart = fOn;};
+	virtual BOOL AutoRestartFlag(){return m_fAutoRestart;};
 
 	// sf@2005 - FTUserImpersonation
 	virtual BOOL FTUserImpersonation(){return m_fFTUserImpersonation;};
@@ -501,6 +504,7 @@ protected:
 	BOOL m_fRunningAsApplication0;
 	BOOL m_fRunningAsApplication0System;
 	BOOL m_fRunningAsApplication0User;
+	BOOL m_fAutoRestart;
 
 	// sf@2005 - FTUserImpersonation
 	BOOL m_fFTUserImpersonation;

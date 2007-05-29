@@ -404,7 +404,7 @@ vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 					) // sf@2007 - Do not display Properties pages when running in Application0 mode
 				{
 					vnclog.Print(LL_INTINFO, VNCLOG("opening dialog box\n"));
-					m_properties.ShowAdmin(TRUE);
+					m_properties.ShowAdmin(TRUE, TRUE);
 					PostQuitMessage(0);
 				}
 			}
@@ -431,16 +431,19 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		{					
 			case WTS_CONSOLE_CONNECT:
 				vnclog.Print(LL_INTERR, VNCLOG("++++++++++++++++++++++++++++++++++++WTS_CONSOLE_CONNECT\n"));
+				_this->m_server->AutoRestartFlag(TRUE);
 				//_this->m_server->KillAuthClients();
 				//DestroyWindow(hwnd);
 				break;
 			case WTS_CONSOLE_DISCONNECT:
 				vnclog.Print(LL_INTERR, VNCLOG("WTS_CONSOLE_DISCONNECT\n"));
+				_this->m_server->AutoRestartFlag(TRUE);
 				_this->m_server->KillAuthClients();
 				DestroyWindow(hwnd);
 				break;
 			case WTS_SESSION_LOCK:
 				vnclog.Print(LL_INTERR, VNCLOG("WTS_SESSION_LOCK\n"));
+				_this->m_server->AutoRestartFlag(TRUE);
 				_this->m_server->KillAuthClients();
 				DestroyWindow(hwnd);
 				break;
@@ -466,6 +469,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		{
 			if (!vncService::InputDesktopSelected())
 			{
+				_this->m_server->AutoRestartFlag(TRUE);
 				_this->m_server->KillAuthClients();
 				DestroyWindow(hwnd);
 			}
@@ -518,21 +522,21 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		case ID_DEFAULT_PROPERTIES:
 			// Show the default properties dialog, unless it is already displayed
 			vnclog.Print(LL_INTINFO, VNCLOG("show default properties requested\n"));
-			_this->m_properties.ShowAdmin(TRUE);
+			_this->m_properties.ShowAdmin(TRUE, FALSE);
 			_this->FlashTrayIcon(_this->m_server->AuthClientCount() != 0);
 			break;
 		
 		case ID_PROPERTIES:
 			// Show the properties dialog, unless it is already displayed
 			vnclog.Print(LL_INTINFO, VNCLOG("show user properties requested\n"));
-			_this->m_propertiesPoll.Show(TRUE);
+			_this->m_propertiesPoll.Show(TRUE, TRUE);
 			_this->FlashTrayIcon(_this->m_server->AuthClientCount() != 0);
 			break;
 
         case ID_ADMIN_PROPERTIES:
 			// Show the properties dialog, unless it is already displayed
 			vnclog.Print(LL_INTINFO, VNCLOG("show user properties requested\n"));
-			_this->m_properties.ShowAdmin(TRUE);
+			_this->m_properties.ShowAdmin(TRUE, TRUE);
 			_this->FlashTrayIcon(_this->m_server->AuthClientCount() != 0);
 			break;
 		
@@ -671,8 +675,16 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 					_this->AddTrayIcon();
 					_this->FlashTrayIcon(_this->m_server->AuthClientCount() != 0);
 					// We should load in the prefs for the new user
-					_this->m_properties.Load();
-					_this->m_propertiesPoll.Load();
+					if (_this->m_properties.m_fUseRegistry)
+					{
+						_this->m_properties.Load(TRUE);
+						_this->m_propertiesPoll.Load(TRUE);
+					}
+					else
+					{
+						_this->m_properties.LoadFromIniFile();
+						_this->m_propertiesPoll.LoadFromIniFile();
+					}
 
 				}
 			}

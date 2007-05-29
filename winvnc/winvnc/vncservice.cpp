@@ -57,7 +57,7 @@ DWORD	g_platform_id;
 BOOL	g_impersonating_user = 0;
 DWORD	g_version_major;
 DWORD	g_version_minor;
-BOOL	m_fRunningAsApplication0System;
+BOOL	m_fRunningAsApplication0System = false;
 
 
 
@@ -469,11 +469,14 @@ SimulateCtrlAltDelThreadFn(void *context)
 {
 	HDESK old_desktop = GetThreadDesktop(GetCurrentThreadId());
 
-	// Switch into the Winlogon desktop
-	if (!vncService::SelectDesktop("Winlogon"))
+	if (!vncService::RunningAsApplication0System())
 	{
-		vnclog.Print(LL_INTERR, VNCLOG("failed to select logon desktop\n"));
-		return FALSE;
+		// Switch into the Winlogon desktop
+		if (!vncService::SelectDesktop("Winlogon"))
+		{
+			vnclog.Print(LL_INTERR, VNCLOG("failed to select logon desktop\n"));
+			return FALSE;
+		}
 	}
 
 	vnclog.Print(LL_ALL, VNCLOG("generating ctrl-alt-del\n"));
@@ -483,8 +486,11 @@ SimulateCtrlAltDelThreadFn(void *context)
 	PostMessage(HWND_BROADCAST, WM_HOTKEY, 0, MAKELONG(MOD_ALT | MOD_CONTROL, VK_DELETE));
 
 	// Switch back to our original desktop
-	if (old_desktop != NULL)
-		vncService::SelectHDESK(old_desktop);
+	if (!vncService::RunningAsApplication0System())
+	{
+		if (old_desktop != NULL)
+			vncService::SelectHDESK(old_desktop);
+	}
 	return NULL;
 }
 

@@ -61,10 +61,11 @@ public:
 	// Display the properties dialog
 	// If usersettings is TRUE then the per-user settings come up
 	// If usersettings is FALSE then the default system settings come up
-	void ShowAdmin(BOOL show);
+	void ShowAdmin(BOOL show, BOOL usersettings);
 
 	// Loading & saving of preferences
-	void Load();
+	void Load(BOOL usersettings);
+	void ResetRegistry();
 
 	void Save();
 
@@ -75,25 +76,47 @@ public:
 	BOOL AllowEditClients() {return m_alloweditclients;};
 	bool Lock_service_helper;
 
+	BOOL m_fUseRegistry;
+	// Ini file
+	IniFile myIniFile;
+	void LoadFromIniFile();
+	void LoadUserPrefsFromIniFile();
+	void SaveToIniFile();
+	void SaveUserPrefsToIniFile();
+
 	// Implementation
 protected:
 	// The server object to which this properties object is attached.
 	vncServer *			m_server;
+
+	// Flag to indicate whether the currently loaded settings are for
+	// the current user, or are default system settings
+	BOOL				m_usersettings;
 
 	// Tray icon menu settings
 	BOOL				m_allowproperties;
 	BOOL				m_allowshutdown;
 	BOOL				m_alloweditclients;
 
+
+	// Password handling
+	void LoadPassword(HKEY k, char *buffer);
+	void SavePassword(HKEY k, char *buffer);
+
+	// String handling
+	char * LoadString(HKEY k, LPCSTR valname);
+	void SaveString(HKEY k, LPCSTR valname, const char *buffer);
+
 	// Manipulate the registry settings
+	LONG LoadInt(HKEY key, LPCSTR valname, LONG defval);
+	void SaveInt(HKEY key, LPCSTR valname, LONG val);
 
 	// Loading/saving all the user prefs
-	void LoadUserPrefs();
-	void SaveUserPrefs();
+	void LoadUserPrefs(HKEY appkey);
+	void SaveUserPrefs(HKEY appkey);
 
 	// Making the loaded user prefs active
 	void ApplyUserPrefs();
-
 	
 	BOOL m_returncode_valid;
 	BOOL m_dlgvisible;
@@ -133,11 +156,11 @@ protected:
 
 	BOOL m_pref_UseDSMPlugin;
 	char m_pref_szDSMPlugin[128];
+    void LoadDSMPluginName(HKEY key, char *buffer);
+	void SaveDSMPluginName(HKEY key, char *buffer); 
 	vncSetAuth		m_vncauth;
 
-
 	char m_pref_path111[500];
-	IniFile myIniFile;
 
 
 private:

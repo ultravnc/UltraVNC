@@ -219,6 +219,11 @@ vncServer::vncServer()
 	m_xdmcpConn=NULL;
 
 	m_impersonationtoken=NULL; // Modif Jeremy C. 
+
+	m_fRunningAsApplication0 = false;
+	m_fRunningAsApplication0System = false;
+	m_fRunningAsApplication0User = false;
+	m_fAutoRestart = false;
 }
 
 vncServer::~vncServer()
@@ -863,22 +868,27 @@ vncServer::RemoveClient(vncClientId clientid)
 	{
 		vnclog.Print(LL_STATE, VNCLOG("deleting desktop server\n"));
 
-		// Are there locksettings set?
-		if (LockSettings() == 1)
+		// sf@2007 - Do not lock/logoff even if required when WinVNC autorestarts (on desktop change (XP FUS / Vista))
+		if (!AutoRestartFlag())
 		{
-		    // Yes - lock the machine on disconnect!
-			vncService::LockWorkstation();
-		} else if (LockSettings() > 1)
-		{
-		    char username[UNLEN+1];
+			// Are there locksettings set?
+			if (LockSettings() == 1)
+			{
+				// Yes - lock the machine on disconnect!
+				vncService::LockWorkstation();
+			} 
+			else if (LockSettings() > 1)
+			{
+				char username[UNLEN+1];
 
-		    vncService::CurrentUser((char *)&username, sizeof(username));
-		    if (strcmp(username, "") != 0)
-		    {
-				// Yes - force a user logoff on disconnect!
-				if (!ExitWindowsEx(EWX_LOGOFF, 0))
-					vnclog.Print(LL_CONNERR, VNCLOG("client disconnect - failed to logoff user!\n"));
-		    }
+				vncService::CurrentUser((char *)&username, sizeof(username));
+				if (strcmp(username, "") != 0)
+				{
+					// Yes - force a user logoff on disconnect!
+					if (!ExitWindowsEx(EWX_LOGOFF, 0))
+						vnclog.Print(LL_CONNERR, VNCLOG("client disconnect - failed to logoff user!\n"));
+				}
+			}
 		}
 
 		// Delete the screen server
