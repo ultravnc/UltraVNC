@@ -469,13 +469,14 @@ SimulateCtrlAltDelThreadFn(void *context)
 {
 	HDESK old_desktop = GetThreadDesktop(GetCurrentThreadId());
 
-	if (!vncService::RunningAsApplication0System())
+	//if (!vncService::RunningAsApplication0System())
 	{
 		// Switch into the Winlogon desktop
 		if (!vncService::SelectDesktop("Winlogon"))
 		{
 			vnclog.Print(LL_INTERR, VNCLOG("failed to select logon desktop\n"));
-			return FALSE;
+			//return FALSE;
+			old_desktop = NULL;
 		}
 	}
 
@@ -486,7 +487,7 @@ SimulateCtrlAltDelThreadFn(void *context)
 	PostMessage(HWND_BROADCAST, WM_HOTKEY, 0, MAKELONG(MOD_ALT | MOD_CONTROL, VK_DELETE));
 
 	// Switch back to our original desktop
-	if (!vncService::RunningAsApplication0System())
+	//if (!vncService::RunningAsApplication0System())
 	{
 		if (old_desktop != NULL)
 			vncService::SelectHDESK(old_desktop);
