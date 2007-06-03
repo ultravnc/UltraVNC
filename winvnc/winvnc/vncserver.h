@@ -195,6 +195,7 @@ public:
 	virtual void SetPort(const UINT port);
 	virtual UINT GetPort();
 	*/
+	virtual void KillSockConnect();
 	virtual void SetAutoPortSelect(const BOOL autoport) {
 	    if (autoport && !m_autoportselect)
 	    {

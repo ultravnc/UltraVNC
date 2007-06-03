@@ -1143,11 +1143,21 @@ BOOL vncServer::LocalInputsDisabled()
 	return m_disable_local_inputs;
 }
 
+void 
+vncServer::KillSockConnect()
+{
+	if (m_socketConn != NULL)
+		delete m_socketConn;
+	m_socketConn = NULL;
+
+}
+
 // Socket connection handling
 BOOL
 vncServer::SockConnect(BOOL On)
 {
 	// Are we being asked to switch socket connects on or off?
+	vnclog.Print(20, VNCLOG("SockConnect %d\n"), On);
 	if (On)
 	{
 		// Is there a listening socket?
@@ -1206,6 +1216,7 @@ vncServer::SockConnect(BOOL On)
 			// Now let's start the HTTP connection stuff
 			EnableHTTPConnect(m_enableHttpConn);
 			EnableXDMCPConnect(m_enableXdmcpConn);
+			vnclog.Print(20, VNCLOG("SockConnect  Done %d\n"), On);
 		}
 	}
 	else

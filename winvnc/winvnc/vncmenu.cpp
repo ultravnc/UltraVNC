@@ -428,27 +428,36 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 	case WM_WTSSESSION_CHANGE:
 	{
 		switch( wParam )
-		{					
+		{		
+			case WTS_SESSION_LOGON:
+			case WTS_SESSION_LOGOFF:
 			case WTS_CONSOLE_CONNECT:
 				vnclog.Print(LL_INTERR, VNCLOG("++++++++++++++++++++++++++++++++++++WTS_CONSOLE_CONNECT\n"));
 				_this->m_server->AutoRestartFlag(TRUE);
-				//_this->m_server->KillAuthClients();
-				//DestroyWindow(hwnd);
+				_this->m_server->KillAuthClients();
+				_this->m_server->KillSockConnect();
+				PostMessage(hwnd, WM_CLOSE, 0, 0);
 				break;
 			case WTS_CONSOLE_DISCONNECT:
 				vnclog.Print(LL_INTERR, VNCLOG("WTS_CONSOLE_DISCONNECT\n"));
 				_this->m_server->AutoRestartFlag(TRUE);
 				_this->m_server->KillAuthClients();
-				DestroyWindow(hwnd);
+				_this->m_server->KillSockConnect();
+				PostMessage(hwnd, WM_CLOSE, 0, 0);
 				break;
 			case WTS_SESSION_LOCK:
 				vnclog.Print(LL_INTERR, VNCLOG("WTS_SESSION_LOCK\n"));
 				_this->m_server->AutoRestartFlag(TRUE);
 				_this->m_server->KillAuthClients();
-				DestroyWindow(hwnd);
+				_this->m_server->KillSockConnect();
+				PostMessage(hwnd, WM_CLOSE, 0, 0);
 				break;
 			case WTS_SESSION_UNLOCK:
 				vnclog.Print(LL_INTERR, VNCLOG("WTS_SESSION_UNLOCK\n"));
+				_this->m_server->AutoRestartFlag(TRUE);
+				_this->m_server->KillAuthClients();
+				_this->m_server->KillSockConnect();
+				PostMessage(hwnd, WM_CLOSE, 0, 0);
 				break;
 			default:
 				break;
@@ -471,7 +480,8 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			{
 				_this->m_server->AutoRestartFlag(TRUE);
 				_this->m_server->KillAuthClients();
-				DestroyWindow(hwnd);
+				_this->m_server->KillSockConnect();
+				PostMessage(hwnd, WM_CLOSE, 0, 0);
 			}
 		}
 
