@@ -149,7 +149,7 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 			// sf@2005 - Make the save settings optional but always enabled by default (for now)
 			// (maybe disabled as default is better ?)
 			HWND hSave = GetDlgItem(hwnd, IDC_SETDEFAULT_CHECK);
-			SendMessage(hSave, BM_SETCHECK, true, 0);
+//ACT			SendMessage(hSave, BM_SETCHECK, true, 0);
 
 
 			// sf@2002 - Select Modem Option as default

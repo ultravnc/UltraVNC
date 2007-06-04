@@ -54,6 +54,7 @@ public:
 	int     m_listenPort;
 	bool	m_connectionSpecified;
 	bool	m_configSpecified;
+	TCHAR   m_cmdlnUser[256]; // act: add user option on command line
 	TCHAR   m_clearPassword[256]; // Modif sf@2002
 	int     m_quickoption; // Modif sf@2002 - v1.1.2
 	TCHAR   m_configFilename[_MAX_PATH];

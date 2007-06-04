@@ -34,6 +34,7 @@ void vncEncryptBytes(unsigned char *bytes, char *passwd);
 void vncEncryptPasswd(unsigned char *encryptedPasswd, char *passwd);
 void vncEncryptPasswdMs(unsigned char *encryptedPasswd, char *passwd);
 char *vncDecryptPasswd(const unsigned char *encryptedPasswd);
+char *vncDecryptPasswdMs(const unsigned char *encryptedPasswd);
 // marscha@2006
 void vncEncryptBytes2(unsigned char *bytes, const int length, unsigned char *key);
 

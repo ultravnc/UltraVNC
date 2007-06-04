@@ -148,6 +148,7 @@ VNCOptions::VNCOptions()
   m_requestShapeUpdates = true;
   m_ignoreShapeUpdates = false;
 
+  m_cmdlnUser[0] = '\0';		// act : add user option on command line
   m_clearPassword[0] = '\0';		// sf@2002
   m_quickoption = 1;				// sf@2002 - Auto Mode as default
   m_fUseDSMPlugin = false;
@@ -570,6 +571,16 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 				continue;
 			}
 	}
+	// act : add user option on command line
+	else if ( SwitchMatch(args[j], _T("user") ))
+	{
+			if (++j == i)
+			{
+				ArgError(sz_D24);
+				continue;
+			}
+			strcpy(m_cmdlnUser, args[j]);
+	} // act : add user option on command line
 	// Modif sf@2002 : password in the command line
 	else if ( SwitchMatch(args[j], _T("password") ))
 	{
@@ -838,8 +849,9 @@ void VNCOptions::ShowUsage(LPTSTR info) {
             _T("%s\n\rUsage includes:\n\r"
                "  vncviewer [/8bit] [/swapmouse] [/shared] [/belldeiconify] \n\r"
                "      [/listen [portnum]] [/fullscreen] [/viewonly] [/notoolbar]\n\r"
-               "      [/scale a/b] [/config configfile] [server:display] [/emulate3] \n\r"
-			   "      [/quickoption n] [/password clearpassword] [/serverscale n]\n\r"
+               "      [/scale a/b] [/config configfile] [server:display] \n\r"
+			   "      [/emulate3] [/quickoption n] [/serverscale n]\n\r"
+			   "      [/user msuser] [/password clearpassword]\n\r"
 			   "      [/nostatus] [/dsmplugin pluginfilename.dsm] [/autoscaling] \n\r"
 			   "      [/autoreconnect delayInSeconds] \n\r"
 			   "      [/nohotkeys] [/proxy proxyhost [portnum]] [/256colors] [/64colors]\r\n"

@@ -149,6 +149,27 @@ vncDecryptPasswd(const unsigned char *encryptedPasswd)
     return (char *)passwd;
 }
 
+char *
+vncDecryptPasswdMs(const unsigned char *encryptedPasswd)
+{
+    unsigned int i;
+    unsigned char *passwd = (unsigned char *)malloc(32+1);
+
+	memcpy(passwd, encryptedPasswd, 32);
+
+    for (i = 0; i < 32; i++) {
+		passwd[i] = encryptedPasswd[i];
+    }
+
+    deskey(fixedkey, DE1);
+    des(passwd, passwd);
+
+    passwd[32] = 0;
+
+    return (char *)passwd;
+}
+
+
 /*
  *   marscha@2006
  *   Encrypt bytes[length] in memory using key.
