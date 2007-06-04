@@ -643,7 +643,8 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			return 0;
 		}
 		// tnatsni Wallpaper fix
-		RestoreWallpaper();
+		if (_this->m_server->RemoveWallpaperEnabled())
+			RestoreWallpaper();
 		break;
 		
 	case WM_DESTROY:
