@@ -77,6 +77,8 @@ extern "C" {
 
 const UINT FileTransferSendPacketMessage = RegisterWindowMessage("UltraVNC.Viewer.FileTransferSendPacketMessage");
 extern bool g_passwordfailed;
+bool havetobekilled;
+bool forcedexit=false;
 
 /*
  * Macro to compare pixel formats.
@@ -287,6 +289,9 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_hCacheBitmap = NULL;
 	m_hPalette = NULL;
 	m_encPasswd[0] = '\0';
+	m_encPasswdMs[0] = '\0'; // act: add mspasswd storage
+	m_ms_user[0] = '\0';    // act: add msuser storage
+	m_cmdlnUser[0] = '\0'; // act: add user option on command line
 	m_clearPasswd[0] = '\0'; // Modif sf@2002
 	// static window
 	m_BytesSend=0;
@@ -458,6 +463,10 @@ void ClientConnection::Run()
 		}
 	}
 	*/
+
+	// act : add user option on command line
+	if (strlen(	m_pApp->m_options.m_cmdlnUser) > 0) 
+		strcpy(m_cmdlnUser, m_pApp->m_options.m_cmdlnUser);
 
 	// Modif sf@2002 - bit of a hack...and unsafe
 	if (strlen(	m_pApp->m_options.m_clearPassword) > 0) 
@@ -1359,7 +1368,23 @@ void ClientConnection::GetConnectDetails()
 	m_pApp->m_options.m_configSpecified = false;
 
 }
-
+DWORD WINAPI SocketTimeout(LPVOID lpParam)
+{
+	SOCKET *sock;
+	sock=(SOCKET*) lpParam;
+	int counter=0;
+	while (havetobekilled && !forcedexit)
+	{
+		Sleep(50);
+		counter++;
+		if (counter>100) break;
+	}
+	if (havetobekilled)
+	{
+		closesocket(*sock);
+	}
+	return 0;
+}
 void ClientConnection::Connect()
 {
 	struct sockaddr_in thataddr;
@@ -1397,8 +1422,13 @@ void ClientConnection::Connect()
 	if (m_hwndStatus)SetDlgItemInt(m_hwndStatus,IDC_PORT,m_port,FALSE);
 	thataddr.sin_family = AF_INET;
 	thataddr.sin_port = htons(m_port);
-	
+	///Force break after timeout
+	DWORD				  threadID;
+	HANDLE Thread = CreateThread(NULL,0,SocketTimeout,(LPVOID)&m_sock,0,&threadID);
+	havetobekilled=true;
 	res = connect(m_sock, (LPSOCKADDR) &thataddr, sizeof(thataddr));
+	//Force break
+	havetobekilled=false;
 	if (res == SOCKET_ERROR) 
 		{
 			if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L48);
@@ -1756,21 +1786,44 @@ void ClientConnection::Authenticate()
 			memset(domain, 0, sizeof(char)*256);
 			memset(user, 0, sizeof(char)*256);
 
-			// We ignore the clear password in case of ms_logon !
-			// Todo: Add ms_user & ms_password command line params
-			if (m_ms_logon) memset(m_clearPasswd, 0, sizeof(m_clearPasswd));
+			// We NOT ignore the clear password in case of ms_logon !
+			// finally done !! : Add ms_user & ms_password command line params
+			// act: add user option on command line
+			if (m_ms_logon) 
+			{	// mslogon required
+				// if user cmd line option is not specified, cmd line passwd must be cleared
+				// the same if user is provided and not password
+				if (strlen(m_cmdlnUser)>0)  
+				{	if (strlen(m_clearPasswd)>0)
+					{  //user and password are not empty
+					    strcpy(user, m_cmdlnUser);
+						strcpy(passwd, m_clearPasswd);
+					}
+					else memset(m_cmdlnUser, 0, sizeof(m_cmdlnUser)); // user without password
+				}
+				else
+					memset(m_clearPasswd, 0, sizeof(m_clearPasswd));
+
+			}
 
 			// Was the password already specified in a config file or entered for DSMPlugin ?
 			// Modif sf@2002 - A clear password can be transmitted via the vncviewer command line
 			if (strlen(m_clearPasswd)>0)
 			{
 				strcpy(passwd, m_clearPasswd);
+			    if (m_ms_logon) strcpy(user, m_cmdlnUser);
+			    
 			} 
 			else if (strlen((const char *) m_encPasswd)>0)
-			{
-				char *pw = vncDecryptPasswd(m_encPasswd);
+			{  char * pw = vncDecryptPasswd(m_encPasswd);
 				strcpy(passwd, pw);
 				free(pw);
+			}
+			else if (strlen((const char *) m_encPasswdMs)>0)
+			{  char * pw = vncDecryptPasswdMs(m_encPasswdMs);
+			   strcpy(passwd, pw);
+			   free(pw);
+			   strcpy(user, m_ms_user);
 			}
 			else 
 			{
@@ -1831,8 +1884,13 @@ void ClientConnection::Authenticate()
 								passwd[8] = '\0';
 							}
 						}
-					if (m_ms_logon) vncEncryptPasswdMs(m_encPasswdMs, passwd);
-					vncEncryptPasswd(m_encPasswd, passwd);
+					if (m_ms_logon) 
+					{
+						vncEncryptPasswdMs(m_encPasswdMs, passwd);
+						strcpy(m_ms_user, user);
+					}
+					else
+						vncEncryptPasswd(m_encPasswd, passwd);
 				} 
 				else 
 				{
@@ -1946,7 +2004,8 @@ void ClientConnection::AuthMsLogon() {
 	char user[256], passwd[64];
 	unsigned char key[8];
 
-	memset(m_clearPasswd, 0, sizeof(m_clearPasswd)); // ??
+//act: clearPasswd must NOT be cleared, because of use of user command line
+//line commented:	memset(m_clearPasswd, 0, sizeof(m_clearPasswd)); // ??
 	
 	ReadExact(gen, sizeof(gen));
 	ReadExact(mod, sizeof(mod));
@@ -1961,6 +2020,29 @@ void ClientConnection::AuthMsLogon() {
 	vnclog.Print(100, _T("After DH: g=%I64u, m=%I64u, i=%I64u, key=%I64u\n"),
 	  bytesToInt64(gen), bytesToInt64(mod), bytesToInt64(pub), bytesToInt64((char*) key));
 	// get username and passwd
+	if ((strlen(m_cmdlnUser)>0)||(strlen(m_clearPasswd)>0))
+    {
+		vnclog.Print(0, _T("Command line MS-Logon.\n"));
+#ifndef UNDER_CE
+		strncpy(passwd, m_clearPasswd, 64);
+		strncpy(user, m_cmdlnUser, 254);
+		//strncpy(domain, ad.m_domain, 254);
+#else
+		vncWc2Mb(passwd, m_clearPasswd, 64);
+		vncWc2Mb(user, m_cmdlnUser, 256);
+		//vncWc2Mb(domain, ad.m_domain, 256);
+#endif
+		vncEncryptPasswdMs(m_encPasswdMs, passwd);
+		strcpy(m_ms_user, user);
+	}
+	else if (strlen((const char *) m_encPasswdMs)>0)
+	{  char * pw = vncDecryptPasswdMs(m_encPasswdMs);
+	   strcpy(passwd, pw);
+	   free(pw);
+	   strcpy(user, m_ms_user);
+	}
+	else
+	{
 	AuthDialog ad;
 	if (ad.DoDialog(m_ms_logon, true)) {
 #ifndef UNDER_CE
@@ -1972,12 +2054,13 @@ void ClientConnection::AuthMsLogon() {
 		vncWc2Mb(user, ad.m_user, 256);
 		//vncWc2Mb(domain, ad.m_domain, 256);
 #endif
-		//vncEncryptPasswdMs(m_encPasswdMs, passwd);
+		vncEncryptPasswdMs(m_encPasswdMs, passwd);
+		strcpy(m_ms_user, user);
 	} else {
 		throw QuietException(sz_L54);
 	}
 	//user = domain + "\\" + user;
-
+	}
 	vncEncryptBytes2((unsigned char*) user, sizeof(user), key);
 	vncEncryptBytes2((unsigned char*) passwd, sizeof(passwd), key);
 	
@@ -4707,6 +4790,7 @@ LRESULT CALLBACK ClientConnection::GTGBS_StatusProc(HWND hwnd, UINT iMsg, WPARAM
 				EndDialog(hwnd, TRUE);
 			}
 			if (LOWORD(wParam) == IDQUIT) {
+				forcedexit=true;
 				_this->Pressed_Cancel=true;
 				EndDialog(hwnd, TRUE);
 			}

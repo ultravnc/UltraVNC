@@ -464,6 +464,8 @@ private:
 	TCHAR *m_desktopName;
 	unsigned char m_encPasswd[8];
 	unsigned char m_encPasswdMs[32];
+	char m_ms_user[256];  // act: add user storage for mslogon autoreconnect
+	char m_cmdlnUser[256]; // act: add user option on command line
 	char m_clearPasswd[256]; // Modif sf@2002
 
 	rfbServerInitMsg m_si;
