@@ -1375,7 +1375,7 @@ DWORD WINAPI SocketTimeout(LPVOID lpParam)
 	int counter=0;
 	while (havetobekilled && !forcedexit)
 	{
-		Sleep(50);
+		Sleep(100);
 		counter++;
 		if (counter>100) break;
 	}
