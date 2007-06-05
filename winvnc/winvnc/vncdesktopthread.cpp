@@ -441,6 +441,12 @@ vncDesktopThread::run_undetached(void *arg)
 					m_desktop->asked_display!=m_desktop->m_buffer.GetDisplay()		//monitor change request
 					) 
 					{
+						if (!vncService::InputDesktopSelected())
+						{
+							int a=0;
+							a++;
+							break;
+						}
 						// We need to wait until viewer has send if he support Size changes
 						if (!m_server->All_clients_initialalized())
 						{
