@@ -96,17 +96,17 @@ vncDesktopThread::handle_driver_changes(rfb::Region2D &rgncache,rfb::UpdateTrack
 
 	int oldaantal=m_desktop->m_videodriver->oldaantal;
 	int counter=m_desktop->pchanges_buf->counter;
-	int nr_updates=m_desktop->pchanges_buf->pointrect[0].type;
+//	int nr_updates=m_desktop->pchanges_buf->pointrect[0].type;
 	vnclog.Print(LL_INTERR, VNCLOG("updates, rects %i %i\n"),m_desktop->pchanges_buf->pointrect[0].type,oldaantal-counter);
-	m_desktop->pchanges_buf->pointrect[0].type=0;
 	if (oldaantal==counter) return FALSE;
 	if (counter<1 || counter >1999) return FALSE;
+//	m_desktop->pchanges_buf->pointrect[0].type=0;
 	if (!m_server->SingleWindow()) m_screen_moved=m_desktop->CalcCopyRects(tracker);
 	else m_screen_moved=true;
 
 /// HEITE01E
 // buffer was overloaded, so we use the bounding rect
-	if (nr_updates>2000)
+/*	if (nr_updates>2000)
 	{
 		rfb::Rect rect;
 		int x = m_desktop->pchanges_buf->pointrect[0].rect.left;
@@ -124,7 +124,7 @@ vncDesktopThread::handle_driver_changes(rfb::Region2D &rgncache,rfb::UpdateTrack
 		m_desktop->m_videodriver->oldaantal=counter;
 		}
 	    return TRUE;
-	}
+	}*/
 	if (m_server->SingleWindow()) m_screen_moved=true;
 	if (oldaantal<counter)
 		{
@@ -460,9 +460,6 @@ vncDesktopThread::run_undetached(void *arg)
 						if (m_desktop->m_hookswitch)									vnclog.Print(LL_INTERR, VNCLOG("m_hookswitch \n"));
 						if (m_desktop->asked_display!=m_desktop->m_buffer.GetDisplay()) vnclog.Print(LL_INTERR, VNCLOG("desktop switch %i %i \n"),m_desktop->asked_display,m_desktop->m_buffer.GetDisplay());
 						if (!vncService::InputDesktopSelected())						vnclog.Print(LL_INTERR, VNCLOG("++++InputDesktopSelected \n"));
-
-						//Disable driver for logon and screensaver windows
-						//if (!vncService::InputDesktopSelected()) m_desktop->Temp_Resolution=true;
 						
 						
 						BOOL screensize_changed=false;

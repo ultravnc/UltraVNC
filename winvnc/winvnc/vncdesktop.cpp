@@ -324,7 +324,6 @@ vncDesktop::vncDesktop()
 	g_Desktop_running=true;
 	hUser32=LoadLibrary("USER32");
 	pbi = (pBlockInput)GetProcAddress( hUser32, "BlockInput");
-	Temp_Resolution=false;
 	m_OrigpollingSet=false;
 	m_Origpolling=false;
 	DriverWantedSet=false;
@@ -423,16 +422,14 @@ vncDesktop::Startup()
 		}
 
 	// Modif rdv@2002 - v1.1.x - videodriver
-	if (!Temp_Resolution)
-		{
-			vnclog.Print(LL_INTINFO, VNCLOG("InitVideo driver Called no Temp_Resolution\n"));
-			if (DriverWantedSet==true)
+	vnclog.Print(LL_INTINFO, VNCLOG("InitVideo driver Called\n"));
+	if (DriverWantedSet==true)
 			{
 			m_server->Driver(DriverWanted);
 			m_server->Hook(HookWanted);
 			DriverWantedSet=false;
 			}
-			if (m_server->Driver())
+	if (m_server->Driver())
 				{
 					vnclog.Print(LL_INTINFO, VNCLOG("Driver option enabled \n"));
 					if(OSVersion()==1 )
@@ -440,17 +437,9 @@ vncDesktop::Startup()
 							InitVideoDriver();
 						}
 				}
-			vnclog.Print(LL_INTINFO, VNCLOG("Driver option dsiabled \n"));
-			if (m_Origpolling) m_server->PollFullScreen(m_Origpolling);
-			m_OrigpollingSet=false;
-		}
-	else
-		{
-			m_Origpolling=m_server->PollFullScreen();
-			m_OrigpollingSet=true;
-			m_server->PollFullScreen(TRUE);
-			vnclog.Print(LL_INTINFO, VNCLOG("InitVideo driver Called Temp_Resolution\n"));
-		}
+	vnclog.Print(LL_INTINFO, VNCLOG("Driver option dsiabled \n"));
+	if (m_Origpolling) m_server->PollFullScreen(m_Origpolling);
+	m_OrigpollingSet=false;
 	
 	if (VideoBuffer())
 	{
@@ -497,10 +486,6 @@ vncDesktop::Startup()
 
 	if (VideoBuffer())
 	{
-		pchanges_buf=NULL;
-		GETCHANGESBUF *pcommbuffer=m_videodriver->CreateCommunicationBuffer(m_bminfo.bmi.bmiHeader.biSizeImage);
-		// we need to check again, communication service can be down
-		// In that case driver can not be used
 		if (VideoBuffer())
 		{
 			vnclog.Print(LL_INTINFO, VNCLOG("Removing real Dib buffer and replace by driver communication buffer\n"));
@@ -509,8 +494,8 @@ vncDesktop::Startup()
 					DeleteObject(m_membitmap);
 					m_membitmap = NULL;
 				}
-			m_DIBbits=pcommbuffer->UserbufferBegin;
-			pchanges_buf=pcommbuffer->buffer;
+			m_DIBbits=m_videodriver->myframebuffer;
+			pchanges_buf=m_videodriver->mypchangebuf;
 			InvalidateRect(NULL,NULL,TRUE);
 		}
 	}
@@ -555,20 +540,8 @@ vncDesktop::Shutdown()
 	// Now free all the bitmap stuff
 	if (m_hrootdc != NULL)
 	{
-		// Release our device context
-		// if m_hrootdc was created with createdc, we need to use deletedc to release 
-//		if (VideoBuffer())
-		{
-			if (!DeleteDC(m_hrootdc))
+		if (!DeleteDC(m_hrootdc))
 				vnclog.Print(LL_INTERR, VNCLOG("failed to DeleteDC hrootdc\n"));
-		}
-//		else
-//		{
-//			if(ReleaseDC(NULL, m_hrootdc) == 0)
-//				{
-//					vnclog.Print(LL_INTERR, VNCLOG("failed to ReleaseDC\n"));
-//				}
-//		}
 		m_hrootdc = NULL;
 	}
 	if (m_hmemdc != NULL)
@@ -591,19 +564,7 @@ vncDesktop::Shutdown()
 	}
 
 	// Modif rdv@2002 - v1.1.x - videodriver
-	//if (!Temp_Resolution)
 	ShutdownVideoDriver();
-	/*else if (m_videodriver!=NULL)
-		{
-			m_videodriver->StopMirroring();
-			m_videodriver->RemoveCommunicationBuffer();
-			m_hookswitch=true;
-			Hookdll_Changed=true;
-			pchanges_buf=NULL;
-			m_DIBbits=NULL;
-		}*/
-
-
 	// ***
 	// vncService::SelectHomeWinStation();
 
@@ -726,7 +687,7 @@ vncDesktop::InitBitmap()
 			if (VideoBuffer())
 				{
 					pEnumDisplayDevices pd;
-					LPSTR driverName = "Winvnc video hook driver";
+					LPSTR driverName = "mv video hook driver2";
 					BOOL DriverFound;
 					DEVMODE devmode;
 					FillMemory(&devmode, sizeof(DEVMODE), 0);
@@ -1789,31 +1750,15 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		// We First check if the Resolution changed is caused by a temp resolution switch
 		// For a temp resolution we don't use the driver, to fix the mirror driver
 		// to the new change, a resolution switch is needed, preventing screensaver locking.
-		if (_this->m_videodriver != NULL)
-			{	
-				_this->Temp_Resolution=_this->m_videodriver->Tempres();
-				_this->m_videodriver->Temp_Resolution=_this->m_videodriver->Tempres();
-			}
-		else _this->Temp_Resolution=false;
 
 		if (_this->m_videodriver != NULL) //Video driver active
 		{
 			if (!_this->m_videodriver->blocked)
 			{
 				_this->m_displaychanged = TRUE;
-				if ( _this->Temp_Resolution) 
-					{
-						_this->m_hookdriver=false;
-						vnclog.Print(LL_INTERR, VNCLOG("Temp Resolution switch detected\n"));
-					}	
-				else
-					{
-						_this->m_hookdriver=true;
-						_this->m_videodriver->blocked=true;
-						vnclog.Print(LL_INTERR, VNCLOG("Resolution switch detected, driver active\n"));
-					}
-
-				
+				_this->m_hookdriver=true;
+				_this->m_videodriver->blocked=true;
+				vnclog.Print(LL_INTERR, VNCLOG("Resolution switch detected, driver active\n"));	
 			}
 			else
 			{
@@ -2091,14 +2036,10 @@ BOOL vncDesktop::VideoBuffer()
 	//Always access the shared mememory thru this function
 	// Check NULL
 	if (m_videodriver==NULL) return FALSE;
-	if (IsBadReadPtr(m_videodriver,1)) return FALSE;
-	// If we reach this place, the driver was active
-	if (m_videodriver->driver_succes) return true;
+	if (m_videodriver->mypVideoMemory) return true;
 
-	if (!m_videodriver->driver_succes && Temp_Resolution) return false;
-	if (!m_videodriver->driver_succes && !Temp_Resolution)
+	if (!m_videodriver->mypVideoMemory)
 	{
-		m_videodriver->StopMirroring();
 		m_hookswitch=true;
 		Hookdll_Changed=true;
 		return FALSE;
@@ -2125,12 +2066,6 @@ BOOL vncDesktop::InitVideoDriver()
 	// The pointers to the shared memory still exist, but no more memeory
 	// associated...This is the biggest risk when using the driver
 	//
-/*	if (!RestartDriver)
-	{
-		m_hookdriver=false;
-		m_hookdll=true;
-		return false;
-	}*/
 
 	// First check driver version
 	if (m_videodriver!=NULL) 
@@ -2141,63 +2076,27 @@ BOOL vncDesktop::InitVideoDriver()
 			
 	}
 
-	m_videodriver=new vncVideoDriver;
+	m_videodriver=new VIDEODRIVER;
 	//try to use the mirror driver if he is still active
-/*	if (m_videodriver->ExistMirrorDriver())
-	{
-		char buffer[256];
-		if (m_videodriver->GetDllProductVersion("vncdrv.dll",buffer,254))
-				{
-					DWORD myword;
-					if (strcmp(buffer,"1.00.18")<0)
-					{
-						HANDLE T1=CreateThread(NULL,0,Warningbox_non_locked,m_hwnd,0,&myword);
-						CloseHandle(T1);
-						vnclog.Print(LL_INTERR, VNCLOG("Wrong driver version\n"));
-						if (m_videodriver!=NULL) delete m_videodriver;
-						m_videodriver=NULL;
-						m_hookdriver=false;
-						m_hookdll=true;
-						m_server->Driver(false);
-						m_server->Hook(true);
-						return false;
-					}
-
-				}
-	}*/
-	if (m_videodriver->IsMirrorDriverActive())
-	{
-		// This should normal not happen
-		vnclog.Print(LL_INTERR, VNCLOG("Use active Mirror driver\n"));
-		m_videodriver->StartMirroring();
-		m_hookdriver=true;
-		m_hookdll=false;
-	}
-	else // no drivers where active, so start the mirror driver
-	{
-		Checkmonitors();
-		nr_monitors=GetNrMonitors();
-		if (nr_monitors==1)
+	Checkmonitors();
+	nr_monitors=GetNrMonitors();
+	if (nr_monitors==1)
 		{
 			m_ScreenOffsetx=mymonitor[0].offsetx;
 			m_ScreenOffsety=mymonitor[0].offsety;
-			m_videodriver->Activate_video_driver(true,mymonitor[0].offsetx,mymonitor[0].offsety,mymonitor[0].Width,mymonitor[0].Height);
+			m_videodriver->VIDEODRIVER_start(mymonitor[0].offsetx,mymonitor[0].offsety,mymonitor[0].Width,mymonitor[0].Height);
 		}
-		if (nr_monitors>1)
+	if (nr_monitors>1)
 		{
 			m_ScreenOffsetx=mymonitor[2].offsetx;
 			m_ScreenOffsety=mymonitor[2].offsety;
-			m_videodriver->Activate_video_driver(true,mymonitor[2].offsetx,mymonitor[2].offsety,mymonitor[2].Width,mymonitor[2].Height);
-		}
-		
-
-		vnclog.Print(LL_INTERR, VNCLOG("Start Mirror driver\n"));
-		m_videodriver->StartMirroring();
-		m_hookdriver=true;
-		m_hookdll=false;
-	}
+			m_videodriver->VIDEODRIVER_start(mymonitor[2].offsetx,mymonitor[2].offsety,mymonitor[2].Width,mymonitor[2].Height);
+		}		
+	vnclog.Print(LL_INTERR, VNCLOG("Start Mirror driver\n"));
+	m_hookdriver=true;
+	m_hookdll=false;
 	// check if driver has mapped the shared memory
-	if (!m_videodriver->driver_succes) 
+	if (!m_videodriver->mypVideoMemory) 
 	{
 		vnclog.Print(LL_INTERR, VNCLOG("Start Mirror driver Failed\n"));
 		vnclog.Print(LL_INTERR, VNCLOG("Using non driver mode\n"));
@@ -2217,10 +2116,10 @@ BOOL vncDesktop::InitVideoDriver()
 		return false;
 	}
 	
-	if (m_videodriver->driver_succes)
+	if (m_videodriver->mypVideoMemory)
 	{
 		vnclog.Print(LL_INTERR, VNCLOG("Driver Used\n"));
-		if (!m_videodriver->driver_succes)
+		if (!m_videodriver->mypVideoMemory)
 		{
 			vnclog.Print(LL_INTERR, VNCLOG("Unable to map memory\n"));
 			delete m_videodriver;

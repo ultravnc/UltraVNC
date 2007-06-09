@@ -19,7 +19,6 @@ CFG=winvnc - Win32 Release
 !MESSAGE 
 !MESSAGE "winvnc - Win32 Release" (based on "Win32 (x86) Application")
 !MESSAGE "winvnc - Win32 Debug" (based on "Win32 (x86) Application")
-!MESSAGE "winvnc - Win32 Http" (based on "Win32 (x86) Application")
 !MESSAGE 
 
 # Begin Project
@@ -44,7 +43,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /MT /W3 /GX /Zi /O2 /I "..\omnithread" /I ".." /I "..\.." /D "NDEBUG" /D "__x86__" /D "__WIN32__" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D _WIN32_WINNT=0x501 /D "XMD_H" /D "_WINSTATIC" /YX /FD /D /O3 /QaxWK /c
+# ADD CPP /nologo /MT /W3 /GX /Zi /O2 /I "..\omnithread" /I ".." /I "..\.." /D "NDEBUG" /D "__x86__" /D "__WIN32__" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D _WIN32_WINNT=0x501 /D "XMD_H" /D "_WINSTATIC" /YX /FD /D /O3 /QaxNB /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x809 /d "NDEBUG"
@@ -92,48 +91,12 @@ SOURCE="$(InputPath)"
 PreLink_Cmds=cl /nologo /MTd /Fo..\Debug\ /Fd..\Debug\ /c buildtime.cpp
 # End Special Build Tool
 
-!ELSEIF  "$(CFG)" == "winvnc - Win32 Http"
-
-# PROP BASE Use_MFC 0
-# PROP BASE Use_Debug_Libraries 0
-# PROP BASE Output_Dir "winvnc___Win32_Http"
-# PROP BASE Intermediate_Dir "winvnc___Win32_Http"
-# PROP BASE Ignore_Export_Lib 0
-# PROP BASE Target_Dir ""
-# PROP Use_MFC 0
-# PROP Use_Debug_Libraries 0
-# PROP Output_Dir "winvnc___Win32_Http"
-# PROP Intermediate_Dir "winvnc___Win32_Http"
-# PROP Ignore_Export_Lib 0
-# PROP Target_Dir ""
-# ADD BASE CPP /nologo /MT /W3 /GX /Zi /O2 /I "..\omnithread" /I ".." /I "..\.." /D "NDEBUG" /D "__x86__" /D "__WIN32__" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D _WIN32_WINNT=0x501 /D "XMD_H" /D "_WINSTATIC" /YX /FD /O3 /QaxWK /c
-# SUBTRACT BASE CPP /Fr
-# ADD CPP /nologo /MT /W3 /GX /Zi /O2 /I "..\omnithread" /I ".." /I "..\.." /D "NDEBUG" /D "__x86__" /D "__WIN32__" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D _WIN32_WINNT=0x501 /D "XMD_H" /D "_WINSTATIC" /D "HTTP_SAMEPORT" /YX /FD /O3 /QaxWK /c
-# SUBTRACT CPP /Fr
-# ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
-# ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
-# ADD BASE RSC /l 0x809 /d "NDEBUG"
-# ADD RSC /l 0x809 /d "NDEBUG"
-BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo
-# ADD BSC32 /nologo
-LINK32=xilink6.exe
-# ADD BASE LINK32 wsock32.lib winmm.lib kernel32.lib user32.lib gdi32.lib shell32.lib advapi32.lib ole32.lib version.lib comctl32.lib /nologo /subsystem:windows /machine:I386
-# SUBTRACT BASE LINK32 /pdb:none /nodefaultlib
-# ADD LINK32 wsock32.lib winmm.lib kernel32.lib user32.lib gdi32.lib shell32.lib advapi32.lib ole32.lib version.lib comctl32.lib /nologo /subsystem:windows /machine:I386
-# SUBTRACT LINK32 /pdb:none /nodefaultlib
-# Begin Special Build Tool
-SOURCE="$(InputPath)"
-PreLink_Cmds=cl /nologo /MT /Fo..\Release\ /Fd..\Release\ /c buildtime.cpp
-# End Special Build Tool
-
 !ENDIF 
 
 # Begin Target
 
 # Name "winvnc - Win32 Release"
 # Name "winvnc - Win32 Debug"
-# Name "winvnc - Win32 Http"
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
@@ -172,22 +135,7 @@ SOURCE=..\..\lzo\minilzo.c
 # Begin Source File
 
 SOURCE=.\rfbRegion.cpp
-
-!IF  "$(CFG)" == "winvnc - Win32 Release"
-
 # PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "winvnc - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "winvnc - Win32 Http"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
@@ -208,62 +156,17 @@ SOURCE=.\stdhdrs.cpp
 # Begin Source File
 
 SOURCE=.\tableinitcmtemplate.cpp
-
-!IF  "$(CFG)" == "winvnc - Win32 Release"
-
 # PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "winvnc - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "winvnc - Win32 Http"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=.\tableinittctemplate.cpp
-
-!IF  "$(CFG)" == "winvnc - Win32 Release"
-
 # PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "winvnc - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "winvnc - Win32 Http"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=.\tabletranstemplate.cpp
-
-!IF  "$(CFG)" == "winvnc - Win32 Release"
-
 # PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "winvnc - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "winvnc - Win32 Http"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
@@ -308,22 +211,7 @@ SOURCE=.\vncconndialog.cpp
 # Begin Source File
 
 SOURCE=.\vnccorbaconnect.cpp
-
-!IF  "$(CFG)" == "winvnc - Win32 Release"
-
 # PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "winvnc - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "winvnc - Win32 Http"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
@@ -436,22 +324,7 @@ SOURCE=.\vncsetauth.cpp
 # Begin Source File
 
 SOURCE=.\vncsk.cpp
-
-!IF  "$(CFG)" == "winvnc - Win32 Release"
-
 # PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "winvnc - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "winvnc - Win32 Http"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 

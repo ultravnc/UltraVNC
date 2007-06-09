@@ -4,7 +4,7 @@
 
 typedef BOOL (WINAPI* pEnumDisplayDevices)(PVOID,DWORD,PVOID,DWORD);
 
-bool CheckDriver2(void)
+/*bool CheckDriver2(void)
 {
 	SC_HANDLE       schMaster;
 	SC_HANDLE       schSlave;
@@ -24,85 +24,9 @@ bool CheckDriver2(void)
 		CloseServiceHandle(schMaster);
 		return true;
 	}
-}
-
-BOOL
-IsDriverActive()
-{
-pEnumDisplayDevices pd;
-
-	LPSTR driverName = "Winvnc video hook driver";
-
-	DEVMODE devmode;
-    FillMemory(&devmode, sizeof(DEVMODE), 0);
-    devmode.dmSize = sizeof(DEVMODE);
-    devmode.dmDriverExtra = 0;
-    BOOL change = EnumDisplaySettings(NULL,ENUM_CURRENT_SETTINGS,&devmode);
-    devmode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
-	HMODULE hUser32=LoadLibrary("USER32");
-	pd = (pEnumDisplayDevices)GetProcAddress( hUser32, "EnumDisplayDevicesA");
-	BOOL result;
+}*/
 
 
-    if (pd)
-    {
-        DISPLAY_DEVICE dd;
-        ZeroMemory(&dd, sizeof(dd));
-        dd.cb = sizeof(dd);
-		LPSTR deviceName = NULL;
-        devmode.dmDeviceName[0] = '\0';
-        INT devNum = 0;
-        while (result = (*pd)(NULL,devNum, &dd,0))
-        {
-          if (strcmp((const char *)&dd.DeviceString[0], driverName) == 0)
-              break;
-
-           devNum++;
-        }
-	if (dd.StateFlags & DISPLAY_DEVICE_ATTACHED_TO_DESKTOP)
-		{
-			if (hUser32) FreeLibrary(hUser32);
-			return 1;
-		}
-	else 
-		{
-			if (hUser32) FreeLibrary(hUser32);
-			return 0;
-		}
-	}
-	if (hUser32) FreeLibrary(hUser32);
-	return 0;
-}
-
-bool ExistDriver()
-{
-
-	LPSTR driverName = "Winvnc video hook driver";
-	DEVMODE devmode;
-    FillMemory(&devmode, sizeof(DEVMODE), 0);
-    devmode.dmSize = sizeof(DEVMODE);
-    devmode.dmDriverExtra = 0;
-    BOOL change = EnumDisplaySettings(NULL,ENUM_CURRENT_SETTINGS,&devmode);
-    devmode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
-	BOOL result;
-    DISPLAY_DEVICE dd;
-    ZeroMemory(&dd, sizeof(dd));
-    dd.cb = sizeof(dd);
-	LPSTR deviceName = NULL;
-    devmode.dmDeviceName[0] = '\0';
-    INT devNum = 0;
-	pEnumDisplayDevices pd;
-	HMODULE hUser32=LoadLibrary("USER32");
-	pd = (pEnumDisplayDevices)GetProcAddress( hUser32, "EnumDisplayDevicesA");
-    while (result = (*pd)(NULL,devNum, &dd,0))
-        {
-          if (strcmp((const char *)&dd.DeviceString[0], driverName) == 0)
-              break;
-           devNum++;
-        }
-	if (hUser32) FreeLibrary(hUser32);
-	return result;
-}
 ///////////////////////////////////////////////////////////////////
 BOOL GetDllProductVersion(char* dllName, char *vBuffer, int size)
 {
@@ -158,113 +82,53 @@ TEXT("\\StringFileInfo\\040904b0\\ProductVersion"),
 bool
 CheckVideoDriver(bool Box)
 {
-	if(OSVersion()!=1) return false;
-	char DriverFileName1[MAX_PATH];
-	char DriverFileName2[MAX_PATH];
-	char DriverFileName3[MAX_PATH];
-	char text [MAX_PATH*3];
-	char buffer1[256];
-	char buffer2[256];
-	char buffer3[256];
-	buffer1[0]=0;
-	buffer2[0]=0;
-	buffer3[0]=0;
-	bool b1,b2,b3,b4,active,active2;
-	b1=false;
-	b2=false;
-	b3=false;
-	b4=false;
-	active=false;
-	active2=false;
-
-	GetSystemDirectory(DriverFileName1, MAX_PATH);
-	GetSystemDirectory(DriverFileName2, MAX_PATH);
-	GetSystemDirectory(DriverFileName3, MAX_PATH);
-	strcat(DriverFileName1,"\\vncdrv.dll");
-	strcat(DriverFileName2,"\\Drivers\\vnccom.SYS");
-	strcat(DriverFileName3,"\\Drivers\\vncdrv.SYS");
-
-	GetDllProductVersion(DriverFileName1,buffer1,254);
-	GetDllProductVersion(DriverFileName2,buffer2,254);
-	GetDllProductVersion(DriverFileName3,buffer3,254);
-	if (strcmp(buffer1,"1.00.18")==NULL) b1=true;
-	if (strcmp(buffer1,"1.00.19")==NULL) b1=true;
-	if (strcmp(buffer2,"1.0.0.17")==NULL) b2=true;
-	if (strcmp(buffer3,"1.00.17")==NULL) b3=true;
-	if (ExistDriver()) b4=true;
-	if (b1 && b2 && b3 && b4)
-	{
-		if (IsDriverActive()) active=true;
-		if (CheckDriver2()) active2=true;
-	}
-
-	if (Box)
-	{
-		strcpy(text,DriverFileName1);
-		strcat(text," Version:  ");
-		strcat(text,buffer1);
-		strcat(text,"\n");
-
-		strcat(text,DriverFileName2);
-		strcat(text," Version:  ");
-		strcat(text,buffer2);
-		strcat(text,"\n");
-
-		strcat(text,DriverFileName3);
-		strcat(text," Version:  ");
-		strcat(text,buffer3);
-		strcat(text,"\n");
-		strcat(text,"\n");
-
-		if (b4) 
-		{
-			strcat(text,"The driver is present ");
-			strcat(text,"\n");
-		}
-		else
-		{
-			strcat(text,"The driver is NOT present ");
-			strcat(text,"\n");
-		}
-
-		if (active2) 
-		{
-			strcat(text,"The communication service is present ");
-			strcat(text,"\n");
-		}
-		else
-		{
-			strcat(text,"The communication service is NOT present ");
-			strcat(text,"\n");
-		}
-
-		if (active) 
-		{
-			strcat(text,"The driver is currently ACTIVE ");
-			strcat(text,"\n");
-		}
-		else
-		{
-			strcat(text,"The driver is NOT active ");
-			DEVMODE devmode;
-			FillMemory(&devmode, sizeof(DEVMODE), 0);
-			devmode.dmSize = sizeof(DEVMODE);
-			devmode.dmDriverExtra = 0;
-			BOOL change = EnumDisplaySettings(NULL,ENUM_CURRENT_SETTINGS,&devmode);
-			if (devmode.dmBitsPerPel==8 || devmode.dmBitsPerPel==16 || devmode.dmBitsPerPel==32) 
+		typedef BOOL (WINAPI* pEnumDisplayDevices)(PVOID,DWORD,PVOID,DWORD);
+		HDC m_hrootdc=NULL;
+		pEnumDisplayDevices pd;
+		LPSTR driverName = "mv video hook driver2";
+		BOOL DriverFound;
+		DEVMODE devmode;
+		FillMemory(&devmode, sizeof(DEVMODE), 0);
+		devmode.dmSize = sizeof(DEVMODE);
+		devmode.dmDriverExtra = 0;
+		BOOL change = EnumDisplaySettings(NULL,ENUM_CURRENT_SETTINGS,&devmode);
+		devmode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
+		HMODULE hUser32=LoadLibrary("USER32");
+		pd = (pEnumDisplayDevices)GetProcAddress( hUser32, "EnumDisplayDevicesA");
+		if (pd)
 			{
-				strcat(text,"\n");
+				LPSTR deviceName=NULL;
+				DISPLAY_DEVICE dd;
+				ZeroMemory(&dd, sizeof(dd));
+				dd.cb = sizeof(dd);
+				devmode.dmDeviceName[0] = '\0';
+				INT devNum = 0;
+				BOOL result;
+				DriverFound=false;
+				while (result = (*pd)(NULL,devNum, &dd,0))
+				{
+					if (strcmp((const char *)&dd.DeviceString[0], driverName) == 0)
+					{
+					DriverFound=true;
+					break;
+					}
+					devNum++;
+				}
+				if (DriverFound)
+				{
+					if (hUser32) FreeLibrary(hUser32);
+					if(Box)
+					{
+						char buf[512];
+						GetDllProductVersion("mv2.dll",buf,512);
+						MessageBox(NULL,buf,"driver info",0);
+					}
+					return true;
+				//deviceName = (LPSTR)&dd.DeviceName[0];
+				//m_hrootdc = CreateDC("DISPLAY",deviceName,NULL,NULL);	
+				//if (m_hrootdc) DeleteDC(m_hrootdc);
+				}
 			}
-			else
-			{
-				strcat(text,"Color depth NOT supported, have to be 8/16/32");
-				strcat(text,"\n");
-			}
-		}
-
-		MessageBox(NULL,text,"Driver Test",0);
-	}
-
-	if (b1 && b2 && b3 && b4) return true;
-	else return false;
+	if (hUser32) FreeLibrary(hUser32);	
+	return false;
 }

@@ -386,7 +386,7 @@ protected:
 	PCOPYDATASTRUCT pMyCDS;
 
 	// Modif rdv@2002 - v1.1.x - videodriver
-	vncVideoDriver *m_videodriver;
+	VIDEODRIVER *m_videodriver;
 	BOOL InitVideoDriver();
  	void ShutdownVideoDriver();
 	omni_mutex		m_videodriver_lock;
@@ -413,7 +413,6 @@ protected:
 	SetMouseFilterHookFn SetMouseFilterHook;
 	pBlockInput pbi;
 	HMODULE hUser32;
-	BOOL Temp_Resolution;
 	BOOL m_OrigpollingSet;
 	BOOL m_Origpolling;
 /*	BOOL Check24bit();*/

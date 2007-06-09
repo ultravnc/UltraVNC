@@ -168,7 +168,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
         //ACT: end
 
 	// Configure the log file, in case one is required
-	vnclog.SetFile("WinVNC.log", false);
+	vnclog.SetFile("WinVNC.log", true);
 	vnclog.SetMode(2);
 	vnclog.SetLevel(10);
 

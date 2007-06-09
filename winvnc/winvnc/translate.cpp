@@ -138,63 +138,14 @@ rfbTranslateNone(char *table, rfbPixelFormat *in, rfbPixelFormat *out,
     }
 }
 
-BOOL
-IsMirrorDriverActive()
-{
-	typedef BOOL (WINAPI* pEnumDisplayDevices)(PVOID,DWORD,PVOID,DWORD);
-pEnumDisplayDevices pd;
-	LPSTR driverName = "Winvnc video hook driver";
-	DEVMODE devmode;
-    FillMemory(&devmode, sizeof(DEVMODE), 0);
-    devmode.dmSize = sizeof(DEVMODE);
-    devmode.dmDriverExtra = 0;
-    BOOL change = EnumDisplaySettings(NULL,ENUM_CURRENT_SETTINGS,&devmode);
-    devmode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
-	HMODULE hUser32=LoadLibrary("USER32");
-	pd = (pEnumDisplayDevices)GetProcAddress( hUser32, "EnumDisplayDevicesA");
-	BOOL result;
-
-
-    if (pd)
-    {
-        DISPLAY_DEVICE dd;
-        ZeroMemory(&dd, sizeof(dd));
-        dd.cb = sizeof(dd);
-		LPSTR deviceName = NULL;
-        devmode.dmDeviceName[0] = '\0';
-        INT devNum = 0;
-        while (result = (*pd)(NULL,devNum, &dd,0))
-        {
-          if (strcmp((const char *)&dd.DeviceString[0], driverName) == 0)
-              break;
-
-           devNum++;
-        }
-	if (dd.StateFlags & DISPLAY_DEVICE_ATTACHED_TO_DESKTOP)
-		{
-			if (hUser32) FreeLibrary(hUser32);
-			return 1;
-		}
-	else 
-		{
-			if (hUser32) FreeLibrary(hUser32);
-			return 0;
-		}
-	}
-	return 0;
-}
-
 
 
 HDC GetDcMirror()
 {
-if(OSVersion()==1)
-{
-	if (!IsMirrorDriverActive()) return NULL;
 typedef BOOL (WINAPI* pEnumDisplayDevices)(PVOID,DWORD,PVOID,DWORD);
-		HDC m_hrootdc;
+		HDC m_hrootdc=NULL;
 		pEnumDisplayDevices pd;
-		LPSTR driverName = "Winvnc video hook driver";
+		LPSTR driverName = "mv video hook driver2";
 		BOOL DriverFound;
 		DEVMODE devmode;
 		FillMemory(&devmode, sizeof(DEVMODE), 0);
@@ -226,12 +177,11 @@ typedef BOOL (WINAPI* pEnumDisplayDevices)(PVOID,DWORD,PVOID,DWORD);
 				if (DriverFound)
 				{
 				deviceName = (LPSTR)&dd.DeviceName[0];
-				m_hrootdc = CreateDC("DISPLAY",deviceName,NULL,NULL);				
+				m_hrootdc = CreateDC("DISPLAY",deviceName,NULL,NULL);	
+				if (m_hrootdc) DeleteDC(m_hrootdc);
 				}
 			}
 		if (hUser32) FreeLibrary(hUser32);
 
 		return m_hrootdc;
-}
-else return NULL;
 }
