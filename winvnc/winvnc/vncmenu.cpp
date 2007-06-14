@@ -149,12 +149,8 @@ vncMenu::vncMenu(vncServer *server)
 		return;
 	}
 
-	// Only enable the timer if the tray icon will be displayed.
-	if ( ! server->GetDisableTrayIcon())
-	{
-		// Timer to trigger icon updating
-		SetTimer(m_hwnd, 1, 5000, NULL);
-	}
+	SetTimer(m_hwnd, 1, 100, NULL);
+
 
 	// sf@2002
 	if (!m_ListDlg.Init(m_server))
@@ -412,6 +408,7 @@ vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 	}
 }
 
+int counter=0;
 // Process window messages
 LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -430,34 +427,46 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		switch( wParam )
 		{		
 			case WTS_SESSION_LOGON:
+				vnclog.Print(LL_INTERR, VNCLOG("++++++++++++++++++++++++++++++++++++WTS_CONSOLE_LOGON\n"));
+				//_this->m_server->AutoRestartFlag(TRUE);
+				//_this->m_server->KillAuthClients();
+				//_this->m_server->KillSockConnect();
+				//PostMessage(hwnd, WM_CLOSE, 0, 0);
+				break;
 			case WTS_SESSION_LOGOFF:
+				vnclog.Print(LL_INTERR, VNCLOG("++++++++++++++++++++++++++++++++++++WTS_CONSOLE_LOGOFF\n"));
+				//_this->m_server->AutoRestartFlag(TRUE);
+				//_this->m_server->KillAuthClients();
+				//_this->m_server->KillSockConnect();
+				//PostMessage(hwnd, WM_CLOSE, 0, 0);
+				break;
 			case WTS_CONSOLE_CONNECT:
 				vnclog.Print(LL_INTERR, VNCLOG("++++++++++++++++++++++++++++++++++++WTS_CONSOLE_CONNECT\n"));
-				_this->m_server->AutoRestartFlag(TRUE);
-				_this->m_server->KillAuthClients();
-				_this->m_server->KillSockConnect();
-				PostMessage(hwnd, WM_CLOSE, 0, 0);
+				//_this->m_server->AutoRestartFlag(TRUE);
+				//_this->m_server->KillAuthClients();
+				//_this->m_server->KillSockConnect();
+				//PostMessage(hwnd, WM_CLOSE, 0, 0);
 				break;
 			case WTS_CONSOLE_DISCONNECT:
 				vnclog.Print(LL_INTERR, VNCLOG("WTS_CONSOLE_DISCONNECT\n"));
-				_this->m_server->AutoRestartFlag(TRUE);
-				_this->m_server->KillAuthClients();
-				_this->m_server->KillSockConnect();
+				//_this->m_server->AutoRestartFlag(TRUE);
+				//_this->m_server->KillAuthClients();
+				//_this->m_server->KillSockConnect();
 				PostMessage(hwnd, WM_CLOSE, 0, 0);
 				break;
 			case WTS_SESSION_LOCK:
 				vnclog.Print(LL_INTERR, VNCLOG("WTS_SESSION_LOCK\n"));
-				_this->m_server->AutoRestartFlag(TRUE);
-				_this->m_server->KillAuthClients();
-				_this->m_server->KillSockConnect();
-				PostMessage(hwnd, WM_CLOSE, 0, 0);
+				//zz_this->m_server->AutoRestartFlag(TRUE);
+				//_this->m_server->KillAuthClients();
+				//_this->m_server->KillSockConnect();
+				//PostMessage(hwnd, WM_CLOSE, 0, 0);
 				break;
 			case WTS_SESSION_UNLOCK:
 				vnclog.Print(LL_INTERR, VNCLOG("WTS_SESSION_UNLOCK\n"));
-				_this->m_server->AutoRestartFlag(TRUE);
-				_this->m_server->KillAuthClients();
-				_this->m_server->KillSockConnect();
-				PostMessage(hwnd, WM_CLOSE, 0, 0);
+				//_this->m_server->AutoRestartFlag(TRUE);
+				//_this->m_server->KillAuthClients();
+				//_this->m_server->KillSockConnect();
+				//PostMessage(hwnd, WM_CLOSE, 0, 0);
 				break;
 			default:
 				break;
@@ -481,20 +490,26 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				_this->m_server->AutoRestartFlag(TRUE);
 				_this->m_server->KillAuthClients();
 				_this->m_server->KillSockConnect();
+				_this->m_server->ShutdownServer();
 				PostMessage(hwnd, WM_CLOSE, 0, 0);
 			}
 		}
+		counter++;
 
-	    // *** HACK for running servicified
-		if (vncService::RunningAsService()) {
-		    // Attempt to add the icon if it's not already there
-		    _this->AddTrayIcon();
-		    // Trigger a check of the current user
-		    PostMessage(hwnd, WM_USERCHANGED, 0, 0);
-		}
+		if ( ! _this->m_server->GetDisableTrayIcon() && counter>50)
+			{
+				counter=0;
+				// *** HACK for running servicified
+				if (vncService::RunningAsService()) {
+					// Attempt to add the icon if it's not already there
+					_this->AddTrayIcon();
+					// Trigger a check of the current user
+					PostMessage(hwnd, WM_USERCHANGED, 0, 0);
+				}
 
-		// Update the icon
-		_this->FlashTrayIcon(_this->m_server->AuthClientCount() != 0);
+				// Update the icon
+				_this->FlashTrayIcon(_this->m_server->AuthClientCount() != 0);
+			}
 		break;
 
 		// DEAL WITH NOTIFICATIONS FROM THE SERVER:
@@ -645,6 +660,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		// tnatsni Wallpaper fix
 		if (_this->m_server->RemoveWallpaperEnabled())
 			RestoreWallpaper();
+		DestroyWindow(hwnd);
 		break;
 		
 	case WM_DESTROY:
@@ -654,6 +670,10 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		return 0;
 		
 	case WM_QUERYENDSESSION:
+		_this->m_server->KillAuthClients();
+		_this->m_server->KillSockConnect();
+		_this->m_server->ShutdownServer();
+		DestroyWindow(hwnd);
 		vnclog.Print(LL_INTERR, VNCLOG("WM_QUERYENDSESSION\n"));
 		break;
 		
