@@ -93,15 +93,21 @@ bool InputDesktopSelected()
 				DESKTOP_WRITEOBJECTS | DESKTOP_READOBJECTS |
 				DESKTOP_SWITCHDESKTOP | GENERIC_WRITE);
 
-		if (inputdesktop == NULL) return FALSE;
+		if (inputdesktop == NULL)
+		{
+			vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - inputdesktop == NULL \n"));
+			return FALSE;
+		}
 
 
 		if (!GetUserObjectInformation(threaddesktop, UOI_NAME, &threadname, 256, &dummy)) {
 			CloseDesktop(inputdesktop);
+			vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - threadname == NULL \n"));
 			return FALSE;
 		}
 		if (!GetUserObjectInformation(inputdesktop, UOI_NAME, &inputname, 256, &dummy)) {
 			CloseDesktop(inputdesktop);
+			vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - inputname == NULL \n"));
 			return FALSE;
 		}
 
@@ -168,9 +174,25 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
         //ACT: end
 
 	// Configure the log file, in case one is required
-	vnclog.SetFile("WinVNC.log", true);
+//		Beep(1000,100);
+//		Beep(2000,100);
+//		Beep(3000,100);
+//		Beep(4000,100);
+
+	char WORKDIR[MAX_PATH];
+	if (GetModuleFileName(NULL, WORKDIR, MAX_PATH))
+		{
+		char* p = strrchr(WORKDIR, '\\');
+		if (p == NULL) return 0;
+		*p = '\0';
+		}
+	strcat(WORKDIR,"\\");
+	strcat(WORKDIR,"WinVNC.log");
+
+	vnclog.SetFile(WORKDIR, true);
 	vnclog.SetMode(2);
 	vnclog.SetLevel(10);
+	vnclog.Print(LL_STATE, VNCLOG("sockets initialised pre %s\n"),szCmdLine);
 
 #ifdef _DEBUG
 	{
@@ -196,7 +218,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 		MessageBox(NULL, sz_ID_FAILED_INIT, szAppName, MB_OK);
 		return 0;
 	}
-	vnclog.Print(LL_STATE, VNCLOG("sockets initialised\n"));
+	vnclog.Print(LL_STATE, VNCLOG("sockets initialised %s\n"),szCmdLine);
 
 
 	// Make the command-line lowercase and parse it
@@ -251,7 +273,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 		if (strncmp(&szCmdLine[i], "windesk",  strlen("-windesk")) == 0)
 		{
 			fRunningAsApplication0System = true;
-			if (!InputDesktopSelected()) return 0;
+			if (!InputDesktopSelected())
+			{
+				vnclog.Print(LL_STATE, VNCLOG("failed, return inputdesk\n"));
+				return 0;
+			}
 			vncService::RunningAsApplication0System(true); 
 			return WinVNCAppMain();
 		}
@@ -259,7 +285,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 		if (strncmp(&szCmdLine[i], "defaultdesk",  strlen("-defaultdesk")) == 0)
 		{
 			fRunningAsApplication0User = true;
-			if (!InputDesktopSelected()) return 0;
+			if (!InputDesktopSelected())
+			{
+				vnclog.Print(LL_STATE, VNCLOG("failed, return inputdesk\n"));
+				return 0;
+			}
 			vncService::RunningAsApplication0System(false); 
 			return WinVNCAppMain();
 		}
