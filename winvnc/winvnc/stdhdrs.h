@@ -25,9 +25,10 @@
 #define WIN32_LEAN_AND_MEAN
 #define STRICT
 
+#include <winsock2.h>
 #include <windows.h>
 #include <shellapi.h>
-#include <winsock2.h>
+//#include <winsock2.h>
 
 #include <malloc.h>
 #include <stdio.h>

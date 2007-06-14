@@ -1,3 +1,4 @@
+#include "stdhdrs.h"
 #include "videodriver.h"
 #include <StrSafe.h>
 LPSTR driverName = "mv video hook driver2";
@@ -129,6 +130,10 @@ PCHAR VIDEODRIVER::VideoMemory_GetSharedMemory(void)
        }
 
        CloseHandle(hFile);
+   }
+   else
+   {
+	   vnclog.Print(LL_INTERR, VNCLOG("Error video.dat \n")); 
    }
    
    return pVideoMemory;
