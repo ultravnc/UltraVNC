@@ -301,7 +301,10 @@ vncServer::~vncServer()
 
 	// Modif sf@2002 - DSMPlugin handling
 	if (m_pDSMPlugin != NULL)
+	{
 		delete(m_pDSMPlugin);
+		m_pDSMPlugin=NULL;
+	}
 
 	// Free the host blacklist
 	while (m_blacklist) {
@@ -313,7 +316,104 @@ vncServer::~vncServer()
 	}
 	//We need to give the client thread to give some time to close
 	// bad hack
-	Sleep(500);
+	//Sleep(500);
+	//sometimes crash, vnclog seems already removed
+	//	vnclog.Print(LL_STATE, VNCLOG("shutting down server object(4)\n"));
+	g_Server_running=false;
+}
+
+void
+vncServer::ShutdownServer()
+{
+	vnclog.Print(LL_STATE, VNCLOG("shutting down server object\n"));
+
+	// We don't want to retry when we are shutting down...
+	m_fAutoReconnect = FALSE;
+
+	// if we are in the middle of retrying our autoreconnect - kill the timer
+	if ( m_retry_timeout > 0 )
+	{
+		KillTimer( NULL, m_retry_timeout );
+		m_retry_timeout = 0;
+	}
+
+	// If there is a socket_conn object then delete it
+	if (m_socketConn != NULL)
+	{
+		delete m_socketConn;
+		m_socketConn = NULL;
+	}
+
+	if (m_httpConn != NULL)
+	{
+		delete m_httpConn;
+		m_httpConn = NULL;
+	}
+
+	// Modif Jeremy C. 
+	if(m_impersonationtoken) 
+		CloseHandle(m_impersonationtoken);
+
+	// Remove any active clients!
+	KillAuthClients();
+	KillUnauthClients();
+
+	// Wait for all the clients to die
+	WaitUntilAuthEmpty();
+	WaitUntilUnauthEmpty();
+
+	// Don't free the desktop until no KillClient is likely to free it
+	{	omni_mutex_lock l(m_desktopLock);
+
+		if (m_desktop != NULL)
+		{
+			delete m_desktop;
+			m_desktop = NULL;
+		}
+	}
+	while (g_Desktop_running)
+	{
+		Sleep(100);
+		vnclog.Print(LL_STATE, VNCLOG("Waiting for desktop to shutdown\n"));
+	}
+
+	// Don't free the authhosts string until no more connections are possible
+	if (m_auth_hosts != 0)
+	{
+		free(m_auth_hosts);
+		m_auth_hosts = 0;
+	}
+
+	if (m_name != NULL)
+	{
+		free(m_name);
+		m_name = NULL;
+	}
+
+	if (m_clientquitsig != NULL)
+	{
+		delete m_clientquitsig;
+		m_clientquitsig = NULL;
+	}
+
+	// Modif sf@2002 - DSMPlugin handling
+	if (m_pDSMPlugin != NULL)
+	{
+		delete(m_pDSMPlugin);
+		m_pDSMPlugin=NULL;
+	}
+
+	// Free the host blacklist
+	while (m_blacklist) {
+		vncServer::BlacklistEntry *current = m_blacklist;
+		m_blacklist=m_blacklist->_next;
+
+		free (current->_machineName);
+		delete current;
+	}
+	//We need to give the client thread to give some time to close
+	// bad hack
+	//Sleep(500);
 	//sometimes crash, vnclog seems already removed
 //	vnclog.Print(LL_STATE, VNCLOG("shutting down server object(4)\n"));
 	g_Server_running=false;
