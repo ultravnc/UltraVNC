@@ -97,7 +97,7 @@ vncDesktopThread::handle_driver_changes(rfb::Region2D &rgncache,rfb::UpdateTrack
 	int oldaantal=m_desktop->m_videodriver->oldaantal;
 	int counter=m_desktop->pchanges_buf->counter;
 //	int nr_updates=m_desktop->pchanges_buf->pointrect[0].type;
-	vnclog.Print(LL_INTERR, VNCLOG("updates, rects %i %i\n"),m_desktop->pchanges_buf->pointrect[0].type,oldaantal-counter);
+//	vnclog.Print(LL_INTERR, VNCLOG("updates, rects %i\n"),oldaantal-counter);
 	if (oldaantal==counter) return FALSE;
 	if (counter<1 || counter >1999) return FALSE;
 //	m_desktop->pchanges_buf->pointrect[0].type=0;
@@ -146,7 +146,7 @@ vncDesktopThread::handle_driver_changes(rfb::Region2D &rgncache,rfb::UpdateTrack
 					copy_bitmaps_to_buffer(i,rgncache,tracker);
 				}
 		}	
-	vnclog.Print(LL_INTINFO, VNCLOG("Nr rects %i \n"),rgncache.Numrects());
+//	vnclog.Print(LL_INTINFO, VNCLOG("Nr rects %i \n"),rgncache.Numrects());
 	m_desktop->m_videodriver->oldaantal=counter;
 // A lot updates left after combining 
 // This generates an overflow
@@ -322,10 +322,10 @@ vncDesktopThread::run_undetached(void *arg)
 	//*******************************************************
 	// INIT
 	//*******************************************************
-	SessionFix();
+//	SessionFix();
 	vnclog.Print(LL_INTERR, VNCLOG("Hook changed 1\n"));
 	// Save the thread's "home" desktop, under NT (no effect under 9x)
-	HDESK home_desktop = GetThreadDesktop(GetCurrentThreadId());
+//	HDESK home_desktop = GetThreadDesktop(GetCurrentThreadId());
     vnclog.Print(LL_INTERR, VNCLOG("Hook changed 2\n"));
 	// Attempt to initialise and return success or failure
 	m_desktop->KillScreenSaver();
@@ -336,7 +336,7 @@ vncDesktopThread::run_undetached(void *arg)
 	}
 	if (!m_desktop->Startup())
 	{
-		vncService::SelectHDESK(home_desktop);
+//		vncService::SelectHDESK(home_desktop);
 		ReturnVal(FALSE);
 		return NULL;
 	}
@@ -443,8 +443,7 @@ vncDesktopThread::run_undetached(void *arg)
 					{
 						if (!vncService::InputDesktopSelected())
 						{
-							int a=0;
-							a++;
+							m_server->KillAuthClients();
 							break;
 						}
 						// We need to wait until viewer has send if he support Size changes
@@ -1084,7 +1083,7 @@ vncDesktopThread::run_undetached(void *arg)
 	vncKeymap::ClearShiftKeys();
 	
 	// Switch back into our home desktop, under NT (no effect under 9x)
-	vncService::SelectHDESK(home_desktop);
+//	vncService::SelectHDESK(home_desktop);
 	g_DesktopThread_running=false;
 	HWND mywin=FindWindow("blackscreen",NULL);
 	if (mywin)PostMessage(mywin,WM_CLOSE, 0, 0);
