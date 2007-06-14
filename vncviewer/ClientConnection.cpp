@@ -533,12 +533,21 @@ void ClientConnection::DoConnection()
 void ClientConnection::Reconnect()
 {
 	Sleep( m_autoReconnect * 1000 );
-	DoConnection();
+	try
+	{
+		DoConnection();
 
-	m_bKillThread = false;
-	m_running = true;
+		m_bKillThread = false;
+		m_running = true;
 
-	SendFullFramebufferUpdateRequest();
+		SendFullFramebufferUpdateRequest();
+	}
+	catch (Exception &e)
+	{
+		if( !m_autoReconnect )
+			e.Report();
+		PostMessage(m_hwndMain, WM_CLOSE, 1, 0);
+	}
 }
 
 
@@ -3438,7 +3447,7 @@ void* ClientConnection::run_undetached(void* arg) {
 			PostMessage(m_hwndMain, WM_CLOSE, 1, 0);
 		}
 
-		yield();
+		Sleep(0);
 		Sleep(2000);
 	}
 
