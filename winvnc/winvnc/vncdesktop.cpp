@@ -412,9 +412,6 @@ vncDesktop::Startup()
 {
 	// Initialise the Desktop object
 
-	// ***
-	// vncService::SelectInputWinStation()
-
 	if (!InitDesktop())
 		{
 			vnclog.Print(LL_INTINFO, VNCLOG("InitDesktop Failed\n"));
@@ -578,9 +575,7 @@ vncDesktop::InitDesktop()
 {
 	if (vncService::InputDesktopSelected())
 		return TRUE;
-
-	// Ask for the current input desktop
-	return vncService::SelectDesktop(NULL);
+	return false;
 }
 
 // Routine used to close the screen saver, if it's active...
@@ -1700,7 +1695,7 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		switch (wParam)
 		{
 			case SC_MONITORPOWER:
-				vnclog.Print(LL_INTINFO, VNCLOG("Monitor2 %i\n"),lParam);
+				vnclog.Print(LL_INTINFO, VNCLOG("Monitor22 %i\n"),lParam);
 		}
 		vnclog.Print(LL_INTINFO, VNCLOG("Monitor3 %i %i\n"),wParam,lParam);
 		return DefWindowProc(hwnd, iMsg, wParam, lParam);
@@ -1710,7 +1705,7 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		switch (wParam)
 		{
 			case SC_MONITORPOWER:
-				vnclog.Print(LL_INTINFO, VNCLOG("Monitor2 %i\n"),lParam);
+				vnclog.Print(LL_INTINFO, VNCLOG("Monitor222 %i\n"),lParam);
 		}
 		vnclog.Print(LL_INTINFO, VNCLOG("Power3 %i %i\n"),wParam,lParam);
 		return DefWindowProc(hwnd, iMsg, wParam, lParam);
