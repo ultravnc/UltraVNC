@@ -304,6 +304,7 @@ vncService::SelectHDESK(HDESK new_desktop)
 BOOL
 vncService::SelectDesktop(char *name)
 {
+	return false;
 	// Are we running on NT?
 	if (IsWinNT())
 	{
@@ -382,21 +383,6 @@ BOOL CALLBACK WinStationEnumProc(LPTSTR name, LPARAM param) {
 	return TRUE;
 }
 
-BOOL
-vncService::SelectInputWinStation()
-{
-	home_window_station = GetProcessWindowStation();
-	return EnumWindowStations(&WinStationEnumProc, NULL);
-}
-
-void
-vncService::SelectHomeWinStation()
-{
-	HWINSTA station=GetProcessWindowStation();
-	SetProcessWindowStation(home_window_station);
-	CloseWindowStation(station);
-}
-
 // NT only function to establish whether we're on the current input desktop
 
 BOOL
@@ -469,7 +455,9 @@ SimulateCtrlAltDelThreadFn(void *context)
 {
 	HDESK old_desktop = GetThreadDesktop(GetCurrentThreadId());
 
-	//if (!vncService::RunningAsApplication0System())
+
+	//When runnning in default desktop, try to switch desktop
+	if (!vncService::RunningAsApplication0System())
 	{
 		// Switch into the Winlogon desktop
 		if (!vncService::SelectDesktop("Winlogon"))
@@ -487,7 +475,8 @@ SimulateCtrlAltDelThreadFn(void *context)
 	PostMessage(HWND_BROADCAST, WM_HOTKEY, 0, MAKELONG(MOD_ALT | MOD_CONTROL, VK_DELETE));
 
 	// Switch back to our original desktop
-	//if (!vncService::RunningAsApplication0System())
+	//When runnning in default desktop, try to switch desktop
+	if (!vncService::RunningAsApplication0System())
 	{
 		if (old_desktop != NULL)
 			vncService::SelectHDESK(old_desktop);
@@ -743,7 +732,7 @@ vncService::PostUserHelperMessage()
 // ROUTINE TO PROCESS AN INCOMING INSTANCE OF THE ABOVE MESSAGE
 BOOL
 vncService::ProcessUserHelperMessage(WPARAM wParam, LPARAM lParam) {
-	// - Check the platform type
+/*	// - Check the platform type
 	if (!IsWinNT() || !vncService::RunningAsService())
 		return TRUE;
 
@@ -797,7 +786,7 @@ vncService::ProcessUserHelperMessage(WPARAM wParam, LPARAM lParam) {
 	CloseHandle(userToken);
 
 	g_impersonating_user = TRUE;
-	vnclog.Print(LL_INTINFO, VNCLOG("impersonating logged on user\n"));
+	vnclog.Print(LL_INTINFO, VNCLOG("impersonating logged on user\n"));*/
 	return TRUE;
 }
 

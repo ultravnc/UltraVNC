@@ -95,8 +95,6 @@ public:
 
 	// Routine to switch the service process across to the currently
 	// visible Window Station and back to its home window station again
-	static BOOL SelectInputWinStation();
-	static void SelectHomeWinStation();
 
 	// Routine to establish whether the current thread desktop is the
 	// current user input one
