@@ -148,6 +148,8 @@ public:
 	UINT				m_port;
 	UINT				m_port_http; // TightVNC 1.2.7
 
+	virtual void ShutdownServer();
+
 protected:
 	// Send a notification message
 	virtual void DoNotify(UINT message, WPARAM wparam, LPARAM lparam);
