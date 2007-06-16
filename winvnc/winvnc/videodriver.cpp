@@ -142,6 +142,10 @@ PCHAR VIDEODRIVER::VideoMemory_GetSharedMemory(void)
 bool
 VIDEODRIVER::Mirror_driver_Vista(DWORD dwAttach,int x,int y,int w,int h)
 {
+	pEnumDisplayDevices pd;
+	HMODULE hUser32=LoadLibrary("USER32");
+	pd = (pEnumDisplayDevices)GetProcAddress( hUser32, "EnumDisplayDevicesA");
+
     BOOL  bED   = TRUE;
     DEVMODE devmode;
 
@@ -185,7 +189,7 @@ VIDEODRIVER::Mirror_driver_Vista(DWORD dwAttach,int x,int y,int w,int h)
         DWORD cyPrimary = 0xFFFFFFFF;
 
         // First enumerate for Primary display device:
-        while (result = EnumDisplayDevices(NULL,
+        while (result = (*pd)(NULL,
                                 devNum,
                                 &dispDevice,
                                 0))
@@ -204,24 +208,30 @@ VIDEODRIVER::Mirror_driver_Vista(DWORD dwAttach,int x,int y,int w,int h)
           }
           devNum++;
         }
-		if (devmode.dmBitsPerPel!=8 && devmode.dmBitsPerPel!=16 && devmode.dmBitsPerPel!=32) return false;
+		if (devmode.dmBitsPerPel!=8 && devmode.dmBitsPerPel!=16 && devmode.dmBitsPerPel!=32) 
+		{
+			if (hUser32) FreeLibrary(hUser32);
+			return false;
+		}
 
         // error check
         if (!result)
         {
 //           MessageBox(NULL,  driverName, NULL, MB_OK);
+		   if (hUser32) FreeLibrary(hUser32);
            return false;
         }
 
         if (cxPrimary == 0xffffffff || cyPrimary == 0xffffffff)
         {
 //             MessageBox(NULL,"cxPrimary or cyPrimary not valid", NULL, MB_OK);
+			if (hUser32) FreeLibrary(hUser32);
             return false;
         }
 
         // Enumerate again for the mirror driver:
         devNum = 0;
-        while (result = EnumDisplayDevices(NULL,
+        while (result = (*pd)(NULL,
                                   devNum,
                                   &dispDevice,
                                   0))
@@ -236,6 +246,7 @@ VIDEODRIVER::Mirror_driver_Vista(DWORD dwAttach,int x,int y,int w,int h)
         if (!result)
         {
 //          MessageBox(NULL,driverName, NULL, MB_OK);
+		   if (hUser32) FreeLibrary(hUser32);
            return false;
         }
 
@@ -304,7 +315,11 @@ VIDEODRIVER::Mirror_driver_Vista(DWORD dwAttach,int x,int y,int w,int h)
                                     NULL
                                     );
 //            GetDispCode(code);
-			if (code!=0) return false;
+			if (code!=0) 
+			{
+				if (hUser32) FreeLibrary(hUser32);
+				return false;
+			}
             // Now do the real mode change to take mirror driver changes into
             // effect.
             code = ChangeDisplaySettingsEx(NULL,
@@ -314,11 +329,18 @@ VIDEODRIVER::Mirror_driver_Vista(DWORD dwAttach,int x,int y,int w,int h)
                                            NULL);
 //			MessageBox(NULL,"end", NULL, MB_OK);
  //            GetDispCode(code);
-			if (code!=0) return false;
+			if (code!=0)
+			{
+				if (hUser32) FreeLibrary(hUser32);
+				return false;
+			}
+			if (hUser32) FreeLibrary(hUser32);
 			return true;
         }
+		if (hUser32) FreeLibrary(hUser32);
 		return false;
 	}
+	if (hUser32) FreeLibrary(hUser32);
 	return false;
 }
 
@@ -327,6 +349,11 @@ VIDEODRIVER::Mirror_driver_Vista(DWORD dwAttach,int x,int y,int w,int h)
 void
 VIDEODRIVER::Mirror_driver_detach_XP()
 {
+
+	pEnumDisplayDevices pd;
+	HMODULE hUser32=LoadLibrary("USER32");
+	pd = (pEnumDisplayDevices)GetProcAddress( hUser32, "EnumDisplayDevicesA");
+
 	DEVMODE devmode;
 
     FillMemory(&devmode, sizeof(DEVMODE), 0);
@@ -361,7 +388,7 @@ VIDEODRIVER::Mirror_driver_detach_XP()
         INT devNum = 0;
         BOOL result;
 
-        while (result = EnumDisplayDevices(NULL,
+        while (result = (*pd)(NULL,
                                   devNum,
                                   &dispDevice,
                                   0))
@@ -375,6 +402,7 @@ VIDEODRIVER::Mirror_driver_detach_XP()
         if (!result)
         {
            printf("No '%s' found.\n", driverName);
+		   if (hUser32) FreeLibrary(hUser32);
            return;
         }
 
@@ -410,6 +438,7 @@ VIDEODRIVER::Mirror_driver_detach_XP()
                         _T("SYSTEM\\CurrentControlSet\\Hardware Profiles\\Current\\System\\CurrentControlSet\\Services\\mv2"),
                          &hKeyProfileMirror) != ERROR_SUCCESS)
         {
+		   if (hUser32) FreeLibrary(hUser32);
            return;
         }
 
@@ -418,6 +447,7 @@ VIDEODRIVER::Mirror_driver_detach_XP()
                          _T(&deviceNum[0]),
                          &hKeyDevice) != ERROR_SUCCESS)
         {
+		   if (hUser32) FreeLibrary(hUser32);
            return;
         }
 
@@ -429,6 +459,7 @@ VIDEODRIVER::Mirror_driver_detach_XP()
                           (unsigned char *)&one,
                           4) != ERROR_SUCCESS)
         {
+		   if (hUser32) FreeLibrary(hUser32);
            return;
         }
 
@@ -456,7 +487,8 @@ VIDEODRIVER::Mirror_driver_detach_XP()
 //        GetDispCode(code);
 		RegCloseKey(hKeyProfileMirror);
         RegCloseKey(hKeyDevice);
-}
+	}
+if (hUser32) FreeLibrary(hUser32);
 }
 
 //BOOL
@@ -467,6 +499,10 @@ VIDEODRIVER::Mirror_driver_attach_XP(int x,int y,int w,int h)
 {
 //	Activate_video_driver();
 //	return;
+	pEnumDisplayDevices pd;
+	HMODULE hUser32=LoadLibrary("USER32");
+	pd = (pEnumDisplayDevices)GetProcAddress( hUser32, "EnumDisplayDevicesA");
+
 	DEVMODE devmode;
 
     FillMemory(&devmode, sizeof(DEVMODE), 0);
@@ -483,7 +519,11 @@ VIDEODRIVER::Mirror_driver_attach_XP(int x,int y,int w,int h)
 					   DM_POSITION |
                        DM_PELSHEIGHT;
 
-	if (devmode.dmBitsPerPel!=8 && devmode.dmBitsPerPel!=16 && devmode.dmBitsPerPel!=32) return false;
+	if (devmode.dmBitsPerPel!=8 && devmode.dmBitsPerPel!=16 && devmode.dmBitsPerPel!=32)
+	{
+		if (hUser32) FreeLibrary(hUser32);
+		return false;
+	}
 
     if (change) 
     {
@@ -504,7 +544,7 @@ VIDEODRIVER::Mirror_driver_attach_XP(int x,int y,int w,int h)
         INT devNum = 0;
         BOOL result;
 
-        while (result = EnumDisplayDevices(NULL,
+        while (result = (*pd)(NULL,
                                   devNum,
                                   &dispDevice,
                                   0))
@@ -518,6 +558,7 @@ VIDEODRIVER::Mirror_driver_attach_XP(int x,int y,int w,int h)
         if (!result)
         {
            printf("No '%s' found.\n", driverName);
+		   if (hUser32) FreeLibrary(hUser32);
            return false;
         }
 
@@ -553,6 +594,7 @@ VIDEODRIVER::Mirror_driver_attach_XP(int x,int y,int w,int h)
                         _T("SYSTEM\\CurrentControlSet\\Hardware Profiles\\Current\\System\\CurrentControlSet\\Services\\mv2"),
                          &hKeyProfileMirror) != ERROR_SUCCESS)
         {
+		   if (hUser32) FreeLibrary(hUser32);
            return false;
         }
 
@@ -561,6 +603,7 @@ VIDEODRIVER::Mirror_driver_attach_XP(int x,int y,int w,int h)
                          _T(&deviceNum[0]),
                          &hKeyDevice) != ERROR_SUCCESS)
         {
+		   if (hUser32) FreeLibrary(hUser32);
            return false;
         }
 
@@ -572,6 +615,7 @@ VIDEODRIVER::Mirror_driver_attach_XP(int x,int y,int w,int h)
                           (unsigned char *)&one,
                           4) != ERROR_SUCCESS)
         {
+		   if (hUser32) FreeLibrary(hUser32);
            return false;
         }
 
@@ -592,7 +636,11 @@ VIDEODRIVER::Mirror_driver_attach_XP(int x,int y,int w,int h)
                                 );
     
 //        GetDispCode(code);
-		if (code!=0) return false;
+		if (code!=0) 
+		{
+			if (hUser32) FreeLibrary(hUser32);
+			return false;
+		}
         code = ChangeDisplaySettingsEx(deviceName,
                                 &devmode, 
                                 NULL,
@@ -603,10 +651,16 @@ VIDEODRIVER::Mirror_driver_attach_XP(int x,int y,int w,int h)
 //        GetDispCode(code);
 		RegCloseKey(hKeyProfileMirror);
         RegCloseKey(hKeyDevice);
-		if (code!=0) return false;
+		if (code!=0)
+		{
+			if (hUser32) FreeLibrary(hUser32);
+			return false;
+		}
+		if (hUser32) FreeLibrary(hUser32);
 		return true;
 	}
-return false;
+	if (hUser32) FreeLibrary(hUser32);
+	return false;
 }
 
 int
