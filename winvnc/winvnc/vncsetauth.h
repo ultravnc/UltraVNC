@@ -25,7 +25,7 @@
 // vncSetAuth
 
 // Object implementing the About dialog for WinVNC.
-
+#include "inifile.h"
 class vncSetAuth;
 
 #if (!defined(_WINVNC_VNCSETAUTH))
@@ -89,6 +89,8 @@ public:
 	char pszgroup3[256];
 
 	vncServer *			m_server;
+	BOOL m_fUseRegistry;
+	IniFile myIniFile;
 };
 
 #endif // _WINVNC_VNCPROPERTIES
