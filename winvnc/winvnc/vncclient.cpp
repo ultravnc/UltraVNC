@@ -1059,7 +1059,19 @@ vncClientThread::run(void *arg)
 	// Use Plugin only from this point (now BEFORE Protocole handshaking)
 	if (m_server->GetDSMPluginPointer()->IsEnabled())
 	{
-		m_server->GetDSMPluginPointer()->ResetPlugin();	//SEC reset if needed
+
+		// sf@2007 - Current DSM code does not support multithreading
+		// Data mix is causing server crash and viewer drops when more than one viewer is copnnected at a time
+		// We must reject any new viewer connection BEFORE any data passes through the plugin
+		// This is a dirty workaround. We ignore all Multi Viewer connection settings...
+		if (m_server->AuthClientCount() > 0)
+		{
+			vnclog.Print(LL_CLIENTS, VNCLOG("A connection using DSM already exist - client rejected to avoid crash \n"));
+			return;
+		} 
+
+		if (m_server->AuthClientCount() == 0)
+			m_server->GetDSMPluginPointer()->ResetPlugin();	//SEC reset if needed
 		m_socket->EnableUsePlugin(true);
 		m_client->m_encodemgr.EnableQueuing(false);
 		// TODO: Make a more secured challenge (with time stamp)

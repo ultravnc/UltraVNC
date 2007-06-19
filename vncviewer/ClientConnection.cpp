@@ -1533,6 +1533,7 @@ void ClientConnection::NegotiateProtocolVersion()
 									"- The selected DSMPlugin is not compatible with the one running on the Server\r\n"
 									"- The selected DSMPlugin is not correctly configured (also possibly on the Server)\r\n"
 									"- The password you've possibly entered is incorrect\r\n"
+									"- Another viewer using a DSMPlugin is already connected to the Server (more than one is forbidden)\r\n"
 									);
 		else
 			throw WarningException("Connection failed - Error reading Protocol Version\r\n\n\r"
@@ -1574,6 +1575,8 @@ void ClientConnection::NegotiateProtocolVersion()
 									"- The selected DSMPlugin is not compatible with the one running on the Server\r\n"
 									"- The selected DSMPlugin is not correctly configured (also possibly on the Server)\r\n"
 									"- The password you've possibly entered is incorrect\r\n"
+									"- Another viewer using a DSMPlugin is already connected to the Server (more than one is forbidden)\r\n"
+
 									);
 		else
 			throw WarningException("Connection failed - Invalid protocol !\r\n\r\n"
@@ -1679,6 +1682,7 @@ void ClientConnection::NegotiateProxy()
 									"- The selected DSMPlugin is not compatible with the one running on the Server\r\n"
 									"- The selected DSMPlugin is not correctly configured (also possibly on the Server)\r\n"
 									"- The password you've possibly entered is incorrect\r\n"
+									"- Another viewer using a DSMPlugin is already connected to the Server (more than one is forbidden)\r\n"
 									);
 		else
 			throw WarningException("Proxy Connection failed - Error reading Protocol Version\r\n\n\r"
@@ -1713,6 +1717,7 @@ void ClientConnection::NegotiateProxy()
 									"- The selected DSMPlugin is not compatible with the one running on the Server\r\n"
 									"- The selected DSMPlugin is not correctly configured (also possibly on the Server)\r\n"
 									"- The password you've possibly entered is incorrect\r\n"
+									"- Another viewer using a DSMPlugin is already connected to the Server (more than one is forbidden)\r\n"
 									);
 		else
 			throw WarningException("Proxy Connection failed - Invalid protocol !\r\n\r\n"
