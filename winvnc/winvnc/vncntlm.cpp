@@ -5,6 +5,7 @@
 // Marscha@2004 - authSSP: from stdhdrs.h, required for logging
 #include "VNCLog.h"
 extern VNCLog vnclog;
+#include "inifile.h"
 
 // No logging at all
 #define LL_NONE		0
@@ -57,210 +58,375 @@ HKEY hkUser=NULL;
 void
 OpenRegistry()
 {
-	DWORD dw;
-	if (RegCreateKeyEx(HKEY_LOCAL_MACHINE,
-		REGISTRY_KEY,
-		0,REG_NONE, REG_OPTION_NON_VOLATILE,
-		KEY_READ,
-		NULL, &hkLocal, &dw) != ERROR_SUCCESS)
-		return;
-	if (RegCreateKeyEx(hkLocal,
-		"mslogon",
-		0, REG_NONE, REG_OPTION_NON_VOLATILE,
-		KEY_WRITE | KEY_READ,
-		NULL, &hkDefault, &dw) != ERROR_SUCCESS)
-		return;
+	IniFile myIniFile;
+	BOOL fUseRegistry = ((myIniFile.ReadInt("admin", "UseRegistry", 0) == 1) ? TRUE : FALSE);
+	if (fUseRegistry)
+	{
+		DWORD dw;
+		if (RegCreateKeyEx(HKEY_LOCAL_MACHINE,
+			REGISTRY_KEY,
+			0,REG_NONE, REG_OPTION_NON_VOLATILE,
+			KEY_READ,
+			NULL, &hkLocal, &dw) != ERROR_SUCCESS)
+			return;
+		if (RegCreateKeyEx(hkLocal,
+			"mslogon",
+			0, REG_NONE, REG_OPTION_NON_VOLATILE,
+			KEY_WRITE | KEY_READ,
+			NULL, &hkDefault, &dw) != ERROR_SUCCESS)
+			return;
+	}
 }
 
 void
 CloseRegistry()
 {
-	if (hkDefault != NULL) RegCloseKey(hkDefault);
-	if (hkUser != NULL) RegCloseKey(hkUser);
-	if (hkLocal != NULL) RegCloseKey(hkLocal);
+	IniFile myIniFile;
+	BOOL fUseRegistry = ((myIniFile.ReadInt("admin", "UseRegistry", 0) == 1) ? TRUE : FALSE);
+	if (fUseRegistry)
+	{
+		if (hkDefault != NULL) RegCloseKey(hkDefault);
+		if (hkUser != NULL) RegCloseKey(hkUser);
+		if (hkLocal != NULL) RegCloseKey(hkLocal);
+	}
 }
 
 LONG
 LoadInt(HKEY key, LPCSTR valname, LONG defval)
 {
-	LONG pref;
-	ULONG type = REG_DWORD;
-	ULONG prefsize = sizeof(pref);
+	IniFile myIniFile;
+	BOOL fUseRegistry = ((myIniFile.ReadInt("admin", "UseRegistry", 0) == 1) ? TRUE : FALSE);
+	if (fUseRegistry)
+	{
+		LONG pref;
+		ULONG type = REG_DWORD;
+		ULONG prefsize = sizeof(pref);
 
-	if (RegQueryValueEx(key,
-		valname,
-		NULL,
-		&type,
-		(LPBYTE) &pref,
-		&prefsize) != ERROR_SUCCESS)
-		return defval;
+		if (RegQueryValueEx(key,
+			valname,
+			NULL,
+			&type,
+			(LPBYTE) &pref,
+			&prefsize) != ERROR_SUCCESS)
+			return defval;
 
-	if (type != REG_DWORD)
-		return defval;
+		if (type != REG_DWORD)
+			return defval;
 
-	if (prefsize != sizeof(pref))
-		return defval;
+		if (prefsize != sizeof(pref))
+			return defval;
 
-	return pref;
+		return pref;
+	}
+	else
+	{
+		return myIniFile.ReadInt("admin_auth", (char *)valname, defval);
+	}
 }
 
 TCHAR *
 LoadString(HKEY key, LPCSTR keyname)
 {
-	DWORD type = REG_SZ;
-	DWORD buflen = 256*sizeof(TCHAR);
-	TCHAR *buffer = 0;
+	IniFile myIniFile;
+	BOOL fUseRegistry = ((myIniFile.ReadInt("admin", "UseRegistry", 0) == 1) ? TRUE : FALSE);
+	if (fUseRegistry)
+	{
+		DWORD type = REG_SZ;
+		DWORD buflen = 256*sizeof(TCHAR);
+		TCHAR *buffer = 0;
 
-	// Get the length of the string
-	if (RegQueryValueEx(key,
-		keyname,
-		NULL,
-		&type,
-		NULL,
-		&buflen) != ERROR_SUCCESS)
-		return 0;
+		// Get the length of the string
+		if (RegQueryValueEx(key,
+			keyname,
+			NULL,
+			&type,
+			NULL,
+			&buflen) != ERROR_SUCCESS)
+			return 0;
 
-	if (type != REG_BINARY)
-		return 0;
-	buflen = 256*sizeof(TCHAR);
-	buffer = new TCHAR[buflen];
-	if (buffer == 0)
-		return 0;
+		if (type != REG_BINARY)
+			return 0;
+		buflen = 256*sizeof(TCHAR);
+		buffer = new TCHAR[buflen];
+		if (buffer == 0)
+			return 0;
 
-	// Get the string data
-	if (RegQueryValueEx(key,
-		keyname,
-		NULL,
-		&type,
-		(BYTE*)buffer,
-		&buflen) != ERROR_SUCCESS) {
-		delete [] buffer;
-		return 0;
+		// Get the string data
+		if (RegQueryValueEx(key,
+			keyname,
+			NULL,
+			&type,
+			(BYTE*)buffer,
+			&buflen) != ERROR_SUCCESS) {
+			delete [] buffer;
+			return 0;
+		}
+
+		// Verify the type
+		if (type != REG_BINARY) {
+			delete [] buffer;
+			return 0;
+		}
+
+		return (TCHAR *)buffer;
 	}
-
-	// Verify the type
-	if (type != REG_BINARY) {
-		delete [] buffer;
-		return 0;
+	else
+	{
+		TCHAR *authhosts=new char[150];
+		myIniFile.ReadString("admin_auth", (char *)keyname,authhosts,150);
+		return (TCHAR *)authhosts;
 	}
-
-	return (TCHAR *)buffer;
 }
 
 void
 SaveInt(HKEY key, LPCSTR valname, LONG val)
 {
-	RegSetValueEx(key, valname, 0, REG_DWORD, (LPBYTE) &val, sizeof(val));
+	IniFile myIniFile;
+	BOOL fUseRegistry = ((myIniFile.ReadInt("admin", "UseRegistry", 0) == 1) ? TRUE : FALSE);
+	if (fUseRegistry)
+	{
+		RegSetValueEx(key, valname, 0, REG_DWORD, (LPBYTE) &val, sizeof(val));
+	}
+	else
+	{
+		myIniFile.WriteInt("admin_auth", (char *)valname, val);
+	}
 }
 
 void
 SaveString(HKEY key,LPCSTR valname, TCHAR *buffer)
 {
-	RegSetValueEx(key, valname, 0, REG_BINARY, (LPBYTE) buffer, MAXSTRING);
+	IniFile myIniFile;
+	BOOL fUseRegistry = ((myIniFile.ReadInt("admin", "UseRegistry", 0) == 1) ? TRUE : FALSE);
+	if (fUseRegistry)
+	{
+		RegSetValueEx(key, valname, 0, REG_BINARY, (LPBYTE) buffer, MAXSTRING);
+	}
+	else
+	{
+		myIniFile.WriteString("admin_auth", (char *)valname,buffer);
+	}
 }
 
 void
 savegroup1(TCHAR *value)
 {
-	OpenRegistry();
-	if (hkDefault)SaveString(hkDefault, "group1", value);
-	CloseRegistry();
+	IniFile myIniFile;
+	BOOL fUseRegistry = ((myIniFile.ReadInt("admin", "UseRegistry", 0) == 1) ? TRUE : FALSE);
+	if (fUseRegistry)
+	{
+		OpenRegistry();
+		if (hkDefault)SaveString(hkDefault, "group1", value);
+		CloseRegistry();
+	}
+	else
+	{
+		SaveString(hkDefault, "group1", value);
+	}
 }
 TCHAR*
 Readgroup1()
 {
-	TCHAR *value=NULL;
-	OpenRegistry();
-	if (hkDefault) value=LoadString (hkDefault, "group1");
-	CloseRegistry();
-	return value;
+	IniFile myIniFile;
+	BOOL fUseRegistry = ((myIniFile.ReadInt("admin", "UseRegistry", 0) == 1) ? TRUE : FALSE);
+	if (fUseRegistry)
+	{
+		TCHAR *value=NULL;
+		OpenRegistry();
+		if (hkDefault) value=LoadString (hkDefault, "group1");
+		CloseRegistry();
+		return value;
+	}
+	else
+	{
+		TCHAR *value=NULL;
+		value=LoadString (hkDefault, "group1");
+		return value;
+	}
 }
 
 void
 savegroup2(TCHAR *value)
 {
-	OpenRegistry();
-	if (hkDefault)SaveString(hkDefault, "group2", value);
-	CloseRegistry();
+	IniFile myIniFile;
+	BOOL fUseRegistry = ((myIniFile.ReadInt("admin", "UseRegistry", 0) == 1) ? TRUE : FALSE);
+	if (fUseRegistry)
+	{
+		OpenRegistry();
+		if (hkDefault)SaveString(hkDefault, "group2", value);
+		CloseRegistry();
+	}
+	else
+	{
+		SaveString(hkDefault, "group2", value);
+	}
 }
 TCHAR*
 Readgroup2()
 {
-	TCHAR *value=NULL;
-	OpenRegistry();
-	if (hkDefault) value=LoadString (hkDefault, "group2");
-	CloseRegistry();
-	return value;
+	IniFile myIniFile;
+	BOOL fUseRegistry = ((myIniFile.ReadInt("admin", "UseRegistry", 0) == 1) ? TRUE : FALSE);
+	if (fUseRegistry)
+	{
+		TCHAR *value=NULL;
+		OpenRegistry();
+		if (hkDefault) value=LoadString (hkDefault, "group2");
+		CloseRegistry();
+		return value;
+	}
+	else
+	{
+		TCHAR *value=NULL;
+		value=LoadString (hkDefault, "group2");
+		return value;
+	}
 }
 
 void
 savegroup3(TCHAR *value)
 {
-	OpenRegistry();
-	if (hkDefault)SaveString(hkDefault, "group3", value);
-	CloseRegistry();
+	IniFile myIniFile;
+	BOOL fUseRegistry = ((myIniFile.ReadInt("admin", "UseRegistry", 0) == 1) ? TRUE : FALSE);
+	if (fUseRegistry)
+	{
+		OpenRegistry();
+		if (hkDefault)SaveString(hkDefault, "group3", value);
+		CloseRegistry();
+	}
+	else
+	{
+		SaveString(hkDefault, "group3", value);
+	}
 }
 TCHAR*
 Readgroup3()
 {
-	TCHAR *value=NULL;
-	OpenRegistry();
-	if (hkDefault) value=LoadString (hkDefault, "group3");
-	CloseRegistry();
-	return value;
+	IniFile myIniFile;
+	BOOL fUseRegistry = ((myIniFile.ReadInt("admin", "UseRegistry", 0) == 1) ? TRUE : FALSE);
+	if (fUseRegistry)
+	{
+		TCHAR *value=NULL;
+		OpenRegistry();
+		if (hkDefault) value=LoadString (hkDefault, "group3");
+		CloseRegistry();
+		return value;
+	}
+	else
+	{
+		TCHAR *value=NULL;
+		value=LoadString (hkDefault, "group3");
+		return value;
+	}
 }
 
 LONG
 Readlocdom1(LONG returnvalue)
 {
-	OpenRegistry();
-	if (hkDefault) returnvalue=LoadInt(hkDefault, "locdom1",returnvalue);
-	CloseRegistry();
-	return returnvalue;
+	IniFile myIniFile;
+	BOOL fUseRegistry = ((myIniFile.ReadInt("admin", "UseRegistry", 0) == 1) ? TRUE : FALSE);
+	if (fUseRegistry)
+	{
+		OpenRegistry();
+		if (hkDefault) returnvalue=LoadInt(hkDefault, "locdom1",returnvalue);
+		CloseRegistry();
+		return returnvalue;
+	}
+	else
+	{
+		returnvalue=LoadInt(hkDefault, "locdom1",returnvalue);
+		return returnvalue;
+	}
 }
 
 void
 savelocdom1(LONG value)
 {
-	OpenRegistry();
-	if (hkDefault)SaveInt(hkDefault, "locdom1", value);
-	CloseRegistry();
+	IniFile myIniFile;
+	BOOL fUseRegistry = ((myIniFile.ReadInt("admin", "UseRegistry", 0) == 1) ? TRUE : FALSE);
+	if (fUseRegistry)
+	{
+		OpenRegistry();
+		if (hkDefault)SaveInt(hkDefault, "locdom1", value);
+		CloseRegistry();
+	}
+	else
+	{
+		SaveInt(hkDefault, "locdom1", value);
+	}
 
 }
 
 LONG
 Readlocdom2(LONG returnvalue)
 {
-	OpenRegistry();
-	if (hkDefault) returnvalue=LoadInt(hkDefault, "locdom2",returnvalue);
-	CloseRegistry();
-	return returnvalue;
+	IniFile myIniFile;
+	BOOL fUseRegistry = ((myIniFile.ReadInt("admin", "UseRegistry", 0) == 1) ? TRUE : FALSE);
+	if (fUseRegistry)
+	{
+		OpenRegistry();
+		if (hkDefault) returnvalue=LoadInt(hkDefault, "locdom2",returnvalue);
+		CloseRegistry();
+		return returnvalue;
+	}
+	else
+	{
+		returnvalue=LoadInt(hkDefault, "locdom2",returnvalue);
+		return returnvalue;
+	}
 }
 
 void
 savelocdom2(LONG value)
 {
-	OpenRegistry();
-	if (hkDefault)SaveInt(hkDefault, "locdom2", value);
-	CloseRegistry();
+	IniFile myIniFile;
+	BOOL fUseRegistry = ((myIniFile.ReadInt("admin", "UseRegistry", 0) == 1) ? TRUE : FALSE);
+	if (fUseRegistry)
+	{
+		OpenRegistry();
+		if (hkDefault)SaveInt(hkDefault, "locdom2", value);
+		CloseRegistry();
+	}
+	else
+	{
+		SaveInt(hkDefault, "locdom2", value);
+	}
 
 }
 
 LONG
 Readlocdom3(LONG returnvalue)
 {
-	OpenRegistry();
-	if (hkDefault) returnvalue=LoadInt(hkDefault, "locdom3",returnvalue);
-	CloseRegistry();
-	return returnvalue;
+	IniFile myIniFile;
+	BOOL fUseRegistry = ((myIniFile.ReadInt("admin", "UseRegistry", 0) == 1) ? TRUE : FALSE);
+	if (fUseRegistry)
+	{
+		OpenRegistry();
+		if (hkDefault) returnvalue=LoadInt(hkDefault, "locdom3",returnvalue);
+		CloseRegistry();
+		return returnvalue;
+	}
+	else
+	{
+		returnvalue=LoadInt(hkDefault, "locdom3",returnvalue);
+		return returnvalue;
+	}
 }
 
 void
 savelocdom3(LONG value)
 {
-	OpenRegistry();
-	if (hkDefault)SaveInt(hkDefault, "locdom3", value);
-	CloseRegistry();
+	IniFile myIniFile;
+	BOOL fUseRegistry = ((myIniFile.ReadInt("admin", "UseRegistry", 0) == 1) ? TRUE : FALSE);
+	if (fUseRegistry)
+	{
+		OpenRegistry();
+		if (hkDefault)SaveInt(hkDefault, "locdom3", value);
+		CloseRegistry();
+	}
+	else
+	{
+		SaveInt(hkDefault, "locdom3", value);
+	}
 
 }
 
@@ -842,48 +1008,39 @@ BOOL IsNewMSLogon(){
 	LONG data;
 	ULONG type = REG_DWORD;
 	ULONG datasize = sizeof(data);
+	IniFile myIniFile;
+	BOOL fUseRegistry = ((myIniFile.ReadInt("admin", "UseRegistry", 0) == 1) ? TRUE : FALSE);
 		
-
-	__try {
-		if (RegOpenKeyEx(HKEY_LOCAL_MACHINE,
-			"Software\\ORL\\WinVNC3",
-			NULL,
-			KEY_QUERY_VALUE,
-			&hkLocal) != ERROR_SUCCESS)
-			__leave;
-		
-		if (RegQueryValueEx(hkLocal,
-			"NewMSLogon",
-			NULL,
-			&type,
-			(LPBYTE) &data,
-			&datasize) != ERROR_SUCCESS)
-			__leave;
-		
-		if (type != REG_DWORD ||
-			datasize != sizeof(data))
-			__leave;
-		
-		isNewMSLogon = data;
-	} __finally {
-
-		if (hkLocal != NULL) RegCloseKey(hkLocal);
-	}
-	return isNewMSLogon;
-}
-
-/*
-char *AddToModuleDir(char *filename, int length){
-	char *szCurrentDir = new char[length];
-	if (GetModuleFileName(NULL, szCurrentDir, length))
+	if (fUseRegistry)
 	{
-		char *p = strrchr(szCurrentDir, '\\');
-		*p = '\0';
-		strcat(szCurrentDir,"\\");
-		strcat(szCurrentDir, filename);
+		if (RegOpenKeyEx(HKEY_LOCAL_MACHINE,
+				"Software\\ORL\\WinVNC3",
+				NULL,
+				KEY_QUERY_VALUE,
+				&hkLocal) != ERROR_SUCCESS)
+				return false;
+			
+		if (RegQueryValueEx(hkLocal,
+				"NewMSLogon",
+				NULL,
+				&type,
+				(LPBYTE) &data,
+				&datasize) != ERROR_SUCCESS)
+				return false;
+			
+		if (type != REG_DWORD ||
+				datasize != sizeof(data))
+				return false;
+			
+		isNewMSLogon = data;
+		if (hkLocal != NULL) RegCloseKey(hkLocal);
+		return isNewMSLogon;
 	}
-	strcpy(filename, szCurrentDir);
-	delete szCurrentDir;
-	return filename;
+	else
+	{
+		BOOL newmslogon=false;
+		newmslogon=myIniFile.ReadInt("admin", "NewMSLogon", newmslogon);
+		return newmslogon;
+	}
+
 }
-*/
