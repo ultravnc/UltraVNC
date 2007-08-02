@@ -81,7 +81,6 @@ const VInt rfbMaxClientWait = 5000;
 
 ////////////////////////////
 // Socket implementation initialisation
-
 static WORD winsockVersion = 0;
 
 VSocketSystem::VSocketSystem()
@@ -356,22 +355,6 @@ VSocket::Accept()
   setsockopt(new_socket->sock, IPPROTO_TCP, TCP_NODELAY, (char *)&one, sizeof(one));
 
   // Put the socket into non-blocking mode
-/*
-#ifdef __WIN32__
-  u_long arg = 1;
-  if (ioctlsocket(new_socket->sock, FIONBIO, &arg) != 0)
-  {
-	delete new_socket;
-	new_socket = NULL;
-  }
-#else
-  if (fcntl(new_socket->sock, F_SETFL, O_NDELAY) != 0)
-  {
-	delete new_socket;
-	new_socket = NULL;
-  }
-#endif
-*/
   return new_socket;
 }
 
@@ -856,7 +839,6 @@ VSocket::ReadSelect(VCard to)
  	return false;
  }
 #endif
-
 
 
 
