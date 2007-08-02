@@ -161,6 +161,7 @@ void ShowActiveDesktop()
 // OK, so this doesn't work in multiple threads or nest...
 static TCHAR	DesktopPattern[40];
 static BOOL		ADWasEnabled = false;
+static BOOL		ISWallPaperHided = false;
 
 void HideDesktop()
 {
@@ -173,16 +174,20 @@ void HideDesktop()
 	// Note that this doesn't change the wallpaper registry setting!
 	// @@@efh On Win98 and Win95 this returns an error in the debug build (but not in release)...
 	SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, "", SPIF_SENDCHANGE);
-
 	ADWasEnabled = HideActiveDesktop();
+	ISWallPaperHided=true;
 }
 
 void RestoreDesktop()
 {
+	if (ISWallPaperHided)
+	{
 	if (ADWasEnabled)
 		ShowActiveDesktop();
 
 	SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, NULL, SPIF_SENDCHANGE);
+	}
+	ISWallPaperHided=false;
 
 	//SystemParametersInfo(SPI_SETDESKPATTERN, 0, DesktopPattern, SPIF_SENDCHANGE);
 }
