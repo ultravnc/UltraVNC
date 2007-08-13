@@ -1247,10 +1247,8 @@ vncProperties::Load(BOOL usersettings)
 	// Default settings (Service mode) are used when WinVNC app in run under Vista login screen
 	// User settings (loggued user mode) are used when WinVNC app in run in a user session
 	// Todo: Maybe we should additionally check OS version...
-	if (m_server->RunningAsApplication0System())
+	if (m_server->RunningFromExternalService())
 		usersettings=false;
-	if (m_server->RunningAsApplication0User())
-		usersettings=true;
 
 	m_usersettings = usersettings;
 
@@ -1282,7 +1280,7 @@ vncProperties::Load(BOOL usersettings)
 	// If there is no user logged on them default to SYSTEM
 	if (strcmp(username, "") == 0)
 	{
-		vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - Force USER SYSTEM\n"));
+		vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - Force USER SYSTEM 1\n"));
 		strcpy((char *)&username, "SYSTEM");
 	}
 
@@ -1793,7 +1791,7 @@ void vncProperties::LoadFromIniFile()
 	// If there is no user logged on them default to SYSTEM
 	if (strcmp(username, "") == 0)
 	{
-		vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - Force USER SYSTEM\n"));
+		vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - Force USER SYSTEM 2\n"));
 		strcpy((char *)&username, "SYSTEM");
 	}
 

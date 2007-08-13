@@ -57,7 +57,7 @@ DWORD	g_platform_id;
 BOOL	g_impersonating_user = 0;
 DWORD	g_version_major;
 DWORD	g_version_minor;
-BOOL	m_fRunningAsApplication0System = false;
+BOOL	m_fRunningFromExternalService = false;
 
 
 
@@ -277,6 +277,7 @@ vncService::SelectHDESK(HDESK new_desktop)
 		char new_name[256];
 
 		if (!GetUserObjectInformation(new_desktop, UOI_NAME, &new_name, 256, &dummy)) {
+			vnclog.Print(LL_INTERR, VNCLOG("!GetUserObjectInformation \n"));
 			return FALSE;
 		}
 
@@ -284,6 +285,7 @@ vncService::SelectHDESK(HDESK new_desktop)
 
 		// Switch the desktop
 		if(!SetThreadDesktop(new_desktop)) {
+			vnclog.Print(LL_INTERR, VNCLOG("SelectHDESK:!SetThreadDesktop \n"));
 			return FALSE;
 		}
 
@@ -304,7 +306,7 @@ vncService::SelectHDESK(HDESK new_desktop)
 BOOL
 vncService::SelectDesktop(char *name)
 {
-	return false;
+	//return false;
 	// Are we running on NT?
 	if (IsWinNT())
 	{
@@ -388,6 +390,7 @@ BOOL CALLBACK WinStationEnumProc(LPTSTR name, LPARAM param) {
 BOOL
 vncService::InputDesktopSelected()
 {
+	vnclog.Print(LL_INTERR, VNCLOG("InputDesktopSelected()\n"));
 	// Are we running on NT?
 //	if (serviceshutdown==true) return TRUE;
 	if (IsWinNT())
@@ -419,27 +422,25 @@ vncService::InputDesktopSelected()
 
 		if (!GetUserObjectInformation(threaddesktop, UOI_NAME, &threadname, 256, &dummy)) {
 			if (!CloseDesktop(inputdesktop))
-				vnclog.Print(LL_INTWARN, VNCLOG("failed to close input desktop\n"));
+				vnclog.Print(LL_INTERR, VNCLOG("failed to close input desktop\n"));
+			vnclog.Print(LL_INTERR, VNCLOG("!GetUserObjectInformation(threaddesktop\n"));
 			return FALSE;
 		}
 		_ASSERT(dummy <= 256);
 		if (!GetUserObjectInformation(inputdesktop, UOI_NAME, &inputname, 256, &dummy)) {
 			if (!CloseDesktop(inputdesktop))
-				vnclog.Print(LL_INTWARN, VNCLOG("failed to close input desktop\n"));
+				vnclog.Print(LL_INTERR, VNCLOG("failed to close input desktop\n"));
+			vnclog.Print(LL_INTERR, VNCLOG("!GetUserObjectInformation(inputdesktop\n"));
 			return FALSE;
 		}
 		_ASSERT(dummy <= 256);
 
 		if (!CloseDesktop(inputdesktop))
-			vnclog.Print(LL_INTWARN, VNCLOG("failed to close input desktop\n"));
+			vnclog.Print(LL_INTERR, VNCLOG("failed to close input desktop\n"));
 
-		// sf@2007 - Test screensaver case
 		if (strcmp(threadname, inputname) != 0)
 		{
-  		   if (strcmp(inputname, "Screen-saver") == 0)
-		   {
-     		   return SelectDesktop(NULL);
-		   }
+			vnclog.Print(LL_INTERR, VNCLOG("threadname, inputname differ\n"));
 		   return FALSE;
 		}	
 	}
@@ -455,17 +456,11 @@ SimulateCtrlAltDelThreadFn(void *context)
 {
 	HDESK old_desktop = GetThreadDesktop(GetCurrentThreadId());
 
-
-	//When runnning in default desktop, try to switch desktop
-	if (!vncService::RunningAsApplication0System())
+	// Switch into the Winlogon desktop
+	if (!vncService::SelectDesktop("Winlogon"))
 	{
-		// Switch into the Winlogon desktop
-		if (!vncService::SelectDesktop("Winlogon"))
-		{
-			vnclog.Print(LL_INTERR, VNCLOG("failed to select logon desktop\n"));
-			//return FALSE;
-			old_desktop = NULL;
-		}
+		vnclog.Print(LL_INTERR, VNCLOG("failed to select logon desktop\n"));
+		return FALSE;
 	}
 
 	vnclog.Print(LL_ALL, VNCLOG("generating ctrl-alt-del\n"));
@@ -475,12 +470,8 @@ SimulateCtrlAltDelThreadFn(void *context)
 	PostMessage(HWND_BROADCAST, WM_HOTKEY, 0, MAKELONG(MOD_ALT | MOD_CONTROL, VK_DELETE));
 
 	// Switch back to our original desktop
-	//When runnning in default desktop, try to switch desktop
-	if (!vncService::RunningAsApplication0System())
-	{
-		if (old_desktop != NULL)
+	if (old_desktop != NULL)
 			vncService::SelectHDESK(old_desktop);
-	}
 	return NULL;
 }
 
@@ -682,7 +673,8 @@ BOOL	g_servicemode = FALSE;
 BOOL
 vncService::RunningAsService()
 {
-	return g_servicemode;
+	if (m_fRunningFromExternalService || g_servicemode) return true;
+	else return false;
 }
 
 BOOL
@@ -1377,15 +1369,15 @@ void LogErrorMsg(char *message)
 }
 
 BOOL 
-vncService::RunningAsApplication0System()
+vncService::RunningFromExternalService()
 {
-	return m_fRunningAsApplication0System;
+	return m_fRunningFromExternalService;
 }
 
 
 void 
-vncService::RunningAsApplication0System(BOOL fEnabled)
+vncService::RunningFromExternalService(BOOL fEnabled)
 {
-	m_fRunningAsApplication0System = fEnabled;
+	m_fRunningFromExternalService = fEnabled;
 }
 

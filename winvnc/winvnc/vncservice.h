@@ -128,8 +128,8 @@ public:
 	// along with an ID
 	static BOOL PostAddAutoConnectClient( const char* pszId );
 
-	static BOOL RunningAsApplication0System();
-	static void RunningAsApplication0System(BOOL fEnabled);
+	static BOOL RunningFromExternalService();
+	static void RunningFromExternalService(BOOL fEnabled);
 
 };
 

@@ -220,9 +220,7 @@ vncServer::vncServer()
 
 	m_impersonationtoken=NULL; // Modif Jeremy C. 
 
-	m_fRunningAsApplication0 = false;
-	m_fRunningAsApplication0System = false;
-	m_fRunningAsApplication0User = false;
+	m_fRunningFromExternalService = false;
 	m_fAutoRestart = false;
 }
 

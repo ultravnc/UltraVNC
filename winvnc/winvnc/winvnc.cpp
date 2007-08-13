@@ -62,105 +62,11 @@ const char	*szAppName = "WinVNC";
 DWORD		mainthreadId;
 BOOL		AllowMulti=false;
 BOOL		DisableMultiWarning=false;
-BOOL		fRunningAsApplication0=false;
-BOOL		fRunningAsApplication0System=false;
-BOOL		fRunningAsApplication0User=false;
+BOOL		fRunningFromExternalService=false;
+
 
 
 void WRITETOLOG(char *szText, int size, DWORD *byteswritten, void *);
-
-bool SelectDesktop();
-bool InputDesktopSelected()
-{
-
-	DWORD dummy;
-	char threadname[256];
-	char inputname[256];
-	bool IsWinNT;
-
-	OSVERSIONINFO WinVer;	
-	WinVer.dwOSVersionInfoSize=sizeof(OSVERSIONINFO);
-	GetVersionEx(&WinVer);
-	if ((WinVer.dwPlatformId==VER_PLATFORM_WIN32_NT)) IsWinNT=1;
-	else IsWinNT=0;
-
-	if (IsWinNT)
-	{
-		HDESK threaddesktop = GetThreadDesktop(GetCurrentThreadId());
-		HDESK inputdesktop = OpenInputDesktop(0, FALSE,
-				DESKTOP_CREATEMENU | DESKTOP_CREATEWINDOW |
-				DESKTOP_ENUMERATE | DESKTOP_HOOKCONTROL |
-				DESKTOP_WRITEOBJECTS | DESKTOP_READOBJECTS |
-				DESKTOP_SWITCHDESKTOP | GENERIC_WRITE);
-
-		if (inputdesktop == NULL)
-		{
-			vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - inputdesktop == NULL \n"));
-			return FALSE;
-		}
-
-
-		if (!GetUserObjectInformation(threaddesktop, UOI_NAME, &threadname, 256, &dummy)) {
-			CloseDesktop(inputdesktop);
-			vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - threadname == NULL \n"));
-			return FALSE;
-		}
-		if (!GetUserObjectInformation(inputdesktop, UOI_NAME, &inputname, 256, &dummy)) {
-			CloseDesktop(inputdesktop);
-			vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - inputname == NULL \n"));
-			return FALSE;
-		}
-
-		CloseDesktop(inputdesktop);
-		vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - threadname %s\n"),threadname);
-		vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - inputname %s\n"),inputname);
-
-		if (strcmp(threadname, inputname) != 0)
-		{
-			if (strcmp(inputname, "Screen-saver") == 0)
-			{
-				return SelectDesktop();
-			}
-			return FALSE;
-		}
-	}
-	return TRUE;
-}
-
-
-bool SelectDesktop()
-{
-		HDESK desktop;
-		HDESK old_desktop;
-		DWORD dummy;
-		char new_name[256];
-
-		desktop = OpenInputDesktop(0, FALSE,
-				DESKTOP_CREATEMENU | DESKTOP_CREATEWINDOW |
-				DESKTOP_ENUMERATE | DESKTOP_HOOKCONTROL |
-				DESKTOP_WRITEOBJECTS | DESKTOP_READOBJECTS |
-				DESKTOP_SWITCHDESKTOP | GENERIC_WRITE);
-
-		if (desktop == NULL) return FALSE;
-
-
-		old_desktop = GetThreadDesktop(GetCurrentThreadId());
-
-
-		if (!GetUserObjectInformation(desktop, UOI_NAME, &new_name, 256, &dummy)) {
-			CloseDesktop(desktop);
-			return FALSE;
-		}
-
-		if(!SetThreadDesktop(desktop)) {
-			CloseDesktop(desktop);
-			return FALSE;
-		}
-
-		CloseDesktop(old_desktop);
-			
-		return TRUE;
-}
 
 
 // WinMain parses the command line and either calls the main App
@@ -208,8 +114,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 #endif
 
 	// Save the application instance and main thread id
+//	Beep(1000,500);
 	hAppInstance = hInstance;
 	mainthreadId = GetCurrentThreadId();
+//	Beep(1000,500);
 
 	// Initialise the VSocket system
 	VSocketSystem socksys;
@@ -248,13 +156,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 			// parser machine and parse-table...)
 
 			// Run the WinVNC Service Helper app
-			vncService::PostUserHelperMessage();
+			// Seperate service this is not longer needed, just disable it to avoid unwanted effects
+			//vncService::PostUserHelperMessage();
 			return 0;
 		}
 		if (strncmp(&szCmdLine[i], winvncRunService, strlen(winvncRunService)) == 0)
 		{
 			// Run WinVNC as a service
-			return vncService::WinVNCServiceMain();
+			// Seperate service this is not longer needed, just disable it to avoid unwanted effects
+			//return vncService::WinVNCServiceMain();
+			return 0;
 		}
 
 		if (strncmp(&szCmdLine[i], winvncRunAsUserApp, strlen(winvncRunAsUserApp)) == 0)
@@ -263,35 +174,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 			return WinVNCAppMain();
 		}
 
-		if (strncmp(&szCmdLine[i], "-0run",  strlen("-0run")) == 0)
+		if (strncmp(&szCmdLine[i], "windesk",  strlen("windesk")) == 0)
 		{
-			fRunningAsApplication0 = true;
-			if (!InputDesktopSelected()) return 0;
+			fRunningFromExternalService = true;
+			vncService::RunningFromExternalService(true); 
 			return WinVNCAppMain();
 		}
 
-		if (strncmp(&szCmdLine[i], "windesk",  strlen("-windesk")) == 0)
+		if (strncmp(&szCmdLine[i], "defaultdesk",  strlen("defaultdesk")) == 0)
 		{
-			fRunningAsApplication0System = true;
-			if (!InputDesktopSelected())
-			{
-				vnclog.Print(LL_STATE, VNCLOG("failed, return inputdesk\n"));
-				return 0;
-			}
-			vncService::RunningAsApplication0System(true); 
-			return WinVNCAppMain();
-		}
-
-		if (strncmp(&szCmdLine[i], "defaultdesk",  strlen("-defaultdesk")) == 0)
-		{
-			fRunningAsApplication0User = true;
-			if (!InputDesktopSelected())
-			{
-				vnclog.Print(LL_STATE, VNCLOG("failed, return inputdesk\n"));
-				return 0;
-			}
-			vncService::RunningAsApplication0System(false); 
-			return WinVNCAppMain();
+//			Beep(500,5000);
+			return 0;
 		}
 
 		if (strncmp(&szCmdLine[i], winvncAllowMulti, strlen(winvncAllowMulti)) == 0)
@@ -317,34 +210,45 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 		if (strncmp(&szCmdLine[i], winvncInstallService, strlen(winvncInstallService)) == 0)
 		{
 			// Install WinVNC as a service
-
-			vncService::InstallService();
+			// Seperate service this is not longer needed, just disable it to avoid unwanted effects
+			/*vncService::InstallService();
 			i+=strlen(winvncInstallService);
-			continue;
+			continue;*/
+			return 0;
 		}
 
 		if (strncmp(&szCmdLine[i], winvncInstallServices, strlen(winvncInstallServices)) == 0)
 		{
 			// Install WinVNC as a service
-
+			// Seperate service this is not longer needed, just disable it to avoid unwanted effects
+			/*
 			vncService::InstallService(1);
 			i+=strlen(winvncInstallServices);
-			continue;
+			continue;*/
+			return 0;
 		}
 
 		if (strncmp(&szCmdLine[i], winvncReinstallService, strlen(winvncReinstallService)) == 0)
 		{
 			// Silently remove WinVNC, then re-install it
+			// Seperate service this is not longer needed, just disable it to avoid unwanted effects
+			/*
 			vncService::ReinstallService();
 			i+=strlen(winvncReinstallService);
 			continue;
+			*/
+			return 0;
 		}
 		if (strncmp(&szCmdLine[i], winvncRemoveService, strlen(winvncRemoveService)) == 0)
 		{
 			// Remove the WinVNC service
+			// Seperate service this is not longer needed, just disable it to avoid unwanted effects
+			/*
 			vncService::RemoveService();
 			i+=strlen(winvncRemoveService);
 			continue;
+			*/
+			return 0;
 		}
 		if (strncmp(&szCmdLine[i], winvncShowProperties, strlen(winvncShowProperties)) == 0)
 		{
@@ -521,9 +425,7 @@ int WinVNCAppMain()
 	///uninstall driver before cont
 	
 	// sf@2007 - Set Application0 special mode
-	server.RunningAsApplication0(fRunningAsApplication0);
-	server.RunningAsApplication0System(fRunningAsApplication0System);
-	server.RunningAsApplication0User(fRunningAsApplication0User);
+	server.RunningFromExternalService(fRunningFromExternalService);
 
 	// Create tray icon & menu if we're running as an app
 	vncMenu *menu = new vncMenu(&server);

@@ -148,6 +148,8 @@ vncMenu::vncMenu(vncServer *server)
 		PostQuitMessage(0);
 		return;
 	}
+	hEvent = OpenEvent(EVENT_ALL_ACCESS, FALSE, "Global\\SessionEvent");
+	ResetEvent(hEvent);
 
 	SetTimer(m_hwnd, 1, 100, NULL);
 
@@ -392,12 +394,7 @@ vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 			{
 				// The tray icon couldn't be created, so use the Properties dialog
 				// as the main program window
-				if (!m_server->RunningAsApplication0()
-					&&
-					!m_server->RunningAsApplication0System()
-					&& 
-					!m_server->RunningAsApplication0User()
-					) // sf@2007 - Do not display Properties pages when running in Application0 mode
+				if (!m_server->RunningFromExternalService()) // sf@2007 - Do not display Properties pages when running in Application0 mode
 				{
 					vnclog.Print(LL_INTINFO, VNCLOG("opening dialog box\n"));
 					m_properties.ShowAdmin(TRUE, TRUE);
@@ -422,77 +419,36 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 	switch (iMsg)
 	{
 
-	case WM_WTSSESSION_CHANGE:
-	{
-		switch( wParam )
-		{		
-			case WTS_SESSION_LOGON:
-				vnclog.Print(LL_INTERR, VNCLOG("++++++++++++++++++++++++++++++++++++WTS_CONSOLE_LOGON\n"));
-				//_this->m_server->AutoRestartFlag(TRUE);
-				//_this->m_server->KillAuthClients();
-				//_this->m_server->KillSockConnect();
-				//PostMessage(hwnd, WM_CLOSE, 0, 0);
-				break;
-			case WTS_SESSION_LOGOFF:
-				vnclog.Print(LL_INTERR, VNCLOG("++++++++++++++++++++++++++++++++++++WTS_CONSOLE_LOGOFF\n"));
-				//_this->m_server->AutoRestartFlag(TRUE);
-				//_this->m_server->KillAuthClients();
-				//_this->m_server->KillSockConnect();
-				//PostMessage(hwnd, WM_CLOSE, 0, 0);
-				break;
-			case WTS_CONSOLE_CONNECT:
-				vnclog.Print(LL_INTERR, VNCLOG("++++++++++++++++++++++++++++++++++++WTS_CONSOLE_CONNECT\n"));
-				//_this->m_server->AutoRestartFlag(TRUE);
-				//_this->m_server->KillAuthClients();
-				//_this->m_server->KillSockConnect();
-				//PostMessage(hwnd, WM_CLOSE, 0, 0);
-				break;
-			case WTS_CONSOLE_DISCONNECT:
-				vnclog.Print(LL_INTERR, VNCLOG("WTS_CONSOLE_DISCONNECT\n"));
-				//_this->m_server->AutoRestartFlag(TRUE);
-				//_this->m_server->KillAuthClients();
-				//_this->m_server->KillSockConnect();
-				PostMessage(hwnd, WM_CLOSE, 0, 0);
-				break;
-			case WTS_SESSION_LOCK:
-				vnclog.Print(LL_INTERR, VNCLOG("WTS_SESSION_LOCK\n"));
-				//zz_this->m_server->AutoRestartFlag(TRUE);
-				//_this->m_server->KillAuthClients();
-				//_this->m_server->KillSockConnect();
-				//PostMessage(hwnd, WM_CLOSE, 0, 0);
-				break;
-			case WTS_SESSION_UNLOCK:
-				vnclog.Print(LL_INTERR, VNCLOG("WTS_SESSION_UNLOCK\n"));
-				//_this->m_server->AutoRestartFlag(TRUE);
-				//_this->m_server->KillAuthClients();
-				//_this->m_server->KillSockConnect();
-				//PostMessage(hwnd, WM_CLOSE, 0, 0);
-				break;
-			default:
-				break;
-		}
-		break;
-	}
-
 		// Every five seconds, a timer message causes the icon to update
 	case WM_TIMER:
 		// sf@2007 - Can't get the WTS_CONSOLE_CONNECT message work properly for now..
 		// So use a hack instead
-		if (_this->m_server->RunningAsApplication0()
-			||
-			_this->m_server->RunningAsApplication0System()
-			|| 
-			_this->m_server->RunningAsApplication0User()
-			)
+		if (_this->m_server->RunningFromExternalService())
 		{
-			if (!vncService::InputDesktopSelected())
+			/*if (!vncService::InputDesktopSelected())
 			{
+				if (!vncService::SelectDesktop(NULL)) 
+				{
+				vnclog.Print(LL_INTERR, VNCLOG("!InputDesktopSelected() \n"));
+				_this->m_server->AutoRestartFlag(TRUE);
+				_this->m_server->KillAuthClients();
+				_this->m_server->KillSockConnect();
+				_this->m_server->ShutdownServer();
+				PostMessage(hwnd, WM_CLOSE, 0, 0);
+				}
+			}*/
+			DWORD result=WaitForSingleObject(_this->hEvent, 0);
+			if (WAIT_OBJECT_0==result)
+			{
+				ResetEvent(_this->hEvent);
+				vnclog.Print(LL_INTERR, VNCLOG("WaitForSingleObject \n"));
 				_this->m_server->AutoRestartFlag(TRUE);
 				_this->m_server->KillAuthClients();
 				_this->m_server->KillSockConnect();
 				_this->m_server->ShutdownServer();
 				PostMessage(hwnd, WM_CLOSE, 0, 0);
 			}
+
 		}
 		counter++;
 

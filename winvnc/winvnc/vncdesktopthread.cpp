@@ -325,7 +325,7 @@ vncDesktopThread::run_undetached(void *arg)
 //	SessionFix();
 	vnclog.Print(LL_INTERR, VNCLOG("Hook changed 1\n"));
 	// Save the thread's "home" desktop, under NT (no effect under 9x)
-//	HDESK home_desktop = GetThreadDesktop(GetCurrentThreadId());
+	HDESK home_desktop = GetThreadDesktop(GetCurrentThreadId());
     vnclog.Print(LL_INTERR, VNCLOG("Hook changed 2\n"));
 	// Attempt to initialise and return success or failure
 	m_desktop->KillScreenSaver();
@@ -336,7 +336,8 @@ vncDesktopThread::run_undetached(void *arg)
 	}
 	if (!m_desktop->Startup())
 	{
-//		vncService::SelectHDESK(home_desktop);
+		//TAG14
+		vncService::SelectHDESK(home_desktop);
 		ReturnVal(FALSE);
 		return NULL;
 	}
@@ -441,11 +442,6 @@ vncDesktopThread::run_undetached(void *arg)
 					m_desktop->asked_display!=m_desktop->m_buffer.GetDisplay()		//monitor change request
 					) 
 					{
-						if (!vncService::InputDesktopSelected())
-						{
-							m_server->KillAuthClients();
-							break;
-						}
 						// We need to wait until viewer has send if he support Size changes
 						if (!m_server->All_clients_initialalized())
 						{
@@ -1083,7 +1079,8 @@ vncDesktopThread::run_undetached(void *arg)
 	vncKeymap::ClearShiftKeys();
 	
 	// Switch back into our home desktop, under NT (no effect under 9x)
-//	vncService::SelectHDESK(home_desktop);
+	//TAG14
+	vncService::SelectHDESK(home_desktop);
 	g_DesktopThread_running=false;
 	HWND mywin=FindWindow("blackscreen",NULL);
 	if (mywin)PostMessage(mywin,WM_CLOSE, 0, 0);

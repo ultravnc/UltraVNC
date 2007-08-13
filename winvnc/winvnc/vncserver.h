@@ -342,14 +342,8 @@ public:
 	void _actualTimerRetryHandler();
 
 	// sf@2007 - Vista / XP FUS special modes
-	virtual BOOL RunningAsApplication0(){return m_fRunningAsApplication0;};
-	virtual void RunningAsApplication0(BOOL fEnabled){m_fRunningAsApplication0 = fEnabled;};
-
-	virtual BOOL RunningAsApplication0System(){return m_fRunningAsApplication0System;};
-	virtual void RunningAsApplication0System(BOOL fEnabled){m_fRunningAsApplication0System = fEnabled;};
-
-	virtual BOOL RunningAsApplication0User(){return m_fRunningAsApplication0User;};
-	virtual void RunningAsApplication0User(BOOL fEnabled){m_fRunningAsApplication0User = fEnabled;};
+	virtual BOOL RunningFromExternalService(){return m_fRunningFromExternalService;};
+	virtual void RunningFromExternalService(BOOL fEnabled){m_fRunningFromExternalService = fEnabled;};
 
 	virtual void AutoRestartFlag(BOOL fOn){m_fAutoRestart = fOn;};
 	virtual BOOL AutoRestartFlag(){return m_fAutoRestart;};
@@ -504,9 +498,7 @@ protected:
 	char m_szAutoReconnectId[MAX_PATH];
 
 	// sf@2007
-	BOOL m_fRunningAsApplication0;
-	BOOL m_fRunningAsApplication0System;
-	BOOL m_fRunningAsApplication0User;
+	BOOL m_fRunningFromExternalService;
 	BOOL m_fAutoRestart;
 
 	// sf@2005 - FTUserImpersonation
