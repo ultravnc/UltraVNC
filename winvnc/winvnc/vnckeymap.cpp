@@ -641,10 +641,14 @@ public:
           ((GetAsyncKeyState(VK_MENU) & 0x8000) != 0) &&
           vncService::IsWinNT())
       {
-
+		vnclog.Print(LL_INTINFO,
+                 "CAD\n");
 		// If running under Vista and started from Session0 in Application mode
-		if (vncService::VersionMajor()>=6 && vncService::RunningAsApplication0System() )
+		if (vncService::VersionMajor()>=6 && vncService::RunningFromExternalService() )
 		{
+			      vnclog.Print(LL_INTINFO,
+                 "Vista and runnning as system -> CAD\n");
+
 				// Try to run the special Vista cad.exe file...
 				int ret = (int)ShellExecute(GetDesktopWindow(), "open", "cad.exe", "", 0, SW_SHOWNORMAL);
 				if (false/*ret <= 32*/)
@@ -729,10 +733,14 @@ public:
 		}
 		else if (vncService::VersionMajor()>=6)
 		{
+			vnclog.Print(LL_INTINFO,
+                 "Vista and runnning as user -> Taskmgr\n");
 			WinExec("taskmgr.exe", SW_SHOWNORMAL);
 		}
 		else
 		{
+			vnclog.Print(LL_INTINFO,
+                 "Not Vista, use old method\n");
 			vncService::SimulateCtrlAltDel();
 		}
         return;
