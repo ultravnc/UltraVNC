@@ -577,9 +577,6 @@ vncClientThread::InitAuthenticate()
 				}
 			else 
 				{
-					// Ensure that we're running in the correct desktop
-		            if (!vncService::InputDesktopSelected()) return false;
-
 					if ( !(acceptDlg->DoDialog()) ) verified = vncServer::aqrReject;
 				}
 		}
@@ -1030,7 +1027,7 @@ vncClientThread::run(void *arg)
 								m_client->GetClientName(),
 								m_client->GetClientId());
 	// Save the handle to the thread's original desktop
-//	HDESK home_desktop = GetThreadDesktop(GetCurrentThreadId());
+	HDESK home_desktop = GetThreadDesktop(GetCurrentThreadId());
 	
 	// To avoid people connecting and then halting the connection, set a timeout
 	if (!m_socket->SetTimeout(30000))
@@ -1216,7 +1213,9 @@ vncClientThread::run(void *arg)
 		rfbClientToServerMsg msg;
 
 		// Ensure that we're running in the correct desktop
-		if (!vncService::InputDesktopSelected()) break;
+		if (!vncService::InputDesktopSelected()) 
+			if (!vncService::SelectDesktop(NULL)) 
+					break;
 
 		// sf@2002 - v1.1.2
 		int nTO = 1; // Type offset
@@ -2629,7 +2628,8 @@ vncClientThread::run(void *arg)
 	}
 
 	// Move into the thread's original desktop
-//	vncService::SelectHDESK(home_desktop);
+	// TAG 14
+	vncService::SelectHDESK(home_desktop);
 
 	// Quit this thread.  This will automatically delete the thread and the
 	// associated client.

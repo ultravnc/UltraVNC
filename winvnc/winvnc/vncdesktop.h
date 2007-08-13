@@ -268,8 +268,8 @@ protected:
 	// Init routines called by the child thread
 	BOOL InitDesktop();
 	void KillScreenSaver();
-	void KillWallpaper();
-	void RestoreWallpaper();
+//	void KillWallpaper();
+//	void RestoreWallpaper();
 	BOOL InitBitmap();
 	BOOL InitWindow();
 	BOOL ThunkBitmapInfo();

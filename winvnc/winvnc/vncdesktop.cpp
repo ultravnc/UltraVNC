@@ -562,8 +562,6 @@ vncDesktop::Shutdown()
 
 	// Modif rdv@2002 - v1.1.x - videodriver
 	ShutdownVideoDriver();
-	// ***
-	// vncService::SelectHomeWinStation();
 
 	return TRUE;
 }
@@ -575,7 +573,7 @@ vncDesktop::InitDesktop()
 {
 	if (vncService::InputDesktopSelected())
 		return TRUE;
-	return false;
+	return vncService::SelectDesktop(NULL);
 }
 
 // Routine used to close the screen saver, if it's active...
