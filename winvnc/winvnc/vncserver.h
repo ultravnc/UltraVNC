@@ -294,6 +294,9 @@ public:
 	// Removal of desktop wallpaper, etc
 	virtual void EnableRemoveWallpaper(const BOOL enable) {m_remove_wallpaper = enable;};
 	virtual BOOL RemoveWallpaperEnabled() {return m_remove_wallpaper;};
+	// Removal of desktop composit desktop, etc
+	virtual void EnableRemoveEaro(const BOOL enable) {m_remove_earo = enable;};
+	virtual BOOL RemoveEaroEnabled() {return m_remove_earo;};
 
 	// sf@2002 - v1.1.x - Server Default Scale
 	virtual UINT GetDefaultScale();
@@ -420,6 +423,7 @@ protected:
 	UINT				m_retry_timeout;
 
 	BOOL				m_remove_wallpaper;
+	BOOL				m_remove_earo;
 	BOOL				m_disableTrayIcon;
 	BOOL				m_AllowEditClients;
 

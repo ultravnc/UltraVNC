@@ -423,6 +423,11 @@ vncProperties::DialogProc(HWND hwnd,
 				BM_SETCHECK,
 				_this->m_server->RemoveWallpaperEnabled(),
 				0);
+			HWND hRemoveEaro = GetDlgItem(hwnd, IDC_REMOVE_EARO);
+			SendMessage(hRemoveEaro,
+				BM_SETCHECK,
+				_this->m_server->RemoveEaroEnabled(),
+				0);
 
 			// Lock settings
 			HWND hLockSetting;
@@ -631,6 +636,12 @@ vncProperties::DialogProc(HWND hwnd,
 				HWND hRemoveWallpaper = GetDlgItem(hwnd, IDC_REMOVE_WALLPAPER);
 				_this->m_server->EnableRemoveWallpaper(
 					SendMessage(hRemoveWallpaper, BM_GETCHECK, 0, 0) == BST_CHECKED
+					);
+
+				// Earo handling
+				HWND hRemoveEaro = GetDlgItem(hwnd, IDC_REMOVE_EARO);
+				_this->m_server->EnableRemoveEaro(
+					SendMessage(hRemoveEaro, BM_GETCHECK, 0, 0) == BST_CHECKED
 					);
 
 				// Lock settings handling
@@ -1388,6 +1399,7 @@ LABELUSERSETTINGS:
 	m_pref_LockSettings=-1;
 
 	m_pref_RemoveWallpaper=TRUE;
+	m_pref_RemoveEaro=TRUE;
     m_alloweditclients = TRUE;
 	m_allowshutdown = TRUE;
 	m_allowproperties = TRUE;
@@ -1501,6 +1513,7 @@ vncProperties::LoadUserPrefs(HKEY appkey)
 	m_pref_IdleTimeout=LoadInt(appkey, "IdleTimeout", m_pref_IdleTimeout);
 	
 	m_pref_RemoveWallpaper=LoadInt(appkey, "RemoveWallpaper", m_pref_RemoveWallpaper);
+	m_pref_RemoveWallpaper=LoadInt(appkey, "RemoveEaro", m_pref_RemoveEaro);
 
 	// Connection querying settings
 	m_pref_QuerySetting=LoadInt(appkey, "QuerySetting", m_pref_QuerySetting);
@@ -1543,6 +1556,7 @@ vncProperties::ApplyUserPrefs()
 	m_server->SetQueryAccept(m_pref_QueryAccept);
 	m_server->SetAutoIdleDisconnectTimeout(m_pref_IdleTimeout);
 	m_server->EnableRemoveWallpaper(m_pref_RemoveWallpaper);
+	m_server->EnableRemoveEaro(m_pref_RemoveEaro);
 
 	// Is the listening socket closing?
 
@@ -1756,6 +1770,7 @@ vncProperties::SaveUserPrefs(HKEY appkey)
 
 	// Wallpaper removal
 	SaveInt(appkey, "RemoveWallpaper", m_server->RemoveWallpaperEnabled());
+	SaveInt(appkey, "RemoveEaro", m_server->RemoveEaroEnabled());
 
 	// Save the password
 	char passwd[MAXPWLEN];
@@ -1861,6 +1876,7 @@ void vncProperties::LoadFromIniFile()
 	m_pref_LockSettings=-1;
 
 	m_pref_RemoveWallpaper=TRUE;
+	m_pref_RemoveEaro=TRUE;
     m_alloweditclients = TRUE;
 	m_allowshutdown = TRUE;
 	m_allowproperties = TRUE;
@@ -1910,6 +1926,7 @@ void vncProperties::LoadUserPrefsFromIniFile()
 	m_pref_IdleTimeout=myIniFile.ReadInt("admin", "IdleTimeout", m_pref_IdleTimeout);
 	
 	m_pref_RemoveWallpaper=myIniFile.ReadInt("admin", "RemoveWallpaper", m_pref_RemoveWallpaper);
+	m_pref_RemoveWallpaper=myIniFile.ReadInt("admin", "RemoveEaro", m_pref_RemoveEaro);
 
 	// Connection querying settings
 	m_pref_QuerySetting=myIniFile.ReadInt("admin", "QuerySetting", m_pref_QuerySetting);
@@ -2001,6 +2018,7 @@ void vncProperties::SaveUserPrefsToIniFile()
 
 	// Wallpaper removal
 	myIniFile.WriteInt("admin", "RemoveWallpaper", m_server->RemoveWallpaperEnabled());
+	myIniFile.WriteInt("admin", "RemoveEaro", m_server->RemoveEaroEnabled());
 
 	// Save the password
 	char passwd[MAXPWLEN];

@@ -111,8 +111,8 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,8,135,54,16
     CONTROL         139,IDC_VNCLOGO,"Static",SS_BITMAP | SS_CENTERIMAGE | 
                     SS_SUNKEN,7,5,53,46,WS_EX_TRANSPARENT
-    LTEXT           "UltraVNC Win32 Server 1.0.3 RC4",IDC_VERSION,73,5,
-                    195,11
+    LTEXT           "UltraVNC Win32 Server 1.0.3 RC4",IDC_VERSION,73,5,195,
+                    11
     LTEXT           "Copyright © 2002-2005 Ultr@VNC Team\nCopyright © 2001-2002 Sam - eSVNC \nCopyright © 1999-2002 Rudi D. V. - VdaccVNC \nCopyright © 2001 Harakan Software - PalmVNC\nCopyright © 1999-2002 Const. Kaplinsky - TightVNC \n",
                     IDC_NAME,74,27,202,41
     LTEXT           "For more Information and Links please visit: \nhttp://ultravnc.sf.net",
@@ -287,23 +287,23 @@ BEGIN
                     BS_AUTORADIOBUTTON,255,103,102,10
     GROUPBOX        "Misc.",IDC_STATIC,221,122,165,120,BS_LEFT
     CONTROL         "Remove Wallpaper for Viewers",IDC_REMOVE_WALLPAPER,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,228,135,134,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,228,140,134,10
     CONTROL         "Enable Blank Monitor on Viewer Request",IDC_BLANK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,228,146,144,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,228,150,144,10
     CONTROL         "Enable Alpha-Blending Monitor Blanking",IDC_ALPHABLACK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,228,157,142,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,228,160,142,10
     CONTROL         "Capture Alpha-Blending",IDC_ALPHA,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,228,168,99,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,228,170,99,10
     CONTROL         "DisableTrayIcon",IDC_DISABLETRAY,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,228,179,67,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,228,180,67,10
     CONTROL         "Disable clients options in tray icon menu",
                     IDC_ALLOWEDITCLIENTS,"Button",BS_AUTOCHECKBOX | 
                     WS_TABSTOP,228,190,141,10
     CONTROL         "Forbid the user to close down WinVNC",IDC_ALLOWSHUTDOWN,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,228,
-                    201,143,10
+                    200,143,10
     CONTROL         "Log debug infos to the WinVNC.log file",IDC_LOG,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,228,212,139,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,228,210,139,10
     LTEXT           "Default Server Screen Scale:",IDC_STATIC,239,228,92,8
     LTEXT           "1 / ",IDC_STATIC,337,229,12,8
     EDITTEXT        IDC_SCALE,352,227,12,12,ES_AUTOHSCROLL
@@ -311,6 +311,8 @@ BEGIN
     PUSHBUTTON      "&Apply",IDC_APPLY,294,247,43,14
     PUSHBUTTON      "&Cancel",IDCANCEL,342,247,44,14
     RTEXT           "N°",IDC_STATIC,53,42,9,8
+    CONTROL         "Remove Earo (Vista)",IDC_REMOVE_EARO,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,228,130,81,10
 END
 
 

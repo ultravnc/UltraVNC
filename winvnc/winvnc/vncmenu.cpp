@@ -62,6 +62,74 @@ bool RunningAsAdministrator ();
 typedef BOOL (WINAPI *WTSREGISTERSESSIONNOTIFICATION)(HWND, DWORD);
 typedef BOOL (WINAPI *WTSUNREGISTERSESSIONNOTIFICATION)(HWND);
 
+static HMODULE DMdll = NULL; 
+typedef HRESULT (CALLBACK *P_DwmIsCompositionEnabled) (BOOL *pfEnabled); 
+static P_DwmIsCompositionEnabled pfnDwmIsCompositionEnabled = NULL; 
+typedef HRESULT (CALLBACK *P_DwmEnableComposition) (BOOL   fEnable); 
+static P_DwmEnableComposition pfnDwmEnableComposition = NULL; 
+static BOOL AeroWasEnabled = FALSE;
+
+static inline VOID UnloadDM(VOID) 
+ { 
+         pfnDwmEnableComposition = NULL; 
+         pfnDwmIsCompositionEnabled = NULL; 
+         if (DMdll) FreeLibrary(DMdll); 
+         DMdll = NULL; 
+ } 
+static inline BOOL LoadDM(VOID) 
+ { 
+         if (DMdll) 
+                 return TRUE; 
+  
+         DMdll = LoadLibraryA("dwmapi.dll"); 
+         if (!DMdll) return FALSE; 
+  
+         pfnDwmIsCompositionEnabled = (P_DwmIsCompositionEnabled)GetProcAddress(DMdll, "DwmIsCompositionEnabled");  
+         pfnDwmEnableComposition = (P_DwmEnableComposition)GetProcAddress(DMdll, "DwmEnableComposition"); 
+  
+         return TRUE; 
+ } 
+
+
+
+
+static inline VOID DisableAero(VOID) 
+ { 
+         BOOL pfnDwmEnableCompositiond = FALSE; 
+         AeroWasEnabled = FALSE; 
+  
+         if (!LoadDM()) 
+                 return; 
+  
+         if (pfnDwmIsCompositionEnabled && SUCCEEDED(pfnDwmIsCompositionEnabled(&pfnDwmEnableCompositiond))) 
+                 ; 
+         else 
+                 return; 
+  
+         if ((AeroWasEnabled = pfnDwmEnableCompositiond)) 
+                 ; 
+         else 
+                 return; 
+  
+         if (pfnDwmEnableComposition && SUCCEEDED(pfnDwmEnableComposition(FALSE))) 
+                 ; 
+         else 
+                 ; 
+ } 
+  
+ static inline VOID ResetAero(VOID) 
+ { 
+         if (pfnDwmEnableComposition && AeroWasEnabled) 
+         { 
+                 if (SUCCEEDED(pfnDwmEnableComposition(AeroWasEnabled))) 
+                         ; 
+                 else 
+                         ; 
+         } 
+         UnloadDM(); 
+ } 
+
+
 
 static void KillWallpaper()
 {
@@ -284,6 +352,8 @@ vncMenu::~vncMenu()
 
 	if (m_server->RemoveWallpaperEnabled())
 		RestoreWallpaper();
+	if (m_server->RemoveEaroEnabled())
+		ResetAero();
 }
 
 void
@@ -549,6 +619,13 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			if (_this->m_server->RemoveWallpaperEnabled())
 				RestoreWallpaper();
 		}
+		if (_this->m_server->AuthClientCount() != 0) {
+			if (_this->m_server->RemoveEaroEnabled())
+				DisableAero();
+		} else {
+			if (_this->m_server->RemoveEaroEnabled())
+				ResetAero();
+		}
 		return 0;
 
 		// STANDARD MESSAGE HANDLING
@@ -684,6 +761,8 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		// tnatsni Wallpaper fix
 		if (_this->m_server->RemoveWallpaperEnabled())
 			RestoreWallpaper();
+		if (_this->m_server->RemoveEaroEnabled())
+			ResetAero();
 
 		vnclog.Print(LL_INTERR, VNCLOG("vncMenu WM_CLOSE call - All cleanup done\n"));
 		DestroyWindow(hwnd);
