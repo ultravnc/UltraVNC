@@ -88,6 +88,10 @@ vncMenu::vncMenu(vncServer *server)
 	// Set the initial user name to something sensible...
 	vncService::CurrentUser((char *)&m_username, sizeof(m_username));
 
+	//if (strcmp(m_username, "") == 0)
+	//	strcpy((char *)&m_username, "SYSTEM");
+	//vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::vncMenu - UserName = %s\n"), m_username);
+
 	// Create a dummy window to handle tray icon messages
 	WNDCLASSEX wndclass;
 
@@ -148,8 +152,11 @@ vncMenu::vncMenu(vncServer *server)
 		PostQuitMessage(0);
 		return;
 	}
+	
+	/* Does not work when vncMenu is created from imp_thread
 	hEvent = OpenEvent(EVENT_ALL_ACCESS, FALSE, "Global\\SessionEvent");
 	ResetEvent(hEvent);
+	*/
 
 	SetTimer(m_hwnd, 1, 100, NULL);
 
@@ -282,13 +289,18 @@ vncMenu::~vncMenu()
 void
 vncMenu::AddTrayIcon()
 {
+	//vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::AddTrayIcon \n"));
+	vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::AddTrayIcon - UserName = %s\n"), m_username);
+
 	// If the user name is non-null then we have a user!
 	if (strcmp(m_username, "") != 0)
 	{
+		//vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::AddTrayIcon - User exists\n"));
 		// Make sure the server has not been configured to
 		// suppress the tray icon.
 		if ( ! m_server->GetDisableTrayIcon())
 		{
+			vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::AddTrayIcon - ADD Tray Icon call\n"));
 			SendTrayMsg(NIM_ADD, FALSE);
 		}
 	}
@@ -297,12 +309,14 @@ vncMenu::AddTrayIcon()
 void
 vncMenu::DelTrayIcon()
 {
+	//vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::DelTrayIcon - DEL Tray Icon call\n"));
 	SendTrayMsg(NIM_DELETE, FALSE);
 }
 
 void
 vncMenu::FlashTrayIcon(BOOL flash)
 {
+	//vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::FlashTrayIcon - FLASH Tray Icon call\n"));
 	SendTrayMsg(NIM_MODIFY, flash);
 }
 
@@ -372,11 +386,13 @@ vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 	    }
 	}
 
+	vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::SendTrayMsg - Shell_NotifyIcon call\n"));
 	// Send the message
 	if (Shell_NotifyIcon(msg, &m_nid))
 	{
-		// Set the enabled/disabled state of the menu items
-//		vnclog.Print(LL_INTINFO, VNCLOG("tray icon added ok\n"));
+			vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::SendTrayMsg - Shell_NotifyIcon call SUCCESS\n"));
+			// Set the enabled/disabled state of the menu items
+			//		vnclog.Print(LL_INTINFO, VNCLOG("tray icon added ok\n"));
 			EnableMenuItem(m_hmenu, ID_ADMIN_PROPERTIES,
 			m_properties.AllowProperties() && RunningAsAdministrator() ? MF_ENABLED : MF_GRAYED);
 			EnableMenuItem(m_hmenu, ID_PROPERTIES,
@@ -388,15 +404,19 @@ vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 			EnableMenuItem(m_hmenu, ID_OUTGOING_CONN,
 			m_properties.AllowEditClients() ? MF_ENABLED : MF_GRAYED);
 	} else {
+
+		vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::SendTrayMsg - Shell_NotifyIcon call FAILED ( %u ) \n"), 0);
 		if (!vncService::RunningAsService())
 		{
+			//vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::SendTrayMsg - Shell_NotifyIcon call FAILED NOT runasservice\n"));
 			if (msg == NIM_ADD)
 			{
 				// The tray icon couldn't be created, so use the Properties dialog
 				// as the main program window
 				if (!m_server->RunningFromExternalService()) // sf@2007 - Do not display Properties pages when running in Application0 mode
 				{
-					vnclog.Print(LL_INTINFO, VNCLOG("opening dialog box\n"));
+					vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::SendTrayMsg - Shell_NotifyIcon call FAILED NOT runfromexternalservice\n"));
+					//vnclog.Print(LL_INTINFO, VNCLOG("opening dialog box\n"));
 					m_properties.ShowAdmin(TRUE, TRUE);
 					PostQuitMessage(0);
 				}
@@ -404,6 +424,19 @@ vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 		}
 	}
 }
+
+
+// sf@2007
+void vncMenu::Shutdown()
+{
+	vnclog.Print(LL_INTERR, VNCLOG("vncMenu::Shutdown: Close menu - Disconnect all - Shutdown server\n"));
+	m_server->AutoRestartFlag(TRUE);
+	m_server->KillAuthClients();
+	m_server->KillSockConnect();
+	m_server->ShutdownServer();
+	SendMessage(m_hwnd, WM_CLOSE, 0, 0);
+}
+
 
 int counter=0;
 // Process window messages
@@ -437,17 +470,20 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				PostMessage(hwnd, WM_CLOSE, 0, 0);
 				}
 			}*/
+
+			/* Does not work when vncMenu is created from imp_thread
 			DWORD result=WaitForSingleObject(_this->hEvent, 0);
 			if (WAIT_OBJECT_0==result)
 			{
 				ResetEvent(_this->hEvent);
-				vnclog.Print(LL_INTERR, VNCLOG("WaitForSingleObject \n"));
+				vnclog.Print(LL_INTERR, VNCLOG("WaitForSingleObject - Shutdown server\n"));
 				_this->m_server->AutoRestartFlag(TRUE);
 				_this->m_server->KillAuthClients();
 				_this->m_server->KillSockConnect();
 				_this->m_server->ShutdownServer();
 				PostMessage(hwnd, WM_CLOSE, 0, 0);
 			}
+			*/
 
 		}
 		counter++;
@@ -455,8 +491,40 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		if ( ! _this->m_server->GetDisableTrayIcon() && counter>50)
 			{
 				counter=0;
+				vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::TIMER TrayIcon 5s hack\n"));
+
+				if (_this->m_server->RunningFromExternalService())
+				{
+					char newuser[UNLEN+1];
+
+					if (vncService::CurrentUser((char *) &newuser, sizeof(newuser)))
+					{
+						vnclog.Print(LL_INTINFO,
+							VNCLOG("############### Usernames change: old=\"%s\", new=\"%s\"\n"),
+							_this->m_username, newuser);
+
+						// Check whether the user name has changed!
+						if (strcmp(newuser, _this->m_username) != 0)
+						{
+							vnclog.Print(LL_INTINFO,
+								VNCLOG("user name has changed\n"));
+
+							// User has changed!
+							strcpy(_this->m_username, newuser);
+
+							vnclog.Print(LL_INTINFO,
+								VNCLOG("############## Kill vncMenu thread\n"));
+
+							// Order impersonation thread killing
+							PostQuitMessage(0);
+						}
+					}
+				}
+
 				// *** HACK for running servicified
-				if (vncService::RunningAsService()) {
+				if (vncService::RunningAsService())
+				{
+					vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::TIMER TrayIcon 5s hack call - Runningasservice\n"));
 					// Attempt to add the icon if it's not already there
 					_this->AddTrayIcon();
 					// Trigger a check of the current user
@@ -616,6 +684,8 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		// tnatsni Wallpaper fix
 		if (_this->m_server->RemoveWallpaperEnabled())
 			RestoreWallpaper();
+
+		vnclog.Print(LL_INTERR, VNCLOG("vncMenu WM_CLOSE call - All cleanup done\n"));
 		DestroyWindow(hwnd);
 		break;
 		
@@ -645,7 +715,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			if (vncService::CurrentUser((char *) &newuser, sizeof(newuser)))
 			{
 				vnclog.Print(LL_INTINFO,
-//					VNCLOG("usernames : old=\"%s\", new=\"%s\"\n"),
+					VNCLOG("############### Usernames change: old=\"%s\", new=\"%s\"\n"),
 					_this->m_username, newuser);
 
 				// Check whether the user name has changed!

@@ -73,6 +73,9 @@ class vncMenu
 public:
 	vncMenu(vncServer *server);
 	~vncMenu();
+
+	void Shutdown(); // sf@2007
+
 protected:
 	// Tray icon handling
 	void AddTrayIcon();
@@ -118,7 +121,7 @@ protected:
 	UINT port_rfb;
 	UINT port_http;
 	BOOL ports_set;
-	HANDLE hEvent;
+	//HANDLE hEvent;
 
 };
 

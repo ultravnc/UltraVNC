@@ -1,3 +1,4 @@
+//  Copyright (C) 2007 Ultr@VNC Team Members. All Rights Reserved.
 //  Copyright (C) 1999 AT&T Laboratories Cambridge. All Rights Reserved.
 //
 //  This file is part of the VNC system.
@@ -30,6 +31,8 @@
 ////////////////////////////
 // System headers
 #include "stdhdrs.h"
+
+#include "mmsystem.h"
 
 ////////////////////////////
 // Custom headers
@@ -64,7 +67,10 @@ BOOL		AllowMulti=false;
 BOOL		DisableMultiWarning=false;
 BOOL		fRunningFromExternalService=false;
 
-
+// sf@2007 - New shutdown order handling stuff (with uvnc_service)
+static bool			fShutdownOrdered = false;
+static HANDLE		hShutdownEvent;
+MMRESULT			mmRes;
 
 void WRITETOLOG(char *szText, int size, DWORD *byteswritten, void *);
 
@@ -388,6 +394,180 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 	return 0;
 }
 
+
+// rdv&sf@2007 - New TrayIcon impuDEsktop/impersonation thread stuff
+// Todo: cleanup
+HINSTANCE hInst_;
+HWND hwnd_;
+HANDLE Token_;
+HANDLE process_;
+
+// Todo: use same security.cpp function instead
+DWORD GetCurrentUserToken_()
+{
+	HWND tray = FindWindow(("Shell_TrayWnd"), 0);
+	if (!tray)
+		return 0;
+	
+	DWORD processId = 0;
+	GetWindowThreadProcessId(tray, &processId);
+	if (!processId)
+		return 0;
+	
+	process_ = OpenProcess(MAXIMUM_ALLOWED, FALSE, processId);
+	if (!process_)
+		return 0;
+	
+	OpenProcessToken(process_, MAXIMUM_ALLOWED, &Token_);
+	return 2;
+	
+}
+
+// Todo: use same security.cpp function instead
+bool ImpersonateCurrentUser_()
+{
+  SetLastError(0);
+  process_=0;
+  Token_=NULL;
+  if (GetCurrentUserToken_()==0)
+  {
+	 vnclog.Print(LL_INTERR, VNCLOG("!GetCurrentUserToken_ \n"));
+     return false;
+  }
+  bool test=ImpersonateLoggedOnUser(Token_);
+  if (test==1) vnclog.Print(LL_INTERR, VNCLOG("ImpersonateLoggedOnUser OK \n"));
+  if (process_) CloseHandle(process_);
+  if (Token_) CloseHandle(Token_);
+  return test;
+}
+
+
+DWORD WINAPI imp_desktop_thread(LPVOID lpParam)
+{
+	vncServer *server = (vncServer *)lpParam;
+	HDESK desktop;
+	//vnclog.Print(LL_INTERR, VNCLOG("SelectDesktop \n"));
+	//vnclog.Print(LL_INTERR, VNCLOG("OpenInputdesktop2 NULL\n"));
+	desktop = OpenInputDesktop(0, FALSE,
+								DESKTOP_CREATEMENU | DESKTOP_CREATEWINDOW |
+								DESKTOP_ENUMERATE | DESKTOP_HOOKCONTROL |
+								DESKTOP_WRITEOBJECTS | DESKTOP_READOBJECTS |
+								DESKTOP_SWITCHDESKTOP | GENERIC_WRITE
+								);
+
+	if (desktop == NULL)
+		vnclog.Print(LL_INTERR, VNCLOG("OpenInputdesktop Error \n"));
+	else 
+		vnclog.Print(LL_INTERR, VNCLOG("OpenInputdesktop OK\n"));
+
+	HDESK old_desktop = GetThreadDesktop(GetCurrentThreadId());
+	DWORD dummy;
+
+	char new_name[256];
+
+	if (!GetUserObjectInformation(desktop, UOI_NAME, &new_name, 256, &dummy))
+	{
+		vnclog.Print(LL_INTERR, VNCLOG("!GetUserObjectInformation \n"));
+	}
+
+	vnclog.Print(LL_INTERR, VNCLOG("SelectHDESK to %s (%x) from %x\n"), new_name, desktop, old_desktop);
+
+	if (!SetThreadDesktop(desktop))
+	{
+		vnclog.Print(LL_INTERR, VNCLOG("SelectHDESK:!SetThreadDesktop \n"));
+	}
+
+	if (!CloseDesktop(old_desktop))
+		vnclog.Print(LL_INTERR, VNCLOG("SelectHDESK failed to close old desktop %x (Err=%d)\n"), old_desktop, GetLastError());
+
+	ImpersonateCurrentUser_();
+
+	char m_username[200];
+	HWINSTA station = GetProcessWindowStation();
+	if (station != NULL)
+	{
+		DWORD usersize;
+		GetUserObjectInformation(station, UOI_USER_SID, NULL, 0, &usersize);
+		DWORD  dwErrorCode = GetLastError();
+		SetLastError(0);
+		if (usersize != 0)
+		{
+			DWORD length = usersize;
+			if (GetUserName(m_username, &length) == 0)
+			{
+				UINT error = GetLastError();
+				if (error == ERROR_NOT_LOGGED_ON)
+				{
+				}
+				else
+				{
+					vnclog.Print(LL_INTERR, VNCLOG("getusername error %d\n"), GetLastError());
+					return FALSE;
+				}
+			}
+		}
+	}
+    vnclog.Print(LL_INTERR, VNCLOG("Username %s \n"),m_username);
+
+	// Create tray icon and menu
+	vncMenu *menu = new vncMenu(server);
+	if (menu == NULL)
+	{
+		vnclog.Print(LL_INTERR, VNCLOG("failed to create tray menu\n"));
+		PostQuitMessage(0);
+	}
+
+	MSG msg;
+	while (GetMessage(&msg,0,0,0) != 0 && !fShutdownOrdered)
+	{
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+
+	// sf@2007 - Close all (vncMenu,tray icon, connections...)
+	menu->Shutdown();
+
+	if (menu != NULL)
+		delete menu;
+
+	//vnclog.Print(LL_INTERR, VNCLOG("GetMessage stop \n"));
+	CloseDesktop(desktop);
+	return 0;
+
+}
+
+
+// sf@2007 - For now we use a mmtimer to test the shutdown event periodically
+// Maybe there's a less rude method...
+void CALLBACK fpTimer(UINT uID, UINT uMsg, DWORD dwUser, DWORD dw1, DWORD dw2)
+{
+	// vnclog.Print(LL_INTERR, VNCLOG("****************** SDTimer tic\n"));
+	DWORD result=WaitForSingleObject(hShutdownEvent, 0);
+	if (WAIT_OBJECT_0==result)
+	{
+		ResetEvent(hShutdownEvent);
+		fShutdownOrdered = true;
+		vnclog.Print(LL_INTERR, VNCLOG("****************** WaitForSingleObject - Shutdown server\n"));
+	}
+}
+
+void InitSDTimer()
+{
+	if (mmRes != -1) return;
+	vnclog.Print(LL_INTERR, VNCLOG("****************** Init SDTimer\n"));
+	mmRes = timeSetEvent( 2000, 0, fpTimer, NULL, TIME_PERIODIC );
+}
+
+
+void KillSDTimer()
+{
+	vnclog.Print(LL_INTERR, VNCLOG("****************** Kill SDTimer\n"));
+	timeKillEvent(mmRes);
+	mmRes = -1;
+}
+
+
+
 // This is the main routine for WinVNC when running as an application
 // (under Windows 95 or Windows NT)
 // Under NT, WinVNC can also run as a service.  The WinVNCServerMain routine,
@@ -398,7 +578,7 @@ int WinVNCAppMain()
 {
 	vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - WinVNCAPPMain\n"));
 #ifdef CRASH_ENABLED
-	LPVOID lpvState = Install(NULL,  "rudi.de.vos@skynet.be", "UltraVnc v100 RC12G");
+	LPVOID lpvState = Install(NULL,  "rudi.de.vos@skynet.be", "UltraVnc");
 #endif
 
 	// Set this process to be the last application to be shut down.
@@ -427,6 +607,9 @@ int WinVNCAppMain()
 	// sf@2007 - Set Application0 special mode
 	server.RunningFromExternalService(fRunningFromExternalService);
 
+	// sf@2007 - New impersonation thread stuff for tray icon & menu
+
+	/* 
 	// Create tray icon & menu if we're running as an app
 	vncMenu *menu = new vncMenu(&server);
 	if (menu == NULL)
@@ -434,8 +617,8 @@ int WinVNCAppMain()
 		vnclog.Print(LL_INTERR, VNCLOG("failed to create tray menu\n"));
 		PostQuitMessage(0);
 	}
-
-	// Now enter the message handling loop until told to quit!
+	*/
+	/*
 	MSG msg;
 	while (GetMessage(&msg, NULL, 0,0) ) {
 		//vnclog.Print(LL_INTINFO, VNCLOG("Message %d received\n"), msg.message);
@@ -444,11 +627,39 @@ int WinVNCAppMain()
 		DispatchMessage(&msg);
 	}
 	vnclog.Print(LL_STATE, VNCLOG("shutting down server\n"));
+	*/
 
+	// Subscribe to shutdown event
+	hShutdownEvent = OpenEvent(EVENT_ALL_ACCESS, FALSE, "Global\\SessionEvent");
+	ResetEvent(hShutdownEvent);
+	vnclog.Print(LL_STATE, VNCLOG("***************** SDEvent created \n"));
+	// Create the timer that looks periodicaly for shutdown event
+	mmRes = -1;
+	InitSDTimer();
+
+	//int nn = 10;
+	while (/*nn-- > 0 &&*/ !fShutdownOrdered)
+	{
+		//vnclog.Print(LL_STATE, VNCLOG("################## Creating Imp Thread : %d \n"), nn);
+
+		HANDLE threadHandle;
+		DWORD dwTId;
+		threadHandle = CreateThread(NULL, 0, imp_desktop_thread, &server, 0, &dwTId);
+
+		WaitForSingleObject( threadHandle, INFINITE );
+		CloseHandle(threadHandle);
+		vnclog.Print(LL_STATE, VNCLOG("################## Closing Imp Thread\n"));
+	}
+
+	/*
 	if (menu != NULL)
 		delete menu;
+	*/
+
 	if (instancehan!=NULL)
 		delete instancehan;
 
-	return msg.wParam;
+	vnclog.Print(LL_STATE, VNCLOG("################## SHUTING DOWN SERVER ####################\n"));
+	return 1;
+	//return msg.wParam;
 };

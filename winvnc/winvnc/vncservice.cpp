@@ -78,7 +78,14 @@ vncService::vncService()
 // CurrentUser - fills a buffer with the name of the current user!
 BOOL
 GetCurrentUser(char *buffer, UINT size) // RealVNC 336 change
-{	// How to obtain the name of the current user depends upon the OS being used
+{	
+	if (vncService::RunningFromExternalService())
+	{
+		vnclog.Print(LL_INTERR, VNCLOG("@@@@@@@@@@@@@ GetCurrentUser - Forcing g_impersonating_user \n"));
+		g_impersonating_user = TRUE;
+	}
+
+	// How to obtain the name of the current user depends upon the OS being used
 	if ((g_platform_id == VER_PLATFORM_WIN32_NT) && vncService::RunningAsService())
 	{
 		// Windows NT, service-mode
@@ -88,7 +95,10 @@ GetCurrentUser(char *buffer, UINT size) // RealVNC 336 change
 		// Get the current Window station
 		HWINSTA station = GetProcessWindowStation();
 		if (station == NULL)
+		{
+			vnclog.Print(LL_INTERR, VNCLOG("@@@@@@@@@@@@@ GetCurrentUser - ERROR : No window station \n"));
 			return FALSE;
+		}
 
 		// Get the current user SID size
 		DWORD usersize;
@@ -106,15 +116,21 @@ GetCurrentUser(char *buffer, UINT size) // RealVNC 336 change
 
 			// Return "" as the name...
 			if (strlen("") >= size)
+			{
+				vnclog.Print(LL_INTERR, VNCLOG("@@@@@@@@@@@@@ GetCurrentUser - Error: Bad buffer size \n"));
 				return FALSE;
+			}
 			strcpy(buffer, "");
 
+			vnclog.Print(LL_INTERR, VNCLOG("@@@@@@@@@@@@@ GetCurrentUser - Error: Usersize 0\n"));
 			return TRUE;
 		}
 
 		// -=- SECONDLY - a user is logged on but if we're not impersonating
 		//     them then we can't continue!
-		if (!g_impersonating_user) {
+		if (!g_impersonating_user)
+		{
+			vnclog.Print(LL_INTERR, VNCLOG("@@@@@@@@@@@@@ GetCurrentUser - Error: NOT impersonating user \n"));
 			// Return "" as the name...
 			if (strlen("") >= size)
 				return FALSE;
@@ -136,12 +152,14 @@ GetCurrentUser(char *buffer, UINT size) // RealVNC 336 change
 			// Just call GetCurrentUser
 			DWORD length = size;
 
+			vnclog.Print(LL_INTERR, VNCLOG("@@@@@@@@@@@@@ GetCurrentUser - GetUserName call \n"));
 			if (GetUserName(buffer, &length) == 0)
 			{
 				UINT error = GetLastError();
 
 				if (error == ERROR_NOT_LOGGED_ON)
 				{
+					vnclog.Print(LL_INTERR, VNCLOG("@@@@@@@@@@@@@ GetCurrentUser - Error: No user logged on \n"));
 					// No user logged on
 					if (strlen("") >= size)
 						return FALSE;
@@ -156,10 +174,12 @@ GetCurrentUser(char *buffer, UINT size) // RealVNC 336 change
 				}
 			}
 		}
+		vnclog.Print(LL_INTERR, VNCLOG("@@@@@@@@@@@@@ GetCurrentUser - UserNAme found: %s \n"), buffer);
 		return TRUE;
 	};
 
 	// OS was not recognised!
+	vnclog.Print(LL_INTERR, VNCLOG("@@@@@@@@@@@@@ GetCurrentUser - Error: Unknown OS \n"));
 	return FALSE;
 }
 
