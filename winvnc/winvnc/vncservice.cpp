@@ -59,6 +59,71 @@ DWORD	g_version_major;
 DWORD	g_version_minor;
 BOOL	m_fRunningFromExternalService = false;
 
+#include <tlhelp32.h>
+bool
+GetConsoleUser(char *buffer, UINT size)
+{
+	DWORD dwSessionId;
+	DWORD dwExplorerLogonPid;
+	PROCESSENTRY32 procEntry;
+	HANDLE hProcess,hPToken;
+
+	dwSessionId = WTSGetActiveConsoleSessionId();
+
+    HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if (hSnap == INVALID_HANDLE_VALUE)
+    {
+        return 0 ;
+    }
+
+    procEntry.dwSize = sizeof(PROCESSENTRY32);
+
+    if (!Process32First(hSnap, &procEntry))
+    {
+        return 0 ;
+    }
+
+    do
+    {
+        if (_stricmp(procEntry.szExeFile, "explorer.exe") == 0)
+        {
+          DWORD dwExplorerSessId = 0;
+          if (ProcessIdToSessionId(procEntry.th32ProcessID, &dwExplorerSessId) 
+                    && dwExplorerSessId == dwSessionId)
+            {
+                dwExplorerLogonPid = procEntry.th32ProcessID;
+                break;
+            }
+        }
+
+    } while (Process32Next(hSnap, &procEntry));
+
+	hProcess = OpenProcess(MAXIMUM_ALLOWED,FALSE,dwExplorerLogonPid);
+
+   if(!::OpenProcessToken(hProcess,TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY
+                                    |TOKEN_DUPLICATE|TOKEN_ASSIGN_PRIMARY|TOKEN_ADJUST_SESSIONID
+                                    |TOKEN_READ|TOKEN_WRITE,&hPToken))
+		{               
+			   return 0 ;
+		}
+
+
+	//Impersonate the explorer token which runs under the user account
+	ImpersonateLoggedOnUser(hPToken);
+
+	int iImpersonateResult = GetLastError();
+
+	if(iImpersonateResult == ERROR_SUCCESS)
+	{
+		DWORD dwsize=size;
+		GetUserName(buffer,&dwsize); 
+		vnclog.Print(LL_INTERR, VNCLOG("@@@@@@@@@@@@@ GetCurrentUser Impersonate console - UserNAme found: %s \n"), buffer);
+	}
+	//Once the operation is over revert back to system account.
+	RevertToSelf();
+	return 1;
+}
+
 
 
 vncService::vncService()
@@ -153,7 +218,8 @@ GetCurrentUser(char *buffer, UINT size) // RealVNC 336 change
 			DWORD length = size;
 
 			vnclog.Print(LL_INTERR, VNCLOG("@@@@@@@@@@@@@ GetCurrentUser - GetUserName call \n"));
-			if (GetUserName(buffer, &length) == 0)
+			if ( GetConsoleUser(buffer, size) == 0)
+			//if (GetUserName(buffer, &length) == 0)
 			{
 				UINT error = GetLastError();
 
