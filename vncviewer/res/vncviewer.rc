@@ -496,6 +496,19 @@ BEGIN
     PUSHBUTTON      "No for all",IDC_NOALL_B,135,65,39,14
 END
 
+IDD_APP_MESSAGE DIALOGEX 0, 0, 246, 142
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "VncViewer Message Box"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "Close",IDOK,183,125,62,14
+    LTEXT           "BuildTime",IDC_BUILDTIME,9,11,229,26
+    PUSHBUTTON      "",IDC_BUTTON1,2,43,176,96,BS_BITMAP,WS_EX_CLIENTEDGE | 
+                    WS_EX_STATICEDGE
+    GROUPBOX        "Info Message",IDC_STATIC,3,1,242,40,BS_CENTER
+    CTEXT           "Sponsored by",IDC_STATIC,183,44,58,23
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -624,6 +637,17 @@ BEGIN
         BOTTOMMARGIN, 152
         HORZGUIDE, 29
     END
+
+    IDD_APP_MESSAGE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        VERTGUIDE, 86
+        VERTGUIDE, 94
+        VERTGUIDE, 108
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 135
+        HORZGUIDE, 29
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -702,7 +726,9 @@ BEGIN
             VALUE "FileVersion", "1.1.0.2\0"
             VALUE "InternalName", "VNCViewer\0"
             VALUE "LegalCopyright", "Copyright © 2002-2006 UltraVNC team members\0"
+            VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "VNCViewer.exe\0"
+            VALUE "PrivateBuild", "\0"
             VALUE "ProductName", "UltraVNC VNCViewer\0"
             VALUE "ProductVersion", "1.1.0.2\0"
             VALUE "SpecialBuild", "1.0.2\0"
@@ -1069,6 +1095,13 @@ LANGUAGE LANG_DUTCH, SUBLANG_DUTCH_BELGIAN
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDR_TRAY_DISABLED       ICON    DISCARDABLE     "idr_tray_disabled.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_BITMAP12            BITMAP  DISCARDABLE     "sponsor.bmp"
 #endif    // Dutch (Belgium) resources
 /////////////////////////////////////////////////////////////////////////////
 
