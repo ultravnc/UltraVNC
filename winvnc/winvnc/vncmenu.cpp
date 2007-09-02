@@ -56,6 +56,7 @@ const char *MENU_CLASS_NAME = "WinVNC Tray Icon";
 
 BOOL g_restore_ActiveDesktop = FALSE;
 bool RunningAsAdministrator ();
+extern bool			fShutdownOrdered;
 
 // sf@2007 - WTS notifications stuff
 #define NOTIFY_FOR_THIS_SESSION 0
@@ -700,6 +701,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			// User selected Close from the tray menu
 			vnclog.Print(LL_INTINFO, VNCLOG("KillAuthClients() ID_CLOSE \n"));
 			_this->m_server->KillAuthClients();
+			fShutdownOrdered=TRUE;
 			PostMessage(hwnd, WM_CLOSE, 0, 0);
 			break;
 		case ID_CLOSE_SERVICE:

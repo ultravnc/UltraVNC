@@ -68,7 +68,7 @@ BOOL		DisableMultiWarning=false;
 BOOL		fRunningFromExternalService=false;
 
 // sf@2007 - New shutdown order handling stuff (with uvnc_service)
-static bool			fShutdownOrdered = false;
+bool			fShutdownOrdered = false;
 static HANDLE		hShutdownEvent;
 MMRESULT			mmRes;
 
