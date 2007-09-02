@@ -25,7 +25,7 @@ CFG=vncviewer - Win32 Debug
 # PROP AllowPerConfigDependencies 0
 # PROP Scc_ProjName ""
 # PROP Scc_LocalPath ""
-CPP=cl.exe
+CPP=xicl6.exe
 MTL=midl.exe
 RSC=rc.exe
 
@@ -51,7 +51,7 @@ RSC=rc.exe
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
-LINK32=link.exe
+LINK32=xilink6.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386
 # ADD LINK32 comctl32.lib winmm.lib omnithread.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib uuid.lib wsock32.lib /nologo /subsystem:windows /incremental:yes /machine:I386 /libpath:"omnithread/Release"
 # SUBTRACT LINK32 /profile /map /debug
@@ -83,7 +83,7 @@ PreLink_Cmds=cl /nologo /MT /FoRelease\ /FdRelease\ /c buildtime.cpp
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
-LINK32=link.exe
+LINK32=xilink6.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /pdbtype:sept
 # ADD LINK32 ole32.lib oleaut32.lib comctl32.lib winmm.lib omnithread.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib uuid.lib wsock32.lib /nologo /subsystem:windows /profile /map /debug /machine:I386 /libpath:"./omnithread/Debug"
 # Begin Special Build Tool
@@ -220,6 +220,10 @@ SOURCE=.\res\stat\pinup.bmp
 # Begin Source File
 
 SOURCE=.\res\quer.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=.\res\sponsor.bmp
 # End Source File
 # Begin Source File
 
@@ -445,6 +449,14 @@ SOURCE=.\LowLevelHook.cpp
 # Begin Source File
 
 SOURCE=.\LowLevelHook.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\MessBox.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\MEssBox.h
 # End Source File
 # Begin Source File
 

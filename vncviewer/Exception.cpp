@@ -24,6 +24,7 @@
 
 #include "stdhdrs.h"
 #include "Exception.h"
+#include "messbox.h"
 
 Exception::Exception(const char *info)
 {
@@ -74,7 +75,8 @@ void WarningException::Report()
 #ifdef _MSC_VER
 	_RPT1(_CRT_WARN, "Warning : %s\n", m_info);
 #endif
-	MessageBox(NULL, m_info, " Ultr@VNC Info", MB_OK| MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TOPMOST);
+	ShowMessageBox(m_info);
+	//MessageBox(NULL, m_info, " Ultr@VNC Info", MB_OK| MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TOPMOST);
 }
 
 // ---------------------------------------
@@ -94,5 +96,6 @@ void ErrorException::Report()
 #ifdef _MSC_VER
 	_RPT1(_CRT_WARN, "Warning : %s\n", m_info);
 #endif
-	MessageBox(NULL, m_info, " Ultr@VNC Info", MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST);
+	ShowMessageBox(m_info);
+	//MessageBox(NULL, m_info, " Ultr@VNC Info", MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST);
 }
