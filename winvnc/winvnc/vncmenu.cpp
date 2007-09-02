@@ -469,6 +469,8 @@ vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 			m_properties.AllowProperties() && RunningAsAdministrator() ? MF_ENABLED : MF_GRAYED);
 			EnableMenuItem(m_hmenu, ID_CLOSE,
 			m_properties.AllowShutdown() ? MF_ENABLED : MF_GRAYED);
+			EnableMenuItem(m_hmenu, ID_CLOSE_SERVICE,
+			m_properties.AllowShutdown() ? MF_ENABLED : MF_GRAYED);
 			EnableMenuItem(m_hmenu, ID_KILLCLIENTS,
 			m_properties.AllowEditClients() ? MF_ENABLED : MF_GRAYED);
 			EnableMenuItem(m_hmenu, ID_OUTGOING_CONN,
@@ -699,6 +701,9 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			vnclog.Print(LL_INTINFO, VNCLOG("KillAuthClients() ID_CLOSE \n"));
 			_this->m_server->KillAuthClients();
 			PostMessage(hwnd, WM_CLOSE, 0, 0);
+			break;
+		case ID_CLOSE_SERVICE:
+			ShellExecute(GetDesktopWindow(), "open", "stop_service.exe", "", 0, SW_SHOWNORMAL);
 			break;
 
 		}

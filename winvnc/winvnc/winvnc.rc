@@ -475,7 +475,8 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "&About WinVNC",               ID_ABOUT
         MENUITEM SEPARATOR
-        MENUITEM "&Close VNC",                  ID_CLOSE
+        MENUITEM "&Close VNC Connections",      ID_CLOSE
+        MENUITEM "Close VNC (service)",         ID_CLOSE_SERVICE
     END
 END
 
