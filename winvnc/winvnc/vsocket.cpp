@@ -125,7 +125,7 @@ VSocket::VSocket()
 {
 	// Clear out the internal socket fields
 	sock = -1;
-	
+	vnclog.Print(LL_SOCKINFO, VNCLOG("VSocket() m_pDSMPlugin = NULL \n"));
 	m_pDSMPlugin = NULL;
 	m_fUsePlugin = false;
 	

@@ -226,7 +226,7 @@ vncServer::vncServer()
 
 vncServer::~vncServer()
 {
-	vnclog.Print(LL_STATE, VNCLOG("shutting down server object\n"));
+	vnclog.Print(LL_STATE, VNCLOG("shutting down server object1\n"));
 
 	// We don't want to retry when we are shutting down...
 	m_fAutoReconnect = FALSE;
@@ -302,6 +302,7 @@ vncServer::~vncServer()
 	{
 		delete(m_pDSMPlugin);
 		m_pDSMPlugin=NULL;
+		vnclog.Print(LL_SOCKINFO, VNCLOG("~server m_pDSMPlugin = NULL \n"));
 	}
 
 	// Free the host blacklist
@@ -323,7 +324,7 @@ vncServer::~vncServer()
 void
 vncServer::ShutdownServer()
 {
-	vnclog.Print(LL_STATE, VNCLOG("shutting down server object\n"));
+	vnclog.Print(LL_STATE, VNCLOG("shutting down server object2\n"));
 
 	// We don't want to retry when we are shutting down...
 	m_fAutoReconnect = FALSE;
@@ -399,6 +400,7 @@ vncServer::ShutdownServer()
 	{
 		delete(m_pDSMPlugin);
 		m_pDSMPlugin=NULL;
+		vnclog.Print(LL_SOCKINFO, VNCLOG("ShutdownServer m_pDSMPlugin = NULL \n"));
 	}
 
 	// Free the host blacklist

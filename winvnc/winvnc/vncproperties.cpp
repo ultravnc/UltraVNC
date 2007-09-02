@@ -423,6 +423,7 @@ vncProperties::DialogProc(HWND hwnd,
 				BM_SETCHECK,
 				_this->m_server->RemoveWallpaperEnabled(),
 				0);
+			// Remove the composit desktop
 			HWND hRemoveEaro = GetDlgItem(hwnd, IDC_REMOVE_EARO);
 			SendMessage(hRemoveEaro,
 				BM_SETCHECK,
@@ -1513,7 +1514,7 @@ vncProperties::LoadUserPrefs(HKEY appkey)
 	m_pref_IdleTimeout=LoadInt(appkey, "IdleTimeout", m_pref_IdleTimeout);
 	
 	m_pref_RemoveWallpaper=LoadInt(appkey, "RemoveWallpaper", m_pref_RemoveWallpaper);
-	m_pref_RemoveWallpaper=LoadInt(appkey, "RemoveEaro", m_pref_RemoveEaro);
+	m_pref_RemoveEaro=LoadInt(appkey, "RemoveEaro", m_pref_RemoveEaro);
 
 	// Connection querying settings
 	m_pref_QuerySetting=LoadInt(appkey, "QuerySetting", m_pref_QuerySetting);
@@ -1770,6 +1771,7 @@ vncProperties::SaveUserPrefs(HKEY appkey)
 
 	// Wallpaper removal
 	SaveInt(appkey, "RemoveWallpaper", m_server->RemoveWallpaperEnabled());
+	// Composit desktop removal
 	SaveInt(appkey, "RemoveEaro", m_server->RemoveEaroEnabled());
 
 	// Save the password
@@ -1926,7 +1928,7 @@ void vncProperties::LoadUserPrefsFromIniFile()
 	m_pref_IdleTimeout=myIniFile.ReadInt("admin", "IdleTimeout", m_pref_IdleTimeout);
 	
 	m_pref_RemoveWallpaper=myIniFile.ReadInt("admin", "RemoveWallpaper", m_pref_RemoveWallpaper);
-	m_pref_RemoveWallpaper=myIniFile.ReadInt("admin", "RemoveEaro", m_pref_RemoveEaro);
+	m_pref_RemoveEaro=myIniFile.ReadInt("admin", "RemoveEaro", m_pref_RemoveEaro);
 
 	// Connection querying settings
 	m_pref_QuerySetting=myIniFile.ReadInt("admin", "QuerySetting", m_pref_QuerySetting);
@@ -2018,6 +2020,7 @@ void vncProperties::SaveUserPrefsToIniFile()
 
 	// Wallpaper removal
 	myIniFile.WriteInt("admin", "RemoveWallpaper", m_server->RemoveWallpaperEnabled());
+	// Composit desktop removal
 	myIniFile.WriteInt("admin", "RemoveEaro", m_server->RemoveEaroEnabled());
 
 	// Save the password

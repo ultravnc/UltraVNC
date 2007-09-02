@@ -117,7 +117,7 @@ GetConsoleUser(char *buffer, UINT size)
 	{
 		DWORD dwsize=size;
 		GetUserName(buffer,&dwsize); 
-		vnclog.Print(LL_INTERR, VNCLOG("@@@@@@@@@@@@@ GetCurrentUser Impersonate console - UserNAme found: %s \n"), buffer);
+//		vnclog.Print(LL_INTERR, VNCLOG("@@@@@@@@@@@@@ GetCurrentUser Impersonate console - UserNAme found: %s \n"), buffer);
 	}
 	//Once the operation is over revert back to system account.
 	RevertToSelf();
@@ -146,7 +146,7 @@ GetCurrentUser(char *buffer, UINT size) // RealVNC 336 change
 {	
 	if (vncService::RunningFromExternalService())
 	{
-		vnclog.Print(LL_INTERR, VNCLOG("@@@@@@@@@@@@@ GetCurrentUser - Forcing g_impersonating_user \n"));
+//		vnclog.Print(LL_INTERR, VNCLOG("@@@@@@@@@@@@@ GetCurrentUser - Forcing g_impersonating_user \n"));
 		g_impersonating_user = TRUE;
 	}
 
@@ -217,26 +217,28 @@ GetCurrentUser(char *buffer, UINT size) // RealVNC 336 change
 			// Just call GetCurrentUser
 			DWORD length = size;
 
-			vnclog.Print(LL_INTERR, VNCLOG("@@@@@@@@@@@@@ GetCurrentUser - GetUserName call \n"));
+//			vnclog.Print(LL_INTERR, VNCLOG("@@@@@@@@@@@@@ GetCurrentUser - GetUserName call \n"));
 			if ( GetConsoleUser(buffer, size) == 0)
-			//if (GetUserName(buffer, &length) == 0)
 			{
-				UINT error = GetLastError();
+				if (GetUserName(buffer, &length) == 0)
+				{
+					UINT error = GetLastError();
 
-				if (error == ERROR_NOT_LOGGED_ON)
-				{
-					vnclog.Print(LL_INTERR, VNCLOG("@@@@@@@@@@@@@ GetCurrentUser - Error: No user logged on \n"));
-					// No user logged on
-					if (strlen("") >= size)
+					if (error == ERROR_NOT_LOGGED_ON)
+					{
+						vnclog.Print(LL_INTERR, VNCLOG("@@@@@@@@@@@@@ GetCurrentUser - Error: No user logged on \n"));
+						// No user logged on
+						if (strlen("") >= size)
+							return FALSE;
+						strcpy(buffer, "");
+						return TRUE;
+					}
+					else
+					{
+						// Genuine error...
+						vnclog.Print(LL_INTERR, VNCLOG("getusername error %d\n"), GetLastError());
 						return FALSE;
-					strcpy(buffer, "");
-					return TRUE;
-				}
-				else
-				{
-					// Genuine error...
-					vnclog.Print(LL_INTERR, VNCLOG("getusername error %d\n"), GetLastError());
-					return FALSE;
+					}
 				}
 			}
 		}

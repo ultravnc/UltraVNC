@@ -370,7 +370,7 @@ vncMenu::AddTrayIcon()
 		// suppress the tray icon.
 		if ( ! m_server->GetDisableTrayIcon())
 		{
-			vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::AddTrayIcon - ADD Tray Icon call\n"));
+//			vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::AddTrayIcon - ADD Tray Icon call\n"));
 			SendTrayMsg(NIM_ADD, FALSE);
 		}
 	}
@@ -456,11 +456,11 @@ vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 	    }
 	}
 
-	vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::SendTrayMsg - Shell_NotifyIcon call\n"));
+//	vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::SendTrayMsg - Shell_NotifyIcon call\n"));
 	// Send the message
 	if (Shell_NotifyIcon(msg, &m_nid))
 	{
-			vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::SendTrayMsg - Shell_NotifyIcon call SUCCESS\n"));
+//			vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::SendTrayMsg - Shell_NotifyIcon call SUCCESS\n"));
 			// Set the enabled/disabled state of the menu items
 			//		vnclog.Print(LL_INTINFO, VNCLOG("tray icon added ok\n"));
 			EnableMenuItem(m_hmenu, ID_ADMIN_PROPERTIES,
@@ -475,17 +475,17 @@ vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 			m_properties.AllowEditClients() ? MF_ENABLED : MF_GRAYED);
 	} else {
 
-		vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::SendTrayMsg - Shell_NotifyIcon call FAILED ( %u ) \n"), 0);
+//		vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::SendTrayMsg - Shell_NotifyIcon call FAILED ( %u ) \n"), 0);
 		if (!vncService::RunningAsService())
 		{
-			//vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::SendTrayMsg - Shell_NotifyIcon call FAILED NOT runasservice\n"));
+//			//vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::SendTrayMsg - Shell_NotifyIcon call FAILED NOT runasservice\n"));
 			if (msg == NIM_ADD)
 			{
 				// The tray icon couldn't be created, so use the Properties dialog
 				// as the main program window
 				if (!m_server->RunningFromExternalService()) // sf@2007 - Do not display Properties pages when running in Application0 mode
 				{
-					vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::SendTrayMsg - Shell_NotifyIcon call FAILED NOT runfromexternalservice\n"));
+//					vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::SendTrayMsg - Shell_NotifyIcon call FAILED NOT runfromexternalservice\n"));
 					//vnclog.Print(LL_INTINFO, VNCLOG("opening dialog box\n"));
 					m_properties.ShowAdmin(TRUE, TRUE);
 					PostQuitMessage(0);
@@ -500,10 +500,10 @@ vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 void vncMenu::Shutdown()
 {
 	vnclog.Print(LL_INTERR, VNCLOG("vncMenu::Shutdown: Close menu - Disconnect all - Shutdown server\n"));
-	m_server->AutoRestartFlag(TRUE);
-	m_server->KillAuthClients();
-	m_server->KillSockConnect();
-	m_server->ShutdownServer();
+//	m_server->AutoRestartFlag(TRUE);
+//	m_server->KillAuthClients();
+//	m_server->KillSockConnect();
+//	m_server->ShutdownServer();
 	SendMessage(m_hwnd, WM_CLOSE, 0, 0);
 }
 
@@ -569,9 +569,9 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
 					if (vncService::CurrentUser((char *) &newuser, sizeof(newuser)))
 					{
-						vnclog.Print(LL_INTINFO,
-							VNCLOG("############### Usernames change: old=\"%s\", new=\"%s\"\n"),
-							_this->m_username, newuser);
+//						vnclog.Print(LL_INTINFO,
+//							VNCLOG("############### Usernames change: old=\"%s\", new=\"%s\"\n"),
+//							_this->m_username, newuser);
 
 						// Check whether the user name has changed!
 						if (strcmp(newuser, _this->m_username) != 0)
@@ -680,6 +680,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
 		case ID_KILLCLIENTS:
 			// Disconnect all currently connected clients
+			vnclog.Print(LL_INTINFO, VNCLOG("KillAuthClients() ID_KILLCLIENTS \n"));
 			_this->m_server->KillAuthClients();
 			break;
 
@@ -695,6 +696,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
 		case ID_CLOSE:
 			// User selected Close from the tray menu
+			vnclog.Print(LL_INTINFO, VNCLOG("KillAuthClients() ID_CLOSE \n"));
 			_this->m_server->KillAuthClients();
 			PostMessage(hwnd, WM_CLOSE, 0, 0);
 			break;
@@ -775,11 +777,11 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		return 0;
 		
 	case WM_QUERYENDSESSION:
-		_this->m_server->KillAuthClients();
-		_this->m_server->KillSockConnect();
-		_this->m_server->ShutdownServer();
-		DestroyWindow(hwnd);
 		vnclog.Print(LL_INTERR, VNCLOG("WM_QUERYENDSESSION\n"));
+		//_this->m_server->KillAuthClients();
+		//_this->m_server->KillSockConnect();
+		//_this->m_server->ShutdownServer();
+		//DestroyWindow(hwnd);
 		break;
 		
 	case WM_ENDSESSION:
