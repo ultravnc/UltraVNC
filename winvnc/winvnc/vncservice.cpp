@@ -59,16 +59,24 @@ DWORD	g_version_major;
 DWORD	g_version_minor;
 BOOL	m_fRunningFromExternalService = false;
 
+typedef DWORD (WINAPI* pWTSGetActiveConsoleSessionId)(VOID);
 #include <tlhelp32.h>
-bool
-GetConsoleUser(char *buffer, UINT size)
+
+DWORD GetExplorerLogonPid()
 {
 	DWORD dwSessionId;
 	DWORD dwExplorerLogonPid;
 	PROCESSENTRY32 procEntry;
 	HANDLE hProcess,hPToken;
 
-	dwSessionId = WTSGetActiveConsoleSessionId();
+	pWTSGetActiveConsoleSessionId WTSGetActiveConsoleSessionIdF=NULL;
+	HMODULE  hlibkernel = LoadLibrary("kernel32.dll"); 
+	WTSGetActiveConsoleSessionIdF=(pWTSGetActiveConsoleSessionId)GetProcAddress(hlibkernel, "WTSGetActiveConsoleSessionId");
+	if (WTSGetActiveConsoleSessionIdF!=NULL)
+	   dwSessionId =WTSGetActiveConsoleSessionIdF();
+	else dwSessionId=0;
+
+	FreeLibrary(hlibkernel);
 
     HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     if (hSnap == INVALID_HANDLE_VALUE)
@@ -97,31 +105,50 @@ GetConsoleUser(char *buffer, UINT size)
         }
 
     } while (Process32Next(hSnap, &procEntry));
+	return dwExplorerLogonPid;
+}
 
+#include <tlhelp32.h>
+bool
+GetConsoleUser(char *buffer, UINT size)
+{
+
+	HANDLE hProcess,hPToken;
+	DWORD dwExplorerLogonPid=GetExplorerLogonPid();
+	if (dwExplorerLogonPid==0) 
+	{
+		strcpy(buffer,"");
+		return 0;
+	}
 	hProcess = OpenProcess(MAXIMUM_ALLOWED,FALSE,dwExplorerLogonPid);
 
    if(!::OpenProcessToken(hProcess,TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY
                                     |TOKEN_DUPLICATE|TOKEN_ASSIGN_PRIMARY|TOKEN_ADJUST_SESSIONID
                                     |TOKEN_READ|TOKEN_WRITE,&hPToken))
-		{               
+		{     
+			   strcpy(buffer,"");
 			   return 0 ;
 		}
 
 
-	//Impersonate the explorer token which runs under the user account
-	ImpersonateLoggedOnUser(hPToken);
-
-	int iImpersonateResult = GetLastError();
-
-	if(iImpersonateResult == ERROR_SUCCESS)
+   // token user
+    TOKEN_USER *ptu;
+	DWORD needed;
+	ptu = (TOKEN_USER *) malloc( 16384 );
+	if (GetTokenInformation( hPToken, TokenUser, ptu, 16384, &needed ) )
 	{
+		char  DomainName[64];
+		memset(DomainName, 0, sizeof(DomainName));
+		DWORD UserSize, DomainSize;
+		DomainSize =sizeof(DomainName)-1;
+		SID_NAME_USE SidType;
 		DWORD dwsize=size;
-		GetUserName(buffer,&dwsize); 
-//		vnclog.Print(LL_INTERR, VNCLOG("@@@@@@@@@@@@@ GetCurrentUser Impersonate console - UserNAme found: %s \n"), buffer);
+		LookupAccountSid(NULL, ptu->User.Sid, buffer, &dwsize, DomainName, &DomainSize, &SidType);
+		free(ptu);
+		return 1;
 	}
-	//Once the operation is over revert back to system account.
-	RevertToSelf();
-	return 1;
+	strcpy(buffer,"");
+	return 0;
 }
 
 
