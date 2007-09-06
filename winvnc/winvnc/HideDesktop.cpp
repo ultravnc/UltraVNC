@@ -162,6 +162,7 @@ void ShowActiveDesktop()
 static TCHAR	DesktopPattern[40];
 static BOOL		ADWasEnabled = false;
 static BOOL		ISWallPaperHided = false;
+static TCHAR SCREENNAME[1024];
 
 void HideDesktop()
 {
@@ -173,9 +174,13 @@ void HideDesktop()
 	// Tell all applications that there is no wallpaper
 	// Note that this doesn't change the wallpaper registry setting!
 	// @@@efh On Win98 and Win95 this returns an error in the debug build (but not in release)...
+	if (!ISWallPaperHided)
+	{
+	SystemParametersInfo(SPI_GETDESKWALLPAPER,1024,SCREENNAME,NULL );
 	SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, "", SPIF_SENDCHANGE);
 	ADWasEnabled = HideActiveDesktop();
 	ISWallPaperHided=true;
+	}
 }
 
 void RestoreDesktop()
@@ -185,7 +190,7 @@ void RestoreDesktop()
 	if (ADWasEnabled)
 		ShowActiveDesktop();
 
-	SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, NULL, SPIF_SENDCHANGE);
+	SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, SCREENNAME, SPIF_SENDCHANGE);
 	}
 	ISWallPaperHided=false;
 
