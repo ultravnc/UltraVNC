@@ -416,6 +416,7 @@ protected:
 	BOOL m_OrigpollingSet;
 	BOOL m_Origpolling;
 /*	BOOL Check24bit();*/
+	COLORREF CapturePixel(int x,int y);
 
 	
 BOOL DriverWanted;

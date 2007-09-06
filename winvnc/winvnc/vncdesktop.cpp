@@ -88,9 +88,32 @@ DWORD WINAPI BlackWindow(LPVOID lpParam);
 // 
 // 
 //
+COLORREF
+vncDesktop::CapturePixel(int x,int y)
+{
+
+	// Select the memory bitmap into the memory DC
+	HBITMAP oldbitmap;
+	if ((oldbitmap = (HBITMAP) SelectObject(m_hmemdc, m_membitmap)) == NULL)
+		return 0;
+
+	// Capture screen into bitmap
+	BOOL blitok = BitBlt(m_hmemdc, 0, 0,
+		1,
+		1,
+		m_hrootdc,x, y, m_fCaptureAlphaBlending ? (CAPTUREBLT | SRCCOPY) : SRCCOPY);
+
+	// Select the old bitmap back into the memory DC
+	SelectObject(m_hmemdc, oldbitmap);
+	int bytesPerPixel = m_scrinfo.format.bitsPerPixel / 8;
+	COLORREF cr=0;
+	memcpy(&cr ,m_DIBbits,m_scrinfo.format.bitsPerPixel / 8);
+	return cr;
+}
 void
 vncDesktop::FastDetectChanges(rfb::Region2D &rgn, rfb::Rect &rect, int nZone, bool fTurbo)
 {
+	vnclog.Print(LL_INTINFO, VNCLOG("### y y x x %i %i %i %i \n"), rect.tl.y,rect.br.y,rect.tl.x,rect.br.x);
 	RGBPixelList::iterator iPixelColor;
 	RGBPixelList *pThePixelGrid;
 	bool fInitGrid = false;
@@ -173,17 +196,21 @@ vncDesktop::FastDetectChanges(rfb::Region2D &rgn, rfb::Rect &rect, int nZone, bo
 			// If init list
 			if (fInitGrid)
 			{
-			   COLORREF PixelColor = GetPixel(m_hrootdc, xo, yo);
+			   COLORREF PixelColor;
+			   if (OSversion()==2) PixelColor= CapturePixel( xo, yo);
+			   else PixelColor= GetPixel(m_hrootdc, xo, yo);
 			   pThePixelGrid->push_back(PixelColor);
 			   // vnclog.Print(LL_INTINFO, VNCLOG("### PixelsGrid Init : Pixel xo=%d - yo=%d - C=%ld\n"), xo, yo, (long)PixelColor); 
 			   continue;
 			}
 
 			// Read the pixel's color on the screen
-		    COLORREF PixelColor = GetPixel(m_hrootdc, xo, yo);
-
+			COLORREF PixelColor=0;
+		    if (OSversion()==2 ) PixelColor = CapturePixel( xo, yo);
+			else PixelColor = GetPixel(m_hrootdc, xo, yo);
+			vnclog.Print(LL_INTINFO, VNCLOG("### GetPixel %i\n"),OSversion());
 			// If the pixel has changed
-			if (*iPixelColor != PixelColor)
+			if (*iPixelColor != PixelColor )
 			{
 				// Save the new Pixel in the list
 				*iPixelColor = PixelColor;
@@ -429,7 +456,7 @@ vncDesktop::Startup()
 	if (m_server->Driver())
 				{
 					vnclog.Print(LL_INTINFO, VNCLOG("Driver option enabled \n"));
-					if(OSVersion()==1 )
+					if(OSversion()==1 || OSversion()==2 )
 						{
 							InitVideoDriver();
 						}
@@ -675,7 +702,7 @@ vncDesktop::InitBitmap()
 {	
 	// Get the device context for the whole screen and find it's size
 	DriverType=NONE;
-	if (OSVersion()==1) //XP W2k
+	if (OSversion()==1 || OSversion()==2) //XP W2k
 		{	
 			if (VideoBuffer())
 				{
@@ -1115,7 +1142,7 @@ vncDesktop::SetPalette()
 DWORD WINAPI Driverwatch(LPVOID lpParam)
 {
 	//Mouse shape changed
-	if(OSVersion()==1)
+	if (OSversion()==1 || OSversion()==2)
 	{
 		HANDLE event;
 		//DrvWatch *mywatch=(DrvWatch*)lpParam;
@@ -1151,7 +1178,7 @@ DWORD WINAPI Driverwatch(LPVOID lpParam)
 DWORD WINAPI Driverwatch2(LPVOID lpParam)
 {
 	//new screen update
-	if(OSVersion()==1)
+	if (OSversion()==1 || OSversion()==2)
 	{
 		HANDLE event;
 		//DrvWatch *mywatch=(DrvWatch*)lpParam;
@@ -1300,7 +1327,7 @@ vncDesktop::Init(vncServer *server)
 	m_server = server;
 
 	// sf@2005
-	if (OSVersion()==1)
+	if (OSversion()==1 || OSversion()==2)
 	m_fCaptureAlphaBlending = m_server->CaptureAlphaBlending();
 	else m_fCaptureAlphaBlending=false;
 
@@ -1884,7 +1911,7 @@ vncDesktop::SetDisableInput(bool enabled)
 
 	//BlockInput block everything on non w2k and XP
 	//if hookdll is used, he take care of input blocking
-	if (OSVersion()==1) 
+	if (OSversion()==1 || OSversion()==2) 
 		{
 			if (pbi) (*pbi)(enabled);
 		}
@@ -2051,7 +2078,7 @@ BOOL vncDesktop::InitVideoDriver()
 {
 	omni_mutex_lock l(m_videodriver_lock);
 	
-	if(OSVersion()!=1 ) return true; //we need w2k or xp
+	if(!(OSversion()==1  || OSversion()==2)) return true; //we need w2k or xp
 	vnclog.Print(LL_INTERR, VNCLOG("Driver option is enabled\n"));
 	// If m_videodriver exist, the driver was activated.
 	// This does not mean he is still active
@@ -2135,7 +2162,7 @@ BOOL vncDesktop::InitVideoDriver()
 // Modif rdv@2002 - v1.1.x - videodriver
 void vncDesktop::ShutdownVideoDriver()
 {
-	if(OSVersion()!=1) return;
+	if(!(OSversion()!=1 || OSversion()!=2)) return;
 	if (m_videodriver==NULL) return;
 	if (m_videodriver!=NULL)
 	{
@@ -2164,7 +2191,7 @@ void vncDesktop::SethookMechanism(BOOL hookall,BOOL hookdriver)
 
 	// 9,x case 
 	vnclog.Print(LL_INTERR, VNCLOG("SethookMechanism called\r\n"));
-	if(OSVersion()==4 || OSVersion()==5)
+	if(OSversion()==4 || OSversion()==5)
 	{
 		m_hookdriver=false;//(user driver updates)
 		m_hookdll=false;//(use hookdll updates)
@@ -2180,7 +2207,7 @@ void vncDesktop::SethookMechanism(BOOL hookall,BOOL hookdriver)
 		else Hookdll_Changed=false;
 	}
 	// W2k-XP case
-	else if(OSVersion()==1)
+	else if(OSversion()==1 || OSversion()==2)
 	{
 		// sf@2002 - We forbid hoodll and hookdriver at the same time (pointless and high CPU load)
 		if (!hookall && !hookdriver) {m_hookdll=false;m_hookdriver=false;}
