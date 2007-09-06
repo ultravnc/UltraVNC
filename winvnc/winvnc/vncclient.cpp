@@ -67,6 +67,8 @@
 
 #include "localization.h" // Act : add localization on messages
 typedef BOOL (WINAPI *PGETDISKFREESPACEEX)(LPCSTR,PULARGE_INTEGER, PULARGE_INTEGER, PULARGE_INTEGER);
+DWORD GetExplorerLogonPid();
+
 // vncClient update thread class
 
 class vncClientUpdateThread : public omni_thread
@@ -4177,42 +4179,84 @@ bool vncClient::MyGetFileSize(char* szFilePath, ULARGE_INTEGER *n2FileSize)
 
 bool vncClient::DoFTUserImpersonation()
 {
+	vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::DoFTUserImpersonation - Call\n"));
 	omni_mutex_lock l(GetUpdateLock());
 
 	if (m_fFileDownloadRunning) return true;
 	if (m_fFileUploadRunning) return true;
 	if (m_fFTUserImpersonatedOk) return true;
 
+	vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::DoFTUserImpersonation - 1\n"));
 	bool fUserOk = true;
 
 	if (vncService::IsWSLocked())
 	{
 		m_fFTUserImpersonatedOk = false;
+		vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::DoFTUserImpersonation - WSLocked\n"));
 		return false;
 	}
 
 	char username[UNLEN+1];
 	vncService::CurrentUser((char *)&username, sizeof(username));
+	vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::DoFTUserImpersonation - currentUser = %s\n"), username);
 	if (strcmp(username, "") != 0)
 	{
+		// sf@2007 - New method to achieve FTUserImpersonation - Still needs to be further tested...
+		HANDLE hProcess, hPToken;
+		DWORD pid = GetExplorerLogonPid();
+		if (pid != 0) 
+		{
+			hProcess = OpenProcess(MAXIMUM_ALLOWED, FALSE, pid);
+			if (!OpenProcessToken(hProcess, TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY
+									|TOKEN_DUPLICATE|TOKEN_ASSIGN_PRIMARY|TOKEN_ADJUST_SESSIONID
+									|TOKEN_READ|TOKEN_WRITE,&hPToken
+								 )
+			) 
+			{
+				vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::DoFTUserImpersonation - OpenProcessToken Error\n"));
+				fUserOk = false;
+			}
+			else
+			{
+				if (!ImpersonateLoggedOnUser(hPToken))
+				{
+					vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::DoFTUserImpersonation - ImpersonateLoggedOnUser Failed\n"));
+					fUserOk = false;
+				}
+			}
+
+			CloseHandle(hProcess);
+			CloseHandle(hPToken);
+		}
+		
+		/* Old method
 		// Modif Byteboon (Jeremy C.) - Impersonnation
 		if (m_server->m_impersonationtoken)
 		{
+			vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::DoFTUserImpersonation - Impersonationtoken exists\n"));
 			HANDLE newToken;
 			if (DuplicateToken(m_server->m_impersonationtoken, SecurityImpersonation, &newToken))
 			{
+				vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::DoFTUserImpersonation - DuplicateToken ok\n"));
 				if(!ImpersonateLoggedOnUser(newToken))
 				{
-					vnclog.Print(LL_INTERR, VNCLOG("failed to impersonate [%d]\n"),GetLastError());
+					vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::DoFTUserImpersonation - failed to impersonate [%d]\n"),GetLastError());
 					fUserOk = false;
 				}
 				CloseHandle(newToken);
 			}
 			else
+			{
+				vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::DoFTUserImpersonation - DuplicateToken FAILEDk\n"));
 				fUserOk = false;
+			}
 		}
 		else
+		{
+			vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::DoFTUserImpersonation - No impersonationtoken\n"));
 			fUserOk = false;
+		}
+		*/
 		
 		if (!vncService::RunningAsService())
 			fUserOk = true;
@@ -4234,20 +4278,23 @@ bool vncClient::DoFTUserImpersonation()
 
 void vncClient::UndoFTUserImpersonation()
 {
+	//vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::UNDoFTUserImpersonation - Call\n"));
 	omni_mutex_lock l(GetUpdateLock());
 
 	if (!m_fFTUserImpersonatedOk) return;
 	if (m_fFileDownloadRunning) return;
 	if (m_fFileUploadRunning) return;
 
+	vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::UNDoFTUserImpersonation - 1\n"));
 	DWORD lTime = timeGetTime();
 	if (lTime - m_lLastFTUserImpersonationTime < 10000) return;
 
-	if (m_server->m_impersonationtoken)
+	//if (m_server->m_impersonationtoken) // sf@2007 - New method. No more needed
 	{
+		vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::UNDoFTUserImpersonation - Impersonationtoken exists\n"));
 		RevertToSelf();
 		// PostMessage(FindWindow(MENU_CLASS_NAME, NULL), MENU_SERVICEHELPER_MSG, 0, 0);
-		PostToWinVNC(MENU_SERVICEHELPER_MSG, 0, 0L);
+		//PostToWinVNC(MENU_SERVICEHELPER_MSG, 0, 0L); // sf@2007 - New method. No more needed
 	}
 
 	m_fFTUserImpersonatedOk = false;
