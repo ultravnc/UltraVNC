@@ -113,7 +113,6 @@ vncDesktop::CapturePixel(int x,int y)
 void
 vncDesktop::FastDetectChanges(rfb::Region2D &rgn, rfb::Rect &rect, int nZone, bool fTurbo)
 {
-	vnclog.Print(LL_INTINFO, VNCLOG("### y y x x %i %i %i %i \n"), rect.tl.y,rect.br.y,rect.tl.x,rect.br.x);
 	RGBPixelList::iterator iPixelColor;
 	RGBPixelList *pThePixelGrid;
 	bool fInitGrid = false;

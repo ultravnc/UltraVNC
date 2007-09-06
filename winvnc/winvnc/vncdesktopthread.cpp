@@ -3,6 +3,7 @@ int counterwatch;//global var for driverwatch
 bool g_DesktopThread_running;
 bool g_update_triggered;
 
+
 inline bool
 ClipRect(int *x, int *y, int *w, int *h,
 	    int cx, int cy, int cw, int ch) {
@@ -404,6 +405,7 @@ vncDesktopThread::run_undetached(void *arg)
 	{
 		if (!PeekMessage(&msg, NULL, NULL, NULL, PM_REMOVE)) 
 		{
+
 			// MAX 30fps
 			newtick = timeGetTime(); // Better resolution than GetTickCount ;)		
 			if ((newtick-oldtick)<33)
@@ -700,8 +702,10 @@ vncDesktopThread::run_undetached(void *arg)
 			//
 			// CALCULATE CHANGES
 			m_desktop->m_UltraEncoder_used=m_desktop->m_server->IsThereAUltraEncodingClient();
+			vnclog.Print(LL_INTERR, VNCLOG("UpdateWanted B\n"));
 			if (m_desktop->m_server->UpdateWanted())
 			{
+				vnclog.Print(LL_INTERR, VNCLOG("UpdateWanted N\n"));
 				//TEST4
 				// Re-render the mouse's old location if it's moved
 				BOOL cursormoved = FALSE;
@@ -710,6 +714,7 @@ vncDesktopThread::run_undetached(void *arg)
 					((cursorpos.x != oldcursorpos.x) ||
 					(cursorpos.y != oldcursorpos.y)))
 				{
+					vnclog.Print(LL_INTERR, VNCLOG("UpdateWanted M %i %i %i %i\n"),cursorpos.x, oldcursorpos.x,cursorpos.y,oldcursorpos.y);
 					cursormoved = TRUE;
 					oldcursorpos = rfb::Point(cursorpos);
 					// nyama/marscha - PointerPos. Inform clients about mouse move.
@@ -748,13 +753,15 @@ vncDesktopThread::run_undetached(void *arg)
    							m_lLastUpdateTime = lTime;
 							
 							if (
-								(lTime - m_lLastMouseMoveTime > 300) // Restart FS Polling 300ms after last mouse move
+								(lTime - m_lLastMouseMoveTime > 150) // Restart FS Polling 300ms after last mouse move
 								//|| 
 								//(!m_desktop->m_server->TurboMode())
 //								||
 //								(!m_desktop->RestartDriver)
 							   )
+							{
 							   m_desktop->FastDetectChanges(rgncache, m_desktop->GetSize(), 0, true);
+							}
 						}
 					}
 						
