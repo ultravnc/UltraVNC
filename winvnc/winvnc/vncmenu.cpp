@@ -69,6 +69,7 @@ static P_DwmIsCompositionEnabled pfnDwmIsCompositionEnabled = NULL;
 typedef HRESULT (CALLBACK *P_DwmEnableComposition) (BOOL   fEnable); 
 static P_DwmEnableComposition pfnDwmEnableComposition = NULL; 
 static BOOL AeroWasEnabled = FALSE;
+DWORD GetExplorerLogonPid();
 
 static inline VOID UnloadDM(VOID) 
  { 
@@ -705,7 +706,27 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			PostMessage(hwnd, WM_CLOSE, 0, 0);
 			break;
 		case ID_CLOSE_SERVICE:
-			ShellExecute(GetDesktopWindow(), "open", "stop_service.exe", "", 0, SW_SHOWNORMAL);
+			{
+			HANDLE hProcess,hPToken;
+			DWORD id=GetExplorerLogonPid();
+			if (id!=0) 
+			{
+				hProcess = OpenProcess(MAXIMUM_ALLOWED,FALSE,id);
+				if(!OpenProcessToken(hProcess,TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY
+										|TOKEN_DUPLICATE|TOKEN_ASSIGN_PRIMARY|TOKEN_ADJUST_SESSIONID
+										|TOKEN_READ|TOKEN_WRITE,&hPToken)) break;
+				ImpersonateLoggedOnUser(hPToken);
+				int iImpersonateResult = GetLastError();
+				if(iImpersonateResult == ERROR_SUCCESS)
+					{
+						ShellExecute(GetDesktopWindow(), "open", "stop_service.exe", "", 0, SW_SHOWNORMAL);
+					}
+				//Once the operation is over revert back to system account.
+				RevertToSelf();
+				CloseHandle(hProcess);
+				CloseHandle(hPToken);
+			}
+			}
 			break;
 
 		}
