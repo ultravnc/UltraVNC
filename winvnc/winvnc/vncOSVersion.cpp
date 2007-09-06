@@ -23,9 +23,9 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include <windows.h>
-
-int
-OSVersion()
+int OSTYPE=4;
+void
+SetOSVersion()
 {
 	OSVERSIONINFO OSversion;
 	
@@ -37,18 +37,27 @@ OSVersion()
 	{
 		case VER_PLATFORM_WIN32_NT:
 								  if(OSversion.dwMajorVersion==5 && OSversion.dwMinorVersion==0)
-									 return 1;							    
+									 OSTYPE=1;							    
 								  if(OSversion.dwMajorVersion==5 && OSversion.dwMinorVersion==1)
-									 return 1;
+									 OSTYPE=1;
 								  if(OSversion.dwMajorVersion==5)
-									 return 1;
+									 OSTYPE=1;
 								  if(OSversion.dwMajorVersion==6)
-									 return 1;
+									 OSTYPE=2;
 								  if(OSversion.dwMajorVersion<=4) 	  
-								     return 3;
+								     OSTYPE=3;
+								  break;
 		case VER_PLATFORM_WIN32_WINDOWS:
-								if(OSversion.dwMinorVersion==0) return 5; //95
-								return 4;
+								if(OSversion.dwMinorVersion==0) 
+								{
+									OSTYPE=5; //95
+									break;
+								}
+								OSTYPE=4;
 	}
-	return 0;
+}
+
+int OSversion()
+{
+	return OSTYPE;
 }

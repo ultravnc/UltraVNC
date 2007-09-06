@@ -25,6 +25,6 @@
 #if !defined(DISPL)
 #define DISPL
 #pragma once
-int
-OSVersion();
+void SetOSVersion();
+int OSversion();
 #endif

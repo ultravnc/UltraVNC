@@ -517,7 +517,7 @@ vncProperties::DialogProc(HWND hwnd,
 
 			// 2006 - Patch from KP774 - disable some options depending on this OS version
 			// for Win9x, no user impersonation, no LockWorkstation
-			if(OSVersion() == 4 || OSVersion() == 5)
+			if(OSversion() == 4 || OSversion() == 5)
 			{
 				// Disable userimpersonation
 				_this->m_server->FTUserImpersonation(FALSE);
@@ -535,7 +535,7 @@ vncProperties::DialogProc(HWND hwnd,
 			}
 
 			// if not XP or above (if win9x or NT4 or NT3.51), disable Alpha blending
-			if(OSVersion() != 1)
+			if(!(OSversion() == 1 || OSversion()==2))
 			{
 				// Disable Capture Alpha Blending
 				_this->m_server->CaptureAlphaBlending(FALSE);

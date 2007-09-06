@@ -231,7 +231,7 @@ vncPropertiesPoll::DialogProcPoll(HWND hwnd,
 				BM_SETCHECK,
 				_this->m_server->Driver(),0);
 
-			if (OSVersion()==3) // If NT4 or below, no driver
+			if (OSversion()==3) // If NT4 or below, no driver
 			{
 				SendMessage(hDriver,BM_SETCHECK,false,0);
 				_this->m_server->Driver(false);
