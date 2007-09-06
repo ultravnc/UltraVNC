@@ -79,6 +79,7 @@ void WRITETOLOG(char *szText, int size, DWORD *byteswritten, void *);
 // routine or, under NT, the main service routine.
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow)
 {
+	SetOSVersion();
 	setbuf(stderr, 0);
 
         //ACT: Load all messages from ressource file
@@ -480,7 +481,7 @@ DWORD WINAPI imp_desktop_thread(LPVOID lpParam)
 	if (!CloseDesktop(old_desktop))
 		vnclog.Print(LL_INTERR, VNCLOG("SelectHDESK failed to close old desktop %x (Err=%d)\n"), old_desktop, GetLastError());
 
-	ImpersonateCurrentUser_();
+	//ImpersonateCurrentUser_();
 
 	char m_username[200];
 	HWINSTA station = GetProcessWindowStation();
@@ -576,6 +577,7 @@ void KillSDTimer()
 
 int WinVNCAppMain()
 {
+	SetOSVersion();
 	vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - WinVNCAPPMain\n"));
 #ifdef CRASH_ENABLED
 	LPVOID lpvState = Install(NULL,  "rudi.de.vos@skynet.be", "UltraVnc");
