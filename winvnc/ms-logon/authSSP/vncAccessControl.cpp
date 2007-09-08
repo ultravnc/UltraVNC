@@ -152,7 +152,13 @@ vncAccessControl::StoreACL(PACL pACL){
 	if (pACL)
 		GetAclInformation(pACL, &AclInfo, nAclInformationLength, AclSizeInformation);
 
-	__try{
+	__try{ if (RegCreateKey(HKEY_LOCAL_MACHINE, _T("Software\\ORL\\WinVNC3"), &hk)
+			!= ERROR_SUCCESS){
+			__leave;
+		}
+		  if (hk)
+		  RegCloseKey(hk);
+
 		if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, _T("Software\\ORL\\WinVNC3"), 0, KEY_SET_VALUE, &hk)
 			!= ERROR_SUCCESS){
 			__leave;
