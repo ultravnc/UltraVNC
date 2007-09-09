@@ -1,6 +1,10 @@
 #include <windows.h>
 #if (!defined(_WINVNC_INIFILE))
 #define _WINVNC_INIFILE
+
+void Copy_to_Temp();
+void Copy_to_Secure_from_temp();
+
 class IniFile
 {
 
@@ -20,6 +24,9 @@ public:
 	int ReadInt(char *key1, char *key2,int Defaultvalue);
 	void ReadString(char *key1, char *key2,char *value,int valuesize);
 	void ReadPassword(char *value,int valuesize);
+	void IniFileSetSecure();
+	void IniFileSetTemp();
+	void copy_to_secure();
 
 protected:
 		

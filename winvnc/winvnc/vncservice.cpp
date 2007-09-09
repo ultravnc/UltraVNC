@@ -88,6 +88,7 @@ DWORD GetExplorerLogonPid()
 
     if (!Process32First(hSnap, &procEntry))
     {
+		CloseHandle(hSnap);
         return 0 ;
     }
 
@@ -105,6 +106,7 @@ DWORD GetExplorerLogonPid()
         }
 
     } while (Process32Next(hSnap, &procEntry));
+	CloseHandle(hSnap);
 	return dwExplorerLogonPid;
 }
 
@@ -127,6 +129,7 @@ GetConsoleUser(char *buffer, UINT size)
                                     |TOKEN_READ|TOKEN_WRITE,&hPToken))
 		{     
 			   strcpy(buffer,"");
+			   CloseHandle(hProcess);
 			   return 0 ;
 		}
 
@@ -145,9 +148,11 @@ GetConsoleUser(char *buffer, UINT size)
 		DWORD dwsize=size;
 		LookupAccountSid(NULL, ptu->User.Sid, buffer, &dwsize, DomainName, &DomainSize, &SidType);
 		free(ptu);
+		CloseHandle(hProcess);
 		return 1;
 	}
 	strcpy(buffer,"");
+	CloseHandle(hProcess);
 	return 0;
 }
 

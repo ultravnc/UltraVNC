@@ -466,13 +466,13 @@ vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 			// Set the enabled/disabled state of the menu items
 			//		vnclog.Print(LL_INTINFO, VNCLOG("tray icon added ok\n"));
 			EnableMenuItem(m_hmenu, ID_ADMIN_PROPERTIES,
-			m_properties.AllowProperties() && RunningAsAdministrator() ? MF_ENABLED : MF_GRAYED);
+			m_properties.AllowProperties() ? MF_ENABLED : MF_GRAYED);
 			EnableMenuItem(m_hmenu, ID_PROPERTIES,
-			m_properties.AllowProperties() && RunningAsAdministrator() ? MF_ENABLED : MF_GRAYED);
+			m_properties.AllowProperties() ? MF_ENABLED : MF_GRAYED);
 			EnableMenuItem(m_hmenu, ID_CLOSE,
 			m_properties.AllowShutdown() ? MF_ENABLED : MF_GRAYED);
 			EnableMenuItem(m_hmenu, ID_CLOSE_SERVICE,
-			m_properties.AllowShutdown() ? MF_ENABLED : MF_GRAYED);
+			m_properties.AllowShutdown() &&  RunningAsAdministrator() ? MF_ENABLED : MF_GRAYED);
 			EnableMenuItem(m_hmenu, ID_KILLCLIENTS,
 			m_properties.AllowEditClients() ? MF_ENABLED : MF_GRAYED);
 			EnableMenuItem(m_hmenu, ID_OUTGOING_CONN,
@@ -641,12 +641,50 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		switch (LOWORD(wParam))
 		{
 		case ID_ONLINEHELP:
-			MessageBox(NULL,"http://ultravnc.sourceforge.net/help.htm","Info",0);
-			//ShellExecute(GetDesktopWindow(), "open", "http://ultravnc.sourceforge.net/help.htm", "", 0, SW_SHOWNORMAL);
+			{
+			HANDLE hProcess,hPToken;
+			DWORD id=GetExplorerLogonPid();
+			if (id!=0) 
+			{
+				hProcess = OpenProcess(MAXIMUM_ALLOWED,FALSE,id);
+				if(!OpenProcessToken(hProcess,TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY
+										|TOKEN_DUPLICATE|TOKEN_ASSIGN_PRIMARY|TOKEN_ADJUST_SESSIONID
+										|TOKEN_READ|TOKEN_WRITE,&hPToken)) break;
+				ImpersonateLoggedOnUser(hPToken);
+				int iImpersonateResult = GetLastError();
+				if(iImpersonateResult == ERROR_SUCCESS)
+					{
+						ShellExecute(GetDesktopWindow(), "open", "http://forum.ultravnc.info/", "", 0, SW_SHOWNORMAL);
+					}
+				//Once the operation is over revert back to system account.
+				RevertToSelf();
+				CloseHandle(hProcess);
+				CloseHandle(hPToken);
+			}
+			}
 			break;
 		case ID_HOME:
-			MessageBox(NULL,"http://ultravnc.sourceforge.net","Info",0);
-			//ShellExecute(GetDesktopWindow(), "open", "http://ultravnc.sourceforge.net/index.html", "", 0, SW_SHOWNORMAL);
+			{
+			HANDLE hProcess,hPToken;
+			DWORD id=GetExplorerLogonPid();
+			if (id!=0) 
+			{
+				hProcess = OpenProcess(MAXIMUM_ALLOWED,FALSE,id);
+				if(!OpenProcessToken(hProcess,TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY
+										|TOKEN_DUPLICATE|TOKEN_ASSIGN_PRIMARY|TOKEN_ADJUST_SESSIONID
+										|TOKEN_READ|TOKEN_WRITE,&hPToken)) break;
+				ImpersonateLoggedOnUser(hPToken);
+				int iImpersonateResult = GetLastError();
+				if(iImpersonateResult == ERROR_SUCCESS)
+					{
+						ShellExecute(GetDesktopWindow(), "open", "http://www.uvnc.com", "", 0, SW_SHOWNORMAL);
+					}
+				//Once the operation is over revert back to system account.
+				RevertToSelf();
+				CloseHandle(hProcess);
+				CloseHandle(hPToken);
+			}
+			}
 			break;
 
 		case ID_DEFAULT_PROPERTIES:

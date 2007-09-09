@@ -50,6 +50,7 @@ const char WINVNC_REGISTRY_KEY [] = "Software\\ORL\\WinVNC3";
 // Marscha@2004 - authSSP: Function pointer for dyn. linking
 typedef void (*vncEditSecurityFn) (HWND hwnd, HINSTANCE hInstance);
 vncEditSecurityFn vncEditSecurity = 0;
+DWORD GetExplorerLogonPid();
 
 // Constructor & Destructor
 vncProperties::vncProperties()
@@ -130,8 +131,35 @@ void
 vncProperties::ShowAdmin(BOOL show, BOOL usersettings)
 {
 //	if (Lock_service_helper) return;
-	if (!m_allowproperties) return;
-	if (!RunningAsAdministrator ()) return;
+	HANDLE hProcess,hPToken;
+	DWORD id=GetExplorerLogonPid();
+	int iImpersonateResult=0;
+	if (id!=0) 
+			{
+				hProcess = OpenProcess(MAXIMUM_ALLOWED,FALSE,id);
+				if(OpenProcessToken(hProcess,TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY
+										|TOKEN_DUPLICATE|TOKEN_ASSIGN_PRIMARY|TOKEN_ADJUST_SESSIONID
+										|TOKEN_READ|TOKEN_WRITE,&hPToken))
+				{
+					ImpersonateLoggedOnUser(hPToken);
+					iImpersonateResult = GetLastError();
+				}
+			}
+
+	if (!m_allowproperties) 
+	{
+		if(iImpersonateResult == ERROR_SUCCESS)RevertToSelf();
+		CloseHandle(hProcess);
+		CloseHandle(hPToken);
+		return;
+	}
+	/*if (!RunningAsAdministrator ())
+		{
+		if(iImpersonateResult == ERROR_SUCCESS)RevertToSelf();
+		CloseHandle(hProcess);
+		CloseHandle(hPToken);
+		return;
+		}*/
 
 	if (m_fUseRegistry)
 	{
@@ -145,10 +173,13 @@ vncProperties::ShowAdmin(BOOL show, BOOL usersettings)
 		if (!m_fUseRegistry) // Use the ini file
 		{
 			// We're trying to edit the default local settings - verify that we can
-			if (!myIniFile.WriteInt("dummy", "dummy",1))
+			/*if (!myIniFile.WriteInt("dummy", "dummy",1))
 			{
+				if(iImpersonateResult == ERROR_SUCCESS)RevertToSelf();
+				CloseHandle(hProcess);
+				CloseHandle(hPToken);
 				return;
-			}
+			}*/
 		}
 		else // Use the registry
 		{
@@ -157,9 +188,17 @@ vncProperties::ShowAdmin(BOOL show, BOOL usersettings)
 			{
 				char username[UNLEN+1];
 				if (!vncService::CurrentUser(username, sizeof(username)))
-					return;
+					{
+						if(iImpersonateResult == ERROR_SUCCESS)RevertToSelf();
+						CloseHandle(hProcess);
+						CloseHandle(hPToken);
+						return;
+					}
 				if (strcmp(username, "") == 0) {
 					MessageBox(NULL, sz_ID_NO_CURRENT_USER_ERR, sz_ID_WINVNC_ERROR, MB_OK | MB_ICONEXCLAMATION);
+					if(iImpersonateResult == ERROR_SUCCESS)RevertToSelf();
+					CloseHandle(hProcess);
+					CloseHandle(hPToken);
 					return;
 				}
 			}
@@ -184,6 +223,9 @@ vncProperties::ShowAdmin(BOOL show, BOOL usersettings)
 
 				if (!canEditDefaultPrefs) {
 					MessageBox(NULL, sz_ID_CANNOT_EDIT_DEFAULT_PREFS, sz_ID_WINVNC_ERROR, MB_OK | MB_ICONEXCLAMATION);
+					if(iImpersonateResult == ERROR_SUCCESS)RevertToSelf();
+					CloseHandle(hProcess);
+					CloseHandle(hPToken);
 					return;
 				}
 			}
@@ -224,6 +266,9 @@ vncProperties::ShowAdmin(BOOL show, BOOL usersettings)
 				{
 					// Dialog box failed, so quit
 					PostQuitMessage(0);
+					if(iImpersonateResult == ERROR_SUCCESS)RevertToSelf();
+					CloseHandle(hProcess);
+					CloseHandle(hPToken);
 					return;
 				}
 
@@ -244,7 +289,10 @@ vncProperties::ShowAdmin(BOOL show, BOOL usersettings)
 				{
 				    vnclog.Print(LL_INTERR, VNCLOG("no password - QUITTING\n"));
 				    PostQuitMessage(0);
-				    return;
+				    if(iImpersonateResult == ERROR_SUCCESS)RevertToSelf();
+					CloseHandle(hProcess);
+					CloseHandle(hPToken);
+					return;
 				}
 
 				// If we reached here then OK was used & there is no password!
@@ -262,6 +310,9 @@ vncProperties::ShowAdmin(BOOL show, BOOL usersettings)
 
 		}
 	}
+	if(iImpersonateResult == ERROR_SUCCESS)RevertToSelf();
+	CloseHandle(hProcess);
+	CloseHandle(hPToken);
 }
 
 BOOL CALLBACK
@@ -1956,10 +2007,19 @@ void vncProperties::SaveToIniFile()
 {
 	DWORD dw;
 
-	if (!m_allowproperties  || !RunningAsAdministrator ())
+	if (!m_allowproperties  /*|| !RunningAsAdministrator ()*/)
 		return;
 
 	// SAVE PER-USER PREFS IF ALLOWED
+	bool use_uac=false;
+	if (!myIniFile.WriteInt("dummy", "dummy",1))
+			{
+				// We can't write to the ini file , Vista in service mode
+				Copy_to_Temp();
+				myIniFile.IniFileSetTemp();
+				use_uac=true;
+			}
+
 	SaveUserPrefsToIniFile();
 	myIniFile.WriteInt("admin", "DebugMode", vnclog.GetMode());
 	myIniFile.WriteInt("admin", "DebugLevel", vnclog.GetLevel());
@@ -1977,6 +2037,12 @@ void vncProperties::SaveToIniFile()
 	myIniFile.WriteInt("admin", "UseDSMPlugin", m_server->IsDSMPluginEnabled());
 	myIniFile.WriteInt("admin", "ConnectPriority", m_server->ConnectPriority());
 	myIniFile.WriteString("admin", "DSMPlugin",m_server->GetDSMPluginName());
+
+	if (use_uac==true)
+	{
+	myIniFile.copy_to_secure();
+	myIniFile.IniFileSetSecure();
+	}
 }
 
 

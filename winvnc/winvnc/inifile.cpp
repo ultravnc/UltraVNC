@@ -1,8 +1,6 @@
 #include "stdhdrs.h"
 #include "inifile.h"
 
-
-
 IniFile::IniFile()
 {
 char WORKDIR[MAX_PATH];
@@ -16,6 +14,54 @@ char WORKDIR[MAX_PATH];
 	strcat(myInifile,WORKDIR);//set the directory
 	strcat(myInifile,"\\");
 	strcat(myInifile,"ultravnc.ini");
+}
+
+void
+IniFile::IniFileSetSecure()
+{
+char WORKDIR[MAX_PATH];
+	if (GetModuleFileName(NULL, WORKDIR, MAX_PATH))
+		{
+		char* p = strrchr(WORKDIR, '\\');
+		if (p == NULL) return;
+		*p = '\0';
+		}
+	strcpy(myInifile,"");
+	strcat(myInifile,WORKDIR);//set the directory
+	strcat(myInifile,"\\");
+	strcat(myInifile,"ultravnc.ini");
+}
+
+void
+IniFile::IniFileSetTemp()
+{
+char WORKDIR[MAX_PATH];
+
+	if (!GetTempPath(MAX_PATH,WORKDIR))
+	{
+		//Function failed, just set something
+		if (GetModuleFileName(NULL, WORKDIR, MAX_PATH))
+		{
+		char* p = strrchr(WORKDIR, '\\');
+		if (p == NULL) return;
+		*p = '\0';
+		}
+		strcpy(myInifile,"");
+		strcat(myInifile,WORKDIR);//set the directory
+		strcat(myInifile,"\\");
+		strcat(myInifile,"ultravnc.ini");
+		return;
+	}
+
+	strcpy(myInifile,"");
+	strcat(myInifile,WORKDIR);//set the directory
+	strcat(myInifile,"ultravnc.ini");
+}
+
+void
+IniFile::copy_to_secure()
+{
+ShellExecute(GetDesktopWindow(), "open", "UacVista.exe", myInifile , 0, SW_SHOWNORMAL);
 }
 
 IniFile::~IniFile()
@@ -56,7 +102,7 @@ void
 IniFile::ReadPassword(char *value,int valuesize)
 {
 	//int size=ReadInt("ultravnc", "passwdsize",0);
-	vnclog.Print(LL_INTERR, VNCLOG("%s \n"),myInifile);
+	//vnclog.Print(LL_INTERR, VNCLOG("%s \n"),myInifilePasswd);
 	GetPrivateProfileStruct("ultravnc","passwd",value,8,myInifile);
 }
 
@@ -67,3 +113,5 @@ IniFile::WritePassword(char *value)
 		//vnclog.Print(LL_INTERR, VNCLOG("%s \n"),myInifile);
 		return WritePrivateProfileStruct("ultravnc","passwd", value,8,myInifile);
 }
+
+

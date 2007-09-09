@@ -600,12 +600,26 @@ vncSetAuth::DialogProc(HWND hwnd,
 				GetDlgItemText(hwnd, IDC_GROUP2, (LPSTR) _this->pszgroup2, 240);
 				GetDlgItemText(hwnd, IDC_GROUP3, (LPSTR) _this->pszgroup3, 240);
 
+				bool use_uac=false;
+				if (!_this->myIniFile.WriteInt("dummy", "dummy",1))
+				{
+					// We can't write to the ini file , Vista in service mode
+					Copy_to_Temp();
+					_this->myIniFile.IniFileSetTemp();
+					use_uac=true;
+				}
+	
 				_this->savegroup1(_this->pszgroup1);
 				_this->savegroup2(_this->pszgroup2);
 				_this->savegroup3(_this->pszgroup3);
 				_this->savelocdom1(_this->locdom1);
 				_this->savelocdom2(_this->locdom2);
 				_this->savelocdom3(_this->locdom3);
+				if (use_uac==true)
+				{
+				_this->myIniFile.copy_to_secure();
+				_this->myIniFile.IniFileSetSecure();
+				}
 
 				EndDialog(hwnd, TRUE);
 				_this->m_dlgvisible = FALSE;

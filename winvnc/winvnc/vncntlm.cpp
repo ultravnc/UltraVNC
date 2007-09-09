@@ -558,12 +558,14 @@ int CheckUserGroupPasswordUni2(char * userin,char *password,const char *machine)
 	if (group1){strcpy(pszgroup1,group1);}
 	if (group2){strcpy(pszgroup2,group2);}
 	if (group3){strcpy(pszgroup3,group3);}
+
 	savegroup1(pszgroup1);
 	savegroup2(pszgroup2);
 	savegroup3(pszgroup3);
 	savelocdom1(locdom1);
 	savelocdom2(locdom2);
 	savelocdom3(locdom3);
+
 	if (group1){strcpy(pszgroup1,group1);delete group1;}
 	if (group2){strcpy(pszgroup2,group2);delete group2;}
 	if (group3){strcpy(pszgroup3,group3);delete group3;}
