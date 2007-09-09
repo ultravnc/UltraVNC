@@ -471,7 +471,7 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,8,137,62,14
     CONTROL         156,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE | 
                     SS_SUNKEN,8,7,62,54
-    LTEXT           "UltraVNC Win32 Viewer 1.0.3 RC2",IDC_STATIC,86,6,197,11
+    LTEXT           "UltraVNC Win32 Viewer 1.0.4 RC2",IDC_STATIC,86,6,197,11
     LTEXT           "For more Information and Links please visit: \nhttp://ultravnc.sf.net",
                     IDC_STATIC,86,133,197,19
     LTEXT           "Copyright © 2002-2005 Ultr@VNC Team\nCopyright © 2001-2002 Sam - eSVNC \nCopyright © 1999-2002 Rudi D. V. - VdaccVNC \nCopyright © 1999-2002 Const. Kaplinsky - TightVNC \nCopyright © 2002 RealVNC Ltd. - RealVNC\n",
@@ -496,17 +496,18 @@ BEGIN
     PUSHBUTTON      "No for all",IDC_NOALL_B,135,65,39,14
 END
 
-IDD_APP_MESSAGE DIALOGEX 0, 0, 246, 142
+IDD_APP_MESSAGE DIALOGEX 0, 0, 246, 164
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "VncViewer Message Box"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "Close",IDOK,183,125,62,14
-    LTEXT           "BuildTime",IDC_BUILDTIME,9,11,229,26
-    PUSHBUTTON      "",IDC_BUTTON1,2,43,176,96,BS_BITMAP,WS_EX_CLIENTEDGE | 
+    DEFPUSHBUTTON   "Close",IDOK,183,149,62,14
+    LTEXT           "BuildTime",IDC_BUILDTIME,9,11,229,49
+    PUSHBUTTON      "",IDC_BUTTON1,1,67,176,96,BS_BITMAP,WS_EX_CLIENTEDGE | 
                     WS_EX_STATICEDGE
-    GROUPBOX        "Info Message",IDC_STATIC,3,1,242,40,BS_CENTER
-    CTEXT           "Sponsored by",IDC_STATIC,183,44,58,23
+    GROUPBOX        "Info Message",IDC_STATIC,3,1,242,63,BS_CENTER
+    CTEXT           "This version of UltraVnc have been sponsered by TeamViewer.",
+                    IDC_STATIC,183,90,58,38,SS_SUNKEN
 END
 
 
@@ -645,7 +646,7 @@ BEGIN
         VERTGUIDE, 94
         VERTGUIDE, 108
         TOPMARGIN, 7
-        BOTTOMMARGIN, 135
+        BOTTOMMARGIN, 157
         HORZGUIDE, 29
     END
 END
@@ -704,8 +705,8 @@ IDC_NOCURSOR            CURSOR  DISCARDABLE     "nocursor.cur"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,1,0,2
- PRODUCTVERSION 1,1,0,2
+ FILEVERSION 1,1,0,4
+ PRODUCTVERSION 1,1,0,4
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x21L
@@ -723,15 +724,15 @@ BEGIN
             VALUE "Comments", "UltraVNC Viewer\0"
             VALUE "CompanyName", "UltraVNC\0"
             VALUE "FileDescription", "VNCViewer\0"
-            VALUE "FileVersion", "1.1.0.2\0"
+            VALUE "FileVersion", "1.1.0.4\0"
             VALUE "InternalName", "VNCViewer\0"
             VALUE "LegalCopyright", "Copyright © 2002-2006 UltraVNC team members\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "VNCViewer.exe\0"
             VALUE "PrivateBuild", "\0"
             VALUE "ProductName", "UltraVNC VNCViewer\0"
-            VALUE "ProductVersion", "1.1.0.2\0"
-            VALUE "SpecialBuild", "1.0.2\0"
+            VALUE "ProductVersion", "1.1.0.4\0"
+            VALUE "SpecialBuild", "1.0.4\0"
         END
     END
     BLOCK "VarFileInfo"
