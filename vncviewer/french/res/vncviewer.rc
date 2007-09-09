@@ -466,7 +466,7 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,8,139,62,14
     CONTROL         156,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE | 
                     SS_SUNKEN,8,7,62,54
-    LTEXT           "Ultr@VNC Win32 Viewer  v1.0.3 RC2",IDC_STATIC,80,7,197,10
+    LTEXT           "Ultr@VNC Win32 Viewer  v1.0.4 RC2",IDC_STATIC,80,7,197,10
     LTEXT           "Pour plus d'informations merci de visiter le site: \nhttp://ultravnc.sf.net",
                     IDC_STATIC,80,137,197,19
     LTEXT           "Copyright © 2002-2003 Ultr@VNC Team\nCopyright © 2001-2002 Sam - eSVNC \nCopyright © 1999-2002 Rudi D. V. - VdaccVNC \nCopyright © 1999-2002 Const. Kaplinsky - TightVNC \nCopyright © 2002 RealVNC Ltd. - RealVNC\n",
