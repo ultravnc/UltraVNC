@@ -464,12 +464,12 @@ void ClientConnection::Run()
 	}
 	*/
 
-	// act : add user option on command line
-	if (strlen(	m_pApp->m_options.m_cmdlnUser) > 0) 
+	// add user option on command line
+	if ( (strlen(	m_pApp->m_options.m_cmdlnUser) > 0) & !m_pApp->m_options.m_NoMoreCommandLineUserPassword) // Fix by Act
 		strcpy(m_cmdlnUser, m_pApp->m_options.m_cmdlnUser);
 
 	// Modif sf@2002 - bit of a hack...and unsafe
-	if (strlen(	m_pApp->m_options.m_clearPassword) > 0) 
+	if ( (strlen(	m_pApp->m_options.m_clearPassword) > 0) & !m_pApp->m_options.m_NoMoreCommandLineUserPassword)
 		strcpy(m_clearPasswd, m_pApp->m_options.m_clearPassword);
 
 	if (saved_set)
@@ -1984,6 +1984,11 @@ void ClientConnection::Authenticate()
 				break;
 			case rfbVncAuthFailed:
 				vnclog.Print(0, _T("VNC authentication failed!"));
+				
+				// Fix by Act: suppress command line password if it's wrong.
+			    m_pApp->m_options.m_NoMoreCommandLineUserPassword = TRUE;
+					
+
 				g_passwordfailed=true;
 				if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L56);
 //				if (flash) {flash->Killflash();}
@@ -2096,6 +2101,7 @@ void ClientConnection::AuthMsLogon() {
 	case rfbVncAuthFailed:
 		vnclog.Print(0, _T("MS-Logon (DH) authentication failed!\n"));
 		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L56);
+		m_pApp->m_options.m_NoMoreCommandLineUserPassword = TRUE; // Fix by Act
 		g_passwordfailed=true;
 		throw WarningException(sz_L57);
 	case rfbVncAuthTooMany:

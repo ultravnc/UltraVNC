@@ -136,6 +136,8 @@ public:
 	// sf@2007 - AutoReconnect
 	int	m_autoReconnect;
 
+	// Fix by Act : No User and/Or password if the first VNC connection is rejected
+	bool m_NoMoreCommandLineUserPassword;
 
 #ifdef UNDER_CE
 	// WinCE screen format for dialogs (Palm vs HPC)

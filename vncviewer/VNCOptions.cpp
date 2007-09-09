@@ -162,6 +162,9 @@ VNCOptions::VNCOptions()
   
   // sf@2007 - Autoreconnect
   m_autoReconnect = 10; // Default: 10s before reconnecting
+
+  // Fix by Act : no user password command line after a rejected connection
+  m_NoMoreCommandLineUserPassword = false;
   
 #ifdef UNDER_CE
   m_palmpc = false;
