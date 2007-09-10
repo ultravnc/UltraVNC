@@ -53,7 +53,7 @@ public:
 
 	// Methods
 	TextChat(vncClient *pCC);
-	int DoDialog();
+//	int DoDialog();
 	HWND DisplayTextChat();
 	void KillDialog();
 	void OrderTextChat();
