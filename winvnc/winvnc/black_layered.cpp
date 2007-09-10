@@ -19,6 +19,8 @@ HINSTANCE hInst;
 #ifndef WS_EX_LAYERED
 # define WS_EX_LAYERED 0x80000
 #endif
+#include "stdhdrs.h"
+#include "resource.h"
 
 
 int wd=0;
@@ -33,6 +35,12 @@ HBITMAP
         if (NULL == hbmBkGnd)
         {
 			hbmBkGnd = (HBITMAP)LoadImage(NULL, "background.bmp", IMAGE_BITMAP, 0, 0,LR_LOADFROMFILE);
+			if (hbmBkGnd ==NULL)
+			{
+				 hbmBkGnd = (HBITMAP)LoadImage(
+                GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_LOGO64),
+                    IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
+			}
 			BITMAPINFOHEADER h2;
 			h2.biSize=sizeof(h2);
 			h2.biBitCount=0;
@@ -42,9 +50,6 @@ HBITMAP
 			wd=h2.biWidth; ht=h2.biHeight;
 			DeleteDC(hxdc);
 
-           // hbmBkGnd = (HBITMAP)LoadImage(
-           //     GetModuleHandle(NULL), MAKEINTRESOURCE(uBmpResId),
-           //         IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
             if (NULL == hbmBkGnd)
                 hbmBkGnd = (HBITMAP)-1;
         }
@@ -125,7 +130,11 @@ static LRESULT CALLBACK WndProc(
 							SetTimer(hwnd,100,2000,NULL);
 							break;
 						case WM_TIMER:
-							if (wParam==100) SetWindowPos(hwnd,HWND_TOPMOST,0,0,GetSystemMetrics(SM_CXSCREEN),GetSystemMetrics(SM_CYSCREEN), NULL);
+							if (wParam==100) 
+							{
+								SetWindowPos(hwnd,HWND_TOPMOST,0,0,GetSystemMetrics(SM_CXSCREEN),GetSystemMetrics(SM_CYSCREEN), NULL);
+								InvalidateRect(hwnd,NULL,true);
+							}
 //							if (wParam==10) DestroyWindow(hwnd);
                          
 						 case WM_ERASEBKGND:
@@ -173,8 +182,8 @@ create_window(void)
         RECT clientRect;
         clientRect.left = 0;
         clientRect.top = 0;
-        clientRect.right = 640;
-        clientRect.bottom = 480;
+        clientRect.right = GetSystemMetrics(SM_CXSCREEN);
+        clientRect.bottom = GetSystemMetrics(SM_CYSCREEN);
         AdjustWindowRect (&clientRect, WS_CAPTION, FALSE);
         hwnd = CreateWindowEx (0,
                                "blackscreen",
@@ -231,6 +240,41 @@ create_window(void)
 DWORD WINAPI BlackWindow(LPVOID lpParam)
 {
  	// TODO: Place code here.
+	HDESK desktop;
+	//vnclog.Print(LL_INTERR, VNCLOG("SelectDesktop \n"));
+	//vnclog.Print(LL_INTERR, VNCLOG("OpenInputdesktop2 NULL\n"));
+	desktop = OpenInputDesktop(0, FALSE,
+								DESKTOP_CREATEMENU | DESKTOP_CREATEWINDOW |
+								DESKTOP_ENUMERATE | DESKTOP_HOOKCONTROL |
+								DESKTOP_WRITEOBJECTS | DESKTOP_READOBJECTS |
+								DESKTOP_SWITCHDESKTOP | GENERIC_WRITE
+								);
+
+	if (desktop == NULL)
+		vnclog.Print(LL_INTERR, VNCLOG("OpenInputdesktop Error \n"));
+	else 
+		vnclog.Print(LL_INTERR, VNCLOG("OpenInputdesktop OK\n"));
+
+	HDESK old_desktop = GetThreadDesktop(GetCurrentThreadId());
+	DWORD dummy;
+
+	char new_name[256];
+
+	if (!GetUserObjectInformation(desktop, UOI_NAME, &new_name, 256, &dummy))
+	{
+		vnclog.Print(LL_INTERR, VNCLOG("!GetUserObjectInformation \n"));
+	}
+
+	vnclog.Print(LL_INTERR, VNCLOG("SelectHDESK to %s (%x) from %x\n"), new_name, desktop, old_desktop);
+
+	if (!SetThreadDesktop(desktop))
+	{
+		vnclog.Print(LL_INTERR, VNCLOG("SelectHDESK:!SetThreadDesktop \n"));
+	}
+
+	if (!CloseDesktop(old_desktop))
+		vnclog.Print(LL_INTERR, VNCLOG("SelectHDESK failed to close old desktop %x (Err=%d)\n"), old_desktop, GetLastError());
+
 	create_window();
 	MSG msg;
 	while (GetMessage(&msg,0,0,0) != 0)
@@ -238,6 +282,8 @@ DWORD WINAPI BlackWindow(LPVOID lpParam)
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
+	vnclog.Print(LL_INTERR, VNCLOG("end BlackWindow \n"));
+	CloseDesktop(desktop);
 
 	return 0;
 }
