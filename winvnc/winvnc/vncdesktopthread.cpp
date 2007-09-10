@@ -396,6 +396,7 @@ vncDesktopThread::run_undetached(void *arg)
 
 	InvalidateRect(NULL,NULL,TRUE);
 	oldtick=timeGetTime();
+	int fullpollcounter=0;
 	//*******************************************************
 	// END INIT
 	//*******************************************************
@@ -405,7 +406,7 @@ vncDesktopThread::run_undetached(void *arg)
 	{
 		if (!PeekMessage(&msg, NULL, NULL, NULL, PM_REMOVE)) 
 		{
-
+//			vnclog.Print(LL_INTERR, VNCLOG("!PeekMessage \n"));
 			// MAX 30fps
 			newtick = timeGetTime(); // Better resolution than GetTickCount ;)		
 			if ((newtick-oldtick)<33)
@@ -760,7 +761,13 @@ vncDesktopThread::run_undetached(void *arg)
 //								(!m_desktop->RestartDriver)
 							   )
 							{
+							   fullpollcounter++;
 							   m_desktop->FastDetectChanges(rgncache, m_desktop->GetSize(), 0, true);
+							   if (fullpollcounter>20) //force full screen scan
+							   {
+									rgncache=rgncache.union_(m_desktop->m_Cliprect);
+									fullpollcounter=0;
+							   }
 							}
 						}
 					}
@@ -1071,6 +1078,7 @@ vncDesktopThread::run_undetached(void *arg)
 			DispatchMessage(&msg);
 			idle_skip = TRUE;
 		}
+	//	vnclog.Print(LL_INTERR, VNCLOG("Message %i\n"),msg.message);
 	}//while
 
 	
