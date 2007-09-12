@@ -364,8 +364,10 @@ vncMenu::AddTrayIcon()
 	//vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::AddTrayIcon \n"));
 	vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::AddTrayIcon - UserName = %s\n"), m_username);
 
+	HWND tray = FindWindow(("Shell_TrayWnd"), 0);
+    if (!tray) return;
 	// If the user name is non-null then we have a user!
-	if (strcmp(m_username, "") != 0)
+	if (strcmp(m_username, "") != 0 && strcmp(m_username, "SYSTEM") != 0)
 	{
 		//vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::AddTrayIcon - User exists\n"));
 		// Make sure the server has not been configured to
