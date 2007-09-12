@@ -133,7 +133,7 @@ static LRESULT CALLBACK WndProc(
 							if (wParam==100) 
 							{
 								SetWindowPos(hwnd,HWND_TOPMOST,0,0,GetSystemMetrics(SM_CXSCREEN),GetSystemMetrics(SM_CYSCREEN), NULL);
-								InvalidateRect(hwnd,NULL,true);
+							
 							}
 //							if (wParam==10) DestroyWindow(hwnd);
                          
