@@ -478,11 +478,11 @@ void ClientConnection::Run()
 		Save_Latest_Connection();
 	}
 
-	DoConnection(); // sf@2007 - Autoreconnect
-
 	GTGBS_CreateDisplay();
 	GTGBS_CreateToolbar();
 	CreateDisplay();
+
+	DoConnection(); // sf@2007 - Autoreconnect - Must be done after windows creation, otherwise ReadServerInit does not initialise the title bar...
 
 	Createdib();
 	SizeWindow();
@@ -2151,7 +2151,7 @@ void ClientConnection::ReadServerInit()
 	
 	// sprintf(tcDummy,"%s ",m_desktopName);
 	strcat(m_desktopName, " ");
-	SetWindowText(m_hwndMain, m_desktopName);	
+	SetWindowText(m_hwndMain, m_desktopName);
 
 	vnclog.Print(0, _T("Desktop name \"%s\"\n"),m_desktopName);
 	vnclog.Print(1, _T("Geometry %d x %d depth %d\n"),
@@ -2168,8 +2168,7 @@ void ClientConnection::ReadServerInit()
 					);
 			strcat(m_desktopName, szMess);
 	}
-	SetWindowText(m_hwndMain, m_desktopName);	
-
+	SetWindowText(m_hwndMain, m_desktopName);
 	SizeWindow();
 }
 
