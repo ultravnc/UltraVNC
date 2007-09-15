@@ -158,6 +158,9 @@ typedef BOOL (*SetMouseFilterHookFn)(BOOL activate);
 typedef BOOL (WINAPI*  pBlockInput) (BOOL);
 typedef BOOL (WINAPI* LPGETMONITORINFO)(HMONITOR, LPMONITORINFO);
 typedef HMONITOR (WINAPI* LPMONITOTFROMPOINT) (POINT,DWORD);
+typedef BOOL (*SetHookFn)(HWND hwnd);
+typedef BOOL (*UnSetHookFn)(HWND hwnd);
+
 // Class definition
 // multi monitor
 struct monitor
@@ -407,8 +410,11 @@ protected:
 	void StartStophookdll(BOOL enabled);
 	void InitHookSettings();
 	HMODULE hModule;
+	HMODULE hSCModule;
 	SetHooksFn SetHooks;
 	UnSetHooksFn  UnSetHooks;
+	SetHookFn SetHook;
+	UnSetHookFn  UnSetHook;
 	SetKeyboardFilterHookFn SetKeyboardFilterHook;
 	SetMouseFilterHookFn SetMouseFilterHook;
 	pBlockInput pbi;

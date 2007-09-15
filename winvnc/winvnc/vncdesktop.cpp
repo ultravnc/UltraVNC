@@ -334,17 +334,37 @@ vncDesktop::vncDesktop()
 			*p = '\0';
 			strcat (szCurrentDir,"\\vnchooks.dll");
 		}
+	hSCModule=NULL;
+	char szCurrentDirSC[MAX_PATH];
+		if (GetModuleFileName(NULL, szCurrentDirSC, MAX_PATH))
+		{
+			char* p = strrchr(szCurrentDirSC, '\\');
+			if (p == NULL) return;
+			*p = '\0';
+			strcat (szCurrentDirSC,"\\schook.dll");
+		}
+
 	UnSetHooks=NULL;
 	SetMouseFilterHook=NULL;
 	SetKeyboardFilterHook=NULL;
 	SetHooks=NULL;
+
+	UnSetHook=NULL;
+	SetHook=NULL;
+
 	hModule = LoadLibrary(szCurrentDir);
+	hSCModule = LoadLibrary(szCurrentDirSC);
 	if (hModule)
 		{
 			UnSetHooks = (UnSetHooksFn) GetProcAddress( hModule, "UnSetHooks" );
 			SetMouseFilterHook  = (SetMouseFilterHookFn) GetProcAddress( hModule, "SetMouseFilterHook" );
 			SetKeyboardFilterHook  = (SetKeyboardFilterHookFn) GetProcAddress( hModule, "SetKeyboardFilterHook" );
 			SetHooks  = (SetHooksFn) GetProcAddress( hModule, "SetHooks" );
+		}
+	if (hSCModule)
+		{
+			UnSetHook = (UnSetHookFn) GetProcAddress( hSCModule, "UnSetHook" );
+			SetHook  = (SetHookFn) GetProcAddress( hSCModule, "SetHook" );
 		}
 	On_Off_hookdll=false;
 	g_Desktop_running=true;
@@ -400,6 +420,7 @@ vncDesktop::~vncDesktop()
 	}
 	m_lGridsList.clear();
 	if (hModule)FreeLibrary(hModule);
+	if (hSCModule)FreeLibrary(hSCModule);
 	if (hUser32) FreeLibrary(hUser32);
 	g_Desktop_running=false;
 }
@@ -549,7 +570,8 @@ vncDesktop::Shutdown()
 	if(m_hwnd != NULL)
 	{	
 		// Remove the system hooks
-		if (UnSetHooks) UnSetHooks(GetCurrentThreadId());
+		if (UnSetHook) UnSetHook(m_hwnd);
+		else if (UnSetHooks) UnSetHooks(GetCurrentThreadId());
 
 		// The window is being closed - remove it from the viewer list
 		ChangeClipboardChain(m_hwnd, m_hnextviewer);
@@ -2292,7 +2314,13 @@ void vncDesktop::StartStophookdll(BOOL enabled)
 {
 	if (enabled)
 	{
-		if (SetHooks)
+		if (SetHook)
+		{
+			SetHook(m_hwnd);
+			vnclog.Print(LL_INTERR, VNCLOG("set SC hooks OK\n"));
+			m_hookinited = TRUE;
+		}
+		else if (SetHooks)
 		{
 			if (!SetHooks(
 				GetCurrentThreadId(),
@@ -2310,15 +2338,20 @@ void vncDesktop::StartStophookdll(BOOL enabled)
 			{
 				vnclog.Print(LL_INTERR, VNCLOG("set hooks OK\n"));
 				m_hookinited = TRUE;
+				// Start up the keyboard and mouse filters
+				if (SetKeyboardFilterHook) SetKeyboardFilterHook(m_server->LocalInputsDisabled());
+				if (SetMouseFilterHook) SetMouseFilterHook(m_server->LocalInputsDisabled());
 			}
 		}
-		// Start up the keyboard and mouse filters
-		if (SetKeyboardFilterHook) SetKeyboardFilterHook(m_server->LocalInputsDisabled());
-		if (SetMouseFilterHook) SetMouseFilterHook(m_server->LocalInputsDisabled());
+
 	}
 	else if (m_hookinited)
 	{
-		if (UnSetHooks)
+		if (UnSetHook)
+		{
+			UnSetHook(m_hwnd);
+		}
+		else if (UnSetHooks)
 		{
 		if(!UnSetHooks(GetCurrentThreadId()) )
 			vnclog.Print(LL_INTERR, VNCLOG("Unsethooks Failed\n"));
