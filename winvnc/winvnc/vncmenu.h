@@ -121,6 +121,9 @@ protected:
 	UINT port_rfb;
 	UINT port_http;
 	BOOL ports_set;
+
+	BOOL IsIconSet;
+	int IconFaultCounter;
 	//HANDLE hEvent;
 
 };

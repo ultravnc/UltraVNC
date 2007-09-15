@@ -150,6 +150,8 @@ vncMenu::vncMenu(vncServer *server)
 	hWTSDll = NULL;
 	ports_set=false;
     CoInitialize(0);
+	IsIconSet=false;
+	IconFaultCounter=0;
 	
 
 	// Save the server pointer
@@ -364,14 +366,20 @@ vncMenu::AddTrayIcon()
 	//vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::AddTrayIcon \n"));
 	vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::AddTrayIcon - UserName = %s\n"), m_username);
 
-	HWND tray = FindWindow(("Shell_TrayWnd"), 0);
-    if (!tray) return;
 	// If the user name is non-null then we have a user!
 	if (strcmp(m_username, "") != 0 && strcmp(m_username, "SYSTEM") != 0)
 	{
 		//vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::AddTrayIcon - User exists\n"));
 		// Make sure the server has not been configured to
 		// suppress the tray icon.
+		HWND tray = FindWindow(("Shell_TrayWnd"), 0);
+		if (!tray)
+		{
+			vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::AddTrayIcon - User exists, traywnd is not found reset when counter reach %i=20\n"),IconFaultCounter);
+			IconFaultCounter++;
+			return;
+		}
+
 		if ( ! m_server->GetDisableTrayIcon())
 		{
 //			vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::AddTrayIcon - ADD Tray Icon call\n"));
@@ -462,6 +470,13 @@ vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 
 //	vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::SendTrayMsg - Shell_NotifyIcon call\n"));
 	// Send the message
+	if (msg ==NIM_MODIFY && IsIconSet==false) return; //no icon to modify
+	if (msg ==NIM_ADD && IsIconSet==true) return; //no icon to set
+	if (msg ==NIM_DELETE)
+	{
+		IsIconSet=false;
+		IconFaultCounter=0;
+	}
 	if (Shell_NotifyIcon(msg, &m_nid))
 	{
 //			vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::SendTrayMsg - Shell_NotifyIcon call SUCCESS\n"));
@@ -479,6 +494,13 @@ vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 			m_properties.AllowEditClients() ? MF_ENABLED : MF_GRAYED);
 			EnableMenuItem(m_hmenu, ID_OUTGOING_CONN,
 			m_properties.AllowEditClients() ? MF_ENABLED : MF_GRAYED);
+			if (msg == NIM_ADD)
+			{
+				IsIconSet=true;
+				IconFaultCounter=0;
+				vnclog.Print(LL_INTINFO, VNCLOG("IsIconSet \n"));
+			}
+
 	} else {
 
 //		vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::SendTrayMsg - Shell_NotifyIcon call FAILED ( %u ) \n"), 0);
@@ -496,6 +518,15 @@ vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 					m_properties.ShowAdmin(TRUE, TRUE);
 					PostQuitMessage(0);
 				}
+			}
+		}
+		else
+		{
+			if (msg == NIM_ADD)
+			{
+			IsIconSet=false;
+			IconFaultCounter++;
+			vnclog.Print(LL_INTINFO, VNCLOG("Failed IsIconSet \n"));
 			}
 		}
 	}
@@ -580,7 +611,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 //							_this->m_username, newuser);
 
 						// Check whether the user name has changed!
-						if (strcmp(newuser, _this->m_username) != 0)
+						if (strcmp(newuser, _this->m_username) != 0 || _this->IconFaultCounter>20)
 						{
 							vnclog.Print(LL_INTINFO,
 								VNCLOG("user name has changed\n"));
