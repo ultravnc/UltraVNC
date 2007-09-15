@@ -730,7 +730,7 @@ vncDesktopThread::run_undetached(void *arg)
 					// POLL PROBLEM AREAS
 					// We add specific areas of the screen to the region cache,
 					// causing them to be fetched for processing.
-					
+					Handle_Ringbuffer(g_obIPC.listall(),rgncache);
 					DWORD lTime = timeGetTime();
 
 					if (cursormoved)

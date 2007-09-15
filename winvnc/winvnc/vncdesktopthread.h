@@ -6,7 +6,7 @@
 #include "vncDesktop.h"
 #include "vncService.h"
 #include "mmsystem.h"
-
+#include "ipc.h"
 
 typedef struct _CURSORINFO
 {
@@ -47,6 +47,7 @@ public:
 	// Modif rdv@2002 - v1.1.x - videodriver
 	virtual BOOL handle_driver_changes(rfb::Region2D &rgncache,rfb::UpdateTracker &tracker);
 	virtual void copy_bitmaps_to_buffer(ULONG i,rfb::Region2D &rgncache,rfb::UpdateTracker &tracker);
+	bool Handle_Ringbuffer(mystruct *ringbuffer,rfb::Region2D &rgncache);
 
 protected:
 	vncServer *m_server;
@@ -66,6 +67,7 @@ protected:
 	DWORD m_lLastUpdateTime;
 	DWORD m_lLastMouseMoveTime;
 	void SessionFix();
+	CIPC g_obIPC;
 
 };
 #endif
