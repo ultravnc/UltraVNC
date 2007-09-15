@@ -130,7 +130,19 @@ SOURCE=.\inifile.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\IPC.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\IPC.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\lzo\minilzo.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\read_write_ini.cpp
 # End Source File
 # Begin Source File
 
@@ -183,6 +195,10 @@ SOURCE=.\videodriver.cpp
 # Begin Source File
 
 SOURCE=.\videodrivercheck.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\vistahook.cpp
 # End Source File
 # Begin Source File
 
@@ -694,6 +710,10 @@ SOURCE=..\building.txt
 # Begin Source File
 
 SOURCE=.\res\ButtonPanel.class
+# End Source File
+# Begin Source File
+
+SOURCE=.\res\DH.class
 # End Source File
 # Begin Source File
 
