@@ -48,10 +48,11 @@ public:
 	virtual BOOL handle_driver_changes(rfb::Region2D &rgncache,rfb::UpdateTracker &tracker);
 	virtual void copy_bitmaps_to_buffer(ULONG i,rfb::Region2D &rgncache,rfb::UpdateTracker &tracker);
 	bool Handle_Ringbuffer(mystruct *ringbuffer,rfb::Region2D &rgncache);
+	CIPC g_obIPC;
+	vncDesktop *m_desktop;
 
 protected:
 	vncServer *m_server;
-	vncDesktop *m_desktop;
 
 	omni_mutex m_returnLock;
 	omni_condition *m_returnsig;
@@ -67,7 +68,6 @@ protected:
 	DWORD m_lLastUpdateTime;
 	DWORD m_lLastMouseMoveTime;
 	void SessionFix();
-	CIPC g_obIPC;
 
 };
 #endif

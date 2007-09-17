@@ -2,6 +2,8 @@
 int counterwatch;//global var for driverwatch
 bool g_DesktopThread_running;
 bool g_update_triggered;
+DWORD WINAPI hookwatch(LPVOID lpParam);
+extern bool stop_hookwatch;
 
 
 inline bool
@@ -401,6 +403,12 @@ vncDesktopThread::run_undetached(void *arg)
 	// END INIT
 	//*******************************************************
 	// START PROCESSING DESKTOP MESSAGES
+	/////////////////////
+	HANDLE threadHandle=NULL;
+	DWORD dwTId;
+	stop_hookwatch=false;
+
+	/////////////////////
 	MSG msg;
 	while (TRUE)
 	{
@@ -548,6 +556,15 @@ vncDesktopThread::run_undetached(void *arg)
 												vnclog.Print(LL_INTERR, VNCLOG("m_videodriver == NULL \n"));
 												m_desktop->SethookMechanism(true, false); 	// InitHookSettings() would work as well;
 											}
+										stop_hookwatch=true;
+										if (threadHandle)
+										{
+											WaitForSingleObject( threadHandle, INFINITE );
+											CloseHandle(threadHandle);
+											stop_hookwatch=false;
+											threadHandle=NULL;
+										}
+
 									}
 							//*******************************************************
 							// end reinit
@@ -703,10 +720,10 @@ vncDesktopThread::run_undetached(void *arg)
 			//
 			// CALCULATE CHANGES
 			m_desktop->m_UltraEncoder_used=m_desktop->m_server->IsThereAUltraEncodingClient();
-			vnclog.Print(LL_INTERR, VNCLOG("UpdateWanted B\n"));
+//			vnclog.Print(LL_INTERR, VNCLOG("UpdateWanted B\n"));
 			if (m_desktop->m_server->UpdateWanted())
 			{
-				vnclog.Print(LL_INTERR, VNCLOG("UpdateWanted N\n"));
+//				vnclog.Print(LL_INTERR, VNCLOG("UpdateWanted N\n"));
 				//TEST4
 				// Re-render the mouse's old location if it's moved
 				BOOL cursormoved = FALSE;
@@ -715,7 +732,7 @@ vncDesktopThread::run_undetached(void *arg)
 					((cursorpos.x != oldcursorpos.x) ||
 					(cursorpos.y != oldcursorpos.y)))
 				{
-					vnclog.Print(LL_INTERR, VNCLOG("UpdateWanted M %i %i %i %i\n"),cursorpos.x, oldcursorpos.x,cursorpos.y,oldcursorpos.y);
+//					vnclog.Print(LL_INTERR, VNCLOG("UpdateWanted M %i %i %i %i\n"),cursorpos.x, oldcursorpos.x,cursorpos.y,oldcursorpos.y);
 					cursormoved = TRUE;
 					oldcursorpos = rfb::Point(cursorpos);
 					// nyama/marscha - PointerPos. Inform clients about mouse move.
@@ -730,7 +747,11 @@ vncDesktopThread::run_undetached(void *arg)
 					// POLL PROBLEM AREAS
 					// We add specific areas of the screen to the region cache,
 					// causing them to be fetched for processing.
-					Handle_Ringbuffer(g_obIPC.listall(),rgncache);
+					if (m_desktop->SetHook && g_obIPC.listall()!=NULL) 
+					{
+						if (threadHandle==NULL) threadHandle = CreateThread(NULL, 0, hookwatch, this, 0, &dwTId);
+						Handle_Ringbuffer(g_obIPC.listall(),rgncache);
+					}
 					DWORD lTime = timeGetTime();
 
 					if (cursormoved)
@@ -1081,6 +1102,12 @@ vncDesktopThread::run_undetached(void *arg)
 	//	vnclog.Print(LL_INTERR, VNCLOG("Message %i\n"),msg.message);
 	}//while
 
+	stop_hookwatch=true;
+	if (threadHandle)
+	{
+		WaitForSingleObject( threadHandle, INFINITE );
+		CloseHandle(threadHandle);
+	}
 	
 	m_desktop->SetClipboardActive(FALSE);
 	vnclog.Print(LL_INTINFO, VNCLOG("quitting desktop server thread\n"));
