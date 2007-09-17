@@ -207,7 +207,7 @@ vncDesktop::FastDetectChanges(rfb::Region2D &rgn, rfb::Rect &rect, int nZone, bo
 			COLORREF PixelColor=0;
 		    if (OSversion()==2 ) PixelColor = CapturePixel( xo, yo);
 			else PixelColor = GetPixel(m_hrootdc, xo, yo);
-			vnclog.Print(LL_INTINFO, VNCLOG("### GetPixel %i\n"),OSversion());
+//			vnclog.Print(LL_INTINFO, VNCLOG("### GetPixel %i\n"),OSversion());
 			// If the pixel has changed
 			if (*iPixelColor != PixelColor )
 			{
