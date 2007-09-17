@@ -13,6 +13,7 @@ int oldcounter=0;
 //***********************************************
 CIPC::CIPC() : m_hFileMap(NULL), m_hMutex(NULL)
 {
+	plist=NULL;
 	m_FileView=0;
 	CreateIPCMMF();
 	OpenIPCMMF();
