@@ -510,7 +510,7 @@ BOOL CALLBACK WinStationEnumProc(LPTSTR name, LPARAM param) {
 BOOL
 vncService::InputDesktopSelected()
 {
-	vnclog.Print(LL_INTERR, VNCLOG("InputDesktopSelected()\n"));
+//	vnclog.Print(LL_INTERR, VNCLOG("InputDesktopSelected()\n"));
 	// Are we running on NT?
 //	if (serviceshutdown==true) return TRUE;
 	if (IsWinNT())
