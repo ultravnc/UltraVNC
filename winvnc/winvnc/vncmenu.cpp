@@ -673,7 +673,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		// User has clicked an item on the tray menu
 		switch (LOWORD(wParam))
 		{
-		case ID_ONLINEHELP:
+		/*case ID_ONLINEHELP:
 			{
 			HANDLE hProcess,hPToken;
 			DWORD id=GetExplorerLogonPid();
@@ -718,7 +718,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				CloseHandle(hPToken);
 			}
 			}
-			break;
+			break;*/
 
 		case ID_DEFAULT_PROPERTIES:
 			// Show the default properties dialog, unless it is already displayed
