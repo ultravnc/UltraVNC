@@ -465,8 +465,8 @@ BEGIN
         MENUITEM "&Admin Properties",           ID_ADMIN_PROPERTIES
         MENUITEM "&Properties",                 ID_PROPERTIES
         MENUITEM SEPARATOR
-        MENUITEM "Online Help",                 ID_ONLINEHELP
-        MENUITEM "Home Page",                   ID_HOME
+//        MENUITEM "Online Help",                 ID_ONLINEHELP
+//        MENUITEM "Home Page",                   ID_HOME
         MENUITEM SEPARATOR
         MENUITEM "Add &New Client",             ID_OUTGOING_CONN
         MENUITEM "&Kill All Clients",           ID_KILLCLIENTS
