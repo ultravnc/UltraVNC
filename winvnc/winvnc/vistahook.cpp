@@ -1,6 +1,7 @@
 
 #include "vncDesktopThread.h"
 int g_Oldcounter=0;
+bool stop_hookwatch=false;
 
 inline bool
 ClipRect(int *x, int *y, int *w, int *h,
@@ -20,6 +21,23 @@ ClipRect(int *x, int *y, int *w, int *h,
     *h = (cy+ch)-*y;
   }
   return (*w>0) && (*h>0);
+}
+
+DWORD WINAPI hookwatch(LPVOID lpParam)
+{
+	vncDesktopThread *dt = (vncDesktopThread *)lpParam;
+
+	while (!stop_hookwatch)
+	{
+		if (dt->g_obIPC.listall()->counter!=g_Oldcounter)
+		{
+			dt->m_desktop->TriggerUpdate();
+			Sleep(15);
+		}
+		Sleep(5);
+	}
+
+	return 0;
 }
 
 bool
