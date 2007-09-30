@@ -41,6 +41,7 @@
 
 #include <map>
 #include <vector>
+DWORD WINAPI Cadthread(LPVOID lpParam);
 
 // Mapping of X keysyms to windows VK codes.  Ordering here is the same as
 // keysymdef.h to make checking easier
@@ -650,7 +651,12 @@ public:
                  "Vista and runnning as system -> CAD\n");
 
 				// Try to run the special Vista cad.exe file...
-				int ret = (int)ShellExecute(GetDesktopWindow(), "open", "cad.exe", "", 0, SW_SHOWNORMAL);
+				HANDLE ThreadHandle2;
+				DWORD dwTId;
+				ThreadHandle2 = CreateThread(NULL, 0, Cadthread, NULL, 0, &dwTId);
+				CloseHandle(ThreadHandle2);
+
+				//int ret = (int)ShellExecute(GetDesktopWindow(), "open", "cad.exe", "", 0, SW_SHOWNORMAL);
 				if (false/*ret <= 32*/)
 				{
 					// If cad.exe is not available, run the existing osk.exe
