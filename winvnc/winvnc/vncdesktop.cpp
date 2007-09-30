@@ -2241,6 +2241,7 @@ void vncDesktop::SethookMechanism(BOOL hookall,BOOL hookdriver)
 		else On_Off_hookdll=false;
 		if (old_On_Off_hookdll!=On_Off_hookdll) Hookdll_Changed=true;
 		else Hookdll_Changed=false;
+		if (OSversion()==2) Hookdll_Changed=true;
 		
 		vnclog.Print(LL_INTERR, VNCLOG("Sethook_restart_wanted hook=%d driver=%d \r\n"),m_hookdll,m_hookdriver);
 		if (Hookdll_Changed)

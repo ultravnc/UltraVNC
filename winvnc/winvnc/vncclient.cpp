@@ -68,6 +68,7 @@
 #include "localization.h" // Act : add localization on messages
 typedef BOOL (WINAPI *PGETDISKFREESPACEEX)(LPCSTR,PULARGE_INTEGER, PULARGE_INTEGER, PULARGE_INTEGER);
 DWORD GetExplorerLogonPid();
+unsigned long updates_sent;
 
 // vncClient update thread class
 
@@ -229,7 +230,7 @@ vncClientUpdateThread::run_undetached(void *arg)
 	update.enable_copyrect(true);
 	BOOL send_palette = FALSE;
 
-	unsigned long updates_sent=0;
+	updates_sent=0;
 
 	vnclog.Print(LL_INTINFO, VNCLOG("starting update thread\n"));
 
