@@ -67,7 +67,7 @@ DWORD GetExplorerLogonPid()
 	DWORD dwSessionId;
 	DWORD dwExplorerLogonPid;
 	PROCESSENTRY32 procEntry;
-	HANDLE hProcess,hPToken;
+//	HANDLE hProcess,hPToken;
 
 	pWTSGetActiveConsoleSessionId WTSGetActiveConsoleSessionIdF=NULL;
 	HMODULE  hlibkernel = LoadLibrary("kernel32.dll"); 
@@ -110,6 +110,7 @@ DWORD GetExplorerLogonPid()
 	return dwExplorerLogonPid;
 }
 
+char aa[16384];
 #include <tlhelp32.h>
 bool
 GetConsoleUser(char *buffer, UINT size)
@@ -137,21 +138,24 @@ GetConsoleUser(char *buffer, UINT size)
    // token user
     TOKEN_USER *ptu;
 	DWORD needed;
-	ptu = (TOKEN_USER *) malloc( 16384 );
+	ptu = (TOKEN_USER *) aa;//malloc( 16384 );
 	if (GetTokenInformation( hPToken, TokenUser, ptu, 16384, &needed ) )
 	{
 		char  DomainName[64];
 		memset(DomainName, 0, sizeof(DomainName));
-		DWORD UserSize, DomainSize;
+		DWORD DomainSize;
 		DomainSize =sizeof(DomainName)-1;
 		SID_NAME_USE SidType;
 		DWORD dwsize=size;
 		LookupAccountSid(NULL, ptu->User.Sid, buffer, &dwsize, DomainName, &DomainSize, &SidType);
-		free(ptu);
+		//free(ptu);
+		CloseHandle(hPToken);
 		CloseHandle(hProcess);
 		return 1;
 	}
+	//free(ptu);
 	strcpy(buffer,"");
+	CloseHandle(hPToken);
 	CloseHandle(hProcess);
 	return 0;
 }
