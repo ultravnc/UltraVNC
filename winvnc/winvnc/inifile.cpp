@@ -61,7 +61,20 @@ char WORKDIR[MAX_PATH];
 void
 IniFile::copy_to_secure()
 {
-ShellExecute(GetDesktopWindow(), "open", "UacVista.exe", myInifile , 0, SW_SHOWNORMAL);
+SHELLEXECUTEINFO shExecInfo;
+
+      shExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
+
+      shExecInfo.fMask = NULL;
+      shExecInfo.hwnd = GetForegroundWindow();
+      shExecInfo.lpVerb = "runas";
+      shExecInfo.lpFile = "UacVista.exe";
+      shExecInfo.lpParameters = myInifile;
+      shExecInfo.lpDirectory = NULL;
+      shExecInfo.nShow = SW_SHOWNORMAL;
+      shExecInfo.hInstApp = NULL;
+	  ShellExecuteEx(&shExecInfo);
+	  //ShellExecute(GetForegroundWindow(), "open", "UacVista.exe", myInifile , 0, SW_SHOWNORMAL);
 }
 
 IniFile::~IniFile()
