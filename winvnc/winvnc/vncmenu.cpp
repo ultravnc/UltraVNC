@@ -786,7 +786,35 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				if(!OpenProcessToken(hProcess,TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY
 										|TOKEN_DUPLICATE|TOKEN_ASSIGN_PRIMARY|TOKEN_ADJUST_SESSIONID
 										|TOKEN_READ|TOKEN_WRITE,&hPToken)) break;
-				ImpersonateLoggedOnUser(hPToken);
+
+				
+				char dir[MAX_PATH], *ptr;
+				GetModuleFileName(0, dir, MAX_PATH);
+
+				ptr=strrchr(dir, '\\'); 
+				if(ptr)
+					ptr[1]='\0'; 
+				if(!SetCurrentDirectory(dir)) {
+				return 0;
+				}
+				strcat(dir, "\\stop_servicehelper.exe");
+	
+
+				STARTUPINFO          StartUPInfo;
+				PROCESS_INFORMATION  ProcessInfo;
+				HANDLE Token=NULL;
+				HANDLE process=NULL;
+				ZeroMemory(&StartUPInfo,sizeof(STARTUPINFO));
+				ZeroMemory(&ProcessInfo,sizeof(PROCESS_INFORMATION));
+				StartUPInfo.wShowWindow = SW_SHOW;
+				StartUPInfo.lpDesktop = "Winsta0\\Default";
+				StartUPInfo.cb = sizeof(STARTUPINFO);
+		
+				CreateProcessAsUser(hPToken,NULL,dir,NULL,NULL,FALSE,DETACHED_PROCESS,NULL,NULL,&StartUPInfo,&ProcessInfo);
+				CloseHandle(hProcess);
+				CloseHandle(hPToken);
+				
+				/*ImpersonateLoggedOnUser(hPToken);
 				int iImpersonateResult = GetLastError();
 				if(iImpersonateResult == ERROR_SUCCESS)
 					{
@@ -795,7 +823,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				//Once the operation is over revert back to system account.
 				RevertToSelf();
 				CloseHandle(hProcess);
-				CloseHandle(hPToken);
+				CloseHandle(hPToken);*/
 			}
 			}
 			break;
