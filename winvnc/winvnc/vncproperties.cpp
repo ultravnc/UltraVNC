@@ -821,11 +821,18 @@ vncProperties::DialogProc(HWND hwnd,
 
 				// And to the registry
 
+				if (!RunningAsAdministrator () && vncService::RunningAsService())
+				{
+					MessageBox(NULL,"Only admins are allowed to save","Warning", MB_OK | MB_ICONINFORMATION);
+				}
+				else
+				{
 				// Load the settings
 				if (_this->m_fUseRegistry)
 					_this->Save();
 				else
 					_this->SaveToIniFile();
+				}
 
 				// Was ok pressed?
 				if (LOWORD(wParam) == IDOK)
@@ -1693,7 +1700,7 @@ vncProperties::Save()
 	HKEY appkey;
 	DWORD dw;
 
-	if (!m_allowproperties  || !RunningAsAdministrator ())
+	if (!m_allowproperties)
 		return;
 
 	// NEW (R3) PREFERENCES ALGORITHM
@@ -2007,7 +2014,7 @@ void vncProperties::SaveToIniFile()
 {
 	DWORD dw;
 
-	if (!m_allowproperties  /*|| !RunningAsAdministrator ()*/)
+	if (!m_allowproperties)
 		return;
 
 	// SAVE PER-USER PREFS IF ALLOWED
