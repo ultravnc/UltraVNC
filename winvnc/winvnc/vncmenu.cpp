@@ -546,6 +546,7 @@ void vncMenu::Shutdown()
 
 
 int counter=0;
+char newuser[UNLEN+1];
 // Process window messages
 LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -602,8 +603,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
 				if (_this->m_server->RunningFromExternalService())
 				{
-					char newuser[UNLEN+1];
-
+					strcpy(newuser,"");
 					if (vncService::CurrentUser((char *) &newuser, sizeof(newuser)))
 					{
 //						vnclog.Print(LL_INTINFO,
@@ -890,7 +890,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 	case WM_USERCHANGED:
 		// The current user may have changed.
 		{
-			char newuser[UNLEN+1];
+			strcpy(newuser,"");
 
 			if (vncService::CurrentUser((char *) &newuser, sizeof(newuser)))
 			{
