@@ -119,7 +119,7 @@ END
 IDD_OPTIONDIALOG DIALOGEX 0, 0, 323, 217
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION " Connection Options..."
-FONT 8, "MS Sans Serif", 0, 0, 0x1
+FONT 8, "MS Sans Serif"
 BEGIN
     GROUPBOX        "Format and Encoding",IDC_STATIC,4,2,150,160
     CONTROL         "Auto select best settings",IDC_AUTODETECT,"Button",
@@ -170,7 +170,7 @@ BEGIN
     EDITTEXT        IDC_QUALITYLEVEL,113,146,14,12,ES_AUTOHSCROLL
     GROUPBOX        "Misc",IDC_STATIC,4,164,150,49
     CONTROL         "Share the Server",IDC_SHARED,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,10,176,137,10
+                    WS_TABSTOP,10,176,71,10
     CONTROL         "Deiconify on Bell",IDC_BELLDEICONIFY,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,10,188,137,8
     CONTROL         "Disable clipboard transfer",IDC_DISABLECLIPBOARD,"Button",
@@ -205,7 +205,7 @@ BEGIN
     LTEXT           "Server Screen Scale by :",IDC_STATIC,165,152,80,8
     EDITTEXT        IDC_SERVER_SCALE,272,152,14,12,ES_AUTOHSCROLL
     CONTROL         "Use 8-bit colour (256 colors)",IDC_8BITCHECK,"Button",
-                    BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,184,178,
+                    BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,160,170,
                     137,10
     DEFPUSHBUTTON   "OK",IDOK,210,199,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,265,199,50,14
@@ -216,6 +216,8 @@ BEGIN
                     NOT WS_VISIBLE
     LTEXT           "1  /",IDC_STATIC,253,153,12,8
     LTEXT           "by",IDC_STATIC,259,139,10,8
+    CONTROL         "do not display the sponsored link any more",IDC_CHECK1,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,160,184,149,10
 END
 
 IDD_FILETRANSFER_DLG DIALOGEX 0, 0, 555, 414
@@ -496,18 +498,30 @@ BEGIN
     PUSHBUTTON      "No for all",IDC_NOALL_B,135,65,39,14
 END
 
-IDD_APP_MESSAGE DIALOGEX 0, 0, 246, 164
+IDD_APP_MESSAGE1 DIALOG DISCARDABLE  0, 0, 246, 118
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "VncViewer Message Box"
-FONT 8, "MS Sans Serif", 0, 0, 0x1
+FONT 8, "MS Sans Serif"
 BEGIN
-    DEFPUSHBUTTON   "Close",IDOK,183,149,62,14
-    LTEXT           "BuildTime",IDC_BUILDTIME,9,11,229,49
-    PUSHBUTTON      "",IDC_BUTTON1,1,67,176,96,BS_BITMAP,WS_EX_CLIENTEDGE | 
-                    WS_EX_STATICEDGE
+    DEFPUSHBUTTON   "Close",IDOK,181,87,56,14
+    LTEXT           "BuildTime",IDC_BUILDTIME,9,11,228,49
     GROUPBOX        "Info Message",IDC_STATIC,3,1,242,63,BS_CENTER
-    CTEXT           "This version of UltraVnc have been sponsered by TeamViewer.",
-                    IDC_STATIC,183,90,58,38,SS_SUNKEN
+    CTEXT           "UltraVnc 1.0.4",IDC_STATIC,193,105,51,12
+    PUSHBUTTON      "",IDC_BUTTON1,3,66,170,47,BS_BITMAP
+END
+
+IDD_APP_MESSAGE2 DIALOG DISCARDABLE  0, 0, 246, 167
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "VncViewer Message Box"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "Close",IDOK,181,135,56,14
+    LTEXT           "BuildTime",IDC_BUILDTIME,9,11,228,49
+    PUSHBUTTON      "",IDC_BUTTON2,4,66,170,47,BS_BITMAP
+    GROUPBOX        "Info Message",IDC_STATIC,3,1,242,63,BS_CENTER
+    CTEXT           "UltraVnc 1.0.4",IDC_STATIC,193,153,51,12
+    PUSHBUTTON      "",IDC_BUTTON1,4,114,170,47,BS_BITMAP
+    CTEXT           "Sponsored\n Link",IDC_STATIC,175,79,36,21
 END
 
 
@@ -639,14 +653,25 @@ BEGIN
         HORZGUIDE, 29
     END
 
-    IDD_APP_MESSAGE, DIALOG
+    IDD_APP_MESSAGE1, DIALOG
     BEGIN
         LEFTMARGIN, 7
         VERTGUIDE, 86
         VERTGUIDE, 94
         VERTGUIDE, 108
         TOPMARGIN, 7
-        BOTTOMMARGIN, 157
+        BOTTOMMARGIN, 111
+        HORZGUIDE, 29
+    END
+
+    IDD_APP_MESSAGE2, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        VERTGUIDE, 86
+        VERTGUIDE, 94
+        VERTGUIDE, 108
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 160
         HORZGUIDE, 29
     END
 END
@@ -1102,7 +1127,8 @@ IDR_TRAY_DISABLED       ICON    DISCARDABLE     "idr_tray_disabled.ico"
 // Bitmap
 //
 
-IDB_BITMAP12            BITMAP  DISCARDABLE     "sponsor.bmp"
+IDB_BITMAP13            BITMAP  DISCARDABLE     "l1.bmp"
+IDB_BITMAP14            BITMAP  DISCARDABLE     "l2.bmp"
 #endif    // Dutch (Belgium) resources
 /////////////////////////////////////////////////////////////////////////////
 

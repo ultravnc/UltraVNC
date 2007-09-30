@@ -66,6 +66,8 @@
 #define IDI_FILE                        183
 #define IDI_DIR                         184
 #define IDI_DRIVE                       185
+#define IDB_BITMAP13                    186
+#define IDB_BITMAP14                    187
 #define IDD_USER_NAME                   604
 #define ID_VK_LWINDOWN                  605
 #define ID_VK_RWINDOWN                  606
@@ -194,6 +196,10 @@
 #define IDC_PR_STATIC                   1147
 #define IDD_AUTH_DIALOG2                1148
 #define IDD_APP_MESSAGE                 1149
+#define IDC_BUTTON2                     1149
+#define IDD_APP_MESSAGE1                1150
+#define IDD_APP_MESSAGE2                1151
+#define IDC_CHECK1                      1154
 #define IDC_ENCODING_BASE               1999
 #define IDC_RAWRADIO                    2000
 #define IDC_RRERADIO                    2002
@@ -485,9 +491,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        183
+#define _APS_NEXT_RESOURCE_VALUE        188
 #define _APS_NEXT_COMMAND_VALUE         50025
-#define _APS_NEXT_CONTROL_VALUE         1149
+#define _APS_NEXT_CONTROL_VALUE         1155
 #define _APS_NEXT_SYMED_VALUE           154
 #endif
 #endif
