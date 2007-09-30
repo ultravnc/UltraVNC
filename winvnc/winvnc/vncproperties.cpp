@@ -821,11 +821,11 @@ vncProperties::DialogProc(HWND hwnd,
 
 				// And to the registry
 
-				if (!RunningAsAdministrator () && vncService::RunningAsService())
+				/*if (!RunningAsAdministrator () && vncService::RunningAsService())
 				{
 					MessageBox(NULL,"Only admins are allowed to save","Warning", MB_OK | MB_ICONINFORMATION);
 				}
-				else
+				else*/
 				{
 				// Load the settings
 				if (_this->m_fUseRegistry)

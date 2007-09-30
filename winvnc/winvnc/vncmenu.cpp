@@ -489,7 +489,7 @@ vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 			EnableMenuItem(m_hmenu, ID_CLOSE,
 			m_properties.AllowShutdown() ? MF_ENABLED : MF_GRAYED);
 			EnableMenuItem(m_hmenu, ID_CLOSE_SERVICE,
-			m_properties.AllowShutdown() &&  RunningAsAdministrator() ? MF_ENABLED : MF_GRAYED);
+			m_properties.AllowShutdown()  ? MF_ENABLED : MF_GRAYED);
 			EnableMenuItem(m_hmenu, ID_KILLCLIENTS,
 			m_properties.AllowEditClients() ? MF_ENABLED : MF_GRAYED);
 			EnableMenuItem(m_hmenu, ID_OUTGOING_CONN,
