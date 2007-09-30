@@ -61,7 +61,7 @@ char WORKDIR[MAX_PATH];
 void
 IniFile::copy_to_secure()
 {
-SHELLEXECUTEINFO shExecInfo;
+/*SHELLEXECUTEINFO shExecInfo;
 
       shExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
 
@@ -73,8 +73,48 @@ SHELLEXECUTEINFO shExecInfo;
       shExecInfo.lpDirectory = NULL;
       shExecInfo.nShow = SW_SHOWNORMAL;
       shExecInfo.hInstApp = NULL;
-	  ShellExecuteEx(&shExecInfo);
+	  ShellExecuteEx(&shExecInfo);*/
 	  //ShellExecute(GetForegroundWindow(), "open", "UacVista.exe", myInifile , 0, SW_SHOWNORMAL);
+
+
+        char dir[MAX_PATH], *ptr;
+		GetModuleFileName(0, dir, MAX_PATH);
+
+		ptr=strrchr(dir, '\\'); 
+		if(ptr)
+			ptr[1]='\0'; 
+		if(!SetCurrentDirectory(dir)) {
+        return ;
+		}
+		strcat(dir, "\\uacvistahelper.exe");
+		strcat(dir, " ");
+		strcat(dir, myInifile);
+
+		STARTUPINFO          StartUPInfo;
+		PROCESS_INFORMATION  ProcessInfo;
+		HANDLE Token=NULL;
+		HANDLE process=NULL;
+		ZeroMemory(&StartUPInfo,sizeof(STARTUPINFO));
+		ZeroMemory(&ProcessInfo,sizeof(PROCESS_INFORMATION));
+		StartUPInfo.wShowWindow = SW_SHOW;
+		StartUPInfo.lpDesktop = "Winsta0\\Default";
+		StartUPInfo.cb = sizeof(STARTUPINFO);
+		HWND tray = FindWindow(("Shell_TrayWnd"), 0);
+		if (!tray)
+			return;
+	
+		DWORD processId = 0;
+			GetWindowThreadProcessId(tray, &processId);
+		if (!processId)
+			return;	
+		process = OpenProcess(MAXIMUM_ALLOWED, FALSE, processId);
+		if (!process)
+			return;	
+		OpenProcessToken(process, MAXIMUM_ALLOWED, &Token);
+		CreateProcessAsUser(Token,NULL,dir,NULL,NULL,FALSE,DETACHED_PROCESS,NULL,NULL,&StartUPInfo,&ProcessInfo);
+		if (process) CloseHandle(process);
+		if (Token) CloseHandle(Token);
+
 }
 
 IniFile::~IniFile()
