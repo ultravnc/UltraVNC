@@ -15,7 +15,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	if (GetModuleFileName(NULL, WORKDIR, MAX_PATH))
 		{
 		char* p = strrchr(WORKDIR, '\\');
-		if (p == NULL) return;
+		if (p == NULL) return 0;
 		*p = '\0';
 		}
 	strcat(WORKDIR,"\\");
