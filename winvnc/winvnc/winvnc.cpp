@@ -481,7 +481,7 @@ DWORD WINAPI imp_desktop_thread(LPVOID lpParam)
 	if (!CloseDesktop(old_desktop))
 		vnclog.Print(LL_INTERR, VNCLOG("SelectHDESK failed to close old desktop %x (Err=%d)\n"), old_desktop, GetLastError());
 
-	//ImpersonateCurrentUser_();
+//	ImpersonateCurrentUser_();
 
 	char m_username[200];
 	HWINSTA station = GetProcessWindowStation();
@@ -533,6 +533,7 @@ DWORD WINAPI imp_desktop_thread(LPVOID lpParam)
 
 	//vnclog.Print(LL_INTERR, VNCLOG("GetMessage stop \n"));
 	CloseDesktop(desktop);
+//	RevertToSelf();
 	return 0;
 
 }
