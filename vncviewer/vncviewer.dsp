@@ -167,6 +167,10 @@ SOURCE=.\res\drive.ico
 # End Source File
 # Begin Source File
 
+SOURCE=.\res\explmsg.bmp
+# End Source File
+# Begin Source File
+
 SOURCE=.\res\file.ico
 # End Source File
 # Begin Source File
@@ -188,6 +192,14 @@ SOURCE=.\res\idr_tray.ico
 # Begin Source File
 
 SOURCE=.\res\idr_tray_disabled.ico
+# End Source File
+# Begin Source File
+
+SOURCE=.\res\l1.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=.\res\l2.bmp
 # End Source File
 # Begin Source File
 
@@ -228,6 +240,10 @@ SOURCE=.\res\sponsor.bmp
 # Begin Source File
 
 SOURCE=.\res\toolbar1.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=.\res\tv.bmp
 # End Source File
 # Begin Source File
 
@@ -457,6 +473,10 @@ SOURCE=.\MessBox.cpp
 # Begin Source File
 
 SOURCE=.\MEssBox.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\MessBox2.cpp
 # End Source File
 # Begin Source File
 

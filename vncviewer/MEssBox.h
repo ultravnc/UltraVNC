@@ -24,4 +24,5 @@
 
 // Display the about box!
 
-void ShowMessageBox(char *info);
+void ShowMessageBox(char *info, int error_nr);
+void ShowMessageBox2(char *info, int error_nr);

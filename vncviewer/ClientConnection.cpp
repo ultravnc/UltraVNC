@@ -527,16 +527,17 @@ void ClientConnection::DoConnection()
 	SetupPixelFormat();
 
     SetFormatAndEncodings();
+
+	reconnectcounter=4;
  
 }
 
 void ClientConnection::Reconnect()
 {
-	Sleep( m_autoReconnect * 1000 );
+	//Sleep( m_autoReconnect * 1000 );
 	try
 	{
 		DoConnection();
-
 		m_bKillThread = false;
 		m_running = true;
 
@@ -546,7 +547,9 @@ void ClientConnection::Reconnect()
 	{
 		if( !m_autoReconnect )
 			e.Report();
-		PostMessage(m_hwndMain, WM_CLOSE, 1, 0);
+		reconnectcounter--;
+		if (reconnectcounter<0) reconnectcounter=0;
+		PostMessage(m_hwndMain, WM_CLOSE, reconnectcounter, 0);
 	}
 }
 
@@ -1228,7 +1231,7 @@ void ClientConnection::SetDSMPluginStuff()
 			m_pDSMPlugin->SetEnabled(false);
 			m_fUsePlugin = false;
 			vnclog.Print(0, _T("DSMPlugin cannot be configured\n"));
-			throw WarningException(sz_L41);
+			throw WarningException(sz_L41,IDS_L41);
 		}
 		// If all went well
 		m_fUsePlugin = true;
@@ -1441,7 +1444,7 @@ void ClientConnection::Connect()
 	if (res == SOCKET_ERROR) 
 		{
 			if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L48);
-			if (!Pressed_Cancel) throw WarningException(sz_L48);
+			if (!Pressed_Cancel) throw WarningException(sz_L48,IDS_L48);
 			else throw QuietException(sz_L48);
 		}
 	vnclog.Print(0, _T("Connected to %s port %d\n"), m_host, m_port);
@@ -1490,7 +1493,7 @@ void ClientConnection::ConnectProxy()
 	thataddr.sin_port = htons(m_proxyport);
 	
 	res = connect(m_sock, (LPSOCKADDR) &thataddr, sizeof(thataddr));
-	if (res == SOCKET_ERROR) {if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L48);throw WarningException(sz_L48);}
+	if (res == SOCKET_ERROR) {if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L48);throw WarningException(sz_L48,IDS_L48);}
 	vnclog.Print(0, _T("Connected to %s port %d\n"), m_proxyhost, m_proxyport);
 	if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L49);
 	if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_VNCSERVER,m_proxyhost);
@@ -1534,13 +1537,14 @@ void ClientConnection::NegotiateProtocolVersion()
 									"- The selected DSMPlugin is not correctly configured (also possibly on the Server)\r\n"
 									"- The password you've possibly entered is incorrect\r\n"
 									"- Another viewer using a DSMPlugin is already connected to the Server (more than one is forbidden)\r\n"
+									,1003
 									);
 		else
 			throw WarningException("Connection failed - Error reading Protocol Version\r\n\n\r"
 									"Possible causes:\r\r"
 									"- You've forgotten to select a DSMPlugin and the Server uses a DSMPlugin\r\n"
 									"- Viewer and Server are not compatible (they use different RFB protocoles)\r\n"
-									"- Bad connection\r\n"
+									"- Bad connection\r\n",1004
 									);
 
 		throw QuietException(c.m_info);
@@ -2932,7 +2936,7 @@ inline void ClientConnection::SubProcessPointerEvent(int x, int y, DWORD keyflag
 	} catch (Exception &e) {
 		if( !m_autoReconnect )
 			e.Report();
-		PostMessage(m_hwndMain, WM_CLOSE, 1, 0);
+		PostMessage(m_hwndMain, WM_CLOSE, 4, 0);
 	}
 }
 
@@ -3090,7 +3094,7 @@ inline void ClientConnection::ProcessKeyEvent(int virtkey, DWORD keyData)
 	} catch (Exception &e) {
 		if( !m_autoReconnect )
 			e.Report();
-		PostMessage(m_hwndMain, WM_CLOSE, 1, 0);
+		PostMessage(m_hwndMain, WM_CLOSE, 4, 0);
 	}
 
 }
@@ -3437,7 +3441,7 @@ void* ClientConnection::run_undetached(void* arg) {
 			// m_pFileTransfer->m_fFileTransferRunning = false;
 			// m_pTextChat->m_fTextChatRunning = false;
 			m_bKillThread = true;
-			PostMessage(m_hwndMain, WM_CLOSE, 1, 0);
+			PostMessage(m_hwndMain, WM_CLOSE, 4, 0);
 		}
 		catch (QuietException &e)
 		{
@@ -3445,7 +3449,7 @@ void* ClientConnection::run_undetached(void* arg) {
 			// m_pFileTransfer->m_fFileTransferRunning = false;
 			// m_pTextChat->m_fTextChatRunning = false;
 			m_bKillThread = true;
-			PostMessage(m_hwndMain, WM_CLOSE, 1, 0);
+			PostMessage(m_hwndMain, WM_CLOSE, 4, 0);
 		}
 		catch (rdr::Exception& e)
 		{
@@ -3454,7 +3458,7 @@ void* ClientConnection::run_undetached(void* arg) {
 			// m_pTextChat->m_fTextChatRunning = false;
 			// throw QuietException(e.str());
 			m_bKillThread = true;
-			PostMessage(m_hwndMain, WM_CLOSE, 1, 0);
+			PostMessage(m_hwndMain, WM_CLOSE, 4, 0);
 		}
 
 		Sleep(0);
@@ -5512,6 +5516,12 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						}
 						else // Autoreconnect allowed - We only suspend the working thread then reconnect a few seconds later
 						{
+							char temp[10];
+							char wtext[30];
+							itoa(wParam,temp,10);
+							strcpy(wtext,"Trying to reconnect ");
+							strcat(wtext,temp);
+							SetWindowText(_this->m_hwndMain, wtext);
 							_this->m_opts.m_NoStatus = true;
 							_this->SuspendThread();
 							_this->Reconnect();

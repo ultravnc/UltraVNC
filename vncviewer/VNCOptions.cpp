@@ -63,6 +63,7 @@ extern char sz_D25[64];
 extern char sz_D26[64];
 extern char sz_D27[64];
 extern char sz_D28[64];
+extern bool g_sponsor;
 
 
 VNCOptions::VNCOptions()
@@ -152,6 +153,7 @@ VNCOptions::VNCOptions()
   m_clearPassword[0] = '\0';		// sf@2002
   m_quickoption = 1;				// sf@2002 - Auto Mode as default
   m_fUseDSMPlugin = false;
+  g_sponsor= false;
   m_fUseProxy = false;
   m_szDSMPluginFilename[0] = '\0';
 
@@ -161,7 +163,7 @@ VNCOptions::VNCOptions()
   m_saved_scaling = false;
   
   // sf@2007 - Autoreconnect
-  m_autoReconnect = 10; // Default: 10s before reconnecting
+  m_autoReconnect = 3; // Default: 10s before reconnecting
 
   // Fix by Act : no user password command line after a rejected connection
   m_NoMoreCommandLineUserPassword = false;
@@ -734,6 +736,8 @@ void VNCOptions::Save(char *fname)
   saveInt("QuickOption",			m_quickoption,	fname);
   saveInt("UseDSMPlugin",			m_fUseDSMPlugin,	fname);
   saveInt("UseProxy",				m_fUseProxy,	fname);
+  saveInt("sponsor",				g_sponsor,	fname);
+
   WritePrivateProfileString("options", "DSMPlugin", m_szDSMPluginFilename, fname);
   //saveInt("AutoReconnect", m_autoReconnect,	fname);
  
@@ -788,6 +792,22 @@ void VNCOptions::Load(char *fname)
   m_fUseDSMPlugin =		readInt("UseDSMPlugin",		m_fUseDSMPlugin, fname) != 0;
   m_fUseProxy =			readInt("UseProxy",			m_fUseProxy, fname) != 0;
   GetPrivateProfileString("options", "DSMPlugin", "NoPlugin", m_szDSMPluginFilename, MAX_PATH, fname);
+  g_sponsor=readInt("sponsor",			g_sponsor, fname) != 0;
+
+  HKEY hRegKey;
+		DWORD sponsor = 0;
+		if ( RegCreateKey(HKEY_CURRENT_USER, SETTINGS_KEY_NAME, &hRegKey)  != ERROR_SUCCESS ) {
+	        hRegKey = NULL;
+		} else {
+			DWORD sponsorsize = sizeof(sponsor);
+			DWORD valtype=REG_DWORD;	
+			if ( RegQueryValueEx( hRegKey,  "sponsor", NULL, &valtype, 
+				(LPBYTE) &sponsor, &sponsorsize) == ERROR_SUCCESS) {
+			g_sponsor=sponsor;
+			}
+			RegCloseKey(hRegKey);
+		}
+
   //m_autoReconnect =		readInt("AutoReconnect",	m_autoReconnect, fname) != 0;
   
 }
@@ -1059,6 +1079,9 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 			  hRemoteCursor = GetDlgItem(hwnd, IDC_CSHAPE_DISABLE_RADIO);
 		  }
 		  SendMessage(hRemoteCursor, BM_SETCHECK,	true, 0);
+
+		  HWND hsponsor = GetDlgItem(hwnd, IDC_CHECK1);
+		  SendMessage(hsponsor, BM_SETCHECK, g_sponsor, 1);
 		  
 		  CentreWindow(hwnd);
 		  SetForegroundWindow(hwnd);
@@ -1217,6 +1240,31 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 					  _this->m_ignoreShapeUpdates = true;
 				  }
 			  }
+
+			HWND hsponsor = GetDlgItem(hwnd, IDC_CHECK1);
+			if (SendMessage(hsponsor, BM_GETCHECK, 0, 0) == BST_CHECKED)
+			{
+				g_sponsor = true;
+			}
+			else 
+			{
+				g_sponsor = false;
+
+			}
+
+			DWORD dw;
+			DWORD val=g_sponsor;
+			HKEY huser;
+			if (RegCreateKeyEx(HKEY_CURRENT_USER,
+			SETTINGS_KEY_NAME,
+			0,REG_NONE, REG_OPTION_NON_VOLATILE,
+			KEY_WRITE | KEY_READ,
+			NULL, &huser, &dw) == ERROR_SUCCESS)
+			{
+				RegSetValueEx(huser, "sponsor", 0, REG_DWORD, (LPBYTE) &val, sizeof(val));
+				if (huser != NULL) RegCloseKey(huser);
+			}
+
 			  
 			  EndDialog(hwnd, TRUE);
 			  

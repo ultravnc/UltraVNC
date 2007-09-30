@@ -26,11 +26,12 @@
 #include "Exception.h"
 #include "messbox.h"
 
-Exception::Exception(const char *info)
+Exception::Exception(const char *info,int error_nr)
 {
 	assert(info != NULL);
 	m_info = new char[strlen(info)+1];
 	strcpy(m_info, info);
+	m_error_nr=error_nr;
 }
 
 Exception::~Exception()
@@ -41,7 +42,7 @@ Exception::~Exception()
 // ---------------------------------------
 
 
-QuietException::QuietException(const char *info) : Exception(info)
+QuietException::QuietException(const char *info,int error_nr) : Exception(info,error_nr)
 {
 
 }
@@ -60,7 +61,7 @@ void QuietException::Report()
 
 // ---------------------------------------
 
-WarningException::WarningException(const char *info, bool close) : Exception(info)
+WarningException::WarningException(const char *info,int error_nr, bool close) : Exception(info,error_nr)
 {
 	m_close = close;
 }
@@ -75,13 +76,13 @@ void WarningException::Report()
 #ifdef _MSC_VER
 	_RPT1(_CRT_WARN, "Warning : %s\n", m_info);
 #endif
-	ShowMessageBox(m_info);
+	ShowMessageBox2(m_info,m_error_nr);
 	//MessageBox(NULL, m_info, " Ultr@VNC Info", MB_OK| MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TOPMOST);
 }
 
 // ---------------------------------------
 
-ErrorException::ErrorException(const char *info) : Exception(info)
+ErrorException::ErrorException(const char *info,int error_nr) : Exception(info,error_nr)
 {
 
 }
@@ -96,6 +97,6 @@ void ErrorException::Report()
 #ifdef _MSC_VER
 	_RPT1(_CRT_WARN, "Warning : %s\n", m_info);
 #endif
-	ShowMessageBox(m_info);
+	ShowMessageBox2(m_info,m_error_nr);
 	//MessageBox(NULL, m_info, " Ultr@VNC Info", MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST);
 }

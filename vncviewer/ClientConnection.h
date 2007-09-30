@@ -63,6 +63,7 @@ extern const UINT FileTransferSendPacketMessage;
 #endif
 
 #define SETTINGS_KEY_NAME "Software\\ORL\\VNCviewer\\Settings"
+#define SETTINGS_KEY_NAME2 "Software\\ORL\\VNCviewer\\Settingss"
 #define MAX_HOST_NAME_LEN 250
 
 #define ZLIBHEX_DECOMP_UNINITED (-1)
@@ -577,6 +578,7 @@ private:
 	int m_autoReconnect;
 	void Reconnect();
 	void DoConnection();
+	int reconnectcounter;
 };
 
 // Some handy classes for temporary GDI object selection

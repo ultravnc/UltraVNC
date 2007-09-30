@@ -26,6 +26,7 @@
 #include "stdhdrs.h"
 #include "vncviewer.h"
 char *infomsg;
+int g_error_nr;
 // Process the About dialog.
 static LRESULT CALLBACK MessageDlgProc(HWND hwnd, UINT iMsg, 
 										   WPARAM wParam, LPARAM lParam) {
@@ -57,9 +58,10 @@ static LRESULT CALLBACK MessageDlgProc(HWND hwnd, UINT iMsg,
 	return FALSE;
 }
 
-void ShowMessageBox(char *info)
+void ShowMessageBox(char *info,int error_nr)
 {
 	infomsg=info;
+	g_error_nr=error_nr;
 	int res = DialogBox(pApp->m_instance, 
  		DIALOG_MAKEINTRESOURCE(IDD_APP_MESSAGE),
 		NULL, (DLGPROC) MessageDlgProc);
