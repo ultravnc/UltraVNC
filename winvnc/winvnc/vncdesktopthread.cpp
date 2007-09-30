@@ -4,6 +4,8 @@ bool g_DesktopThread_running;
 bool g_update_triggered;
 DWORD WINAPI hookwatch(LPVOID lpParam);
 extern bool stop_hookwatch;
+extern unsigned long updates_sent;
+unsigned long old_updates_sent;
 
 
 inline bool
@@ -1034,11 +1036,18 @@ vncDesktopThread::run_undetached(void *arg)
 
 			
 			// Now wait for more messages to be queued
+
+		  if (old_updates_sent!=updates_sent)
+		  {
 			if (!WaitMessage())
 			{
 				vnclog.Print(LL_INTERR, VNCLOG("WaitMessage() failed\n"));
 				break;
 			}
+			vnclog.Print(LL_INTERR, VNCLOG("WaitMessage()\n"));
+			old_updates_sent=updates_sent;
+		  }
+		  else vnclog.Print(LL_INTERR, VNCLOG("WaitMessage() skip\n"));
 		}//peek message
 
 
