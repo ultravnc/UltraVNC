@@ -80,8 +80,6 @@ void *vncSockConnectThread::run_undetached(void * arg)
 	{
 		// Accept an incoming connection
 		VSocket *new_socket = m_socket->Accept();
-		//if (!m_socket->TryAccept(&new_socket, 100)) // Does not work. Todo: digg it
-		//	break;
 		if (new_socket == NULL)
 			break;
 		else
