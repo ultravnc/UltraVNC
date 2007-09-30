@@ -359,39 +359,6 @@ VSocket::Accept()
 }
 
 ////////////////////////////
-
-VBool
-VSocket::TryAccept(VSocket **new_socket, long ms)
-{
-	// Check this socket
-	if (sock < 0)
-		return NULL;
-
-	struct fd_set fds;
-	struct timeval tm;
-	FD_ZERO(&fds);
-	FD_SET((unsigned int)sock, &fds);
-	tm.tv_sec = ms / 1000;
-	tm.tv_usec = (ms % 1000) * 1000;
-	int ready = select(sock + 1, &fds, NULL, NULL, &tm);
-	if (ready == 0) {
-		// Timeout
-		*new_socket = NULL;
-		return VTrue;
-	} else if (ready != 1) {
-		// Error
-		return VFalse;
-	}
-	// Ready to accept new connection
-	VSocket *s = Accept();
-	if (s == NULL)
-		return VFalse;
-	// Success
-	*new_socket = s;
-	return VTrue;
-}
-
-////////////////////////////
 ////////////////////////////
 
 VString

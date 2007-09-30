@@ -96,13 +96,6 @@ public:
   //        returns a new socket object for the new connection
   VSocket *Accept();
 
-// TryAccept
-  //        Non-blocking version of Accept. It waits for an
-  //        incoming connection only for the specified number of
-  //        milliseconds. It returns VFalse on error, otherwise stores
-  //        either pointer to the new VSocket, or NULL on timeout
-  VBool TryAccept(VSocket **new_socket, long ms);
-
   // GetPeerName
   //        If the socket is connected then this returns the name
   //        of the machine to which it is connected.
