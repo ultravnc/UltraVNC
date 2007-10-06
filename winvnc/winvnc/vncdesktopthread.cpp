@@ -739,6 +739,13 @@ vncDesktopThread::run_undetached(void *arg)
 					oldcursorpos = rfb::Point(cursorpos);
 					// nyama/marscha - PointerPos. Inform clients about mouse move.
 					m_desktop->m_server->UpdateMouse();
+					if (MyGetCursorInfo)
+					{
+						MyCURSORINFO cinfo;
+						cinfo.cbSize=sizeof(MyCURSORINFO);
+						MyGetCursorInfo(&cinfo);
+						m_desktop->SetCursor(cinfo.hCursor);
+					}
 				}
 			
 				//****************************************************************************

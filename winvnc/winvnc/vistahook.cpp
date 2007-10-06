@@ -72,14 +72,14 @@ vncDesktopThread::Handle_Ringbuffer(mystruct *ringbuffer,rfb::Region2D &rgncache
 			}
 			if (ringbuffer->type[i]==2 || ringbuffer->type[i]==4)
 			{
-				if (MyGetCursorInfo)
+				/*if (MyGetCursorInfo)
 					{
 						MyCURSORINFO cinfo;
 						cinfo.cbSize=sizeof(MyCURSORINFO);
 						MyGetCursorInfo(&cinfo);
 						m_desktop->SetCursor(cinfo.hCursor);
 						//vnclog.Print(LL_INTERR, VNCLOG("Cursor %i  \n"),cinfo.hCursor);
-					}
+					}*/
 	
 				
 			}
@@ -112,14 +112,14 @@ vncDesktopThread::Handle_Ringbuffer(mystruct *ringbuffer,rfb::Region2D &rgncache
 			}
 			if (ringbuffer->type[i]==2 || ringbuffer->type[i]==4)
 			{
-				if (MyGetCursorInfo)
+				/*if (MyGetCursorInfo)
 					{
 						MyCURSORINFO cinfo;
 						cinfo.cbSize=sizeof(MyCURSORINFO);
 						MyGetCursorInfo(&cinfo);
 						m_desktop->SetCursor(cinfo.hCursor);
 						//vnclog.Print(LL_INTERR, VNCLOG("Cursor %i  \n"),cinfo.hCursor);
-					}
+					}*/
 				
 			}
 			
@@ -146,14 +146,14 @@ vncDesktopThread::Handle_Ringbuffer(mystruct *ringbuffer,rfb::Region2D &rgncache
 			}
 			if (ringbuffer->type[i]==2 || ringbuffer->type[i]==4)
 			{
-				if (MyGetCursorInfo)
+				/*if (MyGetCursorInfo)
 					{
 						MyCURSORINFO cinfo;
 						cinfo.cbSize=sizeof(MyCURSORINFO);
 						MyGetCursorInfo(&cinfo);
 						m_desktop->SetCursor(cinfo.hCursor);
 						//vnclog.Print(LL_INTERR, VNCLOG("Cursor %i  \n"),cinfo.hCursor);
-					}
+					}*/
 				
 			}
 			
