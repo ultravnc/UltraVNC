@@ -171,7 +171,7 @@ private:
 	static LRESULT CALLBACK GTGBS_ShowStatusWindow(LPVOID lpParameter);
 	static LRESULT CALLBACK GTGBS_StatusProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam);
 	static LRESULT CALLBACK GTGBS_SendCustomKey_proc(HWND Dlg, UINT iMsg, WPARAM wParam, LPARAM lParam);
-	void LoadDSMPlugin(); // sf@2002 - DSM Plugin
+	void LoadDSMPlugin(bool fForceReload); // sf@2002 - DSM Plugin
 	void SetDSMPluginStuff();
 	void GetConnectDetails();
 	void Connect();

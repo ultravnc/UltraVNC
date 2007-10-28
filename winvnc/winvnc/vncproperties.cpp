@@ -1651,7 +1651,15 @@ vncProperties::ApplyUserPrefs()
 	// DSM Plugin prefs
 	m_server->EnableDSMPlugin(m_pref_UseDSMPlugin);
 	m_server->SetDSMPluginName(m_pref_szDSMPlugin);
-	if (m_server->IsDSMPluginEnabled()) m_server->SetDSMPlugin();
+	if (m_server->IsDSMPluginEnabled()) 
+	{
+		vnclog.Print(LL_INTINFO, VNCLOG("$$$$$$$$$$ ApplyUserPrefs - Plugin Enabled - Call SetDSMPlugin() \n"));
+		m_server->SetDSMPlugin(false);
+	}
+	else
+	{
+		vnclog.Print(LL_INTINFO, VNCLOG("$$$$$$$$$$ ApplyUserPrefs - Plugin NOT enabled \n"));
+	}
 
 }
 

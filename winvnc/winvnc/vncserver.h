@@ -315,7 +315,7 @@ public:
 	virtual void EnableDSMPlugin(BOOL fEnable);
 	virtual char* GetDSMPluginName();
 	virtual void SetDSMPluginName(char* szDSMPlugin);
-	virtual BOOL SetDSMPlugin(void);
+	virtual BOOL SetDSMPlugin(BOOL fForceReload);
 	virtual CDSMPlugin* GetDSMPluginPointer() { return m_pDSMPlugin;};
 
 	// sf@2002 - Cursor handling

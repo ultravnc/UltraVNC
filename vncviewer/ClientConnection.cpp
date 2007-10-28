@@ -441,11 +441,11 @@ void ClientConnection::Run()
 	{
 		GetConnectDetails();
 		// sf@2002 - DSM Plugin loading if required
-		LoadDSMPlugin();
+		LoadDSMPlugin(false);
 	}
 	else
 	{
-		LoadDSMPlugin();
+		LoadDSMPlugin(false);
 		// sf@2003 - Take command line quickoption into account
 		HandleQuickOption();
 	}
@@ -534,7 +534,7 @@ void ClientConnection::DoConnection()
 
 void ClientConnection::Reconnect()
 {
-	//Sleep( m_autoReconnect * 1000 );
+	Sleep( m_autoReconnect * 1000 );
 	try
 	{
 		DoConnection();
@@ -1151,10 +1151,17 @@ void ClientConnection::CreateDisplay()
 //
 // sf@2002 - DSMPlugin loading and initialization if required
 //
-void ClientConnection::LoadDSMPlugin()
+void ClientConnection::LoadDSMPlugin(bool fForceReload)
 {
 	if (m_opts.m_fUseDSMPlugin)
 	{
+		// sf@2007 - Autoreconnect stuff - Reload/Reset of the plugin
+		if (m_pDSMPlugin->IsLoaded() && fForceReload)
+		{
+			m_pDSMPlugin->UnloadPlugin();
+			m_pDSMPlugin->SetEnabled(false);
+		}
+
 		if (!m_pDSMPlugin->IsLoaded())
 		{
 			m_pDSMPlugin->LoadPlugin(m_opts.m_szDSMPluginFilename, m_opts.m_listening);
@@ -2651,8 +2658,7 @@ void ClientConnection::SuspendThread()
 
 	// Reinit DSM stuff
 	m_nTO = 1;
-	m_pDSMPlugin = new CDSMPlugin();
-	m_fUsePlugin = false;
+	LoadDSMPlugin(true);
 	m_fUseProxy = false;
 	m_pNetRectBuf = NULL;
 	m_fReadFromNetRectBuf = false; 
@@ -5519,8 +5525,9 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							char temp[10];
 							char wtext[30];
 							itoa(wParam,temp,10);
-							strcpy(wtext,"Trying to reconnect ");
+							strcpy(wtext,"Ultr@VNC Viewer - Connection dropped, trying to reconnect (");
 							strcat(wtext,temp);
+							strcat(wtext,")");
 							SetWindowText(_this->m_hwndMain, wtext);
 							_this->m_opts.m_NoStatus = true;
 							_this->SuspendThread();
