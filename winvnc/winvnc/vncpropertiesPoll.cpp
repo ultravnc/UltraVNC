@@ -580,10 +580,10 @@ LABELUSERSETTINGS:
 void
 vncPropertiesPoll::Load(BOOL usersettings)
 {
-	if (m_dlgvisible) {
-		vnclog.Print(LL_INTWARN, VNCLOG("service helper invoked while Properties panel displayed\n"));
-		return;
-	}
+//	if (m_dlgvisible) {
+//		vnclog.Print(LL_INTWARN, VNCLOG("service helper invoked while Properties panel displayed\n"));
+//		return;
+//	}
 	ResetRegistry();
 	
 	char username[UNLEN+1];
@@ -826,11 +826,11 @@ vncPropertiesPoll::SaveUserPrefsPoll(HKEY appkey)
 
 void vncPropertiesPoll::LoadFromIniFile()
 {
-	if (m_dlgvisible)
-	{
-		vnclog.Print(LL_INTWARN, VNCLOG("service helper invoked while Properties panel displayed\n"));
-		return;
-	}
+//	if (m_dlgvisible)
+//	{
+//		vnclog.Print(LL_INTWARN, VNCLOG("service helper invoked while Properties panel displayed\n"));
+//		return;
+//	}
 	
 	m_pref_TurboMode = ((vncService::VersionMajor() >= 6) ? TRUE : FALSE);
 	m_pref_PollUnderCursor=FALSE;

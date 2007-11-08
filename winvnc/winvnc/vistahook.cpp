@@ -203,8 +203,21 @@ DWORD WINAPI Cadthread(LPVOID lpParam)
 	if (!CloseDesktop(old_desktop))
 		vnclog.Print(LL_INTERR, VNCLOG("SelectHDESK failed to close old desktop %x (Err=%d) %s\n"), old_desktop, GetLastError(),user);
 
+//Full path needed, sometimes it just default to system32
+	char WORKDIR[MAX_PATH];
+	char mycommand[MAX_PATH];
+	if (GetModuleFileName(NULL, WORKDIR, MAX_PATH))
+		{
+		char* p = strrchr(WORKDIR, '\\');
+		if (p == NULL) return 0;
+		*p = '\0';
+		}
+	strcpy(mycommand,"");
+	strcat(mycommand,WORKDIR);//set the directory
+	strcat(mycommand,"\\");
+	strcat(mycommand,"cad.exe");
 
-	ShellExecute(GetDesktopWindow(), "open", "cad.exe", "", 0, SW_SHOWNORMAL);
+	ShellExecute(GetDesktopWindow(), "open", mycommand, "", 0, SW_SHOWNORMAL);
 
 	CloseDesktop(desktop);
 	return 0;

@@ -47,31 +47,9 @@ class vncService
 
 public:
 	vncService();
-
-	// SERVICE INSTALL & START FUNCTIONS
-
-	// Routine called by WinMain to cause WinVNC to be installed
-	// as a service.
-	static int WinVNCServiceMain();
-
-	// Routine to install the WinVNC service on the local machine
-	static int InstallService(BOOL silent=0);
-  static int ReinstallService();
-
-	// Routine to remove the WinVNC service from the local machine
-	static int RemoveService(BOOL silent=0);
-
-	// SERVICE SUPPORT FUNCTIONS
-
 	// Routine to establish and return the currently logged in user name
 	static BOOL CurrentUser(char *buffer, UINT size);
 	static BOOL IsWSLocked(); // sf@2005
-
-	// Routine to post a message to the currently running WinVNC server
-	// to pass it a handle to the current user
-	static BOOL PostUserHelperMessage();
-	// Routine to process a user helper message
-	static BOOL ProcessUserHelperMessage(WPARAM wParam, LPARAM lParam);
 
 	// Routines to establish which OS we're running on
 	static BOOL IsWin95();
@@ -108,14 +86,6 @@ public:
 	// Main cause of failure will be when locking is not supported
 	static BOOL LockWorkstation();
 
-	// Routine to make any currently running version of WinVNC show its
-	// Properties dialog, to allow the user to make changes to their settings
-	static BOOL ShowProperties();
-
-	// Routine to make any currently running version of WinVNC show the
-	// Properties dialog for the default settings, so the user can make changes
-	static BOOL ShowDefaultProperties();
-
 	// Routine to make the an already running copy of WinVNC bring up its
 	// About box so you can check the version!
 	static BOOL ShowAboutBox();
@@ -130,6 +100,7 @@ public:
 
 	static BOOL RunningFromExternalService();
 	static void RunningFromExternalService(BOOL fEnabled);
+	static bool IsInstalled();
 
 };
 

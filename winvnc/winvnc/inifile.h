@@ -26,6 +26,7 @@ public:
 	void ReadPassword(char *value,int valuesize);
 	void IniFileSetSecure();
 	void IniFileSetTemp();
+	void IniFileSetTemp(char *lpCmdLine);
 	void copy_to_secure();
 
 protected:

@@ -655,8 +655,6 @@ public:
 				DWORD dwTId;
 				ThreadHandle2 = CreateThread(NULL, 0, Cadthread, NULL, 0, &dwTId);
 				CloseHandle(ThreadHandle2);
-
-				//int ret = (int)ShellExecute(GetDesktopWindow(), "open", "cad.exe", "", 0, SW_SHOWNORMAL);
 				if (false/*ret <= 32*/)
 				{
 					// If cad.exe is not available, run the existing osk.exe

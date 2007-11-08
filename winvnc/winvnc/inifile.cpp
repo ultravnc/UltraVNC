@@ -33,6 +33,12 @@ char WORKDIR[MAX_PATH];
 }
 
 void
+IniFile::IniFileSetTemp(char *lpCmdLine)
+{	
+	strcpy(myInifile,lpCmdLine);
+}
+
+void
 IniFile::IniFileSetTemp()
 {
 char WORKDIR[MAX_PATH];
@@ -61,34 +67,16 @@ char WORKDIR[MAX_PATH];
 void
 IniFile::copy_to_secure()
 {
-/*SHELLEXECUTEINFO shExecInfo;
-
-      shExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
-
-      shExecInfo.fMask = NULL;
-      shExecInfo.hwnd = GetForegroundWindow();
-      shExecInfo.lpVerb = "runas";
-      shExecInfo.lpFile = "UacVista.exe";
-      shExecInfo.lpParameters = myInifile;
-      shExecInfo.lpDirectory = NULL;
-      shExecInfo.nShow = SW_SHOWNORMAL;
-      shExecInfo.hInstApp = NULL;
-	  ShellExecuteEx(&shExecInfo);*/
-	  //ShellExecute(GetForegroundWindow(), "open", "UacVista.exe", myInifile , 0, SW_SHOWNORMAL);
-
-
         char dir[MAX_PATH], *ptr;
-		GetModuleFileName(0, dir, MAX_PATH);
 
-		ptr=strrchr(dir, '\\'); 
-		if(ptr)
-			ptr[1]='\0'; 
-		if(!SetCurrentDirectory(dir)) {
-        return ;
-		}
-		strcat(dir, "\\uacvistahelper.exe");
-		strcat(dir, " ");
+		char exe_file_name[MAX_PATH];
+		GetModuleFileName(0, exe_file_name, MAX_PATH);
+
+		strcpy(dir, exe_file_name);
+		strcat(dir, " -settingshelper");
+		strcat(dir, ":");
 		strcat(dir, myInifile);
+
 
 		STARTUPINFO          StartUPInfo;
 		PROCESS_INFORMATION  ProcessInfo;

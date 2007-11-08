@@ -4289,14 +4289,7 @@ void vncClient::UndoFTUserImpersonation()
 	vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::UNDoFTUserImpersonation - 1\n"));
 	DWORD lTime = timeGetTime();
 	if (lTime - m_lLastFTUserImpersonationTime < 10000) return;
-
-	//if (m_server->m_impersonationtoken) // sf@2007 - New method. No more needed
-	{
-		vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::UNDoFTUserImpersonation - Impersonationtoken exists\n"));
-		RevertToSelf();
-		// PostMessage(FindWindow(MENU_CLASS_NAME, NULL), MENU_SERVICEHELPER_MSG, 0, 0);
-		//PostToWinVNC(MENU_SERVICEHELPER_MSG, 0, 0L); // sf@2007 - New method. No more needed
-	}
-
+	vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::UNDoFTUserImpersonation - Impersonationtoken exists\n"));
+	RevertToSelf();
 	m_fFTUserImpersonatedOk = false;
 }

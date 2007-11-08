@@ -63,8 +63,6 @@
 HINSTANCE	hAppInstance;
 const char	*szAppName = "WinVNC";
 DWORD		mainthreadId;
-BOOL		AllowMulti=false;
-BOOL		DisableMultiWarning=false;
 BOOL		fRunningFromExternalService=false;
 
 // sf@2007 - New shutdown order handling stuff (with uvnc_service)
@@ -75,22 +73,37 @@ MMRESULT			mmRes;
 void WRITETOLOG(char *szText, int size, DWORD *byteswritten, void *);
 
 
-// WinMain parses the command line and either calls the main App
-// routine or, under NT, the main service routine.
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow)
+//// Handle Old PostAdd message
+bool PostAddAutoConnectClient_bool=false;
+bool PostAddNewClient_bool=false;
+bool PostAddAutoConnectClient_bool_null=false;
+char pszId_char[20];
+VCard32 address_vcard;
+int port_int;
+
+int start_service(char *cmd);
+int install_service(void);
+int uninstall_service(void);
+extern char service_name[];
+
+void Real_stop_service();
+void Set_stop_service_as_admin();
+void Real_start_service();
+void Set_start_service_as_admin();
+void Real_settings(char *mycommand);
+void Set_settings_as_admin(char *mycommand);
+void Set_uninstall_service_as_admin();
+void Set_install_service_as_admin();
+
+// winvnc.exe will also be used for helper exe
+// This allow us to minimize the number of seperate exe
+bool
+Myinit(HINSTANCE hInstance)
 {
 	SetOSVersion();
 	setbuf(stderr, 0);
-
-        //ACT: Load all messages from ressource file
-        Load_Localization(hInstance) ;
-        //ACT: end
-
-	// Configure the log file, in case one is required
-//		Beep(1000,100);
-//		Beep(2000,100);
-//		Beep(3000,100);
-//		Beep(4000,100);
+    //Load all messages from ressource file
+    Load_Localization(hInstance) ;
 
 	char WORKDIR[MAX_PATH];
 	if (GetModuleFileName(NULL, WORKDIR, MAX_PATH))
@@ -105,7 +118,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 	vnclog.SetFile(WORKDIR, true);
 	vnclog.SetMode(2);
 	vnclog.SetLevel(10);
-	vnclog.Print(LL_STATE, VNCLOG("sockets initialised pre %s\n"),szCmdLine);
 
 #ifdef _DEBUG
 	{
@@ -121,10 +133,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 #endif
 
 	// Save the application instance and main thread id
-//	Beep(1000,500);
 	hAppInstance = hInstance;
 	mainthreadId = GetCurrentThreadId();
-//	Beep(1000,500);
+
 
 	// Initialise the VSocket system
 	VSocketSystem socksys;
@@ -133,21 +144,67 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 		MessageBox(NULL, sz_ID_FAILED_INIT, szAppName, MB_OK);
 		return 0;
 	}
-	vnclog.Print(LL_STATE, VNCLOG("sockets initialised %s\n"),szCmdLine);
+	return 1;
+}
 
+
+// WinMain parses the command line and either calls the main App
+// routine or, under NT, the main service routine.
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow)
+{
+
+
+	SetOSVersion();
+	setbuf(stderr, 0);
+    //Load all messages from ressource file
+    Load_Localization(hInstance) ;
+
+	char WORKDIR[MAX_PATH];
+	if (GetModuleFileName(NULL, WORKDIR, MAX_PATH))
+		{
+		char* p = strrchr(WORKDIR, '\\');
+		if (p == NULL) return 0;
+		*p = '\0';
+		}
+	strcat(WORKDIR,"\\");
+	strcat(WORKDIR,"WinVNC.log");
+
+	vnclog.SetFile(WORKDIR, true);
+	vnclog.SetMode(2);
+	vnclog.SetLevel(10);
+
+#ifdef _DEBUG
+	{
+		// Get current flag
+		int tmpFlag = _CrtSetDbgFlag( _CRTDBG_REPORT_FLAG );
+
+		// Turn on leak-checking bit
+		tmpFlag |= _CRTDBG_LEAK_CHECK_DF;
+
+		// Set flag to the new value
+		_CrtSetDbgFlag( tmpFlag );
+	}
+#endif
+
+	// Save the application instance and main thread id
+	hAppInstance = hInstance;
+	mainthreadId = GetCurrentThreadId();
+
+
+	// Initialise the VSocket system
+	VSocketSystem socksys;
+	if (!socksys.Initialised())
+	{
+		MessageBox(NULL, sz_ID_FAILED_INIT, szAppName, MB_OK);
+		return 0;
+	}
 
 	// Make the command-line lowercase and parse it
 	int i;
 	for (i = 0; i < strlen(szCmdLine); i++)
 	{
 		szCmdLine[i] = tolower(szCmdLine[i]);
-	}
-
-	//MessageBox(NULL, sz_ID_FAILED_INIT, szCmdLine, MB_OK);
-	//char szMsg[255];
-	// wsprintf(szMsg, "***** DBG - WinMain CommandLine  %s\n", szCmdLine);
-	//vnclog.Print(LL_INTINFO, szMsg); 
-
+	} 
 	BOOL argfound = FALSE;
 	for (i = 0; i < strlen(szCmdLine); i++)
 	{
@@ -155,136 +212,104 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 			continue;
 		argfound = TRUE;
 
-		// Now check for command-line arguments
-		if (strncmp(&szCmdLine[i], winvncRunServiceHelper, strlen(winvncRunServiceHelper)) == 0)
+		if (strncmp(&szCmdLine[i], winvncSettingshelper, strlen(winvncSettingshelper)) == 0)
 		{
-			// NB : This flag MUST be parsed BEFORE "-service", otherwise it will match
-			// the wrong option!  (This code should really be replaced with a simple
-			// parser machine and parse-table...)
-
-			// Run the WinVNC Service Helper app
-			// Seperate service this is not longer needed, just disable it to avoid unwanted effects
-			//vncService::PostUserHelperMessage();
+			char mycommand[MAX_PATH];
+			i+=strlen(winvncSettingshelper);
+			strcpy( mycommand, &(szCmdLine[i+1]));
+			Set_settings_as_admin(mycommand);
 			return 0;
 		}
+
+		if (strncmp(&szCmdLine[i], winvncStopserviceHelper, strlen(winvncStopserviceHelper)) == 0)
+		{
+			Set_stop_service_as_admin();
+			return 0;
+		}
+
+		if (strncmp(&szCmdLine[i], winvncStartserviceHelper, strlen(winvncStartserviceHelper)) == 0)
+		{
+			Set_start_service_as_admin();
+			return 0;
+		}
+
+		if (strncmp(&szCmdLine[i], winvncInstallServiceHelper, strlen(winvncInstallServiceHelper)) == 0)
+			{
+				Set_install_service_as_admin();
+				return 0;
+			}
+		if (strncmp(&szCmdLine[i], winvncUnInstallServiceHelper, strlen(winvncUnInstallServiceHelper)) == 0)
+			{
+				Set_uninstall_service_as_admin();
+				return 0;
+			}
+
+		if (strncmp(&szCmdLine[i], winvncSettings, strlen(winvncSettings)) == 0)
+		{
+			char mycommand[MAX_PATH];
+			i+=strlen(winvncSettings);
+			strcpy( mycommand, &(szCmdLine[i+1]));
+			Real_settings(mycommand);
+			return 0;
+		}
+
+		if (strncmp(&szCmdLine[i], winvncStopservice, strlen(winvncStopservice)) == 0)
+		{
+			Real_stop_service();
+			return 0;
+		}
+
+		if (strncmp(&szCmdLine[i], winvncStartservice, strlen(winvncStartservice)) == 0)
+		{
+			Real_start_service();
+			return 0;
+		}
+
+		if (strncmp(&szCmdLine[i], winvncInstallService, strlen(winvncInstallService)) == 0)
+			{
+				install_service();
+				Sleep(2000);
+				char command[100];
+				strcpy(command,"net start ");
+				strcat(command,service_name);
+				WinExec(command,SW_HIDE);
+				return 0;
+			}
+		if (strncmp(&szCmdLine[i], winvncUnInstallService, strlen(winvncUnInstallService)) == 0)
+			{
+				char command[100];
+				strcpy(command,"net stop ");
+				strcat(command,service_name);
+				WinExec(command,SW_HIDE);
+				uninstall_service();
+				return 0;
+			}
+
+
+
 		if (strncmp(&szCmdLine[i], winvncRunService, strlen(winvncRunService)) == 0)
 		{
-			// Run WinVNC as a service
-			// Seperate service this is not longer needed, just disable it to avoid unwanted effects
-			//return vncService::WinVNCServiceMain();
-			return 0;
-		}
-
-		if (strncmp(&szCmdLine[i], winvncRunAsUserApp, strlen(winvncRunAsUserApp)) == 0)
-		{
-			// WinVNC is being run as a user-level program
-			return WinVNCAppMain();
-		}
-
-		if (strncmp(&szCmdLine[i], "windesk",  strlen("windesk")) == 0)
-		{
+			//Run as service
+			Beep(1000,100);
+			if (!Myinit(hInstance)) return 0;
 			fRunningFromExternalService = true;
 			vncService::RunningFromExternalService(true); 
 			return WinVNCAppMain();
 		}
 
-		if (strncmp(&szCmdLine[i], "defaultdesk",  strlen("defaultdesk")) == 0)
+		if (strncmp(&szCmdLine[i], winvncStartService, strlen(winvncStartService)) == 0)
 		{
-//			Beep(500,5000);
-			return 0;
+		start_service(szCmdLine);
+		return 0;
 		}
 
-		if (strncmp(&szCmdLine[i], winvncAllowMulti, strlen(winvncAllowMulti)) == 0)
+		if (strncmp(&szCmdLine[i], winvncRunAsUserApp, strlen(winvncRunAsUserApp)) == 0)
 		{
 			// WinVNC is being run as a user-level program
-			AllowMulti=true;
-			i+=strlen(winvncAllowMulti);
-			continue;
-		}
-
-		if (strncmp(&szCmdLine[i], winvncDisableMultiWarning, strlen(winvncDisableMultiWarning)) == 0)
-		{
-			// WinVNC is being run as a user-level program
-			DisableMultiWarning=true;
-			i+=strlen(winvncDisableMultiWarning);
-			vnclog.SetFile("WinVNCfus.log", false);
-
+			if (!Myinit(hInstance)) return 0;
 			return WinVNCAppMain();
-
-			continue;
 		}
 
-		if (strncmp(&szCmdLine[i], winvncInstallService, strlen(winvncInstallService)) == 0)
-		{
-			// Install WinVNC as a service
-			// Seperate service this is not longer needed, just disable it to avoid unwanted effects
-			/*vncService::InstallService();
-			i+=strlen(winvncInstallService);
-			continue;*/
-			return 0;
-		}
-
-		if (strncmp(&szCmdLine[i], winvncInstallServices, strlen(winvncInstallServices)) == 0)
-		{
-			// Install WinVNC as a service
-			// Seperate service this is not longer needed, just disable it to avoid unwanted effects
-			/*
-			vncService::InstallService(1);
-			i+=strlen(winvncInstallServices);
-			continue;*/
-			return 0;
-		}
-
-		if (strncmp(&szCmdLine[i], winvncReinstallService, strlen(winvncReinstallService)) == 0)
-		{
-			// Silently remove WinVNC, then re-install it
-			// Seperate service this is not longer needed, just disable it to avoid unwanted effects
-			/*
-			vncService::ReinstallService();
-			i+=strlen(winvncReinstallService);
-			continue;
-			*/
-			return 0;
-		}
-		if (strncmp(&szCmdLine[i], winvncRemoveService, strlen(winvncRemoveService)) == 0)
-		{
-			// Remove the WinVNC service
-			// Seperate service this is not longer needed, just disable it to avoid unwanted effects
-			/*
-			vncService::RemoveService();
-			i+=strlen(winvncRemoveService);
-			continue;
-			*/
-			return 0;
-		}
-		if (strncmp(&szCmdLine[i], winvncShowProperties, strlen(winvncShowProperties)) == 0)
-		{
-			// Show the Properties dialog of an existing instance of WinVNC
-			vncService::ShowProperties();
-			i+=strlen(winvncShowProperties);
-			continue;
-		}
-		if (strncmp(&szCmdLine[i], winvncShowDefaultProperties, strlen(winvncShowDefaultProperties)) == 0)
-		{
-			// Show the Properties dialog of an existing instance of WinVNC
-			vncService::ShowDefaultProperties();
-			i+=strlen(winvncShowDefaultProperties);
-			continue;
-		}
-		if (strncmp(&szCmdLine[i], winvncShowAbout, strlen(winvncShowAbout)) == 0)
-		{
-			// Show the About dialog of an existing instance of WinVNC
-			vncService::ShowAboutBox();
-			i+=strlen(winvncShowAbout);
-			continue;
-		}
-		if (strncmp(&szCmdLine[i], winvncKillRunningCopy, strlen(winvncKillRunningCopy)) == 0)
-		{
-			// Kill any already running copy of WinVNC
-			vncService::KillRunningCopy();
-			i+=strlen(winvncKillRunningCopy);
-			continue;
-		}
 		if (strncmp(&szCmdLine[i], winvncAutoReconnect, strlen(winvncAutoReconnect)) == 0)
 		{
 			// Note that this "autoreconnect" param MUST be BEFORE the "connect" one
@@ -315,24 +340,25 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 			}// end of condition we found the ID: parameter
 			
 			// NOTE:  id must be NULL or the ID:???? (pointer will get deleted when message is processed)
-			vncService::PostAddAutoConnectClient( pszId );
+			// We can not contact a runnning service, permissions, so we must store the settings
+			// and process until the vncmenu has been started
+			PostAddAutoConnectClient_bool=true;
+			if (pszId==NULL)
+			{
+				PostAddAutoConnectClient_bool_null=true;
+				PostAddAutoConnectClient_bool=false;
+			}
+			else
+				strcpy(pszId_char,pszId);
+			//vncService::PostAddAutoConnectClient( pszId );
 
 			continue;
 		}
-		/*
-		if (strncmp(&szCmdLine[i], winvncFTNoUserImpersonation, strlen(winvncFTNoUserImpersonation)) == 0)
-		{
-			// We disable User Impersonnation for FT thread
-			// (so even a non loged user can access the whole FileSystem)
-			vncService::PostAddNewClient(998, 998); // sf@2005 - I still hate to do that ;)
-			i+=strlen(winvncFTNoUserImpersonation);
-			continue;
-		}
-		*/
-		if (strncmp(&szCmdLine[i], winvncAddNewClient, strlen(winvncAddNewClient)) == 0)
+
+		if (strncmp(&szCmdLine[i], winvncConnect, strlen(winvncConnect)) == 0)
 		{
 			// Add a new client to an existing copy of winvnc
-			i+=strlen(winvncAddNewClient);
+			i+=strlen(winvncConnect);
 
 			// First, we have to parse the command line to get the filename to use
 			int start, end;
@@ -364,8 +390,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 					delete [] name;
 					if (address != 0) {
 						// Post the IP address to the server
-
-						vncService::PostAddNewClient(address, port);
+						// We can not contact a runnning service, permissions, so we must store the settings
+						// and process until the vncmenu has been started
+						PostAddNewClient_bool=true;
+						port_int=port;
+						address_vcard=address;
+						//vncService::PostAddNewClient(address, port);
 					}
 				}
 				i=end;
@@ -374,7 +404,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 			else 
 			{
 				// Tell the server to show the Add New Client dialog
-				vncService::PostAddNewClient(0, 0);
+				// We can not contact a runnning service, permissions, so we must store the settings
+				// and process until the vncmenu has been started
+				PostAddNewClient_bool=true;
+				port_int=0;
+				address_vcard=0;
+				//vncService::PostAddNewClient(0, 0);
 			}
 			continue;
 		}
@@ -389,6 +424,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 	// If no arguments were given then just run
 	if (!argfound)
 	{
+		if (!Myinit(hInstance)) return 0;
 		return WinVNCAppMain();
 	}
 
@@ -518,6 +554,14 @@ DWORD WINAPI imp_desktop_thread(LPVOID lpParam)
 		PostQuitMessage(0);
 	}
 
+	// This is a good spot to handle the old PostAdd messages
+	if (PostAddAutoConnectClient_bool)
+		vncService::PostAddAutoConnectClient( pszId_char );
+	if (PostAddAutoConnectClient_bool_null)
+		vncService::PostAddAutoConnectClient( NULL );
+	if (PostAddNewClient_bool)
+	vncService::PostAddNewClient(address_vcard, port_int);
+
 	MSG msg;
 	while (GetMessage(&msg,0,0,0) != 0 && !fShutdownOrdered)
 	{
@@ -589,13 +633,10 @@ int WinVNCAppMain()
 	vncInstHandler *instancehan=new vncInstHandler;
 	
 	if (!instancehan->Init())
-	{
-		if (!AllowMulti)
-		{
-			// We don't allow multiple instances!
-			if (!DisableMultiWarning) MessageBox(NULL, sz_ID_ANOTHER_INST, szAppName, MB_OK);
-			return 0;
-		}
+	{	
+		// We don't allow multiple instances!
+		MessageBox(NULL, sz_ID_ANOTHER_INST, szAppName, MB_OK);
+		return 0;
 	}
 
 	//vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - Previous instance checked - Trying to create server\n"));
@@ -611,37 +652,15 @@ int WinVNCAppMain()
 	server.RunningFromExternalService(fRunningFromExternalService);
 
 	// sf@2007 - New impersonation thread stuff for tray icon & menu
-
-	/* 
-	// Create tray icon & menu if we're running as an app
-	vncMenu *menu = new vncMenu(&server);
-	if (menu == NULL)
-	{
-		vnclog.Print(LL_INTERR, VNCLOG("failed to create tray menu\n"));
-		PostQuitMessage(0);
-	}
-	*/
-	/*
-	MSG msg;
-	while (GetMessage(&msg, NULL, 0,0) ) {
-		//vnclog.Print(LL_INTINFO, VNCLOG("Message %d received\n"), msg.message);
-
-		TranslateMessage(&msg);  // convert key ups and downs to chars
-		DispatchMessage(&msg);
-	}
-	vnclog.Print(LL_STATE, VNCLOG("shutting down server\n"));
-	*/
-
 	// Subscribe to shutdown event
-	hShutdownEvent = OpenEvent(EVENT_ALL_ACCESS, FALSE, "Global\\SessionEvent");
+	hShutdownEvent = OpenEvent(EVENT_ALL_ACCESS, FALSE, "Global\\SessionEventUltra");
 	ResetEvent(hShutdownEvent);
 	vnclog.Print(LL_STATE, VNCLOG("***************** SDEvent created \n"));
 	// Create the timer that looks periodicaly for shutdown event
 	mmRes = -1;
 	InitSDTimer();
 
-	//int nn = 10;
-	while (/*nn-- > 0 &&*/ !fShutdownOrdered)
+	while ( !fShutdownOrdered)
 	{
 		//vnclog.Print(LL_STATE, VNCLOG("################## Creating Imp Thread : %d \n"), nn);
 
@@ -654,15 +673,9 @@ int WinVNCAppMain()
 		vnclog.Print(LL_STATE, VNCLOG("################## Closing Imp Thread\n"));
 	}
 
-	/*
-	if (menu != NULL)
-		delete menu;
-	*/
-
 	if (instancehan!=NULL)
 		delete instancehan;
 
 	vnclog.Print(LL_STATE, VNCLOG("################## SHUTING DOWN SERVER ####################\n"));
 	return 1;
-	//return msg.wParam;
 };

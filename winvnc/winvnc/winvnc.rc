@@ -106,7 +106,7 @@ END
 IDD_ABOUT DIALOGEX 0, 0, 282, 158
 STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION " About WinVNC"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,8,135,54,16
     CONTROL         139,IDC_VNCLOGO,"Static",SS_BITMAP | SS_CENTERIMAGE | 
@@ -462,19 +462,23 @@ IDR_TRAYMENU MENU DISCARDABLE
 BEGIN
     POPUP "tray"
     BEGIN
+        MENUITEM "&About WinVNC",               ID_ABOUT
+        MENUITEM SEPARATOR
         MENUITEM "&Admin Properties",           ID_ADMIN_PROPERTIES
         MENUITEM "&Properties",                 ID_PROPERTIES
-        MENUITEM SEPARATOR
         MENUITEM SEPARATOR
         MENUITEM "Add &New Client",             ID_OUTGOING_CONN
         MENUITEM "&Kill All Clients",           ID_KILLCLIENTS
         MENUITEM SEPARATOR
         MENUITEM "&List All Clients",           ID_LISTCLIENTS
         MENUITEM SEPARATOR
-        MENUITEM "&About WinVNC",               ID_ABOUT
+        MENUITEM "Install Service",             ID_RUNASSERVICE
+        MENUITEM "Uninstall Service",           ID_UNINSTALL_SERVICE
+        MENUITEM "Stop Service",                ID_CLOSE_SERVICE
+        MENUITEM "Start Service (need to be previous installed)", 
+                                                ID_START_SERVICE
         MENUITEM SEPARATOR
         MENUITEM "&Close VNC Connections",      ID_CLOSE
-        MENUITEM "Close VNC (service)",         ID_CLOSE_SERVICE
     END
 END
 

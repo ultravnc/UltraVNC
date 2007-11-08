@@ -1304,10 +1304,10 @@ vncProperties::Load(BOOL usersettings)
 {
 	vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - Entering Load\n"));
 
-	if (m_dlgvisible) {
-		vnclog.Print(LL_INTWARN, VNCLOG("service helper invoked while Properties panel displayed\n"));
-		return;
-	}
+	//if (m_dlgvisible) {
+	//	vnclog.Print(LL_INTWARN, VNCLOG("service helper invoked while Properties panel displayed\n"));
+	//	return;
+	//}
 	ResetRegistry();
 
 	if (vncService::RunningAsService()) usersettings=false;
@@ -1855,11 +1855,11 @@ vncProperties::SaveUserPrefs(HKEY appkey)
 
 void vncProperties::LoadFromIniFile()
 {
-	if (m_dlgvisible)
-	{
-		vnclog.Print(LL_INTWARN, VNCLOG("service helper invoked while Properties panel displayed\n"));
-		return;
-	}
+	//if (m_dlgvisible)
+	//{
+	//	vnclog.Print(LL_INTWARN, VNCLOG("service helper invoked while Properties panel displayed\n"));
+	//	return;
+	//}
 
 	char username[UNLEN+1];
 	DWORD dw;

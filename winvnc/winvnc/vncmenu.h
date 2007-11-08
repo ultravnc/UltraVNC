@@ -40,10 +40,6 @@ class vncMenu;
 #include "vncListDlg.h"
 
 // Constants
-extern const UINT MENU_PROPERTIES_SHOW;
-extern const UINT MENU_DEFAULT_PROPERTIES_SHOW;
-extern const UINT MENU_ABOUTBOX_SHOW;
-extern const UINT MENU_SERVICEHELPER_MSG;
 extern const UINT MENU_ADD_CLIENT_MSG;
 extern const UINT MENU_AUTO_RECONNECT_MSG;
 extern const char *MENU_CLASS_NAME;

@@ -42,12 +42,7 @@
 #include "HideDesktop.h"
 
 // Constants
-const UINT MENU_PROPERTIES_SHOW = RegisterWindowMessage("WinVNC.Properties.User.Show");
-const UINT MENU_DEFAULT_PROPERTIES_SHOW = RegisterWindowMessage("WinVNC.Properties.Default.Show");
-const UINT MENU_ABOUTBOX_SHOW = RegisterWindowMessage("WinVNC.AboutBox.Show");
-const UINT MENU_SERVICEHELPER_MSG = RegisterWindowMessage("WinVNC.ServiceHelper.Message");
 const UINT MENU_ADD_CLIENT_MSG = RegisterWindowMessage("WinVNC.AddClient.Message");
-const UINT MENU_REMOVE_CLIENTS_MSG = RegisterWindowMessage("WinVNC.RemoveClients.Message"); // REalVNc 336
 const UINT MENU_AUTO_RECONNECT_MSG = RegisterWindowMessage("WinVNC.AddAutoClient.Message");
 
 const UINT FileTransferSendPacketMessage = RegisterWindowMessage("UltraVNC.Viewer.FileTransferSendPacketMessage");
@@ -230,7 +225,7 @@ vncMenu::vncMenu(vncServer *server)
 	ResetEvent(hEvent);
 	*/
 
-	SetTimer(m_hwnd, 1, 100, NULL);
+	SetTimer(m_hwnd, 1, 5000, NULL);
 
 
 	// sf@2002
@@ -488,12 +483,16 @@ vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 			m_properties.AllowProperties() ? MF_ENABLED : MF_GRAYED);
 			EnableMenuItem(m_hmenu, ID_CLOSE,
 			m_properties.AllowShutdown() ? MF_ENABLED : MF_GRAYED);
-			EnableMenuItem(m_hmenu, ID_CLOSE_SERVICE,
-			m_properties.AllowShutdown()  ? MF_ENABLED : MF_GRAYED);
 			EnableMenuItem(m_hmenu, ID_KILLCLIENTS,
 			m_properties.AllowEditClients() ? MF_ENABLED : MF_GRAYED);
 			EnableMenuItem(m_hmenu, ID_OUTGOING_CONN,
 			m_properties.AllowEditClients() ? MF_ENABLED : MF_GRAYED);
+
+			EnableMenuItem(m_hmenu, ID_CLOSE_SERVICE,vncService::RunningAsService() ? MF_ENABLED : MF_GRAYED);
+			EnableMenuItem(m_hmenu, ID_START_SERVICE,(vncService::IsInstalled() && !vncService::RunningAsService()) ? MF_ENABLED : MF_GRAYED);
+			EnableMenuItem(m_hmenu, ID_RUNASSERVICE,(!vncService::IsInstalled() &&!vncService::RunningAsService()) ? MF_ENABLED : MF_GRAYED);
+			EnableMenuItem(m_hmenu, ID_UNINSTALL_SERVICE,vncService::IsInstalled() ? MF_ENABLED : MF_GRAYED);
+
 			if (msg == NIM_ADD)
 			{
 				IsIconSet=true;
@@ -545,7 +544,6 @@ void vncMenu::Shutdown()
 }
 
 
-int counter=0;
 char newuser[UNLEN+1];
 // Process window messages
 LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
@@ -564,41 +562,9 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 	case WM_TIMER:
 		// sf@2007 - Can't get the WTS_CONSOLE_CONNECT message work properly for now..
 		// So use a hack instead
-		if (_this->m_server->RunningFromExternalService())
-		{
-			/*if (!vncService::InputDesktopSelected())
-			{
-				if (!vncService::SelectDesktop(NULL)) 
-				{
-				vnclog.Print(LL_INTERR, VNCLOG("!InputDesktopSelected() \n"));
-				_this->m_server->AutoRestartFlag(TRUE);
-				_this->m_server->KillAuthClients();
-				_this->m_server->KillSockConnect();
-				_this->m_server->ShutdownServer();
-				PostMessage(hwnd, WM_CLOSE, 0, 0);
-				}
-			}*/
 
-			/* Does not work when vncMenu is created from imp_thread
-			DWORD result=WaitForSingleObject(_this->hEvent, 0);
-			if (WAIT_OBJECT_0==result)
+		if ( ! _this->m_server->GetDisableTrayIcon())
 			{
-				ResetEvent(_this->hEvent);
-				vnclog.Print(LL_INTERR, VNCLOG("WaitForSingleObject - Shutdown server\n"));
-				_this->m_server->AutoRestartFlag(TRUE);
-				_this->m_server->KillAuthClients();
-				_this->m_server->KillSockConnect();
-				_this->m_server->ShutdownServer();
-				PostMessage(hwnd, WM_CLOSE, 0, 0);
-			}
-			*/
-
-		}
-		counter++;
-
-		if ( ! _this->m_server->GetDisableTrayIcon() && counter>50)
-			{
-				counter=0;
 				vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::TIMER TrayIcon 5s hack\n"));
 
 				if (_this->m_server->RunningFromExternalService())
@@ -673,53 +639,6 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		// User has clicked an item on the tray menu
 		switch (LOWORD(wParam))
 		{
-		/*case ID_ONLINEHELP:
-			{
-			HANDLE hProcess,hPToken;
-			DWORD id=GetExplorerLogonPid();
-			if (id!=0) 
-			{
-				hProcess = OpenProcess(MAXIMUM_ALLOWED,FALSE,id);
-				if(!OpenProcessToken(hProcess,TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY
-										|TOKEN_DUPLICATE|TOKEN_ASSIGN_PRIMARY|TOKEN_ADJUST_SESSIONID
-										|TOKEN_READ|TOKEN_WRITE,&hPToken)) break;
-				ImpersonateLoggedOnUser(hPToken);
-				int iImpersonateResult = GetLastError();
-				if(iImpersonateResult == ERROR_SUCCESS)
-					{
-						ShellExecute(GetDesktopWindow(), "open", "http://forum.ultravnc.info/", "", 0, SW_SHOWNORMAL);
-					}
-				//Once the operation is over revert back to system account.
-				RevertToSelf();
-				CloseHandle(hProcess);
-				CloseHandle(hPToken);
-			}
-			}
-			break;
-		case ID_HOME:
-			{
-			HANDLE hProcess,hPToken;
-			DWORD id=GetExplorerLogonPid();
-			if (id!=0) 
-			{
-				hProcess = OpenProcess(MAXIMUM_ALLOWED,FALSE,id);
-				if(!OpenProcessToken(hProcess,TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY
-										|TOKEN_DUPLICATE|TOKEN_ASSIGN_PRIMARY|TOKEN_ADJUST_SESSIONID
-										|TOKEN_READ|TOKEN_WRITE,&hPToken)) break;
-				ImpersonateLoggedOnUser(hPToken);
-				int iImpersonateResult = GetLastError();
-				if(iImpersonateResult == ERROR_SUCCESS)
-					{
-						ShellExecute(GetDesktopWindow(), "open", "http://www.uvnc.com", "", 0, SW_SHOWNORMAL);
-					}
-				//Once the operation is over revert back to system account.
-				RevertToSelf();
-				CloseHandle(hProcess);
-				CloseHandle(hPToken);
-			}
-			}
-			break;*/
-
 		case ID_DEFAULT_PROPERTIES:
 			// Show the default properties dialog, unless it is already displayed
 			vnclog.Print(LL_INTINFO, VNCLOG("show default properties requested\n"));
@@ -776,55 +695,153 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			fShutdownOrdered=TRUE;
 			PostMessage(hwnd, WM_CLOSE, 0, 0);
 			break;
+		case ID_UNINSTALL_SERVICE:
+			{
+			HANDLE hProcess,hPToken;
+			DWORD id=GetExplorerLogonPid();
+				if (id!=0) 
+				{
+					hProcess = OpenProcess(MAXIMUM_ALLOWED,FALSE,id);
+					if(!OpenProcessToken(hProcess,TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY
+											|TOKEN_DUPLICATE|TOKEN_ASSIGN_PRIMARY|TOKEN_ADJUST_SESSIONID
+											|TOKEN_READ|TOKEN_WRITE,&hPToken)) break;
+
+					char dir[MAX_PATH];
+					char exe_file_name[MAX_PATH];
+					GetModuleFileName(0, exe_file_name, MAX_PATH);
+					strcpy(dir, exe_file_name);
+					strcat(dir, " -uninstallhelper");
+		
+					{
+					STARTUPINFO          StartUPInfo;
+					PROCESS_INFORMATION  ProcessInfo;
+					HANDLE Token=NULL;
+					HANDLE process=NULL;
+					ZeroMemory(&StartUPInfo,sizeof(STARTUPINFO));
+					ZeroMemory(&ProcessInfo,sizeof(PROCESS_INFORMATION));
+					StartUPInfo.wShowWindow = SW_SHOW;
+					StartUPInfo.lpDesktop = "Winsta0\\Default";
+					StartUPInfo.cb = sizeof(STARTUPINFO);
+			
+					CreateProcessAsUser(hPToken,NULL,dir,NULL,NULL,FALSE,DETACHED_PROCESS,NULL,NULL,&StartUPInfo,&ProcessInfo);
+					CloseHandle(hProcess);
+					CloseHandle(hPToken);
+					}
+					vnclog.Print(LL_INTINFO, VNCLOG("KillAuthClients() ID_CLOSE \n"));
+					_this->m_server->KillAuthClients();
+					fShutdownOrdered=TRUE;
+					PostMessage(hwnd, WM_CLOSE, 0, 0);
+				}
+			}
+			break;
+		case ID_RUNASSERVICE:
+			{
+			HANDLE hProcess,hPToken;
+			DWORD id=GetExplorerLogonPid();
+				if (id!=0) 
+				{
+					hProcess = OpenProcess(MAXIMUM_ALLOWED,FALSE,id);
+					if(!OpenProcessToken(hProcess,TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY
+											|TOKEN_DUPLICATE|TOKEN_ASSIGN_PRIMARY|TOKEN_ADJUST_SESSIONID
+											|TOKEN_READ|TOKEN_WRITE,&hPToken)) break;
+
+					char dir[MAX_PATH];
+					char exe_file_name[MAX_PATH];
+					GetModuleFileName(0, exe_file_name, MAX_PATH);
+					strcpy(dir, exe_file_name);
+					strcat(dir, " -installhelper");
+		
+
+					STARTUPINFO          StartUPInfo;
+					PROCESS_INFORMATION  ProcessInfo;
+					HANDLE Token=NULL;
+					HANDLE process=NULL;
+					ZeroMemory(&StartUPInfo,sizeof(STARTUPINFO));
+					ZeroMemory(&ProcessInfo,sizeof(PROCESS_INFORMATION));
+					StartUPInfo.wShowWindow = SW_SHOW;
+					StartUPInfo.lpDesktop = "Winsta0\\Default";
+					StartUPInfo.cb = sizeof(STARTUPINFO);
+			
+					CreateProcessAsUser(hPToken,NULL,dir,NULL,NULL,FALSE,DETACHED_PROCESS,NULL,NULL,&StartUPInfo,&ProcessInfo);
+					CloseHandle(hProcess);
+					CloseHandle(hPToken);
+				}
+			vnclog.Print(LL_INTINFO, VNCLOG("KillAuthClients() ID_CLOSE \n"));
+			_this->m_server->KillAuthClients();
+			fShutdownOrdered=TRUE;
+			PostMessage(hwnd, WM_CLOSE, 0, 0);
+			}
+			break;
 		case ID_CLOSE_SERVICE:
 			{
 			HANDLE hProcess,hPToken;
 			DWORD id=GetExplorerLogonPid();
-			if (id!=0) 
-			{
-				hProcess = OpenProcess(MAXIMUM_ALLOWED,FALSE,id);
-				if(!OpenProcessToken(hProcess,TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY
-										|TOKEN_DUPLICATE|TOKEN_ASSIGN_PRIMARY|TOKEN_ADJUST_SESSIONID
-										|TOKEN_READ|TOKEN_WRITE,&hPToken)) break;
+				if (id!=0) 
+				{
+					hProcess = OpenProcess(MAXIMUM_ALLOWED,FALSE,id);
+					if(!OpenProcessToken(hProcess,TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY
+											|TOKEN_DUPLICATE|TOKEN_ASSIGN_PRIMARY|TOKEN_ADJUST_SESSIONID
+											|TOKEN_READ|TOKEN_WRITE,&hPToken)) break;
 
-				
-				char dir[MAX_PATH], *ptr;
-				GetModuleFileName(0, dir, MAX_PATH);
-
-				ptr=strrchr(dir, '\\'); 
-				if(ptr)
-					ptr[1]='\0'; 
-				if(!SetCurrentDirectory(dir)) {
-				return 0;
-				}
-				strcat(dir, "\\stop_servicehelper.exe");
-	
-
-				STARTUPINFO          StartUPInfo;
-				PROCESS_INFORMATION  ProcessInfo;
-				HANDLE Token=NULL;
-				HANDLE process=NULL;
-				ZeroMemory(&StartUPInfo,sizeof(STARTUPINFO));
-				ZeroMemory(&ProcessInfo,sizeof(PROCESS_INFORMATION));
-				StartUPInfo.wShowWindow = SW_SHOW;
-				StartUPInfo.lpDesktop = "Winsta0\\Default";
-				StartUPInfo.cb = sizeof(STARTUPINFO);
+					char dir[MAX_PATH];
+					char exe_file_name[MAX_PATH];
+					GetModuleFileName(0, exe_file_name, MAX_PATH);
+					strcpy(dir, exe_file_name);
+					strcat(dir, " -stopservicehelper");
 		
-				CreateProcessAsUser(hPToken,NULL,dir,NULL,NULL,FALSE,DETACHED_PROCESS,NULL,NULL,&StartUPInfo,&ProcessInfo);
-				CloseHandle(hProcess);
-				CloseHandle(hPToken);
-				
-				/*ImpersonateLoggedOnUser(hPToken);
-				int iImpersonateResult = GetLastError();
-				if(iImpersonateResult == ERROR_SUCCESS)
-					{
-						ShellExecute(GetDesktopWindow(), "open", "stop_service.exe", "", 0, SW_SHOWNORMAL);
-					}
-				//Once the operation is over revert back to system account.
-				RevertToSelf();
-				CloseHandle(hProcess);
-				CloseHandle(hPToken);*/
+
+					STARTUPINFO          StartUPInfo;
+					PROCESS_INFORMATION  ProcessInfo;
+					HANDLE Token=NULL;
+					HANDLE process=NULL;
+					ZeroMemory(&StartUPInfo,sizeof(STARTUPINFO));
+					ZeroMemory(&ProcessInfo,sizeof(PROCESS_INFORMATION));
+					StartUPInfo.wShowWindow = SW_SHOW;
+					StartUPInfo.lpDesktop = "Winsta0\\Default";
+					StartUPInfo.cb = sizeof(STARTUPINFO);
+			
+					CreateProcessAsUser(hPToken,NULL,dir,NULL,NULL,FALSE,DETACHED_PROCESS,NULL,NULL,&StartUPInfo,&ProcessInfo);
+					CloseHandle(hProcess);
+					CloseHandle(hPToken);
+				}
 			}
+			break;
+		case ID_START_SERVICE:
+			{
+			HANDLE hProcess,hPToken;
+			DWORD id=GetExplorerLogonPid();
+				if (id!=0) 
+				{
+					hProcess = OpenProcess(MAXIMUM_ALLOWED,FALSE,id);
+					if(!OpenProcessToken(hProcess,TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY
+											|TOKEN_DUPLICATE|TOKEN_ASSIGN_PRIMARY|TOKEN_ADJUST_SESSIONID
+											|TOKEN_READ|TOKEN_WRITE,&hPToken)) break;
+
+					char dir[MAX_PATH];
+					char exe_file_name[MAX_PATH];
+					GetModuleFileName(0, exe_file_name, MAX_PATH);
+					strcpy(dir, exe_file_name);
+					strcat(dir, " -startservicehelper");
+		
+
+					STARTUPINFO          StartUPInfo;
+					PROCESS_INFORMATION  ProcessInfo;
+					HANDLE Token=NULL;
+					HANDLE process=NULL;
+					ZeroMemory(&StartUPInfo,sizeof(STARTUPINFO));
+					ZeroMemory(&ProcessInfo,sizeof(PROCESS_INFORMATION));
+					StartUPInfo.wShowWindow = SW_SHOW;
+					StartUPInfo.lpDesktop = "Winsta0\\Default";
+					StartUPInfo.cb = sizeof(STARTUPINFO);
+			
+					CreateProcessAsUser(hPToken,NULL,dir,NULL,NULL,FALSE,DETACHED_PROCESS,NULL,NULL,&StartUPInfo,&ProcessInfo);
+					CloseHandle(hProcess);
+					CloseHandle(hPToken);
+					vnclog.Print(LL_INTINFO, VNCLOG("KillAuthClients() ID_CLOSE \n"));
+					_this->m_server->KillAuthClients();
+					fShutdownOrdered=TRUE;
+					PostMessage(hwnd, WM_CLOSE, 0, 0);
+				}
 			}
 			break;
 
@@ -957,44 +974,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		return 0;
 	
 	default:
-		// Deal with any of our custom message types
-		if (iMsg == MENU_PROPERTIES_SHOW)
-		{
-			// External request to show our Properties dialog
-			PostMessage(hwnd, WM_COMMAND, MAKELONG(ID_PROPERTIES, 0), 0);
-			return 0;
-		}
-		if (iMsg == MENU_DEFAULT_PROPERTIES_SHOW)
-		{
-			// External request to show our Properties dialog
-			PostMessage(hwnd, WM_COMMAND, MAKELONG(ID_DEFAULT_PROPERTIES, 0), 0);
-			return 0;
-		}
-		if (iMsg == MENU_ABOUTBOX_SHOW)
-		{
-			// External request to show our About dialog
-			PostMessage(hwnd, WM_COMMAND, MAKELONG(ID_ABOUT, 0), 0);
-			return 0;
-		}
-		if (iMsg == MENU_SERVICEHELPER_MSG)
-		{
-			// External ServiceHelper message.
-			// This message holds a process id which we can use to
-			// impersonate a specific user.  In doing so, we can load their
-			// preferences correctly
-
-			// vncService::ProcessUserHelperMessage(wParam, lParam);
-			// Modif Jeremy C.
-			if (!_this->m_properties.Lock_service_helper)
-			{
-			vncService::ProcessUserHelperMessage((WPARAM)&_this->m_server->m_impersonationtoken, lParam); 
-
-			// - Trigger a check of the current user
-			PostMessage(hwnd, WM_USERCHANGED, 0, 0);
-			}
-			return 0;
-		}
-		
+		// Deal with any of our custom message types		
 		// wa@2005 -- added support for the AutoReconnectId
 		// removed the previous code that used 999,999
 		if ( iMsg == MENU_AUTO_RECONNECT_MSG )

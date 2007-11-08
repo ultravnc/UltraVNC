@@ -47,28 +47,24 @@ extern DWORD		mainthreadId;
 extern int WinVNCAppMain();
 
 // Standard command-line flag definitions
-const char winvncRunService[]		= "-service";
-const char winvncRunServiceHelper[]	= "-servicehelper";
+const char winvncRunService[]		= "-service_run";
+const char winvncStartService[]		= "-service";
 const char winvncRunAsUserApp[]		= "-run";
-
-const char winvncInstallService[]	= "-install";
-const char winvncInstallServices[]	= "-sinstall";
-const char winvncRemoveService[]	= "-remove";
-const char winvncReinstallService[]	= "-reinstall";
-
-const char winvncShowProperties[]	= "-settings";
-const char winvncShowDefaultProperties[]	= "-defaultsettings";
-const char winvncShowAbout[]		= "-about";
-const char winvncKillRunningCopy[]	= "-kill";
-
-const char winvncAddNewClient[]		= "-connect";
-
-const char winvncShowHelp[]			= "-help";
-const char winvncAllowMulti[]		= "-multi";
-const char winvncDisableMultiWarning[]		= "-fus";
+const char winvncConnect[]		= "-connect";
 const char winvncAutoReconnect[]	= "-autoreconnect";
 const char winvncAutoReconnectId[]	= "id:";
-//const char winvncFTNoUserImpersonation[]	= "-ftnouserimpersonation";
+
+const char winvncSettingshelper[]		= "-settingshelper";
+const char winvncSettings[]				= "-settings";
+const char winvncStopserviceHelper[]	= "-stopservicehelper";
+const char winvncStopservice[]			= "-stopservice";
+const char winvncStartserviceHelper[]	= "-startservicehelper";
+const char winvncStartservice[]			= "-startservice";
+
+const char winvncInstallService[]		= "-install";
+const char winvncUnInstallService[]		= "-uninstall";
+const char winvncInstallServiceHelper[]		= "-installhelper";
+const char winvncUnInstallServiceHelper[]		= "-uninstallhelper";
 
 // Usage string
-const char winvncUsageText[]		= "winvnc [-run] [-kill] [-autoreconnect[ ID:????]] [-connect host[:display]] [-connect host[::port]] [-install] [-installs] [-remove] [-settings] [-defaultsettings] [-about]\n";
+const char winvncUsageText[]		= "winvnc [-run] [-autoreconnect[ ID:????]] [-connect host[:display]] [-connect host[::port]] \n";
