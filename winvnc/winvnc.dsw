@@ -1,5 +1,5 @@
 Microsoft Developer Studio Workspace File, Format Version 6.00
-# WARNUNG: DIESE ARBEITSBEREICHSDATEI DARF NICHT BEARBEITET ODER GELÖSCHT WERDEN!
+# WARNING: DO NOT EDIT OR DELETE THIS WORKSPACE FILE!
 
 ###############################################################################
 
@@ -15,7 +15,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "Xregion"=..\Xregion\Xregion.dsp - Package Owner=<4>
+Project: "Xregion"="..\Xregion\Xregion.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -87,7 +87,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "libjpeg"=..\libjpeg\libjpeg.dsp - Package Owner=<4>
+Project: "libjpeg"="..\libjpeg\libjpeg.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -111,7 +111,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "logmessages"=.\logger\logmessages.dsp - Package Owner=<4>
+Project: "logmessages"=".\logger\logmessages.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -123,7 +123,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "omnithread"=.\omnithread\omnithread.dsp - Package Owner=<4>
+Project: "omnithread"=".\omnithread\omnithread.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -135,7 +135,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "rdr"=..\rdr\rdr.dsp - Package Owner=<4>
+Project: "rdr"="..\rdr\rdr.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -159,7 +159,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "vnchooks"=.\vnchooks\vnchooks.dsp - Package Owner=<4>
+Project: "vnchooks"=".\vnchooks\vnchooks.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -171,7 +171,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "winvnc"=.\winvnc\winvnc.dsp - Package Owner=<4>
+Project: "winvnc"=".\winvnc\winvnc.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -181,9 +181,6 @@ Package=<4>
 {{{
     Begin Project Dependency
     Project_Dep_Name omnithread
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name rdr
     End Project Dependency
     Begin Project Dependency
     Project_Dep_Name zlib
@@ -224,11 +221,14 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name workgrpdomnt4
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name rdr
+    End Project Dependency
 }}}
 
 ###############################################################################
 
-Project: "winvncsc"=.\winvncsc\winvnc2.dsp - Package Owner=<4>
+Project: "winvncsc"=".\winvncsc\winvnc2.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -248,9 +248,6 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name zlib
     End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name rdr
-    End Project Dependency
 }}}
 
 ###############################################################################
@@ -267,7 +264,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "zlib"=..\zlib\zlib.dsp - Package Owner=<4>
+Project: "zlib"="..\zlib\zlib.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
