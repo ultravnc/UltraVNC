@@ -13,25 +13,6 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Neutral resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEU)
-#ifdef _WIN32
-LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
-#pragma code_page(1252)
-#endif //_WIN32
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// JAVACLASS
-//
-
-IDR_FTPFRAME_CLASS      JAVACLASS DISCARDABLE   "res\\FTPFrame.class"
-#endif    // Neutral resources
-/////////////////////////////////////////////////////////////////////////////
-
-
-/////////////////////////////////////////////////////////////////////////////
 // English (U.S.) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
@@ -45,6 +26,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // JAVACLASS
 //
 
+IDR_FTPFRAME_CLASS      JAVACLASS DISCARDABLE   "res\\FTPFrame.class"
 IDR_AUTHPANEL_CLASS     JAVACLASS DISCARDABLE   "res\\AuthPanel.class"
 IDR_CLIPBOARDFRAME_CLASS JAVACLASS DISCARDABLE   "res\\clipboardFrame.class"
 IDR_OPTIONSFRAME_CLASS  JAVACLASS DISCARDABLE   "res\\optionsFrame.class"
@@ -56,6 +38,7 @@ IDR_DESCIPHER_CLASS     JAVACLASS DISCARDABLE   "res\\DesCipher.class"
 IDR_RECFRAME_CLASS      JAVACLASS DISCARDABLE   "res\\RecordingFrame.class"
 IDR_SESSIONREC_CLASS    JAVACLASS DISCARDABLE   "res\\SessionRecorder.class"
 IDR_DH_CLASS            JAVACLASS DISCARDABLE   "res\\dh.class"
+IDR_FTPFRAMESTRCOMP_CLASS JAVACLASS DISCARDABLE   "res\\ftpframe$strcomp.class"
 
 /////////////////////////////////////////////////////////////////////////////
 //

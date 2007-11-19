@@ -162,9 +162,10 @@ const FileMap filemapping []	={
 	{"/RecordingFrame.class", "JavaClass", IDR_RECFRAME_CLASS},
 	{"/SessionRecorder.class", "JavaClass", IDR_SESSIONREC_CLASS},
 	{"/FTPFrame.class", "JavaClass", IDR_FTPFRAME_CLASS},
-	{"/DH.class", "JavaClass", IDR_DH_CLASS}
+	{"/DH.class", "JavaClass", IDR_DH_CLASS},
+	{"/FTPFRame$StrComp.class", "JavaClass", IDR_FTPFRAMESTRCOMP_CLASS},
 	};
-const int filemappingsize		= 13;
+const int filemappingsize		= 14;
 
 #ifdef HTTP_SAMEPORT
 // Added for HTTP-via-RFB. Allows us to handle an HTTP transaction

@@ -37,6 +37,7 @@
 #define IDD_PROPERTIES1                 146
 #define IDR_FTPFRAME_CLASS              148
 #define IDR_DH_CLASS                    149
+#define IDR_FTPFRAMESTRCOMP_CLASS       151
 #define IDD_USER_NAME                   604
 #define IDD_PASSWORD                    608
 #define IDD_LOGON                       1002
@@ -248,7 +249,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        150
+#define _APS_NEXT_RESOURCE_VALUE        152
 #define _APS_NEXT_COMMAND_VALUE         40019
 #define _APS_NEXT_CONTROL_VALUE         1119
 #define _APS_NEXT_SYMED_VALUE           101
