@@ -405,7 +405,7 @@ public class VncViewer extends java.applet.Applet
 
   void prologueDetectAuthProtocol() throws Exception {
 
-    rfb = new RfbProto(host, port, this);
+    rfb = new RfbProto(host, port, this, null, 0); // Modif: troessner - sf@2007: not yet used
 
     rfb.readVersionMsg();
 
@@ -431,7 +431,7 @@ public class VncViewer extends java.applet.Applet
 
   boolean tryAuthenticate(String us, String pw) throws Exception {
     
-    rfb = new RfbProto(host, port, this);
+    rfb = new RfbProto(host, port, this, null, 0); // Modif: troessner - sf@2007: not yet used
 
     rfb.readVersionMsg();
 

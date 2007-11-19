@@ -35,6 +35,7 @@ import java.util.zip.*;
 
 class RfbProto {
 
+	private final static boolean DEBUG  = false; // Modif: troessner
 	final String versionMsg = "RFB 003.003\n";
 	final static int ConnFailed = 0, NoAuth = 1, VncAuth = 2, MsLogon = 0xfffffffa;
 	final static int VncAuthOK = 0, VncAuthFailed = 1, VncAuthTooMany = 2;
@@ -157,7 +158,7 @@ class RfbProto {
 
 	String rfbZipDirectoryPrefix = "!UVNCDIR-\0";
 	// Transfered directory are zipped in a file with this prefix. Must end with "-"
-	
+
 	// End of FileTransfer part 
 	
 	String host;
@@ -203,11 +204,17 @@ class RfbProto {
 	// Constructor. Make TCP connection to RFB server.
 	//
 
-	RfbProto(String h, int p, VncViewer v) throws IOException {
+	RfbProto(String h, int p, VncViewer v, String repeaterHost, int repeaterPort) throws IOException {
 		viewer = v;
 		host = h;
 		port = p;
-		sock = new Socket(host, port);
+		
+        if (repeaterHost != null) {
+            sock = new Socket(repeaterHost, repeaterPort);
+            doRepeater(sock,host,port);
+        } else {
+            sock = new Socket(host, port);
+        }
 		is =
 			new DataInputStream(
 				new BufferedInputStream(sock.getInputStream(), 16384));
@@ -221,6 +228,25 @@ class RfbProto {
 	
 		sendFileSource = "";
 	}
+	
+	    private void doRepeater(Socket sock, String host, int port) throws IOException {
+        // Read the RFB protocol version
+        final String buf2 = "";
+        sock.getOutputStream().write(buf2.getBytes());
+
+        DataInputStream is = new DataInputStream(sock.getInputStream());
+        String line = is.readLine();
+
+        // Write the ID
+        //if (!id.startsWith("ID:"))
+            //id = "ID:" + id;
+
+        String dest = host + ":" + port;
+        byte[] buf = new byte[250];
+        System.arraycopy(dest.getBytes("ISO-8859-1"), 0, buf, 0, dest.length());
+
+        sock.getOutputStream().write(buf);
+    }
 
 	void close() {
 		try {
@@ -643,7 +669,7 @@ class RfbProto {
 		}
 		else
 		{
-			System.out.println("ContentType: " + contentType);
+			//System.out.println("ContentType: " + contentType);
 		}
 	}
 
@@ -682,7 +708,7 @@ class RfbProto {
 		}
 		else
 		{
-			System.out.println("ContentParam: " + contentParam);
+			//System.out.println("ContentParam: " + contentParam);
 		}
 	}
 
@@ -918,6 +944,9 @@ class RfbProto {
 		viewer.ftp.refreshRemoteLocation();	
 		viewer.ftp.historyComboBox.insertItemAt(new String(" > Deleted File On Remote Machine: " + f.substring(0, f.length()-1)),0);
 		viewer.ftp.historyComboBox.setSelectedIndex(0);
+		viewer.ftp.setEnabled(false);
+		viewer.ftp.repaint();
+		viewer.ftp.setEnabled(true);
 	}
 
 	//Call this method to delete a file at server
@@ -1141,7 +1170,9 @@ class RfbProto {
 		}
 		catch (IOException e)
 		{
-			System.err.println(e);
+			System.out.println("IOException in readServerDirectory(String text) in RfbProto!");
+			System.out.println(e);
+			System.out.println("End of exception");
 		}
 
 	}
@@ -1171,7 +1202,7 @@ class RfbProto {
 		// Populate the remote directory
 		viewer.ftp.changeRemoteDrive();
 		viewer.ftp.refreshRemoteLocation();
-		
+
 	}
 
 	//Internally used to receive directory content from server
@@ -1253,6 +1284,9 @@ class RfbProto {
 			cAlternateFileName = (char) is.readUnsignedByte();
 			length--;
 		}
+		//System.out.println("fileName= " + fileName);
+		//System.out.println("dwFileAttributes= " + dwFileAttributes);
+		
 		if (dwFileAttributes == 268435456
 			|| dwFileAttributes == 369098752
 			|| dwFileAttributes == 285212672 
@@ -1260,7 +1294,8 @@ class RfbProto {
 			|| dwFileAttributes == 824705024
 			||	dwFileAttributes == 807927808
 			|| dwFileAttributes == 371720192
-			|| dwFileAttributes == 369623040)
+			|| dwFileAttributes == 369623040
+			|| dwFileAttributes == 805306368) // Fix: troessner
 		{
 			fileName = " [" + fileName + "]";
 			remoteDirsList.add(fileName); // sf@2004
@@ -1289,7 +1324,7 @@ class RfbProto {
 		remoteDirsList.clear();
 		remoteFilesList.clear();
 		
-		viewer.ftp.printDirectory(a);
+		viewer.ftp.printRemoteDirectory(a);
 	}
 
 	//Internally used to signify the drive requested is not ready
@@ -1682,6 +1717,17 @@ class RfbProto {
 				case KeyEvent.VK_F12 :
 					key = 0xffc9;
 					break;
+			    /*
+			     * EDIT troessner start
+			     */
+			     /*
+				case KeyEvent.VK_WINDOWS:
+					key = 0xFFEB;
+					break;
+			     */
+			    /*
+			     * EDIT troessner end
+			     */	
 				default :
 					return;
 			}

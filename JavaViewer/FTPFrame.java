@@ -23,6 +23,9 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.Vector;
 import javax.swing.*;
 
@@ -32,18 +35,20 @@ import javax.swing.*;
  *
  */
 
+
 /**
  * @author John Witchel, Kenn Min Chong
+ * sf@2004, 2005, 2006, 2007
  *
  */
 public class FTPFrame extends JFrame implements ActionListener, MouseListener {
-	VncViewer viewer;
+
+	private VncViewer viewer;
 
 	private javax.swing.JPanel jContentPane = null;
 	private javax.swing.JPanel topPanel = null;
 	private javax.swing.JPanel topPanelLocal = null;
 	private javax.swing.JPanel topPanelRemote = null;
-	private javax.swing.JPanel topPanelCenter = null;
 	private javax.swing.JPanel statusPanel = null;
 	private javax.swing.JPanel remotePanel = null;
 	private javax.swing.JPanel localPanel = null;
@@ -54,7 +59,6 @@ public class FTPFrame extends JFrame implements ActionListener, MouseListener {
 	private javax.swing.JButton newFolderButton = null;
 	private javax.swing.JButton stopButton = null;
 	private javax.swing.JButton closeButton = null;
-	private javax.swing.JButton dummyButton = null;
 	private javax.swing.JComboBox localDrivesComboBox = null;
 	private javax.swing.JComboBox remoteDrivesComboBox = null;
 	private javax.swing.JTextField localMachineLabel = null;
@@ -76,68 +80,227 @@ public class FTPFrame extends JFrame implements ActionListener, MouseListener {
 	private Vector remoteList = null;
 	private Vector localList = null;
 	private File currentLocalDirectory = null;	// Holds the current local Directory
-	private File currentRemoteDirectory = null;	// Holds the current remote Directory
-	private File localSelection = null;		// Holds the currently selected local file  
-	private String remoteSelection = null;	// Holds the currently selected remote file
 	public String selectedTable = null;
-	
-//	 sf@2004 - Separate directories and files for better lisibility
-	private ArrayList DirsList;
-	private ArrayList FilesList;	
+	private ArrayList localDirList;
+	private ArrayList localFileList;
+	private final static boolean DEBUG  = false;
 
-	public static void main(String[] args) {
-	}
-	/**
-	 * This is the default constructor
-	 
-	public FTPFrame() {
-		super();
-		initialize();
-	}
-	*/
+
+        // sf@2007 - The 'natural' string comparator is case sensitive... which sucks
+        // for our purpose as the files names beginning with an upper case char are
+        // all grouped before files names starting with a lower case char...
+        private class StrComp implements java.util.Comparator
+        {
+          public int compare(Object obj1, Object obj2)
+          {
+               String str1 = obj1.toString().toUpperCase();
+               String str2 = obj2.toString().toUpperCase();
+               return str1.compareTo(str2);
+          }
+        }
+
+	///////////////////////////////////////////////////////////////////////////
+	//																		//
+	//							Constructor									//
+	//																		//
+	///////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * This is Kenn's Constructor
-	 *
+	 * only constructor
+	 * @param VnvViewer
 	 */
+
 	FTPFrame(VncViewer v) {
 		super("Ultr@VNC File Transfer");
 		viewer = v;
-		// this.setUndecorated(true); // sf@2004
-		this.setResizable(false);  // sf@2004
-		setSize(320, 240);
-		
-		// sf@2004
-		DirsList = new ArrayList();
-		FilesList = new ArrayList();
-		
 		initialize();
 	}
-	
-	 /* Refreshing local and remote directory lists
-	  * after an operation has been performed
+
+	///////////////////////////////////////////////////////////////////////////
+	//																		//
+	//						public - Methods								//
+	//																		//
+	///////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * Implements Action listener.
+	 * @return void
 	 */
-	 void refreshLocalLocation()
-	 {
+
+	public void actionPerformed(ActionEvent evt) {
+		System.out.println(evt.getSource());
+
+		if (evt.getSource() == closeButton) {
+			doClose();
+		}
+		else if (evt.getSource() == sendButton) {
+			Dimension dim = localPanel.getSize();
+			doSend();
+			this.repaint(); // Fix: troessner - Disapearing buttons bug
+		}
+		else if (evt.getSource() == receiveButton) {
+			doReceive();
+			this.repaint();
+		}
+		else if (evt.getSource() == localDrivesComboBox) {
+			changeLocalDrive();
+			this.repaint();
+		}
+		else if (evt.getSource() == remoteDrivesComboBox) {
+			changeRemoteDrive();
+			remoteList.clear();
+			remoteFileTable.setListData(remoteList);
+		}
+		else if (evt.getSource() == localTopButton) {
+			changeLocalDrive();
+			this.repaint();
+		}
+		else if (evt.getSource() == remoteTopButton) {
+		  	changeRemoteDrive();
+			this.repaint();
+		}
+		else if(evt.getSource() == deleteButton) {
+			doDelete();
+			this.repaint();
+			this.repaint();
+		}
+		else if(evt.getSource() == newFolderButton) {
+			doNewFolder();
+			this.repaint();
+			this.repaint();
+		}
+		else if (evt.getSource() == stopButton) {
+			doStop();
+			this.repaint();
+			this.repaint();
+		}
+	}
+
+	/**
+	 * Disable buttons/lists while file transfer is in progress
+	 * @return void
+	 */
+
+	public void disableButtons() {
+
+		closeButton.setEnabled(false);
+		deleteButton.setEnabled(false);
+		localTopButton.setEnabled(false);
+		newFolderButton.setEnabled(false);
+		stopButton.setVisible(true);
+		stopButton.setEnabled(true);
+		receiveButton.setEnabled(false);
+		remoteTopButton.setEnabled(false);
+		sendButton.setEnabled(false);
+		remoteFileTable.setEnabled(false);
+		localFileTable.setEnabled(false);
+		localLocation.setEnabled(false);
+		remoteLocation.setEnabled(false);
+		remoteDrivesComboBox.setEnabled(false);
+		localDrivesComboBox.setEnabled(false);
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE); // sf@2004
+	}
+
+	/**
+	 * Enable buttons/lists when file transfer is done
+	 * @return void
+	 */
+	
+	public void enableButtons() {
+		
+		closeButton.setEnabled(true);
+		deleteButton.setEnabled(true);
+		localTopButton.setEnabled(true);
+		newFolderButton.setEnabled(true);
+		stopButton.setVisible(false);
+		stopButton.setEnabled(false);
+		receiveButton.setEnabled(true);
+		remoteTopButton.setEnabled(true);
+		sendButton.setEnabled(true);
+		remoteFileTable.setEnabled(true);
+		localFileTable.setEnabled(true);
+		localLocation.setEnabled(true);		
+		remoteLocation.setEnabled(true);
+		remoteDrivesComboBox.setEnabled(true);
+		localDrivesComboBox.setEnabled(true);
+	}
+	
+	/**
+	 * This method updates the file table to the current selection of the remoteComboBox
+	 * @return void
+	 */
+	
+	public void changeRemoteDrive() {
+
+		if (!updateDriveList) {
+			String drive =	remoteDrivesComboBox.getSelectedItem().toString().substring(0,1)+ ":\\";
+			viewer.rfb.readServerDirectory(drive);
+			remoteLocation.setText(drive);
+		}
+		remoteList.clear();
+		remoteFileTable.setListData(remoteList);
+	}
+	
+	/**
+	 * Determines which FileTable was double-clicked and updates the table
+	 */
+	
+	public void mouseClicked(MouseEvent e) {
+		
+		// Single clicked
+		if(e.getClickCount() == 1) {
+			// on local file table
+			if (e.getSource() == localFileTable ){  	 
+				updateLocalFileTableSelection();
+			}
+			// on a remote file table
+			else if (e.getSource() == remoteFileTable) {
+				updateRemoteFileTableSelection();						
+			}
+		}
+		// Mouse Double clicked
+		else if (e.getClickCount() == 2) {
+			// Clicked on local file
+			if (e.getSource() == localFileTable) {	
+				updateLocalFileTable();
+			}
+			// Clicked on remote file
+			else if (e.getSource() == remoteFileTable) {	
+				updateRemoteFileTable();
+			}
+		}
+	}
+	
+	/**
+	 * Refreshing local and remote directory lists after an operation has been performed
+	 * @return void
+	 */
+
+	 public void refreshLocalLocation()	{
+		 
 	 	File f = new File(localLocation.getText());
 	 	this.changeLocalDirectory(f);
 	 }
 	 
-	 void refreshRemoteLocation()
-	 {
+	 public void refreshRemoteLocation() {
+		 
 		remoteList.clear();
 		remoteFileTable.setListData(remoteList);	
 		viewer.rfb.readServerDirectory(remoteLocation.getText());
 	 }
+
 	 
-	/*
+	/**
 	 * Prints the list of drives on the remote directory and returns a String[].  
 	 * str takes as string like A:fC:lD:lE:lF:lG:cH:c
 	 * in the form Drive Letter:Drive Type where 
 	 * f = floppy, l = local drive, c=CD-ROM, n = network
+	 * 
+	 * @return String[]
 	 */
-	String[] printDrives(String str) {
-		System.out.println(str);
+ 
+	public String[] printDrives(String str) {
+		
 		updateDriveList = true;
 		remoteDrivesComboBox.removeAllItems();
 		int size = str.length();
@@ -173,72 +336,453 @@ public class FTPFrame extends JFrame implements ActionListener, MouseListener {
 		updateDriveList = false;
 		return drive;
 	}
-	
-	/*Disable buttons/lists while file transfer is in progress*/
-	
-	public void disableButtons()
-	{
-		closeButton.setEnabled(false);
-		deleteButton.setEnabled(false);
-		localTopButton.setEnabled(false);
-		newFolderButton.setEnabled(false);
-		stopButton.setVisible(true);
-		stopButton.setEnabled(true);
-		receiveButton.setEnabled(false);
-		remoteTopButton.setEnabled(false);
-		sendButton.setEnabled(false);
-		remoteFileTable.setEnabled(false);
-		localFileTable.setEnabled(false);	
-		localLocation.setEnabled(false);
-		remoteLocation.setEnabled(false);	
-		remoteDrivesComboBox.setEnabled(false);
-		localDrivesComboBox.setEnabled(false);
-		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE); // sf@2004
-		
-	}
-	/*Enable buttons/lists after file transfer is done*/
-	
-	public void enableButtons()
-	{
-		closeButton.setEnabled(true);
-		deleteButton.setEnabled(true);
-		localTopButton.setEnabled(true);
-		newFolderButton.setEnabled(true);
-		stopButton.setVisible(false);
-		stopButton.setEnabled(false);
-		receiveButton.setEnabled(true);
-		remoteTopButton.setEnabled(true);
-		sendButton.setEnabled(true);
-		remoteFileTable.setEnabled(true);
-		localFileTable.setEnabled(true);
-		localLocation.setEnabled(true);		
-		remoteLocation.setEnabled(true);
-		remoteDrivesComboBox.setEnabled(true);
-		localDrivesComboBox.setEnabled(true);
-		// setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE); // sf@2004
-	}
 
-	/*
+
+	/**
 	 * Print Directory prints out all the contents of a directory
 	 */
-	void printDirectory(ArrayList a) {
+        // Remote directory content sorting - Modif: troessner
+	public void printRemoteDirectory(ArrayList a) {
 
-		for (int i = 0; i < a.size(); i++) {
-			remoteList.addElement(a.get(i));
+                remoteList.clear(); // sf@2007 - Avoids to have the same entries twice in some cases
+
+		ArrayList files = new ArrayList();
+		ArrayList dirs = new ArrayList();
+
+		for (Iterator i = a.iterator(); i.hasNext();) {
+			String name = (String) i.next();
+
+			if(name.equals("[..]")) {
+				remoteList.add(name);
+			}
+			// blank before '[' is mandatory!
+			else if(name.startsWith(" [") && name.endsWith("]")) {
+				dirs.add(name.substring(2, name.length() - 1));
+			}
+			else {
+				files.add(name);
+			}
+		}
+		Collections.sort(dirs, new StrComp());
+		Collections.sort(files, new StrComp());
+
+		for (Iterator i = dirs.iterator(); i.hasNext();) {
+			String dirname = (String) i.next();
+			// blank before '[' is mandatory!
+			remoteList.add(" [" + dirname + "]");
+		}
+		for (Iterator i = files.iterator(); i.hasNext();) {
+			String filename = (String) i.next();
+			remoteList.add(filename);
 		}
 		remoteFileTable.setListData(remoteList);
 	}
 
+
+
+	public void mouseEntered(MouseEvent e) {}
+	public void mouseExited(MouseEvent e) {}
+	public void mousePressed(MouseEvent e) {}
+	public void mouseReleased(MouseEvent e) {}
+
+
+	///////////////////////////////////////////////////////////////////////////
+	//						private - Methods								//
+	///////////////////////////////////////////////////////////////////////////
+
+
+	//************************************************************************//
+	//								ACTIONS									  //
+	//************************************************************************//
+	
+	private void doNewFolder() {
+		
+		String name = JOptionPane.showInputDialog(null,"Enter new directory name", "Create New Directory", JOptionPane.QUESTION_MESSAGE);
+		// Fix: troessner - if name is null, the user hit the "cancel"-button. in that case -> do not create folder
+		if(name == null) {
+			return;
+		}
+		if(selectedTable.equals("remote")) {
+			name = remoteLocation.getText()+name;
+			viewer.rfb.createRemoteDirectory(name);
+		}
+		else {
+			name = localLocation.getText()+name;
+			File f = new File(name);
+			f.mkdir();
+			refreshLocalLocation();
+			historyComboBox.insertItemAt(new String("Created Local Directory: " + name),0);
+			historyComboBox.setSelectedIndex(0);
+		}
+	}
+	
+	private void doClose() {
+		
+		try {
+			this.setVisible(false);
+			viewer.rfb.writeFramebufferUpdateRequest(
+									0,
+									0,
+									viewer.rfb.framebufferWidth,
+									viewer.rfb.framebufferHeight,
+									true);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void doDelete() {
+		
+		System.out.println("Delete Button Pressed");
+		//Call this method to delete a file at server
+		if(selectedTable.equals("remote"))
+		{	
+			String sFileName = ((String) this.remoteFileTable.getSelectedValue());
+			
+//			 sf@2004 - Directory can't be deleted
+			if (sFileName.substring(0, 2).equals(" [") && sFileName.substring((sFileName.length() - 1), sFileName.length()).equals("]"))
+			{
+				JOptionPane.showMessageDialog(null, (String)"Directory Deletion is not yet available in this version...", "FileTransfer Info", JOptionPane.INFORMATION_MESSAGE);
+				return;
+			}			
+			// for (int i = 0; i < remoteList.contains(size(); i++) 
+			// 	remoteFileTable.g(i));
+			// sf@2004 - Delete prompt
+			if (remoteList.contains(sFileName))
+			{
+				int r = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete the file \n< " + sFileName + " >\n on Remote Machine ?", "File Transfer Warning", JOptionPane.YES_NO_OPTION);
+				if (r == JOptionPane.NO_OPTION)
+					return;
+			}
+			
+			String fileName = remoteLocation.getText()+ sFileName.substring(1);
+			viewer.rfb.deleteRemoteFile(fileName);
+		}
+		else
+		{
+			String sFileName = ((String) this.localFileTable.getSelectedValue());
+			
+//			 sf@2004 - Directory can't be deleted
+			if (sFileName.substring(0, 2).equals(" [") && sFileName.substring((sFileName.length() - 1), sFileName.length()).equals("]"))
+			{
+				JOptionPane.showMessageDialog(null, (String)"Directory Deletion is not yet available in this version...", "FileTransfer Info", JOptionPane.INFORMATION_MESSAGE);
+				return;
+			}			
+			// sf@2004 - Delete prompt
+			if (localList.contains(sFileName))
+			{
+				int r = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete the file \n< " + sFileName + " >\n on Local Machine ?", "File Transfer Warning", JOptionPane.YES_NO_OPTION);
+				if (r == JOptionPane.NO_OPTION)
+					return;
+			}			
+			String s = localLocation.getText() + sFileName.substring(1);
+			File f = new File(s);
+			f.delete();
+			refreshLocalLocation();
+			historyComboBox.insertItemAt(new String("Deleted On Local Disk: " + s),0);
+			historyComboBox.setSelectedIndex(0);
+		}
+	}
+
+	private void doReceive() {
+		
+		System.out.println("Received Button Pressed");
+
+		String sFileName = ((String) this.remoteFileTable.getSelectedValue());
+		
+		// sf@2004 - Directory can't be transfered
+		if (sFileName.substring(0, 2).equals(" [") && sFileName.substring((sFileName.length() - 1), sFileName.length()).equals("]"))
+		{
+			JOptionPane.showMessageDialog(null, (String)"Directory Transfer is not yet available in this version...", "FileTransfer Info", JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
+		
+		// sf@2004 - Overwrite prompt
+		if (localList.contains(sFileName))
+		{
+			int r = JOptionPane.showConfirmDialog(null, "The file < " + sFileName + " >\n already exists on Local Machine\n Are you sure you want to overwrite it ?", "File Transfer Warning", JOptionPane.YES_NO_OPTION);
+			if (r == JOptionPane.NO_OPTION)
+				return;
+		}
+		
+		//updateHistory("Downloaded " + localSelection.toString());
+		String remoteFileName = this.remoteLocation.getText();
+		remoteFileName+= ((String) this.remoteFileTable.getSelectedValue()).substring(1);
+
+		String localDestinationPath = this.localLocation.getText()+((String)this.remoteFileTable.getSelectedValue()).substring(1);
+		viewer.rfb.requestRemoteFile(remoteFileName,localDestinationPath);
+	}
+
+	private void doSend() {
+		
+		System.out.println("Send Button Pressed");
+
+		String sFileName = ((String) this.localFileTable.getSelectedValue());
+		
+		// sf@2004 - Directory can't be transfered
+		if (sFileName.substring(0, 2).equals(" [") && sFileName.substring((sFileName.length() - 1), sFileName.length()).equals("]"))
+		{
+			JOptionPane.showMessageDialog(null, (String)"Directory Transfer is not yet available in this version...", "FileTransfer Info", JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
+		
+		// sf@2004 - Overwrite prompt
+		if (remoteList.contains(sFileName))
+		{
+			int r = JOptionPane.showConfirmDialog(null, "The file < " + sFileName + " >\n already exists on Remote Machine\n Are you sure you want to overwrite it ?", "File Transfer Warning", JOptionPane.YES_NO_OPTION);
+			if (r == JOptionPane.NO_OPTION)
+				return;
+		}
+		//updateHistory("Uploaded " + localSelection.toString());
+		String source = this.localLocation.getText();
+		source += ((String) this.localFileTable.getSelectedValue()).substring(1);
+		
+		String destinationPath = this.remoteLocation.getText();
+		viewer.rfb.offerLocalFile(source,destinationPath);
+	}
+
+	//
+	// sf@2004 - The user stops the current file transfer
+	// 
+	private void doStop() {
+		viewer.rfb.fAbort = true;
+	}
+
+
 	/**
-	 * This method initializes this
+	 * changeLocalDrive updates the file table
+	 * to the current selection of the localComboBox
+	 */
+	private void changeLocalDrive() {
+		
+		File currentDrive = new File(localDrivesComboBox.getSelectedItem().toString());
+		if(currentDrive.canRead()) {
+			localStatus.setText("");
+			changeLocalDirectory(currentDrive);
+		}
+		else {
+			localList.clear();
+			localStatus.setText("WARNING: Drive " + localDrivesComboBox.getSelectedItem().toString());
+			connectionStatus.setText(" > WARNING - Local Drive unavailable (possibly restricted access or media not present)");
+		}
+	}
+
+	/**
+	 * Updates the globally accessible remote file selection if a file is single clicked in the RemoteFileTable
+	 *
+	 */
+	
+	private void updateRemoteFileTableSelection() {
+		
+		selectedTable = "remote";
+		localFileTable.setBackground(new Color(238, 238, 238));
+		remoteFileTable.setBackground(new Color(255, 255, 255));
+	}
+
+	/**
+	 * Updates the globally accessible local file selection
+	 * if a file is single clicked in the LocalFileTable 
+	 *
+	 */
+	
+	private void updateLocalFileTableSelection() {
+		
+		selectedTable="local";
+		remoteFileTable.setBackground(new Color(238, 238, 238));
+		localFileTable.setBackground(new Color(255, 255, 255));
+	}
+	
+	/**
+	 * Updates the Remote File Table based on selection.  Called from mouseClicked handler
+	 */
+	
+	public void updateRemoteFileTable() {
+
+		String name = null;
+		String drive = null;
+		name = (remoteFileTable.getSelectedValue().toString()).substring(1);
+
+		if (name.equals("[..]")) {
+			drive = remoteLocation.getText().substring(0, remoteLocation.getText().length() - 1);
+			// JOptionPane.showMessageDialog(null, (String)drive, "FileTransfer DEBUG", JOptionPane.INFORMATION_MESSAGE);
+			int index = drive.lastIndexOf("\\");
+			drive = drive.substring(0, index + 1);
+
+			remoteLocation.setText(drive);
+			viewer.rfb.readServerDirectory(drive);
+			remoteList.clear();
+			remoteFileTable.setListData(remoteList);
+		}
+		else if (!name.substring(0, 2).equals(" [") && !name.substring((name.length() - 1), name.length()).equals("]")) {
+
+			drive = remoteLocation.getText();
+		}
+		else { 
+			name = name.substring(1, name.length() - 1);
+			drive = remoteLocation.getText() + name + "\\";
+			remoteLocation.setText(drive);
+			viewer.rfb.readServerDirectory(drive);
+			remoteList.clear();
+			remoteFileTable.setListData(remoteList);
+		}	
+		//remoteLocation.setText(drive);	
+	}
+	/**
+	 * Updates the Local File Table based on selection. Called from MouseClicked handler
+	 */
+
+	private void updateLocalFileTable()
+	{
+		localStatus.setText("");
+		File currentSelection = new File(currentLocalDirectory , getTrimmedSelection());		// Selection
+
+		if (getTrimmedSelection().equals(".."))
+		{ // The [..] selected
+			currentSelection = currentLocalDirectory.getParentFile();
+			if(currentSelection != null)
+			{
+				changeLocalDirectory(currentSelection);
+			}
+			else
+			{
+				localStatus.setText("You are at the root !"); 
+			}
+		}
+		
+		else if (currentSelection.isDirectory())
+		{
+			changeLocalDirectory(currentSelection);
+		}
+	}
+
+	/*
+	 * Trims off the [] of a directory entry if it exists, else ignores it
+	 * 
+	 */
+	private String getTrimmedSelection(){
+		String currentSelection = (localFileTable.getSelectedValue().toString()).substring(1);
+				if(currentSelection.substring(0,1).equals("[") &&
+				currentSelection.substring(currentSelection.length()-1,currentSelection.length()).equals("]")){
+				return currentSelection.substring(1,currentSelection.length()-1);
+				} else {
+					return currentSelection;
+				}
+	}
+
+	/*
+	 *  Reads the localDriveComboBox and returns the first readable drive for populating
+	 *  the file table on load, so it's not looking at the A:\ drive when it opens. 
+	 */
+	 public File getFirstReadableLocalDrive(){
+		File currentDrive;
+		// sf@ - Select C: as default first readable drive
+		for(int i = 0; i < localDrivesComboBox.getItemCount() ; i++)
+		{
+			currentDrive = new File(localDrivesComboBox.getItemAt(i).toString());
+			if(localDrivesComboBox.getItemAt(i).toString().substring(0,1).toUpperCase().equals("C") && currentDrive.canRead())
+			{
+				localDrivesComboBox.setSelectedIndex(i);
+				return currentDrive;
+			}
+		}
+		// if C: not available, take the first readable drive, this time.
+		for(int i = 0; i < localDrivesComboBox.getItemCount() ; i++)
+		{
+			currentDrive = new File(localDrivesComboBox.getItemAt(i).toString());
+			if(currentDrive.canRead())
+			{
+				localDrivesComboBox.setSelectedIndex(i);
+				return currentDrive;
+			}
+		}
+		
+		localStatus.setText("ERROR!: No Local Drives are Readable"); 
+	 	return null;
+	}
+
+		/*
+		 * Navigates the local file structure up or down one directory
+		 */
+
+		public void changeLocalDirectory(File dir)
+		{
+				currentLocalDirectory = dir;	// Updates Global
+				String[] contents = dir.list();
+
+				localList.clear();
+				localList.addElement(" [..]");
+
+				// sort content list
+				Arrays.sort(contents);
+
+				// Populate the Lists
+				for (int i = 0; i < contents.length; i++)
+				{
+					if (new File(dir.getAbsolutePath() + System.getProperty("file.separator") + contents[i]).isDirectory()) {
+						// localList.addElement("[" + contents[i] + "]");
+						localDirList.add(" [" + contents[i] + "]"); // sf@2004
+						//System.out.println(contents[i] + " is a directory");
+					}
+					else
+					{
+						// localList.addElement(contents[i]);
+						localFileList.add(" " + contents[i]); // sf@2004
+						//System.out.println(contents[i] + " is a file");
+					}
+				}
+
+				// sf@2007 - Sort the lists, using a good string comparator
+				Collections.sort(localDirList, new StrComp());
+				Collections.sort(localFileList, new StrComp());
+
+				// sf@2004
+				for (int i = 0; i < localDirList.size(); i++)
+					localList.addElement(localDirList.get(i));
+				for (int i = 0; i < localFileList.size(); i++)
+					localList.addElement(localFileList.get(i));
+
+				localFileList.clear();
+				localDirList.clear();
+
+				localFileTable.setListData(localList);
+				if(dir.toString().charAt(dir.toString().length()-1)==(File.separatorChar))
+				{
+					localLocation.setText(dir.toString());
+				}
+				else
+				{
+					localLocation.setText(dir.toString()+File.separator);	// Display updated location above file table
+				}
+				localStatus.setText("Total Files / Folders: " + (localList.size()-1));
+				if(DEBUG) System.out.println("leaving changeRemoteDrive() / FTPFrame...");
+		}
+
+
+	
+	//************************************************************************//
+	//								INIT									  //
+	//************************************************************************//
+	
+	/**
+	 * This method initializes the whole frame
 	 * 
 	 * @return void
 	 */
+		
 	private void initialize() {
+		
+		this.setResizable(false);
 		this.setSize(794, 500);
 		this.setContentPane(getJContentPane());
+		localDirList = new ArrayList();
+		localFileList = new ArrayList();
 		updateDriveList = true;
 		}
+
+	//////////////////////////////////////////////
+	/*				INIT PANELS					*/
+	//////////////////////////////////////////////
+	
 	/**
 	 * This method initializes jContentPane.  This is the main content pane
 	 * 
@@ -250,9 +794,19 @@ public class FTPFrame extends JFrame implements ActionListener, MouseListener {
 			jContentPane.setLayout(new java.awt.BorderLayout());
 			jContentPane.add(getTopPanel(), java.awt.BorderLayout.NORTH);
 			jContentPane.add(getStatusPanel(), java.awt.BorderLayout.SOUTH);
-			jContentPane.add(getRemotePanel(), java.awt.BorderLayout.EAST);
+			jContentPane.add(getRemotePanel(), java.awt.BorderLayout.EAST);			
 			jContentPane.add(getLocalPanel(), java.awt.BorderLayout.WEST);
 			jContentPane.add(getButtonPanel(), java.awt.BorderLayout.CENTER);
+			
+			// Fix : troessner - Long path causing unusable window bug
+			localPanel.setMaximumSize(new Dimension(325,398));
+			localPanel.setMinimumSize(new Dimension(325,398));
+			localPanel.setPreferredSize(new Dimension(325,398));
+			
+			remotePanel.setMaximumSize(new Dimension(325,398));
+			remotePanel.setMinimumSize(new Dimension(325,398));
+			remotePanel.setPreferredSize(new Dimension(325,398));
+
 		}
 		return jContentPane;
 	}
@@ -292,24 +846,13 @@ public class FTPFrame extends JFrame implements ActionListener, MouseListener {
 		return topPanelRemote;
 	}
 
-	/**
-	 * This method initializes topPanelRemote
-	 * 
-	 * @return javax.swing.JPanel
-	 */
-	private javax.swing.JPanel getTopPanelCenter() {
-		if (topPanelCenter == null) {
-			topPanelCenter = new javax.swing.JPanel();
-			topPanelCenter.add(getDummyButton(), null);
-		}
-		return topPanelCenter;
-	}
 	
 	/**
 	 * This method initializes topPanel
 	 * 
 	 * @return javax.swing.JPanel
 	 */
+	
 	private javax.swing.JPanel getTopPanel() {
 		if (topPanel == null) {
 			topPanel = new javax.swing.JPanel();
@@ -318,16 +861,7 @@ public class FTPFrame extends JFrame implements ActionListener, MouseListener {
 			topPanel.add(getTopPanelLocal(), java.awt.BorderLayout.WEST);
 			// topPanel.add(getTopPanelCenter(), java.awt.BorderLayout.CENTER);
 			topPanel.add(getTopPanelRemote(), java.awt.BorderLayout.EAST);
-						
-			/*
-			topPanel.add(getLocalDrivesComboBox(), null);
-			topPanel.add(getLocalMachineLabel(), null);
-			topPanel.add(getLocalTopButton(), null);
-			topPanel.add(getRemoteDrivesComboBox(), null);
-			topPanel.add(getRemoteMachineLabel(), null);
-			topPanel.add(getRemoteTopButton(), null);
-			topPanel.setBackground(java.awt.Color.lightGray);
-			*/
+
 		}
 		return topPanel;
 	}
@@ -348,17 +882,18 @@ public class FTPFrame extends JFrame implements ActionListener, MouseListener {
 			statusPanel.add(getJProgressBar(), null);
 			statusPanel.add(getConnectionStatus(), null);
 			statusPanel.setBackground(java.awt.Color.lightGray);
-			
+
 		}
 		return statusPanel;
 	}
 	/**
 	 * This method initializes remotePanel
-	 * 
+	 *
 	 * @return javax.swing.JPanel
 	 */
 	private javax.swing.JPanel getRemotePanel() {
-		if (remotePanel == null) {
+		if (remotePanel == null) // Fix: troessner
+                {
 			remotePanel = new javax.swing.JPanel();
 			remotePanel.setLayout(
 				new javax.swing.BoxLayout(
@@ -369,6 +904,10 @@ public class FTPFrame extends JFrame implements ActionListener, MouseListener {
 			remotePanel.add(getRemoteStatus(), null);
 			remotePanel.setBackground(java.awt.Color.lightGray);
 		}
+
+		/*
+		 * EDIT troessner end
+		 */
 		return remotePanel;
 	}
 	/**
@@ -390,6 +929,8 @@ public class FTPFrame extends JFrame implements ActionListener, MouseListener {
 			localPanel.setComponentOrientation(
 				java.awt.ComponentOrientation.UNKNOWN);
 			localPanel.setName("localPanel");
+			Dimension dim = localPanel.getSize();
+
 		}
 		return localPanel;
 	}
@@ -414,6 +955,9 @@ public class FTPFrame extends JFrame implements ActionListener, MouseListener {
 		}
 		return buttonPanel;
 	}
+	
+	/*				INIT BUTTONS					*/
+	
 	/**
 	 * This method initializes sendButton
 	 * 
@@ -497,7 +1041,7 @@ public class FTPFrame extends JFrame implements ActionListener, MouseListener {
 	
 	/**
 	 * This method initializes closeButton
-	 * 
+	 *
 	 * @return javax.swing.JButton
 	 */
 	private javax.swing.JButton getCloseButton() {
@@ -510,23 +1054,7 @@ public class FTPFrame extends JFrame implements ActionListener, MouseListener {
 		}
 		return closeButton;
 	}
-	
-	/**
-	 * This method initializes dummyButton
-	 * 
-	 * @return javax.swing.JButton
-	 */
-	private javax.swing.JButton getDummyButton() {
-		if (dummyButton == null) {
-			dummyButton = new javax.swing.JButton();
-			dummyButton.setBounds(12, 206, 99, 25);
-			dummyButton.setText("aaaaaaaaaaaaaaa");
-			dummyButton.setName("DummyButton");
-			dummyButton.setVisible(false);
-		}
-		return dummyButton;
-	}
-	
+
 	/**
 	 * This method initializes localDrivesComboBox
 	 * 
@@ -560,7 +1088,7 @@ public class FTPFrame extends JFrame implements ActionListener, MouseListener {
 	 * 
 	 * @return javax.swing.JComboBox
 	 */
-	public javax.swing.JComboBox getRemoteDrivesComboBox() {
+	private javax.swing.JComboBox getRemoteDrivesComboBox() {
 		if (remoteDrivesComboBox == null) {
 			remoteDrivesComboBox = new javax.swing.JComboBox();
 			remoteDrivesComboBox.setName("remoteDisks");
@@ -627,7 +1155,7 @@ public class FTPFrame extends JFrame implements ActionListener, MouseListener {
 	}
 	/**
 	 * This method initializes remoteTopButton
-	 * 
+	 *
 	 * @return javax.swing.JButton
 	 */
 	private javax.swing.JButton getRemoteTopButton() {
@@ -684,7 +1212,7 @@ public class FTPFrame extends JFrame implements ActionListener, MouseListener {
 			remoteFileTable.addMouseListener(this);
 			remoteFileTable.setSelectedValue("C:\\", false);
 			remoteFileTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-			
+
 		}
 		return remoteFileTable;
 	}
@@ -811,488 +1339,6 @@ public class FTPFrame extends JFrame implements ActionListener, MouseListener {
 		return connectionStatus;
 	}
 
-	/**
-	 * Implements Action listener.
-	 */
-	public void actionPerformed(ActionEvent evt) {
-		System.out.println(evt.getSource());
 
-		if (evt.getSource() == closeButton)
-		{ // Close Button
-			doClose();
-		}
-		else if (evt.getSource() == sendButton)
-		{
-			doSend();
-		}
-		else if (evt.getSource() == receiveButton)
-		{
-			doReceive();
-		}
-		else if (evt.getSource() == localDrivesComboBox)
-		{
-			changeLocalDrive();
-		}
-		else if (evt.getSource() == remoteDrivesComboBox)
-		{ 
-			changeRemoteDrive();
-			remoteList.clear();
-			remoteFileTable.setListData(remoteList);
-		}
-		else if (evt.getSource() == localTopButton)
-		{
-			changeLocalDrive();
-		}
-		else if (evt.getSource() == remoteTopButton)
-		{
-		  	changeRemoteDrive();
-		}
-		else if(evt.getSource() == deleteButton)
-		{
-			doDelete();
-		}
-		else if(evt.getSource()==newFolderButton)
-		{
-			doNewFolder();
-		}
-		else if (evt.getSource() == stopButton)
-		{
-			doStop();
-		}
 
-	}
-
-	private void doNewFolder()
-	{
-		String name = JOptionPane.showInputDialog(null,"Enter new directory name", "Create New Directory", JOptionPane.QUESTION_MESSAGE);
-		if(selectedTable.equals("remote"))
-		{
-			name = remoteLocation.getText()+name;
-			viewer.rfb.createRemoteDirectory(name);
-		}
-		else
-		{
-			name = localLocation.getText()+name;
-			File f = new File(name);
-			f.mkdir();
-			refreshLocalLocation();
-			historyComboBox.insertItemAt(new String("Created Local Directory: " + name),0);
-			historyComboBox.setSelectedIndex(0);
-		}
-	}
-	private void doClose()
-	{
-		try {
-			this.setVisible(false);
-			viewer.rfb.writeFramebufferUpdateRequest(
-									0,
-									0,
-									viewer.rfb.framebufferWidth,
-									viewer.rfb.framebufferHeight,
-									true);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	private void doDelete()
-	{
-		System.out.println("Delete Button Pressed");
-		//Call this method to delete a file at server
-		if(selectedTable.equals("remote"))
-		{	
-			String sFileName = ((String) this.remoteFileTable.getSelectedValue());
-			
-//			 sf@2004 - Directory can't be deleted
-			if (sFileName.substring(0, 2).equals(" [") && sFileName.substring((sFileName.length() - 1), sFileName.length()).equals("]"))
-			{
-				JOptionPane.showMessageDialog(null, (String)"Directory Deletion is not yet available in this version...", "FileTransfer Info", JOptionPane.INFORMATION_MESSAGE);
-				return;
-			}			
-			
-			// for (int i = 0; i < remoteList.contains(size(); i++) 
-			// 	remoteFileTable.g(i));			
-			// sf@2004 - Delete prompt
-			if (remoteList.contains(sFileName))
-			{
-				int r = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete the file \n< " + sFileName + " >\n on Remote Machine ?", "File Transfer Warning", JOptionPane.YES_NO_OPTION);
-				if (r == JOptionPane.NO_OPTION)
-					return;
-			}
-			
-			String fileName = remoteLocation.getText()+ sFileName.substring(1);
-			viewer.rfb.deleteRemoteFile(fileName);
-		}
-		else
-		{
-			String sFileName = ((String) this.localFileTable.getSelectedValue());
-			
-//			 sf@2004 - Directory can't be deleted
-			if (sFileName.substring(0, 2).equals(" [") && sFileName.substring((sFileName.length() - 1), sFileName.length()).equals("]"))
-			{
-				JOptionPane.showMessageDialog(null, (String)"Directory Deletion is not yet available in this version...", "FileTransfer Info", JOptionPane.INFORMATION_MESSAGE);
-				return;
-			}			
-			// sf@2004 - Delete prompt
-			if (localList.contains(sFileName))
-			{
-				int r = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete the file \n< " + sFileName + " >\n on Local Machine ?", "File Transfer Warning", JOptionPane.YES_NO_OPTION);
-				if (r == JOptionPane.NO_OPTION)
-					return;
-			}			
-			String s = localLocation.getText() + sFileName.substring(1);
-			File f = new File(s);
-			f.delete();
-			refreshLocalLocation();
-			historyComboBox.insertItemAt(new String("Deleted On Local Disk: " + s),0);
-			historyComboBox.setSelectedIndex(0);
-		}
-	}
-
-	private void doReceive()
-	{
-		System.out.println("Received Button Pressed");
-
-		String sFileName = ((String) this.remoteFileTable.getSelectedValue());
-		
-		// sf@2004 - Directory can't be transfered
-		if (sFileName.substring(0, 2).equals(" [") && sFileName.substring((sFileName.length() - 1), sFileName.length()).equals("]"))
-		{
-			JOptionPane.showMessageDialog(null, (String)"Directory Transfer is not yet available in this version...", "FileTransfer Info", JOptionPane.INFORMATION_MESSAGE);
-			return;
-		}
-		
-		// sf@2004 - Overwrite prompt
-		if (localList.contains(sFileName))
-		{
-			int r = JOptionPane.showConfirmDialog(null, "The file < " + sFileName + " >\n already exists on Local Machine\n Are you sure you want to overwrite it ?", "File Transfer Warning", JOptionPane.YES_NO_OPTION);
-			if (r == JOptionPane.NO_OPTION)
-				return;
-		}
-		
-		//updateHistory("Downloaded " + localSelection.toString());
-		String remoteFileName = this.remoteLocation.getText();
-		remoteFileName+= ((String) this.remoteFileTable.getSelectedValue()).substring(1);
-		
-		String localDestinationPath = this.localLocation.getText()+((String)this.remoteFileTable.getSelectedValue()).substring(1);
-		viewer.rfb.requestRemoteFile(remoteFileName,localDestinationPath);
-	}
-
-	private void doSend()
-	{
-		System.out.println("Send Button Pressed");
-
-		String sFileName = ((String) this.localFileTable.getSelectedValue());
-		
-		// sf@2004 - Directory can't be transfered
-		if (sFileName.substring(0, 2).equals(" [") && sFileName.substring((sFileName.length() - 1), sFileName.length()).equals("]"))
-		{
-			JOptionPane.showMessageDialog(null, (String)"Directory Transfer is not yet available in this version...", "FileTransfer Info", JOptionPane.INFORMATION_MESSAGE);
-			return;
-		}
-		
-		// sf@2004 - Overwrite prompt
-		if (remoteList.contains(sFileName))
-		{
-			int r = JOptionPane.showConfirmDialog(null, "The file < " + sFileName + " >\n already exists on Remote Machine\n Are you sure you want to overwrite it ?", "File Transfer Warning", JOptionPane.YES_NO_OPTION);
-			if (r == JOptionPane.NO_OPTION)
-				return;
-		}
-		//updateHistory("Uploaded " + localSelection.toString());
-		String source = this.localLocation.getText();
-		source += ((String) this.localFileTable.getSelectedValue()).substring(1);
-		
-		String destinationPath = this.remoteLocation.getText();
-		
-		viewer.rfb.offerLocalFile(source,destinationPath); 
-	}
-	
-	//
-	// sf@2004 - The user stops the current file transfer
-	// 
-	private void doStop()
-	{
-		viewer.rfb.fAbort = true;
-	}
-	/**
-	 * Update History: This method updates the history pulldown menu with the message string
-	 *
-	 */
-	private void updateHistory(String message)
-	{
-		System.out.println("History: " + message);
-		historyComboBox.insertItemAt(new String(message), 0);
-	}
-	
-	/**
-	 * This method updates the file table to the current selection of the remoteComboBox
-	 *
-	 */
-	public void changeRemoteDrive()
-	{
-		remoteSelection = null;
-	
-		if (!updateDriveList) {
-			String drive =	remoteDrivesComboBox.getSelectedItem().toString().substring(0,1)+ ":\\";
-			viewer.rfb.readServerDirectory(drive);
-			remoteLocation.setText(drive);
-		}
-		remoteList.clear();
-		remoteFileTable.setListData(remoteList);
-	}
-	/**
-	 * changeLocalDrive updates the file table
-	 * to the current selection of the localComboBox
-	 */
-	private void changeLocalDrive()
-	{
-		File currentDrive = new File(localDrivesComboBox.getSelectedItem().toString());
-		if(currentDrive.canRead())
-		{
-			localSelection = null;
-			localStatus.setText("");
-			changeLocalDirectory(currentDrive);
-		}
-		else
-		{
-			localList.clear();
-			localStatus.setText("WARNING: Drive " + localDrivesComboBox.getSelectedItem().toString());
-			connectionStatus.setText(" > WARNING - Local Drive unavailable (possibly restricted access or media not present)");
-		}
-	}
-	/**
-	 * Determines which FileTable was double-clicked and updates the table
-	 */
-	public void mouseClicked(MouseEvent e)
-	{
-		
-		if(e.getClickCount() == 1)
-		{								// Single clicked
-			if (e.getSource() == localFileTable )
-			{  			// on local file table 
-				updateLocalFileTableSelection();
-			}
-			else if (e.getSource() == remoteFileTable)
-			{
-				updateRemoteFileTableSelection();						// on a remote file table
-			}
-		}
-		else if (e.getClickCount() == 2)
-		{						// Mouse Double clicked
-			if (e.getSource() == localFileTable)
-			{				// Clicked on local file
-				updateLocalFileTable();
-			}
-			else if (e.getSource() == remoteFileTable)
-			{		// Clicked on remote file
-				updateRemoteFileTable();
-			}
-		}
-	}
-	/*
-	 * Updates the globally accessible remote file selection if a file is single clicked in the RemoteFileTable
-	 *
-	 */
-	private void updateRemoteFileTableSelection() {
-		selectedTable = "remote";
-		localFileTable.setBackground(new Color(238, 238, 238));
-		remoteFileTable.setBackground(new Color(255, 255, 255));
-		String name = (remoteFileTable.getSelectedValue().toString()).substring(1);
-		if( !name.substring(0, 2).equals(" ["))	
-			remoteSelection = remoteLocation.getText() + name.substring(0, name.length());
-		
-	}
-
-	/*
-	 * Updates the globally accessible local file selection 
-	 * if a file is single clicked in the LocalFileTable 
-	 *
-	 */
-	private void updateLocalFileTableSelection() {
-		selectedTable="local";
-		remoteFileTable.setBackground(new Color(238, 238, 238));
-		localFileTable.setBackground(new Color(255, 255, 255));
-		File currentSelection = new File(currentLocalDirectory, getTrimmedSelection());
-		
-		if(currentSelection.isFile()) 
-			localSelection = currentSelection.getAbsoluteFile();
-
-	}
-	/**
-	 * Updates the Remote File Table based on selection.  Called from mouseClicked handler
-	 */
-	public void updateRemoteFileTable() {
-		String name = null;
-		String action = null;
-		String drive = null;
-		name = (remoteFileTable.getSelectedValue().toString()).substring(1);
-
-		if (name.equals("[..]"))
-		{
-			action = "up";
-			remoteSelection = null;
-			drive = remoteLocation.getText().substring(0, remoteLocation.getText().length() - 1);
-			// JOptionPane.showMessageDialog(null, (String)drive, "FileTransfer DEBUG", JOptionPane.INFORMATION_MESSAGE);
-			int index = drive.lastIndexOf("\\");
-			drive = drive.substring(0, index + 1);
-
-			remoteLocation.setText(drive);
-			viewer.rfb.readServerDirectory(drive);
-			remoteList.clear();
-			remoteFileTable.setListData(remoteList);	
-		}
-		else if (!name.substring(0, 2).equals(" [") && !name.substring((name.length() - 1), name.length()).equals("]"))
-		{
-			action = "file";
-			// Set the global remoteSelection field (used for get/put buttons)
-			remoteSelection = remoteLocation.getText() + name.substring(0, name.length());
-			drive = remoteLocation.getText();
-			// ??
-		}
-		else
-		{ 
-			action = "down";
-			remoteSelection = null;
-			name = name.substring(1, name.length() - 1);
-			drive = remoteLocation.getText() + name + "\\";
-			remoteLocation.setText(drive);
-			viewer.rfb.readServerDirectory(drive);
-			remoteList.clear();
-			remoteFileTable.setListData(remoteList);	
-		}	
-		//remoteLocation.setText(drive);	
-	}
-	/**
-	 * Updates the Local File Table based on selection. Called from MouseClicked handler
-	 */
-
-	private void updateLocalFileTable()
-	{
-		localStatus.setText("");
-		File currentSelection = new File(currentLocalDirectory , getTrimmedSelection());		// Selection
-
-		if (getTrimmedSelection().equals(".."))
-		{ // The [..] selected
-			localSelection = null;	// No selection since directory changed
-			currentSelection = currentLocalDirectory.getParentFile();
-			if(currentSelection != null)
-			{
-				changeLocalDirectory(currentSelection);
-			}
-			else
-			{
-				localStatus.setText("You are at the root !"); 
-			}
-		}
-		else if (currentSelection.isFile())
-		{
-			localSelection = currentSelection.getAbsoluteFile();
-		}
-		else if (currentSelection.isDirectory())
-		{
-			localSelection = null;	// No selection since directory changed
-			changeLocalDirectory(currentSelection);
-		}
-	}
-
-	/*
-	 * Trims off the [] of a directory entry if it exists, else ignores it
-	 * 
-	 */
-	private String getTrimmedSelection(){
-		String currentSelection = (localFileTable.getSelectedValue().toString()).substring(1);
-				if(currentSelection.substring(0,1).equals("[") &&
-				currentSelection.substring(currentSelection.length()-1,currentSelection.length()).equals("]")){
-				return currentSelection.substring(1,currentSelection.length()-1);
-				} else {
-					return currentSelection;
-				}
-	}
-
-	/*
-	 *  Reads the localDriveComboBox and returns the first readable drive for populating
-	 *  the file table on load, so it's not looking at the A:\ drive when it opens. 
-	 */
-	 public File getFirstReadableLocalDrive(){
-		File currentDrive;
-		// sf@ - Select C: as default first readable drive
-		for(int i = 0; i < localDrivesComboBox.getItemCount() ; i++)
-		{
-			currentDrive = new File(localDrivesComboBox.getItemAt(i).toString());
-			if(localDrivesComboBox.getItemAt(i).toString().substring(0,1).toUpperCase().equals("C") && currentDrive.canRead())
-			{
-				localDrivesComboBox.setSelectedIndex(i);
-				return currentDrive;
-			}
-		}
-		// if C: not available, take the first readable drive, this time.
-		for(int i = 0; i < localDrivesComboBox.getItemCount() ; i++)
-		{
-			currentDrive = new File(localDrivesComboBox.getItemAt(i).toString());
-			if(currentDrive.canRead())
-			{
-				localDrivesComboBox.setSelectedIndex(i);
-				return currentDrive;
-			}
-		}
-		
-		localStatus.setText("ERROR!: No Local Drives are Readable"); 
-	 	return null;
-	}
-	
-
-	/*
-	 * Navigates the local file structure up or down one directory
-	 */
-	public void changeLocalDirectory(File dir)
-	{
-			currentLocalDirectory = dir;	// Updates Global
-			File allFiles[] = dir.listFiles();	// Reads files
-			String[] contents = dir.list();
-
-			localList.clear();
-			localList.addElement(" [..]");
-			
-			// Populate the Lists
-			for (int i = 0; i < contents.length; i++)
-			{
-				if (allFiles[i].isDirectory())
-					// localList.addElement("[" + contents[i] + "]");
-					DirsList.add(" [" + contents[i] + "]"); // sf@2004
-				else
-				{
-					// localList.addElement(contents[i]);
-					FilesList.add(" " + contents[i]); // sf@2004
-				}
-			}
-			// sf@2004
-			for (int i = 0; i < DirsList.size(); i++) 
-				localList.addElement(DirsList.get(i));
-			for (int i = 0; i < FilesList.size(); i++) 
-				localList.addElement(FilesList.get(i));
-			
-			FilesList.clear();
-			DirsList.clear();
-			
-			localFileTable.setListData(localList);
-			if(dir.toString().charAt(dir.toString().length()-1)==(File.separatorChar))
-			{
-				localLocation.setText(dir.toString());
-			}
-			else
-			{
-				localLocation.setText(dir.toString()+File.separator);	// Display updated location above file table
-			}
-			localStatus.setText("Total Files / Folders: " + (localList.size()-1));
-	}
-	public void mouseEntered(MouseEvent e) {
-	}
-	public void mouseExited(MouseEvent e) {
-	}
-	public void mousePressed(MouseEvent e) {
-	}
-	public void mouseReleased(MouseEvent e) {
-	}
-
-} //  @jve:visual-info  decl-index=0 visual-constraint="10,10"
+}
