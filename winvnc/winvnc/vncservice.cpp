@@ -56,7 +56,24 @@ DWORD	g_version_minor;
 BOOL	m_fRunningFromExternalService = false;
 
 typedef DWORD (WINAPI* pWTSGetActiveConsoleSessionId)(VOID);
+typedef BOOL (WINAPI * pProcessIdToSessionId)(DWORD,DWORD*);
 #include <tlhelp32.h>
+
+pProcessIdToSessionId WTSProcessIdToSessionIdF=NULL;
+
+#ifndef SM_REMOTESESSION
+#define SM_REMOTESESSION 0X1000
+#endif
+
+DWORD GetCurrentSessionID()
+{
+	DWORD dw		 = GetCurrentProcessId();
+	DWORD pSessionId = 0xFFFFFFFF;
+
+	WTSProcessIdToSessionIdF( dw, &pSessionId );
+
+	return pSessionId;
+}
 
 DWORD GetExplorerLogonPid()
 {
@@ -66,17 +83,25 @@ DWORD GetExplorerLogonPid()
 //	HANDLE hProcess,hPToken;
 
 	pWTSGetActiveConsoleSessionId WTSGetActiveConsoleSessionIdF=NULL;
+	WTSProcessIdToSessionIdF=NULL;
+
 	HMODULE  hlibkernel = LoadLibrary("kernel32.dll"); 
 	WTSGetActiveConsoleSessionIdF=(pWTSGetActiveConsoleSessionId)GetProcAddress(hlibkernel, "WTSGetActiveConsoleSessionId");
+	WTSProcessIdToSessionIdF=(pProcessIdToSessionId)GetProcAddress(hlibkernel, "ProcessIdToSessionId");
 	if (WTSGetActiveConsoleSessionIdF!=NULL)
 	   dwSessionId =WTSGetActiveConsoleSessionIdF();
 	else dwSessionId=0;
 
-	FreeLibrary(hlibkernel);
+	if( GetSystemMetrics( SM_REMOTESESSION))
+		if (WTSProcessIdToSessionIdF!=NULL)
+			dwSessionId=GetCurrentSessionID();
+
+	
 
     HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     if (hSnap == INVALID_HANDLE_VALUE)
     {
+		FreeLibrary(hlibkernel);
         return 0 ;
     }
 
@@ -85,6 +110,7 @@ DWORD GetExplorerLogonPid()
     if (!Process32First(hSnap, &procEntry))
     {
 		CloseHandle(hSnap);
+		FreeLibrary(hlibkernel);
         return 0 ;
     }
 
@@ -93,16 +119,21 @@ DWORD GetExplorerLogonPid()
         if (_stricmp(procEntry.szExeFile, "explorer.exe") == 0)
         {
           DWORD dwExplorerSessId = 0;
-          if (ProcessIdToSessionId(procEntry.th32ProcessID, &dwExplorerSessId) 
-                    && dwExplorerSessId == dwSessionId)
-            {
-                dwExplorerLogonPid = procEntry.th32ProcessID;
-                break;
-            }
+		  if (WTSProcessIdToSessionIdF!=NULL)
+		  {
+			  if (WTSProcessIdToSessionIdF(procEntry.th32ProcessID, &dwExplorerSessId) 
+						&& dwExplorerSessId == dwSessionId)
+				{
+					dwExplorerLogonPid = procEntry.th32ProcessID;
+					break;
+				}
+		  }
+		  else dwExplorerLogonPid = procEntry.th32ProcessID;
         }
 
     } while (Process32Next(hSnap, &procEntry));
 	CloseHandle(hSnap);
+	FreeLibrary(hlibkernel);
 	return dwExplorerLogonPid;
 }
 
