@@ -580,7 +580,24 @@ vncClientThread::InitAuthenticate()
 				}
 			else 
 				{
-					if ( !(acceptDlg->DoDialog()) ) verified = vncServer::aqrReject;
+						HDESK desktop;
+						desktop = OpenInputDesktop(0, FALSE,
+													DESKTOP_CREATEMENU | DESKTOP_CREATEWINDOW |
+													DESKTOP_ENUMERATE | DESKTOP_HOOKCONTROL |
+													DESKTOP_WRITEOBJECTS | DESKTOP_READOBJECTS |
+													DESKTOP_SWITCHDESKTOP | GENERIC_WRITE
+													);
+
+						HDESK old_desktop = GetThreadDesktop(GetCurrentThreadId());
+						
+					
+						SetThreadDesktop(desktop);
+
+						if ( !(acceptDlg->DoDialog()) ) verified = vncServer::aqrReject;
+
+						CloseDesktop(desktop);
+						SetThreadDesktop(old_desktop);
+						CloseDesktop(old_desktop);
 				}
 		}
 
