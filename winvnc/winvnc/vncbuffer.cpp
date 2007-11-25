@@ -36,8 +36,6 @@
 
 #include "vncBuffer.h"
 
-// Implementation
-
 vncBuffer::vncBuffer()
 {
 	m_freemainbuff = FALSE;
@@ -70,7 +68,7 @@ vncBuffer::~vncBuffer()
 	if (m_freemainbuff) {
 		// We need to free the slow-blit buffer
 		// Modif rdv@2002 - v1.1.x - Videodriver
-		if (m_mainbuff != NULL)
+	if (m_mainbuff != NULL)
 		{
 			delete [] m_mainbuff;
 			m_mainbuff = NULL;
