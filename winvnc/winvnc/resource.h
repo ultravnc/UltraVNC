@@ -168,7 +168,7 @@
 #define IDC_ALPHA                       1112
 #define IDC_ALPHABLACK                  1114
 #define IDC_FTUSERIMPERSONATION_CHECK   1117
-#define IDC_REMOVE_EARO                 1118
+#define IDC_REMOVE_Aero                 1118
 #define IDC_Path1                       1132
 #define IDC_Path2                       1133
 #define IDC_Path3                       1134
