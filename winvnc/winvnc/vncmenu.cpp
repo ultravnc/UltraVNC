@@ -66,6 +66,11 @@ static P_DwmEnableComposition pfnDwmEnableComposition = NULL;
 static BOOL AeroWasEnabled = FALSE;
 DWORD GetExplorerLogonPid();
 
+void Set_uninstall_service_as_admin();
+void Set_install_service_as_admin();
+void Set_stop_service_as_admin();
+void Set_start_service_as_admin();
+
 static inline VOID UnloadDM(VOID) 
  { 
          pfnDwmEnableComposition = NULL; 
@@ -351,7 +356,7 @@ vncMenu::~vncMenu()
 
 	if (m_server->RemoveWallpaperEnabled())
 		RestoreWallpaper();
-	if (m_server->RemoveEaroEnabled())
+	if (m_server->RemoveAeroEnabled())
 		ResetAero();
 }
 
@@ -623,10 +628,10 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				RestoreWallpaper();
 		}
 		if (_this->m_server->AuthClientCount() != 0) {
-			if (_this->m_server->RemoveEaroEnabled())
+			if (_this->m_server->RemoveAeroEnabled())
 				DisableAero();
 		} else {
-			if (_this->m_server->RemoveEaroEnabled())
+			if (_this->m_server->RemoveAeroEnabled())
 				ResetAero();
 		}
 		return 0;
@@ -724,8 +729,14 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 					StartUPInfo.cb = sizeof(STARTUPINFO);
 			
 					CreateProcessAsUser(hPToken,NULL,dir,NULL,NULL,FALSE,DETACHED_PROCESS,NULL,NULL,&StartUPInfo,&ProcessInfo);
-					CloseHandle(hProcess);
-					CloseHandle(hPToken);
+					DWORD error=GetLastError();
+					if (process) CloseHandle(process);
+					if (Token) CloseHandle(Token);
+					if (error==1314)
+					{
+						Set_uninstall_service_as_admin();
+					}
+
 					}
 					vnclog.Print(LL_INTINFO, VNCLOG("KillAuthClients() ID_CLOSE \n"));
 					_this->m_server->KillAuthClients();
@@ -763,8 +774,13 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 					StartUPInfo.cb = sizeof(STARTUPINFO);
 			
 					CreateProcessAsUser(hPToken,NULL,dir,NULL,NULL,FALSE,DETACHED_PROCESS,NULL,NULL,&StartUPInfo,&ProcessInfo);
-					CloseHandle(hProcess);
-					CloseHandle(hPToken);
+					DWORD error=GetLastError();
+					if (process) CloseHandle(process);
+					if (Token) CloseHandle(Token);
+					if (error==1314)
+					{
+						Set_install_service_as_admin();
+					}
 				}
 			vnclog.Print(LL_INTINFO, VNCLOG("KillAuthClients() ID_CLOSE \n"));
 			_this->m_server->KillAuthClients();
@@ -801,8 +817,13 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 					StartUPInfo.cb = sizeof(STARTUPINFO);
 			
 					CreateProcessAsUser(hPToken,NULL,dir,NULL,NULL,FALSE,DETACHED_PROCESS,NULL,NULL,&StartUPInfo,&ProcessInfo);
-					CloseHandle(hProcess);
-					CloseHandle(hPToken);
+					DWORD error=GetLastError();
+					if (process) CloseHandle(process);
+					if (Token) CloseHandle(Token);
+					if (error==1314)
+					{
+						Set_stop_service_as_admin();
+					}
 				}
 			}
 			break;
@@ -835,8 +856,13 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 					StartUPInfo.cb = sizeof(STARTUPINFO);
 			
 					CreateProcessAsUser(hPToken,NULL,dir,NULL,NULL,FALSE,DETACHED_PROCESS,NULL,NULL,&StartUPInfo,&ProcessInfo);
-					CloseHandle(hProcess);
-					CloseHandle(hPToken);
+					DWORD error=GetLastError();
+					if (process) CloseHandle(process);
+					if (Token) CloseHandle(Token);
+					if (error==1314)
+					{
+						Set_start_service_as_admin();
+					}
 					vnclog.Print(LL_INTINFO, VNCLOG("KillAuthClients() ID_CLOSE \n"));
 					_this->m_server->KillAuthClients();
 					fShutdownOrdered=TRUE;
@@ -907,7 +933,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		// tnatsni Wallpaper fix
 		if (_this->m_server->RemoveWallpaperEnabled())
 			RestoreWallpaper();
-		if (_this->m_server->RemoveEaroEnabled())
+		if (_this->m_server->RemoveAeroEnabled())
 			ResetAero();
 
 		vnclog.Print(LL_INTERR, VNCLOG("vncMenu WM_CLOSE call - All cleanup done\n"));
