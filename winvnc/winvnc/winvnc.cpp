@@ -116,8 +116,8 @@ Myinit(HINSTANCE hInstance)
 	strcat(WORKDIR,"WinVNC.log");
 
 	vnclog.SetFile(WORKDIR, true);
-	vnclog.SetMode(2);
-	vnclog.SetLevel(10);
+//	vnclog.SetMode(2);
+//	vnclog.SetLevel(10);
 
 #ifdef _DEBUG
 	{
@@ -147,13 +147,10 @@ Myinit(HINSTANCE hInstance)
 	return 1;
 }
 
-
 // WinMain parses the command line and either calls the main App
 // routine or, under NT, the main service routine.
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow)
 {
-
-
 	SetOSVersion();
 	setbuf(stderr, 0);
     //Load all messages from ressource file
@@ -170,8 +167,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 	strcat(WORKDIR,"WinVNC.log");
 
 	vnclog.SetFile(WORKDIR, true);
-	vnclog.SetMode(2);
-	vnclog.SetLevel(10);
+//	vnclog.SetMode(2);
+//	vnclog.SetLevel(10);
 
 #ifdef _DEBUG
 	{
@@ -290,7 +287,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 		if (strncmp(&szCmdLine[i], winvncRunService, strlen(winvncRunService)) == 0)
 		{
 			//Run as service
-			Beep(1000,100);
 			if (!Myinit(hInstance)) return 0;
 			fRunningFromExternalService = true;
 			vncService::RunningFromExternalService(true); 
