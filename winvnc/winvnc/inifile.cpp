@@ -1,5 +1,6 @@
 #include "stdhdrs.h"
 #include "inifile.h"
+void Set_settings_as_admin(char *mycommand);
 
 IniFile::IniFile()
 {
@@ -100,8 +101,13 @@ IniFile::copy_to_secure()
 			return;	
 		OpenProcessToken(process, MAXIMUM_ALLOWED, &Token);
 		CreateProcessAsUser(Token,NULL,dir,NULL,NULL,FALSE,DETACHED_PROCESS,NULL,NULL,&StartUPInfo,&ProcessInfo);
+		DWORD error=GetLastError();
 		if (process) CloseHandle(process);
 		if (Token) CloseHandle(Token);
+		if (error==1314)
+		{
+			Set_settings_as_admin(myInifile);
+		}
 
 }
 
