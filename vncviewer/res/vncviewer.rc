@@ -278,7 +278,7 @@ END
 
 IDD_SESSION_DLG DIALOG DISCARDABLE  0, 0, 245, 199
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Ultr@VNC Viewer - Connection"
+CAPTION "Ultr@VNC Viewer - Connection 104 RC7"
 FONT 8, "MS Sans Serif"
 BEGIN
     COMBOBOX        IDC_HOSTNAME_EDIT,76,4,120,66,CBS_DROPDOWN | 
@@ -473,7 +473,7 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,8,137,62,14
     CONTROL         156,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE | 
                     SS_SUNKEN,8,7,62,54
-    LTEXT           "UltraVNC Win32 Viewer 1.0.4 RC5",IDC_STATIC,86,6,197,11
+    LTEXT           "UltraVNC Win32 Viewer 1.0.4 RC7",IDC_STATIC,86,6,197,11
     LTEXT           "For more Information and Links please visit: \nhttp://ultravnc.sf.net",
                     IDC_STATIC,86,133,197,19
     LTEXT           "Copyright © 2002-2005 Ultr@VNC Team\nCopyright © 2001-2002 Sam - eSVNC \nCopyright © 1999-2002 Rudi D. V. - VdaccVNC \nCopyright © 1999-2002 Const. Kaplinsky - TightVNC \nCopyright © 2002 RealVNC Ltd. - RealVNC\n",
