@@ -87,7 +87,7 @@ LONG HttpPortNumber;
 LONG IdleTimeout;
 
 LONG RemoveWallpaper=1;
-LONG RemoveEaro=1;
+LONG RemoveAero=1;
 
 LONG QuerySetting=1;
 LONG QueryTimeout=10;
@@ -203,9 +203,9 @@ myIniFile_Out.WriteInt("admin", "HTTPPortNumber", HttpPortNumber);
 myIniFile_Out.WriteInt("admin", "IdleTimeout", IdleTimeout);
 	
 RemoveWallpaper=myIniFile_In.ReadInt("admin", "RemoveWallpaper", 0);
-RemoveEaro=myIniFile_In.ReadInt("admin", "RemoveEaro", 0);
+RemoveAero=myIniFile_In.ReadInt("admin", "RemoveAero", 0);
 myIniFile_Out.WriteInt("admin", "RemoveWallpaper", RemoveWallpaper);
-myIniFile_Out.WriteInt("admin", "RemoveEaro", RemoveEaro);
+myIniFile_Out.WriteInt("admin", "RemoveAero", RemoveAero);
 
 	// Connection querying settings
 QuerySetting=myIniFile_In.ReadInt("admin", "QuerySetting", 0);
