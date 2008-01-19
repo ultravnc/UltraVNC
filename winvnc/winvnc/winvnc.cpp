@@ -67,7 +67,7 @@ BOOL		fRunningFromExternalService=false;
 
 // sf@2007 - New shutdown order handling stuff (with uvnc_service)
 bool			fShutdownOrdered = false;
-static HANDLE		hShutdownEvent;
+static HANDLE		hShutdownEvent = NULL;
 MMRESULT			mmRes;
 
 void WRITETOLOG(char *szText, int size, DWORD *byteswritten, void *);
@@ -94,6 +94,7 @@ void Real_settings(char *mycommand);
 void Set_settings_as_admin(char *mycommand);
 void Set_uninstall_service_as_admin();
 void Set_install_service_as_admin();
+void winvncSecurityEditorHelper_as_admin();
 
 // winvnc.exe will also be used for helper exe
 // This allow us to minimize the number of seperate exe
@@ -224,6 +225,22 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 			return 0;
 		}
 
+		if (strncmp(&szCmdLine[i], winvncKill, strlen(winvncKill)) == 0)
+		{
+			static HANDLE		hShutdownEvent;
+			hShutdownEvent = OpenEvent(EVENT_ALL_ACCESS, FALSE, "Global\\SessionEventUltra");
+			SetEvent(hShutdownEvent);
+			CloseHandle(hShutdownEvent);
+			HWND hservwnd;
+			hservwnd = FindWindow("WinVNC Tray Icon", NULL);
+			if (hservwnd!=NULL)
+			{
+				PostMessage(hservwnd, WM_COMMAND, 40002, 0);
+				PostMessage(hservwnd, WM_CLOSE, 0, 0);
+			}
+			return 0;
+		}
+
 		if (strncmp(&szCmdLine[i], winvncStartserviceHelper, strlen(winvncStartserviceHelper)) == 0)
 		{
 			Set_start_service_as_admin();
@@ -238,6 +255,31 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 		if (strncmp(&szCmdLine[i], winvncUnInstallServiceHelper, strlen(winvncUnInstallServiceHelper)) == 0)
 			{
 				Set_uninstall_service_as_admin();
+				return 0;
+			}
+		if (strncmp(&szCmdLine[i], winvncSecurityEditorHelper, strlen(winvncSecurityEditorHelper)) == 0)
+			{
+				winvncSecurityEditorHelper_as_admin();
+				return 0;
+			}
+		if (strncmp(&szCmdLine[i], winvncSecurityEditorHelper, strlen(winvncSecurityEditor)) == 0)
+			{
+			    typedef void (*vncEditSecurityFn) (HWND hwnd, HINSTANCE hInstance);
+				vncEditSecurityFn vncEditSecurity = 0;
+				char szCurrentDir[MAX_PATH];
+					if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH)) {
+						char* p = strrchr(szCurrentDir, '\\');
+						*p = '\0';
+						strcat (szCurrentDir,"\\authSSP.dll");
+					}
+					HMODULE hModule = LoadLibrary(szCurrentDir);
+					if (hModule) {
+						vncEditSecurity = (vncEditSecurityFn) GetProcAddress(hModule, "vncEditSecurity");
+						HRESULT hr = CoInitialize(NULL);
+						vncEditSecurity(NULL, hAppInstance);
+						CoUninitialize();
+						FreeLibrary(hModule);
+					}
 				return 0;
 			}
 
@@ -583,13 +625,16 @@ DWORD WINAPI imp_desktop_thread(LPVOID lpParam)
 // Maybe there's a less rude method...
 void CALLBACK fpTimer(UINT uID, UINT uMsg, DWORD dwUser, DWORD dw1, DWORD dw2)
 {
-	// vnclog.Print(LL_INTERR, VNCLOG("****************** SDTimer tic\n"));
-	DWORD result=WaitForSingleObject(hShutdownEvent, 0);
-	if (WAIT_OBJECT_0==result)
+	if (hShutdownEvent)
 	{
-		ResetEvent(hShutdownEvent);
-		fShutdownOrdered = true;
-		vnclog.Print(LL_INTERR, VNCLOG("****************** WaitForSingleObject - Shutdown server\n"));
+		// vnclog.Print(LL_INTERR, VNCLOG("****************** SDTimer tic\n"));
+		DWORD result=WaitForSingleObject(hShutdownEvent, 0);
+		if (WAIT_OBJECT_0==result)
+		{
+			ResetEvent(hShutdownEvent);
+			fShutdownOrdered = true;
+			vnclog.Print(LL_INTERR, VNCLOG("****************** WaitForSingleObject - Shutdown server\n"));
+		}
 	}
 }
 
@@ -650,7 +695,7 @@ int WinVNCAppMain()
 	// sf@2007 - New impersonation thread stuff for tray icon & menu
 	// Subscribe to shutdown event
 	hShutdownEvent = OpenEvent(EVENT_ALL_ACCESS, FALSE, "Global\\SessionEventUltra");
-	ResetEvent(hShutdownEvent);
+	if (hShutdownEvent) ResetEvent(hShutdownEvent);
 	vnclog.Print(LL_STATE, VNCLOG("***************** SDEvent created \n"));
 	// Create the timer that looks periodicaly for shutdown event
 	mmRes = -1;
@@ -672,6 +717,7 @@ int WinVNCAppMain()
 	if (instancehan!=NULL)
 		delete instancehan;
 
+	if (hShutdownEvent)CloseHandle(hShutdownEvent);
 	vnclog.Print(LL_STATE, VNCLOG("################## SHUTING DOWN SERVER ####################\n"));
 	return 1;
 };
