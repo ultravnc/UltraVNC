@@ -33,9 +33,9 @@
 
 #include "vncauth.h"
 
-extern char sz_K1[254];
+extern char sz_K1[64];
 extern char sz_K2[64];
-extern char sz_K3[256];
+extern char sz_K3[128];
 extern char sz_K4[64];
 extern char sz_K5[64];
 extern char sz_K6[64];
