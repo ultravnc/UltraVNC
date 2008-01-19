@@ -243,20 +243,21 @@ LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg,
 
             lpdis = (LPDRAWITEMSTRUCT) lParam; 
             hdcMem = CreateCompatibleDC(lpdis->hDC); 
+			HGDIOBJ hbrOld=NULL;
  
 			if(lpdis->CtlID==tbIDC_CLOSE)
-					SelectObject(hdcMem, TitleBarThis->hClose); 
+					hbrOld=SelectObject(hdcMem, TitleBarThis->hClose); 
 			if(lpdis->CtlID==tbIDC_MAXIMIZE)
-					SelectObject(hdcMem, TitleBarThis->hMaximize); 
+					hbrOld=SelectObject(hdcMem, TitleBarThis->hMaximize); 
 			if(lpdis->CtlID==tbIDC_MINIMIZE)
-					SelectObject(hdcMem, TitleBarThis->hMinimize); 
+					hbrOld=SelectObject(hdcMem, TitleBarThis->hMinimize); 
 			
 			if(lpdis->CtlID==tbIDC_PIN)
 			{
 				if(TitleBarThis->AutoHide==TRUE)
-					SelectObject(hdcMem, TitleBarThis->hPinUp); 
+					hbrOld=SelectObject(hdcMem, TitleBarThis->hPinUp); 
 				else
-					SelectObject(hdcMem, TitleBarThis->hPinDown); 
+					hbrOld=SelectObject(hdcMem, TitleBarThis->hPinDown); 
 			}
 
 			BitBlt(lpdis->hDC,
@@ -268,7 +269,7 @@ LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg,
 					0,
 					0,
 					SRCCOPY);
- 
+			SelectObject(hdcMem,hbrOld);
             DeleteDC(hdcMem); 
             return TRUE; 
 		}
@@ -568,7 +569,7 @@ void CTitleBar::Draw()
 
 	//Draw border around window
 	HPEN Border=::CreatePen(PS_SOLID, tbBorderWidth, tbBorderPenColor);
-	::SelectObject(hdc, Border);
+	HGDIOBJ hbmOld=SelectObject(hdc, Border);
 
 	//Draw border around window
 	::MoveToEx(hdc, 0,0, NULL);
@@ -578,11 +579,14 @@ void CTitleBar::Draw()
 	::LineTo(hdc, 0,0);
 
 	//Draw extra shadow at bottom
+	SelectObject(hdc,hbmOld);
 	DeleteObject(Border);
 	Border=::CreatePen(PS_SOLID, tbBorderWidth, tbBorderPenShadow);
-	::SelectObject(hdc, Border);
+	hbmOld=SelectObject(hdc, Border);
 	::MoveToEx(hdc, tbTriangularPoint+1,tbHeigth-1, NULL);
 	::LineTo(hdc, tbWidth-tbTriangularPoint-1, tbHeigth-1);
+	SelectObject(hdc,hbmOld);
+	DeleteObject(Border);
 
 	//Create rect for drawin the text
 	RECT lpRect;
