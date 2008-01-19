@@ -142,6 +142,8 @@ PCHAR VIDEODRIVER::VideoMemory_GetSharedMemory(void)
 bool
 VIDEODRIVER::Mirror_driver_Vista(DWORD dwAttach,int x,int y,int w,int h)
 {
+	HDESK   hdeskInput;
+    HDESK   hdeskCurrent;
 	pEnumDisplayDevices pd;
 	HMODULE hUser32=LoadLibrary("USER32");
 	pd = (pEnumDisplayDevices)GetProcAddress( hUser32, "EnumDisplayDevicesA");
@@ -306,8 +308,21 @@ VIDEODRIVER::Mirror_driver_Vista(DWORD dwAttach,int x,int y,int w,int h)
 				devmode.dmPosition.y=y;
             }
             // Update the mirror device's registry data with the devmode. Dont
-            // do a mode change. 
-            INT code =
+            // do a mode change.
+			
+/////////////////////////
+				hdeskCurrent = GetThreadDesktop(GetCurrentThreadId());
+				if (hdeskCurrent != NULL)
+					{
+						hdeskInput = OpenInputDesktop(0, FALSE, MAXIMUM_ALLOWED);
+						if (hdeskInput != NULL)
+							{
+								SetThreadDesktop(hdeskInput);
+							}
+					}
+
+
+				INT code =
             ChangeDisplaySettingsEx(deviceName,
                                     &devmode, 
                                     NULL,
@@ -327,8 +342,10 @@ VIDEODRIVER::Mirror_driver_Vista(DWORD dwAttach,int x,int y,int w,int h)
                                            NULL,
                                            0,
                                            NULL);
-//			MessageBox(NULL,"end", NULL, MB_OK);
- //            GetDispCode(code);
+
+			SetThreadDesktop(hdeskCurrent);
+			CloseDesktop(hdeskInput);
+
 			if (code!=0)
 			{
 				if (hUser32) FreeLibrary(hUser32);
@@ -349,7 +366,8 @@ VIDEODRIVER::Mirror_driver_Vista(DWORD dwAttach,int x,int y,int w,int h)
 void
 VIDEODRIVER::Mirror_driver_detach_XP()
 {
-
+	HDESK   hdeskInput;
+    HDESK   hdeskCurrent;
 	pEnumDisplayDevices pd;
 	HMODULE hUser32=LoadLibrary("USER32");
 	pd = (pEnumDisplayDevices)GetProcAddress( hUser32, "EnumDisplayDevicesA");
@@ -467,6 +485,16 @@ VIDEODRIVER::Mirror_driver_detach_XP()
         deviceName = (LPSTR)&dispDevice.DeviceName[0];
 		devmode.dmBitsPerPel=32;
         // add 'Default.*' settings to the registry under above hKeyProfile\mirror\device
+		hdeskCurrent = GetThreadDesktop(GetCurrentThreadId());
+				if (hdeskCurrent != NULL)
+					{
+						hdeskInput = OpenInputDesktop(0, FALSE, MAXIMUM_ALLOWED);
+						if (hdeskInput != NULL)
+							{
+								SetThreadDesktop(hdeskInput);
+							}
+					}
+
         INT code =
         ChangeDisplaySettingsEx(deviceName,
                                 &devmode, 
@@ -484,7 +512,8 @@ VIDEODRIVER::Mirror_driver_detach_XP()
                                 NULL
                                 );
    
-//        GetDispCode(code);
+		SetThreadDesktop(hdeskCurrent);
+		CloseDesktop(hdeskInput);
 		RegCloseKey(hKeyProfileMirror);
         RegCloseKey(hKeyDevice);
 	}
@@ -497,8 +526,9 @@ if (hUser32) FreeLibrary(hUser32);
 bool
 VIDEODRIVER::Mirror_driver_attach_XP(int x,int y,int w,int h)
 {
-//	Activate_video_driver();
-//	return;
+	HDESK   hdeskInput;
+    HDESK   hdeskCurrent;
+
 	pEnumDisplayDevices pd;
 	HMODULE hUser32=LoadLibrary("USER32");
 	pd = (pEnumDisplayDevices)GetProcAddress( hUser32, "EnumDisplayDevicesA");
@@ -626,6 +656,16 @@ VIDEODRIVER::Mirror_driver_attach_XP(int x,int y,int w,int h)
 		devmode.dmPosition.x=x;
 		devmode.dmPosition.y=y;
 
+		hdeskCurrent = GetThreadDesktop(GetCurrentThreadId());
+				if (hdeskCurrent != NULL)
+					{
+						hdeskInput = OpenInputDesktop(0, FALSE, MAXIMUM_ALLOWED);
+						if (hdeskInput != NULL)
+							{
+								SetThreadDesktop(hdeskInput);
+							}
+					}
+
         // add 'Default.*' settings to the registry under above hKeyProfile\mirror\device
         INT code =
         ChangeDisplaySettingsEx(deviceName,
@@ -648,7 +688,9 @@ VIDEODRIVER::Mirror_driver_attach_XP(int x,int y,int w,int h)
                                 NULL
                                 );
    
-//        GetDispCode(code);
+		SetThreadDesktop(hdeskCurrent);
+		CloseDesktop(hdeskInput);
+
 		RegCloseKey(hKeyProfileMirror);
         RegCloseKey(hKeyDevice);
 		if (code!=0)
