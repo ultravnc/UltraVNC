@@ -121,6 +121,25 @@ CheckVideoDriver(bool Box)
 					{
 						char buf[512];
 						GetDllProductVersion("mv2.dll",buf,512);
+						if (dd.StateFlags & DISPLAY_DEVICE_ATTACHED_TO_DESKTOP)
+						{
+							strcat(buf," driver Active");
+							HDC testdc=NULL;
+							deviceName = (LPSTR)&dd.DeviceName[0];
+							testdc = CreateDC("DISPLAY",deviceName,NULL,NULL);	
+							if (testdc)
+							{
+								DeleteDC(testdc);
+								strcat(buf," access ok");
+							}
+							else
+							{
+								strcat(buf," access denied, permission problem");
+							}
+						}
+						else
+							strcat(buf," driver Not Active");
+						    
 						MessageBox(NULL,buf,"driver info",0);
 					}
 					return true;
