@@ -170,7 +170,7 @@ char sz_J1[128];
 char sz_J2[64];
 char sz_K1[64];
 char sz_K2[64];
-char sz_K3[256];
+char sz_K3[128];
 char sz_K4[64];
 char sz_K5[64];
 char sz_K6[64];
@@ -441,7 +441,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 
 	LoadString(m_hInstResDLL, IDS_K1, sz_K1, 64 -1);
 	LoadString(m_hInstResDLL, IDS_K2, sz_K2, 64 -1);
-	LoadString(m_hInstResDLL, IDS_K3, sz_K3, 256 -1);
+	LoadString(m_hInstResDLL, IDS_K3, sz_K3, sizeof(sz_K3)/sizeof(sz_K3[0]));
 	LoadString(m_hInstResDLL, IDS_K4, sz_K4, 64 -1);
 	LoadString(m_hInstResDLL, IDS_K5, sz_K5, 64 -1);
 	LoadString(m_hInstResDLL, IDS_K6, sz_K6, 64 -1);
