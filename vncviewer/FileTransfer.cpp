@@ -194,6 +194,11 @@ FileTransfer::~FileTransfer()
 	m_fFileTransferRunning = false;
 	m_FilesList.clear();
 	if (m_pZipUnZip) delete m_pZipUnZip;
+	if (m_lpCSBuffer != NULL) 
+	{
+		delete [] m_lpCSBuffer;
+		m_lpCSBuffer = NULL;
+	}
 }
 
 
