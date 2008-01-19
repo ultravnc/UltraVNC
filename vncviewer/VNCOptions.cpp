@@ -116,6 +116,8 @@ VNCOptions::VNCOptions()
   // Modif sf@2002 - Server Scaling
   m_nServerScale = 1;
 
+  m_reconnectcounter = 4;
+
   // Modif sf@2002 - Cache
   m_fEnableCache = false;
   // m_fAutoAdjust = false;
@@ -732,6 +734,7 @@ void VNCOptions::Save(char *fname)
 
   // Modif sf@2002
   saveInt("ServerScale",			m_nServerScale,		fname);
+  saveInt("Reconnect",				m_reconnectcounter,		fname);
   saveInt("EnableCache",			m_fEnableCache,		fname);
   saveInt("QuickOption",			m_quickoption,	fname);
   saveInt("UseDSMPlugin",			m_fUseDSMPlugin,	fname);
@@ -787,6 +790,7 @@ void VNCOptions::Load(char *fname)
   }
   // Modif sf@2002
   m_nServerScale =		readInt("ServerScale",		m_nServerScale,	fname);
+  m_reconnectcounter = readInt("Reconnect",		m_reconnectcounter,	fname);
   m_fEnableCache =		readInt("EnableCache",		m_fEnableCache,	fname) != 0;
   m_quickoption  =		readInt("QuickOption",		m_quickoption, fname);
   m_fUseDSMPlugin =		readInt("UseDSMPlugin",		m_fUseDSMPlugin, fname) != 0;
@@ -958,12 +962,6 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 		  SendMessage(hDisableClip, BM_SETCHECK, _this->m_DisableClipboard, 0);
 #endif			
 		  
-		  /*
-		  HWND h8bit = GetDlgItem(hwnd, IDC_8BITCHECK);
-		  SendMessage(h8bit, BM_SETCHECK, _this->m_Use8Bit, 0);
-		  EnableWindow(h8bit, !_this->autoDetect);
-		  */
-		  
 
 		  // sf@2005 - New Color depth choice
 		  HWND hColorMode;
@@ -1044,6 +1042,8 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 				  
 		  // Modif sf@2002 - Server Scaling
 		  SetDlgItemInt( hwnd, IDC_SERVER_SCALE, _this->m_nServerScale, FALSE);
+
+		  SetDlgItemInt( hwnd, IDC_SERVER_RECON, _this->m_reconnectcounter, FALSE);
 		  
 		  // Modif sf@2002 - Cache 
 		  HWND hCache = GetDlgItem(hwnd, ID_SESSION_SET_CACHE);
@@ -1125,12 +1125,6 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 			  _this->m_DisableClipboard =
 				  (SendMessage(hDisableClip, BM_GETCHECK, 0, 0) == BST_CHECKED);
 #endif
-			 
-			  /*
-			  HWND h8bit = GetDlgItem(hwnd, IDC_8BITCHECK);
-			  _this->m_Use8Bit =
-				  (SendMessage(h8bit, BM_GETCHECK, 0, 0) == BST_CHECKED);
-			  */
 			  
 			  // sd@2005 - New Color depth choice
 			  HWND hColorMode = GetDlgItem(hwnd, IDC_FULLCOLORS_RADIO);
@@ -1200,6 +1194,10 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 				  if (_this->m_nServerScale < 1 || _this->m_nServerScale > 9) 
 					  _this->m_nServerScale = 1;
 			  }
+
+			  _this->m_reconnectcounter = GetDlgItemInt( hwnd, IDC_SERVER_RECON, NULL, TRUE);
+
+
 			  
 #ifndef UNDER_CE
 			  HWND hFullScreen = GetDlgItem(hwnd, IDC_FULLSCREEN);
@@ -1286,11 +1284,6 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 		
 		HWND hCopyRect = GetDlgItem(hwnd, ID_SESSION_SET_CRECT);
 		EnableWindow(hCopyRect, !ad);
-
-		/*
-		HWND h8bit = GetDlgItem(hwnd, IDC_8BITCHECK);
-		EnableWindow(h8bit, !ad);
-		*/
 
 		// sf@2005 - New color depth choice
 		HWND hColorMode = GetDlgItem(hwnd, IDC_FULLCOLORS_RADIO);

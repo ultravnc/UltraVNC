@@ -99,6 +99,8 @@ public:
 
 	// Modif sf@2002 - Server Scaling
 	int		m_nServerScale; // Divider of the Target Server's screensize
+	// Reconnect
+	int m_reconnectcounter;
 	// Modif sf@2002 - Cache
 	bool    m_fEnableCache;
 	// Modif sz@2002 - DSM Plugin
