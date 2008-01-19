@@ -19,6 +19,12 @@ typedef struct _CURSORINFO
 // This handles the messages posted by RFBLib to the vncDesktop window
 typedef BOOL (WINAPI *_GetCursorInfo)(PMyCURSORINFO pci);
 extern bool g_DesktopThread_running;
+#define MSGFLT_ADD		1
+typedef BOOL (*CHANGEWINDOWMESSAGEFILTER)(UINT message, DWORD dwFlag);
+
+extern const UINT RFB_SCREEN_UPDATE;
+extern const UINT RFB_COPYRECT_UPDATE;
+extern const UINT RFB_MOUSE_UPDATE;
 
 class vncDesktopThread : public omni_thread
 {
@@ -32,12 +38,20 @@ public:
 
 		m_lLastMouseMoveTime = 0L;
 		m_lLastUpdateTime = 0L;
+		
+		hUser32 = LoadLibrary("user32.dll");
+		CHANGEWINDOWMESSAGEFILTER pfnFilter = NULL;
+		pfnFilter =(CHANGEWINDOWMESSAGEFILTER)GetProcAddress(hUser32,"ChangeWindowMessageFilter");
+		if (pfnFilter) pfnFilter(RFB_SCREEN_UPDATE, MSGFLT_ADD);
+		if (pfnFilter) pfnFilter(RFB_COPYRECT_UPDATE, MSGFLT_ADD);
+		if (pfnFilter) pfnFilter(RFB_MOUSE_UPDATE, MSGFLT_ADD);
 	};
 protected:
 	~vncDesktopThread() {
 		if (m_returnsig != NULL) delete m_returnsig;
 		if (user32) FreeLibrary(user32);
 		g_DesktopThread_running=false;
+		if (hUser32) FreeLibrary(hUser32);
 	};
 public:
 	virtual BOOL Init(vncDesktop *desktop, vncServer *server);
@@ -68,6 +82,7 @@ protected:
 	DWORD m_lLastUpdateTime;
 	DWORD m_lLastMouseMoveTime;
 	void SessionFix();
+	HMODULE  hUser32;
 
 };
 #endif
