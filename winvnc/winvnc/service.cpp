@@ -5,6 +5,7 @@
 #include <WtsApi32.h>
 #include <stdio.h>
 #include <Tlhelp32.h>
+#include "inifile.h"
 
 
 extern HANDLE stopServiceEvent;
@@ -16,6 +17,7 @@ WTSQUERYUSERTOKEN lpfnWTSQueryUserToken = NULL;
 PROCESS_INFORMATION  ProcessInfo;
 int counter=0;
 extern char cmdtext[256];
+int kickrdp=0;
 //////////////////////////////////////////////////////////////////////////////
 static int pad2()
 {
@@ -26,6 +28,8 @@ static int pad2()
 	strcat(app_path, " ");
 	strcat(app_path,cmdtext);
     strcat(app_path, "_run");
+	IniFile myIniFile;
+	myIniFile.ReadInt("admin", "kickrdp", kickrdp);
 	return 0;
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -226,7 +230,7 @@ LaunchProcessWin()
 					sprintf(szText," ++++++ CreateProcessAsUser failed %d\n",error);
 					OutputDebugString(szText);		
 			#endif
-			/*if (error==233)
+			if (error==233 && kickrdp)
 					{
 						counter++;
 						if (counter>3)
@@ -261,7 +265,7 @@ LaunchProcessWin()
 									}
 								Sleep(3000);
 						}
-					}*/
+					}
 		 }
 
          if (lpEnvironment) 
@@ -296,7 +300,7 @@ LaunchProcessWin()
 			 //Switch to USER B, logout user B
 			 //The logon session is then unreachable
 			 //We force the logon session on the console
-			/*if (error==233)
+			if (error==233 && kickrdp)
 					{
 						counter++;
 						if (counter>3)
@@ -331,7 +335,7 @@ LaunchProcessWin()
 									}
 								Sleep(3000);
 						}
-					}*/
+					}
 	  }
         CloseHandle(hToken);
 	}  //getsession
