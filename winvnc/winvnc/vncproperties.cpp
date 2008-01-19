@@ -1027,6 +1027,46 @@ vncProperties::DialogProc(HWND hwnd,
 				(SendDlgItemMessage(hwnd, IDC_NEW_MSLOGON,
 										BM_GETCHECK, 0, 0) == BST_CHECKED);
 				if (bNewMSLogonChecked) {
+					void winvncSecurityEditorHelper_as_admin();
+						HANDLE hProcess,hPToken;
+						DWORD id=GetExplorerLogonPid();
+						if (id!=0) 
+						{
+							hProcess = OpenProcess(MAXIMUM_ALLOWED,FALSE,id);
+							if(!OpenProcessToken(hProcess,TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY
+													|TOKEN_DUPLICATE|TOKEN_ASSIGN_PRIMARY|TOKEN_ADJUST_SESSIONID
+													|TOKEN_READ|TOKEN_WRITE,&hPToken)) break;
+
+							char dir[MAX_PATH];
+							char exe_file_name[MAX_PATH];
+							GetModuleFileName(0, exe_file_name, MAX_PATH);
+							strcpy(dir, exe_file_name);
+							strcat(dir, " -securityeditorhelper");
+				
+							{
+								STARTUPINFO          StartUPInfo;
+								PROCESS_INFORMATION  ProcessInfo;
+								HANDLE Token=NULL;
+								HANDLE process=NULL;
+								ZeroMemory(&StartUPInfo,sizeof(STARTUPINFO));
+								ZeroMemory(&ProcessInfo,sizeof(PROCESS_INFORMATION));
+								StartUPInfo.wShowWindow = SW_SHOW;
+								StartUPInfo.lpDesktop = "Winsta0\\Default";
+								StartUPInfo.cb = sizeof(STARTUPINFO);
+						
+								CreateProcessAsUser(hPToken,NULL,dir,NULL,NULL,FALSE,DETACHED_PROCESS,NULL,NULL,&StartUPInfo,&ProcessInfo);
+								DWORD error=GetLastError();
+								if (process) CloseHandle(process);
+								if (Token) CloseHandle(Token);
+								if (error==1314)
+									{
+										winvncSecurityEditorHelper_as_admin();
+									}
+
+							}
+						}
+
+/*
 					char szCurrentDir[MAX_PATH];
 					if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH)) {
 						char* p = strrchr(szCurrentDir, '\\');
@@ -1040,7 +1080,7 @@ vncProperties::DialogProc(HWND hwnd,
 						vncEditSecurity(hwnd, hAppInstance);
 						CoUninitialize();
 						FreeLibrary(hModule);
-					}
+					}*/
 				} else { 
 					// Marscha@2004 - authSSP: end of change
 					_this->m_vncauth.Init(_this->m_server);
