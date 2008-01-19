@@ -10,6 +10,7 @@ const char winvncStopservice[]			= "-stopservice";
 const char winvncStartservice[]			= "-startservice";
 const char winvncInstallService[]		= "-install";
 const char winvncUnInstallService[]		= "-uninstall";
+const char winvncSecurityEditor[]		= "-securityeditor";
 
 extern char service_name[];
 
@@ -356,4 +357,24 @@ Set_uninstall_service_as_admin()
 	shExecInfo.hInstApp = NULL;
 	ShellExecuteEx(&shExecInfo);
 
+}
+
+void
+winvncSecurityEditorHelper_as_admin()
+{
+	char exe_file_name[MAX_PATH];
+	GetModuleFileName(0, exe_file_name, MAX_PATH);
+
+	SHELLEXECUTEINFO shExecInfo;
+
+	shExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
+	shExecInfo.fMask = NULL;
+	shExecInfo.hwnd = GetForegroundWindow();
+	shExecInfo.lpVerb = "runas";
+	shExecInfo.lpFile = exe_file_name;
+	shExecInfo.lpParameters = winvncSecurityEditor;
+	shExecInfo.lpDirectory = NULL;
+	shExecInfo.nShow = SW_SHOWNORMAL;
+	shExecInfo.hInstApp = NULL;
+	ShellExecuteEx(&shExecInfo);
 }
