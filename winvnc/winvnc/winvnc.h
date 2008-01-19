@@ -64,7 +64,10 @@ const char winvncStartservice[]			= "-startservice";
 const char winvncInstallService[]		= "-install";
 const char winvncUnInstallService[]		= "-uninstall";
 const char winvncInstallServiceHelper[]		= "-installhelper";
-const char winvncUnInstallServiceHelper[]		= "-uninstallhelper";
+const char winvncUnInstallServiceHelper[]	= "-uninstallhelper";
+const char winvncSecurityEditorHelper[]		= "-securityeditorhelper";
+const char winvncSecurityEditor[]			= "-securityeditor";
+const char winvncKill[]						= "-kill";
 
 // Usage string
 const char winvncUsageText[]		= "winvnc [-run] [-autoreconnect[ ID:????]] [-connect host[:display]] [-connect host[::port]] \n";
