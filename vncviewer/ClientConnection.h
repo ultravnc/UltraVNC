@@ -441,6 +441,8 @@ private:
 	TextChat *m_pTextChat;			// Modif sf@2002 - Text Chat
 	int m_nServerScale; 	       // Modif sf@2002 - Server Scaling
 
+	int m_reconnectcounter;
+
 	// Modif sf@2002 - Data Stream Modification Plugin handling
 	int m_nTO;
 	CDSMPlugin *m_pDSMPlugin;

@@ -371,6 +371,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_pendingScaleChange = false;
 	m_pendingCacheInit = false;
 	m_nServerScale = 1;
+	m_reconnectcounter = 4;
 
 	//ms logon
 	m_ms_logon=false;
@@ -528,7 +529,7 @@ void ClientConnection::DoConnection()
 
     SetFormatAndEncodings();
 
-	reconnectcounter=4;
+	reconnectcounter=m_reconnectcounter;
  
 }
 
@@ -938,8 +939,9 @@ void ClientConnection::GTGBS_CreateToolbar()
 	HDC hdc = GetDC(m_TrafficMonitor);
 	HDC hdcBits;
 	hdcBits = CreateCompatibleDC(hdc);
-	SelectObject(hdcBits,m_bitmapNONE);
+	HGDIOBJ hbrOld = SelectObject(hdcBits,m_bitmapNONE);
 	BitBlt(hdc,0,0,22,22,hdcBits,0,0,SRCCOPY);
+	SelectObject(hdcBits,hbrOld);
 	DeleteDC(hdcBits);
 	ReleaseDC(m_TrafficMonitor,hdc);
 
@@ -2942,7 +2944,7 @@ inline void ClientConnection::SubProcessPointerEvent(int x, int y, DWORD keyflag
 	} catch (Exception &e) {
 		if( !m_autoReconnect )
 			e.Report();
-		PostMessage(m_hwndMain, WM_CLOSE, 4, 0);
+		PostMessage(m_hwndMain, WM_CLOSE, reconnectcounter, 0);
 	}
 }
 
@@ -3100,7 +3102,7 @@ inline void ClientConnection::ProcessKeyEvent(int virtkey, DWORD keyData)
 	} catch (Exception &e) {
 		if( !m_autoReconnect )
 			e.Report();
-		PostMessage(m_hwndMain, WM_CLOSE, 4, 0);
+		PostMessage(m_hwndMain, WM_CLOSE, reconnectcounter, 0);
 	}
 
 }
@@ -3327,6 +3329,10 @@ void* ClientConnection::run_undetached(void* arg) {
 
 	// Modif sf@2002 - Server Scaling
 	m_nServerScale = m_opts.m_nServerScale;
+
+	m_reconnectcounter = m_opts.m_reconnectcounter;
+	reconnectcounter = m_reconnectcounter;
+
 	if (m_nServerScale > 1) SendServerScale(m_nServerScale);
 
 	SendFullFramebufferUpdateRequest();
@@ -3447,7 +3453,7 @@ void* ClientConnection::run_undetached(void* arg) {
 			// m_pFileTransfer->m_fFileTransferRunning = false;
 			// m_pTextChat->m_fTextChatRunning = false;
 			m_bKillThread = true;
-			PostMessage(m_hwndMain, WM_CLOSE, 4, 0);
+			PostMessage(m_hwndMain, WM_CLOSE, reconnectcounter, 0);
 		}
 		catch (QuietException &e)
 		{
@@ -3455,7 +3461,7 @@ void* ClientConnection::run_undetached(void* arg) {
 			// m_pFileTransfer->m_fFileTransferRunning = false;
 			// m_pTextChat->m_fTextChatRunning = false;
 			m_bKillThread = true;
-			PostMessage(m_hwndMain, WM_CLOSE, 4, 0);
+			PostMessage(m_hwndMain, WM_CLOSE, reconnectcounter, 0);
 		}
 		catch (rdr::Exception& e)
 		{
@@ -3464,7 +3470,7 @@ void* ClientConnection::run_undetached(void* arg) {
 			// m_pTextChat->m_fTextChatRunning = false;
 			// throw QuietException(e.str());
 			m_bKillThread = true;
-			PostMessage(m_hwndMain, WM_CLOSE, 4, 0);
+			PostMessage(m_hwndMain, WM_CLOSE, reconnectcounter, 0);
 		}
 
 		Sleep(0);
@@ -3766,8 +3772,9 @@ inline void ClientConnection::ReadScreenUpdate()
 		{
 			hdcX = GetDC(m_TrafficMonitor);
 			hdcBits = CreateCompatibleDC(hdcX);
-			SelectObject(hdcBits,m_bitmapBACK);
+			HGDIOBJ hbrOld=SelectObject(hdcBits,m_bitmapBACK);
 			BitBlt(hdcX,4,2,22,20,hdcBits,0,0,SRCCOPY);
+			SelectObject(hdcBits, hbrOld);
 			DeleteDC(hdcBits);
 			ReleaseDC(m_TrafficMonitor,hdcX);
 		}
@@ -3932,8 +3939,9 @@ inline void ClientConnection::ReadScreenUpdate()
 		{
 			hdcX = GetDC(m_TrafficMonitor);
 			hdcBits = CreateCompatibleDC(hdcX);
-			SelectObject(hdcBits,m_bitmapNONE);
+			HGDIOBJ hbrOld=SelectObject(hdcBits,m_bitmapNONE);
 			BitBlt(hdcX,4,2,22,20,hdcBits,0,0,SRCCOPY);
+			SelectObject(hdcBits,hbrOld);
 			DeleteDC(hdcBits);
 			ReleaseDC(m_TrafficMonitor,hdcX);
 		}
@@ -5523,7 +5531,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						else // Autoreconnect allowed - We only suspend the working thread then reconnect a few seconds later
 						{
 							char temp[10];
-							char wtext[30];
+							char wtext[150];
 							itoa(wParam,temp,10);
 							strcpy(wtext,"Ultr@VNC Viewer - Connection dropped, trying to reconnect (");
 							strcat(wtext,temp);
