@@ -200,6 +200,7 @@
 #define IDD_APP_MESSAGE1                1150
 #define IDD_APP_MESSAGE2                1151
 #define IDC_CHECK1                      1154
+#define IDC_SERVER_RECON                1155
 #define IDC_ENCODING_BASE               1999
 #define IDC_RAWRADIO                    2000
 #define IDC_RRERADIO                    2002
@@ -493,7 +494,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        188
 #define _APS_NEXT_COMMAND_VALUE         50025
-#define _APS_NEXT_CONTROL_VALUE         1155
+#define _APS_NEXT_CONTROL_VALUE         1156
 #define _APS_NEXT_SYMED_VALUE           154
 #endif
 #endif
