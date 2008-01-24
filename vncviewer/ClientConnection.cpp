@@ -371,7 +371,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_pendingScaleChange = false;
 	m_pendingCacheInit = false;
 	m_nServerScale = 1;
-	m_reconnectcounter = 4;
+	m_reconnectcounter = 0;
 
 	//ms logon
 	m_ms_logon=false;
@@ -427,6 +427,9 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	rcMask=NULL;
 
 	m_autoReconnect = m_opts.m_autoReconnect;
+	ThreadSocketTimeout=NULL;
+	m_statusThread=NULL;
+	m_hSavedAreaBitmap=NULL;
 }
 
 // 
@@ -1445,7 +1448,7 @@ void ClientConnection::Connect()
 	thataddr.sin_port = htons(m_port);
 	///Force break after timeout
 	DWORD				  threadID;
-	HANDLE Thread = CreateThread(NULL,0,SocketTimeout,(LPVOID)&m_sock,0,&threadID);
+	ThreadSocketTimeout = CreateThread(NULL,0,SocketTimeout,(LPVOID)&m_sock,0,&threadID);
 	havetobekilled=true;
 	res = connect(m_sock, (LPSOCKADDR) &thataddr, sizeof(thataddr));
 	//Force break
@@ -1646,6 +1649,13 @@ void ClientConnection::NegotiateProtocolVersion()
 		int size;
 		ReadExact((char *)&size,sizeof(int));
 		char mytext[1024]; //10k
+		//block
+		if (size<0 || size >1024)
+		{
+			throw WarningException("Buffer to big, ");
+			return;
+		}
+
 		ReadExact(mytext,size);
 		mytext[size]=0;
 
@@ -2755,7 +2765,10 @@ ClientConnection::~ClientConnection()
 		delete[] rcSource;
 	if (rcMask!=NULL)
 		delete[] rcMask;
-	CloseHandle(KillEvent);
+	if (KillEvent) CloseHandle(KillEvent);
+	if (ThreadSocketTimeout) CloseHandle(ThreadSocketTimeout);
+	if (m_statusThread) CloseHandle(m_statusThread);
+	if (m_hSavedAreaBitmap) DeleteObject(m_hSavedAreaBitmap);
 }
 
 // You can specify a dx & dy outside the limits; the return value will
@@ -3770,6 +3783,7 @@ inline void ClientConnection::ReadScreenUpdate()
 
 		if (m_TrafficMonitor)
 		{
+			HDC hdcX,hdcBits;
 			hdcX = GetDC(m_TrafficMonitor);
 			hdcBits = CreateCompatibleDC(hdcX);
 			HGDIOBJ hbrOld=SelectObject(hdcBits,m_bitmapBACK);
