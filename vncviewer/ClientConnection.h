@@ -581,6 +581,7 @@ private:
 	void Reconnect();
 	void DoConnection();
 	int reconnectcounter;
+	HANDLE ThreadSocketTimeout;
 };
 
 // Some handy classes for temporary GDI object selection
