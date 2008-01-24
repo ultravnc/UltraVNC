@@ -116,7 +116,7 @@ VNCOptions::VNCOptions()
   // Modif sf@2002 - Server Scaling
   m_nServerScale = 1;
 
-  m_reconnectcounter = 4;
+  m_reconnectcounter = 0;
 
   // Modif sf@2002 - Cache
   m_fEnableCache = false;
