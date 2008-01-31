@@ -56,7 +56,26 @@ VIDEODRIVER::VIDEODRIVER_start(int x,int y,int w,int h)
 			else
 			{
 	//			MessageBox(NULL,"Video driver failed", NULL, MB_OK);
-				mypVideoMemory=NULL;
+////////////////////////////////////////////////////////////////////////////////
+				if (Mirror_driver_attach_XP(x,y,w,h))
+					{
+						if (GetDcMirror()!=NULL)
+						{
+						mypVideoMemory=VideoMemory_GetSharedMemory();
+						mypchangebuf=(PCHANGES_BUF)mypVideoMemory;
+						myframebuffer=mypVideoMemory+sizeof(CHANGES_BUF);
+						}
+						else
+						{
+							mypVideoMemory=NULL;
+						}
+					}
+					else
+					{
+						mypVideoMemory=NULL;
+					}
+////////////////////////////////////////////////////////////////////////////////
+				//mypVideoMemory=NULL;
 			}
 		}
 		else
@@ -326,7 +345,7 @@ VIDEODRIVER::Mirror_driver_Vista(DWORD dwAttach,int x,int y,int w,int h)
             ChangeDisplaySettingsEx(deviceName,
                                     &devmode, 
                                     NULL,
-                                    (CDS_UPDATEREGISTRY | CDS_NORESET),
+                                    (CDS_UPDATEREGISTRY | CDS_RESET|CDS_GLOBAL),
                                     NULL
                                     );
 //            GetDispCode(code);
