@@ -409,6 +409,7 @@ vncDesktopThread::run_undetached(void *arg)
 	HANDLE threadHandle=NULL;
 	DWORD dwTId;
 	stop_hookwatch=false;
+	/////////////////////
 
 	/////////////////////
 	MSG msg;
