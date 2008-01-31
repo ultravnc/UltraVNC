@@ -796,8 +796,10 @@ void VNCOptions::Load(char *fname)
   m_fUseDSMPlugin =		readInt("UseDSMPlugin",		m_fUseDSMPlugin, fname) != 0;
   m_fUseProxy =			readInt("UseProxy",			m_fUseProxy, fname) != 0;
   GetPrivateProfileString("options", "DSMPlugin", "NoPlugin", m_szDSMPluginFilename, MAX_PATH, fname);
-  g_sponsor=readInt("sponsor",			g_sponsor, fname) != 0;
+  if (!g_sponsor) g_sponsor=readInt("sponsor",			g_sponsor, fname) != 0;
 
+  if (!g_sponsor)
+  {
   HKEY hRegKey;
 		DWORD sponsor = 0;
 		if ( RegCreateKey(HKEY_CURRENT_USER, SETTINGS_KEY_NAME, &hRegKey)  != ERROR_SUCCESS ) {
@@ -811,6 +813,7 @@ void VNCOptions::Load(char *fname)
 			}
 			RegCloseKey(hRegKey);
 		}
+  }
 
   //m_autoReconnect =		readInt("AutoReconnect",	m_autoReconnect, fname) != 0;
   

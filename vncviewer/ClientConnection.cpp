@@ -297,8 +297,14 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_BytesSend=0;
 	m_BytesRead=0;
 
+	m_keymap = new KeyMap;
+
 	// We take the initial conn options from the application defaults
 	m_opts = m_pApp->m_options;
+
+	// Pass the connection option(s) to module(s)
+    m_keymap->SetKeyMapOption1(false);
+    m_keymap->SetKeyMapOption2(true);
 
 	m_sock = INVALID_SOCKET;
 	m_bKillThread = false;
@@ -2769,6 +2775,10 @@ ClientConnection::~ClientConnection()
 	if (ThreadSocketTimeout) CloseHandle(ThreadSocketTimeout);
 	if (m_statusThread) CloseHandle(m_statusThread);
 	if (m_hSavedAreaBitmap) DeleteObject(m_hSavedAreaBitmap);
+	if (m_keymap) {
+        delete m_keymap;
+        m_keymap = NULL;
+    }
 }
 
 // You can specify a dx & dy outside the limits; the return value will
@@ -3044,7 +3054,7 @@ ClientConnection::SendPointerEvent(int x, int y, int buttonMask)
 //      Alt-Up, Ctrl-Up
 //                 (when the AltGr is released)
 
-inline void ClientConnection::ProcessKeyEvent(int virtkey, DWORD keyData)
+inline void ClientConnection::ProcessKeyEvent(int virtKey, DWORD keyData)
 {
     bool down = ((keyData & 0x80000000l) == 0);
 
@@ -3071,47 +3081,7 @@ inline void ClientConnection::ProcessKeyEvent(int virtkey, DWORD keyData)
 #endif
 
 	try {
-		KeyActionSpec kas = m_keymap.PCtoX(virtkey, keyData);    
-		
-		if (kas.releaseModifiers & KEYMAP_LCONTROL) {
-			SendKeyEvent(XK_Control_L, false );
-			vnclog.Print(5, _T("fake L Ctrl raised\n"));
-		}
-		if (kas.releaseModifiers & KEYMAP_LALT) {
-			SendKeyEvent(XK_Alt_L, false );
-			vnclog.Print(5, _T("fake L Alt raised\n"));
-		}
-		if (kas.releaseModifiers & KEYMAP_RCONTROL) {
-			SendKeyEvent(XK_Control_R, false );
-			vnclog.Print(5, _T("fake R Ctrl raised\n"));
-		}
-		if (kas.releaseModifiers & KEYMAP_RALT) {
-			SendKeyEvent(XK_Alt_R, false );
-			vnclog.Print(5, _T("fake R Alt raised\n"));
-		}
-		
-		for (int i = 0; kas.keycodes[i] != XK_VoidSymbol && i < MaxKeysPerKey; i++) {
-			SendKeyEvent(kas.keycodes[i], down );
-			//vnclog.Print(4, _T("Sent keysym %04x (%s)\n"), 
-			//	kas.keycodes[i], down ? _T("press") : _T("release"));
-		}
-		
-		if (kas.releaseModifiers & KEYMAP_RALT) {
-			SendKeyEvent(XK_Alt_R, true );
-			vnclog.Print(5, _T("fake R Alt pressed\n"));
-		}
-		if (kas.releaseModifiers & KEYMAP_RCONTROL) {
-			SendKeyEvent(XK_Control_R, true );
-			vnclog.Print(5, _T("fake R Ctrl pressed\n"));
-		}
-		if (kas.releaseModifiers & KEYMAP_LALT) {
-			SendKeyEvent(XK_Alt_L, false );
-			vnclog.Print(5, _T("fake L Alt pressed\n"));
-		}
-		if (kas.releaseModifiers & KEYMAP_LCONTROL) {
-			SendKeyEvent(XK_Control_L, false );
-			vnclog.Print(5, _T("fake L Ctrl pressed\n"));
-		}
+        m_keymap->PCtoX(virtKey, keyData, this);
 	} catch (Exception &e) {
 		if( !m_autoReconnect )
 			e.Report();
@@ -5482,17 +5452,21 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 
 				case WM_SETFOCUS:		
 					TheAccelKeys.SetWindowHandle(_this->m_opts.m_NoHotKeys ? 0 : hwnd);
+					_this->m_keymap->Reset();
 					return 0;			
 
 				case WM_KILLFOCUS:
 					if (!_this->m_running) return 0;
 					if ( _this->m_opts.m_ViewOnly) return 0;
+					_this->m_keymap->ReleaseAllKeys(_this);
+					/*
 					_this->SendKeyEvent(XK_Alt_L,     false);
 					_this->SendKeyEvent(XK_Control_L, false);
 					_this->SendKeyEvent(XK_Shift_L,   false);
 					_this->SendKeyEvent(XK_Alt_R,     false);
 					_this->SendKeyEvent(XK_Control_R, false);
 					_this->SendKeyEvent(XK_Shift_R,   false);
+					*/
 					return 0; 
 			
 				case WM_CLOSE:
@@ -5589,7 +5563,9 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						//PostQuitMessage(0);
 						return 0;
 					}
-					
+// Verify
+// Possible not needed as clientwindow receive inout
+
 				case WM_KEYDOWN:
 				case WM_KEYUP:
 				case WM_SYSKEYDOWN:
@@ -5600,29 +5576,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						_this->ProcessKeyEvent((int) wParam, (DWORD) lParam);
 						return 0;
 					}
-/*					
-				case WM_CHAR:
-				case WM_SYSCHAR:
-#ifdef UNDER_CE
-					{
-						int key = wParam;
-						vnclog.Print(4,_T("CHAR msg : %02x\n"), key);
-						// Control keys which are in the Keymap table will already
-						// have been handled.
-						if (key == 0x0D  ||  // return
-							key == 0x20 ||   // space
-							key == 0x08)     // backspace
-							return 0;
-						
-						if (key < 32) key += 64;  // map ctrl-keys onto alphabet
-						if (key > 32 && key < 127) {
-							_this->SendKeyEvent(wParam & 0xff, true);
-							_this->SendKeyEvent(wParam & 0xff, false);
-						}
-						return 0;
-					}
-#endif
-*/
+
 				case WM_DEADCHAR:
 				case WM_SYSDEADCHAR:
 					return 0;
@@ -6070,8 +6024,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 	ClientConnection *_this = (ClientConnection *) GetWindowLong(hwnd, GWL_USERDATA);
 	if (_this == NULL) return DefWindowProc(hwnd, iMsg, wParam, lParam);
 	switch (iMsg) 
-			{
-				
+			{				
 			case WM_CREATE:
 				SetTimer(_this->m_hwnd,3335, 1000, NULL);
 				return 0;
@@ -6168,6 +6121,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 			case WM_SETFOCUS:
 				if (_this->InFullScreenMode())
 					SetWindowPos(hwnd, HWND_TOPMOST, 0,0,100,100, SWP_NOMOVE | SWP_NOSIZE);
+				_this->m_keymap->Reset();
 				return 0;
 
 				// Cacnel modifiers when we lose focus
@@ -6189,6 +6143,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 						
 						SetWindowPos(hwnd, hwndafter, 0,0,100,100, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
 					}
+					_this->m_keymap->ReleaseAllKeys(_this);
 					/*	
 					vnclog.Print(6, _T("Losing focus - cancelling modifiers\n"));
 					_this->SendKeyEvent(XK_Alt_L,     false);

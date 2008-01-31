@@ -143,6 +143,8 @@ public:
 
 	bool IsDormant(){ return m_dormant;};
 
+	void SendKeyEvent(CARD32 key, bool down);
+
 private:
 	static LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam);
 	static LRESULT CALLBACK WndProcTBwin(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam);
@@ -202,7 +204,6 @@ private:
 	void ProcessMouseWheel(int delta); // RealVNC 335 method
 	void SendPointerEvent(int x, int y, int buttonMask);
     void ProcessKeyEvent(int virtkey, DWORD keyData);
-	void SendKeyEvent(CARD32 key, bool down);
 	
 	void ReadScreenUpdate();
 	void Update(RECT *pRect);
@@ -432,7 +433,7 @@ private:
 #endif
  
 	// Keyboard mapper
-	KeyMap m_keymap;
+    KeyMap *m_keymap;
 
 	// RFB settings
 	VNCOptions m_opts;
