@@ -152,6 +152,7 @@ Myinit(HINSTANCE hInstance)
 // routine or, under NT, the main service routine.
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow)
 {
+
 	SetOSVersion();
 	setbuf(stderr, 0);
     //Load all messages from ressource file
@@ -380,16 +381,18 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 			// NOTE:  id must be NULL or the ID:???? (pointer will get deleted when message is processed)
 			// We can not contact a runnning service, permissions, so we must store the settings
 			// and process until the vncmenu has been started
-			PostAddAutoConnectClient_bool=true;
-			if (pszId==NULL)
-			{
-				PostAddAutoConnectClient_bool_null=true;
-				PostAddAutoConnectClient_bool=false;
-			}
-			else
-				strcpy(pszId_char,pszId);
-			//vncService::PostAddAutoConnectClient( pszId );
 
+			if (!vncService::PostAddAutoConnectClient( pszId ))
+			{
+				PostAddAutoConnectClient_bool=true;
+				if (pszId==NULL)
+				{
+					PostAddAutoConnectClient_bool_null=true;
+					PostAddAutoConnectClient_bool=false;
+				}
+				else
+					strcpy(pszId_char,pszId);
+				}
 			continue;
 		}
 
@@ -430,10 +433,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 						// Post the IP address to the server
 						// We can not contact a runnning service, permissions, so we must store the settings
 						// and process until the vncmenu has been started
+						if (!vncService::PostAddNewClient(address, port))
+						{
 						PostAddNewClient_bool=true;
 						port_int=port;
 						address_vcard=address;
-						//vncService::PostAddNewClient(address, port);
+						}
 					}
 				}
 				i=end;
@@ -444,10 +449,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 				// Tell the server to show the Add New Client dialog
 				// We can not contact a runnning service, permissions, so we must store the settings
 				// and process until the vncmenu has been started
+				if (!vncService::PostAddNewClient(0, 0))
+				{
 				PostAddNewClient_bool=true;
 				port_int=0;
 				address_vcard=0;
-				//vncService::PostAddNewClient(0, 0);
+				}
 			}
 			continue;
 		}
