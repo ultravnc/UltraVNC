@@ -609,6 +609,11 @@ SimulateCtrlAltDelThreadFn(void *context)
 	if (!vncService::SelectDesktop("Winlogon"))
 	{
 		vnclog.Print(LL_INTERR, VNCLOG("failed to select logon desktop\n"));
+		vncTimedMsgBox::Do(
+									sz_ID_CADERROR,
+									sz_ID_ULTRAVNC_WARNING,
+									MB_ICONINFORMATION | MB_OK
+									);
 		return FALSE;
 	}
 
