@@ -22,6 +22,7 @@ int kickrdp=0;
 static int pad2()
 {
 	char exe_file_name[MAX_PATH];
+	char cmdline[MAX_PATH];
     GetModuleFileName(0, exe_file_name, MAX_PATH);
 
     strcpy(app_path, exe_file_name);
@@ -29,7 +30,15 @@ static int pad2()
 	strcat(app_path,cmdtext);
     strcat(app_path, "_run");
 	IniFile myIniFile;
-	myIniFile.ReadInt("admin", "kickrdp", kickrdp);
+	kickrdp=myIniFile.ReadInt("admin", "kickrdp", kickrdp);
+	myIniFile.ReadString("admin", "service_commandline",cmdline,256);
+	if (strlen(cmdline)!=0)
+	{
+		strcpy(app_path, exe_file_name);
+		strcat(app_path, " ");
+		strcat(app_path,cmdline);
+		strcat(app_path, " -service_run");
+	}
 	return 0;
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -204,6 +213,7 @@ LaunchProcessWin()
   //StartUPInfo.lpDesktop = "Winsta0\\Default";
   StartUPInfo.cb = sizeof(STARTUPINFO);
   SetTBCPrivileges();
+  pad2();
 
   if ( GetSessionUserTokenWin(&hToken) )
   {
@@ -227,10 +237,10 @@ LaunchProcessWin()
 			 DWORD error=GetLastError();
 			 #ifdef _DEBUG
 					char			szText[256];
-					sprintf(szText," ++++++ CreateProcessAsUser failed %d\n",error);
+					sprintf(szText," ++++++ CreateProcessAsUser failed %d %d %d\n",error,kickrdp,counter);
 					OutputDebugString(szText);		
 			#endif
-			if (error==233 && kickrdp)
+			if (error==233 && kickrdp==1)
 					{
 						counter++;
 						if (counter>3)
@@ -300,7 +310,7 @@ LaunchProcessWin()
 			 //Switch to USER B, logout user B
 			 //The logon session is then unreachable
 			 //We force the logon session on the console
-			if (error==233 && kickrdp)
+			if (error==233 && kickrdp==1)
 					{
 						counter++;
 						if (counter>3)
