@@ -71,6 +71,17 @@ void Set_install_service_as_admin();
 void Set_stop_service_as_admin();
 void Set_start_service_as_admin();
 
+
+
+#define MSGFLT_ADD		1
+typedef BOOL (WINAPI *CHANGEWINDOWMESSAGEFILTER)(UINT message, DWORD dwFlag);
+
+
+
+
+
+
+
 static inline VOID UnloadDM(VOID) 
  { 
          pfnDwmEnableComposition = NULL; 
@@ -152,6 +163,13 @@ vncMenu::vncMenu(vncServer *server)
     CoInitialize(0);
 	IsIconSet=false;
 	IconFaultCounter=0;
+
+	hUser32 = LoadLibrary("user32.dll");
+	CHANGEWINDOWMESSAGEFILTER pfnFilter = NULL;
+	pfnFilter =(CHANGEWINDOWMESSAGEFILTER)GetProcAddress(hUser32,"ChangeWindowMessageFilter");
+	if (pfnFilter) pfnFilter(MENU_ADD_CLIENT_MSG, MSGFLT_ADD);
+	if (pfnFilter) pfnFilter(MENU_AUTO_RECONNECT_MSG, MSGFLT_ADD);
+
 	
 
 	// Save the server pointer
@@ -358,6 +376,7 @@ vncMenu::~vncMenu()
 		RestoreWallpaper();
 	if (m_server->RemoveAeroEnabled())
 		ResetAero();
+	if (hUser32) FreeLibrary(hUser32);
 }
 
 void
