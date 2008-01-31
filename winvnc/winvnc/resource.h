@@ -2,6 +2,7 @@
 // Microsoft Developer Studio generated include file.
 // Used by winvnc.rc
 //
+#define IDR_MANIFEST                    1
 #define IDI_WINVNC                      102
 #define IDD_PROPERTIES                  102
 #define IDS_WARNING                     103
@@ -244,6 +245,9 @@
 #define ID_DEFAULT_SYST_PROP            41050
 #define ID_AUTOREJECT_U                 41051
 #define ID_AUTOACCEPT_U                 41052
+#define ID_CADERROR                     41053
+#define ID_CADERRORFILE                 41054
+#define ID_CADPERMISSION                41055
 
 // Next default values for new objects
 // 

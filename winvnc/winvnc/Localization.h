@@ -69,6 +69,9 @@ char sz_ID_CURRENT_USER_PROP [64]; //   "WinVNC: Current User Properties"
 char sz_ID_DEFAULT_SYST_PROP [64]; //  "WinVNC: Default Local System Properties"
 char sz_ID_AUTOREJECT_U [64] ; //  "AutoReject:%u"
 char sz_ID_AUTOACCEPT_U [64] ; //  "AutoAccept:%u"
+char sz_ID_CADERROR [128];
+char sz_ID_CADERRORFILE [128];
+char sz_ID_CADPERMISSION [128];
 
 
 int Load_Localization(HINSTANCE hInstance) 
@@ -127,6 +130,9 @@ int Load_Localization(HINSTANCE hInstance)
    LoadString(hInstance, ID_DEFAULT_SYST_PROP, sz_ID_DEFAULT_SYST_PROP, 64 -1); 
    LoadString(hInstance, ID_AUTOREJECT_U, sz_ID_AUTOREJECT_U, 64 -1);
    LoadString(hInstance, ID_AUTOACCEPT_U, sz_ID_AUTOACCEPT_U, 64 -1);
+   LoadString(hInstance, ID_CADERROR, sz_ID_CADERROR , 128 -1);
+   LoadString(hInstance, ID_CADERROR, sz_ID_CADERRORFILE , 128 -1);
+   LoadString(hInstance, ID_CADERROR, sz_ID_CADPERMISSION , 128 -1);
 
 
   return 0;
@@ -189,5 +195,8 @@ extern char sz_ID_CURRENT_USER_PROP [64]; //   "WinVNC: Current User Properties"
 extern char sz_ID_DEFAULT_SYST_PROP [64]; //  "WinVNC: Default Local System Properties"
 extern char sz_ID_AUTOREJECT_U [64] ; //  "AutoReject:%u"
 extern char sz_ID_AUTOACCEPT_U [64] ; //  "AutoReject:%u"
+extern char sz_ID_CADERROR [128];
+extern char sz_ID_CADERRORFILE [128];
+extern char sz_ID_CADPERMISSION [128];
 
 #endif
