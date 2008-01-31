@@ -20,7 +20,7 @@ typedef struct _CURSORINFO
 typedef BOOL (WINAPI *_GetCursorInfo)(PMyCURSORINFO pci);
 extern bool g_DesktopThread_running;
 #define MSGFLT_ADD		1
-typedef BOOL (*CHANGEWINDOWMESSAGEFILTER)(UINT message, DWORD dwFlag);
+typedef BOOL (WINAPI *CHANGEWINDOWMESSAGEFILTER)(UINT message, DWORD dwFlag);
 
 extern const UINT RFB_SCREEN_UPDATE;
 extern const UINT RFB_COPYRECT_UPDATE;
