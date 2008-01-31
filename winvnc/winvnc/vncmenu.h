@@ -120,6 +120,7 @@ protected:
 
 	BOOL IsIconSet;
 	int IconFaultCounter;
+	HMODULE hUser32;
 	//HANDLE hEvent;
 
 };
