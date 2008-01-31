@@ -1,5 +1,7 @@
 
 #include "vncDesktopThread.h"
+#include "Localization.h"
+#include "vncTimedMsgBox.h"
 int g_Oldcounter=0;
 bool stop_hookwatch=false;
 
@@ -217,7 +219,26 @@ DWORD WINAPI Cadthread(LPVOID lpParam)
 	strcat(mycommand,"\\");
 	strcat(mycommand,"cad.exe");
 
-	ShellExecute(GetDesktopWindow(), "open", mycommand, "", 0, SW_SHOWNORMAL);
+	int nr=(int)ShellExecute(GetDesktopWindow(), "open", mycommand, "", 0, SW_SHOWNORMAL);
+	if (nr<=32)
+	{
+		//error
+		//
+		if ( nr==SE_ERR_ACCESSDENIED )
+			vncTimedMsgBox::Do(
+									sz_ID_CADPERMISSION,
+									sz_ID_ULTRAVNC_WARNING,
+									MB_ICONINFORMATION | MB_OK
+									);
+
+		if ( nr==ERROR_PATH_NOT_FOUND || nr==ERROR_FILE_NOT_FOUND)
+			vncTimedMsgBox::Do(
+									sz_ID_CADERRORFILE,
+									sz_ID_ULTRAVNC_WARNING,
+									MB_ICONINFORMATION | MB_OK
+									);
+
+	}
 
 	CloseDesktop(desktop);
 	return 0;
