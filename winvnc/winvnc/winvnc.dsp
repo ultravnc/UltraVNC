@@ -167,10 +167,6 @@ SOURCE=.\rfbUpdateTracker.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\screenlogging\screenlogging.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=.\security.cpp
 # End Source File
 # Begin Source File
