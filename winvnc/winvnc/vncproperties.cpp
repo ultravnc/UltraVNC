@@ -328,8 +328,11 @@ vncProperties::DialogProc(HWND hwnd,
 {
 	// We use the dialog-box's USERDATA to store a _this pointer
 	// This is set only once WM_INITDIALOG has been recieved, though!
+#ifndef _X64
 	vncProperties *_this = (vncProperties *) GetWindowLong(hwnd, GWL_USERDATA);
-
+#else
+	vncProperties *_this = (vncProperties *) GetWindowLongPtr(hwnd, GWLP_USERDATA);
+#endif
 	switch (uMsg)
 	{
 
@@ -338,7 +341,11 @@ vncProperties::DialogProc(HWND hwnd,
 			vnclog.Print(LL_INTINFO, VNCLOG("INITDIALOG properties\n"));
 			// Retrieve the Dialog box parameter and use it as a pointer
 			// to the calling vncProperties object
+#ifndef _X64
 			SetWindowLong(hwnd, GWL_USERDATA, lParam);
+#else
+			SetWindowLongPtr(hwnd, GWLP_USERDATA, lParam);
+#endif
 			_this = (vncProperties *) lParam;
 			_this->m_dlgvisible = TRUE;
 			if (_this->m_fUseRegistry)

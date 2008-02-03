@@ -1,8 +1,7 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Developer Studio generated include file.
+// Microsoft Visual C++ generated include file.
 // Used by winvnc.rc
 //
-#define IDR_MANIFEST                    1
 #define IDI_WINVNC                      102
 #define IDD_PROPERTIES                  102
 #define IDS_WARNING                     103

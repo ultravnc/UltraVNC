@@ -72,8 +72,11 @@ BOOL CALLBACK vncConnDialog::vncConnDlgProc(HWND hwnd,
 	// dealing with. But we can get a pseudo-this from the parameter to 
 	// WM_INITDIALOG, which we therafter store with the window and retrieve
 	// as follows:
+#ifndef _X64
 	vncConnDialog *_this = (vncConnDialog *) GetWindowLong(hwnd, GWL_USERDATA);
-
+#else
+	vncConnDialog *_this = (vncConnDialog *) GetWindowLongPtr(hwnd, GWLP_USERDATA);
+#endif
 	switch (uMsg) {
 
 		// Dialog has just been created
@@ -81,8 +84,11 @@ BOOL CALLBACK vncConnDialog::vncConnDlgProc(HWND hwnd,
 		{
 			// Save the lParam into our user data so that subsequent calls have
 			// access to the parent C++ object
-
+#ifndef _X64
             SetWindowLong(hwnd, GWL_USERDATA, lParam);
+#else
+			SetWindowLongPtr(hwnd, GWLP_USERDATA, lParam);
+#endif
             vncConnDialog *_this = (vncConnDialog *) lParam;
             
 			// Make the text entry box active

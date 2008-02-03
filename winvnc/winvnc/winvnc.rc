@@ -1,4 +1,4 @@
-//Microsoft Developer Studio generated resource script.
+// Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
 
@@ -26,35 +26,26 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // Cursor
 //
 
-IDC_FINGER              CURSOR  DISCARDABLE     "res\\Finger.cur"
+IDC_FINGER              CURSOR                  "res\\Finger.cur"
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // JAVACLASS
 //
 
-IDR_FTPFRAME_CLASS      JAVACLASS DISCARDABLE   "res\\FTPFrame.class"
-IDR_AUTHPANEL_CLASS     JAVACLASS DISCARDABLE   "res\\AuthPanel.class"
-IDR_CLIPBOARDFRAME_CLASS JAVACLASS DISCARDABLE   "res\\clipboardFrame.class"
-IDR_OPTIONSFRAME_CLASS  JAVACLASS DISCARDABLE   "res\\optionsFrame.class"
-IDR_RFBPROTO_CLASS      JAVACLASS DISCARDABLE   "res\\rfbProto.class"
-IDR_VNCCANVAS_CLASS     JAVACLASS DISCARDABLE   "res\\vncCanvas.class"
-IDR_VNCVIEWER_CLASS     JAVACLASS DISCARDABLE   "res\\vncviewer.class"
-IDR_BUTTONPANEL_CLASS   JAVACLASS DISCARDABLE   "res\\ButtonPanel.class"
-IDR_DESCIPHER_CLASS     JAVACLASS DISCARDABLE   "res\\DesCipher.class"
-IDR_RECFRAME_CLASS      JAVACLASS DISCARDABLE   "res\\RecordingFrame.class"
-IDR_SESSIONREC_CLASS    JAVACLASS DISCARDABLE   "res\\SessionRecorder.class"
-IDR_DH_CLASS            JAVACLASS DISCARDABLE   "res\\dh.class"
-IDR_FTPFRAMESTRCOMP_CLASS JAVACLASS DISCARDABLE   "res\\ftpframe$strcomp.class"
-//IDR_MESSAGES_PROPERTIES JAVACLASS DISCARDABLE   "res\\messages.properties"
-//IDR_MESSAGES_CLASS      JAVACLASS DISCARDABLE   "res\\Messages.class"
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// 24
-//
-
-IDR_MANIFEST            24      DISCARDABLE     "winvnc.exe.manifest"
+IDR_FTPFRAME_CLASS      JAVACLASS               "res\\FTPFrame.class"
+IDR_AUTHPANEL_CLASS     JAVACLASS               "res\\AuthPanel.class"
+IDR_CLIPBOARDFRAME_CLASS JAVACLASS               "res\\clipboardFrame.class"
+IDR_OPTIONSFRAME_CLASS  JAVACLASS               "res\\optionsFrame.class"
+IDR_RFBPROTO_CLASS      JAVACLASS               "res\\rfbProto.class"
+IDR_VNCCANVAS_CLASS     JAVACLASS               "res\\vncCanvas.class"
+IDR_VNCVIEWER_CLASS     JAVACLASS               "res\\vncviewer.class"
+IDR_BUTTONPANEL_CLASS   JAVACLASS               "res\\ButtonPanel.class"
+IDR_DESCIPHER_CLASS     JAVACLASS               "res\\DesCipher.class"
+IDR_RECFRAME_CLASS      JAVACLASS               "res\\RecordingFrame.class"
+IDR_SESSIONREC_CLASS    JAVACLASS               "res\\SessionRecorder.class"
+IDR_DH_CLASS            JAVACLASS               "res\\dh.class"
+IDR_FTPFRAMESTRCOMP_CLASS JAVACLASS               "res\\ftpframe$strcomp.class"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -62,26 +53,21 @@ IDR_MANIFEST            24      DISCARDABLE     "winvnc.exe.manifest"
 //
 
 IDD_TEXTCHAT_DLG DIALOGEX 0, 0, 308, 177
-STYLE DS_3DLOOK | DS_CENTER | WS_POPUP | WS_CAPTION | WS_THICKFRAME
+STYLE DS_SETFONT | DS_3DLOOK | DS_CENTER | WS_POPUP | WS_CAPTION | WS_THICKFRAME
 CAPTION " Chat - Ultr@VNC"
 FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
-    EDITTEXT        IDC_INPUTAREA_EDIT,4,135,255,39,ES_MULTILINE | 
-                    ES_AUTOVSCROLL | ES_WANTRETURN | NOT WS_BORDER | 
-                    WS_VSCROLL,WS_EX_STATICEDGE
+    EDITTEXT        IDC_INPUTAREA_EDIT,4,135,255,39,ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN | NOT WS_BORDER | WS_VSCROLL,WS_EX_STATICEDGE
     PUSHBUTTON      "Send",IDC_SEND_B,264,135,39,16,BS_MULTILINE
     PUSHBUTTON      "Minimize",IDC_HIDE_B,264,153,39,11
     PUSHBUTTON      "Close",IDCANCEL,264,164,39,11
-    CONTROL         "",IDC_CHATAREA_EDIT,"RICHEDIT",ES_MULTILINE | 
-                    ES_AUTOVSCROLL | ES_READONLY | ES_WANTRETURN | 
-                    WS_VSCROLL | WS_TABSTOP,4,4,300,122,WS_EX_STATICEDGE
+    CONTROL         "",IDC_CHATAREA_EDIT,"RICHEDIT",TCS_HOTTRACK | TCS_RAGGEDRIGHT | TCS_FOCUSONBUTTONDOWN | TCS_MULTISELECT | WS_VSCROLL | WS_TABSTOP,4,4,300,122,WS_EX_STATICEDGE
     PUSHBUTTON      "",IDOK,303,0,6,6,NOT WS_VISIBLE
     LTEXT           "",IDC_STATIC_SPLIT,5,127,298,8,SS_NOTIFY
 END
 
 IDD_LIST_DLG DIALOGEX 0, 0, 164, 116
-STYLE DS_MODALFRAME | DS_3DLOOK | DS_CENTER | WS_POPUP | WS_CAPTION | 
-    WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOOLWINDOW
 CAPTION " List of Clients - UltraVNC"
 FONT 8, "MS Sans Serif", 0, 0, 0x1
@@ -89,195 +75,137 @@ BEGIN
     DEFPUSHBUTTON   "Close",IDOK,106,94,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,106,78,50,14,NOT WS_VISIBLE
     LTEXT           " Currently Connected Clients :",IDC_STATIC,5,4,105,8
-    LISTBOX         IDC_VIEWERS_LISTBOX,7,16,91,93,LBS_NOINTEGRALHEIGHT | 
-                    WS_VSCROLL | WS_TABSTOP,WS_EX_STATICEDGE
+    LISTBOX         IDC_VIEWERS_LISTBOX,7,16,91,93,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP,WS_EX_STATICEDGE
     PUSHBUTTON      "Kill Client",IDC_KILL_B,106,17,50,14
-    PUSHBUTTON      "Chat with    Client",IDC_TEXTCHAT_B,106,35,50,22,
-                    BS_MULTILINE
+    PUSHBUTTON      "Chat with    Client",IDC_TEXTCHAT_B,106,35,50,22,BS_MULTILINE
 END
 
 IDD_ABOUT DIALOGEX 0, 0, 282, 158
-STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION " About WinVNC"
 FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,8,135,54,16
-    CONTROL         139,IDC_VNCLOGO,"Static",SS_BITMAP | SS_CENTERIMAGE | 
-                    SS_SUNKEN,7,5,53,46,WS_EX_TRANSPARENT
-    LTEXT           "UltraVNC Win32 Server 1.0.4 RC11",IDC_VERSION,73,5,195,
-                    11
-    LTEXT           "Copyright © 2002-2005 Ultr@VNC Team\nCopyright © 2001-2002 Sam - eSVNC \nCopyright © 1999-2002 Rudi D. V. - VdaccVNC \nCopyright © 2001 Harakan Software - PalmVNC\nCopyright © 1999-2002 Const. Kaplinsky - TightVNC \n",
-                    IDC_NAME,74,27,202,41
-    LTEXT           "For more Information and Links please visit: \nhttp://ultravnc.sf.net",
-                    IDC_WWW,74,135,141,19
+    CONTROL         139,IDC_VNCLOGO,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_SUNKEN,7,5,53,46,WS_EX_TRANSPARENT
+    LTEXT           "UltraVNC Win32 Server 1.0.4 RC11",IDC_VERSION,73,5,195,11
+    LTEXT           "Copyright © 2002-2005 Ultr@VNC Team\nCopyright © 2001-2002 Sam - eSVNC \nCopyright © 1999-2002 Rudi D. V. - VdaccVNC \nCopyright © 2001 Harakan Software - PalmVNC\nCopyright © 1999-2002 Const. Kaplinsky - TightVNC \n",IDC_NAME,74,27,202,41
+    LTEXT           "For more Information and Links please visit: \nhttp://ultravnc.sf.net",IDC_WWW,74,135,141,19
     LTEXT           "Build:",IDC_BUILDTEXT,74,16,20,10
     LTEXT           "BuildTime",IDC_BUILDTIME,97,16,92,10
-    LTEXT           "Copyright © 2002 RealVNC Ltd. - RealVNC\nCopyright © 1999-2002 Tridia Corporation - TridiaVNC \nCopyright © 1994-2001 AT&&T Laboratories Cambridge/Olivetti Research Ltd. - VNC",
-                    IDC_STATIC,74,67,203,32
-    LTEXT           "Copyright © 1990-2002 Info-ZIP\nCopyright © 1996-2002 Markus Franz Xaver Johannes Oberhumer - Mini LZO library",
-                    IDC_STATIC,74,99,200,27
+    LTEXT           "Copyright © 2002 RealVNC Ltd. - RealVNC\nCopyright © 1999-2002 Tridia Corporation - TridiaVNC \nCopyright © 1994-2001 AT&&T Laboratories Cambridge/Olivetti Research Ltd. - VNC",IDC_STATIC,74,67,203,32
+    LTEXT           "Copyright © 1990-2002 Info-ZIP\nCopyright © 1996-2002 Markus Franz Xaver Johannes Oberhumer - Mini LZO library",IDC_STATIC,74,99,200,27
 END
 
-IDD_OUTGOING_CONN DIALOG DISCARDABLE  0, 0, 243, 78
-STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | 
-    WS_SYSMENU
+IDD_OUTGOING_CONN DIALOG  0, 0, 243, 78
+STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "Initiate Outgoing Connection (Add New Client)"
 FONT 8, "MS Sans Serif"
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,193,30,46,14
     PUSHBUTTON      "Cancel",IDCANCEL,193,48,46,14
     EDITTEXT        IDC_HOSTNAME_EDIT,55,6,130,14,ES_AUTOHSCROLL
-    RTEXT           "Host Name:",IDC_HOSTNAME_STATIC,7,6,43,14,
-                    SS_CENTERIMAGE
-    CTEXT           "(NB:Host must be running VNCviewer in 'listen' mode)",
-                    IDC_NOTE_STATIC,0,48,178,11,SS_CENTERIMAGE
+    RTEXT           "Host Name:",IDC_HOSTNAME_STATIC,7,6,43,14,SS_CENTERIMAGE
+    CTEXT           "(NB:Host must be running VNCviewer in 'listen' mode)",IDC_NOTE_STATIC,0,48,178,11,SS_CENTERIMAGE
     EDITTEXT        IDC_IDCODE,55,29,130,14,ES_AUTOHSCROLL
-    LTEXT           "If ID is used, Host=repetaer ip address",IDC_STATIC,6,
-                    61,125,9
+    LTEXT           "If ID is used, Host=repetaer ip address",IDC_STATIC,6,61,125,9
     LTEXT           "ID code",IDC_STATIC,17,33,27,8
 END
 
-IDD_ACCEPT_CONN DIALOG DISCARDABLE  0, 0, 186, 95
-STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION
+IDD_ACCEPT_CONN DIALOG  0, 0, 186, 95
+STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION
 CAPTION "Accept WinVNC Connection?"
 FONT 8, "MS Sans Serif"
 BEGIN
     DEFPUSHBUTTON   "&Accept",IDACCEPT,7,74,53,14
     PUSHBUTTON      "&Reject",IDREJECT,130,74,49,14
-    CTEXT           "WinVNC has received an incoming connection from",
-                    IDC_STATIC_TEXT1,7,7,172,17,SS_CENTERIMAGE
-    CTEXT           "<unknown host>",IDC_ACCEPT_IP,7,30,172,16,
-                    SS_CENTERIMAGE
-    CTEXT           "Do you wish to Accept or Reject the connection?",
-                    IDC_STATIC_TEXT,7,50,172,15,SS_CENTERIMAGE
-    CTEXT           "AutoReject:",IDC_ACCEPT_TIMEOUT,60,74,70,14,
-                    SS_CENTERIMAGE
+    CTEXT           "WinVNC has received an incoming connection from",IDC_STATIC_TEXT1,7,7,172,17,SS_CENTERIMAGE
+    CTEXT           "<unknown host>",IDC_ACCEPT_IP,7,30,172,16,SS_CENTERIMAGE
+    CTEXT           "Do you wish to Accept or Reject the connection?",IDC_STATIC_TEXT,7,50,172,15,SS_CENTERIMAGE
+    CTEXT           "AutoReject:",IDC_ACCEPT_TIMEOUT,60,74,70,14,SS_CENTERIMAGE
 END
 
-IDD_PROPERTIES DIALOG DISCARDABLE  0, 0, 224, 172
-STYLE DS_MODALFRAME | DS_3DLOOK | DS_CENTER | WS_MINIMIZEBOX | WS_POPUP | 
-    WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+IDD_PROPERTIES DIALOG  0, 0, 224, 172
+STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_CENTER | WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION " Ultr@VNC Server Property Page"
 FONT 8, "MS Sans Serif"
 BEGIN
     PUSHBUTTON      "&Cancel",IDCANCEL,177,154,41,14
     DEFPUSHBUTTON   "&OK",IDOK,81,154,44,14
-    GROUPBOX        "Server Screen Updates Handling",IDC_UPDATE_BORDER,6,2,
-                    214,94
+    GROUPBOX        "Server Screen Updates Handling",IDC_UPDATE_BORDER,6,2,214,94
     CONTROL         "Poll Full Screen ( Ultra Fast )",IDC_POLL_FULLSCREEN,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,13,112,13
-    CONTROL         "Poll Console Windows Only",IDC_CONSOLE_ONLY,"Button",
-                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,117,26,99,15
-    CONTROL         "Poll Foreground Window",IDC_POLL_FOREGROUND,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,16,28,95,9
-    CONTROL         "Poll Window Under Cursor",IDC_POLL_UNDER_CURSOR,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,16,37,95,16
-    CONTROL         "Poll On Event Only",IDC_ONEVENT_ONLY,"Button",
-                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,117,39,78,12
+    CONTROL         "Poll Console Windows Only",IDC_CONSOLE_ONLY,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,117,26,99,15
+    CONTROL         "Poll Foreground Window",IDC_POLL_FOREGROUND,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,28,95,9
+    CONTROL         "Poll Window Under Cursor",IDC_POLL_UNDER_CURSOR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,37,95,16
+    CONTROL         "Poll On Event Only",IDC_ONEVENT_ONLY,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,117,39,78,12
     PUSHBUTTON      "&Apply",IDC_APPLY,130,154,43,14
-    CONTROL         "Video Hook Driver",IDC_DRIVER,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,13,68,74,10
-    CONTROL         "System HookDll",IDC_HOOK,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,13,56,66,10
-    CONTROL         "Low Accuracy ( Turbo Speed )",IDC_TURBOMODE,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,13,81,112,10
-    PUSHBUTTON      "Check the Video Hook Driver",IDC_CHECKDRIVER,92,67,121,
-                    11
+    CONTROL         "Video Hook Driver",IDC_DRIVER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,68,74,10
+    CONTROL         "System HookDll",IDC_HOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,56,66,10
+    CONTROL         "Low Accuracy ( Turbo Speed )",IDC_TURBOMODE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,81,112,10
+    PUSHBUTTON      "Check the Video Hook Driver",IDC_CHECKDRIVER,92,67,121,11
     CONTROL         "Share only the Server Window Named :",IDC_SINGLE_WINDOW,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,113,188,10
     EDITTEXT        IDC_NAME_APPLI,14,127,195,13,ES_AUTOHSCROLL
     GROUPBOX        "Single Window Sharing",IDC_STATIC,5,100,214,47,BS_LEFT
 END
 
-IDD_PROPERTIES1 DIALOG DISCARDABLE  0, 0, 390, 285
-STYLE DS_MODALFRAME | DS_3DLOOK | DS_CENTER | WS_MINIMIZEBOX | WS_POPUP | 
-    WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+IDD_PROPERTIES1 DIALOG  0, 0, 390, 285
+STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_CENTER | WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION " Ultr@VNC Server Property Page"
 FONT 8, "MS Sans Serif"
 BEGIN
-    GROUPBOX        "Incoming Connections",IDC_CONNECT_BORDER,5,3,132,116,
-                    BS_LEFT
-    CONTROL         "Accept Socket Connections",IDC_CONNECT_SOCK,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,12,15,112,11
-    LTEXT           "Display Number or Ports to use:",IDC_DISPLAY_NO_LABEL,
-                    11,28,102,9,SS_CENTERIMAGE
-    CONTROL         "Display",IDC_SPECDISPLAY,"Button",BS_AUTORADIOBUTTON,11,
-                    41,35,10
+    GROUPBOX        "Incoming Connections",IDC_CONNECT_BORDER,5,3,132,116,BS_LEFT
+    CONTROL         "Accept Socket Connections",IDC_CONNECT_SOCK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,15,112,11
+    LTEXT           "Display Number or Ports to use:",IDC_DISPLAY_NO_LABEL,11,28,102,9,SS_CENTERIMAGE
+    CONTROL         "Display",IDC_SPECDISPLAY,"Button",BS_AUTORADIOBUTTON,11,41,35,10
     EDITTEXT        IDC_DISPLAYNO,66,41,29,12,ES_AUTOHSCROLL | ES_NUMBER
-    CONTROL         "Auto",IDC_AUTO_DISPLAY_NO,"Button",BS_AUTOCHECKBOX | 
-                    NOT WS_VISIBLE | WS_TABSTOP,102,39,35,13
-    CONTROL         "Ports",IDC_SPECPORT,"Button",BS_AUTORADIOBUTTON,11,54,
-                    30,10
-    CONTROL         "Auto",IDC_PORTNO_AUTO,"Button",BS_AUTORADIOBUTTON,101,
-                    54,31,9
+    CONTROL         "Auto",IDC_AUTO_DISPLAY_NO,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,102,39,35,13
+    CONTROL         "Ports",IDC_SPECPORT,"Button",BS_AUTORADIOBUTTON,11,54,30,10
+    CONTROL         "Auto",IDC_PORTNO_AUTO,"Button",BS_AUTORADIOBUTTON,101,54,31,9
     RTEXT           "Main:",IDC_STATIC,45,55,18,8
     EDITTEXT        IDC_PORTRFB,66,53,29,12,ES_AUTOHSCROLL
     RTEXT           "Http:",IDC_STATIC,47,67,16,8
     EDITTEXT        IDC_PORTHTTP,66,65,29,12,ES_AUTOHSCROLL
     CONTROL         "Enable JavaViewer (Http Connect)",IDC_CONNECT_HTTP,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,80,122,10
-    CONTROL         "Allow Loopback Connections",IDC_ALLOWLOOPBACK,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,11,91,105,10
-    CONTROL         "LoopbackOnly",IDC_LOOPBACKONLY,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,11,102,59,10
+    CONTROL         "Allow Loopback Connections",IDC_ALLOWLOOPBACK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,91,105,10
+    CONTROL         "LoopbackOnly",IDC_LOOPBACKONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,102,59,10
     GROUPBOX        "Authentication",IDC_STATIC,6,122,210,77,BS_LEFT
-    LTEXT           "VNC Password:",IDC_PASSWORD_LABEL,12,135,50,11,
-                    SS_CENTERIMAGE
+    LTEXT           "VNC Password:",IDC_PASSWORD_LABEL,12,135,50,11,SS_CENTERIMAGE
     EDITTEXT        IDC_PASSWORD,66,135,74,13,ES_PASSWORD | ES_AUTOHSCROLL
-    CONTROL         "Require MS Logon  (User/Pass./Domain)",
-                    IDC_MSLOGON_CHECKD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    13,153,146,10
-    CONTROL         "New MS Logon (supports multiple domains)",
-                    IDC_NEW_MSLOGON,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,
-                    164,153,11
+    CONTROL         "Require MS Logon  (User/Pass./Domain)",IDC_MSLOGON_CHECKD,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,153,146,10
+    CONTROL         "New MS Logon (supports multiple domains)",IDC_NEW_MSLOGON,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,164,153,11
     PUSHBUTTON      "Configure MS Logon Groups",IDC_MSLOGON,13,179,195,12
     GROUPBOX        "File Transfer",IDC_STATIC,6,202,210,25
-    CONTROL         "Enable",IDC_FILETRANSFER,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,13,213,38,10
-    CONTROL         "User impersonation (for Service only)",
-                    IDC_FTUSERIMPERSONATION_CHECK,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,71,213,133,10
+    CONTROL         "Enable",IDC_FILETRANSFER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,213,38,10
+    CONTROL         "User impersonation (for Service only)",IDC_FTUSERIMPERSONATION_CHECK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,71,213,133,10
     GROUPBOX        "DSM Plugin",IDC_STATIC,5,230,211,32,BS_LEFT
-    CONTROL         "Use :",IDC_PLUGIN_CHECK,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,13,244,31,10
-    COMBOBOX        IDC_PLUGINS_COMBO,45,242,129,86,CBS_DROPDOWN | CBS_SORT | 
-                    WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Use :",IDC_PLUGIN_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,244,31,10
+    COMBOBOX        IDC_PLUGINS_COMBO,45,242,129,86,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "Config.",IDC_PLUGIN_BUTTON,179,242,29,12
-    GROUPBOX        "When Last Client Disconnects",IDC_LOCKSETTINGS,142,3,
-                    104,52,BS_LEFT
-    CONTROL         "Do Nothing",IDC_LOCKSETTING_NOTHING,"Button",
-                    BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,146,15,80,12
-    CONTROL         "Lock Workstation (W2K)",IDC_LOCKSETTING_LOCK,"Button",
-                    BS_AUTORADIOBUTTON | WS_TABSTOP,146,26,96,13
-    CONTROL         "Logoff Workstation",IDC_LOCKSETTING_LOGOFF,"Button",
-                    BS_AUTORADIOBUTTON | WS_TABSTOP,146,39,80,11
+    GROUPBOX        "When Last Client Disconnects",IDC_LOCKSETTINGS,142,3,104,52,BS_LEFT
+    CONTROL         "Do Nothing",IDC_LOCKSETTING_NOTHING,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,146,15,80,12
+    CONTROL         "Lock Workstation (W2K)",IDC_LOCKSETTING_LOCK,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,146,26,96,13
+    CONTROL         "Logoff Workstation",IDC_LOCKSETTING_LOGOFF,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,146,39,80,11
     GROUPBOX        "Keyboard && Mouse",IDC_STATIC,142,59,103,60,BS_LEFT
-    CONTROL         "Disable Viewers inputs",IDC_DISABLE_INPUTS,"Button",
-                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,148,78,92,13
-    CONTROL         "Disable Local inputs",IDC_DISABLE_LOCAL_INPUTS,"Button",
-                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,148,90,83,15
-    GROUPBOX        "Query on incoming connection",IDC_STATIC,250,3,136,53,
-                    BS_LEFT
-    CONTROL         "Display Query Window",IDQUERY,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,257,15,86,10
+    CONTROL         "Disable Viewers inputs",IDC_DISABLE_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,148,78,92,13
+    CONTROL         "Disable Local inputs",IDC_DISABLE_LOCAL_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,148,90,83,15
+    GROUPBOX        "Query on incoming connection",IDC_STATIC,250,3,136,53,BS_LEFT
+    CONTROL         "Display Query Window",IDQUERY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,257,15,86,10
     LTEXT           "Timeout:",IDC_STATIC,275,29,28,8
     EDITTEXT        IDQUERYTIMEOUT,308,27,19,12,ES_AUTOHSCROLL
     LTEXT           "seconds",IDC_STATIC,330,29,29,8
     LTEXT           "Default action:",IDC_STATIC,257,43,47,8
-    CONTROL         "Refuse",IDC_DREFUSE,"Button",BS_AUTORADIOBUTTON | 
-                    WS_GROUP,307,43,39,10
-    CONTROL         "Accept",IDC_DACCEPT,"Button",BS_AUTORADIOBUTTON,346,43,
-                    37,10
-    GROUPBOX        "Multi viewer connections",IDC_STATIC,250,59,136,60,
-                    BS_LEFT
-    CONTROL         "Disconnect all existing connections",IDC_MV1,"Button",
-                    BS_AUTORADIOBUTTON | WS_GROUP,255,71,127,10
-    CONTROL         "Keep existing connections",IDC_MV2,"Button",
-                    BS_AUTORADIOBUTTON,255,81,104,10
-    CONTROL         "Refuse the new connection",IDC_MV3,"Button",
-                    BS_AUTORADIOBUTTON,255,92,103,9
-    CONTROL         "Refuse all new connection ",IDC_MV4,"Button",
-                    BS_AUTORADIOBUTTON,255,103,102,10
+    CONTROL         "Refuse",IDC_DREFUSE,"Button",BS_AUTORADIOBUTTON | WS_GROUP,307,43,39,10
+    CONTROL         "Accept",IDC_DACCEPT,"Button",BS_AUTORADIOBUTTON,346,43,37,10
+    GROUPBOX        "Multi viewer connections",IDC_STATIC,250,59,136,60,BS_LEFT
+    CONTROL         "Disconnect all existing connections",IDC_MV1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,255,71,127,10
+    CONTROL         "Keep existing connections",IDC_MV2,"Button",BS_AUTORADIOBUTTON,255,81,104,10
+    CONTROL         "Refuse the new connection",IDC_MV3,"Button",BS_AUTORADIOBUTTON,255,92,103,9
+    CONTROL         "Refuse all new connection ",IDC_MV4,"Button",BS_AUTORADIOBUTTON,255,103,102,10
     GROUPBOX        "Misc.",IDC_STATIC,221,122,165,120,BS_LEFT
     CONTROL         "Remove Wallpaper for Viewers",IDC_REMOVE_WALLPAPER,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,228,140,134,10
@@ -285,18 +213,13 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,228,150,144,10
     CONTROL         "Enable Alpha-Blending Monitor Blanking",IDC_ALPHABLACK,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,228,160,142,10
-    CONTROL         "Capture Alpha-Blending",IDC_ALPHA,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,228,170,99,10
-    CONTROL         "DisableTrayIcon",IDC_DISABLETRAY,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,228,180,67,10
-    CONTROL         "Disable clients options in tray icon menu",
-                    IDC_ALLOWEDITCLIENTS,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,228,190,141,10
+    CONTROL         "Capture Alpha-Blending",IDC_ALPHA,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,228,170,99,10
+    CONTROL         "DisableTrayIcon",IDC_DISABLETRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,228,180,67,10
+    CONTROL         "Disable clients options in tray icon menu",IDC_ALLOWEDITCLIENTS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,228,190,141,10
     CONTROL         "Forbid the user to close down WinVNC",IDC_ALLOWSHUTDOWN,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,228,
-                    200,143,10
-    CONTROL         "Log debug infos to the WinVNC.log file",IDC_LOG,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,228,210,139,10
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,228,200,143,10
+    CONTROL         "Log debug infos to the WinVNC.log file",IDC_LOG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,228,210,139,10
     LTEXT           "Default Server Screen Scale:",IDC_STATIC,239,228,92,8
     LTEXT           "1 / ",IDC_STATIC,337,229,12,8
     EDITTEXT        IDC_SCALE,352,227,12,12,ES_AUTOHSCROLL
@@ -304,8 +227,7 @@ BEGIN
     PUSHBUTTON      "&Apply",IDC_APPLY,294,247,43,14
     PUSHBUTTON      "&Cancel",IDCANCEL,342,247,44,14
     RTEXT           "N°",IDC_STATIC,53,42,9,8
-    CONTROL         "Remove Aero (Vista)",IDC_REMOVE_Aero,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,228,130,81,10
+    CONTROL         "Remove Aero (Vista)",IDC_REMOVE_Aero,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,228,130,81,10
 END
 
 
@@ -315,7 +237,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO DISCARDABLE 
+GUIDELINES DESIGNINFO 
 BEGIN
     IDD_TEXTCHAT_DLG, DIALOG
     BEGIN
@@ -400,7 +322,6 @@ END
 #endif    // APSTUDIO_INVOKED
 
 
-#ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
 //
 // Version
@@ -411,9 +332,9 @@ VS_VERSION_INFO VERSIONINFO
  PRODUCTVERSION 1,0,4,901
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
- FILEFLAGS 0x2DL
+ FILEFLAGS 0x2dL
 #else
- FILEFLAGS 0x2CL
+ FILEFLAGS 0x2cL
 #endif
  FILEOS 0x40004L
  FILETYPE 0x2L
@@ -423,18 +344,17 @@ BEGIN
     BEGIN
         BLOCK "000004b0"
         BEGIN
-            VALUE "Comments", "UltraVNC - Remote Control for all\0"
-            VALUE "CompanyName", "UltraVNC\0"
-            VALUE "FileDescription", "VNC server for Win32\0"
-            VALUE "FileVersion", "1.0.4 RC9 - jp1\0"
-            VALUE "InternalName", "WinVNC\0"
-            VALUE "LegalCopyright", "Copyright © 2002-2005 UltraVNC team members\0"
-            VALUE "LegalTrademarks", "VNC\0"
-            VALUE "OriginalFilename", "WinVNC.exe\0"
-            VALUE "PrivateBuild", "With japanized patch based on 1.0.2-jp2\0"
-            VALUE "ProductName", "UltraVNC\0"
-            VALUE "ProductVersion", "1.0.4 RC9 - jp1\0"
-            VALUE "SpecialBuild", "\0"
+            VALUE "Comments", "UltraVNC - Remote Control for all"
+            VALUE "CompanyName", "UltraVNC"
+            VALUE "FileDescription", "VNC server for Win32"
+            VALUE "FileVersion", "1.0.4 RC9 - jp1"
+            VALUE "InternalName", "WinVNC"
+            VALUE "LegalCopyright", "Copyright © 2002-2005 UltraVNC team members"
+            VALUE "LegalTrademarks", "VNC"
+            VALUE "OriginalFilename", "WinVNC.exe"
+            VALUE "PrivateBuild", "With japanized patch based on 1.0.2-jp2"
+            VALUE "ProductName", "UltraVNC"
+            VALUE "ProductVersion", "1.0.4 RC9 - jp1"
         END
     END
     BLOCK "VarFileInfo"
@@ -443,15 +363,13 @@ BEGIN
     END
 END
 
-#endif    // !_MAC
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Menu
 //
 
-IDR_TRAYMENU MENU DISCARDABLE 
+IDR_TRAYMENU MENU 
 BEGIN
     POPUP "tray"
     BEGIN
@@ -468,8 +386,7 @@ BEGIN
         MENUITEM "Install Service",             ID_RUNASSERVICE
         MENUITEM "Uninstall Service",           ID_UNINSTALL_SERVICE
         MENUITEM "Stop Service",                ID_CLOSE_SERVICE
-        MENUITEM "Start Service (need to be previous installed)", 
-                                                ID_START_SERVICE
+        MENUITEM "Start Service (need to be previous installed)", ID_START_SERVICE
         MENUITEM SEPARATOR
         MENUITEM "&Close VNC Connections",      ID_CLOSE
     END
@@ -481,20 +398,20 @@ END
 // JAVAARCHIVE
 //
 
-IDR_VNCVIEWER_JAR       JAVAARCHIVE DISCARDABLE "res\\vncviewer.jar"
+IDR_VNCVIEWER_JAR       JAVAARCHIVE             "res\\vncviewer.jar"
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // String Table
 //
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDI_WINVNC              "WinVNC"
     IDS_WARNING             "WARNING: By default, this session do not use any encryption whatsoever. Please do not use it to send sensitive data unless you are sure your connection is secure.\n\n"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     ID_FAILED_INIT          "Failed to initialise the socket system"
     ID_WINVNC_USAGE         "WinVNC Usage"
@@ -506,7 +423,7 @@ BEGIN
     ID_SERV_FAIL_ST         "The WinVNC service failed to start"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     ID_SERV_CT_MISS         "The Service Control Manager could not be contacted - the WinVNC service was not registered"
     ID_SERV_OLD_REG         "The WinVNC service is already registered"
@@ -529,7 +446,7 @@ BEGIN
                             "WARNING : This machine has no default password set.  WinVNC will present the Default Properties dialog now to allow one to be entered."
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     ID_NO_OVERRIDE_ERR      "This machine has been preconfigured with WinVNC settings, which cannot be overridden by individual users.  The preconfigured settings may be modified only by a System Administrator."
     ID_NO_CURRENT_USER_ERR  "The WinVNC settings for the current user are unavailable at present."
@@ -550,7 +467,7 @@ BEGIN
     ID_UNABLE_PROC_MSLOGON  "Unable to process MS logon"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     ID_RICHED32_UNLOAD      "Unable to load the Rich Edit (RICHED32.DLL) control!"
     ID_RICHED32_DLL_LD      "Rich Edit Dll Loading"
@@ -570,12 +487,12 @@ BEGIN
     ID_CADPERMISSION        "Permission denied on cad.exe, Ultravnc must be installed in ""program files"" else special cad permission is refused."
 END
 
-#endif    // ‰pŒê (±ÒØ¶) resources
+#endif    // English (U.S.) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// ‰pŒê (²·ÞØ½) resources
+// English (U.K.) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENG)
 #ifdef _WIN32
@@ -589,18 +506,18 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE DISCARDABLE 
+1 TEXTINCLUDE 
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE DISCARDABLE 
+2 TEXTINCLUDE 
 BEGIN
     "#include ""afxres.h""\r\n"
     "\0"
 END
 
-3 TEXTINCLUDE DISCARDABLE 
+3 TEXTINCLUDE 
 BEGIN
     "\r\n"
     "\0"
@@ -608,12 +525,12 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-#endif    // ‰pŒê (²·ÞØ½) resources
+#endif    // English (U.K.) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// µ×ÝÀÞŒê (ÍÞÙ·Þ°) resources
+// Dutch (Belgium) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NLB)
 #ifdef _WIN32
@@ -626,8 +543,8 @@ LANGUAGE LANG_DUTCH, SUBLANG_DUTCH_BELGIAN
 // Dialog
 //
 
-IDD_MSLOGON DIALOG DISCARDABLE  0, 0, 186, 166
-STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+IDD_MSLOGON DIALOG  0, 0, 186, 166
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "MS logon setup"
 FONT 8, "MS Sans Serif"
 BEGIN
@@ -636,28 +553,20 @@ BEGIN
     EDITTEXT        IDC_GROUP1,21,19,93,13,ES_AUTOHSCROLL
     EDITTEXT        IDC_GROUP2,21,36,93,13,ES_AUTOHSCROLL
     EDITTEXT        IDC_GROUP3,21,53,93,13,ES_AUTOHSCROLL
-    CONTROL         "",IDC_CHECKG1L,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    127,20,13,10
-    CONTROL         "",IDC_CHECKG2L,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    127,38,16,8
-    CONTROL         "",IDC_CHECKG3L,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    127,56,16,8
-    CONTROL         "",IDC_CHECKG1D,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    153,22,16,8
-    CONTROL         "",IDC_CHECKG2D,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    153,38,16,8
-    CONTROL         "",IDC_CHECKG3D,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    153,56,16,8
+    CONTROL         "",IDC_CHECKG1L,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,127,20,13,10
+    CONTROL         "",IDC_CHECKG2L,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,127,38,16,8
+    CONTROL         "",IDC_CHECKG3L,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,127,56,16,8
+    CONTROL         "",IDC_CHECKG1D,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,153,22,16,8
+    CONTROL         "",IDC_CHECKG2D,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,153,38,16,8
+    CONTROL         "",IDC_CHECKG3D,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,153,56,16,8
     LTEXT           "Local",IDC_STATIC,127,8,18,8
     LTEXT           "Domain",IDC_STATIC,153,8,25,8
     LTEXT           "Group",IDC_STATIC,23,8,20,8
     LTEXT           "1",IDC_STATIC,11,22,8,8
     LTEXT           "2",IDC_STATIC,11,38,8,8
     LTEXT           "3",IDC_STATIC,11,56,8,8
-    LTEXT           "Group 1, 2 = Full Access       Group 3 = Read Only",
-                    IDC_STATIC,16,88,162,8
-    LTEXT           "Must be run as a Service on NT4, W2K\nCan be run as a Service or Application on XP, W2003\nLocal admins have always access.\nFor NT4 and W2K in Application mode you need to add the Local Admin Group.",
-                    IDC_STATIC,8,100,174,41
+    LTEXT           "Group 1, 2 = Full Access       Group 3 = Read Only",IDC_STATIC,16,88,162,8
+    LTEXT           "Must be run as a Service on NT4, W2K\nCan be run as a Service or Application on XP, W2003\nLocal admins have always access.\nFor NT4 and W2K in Application mode you need to add the Local Admin Group.",IDC_STATIC,8,100,174,41
     GROUPBOX        "",IDC_STATIC,5,0,178,74
     GROUPBOX        "Rules",IDC_STATIC,5,77,178,68
 END
@@ -669,7 +578,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO DISCARDABLE 
+GUIDELINES DESIGNINFO 
 BEGIN
     IDD_MSLOGON, DIALOG
     BEGIN
@@ -698,16 +607,16 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_WINVNC              ICON    DISCARDABLE     "res\\world3a.ico"
-IDI_FLASH               ICON    DISCARDABLE     "res\\icon2.ico"
+IDI_WINVNC              ICON                    "res\\world3a.ico"
+IDI_FLASH               ICON                    "res\\icon2.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Bitmap
 //
 
-IDB_LOGO64              BITMAP  DISCARDABLE     "res\\vnc-1.bmp"
-#endif    // µ×ÝÀÞŒê (ÍÞÙ·Þ°) resources
+IDB_LOGO64              BITMAP                  "res\\vnc-1.bmp"
+#endif    // Dutch (Belgium) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

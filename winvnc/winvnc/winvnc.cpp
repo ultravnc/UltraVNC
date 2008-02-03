@@ -676,7 +676,7 @@ void InitSDTimer()
 {
 	if (mmRes != -1) return;
 	vnclog.Print(LL_INTERR, VNCLOG("****************** Init SDTimer\n"));
-	mmRes = timeSetEvent( 2000, 0, fpTimer, NULL, TIME_PERIODIC );
+	mmRes = timeSetEvent( 2000, 0, (LPTIMECALLBACK)fpTimer, NULL, TIME_PERIODIC );
 }
 
 

@@ -79,14 +79,21 @@ void vncListDlg::Display()
 //
 BOOL CALLBACK vncListDlg::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
+#ifndef _X64
 	vncListDlg *_this = (vncListDlg *) GetWindowLong(hwnd, GWL_USERDATA);
-
+#else
+	vncListDlg *_this = (vncListDlg *) GetWindowLongPtr(hwnd, GWLP_USERDATA);
+#endif
 	switch (uMsg)
 	{
 
 	case WM_INITDIALOG:
 		{
+#ifndef _X64
 			SetWindowLong(hwnd, GWL_USERDATA, lParam);
+#else
+			SetWindowLongPtr(hwnd, GWLP_USERDATA, lParam);
+#endif
 			_this = (vncListDlg *) lParam;
 
 			vncClientList::iterator i;
