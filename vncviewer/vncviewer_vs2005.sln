@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libjpeg", "..\libjpeg\libjpeg.vcproj", "{181769CB-5295-452F-A421-FE1F9ED2022A}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "omnithread", "omnithread\omnithread.vcproj", "{AB1CE62F-4A4D-4DAA-831D-5C93AD68F5F1}"
