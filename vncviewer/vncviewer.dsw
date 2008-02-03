@@ -1,9 +1,9 @@
 Microsoft Developer Studio Workspace File, Format Version 6.00
-# åxçê: Ç±ÇÃ‹∞∏ΩÕﬂ∞Ω Ãß≤Ÿ Çï“èWÇ‹ÇΩÇÕçÌèúÇµÇ»Ç¢Ç≈Ç≠ÇæÇ≥Ç¢!
+# WARNING: DO NOT EDIT OR DELETE THIS WORKSPACE FILE!
 
 ###############################################################################
 
-Project: "french"=.\french\french.dsp - Package Owner=<4>
+Project: "french"=".\french\french.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -15,7 +15,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "german"=.\german\german.dsp - Package Owner=<4>
+Project: "german"=".\german\german.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -27,7 +27,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "japanese"=.\japanese\japanese.dsp - Package Owner=<4>
+Project: "japanese"=".\japanese\japanese.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -39,7 +39,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "korean"=.\korean\korean.dsp - Package Owner=<4>
+Project: "libjpeg"="..\libjpeg\libjpeg.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -51,7 +51,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "libjpeg"=..\libjpeg\libjpeg.dsp - Package Owner=<4>
+Project: "omnithread"=".\omnithread\omnithread.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -63,7 +63,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "omnithread"=.\omnithread\omnithread.dsp - Package Owner=<4>
+Project: "rdr"="..\rdr\rdr.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -75,43 +75,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "portugees"=.\portugees\portugees.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
-Project: "rdr"=..\rdr\rdr.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
-Project: "spanish"=.\spanish\spanish.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
-Project: "vncviewer"=.\vncviewer.dsp - Package Owner=<4>
+Project: "vncviewer"=".\vncviewer.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -135,7 +99,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "zlib"=..\zlib\zlib.dsp - Package Owner=<4>
+Project: "zlib"="..\zlib\zlib.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
