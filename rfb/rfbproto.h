@@ -322,6 +322,8 @@ typedef struct {
 #define rfbEncodingZlibHex 8
 #define rfbEncodingUltra	9
 #define rfbEncodingZRLE 16
+// nyama/2006/08/02:new YUV-Wavlet lossy codec based on ZRLE
+#define rfbEncodingZYWRLE 17
 
 // Cache & XOR-Zlib - rdv@2002
 #define rfbEncodingCache					0xFFFF0000

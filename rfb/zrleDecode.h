@@ -39,14 +39,40 @@ using namespace rdr;
 #define __RFB_CONCAT2E(a,b) __RFB_CONCAT2(a,b)
 #endif
 
+#ifndef __RFB_CONCAT3E
+#define __RFB_CONCAT3(a,b,c) a##b##c
+#define __RFB_CONCAT3E(a,b,c) __RFB_CONCAT3(a,b,c)
+#endif
+
+#undef END_FIX
+#if ZYWRLE_ENDIAN == ENDIAN_LITTLE
+#  define END_FIX LE
+#elif ZYWRLE_ENDIAN == ENDIAN_BIG
+#  define END_FIX BE
+#else
+#  define END_FIX NE
+#endif
+
 #ifdef CPIXEL
 #define PIXEL_T __RFB_CONCAT2E(rdr::U,BPP)
 #define READ_PIXEL __RFB_CONCAT2E(readOpaque,CPIXEL)
-#define ZRLE_DECODE_BPP __RFB_CONCAT2E(zrleDecode,CPIXEL)
+#define ZRLE_DECODE_BPP __RFB_CONCAT3E(zrleDecode,CPIXEL,END_FIX)
+#define BPPOUT BPP
+#elif BPP==15
+#define PIXEL_T __RFB_CONCAT2E(rdr::U,16)
+#define READ_PIXEL __RFB_CONCAT2E(readOpaque,16)
+#define ZRLE_DECODE_BPP __RFB_CONCAT3E(zrleDecode,BPP,END_FIX)
+#define BPPOUT 16
 #else
 #define PIXEL_T __RFB_CONCAT2E(rdr::U,BPP)
 #define READ_PIXEL __RFB_CONCAT2E(readOpaque,BPP)
-#define ZRLE_DECODE_BPP __RFB_CONCAT2E(zrleDecode,BPP)
+#define ZRLE_DECODE_BPP __RFB_CONCAT3E(zrleDecode,BPP,END_FIX)
+#define BPPOUT BPP
+#endif
+
+#if BPP!=8
+#define ZYWRLE_DECODE
+#include <rfb/zywrletemplate.c>
 #endif
 
 void ZRLE_DECODE_BPP (int x, int y, int w, int h, rdr::InStream* is,
@@ -62,6 +88,9 @@ void ZRLE_DECODE_BPP (int x, int y, int w, int h, rdr::InStream* is,
       int tw = rfbZRLETileWidth;
       if (tw > x+w-tx) tw = x+w-tx;
 
+#if BPP!=8
+top:
+#endif
       int mode = zis->readU8();
       BOOL rle = mode & 128;
       int palSize = mode & 127;
@@ -74,9 +103,11 @@ void ZRLE_DECODE_BPP (int x, int y, int w, int h, rdr::InStream* is,
       }
 
       if (palSize == 1) {
-        PIXEL_T pix = palette[0];
-        FILL_RECT(tx,ty,tw,th,pix);
-        continue;
+        PIXEL_T* ptr = buf;
+        for (int i = 0; i < tw*th; i++) {
+			*ptr++ = palette[0];
+		}
+		goto draw;
       }
 
       if (!rle) {
@@ -84,12 +115,18 @@ void ZRLE_DECODE_BPP (int x, int y, int w, int h, rdr::InStream* is,
 
           // raw
 
+#if BPP!=8
+          if( (zywrle_level>0)&& !(zywrle_level & 0x80) ){
+			zywrle_level |= 0x80;
+			goto top;
+		  }else
+#endif
 #ifdef CPIXEL
           for (PIXEL_T* ptr = buf; ptr < buf+tw*th; ptr++) {
             *ptr = zis->READ_PIXEL();
           }
 #else
-          zis->readBytes(buf, tw * th * (BPP / 8));
+          zis->readBytes(buf, tw * th * (BPPOUT / 8));
 #endif
 
         } else {
@@ -228,6 +265,13 @@ void ZRLE_DECODE_BPP (int x, int y, int w, int h, rdr::InStream* is,
 
 #ifndef FAVOUR_FILL_RECT
       //fprintf(stderr,"copying data to screen %dx%d at %d,%d\n",tw,th,tx,ty);
+draw:
+#if BPP!=8
+      if( zywrle_level & 0x80 ){
+	    zywrle_level &= 0x7F;
+		ZYWRLE_SYNTHESIZE( buf, buf, tw, th, tw, zywrle_level, zywrleBuf );
+	  }
+#endif
       IMAGE_RECT(tx,ty,tw,th,buf);
 #endif
     }
@@ -239,3 +283,4 @@ void ZRLE_DECODE_BPP (int x, int y, int w, int h, rdr::InStream* is,
 #undef ZRLE_DECODE_BPP
 #undef READ_PIXEL
 #undef PIXEL_T
+#undef BPPOUT
