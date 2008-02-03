@@ -44,8 +44,9 @@ LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
 //
 // 24
 //
-
+#ifndef _X64
 IDR_MANIFEST            24      DISCARDABLE     "vncviewer.exe.manifest"
+#endif
 #endif    // German (Germany) resources
 /////////////////////////////////////////////////////////////////////////////
 
