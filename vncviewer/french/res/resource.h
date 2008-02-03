@@ -56,14 +56,18 @@
 #define IDB_BITMAP8                     175
 #define IDB_BITMAP9                     176
 #define IDB_MAXIMIZE                    177
+#define IDR_TRAY_DISABLED               177
 #define IDB_MINIMIZE                    178
 #define IDB_PINDOWN                     179
 #define IDB_PINUP                       180
 #define IDR_tbMENU                      181
 #define IDD_FTCONFIRM_DLG               182
+#define IDB_BITMAP12                    182
 #define IDI_FILE                        183
 #define IDI_DIR                         184
 #define IDI_DRIVE                       185
+#define IDB_BITMAP13                    186
+#define IDB_BITMAP14                    187
 #define IDD_USER_NAME                   604
 #define ID_VK_LWINDOWN                  605
 #define ID_VK_RWINDOWN                  606
@@ -191,6 +195,12 @@
 #define IDC_HS_STATIC                   1146
 #define IDC_PR_STATIC                   1147
 #define IDD_AUTH_DIALOG2                1148
+#define IDD_APP_MESSAGE                 1149
+#define IDC_BUTTON2                     1149
+#define IDD_APP_MESSAGE1                1150
+#define IDD_APP_MESSAGE2                1151
+#define IDC_CHECK1                      1154
+#define IDC_SERVER_RECON                1155
 #define IDC_ENCODING_BASE               1999
 #define IDC_RAWRADIO                    2000
 #define IDC_RRERADIO                    2002
@@ -226,7 +236,9 @@
 #define IDS_WARNING                     50022
 #define IDS_A1                          50023
 #define IDC_NULL                        50023
+#define ID_CLOSEAPP                     50023
 #define IDS_A2                          50024
+#define ID_LISTEN_MODE                  50024
 #define IDS_A3                          50026
 #define IDS_A4                          50027
 #define IDS_A5                          50028
@@ -480,9 +492,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        177
-#define _APS_NEXT_COMMAND_VALUE         50023
-#define _APS_NEXT_CONTROL_VALUE         1149
+#define _APS_NEXT_RESOURCE_VALUE        188
+#define _APS_NEXT_COMMAND_VALUE         50025
+#define _APS_NEXT_CONTROL_VALUE         1156
 #define _APS_NEXT_SYMED_VALUE           154
 #endif
 #endif
