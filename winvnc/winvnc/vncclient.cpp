@@ -72,6 +72,14 @@ unsigned long updates_sent;
 
 // vncClient update thread class
 
+//	[v1.0.2-jp1 fix]
+//	yak!'s File transfer patch
+//	Simply forward strchr() and strrchr() to _mbschr() and _mbsrchr() to avoid 0x5c problem, respectively.
+//	Probably, it is better to write forward functions internally.
+#include <mbstring.h>
+#define strchr(a, b) reinterpret_cast<char*>(_mbschr(reinterpret_cast<unsigned char*>(a), b))
+#define strrchr(a, b) reinterpret_cast<char*>(_mbsrchr(reinterpret_cast<unsigned char*>(a), b))
+
 class vncClientUpdateThread : public omni_thread
 {
 public:
@@ -2053,6 +2061,18 @@ vncClientThread::run(void *arg)
 						{
 							//MessageBox(NULL, "5. Abort !", "Ultra WinVNC", MB_OK);
 							//vnclog.Print(LL_INTINFO, VNCLOG("*** FileTransfer: Failed to zip requested dir. Abort !\n"));
+
+							//	[v1.0.2-jp1 fix] Empty directory receive problem
+							rfbFileTransferMsg ft;
+							ft.type = rfbFileTransfer;
+							ft.contentType = rfbFileHeader;
+							ft.size = Swap32IfLE(0xffffffff); // File Size in bytes, 0xFFFFFFFF (-1) means error
+							ft.length = Swap32IfLE(strlen(m_client->m_szSrcFileName));
+							m_socket->SendExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
+							m_socket->SendExact((char *)m_client->m_szSrcFileName, strlen(m_client->m_szSrcFileName));
+							m_client->m_fFileDownloadError = true;
+							m_client->m_fFileDownloadRunning = false;
+
 							break;
 						}
 

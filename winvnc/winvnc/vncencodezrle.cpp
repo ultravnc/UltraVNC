@@ -37,18 +37,50 @@
 
 #define EXTRA_ARGS , BYTE* source, vncEncoder* encoder
 
+#define ENDIAN_LITTLE 0
+#define ENDIAN_BIG 1
+#define ENDIAN_NO 2
 #define BPP 8
+#define ZYWRLE_ENDIAN ENDIAN_NO
+#include <rfb/zrleEncode.h>
+#undef BPP
+#define BPP 15
+#undef ZYWRLE_ENDIAN
+#define ZYWRLE_ENDIAN ENDIAN_LITTLE
+#include <rfb/zrleEncode.h>
+#undef ZYWRLE_ENDIAN
+#define ZYWRLE_ENDIAN ENDIAN_BIG
 #include <rfb/zrleEncode.h>
 #undef BPP
 #define BPP 16
+#undef ZYWRLE_ENDIAN
+#define ZYWRLE_ENDIAN ENDIAN_LITTLE
+#include <rfb/zrleEncode.h>
+#undef ZYWRLE_ENDIAN
+#define ZYWRLE_ENDIAN ENDIAN_BIG
 #include <rfb/zrleEncode.h>
 #undef BPP
 #define BPP 32
+#undef ZYWRLE_ENDIAN
+#define ZYWRLE_ENDIAN ENDIAN_LITTLE
+#include <rfb/zrleEncode.h>
+#undef ZYWRLE_ENDIAN
+#define ZYWRLE_ENDIAN ENDIAN_BIG
 #include <rfb/zrleEncode.h>
 #define CPIXEL 24A
+#undef ZYWRLE_ENDIAN
+#define ZYWRLE_ENDIAN ENDIAN_LITTLE
+#include <rfb/zrleEncode.h>
+#undef ZYWRLE_ENDIAN
+#define ZYWRLE_ENDIAN ENDIAN_BIG
 #include <rfb/zrleEncode.h>
 #undef CPIXEL
 #define CPIXEL 24B
+#undef ZYWRLE_ENDIAN
+#define ZYWRLE_ENDIAN ENDIAN_LITTLE
+#include <rfb/zrleEncode.h>
+#undef ZYWRLE_ENDIAN
+#define ZYWRLE_ENDIAN ENDIAN_BIG
 #include <rfb/zrleEncode.h>
 #undef CPIXEL
 #undef BPP
@@ -58,6 +90,7 @@ vncEncodeZRLE::vncEncodeZRLE()
   mos = new rdr::MemOutStream;
   zos = new rdr::ZlibOutStream;
   beforeBuf = new rdr::U32[rfbZRLETileWidth * rfbZRLETileHeight + 1];
+  m_use_zywrle = FALSE;
 }
 
 vncEncodeZRLE::~vncEncodeZRLE()
@@ -90,14 +123,40 @@ UINT vncEncodeZRLE::EncodeRect(BYTE *source, BYTE *dest, const rfb::Rect &rect)
 
   mos->clear();
 
+  if( m_use_zywrle ){
+	  if( m_qualitylevel < 0 ){
+		  zywrle_level = 1;
+	  }else if( m_qualitylevel < 3 ){
+		  zywrle_level = 3;
+	  }else if( m_qualitylevel < 6 ){
+		  zywrle_level = 2;
+	  }else{
+		  zywrle_level = 1;
+	  }
+  }else{
+	  zywrle_level = 0;
+  }
+
   switch (m_remoteformat.bitsPerPixel) {
 
   case 8:
-    zrleEncode8( x, y, w, h, mos, zos, beforeBuf, source, this);
+    zrleEncode8NE( x, y, w, h, mos, zos, beforeBuf, source, this);
     break;
 
   case 16:
-    zrleEncode16(x, y, w, h, mos, zos, beforeBuf, source, this);
+    if( m_remoteformat.greenMax > 0x1F ){
+      if( m_remoteformat.bigEndian ){
+        zrleEncode16BE(x, y, w, h, mos, zos, beforeBuf, source, this);
+	  }else{
+        zrleEncode16LE(x, y, w, h, mos, zos, beforeBuf, source, this);
+	  }
+	}else{
+      if( m_remoteformat.bigEndian ){
+        zrleEncode15BE(x, y, w, h, mos, zos, beforeBuf, source, this);
+	  }else{
+        zrleEncode15LE(x, y, w, h, mos, zos, beforeBuf, source, this);
+	  }
+	}
     break;
 
   case 32:
@@ -113,16 +172,28 @@ UINT vncEncodeZRLE::EncodeRect(BYTE *source, BYTE *dest, const rfb::Rect &rect)
     if ((fitsInLS3Bytes && !m_remoteformat.bigEndian) ||
         (fitsInMS3Bytes && m_remoteformat.bigEndian))
     {
-      zrleEncode24A(x, y, w, h, mos, zos, beforeBuf, source, this);
+      if( m_remoteformat.bigEndian ){
+        zrleEncode24ABE(x, y, w, h, mos, zos, beforeBuf, source, this);
+	  }else{
+        zrleEncode24ALE(x, y, w, h, mos, zos, beforeBuf, source, this);
+	  }
     }
     else if ((fitsInLS3Bytes && m_remoteformat.bigEndian) ||
              (fitsInMS3Bytes && !m_remoteformat.bigEndian))
     {
-      zrleEncode24B(x, y, w, h, mos, zos, beforeBuf, source, this);
+      if( m_remoteformat.bigEndian ){
+        zrleEncode24BBE(x, y, w, h, mos, zos, beforeBuf, source, this);
+	  }else{
+        zrleEncode24BLE(x, y, w, h, mos, zos, beforeBuf, source, this);
+	  }
     }
     else
     {
-      zrleEncode32(x, y, w, h, mos, zos, beforeBuf, source, this);
+      if( m_remoteformat.bigEndian ){
+        zrleEncode32BE(x, y, w, h, mos, zos, beforeBuf, source, this);
+	  }else{
+        zrleEncode32LE(x, y, w, h, mos, zos, beforeBuf, source, this);
+	  }
     }
     break;
   }
@@ -132,7 +203,11 @@ UINT vncEncodeZRLE::EncodeRect(BYTE *source, BYTE *dest, const rfb::Rect &rect)
   surh->r.y = Swap16IfLE(y-m_SWOffsety);
   surh->r.w = Swap16IfLE(w);
   surh->r.h = Swap16IfLE(h);
-  surh->encoding = Swap32IfLE(rfbEncodingZRLE);
+  if( m_use_zywrle ){
+    surh->encoding = Swap32IfLE(rfbEncodingZYWRLE);
+  }else{
+    surh->encoding = Swap32IfLE(rfbEncodingZRLE);
+  }
 
   rfbZRLEHeader* hdr = (rfbZRLEHeader*)(dest +
                                         sz_rfbFramebufferUpdateRectHeader);

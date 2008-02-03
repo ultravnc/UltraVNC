@@ -38,6 +38,8 @@ public:
 
   virtual UINT EncodeRect(BYTE *source, BYTE *dest, const rfb::Rect &rect);
 
+  BOOL m_use_zywrle;
+
 private:
   rdr::ZlibOutStream* zos;
   rdr::MemOutStream* mos;

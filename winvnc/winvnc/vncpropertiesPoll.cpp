@@ -42,6 +42,9 @@
 
 #include "localization.h" // ACT : Add localization on messages
 
+// [v1.0.2-jp1 fix] Load resouce from dll
+extern HINSTANCE	hInstResDLL;
+
 bool RunningAsAdministrator ();
 const char WINVNC_REGISTRY_KEY [] = "Software\\ORL\\WinVNC3";
 DWORD GetExplorerLogonPid();
@@ -183,7 +186,9 @@ vncPropertiesPoll::Show(BOOL show, BOOL usersettings)
 				m_returncode_valid = FALSE;
 
 				// Do the dialog box
-				int result = DialogBoxParam(hAppInstance,
+				// [v1.0.2-jp1 fix]
+				//int result = DialogBoxParam(hAppInstance,
+				int result = DialogBoxParam(hInstResDLL,
 				    MAKEINTRESOURCE(IDD_PROPERTIES), 
 				    NULL,
 				    (DLGPROC) DialogProcPoll,
@@ -317,6 +322,18 @@ vncPropertiesPoll::DialogProcPoll(HWND hwnd,
 			EnableWindow(hPollOnEventOnly,
 				_this->m_server->PollUnderCursor() || _this->m_server->PollForeground()
 				);
+
+			// [v1.0.2-jp2 fix-->]
+			HWND hSingleWindow = GetDlgItem(hwnd, IDC_SINGLE_WINDOW);
+			SendMessage(hSingleWindow, BM_SETCHECK, _this->m_server->SingleWindow(), 0);
+
+			HWND hWindowName = GetDlgItem(hwnd, IDC_NAME_APPLI);
+			if ( _this->m_server->GetWindowName() != NULL){
+			   SetDlgItemText(hwnd, IDC_NAME_APPLI,_this->m_server->GetWindowName());
+			}
+			EnableWindow(hWindowName, _this->m_server->SingleWindow());
+			// [<--v1.0.2-jp2 fix]
+
 			SetForegroundWindow(hwnd);
 
 			return FALSE; // Because we've set the focus
@@ -373,6 +390,19 @@ vncPropertiesPoll::DialogProcPoll(HWND hwnd,
 					SendMessage(hPollOnEventOnly, BM_GETCHECK, 0, 0) == BST_CHECKED
 					);
 
+				// [v1.0.2-jp2 fix-->] Move to vncpropertiesPoll.cpp
+				HWND hSingleWindow = GetDlgItem(hwnd, IDC_SINGLE_WINDOW);
+				_this->m_server->SingleWindow(SendMessage(hSingleWindow, BM_GETCHECK, 0, 0) == BST_CHECKED);
+
+				char szName[32];
+				if (GetDlgItemText(hwnd, IDC_NAME_APPLI, (LPSTR) szName, 32) == 0){
+					vnclog.Print(LL_INTINFO,VNCLOG("Error while reading Window Name %d \n"), GetLastError());
+				}
+				else{
+					_this->m_server->SetSingleWindowName(szName);
+				}
+				// [<--v1.0.2-jp2 fix] Move to vncpropertiesPoll.cpp
+
 				// Save the settings
 				if (_this->m_fUseRegistry)
 					_this->Save();
@@ -396,7 +426,18 @@ vncPropertiesPoll::DialogProcPoll(HWND hwnd,
 				return TRUE;
 			}
 
-		case IDCANCEL:
+		// [v1.0.2-jp2 fix-->] Move to vncpropertiesPoll.cpp
+		 case IDC_SINGLE_WINDOW:
+			 {
+				 HWND hSingleWindow = GetDlgItem(hwnd, IDC_SINGLE_WINDOW);
+				 BOOL fSingleWindow = (SendMessage(hSingleWindow, BM_GETCHECK,0, 0) == BST_CHECKED);
+				 HWND hWindowName   = GetDlgItem(hwnd, IDC_NAME_APPLI);
+				 EnableWindow(hWindowName, fSingleWindow);
+			 }
+			 return TRUE;
+		// [<--v1.0.2-jp2 fix] Move to vncpropertiesPoll.cpp
+
+		 case IDCANCEL:
 			vnclog.Print(LL_INTINFO, VNCLOG("enddialog (CANCEL)\n"));
 
 			_this->m_returncode_valid = TRUE;
@@ -404,7 +445,6 @@ vncPropertiesPoll::DialogProcPoll(HWND hwnd,
 			EndDialog(hwnd, IDCANCEL);
 			_this->m_dlgvisible = FALSE;
 			return TRUE;
-
 		
 
 		case IDC_POLL_FOREGROUND:
@@ -470,6 +510,27 @@ vncPropertiesPoll::LoadInt(HKEY key, LPCSTR valname, LONG defval)
 		return defval;
 
 	return pref;
+}
+
+void
+vncPropertiesPoll::LoadSingleWindowName(HKEY key, char *buffer)
+{
+	DWORD type = REG_BINARY;
+	int slen=32;
+	char inouttext[32];
+
+	if (RegQueryValueEx(key,
+		"SingleWindowName",
+		NULL,
+		&type,
+		(LPBYTE) &inouttext,
+		(LPDWORD) &slen) != ERROR_SUCCESS)
+		return;
+
+	if (slen > MAXPATH)
+		return;
+
+	memcpy(buffer, inouttext, 32);
 }
 
 char *
@@ -651,6 +712,10 @@ LABELUSERSETTINGS:
 	m_pref_Hook=TRUE;
 	m_pref_Virtual=FALSE;
 
+	// [v1.0.2-jp2 fix]
+	m_pref_SingleWindow = FALSE;
+	*m_pref_szSingleWindowName = '\0';
+
 	// Load the local prefs for this user
 	if (hkDefault != NULL)
 	{
@@ -714,6 +779,9 @@ vncPropertiesPoll::LoadUserPrefsPoll(HKEY appkey)
 	if (m_pref_Driver)m_pref_Driver=CheckVideoDriver(0);
 	m_pref_Hook=LoadInt(appkey, "EnableHook", m_pref_Hook);
 	m_pref_Virtual=LoadInt(appkey, "EnableVirtual", m_pref_Virtual);
+	// [v1.0.2-jp2 fix]
+	m_pref_SingleWindow=LoadInt(appkey, "SingleWindow", m_pref_SingleWindow);
+	LoadSingleWindowName(appkey, m_pref_szSingleWindowName);
 
 }
 
@@ -735,6 +803,9 @@ vncPropertiesPoll::ApplyUserPrefs()
 	else m_server->Driver(false);
 	m_server->Hook(m_pref_Hook);
 	m_server->Virtual(m_pref_Virtual);
+	// [v1.0.2-jp2 fix]
+	m_server->SingleWindow(m_pref_SingleWindow);
+	m_server->SetSingleWindowName(m_pref_szSingleWindowName);
 
 }
 
@@ -743,6 +814,14 @@ vncPropertiesPoll::SaveInt(HKEY key, LPCSTR valname, LONG val)
 {
 	RegSetValueEx(key, valname, 0, REG_DWORD, (LPBYTE) &val, sizeof(val));
 }
+
+// [v1.0.2-jp2 fix-->]
+void
+vncPropertiesPoll::SaveString(HKEY key,LPCSTR valname, const char *buffer)
+{
+	RegSetValueEx(key, valname, 0, REG_BINARY, (LPBYTE) buffer, strlen(buffer)+1);
+}
+// [<--v1.0.2-jp2 fix]
 
 void
 vncPropertiesPoll::Save()
@@ -814,6 +893,9 @@ vncPropertiesPoll::SaveUserPrefsPoll(HKEY appkey)
 	SaveInt(appkey, "EnableDriver", m_server->Driver());
 	SaveInt(appkey, "EnableHook", m_server->Hook());
 	SaveInt(appkey, "EnableVirtual", m_server->Virtual());
+	// [v1.0.2-jp2 fix]
+	SaveInt(appkey, "SingleWindow", m_server->SingleWindow());
+	SaveString(appkey, "SingleWindowName", m_server->GetWindowName());
 	
 }
 

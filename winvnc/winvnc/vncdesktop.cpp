@@ -398,6 +398,15 @@ vncDesktop::~vncDesktop()
 		m_thread->join(&returnval);
 		m_thread = NULL;
 	}
+
+	//	[v1.0.2-jp1 fix] Blank Monitor
+	if(m_server->GammaGray() && m_grayed){
+		HDC hDC = GetDC(NULL);
+		SetDeviceGammaRamp(hDC, bk_gamma);
+		ReleaseDC(NULL, hDC);
+	}
+
+
 	SetDisableInput(false);
 	// Let's call Shutdown just in case something went wrong...
 	Shutdown();
@@ -1945,13 +1954,32 @@ vncDesktop::SetDisableInput(bool enabled)
 	if (m_server->BlankMonitorEnabled())
 	if (enabled)
 	{
-		if (!m_server->BlackAlphaBlending())
+		//	[v1.0.2-jp1 fix] Blank Monitor
+		//if (!m_server->BlackAlphaBlending())
+		if (m_server->GammaGray())
 		{
-		SetProcessShutdownParameters(0x100, 0);
-		SystemParametersInfo(SPI_GETPOWEROFFTIMEOUT, 0, &OldPowerOffTimeout, 0);
-		SystemParametersInfo(SPI_SETPOWEROFFTIMEOUT, 100, NULL, 0);
-		SystemParametersInfo(SPI_SETPOWEROFFACTIVE, 1, NULL, 0);
-		SendMessage(m_hwnd,WM_SYSCOMMAND,SC_MONITORPOWER,(LPARAM)2);
+			if(!m_grayed){
+				WORD gamma[3][256];
+				HDC hDC = GetDC(NULL);
+				
+				GetDeviceGammaRamp(hDC, bk_gamma);
+				for(int i = 0; i < 256; i++){
+					gamma[0][i] = gamma[1][i] = gamma[2][i] = MAXWORD / 2;
+				}
+				SetDeviceGammaRamp(hDC, gamma);
+				m_grayed = TRUE;
+				
+				ReleaseDC(NULL, hDC);
+			}
+		}
+		else if (!m_server->BlackAlphaBlending())
+		//	[<--v1.0.2-jp1 fix]
+		{
+			SetProcessShutdownParameters(0x100, 0);
+			SystemParametersInfo(SPI_GETPOWEROFFTIMEOUT, 0, &OldPowerOffTimeout, 0);
+			SystemParametersInfo(SPI_SETPOWEROFFTIMEOUT, 100, NULL, 0);
+			SystemParametersInfo(SPI_SETPOWEROFFACTIVE, 1, NULL, 0);
+			SendMessage(m_hwnd,WM_SYSCOMMAND,SC_MONITORPOWER,(LPARAM)2);
 		}
 		else
 		{
@@ -1965,13 +1993,24 @@ vncDesktop::SetDisableInput(bool enabled)
 	}
 	else // Monitor On
 	{
-		if (!m_server->BlackAlphaBlending())
+		//	[v1.0.2-jp1 fix-->] Blank Monitor
+		//if (!m_server->BlackAlphaBlending())
+		if (m_server->GammaGray() && m_grayed)
 		{
-		if (OldPowerOffTimeout!=0)
-			SystemParametersInfo(SPI_SETPOWEROFFTIMEOUT, OldPowerOffTimeout, NULL, 0);
-		SystemParametersInfo(SPI_SETPOWEROFFACTIVE, 0, NULL, 0);
-		if (m_hwnd!=NULL) SendMessage(m_hwnd,WM_SYSCOMMAND,SC_MONITORPOWER,(LPARAM)-1);
-		OldPowerOffTimeout=0;
+			HDC hDC = GetDC(NULL);
+
+			SetDeviceGammaRamp(hDC, bk_gamma);
+			m_grayed = FALSE;
+
+			ReleaseDC(NULL, hDC);
+		}
+		else if (!m_server->BlackAlphaBlending())
+		{
+			if (OldPowerOffTimeout!=0)
+				SystemParametersInfo(SPI_SETPOWEROFFTIMEOUT, OldPowerOffTimeout, NULL, 0);
+			SystemParametersInfo(SPI_SETPOWEROFFACTIVE, 0, NULL, 0);
+			if (m_hwnd!=NULL) SendMessage(m_hwnd,WM_SYSCOMMAND,SC_MONITORPOWER,(LPARAM)-1);
+			OldPowerOffTimeout=0;
 		}
 		else
 		{

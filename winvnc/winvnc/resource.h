@@ -41,6 +41,8 @@
 #define IDR_FTPFRAMESTRCOMP_CLASS       151
 #define IDD_USER_NAME                   604
 #define IDD_PASSWORD                    608
+#define IDR_MESSAGES_PROPERTIES         900
+#define IDR_MESSAGES_CLASS              901
 #define IDD_LOGON                       1002
 #define IDC_CONNECT_BORDER              1003
 #define IDD_AUTH_DIALOG                 1003
@@ -168,8 +170,12 @@
 #define IDC_HIDE_B                      1110
 #define IDC_ALPHA                       1112
 #define IDC_ALPHABLACK                  1114
+#define IDC_ALPHABLACK2                 1116
 #define IDC_FTUSERIMPERSONATION_CHECK   1117
 #define IDC_REMOVE_Aero                 1118
+#define IDE_CUSTOM1                     1119
+#define IDC_WWW2                        1120
+#define IDC_WWW3                        1121
 #define IDC_Path1                       1132
 #define IDC_Path2                       1133
 #define IDC_Path3                       1134
@@ -178,6 +184,9 @@
 #define IDC_REMOTETEXT_EDIT             1141
 #define IDC_CHATAREA_EDIT               1141
 #define IDC_CLEAR_B                     1142
+#define IDC_FINGER                      9000
+#define IDC_GAMMAGRAY                   9001
+#define IDC_STATIC_SPLIT                9002
 #define ID_ADMIN_PROPERTIES             40000
 #define ID_PROPERTIES                   40001
 #define ID_CLOSE                        40002
@@ -255,7 +264,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        152
 #define _APS_NEXT_COMMAND_VALUE         40019
-#define _APS_NEXT_CONTROL_VALUE         1119
+#define _APS_NEXT_CONTROL_VALUE         1122
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

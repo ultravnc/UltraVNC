@@ -116,7 +116,7 @@ public:
 	inline BOOL ResetZRLEEncoding(void);
 #endif
 
-	inline bool IsSlowEncoding() {return (m_encoding == rfbEncodingZRLE || m_encoding == rfbEncodingTight || m_encoding == rfbEncodingZlib);};
+	inline bool IsSlowEncoding() {return (m_encoding == rfbEncodingZYWRLE || m_encoding == rfbEncodingZRLE || m_encoding == rfbEncodingTight || m_encoding == rfbEncodingZlib);};
 	inline bool IsUltraEncoding() {return (m_encoding == rfbEncodingUltra);};
 
 
@@ -480,6 +480,15 @@ vncEncodeMgr::SetEncoding(CARD32 encoding,BOOL reinitialize)
 		if (!zrleEncoder)
 			zrleEncoder = new vncEncodeZRLE;
 		m_encoder = zrleEncoder;
+		((vncEncodeZRLE*)zrleEncoder)->m_use_zywrle = FALSE;
+		break;
+
+	case rfbEncodingZYWRLE:
+		vnclog.Print(LL_INTINFO, VNCLOG("ZYWRLE encoder requested\n"));
+		if (!zrleEncoder)
+			zrleEncoder = new vncEncodeZRLE;
+		m_encoder = zrleEncoder;
+		((vncEncodeZRLE*)zrleEncoder)->m_use_zywrle = TRUE;
 		break;
 
 	case rfbEncodingZlib:

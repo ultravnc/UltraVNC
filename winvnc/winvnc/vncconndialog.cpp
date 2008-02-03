@@ -35,6 +35,9 @@
 
 #include "localization.h" // ACT : Add localization on messages
 
+//	[v1.0.2-jp1 fix] Load resouce from dll
+extern HINSTANCE	hInstResDLL;
+
 // Constructor
 
 vncConnDialog::vncConnDialog(vncServer *server)
@@ -52,7 +55,9 @@ vncConnDialog::~vncConnDialog()
 
 void vncConnDialog::DoDialog()
 {
-	DialogBoxParam(hAppInstance, MAKEINTRESOURCE(IDD_OUTGOING_CONN), 
+	//	[v1.0.2-jp1 fix]
+	//DialogBoxParam(hAppInstance, MAKEINTRESOURCE(IDD_OUTGOING_CONN), 
+	DialogBoxParam(hInstResDLL, MAKEINTRESOURCE(IDD_OUTGOING_CONN), 
 		NULL, (DLGPROC) vncConnDlgProc, (LONG) this);
 	delete this;
 }

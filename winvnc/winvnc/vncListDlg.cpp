@@ -29,6 +29,9 @@
 #include "WinVNC.h"
 #include "vncListDlg.h"
 
+// [v1.0.2-jp1 fix] Load resouce from dll
+extern HINSTANCE	hInstResDLL;
+
 //
 //
 //
@@ -60,7 +63,9 @@ void vncListDlg::Display()
 {
 	if (!m_dlgvisible)
 	{
-		DialogBoxParam(	hAppInstance,
+		// [v1.0.2-jp1 fix] Load resouce from dll
+		//DialogBoxParam(	hAppInstance,
+		DialogBoxParam(	hInstResDLL,
 						MAKEINTRESOURCE(IDD_LIST_DLG), 
 						NULL,
 						(DLGPROC) DialogProc,

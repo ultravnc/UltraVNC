@@ -142,6 +142,7 @@ protected:
 	BOOL m_pref_DisableLocalInputs;
 
 	// Modif sf@2002
+	// [v1.0.2-jp2 fix]
 	BOOL m_pref_SingleWindow;
 	BOOL m_pref_EnableFileTransfer;
 	BOOL m_pref_FTUserImpersonation;
@@ -150,6 +151,7 @@ protected:
 	BOOL m_pref_RequireMSLogon;
 	BOOL m_pref_CaptureAlphaBlending;
 	BOOL m_pref_BlackAlphaBlending;
+	BOOL m_pref_GammaGray;	// [v1.0.2-jp1 fix1]
 
 	
 	// Marscha@2004 - authSSP: added state of "New MS-Logon"

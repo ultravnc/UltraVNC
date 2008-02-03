@@ -11,6 +11,9 @@ TCHAR szUsername[64];
 TCHAR szPassword[64];
 TCHAR szDomain[64];
 
+// [v1.0.2-jp1 fix] Load resouce from dll
+extern HINSTANCE	hInstResDLL;
+
 BOOL vncLogonThread::Init(vncDesktop *desktop)
 {
 	m_desktop = desktop;
@@ -76,7 +79,10 @@ vncLogonThread::LogonDlgProc(HWND hDlg,
 int vncLogonThread::CreateLogonWindow(HINSTANCE hInstance)
 {
 	int returnvalue=0;
-	returnvalue = DialogBoxParam(hAppInstance,MAKEINTRESOURCE(IDD_LOGON),
+
+	// [v1.0.2-jp1 fix] Load resouce from dll
+	//returnvalue = DialogBoxParam(hAppInstance,MAKEINTRESOURCE(IDD_LOGON),
+	returnvalue = DialogBoxParam(hInstResDLL,MAKEINTRESOURCE(IDD_LOGON),
 				NULL,
 				(DLGPROC) LogonDlgProc,
 				(LONG) this);

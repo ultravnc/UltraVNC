@@ -46,6 +46,10 @@
 ///unload driver
 #include "vncOSVersion.h"
 #include "videodriver.h"
+
+// [v1.0.2-jp1 fix] Support "LinkLabel"
+#include "LinkLabel.h"
+
 //#define CRASH_ENABLED
 #ifdef CRASH_ENABLED
 	#ifndef _CRASH_RPT_
@@ -96,6 +100,9 @@ void Set_uninstall_service_as_admin();
 void Set_install_service_as_admin();
 void winvncSecurityEditorHelper_as_admin();
 
+// [v1.0.2-jp1 fix] Load resouce from dll
+HINSTANCE	hInstResDLL;
+
 // winvnc.exe will also be used for helper exe
 // This allow us to minimize the number of seperate exe
 bool
@@ -103,8 +110,18 @@ Myinit(HINSTANCE hInstance)
 {
 	SetOSVersion();
 	setbuf(stderr, 0);
+
+	// [v1.0.2-jp1 fix] Load resouce from dll
+	hInstResDLL = NULL;
+	hInstResDLL = LoadLibrary("vnclang_server.dll");
+	if (hInstResDLL == NULL)
+	{
+		hInstResDLL = hInstance;
+	}
+	RegisterLinkLabel(hInstResDLL);
+
     //Load all messages from ressource file
-    Load_Localization(hInstance) ;
+    Load_Localization(hInstResDLL) ;
 
 	char WORKDIR[MAX_PATH];
 	if (GetModuleFileName(NULL, WORKDIR, MAX_PATH))
@@ -155,8 +172,18 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 
 	SetOSVersion();
 	setbuf(stderr, 0);
+
+	// [v1.0.2-jp1 fix] Load resouce from dll
+	hInstResDLL = NULL;
+	hInstResDLL = LoadLibrary("vnclang_server.dll");
+	if (hInstResDLL == NULL)
+	{
+		hInstResDLL = hInstance;
+	}
+	RegisterLinkLabel(hInstResDLL);
+
     //Load all messages from ressource file
-    Load_Localization(hInstance) ;
+    Load_Localization(hInstResDLL) ;
 
 	char WORKDIR[MAX_PATH];
 	if (GetModuleFileName(NULL, WORKDIR, MAX_PATH))

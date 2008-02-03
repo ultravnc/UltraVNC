@@ -36,9 +36,16 @@
 #define XK_GREEK
 #define XK_TECHNICAL
 #define XK_XKB_KEYS
+
+//	[v1.0.2-jp1 fix] IOport's patch (Define XK_KATAKANA)
+#define XK_KATAKANA
+
 #include "keysymdef.h"
 #include "vncService.h"
 
+//	[v1.0.2-jp1 fix] IOport's patch (Include "ime.h" for IME control)
+#include <ime.h>
+ 
 #include <map>
 #include <vector>
 DWORD WINAPI Cadthread(LPVOID lpParam);
@@ -68,8 +75,19 @@ static keymap_t keymap[] = {
   { XK_Delete,           VK_DELETE, 1 },
 
   // Japanese stuff - almost certainly wrong...
-  { XK_Kanji,            VK_KANJI, 0 },
-  { XK_Kana_Shift,       VK_KANA, 0 },
+  //	[v1.0.2-jp1 fix] IOport's patch (Correct definition of Japanese key)
+  //{ XK_Kanji,            VK_KANJI, 0 },
+  //{ XK_Kana_Shift,       VK_KANA, 0 },
+  // Japanese key
+  { XK_Kanji,            VK_KANJI, 0 },				/* 0x19: Kanji, Kanji convert */
+  { XK_Muhenkan,         VK_NONCONVERT, 0 },		/* 0x1d: Cancel Conversion */
+  { XK_Romaji,           VK_DBE_ROMAN, 0 },			/* 0xf5: to Romaji */
+  { XK_Hiragana,         VK_DBE_HIRAGANA, 0 },		/* 0xf2: to Hiragana */
+  { XK_Katakana,         VK_DBE_KATAKANA, 0 },		/* 0xf1: to Katakana */
+  { XK_Zenkaku,          VK_DBE_SBCSCHAR, 0 },		/* 0xf3: to Zenkaku */
+  { XK_Hankaku,          VK_DBE_DBCSCHAR, 0 },		/* 0xf4: to Hankaku */
+  { XK_Eisu_toggle,      VK_DBE_ALPHANUMERIC, 0 },	/* 0xf0: Alphanumeric toggle */
+  { XK_Mae_Koho,         VK_CONVERT, 0 },			/* 0x1c: Previous Candidate */
 
   // Cursor control & motion
 
@@ -540,6 +558,16 @@ public:
       // ordinary Latin-1 character
 
       SHORT s = VkKeyScan(keysym);
+
+      //	[v1.0.2-jp1 fix] yak!'s patch
+      if (keysym==XK_kana_WO) {
+        s = 0x0130;
+      } else if (keysym==XK_backslash) {
+        s = 0x00e2;
+      } else if (keysym==XK_yen) {
+        s = 0x00dc;
+      }
+
 	  vnclog.Print(LL_INTWARN, " SHORT s %i",s);
 
 	 if (s == -1)
@@ -606,12 +634,17 @@ public:
         if (modifierState & 1) {
           shift.press(); 
         } else {
-          if (vncService::IsWin95()) {
-            shift.release();
-          } else {
-            lshift.release();
-            rshift.release();
-          }
+		  // [v1.0.2-jp1 fix] Even if "SHIFT + SPACE" are pressed, "SHIFT" is valid
+          if (vkCode == 0x20){
+		  }
+		  else{
+            if (vncService::IsWin95()) {
+              shift.release();
+			} else {
+              lshift.release();
+              rshift.release();
+			}
+		  }
         }
       }
       vnclog.Print(LL_INTINFO,

@@ -32,6 +32,9 @@
 #include "WinVNC.h"
 #include "vncAbout.h"
 
+//	[v1.0.2-jp1 fix] Load resouce from dll
+extern HINSTANCE	hInstResDLL;
+
 HBITMAP
     DoGetBkGndBitmap(IN CONST UINT uBmpResId )
     {
@@ -129,7 +132,9 @@ vncAbout::Show(BOOL show)
 	{
 		if (!m_dlgvisible)
 		{
-			DialogBoxParam(hAppInstance,
+			//	[v1.0.2-jp1 fix]
+			//DialogBoxParam(hAppInstance,
+			DialogBoxParam(hInstResDLL,
 				MAKEINTRESOURCE(IDD_ABOUT), 
 				NULL,
 				(DLGPROC) DialogProc,

@@ -36,6 +36,9 @@
 #include <omnithread.h>
 #include "resource.h"
 
+//	[v1.0.2-jp1 fix]
+extern	HINSTANCE	hInstResDLL;
+
 /* Old viewer - TODO: remove
 // HTTP messages/message formats
 const char HTTP_MSG_OK []			="HTTP/1.0 200 OK\r\n\r\n";
@@ -403,7 +406,9 @@ void vncHTTPConnectThread::DoHTTP(VSocket *socket)
 			vnclog.Print(LL_INTINFO, VNCLOG("requested file recognised\n"));
 
 			// Find the resource here
-			resource = FindResource(NULL,
+			//	[v1.0.2-jp1 fix]
+			//resource = FindResource(NULL,
+			resource = FindResource(hInstResDLL,
 					MAKEINTRESOURCE(filemapping[x].resourceID),
 					filemapping[x].type
 					);
@@ -411,10 +416,14 @@ void vncHTTPConnectThread::DoHTTP(VSocket *socket)
 				return;
 
 			// Get its size
-			resourcesize = SizeofResource(NULL, resource);
+			//	[v1.0.2-jp1 fix]
+			//resourcesize = SizeofResource(NULL, resource);
+			resourcesize = SizeofResource(hInstResDLL, resource);
 
 			// Load the resource
-			resourcehan = LoadResource(NULL, resource);
+			//	[v1.0.2-jp1 fix]
+			//resourcehan = LoadResource(NULL, resource);
+			resourcehan = LoadResource(hInstResDLL, resource);
 			if (resourcehan == NULL)
 				return;
 

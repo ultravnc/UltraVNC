@@ -36,6 +36,9 @@
 
 const TCHAR REGISTRY_KEY [] = "Software\\UltraVnc";
 
+// [v1.0.2-jp1 fix] Load resouce from dll
+extern HINSTANCE	hInstResDLL;
+
 void
 vncSetAuth::OpenRegistry()
 {
@@ -443,7 +446,9 @@ vncSetAuth::Show(BOOL show)
 	{
 		if (!m_dlgvisible)
 		{
-			DialogBoxParam(hAppInstance,
+			// [v1.0.2-jp1 fix] Load resouce from dll
+			//DialogBoxParam(hAppInstance,
+			DialogBoxParam(hInstResDLL,
 				MAKEINTRESOURCE(IDD_MSLOGON), 
 				NULL,
 				(DLGPROC) DialogProc,

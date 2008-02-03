@@ -96,6 +96,8 @@ protected:
 	void LoadUserPrefsPoll(HKEY appkey);
 	void SaveUserPrefsPoll(HKEY appkey);
 
+	// [v1.0.2-jp2 fix]
+	void LoadSingleWindowName(HKEY key, char *buffer);
 
 	// Making the loaded user prefs active
 	void ApplyUserPrefs();
@@ -114,6 +116,10 @@ protected:
 	BOOL m_pref_Driver;
 	BOOL m_pref_Hook;
 	BOOL m_pref_Virtual;
+
+	// [v1.0.2-jp2 fix]
+	BOOL m_pref_SingleWindow;
+	char m_pref_szSingleWindowName[32];
 
 };
 

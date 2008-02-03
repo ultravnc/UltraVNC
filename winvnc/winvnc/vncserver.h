@@ -360,6 +360,10 @@ public:
 	virtual BOOL BlackAlphaBlending(){return m_fBlackAlphaBlending;};
 	virtual void BlackAlphaBlending(BOOL fEnabled){m_fBlackAlphaBlending = fEnabled;};
 
+	// [v1.0.2-jp1 fix]
+	virtual BOOL GammaGray(){return m_fGammaGray;};
+	virtual void GammaGray(BOOL fEnabled){m_fGammaGray = fEnabled;};
+
 	virtual void Clear_Update_Tracker();
 	virtual void UpdateCursorShape();
 
@@ -511,6 +515,7 @@ protected:
 	// sf@2005
 	BOOL m_fCaptureAlphaBlending;
 	BOOL m_fBlackAlphaBlending;
+	BOOL m_fGammaGray;	// [v1.0.2-jp1 fix]
 
 	HINSTANCE   hWtsLib;
 };

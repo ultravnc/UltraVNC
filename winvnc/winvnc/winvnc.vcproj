@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="winvnc"
 	ProjectGUID="{C05AE605-1250-4F58-911B-EC99AE2C25AF}"
 	>
@@ -174,7 +174,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wsock32.lib winmm.lib version.lib comctl32.lib"
+				AdditionalDependencies="wsock32.lib winmm.lib version.lib comctl32.lib wtsapi32.lib userenv.lib"
 				OutputFile=".\..\Release/winvnc.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -328,6 +328,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\helpers.cpp"
+				>
+			</File>
+			<File
 				RelativePath="HideDesktop.cpp"
 				>
 				<FileConfiguration
@@ -372,6 +376,14 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\IPC.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\LinkLabel.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\lzo\minilzo.c"
 				>
 				<FileConfiguration
@@ -392,6 +404,10 @@
 						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\read_write_ini.cpp"
+				>
 			</File>
 			<File
 				RelativePath="rfbRegion_X11.cxx"
@@ -458,6 +474,14 @@
 						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\service.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\service_motor.cpp"
+				>
 			</File>
 			<File
 				RelativePath="stdhdrs.cpp"
@@ -640,6 +664,10 @@
 						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\vistahook.cpp"
+				>
 			</File>
 			<File
 				RelativePath="vncabout.cpp"
@@ -1519,7 +1547,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\IPC.h"
+				>
+			</File>
+			<File
 				RelativePath="keysymdef.h"
+				>
+			</File>
+			<File
+				RelativePath=".\LinkLabel.h"
 				>
 			</File>
 			<File
@@ -1792,11 +1828,11 @@
 				>
 			</File>
 			<File
-				RelativePath="vnc.bmp"
+				RelativePath="res\vnc.bmp"
 				>
 			</File>
 			<File
-				RelativePath="res\vnc.bmp"
+				RelativePath="vnc.bmp"
 				>
 			</File>
 			<File
@@ -1833,11 +1869,11 @@
 			>
 		</File>
 		<File
-			RelativePath="..\building.txt"
+			RelativePath="..\..\BUILDING.txt"
 			>
 		</File>
 		<File
-			RelativePath="..\..\BUILDING.txt"
+			RelativePath="..\building.txt"
 			>
 		</File>
 		<File

@@ -142,6 +142,10 @@ SOURCE=.\IPC.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\LinkLabel.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\lzo\minilzo.c
 # End Source File
 # Begin Source File
@@ -408,6 +412,22 @@ SOURCE=.\keysymdef.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\LinkLabel.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\lzo\lzoconf.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\lzo\lzodefs.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\lzo\minilzo.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\MultiMon.h
 # End Source File
 # Begin Source File
@@ -640,6 +660,10 @@ SOURCE=.\res\descipher.class
 # End Source File
 # Begin Source File
 
+SOURCE=.\res\Finger.cur
+# End Source File
+# Begin Source File
+
 SOURCE=.\HideDesktop.h
 # End Source File
 # Begin Source File
@@ -730,6 +754,14 @@ SOURCE=.\res\ButtonPanel.class
 # Begin Source File
 
 SOURCE=.\res\DH.class
+# End Source File
+# Begin Source File
+
+SOURCE=.\res\DH.class
+# End Source File
+# Begin Source File
+
+SOURCE=".\res\ftpframe$strcomp.class"
 # End Source File
 # Begin Source File
 

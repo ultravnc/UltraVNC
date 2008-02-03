@@ -23,6 +23,13 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 /////////////////////////////////////////////////////////////////////////////
 //
+// Cursor
+//
+
+IDC_FINGER              CURSOR  DISCARDABLE     "res\\Finger.cur"
+
+/////////////////////////////////////////////////////////////////////////////
+//
 // JAVACLASS
 //
 
@@ -39,6 +46,8 @@ IDR_RECFRAME_CLASS      JAVACLASS DISCARDABLE   "res\\RecordingFrame.class"
 IDR_SESSIONREC_CLASS    JAVACLASS DISCARDABLE   "res\\SessionRecorder.class"
 IDR_DH_CLASS            JAVACLASS DISCARDABLE   "res\\dh.class"
 IDR_FTPFRAMESTRCOMP_CLASS JAVACLASS DISCARDABLE   "res\\ftpframe$strcomp.class"
+//IDR_MESSAGES_PROPERTIES JAVACLASS DISCARDABLE   "res\\messages.properties"
+//IDR_MESSAGES_CLASS      JAVACLASS DISCARDABLE   "res\\Messages.class"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -52,8 +61,8 @@ IDR_MANIFEST            24      DISCARDABLE     "winvnc.exe.manifest"
 // Dialog
 //
 
-IDD_TEXTCHAT_DLG DIALOGEX 0, 0, 307, 177
-STYLE DS_MODALFRAME | DS_3DLOOK | DS_CENTER | WS_POPUP | WS_CAPTION
+IDD_TEXTCHAT_DLG DIALOGEX 0, 0, 308, 177
+STYLE DS_3DLOOK | DS_CENTER | WS_POPUP | WS_CAPTION | WS_THICKFRAME
 CAPTION " Chat - Ultr@VNC"
 FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
@@ -65,8 +74,9 @@ BEGIN
     PUSHBUTTON      "Close",IDCANCEL,264,164,39,11
     CONTROL         "",IDC_CHATAREA_EDIT,"RICHEDIT",ES_MULTILINE | 
                     ES_AUTOVSCROLL | ES_READONLY | ES_WANTRETURN | 
-                    WS_VSCROLL | WS_TABSTOP,4,4,300,128,WS_EX_STATICEDGE
-    PUSHBUTTON      "",IDOK,301,0,6,6,NOT WS_VISIBLE
+                    WS_VSCROLL | WS_TABSTOP,4,4,300,122,WS_EX_STATICEDGE
+    PUSHBUTTON      "",IDOK,303,0,6,6,NOT WS_VISIBLE
+    LTEXT           "",IDC_STATIC_SPLIT,5,127,298,8,SS_NOTIFY
 END
 
 IDD_LIST_DLG DIALOGEX 0, 0, 164, 116
@@ -179,7 +189,7 @@ BEGIN
     GROUPBOX        "Single Window Sharing",IDC_STATIC,5,100,214,47,BS_LEFT
 END
 
-IDD_PROPERTIES1 DIALOG DISCARDABLE  0, 0, 390, 266
+IDD_PROPERTIES1 DIALOG DISCARDABLE  0, 0, 390, 285
 STYLE DS_MODALFRAME | DS_3DLOOK | DS_CENTER | WS_MINIMIZEBOX | WS_POPUP | 
     WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION " Ultr@VNC Server Property Page"
@@ -205,11 +215,11 @@ BEGIN
     RTEXT           "Http:",IDC_STATIC,47,67,16,8
     EDITTEXT        IDC_PORTHTTP,66,65,29,12,ES_AUTOHSCROLL
     CONTROL         "Enable JavaViewer (Http Connect)",IDC_CONNECT_HTTP,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,80,122,8
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,80,122,10
     CONTROL         "Allow Loopback Connections",IDC_ALLOWLOOPBACK,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,11,91,108,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,11,91,105,10
     CONTROL         "LoopbackOnly",IDC_LOOPBACKONLY,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,11,103,62,10
+                    WS_TABSTOP,11,102,59,10
     GROUPBOX        "Authentication",IDC_STATIC,6,122,210,77,BS_LEFT
     LTEXT           "VNC Password:",IDC_PASSWORD_LABEL,12,135,50,11,
                     SS_CENTERIMAGE
@@ -310,7 +320,7 @@ BEGIN
     IDD_TEXTCHAT_DLG, DIALOG
     BEGIN
         LEFTMARGIN, 5
-        RIGHTMARGIN, 302
+        RIGHTMARGIN, 303
         TOPMARGIN, 5
         BOTTOMMARGIN, 172
     END
@@ -332,7 +342,7 @@ BEGIN
         VERTGUIDE, 100
         VERTGUIDE, 120
         TOPMARGIN, 5
-        BOTTOMMARGIN, 150
+        BOTTOMMARGIN, 174
         HORZGUIDE, 9
         HORZGUIDE, 20
         HORZGUIDE, 30
@@ -397,13 +407,13 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,1,0,4
- PRODUCTVERSION 1,1,0,4
+ FILEVERSION 1,0,4,901
+ PRODUCTVERSION 1,0,4,901
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
- FILEFLAGS 0x1L
+ FILEFLAGS 0x2DL
 #else
- FILEFLAGS 0x0L
+ FILEFLAGS 0x2CL
 #endif
  FILEOS 0x40004L
  FILETYPE 0x2L
@@ -416,14 +426,14 @@ BEGIN
             VALUE "Comments", "UltraVNC - Remote Control for all\0"
             VALUE "CompanyName", "UltraVNC\0"
             VALUE "FileDescription", "VNC server for Win32\0"
-            VALUE "FileVersion", "1.1.0.4\0"
+            VALUE "FileVersion", "1.0.4 RC9 - jp1\0"
             VALUE "InternalName", "WinVNC\0"
             VALUE "LegalCopyright", "Copyright © 2002-2005 UltraVNC team members\0"
             VALUE "LegalTrademarks", "VNC\0"
             VALUE "OriginalFilename", "WinVNC.exe\0"
-            VALUE "PrivateBuild", "\0"
+            VALUE "PrivateBuild", "With japanized patch based on 1.0.2-jp2\0"
             VALUE "ProductName", "UltraVNC\0"
-            VALUE "ProductVersion", "1.1.0.4\0"
+            VALUE "ProductVersion", "1.0.4 RC9 - jp1\0"
             VALUE "SpecialBuild", "\0"
         END
     END
@@ -560,12 +570,12 @@ BEGIN
     ID_CADPERMISSION        "Permission denied on cad.exe, Ultravnc must be installed in ""program files"" else special cad permission is refused."
 END
 
-#endif    // English (U.S.) resources
+#endif    // ‰pŒê (±ÒØ¶) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// English (U.K.) resources
+// ‰pŒê (²·ÞØ½) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENG)
 #ifdef _WIN32
@@ -598,12 +608,12 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-#endif    // English (U.K.) resources
+#endif    // ‰pŒê (²·ÞØ½) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// Dutch (Belgium) resources
+// µ×ÝÀÞŒê (ÍÞÙ·Þ°) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NLB)
 #ifdef _WIN32
@@ -697,7 +707,7 @@ IDI_FLASH               ICON    DISCARDABLE     "res\\icon2.ico"
 //
 
 IDB_LOGO64              BITMAP  DISCARDABLE     "res\\vnc-1.bmp"
-#endif    // Dutch (Belgium) resources
+#endif    // µ×ÝÀÞŒê (ÍÞÙ·Þ°) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

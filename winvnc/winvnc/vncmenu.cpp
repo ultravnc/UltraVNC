@@ -41,6 +41,9 @@
 #include "vncMenu.h"
 #include "HideDesktop.h"
 
+// [v1.0.2-jp1 fix]
+#pragma comment(lib, "imm32.lib")
+
 // Constants
 const UINT MENU_ADD_CLIENT_MSG = RegisterWindowMessage("WinVNC.AddClient.Message");
 const UINT MENU_AUTO_RECONNECT_MSG = RegisterWindowMessage("WinVNC.AddAutoClient.Message");
@@ -51,6 +54,9 @@ const char *MENU_CLASS_NAME = "WinVNC Tray Icon";
 
 BOOL g_restore_ActiveDesktop = FALSE;
 bool RunningAsAdministrator ();
+// [v1.0.2-jp1 fix] Load resouce from dll
+extern HINSTANCE	hInstResDLL;
+
 extern bool			fShutdownOrdered;
 
 // sf@2007 - WTS notifications stuff
@@ -305,12 +311,15 @@ vncMenu::vncMenu(vncServer *server)
                         GetSystemMetrics(SM_CYSMICON), LR_LOADFROMFILE|LR_DEFAULTCOLOR);
 			m_flash_icon=(HICON)LoadImage(NULL, "icon2.ico", IMAGE_ICON, GetSystemMetrics(SM_CXSMICON),
                         GetSystemMetrics(SM_CYSMICON), LR_LOADFROMFILE|LR_DEFAULTCOLOR);
-
-			if (!m_winvnc_icon) m_winvnc_icon=(HICON)LoadImage(hAppInstance, MAKEINTRESOURCE(IDI_WINVNC), IMAGE_ICON,
+			// [v1.0.2-jp1 fix]
+			//if (!m_winvnc_icon) m_winvnc_icon=(HICON)LoadImage(hAppInstance, MAKEINTRESOURCE(IDI_WINVNC), IMAGE_ICON,
+			if (!m_winvnc_icon) m_winvnc_icon=(HICON)LoadImage(hInstResDLL, MAKEINTRESOURCE(IDI_WINVNC), IMAGE_ICON,
                         GetSystemMetrics(SM_CXSMICON),
                         GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR);
-			if (!m_flash_icon) m_flash_icon=(HICON)LoadImage(hAppInstance, MAKEINTRESOURCE(IDI_FLASH), IMAGE_ICON,
-                        GetSystemMetrics(SM_CXSMICON),
+			// [v1.0.2-jp1 fix]
+			//if (!m_flash_icon) m_flash_icon=(HICON)LoadImage(hAppInstance, MAKEINTRESOURCE(IDI_FLASH), IMAGE_ICON,
+ 			if (!m_flash_icon) m_flash_icon=(HICON)LoadImage(hInstResDLL, MAKEINTRESOURCE(IDI_FLASH), IMAGE_ICON,
+                       GetSystemMetrics(SM_CXSMICON),
                         GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR);
 		  }
 		  else
@@ -319,11 +328,15 @@ vncMenu::vncMenu(vncServer *server)
                         GetSystemMetrics(SM_CYSMICON), LR_LOADFROMFILE|LR_VGACOLOR);
 				m_flash_icon=(HICON)LoadImage(NULL, "icon2.ico", IMAGE_ICON, GetSystemMetrics(SM_CXSMICON),
                         GetSystemMetrics(SM_CYSMICON), LR_LOADFROMFILE|LR_VGACOLOR);
-			  if (!m_winvnc_icon)m_winvnc_icon=(HICON)LoadImage(hAppInstance, MAKEINTRESOURCE(IDI_WINVNC), IMAGE_ICON,
-                        GetSystemMetrics(SM_CXSMICON),
+			  // [v1.0.2-jp1 fix]
+			  //if (!m_winvnc_icon)m_winvnc_icon=(HICON)LoadImage(hAppInstance, MAKEINTRESOURCE(IDI_WINVNC), IMAGE_ICON,
+ 			  if (!m_winvnc_icon)m_winvnc_icon=(HICON)LoadImage(hInstResDLL, MAKEINTRESOURCE(IDI_WINVNC), IMAGE_ICON,
+                       GetSystemMetrics(SM_CXSMICON),
                         GetSystemMetrics(SM_CYSMICON), LR_VGACOLOR);
-			 if (!m_flash_icon)m_flash_icon=(HICON)LoadImage(hAppInstance, MAKEINTRESOURCE(IDI_FLASH), IMAGE_ICON,
-                        GetSystemMetrics(SM_CXSMICON),
+			 // [v1.0.2-jp1 fix]
+			 //if (!m_flash_icon)m_flash_icon=(HICON)LoadImage(hAppInstance, MAKEINTRESOURCE(IDI_FLASH), IMAGE_ICON,
+ 			 if (!m_flash_icon)m_flash_icon=(HICON)LoadImage(hInstResDLL, MAKEINTRESOURCE(IDI_FLASH), IMAGE_ICON,
+                       GetSystemMetrics(SM_CXSMICON),
                         GetSystemMetrics(SM_CYSMICON), LR_VGACOLOR);
 		  }
 		 }
@@ -333,17 +346,23 @@ vncMenu::vncMenu(vncServer *server)
                         GetSystemMetrics(SM_CYSMICON), LR_LOADFROMFILE|LR_VGACOLOR);
 				m_flash_icon=(HICON)LoadImage(NULL, "icon2.ico", IMAGE_ICON, GetSystemMetrics(SM_CXSMICON),
                         GetSystemMetrics(SM_CYSMICON), LR_LOADFROMFILE|LR_VGACOLOR);
-				if (!m_winvnc_icon)m_winvnc_icon=(HICON)LoadImage(hAppInstance, MAKEINTRESOURCE(IDI_WINVNC), IMAGE_ICON,
-                        GetSystemMetrics(SM_CXSMICON),
+				// [v1.0.2-jp1 fix]
+				//if (!m_winvnc_icon)m_winvnc_icon=(HICON)LoadImage(hAppInstance, MAKEINTRESOURCE(IDI_WINVNC), IMAGE_ICON,
+				if (!m_winvnc_icon)m_winvnc_icon=(HICON)LoadImage(hInstResDLL, MAKEINTRESOURCE(IDI_WINVNC), IMAGE_ICON,
+                       GetSystemMetrics(SM_CXSMICON),
                         GetSystemMetrics(SM_CYSMICON), LR_VGACOLOR);
-				if (!m_flash_icon)m_flash_icon=(HICON)LoadImage(hAppInstance, MAKEINTRESOURCE(IDI_FLASH), IMAGE_ICON,
+				// [v1.0.2-jp1 fix]
+				//if (!m_flash_icon)m_flash_icon=(HICON)LoadImage(hAppInstance, MAKEINTRESOURCE(IDI_FLASH), IMAGE_ICON,
+				if (!m_flash_icon)m_flash_icon=(HICON)LoadImage(hInstResDLL, MAKEINTRESOURCE(IDI_FLASH), IMAGE_ICON,
                         GetSystemMetrics(SM_CXSMICON),
                         GetSystemMetrics(SM_CYSMICON), LR_VGACOLOR);
 		  }
 	}
 
 	// Load the popup menu
-	m_hmenu = LoadMenu(hAppInstance, MAKEINTRESOURCE(IDR_TRAYMENU));
+	// [v1.0.2-jp1 fix]
+	//m_hmenu = LoadMenu(hAppInstance, MAKEINTRESOURCE(IDR_TRAYMENU));
+	m_hmenu = LoadMenu(hInstResDLL, MAKEINTRESOURCE(IDR_TRAYMENU));
 
 	// Install the tray icon!
 	AddTrayIcon();
@@ -464,7 +483,9 @@ vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 	//vnclog.Print(LL_INTINFO, VNCLOG("SendTRaymesg\n"));
 
 	// Use resource string as tip if there is one
-	if (LoadString(hAppInstance, IDI_WINVNC, m_nid.szTip, sizeof(m_nid.szTip)))
+	// [v1.0.2-jp1 fix]
+	//if (LoadString(hAppInstance, IDI_WINVNC, m_nid.szTip, sizeof(m_nid.szTip)))
+	if (LoadString(hInstResDLL, IDI_WINVNC, m_nid.szTip, sizeof(m_nid.szTip)))
 	{
 	    m_nid.uFlags |= NIF_TIP;
 	}
@@ -971,6 +992,14 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		//_this->m_server->KillSockConnect();
 		//_this->m_server->ShutdownServer();
 		//DestroyWindow(hwnd);
+
+		// [v1.0.2-jp1 fix] Shutdown slow probrem
+		RevertToSelf();
+		// [v1.0.2-jp2 fix] Shutdown slow probrem
+		if((lParam & ENDSESSION_LOGOFF) != ENDSESSION_LOGOFF){
+			_this->m_server->KillAuthClients();
+		}
+		
 		break;
 		
 	case WM_ENDSESSION:
@@ -1017,7 +1046,13 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			}
 		}
 		return 0;
-	
+
+	// [v1.0.2-jp1 fix] Don't show IME toolbar on right click menu.
+	case WM_INITMENU:
+	case WM_INITMENUPOPUP:
+		SendMessage(ImmGetDefaultIMEWnd(hwnd), WM_IME_CONTROL, IMC_CLOSESTATUSWINDOW, 0);
+		return 0;
+
 	default:
 		// Deal with any of our custom message types		
 		// wa@2005 -- added support for the AutoReconnectId

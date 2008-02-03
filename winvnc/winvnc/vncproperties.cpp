@@ -47,6 +47,9 @@
 bool RunningAsAdministrator ();
 const char WINVNC_REGISTRY_KEY [] = "Software\\ORL\\WinVNC3";
 
+// [v1.0.2-jp1 fix] Load resouce from dll
+extern HINSTANCE	hInstResDLL;
+
 // Marscha@2004 - authSSP: Function pointer for dyn. linking
 typedef void (*vncEditSecurityFn) (HWND hwnd, HINSTANCE hInstance);
 vncEditSecurityFn vncEditSecurity = 0;
@@ -251,7 +254,9 @@ vncProperties::ShowAdmin(BOOL show, BOOL usersettings)
 				m_returncode_valid = FALSE;
 
 				// Do the dialog box
-				int result = DialogBoxParam(hAppInstance,
+				// [v1.0.2-jp1 fix]
+				//int result = DialogBoxParam(hAppInstance,
+				int result = DialogBoxParam(hInstResDLL,
 				    MAKEINTRESOURCE(IDD_PROPERTIES1), 
 				    NULL,
 				    (DLGPROC) DialogProc,
@@ -411,6 +416,10 @@ vncProperties::DialogProc(HWND hwnd,
            SendMessage(hAlpha, BM_SETCHECK, _this->m_server->CaptureAlphaBlending(), 0);
 		   HWND hAlphab = GetDlgItem(hwnd, IDC_ALPHABLACK);
            SendMessage(hAlphab, BM_SETCHECK, _this->m_server->BlackAlphaBlending(), 0);
+
+		   // [v1.0.2-jp1 fix]
+		   HWND hGammaGray = GetDlgItem(hwnd, IDC_GAMMAGRAY);
+           SendMessage(hGammaGray, BM_SETCHECK, _this->m_server->GammaGray(), 0);
 		   
 		   HWND hLoopback = GetDlgItem(hwnd, IDC_ALLOWLOOPBACK);
 		   BOOL fLoopback = _this->m_server->LoopbackOk();
@@ -733,18 +742,20 @@ vncProperties::DialogProc(HWND hwnd,
 				
 
 				// Modif sf@2002
-				HWND hSingleWindow = GetDlgItem(hwnd, IDC_SINGLE_WINDOW);
-				_this->m_server->SingleWindow(SendMessage(hSingleWindow, BM_GETCHECK, 0, 0) == BST_CHECKED);
-
-				char szName[32];
-				if (GetDlgItemText(hwnd, IDC_NAME_APPLI, (LPSTR) szName, 32) == 0)
-				{
-					vnclog.Print(LL_INTINFO,VNCLOG("Error while reading Window Name %d \n"), GetLastError());
-				}
-				else
-				{
-					_this->m_server->SetSingleWindowName(szName);
-				}
+				// [v1.0.2-jp2 fix-->] Move to vncpropertiesPoll.cpp
+//				HWND hSingleWindow = GetDlgItem(hwnd, IDC_SINGLE_WINDOW);
+//				_this->m_server->SingleWindow(SendMessage(hSingleWindow, BM_GETCHECK, 0, 0) == BST_CHECKED);
+//
+//				char szName[32];
+//				if (GetDlgItemText(hwnd, IDC_NAME_APPLI, (LPSTR) szName, 32) == 0)
+//				{
+//					vnclog.Print(LL_INTINFO,VNCLOG("Error while reading Window Name %d \n"), GetLastError());
+//				}
+//				else
+//				{
+//					_this->m_server->SetSingleWindowName(szName);
+//				}
+				// [<--v1.0.2-jp2 fix] Move to vncpropertiesPoll.cpp
 				
 				// Modif sf@2002 - v1.1.0
 				HWND hFileTransfer = GetDlgItem(hwnd, IDC_FILETRANSFER);
@@ -759,6 +770,10 @@ vncProperties::DialogProc(HWND hwnd,
 				_this->m_server->CaptureAlphaBlending(SendMessage(hAlpha, BM_GETCHECK, 0, 0) == BST_CHECKED);
 				HWND hAlphab = GetDlgItem(hwnd, IDC_ALPHABLACK);
 				_this->m_server->BlackAlphaBlending(SendMessage(hAlphab, BM_GETCHECK, 0, 0) == BST_CHECKED);
+
+				// [v1.0.2-jp1 fix]
+				HWND hGammaGray = GetDlgItem(hwnd, IDC_GAMMAGRAY);
+				_this->m_server->GammaGray(SendMessage(hGammaGray, BM_GETCHECK, 0, 0) == BST_CHECKED);
 
 				_this->m_server->SetLoopbackOk(IsDlgButtonChecked(hwnd, IDC_ALLOWLOOPBACK));
 				_this->m_server->SetLoopbackOnly(IsDlgButtonChecked(hwnd, IDC_LOOPBACKONLY));
@@ -852,14 +867,16 @@ vncProperties::DialogProc(HWND hwnd,
 			}
 
 		// Modif sf@2002
-		 case IDC_SINGLE_WINDOW:
-			 {
-				 HWND hSingleWindow = GetDlgItem(hwnd, IDC_SINGLE_WINDOW);
-				 BOOL fSingleWindow = (SendMessage(hSingleWindow, BM_GETCHECK,0, 0) == BST_CHECKED);
-				 HWND hWindowName   = GetDlgItem(hwnd, IDC_NAME_APPLI);
-				 EnableWindow(hWindowName, fSingleWindow);
-			 }
-			 return TRUE;
+		// [v1.0.2-jp2 fix-->] Move to vncpropertiesPoll.cpp
+//		 case IDC_SINGLE_WINDOW:
+//			 {
+//				 HWND hSingleWindow = GetDlgItem(hwnd, IDC_SINGLE_WINDOW);
+//				 BOOL fSingleWindow = (SendMessage(hSingleWindow, BM_GETCHECK,0, 0) == BST_CHECKED);
+//				 HWND hWindowName   = GetDlgItem(hwnd, IDC_NAME_APPLI);
+//				 EnableWindow(hWindowName, fSingleWindow);
+//			 }
+//			 return TRUE;
+		// [<--v1.0.2-jp2 fix] Move to vncpropertiesPoll.cpp
 
 		case IDCANCEL:
 			vnclog.Print(LL_INTINFO, VNCLOG("enddialog (CANCEL)\n"));
@@ -1504,7 +1521,8 @@ LABELUSERSETTINGS:
 	m_allowproperties = TRUE;
 
 	// Modif sf@2002
-	m_pref_SingleWindow = FALSE;
+	// [v1.0.2-jp2 fix] Move to vncpropertiesPoll.cpp
+//	m_pref_SingleWindow = FALSE;
 	m_pref_UseDSMPlugin = FALSE;
 	*m_pref_szDSMPlugin = '\0';
 
@@ -1514,6 +1532,7 @@ LABELUSERSETTINGS:
 	m_pref_DefaultScale = 1;
 	m_pref_CaptureAlphaBlending = FALSE; 
 	m_pref_BlackAlphaBlending = FALSE; 
+	m_pref_GammaGray = FALSE;			// [v1.0.2-jp1 fix]
 
 
 	// Load the local prefs for this user
@@ -1597,6 +1616,7 @@ vncProperties::LoadUserPrefs(HKEY appkey)
 	m_pref_DefaultScale = LoadInt(appkey, "DefaultScale", m_pref_DefaultScale);
 	m_pref_CaptureAlphaBlending = LoadInt(appkey, "CaptureAlphaBlending", m_pref_CaptureAlphaBlending); // sf@2005
 	m_pref_BlackAlphaBlending = LoadInt(appkey, "BlackAlphaBlending", m_pref_BlackAlphaBlending); // sf@2005
+	m_pref_GammaGray = LoadInt(appkey, "GammaGray", m_pref_GammaGray);	// [v1.0.2-jp1 fix]
 
 	m_pref_UseDSMPlugin = LoadInt(appkey, "UseDSMPlugin", m_pref_UseDSMPlugin);
 	LoadDSMPluginName(appkey, m_pref_szDSMPlugin);
@@ -1645,6 +1665,7 @@ vncProperties::ApplyUserPrefs()
 	m_server->FTUserImpersonation(m_pref_FTUserImpersonation); // sf@2005
 	m_server->CaptureAlphaBlending(m_pref_CaptureAlphaBlending); // sf@2005
 	m_server->BlackAlphaBlending(m_pref_BlackAlphaBlending); // sf@2005
+	m_server->GammaGray(m_pref_GammaGray);	// [v1.0.2-jp1 fix]
 
 	m_server->BlankMonitorEnabled(m_pref_EnableBlankMonitor);
 	m_server->SetDefaultScale(m_pref_DefaultScale);
@@ -1848,6 +1869,7 @@ vncProperties::SaveUserPrefs(HKEY appkey)
 	SaveInt(appkey, "BlankMonitorEnabled", m_server->BlankMonitorEnabled());
 	SaveInt(appkey, "CaptureAlphaBlending", m_server->CaptureAlphaBlending()); // sf@2005
 	SaveInt(appkey, "BlackAlphaBlending", m_server->BlackAlphaBlending()); // sf@2005
+	SaveInt(appkey, "GammaGray", m_server->GammaGray());	// [v1.0.2-jp1 fix]
 
 	SaveInt(appkey, "DefaultScale", m_server->GetDefaultScale());
 

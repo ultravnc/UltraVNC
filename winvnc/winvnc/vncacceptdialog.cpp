@@ -34,6 +34,9 @@
 
 #include "localization.h" // Act : add localization on messages
 
+//	[v1.0.2-jp1 fix] Load resouce from dll
+extern HINSTANCE	hInstResDLL;
+
 // Constructor
 
 vncAcceptDialog::vncAcceptDialog(UINT timeoutSecs,BOOL acceptOnTimeout, const char *ipAddress)
@@ -56,7 +59,9 @@ vncAcceptDialog::~vncAcceptDialog()
 
 BOOL vncAcceptDialog::DoDialog()
 {
-	int retVal = DialogBoxParam(hAppInstance, MAKEINTRESOURCE(IDD_ACCEPT_CONN), 
+	//	[v1.0.2-jp1 fix]
+	//int retVal = DialogBoxParam(hAppInstance, MAKEINTRESOURCE(IDD_ACCEPT_CONN), 
+	int retVal = DialogBoxParam(hInstResDLL, MAKEINTRESOURCE(IDD_ACCEPT_CONN), 
 		NULL, (DLGPROC) vncAcceptDlgProc, (LONG) this);
 	delete this;
 	switch (retVal) 
