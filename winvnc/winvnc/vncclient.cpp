@@ -2537,8 +2537,8 @@ vncClientThread::run(void *arg)
 
 									char *p = strrchr(szNames, '*');
 									if (p == NULL) break;
-									char szCurrentName[MAX_PATH];
-									char szNewName[MAX_PATH];
+									char szCurrentName[ (2 * MAX_PATH) + 1];
+									char szNewName[ (2 * MAX_PATH) + 1];
 
 									strcpy(szNewName, p + 1); 
 									*p = '\0';
