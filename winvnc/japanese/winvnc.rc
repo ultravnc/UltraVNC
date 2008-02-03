@@ -1,0 +1,668 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// 日本語 resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+#ifdef _WIN32
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+#pragma code_page(932)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// JAVACLASS
+//
+
+IDR_FTPFRAME_CLASS      JAVACLASS DISCARDABLE   "res\\FTPFrame.class"
+IDR_AUTHPANEL_CLASS     JAVACLASS DISCARDABLE   "res\\AuthPanel.class"
+IDR_CLIPBOARDFRAME_CLASS JAVACLASS DISCARDABLE   "res\\clipboardFrame.class"
+IDR_OPTIONSFRAME_CLASS  JAVACLASS DISCARDABLE   "res\\optionsFrame.class"
+IDR_RFBPROTO_CLASS      JAVACLASS DISCARDABLE   "res\\rfbProto.class"
+IDR_VNCCANVAS_CLASS     JAVACLASS DISCARDABLE   "res\\vncCanvas.class"
+IDR_VNCVIEWER_CLASS     JAVACLASS DISCARDABLE   "res\\vncviewer.class"
+IDR_BUTTONPANEL_CLASS   JAVACLASS DISCARDABLE   "res\\ButtonPanel.class"
+IDR_DESCIPHER_CLASS     JAVACLASS DISCARDABLE   "res\\DesCipher.class"
+IDR_RECFRAME_CLASS      JAVACLASS DISCARDABLE   "res\\RecordingFrame.class"
+IDR_SESSIONREC_CLASS    JAVACLASS DISCARDABLE   "res\\SessionRecorder.class"
+IDR_DH_CLASS            JAVACLASS DISCARDABLE   "res\\dh.class"
+IDR_FTPFRAMESTRCOMP_CLASS JAVACLASS DISCARDABLE   "res\\ftpframe$strcomp.class"
+IDR_MESSAGES_PROPERTIES JAVACLASS DISCARDABLE   "res\\messages.properties"
+IDR_MESSAGES_CLASS      JAVACLASS DISCARDABLE   "res\\Messages.class"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// 24
+//
+
+IDR_MANIFEST            24      DISCARDABLE     "winvnc.exe.manifest"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_TEXTCHAT_DLG DIALOGEX 0, 0, 306, 177
+STYLE DS_3DLOOK | DS_CENTER | WS_POPUP | WS_CAPTION | WS_THICKFRAME
+CAPTION "チャット - Ultr@VNC"
+FONT 9, "ＭＳ Ｐゴシック", 0, 0, 0x1
+BEGIN
+    EDITTEXT        IDC_INPUTAREA_EDIT,4,135,255,39,ES_MULTILINE | 
+                    ES_AUTOVSCROLL | ES_WANTRETURN | NOT WS_BORDER | 
+                    WS_VSCROLL,WS_EX_STATICEDGE
+    PUSHBUTTON      "送信",IDC_SEND_B,264,135,39,16,BS_MULTILINE
+    PUSHBUTTON      "最小化",IDC_HIDE_B,264,153,39,11
+    PUSHBUTTON      "閉じる",IDCANCEL,264,164,39,11
+    CONTROL         "",IDC_CHATAREA_EDIT,"RICHEDIT",ES_MULTILINE | 
+                    ES_AUTOVSCROLL | ES_READONLY | ES_WANTRETURN | 
+                    WS_VSCROLL | WS_TABSTOP,4,4,300,120,WS_EX_STATICEDGE
+    PUSHBUTTON      "",IDOK,301,0,6,6,NOT WS_VISIBLE
+    LTEXT           "",IDC_STATIC_SPLIT,4,124,300,8,SS_NOTIFY
+END
+
+IDD_LIST_DLG DIALOGEX 0, 0, 164, 116
+STYLE DS_MODALFRAME | DS_3DLOOK | DS_CENTER | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "クライアント一覧 - UltraVNC"
+FONT 9, "ＭＳ Ｐゴシック", 0, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "閉じる",IDOK,106,94,50,14
+    PUSHBUTTON      "キャンセル",IDCANCEL,106,78,50,14,NOT WS_VISIBLE
+    LTEXT           "接続中のクライアント：",IDC_STATIC,5,4,105,8
+    LISTBOX         IDC_VIEWERS_LISTBOX,7,16,91,93,LBS_NOINTEGRALHEIGHT | 
+                    WS_VSCROLL | WS_TABSTOP,WS_EX_STATICEDGE
+    PUSHBUTTON      "切断",IDC_KILL_B,106,17,50,14
+    PUSHBUTTON      "チャット",IDC_TEXTCHAT_B,106,35,50,22,BS_MULTILINE
+END
+
+IDD_ABOUT DIALOGEX 0, 0, 282, 199
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "WinVNCのバージョン情報"
+FONT 9, "ＭＳ Ｐゴシック"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,7,174,54,16
+    CONTROL         139,IDC_VNCLOGO,"Static",SS_BITMAP | SS_CENTERIMAGE | 
+                    SS_SUNKEN,7,5,53,46,WS_EX_TRANSPARENT
+    LTEXT           "UltraVNC Win32 サーバ 1.0.4 RC9 - jp1",
+                    IDC_VERSION,73,5,147,8
+    LTEXT           "Copyright(C) 2002-2005 Ultr@VNC Team\nCopyright(C) 2001-2002 Sam - eSVNC \nCopyright(C) 1999-2002 Rudi D. V. - VdaccVNC \nCopyright(C) 2001 Harakan Software - PalmVNC\nCopyright(C) 1999-2002 Const. Kaplinsky - TightVNC \n",
+                    IDC_NAME,73,27,202,40
+    LTEXT           "UltraVNC（オリジナルの英語版）の公式サイト：",IDC_WWW,
+                    74,135,135,8
+    LTEXT           "作成日：",IDC_BUILDTEXT,74,16,25,8
+    LTEXT           "BuildTime",IDC_BUILDTIME,102,16,173,8
+    LTEXT           "Copyright(C) 2002 RealVNC Ltd. - RealVNC\nCopyright(C) 1999-2002 Tridia Corporation - TridiaVNC \nCopyright(C) 1994-2001 AT&&T Laboratories Cambridge/Olivetti Research Ltd. - VNC",
+                    IDC_STATIC,73,67,203,32
+    LTEXT           "Copyright(C) 1990-2002 Info-ZIP\nCopyright(C) 1996-2002 Markus Franz Xaver Johannes Oberhumer - Mini LZO library",
+                    IDC_STATIC,73,99,200,24
+    CONTROL         "http://ultravnc.sf.net/|http://ultravnc.sf.net/",
+                    IDC_STATIC,"LinkLabel",WS_TABSTOP,74,143,93,8
+    LTEXT           "ベースにした日本語版の公開サイト：",IDC_STATIC,74,157,160,8
+    CONTROL         "http://kp774.com/|http://kp774.com/",IDC_STATIC,
+                    "LinkLabel",WS_TABSTOP,74,165,54,8
+    LTEXT           "SVN Rev. 169 に適用：",
+                    IDC_STATIC,74,177,165,8
+    CONTROL         "http://yak.myhome.cx/junks/|http://yak.myhome.cx/junks/",IDC_WWW3,"LinkLabel",
+                    WS_TABSTOP,74,185,160,8
+END
+
+IDD_OUTGOING_CONN DIALOG DISCARDABLE  0, 0, 246, 87
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "Initiate Outgoing Connection （新しいクライアントを追加）"
+FONT 9, "ＭＳ Ｐゴシック"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,193,30,46,14
+    PUSHBUTTON      "キャンセル",IDCANCEL,193,48,46,14
+    EDITTEXT        IDC_HOSTNAME_EDIT,55,6,130,14,ES_AUTOHSCROLL
+    RTEXT           "ホスト名：",IDC_HOSTNAME_STATIC,23,9,28,8,
+                    SS_CENTERIMAGE
+    LTEXT           "※ホストはVNCビューアをlisten（待機）モードで起動している必要があります）",
+                    IDC_NOTE_STATIC,6,47,179,16
+    EDITTEXT        IDC_IDCODE,55,29,130,14,ES_AUTOHSCROLL
+    LTEXT           "IDコードを入力した場合、ホスト名はリピータのIPアドレスと見なされます",
+                    IDC_STATIC,6,63,179,16
+    LTEXT           "IDコード：",IDC_STATIC,24,32,28,8
+END
+
+IDD_ACCEPT_CONN DIALOG DISCARDABLE  0, 0, 186, 95
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION
+CAPTION "VNCの接続を受け入れますか？"
+FONT 9, "ＭＳ Ｐゴシック"
+BEGIN
+    DEFPUSHBUTTON   "許可(&A)",IDACCEPT,7,74,53,14
+    PUSHBUTTON      "拒否(&R)",IDREJECT,130,74,49,14
+    CTEXT           "WinVNCサーバは次のホストから接続要求を受けました",
+                    IDC_STATIC_TEXT1,7,7,172,17,SS_CENTERIMAGE
+    CTEXT           "<unknown host>",IDC_ACCEPT_IP,7,30,172,16,
+                    SS_CENTERIMAGE
+    CTEXT           "この接続を受け入れますか？",IDC_STATIC_TEXT,7,50,172,15,
+                    SS_CENTERIMAGE
+    CTEXT           "AutoReject:",IDC_ACCEPT_TIMEOUT,60,74,70,14,
+                    SS_CENTERIMAGE
+END
+
+IDD_PROPERTIES DIALOG DISCARDABLE  0, 0, 224, 172
+STYLE DS_MODALFRAME | DS_3DLOOK | DS_CENTER | WS_MINIMIZEBOX | WS_POPUP | 
+    WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "UltraVNCサーバのプロパティ"
+FONT 9, "ＭＳ Ｐゴシック"
+BEGIN
+    PUSHBUTTON      "キャンセル(&C)",IDCANCEL,177,154,41,14
+    DEFPUSHBUTTON   "&OK",IDOK,81,154,44,14
+    GROUPBOX        "サーバ画面の更新",IDC_UPDATE_BORDER,6,2,214,94
+    CONTROL         "全画面（超高速）",IDC_POLL_FULLSCREEN,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,13,13,103,10
+    CONTROL         "コンソールウィンドウのみ",IDC_CONSOLE_ONLY,"Button",
+                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,117,27,88,10
+    CONTROL         "ﾌｫｱｸﾞﾗｳﾝﾄﾞｳｨﾝﾄﾞｳ",IDC_POLL_FOREGROUND,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,16,28,86,10
+    CONTROL         "ｶｰｿﾙの下にあるｳｨﾝﾄﾞｳ",IDC_POLL_UNDER_CURSOR,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,16,40,86,10
+    CONTROL         "イベントを受信した場合のみ",IDC_ONEVENT_ONLY,"Button",
+                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,117,40,97,10
+    PUSHBUTTON      "適用(&A)",IDC_APPLY,130,154,43,14
+    CONTROL         "ビデオフックドライバ",IDC_DRIVER,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,13,68,74,10
+    CONTROL         "システムフックDLL",IDC_HOOK,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,13,56,70,10
+    CONTROL         "低精度（非常に高速）",IDC_TURBOMODE,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,13,81,77,10
+    PUSHBUTTON      "ビデオフックドライバのチェック",IDC_CHECKDRIVER,92,67,
+                    121,11
+    CONTROL         "サーバ上にある、表示するウィンドウの名前：",
+                    IDC_SINGLE_WINDOW,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    14,113,188,10
+    EDITTEXT        IDC_NAME_APPLI,14,127,195,13,ES_AUTOHSCROLL
+    GROUPBOX        "一つのウィンドウを表示",IDC_STATIC,5,100,214,47,BS_LEFT
+END
+
+IDD_PROPERTIES1 DIALOG DISCARDABLE  0, 0, 391, 291
+STYLE DS_MODALFRAME | DS_3DLOOK | DS_CENTER | WS_MINIMIZEBOX | WS_POPUP | 
+    WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "UltraVNCサーバのプロパティ"
+FONT 9, "ＭＳ Ｐゴシック"
+BEGIN
+    GROUPBOX        "接続の受け付け",IDC_CONNECT_BORDER,5,3,132,116,BS_LEFT
+    CONTROL         "ソケットによる接続を許可",IDC_CONNECT_SOCK,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,12,15,89,10
+    LTEXT           "使用するディスプレイ番号およびポート",
+                    IDC_DISPLAY_NO_LABEL,11,28,113,8,SS_CENTERIMAGE
+    CONTROL         "ﾃﾞｨｽﾌﾟﾚｲ",IDC_SPECDISPLAY,"Button",BS_AUTORADIOBUTTON,
+                    11,41,37,10
+    EDITTEXT        IDC_DISPLAYNO,66,41,29,12,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "自動",IDC_AUTO_DISPLAY_NO,"Button",BS_AUTOCHECKBOX | 
+                    NOT WS_VISIBLE | WS_TABSTOP,101,41,30,10
+    CONTROL         "ポート",IDC_SPECPORT,"Button",BS_AUTORADIOBUTTON,11,54,
+                    30,10
+    CONTROL         "自動",IDC_PORTNO_AUTO,"Button",BS_AUTORADIOBUTTON,101,
+                    54,30,10
+    RTEXT           "ﾒｲﾝ：",IDC_STATIC,45,55,18,8
+    EDITTEXT        IDC_PORTRFB,66,53,29,12,ES_AUTOHSCROLL
+    RTEXT           "Http:",IDC_STATIC,47,67,16,8
+    EDITTEXT        IDC_PORTHTTP,66,65,29,12,ES_AUTOHSCROLL
+    CONTROL         "Javaビューアを使う（HTTP接続）",IDC_CONNECT_HTTP,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,11,80,109,10
+    CONTROL         "ﾙｰﾌﾟﾊﾞｯｸ（自分自身への）接続を許可",IDC_ALLOWLOOPBACK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,91,125,10
+    CONTROL         "ループバックのみ",IDC_LOOPBACKONLY,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,11,103,67,10
+    GROUPBOX        "認証",IDC_STATIC,6,122,210,77,BS_LEFT
+    LTEXT           "VNCパスワード：",IDC_PASSWORD_LABEL,12,135,50,11,
+                    SS_CENTERIMAGE
+    EDITTEXT        IDC_PASSWORD,66,135,74,13,ES_PASSWORD | ES_AUTOHSCROLL
+    CONTROL         "MSログオンを使用（ユーザ名/パスワード/ドメイン）",
+                    IDC_MSLOGON_CHECKD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    13,153,174,10
+    CONTROL         "新方式のMSログオンを使用（複数のドメインに対応）",
+                    IDC_NEW_MSLOGON,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,
+                    164,165,10
+    PUSHBUTTON      "MSログオングループの設定",IDC_MSLOGON,13,179,195,12
+    GROUPBOX        "ファイル転送",IDC_STATIC,6,202,210,25
+    CONTROL         "有効",IDC_FILETRANSFER,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,13,213,38,10
+    CONTROL         "ユーザに成りすます（サービス動作のときのみ）",
+                    IDC_FTUSERIMPERSONATION_CHECK,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,61,213,153,10
+    GROUPBOX        "DSMプラグイン",IDC_STATIC,5,230,211,32,BS_LEFT
+    CONTROL         "使用：",IDC_PLUGIN_CHECK,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,13,244,33,10
+    COMBOBOX        IDC_PLUGINS_COMBO,46,242,129,86,CBS_DROPDOWN | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "設定",IDC_PLUGIN_BUTTON,179,242,29,13
+    GROUPBOX        "最後のクライアントが切断した時",IDC_LOCKSETTINGS,142,3,
+                    104,52,BS_LEFT
+    CONTROL         "何もしない",IDC_LOCKSETTING_NOTHING,"Button",
+                    BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,146,15,46,10
+    CONTROL         "ロック（Windows2000以降）",IDC_LOCKSETTING_LOCK,"Button",
+                    BS_AUTORADIOBUTTON | WS_TABSTOP,146,27,94,10
+    CONTROL         "ログオフ",IDC_LOCKSETTING_LOGOFF,"Button",
+                    BS_AUTORADIOBUTTON | WS_TABSTOP,146,39,40,10
+    GROUPBOX        "キーボード＆マウス",IDC_STATIC,142,59,103,60,BS_LEFT
+    CONTROL         "ビューアでの操作を無効",IDC_DISABLE_INPUTS,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,148,71,87,10
+    CONTROL         "サーバでの操作を無効",IDC_DISABLE_LOCAL_INPUTS,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,148,91,96,10
+    GROUPBOX        "接続要求を受けたときの問い合わせ",IDC_STATIC,250,3,136,
+                    53,BS_LEFT
+    CONTROL         "問い合わせウィンドウを表示する",IDQUERY,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,257,15,109,10
+    LTEXT           "待ち時間：",IDC_STATIC,275,29,31,8
+    EDITTEXT        IDQUERYTIMEOUT,308,27,19,12,ES_AUTOHSCROLL
+    LTEXT           "秒",IDC_STATIC,330,29,29,8
+    LTEXT           "デフォルト動作：",IDC_STATIC,257,43,48,8
+    CONTROL         "拒否",IDC_DREFUSE,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,307,43,30,10
+    CONTROL         "許可",IDC_DACCEPT,"Button",BS_AUTORADIOBUTTON,346,43,30,
+                    10
+    GROUPBOX        "複数のビューアが接続したとき",IDC_STATIC,250,59,136,60,
+                    BS_LEFT
+    CONTROL         "接続済みのビューアをすべて切断する",IDC_MV1,"Button",
+                    BS_AUTORADIOBUTTON | WS_GROUP,255,71,127,10
+    CONTROL         "接続済みのビューアをそのままにする",IDC_MV2,"Button",
+                    BS_AUTORADIOBUTTON,255,81,125,10
+    CONTROL         "新しい接続を受け付けない",IDC_MV3,"Button",
+                    BS_AUTORADIOBUTTON,255,92,93,10
+    CONTROL         "すべての新しい接続を受け付けない",IDC_MV4,"Button",
+                    BS_AUTORADIOBUTTON,255,103,119,10
+    GROUPBOX        "その他",IDC_STATIC,221,122,165,140,BS_LEFT
+    CONTROL         "ビューアの接続中に壁紙を取り除く（高速化）",
+                    IDC_REMOVE_WALLPAPER,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,228,135,144,10
+    CONTROL         "ブランクモニタを有効にする",IDC_BLANK,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,228,157,144,10
+    CONTROL         "アルファブレンドを使用したブランクモニタ",
+                    IDC_ALPHABLACK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,228,
+                    168,134,10
+    CONTROL         "半透明ウィンドウを表示する（速度低下）",IDC_ALPHA,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,228,190,130,10
+    CONTROL         "トレイアイコンを表示しない",IDC_DISABLETRAY,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,228,201,93,10
+    CONTROL         "トレイアイコンのクライアントオプションを無効化",
+                    IDC_ALLOWEDITCLIENTS,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,228,212,151,10
+    CONTROL         "ユーザによるVNCサーバの終了を禁止",IDC_ALLOWSHUTDOWN,
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,228,
+                    223,129,10
+    CONTROL         "デバッグ情報をWinVNC.logファイルに記録",IDC_LOG,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,228,234,138,10
+    LTEXT           "ﾃﾞﾌｫﾙﾄのｻｰﾊﾞ画面表示倍率",IDC_STATIC,239,248,86,8
+    LTEXT           "1 / ",IDC_STATIC,337,248,12,8
+    EDITTEXT        IDC_SCALE,352,246,12,12,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "&OK",IDOK,245,267,43,14
+    PUSHBUTTON      "適用(&A)",IDC_APPLY,294,267,43,14
+    PUSHBUTTON      "キャンセル(&C)",IDCANCEL,342,267,44,14
+    RTEXT           "番号",IDC_STATIC,48,42,15,8
+    CONTROL         "ビューアの接続中に Aero を解除（Vista）",IDC_REMOVE_Aero,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,228,146,138,10
+    CONTROL         "ガンマ値変更を利用したブランクモニタ",IDC_GAMMAGRAY,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,228,179,127,10
+    LTEXT           "（表示のみ）",IDC_STATIC,158,82,35,8
+END
+
+IDD_MSLOGON DIALOG DISCARDABLE  0, 0, 186, 166
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "MSログオン設定"
+FONT 9, "ＭＳ Ｐゴシック"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,77,148,50,14
+    PUSHBUTTON      "キャンセル",IDCANCEL,132,148,50,14
+    EDITTEXT        IDC_GROUP1,21,19,93,13,ES_AUTOHSCROLL
+    EDITTEXT        IDC_GROUP2,21,36,93,13,ES_AUTOHSCROLL
+    EDITTEXT        IDC_GROUP3,21,53,93,13,ES_AUTOHSCROLL
+    CONTROL         "",IDC_CHECKG1L,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    127,20,13,10
+    CONTROL         "",IDC_CHECKG2L,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    127,38,16,8
+    CONTROL         "",IDC_CHECKG3L,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    127,56,16,8
+    CONTROL         "",IDC_CHECKG1D,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    153,22,16,8
+    CONTROL         "",IDC_CHECKG2D,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    153,38,16,8
+    CONTROL         "",IDC_CHECKG3D,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    153,56,16,8
+    LTEXT           "ﾛｰｶﾙ",IDC_STATIC,127,8,18,8
+    LTEXT           "ﾄﾞﾒｲﾝ",IDC_STATIC,153,8,25,8
+    LTEXT           "グループ",IDC_STATIC,23,8,27,8
+    LTEXT           "1",IDC_STATIC,11,22,8,8
+    LTEXT           "2",IDC_STATIC,11,38,8,8
+    LTEXT           "3",IDC_STATIC,11,56,8,8
+    LTEXT           "ｸﾞﾙｰﾌﾟ 1, 2 = ﾌﾙｱｸｾｽ可能    ｸﾞﾙｰﾌﾟ 3 = 読み取りのみ",
+                    IDC_STATIC,16,88,162,8
+    LTEXT           "・WindowsNT4/2000上ではｻｰﾋﾞｽとして動作させる必要あり\n・XP/2003ではｻｰﾋﾞｽ/ｱﾌﾟﾘｹｰｼｮﾝのどちらで動作しても可\n・ローカル管理はいつでもアクセス可能\n・NT4/2000のアプリケーションモードでは、ローカル管理グループに追加する必要があります",
+                    IDC_STATIC,8,100,174,41
+    GROUPBOX        "",IDC_STATIC,5,0,178,74
+    GROUPBOX        "仕様",IDC_STATIC,5,77,178,68
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_TEXTCHAT_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 5
+        RIGHTMARGIN, 301
+        TOPMARGIN, 5
+        BOTTOMMARGIN, 172
+    END
+
+    IDD_LIST_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 157
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 109
+    END
+
+    IDD_OUTGOING_CONN, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 239
+        VERTGUIDE, 50
+        VERTGUIDE, 55
+        VERTGUIDE, 185
+        VERTGUIDE, 190
+        TOPMARGIN, 6
+        BOTTOMMARGIN, 80
+        HORZGUIDE, 20
+        HORZGUIDE, 49
+    END
+
+    IDD_ACCEPT_CONN, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 179
+        VERTGUIDE, 60
+        VERTGUIDE, 130
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 88
+        HORZGUIDE, 24
+        HORZGUIDE, 30
+        HORZGUIDE, 46
+        HORZGUIDE, 50
+        HORZGUIDE, 65
+        HORZGUIDE, 74
+    END
+
+    IDD_PROPERTIES, DIALOG
+    BEGIN
+        VERTGUIDE, 14
+    END
+
+    IDD_PROPERTIES1, DIALOG
+    BEGIN
+        VERTGUIDE, 257
+        BOTTOMMARGIN, 282
+    END
+
+    IDD_MSLOGON, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 182
+        VERTGUIDE, 17
+        VERTGUIDE, 110
+        VERTGUIDE, 123
+        VERTGUIDE, 149
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 162
+        HORZGUIDE, 46
+        HORZGUIDE, 66
+        HORZGUIDE, 88
+        HORZGUIDE, 105
+        HORZGUIDE, 164
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+#ifndef _MAC
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,4,901
+ PRODUCTVERSION 1,0,4,901
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x2DL
+#else
+ FILEFLAGS 0x2CL
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "080004b0"
+        BEGIN
+            VALUE "Comments", "UltraVNC - リモートコントロールをすべてに\0"
+            VALUE "CompanyName", "UltraVNC\0"
+            VALUE "FileDescription", "VNC サーバ for Win32\0"
+            VALUE "FileVersion", "1.0.4 RC9 - jp1\0"
+            VALUE "InternalName", "WinVNC\0"
+            VALUE "LegalCopyright", "Copyright(C) 2002-2005 UltraVNC チーム\nTranslated by NANASI(KANTAN PROJECT)\0"
+            VALUE "LegalTrademarks", "VNC\0"
+            VALUE "OriginalFilename", "WinVNC.exe\0"
+            VALUE "PrivateBuild", "日本語版(1.0.2-jp2ベース)\0"
+            VALUE "ProductName", "UltraVNC 日本語版\0"
+            VALUE "ProductVersion", "1.0.4 RC9 - jp1\0"
+            VALUE "SpecialBuild", "日本語版(1.0.2-jp2ベース)\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x800, 1200
+    END
+END
+
+#endif    // !_MAC
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_TRAYMENU MENU DISCARDABLE 
+BEGIN
+    POPUP "tray"
+    BEGIN
+        MENUITEM "バージョン情報(&V)",          ID_ABOUT
+        MENUITEM SEPARATOR
+        MENUITEM "管理プロパティ(&A)",          ID_ADMIN_PROPERTIES
+        MENUITEM "プロパティ(&P)",              ID_PROPERTIES
+        MENUITEM SEPARATOR
+        MENUITEM "新しいクライアントを追加(&N)", ID_OUTGOING_CONN
+        MENUITEM "すべてのクライアントを切断(&K)", ID_KILLCLIENTS
+        MENUITEM SEPARATOR
+        MENUITEM "クライアント一覧(&L)",        ID_LISTCLIENTS
+        MENUITEM SEPARATOR
+        MENUITEM "サービスをインストール",      ID_RUNASSERVICE
+        MENUITEM "サービスをアンインストール",  ID_UNINSTALL_SERVICE
+        MENUITEM "サービスを停止",              ID_CLOSE_SERVICE
+        MENUITEM "サービスを開始(要インストール)",
+                                                ID_START_SERVICE
+        MENUITEM SEPARATOR
+        MENUITEM "UltraVNCサーバを終了(&C)",    ID_CLOSE
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// JAVAARCHIVE
+//
+
+IDR_VNCVIEWER_JAR       JAVAARCHIVE DISCARDABLE "res\\vncviewer.jar"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_WINVNC              ICON    DISCARDABLE     "res\\world3a.ico"
+IDI_FLASH               ICON    DISCARDABLE     "res\\icon2.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_LOGO64              BITMAP  DISCARDABLE     "res\\vnc-1.bmp"
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Cursor
+//
+
+IDC_FINGER              CURSOR  DISCARDABLE     "res\\Finger.cur"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDI_WINVNC              "WinVNC"
+    IDS_WARNING             "警告：デフォルトではこのセッションは暗号化されません。安全な接続ではない場合は、重要なデータを送信しないでください。\n\n"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_FAILED_INIT          "ソケットシステムの初期化に失敗しました"
+    ID_WINVNC_USAGE         "WinVNC 使用方法"
+    ID_ANOTHER_INST         "他の WinVNC サーバがすでに起動しています"
+    ID_NO_EXIST_INST        "WinVNC サーバが起動していません"
+    ID_UNABLE_INST          "WinVNC サービスをインストールできません"
+    ID_SCM_NOT_HERE         "サービスコントロールマネージャが見つかりません - WinVNC サービスをインストールできませんでした"
+    ID_SERV_NOT_REG         "WinVNC サービスを登録できません"
+    ID_SERV_FAIL_ST         "WinVNC サービスを開始できません"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_SERV_CT_MISS         "サービスコントロールマネージャが見つかりません - WinVNC サービスを登録できませんでした"
+    ID_SERV_OLD_REG         "WinVNC サービスはすでに登録されています"
+    ID_SERVHELP_UNAB        "警告：サービスヘルパーフックをインストールできません\nGlobal user-specific registry settings will not be loaded"
+    ID_SERV_CT_UNREG        "サービスコントロールマネージャに連絡できませんでした。WinVNC サービスが登録されていません。"
+    ID_SERV_NOT_UNRG        "WinVNC サービスを解除できません。"
+    ID_SERV_NCONTACT        "WinVNC サービスに連絡することができませんでした。"
+    ID_SERVHELP_NREM        "警告：サービスフックエントリをレジストリから削除できませんでした。"
+    ID_SERV_NOT_STOP        "WinVNC サービスを停止できません"
+    ID_SERV_MK_UNREG        "WinVNC サービスはすでに解除済みとマークされています。\n"
+    ID_SERV_NT_FOUND        "WinVNC サービスが見つかりません"
+    ID_WINVNC_ERROR         "WinVNC エラー"
+    ID_WINVNC_WARNIN        "WinVNC 警告"
+    ID_PLUGIN_LOADIN        "プラグインの読み込み中"
+    ID_NO_PASSWD_NO_OVERRIDE_ERR 
+                            "パスワードが設定されていません。\nこのマシンはユーザによる設定を拒否するように設定されているため、\n管理者に正しい設定をするよう依頼してください。"
+    ID_NO_PASSWD_NO_OVERRIDE_WARN 
+                            "このマシンのWinVNC設定は、管理者のみが変更できるように構成されています"
+    ID_NO_PASSWD_NO_LOGON_WARN 
+                            "パスワードが設定されていません。\nWinVNCの管理プロパティでパスワードを設定するまでは接続できません。"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_NO_OVERRIDE_ERR      "このマシンの WinVNC 設定は管理者のみが変更できます。ユーザによる設定は無効です。"
+    ID_NO_CURRENT_USER_ERR  "ユーザごとの WinVNC 設定を利用できません。"
+    ID_CANNOT_EDIT_DEFAULT_PREFS "WinVNC の設定を変更する権限がありません"
+    ID_NO_PASSWORD_WARN     "警告：動作中の WinVNC はパスワードが設定されていないためセキュリティに問題があります！\nパスワードを設定するまで WinVNC は外部からの接続を受け付けません。"
+    ID_PLUGIN_NOT_LOAD      "プラグインを読み込めません"
+    ID_MB1                  "MB1"
+    ID_WVNC                 "WVNC"
+    ID_AUTHAD_NOT_FO        "あなたは MS ログオンを選択しましたが、必要なファイル(authad.dll)が見つかりません。インストールが正しく行われたかチェックしてください。"
+    ID_WARNING              "警告"
+    ID_AUTH_NOT_FO          "あなたは MS ログオンを選択しましたが、必要なファイル(auth.dll)が見つかりません。インストールが正しく行われたかチェックしてください。"
+    ID_DESKTOP_BITBLT_ROOT  "VNC デスクトップ：ルートデバイスが BitBlt をサポートしていません。WinVNCはこのグラフィックデバイスドライバでは使用できません。"
+    ID_DESKTOP_BITBLT_MEM   "VNC デスクトップ：メモリデバイスが GetDIBits をサポートしていません。WinVNC はこのグラフィックデバイスドライバでは使用できません。"
+    ID_DESKTOP_PLANAR_NOTC  "VNC デスクトップ：現在のディスプレイは CHUNKY ではなく PLANAR です。WinVNC はこのグラフィックデバイスドライバでは使用できません。"
+    ID_FAILED_CONNECT_LISTING_VIEW "VNC ビューアへの接続に失敗しました"
+    ID_OUTGOING_CONNECTION  "外部への接続"
+    ID_UNABLE_PROC_MSLOGON  "MS ログオンを実行できません"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_RICHED32_UNLOAD      "リッチエディットコントロール DLL (riched32.dll)を読み込めません"
+    ID_RICHED32_DLL_LD      "リッチエディットコントロール DLL (riched32.dll)を読み込んでいます"
+    ID_SERV_SUCCESS_INST    "WinVNC サービスは正常にインストールされました。\nサービスは自動的に開始されます。\nまた、コンピュータを再起動したときは次回から自動的に起動します。"
+    ID_SERV_SUCCESS_REG     "WinVNC サービスは正常に登録されました。\nサービスはコントロールパネルから開始できます。\nまた、コンピュータを再起動すると次回から自動的に起動します。"
+    ID_SERV_SUCCESS_UNREG   "WinVNC サービスは解除されました"
+    ID_ULTRAVNC_TEXTCHAT    "選択したクライアントは UltraVNC ビューアではありません！\nテキストチャットは使用できません。"
+    ID_ULTRAVNC_WARNING     "UltraVNC 警告"
+    ID_NO_PLUGIN_DETECT     "プラグインが見つかりません..."
+    ID_CHAT_WITH_S_ULTRAVNC "<%s> とチャット - UltraVNC"
+    ID_CURRENT_USER_PROP    "UltraVNC サーバのプロパティ（ユーザモード）"
+    ID_DEFAULT_SYST_PROP    "UltraVNC サーバのプロパティ（サービスモード）"
+    ID_AUTOREJECT_U         "自動拒否まであと %u 秒"
+    ID_AUTOACCEPT_U         "自動許可まであと %u 秒"
+END
+
+#endif    // 日本語 resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
