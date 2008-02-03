@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="vncviewer"
 	ProjectGUID="{357D07B6-0613-4B05-9D22-1764A49AC945}"
 	>
@@ -225,11 +225,11 @@
 				>
 			</File>
 			<File
-				RelativePath="res\stat\background2.bmp"
+				RelativePath="res\background2.bmp"
 				>
 			</File>
 			<File
-				RelativePath="res\background2.bmp"
+				RelativePath="res\stat\background2.bmp"
 				>
 			</File>
 			<File
@@ -1050,6 +1050,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\LinkLabel.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\LinkLabel.h"
+			>
+		</File>
+		<File
 			RelativePath="Log.cpp"
 			>
 			<FileConfiguration
@@ -1099,6 +1107,10 @@
 		</File>
 		<File
 			RelativePath="LowLevelHook.h"
+			>
+		</File>
+		<File
+			RelativePath=".\MessBox2.cpp"
 			>
 		</File>
 		<File

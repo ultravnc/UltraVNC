@@ -175,6 +175,10 @@ SOURCE=.\res\file.ico
 # End Source File
 # Begin Source File
 
+SOURCE=.\res\Finger.cur
+# End Source File
+# Begin Source File
+
 SOURCE=.\res\stat\flash.bmp
 # End Source File
 # Begin Source File
@@ -188,6 +192,10 @@ SOURCE=.\res\hoch.bmp
 # Begin Source File
 
 SOURCE=.\res\idr_tray.ico
+# End Source File
+# Begin Source File
+
+SOURCE=.\res\idr_tray_disabled.ico
 # End Source File
 # Begin Source File
 
@@ -444,11 +452,31 @@ SOURCE=.\KeyMap.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\KeyMapjap.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\KeyMapjap.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\keysymdef.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\keysymdefjap.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\LICENCE.txt
+# End Source File
+# Begin Source File
+
+SOURCE=.\LinkLabel.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\LinkLabel.h
 # End Source File
 # Begin Source File
 
@@ -596,6 +624,10 @@ SOURCE=..\ZipUnZip32\ZipUnZip32.h
 # Begin Source File
 
 SOURCE=.\zrle.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\rfb\zywrletemplate.c
 # End Source File
 # End Target
 # End Project
