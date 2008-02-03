@@ -1594,12 +1594,15 @@ void FileTransfer::SetGlobalCount()
 //
 void FileTransfer::SetStatus(LPSTR szStatus)
 {
-//	vnclog.Print(0, _T("SetStatus\n"));
+	if (strlen(szStatus) > (512 + 256 - 1))
+		szStatus[768] = '\0';
+
+	//	vnclog.Print(0, _T("SetStatus\n"));
 	// time_t lTime;
 	char dbuffer [9];
 	char tbuffer [9];
 
-	char szHist[255 + 64];
+	char szHist[800];
 
 	SetDlgItemText(hWnd, IDC_STATUS, szStatus);
 	_tzset();
@@ -1679,7 +1682,12 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, int nLen)
 	// Read in the Name of the file to copy (remote full name !)
 	m_pCC->ReadExact(szRemoteFileName, nLen);
 
-	char szStatus[512];
+	if (nLen > MAX_PATH)
+		szRemoteFileName[MAX_PATH] = '\0';
+	else
+		szRemoteFileName[nLen] = '\0';
+
+	char szStatus[MAX_PATH + 256];
 
 	// If lSize = -1 (0xFFFFFFFF) that means that the Src file on the remote machine
 	// could not be opened for some reason (locked, doesn't exits any more...)
@@ -1742,9 +1750,26 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, int nLen)
 	dwFreeKBytes  = (unsigned long) (Int64ShraMod32(lpFreeBytesAvailable.QuadPart, 10));
 	if (dwFreeKBytes < (unsigned long)(lSize / 1000)) fErr = true;
 
+	bool fErrNoFileName = false;
+	char *plbs = strrchr(szRemoteFileName, '\\');
+	if (plbs == NULL)
+	{ 
+		fErrNoFileName = true;
+		fErr = true;
+	}
+	else if (plbs[1] == '\0')
+	{
+		fErrNoFileName = true;
+		fErr = true;
+	}
+
 	if (fErr)
 	{
-		sprintf(szStatus, " %s < %s >",sz_H14, strrchr(szRemoteFileName, '\\') + 1); 
+		if (!fErrNoFileName)
+			sprintf(szStatus, " %s < %s >",sz_H14, strrchr(szRemoteFileName, '\\') + 1); 
+		else
+			sprintf(szStatus, " %s < %s > %s",sz_H14, "Invalid remote file name", sz_H13); 
+
 		SetStatus(szStatus);
 		delete [] szRemoteFileName;
 		// Tell the server to cancel the transfer
@@ -1755,6 +1780,7 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, int nLen)
 			m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
 		return false;
 	}
+
 
 	strcat(m_szDestFileName, strrchr(szRemoteFileName, '\\') + 1);
 
@@ -2009,7 +2035,7 @@ bool FileTransfer::FinishFileReception()
 
 	// TODO : check dwNbReceivedPackets and dwTotalNbBytesWritten or test a checksum
 	FlushFileBuffers(m_hDestFile);
-	char szStatus[512];
+	char szStatus[512 + 256];
 	if (m_fFileDownloadError)
 		sprintf(szStatus, " %s < %s > %s", sz_H19,m_szDestFileName,sz_H20); 
 	else
@@ -2071,7 +2097,7 @@ int FileTransfer::UnzipPossibleDirectory(LPSTR szFileName)
 		!strncmp(strrchr(szFileName, '\\') + 1, rfbZipDirectoryPrefix, strlen(rfbZipDirectoryPrefix))
 	   )
 	{
-		char szStatus[512];
+		char szStatus[512 + 256];
 		char szPath[MAX_PATH + MAX_PATH];
 		char szDirName[MAX_PATH]; // Todo: improve this (size) 
 		strcpy(szPath, szFileName);
@@ -2109,7 +2135,7 @@ bool FileTransfer::AbortFileReception()
 
 	m_fFileDownloadError = true;
 	FlushFileBuffers(m_hDestFile);
-	char szStatus[512];
+	char szStatus[512 + 256];
 	sprintf(szStatus, " %s < %s > %s", sz_H19, m_szDestFileName,sz_H20); 
 
 	m_fFileDownloadRunning = false;
@@ -2125,7 +2151,7 @@ bool FileTransfer::OfferLocalFile(LPSTR szSrcFileName)
 //	vnclog.Print(0, _T("OfferLocalFile\n"));
 	if (!m_fFTAllowed) return false;
 
-	char szStatus[512];
+	char szStatus[512 + 256];
 
 	strcpy(m_szSrcFileName, szSrcFileName);
 
@@ -2276,7 +2302,7 @@ int FileTransfer::ZipPossibleDirectory(LPSTR szSrcFileName)
 		else
 			return -1;
 
-		char szStatus[512];
+		char szStatus[512 + 256];
 		char szPath[MAX_PATH];
 		char szDirectoryName[MAX_PATH];
 		strcpy(szPath, szSrcFileName);
@@ -2350,7 +2376,12 @@ bool FileTransfer::SendFile(long lSize, int nLen)
 	// Read in the Name of the file to copy (remote full name !)
 	m_pCC->ReadExact(szRemoteFileName, nLen);
 
-	char szStatus[512];
+	if (nLen > MAX_PATH)
+		szRemoteFileName[MAX_PATH] = '\0';
+	else
+		szRemoteFileName[nLen] = '\0';
+	
+	char szStatus[MAX_PATH + 256];
 
 	// If lSize = -1 (0xFFFFFFFF) that means that the Dst file on the remote machine
 	// could not be created for some reason (locked..)
@@ -2567,7 +2598,7 @@ bool FileTransfer::FinishFileSending()
 
 	m_fFileUploadRunning = false;
 
-	char szStatus[512];
+	char szStatus[512 + 256];
 
 	CloseHandle(m_hSrcFile);
 	
@@ -2666,6 +2697,7 @@ void FileTransfer::DeleteRemoteFile(LPSTR szFile)
 void FileTransfer::RenameRemoteFileOrDirectory(LPSTR szCurrentName, LPSTR szNewName)
 {
 	char szMsgContent[(2 * MAX_PATH) + 1];
+	if (strlen(szCurrentName) > MAX_PATH || strlen(szNewName) > MAX_PATH) return; // Todo: error message
 	sprintf(szMsgContent, "%s*%s", szCurrentName, szNewName);
     rfbFileTransferMsg ft;
     ft.type = rfbFileTransfer;
@@ -2687,7 +2719,13 @@ bool FileTransfer::CreateRemoteDirectoryFeedback(long lSize, int nLen)
 	if (szRemoteName == NULL) return false;
 	memset(szRemoteName, 0, nLen+1);
 	m_pCC->ReadExact(szRemoteName, nLen);
-	char szStatus[512];
+
+	if (nLen > MAX_PATH)
+		szRemoteName[MAX_PATH] = '\0';
+	else
+		szRemoteName[nLen] = '\0';
+	
+	char szStatus[MAX_PATH + 256];
 
 	if (lSize == -1)
 	{
@@ -2696,6 +2734,7 @@ bool FileTransfer::CreateRemoteDirectoryFeedback(long lSize, int nLen)
 		delete [] szRemoteName;
 		return false;
 	}
+
 	sprintf(szStatus, "%s < %s > %s",sz_H31, szRemoteName,sz_H32); 
 	SetStatus(szStatus);
 	// Refresh the remote list
@@ -2716,7 +2755,13 @@ bool FileTransfer::DeleteRemoteFileFeedback(long lSize, int nLen)
 	if (szRemoteName == NULL) return false;
 	memset(szRemoteName, 0, nLen+1);
 	m_pCC->ReadExact(szRemoteName, nLen);
-	char szStatus[512];
+
+	if (nLen > MAX_PATH)
+		szRemoteName[MAX_PATH] = '\0';
+	else
+		szRemoteName[nLen] = '\0';
+	
+	char szStatus[MAX_PATH + 256];
 
 	if (lSize == -1)
 	{
@@ -2742,21 +2787,34 @@ bool FileTransfer::DeleteRemoteFileFeedback(long lSize, int nLen)
 //
 bool FileTransfer::RenameRemoteFileOrDirectoryFeedback(long lSize, int nLen)
 {
+	if (nLen <= 0) return false;
+	if (nLen > ((2 * MAX_PATH))) return false;
+
 	char *szContent = new char [nLen+1];
 	if (szContent == NULL) return false;
 	memset(szContent, 0, nLen+1);
 	m_pCC->ReadExact(szContent, nLen);
-	char szStatus[512];
+	szContent[nLen] = '\0';
+
+	char szStatus[(2 * MAX_PATH) + 1 + 200];
 
 	char *p = strrchr(szContent, '*');
-	char szOldName[MAX_PATH];
-	char szCurrentName[MAX_PATH];
+	if (p==NULL)
+	{
+		sprintf(szStatus, " %s < %s > %s", sz_M5, "selected file", sz_H30); 
+		SetStatus(szStatus);
+		delete [] szContent;
+		return false;
+	}
+
+	char szOldName[(2 * MAX_PATH) + 1];
+	char szCurrentName[(2 * MAX_PATH) + 1];
 
 	strcpy(szCurrentName, p + 1); 
 	*p = '\0';
 	strcpy(szOldName, szContent);
 
-	if (lSize == -1 || p == NULL)
+	if (lSize == -1)
 	{
 		sprintf(szStatus, " %s < %s > %s", sz_M5, szOldName, sz_H30); 
 		SetStatus(szStatus);

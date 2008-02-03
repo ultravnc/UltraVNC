@@ -539,7 +539,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 	LoadString(m_hInstResDLL, IDS_L91, sz_L91, 64 -1);
 	LoadString(m_hInstResDLL, IDS_L92, sz_L92, 64 -1);
 
-  
+	LoadString(m_hInstResDLL, IDS_M1, sz_M1, 64 -1);
+	LoadString(m_hInstResDLL, IDS_M2, sz_M2, 64 -1);
+	LoadString(m_hInstResDLL, IDS_M3, sz_M3, 64 -1);
+	LoadString(m_hInstResDLL, IDS_M4, sz_M4, 64 -1);
+	LoadString(m_hInstResDLL, IDS_M5, sz_M5, 64 -1);
+	LoadString(m_hInstResDLL, IDS_M6, sz_M6, 64 -1);
+	LoadString(m_hInstResDLL, IDS_M7, sz_M7, 64 -1);
+	LoadString(m_hInstResDLL, IDS_M8, sz_M8, 64 -1);  
 
   
   /////////////////////////////////////////////////////////////
