@@ -414,15 +414,22 @@ void AdjustBottom(LPRECT lprc)
 //
 BOOL CALLBACK TextChat::TextChatDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM wParam, LPARAM lParam )
 {
-
+#ifndef _X64
 	TextChat* _this = (TextChat *) GetWindowLong(hWnd, GWL_USERDATA);
+#else
+	TextChat* _this = (TextChat *) GetWindowLongPtr(hWnd, GWLP_USERDATA);
+#endif
 
 	switch (uMsg)
 	{
 
 	case WM_INITDIALOG:
 		{
+#ifndef _X64
 			SetWindowLong(hWnd, GWL_USERDATA, lParam);
+#else
+			SetWindowLongPtr(hWnd, GWLP_USERDATA, lParam);
+#endif
             TextChat *_this = (TextChat *) lParam;
 			if (_this->m_szLocalText == NULL || _this->m_szRemoteText == NULL)
 				EndDialog(hWnd, FALSE);
@@ -505,8 +512,13 @@ BOOL CALLBACK TextChat::TextChatDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM wParam,
 			SetForegroundWindow(hWnd);
 			
 			// [v1.0.2-jp1 fix] SUBCLASS Split bar
+#ifndef _X64
 			pDefSBProc = GetWindowLong(GetDlgItem(hWnd, IDC_STATIC_SPLIT), GWL_WNDPROC);
 			SetWindowLong(GetDlgItem(hWnd, IDC_STATIC_SPLIT), GWL_WNDPROC, (LONG)SBProc);
+#else
+			pDefSBProc = GetWindowLongPtr(GetDlgItem(hWnd, IDC_STATIC_SPLIT), GWLP_WNDPROC);
+			SetWindowLongPtr(GetDlgItem(hWnd, IDC_STATIC_SPLIT), GWLP_WNDPROC, (LONG)SBProc);
+#endif
 
 			return TRUE;
 		}
@@ -524,7 +536,11 @@ BOOL CALLBACK TextChat::TextChatDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM wParam,
 			// Server orders to close TextChat 			
 
 			// [v1.0.2-jp1 fix] UNSUBCLASS Split bar
+#ifndef _X64
 			SetWindowLong(GetDlgItem(hWnd, IDC_STATIC_SPLIT), GWL_WNDPROC, pDefSBProc);
+#else
+			SetWindowLongPtr(GetDlgItem(hWnd, IDC_STATIC_SPLIT), GWLP_WNDPROC, pDefSBProc);
+#endif
 
 			EndDialog(hWnd, FALSE);
 			return TRUE;
@@ -533,7 +549,11 @@ BOOL CALLBACK TextChat::TextChatDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM wParam,
 			_this->SendTextChatRequest(CHAT_CLOSE); // Server must close TextChat
 
 			// [v1.0.2-jp1 fix] UNSUBCLASS Split bar
+#ifndef _X64
 			SetWindowLong(GetDlgItem(hWnd, IDC_STATIC_SPLIT), GWL_WNDPROC, pDefSBProc);
+#else
+			SetWindowLongPtr(GetDlgItem(hWnd, IDC_STATIC_SPLIT), GWLP_WNDPROC, pDefSBProc);
+#endif
 
 			EndDialog(hWnd, FALSE);
 			return TRUE;

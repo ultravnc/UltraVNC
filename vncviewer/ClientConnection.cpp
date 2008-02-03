@@ -736,8 +736,11 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 			SendMessage(m_hwndTT,TTM_SETTIPBKCOLOR,(WPARAM)(COLORREF)0x00404040,(LPARAM)0);
 			SendMessage(m_hwndTT,TTM_SETTIPTEXTCOLOR,(WPARAM)(COLORREF)0x00F5B28D,(LPARAM)0);
 			SendMessage(m_hwndTT,TTM_SETDELAYTIME,(WPARAM)(DWORD)TTDT_INITIAL,(LPARAM)(INT) MAKELONG(200,0));
-			
+#ifndef _X64			
 			SetWindowLong(m_hwndTBwin, GWL_USERDATA, (LONG) this);
+#else
+			SetWindowLongPtr(m_hwndTBwin, GWLP_USERDATA, (LONG) this);
+#endif
 			ShowWindow(m_hwndTB, SW_SHOW);
 			ShowWindow(m_hwndTBwin, SW_SHOW);
 	}
@@ -870,8 +873,11 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 			SendMessage(m_hwndTT,TTM_SETTIPBKCOLOR,(WPARAM)(COLORREF)0x0000ff00,(LPARAM)0);
 			SendMessage(m_hwndTT,TTM_SETTIPTEXTCOLOR,(WPARAM)(COLORREF)0x00000000,(LPARAM)0);
 			SendMessage(m_hwndTT,TTM_SETDELAYTIME,(WPARAM)(DWORD)TTDT_INITIAL,(LPARAM)(INT) MAKELONG(200,0));
-
+#ifndef _X64
 			SetWindowLong(m_hwndTBwin, GWL_USERDATA, (LONG) this);
+#else
+			SetWindowLongPtr(m_hwndTBwin, GWLP_USERDATA, (LONG) this);
+#endif
 			ShowWindow(m_hwndTB, SW_SHOW);
 			ShowWindow(m_hwndTBwin, SW_SHOW);
 	}
@@ -1062,7 +1068,11 @@ void ClientConnection::CreateDisplay()
 	ShowWindow(m_hwnd, SW_SHOW);
 
 	// record which client created this window
+#ifndef _X64
 	SetWindowLong(m_hwnd, GWL_USERDATA, (LONG) this);
+#else
+	SetWindowLongPtr(m_hwnd, GWLP_USERDATA, (LONG) this);
+#endif
 //	SendMessage(m_hwnd,WM_CREATE,0,0);
 
 
@@ -4787,8 +4797,11 @@ void ClientConnection::GTGBS_CreateDisplay()
 
 	// [v1.0.2-jp1 fix]
 	ImmAssociateContext(m_hwndMain, NULL);
-
+#ifndef _X64
 	SetWindowLong(m_hwndMain, GWL_USERDATA, (LONG) this);
+#else
+	SetWindowLongPtr(m_hwndMain, GWLP_USERDATA, (LONG) this);
+#endif
 }
 
 //
@@ -4810,7 +4823,11 @@ LRESULT CALLBACK ClientConnection::GTGBS_ShowStatusWindow(LPVOID lpParameter)
 //
 LRESULT CALLBACK ClientConnection::GTGBS_StatusProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 {
+#ifndef _X64
 	ClientConnection* _this = (ClientConnection *) GetWindowLong(hwnd, GWL_USERDATA);
+#else
+	ClientConnection* _this = (ClientConnection *) GetWindowLongPtr(hwnd, GWLP_USERDATA);
+#endif
 	
 	switch (iMsg)
 	{
@@ -4829,7 +4846,11 @@ LRESULT CALLBACK ClientConnection::GTGBS_StatusProc(HWND hwnd, UINT iMsg, WPARAM
 			
 			char wt[MAX_PATH];
 			ClientConnection *_this = (ClientConnection *)lParam;
+#ifndef _X64
 			SetWindowLong(hwnd, GWL_USERDATA, (LONG) _this);
+#else
+			SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG) _this);
+#endif
 			SetDlgItemInt(hwnd,IDC_RECEIVED,_this->m_BytesRead,false);
 			SetDlgItemInt(hwnd,IDC_SEND,_this->m_BytesSend,false);
 			
@@ -5017,7 +5038,11 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 	
 	// This is a static method, so we don't know which instantiation we're 
 	// dealing with.  But we've stored a 'pseudo-this' in the window data.
+#ifndef _X64
 	ClientConnection *_this = (ClientConnection *) GetWindowLong(hwnd, GWL_USERDATA);
+#else
+	ClientConnection *_this = (ClientConnection *) GetWindowLongPtr(hwnd, GWLP_USERDATA);
+#endif
 	
 	if (_this == NULL)
 		return DefWindowProc(hwnd, iMsg, wParam, lParam);
@@ -5909,7 +5934,11 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 //
 LRESULT CALLBACK ClientConnection::WndProcTBwin(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 {
+#ifndef _X64
 	ClientConnection *_this = (ClientConnection *) GetWindowLong(hwnd, GWL_USERDATA);
+#else
+	ClientConnection *_this = (ClientConnection *) GetWindowLongPtr(hwnd, GWLP_USERDATA);
+#endif
 	if (_this == NULL) return DefWindowProc(hwnd, iMsg, wParam, lParam);
 
 	HWND parent;
@@ -6112,7 +6141,11 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 {
 	
 	//	HWND parent;
+#ifndef _X64
 	ClientConnection *_this = (ClientConnection *) GetWindowLong(hwnd, GWL_USERDATA);
+#else
+	ClientConnection *_this = (ClientConnection *) GetWindowLongPtr(hwnd, GWLP_USERDATA);
+#endif
 	if (_this == NULL) return DefWindowProc(hwnd, iMsg, wParam, lParam);
 	switch (iMsg) 
 			{				

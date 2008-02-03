@@ -75,13 +75,21 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 	// dealing with. But we can get a pseudo-this from the parameter to 
 	// WM_INITDIALOG, which we therafter store with the window and retrieve
 	// as follows:
+#ifndef _X64
 	SessionDialog *_this = (SessionDialog *) GetWindowLong(hwnd, GWL_USERDATA);
+#else
+	SessionDialog *_this = (SessionDialog *) GetWindowLongPtr(hwnd, GWLP_USERDATA);
+#endif
 
 	switch (uMsg) {
 
 	case WM_INITDIALOG:
 		{
+#ifndef _X64
             SetWindowLong(hwnd, GWL_USERDATA, lParam);
+#else
+			SetWindowLongPtr(hwnd, GWLP_USERDATA, lParam);
+#endif
             SessionDialog *_this = (SessionDialog *) lParam;
             CentreWindow(hwnd);
 			SetForegroundWindow(hwnd);

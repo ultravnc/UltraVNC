@@ -57,13 +57,21 @@ BOOL CALLBACK AuthDialog::DlgProc(  HWND hwnd,  UINT uMsg,
 	// dealing with. But we can get a pseudo-this from the parameter to 
 	// WM_INITDIALOG, which we therafter store with the window and retrieve
 	// as follows:
+#ifndef _X64
 	AuthDialog *_this = (AuthDialog *) GetWindowLong(hwnd, GWL_USERDATA);
+#else
+	AuthDialog *_this = (AuthDialog *) GetWindowLongPtr(hwnd, GWLP_USERDATA);
+#endif
 
 	switch (uMsg) {
 
 	case WM_INITDIALOG:
 		{
+#ifndef _X64
 			SetWindowLong(hwnd, GWL_USERDATA, lParam);
+#else
+			SetWindowLongPtr(hwnd, GWLP_USERDATA, lParam);
+#endif
 			_this = (AuthDialog *) lParam;
 			CentreWindow(hwnd);
 			SetForegroundWindow(hwnd);
@@ -102,13 +110,21 @@ BOOL CALLBACK AuthDialog::DlgProc1(  HWND hwnd,  UINT uMsg,
 	// dealing with. But we can get a pseudo-this from the parameter to 
 	// WM_INITDIALOG, which we therafter store with the window and retrieve
 	// as follows:
+#ifndef _X64
 	AuthDialog *_this = (AuthDialog *) GetWindowLong(hwnd, GWL_USERDATA);
+#else
+	AuthDialog *_this = (AuthDialog *) GetWindowLongPtr(hwnd, GWLP_USERDATA);
+#endif
 
 	switch (uMsg) {
 
 	case WM_INITDIALOG:
 		{
+#ifndef _X64
 			SetWindowLong(hwnd, GWL_USERDATA, lParam);
+#else
+			SetWindowLongPtr(hwnd, GWLP_USERDATA, lParam);
+#endif
 			_this = (AuthDialog *) lParam;
 			CentreWindow(hwnd);
 			return TRUE;

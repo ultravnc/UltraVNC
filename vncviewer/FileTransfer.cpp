@@ -214,7 +214,7 @@ void FileTransfer::InitFTTimer()
 	if (m_mmRes != -1) return;
 
 	m_fSendFileChunk = false;
-	m_mmRes = timeSetEvent( 1, 0, fpTimer, (DWORD)this, TIME_PERIODIC );
+	m_mmRes = timeSetEvent( 1, 0, (LPTIMECALLBACK)fpTimer, (DWORD)this, TIME_PERIODIC );
 }
 
 
@@ -2980,7 +2980,11 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 	// dealing with. But we can get a pseudo-this from the parameter to 
 	// WM_INITDIALOG, which we therafter store with the window and retrieve
 	// as follows:
+#ifndef _X64
 	FileTransfer *_this = (FileTransfer *) GetWindowLong(hWnd, GWL_USERDATA);
+#else
+	FileTransfer *_this = (FileTransfer *) GetWindowLongPtr(hWnd, GWLP_USERDATA);
+#endif
 
 	switch (uMsg)
 	{
@@ -3003,7 +3007,11 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 
 	case WM_INITDIALOG:
 		{
+#ifndef _X64
             SetWindowLong(hWnd, GWL_USERDATA, lParam);
+#else
+			SetWindowLongPtr(hWnd, GWLP_USERDATA, lParam);
+#endif
             FileTransfer *_this = (FileTransfer *) lParam;
             // CentreWindow(hWnd);
 			_this->hWnd = hWnd;
@@ -3977,13 +3985,20 @@ int FileTransfer::DoFTParamDialog(LPSTR szTitle, LPSTR szComment)
 
 BOOL CALLBACK FileTransfer::FTParamDlgProc(  HWND hwnd,  UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
+#ifndef _X64
 	FileTransfer *_this = (FileTransfer *) GetWindowLong(hwnd, GWL_USERDATA);
-
+#else
+	FileTransfer *_this = (FileTransfer *) GetWindowLongPtr(hwnd, GWLP_USERDATA);
+#endif
 	switch (uMsg)
 	{
 	case WM_INITDIALOG:
 		{
+#ifndef _X64
 			SetWindowLong(hwnd, GWL_USERDATA, lParam);
+#else
+			SetWindowLongPtr(hwnd, GWLP_USERDATA, lParam);
+#endif
 			_this = (FileTransfer *) lParam;
 			CentreWindow(hwnd);
 
@@ -4033,13 +4048,20 @@ int FileTransfer::DoFTConfirmDialog(LPSTR szTitle, LPSTR szComment)
 
 BOOL CALLBACK FileTransfer::FTConfirmDlgProc(  HWND hwnd,  UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
+#ifndef _X64
 	FileTransfer *_this = (FileTransfer *) GetWindowLong(hwnd, GWL_USERDATA);
-
+#else
+	FileTransfer *_this = (FileTransfer *) GetWindowLongPtr(hwnd, GWLP_USERDATA);
+#endif
 	switch (uMsg)
 	{
 	case WM_INITDIALOG:
 		{
+#ifndef _X64
 			SetWindowLong(hwnd, GWL_USERDATA, lParam);
+#else
+			SetWindowLongPtr(hwnd, GWLP_USERDATA, lParam);
+#endif
 			_this = (FileTransfer *) lParam;
 			CentreWindow(hwnd);
 

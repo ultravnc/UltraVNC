@@ -1,8 +1,7 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Developer Studio generated include file.
+// Microsoft Visual C++ generated include file.
 // Used by vncviewer.rc
 //
-#define IDR_MANIFEST                    1
 #define IDQUIT                          9
 #define IDR_TRAY                        101
 #define IDR_TRAYMENU                    103

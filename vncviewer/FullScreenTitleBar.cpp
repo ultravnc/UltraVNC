@@ -191,7 +191,11 @@ void CTitleBar::CreateDisplay()
 				NULL);
 
 	//Set the creation of the window
+#ifndef _X64
 	SetWindowLong(m_hWnd, GWL_USERDATA, (LONG) this);
+#else
+	SetWindowLongPtr(m_hWnd, GWLP_USERDATA, (LONG) this);
+#endif
 
 	//Load pictures
 	this->LoadPictures();
