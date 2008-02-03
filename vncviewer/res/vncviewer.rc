@@ -13,6 +13,25 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
+// Japanese resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+#ifdef _WIN32
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+#pragma code_page(932)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Cursor
+//
+
+IDC_FINGER              CURSOR  DISCARDABLE     "Finger.cur"
+#endif    // Japanese resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
 // German (Germany) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
@@ -39,6 +58,15 @@ IDR_MANIFEST            24      DISCARDABLE     "vncviewer.exe.manifest"
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
 #endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Cursor
+//
+
+IDC_CURSOR1             CURSOR  DISCARDABLE     "cursorsel.cur"
+IDC_DOTCURSOR           CURSOR  DISCARDABLE     "cursor1.cur"
+IDC_NOCURSOR            CURSOR  DISCARDABLE     "nocursor.cur"
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -119,7 +147,7 @@ END
 IDD_OPTIONDIALOG DIALOGEX 0, 0, 323, 217
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION " Connection Options..."
-FONT 8, "MS Sans Serif", 0, 0, 0x1
+FONT 8, "MS Sans Serif"
 BEGIN
     GROUPBOX        "Format and Encoding",IDC_STATIC,4,2,150,160
     CONTROL         "Auto select best settings",IDC_AUTODETECT,"Button",
@@ -135,14 +163,15 @@ BEGIN
                     12,52,55,10
     CONTROL         "Hextile",IDC_HEXTILERADIO,"Button",BS_AUTORADIOBUTTON,
                     12,62,37,10
-    CONTROL         "RRE",IDC_RRERADIO,"Button",BS_AUTORADIOBUTTON,12,73,31,
+    CONTROL         "RRE",IDC_RRERADIO,"Button",BS_AUTORADIOBUTTON,12,73,29,
                     10
-    CONTROL         "CoRRE",IDC_CORRERADIO,"Button",BS_AUTORADIOBUTTON,12,83,
-                    40,10
-    CONTROL         "Raw",IDC_RAWRADIO,"Button",BS_AUTORADIOBUTTON,12,94,29,
+    CONTROL         "CoRRE",IDC_CORRERADIO,"Button",BS_AUTORADIOBUTTON,41,73,
+                    38,10
+    CONTROL         "Raw",IDC_RAWRADIO,"Button",BS_AUTORADIOBUTTON,12,83,29,
                     10
-    CONTROL         "Ultra",IDC_ULTRA,"Button",BS_AUTORADIOBUTTON,47,94,29,
+    CONTROL         "Ultra",IDC_ULTRA,"Button",BS_AUTORADIOBUTTON,41,83,29,
                     10
+	CONTROL         "ZYWRLE",IDC_ZYWRLERADIO,"Button",BS_AUTORADIOBUTTON,12,94,47,10
     GROUPBOX        "",IDC_STATIC,84,22,65,86,WS_GROUP
     CONTROL         "Full Colors",IDC_FULLCOLORS_RADIO,"Button",
                     BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,89,30,48,10
@@ -175,13 +204,12 @@ BEGIN
                     BS_AUTOCHECKBOX | WS_TABSTOP,10,188,137,8
     CONTROL         "Disable clipboard transfer",IDC_DISABLECLIPBOARD,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,10,198,138,10
-    GROUPBOX        "Mouse Buttons",IDC_STATIC,159,2,159,37
+    GROUPBOX        "Mouse and Keyboard",IDC_STATIC,159,2,159,85
     CONTROL         "Emulate 3 Buttons (with 2-button click)",
                     IDC_EMULATECHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
                     166,15,139,10
     CONTROL         "Swap mouse buttons 2 and 3",ID_SESSION_SWAPMOUSE,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,166,26,126,10
-    GROUPBOX        "Mouse Cursor",IDC_STATIC,159,41,159,47
+                    BS_AUTOCHECKBOX | WS_TABSTOP,166,27,126,10
     CONTROL         "Track remote cursor locally",IDC_CSHAPE_ENABLE_RADIO,
                     "Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,165,
                     52,144,10
@@ -218,6 +246,8 @@ BEGIN
     EDITTEXT        IDC_SERVER_RECON,159,170,16,12,ES_AUTOHSCROLL
     LTEXT           "number of times the reconnect is attempted",IDC_STATIC,
                     180,171,143,11
+    CONTROL         "Japanese keyboard",IDC_JAPKEYBOARD,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,166,39,78,10
 END
 
 IDD_FILETRANSFER_DLG DIALOGEX 0, 0, 555, 414
@@ -485,6 +515,16 @@ BEGIN
                     IDC_STATIC,86,70,203,33
     LTEXT           "Copyright © 1990-2002 Info-ZIP\nCopyright © 1996-2002 Markus Franz Xaver Johannes Oberhumer - Mini LZO library",
                     IDC_STATIC,85,102,198,24
+    CONTROL         "http://ultravnc.sf.net/|http://ultravnc.sf.net/",
+                    IDC_CUSTOM1,"LinkLabel",WS_TABSTOP,86,140,104,8
+    LTEXT           "Unofficial patch for Japanese Environment made by:",
+                    IDC_STATIC,86,153,169,8
+    CONTROL         "http://kp774.com/|http://kp774.com/",IDC_CUSTOM2,
+                    "LinkLabel",WS_TABSTOP,86,160,60,8
+    LTEXT           "Adopt the patch to SVN Rev. 169 by:",IDC_STATIC,86,170,
+                    169,8
+    CONTROL         "http://yak.myhome.cx/junks/|http://yak.myhome.cx/junks/",
+                    IDC_CUSTOM3,"LinkLabel",WS_TABSTOP,86,178,104,8
 END
 
 IDD_FTCONFIRM_DLG DIALOG DISCARDABLE  0, 0, 178, 86
@@ -650,7 +690,7 @@ BEGIN
         VERTGUIDE, 108
         VERTGUIDE, 283
         TOPMARGIN, 7
-        BOTTOMMARGIN, 152
+        BOTTOMMARGIN, 170
         HORZGUIDE, 29
     END
 
@@ -715,15 +755,6 @@ IDB_PINDOWN             BITMAP  MOVEABLE PURE   "stat\\pindown.bmp"
 IDB_PINUP               BITMAP  MOVEABLE PURE   "stat\\pinup.bmp"
 IDB_VNC32               BITMAP  MOVEABLE PURE   "vnc32.BMP"
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// Cursor
-//
-
-IDC_CURSOR1             CURSOR  DISCARDABLE     "cursorsel.cur"
-IDC_DOTCURSOR           CURSOR  DISCARDABLE     "cursor1.cur"
-IDC_NOCURSOR            CURSOR  DISCARDABLE     "nocursor.cur"
-
 #ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -731,13 +762,13 @@ IDC_NOCURSOR            CURSOR  DISCARDABLE     "nocursor.cur"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,1,0,4
- PRODUCTVERSION 1,1,0,4
+ FILEVERSION 1,0,4,501
+ PRODUCTVERSION 1,0,4,501
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
- FILEFLAGS 0x21L
+ FILEFLAGS 0x2dL
 #else
- FILEFLAGS 0x20L
+ FILEFLAGS 0x2cL
 #endif
  FILEOS 0x40004L
  FILETYPE 0x2L
@@ -750,15 +781,15 @@ BEGIN
             VALUE "Comments", "UltraVNC Viewer\0"
             VALUE "CompanyName", "UltraVNC\0"
             VALUE "FileDescription", "VNCViewer\0"
-            VALUE "FileVersion", "1.1.0.4\0"
+            VALUE "FileVersion", "1.0.4 RC7 - jp1\0"
             VALUE "InternalName", "VNCViewer\0"
             VALUE "LegalCopyright", "Copyright © 2002-2006 UltraVNC team members\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "VNCViewer.exe\0"
-            VALUE "PrivateBuild", "\0"
+            VALUE "PrivateBuild", "With Japanized patch based on 1.0.2-jp2\0"
             VALUE "ProductName", "UltraVNC VNCViewer\0"
-            VALUE "ProductVersion", "1.1.0.4\0"
-            VALUE "SpecialBuild", "1.0.4\0"
+            VALUE "ProductVersion", "1.0.4 RC7 - jp1\0"
+            VALUE "SpecialBuild", "With Japanized patch based on 1.0.2-jp2\0"
         END
     END
     BLOCK "VarFileInfo"

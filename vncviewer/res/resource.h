@@ -75,6 +75,7 @@
 #define ID_VK_LWINUP                    608
 #define ID_VK_RWINUP                    609
 #define ID_VK_APPSUP                    610
+#define IDC_FINGER                      900
 #define IDC_HOSTNAME_EDIT               1000
 #define IDC_SHARED                      1000
 #define IDC_DPYNUM_EDIT                 1001
@@ -201,6 +202,10 @@
 #define IDD_APP_MESSAGE2                1151
 #define IDC_CHECK1                      1154
 #define IDC_SERVER_RECON                1155
+#define IDC_CUSTOM1                     1156
+#define IDC_CUSTOM2                     1157
+#define IDC_CUSTOM3                     1158
+#define IDC_JAPKEYBOARD                 1159
 #define IDC_ENCODING_BASE               1999
 #define IDC_RAWRADIO                    2000
 #define IDC_RRERADIO                    2002
@@ -211,7 +216,10 @@
 #define IDC_ZLIBHEXRADIO                2008
 #define IDC_ULTRA                       2009
 #define IDC_ZRLERADIO                   2016
-#define IDC_LAST_ENCODING               2017
+#define IDC_ZYWRLERADIO                 2017
+#define IDC_LAST_ENCODING               2018
+#define IDC_STATIC_SPLIT                9000
+#define IDC_HOSTNAME_DEL                9001
 #define ID_SESSION_SET_CRECT            32777
 #define ID_SESSION_SWAPMOUSE            32785
 #define ID_CLOSEDAEMON                  50001
@@ -494,7 +502,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        188
 #define _APS_NEXT_COMMAND_VALUE         50025
-#define _APS_NEXT_CONTROL_VALUE         1156
+#define _APS_NEXT_CONTROL_VALUE         1160
 #define _APS_NEXT_SYMED_VALUE           154
 #endif
 #endif
