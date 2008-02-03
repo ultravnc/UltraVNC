@@ -80,6 +80,7 @@ VNCOptions::VNCOptions()
   m_UseEnc[rfbEncodingTight] = true;
   m_UseEnc[rfbEncodingZlibHex] = true;
   m_UseEnc[rfbEncodingZRLE] = true;
+  m_UseEnc[rfbEncodingZYWRLE] = true;
   m_UseEnc[rfbEncodingUltra] = true;
 	
   m_ViewOnly = false;
@@ -99,6 +100,7 @@ VNCOptions::VNCOptions()
   // reads the whole update in one socket call.
   m_PreferredEncoding = rfbEncodingCoRRE;
 #endif
+  m_JapKeyboard = false;
   m_SwapMouse = false;
   m_Emul3Buttons = true;
   m_Emul3Timeout = 100; // milliseconds
@@ -259,6 +261,7 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
   
   // sf@2007 - Autoreconnect
   m_autoReconnect         = s.m_autoReconnect;
+  m_JapKeyboard			  = s.m_JapKeyboard;
 
 
 #ifdef UNDER_CE
@@ -419,6 +422,8 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
       m_DeiconifyOnBell = true;
     } else if ( SwitchMatch(args[j], _T("emulate3") )) {
       m_Emul3Buttons = true;
+	} else if ( SwitchMatch(args[j], _T("JapKeyboard") )) {
+      m_JapKeyboard = true;
     } else if ( SwitchMatch(args[j], _T("noemulate3") )) {
       m_Emul3Buttons = false;
 	} else if ( SwitchMatch(args[j], _T("nocursorshape") )) {
@@ -714,6 +719,7 @@ void VNCOptions::Save(char *fname)
   saveInt("swapmouse",			m_SwapMouse,		fname);
   saveInt("belldeiconify",		m_DeiconifyOnBell,	fname);
   saveInt("emulate3",				m_Emul3Buttons,		fname);
+  saveInt("JapKeyboard",				m_JapKeyboard,		fname);
   saveInt("emulate3timeout",		m_Emul3Timeout,		fname);
   saveInt("emulate3fuzz",			m_Emul3Fuzz,		fname);
   saveInt("disableclipboard",		m_DisableClipboard, fname);
@@ -767,6 +773,7 @@ void VNCOptions::Load(char *fname)
   m_SwapMouse =			readInt("swapmouse",		m_SwapMouse,	fname) != 0;
   m_DeiconifyOnBell =		readInt("belldeiconify",	m_DeiconifyOnBell, fname) != 0;
   m_Emul3Buttons =		readInt("emulate3",			m_Emul3Buttons, fname) != 0;
+  m_JapKeyboard  =		readInt("JapKeyboard",			m_JapKeyboard, fname) != 0;
   m_Emul3Timeout =		readInt("emulate3timeout",	m_Emul3Timeout, fname);
   m_Emul3Fuzz =			readInt("emulate3fuzz",		m_Emul3Fuzz,    fname);
   m_DisableClipboard =	readInt("disableclipboard", m_DisableClipboard, fname) != 0;
@@ -1060,8 +1067,13 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 		  
 		  HWND hEmulate = GetDlgItem(hwnd, IDC_EMULATECHECK);
 		  SendMessage(hEmulate, BM_SETCHECK, _this->m_Emul3Buttons, 0);
+
+		  HWND hJapkeyboard = GetDlgItem(hwnd, IDC_JAPKEYBOARD);
+		  SendMessage(hJapkeyboard, BM_SETCHECK, _this->m_JapKeyboard, 0);
 #endif
+
 		  
+
 		  // Tight Specific
 		  HWND hAllowCompressLevel = GetDlgItem(hwnd, IDC_ALLOW_COMPRESSLEVEL);
 		  SendMessage(hAllowCompressLevel, BM_SETCHECK, _this->m_useCompressLevel, 0);
@@ -1106,6 +1118,12 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 				  if (SendMessage(hPref, BM_GETCHECK, 0, 0) == BST_CHECKED)
 					  _this->m_PreferredEncoding = i;
 			  }
+
+			// [v1.0.2-jp2 fix-->]
+			  if (SendMessage(GetDlgItem(hwnd, IDC_ULTRA), BM_GETCHECK, 0, 0) == BST_CHECKED){
+					SendMessage(GetDlgItem(hwnd, ID_SESSION_SET_CRECT), BM_SETCHECK, false, 0);
+			  }
+			// [<--v1.0.2-jp2 fix]
 			  
 			  HWND hCopyRect = GetDlgItem(hwnd, ID_SESSION_SET_CRECT);
 			  _this->m_UseEnc[rfbEncodingCopyRect] =
@@ -1210,6 +1228,10 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 			  HWND hEmulate = GetDlgItem(hwnd, IDC_EMULATECHECK);
 			  _this->m_Emul3Buttons =
 				  (SendMessage(hEmulate, BM_GETCHECK, 0, 0) == BST_CHECKED);
+
+			  HWND hJapkeyboard = GetDlgItem(hwnd, IDC_JAPKEYBOARD);
+			  _this->m_JapKeyboard =
+				  (SendMessage(hJapkeyboard, BM_GETCHECK, 0, 0) == BST_CHECKED);
 #endif
 			  
 			  // Tight Specific
@@ -1342,6 +1364,10 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 		{
 	 	    HWND hCache = GetDlgItem(hwnd, ID_SESSION_SET_CACHE);
 			SendMessage(hCache, BM_SETCHECK, false, 0);
+			// [v1.0.2-jp2 fix-->]
+			HWND hCopyRect = GetDlgItem(hwnd, ID_SESSION_SET_CRECT);
+			SendMessage(hCopyRect, BM_SETCHECK, false, 0);
+			// [<--v1.0.2-jp2 fix]
 			HWND hRemoteCursor = GetDlgItem(hwnd, IDC_CSHAPE_DISABLE_RADIO);
 			SendMessage(hRemoteCursor, BM_SETCHECK,	true, 0);
 			HWND hRemoteCursor2 = GetDlgItem(hwnd, IDC_CSHAPE_ENABLE_RADIO);

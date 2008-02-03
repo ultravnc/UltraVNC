@@ -38,7 +38,7 @@ void ClientConnection::ReadUltraRect(rfbFramebufferUpdateRectHeader *pfburh) {
     // this assumes at least one byte per pixel. Naughty.
 	UINT numRawBytes = numpixels * m_minPixelBytes;
 	UINT numCompBytes;
-	UINT new_len;
+	ULONG new_len;
 
 	rfbZlibHeader hdr;
 
@@ -64,7 +64,7 @@ void ClientConnection::ReadUltraZip(rfbFramebufferUpdateRectHeader *pfburh,HRGN 
 	UINT nNbCacheRects = pfburh->r.x;
 	UINT numRawBytes = pfburh->r.y+pfburh->r.w*65535;
 	UINT numCompBytes;
-	UINT new_len;
+	ULONG new_len;
 	rfbZlibHeader hdr;
 	// Read in the rfbZlibHeader
 	omni_mutex_lock l(m_bitmapdcMutex);

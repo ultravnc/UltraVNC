@@ -32,7 +32,7 @@
 
 #pragma once
 
-#define LASTENCODING rfbEncodingZRLE
+#define LASTENCODING rfbEncodingZYWRLE
 
 #define NOCURSOR 0
 #define DOTCURSOR 1
@@ -80,6 +80,7 @@ public:
 
 	bool	m_SwapMouse;
 	bool    m_Emul3Buttons; 
+	bool    m_JapKeyboard;
  	int     m_Emul3Timeout;
  	int     m_Emul3Fuzz;
 	bool	m_Shared;

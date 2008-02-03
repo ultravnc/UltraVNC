@@ -459,6 +459,15 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 				return TRUE;
 			}
 
+		// [v1.0.2-jp1 fix]
+		case IDC_HOSTNAME_DEL:
+            HWND hcombo = GetDlgItem(  hwnd, IDC_HOSTNAME_EDIT);
+			int sel = SendMessage(hcombo, CB_GETCURSEL, 0, 0);
+			if(sel != CB_ERR){
+				SendMessage(hcombo, CB_DELETESTRING, sel, 0);
+				_this->m_pMRU->RemoveItem(sel);
+			}
+			return TRUE;
 		}
 
 		break;

@@ -69,6 +69,9 @@ extern "C" {
 
 #include <DSMPlugin/DSMPlugin.h> // sf@2002
 
+// [v1.0.2-jp1 fix]
+#pragma comment(lib, "imm32.lib")
+
 #define INITIALNETBUFSIZE 4096
 #define MAX_ENCODINGS (LASTENCODING+10)
 #define VWR_WND_CLASS_NAME _T("VNCviewer")
@@ -215,6 +218,11 @@ extern bool command_line;
 //  This first section contains bits which are generally called by the main
 //  program thread.
 // *************************************************************************
+ClientConnection::ClientConnection()
+{
+	m_keymap = NULL;
+	m_keymapJap = NULL;
+}
 
 ClientConnection::ClientConnection(VNCviewerApp *pApp) 
   : fis(0), zis(0)
@@ -298,6 +306,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_BytesRead=0;
 
 	m_keymap = new KeyMap;
+	m_keymapJap = new KeyMapJap;
 
 	// We take the initial conn options from the application defaults
 	m_opts = m_pApp->m_options;
@@ -431,6 +440,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_zlibbuf=NULL; 
 	rcSource=NULL;
 	rcMask=NULL;
+	zywrle_level = 1;
 
 	m_autoReconnect = m_opts.m_autoReconnect;
 	ThreadSocketTimeout=NULL;
@@ -1312,6 +1322,9 @@ void ClientConnection::HandleQuickOption()
 		m_opts.m_PreferredEncoding = rfbEncodingUltra;
 		m_opts.m_Use8Bit = rfbPFFullColors; //false; // Max colors
 		m_opts.autoDetect = false;
+		// [v1.0.2-jp2 fix-->]
+		m_opts.m_UseEnc[rfbEncodingCopyRect] = false;
+		// [<--v1.0.2-jp2 fix]
 		m_opts.m_fEnableCache = false;
 		m_opts.m_requestShapeUpdates = false;
 		m_opts.m_ignoreShapeUpdates = true;
@@ -1654,12 +1667,13 @@ void ClientConnection::NegotiateProtocolVersion()
 	{
 		int size;
 		ReadExact((char *)&size,sizeof(int));
-		char mytext[1024]; //10k
+		char mytext[1025]; //10k
 		//block
 		if (size<0 || size >1024)
 		{
 			throw WarningException("Buffer to big, ");
-			return;
+			if (size<0) size=0;
+			if (size>1024) size=1024;
 		}
 
 		ReadExact(mytext,size);
@@ -2498,6 +2512,13 @@ void ClientConnection::SetFormatAndEncodings()
 				{
 					useCompressLevel = true;
 				}
+	  			if ( i == rfbEncodingZYWRLE
+			   )
+				{
+					zywrle = 1;
+				}else{
+					zywrle = 0;
+				}
 			}
 			else 
 			{
@@ -2778,6 +2799,10 @@ ClientConnection::~ClientConnection()
 	if (m_keymap) {
         delete m_keymap;
         m_keymap = NULL;
+    }
+	if (m_keymapJap) {
+        delete m_keymapJap;
+        m_keymapJap = NULL;
     }
 }
 
@@ -3080,12 +3105,66 @@ inline void ClientConnection::ProcessKeyEvent(int virtKey, DWORD keyData)
 #endif
 #endif
 
-	try {
-        m_keymap->PCtoX(virtKey, keyData, this);
-	} catch (Exception &e) {
-		if( !m_autoReconnect )
-			e.Report();
-		PostMessage(m_hwndMain, WM_CLOSE, reconnectcounter, 0);
+	if (m_opts.m_JapKeyboard==0)
+	{
+		try {
+			m_keymap->PCtoX(virtKey, keyData, this);
+		} catch (Exception &e) {
+			if( !m_autoReconnect )
+				e.Report();
+			PostMessage(m_hwndMain, WM_CLOSE, reconnectcounter, 0);
+		}
+	}
+	else
+	{
+
+		try {
+			KeyActionSpec kas = m_keymapJap->PCtoX(virtKey, keyData);    
+			
+			if (kas.releaseModifiers & KEYMAP_LCONTROL) {
+				SendKeyEvent(XK_Control_L, false );
+				vnclog.Print(5, _T("fake L Ctrl raised\n"));
+			}
+			if (kas.releaseModifiers & KEYMAP_LALT) {
+				SendKeyEvent(XK_Alt_L, false );
+				vnclog.Print(5, _T("fake L Alt raised\n"));
+			}
+			if (kas.releaseModifiers & KEYMAP_RCONTROL) {
+				SendKeyEvent(XK_Control_R, false );
+				vnclog.Print(5, _T("fake R Ctrl raised\n"));
+			}
+			if (kas.releaseModifiers & KEYMAP_RALT) {
+				SendKeyEvent(XK_Alt_R, false );
+				vnclog.Print(5, _T("fake R Alt raised\n"));
+			}
+			
+			for (int i = 0; kas.keycodes[i] != XK_VoidSymbol && i < MaxKeysPerKey; i++) {
+				SendKeyEvent(kas.keycodes[i], down );
+				//vnclog.Print(4, _T("Sent keysym %04x (%s)\n"), 
+				//	kas.keycodes[i], down ? _T("press") : _T("release"));
+			}
+			
+			if (kas.releaseModifiers & KEYMAP_RALT) {
+				SendKeyEvent(XK_Alt_R, true );
+				vnclog.Print(5, _T("fake R Alt pressed\n"));
+			}
+			if (kas.releaseModifiers & KEYMAP_RCONTROL) {
+				SendKeyEvent(XK_Control_R, true );
+				vnclog.Print(5, _T("fake R Ctrl pressed\n"));
+			}
+			if (kas.releaseModifiers & KEYMAP_LALT) {
+				SendKeyEvent(XK_Alt_L, false );
+				vnclog.Print(5, _T("fake L Alt pressed\n"));
+			}
+			if (kas.releaseModifiers & KEYMAP_LCONTROL) {
+				SendKeyEvent(XK_Control_L, false );
+				vnclog.Print(5, _T("fake L Ctrl pressed\n"));
+			}
+		} catch (Exception &e) {
+			if( !m_autoReconnect )
+				e.Report();
+			PostMessage(m_hwndMain, WM_CLOSE, 4, 0);
+		}
 	}
 
 }
@@ -3727,7 +3806,7 @@ inline void ClientConnection::ReadScreenUpdate()
 			// ZRLE special case
 			if (!fis->GetReadFromMemoryBuffer())
 			{
-				if (surh.encoding == rfbEncodingZRLE)
+				if ((surh.encoding == rfbEncodingZYWRLE)||(surh.encoding == rfbEncodingZRLE))
 				{
 					// Get the size of the rectangle data buffer
 					ReadExact((char*)&(m_nZRLEReadSize), sizeof(CARD32));
@@ -3858,9 +3937,11 @@ inline void ClientConnection::ReadScreenUpdate()
 			ReadSolidRect(&surh);
 			break;
 		case rfbEncodingZRLE:
+			zywrle = 0;
+		case rfbEncodingZYWRLE:
 			SaveArea(cacherect);
 			zrleDecode(surh.r.x, surh.r.y, surh.r.w, surh.r.h);
-			EncodingStatusWindow=rfbEncodingZRLE;
+			EncodingStatusWindow=zywrle ? rfbEncodingZYWRLE : rfbEncodingZRLE;
 			break;
 		case rfbEncodingTight:
 			SaveArea(cacherect);
@@ -4469,12 +4550,16 @@ void ClientConnection::CheckFileChunkBufferSize(int bufsize)
 //
 void ClientConnection::ReadNewFBSize(rfbFramebufferUpdateRectHeader *pfburh)
 {
-	m_si.framebufferWidth = pfburh->r.w;
-	m_si.framebufferHeight = pfburh->r.h;
+	// [v1.0.2-jp1 fix]
+	//m_si.framebufferWidth = pfburh->r.w;
+	//m_si.framebufferHeight = pfburh->r.h;
+	m_si.framebufferWidth = pfburh->r.w / m_nServerScale;
+	m_si.framebufferHeight = pfburh->r.h / m_nServerScale;
+
 	ClearCache();
 	CreateLocalFramebuffer();
     SendFullFramebufferUpdateRequest();
-	Createdib();\
+	Createdib();
 	m_pendingScaleChange = true;
 	m_pendingFormatChange = true;
 	SendAppropriateFramebufferUpdateRequest();
@@ -4611,6 +4696,9 @@ void ClientConnection::UpdateStatusFields()
   			case rfbEncodingZRLE:		
 				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "ZRLE, Cache" :"ZRLE");
   				break;
+  			case rfbEncodingZYWRLE:		
+				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "ZYWRLE, Cache" :"ZYWRLE");
+  				break;
 			case rfbEncodingTight:
 				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "Tight, Cache" : "Tight");
 				break; 
@@ -4696,6 +4784,9 @@ void ClientConnection::GTGBS_CreateDisplay()
 			  m_pApp->m_instance,
 			  NULL);
 	//ShowWindow(m_hwndMain,SW_SHOW);
+
+	// [v1.0.2-jp1 fix]
+	ImmAssociateContext(m_hwndMain, NULL);
 
 	SetWindowLong(m_hwndMain, GWL_USERDATA, (LONG) this);
 }

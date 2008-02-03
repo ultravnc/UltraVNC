@@ -34,6 +34,12 @@
 #define CHAT_OPEN  -1 // Todo; put these codes in rfbproto.h
 #define CHAT_CLOSE -2
 #define CHAT_FINISHED -3
+
+// [v1.0.2-jp1 fix]
+LRESULT CALLBACK SBProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+LONG pDefSBProc;
+extern HINSTANCE m_hInstResDLL;
+
 extern char sz_E1[64];
 extern char sz_E2[64];
 
@@ -246,7 +252,17 @@ void TextChat::PrintMessage(const char* szMessage,const char* szSender,DWORD dwC
 		cr.cpMin  = cr.cpMax;
 		SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT, EM_EXSETSEL, 0, (LONG)&cr);
 		/***/
-		SetTextFormat(false, false, 0x75, "MS Sans Serif", dwColor);
+
+		// [v1.0.2-jp1 fix-->]
+		//SetTextFormat(false, false, 0x75, "MS Sans Serif", dwColor);
+		if(!m_hInstResDLL){
+			SetTextFormat(false, false, 0x75, "MS Sans Serif", dwColor);
+		}
+		else{
+			SetTextFormat(false, false, 0xb4, "‚l‚r ‚oƒSƒVƒbƒN", dwColor);
+		}
+		// [<--v1.0.2-jp1 fix]
+
 		_snprintf(m_szTextBoxBuffer, MAXNAMESIZE-1 + 4, "<%s>: ", szSender);		
 		SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT,EM_REPLACESEL,FALSE,(LONG)m_szTextBoxBuffer); // Replace the selection with the message
 	}
@@ -259,7 +275,16 @@ void TextChat::PrintMessage(const char* szMessage,const char* szSender,DWORD dwC
 		cr.cpMin  = cr.cpMax;
 		SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT,EM_EXSETSEL,0,(LONG) &cr);
 		/***/
-		SetTextFormat(false, false, 0x75, "MS Sans Serif", dwColor != GREY ? BLACK : GREY);	
+		// [v1.0.2-jp1 fix-->]
+		//SetTextFormat(false, false, 0x75, "MS Sans Serif", dwColor != GREY ? BLACK : GREY);	
+		if(!m_hInstResDLL){
+			SetTextFormat(false, false, 0x75, "MS Sans Serif", dwColor != GREY ? BLACK : GREY);	
+		}
+		else{
+			SetTextFormat(false, false, 0xb4, "‚l‚r ‚oƒSƒVƒbƒN", dwColor != GREY ? BLACK : GREY);	
+		}
+		// [<--v1.0.2-jp1 fix]
+
 		_snprintf(m_szTextBoxBuffer, TEXTMAXSIZE-1, "%s", szMessage);		
 		SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT, EM_REPLACESEL, FALSE, (LONG)m_szTextBoxBuffer); 
 	}
@@ -345,6 +370,43 @@ void TextChat::ShowChatWindow(bool fVisible)
 	// Refresh screen view if Chat window has been hidden
 	if (!fVisible)
 		m_pCC->SendAppropriateFramebufferUpdateRequest();
+}
+
+// [v1.0.2-jp1 fix]
+void AdjustLeft(LPRECT lprc)
+{
+	int cx = lprc->right - lprc->left - GetSystemMetrics(SM_CXSIZEFRAME) * 2;
+
+	if(cx < 240){
+		lprc->left = lprc->right - 240 - GetSystemMetrics(SM_CXSIZEFRAME) * 2;
+	}
+}
+
+void AdjustTop(LPRECT lprc)
+{
+	int cy = lprc->bottom - lprc->top - GetSystemMetrics(SM_CYSIZEFRAME) * 2;
+
+	if(cy < 179){
+		lprc->top = lprc->bottom - 179 - GetSystemMetrics(SM_CYSIZEFRAME) * 2;
+	}
+}
+
+void AdjustRight(LPRECT lprc)
+{
+	int cx = lprc->right - lprc->left - GetSystemMetrics(SM_CXSIZEFRAME) * 2;
+
+	if(cx < 240){
+		lprc->right = lprc->left + 240 + GetSystemMetrics(SM_CXSIZEFRAME) * 2;
+	}
+}
+
+void AdjustBottom(LPRECT lprc)
+{
+	int cy = lprc->bottom - lprc->top - GetSystemMetrics(SM_CYSIZEFRAME) * 2;
+
+	if(cy < 179){
+		lprc->bottom = lprc->top + 179 + GetSystemMetrics(SM_CYSIZEFRAME) * 2;
+	}
 }
 
 //
@@ -442,6 +504,10 @@ BOOL CALLBACK TextChat::TextChatDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM wParam,
 
 			SetForegroundWindow(hWnd);
 			
+			// [v1.0.2-jp1 fix] SUBCLASS Split bar
+			pDefSBProc = GetWindowLong(GetDlgItem(hWnd, IDC_STATIC_SPLIT), GWL_WNDPROC);
+			SetWindowLong(GetDlgItem(hWnd, IDC_STATIC_SPLIT), GWL_WNDPROC, (LONG)SBProc);
+
 			return TRUE;
 		}
 		// break;
@@ -456,11 +522,19 @@ BOOL CALLBACK TextChat::TextChatDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM wParam,
 
 		case IDOK:
 			// Server orders to close TextChat 			
+
+			// [v1.0.2-jp1 fix] UNSUBCLASS Split bar
+			SetWindowLong(GetDlgItem(hWnd, IDC_STATIC_SPLIT), GWL_WNDPROC, pDefSBProc);
+
 			EndDialog(hWnd, FALSE);
 			return TRUE;
 
 		case IDCANCEL:			
 			_this->SendTextChatRequest(CHAT_CLOSE); // Server must close TextChat
+
+			// [v1.0.2-jp1 fix] UNSUBCLASS Split bar
+			SetWindowLong(GetDlgItem(hWnd, IDC_STATIC_SPLIT), GWL_WNDPROC, pDefSBProc);
+
 			EndDialog(hWnd, FALSE);
 			return TRUE;
 
@@ -502,6 +576,62 @@ BOOL CALLBACK TextChat::TextChatDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM wParam,
 		}
 		break;
 
+	// [v1.0.2-jp1 fix-->]
+	case WM_SIZING:
+		LPRECT lprc;
+		lprc = (LPRECT)lParam;
+		switch(wParam){
+		case WMSZ_TOPLEFT:
+			AdjustTop(lprc);
+			AdjustLeft(lprc);
+		case WMSZ_TOP:
+			AdjustTop(lprc);
+		case WMSZ_TOPRIGHT:
+			AdjustTop(lprc);
+			AdjustRight(lprc);
+		case WMSZ_LEFT:
+			AdjustLeft(lprc);
+		case WMSZ_RIGHT:
+			AdjustRight(lprc);
+		case WMSZ_BOTTOMLEFT:
+			AdjustBottom(lprc);
+			AdjustLeft(lprc);
+		case WMSZ_BOTTOM:
+			AdjustBottom(lprc);
+		case WMSZ_BOTTOMRIGHT:
+			AdjustBottom(lprc);
+			AdjustRight(lprc);
+		}
+		return TRUE;
+	case WM_SIZE:
+		int cx;
+		int cy;
+		int icy;
+		RECT rc;
+
+		if(wParam == SIZE_MINIMIZED){
+			break;
+		}
+
+		cx = LOWORD(lParam);
+		cy = HIWORD(lParam);
+		GetWindowRect(GetDlgItem(hWnd, IDC_INPUTAREA_EDIT), &rc);
+		icy = rc.bottom - rc.top;
+		if(cy - icy - 12 < 80){
+			icy = cy - 92;
+		}
+		MoveWindow(GetDlgItem(hWnd, IDC_CHATAREA_EDIT),  4,             4, cx -  8, cy - icy - 16, TRUE); 
+		MoveWindow(GetDlgItem(hWnd, IDC_STATIC_SPLIT),   4, cy - icy - 12, cx -  8,             8, TRUE); 
+		MoveWindow(GetDlgItem(hWnd, IDC_INPUTAREA_EDIT), 4, cy - icy -  4, cx - 88,           icy, TRUE);
+
+		MoveWindow(GetDlgItem(hWnd, IDC_SEND_B), cx - 76, cy - 64, 72, 20, TRUE); 
+		MoveWindow(GetDlgItem(hWnd, IDC_HIDE_B), cx - 76, cy - 40, 72, 18, TRUE); 
+		MoveWindow(GetDlgItem(hWnd, IDCANCEL),   cx - 76, cy - 22, 72, 18, TRUE);
+
+		InvalidateRect(hWnd, NULL, FALSE);
+		return TRUE;
+	// [<--v1.0.2-jp1 fix]
+
 	case WM_DESTROY:
 		// _this->SendTextChatRequest(_this, CHAT_FINISHED);
 		EndDialog(hWnd, FALSE);
@@ -510,5 +640,97 @@ BOOL CALLBACK TextChat::TextChatDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM wParam,
 	return 0;
 }
 
+// [JEE6 Fix] Split bar
+void DrawResizeLine(HWND hWnd, int y)
+{
+	HWND hParent;
+	RECT rc;
+	HDC hDC;
 
+	hParent = GetParent(hWnd);
+	GetClientRect(hParent, &rc);
 
+	if(y < 80){
+		y = 80;
+	}
+	else if(y > rc.bottom - 80){
+		y = rc.bottom - 80;
+	}
+	
+	hDC = GetDC(hParent);
+	SetROP2(hDC, R2_NOTXORPEN);
+	MoveToEx(hDC, rc.left, y, NULL);
+	LineTo(hDC, rc.right, y);
+	MoveToEx(hDC, rc.left, y+1, NULL);
+	LineTo(hDC, rc.right, y+1);
+	MoveToEx(hDC, rc.left, y+2, NULL);
+	LineTo(hDC, rc.right, y+2);
+	MoveToEx(hDC, rc.left, y+3, NULL);
+	LineTo(hDC, rc.right, y+3);
+	ReleaseDC(hParent, hDC);
+}
+
+// [v1.0.2-jp1 fix] Split bar proc
+LRESULT CALLBACK SBProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	static BOOL bCapture;
+	static UINT u;
+	static int oldy;
+	HWND hParent;
+	RECT rc;
+	POINT cp;
+	int y;
+	int cx;
+	int cy;
+
+	switch(uMsg){
+	case WM_SETCURSOR:
+		SetCursor(LoadCursor(NULL, IDC_SIZENS));
+		return TRUE;
+	case WM_LBUTTONDOWN:
+		SetCapture(hWnd);
+		bCapture = TRUE;
+		u = GetCaretBlinkTime();
+		SetCaretBlinkTime(0x7fffffff);
+		GetCursorPos(&cp);
+		hParent = GetParent(hWnd);
+		ScreenToClient(hParent, &cp);
+		DrawResizeLine(hWnd, cp.y);
+		oldy = cp.y;
+		break;
+	case WM_MOUSEMOVE:
+		if(bCapture){
+			GetCursorPos(&cp);
+			hParent = GetParent(hWnd);
+			ScreenToClient(hParent, &cp);
+			DrawResizeLine(hWnd, oldy);
+			DrawResizeLine(hWnd, cp.y);
+			oldy = cp.y;
+		}
+		break;
+	case WM_LBUTTONUP:
+		ReleaseCapture();
+		bCapture = FALSE;
+		SetCaretBlinkTime(u);
+		GetCursorPos(&cp);
+		hParent = GetParent(hWnd);
+		GetClientRect(hParent, &rc);
+		cx = rc.right - rc.left;
+		cy = rc.bottom - rc.top;
+		ScreenToClient(hParent, &cp);
+		DrawResizeLine(hWnd, cp.y);
+		y = cp.y;
+		if(y < 80){
+			y = 80;
+		}
+		else if(y > cy - 80){
+			y = cy - 80;
+		}
+		MoveWindow(GetDlgItem(hParent, IDC_CHATAREA_EDIT),  4,         4, cx -  8,       y - 4, TRUE); 
+		MoveWindow(GetDlgItem(hParent, IDC_STATIC_SPLIT),   4,         y, cx -  8,           8, TRUE); 
+		MoveWindow(GetDlgItem(hParent, IDC_INPUTAREA_EDIT), 4,     y + 8, cx - 88, cy - y - 12, TRUE);
+		break;
+	}
+
+	return CallWindowProc((WNDPROC)pDefSBProc, hWnd, uMsg, wParam, lParam);
+}

@@ -38,6 +38,7 @@
 #include "VNCOptions.h"
 #include "VNCviewerApp.h"
 #include "KeyMap.h"
+#include "KeyMapJap.h"
 #include <rdr/types.h>
 #include "zlib/zlib.h"
 extern "C"
@@ -124,6 +125,7 @@ public:
 	void GTGBS_CreateDisplay(void);
 	void GTGBS_ScrollToolbar(int dx, int dy);
 	void CreateButtons(BOOL mini,BOOL ultra);
+	ClientConnection();
 	ClientConnection(VNCviewerApp *pApp);
 	ClientConnection(VNCviewerApp *pApp, SOCKET sock);
 	ClientConnection(VNCviewerApp *pApp, LPTSTR host, int port);
@@ -434,6 +436,7 @@ private:
  
 	// Keyboard mapper
     KeyMap *m_keymap;
+	KeyMapJap *m_keymapJap;
 
 	// RFB settings
 	VNCOptions m_opts;
@@ -553,16 +556,21 @@ private:
 	rdr::FdInStream* fis;
 	rdr::ZlibInStream* zis;
 	void zrleDecode(int x, int y, int w, int h);
-	void zrleDecode8(int x, int y, int w, int h, rdr::InStream* is,
+	void zrleDecode8NE(int x, int y, int w, int h, rdr::InStream* is,
 		rdr::ZlibInStream* zis, rdr::U8* buf);
-	void zrleDecode16(int x, int y, int w, int h, rdr::InStream* is,
+	void zrleDecode15LE(int x, int y, int w, int h, rdr::InStream* is,
 		rdr::ZlibInStream* zis, rdr::U16* buf);
-	void zrleDecode24A(int x, int y, int w, int h, rdr::InStream* is,
+	void zrleDecode16LE(int x, int y, int w, int h, rdr::InStream* is,
+		rdr::ZlibInStream* zis, rdr::U16* buf);
+	void zrleDecode24ALE(int x, int y, int w, int h, rdr::InStream* is,
 		rdr::ZlibInStream* zis, rdr::U32* buf);
-	void zrleDecode24B(int x, int y, int w, int h, rdr::InStream* is,
+	void zrleDecode24BLE(int x, int y, int w, int h, rdr::InStream* is,
 		rdr::ZlibInStream* zis, rdr::U32* buf);
-	void zrleDecode32(int x, int y, int w, int h, rdr::InStream* is,
+	void zrleDecode32LE(int x, int y, int w, int h, rdr::InStream* is,
 		rdr::ZlibInStream* zis, rdr::U32* buf);
+	long zywrle;
+	long zywrle_level;
+	int zywrleBuf[rfbZRLETileWidth*rfbZRLETileHeight];
 	//UltraFast
 	void ConvertAll(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth);
 	void SolidColor(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth);

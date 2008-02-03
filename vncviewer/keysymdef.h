@@ -1146,7 +1146,7 @@ SOFTWARE.
 #define XK_Greek_ETAaccent                             0x7a3
 #define XK_Greek_IOTAaccent                            0x7a4
 #define XK_Greek_IOTAdieresis                          0x7a5
-#define XK_Greek_IOTAdiaeresis         XK_Greek_IOTAdieresis /* old typo */
+#define XK_Greek_IOTAdiaeresis                         0x7a5
 #define XK_Greek_OMICRONaccent                         0x7a7
 #define XK_Greek_UPSILONaccent                         0x7a8
 #define XK_Greek_UPSILONdieresis                       0x7a9

@@ -11,11 +11,15 @@
 
 // Instantiate the decoding function for 8, 16 and 32 BPP
 
-#define FAVOUR_FILL_RECT
+//#define FAVOUR_FILL_RECT
 
 #define zrleDecode ClientConnection::zrleDecode
 
+#define ENDIAN_LITTLE 0
+#define ENDIAN_BIG 1
+#define ENDIAN_NO 2
 #define BPP 8
+#define ZYWRLE_ENDIAN ENDIAN_NO
 #define IMAGE_RECT(x,y,w,h,data)                \
     SETUP_COLOR_SHORTCUTS;                      \
     SETPIXELS(m_netbuf,8,x,y,w,h)
@@ -25,10 +29,12 @@
     FillSolidRect(x,y,w,h,color)
 #include <rfb/zrleDecode.h>
 #undef BPP
+#undef ZYWRLE_ENDIAN
 #undef IMAGE_RECT
 #undef FILL_RECT
 
 #define BPP 16
+#define ZYWRLE_ENDIAN ENDIAN_LITTLE
 #define IMAGE_RECT(x,y,w,h,data)                \
     SETUP_COLOR_SHORTCUTS;                      \
     SETPIXELS(m_netbuf,16,x,y,w,h)
@@ -38,6 +44,12 @@
     FillSolidRect(x,y,w,h,color)
 #include <rfb/zrleDecode.h>
 #undef BPP
+#undef ZYWRLE_ENDIAN
+#define BPP 15
+#define ZYWRLE_ENDIAN ENDIAN_LITTLE
+#include <rfb/zrleDecode.h>
+#undef BPP
+#undef ZYWRLE_ENDIAN
 #undef IMAGE_RECT
 #undef FILL_RECT
 
@@ -50,6 +62,7 @@
     FillSolidRect(x,y,w,h,color)
 
 #define BPP 32
+#define ZYWRLE_ENDIAN ENDIAN_LITTLE
 #include <rfb/zrleDecode.h>
 #define CPIXEL 24A
 #include <rfb/zrleDecode.h>
@@ -58,6 +71,7 @@
 #include <rfb/zrleDecode.h>
 #undef CPIXEL
 #undef BPP
+#undef ZYWRLE_ENDIAN
 #undef IMAGE_RECT
 #undef FILL_RECT
 
@@ -71,14 +85,32 @@ void ClientConnection::zrleDecode(int x, int y, int w, int h)
     ObjectSelector b(m_hBitmapDC, m_hBitmap);
     PaletteSelector p(m_hBitmapDC, m_hPalette);
 
+	if( zywrle ){
+	  if( !m_opts.m_enableJpegCompression ){
+		  zywrle_level = 1;
+	  }else if( m_opts.m_jpegQualityLevel < 3 ){
+		  zywrle_level = 3;
+	  }else if( m_opts.m_jpegQualityLevel < 6 ){
+		  zywrle_level = 2;
+	  }else{
+		  zywrle_level = 1;
+	  }
+	}else{
+	  zywrle_level = 0;
+	}
+
     switch (m_myFormat.bitsPerPixel) {
 
     case 8:
-      zrleDecode8(x,y,w,h,fis,zis,(rdr::U8*)m_netbuf);
+      zrleDecode8NE(x,y,w,h,fis,zis,(rdr::U8*)m_netbuf);
       break;
 
     case 16:
-      zrleDecode16(x,y,w,h,fis,zis,(rdr::U16*)m_netbuf);
+      if( m_myFormat.greenMax > 0x1F ){
+        zrleDecode16LE(x,y,w,h,fis,zis,(rdr::U16*)m_netbuf);
+	  }else{
+        zrleDecode15LE(x,y,w,h,fis,zis,(rdr::U16*)m_netbuf);
+	  }
       break;
 
     case 32:
@@ -94,16 +126,16 @@ void ClientConnection::zrleDecode(int x, int y, int w, int h)
       if ((fitsInLS3Bytes && !m_myFormat.bigEndian) ||
           (fitsInMS3Bytes && m_myFormat.bigEndian))
       {
-        zrleDecode24A(x,y,w,h,fis,zis,(rdr::U32*)m_netbuf);
+        zrleDecode24ALE(x,y,w,h,fis,zis,(rdr::U32*)m_netbuf);
       }
       else if ((fitsInLS3Bytes && m_myFormat.bigEndian) ||
                (fitsInMS3Bytes && !m_myFormat.bigEndian))
       {
-        zrleDecode24B(x,y,w,h,fis,zis,(rdr::U32*)m_netbuf);
+        zrleDecode24BLE(x,y,w,h,fis,zis,(rdr::U32*)m_netbuf);
       }
       else
       {
-        zrleDecode32(x,y,w,h,fis,zis,(rdr::U32*)m_netbuf);
+        zrleDecode32LE(x,y,w,h,fis,zis,(rdr::U32*)m_netbuf);
       }
       break;
     }

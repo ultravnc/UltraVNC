@@ -51,6 +51,13 @@
 #include "shlobj.h"
 #include "zlib/zlib.h"
 
+// [v1.0.2-jp1 fix] yak!'s File transfer patch
+// Simply forward strchr() and strrchr() to _mbschr() and _mbsrchr() to avoid 0x5c problem, respectively.
+// Probably, it is better to write forward functions internally.
+#include <mbstring.h>
+#define strchr(a, b) reinterpret_cast<char*>(_mbschr(reinterpret_cast<unsigned char*>(a), b))
+#define strrchr(a, b) reinterpret_cast<char*>(_mbsrchr(reinterpret_cast<unsigned char*>(a), b))
+
 // These strings contain all the translated FT messages 
 extern char sz_H1[64];
 extern char sz_H2[64];
