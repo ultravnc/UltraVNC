@@ -710,7 +710,7 @@ BOOL CALLBACK EnumWindowsHnd(HWND hwnd, LPARAM arg)
  char buffer[128];
  char szNameAppli[16];
 
- strcpy(szNameAppli, (LPSTR)(((vncDesktop*)arg)->GetServerPointer()->GetWindowName()));
+ strncpy(szNameAppli, (LPSTR)(((vncDesktop*)arg)->GetServerPointer()->GetWindowName()),15);
  szNameAppli[15]=0;
  nRet = GetWindowText(hwnd, buffer, sizeof(buffer));
  if (nRet > 0)
