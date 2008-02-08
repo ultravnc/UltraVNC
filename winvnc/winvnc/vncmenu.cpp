@@ -615,7 +615,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		// sf@2007 - Can't get the WTS_CONSOLE_CONNECT message work properly for now..
 		// So use a hack instead
 
-		if ( ! _this->m_server->GetDisableTrayIcon())
+if ( ! _this->m_server->GetDisableTrayIcon())
 			{
 				vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::TIMER TrayIcon 5s hack\n"));
 
