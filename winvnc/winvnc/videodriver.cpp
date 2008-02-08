@@ -135,7 +135,9 @@ PCHAR VIDEODRIVER::VideoMemory_GetSharedMemory(void)
    PCHAR pVideoMemory=NULL;
    HANDLE hMapFile, hFile; 
    
-   hFile = CreateFile("c:\\video.dat", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+   hFile = CreateFile("c:\\video0.dat", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+   if (!(hFile && hFile != INVALID_HANDLE_VALUE)) hFile = CreateFile("c:\\video1.dat", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+
 
    if(hFile && hFile != INVALID_HANDLE_VALUE)
    {
