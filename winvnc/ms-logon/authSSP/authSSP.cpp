@@ -253,7 +253,7 @@ const char *SplitString(const char *input, char separator, char *head){
 
 bool IsImpersonationAllowed() {
 	bool isImpersonationAllowed = false;
-	HANDLE hToken;
+	HANDLE hToken = NULL;
 	DWORD dwReturnLength = 0;
 	LUID impersonatePrivilege;
 	TOKEN_PRIVILEGES *ptp = NULL;

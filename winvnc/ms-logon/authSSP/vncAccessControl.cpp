@@ -145,7 +145,7 @@ vncAccessControl::StoreACL(PACL pACL){
     HKEY hk = NULL; 
 	BOOL isSaveOK = FALSE;
 
-	ACL_SIZE_INFORMATION AclInfo;
+    ACL_SIZE_INFORMATION AclInfo = {0, 0, 0};
 	DWORD nAclInformationLength = sizeof(AclInfo);
 
 	// Todo: Better error handling

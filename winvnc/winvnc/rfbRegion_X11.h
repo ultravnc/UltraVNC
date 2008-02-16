@@ -82,6 +82,6 @@ namespace rfb {
 
   typedef Region Region2D;
 
-};
+}
 
 #endif // __RFB_REGION_X11_INCLUDED__

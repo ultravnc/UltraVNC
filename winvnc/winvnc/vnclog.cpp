@@ -35,17 +35,19 @@ const int VNCLog::ToDebug   =  1;
 const int VNCLog::ToFile    =  2;
 const int VNCLog::ToConsole =  4;
 
-const static int LINE_BUFFER_SIZE = 1024;
+static const int LINE_BUFFER_SIZE = 1024;
 
 VNCLog::VNCLog()
+    : m_tofile(false)
+    , m_todebug(false)
+    , m_toconsole(false)
+    , m_mode(0)
+    , m_level(0)
+    , hlogfile(NULL)
+    , m_filename(NULL)
+    , m_append(false)
+    , m_lastLogTime(0)
 {
-	m_lastLogTime = 0;
-	m_filename = NULL;
-	m_append = false;
-    hlogfile = NULL;
-    m_todebug = false;
-    m_toconsole = false;
-    m_tofile = false;
 }
 
 void VNCLog::SetMode(int mode)
@@ -66,7 +68,7 @@ void VNCLog::SetMode(int mode)
     
     if (mode & ToConsole) {
         if (!m_toconsole) {
-            AllocConsole();
+            AllocConsole(); //lint !e534
             fclose(stdout);
             fclose(stderr);
 #ifdef _MSC_VER
@@ -189,7 +191,7 @@ void VNCLog::ReallyPrint(const char* format, va_list ap)
 	SetLastError(0);
 	FormatMessage( 
          FORMAT_MESSAGE_FROM_SYSTEM, NULL, dwErrorCode,
-         MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),(char *)&szErrorMsg,
+         MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),(char *)&szErrorMsg, //lint !e545
          LINE_BUFFER_SIZE, NULL);
     _vsnprintf(line, LINE_BUFFER_SIZE, format, ap);
 	strcat(line," --");
@@ -202,10 +204,16 @@ VNCLog::~VNCLog()
 {
 	if (m_filename != NULL)
 		free(m_filename);
-    CloseFile();
+    try
+    {
+        CloseFile();
+    }
+    catch(...)
+    {
+    }
 }
 
-void VNCLog::GetLastErrorMsg(LPSTR szErrorMsg) {
+void VNCLog::GetLastErrorMsg(LPSTR szErrorMsg) const {
 
    DWORD  dwErrorCode = GetLastError();
 

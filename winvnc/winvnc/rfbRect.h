@@ -109,7 +109,7 @@ namespace rfb {
 	// An STL vector containing Rects. 
 	typedef std::vector<Rect> RectVector;
 
-};
+}
 
 
 #endif // __RFB_RECT_INCLUDED__

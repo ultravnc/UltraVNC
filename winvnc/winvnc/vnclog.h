@@ -71,11 +71,11 @@ public:
     
     // Change the log level
     void SetLevel(int level);
-	int  GetLevel() {return m_level;};
+	int  GetLevel() const {return m_level;};
 
     // Change the logging mode
     void SetMode(int mode);
-	int  GetMode() {return m_mode;};
+	int  GetMode() const {return m_mode;};
 
     // Change or set the logging filename.  This only has an effect if
 	// the log mode includes ToFile
@@ -96,7 +96,7 @@ private:
 	bool m_append;
 
 	time_t m_lastLogTime;
-	void GetLastErrorMsg(LPSTR szErrorMsg);
+	void GetLastErrorMsg(LPSTR szErrorMsg) const;
 };
 
 #endif // VNCLOGGING
