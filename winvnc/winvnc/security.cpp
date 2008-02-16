@@ -42,7 +42,7 @@ ImpersonateCurrentUser() {
    process=0;
   Token=NULL;
   GetCurrentUserToken();
-  bool test=ImpersonateLoggedOnUser(Token);
+  bool test=(FALSE != ImpersonateLoggedOnUser(Token));
   if (process) CloseHandle(process);
   if (Token) CloseHandle(Token);
   return test;
@@ -50,7 +50,7 @@ ImpersonateCurrentUser() {
 
 bool
 RevertCurrentUser() {
-  return RevertToSelf();
+  return (FALSE != RevertToSelf());
 }
 
 bool RunningAsAdministrator ()
@@ -126,5 +126,5 @@ bool RunningAsAdministrator ()
  FreeSid ( psidAdmin);
  if (process) CloseHandle(process);
  if (Token) CloseHandle(Token);
- return ( fAdmin);
+ return (FALSE != fAdmin);
 }

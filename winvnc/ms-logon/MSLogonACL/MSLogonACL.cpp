@@ -41,35 +41,35 @@ int _tmain(int argc, TCHAR *argv[])
 				else if (_tcsicmp(argv[2], _T("/o")) == 0 || _tcsicmp(argv[2], _T("-o")) == 0)
 					; //override
 				else {
-					usage(argv[0]);
+					usage_(argv[0]);
 					return 1;
 				}
 				if (!_tfreopen(argv[3], _T("r"), stdin)) {
 					_tprintf(_T("Error opening file %s"), argv[3]);
-					usage(argv[0]);
+					usage_(argv[0]);
 					return 1;
 				}
 			}
-			rc = import(append);
+			rc = import_(append);
 		} else if (_tcsicmp(argv[1], _T("/e")) == 0 || _tcsicmp(argv[1], _T("-e")) == 0) {
 			if (argc > 2)
 				if (!_tfreopen(argv[2], _T("w"), stdout)) {
 					_tprintf(_T("Error opening file %s"), argv[2]);
-					usage(argv[0]);
+					usage_(argv[0]);
 					return 1;
 				}
-			rc = export();
+			rc = export_();
 		} else {
-			usage(argv[0]);
+			usage_(argv[0]);
 		}
 	} else {
-		usage(argv[0]);
+		usage_(argv[0]);
 	}
 	return rc;
 }
 
 int 
-import(bool append){
+import_(bool append){
 	int rc = 0;
 	vncImportACL importAcl;
 	PACL pACL = NULL; //?
@@ -88,7 +88,7 @@ import(bool append){
 }
 
 int
-export()
+export_()
 {
 	PACL pACL = NULL;
 
@@ -102,7 +102,7 @@ export()
 }
 
 
-void usage(const TCHAR *appname){
+void usage_(const TCHAR *appname){
 	_tprintf(_T("Usage:\n%s /e <file>\n\t for exporting an ACL to an (optional) file.\n"), appname);
 	_tprintf(_T("%s /i <mode> <file>\n\t for importing an ACL where mode is either\n"), appname);
 	_tprintf(_T("\t/o for override or /a for append and file holds the ACEs.\n"));

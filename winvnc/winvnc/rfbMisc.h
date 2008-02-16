@@ -113,7 +113,7 @@ namespace rfb {
 		__int64 start_kernel_time;
 		__int64 start_user_time;
 	};
-};
+}
 
 #endif
 

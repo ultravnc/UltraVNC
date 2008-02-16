@@ -1592,7 +1592,7 @@ vncClientThread::run(void *arg)
 
 					// Get the keymapper to do the work
 					// m_client->m_keymap.DoXkeysym(msg.ke.key, msg.ke.down);
-					vncKeymap::keyEvent(msg.ke.key, msg.ke.down);
+					vncKeymap::keyEvent(msg.ke.key, (0 != msg.ke.down));
 
 					m_client->m_remoteevent = TRUE;
 				}

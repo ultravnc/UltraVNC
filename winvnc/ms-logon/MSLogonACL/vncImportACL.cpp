@@ -218,7 +218,7 @@ bool vncImportACL::SetACL(PACL pACL){
 	bool isSaveOK = false;
 
 	
-	ACL_SIZE_INFORMATION AclInformation;
+    ACL_SIZE_INFORMATION AclInformation = {0, 0, 0};
 	DWORD nAclInformationLength = sizeof(AclInformation);
 
 	// Todo: Better error handling

@@ -1095,10 +1095,10 @@ vncBuffer::Display(int number)
 int
 vncBuffer::GetDisplay()
 {
-	if (m_display_prim==false &&m_display_sec==false) return 1;//we need at least 1 display
-	if (m_display_prim==true &&m_display_sec==false) return 1;
-	if (m_display_prim==false &&m_display_sec==true) return 2;
-	if (m_display_prim==true &&m_display_sec==true) return 3;
+	if ((FALSE == m_display_prim) && (FALSE == m_display_sec)) return 1;//we need at least 1 display
+	if ((FALSE != m_display_prim) && (FALSE == m_display_sec)) return 1;
+	if ((FALSE == m_display_prim) && (FALSE != m_display_sec)) return 2;
+	if ((FALSE != m_display_prim) && (FALSE != m_display_sec)) return 3;
 	return 1;
 }
 

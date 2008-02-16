@@ -1931,7 +1931,6 @@ void vncProperties::LoadFromIniFile()
 	//}
 
 	char username[UNLEN+1];
-	DWORD dw;
 
 	// Get the user name / service name
 	if (!vncService::CurrentUser((char *)&username, sizeof(username)))
@@ -2089,8 +2088,6 @@ void vncProperties::LoadUserPrefsFromIniFile()
 
 void vncProperties::SaveToIniFile()
 {
-	DWORD dw;
-
 	if (!m_allowproperties)
 		return;
 

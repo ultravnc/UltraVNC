@@ -23,7 +23,9 @@
 // the authors on vnc@uk.research.att.com for information on obtaining it.
 
 #define WIN32_LEAN_AND_MEAN
+#ifndef STRICT
 #define STRICT
+#endif
 
 #include <winsock2.h>
 #include <windows.h>

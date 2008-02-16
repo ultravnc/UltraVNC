@@ -1533,7 +1533,7 @@ vncServer::GetScreenInfo(int &width, int &height, int &depth)
 									}
 								else
 									{
-										scrinfo.format.bitsPerPixel = m_bminfo.bmi.bmiHeader.biBitCount;
+										scrinfo.format.bitsPerPixel = (CARD8)(m_bminfo.bmi.bmiHeader.biBitCount);
 										if (scrinfo.format.bitsPerPixel==24) scrinfo.format.bitsPerPixel=32;
 									}
 							}//result

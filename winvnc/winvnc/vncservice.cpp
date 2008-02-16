@@ -773,6 +773,6 @@ vncService::IsInstalled()
         }
         ::CloseServiceHandle(hSCM);
     }
-    return bResult;
+    return (FALSE != bResult);
 }
 

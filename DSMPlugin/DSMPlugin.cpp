@@ -294,7 +294,7 @@ bool CDSMPlugin::LoadPlugin(char* szPlugin, bool fAllowMulti)
 			strcpy(szDllCopyName, szPlugin);
 			szDllCopyName[strlen(szPlugin) - 4] = '\0'; //remove the ".dsm" extension
 			sprintf(szDllCopyName, "%s-tmp.d%d", szDllCopyName, i++);
-			fDllCopyCreated = (bool) CopyFile(szPlugin, szDllCopyName, false); 
+			fDllCopyCreated = (FALSE != CopyFile(szPlugin, szDllCopyName, false));
 			// Note: Let's be really dirty; Overwrite if it's possible only (dll not loaded). 
 			// This way if for some reason (abnormal process termination) the dll wasn't previously 
 			// normally deleted we overwrite/clean it with the new one at the same time.
@@ -353,7 +353,7 @@ bool CDSMPlugin::UnloadPlugin(void)
 	if ((*m_PShutdown)())
 	{
 		bool fFreed = false;
-		fFreed = FreeLibrary(m_hPDll); 
+		fFreed = (FALSE != FreeLibrary(m_hPDll));
 		if (*m_szDllName) DeleteFile(m_szDllName);
 		return fFreed;
 	}

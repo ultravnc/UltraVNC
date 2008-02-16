@@ -147,11 +147,11 @@ rfb::Region Region::subtract(const Region& r) const {
 
 
 bool Region::equals(const Region& b) const {
-  return XEqualRegion(Xrgn, b.Xrgn);
+  return (0 != XEqualRegion(Xrgn, b.Xrgn));
 }
 
 bool Region::is_empty() const {
-  return XEmptyRegion(Xrgn);
+  return (0 != XEmptyRegion(Xrgn));
 }
 
 

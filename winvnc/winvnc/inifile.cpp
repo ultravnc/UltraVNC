@@ -68,7 +68,7 @@ char WORKDIR[MAX_PATH];
 void
 IniFile::copy_to_secure()
 {
-        char dir[MAX_PATH], *ptr;
+		char dir[MAX_PATH];
 
 		char exe_file_name[MAX_PATH];
 		GetModuleFileName(0, exe_file_name, MAX_PATH);
@@ -119,7 +119,7 @@ bool
 IniFile::WriteString(char *key1, char *key2,char *value)
 {
 	//vnclog.Print(LL_INTERR, VNCLOG("%s \n"),myInifile); 
-	return WritePrivateProfileString(key1,key2, value,myInifile);
+	return (FALSE != WritePrivateProfileString(key1,key2, value,myInifile));
 }
 
 bool 
@@ -128,7 +128,7 @@ IniFile::WriteInt(char *key1, char *key2,int value)
 	char       buf[32];
 	wsprintf(buf, "%d", value);
 	//vnclog.Print(LL_INTERR, VNCLOG("%s \n"),myInifile);
-	return WritePrivateProfileString(key1,key2, buf,myInifile);
+	return (FALSE != WritePrivateProfileString(key1,key2, buf,myInifile));
 }
 
 int
@@ -158,7 +158,7 @@ IniFile::WritePassword(char *value)
 {
 		//WriteInt("ultravnc", "passwdsize",sizeof(value));
 		//vnclog.Print(LL_INTERR, VNCLOG("%s \n"),myInifile);
-		return WritePrivateProfileStruct("ultravnc","passwd", value,8,myInifile);
+		return (FALSE != WritePrivateProfileStruct("ultravnc","passwd", value,8,myInifile));
 }
 
 

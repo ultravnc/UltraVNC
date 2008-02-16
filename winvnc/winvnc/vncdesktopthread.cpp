@@ -393,7 +393,7 @@ vncDesktopThread::run_undetached(void *arg)
 	m_desktop->m_hookinited = FALSE;
 
 	// Set driver cursor state
-	XRichCursorEnabled=m_desktop->m_server->IsXRichCursorEnabled();
+	XRichCursorEnabled= (FALSE != m_desktop->m_server->IsXRichCursorEnabled());
 	if (!XRichCursorEnabled && m_desktop->m_videodriver) m_desktop->m_videodriver->HardwareCursor();
 	if (XRichCursorEnabled && m_desktop->m_videodriver) m_desktop->m_videodriver->NoHardwareCursor();
 	if (XRichCursorEnabled) m_server->UpdateCursorShape();
@@ -525,7 +525,7 @@ vncDesktopThread::run_undetached(void *arg)
 												m_server->KillAuthClients();
 												break;
 											}					
-										bool fHookDriverWanted = m_desktop->m_hookdriver;
+										bool fHookDriverWanted = (FALSE != m_desktop->m_hookdriver);
 										vnclog.Print(LL_INTERR, VNCLOG("m_desktop->Startup"));
 										if (!m_desktop->Startup())
 											{
@@ -918,7 +918,7 @@ vncDesktopThread::run_undetached(void *arg)
 					// This is Disabled for now.
 					if( !XRichCursorEnabled==m_desktop->m_server->IsXRichCursorEnabled())
 						{
-							XRichCursorEnabled=m_desktop->m_server->IsXRichCursorEnabled();
+							XRichCursorEnabled= (FALSE != m_desktop->m_server->IsXRichCursorEnabled());
 							if (m_desktop->m_videodriver)
 									{
 											if (!XRichCursorEnabled) m_desktop->m_videodriver->HardwareCursor();

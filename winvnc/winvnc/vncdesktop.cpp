@@ -476,11 +476,11 @@ vncDesktop::Startup()
 
 	// Modif rdv@2002 - v1.1.x - videodriver
 	vnclog.Print(LL_INTINFO, VNCLOG("InitVideo driver Called\n"));
-	if (DriverWantedSet==true)
+	if (FALSE != DriverWantedSet)
 			{
 			m_server->Driver(DriverWanted);
 			m_server->Hook(HookWanted);
-			DriverWantedSet=false;
+			DriverWantedSet=FALSE;
 			}
 	if (m_server->Driver())
 				{
@@ -490,7 +490,7 @@ vncDesktop::Startup()
 							InitVideoDriver();
 						}
 				}
-	vnclog.Print(LL_INTINFO, VNCLOG("Driver option dsiabled \n"));
+	vnclog.Print(LL_INTINFO, VNCLOG("Driver option disabled \n"));
 	if (m_Origpolling) m_server->PollFullScreen(m_Origpolling);
 	m_OrigpollingSet=false;
 	
@@ -1993,7 +1993,7 @@ vncDesktop::SetDisableInput(bool enabled)
 			DWORD dwTId;
 			ThreadHandle2 = CreateThread(NULL, 0, BlackWindow, NULL, 0, &dwTId);
 			CloseHandle(ThreadHandle2);
-			OldCaptureBlending=m_fCaptureAlphaBlending;
+			OldCaptureBlending=(FALSE != m_fCaptureAlphaBlending);
 			m_fCaptureAlphaBlending=false;
 		}
 	}

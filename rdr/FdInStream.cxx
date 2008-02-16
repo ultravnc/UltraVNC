@@ -194,7 +194,7 @@ static void gettimeofday(struct timeval* tv, void*)
 
 int FdInStream::readWithTimeoutOrCallback(void* buf, int len)
 {
-  struct timeval before, after;
+  struct timeval before = {0, 0}, after; // before will not get initialized if the condition is false
   if (timing)
     gettimeofday(&before, 0);
 

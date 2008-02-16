@@ -543,7 +543,7 @@ bool ImpersonateCurrentUser_()
 	 vnclog.Print(LL_INTERR, VNCLOG("!GetCurrentUserToken_ \n"));
      return false;
   }
-  bool test=ImpersonateLoggedOnUser(Token_);
+  bool test=(FALSE != ImpersonateLoggedOnUser(Token_));
   if (test==1) vnclog.Print(LL_INTERR, VNCLOG("ImpersonateLoggedOnUser OK \n"));
   if (process_) CloseHandle(process_);
   if (Token_) CloseHandle(Token_);

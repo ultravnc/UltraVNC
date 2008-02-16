@@ -513,9 +513,9 @@ vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 
 //	vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::SendTrayMsg - Shell_NotifyIcon call\n"));
 	// Send the message
-	if (msg ==NIM_MODIFY && IsIconSet==false) return; //no icon to modify
-	if (msg ==NIM_ADD && IsIconSet==true) return; //no icon to set
-	if (msg ==NIM_DELETE)
+	if ((msg == NIM_MODIFY) && (IsIconSet == FALSE)) return; //no icon to modify
+	if ((msg ==NIM_ADD) && (IsIconSet != FALSE)) return; //no icon to set
+	if (msg == NIM_DELETE)
 	{
 		IsIconSet=false;
 		IconFaultCounter=0;

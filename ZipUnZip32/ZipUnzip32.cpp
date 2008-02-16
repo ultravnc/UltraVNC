@@ -91,7 +91,7 @@ CZipUnZip32::~CZipUnZip32()
 // 
 bool CZipUnZip32::ZipDirectory(char* szRootDir, char* szDirectoryToZip, char* szZipFileName, bool fCompress)
 {
-	LPSTR szFileList;
+	LPSTR szFileList = NULL;
 	char **index, *sz;
 	int retcode, i, cc;
 	char szFullPath[MAX_PATH];
@@ -170,7 +170,7 @@ bool CZipUnZip32::ZipDirectory(char* szRootDir, char* szDirectoryToZip, char* sz
 	{
 	  szFileList = (char far *)GlobalLock(m_hFileList);
 	}
-	index = (char **)szFileList;
+	index = (char **)szFileList; // WARNING: szFileList potentially a NULL ptr
 	cc = (sizeof(char *) * m_ZpZCL.argc);
 	sz = szFileList + cc;
 	for (i = 0; i < m_ZpZCL.argc; i++)
