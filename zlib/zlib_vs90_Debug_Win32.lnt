@@ -3,7 +3,8 @@
 // -dConfiguration=Debug|Win32
 //
 -D_MBCS                         // CharacterSet = "2"
--DWIN32;_DEBUG;_LIB             // PreprocessorDefinitions = "WIN32;_DEBUG;_LIB"
+-DWIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS
+                                // PreprocessorDefinitions = "WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS"
 -D_NATIVE_WCHAR_T_DEFINED       // TreatWChar_tAsBuiltInType = "TRUE"
 -D_MT;_DEBUG                    // RuntimeLibrary = "1"
 

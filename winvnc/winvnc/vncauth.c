@@ -51,7 +51,7 @@ unsigned char fixedkey[8] = {23,82,107,6,35,78,88,7};
 int
 vncEncryptPasswd(char *passwd, char *encryptedPasswd)
 {
-    int i;
+    size_t i;
 
     /* pad password with nulls */
 

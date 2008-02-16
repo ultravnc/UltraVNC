@@ -2,7 +2,10 @@
 #include "vncDesktopThread.h"
 #include "Localization.h"
 #include "vncTimedMsgBox.h"
-int g_Oldcounter=0;
+namespace
+{
+    int g_Oldcounter=0;
+}
 bool stop_hookwatch=false;
 
 inline bool
