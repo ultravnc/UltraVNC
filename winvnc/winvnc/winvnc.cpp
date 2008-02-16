@@ -48,7 +48,7 @@
 #include "videodriver.h"
 
 // [v1.0.2-jp1 fix] Support "LinkLabel"
-#include "LinkLabel.h"
+//#include "LinkLabel.h"
 
 //#define CRASH_ENABLED
 #ifdef CRASH_ENABLED
@@ -118,7 +118,7 @@ Myinit(HINSTANCE hInstance)
 	{
 		hInstResDLL = hInstance;
 	}
-	RegisterLinkLabel(hInstResDLL);
+//	RegisterLinkLabel(hInstResDLL);
 
     //Load all messages from ressource file
     Load_Localization(hInstResDLL) ;
@@ -180,7 +180,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 	{
 		hInstResDLL = hInstance;
 	}
-	RegisterLinkLabel(hInstResDLL);
+//	RegisterLinkLabel(hInstResDLL);
 
     //Load all messages from ressource file
     Load_Localization(hInstResDLL) ;
