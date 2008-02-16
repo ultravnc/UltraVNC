@@ -83,7 +83,7 @@ BOOL SetTBCPrivileges(VOID) {
 DWORD GetwinlogonPid()
 {
 	DWORD dwSessionId;
-	DWORD dwExplorerLogonPid;
+	DWORD dwExplorerLogonPid=0;
 	PROCESSENTRY32 procEntry;
 
 	dwSessionId=0;

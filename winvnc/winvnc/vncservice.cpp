@@ -78,7 +78,7 @@ DWORD GetCurrentSessionID()
 DWORD GetExplorerLogonPid()
 {
 	DWORD dwSessionId;
-	DWORD dwExplorerLogonPid;
+	DWORD dwExplorerLogonPid=0;
 	PROCESSENTRY32 procEntry;
 //	HANDLE hProcess,hPToken;
 
