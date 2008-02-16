@@ -28,7 +28,7 @@
 #include "Exception.h"
 
 // [v1.0.2-jp1 fix] Support "LinkLabel"
-#include "LinkLabel.h"
+//#include "LinkLabel.h"
 
 #ifdef UNDER_CE
 #include "omnithreadce.h"
@@ -556,7 +556,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 	LoadString(m_hInstResDLL, IDS_M7, sz_M7, 64 -1);
 	LoadString(m_hInstResDLL, IDS_M8, sz_M8, 64 -1);  
 
-	RegisterLinkLabel(m_hInstResDLL);
+//	RegisterLinkLabel(m_hInstResDLL);
 
 
 	/////////////////////////////////////////////////////////////
