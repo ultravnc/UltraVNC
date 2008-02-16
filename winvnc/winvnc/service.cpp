@@ -18,9 +18,24 @@ PROCESS_INFORMATION  ProcessInfo;
 int counter=0;
 extern char cmdtext[256];
 int kickrdp=0;
+bool W2K=0;
 //////////////////////////////////////////////////////////////////////////////
 static int pad2()
 {
+
+	OSVERSIONINFO OSversion;
+	
+	OSversion.dwOSVersionInfoSize=sizeof(OSVERSIONINFO);
+
+	GetVersionEx(&OSversion);
+	W2K=0;
+	switch(OSversion.dwPlatformId)
+	{
+		case VER_PLATFORM_WIN32_NT:
+						  if(OSversion.dwMajorVersion==5 && OSversion.dwMinorVersion==0)
+									 W2K=1;							    
+								  
+	}
 	char exe_file_name[MAX_PATH];
 	char cmdline[MAX_PATH];
     GetModuleFileName(0, exe_file_name, MAX_PATH);
@@ -61,6 +76,44 @@ BOOL SetTBCPrivileges(VOID) {
   CloseHandle(hToken);
   CloseHandle(hProcess);
   return TRUE;
+}
+//////////////////////////////////////////////////////////////////////////////
+#include <tlhelp32.h>
+
+DWORD GetwinlogonPid()
+{
+	DWORD dwSessionId;
+	DWORD dwExplorerLogonPid;
+	PROCESSENTRY32 procEntry;
+
+	dwSessionId=0;
+
+	
+
+    HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if (hSnap == INVALID_HANDLE_VALUE)
+    {
+        return 0 ;
+    }
+
+    procEntry.dwSize = sizeof(PROCESSENTRY32);
+
+    if (!Process32First(hSnap, &procEntry))
+    {
+		CloseHandle(hSnap);
+        return 0 ;
+    }
+
+    do
+    {
+        if (_stricmp(procEntry.szExeFile, "winlogon.exe") == 0)
+        {
+			dwExplorerLogonPid = procEntry.th32ProcessID;
+        }
+
+    } while (Process32Next(hSnap, &procEntry));
+	CloseHandle(hSnap);
+	return dwExplorerLogonPid;
 }
 //////////////////////////////////////////////////////////////////////////////
 DWORD
@@ -104,8 +157,9 @@ get_winlogon_handle(OUT LPHANDLE  lphUserToken)
 	HANDLE hTokenThis = NULL;
 	DWORD ID_session=0;
 	if (lpfnWTSGetActiveConsoleSessionId!=NULL) ID_session=lpfnWTSGetActiveConsoleSessionId();
-
-	DWORD Id=Find_winlogon(ID_session);
+	DWORD Id=0;
+	if (W2K==0) Id=Find_winlogon(ID_session);
+	else Id=GetwinlogonPid();
 	#ifdef _DEBUG
 					char			szText[256];
 					DWORD error=GetLastError();
