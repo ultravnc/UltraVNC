@@ -13,7 +13,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// 日本語 resources
+// Japanese resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
 #ifdef _WIN32
@@ -174,11 +174,10 @@ BEGIN
                     NOT WS_VISIBLE
     LTEXT           "1  /",IDC_STATIC,253,153,12,8
     LTEXT           "by",IDC_STATIC,259,139,10,8,NOT WS_VISIBLE
-    CONTROL         "スポンサー広告を表示しない",IDC_CHECK1,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,160,185,149,10
+    CONTROL         "スポンサー広告を表示しない",IDC_CHECK1,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,160,185,149,10
     EDITTEXT        IDC_SERVER_RECON,159,170,16,12,ES_AUTOHSCROLL
-    LTEXT           "回 再接続を試行する",IDC_STATIC,
-                    180,171,143,11
+    LTEXT           "回 再接続を試行する",IDC_STATIC,180,171,143,11
 END
 
 IDD_FILETRANSFER_DLG DIALOGEX 0, 0, 491, 247
@@ -427,18 +426,16 @@ BEGIN
     LTEXT           "",IDC_STATIC_SPLIT,3,124,300,8,SS_NOTIFY
 END
 
-IDD_APP_ABOUT DIALOG DISCARDABLE  0, 0, 290, 198
+IDD_APP_ABOUT DIALOG DISCARDABLE  0, 0, 290, 134
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "VNCビューアのバージョン情報"
 FONT 9, "ＭＳ Ｐゴシック"
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,7,175,62,14
+    DEFPUSHBUTTON   "OK",IDOK,6,111,62,14
     CONTROL         156,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE | 
                     SS_SUNKEN,8,7,62,54
-    LTEXT           "UltraVNC Win32 ビューア 1.0.4 RC9 - jp1",
-                    IDC_STATIC,86,6,151,8
-    LTEXT           "UltraVNC（オリジナルの英語版）の公式サイト：",
-                    IDC_STATIC,86,133,135,8
+    LTEXT           "UltraVNC Win32 ビューア 1.0.4 RC12 - jp1",IDC_STATIC,86,
+                    6,151,8
     LTEXT           "Copyright(C) 2002-2005 Ultr@VNC Team\nCopyright(C) 2001-2002 Sam - eSVNC \nCopyright(C) 1999-2002 Rudi D. V. - VdaccVNC \nCopyright(C) 1999-2002 Const. Kaplinsky - TightVNC \nCopyright(C) 2002 RealVNC Ltd. - RealVNC\n",
                     IDC_STATIC,86,30,200,40
     LTEXT           "作成日：",IDC_STATIC,89,17,25,8
@@ -447,15 +444,6 @@ BEGIN
                     IDC_STATIC,86,70,204,32
     LTEXT           "Copyright(C) 1990-2002 Info-ZIP\nCopyright(C) 1996-2002 Markus Franz Xaver Johannes Oberhumer - Mini LZO library",
                     IDC_STATIC,86,102,198,24
-    CONTROL         "http://ultravnc.sf.net/|http://ultravnc.sf.net/",
-                    IDC_STATIC,"LinkLabel",WS_TABSTOP,86,141,104,8
-    LTEXT           "ベースにした日本語版の公開サイト：",IDC_STATIC,86,155,160,8
-    CONTROL         "http://kp774.com/|http://kp774.com/",IDC_STATIC,
-                    "LinkLabel",WS_TABSTOP,86,163,60,8
-    LTEXT           "SVN Rev 169 に適用：",
-                    IDC_STATIC,86,175,169,8
-    CONTROL         "http://yak.myhome.cx/junks/|http://yak.myhome.cx/junks/",IDC_CUSTOM3,
-                    "LinkLabel",WS_TABSTOP,86,183,104,8
 END
 
 IDD_FTCONFIRM_DLG DIALOG DISCARDABLE  0, 0, 178, 86
@@ -537,6 +525,11 @@ BEGIN
         BOTTOMMARGIN, 163
     END
 
+    IDD_AUTH_DIALOG2, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 92
+    END
+
     IDD_CUSTUM_KEY, DIALOG
     BEGIN
         LEFTMARGIN, 7
@@ -595,13 +588,8 @@ BEGIN
         VERTGUIDE, 108
         VERTGUIDE, 283
         TOPMARGIN, 7
-        BOTTOMMARGIN, 172
+        BOTTOMMARGIN, 108
         HORZGUIDE, 29
-    END
-
-    IDD_AUTH_DIALOG2, DIALOG
-    BEGIN
-        BOTTOMMARGIN, 92
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -653,9 +641,9 @@ VS_VERSION_INFO VERSIONINFO
  PRODUCTVERSION 1,0,4,901
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
- FILEFLAGS 0x2DL
+ FILEFLAGS 0x2dL
 #else
- FILEFLAGS 0x2CL
+ FILEFLAGS 0x2cL
 #endif
  FILEOS 0x40004L
  FILETYPE 0x2L
@@ -1045,9 +1033,7 @@ BEGIN
     IDS_M8                  "リモートの名前変更完了"
 END
 
-
-
-#endif    // 日本語 resources
+#endif    // Japanese resources
 /////////////////////////////////////////////////////////////////////////////
 
 
