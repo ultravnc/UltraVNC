@@ -44,9 +44,8 @@ LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
 //
 // 24
 //
-#ifndef _X64
+
 IDR_MANIFEST            24      DISCARDABLE     "vncviewer.exe.manifest"
-#endif
 #endif    // German (Germany) resources
 /////////////////////////////////////////////////////////////////////////////
 
@@ -148,7 +147,7 @@ END
 IDD_OPTIONDIALOG DIALOGEX 0, 0, 323, 217
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION " Connection Options..."
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
     GROUPBOX        "Format and Encoding",IDC_STATIC,4,2,150,160
     CONTROL         "Auto select best settings",IDC_AUTODETECT,"Button",
@@ -172,7 +171,8 @@ BEGIN
                     10
     CONTROL         "Ultra",IDC_ULTRA,"Button",BS_AUTORADIOBUTTON,41,83,29,
                     10
-	CONTROL         "ZYWRLE",IDC_ZYWRLERADIO,"Button",BS_AUTORADIOBUTTON,12,94,47,10
+    CONTROL         "ZYWRLE",IDC_ZYWRLERADIO,"Button",BS_AUTORADIOBUTTON,12,
+                    94,47,10
     GROUPBOX        "",IDC_STATIC,84,22,65,86,WS_GROUP
     CONTROL         "Full Colors",IDC_FULLCOLORS_RADIO,"Button",
                     BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,89,30,48,10
@@ -496,7 +496,7 @@ BEGIN
     PUSHBUTTON      "Minimize",IDC_HIDE_B,264,151,39,11
 END
 
-IDD_APP_ABOUT DIALOG DISCARDABLE  0, 0, 289, 159
+IDD_APP_ABOUT DIALOG DISCARDABLE  0, 0, 289, 156
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION " About VNCviewer"
 FONT 8, "MS Sans Serif"
@@ -518,14 +518,6 @@ BEGIN
                     IDC_STATIC,85,102,198,24
     CONTROL         "http://ultravnc.sf.net/|http://ultravnc.sf.net/",
                     IDC_CUSTOM1,"LinkLabel",WS_TABSTOP,86,140,104,8
-    LTEXT           "Unofficial patch for Japanese Environment made by:",
-                    IDC_STATIC,86,153,169,8
-    CONTROL         "http://kp774.com/|http://kp774.com/",IDC_CUSTOM2,
-                    "LinkLabel",WS_TABSTOP,86,160,60,8
-    LTEXT           "Adopt the patch to SVN Rev. 169 by:",IDC_STATIC,86,170,
-                    169,8
-    CONTROL         "http://yak.myhome.cx/junks/|http://yak.myhome.cx/junks/",
-                    IDC_CUSTOM3,"LinkLabel",WS_TABSTOP,86,178,104,8
 END
 
 IDD_FTCONFIRM_DLG DIALOG DISCARDABLE  0, 0, 178, 86
@@ -691,7 +683,7 @@ BEGIN
         VERTGUIDE, 108
         VERTGUIDE, 283
         TOPMARGIN, 7
-        BOTTOMMARGIN, 170
+        BOTTOMMARGIN, 124
         HORZGUIDE, 29
     END
 
