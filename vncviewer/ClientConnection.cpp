@@ -1568,6 +1568,7 @@ void ClientConnection::NegotiateProtocolVersion()
 	}
 	catch (Exception &c)
 	{
+		SetEvent(KillEvent);
 		vnclog.Print(0, _T("Error reading protocol version: %s\n"),
                           c.m_info);
 		if (m_fUsePlugin)
@@ -1613,6 +1614,7 @@ void ClientConnection::NegotiateProtocolVersion()
 #else
     if (sscanf(pv,rfbProtocolVersionFormat,&m_majorVersion,&m_minorVersion) != 2)
 	{
+		SetEvent(KillEvent);
 		if (m_fUsePlugin)
 			throw WarningException("Connection failed - Invalid protocol !\r\n\r\n"
 									"Possible causes:\r\r"
@@ -1629,6 +1631,7 @@ void ClientConnection::NegotiateProtocolVersion()
 									"- You've forgotten to select a DSMPlugin and the Server uses a DSMPlugin\r\n"
 									"- Viewer and Server are not compatible (they use different RFB protocoles)\r\n"
 									);
+
     }
 
     vnclog.Print(0, _T("RFB server supports protocol version %d.%d\n"),
@@ -2730,6 +2733,7 @@ void ClientConnection::SuspendThread()
 
 ClientConnection::~ClientConnection()
 {
+	SendMessage(m_hwnd, WM_CLOSE, 0, 0);
 	if (m_hwndStatus)
 		EndDialog(m_hwndStatus,0);
 
