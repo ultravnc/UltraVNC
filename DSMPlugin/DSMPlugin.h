@@ -100,7 +100,7 @@ private:
 	char m_szPluginFileName[128]; // No path, just the filename and possible comment
 
 	HMODULE m_hPDll;
-	char m_szDllName[196];
+	char m_szDllName[MAX_PATH];
 
 	// Plugin's functions pointers when loaded
 	DESCRIPTION     m_PDescription;

@@ -288,7 +288,10 @@ bool CDSMPlugin::LoadPlugin(char* szPlugin, bool fAllowMulti)
 	{
 		bool fDllCopyCreated = false;
 		int i = 1;
-		char szDllCopyName[196];
+		char szDllCopyName[MAX_PATH];
+		char szCurrentDir[MAX_PATH];
+		char szCurrentDir_szPlugin[MAX_PATH];
+		char szCurrentDir_szDllCopyName[MAX_PATH];
 		while (!fDllCopyCreated)
 		{
 			strcpy(szDllCopyName, szPlugin);
@@ -298,6 +301,24 @@ bool CDSMPlugin::LoadPlugin(char* szPlugin, bool fAllowMulti)
 			// Note: Let's be really dirty; Overwrite if it's possible only (dll not loaded). 
 			// This way if for some reason (abnormal process termination) the dll wasn't previously 
 			// normally deleted we overwrite/clean it with the new one at the same time.
+			strcpy (szCurrentDir_szDllCopyName,szDllCopyName);
+			DWORD error=GetLastError();
+			if (error==2)
+			{
+				if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
+				{
+					char* p = strrchr(szCurrentDir, '\\');
+					*p = '\0';
+				}
+				strcpy (szCurrentDir_szPlugin,szCurrentDir);
+				strcat (szCurrentDir_szPlugin,"\\");
+				strcat (szCurrentDir_szPlugin,szPlugin);
+
+				strcpy (szCurrentDir_szDllCopyName,szCurrentDir);
+				strcat (szCurrentDir_szDllCopyName,"\\");
+				strcat (szCurrentDir_szDllCopyName,szDllCopyName);
+				fDllCopyCreated = (FALSE != CopyFile(szCurrentDir_szPlugin, szCurrentDir_szDllCopyName, false));
+			}
 			if (i > 99) break; // Just in case...
 		}
 		strcpy(m_szDllName, szDllCopyName);
@@ -307,6 +328,21 @@ bool CDSMPlugin::LoadPlugin(char* szPlugin, bool fAllowMulti)
 	{
 		ZeroMemory(m_szDllName, strlen(m_szDllName));
 		m_hPDll = LoadLibrary(szPlugin);
+		//Try current PATH
+		if (m_hPDll==NULL)
+		{
+			char szCurrentDir[MAX_PATH];
+			char szCurrentDir_szPlugin[MAX_PATH];
+			if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
+				{
+					char* p = strrchr(szCurrentDir, '\\');
+					*p = '\0';
+				}
+			strcpy (szCurrentDir_szPlugin,szCurrentDir);
+			strcat (szCurrentDir_szPlugin,"\\");
+			strcat (szCurrentDir_szPlugin,szPlugin);
+			m_hPDll = LoadLibrary(szCurrentDir_szPlugin);
+		}
 	}
 
 	if (m_hPDll == NULL) return false;
