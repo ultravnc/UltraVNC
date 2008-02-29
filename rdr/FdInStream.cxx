@@ -167,20 +167,23 @@ int FdInStream::checkReadable(int fd, int timeout)
   }
 }
 
-#ifdef _WIN32
-static void gettimeofday(struct timeval* tv, void*)
+/*#ifdef _WIN32
+static void gettimeofday_(struct timeval* tv, void*)
 {
   LARGE_INTEGER counts, countsPerSec;
   static double usecPerCount = 0.0;
-
+  counts.QuadPart=0;
   if (QueryPerformanceCounter(&counts)) {
     if (usecPerCount == 0.0) {
       QueryPerformanceFrequency(&countsPerSec);
+	  if (countsPerSec.QuadPart!=0)
       usecPerCount = 1000000.0 / countsPerSec.QuadPart;
+	  else usecPerCount = 200;
     }
 
     LONGLONG usecs = (LONGLONG)(counts.QuadPart * usecPerCount);
-    tv->tv_usec = (long)(usecs % 1000000);
+	
+    tv->tv_usec = (long)((LONGLONG)usecs % (LONGLONG)1000000);
     tv->tv_sec = (long)(usecs / 1000000);
 
   } else {
@@ -190,13 +193,40 @@ static void gettimeofday(struct timeval* tv, void*)
     tv->tv_usec = tb.millitm * 1000;
   }
 }
+#endif*/
+
+#ifdef _WIN32
+LONGLONG 
+Passedusecs()
+{
+  LARGE_INTEGER counts, countsPerSec;
+  static LONGLONG usecPerCount = 0;
+  LONGLONG usecs=0;
+
+  if (QueryPerformanceCounter(&counts)) {
+    if (usecPerCount == 0) {
+      QueryPerformanceFrequency(&countsPerSec);
+      usecPerCount = 1000000000000000000 / countsPerSec.QuadPart;
+    }
+    usecs = (LONGLONG)(counts.QuadPart * usecPerCount /1000000000000);
+
+  } else {
+    struct timeb tb;
+    ftime(&tb);
+	usecs=tb.time*1000000+tb.millitm * 1000;
+  }
+  return usecs;
+}
 #endif
 
 int FdInStream::readWithTimeoutOrCallback(void* buf, int len)
 {
-  struct timeval before = {0, 0}, after; // before will not get initialized if the condition is false
+  /*struct timeval before = {0, 0}, after; // before will not get initialized if the condition is false
   if (timing)
-    gettimeofday(&before, 0);
+    gettimeofday_(&before, NULL);*/
+  LONGLONG before =0, after; // before will not get initialized if the condition is false
+  if (timing)
+    before=Passedusecs();
 
   int n=0;
   if (!m_fReadFromNetRectBuf)
@@ -255,7 +285,21 @@ int FdInStream::readWithTimeoutOrCallback(void* buf, int len)
 
   if (timing)
   {
-    gettimeofday(&after, 0);
+    after=Passedusecs();
+
+    LONGLONG newTimeWaited = (after- before)/100;
+    int newKbits = n * 8 / 1000;
+    if (newTimeWaited > newKbits*1000) newTimeWaited = newKbits*1000;
+    if (newTimeWaited < newKbits/4)    newTimeWaited = newKbits/4;
+
+    timeWaitedIn100us += (unsigned int)newTimeWaited;
+    timedKbits += newKbits;
+  }
+
+
+  /*if (timing)
+  {
+    gettimeofday_(&after, 0);
 //      fprintf(stderr,"%d.%06d\n",(after.tv_sec - before.tv_sec),
 //              (after.tv_usec - before.tv_usec));
     int newTimeWaited = ((after.tv_sec - before.tv_sec) * 10000 +
@@ -277,7 +321,7 @@ int FdInStream::readWithTimeoutOrCallback(void* buf, int len)
 
     timeWaitedIn100us += newTimeWaited;
     timedKbits += newKbits;
-  }
+  }*/
 
   return n;
 }
