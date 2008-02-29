@@ -7,6 +7,7 @@ static int pad();
 static SERVICE_STATUS serviceStatus;
 static SERVICE_STATUS_HANDLE serviceStatusHandle=0;
 HANDLE stopServiceEvent=0;
+extern HANDLE hEvent;
 static char service_path[MAX_PATH];
 void monitor_sessions();
 char service_name[]="uvnc_service";
@@ -68,6 +69,7 @@ static void WINAPI control_handler(DWORD controlCode) {
         serviceStatus.dwCurrentState=SERVICE_STOP_PENDING;
         SetServiceStatus(serviceStatusHandle, &serviceStatus);
         SetEvent(stopServiceEvent);
+		SetEvent(hEvent);
         return;
 
     case SERVICE_CONTROL_PAUSE:

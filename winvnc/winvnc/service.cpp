@@ -7,7 +7,7 @@
 #include <Tlhelp32.h>
 #include "inifile.h"
 
-
+HANDLE hEvent=NULL;
 extern HANDLE stopServiceEvent;
 static char app_path[MAX_PATH];
 typedef DWORD (*WTSGETACTIVECONSOLESESSIONID)();
@@ -436,9 +436,9 @@ void monitor_sessions()
 	bool last_con=false;
 	//We use this event to notify the program that the session has changed
 	//The program need to end so the service can restart the program in the correct session
-	HANDLE hEvent = CreateEvent(NULL, FALSE, FALSE, "Global\\SessionEventUltra");
+	hEvent = CreateEvent(NULL, FALSE, FALSE, "Global\\SessionEventUltra");
 	if (OlddwSessionId!=dwSessionId) SetEvent(hEvent);
-
+	Sleep(3000);
 	while(WaitForSingleObject(stopServiceEvent, 1000)==WAIT_TIMEOUT)
 	{
 
