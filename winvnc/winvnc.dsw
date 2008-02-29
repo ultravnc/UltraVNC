@@ -198,9 +198,6 @@ Package=<4>
     Project_Dep_Name authadmin
     End Project Dependency
     Begin Project Dependency
-    Project_Dep_Name authSSP
-    End Project Dependency
-    Begin Project Dependency
     Project_Dep_Name ldapauth
     End Project Dependency
     Begin Project Dependency
@@ -211,9 +208,6 @@ Package=<4>
     End Project Dependency
     Begin Project Dependency
     Project_Dep_Name logging
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name MSLogonACL
     End Project Dependency
     Begin Project Dependency
     Project_Dep_Name testauth
