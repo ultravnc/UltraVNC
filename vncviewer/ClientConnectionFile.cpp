@@ -79,7 +79,7 @@ void ClientConnection::SaveConnection()
 	ofnInit();
 	int disp = PORT_TO_DISPLAY(m_port);
 	sprintf(fname, "%.10s-%d.vnc", m_host, (disp > 0 && disp < 100) ? disp : m_port);
-	ofn.hwndOwner = m_hwnd;
+	ofn.hwndOwner = m_hwndcn;
 	ofn.lpstrFile = fname;
 	ofn.lpstrFileTitle = tname;
 	ofn.Flags = OFN_HIDEREADONLY;
@@ -91,7 +91,7 @@ void ClientConnection::SaveConnection()
 			break;
 		case FNERR_INVALIDFILENAME:
 			strcpy(msg, sz_K1);
-			MessageBox(m_hwnd, msg, sz_K2, MB_ICONERROR | MB_OK | MB_SETFOREGROUND | MB_TOPMOST);
+			MessageBox(m_hwndcn, msg, sz_K2, MB_ICONERROR | MB_OK | MB_SETFOREGROUND | MB_TOPMOST);
 			break;
 		default:
 			vnclog.Print(0, "Error %d from GetSaveFileName\n", err);
@@ -110,7 +110,7 @@ void ClientConnection::SaveConnection()
 	sprintf(buf, "%d", m_proxyport);
 	WritePrivateProfileString("connection", "proxyport", buf, fname);
 
-	if (MessageBox(m_hwnd,
+	if (MessageBox(m_hwndcn,
 		sz_K3,  
 		sz_K4, 
 		MB_YESNO | MB_ICONWARNING) == IDYES) 

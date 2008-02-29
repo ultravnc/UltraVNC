@@ -81,6 +81,8 @@ void VNCviewerApp32::NewConnection() {
 	try {
 		pcc->Run();
 	} catch (Exception &e) {
+//		DestroyWindow(pcc->m_hwndMain);
+		pcc->CloseWindows();
 		e.Report();	
 		delete pcc;
 	} 
@@ -91,6 +93,8 @@ void VNCviewerApp32::NewConnection(TCHAR *host, int port) {
 	try {
 		pcc->Run();
 	} catch (Exception &e) {
+//		DestroyWindow(pcc->m_hwndMain); 
+		pcc->CloseWindows();
 		e.Report();	
 		delete pcc;
 	} 
@@ -101,6 +105,8 @@ void VNCviewerApp32::NewConnection(SOCKET sock) {
 	try {
 		pcc->Run();
 	} catch (Exception &e) {
+//		DestroyWindow(pcc->m_hwndMain); 
+		pcc->CloseWindows();
 		e.Report();	
 		delete pcc;
 	} 
@@ -113,40 +119,51 @@ const char* BELL_LABEL = "VNCviewerBell";
 
 void VNCviewerApp32::RegisterSounds() {
 	
-	HKEY hBellKey;
+	HKEY hBellKey1=NULL;
+	HKEY hBellKey2=NULL;
+	HKEY hBellKey3=NULL;
+	HKEY hBellKey4=NULL;
+	HKEY hBellKey5=NULL;
 	char keybuf[256];
 	
 	sprintf(keybuf, "AppEvents\\EventLabels\\%s", BELL_LABEL);
 	// First create a label for it
-	if ( RegCreateKey(HKEY_CURRENT_USER, keybuf, &hBellKey)  == ERROR_SUCCESS ) {
-		RegSetValue(hBellKey, NULL, REG_SZ, "Bell", 0);
-		RegCloseKey(hBellKey);
+	if ( RegCreateKey(HKEY_CURRENT_USER, keybuf, &hBellKey1)  == ERROR_SUCCESS ) {
+		RegSetValue(hBellKey1, NULL, REG_SZ, "Bell", 0);
+		//RegCloseKey(hBellKey1);
 		
 		// Then put the detail in the app-specific area
 		
-		if ( RegCreateKey(HKEY_CURRENT_USER, BELL_APPL_KEY_NAME, &hBellKey)  == ERROR_SUCCESS ) {
+		if ( RegCreateKey(HKEY_CURRENT_USER, BELL_APPL_KEY_NAME, &hBellKey2)  == ERROR_SUCCESS ) {
 			
 			sprintf(keybuf, "%s\\%s", BELL_APPL_KEY_NAME, BELL_LABEL);
-			RegCreateKey(HKEY_CURRENT_USER, keybuf, &hBellKey);
-			RegSetValue(hBellKey, NULL, REG_SZ, "Bell", 0);
-			RegCloseKey(hBellKey);
+			RegCreateKey(HKEY_CURRENT_USER, keybuf, &hBellKey5);
+			RegSetValue(hBellKey5, NULL, REG_SZ, "Bell", 0);
+			//RegCloseKey(hBellKey2);
 			
 			sprintf(keybuf, "%s\\%s\\.current", BELL_APPL_KEY_NAME, BELL_LABEL);
-			if (RegOpenKey(HKEY_CURRENT_USER, keybuf, &hBellKey) != ERROR_SUCCESS) {
-				RegCreateKey(HKEY_CURRENT_USER, keybuf, &hBellKey);
-				RegSetValue(hBellKey, NULL, REG_SZ, "ding.wav", 0);
+			if (RegOpenKey(HKEY_CURRENT_USER, keybuf, &hBellKey3) != ERROR_SUCCESS) {
+				RegCreateKey(HKEY_CURRENT_USER, keybuf, &hBellKey3);
+				RegSetValue(hBellKey3, NULL, REG_SZ, "ding.wav", 0);
+				//RegCloseKey(hBellKey3);
 			}
-			RegCloseKey(hBellKey);
+			
 			
 			sprintf(keybuf, "%s\\%s\\.default", BELL_APPL_KEY_NAME, BELL_LABEL);
-			if (RegOpenKey(HKEY_CURRENT_USER, keybuf, &hBellKey) != ERROR_SUCCESS) {
-				RegCreateKey(HKEY_CURRENT_USER, keybuf, &hBellKey);
-				RegSetValue(hBellKey, NULL, REG_SZ, "ding.wav", 0);
+			if (RegOpenKey(HKEY_CURRENT_USER, keybuf, &hBellKey4) != ERROR_SUCCESS) {
+				RegCreateKey(HKEY_CURRENT_USER, keybuf, &hBellKey4);
+				RegSetValue(hBellKey4, NULL, REG_SZ, "ding.wav", 0);
+				//RegCloseKey(hBellKey4);
 			}
-			RegCloseKey(hBellKey);
+			
 		}
 		
 	} 
+	if (hBellKey1)RegCloseKey(hBellKey1);
+	if (hBellKey2)RegCloseKey(hBellKey2);
+	if (hBellKey3)RegCloseKey(hBellKey3);
+	if (hBellKey4)RegCloseKey(hBellKey4);
+	if (hBellKey5)RegCloseKey(hBellKey5);
 	
 }
 

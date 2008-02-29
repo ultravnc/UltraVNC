@@ -1,13 +1,13 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libjpeg", "..\libjpeg\libjpeg.vcproj", "{181769CB-5295-452F-A421-FE1F9ED2022A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libjpeg", "..\libjpeg\libjpegvs2005.vcproj", "{181769CB-5295-452F-A421-FE1F9ED2022A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "omnithread", "omnithread\omnithread.vcproj", "{AB1CE62F-4A4D-4DAA-831D-5C93AD68F5F1}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "omnithread", "omnithread\omnithreadvs2005.vcproj", "{AB1CE62F-4A4D-4DAA-831D-5C93AD68F5F1}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rdr", "..\rdr\rdr.vcproj", "{F5244002-0FFF-4F19-A941-FCCE1861F132}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rdr", "..\rdr\rdrvs2005.vcproj", "{F5244002-0FFF-4F19-A941-FCCE1861F132}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vncviewer", "vncviewer.vcproj", "{357D07B6-0613-4B05-9D22-1764A49AC945}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vncviewer", "vncviewervs2005.vcproj", "{357D07B6-0613-4B05-9D22-1764A49AC945}"
 	ProjectSection(ProjectDependencies) = postProject
 		{85445BB7-B95B-4DE1-BA52-7311AA700A27} = {85445BB7-B95B-4DE1-BA52-7311AA700A27}
 		{F5244002-0FFF-4F19-A941-FCCE1861F132} = {F5244002-0FFF-4F19-A941-FCCE1861F132}
@@ -15,7 +15,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vncviewer", "vncviewer.vcpr
 		{181769CB-5295-452F-A421-FE1F9ED2022A} = {181769CB-5295-452F-A421-FE1F9ED2022A}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zlib", "..\zlib\zlib.vcproj", "{85445BB7-B95B-4DE1-BA52-7311AA700A27}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zlib", "..\zlib\zlibvs2005.vcproj", "{85445BB7-B95B-4DE1-BA52-7311AA700A27}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

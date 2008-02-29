@@ -108,6 +108,10 @@ const rfbPixelFormat vnc8bitFormat_2Grey	= {8,3,0,1,1,1,1,2,1,0, 1, 0} ;	// 2 co
 
 const rfbPixelFormat vnc16bitFormat			= {16,16,0,1,63,31,31,0,6,11, 0, 0};
 
+#define KEYMAP_LALT_FLAG        (KEYMAP_LALT     << 28)
+#define KEYMAP_RALT_FLAG        (KEYMAP_RALT     << 28)
+#define KEYMAP_RCONTROL_FLAG    (KEYMAP_RCONTROL << 28)
+
 //static LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam);
 extern HWND currentHWND;
 extern char sz_L1[64];
@@ -277,7 +281,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 {
 	Pressed_Cancel=false;
 	saved_set=false;
-	m_hwnd = 0;
+	m_hwndcn = 0;
 	m_desktopName = NULL;
 	m_port = -1;
 	m_proxyport = -1;
@@ -404,7 +408,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	for (int i = 0; i < 4; i++)
 		m_tightZlibStreamActive[i] = false;
 
-	m_hwnd=NULL;
+	m_hwndcn=NULL;
 	m_hbands=NULL;
 	m_hwndTB=NULL;
 	m_hwndTBwin=NULL;
@@ -1049,7 +1053,7 @@ void ClientConnection::CreateDisplay()
 
 	RegisterClass(&wndclass);
 
-	m_hwnd = CreateWindow(VWR_WND_CLASS_NAME_VIEWER,
+	m_hwndcn = CreateWindow(VWR_WND_CLASS_NAME_VIEWER,
 	//m_hwnd = CreateWindow(_T("VNCMDI_Window"),
 			      _T("VNCviewer"),
 			      winstyle ,
@@ -1065,13 +1069,13 @@ void ClientConnection::CreateDisplay()
 
 
 	//ShowWindow(m_hwnd, SW_HIDE);
-	ShowWindow(m_hwnd, SW_SHOW);
+	ShowWindow(m_hwndcn, SW_SHOW);
 
 	// record which client created this window
 #ifndef _X64
-	SetWindowLong(m_hwnd, GWL_USERDATA, (LONG) this);
+	SetWindowLong(m_hwndcn, GWL_USERDATA, (LONG) this);
 #else
-	SetWindowLongPtr(m_hwnd, GWLP_USERDATA, (LONG) this);
+	SetWindowLongPtr(m_hwndcn, GWLP_USERDATA, (LONG) this);
 #endif
 //	SendMessage(m_hwnd,WM_CREATE,0,0);
 
@@ -1170,7 +1174,7 @@ void ClientConnection::CreateDisplay()
 	// the current state.
 	// We don't want to send that.
 	m_initialClipboardSeen = false;
-	m_hwndNextViewer = SetClipboardViewer(m_hwnd); 	
+	m_hwndNextViewer = SetClipboardViewer(m_hwndcn); 	
 #endif
 
 	//Added by: Lars Werner (http://lars.werner.no)
@@ -1430,7 +1434,7 @@ DWORD WINAPI SocketTimeout(LPVOID lpParam)
 	{
 		Sleep(100);
 		counter++;
-		if (counter>100) break;
+		if (counter>50) break;
 	}
 	if (havetobekilled)
 	{
@@ -1463,6 +1467,7 @@ void ClientConnection::Connect()
 		
 		if (lphost == NULL) { 
 			//if(myDialog!=0)DestroyWindow(myDialog);
+			SetEvent(KillEvent);
 			if (m_hwndStatus) SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L46);
 			throw WarningException(sz_L46); 
 		};
@@ -1485,6 +1490,7 @@ void ClientConnection::Connect()
 	if (res == SOCKET_ERROR) 
 		{
 			if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L48);
+			SetEvent(KillEvent);
 			if (!Pressed_Cancel) throw WarningException(sz_L48,IDS_L48);
 			else throw QuietException(sz_L48);
 		}
@@ -1520,6 +1526,7 @@ void ClientConnection::ConnectProxy()
 		
 		if (lphost == NULL) { 
 			//if(myDialog!=0)DestroyWindow(myDialog);
+			SetEvent(KillEvent);
 			if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L46);
 			throw WarningException(sz_L46); 
 		};
@@ -2048,8 +2055,11 @@ void ClientConnection::Authenticate()
 				g_passwordfailed=true;
 				if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L56);
 //				if (flash) {flash->Killflash();}
+// 26 February 2008 jdp - speed up auth failure handling
+				SetEvent(KillEvent);
 				throw WarningException(sz_L57);
 			case rfbVncAuthTooMany:
+				SetEvent(KillEvent);
 				throw WarningException(
 					sz_L58);
 			default:
@@ -2284,8 +2294,8 @@ void ClientConnection::SizeWindow()
 		SetRect(&fullwinrect, 0, 0, m_si.framebufferWidth, m_si.framebufferHeight);
 
 	AdjustWindowRectEx(&fullwinrect, 
-			   GetWindowLong(m_hwnd, GWL_STYLE) & ~WS_VSCROLL & ~WS_HSCROLL, 
-			   FALSE, GetWindowLong(m_hwnd, GWL_EXSTYLE));
+			   GetWindowLong(m_hwndcn, GWL_STYLE) & ~WS_VSCROLL & ~WS_HSCROLL, 
+			   FALSE, GetWindowLong(m_hwndcn, GWL_EXSTYLE));
 	/*
 	AdjustWindowRectEx(&fullwinrect, 
 			   GetWindowLong(m_hwndMain, GWL_STYLE), 
@@ -2300,10 +2310,10 @@ void ClientConnection::SizeWindow()
 
 	//SetWindowPos(m_hwnd, HWND_TOP,
 	if (m_opts.m_ShowToolbar)
-		SetWindowPos(m_hwnd, m_hwndTBwin, 0, m_TBr.bottom, m_winwidth, m_winheight, SWP_SHOWWINDOW);
+		SetWindowPos(m_hwndcn, m_hwndTBwin, 0, m_TBr.bottom, m_winwidth, m_winheight, SWP_SHOWWINDOW);
 	else 
 	{
-		SetWindowPos(m_hwnd, m_hwndTBwin, 0, 0, m_winwidth, m_winheight, SWP_SHOWWINDOW);
+		SetWindowPos(m_hwndcn, m_hwndTBwin, 0, 0, m_winwidth, m_winheight, SWP_SHOWWINDOW);
 		SetWindowPos(m_hwndTBwin, NULL ,0, 0, 0, 0, SWP_HIDEWINDOW);
 	}
 
@@ -2362,7 +2372,7 @@ void ClientConnection::CreateLocalFramebuffer()
 	// We create a bitmap which has the same pixel characteristics as
 	// the local display, in the hope that blitting will be faster.
 
-	TempDC hdc(m_hwnd);
+	TempDC hdc(m_hwndcn);
 
 	if (m_hBitmap != NULL)
 		DeleteObject(m_hBitmap);
@@ -2398,7 +2408,7 @@ void ClientConnection::CreateLocalFramebuffer()
 
 	SetBkColor(  m_hBitmapDC, oldbgcol);
 	SetTextColor(m_hBitmapDC, oldtxtcol);
-	InvalidateRect(m_hwnd, NULL, FALSE);
+	InvalidateRect(m_hwndcn, NULL, FALSE);
 
 }
 
@@ -2613,7 +2623,7 @@ void ClientConnection::SetFormatAndEncodings()
 void ClientConnection::Createdib()
 {
 	omni_mutex_lock l(m_bitmapdcMutex);
-	TempDC hdc(m_hwnd);
+	TempDC hdc(m_hwndcn);
 	BitmapInfo bi;
 	UINT iUsage;
     memset(&bi, 0, sizeof(bi));
@@ -2686,7 +2696,7 @@ void ClientConnection::KillThread()
 		closesocket(m_sock);
 		m_sock = INVALID_SOCKET;
 	}
-	WaitForSingleObject(KillEvent, 100000);
+	WaitForSingleObject(KillEvent, 6000);
 }
 
 
@@ -2730,10 +2740,16 @@ void ClientConnection::SuspendThread()
 		m_sock = INVALID_SOCKET;
 	}
 }
-
+void
+ClientConnection::CloseWindows()
+{
+	SetEvent(KillEvent);
+	if (m_hwndcn)SendMessage(m_hwndcn, WM_CLOSE, 0, 0);
+	SetEvent(KillEvent);
+	if (m_hwndMain) SendMessage(m_hwndMain, WM_CLOSE, 0, 0);
+}
 ClientConnection::~ClientConnection()
 {
-	SendMessage(m_hwnd, WM_CLOSE, 0, 0);
 	if (m_hwndStatus)
 		EndDialog(m_hwndStatus,0);
 
@@ -2844,9 +2860,9 @@ bool ClientConnection::ScrollScreen(int dx, int dy)
 		
 		clirect.top += Rtb.top;
 		clirect.bottom += Rtb.bottom;
-		ScrollWindowEx(m_hwnd, -dx, -dy, NULL, &clirect, NULL, NULL,  SW_INVALIDATE);
+		ScrollWindowEx(m_hwndcn, -dx, -dy, NULL, &clirect, NULL, NULL,  SW_INVALIDATE);
 		UpdateScrollbars();
-		UpdateWindow(m_hwnd);
+		UpdateWindow(m_hwndcn);
 		
 		return true;
 	}
@@ -2905,7 +2921,7 @@ inline void ClientConnection::ProcessPointerEvent(int x, int y, DWORD keyflags, 
 		}
 	      
 	      // if we reached here, we don't need the timer anymore.
-	      KillTimer(m_hwnd, m_emulate3ButtonsTimer);
+	      KillTimer(m_hwndcn, m_emulate3ButtonsTimer);
 	      m_waitingOnEmulateTimer = false;
 	    }
 	  else if (m_emulatingMiddleButton)
@@ -2934,7 +2950,7 @@ inline void ClientConnection::ProcessPointerEvent(int x, int y, DWORD keyflags, 
 		  // Start timer for emulation.
 		  m_emulate3ButtonsTimer = 
 		    SetTimer(
-			     m_hwnd, 
+			     m_hwndcn, 
 			     IDT_EMULATE3BUTTONSTIMER, 
 			     m_opts.m_Emul3Timeout, 
 			     NULL);
@@ -3235,7 +3251,7 @@ inline void ClientConnection::DoBlit()
 	omni_mutex_lock l(m_bitmapdcMutex);
 
 	PAINTSTRUCT ps;
-	HDC hdc = BeginPaint(m_hwnd, &ps);
+	HDC hdc = BeginPaint(m_hwndcn, &ps);
 
 	// Select and realize hPalette
 	PaletteSelector p(hdc, m_hPalette);
@@ -3322,7 +3338,7 @@ inline void ClientConnection::DoBlit()
 			}
 		}
 	}
-	EndPaint(m_hwnd, &ps);
+	EndPaint(m_hwndcn, &ps);
 
 }
 
@@ -3418,7 +3434,7 @@ void* ClientConnection::run_undetached(void* arg) {
 	if (!InFullScreenMode()) SizeWindow();
 
 	m_running = true;
-	UpdateWindow(m_hwnd);
+	UpdateWindow(m_hwndcn);
 
 	// sf@2002 - Attempt to speed up the thing
 	// omni_thread::set_priority(omni_thread::PRIORITY_LOW);
@@ -3503,7 +3519,7 @@ void* ClientConnection::run_undetached(void* arg) {
 					SendAppropriateFramebufferUpdateRequest();
 					
 					SizeWindow();
-					InvalidateRect(m_hwnd, NULL, TRUE);
+					InvalidateRect(m_hwndcn, NULL, TRUE);
 					RealiseFullScreenMode();	
 					break;
 				}
@@ -4008,7 +4024,7 @@ inline void ClientConnection::ReadScreenUpdate()
 		}
 		else if (surh.encoding !=rfbEncodingNewFBSize)
 		{
-			InvalidateRgn(m_hwnd, UpdateRegion, FALSE);
+			InvalidateRgn(m_hwndcn, UpdateRegion, FALSE);
 			HRGN tempregion=CreateRectRgn(0,0,0,0);
 			CombineRgn(UpdateRegion,UpdateRegion,tempregion,RGN_AND);
 			DeleteObject(tempregion);
@@ -4117,7 +4133,7 @@ inline void ClientConnection::ReadScreenUpdate()
 		
 	// Inform the other thread that an update is needed.
 	
-	PostMessage(m_hwnd, WM_REGIONUPDATED, NULL, NULL);
+	PostMessage(m_hwndcn, WM_REGIONUPDATED, NULL, NULL);
 	DeleteObject(UpdateRegion);
 }	
 
@@ -4166,9 +4182,9 @@ void ClientConnection::ReadBell()
 	}
 	#endif
 	if (m_opts.m_DeiconifyOnBell) {
-		if (IsIconic(m_hwnd)) {
+		if (IsIconic(m_hwndcn)) {
 			SetDormant(false);
-			ShowWindow(m_hwnd, SW_SHOWNORMAL);
+			ShowWindow(m_hwndcn, SW_SHOWNORMAL);
 		}
 	}
 	vnclog.Print(6, _T("Bell!\n"));
@@ -4578,7 +4594,7 @@ void ClientConnection::ReadNewFBSize(rfbFramebufferUpdateRectHeader *pfburh)
 	m_pendingFormatChange = true;
 	SendAppropriateFramebufferUpdateRequest();
 	SizeWindow();
-	InvalidateRect(m_hwnd, NULL, TRUE);
+	InvalidateRect(m_hwndcn, NULL, TRUE);
 	RealiseFullScreenMode();
 }
 
@@ -5018,14 +5034,21 @@ LRESULT CALLBACK ClientConnection::GTGBS_SendCustomKey_proc(HWND Dlg, UINT iMsg,
 				Key = GetDlgItemInt(Dlg,IDC_CUSTOM_KEY,&Okay,FALSE);
 				
 				if (ALT!=0)
-					Key |=KEYMAP_LALT;
+					Key |=KEYMAP_LALT_FLAG;
 				if (ALTGR != 0)
-					Key |= KEYMAP_RALT;
+					Key |= KEYMAP_RALT_FLAG;
 				if (STRG != 0)
-					Key |= KEYMAP_RCONTROL;
+					Key |= KEYMAP_RCONTROL_FLAG;
 				
 				if (Okay)
+					{
+#ifndef _X64	
+					::SetWindowLong(Dlg, DWL_MSGRESULT, Key); 
+#else
+					::SetWindowLongPtr(Dlg, DWLP_MSGRESULT, Key); 
+#endif
 					EndDialog(Dlg, Key);
+					}
 				else
 					EndDialog(Dlg, 0);
 			}
@@ -5633,7 +5656,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							DestroyWindow(_this->m_logo_wnd);
 							DestroyWindow(_this->m_button_wnd);
 	//						DestroyWindow(_this->m_hwndTBwin);
-							DestroyWindow(_this->m_hwnd);
+							DestroyWindow(_this->m_hwndcn);
 							DestroyWindow(hwnd);
 						}
 						else // Autoreconnect allowed - We only suspend the working thread then reconnect a few seconds later
@@ -5656,11 +5679,11 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 					{
 #ifndef UNDER_CE
 						// Remove us from the clipboard viewer chain
-						BOOL res = ChangeClipboardChain( _this->m_hwnd, _this->m_hwndNextViewer);
+						BOOL res = ChangeClipboardChain( _this->m_hwndcn, _this->m_hwndNextViewer);
 #endif
 						if (_this->m_waitingOnEmulateTimer)
 						{
-							KillTimer(_this->m_hwnd, _this->m_emulate3ButtonsTimer);
+							KillTimer(_this->m_hwndcn, _this->m_emulate3ButtonsTimer);
 							_this->m_waitingOnEmulateTimer = false;
 						}
 //						if (_this->m_FTtimer != 0) 
@@ -5814,7 +5837,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 										 )
 								     );
 						
-						ScrollWindowEx(_this->m_hwnd,
+						ScrollWindowEx(_this->m_hwndcn,
 							           _this->m_hScrollPos - newhpos,
 									   _this->m_vScrollPos - newvpos,
 							           NULL, &rect, NULL, NULL,  SW_INVALIDATE);
@@ -6009,23 +6032,23 @@ LRESULT CALLBACK ClientConnection::WndProcTBwin(HWND hwnd, UINT iMsg, WPARAM wPa
 					Key = DialogBox(_this->m_pApp->m_instance,MAKEINTRESOURCE(IDD_CUSTUM_KEY),NULL,(DLGPROC)ClientConnection::GTGBS_SendCustomKey_proc);
 					if (Key>0){
 						vnclog.Print(0,_T("START Send Custom Key %d\n"),Key);
-						if ( (Key & KEYMAP_LALT) == KEYMAP_LALT){
+						if ( (Key & KEYMAP_LALT_FLAG) == KEYMAP_LALT_FLAG){
 							_this->SendKeyEvent(XK_Alt_L,true);
-							_this->SendKeyEvent(Key ^ KEYMAP_LALT,true);
-							_this->SendKeyEvent(Key ^ KEYMAP_LALT,false);
+							_this->SendKeyEvent(Key ^ KEYMAP_LALT_FLAG,true);
+							_this->SendKeyEvent(Key ^ KEYMAP_LALT_FLAG,false);
 							_this->SendKeyEvent(XK_Alt_L,false);
-						}else if ( (Key & KEYMAP_RALT) ==KEYMAP_RALT){
+						}else if ( (Key & KEYMAP_RALT_FLAG) ==KEYMAP_RALT_FLAG){
 							_this->SendKeyEvent(XK_Alt_R,true);
 							_this->SendKeyEvent(XK_Control_R,true);
-							_this->SendKeyEvent(Key ^ KEYMAP_RALT,true);
-							_this->SendKeyEvent(Key ^ KEYMAP_RALT,false);
+							_this->SendKeyEvent(Key ^ KEYMAP_RALT_FLAG,true);
+							_this->SendKeyEvent(Key ^ KEYMAP_RALT_FLAG,false);
 							_this->SendKeyEvent(XK_Alt_R,false);
 							_this->SendKeyEvent(XK_Control_R,false);
 							
-						}else if ( (Key &  KEYMAP_RCONTROL) == KEYMAP_RCONTROL){
+						}else if ( (Key &  KEYMAP_RCONTROL_FLAG) == KEYMAP_RCONTROL_FLAG){
 							_this->SendKeyEvent(XK_Control_R,true);
-							_this->SendKeyEvent(Key ^ KEYMAP_RCONTROL,true);
-							_this->SendKeyEvent(Key ^ KEYMAP_RCONTROL,false);
+							_this->SendKeyEvent(Key ^ KEYMAP_RCONTROL_FLAG,true);
+							_this->SendKeyEvent(Key ^ KEYMAP_RCONTROL_FLAG,false);
 							_this->SendKeyEvent(XK_Control_R,false);
 						}else{
 							_this->SendKeyEvent(Key,true);
@@ -6035,7 +6058,7 @@ LRESULT CALLBACK ClientConnection::WndProcTBwin(HWND hwnd, UINT iMsg, WPARAM wPa
 						
 						vnclog.Print(0,_T("END   Send Custom Key %d\n"),Key);
 					}
-					SetForegroundWindow(_this->m_hwnd);
+					SetForegroundWindow(_this->m_hwndcn);
 					
 					return 0;
 				}
@@ -6154,7 +6177,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 	switch (iMsg) 
 			{				
 			case WM_CREATE:
-				SetTimer(_this->m_hwnd,3335, 1000, NULL);
+				SetTimer(_this->m_hwndcn,3335, 1000, NULL);
 				return 0;
 				
 			case WM_REGIONUPDATED:
@@ -6173,7 +6196,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 						_this->m_emulateButtonPressedX,
 						_this->m_emulateButtonPressedY,
 						_this->m_emulateKeyFlags);
-					KillTimer(_this->m_hwnd, _this->m_emulate3ButtonsTimer);
+					KillTimer(_this->m_hwndcn, _this->m_emulate3ButtonsTimer);
 					_this->m_waitingOnEmulateTimer = false;
 				}
 				return 0;
@@ -6329,8 +6352,8 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 				#endif
 				if (_this->m_waitingOnEmulateTimer)
 				{
-				KillTimer(_this->m_hwnd, _this->m_emulate3ButtonsTimer);
-				KillTimer(_this->m_hwnd, 3335);
+				KillTimer(_this->m_hwndcn, _this->m_emulate3ButtonsTimer);
+				KillTimer(_this->m_hwndcn, 3335);
 				_this->m_waitingOnEmulateTimer = false;
 				}
 				/*

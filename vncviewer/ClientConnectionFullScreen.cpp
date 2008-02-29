@@ -118,10 +118,10 @@ void ClientConnection::RealiseFullScreenMode()
 		SetWindowPos(m_hwndMain, HWND_TOPMOST, -1, -1, cx+3, cy+3, SWP_FRAMECHANGED);
 		CheckMenuItem(GetSystemMenu(m_hwndMain, FALSE), ID_FULLSCREEN, MF_BYCOMMAND|MF_CHECKED);
 		if (m_opts.m_ShowToolbar)
-		SetWindowPos(m_hwnd, m_hwndTBwin,0,m_TBr.bottom,m_winwidth, m_winheight, SWP_SHOWWINDOW);
+		SetWindowPos(m_hwndcn, m_hwndTBwin,0,m_TBr.bottom,m_winwidth, m_winheight, SWP_SHOWWINDOW);
 		else 
 		{
-			SetWindowPos(m_hwnd, m_hwndTBwin,0,0,cx+3, cy+3, SWP_SHOWWINDOW);
+			SetWindowPos(m_hwndcn, m_hwndTBwin,0,0,cx+3, cy+3, SWP_SHOWWINDOW);
 			SetWindowPos(m_hwndTBwin, NULL ,0,0,0, 0, SWP_HIDEWINDOW);
 		}
 

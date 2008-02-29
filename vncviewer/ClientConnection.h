@@ -131,6 +131,7 @@ public:
 	ClientConnection(VNCviewerApp *pApp, LPTSTR host, int port);
 	ClientConnection(VNCviewerApp *pApp, LPTSTR configFile);
 	virtual ~ClientConnection();
+	void CloseWindows();
 	void Run();
 	void KillThread();
 	void SuspendThread();
@@ -156,7 +157,7 @@ private:
 
 	SOCKET m_sock;
 	bool m_serverInitiated;
-	HWND m_hwnd, m_hbands,m_hwndTB,m_hwndTBwin,m_hwndMain,m_hwndStatus,m_TrafficMonitor,m_logo_wnd,m_button_wnd;
+	HWND m_hwndcn, m_hbands,m_hwndTB,m_hwndTBwin,m_hwndMain,m_hwndStatus,m_TrafficMonitor,m_logo_wnd,m_button_wnd;
 	HANDLE m_statusThread;
 	RECT m_TBr;
 	// bool m_ToolbarEnable;

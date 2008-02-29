@@ -443,7 +443,7 @@ void ClientConnection::InvalidateScreenRect(const RECT *pRect) {
 		rect.right  = pRect->right  - m_hScrollPos;
 		rect.bottom = pRect->bottom - m_vScrollPos;
 	}
-	InvalidateRect(m_hwnd, &rect, FALSE);
+	InvalidateRect(m_hwndcn, &rect, FALSE);
 }
 
 void ClientConnection::InvalidateRegion(const RECT *pRect,HRGN *prgn) {

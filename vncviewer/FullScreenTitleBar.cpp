@@ -36,6 +36,10 @@ CTitleBar::CTitleBar()
 	hInstance=NULL;
 	Parent=NULL;
 	this->Init();
+	Pin=NULL;
+	Close=NULL;
+	Maximize=NULL;
+	Minimize=NULL;
 }
 
 CTitleBar::CTitleBar(HINSTANCE hInst, HWND ParentWindow)
@@ -50,7 +54,11 @@ CTitleBar::CTitleBar(HINSTANCE hInst, HWND ParentWindow)
 CTitleBar::~CTitleBar()
 {
 	DeleteObject(Font);
-	DestroyWindow(m_hWnd);
+	if (m_hWnd) DestroyWindow(m_hWnd);
+	if (Pin) DestroyWindow(Pin);
+	if (Close) DestroyWindow(Close);
+	if (Maximize) DestroyWindow(Maximize);
+	if (Minimize) DestroyWindow(Minimize);
 }
 
 //***************************************************************************************

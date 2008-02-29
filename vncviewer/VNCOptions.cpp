@@ -1061,7 +1061,9 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 		  // Modif sf@2002 - Server Scaling
 		  SetDlgItemInt( hwnd, IDC_SERVER_SCALE, _this->m_nServerScale, FALSE);
 
+		  if (_this->m_Shared)
 		  SetDlgItemInt( hwnd, IDC_SERVER_RECON, _this->m_reconnectcounter, FALSE);
+		  else SetDlgItemInt( hwnd, IDC_SERVER_RECON, 0, FALSE);
 		  
 		  // Modif sf@2002 - Cache 
 		  HWND hCache = GetDlgItem(hwnd, ID_SESSION_SET_CACHE);
@@ -1223,8 +1225,9 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 				  if (_this->m_nServerScale < 1 || _this->m_nServerScale > 9) 
 					  _this->m_nServerScale = 1;
 			  }
-
+			 if (_this->m_Shared)
 			  _this->m_reconnectcounter = GetDlgItemInt( hwnd, IDC_SERVER_RECON, NULL, TRUE);
+			 else _this->m_reconnectcounter=0;
 
 
 			  

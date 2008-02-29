@@ -45,7 +45,7 @@ void ClientConnection::ProcessLocalClipboardChange()
 	vnclog.Print(2, _T("Clipboard changed\n"));
 	
 	HWND hOwner = GetClipboardOwner();
-	if (hOwner == m_hwnd) {
+	if (hOwner == m_hwndcn) {
 		vnclog.Print(2, _T("We changed it - ignore!\n"));
 	} else if (!m_initialClipboardSeen) {
 		vnclog.Print(2, _T("Don't send initial clipboard!\n"));
@@ -55,7 +55,7 @@ void ClientConnection::ProcessLocalClipboardChange()
 		// The clipboard should not be modified by more than one thread at once
 		omni_mutex_lock l(m_clipMutex);
 		
-		if (OpenClipboard(m_hwnd)) { 
+		if (OpenClipboard(m_hwndcn)) { 
 			HGLOBAL hglb = GetClipboardData(CF_TEXT); 
 			if (hglb == NULL) {
 				CloseClipboard();
@@ -80,7 +80,7 @@ void ClientConnection::ProcessLocalClipboardChange()
 					SendClientCutText(unixcontents, strlen(unixcontents));
 				} catch (WarningException &e) {
 					vnclog.Print(0, _T("Exception while sending clipboard text : %s\n"), e.m_info);
-					DestroyWindow(m_hwnd);
+					DestroyWindow(m_hwndcn);
 				}
 				delete [] contents; 
 				delete [] unixcontents;
@@ -116,7 +116,7 @@ void ClientConnection::UpdateLocalClipboard(char *buf, int len) {
     {
         omni_mutex_lock l(m_clipMutex);
 
-        if (!OpenClipboard(m_hwnd)) {
+        if (!OpenClipboard(m_hwndcn)) {
 	        throw WarningException(sz_C1);
         }
         if (! ::EmptyClipboard()) {

@@ -78,6 +78,10 @@ private:
 	HBITMAP hPinUp;
 	HBITMAP hPinDown;
 	HWND Pin;
+	HWND Close;
+	HWND Maximize;
+	HWND Minimize;
+
 
 	//Text to show on titlebar and it corespondent font! :)
 	LPTSTR Text;
