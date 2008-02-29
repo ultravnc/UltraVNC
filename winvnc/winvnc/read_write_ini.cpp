@@ -59,6 +59,7 @@ LONG QueryIfNoLogon;
 LONG EnableRemoteInputs;
 LONG LockSettings;
 LONG DisableLocalInputs;
+LONG EnableJapInput;
 
 #define MAXPWLEN 8
 char passwd[MAXPWLEN];
@@ -72,6 +73,8 @@ LONG PollOnEventOnly;
 LONG Driver;
 LONG Hook;
 LONG Virtual;
+LONG SingleWindow=0;
+char SingleWindowName[32];
 
 BUseRegistry = myIniFile_In.ReadInt("admin", "UseRegistry", 0);
 myIniFile_Out.WriteInt("admin", "UseRegistry", BUseRegistry);
@@ -185,10 +188,11 @@ myIniFile_Out.WritePassword(passwd);
 EnableRemoteInputs=myIniFile_In.ReadInt("admin", "InputsEnabled", 0);
 LockSettings=myIniFile_In.ReadInt("admin", "LockSetting", 0);
 DisableLocalInputs=myIniFile_In.ReadInt("admin", "LocalInputsDisabled", 0);
+EnableJapInput=myIniFile_In.ReadInt("admin", "EnableJapInput", 0);
 myIniFile_Out.WriteInt("admin", "InputsEnabled", EnableRemoteInputs);
 myIniFile_Out.WriteInt("admin", "LockSetting", LockSettings);
 myIniFile_Out.WriteInt("admin", "LocalInputsDisabled", DisableLocalInputs);	
-
+myIniFile_Out.WriteInt("admin", "EnableJapInput", EnableJapInput);	
 
 
 TurboMode = myIniFile_In.ReadInt("poll", "TurboMode", 0);
@@ -201,6 +205,9 @@ Driver=myIniFile_In.ReadInt("poll", "EnableDriver", 0);
 Hook=myIniFile_In.ReadInt("poll", "EnableHook", 0);
 Virtual=myIniFile_In.ReadInt("poll", "EnableVirtual", 0);
 
+SingleWindow=myIniFile_In.ReadInt("poll","SingleWindow",SingleWindow);
+myIniFile_In.ReadString("poll", "SingleWindowName", SingleWindowName,32);
+
 myIniFile_Out.WriteInt("poll", "TurboMode", TurboMode);
 myIniFile_Out.WriteInt("poll", "PollUnderCursor", PollUnderCursor);
 myIniFile_Out.WriteInt("poll", "PollForeground", PollForeground);
@@ -210,6 +217,9 @@ myIniFile_Out.WriteInt("poll", "OnlyPollOnEvent", PollOnEventOnly);
 myIniFile_Out.WriteInt("poll", "EnableDriver", Driver);
 myIniFile_Out.WriteInt("poll", "EnableHook", Hook);
 myIniFile_Out.WriteInt("poll", "EnableVirtual", Virtual);
+
+myIniFile_Out.WriteInt("poll", "SingleWindow", SingleWindow);
+myIniFile_Out.WriteString("poll", "SingleWindowName", SingleWindowName);
 }
 
 
@@ -271,6 +281,7 @@ LONG QueryIfNoLogon;
 LONG EnableRemoteInputs;
 LONG LockSettings;
 LONG DisableLocalInputs;
+LONG EnableJapInput;
 
 #define MAXPWLEN 8
 char passwd[MAXPWLEN];
@@ -284,6 +295,8 @@ LONG PollOnEventOnly;
 LONG Driver;
 LONG Hook;
 LONG Virtual;
+LONG SingleWindow=0;
+char SingleWindowName[32];
 
 BUseRegistry = myIniFile_In.ReadInt("admin", "UseRegistry", 0);
 myIniFile_Out.WriteInt("admin", "UseRegistry", BUseRegistry);
@@ -397,9 +410,11 @@ myIniFile_Out.WritePassword(passwd);
 EnableRemoteInputs=myIniFile_In.ReadInt("admin", "InputsEnabled", 0);
 LockSettings=myIniFile_In.ReadInt("admin", "LockSetting", 0);
 DisableLocalInputs=myIniFile_In.ReadInt("admin", "LocalInputsDisabled", 0);
+EnableJapInput=myIniFile_In.ReadInt("admin", "EnableJapInput", 0);
 myIniFile_Out.WriteInt("admin", "InputsEnabled", EnableRemoteInputs);
 myIniFile_Out.WriteInt("admin", "LockSetting", LockSettings);
 myIniFile_Out.WriteInt("admin", "LocalInputsDisabled", DisableLocalInputs);	
+myIniFile_Out.WriteInt("admin", "EnableJapInput", EnableJapInput);	
 
 
 
@@ -412,6 +427,8 @@ PollOnEventOnly=myIniFile_In.ReadInt("poll", "OnlyPollOnEvent", 0);
 Driver=myIniFile_In.ReadInt("poll", "EnableDriver", 0);
 Hook=myIniFile_In.ReadInt("poll", "EnableHook", 0);
 Virtual=myIniFile_In.ReadInt("poll", "EnableVirtual", 0);
+SingleWindow=myIniFile_In.ReadInt("poll","SingleWindow",0);
+myIniFile_In.ReadString("poll", "SingleWindowName", SingleWindowName,32);
 
 myIniFile_Out.WriteInt("poll", "TurboMode", TurboMode);
 myIniFile_Out.WriteInt("poll", "PollUnderCursor", PollUnderCursor);
@@ -422,4 +439,7 @@ myIniFile_Out.WriteInt("poll", "OnlyPollOnEvent", PollOnEventOnly);
 myIniFile_Out.WriteInt("poll", "EnableDriver", Driver);
 myIniFile_Out.WriteInt("poll", "EnableHook", Hook);
 myIniFile_Out.WriteInt("poll", "EnableVirtual", Virtual);
+
+myIniFile_Out.WriteInt("poll", "SingleWindow", SingleWindow);
+myIniFile_Out.WriteString("poll", "SingleWindowName", SingleWindowName);
 }

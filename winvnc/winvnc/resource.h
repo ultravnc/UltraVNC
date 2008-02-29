@@ -175,6 +175,8 @@
 #define IDE_CUSTOM1                     1119
 #define IDC_WWW2                        1120
 #define IDC_WWW3                        1121
+#define IDC_CHECK1                      1122
+#define IDC_JAP_INPUTS                  1122
 #define IDC_Path1                       1132
 #define IDC_Path2                       1133
 #define IDC_Path3                       1134
@@ -263,7 +265,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        152
 #define _APS_NEXT_COMMAND_VALUE         40019
-#define _APS_NEXT_CONTROL_VALUE         1122
+#define _APS_NEXT_CONTROL_VALUE         1123
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

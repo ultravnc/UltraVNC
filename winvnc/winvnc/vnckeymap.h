@@ -29,7 +29,7 @@
 
 class vncKeymap {
 public:
-  static void keyEvent(CARD32 keysym, bool down);
+  static void keyEvent(CARD32 keysym, bool down,bool jap);
   static void ClearShiftKeys();
 };
 

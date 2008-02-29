@@ -168,6 +168,7 @@ vncServer::vncServer()
 	// Set the input options
 	m_enable_remote_inputs = TRUE;
 	m_disable_local_inputs = FALSE;
+	m_enable_jap_input = FALSE;
 
 	// Clear the client mapping table
 	for (int x=0; x<MAX_CLIENTS; x++)
@@ -469,6 +470,7 @@ vncClientId vncServer::AddClient(VSocket *socket,
 	client->SetCapability(capability);
 	client->EnableKeyboard(/*keysenabled &&*/ m_enable_remote_inputs);
 	client->EnablePointer(/*ptrenabled &&*/ m_enable_remote_inputs);
+	client->EnableJap(/*ptrenabled &&*/ m_enable_jap_input);
 
 	// Start the client
 	if (!client->Init(this, socket, auth, shared, clientid))
@@ -1241,6 +1243,25 @@ vncServer::DisableLocalInputs(BOOL disable)
 BOOL vncServer::LocalInputsDisabled()
 {
 	return m_disable_local_inputs;
+}
+
+BOOL vncServer::JapInputEnabled()
+{
+	return m_enable_jap_input;
+}
+
+void
+vncServer::EnableJapInput(BOOL enable)
+{
+	m_enable_jap_input = enable;
+	vncClientList::iterator i;
+		
+	omni_mutex_lock l(m_clientsLock);
+
+	for (i = m_authClients.begin(); i != m_authClients.end(); i++)
+	{
+		GetClient(*i)->EnableJap(m_enable_jap_input);
+	}
 }
 
 void 

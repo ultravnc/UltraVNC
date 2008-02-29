@@ -254,7 +254,7 @@ inline vncEncodeMgr::~vncEncodeMgr()
 	}
 	if (m_clientbuff != NULL)
 	{
-		delete m_clientbuff;
+		delete [] m_clientbuff;
 		m_clientbuff = NULL;
 	}
 /*	if (m_clientbackbuff != NULL)

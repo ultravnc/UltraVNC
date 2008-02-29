@@ -711,7 +711,7 @@ vncService::PostAddNewClient(unsigned long ipaddress, unsigned short port)
 	if (!PostToWinVNC(MENU_ADD_CLIENT_MSG, (WPARAM)port, (LPARAM)ipaddress))
 	{
 
-		MessageBox(NULL, sz_ID_NO_EXIST_INST, szAppName, MB_ICONEXCLAMATION | MB_OK);
+		//MessageBox(NULL, sz_ID_NO_EXIST_INST, szAppName, MB_ICONEXCLAMATION | MB_OK);
 
 		return FALSE;
 	}

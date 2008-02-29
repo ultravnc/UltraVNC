@@ -140,6 +140,7 @@ protected:
 	BOOL m_pref_EnableRemoteInputs;
 	int m_pref_LockSettings;
 	BOOL m_pref_DisableLocalInputs;
+	BOOL m_pref_EnableJapInput;
 
 	// Modif sf@2002
 	// [v1.0.2-jp2 fix]
@@ -151,7 +152,7 @@ protected:
 	BOOL m_pref_RequireMSLogon;
 	BOOL m_pref_CaptureAlphaBlending;
 	BOOL m_pref_BlackAlphaBlending;
-	BOOL m_pref_GammaGray;	// [v1.0.2-jp1 fix1]
+//	BOOL m_pref_GammaGray;	// [v1.0.2-jp1 fix1]
 
 	
 	// Marscha@2004 - authSSP: added state of "New MS-Logon"

@@ -425,8 +425,8 @@ vncProperties::DialogProc(HWND hwnd,
            SendMessage(hAlphab, BM_SETCHECK, _this->m_server->BlackAlphaBlending(), 0);
 
 		   // [v1.0.2-jp1 fix]
-		   HWND hGammaGray = GetDlgItem(hwnd, IDC_GAMMAGRAY);
-           SendMessage(hGammaGray, BM_SETCHECK, _this->m_server->GammaGray(), 0);
+//		   HWND hGammaGray = GetDlgItem(hwnd, IDC_GAMMAGRAY);
+//         SendMessage(hGammaGray, BM_SETCHECK, _this->m_server->GammaGray(), 0);
 		   
 		   HWND hLoopback = GetDlgItem(hwnd, IDC_ALLOWLOOPBACK);
 		   BOOL fLoopback = _this->m_server->LoopbackOk();
@@ -482,6 +482,13 @@ vncProperties::DialogProc(HWND hwnd,
 			SendMessage(hDisableLocalInputs,
 				BM_SETCHECK,
 				_this->m_server->LocalInputsDisabled(),
+				0);
+
+			// japanese keybaord
+			HWND hJapInputs = GetDlgItem(hwnd, IDC_JAP_INPUTS);
+			SendMessage(hJapInputs,
+				BM_SETCHECK,
+				_this->m_server->JapInputEnabled(),
 				0);
 
 			// Remove the wallpaper
@@ -577,6 +584,10 @@ vncProperties::DialogProc(HWND hwnd,
 			SendMessage(hQuery, BM_SETCHECK, queryEnabled, 0);
 			HWND hQueryTimeout = GetDlgItem(hwnd, IDQUERYTIMEOUT);
 			EnableWindow(hQueryTimeout, queryEnabled);
+			EnableWindow(GetDlgItem(hwnd, IDC_DREFUSE), queryEnabled);
+			EnableWindow(GetDlgItem(hwnd, IDC_DACCEPT), queryEnabled);
+
+
 			char timeout[128];
 			UINT t = _this->m_server->QueryTimeout();
 			sprintf(timeout, "%d", (int)t);
@@ -700,6 +711,12 @@ vncProperties::DialogProc(HWND hwnd,
 					SendMessage(hDisableLocalInputs, BM_GETCHECK, 0, 0) == BST_CHECKED
 					);
 
+				// japanese keyboard
+				HWND hJapInputs = GetDlgItem(hwnd, IDC_JAP_INPUTS);
+				_this->m_server->EnableJapInput(
+					SendMessage(hJapInputs, BM_GETCHECK, 0, 0) == BST_CHECKED
+					);
+
 				// Wallpaper handling
 				HWND hRemoveWallpaper = GetDlgItem(hwnd, IDC_REMOVE_WALLPAPER);
 				_this->m_server->EnableRemoveWallpaper(
@@ -779,8 +796,8 @@ vncProperties::DialogProc(HWND hwnd,
 				_this->m_server->BlackAlphaBlending(SendMessage(hAlphab, BM_GETCHECK, 0, 0) == BST_CHECKED);
 
 				// [v1.0.2-jp1 fix]
-				HWND hGammaGray = GetDlgItem(hwnd, IDC_GAMMAGRAY);
-				_this->m_server->GammaGray(SendMessage(hGammaGray, BM_GETCHECK, 0, 0) == BST_CHECKED);
+//				HWND hGammaGray = GetDlgItem(hwnd, IDC_GAMMAGRAY);
+//				_this->m_server->GammaGray(SendMessage(hGammaGray, BM_GETCHECK, 0, 0) == BST_CHECKED);
 
 				_this->m_server->SetLoopbackOk(IsDlgButtonChecked(hwnd, IDC_ALLOWLOOPBACK));
 				_this->m_server->SetLoopbackOnly(IsDlgButtonChecked(hwnd, IDC_LOOPBACKONLY));
@@ -1017,6 +1034,8 @@ vncProperties::DialogProc(HWND hwnd,
 				HWND hQuery = GetDlgItem(hwnd, IDQUERY);
 				BOOL queryon = (SendMessage(hQuery, BM_GETCHECK, 0, 0) == BST_CHECKED);
 				EnableWindow(GetDlgItem(hwnd, IDQUERYTIMEOUT), queryon);
+				EnableWindow(GetDlgItem(hwnd, IDC_DREFUSE), queryon);
+				EnableWindow(GetDlgItem(hwnd, IDC_DACCEPT), queryon);
 			}
 			return TRUE;
 
@@ -1519,6 +1538,7 @@ LABELUSERSETTINGS:
 	m_pref_IdleTimeout=0;
 	m_pref_EnableRemoteInputs=TRUE;
 	m_pref_DisableLocalInputs=FALSE;
+	m_pref_EnableJapInput=FALSE;
 	m_pref_LockSettings=-1;
 
 	m_pref_RemoveWallpaper=TRUE;
@@ -1539,7 +1559,7 @@ LABELUSERSETTINGS:
 	m_pref_DefaultScale = 1;
 	m_pref_CaptureAlphaBlending = FALSE; 
 	m_pref_BlackAlphaBlending = FALSE; 
-	m_pref_GammaGray = FALSE;			// [v1.0.2-jp1 fix]
+//	m_pref_GammaGray = FALSE;			// [v1.0.2-jp1 fix]
 
 
 	// Load the local prefs for this user
@@ -1623,7 +1643,7 @@ vncProperties::LoadUserPrefs(HKEY appkey)
 	m_pref_DefaultScale = LoadInt(appkey, "DefaultScale", m_pref_DefaultScale);
 	m_pref_CaptureAlphaBlending = LoadInt(appkey, "CaptureAlphaBlending", m_pref_CaptureAlphaBlending); // sf@2005
 	m_pref_BlackAlphaBlending = LoadInt(appkey, "BlackAlphaBlending", m_pref_BlackAlphaBlending); // sf@2005
-	m_pref_GammaGray = LoadInt(appkey, "GammaGray", m_pref_GammaGray);	// [v1.0.2-jp1 fix]
+//	m_pref_GammaGray = LoadInt(appkey, "GammaGray", m_pref_GammaGray);	// [v1.0.2-jp1 fix]
 
 	m_pref_UseDSMPlugin = LoadInt(appkey, "UseDSMPlugin", m_pref_UseDSMPlugin);
 	LoadDSMPluginName(appkey, m_pref_szDSMPlugin);
@@ -1660,6 +1680,7 @@ vncProperties::LoadUserPrefs(HKEY appkey)
 	m_pref_EnableRemoteInputs=LoadInt(appkey, "InputsEnabled", m_pref_EnableRemoteInputs);
 	m_pref_LockSettings=LoadInt(appkey, "LockSetting", m_pref_LockSettings);
 	m_pref_DisableLocalInputs=LoadInt(appkey, "LocalInputsDisabled", m_pref_DisableLocalInputs);
+	m_pref_EnableJapInput=LoadInt(appkey, "EnableJapInput", m_pref_EnableJapInput);
 }
 
 void
@@ -1672,7 +1693,7 @@ vncProperties::ApplyUserPrefs()
 	m_server->FTUserImpersonation(m_pref_FTUserImpersonation); // sf@2005
 	m_server->CaptureAlphaBlending(m_pref_CaptureAlphaBlending); // sf@2005
 	m_server->BlackAlphaBlending(m_pref_BlackAlphaBlending); // sf@2005
-	m_server->GammaGray(m_pref_GammaGray);	// [v1.0.2-jp1 fix]
+//	m_server->GammaGray(m_pref_GammaGray);	// [v1.0.2-jp1 fix]
 
 	m_server->BlankMonitorEnabled(m_pref_EnableBlankMonitor);
 	m_server->SetDefaultScale(m_pref_DefaultScale);
@@ -1698,6 +1719,8 @@ vncProperties::ApplyUserPrefs()
 		m_server->EnableRemoteInputs(m_pref_EnableRemoteInputs);
 	if (m_pref_DisableLocalInputs)
 		m_server->DisableLocalInputs(m_pref_DisableLocalInputs);
+	if (m_pref_EnableJapInput)
+		m_server->EnableJapInput(m_pref_EnableJapInput);
 
 	// Update the password
 	m_server->SetPassword(m_pref_passwd);
@@ -1715,6 +1738,7 @@ vncProperties::ApplyUserPrefs()
 	m_server->EnableRemoteInputs(m_pref_EnableRemoteInputs);
 	m_server->SetLockSettings(m_pref_LockSettings);
 	m_server->DisableLocalInputs(m_pref_DisableLocalInputs);
+	m_server->EnableJapInput(m_pref_EnableJapInput);
 
 	// DSM Plugin prefs
 	m_server->EnableDSMPlugin(m_pref_UseDSMPlugin);
@@ -1876,7 +1900,7 @@ vncProperties::SaveUserPrefs(HKEY appkey)
 	SaveInt(appkey, "BlankMonitorEnabled", m_server->BlankMonitorEnabled());
 	SaveInt(appkey, "CaptureAlphaBlending", m_server->CaptureAlphaBlending()); // sf@2005
 	SaveInt(appkey, "BlackAlphaBlending", m_server->BlackAlphaBlending()); // sf@2005
-	SaveInt(appkey, "GammaGray", m_server->GammaGray());	// [v1.0.2-jp1 fix]
+//	SaveInt(appkey, "GammaGray", m_server->GammaGray());	// [v1.0.2-jp1 fix]
 
 	SaveInt(appkey, "DefaultScale", m_server->GetDefaultScale());
 
@@ -1895,6 +1919,7 @@ vncProperties::SaveUserPrefs(HKEY appkey)
 	SaveInt(appkey, "InputsEnabled", m_server->RemoteInputsEnabled());
 	SaveInt(appkey, "LocalInputsDisabled", m_server->LocalInputsDisabled());
 	SaveInt(appkey, "IdleTimeout", m_server->AutoIdleDisconnectTimeout());
+	SaveInt(appkey, "EnableJapInput", m_server->JapInputEnabled());
 
 	// Connection querying settings
 	SaveInt(appkey, "QuerySetting", m_server->QuerySetting());
@@ -2009,6 +2034,7 @@ void vncProperties::LoadFromIniFile()
 	m_pref_IdleTimeout=0;
 	m_pref_EnableRemoteInputs=TRUE;
 	m_pref_DisableLocalInputs=FALSE;
+	m_pref_EnableJapInput=FALSE;
 	m_pref_LockSettings=-1;
 
 	m_pref_RemoveWallpaper=TRUE;
@@ -2083,6 +2109,7 @@ void vncProperties::LoadUserPrefsFromIniFile()
 	m_pref_EnableRemoteInputs=myIniFile.ReadInt("admin", "InputsEnabled", m_pref_EnableRemoteInputs);
 	m_pref_LockSettings=myIniFile.ReadInt("admin", "LockSetting", m_pref_LockSettings);
 	m_pref_DisableLocalInputs=myIniFile.ReadInt("admin", "LocalInputsDisabled", m_pref_DisableLocalInputs);
+	m_pref_EnableJapInput=myIniFile.ReadInt("admin", "EnableJapInput", m_pref_EnableJapInput);
 }
 
 
@@ -2156,6 +2183,7 @@ void vncProperties::SaveUserPrefsToIniFile()
 	myIniFile.WriteInt("admin", "InputsEnabled", m_server->RemoteInputsEnabled());
 	myIniFile.WriteInt("admin", "LocalInputsDisabled", m_server->LocalInputsDisabled());
 	myIniFile.WriteInt("admin", "IdleTimeout", m_server->AutoIdleDisconnectTimeout());
+	myIniFile.WriteInt("admin", "EnableJapInput", m_server->JapInputEnabled());
 
 	// Connection querying settings
 	myIniFile.WriteInt("admin", "QuerySetting", m_server->QuerySetting());

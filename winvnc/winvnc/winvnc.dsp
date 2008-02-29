@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /MT /W3 /GX /Zi /O2 /I "..\omnithread" /I ".." /I "..\.." /D "NDEBUG" /D "__x86__" /D "__WIN32__" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D _WIN32_WINNT=0x501 /D "XMD_H" /D "_WINSTATIC" /YX /FD /D /O3 /QaxNB /c
+# ADD CPP /nologo /MT /W3 /GX /Zi /O2 /I "..\omnithread" /I ".." /I "..\.." /D "NDEBUG" /D "__x86__" /D "__WIN32__" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D _WIN32_WINNT=0x501 /D "XMD_H" /D "_WINSTATIC" /YX /FD /D /O3 /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x809 /d "NDEBUG"
@@ -84,7 +84,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=xilink6.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 ws2_32.lib winmm.lib kernel32.lib user32.lib gdi32.lib shell32.lib advapi32.lib ole32.lib version.lib userenv.lib wtsapi32.lib vfw32.lib /nologo /subsystem:windows /debug /machine:I386
+# ADD LINK32 ws2_32.lib winmm.lib kernel32.lib user32.lib gdi32.lib shell32.lib advapi32.lib ole32.lib version.lib userenv.lib WtsApi32.lib /nologo /subsystem:windows /debug /machine:I386
 # SUBTRACT LINK32 /profile
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
@@ -139,10 +139,6 @@ SOURCE=.\IPC.cpp
 # Begin Source File
 
 SOURCE=.\IPC.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\LinkLabel.cpp
 # End Source File
 # Begin Source File
 
@@ -405,10 +401,6 @@ SOURCE=.\inifile.h
 # Begin Source File
 
 SOURCE=.\keysymdef.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\LinkLabel.h
 # End Source File
 # Begin Source File
 

@@ -400,11 +400,11 @@ vncDesktop::~vncDesktop()
 	}
 
 	//	[v1.0.2-jp1 fix] Blank Monitor
-	if(m_server->GammaGray() && m_grayed){
-		HDC hDC = GetDC(NULL);
-		SetDeviceGammaRamp(hDC, bk_gamma);
-		ReleaseDC(NULL, hDC);
-	}
+//	if(m_server->GammaGray() && m_grayed){
+//		HDC hDC = GetDC(NULL);
+//		SetDeviceGammaRamp(hDC, bk_gamma);
+//		ReleaseDC(NULL, hDC);
+//	}
 
 
 	SetDisableInput(false);
@@ -1962,23 +1962,24 @@ vncDesktop::SetDisableInput(bool enabled)
 	{
 		//	[v1.0.2-jp1 fix] Blank Monitor
 		//if (!m_server->BlackAlphaBlending())
-		if (m_server->GammaGray())
-		{
-			if(!m_grayed){
-				WORD gamma[3][256];
-				HDC hDC = GetDC(NULL);
-				
-				GetDeviceGammaRamp(hDC, bk_gamma);
-				for(int i = 0; i < 256; i++){
-					gamma[0][i] = gamma[1][i] = gamma[2][i] = MAXWORD / 2;
-				}
-				SetDeviceGammaRamp(hDC, gamma);
-				m_grayed = TRUE;
-				
-				ReleaseDC(NULL, hDC);
-			}
-		}
-		else if (!m_server->BlackAlphaBlending())
+		//if (m_server->GammaGray())
+		//{
+		//	if(!m_grayed){
+		//		WORD gamma[3][256];
+		//		HDC hDC = GetDC(NULL);
+		//		
+		//		GetDeviceGammaRamp(hDC, bk_gamma);
+		//		for(int i = 0; i < 256; i++){
+		//			gamma[0][i] = gamma[1][i] = gamma[2][i] = MAXWORD / 2;
+		//		}
+		//		SetDeviceGammaRamp(hDC, gamma);
+		//		m_grayed = TRUE;
+		//		
+		//		ReleaseDC(NULL, hDC);
+		//	}
+		//}
+		//else
+		if (!m_server->BlackAlphaBlending())
 		//	[<--v1.0.2-jp1 fix]
 		{
 			SetProcessShutdownParameters(0x100, 0);
@@ -2001,16 +2002,15 @@ vncDesktop::SetDisableInput(bool enabled)
 	{
 		//	[v1.0.2-jp1 fix-->] Blank Monitor
 		//if (!m_server->BlackAlphaBlending())
-		if (m_server->GammaGray() && m_grayed)
-		{
-			HDC hDC = GetDC(NULL);
-
-			SetDeviceGammaRamp(hDC, bk_gamma);
-			m_grayed = FALSE;
-
-			ReleaseDC(NULL, hDC);
-		}
-		else if (!m_server->BlackAlphaBlending())
+		//if (m_server->GammaGray() && m_grayed)
+		//{
+		//	HDC hDC = GetDC(NULL);
+		//	SetDeviceGammaRamp(hDC, bk_gamma);
+		//	m_grayed = FALSE;
+		//	ReleaseDC(NULL, hDC);
+		//}
+		//else
+		if (!m_server->BlackAlphaBlending())
 		{
 			if (OldPowerOffTimeout!=0)
 				SystemParametersInfo(SPI_SETPOWEROFFTIMEOUT, OldPowerOffTimeout, NULL, 0);

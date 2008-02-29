@@ -721,7 +721,7 @@ LABELUSERSETTINGS:
 	m_pref_Virtual=FALSE;
 
 	// [v1.0.2-jp2 fix]
-	m_pref_SingleWindow = FALSE;
+	m_pref_SingleWindow = 0;
 	*m_pref_szSingleWindowName = '\0';
 
 	// Load the local prefs for this user
@@ -932,6 +932,9 @@ void vncPropertiesPoll::LoadFromIniFile()
 	m_pref_Hook=TRUE;
 	m_pref_Virtual=FALSE;
 
+	m_pref_SingleWindow = 0;
+	*m_pref_szSingleWindowName = '\0';
+
 	LoadUserPrefsPollFromIniFile();
 	ApplyUserPrefs();
 }
@@ -950,6 +953,9 @@ void vncPropertiesPoll::LoadUserPrefsPollFromIniFile()
 	if (m_pref_Driver)m_pref_Driver=CheckVideoDriver(0);
 	m_pref_Hook=myIniFile.ReadInt("poll", "EnableHook", m_pref_Hook);
 	m_pref_Virtual=myIniFile.ReadInt("poll", "EnableVirtual", m_pref_Virtual);
+	
+	m_pref_SingleWindow=myIniFile.ReadInt("poll","SingleWindow",m_pref_SingleWindow);
+	myIniFile.ReadString("poll", "SingleWindowName", m_pref_szSingleWindowName,32);
 
 }
 
@@ -987,5 +993,8 @@ void vncPropertiesPoll::SaveUserPrefsPollToIniFile()
 	myIniFile.WriteInt("poll", "EnableDriver", m_server->Driver());
 	myIniFile.WriteInt("poll", "EnableHook", m_server->Hook());
 	myIniFile.WriteInt("poll", "EnableVirtual", m_server->Virtual());
+
+	myIniFile.WriteInt("poll", "SingleWindow", m_server->SingleWindow());
+	myIniFile.WriteString("poll", "SingleWindowName", m_server->GetWindowName());
 	
 }

@@ -401,8 +401,8 @@ protected:
 	bool OldCaptureBlending;
 
 	//	[v1.0.2-jp1 fix] Monitor Blanking
-	BOOL m_grayed;
-	WORD bk_gamma[3][256];
+	//BOOL m_grayed;
+	//WORD bk_gamma[3][256];
 	
 	//hook selection
 	BOOL m_hookdll;

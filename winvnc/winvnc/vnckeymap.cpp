@@ -453,7 +453,7 @@ public:
 
 
 
-  void keyEvent(rdr::U32 keysym, bool down)
+  void keyEvent(rdr::U32 keysym, bool down, bool jap)
   {
 	  vnclog.Print(LL_INTWARN, " keysym 0x%x",keysym);
 	if (keysym>=XK_dead_grave && keysym <=XK_dead_belowdot)// && down)
@@ -560,13 +560,17 @@ public:
       SHORT s = VkKeyScan(keysym);
 
       //	[v1.0.2-jp1 fix] yak!'s patch
-      if (keysym==XK_kana_WO) {
-        s = 0x0130;
-      } else if (keysym==XK_backslash) {
-        s = 0x00e2;
-      } else if (keysym==XK_yen) {
-        s = 0x00dc;
-      }
+	  // This break Other keyboards, we need an easy way of fixing this
+	  if (jap)
+	  {
+		  if (keysym==XK_kana_WO) {
+			s = 0x0130;
+		  } else if (keysym==XK_backslash) {
+			s = 0x00e2;
+		  } else if (keysym==XK_yen) {
+			s = 0x00dc;
+		  }
+	  }
 
 	  vnclog.Print(LL_INTWARN, " SHORT s %i",s);
 
@@ -721,9 +725,9 @@ private:
   std::map<rdr::U32,bool> extendedMap;
 } key_mapper;
 
-void vncKeymap::keyEvent(CARD32 keysym, bool down)
+void vncKeymap::keyEvent(CARD32 keysym, bool down,bool jap)
 {
-  key_mapper.keyEvent(keysym, down);
+  key_mapper.keyEvent(keysym, down,jap);
 }
 
 

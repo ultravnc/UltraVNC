@@ -225,6 +225,8 @@ public:
 	// Local input handling
 	virtual void DisableLocalInputs(BOOL disable);
 	virtual BOOL LocalInputsDisabled();
+	virtual BOOL JapInputEnabled();
+	virtual void EnableJapInput(BOOL enable);
 
 	// General connection handling
 	virtual void SetConnectPriority(UINT priority) {m_connect_pri = priority;};
@@ -361,8 +363,8 @@ public:
 	virtual void BlackAlphaBlending(BOOL fEnabled){m_fBlackAlphaBlending = fEnabled;};
 
 	// [v1.0.2-jp1 fix]
-	virtual BOOL GammaGray(){return m_fGammaGray;};
-	virtual void GammaGray(BOOL fEnabled){m_fGammaGray = fEnabled;};
+//	virtual BOOL GammaGray(){return m_fGammaGray;};
+//	virtual void GammaGray(BOOL fEnabled){m_fGammaGray = fEnabled;};
 
 	virtual void Clear_Update_Tracker();
 	virtual void UpdateCursorShape();
@@ -417,6 +419,7 @@ protected:
 	char				*m_auth_hosts;
 	BOOL				m_enable_remote_inputs;
 	BOOL				m_disable_local_inputs;
+	BOOL				m_enable_jap_input;
 	int					m_lock_on_exit;
 	int					m_connect_pri;
 	UINT				m_querysetting;
@@ -515,7 +518,7 @@ protected:
 	// sf@2005
 	BOOL m_fCaptureAlphaBlending;
 	BOOL m_fBlackAlphaBlending;
-	BOOL m_fGammaGray;	// [v1.0.2-jp1 fix]
+	//BOOL m_fGammaGray;	// [v1.0.2-jp1 fix]
 
 	HINSTANCE   hWtsLib;
 };

@@ -47,9 +47,6 @@
 #include "vncOSVersion.h"
 #include "videodriver.h"
 
-// [v1.0.2-jp1 fix] Support "LinkLabel"
-//#include "LinkLabel.h"
-
 //#define CRASH_ENABLED
 #ifdef CRASH_ENABLED
 	#ifndef _CRASH_RPT_

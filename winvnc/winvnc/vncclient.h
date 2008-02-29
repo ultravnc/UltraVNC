@@ -130,6 +130,7 @@ public:
 	// Functions for setting & getting the client settings
 	virtual void EnableKeyboard(BOOL enable) {m_keyboardenabled = enable;};
 	virtual void EnablePointer(BOOL enable) {m_pointerenabled = enable;};
+	virtual void EnableJap(BOOL enable) {m_jap = enable;};
 	virtual void SetCapability(int capability) {m_capability = capability;};
 
 	virtual int GetCapability() {return m_capability;};
@@ -293,6 +294,7 @@ protected:
 	BOOL			m_IsLoopback;
 	BOOL			m_keyboardenabled;
 	BOOL			m_pointerenabled;
+	BOOL			m_jap;
 	int				m_capability;
 	vncClientId		m_id;
 	long			m_lConnectTime;

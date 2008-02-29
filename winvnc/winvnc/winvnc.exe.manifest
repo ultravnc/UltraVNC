@@ -3,7 +3,7 @@
 <assemblyIdentity
    version="1.0.0.20"
    processorArchitecture="X86"
-   name="UltraVNC.vncviewer.exe"
+   name="UltraVNC..exe"
    type="win32"
 />
 <description>UltraVNC</description>
