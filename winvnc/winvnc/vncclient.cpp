@@ -1236,6 +1236,8 @@ vncClientThread::run(void *arg)
 	set_priority(omni_thread::PRIORITY_HIGH);
 
 	BOOL connected = TRUE;
+	// added jeff
+	BOOL need_to_disable_input = m_server->LocalInputsDisabled();
 	while (connected)
 	{
 		rfbClientToServerMsg msg;
@@ -1244,7 +1246,13 @@ vncClientThread::run(void *arg)
 		if (!vncService::InputDesktopSelected()) 
 			if (!vncService::SelectDesktop(NULL)) 
 					break;
-
+		// added jeff
+        if (need_to_disable_input)
+        {
+            // have to do this here if we're a service so that we're on the correct desktop
+            m_client->m_encodemgr.m_buffer->m_desktop->SetDisableInput(m_server->LocalInputsDisabled());
+            need_to_disable_input = false;
+        }
 		// sf@2002 - v1.1.2
 		int nTO = 1; // Type offset
 		// If DSM Plugin, we must read all the transformed incoming rfb messages (type included)
@@ -1820,8 +1828,12 @@ vncClientThread::run(void *arg)
 			}
 			if (m_client->m_keyboardenabled)
 				{
-					if (msg.sim.status==1) m_client->m_encodemgr.m_buffer->m_desktop->SetDisableInput(true);
-					if (msg.sim.status==0) m_client->m_encodemgr.m_buffer->m_desktop->SetDisableInput(false);
+					//if (msg.sim.status==1) m_client->m_encodemgr.m_buffer->m_desktop->SetDisableInput(true);
+					//if (msg.sim.status==0) m_client->m_encodemgr.m_buffer->m_desktop->SetDisableInput(false);
+					// added jeff
+					vnclog.Print(LL_INTINFO, VNCLOG("rfbSetServerInput:  %s\n"), (msg.sim.status==1) ? "enabled" : "disabled");
+                    m_client->m_encodemgr.m_buffer->m_desktop->SetDisableInput(msg.sim.status==1);
+                    m_client->m_encodemgr.m_buffer->m_desktop->SetBlankMonitor(msg.sim.status==1);
 				}
 			break;
 

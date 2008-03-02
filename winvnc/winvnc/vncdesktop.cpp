@@ -408,6 +408,8 @@ vncDesktop::~vncDesktop()
 
 
 	SetDisableInput(false);
+	// added jeff
+	SetBlankMonitor(false);
 	// Let's call Shutdown just in case something went wrong...
 	Shutdown();
 
@@ -1933,6 +1935,52 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
+// added jef
+void vncDesktop::SetBlankMonitor(bool enabled)
+{
+	// Also Turn Off the Monitor if allowed ("Blank Screen", "Blank Monitor")
+	if (m_server->BlankMonitorEnabled())
+    {
+	    if (enabled)
+	    {
+		    if (!m_server->BlackAlphaBlending())
+		    {
+			    SetProcessShutdownParameters(0x100, 0);
+			    SystemParametersInfo(SPI_GETPOWEROFFTIMEOUT, 0, &OldPowerOffTimeout, 0);
+			    SystemParametersInfo(SPI_SETPOWEROFFTIMEOUT, 100, NULL, 0);
+			    SystemParametersInfo(SPI_SETPOWEROFFACTIVE, 1, NULL, 0);
+			    SendMessage(m_hwnd,WM_SYSCOMMAND,SC_MONITORPOWER,(LPARAM)2);
+		    }
+		    else
+		    {
+			    HANDLE ThreadHandle2;
+			    DWORD dwTId;
+			    ThreadHandle2 = CreateThread(NULL, 0, BlackWindow, NULL, 0, &dwTId);
+			    CloseHandle(ThreadHandle2);
+			    OldCaptureBlending=(FALSE != m_fCaptureAlphaBlending);
+			    m_fCaptureAlphaBlending=false;
+		    }
+	    }
+	    else // Monitor On
+	    {
+		    if (!m_server->BlackAlphaBlending())
+		    {
+			    if (OldPowerOffTimeout!=0)
+				    SystemParametersInfo(SPI_SETPOWEROFFTIMEOUT, OldPowerOffTimeout, NULL, 0);
+			    SystemParametersInfo(SPI_SETPOWEROFFACTIVE, 0, NULL, 0);
+			    if (m_hwnd!=NULL) SendMessage(m_hwnd,WM_SYSCOMMAND,SC_MONITORPOWER,(LPARAM)-1);
+			    OldPowerOffTimeout=0;
+		    }
+		    else
+		    {
+			    HWND Blackhnd = FindWindow(("blackscreen"), 0);
+			    if (Blackhnd) PostMessage(Blackhnd, WM_CLOSE, 0, 0);
+			    m_fCaptureAlphaBlending=OldCaptureBlending;
+		    }
+	    }
+    }
+}
+
 
 // Modif rdv@2002 Dis/enable input
 void
@@ -1949,7 +1997,15 @@ vncDesktop::SetDisableInput(bool enabled)
 	//if hookdll is used, he take care of input blocking
 	if (OSversion()==1 || OSversion()==2) 
 		{
-			if (pbi) (*pbi)(enabled);
+			// added jeff
+			BOOL blocked;
+			if (pbi) 
+            {
+                blocked = (*pbi)(enabled);
+                if (!blocked && enabled)
+                    vnclog.Print(LL_INTINFO, VNCLOG("BlockInput failed:  Last error %08X\n"), ::GetLastError());
+            }
+
 		}
 	else
 		{
@@ -1957,7 +2013,8 @@ vncDesktop::SetDisableInput(bool enabled)
 			On_Off_hookdll=true;
 		}
 	// Also Turn Off the Monitor if allowed ("Blank Screen", "Blank Monitor")
-	if (m_server->BlankMonitorEnabled())
+	// added jeff
+/*	if (m_server->BlankMonitorEnabled())
 	if (enabled)
 	{
 		//	[v1.0.2-jp1 fix] Blank Monitor
@@ -2024,7 +2081,7 @@ vncDesktop::SetDisableInput(bool enabled)
 			if (Blackhnd) PostMessage(Blackhnd, WM_CLOSE, 0, 0);
 			m_fCaptureAlphaBlending=OldCaptureBlending;
 		}
-	}
+	}*/
 }
 
 

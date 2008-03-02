@@ -243,6 +243,8 @@ public:
 	int m_ScreenOffsety;
 	int DriverType;
 	DWORD color[10];
+	// added jeff
+	void SetBlankMonitor(bool enabled);
 	// Modif rdv@2002 Dis/enable input
 	void SetDisableInput(bool enabled);
 	void SetSW(int x,int y);
