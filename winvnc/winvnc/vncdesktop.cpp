@@ -1938,6 +1938,16 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 // added jef
 void vncDesktop::SetBlankMonitor(bool enabled)
 {
+
+	// Added Jef Fix
+	typedef DWORD (WINAPI *PSLWA)(HWND, DWORD, BYTE, DWORD);
+	PSLWA pSetLayeredWindowAttributes;
+	HMODULE hDLL = LoadLibrary ("user32");
+	pSetLayeredWindowAttributes = (PSLWA) GetProcAddress(hDLL,"SetLayeredWindowAttributes");
+	if (!pSetLayeredWindowAttributes) m_server->BlackAlphaBlending(false);
+	if (VideoBuffer()) m_server->BlackAlphaBlending(false);
+
+
 	// Also Turn Off the Monitor if allowed ("Blank Screen", "Blank Monitor")
 	if (m_server->BlankMonitorEnabled())
     {
@@ -1986,12 +1996,6 @@ void vncDesktop::SetBlankMonitor(bool enabled)
 void
 vncDesktop::SetDisableInput(bool enabled)
 {
-	typedef DWORD (WINAPI *PSLWA)(HWND, DWORD, BYTE, DWORD);
-	PSLWA pSetLayeredWindowAttributes;
-	HMODULE hDLL = LoadLibrary ("user32");
-	pSetLayeredWindowAttributes = (PSLWA) GetProcAddress(hDLL,"SetLayeredWindowAttributes");
-	if (!pSetLayeredWindowAttributes) m_server->BlackAlphaBlending(false);
-	if (VideoBuffer())m_server->BlackAlphaBlending(false);
 
 	//BlockInput block everything on non w2k and XP
 	//if hookdll is used, he take care of input blocking
@@ -2012,76 +2016,6 @@ vncDesktop::SetDisableInput(bool enabled)
 			m_server->DisableLocalInputs(enabled);
 			On_Off_hookdll=true;
 		}
-	// Also Turn Off the Monitor if allowed ("Blank Screen", "Blank Monitor")
-	// added jeff
-/*	if (m_server->BlankMonitorEnabled())
-	if (enabled)
-	{
-		//	[v1.0.2-jp1 fix] Blank Monitor
-		//if (!m_server->BlackAlphaBlending())
-		//if (m_server->GammaGray())
-		//{
-		//	if(!m_grayed){
-		//		WORD gamma[3][256];
-		//		HDC hDC = GetDC(NULL);
-		//		
-		//		GetDeviceGammaRamp(hDC, bk_gamma);
-		//		for(int i = 0; i < 256; i++){
-		//			gamma[0][i] = gamma[1][i] = gamma[2][i] = MAXWORD / 2;
-		//		}
-		//		SetDeviceGammaRamp(hDC, gamma);
-		//		m_grayed = TRUE;
-		//		
-		//		ReleaseDC(NULL, hDC);
-		//	}
-		//}
-		//else
-		if (!m_server->BlackAlphaBlending())
-		//	[<--v1.0.2-jp1 fix]
-		{
-			SetProcessShutdownParameters(0x100, 0);
-			SystemParametersInfo(SPI_GETPOWEROFFTIMEOUT, 0, &OldPowerOffTimeout, 0);
-			SystemParametersInfo(SPI_SETPOWEROFFTIMEOUT, 100, NULL, 0);
-			SystemParametersInfo(SPI_SETPOWEROFFACTIVE, 1, NULL, 0);
-			SendMessage(m_hwnd,WM_SYSCOMMAND,SC_MONITORPOWER,(LPARAM)2);
-		}
-		else
-		{
-			HANDLE ThreadHandle2;
-			DWORD dwTId;
-			ThreadHandle2 = CreateThread(NULL, 0, BlackWindow, NULL, 0, &dwTId);
-			CloseHandle(ThreadHandle2);
-			OldCaptureBlending=(FALSE != m_fCaptureAlphaBlending);
-			m_fCaptureAlphaBlending=false;
-		}
-	}
-	else // Monitor On
-	{
-		//	[v1.0.2-jp1 fix-->] Blank Monitor
-		//if (!m_server->BlackAlphaBlending())
-		//if (m_server->GammaGray() && m_grayed)
-		//{
-		//	HDC hDC = GetDC(NULL);
-		//	SetDeviceGammaRamp(hDC, bk_gamma);
-		//	m_grayed = FALSE;
-		//	ReleaseDC(NULL, hDC);
-		//}
-		//else
-		if (!m_server->BlackAlphaBlending())
-		{
-			if (OldPowerOffTimeout!=0)
-				SystemParametersInfo(SPI_SETPOWEROFFTIMEOUT, OldPowerOffTimeout, NULL, 0);
-			SystemParametersInfo(SPI_SETPOWEROFFACTIVE, 0, NULL, 0);
-			if (m_hwnd!=NULL) SendMessage(m_hwnd,WM_SYSCOMMAND,SC_MONITORPOWER,(LPARAM)-1);
-			OldPowerOffTimeout=0;
-		}
-		else
-		{
-			HWND Blackhnd = FindWindow(("blackscreen"), 0);
-			if (Blackhnd) PostMessage(Blackhnd, WM_CLOSE, 0, 0);
-			m_fCaptureAlphaBlending=OldCaptureBlending;
-		}
-	}*/
 }
 
 

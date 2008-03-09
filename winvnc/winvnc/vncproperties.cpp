@@ -911,6 +911,16 @@ vncProperties::DialogProc(HWND hwnd,
 			_this->m_dlgvisible = FALSE;
 			return TRUE;
 
+	    // Added Jef Fix - 5 March 2008 paquette@atnetsend.net
+        case IDC_BLANK:
+            {
+                // only enable alpha blanking if blanking is enabled
+                HWND hBlank = ::GetDlgItem(hwnd, IDC_BLANK);
+                HWND hAlphab = ::GetDlgItem(hwnd, IDC_ALPHABLACK);
+                ::EnableWindow(hAlphab, ::SendMessage(hBlank, BM_GETCHECK, 0, 0) == BST_CHECKED);
+            }
+            break;
+
 		case IDC_CONNECT_SOCK:
 			// TightVNC 1.2.7 method
 			// The user has clicked on the socket connect tickbox

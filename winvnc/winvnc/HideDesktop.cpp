@@ -164,6 +164,38 @@ static BOOL		ADWasEnabled = false;
 static BOOL		ISWallPaperHided = false;
 static TCHAR SCREENNAME[1024];
 
+// Added Jef Fix - 4 March 2008 jpaquette (paquette@atnetsend.net)
+static unsigned char WallpaperStyle[10] = {0}; // string "0" centered, "1" tiled, "2" stretched
+
+static const TCHAR * const DESKTOP_KEYNAME = _T("Control Panel\\Desktop");
+static const TCHAR * const DESKTOP_WALLPAPER_STYLE_KEYNAME = _T("WallpaperStyle");
+
+void SaveWallpaperStyle()
+{
+    HKEY hKey;
+
+    if (::RegOpenKeyEx(HKEY_CURRENT_USER, DESKTOP_KEYNAME, 0, KEY_READ, &hKey) == ERROR_SUCCESS)
+    {
+        DWORD sz = sizeof WallpaperStyle;
+        ::RegQueryValueEx(hKey, DESKTOP_WALLPAPER_STYLE_KEYNAME, 0, 0, WallpaperStyle, &sz);
+        ::RegCloseKey(hKey);
+    }
+}
+
+void RestoreWallpaperStyle()
+{
+    HKEY hKey;
+
+    if (::RegOpenKeyEx(HKEY_CURRENT_USER, DESKTOP_KEYNAME, 0, KEY_WRITE, &hKey) == ERROR_SUCCESS)
+    {
+        DWORD sz = strlen((const char *)WallpaperStyle);
+        ::RegSetValueEx(hKey, DESKTOP_WALLPAPER_STYLE_KEYNAME, 0, REG_SZ, WallpaperStyle, sz);
+        ::RegCloseKey(hKey);
+    }
+}
+// -- end jdp
+
+
 void HideDesktop()
 {
 	//GetProfileString("Desktop", "Pattern", "0 0 0 0 0 0 0 0", DesktopPattern, sizeof(DesktopPattern));
@@ -176,10 +208,11 @@ void HideDesktop()
 	// @@@efh On Win98 and Win95 this returns an error in the debug build (but not in release)...
 	if (!ISWallPaperHided)
 	{
-	SystemParametersInfo(SPI_GETDESKWALLPAPER,1024,SCREENNAME,NULL );
-	SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, "", SPIF_SENDCHANGE);
-	ADWasEnabled = HideActiveDesktop();
-	ISWallPaperHided=true;
+		SaveWallpaperStyle(); // Added Jef Fix
+		SystemParametersInfo(SPI_GETDESKWALLPAPER,1024,SCREENNAME,NULL );
+		SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, "", SPIF_SENDCHANGE);
+		ADWasEnabled = HideActiveDesktop();
+		ISWallPaperHided=true;
 	}
 }
 
@@ -187,11 +220,13 @@ void RestoreDesktop()
 {
 	if (ISWallPaperHided)
 	{
-	if (ADWasEnabled)
-		ShowActiveDesktop();
+		if (ADWasEnabled)
+			ShowActiveDesktop();
 
-	SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, SCREENNAME, SPIF_SENDCHANGE);
+		SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, SCREENNAME, SPIF_SENDCHANGE);
+		RestoreWallpaperStyle(); // Added Jef Fix
 	}
+
 	ISWallPaperHided=false;
 
 	//SystemParametersInfo(SPI_SETDESKPATTERN, 0, DesktopPattern, SPIF_SENDCHANGE);
