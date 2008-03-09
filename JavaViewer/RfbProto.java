@@ -1229,7 +1229,7 @@ class RfbProto {
 				}
 			}
 			// viewer.ftp.changeRemoteDirectory(str);
-			
+
 		}
 	}
 
@@ -1286,25 +1286,29 @@ class RfbProto {
 		}
 		//System.out.println("fileName= " + fileName);
 		//System.out.println("dwFileAttributes= " + dwFileAttributes);
-		
+                /*
 		if (dwFileAttributes == 268435456
 			|| dwFileAttributes == 369098752
-			|| dwFileAttributes == 285212672 
+			|| dwFileAttributes == 285212672
 			|| dwFileAttributes == 271056896
 			|| dwFileAttributes == 824705024
 			||	dwFileAttributes == 807927808
 			|| dwFileAttributes == 371720192
 			|| dwFileAttributes == 369623040
 			|| dwFileAttributes == 805306368) // Fix: troessner
-		{
-			fileName = " [" + fileName + "]";
-			remoteDirsList.add(fileName); // sf@2004
+		*/
++		// Added Jef Fix (jdp) - check for FILE_ATTRIBUTE_DIRECTORY attribute bit
++		// note that we're looking at a little-endian value in a big-endian world
++		if ((dwFileAttributes & 0x10000000) == 0x10000000)
+ 		{
+ 			fileName = " [" + fileName + "]";
+ 			remoteDirsList.add(fileName); // sf@2004
 		}
 		else
 		{
 			remoteFilesList.add(" " + fileName); // sf@2004
 		}
-	
+
 		// a.add(fileName);
 	}
 
