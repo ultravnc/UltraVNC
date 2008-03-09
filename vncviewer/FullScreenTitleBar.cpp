@@ -27,7 +27,7 @@ extern Log vnclog;
 
 //***************************************************************************************
 
-CTitleBar *TitleBarThis=NULL;
+// CTitleBar *TitleBarThis=NULL; // Added Jef Fix
 
 //***************************************************************************************
 
@@ -87,7 +87,7 @@ void CTitleBar::Init()
 
 	if(Parent!=NULL&&hInstance!=NULL)
 	{
-		TitleBarThis=this;
+		// TitleBarThis=this; // Added Jef Fix
 		this->CreateDisplay();
 	}
 }
@@ -116,7 +116,7 @@ void CTitleBar::CreateDisplay()
 	wndclass.style			= CS_DBLCLKS;
 	wndclass.lpfnWndProc	= CTitleBar::WndProc;
 	wndclass.cbClsExtra		= 0;
-	wndclass.cbWndExtra		= 0;
+	wndclass.cbWndExtra		= sizeof (CTitleBar *); // Added Jef Fix
 	wndclass.hInstance		= hInstance;
 	wndclass.hIcon=NULL;
 	wndclass.hCursor		= LoadCursor(NULL, IDC_ARROW);
@@ -147,6 +147,7 @@ void CTitleBar::CreateDisplay()
 			      hInstance,
 			      NULL);
 
+
 	//Set region to window so it is non rectangular
 	HRGN Range;
 	POINT Points[4];
@@ -160,7 +161,7 @@ void CTitleBar::CreateDisplay()
 	Points[3].y=0;
 	Range=::CreatePolygonRgn(Points, 4, ALTERNATE );
 
-	::SetWindowRgn(m_hWnd, Range, TRUE);
+	::SetWindowRgn(m_hWnd, Range, TRUE); // Added Jef Fix
 
 	//Close button
 	HWND Close=CreateWindow("STATIC",
@@ -222,6 +223,10 @@ void CTitleBar::CreateDisplay()
 LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg, 
 					   WPARAM wParam, LPARAM lParam)
 {
+	// Added Jef Fix
+    CTitleBar *TitleBarThis=NULL;
+    TitleBarThis = (CTitleBar *)::GetWindowLong(hwnd, GWL_USERDATA);
+
 	switch (iMsg)
 	{
 
