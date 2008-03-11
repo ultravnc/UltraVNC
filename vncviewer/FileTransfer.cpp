@@ -970,8 +970,9 @@ void FileTransfer::PopulateLocalListBox(HWND hWnd, LPSTR szPath)
 				break;
 			}
 		}
-		if (ResolvePossibleShortcutFolder(hWnd, ofDirT))
-			ofDirT[0] = '\0';
+		// Added Jef Fix - removed so as not to treat c:\foo\Desktop as the special folder [ Desktop ]
+		//if (ResolvePossibleShortcutFolder(hWnd, ofDirT))
+		//	ofDirT[0] = '\0';
 	}
 	else
 	{
