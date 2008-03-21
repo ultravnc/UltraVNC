@@ -2266,7 +2266,7 @@ void ClientConnection::SizeWindow()
 		//if (m_opts.m_ShowToolbar)
 		nLocalHeight -= (m_TBr.bottom); // Always take toolbar into account in calculation
 		int verticalRatio = (int)((nLocalHeight * 100) / m_si.framebufferHeight);
-		int horizontalRatio = (int)((nLocalWidth * 100) / m_si.framebufferWidth);
+		int horizontalRatio = (int)((workwidth * 100) / m_si.framebufferWidth);
 		m_opts.m_scale_num = min(verticalRatio, horizontalRatio);
 
 		m_opts.m_scale_den = 100;
