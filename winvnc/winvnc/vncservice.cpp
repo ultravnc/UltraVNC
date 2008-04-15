@@ -65,6 +65,7 @@ pProcessIdToSessionId WTSProcessIdToSessionIdF=NULL;
 #define SM_REMOTESESSION 0X1000
 #endif
 
+void ClearKeyState(BYTE key);
 DWORD GetCurrentSessionID()
 {
 	DWORD dw		 = GetCurrentProcessId();
@@ -617,6 +618,9 @@ SimulateCtrlAltDelThreadFn(void *context)
 		return FALSE;
 	}
 
+    // 9 April 2008 jdp
+    // turn off capslock if on
+    ClearKeyState(VK_CAPITAL);
 	vnclog.Print(LL_ALL, VNCLOG("generating ctrl-alt-del\n"));
 
 	// Fake a hotkey event to any windows we find there.... :(
@@ -775,4 +779,5 @@ vncService::IsInstalled()
     }
     return (FALSE != bResult);
 }
+
 

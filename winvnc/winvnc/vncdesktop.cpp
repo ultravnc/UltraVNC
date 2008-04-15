@@ -375,6 +375,7 @@ vncDesktop::vncDesktop()
 	DriverWantedSet=false;
 
 	current_monitor=3;
+    m_bIsInputDisabledByClient = false;
 }
 
 vncDesktop::~vncDesktop()
@@ -407,9 +408,8 @@ vncDesktop::~vncDesktop()
 //	}
 
 
-	SetDisableInput(false);
 	// added jeff
-	SetBlankMonitor(false);
+    SetBlockInputState(false);
 	// Let's call Shutdown just in case something went wrong...
 	Shutdown();
 
@@ -827,8 +827,8 @@ vncDesktop::InitBitmap()
 		}
 		
 	}
-
-	m_bmrect = rfb::Rect(0, 0,GetDeviceCaps(m_hrootdc, HORZRES),GetDeviceCaps(m_hrootdc, VERTRES));
+	if (current_monitor==3 && !VideoBuffer()) m_bmrect = rfb::Rect(0, 0,mymonitor[2].Width,mymonitor[2].Height);
+	else m_bmrect = rfb::Rect(0, 0,GetDeviceCaps(m_hrootdc, HORZRES),GetDeviceCaps(m_hrootdc, VERTRES));
 	vnclog.Print(LL_INTINFO, VNCLOG("bitmap dimensions are %d x %d\n"), m_bmrect.br.x, m_bmrect.br.y);
 
 	// Create a compatible memory DC
@@ -1947,6 +1947,9 @@ void vncDesktop::SetBlankMonitor(bool enabled)
 	if (!pSetLayeredWindowAttributes) m_server->BlackAlphaBlending(false);
 	if (VideoBuffer()) m_server->BlackAlphaBlending(false);
 
+    vnclog.Print(LL_INTINFO, VNCLOG("SetBlankMonitor: monitor %s, using alpha %s\n"), 
+        enabled ? "off" : "on",
+        m_server->BlackAlphaBlending() ? "true" : "false");
 
 	// Also Turn Off the Monitor if allowed ("Blank Screen", "Blank Monitor")
 	if (m_server->BlankMonitorEnabled())
@@ -1996,6 +1999,8 @@ void vncDesktop::SetBlankMonitor(bool enabled)
 void
 vncDesktop::SetDisableInput(bool enabled)
 {
+    CARD32 state = enabled ? rfbServerState_Disabled : rfbServerState_Enabled;
+    vnclog.Print(LL_INTINFO, VNCLOG("SetDisableInput:  %s\n"), enabled ? "enabled" : "disabled");
 
 	//BlockInput block everything on non w2k and XP
 	//if hookdll is used, he take care of input blocking
@@ -2016,6 +2021,7 @@ vncDesktop::SetDisableInput(bool enabled)
 			m_server->DisableLocalInputs(enabled);
 			On_Off_hookdll=true;
 		}
+    m_server->NotifyClients_StateChange(rfbServerRemoteInputsState, state);
 }
 
 
@@ -2405,4 +2411,11 @@ void vncDesktop::StartStophookdll(BOOL enabled)
 void vncDesktop::InitHookSettings()
 {
 	SethookMechanism(m_server->Hook(),m_server->Driver());
+}
+
+void vncDesktop::SetBlockInputState(bool newstate)
+{
+    SetDisableInput(newstate);
+    SetBlankMonitor(newstate);
+    m_bIsInputDisabledByClient = newstate;
 }

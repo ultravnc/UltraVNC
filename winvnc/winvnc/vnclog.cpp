@@ -188,15 +188,16 @@ void VNCLog::ReallyPrint(const char* format, va_list ap)
 	TCHAR line[(LINE_BUFFER_SIZE * 2) + 1]; // sf@2006 - Prevents buffer overflow
 	TCHAR szErrorMsg[LINE_BUFFER_SIZE];
 	DWORD  dwErrorCode = GetLastError();
-	SetLastError(0);
-	FormatMessage( 
-         FORMAT_MESSAGE_FROM_SYSTEM, NULL, dwErrorCode,
-         MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),(char *)&szErrorMsg, //lint !e545
-         LINE_BUFFER_SIZE, NULL);
     _vsnprintf(line, LINE_BUFFER_SIZE, format, ap);
+	SetLastError(0);
+    if (dwErrorCode != 0) {
+	    FormatMessage( 
+             FORMAT_MESSAGE_FROM_SYSTEM, NULL, dwErrorCode,
+             MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),(char *)&szErrorMsg,
+             LINE_BUFFER_SIZE, NULL);
 	strcat(line," --");
 	strcat(line,szErrorMsg);
-
+    }
 	ReallyPrintLine(line);
 }
 

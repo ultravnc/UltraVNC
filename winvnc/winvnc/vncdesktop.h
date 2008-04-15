@@ -262,6 +262,9 @@ public:
 	void GetPrimaryDevice();
 	void GetSecondaryDevice();
 	void Checkmonitors();
+    // 28 Mar 2008 jdp
+    void SetBlockInputState(bool newstate);
+    bool GetBlockInputState() { return m_bIsInputDisabledByClient; }
 
 	// Implementation
 protected:
@@ -442,7 +445,7 @@ int nr_monitors;
 int current_monitor;
 int asked_display;
 
-
+bool m_bIsInputDisabledByClient; // 28 March 2008 jdp
 
 };
 

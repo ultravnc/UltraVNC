@@ -192,7 +192,7 @@ int ClientConnection::LoadConnection(char *fname, bool fFromDialog)
 
 	GetPrivateProfileString("connection", "proxyhost", "", m_proxyhost, MAX_HOST_NAME_LEN, fname);
 	m_proxyport = GetPrivateProfileInt("connection", "proxyport", 0, fname);
-	m_fUseProxy = GetPrivateProfileInt("options", "UseProxy", 0, fname);
+    m_fUseProxy = GetPrivateProfileInt("options", "UseProxy", 0, fname) ? true : false;
 
 	char buf[32];
 	m_encPasswd[0] = '\0';

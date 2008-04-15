@@ -282,6 +282,7 @@ typedef struct {
 #define rfbKeyFrameUpdate 5
 #endif
 #define rfbPalmVNCReSizeFrameBuffer 0xF
+#define rfbServerState 0xAD // 26 March 2008 jdp
 
 
 /* client -> server */
@@ -337,6 +338,8 @@ typedef struct {
 #define rfbEncodingSolMonoZip				0xFFFF0008
 #define rfbEncodingUltraZip				0xFFFF0009
 
+// viewer requests server state updates
+#define rfbEncodingServerState              0xFFFF8000
 
 // Same encoder number as in tight 
 /*
@@ -814,7 +817,23 @@ typedef struct {
 #define sz_rfbPalmVNCReSizeFrameBufferMsg (12)
 
 
+// new message for sending server state to client
 
+#define rfbServerState_Disabled     0
+#define rfbServerState_Enabled      1
+
+#define rfbServerRemoteInputsState  1
+
+typedef struct {
+    CARD8   type;          /* always rfbServerState */
+    CARD8   pad1;
+    CARD8   pad2;
+    CARD8   pad3;
+    CARD32  state;         /* state id*/
+    CARD32  value;         /* state value */ 
+} rfbServerStateMsg;
+
+#define sz_rfbServerStateMsg 12
 
 /*-----------------------------------------------------------------------------
  * Union of all server->client messages.
@@ -830,6 +849,7 @@ typedef union {
 	rfbPalmVNCReSizeFrameBufferMsg prsfb; 
 	rfbFileTransferMsg ft;
 	rfbTextChatMsg tc;
+    rfbServerStateMsg ss;
 } rfbServerToClientMsg;
 
 

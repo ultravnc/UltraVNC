@@ -140,6 +140,7 @@ vncServer::vncServer()
 	m_querysetting = 2;
 	m_queryaccept = 0;
 	m_querytimeout = 10;
+	m_retry_timeout = 0;
 
 	// Autolock settings
 	m_lock_on_exit = 0;
@@ -470,7 +471,7 @@ vncClientId vncServer::AddClient(VSocket *socket,
 	client->SetCapability(capability);
 	client->EnableKeyboard(/*keysenabled &&*/ m_enable_remote_inputs);
 	client->EnablePointer(/*ptrenabled &&*/ m_enable_remote_inputs);
-	client->EnableJap(/*ptrenabled &&*/ m_enable_jap_input);
+    client->EnableJap(/*ptrenabled &&*/ m_enable_jap_input ? true : false);
 
 	// Start the client
 	if (!client->Init(this, socket, auth, shared, clientid))
@@ -1240,9 +1241,9 @@ vncServer::DisableLocalInputs(BOOL disable)
 	m_disable_local_inputs = disable;
 }
 
-BOOL vncServer::LocalInputsDisabled()
+bool vncServer::LocalInputsDisabled()
 {
-	return m_disable_local_inputs;
+    return m_disable_local_inputs ? true : false;
 }
 
 BOOL vncServer::JapInputEnabled()
@@ -1260,7 +1261,7 @@ vncServer::EnableJapInput(BOOL enable)
 
 	for (i = m_authClients.begin(); i != m_authClients.end(); i++)
 	{
-		GetClient(*i)->EnableJap(m_enable_jap_input);
+        GetClient(*i)->EnableJap(m_enable_jap_input ? true : false);
 	}
 }
 
@@ -2231,5 +2232,31 @@ void vncServer::_actualTimerRetryHandler()
 				m_retry_timeout = SetTimer( NULL, 0, (1000*30), (TIMERPROC)_timerRetryHandler );
 			}
 		}
+	}
+}
+void vncServer::NotifyClients_StateChange(CARD32 state, CARD32 value)
+{
+	omni_mutex_lock l(m_clientsLock);
+    vncClient *client = NULL;
+
+    vncClientList::iterator i;
+	for (i = m_unauthClients.begin(); i != m_unauthClients.end(); i++)
+	{
+		// Is this the right client?
+        client = GetClient(*i);
+        if (!client)
+            continue;
+
+        client->SendServerStateUpdate(state, value);
+	}
+
+	for (i = m_authClients.begin(); i != m_authClients.end(); i++)
+	{
+		// Is this the right client?
+        client = GetClient(*i);
+        if (!client)
+            continue;
+
+        client->SendServerStateUpdate(state, value);
 	}
 }

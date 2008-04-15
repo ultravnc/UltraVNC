@@ -625,6 +625,12 @@ public:
 
       BYTE vkCode = LOBYTE(s);
 
+      // 18 March 2008 jdp
+      // Correct the keymask shift state to cope with the capslock state
+      BOOL capslockOn = (GetKeyState(VK_CAPITAL) & 1) != 0;
+
+      BYTE modifierState = HIBYTE(s);
+      modifierState = capslockOn ? modifierState ^ 1 : modifierState;
       KeyStateModifier ctrl(VK_CONTROL);
       KeyStateModifier alt(VK_MENU);
       KeyStateModifier shift(VK_SHIFT);
@@ -632,7 +638,6 @@ public:
       KeyStateModifier rshift(VK_RSHIFT);
 
       if (down) {
-        BYTE modifierState = HIBYTE(s);
         if (modifierState & 2) ctrl.press();
         if (modifierState & 4) alt.press();
         if (modifierState & 1) {
@@ -652,8 +657,8 @@ public:
         }
       }
       vnclog.Print(LL_INTINFO,
-                   "latin-1 key: keysym %d(0x%x) vkCode 0x%x down %d\n",
-                   keysym, keysym, vkCode, down);
+                   "latin-1 key: keysym %d(0x%x) vkCode 0x%x down %d capslockOn %d\n",
+                   keysym, keysym, vkCode, down, capslockOn);
 
       doKeyboardEvent(vkCode, down ? 0 : KEYEVENTF_KEYUP);
 

@@ -324,6 +324,7 @@ vncMenu::vncMenu(vncServer *server)
  			if (!m_flash_icon) m_flash_icon=(HICON)LoadImage(hInstResDLL, MAKEINTRESOURCE(IDI_FLASH), IMAGE_ICON,
                        GetSystemMetrics(SM_CXSMICON),
                         GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR);
+			
 		  }
 		  else
 		 {
@@ -331,6 +332,7 @@ vncMenu::vncMenu(vncServer *server)
                         GetSystemMetrics(SM_CYSMICON), LR_LOADFROMFILE|LR_VGACOLOR);
 				m_flash_icon=(HICON)LoadImage(NULL, "icon2.ico", IMAGE_ICON, GetSystemMetrics(SM_CXSMICON),
                         GetSystemMetrics(SM_CYSMICON), LR_LOADFROMFILE|LR_VGACOLOR);
+				
 			  // [v1.0.2-jp1 fix]
 			  //if (!m_winvnc_icon)m_winvnc_icon=(HICON)LoadImage(hAppInstance, MAKEINTRESOURCE(IDI_WINVNC), IMAGE_ICON,
  			  if (!m_winvnc_icon)m_winvnc_icon=(HICON)LoadImage(hInstResDLL, MAKEINTRESOURCE(IDI_WINVNC), IMAGE_ICON,
@@ -341,6 +343,7 @@ vncMenu::vncMenu(vncServer *server)
  			 if (!m_flash_icon)m_flash_icon=(HICON)LoadImage(hInstResDLL, MAKEINTRESOURCE(IDI_FLASH), IMAGE_ICON,
                        GetSystemMetrics(SM_CXSMICON),
                         GetSystemMetrics(SM_CYSMICON), LR_VGACOLOR);
+			 
 		  }
 		 }
 	else
@@ -349,6 +352,7 @@ vncMenu::vncMenu(vncServer *server)
                         GetSystemMetrics(SM_CYSMICON), LR_LOADFROMFILE|LR_VGACOLOR);
 				m_flash_icon=(HICON)LoadImage(NULL, "icon2.ico", IMAGE_ICON, GetSystemMetrics(SM_CXSMICON),
                         GetSystemMetrics(SM_CYSMICON), LR_LOADFROMFILE|LR_VGACOLOR);
+				
 				// [v1.0.2-jp1 fix]
 				//if (!m_winvnc_icon)m_winvnc_icon=(HICON)LoadImage(hAppInstance, MAKEINTRESOURCE(IDI_WINVNC), IMAGE_ICON,
 				if (!m_winvnc_icon)m_winvnc_icon=(HICON)LoadImage(hInstResDLL, MAKEINTRESOURCE(IDI_WINVNC), IMAGE_ICON,
@@ -359,6 +363,7 @@ vncMenu::vncMenu(vncServer *server)
 				if (!m_flash_icon)m_flash_icon=(HICON)LoadImage(hInstResDLL, MAKEINTRESOURCE(IDI_FLASH), IMAGE_ICON,
                         GetSystemMetrics(SM_CXSMICON),
                         GetSystemMetrics(SM_CYSMICON), LR_VGACOLOR);
+				
 		  }
 	}
 
@@ -479,7 +484,7 @@ vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 	// Create the tray icon message
 	m_nid.hWnd = m_hwnd;
 	m_nid.cbSize = sizeof(m_nid);
-	m_nid.uID = IDI_WINVNC;			// never changes after construction
+	m_nid.uID = IDI_WINVNC;			// never changes after construction	
 	m_nid.hIcon = flash ? m_flash_icon : m_winvnc_icon;
 	m_nid.uFlags = NIF_ICON | NIF_MESSAGE;
 	m_nid.uCallbackMessage = WM_TRAYNOTIFY;

@@ -57,7 +57,7 @@ vncBuffer::vncBuffer()
 	nRowIndex = 0;
 	m_cursorpending = false;
 	m_display_prim=1;
-	m_display_sec=1;
+	m_display_sec=0;
 
 	// sf@2005 - Grey Palette
 	m_fGreyPalette = false;

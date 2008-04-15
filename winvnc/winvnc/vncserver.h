@@ -224,7 +224,7 @@ public:
 
 	// Local input handling
 	virtual void DisableLocalInputs(BOOL disable);
-	virtual BOOL LocalInputsDisabled();
+	virtual bool LocalInputsDisabled();
 	virtual BOOL JapInputEnabled();
 	virtual void EnableJapInput(BOOL enable);
 
@@ -371,6 +371,9 @@ public:
 
 	bool IsClient(vncClient* pClient);
 
+    void EnableServerStateUpdates(bool newstate) { m_fEnableStateUpdates = newstate; }
+    bool DoServerStateUpdates() { return m_fEnableStateUpdates; }
+    void NotifyClients_StateChange(CARD32 state, CARD32 value);
 
 protected:
 	// The vncServer UpdateTracker class
@@ -521,6 +524,7 @@ protected:
 	//BOOL m_fGammaGray;	// [v1.0.2-jp1 fix]
 
 	HINSTANCE   hWtsLib;
+    bool m_fEnableStateUpdates;
 };
 
 #endif

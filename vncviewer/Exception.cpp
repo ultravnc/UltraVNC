@@ -26,11 +26,12 @@
 #include "Exception.h"
 #include "messbox.h"
 
-Exception::Exception(const char *info,int error_nr)
+Exception::Exception(const char *info,int error_nr) : m_error_nr(-1)
 {
 	assert(info != NULL);
 	m_info = new char[strlen(info)+1];
 	strcpy(m_info, info);
+    if (error_nr)
 	m_error_nr=error_nr;
 }
 

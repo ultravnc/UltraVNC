@@ -130,7 +130,7 @@ public:
 	// Functions for setting & getting the client settings
 	virtual void EnableKeyboard(BOOL enable) {m_keyboardenabled = enable;};
 	virtual void EnablePointer(BOOL enable) {m_pointerenabled = enable;};
-	virtual void EnableJap(BOOL enable) {m_jap = enable;};
+	virtual void EnableJap(bool enable) {m_jap = enable;};
 	virtual void SetCapability(int capability) {m_capability = capability;};
 
 	virtual int GetCapability() {return m_capability;};
@@ -176,6 +176,7 @@ public:
 	bool DoFTUserImpersonation();
 	void UndoFTUserImpersonation();
 
+    void SendServerStateUpdate(CARD32 state, CARD32 value);
 	// sf@2002 
 	// Update routines
 protected:
@@ -294,7 +295,7 @@ protected:
 	BOOL			m_IsLoopback;
 	BOOL			m_keyboardenabled;
 	BOOL			m_pointerenabled;
-	BOOL			m_jap;
+	bool			m_jap;
 	int				m_capability;
 	vncClientId		m_id;
 	long			m_lConnectTime;
@@ -375,6 +376,8 @@ protected:
 	bool m_fFileDownloadError;
 	bool m_fFileDownloadRunning;
 
+    // 8 April 2008 jdp
+    bool m_fDeletePartialFileTransfer;
 	char m_szSrcFileName[MAX_PATH + 64]; // Path + timestring
 	HANDLE m_hSrcFile;
 	bool m_fEof;
@@ -429,6 +432,7 @@ protected:
 	HANDLE m_hmtxEncodeAccess;
 #endif
 
+    bool        m_wants_ServerStateUpdates;
 };
 
 #endif

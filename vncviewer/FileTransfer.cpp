@@ -2072,7 +2072,7 @@ bool FileTransfer::FinishFileReception()
 	CloseHandle(m_hDestFile);
 
 	// sf@2004 - Delta Transfer - Now we can keep the existing file data :)
-	if (m_fFileDownloadError && m_fOldFTProtocole) DeleteFile(m_szDestFileName);
+	if (m_fFileDownloadError && (m_fOldFTProtocole || m_fAborted)) DeleteFile(m_szDestFileName);
 
 	// sf@2003 - Directory Transfer trick
 	// If the file is an Ultra Directory Zip we unzip it here and we delete the

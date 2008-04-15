@@ -82,6 +82,7 @@ const UINT FileTransferSendPacketMessage = RegisterWindowMessage("UltraVNC.Viewe
 extern bool g_passwordfailed;
 bool havetobekilled;
 bool forcedexit=false;
+const UINT RebuildToolbarMessage = RegisterWindowMessage("UltraVNC.Viewer.RebuildToolbar");
 
 /*
  * Macro to compare pixel formats.
@@ -573,7 +574,7 @@ void ClientConnection::Reconnect()
 			e.Report();
 		reconnectcounter--;
 		if (reconnectcounter<0) reconnectcounter=0;
-		PostMessage(m_hwndMain, WM_CLOSE, reconnectcounter, 0);
+		PostMessage(m_hwndMain, WM_CLOSE, reconnectcounter, 1);
 	}
 }
 
@@ -887,8 +888,28 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 	}
 }
 
-
-
+void ClientConnection::RebuildToolbar(HWND hwnd)
+{
+    if (m_opts.m_ShowToolbar)
+    {
+        RECT rect;
+        GetWindowRect(hwnd, &rect);
+        m_winwidth = rect.right - rect.left;
+        m_winheight = rect.bottom - rect.top ;
+        if (m_winwidth > 140+85+14*24)
+        {
+            DestroyWindow(m_hwndTB);
+            m_BigToolbar=true;
+            CreateButtons(false, m_fServerKnowsFileTransfer);
+        }
+        else
+        {
+            m_BigToolbar=false;
+            DestroyWindow(m_hwndTB);
+            CreateButtons(true, m_fServerKnowsFileTransfer);
+        }
+    }
+}
 
 void ClientConnection::GTGBS_CreateToolbar()
 {
@@ -2613,6 +2634,7 @@ void ClientConnection::SetFormatAndEncodings()
 
     // len = sz_rfbSetEncodingsMsg + se->nEncodings * 4;
 	
+    encs[se->nEncodings++] = Swap32IfLE(rfbEncodingServerState);
     // sf@2002 - DSM Plugin
 	int nEncodings = se->nEncodings;
 	se->nEncodings = Swap16IfLE(se->nEncodings);
@@ -2747,9 +2769,9 @@ void
 ClientConnection::CloseWindows()
 {
 	SetEvent(KillEvent);
-	if (m_hwndcn)SendMessage(m_hwndcn, WM_CLOSE, 0, 0);
+	if (m_hwndcn)SendMessage(m_hwndcn, WM_CLOSE, 0, 1);
 	SetEvent(KillEvent);
-	if (m_hwndMain) SendMessage(m_hwndMain, WM_CLOSE, 0, 0);
+	if (m_hwndMain) SendMessage(m_hwndMain, WM_CLOSE, 0, 1);
 }
 ClientConnection::~ClientConnection()
 {
@@ -2961,7 +2983,7 @@ inline void ClientConnection::ProcessPointerEvent(int x, int y, DWORD keyflags, 
 		  if (!m_emulate3ButtonsTimer)
 		    {
 		      vnclog.Print(0, _T("Failed to create timer for emulating 3 buttons"));
-		      PostMessage(m_hwndMain, WM_CLOSE, 0, 0);
+		      PostMessage(m_hwndMain, WM_CLOSE, 0, 1);
 		      return;
 		    }
 		  
@@ -3025,7 +3047,7 @@ inline void ClientConnection::SubProcessPointerEvent(int x, int y, DWORD keyflag
 	} catch (Exception &e) {
 		if( !m_autoReconnect )
 			e.Report();
-		PostMessage(m_hwndMain, WM_CLOSE, reconnectcounter, 0);
+		PostMessage(m_hwndMain, WM_CLOSE, reconnectcounter, 1);
 	}
 }
 
@@ -3145,7 +3167,7 @@ inline void ClientConnection::ProcessKeyEvent(int virtKey, DWORD keyData)
 		} catch (Exception &e) {
 			if( !m_autoReconnect )
 				e.Report();
-			PostMessage(m_hwndMain, WM_CLOSE, reconnectcounter, 0);
+			PostMessage(m_hwndMain, WM_CLOSE, reconnectcounter, 1);
 		}
 	}
 	else
@@ -3196,7 +3218,7 @@ inline void ClientConnection::ProcessKeyEvent(int virtKey, DWORD keyData)
 		} catch (Exception &e) {
 			if( !m_autoReconnect )
 				e.Report();
-			PostMessage(m_hwndMain, WM_CLOSE, 4, 0);
+			PostMessage(m_hwndMain, WM_CLOSE, 4, 1);
 		}
 	}
 
@@ -3527,6 +3549,12 @@ void* ClientConnection::run_undetached(void* arg) {
 					break;
 				}
 
+                case rfbServerState:
+                {
+                    ReadServerState();
+                    ::PostMessage(m_hwndMain, RebuildToolbarMessage, 0, 0);
+                }
+                    break;
 				default:
 						  vnclog.Print(3, _T("Unknown message type x%02x\n"), msgType );
 						  throw WarningException(sz_L64);
@@ -3548,7 +3576,7 @@ void* ClientConnection::run_undetached(void* arg) {
 			// m_pFileTransfer->m_fFileTransferRunning = false;
 			// m_pTextChat->m_fTextChatRunning = false;
 			m_bKillThread = true;
-			PostMessage(m_hwndMain, WM_CLOSE, reconnectcounter, 0);
+			PostMessage(m_hwndMain, WM_CLOSE, reconnectcounter, 1);
 		}
 		catch (QuietException &e)
 		{
@@ -3556,7 +3584,7 @@ void* ClientConnection::run_undetached(void* arg) {
 			// m_pFileTransfer->m_fFileTransferRunning = false;
 			// m_pTextChat->m_fTextChatRunning = false;
 			m_bKillThread = true;
-			PostMessage(m_hwndMain, WM_CLOSE, reconnectcounter, 0);
+			PostMessage(m_hwndMain, WM_CLOSE, reconnectcounter, 1);
 		}
 		catch (rdr::Exception& e)
 		{
@@ -3565,7 +3593,7 @@ void* ClientConnection::run_undetached(void* arg) {
 			// m_pTextChat->m_fTextChatRunning = false;
 			// throw QuietException(e.str());
 			m_bKillThread = true;
-			PostMessage(m_hwndMain, WM_CLOSE, reconnectcounter, 0);
+			PostMessage(m_hwndMain, WM_CLOSE, reconnectcounter, 1);
 		}
 
 		Sleep(0);
@@ -4191,6 +4219,30 @@ void ClientConnection::ReadBell()
 		}
 	}
 	vnclog.Print(6, _T("Bell!\n"));
+}
+void ClientConnection::ReadServerState()
+{
+    rfbServerStateMsg ss;
+    memset(&ss, 0, sizeof ss);
+
+    vnclog.Print(1, _T("ServerState- reading %u bytes\n"), sz_rfbServerStateMsg-m_nTO);
+
+    ReadExact(((char *) &ss)+m_nTO, sz_rfbServerStateMsg-m_nTO);
+    CARD32 state = Swap32IfLE(ss.state);
+    CARD32 value = Swap32IfLE(ss.value);
+
+    vnclog.Print(1, _T("ServerState (%u, %u)\n"), state, value);
+    switch (state)
+    {
+    case rfbServerRemoteInputsState:
+        m_remote_mouse_disable = (value == rfbServerState_Disabled) ? true : false;
+        vnclog.Print(1, _T("New input state %u"), m_remote_mouse_disable);
+        break;
+
+    default:
+        vnclog.Print(1, _T("Ignoring unsupported state %u"), state);
+        break;
+    }
 }
 
 
@@ -5141,22 +5193,8 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						_this->m_remote_mouse_disable = true;
 						if (_this->m_opts.m_ShowToolbar)
 						{
-							RECT rect;
-							GetWindowRect(hwnd, &rect);
-							_this->m_winwidth = rect.right - rect.left;
-							_this->m_winheight = rect.bottom - rect.top ;
-							if ((_this->m_winwidth) > 140+85+14*24)
-							{
-								DestroyWindow(_this->m_hwndTB);
-								_this->m_BigToolbar=true;
-								_this->CreateButtons(false,_this->m_fServerKnowsFileTransfer);
-							}
-							else 
-							{
-								_this->m_BigToolbar=false;
-								DestroyWindow(_this->m_hwndTB);
-								_this->CreateButtons(true,_this->m_fServerKnowsFileTransfer);
-							}
+                            // 24 March 2008 jdp
+                            _this->RebuildToolbar(hwnd);
 							SendMessage(hwnd,WM_SIZE,(WPARAM)ID_DINPUT,(LPARAM)0);
 						}
 						if (_this->m_opts.m_ViewOnly) return 0;
@@ -5167,22 +5205,8 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						_this->m_remote_mouse_disable = false;
 						if (_this->m_opts.m_ShowToolbar)
 						{
-							RECT rect;
-							GetWindowRect(hwnd, &rect);
-							_this->m_winwidth = rect.right - rect.left;
-							_this->m_winheight = rect.bottom - rect.top ;
-							if ((_this->m_winwidth) > 140+85+14*24)
-							{
-								DestroyWindow(_this->m_hwndTB);
-								_this->m_BigToolbar=true;
-								_this->CreateButtons(false,_this->m_fServerKnowsFileTransfer);
-							}
-							else 
-							{
-								_this->m_BigToolbar=false;
-								DestroyWindow(_this->m_hwndTB);
-								_this->CreateButtons(true,_this->m_fServerKnowsFileTransfer);
-							}
+                            // 24 March 2008 jdp
+                            _this->RebuildToolbar(hwnd);
 							SendMessage(hwnd,WM_SIZE,(WPARAM)ID_DINPUT,(LPARAM)0);
 						}
 						if (_this->m_opts.m_ViewOnly) return 0;
@@ -5221,7 +5245,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							int prev_scale_num = _this->m_opts.m_scale_num;
 							int prev_scale_den = _this->m_opts.m_scale_den;
 							bool fOldToolbarState = _this->m_opts.m_ShowToolbar;
-							int nOldAutoMode = _this->m_opts.autoDetect;
+							bool nOldAutoMode = _this->m_opts.autoDetect;
 							
 							if (_this->m_opts.DoDialog(true))
 							{
@@ -5617,7 +5641,13 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 			
 				case WM_CLOSE:
 					{
-						// sf@2002 - Do not close vncviewer if the File Transfer GUI is open !
+                        // April 8 2008 jdp
+                        if ((lParam == 0) && MessageBox(NULL, sz_L75, 
+							    sz_L76,
+							    MB_YESNO | MB_ICONQUESTION | MB_SETFOREGROUND | MB_TOPMOST) == IDNO)
+                        {
+                            return 0;
+                        }
 						if (_this->m_pFileTransfer->m_fFileTransferRunning)
 						{
 							_this->m_pFileTransfer->ShowFileTransferWindow(true);
@@ -5651,6 +5681,8 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						{
 							_this->m_autoReconnect = 0; // Forbid autoreconnect when the CLOSE order comes from the user
 
+                            // 8 April 2008 jdp hide window while shutting down
+                            ::ShowWindow(hwnd, SW_HIDE);
 							// Close the worker thread
 							_this->KillThread();
 
@@ -5754,7 +5786,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							}
 							else 
 							{
-								if (_this->m_BigToolbar==true)
+								if (_this->m_BigToolbar)
 								{
 								_this->m_BigToolbar=false;
 								DestroyWindow(_this->m_hwndTB);
@@ -5920,7 +5952,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 					
 				//Added by: Lars Werner (http://lars.werner.no) - These is the custom messages from the TitleBar
 				case tbWM_CLOSE:
-					SendMessage(_this->m_hwndMain, WM_CLOSE,NULL,NULL);
+					SendMessage(_this->m_hwndMain, WM_CLOSE,NULL,1);
 					return 0;
 
 				case tbWM_MINIMIZE:
@@ -5948,6 +5980,15 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 					_this->m_pFileTransfer->ProcessFileTransferMsg();
 				return 0;
 			}
+            // 24 March 2008 jdp
+            if (iMsg == RebuildToolbarMessage)
+            {
+		        if (_this->m_opts.m_ShowToolbar)
+		        {
+                    _this->RebuildToolbar(hwnd);
+			        SendMessage(hwnd,WM_SIZE,(WPARAM)ID_DINPUT,(LPARAM)0);
+		        }
+            }
 
 		} // End if Main Window
 	}
@@ -6312,6 +6353,13 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 
 			case WM_CLOSE:
 				{
+                    // April 8 2008 jdp
+                    if (lParam==0 && MessageBox(NULL, sz_L75, 
+							sz_L76,
+							MB_YESNO | MB_ICONQUESTION | MB_SETFOREGROUND | MB_TOPMOST) == IDNO)
+                    {
+                        return 0;
+                    }
 					// sf@2002 - Do not close vncviewer if the File Transfer GUI is open !
 					if (_this->m_pFileTransfer->m_fFileTransferRunning)
 					{
@@ -6340,6 +6388,8 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 						return 0;
 					}
 					
+                    // 8 April 2008 jdp
+                    ::ShowWindow(hwnd, SW_HIDE);
 					// Close the worker thread as well
 					_this->KillThread();
 

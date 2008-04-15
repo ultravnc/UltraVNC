@@ -1446,6 +1446,13 @@ vncClientThread::run(void *arg)
 						vnclog.Print(LL_INTINFO, VNCLOG("PointerPos protocol extension enabled\n"));
 						continue;
 					}
+					// 21 March 2008 jdp - client wants server state updates
+					if (Swap32IfLE(encoding) == rfbEncodingServerState) {
+						m_client->m_wants_ServerStateUpdates = true;
+                        m_server->EnableServerStateUpdates(true);
+						vnclog.Print(LL_INTINFO, VNCLOG("ServerState protocol extension enabled\n"));
+                        continue;
+					}
 
 					// RDV - We try to detect which type of viewer tries to connect
 					if (Swap32IfLE(encoding) == rfbEncodingZRLE) {
@@ -1494,6 +1501,9 @@ vncClientThread::run(void *arg)
 			m_client->client_settings_passed=true;
 			m_client->EnableProtocol();
 
+            // 26 March 2008 jdp 
+            // send notification of remote input state to new client
+            m_client->SendServerStateUpdate(rfbServerRemoteInputsState, m_server->GetDesktopPointer()->GetBlockInputState() ? rfbServerState_Disabled : rfbServerState_Enabled);
 			break;
 			
 		case rfbFramebufferUpdateRequest:
@@ -1831,9 +1841,9 @@ vncClientThread::run(void *arg)
 					//if (msg.sim.status==1) m_client->m_encodemgr.m_buffer->m_desktop->SetDisableInput(true);
 					//if (msg.sim.status==0) m_client->m_encodemgr.m_buffer->m_desktop->SetDisableInput(false);
 					// added jeff
-					vnclog.Print(LL_INTINFO, VNCLOG("rfbSetServerInput:  %s\n"), (msg.sim.status==1) ? "enabled" : "disabled");
-                    m_client->m_encodemgr.m_buffer->m_desktop->SetDisableInput(msg.sim.status==1);
-                    m_client->m_encodemgr.m_buffer->m_desktop->SetBlankMonitor(msg.sim.status==1);
+                vnclog.Print(LL_INTINFO, VNCLOG("rfbSetServerInput: inputs %s\n"), (msg.sim.status==1) ? "disabled" : "enabled");
+
+                    m_client->m_encodemgr.m_buffer->m_desktop->SetBlockInputState(msg.sim.status==1);
 				}
 			break;
 
@@ -2042,6 +2052,7 @@ vncClientThread::run(void *arg)
 						m_client->m_dwNbBytesWritten = 0;
 						m_client->m_dwTotalNbBytesWritten = 0;
 
+						m_client->m_fDeletePartialFileTransfer = false;
 						m_client->m_fFileDownloadError = false;
 						m_client->m_fFileDownloadRunning = true;
 
@@ -2258,6 +2269,7 @@ vncClientThread::run(void *arg)
 						if (m_client->m_fFileDownloadRunning)
 						{
 							m_client->m_fFileDownloadError = true;
+                            m_client->m_fDeletePartialFileTransfer = true;
 							m_client->FinishFileReception();
 						}
 						else if (m_client->m_fFileUploadRunning)
@@ -2682,6 +2694,7 @@ vncClientThread::run(void *arg)
 	// Move into the thread's original desktop
 	// TAG 14
 	vncService::SelectHDESK(home_desktop);
+    m_client->m_encodemgr.m_buffer->m_desktop->SetBlockInputState(false);
 
 	// Quit this thread.  This will automatically delete the thread and the
 	// associated client.
@@ -2787,6 +2800,7 @@ vncClient::vncClient()
 	m_dwNbBytesWritten = 0;
 	m_dwTotalNbBytesWritten = 0;
 	m_fFileDownloadError = false;
+    m_fDeletePartialFileTransfer  = false;
 	m_fFileDownloadRunning = false;
 	m_hSrcFile = 0;
 	//m_szSrcFileName = NULL;
@@ -2843,6 +2857,7 @@ vncClient::vncClient()
 #ifdef DSHOW
 	m_hmtxEncodeAccess = CreateMutex(NULL, FALSE, NULL);
 #endif
+    m_wants_ServerStateUpdates =  false;
 }
 
 vncClient::~vncClient()
@@ -3906,6 +3921,8 @@ void vncClient::FinishFileReception()
 	}
 	*/
 
+    if (m_fFileDownloadError && m_fDeletePartialFileTransfer)
+        ::DeleteFile(m_szFullDestName);
 	//delete [] m_szFullDestName;
 
 	if (m_pCompBuff != NULL)
@@ -4071,14 +4088,23 @@ void vncClient::FinishFileSending()
 bool vncClient::GetSpecialFolderPath(int nId, char* szPath)
 {
 	LPITEMIDLIST pidl;
+    bool retval = false;
 
-	if (SHGetSpecialFolderLocation(0, nId, &pidl) != NOERROR)
-		return false;
+    LPMALLOC pSHMalloc;
 
-	if (!SHGetPathFromIDList(pidl, szPath) )
-		return false;
+    if (FAILED(SHGetMalloc(&pSHMalloc)))
+        return false;
 
-	return true;
+	if (SHGetSpecialFolderLocation(0, nId, &pidl) == NOERROR)
+    {
+        retval = SHGetPathFromIDList(pidl, szPath) ? true : false;
+
+        pSHMalloc->Free(pidl);
+    }
+
+    pSHMalloc->Release();
+
+	return retval;
 }
 
 //
@@ -4341,4 +4367,20 @@ void vncClient::UndoFTUserImpersonation()
 	vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::UNDoFTUserImpersonation - Impersonationtoken exists\n"));
 	RevertToSelf();
 	m_fFTUserImpersonatedOk = false;
+}
+
+// 10 April 2008 jdp paquette@atnetsend.net
+void vncClient::SendServerStateUpdate(CARD32 state, CARD32 value)
+{
+    if (m_wants_ServerStateUpdates && m_socket)
+    {
+        // send message to client
+		rfbServerStateMsg rsmsg;
+        memset(&rsmsg, 0, sizeof rsmsg);
+		rsmsg.type = rfbServerState;
+		rsmsg.state  = Swap32IfLE(state);
+		rsmsg.value = Swap32IfLE(value);
+
+		m_socket->SendExact((char*)&rsmsg, sz_rfbServerStateMsg, rfbServerState);
+    }
 }

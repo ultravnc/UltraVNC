@@ -816,7 +816,7 @@ void VNCOptions::Load(char *fname)
 			DWORD valtype=REG_DWORD;	
 			if ( RegQueryValueEx( hRegKey,  "sponsor", NULL, &valtype, 
 				(LPBYTE) &sponsor, &sponsorsize) == ERROR_SUCCESS) {
-			g_sponsor=sponsor;
+                g_sponsor=sponsor ? true : false;
 			}
 			RegCloseKey(hRegKey);
 		}
@@ -1399,4 +1399,5 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
   }
   return 0;
 }
+
 

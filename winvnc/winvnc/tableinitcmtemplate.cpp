@@ -34,7 +34,7 @@ rfbInitColourMapSingleTableOUTVNC (char **table,
 
 	// ALLOCATE SPACE FOR COLOUR TABLE
 
-    int nEntries = 1 << in->bitsPerPixel;
+    unsigned int nEntries = 1 << in->bitsPerPixel;
 
 	// Allocate the table
     if (*table) free(*table);

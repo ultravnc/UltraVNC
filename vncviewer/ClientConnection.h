@@ -122,6 +122,7 @@ public:
 	int  LoadConnection(char *fname, bool fFromDialog);
 	void HandleQuickOption();
 
+    void RebuildToolbar(HWND hwnd); // 24 March 2008 jdp
 	void GTGBS_CreateDisplay(void);
 	void GTGBS_ScrollToolbar(int dx, int dy);
 	void CreateButtons(BOOL mini,BOOL ultra);
@@ -345,6 +346,8 @@ private:
 	//
 	int EncodingStatusWindow,OldEncodingStatusWindow;
 
+    // 21 March 2008 jdp
+    void ReadServerState();
 	// Utilities
 
 	// These draw a solid rectangle of colour on the bitmap
@@ -530,7 +533,7 @@ private:
 //	BmpFlasher *flash;
 
 	// ms logon
-	BOOL m_ms_logon;
+	bool m_ms_logon;
 	char m_ad_passwd[256];
 	char m_ad_domain[256];
 	char m_ad_user[256];
@@ -606,7 +609,7 @@ public:
 
 class PaletteSelector {
 public:
-	PaletteSelector(HDC hdc, HPALETTE hpal) { 
+    PaletteSelector(HDC hdc, HPALETTE hpal) : m_hOldPal(0), m_hdc(0) { 
 		m_hdc = hdc; 
 		if (hpal)
 		{
