@@ -121,6 +121,7 @@ public:
 	bool				bSortDirectionsL[3];
 	bool				bSortDirectionsR[3];
 
+   	HMODULE				m_hRichEdit;     // 16 April 2008 jdp
 	// Methods
 	FileTransfer(VNCviewerApp *pApp, ClientConnection *pCC);
 	int DoDialog();
@@ -187,6 +188,7 @@ public:
 	void GetFriendlyFileSizeString(__int64 Size, char* szText);
 	bool MyGetFileSize(char* szFilePath, ULARGE_INTEGER* n2FileSize);
 	void InitListViewImagesList(HWND hListView);
+    bool DeleteFileOrDirectory(TCHAR *srcpath); // 14 April 2008 jdp
 
 	void FileTransfer::InitFTTimer();
 	void FileTransfer::KillFTTimer();
@@ -198,4 +200,5 @@ public:
 };
 
 #endif // FILETRANSFER_H__
+
 

@@ -272,6 +272,13 @@ char sz_L90[64];
 char sz_L91[64];
 char sz_L92[64];
 
+// 14 April 2008 jdp
+char sz_H94[64];
+char sz_H95[64];
+char sz_H96[64];
+char sz_H97[64];
+char sz_H98[64];
+char sz_H99[64];
 // File/dir Rename messages
 char sz_M1[64];
 char sz_M2[64];
@@ -556,6 +563,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 	LoadString(m_hInstResDLL, IDS_M7, sz_M7, 64 -1);
 	LoadString(m_hInstResDLL, IDS_M8, sz_M8, 64 -1);  
 
+    // 14 April 2008 jdp
+	LoadString(m_hInstResDLL, IDS_H94, sz_H94, 64 -1);
+	LoadString(m_hInstResDLL, IDS_H95, sz_H95, 64 -1);
+	LoadString(m_hInstResDLL, IDS_H96, sz_H96, 64 -1);
+	LoadString(m_hInstResDLL, IDS_H97, sz_H97, 64 -1);
+	LoadString(m_hInstResDLL, IDS_H98, sz_H98, 64 -1);
+	LoadString(m_hInstResDLL, IDS_H99, sz_H99, 64 -1);
 //	RegisterLinkLabel(m_hInstResDLL);
 
 
@@ -686,5 +700,6 @@ bool ParseDisplay(LPTSTR display, LPTSTR phost, int hostlen, int *pport)
     *pport = tmp_port;
     return true;
 }
+
 
 

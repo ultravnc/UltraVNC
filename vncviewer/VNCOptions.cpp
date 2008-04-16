@@ -365,7 +365,7 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 	{
 	  m_NoStatus = true;
       ShowUsage();
-      PostQuitMessage(1);
+      exit(1);
     }
 	else if ( SwitchMatch(args[j], _T("listen")))
 	{
@@ -1311,7 +1311,7 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 		
     case IDC_AUTODETECT:
 		{
-		bool ad = IsDlgButtonChecked(hwnd, IDC_AUTODETECT);
+            bool ad = IsDlgButtonChecked(hwnd, IDC_AUTODETECT) ? true : false;
 		for (int i = rfbEncodingRaw; i <= LASTENCODING; i++)
 		{
 			HWND hPref = GetDlgItem(hwnd, IDC_RAWRADIO + (i-rfbEncodingRaw));
@@ -1360,7 +1360,7 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 	// (the user can still uncheck it if he wants)
     case IDC_ZLIBRADIO:
 		{
-		bool xor = IsDlgButtonChecked(hwnd, IDC_ZLIBRADIO);
+            bool xor = IsDlgButtonChecked(hwnd, IDC_ZLIBRADIO) ? true : false;
 		if (xor)
 		{
 	 	    HWND hCache = GetDlgItem(hwnd, ID_SESSION_SET_CACHE);
@@ -1370,7 +1370,7 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 		}
 	case IDC_ULTRA:
 		{
-		bool ultra=IsDlgButtonChecked(hwnd, IDC_ULTRA);
+		bool ultra=IsDlgButtonChecked(hwnd, IDC_ULTRA) ? true : false;
 		if (ultra)
 		{
 	 	    HWND hCache = GetDlgItem(hwnd, ID_SESSION_SET_CACHE);
@@ -1399,5 +1399,6 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
   }
   return 0;
 }
+
 
 

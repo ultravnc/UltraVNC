@@ -471,36 +471,75 @@ VIDEODRIVER::Mirror_driver_detach_XP()
         
         // Add 'Attach.ToDesktop' setting.
         //
+		{
+				HKEY hKeyProfileMirror = (HKEY)0;
+				if (RegCreateKey(HKEY_LOCAL_MACHINE,
+								_T("SYSTEM\\CurrentControlSet\\Hardware Profiles\\Current\\System\\CurrentControlSet\\Services\\mv2"),
+								 &hKeyProfileMirror) != ERROR_SUCCESS)
+				{
+				   if (hUser32) FreeLibrary(hUser32);
+				   return;
+				}
 
-        HKEY hKeyProfileMirror = (HKEY)0;
-        if (RegCreateKey(HKEY_LOCAL_MACHINE,
-                        _T("SYSTEM\\CurrentControlSet\\Hardware Profiles\\Current\\System\\CurrentControlSet\\Services\\mv2"),
-                         &hKeyProfileMirror) != ERROR_SUCCESS)
-        {
-		   if (hUser32) FreeLibrary(hUser32);
-           return;
-        }
+				HKEY hKeyDevice = (HKEY)0;
+				if (RegCreateKey(hKeyProfileMirror,
+								 _T(&deviceNum[0]),
+								 &hKeyDevice) != ERROR_SUCCESS)
+				{
+				   if (hUser32) FreeLibrary(hUser32);
+				   return;
+				}
 
-        HKEY hKeyDevice = (HKEY)0;
-        if (RegCreateKey(hKeyProfileMirror,
-                         _T(&deviceNum[0]),
-                         &hKeyDevice) != ERROR_SUCCESS)
-        {
-		   if (hUser32) FreeLibrary(hUser32);
-           return;
-        }
+				DWORD one = 0;
+				if (RegSetValueEx(hKeyDevice,
+								  _T("Attach.ToDesktop"),
+								  0,
+								  REG_DWORD,
+								  (unsigned char *)&one,
+								  4) != ERROR_SUCCESS)
+				{
+				   if (hUser32) FreeLibrary(hUser32);
+				   return;
+				}
+				RegCloseKey(hKeyProfileMirror);
+				RegCloseKey(hKeyDevice);
+		}
+		{
+				deviceSub = strstr(&dispDevice.DeviceKey[0],
+                           "SYSTEM");
 
-        DWORD one = 0;
-        if (RegSetValueEx(hKeyDevice,
-                          _T("Attach.ToDesktop"),
-                          0,
-                          REG_DWORD,
-                          (unsigned char *)&one,
-                          4) != ERROR_SUCCESS)
-        {
-		   if (hUser32) FreeLibrary(hUser32);
-           return;
-        }
+				HKEY hKeyProfileMirror = (HKEY)0;
+				if (RegCreateKey(HKEY_LOCAL_MACHINE,
+								_T("SYSTEM\\CurrentControlSet\\Hardware Profiles\\Current"),
+								 &hKeyProfileMirror) != ERROR_SUCCESS)
+				{
+				   if (hUser32) FreeLibrary(hUser32);
+				   return;
+				}
+
+				HKEY hKeyDevice = (HKEY)0;
+				if (RegCreateKey(hKeyProfileMirror,
+								 _T(deviceSub),
+								 &hKeyDevice) != ERROR_SUCCESS)
+				{
+				   if (hUser32) FreeLibrary(hUser32);
+				   return;
+				}
+
+				DWORD one = 0;
+				if (RegSetValueEx(hKeyDevice,
+								  _T("Attach.ToDesktop"),
+								  0,
+								  REG_DWORD,
+								  (unsigned char *)&one,
+								  4) != ERROR_SUCCESS)
+				{
+				   if (hUser32) FreeLibrary(hUser32);
+				   return;
+				}
+				RegCloseKey(hKeyProfileMirror);
+				RegCloseKey(hKeyDevice);
+		}
 
         StringCbCopy((LPSTR)&devmode.dmDeviceName[0], sizeof(devmode.dmDeviceName), "mv2");
         deviceName = (LPSTR)&dispDevice.DeviceName[0];
@@ -535,8 +574,7 @@ VIDEODRIVER::Mirror_driver_detach_XP()
    
 		SetThreadDesktop(hdeskCurrent);
 		CloseDesktop(hdeskInput);
-		RegCloseKey(hKeyProfileMirror);
-        RegCloseKey(hKeyDevice);
+		
 	}
 if (hUser32) FreeLibrary(hUser32);
 }

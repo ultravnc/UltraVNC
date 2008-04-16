@@ -1095,6 +1095,16 @@ BEGIN
     IDS_M8                  "Elément DISTANT"
 END
 
+STRINGTABLE DISCARDABLE
+BEGIN
+    IDS_H94                 "Folder Deletion Warning"
+    IDS_H95                 "Are you sure you want to delete the LOCAL folder"
+    IDS_H96                 "Are you sure you want to delete the REMOTE folder"
+    IDS_H97                 "Unable to delete the local folder"
+    IDS_H98                 "Unable to delete the remote folder"
+    IDS_H99                 "Unable to delete the folder"
+
+END
 #endif    // French (France) resources
 /////////////////////////////////////////////////////////////////////////////
 
@@ -1109,4 +1119,5 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
+
 

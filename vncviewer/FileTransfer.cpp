@@ -50,6 +50,7 @@
 #include "commctrl.h"
 #include "shlobj.h"
 #include "zlib/zlib.h"
+#include "Log.h"
 
 // [v1.0.2-jp1 fix] yak!'s File transfer patch
 // Simply forward strchr() and strrchr() to _mbschr() and _mbsrchr() to avoid 0x5c problem, respectively.
@@ -145,9 +146,38 @@ extern char sz_M6[64];
 extern char sz_M7[64];
 extern char sz_M8[64];
 
+// 14 April 2008 jdp
+extern char sz_H94[64];
+extern char sz_H95[64];
+extern char sz_H96[64];
+extern char sz_H97[64];
+extern char sz_H98[64];
+extern char sz_H99[64];
+extern char sz_E1[64];
+extern char sz_E2[64];
 typedef BOOL (WINAPI *PGETDISKFREESPACEEX)(LPCSTR,PULARGE_INTEGER, PULARGE_INTEGER, PULARGE_INTEGER);
 
 static HWND hFTWnd = 0;
+bool FileTransfer::DeleteFileOrDirectory(TCHAR *srcpath)
+{
+    TCHAR path[MAX_PATH + 1]; // room for extra null; SHFileOperation requires double null terminator
+    memset(path, 0, sizeof path);
+    
+    _tcsncpy(path, srcpath, MAX_PATH);
+
+    SHFILEOPSTRUCT op;
+    memset(&op, 0, sizeof(SHFILEOPSTRUCT));
+    op.hwnd = hWnd;
+    op.wFunc = FO_DELETE;
+    op.pFrom  = path;
+    op.fFlags =  FOF_SILENT | FOF_NOCONFIRMATION | FOF_NOCONFIRMMKDIR | FOF_ALLOWUNDO;
+
+    // MSDN says to not look at the error code, just treat 0 as SUCCESS, nonzero is failure.
+    // Do not use GetLastError with the return values of this function.
+    int result = SHFileOperation(&op);
+
+    return result == 0;
+}
 
 //
 //
@@ -189,6 +219,13 @@ FileTransfer::FileTransfer(VNCviewerApp *pApp, ClientConnection *pCC)
 		bSortDirectionsL[i] = true;
 		bSortDirectionsR[i] = true;
 	}
+    // 16 April 2008 jdp
+    // load richedit so the path display can handly mbcs
+    m_hRichEdit = LoadLibrary( "RICHED32.DLL" );
+	if (!m_hRichEdit)
+	{
+		MessageBox( NULL, sz_E1, sz_E2, MB_OK | MB_ICONEXCLAMATION );
+    }
 }
 
 //
@@ -206,6 +243,8 @@ FileTransfer::~FileTransfer()
 		delete [] m_lpCSBuffer;
 		m_lpCSBuffer = NULL;
 	}
+    // 16 April 2008 jdp
+	if (m_hRichEdit != NULL) FreeLibrary(m_hRichEdit);
 }
 
 
@@ -2771,14 +2810,15 @@ bool FileTransfer::DeleteRemoteFileFeedback(long lSize, int nLen)
 	
 	char szStatus[MAX_PATH + 256];
 
+    bool isDir = IsDirectoryGetIt(szRemoteName);
 	if (lSize == -1)
 	{
-		sprintf(szStatus, "%s < %s > %s", sz_H33,szRemoteName,sz_H30); 
+        sprintf(szStatus, "%s < %s > %s", isDir ? sz_H99: sz_H33, szRemoteName,sz_H30);
 		SetStatus(szStatus);
 		delete [] szRemoteName;
 		return false;
 	}
-	sprintf(szStatus, "%s < %s > %s", sz_H17,szRemoteName,sz_H34); 
+    sprintf(szStatus, "%s < %s > %s", isDir ? sz_H31 : sz_H17, szRemoteName,sz_H34);
 	SetStatus(szStatus);
 	// Refresh the remote list
 	if (--m_nDeleteCount == 0)
@@ -3446,7 +3486,8 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 					{
 						Item.iItem = nSelected;
 						ListView_GetItem(hWndLocalList, &Item);
-						if (szSelectedFile[0] == rfbDirPrefix[0] && szSelectedFile[1] == rfbDirPrefix[1]) continue;// Only a file can be deleted
+                        // 14 April 2008 jdp
+                        bool isDir = _this->IsDirectoryGetIt(szSelectedFile);
 						GetDlgItemText(hWnd, IDC_CURR_LOCAL, szCurrLocal, sizeof(szCurrLocal));
 						if (strlen(szCurrLocal) + strlen(szSelectedFile) > MAX_PATH)
 						{
@@ -3455,21 +3496,21 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 						}
 						if (_this->m_nConfirmAnswer == CONFIRM_YES || _this->m_nConfirmAnswer == CONFIRM_NO)
 						{
-							wsprintf(szMes, "%s\n\n< %s > ?\n", sz_H48,szSelectedFile);
-							_this->DoFTConfirmDialog(sz_H47, _T(szMes));
+                            wsprintf(szMes, "%s\n\n< %s > ?\n", isDir ? sz_H95 : sz_H48, szSelectedFile);
+                            _this->DoFTConfirmDialog(isDir ? sz_H94 : sz_H47, _T(szMes));
 							if (_this->m_nConfirmAnswer == CONFIRM_NO)
 								continue;
 							if (_this->m_nConfirmAnswer == CONFIRM_NOALL)
 								break;
 						}
 						strcat(szCurrLocal, szSelectedFile);
-						if (!DeleteFile(szCurrLocal))
+						if (!_this->DeleteFileOrDirectory(szCurrLocal))
 						{
-							wsprintf(szMes, "%s < %s >", sz_H49,szCurrLocal);
+                            wsprintf(szMes, "%s < %s >", isDir ? sz_H97 : sz_H49, szCurrLocal);
 							_this->SetStatus(szMes);
 							break;
 						}
-						wsprintf(szMes, "%s < %s > %s", sz_H17,szCurrLocal,sz_H50);
+                        wsprintf(szMes, "%s < %s > %s", isDir ? sz_H31 : sz_H17, szCurrLocal,sz_H50);
 						_this->SetStatus(szMes);
 					}
 				}
@@ -3507,13 +3548,14 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 					{
 						Item.iItem = nSelected;
 						ListView_GetItem(hWndRemoteList, &Item);
-						if (szSelectedFile[0] == rfbDirPrefix[0] && szSelectedFile[1] == rfbDirPrefix[1]) continue;// Only a file can be deleted
+                        // 14 April 2008 jdp
+                        bool isDir = _this->IsDirectoryGetIt(szSelectedFile);
 						GetDlgItemText(hWnd, IDC_CURR_REMOTE, szCurrRemote, sizeof(szCurrRemote));
 						if (strlen(szCurrRemote) + strlen(szSelectedFile) > MAX_PATH) continue;
 						if (_this->m_nConfirmAnswer == CONFIRM_YES || _this->m_nConfirmAnswer == CONFIRM_NO)
 						{
-							wsprintf(szMes, "%s\n\n< %s > ?\n", sz_H51, szSelectedFile);
-							_this->DoFTConfirmDialog(sz_H47, _T(szMes));
+							wsprintf(szMes, "%s\n\n< %s > ?\n", isDir ? sz_H96 : sz_H51, szSelectedFile);
+							_this->DoFTConfirmDialog(isDir ? sz_H94 : sz_H47, _T(szMes));
 							if (_this->m_nConfirmAnswer == CONFIRM_NO)
 								continue;
 							if (_this->m_nConfirmAnswer == CONFIRM_NOALL)

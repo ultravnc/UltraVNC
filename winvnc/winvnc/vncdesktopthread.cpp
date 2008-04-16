@@ -1,4 +1,5 @@
 #include "vncdesktopthread.h"
+#include "vncOSVersion.h"
 int counterwatch;//global var for driverwatch
 bool g_DesktopThread_running;
 bool g_update_triggered;
@@ -1033,10 +1034,13 @@ vncDesktopThread::run_undetached(void *arg)
 				// screen blanking
 				if (m_desktop->OldPowerOffTimeout!=0)
 					{
-					if (!m_server->BlackAlphaBlending())
+					if (!m_server->BlackAlphaBlending() || m_desktop->VideoBuffer())
 						{
+							if(OSversion()!=2)
+							{
 							SystemParametersInfo(SPI_SETPOWEROFFACTIVE, 1, NULL, 0);
 							SendMessage(m_desktop->m_hwnd,WM_SYSCOMMAND,SC_MONITORPOWER,(LPARAM)2);
+							}
 							if (m_desktop->pbi) (*m_desktop->pbi)(true);
 						}
 					}

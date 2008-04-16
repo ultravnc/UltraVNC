@@ -62,9 +62,29 @@
 #include "zlib/zlib.h" // sf@2002
 #include "mmSystem.h" // sf@2002
 #include "shlobj.h" 
+#include "sys/types.h"
+#include "sys/stat.h"
 
 // #include "rfb.h"
+bool DeleteFileOrDirectory(TCHAR *srcpath)
+{
+    TCHAR path[MAX_PATH + 1]; // room for extra null; SHFileOperation requires double null terminator
+    memset(path, 0, sizeof path);
+    
+    _tcsncpy(path, srcpath, MAX_PATH);
 
+    SHFILEOPSTRUCT op;
+    memset(&op, 0, sizeof(SHFILEOPSTRUCT));
+    op.wFunc = FO_DELETE;
+    op.pFrom  = path;
+    op.fFlags = FOF_SILENT | FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_NOCONFIRMMKDIR | FOF_ALLOWUNDO;
+    
+    int result = SHFileOperation(&op);
+    // MSDN says to not look at the error code, just treat 0 as SUCCESS, nonzero is failure.
+    // Do not use GetLastError with the return values of this function.
+
+    return result == 0;
+}
 #include "localization.h" // Act : add localization on messages
 typedef BOOL (WINAPI *PGETDISKFREESPACEEX)(LPCSTR,PULARGE_INTEGER, PULARGE_INTEGER, PULARGE_INTEGER);
 DWORD GetExplorerLogonPid();
@@ -79,6 +99,23 @@ unsigned long updates_sent;
 #include <mbstring.h>
 #define strchr(a, b) reinterpret_cast<char*>(_mbschr(reinterpret_cast<unsigned char*>(a), b))
 #define strrchr(a, b) reinterpret_cast<char*>(_mbsrchr(reinterpret_cast<unsigned char*>(a), b))
+// 31 January 2008 jdp
+std::string AddDirPrefixAndSuffix(const char *name)
+{
+    std::string dirname(rfbDirPrefix);
+    dirname += name;
+    dirname += rfbDirSuffix;
+
+    return dirname;
+}
+
+bool isDirectory(char *name)
+{
+    struct _stat statbuf;
+
+    _stat(name, &statbuf);
+    return statbuf.st_mode & _S_IFDIR == _S_IFDIR;
+}
 
 class vncClientUpdateThread : public omni_thread
 {
@@ -1753,8 +1790,7 @@ vncClientThread::run(void *arg)
 					// Tell the desktop hook system to grab the screen...
 					m_client->m_encodemgr.m_buffer->m_desktop->TriggerUpdate();
 				}
-			}
-			
+			}	
 			break;
 
 		case rfbClientCutText:
@@ -2537,7 +2573,7 @@ vncClientThread::run(void *arg)
 							// Client requests the deletion of a file
 							case rfbCFileDelete:
 								{
-									const UINT length = Swap32IfLE(msg.ft.length);
+									UINT length = Swap32IfLE(msg.ft.length);
 									char szFile[MAX_PATH];
 									if (length > sizeof(szFile)) break;
 
@@ -2550,6 +2586,13 @@ vncClientThread::run(void *arg)
 									szFile[length] = 0;
 
 									// Delete the file
+                                    // 13 February 2008 jdp
+                                    bool isDir = isDirectory(szFile);
+                                    std::string newname(szFile);
+                                    if (isDir)
+                                        newname = AddDirPrefixAndSuffix(szFile);
+
+                                    length = newname.length()+1;
 									BOOL fRet = DeleteFile(szFile);
 
 									rfbFileTransferMsg ft;
@@ -2557,10 +2600,10 @@ vncClientThread::run(void *arg)
 									ft.contentType = rfbCommandReturn;
 									ft.contentParam = rfbAFileDelete;
 									ft.size = fRet ? 0 : -1;
-									ft.length = msg.ft.length;
+									ft.length = Swap32IfLE(length);
 
 									m_socket->SendExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
-									m_socket->SendExact((char *)szFile, (int)length);
+									m_socket->SendExact((char *)newname.c_str(), length);
 								}
 								break;
 

@@ -494,12 +494,18 @@
 #define IDS_M6                          50261
 #define IDS_M7                          50262
 #define IDS_M8                          50263
+#define IDS_H94                         50264
+#define IDS_H95                         50265
+#define IDS_H96                         50266
+#define IDS_H97                         50267
+#define IDS_H98                         50268
+#define IDS_H99                         50269
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        188
+#define _APS_NEXT_RESOURCE_VALUE        189
 #define _APS_NEXT_COMMAND_VALUE         50025
 #define _APS_NEXT_CONTROL_VALUE         1160
 #define _APS_NEXT_SYMED_VALUE           154

@@ -147,7 +147,7 @@ void CTitleBar::CreateDisplay()
 			      hInstance,
 			      NULL);
 
-
+    ::SetWindowLong(m_hWnd, GWL_USERDATA, (long)this);
 	//Set region to window so it is non rectangular
 	HRGN Range;
 	POINT Points[4];

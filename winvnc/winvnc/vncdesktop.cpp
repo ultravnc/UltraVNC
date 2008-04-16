@@ -1945,7 +1945,7 @@ void vncDesktop::SetBlankMonitor(bool enabled)
 	HMODULE hDLL = LoadLibrary ("user32");
 	pSetLayeredWindowAttributes = (PSLWA) GetProcAddress(hDLL,"SetLayeredWindowAttributes");
 	if (!pSetLayeredWindowAttributes) m_server->BlackAlphaBlending(false);
-	if (VideoBuffer()) m_server->BlackAlphaBlending(false);
+	//if (VideoBuffer()) m_server->BlackAlphaBlending(false);
 
     vnclog.Print(LL_INTINFO, VNCLOG("SetBlankMonitor: monitor %s, using alpha %s\n"), 
         enabled ? "off" : "on",
@@ -1956,7 +1956,7 @@ void vncDesktop::SetBlankMonitor(bool enabled)
     {
 	    if (enabled)
 	    {
-		    if (!m_server->BlackAlphaBlending())
+		    if ((!m_server->BlackAlphaBlending() || VideoBuffer()) && (OSversion()!=2))
 		    {
 			    SetProcessShutdownParameters(0x100, 0);
 			    SystemParametersInfo(SPI_GETPOWEROFFTIMEOUT, 0, &OldPowerOffTimeout, 0);
@@ -1976,13 +1976,16 @@ void vncDesktop::SetBlankMonitor(bool enabled)
 	    }
 	    else // Monitor On
 	    {
-		    if (!m_server->BlackAlphaBlending())
+		    if ((!m_server->BlackAlphaBlending() || VideoBuffer()) && (OSversion()!=2))
 		    {
 			    if (OldPowerOffTimeout!=0)
 				    SystemParametersInfo(SPI_SETPOWEROFFTIMEOUT, OldPowerOffTimeout, NULL, 0);
 			    SystemParametersInfo(SPI_SETPOWEROFFACTIVE, 0, NULL, 0);
 			    if (m_hwnd!=NULL) SendMessage(m_hwnd,WM_SYSCOMMAND,SC_MONITORPOWER,(LPARAM)-1);
 			    OldPowerOffTimeout=0;
+				//JUst in case video driver state was changed
+				HWND Blackhnd = FindWindow(("blackscreen"), 0);
+			    if (Blackhnd) PostMessage(Blackhnd, WM_CLOSE, 0, 0);
 		    }
 		    else
 		    {
@@ -2000,7 +2003,7 @@ void
 vncDesktop::SetDisableInput(bool enabled)
 {
     CARD32 state = enabled ? rfbServerState_Disabled : rfbServerState_Enabled;
-    vnclog.Print(LL_INTINFO, VNCLOG("SetDisableInput:  %s\n"), enabled ? "enabled" : "disabled");
+    vnclog.Print(LL_INTINFO, VNCLOG("SetDisableInput: inputs %s\n"), enabled ? "disbled" : "enabled");
 
 	//BlockInput block everything on non w2k and XP
 	//if hookdll is used, he take care of input blocking
@@ -2011,8 +2014,10 @@ vncDesktop::SetDisableInput(bool enabled)
 			if (pbi) 
             {
                 blocked = (*pbi)(enabled);
-                if (!blocked && enabled)
+                if (!blocked)
                     vnclog.Print(LL_INTINFO, VNCLOG("BlockInput failed:  Last error %08X\n"), ::GetLastError());
+				if(!enabled) Sleep(1000);
+				blocked = (*pbi)(enabled);
             }
 
 		}
@@ -2415,7 +2420,7 @@ void vncDesktop::InitHookSettings()
 
 void vncDesktop::SetBlockInputState(bool newstate)
 {
-    SetDisableInput(newstate);
-    SetBlankMonitor(newstate);
+	SetBlankMonitor(newstate);
     m_bIsInputDisabledByClient = newstate;
+    SetDisableInput(newstate);
 }

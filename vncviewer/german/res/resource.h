@@ -475,6 +475,12 @@
 #define IDS_M6                          50261
 #define IDS_M7                          50262
 #define IDS_M8                          50263
+#define IDS_H94                         50264
+#define IDS_H95                         50265
+#define IDS_H96                         50266
+#define IDS_H97                         50267
+#define IDS_H98                         50268
+#define IDS_H99                         50269
 
 // Next default values for new objects
 // 
