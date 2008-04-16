@@ -131,7 +131,7 @@ Find_winlogon(DWORD SessionId)
     for (DWORD CurrentProcess = 0; CurrentProcess < ProcessCount; CurrentProcess++)
     {
 
-        if( strcmp(pProcessInfo[CurrentProcess].pProcessName, "winlogon.exe") == 0 )
+        if( _stricmp(pProcessInfo[CurrentProcess].pProcessName, "winlogon.exe") == 0 )
         {    
 			if (SessionId==pProcessInfo[CurrentProcess].SessionId)
 			{
@@ -527,5 +527,6 @@ void monitor_sessions()
 //	EndProcess();
 
 }
+
 
 
