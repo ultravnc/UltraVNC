@@ -998,6 +998,18 @@ BEGIN
     IDS_H73                 "The LOCAL Folder"
 END
 
+STRINGTABLE
+BEGIN
+    IDS_M1                  "One File or Directory can be renamed at a time"
+    IDS_M2                  "File & Directory Rename Warning"
+    IDS_M3                  "File & Directory Rename"
+    IDS_M4                  "Please enter the new name:"
+    IDS_M5                  "ERROR: Rename failed for "
+    IDS_M6                  "Renamed LOCAL"
+    IDS_M7                  "to"
+    IDS_M8                  "Renamed REMOTE"
+END
+
 STRINGTABLE 
 BEGIN
     IDS_H94                 "Folder Deletion Warning"
