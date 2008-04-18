@@ -58,14 +58,34 @@ vncDesktopThread::copy_bitmaps_to_buffer(ULONG i,rfb::Region2D &rgncache,rfb::Up
 						int dy=m_desktop->pchanges_buf->pointrect[i].point.y;
 						if (!m_screen_moved && (dx==0 || dy==0) )
 								{
-									x=x-dx;;
-									y=y-dy;;
+//// Fix in case !Cliprect
+									int xx=x;
+                                    int yy=y;
+                                    int hh=h;
+                                    int ww=w;
+                                    if (ClipRect(&xx,&yy,&ww,&hh,m_desktop->m_bmrect.tl.x, m_desktop->m_bmrect.tl.y,
+                                                m_desktop->m_bmrect.br.x-m_desktop->m_bmrect.tl.x, m_desktop->m_bmrect.br.y-m_desktop->m_bmrect.tl.y))
+									{
+                                    rect.tl.x=xx;
+                                    rect.tl.y=yy;
+                                    rect.br.x=xx+ww;
+                                    rect.br.y=yy+hh;
+                                    rgncache=rgncache.union_(rect);
+									}
+
+//////////////////////
+// Fix Eckerd
+									x=x+dx;;
+									y=y+dy;;
 									if (!ClipRect(&x,&y,&w,&h,m_desktop->m_bmrect.tl.x, m_desktop->m_bmrect.tl.y,
 												m_desktop->m_bmrect.br.x-m_desktop->m_bmrect.tl.x, m_desktop->m_bmrect.br.y-m_desktop->m_bmrect.tl.y)) return;
-									rect.tl.x=x+dx;
-									rect.tl.y=y+dy;
-									rect.br.x=x+w+dx;
-									rect.br.y=y+h+dy;
+//////////////////////
+// Fix Eckerd
+									rect.tl.x=x-dx;
+									rect.tl.y=y-dy;
+									rect.br.x=x+w-dx;
+									rect.br.y=y+h-dy;
+
 									rfb::Point delta = rfb::Point(-dx,-dy);
 									rgncache=rgncache.union_(rect);
 									tracker.add_copied(rect, delta);
