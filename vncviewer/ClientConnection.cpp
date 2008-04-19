@@ -1490,7 +1490,7 @@ void ClientConnection::Connect()
 			//if(myDialog!=0)DestroyWindow(myDialog);
 			SetEvent(KillEvent);
 			if (m_hwndStatus) SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L46);
-			throw WarningException(sz_L46); 
+			throw WarningException(sz_L46,IDS_L46); 
 		};
 		thataddr.sin_addr.s_addr = ((LPIN_ADDR) lphost->h_addr)->s_addr;
 	};
@@ -2078,7 +2078,7 @@ void ClientConnection::Authenticate()
 //				if (flash) {flash->Killflash();}
 // 26 February 2008 jdp - speed up auth failure handling
 				SetEvent(KillEvent);
-				throw WarningException(sz_L57);
+				throw WarningException(sz_L57,IDS_L57);
 			case rfbVncAuthTooMany:
 				SetEvent(KillEvent);
 				throw WarningException(
@@ -2087,7 +2087,7 @@ void ClientConnection::Authenticate()
 				vnclog.Print(0, _T("Unknown VNC authentication result: %d\n"),
 					(int)authResult);
 //				if (flash) {flash->Killflash();}
-				throw ErrorException(sz_L59);
+				throw ErrorException(sz_L59,IDS_L59);
 			}
 			break;
 		}
@@ -2098,7 +2098,7 @@ void ClientConnection::Authenticate()
 		vnclog.Print(0, _T("Unknown authentication scheme from RFB server: %d\n"),
 			(int)authScheme);
 //		if (flash) {flash->Killflash();}
-		throw ErrorException(sz_L60);
+		throw ErrorException(sz_L60,IDS_L60);
     }
 }
 
@@ -2190,13 +2190,13 @@ void ClientConnection::AuthMsLogon() {
 		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L56);
 		m_pApp->m_options.m_NoMoreCommandLineUserPassword = TRUE; // Fix by Act
 		g_passwordfailed=true;
-		throw WarningException(sz_L57);
+		throw WarningException(sz_L57,IDS_L57);
 	case rfbVncAuthTooMany:
-		throw WarningException(sz_L58);
+		throw WarningException(sz_L58,IDS_L58);
 	default:
 		vnclog.Print(0, _T("Unknown MS-Logon (DH) authentication result: %d\n"),
 			(int)authResult);
-		throw ErrorException(sz_L59);
+		throw ErrorException(sz_L59,IDS_L59);
 	}
 }
 
