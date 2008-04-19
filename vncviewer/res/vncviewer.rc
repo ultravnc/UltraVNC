@@ -206,8 +206,8 @@ BEGIN
     CONTROL         "Progress1",IDC_PROGRESS,"msctls_progress32",WS_BORDER,45,388,410,9
     CTEXT           "LOCAL MACHINE",IDC_LM_STATIC,105,3,94,13,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
     PUSHBUTTON      "Stop",IDC_ABORT_B,248,141,60,14,BS_FLAT | NOT WS_VISIBLE
-    CONTROL         "", IDC_CURR_LOCAL, "RICHEDIT",ES_AUTOHSCROLL | ES_READONLY,3,17,238,12,WS_EX_STATICEDGE
-    CONTROL         "", IDC_CURR_REMOTE,"RICHEDIT",ES_AUTOHSCROLL | ES_READONLY,314,17,238,12,WS_EX_STATICEDGE
+    CONTROL         "",IDC_CURR_LOCAL,"RICHEDIT",TCS_VERTICAL | TCS_RAGGEDRIGHT,3,17,238,12,WS_EX_STATICEDGE
+    CONTROL         "",IDC_CURR_REMOTE,"RICHEDIT",TCS_VERTICAL | TCS_RAGGEDRIGHT,314,17,238,12,WS_EX_STATICEDGE
     PUSHBUTTON      "Local Drives List",IDC_LOCAL_ROOT_B,263,1,40,9,BS_FLAT | NOT WS_VISIBLE
     PUSHBUTTON      "Remote Drives List",IDC_REMOTE_ROOT_B,263,10,36,9,BS_FLAT | NOT WS_VISIBLE
     CONTROL         "List2",IDC_LOCAL_FILELIST,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_AUTOARRANGE | WS_BORDER | WS_TABSTOP,3,31,238,324
@@ -669,7 +669,6 @@ BEGIN
             VALUE "PrivateBuild", "beta 104"
             VALUE "ProductName", "UltraVNC VNCViewer"
             VALUE "ProductVersion", "1.0.4"
-            VALUE "SpecialBuild", ""
         END
     END
     BLOCK "VarFileInfo"
@@ -998,7 +997,7 @@ BEGIN
     IDS_H73                 "The LOCAL Folder"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDS_M1                  "One File or Directory can be renamed at a time"
     IDS_M2                  "File & Directory Rename Warning"
@@ -1008,17 +1007,12 @@ BEGIN
     IDS_M6                  "Renamed LOCAL"
     IDS_M7                  "to"
     IDS_M8                  "Renamed REMOTE"
-END
-
-STRINGTABLE 
-BEGIN
     IDS_H94                 "Folder Deletion Warning"
     IDS_H95                 "Are you sure you want to delete the LOCAL folder"
     IDS_H96                 "Are you sure you want to delete the REMOTE folder"
     IDS_H97                 "Unable to delete the local folder"
     IDS_H98                 "Unable to delete the remote folder"
     IDS_H99                 "Unable to delete the folder"
-
 END
 
 #endif    // English (U.S.) resources
@@ -1050,6 +1044,10 @@ IDR_TRAY_DISABLED       ICON                    "idr_tray_disabled.ico"
 
 IDB_BITMAP13            BITMAP                  "l1.bmp"
 IDB_BITMAP14            BITMAP                  "l2.bmp"
+IDB_BITMAP15            BITMAP                  "toollb_smallmouseX.bmp"
+IDB_BITMAP16            BITMAP                  "toollb_large.bmp"
+IDB_BITMAP17            BITMAP                  "toollb_largemouseX.bmp"
+IDB_BITMAP18            BITMAP                  "toollb_small.bmp"
 #endif    // Dutch (Belgium) resources
 /////////////////////////////////////////////////////////////////////////////
 
@@ -1064,5 +1062,4 @@ IDB_BITMAP14            BITMAP                  "l2.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
-
 

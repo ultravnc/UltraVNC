@@ -423,11 +423,11 @@
 				>
 			</File>
 			<File
-				RelativePath="res\stat\background2.bmp"
+				RelativePath="res\background2.bmp"
 				>
 			</File>
 			<File
-				RelativePath="res\background2.bmp"
+				RelativePath="res\stat\background2.bmp"
 				>
 			</File>
 			<File
@@ -548,6 +548,22 @@
 			</File>
 			<File
 				RelativePath="res\toolbar1.bmp"
+				>
+			</File>
+			<File
+				RelativePath=".\res\toollb_large.bmp"
+				>
+			</File>
+			<File
+				RelativePath=".\res\toollb_largemouseX.bmp"
+				>
+			</File>
+			<File
+				RelativePath=".\res\toollb_small.bmp"
+				>
+			</File>
+			<File
+				RelativePath=".\res\toollb_smallmouseX.bmp"
 				>
 			</File>
 			<File

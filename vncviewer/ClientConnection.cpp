@@ -648,12 +648,19 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 		m_TBr.right=clr.right;
 		m_TBr.top=0;
 		m_TBr.bottom=28;
-		buttonmap=IDB_BITMAP1;
-		minibuttonmap=IDB_BITMAP7;
+		//new bitmap
+		//buttonmap=IDB_BITMAP1;
+		buttonmap=IDB_BITMAP16;
+		//new bitmap
+		//minibuttonmap=IDB_BITMAP7;
+		minibuttonmap=IDB_BITMAP18;
 		if (m_remote_mouse_disable)
 					{
-						buttonmap=IDB_BITMAP8;
-						minibuttonmap=IDB_BITMAP9;
+						//new bitmap
+						//buttonmap=IDB_BITMAP8;
+						//minibuttonmap=IDB_BITMAP9;
+						buttonmap=IDB_BITMAP17;
+						minibuttonmap=IDB_BITMAP15;
 					}
 		if (mini)
 		{

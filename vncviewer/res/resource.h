@@ -67,6 +67,10 @@
 #define IDI_DRIVE                       185
 #define IDB_BITMAP13                    186
 #define IDB_BITMAP14                    187
+#define IDB_BITMAP15                    189
+#define IDB_BITMAP16                    190
+#define IDB_BITMAP17                    191
+#define IDB_BITMAP18                    192
 #define IDD_USER_NAME                   604
 #define ID_VK_LWINDOWN                  605
 #define ID_VK_RWINDOWN                  606
@@ -505,7 +509,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        189
+#define _APS_NEXT_RESOURCE_VALUE        193
 #define _APS_NEXT_COMMAND_VALUE         50025
 #define _APS_NEXT_CONTROL_VALUE         1160
 #define _APS_NEXT_SYMED_VALUE           154
