@@ -1194,6 +1194,10 @@ void ClientConnection::CreateDisplay()
 				  ID_AUTOSCALING,
 				  MF_BYCOMMAND | (m_opts.m_fAutoScaling ? MF_CHECKED :MF_UNCHECKED));
 
+	CheckMenuItem(GetSystemMenu(m_hwndMain, FALSE),
+				  ID_VIEWONLYTOGGLE,
+				  MF_BYCOMMAND | (m_opts.m_ViewOnly ? MF_CHECKED :MF_UNCHECKED));
+
 	// Set up clipboard watching
 #ifndef _WIN32_WCE
 	// We want to know when the clipboard changes, so

@@ -3424,10 +3424,11 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 		case IDC_REMOTE_ROOTB:
 			if (!_this->m_fFileCommandPending)
 			{
-				_this->m_fFileCommandPending = true;
+				// _this->m_fFileCommandPending = true; // Move to after nSelected test
 				char ofDir[MAX_PATH];
 				int nSelected = SendMessage(GetDlgItem(hWnd, IDC_REMOTE_DRIVECB), CB_GETCURSEL, 0, 0); 
 				if (nSelected == -1) break;
+				_this->m_fFileCommandPending = true; // Moved // PGM @ Advantig 
 				SendMessage(GetDlgItem(hWnd, IDC_REMOTE_DRIVECB), CB_GETLBTEXT, (WPARAM)nSelected, (LPARAM)ofDir); 
 				//ofDir[4] = '\0'; // Hum...
 				_this->RequestRemoteDirectoryContent(hWnd, ofDir);					
