@@ -1015,6 +1015,7 @@ void FileTransfer::PopulateLocalListBox(HWND hWnd, LPSTR szPath)
 	}
 	else
 	{
+// MessageBox(NULL, szPath, "*DEBUG* 1", MB_OK | MB_ICONSTOP); // PGM *DEBUG*
 		// Usual shortcuts case
 		if (ResolvePossibleShortcutFolder(hWnd, szPath))
 		{
@@ -1033,6 +1034,7 @@ void FileTransfer::PopulateLocalListBox(HWND hWnd, LPSTR szPath)
 		}
 	}
 
+
 	if (nSelected == nCount || lstrlen(ofDirT) == 0)
 	{
 		GetDlgItemText(hWnd, IDC_CURR_LOCAL, ofDirT, sizeof(ofDirT));
@@ -1040,10 +1042,25 @@ void FileTransfer::PopulateLocalListBox(HWND hWnd, LPSTR szPath)
 	}
 	else
 	{
+
 		if (ofDirT[0] == rfbDirPrefix[0] && ofDirT[1] == rfbDirPrefix[1])
 		{
-			strncpy(ofDir, ofDirT + 2, strlen(ofDirT) - 3); 
-			ofDir[strlen(ofDirT) - 4] = '\0';
+			TCHAR szTmp[MAX_PATH]; // PGM @ Advantig
+			GetDlgItemText(hWnd, IDC_CURR_LOCAL, szTmp, sizeof(szTmp)); //PGM @ Advantig
+			if (strlen(szTmp) == 0 && strlen(ofDirT) > 10 ) //PGM @ Advantig
+			{ //PGM @ Advantig
+				if (ResolvePossibleShortcutFolder(hWnd, ofDirT)) //PGM @ Advantig
+				{ //PGM @ Advantig
+					GetDlgItemText(hWnd, IDC_CURR_LOCAL, ofDirT, sizeof(ofDirT)); //PGM @ Advantig
+					strncpy(szTmp, ofDirT, strlen(ofDirT) - 1); //PGM @ Advantig
+					SetDlgItemText(hWnd, IDC_CURR_LOCAL, szTmp); //PGM @ Advantig
+				} //PGM @ Advantig
+			} //PGM @ Advantig
+			else //PGM @ Advantig
+			{ //PGM @ Advantig
+				strncpy(ofDir, ofDirT + 2, strlen(ofDirT) - 3); 
+				ofDir[strlen(ofDirT) - 4] = '\0';
+			} //PGM @ Advantig
 		}
 		else
 			return;
@@ -1061,6 +1078,8 @@ void FileTransfer::PopulateLocalListBox(HWND hWnd, LPSTR szPath)
 			strcat(ofDirT, ofDir);
 		strcat(ofDirT, "\\");
 		SetDlgItemText(hWnd, IDC_CURR_LOCAL, ofDirT);
+// MessageBox(NULL, szPath, "*DEBUG* 8", MB_OK | MB_ICONSTOP); // PGM *DEBUG*
+// MessageBox(NULL, ofDirT, "*DEBUG* 9", MB_OK | MB_ICONSTOP); // PGM *DEBUG*
 	}
 	strcpy(ofDir, ofDirT);
 	strcat(ofDir, "*");
