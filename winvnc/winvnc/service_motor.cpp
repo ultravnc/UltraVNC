@@ -1,7 +1,7 @@
 #include <windows.h>
 
 static void WINAPI service_main(DWORD, LPTSTR *);
-static void WINAPI control_handler(DWORD);
+static DWORD WINAPI control_handler(DWORD controlCode, DWORD dwEventType, LPVOID lpEventData, LPVOID lpContext);
 static int pad();
 
 static SERVICE_STATUS serviceStatus;
@@ -11,6 +11,7 @@ extern HANDLE hEvent;
 static char service_path[MAX_PATH];
 void monitor_sessions();
 char service_name[]="uvnc_service";
+void disconnect_remote_sessions();
 char cmdtext[256];
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -37,7 +38,7 @@ static void WINAPI service_main(DWORD argc, LPTSTR* argv) {
 
         /* running */
         serviceStatus.dwControlsAccepted|=
-            (SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_SHUTDOWN);
+            (SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_SHUTDOWN | SERVICE_ACCEPT_SESSIONCHANGE);
         serviceStatus.dwCurrentState=SERVICE_RUNNING;
         SetServiceStatus(serviceStatusHandle, &serviceStatus);
 
@@ -59,7 +60,7 @@ monitor_sessions();
     }
 }
 ////////////////////////////////////////////////////////////////////////////////
-static void WINAPI control_handler(DWORD controlCode) {
+static DWORD WINAPI control_handler(DWORD controlCode, DWORD dwEventType, LPVOID lpEventData, LPVOID lpContext) {
     switch (controlCode) {
     case SERVICE_CONTROL_INTERROGATE:
         break;
@@ -70,12 +71,28 @@ static void WINAPI control_handler(DWORD controlCode) {
         SetServiceStatus(serviceStatusHandle, &serviceStatus);
         SetEvent(stopServiceEvent);
 		SetEvent(hEvent);
-        return;
+        return NO_ERROR;
 
     case SERVICE_CONTROL_PAUSE:
         break;
 
     case SERVICE_CONTROL_CONTINUE:
+        break;
+
+    case SERVICE_CONTROL_SESSIONCHANGE:
+        {
+#ifdef _DEBUG
+            WTSSESSION_NOTIFICATION *pSessionNotification = static_cast<WTSSESSION_NOTIFICATION *>(lpEventData);
+            char msg[1024];
+            sprintf(msg, "SERVICE_CONTROL_SESSIONCHANGE - Session ID %08X\n", pSessionNotification->dwSessionId);
+            ::OutputDebugString(msg);
+#endif
+            if (dwEventType == WTS_REMOTE_DISCONNECT)
+            {
+                // disconnect rdp, and reconnect to the console
+                disconnect_remote_sessions();
+            }
+        }
         break;
 
     default:
@@ -85,6 +102,7 @@ static void WINAPI control_handler(DWORD controlCode) {
             break;
     }
     SetServiceStatus(serviceStatusHandle, &serviceStatus);
+    return NO_ERROR;
 }
 ////////////////////////////////////////////////////////////////////////////////
 int start_service(char *cmd) {

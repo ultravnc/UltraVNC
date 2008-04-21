@@ -528,5 +528,78 @@ void monitor_sessions()
 
 }
 
+// 20 April 2008 jdp paquette@atnetsend.net
 
+bool IsAnyRDPSessionActive()
+{
+    WTS_SESSION_INFO *pSessions = 0;
+    DWORD   nSessions(0);
+    DWORD   rdpSessionExists = false;
+
+    if (WTSEnumerateSessions(WTS_CURRENT_SERVER_HANDLE, 0, 1, &pSessions, &nSessions)) 
+    {
+        for (DWORD i(0); i < nSessions && !rdpSessionExists; ++i)
+        {
+            if ((_stricmp(pSessions[i].pWinStationName, "Console") != 0) &&
+                (pSessions[i].State == WTSActive        || 
+                 pSessions[i].State == WTSShadow        ||
+                 pSessions[i].State == WTSConnectQuery
+                ))
+            {
+                rdpSessionExists = true;
+            }
+        }
+
+        WTSFreeMemory(pSessions);
+    }
+
+    return rdpSessionExists ? true : false;
+}
+
+// 20 April 2008 jdp paquette@atnetsend.net
+void disconnect_remote_sessions()
+{
+	typedef BOOLEAN (WINAPI * pWinStationConnect) (HANDLE,ULONG,ULONG,PCWSTR,ULONG);
+	typedef BOOL (WINAPI * pLockWorkStation)();
+	HMODULE  hlibwinsta = LoadLibrary("winsta.dll"); 
+	HMODULE  hlibuser32 = LoadLibrary("user32.dll");
+	pWinStationConnect WinStationConnectF=NULL;
+	pLockWorkStation LockWorkStationF=NULL;
+
+
+    // don't kick rdp off if there's still an active session
+    if (IsAnyRDPSessionActive())
+        return;
+
+	if (hlibwinsta)
+	   {
+		   WinStationConnectF=(pWinStationConnect)GetProcAddress(hlibwinsta, "WinStationConnectW"); 
+	   }
+	if (hlibuser32)
+	   {
+		   LockWorkStationF=(pLockWorkStation)GetProcAddress(hlibuser32, "LockWorkStation"); 
+	   }
+	if (WinStationConnectF!=NULL && WinStationConnectF!=NULL)
+		{
+				DWORD ID=0;
+				if (lpfnWTSGetActiveConsoleSessionId!=NULL) ID=lpfnWTSGetActiveConsoleSessionId();
+				WinStationConnectF(0, 0, ID, L"", 0);
+				// sleep to allow the system to finish the connect/disconnect process. If we don't
+				// then the workstation won't get locked every time.
+            	Sleep(3000);
+				if (!LockWorkStationF())
+                {
+                    char msg[1024];
+                    sprintf(msg, "LockWorkstation failed with error 0x%0X", GetLastError());
+                    ::OutputDebugString(msg);
+                }
+
+		}
+	Sleep(3000);
+
+	if (hlibwinsta)
+        FreeLibrary(hlibwinsta);
+	if (hlibuser32)
+        FreeLibrary(hlibuser32);
+}
 

@@ -2593,7 +2593,7 @@ vncClientThread::run(void *arg)
                                         newname = AddDirPrefixAndSuffix(szFile);
 
                                     length = newname.length()+1;
-									BOOL fRet = DeleteFile(szFile);
+									BOOL fRet = DeleteFileOrDirectory(szFile);
 
 									rfbFileTransferMsg ft;
 									ft.type = rfbFileTransfer;
