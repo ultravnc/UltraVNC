@@ -26,7 +26,7 @@ static void WINAPI service_main(DWORD argc, LPTSTR* argv) {
     serviceStatus.dwWaitHint=0;
 
     serviceStatusHandle=
-	RegisterServiceCtrlHandler(service_name, control_handler);
+	RegisterServiceCtrlHandlerEx(service_name, control_handler,0);
 
     if(serviceStatusHandle) {
         /* service is starting */
@@ -81,12 +81,6 @@ static DWORD WINAPI control_handler(DWORD controlCode, DWORD dwEventType, LPVOID
 
     case SERVICE_CONTROL_SESSIONCHANGE:
         {
-#ifdef _DEBUG
-            WTSSESSION_NOTIFICATION *pSessionNotification = static_cast<WTSSESSION_NOTIFICATION *>(lpEventData);
-            char msg[1024];
-            sprintf(msg, "SERVICE_CONTROL_SESSIONCHANGE - Session ID %08X\n", pSessionNotification->dwSessionId);
-            ::OutputDebugString(msg);
-#endif
             if (dwEventType == WTS_REMOTE_DISCONNECT)
             {
                 // disconnect rdp, and reconnect to the console

@@ -880,7 +880,7 @@ END
 STRINGTABLE 
 BEGIN
     IDS_L13                 "Select Single Window"
-    IDS_L14                 "Select Full Desktop"
+    IDS_L14                 "Select Full Desktop / Switch monitor(driver only)"
     IDS_L15                 "Open Chat..."
     IDS_L16                 "File Transfer... \tCtrl+Alt+F7"
     IDS_L17                 "Chat... \tCtrl+Alt+F8"
@@ -1048,6 +1048,10 @@ IDB_BITMAP15            BITMAP                  "toollb_smallmouseX.bmp"
 IDB_BITMAP16            BITMAP                  "toollb_large.bmp"
 IDB_BITMAP17            BITMAP                  "toollb_largemouseX.bmp"
 IDB_BITMAP18            BITMAP                  "toollb_small.bmp"
+IDB_BITMAP19            BITMAP                  "toollb_smallcolormx.bmp"
+IDB_BITMAP20            BITMAP                  "toollb_largecolor.bmp"
+IDB_BITMAP21            BITMAP                  "toollb_largecolormx.bmp"
+IDB_BITMAP22            BITMAP                  "toollb_smallcolor.bmp"
 #endif    // Dutch (Belgium) resources
 /////////////////////////////////////////////////////////////////////////////
 

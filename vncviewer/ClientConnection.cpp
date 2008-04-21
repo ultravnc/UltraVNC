@@ -648,19 +648,27 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 		m_TBr.right=clr.right;
 		m_TBr.top=0;
 		m_TBr.bottom=28;
-		//new bitmap
+		//old
 		//buttonmap=IDB_BITMAP1;
-		buttonmap=IDB_BITMAP16;
-		//new bitmap
 		//minibuttonmap=IDB_BITMAP7;
-		minibuttonmap=IDB_BITMAP18;
+		// BW
+		//buttonmap=IDB_BITMAP16;
+		//minibuttonmap=IDB_BITMAP18;
+		// new color
+		buttonmap=IDB_BITMAP20;
+		minibuttonmap=IDB_BITMAP22;
 		if (m_remote_mouse_disable)
 					{
-						//new bitmap
+						//old
 						//buttonmap=IDB_BITMAP8;
 						//minibuttonmap=IDB_BITMAP9;
-						buttonmap=IDB_BITMAP17;
-						minibuttonmap=IDB_BITMAP15;
+						//BW
+						//buttonmap=IDB_BITMAP17;
+						//minibuttonmap=IDB_BITMAP15;
+						// new color
+						buttonmap=IDB_BITMAP21;
+						minibuttonmap=IDB_BITMAP19;
+
 					}
 		if (mini)
 		{
@@ -5653,12 +5661,18 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 				case WM_CLOSE:
 					{
                         // April 8 2008 jdp
-                        if ((lParam == 0) && MessageBox(NULL, sz_L75, 
-							    sz_L76,
-							    MB_YESNO | MB_ICONQUESTION | MB_SETFOREGROUND | MB_TOPMOST) == IDNO)
-                        {
-                            return 0;
-                        }
+						static bool boxopen=false;
+						if (boxopen) return 0;
+                        if (lParam == 0)
+						{
+							boxopen=true;
+							if(MessageBox(NULL, sz_L75,sz_L76,MB_YESNO | MB_ICONQUESTION | MB_SETFOREGROUND | MB_TOPMOST) == IDNO)
+								{
+									boxopen=false;
+									return 0;
+								}
+							boxopen=false;
+						}
 						if (_this->m_pFileTransfer->m_fFileTransferRunning)
 						{
 							_this->m_pFileTransfer->ShowFileTransferWindow(true);
