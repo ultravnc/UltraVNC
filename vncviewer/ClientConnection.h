@@ -156,6 +156,11 @@ private:
 	void DoBlit();
 	VNCviewerApp *m_pApp;
 
+	HBITMAP hbmToolbig;
+	HBITMAP hbmToolsmall;
+	HBITMAP hbmToolbigX;
+	HBITMAP hbmToolsmallX;
+
 	SOCKET m_sock;
 	bool m_serverInitiated;
 	HWND m_hwndcn, m_hbands,m_hwndTB,m_hwndTBwin,m_hwndMain,m_hwndStatus,m_TrafficMonitor,m_logo_wnd,m_button_wnd;

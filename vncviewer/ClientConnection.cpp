@@ -451,6 +451,11 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	ThreadSocketTimeout=NULL;
 	m_statusThread=NULL;
 	m_hSavedAreaBitmap=NULL;
+	hbmToolbig = (HBITMAP)LoadImage(m_pApp->m_instance, "tlbarbig.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_LOADMAP3DCOLORS);
+	hbmToolsmall = (HBITMAP)LoadImage(m_pApp->m_instance, "tlbarsmall.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_LOADMAP3DCOLORS);
+	hbmToolbigX = (HBITMAP)LoadImage(m_pApp->m_instance, "tlbarbigx.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_LOADMAP3DCOLORS);
+	hbmToolsmallX = (HBITMAP)LoadImage(m_pApp->m_instance, "tlbarsmallx.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_LOADMAP3DCOLORS);
+
 }
 
 // 
@@ -648,6 +653,85 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 		m_TBr.right=clr.right;
 		m_TBr.top=0;
 		m_TBr.bottom=28;
+		if(hbmToolbig && hbmToolsmall && hbmToolbigX && hbmToolsmallX)
+		{
+			if (m_remote_mouse_disable)
+			{
+				if(mini)
+					{
+						m_hwndTB = CreateToolbarEx(
+						m_hwndTBwin
+						,WS_CHILD | TBSTYLE_WRAPABLE | WS_VISIBLE |TBSTYLE_TOOLTIPS |CCS_NORESIZE| TBSTYLE_FLAT | TBSTYLE_TRANSPARENT 
+						,IDR_TOOLBAR
+						,nr_buttons
+						,NULL
+						,(UINT)hbmToolsmallX
+						,(LPCTBBUTTON)&tbButtons
+						,nr_buttons
+						,10
+						,10
+						,10
+						,10
+						,sizeof(TBBUTTON));
+					}
+				else
+				{
+						m_hwndTB = CreateToolbarEx(
+						m_hwndTBwin
+						,WS_CHILD | TBSTYLE_WRAPABLE | WS_VISIBLE |TBSTYLE_TOOLTIPS |CCS_NORESIZE | TBSTYLE_FLAT | TBSTYLE_TRANSPARENT 
+						,IDR_TOOLBAR
+						,nr_buttons
+						,NULL
+						,(UINT)hbmToolbigX
+						,(LPCTBBUTTON)&tbButtons
+						,nr_buttons
+						,20
+						,20
+						,20
+						,20
+						,sizeof(TBBUTTON));
+				}
+			}
+			else
+			{
+				if(mini)
+				{
+					m_hwndTB = CreateToolbarEx(
+						m_hwndTBwin
+						,WS_CHILD | TBSTYLE_WRAPABLE | WS_VISIBLE |TBSTYLE_TOOLTIPS |CCS_NORESIZE| TBSTYLE_FLAT | TBSTYLE_TRANSPARENT 
+						,IDR_TOOLBAR
+						,nr_buttons
+						,NULL
+						,(UINT)hbmToolbig
+						,(LPCTBBUTTON)&tbButtons
+						,nr_buttons
+						,10
+						,10
+						,10
+						,10
+						,sizeof(TBBUTTON));
+				}
+				else
+				{
+					m_hwndTB = CreateToolbarEx(
+						m_hwndTBwin
+						,WS_CHILD | TBSTYLE_WRAPABLE | WS_VISIBLE |TBSTYLE_TOOLTIPS |CCS_NORESIZE | TBSTYLE_FLAT | TBSTYLE_TRANSPARENT 
+						,IDR_TOOLBAR
+						,nr_buttons
+						,NULL
+						,(UINT)hbmToolbigX
+						,(LPCTBBUTTON)&tbButtons
+						,nr_buttons
+						,20
+						,20
+						,20
+						,20
+						,sizeof(TBBUTTON));
+				}
+			}
+		}
+		else
+		{
 		//old
 		//buttonmap=IDB_BITMAP1;
 		//minibuttonmap=IDB_BITMAP7;
@@ -705,6 +789,7 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 				,20
 				,20
 				,sizeof(TBBUTTON));
+		}
 		}
 		
 		tbab.hInst = m_pApp->m_instance;

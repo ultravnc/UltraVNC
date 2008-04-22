@@ -431,6 +431,12 @@ vncMenu::AddTrayIcon()
 //			vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::AddTrayIcon - ADD Tray Icon call\n"));
 			SendTrayMsg(NIM_ADD, FALSE);
 		}
+		if (m_server->AuthClientCount() != 0) { //PGM @ Advantig
+			if (m_server->RemoveWallpaperEnabled()) //PGM @ Advantig
+				KillWallpaper(); //PGM @ Advantig
+			if (m_server->RemoveAeroEnabled()) //PGM @ Advantig
+				DisableAero(); //PGM @ Advantig
+		} //PGM @ Advantig
 	}
 }
 
@@ -675,17 +681,23 @@ if ( ! _this->m_server->GetDisableTrayIcon())
 		if (_this->m_server->AuthClientCount() != 0) {
 			if (_this->m_server->RemoveWallpaperEnabled())
 				KillWallpaper();
+			if (_this->m_server->RemoveAeroEnabled()) // Moved, redundant if //PGM @ Advantig
+				DisableAero(); // Moved, redundant if //PGM @ Advantig
 		} else {
-			if (_this->m_server->RemoveWallpaperEnabled())
+			if (_this->m_server->RemoveAeroEnabled()) // Moved, redundant if //PGM @ Advantig
+				ResetAero(); // Moved, redundant if //PGM @ Advantig
+			if (_this->m_server->RemoveWallpaperEnabled()) { // Added { //PGM @ Advantig
+				Sleep(2000); // Added 2 second delay to help wallpaper restore //PGM @ Advantig
 				RestoreWallpaper();
+			} //PGM @ Advantig
 		}
-		if (_this->m_server->AuthClientCount() != 0) {
-			if (_this->m_server->RemoveAeroEnabled())
-				DisableAero();
-		} else {
-			if (_this->m_server->RemoveAeroEnabled())
-				ResetAero();
-		}
+//PGM @ Advantig		if (_this->m_server->AuthClientCount() != 0) {
+//PGM @ Advantig			if (_this->m_server->RemoveAeroEnabled())
+//PGM @ Advantig				DisableAero();
+//PGM @ Advantig		} else {
+//PGM @ Advantig			if (_this->m_server->RemoveAeroEnabled())
+//PGM @ Advantig				ResetAero();
+//PGM @ Advantig		}
 		return 0;
 
 		// STANDARD MESSAGE HANDLING
@@ -1053,7 +1065,6 @@ if ( ! _this->m_server->GetDisableTrayIcon())
 						_this->m_properties.LoadFromIniFile();
 						_this->m_propertiesPoll.LoadFromIniFile();
 					}
-
 				}
 			}
 		}

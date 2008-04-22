@@ -1045,14 +1045,17 @@ void FileTransfer::PopulateLocalListBox(HWND hWnd, LPSTR szPath)
 
 		if (ofDirT[0] == rfbDirPrefix[0] && ofDirT[1] == rfbDirPrefix[1])
 		{
-			TCHAR szTmp[MAX_PATH]; // PGM @ Advantig
+			TCHAR szTmp[MAX_PATH]; //PGM @ Advantig
 			GetDlgItemText(hWnd, IDC_CURR_LOCAL, szTmp, sizeof(szTmp)); //PGM @ Advantig
 			if (strlen(szTmp) == 0 && strlen(ofDirT) > 10 ) //PGM @ Advantig
 			{ //PGM @ Advantig
 				if (ResolvePossibleShortcutFolder(hWnd, ofDirT)) //PGM @ Advantig
 				{ //PGM @ Advantig
 					GetDlgItemText(hWnd, IDC_CURR_LOCAL, ofDirT, sizeof(ofDirT)); //PGM @ Advantig
-					strncpy(szTmp, ofDirT, strlen(ofDirT) - 1); //PGM @ Advantig
+					strcpy(szTmp, ofDirT); //PGM @ Advantig
+					char* p = strrchr(szTmp, '\\'); //PGM @ Advantig
+					if (p == NULL) return; //PGM @ Advantig
+					*p = '\0'; //PGM @ Advantig
 					SetDlgItemText(hWnd, IDC_CURR_LOCAL, szTmp); //PGM @ Advantig
 				} //PGM @ Advantig
 			} //PGM @ Advantig
