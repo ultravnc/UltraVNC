@@ -59,7 +59,11 @@
 #include "rfb/dh.h"
 #include "vncAuth.h"
 
-#include "zlib/zlib.h" // sf@2002
+#ifdef IPP
+#include "ipp_zlib/zlib.h"
+#else
+#include "zlib/zlib.h"
+#endif
 #include "mmSystem.h" // sf@2002
 #include "shlobj.h" 
 #include "sys/types.h"

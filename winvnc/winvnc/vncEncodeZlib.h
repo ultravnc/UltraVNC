@@ -37,8 +37,11 @@ class vncEncodeZlib;
 #pragma once
 
 #include "vncEncoder.h"
-
+#ifdef IPP
+#include "ipp_zlib/zlib.h"
+#else
 #include "zlib/zlib.h"
+#endif
 
 // Minimum zlib rectangle size in bytes.  Anything smaller will
 // not compress well due to overhead.

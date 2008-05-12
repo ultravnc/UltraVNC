@@ -18,7 +18,11 @@
 
 #include "ZlibInStream.h"
 #include "Exception.h"
+#ifdef IPP
+#include "../ipp_zlib/zlib.h"
+#else
 #include "../zlib/zlib.h"
+#endif
 
 using namespace rdr;
 

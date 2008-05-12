@@ -36,7 +36,11 @@ class vncEncodeTight;
 
 #include "vncEncoder.h"
 
+#ifdef IPP
+#include "ipp_zlib/zlib.h"
+#else
 #include "zlib/zlib.h"
+#endif
 extern "C"
 {
 #include "libjpeg/jpeglib.h"

@@ -47,6 +47,10 @@
 #include "vncOSVersion.h"
 #include "videodriver.h"
 
+#ifdef IPP
+void InitIpp();
+#endif
+
 //#define CRASH_ENABLED
 #ifdef CRASH_ENABLED
 	#ifndef _CRASH_RPT_
@@ -166,7 +170,9 @@ Myinit(HINSTANCE hInstance)
 // routine or, under NT, the main service routine.
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow)
 {
-
+#ifdef IPP
+	InitIpp();
+#endif
 	SetOSVersion();
 	setbuf(stderr, 0);
 
