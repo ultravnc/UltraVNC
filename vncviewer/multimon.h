@@ -1,4 +1,4 @@
-#if !defined(_WIN32_WINNT) || (_WIN32_WINNT < 0x0500)
+#if !defined(_WIN32_WINNT) || (_WIN32_WINNT < 0x9600)
 
 //=============================================================================
 //
@@ -12,7 +12,6 @@
 // exactly one source must include this with COMPILE_MULTIMON_STUBS defined
 //
 //=============================================================================
-
 #ifdef __cplusplus
 extern "C" {            /* Assume C declarations for C++ */
 #endif  /* __cplusplus */

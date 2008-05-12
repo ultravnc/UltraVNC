@@ -71,7 +71,7 @@ static LRESULT CALLBACK MessageDlgProc2(HWND hwnd, UINT iMsg,
 			char link[256];
 			char tempchar[10];
 			strcpy(link,"http://www.uvnc.com/onlinehelp/");
-			itoa(g_error_nr2,tempchar,10);
+			_itoa(g_error_nr2,tempchar,10);
 			strcat(link,tempchar);
 			strcat(link,".html");
 			ShellExecute(GetDesktopWindow(), "open", link, "", 0, SW_SHOWNORMAL);
