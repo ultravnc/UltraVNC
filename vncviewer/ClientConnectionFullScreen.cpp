@@ -113,9 +113,19 @@ void ClientConnection::RealiseFullScreenMode()
 		// int cx = this->m_hScrollMax;
 		// int cy = this->m_vScrollMax;
 		*/
-		int cx = GetSystemMetrics(SM_CXSCREEN);
-		int cy = GetSystemMetrics(SM_CYSCREEN);
-		SetWindowPos(m_hwndMain, HWND_TOPMOST, -1, -1, cx+3, cy+3, SWP_FRAMECHANGED);
+
+        // 7 May 2008 jdp
+        HMONITOR hMonitor = ::MonitorFromWindow(m_hwndMain, MONITOR_DEFAULTTOPRIMARY);
+        MONITORINFO mi;
+        mi.cbSize = sizeof (MONITORINFO);
+
+        GetMonitorInfo(hMonitor, &mi);
+        int x = mi.rcMonitor.left; 
+        int y = mi.rcMonitor.top;
+		int cx = mi.rcMonitor.right - x; 
+		int cy = mi.rcMonitor.bottom - y;
+		SetWindowPos(m_hwndMain, HWND_TOPMOST, x, y, cx+3, cy+3, SWP_FRAMECHANGED);
+        TitleBar.MoveToMonitor(hMonitor);
 		CheckMenuItem(GetSystemMenu(m_hwndMain, FALSE), ID_FULLSCREEN, MF_BYCOMMAND|MF_CHECKED);
 		if (m_opts.m_ShowToolbar)
 		SetWindowPos(m_hwndcn, m_hwndTBwin,0,m_TBr.bottom,m_winwidth, m_winheight, SWP_SHOWWINDOW);

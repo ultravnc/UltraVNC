@@ -24,6 +24,8 @@
 #include "FullScreenTitleBar.h"
 #include "log.h"
 extern Log vnclog;
+#define COMPILE_MULTIMON_STUBS
+#include "multimon.h"
 
 //***************************************************************************************
 
@@ -676,3 +678,33 @@ void CTitleBar::DisplayWindow(BOOL Show, BOOL SetHideFlag)
 }
 
 //***************************************************************************************
+// 7 May 2008 jdp
+void CTitleBar::MoveToMonitor(HMONITOR hMonitor)
+{
+    int dx;
+    int dy;
+
+    HMONITOR hOrigMonitor = ::MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTOPRIMARY);
+    // don't do anything if we're on the same monitor
+    if (hOrigMonitor == hMonitor)
+        return;
+
+    // get our window rect 
+    RECT wndRect;
+    ::GetWindowRect(m_hWnd, &wndRect);
+
+    MONITORINFO mi;
+    mi.cbSize = sizeof (MONITORINFO);
+    GetMonitorInfo(hOrigMonitor, &mi);
+    // ... and calculate the offsets of our origin from the desktop's origin
+    dx = wndRect.left - mi.rcMonitor.left;
+    dy = wndRect.top - mi.rcMonitor.top;
+
+
+    // now calculate our new origin relative to the new monitor.
+    GetMonitorInfo(hMonitor, &mi);
+    int x = mi.rcMonitor.left + dx;
+    int y = mi.rcMonitor.top + dy;
+    // finally move the window.
+    ::SetWindowPos(m_hWnd, 0, x, y, 0,0, SWP_NOSIZE|SWP_NOACTIVATE|SWP_NOZORDER);
+}

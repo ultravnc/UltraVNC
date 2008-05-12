@@ -188,6 +188,7 @@ FileTransfer::FileTransfer(VNCviewerApp *pApp, ClientConnection *pCC)
 	m_pApp	= pApp;
 	m_pCC	= pCC;
 	m_fAbort = false;
+    m_fUserAbortedFileTransfer = false;
 	m_fAborted = false;
 	m_FilesList.clear();
 	m_nFilesToTransfer = 0;
@@ -1053,7 +1054,9 @@ void FileTransfer::PopulateLocalListBox(HWND hWnd, LPSTR szPath)
 				{ //PGM @ Advantig
 					GetDlgItemText(hWnd, IDC_CURR_LOCAL, ofDirT, sizeof(ofDirT)); //PGM @ Advantig
 					strcpy(szTmp, ofDirT); //PGM @ Advantig
-					char* p = strrchr(szTmp, '\\'); //PGM @ Advantig
+					char* p; //PGM @ Advantig
+					szTmp[strlen(szTmp) - 1] = '\0'; //PGM @ Advantig
+					p = strrchr(szTmp, '\\'); //PGM @ Advantig
 					if (p == NULL) return; //PGM @ Advantig
 					*p = '\0'; //PGM @ Advantig
 					SetDlgItemText(hWnd, IDC_CURR_LOCAL, szTmp); //PGM @ Advantig
@@ -1758,17 +1761,6 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, int nLen)
 
 	char szStatus[MAX_PATH + 256];
 
-	// If lSize = -1 (0xFFFFFFFF) that means that the Src file on the remote machine
-	// could not be opened for some reason (locked, doesn't exits any more...)
-	if (lSize == -1)
-	{
-		sprintf(szStatus, " %s < %s > %s", sz_H12, szRemoteFileName, sz_H13); 
-		// SetDlgItemText(pFileTransfer->hWnd, IDC_STATUS, szStatus);
-		SetStatus(szStatus);
-		delete [] szRemoteFileName;
-		return false;
-	}
-
 	// sf@2004 - The file size can be wrong for huge files (>4Gb)
 	// idealy we should pass another param (sizeH) in the rfbFileTransfer msg (same thing
 	// for the Date/Time) but we want to maintain backward compatibility between all Ultra V1 RC version..
@@ -1780,6 +1772,18 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, int nLen)
 		CARD32 sizeHtmp;
 		m_pCC->ReadExact((char*)&sizeHtmp, sizeof(CARD32));
 		sizeH = Swap32IfLE(sizeHtmp);
+	}
+    // 5/2/2008 moved jdp so that the entire packet is read
+	// If lSize = -1 (0xFFFFFFFF) that means that the Src file on the remote machine
+	// could not be opened for some reason (locked, doesn't exits any more...)
+	if ((m_fOldFTProtocole && lSize == 0xFFFFFFFFu)  ||
+        (!m_fOldFTProtocole && lSize == 0xFFFFFFFFu && sizeH == 0xFFFFFFFFu))
+	{
+		sprintf(szStatus, " %s < %s > %s", sz_H12, szRemoteFileName, sz_H13);
+		// SetDlgItemText(pFileTransfer->hWnd, IDC_STATUS, szStatus);
+		SetStatus(szStatus);
+		delete [] szRemoteFileName;
+		return false;
 	}
 
 	// Get the current path (destination path)
@@ -2133,7 +2137,7 @@ bool FileTransfer::FinishFileReception()
 	CloseHandle(m_hDestFile);
 
 	// sf@2004 - Delta Transfer - Now we can keep the existing file data :)
-	if (m_fFileDownloadError && (m_fOldFTProtocole || m_fAborted)) DeleteFile(m_szDestFileName);
+	if (m_fFileDownloadError && (m_fOldFTProtocole || m_fUserAbortedFileTransfer)) DeleteFile(m_szDestFileName);
 
 	// sf@2003 - Directory Transfer trick
 	// If the file is an Ultra Directory Zip we unzip it here and we delete the
@@ -2844,8 +2848,10 @@ bool FileTransfer::DeleteRemoteFileFeedback(long lSize, int nLen)
 	SetStatus(szStatus);
 	// Refresh the remote list
 	if (--m_nDeleteCount == 0)
+    {
 		ListView_DeleteAllItems(GetDlgItem(hWnd, IDC_REMOTE_FILELIST));
-	RequestRemoteDirectoryContent(hWnd, "");
+	    RequestRemoteDirectoryContent(hWnd, "");
+    }
 
 	delete [] szRemoteName;
 	return true;
@@ -3321,6 +3327,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 			_this->m_fFileCommandPending = true;
 			_this->m_fAbort = false;
 			_this->m_fAborted = false;
+            _this->m_fUserAbortedFileTransfer = false;
 			if (!_this->OfferLocalFile(szCurrLocal))
 				_this->SendFiles(-1, 0); // If the first file could not be opened try next file
 
@@ -3427,6 +3434,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 			_this->m_fFileCommandPending = true;
 			_this->m_fAbort = false;
 			_this->m_fAborted = false;
+            _this->m_fUserAbortedFileTransfer = false;
 			_this->RequestRemoteFile(szDstFile);
 
 			}
@@ -3477,6 +3485,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 
 		case IDC_ABORT_B:
 			_this->m_fAbort = true;
+            _this->m_fUserAbortedFileTransfer = true;
 			break;
 
 		case IDC_DELETE_B:
@@ -4081,6 +4090,14 @@ BOOL CALLBACK FileTransfer::FTParamDlgProc(  HWND hwnd,  UINT uMsg, WPARAM wPara
 	case WM_COMMAND:
 		switch (LOWORD(wParam))
 		{
+        case IDC_FTPARAM_EDIT:
+            if (HIWORD(wParam) == EN_CHANGE)
+            {
+                EnableWindow(GetDlgItem(hwnd, IDOK), GetWindowTextLength(GetDlgItem(hwnd, IDC_FTPARAM_EDIT)) > 0);
+            }
+            break;
+
+
 		case IDOK:
 			{
 				UINT res = GetDlgItemText( hwnd,  IDC_FTPARAM_EDIT, _this->m_szFTParam, 256);

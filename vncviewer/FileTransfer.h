@@ -46,6 +46,7 @@ public:
 	ClientConnection	*m_pCC;
 	HWND				hWnd;
 	bool				m_fAbort;
+    bool                m_fUserAbortedFileTransfer; // 21 April 2008 jdp 
 	bool				m_fAborted;		// Async Reception file only
 	int					m_nDeleteCount; // Grouped file deletion trick
 
@@ -200,5 +201,6 @@ public:
 };
 
 #endif // FILETRANSFER_H__
+
 
 

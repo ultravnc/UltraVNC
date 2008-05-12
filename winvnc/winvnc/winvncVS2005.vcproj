@@ -84,6 +84,7 @@
 				OutputFile=".\..\Debug/winvnc.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
+				GenerateManifest="false"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\Debug/winvnc.pdb"
 				SubSystem="2"
@@ -282,6 +283,7 @@
 				OutputFile=".\..\Release/winvnc.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
+				GenerateManifest="false"
 				ProgramDatabaseFile=".\..\Release/winvnc.pdb"
 				SubSystem="2"
 				TargetMachine="1"
@@ -3081,11 +3083,11 @@
 				>
 			</File>
 			<File
-				RelativePath="vnc.bmp"
+				RelativePath="res\vnc.bmp"
 				>
 			</File>
 			<File
-				RelativePath="res\vnc.bmp"
+				RelativePath="vnc.bmp"
 				>
 			</File>
 			<File
@@ -3122,11 +3124,11 @@
 			>
 		</File>
 		<File
-			RelativePath="..\..\BUILDING.txt"
+			RelativePath="..\building.txt"
 			>
 		</File>
 		<File
-			RelativePath="..\building.txt"
+			RelativePath="..\..\BUILDING.txt"
 			>
 		</File>
 		<File

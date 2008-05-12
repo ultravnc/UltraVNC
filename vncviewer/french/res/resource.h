@@ -201,6 +201,7 @@
 #define IDD_APP_MESSAGE2                1151
 #define IDC_CHECK1                      1154
 #define IDC_SERVER_RECON                1155
+#define IDC_EXIT_CHECK                  1160
 #define IDC_ENCODING_BASE               1999
 #define IDC_RAWRADIO                    2000
 #define IDC_RRERADIO                    2002

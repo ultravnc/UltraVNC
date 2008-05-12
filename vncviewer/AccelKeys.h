@@ -26,7 +26,6 @@
 #define ACCELKEYS_H__
 
 #pragma once
-
 class AccelKeys
 {
 public:

@@ -261,7 +261,7 @@ BEGIN
     PUSHBUTTON      "Wiederernennen",IDC_RENAME_B,247,238,60,14,BS_FLAT
 END
 
-IDD_SESSION_DLG DIALOG DISCARDABLE  0, 0, 245, 206
+IDD_SESSION_DLG DIALOG DISCARDABLE  0, 0, 245, 227
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Verbindung "
 FONT 8, "MS Sans Serif"
@@ -273,13 +273,13 @@ BEGIN
     PUSHBUTTON      "Optionen ",IDC_OPTIONBUTTON,200,117,40,15
     CONTROL         108,IDC_STATIC,"Static",SS_BITMAP,3,2,24,24
     LTEXT           "(host:display oder host::port) ",IDC_STATIC,83,19,108,8
-    GROUPBOX        "Schnell-Optionen",IDC_STATIC,4,29,191,104
-    GROUPBOX        "",IDC_STATIC,4,134,237,42
+    GROUPBOX        "Schnell-Optionen",IDC_STATIC,4,29,191,123
+    GROUPBOX        "",IDC_STATIC,4,154,237,42
     CONTROL         "Benutze Plugin",IDC_PLUGIN_CHECK,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,12,145,66,10
-    COMBOBOX        IDC_PLUGINS_COMBO,78,143,118,55,CBS_DROPDOWN | CBS_SORT | 
+                    BS_AUTOCHECKBOX | WS_TABSTOP,12,165,66,10
+    COMBOBOX        IDC_PLUGINS_COMBO,78,163,118,55,CBS_DROPDOWN | CBS_SORT | 
                     WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "Info",IDC_PLUGIN_BUTTON,200,143,36,12
+    PUSHBUTTON      "Info",IDC_PLUGIN_BUTTON,200,163,36,12
     CONTROL         "AUTO (Beste Einstellungen automatisch wählen)",
                     IDC_DYNAMIC,"Button",BS_AUTORADIOBUTTON,13,42,177,10
     CONTROL         "ULTRA         (>2Mbit/s)- Experimental",
@@ -294,20 +294,22 @@ BEGIN
     CONTROL         "LANGSAM   (< 19kKbit/s) - 256 Farben",IDC_SLOW_RB,
                     "Button",BS_AUTORADIOBUTTON,13,102,176,10
     CONTROL         "Nur Ansehen ",IDC_VIEWONLY_CHECK,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,13,118,47,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,13,118,63,10
     PUSHBUTTON      "...",IDC_LOADPROFILE_B,200,4,13,12
     CONTROL         "Automatische Skalierung",IDC_AUTOSCALING_CHECK,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,66,118,127,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,80,118,109,10
     LTEXT           "VNC Server: ",IDC_STATIC,34,7,40,8
     CONTROL         "Benutze Proxy",IDC_PROXY_CHECK,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,12,160,66,10
-    EDITTEXT        IDC_PROXY_EDIT,78,158,117,12,ES_AUTOHSCROLL
-    PUSHBUTTON      "Delete saved settings",IDC_DELETE,152,185,84,12,
+                    WS_TABSTOP,12,180,66,10
+    EDITTEXT        IDC_PROXY_EDIT,78,178,117,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "Delete saved settings",IDC_DELETE,152,205,84,12,
                     BS_MULTILINE
     CONTROL         "Save connection settings as default",
                     IDC_SETDEFAULT_CHECK,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,12,187,128,10
-    GROUPBOX        "",IDC_STATIC,4,177,237,25
+                    WS_TABSTOP,12,207,128,10
+    GROUPBOX        "",IDC_STATIC,4,197,237,25
+    CONTROL         "bestätigen Ausfahrt",IDC_EXIT_CHECK,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,13,135,80,10
 END
 
 IDD_SERVINFO_DLG DIALOG DISCARDABLE  0, 0, 224, 170
@@ -514,7 +516,7 @@ BEGIN
         VERTGUIDE, 10
         VERTGUIDE, 232
         TOPMARGIN, 7
-        BOTTOMMARGIN, 203
+        BOTTOMMARGIN, 224
         HORZGUIDE, 17
     END
 
@@ -990,18 +992,14 @@ BEGIN
     IDS_M6                  "Renamed LOCAL"
     IDS_M7                  "to"
     IDS_M8                  "Renamed REMOTE"
-END
-
-STRINGTABLE DISCARDABLE
-BEGIN
     IDS_H94                 "Folder Deletion Warning"
     IDS_H95                 "Are you sure you want to delete the LOCAL folder"
     IDS_H96                 "Are you sure you want to delete the REMOTE folder"
     IDS_H97                 "Unable to delete the local folder"
     IDS_H98                 "Unable to delete the remote folder"
     IDS_H99                 "Unable to delete the folder"
-
 END
+
 #endif    // German (Germany) resources
 /////////////////////////////////////////////////////////////////////////////
 
@@ -1016,5 +1014,4 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
-
 

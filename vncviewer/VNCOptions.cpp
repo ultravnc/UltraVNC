@@ -171,6 +171,9 @@ VNCOptions::VNCOptions()
 
   // Fix by Act : no user password command line after a rejected connection
   m_NoMoreCommandLineUserPassword = false;
+
+  m_fExitCheck = true; //PGM @ Advantig
+
   
 #ifdef UNDER_CE
   m_palmpc = false;
@@ -262,6 +265,9 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
   // sf@2007 - Autoreconnect
   m_autoReconnect         = s.m_autoReconnect;
   m_JapKeyboard			  = s.m_JapKeyboard;
+
+  m_fExitCheck    = s.m_fExitCheck; //PGM @ Advantig
+
 
 
 #ifdef UNDER_CE
@@ -377,6 +383,8 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
         }
         j++;
       }
+    } else if ( SwitchMatch(args[j], _T("silentexit"))) { //PGM @ Advantig
+      m_fExitCheck = false; //PGM @ Advantig
     } else if ( SwitchMatch(args[j], _T("restricted"))) {
       m_restricted = true;
     } else if ( SwitchMatch(args[j], _T("viewonly"))) {
@@ -750,6 +758,7 @@ void VNCOptions::Save(char *fname)
   WritePrivateProfileString("options", "DSMPlugin", m_szDSMPluginFilename, fname);
   //saveInt("AutoReconnect", m_autoReconnect,	fname);
  
+  saveInt("ExitCheck",				m_fExitCheck,	fname); //PGM @ Advantig
 }
 
 void VNCOptions::Load(char *fname)
@@ -824,6 +833,8 @@ void VNCOptions::Load(char *fname)
 
   //m_autoReconnect =		readInt("AutoReconnect",	m_autoReconnect, fname) != 0;
   
+  m_fExitCheck =		readInt("ExitCheck", m_fExitCheck,  fname) != 0; //PGM @ Advantig
+
 }
 
 // Record the path to the VNC viewer and the type
@@ -888,7 +899,7 @@ void VNCOptions::ShowUsage(LPTSTR info) {
                "      [/listen [portnum]] [/fullscreen] [/viewonly] [/notoolbar]\n\r"
                "      [/scale a/b] [/config configfile] [server:display] \n\r"
 			   "      [/emulate3] [/quickoption n] [/serverscale n]\n\r"
-			   "      [/user msuser] [/password clearpassword]\n\r"
+			   "      [/silentexit] [/user msuser] [/password clearpassword]\n\r" // Added silentexit //PGM@ Advantig.com
 			   "      [/nostatus] [/dsmplugin pluginfilename.dsm] [/autoscaling] \n\r"
 			   "      [/autoreconnect delayInSeconds] \n\r"
 			   "      [/nohotkeys] [/proxy proxyhost [portnum]] [/256colors] [/64colors]\r\n"
@@ -1110,6 +1121,9 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 		  
 		  CentreWindow(hwnd);
 		  SetForegroundWindow(hwnd);
+		  
+		  HWND hExitCheck = GetDlgItem(hwnd, IDC_EXIT_CHECK); //PGM @ Advantig
+		  SendMessage(hExitCheck, BM_SETCHECK, _this->m_fExitCheck, 0); //PGM @ Advantig
 		  
 		  return TRUE;
     }

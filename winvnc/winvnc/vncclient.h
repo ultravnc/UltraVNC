@@ -377,7 +377,7 @@ protected:
 	bool m_fFileDownloadRunning;
 
     // 8 April 2008 jdp
-    bool m_fDeletePartialFileTransfer;
+    bool m_fUserAbortedFileTransfer;
 	char m_szSrcFileName[MAX_PATH + 64]; // Path + timestring
 	HANDLE m_hSrcFile;
 	bool m_fEof;
@@ -433,6 +433,7 @@ protected:
 #endif
 
     bool        m_wants_ServerStateUpdates;
+    bool        m_bClientHasBlockedInput;
 };
 
 #endif

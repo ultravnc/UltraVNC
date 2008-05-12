@@ -1257,16 +1257,6 @@ vncClientThread::run(void *arg)
 		m_client->m_update_tracker.add_changed(m_client->m_ScaledScreen);
 	}
 
-
-	// Clear the CapsLock and NumLock keys
-	if (m_client->m_keyboardenabled)
-	{
-		ClearKeyState(VK_CAPITAL);
-		// *** JNW - removed because people complain it's wrong
-		//ClearKeyState(VK_NUMLOCK);
-		ClearKeyState(VK_SCROLL);
-	}
-
 	// MAIN LOOP
 
 	// Set the input thread to a high priority
@@ -1275,6 +1265,7 @@ vncClientThread::run(void *arg)
 	BOOL connected = TRUE;
 	// added jeff
 	BOOL need_to_disable_input = m_server->LocalInputsDisabled();
+    bool need_to_clear_keyboard = true;
 	while (connected)
 	{
 		rfbClientToServerMsg msg;
@@ -1284,6 +1275,17 @@ vncClientThread::run(void *arg)
 			if (!vncService::SelectDesktop(NULL)) 
 					break;
 		// added jeff
+        // 2 May 2008 jdp paquette@atnetsend.net moved so that we're on the right desktop  when we're a service
+	    // Clear the CapsLock and NumLock keys
+	    if (m_client->m_keyboardenabled && need_to_clear_keyboard)
+	    {
+		    ClearKeyState(VK_CAPITAL);
+		    // *** JNW - removed because people complain it's wrong
+		    //ClearKeyState(VK_NUMLOCK);
+		    ClearKeyState(VK_SCROLL);
+            need_to_clear_keyboard = false;
+	    }
+        //
         if (need_to_disable_input)
         {
             // have to do this here if we're a service so that we're on the correct desktop
@@ -1879,7 +1881,17 @@ vncClientThread::run(void *arg)
 					// added jeff
                 vnclog.Print(LL_INTINFO, VNCLOG("rfbSetServerInput: inputs %s\n"), (msg.sim.status==1) ? "disabled" : "enabled");
 
+                // only allow change if this is the client that originally changed the input state
+                if (m_server->GetDesktopPointer()->GetBlockInputState() && !m_client->m_bClientHasBlockedInput) 
+                {
+                    CARD32 state = m_server->GetDesktopPointer()->GetBlockInputState() ? rfbServerState_Disabled : rfbServerState_Enabled;
+                    m_server->NotifyClients_StateChange(rfbServerRemoteInputsState, state);
+                }
+                else
+                {
                     m_client->m_encodemgr.m_buffer->m_desktop->SetBlockInputState(msg.sim.status==1);
+                    m_client->m_bClientHasBlockedInput = (msg.sim.status==1);
+                }
 				}
 			break;
 
@@ -2088,7 +2100,7 @@ vncClientThread::run(void *arg)
 						m_client->m_dwNbBytesWritten = 0;
 						m_client->m_dwTotalNbBytesWritten = 0;
 
-						m_client->m_fDeletePartialFileTransfer = false;
+						m_client->m_fUserAbortedFileTransfer = false;
 						m_client->m_fFileDownloadError = false;
 						m_client->m_fFileDownloadRunning = true;
 
@@ -2129,8 +2141,14 @@ vncClientThread::run(void *arg)
 							ft.length = Swap32IfLE(strlen(m_client->m_szSrcFileName));
 							m_socket->SendExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
 							m_socket->SendExact((char *)m_client->m_szSrcFileName, strlen(m_client->m_szSrcFileName));
-							m_client->m_fFileDownloadError = true;
-							m_client->m_fFileDownloadRunning = false;
+                            // 2 May 2008 jdp send the highpart too, else the client will hang
+                            // sf@2004 - Improving huge file size handling
+                            // TODO: what if we're speaking the old protocol, how can we tell? 
+					        CARD32 sizeH = Swap32IfLE(0xffffffffu);
+					        m_socket->SendExact((char *)&sizeH, sizeof(CARD32));
+
+							m_client->m_fFileUploadError = true;
+							m_client->m_fFileUploadRunning = false;
 
 							break;
 						}
@@ -2153,6 +2171,7 @@ vncClientThread::run(void *arg)
 							DWORD TheError = GetLastError();
 							// dwSrcSize = 0xFFFFFFFF;
 							n2SrcSize.LowPart = 0xFFFFFFFF;
+                            n2SrcSize.HighPart = 0xFFFFFFFF;
 						}
 						else
 						{	
@@ -2164,6 +2183,7 @@ vncClientThread::run(void *arg)
 							{
 								CloseHandle(m_client->m_hSrcFile);
 								n2SrcSize.LowPart = 0xFFFFFFFF;
+                                n2SrcSize.HighPart = 0xFFFFFFFF;
 							}
 							else
 							{
@@ -2220,7 +2240,7 @@ vncClientThread::run(void *arg)
 						m_socket->SendExact((char *)&sizeH, sizeof(CARD32));
 
 						// delete [] szSrcFileName;
-						if (n2SrcSize.LowPart == 0xFFFFFFFF)
+						if (n2SrcSize.LowPart == 0xFFFFFFFF && n2SrcSize.HighPart == 0xFFFFFFFF)
 						{
 							//MessageBox(NULL, "6. Abort !", "Ultra WinVNC", MB_OK);
 							//vnclog.Print(LL_INTINFO, VNCLOG("*** FileTransfer: Wrong Src File size. Abort !\n"));
@@ -2276,6 +2296,7 @@ vncClientThread::run(void *arg)
 						m_client->m_nPacketCount = 0;
 						m_client->m_fFileUploadError = false;
 						m_client->m_fFileUploadRunning = true;
+                        m_client->m_fUserAbortedFileTransfer = false;
 
 						m_client->SendFileChunk();
 						}
@@ -2305,12 +2326,13 @@ vncClientThread::run(void *arg)
 						if (m_client->m_fFileDownloadRunning)
 						{
 							m_client->m_fFileDownloadError = true;
-                            m_client->m_fDeletePartialFileTransfer = true;
+                            m_client->m_fUserAbortedFileTransfer = true;
 							m_client->FinishFileReception();
 						}
 						else if (m_client->m_fFileUploadRunning)
 						{
 							m_client->m_fFileUploadError = true;
+                            m_client->m_fUserAbortedFileTransfer = true;
 							// m_client->FinishFileSending();
 						}
 						else // Old method for FileTransfer handshake perimssion (<=RC18)
@@ -2737,7 +2759,11 @@ vncClientThread::run(void *arg)
 	// Move into the thread's original desktop
 	// TAG 14
 	vncService::SelectHDESK(home_desktop);
-    m_client->m_encodemgr.m_buffer->m_desktop->SetBlockInputState(false);
+    if (m_client->m_bClientHasBlockedInput)
+    {
+        m_client->m_encodemgr.m_buffer->m_desktop->SetBlockInputState(false);
+        m_client->m_bClientHasBlockedInput = false;
+    }
 
 	// Quit this thread.  This will automatically delete the thread and the
 	// associated client.
@@ -2843,7 +2869,7 @@ vncClient::vncClient()
 	m_dwNbBytesWritten = 0;
 	m_dwTotalNbBytesWritten = 0;
 	m_fFileDownloadError = false;
-    m_fDeletePartialFileTransfer  = false;
+    m_fUserAbortedFileTransfer  = false;
 	m_fFileDownloadRunning = false;
 	m_hSrcFile = 0;
 	//m_szSrcFileName = NULL;
@@ -2901,6 +2927,7 @@ vncClient::vncClient()
 	m_hmtxEncodeAccess = CreateMutex(NULL, FALSE, NULL);
 #endif
     m_wants_ServerStateUpdates =  false;
+    m_bClientHasBlockedInput = false;
 }
 
 vncClient::~vncClient()
@@ -3964,7 +3991,7 @@ void vncClient::FinishFileReception()
 	}
 	*/
 
-    if (m_fFileDownloadError && m_fDeletePartialFileTransfer)
+    if (m_fFileDownloadError && m_fUserAbortedFileTransfer)
         ::DeleteFile(m_szFullDestName);
 	//delete [] m_szFullDestName;
 

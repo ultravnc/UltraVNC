@@ -2421,6 +2421,6 @@ void vncDesktop::InitHookSettings()
 void vncDesktop::SetBlockInputState(bool newstate)
 {
 	SetBlankMonitor(newstate);
-    m_bIsInputDisabledByClient = newstate;
     SetDisableInput(newstate);
+    m_bIsInputDisabledByClient = newstate;
 }

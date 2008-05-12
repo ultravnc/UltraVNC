@@ -23,6 +23,7 @@
 
 //All settings is stored here.
 #include "FullScreenTitleBarConst.h"
+#include "multimon.h"
 
 class CTitleBar
 {
@@ -36,6 +37,7 @@ public:
 	void SetText(LPTSTR TextOut); //Set the header text eg: hostname, windowtitle ect...
 
 	void DisplayWindow(BOOL Show, BOOL SetHideFlag=FALSE); //Variable like ShowWindow but it triggers the scrolling feature
+    void MoveToMonitor(HMONITOR hmon); // 7 May 2008 jdp
 
 	//Returns the window - This is stored in the header cause of it size :)
 	HWND GetSafeHwnd()

@@ -817,6 +817,8 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 			(HINSTANCE)m_pApp->m_instance,
 			NULL);
 		
+        // 6 May 2008 jdp make topmost so they display in fullscreen mode
+        ::SetWindowPos(m_hwndTT, HWND_TOPMOST,0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
 		DWORD buttonWidth = LOWORD(SendMessage(m_hwndTB,TB_GETBUTTONSIZE,(WPARAM)0,(LPARAM)0));
 		DWORD buttonHeight = HIWORD(SendMessage(m_hwndTB,TB_GETBUTTONSIZE,(WPARAM)0,(LPARAM)0));
 		
@@ -952,7 +954,8 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 			(HINSTANCE)m_pApp->m_instance,
 			NULL);
 		
-		
+        // 6 May 2008 jdp make topmost so they display in fullscreen mode
+        ::SetWindowPos(m_hwndTT, HWND_TOPMOST,0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
 		
 		DWORD buttonWidth = LOWORD(SendMessage(m_hwndTB,TB_GETBUTTONSIZE,(WPARAM)0,(LPARAM)0));
 		DWORD buttonHeight = HIWORD(SendMessage(m_hwndTB,TB_GETBUTTONSIZE,(WPARAM)0,(LPARAM)0));
@@ -5750,12 +5753,15 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						if (boxopen) return 0;
                         if (lParam == 0)
 						{
-							boxopen=true;
-							if(MessageBox(NULL, sz_L75,sz_L76,MB_YESNO | MB_ICONQUESTION | MB_SETFOREGROUND | MB_TOPMOST) == IDNO)
-								{
-									boxopen=false;
-									return 0;
-								}
+							if (_this->m_opts.m_fExitCheck) //PGM @ Advantig
+							{ //PGM @ Advantig
+								boxopen=true;
+								if(MessageBox(NULL, sz_L75,sz_L76,MB_YESNO | MB_ICONQUESTION | MB_SETFOREGROUND | MB_TOPMOST) == IDNO)
+									{
+										boxopen=false;
+										return 0;
+									}
+							} // PGM @ Advantig.com
 							boxopen=false;
 						}
 						if (_this->m_pFileTransfer->m_fFileTransferRunning)
@@ -5808,7 +5814,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						{
 							char temp[10];
 							char wtext[150];
-							itoa(wParam,temp,10);
+							_itoa(wParam,temp,10);
 							strcpy(wtext,"Ultr@VNC Viewer - Connection dropped, trying to reconnect (");
 							strcat(wtext,temp);
 							strcat(wtext,")");
@@ -6464,12 +6470,18 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 			case WM_CLOSE:
 				{
                     // April 8 2008 jdp
-                    if (lParam==0 && MessageBox(NULL, sz_L75, 
-							sz_L76,
-							MB_YESNO | MB_ICONQUESTION | MB_SETFOREGROUND | MB_TOPMOST) == IDNO)
-                    {
-                        return 0;
-                    }
+					static bool boxopen=false;
+					if (boxopen) return 0;
+                    if (lParam == 0)
+					{
+						boxopen=true;
+						if(MessageBox(NULL, sz_L75,sz_L76,MB_YESNO | MB_ICONQUESTION | MB_SETFOREGROUND | MB_TOPMOST) == IDNO)
+							{
+								boxopen=false;
+								return 0;
+							}
+						boxopen=false;
+					}
 					// sf@2002 - Do not close vncviewer if the File Transfer GUI is open !
 					if (_this->m_pFileTransfer->m_fFileTransferRunning)
 					{

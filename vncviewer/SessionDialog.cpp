@@ -150,6 +150,9 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 			HWND hAutoScaling = GetDlgItem(hwnd, IDC_AUTOSCALING_CHECK);
 			SendMessage(hAutoScaling, BM_SETCHECK, _this->m_pOpt->m_fAutoScaling, 0);
 
+			HWND hExitCheck = GetDlgItem(hwnd, IDC_EXIT_CHECK); //PGM @ Advantig
+			SendMessage(hExitCheck, BM_SETCHECK, _this->m_pOpt->m_fExitCheck, 0); //PGM @ Advantig
+
 			HWND hProxy = GetDlgItem(hwnd, IDC_PROXY_CHECK);
 			SendMessage(hProxy, BM_SETCHECK, _this->m_pOpt->m_fUseProxy, 0);
 
@@ -334,6 +337,9 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 			HWND hAutoScaling = GetDlgItem(hwnd, IDC_AUTOSCALING_CHECK);
 			_this->m_pOpt->m_fAutoScaling = (SendMessage(hAutoScaling, BM_GETCHECK, 0, 0) == BST_CHECKED);
 
+			HWND hExitCheck = GetDlgItem(hwnd, IDC_EXIT_CHECK); //PGM @ Advantig
+			_this->m_pOpt->m_fExitCheck = (SendMessage(hExitCheck, BM_GETCHECK, 0, 0) == BST_CHECKED); //PGM @ Advantig
+
 			EndDialog(hwnd, TRUE);
 			return TRUE;
 			}
@@ -353,6 +359,9 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 					
 					HWND hAutoScaling = GetDlgItem(hwnd, IDC_AUTOSCALING_CHECK);
 					_this->m_pOpt->m_fAutoScaling = (SendMessage(hAutoScaling, BM_GETCHECK, 0, 0) == BST_CHECKED);
+
+					HWND hExitCheck = GetDlgItem(hwnd, IDC_EXIT_CHECK); //PGM @ Advantig
+					_this->m_pOpt->m_fExitCheck = (SendMessage(hExitCheck, BM_GETCHECK, 0, 0) == BST_CHECKED); //PGM @ Advantig
 
 				}
 				
@@ -461,6 +470,9 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 
 				HWND hAutoScaling = GetDlgItem(hwnd, IDC_AUTOSCALING_CHECK);
 				SendMessage(hAutoScaling, BM_SETCHECK, _this->m_pOpt->m_fAutoScaling, 0);
+
+				HWND hExitCheck = GetDlgItem(hwnd, IDC_EXIT_CHECK); //PGM @ Advantig
+				SendMessage(hExitCheck, BM_SETCHECK, _this->m_pOpt->m_fExitCheck, 0); //PGM @ Advantig
 
 				_this->m_fFromOptions = true;
 				_this->m_fFromFile = true;

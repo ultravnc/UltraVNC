@@ -1,3 +1,4 @@
+#include "stdhdrs.h"
 #include <windows.h>
 
 static void WINAPI service_main(DWORD, LPTSTR *);
@@ -11,6 +12,7 @@ extern HANDLE hEvent;
 static char service_path[MAX_PATH];
 void monitor_sessions();
 char service_name[]="uvnc_service";
+char *app_name = "UltraVNC";
 void disconnect_remote_sessions();
 char cmdtext[256];
 
@@ -112,6 +114,34 @@ int start_service(char *cmd) {
     return 0; /* NT service started */
 }
 ////////////////////////////////////////////////////////////////////////////////
+void set_service_description()
+{
+    // Add service description 
+	DWORD	dw;
+	HKEY hKey;
+	char tempName[256];
+    char desc[] = "Provides secure remote desktop sharing";
+	_snprintf(tempName,  sizeof tempName, "SYSTEM\\CurrentControlSet\\Services\\%s", service_name);
+	RegCreateKeyEx(HKEY_LOCAL_MACHINE,
+						tempName,
+						0,
+						REG_NONE,
+						REG_OPTION_NON_VOLATILE,
+						KEY_READ|KEY_WRITE,
+						NULL,
+						&hKey,
+						&dw);
+	RegSetValueEx(hKey,
+					"Description",
+					0,
+					REG_SZ,
+					(const BYTE *)desc,
+					strlen(desc)+1);
+
+
+	RegCloseKey(hKey);
+}
+
 int install_service(void) {
     SC_HANDLE scm, service;
 	pad();
@@ -119,21 +149,20 @@ int install_service(void) {
     scm=OpenSCManager(0, 0, SC_MANAGER_CREATE_SERVICE);
     if(!scm) {
         MessageBox(NULL, "Failed to open service control manager",
-            "UltraVnc", MB_ICONERROR);
+            app_name, MB_ICONERROR);
         return 1;
     }
-    service=CreateService(scm,
-
-	service_name, service_name, SERVICE_ALL_ACCESS,
-        SERVICE_WIN32_OWN_PROCESS | SERVICE_INTERACTIVE_PROCESS,
-        SERVICE_AUTO_START, SERVICE_ERROR_NORMAL, service_path,
+    //"Provides secure remote desktop sharing"
+    service=CreateService(scm,service_name, service_name, SERVICE_ALL_ACCESS,
+                          SERVICE_WIN32_OWN_PROCESS | SERVICE_INTERACTIVE_PROCESS,
+                          SERVICE_AUTO_START, SERVICE_ERROR_NORMAL, service_path,
         NULL, NULL, NULL, NULL, NULL);
     if(!service) {
 		DWORD myerror=GetLastError();
 		if (myerror==ERROR_ACCESS_DENIED)
 		{
 			MessageBox(NULL, "Failed: Permission denied",
-            "UltraVnc", MB_ICONERROR);
+            app_name, MB_ICONERROR);
 			CloseServiceHandle(scm);
 			return 1;
 		}
@@ -146,10 +175,12 @@ int install_service(void) {
 		}
 
         MessageBox(NULL, "Failed to create a new service",
-            "UltraVnc", MB_ICONERROR);
+            app_name, MB_ICONERROR);
         CloseServiceHandle(scm);
         return 1;
     }
+    else
+        set_service_description();
     CloseServiceHandle(service);
     CloseServiceHandle(scm);
     return 0;
@@ -162,7 +193,7 @@ int uninstall_service(void) {
     scm=OpenSCManager(0, 0, SC_MANAGER_CONNECT);
     if(!scm) {
         MessageBox(NULL, "Failed to open service control manager",
-            "UltraVnc", MB_ICONERROR);
+            app_name, MB_ICONERROR);
         return 1;
     }
 
@@ -173,26 +204,28 @@ int uninstall_service(void) {
 		if (myerror==ERROR_ACCESS_DENIED)
 		{
 			MessageBox(NULL, "Failed: Permission denied",
-            "UltraVnc", MB_ICONERROR);
+            app_name, MB_ICONERROR);
 			CloseServiceHandle(scm);
 			return 1;
 		}
 		if (myerror==ERROR_SERVICE_DOES_NOT_EXIST)
 		{
+#if 0
 			MessageBox(NULL, "Failed: Service is not installed",
-            "UltraVnc", MB_ICONERROR);
+            app_name, MB_ICONERROR);
+#endif
 			CloseServiceHandle(scm);
 			return 1;
 		}
 
         MessageBox(NULL, "Failed to open the service",
-            "UltraVnc", MB_ICONERROR);
+            app_name, MB_ICONERROR);
         CloseServiceHandle(scm);
         return 1;
     }
     if(!QueryServiceStatus(service, &serviceStatus)) {
         MessageBox(NULL, "Failed to query service status",
-            "UltraVnc", MB_ICONERROR);
+            app_name, MB_ICONERROR);
         CloseServiceHandle(service);
         CloseServiceHandle(scm);
         return 1;
@@ -207,7 +240,7 @@ int uninstall_service(void) {
     }
     if(!DeleteService(service)) {
         MessageBox(NULL, "Failed to delete the service",
-            "UltraVnc", MB_ICONERROR);
+            app_name, MB_ICONERROR);
         CloseServiceHandle(service);
         CloseServiceHandle(scm);
         return 1;

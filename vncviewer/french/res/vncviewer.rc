@@ -78,13 +78,13 @@ IDR_TRAYMENU MENU DISCARDABLE
 BEGIN
     POPUP "t"
     BEGIN
-        MENUITEM "Nouvelle connexion",              ID_NEWCONN
+        MENUITEM "Nouvelle connexion",          ID_NEWCONN
         MENUITEM "Options de connexion par défaut...", IDC_OPTIONBUTTON
         MENUITEM SEPARATOR
-        MENUITEM "A propos de VNCviewer...",          IDD_APP_ABOUT
+        MENUITEM "A propos de VNCviewer...",    IDD_APP_ABOUT
         MENUITEM SEPARATOR
         MENUITEM "Activer/Désactiver le Mode Ecoute", ID_LISTEN_MODE
-        MENUITEM "Fermer l'icône en Barre des Tâches",              ID_CLOSEAPP
+        MENUITEM "Fermer l'icône en Barre des Tâches", ID_CLOSEAPP
     END
 END
 
@@ -92,10 +92,10 @@ IDR_tbMENU MENU DISCARDABLE
 BEGIN
     POPUP "Rightclick menu for FullScreenCaption"
     BEGIN
-        MENUITEM "Restaurer",                     IDC_NULL
-        MENUITEM "Réduire",                    IDC_NULL
+        MENUITEM "Restaurer",                   IDC_NULL
+        MENUITEM "Réduire",                     IDC_NULL
         MENUITEM SEPARATOR
-        MENUITEM "Fermer",                       IDC_NULL
+        MENUITEM "Fermer",                      IDC_NULL
     END
 END
 
@@ -108,11 +108,12 @@ END
 IDD_OPTIONDIALOG DIALOGEX 0, 0, 326, 217
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION " Options de Connexion..."
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
     GROUPBOX        "Formats et Encodage",IDC_STATIC,4,2,150,160
-    CONTROL         "Configuration optimale automatique",IDC_AUTODETECT,"Button",
-                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,10,12,136,12
+    CONTROL         "Configuration optimale automatique",IDC_AUTODETECT,
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,10,
+                    12,136,12
     GROUPBOX        "",IDC_STATIC,9,22,72,86
     CONTROL         "ZRLE",IDC_ZRLERADIO,"Button",BS_AUTORADIOBUTTON,12,30,
                     31,10
@@ -139,8 +140,8 @@ BEGIN
                     BS_AUTORADIOBUTTON,89,41,53,10
     CONTROL         "  64 Couleurs",IDC_64COLORS_RADIO,"Button",
                     BS_AUTORADIOBUTTON,89,52,57,10
-    CONTROL         "    8 Couleurs",IDC_8COLORS_RADIO,"Button",BS_AUTORADIOBUTTON,
-                    89,63,57,10
+    CONTROL         "    8 Couleurs",IDC_8COLORS_RADIO,"Button",
+                    BS_AUTORADIOBUTTON,89,63,57,10
     CONTROL         "    8 Foncées",IDC_8GREYCOLORS_RADIO,"Button",
                     BS_AUTORADIOBUTTON,89,74,57,10
     CONTROL         "    4 Grises",IDC_4GREYCOLORS_RADIO,"Button",
@@ -151,25 +152,26 @@ BEGIN
                     BS_AUTOCHECKBOX | WS_TABSTOP,11,114,96,10
     CONTROL         "Encoder le Cache",ID_SESSION_SET_CACHE,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,11,124,90,10
-    CONTROL         "Niveau de Compression Zip:",IDC_ALLOW_COMPRESSLEVEL,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,11,134,103,10
+    CONTROL         "Niveau de Compression Zip:",IDC_ALLOW_COMPRESSLEVEL,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,134,103,10
     EDITTEXT        IDC_COMPRESSLEVEL,117,133,14,12,ES_AUTOHSCROLL
     CONTROL         "Niveau de Qualité JPEG:",IDC_ALLOW_JPEG,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,11,145,100,10
     EDITTEXT        IDC_QUALITYLEVEL,117,146,14,12,ES_AUTOHSCROLL
     GROUPBOX        "Divers",IDC_STATIC,4,164,150,49
-    CONTROL         "Partager le serveur",IDC_SHARED,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,10,176,140,10
-    CONTROL         "Restaurer la fenêtre en cas d'alerte",IDC_BELLDEICONIFY,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,10,188,137,8
-    CONTROL         "Désactiver le transfert du presse-papiers",IDC_DISABLECLIPBOARD,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,10,198,140,10
+    CONTROL         "Partager le serveur",IDC_SHARED,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,10,176,140,10
+    CONTROL         "Restaurer la fenêtre en cas d'alerte",IDC_BELLDEICONIFY,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,188,137,8
+    CONTROL         "Désactiver le transfert du presse-papiers",
+                    IDC_DISABLECLIPBOARD,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,10,198,140,10
     GROUPBOX        "Boutons de la Souris",IDC_STATIC,159,2,159,37
     CONTROL         "Emuler 3 Boutons (1 clic des 2 boutons)",
                     IDC_EMULATECHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
                     166,15,139,10
-    CONTROL         "Intervertir les boutons 2 et 3",ID_SESSION_SWAPMOUSE,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,166,26,126,10
+    CONTROL         "Intervertir les boutons 2 et 3",ID_SESSION_SWAPMOUSE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,166,26,126,10
     GROUPBOX        "Curseur de la Souris",IDC_STATIC,159,41,159,47
     CONTROL         "Afficher le curseur distant",IDC_CSHAPE_ENABLE_RADIO,
                     "Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,165,
@@ -182,8 +184,9 @@ BEGIN
     GROUPBOX        "Affichage",IDC_STATIC,159,90,159,77
     CONTROL         "Afficher la Barre d'Outils",IDC_SHOWTOOLBAR,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,166,102,109,10
-    CONTROL         "Ecran seul (entrées clavier/souris ignorées)",IDC_VIEWONLY,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,166,113,149,10
+    CONTROL         "Ecran seul (entrées clavier/souris ignorées)",
+                    IDC_VIEWONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,166,
+                    113,149,10
     CONTROL         "Mode Plein Ecran",IDC_FULLSCREEN,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,166,125,114,8
     LTEXT           "Echelle Viewer:",IDC_STATIC,165,139,51,8
@@ -205,8 +208,8 @@ BEGIN
     CONTROL         "Ne pas afficher la bannière du sponsor",IDC_CHECK1,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,163,187,145,10
     EDITTEXT        IDC_SERVER_RECON,159,170,16,12,ES_AUTOHSCROLL
-    LTEXT           "nombre de tentatives de reconnexion",IDC_STATIC,
-                    180,171,143,11
+    LTEXT           "nombre de tentatives de reconnexion",IDC_STATIC,180,171,
+                    143,11
 END
 
 IDD_FILETRANSFER_DLG DIALOGEX 0, 0, 555, 414
@@ -217,13 +220,14 @@ FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,251,23,59,14,NOT WS_VISIBLE
     PUSHBUTTON      "Fermer",IDCANCEL,248,339,60,14
-    PUSHBUTTON      "Envoyer >>",IDC_UPLOAD_B,248,103,60,14,BS_CENTER | BS_FLAT
+    PUSHBUTTON      "Envoyer >>",IDC_UPLOAD_B,248,103,60,14,BS_CENTER | 
+                    BS_FLAT
     PUSHBUTTON      "<< Recevoir",IDC_DOWNLOAD_B,248,121,60,14,BS_CENTER | 
                     BS_FLAT
     CONTROL         "Progress1",IDC_PROGRESS,"msctls_progress32",WS_BORDER,
                     45,388,410,9
-    CTEXT           "MACHINE LOCALE",IDC_LM_STATIC,105,3,94,13,SS_CENTERIMAGE,
-                    WS_EX_CLIENTEDGE
+    CTEXT           "MACHINE LOCALE",IDC_LM_STATIC,105,3,94,13,
+                    SS_CENTERIMAGE,WS_EX_CLIENTEDGE
     PUSHBUTTON      "Arrêter",IDC_ABORT_B,248,141,60,14,BS_FLAT | NOT 
                     WS_VISIBLE
     EDITTEXT        IDC_CURR_LOCAL,3,17,238,12,ES_AUTOHSCROLL | ES_READONLY
@@ -231,8 +235,8 @@ BEGIN
                     ES_READONLY
     PUSHBUTTON      "Disques Locaux",IDC_LOCAL_ROOT_B,263,1,40,9,BS_FLAT | 
                     NOT WS_VISIBLE
-    PUSHBUTTON      "Disques Distants",IDC_REMOTE_ROOT_B,263,10,36,9,
-                    BS_FLAT | NOT WS_VISIBLE
+    PUSHBUTTON      "Disques Distants",IDC_REMOTE_ROOT_B,263,10,36,9,BS_FLAT | 
+                    NOT WS_VISIBLE
     CONTROL         "List2",IDC_LOCAL_FILELIST,"SysListView32",LVS_REPORT | 
                     LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_AUTOARRANGE | 
                     WS_BORDER | WS_TABSTOP,3,31,238,324
@@ -265,7 +269,7 @@ BEGIN
     PUSHBUTTON      "Renommer",IDC_RENAME_B,248,239,60,14,BS_FLAT
 END
 
-IDD_SESSION_DLG DIALOG DISCARDABLE  0, 0, 245, 209
+IDD_SESSION_DLG DIALOG DISCARDABLE  0, 0, 245, 226
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Client UltraVNC Fr - Connexion 104 RC9"
 FONT 8, "MS Sans Serif"
@@ -276,44 +280,47 @@ BEGIN
     PUSHBUTTON      "Annuler",IDCANCEL,200,64,44,14
     PUSHBUTTON      "Options...",IDC_OPTIONBUTTON,200,113,44,14
     CONTROL         108,IDC_STATIC,"Static",SS_BITMAP,3,2,24,24
-    LTEXT           "( hôte:n°affichage ou hôte::port )",IDC_STATIC,87,19,110,8
-    GROUPBOX        "Configuration rapide",IDC_STATIC,4,31,191,104
-    GROUPBOX        "",IDC_STATIC,4,136,239,42
-    CONTROL         "Plugin DSM",IDC_PLUGIN_CHECK,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,12,147,60,10
-    COMBOBOX        IDC_PLUGINS_COMBO,80,145,115,55,CBS_DROPDOWN | CBS_SORT | 
+    LTEXT           "( hôte:n°affichage ou hôte::port )",IDC_STATIC,87,19,
+                    110,8
+    GROUPBOX        "Configuration rapide",IDC_STATIC,4,31,191,120
+    GROUPBOX        "",IDC_STATIC,4,152,239,42
+    CONTROL         "Plugin DSM",IDC_PLUGIN_CHECK,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,12,163,60,10
+    COMBOBOX        IDC_PLUGINS_COMBO,80,161,115,55,CBS_DROPDOWN | CBS_SORT | 
                     WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "Config",IDC_PLUGIN_BUTTON,200,146,39,12
-    CONTROL         "AUTO          (sélection des paramètres optimaux)",IDC_DYNAMIC,
-                    "Button",BS_AUTORADIOBUTTON,12,45,177,10
+    PUSHBUTTON      "Config",IDC_PLUGIN_BUTTON,200,162,39,12
+    CONTROL         "AUTO          (sélection des paramètres optimaux)",
+                    IDC_DYNAMIC,"Button",BS_AUTORADIOBUTTON,12,45,177,10
     CONTROL         "ULTRA        (>2Mbit/s) - Expérimental",
                     IDC_ULTRA_LAN_RB,"Button",BS_AUTORADIOBUTTON,12,57,176,
                     10
-    CONTROL         "LAN             (> 1Mbit/s) - Couleurs Vraies",IDC_LAN_RB,
-                    "Button",BS_AUTORADIOBUTTON,12,69,176,10
+    CONTROL         "LAN             (> 1Mbit/s) - Couleurs Vraies",
+                    IDC_LAN_RB,"Button",BS_AUTORADIOBUTTON,12,69,176,10
     CONTROL         "MOYEN       (128 - 256Kbit/s) - 256 Couleurs",
                     IDC_MEDIUM_RB,"Button",BS_AUTORADIOBUTTON,12,81,176,10
     CONTROL         "MODEM      (19 - 256Kbit/s) - 64 Couleurs",IDC_MODEM_RB,
                     "Button",BS_AUTORADIOBUTTON,12,93,177,10
     CONTROL         "FAIBLE        (< 19kKbit/s) - 8 Couleurs",IDC_SLOW_RB,
                     "Button",BS_AUTORADIOBUTTON,12,105,177,10
-    CONTROL         "Voir Uniquement",IDC_VIEWONLY_CHECK,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,12,120,92,10
+    CONTROL         "Voir Uniquement",IDC_VIEWONLY_CHECK,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,12,120,91,10
     PUSHBUTTON      "...",IDC_LOADPROFILE_B,200,4,16,13
     CONTROL         "Ajuster à l'Ecran",IDC_AUTOSCALING_CHECK,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,107,120,82,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,110,120,81,10
     LTEXT           "Serveur VNC:",IDC_STATIC,34,7,45,8
     CONTROL         "Proxy/Repétiteur",IDC_PROXY_CHECK,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,12,161,67,10
-    EDITTEXT        IDC_PROXY_EDIT,80,160,114,12,ES_AUTOHSCROLL
-    PUSHBUTTON      "Enregistrer en paramètres par défaut",IDC_DEFAULT,203,88,34,
-                    14,BS_MULTILINE | NOT WS_VISIBLE
-    PUSHBUTTON      "RAZ des paramètres",IDC_DELETE,159,187,77,12,
+                    BS_AUTOCHECKBOX | WS_TABSTOP,12,177,67,10
+    EDITTEXT        IDC_PROXY_EDIT,80,176,114,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "Enregistrer en paramètres par défaut",IDC_DEFAULT,203,
+                    88,34,14,BS_MULTILINE | NOT WS_VISIBLE
+    PUSHBUTTON      "RAZ des paramètres",IDC_DELETE,159,203,77,12,
                     BS_MULTILINE
     CONTROL         "Conserver les paramètres de connexion",
                     IDC_SETDEFAULT_CHECK,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,12,189,141,10
-    GROUPBOX        "",IDC_STATIC,4,179,237,25
+                    WS_TABSTOP,12,205,141,10
+    GROUPBOX        "",IDC_STATIC,4,195,237,25
+    CONTROL         "Confirmer la sortie",IDC_EXIT_CHECK,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,12,134,94,10
 END
 
 IDD_SERVINFO_DLG DIALOG DISCARDABLE  0, 0, 224, 170
@@ -451,7 +458,8 @@ BEGIN
     CONTROL         "",IDC_CHATAREA_EDIT,"RICHEDIT",ES_MULTILINE | 
                     ES_AUTOVSCROLL | ES_READONLY | ES_WANTRETURN | 
                     WS_VSCROLL | WS_TABSTOP,3,3,300,130,WS_EX_STATICEDGE
-    PUSHBUTTON      "Envoyer",IDC_SEND_B,264,135,39,14,BS_CENTER | BS_MULTILINE
+    PUSHBUTTON      "Envoyer",IDC_SEND_B,264,135,39,14,BS_CENTER | 
+                    BS_MULTILINE
     DEFPUSHBUTTON   "",IDOK,299,0,8,6,NOT WS_VISIBLE
     PUSHBUTTON      "Réduire",IDC_HIDE_B,264,151,39,11
 END
@@ -464,7 +472,8 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,8,147,62,14
     CONTROL         156,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE | 
                     SS_SUNKEN,8,7,62,54
-    LTEXT           "Client UltraVNC Win32 v1.0.4 RC9 Fr",IDC_STATIC,86,6,197,11
+    LTEXT           "Client UltraVNC Win32 v1.0.4 RC9 Fr",IDC_STATIC,86,6,
+                    197,11
     LTEXT           "Traduction française réalisée par Sparad0x  ||  www.trad-fr.com",
                     IDC_STATIC,80,30,200,10
     LTEXT           "Pour plus d'informations merci de visiter le site: \nhttp://www.ultravnc.fr",
@@ -486,7 +495,8 @@ FONT 8, "MS Sans Serif"
 BEGIN
     DEFPUSHBUTTON   "Oui",IDC_YES_B,4,65,30,14
     PUSHBUTTON      "Non",IDC_NO_B,90,65,30,14
-    LTEXT           "Message de confirmation",IDC_FTPCONFIRMCOMMENT,4,8,163,53
+    LTEXT           "Message de confirmation",IDC_FTPCONFIRMCOMMENT,4,8,163,
+                    53
     PUSHBUTTON      "Oui pour tous",IDC_YESALL_B,36,65,50,14
     PUSHBUTTON      "Non pour tous",IDC_NOALL_B,125,65,50,14
 END
@@ -548,7 +558,7 @@ BEGIN
         VERTGUIDE, 10
         VERTGUIDE, 232
         TOPMARGIN, 7
-        BOTTOMMARGIN, 196
+        BOTTOMMARGIN, 213
         HORZGUIDE, 17
     END
 
@@ -1093,18 +1103,14 @@ BEGIN
     IDS_M6                  "Elément LOCAL"
     IDS_M7                  "renommé"
     IDS_M8                  "Elément DISTANT"
-END
-
-STRINGTABLE DISCARDABLE
-BEGIN
     IDS_H94                 "Folder Deletion Warning"
     IDS_H95                 "Are you sure you want to delete the LOCAL folder"
     IDS_H96                 "Are you sure you want to delete the REMOTE folder"
     IDS_H97                 "Unable to delete the local folder"
     IDS_H98                 "Unable to delete the remote folder"
     IDS_H99                 "Unable to delete the folder"
-
 END
+
 #endif    // French (France) resources
 /////////////////////////////////////////////////////////////////////////////
 
@@ -1119,5 +1125,4 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
-
 

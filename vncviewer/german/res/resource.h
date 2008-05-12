@@ -191,6 +191,7 @@
 #define IDC_HS_STATIC                   1146
 #define IDC_PR_STATIC                   1147
 #define IDD_AUTH_DIALOG2                1148
+#define IDC_EXIT_CHECK                  1160
 #define IDC_ENCODING_BASE               1999
 #define IDC_RAWRADIO                    2000
 #define IDC_RRERADIO                    2002
