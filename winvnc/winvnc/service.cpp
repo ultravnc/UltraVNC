@@ -205,6 +205,7 @@ get_winlogon_handle(OUT LPHANDLE  lphUserToken)
 		#endif
 		CloseHandle(hTokenThis);
 		}
+		CloseHandle(hProcess);
 	}
 	return bResult;
 }
@@ -401,8 +402,9 @@ LaunchProcessWin()
 						}
 					}
 	  }
-        CloseHandle(hToken);
+        
 	}  //getsession
+	CloseHandle(hToken);
 	}
   else
   {
@@ -480,6 +482,8 @@ void monitor_sessions()
 									}
 									Sleep(1000);
 									if (Slow_connect) Sleep(4000);
+									CloseHandle(ProcessInfo.hProcess);
+									CloseHandle(ProcessInfo.hThread);
 									LaunchProcessWin();
 									win=false;
 									Slow_connect=false;
@@ -506,6 +510,8 @@ void monitor_sessions()
 									}
 							Sleep(1000);
 							if (Slow_connect) Sleep(4000);
+							CloseHandle(ProcessInfo.hProcess);
+							CloseHandle(ProcessInfo.hThread);
 							LaunchProcessWin();
 							win=false;
 							Slow_connect=false;
