@@ -614,7 +614,7 @@ vncSetAuth::DialogProc(HWND hwnd,
 				GetDlgItemText(hwnd, IDC_GROUP3, (LPSTR) _this->pszgroup3, 240);
 
 				bool use_uac=false;
-				if (!_this->myIniFile.WriteInt("dummy", "dummy",1))
+				if (!_this->myIniFile.IsWritable())
 				{
 					// We can't write to the ini file , Vista in service mode
 					Copy_to_Temp();

@@ -29,6 +29,8 @@ public:
 	void IniFileSetTemp(char *lpCmdLine);
 	void copy_to_secure();
 
+    bool IsWritable();
+
 protected:
 		
 };

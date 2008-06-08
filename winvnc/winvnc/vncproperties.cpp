@@ -176,7 +176,7 @@ vncProperties::ShowAdmin(BOOL show, BOOL usersettings)
 		if (!m_fUseRegistry) // Use the ini file
 		{
 			// We're trying to edit the default local settings - verify that we can
-			/*if (!myIniFile.WriteInt("dummy", "dummy",1))
+			/*if (!myIniFile.IsWritable())
 			{
 				if(iImpersonateResult == ERROR_SUCCESS)RevertToSelf();
 				CloseHandle(hProcess);
@@ -1099,8 +1099,6 @@ vncProperties::DialogProc(HWND hwnd,
 							{
 								STARTUPINFO          StartUPInfo;
 								PROCESS_INFORMATION  ProcessInfo;
-								HANDLE Token=NULL;
-								HANDLE process=NULL;
 								ZeroMemory(&StartUPInfo,sizeof(STARTUPINFO));
 								ZeroMemory(&ProcessInfo,sizeof(PROCESS_INFORMATION));
 								StartUPInfo.wShowWindow = SW_SHOW;
@@ -1109,8 +1107,8 @@ vncProperties::DialogProc(HWND hwnd,
 						
 								CreateProcessAsUser(hPToken,NULL,dir,NULL,NULL,FALSE,DETACHED_PROCESS,NULL,NULL,&StartUPInfo,&ProcessInfo);
 								DWORD error=GetLastError();
-								if (process) CloseHandle(process);
-								if (Token) CloseHandle(Token);
+                                if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
+                                if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
 								if (error==1314)
 									{
 										winvncSecurityEditorHelper_as_admin();
@@ -2130,7 +2128,7 @@ void vncProperties::SaveToIniFile()
 
 	// SAVE PER-USER PREFS IF ALLOWED
 	bool use_uac=false;
-	if (!myIniFile.WriteInt("dummy", "dummy",1))
+	if (!myIniFile.IsWritable())
 			{
 				// We can't write to the ini file , Vista in service mode
 				Copy_to_Temp();

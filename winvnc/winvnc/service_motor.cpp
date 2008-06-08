@@ -15,6 +15,21 @@ char service_name[]="uvnc_service";
 char *app_name = "UltraVNC";
 void disconnect_remote_sessions();
 char cmdtext[256];
+bool IsWin2000()
+{
+	OSVERSIONINFO OSversion;
+	
+	OSversion.dwOSVersionInfoSize=sizeof(OSVERSIONINFO);
+	GetVersionEx(&OSversion);
+
+    if (OSversion.dwPlatformId == VER_PLATFORM_WIN32_NT)
+    {
+        if (OSversion.dwMajorVersion==5 && OSversion.dwMinorVersion==0)
+            return true; 
+						
+    }
+
+    return false;
 
 ////////////////////////////////////////////////////////////////////////////////
 static void WINAPI service_main(DWORD argc, LPTSTR* argv) {
@@ -39,8 +54,10 @@ static void WINAPI service_main(DWORD argc, LPTSTR* argv) {
         stopServiceEvent=CreateEvent(0, FALSE, FALSE, 0);
 
         /* running */
-        serviceStatus.dwControlsAccepted|=
-            (SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_SHUTDOWN | SERVICE_ACCEPT_SESSIONCHANGE);
+        serviceStatus.dwControlsAccepted |= (SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_SHUTDOWN);
+        if (!IsWin2000())
+            serviceStatus.dwControlsAccepted |= SERVICE_ACCEPT_SESSIONCHANGE;
+
         serviceStatus.dwCurrentState=SERVICE_RUNNING;
         SetServiceStatus(serviceStatusHandle, &serviceStatus);
 

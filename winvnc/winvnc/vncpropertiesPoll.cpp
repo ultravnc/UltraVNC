@@ -105,7 +105,7 @@ vncPropertiesPoll::Show(BOOL show, BOOL usersettings)
 		{
 			// We're trying to edit the default local settings - verify that we can
 			/*
-			if (!myIniFile.WriteInt("dummy", "dummy",1))
+			if (!myIniFile.IsWritable())
 			{
 				if(iImpersonateResult == ERROR_SUCCESS)RevertToSelf();
 				CloseHandle(hProcess);
@@ -963,7 +963,7 @@ void vncPropertiesPoll::LoadUserPrefsPollFromIniFile()
 void vncPropertiesPoll::SaveToIniFile()
 {
 	bool use_uac=false;
-	if (!myIniFile.WriteInt("dummy", "dummy",1))
+	if (!myIniFile.IsWritable())
 			{
 				// We can't write to the ini file , Vista in service mode
 				Copy_to_Temp();

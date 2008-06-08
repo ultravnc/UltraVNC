@@ -161,4 +161,12 @@ IniFile::WritePassword(char *value)
 		return (FALSE != WritePrivateProfileStruct("ultravnc","passwd", value,8,myInifile));
 }
 
+bool IniFile::IsWritable()
+{
+    bool writable = WriteInt("Permissions", "isWritable",1);
+    if (writable)
+        WritePrivateProfileSection("Permissions", "", myInifile);
+
+    return writable;
+}
 
