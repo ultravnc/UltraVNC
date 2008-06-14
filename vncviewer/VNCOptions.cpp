@@ -189,6 +189,13 @@ VNCOptions::VNCOptions()
 
   m_slowgdi = false;
 #endif
+  char optionfile[MAX_PATH];
+  char *tempvar=NULL;
+  tempvar = getenv( "TEMP" );
+  if (tempvar) strcpy(optionfile,tempvar);
+  else strcpy(optionfile,"");
+  strcat(optionfile,"\\options.vnc");
+  Load(optionfile);
 }
 
 VNCOptions& VNCOptions::operator=(VNCOptions& s)
