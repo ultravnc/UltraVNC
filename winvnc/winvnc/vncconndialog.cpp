@@ -154,6 +154,10 @@ BOOL CALLBACK vncConnDialog::vncConnDlgProc(HWND hwnd,
 			{
 				if (id) 
 					{	
+						for (int i = 0; i < strlen(idcode); i++)
+						{
+							idcode[i] = toupper(idcode[i]);
+						} 
 						tmpsock->Send(idcode,250);
 						tmpsock->SetTimeout(0);
 /*						if (strncmp(hostname,"ID",2)!=0)

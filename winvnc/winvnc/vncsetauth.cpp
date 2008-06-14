@@ -31,6 +31,7 @@
 
 #include "WinVNC.h"
 #include "vncsetAuth.h"
+#include "vncService.h"
 
 #define MAXSTRING 254
 
@@ -614,7 +615,7 @@ vncSetAuth::DialogProc(HWND hwnd,
 				GetDlgItemText(hwnd, IDC_GROUP3, (LPSTR) _this->pszgroup3, 240);
 
 				bool use_uac=false;
-				if (!_this->myIniFile.IsWritable())
+				if (!_this->myIniFile.IsWritable() || vncService::RunningAsService() )
 				{
 					// We can't write to the ini file , Vista in service mode
 					Copy_to_Temp();

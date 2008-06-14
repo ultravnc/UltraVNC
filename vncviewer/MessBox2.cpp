@@ -27,7 +27,7 @@
 #include "vncviewer.h"
 char *infomsg2;
 int g_error_nr2;
-bool	g_sponsor;
+bool	g_disable_sponsor;
 // Process the About dialog.
 static LRESULT CALLBACK MessageDlgProc2(HWND hwnd, UINT iMsg, 
 										   WPARAM wParam, LPARAM lParam) {
@@ -87,7 +87,7 @@ void ShowMessageBox2(char *info,int error_nr)
 {
 	infomsg2=info;
 	g_error_nr2=error_nr;
-	if (g_sponsor)
+	if (g_disable_sponsor)
 	{
 	int res = DialogBox(pApp->m_instance, 
  		DIALOG_MAKEINTRESOURCE(IDD_APP_MESSAGE1),

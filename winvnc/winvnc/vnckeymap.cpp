@@ -704,11 +704,17 @@ public:
                  "Vista and runnning as user -> Taskmgr\n");
 			WinExec("taskmgr.exe", SW_SHOWNORMAL);
 		}
-		else
+		else if (vncService::VersionMajor()<6 && vncService::RunningFromExternalService() )
 		{
 			vnclog.Print(LL_INTINFO,
-                 "Not Vista, use old method\n");
+                 "Not Vista and and runnning as system, use old method\n");
 			vncService::SimulateCtrlAltDel();
+		}
+		else if (vncService::VersionMajor()<6)
+		{
+			vnclog.Print(LL_INTINFO,
+                 "Not Vista and runnning as user -> Taskmgr\n");
+			WinExec("taskmgr.exe", SW_SHOWNORMAL);
 		}
         return;
       }

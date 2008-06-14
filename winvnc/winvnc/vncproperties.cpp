@@ -2128,7 +2128,7 @@ void vncProperties::SaveToIniFile()
 
 	// SAVE PER-USER PREFS IF ALLOWED
 	bool use_uac=false;
-	if (!myIniFile.IsWritable())
+	if (!myIniFile.IsWritable()  || vncService::RunningAsService())
 			{
 				// We can't write to the ini file , Vista in service mode
 				Copy_to_Temp();

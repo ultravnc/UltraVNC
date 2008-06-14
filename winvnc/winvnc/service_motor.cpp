@@ -30,6 +30,7 @@ bool IsWin2000()
     }
 
     return false;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 static void WINAPI service_main(DWORD argc, LPTSTR* argv) {

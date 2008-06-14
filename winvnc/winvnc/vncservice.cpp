@@ -766,7 +766,7 @@ vncService::IsInstalled()
     BOOL bResult = FALSE;
     SC_HANDLE hSCM = ::OpenSCManager(NULL, // local machine
                                      NULL, // ServicesActive database
-                                     SC_MANAGER_ALL_ACCESS); // full access
+                                     SC_MANAGER_ENUMERATE_SERVICE); // full access
     if (hSCM) {
         SC_HANDLE hService = ::OpenService(hSCM,
                                            service_name,

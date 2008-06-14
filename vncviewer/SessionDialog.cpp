@@ -204,6 +204,10 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
                     sz_F8, 
                     sz_F10, MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TOPMOST);
             } else {
+				for (int i = 0; i < strlen(tmphost); i++)
+						{
+							tmphost[i] = toupper(tmphost[i]);
+						} 
                 _tcscpy(_this->m_host_dialog, tmphost);
 				_this->m_pMRU->AddItem(fulldisplay);
 //				_tcscpy(_this->m_remotehost, fulldisplay);

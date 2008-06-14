@@ -63,7 +63,7 @@ extern char sz_D25[64];
 extern char sz_D26[64];
 extern char sz_D27[64];
 extern char sz_D28[64];
-extern bool g_sponsor;
+extern bool g_disable_sponsor;
 
 
 VNCOptions::VNCOptions()
@@ -157,7 +157,7 @@ VNCOptions::VNCOptions()
   m_clearPassword[0] = '\0';		// sf@2002
   m_quickoption = 1;				// sf@2002 - Auto Mode as default
   m_fUseDSMPlugin = false;
-  g_sponsor= false;
+  g_disable_sponsor= false;
   m_fUseProxy = false;
   m_szDSMPluginFilename[0] = '\0';
 
@@ -560,6 +560,10 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 				enc = rfbEncodingTight;
 			} else if (_tcsicmp(args[j], _T("ultra")) == 0) {
 				enc = rfbEncodingUltra;
+			} else if (_tcsicmp(args[j], _T("zrle")) == 0) { 
+				enc = rfbEncodingZRLE; 
+			} else if (_tcsicmp(args[j], _T("zywrle")) == 0) { 
+				enc = rfbEncodingZYWRLE; 
 			} else {
 				ArgError(sz_D19);
 				continue;
@@ -753,7 +757,7 @@ void VNCOptions::Save(char *fname)
   saveInt("QuickOption",			m_quickoption,	fname);
   saveInt("UseDSMPlugin",			m_fUseDSMPlugin,	fname);
   saveInt("UseProxy",				m_fUseProxy,	fname);
-  saveInt("sponsor",				g_sponsor,	fname);
+  saveInt("sponsor",				g_disable_sponsor,	fname);
 
   WritePrivateProfileString("options", "DSMPlugin", m_szDSMPluginFilename, fname);
   //saveInt("AutoReconnect", m_autoReconnect,	fname);
@@ -812,9 +816,9 @@ void VNCOptions::Load(char *fname)
   m_fUseDSMPlugin =		readInt("UseDSMPlugin",		m_fUseDSMPlugin, fname) != 0;
   m_fUseProxy =			readInt("UseProxy",			m_fUseProxy, fname) != 0;
   GetPrivateProfileString("options", "DSMPlugin", "NoPlugin", m_szDSMPluginFilename, MAX_PATH, fname);
-  if (!g_sponsor) g_sponsor=readInt("sponsor",			g_sponsor, fname) != 0;
+  if (!g_disable_sponsor) g_disable_sponsor=readInt("sponsor",			g_disable_sponsor, fname) != 0;
 
-  if (!g_sponsor)
+  if (!g_disable_sponsor)
   {
   HKEY hRegKey;
 		DWORD sponsor = 0;
@@ -825,7 +829,7 @@ void VNCOptions::Load(char *fname)
 			DWORD valtype=REG_DWORD;	
 			if ( RegQueryValueEx( hRegKey,  "sponsor", NULL, &valtype, 
 				(LPBYTE) &sponsor, &sponsorsize) == ERROR_SUCCESS) {
-                g_sponsor=sponsor ? true : false;
+                g_disable_sponsor=sponsor ? true : false;
 			}
 			RegCloseKey(hRegKey);
 		}
@@ -903,7 +907,8 @@ void VNCOptions::ShowUsage(LPTSTR info) {
 			   "      [/nostatus] [/dsmplugin pluginfilename.dsm] [/autoscaling] \n\r"
 			   "      [/autoreconnect delayInSeconds] \n\r"
 			   "      [/nohotkeys] [/proxy proxyhost [portnum]] [/256colors] [/64colors]\r\n"
-			   "      [/8colors] [/8greycolors] [/4greycolors] [/2greycolors]\r\n\r\n"
+			   "      [/8colors] [/8greycolors] [/4greycolors] [/2greycolors]\r\n"
+			   "      [/encoding [zrle | zywrle | tight | zlib | zlibhex | ultra]] \r\n"
                "For full details see documentation."), 
 #endif
             tmpinf);
@@ -1117,7 +1122,7 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 		  SendMessage(hRemoteCursor, BM_SETCHECK,	true, 0);
 
 		  HWND hsponsor = GetDlgItem(hwnd, IDC_CHECK1);
-		  SendMessage(hsponsor, BM_SETCHECK, g_sponsor, 1);
+		  SendMessage(hsponsor, BM_SETCHECK, g_disable_sponsor, 1);
 		  
 		  CentreWindow(hwnd);
 		  SetForegroundWindow(hwnd);
@@ -1292,16 +1297,16 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 			HWND hsponsor = GetDlgItem(hwnd, IDC_CHECK1);
 			if (SendMessage(hsponsor, BM_GETCHECK, 0, 0) == BST_CHECKED)
 			{
-				g_sponsor = true;
+				g_disable_sponsor = true;
 			}
 			else 
 			{
-				g_sponsor = false;
+				g_disable_sponsor = false;
 
 			}
 
 			DWORD dw;
-			DWORD val=g_sponsor;
+			DWORD val=g_disable_sponsor;
 			HKEY huser;
 			if (RegCreateKeyEx(HKEY_CURRENT_USER,
 			SETTINGS_KEY_NAME,
