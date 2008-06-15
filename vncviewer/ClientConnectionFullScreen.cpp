@@ -136,7 +136,8 @@ void ClientConnection::RealiseFullScreenMode()
 		}
 
 		TitleBar.DisplayWindow(TRUE, TRUE); //Added by: Lars Werner (http://lars.werner.no)
- 		TitleBar.SetText(m_desktopName); //Added by: Lars Werner (http://lars.werner.no)
+ 		if (m_opts.m_ViewOnly)TitleBar.SetText(m_desktopName_viewonly);
+		else TitleBar.SetText(m_desktopName); //Added by: Lars Werner (http://lars.werner.no)
 
 	} else {
 		ShowWindow(m_hwndMain, SW_NORMAL);

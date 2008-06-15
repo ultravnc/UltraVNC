@@ -284,6 +284,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	saved_set=false;
 	m_hwndcn = 0;
 	m_desktopName = NULL;
+	m_desktopName_viewonly = NULL;
 	m_port = -1;
 	m_proxyport = -1;
 //	m_proxy = 0;
@@ -1293,6 +1294,7 @@ void ClientConnection::CreateDisplay()
 	CheckMenuItem(GetSystemMenu(m_hwndMain, FALSE),
 				  ID_VIEWONLYTOGGLE,
 				  MF_BYCOMMAND | (m_opts.m_ViewOnly ? MF_CHECKED :MF_UNCHECKED));
+
 
 	// Set up clipboard watching
 #ifndef _WIN32_WCE
@@ -2328,6 +2330,7 @@ void ClientConnection::ReadServerInit()
     m_si.nameLength = Swap32IfLE(m_si.nameLength);
 	
     m_desktopName = new TCHAR[m_si.nameLength + 4 + 256];
+	m_desktopName_viewonly = new TCHAR[m_si.nameLength + 4 + 256+16];
 
 #ifdef UNDER_CE
     char *deskNameBuf = new char[m_si.nameLength + 4];
@@ -2345,7 +2348,12 @@ void ClientConnection::ReadServerInit()
 	
 	// sprintf(tcDummy,"%s ",m_desktopName);
 	strcat(m_desktopName, " ");
-	SetWindowText(m_hwndMain, m_desktopName);
+
+	strcpy(m_desktopName_viewonly,m_desktopName);
+	strcat(m_desktopName_viewonly,"viewonly");
+
+	if (m_opts.m_ViewOnly) SetWindowText(m_hwndMain, m_desktopName_viewonly);
+	else SetWindowText(m_hwndMain, m_desktopName);
 
 	vnclog.Print(0, _T("Desktop name \"%s\"\n"),m_desktopName);
 	vnclog.Print(1, _T("Geometry %d x %d depth %d\n"),
@@ -2362,7 +2370,11 @@ void ClientConnection::ReadServerInit()
 					);
 			strcat(m_desktopName, szMess);
 	}
-	SetWindowText(m_hwndMain, m_desktopName);
+	strcpy(m_desktopName_viewonly,m_desktopName);
+	strcat(m_desktopName_viewonly,"viewonly");
+
+	if (m_opts.m_ViewOnly) SetWindowText(m_hwndMain, m_desktopName_viewonly);
+	else SetWindowText(m_hwndMain, m_desktopName);
 	SizeWindow();
 }
 
@@ -2376,6 +2388,8 @@ void ClientConnection::SizeWindow()
 	int workheight = workrect.bottom - workrect.top;
 	vnclog.Print(2, _T("Screen work area is %d x %d\n"), workwidth, workheight);
 
+	int widthwindow,heightwindow;
+
 	// sf@2003 - AutoScaling 
 	if (m_opts.m_fAutoScaling && !m_fScalingDone)
 	{
@@ -2384,22 +2398,66 @@ void ClientConnection::SizeWindow()
 		m_opts.m_saved_scale_den = m_opts.m_scale_den;
 		m_opts.m_saved_scaling = m_opts.m_scaling;
 
-		NONCLIENTMETRICS ncm = {0};
-		ncm.cbSize = sizeof(ncm);
-		SystemParametersInfo(SPI_GETNONCLIENTMETRICS, 0, &ncm, 0); 
-		int TitleBarHeight = ncm.iCaptionHeight + 10;
-		
-		int nLocalHeight = workheight; 
-		nLocalHeight -= TitleBarHeight;
-		//if (m_opts.m_ShowToolbar)
-		nLocalHeight -= (m_TBr.bottom); // Always take toolbar into account in calculation
-		int verticalRatio = (int)((nLocalHeight * 100) / m_si.framebufferHeight);
-		int horizontalRatio = (int)((workwidth * 100) / m_si.framebufferWidth);
-		m_opts.m_scale_num = min(verticalRatio, horizontalRatio);
+		RECT myrect,myclrect;
+		GetWindowRect(m_hwndMain,&myrect);
+		GetClientRect(m_hwndMain,&myclrect);
+		int dx=(myrect.right-myrect.left)-(myclrect.right-myclrect.left);
+		int dy=(myrect.bottom-myrect.top)-(myclrect.bottom-myclrect.top);
 
-		m_opts.m_scale_den = 100;
-		m_opts.m_scaling = true; 
-		m_fScalingDone = true;
+		//case one, does the scaling fit the window include borders?
+		int clientwidth=m_si.framebufferWidth*m_opts.m_scale_den/m_opts.m_scale_num;
+		int clientheight=m_si.framebufferHeight*m_opts.m_scale_den/m_opts.m_scale_num;
+
+		if ((workwidth>=clientwidth+dx) && (workheight>=clientheight+dy))
+		{
+			//we can scale the clientarea
+			widthwindow=clientwidth+dx;
+			heightwindow=clientheight+dy;
+			int widthclientwindow=clientwidth;
+			int heightclientwindow=clientheight;
+			int horizontalRatio= (int) ((widthclientwindow*100)/m_si.framebufferWidth);
+			int verticalRatio = (int) ((heightclientwindow*100)/m_si.framebufferHeight);
+			int Ratio= min(verticalRatio, horizontalRatio);
+			m_opts.m_scale_num =Ratio;
+			m_opts.m_scale_den = 100;
+			m_opts.m_scaling = true; 
+			m_fScalingDone = true;
+
+		}
+		else if ((workwidth>=clientwidth) && (workheight>=clientheight))
+		{
+			// we need to scale the window
+			widthwindow=clientwidth;
+			heightwindow=clientheight;
+			int widthclientwindow=clientwidth-dx;
+			int heightclientwindow=clientheight-dy;
+			int horizontalRatio= (int) ((widthclientwindow*100)/m_si.framebufferWidth);
+			int verticalRatio = (int) ((heightclientwindow*100)/m_si.framebufferHeight);
+			int Ratio= min(verticalRatio, horizontalRatio);
+			m_opts.m_scale_num =Ratio;
+			m_opts.m_scale_den = 100;
+			m_opts.m_scaling = true; 
+			m_fScalingDone = true;
+		}
+		else
+		{
+			// we change the scaling to fit the window
+			// max windows size including borders etc..
+			int horizontalRatio= (int) (((workwidth-dx)*100)/m_si.framebufferWidth);
+			int verticalRatio = (int) (((workheight-dy)*100)/m_si.framebufferHeight);
+			int Ratio= min(verticalRatio, horizontalRatio);
+			widthwindow=m_si.framebufferWidth*Ratio/100;
+			heightwindow=m_si.framebufferHeight*Ratio/100;
+			/*int widthclientwindow=widthwindow-dx;
+			int heightclientwindow=heightwindow-dy;
+			horizontalRatio= (int) ((widthclientwindow*100)/m_si.framebufferWidth);
+			verticalRatio = (int) ((heightclientwindow*100)/m_si.framebufferHeight);
+			Ratio= min(verticalRatio, horizontalRatio);*/
+			m_opts.m_scale_num =Ratio;
+			m_opts.m_scale_den = 100;
+			m_opts.m_scaling = true; 
+			m_fScalingDone = true;
+		}
 	}
 	
 	if (!m_opts.m_fAutoScaling && m_fScalingDone)
@@ -2917,6 +2975,7 @@ ClientConnection::~ClientConnection()
 	}
 
 	if (m_desktopName != NULL) delete [] m_desktopName;
+	if (m_desktopName_viewonly != NULL) delete [] m_desktopName_viewonly;
 	delete [] m_netbuf;
 
 	if (m_hCacheBitmapDC != NULL)
@@ -5412,6 +5471,11 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						// Toggle view only mode
 						_this->m_opts.m_ViewOnly = !_this->m_opts.m_ViewOnly;
 						// Todo update menu state
+						CheckMenuItem(GetSystemMenu(_this->m_hwndMain, FALSE),
+							          ID_VIEWONLYTOGGLE,
+									  MF_BYCOMMAND | (_this->m_opts.m_ViewOnly ? MF_CHECKED :MF_UNCHECKED));
+						if (_this->m_opts.m_ViewOnly) SetWindowText(_this->m_hwndMain, _this->m_desktopName_viewonly);
+						else SetWindowText(_this->m_hwndMain, _this->m_desktopName);
 						return 0;
 						
 					case ID_REQUEST_REFRESH: 

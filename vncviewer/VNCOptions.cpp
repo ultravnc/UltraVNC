@@ -685,6 +685,10 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
         ShowUsage(sz_D28);
         PostQuitMessage(1);
       } else {
+		  for (int i = 0; i < strlen(phost); i++)
+						{
+							phost[i] = toupper(phost[i]);
+						} 
         _tcscpy(m_host_options, phost);
         m_connectionSpecified = true;
       }
