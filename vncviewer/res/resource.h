@@ -1,5 +1,5 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Developer Studio generated include file.
+// Microsoft Visual C++ generated include file.
 // Used by vncviewer.rc
 //
 #define IDQUIT                          9
@@ -509,6 +509,7 @@
 #define IDS_H97                         50267
 #define IDS_H98                         50268
 #define IDS_H99                         50269
+#define IDS_L93                         50270
 
 // Next default values for new objects
 // 

@@ -293,7 +293,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 				winvncSecurityEditorHelper_as_admin();
 				return 0;
 			}
-		if (strncmp(&szCmdLine[i], winvncSecurityEditorHelper, strlen(winvncSecurityEditor)) == 0)
+		if (strncmp(&szCmdLine[i], winvncSecurityEditor, strlen(winvncSecurityEditor)) == 0)
 			{
 			    typedef void (*vncEditSecurityFn) (HWND hwnd, HINSTANCE hInstance);
 				vncEditSecurityFn vncEditSecurity = 0;
@@ -404,8 +404,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 					pszId[ end - start ] = 0;
 					pszId = _strupr( pszId );
 				}
-
-				i += strlen( pszId );
+//multiple spaces between autoreconnect and id 
+				i += end;
 			}// end of condition we found the ID: parameter
 			
 			// NOTE:  id must be NULL or the ID:???? (pointer will get deleted when message is processed)

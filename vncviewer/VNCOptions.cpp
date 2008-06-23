@@ -411,7 +411,9 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 	  m_quickoption = 0;
     } else if ( SwitchMatch(args[j], _T("8bit"))) {
       m_Use8Bit = rfbPF256Colors; //true;
-    } else if ( SwitchMatch(args[j], _T("256colors"))) {
+	} else if ( SwitchMatch(args[j], _T("256colors"))) {
+      m_Use8Bit = rfbPF256Colors; //true;
+    } else if ( SwitchMatch(args[j], _T("fullcolors"))) {
       m_Use8Bit = rfbPFFullColors;
     } else if ( SwitchMatch(args[j], _T("64colors"))) {
       m_Use8Bit = rfbPF64Colors;
@@ -792,7 +794,7 @@ void VNCOptions::Load(char *fname)
   m_fAutoScaling =      readInt("AutoScaling",			m_fAutoScaling,		fname) != 0;
   m_FullScreen =			readInt("fullscreen",		m_FullScreen,	fname) != 0;
   autoDetect = readInt("autoDetect", autoDetect, fname) != 0;
-  m_Use8Bit =				readInt("8bit",				m_Use8Bit,		fname) != 0;
+  m_Use8Bit =				readInt("8bit",				m_Use8Bit,		fname);
   m_Shared =				readInt("shared",			m_Shared,		fname) != 0;
   m_SwapMouse =			readInt("swapmouse",		m_SwapMouse,	fname) != 0;
   m_DeiconifyOnBell =		readInt("belldeiconify",	m_DeiconifyOnBell, fname) != 0;

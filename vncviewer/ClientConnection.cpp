@@ -207,6 +207,7 @@ extern char sz_L89[64];
 extern char sz_L90[64];
 extern char sz_L91[64];
 extern char sz_L92[64];
+extern char sz_L93[64];
 
 extern char sz_F1[64];
 extern char sz_F5[128];
@@ -1250,7 +1251,7 @@ void ClientConnection::CreateDisplay()
 		AppendMenu(hsysmenu, MF_STRING, IDC_OPTIONBUTTON,	sz_L21);
 		AppendMenu(hsysmenu, MF_STRING, ID_CONN_ABOUT,		sz_L22);
 		AppendMenu(hsysmenu, MF_STRING, ID_REQUEST_REFRESH,	sz_L23);
-		AppendMenu(hsysmenu, MF_STRING, ID_VIEWONLYTOGGLE,	"View Only"); // Todo: translate
+		AppendMenu(hsysmenu, MF_STRING, ID_VIEWONLYTOGGLE,	sz_L93); // Todo: translate
 
 		AppendMenu(hsysmenu, MF_SEPARATOR, NULL, NULL);
 		AppendMenu(hsysmenu, MF_STRING, ID_FULLSCREEN,		sz_L24);
@@ -5308,6 +5309,8 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 //				_this->m_FTtimer=0;
 //				_this->m_pFileTransfer->SendFileChunk();
 //				break;
+			case WM_SYSCHAR:
+				return true;
 			case WM_SYSCOMMAND:
 				{
 					switch (LOWORD(wParam))

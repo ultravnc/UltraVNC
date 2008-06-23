@@ -34,7 +34,17 @@ HBITMAP
         static HBITMAP hbmBkGnd = NULL;
         if (NULL == hbmBkGnd)
         {
-			hbmBkGnd = (HBITMAP)LoadImage(NULL, "background.bmp", IMAGE_BITMAP, 0, 0,LR_LOADFROMFILE);
+			char WORKDIR[MAX_PATH];
+			char mycommand[MAX_PATH];
+			if (GetModuleFileName(NULL, WORKDIR, MAX_PATH))
+				{
+				char* p = strrchr(WORKDIR, '\\');
+				if (p == NULL) return 0;
+				*p = '\0';
+			}
+			strcpy(mycommand,"\\background.bmp");
+
+			hbmBkGnd = (HBITMAP)LoadImage(NULL, mycommand, IMAGE_BITMAP, 0, 0,LR_LOADFROMFILE);
 			if (hbmBkGnd ==NULL)
 			{
 				 hbmBkGnd = (HBITMAP)LoadImage(
