@@ -560,6 +560,9 @@ void KeyMap::PCtoX(BYTE virtKey, DWORD keyData, ClientConnection* clientCon)
     bool repeated = ((keyData & 0xc0000000) == 0x40000000);
     UINT extVkey = virtKey + (extended ? 256 : 0);
 
+	// exclude winkey when not scroll-lock
+	if (virtKey==91 || virtKey==92) return;
+
    vnclog.Print(8, _T("\nPCtoX: %svirtKey 0x%02x%s%s, keyData 0x%08x\n"),
               (extended ? _T("extended ") : _T("")), virtKey,
               (repeated ? _T(" repeated") : _T("")),
@@ -674,7 +677,11 @@ void KeyMap::PCtoX(BYTE virtKey, DWORD keyData, ClientConnection* clientCon)
     }
 
     else ret = ToUnicode(virtKey, 0, KBKeysState, ucsChar, (sizeof(ucsChar) / sizeof(WCHAR)), 0);
-
+	if (ucsChar[0]==8364)
+	{
+		//euro
+//		return;
+	}
     if (ret < 0 || ret==2) {
         //  It is a dead key
        vnclog.Print(8, _T("ToUnicode returns dead key: 0x%02x (%c) "), *ucsChar, *ucsChar);

@@ -2409,7 +2409,7 @@ void ClientConnection::SizeWindow()
 		int clientwidth=m_si.framebufferWidth*m_opts.m_scale_den/m_opts.m_scale_num;
 		int clientheight=m_si.framebufferHeight*m_opts.m_scale_den/m_opts.m_scale_num;
 
-		if ((workwidth>=clientwidth+dx) && (workheight>=clientheight+dy))
+		/*if ((workwidth>=clientwidth+dx) && (workheight>=clientheight+dy))
 		{
 			//we can scale the clientarea
 			widthwindow=clientwidth+dx;
@@ -2440,12 +2440,12 @@ void ClientConnection::SizeWindow()
 			m_opts.m_scaling = true; 
 			m_fScalingDone = true;
 		}
-		else
+		else*/
 		{
 			// we change the scaling to fit the window
 			// max windows size including borders etc..
 			int horizontalRatio= (int) (((workwidth-dx)*100)/m_si.framebufferWidth);
-			int verticalRatio = (int) (((workheight-dy)*100)/m_si.framebufferHeight);
+			int verticalRatio = (int) (((workheight-dy*2)*100)/m_si.framebufferHeight);
 			int Ratio= min(verticalRatio, horizontalRatio);
 			widthwindow=m_si.framebufferWidth*Ratio/100;
 			heightwindow=m_si.framebufferHeight*Ratio/100;
@@ -3327,7 +3327,7 @@ inline void ClientConnection::ProcessKeyEvent(int virtKey, DWORD keyData)
 #endif
 #endif
 
-	if (m_opts.m_JapKeyboard==0)
+	if (m_opts.m_JapKeyboard==0 && virtKey!=69)
 	{
 		try {
 			m_keymap->PCtoX(virtKey, keyData, this);
