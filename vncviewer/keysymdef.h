@@ -1999,7 +1999,7 @@ SOFTWARE.
 #define XK_combining_belowdot				0x1eff /* U+0323 */
 #endif /* XK_VIETNAMESE */
 
-//#ifdef XK_CURRENCY
+#ifdef XK_CURRENCY
 #define XK_EcuSign					0x20a0
 #define XK_ColonSign					0x20a1
 #define XK_CruzeiroSign					0x20a2
@@ -2013,4 +2013,4 @@ SOFTWARE.
 #define XK_NewSheqelSign				0x20aa
 #define XK_DongSign					0x20ab
 #define XK_EuroSign					0x20ac
-//#endif
+#endif
