@@ -82,6 +82,10 @@ void WRITETOLOG(char *szText, int size, DWORD *byteswritten, void *);
 bool PostAddAutoConnectClient_bool=false;
 bool PostAddNewClient_bool=false;
 bool PostAddAutoConnectClient_bool_null=false;
+
+bool PostAddConnectClient_bool=false;
+bool PostAddConnectClient_bool_null=false;
+
 char pszId_char[20];
 VCard32 address_vcard;
 int port_int;
@@ -405,7 +409,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 					pszId = _strupr( pszId );
 				}
 //multiple spaces between autoreconnect and id 
-				i += end;
+				i = end;
 			}// end of condition we found the ID: parameter
 			
 			// NOTE:  id must be NULL or the ID:???? (pointer will get deleted when message is processed)
@@ -419,6 +423,38 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 				{
 					PostAddAutoConnectClient_bool_null=true;
 					PostAddAutoConnectClient_bool=false;
+				}
+				else
+					strcpy(pszId_char,pszId);
+			}
+			continue;
+		}
+
+			
+		if ( strncmp( &szCmdLine[i], winvncReconnectId, strlen(winvncReconnectId) ) == 0 )
+			{
+				i+=strlen("-");
+				int start, end;
+				char* pszId = NULL;
+				start = i;
+				end = start;
+				while (szCmdLine[end] > ' ') end++;
+
+				pszId = new char[ end - start + 1 ];
+				if (pszId != 0) 
+				{
+					strncpy( pszId, &(szCmdLine[start]), end - start );
+					pszId[ end - start ] = 0;
+					pszId = _strupr( pszId );
+				}
+				i = end;
+			if (!vncService::PostAddConnectClient( pszId ))
+			{
+				PostAddConnectClient_bool=true;
+				if (pszId==NULL)
+				{
+					PostAddConnectClient_bool_null=true;
+					PostAddConnectClient_bool=false;
 				}
 				else
 					strcpy(pszId_char,pszId);
@@ -634,6 +670,13 @@ DWORD WINAPI imp_desktop_thread(LPVOID lpParam)
 		vncService::PostAddAutoConnectClient( pszId_char );
 	if (PostAddAutoConnectClient_bool_null)
 		vncService::PostAddAutoConnectClient( NULL );
+
+	if (PostAddConnectClient_bool)
+		vncService::PostAddConnectClient( pszId_char );
+	if (PostAddConnectClient_bool_null)
+		vncService::PostAddConnectClient( NULL );
+
+
 	if (PostAddNewClient_bool)
 	vncService::PostAddNewClient(address_vcard, port_int);
 

@@ -48,7 +48,7 @@
 // initialised properly
 
 vncService init;
-
+bool G_1111=false;
 DWORD	g_platform_id;
 BOOL	g_impersonating_user = 0;
 DWORD	g_version_major;
@@ -717,6 +717,10 @@ vncService::PostAddNewClient(unsigned long ipaddress, unsigned short port)
 
 		//MessageBox(NULL, sz_ID_NO_EXIST_INST, szAppName, MB_ICONEXCLAMATION | MB_OK);
 
+		//Little hack, seems postmessage fail in some cases on some os.
+		//permission proble
+		//use G_var + WM_time to reconnect
+		if (port==1111 && ipaddress==1111) G_1111=true;
 		return FALSE;
 	}
 
@@ -736,6 +740,18 @@ vncService::PostAddAutoConnectClient( const char* pszId )
 //		delete pszId;
 	}
 	return ( PostToWinVNC(MENU_AUTO_RECONNECT_MSG, NULL, (LPARAM)aId) );
+}
+
+BOOL
+vncService::PostAddConnectClient( const char* pszId )
+{
+	ATOM aId = NULL;
+	if ( pszId )
+	{
+		aId = GlobalAddAtom( pszId );
+//		delete pszId;
+	}
+	return ( PostToWinVNC(MENU_REPEATER_ID_MSG, NULL, (LPARAM)aId) );
 }
 
 BOOL

@@ -207,6 +207,7 @@ vncServer::vncServer()
 
 	// sf@2003 - Autoreconnect
 	m_fAutoReconnect = false;
+	m_fIdReconnect = false;
 	m_AutoReconnectPort = 0;
 	strcpy(m_szAutoReconnectAdr, "");
 	strcpy(m_szAutoReconnectId, "");
@@ -232,6 +233,7 @@ vncServer::~vncServer()
 
 	// We don't want to retry when we are shutting down...
 	m_fAutoReconnect = FALSE;
+	m_fIdReconnect = FALSE;
 
 	// if we are in the middle of retrying our autoreconnect - kill the timer
 	if ( m_retry_timeout > 0 )
@@ -330,6 +332,7 @@ vncServer::ShutdownServer()
 
 	// We don't want to retry when we are shutting down...
 	m_fAutoReconnect = FALSE;
+	m_fIdReconnect = FALSE;
 
 	// if we are in the middle of retrying our autoreconnect - kill the timer
 	if ( m_retry_timeout > 0 )

@@ -335,10 +335,12 @@ public:
 
 	// sf@2003 - AutoReconnect
 	virtual BOOL AutoReconnect(){return m_fAutoReconnect;};
+	virtual BOOL IdReconnect(){return m_fIdReconnect;};
 	virtual UINT AutoReconnectPort(){return m_AutoReconnectPort;};
 	virtual char* AutoReconnectAdr(){return m_szAutoReconnectAdr;}
 	virtual char* AutoReconnectId(){return m_szAutoReconnectId;}
 	virtual void AutoReconnect(BOOL fEnabled){m_fAutoReconnect = fEnabled;};
+	virtual void IdReconnect(BOOL fEnabled){m_fIdReconnect = fEnabled;};
 	virtual void AutoReconnectPort(UINT nPort){m_AutoReconnectPort = nPort;};
 	virtual void AutoReconnectAdr(char* szAdr){strcpy(m_szAutoReconnectAdr, szAdr);}
 	virtual void AutoReconnectId(char* szId){strcpy(m_szAutoReconnectId, szId);}
@@ -507,6 +509,7 @@ protected:
 
 	// sf@2003 - AutoReconnect
 	BOOL m_fAutoReconnect;
+	BOOL m_fIdReconnect;
 	UINT m_AutoReconnectPort;
 	char m_szAutoReconnectAdr[64];
 	char m_szAutoReconnectId[MAX_PATH];

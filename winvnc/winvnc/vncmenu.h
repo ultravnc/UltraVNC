@@ -42,6 +42,7 @@ class vncMenu;
 // Constants
 extern const UINT MENU_ADD_CLIENT_MSG;
 extern const UINT MENU_AUTO_RECONNECT_MSG;
+extern const UINT MENU_REPEATER_ID_MSG;
 extern const char *MENU_CLASS_NAME;
 
 // WTS Stuff for FastUserSwitching management

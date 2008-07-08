@@ -44,9 +44,12 @@
 // [v1.0.2-jp1 fix]
 #pragma comment(lib, "imm32.lib")
 
+extern bool G_1111;
 // Constants
 const UINT MENU_ADD_CLIENT_MSG = RegisterWindowMessage("WinVNC.AddClient.Message");
 const UINT MENU_AUTO_RECONNECT_MSG = RegisterWindowMessage("WinVNC.AddAutoClient.Message");
+const UINT MENU_REPEATER_ID_MSG = RegisterWindowMessage("WinVNC.AddRepeaterID.Message");
+ 
 
 const UINT FileTransferSendPacketMessage = RegisterWindowMessage("UltraVNC.Viewer.FileTransferSendPacketMessage");
 
@@ -164,6 +167,7 @@ static void RestoreWallpaper()
 
 vncMenu::vncMenu(vncServer *server)
 {
+	vnclog.Print(LL_INTERR, VNCLOG("vncmenu(server)\n"));
 	hWTSDll = NULL;
 	ports_set=false;
     CoInitialize(0);
@@ -175,6 +179,7 @@ vncMenu::vncMenu(vncServer *server)
 	pfnFilter =(CHANGEWINDOWMESSAGEFILTER)GetProcAddress(hUser32,"ChangeWindowMessageFilter");
 	if (pfnFilter) pfnFilter(MENU_ADD_CLIENT_MSG, MSGFLT_ADD);
 	if (pfnFilter) pfnFilter(MENU_AUTO_RECONNECT_MSG, MSGFLT_ADD);
+	if (pfnFilter) pfnFilter(MENU_REPEATER_ID_MSG, MSGFLT_ADD);
 
 	
 
@@ -378,6 +383,7 @@ vncMenu::vncMenu(vncServer *server)
 
 vncMenu::~vncMenu()
 {
+	vnclog.Print(LL_INTERR, VNCLOG("vncmenu killed\n"));
 	if (hWTSDll)
 	{
 		WTSUNREGISTERSESSIONNOTIFICATION FunctionWTSUnRegisterSessionNotification;
@@ -421,6 +427,7 @@ vncMenu::AddTrayIcon()
 		HWND tray = FindWindow(("Shell_TrayWnd"), 0);
 		if (!tray)
 		{
+			IsIconSet=false;
 			vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::AddTrayIcon - User exists, traywnd is not found reset when counter reach %i=20\n"),IconFaultCounter);
 			IconFaultCounter++;
 			return;
@@ -625,6 +632,16 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 	case WM_TIMER:
 		// sf@2007 - Can't get the WTS_CONSOLE_CONNECT message work properly for now..
 		// So use a hack instead
+
+		if (G_1111==true)
+		{
+			if (_this->IsIconSet==true)
+			{
+				vnclog.Print(LL_INTERR, VNCLOG("IconSET\n"));
+				G_1111=false;
+				PostMessage(hwnd,MENU_ADD_CLIENT_MSG,1111,1111);
+			}
+		}
 
 if ( ! _this->m_server->GetDisableTrayIcon())
 			{
@@ -1097,6 +1114,22 @@ if ( ! _this->m_server->GetDisableTrayIcon())
 			
 			return 0;
 		}
+		if ( iMsg == MENU_REPEATER_ID_MSG )
+ 		{
+			char szId[MAX_PATH] = {0};
+			UINT ret = 0;
+			if ( lParam != NULL )
+			{
+				ret = GlobalGetAtomName( (ATOM)lParam, szId, sizeof( szId ) );
+				GlobalDeleteAtom( (ATOM)lParam );
+			}
+			_this->m_server->IdReconnect(true);
+			
+			if ( ret > 0 )
+				_this->m_server->AutoReconnectId(szId);
+			
+			return 0;
+		}
 
 
 		if (iMsg == MENU_ADD_CLIENT_MSG)
@@ -1132,7 +1165,7 @@ if ( ! _this->m_server->GetDisableTrayIcon())
 			char szAdrName[64];
 			char szId[MAX_PATH] = {0};
 			// sf@2003 - Values are already converted
-			if (_this->m_server->AutoReconnect() && strlen(_this->m_server->AutoReconnectAdr()) > 0)
+			if ((_this->m_server->AutoReconnect()|| _this->m_server->IdReconnect() )&& strlen(_this->m_server->AutoReconnectAdr()) > 0)
 			{
 				nport = _this->m_server->AutoReconnectPort();
 				strcpy(szAdrName, _this->m_server->AutoReconnectAdr());
@@ -1168,7 +1201,7 @@ if ( ! _this->m_server->GetDisableTrayIcon())
 			// sf@2003
 			// Stores the client adr/ports the first time we try to connect
 			// This way we can call this message again later to reconnect with the same values
-			if (_this->m_server->AutoReconnect() && strlen(_this->m_server->AutoReconnectAdr()) == 0)
+			if ((_this->m_server->AutoReconnect() || _this->m_server->IdReconnect())&& strlen(_this->m_server->AutoReconnectAdr()) == 0)
 			{
 				_this->m_server->AutoReconnectAdr(szAdrName);
 				_this->m_server->AutoReconnectPort(nport);
