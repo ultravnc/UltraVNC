@@ -172,7 +172,7 @@ VNCOptions::VNCOptions()
   // Fix by Act : no user password command line after a rejected connection
   m_NoMoreCommandLineUserPassword = false;
 
-  m_fExitCheck = true; //PGM @ Advantig
+  m_fExitCheck = false; //PGM @ Advantig
 
   
 #ifdef UNDER_CE
@@ -390,8 +390,8 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
         }
         j++;
       }
-    } else if ( SwitchMatch(args[j], _T("silentexit"))) { //PGM @ Advantig
-      m_fExitCheck = false; //PGM @ Advantig
+    } else if ( SwitchMatch(args[j], _T("askexit"))) { //PGM @ Advantig
+      m_fExitCheck = true; //PGM @ Advantig
     } else if ( SwitchMatch(args[j], _T("restricted"))) {
       m_restricted = true;
     } else if ( SwitchMatch(args[j], _T("viewonly"))) {
@@ -916,7 +916,7 @@ void VNCOptions::ShowUsage(LPTSTR info) {
                "      [/listen [portnum]] [/fullscreen] [/viewonly] [/notoolbar]\n\r"
                "      [/scale a/b] [/config configfile] [server:display] \n\r"
 			   "      [/emulate3] [/quickoption n] [/serverscale n]\n\r"
-			   "      [/silentexit] [/user msuser] [/password clearpassword]\n\r" // Added silentexit //PGM@ Advantig.com
+			   "      [/askexit] [/user msuser] [/password clearpassword]\n\r" // Added silentexit //PGM@ Advantig.com
 			   "      [/nostatus] [/dsmplugin pluginfilename.dsm] [/autoscaling] \n\r"
 			   "      [/autoreconnect delayInSeconds] \n\r"
 			   "      [/nohotkeys] [/proxy proxyhost [portnum]] [/256colors] [/64colors]\r\n"
