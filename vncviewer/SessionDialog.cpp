@@ -369,9 +369,24 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 
 				}
 				
-				_this->m_pOpt->DoDialog();
+				if (_this->m_pOpt->DoDialog())
+				{
 				_this->m_fFromOptions = true;
-				
+				 HWND hDyn = GetDlgItem(hwnd, IDC_DYNAMIC);
+				SendMessage(hDyn, BM_SETCHECK, false, 0);
+				HWND hLan = GetDlgItem(hwnd, IDC_LAN_RB);
+				SendMessage(hLan, BM_SETCHECK, false, 0);
+				HWND hUltraLan = GetDlgItem(hwnd, IDC_ULTRA_LAN_RB);
+				SendMessage(hUltraLan, BM_SETCHECK, false, 0);
+				HWND hMedium = GetDlgItem(hwnd, IDC_MEDIUM_RB);
+				SendMessage(hMedium, BM_SETCHECK, false, 0);
+				HWND hModem = GetDlgItem(hwnd, IDC_MODEM_RB);
+				SendMessage(hModem, BM_SETCHECK, false, 0);
+				HWND hSlow = GetDlgItem(hwnd, IDC_SLOW_RB);
+				SendMessage(hSlow, BM_SETCHECK, false, 0);
+				HWND hManual = GetDlgItem(hwnd, IDC_MANUAL);
+				SendMessage(hManual, BM_SETCHECK, true, 0);
+				}
 				return TRUE;
 			}
 
@@ -521,6 +536,8 @@ int SessionDialog::SetQuickOption(SessionDialog* p_SD, HWND hwnd)
 	SendMessage(hModem, BM_SETCHECK, false, 0);
 	HWND hSlow = GetDlgItem(hwnd, IDC_SLOW_RB);
 	SendMessage(hSlow, BM_SETCHECK, false, 0);
+	HWND hManual = GetDlgItem(hwnd, IDC_MANUAL);
+	SendMessage(hManual, BM_SETCHECK, false, 0);
 
 	// sf@2002 - Select Modem Option as default
 	switch (p_SD->m_pOpt->m_quickoption)
@@ -560,6 +577,12 @@ int SessionDialog::SetQuickOption(SessionDialog* p_SD, HWND hwnd)
 		{
 		HWND hUltraLan = GetDlgItem(hwnd, IDC_ULTRA_LAN_RB);
 		SendMessage(hUltraLan, BM_SETCHECK, true, 0);
+		}
+		break;
+	case 8: // MANUAL
+		{
+		HWND hManual = GetDlgItem(hwnd, IDC_MANUAL);
+		SendMessage(hManual, BM_SETCHECK, true, 0);
 		}
 		break;
 	/*
@@ -609,6 +632,11 @@ int SessionDialog::ManageQuickOptions(SessionDialog* _this, HWND hwnd)
 	HWND hLow = GetDlgItem(hwnd, IDC_SLOW_RB);
 	if ((SendMessage(hLow, BM_GETCHECK, 0, 0) == BST_CHECKED))
 		_this->m_pOpt->m_quickoption = 5;
+
+	// Options for Manual
+	HWND hManual = GetDlgItem(hwnd, IDC_MANUAL);
+	if ((SendMessage(hManual, BM_GETCHECK, 0, 0) == BST_CHECKED))
+		_this->m_pOpt->m_quickoption = 8;
 
 	// Set the params depending on the selected QuickOption
 	_this->m_pCC->HandleQuickOption();

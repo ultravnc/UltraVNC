@@ -823,7 +823,7 @@ void VNCOptions::Load(char *fname)
   }
   // Modif sf@2002
   m_nServerScale =		readInt("ServerScale",		m_nServerScale,	fname);
-  m_reconnectcounter = readInt("Reconnect",		m_reconnectcounter,	fname);
+  m_reconnectcounter =  readInt("Reconnect",		m_reconnectcounter,	fname);
   m_fEnableCache =		readInt("EnableCache",		m_fEnableCache,	fname) != 0;
   m_quickoption  =		readInt("QuickOption",		m_quickoption, fname);
   m_fUseDSMPlugin =		readInt("UseDSMPlugin",		m_fUseDSMPlugin, fname) != 0;

@@ -214,6 +214,8 @@
 #define IDC_CUSTOM3                     1158
 #define IDC_JAPKEYBOARD                 1159
 #define IDC_EXIT_CHECK                  1160
+#define IDC_RADIO2                      1161
+#define IDC_MANUAL                      1161
 #define IDC_ENCODING_BASE               1999
 #define IDC_RAWRADIO                    2000
 #define IDC_RRERADIO                    2002
@@ -517,7 +519,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        197
 #define _APS_NEXT_COMMAND_VALUE         50025
-#define _APS_NEXT_CONTROL_VALUE         1161
+#define _APS_NEXT_CONTROL_VALUE         1162
 #define _APS_NEXT_SYMED_VALUE           154
 #endif
 #endif
