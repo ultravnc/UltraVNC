@@ -36,7 +36,7 @@
 // It also creates the vncSockConnect
 // servers, which respectively allow connections via sockets
 // and via the ORB interface
-
+extern bool			fShutdownOrdered;
 class vncServer;
 
 #if (!defined(_WINVNC_VNCSERVER))
@@ -334,7 +334,11 @@ public:
 	virtual BOOL TurboMode() { return m_TurboMode; };
 
 	// sf@2003 - AutoReconnect
-	virtual BOOL AutoReconnect(){return m_fAutoReconnect;};
+	virtual BOOL AutoReconnect()
+	{
+		if (fShutdownOrdered) return false;
+		return m_fAutoReconnect;
+	};
 	virtual BOOL IdReconnect(){return m_fIdReconnect;};
 	virtual UINT AutoReconnectPort(){return m_AutoReconnectPort;};
 	virtual char* AutoReconnectAdr(){return m_szAutoReconnectAdr;}
