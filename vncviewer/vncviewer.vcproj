@@ -421,11 +421,11 @@
 				>
 			</File>
 			<File
-				RelativePath="res\background2.bmp"
+				RelativePath="res\stat\background2.bmp"
 				>
 			</File>
 			<File
-				RelativePath="res\stat\background2.bmp"
+				RelativePath="res\background2.bmp"
 				>
 			</File>
 			<File
@@ -2391,6 +2391,14 @@
 		</File>
 		<File
 			RelativePath="VNCviewerApp32.h"
+			>
+		</File>
+		<File
+			RelativePath="..\common\win32_helpers.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\common\win32_helpers.h"
 			>
 		</File>
 		<File

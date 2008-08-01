@@ -201,12 +201,6 @@ DWORD WINAPI Cadthread(LPVOID lpParam)
 	{
 		vnclog.Print(LL_INTERR, VNCLOG("SelectHDESK:!SetThreadDesktop \n"));
 	}
-	char user[150];
-	DWORD length=150;
-	GetUserName(user, &length);
-
-	if (!CloseDesktop(old_desktop))
-		vnclog.Print(LL_INTERR, VNCLOG("SelectHDESK failed to close old desktop %x (Err=%d) %s\n"), old_desktop, GetLastError(),user);
 
 //Full path needed, sometimes it just default to system32
 	char WORKDIR[MAX_PATH];

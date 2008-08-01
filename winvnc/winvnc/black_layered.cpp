@@ -302,9 +302,6 @@ DWORD WINAPI BlackWindow(LPVOID lpParam)
 		vnclog.Print(LL_INTERR, VNCLOG("SelectHDESK:!SetThreadDesktop \n"));
 	}
 
-	if (!CloseDesktop(old_desktop))
-		vnclog.Print(LL_INTERR, VNCLOG("SelectHDESK failed to close old desktop %x (Err=%d)\n"), old_desktop, GetLastError());
-
 	create_window();
 	MSG msg;
 	while (GetMessage(&msg,0,0,0) != 0)

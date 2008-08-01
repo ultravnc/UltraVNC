@@ -372,9 +372,6 @@ LRESULT CALLBACK TextChat::DoDialogThread(LPVOID lpParameter)
 		vnclog.Print(LL_INTERR, VNCLOG("SelectHDESK:!SetThreadDesktop \n"));
 	}
 
-	if (!CloseDesktop(old_desktop))
-		vnclog.Print(LL_INTERR, VNCLOG("SelectHDESK failed to close old desktop %x (Err=%d)\n"), old_desktop, GetLastError());
-
 	 //	[v1.0.2-jp1 fix]
  	 //DialogBoxParam(hAppInstance, MAKEINTRESOURCE(IDD_TEXTCHAT_DLG), 
 	 //						NULL, (DLGPROC) TextChatDlgProc, (LONG) _this);

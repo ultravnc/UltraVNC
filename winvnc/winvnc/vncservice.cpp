@@ -440,10 +440,6 @@ vncService::SelectHDESK(HDESK new_desktop)
 			return FALSE;
 		}
 
-		// Switched successfully - destroy the old desktop
-		if (!CloseDesktop(old_desktop))
-			vnclog.Print(LL_INTERR, VNCLOG("SelectHDESK failed to close old desktop %x (Err=%d)\n"), old_desktop, GetLastError());
-
 		return TRUE;
 	}
 

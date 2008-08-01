@@ -686,9 +686,6 @@ DWORD WINAPI imp_desktop_thread(LPVOID lpParam)
 		vnclog.Print(LL_INTERR, VNCLOG("SelectHDESK:!SetThreadDesktop \n"));
 	}
 
-	if (!CloseDesktop(old_desktop))
-		vnclog.Print(LL_INTERR, VNCLOG("SelectHDESK failed to close old desktop %x (Err=%d)\n"), old_desktop, GetLastError());
-
 //	ImpersonateCurrentUser_();
 
 	char m_username[200];

@@ -740,7 +740,6 @@ vncClientThread::InitAuthenticate()
 
 						CloseDesktop(desktop);
 						SetThreadDesktop(old_desktop);
-						CloseDesktop(old_desktop);
 				}
 		}
 
