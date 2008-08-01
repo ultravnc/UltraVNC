@@ -224,7 +224,7 @@ BEGIN
     LTEXT           "",IDC_GLOBAL_STATUS,419,221,65,8,0,WS_EX_RIGHT
     LTEXT           "進行状況：",IDC_PR_STATIC,4,221,32,8
     COMBOBOX        IDC_HISTORY_CB,45,205,441,71,CBS_DROPDOWNLIST | 
-                    CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+                    CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP|WS_HSCROLL
     LTEXT           "履歴：",IDC_HS_STATIC,4,207,18,8
     CTEXT           "リモートマシン",IDC_RM_STATIC,364,3,93,13,
                     SS_CENTERIMAGE,WS_EX_CLIENTEDGE
@@ -1042,7 +1042,8 @@ BEGIN
     IDS_H98                 "Unable to delete the remote folder"
     IDS_H99                 "Unable to delete the folder"
     IDS_H100                "Create New Folder"
-
+    IDS_H101                "Folder Transfer Warning"
+    IDS_H102				"a file or folder of that name already exists."
 END
 #endif    // Japanese resources
 /////////////////////////////////////////////////////////////////////////////

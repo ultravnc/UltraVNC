@@ -28,6 +28,7 @@
 #include "Exception.h"
 #include "commctrl.h"
 #include "richedit.h"
+#include "common/win32_helpers.h"
 
 #define TEXTMAXSIZE 16384
 #define MAXNAMESIZE	128 // MAX_COMPUTERNAME_LENGTH+1 (32)
@@ -414,22 +415,14 @@ void AdjustBottom(LPRECT lprc)
 //
 BOOL CALLBACK TextChat::TextChatDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM wParam, LPARAM lParam )
 {
-#ifndef _X64
-	TextChat* _this = (TextChat *) GetWindowLong(hWnd, GWL_USERDATA);
-#else
-	TextChat* _this = (TextChat *) GetWindowLongPtr(hWnd, GWLP_USERDATA);
-#endif
+    TextChat *_this = helper::SafeGetWindowUserData<TextChat>(hWnd);
 
 	switch (uMsg)
 	{
 
 	case WM_INITDIALOG:
 		{
-#ifndef _X64
-			SetWindowLong(hWnd, GWL_USERDATA, lParam);
-#else
-			SetWindowLongPtr(hWnd, GWLP_USERDATA, lParam);
-#endif
+            helper::SafeSetWindowUserData(hWnd, lParam);
             TextChat *_this = (TextChat *) lParam;
 			if (_this->m_szLocalText == NULL || _this->m_szRemoteText == NULL)
 				EndDialog(hWnd, FALSE);

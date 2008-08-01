@@ -281,6 +281,8 @@ char sz_H97[64];
 char sz_H98[64];
 char sz_H99[64];
 char sz_H100[64];
+char sz_H101[64];
+char sz_H102[128];
 // File/dir Rename messages
 char sz_M1[64];
 char sz_M2[64];
@@ -574,6 +576,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 	LoadString(m_hInstResDLL, IDS_H98, sz_H98, 64 -1);
 	LoadString(m_hInstResDLL, IDS_H99, sz_H99, 64 -1);
     LoadString(m_hInstResDLL, IDS_H100, sz_H100, 64 -1);
+    LoadString(m_hInstResDLL, IDS_H101, sz_H101, 64 -1);
+    LoadString(m_hInstResDLL, IDS_H102, sz_H102, 128 -1);
 //	RegisterLinkLabel(m_hInstResDLL);
 
 

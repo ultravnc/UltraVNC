@@ -56,7 +56,7 @@ BSC32=bscmake.exe
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib winmm.lib omnithread.lib wsock32.lib /nologo /subsystem:windows /map /debug /machine:IX86 /pdbtype:sept /libpath:"./omnithread/Debug"
 # SUBTRACT BASE LINK32 /pdb:none
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib winmm.lib omnithread.lib wsock32.lib /nologo /subsystem:windows /map /debug /machine:IX86 /pdbtype:sept /libpath:"./omnithread/Debug"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib winmm.lib omnithread.lib wsock32.lib /nologo /subsystem:windows /map /debug /machine:IX86 /nodefaultlib:"libcd.lib" /pdbtype:sept /libpath:"./omnithread/Debug"
 # SUBTRACT LINK32 /pdb:none
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
@@ -120,7 +120,7 @@ BSC32=bscmake.exe
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib winmm.lib omnithread.lib wsock32.lib /nologo /subsystem:windows /incremental:yes /machine:IX86 /pdbtype:sept /libpath:"omnithread/Release"
 # SUBTRACT BASE LINK32 /pdb:none
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib winmm.lib omnithread.lib wsock32.lib /nologo /subsystem:windows /incremental:yes /machine:IX86 /pdbtype:sept /libpath:"omnithread/Release"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib winmm.lib omnithread.lib wsock32.lib /nologo /subsystem:windows /incremental:yes /machine:IX86 /nodefaultlib:"libc.lib" /pdbtype:sept /libpath:"omnithread/Release"
 # SUBTRACT LINK32 /pdb:none
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
@@ -1385,6 +1385,14 @@ SOURCE=VNCviewerApp32.cpp
 # Begin Source File
 
 SOURCE=VNCviewerApp32.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\common\win32_helpers.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\common\win32_helpers.h
 # End Source File
 # Begin Source File
 

@@ -123,6 +123,8 @@ public:
 	bool				bSortDirectionsR[3];
 
    	HMODULE				m_hRichEdit;     // 16 April 2008 jdp
+    int                 m_maxHistExtent;
+
 	// Methods
 	FileTransfer(VNCviewerApp *pApp, ClientConnection *pCC);
 	int DoDialog();
@@ -139,6 +141,7 @@ public:
 
 	void DisableButtons(HWND hWnd);
 	void EnableButtons(HWND hWnd);
+    void CheckButtonState(HWND hWnd);
 
 	bool SendFile(long lSize, int nLen);
 	bool SendFileChunk();
@@ -190,6 +193,7 @@ public:
 	bool MyGetFileSize(char* szFilePath, ULARGE_INTEGER* n2FileSize);
 	void InitListViewImagesList(HWND hListView);
     bool DeleteFileOrDirectory(TCHAR *srcpath); // 14 April 2008 jdp
+	bool FileOrFolderExists(HWND fileListWnd, std::string fileOrFolder);
 
 	void FileTransfer::InitFTTimer();
 	void FileTransfer::KillFTTimer();

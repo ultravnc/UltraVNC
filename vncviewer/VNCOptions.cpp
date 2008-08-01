@@ -34,6 +34,9 @@
 #include "vncviewer.h"
 #include "VNCOptions.h"
 #include "Exception.h"
+#include "common/win32_helpers.h"
+
+
 extern char sz_A2[64];
 extern char sz_D1[64];
 extern char sz_D2[64];
@@ -966,21 +969,13 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
   // dealing with. But we can get a pseudo-this from the parameter to 
   // WM_INITDIALOG, which we therafter store with the window and retrieve
   // as follows:
-#ifndef _X64
-  VNCOptions *_this = (VNCOptions *) GetWindowLong(hwnd, GWL_USERDATA);
-#else
-	VNCOptions *_this = (VNCOptions *) GetWindowLongPtr(hwnd, GWLP_USERDATA);
-#endif
+    VNCOptions *_this = helper::SafeGetWindowUserData<VNCOptions>(hwnd);
 	
   switch (uMsg) {
 		
   case WM_INITDIALOG:
 	  {
-#ifndef _X64
-		SetWindowLong(hwnd, GWL_USERDATA, lParam);
-#else
-		SetWindowLongPtr(hwnd, GWLP_USERDATA, lParam);
-#endif
+          helper::SafeSetWindowUserData(hwnd, lParam);
 		  _this = (VNCOptions *) lParam;
 		  // Initialise the controls
 		  _this->hwnd = hwnd;

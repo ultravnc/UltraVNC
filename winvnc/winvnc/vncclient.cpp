@@ -74,19 +74,8 @@
 #include <iterator>
 #include <shlobj.h>
 #include "vncOSVersion.h"
+#include "common/win32_helpers.h"
 
-
-namespace helper {
-    void close_handle(HANDLE& h)
-    {
-        if (h != INVALID_HANDLE_VALUE) 
-        {
-            ::CloseHandle(h);
-            h = INVALID_HANDLE_VALUE;
-        }
-    }
-
-}
 bool isDirectoryTransfer(const char *szFileName);
 
 // take a full path & file name, split it, prepend prefix to filename, then merge it back

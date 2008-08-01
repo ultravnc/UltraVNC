@@ -119,7 +119,7 @@ protected:
 	UINT port_http;
 	BOOL ports_set;
 
-	BOOL IsIconSet;
+	bool IsIconSet;
 	int IconFaultCounter;
 	HMODULE hUser32;
 	//HANDLE hEvent;

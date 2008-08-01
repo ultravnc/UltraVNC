@@ -258,7 +258,7 @@ BEGIN
     LTEXT           "",IDC_GLOBAL_STATUS,484,388,65,8,0,WS_EX_RIGHT
     LTEXT           "Progression:",IDC_PR_STATIC,4,388,40,8
     COMBOBOX        IDC_HISTORY_CB,45,372,507,71,CBS_DROPDOWNLIST | 
-                    CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+                    CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP|WS_HSCROLL
     LTEXT           "Historique:",IDC_HS_STATIC,4,374,36,8
     CTEXT           "MACHINE DISTANTE",IDC_RM_STATIC,415,3,95,13,
                     SS_CENTERIMAGE,WS_EX_CLIENTEDGE
@@ -462,6 +462,7 @@ BEGIN
                     BS_MULTILINE
     DEFPUSHBUTTON   "",IDOK,299,0,8,6,NOT WS_VISIBLE
     PUSHBUTTON      "Réduire",IDC_HIDE_B,264,151,39,11
+    LTEXT           "",IDC_STATIC_SPLIT,5,127,298,8,SS_NOTIFY
 END
 
 IDD_APP_ABOUT DIALOG DISCARDABLE  0, 0, 289, 171
@@ -1110,6 +1111,8 @@ BEGIN
     IDS_H98                 "Unable to delete the remote folder"
     IDS_H99                 "Unable to delete the folder"
     IDS_H100                "Create New Folder"
+    IDS_H101                "Folder Transfer Warning"
+    IDS_H102				"a file or folder of that name already exists."
 END
 
 #endif    // French (France) resources

@@ -203,6 +203,7 @@
 #define IDC_ULTRA                       2009
 #define IDC_ZRLERADIO                   2016
 #define IDC_LAST_ENCODING               2017
+#define IDC_STATIC_SPLIT                9000
 #define ID_SESSION_SET_CRECT            32777
 #define ID_SESSION_SWAPMOUSE            32785
 #define ID_CLOSEDAEMON                  50001
@@ -483,6 +484,9 @@
 #define IDS_H98                         50268
 #define IDS_H99                         50269
 #define IDS_H100                        50270
+#define IDS_L93                         50271
+#define IDS_H101                        50272
+#define IDS_H102                        50273
 
 // Next default values for new objects
 // 

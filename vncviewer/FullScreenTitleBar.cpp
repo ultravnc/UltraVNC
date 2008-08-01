@@ -23,6 +23,7 @@
 #include "res\\resource.h"
 #include "FullScreenTitleBar.h"
 #include "log.h"
+#include "common/win32_helpers.h"
 extern Log vnclog;
 #define COMPILE_MULTIMON_STUBS
 #include "multimon.h"
@@ -202,11 +203,7 @@ void CTitleBar::CreateDisplay()
 				NULL);
 
 	//Set the creation of the window
-#ifndef _X64
-	SetWindowLong(m_hWnd, GWL_USERDATA, (LONG) this);
-#else
-	SetWindowLongPtr(m_hWnd, GWLP_USERDATA, (LONG) this);
-#endif
+    helper::SafeSetWindowUserData(m_hWnd, (LONG)this);
 
 	//Load pictures
 	this->LoadPictures();

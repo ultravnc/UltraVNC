@@ -29,6 +29,7 @@
 #include "vncviewer.h"
 #include "SessionDialog.h"
 #include "Exception.h"
+#include "common/win32_helpers.h"
 
 #define SESSION_MRU_KEY_NAME _T("Software\\ORL\\VNCviewer\\MRU")
 #define NUM_MRU_ENTRIES 8
@@ -75,21 +76,13 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 	// dealing with. But we can get a pseudo-this from the parameter to 
 	// WM_INITDIALOG, which we therafter store with the window and retrieve
 	// as follows:
-#ifndef _X64
-	SessionDialog *_this = (SessionDialog *) GetWindowLong(hwnd, GWL_USERDATA);
-#else
-	SessionDialog *_this = (SessionDialog *) GetWindowLongPtr(hwnd, GWLP_USERDATA);
-#endif
+    SessionDialog*_this = helper::SafeGetWindowUserData<SessionDialog>(hwnd);
 
 	switch (uMsg) {
 
 	case WM_INITDIALOG:
 		{
-#ifndef _X64
-            SetWindowLong(hwnd, GWL_USERDATA, lParam);
-#else
-			SetWindowLongPtr(hwnd, GWLP_USERDATA, lParam);
-#endif
+            helper::SafeSetWindowUserData(hwnd, lParam);
             SessionDialog *_this = (SessionDialog *) lParam;
             CentreWindow(hwnd);
 			SetForegroundWindow(hwnd);

@@ -401,6 +401,24 @@ VSocket::GetSockName()
 		return name;
 }
 
+// 25 January 2008 jdp
+bool VSocket::GetPeerAddress(char *address, int size)
+{
+    struct sockaddr_in addr;
+    int addrsize = sizeof(sockaddr_in);
+
+    if (sock < 0)
+        return false;
+
+    if (getpeername(sock, (struct sockaddr *) &addr, &addrsize) != 0)
+        return false;
+
+    _snprintf(address, size, "%s:%d",
+              inet_ntoa(addr.sin_addr),
+              ntohs(addr.sin_port));
+
+    return true;
+}
 ////////////////////////////
 
 VCard32

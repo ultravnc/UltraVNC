@@ -119,6 +119,8 @@ public:
   VBool SetSendTimeout(VCard32 msecs);
   VBool SetRecvTimeout(VCard32 msecs);
 
+  bool VSocket::GetPeerAddress(char *address, int size);
+  SOCKET GetChannel() const { return (SOCKET) sock; }
   // I/O routines
 #ifdef HTTP_SAMEPORT
   // Check to see if the socket becomes readable within <to> msec.

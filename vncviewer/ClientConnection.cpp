@@ -68,6 +68,7 @@ extern "C" {
 #include <rfb/dh.h>
 
 #include <DSMPlugin/DSMPlugin.h> // sf@2002
+#include "common/win32_helpers.h"
 
 // [v1.0.2-jp1 fix]
 #pragma comment(lib, "imm32.lib")
@@ -868,11 +869,9 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 			SendMessage(m_hwndTT,TTM_SETTIPBKCOLOR,(WPARAM)(COLORREF)0x00404040,(LPARAM)0);
 			SendMessage(m_hwndTT,TTM_SETTIPTEXTCOLOR,(WPARAM)(COLORREF)0x00F5B28D,(LPARAM)0);
 			SendMessage(m_hwndTT,TTM_SETDELAYTIME,(WPARAM)(DWORD)TTDT_INITIAL,(LPARAM)(INT) MAKELONG(200,0));
-#ifndef _X64			
-			SetWindowLong(m_hwndTBwin, GWL_USERDATA, (LONG) this);
-#else
-			SetWindowLongPtr(m_hwndTBwin, GWLP_USERDATA, (LONG) this);
-#endif
+
+            helper::SafeSetWindowUserData(m_hwndTBwin, (LONG)this);
+
 			ShowWindow(m_hwndTB, SW_SHOW);
 			ShowWindow(m_hwndTBwin, SW_SHOW);
 	}
@@ -1006,11 +1005,9 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 			SendMessage(m_hwndTT,TTM_SETTIPBKCOLOR,(WPARAM)(COLORREF)0x0000ff00,(LPARAM)0);
 			SendMessage(m_hwndTT,TTM_SETTIPTEXTCOLOR,(WPARAM)(COLORREF)0x00000000,(LPARAM)0);
 			SendMessage(m_hwndTT,TTM_SETDELAYTIME,(WPARAM)(DWORD)TTDT_INITIAL,(LPARAM)(INT) MAKELONG(200,0));
-#ifndef _X64
-			SetWindowLong(m_hwndTBwin, GWL_USERDATA, (LONG) this);
-#else
-			SetWindowLongPtr(m_hwndTBwin, GWLP_USERDATA, (LONG) this);
-#endif
+            
+            helper::SafeSetWindowUserData(m_hwndTBwin, (LONG)this);
+
 			ShowWindow(m_hwndTB, SW_SHOW);
 			ShowWindow(m_hwndTBwin, SW_SHOW);
 	}
@@ -1221,11 +1218,8 @@ void ClientConnection::CreateDisplay()
 	ShowWindow(m_hwndcn, SW_SHOW);
 
 	// record which client created this window
-#ifndef _X64
-	SetWindowLong(m_hwndcn, GWL_USERDATA, (LONG) this);
-#else
-	SetWindowLongPtr(m_hwndcn, GWLP_USERDATA, (LONG) this);
-#endif
+    helper::SafeSetWindowUserData(m_hwndcn, (LONG)this);
+
 //	SendMessage(m_hwnd,WM_CREATE,0,0);
 
 
@@ -5079,11 +5073,8 @@ void ClientConnection::GTGBS_CreateDisplay()
 
 	// [v1.0.2-jp1 fix]
 	ImmAssociateContext(m_hwndMain, NULL);
-#ifndef _X64
-	SetWindowLong(m_hwndMain, GWL_USERDATA, (LONG) this);
-#else
-	SetWindowLongPtr(m_hwndMain, GWLP_USERDATA, (LONG) this);
-#endif
+    helper::SafeSetWindowUserData(m_hwndMain, (LONG)this);
+
 }
 
 //
@@ -5105,11 +5096,8 @@ LRESULT CALLBACK ClientConnection::GTGBS_ShowStatusWindow(LPVOID lpParameter)
 //
 LRESULT CALLBACK ClientConnection::GTGBS_StatusProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 {
-#ifndef _X64
-	ClientConnection* _this = (ClientConnection *) GetWindowLong(hwnd, GWL_USERDATA);
-#else
-	ClientConnection* _this = (ClientConnection *) GetWindowLongPtr(hwnd, GWLP_USERDATA);
-#endif
+
+    ClientConnection* _this = helper::SafeGetWindowUserData<ClientConnection>(hwnd);
 	
 	switch (iMsg)
 	{
@@ -5128,11 +5116,8 @@ LRESULT CALLBACK ClientConnection::GTGBS_StatusProc(HWND hwnd, UINT iMsg, WPARAM
 			
 			char wt[MAX_PATH];
 			ClientConnection *_this = (ClientConnection *)lParam;
-#ifndef _X64
-			SetWindowLong(hwnd, GWL_USERDATA, (LONG) _this);
-#else
-			SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG) _this);
-#endif
+            helper::SafeSetWindowUserData(hwnd, lParam);
+
 			SetDlgItemInt(hwnd,IDC_RECEIVED,_this->m_BytesRead,false);
 			SetDlgItemInt(hwnd,IDC_SEND,_this->m_BytesSend,false);
 			
@@ -5304,11 +5289,7 @@ LRESULT CALLBACK ClientConnection::GTGBS_SendCustomKey_proc(HWND Dlg, UINT iMsg,
 				
 				if (Okay)
 					{
-#ifndef _X64	
-					::SetWindowLong(Dlg, DWL_MSGRESULT, Key); 
-#else
-					::SetWindowLongPtr(Dlg, DWLP_MSGRESULT, Key); 
-#endif
+                    helper::SafeSetMsgResult(Dlg, Key);
 					EndDialog(Dlg, Key);
 					}
 				else
@@ -5327,11 +5308,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 	
 	// This is a static method, so we don't know which instantiation we're 
 	// dealing with.  But we've stored a 'pseudo-this' in the window data.
-#ifndef _X64
-	ClientConnection *_this = (ClientConnection *) GetWindowLong(hwnd, GWL_USERDATA);
-#else
-	ClientConnection *_this = (ClientConnection *) GetWindowLongPtr(hwnd, GWLP_USERDATA);
-#endif
+    ClientConnection *_this = helper::SafeGetWindowUserData<ClientConnection>(hwnd);
 	
 	if (_this == NULL)
 		return DefWindowProc(hwnd, iMsg, wParam, lParam);
@@ -6240,12 +6217,9 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 //
 LRESULT CALLBACK ClientConnection::WndProcTBwin(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 {
-#ifndef _X64
-	ClientConnection *_this = (ClientConnection *) GetWindowLong(hwnd, GWL_USERDATA);
-#else
-	ClientConnection *_this = (ClientConnection *) GetWindowLongPtr(hwnd, GWLP_USERDATA);
-#endif
-	if (_this == NULL) return DefWindowProc(hwnd, iMsg, wParam, lParam);
+    ClientConnection *_this = helper::SafeGetWindowUserData<ClientConnection>(hwnd);
+
+    if (_this == NULL) return DefWindowProc(hwnd, iMsg, wParam, lParam);
 
 	HWND parent;
 	if (_this->m_opts.m_ShowToolbar==true)
@@ -6447,11 +6421,8 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 {
 	
 	//	HWND parent;
-#ifndef _X64
-	ClientConnection *_this = (ClientConnection *) GetWindowLong(hwnd, GWL_USERDATA);
-#else
-	ClientConnection *_this = (ClientConnection *) GetWindowLongPtr(hwnd, GWLP_USERDATA);
-#endif
+    ClientConnection *_this = helper::SafeGetWindowUserData<ClientConnection>(hwnd);
+
 	if (_this == NULL) return DefWindowProc(hwnd, iMsg, wParam, lParam);
 	switch (iMsg) 
 			{				

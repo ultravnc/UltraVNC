@@ -30,6 +30,8 @@
 #include "vncviewer.h"
 #include "AuthDialog.h"
 #include "Exception.h"
+#include <windowsx.h>
+#include "common/win32_helpers.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -57,22 +59,18 @@ BOOL CALLBACK AuthDialog::DlgProc(  HWND hwnd,  UINT uMsg,
 	// dealing with. But we can get a pseudo-this from the parameter to 
 	// WM_INITDIALOG, which we therafter store with the window and retrieve
 	// as follows:
-#ifndef _X64
-	AuthDialog *_this = (AuthDialog *) GetWindowLong(hwnd, GWL_USERDATA);
-#else
-	AuthDialog *_this = (AuthDialog *) GetWindowLongPtr(hwnd, GWLP_USERDATA);
-#endif
+
+    AuthDialog *_this = helper::SafeGetWindowUserData<AuthDialog>(hwnd); 
 
 	switch (uMsg) {
 
 	case WM_INITDIALOG:
 		{
-#ifndef _X64
-			SetWindowLong(hwnd, GWL_USERDATA, lParam);
-#else
-			SetWindowLongPtr(hwnd, GWLP_USERDATA, lParam);
-#endif
+            helper::SafeSetWindowUserData(hwnd, lParam);
+
 			_this = (AuthDialog *) lParam;
+
+            Edit_LimitText(GetDlgItem(hwnd, IDC_PASSWD_EDIT), 32);
 			CentreWindow(hwnd);
 			SetForegroundWindow(hwnd);
 			return TRUE;
@@ -110,22 +108,15 @@ BOOL CALLBACK AuthDialog::DlgProc1(  HWND hwnd,  UINT uMsg,
 	// dealing with. But we can get a pseudo-this from the parameter to 
 	// WM_INITDIALOG, which we therafter store with the window and retrieve
 	// as follows:
-#ifndef _X64
-	AuthDialog *_this = (AuthDialog *) GetWindowLong(hwnd, GWL_USERDATA);
-#else
-	AuthDialog *_this = (AuthDialog *) GetWindowLongPtr(hwnd, GWLP_USERDATA);
-#endif
+    AuthDialog *_this = helper::SafeGetWindowUserData<AuthDialog>(hwnd); 
 
 	switch (uMsg) {
 
 	case WM_INITDIALOG:
 		{
-#ifndef _X64
-			SetWindowLong(hwnd, GWL_USERDATA, lParam);
-#else
-			SetWindowLongPtr(hwnd, GWLP_USERDATA, lParam);
-#endif
+            helper::SafeSetWindowUserData(hwnd, lParam);
 			_this = (AuthDialog *) lParam;
+            Edit_LimitText(GetDlgItem(hwnd, IDC_PASSWD_EDIT), 8);
 			CentreWindow(hwnd);
 			return TRUE;
 		}

@@ -27,6 +27,7 @@
 #define _WIN32_WINNT 0x0400
 #include "LowLevelHook.h"
 #include "res/resource.h"
+#include "common/win32_helpers.h"
 
 HWND LowLevelHook::g_hwndVNCViewer=NULL;
 DWORD LowLevelHook::g_VncProcessID=0;
@@ -53,11 +54,7 @@ BOOL LowLevelHook::Initialize(HWND hwndMain)
         //Get the HInstacne of this window
         //(required because LowLevel-Keyboard-Hook must be global, 
         // and need the HMODULE parameter in SetWindowsHookEx)
-#ifndef _X64
-        hInstance = (HINSTANCE)GetWindowLong(g_hwndVNCViewer,GWL_HINSTANCE);
-#else
-		 hInstance = (HINSTANCE)GetWindowLongPtr(g_hwndVNCViewer,GWLP_HINSTANCE);
-#endif
+        hInstance = helper::SafeGetWindowInstance(g_hwndVNCViewer);
         if (hInstance==NULL)
                 return FALSE;
 
