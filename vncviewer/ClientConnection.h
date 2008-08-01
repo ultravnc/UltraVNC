@@ -144,10 +144,15 @@ public:
 	class ProtocolExc {};
 	class Fatal {};
 	HANDLE KillEvent;
+    bool SetSendTimeout(int msecs = -1);
+    bool SetRecvTimeout(int msecs = -1);
 
 	bool IsDormant(){ return m_dormant;};
 
 	void SendKeyEvent(CARD32 key, bool down);
+
+    void SendKeepAlive(bool bForce = false); // 16 july 2008 jdp
+
 
 private:
 	static LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam);
@@ -456,6 +461,7 @@ private:
 
 	int m_reconnectcounter;
 
+    bool m_bClosedByUser;
 	// Modif sf@2002 - Data Stream Modification Plugin handling
 	int m_nTO;
 	CDSMPlugin *m_pDSMPlugin;
@@ -601,6 +607,8 @@ private:
 	void DoConnection();
 	int reconnectcounter;
 	HANDLE ThreadSocketTimeout;
+
+    bool m_server_wants_keepalives;
 };
 
 // Some handy classes for temporary GDI object selection

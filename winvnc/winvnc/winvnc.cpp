@@ -104,6 +104,7 @@ void Set_settings_as_admin(char *mycommand);
 void Set_uninstall_service_as_admin();
 void Set_install_service_as_admin();
 void winvncSecurityEditorHelper_as_admin();
+bool GetServiceName(TCHAR *pszAppPath, TCHAR *pszServiceName);
 
 // [v1.0.2-jp1 fix] Load resouce from dll
 HINSTANCE	hInstResDLL;
@@ -199,6 +200,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 		if (p == NULL) return 0;
 		*p = '\0';
 		}
+    char progname[MAX_PATH];
+    strncpy(progname, WORKDIR, sizeof progname);
+    progname[MAX_PATH - 1] = 0;
 	strcat(WORKDIR,"\\");
 	strcat(WORKDIR,"WinVNC.log");
 
@@ -231,6 +235,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 		MessageBox(NULL, sz_ID_FAILED_INIT, szAppName, MB_OK);
 		return 0;
 	}
+    // look up the current service name in the registry.
+    GetServiceName(progname, service_name);
 
 	// Make the command-line lowercase and parse it
 	int i;
@@ -341,19 +347,74 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 
 		if (strncmp(&szCmdLine[i], winvncInstallService, strlen(winvncInstallService)) == 0)
 			{
+                // rest of command line service name, if provided.
+                char *pServiceName = &szCmdLine[i];
+                // skip over command switch, find next whitepace
+                while (*pServiceName && !isspace(*pServiceName))
+                    ++pServiceName;
+
+                // skip past whitespace to service name
+                while (*pServiceName && isspace(*pServiceName))
+                    ++pServiceName;
+
+                // strip off any quotes
+                if (*pServiceName && *pServiceName == '\"')
+                    ++pServiceName;
+
+                if (*pServiceName)
+                {
+                    // look for trailing quote, if found, terminate the string there.
+                    char *pQuote = pServiceName;
+                    pQuote = strrchr(pServiceName, '\"');
+                    if (pQuote)
+                        *pQuote = 0;
+                }
+                // if a service name is supplied, and it differs except in case from
+                // the default, use the supplied service name instead
+                if (*pServiceName && (strcmpi(pServiceName, service_name) != 0))
+                {
+                    strncpy(service_name, pServiceName, 256);
+                    service_name[255] = 0;
+                }
 				install_service();
 				Sleep(2000);
-				char command[100];
-				strcpy(command,"net start ");
-				strcat(command,service_name);
+				char command[MAX_PATH + 32]; // 29 January 2008 jdp
+                _snprintf(command, sizeof command, "net start \"%s\"", service_name);
 				WinExec(command,SW_HIDE);
 				return 0;
 			}
 		if (strncmp(&szCmdLine[i], winvncUnInstallService, strlen(winvncUnInstallService)) == 0)
 			{
-				char command[100];
-				strcpy(command,"net stop ");
-				strcat(command,service_name);
+				char command[MAX_PATH + 32]; // 29 January 2008 jdp 
+                // rest of command line service name, if provided.
+                char *pServiceName = &szCmdLine[i];
+                // skip over command switch, find next whitepace
+                while (*pServiceName && !isspace(*pServiceName))
+                    ++pServiceName;
+
+                // skip past whitespace to service name
+                while (*pServiceName && isspace(*pServiceName))
+                    ++pServiceName;
+
+                // strip off any quotes
+                if (*pServiceName && *pServiceName == '\"')
+                    ++pServiceName;
+
+                if (*pServiceName)
+                {
+                    // look for trailing quote, if found, terminate the string there.
+                    char *pQuote = pServiceName;
+                    pQuote = strrchr(pServiceName, '\"');
+                    if (pQuote)
+                        *pQuote = 0;
+                }
+
+                if (*pServiceName && (strcmpi(pServiceName, service_name) != 0))
+                {
+                    strncpy(service_name, pServiceName, 256);
+                    service_name[255] = 0;
+                }
+                _snprintf(command, sizeof command, "net stop \"%s\"", service_name);
 				WinExec(command,SW_HIDE);
 				uninstall_service();
 				return 0;

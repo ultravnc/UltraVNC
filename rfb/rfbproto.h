@@ -303,6 +303,7 @@ typedef struct {
 #ifdef DSHOW
 #define rfbKeyFrameRequest 12
 #endif
+#define rfbKeepAlive 13 // 16 July 2008 jdp -- bidirectional
 #define rfbPalmVNCSetScaleFactor 0xF // PalmVNC 1.4 & 2.0 SetScale Factor message
 
 
@@ -340,6 +341,7 @@ typedef struct {
 
 // viewer requests server state updates
 #define rfbEncodingServerState              0xFFFF8000
+#define rfbEncodingEnableKeepAlive          0xFFFF8001
 
 // Same encoder number as in tight 
 /*
@@ -755,6 +757,9 @@ typedef struct _rfbFileTransferMsg {
 #define rfbDirPrefix			"[ "
 #define rfbDirSuffix			" ]"		
 
+#define rfbPartialFilePrefix   "!UVNCPFT-\0" // Files are transferred with this prefix, until complete. Must end with "-", does not apply to directory transfers
+#define sz_rfbPartialFilePrefix 9 
+
 
 
 /*-----------------------------------------------------------------------------
@@ -835,6 +840,14 @@ typedef struct {
 
 #define sz_rfbServerStateMsg 12
 
+
+typedef struct {
+    CARD8 type;
+} rfbKeepAliveMsg;
+
+#define sz_rfbKeepAliveMsg 1
+#define KEEPALIVE_INTERVAL 5
+
 /*-----------------------------------------------------------------------------
  * Union of all server->client messages.
  */
@@ -850,6 +863,7 @@ typedef union {
 	rfbFileTransferMsg ft;
 	rfbTextChatMsg tc;
     rfbServerStateMsg ss;
+    rfbKeepAliveMsg kp;
 } rfbServerToClientMsg;
 
 
@@ -1102,4 +1116,5 @@ typedef union {
 	rfbFileTransferMsg ft;
 	rfbSetSWMsg sw;
 	rfbTextChatMsg tc;
+    rfbKeepAliveMsg kp;
 } rfbClientToServerMsg;

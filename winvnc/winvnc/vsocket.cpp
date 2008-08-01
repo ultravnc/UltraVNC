@@ -450,6 +450,40 @@ VSocket::SetTimeout(VCard32 msecs)
 	return VTrue;
 }
 
+VBool VSocket::SetSendTimeout(VCard32 msecs)
+{
+#if 1
+    return SetTimeout (msecs);
+#else
+	if (LOBYTE(winsockVersion) < 2)
+		return VFalse;
+	int timeout=msecs;
+
+	if (setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, (char*)&timeout, sizeof(timeout)) == SOCKET_ERROR)
+	{
+		return VFalse;
+	}
+
+	return VTrue;
+#endif
+}
+
+VBool VSocket::SetRecvTimeout(VCard32 msecs)
+{
+#if 1
+    return SetTimeout (msecs);
+#else
+	if (LOBYTE(winsockVersion) < 2)
+		return VFalse;
+	int timeout=msecs;
+	if (setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (char*)&timeout, sizeof(timeout)) == SOCKET_ERROR)
+	{
+		return VFalse;
+	}
+	return VTrue;
+#endif
+}
+
 ////////////////////////////
 VInt
 VSocket::Send(const char *buff, const VCard bufflen)
@@ -477,7 +511,8 @@ VSocket::Send(const char *buff, const VCard bufflen)
 	}
 	memcpy(queuebuffer+queuebuffersize,buff2,bufflen2);
 	queuebuffersize+=bufflen2;
-	if (!send(sock,queuebuffer,queuebuffersize,0)) return false;
+	if (!send(sock,queuebuffer,queuebuffersize,0)) 
+        return false;
 //	vnclog.Print(LL_SOCKERR, VNCLOG("SEND 2 %i\n") ,queuebuffersize);
 	queuebuffersize=0;
 	return bufflen;
@@ -622,7 +657,19 @@ VSocket::ClearQueue()
 VInt
 VSocket::Read(char *buff, const VCard bufflen)
 {
-  return recv(sock, buff, bufflen, 0);
+    int s = recv(sock, buff, bufflen, 0);
+#if defined(_DEBUG)
+    if (s == SOCKET_ERROR)
+    {
+        OutputDebugString("recv: SOCKET_ERROR");
+    }
+
+    if (s == 0)
+    {
+        OutputDebugString("recv: connection closed");
+    }
+#endif
+  return s;
 }
 
 ////////////////////////////

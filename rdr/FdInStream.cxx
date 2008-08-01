@@ -275,7 +275,7 @@ int FdInStream::readWithTimeoutOrCallback(void* buf, int len)
   }
 
   if (n < 0) throw SystemException("read",errno);
-  if (n == 0) throw EndOfStream();
+  if (n == 0) throw EndOfStream("read");
 
   if (fAlreadyCounted)
 	  return n; 

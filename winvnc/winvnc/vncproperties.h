@@ -97,6 +97,7 @@ protected:
 	BOOL				m_allowproperties;
 	BOOL				m_allowshutdown;
 	BOOL				m_alloweditclients;
+    int                 m_ftTimeout;
 
 
 	// Password handling

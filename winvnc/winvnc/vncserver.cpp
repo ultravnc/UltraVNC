@@ -225,6 +225,7 @@ vncServer::vncServer()
 
 	m_fRunningFromExternalService = false;
 	m_fAutoRestart = false;
+    m_ftTimeout = 30000;
 }
 
 vncServer::~vncServer()
@@ -2262,4 +2263,8 @@ void vncServer::NotifyClients_StateChange(CARD32 state, CARD32 value)
 
         client->SendServerStateUpdate(state, value);
 	}
+}
+void vncServer::SetFTTimeout(int msecs)
+{
+    m_ftTimeout = msecs;
 }

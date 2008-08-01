@@ -11,7 +11,7 @@ HANDLE stopServiceEvent=0;
 extern HANDLE hEvent;
 static char service_path[MAX_PATH];
 void monitor_sessions();
-char service_name[]="uvnc_service";
+char service_name[256]="uvnc_service";
 char *app_name = "UltraVNC";
 void disconnect_remote_sessions();
 char cmdtext[256];

@@ -21,6 +21,7 @@ HINSTANCE hInst;
 #endif
 #include "stdhdrs.h"
 #include "resource.h"
+#include "vncservice.h"
 
 
 int wd=0;
@@ -137,12 +138,12 @@ static LRESULT CALLBACK WndProc(
     {
 						case WM_CREATE:
 //							SetTimer(hwnd,10,30000,NULL);
-							SetTimer(hwnd,100,2000,NULL);
+							SetTimer(hwnd,100,20,NULL);
 							break;
 						case WM_TIMER:
 							if (wParam==100) 
 							{
-								SetWindowPos(hwnd,HWND_TOPMOST,0,0,GetSystemMetrics(SM_CXSCREEN),GetSystemMetrics(SM_CYSCREEN), NULL);
+                                SetWindowPos(hwnd,HWND_TOPMOST,0,0,0,0, SWP_NOMOVE|SWP_NOSIZE|SWP_NOACTIVATE);
 							
 							}
 //							if (wParam==10) DestroyWindow(hwnd);
@@ -194,6 +195,25 @@ create_window(void)
         clientRect.top = 0;
         clientRect.right = GetSystemMetrics(SM_CXSCREEN);
         clientRect.bottom = GetSystemMetrics(SM_CYSCREEN);
+
+        UINT x(GetSystemMetrics(SM_XVIRTUALSCREEN));
+        UINT y(GetSystemMetrics(SM_YVIRTUALSCREEN));
+        UINT cx(GetSystemMetrics(SM_CXVIRTUALSCREEN));
+        UINT cy(GetSystemMetrics(SM_CYVIRTUALSCREEN));
+
+        if (vncService::IsWinNT()  && vncService::VersionMajor() <= 4)
+        {
+            x = 0;
+            y = 0;
+            cx = GetSystemMetrics(SM_CXSCREEN);
+            cy = GetSystemMetrics(SM_CYSCREEN);
+        }
+
+        clientRect.left = x;
+        clientRect.top = y;
+        clientRect.right = x + cx;
+        clientRect.bottom = y + cy;
+
         AdjustWindowRect (&clientRect, WS_CAPTION, FALSE);
         hwnd = CreateWindowEx (0,
                                "blackscreen",
@@ -201,8 +221,8 @@ create_window(void)
                                WS_POPUP  | WS_CLIPSIBLINGS | WS_CLIPCHILDREN|WS_BORDER,
                                CW_USEDEFAULT,
                                CW_USEDEFAULT,
-                               clientRect.right - clientRect.left,
-                               clientRect.bottom - clientRect.top,
+                               cx,
+                               cy,
                                NULL,
                                NULL,
                                hInst,
@@ -230,7 +250,7 @@ create_window(void)
 
 	if (pSetLayeredWindowAttributes != NULL) {
 		SetWindowLong (hwnd, GWL_EXSTYLE, GetWindowLong
-		(hwnd, GWL_EXSTYLE) |WS_EX_LAYERED|WS_EX_TRANSPARENT );
+		(hwnd, GWL_EXSTYLE) |WS_EX_LAYERED|WS_EX_TRANSPARENT|WS_EX_TOPMOST);
 	    ShowWindow (hwnd, SW_SHOWNORMAL);
 	}
 	if (pSetLayeredWindowAttributes != NULL) {
@@ -242,7 +262,7 @@ create_window(void)
 	*/
 	pSetLayeredWindowAttributes (hwnd, RGB(255,255,255), 255, LWA_ALPHA);
 	}
-	SetWindowPos(hwnd,HWND_TOPMOST,0,0,GetSystemMetrics(SM_CXSCREEN),GetSystemMetrics(SM_CYSCREEN), SWP_FRAMECHANGED|SWP_NOACTIVATE);
+	SetWindowPos(hwnd,HWND_TOPMOST,x,y,cx,cy, SWP_FRAMECHANGED|SWP_NOACTIVATE);
 //SM_CXVIRTUALSCREEN
 	return true;
 }

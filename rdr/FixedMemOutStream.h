@@ -43,7 +43,7 @@ namespace rdr {
 
   private:
 
-    int overrun(int itemSize, int nItems) { throw EndOfStream(); }
+    int overrun(int itemSize, int nItems) { throw EndOfStream("overrun"); }
     U8* start;
   };
 

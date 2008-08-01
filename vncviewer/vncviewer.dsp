@@ -42,23 +42,26 @@ RSC=rc.exe
 # PROP Use_Debug_Libraries 1
 # PROP Output_Dir ".\Debug"
 # PROP Intermediate_Dir ".\Debug"
+# PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
-# ADD BASE CPP /nologo /MTd /I "omnithread" /I ".." /Zi /W3 /Od /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "__NT__" /D "_WINSTATIC" /D "__WIN32__" /D "_CRT_SECURE_NO_WARNINGS" /Gm /Fp".\Debug/vncviewer.pch" /Fo".\Debug/" /Fd".\Debug/" /FR /GZ /c /GX 
-# ADD CPP /nologo /MTd /I "omnithread" /I ".." /Zi /W3 /Od /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "__NT__" /D "_WINSTATIC" /D "__WIN32__" /D "_CRT_SECURE_NO_WARNINGS" /Gm /Fp".\Debug/vncviewer.pch" /Fo".\Debug/" /Fd".\Debug/" /FR /GZ /c /GX 
-# ADD BASE MTL /nologo /D"_DEBUG" /mktyplib203 /tlb".\Debug\vncviewer.tlb" /win32 
-# ADD MTL /nologo /D"_DEBUG" /mktyplib203 /tlb".\Debug\vncviewer.tlb" /win32 
-# ADD BASE RSC /l 1033 /d "_DEBUG" 
-# ADD RSC /l 1033 /d "_DEBUG" 
+# ADD BASE CPP /nologo /MTd /W3 /Gm /GX /Zi /Od /I "omnithread" /I ".." /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "__NT__" /D "_WINSTATIC" /D "__WIN32__" /D "_CRT_SECURE_NO_WARNINGS" /FR /GZ /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /Zi /Od /Gf /Gy /I "omnithread" /I ".." /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "__NT__" /D "_WINSTATIC" /D "__WIN32__" /D "_MBCS" /D "_CRT_SECURE_NO_WARNINGS" /FR"Debug/" /Fp"Debug/vncviewer.pch" /YX"stdhdrs.h" /Fo"Debug/" /Fd"Debug/" /FD /c
+# ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
+# ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
+# ADD BASE RSC /l 0x409 /d "_DEBUG"
+# ADD RSC /l 0x409 /i "..\.." /i ".." /d "_DEBUG"
 BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo /o ".\Debug\vncviewer.bsc" 
-# ADD BSC32 /nologo /o ".\Debug\vncviewer.bsc" 
+# ADD BASE BSC32 /nologo /o ".\Debug\vncviewer.bsc"
+# ADD BSC32 /nologo /o ".\Debug\vncviewer.bsc"
 LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib winmm.lib omnithread.lib wsock32.lib /nologo /out:".\Debug\vncviewer.exe" /incremental:yes /libpath:"./omnithread/Debug" /debug /pdb:".\Debug\vncviewer.pdb" /pdbtype:sept /map:".\Debug\vncviewer.map" /subsystem:windows /machine:ix86 
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib winmm.lib omnithread.lib wsock32.lib /nologo /out:".\Debug\vncviewer.exe" /incremental:yes /libpath:"./omnithread/Debug" /debug /pdb:".\Debug\vncviewer.pdb" /pdbtype:sept /map:".\Debug\vncviewer.map" /subsystem:windows /machine:ix86 
+# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib winmm.lib omnithread.lib wsock32.lib /nologo /subsystem:windows /map /debug /machine:IX86 /pdbtype:sept /libpath:"./omnithread/Debug"
+# SUBTRACT BASE LINK32 /pdb:none
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib winmm.lib omnithread.lib wsock32.lib /nologo /subsystem:windows /map /debug /machine:IX86 /pdbtype:sept /libpath:"./omnithread/Debug"
+# SUBTRACT LINK32 /pdb:none
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
 PreLink_Desc=Setting build time...
-PreLink_Cmds=cl \nologo \MTd \FoDebug\ \FdDebug\ \c buildtime.cpp
+PreLink_Cmds=cl /nologo /MT /FoRelease\ /FdRelease\ /c buildtime.cpp
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Debug"
@@ -73,22 +76,24 @@ PreLink_Cmds=cl \nologo \MTd \FoDebug\ \FdDebug\ \c buildtime.cpp
 # PROP Output_Dir "$(PlatformName)\$(ConfigurationName)"
 # PROP Intermediate_Dir "$(PlatformName)\$(ConfigurationName)"
 # PROP Target_Dir ""
-# ADD BASE CPP /nologo /MTd /I "omnithread" /I ".." /Zi /W3 /Od /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "__NT__" /D "_WINSTATIC" /D "__WIN32__" /D "_CRT_SECURE_NO_WARNINGS" /D "_X64" /Gm /Fp".\Debug/vncviewer.pch" /Fo".\Debug/" /Fd".\Debug/" /FR /GZ /c /GX 
-# ADD CPP /nologo /MTd /I "omnithread" /I ".." /Zi /W3 /Od /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "__NT__" /D "_WINSTATIC" /D "__WIN32__" /D "_CRT_SECURE_NO_WARNINGS" /D "_X64" /Gm /Fp".\Debug/vncviewer.pch" /Fo".\Debug/" /Fd".\Debug/" /FR /GZ /c /GX 
-# ADD BASE MTL /nologo /D"_DEBUG" /mktyplib203 /tlb".\Debug\vncviewer.tlb" /win32 
-# ADD MTL /nologo /D"_DEBUG" /mktyplib203 /tlb".\Debug\vncviewer.tlb" /win32 
-# ADD BASE RSC /l 1033 /d "_DEBUG" 
-# ADD RSC /l 1033 /d "_DEBUG" 
+# ADD BASE CPP /nologo /MTd /W3 /Gm /GX /Zi /Od /I "omnithread" /I ".." /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "__NT__" /D "_WINSTATIC" /D "__WIN32__" /D "_CRT_SECURE_NO_WARNINGS" /D "_X64" /FR /Fo".\Debug/" /Fd".\Debug/" /GZ /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /Zi /Od /I "omnithread" /I ".." /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "__NT__" /D "_WINSTATIC" /D "__WIN32__" /D "_CRT_SECURE_NO_WARNINGS" /D "_X64" /FR /Fo".\Debug/" /Fd".\Debug/" /GZ /c
+# ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
+# ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
+# ADD BASE RSC /l 0x409 /d "_DEBUG"
+# ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo /o ".\Debug\vncviewer.bsc" 
-# ADD BSC32 /nologo /o ".\Debug\vncviewer.bsc" 
+# ADD BASE BSC32 /nologo /o ".\Debug\vncviewer.bsc"
+# ADD BSC32 /nologo /o ".\Debug\vncviewer.bsc"
 LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib winmm.lib omnithread.lib wsock32.lib /nologo /out:".\Debug\vncviewer.exe" /incremental:yes /libpath:"./omnithread/Debug" /debug /pdb:".\Debug\vncviewer.pdb" /pdbtype:sept /map:".\Debug\vncviewer.map" /subsystem:windows 
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib winmm.lib omnithread.lib wsock32.lib /nologo /out:".\Debug\vncviewer.exe" /incremental:yes /libpath:"./omnithread/Debug" /debug /pdb:".\Debug\vncviewer.pdb" /pdbtype:sept /map:".\Debug\vncviewer.map" /subsystem:windows 
+# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib winmm.lib omnithread.lib wsock32.lib /nologo /subsystem:windows /pdb:".\Debug\vncviewer.pdb" /map:".\Debug\vncviewer.map" /debug /machine:IX86 /out:".\Debug\vncviewer.exe" /pdbtype:sept /libpath:"./omnithread/Debug"
+# SUBTRACT BASE LINK32 /pdb:none
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib winmm.lib omnithread.lib wsock32.lib /nologo /subsystem:windows /pdb:".\Debug\vncviewer.pdb" /map:".\Debug\vncviewer.map" /debug /machine:IX86 /out:".\Debug\vncviewer.exe" /pdbtype:sept /libpath:"./omnithread/Debug"
+# SUBTRACT LINK32 /pdb:none
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
 PreLink_Desc=Setting build time...
-PreLink_Cmds=cl \nologo \MTd \FoDebug\ \FdDebug\ \c buildtime.cpp
+PreLink_Cmds=cl /nologo /MTd /FoDebug\ /FdDebug\ /c buildtime.cpp
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "vncviewer - Win32 Release"
@@ -103,18 +108,20 @@ PreLink_Cmds=cl \nologo \MTd \FoDebug\ \FdDebug\ \c buildtime.cpp
 # PROP Output_Dir ".\Release"
 # PROP Intermediate_Dir ".\Release"
 # PROP Target_Dir ""
-# ADD BASE CPP /nologo /MT /I "omnithread" /I ".." /W3 /Ox /Ot /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "__NT__" /D "_WINSTATIC" /D "__WIN32__" /D "_CRT_SECURE_NO_WARNINGS" /Fp".\Release/vncviewer.pch" /Fo".\Release/" /Fd".\Release/" /c /GX 
-# ADD CPP /nologo /MT /I "omnithread" /I ".." /W3 /Ox /Ot /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "__NT__" /D "_WINSTATIC" /D "__WIN32__" /D "_CRT_SECURE_NO_WARNINGS" /Fp".\Release/vncviewer.pch" /Fo".\Release/" /Fd".\Release/" /c /GX 
-# ADD BASE MTL /nologo /D"NDEBUG" /mktyplib203 /tlb".\Release\vncviewer.tlb" /win32 
-# ADD MTL /nologo /D"NDEBUG" /mktyplib203 /tlb".\Release\vncviewer.tlb" /win32 
-# ADD BASE RSC /l 1033 /d "NDEBUG" 
-# ADD RSC /l 1033 /d "NDEBUG" 
+# ADD BASE CPP /nologo /MT /W3 /GX /Ox /Ot /I "omnithread" /I ".." /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "__NT__" /D "_WINSTATIC" /D "__WIN32__" /D "_CRT_SECURE_NO_WARNINGS" /c
+# ADD CPP /nologo /MT /W3 /GX /Ox /Ot /I "omnithread" /I ".." /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "__NT__" /D "_WINSTATIC" /D "__WIN32__" /D "_CRT_SECURE_NO_WARNINGS" /c
+# ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
+# ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
+# ADD BASE RSC /l 0x409 /d "NDEBUG"
+# ADD RSC /l 0x409 /d "NDEBUG"
 BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo /o ".\Release\vncviewer.bsc" 
-# ADD BSC32 /nologo /o ".\Release\vncviewer.bsc" 
+# ADD BASE BSC32 /nologo /o ".\Release\vncviewer.bsc"
+# ADD BSC32 /nologo /o ".\Release\vncviewer.bsc"
 LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib winmm.lib omnithread.lib wsock32.lib /nologo /out:".\Release\vncviewer.exe" /incremental:yes /libpath:"omnithread/Release" /pdb:".\Release\vncviewer.pdb" /pdbtype:sept /subsystem:windows /machine:ix86 
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib winmm.lib omnithread.lib wsock32.lib /nologo /out:".\Release\vncviewer.exe" /incremental:yes /libpath:"omnithread/Release" /pdb:".\Release\vncviewer.pdb" /pdbtype:sept /subsystem:windows /machine:ix86 
+# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib winmm.lib omnithread.lib wsock32.lib /nologo /subsystem:windows /incremental:yes /machine:IX86 /pdbtype:sept /libpath:"omnithread/Release"
+# SUBTRACT BASE LINK32 /pdb:none
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib winmm.lib omnithread.lib wsock32.lib /nologo /subsystem:windows /incremental:yes /machine:IX86 /pdbtype:sept /libpath:"omnithread/Release"
+# SUBTRACT LINK32 /pdb:none
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
 PreLink_Desc=Setting build time...
@@ -133,25 +140,27 @@ PreLink_Cmds=cl \nologo \MT \FoRelease\ \FdRelease\ \c buildtime.cpp
 # PROP Output_Dir "$(PlatformName)\$(ConfigurationName)"
 # PROP Intermediate_Dir "$(PlatformName)\$(ConfigurationName)"
 # PROP Target_Dir ""
-# ADD BASE CPP /nologo /MT /I "omnithread" /I ".." /W3 /Ox /Ot /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "__NT__" /D "_WINSTATIC" /D "__WIN32__" /D "_CRT_SECURE_NO_WARNINGS" /D "_X64" /Fp".\Release/vncviewer.pch" /Fo".\Release/" /Fd".\Release/" /c /GX 
-# ADD CPP /nologo /MT /I "omnithread" /I ".." /W3 /Ox /Ot /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "__NT__" /D "_WINSTATIC" /D "__WIN32__" /D "_CRT_SECURE_NO_WARNINGS" /D "_X64" /Fp".\Release/vncviewer.pch" /Fo".\Release/" /Fd".\Release/" /c /GX 
-# ADD BASE MTL /nologo /D"NDEBUG" /mktyplib203 /tlb".\Release\vncviewer.tlb" /win32 
-# ADD MTL /nologo /D"NDEBUG" /mktyplib203 /tlb".\Release\vncviewer.tlb" /win32 
-# ADD BASE RSC /l 1033 /d "NDEBUG" 
-# ADD RSC /l 1033 /d "NDEBUG" 
+# ADD BASE CPP /nologo /MT /W3 /GX /Ox /Ot /I "omnithread" /I ".." /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "__NT__" /D "_WINSTATIC" /D "__WIN32__" /D "_CRT_SECURE_NO_WARNINGS" /D "_X64" /Fo".\Release/" /c
+# ADD CPP /nologo /MT /W3 /GX /Ox /Ot /I "omnithread" /I ".." /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "__NT__" /D "_WINSTATIC" /D "__WIN32__" /D "_CRT_SECURE_NO_WARNINGS" /D "_X64" /Fo".\Release/" /c
+# ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
+# ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
+# ADD BASE RSC /l 0x409 /d "NDEBUG"
+# ADD RSC /l 0x409 /d "NDEBUG"
 BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo /o ".\Release\vncviewer.bsc" 
-# ADD BSC32 /nologo /o ".\Release\vncviewer.bsc" 
+# ADD BASE BSC32 /nologo /o ".\Release\vncviewer.bsc"
+# ADD BSC32 /nologo /o ".\Release\vncviewer.bsc"
 LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib winmm.lib omnithread.lib wsock32.lib /nologo /out:".\Release\vncviewer.exe" /incremental:yes /libpath:"omnithread/Release" /pdb:".\Release\vncviewer.pdb" /pdbtype:sept /subsystem:windows 
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib winmm.lib omnithread.lib wsock32.lib /nologo /out:".\Release\vncviewer.exe" /incremental:yes /libpath:"omnithread/Release" /pdb:".\Release\vncviewer.pdb" /pdbtype:sept /subsystem:windows 
+# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib winmm.lib omnithread.lib wsock32.lib /nologo /subsystem:windows /incremental:yes /pdb:".\Release\vncviewer.pdb" /machine:IX86 /out:".\Release\vncviewer.exe" /pdbtype:sept /libpath:"omnithread/Release"
+# SUBTRACT BASE LINK32 /pdb:none
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib winmm.lib omnithread.lib wsock32.lib /nologo /subsystem:windows /incremental:yes /pdb:".\Release\vncviewer.pdb" /machine:IX86 /out:".\Release\vncviewer.exe" /pdbtype:sept /libpath:"omnithread/Release"
+# SUBTRACT LINK32 /pdb:none
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
 PreLink_Desc=Setting build time...
 PreLink_Cmds=cl \nologo \MT \FoRelease\ \FdRelease\ \c buildtime.cpp
 # End Special Build Tool
 
-!ENDIF
+!ENDIF 
 
 # Begin Target
 
@@ -288,7 +297,7 @@ SOURCE=res\toolbar1.bmp
 # End Source File
 # Begin Source File
 
-SOURCE=res\ultra-logo.bmp
+SOURCE="res\ultra-logo.bmp"
 # End Source File
 # Begin Source File
 
@@ -313,17 +322,21 @@ SOURCE=AboutBox.cpp
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - Win32 Release"
 
-# ADD CPP /nologo /GX 
+# ADD CPP /nologo /GX
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Release"
 
-# ADD CPP /nologo /GX 
-!ENDIF
+# ADD CPP /nologo /GX
+
+!ENDIF 
 
 # End Source File
 # Begin Source File
@@ -336,17 +349,21 @@ SOURCE=AccelKeys.cpp
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - Win32 Release"
 
-# ADD CPP /nologo /GX 
+# ADD CPP /nologo /GX
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Release"
 
-# ADD CPP /nologo /GX 
-!ENDIF
+# ADD CPP /nologo /GX
+
+!ENDIF 
 
 # End Source File
 # Begin Source File
@@ -359,17 +376,21 @@ SOURCE=AuthDialog.cpp
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - Win32 Release"
 
-# ADD CPP /nologo /GX 
+# ADD CPP /nologo /GX
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Release"
 
-# ADD CPP /nologo /GX 
-!ENDIF
+# ADD CPP /nologo /GX
+
+!ENDIF 
 
 # End Source File
 # Begin Source File
@@ -382,17 +403,21 @@ SOURCE=buildtime.cpp
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - Win32 Release"
 
-# ADD CPP /nologo /GX 
+# ADD CPP /nologo /GX
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Release"
 
-# ADD CPP /nologo /GX 
-!ENDIF
+# ADD CPP /nologo /GX
+
+!ENDIF 
 
 # End Source File
 # Begin Source File
@@ -401,17 +426,21 @@ SOURCE=ClientConnection.cpp
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - Win32 Release"
 
-# ADD CPP /nologo /GX 
+# ADD CPP /nologo /GX
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Release"
 
-# ADD CPP /nologo /GX 
-!ENDIF
+# ADD CPP /nologo /GX
+
+!ENDIF 
 
 # End Source File
 # Begin Source File
@@ -424,17 +453,21 @@ SOURCE=ClientConnectionCacheRect.cpp
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - Win32 Release"
 
-# ADD CPP /nologo /GX 
+# ADD CPP /nologo /GX
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Release"
 
-# ADD CPP /nologo /GX 
-!ENDIF
+# ADD CPP /nologo /GX
+
+!ENDIF 
 
 # End Source File
 # Begin Source File
@@ -443,17 +476,21 @@ SOURCE=ClientConnectionClipboard.cpp
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - Win32 Release"
 
-# ADD CPP /nologo /GX 
+# ADD CPP /nologo /GX
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Release"
 
-# ADD CPP /nologo /GX 
-!ENDIF
+# ADD CPP /nologo /GX
+
+!ENDIF 
 
 # End Source File
 # Begin Source File
@@ -462,17 +499,21 @@ SOURCE=ClientConnectionCopyRect.cpp
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - Win32 Release"
 
-# ADD CPP /nologo /GX 
+# ADD CPP /nologo /GX
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Release"
 
-# ADD CPP /nologo /GX 
-!ENDIF
+# ADD CPP /nologo /GX
+
+!ENDIF 
 
 # End Source File
 # Begin Source File
@@ -481,17 +522,21 @@ SOURCE=ClientConnectionCoRRE.cpp
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - Win32 Release"
 
-# ADD CPP /nologo /GX 
+# ADD CPP /nologo /GX
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Release"
 
-# ADD CPP /nologo /GX 
-!ENDIF
+# ADD CPP /nologo /GX
+
+!ENDIF 
 
 # End Source File
 # Begin Source File
@@ -500,17 +545,21 @@ SOURCE=ClientConnectionCursor.cpp
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - Win32 Release"
 
-# ADD CPP /nologo /GX 
+# ADD CPP /nologo /GX
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Release"
 
-# ADD CPP /nologo /GX 
-!ENDIF
+# ADD CPP /nologo /GX
+
+!ENDIF 
 
 # End Source File
 # Begin Source File
@@ -519,17 +568,21 @@ SOURCE=ClientConnectionFile.cpp
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - Win32 Release"
 
-# ADD CPP /nologo /GX 
+# ADD CPP /nologo /GX
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Release"
 
-# ADD CPP /nologo /GX 
-!ENDIF
+# ADD CPP /nologo /GX
+
+!ENDIF 
 
 # End Source File
 # Begin Source File
@@ -538,17 +591,21 @@ SOURCE=ClientConnectionFullScreen.cpp
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - Win32 Release"
 
-# ADD CPP /nologo /GX 
+# ADD CPP /nologo /GX
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Release"
 
-# ADD CPP /nologo /GX 
-!ENDIF
+# ADD CPP /nologo /GX
+
+!ENDIF 
 
 # End Source File
 # Begin Source File
@@ -557,17 +614,21 @@ SOURCE=ClientConnectionHextile.cpp
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - Win32 Release"
 
-# ADD CPP /nologo /GX 
+# ADD CPP /nologo /GX
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Release"
 
-# ADD CPP /nologo /GX 
-!ENDIF
+# ADD CPP /nologo /GX
+
+!ENDIF 
 
 # End Source File
 # Begin Source File
@@ -576,17 +637,21 @@ SOURCE=ClientConnectionRaw.cpp
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - Win32 Release"
 
-# ADD CPP /nologo /GX 
+# ADD CPP /nologo /GX
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Release"
 
-# ADD CPP /nologo /GX 
-!ENDIF
+# ADD CPP /nologo /GX
+
+!ENDIF 
 
 # End Source File
 # Begin Source File
@@ -595,17 +660,21 @@ SOURCE=ClientConnectionRRE.cpp
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - Win32 Release"
 
-# ADD CPP /nologo /GX 
+# ADD CPP /nologo /GX
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Release"
 
-# ADD CPP /nologo /GX 
-!ENDIF
+# ADD CPP /nologo /GX
+
+!ENDIF 
 
 # End Source File
 # Begin Source File
@@ -614,17 +683,21 @@ SOURCE=ClientConnectionTight.cpp
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - Win32 Release"
 
-# ADD CPP /nologo /GX 
+# ADD CPP /nologo /GX
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Release"
 
-# ADD CPP /nologo /GX 
-!ENDIF
+# ADD CPP /nologo /GX
+
+!ENDIF 
 
 # End Source File
 # Begin Source File
@@ -633,17 +706,21 @@ SOURCE=ClientConnectionUltra.cpp
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - Win32 Release"
 
-# ADD CPP /nologo /GX 
+# ADD CPP /nologo /GX
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Release"
 
-# ADD CPP /nologo /GX 
-!ENDIF
+# ADD CPP /nologo /GX
+
+!ENDIF 
 
 # End Source File
 # Begin Source File
@@ -652,17 +729,21 @@ SOURCE=ClientConnectionZlib.cpp
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - Win32 Release"
 
-# ADD CPP /nologo /GX 
+# ADD CPP /nologo /GX
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Release"
 
-# ADD CPP /nologo /GX 
-!ENDIF
+# ADD CPP /nologo /GX
+
+!ENDIF 
 
 # End Source File
 # Begin Source File
@@ -671,17 +752,21 @@ SOURCE=ClientConnectionZlibHex.cpp
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - Win32 Release"
 
-# ADD CPP /nologo /GX 
+# ADD CPP /nologo /GX
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Release"
 
-# ADD CPP /nologo /GX 
-!ENDIF
+# ADD CPP /nologo /GX
+
+!ENDIF 
 
 # End Source File
 # Begin Source File
@@ -694,17 +779,21 @@ SOURCE=d3des.c
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - Win32 Release"
 
-# ADD CPP /nologo /GX 
+# ADD CPP /nologo /GX
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Release"
 
-# ADD CPP /nologo /GX 
-!ENDIF
+# ADD CPP /nologo /GX
+
+!ENDIF 
 
 # End Source File
 # Begin Source File
@@ -717,17 +806,21 @@ SOURCE=Daemon.cpp
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - Win32 Release"
 
-# ADD CPP /nologo /GX 
+# ADD CPP /nologo /GX
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Release"
 
-# ADD CPP /nologo /GX 
-!ENDIF
+# ADD CPP /nologo /GX
+
+!ENDIF 
 
 # End Source File
 # Begin Source File
@@ -740,17 +833,21 @@ SOURCE=..\rfb\dh.cpp
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - Win32 Release"
 
-# ADD CPP /nologo /GX 
+# ADD CPP /nologo /GX
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Release"
 
-# ADD CPP /nologo /GX 
-!ENDIF
+# ADD CPP /nologo /GX
+
+!ENDIF 
 
 # End Source File
 # Begin Source File
@@ -763,17 +860,21 @@ SOURCE=..\DSMPlugin\DSMPlugin.cpp
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - Win32 Release"
 
-# ADD CPP /nologo /GX 
+# ADD CPP /nologo /GX
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Release"
 
-# ADD CPP /nologo /GX 
-!ENDIF
+# ADD CPP /nologo /GX
+
+!ENDIF 
 
 # End Source File
 # Begin Source File
@@ -786,17 +887,21 @@ SOURCE=Exception.cpp
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - Win32 Release"
 
-# ADD CPP /nologo /GX 
+# ADD CPP /nologo /GX
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Release"
 
-# ADD CPP /nologo /GX 
-!ENDIF
+# ADD CPP /nologo /GX
+
+!ENDIF 
 
 # End Source File
 # Begin Source File
@@ -809,17 +914,21 @@ SOURCE=FileTransfer.cpp
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - Win32 Release"
 
-# ADD CPP /nologo /GX 
+# ADD CPP /nologo /GX
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Release"
 
-# ADD CPP /nologo /GX 
-!ENDIF
+# ADD CPP /nologo /GX
+
+!ENDIF 
 
 # End Source File
 # Begin Source File
@@ -832,17 +941,21 @@ SOURCE=Flasher.cpp
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - Win32 Release"
 
-# ADD CPP /nologo /GX 
+# ADD CPP /nologo /GX
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Release"
 
-# ADD CPP /nologo /GX 
-!ENDIF
+# ADD CPP /nologo /GX
+
+!ENDIF 
 
 # End Source File
 # Begin Source File
@@ -855,17 +968,21 @@ SOURCE=FullScreenTitleBar.cpp
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - Win32 Release"
 
-# ADD CPP /nologo /GX 
+# ADD CPP /nologo /GX
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Release"
 
-# ADD CPP /nologo /GX 
-!ENDIF
+# ADD CPP /nologo /GX
+
+!ENDIF 
 
 # End Source File
 # Begin Source File
@@ -886,17 +1003,21 @@ SOURCE=KeyMap.cpp
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - Win32 Release"
 
-# ADD CPP /nologo /GX 
+# ADD CPP /nologo /GX
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Release"
 
-# ADD CPP /nologo /GX 
-!ENDIF
+# ADD CPP /nologo /GX
+
+!ENDIF 
 
 # End Source File
 # Begin Source File
@@ -925,29 +1046,25 @@ SOURCE=LICENCE.txt
 # End Source File
 # Begin Source File
 
-SOURCE=.\LinkLabel.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\LinkLabel.h
-# End Source File
-# Begin Source File
-
 SOURCE=Log.cpp
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - Win32 Release"
 
-# ADD CPP /nologo /GX 
+# ADD CPP /nologo /GX
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Release"
 
-# ADD CPP /nologo /GX 
-!ENDIF
+# ADD CPP /nologo /GX
+
+!ENDIF 
 
 # End Source File
 # Begin Source File
@@ -960,17 +1077,21 @@ SOURCE=LowLevelHook.cpp
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - Win32 Release"
 
-# ADD CPP /nologo /GX 
+# ADD CPP /nologo /GX
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Release"
 
-# ADD CPP /nologo /GX 
-!ENDIF
+# ADD CPP /nologo /GX
+
+!ENDIF 
 
 # End Source File
 # Begin Source File
@@ -987,17 +1108,21 @@ SOURCE=..\lzo\minilzo.c
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - Win32 Release"
 
-# ADD CPP /nologo /GX 
+# ADD CPP /nologo /GX
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Release"
 
-# ADD CPP /nologo /GX 
-!ENDIF
+# ADD CPP /nologo /GX
+
+!ENDIF 
 
 # End Source File
 # Begin Source File
@@ -1006,17 +1131,21 @@ SOURCE=MRU.cpp
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - Win32 Release"
 
-# ADD CPP /nologo /GX 
+# ADD CPP /nologo /GX
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Release"
 
-# ADD CPP /nologo /GX 
-!ENDIF
+# ADD CPP /nologo /GX
+
+!ENDIF 
 
 # End Source File
 # Begin Source File
@@ -1037,17 +1166,21 @@ SOURCE=SessionDialog.cpp
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - Win32 Release"
 
-# ADD CPP /nologo /GX 
+# ADD CPP /nologo /GX
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Release"
 
-# ADD CPP /nologo /GX 
-!ENDIF
+# ADD CPP /nologo /GX
+
+!ENDIF 
 
 # End Source File
 # Begin Source File
@@ -1060,17 +1193,21 @@ SOURCE=stdhdrs.cpp
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
-# ADD CPP /nologo /Yc"stdhdrs.h" /GZ /GX 
+# ADD CPP /nologo /GX /Yc"stdhdrs.h" /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Debug"
 
-# ADD CPP /nologo /Yc"stdhdrs.h" /GZ /GX 
+# ADD CPP /nologo /GX /Yc"stdhdrs.h" /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - Win32 Release"
 
-# ADD CPP /nologo /GX 
+# ADD CPP /nologo /GX
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Release"
 
-# ADD CPP /nologo /GX 
-!ENDIF
+# ADD CPP /nologo /GX
+
+!ENDIF 
 
 # End Source File
 # Begin Source File
@@ -1083,17 +1220,21 @@ SOURCE=TextChat.cpp
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - Win32 Release"
 
-# ADD CPP /nologo /GX 
+# ADD CPP /nologo /GX
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Release"
 
-# ADD CPP /nologo /GX 
-!ENDIF
+# ADD CPP /nologo /GX
+
+!ENDIF 
 
 # End Source File
 # Begin Source File
@@ -1110,17 +1251,21 @@ SOURCE=vncauth.c
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - Win32 Release"
 
-# ADD CPP /nologo /GX 
+# ADD CPP /nologo /GX
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Release"
 
-# ADD CPP /nologo /GX 
-!ENDIF
+# ADD CPP /nologo /GX
+
+!ENDIF 
 
 # End Source File
 # Begin Source File
@@ -1133,17 +1278,21 @@ SOURCE=VNCOptions.cpp
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - Win32 Release"
 
-# ADD CPP /nologo /GX 
+# ADD CPP /nologo /GX
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Release"
 
-# ADD CPP /nologo /GX 
-!ENDIF
+# ADD CPP /nologo /GX
+
+!ENDIF 
 
 # End Source File
 # Begin Source File
@@ -1156,17 +1305,21 @@ SOURCE=vncviewer.cpp
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - Win32 Release"
 
-# ADD CPP /nologo /GX 
+# ADD CPP /nologo /GX
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Release"
 
-# ADD CPP /nologo /GX 
-!ENDIF
+# ADD CPP /nologo /GX
+
+!ENDIF 
 
 # End Source File
 # Begin Source File
@@ -1176,21 +1329,8 @@ SOURCE=vncviewer.h
 # Begin Source File
 
 SOURCE=res\vncviewer.rc
-
-!IF  "$(CFG)" == "vncviewer - Win32 Debug"
-
-# ADD RSC /l 1033 /i "res" 
-!ELSEIF  "$(CFG)" == "vncviewer - x64 Debug"
-
-# ADD RSC /l 1033 /i "res" 
-!ELSEIF  "$(CFG)" == "vncviewer - Win32 Release"
-
-# ADD RSC /l 1033 /i "res" 
-!ELSEIF  "$(CFG)" == "vncviewer - x64 Release"
-
-# ADD RSC /l 1033 /i "res" 
-!ENDIF
-
+# ADD BASE RSC /l 0x409 /i "res"
+# ADD RSC /l 0x409 /i "res"
 # End Source File
 # Begin Source File
 
@@ -1198,17 +1338,21 @@ SOURCE=VNCviewerApp.cpp
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - Win32 Release"
 
-# ADD CPP /nologo /GX 
+# ADD CPP /nologo /GX
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Release"
 
-# ADD CPP /nologo /GX 
-!ENDIF
+# ADD CPP /nologo /GX
+
+!ENDIF 
 
 # End Source File
 # Begin Source File
@@ -1221,17 +1365,21 @@ SOURCE=VNCviewerApp32.cpp
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - Win32 Release"
 
-# ADD CPP /nologo /GX 
+# ADD CPP /nologo /GX
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Release"
 
-# ADD CPP /nologo /GX 
-!ENDIF
+# ADD CPP /nologo /GX
+
+!ENDIF 
 
 # End Source File
 # Begin Source File
@@ -1244,17 +1392,21 @@ SOURCE=..\ZipUnZip32\ZipUnzip32.cpp
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - Win32 Release"
 
-# ADD CPP /nologo /GX 
+# ADD CPP /nologo /GX
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Release"
 
-# ADD CPP /nologo /GX 
-!ENDIF
+# ADD CPP /nologo /GX
+
+!ENDIF 
 
 # End Source File
 # Begin Source File
@@ -1267,19 +1419,22 @@ SOURCE=zrle.cpp
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Debug"
 
-# ADD CPP /nologo /GZ /GX 
+# ADD CPP /nologo /GX /GZ
+
 !ELSEIF  "$(CFG)" == "vncviewer - Win32 Release"
 
-# ADD CPP /nologo /GX 
+# ADD CPP /nologo /GX
+
 !ELSEIF  "$(CFG)" == "vncviewer - x64 Release"
 
-# ADD CPP /nologo /GX 
-!ENDIF
+# ADD CPP /nologo /GX
+
+!ENDIF 
 
 # End Source File
 # End Target
 # End Project
-

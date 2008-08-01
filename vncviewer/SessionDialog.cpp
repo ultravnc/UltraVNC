@@ -200,7 +200,7 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 			GetDlgItemText(hwnd, IDC_HOSTNAME_EDIT, display, 256);
             _tcscpy(fulldisplay, display);
             if (!ParseDisplay(display, tmphost, 255, &_this->m_port)) {
-                MessageBox(NULL, 
+                MessageBox(hwnd, 
                     sz_F8, 
                     sz_F10, MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TOPMOST);
             } else {
@@ -217,7 +217,7 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 			GetDlgItemText(hwnd, IDC_PROXY_EDIT, display, 256);
             _tcscpy(fulldisplay, display);
             if (!ParseDisplay(display, tmphost, 255, &_this->m_proxyport)) {
-                MessageBox(NULL, 
+                MessageBox(hwnd, 
                     sz_F8, 
                     sz_F10, MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TOPMOST);
             } else {
@@ -260,7 +260,7 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 						else
 						{
 							_this->m_pDSMPlugin->SetEnabled(false);
-							MessageBox(NULL, 
+							MessageBox(hwnd, 
 							sz_F7, 
 							sz_F6, MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TOPMOST);
 							return TRUE;
@@ -269,7 +269,7 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 					else
 					{
 						_this->m_pDSMPlugin->SetEnabled(false);
-						MessageBox(NULL, 
+						MessageBox(hwnd, 
 							sz_F5, 
 							sz_F6, MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TOPMOST);
 						return TRUE;
@@ -300,7 +300,7 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 						else
 						{
 							_this->m_pDSMPlugin->SetEnabled(false);
-							MessageBox(NULL, 
+							MessageBox(hwnd, 
 							sz_F7, 
 							sz_F6, MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TOPMOST);
 							return TRUE;
@@ -309,7 +309,7 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 					else
 					{
 						_this->m_pDSMPlugin->SetEnabled(false);
-						MessageBox(NULL, 
+						MessageBox(hwnd, 
 							sz_F5, 
 							sz_F6, MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TOPMOST);
 						return TRUE;
@@ -444,7 +444,7 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 				}
 				else
 				{
-					MessageBox(NULL, 
+					MessageBox(hwnd, 
 						sz_F1, 
 						sz_F3, MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TOPMOST);
 				}

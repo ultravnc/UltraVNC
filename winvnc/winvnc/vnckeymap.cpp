@@ -707,7 +707,7 @@ public:
 		else if (vncService::VersionMajor()<6 && vncService::RunningFromExternalService() )
 		{
 			vnclog.Print(LL_INTINFO,
-                 "Not Vista and and runnning as system, use old method\n");
+                 "Not Vista and runnning as system, use old method\n");
 			vncService::SimulateCtrlAltDel();
 		}
 		else if (vncService::VersionMajor()<6)

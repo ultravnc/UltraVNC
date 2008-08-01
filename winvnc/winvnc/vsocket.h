@@ -116,6 +116,8 @@ public:
   // SetTimeout
   //        Sets the socket timeout on reads and writes.
   VBool SetTimeout(VCard32 msecs);
+  VBool SetSendTimeout(VCard32 msecs);
+  VBool SetRecvTimeout(VCard32 msecs);
 
   // I/O routines
 #ifdef HTTP_SAMEPORT

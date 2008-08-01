@@ -229,7 +229,7 @@ char sz_L47[64];
 char sz_L48[64];
 char sz_L49[64];
 char sz_L50[64];
-char sz_L51[64];
+char sz_L51[128];
 char sz_L52[64];
 char sz_L53[64];
 char sz_L54[64];
@@ -255,11 +255,11 @@ char sz_L73[64];
 char sz_L74[64];
 char sz_L75[64];
 char sz_L76[64];
-char sz_L77[64];
+char sz_L77[128];
 char sz_L78[64];
 char sz_L79[64];
 char sz_L80[64];
-char sz_L81[64];
+char sz_L81[128];
 char sz_L82[64];
 char sz_L83[64];
 char sz_L84[64];
@@ -280,6 +280,7 @@ char sz_H96[64];
 char sz_H97[64];
 char sz_H98[64];
 char sz_H99[64];
+char sz_H100[64];
 // File/dir Rename messages
 char sz_M1[64];
 char sz_M2[64];
@@ -512,7 +513,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 	LoadString(m_hInstResDLL, IDS_L48, sz_L48, 64 -1);
 	LoadString(m_hInstResDLL, IDS_L49, sz_L49, 64 -1);
 	LoadString(m_hInstResDLL, IDS_L50, sz_L50, 64 -1);
-	LoadString(m_hInstResDLL, IDS_L51, sz_L51, 64 -1);
+	LoadString(m_hInstResDLL, IDS_L51, sz_L51, 128 -1);
 	LoadString(m_hInstResDLL, IDS_L52, sz_L52, 64 -1);
 	LoadString(m_hInstResDLL, IDS_L53, sz_L53, 64 -1);
 	LoadString(m_hInstResDLL, IDS_L54, sz_L54, 64 -1);
@@ -538,11 +539,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 	LoadString(m_hInstResDLL, IDS_L74, sz_L74, 64 -1);
 	LoadString(m_hInstResDLL, IDS_L75, sz_L75, 64 -1);
 	LoadString(m_hInstResDLL, IDS_L76, sz_L76, 64 -1);
-	LoadString(m_hInstResDLL, IDS_L77, sz_L77, 64 -1);
+	LoadString(m_hInstResDLL, IDS_L77, sz_L77, 128 -1);
 	LoadString(m_hInstResDLL, IDS_L78, sz_L78, 64 -1);
 	LoadString(m_hInstResDLL, IDS_L79, sz_L79, 64 -1);
 	LoadString(m_hInstResDLL, IDS_L80, sz_L80, 64 -1);
-	LoadString(m_hInstResDLL, IDS_L81, sz_L81, 64 -1);
+	LoadString(m_hInstResDLL, IDS_L81, sz_L81, 128 -1);
 	LoadString(m_hInstResDLL, IDS_L82, sz_L82, 64 -1);
 	LoadString(m_hInstResDLL, IDS_L83, sz_L83, 64 -1);
 	LoadString(m_hInstResDLL, IDS_L84, sz_L84, 64 -1);
@@ -572,6 +573,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 	LoadString(m_hInstResDLL, IDS_H97, sz_H97, 64 -1);
 	LoadString(m_hInstResDLL, IDS_H98, sz_H98, 64 -1);
 	LoadString(m_hInstResDLL, IDS_H99, sz_H99, 64 -1);
+    LoadString(m_hInstResDLL, IDS_H100, sz_H100, 64 -1);
 //	RegisterLinkLabel(m_hInstResDLL);
 
 
@@ -610,11 +612,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 						}
 					} 
 			}
-			catch (WarningException &e)
-			{
-				e.Report();
-			}
-			catch (QuietException &e)
+			catch (Exception &e)
 			{
 				e.Report();
 			}

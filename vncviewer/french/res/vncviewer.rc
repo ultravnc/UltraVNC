@@ -1109,6 +1109,7 @@ BEGIN
     IDS_H97                 "Unable to delete the local folder"
     IDS_H98                 "Unable to delete the remote folder"
     IDS_H99                 "Unable to delete the folder"
+    IDS_H100                "Create New Folder"
 END
 
 #endif    // French (France) resources

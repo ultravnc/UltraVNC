@@ -69,6 +69,54 @@
 #include "sys/types.h"
 #include "sys/stat.h"
 
+#include <string>
+#include <sstream>
+#include <iterator>
+#include <shlobj.h>
+#include "vncOSVersion.h"
+
+
+namespace helper {
+    void close_handle(HANDLE& h)
+    {
+        if (h != INVALID_HANDLE_VALUE) 
+        {
+            ::CloseHandle(h);
+            h = INVALID_HANDLE_VALUE;
+        }
+    }
+
+}
+bool isDirectoryTransfer(const char *szFileName);
+
+// take a full path & file name, split it, prepend prefix to filename, then merge it back
+static std::string make_temp_filename(const char *szFullPath)
+{
+    // don't add prefix for directory transfers.
+    if (isDirectoryTransfer(szFullPath))
+        return szFullPath;
+        
+    std::string tmpName(szFullPath);
+    std::string::size_type pos = tmpName.rfind('\\');
+    if (pos != std::string::npos)
+        tmpName.insert(pos + 1, rfbPartialFilePrefix);
+
+    return tmpName;
+}
+
+static std::string get_real_filename(const char *destFileName)
+{
+    std::string name (destFileName);
+    std::string::size_type pos;
+
+    pos = name.find(rfbPartialFilePrefix);
+    if (pos != std::string::npos)
+        name.erase(pos, sz_rfbPartialFilePrefix);
+ 
+    return name;
+}
+
+
 // #include "rfb.h"
 bool DeleteFileOrDirectory(TCHAR *srcpath)
 {
@@ -81,7 +129,7 @@ bool DeleteFileOrDirectory(TCHAR *srcpath)
     memset(&op, 0, sizeof(SHFILEOPSTRUCT));
     op.wFunc = FO_DELETE;
     op.pFrom  = path;
-    op.fFlags = FOF_SILENT | FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_NOCONFIRMMKDIR | FOF_ALLOWUNDO;
+    op.fFlags = FOF_SILENT | FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_NOCONFIRMMKDIR;
     
     int result = SHFileOperation(&op);
     // MSDN says to not look at the error code, just treat 0 as SUCCESS, nonzero is failure.
@@ -89,8 +137,10 @@ bool DeleteFileOrDirectory(TCHAR *srcpath)
 
     return result == 0;
 }
+
 #include "localization.h" // Act : add localization on messages
 typedef BOOL (WINAPI *PGETDISKFREESPACEEX)(LPCSTR,PULARGE_INTEGER, PULARGE_INTEGER, PULARGE_INTEGER);
+
 DWORD GetExplorerLogonPid();
 unsigned long updates_sent;
 
@@ -103,6 +153,8 @@ unsigned long updates_sent;
 #include <mbstring.h>
 #define strchr(a, b) reinterpret_cast<char*>(_mbschr(reinterpret_cast<unsigned char*>(a), b))
 #define strrchr(a, b) reinterpret_cast<char*>(_mbsrchr(reinterpret_cast<unsigned char*>(a), b))
+
+
 // 31 January 2008 jdp
 std::string AddDirPrefixAndSuffix(const char *name)
 {
@@ -119,6 +171,59 @@ bool isDirectory(char *name)
 
     _stat(name, &statbuf);
     return statbuf.st_mode & _S_IFDIR == _S_IFDIR;
+}
+bool isDirectoryTransfer(const char *szFileName)
+{
+    return (strncmp(strrchr(const_cast<char*>(szFileName), '\\') + 1, rfbZipDirectoryPrefix, strlen(rfbZipDirectoryPrefix)) == 0);
+}
+
+void GetZippedFolderPathName(char *szZipFile, char *path)
+{
+    // input lookes like: "c:\temp\!UVNCDIR-folder.zip"
+    // output should look like "c:\temp\folder"
+
+    const char *zip_ext = ".zip";
+    std::string folder_path(szZipFile);
+    std::string::size_type pos;
+
+    // remove "!UVNCDIR-"
+    pos = folder_path.find(rfbZipDirectoryPrefix);
+    if (pos != std::string::npos)
+        folder_path.replace(pos, strlen(rfbZipDirectoryPrefix),"");
+
+    // remove ".zip"
+    pos = folder_path.rfind(zip_ext);
+    if (pos != std::string::npos)
+        folder_path.replace(pos, strlen(zip_ext), "");
+
+    // remove "[ "
+    pos = folder_path.find(rfbDirPrefix);
+    if (pos != std::string::npos)
+        folder_path.replace(pos, strlen(rfbDirPrefix),"");
+
+    // remove " ]"
+    pos = folder_path.rfind(rfbDirSuffix);
+    if (pos != std::string::npos)
+        folder_path.replace(pos, strlen(rfbDirSuffix),"");
+    
+    std::copy(folder_path.begin(), folder_path.end(), path);
+    path[folder_path.size()] = 0; // terminate the string    
+}
+
+void SplitTransferredFileNameAndDate(char *szFileAndDate, char *filetime)
+{
+    char *p = strrchr(szFileAndDate, ',');
+    if (p == NULL)
+    {
+        if (filetime)
+            *filetime = '\0';
+    }
+    else
+    {
+        if (filetime)
+            strcpy(filetime, p+1);
+        *p = '\0';
+    }
 }
 
 class vncClientUpdateThread : public omni_thread
@@ -1270,6 +1375,8 @@ vncClientThread::run(void *arg)
 	// added jeff
 	BOOL need_to_disable_input = m_server->LocalInputsDisabled();
     bool need_to_clear_keyboard = true;
+    bool need_first_keepalive = false;
+
 	while (connected)
 	{
 		rfbClientToServerMsg msg;
@@ -1296,6 +1403,13 @@ vncClientThread::run(void *arg)
             m_client->m_encodemgr.m_buffer->m_desktop->SetDisableInput(m_server->LocalInputsDisabled());
             need_to_disable_input = false;
         }
+
+        if (need_first_keepalive)
+        {
+            // send first keepalive to let the client know we accepted the encoding request
+            m_client->SendKeepAlive();
+            need_first_keepalive = false;
+        }
 		// sf@2002 - v1.1.2
 		int nTO = 1; // Type offset
 		// If DSM Plugin, we must read all the transformed incoming rfb messages (type included)
@@ -1321,6 +1435,31 @@ vncClientThread::run(void *arg)
 		// What to do is determined by the message id
 		switch(msg.type)
 		{
+
+        case rfbKeepAlive:
+            // nothing else to read.
+            // NO-OP
+#if defined(_DEBUG)
+                    {
+                        static time_t lastrecv = 0;
+                        time_t now = time(&now);
+                        int delta = now - lastrecv;
+                        lastrecv = now;
+                        char msg[255];
+                        sprintf(msg, "keepalive received %u seconds since last one\n", delta);
+                        OutputDebugString(msg);
+
+                    }
+#endif
+            if (sz_rfbKeepAliveMsg > 1)
+            {
+			    if (!m_socket->ReadExact(((char *) &msg)+nTO, sz_rfbKeepAliveMsg-nTO))
+			    {
+				    connected = FALSE;
+				    break;
+			    }
+            }
+            break;
 
 		case rfbSetPixelFormat:
 			// Read the rest of the message:
@@ -1494,6 +1633,14 @@ vncClientThread::run(void *arg)
 						m_client->m_wants_ServerStateUpdates = true;
                         m_server->EnableServerStateUpdates(true);
 						vnclog.Print(LL_INTINFO, VNCLOG("ServerState protocol extension enabled\n"));
+                        continue;
+					}
+					// 21 March 2008 jdp  - client wants keepalive messages
+					if (Swap32IfLE(encoding) == rfbEncodingEnableKeepAlive) {
+						m_client->m_wants_KeepAlive = true;
+                        m_server->EnableKeepAlives(true);
+                        need_first_keepalive = true;
+						vnclog.Print(LL_INTINFO, VNCLOG("KeepAlive protocol extension enabled\n"));
                         continue;
 					}
 
@@ -1983,6 +2130,10 @@ vncClientThread::run(void *arg)
 							*p = '\0';
 						}
 
+
+                        // make a temp file name
+                        strcpy(m_client->m_szFullDestName, make_temp_filename(m_client->m_szFullDestName).c_str());
+                        
 						// sf@2004 - Directory Delta Transfer
 						// If the offered file is a zipped directory, we test if it already exists here
 						// and create the zip accordingly. This way we can generate the checksums for it.
@@ -2087,7 +2238,7 @@ vncClientThread::run(void *arg)
 
 						if (dwDstSize == 0xFFFFFFFF)
 						{
-							CloseHandle(m_client->m_hDestFile);
+                            helper::close_handle(m_client->m_hDestFile);
 							if (m_client->m_pCompBuff != NULL)
 								delete m_client->m_pCompBuff;
 							if (m_client->m_pBuff != NULL)
@@ -2141,7 +2292,7 @@ vncClientThread::run(void *arg)
 							rfbFileTransferMsg ft;
 							ft.type = rfbFileTransfer;
 							ft.contentType = rfbFileHeader;
-							ft.size = Swap32IfLE(0xffffffff); // File Size in bytes, 0xFFFFFFFF (-1) means error
+							ft.size = Swap32IfLE(0xffffffffu); // File Size in bytes, 0xFFFFFFFF (-1) means error
 							ft.length = Swap32IfLE(strlen(m_client->m_szSrcFileName));
 							m_socket->SendExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
 							m_socket->SendExact((char *)m_client->m_szSrcFileName, strlen(m_client->m_szSrcFileName));
@@ -2156,6 +2307,7 @@ vncClientThread::run(void *arg)
 
 							break;
 						}
+
 
 						// Open source file
 						m_client->m_hSrcFile = CreateFile(
@@ -2185,7 +2337,7 @@ vncClientThread::run(void *arg)
 							// if (dwSrcSize == 0xFFFFFFFF)
 							if (!bSize)
 							{
-								CloseHandle(m_client->m_hSrcFile);
+								helper::close_handle(m_client->m_hSrcFile);
 								n2SrcSize.LowPart = 0xFFFFFFFF;
                                 n2SrcSize.HighPart = 0xFFFFFFFF;
 							}
@@ -2256,7 +2408,8 @@ vncClientThread::run(void *arg)
 					// sf@2004 - Delta Transfer
 					// Destination file already exists - the viewer sends the checksums
 					case rfbFileChecksums:
-						m_client->ReceiveDestinationFileChecksums(Swap32IfLE(msg.ft.size), Swap32IfLE(msg.ft.length));
+                        m_socket->SetSendTimeout(m_server->GetFTTimeout());
+						connected = m_client->ReceiveDestinationFileChecksums(Swap32IfLE(msg.ft.size), Swap32IfLE(msg.ft.length));
 						break;
 
 					// Destination file (viewer side) is ready for reception (size > 0) or not (size = -1)
@@ -2265,7 +2418,7 @@ vncClientThread::run(void *arg)
 						// Check if the file has been created on client side
 						if (Swap32IfLE(msg.ft.size) == -1)
 						{
-							CloseHandle(m_client->m_hSrcFile);
+							helper::close_handle(m_client->m_hSrcFile);
 							// MessageBox(NULL, "7. Abort !", "Ultra WinVNC", MB_OK);
 							//vnclog.Print(LL_INTINFO, VNCLOG("*** FileTransfer: File not created on client side. Abort !\n"));
 							break;
@@ -2275,7 +2428,7 @@ vncClientThread::run(void *arg)
 						m_client->m_pBuff = new char [sz_rfbBlockSize];
 						if (m_client->m_pBuff == NULL)
 						{
-							CloseHandle(m_client->m_hSrcFile);
+							helper::close_handle(m_client->m_hSrcFile);
 							//MessageBox(NULL, "8. Abort !", "Ultra WinVNC", MB_OK);
 							//vnclog.Print(LL_INTINFO, VNCLOG("*** FileTransfer: rfbFileHeader - Unable to allocate buffer. Abort !\n"));
 							break;
@@ -2286,7 +2439,7 @@ vncClientThread::run(void *arg)
 						m_client->m_pCompBuff = new char [sz_rfbBlockSize + 1024]; // TODO: Improve this
 						if (m_client->m_pCompBuff == NULL)
 						{
-							CloseHandle(m_client->m_hSrcFile);
+							helper::close_handle(m_client->m_hSrcFile);
 							if (m_client->m_pBuff != NULL)
 								delete m_client->m_pBuff;
 							//MessageBox(NULL, "9. Abort !", "Ultra WinVNC", MB_OK);
@@ -2302,14 +2455,15 @@ vncClientThread::run(void *arg)
 						m_client->m_fFileUploadRunning = true;
                         m_client->m_fUserAbortedFileTransfer = false;
 
-						m_client->SendFileChunk();
+						connected = m_client->SendFileChunk();
 						}
 						break;
 
 
 					case rfbFilePacket:
 						if (!m_server->FileTransferEnabled() || !fUserOk) break;
-						m_client->ReceiveFileChunk(Swap32IfLE(msg.ft.length), Swap32IfLE(msg.ft.size));
+						connected = m_client->ReceiveFileChunk(Swap32IfLE(msg.ft.length), Swap32IfLE(msg.ft.size));
+                        m_client->SendKeepAlive();
 						break;
 
 
@@ -2615,6 +2769,8 @@ vncClientThread::run(void *arg)
                                     // 13 February 2008 jdp
                                     bool isDir = isDirectory(szFile);
                                     std::string newname(szFile);
+                                    // put the '[]' around the name if it's a folder, so that the client can display
+                                    // the proper messages. Otherwise, the client assumes it's a file.
                                     if (isDir)
                                         newname = AddDirPrefixAndSuffix(szFile);
 
@@ -2686,6 +2842,15 @@ vncClientThread::run(void *arg)
 				{
 					m_client->m_fFileDownloadError = true;
 					FlushFileBuffers(m_client->m_hDestFile);
+                    helper::close_handle(m_client->m_hDestFile);
+                    m_client->m_fFileDownloadRunning = false;
+				}
+                if (m_client->m_fFileUploadRunning)
+                {
+					m_client->m_fFileUploadError = true;
+                    FlushFileBuffers(m_client->m_hSrcFile);
+                    helper::close_handle(m_client->m_hSrcFile);
+                    m_client->m_fFileUploadRunning = false;
 				}
 				//vnclog.Print(LL_INTINFO, VNCLOG("*** FileTransfer: message content reading error\n"));
 			}
@@ -2759,6 +2924,22 @@ vncClientThread::run(void *arg)
 		}
 
 	}
+
+    if (m_client->m_fFileDownloadRunning)
+    {
+        m_client->m_fFileDownloadError = true;
+        FlushFileBuffers(m_client->m_hDestFile);
+        m_client->m_fFileDownloadRunning = false;
+    }
+        
+    if (m_client->m_fFileUploadRunning)
+    {
+        m_client->m_fFileUploadError = true;
+        FlushFileBuffers(m_client->m_hSrcFile);
+        m_client->m_fFileUploadRunning = false;
+    }
+
+  
 
 	// Move into the thread's original desktop
 	// TAG 14
@@ -2875,7 +3056,7 @@ vncClient::vncClient()
 	m_fFileDownloadError = false;
     m_fUserAbortedFileTransfer  = false;
 	m_fFileDownloadRunning = false;
-	m_hSrcFile = 0;
+	m_hSrcFile = INVALID_HANDLE_VALUE;
 	//m_szSrcFileName = NULL;
 	m_fEof = false;
 	m_dwNbBytesRead = 0;
@@ -2932,6 +3113,7 @@ vncClient::vncClient()
 #endif
     m_wants_ServerStateUpdates =  false;
     m_bClientHasBlockedInput = false;
+    m_wants_KeepAlive = false;
 }
 
 vncClient::~vncClient()
@@ -3845,28 +4027,29 @@ bool vncClient::ReceiveDestinationFileChecksums(int nSize, int nLen)
 
 	memset(m_lpCSBuffer, '\0', nLen+1);
 
-	m_socket->ReadExact((char *)m_lpCSBuffer, nLen);
+	VBool res = m_socket->ReadExact((char *)m_lpCSBuffer, nLen);
 	m_nCSBufferSize = nLen;
 
-	return true;
+	return res == VTrue;
 }
 
 //
 //
 //
-void vncClient::ReceiveFileChunk(int nLen, int nSize)
+bool vncClient::ReceiveFileChunk(int nLen, int nSize)
 {
+    bool connected = true;
 	
 	if (!m_fFileDownloadRunning)
-		return;
+		return  connected;
 
 	if (m_fFileDownloadError)
 	{
 		FinishFileReception();
-		return;
+		return connected;
 	}
 
-	if (nLen > sz_rfbBlockSize) return;
+	if (nLen > sz_rfbBlockSize) return connected;
 
 	bool fCompressed = true;
 	BOOL fRes = true;
@@ -3881,7 +4064,8 @@ void vncClient::ReceiveFileChunk(int nLen, int nSize)
 	}
 	else
 	{
-		if (m_socket->ReadExact((char *)m_pBuff, nLen))
+        connected = m_socket->ReadExact((char *)m_pBuff, nLen) == VTrue;
+		if (connected)
 		{
 			if (nSize == 0) fCompressed = false;
 			unsigned int nRawBytes = sz_rfbBlockSize;
@@ -3898,7 +4082,7 @@ void vncClient::ReceiveFileChunk(int nLen, int nSize)
 				{
 					m_fFileDownloadError = true;
 					FinishFileReception();
-					return;
+					return connected;
 				}
 			}
 
@@ -3921,13 +4105,13 @@ void vncClient::ReceiveFileChunk(int nLen, int nSize)
 		// TODO : send an explicit error msg to the client...
 		m_fFileDownloadError = true;
 		FinishFileReception();
-		return;	
+		return connected;
 	}
 
 	m_dwTotalNbBytesWritten += (fAlreadyHere ? nLen : m_dwNbBytesWritten);
 	m_dwNbReceivedPackets++;
 
-	return;
+	return connected;
 }
 
 
@@ -3937,6 +4121,8 @@ void vncClient::FinishFileReception()
 		return;
 
 	m_fFileDownloadRunning = false;
+	m_socket->SetRecvTimeout(m_server->AutoIdleDisconnectTimeout()*1000);
+    SendKeepAlive(true);
 
 	// sf@2004 - Delta transfer
 	SetEndOfFile(m_hDestFile);
@@ -3962,7 +4148,7 @@ void vncClient::FinishFileReception()
 	}
 
 	// CleanUp
-	CloseHandle(m_hDestFile);
+	helper::close_handle(m_hDestFile);
 
 	// sf@2004 - Delta Transfer : we can keep the existing file data :)
 	// if (m_fFileDownloadError) DeleteFile(m_szFullDestName);
@@ -3972,7 +4158,7 @@ void vncClient::FinishFileReception()
 	// received file
 	// Todo: make a better free space check above in this particular case. The free space must be at least
 	// 3 times the size of the directory zip file (this zip file is ~50% of the real directory size) 
-	UnzipPossibleDirectory(m_szFullDestName);
+	bool bWasDir = UnzipPossibleDirectory(m_szFullDestName);
 	/*
 	if (!m_fFileDownloadError && !strncmp(strrchr(m_szFullDestName, '\\') + 1, rfbZipDirectoryPrefix, strlen(rfbZipDirectoryPrefix)))
 	{
@@ -3996,7 +4182,35 @@ void vncClient::FinishFileReception()
 	*/
 
     if (m_fFileDownloadError && m_fUserAbortedFileTransfer)
+    {
+        SplitTransferredFileNameAndDate(m_szFullDestName, 0);
         ::DeleteFile(m_szFullDestName);
+    }
+    else
+    {
+        std::string realName = get_real_filename(m_szFullDestName);
+        if (!m_fFileDownloadError && !bWasDir)
+        {
+            if (OSversion() == 3)
+            {
+                if (::CopyFile(m_szFullDestName, realName.c_str(), false))
+                    ::DeleteFile(m_szFullDestName);
+                else
+                {
+                    // TODO: what do we do here? the client thinks the transfer succeeded
+                    m_fFileDownloadError = true;
+                }
+            }
+            else 
+            {
+                if (!::MoveFileEx(m_szFullDestName, realName.c_str(), MOVEFILE_REPLACE_EXISTING))
+                {
+                    // TODO: what do we do here? the client thinks the transfer succeeded
+                    m_fFileDownloadError = true;
+                }
+            }            
+        }
+    }
 	//delete [] m_szFullDestName;
 
 	if (m_pCompBuff != NULL)
@@ -4004,21 +4218,22 @@ void vncClient::FinishFileReception()
 	if (m_pBuff != NULL)
 		delete [] m_pBuff;
 
-	return;
 
+	return;
 }
 
 
 
-void vncClient::SendFileChunk()
+bool vncClient::SendFileChunk()
 {
+    bool connected = true;
 	omni_mutex_lock l(GetUpdateLock());
 
-	if (!m_fFileUploadRunning) return;
+	if (!m_fFileUploadRunning) return connected;
 	if ( m_fEof || m_fFileUploadError)
 	{
 		FinishFileSending();
-		return;
+		return connected;
 	}
 
 	int nRes = ReadFile(m_hSrcFile, m_pBuff, sz_rfbBlockSize, &m_dwNbBytesRead, NULL);
@@ -4083,7 +4298,7 @@ void vncClient::SendFileChunk()
 					// Todo: send data uncompressed instead
 					m_fFileUploadError = true;
 					FinishFileSending();
-					return;
+					return connected;
 				}
 				fCompressed = true;
 			}
@@ -4099,19 +4314,25 @@ void vncClient::SendFileChunk()
 			ft.contentType = rfbFilePacket;
 			ft.size = fCompressed ? Swap32IfLE(1) : Swap32IfLE(0); 
 			ft.length = fCompressed ? Swap32IfLE(nMaxCompSize) : Swap32IfLE(m_dwNbBytesRead);
-			m_socket->SendExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
+            connected = m_socket->SendExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer) == VTrue;
+            if (connected) {
 			if (fCompressed)
 				m_socket->SendExact((char *)m_pCompBuff , nMaxCompSize);
 			else
 				m_socket->SendExact((char *)m_pBuff , m_dwNbBytesRead);
 			}
+            }
 		
 		m_dwTotalNbBytesRead += m_dwNbBytesRead;
 		// TODO : test on nb of bytes written
 	}
 					
+    if (connected)
+    {
 	// Order next asynchronous packet sending
  	PostToWinVNC( FileTransferSendPacketMessage, (WPARAM)this, (LPARAM)0);
+    }
+    return connected;
 }
 
 
@@ -4121,6 +4342,9 @@ void vncClient::FinishFileSending()
 
 	if (!m_fFileUploadRunning)
 		return;
+
+    // restore original timeout
+	m_socket->SetSendTimeout(m_server->AutoIdleDisconnectTimeout()*1000);
 
 	m_fFileUploadRunning = false;
 
@@ -4141,7 +4365,7 @@ void vncClient::FinishFileSending()
 		m_socket->SendExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
 	}
 	
-	CloseHandle(m_hSrcFile);
+	helper::close_handle(m_hSrcFile);
 	if (m_pBuff != NULL)
 		delete [] m_pBuff;
 	if (m_pCompBuff != NULL)
@@ -4214,6 +4438,7 @@ int vncClient::ZipPossibleDirectory(LPSTR szSrcFileName)
 		strcpy(szDirectoryName, p1 + 2); // Skip dir prefix (2 chars)
 		szDirectoryName[strlen(szDirectoryName) - 2] = '\0'; // Remove dir suffix (2 chars)
 		*p1 = '\0';
+        m_OrigSourceDirectoryName = std::string(szPath) + szDirectoryName;
 		if ((strlen(szPath) + strlen(rfbZipDirectoryPrefix) + strlen(szDirectoryName) + 4) > (MAX_PATH - 1)) return false;
 		sprintf(szDirZipPath, "%s%s%s%s", szWorkingDir, rfbZipDirectoryPrefix, szDirectoryName, ".zip"); 
 		strcat(szPath, szDirectoryName);
@@ -4270,7 +4495,7 @@ int vncClient::CheckAndZipDirectoryForChecksuming(LPSTR szSrcFileName)
 // Unzip possible directory
 // Todo: handle unzip error correctly...
 //
-int vncClient::UnzipPossibleDirectory(LPSTR szFileName)
+bool vncClient::UnzipPossibleDirectory(LPSTR szFileName)
 {
 //	vnclog.Print(0, _T("UnzipPossibleDirectory\n"));
 	if (!m_fFileDownloadError 
@@ -4289,12 +4514,12 @@ int vncClient::UnzipPossibleDirectory(LPSTR szFileName)
 		*p3 = '\0';
 		if (p != NULL) *p = '\0';
 		strcat(szPath, szDirName);
-
 		// Create the Directory
 		bool fUnzip = m_pZipUnZip->UnZipDirectory(szPath, szFileName);
 		DeleteFile(szFileName);
+        return true;
 	}						
-	return 0;
+	return false;
 }
 
 
@@ -4456,5 +4681,24 @@ void vncClient::SendServerStateUpdate(CARD32 state, CARD32 value)
 		rsmsg.value = Swap32IfLE(value);
 
 		m_socket->SendExact((char*)&rsmsg, sz_rfbServerStateMsg, rfbServerState);
+    }
+}
+void vncClient::SendKeepAlive(bool bForce)
+{
+    if (m_wants_KeepAlive && m_socket)
+    {
+        static time_t lastSent = 0;
+        time_t now = time(&now);
+        int delta = now - lastSent;
+        if (!bForce && delta < KEEPALIVE_INTERVAL)
+            return;
+
+        lastSent = now;
+
+        rfbKeepAliveMsg kp;
+        memset(&kp, 0, sizeof kp);
+        kp.type = rfbKeepAlive;
+
+		m_socket->SendExact((char*)&kp, sz_rfbKeepAliveMsg, rfbKeepAlive);
     }
 }

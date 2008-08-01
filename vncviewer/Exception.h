@@ -29,7 +29,7 @@
 class Exception  
 {
 public:
-	Exception(const char *info = NULL, int error_nr = 0);
+	Exception(const char *info, int error_nr = 0);
 	virtual void Report() = 0;
 	virtual ~Exception();
 	char *m_info;
@@ -41,7 +41,7 @@ public:
 // Report() will display a TRACE message
 class QuietException : public Exception {
 public:
-	QuietException(const char *info = NULL, int error_nr = 0);
+	QuietException(const char *info, int error_nr = 0);
 	virtual void Report();
 	virtual ~QuietException();
 };
@@ -53,7 +53,7 @@ public:
 // Report() will display a message box
 class WarningException : public Exception {
 public:
-	WarningException(const char *info = NULL, int error_nr = 0, bool close = true);
+	WarningException(const char *info, int error_nr = 0, bool close = true);
 	virtual void Report();
 	virtual ~WarningException();
 	bool m_close;
@@ -64,7 +64,7 @@ public:
 // closed.
 class ErrorException : public Exception {
 public:
-	ErrorException(const char *info = NULL, int error_nr = 0);
+	ErrorException(const char *info, int error_nr = 0);
 	virtual void Report();
 	virtual ~ErrorException();
 };

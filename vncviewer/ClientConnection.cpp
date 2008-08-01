@@ -165,7 +165,7 @@ extern char sz_L47[64];
 extern char sz_L48[64];
 extern char sz_L49[64];
 extern char sz_L50[64];
-extern char sz_L51[64];
+extern char sz_L51[128];
 extern char sz_L52[64];
 extern char sz_L53[64];
 extern char sz_L54[64];
@@ -191,11 +191,11 @@ extern char sz_L73[64];
 extern char sz_L74[64];
 extern char sz_L75[64];
 extern char sz_L76[64];
-extern char sz_L77[64];
+extern char sz_L77[128];
 extern char sz_L78[64];
 extern char sz_L79[64];
 extern char sz_L80[64];
-extern char sz_L81[64];
+extern char sz_L81[128];
 extern char sz_L82[64];
 extern char sz_L83[64];
 extern char sz_L84[64];
@@ -453,12 +453,35 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	ThreadSocketTimeout=NULL;
 	m_statusThread=NULL;
 	m_hSavedAreaBitmap=NULL;
+    m_bClosedByUser = false;
+    m_server_wants_keepalives = false;
 	hbmToolbig = (HBITMAP)LoadImage(m_pApp->m_instance, "tlbarbig.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_LOADMAP3DCOLORS);
 	hbmToolsmall = (HBITMAP)LoadImage(m_pApp->m_instance, "tlbarsmall.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_LOADMAP3DCOLORS);
 	hbmToolbigX = (HBITMAP)LoadImage(m_pApp->m_instance, "tlbarbigx.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_LOADMAP3DCOLORS);
 	hbmToolsmallX = (HBITMAP)LoadImage(m_pApp->m_instance, "tlbarsmallx.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_LOADMAP3DCOLORS);
-
 }
+
+// helper functions for setting socket timeouts during file transfer
+bool ClientConnection::SetSendTimeout(int msecs)
+{
+    int timeout= msecs < 0 ? m_opts.m_FTTimeout : msecs;
+	if (setsockopt(m_sock, SOL_SOCKET, SO_SNDTIMEO, (char*)&timeout, sizeof(timeout)) == SOCKET_ERROR)
+	{
+		return false;
+	}
+	return true;
+}
+
+bool ClientConnection::SetRecvTimeout(int msecs)
+{
+    int timeout= msecs < 0 ? m_opts.m_FTTimeout : msecs;
+	if (setsockopt(m_sock, SOL_SOCKET, SO_RCVTIMEO, (char*)&timeout, sizeof(timeout)) == SOCKET_ERROR)
+	{
+		return false;
+	}
+	return true;
+}
+
 
 // 
 // Run() creates the connection if necessary, does the initial negotiations
@@ -1346,7 +1369,7 @@ void ClientConnection::LoadDSMPlugin(bool fForceReload)
 				else
 				{
 					m_pDSMPlugin->SetEnabled(false);
-					MessageBox(NULL, 
+					MessageBox(m_hwndMain,
 						sz_F1, 
 						sz_F6, MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TOPMOST);
 					return;
@@ -1355,7 +1378,7 @@ void ClientConnection::LoadDSMPlugin(bool fForceReload)
 			else
 			{
 				m_pDSMPlugin->SetEnabled(false);
-				MessageBox(NULL, 
+				MessageBox(m_hwndMain,
 					sz_F5, 
 					sz_F6, MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TOPMOST);
 				return;
@@ -1830,7 +1853,7 @@ void ClientConnection::NegotiateProtocolVersion()
 		ReadExact(mytext,size);
 		mytext[size]=0;
 
-		int returnvalue=MessageBox(NULL,   mytext,"Accept Incoming SC connection", MB_YESNO |  MB_TOPMOST);
+		int returnvalue=MessageBox(m_hwndMain,   mytext,"Accept Incoming SC connection", MB_YESNO |  MB_TOPMOST);
 		if (returnvalue==IDNO) 
 		{
 			int nummer=0;
@@ -1978,7 +2001,7 @@ void ClientConnection::Authenticate()
                 /* if server is 3.2 we can't use the new authentication */
                 vnclog.Print(0, _T("Can't use IDEA authentication\n"));
 
-                MessageBox(NULL, 
+                MessageBox(m_hwndMain,
                     sz_L51, 
                     sz_L52, 
                     MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST);
@@ -2801,6 +2824,7 @@ void ClientConnection::SetFormatAndEncodings()
     // len = sz_rfbSetEncodingsMsg + se->nEncodings * 4;
 	
     encs[se->nEncodings++] = Swap32IfLE(rfbEncodingServerState);
+    encs[se->nEncodings++] = Swap32IfLE(rfbEncodingEnableKeepAlive);
     // sf@2002 - DSM Plugin
 	int nEncodings = se->nEncodings;
 	se->nEncodings = Swap16IfLE(se->nEncodings);
@@ -3596,7 +3620,7 @@ void ClientConnection::ShowConnInfo()
 		kbdname,
 		m_pDSMPlugin->IsEnabled() ? m_pDSMPlugin->GetPluginName() : "",
 		m_pDSMPlugin->IsEnabled() ? m_pDSMPlugin->GetPluginVersion() : "");
-	MessageBox(NULL, buf, _T("VNC connection info"), MB_ICONINFORMATION | MB_OK | MB_SETFOREGROUND | MB_TOPMOST);
+	MessageBox(m_hwndMain, buf, _T("VNC connection info"), MB_ICONINFORMATION | MB_OK | MB_SETFOREGROUND | MB_TOPMOST);
 }
 
 // ********************************************************************
@@ -3657,6 +3681,25 @@ void* ClientConnection::run_undetached(void* arg) {
 					
 				switch (msgType)
 				{
+                case rfbKeepAlive:
+                    m_server_wants_keepalives = true;
+#if defined(_DEBUG)
+                    {
+                        static time_t lastrecv = 0;
+                        time_t now = time(&now);
+                        int delta = now - lastrecv;
+                        lastrecv = now;
+                        char msg[255];
+                        sprintf(msg, "keepalive received %u seconds since last one\n", delta);
+                        OutputDebugString(msg);
+                    }
+#endif
+                    if (sz_rfbKeepAliveMsg > 1)
+                    {
+                  	rfbKeepAliveMsg kp;
+                	ReadExact(((char *) &kp)+m_nTO, sz_rfbKeepAliveMsg-m_nTO);
+                    }
+                    break;
 				case rfbFramebufferUpdate:
 					ReadScreenUpdate();
 					break;
@@ -3737,15 +3780,7 @@ void* ClientConnection::run_undetached(void* arg) {
 			}
         
 		}
-		catch (WarningException)
-		{
-			// sf@2002
-			// m_pFileTransfer->m_fFileTransferRunning = false;
-			// m_pTextChat->m_fTextChatRunning = false;
-			m_bKillThread = true;
-			PostMessage(m_hwndMain, WM_CLOSE, reconnectcounter, 1);
-		}
-		catch (QuietException &e)
+		catch (Exception &)
 		{
 			// sf@2002
 			// m_pFileTransfer->m_fFileTransferRunning = false;
@@ -3759,6 +3794,11 @@ void* ClientConnection::run_undetached(void* arg) {
 			// m_pFileTransfer->m_fFileTransferRunning = false;
 			// m_pTextChat->m_fTextChatRunning = false;
 			// throw QuietException(e.str());
+            if (!(/*m_pFileTransfer->m_fFileTransferRunning || m_pTextChat->m_fTextChatRunning ||*/ m_bClosedByUser))
+            {
+                WarningException w(sz_L69);
+                w.Report();
+            }
 			m_bKillThread = true;
 			PostMessage(m_hwndMain, WM_CLOSE, reconnectcounter, 1);
 		}
@@ -4507,7 +4547,7 @@ void ClientConnection::ReadExact(char *inbuf, int wanted)
 	{
 		vnclog.Print(0, "rdr::Exception (2): %s\n",e.str());
 		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L67);
-		throw QuietException(e.str());
+		throw ErrorException(sz_L69);
 	}
 
 	// Too slow !
@@ -5553,7 +5593,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						return 0;
 						
 					case ID_CLOSEDAEMON:
-						if (MessageBox(NULL, sz_L75, 
+						if (MessageBox(hwnd, sz_L75,
 							sz_L76, 
 							MB_YESNO | MB_ICONQUESTION | MB_DEFBUTTON2) == IDYES)
 							PostQuitMessage(0);
@@ -5564,7 +5604,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						// Check if the Server knows FileTransfer
 						if (!_this->m_fServerKnowsFileTransfer)
 						{
-							MessageBox(NULL, sz_L77, 
+							MessageBox(hwnd, sz_L77,
 								sz_L78, 
 								MB_OK | MB_ICONINFORMATION | MB_SETFOREGROUND | MB_TOPMOST);
 							return 0;
@@ -5584,7 +5624,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						if (_this->m_pTextChat->m_fTextChatRunning)
 						{
 							_this->m_pTextChat->ShowChatWindow(true);
-							MessageBox(	NULL,
+							MessageBox(	hwnd,
 										sz_L86, 
 										sz_L88, 
 										MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST);
@@ -5608,7 +5648,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						// Check if the Server knows FileTransfer
 						if (!_this->m_fServerKnowsFileTransfer)
 						{
-							MessageBox(NULL, sz_L81, 
+							MessageBox(hwnd, sz_L81,
 								sz_L82, 
 								MB_OK | MB_ICONINFORMATION | MB_SETFOREGROUND | MB_TOPMOST);
 							return 0;
@@ -5627,7 +5667,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						if (_this->m_pFileTransfer->m_fFileTransferRunning)
 						{
 							_this->m_pFileTransfer->ShowFileTransferWindow(true);
-							MessageBox(NULL,
+							MessageBox(hwnd,
 										sz_L85, 
 										sz_L88, 
 										MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST);
@@ -5818,23 +5858,29 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
                         // April 8 2008 jdp
 						static bool boxopen=false;
 						if (boxopen) return 0;
-                        if (lParam == 0)
+                        if (lParam == 0 && !_this->m_bKillThread)
 						{
 							if (_this->m_opts.m_fExitCheck) //PGM @ Advantig
 							{ //PGM @ Advantig
 								boxopen=true;
-								if(MessageBox(NULL, sz_L75,sz_L76,MB_YESNO | MB_ICONQUESTION | MB_SETFOREGROUND | MB_TOPMOST) == IDNO)
+							    if (MessageBox(hwnd, sz_L75,sz_L76,MB_YESNO | MB_ICONQUESTION | MB_SETFOREGROUND | MB_TOPMOST) == IDNO)
 									{
 										boxopen=false;
 										return 0;
 									}
 							} // PGM @ Advantig.com
 							boxopen=false;
+                            _this->m_bClosedByUser = true;
 						}
 						if (_this->m_pFileTransfer->m_fFileTransferRunning)
 						{
+                            if (_this->m_bKillThread)
+                            {
+                                ::SendMessage(_this->m_pFileTransfer->hWnd, WM_COMMAND, IDCANCEL, 0);
+    							return 0;
+                            }
 							_this->m_pFileTransfer->ShowFileTransferWindow(true);
-							MessageBox(NULL, sz_L85, 
+							MessageBox(hwnd, sz_L85,
 								sz_L88, 
 								MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST);
 							return 0;
@@ -5843,8 +5889,14 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						// sf@2002 - Do not close vncviewer if the Text Chat GUI is open !
 						if (_this->m_pTextChat->m_fTextChatRunning)
 						{
+                            if (_this->m_bKillThread)
+                            {
+                                _this->m_pTextChat->KillDialog();
+    							return 0;
+                            }
+
 							_this->m_pTextChat->ShowChatWindow(true);
-							MessageBox(NULL, sz_L86, 
+							MessageBox(hwnd, sz_L86,
 								sz_L88, 
 								MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST);
 							return 0;
@@ -5852,7 +5904,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						
 						if (_this->m_fOptionsOpen)
 						{
-							MessageBox(NULL, sz_L87, 
+                            MessageBox(hwnd, sz_L87,
 								sz_L88, 
 								MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST);
 							return 0;
@@ -6541,19 +6593,23 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 					if (boxopen) return 0;
                     if (lParam == 0)
 					{
-						boxopen=true;
-						if(MessageBox(NULL, sz_L75,sz_L76,MB_YESNO | MB_ICONQUESTION | MB_SETFOREGROUND | MB_TOPMOST) == IDNO)
+						if (_this->m_opts.m_fExitCheck) //PGM @ Advantig
+						{ //PGM @ Advantig
+						    boxopen=true;
+						    if (MessageBox(hwnd, sz_L75,sz_L76,MB_YESNO | MB_ICONQUESTION | MB_SETFOREGROUND | MB_TOPMOST) == IDNO)
 							{
 								boxopen=false;
 								return 0;
 							}
-						boxopen=false;
+						} // PGM @ Advantig.com
+    					boxopen=false;
+                        _this->m_bClosedByUser = true;
 					}
 					// sf@2002 - Do not close vncviewer if the File Transfer GUI is open !
 					if (_this->m_pFileTransfer->m_fFileTransferRunning)
 					{
 						_this->m_pFileTransfer->ShowFileTransferWindow(true);
-						MessageBox(NULL, sz_L85, 
+						MessageBox(hwnd, sz_L85,
 							sz_L88, 
 							MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST);
 						return 0;
@@ -6563,7 +6619,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 					if (_this->m_pTextChat->m_fTextChatRunning)
 					{
 						_this->m_pTextChat->ShowChatWindow(true);
-						MessageBox(NULL, sz_L86, 
+						MessageBox(hwnd, sz_L86,
 							sz_L88, 
 							MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST);
 						return 0;
@@ -6571,7 +6627,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 
 					if (_this->m_fOptionsOpen)
 					{
-						MessageBox(NULL, sz_L87, 
+						MessageBox(hwnd, sz_L87,
 							sz_L88, 
 							MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST);
 						return 0;
@@ -6793,4 +6849,28 @@ ClientConnection:: Check_Rectangle_borders(int x,int y,int w,int h)
 	return true;
 }
 
+void ClientConnection::SendKeepAlive(bool bForce)
+{
+    if (m_server_wants_keepalives) 
+    {
+        static time_t lastSent = 0;
+        time_t now = time(&now);
+        int delta = now - lastSent;
+
+        if (!bForce && delta < KEEPALIVE_INTERVAL)
+            return;
+
+        lastSent = now;
+#if defined(_DEBUG)
+        char msg[255];
+        sprintf(msg, "keepalive requested %u seconds since last one\n", delta);
+        OutputDebugString(msg);
+
+#endif
+        rfbKeepAliveMsg kp;
+        memset(&kp, 0, sizeof kp);
+        kp.type = rfbKeepAlive;
+        WriteExact((char*)&kp, sz_rfbKeepAliveMsg, rfbKeepAlive);
+    }
+}
 #pragma warning(default :4101)

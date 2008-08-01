@@ -143,6 +143,7 @@ public:
 	bool m_NoMoreCommandLineUserPassword;
 
 	bool m_fExitCheck; //PGM @ Advantig
+    int m_FTTimeout;
 
 #ifdef UNDER_CE
 	// WinCE screen format for dialogs (Palm vs HPC)
@@ -154,6 +155,7 @@ public:
 	int DoDialog(bool running = false);
 	void SetFromCommandLine(LPTSTR szCmdLine);
 
+    void CancelDialog();
 
 	static BOOL CALLBACK OptDlgProc(  HWND hwndDlg,  UINT uMsg, 
 		WPARAM wParam, LPARAM lParam );
@@ -167,7 +169,7 @@ private:
 
 	// Just for temporary use
 	bool m_running;
-
+    HWND hwnd;
 };
 
 #endif VNCOPTIONS_H__

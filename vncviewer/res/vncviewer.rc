@@ -8,6 +8,7 @@
 // Generated from the TEXTINCLUDE 2 resource.
 //
 #include "afxres.h"
+#include "VersionInfo.h"
 
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
@@ -63,6 +64,7 @@ END
 2 TEXTINCLUDE 
 BEGIN
     "#include ""afxres.h""\r\n"
+    "#include ""VersionInfo.h""\r\n"
     "\0"
 END
 
@@ -1014,6 +1016,7 @@ BEGIN
     IDS_H97                 "Unable to delete the local folder"
     IDS_H98                 "Unable to delete the remote folder"
     IDS_H99                 "Unable to delete the folder"
+    IDS_H100                "Create New Folder"
     IDS_L93                 "View Only... \tAlt+Ctrl+F3"
 END
 

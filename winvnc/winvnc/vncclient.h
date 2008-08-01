@@ -40,8 +40,11 @@ typedef SHORT vncClientId;
 
 #if (!defined(_WINVNC_VNCCLIENT))
 #define _WINVNC_VNCCLIENT
+#pragma warning(disable : 4786)
 
 #include <list>
+#include <string>
+#include <vector>
 
 typedef std::list<vncClientId> vncClientList;
 
@@ -164,19 +167,20 @@ public:
 	// sf@2004 - Asynchronous FileTransfer - Delta Transfer
 	int  GenerateFileChecksums(HANDLE hFile, char* lpCSBuffer, int nCSBufferSize);
 	bool ReceiveDestinationFileChecksums(int nSize, int nLen);
-	void ReceiveFileChunk(int nLen, int nSize);
+	bool ReceiveFileChunk(int nLen, int nSize);
 	void FinishFileReception();
-	void SendFileChunk();
+	bool SendFileChunk();
 	void FinishFileSending();
 	bool GetSpecialFolderPath(int nId, char* szPath);
 	int  ZipPossibleDirectory(LPSTR szSrcFileName);
 	int  CheckAndZipDirectoryForChecksuming(LPSTR szSrcFileName);
-	int  UnzipPossibleDirectory(LPSTR szFileName);
+	bool  UnzipPossibleDirectory(LPSTR szFileName);
 	bool MyGetFileSize(char* szFilePath, ULARGE_INTEGER* n2FileSize);
 	bool DoFTUserImpersonation();
 	void UndoFTUserImpersonation();
 
     void SendServerStateUpdate(CARD32 state, CARD32 value);
+    void SendKeepAlive(bool bForce = false);
 	// sf@2002 
 	// Update routines
 protected:
@@ -432,8 +436,10 @@ protected:
 	HANDLE m_hmtxEncodeAccess;
 #endif
 
+    std::string m_OrigSourceDirectoryName;
     bool        m_wants_ServerStateUpdates;
     bool        m_bClientHasBlockedInput;
+    bool        m_wants_KeepAlive;
 };
 
 #endif

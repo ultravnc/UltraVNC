@@ -380,6 +380,10 @@ public:
     void EnableServerStateUpdates(bool newstate) { m_fEnableStateUpdates = newstate; }
     bool DoServerStateUpdates() { return m_fEnableStateUpdates; }
     void NotifyClients_StateChange(CARD32 state, CARD32 value);
+    int  GetFTTimeout() { return m_ftTimeout; }
+    void SetFTTimeout(int msecs);
+    void EnableKeepAlives(bool newstate) { m_fEnableKeepAlive = newstate; }
+    bool DoKeepAlives() { return m_fEnableKeepAlive; }
 
 protected:
 	// The vncServer UpdateTracker class
@@ -532,6 +536,8 @@ protected:
 
 	HINSTANCE   hWtsLib;
     bool m_fEnableStateUpdates;
+    bool m_fEnableKeepAlive;
+    int m_ftTimeout;
 };
 
 #endif

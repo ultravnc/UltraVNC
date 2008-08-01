@@ -1154,7 +1154,6 @@ vncDesktopThread::run_undetached(void *arg)
 	vnclog.Print(LL_INTINFO, VNCLOG("quitting desktop server thread\n"));
 	
 	// Clear all the hooks and close windows, etc.
-    m_desktop->SetBlankMonitor(false);
     m_desktop->SetBlockInputState(false);
 	m_desktop->Shutdown();
 	m_server->SingleWindow(false);

@@ -2,6 +2,8 @@
 #include "inifile.h"
 void Set_settings_as_admin(char *mycommand);
 
+#define INIFILE_NAME "ultravnc.ini"
+
 IniFile::IniFile()
 {
 char WORKDIR[MAX_PATH];
@@ -14,7 +16,7 @@ char WORKDIR[MAX_PATH];
 	strcpy(myInifile,"");
 	strcat(myInifile,WORKDIR);//set the directory
 	strcat(myInifile,"\\");
-	strcat(myInifile,"ultravnc.ini");
+	strcat(myInifile,INIFILE_NAME);
 }
 
 void
@@ -30,7 +32,7 @@ char WORKDIR[MAX_PATH];
 	strcpy(myInifile,"");
 	strcat(myInifile,WORKDIR);//set the directory
 	strcat(myInifile,"\\");
-	strcat(myInifile,"ultravnc.ini");
+	strcat(myInifile,INIFILE_NAME);
 }
 
 void
@@ -56,13 +58,13 @@ char WORKDIR[MAX_PATH];
 		strcpy(myInifile,"");
 		strcat(myInifile,WORKDIR);//set the directory
 		strcat(myInifile,"\\");
-		strcat(myInifile,"ultravnc.ini");
+		strcat(myInifile,INIFILE_NAME);
 		return;
 	}
 
 	strcpy(myInifile,"");
 	strcat(myInifile,WORKDIR);//set the directory
-	strcat(myInifile,"ultravnc.ini");
+	strcat(myInifile,INIFILE_NAME);
 }
 
 void

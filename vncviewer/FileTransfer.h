@@ -62,7 +62,7 @@ public:
 	bool				m_fFocusLocal;
 	char                m_szFTParamTitle[128];
 	char                m_szFTParamComment[64];
-	char                m_szFTParam[248];
+	char                m_szFTParam[256];
 	char                m_szFTConfirmTitle[128];
 	char                m_szFTConfirmComment[364];
 	int					m_nConfirmAnswer;
@@ -143,7 +143,7 @@ public:
 	bool SendFile(long lSize, int nLen);
 	bool SendFileChunk();
 	bool FinishFileReception();
-	int  UnzipPossibleDirectory(LPSTR szFileName);
+	bool UnzipPossibleDirectory(LPSTR szFileName);
 	bool SendFiles(long lSize, int nLen);
 	bool OfferNextFile();
 	void ListRemoteDrives(HWND hWnd, int nLen);
@@ -172,7 +172,7 @@ public:
 	void PopulateLocalListBox(HWND hWnd, LPSTR szPath);
 	void ListDrives(HWND hWnd);
 	void CreateRemoteDirectory(LPSTR szDir);
-	void DeleteRemoteFile(LPSTR szFile);
+    void DeleteRemoteFile(std::string szFile);
 	bool CreateRemoteDirectoryFeedback(long lSize, int nLen);
 	bool DeleteRemoteFileFeedback(long lSize, int nLen);
 	void RenameRemoteFileOrDirectory(LPSTR szCurrentName, LPSTR szNewName);

@@ -988,6 +988,8 @@ if ( ! _this->m_server->GetDisableTrayIcon())
 						0, mouse.x, mouse.y, 0,
 						_this->m_nid.hWnd, NULL);
 
+                PostMessage(hwnd, WM_NULL, 0, 0);
+
 				return 0;
 			}
 			

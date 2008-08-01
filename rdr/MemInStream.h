@@ -38,7 +38,7 @@ namespace rdr {
 
   private:
 
-    int overrun(int itemSize, int nItems) { throw EndOfStream(); }
+    int overrun(int itemSize, int nItems) { throw EndOfStream("overrun"); }
     const U8* start;
   };
 

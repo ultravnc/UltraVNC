@@ -1,5 +1,8 @@
 #include "stdhdrs.h"
 #include "inifile.h"
+#include <string>
+#include <algorithm>
+#include <cctype>
 
 //  We first use shellexecute with "runas"
 //  This way we can use UAC and user/passwd
@@ -295,9 +298,8 @@ Set_stop_service_as_admin()
 void
 Real_stop_service()
 {
-	char command[100];
-	strcpy(command,"net stop ");
-	strcat(command,service_name);
+    char command[MAX_PATH + 32]; // 29 January 2008 jdp 
+    _snprintf(command, sizeof command, "net stop \"%s\"", service_name);
 	WinExec(command,SW_HIDE);
 }
 
@@ -325,9 +327,8 @@ Set_start_service_as_admin()
 void
 Real_start_service()
 {
-	char command[100];
-	strcpy(command,"net start ");
-	strcat(command,service_name);
+    char command[MAX_PATH + 32]; // 29 January 2008 jdp 
+    _snprintf(command, sizeof command, "net start \"%s\"", service_name);
 	WinExec(command,SW_HIDE);
 }
 
@@ -391,4 +392,115 @@ winvncSecurityEditorHelper_as_admin()
 	shExecInfo.nShow = SW_SHOWNORMAL;
 	shExecInfo.hInstApp = NULL;
 	ShellExecuteEx(&shExecInfo);
+}
+void make_upper(std::string& str)
+{
+    // convert to uppercase
+    std::transform(str.begin(), str.end(), str.begin(), toupper);//(int(*)(int))
+}
+//**************************************************************************
+// GetServiceName() looks up service by application path. If found, the function
+// fills pszServiceName (must be at least 256+1 characters long).
+bool GetServiceName(TCHAR *pszAppPath, TCHAR *pszServiceName)
+{
+    // prepare given application path for matching against service list
+    std::string appPath(pszAppPath);
+    // convert to uppercase
+    make_upper(appPath);
+
+	// connect to serice control manager
+    SC_HANDLE hManager = OpenSCManager(NULL, NULL, SC_MANAGER_ENUMERATE_SERVICE);
+    if (!hManager)
+        return false;
+
+    DWORD dwBufferSize = 0;
+    DWORD dwCount = 0;
+    DWORD dwPosition = 0;
+    bool bResult = false;
+
+    // call EnumServicesStatus() the first time to receive services array size
+    BOOL bOK = EnumServicesStatus(
+        hManager,
+        SERVICE_WIN32,
+        SERVICE_STATE_ALL,
+        NULL,
+        0,
+        &dwBufferSize,
+        &dwCount,
+        &dwPosition);
+    if (!bOK && GetLastError() == ERROR_MORE_DATA)
+    {
+        // allocate space per results from the first call
+        ENUM_SERVICE_STATUS *pServices = (ENUM_SERVICE_STATUS *) new UCHAR[dwBufferSize];
+        if (pServices)
+        {
+            // call EnumServicesStatus() the second time to actually get the services array
+            bOK = EnumServicesStatus(
+                hManager,
+                SERVICE_WIN32,
+                SERVICE_STATE_ALL,
+                pServices,
+                dwBufferSize,
+                &dwBufferSize,
+                &dwCount,
+                &dwPosition);
+            if (bOK)
+            {
+                // iterate through all services returned by EnumServicesStatus()
+                for (DWORD i = 0; i < dwCount && !bResult; i++)
+                {
+                    // open service
+                    SC_HANDLE hService = OpenService(hManager,
+                        pServices[i].lpServiceName,
+                        GENERIC_READ);
+                    if (!hService)
+                        break;
+
+                    // call QueryServiceConfig() the first time to receive buffer size
+                    bOK = QueryServiceConfig(
+                        hService,
+                        NULL,
+                        0,
+                        &dwBufferSize);
+                    if (!bOK && GetLastError() == ERROR_INSUFFICIENT_BUFFER)
+                    {
+                        // allocate space per results from the first call
+                        QUERY_SERVICE_CONFIG *pServiceConfig = (QUERY_SERVICE_CONFIG *) new UCHAR[dwBufferSize];
+                        if (pServiceConfig)
+                        {
+                            // call EnumServicesStatus() the second time to actually get service config
+                            bOK = QueryServiceConfig(
+                                hService,
+                                pServiceConfig,
+                                dwBufferSize,
+                                &dwBufferSize);
+                            if (bOK)
+                            {
+                                // match given application name against executable path in the service config
+                                std::string servicePath(pServiceConfig->lpBinaryPathName);
+                                make_upper(servicePath);
+                                if (servicePath.find(appPath.c_str()) != -1)
+                                {
+                                    bResult = true;
+                                    strncpy(pszServiceName, pServices[i].lpServiceName, 256);
+                                    pszServiceName[255] = 0;
+                                }
+                            }
+
+                            delete [] (UCHAR *) pServiceConfig;
+                        }
+                    }
+
+                    CloseServiceHandle(hService);
+                }
+            }
+
+            delete [] (UCHAR *) pServices;
+        }
+    }
+
+    // disconnect from serice control manager
+    CloseServiceHandle(hManager);
+
+    return bResult;
 }

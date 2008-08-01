@@ -318,7 +318,7 @@ LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg,
 			if(tbDefault==TRUE)
 			{
 				if(LOWORD(wParam) == tbIDC_CLOSE)
-					::SendMessage(TitleBarThis->Parent, WM_CLOSE, NULL, 1);
+					::SendMessage(TitleBarThis->Parent, WM_CLOSE, NULL, 0);
 				if(LOWORD(wParam) == tbIDC_MAXIMIZE)
 				{
 					//if(::IsZoomed(TitleBarThis->Parent)==TRUE)

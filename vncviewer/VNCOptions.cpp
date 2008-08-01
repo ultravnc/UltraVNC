@@ -65,6 +65,7 @@ extern char sz_D27[64];
 extern char sz_D28[64];
 extern bool g_disable_sponsor;
 
+#define FT_RECV_TIMEOUT 30 * 1000
 
 VNCOptions::VNCOptions()
 {
@@ -173,7 +174,9 @@ VNCOptions::VNCOptions()
   m_NoMoreCommandLineUserPassword = false;
 
   m_fExitCheck = false; //PGM @ Advantig
+  hwnd = 0;
 
+  m_FTTimeout = FT_RECV_TIMEOUT;
   
 #ifdef UNDER_CE
   m_palmpc = false;
@@ -274,7 +277,7 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
   m_JapKeyboard			  = s.m_JapKeyboard;
 
   m_fExitCheck    = s.m_fExitCheck; //PGM @ Advantig
-
+  m_FTTimeout =  s.m_FTTimeout;
 
 
 #ifdef UNDER_CE
@@ -388,6 +391,17 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
           ArgError(sz_D3);
           continue;
         }
+        j++;
+      }
+    } else if (SwitchMatch(args[j], _T("fttimeout"))) { //PGM @ Advantig
+      if (j+1 < i && args[j+1][0] >= '0' && args[j+1][0] <= '9') {
+        if (_stscanf(args[j+1], _T("%d"), &m_FTTimeout) != 1) {
+          ArgError(sz_D3);
+          continue;
+        }
+        m_FTTimeout *= 1000;
+        if (m_FTTimeout > 60000)
+            m_FTTimeout = 60000;
         j++;
       }
     } else if ( SwitchMatch(args[j], _T("askexit"))) { //PGM @ Advantig
@@ -776,6 +790,7 @@ void VNCOptions::Save(char *fname)
   //saveInt("AutoReconnect", m_autoReconnect,	fname);
  
   saveInt("ExitCheck",				m_fExitCheck,	fname); //PGM @ Advantig
+  saveInt("FileTransferTimeout",    m_FTTimeout/1000,    fname);
 }
 
 void VNCOptions::Load(char *fname)
@@ -851,6 +866,9 @@ void VNCOptions::Load(char *fname)
   //m_autoReconnect =		readInt("AutoReconnect",	m_autoReconnect, fname) != 0;
   
   m_fExitCheck =		readInt("ExitCheck", m_fExitCheck,  fname) != 0; //PGM @ Advantig
+  m_FTTimeout  = readInt("FileTransferTimeout", m_FTTimeout, fname) * 1000;
+  if (m_FTTimeout > 60000)
+      m_FTTimeout = 60000; // cap at 1 minute
 
 }
 
@@ -936,6 +954,12 @@ int VNCOptions::DoDialog(bool running)
                         NULL, (DLGPROC) OptDlgProc, (LONG) this);
 }
 
+void VNCOptions::CancelDialog()
+{
+    ::SendMessage(hwnd, WM_COMMAND, IDCANCEL, 0);
+}
+
+
 BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,  
                                        WPARAM wParam, LPARAM lParam ) {
   // This is a static method, so we don't know which instantiation we're 
@@ -959,7 +983,7 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 #endif
 		  _this = (VNCOptions *) lParam;
 		  // Initialise the controls
-		  
+		  _this->hwnd = hwnd;
 		  // Window always on top
 		  RECT Rect;
 		  GetWindowRect(hwnd, &Rect);
