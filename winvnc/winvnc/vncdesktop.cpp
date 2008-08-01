@@ -47,6 +47,7 @@
 #include "mmSystem.h" // sf@2002
 #include "TextChat.h" // sf@2002
 #include "vncdesktopthread.h"
+#include "common/win32_helpers.h"
 
 
 
@@ -1305,11 +1306,8 @@ vncDesktop::InitWindow()
 	}
 
 	// Set the "this" pointer for the window
-#ifndef _X64
-	SetWindowLong(m_hwnd, GWL_USERDATA, (long)this);
-#else
-	SetWindowLongPtr(m_hwnd, GWLP_USERDATA, (long)this);
-#endif
+    helper::SafeSetWindowUserData(m_hwnd, (long)this);
+
 	// Enable clipboard hooking
 	m_hnextviewer = SetClipboardViewer(m_hwnd);
 	StopDriverWatches=false;

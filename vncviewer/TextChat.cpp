@@ -505,13 +505,8 @@ BOOL CALLBACK TextChat::TextChatDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM wParam,
 			SetForegroundWindow(hWnd);
 			
 			// [v1.0.2-jp1 fix] SUBCLASS Split bar
-#ifndef _X64
-			pDefSBProc = GetWindowLong(GetDlgItem(hWnd, IDC_STATIC_SPLIT), GWL_WNDPROC);
-			SetWindowLong(GetDlgItem(hWnd, IDC_STATIC_SPLIT), GWL_WNDPROC, (LONG)SBProc);
-#else
-			pDefSBProc = GetWindowLongPtr(GetDlgItem(hWnd, IDC_STATIC_SPLIT), GWLP_WNDPROC);
-			SetWindowLongPtr(GetDlgItem(hWnd, IDC_STATIC_SPLIT), GWLP_WNDPROC, (LONG)SBProc);
-#endif
+            pDefSBProc = helper::SafeGetWindowProc(GetDlgItem(hWnd, IDC_STATIC_SPLIT));
+            helper::SafeSetWindowProc(GetDlgItem(hWnd, IDC_STATIC_SPLIT), (LONG)SBProc);
 
 			return TRUE;
 		}
@@ -529,11 +524,7 @@ BOOL CALLBACK TextChat::TextChatDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM wParam,
 			// Server orders to close TextChat 			
 
 			// [v1.0.2-jp1 fix] UNSUBCLASS Split bar
-#ifndef _X64
-			SetWindowLong(GetDlgItem(hWnd, IDC_STATIC_SPLIT), GWL_WNDPROC, pDefSBProc);
-#else
-			SetWindowLongPtr(GetDlgItem(hWnd, IDC_STATIC_SPLIT), GWLP_WNDPROC, pDefSBProc);
-#endif
+            helper::SafeSetWindowProcGetDlgItem(hWnd, IDC_STATIC_SPLIT), pDefSBProc);
 
 			EndDialog(hWnd, FALSE);
 			return TRUE;
@@ -542,11 +533,7 @@ BOOL CALLBACK TextChat::TextChatDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM wParam,
 			_this->SendTextChatRequest(CHAT_CLOSE); // Server must close TextChat
 
 			// [v1.0.2-jp1 fix] UNSUBCLASS Split bar
-#ifndef _X64
-			SetWindowLong(GetDlgItem(hWnd, IDC_STATIC_SPLIT), GWL_WNDPROC, pDefSBProc);
-#else
-			SetWindowLongPtr(GetDlgItem(hWnd, IDC_STATIC_SPLIT), GWLP_WNDPROC, pDefSBProc);
-#endif
+            helper::SafeSetWindowProcGetDlgItem(hWnd, IDC_STATIC_SPLIT), pDefSBProc);
 
 			EndDialog(hWnd, FALSE);
 			return TRUE;

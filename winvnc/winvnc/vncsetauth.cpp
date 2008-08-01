@@ -32,6 +32,7 @@
 #include "WinVNC.h"
 #include "vncsetAuth.h"
 #include "vncService.h"
+#include "common/win32_helpers.h"
 
 #define MAXSTRING 254
 
@@ -466,11 +467,7 @@ vncSetAuth::DialogProc(HWND hwnd,
 {
 	// We use the dialog-box's USERDATA to store a _this pointer
 	// This is set only once WM_INITDIALOG has been recieved, though!
-#ifndef _X64
-	vncSetAuth *_this = (vncSetAuth *) GetWindowLong(hwnd, GWL_USERDATA);
-#else
-	vncSetAuth *_this = (vncSetAuth *) GetWindowLongPtr(hwnd, GWLP_USERDATA);
-#endif
+    vncSetAuth *_this = helper::SafeGetWindowUserData<vncSetAuth>(hwnd);
 
 	switch (uMsg)
 	{
@@ -479,11 +476,8 @@ vncSetAuth::DialogProc(HWND hwnd,
 		{
 			// Retrieve the Dialog box parameter and use it as a pointer
 			// to the calling vncProperties object
-#ifndef _X64
-			SetWindowLong(hwnd, GWL_USERDATA, lParam);
-#else
-			SetWindowLongPtr(hwnd, GWLP_USERDATA, lParam);
-#endif
+            helper::SafeSetWindowUserData(hwnd, lParam);
+
 			_this = (vncSetAuth *) lParam;
 			SetDlgItemText(hwnd, IDC_GROUP1, _this->pszgroup1);
 			SetDlgItemText(hwnd, IDC_GROUP2, _this->pszgroup2);

@@ -31,6 +31,7 @@
 #include "vncService.h"
 
 #include "resource.h"
+#include "common/win32_helpers.h"
 
 #include "localization.h" // Act : add localization on messages
 
@@ -85,11 +86,7 @@ BOOL CALLBACK vncAcceptDialog::vncAcceptDlgProc(HWND hwnd,
 	// dealing with. But we can get a pseudo-this from the parameter to 
 	// WM_INITDIALOG, which we therafter store with the window and retrieve
 	// as follows:
-#ifndef _X64
-	vncAcceptDialog *_this = (vncAcceptDialog *) GetWindowLong(hwnd, GWL_USERDATA);
-#else
-	vncAcceptDialog *_this = (vncAcceptDialog *) GetWindowLongPtr(hwnd, GWLP_USERDATA);
-#endif
+     vncAcceptDialog *_this = helper::SafeGetWindowUserData<vncAcceptDialog>(hwnd);
 	switch (uMsg) {
 
 		// Dialog has just been created
@@ -97,11 +94,7 @@ BOOL CALLBACK vncAcceptDialog::vncAcceptDlgProc(HWND hwnd,
 		{
 			// Save the lParam into our user data so that subsequent calls have
 			// access to the parent C++ object
-#ifndef _X64
-            SetWindowLong(hwnd, GWL_USERDATA, lParam);
-#else
-			SetWindowLongPtr(hwnd, GWLP_USERDATA, lParam);
-#endif
+            helper::SafeSetWindowUserData(hwnd, lParam);
             vncAcceptDialog *_this = (vncAcceptDialog *) lParam;
 
 			// Set the IP-address string

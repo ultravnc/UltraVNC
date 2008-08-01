@@ -28,6 +28,7 @@
 
 #include "WinVNC.h"
 #include "vncListDlg.h"
+#include "common/win32_helpers.h"
 
 // [v1.0.2-jp1 fix] Load resouce from dll
 extern HINSTANCE	hInstResDLL;
@@ -79,21 +80,13 @@ void vncListDlg::Display()
 //
 BOOL CALLBACK vncListDlg::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
-#ifndef _X64
-	vncListDlg *_this = (vncListDlg *) GetWindowLong(hwnd, GWL_USERDATA);
-#else
-	vncListDlg *_this = (vncListDlg *) GetWindowLongPtr(hwnd, GWLP_USERDATA);
-#endif
+    vncListDlg *_this = helper::SafeGetWindowUserData<vncListDlg>(hwnd);
 	switch (uMsg)
 	{
 
 	case WM_INITDIALOG:
 		{
-#ifndef _X64
-			SetWindowLong(hwnd, GWL_USERDATA, lParam);
-#else
-			SetWindowLongPtr(hwnd, GWLP_USERDATA, lParam);
-#endif
+            helper::SafeSetWindowUserData(hwnd, lParam);
 			_this = (vncListDlg *) lParam;
 
 			vncClientList::iterator i;
