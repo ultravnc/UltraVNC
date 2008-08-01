@@ -3819,6 +3819,16 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 							// TODO: Error Message
 							break;
 						}
+		                TCHAR szFolderName[MAX_PATH];
+		                _snprintf(szFolderName, MAX_PATH, "%s%s%s", rfbDirPrefix, _this->m_szFTParam, rfbDirSuffix);
+		                szFolderName[MAX_PATH - 1] = 0;
+						if ((_this->FileOrFolderExists(GetDlgItem(hWnd, IDC_LOCAL_FILELIST), szFolderName)) ||
+						   (_this->FileOrFolderExists(GetDlgItem(hWnd, IDC_LOCAL_FILELIST), _this->m_szFTParam)))
+						{
+							wsprintf(szMes, "%s < %s >: %s", sz_M5,szSelectedFile, sz_H102);
+							_this->SetStatus(szMes);
+							break;
+						}
 						strcpy(szNewLocal, szCurrLocal);
 						strcat(szCurrLocal, szSelectedFile); // Old full name
 						strcat(szNewLocal, _this->m_szFTParam); // New full name
@@ -3884,6 +3894,17 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 							(strlen(szCurrRemote) + strlen(_this->m_szFTParam)) > 248) 
 						{
 							// TODO: Error Message
+							break;
+						}
+		                TCHAR szFolderName[MAX_PATH];
+		                _snprintf(szFolderName, MAX_PATH, "%s%s%s", rfbDirPrefix, _this->m_szFTParam, rfbDirSuffix);
+		                szFolderName[MAX_PATH - 1] = 0;
+						if ((_this->FileOrFolderExists(GetDlgItem(hWnd, IDC_REMOTE_FILELIST), szFolderName)) ||
+						   (_this->FileOrFolderExists(GetDlgItem(hWnd, IDC_REMOTE_FILELIST), _this->m_szFTParam)))
+						{
+            				char szMes[MAX_PATH + 256];
+							wsprintf(szMes, "%s < %s > %s: %s", sz_M5,szSelectedFile, sz_H30, sz_H102);
+							_this->SetStatus(szMes);
 							break;
 						}
 						strcpy(szNewRemote, szCurrRemote);
