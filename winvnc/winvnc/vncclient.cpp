@@ -1370,6 +1370,7 @@ vncClientThread::run(void *arg)
 		rfbClientToServerMsg msg;
 
 		// Ensure that we're running in the correct desktop
+		if (!m_client->IsFileTransBuzy())
 		if (!vncService::InputDesktopSelected()) 
 			if (!vncService::SelectDesktop(NULL)) 
 					break;

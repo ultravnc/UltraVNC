@@ -209,6 +209,7 @@ extern char sz_L90[64];
 extern char sz_L91[64];
 extern char sz_L92[64];
 extern char sz_L93[64];
+extern char sz_L94[64];
 
 extern char sz_F1[64];
 extern char sz_F5[128];
@@ -3788,7 +3789,12 @@ void* ClientConnection::run_undetached(void* arg) {
 			// m_pFileTransfer->m_fFileTransferRunning = false;
 			// m_pTextChat->m_fTextChatRunning = false;
 			// throw QuietException(e.str());
-            if (!(/*m_pFileTransfer->m_fFileTransferRunning || m_pTextChat->m_fTextChatRunning ||*/ m_bClosedByUser))
+			if (strcmp(e.str(),"rdr::EndOfStream: read")==NULL)
+			{
+				WarningException w(sz_L94,200);
+               // w.Report();
+			}
+            else if (!(/*m_pFileTransfer->m_fFileTransferRunning || m_pTextChat->m_fTextChatRunning ||*/ m_bClosedByUser))
             {
                 WarningException w(sz_L69);
                 w.Report();

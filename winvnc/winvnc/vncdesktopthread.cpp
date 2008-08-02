@@ -470,12 +470,13 @@ vncDesktopThread::run_undetached(void *arg)
 			//*******************************************************
 			// SCREEN DISPLAY HAS CHANGED, RESTART DRIVER (IF Used)
 			//*******************************************************
-			if (	m_desktop->m_displaychanged ||									//WM_DISPLAYCHANGE
+			if (!m_server->IsThereFileTransBuzy())
+			if ((m_desktop->m_displaychanged ||									//WM_DISPLAYCHANGE
 					!vncService::InputDesktopSelected() ||							//handle logon and screensaver desktops
 					m_desktop->m_SWtoDesktop ||										//switch from SW to full desktop or visa versa
 					m_desktop->m_hookswitch||										//hook change request
 					m_desktop->asked_display!=m_desktop->m_buffer.GetDisplay()		//monitor change request
-					) 
+					) )
 					{
 						// We need to wait until viewer has send if he support Size changes
 						if (!m_server->All_clients_initialalized())
@@ -489,6 +490,7 @@ vncDesktopThread::run_undetached(void *arg)
 						if (m_desktop->m_SWtoDesktop)									vnclog.Print(LL_INTERR, VNCLOG("m_SWtoDesktop \n"));
 						if (m_desktop->m_hookswitch)									vnclog.Print(LL_INTERR, VNCLOG("m_hookswitch \n"));
 						if (m_desktop->asked_display!=m_desktop->m_buffer.GetDisplay()) vnclog.Print(LL_INTERR, VNCLOG("desktop switch %i %i \n"),m_desktop->asked_display,m_desktop->m_buffer.GetDisplay());
+						if (!m_server->IsThereFileTransBuzy())
 						if (!vncService::InputDesktopSelected())						vnclog.Print(LL_INTERR, VNCLOG("++++InputDesktopSelected \n"));
 						
 						
@@ -534,8 +536,9 @@ vncDesktopThread::run_undetached(void *arg)
 							// Reinitialize buffers,color, etc
 							// monitor change, for non driver, use another buffer
 							//*******************************************************
+							if (!m_server->IsThereFileTransBuzy())
 							if (m_desktop->m_displaychanged || !vncService::InputDesktopSelected() || m_desktop->m_hookswitch || (monitor_changed && !m_desktop->m_videodriver))
-									{
+							{
 										// Attempt to close the old hooks
 										// shutdown(true) driver is reinstalled without shutdown,(shutdown need a 640x480x8 switch)
 										vnclog.Print(LL_INTERR, VNCLOG("m_desktop->Shutdown"));

@@ -160,6 +160,7 @@ public:
 	virtual long GetConnectTime() {return m_lConnectTime;};
 	virtual bool IsSlowEncoding() {return m_encodemgr.IsSlowEncoding();};
 	virtual bool IsUltraEncoding() {return m_encodemgr.IsUltraEncoding();};
+	virtual bool IsFileTransBuzy(){return (m_fFileUploadRunning||m_fFileDownloadRunning);};
 	void SetProtocolVersion(rfbProtocolVersionMsg *protocolMsg);
 	void Clear_Update_Tracker();
 	void UpdateCursorShape();

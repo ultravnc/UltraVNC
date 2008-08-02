@@ -755,6 +755,22 @@ bool vncServer::IsThereAUltraEncodingClient()
 	return false;
 }
 
+bool vncServer::IsThereFileTransBuzy()
+{
+	vncClientList::iterator i;
+	bool fFound = false;
+	omni_mutex_lock l(m_clientsLock);
+
+	for (i = m_authClients.begin(); i != m_authClients.end(); i++)
+	{
+		if (GetClient(*i)->IsFileTransBuzy())
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 
 void
 vncServer::KillUnauthClients()

@@ -272,6 +272,7 @@ char sz_L90[64];
 char sz_L91[64];
 char sz_L92[64];
 char sz_L93[64];
+char sz_L94[64];
 
 // 14 April 2008 jdp
 char sz_H94[64];
@@ -558,6 +559,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 	LoadString(m_hInstResDLL, IDS_L91, sz_L91, 64 -1);
 	LoadString(m_hInstResDLL, IDS_L92, sz_L92, 64 -1);
 	LoadString(m_hInstResDLL, IDS_L93, sz_L93, 64 -1);
+	LoadString(m_hInstResDLL, IDS_L94, sz_L94, 64 -1);
 
 	LoadString(m_hInstResDLL, IDS_M1, sz_M1, 64 -1);
 	LoadString(m_hInstResDLL, IDS_M2, sz_M2, 64 -1);

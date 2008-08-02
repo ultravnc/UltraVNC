@@ -328,6 +328,7 @@ public:
 	virtual void DisableCacheForAllClients();
 	virtual bool IsThereASlowClient();
 	virtual bool IsThereAUltraEncodingClient();
+	virtual bool IsThereFileTransBuzy();
 
 	// sf@2002 - Turbo Mode
 	virtual void TurboMode(BOOL fEnabled) { m_TurboMode = fEnabled; };
