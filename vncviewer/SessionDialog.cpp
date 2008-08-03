@@ -379,6 +379,7 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 				SendMessage(hSlow, BM_SETCHECK, false, 0);
 				HWND hManual = GetDlgItem(hwnd, IDC_MANUAL);
 				SendMessage(hManual, BM_SETCHECK, true, 0);
+				_this->m_pOpt->m_quickoption = 8;
 				}
 				return TRUE;
 			}
@@ -572,7 +573,7 @@ int SessionDialog::SetQuickOption(SessionDialog* p_SD, HWND hwnd)
 		SendMessage(hUltraLan, BM_SETCHECK, true, 0);
 		}
 		break;
-	case 8: // MANUAL
+	default: // MANUAL
 		{
 		HWND hManual = GetDlgItem(hwnd, IDC_MANUAL);
 		SendMessage(hManual, BM_SETCHECK, true, 0);

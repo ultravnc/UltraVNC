@@ -3789,7 +3789,7 @@ void* ClientConnection::run_undetached(void* arg) {
 			// m_pFileTransfer->m_fFileTransferRunning = false;
 			// m_pTextChat->m_fTextChatRunning = false;
 			// throw QuietException(e.str());
-			if (strcmp(e.str(),"rdr::EndOfStream: read")==NULL)
+			if ((strcmp(e.str(),"rdr::EndOfStream: read")==NULL) && !m_bClosedByUser)
 			{
 				WarningException w(sz_L94,200);
                // w.Report();
