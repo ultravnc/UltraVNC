@@ -533,7 +533,7 @@ BOOL CALLBACK TextChat::TextChatDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM wParam,
 			_this->SendTextChatRequest(CHAT_CLOSE); // Server must close TextChat
 
 			// [v1.0.2-jp1 fix] UNSUBCLASS Split bar
-            helper::SafeSetWindowProcGetDlgItem(hWnd, IDC_STATIC_SPLIT), pDefSBProc);
+            helper::SafeSetWindowProc(GetDlgItem(hWnd, IDC_STATIC_SPLIT), pDefSBProc);
 
 			EndDialog(hWnd, FALSE);
 			return TRUE;

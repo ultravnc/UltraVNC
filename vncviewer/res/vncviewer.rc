@@ -1018,6 +1018,8 @@ BEGIN
     IDS_H99                 "Unable to delete the folder"
     IDS_H100                "Create New Folder"
     IDS_L93                 "View Only... \tAlt+Ctrl+F3"
+    IDS_H101                "Folder Transfer Warning"
+    IDS_H102				"a file or folder of that name already exists."
 END
 
 STRINGTABLE 

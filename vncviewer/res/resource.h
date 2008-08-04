@@ -515,7 +515,7 @@
 #define IDS_L93                         50271
 #define IDS_H101                        50272
 #define IDS_H102                        50273
-#define IDS_L94                         50273
+#define IDS_L94                         50274
 
 // Next default values for new objects
 // 

@@ -150,11 +150,7 @@ void CTitleBar::CreateDisplay()
 			      hInstance,
 			      NULL);
 
-    #ifndef _X64
-	SetWindowLong(m_hWnd, GWL_USERDATA, (long)this);
-#else
-	SetWindowLongPtr(m_hWnd, GWLP_USERDATA, (long)this);
-#endif
+    ::SetWindowLong(m_hWnd, GWL_USERDATA, (long)this);
 	//Set region to window so it is non rectangular
 	HRGN Range;
 	POINT Points[4];
@@ -228,12 +224,7 @@ LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg,
 {
 	// Added Jef Fix
     CTitleBar *TitleBarThis=NULL;
-    #ifndef _X64
-	TitleBarThis = (CTitleBar *)::GetWindowLong(hwnd, GWL_USERDATA);
-#else
-	TitleBarThis = (CTitleBar *)::GetWindowLongPtr(hwnd, GWLP_USERDATA);
-	
-#endif
+    TitleBarThis = (CTitleBar *)::GetWindowLong(hwnd, GWL_USERDATA);
 
 	switch (iMsg)
 	{
