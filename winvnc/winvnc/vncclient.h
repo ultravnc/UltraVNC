@@ -70,6 +70,12 @@ typedef UINT (WINAPI *pSendinput)(UINT,LPINPUT,INT);
 #define MOUSEEVENTF_VIRTUALDESK	  0x4000
 
 
+#define FT_PROTO_VERSION_OLD 1  // <= RC18 server.. "fOldFTPRotocole" version
+#define FT_PROTO_VERSION_2   2  // base ft protocol
+#define FT_PROTO_VERSION_3   3  // new ft protocol session messages
+
+
+
 extern int CheckUserGroupPasswordUni(char * userin,char *password,const char *machine);
 
 using namespace rfb;
@@ -160,7 +166,7 @@ public:
 	virtual long GetConnectTime() {return m_lConnectTime;};
 	virtual bool IsSlowEncoding() {return m_encodemgr.IsSlowEncoding();};
 	virtual bool IsUltraEncoding() {return m_encodemgr.IsUltraEncoding();};
-	virtual bool IsFileTransBuzy(){return (m_fFileUploadRunning||m_fFileDownloadRunning);};
+	virtual bool IsFileTransBusy(){return (m_fFileUploadRunning||m_fFileDownloadRunning || m_fFileSessionOpen);};
 	void SetProtocolVersion(rfbProtocolVersionMsg *protocolMsg);
 	void Clear_Update_Tracker();
 	void UpdateCursorShape();
@@ -182,6 +188,7 @@ public:
 
     void SendServerStateUpdate(CARD32 state, CARD32 value);
     void SendKeepAlive(bool bForce = false);
+    void SendFTProtocolMsg();
 	// sf@2002 
 	// Update routines
 protected:
@@ -380,6 +387,7 @@ protected:
 	DWORD m_dwTotalNbBytesWritten;
 	bool m_fFileDownloadError;
 	bool m_fFileDownloadRunning;
+    bool m_fFileSessionOpen;
 
     // 8 April 2008 jdp
     bool m_fUserAbortedFileTransfer;

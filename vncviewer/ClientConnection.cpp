@@ -2820,6 +2820,7 @@ void ClientConnection::SetFormatAndEncodings()
 	
     encs[se->nEncodings++] = Swap32IfLE(rfbEncodingServerState);
     encs[se->nEncodings++] = Swap32IfLE(rfbEncodingEnableKeepAlive);
+    encs[se->nEncodings++] = Swap32IfLE(rfbEncodingFTProtocolVersion);
     // sf@2002 - DSM Plugin
 	int nEncodings = se->nEncodings;
 	se->nEncodings = Swap16IfLE(se->nEncodings);
@@ -3263,7 +3264,7 @@ inline void ClientConnection::ProcessMouseWheel(int delta)
 inline void
 ClientConnection::SendPointerEvent(int x, int y, int buttonMask)
 {
-	if (m_pFileTransfer->m_fFileTransferRunning && ( m_pFileTransfer->m_fVisible || m_pFileTransfer->m_fOldFTProtocole)) return;
+	if (m_pFileTransfer->m_fFileTransferRunning && ( m_pFileTransfer->m_fVisible || m_pFileTransfer->UsingOldProtocol())) return;
 	if (m_pTextChat->m_fTextChatRunning && m_pTextChat->m_fVisible) return;
 
 	//omni_mutex_lock l(m_UpdateMutex);
@@ -3417,7 +3418,7 @@ inline void ClientConnection::ProcessKeyEvent(int virtKey, DWORD keyData)
 inline void
 ClientConnection::SendKeyEvent(CARD32 key, bool down)
 {
-	if (m_pFileTransfer->m_fFileTransferRunning && ( m_pFileTransfer->m_fVisible || m_pFileTransfer->m_fOldFTProtocole)) return;
+	if (m_pFileTransfer->m_fFileTransferRunning && ( m_pFileTransfer->m_fVisible || m_pFileTransfer->UsingOldProtocol())) return;
 	if (m_pTextChat->m_fTextChatRunning && m_pTextChat->m_fVisible) return;
 
     rfbKeyEventMsg ke;
@@ -3437,7 +3438,7 @@ ClientConnection::SendKeyEvent(CARD32 key, bool down)
 
 void ClientConnection::SendClientCutText(char *str, int len)
 {
-	if (m_pFileTransfer->m_fFileTransferRunning && ( m_pFileTransfer->m_fVisible || m_pFileTransfer->m_fOldFTProtocole)) return;
+	if (m_pFileTransfer->m_fFileTransferRunning && ( m_pFileTransfer->m_fVisible || m_pFileTransfer->UsingOldProtocol())) return;
 	if (m_pTextChat->m_fTextChatRunning && m_pTextChat->m_fVisible) return;
 
 	rfbClientCutTextMsg cct;
@@ -3823,7 +3824,7 @@ void* ClientConnection::run_undetached(void* arg) {
 inline void
 ClientConnection::SendFramebufferUpdateRequest(int x, int y, int w, int h, bool incremental)
 {
-	if (m_pFileTransfer->m_fFileTransferRunning && ( m_pFileTransfer->m_fVisible || m_pFileTransfer->m_fOldFTProtocole)) return;
+	if (m_pFileTransfer->m_fFileTransferRunning && ( m_pFileTransfer->m_fVisible || m_pFileTransfer->UsingOldProtocol())) return;
 	if (m_pTextChat->m_fTextChatRunning && m_pTextChat->m_fVisible) return;
 
 	//omni_mutex_lock l(m_UpdateMutex);
@@ -5621,7 +5622,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						_this->m_pFileTransfer->m_fFileTransferRunning = false;
 						// Refresh Screen
 						// _this->SendFullFramebufferUpdateRequest();
-						if (_this->m_pFileTransfer->m_fVisible || _this->m_pFileTransfer->m_fOldFTProtocole)
+						if (_this->m_pFileTransfer->m_fVisible || _this->m_pFileTransfer->UsingOldProtocol())
 							_this->SendAppropriateFramebufferUpdateRequest();
 						return 0;
 						
@@ -6170,7 +6171,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 					
 				//Added by: Lars Werner (http://lars.werner.no) - These is the custom messages from the TitleBar
 				case tbWM_CLOSE:
-					SendMessage(_this->m_hwndMain, WM_CLOSE,NULL,1);
+					SendMessage(_this->m_hwndMain, WM_CLOSE,NULL,0);
 					return 0;
 
 				case tbWM_MINIMIZE:

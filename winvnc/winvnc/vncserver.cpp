@@ -755,7 +755,7 @@ bool vncServer::IsThereAUltraEncodingClient()
 	return false;
 }
 
-bool vncServer::IsThereFileTransBuzy()
+bool vncServer::IsThereFileTransBusy()
 {
 	vncClientList::iterator i;
 	bool fFound = false;
@@ -763,7 +763,7 @@ bool vncServer::IsThereFileTransBuzy()
 
 	for (i = m_authClients.begin(); i != m_authClients.end(); i++)
 	{
-		if (GetClient(*i)->IsFileTransBuzy())
+		if (GetClient(*i)->IsFileTransBusy())
 		{
 			return true;
 		}

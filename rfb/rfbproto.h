@@ -342,6 +342,7 @@ typedef struct {
 // viewer requests server state updates
 #define rfbEncodingServerState              0xFFFF8000
 #define rfbEncodingEnableKeepAlive          0xFFFF8001
+#define rfbEncodingFTProtocolVersion    	0xFFFF8002
 
 // Same encoder number as in tight 
 /*
@@ -702,7 +703,7 @@ typedef struct _rfbFileTransferMsg {
 
 #define sz_rfbFileTransferMsg	12
 
-#define rfbFileTransferVersion  2 // v1 is the old FT version ( <= 1.0.0 RC18 versions)
+#define rfbFileTransferVersion  3 // v1 is the old FT version ( <= 1.0.0 RC18 versions)
 
 // FileTransfer Content types and Params defines
 #define rfbDirContentRequest	1 // Client asks for the content of a given Server directory
@@ -719,6 +720,9 @@ typedef struct _rfbFileTransferMsg {
 #define rfbCommandReturn		11 // The Client receives the server's answer about a simple command
 #define rfbFileChecksums		12 // The zipped checksums of the destination file (Delta Transfer)
 #define rfbFileTransferAccess	14 // Request FileTransfer authorization
+#define rfbFileTransferSessionStart 15 // indicates a client has the FT gui open
+#define rfbFileTransferSessionEnd   16 // indicates a client has closed the ft gui.
+#define rfbFileTransferProtocolVersion 17 // indicates ft protocol version understood by sender. contentParam is version #
 
 								// rfbDirContentRequest client Request - content params 
 #define rfbRDirContent			1 // Request a Server Directory contents

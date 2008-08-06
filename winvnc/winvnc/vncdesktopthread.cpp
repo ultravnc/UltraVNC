@@ -470,7 +470,7 @@ vncDesktopThread::run_undetached(void *arg)
 			//*******************************************************
 			// SCREEN DISPLAY HAS CHANGED, RESTART DRIVER (IF Used)
 			//*******************************************************
-			if (!m_server->IsThereFileTransBuzy())
+			if (!m_server->IsThereFileTransBusy())
 			if ((m_desktop->m_displaychanged ||									//WM_DISPLAYCHANGE
 					!vncService::InputDesktopSelected() ||							//handle logon and screensaver desktops
 					m_desktop->m_SWtoDesktop ||										//switch from SW to full desktop or visa versa
@@ -490,7 +490,7 @@ vncDesktopThread::run_undetached(void *arg)
 						if (m_desktop->m_SWtoDesktop)									vnclog.Print(LL_INTERR, VNCLOG("m_SWtoDesktop \n"));
 						if (m_desktop->m_hookswitch)									vnclog.Print(LL_INTERR, VNCLOG("m_hookswitch \n"));
 						if (m_desktop->asked_display!=m_desktop->m_buffer.GetDisplay()) vnclog.Print(LL_INTERR, VNCLOG("desktop switch %i %i \n"),m_desktop->asked_display,m_desktop->m_buffer.GetDisplay());
-						if (!m_server->IsThereFileTransBuzy())
+						if (!m_server->IsThereFileTransBusy())
 						if (!vncService::InputDesktopSelected())						vnclog.Print(LL_INTERR, VNCLOG("++++InputDesktopSelected \n"));
 						
 						
@@ -536,7 +536,7 @@ vncDesktopThread::run_undetached(void *arg)
 							// Reinitialize buffers,color, etc
 							// monitor change, for non driver, use another buffer
 							//*******************************************************
-							if (!m_server->IsThereFileTransBuzy())
+							if (!m_server->IsThereFileTransBusy())
 							if (m_desktop->m_displaychanged || !vncService::InputDesktopSelected() || m_desktop->m_hookswitch || (monitor_changed && !m_desktop->m_videodriver))
 							{
 										// Attempt to close the old hooks

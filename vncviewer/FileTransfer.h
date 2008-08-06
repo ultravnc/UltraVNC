@@ -34,6 +34,10 @@
 #define CONFIRM_NO 3
 #define CONFIRM_NOALL 4
 
+#define FT_PROTO_VERSION_OLD 1  // <= RC18 server.. "fOldFTPRotocole" version
+#define FT_PROTO_VERSION_2   2  // base ft protocol
+#define FT_PROTO_VERSION_3   3  // new ft protocol session messages
+
 typedef std::list<int> FilesList; // List of files indexes to be sent or received
 
 class ClientConnection;
@@ -111,7 +115,7 @@ public:
 	bool				m_fFileDownloadError;
 	char				m_szIncomingFileTime[18];
 
-	bool				m_fOldFTProtocole;
+    int                 m_ServerFTProtocolVersion; // 8/6/2008 jdp 
 	int					m_nBlockSize;
 
 	int					m_nNotSent;
@@ -194,9 +198,12 @@ public:
 	void InitListViewImagesList(HWND hListView);
     bool DeleteFileOrDirectory(TCHAR *srcpath); // 14 April 2008 jdp
 	bool FileOrFolderExists(HWND fileListWnd, std::string fileOrFolder);
+    bool UsingOldProtocol() { return m_ServerFTProtocolVersion == FT_PROTO_VERSION_OLD; }
+    void StartFTSession();
+    void EndFTSession();
 
-	void FileTransfer::InitFTTimer();
-	void FileTransfer::KillFTTimer();
+	void InitFTTimer();
+	void KillFTTimer();
 	static void CALLBACK fpTimer(UINT uID,	UINT uMsg, DWORD dwUser, DWORD dw1,	DWORD dw2);
 
 	static __int64 GetFileSizeFromString(char* szSize);

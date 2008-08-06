@@ -35,6 +35,7 @@
 #include <lmcons.h>
 #include <wininet.h>
 #include <shlobj.h>
+#include "common/win32_helpers.h"
 
 // Header
 

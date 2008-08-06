@@ -1364,13 +1364,14 @@ vncClientThread::run(void *arg)
 	BOOL need_to_disable_input = m_server->LocalInputsDisabled();
     bool need_to_clear_keyboard = true;
     bool need_first_keepalive = false;
+    bool need_ft_version_msg =  false;
 
 	while (connected)
 	{
 		rfbClientToServerMsg msg;
 
 		// Ensure that we're running in the correct desktop
-		if (!m_client->IsFileTransBuzy())
+		if (!m_client->IsFileTransBusy())
 		if (!vncService::InputDesktopSelected()) 
 			if (!vncService::SelectDesktop(NULL)) 
 					break;
@@ -1398,6 +1399,12 @@ vncClientThread::run(void *arg)
             // send first keepalive to let the client know we accepted the encoding request
             m_client->SendKeepAlive();
             need_first_keepalive = false;
+        }
+        if (need_ft_version_msg)
+        {
+            // send a ft protocol message to client.
+            m_client->SendFTProtocolMsg();
+            need_ft_version_msg = false;
         }
 		// sf@2002 - v1.1.2
 		int nTO = 1; // Type offset
@@ -1630,6 +1637,11 @@ vncClientThread::run(void *arg)
                         m_server->EnableKeepAlives(true);
                         need_first_keepalive = true;
 						vnclog.Print(LL_INTINFO, VNCLOG("KeepAlive protocol extension enabled\n"));
+                        continue;
+					}
+					if (Swap32IfLE(encoding) == rfbEncodingFTProtocolVersion) {
+                        need_ft_version_msg = true;
+						vnclog.Print(LL_INTINFO, VNCLOG("FTProtocolVersion protocol extension enabled\n"));
                         continue;
 					}
 
@@ -2081,6 +2093,12 @@ vncClientThread::run(void *arg)
 				{
 				// A new file is received from the client
 					// case rfbFileHeader:
+                    case rfbFileTransferSessionStart:
+                        m_client->m_fFileSessionOpen = true;
+                        break;
+                    case rfbFileTransferSessionEnd:
+                        m_client->m_fFileSessionOpen = false;
+                        break;
 					case rfbFileTransferOffer:
 						{
 						omni_mutex_lock l(m_client->GetUpdateLock());
@@ -2247,6 +2265,7 @@ vncClientThread::run(void *arg)
 						m_client->m_fUserAbortedFileTransfer = false;
 						m_client->m_fFileDownloadError = false;
 						m_client->m_fFileDownloadRunning = true;
+                        m_socket->SetRecvTimeout(m_server->GetFTTimeout());
 
 						}
 						break;
@@ -2255,7 +2274,6 @@ vncClientThread::run(void *arg)
 					case rfbFileTransferRequest:
 						{
 						omni_mutex_lock l(m_client->GetUpdateLock());
-						if (!m_server->FileTransferEnabled() || !fUserOk) break;
 						m_client->m_fCompressionEnabled = (Swap32IfLE(msg.ft.size) == 1);
 						const UINT length = Swap32IfLE(msg.ft.length);
 						memset(m_client->m_szSrcFileName, 0, sizeof(m_client->m_szSrcFileName));
@@ -2268,6 +2286,8 @@ vncClientThread::run(void *arg)
 							break;
 						}
 						
+                        // moved jdp 8/5/08 -- have to read whole packet to keep protocol in sync
+						if (!m_server->FileTransferEnabled() || !fUserOk) break;
 						// sf@2003 - Directory Transfer trick
 						// If the file is an Ultra Directory Zip Request we zip the directory here
 						// and we give it the requested name for transfer
@@ -2537,7 +2557,6 @@ vncClientThread::run(void *arg)
 
 					// The client requests the content of a directory or Drives List
 					case rfbDirContentRequest:
-						if (!m_server->FileTransferEnabled() || !fUserOk) break;
 						switch (msg.ft.contentParam)
 						{
 							// Client requests the List of Local Drives
@@ -2549,6 +2568,8 @@ vncClientThread::run(void *arg)
 								int nType = 0;
 								TCHAR szDrive[4];
 								dwLen = GetLogicalDriveStrings(256, szDrivesList);
+                                // moved jdp 8/5/08 -- have to read whole packet to keep protocol in sync
+						        if (!m_server->FileTransferEnabled() || !fUserOk) break;
 
 								// We add Drives types to this drive list...
 								while (nIndex < dwLen - 3)
@@ -2600,6 +2621,8 @@ vncClientThread::run(void *arg)
 									if (!m_socket->ReadExact(szDir, length)) break;
 									szDir[length] = 0;
 
+                                    // moved jdp 8/5/08 -- have to read whole packet to keep protocol in sync
+						            if (!m_server->FileTransferEnabled() || !fUserOk) break;
 									// sf@2004 - Shortcuts Case
 									// Todo: Cultures translation ?
 									int nFolder = -1;
@@ -2706,7 +2729,6 @@ vncClientThread::run(void *arg)
 
 					// The client sends a command
 					case rfbCommand:
-						if (!m_server->FileTransferEnabled() || !fUserOk) break;
 						switch (msg.ft.contentParam)
 						{
 							// Client requests the creation of a directory
@@ -2724,6 +2746,8 @@ vncClientThread::run(void *arg)
 									}
 									szDir[length] = 0;
 
+                                    // moved jdp 8/5/08 -- have to read whole packet to keep protocol in sync
+						            if (!m_server->FileTransferEnabled() || !fUserOk) break;
 									// Create the Dir
 									BOOL fRet = CreateDirectory(szDir, NULL);
 
@@ -2753,6 +2777,8 @@ vncClientThread::run(void *arg)
 										break;
 									}
 									szFile[length] = 0;
+                                    // moved jdp 8/5/08 -- have to read whole packet to keep protocol in sync
+						            if (!m_server->FileTransferEnabled() || !fUserOk) break;
 
 									// Delete the file
                                     // 13 February 2008 jdp
@@ -2792,6 +2818,8 @@ vncClientThread::run(void *arg)
 										break;
 									}
 									szNames[length] = 0;
+                                    // moved jdp 8/5/08 -- have to read whole packet to keep protocol in sync
+						            if (!m_server->FileTransferEnabled() || !fUserOk) break;
 
 									char *p = strrchr(szNames, '*');
 									if (p == NULL) break;
@@ -3103,6 +3131,7 @@ vncClient::vncClient()
     m_wants_ServerStateUpdates =  false;
     m_bClientHasBlockedInput = false;
     m_wants_KeepAlive = false;
+    m_fFileSessionOpen = false;
 }
 
 vncClient::~vncClient()
@@ -4549,6 +4578,9 @@ bool vncClient::DoFTUserImpersonation()
 	if (m_fFileDownloadRunning) return true;
 	if (m_fFileUploadRunning) return true;
 	if (m_fFTUserImpersonatedOk) return true;
+    // if we're already impersonating the user and have a session open, do nothing.
+    if (m_fFileSessionOpen && m_fFTUserImpersonatedOk)
+        return true;
 
 	vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::DoFTUserImpersonation - 1\n"));
 	bool fUserOk = true;
@@ -4648,6 +4680,7 @@ void vncClient::UndoFTUserImpersonation()
 	if (!m_fFTUserImpersonatedOk) return;
 	if (m_fFileDownloadRunning) return;
 	if (m_fFileUploadRunning) return;
+    if (m_fFileSessionOpen) return;
 
 	vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::UNDoFTUserImpersonation - 1\n"));
 	DWORD lTime = timeGetTime();
@@ -4690,4 +4723,15 @@ void vncClient::SendKeepAlive(bool bForce)
 
 		m_socket->SendExact((char*)&kp, sz_rfbKeepAliveMsg, rfbKeepAlive);
     }
+}
+
+void vncClient::SendFTProtocolMsg()
+{
+    rfbFileTransferMsg ft;
+    memset(&ft, 0, sizeof ft);
+    ft.type = rfbFileTransfer;
+    ft.contentType = rfbFileTransferProtocolVersion;
+    ft.contentParam = FT_PROTO_VERSION_3;
+    m_socket->SendExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
+
 }

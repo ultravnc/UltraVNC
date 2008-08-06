@@ -241,7 +241,7 @@ FileTransfer::FileTransfer(VNCviewerApp *pApp, ClientConnection *pCC)
 	memset(m_szDeleteButtonLabel, 0, sizeof(m_szDeleteButtonLabel));
 	memset(m_szNewFolderButtonLabel, 0, sizeof(m_szNewFolderButtonLabel));
 	memset(m_szRenameButtonLabel, 0, sizeof(m_szRenameButtonLabel));
-	m_fOldFTProtocole = false;
+    m_ServerFTProtocolVersion = FT_PROTO_VERSION_2;
 	m_nBlockSize = sz_rfbBlockSize;
 	m_dwCurrentValue = 0;
 	m_dwCurrentPercent = 0;
@@ -358,7 +358,7 @@ void CALLBACK FileTransfer::fpTimer(UINT uID, UINT uMsg, DWORD dwUser, DWORD dw1
 			//else
 				Sleep(150);
 		}
-		else if (!ft->m_fVisible && !ft->m_fOldFTProtocole && !ft->m_pCC->IsDormant())
+		else if (!ft->m_fVisible && !ft->UsingOldProtocol() && !ft->m_pCC->IsDormant())
 			Sleep(50);
 
 		ft->m_fSendFileChunk = false;
@@ -447,6 +447,14 @@ void FileTransfer::ProcessFileTransferMsg(void)
 	{
 	// Response to a rfbDirContentRequest request:
 	// some directory data is received from the server
+    case rfbFileTransferProtocolVersion:
+        {
+            int proto_ver = ft.contentParam;
+            if ((proto_ver >= FT_PROTO_VERSION_OLD) && (proto_ver <= FT_PROTO_VERSION_3))
+                m_ServerFTProtocolVersion = proto_ver;
+        }
+        break;
+
 	case rfbDirPacket:
 		switch (ft.contentParam)
 		{
@@ -540,7 +548,7 @@ void FileTransfer::ProcessFileTransferMsg(void)
 		else
 		{
 			// We want the viewer to be backward compatible with UltraWinVNC running the old FT protocole
-			m_fOldFTProtocole = true;  // Old permission method -> it's a <=RC18 server
+            m_ServerFTProtocolVersion = FT_PROTO_VERSION_OLD; // Old permission method -> it's a <=RC18 server
 			m_nBlockSize = 4096; // Old packet size value...
 			ShowWindow(GetDlgItem(hWnd, IDC_RENAME_B), SW_HIDE);
 
@@ -583,7 +591,29 @@ void FileTransfer::RequestPermission()
 	return;
 }
 
+void FileTransfer::StartFTSession()
+{
+    if (m_ServerFTProtocolVersion < FT_PROTO_VERSION_3)
+        return;
 
+    rfbFileTransferMsg ft;
+    memset (&ft, 0, sizeof ft);
+    ft.type = rfbFileTransfer;
+    ft.contentType = rfbFileTransferSessionStart;
+    m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
+}
+
+void FileTransfer::EndFTSession()
+{
+    if (m_ServerFTProtocolVersion < FT_PROTO_VERSION_3)
+        return;
+
+    rfbFileTransferMsg ft;
+    memset (&ft, 0, sizeof ft);
+    ft.type = rfbFileTransfer;
+    ft.contentType = rfbFileTransferSessionEnd;
+    m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
+}
 //
 // Test if we are allowed to access filetransfer
 //
@@ -605,6 +635,7 @@ bool FileTransfer::TestPermission(long lSize, int nVersion)
 	else
 	{
 		m_fFTAllowed = true;
+        StartFTSession();
 		RequestRemoteDrives();
 		SetStatus(sz_H4);
 	}
@@ -1346,7 +1377,7 @@ void FileTransfer::PopulateRemoteListBox(HWND hWnd, int nLen)
 	}
 
 	// sf@2004 - Read the returned Directory full path
-	if (nLen > 1 && !m_fOldFTProtocole)
+	if (nLen > 1 && !UsingOldProtocol())
 	{
 		TCHAR szPath[MAX_PATH];
 		if (nLen > sizeof(szPath)) return;
@@ -1364,7 +1395,7 @@ void FileTransfer::PopulateRemoteListBox(HWND hWnd, int nLen)
 	m_fDirectoryReceptionRunning = true;
 
 	// FT Backward compatibility DIRTY hack for DSMPlugin mode...
-	if (m_fOldFTProtocole && m_pCC->m_fUsePlugin)
+	if (UsingOldProtocol() && m_pCC->m_fUsePlugin)
 	{
 		m_pCC->m_nTO = 0;
 		ProcessFileTransferMsg();
@@ -1396,7 +1427,7 @@ void FileTransfer::ReceiveDirectoryItem(HWND hWnd, int nLen)
 	if (!PseudoYield(GetParent(hWnd))) return;
 
 	// FT Backward compatibility DIRTY hack for DSMPlugin mode...
-	if (m_fOldFTProtocole && m_pCC->m_fUsePlugin)
+	if (UsingOldProtocol() && m_pCC->m_fUsePlugin)
 	{
 		m_pCC->m_nTO = 0;
 		ProcessFileTransferMsg();
@@ -1524,7 +1555,7 @@ void FileTransfer::ListRemoteDrives(HWND hWnd, int nLen)
 
 	// List the usual shorcuts
 
-	if (!m_fOldFTProtocole)
+	if (!UsingOldProtocol())
 	{
 	char szGUIDir[64];
 
@@ -1778,7 +1809,7 @@ void FileTransfer::RequestRemoteFile(LPSTR szRemoteFileName)
 	if (!m_fFTAllowed) return;
 
 	// Ensure Backward FT compatibility (Directory reception)....
-	if (m_fOldFTProtocole)
+	if (UsingOldProtocol())
 	{
 		char* p1 = strrchr(szRemoteFileName, '\\') + 1;
 		char* p2 = strrchr(szRemoteFileName, rfbDirSuffix[0]);
@@ -1848,7 +1879,7 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, int nLen)
 	// So instead we pass the additionnal High size param after the received string...of the current msg
 	// Parse the FileTime and isolate filename
 	CARD32 sizeH = 0;
-	if (!m_fOldFTProtocole)
+	if (!UsingOldProtocol())
 	{
 		CARD32 sizeHtmp;
 		m_pCC->ReadExact((char*)&sizeHtmp, sizeof(CARD32));
@@ -1857,8 +1888,8 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, int nLen)
     // 5/2/2008 moved jdp so that the entire packet is read
 	// If lSize = -1 (0xFFFFFFFF) that means that the Src file on the remote machine
 	// could not be opened for some reason (locked, doesn't exits any more...)
-	if ((m_fOldFTProtocole && lSize == 0xFFFFFFFFu)  ||
-        (!m_fOldFTProtocole && lSize == 0xFFFFFFFFu && sizeH == 0xFFFFFFFFu))
+	if ((UsingOldProtocol() && lSize == 0xFFFFFFFFu)  ||
+        (!UsingOldProtocol() && lSize == 0xFFFFFFFFu && sizeH == 0xFFFFFFFFu))
 	{
 		sprintf(szStatus, " %s < %s > %s", sz_H12, szRemoteFileName, sz_H13);
 		// SetDlgItemText(pFileTransfer->hWnd, IDC_STATUS, szStatus);
@@ -1928,7 +1959,7 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, int nLen)
 		delete [] szRemoteFileName;
 		// Tell the server to cancel the transfer
 		ft.size = Swap32IfLE(-1);
-		if (m_fOldFTProtocole)
+		if (UsingOldProtocol())
 			m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg);
 		else
 			m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
@@ -1974,7 +2005,7 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, int nLen)
 
 		// Tell the server to cancel the transfer
 		ft.size = Swap32IfLE(-1);
-		if (m_fOldFTProtocole)
+		if (UsingOldProtocol())
 			m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg);
 		else
 			m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
@@ -1986,7 +2017,7 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, int nLen)
 	m_pCC->CheckFileChunkBufferSize(m_nBlockSize + 1024);
 
 	// sf@2004 - Delta Transfer
-	if (fAlreadyExists && !m_fOldFTProtocole)
+	if (fAlreadyExists && !UsingOldProtocol())
 	{
 		// DWORD dwFileSize = GetFileSize(m_hDestFile, NULL); 
 		ULARGE_INTEGER n2FileSize;
@@ -2021,7 +2052,7 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, int nLen)
 
 	// Tell the server that the transfer can start
 	ft.size = Swap32IfLE(lSize); 
-	if (m_fOldFTProtocole)
+	if (UsingOldProtocol())
 		m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg);
 	else
 		m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
@@ -2038,7 +2069,7 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, int nLen)
 	m_fFileDownloadRunning = true;
 
 	// FT Backward compatibility DIRTY hack for DSMPlugin mode...
-	if (m_fOldFTProtocole && m_pCC->m_fUsePlugin)
+	if (UsingOldProtocol() && m_pCC->m_fUsePlugin)
 	{
 		m_pCC->m_nTO = 0;
 		ProcessFileTransferMsg();
@@ -2122,7 +2153,7 @@ bool FileTransfer::ReceiveFileChunk(int nLen, int nSize)
 	PseudoYield(GetParent(hWnd));
 
 	// We still support the *dirty* old "Abort" method (for backward compatibility wirh UltraVNC Servers <=RC18)
-	if (m_fOldFTProtocole)
+	if (UsingOldProtocol())
 	{
 		// Every 10 packets, test if the transfer must be stopped
 		m_nPacketCount++;
@@ -2167,7 +2198,7 @@ bool FileTransfer::ReceiveFileChunk(int nLen, int nSize)
 	}
 
 	// FT Backward compatibility DIRTY hack for DSMPlugin mode...
-	if (m_fOldFTProtocole && m_pCC->m_fUsePlugin)
+	if (UsingOldProtocol() && m_pCC->m_fUsePlugin)
 	{
 		m_pCC->m_nTO = 0;
 		ProcessFileTransferMsg();
@@ -2226,7 +2257,7 @@ bool FileTransfer::FinishFileReception()
 	CloseHandle(m_hDestFile);
 
 	// sf@2004 - Delta Transfer - Now we can keep the existing file data :)
-	if (m_fFileDownloadError && (m_fOldFTProtocole || m_fUserAbortedFileTransfer)) DeleteFile(m_szDestFileName);
+	if (m_fFileDownloadError && (UsingOldProtocol() || m_fUserAbortedFileTransfer)) DeleteFile(m_szDestFileName);
 
 	// sf@2003 - Directory Transfer trick
 	// If the file is an Ultra Directory Zip we unzip it here and we delete the
@@ -2439,7 +2470,7 @@ bool FileTransfer::OfferLocalFile(LPSTR szSrcFileName)
     m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
 	m_pCC->WriteExact((char *)szDstFileName, strlen(szDstFileName));
 
-	if (!m_fOldFTProtocole)
+	if (!UsingOldProtocol())
 	{
 		CARD32 sizeH = Swap32IfLE(n2SrcSize.HighPart);
 		m_pCC->WriteExact((char *)&sizeH, sizeof(CARD32));
@@ -2686,7 +2717,7 @@ bool FileTransfer::SendFileChunk()
 			// (Compressed data can be longer if it was already compressed)
 			unsigned int nMaxCompSize = m_nBlockSize + 1024; // TODO: Improve this...
 			bool fCompressed = false;
-			if (m_fCompress && !m_fOldFTProtocole)
+			if (m_fCompress && !UsingOldProtocol())
 			{
 				m_pCC->CheckFileZipBufferSize(nMaxCompSize);
 				int nRetC = compress((unsigned char*)(m_pCC->m_filezipbuf),
@@ -2717,7 +2748,7 @@ bool FileTransfer::SendFileChunk()
 			ft.contentType = rfbFilePacket;
 			ft.size = fCompressed ? Swap32IfLE(1) : Swap32IfLE(0); 
 			ft.length = fCompressed ? Swap32IfLE(nMaxCompSize) : Swap32IfLE(m_dwNbBytesRead);
-			if(m_fOldFTProtocole)
+			    if(UsingOldProtocol())
 				m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg);
 			else
 				m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
@@ -2784,7 +2815,7 @@ bool FileTransfer::FinishFileSending()
 
 		ft.type = rfbFileTransfer;
 		ft.contentType = rfbEndOfFile;
-		if (m_fOldFTProtocole)
+		if (UsingOldProtocol())
 			m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg);
 		else
 			m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
@@ -2798,7 +2829,7 @@ bool FileTransfer::FinishFileSending()
 		ft.contentParam = rfbFileTransferVersion;
 		ft.length = 0;
 		ft.size = 0;
-		if (m_fOldFTProtocole)
+        if (UsingOldProtocol())
 			m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg);
 		else
 			m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
@@ -3320,6 +3351,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 			return TRUE;
 
 		case IDCANCEL:
+            _this->EndFTSession();
 			EndDialog(hWnd, FALSE);
 			return TRUE;
 
@@ -4397,7 +4429,7 @@ void FileTransfer::EnableButtons(HWND hWnd)
 	ShowWindow(GetDlgItem(hWnd, IDCANCEL), SW_SHOW);
 	ShowWindow(GetDlgItem(hWnd, IDC_DELETE_B), SW_SHOW);
 	ShowWindow(GetDlgItem(hWnd, IDC_NEWFOLDER_B), SW_SHOW);
-	if (!m_fOldFTProtocole)
+	if (!UsingOldProtocol())
 		ShowWindow(GetDlgItem(hWnd, IDC_RENAME_B), SW_SHOW);
 	EnableWindow(GetDlgItem(hWnd, IDC_LOCAL_FILELIST), TRUE);
 	EnableWindow(GetDlgItem(hWnd, IDC_LOCAL_DRIVECB), TRUE);
