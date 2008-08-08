@@ -65,13 +65,10 @@
 #include "zlib/zlib.h"
 #endif
 #include "mmSystem.h" // sf@2002
-#include "shlobj.h" 
 #include "sys/types.h"
 #include "sys/stat.h"
 
 #include <string>
-#include <sstream>
-#include <iterator>
 #include <shlobj.h>
 #include "vncOSVersion.h"
 #include "common/win32_helpers.h"
@@ -93,9 +90,8 @@ static std::string make_temp_filename(const char *szFullPath)
     return tmpName;
 }
 
-static std::string get_real_filename(const char *destFileName)
+std::string get_real_filename(std::string name)
 {
-    std::string name (destFileName);
     std::string::size_type pos;
 
     pos = name.find(rfbPartialFilePrefix);
@@ -154,7 +150,7 @@ std::string AddDirPrefixAndSuffix(const char *name)
     return dirname;
 }
 
-bool isDirectory(char *name)
+bool isDirectory(const char *name)
 {
     struct _stat statbuf;
 
@@ -166,7 +162,7 @@ bool isDirectoryTransfer(const char *szFileName)
     return (strncmp(strrchr(const_cast<char*>(szFileName), '\\') + 1, rfbZipDirectoryPrefix, strlen(rfbZipDirectoryPrefix)) == 0);
 }
 
-void GetZippedFolderPathName(char *szZipFile, char *path)
+void GetZippedFolderPathName(const char *szZipFile, char *path)
 {
     // input lookes like: "c:\temp\!UVNCDIR-folder.zip"
     // output should look like "c:\temp\folder"
@@ -214,6 +210,83 @@ void SplitTransferredFileNameAndDate(char *szFileAndDate, char *filetime)
         *p = '\0';
     }
 }
+
+
+/*
+ * File transfer event hooks
+ *
+ * The following functions are called from various points in the file transfer
+ * process. They are notification hooks; the hook function cannot affect the
+ * file operation. One possible use of these hooks is to implement auditing
+ * of file operations on the server side.
+ *
+ * Note that uploads are transfers from the server to the viewer and a
+ * download is a transfer from the viewer to the server.
+ *
+ * The hook will have to use the state stored in the vncClient object
+ * to figure out what was done in most cases. For those cases where it
+ * is not possible, the hook is passed enough information about the event.
+ *  
+ */
+
+// called at the successful start of a file upload
+void vncClient::FTUploadStartHook()
+{
+}
+
+// called when an abort is received from the viewer. it is assumed that it was
+// due to the user cancelling the transfer
+void vncClient::FTUploadCancelledHook()
+{
+}
+
+// Called when an upload fails for any reason: network failure, out of disk space, insufficient privileges etc.
+void vncClient::FTUploadFailureHook()
+{
+}
+
+// Called after the file is successfully uploaded. At this point the file transfer is complete.
+void vncClient::FTUploadCompleteHook()
+{
+}
+
+// called at the successful start of a file download
+void vncClient::FTDownloadStartHook()
+{
+}
+
+// called when an abort is received from the viewer. it is assumed that it was
+// due to the user cancelling the transfer
+void vncClient::FTDownloadCancelledHook()
+{
+}
+
+// Called when an dowload fails for any reason: network failure, out of disk space, insufficient privileges etc.
+void vncClient::FTDownloadFailureHook()
+{
+}
+
+// Called after the file is successfully downloaded. At this point the file transfer is complete.
+void vncClient::FTDownloadCompleteHook()
+{
+}
+
+// Called when a new folder is created.
+void vncClient::FTNewFolderHook(std::string name)
+{
+}
+
+// called when a folder is created
+void vncClient::FTDeleteHook(std::string name, bool isDir)
+{
+}
+
+// called when a file or folder is renamed.
+void vncClient::FTRenameHook(std::string oldName, std::string newname)
+{
+}
+
+
 
 class vncClientUpdateThread : public omni_thread
 {
@@ -536,7 +609,7 @@ vncClientUpdateThread::run_undetached(void *arg)
 		// Also allow in loopbackmode
 		// Loopback mode with winvncviewer will cause a loping
 		// But ssh is back working
-		if (clipboard_text){
+        if (clipboard_text && !m_client->m_fFileSessionOpen){
 			rfbServerCutTextMsg message;
 
 			message.length = Swap32IfLE(strlen(clipboard_text));
@@ -2253,6 +2326,7 @@ vncClientThread::run(void *arg)
 
 							//MessageBox(NULL, "3. Abort !", "Ultra WinVNC", MB_OK);
 							//vnclog.Print(LL_INTINFO, VNCLOG("*** FileTransfer: Wrong Dest File size. Abort !\n"));
+                            m_client->FTDownloadFailureHook();
 							break;
 						}
 
@@ -2265,6 +2339,7 @@ vncClientThread::run(void *arg)
 						m_client->m_fUserAbortedFileTransfer = false;
 						m_client->m_fFileDownloadError = false;
 						m_client->m_fFileDownloadRunning = true;
+                        m_client->FTDownloadStartHook();
                         m_socket->SetRecvTimeout(m_server->GetFTTimeout());
 
 						}
@@ -2313,6 +2388,7 @@ vncClientThread::run(void *arg)
 
 							m_client->m_fFileUploadError = true;
 							m_client->m_fFileUploadRunning = false;
+                            m_client->FTUploadFailureHook();
 
 							break;
 						}
@@ -2409,8 +2485,10 @@ vncClientThread::run(void *arg)
 						{
 							//MessageBox(NULL, "6. Abort !", "Ultra WinVNC", MB_OK);
 							//vnclog.Print(LL_INTINFO, VNCLOG("*** FileTransfer: Wrong Src File size. Abort !\n"));
+                            m_client->FTUploadFailureHook();
 							break; // If error, we don't send anything else
 						}
+                        m_client->FTUploadStartHook();
 						}
 						break;
 
@@ -2428,6 +2506,7 @@ vncClientThread::run(void *arg)
 						if (Swap32IfLE(msg.ft.size) == -1)
 						{
 							helper::close_handle(m_client->m_hSrcFile);
+                            m_client->FTUploadFailureHook();
 							// MessageBox(NULL, "7. Abort !", "Ultra WinVNC", MB_OK);
 							//vnclog.Print(LL_INTINFO, VNCLOG("*** FileTransfer: File not created on client side. Abort !\n"));
 							break;
@@ -2440,6 +2519,7 @@ vncClientThread::run(void *arg)
 							helper::close_handle(m_client->m_hSrcFile);
 							//MessageBox(NULL, "8. Abort !", "Ultra WinVNC", MB_OK);
 							//vnclog.Print(LL_INTINFO, VNCLOG("*** FileTransfer: rfbFileHeader - Unable to allocate buffer. Abort !\n"));
+                            m_client->FTUploadFailureHook();
 							break;
 						}
 
@@ -2453,6 +2533,7 @@ vncClientThread::run(void *arg)
 								delete m_client->m_pBuff;
 							//MessageBox(NULL, "9. Abort !", "Ultra WinVNC", MB_OK);
 							//vnclog.Print(LL_INTINFO, VNCLOG("*** FileTransfer: rfbFileHeader - Unable to allocate comp. buffer. Abort !\n"));
+                            m_client->FTUploadFailureHook();
 							break;
 						}
 
@@ -2760,6 +2841,8 @@ vncClientThread::run(void *arg)
 
 									m_socket->SendExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
 									m_socket->SendExact((char *)szDir, (int)length);
+                                    if (fRet)
+                                        m_client->FTNewFolderHook(szDir);
 								}
 								break;
 
@@ -2801,6 +2884,8 @@ vncClientThread::run(void *arg)
 
 									m_socket->SendExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
 									m_socket->SendExact((char *)newname.c_str(), length);
+                                    if (fRet)
+                                        m_client->FTDeleteHook(szFile, isDir);
 								}
 								break;
 
@@ -2843,6 +2928,8 @@ vncClientThread::run(void *arg)
 
 									m_socket->SendExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
 									m_socket->SendExact((char *)szNames, (int)length);
+                                    if (fRet)
+                                        m_client->FTRenameHook(szCurrentName, szNewName);
 								}
 								break;
 
@@ -2860,6 +2947,7 @@ vncClientThread::run(void *arg)
 					m_client->m_fFileDownloadError = true;
 					FlushFileBuffers(m_client->m_hDestFile);
                     helper::close_handle(m_client->m_hDestFile);
+                    m_client->FTDownloadFailureHook();
                     m_client->m_fFileDownloadRunning = false;
 				}
                 if (m_client->m_fFileUploadRunning)
@@ -2867,6 +2955,7 @@ vncClientThread::run(void *arg)
 					m_client->m_fFileUploadError = true;
                     FlushFileBuffers(m_client->m_hSrcFile);
                     helper::close_handle(m_client->m_hSrcFile);
+                    m_client->FTUploadFailureHook();
                     m_client->m_fFileUploadRunning = false;
 				}
 				//vnclog.Print(LL_INTINFO, VNCLOG("*** FileTransfer: message content reading error\n"));
@@ -2946,6 +3035,7 @@ vncClientThread::run(void *arg)
     {
         m_client->m_fFileDownloadError = true;
         FlushFileBuffers(m_client->m_hDestFile);
+        m_client->FTDownloadFailureHook();
         m_client->m_fFileDownloadRunning = false;
     }
         
@@ -2953,6 +3043,7 @@ vncClientThread::run(void *arg)
     {
         m_client->m_fFileUploadError = true;
         FlushFileBuffers(m_client->m_hSrcFile);
+        m_client->FTUploadFailureHook();
         m_client->m_fFileUploadRunning = false;
     }
 
@@ -4203,6 +4294,7 @@ void vncClient::FinishFileReception()
     {
         SplitTransferredFileNameAndDate(m_szFullDestName, 0);
         ::DeleteFile(m_szFullDestName);
+        FTDownloadCancelledHook();
     }
     else
     {
@@ -4228,6 +4320,10 @@ void vncClient::FinishFileReception()
                 }
             }            
         }
+        if (m_fFileDownloadError)
+            FTDownloadFailureHook();
+        else
+            FTDownloadCompleteHook();
     }
 	//delete [] m_szFullDestName;
 
@@ -4397,6 +4493,13 @@ void vncClient::FinishFileSending()
 		if (p != NULL) *p = '\0'; // Remove the time stamp we've added above from the file name
 		DeleteFile(m_szSrcFileName);
 	}
+    //  jdp 8/8/2008
+    if (m_fUserAbortedFileTransfer)
+        FTUploadCancelledHook();
+    else if (m_fFileUploadError)
+        FTUploadFailureHook();
+    else
+        FTUploadCompleteHook();
 
 }
 
@@ -4457,7 +4560,7 @@ int vncClient::ZipPossibleDirectory(LPSTR szSrcFileName)
 		szDirectoryName[strlen(szDirectoryName) - 2] = '\0'; // Remove dir suffix (2 chars)
 		*p1 = '\0';
         m_OrigSourceDirectoryName = std::string(szPath) + szDirectoryName;
-		if ((strlen(szPath) + strlen(rfbZipDirectoryPrefix) + strlen(szDirectoryName) + 4) > (MAX_PATH - 1)) return false;
+		if ((strlen(szPath) + strlen(rfbZipDirectoryPrefix) + strlen(szDirectoryName) + 4) > (MAX_PATH - 1)) return -1;
 		sprintf(szDirZipPath, "%s%s%s%s", szWorkingDir, rfbZipDirectoryPrefix, szDirectoryName, ".zip"); 
 		strcat(szPath, szDirectoryName);
 		strcpy(szDirectoryName, szPath);

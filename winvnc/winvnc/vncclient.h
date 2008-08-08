@@ -186,6 +186,20 @@ public:
 	bool DoFTUserImpersonation();
 	void UndoFTUserImpersonation();
 
+    // jdp@2008 - File Transfer event hooks
+    void FTUploadStartHook();
+    void FTUploadCancelledHook();
+    void FTUploadFailureHook();
+    void FTUploadCompleteHook();
+
+    void FTDownloadStartHook();
+    void FTDownloadCancelledHook();
+    void FTDownloadFailureHook();
+    void FTDownloadCompleteHook();
+
+    void FTNewFolderHook(std::string name);
+    void FTDeleteHook(std::string name, bool isDir);
+    void FTRenameHook(std::string oldName, std::string newname);
     void SendServerStateUpdate(CARD32 state, CARD32 value);
     void SendKeepAlive(bool bForce = false);
     void SendFTProtocolMsg();
