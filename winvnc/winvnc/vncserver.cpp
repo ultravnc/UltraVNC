@@ -1695,7 +1695,7 @@ vncServer::VerifyHost(const char *hostname) {
 		}
 
 		// Is this the entry we're interested in?
-		if ((strcmp(current->_machineName, hostname) == 0) &&
+		if ((stricmp(current->_machineName, hostname) == 0) &&
 			(current->_blocked)) {
 			// Machine is blocked, so just reject it
 			return vncServer::aqrReject;
@@ -1821,7 +1821,7 @@ vncServer::AddAuthHostsBlacklist(const char *machine) {
 	while (current) {
 
 		// Is this the entry we're interested in?
-		if (strcmp(current->_machineName, machine) == 0) {
+		if (stricmp(current->_machineName, machine) == 0) {
 
 			// If the host is already blocked then ignore
 			if (current->_blocked)
@@ -1860,7 +1860,7 @@ vncServer::RemAuthHostsBlacklist(const char *machine) {
 	while (current) {
 
 		// Is this the entry we're interested in?
-		if (strcmp(current->_machineName, machine) == 0) {
+		if (stricmp(current->_machineName, machine) == 0) {
 			if (previous)
 				previous->_next = current->_next;
 			else

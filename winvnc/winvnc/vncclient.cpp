@@ -858,7 +858,7 @@ vncClientThread::InitAuthenticate()
 		// Check that the local & remote names are different!
 		if ((localname != NULL) && (remotename != NULL))
 		{
-			BOOL ok = strcmp(localname, remotename) != 0;
+			BOOL ok = stricmp(localname, remotename) != 0;
 
 			if (localname != NULL)
 				free(localname);
@@ -893,7 +893,7 @@ vncClientThread::InitAuthenticate()
 		// Check that the local & remote names are different!
 		if ((localname != NULL) && (remotename != NULL))
 		{
-			BOOL ok = strcmp(localname, remotename) != 0;
+			BOOL ok = stricmp(localname, remotename) != 0;
 
 			if (localname != NULL)
 				free(localname);
@@ -3313,6 +3313,8 @@ vncClient::Kill()
 {
 	// Close the socket
 	vnclog.Print(LL_INTERR, VNCLOG("client Kill() called"));
+	if (m_pTextChat)
+        m_pTextChat->KillDialog();
 	if (m_socket != NULL)
 		m_socket->Close();
 }
