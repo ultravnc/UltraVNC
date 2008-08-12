@@ -1862,7 +1862,7 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		// The clipboard contents have changed
 		if((GetClipboardOwner() != _this->Window()) &&
 		    _this->m_initialClipBoardSeen &&
-			_this->m_clipboard_active)
+			_this->m_clipboard_active && !_this->m_server->IsThereFileTransBusy())
 		{
 			LPSTR cliptext = NULL;
 

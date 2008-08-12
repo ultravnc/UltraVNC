@@ -8,7 +8,6 @@
 // Generated from the TEXTINCLUDE 2 resource.
 //
 #include "afxres.h"
-//#include "VersionInfo.h"
 
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
@@ -64,7 +63,6 @@ END
 2 TEXTINCLUDE 
 BEGIN
     "#include ""afxres.h""\r\n"
-    //"#include ""VersionInfo.h""\r\n"
     "\0"
 END
 
@@ -244,7 +242,7 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,200,64,40,14
     PUSHBUTTON      "Options...",IDC_OPTIONBUTTON,200,113,40,14
     CONTROL         108,IDC_STATIC,"Static",SS_BITMAP,3,2,24,24
-    LTEXT           "( host:display or host::port )",IDC_STATIC,83,19,85,8
+    LTEXT           "( host:display or host::port )",IDC_STATIC,83,19,103,8
     GROUPBOX        "Quick Options",IDC_STATIC,4,29,191,108
     GROUPBOX        "",IDC_STATIC,4,136,237,42
     CONTROL         "Use DSMPlugin",IDC_PLUGIN_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,147,66,10

@@ -45,7 +45,12 @@ void ClientConnection::ProcessLocalClipboardChange()
 	vnclog.Print(2, _T("Clipboard changed\n"));
 	
 	HWND hOwner = GetClipboardOwner();
-	if (hOwner == m_hwndcn) {
+
+	if (m_pFileTransfer->m_fFileTransferRunning ||m_pFileTransfer->m_fFileUploadRunning || m_pFileTransfer->m_fFileDownloadRunning)
+	{
+		vnclog.Print(2, _T("Ignore Clipboard while FT is buzy!\n"));
+	}
+	else if (hOwner == m_hwndcn) {
 		vnclog.Print(2, _T("We changed it - ignore!\n"));
 	} else if (!m_initialClipboardSeen) {
 		vnclog.Print(2, _T("Don't send initial clipboard!\n"));
