@@ -1064,7 +1064,7 @@ vncDesktopThread::run_undetached(void *arg)
 							SystemParametersInfo(SPI_SETPOWEROFFACTIVE, 1, NULL, 0);
 							SendMessage(m_desktop->m_hwnd,WM_SYSCOMMAND,SC_MONITORPOWER,(LPARAM)2);
 							}
-							if (m_desktop->pbi) (*m_desktop->pbi)(true);
+// don't block input here, this is the wrong thread!
 						}
 					}
 			}

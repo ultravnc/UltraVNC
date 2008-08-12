@@ -1467,6 +1467,9 @@ vncClientThread::run(void *arg)
             need_to_disable_input = false;
         }
 
+        // reclaim input block after local C+A+D if user currently has it blocked 
+        m_client->m_encodemgr.m_buffer->m_desktop->block_input(m_client->m_encodemgr.m_buffer->m_desktop->GetBlockInputState());
+
         if (need_first_keepalive)
         {
             // send first keepalive to let the client know we accepted the encoding request

@@ -2011,11 +2011,9 @@ vncDesktop::SetDisableInput(bool enabled)
 			BOOL blocked;
 			if (pbi) 
             {
-                blocked = (*pbi)(enabled);
-                if (!blocked)
-                    vnclog.Print(LL_INTINFO, VNCLOG("BlockInput failed:  Last error %08X\n"), ::GetLastError());
-				if(!enabled) Sleep(1000);
-				blocked = (*pbi)(enabled);
+            blocked = block_input(enabled);
+			if(!enabled) Sleep(1000);
+			blocked = block_input(enabled);
             }
 
 		}
@@ -2421,4 +2419,20 @@ void vncDesktop::SetBlockInputState(bool newstate)
 	SetBlankMonitor(newstate);
     SetDisableInput(newstate);
     m_bIsInputDisabledByClient = newstate;
+}
+
+bool vncDesktop::block_input(bool enabled)
+{
+    bool blocked =  false;
+
+    if (pbi)
+    {
+        blocked = (*pbi)(enabled) ? true : false;
+#if 0
+        if (!blocked && enabled)
+            vnclog.Print(LL_INTINFO, VNCLOG("BlockInput failed:  Last error %08X\n"), ::GetLastError());
+#endif
+    }
+
+    return blocked;
 }
