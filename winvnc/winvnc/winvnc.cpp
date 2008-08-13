@@ -170,6 +170,11 @@ Myinit(HINSTANCE hInstance)
 	}
 	return 1;
 }
+#define CRASHRPT
+#ifdef CRASHRPT
+#include "C:/DATA/crash/crashrpt/include/crashrpt.h"
+#pragma comment(lib, "C:/DATA/crash/crashrpt/lib/crashrpt")
+#endif
 
 // WinMain parses the command line and either calls the main App
 // routine or, under NT, the main service routine.
@@ -177,6 +182,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 {
 #ifdef IPP
 	InitIpp();
+#endif
+#ifdef CRASHRPT
+	Install(NULL, _T("ultravnc@skynet.be"), _T(""));
 #endif
 	SetOSVersion();
 	setbuf(stderr, 0);

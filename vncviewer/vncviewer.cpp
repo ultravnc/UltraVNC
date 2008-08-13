@@ -301,6 +301,11 @@ bool g_passwordfailed=true;
 // Accelerator Keys
 AccelKeys TheAccelKeys;
 HINSTANCE m_hInstResDLL;
+#define CRASHRPT
+#ifdef CRASHRPT
+#include "C:/DATA/crash/crashrpt/include/crashrpt.h"
+#pragma comment(lib, "C:/DATA/crash/crashrpt/lib/crashrpt")
+#endif
 
 #ifdef UNDER_CE
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR szCmdLine, int iCmdShow)
@@ -308,6 +313,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR szCmdLin
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow)
 #endif
 {
+  #ifdef CRASHRPT
+	Install(NULL, _T("ultravnc@skynet.be"), _T(""));
+  #endif
+	int *p=0;
+	*p=0;
   setbuf(stderr, 0);
   bool console = false;
   m_hInstResDLL = NULL;
