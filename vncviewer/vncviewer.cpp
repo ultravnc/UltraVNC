@@ -316,8 +316,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
   #ifdef CRASHRPT
 	Install(NULL, _T("ultravnc@skynet.be"), _T(""));
   #endif
-	int *p=0;
-	*p=0;
+
   setbuf(stderr, 0);
   bool console = false;
   m_hInstResDLL = NULL;
