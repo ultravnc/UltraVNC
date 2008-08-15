@@ -302,6 +302,9 @@ bool g_passwordfailed=true;
 AccelKeys TheAccelKeys;
 HINSTANCE m_hInstResDLL;
 #define CRASHRPT
+#ifdef _X64
+#undef CRASHRPT
+#endif
 #ifdef CRASHRPT
 #include "C:/DATA/crash/crashrpt/include/crashrpt.h"
 #pragma comment(lib, "C:/DATA/crash/crashrpt/lib/crashrpt")

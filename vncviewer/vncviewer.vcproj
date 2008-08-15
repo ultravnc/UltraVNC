@@ -278,7 +278,7 @@
 				AdditionalOptions="/LTCG"
 				AdditionalDependencies="comctl32.lib winmm.lib omnithread.lib wsock32.lib"
 				OutputFile=".\Release/vncviewer.exe"
-				LinkIncremental="2"
+				LinkIncremental="0"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="omnithread/Release"
 				ProgramDatabaseFile=".\Release/vncviewer.pdb"
@@ -594,6 +594,10 @@
 			</File>
 			<File
 				RelativePath="res\vnc64.BMP"
+				>
+			</File>
+			<File
+				RelativePath=".\res\vncviewer.exe.manifest"
 				>
 			</File>
 			<File

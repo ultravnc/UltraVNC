@@ -379,7 +379,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
                 }
                 // if a service name is supplied, and it differs except in case from
                 // the default, use the supplied service name instead
-                if (*pServiceName && (strcmpi(pServiceName, service_name) != 0))
+                if (*pServiceName && (_strcmpi(pServiceName, service_name) != 0))
                 {
                     strncpy(service_name, pServiceName, 256);
                     service_name[255] = 0;
@@ -417,7 +417,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
                         *pQuote = 0;
                 }
 
-                if (*pServiceName && (strcmpi(pServiceName, service_name) != 0))
+                if (*pServiceName && (_strcmpi(pServiceName, service_name) != 0))
                 {
                     strncpy(service_name, pServiceName, 256);
                     service_name[255] = 0;

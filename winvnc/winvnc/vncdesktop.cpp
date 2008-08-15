@@ -1406,6 +1406,7 @@ void
 vncDesktop::CaptureScreen(const rfb::Rect &rect, BYTE *scrBuff, UINT scrBuffSize)
 {
 	assert(rect.enclosed_by(m_bmrect));
+	m_fCaptureAlphaBlending = m_server->CaptureAlphaBlending();
 
 	// Select the memory bitmap into the memory DC
 	HBITMAP oldbitmap;
