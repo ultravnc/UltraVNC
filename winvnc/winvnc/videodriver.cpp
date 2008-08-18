@@ -13,6 +13,7 @@ VIDEODRIVER::VIDEODRIVER()
 	mypVideoMemory=NULL;
 	mypchangebuf=NULL;
 	myframebuffer=NULL;
+	shared_buffer_size=0;
 }
 
 void
@@ -133,10 +134,21 @@ void VIDEODRIVER::VideoMemory_ReleaseSharedMemory(PCHAR pVideoMemory)
 PCHAR VIDEODRIVER::VideoMemory_GetSharedMemory(void)
 {
    PCHAR pVideoMemory=NULL;
-   HANDLE hMapFile, hFile; 
+   HANDLE hMapFile, hFile, hFile0,hFile1; 
    
-   hFile = CreateFile("c:\\video0.dat", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
-   if (!(hFile && hFile != INVALID_HANDLE_VALUE)) hFile = CreateFile("c:\\video1.dat", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+   hFile0 = CreateFile("c:\\video0.dat", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+   hFile1 = CreateFile("c:\\video1.dat", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+
+   if ((hFile0 && hFile0 != INVALID_HANDLE_VALUE) && !(hFile1 && hFile1 != INVALID_HANDLE_VALUE)) hFile=hFile0;
+   if ((hFile1 && hFile1 != INVALID_HANDLE_VALUE) && !(hFile0 && hFile0 != INVALID_HANDLE_VALUE)) hFile=hFile1;
+   if ((hFile0 && hFile0 != INVALID_HANDLE_VALUE) && (hFile1 && hFile1 != INVALID_HANDLE_VALUE))
+   {
+	   DWORD size0=GetFileSize(hFile0,NULL);
+	   DWORD size1=GetFileSize(hFile1,NULL);
+	   if (size0==shared_buffer_size) hFile=hFile0;
+	   if (size1==shared_buffer_size) hFile=hFile1;
+
+   }
 
 
    if(hFile && hFile != INVALID_HANDLE_VALUE)
@@ -236,6 +248,7 @@ VIDEODRIVER::Mirror_driver_Vista(DWORD dwAttach,int x,int y,int w,int h)
 			if (hUser32) FreeLibrary(hUser32);
 			return false;
 		}
+		shared_buffer_size=devmode.dmBitsPerPel/8*w*h+sizeof(CHANGES_BUF);
 
         // error check
         if (!result)
@@ -613,6 +626,8 @@ VIDEODRIVER::Mirror_driver_attach_XP(int x,int y,int w,int h)
 		if (hUser32) FreeLibrary(hUser32);
 		return false;
 	}
+
+	shared_buffer_size=devmode.dmBitsPerPel/8*w*h+sizeof(CHANGES_BUF);
 
     if (change) 
     {
