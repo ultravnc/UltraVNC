@@ -14,6 +14,7 @@ LONG locdom1;
 LONG locdom2;
 LONG locdom3;
 LONG DebugMode;
+LONG Avilog;
 LONG DebugLevel;
 LONG DisableTrayIcon;
 LONG LoopbackOnly;
@@ -72,6 +73,7 @@ LONG Virtual;
 LONG SingleWindow=0;
 char SingleWindowName[32];
 LONG FTTimeout = 30;
+char path[512];
 
 BUseRegistry = myIniFile_In.ReadInt("admin", "UseRegistry", 0);
 myIniFile_Out.WriteInt("admin", "UseRegistry", BUseRegistry);
@@ -100,11 +102,15 @@ myIniFile_Out.WriteInt("admin_auth", "locdom3", locdom3);
 
 
 DebugMode=myIniFile_In.ReadInt("admin", "DebugMode", 0);
+Avilog=myIniFile_In.ReadInt("admin", "Avilog", 0);
+myIniFile_In.ReadString("admin", "path", path,512);
 DebugLevel=myIniFile_In.ReadInt("admin", "DebugLevel", 0);
 DisableTrayIcon=myIniFile_In.ReadInt("admin", "DisableTrayIcon", false);
 LoopbackOnly=myIniFile_In.ReadInt("admin", "LoopbackOnly", false);
 
 myIniFile_Out.WriteInt("admin", "DebugMode", DebugMode);
+myIniFile_Out.WriteInt("admin", "Avilog", Avilog);
+myIniFile_Out.WriteString("admin", "path", path);
 myIniFile_Out.WriteInt("admin", "DebugLevel", DebugLevel);
 myIniFile_Out.WriteInt("admin", "DisableTrayIcon", DisableTrayIcon);
 myIniFile_Out.WriteInt("admin", "LoopbackOnly", LoopbackOnly);

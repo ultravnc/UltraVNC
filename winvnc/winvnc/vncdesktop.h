@@ -54,6 +54,9 @@ class vncServer;
 // Modif sf@2002 - v1.1.0
 #include <list>
 #include "textchat.h"
+#ifdef AVILOG
+#include "avilog/avilog/AVIGenerator.h"
+#endif
 //#define COMPILE_MULTIMON_STUBS
 //#include "Multimon.h"
 #ifndef SM_CMONITORS
@@ -447,6 +450,9 @@ int current_monitor;
 int asked_display;
 
 bool m_bIsInputDisabledByClient; // 28 March 2008 jdp
+#ifdef AVILOG
+CAVIGenerator *AviGen;
+#endif
 
 };
 

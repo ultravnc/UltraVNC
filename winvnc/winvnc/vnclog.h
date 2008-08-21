@@ -73,13 +73,19 @@ public:
     void SetLevel(int level);
 	int  GetLevel() const {return m_level;};
 
+	void SetVideo(bool enable) {m_video=enable;};
+	bool GetVideo() {return m_video;};
+	void SetPath(char path[512]);
+	char *GetPath();
+	void ClearAviConfig();
+
     // Change the logging mode
     void SetMode(int mode);
 	int  GetMode() const {return m_mode;};
 
     // Change or set the logging filename.  This only has an effect if
 	// the log mode includes ToFile
-    void SetFile(const char* filename, bool append = false);
+    void SetFile();
 
 	virtual ~VNCLog();
 
@@ -92,8 +98,10 @@ private:
 	int m_mode;
     int m_level;
     HANDLE hlogfile;
-	LPSTR m_filename;
+	char m_filename[512];
 	bool m_append;
+	bool m_video;
+	char m_path[512];
 
 	time_t m_lastLogTime;
 	void GetLastErrorMsg(LPSTR szErrorMsg) const;

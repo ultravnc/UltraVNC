@@ -128,18 +128,7 @@ Myinit(HINSTANCE hInstance)
 
     //Load all messages from ressource file
     Load_Localization(hInstResDLL) ;
-
-	char WORKDIR[MAX_PATH];
-	if (GetModuleFileName(NULL, WORKDIR, MAX_PATH))
-		{
-		char* p = strrchr(WORKDIR, '\\');
-		if (p == NULL) return 0;
-		*p = '\0';
-		}
-	strcat(WORKDIR,"\\");
-	strcat(WORKDIR,"WinVNC.log");
-
-	vnclog.SetFile(WORKDIR, true);
+	vnclog.SetFile();
 //	vnclog.SetMode(2);
 //	vnclog.SetLevel(10);
 
@@ -170,7 +159,7 @@ Myinit(HINSTANCE hInstance)
 	}
 	return 1;
 }
-#define CRASHRPT
+//#define CRASHRPT
 #ifdef CRASHRPT
 #include "C:/DATA/crash/crashrpt/include/crashrpt.h"
 #pragma comment(lib, "C:/DATA/crash/crashrpt/lib/crashrpt")
@@ -211,10 +200,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     char progname[MAX_PATH];
     strncpy(progname, WORKDIR, sizeof progname);
     progname[MAX_PATH - 1] = 0;
-	strcat(WORKDIR,"\\");
-	strcat(WORKDIR,"WinVNC.log");
+	//strcat(WORKDIR,"\\");
+	//strcat(WORKDIR,"WinVNC.log");
 
-	vnclog.SetFile(WORKDIR, true);
+	vnclog.SetFile();
 //	vnclog.SetMode(2);
 //	vnclog.SetLevel(10);
 

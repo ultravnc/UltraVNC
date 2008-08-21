@@ -278,7 +278,9 @@ vncDesktop::FastDetectChanges(rfb::Region2D &rgn, rfb::Rect &rect, int nZone, bo
 vncDesktop::vncDesktop()
 {
 	m_thread = NULL;
-
+#ifdef AVILOG
+	AviGen=NULL;
+#endif
 	m_hwnd = NULL;
 	m_timerid = 0;
 	m_hnextviewer = NULL;
@@ -565,7 +567,25 @@ vncDesktop::Startup()
 	// Initialise the buffer object
 	m_buffer.SetDesktop(this);
 	GetQuarterSize();
+#ifdef AVILOG
+	if(vnclog.GetVideo()){
+		SYSTEMTIME lt;    
+		GetLocalTime(&lt);
+		char str[MAX_PATH + 32]; // 29 January 2008 jdp 
+		_snprintf(str, sizeof str, "%02d_%02d_%02d_%02d_%02d", lt.wMonth,lt.wDay,lt.wHour, lt.wMinute,lt.wSecond);
+		strcat(str,"_vnc.avi");
+		AviGen = new CAVIGenerator(str,"c:\\temp",&m_bminfo.bmi.bmiHeader,5);
+		HRESULT hr;
+		hr=AviGen->InitEngine();
+		if (FAILED(hr))
+		{
+			AviGen->ReleaseEngine(); 
+			delete AviGen;
+			AviGen=NULL;
+		}
 
+	}
+#endif
 	// Everything is ok, so return TRUE
 	return TRUE;
 }
@@ -574,6 +594,14 @@ vncDesktop::Startup()
 BOOL
 vncDesktop::Shutdown()
 {
+#ifdef AVILOG
+	if (AviGen)
+		{
+			AviGen->ReleaseEngine(); 
+			delete AviGen;
+			AviGen=NULL;
+		}
+#endif
 	// If we created a timer then kill it
 	if (m_timerid != NULL)
 		KillTimer(NULL, m_timerid);

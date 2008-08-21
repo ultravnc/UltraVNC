@@ -26,6 +26,7 @@
 #include "stdhdrs.h"
 #include <io.h>
 #include "VNCLog.h"
+#include "inifile.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -44,10 +45,11 @@ VNCLog::VNCLog()
     , m_mode(0)
     , m_level(0)
     , hlogfile(NULL)
-    , m_filename(NULL)
     , m_append(false)
     , m_lastLogTime(0)
+	, m_video(false)
 {
+	strcpy(m_filename,"");
 }
 
 void VNCLog::SetMode(int mode)
@@ -94,14 +96,18 @@ void VNCLog::SetLevel(int level) {
     m_level = level;
 }
 
-void VNCLog::SetFile(const char* filename, bool append) 
+void VNCLog::SetFile() 
 {
 	//SetMode(2);
 	//SetLevel(10);
-	if (m_filename != NULL)
-		free(m_filename);
-	m_filename = _strdup(filename);
-	m_append = append;
+	char temp[512];
+	IniFile myIniFile;
+	myIniFile.ReadString("admin", "path", temp,512);
+	SetPath(temp);
+	strcpy(m_filename,m_path);
+	strcat(m_filename,"\\");
+	strcat(m_filename,"WinVNC.log");
+	m_append = true;
 	if (m_tofile)
 		OpenFile();
 }
@@ -109,7 +115,7 @@ void VNCLog::SetFile(const char* filename, bool append)
 void VNCLog::OpenFile()
 {
 	// Is there a file-name?
-	if (m_filename == NULL)
+	if (strlen(m_filename) == 0)
 	{
         m_todebug = true;
         m_tofile = false;
@@ -203,8 +209,6 @@ void VNCLog::ReallyPrint(const char* format, va_list ap)
 
 VNCLog::~VNCLog()
 {
-	if (m_filename != NULL)
-		free(m_filename);
     try
     {
         CloseFile();
@@ -223,4 +227,46 @@ void VNCLog::GetLastErrorMsg(LPSTR szErrorMsg) const {
          | FORMAT_MESSAGE_FROM_SYSTEM, NULL, dwErrorCode,
          MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR) &szErrorMsg,
          0, NULL);
+}
+
+void VNCLog::SetPath(char path[512])
+{
+	if (strlen(path)==0)
+	{
+		char WORKDIR[MAX_PATH];
+	if (GetModuleFileName(NULL, WORKDIR, MAX_PATH))
+		{
+		char* p = strrchr(WORKDIR, '\\');
+		if (p == NULL) return;
+		*p = '\0';
+		}
+		strcpy(m_path,WORKDIR);
+	}
+	else
+	strcpy(m_path,path);
+}
+char *VNCLog::GetPath()
+{
+	if (strlen(m_path)==0)
+	{
+		char WORKDIR[MAX_PATH];
+	if (GetModuleFileName(NULL, WORKDIR, MAX_PATH))
+		{
+		char* p = strrchr(WORKDIR, '\\');
+		if (p == NULL) return "";
+		*p = '\0';
+		}
+		strcpy(m_path,WORKDIR);
+	}
+	
+	return m_path;
+}
+
+void VNCLog::ClearAviConfig()
+{
+	char WORKDIR[MAX_PATH];
+	strcpy(WORKDIR,m_path);
+	strcat(WORKDIR,"\\");
+	strcat(WORKDIR,"codec.cfg");
+	DeleteFile(WORKDIR);
 }

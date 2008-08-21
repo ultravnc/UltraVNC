@@ -138,6 +138,7 @@
 #define IDC_GROUP1                      1084
 #define IDC_IDCODE                      1084
 #define IDC_BLANKINGTXT                 1084
+#define IDC_EDIT_PATH                   1084
 #define IDC_MSLOGON_CHECKD              1085
 #define IDC_GROUP2                      1086
 #define IDC_MSLOGON_CHECKD2             1086
@@ -177,6 +178,11 @@
 #define IDC_WWW3                        1121
 #define IDC_CHECK1                      1122
 #define IDC_JAP_INPUTS                  1122
+#define IDC_CHECK3                      1123
+#define IDC_EURO                        1123
+#define IDC_VIDEO                       1125
+#define IDC_BUTTON1                     1126
+#define IDC_CLEAR                       1126
 #define IDC_Path1                       1132
 #define IDC_Path2                       1133
 #define IDC_Path3                       1134
@@ -265,7 +271,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        153
 #define _APS_NEXT_COMMAND_VALUE         40019
-#define _APS_NEXT_CONTROL_VALUE         1123
+#define _APS_NEXT_CONTROL_VALUE         1127
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -448,6 +448,23 @@ vncProperties::DialogProc(HWND hwnd,
 			   CheckDlgButton(hwnd, IDC_LOG, BST_CHECKED);
 		   else
 			   CheckDlgButton(hwnd, IDC_LOG, BST_UNCHECKED);
+
+#ifndef AVILOG
+		   ShowWindow (GetDlgItem(hwnd, IDC_CLEAR), SW_HIDE);
+		   ShowWindow (GetDlgItem(hwnd, IDC_VIDEO), SW_HIDE);
+#endif
+		   if (vnclog.GetVideo())
+		   {
+			   SetDlgItemText(hwnd, IDC_EDIT_PATH, vnclog.GetPath());
+			   EnableWindow(GetDlgItem(hwnd, IDC_EDIT_PATH), true);
+			   CheckDlgButton(hwnd, IDC_VIDEO, BST_CHECKED);
+		   }
+		   else
+		   {
+			   SetDlgItemText(hwnd, IDC_EDIT_PATH, vnclog.GetPath());
+			   EnableWindow(GetDlgItem(hwnd, IDC_EDIT_PATH), false);
+			   CheckDlgButton(hwnd, IDC_VIDEO, BST_UNCHECKED);
+		   }
 		   
 			// Marscha@2004 - authSSP: moved MS-Logon checkbox back to admin props page
 			// added New MS-Logon checkbox
@@ -634,6 +651,18 @@ vncProperties::DialogProc(HWND hwnd,
 		case IDOK:
 		case IDC_APPLY:
 			{
+				char path[512];
+				int lenpath = GetDlgItemText(hwnd, IDC_EDIT_PATH, (LPSTR) &path, 512);
+				if (lenpath != 0)
+					{
+						vnclog.SetPath(path);
+				}
+				else
+				{
+					strcpy(path,"");
+					vnclog.SetPath(path);
+				}
+
 				// Save the password
 				char passwd[MAXPWLEN+1];
 				// TightVNC method
@@ -811,6 +840,14 @@ vncProperties::DialogProc(HWND hwnd,
 				{
 					vnclog.SetMode(0);
 				}
+				if (IsDlgButtonChecked(hwnd, IDC_VIDEO))
+				{
+					vnclog.SetVideo(true);
+				}
+				else
+				{
+					vnclog.SetVideo(false);
+				}
 				// Modif sf@2002 - v1.1.0
 				// Marscha@2004 - authSSP: moved MS-Logon checkbox back to admin props page
 				// added New MS-Logon checkbox
@@ -916,6 +953,27 @@ vncProperties::DialogProc(HWND hwnd,
                 ::EnableWindow(hAlphab, ::SendMessage(hBlank, BM_GETCHECK, 0, 0) == BST_CHECKED);
             }
             break;
+
+		case IDC_VIDEO:
+			{
+				if (IsDlgButtonChecked(hwnd, IDC_VIDEO))
+				   {
+					   EnableWindow(GetDlgItem(hwnd, IDC_EDIT_PATH), true);
+					   
+				   }
+				   else
+				   {
+					   EnableWindow(GetDlgItem(hwnd, IDC_EDIT_PATH), false);
+					   
+				   }
+				break;
+			}
+
+		case IDC_CLEAR:
+			{
+				vnclog.ClearAviConfig();
+				break;
+			}
 
 		case IDC_CONNECT_SOCK:
 			// TightVNC 1.2.7 method
@@ -1770,6 +1828,11 @@ vncProperties::SavePassword(HKEY key, char *buffer)
 {
 	RegSetValueEx(key, "Password", 0, REG_BINARY, (LPBYTE) buffer, MAXPWLEN);
 }
+void
+vncProperties::SaveString(HKEY key,LPCSTR valname, const char *buffer)
+{
+	RegSetValueEx(key, valname, 0, REG_BINARY, (LPBYTE) buffer, strlen(buffer)+1);
+}
 
 void
 vncProperties::SaveDSMPluginName(HKEY key, char *buffer)
@@ -1873,6 +1936,8 @@ vncProperties::Save()
 		hkDefault = NULL;
 	// sf@2003
 	SaveInt(hkLocal, "DebugMode", vnclog.GetMode());
+	SaveInt(hkLocal, "Avilog", vnclog.GetVideo());
+	SaveString(hkLocal, "path", vnclog.GetPath());
 	SaveInt(hkLocal, "DebugLevel", vnclog.GetLevel());
 	SaveInt(hkLocal, "AllowLoopback", m_server->LoopbackOk());
 	SaveInt(hkLocal, "LoopbackOnly", m_server->LoopbackOnly());
@@ -1977,7 +2042,11 @@ void vncProperties::LoadFromIniFile()
 
 	// Logging/debugging prefs
 	vnclog.SetMode(myIniFile.ReadInt("admin", "DebugMode", 0));
+	char temp[512];
+	myIniFile.ReadString("admin", "path", temp,512);
+	vnclog.SetPath(temp);
 	vnclog.SetLevel(myIniFile.ReadInt("admin", "DebugLevel", 0));
+	vnclog.SetVideo(myIniFile.ReadInt("admin", "Avilog", 0));
 
 	// Disable Tray Icon
 	m_server->SetDisableTrayIcon(myIniFile.ReadInt("admin", "DisableTrayIcon", false));
@@ -2141,6 +2210,8 @@ void vncProperties::SaveToIniFile()
 
 	SaveUserPrefsToIniFile();
 	myIniFile.WriteInt("admin", "DebugMode", vnclog.GetMode());
+	myIniFile.WriteInt("admin", "Avilog", vnclog.GetVideo());
+	myIniFile.WriteString("admin", "path", vnclog.GetPath());
 	myIniFile.WriteInt("admin", "DebugLevel", vnclog.GetLevel());
 	myIniFile.WriteInt("admin", "AllowLoopback", m_server->LoopbackOk());
 	myIniFile.WriteInt("admin", "LoopbackOnly", m_server->LoopbackOnly());

@@ -1067,6 +1067,9 @@ vncDesktopThread::run_undetached(void *arg)
 // don't block input here, this is the wrong thread!
 						}
 					}
+#ifdef AVILOG
+				if (m_desktop->AviGen) m_desktop->AviGen->AddFrame((BYTE*)m_desktop->m_DIBbits);
+#endif
 			}
 
 			

@@ -898,7 +898,6 @@ vncPropertiesPoll::SaveUserPrefsPoll(HKEY appkey)
 	// [v1.0.2-jp2 fix]
 	SaveInt(appkey, "SingleWindow", m_server->SingleWindow());
 	SaveString(appkey, "SingleWindowName", m_server->GetWindowName());
-	
 }
 
 
