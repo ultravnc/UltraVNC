@@ -4,6 +4,7 @@
 	Version="9,00"
 	Name="winvnc"
 	ProjectGUID="{C05AE605-1250-4F58-911B-EC99AE2C25AF}"
+	RootNamespace="winvnc"
 	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
@@ -51,7 +52,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\omnithread,..,..\.."
-				PreprocessorDefinitions="_DEBUG;__x86__;__WIN32__;WIN32;_WINDOWS;_WIN32_WINNT=0x501;XMD_H;_WINSTATIC;_CRT_SECURE_NO_WARNINGS;_VC80;AVILOG"
+				PreprocessorDefinitions="_DEBUG;__x86__;__WIN32__;WIN32;_WINDOWS;_WIN32_WINNT=0x501;XMD_H;_WINSTATIC;_CRT_SECURE_NO_WARNINGS;_VC80"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -250,7 +251,7 @@
 				EnableFiberSafeOptimizations="true"
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="..\omnithread,..,..\.."
-				PreprocessorDefinitions="NDEBUG;__x86__;__WIN32__;WIN32;_WINDOWS;_WIN32_WINNT=0x501;XMD_H;_WINSTATIC;_VC80;_CRT_SECURE_NO_WARNINGS;AVILOG"
+				PreprocessorDefinitions="NDEBUG;__x86__;__WIN32__;WIN32;_WINDOWS;_WIN32_WINNT=0x501;XMD_H;_WINSTATIC;_VC80;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"

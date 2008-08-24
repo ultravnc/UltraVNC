@@ -766,8 +766,8 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 		//buttonmap=IDB_BITMAP16;
 		//minibuttonmap=IDB_BITMAP18;
 		// new color
-		buttonmap=IDB_BITMAP20;
-		minibuttonmap=IDB_BITMAP22;
+		buttonmap=IDB_BITMAPl;
+		minibuttonmap=IDB_BITMAPs;
 		if (m_remote_mouse_disable)
 					{
 						//old
@@ -777,8 +777,8 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 						//buttonmap=IDB_BITMAP17;
 						//minibuttonmap=IDB_BITMAP15;
 						// new color
-						buttonmap=IDB_BITMAP21;
-						minibuttonmap=IDB_BITMAP19;
+						buttonmap=IDB_BITMAPlx;
+						minibuttonmap=IDB_BITMAPsx;
 
 					}
 		if (mini)
@@ -820,7 +820,7 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 		}
 		
 		tbab.hInst = m_pApp->m_instance;
-		tbab.nID = IDB_BITMAP1;
+		tbab.nID = IDB_BITMAPl;
 		stdidx = SendMessage(m_hwndTB,TB_ADDBITMAP,6,(LPARAM)&tbab);
 		RECT tbrect;
 		RECT wrect;
@@ -926,7 +926,7 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 				,IDR_TOOLBAR
 				,nr_buttons
 				,(HINSTANCE)m_pApp->m_instance
-				,IDB_BITMAP7
+				,IDB_BITMAPs
 				,(LPCTBBUTTON)&tbButtons
 				,nr_buttons
 				,12
@@ -944,7 +944,7 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 				,IDR_TOOLBAR
 				,nr_buttons
 				,(HINSTANCE)m_pApp->m_instance
-				,IDB_BITMAP1
+				,IDB_BITMAPl
 				,(LPCTBBUTTON)&tbButtons
 				,nr_buttons
 				,20
@@ -955,7 +955,7 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 		}
 		
 		tbab.hInst = m_pApp->m_instance;
-		tbab.nID = IDB_BITMAP1;
+		tbab.nID = IDB_BITMAPl;
 		stdidx = SendMessage(m_hwndTB,TB_ADDBITMAP,6,(LPARAM)&tbab);
 		RECT tbrect;
 		RECT wrect;

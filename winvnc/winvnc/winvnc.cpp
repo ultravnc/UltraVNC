@@ -51,14 +51,6 @@
 void InitIpp();
 #endif
 
-//#define CRASH_ENABLED
-#ifdef CRASH_ENABLED
-	#ifndef _CRASH_RPT_
-	#include "crashrpt.h"
-	#pragma comment(lib, "crashrpt.lib")
-	#endif
-#endif
-
 #define LOCALIZATION_MESSAGES   // ACT: full declaration instead on extern ones
 #include "localization.h" // Act : add localization on messages
 

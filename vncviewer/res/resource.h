@@ -34,11 +34,9 @@
 #define ID_BUTTON_INFO                  157
 #define IDD_FTPARAM_DLG                 157
 #define IDC_CURSOR1                     158
-#define IDB_BITMAP1                     159
 #define IDB_BITMAP4                     160
 #define IDD_STATUS                      161
 #define IDB_BITMAP5                     162
-#define IDB_BITMAP7                     163
 #define IDB_BITMAP6                     164
 #define IDI_NET                         165
 #define IDD_TEXTCHAT_DLG                165
@@ -52,8 +50,6 @@
 #define IDB_STAT_BACK                   172
 #define IDB_STAT_BOTH                   173
 #define IDB_STAT_FRONT                  174
-#define IDB_BITMAP8                     175
-#define IDB_BITMAP9                     176
 #define IDB_MAXIMIZE                    177
 #define IDR_TRAY_DISABLED               177
 #define IDB_MINIMIZE                    178
@@ -67,14 +63,10 @@
 #define IDI_DRIVE                       185
 #define IDB_BITMAP13                    186
 #define IDB_BITMAP14                    187
-#define IDB_BITMAP15                    189
-#define IDB_BITMAP16                    190
-#define IDB_BITMAP17                    191
-#define IDB_BITMAP18                    192
-#define IDB_BITMAP19                    193
-#define IDB_BITMAP20                    194
-#define IDB_BITMAP21                    195
-#define IDB_BITMAP22                    196
+#define IDB_BITMAPsx                    197
+#define IDB_BITMAPl                     198
+#define IDB_BITMAPlx                    199
+#define IDB_BITMAPs                     200
 #define IDD_USER_NAME                   604
 #define ID_VK_LWINDOWN                  605
 #define ID_VK_RWINDOWN                  606
@@ -521,7 +513,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        197
+#define _APS_NEXT_RESOURCE_VALUE        201
 #define _APS_NEXT_COMMAND_VALUE         50025
 #define _APS_NEXT_CONTROL_VALUE         1162
 #define _APS_NEXT_SYMED_VALUE           154

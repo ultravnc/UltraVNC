@@ -301,7 +301,7 @@ bool g_passwordfailed=true;
 // Accelerator Keys
 AccelKeys TheAccelKeys;
 HINSTANCE m_hInstResDLL;
-#define CRASHRPT
+//#define CRASHRPT
 #ifdef _X64
 #undef CRASHRPT
 #endif
