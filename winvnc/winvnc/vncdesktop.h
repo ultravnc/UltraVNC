@@ -407,7 +407,7 @@ protected:
 	DWORD m_thread_hooks;
 	BOOL ddihook;
 	UINT OldPowerOffTimeout;
-	bool OldCaptureBlending;
+	bool m_Black_window_active;
 
 	//	[v1.0.2-jp1 fix] Monitor Blanking
 	//BOOL m_grayed;

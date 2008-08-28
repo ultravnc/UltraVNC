@@ -102,7 +102,7 @@ vncDesktop::CapturePixel(int x,int y)
 	BOOL blitok = BitBlt(m_hmemdc, 0, 0,
 		1,
 		1,
-		m_hrootdc,x, y, m_fCaptureAlphaBlending ? (CAPTUREBLT | SRCCOPY) : SRCCOPY);
+		m_hrootdc,x, y, (m_fCaptureAlphaBlending && !m_Black_window_active) ? (CAPTUREBLT | SRCCOPY) : SRCCOPY);
 
 	// Select the old bitmap back into the memory DC
 	SelectObject(m_hmemdc, oldbitmap);
@@ -281,6 +281,7 @@ vncDesktop::vncDesktop()
 #ifdef AVILOG
 	AviGen=NULL;
 #endif
+	m_Black_window_active=false;
 	m_hwnd = NULL;
 	m_timerid = 0;
 	m_hnextviewer = NULL;
@@ -1434,7 +1435,9 @@ void
 vncDesktop::CaptureScreen(const rfb::Rect &rect, BYTE *scrBuff, UINT scrBuffSize)
 {
 	assert(rect.enclosed_by(m_bmrect));
+	if (OSversion()==1 || OSversion()==2)
 	m_fCaptureAlphaBlending = m_server->CaptureAlphaBlending();
+
 
 	// Select the memory bitmap into the memory DC
 	HBITMAP oldbitmap;
@@ -1445,7 +1448,7 @@ vncDesktop::CaptureScreen(const rfb::Rect &rect, BYTE *scrBuff, UINT scrBuffSize
 	BOOL blitok = BitBlt(m_hmemdc, rect.tl.x, rect.tl.y,
 		(rect.br.x-rect.tl.x),
 		(rect.br.y-rect.tl.y),
-		m_hrootdc, rect.tl.x, rect.tl.y, m_fCaptureAlphaBlending ? (CAPTUREBLT | SRCCOPY) : SRCCOPY);
+		m_hrootdc, rect.tl.x, rect.tl.y, (m_fCaptureAlphaBlending && !m_Black_window_active) ? (CAPTUREBLT | SRCCOPY) : SRCCOPY);
 
 	// Select the old bitmap back into the memory DC
 	SelectObject(m_hmemdc, oldbitmap);
@@ -1997,8 +2000,7 @@ void vncDesktop::SetBlankMonitor(bool enabled)
 			    DWORD dwTId;
 			    ThreadHandle2 = CreateThread(NULL, 0, BlackWindow, NULL, 0, &dwTId);
 			    CloseHandle(ThreadHandle2);
-			    OldCaptureBlending=(FALSE != m_fCaptureAlphaBlending);
-			    m_fCaptureAlphaBlending=false;
+			    m_Black_window_active=true;
 		    }
 	    }
 	    else // Monitor On
@@ -2018,7 +2020,7 @@ void vncDesktop::SetBlankMonitor(bool enabled)
 		    {
 			    HWND Blackhnd = FindWindow(("blackscreen"), 0);
 			    if (Blackhnd) PostMessage(Blackhnd, WM_CLOSE, 0, 0);
-			    m_fCaptureAlphaBlending=OldCaptureBlending;
+			    m_Black_window_active=false;
 		    }
 	    }
     }
