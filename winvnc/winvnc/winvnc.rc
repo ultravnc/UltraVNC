@@ -392,7 +392,7 @@ BEGIN
         MENUITEM "Install Service",             ID_RUNASSERVICE
         MENUITEM "Uninstall Service",           ID_UNINSTALL_SERVICE
         MENUITEM "Stop Service",                ID_CLOSE_SERVICE
-        MENUITEM "Start Service (need to be previous installed)", ID_START_SERVICE
+        MENUITEM "Start Service (must be installed first)", ID_START_SERVICE
         MENUITEM SEPARATOR
         MENUITEM "&Close VNC Connections",      ID_CLOSE
     END
@@ -404,7 +404,6 @@ END
 // JAVAARCHIVE
 //
 
-IDR_VNCVIEWER_JAR       JAVAARCHIVE             "res\\vncviewer.jar"
 
 /////////////////////////////////////////////////////////////////////////////
 //
