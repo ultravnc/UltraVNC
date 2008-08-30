@@ -81,7 +81,7 @@ BEGIN
 END
 
 IDD_ABOUT DIALOGEX 0, 0, 282, 158
-STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION " About WinVNC"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
@@ -89,7 +89,7 @@ BEGIN
     CONTROL         139,IDC_VNCLOGO,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_SUNKEN,7,5,53,46,WS_EX_TRANSPARENT
     LTEXT           "UltraVNC Win32 Server 1.0.5",IDC_VERSION,73,5,195,11
     LTEXT           "Copyright © 2002-2005 Ultr@VNC Team\nCopyright © 2001-2002 Sam - eSVNC \nCopyright © 1999-2002 Rudi D. V. - VdaccVNC \nCopyright © 2001 Harakan Software - PalmVNC\nCopyright © 1999-2002 Const. Kaplinsky - TightVNC \n",IDC_NAME,74,27,202,41
-    LTEXT           "For more Information and Links please visit: \nhttp://ultravnc.sf.net",IDC_WWW,74,135,141,19
+    LTEXT           "For more Information and Links please visit: \nhttp://www.uvnc.com",IDC_WWW,74,135,141,19
     LTEXT           "Build:",IDC_BUILDTEXT,74,16,20,10
     LTEXT           "BuildTime",IDC_BUILDTIME,97,16,92,10
     LTEXT           "Copyright © 2002 RealVNC Ltd. - RealVNC\nCopyright © 1999-2002 Tridia Corporation - TridiaVNC \nCopyright © 1994-2001 AT&&T Laboratories Cambridge/Olivetti Research Ltd. - VNC",IDC_STATIC,74,67,203,32
@@ -236,6 +236,15 @@ BEGIN
     PUSHBUTTON      "Clear avi encoder",IDC_CLEAR,297,251,75,9
 END
 
+IDD_ABOUT1 DIALOGEX 0, 0, 286, 222
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION " Info"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,210,204,54,16
+    CONTROL         153,IDC_VNCLOGO,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_SUNKEN,7,5,269,199,WS_EX_TRANSPARENT
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -323,6 +332,28 @@ BEGIN
         VERTGUIDE, 257
         BOTTOMMARGIN, 280
         HORZGUIDE, 270
+    END
+
+    IDD_ABOUT1, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 282
+        VERTGUIDE, 80
+        VERTGUIDE, 90
+        VERTGUIDE, 100
+        VERTGUIDE, 120
+        TOPMARGIN, 5
+        BOTTOMMARGIN, 158
+        HORZGUIDE, 9
+        HORZGUIDE, 20
+        HORZGUIDE, 30
+        HORZGUIDE, 40
+        HORZGUIDE, 50
+        HORZGUIDE, 60
+        HORZGUIDE, 70
+        HORZGUIDE, 80
+        HORZGUIDE, 90
+        HORZGUIDE, 100
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -493,6 +524,25 @@ BEGIN
 END
 
 #endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Dutch (Netherlands) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NLD)
+#ifdef _WIN32
+LANGUAGE LANG_DUTCH, SUBLANG_DUTCH
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_BITMAP3             BITMAP                  "res\\runas.bmp"
+#endif    // Dutch (Netherlands) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

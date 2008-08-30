@@ -35,9 +35,11 @@
 #define IDB_BITMAP1                     144
 #define IDD_MSLOGON                     145
 #define IDD_PROPERTIES1                 146
+#define IDD_ABOUT1                      147
 #define IDR_FTPFRAME_CLASS              148
 #define IDR_DH_CLASS                    149
 #define IDR_FTPFRAMESTRCOMP_CLASS       151
+#define IDB_BITMAP3                     153
 #define IDD_USER_NAME                   604
 #define IDD_PASSWORD                    608
 #define IDR_MESSAGES_PROPERTIES         900
@@ -269,7 +271,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        153
+#define _APS_NEXT_RESOURCE_VALUE        154
 #define _APS_NEXT_COMMAND_VALUE         40019
 #define _APS_NEXT_CONTROL_VALUE         1127
 #define _APS_NEXT_SYMED_VALUE           101

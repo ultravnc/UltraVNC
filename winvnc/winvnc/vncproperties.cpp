@@ -73,6 +73,44 @@ vncProperties::~vncProperties()
 {
 }
 
+
+BOOL CALLBACK
+DialogProc1(HWND hwnd,
+					 UINT uMsg,
+					 WPARAM wParam,
+					 LPARAM lParam )
+{
+	switch (uMsg)
+	{
+
+	case WM_INITDIALOG:
+		{
+
+			// Show the dialog
+			SetForegroundWindow(hwnd);
+
+			return TRUE;
+		}
+
+	case WM_COMMAND:
+		switch (LOWORD(wParam))
+		{
+
+		case IDCANCEL:
+		case IDOK:
+			EndDialog(hwnd, TRUE);
+			return TRUE;
+		}
+
+		break;
+
+	case WM_DESTROY:
+		EndDialog(hwnd, FALSE);
+		return TRUE;
+	}
+	return 0;
+}
+
 // Initialisation
 BOOL
 vncProperties::Init(vncServer *server)
@@ -120,6 +158,11 @@ vncProperties::Init(vncServer *server)
 						ShowAdmin(TRUE, FALSE);
 						Lock_service_helper=false;
 					} else {
+						DialogBoxParam(hInstResDLL,
+				MAKEINTRESOURCE(IDD_ABOUT1), 
+				NULL,
+				(DLGPROC) DialogProc1,
+				(LONG) this);
 						ShowAdmin(TRUE, TRUE);
 					}
 				}

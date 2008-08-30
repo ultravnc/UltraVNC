@@ -4319,6 +4319,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\res\runas.bmp"
+				>
+			</File>
+			<File
 				RelativePath="res\vdacc.bmp"
 				>
 			</File>
@@ -4376,11 +4380,11 @@
 			>
 		</File>
 		<File
-			RelativePath="..\..\BUILDING.txt"
+			RelativePath="..\building.txt"
 			>
 		</File>
 		<File
-			RelativePath="..\building.txt"
+			RelativePath="..\..\BUILDING.txt"
 			>
 		</File>
 		<File
