@@ -81,7 +81,7 @@ BEGIN
 END
 
 IDD_ABOUT DIALOGEX 0, 0, 282, 158
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION " About WinVNC"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
@@ -334,7 +334,7 @@ BEGIN
         HORZGUIDE, 270
     END
 
-    IDD_ABOUT1, DIALOG
+	IDD_ABOUT1, DIALOG
     BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 282
@@ -435,6 +435,7 @@ END
 // JAVAARCHIVE
 //
 
+IDR_VNCVIEWER_JAR       JAVAARCHIVE             "res\\vncviewer.jar"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -524,25 +525,6 @@ BEGIN
 END
 
 #endif    // English (U.S.) resources
-/////////////////////////////////////////////////////////////////////////////
-
-
-/////////////////////////////////////////////////////////////////////////////
-// Dutch (Netherlands) resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NLD)
-#ifdef _WIN32
-LANGUAGE LANG_DUTCH, SUBLANG_DUTCH
-#pragma code_page(1252)
-#endif //_WIN32
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Bitmap
-//
-
-IDB_BITMAP3             BITMAP                  "res\\runas.bmp"
-#endif    // Dutch (Netherlands) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -671,6 +653,7 @@ IDI_FLASH               ICON                    "res\\icon2.ico"
 //
 
 IDB_LOGO64              BITMAP                  "res\\vnc-1.bmp"
+IDB_BITMAP3             BITMAP                  "res\\runas.bmp"
 #endif    // Dutch (Belgium) resources
 /////////////////////////////////////////////////////////////////////////////
 
