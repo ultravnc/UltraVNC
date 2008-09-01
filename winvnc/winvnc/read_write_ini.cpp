@@ -226,24 +226,24 @@ myIniFile_Out.WriteInt("poll", "SingleWindow", SingleWindow);
 myIniFile_Out.WriteString("poll", "SingleWindowName", SingleWindowName);
 }
 
-void Copy_to_Temp()
+void Copy_to_Temp(char *tempfile)
 {
 IniFile myIniFile_In;
 IniFile myIniFile_Out;
 myIniFile_In.IniFileSetSecure();
-myIniFile_Out.IniFileSetTemp();
+myIniFile_Out.IniFileSetTemp(tempfile);
 
 do_copy(myIniFile_In, myIniFile_Out);
 
 }
 
 
-void Copy_to_Secure_from_temp()
+void Copy_to_Secure_from_temp(char *tempfile)
 {
 IniFile myIniFile_In;
 IniFile myIniFile_Out;
 myIniFile_Out.IniFileSetSecure();
-myIniFile_In.IniFileSetTemp();
+myIniFile_In.IniFileSetTemp(tempfile);
 
 do_copy(myIniFile_In, myIniFile_Out);
 }

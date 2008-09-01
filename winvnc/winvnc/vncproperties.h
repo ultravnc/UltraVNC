@@ -43,7 +43,8 @@ class vncProperties;
 #include "vncServer.h"
 #include "vncSetAuth.h"
 #include "inifile.h"
-
+#include <Userenv.h>
+#define INIFILE_NAME "ultravnc.ini"
 // The vncProperties class itself
 class vncProperties
 {
@@ -166,7 +167,7 @@ protected:
 	vncSetAuth		m_vncauth;
 
 	char m_pref_path111[500];
-
+	char m_Tempfile[MAX_PATH];
 
 private:
 	void InitPortSettings(HWND hwnd); // TightVNC 1.1.7

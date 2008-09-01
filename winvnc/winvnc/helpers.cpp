@@ -43,7 +43,7 @@ Set_settings_as_admin(char *mycommand)
 }
 
 
-void Copy_to_Secure_from_temp(char *lpCmdLine)
+void Copy_to_Secure_from_temp_helper(char *lpCmdLine)
 {
 IniFile myIniFile_In;
 IniFile myIniFile_Out;
@@ -277,7 +277,7 @@ DeleteFile(lpCmdLine);
 void
 Real_settings(char *mycommand)
 {
-Copy_to_Secure_from_temp(mycommand);
+Copy_to_Secure_from_temp_helper(mycommand);
 }
 
 void

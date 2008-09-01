@@ -41,7 +41,7 @@ IniFile::IniFileSetTemp(char *lpCmdLine)
 	strcpy(myInifile,lpCmdLine);
 }
 
-void
+/*void
 IniFile::IniFileSetTemp()
 {
 char WORKDIR[MAX_PATH];
@@ -65,7 +65,7 @@ char WORKDIR[MAX_PATH];
 	strcpy(myInifile,"");
 	strcat(myInifile,WORKDIR);//set the directory
 	strcat(myInifile,INIFILE_NAME);
-}
+}*/
 
 void
 IniFile::copy_to_secure()

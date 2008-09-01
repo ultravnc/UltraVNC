@@ -182,6 +182,29 @@ vncProperties::ShowAdmin(BOOL show, BOOL usersettings)
 	HANDLE hProcess,hPToken;
 	DWORD id=GetExplorerLogonPid();
 	int iImpersonateResult=0;
+	{
+		char WORKDIR[MAX_PATH];
+		if (!GetTempPath(MAX_PATH,WORKDIR))
+			{
+				//Function failed, just set something
+				if (GetModuleFileName(NULL, WORKDIR, MAX_PATH))
+				{
+					char* p = strrchr(WORKDIR, '\\');
+					if (p == NULL) return;
+					*p = '\0';
+				}
+					strcpy(m_Tempfile,"");
+					strcat(m_Tempfile,WORKDIR);//set the directory
+					strcat(m_Tempfile,"\\");
+					strcat(m_Tempfile,INIFILE_NAME);
+		}
+		else
+		{
+			strcpy(m_Tempfile,"");
+			strcat(m_Tempfile,WORKDIR);//set the directory
+			strcat(m_Tempfile,INIFILE_NAME);
+		}
+	}
 	if (id!=0) 
 			{
 				hProcess = OpenProcess(MAXIMUM_ALLOWED,FALSE,id);
@@ -191,8 +214,14 @@ vncProperties::ShowAdmin(BOOL show, BOOL usersettings)
 				{
 					ImpersonateLoggedOnUser(hPToken);
 					iImpersonateResult = GetLastError();
+					if(iImpersonateResult == ERROR_SUCCESS)
+					{
+						ExpandEnvironmentStringsForUser(hPToken, "%TEMP%", m_Tempfile, MAX_PATH);
+						strcat(m_Tempfile,"\\");
+						strcat(m_Tempfile,INIFILE_NAME);
+					}
 				}
-			}
+	}
 
 	if (!m_allowproperties) 
 	{
@@ -1232,6 +1261,7 @@ vncProperties::DialogProc(HWND hwnd,
 				} else { 
 					// Marscha@2004 - authSSP: end of change
 					_this->m_vncauth.Init(_this->m_server);
+					_this->m_vncauth.SetTemp(_this->m_Tempfile);
 					_this->m_vncauth.Show(TRUE);
 				}
 			}
@@ -2246,8 +2276,8 @@ void vncProperties::SaveToIniFile()
 	if (!myIniFile.IsWritable()  || vncService::RunningAsService())
 			{
 				// We can't write to the ini file , Vista in service mode
-				Copy_to_Temp();
-				myIniFile.IniFileSetTemp();
+				Copy_to_Temp( m_Tempfile);
+				myIniFile.IniFileSetTemp( m_Tempfile);
 				use_uac=true;
 			}
 

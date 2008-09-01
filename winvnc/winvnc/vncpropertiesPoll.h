@@ -39,7 +39,8 @@ class vncPropertiesPoll;
 #include "stdhdrs.h"
 #include "vncServer.h"
 #include "inifile.h"
-
+#include <Userenv.h>
+#define INIFILE_NAME "ultravnc.ini"
 // The vncPropertiesPoll class itself
 class vncPropertiesPoll
 {
@@ -120,6 +121,7 @@ protected:
 	// [v1.0.2-jp2 fix]
 	BOOL m_pref_SingleWindow;
 	char m_pref_szSingleWindowName[32];
+	char m_Tempfile[MAX_PATH];
 
 };
 

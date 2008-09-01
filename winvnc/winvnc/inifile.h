@@ -2,8 +2,8 @@
 #if (!defined(_WINVNC_INIFILE))
 #define _WINVNC_INIFILE
 
-void Copy_to_Temp();
-void Copy_to_Secure_from_temp();
+void Copy_to_Temp(char *tempfile);
+void Copy_to_Secure_from_temp(char *tempfile);
 
 class IniFile
 {
@@ -25,7 +25,7 @@ public:
 	void ReadString(char *key1, char *key2,char *value,int valuesize);
 	void ReadPassword(char *value,int valuesize);
 	void IniFileSetSecure();
-	void IniFileSetTemp();
+	//void IniFileSetTemp();
 	void IniFileSetTemp(char *lpCmdLine);
 	void copy_to_secure();
 

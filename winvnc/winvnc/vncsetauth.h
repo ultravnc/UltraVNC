@@ -51,6 +51,8 @@ public:
 
 	// General
 	void Show(BOOL show);
+	void SetTemp(char *TempFile){strcpy(m_Tempfile,TempFile);};
+	char m_Tempfile[MAXPATH];
 
 	// Implementation
 	BOOL m_dlgvisible;
