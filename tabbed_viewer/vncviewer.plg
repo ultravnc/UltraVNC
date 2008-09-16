@@ -1,0 +1,483 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: omnithread - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\rudi\LOCALS~1\Temp\RSP217.tmp" with contents
+[
+/nologo /MT /W3 /GX /O2 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "__NT__" /D "_WINSTATIC" /D "__WIN32__" /D _WIN32_WINNT=0x400 /Fp"Release/omnithread.pch" /YX /Fo"Release/" /Fd"Release/" /FD /c 
+"C:\c++\ultravnc_svn\tabbed_viewer\omnithread\nt.cpp"
+]
+Creating command line "xicl6.exe @C:\DOCUME~1\rudi\LOCALS~1\Temp\RSP217.tmp" 
+Creating command line "xilink6.exe -lib /nologo /out:"Release\omnithread.lib"  ".\Release\nt.obj" "
+<h3>Output Window</h3>
+Compiling...
+nt.cpp
+Creating library...
+xilib: executing 'C:\PROGRA~1\MIAF9D~1\VC98\Bin\lib.exe'
+<h3>
+--------------------Configuration: rdr - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\rudi\LOCALS~1\Temp\RSP219.tmp" with contents
+[
+/nologo /MT /W3 /GX /O2 /I ".." /I "../zlib" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /Fp"Release/rdr.pch" /YX /Fo"Release/" /Fd"Release/" /FD /O3 /QaxM /Qip /c 
+"C:\c++\ultravnc_svn\rdr\FdInStream.cxx"
+"C:\c++\ultravnc_svn\rdr\FdOutStream.cxx"
+"C:\c++\ultravnc_svn\rdr\InStream.cxx"
+"C:\c++\ultravnc_svn\rdr\NullOutStream.cxx"
+"C:\c++\ultravnc_svn\rdr\ZlibInStream.cxx"
+"C:\c++\ultravnc_svn\rdr\ZlibOutStream.cxx"
+]
+Creating command line "xicl6.exe @C:\DOCUME~1\rudi\LOCALS~1\Temp\RSP219.tmp" 
+Creating command line "xilink6.exe -lib /nologo /out:"Release\rdr.lib"  ".\Release\FdInStream.obj" ".\Release\FdOutStream.obj" ".\Release\InStream.obj" ".\Release\NullOutStream.obj" ".\Release\ZlibInStream.obj" ".\Release\ZlibOutStream.obj" "
+<h3>Output Window</h3>
+Compiling...
+FdInStream.cxx
+icl: Command line warning: overriding '-O2' with '-O3'
+icl: Command line warning: extension 'M' not supported ignored in option '-Qax'
+FdOutStream.cxx
+InStream.cxx
+NullOutStream.cxx
+ZlibInStream.cxx
+ZlibOutStream.cxx
+Creating library...
+xilib: executing 'C:\PROGRA~1\MIAF9D~1\VC98\Bin\lib.exe'
+<h3>
+--------------------Configuration: libjpeg - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\rudi\LOCALS~1\Temp\RSP220.tmp" with contents
+[
+/nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /Fp"Release/libjpeg.pch" /YX /Fo"Release/" /Fd"Release/" /FD /O3 /QaxM /Qip /c 
+"C:\c++\ultravnc_svn\libjpeg\jcapimin.c"
+"C:\c++\ultravnc_svn\libjpeg\jcapistd.c"
+"C:\c++\ultravnc_svn\libjpeg\jccoefct.c"
+"C:\c++\ultravnc_svn\libjpeg\jccolor.c"
+"C:\c++\ultravnc_svn\libjpeg\jcdctmgr.c"
+"C:\c++\ultravnc_svn\libjpeg\jchuff.c"
+"C:\c++\ultravnc_svn\libjpeg\jcinit.c"
+"C:\c++\ultravnc_svn\libjpeg\jcmainct.c"
+"C:\c++\ultravnc_svn\libjpeg\jcmarker.c"
+"C:\c++\ultravnc_svn\libjpeg\jcmaster.c"
+"C:\c++\ultravnc_svn\libjpeg\jcomapi.c"
+"C:\c++\ultravnc_svn\libjpeg\jcparam.c"
+"C:\c++\ultravnc_svn\libjpeg\jcphuff.c"
+"C:\c++\ultravnc_svn\libjpeg\jcprepct.c"
+"C:\c++\ultravnc_svn\libjpeg\jcsample.c"
+"C:\c++\ultravnc_svn\libjpeg\jctrans.c"
+"C:\c++\ultravnc_svn\libjpeg\jdapimin.c"
+"C:\c++\ultravnc_svn\libjpeg\jdapistd.c"
+"C:\c++\ultravnc_svn\libjpeg\jdatadst.c"
+"C:\c++\ultravnc_svn\libjpeg\jdatasrc.c"
+"C:\c++\ultravnc_svn\libjpeg\jdcoefct.c"
+"C:\c++\ultravnc_svn\libjpeg\jdcolor.c"
+"C:\c++\ultravnc_svn\libjpeg\jddctmgr.c"
+"C:\c++\ultravnc_svn\libjpeg\jdhuff.c"
+"C:\c++\ultravnc_svn\libjpeg\jdinput.c"
+"C:\c++\ultravnc_svn\libjpeg\jdmainct.c"
+"C:\c++\ultravnc_svn\libjpeg\jdmarker.c"
+"C:\c++\ultravnc_svn\libjpeg\jdmaster.c"
+"C:\c++\ultravnc_svn\libjpeg\jdmerge.c"
+"C:\c++\ultravnc_svn\libjpeg\jdphuff.c"
+"C:\c++\ultravnc_svn\libjpeg\jdpostct.c"
+"C:\c++\ultravnc_svn\libjpeg\jdsample.c"
+"C:\c++\ultravnc_svn\libjpeg\jdtrans.c"
+"C:\c++\ultravnc_svn\libjpeg\jerror.c"
+"C:\c++\ultravnc_svn\libjpeg\jfdctflt.c"
+"C:\c++\ultravnc_svn\libjpeg\jfdctfst.c"
+"C:\c++\ultravnc_svn\libjpeg\jfdctint.c"
+"C:\c++\ultravnc_svn\libjpeg\jidctflt.c"
+"C:\c++\ultravnc_svn\libjpeg\jidctfst.c"
+"C:\c++\ultravnc_svn\libjpeg\jidctint.c"
+"C:\c++\ultravnc_svn\libjpeg\jidctred.c"
+"C:\c++\ultravnc_svn\libjpeg\jmemmgr.c"
+"C:\c++\ultravnc_svn\libjpeg\jmemnobs.c"
+"C:\c++\ultravnc_svn\libjpeg\jquant1.c"
+"C:\c++\ultravnc_svn\libjpeg\jquant2.c"
+"C:\c++\ultravnc_svn\libjpeg\jutils.c"
+]
+Creating command line "xicl6.exe @C:\DOCUME~1\rudi\LOCALS~1\Temp\RSP220.tmp" 
+Creating temporary file "C:\DOCUME~1\rudi\LOCALS~1\Temp\RSP221.tmp" with contents
+[
+/nologo /out:"Release\libjpeg.lib" 
+".\Release\jcapimin.obj"
+".\Release\jcapistd.obj"
+".\Release\jccoefct.obj"
+".\Release\jccolor.obj"
+".\Release\jcdctmgr.obj"
+".\Release\jchuff.obj"
+".\Release\jcinit.obj"
+".\Release\jcmainct.obj"
+".\Release\jcmarker.obj"
+".\Release\jcmaster.obj"
+".\Release\jcomapi.obj"
+".\Release\jcparam.obj"
+".\Release\jcphuff.obj"
+".\Release\jcprepct.obj"
+".\Release\jcsample.obj"
+".\Release\jctrans.obj"
+".\Release\jdapimin.obj"
+".\Release\jdapistd.obj"
+".\Release\jdatadst.obj"
+".\Release\jdatasrc.obj"
+".\Release\jdcoefct.obj"
+".\Release\jdcolor.obj"
+".\Release\jddctmgr.obj"
+".\Release\jdhuff.obj"
+".\Release\jdinput.obj"
+".\Release\jdmainct.obj"
+".\Release\jdmarker.obj"
+".\Release\jdmaster.obj"
+".\Release\jdmerge.obj"
+".\Release\jdphuff.obj"
+".\Release\jdpostct.obj"
+".\Release\jdsample.obj"
+".\Release\jdtrans.obj"
+".\Release\jerror.obj"
+".\Release\jfdctflt.obj"
+".\Release\jfdctfst.obj"
+".\Release\jfdctint.obj"
+".\Release\jidctflt.obj"
+".\Release\jidctfst.obj"
+".\Release\jidctint.obj"
+".\Release\jidctred.obj"
+".\Release\jmemmgr.obj"
+".\Release\jmemnobs.obj"
+".\Release\jquant1.obj"
+".\Release\jquant2.obj"
+".\Release\jutils.obj"
+]
+Creating command line "xilink6.exe -lib @C:\DOCUME~1\rudi\LOCALS~1\Temp\RSP221.tmp"
+<h3>Output Window</h3>
+Compiling...
+jcapimin.c
+icl: Command line warning: overriding '-O2' with '-O3'
+icl: Command line warning: extension 'M' not supported ignored in option '-Qax'
+jcapistd.c
+jccoefct.c
+jccolor.c
+jcdctmgr.c
+jchuff.c
+jcinit.c
+jcmainct.c
+jcmarker.c
+jcmaster.c
+jcomapi.c
+jcparam.c
+jcphuff.c
+jcprepct.c
+jcsample.c
+jctrans.c
+jdapimin.c
+jdapistd.c
+jdatadst.c
+jdatasrc.c
+jdcoefct.c
+jdcolor.c
+jddctmgr.c
+jdhuff.c
+jdinput.c
+jdmainct.c
+jdmarker.c
+jdmaster.c
+jdmerge.c
+jdphuff.c
+jdpostct.c
+jdsample.c
+jdtrans.c
+jerror.c
+jfdctflt.c
+jfdctfst.c
+jfdctint.c
+jidctflt.c
+jidctfst.c
+jidctint.c
+jidctred.c
+jmemmgr.c
+jmemnobs.c
+jquant1.c
+jquant2.c
+jutils.c
+Creating library...
+xilib: executing 'C:\PROGRA~1\MIAF9D~1\VC98\Bin\lib.exe'
+<h3>
+--------------------Configuration: zlib - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\rudi\LOCALS~1\Temp\RSP250.bat" with contents
+[
+@echo off
+ml.exe /nologo /c /coff /Cx /Fo".\zlib___Win32_Release\inffas32.obj" "..\..\contrib\masmx86\inffas32.asm"
+]
+Creating command line "C:\DOCUME~1\rudi\LOCALS~1\Temp\RSP250.bat"
+Creating temporary file "C:\DOCUME~1\rudi\LOCALS~1\Temp\RSP251.bat" with contents
+[
+@echo off
+ml.exe /nologo /c /coff /Cx /Fo".\zlib___Win32_Release\gvmat32.obj" "..\..\contrib\masmx86\gvmat32.asm"
+]
+Creating command line "C:\DOCUME~1\rudi\LOCALS~1\Temp\RSP251.bat"
+Creating command line "rc.exe /l 0x409 /fo"zlib___Win32_Release/zlib1.res" /i "\c++\ultravnc_svn\zlib\win32" /d "NDEBUG" "C:\c++\ultravnc_svn\zlib\win32\zlib1.rc"" 
+Assembling...
+ Assembling: ..\..\contrib\masmx86\inffas32.asm
+Assembling...
+ Assembling: ..\..\contrib\masmx86\gvmat32.asm
+Creating temporary file "C:\DOCUME~1\rudi\LOCALS~1\Temp\RSP252.tmp" with contents
+[
+/nologo /MT /W3 /O2 /D "WIN32" /D "NDEBUG" /D "ASMV" /D "ASMINF" /Fo"zlib___Win32_Release/" /Fd"zlib___Win32_Release/" /FD /c 
+"C:\c++\ultravnc_svn\zlib\adler32.c"
+"C:\c++\ultravnc_svn\zlib\compress.c"
+"C:\c++\ultravnc_svn\zlib\crc32.c"
+"C:\c++\ultravnc_svn\zlib\deflate.c"
+"C:\c++\ultravnc_svn\zlib\gzio.c"
+"C:\c++\ultravnc_svn\zlib\infback.c"
+"C:\c++\ultravnc_svn\zlib\inffast.c"
+"C:\c++\ultravnc_svn\zlib\inflate.c"
+"C:\c++\ultravnc_svn\zlib\inftrees.c"
+"C:\c++\ultravnc_svn\zlib\trees.c"
+"C:\c++\ultravnc_svn\zlib\uncompr.c"
+"C:\c++\ultravnc_svn\zlib\zutil.c"
+]
+Creating command line "xicl6.exe @C:\DOCUME~1\rudi\LOCALS~1\Temp\RSP252.tmp" 
+Creating temporary file "C:\DOCUME~1\rudi\LOCALS~1\Temp\RSP253.tmp" with contents
+[
+/nologo /MT /W3 /O2 /I "..\.." /D "WIN32" /D "NDEBUG" /D "ASMV" /D "ASMINF" /Fo"zlib___Win32_Release/" /Fd"zlib___Win32_Release/" /FD /c 
+"C:\c++\ultravnc_svn\zlib\contrib\masmx86\gvmat32c.c"
+]
+Creating command line "xicl6.exe @C:\DOCUME~1\rudi\LOCALS~1\Temp\RSP253.tmp" 
+Creating temporary file "C:\DOCUME~1\rudi\LOCALS~1\Temp\RSP254.tmp" with contents
+[
+/nologo /out:"zlib___Win32_Release\zlib.lib" 
+".\zlib___Win32_Release\adler32.obj"
+".\zlib___Win32_Release\compress.obj"
+".\zlib___Win32_Release\crc32.obj"
+".\zlib___Win32_Release\deflate.obj"
+".\zlib___Win32_Release\gzio.obj"
+".\zlib___Win32_Release\infback.obj"
+".\zlib___Win32_Release\inffast.obj"
+".\zlib___Win32_Release\inflate.obj"
+".\zlib___Win32_Release\inftrees.obj"
+".\zlib___Win32_Release\trees.obj"
+".\zlib___Win32_Release\uncompr.obj"
+".\zlib___Win32_Release\zutil.obj"
+".\zlib___Win32_Release\gvmat32c.obj"
+".\zlib___Win32_Release\zlib1.res"
+".\zlib___Win32_Release\gvmat32.obj"
+".\zlib___Win32_Release\inffas32.obj"
+]
+Creating command line "xilink6.exe -lib @C:\DOCUME~1\rudi\LOCALS~1\Temp\RSP254.tmp"
+<h3>Output Window</h3>
+Compiling resources...
+Compiling...
+adler32.c
+compress.c
+crc32.c
+deflate.c
+gzio.c
+infback.c
+inffast.c
+inflate.c
+inftrees.c
+trees.c
+uncompr.c
+zutil.c
+Compiling...
+gvmat32c.c
+Creating library...
+xilib: executing 'C:\PROGRA~1\MIAF9D~1\VC98\Bin\lib.exe'
+<h3>
+--------------------Configuration: vncviewer - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating command line "rc.exe /l 0x409 /fo"Release/vncviewer.res" /i "res" /d "NDEBUG" "C:\c++\ultravnc_svn\tabbed_viewer\res\vncviewer.rc"" 
+Creating temporary file "C:\DOCUME~1\rudi\LOCALS~1\Temp\RSP255.tmp" with contents
+[
+/nologo /MT /W3 /GX /O2 /I "omnithread" /I ".." /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "__NT__" /D "_WINSTATIC" /D "__WIN32__" /Fp"Release/vncviewer.pch" /YX"stdhdrs.h" /Fo"Release/" /Fd"Release/" /FD /O3 /QaxW /Qssp /Qglobal-hoist /Qipo /c 
+"C:\c++\ultravnc_svn\tabbed_viewer\AboutBox.cpp"
+"C:\c++\ultravnc_svn\tabbed_viewer\AccelKeys.cpp"
+"C:\c++\ultravnc_svn\tabbed_viewer\AuthDialog.cpp"
+"C:\c++\ultravnc_svn\tabbed_viewer\buildtime.cpp"
+"C:\c++\ultravnc_svn\tabbed_viewer\ClientConnection.cpp"
+"C:\c++\ultravnc_svn\tabbed_viewer\ClientConnectionCacheRect.cpp"
+"C:\c++\ultravnc_svn\tabbed_viewer\ClientConnectionClipboard.cpp"
+"C:\c++\ultravnc_svn\tabbed_viewer\ClientConnectionCopyRect.cpp"
+"C:\c++\ultravnc_svn\tabbed_viewer\ClientConnectionCoRRE.cpp"
+"C:\c++\ultravnc_svn\tabbed_viewer\ClientConnectionCursor.cpp"
+"C:\c++\ultravnc_svn\tabbed_viewer\ClientConnectionFile.cpp"
+"C:\c++\ultravnc_svn\tabbed_viewer\ClientConnectionFullScreen.cpp"
+"C:\c++\ultravnc_svn\tabbed_viewer\ClientConnectionHextile.cpp"
+"C:\c++\ultravnc_svn\tabbed_viewer\ClientConnectionRaw.cpp"
+"C:\c++\ultravnc_svn\tabbed_viewer\ClientConnectionRRE.cpp"
+"C:\c++\ultravnc_svn\tabbed_viewer\ClientConnectionTight.cpp"
+"C:\c++\ultravnc_svn\tabbed_viewer\ClientConnectionUltra.cpp"
+"C:\c++\ultravnc_svn\tabbed_viewer\ClientConnectionWinproc.cpp"
+"C:\c++\ultravnc_svn\tabbed_viewer\ClientConnectionZlib.cpp"
+"C:\c++\ultravnc_svn\tabbed_viewer\ClientConnectionZlibHex.cpp"
+"C:\c++\ultravnc_svn\tabbed_viewer\d3des.c"
+"C:\c++\ultravnc_svn\tabbed_viewer\Daemon.cpp"
+"C:\c++\ultravnc_svn\DSMPlugin\DSMPlugin.cpp"
+"C:\c++\ultravnc_svn\tabbed_viewer\Exception.cpp"
+"C:\c++\ultravnc_svn\tabbed_viewer\FileTransfer.cpp"
+"C:\c++\ultravnc_svn\tabbed_viewer\Flasher.cpp"
+"C:\c++\ultravnc_svn\tabbed_viewer\FullScreenTitleBar.cpp"
+"C:\c++\ultravnc_svn\tabbed_viewer\Global_graph.cpp"
+"C:\c++\ultravnc_svn\tabbed_viewer\HotkeyDlg.cpp"
+"C:\c++\ultravnc_svn\tabbed_viewer\KeyMap.cpp"
+"C:\c++\ultravnc_svn\tabbed_viewer\Log.cpp"
+"C:\c++\ultravnc_svn\tabbed_viewer\LowLevelHook.cpp"
+"C:\c++\ultravnc_svn\lzo\minilzo.c"
+"C:\c++\ultravnc_svn\tabbed_viewer\MRU.cpp"
+"C:\c++\ultravnc_svn\tabbed_viewer\SessionDialog.cpp"
+"C:\c++\ultravnc_svn\tabbed_viewer\stdhdrs.cpp"
+"C:\c++\ultravnc_svn\tabbed_viewer\TextChat.cpp"
+"C:\c++\ultravnc_svn\tabbed_viewer\vncauth.c"
+"C:\c++\ultravnc_svn\tabbed_viewer\VNCOptions.cpp"
+"C:\c++\ultravnc_svn\tabbed_viewer\vncviewer.cpp"
+"C:\c++\ultravnc_svn\tabbed_viewer\VNCviewerApp.cpp"
+"C:\c++\ultravnc_svn\tabbed_viewer\VNCviewerApp32.cpp"
+"C:\c++\ultravnc_svn\ZipUnZip32\ZipUnzip32.cpp"
+"C:\c++\ultravnc_svn\tabbed_viewer\zrle.cpp"
+]
+Creating command line "xicl6.exe @C:\DOCUME~1\rudi\LOCALS~1\Temp\RSP255.tmp" 
+Creating temporary file "C:\DOCUME~1\rudi\LOCALS~1\Temp\RSP256.bat" with contents
+[
+@echo off
+cl /nologo /MT /FoRelease\ /FdRelease\ /c buildtime.cpp
+]
+Creating command line "C:\DOCUME~1\rudi\LOCALS~1\Temp\RSP256.bat"
+Compiling resources...
+Compiling...
+AboutBox.cpp
+icl: Command line warning: overriding '-O2' with '-O3'
+AccelKeys.cpp
+AuthDialog.cpp
+buildtime.cpp
+ClientConnection.cpp
+ClientConnectionCacheRect.cpp
+ClientConnectionClipboard.cpp
+ClientConnectionCopyRect.cpp
+ClientConnectionCoRRE.cpp
+ClientConnectionCursor.cpp
+ClientConnectionFile.cpp
+ClientConnectionFullScreen.cpp
+ClientConnectionHextile.cpp
+ClientConnectionRaw.cpp
+ClientConnectionRRE.cpp
+ClientConnectionTight.cpp
+ClientConnectionUltra.cpp
+ClientConnectionWinproc.cpp
+ClientConnectionZlib.cpp
+ClientConnectionZlibHex.cpp
+d3des.c
+C:\c++\ultravnc_svn\tabbed_viewer\d3des.c(72): warning #147: declaration is incompatible with "void deskey(unsigned char *, short)" (declared at line 25 of "C:\c++\ultravnc_svn\tabbed_viewer\d3des.h")
+  void deskey(key, edf)   /* Thanks to James Gillogly & Phil Karn! */
+       ^
+
+Daemon.cpp
+DSMPlugin.cpp
+Exception.cpp
+FileTransfer.cpp
+Flasher.cpp
+FullScreenTitleBar.cpp
+Global_graph.cpp
+HotkeyDlg.cpp
+KeyMap.cpp
+Log.cpp
+LowLevelHook.cpp
+minilzo.c
+MRU.cpp
+SessionDialog.cpp
+stdhdrs.cpp
+TextChat.cpp
+vncauth.c
+VNCOptions.cpp
+vncviewer.cpp
+VNCviewerApp.cpp
+VNCviewerApp32.cpp
+ZipUnzip32.cpp
+zrle.cpp
+Creating temporary file "C:\DOCUME~1\rudi\LOCALS~1\Temp\RSP283.tmp" with contents
+[
+comctl32.lib winmm.lib omnithread.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib uuid.lib wsock32.lib d3d9.lib d3dx9.lib dxguid.lib /nologo /subsystem:windows /incremental:yes /pdb:"Release/vncviewer.pdb" /machine:I386 /out:"Release/vncviewer.exe" /libpath:"omnithread/Release" 
+".\Release\AboutBox.obj"
+".\Release\AccelKeys.obj"
+".\Release\AuthDialog.obj"
+".\Release\buildtime.obj"
+".\Release\ClientConnection.obj"
+".\Release\ClientConnectionCacheRect.obj"
+".\Release\ClientConnectionClipboard.obj"
+".\Release\ClientConnectionCopyRect.obj"
+".\Release\ClientConnectionCoRRE.obj"
+".\Release\ClientConnectionCursor.obj"
+".\Release\ClientConnectionFile.obj"
+".\Release\ClientConnectionFullScreen.obj"
+".\Release\ClientConnectionHextile.obj"
+".\Release\ClientConnectionRaw.obj"
+".\Release\ClientConnectionRRE.obj"
+".\Release\ClientConnectionTight.obj"
+".\Release\ClientConnectionUltra.obj"
+".\Release\ClientConnectionWinproc.obj"
+".\Release\ClientConnectionZlib.obj"
+".\Release\ClientConnectionZlibHex.obj"
+".\Release\d3des.obj"
+".\Release\Daemon.obj"
+".\Release\DSMPlugin.obj"
+".\Release\Exception.obj"
+".\Release\FileTransfer.obj"
+".\Release\Flasher.obj"
+".\Release\FullScreenTitleBar.obj"
+".\Release\Global_graph.obj"
+".\Release\HotkeyDlg.obj"
+".\Release\KeyMap.obj"
+".\Release\Log.obj"
+".\Release\LowLevelHook.obj"
+".\Release\minilzo.obj"
+".\Release\MRU.obj"
+".\Release\SessionDialog.obj"
+".\Release\stdhdrs.obj"
+".\Release\TextChat.obj"
+".\Release\vncauth.obj"
+".\Release\VNCOptions.obj"
+".\Release\vncviewer.obj"
+".\Release\VNCviewerApp.obj"
+".\Release\VNCviewerApp32.obj"
+".\Release\ZipUnzip32.obj"
+".\Release\zrle.obj"
+".\Release\vncviewer.res"
+".\omnithread\Release\omnithread.lib"
+"\c++\ultravnc_svn\rdr\Release\rdr.lib"
+"\c++\ultravnc_svn\libjpeg\Release\libjpeg.lib"
+"\c++\ultravnc_svn\zlib\projects\visualc6\zlib___Win32_Release\zlib.lib"
+]
+Creating command line "xilink6.exe @C:\DOCUME~1\rudi\LOCALS~1\Temp\RSP283.tmp"
+Setting build time...
+buildtime.cpp
+<h3>Output Window</h3>
+Linking...
+IPO: performing multi-file optimizations
+IPO: generating object file ipo_21163.obj
+C:\c++\ultravnc_svn\tabbed_viewer\vncviewer.cpp(298) : (col. 1) remark: _WinMain@16 has been targeted for automatic cpu dispatch.
+C:\c++\ultravnc_svn\tabbed_viewer\ClientConnection.cpp(1481) : (col. 5) remark: LOOP WAS VECTORIZED.
+C:\c++\ultravnc_svn\tabbed_viewer\ClientConnection.cpp(1458) : (col. 5) remark: LOOP WAS VECTORIZED.
+C:\c++\ultravnc_svn\tabbed_viewer\ClientConnection.cpp(1469) : (col. 5) remark: LOOP WAS VECTORIZED.
+C:\c++\ultravnc_svn\tabbed_viewer\ClientConnection.cpp(1294) : (col. 1) remark: ?Authenticate@ClientConnection@@AAEXXZ has been targeted for automatic cpu dispatch.
+C:\c++\ultravnc_svn\tabbed_viewer\VNCviewerApp.cpp(66) : (col. 2) remark: LOOP WAS VECTORIZED.
+C:\c++\ultravnc_svn\tabbed_viewer\VNCviewerApp.cpp(40) : (col. 67) remark: ??0VNCviewerApp@@QAE@PAUHINSTANCE__@@PAD@Z has been targeted for automatic cpu dispatch.
+C:\c++\ultravnc_svn\lzo\minilzo.c(3262) : (col. 62) remark: LOOP WAS VECTORIZED.
+C:\c++\ultravnc_svn\lzo\minilzo.c(3023) : (col. 59) remark: LOOP WAS VECTORIZED.
+C:\c++\ultravnc_svn\lzo\minilzo.c(2938) : (col. 1) remark: _lzo1x_decompress has been targeted for automatic cpu dispatch.
+C:\c++\ultravnc_svn\tabbed_viewer\KeyMap.cpp(211) : (col. 17) remark: LOOP WAS VECTORIZED.
+C:\c++\ultravnc_svn\tabbed_viewer\KeyMap.cpp(259) : (col. 17) remark: LOOP WAS VECTORIZED.
+C:\c++\ultravnc_svn\tabbed_viewer\KeyMap.cpp(124) : (col. 58) remark: ?PCtoX@KeyMap@@QAE?AUKeyActionSpec@@IK@Z has been targeted for automatic cpu dispatch.
+xilink6: executing 'C:\PROGRA~1\MIAF9D~1\VC98\Bin\link.exe'
+
+
+
+<h3>Results</h3>
+vncviewer.exe - 0 error(s), 6 warning(s)
+</pre>
+</body>
+</html>
