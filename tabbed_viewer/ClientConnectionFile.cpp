@@ -33,9 +33,9 @@
 
 #include "vncauth.h"
 
-extern char sz_K1[254];
+extern char sz_K1[64];
 extern char sz_K2[64];
-extern char sz_K3[256];
+extern char sz_K3[128];
 extern char sz_K4[64];
 extern char sz_K5[64];
 extern char sz_K6[64];
@@ -351,7 +351,7 @@ int ClientConnection::LoadConnection_global(char *fname, bool fFromDialog,bool d
 	m_port = GetPrivateProfileInt("connection", "port", 0, fname);
 	GetPrivateProfileString("connection", "proxyhost", "", m_proxyhost, MAX_HOST_NAME_LEN, fname);
 	m_proxyport = GetPrivateProfileInt("connection", "proxyport", 0, fname);
-	m_fUseProxy = GetPrivateProfileInt("options", "UseProxy", 0, fname);
+	m_fUseProxy = GetPrivateProfileInt("options", "UseProxy", 0, fname) ? true : false;
 
 	char buf[32];
 	m_encPasswd[0] = '\0';

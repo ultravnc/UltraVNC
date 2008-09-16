@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002 Ultr@VNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002-2007 Ultr@VNC Team Members. All Rights Reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -36,7 +36,6 @@
 //
 // The GUI is now quite bearable, but following modifs could be done one day or another
 // - Add more columns to FileLists (File type, Attributes...)
-// - Add the possibility to sort files by colomns (File Size Order, File Ext order...)
 // - Total progress should be based on total files' size instead of total number of files
 // - Make the History persistent (file) so it's not lost each time the FileTransfer Win is closed
 // - Clean-up the code (duplicated parts, arrays and strings dimensions checks...)
@@ -51,6 +50,17 @@
 #include "commctrl.h"
 #include "shlobj.h"
 #include "zlib/zlib.h"
+#include "Log.h"
+#include <string>
+#include <vector>
+#include "common/win32_helpers.h"
+
+// [v1.0.2-jp1 fix] yak!'s File transfer patch
+// Simply forward strchr() and strrchr() to _mbschr() and _mbsrchr() to avoid 0x5c problem, respectively.
+// Probably, it is better to write forward functions internally.
+#include <mbstring.h>
+#define strchr(a, b) reinterpret_cast<char*>(_mbschr(reinterpret_cast<unsigned char*>(a), b))
+#define strrchr(a, b) reinterpret_cast<char*>(_mbsrchr(reinterpret_cast<unsigned char*>(a), b))
 
 // These strings contain all the translated FT messages 
 extern char sz_H1[64];
@@ -138,9 +148,69 @@ extern char sz_M5[64];
 extern char sz_M6[64];
 extern char sz_M7[64];
 extern char sz_M8[64];
-extern HWND m_hwndMain;
 
+// 14 April 2008 jdp
+extern char sz_H94[64];
+extern char sz_H95[64];
+extern char sz_H96[64];
+extern char sz_H97[64];
+extern char sz_H98[64];
+extern char sz_H99[64];
+extern char sz_E1[64];
+extern char sz_E2[64];
+extern char sz_H100[64];
+extern char sz_H101[64];
+extern char sz_H102[128];
+#define CB_SETHORIZONTALEXTENT 0x015e
 typedef BOOL (WINAPI *PGETDISKFREESPACEEX)(LPCSTR,PULARGE_INTEGER, PULARGE_INTEGER, PULARGE_INTEGER);
+
+static HWND hFTWnd = 0;
+static std::string make_temp_filename(const char *szRemoteFileName)
+{
+    // don't add prefix for directory transfers.
+    char *pFileName = strrchr(const_cast<char *>(szRemoteFileName), '\\');
+    if (pFileName != NULL)
+        ++pFileName;
+    else pFileName = const_cast<char *>(szRemoteFileName);
+    if (strncmp(pFileName, rfbZipDirectoryPrefix, strlen(rfbZipDirectoryPrefix)) == 0)
+        return szRemoteFileName;
+
+    std::string tmpName(rfbPartialFilePrefix);
+    tmpName += szRemoteFileName;
+    return tmpName;
+}
+
+static std::string get_real_filename(const char *destFileName)
+{
+    std::string name (destFileName);
+    std::string::size_type pos;
+
+    pos = name.find(rfbPartialFilePrefix);
+    if (pos != std::string::npos)
+        name.erase(pos, sz_rfbPartialFilePrefix);
+ 
+    return name;
+}
+bool FileTransfer::DeleteFileOrDirectory(TCHAR *srcpath)
+{
+    TCHAR path[MAX_PATH + 1]; // room for extra null; SHFileOperation requires double null terminator
+    memset(path, 0, sizeof path);
+    
+    _tcsncpy(path, srcpath, MAX_PATH);
+
+    SHFILEOPSTRUCT op;
+    memset(&op, 0, sizeof(SHFILEOPSTRUCT));
+    op.hwnd = hWnd;
+    op.wFunc = FO_DELETE;
+    op.pFrom  = path;
+    op.fFlags =  FOF_SILENT | FOF_NOCONFIRMATION | FOF_NOCONFIRMMKDIR | FOF_ALLOWUNDO;
+
+    // MSDN says to not look at the error code, just treat 0 as SUCCESS, nonzero is failure.
+    // Do not use GetLastError with the return values of this function.
+    int result = SHFileOperation(&op);
+
+    return result == 0;
+}
 
 //
 //
@@ -151,6 +221,7 @@ FileTransfer::FileTransfer(VNCviewerApp *pApp, ClientConnection *pCC)
 	m_pApp	= pApp;
 	m_pCC	= pCC;
 	m_fAbort = false;
+    m_fUserAbortedFileTransfer = false;
 	m_fAborted = false;
 	m_FilesList.clear();
 	m_nFilesToTransfer = 0;
@@ -170,12 +241,60 @@ FileTransfer::FileTransfer(VNCviewerApp *pApp, ClientConnection *pCC)
 	memset(m_szDeleteButtonLabel, 0, sizeof(m_szDeleteButtonLabel));
 	memset(m_szNewFolderButtonLabel, 0, sizeof(m_szNewFolderButtonLabel));
 	memset(m_szRenameButtonLabel, 0, sizeof(m_szRenameButtonLabel));
-	m_fOldFTProtocole = false;
+    m_ServerFTProtocolVersion = FT_PROTO_VERSION_2;
 	m_nBlockSize = sz_rfbBlockSize;
 	m_dwCurrentValue = 0;
 	m_dwCurrentPercent = 0;
 	m_fSendFileChunk = false;
+    m_hSrcFile = INVALID_HANDLE_VALUE;
+    m_hDestFile = INVALID_HANDLE_VALUE;
+    m_fFileUploadRunning = false;
+    m_fFileDownloadRunning = false;
+    hWnd = 0;
+    m_fFocusLocal = true;
+    memset(m_szFTParamTitle, 0, sizeof m_szFTParamTitle);
+    memset(m_szFTParamComment, 0, sizeof m_szFTParamComment);
+    memset(m_szFTParam, 0, sizeof m_szFTParam);
+    memset(m_szFTConfirmTitle, 0, sizeof m_szFTConfirmTitle);
+    memset(m_szFTConfirmComment, 0, sizeof m_szFTConfirmComment);
+    m_nConfirmAnswer = 0;
+    m_fApplyToAll = false;
+    m_fShowApplyToAll = true;
+    m_nnFileSize = 0;
+    memset(m_szSrcFileName, 0, sizeof m_szSrcFileName);
+    m_fEof = false;
+    m_fFileUploadError = false;
+    m_fCompress = true;
+    m_nFileCount = 0;
+    memset(m_szFileSpec, 0, sizeof m_szFileSpec);
+    memset(m_szDestFileName, 0, sizeof m_szDestFileName);
+    m_dwNbReceivedPackets = 0;
+    m_dwNbBytesRead = 0;
+    m_dwNbBytesWritten = 0;
+    m_dwTotalNbBytesRead = 0;
+    m_dwTotalNbBytesWritten = 0;
+    m_dwTotalNbBytesNotReallyWritten = 0;
+    m_nPacketCount = 0;
+    m_fPacketCompressed = false;
+    m_fFileDownloadError = false;
+    memset(m_szIncomingFileTime, 0, sizeof m_szIncomingFileTime);
+    m_nNotSent = 0;
+    m_dwLastChunkTime = 0;
+    m_maxHistExtent = 0;
 	m_mmRes = -1; 
+
+	for (int i = 0; i<3; i++)
+	{
+		bSortDirectionsL[i] = true;
+		bSortDirectionsR[i] = true;
+	}
+    // 16 April 2008 jdp
+    // load richedit so the path display can handly mbcs
+    m_hRichEdit = LoadLibrary( "RICHED32.DLL" );
+	if (!m_hRichEdit)
+	{
+		MessageBox( NULL, sz_E1, sz_E2, MB_OK | MB_ICONEXCLAMATION );
+    }
 }
 
 //
@@ -188,6 +307,13 @@ FileTransfer::~FileTransfer()
 	m_fFileTransferRunning = false;
 	m_FilesList.clear();
 	if (m_pZipUnZip) delete m_pZipUnZip;
+	if (m_lpCSBuffer != NULL) 
+	{
+		delete [] m_lpCSBuffer;
+		m_lpCSBuffer = NULL;
+	}
+    // 16 April 2008 jdp
+	if (m_hRichEdit != NULL) FreeLibrary(m_hRichEdit);
 }
 
 
@@ -218,14 +344,21 @@ void CALLBACK FileTransfer::fpTimer(UINT uID, UINT uMsg, DWORD dwUser, DWORD dw1
 		ft->m_fSendFileChunk = true;
 
 		ft->m_dwLastChunkTime = timeGetTime();
+
 		SendMessage(ft->m_pCC->m_hwnd, FileTransferSendPacketMessage, (WPARAM) 0, (LPARAM) 0);
 
 		// sf@2005 - FileTransfer Temporization
-		// - Prevents the windows message stack to be blocked too much when transfering over slow conenction
+		// - Prevents the windows message stack to be blocked too much when transfering over slow connection
 		// - Gives more priority to screen updates during asynchronous filetransfer
-		if (timeGetTime() - ft->m_dwLastChunkTime > 200)
-			Sleep(150);
-		else if (!ft->m_fVisible && !ft->m_fOldFTProtocole && !ft->m_pCC->IsDormant())
+		long lDelta = timeGetTime() - ft->m_dwLastChunkTime;
+		if (lDelta > 200)
+		{
+			//if (lDelta < 3000)
+			//	Sleep(lDelta);
+			//else
+				Sleep(150);
+		}
+		else if (!ft->m_fVisible && !ft->UsingOldProtocol() && !ft->m_pCC->IsDormant())
 			Sleep(50);
 
 		ft->m_fSendFileChunk = false;
@@ -238,6 +371,9 @@ void CALLBACK FileTransfer::fpTimer(UINT uID, UINT uMsg, DWORD dwUser, DWORD dw1
 void FileTransfer::ShowFileTransferWindow(bool fVisible)
 {
 //	vnclog.Print(0, _T("ShowFileTransferWindow\n"));
+    if (m_fVisible == fVisible)
+        return;
+
 	ShowWindow(hWnd, fVisible ? SW_RESTORE : SW_MINIMIZE);
 	SetForegroundWindow(hWnd);
 	// Put the FT Windows always on Top if fullscreen
@@ -272,7 +408,8 @@ bool PseudoYield(HWND hWnd)
 	{
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
-		if (msg.message == WM_CLOSE) return FALSE;
+		if (msg.message == WM_CLOSE) 
+            return FALSE;
 	}
 	return TRUE;
 }
@@ -310,6 +447,14 @@ void FileTransfer::ProcessFileTransferMsg(void)
 	{
 	// Response to a rfbDirContentRequest request:
 	// some directory data is received from the server
+    case rfbFileTransferProtocolVersion:
+        {
+            int proto_ver = ft.contentParam;
+            if ((proto_ver >= FT_PROTO_VERSION_OLD) && (proto_ver <= FT_PROTO_VERSION_3))
+                m_ServerFTProtocolVersion = proto_ver;
+        }
+        break;
+
 	case rfbDirPacket:
 		switch (ft.contentParam)
 		{
@@ -349,6 +494,7 @@ void FileTransfer::ProcessFileTransferMsg(void)
 	// rfbFileAcceptHeader (only if the destination file already exists and is accessible)
 	case rfbFileChecksums:
 		ReceiveDestinationFileChecksums(Swap32IfLE(ft.size), Swap32IfLE(ft.length));
+        m_pCC->SetRecvTimeout();
 		break;
 
 	// In response to a rfbFileTransferOffer request
@@ -380,7 +526,9 @@ void FileTransfer::ProcessFileTransferMsg(void)
 		
 	// Should never be handled here but in the File Transfer Loop
 	case rfbFilePacket:
+        m_pCC->SetRecvTimeout();
 		ReceiveFileChunk(Swap32IfLE(ft.length), Swap32IfLE(ft.size));
+        m_pCC->SendKeepAlive();
 		break;
 
 	// Should never be handled here but in the File Transfer Loop
@@ -400,7 +548,7 @@ void FileTransfer::ProcessFileTransferMsg(void)
 		else
 		{
 			// We want the viewer to be backward compatible with UltraWinVNC running the old FT protocole
-			m_fOldFTProtocole = true;  // Old permission method -> it's a <=RC18 server
+            m_ServerFTProtocolVersion = FT_PROTO_VERSION_OLD; // Old permission method -> it's a <=RC18 server
 			m_nBlockSize = 4096; // Old packet size value...
 			ShowWindow(GetDlgItem(hWnd, IDC_RENAME_B), SW_HIDE);
 
@@ -443,7 +591,29 @@ void FileTransfer::RequestPermission()
 	return;
 }
 
+void FileTransfer::StartFTSession()
+{
+    if (m_ServerFTProtocolVersion < FT_PROTO_VERSION_3)
+        return;
 
+    rfbFileTransferMsg ft;
+    memset (&ft, 0, sizeof ft);
+    ft.type = rfbFileTransfer;
+    ft.contentType = rfbFileTransferSessionStart;
+    m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
+}
+
+void FileTransfer::EndFTSession()
+{
+    if (m_ServerFTProtocolVersion < FT_PROTO_VERSION_3)
+        return;
+
+    rfbFileTransferMsg ft;
+    memset (&ft, 0, sizeof ft);
+    ft.type = rfbFileTransfer;
+    ft.contentType = rfbFileTransferSessionEnd;
+    m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
+}
 //
 // Test if we are allowed to access filetransfer
 //
@@ -465,6 +635,7 @@ bool FileTransfer::TestPermission(long lSize, int nVersion)
 	else
 	{
 		m_fFTAllowed = true;
+        StartFTSession();
 		RequestRemoteDrives();
 		SetStatus(sz_H4);
 	}
@@ -613,7 +784,7 @@ bool FileTransfer::OfferNextFile()
 
 		if (m_fAbort)
 			SetStatus(sz_H7);
-		else
+		else if (!m_fFileDownloadError)
 			SetStatus(sz_H6);
 
 		EnableButtons(hWnd);
@@ -661,6 +832,8 @@ void FileTransfer::GetFriendlyFileSizeString(__int64 Size, char* szText)
 		wsprintf(szText,"%u bytes", (unsigned long)Size);
 	}
 }
+
+
 
 
 //
@@ -761,7 +934,7 @@ void FileTransfer::AddFileToFileList(HWND hWnd, int nListId, WIN32_FIND_DATA& fd
 		
 		// Last Modif Time
 		// sf@2003
-		// For now, we've made the choice off displaying all the files 
+		// For now, we've made the choice of displaying all the files 
 		// off client AND server sides converted in clients local
 		// time only. So we ALSO convert server's files times in client local time
 		FILETIME LocalFileTime;
@@ -838,15 +1011,15 @@ bool FileTransfer::IsShortcutFolder(LPSTR szPath)
 	char szGUIDir[64];
 
 	sprintf(szGUIDir, "%s%s%s", rfbDirPrefix, "My Documents", rfbDirSuffix);
-	if (!strnicmp(szPath, szGUIDir, strlen(szGUIDir)))
+	if (!_strnicmp(szPath, szGUIDir, strlen(szGUIDir)))
 		return true;
 
 	sprintf(szGUIDir, "%s%s%s", rfbDirPrefix, "Desktop", rfbDirSuffix);
-	if (!strnicmp(szPath, szGUIDir, strlen(szGUIDir)))
+	if (!_strnicmp(szPath, szGUIDir, strlen(szGUIDir)))
 		return true;
 
 	sprintf(szGUIDir, "%s%s%s", rfbDirPrefix, "Network Favorites", rfbDirSuffix);
-	if (!strnicmp(szPath, szGUIDir, strlen(szGUIDir)))
+	if (!_strnicmp(szPath, szGUIDir, strlen(szGUIDir)))
 		return true;
 
 	return false;
@@ -865,15 +1038,15 @@ bool FileTransfer::ResolvePossibleShortcutFolder(HWND hWnd, LPSTR szFolder)
 	char szGUIDir[64];
 
 	sprintf(szGUIDir, "%s%s%s", rfbDirPrefix, "My Documents", rfbDirSuffix);
-	if (!strnicmp(szFolder, szGUIDir, strlen(szGUIDir)))
+	if (!_strnicmp(szFolder, szGUIDir, strlen(szGUIDir)))
 		nFolder = CSIDL_PERSONAL;
 
 	sprintf(szGUIDir, "%s%s%s", rfbDirPrefix, "Desktop", rfbDirSuffix);
-	if (!strnicmp(szFolder, szGUIDir, strlen(szGUIDir)))
+	if (!_strnicmp(szFolder, szGUIDir, strlen(szGUIDir)))
 		nFolder = CSIDL_DESKTOP;
 
 	sprintf(szGUIDir, "%s%s%s", rfbDirPrefix, "Network Favorites", rfbDirSuffix);
-	if (!strnicmp(szFolder, szGUIDir, strlen(szGUIDir)))
+	if (!_strnicmp(szFolder, szGUIDir, strlen(szGUIDir)))
 		nFolder = CSIDL_NETHOOD;
 
 	/*
@@ -943,11 +1116,13 @@ void FileTransfer::PopulateLocalListBox(HWND hWnd, LPSTR szPath)
 				break;
 			}
 		}
-		if (ResolvePossibleShortcutFolder(hWnd, ofDirT))
-			ofDirT[0] = '\0';
+		// Added Jef Fix - removed so as not to treat c:\foo\Desktop as the special folder [ Desktop ]
+		//if (ResolvePossibleShortcutFolder(hWnd, ofDirT))
+		//	ofDirT[0] = '\0';
 	}
 	else
 	{
+// MessageBox(NULL, szPath, "*DEBUG* 1", MB_OK | MB_ICONSTOP); // PGM *DEBUG*
 		// Usual shortcuts case
 		if (ResolvePossibleShortcutFolder(hWnd, szPath))
 		{
@@ -966,6 +1141,7 @@ void FileTransfer::PopulateLocalListBox(HWND hWnd, LPSTR szPath)
 		}
 	}
 
+
 	if (nSelected == nCount || lstrlen(ofDirT) == 0)
 	{
 		GetDlgItemText(hWnd, IDC_CURR_LOCAL, ofDirT, sizeof(ofDirT));
@@ -973,16 +1149,29 @@ void FileTransfer::PopulateLocalListBox(HWND hWnd, LPSTR szPath)
 	}
 	else
 	{
+		bool bTmp = false; //PGM @ Advantig
 		if (ofDirT[0] == rfbDirPrefix[0] && ofDirT[1] == rfbDirPrefix[1])
 		{
-			strncpy(ofDir, ofDirT + 2, strlen(ofDirT) - 3); 
-			ofDir[strlen(ofDirT) - 4] = '\0';
+			TCHAR szTmp[MAX_PATH]; //PGM @ Advantig
+			GetDlgItemText(hWnd, IDC_CURR_LOCAL, szTmp, sizeof(szTmp)); //PGM @ Advantig
+			if (strlen(szTmp) == 0 && strlen(ofDirT) > 10 ) //PGM @ Advantig
+			{ //PGM @ Advantig
+				if (ResolvePossibleShortcutFolder(hWnd, ofDirT)) //PGM @ Advantig
+				{ //PGM @ Advantig
+					bTmp = true; //PGM @ Advantig
+				} //PGM @ Advantig
+			} //PGM @ Advantig
+			else //PGM @ Advantig
+			{ //PGM @ Advantig
+				strncpy(ofDir, ofDirT + 2, strlen(ofDirT) - 3); 
+				ofDir[strlen(ofDirT) - 4] = '\0';
+			} //PGM @ Advantig
 		}
 		else
 			return;
 
 		GetDlgItemText(hWnd, IDC_CURR_LOCAL, ofDirT, sizeof(ofDirT));
-		if (!stricmp(ofDir, ".."))
+		if (!_stricmp(ofDir, ".."))
 		{	
 			char* p;
 			ofDirT[strlen(ofDirT) - 1] = '\0';
@@ -992,7 +1181,8 @@ void FileTransfer::PopulateLocalListBox(HWND hWnd, LPSTR szPath)
 		}
 		else
 			strcat(ofDirT, ofDir);
-		strcat(ofDirT, "\\");
+		if (!bTmp) //PGM @ Advantig
+			strcat(ofDirT, "\\");
 		SetDlgItemText(hWnd, IDC_CURR_LOCAL, ofDirT);
 	}
 	strcpy(ofDir, ofDirT);
@@ -1124,7 +1314,7 @@ void FileTransfer::RequestRemoteDirectoryContent(HWND hWnd, LPSTR szPath)
 		}
 
 		GetDlgItemText(hWnd, IDC_CURR_REMOTE, ofDirT, sizeof(ofDirT));
-		if (!stricmp(ofDir, ".."))
+		if (!_stricmp(ofDir, ".."))
 		{	
 			char* p;
 			ofDirT[strlen(ofDirT) - 1] = '\0';
@@ -1187,7 +1377,7 @@ void FileTransfer::PopulateRemoteListBox(HWND hWnd, int nLen)
 	}
 
 	// sf@2004 - Read the returned Directory full path
-	if (nLen > 1 && !m_fOldFTProtocole)
+	if (nLen > 1 && !UsingOldProtocol())
 	{
 		TCHAR szPath[MAX_PATH];
 		if (nLen > sizeof(szPath)) return;
@@ -1205,7 +1395,7 @@ void FileTransfer::PopulateRemoteListBox(HWND hWnd, int nLen)
 	m_fDirectoryReceptionRunning = true;
 
 	// FT Backward compatibility DIRTY hack for DSMPlugin mode...
-	if (m_fOldFTProtocole && m_pCC->m_fUsePlugin)
+	if (UsingOldProtocol() && m_pCC->m_fUsePlugin)
 	{
 		m_pCC->m_nTO = 0;
 		ProcessFileTransferMsg();
@@ -1237,7 +1427,7 @@ void FileTransfer::ReceiveDirectoryItem(HWND hWnd, int nLen)
 	if (!PseudoYield(GetParent(hWnd))) return;
 
 	// FT Backward compatibility DIRTY hack for DSMPlugin mode...
-	if (m_fOldFTProtocole && m_pCC->m_fUsePlugin)
+	if (UsingOldProtocol() && m_pCC->m_fUsePlugin)
 	{
 		m_pCC->m_nTO = 0;
 		ProcessFileTransferMsg();
@@ -1266,6 +1456,7 @@ void FileTransfer::FinishDirectoryReception()
 	// UpdateWindow(hWnd);
 
 	m_fDirectoryReceptionRunning = false;
+    CheckButtonState(hWnd);
 
 }
 
@@ -1364,7 +1555,7 @@ void FileTransfer::ListRemoteDrives(HWND hWnd, int nLen)
 
 	// List the usual shorcuts
 
-	if (!m_fOldFTProtocole)
+	if (!UsingOldProtocol())
 	{
 	char szGUIDir[64];
 
@@ -1574,12 +1765,15 @@ void FileTransfer::SetGlobalCount()
 //
 void FileTransfer::SetStatus(LPSTR szStatus)
 {
-//	vnclog.Print(0, _T("SetStatus\n"));
+	if (strlen(szStatus) > (512 + 256 - 1))
+		szStatus[768] = '\0';
+
+	//	vnclog.Print(0, _T("SetStatus\n"));
 	// time_t lTime;
 	char dbuffer [9];
 	char tbuffer [9];
 
-	char szHist[255 + 64];
+	char szHist[800];
 
 	SetDlgItemText(hWnd, IDC_STATUS, szStatus);
 	_tzset();
@@ -1587,6 +1781,19 @@ void FileTransfer::SetStatus(LPSTR szStatus)
 	_strdate(dbuffer);
 	_strtime(tbuffer);
 	sprintf(szHist, " > %s %s - %s", dbuffer, tbuffer/*ctime(&lTime)*/, szStatus);
+    {
+        COMBOBOXINFO cbi;
+        cbi.cbSize = sizeof cbi;
+
+        GetComboBoxInfo(GetDlgItem(hWnd, IDC_HISTORY_CB), &cbi);
+        HDC hdc = GetDC(cbi.hwndList);
+        RECT rc;
+        DrawText(hdc, szHist, -1, &rc, DT_CALCRECT|DT_SINGLELINE);
+        ReleaseDC(cbi.hwndList, hdc);
+        int dx = rc.right - rc.left;
+        m_maxHistExtent = max(m_maxHistExtent, dx);
+        SendDlgItemMessage(hWnd, IDC_HISTORY_CB, CB_SETHORIZONTALEXTENT, m_maxHistExtent, 0L);
+    }
 	LRESULT Index = SendMessage(GetDlgItem(hWnd, IDC_HISTORY_CB), CB_ADDSTRING, 0, (LPARAM)szHist); 
 	SendMessage(GetDlgItem(hWnd, IDC_HISTORY_CB), CB_SETCURSEL, (WPARAM)Index, (LPARAM)0);		
 }
@@ -1602,7 +1809,7 @@ void FileTransfer::RequestRemoteFile(LPSTR szRemoteFileName)
 	if (!m_fFTAllowed) return;
 
 	// Ensure Backward FT compatibility (Directory reception)....
-	if (m_fOldFTProtocole)
+	if (UsingOldProtocol())
 	{
 		char* p1 = strrchr(szRemoteFileName, '\\') + 1;
 		char* p2 = strrchr(szRemoteFileName, rfbDirSuffix[0]);
@@ -1659,18 +1866,12 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, int nLen)
 	// Read in the Name of the file to copy (remote full name !)
 	m_pCC->ReadExact(szRemoteFileName, nLen);
 
-	char szStatus[512];
+	if (nLen > MAX_PATH)
+		szRemoteFileName[MAX_PATH] = '\0';
+	else
+		szRemoteFileName[nLen] = '\0';
 
-	// If lSize = -1 (0xFFFFFFFF) that means that the Src file on the remote machine
-	// could not be opened for some reason (locked, doesn't exits any more...)
-	if (lSize == -1)
-	{
-		sprintf(szStatus, " %s < %s > %s", sz_H12, szRemoteFileName, sz_H13); 
-		// SetDlgItemText(pFileTransfer->hWnd, IDC_STATUS, szStatus);
-		SetStatus(szStatus);
-		delete [] szRemoteFileName;
-		return false;
-	}
+	char szStatus[MAX_PATH + 256];
 
 	// sf@2004 - The file size can be wrong for huge files (>4Gb)
 	// idealy we should pass another param (sizeH) in the rfbFileTransfer msg (same thing
@@ -1678,11 +1879,23 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, int nLen)
 	// So instead we pass the additionnal High size param after the received string...of the current msg
 	// Parse the FileTime and isolate filename
 	CARD32 sizeH = 0;
-	if (!m_fOldFTProtocole)
+	if (!UsingOldProtocol())
 	{
 		CARD32 sizeHtmp;
 		m_pCC->ReadExact((char*)&sizeHtmp, sizeof(CARD32));
 		sizeH = Swap32IfLE(sizeHtmp);
+	}
+    // 5/2/2008 moved jdp so that the entire packet is read
+	// If lSize = -1 (0xFFFFFFFF) that means that the Src file on the remote machine
+	// could not be opened for some reason (locked, doesn't exits any more...)
+	if ((UsingOldProtocol() && lSize == 0xFFFFFFFFu)  ||
+        (!UsingOldProtocol() && lSize == 0xFFFFFFFFu && sizeH == 0xFFFFFFFFu))
+	{
+		sprintf(szStatus, " %s < %s > %s", sz_H12, szRemoteFileName, sz_H13);
+		// SetDlgItemText(pFileTransfer->hWnd, IDC_STATUS, szStatus);
+		SetStatus(szStatus);
+		delete [] szRemoteFileName;
+		return false;
 	}
 
 	// Get the current path (destination path)
@@ -1722,27 +1935,48 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, int nLen)
 	dwFreeKBytes  = (unsigned long) (Int64ShraMod32(lpFreeBytesAvailable.QuadPart, 10));
 	if (dwFreeKBytes < (unsigned long)(lSize / 1000)) fErr = true;
 
+	bool fErrNoFileName = false;
+	char *plbs = strrchr(szRemoteFileName, '\\');
+	if (plbs == NULL)
+	{ 
+		fErrNoFileName = true;
+		fErr = true;
+	}
+	else if (plbs[1] == '\0')
+	{
+		fErrNoFileName = true;
+		fErr = true;
+	}
+
 	if (fErr)
 	{
-		sprintf(szStatus, " %s < %s >",sz_H14, strrchr(szRemoteFileName, '\\') + 1); 
+		if (!fErrNoFileName)
+			sprintf(szStatus, " %s < %s >",sz_H14, strrchr(szRemoteFileName, '\\') + 1); 
+		else
+			sprintf(szStatus, " %s < %s > %s",sz_H14, "Invalid remote file name", sz_H13); 
+
 		SetStatus(szStatus);
 		delete [] szRemoteFileName;
 		// Tell the server to cancel the transfer
 		ft.size = Swap32IfLE(-1);
-		if (m_fOldFTProtocole)
+		if (UsingOldProtocol())
 			m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg);
 		else
 			m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
 		return false;
 	}
 
-	strcat(m_szDestFileName, strrchr(szRemoteFileName, '\\') + 1);
+
+    char  displayName[MAX_PATH + 32];
+    sprintf(displayName, "%s%s", m_szDestFileName, strrchr(szRemoteFileName, '\\') + 1);
+    
+    strcat(m_szDestFileName, make_temp_filename(strrchr(szRemoteFileName, '\\') + 1).c_str());
 
 	m_nnFileSize = (((__int64)(sizeH)) << 32) + lSize;
 	char szFFS[96];
 	GetFriendlyFileSizeString(m_nnFileSize, szFFS);
 	sprintf(szStatus, " %s < %s > (%s) <<<",
-			sz_H15, m_szDestFileName , szFFS/*, szRemoteFileName*/); 
+			sz_H15, displayName , szFFS/*, szRemoteFileName*/);
 	SetStatus(szStatus);
 
 	SetTotalSize(hWnd, lSize); // In bytes
@@ -1771,7 +2005,7 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, int nLen)
 
 		// Tell the server to cancel the transfer
 		ft.size = Swap32IfLE(-1);
-		if (m_fOldFTProtocole)
+		if (UsingOldProtocol())
 			m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg);
 		else
 			m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
@@ -1783,7 +2017,7 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, int nLen)
 	m_pCC->CheckFileChunkBufferSize(m_nBlockSize + 1024);
 
 	// sf@2004 - Delta Transfer
-	if (fAlreadyExists && !m_fOldFTProtocole)
+	if (fAlreadyExists && !UsingOldProtocol())
 	{
 		// DWORD dwFileSize = GetFileSize(m_hDestFile, NULL); 
 		ULARGE_INTEGER n2FileSize;
@@ -1818,7 +2052,7 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, int nLen)
 
 	// Tell the server that the transfer can start
 	ft.size = Swap32IfLE(lSize); 
-	if (m_fOldFTProtocole)
+	if (UsingOldProtocol())
 		m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg);
 	else
 		m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
@@ -1835,7 +2069,7 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, int nLen)
 	m_fFileDownloadRunning = true;
 
 	// FT Backward compatibility DIRTY hack for DSMPlugin mode...
-	if (m_fOldFTProtocole && m_pCC->m_fUsePlugin)
+	if (UsingOldProtocol() && m_pCC->m_fUsePlugin)
 	{
 		m_pCC->m_nTO = 0;
 		ProcessFileTransferMsg();
@@ -1919,7 +2153,7 @@ bool FileTransfer::ReceiveFileChunk(int nLen, int nSize)
 	PseudoYield(GetParent(hWnd));
 
 	// We still support the *dirty* old "Abort" method (for backward compatibility wirh UltraVNC Servers <=RC18)
-	if (m_fOldFTProtocole)
+	if (UsingOldProtocol())
 	{
 		// Every 10 packets, test if the transfer must be stopped
 		m_nPacketCount++;
@@ -1956,7 +2190,7 @@ bool FileTransfer::ReceiveFileChunk(int nLen, int nSize)
 			rfbFileTransferMsg ft;
 			ft.type = rfbFileTransfer;
 			ft.contentType = rfbAbortFileTransfer;
-			ft.contentParam = 0;
+			ft.contentParam = rfbFileTransferVersion;
 			ft.length = 0;
 			ft.size = 0;
 			m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
@@ -1964,7 +2198,7 @@ bool FileTransfer::ReceiveFileChunk(int nLen, int nSize)
 	}
 
 	// FT Backward compatibility DIRTY hack for DSMPlugin mode...
-	if (m_fOldFTProtocole && m_pCC->m_fUsePlugin)
+	if (UsingOldProtocol() && m_pCC->m_fUsePlugin)
 	{
 		m_pCC->m_nTO = 0;
 		ProcessFileTransferMsg();
@@ -1983,18 +2217,23 @@ bool FileTransfer::FinishFileReception()
 	if (!m_fFileDownloadRunning) return false;
 
 	m_fFileDownloadRunning = false;
+    m_pCC->SetRecvTimeout(0);
+    m_pCC->SendKeepAlive(true);
 
 	// sf@2004 - Delta transfer
 	SetEndOfFile(m_hDestFile);
 
 	// TODO : check dwNbReceivedPackets and dwTotalNbBytesWritten or test a checksum
 	FlushFileBuffers(m_hDestFile);
-	char szStatus[512];
+
+    std::string realName = get_real_filename(m_szDestFileName);
+    
+	char szStatus[512 + 256];
 	if (m_fFileDownloadError)
-		sprintf(szStatus, " %s < %s > %s", sz_H19,m_szDestFileName,sz_H20); 
+		sprintf(szStatus, " %s < %s > %s", sz_H19,realName.c_str(),sz_H20);
 	else
 		// sprintf(szStatus, " %s < %s > %s - %u bytes", sz_H17, m_szDestFileName,sz_H18, (m_dwTotalNbBytesWritten - m_dwTotalNbBytesNotReallyWritten));  // Testing
-		sprintf(szStatus, " %s < %s > %s", sz_H17, m_szDestFileName,sz_H18); 
+		sprintf(szStatus, " %s < %s > %s", sz_H17, realName.c_str(),sz_H18);
 
 	SetStatus(szStatus);
 
@@ -2018,14 +2257,24 @@ bool FileTransfer::FinishFileReception()
 	CloseHandle(m_hDestFile);
 
 	// sf@2004 - Delta Transfer - Now we can keep the existing file data :)
-	if (m_fFileDownloadError && m_fOldFTProtocole) DeleteFile(m_szDestFileName);
+	if (m_fFileDownloadError && (UsingOldProtocol() || m_fUserAbortedFileTransfer)) DeleteFile(m_szDestFileName);
 
 	// sf@2003 - Directory Transfer trick
 	// If the file is an Ultra Directory Zip we unzip it here and we delete the
 	// received file
 	// Todo: make a better free space check (above) in this particular case. The free space must be at least
 	// 3 times the size of the directory zip file (this zip file is ~50% of the real directory size) 
-	UnzipPossibleDirectory(m_szDestFileName);
+	bool bWasDir = UnzipPossibleDirectory(m_szDestFileName);
+
+    if (!m_fFileDownloadError && !bWasDir)
+    {
+        if (!::MoveFileEx(m_szDestFileName, realName.c_str(), MOVEFILE_REPLACE_EXISTING))
+       {
+            // failure. Updated status
+            sprintf(szStatus, " %s < %s > %s", sz_H12, realName.c_str(), sz_H16);
+            SetStatus(szStatus);
+        }
+    }
 
 	// SetStatus(szStatus);
 	UpdateWindow(hWnd);
@@ -2043,7 +2292,7 @@ bool FileTransfer::FinishFileReception()
 // Unzip possible directory
 // Todo: handle unzip error correctly...
 //
-int FileTransfer::UnzipPossibleDirectory(LPSTR szFileName)
+bool FileTransfer::UnzipPossibleDirectory(LPSTR szFileName)
 {
 //	vnclog.Print(0, _T("UnzipPossibleDirectory\n"));
 	if (!m_fFileDownloadError 
@@ -2051,7 +2300,7 @@ int FileTransfer::UnzipPossibleDirectory(LPSTR szFileName)
 		!strncmp(strrchr(szFileName, '\\') + 1, rfbZipDirectoryPrefix, strlen(rfbZipDirectoryPrefix))
 	   )
 	{
-		char szStatus[512];
+		char szStatus[512 + 256];
 		char szPath[MAX_PATH + MAX_PATH];
 		char szDirName[MAX_PATH]; // Todo: improve this (size) 
 		strcpy(szPath, szFileName);
@@ -2075,8 +2324,9 @@ int FileTransfer::UnzipPossibleDirectory(LPSTR szFileName)
 			sprintf(szStatus, " %s < %s >. %s", sz_H62, szDirName, sz_H63);
 		SetStatus(szStatus);
 		DeleteFile(szFileName);
+        return true;
 	}						
-	return 0;
+	return false;
 }
 
 //
@@ -2089,7 +2339,7 @@ bool FileTransfer::AbortFileReception()
 
 	m_fFileDownloadError = true;
 	FlushFileBuffers(m_hDestFile);
-	char szStatus[512];
+	char szStatus[512 + 256];
 	sprintf(szStatus, " %s < %s > %s", sz_H19, m_szDestFileName,sz_H20); 
 
 	m_fFileDownloadRunning = false;
@@ -2105,7 +2355,7 @@ bool FileTransfer::OfferLocalFile(LPSTR szSrcFileName)
 //	vnclog.Print(0, _T("OfferLocalFile\n"));
 	if (!m_fFTAllowed) return false;
 
-	char szStatus[512];
+	char szStatus[512 + 256];
 
 	strcpy(m_szSrcFileName, szSrcFileName);
 
@@ -2220,12 +2470,13 @@ bool FileTransfer::OfferLocalFile(LPSTR szSrcFileName)
     m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
 	m_pCC->WriteExact((char *)szDstFileName, strlen(szDstFileName));
 
-	if (!m_fOldFTProtocole)
+	if (!UsingOldProtocol())
 	{
 		CARD32 sizeH = Swap32IfLE(n2SrcSize.HighPart);
 		m_pCC->WriteExact((char *)&sizeH, sizeof(CARD32));
 	}
 
+    m_pCC->SetSendTimeout();
 	return true;
 }
 
@@ -2256,7 +2507,7 @@ int FileTransfer::ZipPossibleDirectory(LPSTR szSrcFileName)
 		else
 			return -1;
 
-		char szStatus[512];
+		char szStatus[512 + 256];
 		char szPath[MAX_PATH];
 		char szDirectoryName[MAX_PATH];
 		strcpy(szPath, szSrcFileName);
@@ -2330,7 +2581,12 @@ bool FileTransfer::SendFile(long lSize, int nLen)
 	// Read in the Name of the file to copy (remote full name !)
 	m_pCC->ReadExact(szRemoteFileName, nLen);
 
-	char szStatus[512];
+	if (nLen > MAX_PATH)
+		szRemoteFileName[MAX_PATH] = '\0';
+	else
+		szRemoteFileName[nLen] = '\0';
+	
+	char szStatus[MAX_PATH + 256];
 
 	// If lSize = -1 (0xFFFFFFFF) that means that the Dst file on the remote machine
 	// could not be created for some reason (locked..)
@@ -2340,6 +2596,7 @@ bool FileTransfer::SendFile(long lSize, int nLen)
 		SetStatus(szStatus);
 		sprintf(szStatus, " %s < %s >%s", sz_H25,szRemoteFileName,sz_H26);
 		SetStatus(szStatus);
+        m_fFileDownloadError = true;
 
 		delete [] szRemoteFileName;
 		return false;
@@ -2460,7 +2717,7 @@ bool FileTransfer::SendFileChunk()
 			// (Compressed data can be longer if it was already compressed)
 			unsigned int nMaxCompSize = m_nBlockSize + 1024; // TODO: Improve this...
 			bool fCompressed = false;
-			if (m_fCompress && !m_fOldFTProtocole)
+			if (m_fCompress && !UsingOldProtocol())
 			{
 				m_pCC->CheckFileZipBufferSize(nMaxCompSize);
 				int nRetC = compress((unsigned char*)(m_pCC->m_filezipbuf),
@@ -2491,7 +2748,7 @@ bool FileTransfer::SendFileChunk()
 			ft.contentType = rfbFilePacket;
 			ft.size = fCompressed ? Swap32IfLE(1) : Swap32IfLE(0); 
 			ft.length = fCompressed ? Swap32IfLE(nMaxCompSize) : Swap32IfLE(m_dwNbBytesRead);
-			if(m_fOldFTProtocole)
+			    if(UsingOldProtocol())
 				m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg);
 			else
 				m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
@@ -2546,8 +2803,9 @@ bool FileTransfer::FinishFileSending()
 	if (!m_fFileUploadRunning) return false;
 
 	m_fFileUploadRunning = false;
+    m_pCC->SetSendTimeout(0);
 
-	char szStatus[512];
+	char szStatus[512 + 256];
 
 	CloseHandle(m_hSrcFile);
 	
@@ -2557,7 +2815,7 @@ bool FileTransfer::FinishFileSending()
 
 		ft.type = rfbFileTransfer;
 		ft.contentType = rfbEndOfFile;
-		if (m_fOldFTProtocole)
+		if (UsingOldProtocol())
 			m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg);
 		else
 			m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
@@ -2568,7 +2826,10 @@ bool FileTransfer::FinishFileSending()
 		rfbFileTransferMsg ft;
 		ft.type = rfbFileTransfer;
 		ft.contentType = rfbAbortFileTransfer;
-		if (m_fOldFTProtocole)
+		ft.contentParam = rfbFileTransferVersion;
+		ft.length = 0;
+		ft.size = 0;
+        if (UsingOldProtocol())
 			m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg);
 		else
 			m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
@@ -2627,16 +2888,17 @@ void FileTransfer::CreateRemoteDirectory(LPSTR szDir)
 //
 // Request the deletion of a file on the remote machine
 //
-void FileTransfer::DeleteRemoteFile(LPSTR szFile)
+void FileTransfer::DeleteRemoteFile(std::string szFile)
 {
     rfbFileTransferMsg ft;
     ft.type = rfbFileTransfer;
 	ft.contentType = rfbCommand;
     ft.contentParam = rfbCFileDelete;
 	ft.size = 0;
-	ft.length = Swap32IfLE(strlen(szFile));
+    size_t len = szFile.length();
+	ft.length = Swap32IfLE(len);
     m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
-	m_pCC->WriteExact((char *)szFile, strlen(szFile));
+	m_pCC->WriteExact((char *)szFile.c_str(), szFile.length());
 	return;
 }
 
@@ -2646,6 +2908,7 @@ void FileTransfer::DeleteRemoteFile(LPSTR szFile)
 void FileTransfer::RenameRemoteFileOrDirectory(LPSTR szCurrentName, LPSTR szNewName)
 {
 	char szMsgContent[(2 * MAX_PATH) + 1];
+	if (strlen(szCurrentName) > MAX_PATH || strlen(szNewName) > MAX_PATH) return; // Todo: error message
 	sprintf(szMsgContent, "%s*%s", szCurrentName, szNewName);
     rfbFileTransferMsg ft;
     ft.type = rfbFileTransfer;
@@ -2667,7 +2930,13 @@ bool FileTransfer::CreateRemoteDirectoryFeedback(long lSize, int nLen)
 	if (szRemoteName == NULL) return false;
 	memset(szRemoteName, 0, nLen+1);
 	m_pCC->ReadExact(szRemoteName, nLen);
-	char szStatus[512];
+
+	if (nLen > MAX_PATH)
+		szRemoteName[MAX_PATH] = '\0';
+	else
+		szRemoteName[nLen] = '\0';
+	
+	char szStatus[MAX_PATH + 256];
 
 	if (lSize == -1)
 	{
@@ -2676,6 +2945,7 @@ bool FileTransfer::CreateRemoteDirectoryFeedback(long lSize, int nLen)
 		delete [] szRemoteName;
 		return false;
 	}
+
 	sprintf(szStatus, "%s < %s > %s",sz_H31, szRemoteName,sz_H32); 
 	SetStatus(szStatus);
 	// Refresh the remote list
@@ -2696,21 +2966,30 @@ bool FileTransfer::DeleteRemoteFileFeedback(long lSize, int nLen)
 	if (szRemoteName == NULL) return false;
 	memset(szRemoteName, 0, nLen+1);
 	m_pCC->ReadExact(szRemoteName, nLen);
-	char szStatus[512];
 
+	if (nLen > MAX_PATH)
+		szRemoteName[MAX_PATH] = '\0';
+	else
+		szRemoteName[nLen] = '\0';
+	
+	char szStatus[MAX_PATH + 256];
+
+    bool isDir = IsDirectoryGetIt(szRemoteName);
 	if (lSize == -1)
 	{
-		sprintf(szStatus, "%s < %s > %s", sz_H33,szRemoteName,sz_H30); 
+        sprintf(szStatus, "%s < %s > %s", isDir ? sz_H99: sz_H33, szRemoteName,sz_H30);
 		SetStatus(szStatus);
 		delete [] szRemoteName;
 		return false;
 	}
-	sprintf(szStatus, "%s < %s > %s", sz_H17,szRemoteName,sz_H34); 
+    sprintf(szStatus, "%s < %s > %s", isDir ? sz_H31 : sz_H17, szRemoteName,sz_H34);
 	SetStatus(szStatus);
 	// Refresh the remote list
 	if (--m_nDeleteCount == 0)
+    {
 		ListView_DeleteAllItems(GetDlgItem(hWnd, IDC_REMOTE_FILELIST));
-	RequestRemoteDirectoryContent(hWnd, "");
+	    RequestRemoteDirectoryContent(hWnd, "");
+    }
 
 	delete [] szRemoteName;
 	return true;
@@ -2722,21 +3001,34 @@ bool FileTransfer::DeleteRemoteFileFeedback(long lSize, int nLen)
 //
 bool FileTransfer::RenameRemoteFileOrDirectoryFeedback(long lSize, int nLen)
 {
+	if (nLen <= 0) return false;
+	if (nLen > ((2 * MAX_PATH))) return false;
+
 	char *szContent = new char [nLen+1];
 	if (szContent == NULL) return false;
 	memset(szContent, 0, nLen+1);
 	m_pCC->ReadExact(szContent, nLen);
-	char szStatus[512];
+	szContent[nLen] = '\0';
+
+	char szStatus[(2 * MAX_PATH) + 1 + 200];
 
 	char *p = strrchr(szContent, '*');
-	char szOldName[MAX_PATH];
-	char szCurrentName[MAX_PATH];
+	if (p==NULL)
+	{
+		sprintf(szStatus, " %s < %s > %s", sz_M5, "selected file", sz_H30); 
+		SetStatus(szStatus);
+		delete [] szContent;
+		return false;
+	}
+
+	char szOldName[(2 * MAX_PATH) + 1];
+	char szCurrentName[(2 * MAX_PATH) + 1];
 
 	strcpy(szCurrentName, p + 1); 
 	*p = '\0';
 	strcpy(szOldName, szContent);
 
-	if (lSize == -1 || p == NULL)
+	if (lSize == -1)
 	{
 		sprintf(szStatus, " %s < %s > %s", sz_M5, szOldName, sz_H30); 
 		SetStatus(szStatus);
@@ -2819,6 +3111,75 @@ int FileTransfer::DoDialog()
 
 
 //
+// 2006 - Resizable FT Window mod - By Roytam1 & and KP774
+//
+void FTAdjustLeft(LPRECT lprc)
+{
+	int cx = lprc->right - lprc->left - GetSystemMetrics(SM_CXSIZEFRAME) * 2;
+	if(cx < 611)
+	{
+		lprc->left = lprc->right - 611 - GetSystemMetrics(SM_CXSIZEFRAME) * 2;
+	}
+}
+
+
+void FTAdjustTop(LPRECT lprc)
+{
+	int cy = lprc->bottom - lprc->top - GetSystemMetrics(SM_CYSIZEFRAME) * 2;
+	if(cy < 429)
+	{
+		lprc->top = lprc->bottom - 429 - GetSystemMetrics(SM_CYSIZEFRAME) * 2;
+	}
+}
+
+
+
+void FTAdjustRight(LPRECT lprc)
+{
+	int cx = lprc->right - lprc->left - GetSystemMetrics(SM_CXSIZEFRAME) * 2;
+	if(cx < 611)
+	{
+		lprc->right = lprc->left + 611 + GetSystemMetrics(SM_CXSIZEFRAME) * 2;
+	}
+}
+
+
+
+void FTAdjustBottom(LPRECT lprc)
+{
+	int cy = lprc->bottom - lprc->top - GetSystemMetrics(SM_CYSIZEFRAME) * 2;
+	if(cy < 429)
+	{
+		lprc->bottom = lprc->top + 429 + GetSystemMetrics(SM_CYSIZEFRAME) * 2;
+	}
+}
+
+
+// sf@2006
+void FTAdjustFileNameColumns(HWND hWnd)
+{
+
+	RECT rc;
+	GetWindowRect(GetDlgItem(hWnd, IDC_LOCAL_FILELIST), &rc);
+	int w = rc.right - rc.left;
+	int cw = w - (70 + 100 + 25);
+	if (cw < 120) cw = 120;
+
+	LVCOLUMN Column;
+	Column.mask = LVCF_FMT|LVCF_WIDTH|LVCF_TEXT|LVCF_ORDER|LVCF_SUBITEM;
+	Column.fmt = LVCFMT_LEFT;
+	Column.cx = cw;
+	Column.pszText = "Name";
+	Column.iSubItem = 0;
+	Column.iOrder = 0;
+
+	HWND hWndList = GetDlgItem(hWnd, IDC_LOCAL_FILELIST);
+	ListView_SetColumn(hWndList, 0, &Column);
+	hWndList = GetDlgItem(hWnd, IDC_REMOTE_FILELIST);
+	ListView_SetColumn(hWndList, 0, &Column);
+}
+
+//
 //
 //
 BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM wParam, LPARAM lParam ) {
@@ -2826,12 +3187,8 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 	// dealing with. But we can get a pseudo-this from the parameter to 
 	// WM_INITDIALOG, which we therafter store with the window and retrieve
 	// as follows:
-		FileTransfer *_this = (FileTransfer *)
-#if defined (_MSC_VER) && _MSC_VER <= 1200		
-		GetWindowLong(hWnd, GWL_USERDATA);
-#else
-		GetWindowLongPtr(hWnd, GWLP_USERDATA);
-#endif
+    FileTransfer *_this = helper::SafeGetWindowUserData<FileTransfer>(hWnd);
+
 	switch (uMsg)
 	{
 	case WM_TIMER:
@@ -2853,14 +3210,12 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 
 	case WM_INITDIALOG:
 		{
-#if defined (_MSC_VER) && _MSC_VER <= 1200
-			SetWindowLong(hWnd, GWL_USERDATA, lParam);
-#else
-			SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR) lParam);
-#endif
+            helper::SafeSetWindowUserData(hWnd, lParam);
+
             FileTransfer *_this = (FileTransfer *) lParam;
             // CentreWindow(hWnd);
 			_this->hWnd = hWnd;
+			hFTWnd = hWnd;
 
 			// Window always on top if Fullscreen On
 			if (_this->m_pCC->InFullScreenMode())
@@ -2896,7 +3251,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 			LVCOLUMN Column;
 			Column.mask = LVCF_FMT|LVCF_WIDTH|LVCF_TEXT|LVCF_ORDER|LVCF_SUBITEM;
 			Column.fmt = LVCFMT_LEFT;
-			Column.cx = 120;
+			Column.cx = 166;
 			Column.pszText = "Name";
 			Column.iSubItem = 0;
 			Column.iOrder = 0;
@@ -2984,6 +3339,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 				GetWindowText(hB, (LPSTR)_this->m_szRenameButtonLabel, 64);
 			}
 
+            _this->CheckButtonState(hWnd);
             return TRUE;
 		}
 		break;
@@ -2995,6 +3351,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 			return TRUE;
 
 		case IDCANCEL:
+            _this->EndFTSession();
 			EndDialog(hWnd, FALSE);
 			return TRUE;
 
@@ -3040,14 +3397,10 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 					// if (szSelectedFile[0] != '(') // Only a file can be transfered
 					char szUpDirMask[16];
 					sprintf(szUpDirMask, "%s..%s", rfbDirPrefix, rfbDirSuffix);
-					if (stricmp(szSelectedFile, szUpDirMask))
+					if (_stricmp(szSelectedFile, szUpDirMask))
 					{ 
-						LVFINDINFO Info;
-						Info.flags = LVFI_STRING;
-						Info.psz = (LPSTR)szSelectedFile;
-						int nTheIndex = ListView_FindItem(hWndRemoteList, -1, &Info);
 						bool fDirectory = (szSelectedFile[0] == rfbDirPrefix[0] && szSelectedFile[1] == rfbDirPrefix[1]);
-						if (nTheIndex > -1) 
+						if (_this->FileOrFolderExists(hWndRemoteList, szSelectedFile))
 						{
 							if (_this->m_nConfirmAnswer == CONFIRM_YES || _this->m_nConfirmAnswer == CONFIRM_NO)
 							{
@@ -3056,7 +3409,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 									wsprintf(szMes, "%s < %s >\n%s", sz_H71, szSelectedFile, sz_H72);
 								else
 									wsprintf(szMes, "%s < %s >\n%s", sz_H17, szSelectedFile, sz_H38);
-								_this->DoFTConfirmDialog(sz_H39, _T(szMes));
+                                _this->DoFTConfirmDialog(fDirectory ? sz_H101 : sz_H39, _T(szMes));
 								if (_this->m_nConfirmAnswer == CONFIRM_NO)
 									continue;
 								if (_this->m_nConfirmAnswer == CONFIRM_NOALL)
@@ -3097,6 +3450,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 			_this->m_fFileCommandPending = true;
 			_this->m_fAbort = false;
 			_this->m_fAborted = false;
+            _this->m_fUserAbortedFileTransfer = false;
 			if (!_this->OfferLocalFile(szCurrLocal))
 				_this->SendFiles(-1, 0); // If the first file could not be opened try next file
 
@@ -3145,14 +3499,10 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 					// if (szSelectedFile[0] != '(') // Only a file can be transfered
 					char szUpDirMask[16];
 					sprintf(szUpDirMask, "%s..%s", rfbDirPrefix, rfbDirSuffix);
-					if (stricmp(szSelectedFile, szUpDirMask))
+					if (_stricmp(szSelectedFile, szUpDirMask))
 					{ 
-						LVFINDINFO Info;
-						Info.flags = LVFI_STRING;
-						Info.psz = (LPSTR)szSelectedFile;
-						int nTheIndex = ListView_FindItem(hWndLocalList, -1, &Info);
 						bool fDirectory = (szSelectedFile[0] == rfbDirPrefix[0] && szSelectedFile[1] == rfbDirPrefix[1]);
-						if (nTheIndex > -1) 
+						if (_this->FileOrFolderExists(hWndLocalList, szSelectedFile))
 						{
 
 							if (_this->m_nConfirmAnswer == CONFIRM_YES || _this->m_nConfirmAnswer == CONFIRM_NO)
@@ -3162,7 +3512,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 									wsprintf(szMes, "%s < %s >\n\n%s", sz_H73, szSelectedFile, sz_H72);
 								else
 									wsprintf(szMes, "%s < %s >\n\n%s", sz_H17,szSelectedFile,sz_H43);
-								_this->DoFTConfirmDialog(sz_H47, _T(szMes));
+                                _this->DoFTConfirmDialog(fDirectory ? sz_H101 :sz_H39, _T(szMes));
 								if (_this->m_nConfirmAnswer == CONFIRM_NO)
 									continue;
 								if (_this->m_nConfirmAnswer == CONFIRM_NOALL)
@@ -3203,6 +3553,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 			_this->m_fFileCommandPending = true;
 			_this->m_fAbort = false;
 			_this->m_fAborted = false;
+            _this->m_fUserAbortedFileTransfer = false;
 			_this->RequestRemoteFile(szDstFile);
 
 			}
@@ -3222,10 +3573,11 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 		case IDC_REMOTE_ROOTB:
 			if (!_this->m_fFileCommandPending)
 			{
-				_this->m_fFileCommandPending = true;
+				// _this->m_fFileCommandPending = true; // Move to after nSelected test
 				char ofDir[MAX_PATH];
 				int nSelected = SendMessage(GetDlgItem(hWnd, IDC_REMOTE_DRIVECB), CB_GETCURSEL, 0, 0); 
 				if (nSelected == -1) break;
+				_this->m_fFileCommandPending = true; // Moved // PGM @ Advantig 
 				SendMessage(GetDlgItem(hWnd, IDC_REMOTE_DRIVECB), CB_GETLBTEXT, (WPARAM)nSelected, (LPARAM)ofDir); 
 				//ofDir[4] = '\0'; // Hum...
 				_this->RequestRemoteDirectoryContent(hWnd, ofDir);					
@@ -3252,6 +3604,8 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 
 		case IDC_ABORT_B:
 			_this->m_fAbort = true;
+            _this->m_fUserAbortedFileTransfer = true;
+			ShowWindow(GetDlgItem(_this->hWnd, IDC_ABORT_B), SW_HIDE);
 			break;
 
 		case IDC_DELETE_B:
@@ -3284,7 +3638,8 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 					{
 						Item.iItem = nSelected;
 						ListView_GetItem(hWndLocalList, &Item);
-						if (szSelectedFile[0] == rfbDirPrefix[0] && szSelectedFile[1] == rfbDirPrefix[1]) continue;// Only a file can be deleted
+                        // 14 April 2008 jdp
+                        bool isDir = _this->IsDirectoryGetIt(szSelectedFile);
 						GetDlgItemText(hWnd, IDC_CURR_LOCAL, szCurrLocal, sizeof(szCurrLocal));
 						if (strlen(szCurrLocal) + strlen(szSelectedFile) > MAX_PATH)
 						{
@@ -3293,21 +3648,21 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 						}
 						if (_this->m_nConfirmAnswer == CONFIRM_YES || _this->m_nConfirmAnswer == CONFIRM_NO)
 						{
-							wsprintf(szMes, "%s\n\n< %s > ?\n", sz_H48,szSelectedFile);
-							_this->DoFTConfirmDialog(sz_H47, _T(szMes));
+                            wsprintf(szMes, "%s\n\n< %s > ?\n", isDir ? sz_H95 : sz_H48, szSelectedFile);
+                            _this->DoFTConfirmDialog(isDir ? sz_H94 : sz_H47, _T(szMes));
 							if (_this->m_nConfirmAnswer == CONFIRM_NO)
 								continue;
 							if (_this->m_nConfirmAnswer == CONFIRM_NOALL)
 								break;
 						}
 						strcat(szCurrLocal, szSelectedFile);
-						if (!DeleteFile(szCurrLocal))
+						if (!_this->DeleteFileOrDirectory(szCurrLocal))
 						{
-							wsprintf(szMes, "%s < %s >", sz_H49,szCurrLocal);
+                            wsprintf(szMes, "%s < %s >", isDir ? sz_H97 : sz_H49, szCurrLocal);
 							_this->SetStatus(szMes);
 							break;
 						}
-						wsprintf(szMes, "%s < %s > %s", sz_H17,szCurrLocal,sz_H50);
+                        wsprintf(szMes, "%s < %s > %s", isDir ? sz_H31 : sz_H17, szCurrLocal,sz_H50);
 						_this->SetStatus(szMes);
 					}
 				}
@@ -3339,19 +3694,21 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 				nCount = ListView_GetItemCount(hWndRemoteList);
 				_this->m_nConfirmAnswer = CONFIRM_YES;
 				_this->m_nDeleteCount = 0;
+                std::vector<std::string> pathsToDelete;
 				for (nSelected = 0; nSelected < nCount; nSelected++)
 				{
 					if(ListView_GetItemState(hWndRemoteList, nSelected, LVIS_SELECTED) & LVIS_SELECTED)
 					{
 						Item.iItem = nSelected;
 						ListView_GetItem(hWndRemoteList, &Item);
-						if (szSelectedFile[0] == rfbDirPrefix[0] && szSelectedFile[1] == rfbDirPrefix[1]) continue;// Only a file can be deleted
+                        // 14 April 2008 jdp
+                        bool isDir = _this->IsDirectoryGetIt(szSelectedFile);
 						GetDlgItemText(hWnd, IDC_CURR_REMOTE, szCurrRemote, sizeof(szCurrRemote));
 						if (strlen(szCurrRemote) + strlen(szSelectedFile) > MAX_PATH) continue;
 						if (_this->m_nConfirmAnswer == CONFIRM_YES || _this->m_nConfirmAnswer == CONFIRM_NO)
 						{
-							wsprintf(szMes, "%s\n\n< %s > ?\n", sz_H51, szSelectedFile);
-							_this->DoFTConfirmDialog(sz_H47, _T(szMes));
+							wsprintf(szMes, "%s\n\n< %s > ?\n", isDir ? sz_H96 : sz_H51, szSelectedFile);
+							_this->DoFTConfirmDialog(isDir ? sz_H94 : sz_H47, _T(szMes));
 							if (_this->m_nConfirmAnswer == CONFIRM_NO)
 								continue;
 							if (_this->m_nConfirmAnswer == CONFIRM_NOALL)
@@ -3360,9 +3717,16 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 						_this->m_fFileCommandPending = true;
 						strcat(szCurrRemote, szSelectedFile);
 						_this->m_nDeleteCount++;
-						_this->DeleteRemoteFile(szCurrRemote);
+                        pathsToDelete.push_back(std::string(szCurrRemote));
 					}
 				}
+                std::vector<std::string>::iterator currFile = pathsToDelete.begin();
+                while (currFile != pathsToDelete.end())
+                {
+                    _this->DeleteRemoteFile(currFile->c_str());
+                    ::UpdateWindow(_this->hWnd); // force a repaint
+                    ++currFile;
+                }
 			}
 			break;
 
@@ -3375,13 +3739,22 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 				GetDlgItemText(hWnd, IDC_CURR_LOCAL, szCurrLocal, sizeof(szCurrLocal));
 				if (!strlen(szCurrLocal)) break; // no dst dir selected
 				memset(_this->m_szFTParam, '\0', sizeof(_this->m_szFTParam));
-				_this->DoFTParamDialog(sz_H57,sz_H52);
+				_this->DoFTParamDialog(sz_H100,sz_H52);
 				if (strlen(_this->m_szFTParam) == 0 || (strlen(szCurrLocal) + strlen(_this->m_szFTParam)) > 248) 
 				{
 					// TODO: Error Message
 					break;
 				}
 				strcat(szCurrLocal, _this->m_szFTParam);
+                TCHAR szFolderName[MAX_PATH];
+                _snprintf(szFolderName, MAX_PATH, "%s%s%s", rfbDirPrefix, _this->m_szFTParam, rfbDirSuffix);
+                szFolderName[MAX_PATH - 1] = 0;
+				if (_this->FileOrFolderExists(GetDlgItem(hWnd, IDC_LOCAL_FILELIST), szFolderName))
+				{
+					wsprintf(szMes, "%s < %s >: %s", sz_H53,szCurrLocal, sz_H102);
+					_this->SetStatus(szMes);
+					break;
+				}
 				if (!CreateDirectory(szCurrLocal, NULL))
 				{
 					// TODO: Error Message
@@ -3405,10 +3778,22 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 				GetDlgItemText(hWnd, IDC_CURR_REMOTE, szCurrRemote, sizeof(szCurrRemote));
 				if (!strlen(szCurrRemote)) break; // no dst dir selected
 				memset(_this->m_szFTParam, '\0', sizeof(_this->m_szFTParam));
-				_this->DoFTParamDialog(sz_H57,sz_H56);
+				_this->DoFTParamDialog(sz_H100,sz_H56);
 				if (strlen(_this->m_szFTParam) == 0 || (strlen(szCurrRemote) + strlen(szCurrRemote)) > 248) 
 				{
 					// TODO: Error Message
+					break;
+				}
+
+                TCHAR szFolderName[MAX_PATH];
+                _snprintf(szFolderName, MAX_PATH, "%s%s%s", rfbDirPrefix, _this->m_szFTParam, rfbDirSuffix);
+                szFolderName[MAX_PATH - 1] = 0;
+				if (_this->FileOrFolderExists(GetDlgItem(hWnd, IDC_REMOTE_FILELIST), szFolderName))
+				{
+                    char szStatus[MAX_PATH + 128];
+
+					wsprintf(szStatus, "%s < %s > %s: %s", sz_H29,szCurrRemote,sz_H30, sz_H102);
+					_this->SetStatus(szStatus);
 					break;
 				}
 
@@ -3427,7 +3812,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 				int nCount = ListView_GetSelectedCount(hWndLocalList);
 				if (nCount == 0 || nCount > 1)
 				{
-					MessageBox(	NULL,
+					MessageBox(	_this->hWnd,
 								sz_M1, 
 								sz_M2, 
 								MB_OK | MB_ICONINFORMATION | MB_SETFOREGROUND | MB_TOPMOST);
@@ -3466,6 +3851,16 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 							// TODO: Error Message
 							break;
 						}
+		                TCHAR szFolderName[MAX_PATH];
+		                _snprintf(szFolderName, MAX_PATH, "%s%s%s", rfbDirPrefix, _this->m_szFTParam, rfbDirSuffix);
+		                szFolderName[MAX_PATH - 1] = 0;
+						if ((_this->FileOrFolderExists(GetDlgItem(hWnd, IDC_LOCAL_FILELIST), szFolderName)) ||
+						   (_this->FileOrFolderExists(GetDlgItem(hWnd, IDC_LOCAL_FILELIST), _this->m_szFTParam)))
+						{
+							wsprintf(szMes, "%s < %s >: %s", sz_M5,szSelectedFile, sz_H102);
+							_this->SetStatus(szMes);
+							break;
+						}
 						strcpy(szNewLocal, szCurrLocal);
 						strcat(szCurrLocal, szSelectedFile); // Old full name
 						strcat(szNewLocal, _this->m_szFTParam); // New full name
@@ -3491,7 +3886,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 				int nCount = ListView_GetSelectedCount(hWndRemoteList);
 				if (nCount == 0 || nCount > 1)
 				{
-					MessageBox(	NULL,
+					MessageBox(	_this->hWnd,
 								sz_M1, 
 								sz_M2, 
 								MB_OK | MB_ICONINFORMATION | MB_SETFOREGROUND | MB_TOPMOST);
@@ -3531,6 +3926,17 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 							(strlen(szCurrRemote) + strlen(_this->m_szFTParam)) > 248) 
 						{
 							// TODO: Error Message
+							break;
+						}
+		                TCHAR szFolderName[MAX_PATH];
+		                _snprintf(szFolderName, MAX_PATH, "%s%s%s", rfbDirPrefix, _this->m_szFTParam, rfbDirSuffix);
+		                szFolderName[MAX_PATH - 1] = 0;
+						if ((_this->FileOrFolderExists(GetDlgItem(hWnd, IDC_REMOTE_FILELIST), szFolderName)) ||
+						   (_this->FileOrFolderExists(GetDlgItem(hWnd, IDC_REMOTE_FILELIST), _this->m_szFTParam)))
+						{
+            				char szMes[MAX_PATH + 256];
+							wsprintf(szMes, "%s < %s > %s: %s", sz_M5,szSelectedFile, sz_H30, sz_H102);
+							_this->SetStatus(szMes);
 							break;
 						}
 						strcpy(szNewRemote, szCurrRemote);
@@ -3589,24 +3995,137 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 		case SC_RESTORE:
 			_this->ShowFileTransferWindow(true);
 			return TRUE;
+
+		case SC_MINIMIZE:
+			SendMessage(hWnd,WM_COMMAND,MAKEWPARAM(IDC_HIDE_B,0),0);
+			return FALSE;
+
 		}
 		break;
+
+	case WM_SIZING:
+
+		LPRECT lprc;
+		lprc = (LPRECT)lParam;
+		switch(wParam)
+        {
+		case WMSZ_TOPLEFT:
+			FTAdjustTop(lprc);
+			FTAdjustLeft(lprc);
+
+		case WMSZ_TOP:
+			FTAdjustTop(lprc);
+
+		case WMSZ_TOPRIGHT:
+			FTAdjustTop(lprc);
+			FTAdjustRight(lprc);
+
+		case WMSZ_LEFT:
+			FTAdjustLeft(lprc);
+
+		case WMSZ_RIGHT:
+			FTAdjustRight(lprc);
+
+		case WMSZ_BOTTOMLEFT:
+			FTAdjustBottom(lprc);
+			FTAdjustLeft(lprc);
+
+		case WMSZ_BOTTOM:
+			FTAdjustBottom(lprc);
+
+		case WMSZ_BOTTOMRIGHT:
+			FTAdjustBottom(lprc);
+			FTAdjustRight(lprc);
+		}
+		return TRUE;
+
+
+	case WM_SIZE:
+
+		int cx;
+		int cy;
+		int icx;
+		int icy;
+		int lf_an;
+		RECT rc;
+
+		if(wParam == SIZE_MINIMIZED)
+		{
+			break;
+		}
+
+		cx = LOWORD(lParam);	//Client Width
+		cy = HIWORD(lParam);	//Client Height
+		icy = cy-85-50;
+		icx = cx/2 - (21+4) * 2 - 94 - 95 - 7 * 4;
+		lf_an=(cx - 112)/2;
+
+		//Left
+		GetWindowRect(GetDlgItem(hWnd, IDC_LOCAL_DRIVECB), &rc);
+		MoveWindow(GetDlgItem(hWnd, IDC_LOCAL_DRIVECB),              4,       4,   icx,  rc.bottom - rc.top, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDC_LM_STATIC),            4+icx+7,       4,   141,                  19, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDC_LOCAL_ROOTB),    4+icx+7+141+7,       4,    25,                  18, TRUE); 
+		MoveWindow(GetDlgItem(hWnd, IDC_LOCAL_UPB), 4+icx+7+141+7+25+4,       4,    25,                  18, TRUE); 
+		MoveWindow(GetDlgItem(hWnd, IDC_CURR_LOCAL),                 4,      25, lf_an,                  18, TRUE); 
+		MoveWindow(GetDlgItem(hWnd, IDC_LOCAL_FILELIST),             4,      46, lf_an,                 icy, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDC_LOCAL_STATUS),               4, cy-85+4, lf_an,                  15, TRUE);
+
+		//Right
+		GetWindowRect(GetDlgItem(hWnd, IDC_REMOTE_DRIVECB), &rc);
+		MoveWindow(GetDlgItem(hWnd, IDC_REMOTE_DRIVECB),               lf_an+109,       4,   icx,   rc.bottom - rc.top, TRUE); 
+		MoveWindow(GetDlgItem(hWnd, IDC_RM_STATIC),              lf_an+109+icx+7,       4,   141,                   19, TRUE); 
+		MoveWindow(GetDlgItem(hWnd, IDC_REMOTE_ROOTB),     lf_an+109+icx+7+141+7,       4,    25,                   18, TRUE); 
+		MoveWindow(GetDlgItem(hWnd, IDC_REMOTE_UPB),  lf_an+109+icx+7+141+7+25+4,       4,    25,                   18, TRUE); 
+		MoveWindow(GetDlgItem(hWnd, IDC_CURR_REMOTE),                  lf_an+109,      25, lf_an,                   18, TRUE); 
+		MoveWindow(GetDlgItem(hWnd, IDC_REMOTE_FILELIST),              lf_an+109,      46, lf_an,                  icy, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDC_REMOTE_STATUS),                lf_an+109, cy-85+4, lf_an,                   15, TRUE);
+
+		//Bottom
+		icx = cx-135-69;
+		MoveWindow(GetDlgItem(hWnd, IDC_HS_STATIC),                  8,          cy-85+4+18+4,     39,                15, TRUE);
+		GetWindowRect(GetDlgItem(hWnd, IDC_HISTORY_CB), &rc);
+		MoveWindow(GetDlgItem(hWnd, IDC_HISTORY_CB),                65,            cy-85+4+18,  cx-69,  rc.bottom-rc.top, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDC_PR_STATIC),                  8,   cy-85+4+15+4+4+18+3,     56,                15, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDC_PROGRESS),                  65,   cy-85+4+15+4+4+18+2,    icx,                15, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDC_PERCENT),             65+icx+6, cy-85+4+10+4+4+18+4+2,     25,                12, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDC_GLOBAL_STATUS),  65+icx+6+25+3, cy-85+4+10+4+4+18+4+2,     97,                12, TRUE);
+		GetWindowRect(GetDlgItem(hWnd, IDC_STATUS), &rc);
+		MoveWindow(GetDlgItem(hWnd, IDC_STATUS),                     0, cy-(rc.bottom-rc.top),     cx,  rc.bottom-rc.top, TRUE);
+
+		//Center
+		icy = 46+icy/2;
+		MoveWindow(GetDlgItem(hWnd, IDC_UPLOAD_B),     lf_an+10+2,  icy-15-20-6-20-5-20, 90, 20, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDC_DOWNLOAD_B),   lf_an+10+2,       icy-15-20-6-20, 90, 20, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDC_ABORT_B),      lf_an+10+2,            icy-15-20, 90, 20, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDC_DELETE_B),     lf_an+10+2,               icy+15, 90, 20, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDC_NEWFOLDER_B),  lf_an+10+2,          icy+15+20+6, 90, 20, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDC_RENAME_B),     lf_an+10+2,     icy+15+20+6+20+6, 90, 20, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDC_HIDE_B),       lf_an+10+2,        cy-103-20-4-6, 90, 20, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDCANCEL),         lf_an+10+2,             cy-103-4, 90, 20, TRUE);
+		InvalidateRect(hWnd, NULL, FALSE);
+
+		FTAdjustFileNameColumns(hWnd); // sf@2006
+
+		return TRUE;
+
 
 	// Messages from ListViews
 	case WM_NOTIFY:
 		{
-			// int nId = (int) wParam;
-			LPNMHDR lpNmh = (LPNMHDR) lParam;
+			LPNMLISTVIEW lpNmlv = (LPNMLISTVIEW) lParam;
+			LV_DISPINFO *pLvdi = (LV_DISPINFO*) lParam;
+			LVITEM *lvi = (LVITEM*)(pLvdi->item.lParam);
 
-			switch(lpNmh->code)
+			switch(lpNmlv->hdr.code)
 			{
 			case HDN_ITEMCLICK:
 				return TRUE;
 
 			case NM_SETFOCUS:
-				if (lpNmh->hwndFrom == GetDlgItem(hWnd, IDC_LOCAL_FILELIST))
+				if (lpNmlv->hdr.hwndFrom == GetDlgItem(hWnd, IDC_LOCAL_FILELIST))
 				{
 					_this->m_fFocusLocal = true;
+                    _this->CheckButtonState(hWnd);
 					char szTxt[64];
 					HWND hB = GetDlgItem(hWnd, IDC_DELETE_B);
 					sprintf(szTxt, "<- %s", _this->m_szDeleteButtonLabel);
@@ -3619,9 +4138,10 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 					SetWindowText(hB, szTxt);
 				}
 
-				if (lpNmh->hwndFrom == GetDlgItem(hWnd, IDC_REMOTE_FILELIST))
+				if (lpNmlv->hdr.hwndFrom == GetDlgItem(hWnd, IDC_REMOTE_FILELIST))
 				{
 					_this->m_fFocusLocal = false;
+                    _this->CheckButtonState(hWnd);
 					char szTxt[64];
 					HWND hB = GetDlgItem(hWnd, IDC_DELETE_B);
 					sprintf(szTxt, "%s ->", _this->m_szDeleteButtonLabel);
@@ -3637,12 +4157,13 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 				return TRUE;
 
 			case NM_DBLCLK:
-				if (lpNmh->hwndFrom == GetDlgItem(hWnd, IDC_LOCAL_FILELIST))
+				if (lpNmlv->hdr.hwndFrom == GetDlgItem(hWnd, IDC_LOCAL_FILELIST))
 				{
 					_this->PopulateLocalListBox(hWnd, "");
+                    _this->CheckButtonState(hWnd);
 				}
 
-				if (lpNmh->hwndFrom == GetDlgItem(hWnd, IDC_REMOTE_FILELIST))
+				if (lpNmlv->hdr.hwndFrom == GetDlgItem(hWnd, IDC_REMOTE_FILELIST))
 				{
 					if (!_this->m_fFileCommandPending)
 					{
@@ -3651,10 +4172,34 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 					}
 				}
 				return TRUE;
-			}
 
+			// sf@2006 - 2007 - Added in the ability to sort on the headers of the ListView
+			// Modif initiated by TAW. Thanks !
+			case LVN_COLUMNCLICK:
+				if (lpNmlv->hdr.hwndFrom == GetDlgItem(hWnd, IDC_LOCAL_FILELIST))
+				{
+					int c = (LPARAM)lpNmlv->iSubItem;
+					_this->bSortDirectionsL[c] = !(_this->bSortDirectionsL[c]);
+					::SendMessage(lpNmlv->hdr.hwndFrom,
+								LVM_FIRST+81 /*LVM_SORTITEMSEX*/,
+								(WPARAM)(LPARAM)(_this->bSortDirectionsL[c] ? c+1 : ((c+1) * -1)),
+								(LPARAM)(PFNLVCOMPARE)ListViewLocalCompareProc);
+				}
+
+				if (lpNmlv->hdr.hwndFrom == GetDlgItem(hWnd, IDC_REMOTE_FILELIST))
+				{
+					int c = (LPARAM)lpNmlv->iSubItem;
+					_this->bSortDirectionsR[c] = !(_this->bSortDirectionsR[c]);
+					::SendMessage(lpNmlv->hdr.hwndFrom,
+								LVM_FIRST+81 /*LVM_SORTITEMSEX*/,
+								(WPARAM)(LPARAM)(_this->bSortDirectionsR[c] ? c+1+10 : ((c+1+10) * -1)),
+								(LPARAM)(PFNLVCOMPARE)ListViewLocalCompareProc);
+				}
+				return TRUE;
+			}
 		}
 		break;
+
 
 	case WM_DESTROY:
 		if (_this->m_timer != 0) KillTimer(hWnd, _this->m_timer);
@@ -3682,27 +4227,18 @@ int FileTransfer::DoFTParamDialog(LPSTR szTitle, LPSTR szComment)
 {
 	strcpy(m_szFTParamTitle, szTitle);
 	strcpy(m_szFTParamComment, szComment);
-	return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_FTPARAM_DLG), NULL, (DLGPROC) FTParamDlgProc, (LONG) this);
+	return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_FTPARAM_DLG), hWnd, (DLGPROC) FTParamDlgProc, (LONG) this);
 }
 
 
 BOOL CALLBACK FileTransfer::FTParamDlgProc(  HWND hwnd,  UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
-		FileTransfer *_this = (FileTransfer *)
-#if defined (_MSC_VER) && _MSC_VER <= 1200		
-		GetWindowLong(hwnd, GWL_USERDATA);
-#else
-		GetWindowLongPtr(hwnd, GWLP_USERDATA);
-#endif
+    FileTransfer *_this = helper::SafeGetWindowUserData<FileTransfer>(hwnd);
 	switch (uMsg)
 	{
 	case WM_INITDIALOG:
 		{
-#if defined (_MSC_VER) && _MSC_VER <= 1200
-			SetWindowLong(hwnd, GWL_USERDATA, lParam);
-#else
-			SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR) lParam);
-#endif
+            helper::SafeSetWindowUserData(hwnd, lParam);
 			_this = (FileTransfer *) lParam;
 			CentreWindow(hwnd);
 
@@ -3719,6 +4255,28 @@ BOOL CALLBACK FileTransfer::FTParamDlgProc(  HWND hwnd,  UINT uMsg, WPARAM wPara
 	case WM_COMMAND:
 		switch (LOWORD(wParam))
 		{
+        case IDC_FTPARAM_EDIT:
+            if (HIWORD(wParam) == EN_CHANGE)
+            {
+                size_t length = GetWindowTextLength(GetDlgItem(hwnd, IDC_FTPARAM_EDIT));
+                bool stringOk = length > 0;
+
+                if (stringOk)
+                {
+                    std::string text;
+                    text.resize(length+1);
+                    GetDlgItemText(hwnd,  IDC_FTPARAM_EDIT, &*text.begin(), length+1);
+
+                    std::string::size_type pos;
+                    pos = text.find_first_not_of(" \t\n\r");
+                    if (pos == std::string::npos || pos >= strlen(text.c_str()))
+                       stringOk = false;
+                }
+
+                EnableWindow(GetDlgItem(hwnd, IDOK), stringOk);
+            }
+            break;
+
 		case IDOK:
 			{
 				UINT res = GetDlgItemText( hwnd,  IDC_FTPARAM_EDIT, _this->m_szFTParam, 256);
@@ -3746,27 +4304,18 @@ int FileTransfer::DoFTConfirmDialog(LPSTR szTitle, LPSTR szComment)
 {
 	strcpy(m_szFTConfirmTitle, szTitle);
 	strcpy(m_szFTConfirmComment, szComment);
-	return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_FTCONFIRM_DLG), NULL, (DLGPROC) FTConfirmDlgProc, (LONG) this);
+	return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_FTCONFIRM_DLG), hWnd, (DLGPROC) FTConfirmDlgProc, (LONG) this);
 }
 
 
 BOOL CALLBACK FileTransfer::FTConfirmDlgProc(  HWND hwnd,  UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
-		FileTransfer *_this = (FileTransfer *)
-#if defined (_MSC_VER) && _MSC_VER <= 1200		
-		GetWindowLong(hwnd, GWL_USERDATA);
-#else
-		GetWindowLongPtr(hwnd, GWLP_USERDATA);
-#endif
+    FileTransfer *_this = helper::SafeGetWindowUserData<FileTransfer>(hwnd);
 	switch (uMsg)
 	{
 	case WM_INITDIALOG:
 		{
-#if defined (_MSC_VER) && _MSC_VER <= 1200
-			SetWindowLong(hwnd, GWL_USERDATA, lParam);
-#else
-			SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR) lParam);
-#endif
+            helper::SafeSetWindowUserData(hwnd, lParam);
 			_this = (FileTransfer *) lParam;
 			CentreWindow(hwnd);
 
@@ -3839,6 +4388,34 @@ void FileTransfer::DisableButtons(HWND hWnd)
 	EnableWindow(GetDlgItem(hWnd, IDC_REMOTE_DRIVECB), FALSE);
 	EnableWindow(GetDlgItem(hWnd, IDC_REMOTE_ROOTB), FALSE);
 	EnableWindow(GetDlgItem(hWnd, IDC_REMOTE_UPB), FALSE);
+
+	// Disable Close Window in in title bar
+	HMENU hMenu = GetSystemMenu(hWnd, 0);
+	int nCount = GetMenuItemCount(hMenu);
+	EnableMenuItem(hMenu, nCount-1, MF_DISABLED|MF_GRAYED | MF_BYPOSITION);
+	EnableMenuItem(hMenu, nCount-2, MF_DISABLED|MF_GRAYED | MF_BYPOSITION);
+	DrawMenuBar(hWnd);
+
+}
+void FileTransfer::CheckButtonState(HWND hWnd)
+{
+//    bool bEnable = m_fFocusLocal && || 
+    bool bEnable;
+    bool localDirSet, remoteDirSet;
+
+    localDirSet = GetWindowTextLength(GetDlgItem(hWnd, IDC_CURR_LOCAL)) > 0;
+    remoteDirSet = GetWindowTextLength(GetDlgItem(hWnd, IDC_CURR_REMOTE)) > 0;
+
+    bEnable = m_fFocusLocal ?localDirSet : remoteDirSet;
+
+	EnableWindow(GetDlgItem(hWnd, IDC_UPLOAD_B), localDirSet && remoteDirSet);
+	EnableWindow(GetDlgItem(hWnd, IDC_DOWNLOAD_B), localDirSet && remoteDirSet);
+	EnableWindow(GetDlgItem(hWnd, IDC_DELETE_B), bEnable);
+	EnableWindow(GetDlgItem(hWnd, IDC_NEWFOLDER_B), bEnable);
+	EnableWindow(GetDlgItem(hWnd, IDC_RENAME_B), bEnable);
+//	EnableWindow(GetDlgItem(hWnd, IDCANCEL), bEnable);
+//	EnableWindow(GetDlgItem(hWnd, IDC_HIDE_B), bEnable);
+
 }
 
 //
@@ -3852,7 +4429,7 @@ void FileTransfer::EnableButtons(HWND hWnd)
 	ShowWindow(GetDlgItem(hWnd, IDCANCEL), SW_SHOW);
 	ShowWindow(GetDlgItem(hWnd, IDC_DELETE_B), SW_SHOW);
 	ShowWindow(GetDlgItem(hWnd, IDC_NEWFOLDER_B), SW_SHOW);
-	if (!m_fOldFTProtocole)
+	if (!UsingOldProtocol())
 		ShowWindow(GetDlgItem(hWnd, IDC_RENAME_B), SW_SHOW);
 	EnableWindow(GetDlgItem(hWnd, IDC_LOCAL_FILELIST), TRUE);
 	EnableWindow(GetDlgItem(hWnd, IDC_LOCAL_DRIVECB), TRUE);
@@ -3862,7 +4439,15 @@ void FileTransfer::EnableButtons(HWND hWnd)
 	EnableWindow(GetDlgItem(hWnd, IDC_REMOTE_DRIVECB), TRUE);
 	EnableWindow(GetDlgItem(hWnd, IDC_REMOTE_ROOTB), TRUE);
 	EnableWindow(GetDlgItem(hWnd, IDC_REMOTE_UPB), TRUE);
+	// Disable Close Window in in title bar
+	HMENU hMenu = GetSystemMenu(hWnd, 0);
+	int nCount = GetMenuItemCount(hMenu);
+	EnableMenuItem(hMenu, nCount-1, MF_ENABLED | MF_BYPOSITION);
+	EnableMenuItem(hMenu, nCount-2, MF_ENABLED | MF_BYPOSITION);
+	DrawMenuBar(hWnd);
+
 }
+
 
 
 void FileTransfer::InitListViewImagesList(HWND hListView)
@@ -3882,4 +4467,134 @@ void FileTransfer::InitListViewImagesList(HWND hListView)
     DestroyIcon(hIcon); 
 
     ListView_SetImageList(hListView, hImageList, LVSIL_SMALL); 
+}
+
+
+// sf@2007 - Column sorting comparizon function
+// Modif initiated by TAW. Thanks !
+int CALLBACK FileTransfer::ListViewLocalCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
+{
+	int iResult;
+	bool bSortDirection = true;
+	bool bRemoteList = false;
+	TCHAR szBuf1[255], szBuf2[255];
+
+	if (lParamSort < 0)
+	{
+		bSortDirection = false;
+		lParamSort *= -1;
+	}
+	if (lParamSort >=10)
+	{
+		lParamSort -=10;
+		bRemoteList = true;
+	}
+	lParamSort -= 1;
+	
+	HWND hWndList = GetDlgItem(hFTWnd, bRemoteList ? IDC_REMOTE_FILELIST : IDC_LOCAL_FILELIST);
+
+	ListView_GetItemText(hWndList, lParam1, lParamSort, szBuf1, sizeof(szBuf1));
+    ListView_GetItemText(hWndList, lParam2, lParamSort, szBuf2, sizeof(szBuf2));
+
+	switch(lParamSort)
+	{
+	case 0: //Sort by name
+		iResult = lstrcmpi(szBuf1, szBuf2);
+		break;
+	case 1: //Sort by size
+		{
+		iResult = lstrcmpi(szBuf1, szBuf2);
+		__int64 s1 = GetFileSizeFromString(szBuf1);
+		__int64 s2 = GetFileSizeFromString(szBuf2);
+		iResult = ((s1 >= s2) ? 1 : -1);
+		}
+		break;
+	case 2: //Sort by date
+		{
+		FILETIME ft1 = GetFileTimeFromString(szBuf1);
+		FILETIME ft2 = GetFileTimeFromString(szBuf2);
+		iResult = CompareFileTime(&ft1, &ft2);
+		}
+		break;
+		}
+
+	if (bSortDirection == false)
+		iResult *= -1;
+
+	return(iResult);
+}
+
+
+__int64 FileTransfer::GetFileSizeFromString(char* szSize)
+{
+	__int64 Size = 0;
+	unsigned long m, r;
+	char ts0 = szSize[strlen(szSize)-1];
+	if (ts0 == 'r') return -1;
+	char ts1 = szSize[strlen(szSize)-2];
+	if (ts1 != 'e')
+		sscanf(szSize, "%d.%02d", &m, &r);
+	else
+		sscanf(szSize, "%d", &m);
+
+	switch (ts1)
+	{
+		case 'G':
+			Size = (__int64)(m*(__int64)(1024*1024*1024)) + (__int64)(r*(__int64)(1024*1024*1024/100));
+			break;
+		case 'M':
+			Size = (__int64)(m*(__int64)(1024*1024)) + (__int64)(r*(__int64)(1024*1024/100));
+			break;
+		case 'K':
+			Size = (__int64)(m*(__int64)(1024)) + (__int64)(r*1024/100);
+			break;
+		case 'e':
+			Size = (__int64)m;
+			break;
+		default:
+			Size = 0;
+			break;
+	}
+	return Size;
+}
+
+
+FILETIME FileTransfer::GetFileTimeFromString(char* szFileSystemTime)
+{
+	SYSTEMTIME FileSystemTime;
+	FILETIME LocalFileTime;
+	int m,d,y,h,mn;
+
+	if (strlen(szFileSystemTime) == 0)
+	{
+		m = d = y = h = mn = 0;
+	}
+	else
+	{
+		sscanf(szFileSystemTime,"%2d/%2d/%4d %2d:%2d",
+				&m,
+				&d,
+				&y,
+				&h,
+				&mn
+				);
+	}
+	FileSystemTime.wMonth = (WORD)m;
+	FileSystemTime.wDay = (WORD)d;
+	FileSystemTime.wYear = (WORD)y;
+	FileSystemTime.wHour = (WORD)h;
+	FileSystemTime.wMinute = (WORD)mn;
+	FileSystemTime.wSecond = 0;
+	FileSystemTime.wMilliseconds = 0;
+	FileSystemTime.wDayOfWeek = 0;
+	SystemTimeToFileTime(&FileSystemTime, &LocalFileTime);
+	return LocalFileTime;
+}
+bool FileTransfer::FileOrFolderExists(HWND fileListWnd, std::string fileOrFolder)
+{
+	LVFINDINFO Info;
+	Info.flags = LVFI_STRING;
+	Info.psz = (LPSTR)fileOrFolder.c_str();
+	int nTheIndex = ListView_FindItem(fileListWnd, -1, &Info);
+	return nTheIndex > -1;
 }

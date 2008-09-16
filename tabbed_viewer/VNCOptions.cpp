@@ -34,6 +34,10 @@
 #include "vncviewer.h"
 #include "VNCOptions.h"
 #include "Exception.h"
+#include "common/win32_helpers.h"
+
+#define FT_RECV_TIMEOUT 30 * 1000
+
 extern char sz_A2[64];
 extern char sz_D1[64];
 extern char sz_D2[64];
@@ -79,6 +83,7 @@ VNCOptions::VNCOptions()
   m_UseEnc[rfbEncodingTight] = true;
   m_UseEnc[rfbEncodingZlibHex] = true;
   m_UseEnc[rfbEncodingZRLE] = true;
+  m_UseEnc[rfbEncodingZYWRLE] = true;
   m_UseEnc[rfbEncodingUltra] = true;
 	
   m_ViewOnly = false;
@@ -115,6 +120,7 @@ VNCOptions::VNCOptions()
   
   // Modif sf@2002 - Server Scaling
   m_nServerScale = 1;
+  m_reconnectcounter = 0;
 
   // Modif sf@2002 - Cache
   m_fEnableCache = false;
@@ -149,6 +155,7 @@ VNCOptions::VNCOptions()
   m_requestShapeUpdates = true;
   m_ignoreShapeUpdates = false;
 
+  m_cmdlnUser[0] = '\0';		// act : add user option on command line
   m_clearPassword[0] = '\0';		// sf@2002
   m_quickoption = 1;				// sf@2002 - Auto Mode as default
   m_fUseDSMPlugin = false;
@@ -159,6 +166,13 @@ VNCOptions::VNCOptions()
   m_saved_scale_num = 100;
   m_saved_scale_den = 100;
   m_saved_scaling = false;
+  m_JapKeyboard = false;
+  // sf@2007 - Autoreconnect
+  m_autoReconnect = 3; // Default: 10s before reconnecting
+  // Fix by Act : no user password command line after a rejected connection
+  m_NoMoreCommandLineUserPassword = false;
+
+  m_FTTimeout = FT_RECV_TIMEOUT;
   
   
 #ifdef UNDER_CE
@@ -248,6 +262,10 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
   m_jpegQualityLevel		= s.m_jpegQualityLevel;
   m_requestShapeUpdates	    = s.m_requestShapeUpdates;
   m_ignoreShapeUpdates	    = s.m_ignoreShapeUpdates;
+  m_autoReconnect         = s.m_autoReconnect;
+  m_JapKeyboard			  = s.m_JapKeyboard;
+
+  m_FTTimeout =  s.m_FTTimeout;
 
 #ifdef UNDER_CE
   m_palmpc			= s.m_palmpc;
@@ -365,6 +383,17 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
         }
         j++;
       }
+    } else if (SwitchMatch(args[j], _T("fttimeout"))) { //PGM @ Advantig
+      if (j+1 < i && args[j+1][0] >= '0' && args[j+1][0] <= '9') {
+        if (_stscanf(args[j+1], _T("%d"), &m_FTTimeout) != 1) {
+          ArgError(sz_D3);
+          continue;
+        }
+        m_FTTimeout *= 1000;
+        if (m_FTTimeout > 60000)
+            m_FTTimeout = 60000;
+        j++;
+      }
     } else if ( SwitchMatch(args[j], _T("restricted"))) {
       m_restricted = true;
     } else if ( SwitchMatch(args[j], _T("viewonly"))) {
@@ -410,6 +439,8 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
       m_DeiconifyOnBell = true;
     } else if ( SwitchMatch(args[j], _T("emulate3") )) {
       m_Emul3Buttons = true;
+    } else if ( SwitchMatch(args[j], _T("JapKeyboard") )) {
+      m_JapKeyboard = true;
     } else if ( SwitchMatch(args[j], _T("noemulate3") )) {
       m_Emul3Buttons = false;
 	} else if ( SwitchMatch(args[j], _T("nocursorshape") )) {
@@ -538,6 +569,10 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 				enc = rfbEncodingTight;
 			} else if (_tcsicmp(args[j], _T("ultra")) == 0) {
 				enc = rfbEncodingUltra;
+			} else if (_tcsicmp(args[j], _T("zrle")) == 0) { 
+				enc = rfbEncodingZRLE; 
+			} else if (_tcsicmp(args[j], _T("zywrle")) == 0) { 
+				enc = rfbEncodingZYWRLE; 
 			} else {
 				ArgError(sz_D19);
 				continue;
@@ -569,6 +604,16 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 				continue;
 			}
 	}
+	// act : add user option on command line
+	else if ( SwitchMatch(args[j], _T("user") ))
+	{
+			if (++j == i)
+			{
+				ArgError(sz_D24);
+				continue;
+			}
+			strcpy(m_cmdlnUser, args[j]);
+	} // act : add user option on command line
 	// Modif sf@2002 : password in the command line
 	else if ( SwitchMatch(args[j], _T("password") ))
 	{
@@ -625,6 +670,15 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 			m_fUseProxy = true;
 			_tcscpy(m_proxyhost, proxyhost);
 		}
+	}
+	else if (SwitchMatch(args[j], _T("autoreconnect"))) 
+	{
+        if (++j == i) {
+            ArgError(_T("You must specify an autoreconnect delay (default is 10s)"));
+            PostQuitMessage(1);
+            continue;
+        }
+		_stscanf(args[j], _T("%d"), &m_autoReconnect);
 	}
 	else
 	{
@@ -686,6 +740,7 @@ void VNCOptions::Save(char *fname)
   saveInt("swapmouse",			m_SwapMouse,		fname);
   saveInt("belldeiconify",		m_DeiconifyOnBell,	fname);
   saveInt("emulate3",				m_Emul3Buttons,		fname);
+  saveInt("JapKeyboard",				m_JapKeyboard,		fname);
   saveInt("emulate3timeout",		m_Emul3Timeout,		fname);
   saveInt("emulate3fuzz",			m_Emul3Fuzz,		fname);
   saveInt("disableclipboard",		m_DisableClipboard, fname);
@@ -706,11 +761,13 @@ void VNCOptions::Save(char *fname)
 
   // Modif sf@2002
   saveInt("ServerScale",			m_nServerScale,		fname);
+  saveInt("Reconnect",				m_reconnectcounter,		fname);
   saveInt("EnableCache",			m_fEnableCache,		fname);
   saveInt("QuickOption",			m_quickoption,	fname);
   saveInt("UseDSMPlugin",			m_fUseDSMPlugin,	fname);
   saveInt("UseProxy",				m_fUseProxy,	fname);
   WritePrivateProfileString("options", "DSMPlugin", m_szDSMPluginFilename, fname);
+  saveInt("FileTransferTimeout",    m_FTTimeout/1000,    fname);
  
 }
 
@@ -735,6 +792,7 @@ void VNCOptions::Load(char *fname)
   m_SwapMouse =			readInt("swapmouse",		m_SwapMouse,	fname) != 0;
   m_DeiconifyOnBell =		readInt("belldeiconify",	m_DeiconifyOnBell, fname) != 0;
   m_Emul3Buttons =		readInt("emulate3",			m_Emul3Buttons, fname) != 0;
+  m_JapKeyboard  =		readInt("JapKeyboard",			m_JapKeyboard, fname) != 0;
   m_Emul3Timeout =		readInt("emulate3timeout",	m_Emul3Timeout, fname);
   m_Emul3Fuzz =			readInt("emulate3fuzz",		m_Emul3Fuzz,    fname);
   m_DisableClipboard =	readInt("disableclipboard", m_DisableClipboard, fname) != 0;
@@ -759,11 +817,15 @@ void VNCOptions::Load(char *fname)
   }
   // Modif sf@2002
   m_nServerScale =		readInt("ServerScale",		m_nServerScale,	fname);
+  m_reconnectcounter =  readInt("Reconnect",		m_reconnectcounter,	fname);
   m_fEnableCache =		readInt("EnableCache",		m_fEnableCache,	fname) != 0;
   m_quickoption  =		readInt("QuickOption",		m_quickoption, fname);
   m_fUseDSMPlugin =		readInt("UseDSMPlugin",		m_fUseDSMPlugin, fname) != 0;
   m_fUseProxy =			readInt("UseProxy",			m_fUseProxy, fname) != 0;
   GetPrivateProfileString("options", "DSMPlugin", "NoPlugin", m_szDSMPluginFilename, MAX_PATH, fname);
+  m_FTTimeout  = readInt("FileTransferTimeout", m_FTTimeout, fname) * 1000;
+  if (m_FTTimeout > 60000)
+      m_FTTimeout = 60000; // cap at 1 minute
   
 }
 
@@ -830,8 +892,10 @@ void VNCOptions::ShowUsage(LPTSTR info) {
                "      [/scale a/b] [/config configfile] [server:display] [/emulate3] \n\r"
 			   "      [/quickoption n] [/password clearpassword] [/serverscale n]\n\r"
 			   "      [/nostatus] [/dsmplugin pluginfilename.dsm] [/autoscaling] \n\r"
+			   "      [/autoreconnect delayInSeconds] \n\r"
 			   "      [/nohotkeys] [/proxy proxyhost [portnum]] [/256colors] [/64colors]\r\n"
-			   "      [/8colors] [/8greycolors] [/4greycolors] [/2greycolors]\r\n\r\n"
+			   "      [/8colors] [/8greycolors] [/4greycolors] [/2greycolors]\r\n"
+			   "      [/encoding [zrle | zywrle | tight | zlib | zlibhex | ultra]] \r\n"
                "For full details see documentation."), 
 #endif
             tmpinf);
@@ -852,21 +916,12 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
   // dealing with. But we can get a pseudo-this from the parameter to 
   // WM_INITDIALOG, which we therafter store with the window and retrieve
   // as follows:
-    VNCOptions *_this = (VNCOptions *) 
-#if defined (_MSC_VER) && _MSC_VER <= 1200		
-		GetWindowLong(hwnd, GWL_USERDATA);
-#else
-		GetWindowLongPtr(hwnd, GWLP_USERDATA);
-#endif	
+    VNCOptions *_this = helper::SafeGetWindowUserData<VNCOptions>(hwnd);
   switch (uMsg) {
 		
   case WM_INITDIALOG:
 	  {
-#if defined (_MSC_VER) && _MSC_VER <= 1200
-			SetWindowLong(hwnd, GWL_USERDATA, lParam);
-#else
-			SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR) lParam);
-#endif
+		  helper::SafeSetWindowUserData(hwnd, (LONG)lParam);
 		  _this = (VNCOptions *) lParam;
 		  // Initialise the controls
 		  
@@ -995,7 +1050,7 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 		  char szPer[4];
 		  for (i = 0; i <= 12; i++)
 		  {
-			  itoa(Scales[i], szPer, 10);
+			  _itoa(Scales[i], szPer, 10);
 			  SendMessage(hViewerScale, CB_INSERTSTRING, (WPARAM)i, (LPARAM)(int FAR*)szPer);
 		  }
 		  SetDlgItemInt(hwnd,
@@ -1005,6 +1060,10 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 				  
 		  // Modif sf@2002 - Server Scaling
 		  SetDlgItemInt( hwnd, IDC_SERVER_SCALE, _this->m_nServerScale, FALSE);
+
+		  if (_this->m_Shared)
+		  SetDlgItemInt( hwnd, IDC_SERVER_RECON, _this->m_reconnectcounter, FALSE);
+		  else SetDlgItemInt( hwnd, IDC_SERVER_RECON, 0, FALSE);
 		  
 		  // Modif sf@2002 - Cache 
 		  HWND hCache = GetDlgItem(hwnd, ID_SESSION_SET_CACHE);
@@ -1018,6 +1077,9 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 		  
 		  HWND hEmulate = GetDlgItem(hwnd, IDC_EMULATECHECK);
 		  SendMessage(hEmulate, BM_SETCHECK, _this->m_Emul3Buttons, 0);
+
+		  HWND hJapkeyboard = GetDlgItem(hwnd, IDC_JAPKEYBOARD);
+		  SendMessage(hJapkeyboard, BM_SETCHECK, _this->m_JapKeyboard, 0);
 #endif
 		  
 		  // Tight Specific
@@ -1160,6 +1222,10 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 				  if (_this->m_nServerScale < 1 || _this->m_nServerScale > 9) 
 					  _this->m_nServerScale = 1;
 			  }
+
+			  if (_this->m_Shared)
+			  _this->m_reconnectcounter = GetDlgItemInt( hwnd, IDC_SERVER_RECON, NULL, TRUE);
+			 else _this->m_reconnectcounter=0;
 			  
 #ifndef UNDER_CE
 			  HWND hFullScreen = GetDlgItem(hwnd, IDC_FULLSCREEN);
@@ -1169,6 +1235,10 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 			  HWND hEmulate = GetDlgItem(hwnd, IDC_EMULATECHECK);
 			  _this->m_Emul3Buttons =
 				  (SendMessage(hEmulate, BM_GETCHECK, 0, 0) == BST_CHECKED);
+
+			  HWND hJapkeyboard = GetDlgItem(hwnd, IDC_JAPKEYBOARD);
+			  _this->m_JapKeyboard =
+				  (SendMessage(hJapkeyboard, BM_GETCHECK, 0, 0) == BST_CHECKED);
 #endif
 			  
 			  // Tight Specific

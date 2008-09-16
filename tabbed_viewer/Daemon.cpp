@@ -30,6 +30,7 @@
 #include "Exception.h"
 //#include "ClientConnection.h"
 #include "AboutBox.h"
+#include "common/win32_helpers.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -73,12 +74,7 @@ Daemon::Daemon(int port)
 				NULL);
 	
 	// record which client created this window
-#if defined (_MSC_VER) && _MSC_VER <= 1200
-	SetWindowLong(m_hwnd, GWL_USERDATA, (long)this);
-#else
-	SetWindowLongPtr(m_hwnd, GWLP_USERDATA, (LONG_PTR) this);
-#endif
-
+	helper::SafeSetWindowUserData(m_hwnd, (LONG)this);
 	// Load a popup menu
 	m_hmenu = LoadMenu(pApp->m_instance, MAKEINTRESOURCE(IDR_TRAYMENU));
 
@@ -177,12 +173,7 @@ LRESULT CALLBACK Daemon::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lPa
 	// This is a static method, so we don't know which instantiation we're 
 	// dealing with. We have stored a pseudo-this in the window user data, 
 	// though.
-	Daemon *_this = (Daemon *) 
-#if defined (_MSC_VER) && _MSC_VER <= 1200		
-		GetWindowLong(hwnd, GWL_USERDATA);
-#else
-		GetWindowLongPtr(hwnd, GWLP_USERDATA);
-#endif
+	Daemon *_this = helper::SafeGetWindowUserData<Daemon>(hwnd);
 
 	switch (iMsg) {
 

@@ -2,7 +2,7 @@
 #include "stdhdrs.h"
 #include "vncviewer.h"
 #include "FullScreenTitleBar.h"
-#define COMPILE_MULTIMON_STUBS
+//#define COMPILE_MULTIMON_STUBS
 #include "multimon.h"
 #include "AboutBox.h"
 #include <Windowsx.h>
@@ -92,8 +92,6 @@ FillCombo(HWND m_hcombo)
 	WIN32_FIND_DATA finddata;
 	char WORKDIR[MAX_PATH];
 	char FULLFILL[MAX_PATH];
-	char FILENAME[MAX_PATH];
-	TCHAR szString[MAX_PATH];
 	bool is;
 	if (GetModuleFileName(NULL, WORKDIR, MAX_PATH))
 				{
@@ -147,7 +145,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 				else CheckMenuItem(menu,ID_SETTINGS_AUTORESIZEON,MF_UNCHECKED);
 				
 				break;
-			
+			case WM_SYSCHAR:
+				return true;
 			case WM_SYSCOMMAND:
 				{
 					switch (LOWORD(wParam))
@@ -639,6 +638,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 
 
 						case WM_SETFOCUS:
+//							_this->m_keymap->Reset();
 							if (m_hMDIClient!=NULL) SendMessage(m_hMDIClient,WM_SETFOCUS,NULL,NULL);
 		//					Beep(500,100);
 							break;

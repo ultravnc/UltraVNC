@@ -45,7 +45,6 @@ void ClientConnection::ReadCoRRERect(rfbFramebufferUpdateRectHeader *pfburh)
 	SETUP_COLOR_SHORTCUTS;
 	omni_mutex_lock l(m_bitmapdcMutex);	
 
-    COLORREF color;
     switch (m_myFormat.bitsPerPixel) {
         case 8:
 			FillSolidRect8(pfburh->r.x, pfburh->r.y, pfburh->r.w, pfburh->r.h, (CARD8*)pcolor);

@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002 Ultr@VNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002-2007 Ultr@VNC Team Members. All Rights Reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -34,6 +34,10 @@
 #define CONFIRM_NO 3
 #define CONFIRM_NOALL 4
 
+#define FT_PROTO_VERSION_OLD 1  // <= RC18 server.. "fOldFTPRotocole" version
+#define FT_PROTO_VERSION_2   2  // base ft protocol
+#define FT_PROTO_VERSION_3   3  // new ft protocol session messages
+
 typedef std::list<int> FilesList; // List of files indexes to be sent or received
 
 class ClientConnection;
@@ -46,6 +50,7 @@ public:
 	ClientConnection	*m_pCC;
 	HWND				hWnd;
 	bool				m_fAbort;
+    bool                m_fUserAbortedFileTransfer; // 21 April 2008 jdp 
 	bool				m_fAborted;		// Async Reception file only
 	int					m_nDeleteCount; // Grouped file deletion trick
 
@@ -61,7 +66,7 @@ public:
 	bool				m_fFocusLocal;
 	char                m_szFTParamTitle[128];
 	char                m_szFTParamComment[64];
-	char                m_szFTParam[248];
+	char                m_szFTParam[256];
 	char                m_szFTConfirmTitle[128];
 	char                m_szFTConfirmComment[364];
 	int					m_nConfirmAnswer;
@@ -110,7 +115,7 @@ public:
 	bool				m_fFileDownloadError;
 	char				m_szIncomingFileTime[18];
 
-	bool				m_fOldFTProtocole;
+    int                 m_ServerFTProtocolVersion; // 8/6/2008 jdp 
 	int					m_nBlockSize;
 
 	int					m_nNotSent;
@@ -118,6 +123,11 @@ public:
 	DWORD				m_dwLastChunkTime;
 	MMRESULT			m_mmRes; 
 
+	bool				bSortDirectionsL[3];
+	bool				bSortDirectionsR[3];
+
+   	HMODULE				m_hRichEdit;     // 16 April 2008 jdp
+    int                 m_maxHistExtent;
 
 	// Methods
 	FileTransfer(VNCviewerApp *pApp, ClientConnection *pCC);
@@ -130,14 +140,17 @@ public:
 	static BOOL CALLBACK FTParamDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 	int DoFTConfirmDialog(LPSTR szTitle, LPSTR szComment);
 	static BOOL CALLBACK FTConfirmDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
+	static int CALLBACK ListViewLocalCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort); /*TAW*/
+	static int CALLBACK ListViewRemoteCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort); /*TAW*/
 
 	void DisableButtons(HWND hWnd);
 	void EnableButtons(HWND hWnd);
+    void CheckButtonState(HWND hWnd);
 
 	bool SendFile(long lSize, int nLen);
 	bool SendFileChunk();
 	bool FinishFileReception();
-	int  UnzipPossibleDirectory(LPSTR szFileName);
+	bool UnzipPossibleDirectory(LPSTR szFileName);
 	bool SendFiles(long lSize, int nLen);
 	bool OfferNextFile();
 	void ListRemoteDrives(HWND hWnd, int nLen);
@@ -166,7 +179,7 @@ public:
 	void PopulateLocalListBox(HWND hWnd, LPSTR szPath);
 	void ListDrives(HWND hWnd);
 	void CreateRemoteDirectory(LPSTR szDir);
-	void DeleteRemoteFile(LPSTR szFile);
+    void DeleteRemoteFile(std::string szFile);
 	bool CreateRemoteDirectoryFeedback(long lSize, int nLen);
 	bool DeleteRemoteFileFeedback(long lSize, int nLen);
 	void RenameRemoteFileOrDirectory(LPSTR szCurrentName, LPSTR szNewName);
@@ -183,12 +196,22 @@ public:
 	void GetFriendlyFileSizeString(__int64 Size, char* szText);
 	bool MyGetFileSize(char* szFilePath, ULARGE_INTEGER* n2FileSize);
 	void InitListViewImagesList(HWND hListView);
+    bool DeleteFileOrDirectory(TCHAR *srcpath); // 14 April 2008 jdp
+	bool FileOrFolderExists(HWND fileListWnd, std::string fileOrFolder);
+    bool UsingOldProtocol() { return m_ServerFTProtocolVersion == FT_PROTO_VERSION_OLD; }
+    void StartFTSession();
+    void EndFTSession();
 
-	void FileTransfer::InitFTTimer();
-	void FileTransfer::KillFTTimer();
+	void InitFTTimer();
+	void KillFTTimer();
 	static void CALLBACK fpTimer(UINT uID,	UINT uMsg, DWORD dwUser, DWORD dw1,	DWORD dw2);
+
+	static __int64 GetFileSizeFromString(char* szSize);
+	static FILETIME GetFileTimeFromString(char* szFileSystemTime);
 
 };
 
 #endif // FILETRANSFER_H__
+
+
 

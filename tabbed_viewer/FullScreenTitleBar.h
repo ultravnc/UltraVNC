@@ -1,28 +1,3 @@
-/////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2004 Ultr@VNC Team Members. All Rights Reserved.
-//	Copyright (C) 2003-2004 Lars Werner. All Rights reserved
-//
-//  This program is free software; you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 2 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
-//  USA.
-//
-// If the source code for the program is not available from the place from
-// which you received this file, check 
-// http://ultravnc.sourceforge.net/
-//
-////////////////////////////////////////////////////////////////////////////
-
 //===========================================================================
 //	FullScreen Titlebar Header
 //	2004 - All rights reservered
@@ -48,6 +23,7 @@
 
 //All settings is stored here.
 #include "FullScreenTitleBarConst.h"
+#include "multimon.h"
 
 class CTitleBar
 {
@@ -58,7 +34,7 @@ public:
 
 	void Create(HINSTANCE hInst, HWND ParentWindow);
 	void Resize(int x);
-
+	void MoveToMonitor(HMONITOR hmon); // 7 May 2008 jdp
 	void SetText(LPTSTR TextOut); //Set the header text eg: hostname, windowtitle ect...
 
 	void DisplayWindow(BOOL Show, BOOL SetHideFlag=FALSE); //Variable like ShowWindow but it triggers the scrolling feature
@@ -104,6 +80,9 @@ private:
 	HBITMAP hPinUp;
 	HBITMAP hPinDown;
 	HWND Pin;
+	HWND Close;
+	HWND Maximize;
+	HWND Minimize;
 
 	//Text to show on titlebar and it corespondent font! :)
 	LPTSTR Text;

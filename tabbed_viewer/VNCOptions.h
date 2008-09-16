@@ -54,6 +54,7 @@ public:
 	int     m_listenPort;
 	bool	m_connectionSpecified;
 	bool	m_configSpecified;
+	TCHAR   m_cmdlnUser[256]; // act: add user option on command line
 	TCHAR   m_clearPassword[256]; // Modif sf@2002
 	int     m_quickoption; // Modif sf@2002 - v1.1.2
 	TCHAR   m_configFilename[_MAX_PATH];
@@ -79,6 +80,7 @@ public:
 
 	bool	m_SwapMouse;
 	bool    m_Emul3Buttons; 
+	bool    m_JapKeyboard;
  	int     m_Emul3Timeout;
  	int     m_Emul3Fuzz;
 	bool	m_Shared;
@@ -98,6 +100,8 @@ public:
 
 	// Modif sf@2002 - Server Scaling
 	int		m_nServerScale; // Divider of the Target Server's screensize
+	// Reconnect
+	int m_reconnectcounter;
 	// Modif sf@2002 - Cache
 	bool    m_fEnableCache;
 	// Modif sz@2002 - DSM Plugin
@@ -131,6 +135,13 @@ public:
     
 	// for debugging purposes
 	int m_delay;
+
+	// sf@2007 - AutoReconnect
+	int	m_autoReconnect;
+	int m_FTTimeout;
+
+	// Fix by Act : No User and/Or password if the first VNC connection is rejected
+	bool m_NoMoreCommandLineUserPassword;
 
 #ifdef UNDER_CE
 	// WinCE screen format for dialogs (Palm vs HPC)

@@ -5,7 +5,7 @@
 #include "ClientConnection.h"
 #include "AboutBox.h"
 #include <commctrl.h>
-
+#include "common/win32_helpers.h"
 #define ID_MDI_FIRSTCHILD 60000
 
 extern char sz_L75[64];
@@ -44,12 +44,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 {
 	
 	//	HWND parent;
-		ClientConnection *_this = (ClientConnection *)
-#if defined (_MSC_VER) && _MSC_VER <= 1200		
-		GetWindowLong(hwnd, GWL_USERDATA);
-#else
-		GetWindowLongPtr(hwnd, GWLP_USERDATA);
-#endif	
+		ClientConnection* _this = helper::SafeGetWindowUserData<ClientConnection>(hwnd);
 	if (_this == NULL) return DefWindowProc(hwnd, iMsg, wParam, lParam);
 	
 	switch (iMsg) 
@@ -58,37 +53,75 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 			case WM_CLOSE:
 				{
 				
-					// sf@2002 - Do not close vncviewer if the File Transfer GUI is open !
-					if (_this->m_pFileTransfer->m_fFileTransferRunning)
-					{
-						_this->m_pFileTransfer->ShowFileTransferWindow(true);
-						MessageBox(NULL, sz_L85, 
-							sz_L88, 
-							MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST);
-						return 0;
-					}
-					
-					// sf@2002 - Do not close vncviewer if the Text Chat GUI is open !
-					if (_this->m_pTextChat->m_fTextChatRunning)
-					{
-						_this->m_pTextChat->ShowChatWindow(true);
-						MessageBox(NULL, sz_L86, 
-							sz_L88, 
-							MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST);
-						return 0;
-					}
+					// April 8 2008 jdp
+                        if (lParam == 0 && !_this->m_bKillThread)
+						{
+                            _this->m_bClosedByUser = true;
+						}
+						if (_this->m_pFileTransfer->m_fFileTransferRunning)
+						{
+                            if (_this->m_bKillThread)
+                            {
+                                ::SendMessage(_this->m_pFileTransfer->hWnd, WM_COMMAND, IDCANCEL, 0);
+    							return 0;
+                            }
+							_this->m_pFileTransfer->ShowFileTransferWindow(true);
+							MessageBox(hwnd, sz_L85,
+								sz_L88, 
+								MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST);
+							return 0;
+						}
+												
+						// sf@2002 - Do not close vncviewer if the Text Chat GUI is open !
+						if (_this->m_pTextChat->m_fTextChatRunning)
+						{
+                            if (_this->m_bKillThread)
+                            {
+                                _this->m_pTextChat->KillDialog();
+    							return 0;
+                            }
 
-					if (_this->m_fOptionsOpen)
-					{
-						MessageBox(NULL, sz_L87, 
-							sz_L88, 
-							MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST);
+							_this->m_pTextChat->ShowChatWindow(true);
+							MessageBox(hwnd, sz_L86,
+								sz_L88, 
+								MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST);
+							return 0;
+						}
+						
+						if (_this->m_fOptionsOpen)
+						{
+                            MessageBox(hwnd, sz_L87,
+								sz_L88, 
+								MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST);
+							return 0;
+						}
+
+
+					if ( ( _this->m_autoReconnect == 0) || (wParam == 0))
+						{
+							_this->m_autoReconnect = 0; // Forbid autoreconnect when the CLOSE order comes from the user
+
+                            // 8 April 2008 jdp hide window while shutting down
+                            ::ShowWindow(hwnd, SW_HIDE);
+							// Close the worker thread
+							_this->KillThread();
+
+							SendMessage(GetParent(hwnd),WM_MDIDESTROY,(WPARAM)hwnd,0L);
+						}
+						else // Autoreconnect allowed - We only suspend the working thread then reconnect a few seconds later
+						{
+							char temp[10];
+							char wtext[150];
+							_itoa(wParam,temp,10);
+							strcpy(wtext,"Ultr@VNC Viewer - Connection dropped, trying to reconnect (");
+							strcat(wtext,temp);
+							strcat(wtext,")");
+							SetWindowText(_this->m_hwnd, wtext);
+							_this->m_opts.m_NoStatus = true;
+							_this->SuspendThread();
+							_this->Reconnect();
+						}
 						return 0;
-					}
-					//PostMessage(GetParent(hwnd), WM_MDICASCADE, 0, 0);
-					SendMessage(GetParent(hwnd),WM_MDIDESTROY,(WPARAM)hwnd,0L); 
-//					DestroyWindow(_this->m_hwnd);
-					break;
 				}
 				
 			case WM_DESTROY:
@@ -284,12 +317,13 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 				TheAccelKeys.SetWindowHandle(_this->m_opts.m_NoHotKeys ? 0 : hwnd);
 				if (_this->InFullScreenMode())
 					SetWindowPos(hwnd, HWND_TOPMOST, 0,0,100,100, SWP_NOMOVE | SWP_NOSIZE);
+				_this->m_keymap->Reset();
 				return 0;
 
 				// Cacnel modifiers when we lose focus
 			case WM_KILLFOCUS:
 				{
-					
+					_this->m_keymap->ReleaseAllKeys(_this);
 					if (!_this->m_running) return 0;
 					if (_this->InFullScreenMode()) {
 						// We must top being topmost, but we want to choose our
@@ -1045,7 +1079,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 								_this->m_pFileTransfer->m_fFileTransferRunning = false;
 								// Refresh Screen
 								// _this->SendFullFramebufferUpdateRequest();
-								if (_this->m_pFileTransfer->m_fVisible || _this->m_pFileTransfer->m_fOldFTProtocole)
+								if (_this->m_pFileTransfer->m_fVisible || _this->m_pFileTransfer->UsingOldProtocol())
 									_this->SendAppropriateFramebufferUpdateRequest();
 							}
 							else
@@ -1337,4 +1371,25 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 			}
 			
 			return DefMDIChildProc(hwnd,  iMsg, wParam, lParam);
+}
+
+// helper functions for setting socket timeouts during file transfer
+bool ClientConnection::SetSendTimeout(int msecs)
+{
+    int timeout= msecs < 0 ? m_opts.m_FTTimeout : msecs;
+	if (setsockopt(m_sock, SOL_SOCKET, SO_SNDTIMEO, (char*)&timeout, sizeof(timeout)) == SOCKET_ERROR)
+	{
+		return false;
+	}
+	return true;
+}
+
+bool ClientConnection::SetRecvTimeout(int msecs)
+{
+    int timeout= msecs < 0 ? m_opts.m_FTTimeout : msecs;
+	if (setsockopt(m_sock, SOL_SOCKET, SO_RCVTIMEO, (char*)&timeout, sizeof(timeout)) == SOCKET_ERROR)
+	{
+		return false;
+	}
+	return true;
 }

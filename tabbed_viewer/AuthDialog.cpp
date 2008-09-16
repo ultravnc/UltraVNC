@@ -30,6 +30,7 @@
 #include "vncviewer.h"
 #include "AuthDialog.h"
 #include "Exception.h"
+#include "common/win32_helpers.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -44,9 +45,10 @@ AuthDialog::~AuthDialog()
 {
 }
 
-int AuthDialog::DoDialog(bool ms_logon)
+int AuthDialog::DoDialog(bool ms_logon, bool isSecure)
 {
-	if (ms_logon) return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG), NULL, (DLGPROC) DlgProc, (LONG) this);
+	if (isSecure) return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG), NULL, (DLGPROC) DlgProc, (LONG) this);
+	else if (ms_logon) return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG2), NULL, (DLGPROC) DlgProc, (LONG) this);
 	else return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG1), NULL, (DLGPROC) DlgProc1, (LONG) this);
 }
 
@@ -56,21 +58,12 @@ BOOL CALLBACK AuthDialog::DlgProc(  HWND hwnd,  UINT uMsg,
 	// dealing with. But we can get a pseudo-this from the parameter to 
 	// WM_INITDIALOG, which we therafter store with the window and retrieve
 	// as follows:
-	AuthDialog *_this = (AuthDialog *)
-#if defined (_MSC_VER) && _MSC_VER <= 1200		
-		GetWindowLong(hwnd, GWL_USERDATA);
-#else
-		GetWindowLongPtr(hwnd, GWLP_USERDATA);
-#endif
+   AuthDialog *_this = helper::SafeGetWindowUserData<AuthDialog>(hwnd);
 	switch (uMsg) {
 
 	case WM_INITDIALOG:
 		{
-#if defined (_MSC_VER) && _MSC_VER <= 1200
-			SetWindowLong(hwnd, GWL_USERDATA, lParam);
-#else
-			SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR) lParam);
-#endif
+			helper::SafeSetWindowUserData(hwnd, lParam);
 			_this = (AuthDialog *) lParam;
 			CentreWindow(hwnd);
 			SetForegroundWindow(hwnd);
@@ -109,21 +102,12 @@ BOOL CALLBACK AuthDialog::DlgProc1(  HWND hwnd,  UINT uMsg,
 	// dealing with. But we can get a pseudo-this from the parameter to 
 	// WM_INITDIALOG, which we therafter store with the window and retrieve
 	// as follows:
-	AuthDialog *_this = (AuthDialog *)
-#if defined (_MSC_VER) && _MSC_VER <= 1200		
-		GetWindowLong(hwnd, GWL_USERDATA);
-#else
-		GetWindowLongPtr(hwnd, GWLP_USERDATA);
-#endif
+	AuthDialog *_this = helper::SafeGetWindowUserData<AuthDialog>(hwnd);
 	switch (uMsg) {
 
 	case WM_INITDIALOG:
 		{
-#if defined (_MSC_VER) && _MSC_VER <= 1200
-			SetWindowLong(hwnd, GWL_USERDATA, lParam);
-#else
-			SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR) lParam);
-#endif
+			helper::SafeSetWindowUserData(hwnd, lParam);
 			_this = (AuthDialog *) lParam;
 			CentreWindow(hwnd);
 			return TRUE;

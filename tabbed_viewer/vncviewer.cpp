@@ -170,7 +170,7 @@ char sz_J1[128];
 char sz_J2[64];
 char sz_K1[64];
 char sz_K2[64];
-char sz_K3[256];
+char sz_K3[128];
 char sz_K4[64];
 char sz_K5[64];
 char sz_K6[64];
@@ -225,7 +225,7 @@ char sz_L47[64];
 char sz_L48[64];
 char sz_L49[64];
 char sz_L50[64];
-char sz_L51[64];
+char sz_L51[128];
 char sz_L52[64];
 char sz_L53[64];
 char sz_L54[64];
@@ -251,11 +251,11 @@ char sz_L73[64];
 char sz_L74[64];
 char sz_L75[64];
 char sz_L76[64];
-char sz_L77[64];
+char sz_L77[128];
 char sz_L78[64];
 char sz_L79[64];
 char sz_L80[64];
-char sz_L81[64];
+char sz_L81[128];
 char sz_L82[64];
 char sz_L83[64];
 char sz_L84[64];
@@ -267,7 +267,19 @@ char sz_L89[64];
 char sz_L90[64];
 char sz_L91[64];
 char sz_L92[64];
+char sz_L93[64];
+char sz_L94[64];
 
+// 14 April 2008 jdp
+char sz_H94[64];
+char sz_H95[64];
+char sz_H96[64];
+char sz_H97[64];
+char sz_H98[64];
+char sz_H99[64];
+char sz_H100[64];
+char sz_H101[64];
+char sz_H102[128];
 // File/dir Rename messages
 char sz_M1[64];
 char sz_M2[64];
@@ -279,6 +291,7 @@ char sz_M7[64];
 char sz_M8[64];
 
 bool command_line=true;
+bool g_passwordfailed=true;
 extern bool g_stop;
 extern HWND m_hMDIClient;
 
@@ -445,7 +458,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 
 	LoadString(m_hInstResDLL, IDS_K1, sz_K1, 64 -1);
 	LoadString(m_hInstResDLL, IDS_K2, sz_K2, 64 -1);
-	LoadString(m_hInstResDLL, IDS_K3, sz_K3, 256 -1);
+	LoadString(m_hInstResDLL, IDS_K3, sz_K3, sizeof(sz_K3)/sizeof(sz_K3[0]));
 	LoadString(m_hInstResDLL, IDS_K4, sz_K4, 64 -1);
 	LoadString(m_hInstResDLL, IDS_K5, sz_K5, 64 -1);
 	LoadString(m_hInstResDLL, IDS_K6, sz_K6, 64 -1);
@@ -500,7 +513,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 	LoadString(m_hInstResDLL, IDS_L48, sz_L48, 64 -1);
 	LoadString(m_hInstResDLL, IDS_L49, sz_L49, 64 -1);
 	LoadString(m_hInstResDLL, IDS_L50, sz_L50, 64 -1);
-	LoadString(m_hInstResDLL, IDS_L51, sz_L51, 64 -1);
+	LoadString(m_hInstResDLL, IDS_L51, sz_L51, 128 -1);
 	LoadString(m_hInstResDLL, IDS_L52, sz_L52, 64 -1);
 	LoadString(m_hInstResDLL, IDS_L53, sz_L53, 64 -1);
 	LoadString(m_hInstResDLL, IDS_L54, sz_L54, 64 -1);
@@ -526,11 +539,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 	LoadString(m_hInstResDLL, IDS_L74, sz_L74, 64 -1);
 	LoadString(m_hInstResDLL, IDS_L75, sz_L75, 64 -1);
 	LoadString(m_hInstResDLL, IDS_L76, sz_L76, 64 -1);
-	LoadString(m_hInstResDLL, IDS_L77, sz_L77, 64 -1);
+	LoadString(m_hInstResDLL, IDS_L77, sz_L77, 128 -1);
 	LoadString(m_hInstResDLL, IDS_L78, sz_L78, 64 -1);
 	LoadString(m_hInstResDLL, IDS_L79, sz_L79, 64 -1);
 	LoadString(m_hInstResDLL, IDS_L80, sz_L80, 64 -1);
-	LoadString(m_hInstResDLL, IDS_L81, sz_L81, 64 -1);
+	LoadString(m_hInstResDLL, IDS_L81, sz_L81, 128 -1);
 	LoadString(m_hInstResDLL, IDS_L82, sz_L82, 64 -1);
 	LoadString(m_hInstResDLL, IDS_L83, sz_L83, 64 -1);
 	LoadString(m_hInstResDLL, IDS_L84, sz_L84, 64 -1);
@@ -542,6 +555,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 	LoadString(m_hInstResDLL, IDS_L90, sz_L90, 64 -1);
 	LoadString(m_hInstResDLL, IDS_L91, sz_L91, 64 -1);
 	LoadString(m_hInstResDLL, IDS_L92, sz_L92, 64 -1);
+	LoadString(m_hInstResDLL, IDS_L93, sz_L93, 64 -1);
+	LoadString(m_hInstResDLL, IDS_L94, sz_L94, 64 -1); 
+
+    // 14 April 2008 jdp
+	LoadString(m_hInstResDLL, IDS_H94, sz_H94, 64 -1);
+	LoadString(m_hInstResDLL, IDS_H95, sz_H95, 64 -1);
+	LoadString(m_hInstResDLL, IDS_H96, sz_H96, 64 -1);
+	LoadString(m_hInstResDLL, IDS_H97, sz_H97, 64 -1);
+	LoadString(m_hInstResDLL, IDS_H98, sz_H98, 64 -1);
+	LoadString(m_hInstResDLL, IDS_H99, sz_H99, 64 -1);
+    LoadString(m_hInstResDLL, IDS_H100, sz_H100, 64 -1);
+    LoadString(m_hInstResDLL, IDS_H101, sz_H101, 64 -1);
+    LoadString(m_hInstResDLL, IDS_H102, sz_H102, 128 -1);
+
 
 
   
@@ -565,6 +592,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 	else StartWindows(&app,1);
 	while(!g_stop)
 		{
+			g_passwordfailed=false;
 			if (app.m_options.m_connectionSpecified)
 				app.NewConnection(app.m_options.m_host_options, app.m_options.m_port);
 

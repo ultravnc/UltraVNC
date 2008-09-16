@@ -41,7 +41,6 @@ void ClientConnection::ReadRRERect(rfbFramebufferUpdateRectHeader *pfburh)
 	prreh->nSubrects = Swap32IfLE(prreh->nSubrects);
 	
 	SETUP_COLOR_SHORTCUTS;
-    COLORREF color;
 	// No other threads can use bitmap DC
 	omni_mutex_lock l(m_bitmapdcMutex);
 

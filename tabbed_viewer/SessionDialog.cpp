@@ -29,6 +29,7 @@
 #include "vncviewer.h"
 #include "SessionDialog.h"
 #include "Exception.h"
+#include "common/win32_helpers.h"
 
 #define SESSION_MRU_KEY_NAME _T("Software\\ORL\\VNCviewer\\MRU")
 #define NUM_MRU_ENTRIES 8
@@ -81,21 +82,12 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 	// dealing with. But we can get a pseudo-this from the parameter to 
 	// WM_INITDIALOG, which we therafter store with the window and retrieve
 	// as follows:
-		SessionDialog *_this = (SessionDialog *) 
-#if defined (_MSC_VER) && _MSC_VER <= 1200		
-		GetWindowLong(hwnd, GWL_USERDATA);
-#else
-		GetWindowLongPtr(hwnd, GWLP_USERDATA);
-#endif
+	SessionDialog *_this = (SessionDialog *) GetWindowLong(hwnd, GWL_USERDATA);
 	switch (uMsg) {
 
 	case WM_INITDIALOG:
 		{
-#if defined (_MSC_VER) && _MSC_VER <= 1200
-			SetWindowLong(hwnd, GWL_USERDATA, lParam);
-#else
-			SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR) lParam);
-#endif
+			helper::SafeSetWindowUserData(hwnd, (LONG)lParam);
             SessionDialog *_this = (SessionDialog *) lParam;
             CentreWindow(hwnd);
 			SetForegroundWindow(hwnd);
@@ -146,7 +138,7 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 			if (strcmp(tmphost,"")!=NULL)
 			{
 			_tcscat(tmphost,":");
-			_tcscat(tmphost,itoa(_this->m_pOpt->m_proxyport,tmphost2,10));
+			_tcscat(tmphost,_itoa(_this->m_pOpt->m_proxyport,tmphost2,10));
 			SetDlgItemText(hwnd, IDC_PROXY_EDIT, tmphost);
 			}
 
@@ -275,7 +267,7 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 					// But we must first check that the loaded plugin is the same that 
 					// the one currently selected...
 					_this->m_pDSMPlugin->DescribePlugin();
-					if (stricmp(_this->m_pDSMPlugin->GetPluginFileName(), szPlugin))
+					if (_stricmp(_this->m_pDSMPlugin->GetPluginFileName(), szPlugin))
 					{
 						// Unload the previous plugin
 						_this->m_pDSMPlugin->UnloadPlugin();
@@ -390,7 +382,7 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 				if (_this->m_pDSMPlugin->IsLoaded())
 				{
 					_this->m_pDSMPlugin->DescribePlugin();
-					if (!stricmp(_this->m_pDSMPlugin->GetPluginFileName(), szPlugin))
+					if (!_stricmp(_this->m_pDSMPlugin->GetPluginFileName(), szPlugin))
 					{
 						fLoadIt = false;
 						_this->m_pDSMPlugin->SetPluginParams(hwnd, szParams);

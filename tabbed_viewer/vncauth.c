@@ -149,4 +149,46 @@ vncDecryptPasswd(const unsigned char *encryptedPasswd)
     return (char *)passwd;
 }
 
+/*
+ *   marscha@2006
+ *   Encrypt bytes[length] in memory using key.
+ *   Key has to be 8 bytes, length a multiple of 8 bytes.
+*/
+void
+vncEncryptBytes2(unsigned char *where, const int length, unsigned char *key) {
+	int i, j;
+	deskey(key, EN0);
+	for (i = 0; i< 8; i++)
+		where[i] ^= key[i];
+	des(where, where);
+	for (i = 8; i < length; i += 8) {
+		for (j = 0; j < 8; j++)
+			where[i + j] ^= where[i + j - 8];
+		des(where + i, where + i);
+	}
+}
+
+char *
+vncDecryptPasswdMs(const unsigned char *encryptedPasswd)
+{
+    unsigned int i;
+    unsigned char *passwd = (unsigned char *)malloc(32+1);
+
+	memcpy(passwd, encryptedPasswd, 32);
+
+    for (i = 0; i < 32; i++) {
+		passwd[i] = encryptedPasswd[i];
+    }
+
+    deskey(fixedkey, DE1);
+    des(passwd, passwd);
+
+    passwd[32] = 0;
+
+    return (char *)passwd;
+}
+
+
+
+
 

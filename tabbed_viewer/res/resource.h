@@ -1,8 +1,7 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Developer Studio generated include file.
+// Microsoft Visual C++ generated include file.
 // Used by vncviewer.rc
 //
-#define IDR_MANIFEST                    1
 #define IDQUIT                          9
 #define IDR_TRAY                        101
 #define IDR_MAIN                        101
@@ -66,6 +65,7 @@
 #define IDR_tbMENU                      181
 #define IDI_ICON1                       181
 #define IDD_FTCONFIRM_DLG               182
+#define IDB_BITMAP12                    182
 #define IDI_FILE                        183
 #define IDI_DIR                         184
 #define IDI_DRIVE                       185
@@ -207,21 +207,29 @@
 #define IDC_APPLYTOALLCHECK             1130
 #define IDC_YESALL_B                    1131
 #define IDC_YES_B                       1132
-#define IDC_NO_B                        1133
-#define IDC_256COLORS_RADIO             1133
-#define IDC_NOALL_B                     1134
-#define IDC_64COLORS_RADIO              1134
-#define IDC_FTPCONFIRMCOMMENT           1135
-#define IDC_8COLORS_RADIO               1135
-#define IDC_BUTTON1                     1136
-#define IDC_RENAME_B                    1136
-#define IDC_8GREYCOLORS_RADIO           1136
-#define IDC_DEFAULT                     1136
-#define IDC_4GREYCOLORS_RADIO           1137
-#define IDC_2GREYCOLORS_RADIO           1138
-#define IDC_DELETE                      1142
-#define IDC_SETDEFAULT_CHECK            1143
-#define IDSAVE                          1144
+#define IDC_NO_B                        1134
+#define IDC_256COLORS_RADIO             1135
+#define IDC_NOALL_B                     1136
+#define IDC_64COLORS_RADIO              1137
+#define IDC_FTPCONFIRMCOMMENT           1138
+#define IDC_8COLORS_RADIO               1139
+#define IDC_BUTTON1                     1140
+#define IDC_RENAME_B                    1141
+#define IDC_8GREYCOLORS_RADIO           1142
+#define IDC_DEFAULT                     1143
+#define IDC_4GREYCOLORS_RADIO           1144
+#define IDC_2GREYCOLORS_RADIO           1145
+#define IDC_DELETE                      1146
+#define IDC_SETDEFAULT_CHECK            1147
+#define IDSAVE                          1148
+#define IDD_AUTH_DIALOG2                1149
+#define IDC_CHECK1                      1150
+#define IDC_JAPKEYBOARD                 1151
+#define IDC_SERVER_RECON                1152
+#define IDC_LM_STATIC                   1156
+#define IDC_RM_STATIC                   1157
+#define IDC_HS_STATIC                   1158
+#define IDC_PR_STATIC                   1159
 #define IDC_ENCODING_BASE               1999
 #define IDC_RAWRADIO                    2000
 #define IDC_RRERADIO                    2002
@@ -232,9 +240,11 @@
 #define IDC_ZLIBHEXRADIO                2008
 #define IDC_ULTRA                       2009
 #define IDC_ZRLERADIO                   2016
-#define IDC_LAST_ENCODING               2017
-#define ID_BUTTONSELECT                 2018
-#define ID_NAT2NAT                      2019
+#define IDC_ZYWRLERADIO                 2017
+#define IDC_LAST_ENCODING               2018
+#define ID_BUTTONSELECT                 2019
+#define ID_NAT2NAT                      2020
+#define IDC_STATIC_SPLIT                9000
 #define IDD_EXIT                        9071
 #define CM_WINDOW_CASCADE               9079
 #define CM_WINDOW_TILEVERT              9081
@@ -526,14 +536,25 @@
 #define IDS_M6                          50261
 #define IDS_M7                          50262
 #define IDS_M8                          50263
+#define IDS_H94                         50264
+#define IDS_H95                         50265
+#define IDS_H96                         50266
+#define IDS_H97                         50267
+#define IDS_H98                         50268
+#define IDS_H99                         50269
+#define IDS_H100                        50270
+#define IDS_L93                         50271
+#define IDS_H101                        50272
+#define IDS_H102                        50273
+#define IDS_L94                         50274
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        182
+#define _APS_NEXT_RESOURCE_VALUE        183
 #define _APS_NEXT_COMMAND_VALUE         50037
-#define _APS_NEXT_CONTROL_VALUE         1146
+#define _APS_NEXT_CONTROL_VALUE         1147
 #define _APS_NEXT_SYMED_VALUE           154
 #endif
 #endif

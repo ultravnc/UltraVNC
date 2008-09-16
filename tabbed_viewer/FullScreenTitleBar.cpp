@@ -1,28 +1,3 @@
-/////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2004 Ultr@VNC Team Members. All Rights Reserved.
-//	Copyright (C) 2003-2004 Lars Werner. All Rights reserved
-//
-//  This program is free software; you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 2 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
-//  USA.
-//
-// If the source code for the program is not available from the place from
-// which you received this file, check 
-// http://ultravnc.sourceforge.net/
-//
-////////////////////////////////////////////////////////////////////////////
-
 //===========================================================================
 //	FullScreen Titlebar
 //	2004 - All rights reservered
@@ -48,11 +23,14 @@
 #include "res\\resource.h"
 #include "FullScreenTitleBar.h"
 #include "log.h"
+#include "common/win32_helpers.h"
 extern Log vnclog;
+#define COMPILE_MULTIMON_STUBS
+#include "multimon.h"
 
 //***************************************************************************************
 
-CTitleBar *TitleBarThis=NULL;
+//CTitleBar *TitleBarThis=NULL;
 
 //***************************************************************************************
 
@@ -61,6 +39,10 @@ CTitleBar::CTitleBar()
 	hInstance=NULL;
 	Parent=NULL;
 	this->Init();
+	Pin=NULL;
+	Close=NULL;
+	Maximize=NULL;
+	Minimize=NULL;
 }
 
 CTitleBar::CTitleBar(HINSTANCE hInst, HWND ParentWindow)
@@ -75,7 +57,11 @@ CTitleBar::CTitleBar(HINSTANCE hInst, HWND ParentWindow)
 CTitleBar::~CTitleBar()
 {
 	DeleteObject(Font);
-	DestroyWindow(m_hWnd);
+	if (m_hWnd) DestroyWindow(m_hWnd);
+	if (Pin) DestroyWindow(Pin);
+	if (Close) DestroyWindow(Close);
+	if (Maximize) DestroyWindow(Maximize);
+	if (Minimize) DestroyWindow(Minimize);
 }
 
 //***************************************************************************************
@@ -104,7 +90,7 @@ void CTitleBar::Init()
 
 	if(Parent!=NULL&&hInstance!=NULL)
 	{
-		TitleBarThis=this;
+		//TitleBarThis=this;
 		this->CreateDisplay();
 	}
 }
@@ -140,7 +126,7 @@ void CTitleBar::CreateDisplay()
 	wndclass.style			= CS_DBLCLKS;
 	wndclass.lpfnWndProc	= CTitleBar::WndProc;
 	wndclass.cbClsExtra		= 0;
-	wndclass.cbWndExtra		= 0;
+	wndclass.cbWndExtra		= sizeof (CTitleBar *);
 	wndclass.hInstance		= hInstance;
 	wndclass.hIcon=NULL;
 	wndclass.hCursor		= LoadCursor(NULL, IDC_ARROW);
@@ -170,7 +156,7 @@ void CTitleBar::CreateDisplay()
 			      NULL,                // Menu handle
 			      hInstance,
 			      NULL);
-
+	helper::SafeSetWindowUserData(m_hWnd, (long)this);
 	//Set region to window so it is non rectangular
 	HRGN Range;
 	POINT Points[4];
@@ -223,11 +209,7 @@ void CTitleBar::CreateDisplay()
 				NULL);
 
 	//Set the creation of the window
-#if defined (_MSC_VER) && _MSC_VER <= 1200
-	SetWindowLong(m_hWnd, GWL_USERDATA, (long)this);
-#else
-	SetWindowLongPtr(m_hWnd, GWLP_USERDATA, (LONG_PTR) this);
-#endif
+	helper::SafeSetWindowUserData(m_hWnd, (LONG)this);
 
 	//Load pictures
 	this->LoadPictures();
@@ -246,6 +228,8 @@ void CTitleBar::CreateDisplay()
 LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg, 
 					   WPARAM wParam, LPARAM lParam)
 {
+	CTitleBar *TitleBarThis=NULL;
+    TitleBarThis = helper::SafeGetWindowUserData<CTitleBar>(hwnd);
 	switch (iMsg)
 	{
 
@@ -278,21 +262,22 @@ LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg,
 			LPDRAWITEMSTRUCT lpdis; 
 
             lpdis = (LPDRAWITEMSTRUCT) lParam; 
-            hdcMem = CreateCompatibleDC(lpdis->hDC); 
+            hdcMem = CreateCompatibleDC(lpdis->hDC);
+			HGDIOBJ hbrOld=NULL;
  
 			if(lpdis->CtlID==tbIDC_CLOSE)
-					SelectObject(hdcMem, TitleBarThis->hClose); 
+					hbrOld=SelectObject(hdcMem, TitleBarThis->hClose); 
 			if(lpdis->CtlID==tbIDC_MAXIMIZE)
-					SelectObject(hdcMem, TitleBarThis->hMaximize); 
+					hbrOld=SelectObject(hdcMem, TitleBarThis->hMaximize); 
 			if(lpdis->CtlID==tbIDC_MINIMIZE)
-					SelectObject(hdcMem, TitleBarThis->hMinimize); 
+					hbrOld=SelectObject(hdcMem, TitleBarThis->hMinimize); 
 			
 			if(lpdis->CtlID==tbIDC_PIN)
 			{
 				if(TitleBarThis->AutoHide==TRUE)
-					SelectObject(hdcMem, TitleBarThis->hPinUp); 
+					hbrOld=SelectObject(hdcMem, TitleBarThis->hPinUp); 
 				else
-					SelectObject(hdcMem, TitleBarThis->hPinDown); 
+					hbrOld=SelectObject(hdcMem, TitleBarThis->hPinDown); 
 			}
 
 			BitBlt(lpdis->hDC,
@@ -304,7 +289,7 @@ LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg,
 					0,
 					0,
 					SRCCOPY);
- 
+			SelectObject(hdcMem,hbrOld);
             DeleteDC(hdcMem); 
             return TRUE; 
 		}
@@ -604,7 +589,7 @@ void CTitleBar::Draw()
 
 	//Draw border around window
 	HPEN Border=::CreatePen(PS_SOLID, tbBorderWidth, tbBorderPenColor);
-	::SelectObject(hdc, Border);
+	HGDIOBJ hbmOld=SelectObject(hdc, Border);
 
 	//Draw border around window
 	::MoveToEx(hdc, 0,0, NULL);
@@ -614,11 +599,14 @@ void CTitleBar::Draw()
 	::LineTo(hdc, 0,0);
 
 	//Draw extra shadow at bottom
+	SelectObject(hdc,hbmOld);
 	DeleteObject(Border);
 	Border=::CreatePen(PS_SOLID, tbBorderWidth, tbBorderPenShadow);
-	::SelectObject(hdc, Border);
+	hbmOld=SelectObject(hdc, Border);
 	::MoveToEx(hdc, tbTriangularPoint+1,tbHeigth-1, NULL);
 	::LineTo(hdc, tbWidth-tbTriangularPoint-1, tbHeigth-1);
+	SelectObject(hdc,hbmOld);
+	DeleteObject(Border);
 
 	//Create rect for drawin the text
 	RECT lpRect;
@@ -691,3 +679,34 @@ void CTitleBar::DisplayWindow(BOOL Show, BOOL SetHideFlag)
 }
 
 //***************************************************************************************
+//***************************************************************************************
+// 7 May 2008 jdp
+void CTitleBar::MoveToMonitor(HMONITOR hMonitor)
+{
+    int dx;
+    int dy;
+
+    HMONITOR hOrigMonitor = ::MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTOPRIMARY);
+    // don't do anything if we're on the same monitor
+    if (hOrigMonitor == hMonitor)
+        return;
+
+    // get our window rect 
+    RECT wndRect;
+    ::GetWindowRect(m_hWnd, &wndRect);
+
+    MONITORINFO mi;
+    mi.cbSize = sizeof (MONITORINFO);
+    GetMonitorInfo(hOrigMonitor, &mi);
+    // ... and calculate the offsets of our origin from the desktop's origin
+    dx = wndRect.left - mi.rcMonitor.left;
+    dy = wndRect.top - mi.rcMonitor.top;
+
+
+    // now calculate our new origin relative to the new monitor.
+    GetMonitorInfo(hMonitor, &mi);
+    int x = mi.rcMonitor.left + dx;
+    int y = mi.rcMonitor.top + dy;
+    // finally move the window.
+    ::SetWindowPos(m_hWnd, 0, x, y, 0,0, SWP_NOSIZE|SWP_NOACTIVATE|SWP_NOZORDER);
+}

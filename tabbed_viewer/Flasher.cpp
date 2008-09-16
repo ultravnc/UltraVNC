@@ -28,6 +28,7 @@
 #include "vncviewer.h"
 #include "Flasher.h"
 #include "Exception.h"
+#include "common/win32_helpers.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -75,12 +76,7 @@ Flasher::Flasher(int port)
 				NULL);
 	
 	// record which client created this window
-#if defined (_MSC_VER) && _MSC_VER <= 1200
-	SetWindowLong(m_hwnd, GWL_USERDATA, (long)this);
-#else
-	SetWindowLongPtr(m_hwnd, GWLP_USERDATA, (LONG_PTR) this);
-#endif
-
+	helper::SafeSetWindowUserData(m_hwnd, (LONG)this);
 	// Select a font for displaying user name
 	LOGFONT lf;
 	memset(&lf, 0, sizeof(lf));
@@ -155,13 +151,7 @@ LRESULT CALLBACK Flasher::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 	// This is a static method, so we don't know which instantiation we're 
 	// dealing with. We use Allen Hadden's (ahadden@taratec.com) suggestion 
 	// from a newsgroup to get the pseudo-this.
-	Flasher *_this = (Flasher *) 
-#if defined (_MSC_VER) && _MSC_VER <= 1200		
-		GetWindowLong(hwnd, GWL_USERDATA);
-#else
-		GetWindowLongPtr(hwnd, GWLP_USERDATA);
-#endif
-
+	Flasher *_this = helper::SafeGetWindowUserData<Flasher>(hwnd);
 	switch (iMsg) {
 
 	case WM_CREATE:

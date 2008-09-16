@@ -55,6 +55,7 @@
 #include "AuthDialog.h"
 #include "AboutBox.h"
 #include "LowLevelHook.h"
+#include "common/win32_helpers.h"
 
 #include "Exception.h"
 extern "C" {
@@ -64,6 +65,8 @@ extern "C" {
 #include <rdr/FdInStream.h>
 #include <rdr/ZlibInStream.h>
 #include <rdr/Exception.h>
+
+#include <rfb/dh.h>
 
 #include <DSMPlugin/DSMPlugin.h> // sf@2002
 
@@ -75,7 +78,9 @@ extern "C" {
 #define ID_MDI_FIRSTCHILD 60000
 
 const UINT FileTransferSendPacketMessage = RegisterWindowMessage("UltraVNC.Viewer.FileTransferSendPacketMessage");
-
+extern bool g_passwordfailed;
+bool havetobekilled;
+bool forcedexit=false;
 /*
  * Macro to compare pixel formats.
  */
@@ -195,6 +200,7 @@ extern char sz_L89[64];
 extern char sz_L90[64];
 extern char sz_L91[64];
 extern char sz_L92[64];
+extern char sz_L94[64];
 
 extern char sz_F1[64];
 extern char sz_F5[128];
@@ -224,6 +230,11 @@ extern HANDLE m_bitmapNONE;
 //  This first section contains bits which are generally called by the main
 //  program thread.
 // *************************************************************************
+ClientConnection::ClientConnection()
+{
+	m_keymap = NULL;
+	m_keymapJap = NULL;
+}
 
 ClientConnection::ClientConnection(VNCviewerApp *pApp) 
   : fis(0), zis(0)
@@ -311,6 +322,9 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_bitsCacheSwapBuffer=0;
 	m_hPalette = NULL;
 	m_encPasswd[0] = '\0';
+	m_encPasswdMs[0] = '\0'; // act: add mspasswd storage
+	m_ms_user[0] = '\0';    // act: add msuser storage
+	m_cmdlnUser[0] = '\0'; // act: add user option on command line
 	m_clearPasswd[0] = '\0'; // Modif sf@2002
 	// static window
 	m_BytesSend=0;
@@ -391,6 +405,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_pendingScaleChange = false;
 	m_pendingCacheInit = false;
 	m_nServerScale = 1;
+	m_reconnectcounter = 0;
 
 	//ms logon
 	m_ms_logon=false;
@@ -446,6 +461,14 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	rcSource=NULL;
 	rcSourcecolor=NULL;
 	rcMask=NULL;
+	zywrle_level = 1;
+
+	m_autoReconnect = m_opts.m_autoReconnect;
+	ThreadSocketTimeout=NULL;
+	m_statusThread=NULL;
+	m_bClosedByUser = false;
+	m_server_wants_keepalives = false;
+
 	m_SavedAreaCursor=NULL;
 	m_TBr.left=0;
 	m_TBr.top=0;
@@ -453,6 +476,11 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_Inputlock=true;
 	sleep=0;
 	old_autoscale=2;
+
+	m_keymap = new KeyMap;
+	m_keymapJap = new KeyMapJap;
+	m_keymap->SetKeyMapOption1(false);
+    m_keymap->SetKeyMapOption2(true);
 }
 
 // 
@@ -479,31 +507,21 @@ void ClientConnection::Run()
 	{
 		GetConnectDetails();
 		// sf@2002 - DSM Plugin loading if required
-		LoadDSMPlugin();
+		LoadDSMPlugin(false);
 	}
 	else
 	{
-		LoadDSMPlugin();
+		LoadDSMPlugin(false);
 		// sf@2003 - Take command line quickoption into account
 		HandleQuickOption();
 	}
 
-	// Modif sf@2003 - In case Auto Mode is On with DSMPlugin, we disable ZRLE right now !
-	/*
-	if (m_opts.autoDetect)
-	{
-		if (m_pDSMPlugin->IsEnabled())
-		{
-			m_opts.m_PreferredEncoding = rfbEncodingTight;
-			m_opts.m_fEnableCache = false; // Cache does not work perfectly with Tight
-			m_opts.m_Use8Bit = true; // full colors as Tight is going to last at least 30s...
-			m_lLastChangeTime = timeGetTime(); // defer the first possible Auto encoding switching in 30s
-		}
-	}
-	*/
+	// add user option on command line
+	if ( (strlen(	m_pApp->m_options.m_cmdlnUser) > 0) & !m_pApp->m_options.m_NoMoreCommandLineUserPassword) // Fix by Act
+		strcpy(m_cmdlnUser, m_pApp->m_options.m_cmdlnUser);
 
 	// Modif sf@2002 - bit of a hack...and unsafe
-	if (strlen(	m_pApp->m_options.m_clearPassword) > 0) 
+	if ( (strlen(	m_pApp->m_options.m_clearPassword) > 0) & !m_pApp->m_options.m_NoMoreCommandLineUserPassword)
 		strcpy(m_clearPasswd, m_pApp->m_options.m_clearPassword);
 
 	if (saved_set)
@@ -512,6 +530,25 @@ void ClientConnection::Run()
 		Save_Latest_Connection();
 		return;
 	}
+	DoConnection();
+
+	SendMessage(m_hMDIClient, WM_MDIGETACTIVE, 0, (LPARAM)&bMaximized);
+
+	if(bMaximized == TRUE)
+    {
+        SendMessage(m_hMDIClient, WM_SETREDRAW, FALSE, 0);
+    }
+	if (g_iNumChild==1) bMaximized=TRUE;
+
+	CreateDisplay();
+
+	LowLevelHook::Initialize(m_hwnd);
+	start_undetached();
+	
+	EndDialog(m_hwndStatus,0);
+}
+void ClientConnection::DoConnection()
+{
 	// Connect if we're not already connected
 	if (m_sock == INVALID_SOCKET) 
 		if (strcmp(m_proxyhost,"")!=NULL && m_fUseProxy)ConnectProxy();
@@ -527,17 +564,8 @@ void ClientConnection::Run()
 	Authenticate();
 
 	CheckQueueBufferSize(32000);
-	SendMessage(m_hMDIClient, WM_MDIGETACTIVE, 0, (LPARAM)&bMaximized);
 
-	if(bMaximized == TRUE)
-    {
-        SendMessage(m_hMDIClient, WM_SETREDRAW, FALSE, 0);
-    }
-	if (g_iNumChild==1) bMaximized=TRUE;
-
-	CreateDisplay();
-
-	/*SendClientInit();
+	SendClientInit();
 	
 	ReadServerInit();
 	
@@ -549,21 +577,28 @@ void ClientConnection::Run()
 
     SetFormatAndEncodings();
 
-	if(bMaximized == TRUE)
-    {
-        ShowWindow(m_hwnd, SW_SHOWMAXIMIZED);
+	reconnectcounter=m_reconnectcounter;
+}
 
-        //SendMessage(m_hMDIClient, WM_SETREDRAW, TRUE, 0);
-        RedrawWindow(m_hMDIClient, NULL, NULL,RDW_INVALIDATE | RDW_ALLCHILDREN);
-    }
-	SizeWindow();
-       
-	// This starts the worker thread.
-	// The rest of the processing continues in run_undetached.*/
-	LowLevelHook::Initialize(m_hwnd);
-	start_undetached();
-	
-	EndDialog(m_hwndStatus,0);
+void ClientConnection::Reconnect()
+{
+	Sleep( m_autoReconnect * 1000 );
+	try
+	{
+		DoConnection();
+		m_bKillThread = false;
+		m_running = true;
+
+		SendFullFramebufferUpdateRequest();
+	}
+	catch (Exception &e)
+	{
+		if( !m_autoReconnect )
+			e.Report();
+		reconnectcounter--;
+		if (reconnectcounter<0) reconnectcounter=0;
+		PostMessage(m_hwnd, WM_CLOSE, reconnectcounter, 1); 
+	}
 }
 
 HWND ClientConnection::GTGBS_ShowConnectWindow()
@@ -644,11 +679,7 @@ void ClientConnection::CreateDisplay()
 	//ShowWindow(m_hwnd, SW_HIDE);
 
 	// record which client created this window
-#if defined (_MSC_VER) && _MSC_VER <= 1200
-	SetWindowLong(m_hwnd, GWL_USERDATA, (LONG) this);
-#else
-	SetWindowLongPtr(m_hwnd, GWLP_USERDATA, (LONG_PTR)this);
-#endif
+	helper::SafeSetWindowUserData(m_hwnd, (LONG)this);
 //	SetClassLong(m_hwnd, GCL_HBRBACKGROUND, (LONG)GetStockObject(NULL_BRUSH));
 //	SendMessage(m_hwnd,WM_CREATE,0,0);
 
@@ -694,12 +725,20 @@ void ClientConnection::CreateDisplay()
 
 
 //
+//
 // sf@2002 - DSMPlugin loading and initialization if required
 //
-void ClientConnection::LoadDSMPlugin()
+void ClientConnection::LoadDSMPlugin(bool fForceReload)
 {
 	if (m_opts.m_fUseDSMPlugin)
 	{
+		// sf@2007 - Autoreconnect stuff - Reload/Reset of the plugin
+		if (m_pDSMPlugin->IsLoaded() && fForceReload)
+		{
+			m_pDSMPlugin->UnloadPlugin();
+			m_pDSMPlugin->SetEnabled(false);
+		}
+
 		if (!m_pDSMPlugin->IsLoaded())
 		{
 			m_pDSMPlugin->LoadPlugin(m_opts.m_szDSMPluginFilename, m_opts.m_listening);
@@ -718,7 +757,7 @@ void ClientConnection::LoadDSMPlugin()
 				else
 				{
 					m_pDSMPlugin->SetEnabled(false);
-					MessageBox(NULL, 
+					MessageBox(m_hwndMain,
 						sz_F1, 
 						sz_F6, MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TOPMOST);
 					return;
@@ -727,7 +766,7 @@ void ClientConnection::LoadDSMPlugin()
 			else
 			{
 				m_pDSMPlugin->SetEnabled(false);
-				MessageBox(NULL, 
+				MessageBox(m_hwndMain,
 					sz_F5, 
 					sz_F6, MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TOPMOST);
 				return;
@@ -748,7 +787,7 @@ void ClientConnection::SetDSMPluginStuff()
 		char szParams[256+16];
 
 		// Does the plugin need the VNC password to do its job ?
-		if (!stricmp(m_pDSMPlugin->GetPluginParams(), "VNCPasswordNeeded"))
+		if (!_stricmp(m_pDSMPlugin->GetPluginParams(), "VNCPasswordNeeded"))
 		{
 			// Yes. The user must enter the VNC password
 			// He won't be prompted again for password if ms_logon is not used.
@@ -776,7 +815,7 @@ void ClientConnection::SetDSMPluginStuff()
 			m_pDSMPlugin->SetEnabled(false);
 			m_fUsePlugin = false;
 			vnclog.Print(0, _T("DSMPlugin cannot be configured\n"));
-			throw WarningException(sz_L41);
+			throw WarningException(sz_L41,IDS_L41);
 		}
 		// If all went well
 		m_fUsePlugin = true;
@@ -967,6 +1006,25 @@ void ClientConnection::GetConnectDetails_global()
 
 }
 
+DWORD WINAPI SocketTimeout(LPVOID lpParam) 
+    { 
+            SOCKET *sock; 
+            sock=(SOCKET*) lpParam; 
+            int counter=0; 
+            while (havetobekilled && !forcedexit) 
+            { 
+                    Sleep(100); 
+                    counter++; 
+                    if (counter>100) break; 
+            } 
+            if (havetobekilled) 
+            { 
+                    closesocket(*sock); 
+            } 
+            return 0; 
+    } 
+
+
 void ClientConnection::Connect()
 {
 	struct sockaddr_in thataddr;
@@ -1004,11 +1062,17 @@ void ClientConnection::Connect()
 	if (m_hwndStatus)SetDlgItemInt(m_hwndStatus,IDC_PORT,m_port,FALSE);
 	thataddr.sin_family = AF_INET;
 	thataddr.sin_port = htons(m_port);
-	
+	///Force break after timeout
+	DWORD                             threadID;
+	ThreadSocketTimeout = CreateThread(NULL,0,SocketTimeout,(LPVOID)&m_sock,0,&threadID);
+	havetobekilled=true;
 	res = connect(m_sock, (LPSOCKADDR) &thataddr, sizeof(thataddr));
+	//Force break
+	 havetobekilled=false;
 	if (res == SOCKET_ERROR) 
 		{
 			if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L48);
+			SetEvent(KillEvent);
 			if (!Pressed_Cancel) throw WarningException(sz_L48);
 			else throw QuietException(sz_L48);
 		}
@@ -1186,7 +1250,14 @@ void ClientConnection::NegotiateProtocolVersion()
 	{
 		int size;
 		ReadExact((char *)&size,sizeof(int));
-		char mytext[1024]; //10k
+		char mytext[1025]; //10k
+		//block
+		if (size<0 || size >1024)
+		{
+			throw WarningException("Buffer to big, ");
+			if (size<0) size=0;
+			if (size>1024) size=1024;
+		}
 		ReadExact(mytext,size);
 		mytext[size]=0;
 
@@ -1279,7 +1350,7 @@ void ClientConnection::NegotiateProxy()
 	if (strcmp(tmphost,"")!=NULL)
 	{
 	_tcscat(tmphost,":");
-	_tcscat(tmphost,itoa(m_port,tmphost2,10));
+	_tcscat(tmphost,_itoa(m_port,tmphost2,10));
 	}
     WriteExactProxy(tmphost,MAX_HOST_NAME_LEN);
 
@@ -1341,21 +1412,43 @@ void ClientConnection::Authenticate()
 			memset(domain, 0, sizeof(char)*256);
 			memset(user, 0, sizeof(char)*256);
 
-			// We ignore the clear password in case of ms_logon !
-			// Todo: Add ms_user & ms_password command line params
-			if (m_ms_logon) memset(m_clearPasswd, 0, sizeof(m_clearPasswd));
+			// We NOT ignore the clear password in case of ms_logon !
+			// finally done !! : Add ms_user & ms_password command line params
+			// act: add user option on command line
+			if (m_ms_logon) 
+			{	// mslogon required
+				// if user cmd line option is not specified, cmd line passwd must be cleared
+				// the same if user is provided and not password
+				if (strlen(m_cmdlnUser)>0)  
+				{	if (strlen(m_clearPasswd)>0)
+					{  //user and password are not empty
+					    strcpy(user, m_cmdlnUser);
+						strcpy(passwd, m_clearPasswd);
+					}
+					else memset(m_cmdlnUser, 0, sizeof(m_cmdlnUser)); // user without password
+				}
+				else
+					memset(m_clearPasswd, 0, sizeof(m_clearPasswd));
 
+			}
 			// Was the password already specified in a config file or entered for DSMPlugin ?
 			// Modif sf@2002 - A clear password can be transmitted via the vncviewer command line
 			if (strlen(m_clearPasswd)>0)
 			{
 				strcpy(passwd, m_clearPasswd);
+				if (m_ms_logon) strcpy(user, m_cmdlnUser);
 			} 
 			else if (strlen((const char *) m_encPasswd)>0)
 			{
 				char *pw = vncDecryptPasswd(m_encPasswd);
 				strcpy(passwd, pw);
 				free(pw);
+			}
+			else if (strlen((const char *) m_encPasswdMs)>0)
+			{  char * pw = vncDecryptPasswdMs(m_encPasswdMs);
+			   strcpy(passwd, pw);
+			   free(pw);
+			   strcpy(user, m_ms_user);
 			}
 			else 
 			{
@@ -1416,8 +1509,13 @@ void ClientConnection::Authenticate()
 								passwd[8] = '\0';
 							}
 						}
-					if (m_ms_logon) vncEncryptPasswdMs(m_encPasswdMs, passwd);
-					vncEncryptPasswd(m_encPasswd, passwd);
+					if (m_ms_logon) 
+					{
+						vncEncryptPasswdMs(m_encPasswdMs, passwd);
+						strcpy(m_ms_user, user);
+					}
+					else
+						vncEncryptPasswd(m_encPasswd, passwd);
 				} 
 				else 
 				{
@@ -1493,9 +1591,12 @@ void ClientConnection::Authenticate()
 			case rfbVncAuthOK:
 				if (m_hwndStatus)vnclog.Print(0, _T("VNC authentication succeeded\n"));
 				SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L55);
+				g_passwordfailed=false;
 				break;
 			case rfbVncAuthFailed:
 				vnclog.Print(0, _T("VNC authentication failed!"));
+				m_pApp->m_options.m_NoMoreCommandLineUserPassword = TRUE;
+				g_passwordfailed=true;
 				if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L56);
 //				if (flash) {flash->Killflash();}
 				throw WarningException(sz_L57);
@@ -1510,13 +1611,113 @@ void ClientConnection::Authenticate()
 			}
 			break;
 		}
-		
+    case rfbMsLogon:
+		AuthMsLogon();
+		break;		
 	default:
 		vnclog.Print(0, _T("Unknown authentication scheme from RFB server: %d\n"),
 			(int)authScheme);
 //		if (flash) {flash->Killflash();}
 		throw ErrorException(sz_L60);
     }
+}
+
+// marscha@2006: Try to better hide the windows password.
+// I know that this is no breakthrough in modern cryptography.
+// It's just a patch/kludge/workaround.
+void ClientConnection::AuthMsLogon() {
+	char gen[8], mod[8], pub[8], resp[8];
+	char user[256], passwd[64];
+	unsigned char key[8];
+
+	memset(m_clearPasswd, 0, sizeof(m_clearPasswd)); // ??
+	
+	ReadExact(gen, sizeof(gen));
+	ReadExact(mod, sizeof(mod));
+	ReadExact(resp, sizeof(resp));
+		
+	DH dh(bytesToInt64(gen), bytesToInt64(mod));
+	int64ToBytes(dh.createInterKey(), pub);
+
+	WriteExact(pub, sizeof(pub));
+
+	int64ToBytes(dh.createEncryptionKey(bytesToInt64(resp)), (char*) key);
+	vnclog.Print(100, _T("After DH: g=%I64u, m=%I64u, i=%I64u, key=%I64u\n"), 
+	  bytesToInt64(gen), bytesToInt64(mod), bytesToInt64(pub), bytesToInt64((char*) key));
+	// get username and passwd
+	if ((strlen(m_cmdlnUser)>0)||(strlen(m_clearPasswd)>0))
+    {
+		vnclog.Print(0, _T("Command line MS-Logon.\n"));
+#ifndef UNDER_CE
+		strncpy(passwd, m_clearPasswd, 64);
+		strncpy(user, m_cmdlnUser, 254);
+		//strncpy(domain, ad.m_domain, 254);
+#else
+		vncWc2Mb(passwd, m_clearPasswd, 64);
+		vncWc2Mb(user, m_cmdlnUser, 256);
+		//vncWc2Mb(domain, ad.m_domain, 256);
+#endif
+		vncEncryptPasswdMs(m_encPasswdMs, passwd);
+		strcpy(m_ms_user, user);
+	}
+	else if (strlen((const char *) m_encPasswdMs)>0)
+	{  char * pw = vncDecryptPasswdMs(m_encPasswdMs);
+	   strcpy(passwd, pw);
+	   free(pw);
+	   strcpy(user, m_ms_user);
+	}
+	else
+	{
+		AuthDialog ad;
+		if (ad.DoDialog(m_ms_logon, true)) {
+	#ifndef UNDER_CE
+			strncpy(passwd, ad.m_passwd, 64);
+			strncpy(user, ad.m_user, 254);
+			//strncpy(domain, ad.m_domain, 254);
+	#else
+			vncWc2Mb(passwd, ad.m_passwd, 64);
+			vncWc2Mb(user, ad.m_user, 256);
+			//vncWc2Mb(domain, ad.m_domain, 256);
+	#endif
+			vncEncryptPasswdMs(m_encPasswdMs, passwd);
+			strcpy(m_ms_user, user);
+		} else {
+			throw QuietException(sz_L54);
+		}
+		//user = domain + "\\" + user;
+	}
+
+	vncEncryptBytes2((unsigned char*) user, sizeof(user), key);
+	vncEncryptBytes2((unsigned char*) passwd, sizeof(passwd), key);
+	
+	WriteExact(user, sizeof(user));
+	WriteExact(passwd, sizeof(passwd));
+
+
+	CARD32 authResult;
+	ReadExact((char *) &authResult, 4);
+	
+	authResult = Swap32IfLE(authResult);
+	
+	switch (authResult) {
+	case rfbVncAuthOK:
+		vnclog.Print(0, _T("MS-Logon (DH) authentication succeeded\n"));
+		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L55);
+		g_passwordfailed=false;
+		break;
+	case rfbVncAuthFailed:
+		vnclog.Print(0, _T("MS-Logon (DH) authentication failed!"));
+		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L56);
+		m_pApp->m_options.m_NoMoreCommandLineUserPassword = TRUE; // Fix by Act
+		g_passwordfailed=true;
+		throw WarningException(sz_L57);
+	case rfbVncAuthTooMany:
+		throw WarningException(sz_L58);
+	default:
+		vnclog.Print(0, _T("Unknown MS-Logon (DH) authentication result: %d\n"),
+			(int)authResult);
+		throw ErrorException(sz_L59);
+	}
 }
 
 void ClientConnection::SendClientInit()
@@ -2022,6 +2223,13 @@ void ClientConnection::SetFormatAndEncodings()
 				{
 					useCompressLevel = true;
 				}
+				if ( i == rfbEncodingZYWRLE
+			   )
+				{
+					zywrle = 1;
+				}else{
+					zywrle = 0;
+				}
 			}
 			else 
 			{
@@ -2191,6 +2399,52 @@ void ClientConnection::KillThread()
 	WaitForSingleObject(KillEvent, 100000);
 }
 
+// sf@2007 - AutoReconnect
+// When we want to autoreconnect we don't really kill the working thread
+// and we keep intact most of the current clientconnection data
+// We close the socket and suspend the thread for a while (socket polling)
+// We also need to cleanup some parts, especially those dealing with data streams
+void ClientConnection::SuspendThread()
+{
+	m_bKillThread = true;
+	m_running = false;
+
+	// Reinit encoders stuff
+	delete(zis);
+	zis = new rdr::ZlibInStream;
+
+	for (int i = 0; i < 4; i++)
+		m_tightZlibStreamActive[i] = false;
+
+	// Reinit DSM stuff
+	m_nTO = 1;
+	LoadDSMPlugin(true);
+	m_fUseProxy = false;
+	m_pNetRectBuf = NULL;
+	m_fReadFromNetRectBuf = false; 
+	m_nNetRectBufOffset = 0;
+	m_nReadSize = 0;
+	m_nNetRectBufSize = 0;
+	m_pZRLENetRectBuf = NULL;
+	m_fReadFromZRLENetRectBuf = false;
+	m_nZRLENetRectBufOffset = 0;
+	m_nZRLEReadSize = 0;
+	m_nZRLENetRectBufSize = 0;
+
+	if (m_sock != INVALID_SOCKET)
+	{
+		shutdown(m_sock, SD_BOTH);
+		closesocket(m_sock);
+		m_sock = INVALID_SOCKET;
+	}
+}
+
+void
+ClientConnection::CloseWindows()
+{
+	SetEvent(KillEvent);
+	if (m_hwnd)SendMessage(m_hwnd, WM_CLOSE, 0, 1);
+}
 
 ClientConnection::~ClientConnection()
 {
@@ -2270,7 +2524,17 @@ ClientConnection::~ClientConnection()
 		delete[] rcSourcecolor;
 	if (rcMask!=NULL)
 		delete[] rcMask;
-	CloseHandle(KillEvent);
+	if (m_keymap) {
+        delete m_keymap;
+        m_keymap = NULL;
+    }
+	if (m_keymapJap) {
+        delete m_keymapJap;
+        m_keymapJap = NULL;
+    }
+	if (KillEvent) CloseHandle(KillEvent);
+	if (ThreadSocketTimeout) CloseHandle(ThreadSocketTimeout);
+	if (m_statusThread) CloseHandle(m_statusThread);
 }
 
 
@@ -2424,8 +2688,9 @@ inline void ClientConnection::SubProcessPointerEvent(int x, int y, DWORD keyflag
 			SendPointerEvent(x_scaled, y_scaled, mask);
 		}
 	} catch (Exception &e) {
-		e.Report();
-		PostMessage(m_hwnd, WM_CLOSE, 0, 0);
+		if( !m_autoReconnect )
+			e.Report();
+		PostMessage(m_hwnd, WM_CLOSE, reconnectcounter, 1);
 	}
 }
 
@@ -2455,7 +2720,7 @@ void ClientConnection::ProcessMouseWheel(int delta)
 inline void
 ClientConnection::SendPointerEvent(int x, int y, int buttonMask)
 {
-	if (m_pFileTransfer->m_fFileTransferRunning && ( m_pFileTransfer->m_fVisible || m_pFileTransfer->m_fOldFTProtocole)) return;
+	if (m_pFileTransfer->m_fFileTransferRunning && ( m_pFileTransfer->m_fVisible || m_pFileTransfer->UsingOldProtocol())) return;
 	if (m_pTextChat->m_fTextChatRunning && m_pTextChat->m_fVisible) return;
 
 	//omni_mutex_lock l(m_UpdateMutex);
@@ -2538,9 +2803,21 @@ void ClientConnection::ProcessKeyEvent(int virtkey, DWORD keyData)
     };
 #endif
 #endif
+	if (m_opts.m_JapKeyboard==0 && virtkey!=69)
+	{
+		try {
+			m_keymap->PCtoX(virtkey, keyData, this);
+		} catch (Exception &e) {
+			if( !m_autoReconnect )
+				e.Report();
+			PostMessage(m_hwnd, WM_CLOSE, reconnectcounter, 1);
+		}
+	}
+	else
+	{
 
 	try {
-		KeyActionSpec kas = m_keymap.PCtoX(virtkey, keyData);    
+		KeyActionSpec kas = m_keymapJap->PCtoX(virtkey, keyData);    
 		
 		if (kas.releaseModifiers & KEYMAP_LCONTROL) {
 			SendKeyEvent(XK_Control_L, false );
@@ -2582,8 +2859,10 @@ void ClientConnection::ProcessKeyEvent(int virtkey, DWORD keyData)
 			vnclog.Print(5, _T("fake L Ctrl pressed\n"));
 		}
 	} catch (Exception &e) {
-		e.Report();
-		PostMessage(m_hwnd, WM_CLOSE, 0, 0);
+			if( !m_autoReconnect )
+				e.Report();
+			PostMessage(m_hwnd, WM_CLOSE, 4, 1);
+		}
 	}
 
 }
@@ -2595,7 +2874,7 @@ void ClientConnection::ProcessKeyEvent(int virtkey, DWORD keyData)
 void
 ClientConnection::SendKeyEvent(CARD32 key, bool down)
 {
-	if (m_pFileTransfer->m_fFileTransferRunning && ( m_pFileTransfer->m_fVisible || m_pFileTransfer->m_fOldFTProtocole)) return;
+	if (m_pFileTransfer->m_fFileTransferRunning && ( m_pFileTransfer->m_fVisible || m_pFileTransfer->UsingOldProtocol())) return;
 	if (m_pTextChat->m_fTextChatRunning && m_pTextChat->m_fVisible) return;
 
     rfbKeyEventMsg ke;
@@ -2615,7 +2894,7 @@ ClientConnection::SendKeyEvent(CARD32 key, bool down)
 
 void ClientConnection::SendClientCutText(char *str, int len)
 {
-	if (m_pFileTransfer->m_fFileTransferRunning && ( m_pFileTransfer->m_fVisible || m_pFileTransfer->m_fOldFTProtocole)) return;
+	if (m_pFileTransfer->m_fFileTransferRunning && ( m_pFileTransfer->m_fVisible || m_pFileTransfer->UsingOldProtocol())) return;
 	if (m_pTextChat->m_fTextChatRunning && m_pTextChat->m_fVisible) return;
 
 	rfbClientCutTextMsg cct;
@@ -2821,7 +3100,7 @@ void ClientConnection::ShowConnInfo()
 		m_desktopName, m_host, m_port,
 		strcmp(m_proxyhost,"") ? m_proxyhost : "", 
 		strcmp(m_proxyhost,"") ? "Port" : "", 
-		strcmp(m_proxyhost,"") ? itoa(m_proxyport, num, 10) : "", 
+		strcmp(m_proxyhost,"") ? _itoa(m_proxyport, num, 10) : "", 
 		m_si.framebufferWidth, m_si.framebufferHeight,
                 m_si.format.depth,
 		m_myFormat.depth, kbitsPerSecond,
@@ -2840,7 +3119,7 @@ void ClientConnection::ShowConnInfo()
 
 void* ClientConnection::run_undetached(void* arg) {
 
-	SendClientInit();
+/*	SendClientInit();
 	
 	ReadServerInit();
 	
@@ -2851,6 +3130,8 @@ void* ClientConnection::run_undetached(void* arg) {
 	Createdib();
 
     SetFormatAndEncodings();
+
+	reconnectcounter=m_reconnectcounter;*/
 
 	if(bMaximized == TRUE)
     {
@@ -2868,25 +3149,31 @@ void* ClientConnection::run_undetached(void* arg) {
 	vnclog.Print(9,_T("Update-processing thread started\n"));
 
 	m_threadStarted = true;
-	try
-	{
-		// Modif sf@2002 - Server Scaling
-		m_nServerScale = m_opts.m_nServerScale;
-		if (m_nServerScale > 1) SendServerScale(m_nServerScale);
 
-		SendFullFramebufferUpdateRequest();
+	// Modif sf@2002 - Server Scaling
+	m_nServerScale = m_opts.m_nServerScale;
+	if (m_nServerScale > 1) SendServerScale(m_nServerScale);
 
-		SizeWindow();
+	m_reconnectcounter = m_opts.m_reconnectcounter;
+	reconnectcounter = m_reconnectcounter;
+
+	SendFullFramebufferUpdateRequest();
+
+	SizeWindow();
 //		RealiseFullScreenMode();
 //		if (!InFullScreenMode()) SizeWindow();
 
-		m_running = true;
-		UpdateWindow(m_hwnd);
+	m_running = true;
+	UpdateWindow(m_hwnd);
 
 		// sf@2002 - Attempt to speed up the thing
 		// omni_thread::set_priority(omni_thread::PRIORITY_LOW);
 
-        rdr::U8 msgType;
+    rdr::U8 msgType;
+	while (m_autoReconnect > 0) 
+	{
+		try
+		{
 		while (!m_bKillThread) 
 		{
 			// sf@2002 - DSM Plugin
@@ -2906,6 +3193,14 @@ void* ClientConnection::run_undetached(void* arg) {
 				
             switch (msgType)
 			{
+			case rfbKeepAlive:
+                    m_server_wants_keepalives = true;
+                    if (sz_rfbKeepAliveMsg > 1)
+                    {
+                  	rfbKeepAliveMsg kp;
+                	ReadExact(((char *) &kp)+m_nTO, sz_rfbKeepAliveMsg-m_nTO);
+                    }
+                    break;
 			case rfbFramebufferUpdate:
 				ReadScreenUpdate();
 				break;
@@ -2982,30 +3277,52 @@ void* ClientConnection::run_undetached(void* arg) {
 	}
 	catch (WarningException)
 	{
-		// sf@2002
+		/*// sf@2002
 		 m_pFileTransfer->m_fFileTransferRunning = false;
 		 m_pTextChat->m_fTextChatRunning = false;
 		 vnclog.Print(4, _T("_this->KillEvent\n"));
 		 SetEvent(KillEvent);
-		//if (!m_bKillThread )PostMessage(m_hwnd, WM_CLOSE, 0, 0);
+		//if (!m_bKillThread )PostMessage(m_hwnd, WM_CLOSE, 0, 0);*/
+
+		 m_bKillThread = true;
+		PostMessage(m_hwnd, WM_CLOSE, reconnectcounter, 1);
 	}
 	catch (QuietException &e)
 	{
-		// sf@2002
+		/*// sf@2002
 		 m_pFileTransfer->m_fFileTransferRunning = false;
 		 m_pTextChat->m_fTextChatRunning = false;
 		 vnclog.Print(4, _T("_this->KillEvent\n"));
 		 SetEvent(KillEvent);
-		//if (!m_bKillThread )PostMessage(m_hwnd, WM_CLOSE, 0, 0);
+		//if (!m_bKillThread )PostMessage(m_hwnd, WM_CLOSE, 0, 0);*/
+
+		 m_bKillThread = true;
+			PostMessage(m_hwnd, WM_CLOSE, reconnectcounter, 1);
 	}
 	catch (rdr::Exception& e)
 	{
-		vnclog.Print(0,"rdr::Exception (1): %s\n",e.str());
+		/*vnclog.Print(0,"rdr::Exception (1): %s\n",e.str());
 		m_pFileTransfer->m_fFileTransferRunning = false;
 		m_pTextChat->m_fTextChatRunning = false;
 		//throw QuietException(e.str());
 		//throw WarningException("Stopping\n");
-		//if (!m_bKillThread)PostMessage(m_hwnd, WM_CLOSE, 0, 0);
+		//if (!m_bKillThread)PostMessage(m_hwnd, WM_CLOSE, 0, 0);*/
+
+		if ((strcmp(e.str(),"rdr::EndOfStream: read")==NULL) && !m_bClosedByUser)
+			{
+				WarningException w(sz_L94,200);
+               // w.Report();
+			}
+            else if (!(/*m_pFileTransfer->m_fFileTransferRunning || m_pTextChat->m_fTextChatRunning ||*/ m_bClosedByUser))
+            {
+                WarningException w(sz_L69);
+                w.Report();
+            }
+			m_bKillThread = true;
+			PostMessage(m_hwnd, WM_CLOSE, reconnectcounter, 1);
+	}
+		Sleep(0);
+		Sleep(2000);
 	}
 		// sf@2002
 	m_pFileTransfer->m_fFileTransferRunning = false;
@@ -3024,7 +3341,7 @@ void* ClientConnection::run_undetached(void* arg) {
 inline void
 ClientConnection::SendFramebufferUpdateRequest(int x, int y, int w, int h, bool incremental)
 {
-	if (m_pFileTransfer->m_fFileTransferRunning && ( m_pFileTransfer->m_fVisible || m_pFileTransfer->m_fOldFTProtocole)) return;
+	if (m_pFileTransfer->m_fFileTransferRunning && ( m_pFileTransfer->m_fVisible || m_pFileTransfer->UsingOldProtocol())) return;
 	if (m_pTextChat->m_fTextChatRunning && m_pTextChat->m_fVisible) return;
 
 //	omni_mutex_lock l(m_UpdateMutex);
@@ -3098,15 +3415,6 @@ void ClientConnection::SendAppropriateFramebufferUpdateRequest()
 		Createdib();
 		SetFormatAndEncodings();
 		m_pendingFormatChange = false;
-		/*if (!PF_EQ(m_myFormat, oldFormat) || m_pendingCacheInit || m_pendingScaleChange || m_opts.m_requestShapeUpdates!=m_requestShapeUpdates_old)
-		{
-			m_requestShapeUpdates_old=m_opts.m_requestShapeUpdates;
-			SendFullFramebufferUpdateRequest();	
-		}
-		else
-		{
-			SendIncrementalFramebufferUpdateRequest();
-		}*/
 		
 		SendFullFramebufferUpdateRequest();
 
@@ -3270,7 +3578,7 @@ inline void ClientConnection::ReadScreenUpdate()
 			// ZRLE special case
 			if (!fis->GetReadFromMemoryBuffer())
 			{
-				if (surh.encoding == rfbEncodingZRLE)
+				if ((surh.encoding == rfbEncodingZYWRLE)||(surh.encoding == rfbEncodingZRLE))
 				{
 					// Get the size of the rectangle data buffer
 					ReadExact((char*)&(m_nZRLEReadSize), sizeof(CARD32));
@@ -3388,9 +3696,11 @@ inline void ClientConnection::ReadScreenUpdate()
 			ReadSolidRect(&surh);
 			break;
 		case rfbEncodingZRLE:
+			zywrle = 0;
+		case rfbEncodingZYWRLE:
 			SaveArea(cacherect);
 			zrleDecode(surh.r.x, surh.r.y, surh.r.w, surh.r.h);
-			EncodingStatusWindow=rfbEncodingZRLE;
+			EncodingStatusWindow=zywrle ? rfbEncodingZYWRLE : rfbEncodingZRLE;
 			break;
 		case rfbEncodingTight:
 			SaveArea(cacherect);
@@ -3772,7 +4082,6 @@ void ClientConnection::WriteExact(char *buf, int bytes)
 	m_BytesSend += bytes;
 
 	int i = 0;
-    int j;
 
 	// sf@2002 - DSM Plugin
 	char *pBuffer = buf;
@@ -4219,6 +4528,9 @@ void ClientConnection::UpdateStatusFields()
   			case rfbEncodingZRLE:		
 				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "ZRLE, Cache" :"ZRLE");
   				break;
+			case rfbEncodingZYWRLE:		
+				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "ZYWRLE, Cache" :"ZYWRLE");
+  				break;
 			case rfbEncodingTight:
 				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "Tight, Cache" : "Tight");
 				break; 
@@ -4252,12 +4564,7 @@ LRESULT CALLBACK ClientConnection::GTGBS_ShowStatusWindow(LPVOID lpParameter)
 //
 LRESULT CALLBACK ClientConnection::GTGBS_StatusProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 {
-		ClientConnection* _this = (ClientConnection *)
-#if defined (_MSC_VER) && _MSC_VER <= 1200		
-		GetWindowLong(hwnd, GWL_USERDATA);
-#else
-		GetWindowLongPtr(hwnd, GWLP_USERDATA);
-#endif
+		ClientConnection* _this = helper::SafeGetWindowUserData<ClientConnection>(hwnd);
 	switch (iMsg)
 	{
 	case WM_INITDIALOG:
@@ -4273,13 +4580,8 @@ LRESULT CALLBACK ClientConnection::GTGBS_StatusProc(HWND hwnd, UINT iMsg, WPARAM
 				Rect.bottom - Rect.top,
 				SWP_SHOWWINDOW);
 			
-			char wt[MAX_PATH];
 			ClientConnection *_this = (ClientConnection *)lParam;
-#if defined (_MSC_VER) && _MSC_VER <= 1200
-			SetWindowLong(hwnd, GWL_USERDATA, (LONG) _this);
-#else
-			SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)  _this);
-#endif
+			helper::SafeSetWindowUserData(hwnd, lParam);
 			SetDlgItemInt(hwnd,IDC_RECEIVED,_this->m_BytesRead,false);
 			SetDlgItemInt(hwnd,IDC_SEND,_this->m_BytesSend,false);
 			
@@ -4354,6 +4656,7 @@ LRESULT CALLBACK ClientConnection::GTGBS_StatusProc(HWND hwnd, UINT iMsg, WPARAM
 				EndDialog(hwnd, TRUE);
 			}
 			if (LOWORD(wParam) == IDQUIT) {
+				forcedexit=true;
 				_this->Pressed_Cancel=true;
 				closesocket(_this->m_sock);
 				EndDialog(hwnd, TRUE);
@@ -4522,6 +4825,31 @@ ClientConnection:: Check_Rectangle_borders(int x,int y,int w,int h)
 	if (x+w<x) return false;
 	if (y+h<y) return false;
 	return true;
+}
+
+void ClientConnection::SendKeepAlive(bool bForce)
+{
+    if (m_server_wants_keepalives) 
+    {
+        static time_t lastSent = 0;
+        time_t now = time(&now);
+        int delta = now - lastSent;
+
+        if (!bForce && delta < KEEPALIVE_INTERVAL)
+            return;
+
+        lastSent = now;
+#if defined(_DEBUG)
+        char msg[255];
+        sprintf(msg, "keepalive requested %u seconds since last one\n", delta);
+        OutputDebugString(msg);
+
+#endif
+        rfbKeepAliveMsg kp;
+        memset(&kp, 0, sizeof kp);
+        kp.type = rfbKeepAlive;
+        WriteExact((char*)&kp, sz_rfbKeepAliveMsg, rfbKeepAlive);
+    }
 }
 
 void

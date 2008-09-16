@@ -38,6 +38,7 @@
 #include "VNCOptions.h"
 #include "VNCviewerApp.h"
 #include "KeyMap.h"
+#include "KeyMapJap.h"
 #include <rdr/types.h>
 #include "zlib/zlib.h"
 extern "C"
@@ -132,14 +133,17 @@ public:
 	void GTGBS_CreateDisplay(void);
 	void GTGBS_ScrollToolbar(int dx, int dy);
 	void CreateButtons(BOOL mini,BOOL ultra);
+	ClientConnection();
 	ClientConnection(VNCviewerApp *pApp);
 	ClientConnection(VNCviewerApp *pApp, SOCKET sock);
 	ClientConnection(VNCviewerApp *pApp, LPTSTR host, int port);
 	ClientConnection(VNCviewerApp *pApp, LPTSTR configFile);
 	virtual ~ClientConnection();
+	void CloseWindows();
 	void Run();
 	void Global_options();
 	void KillThread();
+	void SuspendThread();
 
 	// Exceptions 
 	class UserCancelExc {};
@@ -148,10 +152,16 @@ public:
 	class ProtocolExc {};
 	class Fatal {};
 	HANDLE KillEvent;
+	bool SetSendTimeout(int msecs = -1);
+    bool SetRecvTimeout(int msecs = -1);
+
+
 	bool bMaximized;
 	int old_autoscale;
 
 	bool IsDormant(){ return m_dormant;};
+	void SendKeyEvent(CARD32 key, bool down);
+	void SendKeepAlive(bool bForce = false); // 16 july 2008 jdp
 
 private:
 	static LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam);
@@ -183,7 +193,7 @@ private:
 	static LRESULT CALLBACK GTGBS_ShowStatusWindow(LPVOID lpParameter);
 	static LRESULT CALLBACK GTGBS_StatusProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam);
 	static LRESULT CALLBACK GTGBS_SendCustomKey_proc(HWND Dlg, UINT iMsg, WPARAM wParam, LPARAM lParam);
-	void LoadDSMPlugin(); // sf@2002 - DSM Plugin
+	void LoadDSMPlugin(bool  fForceReload); // sf@2002 - DSM Plugin
 	void SetDSMPluginStuff();
 	void GetConnectDetails();
 	void GetConnectDetails_global();
@@ -191,6 +201,7 @@ private:
 	void ConnectProxy();
 	void SetSocketOptions();
 	void Authenticate();
+	void AuthMsLogon();
 	void NegotiateProtocolVersion();
 	void NegotiateProxy();
 	void ReadServerInit();
@@ -215,7 +226,6 @@ private:
 	void ProcessMouseWheel(int delta); // RealVNC 335 method
 	void SendPointerEvent(int x, int y, int buttonMask);
     void ProcessKeyEvent(int virtkey, DWORD keyData);
-	void SendKeyEvent(CARD32 key, bool down);
 	
 	void ReadScreenUpdate();
 	void Update(RECT *pRect);
@@ -480,7 +490,8 @@ private:
 #endif
  
 	// Keyboard mapper
-	KeyMap m_keymap;
+    KeyMap *m_keymap;
+	KeyMapJap *m_keymapJap;
 
 	// RFB settings
 	VNCOptions m_opts;
@@ -489,6 +500,8 @@ private:
 	TextChat *m_pTextChat;			// Modif sf@2002 - Text Chat
 	int m_nServerScale; 	       // Modif sf@2002 - Server Scaling
 
+	int m_reconnectcounter;
+	bool m_bClosedByUser;
 	// Modif sf@2002 - Data Stream Modification Plugin handling
 	int m_nTO;
 	CDSMPlugin *m_pDSMPlugin;
@@ -513,6 +526,8 @@ private:
 	TCHAR *m_desktopName;
 	unsigned char m_encPasswd[8];
 	unsigned char m_encPasswdMs[32];
+	char m_ms_user[256];  // act: add user storage for mslogon autoreconnect
+	char m_cmdlnUser[256]; // act: add user option on command line
 	char m_clearPasswd[256]; // Modif sf@2002
 
 	rfbServerInitMsg m_si;
@@ -598,16 +613,21 @@ private:
 	rdr::FdInStream* fis;
 	rdr::ZlibInStream* zis;
 	void zrleDecode(int x, int y, int w, int h);
-	void zrleDecode8(int x, int y, int w, int h, rdr::InStream* is,
+	void zrleDecode8NE(int x, int y, int w, int h, rdr::InStream* is,
 		rdr::ZlibInStream* zis, rdr::U8* buf);
-	void zrleDecode16(int x, int y, int w, int h, rdr::InStream* is,
+	void zrleDecode15LE(int x, int y, int w, int h, rdr::InStream* is,
 		rdr::ZlibInStream* zis, rdr::U16* buf);
-	void zrleDecode24A(int x, int y, int w, int h, rdr::InStream* is,
+	void zrleDecode16LE(int x, int y, int w, int h, rdr::InStream* is,
+		rdr::ZlibInStream* zis, rdr::U16* buf);
+	void zrleDecode24ALE(int x, int y, int w, int h, rdr::InStream* is,
 		rdr::ZlibInStream* zis, rdr::U32* buf);
-	void zrleDecode24B(int x, int y, int w, int h, rdr::InStream* is,
+	void zrleDecode24BLE(int x, int y, int w, int h, rdr::InStream* is,
 		rdr::ZlibInStream* zis, rdr::U32* buf);
-	void zrleDecode32(int x, int y, int w, int h, rdr::InStream* is,
+	void zrleDecode32LE(int x, int y, int w, int h, rdr::InStream* is,
 		rdr::ZlibInStream* zis, rdr::U32* buf);
+	long zywrle;
+	long zywrle_level;
+	int zywrleBuf[rfbZRLETileWidth*rfbZRLETileHeight];
 	//UltraFast
 	void ConvertAll(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth);
 	void ConvertSolid(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth);
@@ -623,6 +643,15 @@ private:
 	DWORD newtick;
 	DWORD oldtick;
 	bool Pressed_Cancel;
+
+	// sf@2007 - AutoReconnect
+	int m_autoReconnect;
+	void Reconnect();
+	void DoConnection();
+	int reconnectcounter;
+	HANDLE ThreadSocketTimeout;
+
+    bool m_server_wants_keepalives;
 
 int sleep;
 bool m_Inputlock;
