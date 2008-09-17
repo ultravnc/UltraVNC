@@ -76,6 +76,7 @@ ClientConnection::Check_m_bitsCacheSwapBuffer(int bufsize)
 
 	if (m_bitsCacheSwapBuffer != NULL)
 		delete [] m_bitsCacheSwapBuffer;
+
 	m_bitsCacheSwapBuffer = newbuf;
 	m_bitsCacheSwapBufferSize=bufsize + 256;
 

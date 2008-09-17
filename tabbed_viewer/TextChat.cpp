@@ -117,7 +117,7 @@ TextChat::~TextChat()
 // Set text format to a selection in the Chat area
 //
 void TextChat::SetTextFormat(bool bBold /*= false */, bool bItalic /*= false*/
-	, long nSize /*= 0x75*/, const char* szFaceName /*= "MS Sans Serif"*/, DWORD dwColor /*= BLACK*/)
+	, long nSize /*= 0x75*/, const char* szFaceName /*= "MS Shell Dlg"*/, DWORD dwColor /*= BLACK*/)
 {
 	if ( GetDlgItem( m_hDlg, IDC_CHATAREA_EDIT ) )  //  Sanity Check
 	{		
@@ -242,7 +242,7 @@ void TextChat::PrintMessage(const char* szMessage,const char* szSender,DWORD dwC
 		cr.cpMax = strlen(m_szTextBoxBuffer);	 // Select the last caracter to make the text insertion
 		cr.cpMin  = cr.cpMax;
 		SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT,EM_EXSETSEL,0,(LONG) &cr);
-		SetTextFormat(false, false, 0x75, "MS Sans Serif", GREY);
+		SetTextFormat(false, false, 0x75, "MS Shell Dlg", GREY);
 		_snprintf(m_szTextBoxBuffer, TEXTMAXSIZE-1, "[%s]", tbuffer);		
 		SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT,EM_REPLACESEL,FALSE,(LONG)m_szTextBoxBuffer); // Replace the selection with the message
 		*/
@@ -255,9 +255,9 @@ void TextChat::PrintMessage(const char* szMessage,const char* szSender,DWORD dwC
 		/***/
 
 		// [v1.0.2-jp1 fix-->]
-		//SetTextFormat(false, false, 0x75, "MS Sans Serif", dwColor);
+		//SetTextFormat(false, false, 0x75, "MS Shell Dlg", dwColor);
 		if(!m_hInstResDLL){
-			SetTextFormat(false, false, 0x75, "MS Sans Serif", dwColor);
+			SetTextFormat(false, false, 0x75, "MS Shell Dlg", dwColor);
 		}
 		else{
 			SetTextFormat(false, false, 0xb4, "‚l‚r ‚oƒSƒVƒbƒN", dwColor);
@@ -277,9 +277,9 @@ void TextChat::PrintMessage(const char* szMessage,const char* szSender,DWORD dwC
 		SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT,EM_EXSETSEL,0,(LONG) &cr);
 		/***/
 		// [v1.0.2-jp1 fix-->]
-		//SetTextFormat(false, false, 0x75, "MS Sans Serif", dwColor != GREY ? BLACK : GREY);	
+		//SetTextFormat(false, false, 0x75, "MS Shell Dlg", dwColor != GREY ? BLACK : GREY);	
 		if(!m_hInstResDLL){
-			SetTextFormat(false, false, 0x75, "MS Sans Serif", dwColor != GREY ? BLACK : GREY);	
+			SetTextFormat(false, false, 0x75, "MS Shell Dlg", dwColor != GREY ? BLACK : GREY);	
 		}
 		else{
 			SetTextFormat(false, false, 0xb4, "‚l‚r ‚oƒSƒVƒbƒN", dwColor != GREY ? BLACK : GREY);	

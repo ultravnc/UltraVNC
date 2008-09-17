@@ -524,6 +524,7 @@ private:
 	omni_mutex	m_ZlibBufferMutex;
 	
 	TCHAR *m_desktopName;
+	TCHAR *m_desktopName_viewonly;
 	unsigned char m_encPasswd[8];
 	unsigned char m_encPasswdMs[32];
 	char m_ms_user[256];  // act: add user storage for mslogon autoreconnect

@@ -81,6 +81,7 @@ const UINT FileTransferSendPacketMessage = RegisterWindowMessage("UltraVNC.Viewe
 extern bool g_passwordfailed;
 bool havetobekilled;
 bool forcedexit=false;
+BOOL ResizeAllWindows( void );
 /*
  * Macro to compare pixel formats.
  */
@@ -300,6 +301,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	saved_set=false;
 	m_hwnd = 0;
 	m_desktopName = NULL;
+	m_desktopName_viewonly = NULL;
 	m_port = -1;
 	m_proxyport = -1;
 //	m_proxy = 0;
@@ -564,20 +566,6 @@ void ClientConnection::DoConnection()
 	Authenticate();
 
 	CheckQueueBufferSize(32000);
-
-	SendClientInit();
-	
-	ReadServerInit();
-	
-	CreateLocalFramebuffer();
-
-	SetupPixelFormat();
-
-	Createdib();
-
-    SetFormatAndEncodings();
-
-	reconnectcounter=m_reconnectcounter;
 }
 
 void ClientConnection::Reconnect()
@@ -586,6 +574,14 @@ void ClientConnection::Reconnect()
 	try
 	{
 		DoConnection();
+		SendClientInit();
+		ReadServerInit();
+		CreateLocalFramebuffer();
+		SetupPixelFormat();
+		Createdib();
+		SetFormatAndEncodings();
+		reconnectcounter=m_reconnectcounter;
+
 		m_bKillThread = false;
 		m_running = true;
 
@@ -1741,6 +1737,7 @@ void ClientConnection::ReadServerInit()
     m_si.nameLength = Swap32IfLE(m_si.nameLength);
 	
     m_desktopName = new TCHAR[m_si.nameLength + 4 + 256];
+	m_desktopName_viewonly = new TCHAR[m_si.nameLength + 4 + 256+16];
 
 #ifdef UNDER_CE
     char *deskNameBuf = new char[m_si.nameLength + 4];
@@ -1758,9 +1755,14 @@ void ClientConnection::ReadServerInit()
 	
 	// sprintf(tcDummy,"%s ",m_desktopName);
 	strcat(m_desktopName, " ");
-	SetWindowText(m_hwnd, m_desktopName);
+	strcpy(m_desktopName_viewonly,m_desktopName);
+	strcat(m_desktopName_viewonly,"viewonly");
+	if (m_opts.m_ViewOnly) SetWindowText(m_hwnd, m_desktopName_viewonly);
+	else SetWindowText(m_hwnd, m_desktopName);
+
 	TCHAR temptitle[25];
-	strncpy(temptitle,m_desktopName,24);
+	if (m_opts.m_ViewOnly) strncpy(temptitle,m_desktopName,24);
+	else strncpy(temptitle,m_desktopName_viewonly,24);
 	temptitle[24]=0;
 	TCITEM tie;
 	tie.mask = TCIF_TEXT; 
@@ -1782,7 +1784,11 @@ void ClientConnection::ReadServerInit()
 					);
 			strcat(m_desktopName, szMess);
 	}
-	SetWindowText(m_hwnd, m_desktopName);
+	strcpy(m_desktopName_viewonly,m_desktopName);
+	strcat(m_desktopName_viewonly,"viewonly");
+
+	if (m_opts.m_ViewOnly) SetWindowText(m_hwnd, m_desktopName);
+	else SetWindowText(m_hwnd, m_desktopName);
 	tie.mask = TCIF_TEXT; 
     tie.iImage = -1; 
     tie.pszText = temptitle; 
@@ -1882,7 +1888,7 @@ void ClientConnection::SizeWindow()
 		m_winheight = min(m_winheight, (clrect.bottom-clrect.top));
 		vnclog.Print(0, _T("%i %i %i %i \n"),fullwinrect.right - fullwinrect.left,fullwinrect.bottom - fullwinrect.top,m_winwidth,m_winheight);
 
-		if (m_winwidth>=m_fullwinwidth-50)
+		if (m_winwidth>=m_fullwinwidth-35)
 		{
 			ShowScrollBar(m_hwnd,SB_HORZ,FALSE);
 		}
@@ -1891,7 +1897,7 @@ void ClientConnection::SizeWindow()
 			ShowScrollBar(m_hwnd,SB_HORZ,TRUE);
 		}
 
-		if (m_winheight>=m_fullwinheight-50)
+		if (m_winheight>=m_fullwinheight-35)
 		{
 			ShowScrollBar(m_hwnd,SB_VERT,FALSE);
 		}
@@ -2070,7 +2076,9 @@ void ClientConnection::CreateLocalFramebuffer()
 	{
 
 		if (m_bitsCache != NULL) delete [] m_bitsCache;
+		m_bitsCache=NULL;
 		if (m_bitsCacheSwapBuffer != NULL) delete [] m_bitsCacheSwapBuffer;
+		m_bitsCacheSwapBuffer=NULL;
 		if (m_si.format.bitsPerPixel==8)
 		m_bitsCache = new BYTE[m_si.framebufferWidth*m_si.framebufferHeight*16/8];
 		else
@@ -2485,6 +2493,7 @@ ClientConnection::~ClientConnection()
 	}
 
 	if (m_desktopName != NULL) delete [] m_desktopName;
+	if (m_desktopName_viewonly != NULL) delete [] m_desktopName_viewonly;
 	if (m_netbuf != NULL) delete [] m_netbuf;
 	if (m_queuebuff != NULL) delete [] m_queuebuff;
 
@@ -3119,7 +3128,7 @@ void ClientConnection::ShowConnInfo()
 
 void* ClientConnection::run_undetached(void* arg) {
 
-/*	SendClientInit();
+	SendClientInit();
 	
 	ReadServerInit();
 	
@@ -3131,7 +3140,7 @@ void* ClientConnection::run_undetached(void* arg) {
 
     SetFormatAndEncodings();
 
-	reconnectcounter=m_reconnectcounter;*/
+	reconnectcounter=m_reconnectcounter;
 
 	if(bMaximized == TRUE)
     {
@@ -3165,6 +3174,7 @@ void* ClientConnection::run_undetached(void* arg) {
 
 	m_running = true;
 	UpdateWindow(m_hwnd);
+	
 
 		// sf@2002 - Attempt to speed up the thing
 		// omni_thread::set_priority(omni_thread::PRIORITY_LOW);

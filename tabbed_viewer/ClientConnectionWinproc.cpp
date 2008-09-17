@@ -37,6 +37,9 @@ extern TCHAR g_FileName[MAX_PATH];;
 //extern HWND m_Status;
 extern bool g_autoscale;
 
+extern int g_cyToolBar;	 // the height of toolbar
+extern int g_cyStatusBar; // the height of status bar
+
 //
 //
 //
@@ -104,7 +107,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
                             // 8 April 2008 jdp hide window while shutting down
                             ::ShowWindow(hwnd, SW_HIDE);
 							// Close the worker thread
-							_this->KillThread();
+							//_this->KillThread();
 
 							SendMessage(GetParent(hwnd),WM_MDIDESTROY,(WPARAM)hwnd,0L);
 						}
@@ -116,7 +119,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 							strcpy(wtext,"Ultr@VNC Viewer - Connection dropped, trying to reconnect (");
 							strcat(wtext,temp);
 							strcat(wtext,")");
-							SetWindowText(_this->m_hwnd, wtext);
+							SetWindowText(hwnd, wtext);
 							_this->m_opts.m_NoStatus = true;
 							_this->SuspendThread();
 							_this->Reconnect();
@@ -540,7 +543,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 								}
 								SetWindowPos(m_hwndMain,NULL,0,0,
 									_this->m_si.framebufferWidth * _this->m_opts.m_scale_num / _this->m_opts.m_scale_den+dx+dxv,
-									rectm.bottom-rectm.top,
+									rectm.bottom-rectm.top+g_cyStatusBar+g_cyToolBar,
 									SWP_NOZORDER | SWP_NOMOVE); 
 							}
 							if ((rect.bottom - rect.top)>(_this->m_si.framebufferHeight * _this->m_opts.m_scale_num / _this->m_opts.m_scale_den))
@@ -562,8 +565,14 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 									_this->m_si.framebufferHeight * _this->m_opts.m_scale_num / _this->m_opts.m_scale_den+dy+dyh,
 									SWP_NOZORDER | SWP_NOMOVE); 
 							}
-
-
+							if (wParam==SIZE_RESTORED) {
+								RECT rectc;
+								GetClientRect(GetParent(hwnd),&rectc);
+								SetWindowPos(hwnd,NULL,0,0,
+									rectc.right-rectc.left,
+									rectc.bottom-rectc.top,
+									SWP_NOZORDER | SWP_NOMOVE); 
+							}
 						}
 						
 						RECT rect;
@@ -607,6 +616,8 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 						_this->m_hScrollPos = newhpos;
 						_this->m_vScrollPos = newvpos;
 						_this->UpdateScrollbars();
+
+
 						}
 
 						break;
@@ -799,6 +810,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 								style &= ~(WS_DLGFRAME | WS_THICKFRAME |WS_SYSMENU|WS_BORDER  );
 								SetWindowLong(hwnd, GWL_STYLE, style);
 							}
+							//else SendMessage(m_hwndMain,WM_SIZE,(WPARAM)ID_DINPUT,(LPARAM)0);
 							break;
 						case SC_MINIMIZE:
 							
@@ -810,6 +822,12 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 						case SC_RESTORE:
 							_this->SetDormant(false);
 							if (_this->m_hwndStatus)ShowWindow(_this->m_hwndStatus,SW_NORMAL);
+							//SendMessage(hwnd,WM_SIZE,(WPARAM)ID_DINPUT,(LPARAM)0);
+							{
+								RECT rect;
+								GetClientRect(m_hwndMain,&rect);
+								SetWindowPos(hwnd,NULL,0,0,rect.right-rect.left,rect.bottom-rect.top,SWP_FRAMECHANGED | SWP_NOZORDER |SWP_NOMOVE); 
+							}
 							break;
 
 						case ID_SW:
@@ -969,6 +987,11 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 						case ID_VIEWONLYTOGGLE: 
 							// Toggle view only mode
 							_this->m_opts.m_ViewOnly = !_this->m_opts.m_ViewOnly;
+							CheckMenuItem(GetSystemMenu(hwnd, FALSE),
+							          ID_VIEWONLYTOGGLE,
+									  MF_BYCOMMAND | (_this->m_opts.m_ViewOnly ? MF_CHECKED :MF_UNCHECKED));
+						if (_this->m_opts.m_ViewOnly) SetWindowText(hwnd, _this->m_desktopName_viewonly);
+						else SetWindowText(hwnd, _this->m_desktopName);
 							// Todo update menu state
 							return 0;
 							
