@@ -395,7 +395,6 @@ protected:
 	int m_SWOffsety;
 
 	//DDIHOOK
-	PCOPYDATASTRUCT pMyCDS;
 
 	// Modif rdv@2002 - v1.1.x - videodriver
 	VIDEODRIVER *m_videodriver;

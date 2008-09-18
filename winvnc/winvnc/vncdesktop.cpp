@@ -1804,14 +1804,15 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		return DefWindowProc(hwnd, iMsg, wParam, lParam);
 
 	case WM_COPYDATA:
-			_this->pMyCDS= (PCOPYDATASTRUCT) lParam;
-			if (_this->pMyCDS->dwData==112233)
+        {
+			PCOPYDATASTRUCT pMyCDS = (PCOPYDATASTRUCT) lParam;
+			if (pMyCDS->dwData==112233)
 			{
-					DWORD mysize=_this->pMyCDS->cbData;
+					DWORD mysize=pMyCDS->cbData;
 					char mytext[1024];
 					char *myptr;
 					char split[4][6];
-					strcpy(mytext,(LPCSTR)_this->pMyCDS->lpData);
+					strcpy(mytext,(LPCSTR)pMyCDS->lpData);
 					myptr=mytext;
 					for (int j =0; j<(mysize/20);j++)
 					{
@@ -1826,6 +1827,7 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 					
 			}
 			//vnclog.Print(LL_INTINFO, VNCLOG("copydata\n"));	
+        }
 			return 0;
 
 	// GENERAL
