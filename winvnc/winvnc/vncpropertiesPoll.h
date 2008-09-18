@@ -40,7 +40,6 @@ class vncPropertiesPoll;
 #include "vncServer.h"
 #include "inifile.h"
 #include <Userenv.h>
-#define INIFILE_NAME "ultravnc.ini"
 // The vncPropertiesPoll class itself
 class vncPropertiesPoll
 {

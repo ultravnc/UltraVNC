@@ -2,7 +2,6 @@
 #include "inifile.h"
 void Set_settings_as_admin(char *mycommand);
 
-#define INIFILE_NAME "ultravnc.ini"
 
 IniFile::IniFile()
 {

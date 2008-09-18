@@ -4,6 +4,7 @@
 
 void Copy_to_Temp(char *tempfile);
 void Copy_to_Secure_from_temp(char *tempfile);
+#define INIFILE_NAME "ultravnc.ini"
 
 class IniFile
 {

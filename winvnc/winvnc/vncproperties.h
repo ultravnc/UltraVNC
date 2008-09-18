@@ -44,7 +44,6 @@ class vncProperties;
 #include "vncSetAuth.h"
 #include "inifile.h"
 #include <Userenv.h>
-#define INIFILE_NAME "ultravnc.ini"
 // The vncProperties class itself
 class vncProperties
 {
