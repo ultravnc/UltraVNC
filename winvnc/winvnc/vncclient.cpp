@@ -3235,6 +3235,7 @@ vncClient::~vncClient()
 	// Modif sf@2002 - Text Chat
 	if (m_pTextChat) 
 	{
+        m_pTextChat->KillDialog();
 		delete(m_pTextChat);
 		m_pTextChat = NULL;
 	}
