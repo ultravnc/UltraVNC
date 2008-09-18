@@ -3264,8 +3264,8 @@ inline void ClientConnection::ProcessMouseWheel(int delta)
 inline void
 ClientConnection::SendPointerEvent(int x, int y, int buttonMask)
 {
-	if (m_pFileTransfer->m_fFileTransferRunning || m_pFileTransfer->UsingOldProtocol()) return;
-	if (m_pTextChat->m_fTextChatRunning) return;
+	if (m_pFileTransfer->m_fFileTransferRunning && m_pFileTransfer->UsingOldProtocol()) return;
+//	if (m_pTextChat->m_fTextChatRunning) return;
 
 	//omni_mutex_lock l(m_UpdateMutex);
 
@@ -3418,8 +3418,8 @@ inline void ClientConnection::ProcessKeyEvent(int virtKey, DWORD keyData)
 inline void
 ClientConnection::SendKeyEvent(CARD32 key, bool down)
 {
-	if (m_pFileTransfer->m_fFileTransferRunning || m_pFileTransfer->UsingOldProtocol()) return;
-	if (m_pTextChat->m_fTextChatRunning) return;
+	if (m_pFileTransfer->m_fFileTransferRunning && m_pFileTransfer->UsingOldProtocol()) return;
+//	if (m_pTextChat->m_fTextChatRunning) return;
 
     rfbKeyEventMsg ke;
 
@@ -3438,8 +3438,8 @@ ClientConnection::SendKeyEvent(CARD32 key, bool down)
 
 void ClientConnection::SendClientCutText(char *str, int len)
 {
-	if (m_pFileTransfer->m_fFileTransferRunning || m_pFileTransfer->UsingOldProtocol()) return;
-	if (m_pTextChat->m_fTextChatRunning) return;
+	if (m_pFileTransfer->m_fFileTransferRunning && m_pFileTransfer->UsingOldProtocol()) return;
+//	if (m_pTextChat->m_fTextChatRunning) return;
 
 	rfbClientCutTextMsg cct;
 
@@ -3824,8 +3824,8 @@ void* ClientConnection::run_undetached(void* arg) {
 inline void
 ClientConnection::SendFramebufferUpdateRequest(int x, int y, int w, int h, bool incremental)
 {
-	if (m_pFileTransfer->m_fFileTransferRunning || m_pFileTransfer->UsingOldProtocol()) return;
-	if (m_pTextChat->m_fTextChatRunning) return;
+	if (m_pFileTransfer->m_fFileTransferRunning && m_pFileTransfer->UsingOldProtocol()) return;
+//	if (m_pTextChat->m_fTextChatRunning) return;
 
 	//omni_mutex_lock l(m_UpdateMutex);
 
