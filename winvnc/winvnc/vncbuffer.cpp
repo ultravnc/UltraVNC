@@ -666,6 +666,13 @@ void vncBuffer::ScaleRect(rfb::Rect &rect)
 
     //JK 26th Jan, 2005: Color conversion to 8 shades of gray added,
 	//at the moment only works if server has 24/32-bit color
+
+    // this construct is faster than the old method -- it has no jumps, so there's no chance of
+    // branch mispredictions, and it generates better asm code .
+    fCanReduceColors = ((m_scrinfo.format.redMax ^ m_scrinfo.format.blueMax ^ 
+                        m_scrinfo.format.greenMax ^ 0xff == 0)  && m_fGreyPalette);
+
+#if 0
 	if ((m_scrinfo.format.redMax == 255) 
 		&& 
 		(m_scrinfo.format.blueMax == 255)
@@ -677,6 +684,7 @@ void vncBuffer::ScaleRect(rfb::Rect &rect)
 		fCanReduceColors = true;
 	else
 		fCanReduceColors = false;
+#endif
 	//End JK
 
 	// called from grabrect and grabmouse
