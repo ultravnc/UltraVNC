@@ -296,6 +296,7 @@ char sz_M8[64];
 
 bool command_line=true;
 bool g_passwordfailed=true;
+bool g_ConnectionLossAlreadyReported = false;
 
 
 // Accelerator Keys
@@ -632,6 +633,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 			}
 			catch (Exception &e)
 			{
+                if (!g_ConnectionLossAlreadyReported)
 				e.Report();
 			}
 		}

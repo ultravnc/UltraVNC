@@ -858,7 +858,7 @@ vncClientThread::InitAuthenticate()
 		// Check that the local & remote names are different!
 		if ((localname != NULL) && (remotename != NULL))
 		{
-			BOOL ok = stricmp(localname, remotename) != 0;
+			BOOL ok = _stricmp(localname, remotename) != 0;
 
 			if (localname != NULL)
 				free(localname);
@@ -893,7 +893,7 @@ vncClientThread::InitAuthenticate()
 		// Check that the local & remote names are different!
 		if ((localname != NULL) && (remotename != NULL))
 		{
-			BOOL ok = stricmp(localname, remotename) != 0;
+			BOOL ok = _stricmp(localname, remotename) != 0;
 
 			if (localname != NULL)
 				free(localname);
@@ -1356,7 +1356,7 @@ vncClientThread::run(void *arg)
 	// Get the name of this desktop
 	// sf@2002 - v1.1.x - Complete the computer name with the IP address if necessary
 	bool fIP = false;
-	char desktopname[MAX_COMPUTERNAME_LENGTH + 1 + 256];
+    char desktopname[MAX_COMPUTERNAME_LENGTH + 1 + 256] = {0};
 	DWORD desktopnamelen = MAX_COMPUTERNAME_LENGTH + 1 + 256;
 	memset((char*)desktopname, 0, sizeof(desktopname));
 	if (GetComputerName(desktopname, &desktopnamelen))

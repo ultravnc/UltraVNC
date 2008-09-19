@@ -91,6 +91,7 @@ TextChat::TextChat(vncClient *pCC)
 					sz_ID_RICHED32_DLL_LD, MB_OK | MB_ICONEXCLAMATION );
 		// Todo: do normal edit instead (no colors)
 	}
+    m_Thread = INVALID_HANDLE_VALUE;
 }
 
 
@@ -397,7 +398,7 @@ LRESULT CALLBACK TextChat::DoDialogThread(LPVOID lpParameter)
 HWND TextChat::DisplayTextChat()
 {
 	DWORD threadID;
-	HANDLE m_Thread = CreateThread(NULL,0,(LPTHREAD_START_ROUTINE)(TextChat::DoDialogThread),(LPVOID)this, 0, &threadID);
+	m_Thread = CreateThread(NULL,0,(LPTHREAD_START_ROUTINE)(TextChat::DoDialogThread),(LPVOID)this, 0, &threadID);
 	ResumeThread(m_Thread);
 	return (HWND)0;
 
@@ -410,7 +411,12 @@ void TextChat::KillDialog()
 {
 	// DestroyWindow(m_hDlg);
 	m_fTextChatRunning = false;
-	PostMessage(m_hDlg, WM_COMMAND, IDCANCEL, 0);
+    if (m_Thread != INVALID_HANDLE_VALUE)
+    {
+	    SendMessage(m_hDlg, WM_COMMAND, IDCANCEL, 0);
+        ::WaitForSingleObject(m_Thread, INFINITE); // wait for thread to exit
+        m_hDlg=NULL;
+    }
 }
 
 

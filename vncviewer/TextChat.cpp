@@ -29,6 +29,7 @@
 #include "commctrl.h"
 #include "richedit.h"
 #include "common/win32_helpers.h"
+#include <rdr/Exception.h>
 
 #define TEXTMAXSIZE 16384
 #define MAXNAMESIZE	128 // MAX_COMPUTERNAME_LENGTH+1 (32)
@@ -344,6 +345,7 @@ int TextChat::DoDialog()
 void TextChat::KillDialog()
 {
 	// DestroyWindow(m_hDlg);
+    PostMessage(m_hDlg, WM_COMMAND, MAKEWPARAM(IDCANCEL,0), 0);
 }
 
 //

@@ -84,6 +84,7 @@ extern bool g_passwordfailed;
 bool havetobekilled;
 bool forcedexit=false;
 const UINT RebuildToolbarMessage = RegisterWindowMessage("UltraVNC.Viewer.RebuildToolbar");
+extern bool g_ConnectionLossAlreadyReported;
 
 /*
  * Macro to compare pixel formats.
@@ -3799,6 +3800,7 @@ void* ClientConnection::run_undetached(void* arg) {
             {
                 WarningException w(sz_L69);
                 w.Report();
+                g_ConnectionLossAlreadyReported = true;
             }
 			m_bKillThread = true;
 			PostMessage(m_hwndMain, WM_CLOSE, reconnectcounter, 1);

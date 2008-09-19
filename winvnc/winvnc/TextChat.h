@@ -50,6 +50,7 @@ public:
 	HMODULE				m_hRichEdit;
 	bool				m_fPersistentTexts;
 	// char				m_szUserID[16];
+    HANDLE              m_Thread;
 
 	// Methods
 	TextChat(vncClient *pCC);
