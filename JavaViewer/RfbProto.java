@@ -1297,9 +1297,9 @@ class RfbProto {
 			|| dwFileAttributes == 369623040
 			|| dwFileAttributes == 805306368) // Fix: troessner
 		*/
-+		// Added Jef Fix (jdp) - check for FILE_ATTRIBUTE_DIRECTORY attribute bit
-+		// note that we're looking at a little-endian value in a big-endian world
-+		if ((dwFileAttributes & 0x10000000) == 0x10000000)
+		// Added Jef Fix (jdp) - check for FILE_ATTRIBUTE_DIRECTORY attribute bit
+		// note that we're looking at a little-endian value in a big-endian world
+		if ((dwFileAttributes & 0x10000000) == 0x10000000)
  		{
  			fileName = " [" + fileName + "]";
  			remoteDirsList.add(fileName); // sf@2004

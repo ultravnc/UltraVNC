@@ -83,13 +83,13 @@ public class FTPFrame extends JFrame implements ActionListener, MouseListener {
 	public String selectedTable = null;
 	private ArrayList localDirList;
 	private ArrayList localFileList;
-	private final static boolean DEBUG  = false;
+	//private final static boolean DEBUG  = false;
 
 
         // sf@2007 - The 'natural' string comparator is case sensitive... which sucks
         // for our purpose as the files names beginning with an upper case char are
         // all grouped before files names starting with a lower case char...
-        private class StrComp implements java.util.Comparator
+        public class StrComp implements java.util.Comparator
         {
           public int compare(Object obj1, Object obj2)
           {
@@ -295,7 +295,7 @@ public class FTPFrame extends JFrame implements ActionListener, MouseListener {
 	 * str takes as string like A:fC:lD:lE:lF:lG:cH:c
 	 * in the form Drive Letter:Drive Type where 
 	 * f = floppy, l = local drive, c=CD-ROM, n = network
-	 * 
+	 *
 	 * @return String[]
 	 */
  
@@ -445,7 +445,7 @@ public class FTPFrame extends JFrame implements ActionListener, MouseListener {
 				JOptionPane.showMessageDialog(null, (String)"Directory Deletion is not yet available in this version...", "FileTransfer Info", JOptionPane.INFORMATION_MESSAGE);
 				return;
 			}			
-			// for (int i = 0; i < remoteList.contains(size(); i++) 
+			// for (int i = 0; i < remoteList.contains(size(); i++)
 			// 	remoteFileTable.g(i));
 			// sf@2004 - Delete prompt
 			if (remoteList.contains(sFileName))
@@ -604,7 +604,7 @@ public class FTPFrame extends JFrame implements ActionListener, MouseListener {
 
 		if (name.equals("[..]")) {
 			drive = remoteLocation.getText().substring(0, remoteLocation.getText().length() - 1);
-			// JOptionPane.showMessageDialog(null, (String)drive, "FileTransfer DEBUG", JOptionPane.INFORMATION_MESSAGE);
+			// JOptionPane.showMessageDialog(null, (String)drive, "FileTransfer ", JOptionPane.INFORMATION_MESSAGE);
 			int index = drive.lastIndexOf("\\");
 			drive = drive.substring(0, index + 1);
 
@@ -617,7 +617,7 @@ public class FTPFrame extends JFrame implements ActionListener, MouseListener {
 
 			drive = remoteLocation.getText();
 		}
-		else { 
+		else {
 			name = name.substring(1, name.length() - 1);
 			drive = remoteLocation.getText() + name + "\\";
 			remoteLocation.setText(drive);
@@ -754,7 +754,7 @@ public class FTPFrame extends JFrame implements ActionListener, MouseListener {
 					localLocation.setText(dir.toString()+File.separator);	// Display updated location above file table
 				}
 				localStatus.setText("Total Files / Folders: " + (localList.size()-1));
-				if(DEBUG) System.out.println("leaving changeRemoteDrive() / FTPFrame...");
+				//if(DEBUG) System.out.println("leaving changeRemoteDrive() / FTPFrame...");
 		}
 
 
