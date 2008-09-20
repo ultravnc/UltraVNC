@@ -2,6 +2,230 @@
 *  Ultr@VNC - Latest modifications
 **************************************
 
+** v1.0.5 Release
+(v1.0.4 was never released. We switched directly to v1.0.5)
+
+* Update 23 aug 
+
+- Driver+applications that change resolution (like pinpall in fullscreen) 
+- vnclog : In some cases the standard path wasn't writable, now path can be set 
+
+* Update 13 aug
+
+- FT crash when clipboard is used during transfer fix
+- Admin properties and domain user fix 
+- Inputlock input fix 
+
+* Update 3 aug
+
+- Exceptions thrown with no message cause access violations when Report called.
+- All message boxes are now properly parented to the viewer window so that they
+  are modal.
+- Socket timeouts are now used during file transfer so that connections lost 
+  while connected to a repeater are detected 
+- A small keepalive message is sent every 5 seconds after receiving a file chunk
+  to keep the server or viewer from timing out during a read.
+- The prompt for exit is now respects the m_fExitCheck setting  if the 'x' in the 
+  full screen titlebar is clicked
+- Another big change to the file transfer module is that a temporary file is used 
+  to hold the file being transferred. When it is successfully completes, it is 
+  moved to the original file name -- resume still works too. This was because 
+  when a file transfer is interrupted, a user (ie, service tech) can't tell
+  if the file is complete.
+- The close button on the file transfer dialog is now enabled and disabled during 
+  file transfers. You can't close the window with the 'x' during a transfer, 
+  but you can otherwise
+- Many variables are now properly initialized.
+- The black layered window is now brought to the top every 20ms -- the start menu 
+  is still visible on the remote system so this change makes it go away faster.
+- You can now register the service with a custom name.
+- Simplified Copy_to_temp and copy_to_secure_from_temp
+- When the network connection is lost, a message is shown "Connection lost due to 
+  communication failure" instead of "writeexact: socket error while writing"
+- socket read/write errors now break the while (connected) loop in vncclient.cpp
+- Simplified file handle cleanup
+- FT crash fix, lock screeen while transfer
+- quickoption fix: Was not saved correct
+
+
+* Update 10July
+
+- Repeater: found bug that required server to be connected first. 
+  Now you can connect server or viewer first 
+- Viewer: option are now correct loaded. 
+  The problem was the the presets didn't have "manual set", this cause the presets
+  always to be loaded on top of manual settings. 
+- Server now take as commandline 
+- Autoreconnect -id:??? 
+- Single repeater connection server had a possible error ( reconnect couldn't
+  happen if shutdown by service is requested) 
+
+
+* Update 26 june 2008
+
+- View Only, comment text: Alt+Ctrl+F3 
+- Ctrl+Shift+Esc open Task Manager on winvnc application and service 
+- Ctrl+Alt+F4 send Ctrl+Shift+Esc if winvnc run as application 
+- Dead keys \' ^`"´ and € + winkey shortcuts (Windows Logo Key) 
+- Scroll Lock ON, winkey + shortcuts sent to remote 
+- Scroll Lock OFF, winkey + shortcuts are local (default) 
+- 8bit (switching codec+colors) vncviewer crash, fixed. 
+- Auto scaling remote screen improved to fit to local screen 
+- winvnc with mirror driver 1.22 active only when viewer connected, fixed 
+- ExitCheck (default=false vncviewer config file)(pgmoney) 
+
+
+* Update 16 june 2008 
+- vncviewer, View Only (check box) and title bar 
+- vncviewer, command line encoding, added zrle and zywrle 
+- vncviewer auto scaling big screen of remote server to small video screen
+  local viewer. 
+- vista, uvnc_service already installed as service (winvnc) 
+- Start service (need to be previously installed) (Jeff for w2k fix) 
+
+
+
+** v1.0.4 RC16 - BETA - FOR TEST & DEBUG ONLY !
+
+- Handle leak service fix
+- Manifest update ( asinvoker)
+- Projects updated for VS2005/2008
+- Only allows the viewer that disabled remote input to reenable it
+- FT crash  bug when the source file could not be read on the server
+- fullscreen: mode, make the tooltips for the toolbar visible
+- fullscreen: multimon fix
+- FT: no media in remote driver fix
+- Confirm exit option
+
+
+
+** v1.0.4 RC15 - BETA - FOR TEST & DEBUG ONLY !
+- shared connections patch
+- monitor blanking fix
+- restore wallpaper fix
+- java viewer direcory detection
+- title bar crash fix
+- syncronize disable keyboard button with server
+- syncronize caplock state
+- Delete partial files after failed filetransfer
+
+
+
+** v1.0.4 RC14 - BETA - FOR TEST & DEBUG ONLY !
+- "\" Fix (keyboard)
+- service_commandline Fix 
+- Send Custom Key 
+- Authentication fail speedup 
+- Version RC13 was buggy 
+- RC14 now use VS2005.
+- Run stable when no multiple connections are made.
+
+
+
+** v1.0.4 RC13 - BETA - FOR TEST & DEBUG ONLY !
+- FIX plugin path
+- FIX crash after wrong rfbversion message
+
+
+** v1.0.4 RC12BISII - BETA - FOR TEST & DEBUG ONLY !
+FIX W2K and service
+
+
+** v1.0.4 RC12BIS - BETA - FOR TEST & DEBUG ONLY !
+- FIX video driver popup
+
+
+** v1.0.4 RC12 - BETA - FOR TEST & DEBUG ONLY !
+- memory bounding error fixed 
+- serveral possible security risks fixed.. ( added extra protection against buffer overwrites that could be invoked by modified server or viewers.) 
+- 32 / 64 drivers 
+- 32 / 64 exectables 
+- Driver mv2.dll changed !!!!!!!!!!!  new server require new driver.
+
+
+
+** v1.0.4 RC10 & RC11 - BETA - FOR TEST & DEBUG ONLY !
+- Vista driver activation should be fixed 
+- keyboard fix, for international keyboards. Only tested with french and belgium keyboard (dead keys) 
+- commandline options added (same as in 102)
+
+
+
+** v1.0.4 RC9 - BETA - FOR TEST & DEBUG ONLY !
+- Added extra info to check driver 
+- Server->poll properties -> check driver 
+  (version, active, acces ok)(version, not active) 
+- multi monitors on Vista 
+  Driver need to be installed and working 
+  winvnc must be runnning as service or 
+  winvnc running as application must be started with "runasadmin" 
+- MS logon II and group/user settings 
+  Changed made, please check if it correct the problem 
+
+
+
+** v1.0.4 RC8 - BETA - FOR TEST & DEBUG ONLY !
+-added previous (rc4) rdp kill via ultravnc.ini 
+ [admin] 
+ kickrdp=1 
+
+
+** v1.0.4 RC7 - BETA - FOR TEST & DEBUG ONLY !
+- typo's fixed 
+- runasadmin,vista,application mode menu fix 
+
+
+** v1.0.4 RC6 - BETA - FOR TEST & DEBUG ONLY !
+
+- Invisible query window fixed
+- Several JavaViewer bug fixes by TRiessner in the FileTransfer GUI
+  (files lists are now sorted, big directory/file names fixed, files seen
+  as directories fixed...)
+- Beep fixed
+- Win2003 install via rdp session fixed
+- The installer now should be able to correctly install/upgrade 1.0.2 and 1.0.4 RCX
+- Video Mirror Driver and Vista Addons are now optionaly downloaded from the installer.
+
+
+
+** v1.0.4 RC5 - BETA - FOR TEST & DEBUG ONLY !
+
+- Service mode is back in winvnc.exe
+- Service can be installed/start/stop/uninstall from system tray menu
+- mouse shape fixed
+- Dsm plugin fixed (Vista)
+  MSRC4 Plugin should work fine under Vista
+  AESV2 plugin does not always work under Vista
+  ARC4 plugin should work under Vista
+- New commandline options:
+  -autoreconnect ID -connect host -run
+  -autoreconnect ID -connect host -service
+  "-service" or "-run" need to be the latest parameter
+
+
+
+** v1.0.3 RC2 - BETA - FOR TEST & DEBUG ONLY !
+
+- Vista support:
+  - New Viewer Autoreconnect feature
+  - New WinVNC special startup modes (used by uvnc_service), and WinVNC
+    autostop feature when necessary under Vista/XP FUS
+  - CTRL-ALT-DEL using Viewer's "CAD" button should work (Vista and XP)
+- FileTransfer window now allows files lists sorting by columns headers
+- WinVNC now stores its config parameters into ultravnc.ini file
+  (same directory as WinVNC.exe). This change was necessary for Vista/XP FUS.
+  To use the registry instead, like in previous versions, do the following:
+  1.Before running the uvnc_service for the first time, create an 
+    ultravnc.ini file in the UltravNC 1.0.3 RC2 install directory
+  2.Add to this ultravnc.ini file the 2 following lines:
+    [Admin]
+    UseRegistry=1
+- WinVNC contains bug fixes for connections init/stability issues 
+  (v1.0.2 Test2 patch code and more)
+- Please note that DSMPlugin (MSRC4) does not work very well under Vista
+  The ARC4 plugin should work fine though
+  
+
 
 ** v1.0.2 Release
 
@@ -10,7 +234,7 @@
 - Improved Autoreconnect option in server
 - Improved query-on-incoming-connection window in server
 - MSLogon improvements
-- MSLogon weak challenge vulnerability fix
+- MSLogon weak challenge vulnerability fix with displayed
   NOTE: MSLogon backward compatibility is broken with versions
   <= v1.0.1
   Anyway, the new v1.0.2 viewer can use MSLogon with older servers

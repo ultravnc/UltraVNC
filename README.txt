@@ -1,7 +1,7 @@
 
-     Ultr@VNC 1.0.3 RC1-Test1 - FOR TEST ONLY - Win32 -  May 2007
+     Ultr@VNC 1.0.5 release
 
-     Copyright (C) 2002-2005 Ultr@VNC Team - All rights reserved
+     Copyright (C) 2002-2008 Ultr@VNC Team - All rights reserved
 
 **********************************************************************
 
@@ -22,7 +22,7 @@
 
   If the source code for the program is not available from the place from
   which you received this file, check
-  http://ultravnc.sourceforge.net/
+  http://www.uvnc.com/
 
 **********************************************************************
 
@@ -89,7 +89,7 @@
 * Viewer Toolbar for a quick access to the main functions and greatly
 improved ergonomy.
 
-* High Speed. On W2000 and XP, Ultr@VNC can use an additional and optionnal
+* High Speed. On W2000, XP and Vista, Ultr@VNC can use an additional and optional
 Video Hook Driver (aka Mirror Driver) that dramatically improves performances
 and reduces CPU activity over LAN connections. So when the bandwidth
 is good - typically over a LAN - Ultr@VNC lets you work on a remote
@@ -125,7 +125,7 @@ not linked and not distributed with Ultr@VNC): additionnal rights checking,
 communication timing, data recording/persitence, encryption...
 it's up to the DLL developper.
 
-* Optionnal "always-on-top" Viewer Status Window dynamically displaying
+* Optional "always-on-top" Viewer Status Window dynamically displaying
 connection informations.
 
 * Various View Modes including Full-Screen, Scaled and Windowed. Full-Screen
@@ -189,6 +189,7 @@ as well as XDMCP direct X11 connection (still experimental).
  - ldapauthnt4.dll      : Active Directory NT4
  - authSSP              : MS-Logon II (aka New MS-Logon)
  - MSLogonACL.exe       : Import/export utility for MS-Logon II ACL
+ - Logmessages.dll      : log messages handling
 
  - zip32.dll            : These 2 dlls are used by vncviewer.exe and
  - unzip32.dll          : WinVNC to perform Directory Transfers
@@ -204,14 +205,26 @@ as well as XDMCP direct X11 connection (still experimental).
  * Depending on the package, the following files may be included as well,
    possibly in subdirectories:
 
- - Video Driver setup and functionnality: SetupDrv.exe, vncdrv.dll,
-   vnchelp.dll, vncdrv.inf, vncdrv.sys, vnccom.sys...
-
  - Others Languages: French & German vncviewer.exe, French WinVNC.exe ...
  
- - DSM Encryption Plugin : MSRC4 plugin, also available here:
+ - DSM Encryption Plugin : MSRC4 plugin, also available here with 
+                           documentation:
                            http://msrc4plugin.home.comcast.net/index.html
 
+			   The latest version is included in this package,
+                           in the 'plugins' subdiretory. Please see the 
+                           correspondin readme.txt, whatsnew.txt for details
+
+			   The .dsm file is also copied in the
+                           ultravnc main install directory so it can be 
+                           used directly.
+                           
+ - Additional optional files (GPL or non-GPL) can be downloaded and 
+   installed during the setup process, such as the video mirror driver 
+   and the addons for Vista. These files are not mandatory to make UltraVNC 
+   work but they generally improve the performances and user experience. 
+   These additional files can also be downloaded separately here:
+      http://www.uvnc.com/download/		
 
 
 
