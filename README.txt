@@ -82,7 +82,8 @@
 
 2. *** Features *****************************************************
 
-* Supported Operating Systems: Win9x/Me/NT4/2000/XP/2003/VISTA
+* Supported Operating Systems: 2000/XP/2003/VISTA
+       For Win9x/Me/NT4 please use version <= 1.0.2
 
 * Auto configuration and Quick Options for easy connections.
 
