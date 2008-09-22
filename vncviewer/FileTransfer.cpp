@@ -706,7 +706,7 @@ bool FileTransfer::RequestNextFile()
 
 		if (m_fAbort)
 			SetStatus(sz_H5);
-		else
+		else  if (!m_fFileDownloadError)
 			SetStatus(sz_H6);
 
 		EnableButtons(hWnd);
@@ -784,7 +784,7 @@ bool FileTransfer::OfferNextFile()
 
 		if (m_fAbort)
 			SetStatus(sz_H7);
-		else if (!m_fFileDownloadError)
+		else if (!m_fFileUploadError)
 			SetStatus(sz_H6);
 
 		EnableButtons(hWnd);
@@ -1851,8 +1851,6 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, int nLen)
 //	vnclog.Print(0, _T("ReceiveFile\n"));
 	if (!m_fFTAllowed) return false;
 
-	int fError = false;
-
 	rfbFileTransferMsg ft;
 	ft.type = rfbFileTransfer;
 	ft.contentType = rfbFileHeader;
@@ -1895,6 +1893,7 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, int nLen)
 		// SetDlgItemText(pFileTransfer->hWnd, IDC_STATUS, szStatus);
 		SetStatus(szStatus);
 		delete [] szRemoteFileName;
+        m_fFileDownloadError = true;
 		return false;
 	}
 
@@ -1963,6 +1962,7 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, int nLen)
 			m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg);
 		else
 			m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
+        m_fFileDownloadError = true;
 		return false;
 	}
 
