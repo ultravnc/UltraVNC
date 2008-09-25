@@ -1597,7 +1597,7 @@ void ClientConnection::Connect()
 	struct sockaddr_in thataddr;
 	int res;
 	if (!m_opts.m_NoStatus) GTGBS_ShowConnectWindow();
-	
+	if (m_sock!=NULL) closesocket(m_sock);
 	m_sock = socket(PF_INET, SOCK_STREAM, 0);
 	if (m_hwndStatus) SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L43);
 	if (m_sock == INVALID_SOCKET) {if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L44);throw WarningException(sz_L44);}
@@ -1639,6 +1639,10 @@ void ClientConnection::Connect()
 	havetobekilled=false;
 	if (res == SOCKET_ERROR) 
 		{
+			int a=WSAGetLastError();
+			vnclog.Print(0, _T("socket error %i\n"),a);
+			if(a==6) 
+				Sleep(5000);
 			if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L48);
 			SetEvent(KillEvent);
 			if (!Pressed_Cancel) throw WarningException(sz_L48,IDS_L48);
@@ -3795,6 +3799,10 @@ void* ClientConnection::run_undetached(void* arg) {
 			{
 				WarningException w(sz_L94,200);
                // w.Report();
+			}
+			else if ((strcmp(e.str(),"rdr::SystemException: read: Unknown error (10054)")==NULL) && !m_bClosedByUser)
+			{
+				WarningException w(sz_L94,200);
 			}
             else if (!(/*m_pFileTransfer->m_fFileTransferRunning || m_pTextChat->m_fTextChatRunning ||*/ m_bClosedByUser))
             {
