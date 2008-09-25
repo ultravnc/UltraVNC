@@ -115,25 +115,36 @@ bool CZipUnZip32::ZipDirectory(char* szRootDir, char* szDirectoryToZip, char* sz
 	m_lpZipUserFunctions->comment = DummyComment;
 
 	// Check if the Zip32 dll can be found 
-	if (SearchPath
+	//Disabled, we explicit look in installed folder
+	/*if (SearchPath
 		(
-			NULL,               /* address of search path               */
-			ZIP_DLL_NAME,       /* address of filename                  */
-			NULL,               /* address of extension                 */
-			MAX_PATH,           /* size, in characters, of buffer       */
-			szFullPath,         /* address of buffer for found filename */
-			&ptr                /* address of pointer to file component */
+			NULL,               
+			ZIP_DLL_NAME,       
+			NULL,               
+			MAX_PATH,           
+			szFullPath,         
+			&ptr                
 			) == 0
 		)
 	{
 		FreeUpZipMemory();
 		return false;
-	}
+	}*/
 	
 	// If the Dll has not yet been loaded then load it
 	if (m_hZipDll == NULL)
 	{
-		m_hZipDll = LoadLibrary(ZIP_DLL_NAME);
+
+		char szFileName[MAX_PATH];
+			if (GetModuleFileName(NULL, szFileName, MAX_PATH))
+				{
+				char* p = strrchr(szFileName, '\\');
+					if (p == NULL) return false;
+					*p = '\0';
+				strcat (szFileName,"\\");
+				strcat (szFileName,ZIP_DLL_NAME);
+			}
+		m_hZipDll = LoadLibrary(szFileName);
 		if (m_hZipDll != NULL)
 		{
 			// Map the dll functions we need to use 
@@ -282,7 +293,8 @@ bool CZipUnZip32::UnZipDirectory(char* szRootDir, char* szZipFileName)
 	m_lpUserFunctions->replace = GetReplaceDlgRetVal;
 	m_lpUserFunctions->SendApplicationMessage = ReceiveDllMessage;
 
-	if (SearchPath(
+	//Disabled, we explicit look in installed folder
+	/*if (SearchPath(
 		NULL,               // address of search path              
 		UNZIP_DLL_NAME,       // address of filename                  
 		NULL,               // address of extension                 
@@ -293,11 +305,20 @@ bool CZipUnZip32::UnZipDirectory(char* szRootDir, char* szZipFileName)
 	{
 		FreeUpUnzipMemory();
 		return false;
-	}
+	}*/
 		
 	if (m_hUnzipDll == NULL)
 	{
-		m_hUnzipDll = LoadLibrary(UNZIP_DLL_NAME);
+		char szFileName[MAX_PATH];
+			if (GetModuleFileName(NULL, szFileName, MAX_PATH))
+				{
+				char* p = strrchr(szFileName, '\\');
+					if (p == NULL) return false;
+					*p = '\0';
+				strcat (szFileName,"\\");
+				strcat (szFileName,UNZIP_DLL_NAME);
+			}
+		m_hUnzipDll = LoadLibrary(szFileName);
 		if (m_hUnzipDll != NULL)
 		{
 			m_PWiz_SingleEntryUnzip = (_DLL_UNZIP)GetProcAddress(m_hUnzipDll, "Wiz_SingleEntryUnzip");
