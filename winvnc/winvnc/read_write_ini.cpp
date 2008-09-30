@@ -76,7 +76,13 @@ LONG FTTimeout = 30;
 char path[512];
 
 BUseRegistry = myIniFile_In.ReadInt("admin", "UseRegistry", 0);
-myIniFile_Out.WriteInt("admin", "UseRegistry", BUseRegistry);
+if (!myIniFile_Out.WriteInt("admin", "UseRegistry", BUseRegistry))
+{
+		//error
+		char temp[10];
+		DWORD error=GetLastError();
+		MessageBox(NULL,myIniFile_Out.myInifile,itoa(error,temp,10),MB_ICONERROR);
+}
 
 MSLogonRequired=myIniFile_In.ReadInt("admin", "MSLogonRequired", false);
 myIniFile_Out.WriteInt("admin", "MSLogonRequired", MSLogonRequired);
