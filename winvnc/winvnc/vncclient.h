@@ -60,8 +60,16 @@ typedef std::list<vncClientId> vncClientList;
 #include "vncBuffer.h"
 #include "vncEncodeMgr.h"
 #include "TextChat.h" // sf@2002 - TextChat
-#include "ZipUnZip32/zipUnZip32.h"
+//#include "zipunzip_src/zip30/zipUnZip32.h"
 //#include "timer.h"
+class CZipUnZip32 
+{
+public:
+	bool ZipDirectory(char* szRootDir, char* szDirectoryName, char* szZipFileName, bool fCompress);
+	bool UnZipDirectory(char* szRootDir, char* szZipFileName);
+	CZipUnZip32();
+	virtual ~CZipUnZip32();
+};
 
 // The vncClient class itself
 typedef UINT (WINAPI *pSendinput)(UINT,LPINPUT,INT);

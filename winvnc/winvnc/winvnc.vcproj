@@ -3969,60 +3969,10 @@
 			<File
 				RelativePath="..\..\ZipUnZip32\ZipUnzip32.cpp"
 				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="IPP|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="IPP|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\ZipUnZip32\ZipUnZip32.h"
+				>
 			</File>
 		</Filter>
 		<Filter
@@ -4269,10 +4219,6 @@
 				RelativePath="winvnc.h"
 				>
 			</File>
-			<File
-				RelativePath="..\..\ZipUnZip32\ZipUnZip32.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
@@ -4335,11 +4281,11 @@
 				>
 			</File>
 			<File
-				RelativePath="res\vnc.bmp"
+				RelativePath="vnc.bmp"
 				>
 			</File>
 			<File
-				RelativePath="vnc.bmp"
+				RelativePath="res\vnc.bmp"
 				>
 			</File>
 			<File
@@ -4380,11 +4326,11 @@
 			>
 		</File>
 		<File
-			RelativePath="..\building.txt"
+			RelativePath="..\..\BUILDING.txt"
 			>
 		</File>
 		<File
-			RelativePath="..\..\BUILDING.txt"
+			RelativePath="..\building.txt"
 			>
 		</File>
 		<File
