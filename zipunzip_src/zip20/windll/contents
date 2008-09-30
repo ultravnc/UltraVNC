@@ -1,0 +1,37 @@
+Contents of the "windll" sub-archive for Zip 2.32 and later:
+
+  contents       this file
+  windll16.def   definition file for 16-bit Zip DLL
+  windll32.def   definition file for 32-bit Zip DLL
+  windll.c       Contains the entry point for the DLL, "fake" printing,
+                 and password functions.
+  windll.h       header file for both 16 and 32-bit DLLs.
+  zipver.h       versioning information for resource file, and also
+                 used by WiZ application itself.
+  windll.rc      resource file for both 16 and 32-bit DLLs
+  windll.txt     simplistic explanation of how to use DLL.
+  structs.h      header file used by both the dll and by WiZ which defines
+                 several structures passed to the dll.
+  example.c      a very simplistic example of how to load the dll, and make
+                 a call into it.
+  example.h      header file for example.c
+
+  visualc\dll <dir> contains Visual C++ 6.0 project and make files for
+                    zip32 dll.
+  visualc\lib <dir> contains Visual C++ 6.0 project and make files for
+                    zip32 static library.
+  vb          <dir> new version of the Visual Basic dll frontend example,
+                    many bugfixes and enhancements.
+  csharp      <dir> example of using zip32.dll with csharp, but experimental
+                    so see readmeCS.txt in that directory.
+
+The dll and static library port was developed and tested under Microsoft
+Visual C++ 6.0.  The former support for the Borland C++ compilers has been
+discontinued; bcc-compiled DLLs are not universally usable because of their
+requirements for special Borland runtime libs (and probably some calling
+convention specialities).
+Compilation for 16-bit Windows 3.x is no longer supported.
+
+Last updated March 20, 2006
+
+Mike White, Christian Spieler, Ed Gordon
