@@ -130,8 +130,8 @@ IniFile::WriteInt(char *key1, char *key2,int value)
 	wsprintf(buf, "%d", value);
 	//vnclog.Print(LL_INTERR, VNCLOG("%s \n"),myInifile);
 	int result=WritePrivateProfileString(key1,key2, buf,myInifile);
-	if (result==0) return true;
-	return false;
+	if (result==0) return false;
+	return true;
 }
 
 int

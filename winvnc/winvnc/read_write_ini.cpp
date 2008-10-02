@@ -81,7 +81,7 @@ if (!myIniFile_Out.WriteInt("admin", "UseRegistry", BUseRegistry))
 		//error
 		char temp[10];
 		DWORD error=GetLastError();
-		MessageBox(NULL,myIniFile_Out.myInifile,itoa(error,temp,10),MB_ICONERROR);
+		MessageBox(NULL,myIniFile_Out.myInifile,_itoa(error,temp,10),MB_ICONERROR);
 }
 
 MSLogonRequired=myIniFile_In.ReadInt("admin", "MSLogonRequired", false);
