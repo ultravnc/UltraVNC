@@ -651,7 +651,7 @@ if ( ! _this->m_server->GetDisableTrayIcon())
 //							_this->m_username, newuser);
 
 						// Check whether the user name has changed!
-						if (_stricmp(newuser, _this->m_username) != 0 || _this->IconFaultCounter>20)
+						if (_stricmp(newuser, _this->m_username) != 0 || _this->IconFaultCounter>5)
 						{
 							vnclog.Print(LL_INTINFO,
 								VNCLOG("user name has changed\n"));
@@ -1025,7 +1025,14 @@ if ( ! _this->m_server->GetDisableTrayIcon())
 		
 	case WM_QUERYENDSESSION:
 		vnclog.Print(LL_INTERR, VNCLOG("WM_QUERYENDSESSION\n"));
-		//_this->m_server->KillAuthClients();
+
+		vnclog.Print(LL_INTINFO, VNCLOG("KillAuthClients() ID_CLOSE \n"));
+		_this->m_server->KillAuthClients();
+		fShutdownOrdered=TRUE;
+		PostMessage(hwnd, WM_CLOSE, 0, 0);
+
+
+		/*//_this->m_server->KillAuthClients();
 		//_this->m_server->KillSockConnect();
 		//_this->m_server->ShutdownServer();
 		//DestroyWindow(hwnd);
@@ -1035,7 +1042,7 @@ if ( ! _this->m_server->GetDisableTrayIcon())
 		// [v1.0.2-jp2 fix] Shutdown slow probrem
 		if((lParam & ENDSESSION_LOGOFF) != ENDSESSION_LOGOFF){
 			_this->m_server->KillAuthClients();
-		}
+		}*/
 		
 		break;
 		
