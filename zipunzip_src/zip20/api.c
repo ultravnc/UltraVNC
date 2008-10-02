@@ -394,11 +394,11 @@ if (AllocMemory(argCee, C.lpszZipFN, "Zip file name") != ZE_OK)
    return ZE_MEM;
 argCee++;
 
-getcwd(szOrigDir, PATH_MAX); /* Save current drive and directory */
+_getcwd(szOrigDir, PATH_MAX); /* Save current drive and directory */
 
 if ((Options.szRootDir != NULL) && (Options.szRootDir[0] != '\0'))
    {
-   chdir(Options.szRootDir);
+   _chdir(Options.szRootDir);
 #ifdef __BORLANDC__
    setdisk(toupper(Options.szRootDir[0]) - 'A');
 #endif
@@ -433,7 +433,7 @@ argVee[argCee] = NULL;
 
 ZipRet = zipmain(argCee, argVee);
 
-chdir(szOrigDir);
+_chdir(szOrigDir);
 #ifdef __BORLANDC__
 setdisk(toupper(szOrigDir[0]) - 'A');
 #endif

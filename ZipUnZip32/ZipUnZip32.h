@@ -55,43 +55,42 @@ typedef struct
 	DLLSERVICE *ServiceApplication;
 } ZIPUSERFUNCTIONS, far * LPZIPUSERFUNCTIONS;
 
-
 // Zip options structure
 typedef struct
 {       
-	LPSTR Date;             //* Date to include after 
-	LPSTR szRootDir;        //* Directory to use as base for zipping 
-	LPSTR szTempDir;        //* Temporary directory used during zipping 
-	BOOL fTemp;             //* Use temporary directory '-b' during zipping 
-	BOOL fSuffix;           //* include suffixes (not implemented) 
-	BOOL fEncrypt;          //* encrypt files 
-	BOOL fSystem;           //* include system and hidden files 
-	BOOL fVolume;           //* Include volume label 
-	BOOL fExtra;            //* Exclude extra attributes 
-	BOOL fNoDirEntries;     //* Do not add directory entries 
-	BOOL fExcludeDate;      //* Exclude files newer than specified date
-	BOOL fIncludeDate;      //* Include only files newer than specified date 
-	BOOL fVerbose;          //* Mention oddities in zip file structure 
-	BOOL fQuiet;            //* Quiet operation 
-	BOOL fCRLF_LF;          //* Translate CR/LF to LF 
-	BOOL fLF_CRLF;          //* Translate LF to CR/LF 
-	BOOL fJunkDir;          //* Junk directory names 
-	BOOL fGrow;             //* Allow appending to a zip file 
-	BOOL fForce;            //* Make entries using DOS names (k for Katz)
-	BOOL fMove;             //* Delete files added or updated in zip file 
-	BOOL fDeleteEntries;    //* Delete files from zip file 
-	BOOL fUpdate;           //* Update zip file--overwrite only if newer 
-	BOOL fFreshen;          //* Freshen zip file--overwrite only 
-	BOOL fJunkSFX;          //* Junk SFX prefix 
-	BOOL fLatestTime;       //* Set zip file time to time of latest file in it 
-	BOOL fComment;          //* Put comment in zip file 
-	BOOL fOffsets;          //* Update archive offsets for SFX files 
-	BOOL fPrivilege;        //* Use privileges (WIN32 only) 
-	BOOL fEncryption;       //* TRUE if encryption supported, else FALSE.
-							//   this is a read only flag 
-	int  fRecurse;          // Recurse into subdirectories. 1 => -r, 2 => -R (bugged)
-	int  fRepair;           //* Repair archive. 1 => -F, 2 => -FF 
-	char fLevel;            //* Compression level (0 - 9) 
+	LPSTR Date;             /* Date to include after */
+	LPSTR szRootDir;        /* Directory to use as base for zipping */
+	LPSTR szTempDir;        /* Temporary directory used during zipping */
+	BOOL fTemp;             /* Use temporary directory '-b' during zipping */
+	BOOL fSuffix;           /* include suffixes (not implemented) */
+	BOOL fEncrypt;          /* encrypt files */
+	BOOL fSystem;           /* include system and hidden files */
+	BOOL fVolume;           /* Include volume label */
+	BOOL fExtra;            /* Exclude extra attributes */
+	BOOL fNoDirEntries;     /* Do not add directory entries */
+	BOOL fExcludeDate;      /* Exclude files newer than specified date */
+	BOOL fIncludeDate;      /* Include only files newer than specified date */
+	BOOL fVerbose;          /* Mention oddities in zip file structure */
+	BOOL fQuiet;            /* Quiet operation */
+	BOOL fCRLF_LF;          /* Translate CR/LF to LF */
+	BOOL fLF_CRLF;          /* Translate LF to CR/LF */
+	BOOL fJunkDir;          /* Junk directory names */
+	BOOL fGrow;             /* Allow appending to a zip file */
+	BOOL fForce;            /* Make entries using DOS names (k for Katz) */
+	BOOL fMove;             /* Delete files added or updated in zip file */
+	BOOL fDeleteEntries;    /* Delete files from zip file */
+	BOOL fUpdate;           /* Update zip file--overwrite only if newer */
+	BOOL fFreshen;          /* Freshen zip file--overwrite only */
+	BOOL fJunkSFX;          /* Junk SFX prefix */
+	BOOL fLatestTime;       /* Set zip file time to time of latest file in it */
+	BOOL fComment;          /* Put comment in zip file */
+	BOOL fOffsets;          /* Update archive offsets for SFX files */
+	BOOL fPrivilege;        /* Use privileges (WIN32 only) */
+	BOOL fEncryption;       /* TRUE if encryption supported, else FALSE.
+							   this is a read only flag */
+	int  fRecurse;          /* Recurse into subdirectories. 1 => -r, 2 => -R (bugged)*/
+	int  fRepair;           /* Repair archive. 1 => -F, 2 => -FF */
+	char fLevel;            /* Compression level (0 - 9) */
 } ZPOPT, *LPZPOPT;
 
 // Files to Zip structure
@@ -198,12 +197,12 @@ public:
 
 private:
 	// Zip part
-	//_DLL_ZIP				m_PZipArchive; // Zip function
-	//_ZIP_USER_FUNCTIONS		m_PZipInit;    // Zip init
-	//ZIPSETOPTIONS			m_PZipSetOptions; // Zip set options
+	_DLL_ZIP				m_PZipArchive; // Zip function
+	_ZIP_USER_FUNCTIONS		m_PZipInit;    // Zip init
+	ZIPSETOPTIONS			m_PZipSetOptions; // Zip set options
 
 	LPZIPUSERFUNCTIONS m_lpZipUserFunctions;
-	//HINSTANCE m_hZipDll;
+	HINSTANCE m_hZipDll;
 	int m_hFile;
 
 	ZCL m_ZpZCL;
@@ -219,7 +218,7 @@ private:
 
 	LPUSERFUNCTIONS m_lpUserFunctions;
 	LPDCL m_lpDCL;
-	//HINSTANCE m_hUnzipDll;
+	HINSTANCE m_hUnzipDll;
 	int m_hUnzipFile;
 
 	HANDLE m_hUF;

@@ -160,7 +160,7 @@ if ((file == stderr) || (file == stdout))
    len = lpZipUserFunctions->print(pszBuffer, len);
    }
 else
-   len = write(fileno(file),(char far *)(pszBuffer), len);
+   len = _write(_fileno(file),(char far *)(pszBuffer), len);
 GlobalUnlock(hMemory);
 GlobalFree(hMemory);
 return len;
