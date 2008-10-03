@@ -385,6 +385,7 @@ public:
     void SetFTTimeout(int msecs);
     void EnableKeepAlives(bool newstate) { m_fEnableKeepAlive = newstate; }
     bool DoKeepAlives() { return m_fEnableKeepAlive; }
+	void TriggerUpdate();
 
 protected:
 	// The vncServer UpdateTracker class

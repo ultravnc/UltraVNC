@@ -43,7 +43,10 @@ vncInstHandler::vncInstHandler()
 vncInstHandler::~vncInstHandler()
 {
 	if (mutex)
+	{
 		ReleaseMutex(mutex);
+		CloseHandle (mutex);
+	}
 }
 
 BOOL

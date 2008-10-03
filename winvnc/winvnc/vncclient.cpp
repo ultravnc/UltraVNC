@@ -3106,7 +3106,7 @@ vncClientThread::run(void *arg)
 	m_server->RemoveClient(m_client->GetClientId());
 
 	// sf@2003 - AutoReconnection attempt if required
-	if (m_server->AutoReconnect())
+	if (!fShutdownOrdered)if (m_server->AutoReconnect())
 		vncService::PostAddNewClient(1111, 1111);
 }
 
@@ -4074,6 +4074,11 @@ void vncClient::SetProtocolVersion(rfbProtocolVersionMsg *protocolMsg)
 void vncClient::Clear_Update_Tracker()
 {
 	m_update_tracker.clear();
+}
+
+void vncClient::TriggerUpdate()
+{
+	m_encodemgr.m_buffer->m_desktop->TriggerUpdate();
 }
 
 

@@ -285,70 +285,12 @@ vncDesktopThread::PollWindow(rfb::Region2D &rgn, HWND hwnd)
 }
 
 
-void 
-vncDesktopThread::SessionFix() {
-
-   if (!vncService::RunningAsService()) return;
-
-   DWORD  dwSessionId;
-   DWORD  dwCurrentSessionId;
-   typedef DWORD (WINAPI* pWTSGetActiveConsoleSessionId)(VOID);
-   typedef BOOL (WINAPI * pProcessIdToSessionId) (DWORD, DWORD*);
-   typedef BOOLEAN (WINAPI * pWinStationConnect) (HANDLE,ULONG,ULONG,PCWSTR,ULONG);
-   typedef BOOL (WINAPI * pLockWorkStation)();
-   HMODULE  hlibkernel = LoadLibrary("kernel32.dll"); 
-   HMODULE  hlibwinsta = LoadLibrary("winsta.dll"); 
-   HMODULE  hlibuser32 = LoadLibrary("user32.dll"); 
-   pWTSGetActiveConsoleSessionId WTSGetActiveConsoleSessionIdF=NULL;
-   pProcessIdToSessionId ProcessIdToSessionIdF=NULL;
-   pWinStationConnect WinStationConnectF=NULL;
-   pLockWorkStation LockWorkStationF=NULL;
-
-   if (hlibkernel) 
-   {
-		WTSGetActiveConsoleSessionIdF=(pWTSGetActiveConsoleSessionId)GetProcAddress(hlibkernel, "WTSGetActiveConsoleSessionId"); 
-		ProcessIdToSessionIdF=(pProcessIdToSessionId)GetProcAddress(hlibkernel, "ProcessIdToSessionId"); 
-   }
-   if (hlibwinsta)
-   {
-	   WinStationConnectF=(pWinStationConnect)GetProcAddress(hlibwinsta, "WinStationConnectW"); 
-   }
-   if (hlibuser32)
-   {
-	   LockWorkStationF=(pLockWorkStation)GetProcAddress(hlibuser32, "LockWorkStation"); 
-   }
-
-   if (WTSGetActiveConsoleSessionIdF!=NULL)
-	   dwSessionId =WTSGetActiveConsoleSessionIdF();
-   if (ProcessIdToSessionIdF!=NULL)
-		ProcessIdToSessionIdF(GetCurrentProcessId(), &dwCurrentSessionId);
-
-   if (WTSGetActiveConsoleSessionIdF!=NULL) if (dwSessionId!=dwCurrentSessionId)
-   {
-	   //Black screen only session 0 can be handled from a service
-	   if (WinStationConnectF!=NULL) 
-	   {
-		   WinStationConnectF(0, dwCurrentSessionId, dwSessionId, L"", 0);
-			if (LockWorkStationF!=NULL) LockWorkStationF();
-	   }
-   }
-
-   if (hlibkernel) FreeLibrary(hlibkernel);
-   if (hlibwinsta) FreeLibrary(hlibwinsta);
-   if (hlibuser32) FreeLibrary(hlibuser32);
-
-
-
-
-}
-
 void *
 vncDesktopThread::run_undetached(void *arg)
 {
 	//*******************************************************
 	// INIT
 	//*******************************************************
-//	SessionFix();
 	vnclog.Print(LL_INTERR, VNCLOG("Hook changed 1\n"));
 	// Save the thread's "home" desktop, under NT (no effect under 9x)
 	HDESK home_desktop = GetThreadDesktop(GetCurrentThreadId());

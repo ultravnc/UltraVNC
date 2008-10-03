@@ -81,7 +81,6 @@ protected:
 
 	DWORD m_lLastUpdateTime;
 	DWORD m_lLastMouseMoveTime;
-	void SessionFix();
 	HMODULE  hUser32;
 
 };

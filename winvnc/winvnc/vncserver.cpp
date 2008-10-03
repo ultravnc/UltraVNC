@@ -2203,6 +2203,17 @@ vncServer::All_clients_initialalized() {
 	return true;
 }
 
+void
+vncServer::TriggerUpdate() {
+	vncClientList::iterator i;
+	// Post this update to all the connected clients
+	for (i = m_authClients.begin(); i != m_authClients.end(); i++)
+	{
+		GetClient(*i)->TriggerUpdate();
+
+	}
+}
+
 
 bool vncServer::IsClient(vncClient* pClient)
 {

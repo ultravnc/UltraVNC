@@ -428,6 +428,7 @@ vncMenu::AddTrayIcon()
 			IsIconSet=false;
 			vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::AddTrayIcon - User exists, traywnd is not found reset when counter reach %i=20\n"),IconFaultCounter);
 			IconFaultCounter++;
+			m_server->TriggerUpdate();
 			return;
 		}
 
@@ -589,6 +590,7 @@ vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 			{
 			IsIconSet=false;
 			IconFaultCounter++;
+			m_server->TriggerUpdate();
 			vnclog.Print(LL_INTINFO, VNCLOG("Failed IsIconSet \n"));
 			}
 		}
@@ -872,7 +874,11 @@ if ( ! _this->m_server->GetDisableTrayIcon())
 					hProcess = OpenProcess(MAXIMUM_ALLOWED,FALSE,id);
 					if(!OpenProcessToken(hProcess,TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY
 											|TOKEN_DUPLICATE|TOKEN_ASSIGN_PRIMARY|TOKEN_ADJUST_SESSIONID
-											|TOKEN_READ|TOKEN_WRITE,&hPToken)) break;
+											|TOKEN_READ|TOKEN_WRITE,&hPToken))
+					{
+						CloseHandle(hProcess);
+						break;
+					}
 
 					char dir[MAX_PATH];
 					char exe_file_name[MAX_PATH];
@@ -895,6 +901,7 @@ if ( ! _this->m_server->GetDisableTrayIcon())
 					DWORD error=GetLastError();
 					if (process) CloseHandle(process);
 					if (Token) CloseHandle(Token);
+					if (hProcess) CloseHandle(hProcess);
 					if (error==1314)
 					{
 						Set_stop_service_as_admin();
@@ -911,7 +918,11 @@ if ( ! _this->m_server->GetDisableTrayIcon())
 					hProcess = OpenProcess(MAXIMUM_ALLOWED,FALSE,id);
 					if(!OpenProcessToken(hProcess,TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY
 											|TOKEN_DUPLICATE|TOKEN_ASSIGN_PRIMARY|TOKEN_ADJUST_SESSIONID
-											|TOKEN_READ|TOKEN_WRITE,&hPToken)) break;
+											|TOKEN_READ|TOKEN_WRITE,&hPToken))
+					{
+						CloseHandle(hProcess);
+						break;
+					}
 
 					char dir[MAX_PATH];
 					char exe_file_name[MAX_PATH];
@@ -932,8 +943,10 @@ if ( ! _this->m_server->GetDisableTrayIcon())
 			
 					CreateProcessAsUser(hPToken,NULL,dir,NULL,NULL,FALSE,DETACHED_PROCESS,NULL,NULL,&StartUPInfo,&ProcessInfo);
 					DWORD error=GetLastError();
+					if (hPToken) CloseHandle(hPToken);
 					if (process) CloseHandle(process);
 					if (Token) CloseHandle(Token);
+					if (hProcess) CloseHandle(hProcess);
 					if (error==1314)
 					{
 						Set_start_service_as_admin();

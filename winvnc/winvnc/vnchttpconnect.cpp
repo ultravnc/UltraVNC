@@ -38,6 +38,7 @@
 
 //	[v1.0.2-jp1 fix]
 extern	HINSTANCE	hInstResDLL;
+extern bool			fShutdownOrdered;
 
 /* Old viewer - TODO: remove
 // HTTP messages/message formats

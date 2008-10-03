@@ -169,6 +169,7 @@ public:
 	virtual bool IsFileTransBusy(){return (m_fFileUploadRunning||m_fFileDownloadRunning || m_fFileSessionOpen);};
 	void SetProtocolVersion(rfbProtocolVersionMsg *protocolMsg);
 	void Clear_Update_Tracker();
+	void TriggerUpdate();
 	void UpdateCursorShape();
 
 	// sf@2004 - Asynchronous FileTransfer - Delta Transfer
