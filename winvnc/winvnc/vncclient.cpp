@@ -3106,7 +3106,8 @@ vncClientThread::run(void *arg)
 	m_server->RemoveClient(m_client->GetClientId());
 
 	// sf@2003 - AutoReconnection attempt if required
-	if (!fShutdownOrdered)if (m_server->AutoReconnect())
+	//if (!fShutdownOrdered)
+		if (m_server->AutoReconnect())
 		vncService::PostAddNewClient(1111, 1111);
 }
 

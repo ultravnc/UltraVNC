@@ -653,8 +653,9 @@ if ( ! _this->m_server->GetDisableTrayIcon())
 //							_this->m_username, newuser);
 
 						// Check whether the user name has changed!
-						if (_stricmp(newuser, _this->m_username) != 0 || _this->IconFaultCounter>5)
+						if (_stricmp(newuser, _this->m_username) != 0 || _this->IconFaultCounter>10)
 						{
+							Sleep(1000);
 							vnclog.Print(LL_INTINFO,
 								VNCLOG("user name has changed\n"));
 
