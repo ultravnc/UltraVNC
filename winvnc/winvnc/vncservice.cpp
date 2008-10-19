@@ -68,12 +68,27 @@ pProcessIdToSessionId WTSProcessIdToSessionIdF=NULL;
 void ClearKeyState(BYTE key);
 DWORD GetCurrentSessionID()
 {
-	DWORD dw		 = GetCurrentProcessId();
-	DWORD pSessionId = 0xFFFFFFFF;
+	DWORD dwSessionId;
+	pWTSGetActiveConsoleSessionId WTSGetActiveConsoleSessionIdF=NULL;
+	WTSProcessIdToSessionIdF=NULL;
 
-	WTSProcessIdToSessionIdF( dw, &pSessionId );
+	HMODULE  hlibkernel = LoadLibrary("kernel32.dll"); 
+	WTSGetActiveConsoleSessionIdF=(pWTSGetActiveConsoleSessionId)GetProcAddress(hlibkernel, "WTSGetActiveConsoleSessionId");
+	WTSProcessIdToSessionIdF=(pProcessIdToSessionId)GetProcAddress(hlibkernel, "ProcessIdToSessionId");
+	if (WTSGetActiveConsoleSessionIdF!=NULL)
+	   dwSessionId =WTSGetActiveConsoleSessionIdF();
+	else dwSessionId=0;
 
-	return pSessionId;
+	if( GetSystemMetrics( SM_REMOTESESSION))
+		if (WTSProcessIdToSessionIdF!=NULL)
+		{
+			DWORD dw		 = GetCurrentProcessId();
+			DWORD pSessionId = 0xFFFFFFFF;
+			WTSProcessIdToSessionIdF( dw, &pSessionId );
+			dwSessionId=pSessionId;
+		}
+	FreeLibrary(hlibkernel);
+	return dwSessionId;
 }
 
 DWORD GetExplorerLogonPid()
@@ -95,7 +110,12 @@ DWORD GetExplorerLogonPid()
 
 	if( GetSystemMetrics( SM_REMOTESESSION))
 		if (WTSProcessIdToSessionIdF!=NULL)
-			dwSessionId=GetCurrentSessionID();
+		{
+			DWORD dw		 = GetCurrentProcessId();
+			DWORD pSessionId = 0xFFFFFFFF;
+			WTSProcessIdToSessionIdF( dw, &pSessionId );
+			dwSessionId=pSessionId;
+		}
 
 	
 
