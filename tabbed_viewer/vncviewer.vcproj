@@ -348,7 +348,7 @@
 				Optimization="2"
 				InlineFunctionExpansion="1"
 				AdditionalIncludeDirectories="omnithread,.."
-				PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;__NT__;_WINSTATIC;VC2005;__WIN32__;_CRT_SECURE_NO_DEPRECATE"
+				PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;__NT__;_WINSTATIC;VC2005;__WIN32__;_CRT_SECURE_NO_DEPRECATE;_X64"
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
@@ -426,11 +426,11 @@
 				>
 			</File>
 			<File
-				RelativePath="res\stat\background2.bmp"
+				RelativePath="res\background2.bmp"
 				>
 			</File>
 			<File
-				RelativePath="res\background2.bmp"
+				RelativePath="res\stat\background2.bmp"
 				>
 			</File>
 			<File
@@ -563,6 +563,10 @@
 			</File>
 			<File
 				RelativePath="res\vnc64.BMP"
+				>
+			</File>
+			<File
+				RelativePath=".\res\vncviewer.exe.x86.manifest"
 				>
 			</File>
 			<File

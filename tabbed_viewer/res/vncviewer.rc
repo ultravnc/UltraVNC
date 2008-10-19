@@ -314,27 +314,23 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_CENTER | WS_POPUP | WS_CAPTION
 CAPTION " Chat - UltraVNC"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
-    EDITTEXT        IDC_INPUTAREA_EDIT,3,132,259,40,ES_MULTILINE | 
-                    ES_AUTOVSCROLL | ES_WANTRETURN | NOT WS_BORDER | 
-                    WS_VSCROLL,WS_EX_STATICEDGE
+    EDITTEXT        IDC_INPUTAREA_EDIT,3,132,259,40,ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN | NOT WS_BORDER | WS_VSCROLL,WS_EX_STATICEDGE
     PUSHBUTTON      "Close",IDCANCEL,264,162,39,11
-    CONTROL         "",IDC_CHATAREA_EDIT,"RICHEDIT",ES_MULTILINE | 
-                    ES_AUTOVSCROLL | ES_READONLY | ES_WANTRETURN | 
-                    WS_VSCROLL | WS_TABSTOP,3,3,300,120,WS_EX_STATICEDGE
+    CONTROL         "",IDC_CHATAREA_EDIT,"RICHEDIT",TCS_HOTTRACK | TCS_RAGGEDRIGHT | TCS_FOCUSONBUTTONDOWN | TCS_MULTISELECT | WS_VSCROLL | WS_TABSTOP,3,3,300,120,WS_EX_STATICEDGE
     PUSHBUTTON      "Send",IDC_SEND_B,264,134,39,14,BS_CENTER | BS_MULTILINE
     DEFPUSHBUTTON   "",IDOK,298,0,8,6,NOT WS_VISIBLE
     PUSHBUTTON      "Minimize",IDC_HIDE_B,264,150,39,11
     LTEXT           "",IDC_STATIC_SPLIT,3,124,300,8,SS_NOTIFY
 END
 
-IDD_APP_ABOUT DIALOG  0, 0, 289, 159
-STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+IDD_APP_ABOUT DIALOGEX 0, 0, 289, 159
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION " About VNCviewer"
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,8,137,62,14
     CONTROL         156,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_SUNKEN,8,7,62,54
-    LTEXT           "UltraVNC Win32 Viewer 1.0.2",IDC_STATIC,90,5,180,11
+    LTEXT           "UltraVNC Win32 Viewer 1.0.5.2",IDC_STATIC,90,5,180,11
     LTEXT           "For more Information and Links please visit: \nhttp://www.uvnc.com",IDC_STATIC,86,133,197,19
     LTEXT           "Copyright © 2002-2005 Ultr@VNC Team\nCopyright © 2001-2002 Sam - eSVNC \nCopyright © 1999-2002 Rudi D. V. - VdaccVNC \nCopyright © 1999-2002 Const. Kaplinsky - TightVNC \nCopyright © 2002 RealVNC Ltd. - RealVNC\n",IDC_STATIC,86,30,200,40
     LTEXT           "Built:",IDC_STATIC,87,17,15,10
@@ -790,8 +786,8 @@ IDC_NOCURSOR            CURSOR                  "nocursor.cur"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,1,0,2
- PRODUCTVERSION 1,1,0,2
+ FILEVERSION 1,0,5,2
+ PRODUCTVERSION 1,0,5,2
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x21L
@@ -809,13 +805,13 @@ BEGIN
             VALUE "Comments", "UltraVNC Viewer"
             VALUE "CompanyName", "UltraVNC"
             VALUE "FileDescription", "VNCViewer"
-            VALUE "FileVersion", "1.1.0.1"
+            VALUE "FileVersion", "1.0.5.2"
             VALUE "InternalName", "VNCViewer"
             VALUE "LegalCopyright", "Copyright © 2002-2005 UltraVNC team members"
             VALUE "OriginalFilename", "VNCViewer.exe"
             VALUE "ProductName", "UltraVNC VNCViewer"
-            VALUE "ProductVersion", "1.1.0.2"
-            VALUE "SpecialBuild", "1.0.1"
+            VALUE "ProductVersion", "1.0.5.2"
+            VALUE "SpecialBuild", "1.0.5.2"
         END
     END
     BLOCK "VarFileInfo"
@@ -1122,7 +1118,13 @@ BEGIN
     IDS_L90                 "Password requested"
     IDS_L91                 "Connection failed"
     IDS_L92                 "No authentication needed"
-	IDS_L94                 "Server closed connection"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_H101                "Folder Transfer Warning"
+    IDS_H102                "a file or folder of that name already exists."
+    IDS_L94                 "Server closed connection"
 END
 
 STRINGTABLE 
@@ -1155,7 +1157,7 @@ BEGIN
     IDS_M6                  "Renamed LOCAL"
     IDS_M7                  "to"
     IDS_M8                  "Renamed REMOTE"
-	IDS_H94                 "Folder Deletion Warning"
+    IDS_H94                 "Folder Deletion Warning"
     IDS_H95                 "Are you sure you want to delete the LOCAL folder"
     IDS_H96                 "Are you sure you want to delete the REMOTE folder"
     IDS_H97                 "Unable to delete the local folder"
@@ -1163,8 +1165,6 @@ BEGIN
     IDS_H99                 "Unable to delete the folder"
     IDS_H100                "Create New Folder"
     IDS_L93                 "View Only... \tAlt+Ctrl+F3"
-    IDS_H101                "Folder Transfer Warning"
-    IDS_H102				"a file or folder of that name already exists."
 END
 
 #endif    // English (U.S.) resources

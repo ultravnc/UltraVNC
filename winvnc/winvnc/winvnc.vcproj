@@ -52,7 +52,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\omnithread,..,..\.."
-				PreprocessorDefinitions="_DEBUG;__x86__;__WIN32__;WIN32;_WINDOWS;_WIN32_WINNT=0x501;XMD_H;_WINSTATIC;_CRT_SECURE_NO_WARNINGS;_VC80"
+				PreprocessorDefinitions="_DEBUG;__x86__;__WIN32__;WIN32;_WINDOWS;_WIN32_WINNT=0x501;XMD_H;_WINSTATIC;_CRT_SECURE_NO_WARNINGS;_VC80;_WIN32_IE=0x0600"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -251,7 +251,7 @@
 				EnableFiberSafeOptimizations="true"
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="..\omnithread,..,..\.."
-				PreprocessorDefinitions="NDEBUG;__x86__;__WIN32__;WIN32;_WINDOWS;_WIN32_WINNT=0x501;XMD_H;_WINSTATIC;_VC80;_CRT_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="NDEBUG;__x86__;__WIN32__;WIN32;_WINDOWS;_WIN32_WINNT=0x501;XMD_H;_WINSTATIC;_VC80;_CRT_SECURE_NO_WARNINGS;_WIN32_IE=0x0600"
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
@@ -279,7 +279,7 @@
 				Name="VCLinkerTool"
 				AdditionalOptions="/LTCG"
 				AdditionalDependencies="wsock32.lib winmm.lib version.lib comctl32.lib wtsapi32.lib userenv.lib"
-				OutputFile=".\..\Release/winvnc.exe"
+				OutputFile=".\..\Release/winvnc_32.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				GenerateManifest="true"
@@ -375,7 +375,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="wsock32.lib winmm.lib version.lib comctl32.lib wtsapi32.lib userenv.lib"
-				OutputFile=".\..\Release/winvnc.exe"
+				OutputFile=".\..\Release/winvnc_64.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ProgramDatabaseFile=".\..\Release/winvnc.pdb"
@@ -4281,11 +4281,11 @@
 				>
 			</File>
 			<File
-				RelativePath="vnc.bmp"
+				RelativePath="res\vnc.bmp"
 				>
 			</File>
 			<File
-				RelativePath="res\vnc.bmp"
+				RelativePath="vnc.bmp"
 				>
 			</File>
 			<File
@@ -4305,7 +4305,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\winvnc.exe.manifest"
+				RelativePath=".\winvnc.exe.x86.manifest"
 				>
 			</File>
 			<File
@@ -4326,11 +4326,11 @@
 			>
 		</File>
 		<File
-			RelativePath="..\..\BUILDING.txt"
+			RelativePath="..\building.txt"
 			>
 		</File>
 		<File
-			RelativePath="..\building.txt"
+			RelativePath="..\..\BUILDING.txt"
 			>
 		</File>
 		<File

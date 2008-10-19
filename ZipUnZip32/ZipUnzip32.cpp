@@ -37,6 +37,7 @@
 
 extern "C" {
 #include "../zipunzip_src/zip20/zip.h"
+#include "../zipunzip_src/unzip/unzip.h"
 int   EXPENTRY ZpInit(LPZIPUSERFUNCTIONS lpZipUserFunc);
 BOOL  EXPENTRY ZpSetOptions(LPZPOPT Opts);
 int   EXPENTRY ZpArchive(ZCL C);
@@ -53,9 +54,6 @@ int WINAPI Wiz_SingleEntryUnzip(int ifnc, char **ifnv, int xfnc, char **xfnv,LPD
 //
 CZipUnZip32::CZipUnZip32()
 {
-	m_hZipDll = NULL;
-	m_hUnzipDll = NULL;
-
 	m_ZpOpt.fSuffix = FALSE;        /* include suffixes (not yet implemented) */
 	m_ZpOpt.fEncrypt = FALSE;       /* true if encryption wanted */
 	m_ZpOpt.fSystem = TRUE;        /* true to include system/hidden files */
@@ -89,8 +87,7 @@ CZipUnZip32::CZipUnZip32()
 
 CZipUnZip32::~CZipUnZip32()
 {
-	if (m_hZipDll) FreeLibrary(m_hZipDll);
-	if (m_hUnzipDll) FreeLibrary(m_hUnzipDll);
+
 }
 
 
@@ -122,64 +119,6 @@ bool CZipUnZip32::ZipDirectory(char* szRootDir, char* szDirectoryToZip, char* sz
 	m_lpZipUserFunctions->password = DummyPassword;
 	m_lpZipUserFunctions->comment = DummyComment;
 
-	// Check if the Zip32 dll can be found 
-	//Disabled, we explicit look in installed folder
-	/*if (SearchPath
-		(
-			NULL,               
-			ZIP_DLL_NAME,       
-			NULL,               
-			MAX_PATH,           
-			szFullPath,         
-			&ptr                
-			) == 0
-		)
-	{
-		FreeUpZipMemory();
-		return false;
-	}*/
-	
-	// If the Dll has not yet been loaded then load it
-	/*if (m_hZipDll == NULL)
-	{
-
-		char szFileName[MAX_PATH];
-			if (GetModuleFileName(NULL, szFileName, MAX_PATH))
-				{
-				char* p = strrchr(szFileName, '\\');
-					if (p == NULL) return false;
-					*p = '\0';
-				strcat (szFileName,"\\");
-				strcat (szFileName,ZIP_DLL_NAME);
-			}
-		m_hZipDll = LoadLibrary(szFileName);
-		if (m_hZipDll != NULL)
-		{
-			// Map the dll functions we need to use 
-			(_ZIP_USER_FUNCTIONS)m_PZipInit = (_ZIP_USER_FUNCTIONS)GetProcAddress(m_hZipDll, "ZpInit");
-			(_DLL_ZIP)m_PZipArchive			= (_DLL_ZIP)GetProcAddress(m_hZipDll, "ZpArchive");
-			(ZIPSETOPTIONS)m_PZipSetOptions = (ZIPSETOPTIONS)GetProcAddress(m_hZipDll, "ZpSetOptions");
-			if (!m_PZipArchive || !m_PZipSetOptions || !m_PZipInit)
-			{
-				FreeLibrary(m_hZipDll);
-				FreeUpZipMemory();
-				return false;
-			}
-		}
-		else
-		{
-				FreeLibrary(m_hZipDll);
-				FreeUpZipMemory();
-				return false;
-		}
-
-		if (!(*m_PZipInit)(m_lpZipUserFunctions))
-		{
-			FreeLibrary(m_hZipDll);
-			FreeUpZipMemory();
-			return false;
-		}
-	}*/
 	if (!ZpInit(m_lpZipUserFunctions))
 		{
 			FreeUpZipMemory();
@@ -305,43 +244,6 @@ bool CZipUnZip32::UnZipDirectory(char* szRootDir, char* szZipFileName)
 	m_lpUserFunctions->sound = NULL;
 	m_lpUserFunctions->replace = GetReplaceDlgRetVal;
 	m_lpUserFunctions->SendApplicationMessage = ReceiveDllMessage;
-
-	//Disabled, we explicit look in installed folder
-	/*if (SearchPath(
-		NULL,               // address of search path              
-		UNZIP_DLL_NAME,       // address of filename                  
-		NULL,               // address of extension                 
-		MAX_PATH,          //  size, in characters, of buffer      
-		szFullPath,         // address of buffer for found filename 
-		&ptr                // address of pointer to file component 
-		) == 0)
-	{
-		FreeUpUnzipMemory();
-		return false;
-	}*/
-		
-	if (m_hUnzipDll == NULL)
-	{
-		char szFileName[MAX_PATH];
-			if (GetModuleFileName(NULL, szFileName, MAX_PATH))
-				{
-				char* p = strrchr(szFileName, '\\');
-					if (p == NULL) return false;
-					*p = '\0';
-				strcat (szFileName,"\\");
-				strcat (szFileName,UNZIP_DLL_NAME);
-			}
-		m_hUnzipDll = LoadLibrary(szFileName);
-		if (m_hUnzipDll != NULL)
-		{
-			m_PWiz_SingleEntryUnzip = (_DLL_UNZIP)GetProcAddress(m_hUnzipDll, "Wiz_SingleEntryUnzip");
-		}
-		else
-		{
-			FreeUpUnzipMemory();
-			return false;
-		}
-	}
 	
 	m_lpDCL->ncflag = 0; // Write to stdout if true 
 	m_lpDCL->fQuiet = 2; // We want all messages. 1 = fewer messages,2 = no messages 
@@ -361,7 +263,7 @@ bool CZipUnZip32::UnZipDirectory(char* szRootDir, char* szZipFileName)
 	infv = exfv = NULL;
 
 	// Unzip the directory content
-	retcode = (*m_PWiz_SingleEntryUnzip)(	infc,
+	retcode = Wiz_SingleEntryUnzip(	infc,
 											infv,
 											exfc,
 											exfv,
