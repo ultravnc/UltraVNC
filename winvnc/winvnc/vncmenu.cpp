@@ -81,6 +81,7 @@ void Set_install_service_as_admin();
 void Set_stop_service_as_admin();
 void Set_start_service_as_admin();
 
+DWORD GetCurrentSessionID();
 
 
 #define MSGFLT_ADD		1
@@ -432,7 +433,7 @@ vncMenu::AddTrayIcon()
 			return;
 		}
 
-		if ( ! m_server->GetDisableTrayIcon())
+		// if ( ! m_server->GetDisableTrayIcon())
 		{
 //			vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::AddTrayIcon - ADD Tray Icon call\n"));
 			SendTrayMsg(NIM_ADD, FALSE);
@@ -498,8 +499,20 @@ vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 	m_nid.cbSize = sizeof(m_nid);
 	m_nid.uID = IDI_WINVNC;			// never changes after construction	
 	m_nid.hIcon = flash ? m_flash_icon : m_winvnc_icon;
-	m_nid.uFlags = NIF_ICON | NIF_MESSAGE;
+	m_nid.uFlags = NIF_ICON | NIF_MESSAGE |NIF_STATE;
 	m_nid.uCallbackMessage = WM_TRAYNOTIFY;
+	if (m_server->GetDisableTrayIcon())
+	{
+	m_nid.dwState = NIS_HIDDEN;
+	m_nid.dwStateMask = NIS_HIDDEN;
+	}
+	else
+	{
+		m_nid.dwState = 0;
+		m_nid.dwStateMask = NIS_HIDDEN;
+
+	}
+
 	//vnclog.Print(LL_INTINFO, VNCLOG("SendTRaymesg\n"));
 
 	// Use resource string as tip if there is one
@@ -639,7 +652,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			}
 		}
 
-if ( ! _this->m_server->GetDisableTrayIcon())
+//if ( ! _this->m_server->GetDisableTrayIcon())
 			{
 				vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::TIMER TrayIcon 5s hack\n"));
 
@@ -1038,12 +1051,25 @@ if ( ! _this->m_server->GetDisableTrayIcon())
 		return 0;
 		
 	case WM_QUERYENDSESSION:
-		vnclog.Print(LL_INTERR, VNCLOG("WM_QUERYENDSESSION\n"));
-
-		vnclog.Print(LL_INTINFO, VNCLOG("KillAuthClients() ID_CLOSE \n"));
-		_this->m_server->KillAuthClients();
-		fShutdownOrdered=TRUE;
-		PostMessage(hwnd, WM_CLOSE, 0, 0);
+		{
+		DWORD SessionID;
+		SessionID=GetCurrentSessionID();
+		if (SessionID!=0)
+		{
+			vnclog.Print(LL_INTERR, VNCLOG("WM_QUERYENDSESSION session!=0\n"));
+			vnclog.Print(LL_INTINFO, VNCLOG("KillAuthClients() ID_CLOSE \n"));
+			_this->m_server->KillAuthClients();
+			fShutdownOrdered=TRUE;
+			PostMessage(hwnd, WM_CLOSE, 0, 0);
+		}
+		else if((lParam & ENDSESSION_LOGOFF) != ENDSESSION_LOGOFF)
+		{
+			vnclog.Print(LL_INTERR, VNCLOG("WM_QUERYENDSESSION session==0\n"));
+			vnclog.Print(LL_INTINFO, VNCLOG("KillAuthClients() ID_CLOSE \n"));
+			_this->m_server->KillAuthClients();
+			fShutdownOrdered=TRUE;
+			PostMessage(hwnd, WM_CLOSE, 0, 0);
+		}
 
 
 		/*//_this->m_server->KillAuthClients();
@@ -1057,6 +1083,7 @@ if ( ! _this->m_server->GetDisableTrayIcon())
 		if((lParam & ENDSESSION_LOGOFF) != ENDSESSION_LOGOFF){
 			_this->m_server->KillAuthClients();
 		}*/
+		}
 		
 		break;
 		
