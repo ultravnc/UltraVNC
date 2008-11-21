@@ -40,6 +40,7 @@ extern char sz_K4[64];
 extern char sz_K5[64];
 extern char sz_K6[64];
 extern char sz_K7[64];
+extern bool config_specified;
 
 // This file contains the code for saving and loading connection info.
 
@@ -128,7 +129,9 @@ void ClientConnection::SaveConnection()
 
 void ClientConnection::Save_Latest_Connection()
 {
-	vnclog.Print(2, _T("Saving connection info\n"));	
+	vnclog.Print(2, _T("Saving connection info\n"));
+	// don't save in case of .vnc file
+	if (config_specified) return;
 	char fname[_MAX_PATH];
 //	char tname[_MAX_FNAME + _MAX_EXT];
 	ofnInit();
@@ -219,8 +222,7 @@ int ClientConnection::LoadConnection(char *fname, bool fFromDialog)
 		m_opts.Register();
 	}
 	//AaronP
-	else if (strcmp(m_host, "") == 0 || 
-			  strcmp(fname,optionfile)==0)
+	else if (strcmp(m_host, "") == 0 || strcmp(fname,optionfile)==0 )//|| config_specified)
 	{
 		// Load the rest of params 
 		strcpy(m_opts.m_proxyhost,m_proxyhost);
@@ -241,7 +243,15 @@ int ClientConnection::LoadConnection(char *fname, bool fFromDialog)
 		m_proxyport = sessdlg.m_proxyport;
 		m_fUseProxy = sessdlg.m_fUseProxy;
 
-	};	
+	}
+	else if (config_specified)
+	{
+		strcpy(m_opts.m_proxyhost,m_proxyhost);
+		m_opts.m_proxyport=m_proxyport;
+		m_opts.m_fUseProxy=m_fUseProxy;
+		m_opts.Load(fname);
+		m_opts.Register();
+	}
 	//EndAaronP
 	return 0;
 }

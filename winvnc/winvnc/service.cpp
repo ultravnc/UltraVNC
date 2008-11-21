@@ -491,7 +491,7 @@ void monitor_sessions()
 						if (ProcessInfo.hProcess==NULL)
 						{
 									Sleep(1000);
-									if (Slow_connect) Sleep(4000);
+									if (Slow_connect) Sleep(2000);
 									LaunchProcessWin();
 									win=false;
 									Slow_connect=false;
@@ -504,10 +504,10 @@ void monitor_sessions()
 									{
 										//problems, we move from win-->default-->win
 										// Put a long timeout to give system time to start or logout
-										Sleep(10000);
+										Sleep(2000);
 									}
 									Sleep(1000);
-									if (Slow_connect) Sleep(4000);
+									if (Slow_connect) Sleep(2000);
 									CloseHandle(ProcessInfo.hProcess);
 									CloseHandle(ProcessInfo.hThread);
 									LaunchProcessWin();
@@ -532,7 +532,7 @@ void monitor_sessions()
 									{
 										//problems, we move from win-->default-->win
 										// Put a long timeout to give system time to start or logout
-										Sleep(10000);
+										Sleep(2000);
 									}
 							Sleep(1000);
 							if (Slow_connect) Sleep(4000);

@@ -685,7 +685,7 @@ vncDesktopThread::run_undetached(void *arg)
 			// END DYNAMIC CHANGES
 			////////////////////////////////////////////////////////////////////////////////
 
-
+			//Beep(1000,10);
 			//
 			// CALCULATE CHANGES
 			m_desktop->m_UltraEncoder_used=m_desktop->m_server->IsThereAUltraEncodingClient();

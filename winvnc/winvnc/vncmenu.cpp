@@ -432,10 +432,14 @@ vncMenu::AddTrayIcon()
 			m_server->TriggerUpdate();
 			return;
 		}
+		else
+		{
+			vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::AddTrayIcon - ADD Tray Icon call\n"));
+		}
 
 		// if ( ! m_server->GetDisableTrayIcon())
 		{
-//			vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::AddTrayIcon - ADD Tray Icon call\n"));
+			vnclog.Print(LL_INTERR, VNCLOG("########### No Shell_TrayWnd found %i\n"),IsIconSet);
 			SendTrayMsg(NIM_ADD, FALSE);
 		}
 		if (m_server->AuthClientCount() != 0) { //PGM @ Advantig

@@ -67,6 +67,7 @@ extern char sz_D26[64];
 extern char sz_D27[64];
 extern char sz_D28[64];
 extern bool g_disable_sponsor;
+bool config_specified=false;
 
 #define FT_RECV_TIMEOUT 30 * 1000
 
@@ -201,7 +202,7 @@ VNCOptions::VNCOptions()
   if (tempvar) strcpy(optionfile,tempvar);
   else strcpy(optionfile,"");
   strcat(optionfile,"\\options.vnc");
-  Load(optionfile);
+  if (!config_specified) Load(optionfile);
 }
 
 VNCOptions& VNCOptions::operator=(VNCOptions& s)
@@ -332,6 +333,7 @@ void VNCOptions::FixScaling()
 void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
   // We assume no quoting here.
   // Copy the command line - we don't know what might happen to the original
+  config_specified=false;
   int cmdlinelen = _tcslen(szCmdLine);
   if (cmdlinelen == 0) return;
 	
@@ -549,6 +551,10 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
         ArgError(sz_D16);
         continue;
       }
+	  else
+	  {
+		  config_specified=true;
+	  }
       // The GetPrivateProfile* stuff seems not to like some relative paths
       _fullpath(m_configFilename, args[j], _MAX_PATH);
       if (_access(m_configFilename, 04)) {
