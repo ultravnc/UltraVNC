@@ -1,8 +1,11 @@
 #include "stdhdrs.h"
 #include <windows.h>
+#include <Wtsapi32.h>
+#include "common/win32_helpers.h"
 
 static void WINAPI service_main(DWORD, LPTSTR *);
-static DWORD WINAPI control_handler(DWORD controlCode, DWORD dwEventType, LPVOID lpEventData, LPVOID lpContext);
+static void WINAPI control_handler(DWORD controlCode);
+static DWORD WINAPI control_handler_ex(DWORD controlCode, DWORD dwEventType, LPVOID lpEventData, LPVOID lpContext);
 static int pad();
 
 static SERVICE_STATUS serviceStatus;
@@ -43,8 +46,13 @@ static void WINAPI service_main(DWORD argc, LPTSTR* argv) {
     serviceStatus.dwCheckPoint=0;
     serviceStatus.dwWaitHint=0;
 
-    serviceStatusHandle=
-	RegisterServiceCtrlHandlerEx(service_name, control_handler,0);
+    typedef SERVICE_STATUS_HANDLE (WINAPI * pfnRegisterServiceCtrlHandlerEx)(LPCTSTR, LPHANDLER_FUNCTION_EX, LPVOID);
+    helper::DynamicFn<pfnRegisterServiceCtrlHandlerEx> pRegisterServiceCtrlHandlerEx("advapi32.dll","RegisterServiceCtrlHandlerExA");
+
+    if (pRegisterServiceCtrlHandlerEx.isValid())
+      serviceStatusHandle = (*pRegisterServiceCtrlHandlerEx)(service_name, control_handler_ex, 0);
+    else 
+      serviceStatusHandle = RegisterServiceCtrlHandler(service_name, control_handler);
 
     if(serviceStatusHandle) {
         /* service is starting */
@@ -80,7 +88,11 @@ monitor_sessions();
     }
 }
 ////////////////////////////////////////////////////////////////////////////////
-static DWORD WINAPI control_handler(DWORD controlCode, DWORD dwEventType, LPVOID lpEventData, LPVOID lpContext) {
+static void WINAPI control_handler(DWORD controlCode)
+{
+  control_handler_ex(controlCode, 0, 0, 0);
+}
+static DWORD WINAPI control_handler_ex(DWORD controlCode, DWORD dwEventType, LPVOID lpEventData, LPVOID lpContext) {
     switch (controlCode) {
     case SERVICE_CONTROL_INTERROGATE:
         break;

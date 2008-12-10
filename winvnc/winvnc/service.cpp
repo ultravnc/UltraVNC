@@ -32,6 +32,7 @@
 #include <stdio.h>
 #include <Tlhelp32.h>
 #include "inifile.h"
+#include "common/win32_helpers.h"
 
 HANDLE hEvent=NULL;
 extern HANDLE stopServiceEvent;
@@ -151,7 +152,15 @@ Find_winlogon(DWORD SessionId)
 //  char         szUserName[255];
   DWORD         Id = -1;
 
-  if (WTSEnumerateProcesses(WTS_CURRENT_SERVER_HANDLE, 0, 1, &pProcessInfo, &ProcessCount))
+  typedef BOOL (WINAPI *pfnWTSEnumerateProcesses)(HANDLE,DWORD,DWORD,PWTS_PROCESS_INFO*,DWORD*);
+  typedef VOID (WINAPI *pfnWTSFreeMemory)(PVOID);
+
+  helper::DynamicFn<pfnWTSEnumerateProcesses> pWTSEnumerateProcesses("wtsapi32","WTSEnumerateProcessesA");
+  helper::DynamicFn<pfnWTSFreeMemory> pWTSFreeMemory("wtsapi32", "WTSFreeMemory");
+
+  if (pWTSEnumerateProcesses.isValid() && pWTSFreeMemory.isValid())
+  {
+    if ((*pWTSEnumerateProcesses)(WTS_CURRENT_SERVER_HANDLE, 0, 1, &pProcessInfo, &ProcessCount))
   {
     // dump each process description
     for (DWORD CurrentProcess = 0; CurrentProcess < ProcessCount; CurrentProcess++)
@@ -167,7 +176,8 @@ Find_winlogon(DWORD SessionId)
         }
     }
 
-    WTSFreeMemory(pProcessInfo);
+    (*pWTSFreeMemory)(pProcessInfo);
+    }
   }
 
   return Id;
@@ -186,6 +196,11 @@ get_winlogon_handle(OUT LPHANDLE  lphUserToken)
 	DWORD Id=0;
 	if (W2K==0) Id=Find_winlogon(ID_session);
 	else Id=GetwinlogonPid();
+
+    // fall back to old method if Terminal services is disabled
+    if (W2K == 0 && Id == -1)
+        Id=GetwinlogonPid();
+
 	#ifdef _DEBUG
 					char			szText[256];
 					DWORD error=GetLastError();

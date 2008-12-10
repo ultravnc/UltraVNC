@@ -59,5 +59,17 @@ void close_handle(HANDLE& h)
     }
 }
 
+DynamicFnBase::DynamicFnBase(const TCHAR* dllName, const char* fnName) : dllHandle(0), fnPtr(0) {
+  dllHandle = LoadLibrary(dllName);
+  if (!dllHandle) {
+    return;
+  }
+  fnPtr = GetProcAddress(dllHandle, fnName);
+}
+
+DynamicFnBase::~DynamicFnBase() {
+  if (dllHandle)
+    FreeLibrary(dllHandle);
+}
 
 } // namespace helper
