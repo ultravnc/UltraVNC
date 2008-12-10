@@ -781,6 +781,11 @@ vncClientThread::InitAuthenticate()
 	if ((strcmp(username, "") != 0)
         || m_server->QueryIfNoLogon()) // marscha@2006 - Is AcceptDialog required even if no user is logged on
 		if (verified == vncServer::aqrQuery) {
+            // 10 Dec 2008 jdp reject/accept all incoming connections if the workstation is locked
+            if (vncService::IsWSLocked()) {
+                verified = m_server->QueryAccept() == 1 ? vncServer::aqrAccept : verified = vncServer::aqrReject;
+            } else {
+
 			vncAcceptDialog *acceptDlg = new vncAcceptDialog(m_server->QueryTimeout(),m_server->QueryAccept(), m_socket->GetPeerName());
 	
 			if (acceptDlg == NULL) 
@@ -814,6 +819,7 @@ vncClientThread::InitAuthenticate()
 						CloseDesktop(desktop);
 						SetThreadDesktop(old_desktop);
 				}
+            }
 		}
 
 	if (verified == vncServer::aqrReject) {
