@@ -467,7 +467,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 // helper functions for setting socket timeouts during file transfer
 bool ClientConnection::SetSendTimeout(int msecs)
 {
-    int timeout= msecs < 0 ? m_opts.m_FTTimeout : msecs;
+    int timeout= msecs < 0 ? m_opts.m_FTTimeout * 1000 : msecs;
 	if (setsockopt(m_sock, SOL_SOCKET, SO_SNDTIMEO, (char*)&timeout, sizeof(timeout)) == SOCKET_ERROR)
 	{
 		return false;
@@ -477,7 +477,7 @@ bool ClientConnection::SetSendTimeout(int msecs)
 
 bool ClientConnection::SetRecvTimeout(int msecs)
 {
-    int timeout= msecs < 0 ? m_opts.m_FTTimeout : msecs;
+    int timeout= msecs < 0 ? m_opts.m_FTTimeout * 1000 : msecs;
 	if (setsockopt(m_sock, SOL_SOCKET, SO_RCVTIMEO, (char*)&timeout, sizeof(timeout)) == SOCKET_ERROR)
 	{
 		return false;
@@ -1514,14 +1514,10 @@ void ClientConnection::GetConnectDetails()
 	}
 	else
 	{
-		char optionfile[MAX_PATH];
-		char *tempvar=NULL;
-		tempvar = getenv( "TEMP" );
-		if (tempvar) strcpy(optionfile,tempvar);
-		else strcpy(optionfile,"");
-		strcat(optionfile,"\\options.vnc");
 		if (!command_line)
 		{
+            char optionfile[MAX_PATH];
+            VNCOptions::GetDefaultOptionsFileName(optionfile);
 			if (LoadConnection(optionfile, false)==-1)
 				{
 					SessionDialog sessdlg(&m_opts, this, m_pDSMPlugin); //sf@2002
@@ -4457,6 +4453,12 @@ void ClientConnection::ReadServerState()
         vnclog.Print(1, _T("New input state %u"), m_remote_mouse_disable);
         break;
 
+    case rfbKeepAliveInterval:
+        m_opts.m_keepAliveInterval = value;
+        if (m_opts.m_keepAliveInterval >= (m_opts.m_FTTimeout - KEEPALIVE_HEADROOM))
+          m_opts.m_keepAliveInterval = (m_opts.m_FTTimeout  - KEEPALIVE_HEADROOM); 
+        vnclog.Print(1, _T("New keepalive interval %u"), m_opts.m_keepAliveInterval);
+        break;
     default:
         vnclog.Print(1, _T("Ignoring unsupported state %u"), state);
         break;
@@ -6827,7 +6829,7 @@ void ClientConnection::SendKeepAlive(bool bForce)
         time_t now = time(&now);
         int delta = now - lastSent;
 
-        if (!bForce && delta < KEEPALIVE_INTERVAL)
+        if (!bForce && delta < m_opts.m_keepAliveInterval)
             return;
 
         lastSent = now;

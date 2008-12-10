@@ -98,6 +98,7 @@ protected:
 	BOOL				m_allowshutdown;
 	BOOL				m_alloweditclients;
     int                 m_ftTimeout;
+    int                 m_keepAliveInterval;
 
 
 	// Password handling

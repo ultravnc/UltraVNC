@@ -137,11 +137,7 @@ void ClientConnection::Save_Latest_Connection()
 	ofnInit();
 	int disp = PORT_TO_DISPLAY(m_port);
 	char optionfile[MAX_PATH];
-	char *tempvar=NULL;
-	tempvar = getenv( "TEMP" );
-	if (tempvar) strcpy(optionfile,tempvar);
-	else strcpy(optionfile,"");
-	strcat(optionfile,"\\options.vnc");
+    VNCOptions::GetDefaultOptionsFileName(optionfile);
 
 	sprintf(fname, optionfile);
 	vnclog.Print(1, "Saving to %s\n", fname);	
@@ -210,11 +206,7 @@ int ClientConnection::LoadConnection(char *fname, bool fFromDialog)
 	// The Connection Profile ".vnc" has been required from Connection Session Dialog Box
 	// Load the rest of params
 	char optionfile[MAX_PATH];
-	char *tempvar=NULL;
-	tempvar = getenv( "TEMP" );
-	if (tempvar) strcpy(optionfile,tempvar);
-	else strcpy(optionfile,"");
-	strcat(optionfile,"\\options.vnc");
+    VNCOptions::GetDefaultOptionsFileName(optionfile);
 	
 	if (fFromDialog)
 	{

@@ -144,6 +144,7 @@ public:
 
 	bool m_fExitCheck; //PGM @ Advantig
     int m_FTTimeout;
+    int m_keepAliveInterval;
 
 #ifdef UNDER_CE
 	// WinCE screen format for dialogs (Palm vs HPC)
@@ -157,6 +158,8 @@ public:
 
     void CancelDialog();
 
+    static void GetDefaultOptionsFileName(TCHAR *optionfile);
+    static void DeleteDefaultOptions();
 	static BOOL CALLBACK OptDlgProc(  HWND hwndDlg,  UINT uMsg, 
 		WPARAM wParam, LPARAM lParam );
 

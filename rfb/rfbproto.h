@@ -832,6 +832,7 @@ typedef struct {
 #define rfbServerState_Enabled      1
 
 #define rfbServerRemoteInputsState  1
+#define rfbKeepAliveInterval        2
 
 typedef struct {
     CARD8   type;          /* always rfbServerState */
@@ -851,6 +852,10 @@ typedef struct {
 
 #define sz_rfbKeepAliveMsg 1
 #define KEEPALIVE_INTERVAL 5
+#define KEEPALIVE_HEADROOM 1
+
+#define FT_RECV_TIMEOUT    30
+
 
 /*-----------------------------------------------------------------------------
  * Union of all server->client messages.

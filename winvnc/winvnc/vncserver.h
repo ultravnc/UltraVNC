@@ -382,9 +382,16 @@ public:
     bool DoServerStateUpdates() { return m_fEnableStateUpdates; }
     void NotifyClients_StateChange(CARD32 state, CARD32 value);
     int  GetFTTimeout() { return m_ftTimeout; }
+    int  GetKeepAliveInterval () { return m_keepAliveInterval; }
     void SetFTTimeout(int msecs);
     void EnableKeepAlives(bool newstate) { m_fEnableKeepAlive = newstate; }
     bool DoKeepAlives() { return m_fEnableKeepAlive; }
+    void SetKeepAliveInterval(int secs) { 
+        m_keepAliveInterval = secs; 
+    if (m_keepAliveInterval >= (m_ftTimeout - KEEPALIVE_HEADROOM))
+        m_keepAliveInterval = m_ftTimeout  - KEEPALIVE_HEADROOM;
+    }
+
 	void TriggerUpdate();
 
 protected:
@@ -540,6 +547,7 @@ protected:
     bool m_fEnableStateUpdates;
     bool m_fEnableKeepAlive;
     int m_ftTimeout;
+    int m_keepAliveInterval;
 };
 
 #endif

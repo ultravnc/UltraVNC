@@ -1473,6 +1473,7 @@ vncClientThread::run(void *arg)
         if (need_first_keepalive)
         {
             // send first keepalive to let the client know we accepted the encoding request
+            m_client->SendServerStateUpdate(rfbKeepAliveInterval, m_server->GetKeepAliveInterval());
             m_client->SendKeepAlive();
             need_first_keepalive = false;
         }
@@ -2498,7 +2499,7 @@ vncClientThread::run(void *arg)
 					// sf@2004 - Delta Transfer
 					// Destination file already exists - the viewer sends the checksums
 					case rfbFileChecksums:
-                        m_socket->SetSendTimeout(m_server->GetFTTimeout());
+                        m_socket->SetSendTimeout(m_server->GetFTTimeout()*1000);
 						connected = m_client->ReceiveDestinationFileChecksums(Swap32IfLE(msg.ft.size), Swap32IfLE(msg.ft.length));
 						break;
 
@@ -4827,7 +4828,7 @@ void vncClient::SendKeepAlive(bool bForce)
         static time_t lastSent = 0;
         time_t now = time(&now);
         int delta = now - lastSent;
-        if (!bForce && delta < KEEPALIVE_INTERVAL)
+        if (!bForce && delta < m_server->GetKeepAliveInterval())
             return;
 
         lastSent = now;

@@ -2002,6 +2002,7 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, int nLen)
 		SetStatus(szStatus);
 		CloseHandle(m_hDestFile);
 		delete [] szRemoteFileName;
+        m_fFileDownloadError =  true;
 
 		// Tell the server to cancel the transfer
 		ft.size = Swap32IfLE(-1);
@@ -2596,7 +2597,7 @@ bool FileTransfer::SendFile(long lSize, int nLen)
 		SetStatus(szStatus);
 		sprintf(szStatus, " %s < %s >%s", sz_H25,szRemoteFileName,sz_H26);
 		SetStatus(szStatus);
-        m_fFileDownloadError = true;
+        m_fFileUploadError = true;
 
 		delete [] szRemoteFileName;
 		return false;

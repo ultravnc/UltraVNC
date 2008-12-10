@@ -35,7 +35,10 @@
 #include "VNCOptions.h"
 #include "Exception.h"
 #include "common/win32_helpers.h"
-
+#include <shlobj.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <direct.h>
 
 extern char sz_A2[64];
 extern char sz_D1[64];
@@ -69,7 +72,6 @@ extern char sz_D28[64];
 extern bool g_disable_sponsor;
 bool config_specified=false;
 
-#define FT_RECV_TIMEOUT 30 * 1000
 
 VNCOptions::VNCOptions()
 {
@@ -181,6 +183,7 @@ VNCOptions::VNCOptions()
   hwnd = 0;
 
   m_FTTimeout = FT_RECV_TIMEOUT;
+  m_keepAliveInterval = KEEPALIVE_INTERVAL;
   
 #ifdef UNDER_CE
   m_palmpc = false;
@@ -197,12 +200,40 @@ VNCOptions::VNCOptions()
   m_slowgdi = false;
 #endif
   char optionfile[MAX_PATH];
-  char *tempvar=NULL;
-  tempvar = getenv( "TEMP" );
-  if (tempvar) strcpy(optionfile,tempvar);
-  else strcpy(optionfile,"");
-  strcat(optionfile,"\\options.vnc");
+  GetDefaultOptionsFileName(optionfile);
   if (!config_specified) Load(optionfile);
+}
+
+void VNCOptions::GetDefaultOptionsFileName(TCHAR *optionfile)
+{
+    const char *APPDIR = "UltraVNC";
+    if (SHGetFolderPath (0,CSIDL_APPDATA, NULL, SHGFP_TYPE_CURRENT, optionfile) == S_OK)
+    {
+       strcat(optionfile, "\\");
+       strcat(optionfile, APPDIR);
+
+       struct _stat st;
+       if (_stat(optionfile, &st) == -1)
+           _mkdir(optionfile);
+    }
+    else
+    {
+      char *tempvar=NULL;
+      tempvar = getenv( "TEMP" );
+      if (tempvar) 
+          strcpy(optionfile,tempvar);
+      else 
+          strcpy(optionfile,"");
+    }
+
+    strcat(optionfile,"\\options.vnc");
+}
+
+void VNCOptions::DeleteDefaultOptions()
+{
+  char optionfile[MAX_PATH];
+  GetDefaultOptionsFileName(optionfile);
+  DeleteFile(optionfile);
 }
 
 VNCOptions& VNCOptions::operator=(VNCOptions& s)
@@ -282,7 +313,7 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
 
   m_fExitCheck    = s.m_fExitCheck; //PGM @ Advantig
   m_FTTimeout =  s.m_FTTimeout;
-
+  m_keepAliveInterval = s.m_keepAliveInterval;
 
 #ifdef UNDER_CE
   m_palmpc			= s.m_palmpc;
@@ -404,9 +435,18 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
           ArgError(sz_D3);
           continue;
         }
-        m_FTTimeout *= 1000;
-        if (m_FTTimeout > 60000)
-            m_FTTimeout = 60000;
+        if (m_FTTimeout > 60)
+            m_FTTimeout = 60;
+        j++;
+      }
+    }  else if (SwitchMatch(args[j], _T("keepalive"))) { //PGM @ Advantig
+      if (j+1 < i && args[j+1][0] >= '0' && args[j+1][0] <= '9') {
+        if (_stscanf(args[j+1], _T("%d"), &m_keepAliveInterval) != 1) {
+          ArgError(sz_D3);
+          continue;
+        }
+        if (m_keepAliveInterval >= (m_FTTimeout - KEEPALIVE_HEADROOM))
+          m_keepAliveInterval = (m_FTTimeout - KEEPALIVE_HEADROOM); 
         j++;
       }
     } else if ( SwitchMatch(args[j], _T("askexit"))) { //PGM @ Advantig
@@ -799,7 +839,8 @@ void VNCOptions::Save(char *fname)
   //saveInt("AutoReconnect", m_autoReconnect,	fname);
  
   saveInt("ExitCheck",				m_fExitCheck,	fname); //PGM @ Advantig
-  saveInt("FileTransferTimeout",    m_FTTimeout/1000,    fname);
+  saveInt("FileTransferTimeout",    m_FTTimeout,    fname);
+  saveInt("KeepAliveInterval",      m_keepAliveInterval,    fname);
 }
 
 void VNCOptions::Load(char *fname)
@@ -875,9 +916,13 @@ void VNCOptions::Load(char *fname)
   //m_autoReconnect =		readInt("AutoReconnect",	m_autoReconnect, fname) != 0;
   
   m_fExitCheck =		readInt("ExitCheck", m_fExitCheck,  fname) != 0; //PGM @ Advantig
-  m_FTTimeout  = readInt("FileTransferTimeout", m_FTTimeout, fname) * 1000;
-  if (m_FTTimeout > 60000)
-      m_FTTimeout = 60000; // cap at 1 minute
+  m_FTTimeout  = readInt("FileTransferTimeout", m_FTTimeout, fname);
+  if (m_FTTimeout > 60)
+      m_FTTimeout = 60; // cap at 1 minute
+
+  m_keepAliveInterval  = readInt("KeepAliveInterval", m_keepAliveInterval, fname);
+  if (m_keepAliveInterval >= (m_FTTimeout - KEEPALIVE_HEADROOM))
+      m_keepAliveInterval = (m_FTTimeout  - KEEPALIVE_HEADROOM); 
 
 }
 

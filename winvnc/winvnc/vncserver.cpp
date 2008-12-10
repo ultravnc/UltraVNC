@@ -225,7 +225,8 @@ vncServer::vncServer()
 
 	m_fRunningFromExternalService = false;
 	m_fAutoRestart = false;
-    m_ftTimeout = 30000;
+    m_ftTimeout = FT_RECV_TIMEOUT;
+    m_keepAliveInterval = KEEPALIVE_INTERVAL;
 }
 
 vncServer::~vncServer()

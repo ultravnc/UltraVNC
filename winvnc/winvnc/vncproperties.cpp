@@ -66,7 +66,8 @@ vncProperties::vncProperties()
 	m_usersettings = TRUE;
 	Lock_service_helper=TRUE;
 	m_fUseRegistry = FALSE;
-    m_ftTimeout = 30000;
+    m_ftTimeout = FT_RECV_TIMEOUT;
+    m_keepAliveInterval = KEEPALIVE_INTERVAL;
 }
 
 vncProperties::~vncProperties()
@@ -2207,10 +2208,15 @@ void vncProperties::LoadFromIniFile()
 	m_alloweditclients = myIniFile.ReadInt("admin", "AllowEditClients", m_alloweditclients);
 
     m_ftTimeout = myIniFile.ReadInt("admin", "FileTransferTimeout", m_ftTimeout / 1000) * 1000;
-    if (m_ftTimeout > 60000)
-        m_ftTimeout = 60000;
+    if (m_ftTimeout > 60)
+        m_ftTimeout = 60;
+
+    m_keepAliveInterval = myIniFile.ReadInt("admin", "KeepAliveInterval", m_keepAliveInterval);
+    if (m_keepAliveInterval >= (m_ftTimeout - KEEPALIVE_HEADROOM))
+        m_keepAliveInterval = m_ftTimeout - KEEPALIVE_HEADROOM;
 
     m_server->SetFTTimeout(m_ftTimeout);
+    m_server->SetKeepAliveInterval(m_keepAliveInterval);
     
 
 	ApplyUserPrefs();
@@ -2291,7 +2297,8 @@ void vncProperties::SaveToIniFile()
 	myIniFile.WriteInt("admin", "AllowShutdown", m_allowshutdown);
 	myIniFile.WriteInt("admin", "AllowProperties",  m_allowproperties);
 	myIniFile.WriteInt("admin", "AllowEditClients", m_alloweditclients);
-    myIniFile.WriteInt("admin", "FileTransferTimeout", m_ftTimeout / 1000);
+    myIniFile.WriteInt("admin", "FileTransferTimeout", m_ftTimeout);
+    myIniFile.WriteInt("admin", "KeepAliveInterval", m_keepAliveInterval);
 
 	myIniFile.WriteInt("admin", "DisableTrayIcon", m_server->GetDisableTrayIcon());
 	myIniFile.WriteInt("admin", "MSLogonRequired", m_server->MSLogonRequired());
