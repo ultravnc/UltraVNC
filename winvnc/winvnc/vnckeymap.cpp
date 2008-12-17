@@ -584,20 +584,55 @@ public:
 			  vnclog.Print(LL_INTWARN, " Found key");
 			  //Lookup ascii representation
 			  int ascii=0;
+#if 0
+              // 11 Dec 2008 jdp disabled since the viewer is sending unicode now
 			  for (ascii=0;ascii<256;ascii++)
 			  {
 				  if (keysym==ascii_to_x[ascii]) break;
 			  }
+#endif
+              ascii = keysym;
+			  if (ascii <= 255)
+			  {
+
 			  rdr::U8 a0=ascii/100;
 			  ascii=ascii%100;
 			  rdr::U8 a1=ascii/10;
 			  ascii=ascii%10;
 			  rdr::U8 a2=ascii;
-			  if (ascii!=255)
-			  {
 
+              KeyStateModifier shift(VK_SHIFT);
+              KeyStateModifier lshift(VK_LSHIFT);
+              KeyStateModifier rshift(VK_RSHIFT);
+
+              if (vncService::IsWin95()) {
+                shift.release();
+              } else {
+                lshift.release();
+                rshift.release();
+			  }
+
+              vnclog.Print(LL_INTWARN, " Simulating ALT+%d%d%d\n", a0, a1 ,a2);
 
 			  keybd_event(VK_MENU,MapVirtualKey( VK_MENU, 0 ), 0 ,0);
+              /**
+                Pressing the Alt+NNN combinations without leading zero (for example, Alt+20, Alt+130, Alt+221) 
+                will insert characters from the Extended ASCII (or MS DOS ASCII, or OEM) table. The character 
+                glyphs contained by this table depend on the language of Windows. See the table below for the 
+                list of characters that can be inserted through the Alt+NNN combinations (without leading zero)
+                in English Windows.
+
+                Pressing the Alt+0NNN combinations will insert the ANSI characters corresponding to the activate 
+                keyboard layout. Please see Windows Character Map utility (charmap.exe) for the possible Alt+0NNN
+                combinations.
+
+                Finally, the Alt+00NNN combinations (two leading zeros) will insert Unicode characters. The Unicode 
+                codes of characters are displayed in Charmap.
+
+              **/
+              // jdp 11 December 2008 - Need the leading 0! 
+			  keybd_event(VK_NUMPAD0,    MapVirtualKey(VK_NUMPAD0,    0), 0, 0);
+			  keybd_event(VK_NUMPAD0,    MapVirtualKey(VK_NUMPAD0,    0),KEYEVENTF_KEYUP,0);
 			  keybd_event(VK_NUMPAD0+a0, MapVirtualKey(VK_NUMPAD0+a0, 0), 0, 0);
 			  keybd_event(VK_NUMPAD0+a0, MapVirtualKey(VK_NUMPAD0+a0, 0),KEYEVENTF_KEYUP,0);
 			  keybd_event(VK_NUMPAD0+a1, MapVirtualKey(VK_NUMPAD0+a1, 0),0,0);
