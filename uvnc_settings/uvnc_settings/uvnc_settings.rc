@@ -1,0 +1,449 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#define APSTUDIO_HIDDEN_SYMBOLS
+#include "windows.h"
+#undef APSTUDIO_HIDDEN_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Dutch (Netherlands) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NLD)
+#ifdef _WIN32
+LANGUAGE LANG_DUTCH, SUBLANG_DUTCH
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_UVNC_SETTINGS       ICON                    "uvnc_settings.ico"
+IDI_SMALL               ICON                    "small.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDC_UVNC_SETTINGS MENU 
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "E&xit",                       IDM_EXIT
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&About ...",                  IDM_ABOUT
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDC_UVNC_SETTINGS ACCELERATORS 
+BEGIN
+    "?",            IDM_ABOUT,              ASCII,  ALT
+    "/",            IDM_ABOUT,              ASCII,  ALT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_MSLOGON DIALOG  0, 0, 186, 166
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "MS logon setup"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,77,148,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,132,148,50,14
+    EDITTEXT        IDC_GROUP1,21,19,93,13,ES_AUTOHSCROLL
+    EDITTEXT        IDC_GROUP2,21,36,93,13,ES_AUTOHSCROLL
+    EDITTEXT        IDC_GROUP3,21,53,93,13,ES_AUTOHSCROLL
+    CONTROL         "",IDC_CHECKG1L,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,127,20,13,10
+    CONTROL         "",IDC_CHECKG2L,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,127,38,16,8
+    CONTROL         "",IDC_CHECKG3L,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,127,56,16,8
+    CONTROL         "",IDC_CHECKG1D,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,153,22,16,8
+    CONTROL         "",IDC_CHECKG2D,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,153,38,16,8
+    CONTROL         "",IDC_CHECKG3D,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,153,56,16,8
+    LTEXT           "Local",IDC_STATIC,127,8,18,8
+    LTEXT           "Domain",IDC_STATIC,153,8,25,8
+    LTEXT           "Group",IDC_STATIC,23,8,20,8
+    LTEXT           "1",IDC_STATIC,11,22,8,8
+    LTEXT           "2",IDC_STATIC,11,38,8,8
+    LTEXT           "3",IDC_STATIC,11,56,8,8
+    LTEXT           "Group 1, 2 = Full Access       Group 3 = Read Only",IDC_STATIC,16,88,162,8
+    LTEXT           "Must be run as a Service on NT4, W2K\nCan be run as a Service or Application on XP, W2003\nLocal admins have always access.\nFor NT4 and W2K in Application mode you need to add the Local Admin Group.",IDC_STATIC,8,100,174,41
+    GROUPBOX        "",IDC_STATIC,5,0,178,74
+    GROUPBOX        "Rules",IDC_STATIC,5,77,178,68
+END
+
+IDD_PASSWD DIALOGEX 22, 17, 177, 42
+STYLE DS_SYSMODAL | DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | WS_CAPTION | WS_SYSMENU
+CAPTION "sfx password"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   ">>",IDOK,147,29,30,11,WS_GROUP
+    EDITTEXT        IDC_SFXPASSWD,67,10,100,14,ES_PASSWORD | ES_AUTOHSCROLL
+    LTEXT           "SFX Password:",IDC_STATIC,13,13,50,8
+END
+
+IDD_OPTION1 DIALOGEX 0, 0, 260, 180
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    GROUPBOX        "Incoming Connections",IDC_STATIC,3,5,253,166
+    CONTROL         "Enable incoming port",IDC_CONNECT_SOCK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,15,87,10
+    CONTROL         "Enable Java port",IDC_CONNECT_HTTP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,24,26,74,10
+    EDITTEXT        IDC_PORTRFB,159,11,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PORTHTTP,159,26,40,14,ES_AUTOHSCROLL
+    LTEXT           "RFB Port:",IDC_STATIC,119,14,32,8
+    LTEXT           "Http Port:",IDC_STATIC,119,28,33,8
+    CONTROL         "Auto",IDC_PORTNO_AUTO,"Button",BS_AUTORADIOBUTTON,209,16,31,10
+    CONTROL         "Manual",IDC_SPECPORT,"Button",BS_AUTORADIOBUTTON,209,27,39,10
+    CONTROL         "Allow Loopback connections",IDC_ALLOWLOOPBACK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,40,102,10
+    CONTROL         "LoopbackOnly",IDC_LOOPBACKONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,51,61,10
+    PUSHBUTTON      "Find Ext IP",IDC_TESTNET,14,116,50,14
+    PUSHBUTTON      "Forward RFB Port (UPnP)",IDC_UPNPON,14,132,90,14
+    PUSHBUTTON      "Close Port (UPnP)",IDC_UPNPOFF,14,148,90,14
+    LTEXT           "Local IP:",IDC_STATIC,11,87,32,8
+    LTEXT           "External IP:",IDC_STATIC,141,87,39,8
+    LTEXT           "mylocalip",IDC_LOCAL,57,87,71,8
+    LTEXT           "myexternip",IDC_REMOTE,187,87,60,8
+    EDITTEXT        IDC_EDIT3,107,98,141,63,ES_MULTILINE | ES_AUTOVSCROLL
+    GROUPBOX        "Network info  UPnP",IDC_STATIC,7,76,246,90
+    PUSHBUTTON      "Check UPnP",IDC_CHECKUPNP,14,100,50,14
+    PUSHBUTTON      "Fix UPnP",IDC_FIXUPNP,66,101,35,14
+END
+
+IDD_PARENT DIALOGEX 0, 0, 277, 231
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION
+EXSTYLE WS_EX_CONTEXTHELP | WS_EX_CONTROLPARENT
+CAPTION "UltraVnc settings"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    PUSHBUTTON      "&OK",IDOK,140,210,75,14
+    PUSHBUTTON      "&Cancel",IDCANCEL,220,210,50,14
+    CONTROL         "Tab1",IDC_TAB,"SysTabControl32",TCS_MULTILINE | WS_TABSTOP,5,5,265,200
+END
+
+IDD_OPTION2 DIALOGEX 0, 0, 260, 180
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    GROUPBOX        "Security",IDC_STATIC,3,1,253,170
+    LTEXT           "VNC Password:",IDC_STATIC,17,21,50,8
+    EDITTEXT        IDC_PASSWORD,81,18,65,14,ES_PASSWORD | ES_AUTOHSCROLL
+    CONTROL         "Require MS Logon (User/Password/Domain)",IDC_MSLOGON_CHECKD,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,35,155,10
+    CONTROL         "New MS Logon (Support multiple domains)",IDC_NEW_MSLOGON,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,35,46,149,10
+    PUSHBUTTON      "Configure MS Logon Groups",IDC_MSLOGON,62,58,132,14
+    GROUPBOX        "Authentication",IDC_STATIC,11,11,236,64
+    GROUPBOX        "Encryption",IDC_STATIC,11,118,236,47
+    CONTROL         "Use",IDC_PLUGIN_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,132,28,10
+    GROUPBOX        "Advanced",IDC_STATIC,11,75,236,40
+    CONTROL         "Allow shutdown UltraVnc",IDC_ALLOWSHUTDOWN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,115,82,95,10
+    CONTROL         "Password Required",IDC_PASSRECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,93,77,10
+    CONTROL         "Allow edit clients",IDC_ALLOWEDIT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,115,92,69,10
+    CONTROL         "Allow properties",IDC_ALLOWPROP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,115,102,67,10
+    PUSHBUTTON      "Configuration",IDC_PLUGIN_BUTTON,49,146,50,14
+    COMBOBOX        IDC_PLUGINS_COMBO,49,129,183,30,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+END
+
+IDD_OPTION3 DIALOGEX 0, 0, 260, 180
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    GROUPBOX        "File Transfer",IDC_STATIC,3,6,253,59
+    CONTROL         "Enable",IDC_FILETRANSFER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,21,37,10
+    CONTROL         "User impersonation (for Service only)",IDC_FTUSERIMPERSONATION_CHECK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,31,34,135,10
+    LTEXT           "FileTransferTimeout",IDC_STATIC,31,49,64,8
+    EDITTEXT        IDC_FTTIMEOUT,103,46,40,14,ES_AUTOHSCROLL
+    CONTROL         "Disable Viewers inputs",IDC_DISABLE_INPUTS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,89,87,10
+    CONTROL         "Disable Local inputs",IDC_DISABLE_LOCAL_INPUTS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,101,78,10
+    CONTROL         "Japanese (v102 keyboard method)",IDC_JAP_INPUTS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,113,128,10
+    CONTROL         "Enable Blank Monitor on Viewer Request",IDC_BLANK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,125,144,10
+    CONTROL         "Use powersaving",IDC_POWER,"Button",BS_AUTORADIOBUTTON,47,135,71,10
+    CONTROL         "Use Alpha Blending",IDC_ALPHA,"Button",BS_AUTORADIOBUTTON,127,135,77,10
+    GROUPBOX        "Input",IDC_STATIC,3,68,253,103
+END
+
+IDD_OPTION4 DIALOGEX 0, 0, 260, 180
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    GROUPBOX        "Connection Options",IDC_STATIC,3,4,253,167
+    GROUPBOX        "Query on incoming",IDC_STATIC,9,30,241,70
+    GROUPBOX        "Multiple connections",IDC_STATIC,9,103,241,38
+    GROUPBOX        "Disconnect",IDC_STATIC,9,142,241,25
+    CONTROL         "Do Nothing",IDC_LOCKSETTING_NOTHING,"Button",BS_AUTORADIOBUTTON | WS_GROUP,22,152,51,10
+    CONTROL         "Lock Workstation",IDC_LOCKSETTING_LOCK,"Button",BS_AUTORADIOBUTTON,81,152,71,10
+    CONTROL         "Logoff Workstation",IDC_LOCKSETTING_LOGOFF,"Button",BS_AUTORADIOBUTTON,160,152,77,10
+    CONTROL         "Display Query Window",IDQUERY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,42,88,10
+    CONTROL         "Disconnect all existing connections",IDC_MV1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,13,111,126,10
+    CONTROL         "Keep existing connections",IDC_MV2,"Button",BS_AUTORADIOBUTTON,13,124,99,10
+    CONTROL         "Refuse the new connection",IDC_MV3,"Button",BS_AUTORADIOBUTTON,141,111,103,10
+    CONTROL         "Refuse all new connections",IDC_MV4,"Button",BS_AUTORADIOBUTTON,141,124,103,10
+    LTEXT           "Timeout: ",IDC_STATIC,132,43,31,8
+    EDITTEXT        IDQUERYTIMEOUT,167,40,22,14,ES_AUTOHSCROLL
+    LTEXT           "Seconds",IDC_STATIC,198,43,28,8
+    LTEXT           "Default action: ",IDC_STATIC,16,58,50,8
+    CONTROL         "Refuse",IDC_DREFUSE,"Button",BS_AUTORADIOBUTTON,81,57,39,10
+    CONTROL         "Accept",IDC_DACCEPT,"Button",BS_AUTORADIOBUTTON,131,57,38,10
+    EDITTEXT        IDC_AUTHHOST,60,67,188,14,ES_AUTOHSCROLL
+    LTEXT           "AuthHosts:",IDC_STATIC,15,70,37,8
+    CONTROL         "Query If No Logon",IDC_QNOLOGON,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,86,71,10
+    LTEXT           "Idle Timeout",IDC_STATIC,15,17,40,8
+    EDITTEXT        IDC_IDLETIME,59,14,40,14,ES_AUTOHSCROLL
+    LTEXT           "Seconds",IDC_STATIC,104,17,28,8
+END
+
+IDD_OPTION5 DIALOGEX 0, 0, 260, 180
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    GROUPBOX        "Capture options",IDC_STATIC,3,4,253,167
+    GROUPBOX        "Polling",IDC_STATIC,9,14,241,59
+    GROUPBOX        "Advanced",IDC_STATIC,9,73,241,91
+    CONTROL         "Poll Full Screen",IDC_POLL_FULLSCREEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,24,25,63,10
+    CONTROL         "Poll Foreground Window",IDC_POLL_FOREGROUND,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,33,36,93,10
+    CONTROL         "Poll Console Windows Only",IDC_CONSOLE_ONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,142,36,101,10
+    CONTROL         "Poll Window Under Cursor",IDC_POLL_UNDER_CURSOR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,33,48,99,10
+    CONTROL         "Poll On Event Only",IDC_ONEVENT_ONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,142,49,75,10
+    CONTROL         "Low Accuracy",IDC_TURBOMODE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,24,60,60,10
+    CONTROL         "Use system hookdll",IDC_HOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,83,77,10
+    CONTROL         "Use mirror driver",IDC_DRIVER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,94,69,10
+    PUSHBUTTON      "Check the Mirror Driver",IDC_CHECKDRIVER,110,92,84,14
+    CONTROL         "Capture Alpha-Blending",IDC_ALPHA,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,129,91,10
+    CONTROL         "Remove Aero while connected",IDC_REMOVE_Aero,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,140,125,10
+    CONTROL         "Remove Wallpaper while connected",IDC_REMOVE_WALLPAPER,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,151,129,10
+    CONTROL         "Show Primary Display",IDC_PRIM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,45,111,84,10
+    CONTROL         "Show Secundary Display",IDC_SEC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,139,111,94,10
+END
+
+IDD_OPTION7 DIALOGEX 0, 0, 260, 180
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    GROUPBOX        "Misc",IDC_STATIC,3,4,253,67
+    CONTROL         "Disable Tray icon",IDC_DISABLETRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,14,70,10
+    LTEXT           "Default Server screen scale:  1/",IDC_STATIC,13,25,108,8
+    CONTROL         "Disable ini file settings and use registry",IDC_DISINI,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,34,140,10
+    EDITTEXT        IDC_SCALE,119,21,21,14,ES_AUTOHSCROLL
+    CONTROL         "Log debug infos",IDC_LOG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,84,67,10
+    CONTROL         "Log to video",IDC_VIDEO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,128,55,10
+    LTEXT           "Path: ",IDC_STATIC,13,147,20,8
+    EDITTEXT        IDC_EDIT_PATH,35,144,152,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "Reset Avi encoder",IDC_CLEAR,69,125,71,14
+    CONTROL         "File (winvnc.log)",IDC_FILE,"Button",BS_AUTORADIOBUTTON,23,97,68,10
+    CONTROL         "Window",IDC_WINDOW,"Button",BS_AUTORADIOBUTTON,23,108,41,10
+    CONTROL         "All",IDC_ALL,"Button",BS_AUTORADIOBUTTON | WS_GROUP,144,86,23,10
+    CONTROL         "Info",IDC_INFO,"Button",BS_AUTORADIOBUTTON,144,97,29,10
+    CONTROL         "Warning",IDC_WARN,"Button",BS_AUTORADIOBUTTON,144,108,43,10
+    GROUPBOX        "Logging",IDC_STATIC,3,73,253,98
+    CONTROL         "Fast User Switching fix",IDC_KICKRDP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,45,114,10
+    EDITTEXT        IDC_SCL,89,55,164,14,ES_AUTOHSCROLL
+    LTEXT           "Service command line:",IDC_STATIC,15,58,72,8
+END
+
+IDD_OPTION8 DIALOGEX 0, 0, 260, 180
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    GROUPBOX        "Create sfx server",IDC_STATIC,3,4,253,167
+    EDITTEXT        IDC_INVERSPORT,99,35,40,14,ES_AUTOHSCROLL
+    LTEXT           "Invers port :",IDC_STATIC,11,38,42,8
+    PUSHBUTTON      "Find Ext IP",IDC_TESTNET,13,97,50,14
+    PUSHBUTTON      "Forward RFB Port (UPnP)",IDC_UPNPON,13,113,90,14
+    PUSHBUTTON      "Close Port (UPnP)",IDC_UPNPOFF,13,129,90,14
+    LTEXT           "Local IP:",IDC_STATIC,10,68,32,8
+    LTEXT           "External IP:",IDC_STATIC,140,68,39,8
+    LTEXT           "mylocalip",IDC_LOCAL,56,68,71,8
+    EDITTEXT        IDC_EDIT3,106,79,141,63,ES_MULTILINE | ES_AUTOVSCROLL
+    GROUPBOX        "Network info  UPnP",IDC_STATIC,6,53,246,94
+    PUSHBUTTON      "Check UPnP",IDC_CHECKUPNP,13,81,50,14
+    PUSHBUTTON      "Fix UPnP",IDC_FIXUPNP,65,82,35,14
+    LTEXT           "myexternip",IDC_REMOTE,183,67,60,8
+    PUSHBUTTON      ">>",IDC_NEXT,195,152,50,14
+    CONTROL         "Manual enter IP addresses",IDC_MANUAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,154,109,10
+    LTEXT           "Name config :",IDC_STATIC,13,19,45,8
+    EDITTEXT        IDC_EDITNAME,99,16,96,14,ES_AUTOHSCROLL
+END
+
+IDD_OPTION9 DIALOGEX 0, 0, 260, 180
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    GROUPBOX        "Create sfx server",IDC_STATIC,3,4,253,167
+    CONTROL         "Use encryption",IDC_CHECKUSEENCRYPTION,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,60,64,10
+    EDITTEXT        IDC_EDITOUTSERV,41,117,212,14,ES_AUTOHSCROLL
+    CONTROL         "LAN",IDC_RADIOLAN,"Button",BS_AUTORADIOBUTTON | WS_GROUP,108,48,29,10
+    CONTROL         "Internet",IDC_RADIOINTERNET,"Button",BS_AUTORADIOBUTTON,213,48,39,10
+    PUSHBUTTON      "Create sfx",IDC_CREATESFX,195,153,50,14
+    LTEXT           "Is viewer and server on same",IDC_STATIC,11,49,96,8
+    LTEXT           "or connected via the",IDC_STATIC,139,49,71,8
+    CONTROL         "Reconnect on failure",IDC_CHECKRECON,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,72,82,10
+    CONTROL         "Use Repeater",IDC_CHECKREP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,84,60,10
+    EDITTEXT        IDC_EDITREP,148,74,101,14,ES_AUTOHSCROLL
+    LTEXT           "IP Repeater:",IDC_STATIC,94,78,42,8
+    EDITTEXT        IDC_EDITID,113,91,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDITOUTVIEW,41,134,211,14,ES_AUTOHSCROLL
+    LTEXT           "Server:",IDC_STATIC,8,121,25,8
+    LTEXT           "Viewer:",IDC_STATIC,7,137,25,8
+    LTEXT           "Local IP:",IDC_STATIC,12,15,32,8
+    LTEXT           "External IP:",IDC_STATIC,11,34,39,8
+    PUSHBUTTON      "<< ",IDC_BACK,8,153,50,14
+    EDITTEXT        IDC_LOCALIP,59,12,93,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_REMOTEIP,59,31,93,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDITSPORT,161,91,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDITVPORT,209,91,40,14,ES_AUTOHSCROLL
+    LTEXT           "ID",IDC_STATIC,129,107,8,8
+    LTEXT           "Server Port",IDC_STATIC,161,107,38,8
+    LTEXT           "Viewer Port",IDC_STATIC,209,107,38,8
+END
+
+IDD_ABOUTBOX DIALOG  22, 17, 230, 75
+STYLE DS_SETFONT | DS_MODALFRAME | WS_CAPTION | WS_SYSMENU
+CAPTION "About"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    ICON            IDI_UVNC_SETTINGS,IDC_MYICON,14,9,16,16
+    LTEXT           "uvnc_settings Version 1.0",IDC_STATIC,49,10,119,8,SS_NOPREFIX
+    LTEXT           "Copyright (C) 2008",IDC_STATIC,49,20,119,8
+    DEFPUSHBUTTON   "OK",IDOK,195,6,30,11,WS_GROUP
+END
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#define APSTUDIO_HIDDEN_SYMBOLS\r\n"
+    "#include ""windows.h""\r\n"
+    "#undef APSTUDIO_HIDDEN_SYMBOLS\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_PASSWD, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 40
+    END
+
+    IDD_OPTION1, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 171
+    END
+
+    IDD_OPTION2, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 171
+    END
+
+    IDD_OPTION3, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 171
+    END
+
+    IDD_OPTION4, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 171
+    END
+
+    IDD_OPTION5, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 171
+    END
+
+    IDD_OPTION7, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 171
+    END
+
+    IDD_OPTION8, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 171
+    END
+
+    IDD_OPTION9, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 171
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_APP_TITLE           "uvnc_settings"
+    IDC_UVNC_SETTINGS       "UVNC_SETTINGS"
+END
+
+#endif    // Dutch (Netherlands) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
