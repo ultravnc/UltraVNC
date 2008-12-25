@@ -68,6 +68,8 @@ vncProperties::vncProperties()
 	m_fUseRegistry = FALSE;
     m_ftTimeout = FT_RECV_TIMEOUT;
     m_keepAliveInterval = KEEPALIVE_INTERVAL;
+	m_pref_Primary=true;
+	m_pref_Secundary=false;
 }
 
 vncProperties::~vncProperties()
@@ -1779,7 +1781,9 @@ vncProperties::LoadUserPrefs(HKEY appkey)
 	m_pref_DefaultScale = LoadInt(appkey, "DefaultScale", m_pref_DefaultScale);
 	m_pref_CaptureAlphaBlending = LoadInt(appkey, "CaptureAlphaBlending", m_pref_CaptureAlphaBlending); // sf@2005
 	m_pref_BlackAlphaBlending = LoadInt(appkey, "BlackAlphaBlending", m_pref_BlackAlphaBlending); // sf@2005
-//	m_pref_GammaGray = LoadInt(appkey, "GammaGray", m_pref_GammaGray);	// [v1.0.2-jp1 fix]
+	
+	m_pref_Primary=LoadInt(appkey, "primary", m_pref_Primary);
+	m_pref_Secundary=LoadInt(appkey, "secundary", m_pref_Secundary);
 
 	m_pref_UseDSMPlugin = LoadInt(appkey, "UseDSMPlugin", m_pref_UseDSMPlugin);
 	LoadDSMPluginName(appkey, m_pref_szDSMPlugin);
@@ -1829,7 +1833,8 @@ vncProperties::ApplyUserPrefs()
 	m_server->FTUserImpersonation(m_pref_FTUserImpersonation); // sf@2005
 	m_server->CaptureAlphaBlending(m_pref_CaptureAlphaBlending); // sf@2005
 	m_server->BlackAlphaBlending(m_pref_BlackAlphaBlending); // sf@2005
-//	m_server->GammaGray(m_pref_GammaGray);	// [v1.0.2-jp1 fix]
+	m_server->Primary(m_pref_Primary);
+	m_server->Secundary(m_pref_Secundary);
 
 	m_server->BlankMonitorEnabled(m_pref_EnableBlankMonitor);
 	m_server->SetDefaultScale(m_pref_DefaultScale);
@@ -2043,7 +2048,8 @@ vncProperties::SaveUserPrefs(HKEY appkey)
 	SaveInt(appkey, "BlankMonitorEnabled", m_server->BlankMonitorEnabled());
 	SaveInt(appkey, "CaptureAlphaBlending", m_server->CaptureAlphaBlending()); // sf@2005
 	SaveInt(appkey, "BlackAlphaBlending", m_server->BlackAlphaBlending()); // sf@2005
-//	SaveInt(appkey, "GammaGray", m_server->GammaGray());	// [v1.0.2-jp1 fix]
+	SaveInt(appkey, "primary", m_server->Primary());
+	SaveInt(appkey, "secundary", m_server->Secundary());
 
 	SaveInt(appkey, "DefaultScale", m_server->GetDefaultScale());
 
@@ -2236,6 +2242,9 @@ void vncProperties::LoadUserPrefsFromIniFile()
 	m_pref_UseDSMPlugin = myIniFile.ReadInt("admin", "UseDSMPlugin", m_pref_UseDSMPlugin);
 	myIniFile.ReadString("admin", "DSMPlugin",m_pref_szDSMPlugin,128);
 
+	m_pref_Primary = myIniFile.ReadInt("admin", "primary", m_pref_Primary);
+	m_pref_Secundary = myIniFile.ReadInt("admin", "secundary", m_pref_Secundary);
+
 	// Connection prefs
 	m_pref_SockConnect=myIniFile.ReadInt("admin", "SocketConnect", m_pref_SockConnect);
 	m_pref_HTTPConnect=myIniFile.ReadInt("admin", "HTTPConnect", m_pref_HTTPConnect);
@@ -2333,6 +2342,9 @@ void vncProperties::SaveUserPrefsToIniFile()
 
 	myIniFile.WriteInt("admin", "UseDSMPlugin", m_server->IsDSMPluginEnabled());
 	myIniFile.WriteString("admin", "DSMPlugin",m_server->GetDSMPluginName());
+
+	myIniFile.WriteInt("admin", "primary", m_server->Primary());
+	myIniFile.WriteInt("admin", "secundary", m_server->Secundary());
 
 	// Connection prefs
 	myIniFile.WriteInt("admin", "SocketConnect", m_server->SockConnected());

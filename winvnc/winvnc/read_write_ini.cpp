@@ -75,6 +75,9 @@ char SingleWindowName[32];
 LONG FTTimeout = 30;
 char path[512];
 
+LONG Primary=1;
+LONG Secundary=0;
+
 BUseRegistry = myIniFile_In.ReadInt("admin", "UseRegistry", 0);
 if (!myIniFile_Out.WriteInt("admin", "UseRegistry", BUseRegistry))
 {
@@ -153,6 +156,11 @@ DefaultScale = myIniFile_In.ReadInt("admin", "DefaultScale", 1);
 CaptureAlphaBlending = myIniFile_In.ReadInt("admin", "CaptureAlphaBlending", false); // sf@2005
 BlackAlphaBlending = myIniFile_In.ReadInt("admin", "BlackAlphaBlending", false); // sf@2005
 FTTimeout = myIniFile_In.ReadInt("admin", "FileTransferTimeout", 30);
+
+Primary = myIniFile_In.ReadInt("admin", "primary", true);
+Secundary = myIniFile_In.ReadInt("admin", "secundary", false);
+
+
 myIniFile_Out.WriteInt("admin", "FileTransferEnabled", FileTransferEnabled);
 myIniFile_Out.WriteInt("admin", "FTUserImpersonation", FTUserImpersonation);
 myIniFile_Out.WriteInt("admin", "BlankMonitorEnabled", BlankMonitorEnabled);
@@ -160,6 +168,9 @@ myIniFile_Out.WriteInt("admin", "DefaultScale", DefaultScale);
 myIniFile_Out.WriteInt("admin", "CaptureAlphaBlending", CaptureAlphaBlending);
 myIniFile_Out.WriteInt("admin", "BlackAlphaBlending", BlackAlphaBlending);
 myIniFile_Out.WriteInt("admin", "FileTransferTimeout", 30);
+
+myIniFile_Out.WriteInt("admin", "primary", Primary);
+myIniFile_Out.WriteInt("admin", "secundary", Secundary);
 
 	// Connection prefs
 SocketConnect=myIniFile_In.ReadInt("admin", "SocketConnect", true);

@@ -526,12 +526,18 @@ vncServer::Authenticated(vncClientId clientid)
 			if (m_desktop == NULL)
 			{
 				m_desktop = new vncDesktop();
+
 				if (m_desktop == NULL)
 				{
 					client->Kill();
 					authok = FALSE;
 					break;
 				}
+				// Preset toggle prim/sec/both
+				if (Primary()) m_desktop->m_buffer.Display(1);
+				else m_desktop->m_buffer.Display(-1);
+				if (Secundary()) m_desktop->m_buffer.Display(2);
+				else m_desktop->m_buffer.Display(-2);
 				if (!m_desktop->Init(this))
 				{
 					vnclog.Print(LL_INTINFO, VNCLOG("Desktop init failed, unlock in application mode ? \n"));

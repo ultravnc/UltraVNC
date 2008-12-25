@@ -312,6 +312,11 @@ public:
 	virtual BOOL GetNewMSLogon();
 	virtual BOOL SetNewMSLogon(BOOL fEnable);
 
+	virtual BOOL Primary() {return m_PrimaryEnabled;};
+	virtual void Primary(BOOL fEnable) {m_PrimaryEnabled = fEnable;};
+	virtual BOOL Secundary() {return m_SecundaryEnabled;};
+	virtual void Secundary(BOOL fEnable) {m_SecundaryEnabled = fEnable;};
+
 	// sf@2002 - DSM Plugin
 	virtual BOOL IsDSMPluginEnabled();
 	virtual void EnableDSMPlugin(BOOL fEnable);
@@ -512,6 +517,9 @@ protected:
 	BOOL    m_fFileTransferEnabled;
 	BOOL    m_fBlankMonitorEnabled;
 	int     m_nDefaultScale;
+
+	BOOL m_PrimaryEnabled;
+	BOOL m_SecundaryEnabled;
 
 	BOOL    m_fMSLogonRequired;
 	BOOL    m_fNewMSLogon;
