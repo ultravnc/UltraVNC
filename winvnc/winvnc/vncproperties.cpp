@@ -161,11 +161,8 @@ vncProperties::Init(vncServer *server)
 						ShowAdmin(TRUE, FALSE);
 						Lock_service_helper=false;
 					} else {
-						DialogBoxParam(hInstResDLL,
-				MAKEINTRESOURCE(IDD_ABOUT1), 
-				NULL,
-				(DLGPROC) DialogProc1,
-				(LONG) this);
+						//Warning box removed, to ugly
+						//DialogBoxParam(hInstResDLL,MAKEINTRESOURCE(IDD_ABOUT1), NULL,(DLGPROC) DialogProc1,(LONG) this);
 						ShowAdmin(TRUE, TRUE);
 					}
 				}

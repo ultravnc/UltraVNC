@@ -30,6 +30,9 @@
 #include "SessionDialog.h"
 #include "Exception.h"
 #include "common/win32_helpers.h"
+#include <shlobj.h>
+#include <sys/stat.h>
+#include <direct.h>
 
 #define SESSION_MRU_KEY_NAME _T("Software\\ORL\\VNCviewer\\MRU")
 #define NUM_MRU_ENTRIES 8
@@ -171,10 +174,26 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 	    case IDC_DELETE:
 			{
 				char optionfile[MAX_PATH];
-				char *tempvar=NULL;
-				tempvar = getenv( "TEMP" );
-				if (tempvar) strcpy(optionfile,tempvar);
-				else strcpy(optionfile,"");
+				const char *APPDIR = "UltraVNC";
+				if (SHGetFolderPath (0,CSIDL_APPDATA, NULL, SHGFP_TYPE_CURRENT, optionfile) == S_OK)
+				{
+				   strcat(optionfile, "\\");
+				   strcat(optionfile, APPDIR);
+
+				   struct _stat st;
+				   if (_stat(optionfile, &st) == -1)
+					   _mkdir(optionfile);
+				}
+				else
+				{
+				  char *tempvar=NULL;
+				  tempvar = getenv( "TEMP" );
+				  if (tempvar) 
+					  strcpy(optionfile,tempvar);
+				  else 
+					  strcpy(optionfile,"");
+				}
+
 				strcat(optionfile,"\\options.vnc");
 				DeleteFile(optionfile);
 			}

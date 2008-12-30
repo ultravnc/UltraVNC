@@ -630,7 +630,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\res\vncviewer.exe.x86.manifest"
+				RelativePath=".\res\vncviewer.exe.x64.manifest"
 				>
 			</File>
 			<File
