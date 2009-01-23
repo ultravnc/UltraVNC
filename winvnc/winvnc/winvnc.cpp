@@ -803,6 +803,7 @@ int WinVNCAppMain()
 	if (!instancehan->Init())
 	{	
 		// We don't allow multiple instances!
+	if (!fRunningFromExternalService)
 		MessageBox(NULL, sz_ID_ANOTHER_INST, szAppName, MB_OK);
 		return 0;
 	}
