@@ -99,9 +99,6 @@ bool CZipUnZip32::ZipDirectory(char* szRootDir, char* szDirectoryToZip, char* sz
 	LPSTR szFileList = NULL;
 	char **index, *sz;
 	int retcode, i, cc;
-	char szFullPath[MAX_PATH];
-	char *ptr;
-//	HANDLE hMem;
 
 	// Init the User Function struct
 	m_hZUF = GlobalAlloc( GPTR, (DWORD)sizeof(ZIPUSERFUNCTIONS));
@@ -205,10 +202,7 @@ bool CZipUnZip32::UnZipDirectory(char* szRootDir, char* szZipFileName)
 {
 	int exfc, infc;
 	char **exfv, **infv;
-	char szFullPath[MAX_PATH];
 	int retcode;
-	char *ptr;
-//	HANDLE hMem; 
 	
 	m_hDCL = GlobalAlloc( GPTR, (DWORD)sizeof(DCL));
 	if (!m_hDCL)

@@ -228,7 +228,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     GetServiceName(progname, service_name);
 
 	// Make the command-line lowercase and parse it
-	int i;
+	size_t i;
 	for (i = 0; i < strlen(szCmdLine); i++)
 	{
 		szCmdLine[i] = tolower(szCmdLine[i]);
