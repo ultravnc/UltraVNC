@@ -2070,6 +2070,8 @@ vncClientThread::run(void *arg)
 			{
 				// Allocate storage for the text
 				const UINT length = Swap32IfLE(msg.cct.length);
+				if (length > 104857600) // 100 MBytes max
+					break;
 				char *text = new char [length+1];
 				if (text == NULL)
 					break;
@@ -4181,6 +4183,9 @@ int vncClient::GenerateFileChecksums(HANDLE hFile, char* lpCSBuffer, int nCSBuff
 // 
 bool vncClient::ReceiveDestinationFileChecksums(int nSize, int nLen)
 {
+	if (nLen < 0 || nLen > 104857600) // 100 MBytes max
+		return false;
+
 	m_lpCSBuffer = new char [nLen+1];
 	if (m_lpCSBuffer == NULL) 
 	{
@@ -4210,6 +4215,9 @@ bool vncClient::ReceiveFileChunk(int nLen, int nSize)
 		FinishFileReception();
 		return connected;
 	}
+
+	if (nLen < 0)
+		return false;
 
 	if (nLen > sz_rfbBlockSize) return connected;
 
