@@ -2783,9 +2783,9 @@ vncClientThread::run(void *arg)
 									ft.contentType = rfbDirPacket;
 									ft.contentParam = rfbADirectory; // or rfbAFile...
 
-									SetErrorMode(SEM_FAILCRITICALERRORS); // No popup please !
+									DWORD errmode = SetErrorMode(SEM_FAILCRITICALERRORS); // No popup please !
 									ff = FindFirstFile(szDir, &fd);
-									SetErrorMode( 0 );
+									SetErrorMode( errmode );
 									
 									// Case of media not accessible
 									if (ff == INVALID_HANDLE_VALUE || fShortError)
@@ -3083,6 +3083,7 @@ vncClientThread::run(void *arg)
         FlushFileBuffers(m_client->m_hDestFile);
         m_client->FTDownloadFailureHook();
         m_client->m_fFileDownloadRunning = false;
+        helper::close_handle(m_client->m_hDestFile);
     }
         
     if (m_client->m_fFileUploadRunning)
@@ -3091,6 +3092,7 @@ vncClientThread::run(void *arg)
         FlushFileBuffers(m_client->m_hSrcFile);
         m_client->FTUploadFailureHook();
         m_client->m_fFileUploadRunning = false;
+        helper::close_handle(m_client->m_hSrcFile);
     }
 
   
@@ -4696,9 +4698,9 @@ bool vncClient::MyGetFileSize(char* szFilePath, ULARGE_INTEGER *n2FileSize)
 	WIN32_FIND_DATA fd;
 	HANDLE ff;
 
-	SetErrorMode(SEM_FAILCRITICALERRORS); // No popup please !
+    DWORD errmode = SetErrorMode(SEM_FAILCRITICALERRORS); // No popup please !
 	ff = FindFirstFile(szFilePath, &fd);
-	SetErrorMode( 0 );
+	SetErrorMode( errmode );
 
 	if (ff == INVALID_HANDLE_VALUE)
 	{
