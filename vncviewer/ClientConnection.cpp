@@ -4751,11 +4751,19 @@ void ClientConnection::WriteExactProxy(char *buf, int bytes)
 
 }
 
+
+
 // Makes sure netbuf is at least as big as the specified size.
 // Note that netbuf itself may change as a result of this call.
 // Throws an exception on failure.
 void ClientConnection::CheckBufferSize(int bufsize)
 {
+	// sf@2009 - Sanity check
+	if (bufsize < 0 || bufsize > 104857600) // 100 MBytes max
+	{
+		throw ErrorException(sz_L70);
+	}
+
 	if (m_netbufsize > bufsize) return;
 
 	omni_mutex_lock l(m_bufferMutex);
@@ -4779,9 +4787,14 @@ void ClientConnection::CheckBufferSize(int bufsize)
 // Note that zlibbuf itself may change as a result of this call.
 // Throws an exception on failure.
 // sf@2002
-
 void ClientConnection::CheckZipBufferSize(int bufsize)
 {
+	// sf@2009 - Sanity check
+	if (bufsize < 0 || bufsize > 104857600) // 100 MBytes max
+	{
+		throw ErrorException(sz_L71);
+	}
+
 	unsigned char *newbuf;
 
 	if (m_zipbufsize > bufsize) return;
@@ -4806,6 +4819,12 @@ void ClientConnection::CheckZipBufferSize(int bufsize)
 
 void ClientConnection::CheckFileZipBufferSize(int bufsize)
 {
+	// sf@2009 - Sanity check
+	if (bufsize < 0 || bufsize > 104857600) // 100 MBytes max
+	{
+		throw ErrorException(sz_L71);
+	}
+
 	unsigned char *newbuf;
 
 	if (m_filezipbufsize > bufsize) return;
@@ -4826,8 +4845,15 @@ void ClientConnection::CheckFileZipBufferSize(int bufsize)
 	vnclog.Print(4, _T("zipbufsize expanded to %d\n"), m_filezipbufsize);
 }
 
+
 void ClientConnection::CheckFileChunkBufferSize(int bufsize)
 {
+	// sf@2009 - Sanity check
+	if (bufsize < 0 || bufsize > 104857600) // 100 MBytes max
+	{
+		throw ErrorException(sz_L71);
+	}
+
 	unsigned char *newbuf;
 
 	if (m_filechunkbufsize > bufsize) return;
@@ -4848,6 +4874,8 @@ void ClientConnection::CheckFileChunkBufferSize(int bufsize)
 
 
 }
+
+
 
 // Processing NewFBSize pseudo-rectangle. Create new framebuffer of
 // the size specified in pfburh->r.w and pfburh->r.h, and change the

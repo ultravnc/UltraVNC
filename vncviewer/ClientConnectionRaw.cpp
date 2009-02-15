@@ -35,7 +35,7 @@ void ClientConnection::ReadRawRect(rfbFramebufferUpdateRectHeader *pfburh) {
 
 	UINT numpixels = pfburh->r.w * pfburh->r.h;
     // this assumes at least one byte per pixel. Naughty.
-	UINT numbytes = numpixels * m_minPixelBytes;
+	int numbytes = numpixels * m_minPixelBytes;
 	// Read in the whole thing
     CheckBufferSize(numbytes);
 	ReadExact(m_netbuf, numbytes);
