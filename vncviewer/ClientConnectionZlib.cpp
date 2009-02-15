@@ -36,8 +36,8 @@ void ClientConnection::ReadZlibRect(rfbFramebufferUpdateRectHeader *pfburh,int X
 
 	UINT numpixels = pfburh->r.w * pfburh->r.h;
     // this assumes at least one byte per pixel. Naughty.
-	int numRawBytes = numpixels * m_minPixelBytes;
-	int numCompBytes;
+	UINT numRawBytes = numpixels * m_minPixelBytes;
+	UINT numCompBytes;
 	int inflateResult;
 
 	rfbZlibHeader hdr;
@@ -251,8 +251,8 @@ void ClientConnection::ReadSolidRect(rfbFramebufferUpdateRectHeader *pfburh) {
 void ClientConnection::ReadSolMonoZip(rfbFramebufferUpdateRectHeader *pfburh,HRGN *prgn)
 {
 	UINT nNbCacheRects = pfburh->r.x;
-	int numRawBytes = pfburh->r.y+pfburh->r.w*65535;
-	int numCompBytes;
+	UINT numRawBytes = pfburh->r.y+pfburh->r.w*65535;
+	UINT numCompBytes;
 	rfbZlibHeader hdr;
 	// Read in the rfbZlibHeader
 	ReadExact((char *)&hdr, sz_rfbZlibHeader);
