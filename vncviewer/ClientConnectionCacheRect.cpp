@@ -130,7 +130,7 @@ void ClientConnection::ReadCacheZip(rfbFramebufferUpdateRectHeader *pfburh,HRGN 
 
 	UINT numRawBytes = nNbCacheRects * sz_rfbRectangle;
 	numRawBytes += (numRawBytes/100) + 8;
-	int numCompBytes;
+	UINT numCompBytes;
 
 	rfbZlibHeader hdr;
 	// Read in the rfbZlibHeader
