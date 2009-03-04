@@ -605,7 +605,7 @@ void FileTransfer::StartFTSession()
 
 void FileTransfer::EndFTSession()
 {
-    if (m_ServerFTProtocolVersion < FT_PROTO_VERSION_3)
+    if (m_ServerFTProtocolVersion < FT_PROTO_VERSION_3 || !m_pCC->m_running)
         return;
 
     rfbFileTransferMsg ft;
@@ -787,7 +787,7 @@ bool FileTransfer::OfferNextFile()
 		else if (!m_fFileUploadError)
 			SetStatus(sz_H6);
 
-		EnableButtons(hWnd);
+//		EnableButtons(hWnd);
 
 		ShowFileTransferWindow(true);
 		Sleep(1000);
@@ -1456,6 +1456,7 @@ void FileTransfer::FinishDirectoryReception()
 	// UpdateWindow(hWnd);
 
 	m_fDirectoryReceptionRunning = false;
+    EnableButtons(hWnd);
     CheckButtonState(hWnd);
 
 }
@@ -1909,6 +1910,8 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, int nLen)
 		*p = '\0';
 	}
 
+    char  displayName[MAX_PATH + 32];
+    sprintf(displayName, "%s%s", m_szDestFileName, strrchr(szRemoteFileName, '\\') + 1);
 	// Check the free space on local destination drive
 	bool fErr = false;
 	ULARGE_INTEGER lpFreeBytesAvailable;
@@ -1919,6 +1922,10 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, int nLen)
 	memset(szDestPath, 0, strlen(m_szDestFileName) + 1);
 	strcpy(szDestPath, m_szDestFileName);
 	*strrchr(szDestPath, '\\') = '\0'; // We don't handle UNCs for now
+
+    // only check root folder on drive, in case we have no permissions on dest folder
+    if (szDestPath[1] == ':')
+        szDestPath[3] = 0;
 
 	PGETDISKFREESPACEEX pGetDiskFreeSpaceEx;
 	pGetDiskFreeSpaceEx = (PGETDISKFREESPACEEX)GetProcAddress( GetModuleHandle("kernel32.dll"),"GetDiskFreeSpaceExA");
@@ -1950,7 +1957,7 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, int nLen)
 	if (fErr)
 	{
 		if (!fErrNoFileName)
-			sprintf(szStatus, " %s < %s >",sz_H14, strrchr(szRemoteFileName, '\\') + 1); 
+			sprintf(szStatus, " %s < %s >",sz_H14, displayName); 
 		else
 			sprintf(szStatus, " %s < %s > %s",sz_H14, "Invalid remote file name", sz_H13); 
 
@@ -1967,8 +1974,6 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, int nLen)
 	}
 
 
-    char  displayName[MAX_PATH + 32];
-    sprintf(displayName, "%s%s", m_szDestFileName, strrchr(szRemoteFileName, '\\') + 1);
     
     strcat(m_szDestFileName, make_temp_filename(strrchr(szRemoteFileName, '\\') + 1).c_str());
 
@@ -1998,7 +2003,7 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, int nLen)
 
 	if (m_hDestFile == INVALID_HANDLE_VALUE)
 	{
-		sprintf(szStatus, " %s < %s > %s", sz_H12, m_szDestFileName, sz_H16); 
+		sprintf(szStatus, " %s < %s > %s", sz_H12, displayName, sz_H16);
 		SetStatus(szStatus);
 		CloseHandle(m_hDestFile);
 		delete [] szRemoteFileName;
@@ -2265,7 +2270,11 @@ bool FileTransfer::FinishFileReception()
 	// received file
 	// Todo: make a better free space check (above) in this particular case. The free space must be at least
 	// 3 times the size of the directory zip file (this zip file is ~50% of the real directory size) 
+
+    // hide the stop button
+    ShowWindow(GetDlgItem(hWnd, IDC_ABORT_B), SW_HIDE);
 	bool bWasDir = UnzipPossibleDirectory(m_szDestFileName);
+    ShowWindow(GetDlgItem(hWnd, IDC_ABORT_B), SW_SHOW);
 
     if (!m_fFileDownloadError && !bWasDir)
     {
@@ -2366,7 +2375,10 @@ bool FileTransfer::OfferLocalFile(LPSTR szSrcFileName)
 	// the transfer is done)
 	int nDirZipRet = ZipPossibleDirectory(m_szSrcFileName);
 	if (nDirZipRet == -1)
+    {
+        m_fFileUploadError = true;
 		return false;
+    }
 
 	// Open local src file
 	m_hSrcFile = CreateFile(
@@ -2383,6 +2395,7 @@ bool FileTransfer::OfferLocalFile(LPSTR szSrcFileName)
 	{
 		sprintf(szStatus, " %s < %s >", sz_H21, m_szSrcFileName); 
 		SetStatus(szStatus);
+        m_fFileUploadError = true;
 		DWORD TheError = GetLastError();
 		return false;
 	}
@@ -2396,6 +2409,7 @@ bool FileTransfer::OfferLocalFile(LPSTR szSrcFileName)
 		sprintf(szStatus, " %s < %s >", sz_H21, m_szSrcFileName);
 		SetStatus(szStatus);
 		CloseHandle(m_hSrcFile);
+        m_fFileUploadError = true;
 		return false;
 	}
 
@@ -2417,6 +2431,7 @@ bool FileTransfer::OfferLocalFile(LPSTR szSrcFileName)
 		sprintf(szStatus, " %s < %s >", sz_H23, m_szSrcFileName); 
 		SetStatus(szStatus);
 		CloseHandle(m_hSrcFile);
+        m_fFileUploadError = true;
 		return false;
 	}
 
@@ -2476,6 +2491,9 @@ bool FileTransfer::OfferLocalFile(LPSTR szSrcFileName)
 		CARD32 sizeH = Swap32IfLE(n2SrcSize.HighPart);
 		m_pCC->WriteExact((char *)&sizeH, sizeof(CARD32));
 	}
+
+    // show the stop button
+    ShowWindow(GetDlgItem(hWnd, IDC_ABORT_B), SW_SHOW);
 
     m_pCC->SetSendTimeout();
 	return true;
@@ -2593,9 +2611,9 @@ bool FileTransfer::SendFile(long lSize, int nLen)
 	// could not be created for some reason (locked..)
 	if (lSize == -1)
 	{
-		sprintf(szStatus, " %s < %s > %s",sz_H12, szRemoteFileName,sz_H24); 
+		sprintf(szStatus, " %s < %s > %s",sz_H12, get_real_filename(szRemoteFileName).c_str(),sz_H24);
 		SetStatus(szStatus);
-		sprintf(szStatus, " %s < %s >%s", sz_H25,szRemoteFileName,sz_H26);
+		sprintf(szStatus, " %s < %s > %s", sz_H25,get_real_filename(szRemoteFileName).c_str(),sz_H26);
 		SetStatus(szStatus);
         m_fFileUploadError = true;
 
@@ -2631,6 +2649,7 @@ bool FileTransfer::SendFile(long lSize, int nLen)
 		sprintf(szStatus, " %s < %s >", sz_H21, m_szSrcFileName); 
 		SetStatus(szStatus);
 		DWORD TheError = GetLastError();
+        m_fFileUploadError = true;
 		return false;
 	}
 
@@ -2643,6 +2662,7 @@ bool FileTransfer::SendFile(long lSize, int nLen)
 	m_fCompress = (m_pCC->kbitsPerSecond <= 2048);
 
 	m_fFileUploadRunning = true;
+    m_fFileUploadError = false;
 	m_dwLastChunkTime = timeGetTime();
 	// m_nNotSent = 0;
 	// SendFileChunk();
@@ -2856,6 +2876,8 @@ bool FileTransfer::FinishFileSending()
 	SetStatus(szStatus);
 	UpdateWindow(hWnd);
 
+    // hide the stop button
+    ShowWindow(GetDlgItem(hWnd, IDC_ABORT_B), SW_HIDE);
 	// Sound notif
 	//MessageBeep(-1);
 

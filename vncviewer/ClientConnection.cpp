@@ -2826,11 +2826,7 @@ void ClientConnection::SetFormatAndEncodings()
 	int nEncodings = se->nEncodings;
 	se->nEncodings = Swap16IfLE(se->nEncodings);
 	// WriteExact((char *)buf, len);
-	WriteExact((char *)buf, sz_rfbSetEncodingsMsg, rfbSetEncodings);
-	for (int x = 0; x < nEncodings; x++)
-	{ 
-		WriteExact((char *)&encs[x], sizeof(CARD32));
-	}
+	WriteExact((char *)buf, sz_rfbSetEncodingsMsg + sizeof(CARD32) * nEncodings, rfbSetEncodings);
 }
 void ClientConnection::Createdib()
 {
@@ -3265,8 +3261,8 @@ inline void ClientConnection::ProcessMouseWheel(int delta)
 inline void
 ClientConnection::SendPointerEvent(int x, int y, int buttonMask)
 {
-	if (m_pFileTransfer->m_fFileTransferRunning && m_pFileTransfer->UsingOldProtocol()) return;
-//	if (m_pTextChat->m_fTextChatRunning) return;
+	if (m_pFileTransfer->m_fFileTransferRunning && ( m_pFileTransfer->m_fVisible || m_pFileTransfer->UsingOldProtocol())) return;
+	if (m_pTextChat->m_fTextChatRunning && m_pTextChat->m_fVisible) return;
 
 	//omni_mutex_lock l(m_UpdateMutex);
 
@@ -3419,8 +3415,8 @@ inline void ClientConnection::ProcessKeyEvent(int virtKey, DWORD keyData)
 inline void
 ClientConnection::SendKeyEvent(CARD32 key, bool down)
 {
-	if (m_pFileTransfer->m_fFileTransferRunning && m_pFileTransfer->UsingOldProtocol()) return;
-//	if (m_pTextChat->m_fTextChatRunning) return;
+	if (m_pFileTransfer->m_fFileTransferRunning && ( m_pFileTransfer->m_fVisible || m_pFileTransfer->UsingOldProtocol())) return;
+	if (m_pTextChat->m_fTextChatRunning && m_pTextChat->m_fVisible) return;
 
     rfbKeyEventMsg ke;
 
@@ -3439,8 +3435,8 @@ ClientConnection::SendKeyEvent(CARD32 key, bool down)
 
 void ClientConnection::SendClientCutText(char *str, int len)
 {
-	if (m_pFileTransfer->m_fFileTransferRunning && m_pFileTransfer->UsingOldProtocol()) return;
-//	if (m_pTextChat->m_fTextChatRunning) return;
+	if (m_pFileTransfer->m_fFileTransferRunning && ( m_pFileTransfer->m_fVisible || m_pFileTransfer->UsingOldProtocol())) return;
+	if (m_pTextChat->m_fTextChatRunning && m_pTextChat->m_fVisible) return;
 
 	rfbClientCutTextMsg cct;
 
@@ -3830,8 +3826,8 @@ void* ClientConnection::run_undetached(void* arg) {
 inline void
 ClientConnection::SendFramebufferUpdateRequest(int x, int y, int w, int h, bool incremental)
 {
-	if (m_pFileTransfer->m_fFileTransferRunning && m_pFileTransfer->UsingOldProtocol()) return;
-//	if (m_pTextChat->m_fTextChatRunning) return;
+	if (m_pFileTransfer->m_fFileTransferRunning && ( m_pFileTransfer->m_fVisible || m_pFileTransfer->UsingOldProtocol())) return;
+	if (m_pTextChat->m_fTextChatRunning && m_pTextChat->m_fVisible) return;
 
 	//omni_mutex_lock l(m_UpdateMutex);
 
