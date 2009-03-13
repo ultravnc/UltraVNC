@@ -4269,11 +4269,21 @@ void ClientConnection::WriteExactProxy(char *buf, int bytes)
 
 }
 
+// Security fix for uvnc 1.0.5 and 1.0.2 (should be ok for all version...)
+// Replace the corresponding functions with the following fixed ones in vncviewer\ClientConnection.cpp file
+
+
 // Makes sure netbuf is at least as big as the specified size.
 // Note that netbuf itself may change as a result of this call.
 // Throws an exception on failure.
 void ClientConnection::CheckBufferSize(int bufsize)
 {
+	// sf@2009 - Sanity check
+	if (bufsize < 0 || bufsize > 104857600) // 100 MBytes max
+	{
+		throw ErrorException(sz_L70);
+	}
+
 	if (m_netbufsize > bufsize) return;
 
 	omni_mutex_lock l(m_bufferMutex);
@@ -4292,29 +4302,6 @@ void ClientConnection::CheckBufferSize(int bufsize)
 	vnclog.Print(4, _T("bufsize expanded to %d\n"), m_netbufsize);
 }
 
-// Makes sure netbuf is at least as big as the specified size.
-// Note that netbuf itself may change as a result of this call.
-// Throws an exception on failure.
-void ClientConnection::CheckQueueBufferSize(int bufsize)
-{
-	if (m_queuebuffsize > bufsize) return;
-
-	omni_mutex_lock l(m_bufferMutex);
-
-	char *newbuf = new char[bufsize+256];
-	if (newbuf == NULL) {
-		throw ErrorException(sz_L70);
-	}
-
-	// Only if we're successful...
-
-	if (m_queuebuff != NULL)
-		delete [] m_queuebuff;
-	m_queuebuff = newbuf;
-	m_queuebuffsize=bufsize + 256;
-	vnclog.Print(4, _T("bufsize expanded to %d\n"), m_netbufsize);
-}
-
 
 // Makes sure zipbuf is at least as big as the specified size.
 // Note that zlibbuf itself may change as a result of this call.
@@ -4323,6 +4310,12 @@ void ClientConnection::CheckQueueBufferSize(int bufsize)
 
 void ClientConnection::CheckZipBufferSize(int bufsize)
 {
+	// sf@2009 - Sanity check
+	if (bufsize < 0 || bufsize > 104857600) // 100 MBytes max
+	{
+		throw ErrorException(sz_L71);
+	}
+
 	unsigned char *newbuf;
 
 	if (m_zipbufsize > bufsize) return;
@@ -4347,6 +4340,12 @@ void ClientConnection::CheckZipBufferSize(int bufsize)
 
 void ClientConnection::CheckFileZipBufferSize(int bufsize)
 {
+	// sf@2009 - Sanity check
+	if (bufsize < 0 || bufsize > 104857600) // 100 MBytes max
+	{
+		throw ErrorException(sz_L71);
+	}
+
 	unsigned char *newbuf;
 
 	if (m_filezipbufsize > bufsize) return;
@@ -4369,6 +4368,12 @@ void ClientConnection::CheckFileZipBufferSize(int bufsize)
 
 void ClientConnection::CheckFileChunkBufferSize(int bufsize)
 {
+	// sf@2009 - Sanity check
+	if (bufsize < 0 || bufsize > 104857600) // 100 MBytes max
+	{
+		throw ErrorException(sz_L71);
+	}
+
 	unsigned char *newbuf;
 
 	if (m_filechunkbufsize > bufsize) return;
@@ -4388,6 +4393,36 @@ void ClientConnection::CheckFileChunkBufferSize(int bufsize)
 	vnclog.Print(4, _T("m_filechunkbufsize expanded to %d\n"), m_filechunkbufsize);
 
 
+}
+
+
+
+
+// Makes sure netbuf is at least as big as the specified size.
+// Note that netbuf itself may change as a result of this call.
+// Throws an exception on failure.
+void ClientConnection::CheckQueueBufferSize(int bufsize)
+{
+	if (bufsize < 0 || bufsize > 104857600) // 100 MBytes max
+	{
+		throw ErrorException(sz_L71);
+	}
+	if (m_queuebuffsize > bufsize) return;
+
+	omni_mutex_lock l(m_bufferMutex);
+
+	char *newbuf = new char[bufsize+256];
+	if (newbuf == NULL) {
+		throw ErrorException(sz_L70);
+	}
+
+	// Only if we're successful...
+
+	if (m_queuebuff != NULL)
+		delete [] m_queuebuff;
+	m_queuebuff = newbuf;
+	m_queuebuffsize=bufsize + 256;
+	vnclog.Print(4, _T("bufsize expanded to %d\n"), m_netbufsize);
 }
 
 // Processing NewFBSize pseudo-rectangle. Create new framebuffer of

@@ -330,7 +330,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,8,137,62,14
     CONTROL         156,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_SUNKEN,8,7,62,54
-    LTEXT           "UltraVNC Win32 Viewer 1.0.5.2",IDC_STATIC,90,5,180,11
+    LTEXT           "UltraVNC Win32 Viewer 1.0.5.4",IDC_STATIC,90,5,180,11
     LTEXT           "For more Information and Links please visit: \nhttp://www.uvnc.com",IDC_STATIC,86,133,197,19
     LTEXT           "Copyright © 2002-2005 Ultr@VNC Team\nCopyright © 2001-2002 Sam - eSVNC \nCopyright © 1999-2002 Rudi D. V. - VdaccVNC \nCopyright © 1999-2002 Const. Kaplinsky - TightVNC \nCopyright © 2002 RealVNC Ltd. - RealVNC\n",IDC_STATIC,86,30,200,40
     LTEXT           "Built:",IDC_STATIC,87,17,15,10
@@ -786,8 +786,8 @@ IDC_NOCURSOR            CURSOR                  "nocursor.cur"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,5,2
- PRODUCTVERSION 1,0,5,2
+ FILEVERSION 1,0,5,4
+ PRODUCTVERSION 1,0,5,4
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x21L
@@ -805,13 +805,13 @@ BEGIN
             VALUE "Comments", "UltraVNC Viewer"
             VALUE "CompanyName", "UltraVNC"
             VALUE "FileDescription", "VNCViewer"
-            VALUE "FileVersion", "1.0.5.2"
+            VALUE "FileVersion", "1.0.5.4"
             VALUE "InternalName", "VNCViewer"
             VALUE "LegalCopyright", "Copyright © 2002-2005 UltraVNC team members"
             VALUE "OriginalFilename", "VNCViewer.exe"
             VALUE "ProductName", "UltraVNC VNCViewer"
-            VALUE "ProductVersion", "1.0.5.2"
-            VALUE "SpecialBuild", "1.0.5.2"
+            VALUE "ProductVersion", "1.0.5.4"
+            VALUE "SpecialBuild", "1.0.5.4"
         END
     END
     BLOCK "VarFileInfo"

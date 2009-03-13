@@ -4747,6 +4747,8 @@ void ClientConnection::WriteExactProxy(char *buf, int bytes)
 
 }
 
+// Security fix for uvnc 1.0.5 and 1.0.2 (should be ok for all version...)
+// Replace the corresponding functions with the following fixed ones in vncviewer\ClientConnection.cpp file
 
 
 // Makes sure netbuf is at least as big as the specified size.
