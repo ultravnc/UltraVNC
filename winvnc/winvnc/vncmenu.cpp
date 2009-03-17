@@ -35,12 +35,12 @@
 #include <lmcons.h>
 #include <wininet.h>
 #include <shlobj.h>
-#include "common/win32_helpers.h"
 
 // Header
 
 #include "vncMenu.h"
 #include "HideDesktop.h"
+#include "common/win32_helpers.h"
 
 // [v1.0.2-jp1 fix]
 #pragma comment(lib, "imm32.lib")
@@ -176,13 +176,13 @@ vncMenu::vncMenu(vncServer *server)
 	IsIconSet=false;
 	IconFaultCounter=0;
 
-	hUser32 = LoadLibrary("user32.dll");
+	HMODULE hUser32 = LoadLibrary("user32.dll");
 	CHANGEWINDOWMESSAGEFILTER pfnFilter = NULL;
 	pfnFilter =(CHANGEWINDOWMESSAGEFILTER)GetProcAddress(hUser32,"ChangeWindowMessageFilter");
 	if (pfnFilter) pfnFilter(MENU_ADD_CLIENT_MSG, MSGFLT_ADD);
 	if (pfnFilter) pfnFilter(MENU_AUTO_RECONNECT_MSG, MSGFLT_ADD);
 	if (pfnFilter) pfnFilter(MENU_REPEATER_ID_MSG, MSGFLT_ADD);
-
+    FreeLibrary (hUser32);
 	
 
 	// Save the server pointer
@@ -393,6 +393,13 @@ vncMenu::~vncMenu()
 		hWTSDll = NULL;
 	}
 
+
+    if (m_winvnc_icon)
+        DestroyIcon(m_winvnc_icon);
+    if (m_flash_icon)
+        DestroyIcon(m_flash_icon);
+
+
 	// Remove the tray icon
 	DelTrayIcon();
 	
@@ -408,7 +415,6 @@ vncMenu::~vncMenu()
 		RestoreWallpaper();
 	if (m_server->RemoveAeroEnabled())
 		ResetAero();
-	if (hUser32) FreeLibrary(hUser32);
 }
 
 void
