@@ -174,27 +174,7 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 	    case IDC_DELETE:
 			{
 				char optionfile[MAX_PATH];
-				const char *APPDIR = "UltraVNC";
-				if (SHGetFolderPath (0,CSIDL_APPDATA, NULL, SHGFP_TYPE_CURRENT, optionfile) == S_OK)
-				{
-				   strcat(optionfile, "\\");
-				   strcat(optionfile, APPDIR);
-
-				   struct _stat st;
-				   if (_stat(optionfile, &st) == -1)
-					   _mkdir(optionfile);
-				}
-				else
-				{
-				  char *tempvar=NULL;
-				  tempvar = getenv( "TEMP" );
-				  if (tempvar) 
-					  strcpy(optionfile,tempvar);
-				  else 
-					  strcpy(optionfile,"");
-				}
-
-				strcat(optionfile,"\\options.vnc");
+				VNCOptions::GetDefaultOptionsFileName(optionfile);
 				DeleteFile(optionfile);
 			}
 			return TRUE;
@@ -216,7 +196,7 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
                     sz_F8, 
                     sz_F10, MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TOPMOST);
             } else {
-				for (int i = 0; i < strlen(tmphost); i++)
+				for (size_t i = 0, len = strlen(tmphost); i < len; i++)
 						{
 							tmphost[i] = toupper(tmphost[i]);
 						} 
