@@ -3680,10 +3680,10 @@ void* ClientConnection::run_undetached(void* arg) {
                     {
                         static time_t lastrecv = 0;
                         time_t now = time(&now);
-                        int delta = now - lastrecv;
+                        time_t delta = now - lastrecv;
                         lastrecv = now;
                         char msg[255];
-                        sprintf(msg, "keepalive received %u seconds since last one\n", delta);
+                        sprintf(msg, "keepalive received %i64u seconds since last one\n", delta);
                         OutputDebugString(msg);
                     }
 #endif
@@ -5643,6 +5643,15 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							return 0;
 							*/
 						}
+						if (_this->m_pTextChat->m_fTextChatRunning)
+						{
+							_this->m_pTextChat->ShowChatWindow(true);
+							MessageBox(	hwnd,
+										sz_L86,
+										sz_L88,
+										MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST);
+							return 0;
+						}
 
 						// Call FileTransfer Dialog
 						_this->m_pFileTransfer->m_fFileTransferRunning = true;
@@ -5676,6 +5685,15 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 								MB_OK | MB_ICONINFORMATION | MB_SETFOREGROUND | MB_TOPMOST);
 							return 0;
 							*/
+						}
+						if (_this->m_pFileTransfer->m_fFileTransferRunning)
+						{
+							_this->m_pFileTransfer->ShowFileTransferWindow(true);
+							MessageBox(hwnd,
+										sz_L85,
+										sz_L88,
+										MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST);
+							return 0;
 						}
 						_this->m_pTextChat->m_fTextChatRunning = true;
 						_this->m_pTextChat->DoDialog();
@@ -6853,7 +6871,7 @@ void ClientConnection::SendKeepAlive(bool bForce)
     {
         static time_t lastSent = 0;
         time_t now = time(&now);
-        int delta = now - lastSent;
+        time_t delta = now - lastSent;
 
         if (!bForce && delta < m_opts.m_keepAliveInterval)
             return;

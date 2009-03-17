@@ -1604,7 +1604,7 @@ void FileTransfer::ListDrives(HWND hWnd)
 	TCHAR szType[32];
 	UINT nType = 0;
 	DWORD dwLen;
-	int nIndex = 0;
+	DWORD nIndex = 0;
 	dwLen = GetLogicalDriveStrings(256, szDrivesList);
 
 	HWND hWndLocalList = GetDlgItem(hWnd, IDC_LOCAL_FILELIST);

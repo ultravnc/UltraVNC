@@ -160,7 +160,7 @@ void ClientConnection::ReadCacheZip(rfbFramebufferUpdateRectHeader *pfburh,HRGN 
 	rfbRectangle theRect;
 	
 	BYTE* p = m_zipbuf;
-	for (int i = 0 ; i < nNbCacheRects; i++)
+	for (UINT i = 0 ; i < nNbCacheRects; i++)
 	{
 		memcpy((BYTE*)&theRect, p, sz_rfbRectangle);
 		p += sz_rfbRectangle;
