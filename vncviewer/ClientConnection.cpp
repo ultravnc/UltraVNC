@@ -370,7 +370,11 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_pApp->RegisterConnection(this);
 
     kbitsPerSecond = 0;
-	m_lLastChangeTime = 0; // 0 because we want the first encoding switching to occur quickly
+	avg_kbitsPerSecond = 0;
+	m_lLastChangeTimeTimeout = 0;
+	m_lLastChangeTime = timeGetTime(); 
+						   // timeGetTime Fisr time switch is unstable... wait 30 seconds
+						  // 0 because we want the first encoding switching to occur quickly
 	                     // (in Auto mode, ZRLE is used: pointless over a LAN)
 
 	m_fScalingDone = false;
@@ -4136,6 +4140,7 @@ inline void ClientConnection::ReadScreenUpdate()
 		{
 			fis->stopTiming();
 			kbitsPerSecond = fis->kbitsPerSecond();
+			if (kbitsPerSecond>= avg_kbitsPerSecond/2 && kbitsPerSecond<=avg_kbitsPerSecond*3/2) avg_kbitsPerSecond=(avg_kbitsPerSecond+kbitsPerSecond)/2;
 			fTimingAlreadyStopped = true;
 		}
 
@@ -4289,31 +4294,20 @@ inline void ClientConnection::ReadScreenUpdate()
 	{
 		fis->stopTiming();
 		kbitsPerSecond = fis->kbitsPerSecond();
+		if (kbitsPerSecond>= avg_kbitsPerSecond/2 && kbitsPerSecond<=avg_kbitsPerSecond*3/2) avg_kbitsPerSecond=(avg_kbitsPerSecond+kbitsPerSecond)/2;
+		else avg_kbitsPerSecond=(3*avg_kbitsPerSecond+kbitsPerSecond)/4;
 	}
 
 	// sf@2002
 	// We only change the preferred encoding if FileTransfer is not running and if
 	// the last encoding change occured more than 30s ago
-	if (m_opts.autoDetect 
-		&&
-		!m_pFileTransfer->m_fFileTransferRunning
-		&& 
-		(timeGetTime() - m_lLastChangeTime) > 30000)
+	if (m_opts.autoDetect && !m_pFileTransfer->m_fFileTransferRunning && (timeGetTime() - m_lLastChangeTime) > m_lLastChangeTimeTimeout)
 	{
+		//Beep(1000,1000);
+		m_lLastChangeTimeTimeout=60000;  // set to 1 minutes
 		int nOldServerScale = m_nServerScale;
 
-		// If connection speed > 1Mbits/s - All to the max
-		/*if (kbitsPerSecond > 2000 && (m_nConfig != 7))
-		{
-			m_nConfig = 1;
-			m_opts.m_PreferredEncoding = rfbEncodingUltra;
-			m_opts.m_Use8Bit = false; // Max colors
-			m_opts.m_fEnableCache = false;
-			m_pendingFormatChange = true;
-			m_lLastChangeTime = timeGetTime();
-		}*/
-
-		if (kbitsPerSecond > 1000 && (m_nConfig != 1))
+		if (avg_kbitsPerSecond > 1000 && (m_nConfig != 1))
 		{
 			m_nConfig = 1;
 			m_opts.m_PreferredEncoding = rfbEncodingHextile;
@@ -4323,7 +4317,7 @@ inline void ClientConnection::ReadScreenUpdate()
 			m_lLastChangeTime = timeGetTime();
 		}
 		// Medium connection speed 
-		else if (kbitsPerSecond < 256 && kbitsPerSecond > 128 && (m_nConfig != 2))
+		else if (avg_kbitsPerSecond < 256 && avg_kbitsPerSecond > 128 && (m_nConfig != 2))
 		{
 			m_nConfig = 2;
 			m_opts.m_PreferredEncoding = rfbEncodingZRLE; //rfbEncodingZlibHex;
@@ -4334,7 +4328,7 @@ inline void ClientConnection::ReadScreenUpdate()
 			m_lLastChangeTime = timeGetTime();
 		}
 		// Modem (including cable modem) connection speed 
-		else if (kbitsPerSecond < 128 && kbitsPerSecond > 19 && (m_nConfig != 3))
+		else if (avg_kbitsPerSecond < 128 && avg_kbitsPerSecond > 19 && (m_nConfig != 3))
 		{
 			m_nConfig = 3;
 			m_opts.m_PreferredEncoding = rfbEncodingTight; // rfbEncodingZRLE;
@@ -4350,7 +4344,7 @@ inline void ClientConnection::ReadScreenUpdate()
 		// (CTRL-ALT-DEL, initial screen loading, connection short hangups...)
 		// the speed can be momentary VERY slow. The fast fuzzy/normal modes switching
 		// can be quite disturbing and useless in these situations.
-		else if (kbitsPerSecond < 19 && kbitsPerSecond > 5 && (m_nConfig != 4))
+		else if (avg_kbitsPerSecond < 19 && avg_kbitsPerSecond > 5 && (m_nConfig != 4))
 		{
 			m_nConfig = 4;
 			m_opts.m_PreferredEncoding = rfbEncodingTight; //rfbEncodingZRLE;
@@ -4370,7 +4364,7 @@ inline void ClientConnection::ReadScreenUpdate()
 			SendServerScale(m_nServerScale);
 		}
 		*/
-    }
+	}
 		
 	// Inform the other thread that an update is needed.
 	
@@ -4996,7 +4990,7 @@ void ClientConnection::UpdateStatusFields()
 	if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_SEND, szText);
 
 	// Speed
-	if (m_hwndStatus)SetDlgItemInt(m_hwndStatus, IDC_SPEED, kbitsPerSecond, false);
+	if (m_hwndStatus)SetDlgItemInt(m_hwndStatus, IDC_SPEED, avg_kbitsPerSecond, false);
 
 	// Encoder
 	if (m_fStatusOpen) // It's called by the status window timer... fixme

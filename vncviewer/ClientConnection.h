@@ -565,8 +565,10 @@ private:
 
 	int oldPointerX, oldPointerY, oldButtonMask;
 	
-	int kbitsPerSecond;
+	unsigned int kbitsPerSecond;
+	unsigned int avg_kbitsPerSecond;
 	int m_lLastChangeTime; // sf@2003 - Last time the Auto mode has changed the encoding
+	int m_lLastChangeTimeTimeout;  //dynamic timeout
 	bool m_fScalingDone; // sf@2003 - Auto Scaling flag
 
 	rdr::FdInStream* fis;
