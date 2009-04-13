@@ -842,8 +842,8 @@ vncClientThread::InitAuthenticate()
 
 						if ( !(acceptDlg->DoDialog()) ) verified = vncServer::aqrReject;
 
-						CloseDesktop(desktop);
 						SetThreadDesktop(old_desktop);
+						CloseDesktop(desktop);
 				}
             }
 		}
@@ -1304,6 +1304,7 @@ vncClientThread::run(void *arg)
 								m_client->GetClientId());
 	// Save the handle to the thread's original desktop
 	HDESK home_desktop = GetThreadDesktop(GetCurrentThreadId());
+	HDESK input_desktop = 0;
 	
 	// To avoid people connecting and then halting the connection, set a timeout
 	if (!m_socket->SetTimeout(30000))
@@ -1487,7 +1488,7 @@ vncClientThread::run(void *arg)
 		// Ensure that we're running in the correct desktop
 		if (!m_client->IsFileTransBusy())
 		if (!vncService::InputDesktopSelected()) 
-			if (!vncService::SelectDesktop(NULL)) 
+			if (!vncService::SelectDesktop(NULL, &input_desktop)) 
 					break;
 		// added jeff
         // 2 May 2008 jdp paquette@atnetsend.net moved so that we're on the right desktop  when we're a service
@@ -2359,6 +2360,7 @@ vncClientThread::run(void *arg)
 										ft.length = Swap32IfLE(nCSBufferLen);
 										m_socket->SendExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
 										m_socket->SendExact((char *)lpCSBuff, nCSBufferLen);
+										delete [] lpCSBuff;
 									}
 								}
 							}
@@ -2374,9 +2376,15 @@ vncClientThread::run(void *arg)
 						{
                             helper::close_handle(m_client->m_hDestFile);
 							if (m_client->m_pCompBuff != NULL)
-								delete m_client->m_pCompBuff;
+							{
+								delete [] m_client->m_pCompBuff;
+								m_client->m_pCompBuff = NULL;
+							}
 							if (m_client->m_pBuff != NULL)
-								delete m_client->m_pBuff;
+							{
+								delete [] m_client->m_pBuff;
+								m_client->m_pBuff = NULL;
+							}
 
 							//MessageBox(NULL, "3. Abort !", "Ultra WinVNC", MB_OK);
 							//vnclog.Print(LL_INTINFO, VNCLOG("*** FileTransfer: Wrong Dest File size. Abort !\n"));
@@ -2583,8 +2591,10 @@ vncClientThread::run(void *arg)
 						if (m_client->m_pCompBuff == NULL)
 						{
 							helper::close_handle(m_client->m_hSrcFile);
-							if (m_client->m_pBuff != NULL)
-								delete m_client->m_pBuff;
+							if (m_client->m_pBuff != NULL) {
+								delete [] m_client->m_pBuff;
+								m_client->m_pBuff = NULL;
+							}
 							//MessageBox(NULL, "9. Abort !", "Ultra WinVNC", MB_OK);
 							//vnclog.Print(LL_INTINFO, VNCLOG("*** FileTransfer: rfbFileHeader - Unable to allocate comp. buffer. Abort !\n"));
                             m_client->FTUploadFailureHook();
@@ -3114,6 +3124,8 @@ vncClientThread::run(void *arg)
         m_client->m_bClientHasBlockedInput = false;
     }
 
+	if (!CloseDesktop(input_desktop))
+		vnclog.Print(LL_INTERR, VNCLOG("failed to close desktop\n"));
 	// Quit this thread.  This will automatically delete the thread and the
 	// associated client.
 	vnclog.Print(LL_CLIENTS, VNCLOG("client disconnected : %s (%hd)\n"),
@@ -3278,6 +3290,11 @@ vncClient::vncClient() : Sendinput("USER32", "SendInput")
     m_bClientHasBlockedInput = false;
     m_wants_KeepAlive = false;
     m_fFileSessionOpen = false;
+	m_pBuff = 0;
+	m_pCompBuff = 0;
+	m_NewSWDesktop = 0;
+	NewsizeW = 0;
+	NewsizeH = 0;
 }
 
 vncClient::~vncClient()
@@ -3326,6 +3343,12 @@ vncClient::~vncClient()
 #ifdef DSHOW
 	CloseHandle(m_hmtxEncodeAccess);
 #endif
+	if (m_lpCSBuffer)
+		delete [] m_lpCSBuffer;
+	if (m_pBuff)
+		delete [] m_pBuff;
+	if (m_pCompBuff)
+		delete [] m_pCompBuff;
 
 	//thos give sometimes errors, hlogfile is already removed at this point
 	//vnclog.Print(LL_INTINFO, VNCLOG("cached %d \n"),totalraw);
@@ -4378,10 +4401,20 @@ void vncClient::FinishFileReception()
 	//delete [] m_szFullDestName;
 
 	if (m_pCompBuff != NULL)
+	{
 		delete [] m_pCompBuff;
+		m_pCompBuff = NULL;
+	}
 	if (m_pBuff != NULL)
+	{
 		delete [] m_pBuff;
-
+		m_pBuff = NULL;
+	}
+	if (m_lpCSBuffer)
+	{
+		delete [] m_lpCSBuffer;
+		m_lpCSBuffer = NULL;
+	}
 
 	return;
 }
@@ -4531,9 +4564,15 @@ void vncClient::FinishFileSending()
 	
 	helper::close_handle(m_hSrcFile);
 	if (m_pBuff != NULL)
+	{
 		delete [] m_pBuff;
+		m_pBuff = NULL;
+	}
 	if (m_pCompBuff != NULL)
+	{
 		delete [] m_pCompBuff;
+		m_pCompBuff = NULL;
+	}
 
 	// sf@2003 - Directory Transfer trick
 	// If the transfered file is a Directory zip, we delete it locally, whatever the result of the transfer

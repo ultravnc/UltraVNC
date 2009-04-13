@@ -107,7 +107,7 @@ void Region::translate(const Point& delta) {
 
 void Region::setOrderedRects(const std::vector<Rect>& rects) {
   std::vector<Rect>::const_iterator i;
-  for (i=rects.begin(); i != rects.end(); i++) {
+  for (i=rects.begin(); i != rects.end(); ++i) {
     _RectRegion rr(*i);
     XUnionRegion(&rr.region, Xrgn, Xrgn);
   }

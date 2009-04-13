@@ -26,7 +26,8 @@
 
 // vncMenu
 
-// Implementation of a system tray icon & menu for WinVNC 
+// Implementation of a system tray icon & menu for WinVNC
+
 #include "stdhdrs.h"
 #include "WinVNC.h"
 #include "vncService.h"
@@ -376,6 +377,7 @@ vncMenu::vncMenu(vncServer *server)
 
 	// Install the tray icon!
 	AddTrayIcon();
+	CoUninitialize();
 }
 
 vncMenu::~vncMenu()
@@ -440,6 +442,7 @@ vncMenu::AddTrayIcon()
 		{
 			vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::AddTrayIcon - ADD Tray Icon call\n"));
 		}
+
 		if (osvi.dwPlatformId==VER_PLATFORM_WIN32_NT && osvi.dwMinorVersion==0 && osvi.dwMajorVersion==5)
 		{
 			if ( ! m_server->GetDisableTrayIcon())
