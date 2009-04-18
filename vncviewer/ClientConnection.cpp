@@ -527,11 +527,11 @@ void ClientConnection::Run()
 	*/
 
 	// add user option on command line
-	if ( (strlen(	m_pApp->m_options.m_cmdlnUser) > 0) & !m_pApp->m_options.m_NoMoreCommandLineUserPassword) // Fix by Act
+	if ( (strlen(	m_pApp->m_options.m_cmdlnUser) > 0) && !m_pApp->m_options.m_NoMoreCommandLineUserPassword) // Fix by Act
 		strcpy(m_cmdlnUser, m_pApp->m_options.m_cmdlnUser);
 
 	// Modif sf@2002 - bit of a hack...and unsafe
-	if ( (strlen(	m_pApp->m_options.m_clearPassword) > 0) & !m_pApp->m_options.m_NoMoreCommandLineUserPassword)
+	if ( (strlen(	m_pApp->m_options.m_clearPassword) > 0) && !m_pApp->m_options.m_NoMoreCommandLineUserPassword)
 		strcpy(m_clearPasswd, m_pApp->m_options.m_clearPassword);
 
 	if (saved_set)
@@ -2259,10 +2259,14 @@ void ClientConnection::AuthMsLogon() {
 	vnclog.Print(100, _T("After DH: g=%I64u, m=%I64u, i=%I64u, key=%I64u\n"),
 	  bytesToInt64(gen), bytesToInt64(mod), bytesToInt64(pub), bytesToInt64((char*) key));
 	// get username and passwd
-	if ((strlen(m_cmdlnUser)>0)||(strlen(m_clearPasswd)>0))
+	// m_clearPasswd is not from commandline only, but also filled by dsm
+	// Need to be both &&
+
+	if ((strlen(m_cmdlnUser)>0)&& (strlen(	m_pApp->m_options.m_clearPassword) > 0) && !m_pApp->m_options.m_NoMoreCommandLineUserPassword)
     {
 		vnclog.Print(0, _T("Command line MS-Logon.\n"));
 #ifndef UNDER_CE
+		strcpy(m_clearPasswd, m_pApp->m_options.m_clearPassword);
 		strncpy(passwd, m_clearPasswd, 64);
 		strncpy(user, m_cmdlnUser, 254);
 		//strncpy(domain, ad.m_domain, 254);

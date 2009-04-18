@@ -51,7 +51,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="omnithread,.."
-				PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS;__NT__;_WINSTATIC;__WIN32__"
+				PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS;__NT__;_WINSTATIC;__WIN32__;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				RuntimeLibrary="1"
 				PrecompiledHeaderFile=".\Debug/vncviewer.pch"
@@ -422,11 +422,11 @@
 				>
 			</File>
 			<File
-				RelativePath="res\background2.bmp"
+				RelativePath="res\stat\background2.bmp"
 				>
 			</File>
 			<File
-				RelativePath="res\stat\background2.bmp"
+				RelativePath="res\background2.bmp"
 				>
 			</File>
 			<File
@@ -546,11 +546,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Tango_l.bmp"
+				RelativePath=".\res\Tango_l.bmp"
 				>
 			</File>
 			<File
-				RelativePath=".\res\Tango_l.bmp"
+				RelativePath=".\Tango_l.bmp"
 				>
 			</File>
 			<File
@@ -562,19 +562,19 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Tango_s.bmp"
-				>
-			</File>
-			<File
 				RelativePath=".\res\Tango_s.bmp"
 				>
 			</File>
 			<File
-				RelativePath=".\Tango_sx.bmp"
+				RelativePath=".\Tango_s.bmp"
 				>
 			</File>
 			<File
 				RelativePath=".\res\Tango_sx.bmp"
+				>
+			</File>
+			<File
+				RelativePath=".\Tango_sx.bmp"
 				>
 			</File>
 			<File
