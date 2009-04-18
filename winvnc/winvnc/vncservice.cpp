@@ -65,6 +65,8 @@ pProcessIdToSessionId WTSProcessIdToSessionIdF=NULL;
 #define SM_REMOTESESSION 0X1000
 #endif
 
+extern BOOL SPECIAL_SC;
+
 void ClearKeyState(BYTE key);
 DWORD GetCurrentSessionID()
 {
@@ -565,6 +567,9 @@ BOOL CALLBACK WinStationEnumProc(LPTSTR name, LPARAM param) {
 BOOL
 vncService::InputDesktopSelected()
 {
+//Running as SC we want to keep the viewer open in case UAC or screensaver jump in
+if (SPECIAL_SC)return true;
+
 //	vnclog.Print(LL_INTERR, VNCLOG("InputDesktopSelected()\n"));
 	// Are we running on NT?
 	if (IsWinNT())
