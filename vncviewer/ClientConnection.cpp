@@ -4144,7 +4144,13 @@ inline void ClientConnection::ReadScreenUpdate()
 		{
 			fis->stopTiming();
 			kbitsPerSecond = fis->kbitsPerSecond();
-			if (kbitsPerSecond>= avg_kbitsPerSecond/2 && kbitsPerSecond<=avg_kbitsPerSecond*3/2) avg_kbitsPerSecond=(avg_kbitsPerSecond+kbitsPerSecond)/2;
+			if (avg_kbitsPerSecond==0) avg_kbitsPerSecond=kbitsPerSecond;
+			else
+			{
+			if (kbitsPerSecond>= avg_kbitsPerSecond/2 && kbitsPerSecond<=avg_kbitsPerSecond*3/2) 
+				avg_kbitsPerSecond=(avg_kbitsPerSecond+kbitsPerSecond)/2;
+			else avg_kbitsPerSecond=(3*avg_kbitsPerSecond+kbitsPerSecond)/4;
+			}
 			fTimingAlreadyStopped = true;
 		}
 
@@ -4298,8 +4304,12 @@ inline void ClientConnection::ReadScreenUpdate()
 	{
 		fis->stopTiming();
 		kbitsPerSecond = fis->kbitsPerSecond();
+		if (avg_kbitsPerSecond==0) avg_kbitsPerSecond=kbitsPerSecond;
+		else
+		{
 		if (kbitsPerSecond>= avg_kbitsPerSecond/2 && kbitsPerSecond<=avg_kbitsPerSecond*3/2) avg_kbitsPerSecond=(avg_kbitsPerSecond+kbitsPerSecond)/2;
 		else avg_kbitsPerSecond=(3*avg_kbitsPerSecond+kbitsPerSecond)/4;
+		}
 	}
 
 	// sf@2002
