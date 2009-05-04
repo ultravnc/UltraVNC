@@ -1814,7 +1814,12 @@ void ClientConnection::NegotiateProtocolVersion()
 		m_fServerKnowsFileTransfer = true;
 	}
 	// Added for SC so we can do something before actual data transfer start
-	if (m_minorVersion == 14 || m_minorVersion == 16)
+	if (m_minorVersion == 14 )
+	{
+		m_ms_logon = true;
+		m_fServerKnowsFileTransfer = true;
+	}
+	else if ( m_minorVersion == 16)
 	{
 		m_fServerKnowsFileTransfer = true;
 	}
@@ -3640,6 +3645,7 @@ void* ClientConnection::run_undetached(void* arg) {
 	m_nServerScale = m_opts.m_nServerScale;
 
 	m_reconnectcounter = m_opts.m_reconnectcounter;
+	if (m_opts.m_listening)m_reconnectcounter=0;
 	reconnectcounter = m_reconnectcounter;
 
 	if (m_nServerScale > 1) SendServerScale(m_nServerScale);
@@ -3903,8 +3909,8 @@ void ClientConnection::SendAppropriateFramebufferUpdateRequest()
 		SetupPixelFormat();
 		// tight cursor handling
 		SoftCursorFree();
-		Createdib();
 		SetFormatAndEncodings();
+		Createdib();
 		m_pendingFormatChange = false;
 
 		// If the pixel format has changed, or cache, or scale request whole screen

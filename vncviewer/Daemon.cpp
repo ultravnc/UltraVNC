@@ -194,8 +194,10 @@ LRESULT CALLBACK Daemon::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lPa
 			switch(lParam) {
 			case FD_ACCEPT:
 				{
+					struct sockaddr_in incoming;
+					int size_incoming=sizeof(incoming);
 					SOCKET hNewSock;
-					hNewSock = accept(_this->m_sock, NULL, NULL);
+					hNewSock = accept(_this->m_sock, (struct sockaddr *)&incoming,&size_incoming);
 					WSAAsyncSelect(hNewSock, hwnd, 0, 0);
 					unsigned long nbarg = 0;
 					ioctlsocket(hNewSock, FIONBIO, &nbarg);

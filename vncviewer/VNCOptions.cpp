@@ -73,6 +73,8 @@ extern bool g_disable_sponsor;
 bool config_specified=false;
 
 
+
+
 VNCOptions::VNCOptions()
 {
   for (int i = 0; i <= LASTENCODING; i++)
@@ -114,6 +116,7 @@ VNCOptions::VNCOptions()
   m_Emul3Fuzz = 4;      // pixels away before emulation is cancelled
   m_Shared = true;
   m_DeiconifyOnBell = false;
+
   m_DisableClipboard = false;
   m_localCursor = DOTCURSOR; // NOCURSOR;
   m_scaling = false;
@@ -1253,6 +1256,7 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 			  HWND hDeiconify = GetDlgItem(hwnd, IDC_BELLDEICONIFY);
 			  _this->m_DeiconifyOnBell =
 				  (SendMessage(hDeiconify, BM_GETCHECK, 0, 0) == BST_CHECKED);
+
 #ifndef UNDER_CE				
 			  HWND hDisableClip = GetDlgItem(hwnd, IDC_DISABLECLIPBOARD);
 			  _this->m_DisableClipboard =

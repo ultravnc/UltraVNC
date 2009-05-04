@@ -126,7 +126,7 @@ END
 //
 
 IDD_OPTIONDIALOG DIALOGEX 0, 0, 323, 217
-STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION " Connection Options..."
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
@@ -158,9 +158,9 @@ BEGIN
     CONTROL         "Jpeg (Tight) - Quality:",IDC_ALLOW_JPEG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,145,84,10
     EDITTEXT        IDC_QUALITYLEVEL,113,146,14,12,ES_AUTOHSCROLL
     GROUPBOX        "Misc",IDC_STATIC,4,164,150,49
-    CONTROL         "Share the Server",IDC_SHARED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,176,71,10
-    CONTROL         "Deiconify on Bell",IDC_BELLDEICONIFY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,188,137,8
-    CONTROL         "Disable clipboard transfer",IDC_DISABLECLIPBOARD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,198,138,10
+    CONTROL         "Share the Server",IDC_SHARED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,172,71,10
+    CONTROL         "Deiconify on Bell",IDC_BELLDEICONIFY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,183,137,8
+    CONTROL         "Disable clipboard transfer",IDC_DISABLECLIPBOARD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,192,138,10
     GROUPBOX        "Mouse and Keyboard",IDC_STATIC,159,2,159,85
     CONTROL         "Emulate 3 Buttons (with 2-button click)",IDC_EMULATECHECK,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,166,15,139,10
@@ -234,7 +234,7 @@ END
 
 IDD_SESSION_DLG DIALOGEX 0, 0, 245, 208
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Ultr@VNC Viewer - Connection 1.0.5.7"
+CAPTION "Ultr@VNC Viewer - Connection 1.0.5.7.4"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     COMBOBOX        IDC_HOSTNAME_EDIT,76,4,120,66,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
@@ -401,7 +401,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,8,137,62,14
     CONTROL         156,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_SUNKEN,8,7,62,54
-    LTEXT           "UltraVNC Win32 Viewer 1.0.5.7",IDC_STATIC,86,6,197,11
+    LTEXT           "UltraVNC Win32 Viewer 1.0.5.7.4",IDC_STATIC,86,6,197,11
     LTEXT           "For more Information and Links please visit: \nhttp://ultravnc.sf.net",IDC_STATIC,86,133,197,19
     LTEXT           "Copyright © 2002-2005 Ultr@VNC Team\nCopyright © 2001-2002 Sam - eSVNC \nCopyright © 1999-2002 Rudi D. V. - VdaccVNC \nCopyright © 1999-2002 Const. Kaplinsky - TightVNC \nCopyright © 2002 RealVNC Ltd. - RealVNC\n",IDC_STATIC,86,30,200,40
     LTEXT           "Built:",IDC_STATIC,87,17,15,10
@@ -422,28 +422,28 @@ BEGIN
     PUSHBUTTON      "No for all",IDC_NOALL_B,135,65,39,14
 END
 
-IDD_APP_MESSAGE1 DIALOG  0, 0, 246, 118
-STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+IDD_APP_MESSAGE1 DIALOGEX 0, 0, 246, 118
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "VncViewer Message Box"
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "Close",IDOK,181,87,56,14
     LTEXT           "BuildTime",IDC_BUILDTIME,9,11,228,49
     GROUPBOX        "Info Message",IDC_STATIC,3,1,242,63,BS_CENTER
-    CTEXT           "UltraVnc 1.0.5.7",IDC_STATIC,193,105,51,12
+    CTEXT           "UltraVnc 1.0.5.7.4",IDC_STATIC,178,105,66,12
     PUSHBUTTON      "",IDC_BUTTON1,3,66,170,47,BS_BITMAP
 END
 
-IDD_APP_MESSAGE2 DIALOG  0, 0, 246, 167
-STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+IDD_APP_MESSAGE2 DIALOGEX 0, 0, 246, 167
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "VncViewer Message Box"
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "Close",IDOK,181,135,56,14
     LTEXT           "BuildTime",IDC_BUILDTIME,9,11,228,49
     PUSHBUTTON      "",IDC_BUTTON2,4,66,170,47,BS_BITMAP
     GROUPBOX        "Info Message",IDC_STATIC,3,1,242,63,BS_CENTER
-    CTEXT           "UltraVnc 1.0.5.7",IDC_STATIC,193,153,51,12
+    CTEXT           "UltraVnc 1.0.5.7.4",IDC_STATIC,175,153,69,12
     PUSHBUTTON      "",IDC_BUTTON1,4,114,170,47,BS_BITMAP
     CTEXT           "Sponsored\n Link",IDC_STATIC,175,79,36,21
 END
@@ -659,12 +659,12 @@ BEGIN
             VALUE "Comments", "UltraVNC Viewer"
             VALUE "CompanyName", "UltraVNC"
             VALUE "FileDescription", "VNCViewer"
-            VALUE "FileVersion", "1.0.5.7"
+            VALUE "FileVersion", "1.0.5.7.4"
             VALUE "InternalName", "VNCViewer"
             VALUE "LegalCopyright", "Copyright © 2008 UltraVNC team members"
             VALUE "OriginalFilename", "VNCViewer.exe"
             VALUE "ProductName", "UltraVNC VNCViewer"
-            VALUE "ProductVersion", "1.0.5.7"
+            VALUE "ProductVersion", "1.0.5.7.4"
         END
     END
     BLOCK "VarFileInfo"
