@@ -1391,7 +1391,10 @@ vncClientThread::run(void *arg)
 		
 		// wa@2005 - AutoReconnection attempt if required
 		if (m_server->AutoReconnect())
+		{
+			vnclog.Print(LL_INTERR, VNCLOG("PostAddNewClient I\n"));
 			vncService::PostAddNewClient(1111, 1111);
+		}
 
 		return;
 	}
@@ -1518,9 +1521,11 @@ vncClientThread::run(void *arg)
 
 		// Ensure that we're running in the correct desktop
 		if (!m_client->IsFileTransBusy())
-		if (!vncService::InputDesktopSelected()) 
+		if (!vncService::InputDesktopSelected())
+		{
 			if (!vncService::SelectDesktop(NULL, &input_desktop)) 
 					break;
+		}
 		// added jeff
         // 2 May 2008 jdp paquette@atnetsend.net moved so that we're on the right desktop  when we're a service
 	    // Clear the CapsLock and NumLock keys
@@ -3204,7 +3209,10 @@ vncClientThread::run(void *arg)
 	// sf@2003 - AutoReconnection attempt if required
 	//if (!fShutdownOrdered)
 		if (m_server->AutoReconnect())
-		vncService::PostAddNewClient(1111, 1111);
+		{
+			vnclog.Print(LL_INTERR, VNCLOG("PostAddNewClient II\n"));
+			vncService::PostAddNewClient(1111, 1111);
+		}
 }
 
 // The vncClient itself

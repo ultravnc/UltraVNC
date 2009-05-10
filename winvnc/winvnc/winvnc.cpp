@@ -558,6 +558,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 						// Post the IP address to the server
 						// We can not contact a runnning service, permissions, so we must store the settings
 						// and process until the vncmenu has been started
+						vnclog.Print(LL_INTERR, VNCLOG("PostAddNewClient III \n"));
 						if (!vncService::PostAddNewClient(address, port))
 						{
 						PostAddNewClient_bool=true;
@@ -574,6 +575,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 				// Tell the server to show the Add New Client dialog
 				// We can not contact a runnning service, permissions, so we must store the settings
 				// and process until the vncmenu has been started
+				vnclog.Print(LL_INTERR, VNCLOG("PostAddNewClient IIII\n"));
 				if (!vncService::PostAddNewClient(0, 0))
 				{
 				PostAddNewClient_bool=true;
@@ -688,7 +690,11 @@ DWORD WINAPI imp_desktop_thread(LPVOID lpParam)
 
 
 	if (PostAddNewClient_bool)
-	vncService::PostAddNewClient(address_vcard, port_int);
+	{
+		PostAddNewClient_bool=false;
+		vnclog.Print(LL_INTERR, VNCLOG("PostAddNewClient IIIII\n"));
+		vncService::PostAddNewClient(address_vcard, port_int);
+	}
 
 	MSG msg;
 	while (GetMessage(&msg,0,0,0) != 0 && !fShutdownOrdered)
