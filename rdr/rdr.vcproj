@@ -4,6 +4,7 @@
 	Version="9,00"
 	Name="rdr"
 	ProjectGUID="{F5244002-0FFF-4F19-A941-FCCE1861F132}"
+	RootNamespace="rdr"
 	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
@@ -59,6 +60,7 @@
 				ProgramDataBaseFileName=".\Release/"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
