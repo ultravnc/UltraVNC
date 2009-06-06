@@ -36,7 +36,6 @@ VNCviewerApp32::VNCviewerApp32(HINSTANCE hInstance, PSTR szCmdLine) :
 {
 
 	m_pdaemon = NULL;
-	m_pflasher = NULL;
 //HKL hkl = LoadKeyboardLayout(  "00000813", 
 //			KLF_ACTIVATE | KLF_REPLACELANG | KLF_REORDER  );
 	// Load a requested keyboard layout
@@ -56,8 +55,6 @@ VNCviewerApp32::VNCviewerApp32(HINSTANCE hInstance, PSTR szCmdLine) :
 		vnclog.Print(3, _T("In listening mode - staring daemons\n"));
 		
 		try {
-			// m_pflasher = new Flasher(FLASH_PORT_OFFSET);
-			m_pflasher = new Flasher(m_options.m_listenPort + FLASH_PORT_OFFSET - INCOMING_PORT_OFFSET);
 			m_pdaemon = new Daemon(m_options.m_listenPort);
 		} catch (WarningException &e) {
 			char msg[1024];
@@ -171,6 +168,5 @@ void VNCviewerApp32::RegisterSounds() {
 VNCviewerApp32::~VNCviewerApp32() {
 	// We don't need to clean up pcc if the thread has been joined.
 	if (m_pdaemon != NULL) delete m_pdaemon;
-	if (m_pflasher != NULL) delete m_pflasher;
 }
 	

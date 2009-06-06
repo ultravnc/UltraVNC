@@ -23,7 +23,6 @@
 
 #include "VNCviewerApp.h"
 #include "Daemon.h"
-#include "Flasher.h"
 
 class VNCviewerApp32 : public VNCviewerApp {
 public:
@@ -38,7 +37,6 @@ public:
 private:
 	// Set up registry for program's sounds
 	void RegisterSounds();
-	Flasher *m_pflasher;
 	Daemon  *m_pdaemon;
 };
 

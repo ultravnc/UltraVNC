@@ -168,7 +168,7 @@ private:
 
 	SOCKET m_sock;
 	bool m_serverInitiated;
-	HWND m_hwndcn, m_hbands,m_hwndTB,m_hwndTBwin,m_hwndMain,m_hwndStatus,m_TrafficMonitor,m_logo_wnd,m_button_wnd;
+	HWND m_hwndcn, m_hbands,m_hwndTB,m_hwndTBwin,m_hwndStatus,m_TrafficMonitor,m_logo_wnd,m_button_wnd;
 	HANDLE m_statusThread;
 	RECT m_TBr;
 	// bool m_ToolbarEnable;
@@ -209,7 +209,7 @@ private:
 	void SendSetPixelFormat(rfbPixelFormat newFormat);
 
 	void SendIncrementalFramebufferUpdateRequest();
-	void SendFullFramebufferUpdateRequest();
+	
 	void SendAppropriateFramebufferUpdateRequest();
 	void SendFramebufferUpdateRequest(int x, int y, int w, int h, bool incremental);
 	
@@ -339,7 +339,7 @@ private:
 
 	// This is what controls the thread
 	void * run_undetached(void* arg);
-	bool m_bKillThread;
+	
 
 	// Modif sf@2002 - FileTransfer
 	friend class FileTransfer;  
@@ -495,7 +495,7 @@ private:
 	rfbPixelFormat m_myFormat, m_pendingFormat;
 	// protocol version in use.
 	int m_majorVersion, m_minorVersion;
-	bool m_threadStarted, m_running;
+	bool m_threadStarted;
 	// mid-connection format change requested
 
 	// sf@2002 - v1.1.0
@@ -603,14 +603,21 @@ private:
 	DWORD oldtick;
 	bool Pressed_Cancel;
 
+
 	// sf@2007 - AutoReconnect
-	int m_autoReconnect;
 	void Reconnect();
-	void DoConnection();
-	int reconnectcounter;
 	HANDLE ThreadSocketTimeout;
 
     bool m_server_wants_keepalives;
+public:
+	int m_autoReconnect;
+	int reconnectcounter;
+	void DoConnection();
+	bool m_bKillThread;
+	bool m_running;
+	void SendFullFramebufferUpdateRequest();
+	HWND m_hwndMain;
+	HANDLE rcth;
 };
 
 // Some handy classes for temporary GDI object selection

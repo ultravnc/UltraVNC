@@ -466,6 +466,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	hbmToolsmall = (HBITMAP)LoadImage(m_pApp->m_instance, "tlbarsmall.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_LOADMAP3DCOLORS);
 	hbmToolbigX = (HBITMAP)LoadImage(m_pApp->m_instance, "tlbarbigx.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_LOADMAP3DCOLORS);
 	hbmToolsmallX = (HBITMAP)LoadImage(m_pApp->m_instance, "tlbarsmallx.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_LOADMAP3DCOLORS);
+	rcth=NULL;
 }
 
 // helper functions for setting socket timeouts during file transfer
@@ -593,6 +594,30 @@ void ClientConnection::DoConnection()
 	reconnectcounter=m_reconnectcounter;
  
 }
+
+DWORD WINAPI ReconnectThreadProc(LPVOID lpParameter)
+{
+	ClientConnection *cc=(ClientConnection*)lpParameter;
+	Sleep( cc->m_autoReconnect * 1000 );
+	try
+	{
+		cc->DoConnection();
+		cc->m_bKillThread = false;
+		cc->m_running = true;
+
+		cc->SendFullFramebufferUpdateRequest();
+	}
+	catch (Exception &e)
+	{
+		if( !cc->m_autoReconnect )
+			e.Report();
+		cc->reconnectcounter--;
+		if (cc->reconnectcounter<0) cc->reconnectcounter=0;
+		PostMessage(cc->m_hwndMain, WM_CLOSE, cc->reconnectcounter, 1);
+	}
+	return 0;
+}
+
 
 void ClientConnection::Reconnect()
 {
@@ -5954,6 +5979,10 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 
                             // 8 April 2008 jdp hide window while shutting down
                             ::ShowWindow(hwnd, SW_HIDE);
+							//make sure reconnecthread is closed before closing mother
+							forcedexit=true;
+							if(_this->rcth) WaitForSingleObject(_this->rcth,10000);
+							_this->rcth=NULL;
 							// Close the worker thread
 							_this->KillThread();
 
@@ -5976,7 +6005,12 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							SetWindowText(_this->m_hwndMain, wtext);
 							_this->m_opts.m_NoStatus = true;
 							_this->SuspendThread();
-							_this->Reconnect();
+							//_this->Reconnect()
+							DWORD dw;
+							//should never happen, but jjust in case, make sure no 2 are runnning
+							if(_this->rcth) WaitForSingleObject(_this->rcth,10000);
+							_this->rcth=NULL;
+							_this->rcth=CreateThread(NULL,0,ReconnectThreadProc,_this,0,&dw);
 						}
 						return 0;
 					}
