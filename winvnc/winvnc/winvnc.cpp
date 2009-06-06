@@ -566,6 +566,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 						address_vcard=address;
 						}
 					}
+					else
+					{
+						//ask for host,port
+						PostAddNewClient_bool=true;
+						port_int=0;
+						address_vcard=0;
+					}
 				}
 				i=end;
 				continue;
