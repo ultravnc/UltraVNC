@@ -670,8 +670,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 	switch (iMsg)
 	{
 
-		// Every five seconds, a timer message causes the icon to update
-	case WM_SRV_DESKTOP_CHANGE:
+	// Every five seconds, a timer message causes the icon to update
 	case WM_TIMER:
 		// sf@2007 - Can't get the WTS_CONSOLE_CONNECT message work properly for now..
 		// So use a hack instead
@@ -688,51 +687,42 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			}
 		}
 
-//if ( ! _this->m_server->GetDisableTrayIcon())
+
+		vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::TIMER TrayIcon 5s hack\n"));
+
+		if (_this->m_server->RunningFromExternalService())
 			{
-				vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::TIMER TrayIcon 5s hack\n"));
-
-				if (_this->m_server->RunningFromExternalService())
+				strcpy(newuser,"");
+				if (vncService::CurrentUser((char *) &newuser, sizeof(newuser)))
 				{
-					strcpy(newuser,"");
-					if (vncService::CurrentUser((char *) &newuser, sizeof(newuser)))
+					// Check whether the user name has changed!
+					if (_stricmp(newuser, _this->m_username) != 0 || _this->IconFaultCounter>10)
 					{
-//						vnclog.Print(LL_INTINFO,
-//							VNCLOG("############### Usernames change: old=\"%s\", new=\"%s\"\n"),
-//							_this->m_username, newuser);
-
-						// Check whether the user name has changed!
-						if (_stricmp(newuser, _this->m_username) != 0 || _this->IconFaultCounter>10)
-						{
-							Sleep(1000);
-							vnclog.Print(LL_INTINFO,
-								VNCLOG("user name has changed\n"));
-
-							// User has changed!
-							strcpy(_this->m_username, newuser);
-
-							vnclog.Print(LL_INTINFO,
-								VNCLOG("############## Kill vncMenu thread\n"));
-
-							// Order impersonation thread killing
-							PostQuitMessage(0);
-						}
+						Sleep(1000);
+						vnclog.Print(LL_INTINFO,
+						VNCLOG("user name has changed\n"));
+						// User has changed!
+						strcpy(_this->m_username, newuser);
+						vnclog.Print(LL_INTINFO,
+						VNCLOG("############## Kill vncMenu thread\n"));
+						// Order impersonation thread killing
+						PostQuitMessage(0);
+						break;
 					}
 				}
-
-				// *** HACK for running servicified
-				if (vncService::RunningAsService())
-				{
-					vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::TIMER TrayIcon 5s hack call - Runningasservice\n"));
-					// Attempt to add the icon if it's not already there
-					_this->AddTrayIcon();
-					// Trigger a check of the current user
-					PostMessage(hwnd, WM_USERCHANGED, 0, 0);
-				}
-
-				// Update the icon
-				_this->FlashTrayIcon(_this->m_server->AuthClientCount() != 0);
 			}
+
+		// *** HACK for running servicified
+		if (vncService::RunningAsService())
+			{
+				vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::TIMER TrayIcon 5s hack call - Runningasservice\n"));
+				// Attempt to add the icon if it's not already there
+				_this->AddTrayIcon();
+				// Trigger a check of the current user
+				PostMessage(hwnd, WM_USERCHANGED, 0, 0);
+			}
+		// Update the icon
+		_this->FlashTrayIcon(_this->m_server->AuthClientCount() != 0);
 		break;
 
 		// DEAL WITH NOTIFICATIONS FROM THE SERVER:

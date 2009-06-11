@@ -368,7 +368,6 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 								bool fHookDriverWanted = (FALSE != m_desktop->m_hookdriver);
                                 Sleep(1000);
 								vnclog.Print(LL_INTERR, VNCLOG("m_desktop->Startup"));
-								ResetEvent(m_desktop->restart_event);
 								if (m_desktop->Startup() != 0)
 									{
 										vnclog.Print(LL_INTERR, VNCLOG("Startup KillAuthClients\n"));
@@ -522,7 +521,9 @@ void vncDesktopThread::do_polling(HANDLE& threadHandle, rfb::Region2D& rgncache,
 	// POLL PROBLEM AREAS
 	// We add specific areas of the screen to the region cache,
 	// causing them to be fetched for processing.
-	if (m_desktop->SetHook && g_obIPC.listall()!=NULL) 
+	// if can_be_hooked==false, hooking is temp disabled, use polling
+
+	if (m_desktop->SetHook && g_obIPC.listall()!=NULL && m_desktop->can_be_hooked) 
 	{
 		DWORD dwTId(0);
 		if (threadHandle==NULL) threadHandle = CreateThread(NULL, 0, hookwatch, this, 0, &dwTId);
@@ -535,7 +536,7 @@ void vncDesktopThread::do_polling(HANDLE& threadHandle, rfb::Region2D& rgncache,
 	if (cursormoved)
 		m_lLastMouseMoveTime = lTime;
 	
-	if (m_desktop->m_server->PollFullScreen() && !cursormoved)
+	if ((m_desktop->m_server->PollFullScreen() && !cursormoved) || (!m_desktop->can_be_hooked && !cursormoved))
 	{
 		int timeSinceLastMouseMove = lTime - m_lLastMouseMoveTime;
 		if (timeSinceLastMouseMove > 150) // 150 ms pause after a Mouse move 
@@ -553,7 +554,7 @@ void vncDesktopThread::do_polling(HANDLE& threadHandle, rfb::Region2D& rgncache,
 	}
 		
     HWND hWndToPoll = 0;
-	if (m_desktop->m_server->PollForeground())
+	if (m_desktop->m_server->PollForeground() || !m_desktop->can_be_hooked)
 	{
 		// Get the window rectangle for the currently selected window
 		hWndToPoll = GetForegroundWindow();
@@ -562,7 +563,7 @@ void vncDesktopThread::do_polling(HANDLE& threadHandle, rfb::Region2D& rgncache,
 		
 	}
 	
-	if (m_desktop->m_server->PollUnderCursor())
+	if (m_desktop->m_server->PollUnderCursor() || !m_desktop->can_be_hooked)
 	{
 		// Find the mouse position
 		POINT mousepos;
