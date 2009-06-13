@@ -206,7 +206,7 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 
 	case WM_QUERYENDSESSION:
 
-		if (OSversion()==2) 
+		/*if (OSversion()==2) 
 		{
 		if (_this->m_hnextviewer!=NULL) ChangeClipboardChain(hwnd, _this->m_hnextviewer);
 		_this->m_hnextviewer=NULL;
@@ -229,7 +229,7 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		vnclog.Print(LL_INTERR, VNCLOG("WM_QUERYENDSESSION\n"));
 		PostQuitMessage(0);
 		SetEvent(_this->trigger_events[5]);
-		}
+		}*/
 		return DefWindowProc(hwnd, iMsg, wParam, lParam);
 
 	case WM_CLOSE:
@@ -607,7 +607,7 @@ vncDesktop::InitWindow()
 		if (PeekMessage(&msg,NULL,0,0,PM_REMOVE))
 		{
 			vnclog.Print(LL_INTERR, VNCLOG("OOOOOOOOOOOO %i %i\n"),msg.message,msg.hwnd);
-			if (msg.message==WM_QUIT)		
+			if (msg.message==WM_QUIT || fShutdownOrdered)		
 				{
 					vnclog.Print(LL_INTERR, VNCLOG("OOOOOOOOOOOO called wm_quit\n"));
 					DestroyWindow(m_hwnd);

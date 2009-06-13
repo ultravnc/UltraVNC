@@ -48,7 +48,7 @@ DWORD WINAPI hookwatch(LPVOID lpParam)
 bool
 vncDesktopThread::Handle_Ringbuffer(mystruct *ringbuffer,rfb::Region2D &rgncache)
 {
-	vnclog.Print(LL_INTERR, VNCLOG("counter,g_Oldcounter %i %i  \n"),ringbuffer->counter,g_Oldcounter);
+	//vnclog.Print(LL_INTERR, VNCLOG("counter,g_Oldcounter %i %i  \n"),ringbuffer->counter,g_Oldcounter);
 	if (ringbuffer->counter==g_Oldcounter) return 0;
 	int counter=ringbuffer->counter;
 	if (counter<1 || counter>1999) return 0;

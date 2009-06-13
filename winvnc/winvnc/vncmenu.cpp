@@ -1078,8 +1078,21 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		
 	case WM_QUERYENDSESSION:
 		{
+			//shutdown or reboot
+			if((lParam & ENDSESSION_LOGOFF) != ENDSESSION_LOGOFF)
+			{
+				vnclog.Print(LL_INTERR, VNCLOG("SHUTDOWN OS detected\n"));
+				vnclog.Print(LL_INTINFO, VNCLOG("KillAuthClients() ID_CLOSE \n"));
+				_this->m_server->KillAuthClients();
+				fShutdownOrdered=TRUE;
+				PostMessage(hwnd, WM_CLOSE, 0, 0);
+				break;
+			}
+
+
 			DWORD SessionID;
 			SessionID=GetCurrentSessionID();
+			vnclog.Print(LL_INTERR, VNCLOG("Session ID %i\n"),SessionID);
 			if (SessionID!=0)
 			{
 				vnclog.Print(LL_INTERR, VNCLOG("WM_QUERYENDSESSION session!=0\n"));
@@ -1088,15 +1101,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				fShutdownOrdered=TRUE;
 				PostMessage(hwnd, WM_CLOSE, 0, 0);
 			}
-			else if((lParam & ENDSESSION_LOGOFF) != ENDSESSION_LOGOFF)
-			{
-				vnclog.Print(LL_INTERR, VNCLOG("WM_QUERYENDSESSION session==0\n"));
-				vnclog.Print(LL_INTINFO, VNCLOG("KillAuthClients() ID_CLOSE \n"));
-				_this->m_server->KillAuthClients();
-				fShutdownOrdered=TRUE;
-				PostMessage(hwnd, WM_CLOSE, 0, 0);
-			}
-		}		
+		}	
 		break;
 		
 	case WM_ENDSESSION:

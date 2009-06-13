@@ -673,7 +673,7 @@ vncDesktopThread::run_undetached(void *arg)
 	/////////////////////
 	bool looping=true;
 	SetEvent(m_desktop->restart_event);
-	while (looping)
+	while (looping && !fShutdownOrdered)
 	{		
 		DWORD result=WaitForMultipleObjects(6,m_desktop->trigger_events,FALSE,100);
 		{
@@ -1061,8 +1061,8 @@ vncDesktopThread::run_undetached(void *arg)
 								}
 
 								newtick = timeGetTime(); // Better resolution than GetTickCount ;)		
-								if (newtick-oldtick > 0)
-									vnclog.Print(LL_INTINFO, VNCLOG("Elapsed Time for updates %ums\n"), newtick-oldtick);
+								//if (newtick-oldtick > 0)
+									//vnclog.Print(LL_INTINFO, VNCLOG("Elapsed Time for updates %ums\n"), newtick-oldtick);
 								
 								// Now wait for more messages to be queued
 							}//peek message
