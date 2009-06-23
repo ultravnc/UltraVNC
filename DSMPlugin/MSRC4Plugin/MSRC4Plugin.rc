@@ -1,0 +1,130 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_CONFIG_DIALOG DIALOGEX 0, 0, 331, 263
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "MS RC4 Encryption Plugin Configuration"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,7,240,216,17
+    PUSHBUTTON      "Cancel",IDCANCEL,224,240,100,17
+    PUSHBUTTON      "Generate New Key",IDC_KEYGEN,224,209,94,17
+    LTEXT           "Click the ""Generate a New Key"" button to generate a random RC4 key.\r\nWhen you generate a new key be sure to copy it to the program folder of your technicians.\r\nThe same key must be present on the Viewer and the Server computers or connections will fail.",IDC_STATIC,13,167,311,27
+    EDITTEXT        IDC_CLIENT,14,143,310,16,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    EDITTEXT        IDC_SERVER_SERVICE,14,82,310,16,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    EDITTEXT        IDC_KEYLOCATION,14,210,72,15,ES_AUTOHSCROLL
+    EDITTEXT        IDC_SERVER_USER,14,112,310,16,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    LTEXT           "Server Key Location (Service)",IDC_STATIC,15,72,184,10,NOT WS_VISIBLE
+    LTEXT           "Server Key Location (application)",IDC_STATIC,14,102,184,10,NOT WS_VISIBLE
+    LTEXT           "Viewer Key Location",IDC_STATIC,14,133,120,9,NOT WS_VISIBLE
+    GROUPBOX        "",IDC_BITNESS,94,204,121,23
+    CONTROL         "40 bit",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,102,211,33,15
+    CONTROL         "128 bit",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,174,211,37,15
+    CONTROL         "56 bit",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,139,211,33,15
+    GROUPBOX        "Configure Key Locations",IDC_STATIC,7,60,317,136,NOT WS_VISIBLE
+    GROUPBOX        "Generate New Key file",IDC_STATIC,7,197,317,36
+    LTEXT           "",IDC_STATUS,7,7,317,156,SS_SUNKEN | WS_BORDER
+END
+
+IDD_DIALOG1 DIALOG  0, 0, 186, 95
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Error!"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,129,74,50,14
+    LTEXT           "",ID_MSG2,7,7,172,30,NOT WS_GROUP
+    LTEXT           "",IDC_MSG,7,42,172,23,NOT WS_GROUP
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_CONFIG_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 324
+        TOPMARGIN, 7
+    END
+
+    IDD_DIALOG1, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 179
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 88
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#include ""version.rc""\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#include "version.rc"
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
