@@ -162,7 +162,7 @@ if ((file == stderr) || (file == stdout))
    {
 	   if (lpZipUserFunctions && lpZipUserFunctions->print!=NULL)
 		len = lpZipUserFunctions->print(pszBuffer, len);
-	   else len=0
+	   else len=0;
    }
 else
    len = _write(_fileno(file),(char far *)(pszBuffer), len);

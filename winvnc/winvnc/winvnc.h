@@ -79,4 +79,4 @@ const char winvncSecurityEditor[]			= "-securityeditor";
 const char winvncKill[]						= "-kill";
 
 // Usage string
-const char winvncUsageText[]		= "winvnc [-sc] [-id:????] [-autoreconnect[ ID:????]] [-connect host[:display]] [-connect host[::port]] [-run]\n";
+const char winvncUsageText[]		= "winvnc [-sc_prompt] [-sc_exit] [-id:????] [-autoreconnect[ ID:????]] [-connect host[:display]] [-connect host[::port]] [-run]\n";

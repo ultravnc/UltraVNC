@@ -667,7 +667,7 @@ DWORD WINAPI imp_desktop_thread(LPVOID lpParam)
 
 //	ImpersonateCurrentUser_();
 
-	char m_username[200];
+	char m_username[UNLEN+1];
 	HWINSTA station = GetProcessWindowStation();
 	if (station != NULL)
 	{
@@ -677,7 +677,7 @@ DWORD WINAPI imp_desktop_thread(LPVOID lpParam)
 		SetLastError(0);
 		if (usersize != 0)
 		{
-			DWORD length = usersize;
+			DWORD length = sizeof(m_username);
 			if (GetUserName(m_username, &length) == 0)
 			{
 				UINT error = GetLastError();
@@ -686,6 +686,7 @@ DWORD WINAPI imp_desktop_thread(LPVOID lpParam)
 					vnclog.Print(LL_INTERR, VNCLOG("getusername error %d\n"), GetLastError());
 					SetThreadDesktop(old_desktop);
                 	CloseDesktop(desktop);
+					Sleep(500);
 					return FALSE;
 				}
 			}
