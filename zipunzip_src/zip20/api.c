@@ -54,7 +54,7 @@
 DLLPRNT *lpZipPrint;
 DLLPASSWORD *lpZipPassword;
 extern DLLCOMMENT *lpComment;
-ZIPUSERFUNCTIONS ZipUserFunctions, far * lpZipUserFunctions;
+ZIPUSERFUNCTIONS ZipUserFunctions, far * lpZipUserFunctions=NULL;
 
 int ZipRet;
 

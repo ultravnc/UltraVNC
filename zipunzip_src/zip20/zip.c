@@ -2070,7 +2070,7 @@ nextarg: ;
           fflush(mesg);
         }
 #ifdef WINDLL
-        if (lpZipUserFunctions->ServiceApplication != NULL) {
+        if (lpZipUserFunctions && lpZipUserFunctions->ServiceApplication != NULL) {
           if ((*lpZipUserFunctions->ServiceApplication)(z->zname, 0))
             ZIPERR(ZE_ABORT, "User terminated operation");
         }

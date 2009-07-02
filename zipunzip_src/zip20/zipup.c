@@ -707,7 +707,7 @@ FILE *y;                /* output file */
     fflush(mesg);
   }
 #ifdef WINDLL
-  if (lpZipUserFunctions->ServiceApplication != NULL)
+  if (lpZipUserFunctions && lpZipUserFunctions->ServiceApplication != NULL)
      {
      if ((*lpZipUserFunctions->ServiceApplication)(z->zname, isize))
         {
