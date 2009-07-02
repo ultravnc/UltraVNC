@@ -102,6 +102,7 @@ bool GetServiceName(TCHAR *pszAppPath, TCHAR *pszServiceName);
 HINSTANCE	hInstResDLL;
 BOOL SPECIAL_SC_EXIT=false;
 BOOL SPECIAL_SC_PROMPT=false;
+BOOL multi=false;
 
 // winvnc.exe will also be used for helper exe
 // This allow us to minimize the number of seperate exe
@@ -451,6 +452,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 			continue;
 		}
 
+		if (strncmp(&szCmdLine[i], winvncmulti, strlen(winvncmulti)) == 0)
+		{
+			multi=true;
+			i+=strlen(winvncmulti);
+			continue;
+		}
+
 		if (strncmp(&szCmdLine[i], winvncAutoReconnect, strlen(winvncAutoReconnect)) == 0)
 		{
 			// Note that this "autoreconnect" param MUST be BEFORE the "connect" one
@@ -784,14 +792,16 @@ int WinVNCAppMain()
 	// Set this process to be the last application to be shut down.
 	// Check for previous instances of WinVNC!
 	vncInstHandler *instancehan=new vncInstHandler;
-	
-	if (!instancehan->Init())
-	{	
-    	vnclog.Print(LL_INTINFO, VNCLOG("%s -- exiting\n"), sz_ID_ANOTHER_INST);
-		// We don't allow multiple instances!
-	if (!fRunningFromExternalService)
-		MessageBox(NULL, sz_ID_ANOTHER_INST, szAppName, MB_OK);
-		return 0;
+	if (!multi) // this allow to overwrite the multiple instance check
+	{
+		if (!instancehan->Init())
+		{	
+    		vnclog.Print(LL_INTINFO, VNCLOG("%s -- exiting\n"), sz_ID_ANOTHER_INST);
+			// We don't allow multiple instances!
+		if (!fRunningFromExternalService)
+			MessageBox(NULL, sz_ID_ANOTHER_INST, szAppName, MB_OK);
+			return 0;
+		}
 	}
 
 	//vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - Previous instance checked - Trying to create server\n"));

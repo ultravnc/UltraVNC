@@ -61,6 +61,7 @@ const char winvncAutoReconnectId[]	= "id:";
 const char winvncReconnectId[]	= "-id:";
 const char winvncSCexit[]	= "-sc_exit";
 const char winvncSCprompt[]	= "-sc_prompt";
+const char winvncmulti[]	= "-multi";
 
 const char winvncSettingshelper[]		= "-settingshelper";
 const char winvncSettings[]				= "-settings";

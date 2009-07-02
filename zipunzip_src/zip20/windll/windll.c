@@ -104,7 +104,8 @@ else
 free(zcomment);
 zcomment = malloc(1);
 *zcomment = 0;
-lpZipUserFunctions->comment(szCommentBuf);
+if (lpZipUserFunctions->comment)
+	lpZipUserFunctions->comment(szCommentBuf);
 return;
 }
 
@@ -129,7 +130,9 @@ WinAssert(pszBuffer);
 len = wvsprintf(pszBuffer, format, argptr);
 va_end(argptr);
 WinAssert(strlen(pszBuffer) < STDIO_BUF_SIZE);
-len = lpZipUserFunctions->print(pszBuffer, len);
+if (lpZipUserFunctions->print!=NULL)
+	len = lpZipUserFunctions->print(pszBuffer, len);
+else len=0;
 GlobalUnlock(hMemory);
 GlobalFree(hMemory);
 return len;
@@ -157,7 +160,9 @@ va_end(argptr);
 WinAssert(strlen(pszBuffer) < STDIO_BUF_SIZE);
 if ((file == stderr) || (file == stdout))
    {
-   len = lpZipUserFunctions->print(pszBuffer, len);
+	   if (lpZipUserFunctions->print!=NULL)
+		len = lpZipUserFunctions->print(pszBuffer, len);
+	   else len=0
    }
 else
    len = _write(_fileno(file),(char far *)(pszBuffer), len);

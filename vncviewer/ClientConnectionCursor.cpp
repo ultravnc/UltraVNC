@@ -153,10 +153,10 @@ void ClientConnection::ReadCursorShape(rfbFramebufferUpdateRectHeader *pfburh) {
 // marscha PointerPos
 void ClientConnection::ReadCursorPos(rfbFramebufferUpdateRectHeader *pfburh)
 {
-	int x = (int)pfburh->r.x;
+	int x = (int)pfburh->r.x / this->m_opts.m_nServerScale;
 	if (x >= m_si.framebufferWidth)
 		x = m_si.framebufferWidth - 1;
-	int y = (int)pfburh->r.y;
+	int y = (int)pfburh->r.y / this->m_opts.m_nServerScale;
 	if (y >= m_si.framebufferHeight)
 		y = m_si.framebufferHeight - 1;
 	//vnclog.Print(2, _T("reading cursor pos (%d, %d)\n"), x, y);
