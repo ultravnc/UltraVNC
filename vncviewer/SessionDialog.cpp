@@ -117,15 +117,21 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 			}
 			SendMessage(hPlugins, CB_SETCURSEL, 0, 0);
 
+			HWND hButton = GetDlgItem(hwnd, IDC_PLUGIN_BUTTON);
+			EnableWindow(hButton, FALSE); // sf@2009 - Disable plugin config button by default
+
 			//AaronP
-			if( strcmp( _this->m_pOpt->m_szDSMPluginFilename, "" ) != 0 && _this->m_pOpt->m_fUseDSMPlugin ) { 
+			if( strcmp( _this->m_pOpt->m_szDSMPluginFilename, "" ) != 0 && _this->m_pOpt->m_fUseDSMPlugin )
+			{ 
 				int pos = SendMessage(hPlugins, CB_FINDSTRINGEXACT, -1,
 					(LPARAM)&(_this->m_pOpt->m_szDSMPluginFilename[0]));
 
-				if( pos != CB_ERR ) {
+				if( pos != CB_ERR )
+				{
 					SendMessage(hPlugins, CB_SETCURSEL, pos, 0);
 					HWND hUsePlugin = GetDlgItem(hwnd, IDC_PLUGIN_CHECK);
 					SendMessage(hUsePlugin, BM_SETCHECK, TRUE, 0);
+					EnableWindow(hButton, TRUE); // sf@2009 - Enable plugin config button
 				}
 			}
 			//EndAaronP
