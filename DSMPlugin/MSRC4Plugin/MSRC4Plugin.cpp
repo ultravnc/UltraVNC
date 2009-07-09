@@ -72,6 +72,7 @@
 #include <windows.h>
 #include <time.h>
 #include <tchar.h>
+#include "logging.h"
 
 #include <wincrypt.h>       //windows crypto api
 

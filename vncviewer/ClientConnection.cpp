@@ -4346,7 +4346,7 @@ inline void ClientConnection::ReadScreenUpdate()
 	// sf@2002
 	// We only change the preferred encoding if FileTransfer is not running and if
 	// the last encoding change occured more than 30s ago
-	if (m_opts.autoDetect && !m_pFileTransfer->m_fFileTransferRunning && (timeGetTime() - m_lLastChangeTime) > m_lLastChangeTimeTimeout)
+	if (avg_kbitsPerSecond !=0 && m_opts.autoDetect && !m_pFileTransfer->m_fFileTransferRunning && (timeGetTime() - m_lLastChangeTime) > m_lLastChangeTimeTimeout)
 	{
 		//Beep(1000,1000);
 		m_lLastChangeTimeTimeout=60000;  // set to 1 minutes

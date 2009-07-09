@@ -89,6 +89,7 @@
 				MapFileName=".\Debug/vncviewer.map"
 				SubSystem="2"
 				RandomizedBaseAddress="1"
+				FixedBaseAddress="1"
 				DataExecutionPrevention="0"
 				TargetMachine="1"
 			/>
@@ -2299,6 +2300,10 @@
 					AdditionalIncludeDirectories="res"
 				/>
 			</FileConfiguration>
+		</File>
+		<File
+			RelativePath=".\VTune\vncviewer.vpj"
+			>
 		</File>
 		<File
 			RelativePath="VNCviewerApp.cpp"
