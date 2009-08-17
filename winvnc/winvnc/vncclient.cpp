@@ -479,11 +479,13 @@ vncClientUpdateThread::run_undetached(void *arg)
 
 	vnclog.Print(LL_INTINFO, VNCLOG("starting update thread\n"));
 
-	// Set client update threads to high priority
-	// *** set_priority(omni_thread::PRIORITY_HIGH);
-
 	while (1)
 	{
+#ifdef _DEBUG
+										char			szText[256];
+										sprintf(szText," run_undetached loop \n");
+										OutputDebugString(szText);		
+#endif
 		// Block waiting for an update to send
 		{
 			omni_mutex_lock l(m_client->GetUpdateLock());
@@ -591,6 +593,11 @@ vncClientUpdateThread::run_undetached(void *arg)
 			// Fetch the incremental region
 			clipregion = m_client->m_incr_rgn;
 			m_client->m_incr_rgn.clear();
+#ifdef _DEBUG
+										char			szText[256];
+										sprintf(szText," UpdateWanted clear \n");
+										OutputDebugString(szText);		
+#endif
 
 			// Get the clipboard data, if any
 			if (m_client->m_clipboard_text) {
@@ -1505,7 +1512,11 @@ vncClientThread::run(void *arg)
 	}
 
 	// MAIN LOOP
-
+#ifdef _DEBUG
+										char			szText[256];
+										sprintf(szText," MAIN LOOP \n");
+										OutputDebugString(szText);		
+#endif
 	// Set the input thread to a high priority
 	set_priority(omni_thread::PRIORITY_HIGH);
 
@@ -1585,7 +1596,11 @@ vncClientThread::run(void *arg)
 				break;
 			}
 		}
-
+#ifdef _DEBUG
+										char			szText[256];
+										sprintf(szText," msg.type %i \n",msg.type);
+										OutputDebugString(szText);		
+#endif
 		// What to do is determined by the message id
 		switch(msg.type)
 		{
@@ -1857,6 +1872,11 @@ vncClientThread::run(void *arg)
 			
 		case rfbFramebufferUpdateRequest:
 			// Read the rest of the message:
+#ifdef _DEBUG
+										char			szText[256];
+										sprintf(szText," rfbFramebufferUpdateRequest \n");
+										OutputDebugString(szText);		
+#endif
 			if (!m_socket->ReadExact(((char *) &msg)+nTO, sz_rfbFramebufferUpdateRequestMsg-nTO))
 			{
 				connected = FALSE;

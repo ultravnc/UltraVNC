@@ -45,6 +45,7 @@ PROCESS_INFORMATION  ProcessInfo;
 int counter=0;
 extern char cmdtext[256];
 int kickrdp=0;
+int clear_console=0;
 bool W2K=0;
 //////////////////////////////////////////////////////////////////////////////
 static int pad2()
@@ -73,6 +74,7 @@ static int pad2()
     strcat(app_path, "_run");
 	IniFile myIniFile;
 	kickrdp=myIniFile.ReadInt("admin", "kickrdp", kickrdp);
+	clear_console=myIniFile.ReadInt("admin", "clearconsole", clear_console);
 	myIniFile.ReadString("admin", "service_commandline",cmdline,256);
 	if (strlen(cmdline)!=0)
 	{
@@ -654,7 +656,9 @@ bool IsAnyRDPSessionActive()
 void disconnect_remote_sessions()
 {
 	typedef BOOLEAN (WINAPI * pWinStationConnect) (HANDLE,ULONG,ULONG,PCWSTR,ULONG);
+	
 	typedef BOOL (WINAPI * pLockWorkStation)();
+
 	HMODULE  hlibwinsta = LoadLibrary("winsta.dll"); 
 	HMODULE  hlibuser32 = LoadLibrary("user32.dll");
 	pWinStationConnect WinStationConnectF=NULL;
@@ -669,11 +673,14 @@ void disconnect_remote_sessions()
 	   {
 		   WinStationConnectF=(pWinStationConnect)GetProcAddress(hlibwinsta, "WinStationConnectW"); 
 	   }
+	
 	if (hlibuser32)
 	   {
 		   LockWorkStationF=(pLockWorkStation)GetProcAddress(hlibuser32, "LockWorkStation"); 
 	   }
-	if (WinStationConnectF!=NULL && WinStationConnectF!=NULL)
+	if (connect)
+	{
+	if (WinStationConnectF!=NULL && LockWorkStationF!=NULL)
 		{
 				DWORD ID=0;
 				if (lpfnWTSGetActiveConsoleSessionId.isValid()) ID=(*lpfnWTSGetActiveConsoleSessionId)();
@@ -690,6 +697,7 @@ void disconnect_remote_sessions()
 
 		}
 	Sleep(3000);
+	}
 
 	if (hlibwinsta)
         FreeLibrary(hlibwinsta);

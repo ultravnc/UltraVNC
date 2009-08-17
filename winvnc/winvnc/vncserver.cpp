@@ -47,6 +47,7 @@
 #include "localization.h" // ACT : Add localization on messages
 bool g_Server_running;
 extern bool g_Desktop_running;
+extern bool g_DesktopThread_running;
 void*	vncServer::pThis;
 
 // vncServer::UpdateTracker routines
@@ -1046,7 +1047,7 @@ vncServer::RemoveClient(vncClientId clientid)
 		if (!AutoRestartFlag())
 		{
 			// Are there locksettings set?
-			if (LockSettings() == 1)
+			if (LockSettings() == 1 || clearconsole)
 			{
 				// Yes - lock the machine on disconnect!
 				vncService::LockWorkstation();
@@ -1335,6 +1336,14 @@ vncServer::EnableJapInput(BOOL enable)
         GetClient(*i)->EnableJap(m_enable_jap_input ? true : false);
 	}
 }
+
+void
+vncServer::Clearconsole(BOOL enable)
+{
+	clearconsole=enable;
+}
+
+
 
 void 
 vncServer::KillSockConnect()

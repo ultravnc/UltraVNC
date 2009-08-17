@@ -415,12 +415,13 @@ vncDesktop::~vncDesktop()
 		while (g_DesktopThread_running!=false)
 		{
 			if (Window()==NULL)SetEvent(trigger_events[5]);;
-			Sleep(1000);
+			Sleep(100);
 			counter++;
-			if (counter>5) 
+			if (counter>50) 
 			{
 				vnclog.Print(LL_INTINFO, VNCLOG("Desktop thread running, force close \n"));
 				SetEvent(trigger_events[5]);
+				break;
 			}
 		}
 		// Join with the desktop handler thread
@@ -435,7 +436,7 @@ vncDesktop::~vncDesktop()
     SetBlockInputState(false);
 	// Let's call Shutdown just in case something went wrong...
 	Shutdown();
-
+	vnclog.Print(LL_INTINFO, VNCLOG("~vncDesktop Shutdown()\n"));
 	// Modif sf@2002
 	m_lWList.clear();
 	GridsList::iterator iGrid;
@@ -450,8 +451,10 @@ vncDesktop::~vncDesktop()
 			// we must be carefull to avoid memory leaks...
 			((RGBPixelList*)(*iGrid))->clear();
 			delete ((RGBPixelList*)(*iGrid));
+			vnclog.Print(LL_INTWARN, VNCLOG("delete ((RGBPixelList) \n"));
 		}
 	}
+	vnclog.Print(LL_INTINFO, VNCLOG("~vncDesktop m_lGridsList.clear\n"));
 	m_lGridsList.clear();
 	if (hUser32) FreeLibrary(hUser32);
 	g_Desktop_running=false;
@@ -676,6 +679,21 @@ vncDesktop::Shutdown()
 		if (!CloseDesktop(m_input_desktop))
 			vnclog.Print(LL_INTERR, VNCLOG("failed to close desktop\n"));
 		m_input_desktop = 0;
+	}
+	GridsList::iterator iGrid;
+	for (iGrid = m_lGridsList.begin(); iGrid != m_lGridsList.end(); iGrid++)
+	{
+		if (*iGrid)
+		{
+			// Since we've replaced this:
+			// "typedef std::list<RGBPixelList*> GridsList;"
+			// with this:
+			// "typedef std::list<void*> GridsList;"
+			// we must be carefull to avoid memory leaks...
+			((RGBPixelList*)(*iGrid))->clear();
+			delete ((RGBPixelList*)(*iGrid));
+			vnclog.Print(LL_INTWARN, VNCLOG("delete ((RGBPixelList) \n"));
+		}
 	}
 	m_lGridsList.clear();
 	m_foreground_window_rect.clear();

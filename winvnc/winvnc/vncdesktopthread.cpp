@@ -674,6 +674,17 @@ vncDesktopThread::run_undetached(void *arg)
 	/////////////////////
 	bool looping=true;
 	SetEvent(m_desktop->restart_event);
+	///
+	rgncache.assign_union(rfb::Region2D(m_desktop->m_Cliprect));
+	if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver)
+											{
+												m_desktop->m_buffer.GrabRegion(rgncache,true);
+											}
+										else
+											{
+												m_desktop->m_buffer.GrabRegion(rgncache,false);
+											}
+	///
 	while (looping && !fShutdownOrdered)
 	{		
 		DWORD result=WaitForMultipleObjects(6,m_desktop->trigger_events,FALSE,100);
@@ -717,11 +728,11 @@ vncDesktopThread::run_undetached(void *arg)
 									// can cause a very long wait time
 								}	
 								
-								//#ifdef _DEBUG
-								//		char			szText[256];
-								//		sprintf(szText," cpu2: %d %i %i\n",cpuUsage,MIN_UPDATE_INTERVAL,newtick-oldtick);
-								//		OutputDebugString(szText);		
-								//#endif
+								#ifdef _DEBUG
+										char			szText[256];
+										sprintf(szText," cpu2: %d %i %i\n",cpuUsage,MIN_UPDATE_INTERVAL,newtick-oldtick);
+										OutputDebugString(szText);		
+								#endif
 								oldtick=newtick;
 								if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver) handle_driver_changes(rgncache,updates);
 								m_desktop->m_update_triggered = FALSE;
@@ -808,8 +819,18 @@ vncDesktopThread::run_undetached(void *arg)
 								// CALCULATE CHANGES
 								m_desktop->m_UltraEncoder_used=m_desktop->m_server->IsThereAUltraEncodingClient();
 					//			vnclog.Print(LL_INTERR, VNCLOG("UpdateWanted B\n"));
+#ifdef _DEBUG
+//										char			szText[256];
+										sprintf(szText," m_desktop->m_server->UpdateWanted check\n");
+										OutputDebugString(szText);		
+#endif
 								if (m_desktop->m_server->UpdateWanted())
 								{
+#ifdef _DEBUG
+										char			szText[256];
+										sprintf(szText," m_desktop->m_server->UpdateWanted \n");
+										OutputDebugString(szText);		
+#endif
 					//				vnclog.Print(LL_INTERR, VNCLOG("UpdateWanted N\n"));
 									//TEST4
 									// Re-render the mouse's old location if it's moved
@@ -1120,15 +1141,19 @@ vncDesktopThread::run_undetached(void *arg)
 	// Clear all the hooks and close windows, etc.
     m_desktop->SetBlockInputState(false);
 	m_server->SingleWindow(false);
+	vnclog.Print(LL_INTINFO, VNCLOG("quitting desktop server thread:SetBlockInputState\n"));
 	
 	// Clear the shift modifier keys, now that there are no remote clients
 	vncKeymap::ClearShiftKeys();
+	vnclog.Print(LL_INTINFO, VNCLOG("quitting desktop server thread:ClearShiftKeys\n"));
 	
 	// Switch back into our home desktop, under NT (no effect under 9x)
 	//TAG14
 	HWND mywin=FindWindow("blackscreen",NULL);
 	if (mywin)SendMessage(mywin,WM_CLOSE, 0, 0);
 	g_DesktopThread_running=false;
+	vnclog.Print(LL_INTINFO, VNCLOG("quitting desktop server thread:g_DesktopThread_running=false\n"));
 	m_desktop->Shutdown();
+	vnclog.Print(LL_INTINFO, VNCLOG("quitting desktop server thread:m_desktop->Shutdown\n"));
 	return NULL;
 }
