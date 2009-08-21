@@ -49,7 +49,7 @@
 #include "vncdesktopthread.h"
 #include "common/win32_helpers.h"
 #include <algorithm>
-
+extern CDPI g_dpi;
 
 
 
@@ -115,19 +115,18 @@ PixelCaptureEngine::PixelCaptureEngineInit(HDC rootdc, HDC memdc, HBITMAP membit
 bool
 PixelCaptureEngine::CaptureRect(const rfb::Rect& rect)
 	{
-if (m_bIsVista)
-{
-		m_rect = rect;
-		if ((m_oldbitmap = (HBITMAP) SelectObject(m_hmemdc, m_membitmap)) == NULL)
-			return false;
+		if (m_bIsVista)
+		{
+				m_rect = rect;
+				if ((m_oldbitmap = (HBITMAP) SelectObject(m_hmemdc, m_membitmap)) == NULL)
+					return false;
 
-		// Capture screen into bitmap
-		BOOL blitok = BitBlt(m_hmemdc, 0, 0, rect.width(), rect.height(), m_hrootdc, rect.tl.x, rect.tl.y, 
-			                 m_bCaptureAlpha ? (CAPTUREBLT | SRCCOPY) : SRCCOPY);
-
-
-		return blitok ? true : false;
-}
+				// Capture screen into bitmap
+				BOOL blitok = BitBlt(m_hmemdc, 0, 0, rect.width(), rect.height(), m_hrootdc, rect.tl.x, rect.tl.y, 
+									 m_bCaptureAlpha ? (CAPTUREBLT | SRCCOPY) : SRCCOPY);
+				return blitok ? true : false;
+		}
+		return true;
 	}
 
 COLORREF
@@ -157,11 +156,11 @@ void
 PixelCaptureEngine::ReleaseCapture()
 	{
 		// Select the old bitmap back into the memory DC
-if (m_bIsVista) 
-	{
-			SelectObject(m_hmemdc, m_oldbitmap);
-			m_oldbitmap = 0;
-	}
+	if (m_bIsVista) 
+		{
+				SelectObject(m_hmemdc, m_oldbitmap);
+				m_oldbitmap = 0;
+		}
 	}
 
 
@@ -925,7 +924,6 @@ vncDesktop::InitBitmap()
 	if (current_monitor==3 && !VideoBuffer()) m_bmrect = rfb::Rect(0, 0,mymonitor[2].Width,mymonitor[2].Height);
 	if (current_monitor==2 && !VideoBuffer()) m_bmrect = rfb::Rect(0, 0,mymonitor[1].Width,mymonitor[1].Height);
 	if (current_monitor==1 && !VideoBuffer()) m_bmrect = rfb::Rect(0, 0,mymonitor[0].Width,mymonitor[0].Height);
-	// to_verify
 	else m_bmrect = rfb::Rect(0, 0,GetDeviceCaps(m_hrootdc, HORZRES),GetDeviceCaps(m_hrootdc, VERTRES));
 	vnclog.Print(LL_INTINFO, VNCLOG("bitmap dimensions are %d x %d\n"), m_bmrect.br.x, m_bmrect.br.y);
 
@@ -1476,6 +1474,8 @@ vncDesktop::CaptureMouse(BYTE *scrBuff, UINT scrBuffSize)
 	// Get the cursor position
 	if (!GetCursorPos(&CursorPos))
 		return;
+	CursorPos.x=g_dpi.UnscaleX(CursorPos.x);
+	CursorPos.y=g_dpi.UnscaleY(CursorPos.y);
 	//vnclog.Print(LL_INTINFO, VNCLOG("CursorPos %i %i\n"),CursorPos.x, CursorPos.y);
 	// Translate position for hotspot
 	if (GetIconInfo(m_hcursor, &IconInfo))

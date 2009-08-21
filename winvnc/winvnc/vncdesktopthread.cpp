@@ -4,6 +4,7 @@ bool g_DesktopThread_running;
 bool g_update_triggered;
 DWORD WINAPI hookwatch(LPVOID lpParam);
 extern bool stop_hookwatch;
+extern CDPI g_dpi;
 
 
 
@@ -444,6 +445,8 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 							m_desktop->SWinit();
 							m_desktop->GetQuarterSize();
 							GetCursorPos(&CursorPos);
+							CursorPos.x=g_dpi.UnscaleX(CursorPos.x);
+							CursorPos.y=g_dpi.UnscaleY(CursorPos.y);
 							CursorPos.x -= m_desktop->m_ScreenOffsetx;
 							CursorPos.y -= m_desktop->m_ScreenOffsety;
 							m_desktop->m_cursorpos.tl = CursorPos;
@@ -570,6 +573,8 @@ void vncDesktopThread::do_polling(HANDLE& threadHandle, rfb::Region2D& rgncache,
 		POINT mousepos;
 		if (GetCursorPos(&mousepos))
 		{
+			mousepos.x=g_dpi.UnscaleX(mousepos.x);
+			mousepos.y=g_dpi.UnscaleY(mousepos.y);
 			// Find the window under the mouse
 			HWND hwnd = WindowFromPoint(mousepos);
             // exclude the foreground window (done above) and desktop

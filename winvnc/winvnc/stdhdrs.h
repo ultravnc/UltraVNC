@@ -38,6 +38,8 @@
 #include <process.h>
 #include <crtdbg.h>
 
+#include "dpi.h"
+
 // LOGGING SUPPORT
 void *memcpy_amd(void *dest, const void *src, size_t n);
 bool CheckVideoDriver(bool);

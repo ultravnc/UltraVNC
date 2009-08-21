@@ -49,6 +49,7 @@ bool g_Server_running;
 extern bool g_Desktop_running;
 extern bool g_DesktopThread_running;
 void*	vncServer::pThis;
+extern CDPI g_dpi;
 
 // vncServer::UpdateTracker routines
 
@@ -1587,8 +1588,8 @@ vncServer::GetScreenInfo(int &width, int &height, int &depth)
 		}
 		else
 		{
-			scrinfo.framebufferWidth = GetDeviceCaps(hrootdc, HORZRES);
-			scrinfo.framebufferHeight = GetDeviceCaps(hrootdc, VERTRES);
+			scrinfo.framebufferWidth = g_dpi.UnscaleX(GetDeviceCaps(hrootdc, HORZRES));
+			scrinfo.framebufferHeight = g_dpi.UnscaleY(GetDeviceCaps(hrootdc, VERTRES));
 			HBITMAP membitmap = CreateCompatibleBitmap(hrootdc, scrinfo.framebufferWidth, scrinfo.framebufferHeight);
 			if (membitmap == NULL) {
 				scrinfo.framebufferWidth = 0;

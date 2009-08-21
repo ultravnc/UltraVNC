@@ -77,6 +77,7 @@ bool isDirectoryTransfer(const char *szFileName);
 extern BOOL SPECIAL_SC_PROMPT;
 extern BOOL SPECIAL_SC_EXIT;
 int getinfo(char mytext[1024]);
+extern CDPI g_dpi;
 
 // take a full path & file name, split it, prepend prefix to filename, then merge it back
 static std::string make_temp_filename(const char *szFullPath)
@@ -2067,6 +2068,8 @@ vncClientThread::run(void *arg)
 					// offset for multi display
 					int screenX, screenY, screenDepth;
 					m_server->GetScreenInfo(screenX, screenY, screenDepth);
+					//screenX=GetSystemMetrics(SM_CXVIRTUALSCREEN)*2;
+					//screenY=GetSystemMetrics(SM_CYVIRTUALSCREEN)*2;
 //					vnclog.Print(LL_INTINFO, VNCLOG("########mouse :%i %i %i %i \n"),screenX, screenY,m_client->m_ScreenOffsetx,m_client->m_ScreenOffsety );
 					if (m_client->m_display_type==1)
 						{//primary display always have (0,0) as corner
@@ -2082,10 +2085,10 @@ vncClientThread::run(void *arg)
 							{							
 								INPUT evt;
 								evt.type = INPUT_MOUSE;
-								msg.pe.x=msg.pe.x-GetSystemMetrics(SM_XVIRTUALSCREEN);
-								msg.pe.y=msg.pe.y-GetSystemMetrics(SM_YVIRTUALSCREEN);
-								evt.mi.dx = (msg.pe.x * 65535) / (GetSystemMetrics(SM_CXVIRTUALSCREEN)-1);
-								evt.mi.dy = (msg.pe.y* 65535) / (GetSystemMetrics(SM_CYVIRTUALSCREEN)-1);
+								msg.pe.x=msg.pe.x-g_dpi.ScaledScreenVirtualX();
+								msg.pe.y=msg.pe.y-g_dpi.ScaledScreenVirtualY();
+								evt.mi.dx = (msg.pe.x * 65535) / (g_dpi.ScaledScreenVirtualWidth()-1);
+								evt.mi.dy = (msg.pe.y* 65535) / (g_dpi.ScaledScreenVirtualHeight()-1);
 								evt.mi.dwFlags = flags | MOUSEEVENTF_VIRTUALDESK;
 								evt.mi.dwExtraInfo = 0;
 								evt.mi.mouseData = wheel_movement;
@@ -2095,6 +2098,8 @@ vncClientThread::run(void *arg)
 							else
 							{
 								POINT cursorPos; GetCursorPos(&cursorPos);
+								cursorPos.x=g_dpi.UnscaleX(cursorPos.x);
+								cursorPos.y=g_dpi.UnscaleY(cursorPos.y);
 								ULONG oldSpeed, newSpeed = 10;
 								ULONG mouseInfo[3];
 								if (flags & MOUSEEVENTF_MOVE) 
@@ -3514,6 +3519,8 @@ vncClient::UpdateMouse()
 	if (m_use_PointerPos && !m_cursor_pos_changed) {
 		POINT cursorPos;
 		GetCursorPos(&cursorPos);
+		cursorPos.x=g_dpi.UnscaleX(cursorPos.x);
+		cursorPos.y=g_dpi.UnscaleY(cursorPos.y);
 		//vnclog.Print(LL_INTINFO, VNCLOG("UpdateMouse m_cursor_pos(%d, %d), new(%d, %d)\n"), 
 		//  m_cursor_pos.x, m_cursor_pos.y, cursorPos.x, cursorPos.y);
 		if (cursorPos.x != m_cursor_pos.x || cursorPos.y != m_cursor_pos.y) {
