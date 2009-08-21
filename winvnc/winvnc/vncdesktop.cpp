@@ -96,7 +96,8 @@ PixelCaptureEngine::~PixelCaptureEngine()
 PixelCaptureEngine::PixelCaptureEngine()
 	{
 		if (OSversion()==2) m_bIsVista=true;
-		else m_bIsVista=false;
+		else 
+			m_bIsVista=false;
 	}
 void
 PixelCaptureEngine::PixelCaptureEngineInit(HDC rootdc, HDC memdc, HBITMAP membitmap, bool bCaptureAlpha, void *dibbits, int bpp, int bpr)
@@ -114,6 +115,8 @@ PixelCaptureEngine::PixelCaptureEngineInit(HDC rootdc, HDC memdc, HBITMAP membit
 bool
 PixelCaptureEngine::CaptureRect(const rfb::Rect& rect)
 	{
+if (m_bIsVista)
+{
 		m_rect = rect;
 		if ((m_oldbitmap = (HBITMAP) SelectObject(m_hmemdc, m_membitmap)) == NULL)
 			return false;
@@ -124,32 +127,47 @@ PixelCaptureEngine::CaptureRect(const rfb::Rect& rect)
 
 
 		return blitok ? true : false;
+}
 	}
 
 COLORREF
 PixelCaptureEngine::CapturePixel(int x, int y)
 	{
-		COLORREF cr = 0;
-		int tx = x - m_rect.tl.x;
-		int ty = y - m_rect.tl.y;
+		if (m_bIsVista)
+		{
+				COLORREF cr = 0;
+				int tx = x - m_rect.tl.x;
+				int ty = y - m_rect.tl.y;
 
-		unsigned int index = (m_bytesPerRow * y) + (m_bytesPerPixel * x);
-		memcpy(&cr, ((char*)m_DIBbits)+index, m_bytesPerPixel);
+				unsigned int index = (m_bytesPerRow * y) + (m_bytesPerPixel * x);
+				memcpy(&cr, ((char*)m_DIBbits)+index, m_bytesPerPixel);
 
-		return cr;
+				return cr;
+		}
+		else
+		{
+
+				COLORREF cr=0;		
+				cr=GetPixel(m_hrootdc, x, y);
+				return cr;
+		}
 	}
 
 void
 PixelCaptureEngine::ReleaseCapture()
 	{
 		// Select the old bitmap back into the memory DC
-		SelectObject(m_hmemdc, m_oldbitmap);
-		m_oldbitmap = 0;
+if (m_bIsVista) 
+	{
+			SelectObject(m_hmemdc, m_oldbitmap);
+			m_oldbitmap = 0;
+	}
 	}
 
 
-void vncDesktop::FastDetectChanges(rfb::Region2D &rgn, rfb::Rect &rect, int nZone, bool fTurbo)
+bool vncDesktop::FastDetectChanges(rfb::Region2D &rgn, rfb::Rect &rect, int nZone, bool fTurbo)
 {
+	bool returnvalue=false;
 	bool fInitGrid = false;
 	bool fIncCycle = false;
 	// For more accuracy, we could use 24 or even 16
@@ -217,6 +235,7 @@ void vncDesktop::FastDetectChanges(rfb::Region2D &rgn, rfb::Rect &rect, int nZon
 	HWND hDeskWnd = GetDesktopWindow();
 
 	PixelEngine.CaptureRect(rect);
+	if (PixelEngine.m_bIsVista) returnvalue=true;
 	// Try to detect if screen is almost idle
 	// no need to poll static screens very fast, it only use cpu
 	change_found=0;
@@ -312,7 +331,7 @@ void vncDesktop::FastDetectChanges(rfb::Region2D &rgn, rfb::Rect &rect, int nZon
 	{
 	   m_nGridCycle = (m_nGridCycle + 1) % (PIXEL_BLOCK_SIZE / GRID_OFFSET);
 	}
-
+	return returnvalue;
 }
 
 
@@ -904,6 +923,9 @@ vncDesktop::InitBitmap()
 		
 	}
 	if (current_monitor==3 && !VideoBuffer()) m_bmrect = rfb::Rect(0, 0,mymonitor[2].Width,mymonitor[2].Height);
+	if (current_monitor==2 && !VideoBuffer()) m_bmrect = rfb::Rect(0, 0,mymonitor[1].Width,mymonitor[1].Height);
+	if (current_monitor==1 && !VideoBuffer()) m_bmrect = rfb::Rect(0, 0,mymonitor[0].Width,mymonitor[0].Height);
+	// to_verify
 	else m_bmrect = rfb::Rect(0, 0,GetDeviceCaps(m_hrootdc, HORZRES),GetDeviceCaps(m_hrootdc, VERTRES));
 	vnclog.Print(LL_INTINFO, VNCLOG("bitmap dimensions are %d x %d\n"), m_bmrect.br.x, m_bmrect.br.y);
 
@@ -1383,50 +1405,58 @@ vncDesktop::FillDisplayInfo(rfbServerInitMsg *scrinfo)
 // Function to capture an area of the screen immediately prior to sending
 // an update.
 void
-vncDesktop::CaptureScreen(const rfb::Rect &rect, BYTE *scrBuff, UINT scrBuffSize)
+vncDesktop::CaptureScreen(const rfb::Rect &rect, BYTE *scrBuff, UINT scrBuffSize,BOOL capture)
 {
 	assert(rect.enclosed_by(m_bmrect));
-	if (OSversion()==1 || OSversion()==2)
-	m_fCaptureAlphaBlending = m_server->CaptureAlphaBlending();
+	if (capture)
+	{
+		if (OSversion()==1 || OSversion()==2)
+		m_fCaptureAlphaBlending = m_server->CaptureAlphaBlending();
 
 
-	// Select the memory bitmap into the memory DC
-	HBITMAP oldbitmap;
-	if ((oldbitmap = (HBITMAP) SelectObject(m_hmemdc, m_membitmap)) == NULL)
-		return;
+		// Select the memory bitmap into the memory DC
+		HBITMAP oldbitmap;
+		if ((oldbitmap = (HBITMAP) SelectObject(m_hmemdc, m_membitmap)) == NULL)
+			return;
 
-#if defined(_DEBUG)
-	DWORD t = timeGetTime();
-#endif
-	// Capture screen into bitmap
-	BOOL blitok = BitBlt(m_hmemdc, rect.tl.x, rect.tl.y,
-		(rect.br.x-rect.tl.x),
-		(rect.br.y-rect.tl.y),
-		m_hrootdc, rect.tl.x, rect.tl.y, (m_fCaptureAlphaBlending && !m_Black_window_active) ? (CAPTUREBLT | SRCCOPY) : SRCCOPY);
-#if defined(_DEBUG)
-	DWORD e = timeGetTime() - t;
-	vnclog.Print(LL_INTWARN, VNCLOG("Blit (%u,%u - %u,%u) (%ux%u took %ums\n"), 
-		rect.tl.x, rect.tl.y, rect.br.x, rect.br.y,
-		rect.width(), rect.height(), e);
-#endif
-#if 0
-	//*******************************
-	static int cycle(0);
-	static COLORREF c[] = {RGB(0xFF,0,0), RGB(0,0xFF,0),RGB(0,0,0xFF), RGB(0xFF, 0,0xFF), RGB(0,0xFF,0xFF)};
-HPEN pen = CreatePen(PS_SOLID|PS_INSIDEFRAME, 2, c[cycle]);
-HPEN oldpen = (HPEN)SelectObject(m_hmemdc, pen);
-SelectObject(m_hmemdc, GetStockObject(HOLLOW_BRUSH));
-Rectangle(m_hmemdc, rect.tl.x, rect.tl.y, rect.br.x, rect.br.y);
-SelectObject(m_hmemdc, oldpen);
-DeleteObject(pen);
-	cycle = (cycle + 1) % (sizeof c / sizeof c[0]);
-	//*******************************
-#endif
-	// Select the old bitmap back into the memory DC
-	SelectObject(m_hmemdc, oldbitmap);
+	#if defined(_DEBUG)
+		DWORD t = timeGetTime();
+	#endif
+		// Capture screen into bitmap
+		BOOL blitok = BitBlt(m_hmemdc, rect.tl.x, rect.tl.y,
+			(rect.br.x-rect.tl.x),
+			(rect.br.y-rect.tl.y),
+			m_hrootdc, rect.tl.x, rect.tl.y, (m_fCaptureAlphaBlending && !m_Black_window_active) ? (CAPTUREBLT | SRCCOPY) : SRCCOPY);
+	#if defined(_DEBUG)
+		DWORD e = timeGetTime() - t;
+		vnclog.Print(LL_INTWARN, VNCLOG("Blit (%u,%u - %u,%u) (%ux%u took %ums\n"), 
+			rect.tl.x, rect.tl.y, rect.br.x, rect.br.y,
+			rect.width(), rect.height(), e);
+	#endif
+	#if 0
+		//*******************************
+		static int cycle(0);
+		static COLORREF c[] = {RGB(0xFF,0,0), RGB(0,0xFF,0),RGB(0,0,0xFF), RGB(0xFF, 0,0xFF), RGB(0,0xFF,0xFF)};
+	HPEN pen = CreatePen(PS_SOLID|PS_INSIDEFRAME, 2, c[cycle]);
+	HPEN oldpen = (HPEN)SelectObject(m_hmemdc, pen);
+	SelectObject(m_hmemdc, GetStockObject(HOLLOW_BRUSH));
+	Rectangle(m_hmemdc, rect.tl.x, rect.tl.y, rect.br.x, rect.br.y);
+	SelectObject(m_hmemdc, oldpen);
+	DeleteObject(pen);
+		cycle = (cycle + 1) % (sizeof c / sizeof c[0]);
+		//*******************************
+	#endif
+		// Select the old bitmap back into the memory DC
+		SelectObject(m_hmemdc, oldbitmap);
 
-	if (blitok) {
-		// Copy the new data to the screen buffer (CopyToBuffer optimises this if possible)
+		if (blitok)
+		{
+			// Copy the new data to the screen buffer (CopyToBuffer optimises this if possible)
+			CopyToBuffer(rect, scrBuff, scrBuffSize);
+		}
+	}
+	else
+	{
 		CopyToBuffer(rect, scrBuff, scrBuffSize);
 	}
 

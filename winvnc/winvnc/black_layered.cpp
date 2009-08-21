@@ -201,7 +201,6 @@ create_window(void)
         UINT y(GetSystemMetrics(SM_YVIRTUALSCREEN));
         UINT cx(GetSystemMetrics(SM_CXVIRTUALSCREEN));
         UINT cy(GetSystemMetrics(SM_CYVIRTUALSCREEN));
-
         if (vncService::IsWinNT()  && vncService::VersionMajor() <= 4)
         {
             x = 0;

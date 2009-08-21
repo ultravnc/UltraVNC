@@ -528,7 +528,7 @@ void vncDesktopThread::do_polling(HANDLE& threadHandle, rfb::Region2D& rgncache,
 	{
 		DWORD dwTId(0);
 		if (threadHandle==NULL) threadHandle = CreateThread(NULL, 0, hookwatch, this, 0, &dwTId);
-		Handle_Ringbuffer(g_obIPC.listall(),rgncache);
+		if (Handle_Ringbuffer(g_obIPC.listall(),rgncache)) return;
 	}
 	DWORD lTime = timeGetTime();
 
@@ -540,11 +540,11 @@ void vncDesktopThread::do_polling(HANDLE& threadHandle, rfb::Region2D& rgncache,
 	if ((m_desktop->m_server->PollFullScreen() && !cursormoved) || (!m_desktop->can_be_hooked && !cursormoved))
 	{
 		int timeSinceLastMouseMove = lTime - m_lLastMouseMoveTime;
-		if (timeSinceLastMouseMove > 150) // 150 ms pause after a Mouse move 
+		if (timeSinceLastMouseMove > 15) // 150 ms pause after a Mouse move 
 		{
 			++fullpollcounter;
 			// THIS FUNCTION IS A PIG. It uses too much CPU on older machines (PIII, P4)
-			m_desktop->FastDetectChanges(rgncache, m_desktop->GetSize(), 0, true);
+			if (m_desktop->FastDetectChanges(rgncache, m_desktop->GetSize(), 0, true)) capture=false;
 			// force full screen scan every three seconds after the mouse stops moving
 			if (fullpollcounter > 20) 
 			{
@@ -585,6 +585,7 @@ vncDesktopThread::run_undetached(void *arg)
 	//*******************************************************
 	// INIT
 	//*******************************************************
+	capture=true;
 	vnclog.Print(LL_INTERR, VNCLOG("Hook changed 1\n"));
 	// Save the thread's "home" desktop, under NT (no effect under 9x)
 	m_desktop->m_home_desktop = GetThreadDesktop(GetCurrentThreadId());
@@ -678,11 +679,11 @@ vncDesktopThread::run_undetached(void *arg)
 	rgncache.assign_union(rfb::Region2D(m_desktop->m_Cliprect));
 	if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver)
 											{
-												m_desktop->m_buffer.GrabRegion(rgncache,true);
+												m_desktop->m_buffer.GrabRegion(rgncache,true,true);
 											}
 										else
 											{
-												m_desktop->m_buffer.GrabRegion(rgncache,false);
+												m_desktop->m_buffer.GrabRegion(rgncache,false,true);
 											}
 	///
 	while (looping && !fShutdownOrdered)
@@ -940,12 +941,18 @@ vncDesktopThread::run_undetached(void *arg)
 										// or missing mouse cursor.
 										if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver)
 											{
-												m_desktop->m_buffer.GrabRegion(rgncache,true);
+												m_desktop->m_buffer.GrabRegion(rgncache,true,capture);
 											}
 										else
 											{
-												m_desktop->m_buffer.GrabRegion(rgncache,false);
+												m_desktop->m_buffer.GrabRegion(rgncache,false,capture);
 											}
+#ifdef _DEBUG
+										char			szText[256];
+										sprintf(szText," capture %i\n",capture);
+										OutputDebugString(szText);		
+#endif
+										capture=true;
 											
 										// sf@2002 - v1.1.x - Mouse handling
 										// If one client, send cursor shapes only when the cursor changes.
