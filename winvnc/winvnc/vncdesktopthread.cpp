@@ -863,7 +863,7 @@ vncDesktopThread::run_undetached(void *arg)
 									//****************************************************************************
 									//************* Polling ---- no driver
 									//****************************************************************************
-									if (!m_desktop->m_hookdriver)
+									if (!m_desktop->m_hookdriver || !m_desktop->can_be_hooked)
 									{
 										do_polling(threadHandle, rgncache, fullpollcounter, cursormoved);
 									}
