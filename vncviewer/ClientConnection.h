@@ -51,6 +51,9 @@ extern "C"
 #include "MRU.h"
 // #include <DSMPlugin/DSMPlugin.h> // sf@2002
 
+//adzm - 2009-06-21
+#include <DSMPlugin/DSMPlugin.h>
+
 #include "FullScreenTitleBar.h" //Added by: Lars Werner (http://lars.werner.no)
 
 extern const UINT FileTransferSendPacketMessage;
@@ -152,7 +155,6 @@ public:
 	void SendKeyEvent(CARD32 key, bool down);
 
     void SendKeepAlive(bool bForce = false); // 16 july 2008 jdp
-
 
 private:
 	static LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam);
@@ -333,6 +335,8 @@ private:
 	void WriteExact(char *buf, int bytes);
 	void WriteExactProxy(char *buf, int bytes);
 	void WriteExact(char *buf, int bytes, CARD8 msgType); //sf@2002 - DSM Plugin
+	
+	void ReadExactProtocolVersion(char *buf, int bytes, bool& fNotEncrypted); //adzm 2009-06-21
 
 	void GetFriendlySizeString(__int64 Size, char* szText);
 	void UpdateStatusFields();	// sf@2002
@@ -466,6 +470,13 @@ private:
 	int m_nTO;
 	CDSMPlugin *m_pDSMPlugin;
 	bool m_fUsePlugin;
+
+	//adzm - 2009-06-21
+	IPlugin* m_pPluginInterface;
+	BYTE* TransformBuffer(BYTE* pDataBuffer, int nDataLen, int* nTransformedDataLen);
+	BYTE* RestoreBufferStep1(BYTE* pDataBuffer, int nDataLen, int* nRestoredDataLen);
+	BYTE* RestoreBufferStep2(BYTE* pDataBuffer, int nDataLen, int* nRestoredDataLen);
+
 	BYTE* m_pNetRectBuf;
 	bool m_fReadFromNetRectBuf;  // 
 	int m_nNetRectBufOffset;

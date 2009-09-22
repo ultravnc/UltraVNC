@@ -171,6 +171,9 @@ VNCOptions::VNCOptions()
   m_fUseProxy = false;
   m_szDSMPluginFilename[0] = '\0';
 
+  //adzm 2009-07-19
+  m_fAutoAcceptNoDSM = false;
+
   // sf@2003 - Auto Scaling
   m_saved_scale_num = 100;
   m_saved_scale_den = 100;
@@ -318,6 +321,9 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
   m_FTTimeout =  s.m_FTTimeout;
   m_keepAliveInterval = s.m_keepAliveInterval;
 
+
+  //adzm 2009-07-19
+  m_fAutoAcceptNoDSM = s.m_fAutoAcceptNoDSM;
 #ifdef UNDER_CE
   m_palmpc			= s.m_palmpc;
   m_slowgdi			= s.m_slowgdi;
@@ -746,6 +752,11 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
         }
 		_stscanf(args[j], _T("%d"), &m_autoReconnect);
 	}
+	else if (SwitchMatch(args[j], _T("autoacceptnodsm")))
+	{
+		//adzm 2009-07-19
+		m_fAutoAcceptNoDSM = true;
+	}
 	else
 	{
       TCHAR phost[256];
@@ -844,6 +855,8 @@ void VNCOptions::Save(char *fname)
   saveInt("ExitCheck",				m_fExitCheck,	fname); //PGM @ Advantig
   saveInt("FileTransferTimeout",    m_FTTimeout,    fname);
   saveInt("KeepAliveInterval",      m_keepAliveInterval,    fname);
+  //adzm 2009-07-19
+  saveInt("AutoAcceptNoDSM",		m_fAutoAcceptNoDSM, fname);
 }
 
 void VNCOptions::Load(char *fname)
@@ -927,6 +940,8 @@ void VNCOptions::Load(char *fname)
   if (m_keepAliveInterval >= (m_FTTimeout - KEEPALIVE_HEADROOM))
       m_keepAliveInterval = (m_FTTimeout  - KEEPALIVE_HEADROOM); 
 
+  //adzm 2009-07-19
+  m_fAutoAcceptNoDSM = readInt("", (int)m_fAutoAcceptNoDSM, fname) ? true : false;
 }
 
 // Record the path to the VNC viewer and the type
@@ -997,6 +1012,7 @@ void VNCOptions::ShowUsage(LPTSTR info) {
 			   "      [/nohotkeys] [/proxy proxyhost [portnum]] [/256colors] [/64colors]\r\n"
 			   "      [/8colors] [/8greycolors] [/4greycolors] [/2greycolors]\r\n"
 			   "      [/encoding [zrle | zywrle | tight | zlib | zlibhex | ultra]] \r\n"
+			   "      [/autoacceptnodsm]\r\n" //adzm 2009-07-19
                "For full details see documentation."), 
 #endif
             tmpinf);

@@ -228,6 +228,19 @@ private:
     omni_mutex_lock& operator=(const omni_mutex_lock&);
 };
 
+//adzm 2009-06-21 - only locks/unlocks if conditional is true
+class _OMNITHREAD_NTDLL_ omni_mutex_conditional_lock {
+    omni_mutex& mutex;
+	bool conditional;
+public:
+	omni_mutex_conditional_lock(omni_mutex& m, bool c) : mutex(m), conditional(c) { if (conditional) {mutex.lock();} }
+	~omni_mutex_conditional_lock(void) { if (conditional) {mutex.unlock();} }
+private:
+    // dummy copy constructor and operator= to prevent copying
+    omni_mutex_conditional_lock(const omni_mutex_conditional_lock&);
+    omni_mutex_conditional_lock& operator=(const omni_mutex_conditional_lock&);
+};
+
 
 ///////////////////////////////////////////////////////////////////////////
 //

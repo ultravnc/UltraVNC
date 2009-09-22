@@ -1378,12 +1378,15 @@ vncClientThread::run(void *arg)
 		// Data mix is causing server crash and viewer drops when more than one viewer is copnnected at a time
 		// We must reject any new viewer connection BEFORE any data passes through the plugin
 		// This is a dirty workaround. We ignore all Multi Viewer connection settings...
-		if (m_server->AuthClientCount() > 0)
+		//adzm 2009-06-20 - Fixed this to use multi-threaded version, so therefore we can handle multiple
+		// clients with no issues.
+		if (!m_server->GetDSMPluginPointer()->SupportsMultithreaded() && m_server->AuthClientCount() > 0)
 		{
 			vnclog.Print(LL_CLIENTS, VNCLOG("A connection using DSM already exist - client rejected to avoid crash \n"));
 			return;
 		} 
 
+		//adzm 2009-06-20 - TODO - Not sure about this. what about pending connections via the repeater?
 		if (m_server->AuthClientCount() == 0)
 			m_server->GetDSMPluginPointer()->ResetPlugin();	//SEC reset if needed
 		m_socket->EnableUsePlugin(true);
@@ -3423,12 +3426,14 @@ vncClient::~vncClient()
 
 	//thos give sometimes errors, hlogfile is already removed at this point
 	//vnclog.Print(LL_INTINFO, VNCLOG("cached %d \n"),totalraw);
-if (SPECIAL_SC_EXIT)
-{
-	// We want that the server exit when the viewer exit
-	HWND hwnd=FindWindow("WinVNC Tray Icon",NULL);
-	if (hwnd) SendMessage(hwnd,WM_COMMAND,ID_CLOSE,0);
-}
+	if (SPECIAL_SC_EXIT && !fShutdownOrdered) // if fShutdownOrdered, hwnd may not be valid
+	{
+		//adzm 2009-06-20 - if we are SC, only exit if no other viewers are connected!
+		// (since multiple viewers is now allowed with the new DSM plugin)		
+		// We want that the server exit when the viewer exit
+		HWND hwnd=FindWindow("WinVNC Tray Icon",NULL);
+		if (hwnd) SendMessage(hwnd,WM_COMMAND,ID_CLOSE,0);
+	}
 
 }
 

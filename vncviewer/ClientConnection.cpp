@@ -231,6 +231,8 @@ ClientConnection::ClientConnection()
 {
 	m_keymap = NULL;
 	m_keymapJap = NULL;
+	//adzm - 2009-06-21
+	m_pPluginInterface = NULL;
 }
 
 ClientConnection::ClientConnection(VNCviewerApp *pApp) 
@@ -346,6 +348,8 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_nZRLENetRectBufOffset = 0;
 	m_nZRLEReadSize = 0;
 	m_nZRLENetRectBufSize = 0;
+	//adzm - 2009-06-21
+	m_pPluginInterface = NULL;
 
 	// ZlibHex
 	m_decompStreamInited = false;
@@ -1418,9 +1422,16 @@ void ClientConnection::LoadDSMPlugin(bool fForceReload)
 // Get & Set the VNC password for the DSMPlugin if necessary
 // 
 void ClientConnection::SetDSMPluginStuff()
-{
+{	
+	//adzm - 2009-06-21
+	if (m_pPluginInterface) {
+		delete m_pPluginInterface;
+		m_pPluginInterface = NULL;
+	}
+
 	if (m_pDSMPlugin->IsEnabled())
 	{
+		vnclog.Print(0, _T("DSMPlugin enabled\n"));
 		char szParams[256+16];
 
 		// Does the plugin need the VNC password to do its job ?
@@ -1456,6 +1467,13 @@ void ClientConnection::SetDSMPluginStuff()
 		}
 		// If all went well
 		m_fUsePlugin = true;
+
+		//adzm - 2009-06-21
+		if (m_pDSMPlugin->SupportsMultithreaded()) {
+			m_pPluginInterface = m_pDSMPlugin->CreatePluginInterface();
+		}
+	} else {
+		vnclog.Print(0, _T("DSMPlugin not enabled\n"));
 	}
 }
 
@@ -1750,16 +1768,19 @@ void ClientConnection::NegotiateProtocolVersion()
 	if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L89);
     try
 	{
-		ReadExact(pv, sz_rfbProtocolVersionMsg);
+		//ReadExact(pv, sz_rfbProtocolVersionMsg);
+		//adzm 2009-06-21
+		ReadExactProtocolVersion(pv, sz_rfbProtocolVersionMsg, fNotEncrypted);
 	}
-	catch (Exception &c)
+	//adzm 2009-07-05
+	catch (rdr::EndOfStream& c)
 	{
 		SetEvent(KillEvent);
 		vnclog.Print(0, _T("Error reading protocol version: %s\n"),
-                          c.m_info);
+                          c.str());
 		if (m_fUsePlugin)
-			throw WarningException("Connection failed - Error reading Protocol Version\r\n\n\r"
-									"Possible causes:\r\r"
+			throw WarningException("Connection failed - Error reading Protocol Version\r\n\r\n"
+									"Possible causes:\r\n"
 									"- You've forgotten to select a DSMPlugin and the Server uses a DSMPlugin\r\n"
 									"- The selected DSMPlugin is not compatible with the one running on the Server\r\n"
 									"- The selected DSMPlugin is not correctly configured (also possibly on the Server)\r\n"
@@ -1768,10 +1789,34 @@ void ClientConnection::NegotiateProtocolVersion()
 									,1003
 									);
 		else
-			throw WarningException("Connection failed - Error reading Protocol Version\r\n\n\r"
+			throw WarningException("Connection failed - End of Stream\r\n\r\n"
 									"Possible causes:\r\r"
+									"- Another user is already listening on this ID\r\n"
+									"- Bad connection\r\n",1004
+									);
+
+		throw QuietException(c.str());
+	}
+	catch (Exception &c)
+	{
+		SetEvent(KillEvent);
+		vnclog.Print(0, _T("Error reading protocol version: %s\n"),
+                          c.m_info);
+		if (m_fUsePlugin)
+			throw WarningException("Connection failed - Error reading Protocol Version\r\n\n\r"
+									"Possible causes:\r\n"
 									"- You've forgotten to select a DSMPlugin and the Server uses a DSMPlugin\r\n"
-									"- Viewer and Server are not compatible (they use different RFB protocoles)\r\n"
+									"- The selected DSMPlugin is not compatible with the one running on the Server\r\n"
+									"- The selected DSMPlugin is not correctly configured (also possibly on the Server)\r\n"
+									"- The password you've possibly entered is incorrect\r\n"
+									"- Another viewer using a DSMPlugin is already connected to the Server (more than one is forbidden)\r\n"
+									,1003
+									);
+		else
+			throw WarningException("Connection failed - Error reading Protocol Version\r\n\r\n"
+									"Possible causes:\r\n"
+									"- You've forgotten to select a DSMPlugin and the Server uses a DSMPlugin\r\n"
+									"- Viewer and Server are not compatible (they use different RFB protocols)\r\n"
 									"- Bad connection\r\n",1004
 									);
 
@@ -1779,6 +1824,29 @@ void ClientConnection::NegotiateProtocolVersion()
 	}
 
     pv[sz_rfbProtocolVersionMsg] = 0;
+
+	//adzm 2009-06-21 - warn if we are trying to connect to an unencrypted server. but still allow it if desired.
+	if (m_fUsePlugin && fNotEncrypted) {
+		//SetSocketOptions / fDSMMode?
+		m_fUsePlugin = false;
+
+		//adzm - 2009-06-21 - I don't set the plugin to be disabled here, just rely on m_fUsePlugin.
+		
+		//adzm - 2009-06-21
+		if (m_pPluginInterface) {
+			delete m_pPluginInterface;
+			m_pPluginInterface = NULL;
+		}
+
+		//adzm 2009-07-19 - Auto-accept the connection if it is unencrypted if that option is specified
+		if (!m_opts.m_fAutoAcceptNoDSM) {
+			int returnvalue=MessageBox(m_hwndMain, "You have specified an encryption plugin, however this connection in unencrypted! Do you want to continue?", "Accept insecure SC connection", MB_YESNO | MB_ICONEXCLAMATION | MB_TOPMOST);
+			if (returnvalue==IDNO) 
+			{
+				throw WarningException("You refused the insecure connection.");
+			}
+		}
+	}
 
 	/*
 	// sf@2005 - Cleanup scrambled chars before parsing -> Restore original RFB protocol header first chars
@@ -1815,7 +1883,7 @@ void ClientConnection::NegotiateProtocolVersion()
 			throw WarningException("Connection failed - Invalid protocol !\r\n\r\n"
 									"Possible causes:\r\r"
 									"- You've forgotten to select a DSMPlugin and the Server uses a DSMPlugin\r\n"
-									"- Viewer and Server are not compatible (they use different RFB protocoles)\r\n"
+									"- Viewer and Server are not compatible (they use different RFB protocols)\r\n"
 									);
 
     }
@@ -1955,7 +2023,7 @@ void ClientConnection::NegotiateProxy()
 	}
 	*/
 
-    if (sscanf(pv,rfbProtocolVersionFormat,&m_majorVersion,&m_minorVersion) != 2)
+	if (sscanf(pv,rfbProtocolVersionFormat,&m_majorVersion,&m_minorVersion) != 2)
 	{
 		if (m_fUsePlugin)
 			throw WarningException("Proxy Connection failed - Invalid protocol !\r\n\r\n"
@@ -1970,7 +2038,7 @@ void ClientConnection::NegotiateProxy()
 			throw WarningException("Proxy Connection failed - Invalid protocol !\r\n\r\n"
 									"Possible causes:\r\r"
 									"- You've forgotten to select a DSMPlugin and the Server uses a DSMPlugin\r\n"
-									"- Viewer and Server are not compatible (they use different RFB protocoles)\r\n"
+									"- Viewer and Server are not compatible (they use different RFB protocols)\r\n"
 									);
     }
 
@@ -2418,7 +2486,8 @@ void ClientConnection::ReadServerInit()
 		m_si.framebufferWidth, m_si.framebufferHeight, m_si.format.depth );
 
 	//SetWindowText(m_hwndMain, m_desktopName);	
-	if (m_pDSMPlugin->IsEnabled())
+	//adzm 2009-06-21 - if we decide to connect even though it is unencrypted, do not show the plugin info
+	if (m_pDSMPlugin->IsEnabled() && m_fUsePlugin)
 	{
 			char szMess[255];
 			memset(szMess, 0, 255);
@@ -3010,6 +3079,12 @@ ClientConnection::~ClientConnection()
 	// Modif sf@2002 - Text Chat
 	if (m_pTextChat)
 		delete(m_pTextChat);
+
+	//adzm - 2009-06-21
+	if (m_pPluginInterface) {
+		delete m_pPluginInterface;
+		m_pPluginInterface = NULL;
+	}
 
 	// Modif sf@2002 - DSMPlugin handling
 	if (m_pDSMPlugin != NULL)
@@ -4504,7 +4579,6 @@ void ClientConnection::ReadServerState()
 // General utilities -------------------------------------------------
 
 // Reads the number of bytes specified into the buffer given
-
 void ClientConnection::ReadExact(char *inbuf, int wanted)
 {
 	//omni_mutex_lock l(m_readMutex);
@@ -4536,7 +4610,9 @@ void ClientConnection::ReadExact(char *inbuf, int wanted)
 		{
 			if (m_pDSMPlugin->IsEnabled())
 			{
-				omni_mutex_lock l(m_pDSMPlugin->m_RestMutex); 
+				//omni_mutex_lock l(m_pDSMPlugin->m_RestMutex); 
+				//adzm - 2009-06-21
+				omni_mutex_conditional_lock l(m_pDSMPlugin->m_RestMutex, m_pPluginInterface ? false : true);
 
 				// If we must read already restored data from memory
 				if (m_fReadFromNetRectBuf)
@@ -4560,7 +4636,7 @@ void ClientConnection::ReadExact(char *inbuf, int wanted)
 					// Get the DSMPlugin destination buffer where to put transformed incoming data
 					// The number of bytes to read calculated from bufflen is given back in nTransDataLen
 					int nTransDataLen = 0;
-					BYTE* pTransBuffer = m_pDSMPlugin->RestoreBufferStep1(NULL, wanted, &nTransDataLen);
+					BYTE* pTransBuffer = RestoreBufferStep1(NULL, wanted, &nTransDataLen);
 					if (pTransBuffer == NULL)
 					{
 						// m_pDSMPlugin->RestoreBufferUnlock();
@@ -4572,7 +4648,7 @@ void ClientConnection::ReadExact(char *inbuf, int wanted)
 					
 					// Ask plugin to restore data from its local rest. buffer into inbuf
 					int nRestDataLen = 0;
-					m_pDSMPlugin->RestoreBufferStep2((BYTE*)inbuf, nTransDataLen, &nRestDataLen);
+					RestoreBufferStep2((BYTE*)inbuf, nTransDataLen, &nRestDataLen);
 					
 					// Check if we actually get the real original data length
 					if (nRestDataLen != wanted)
@@ -4611,6 +4687,138 @@ void ClientConnection::ReadExact(char *inbuf, int wanted)
 	}
 	*/
 
+}
+
+//adzm 2009-06-21
+void ClientConnection::ReadExactProtocolVersion(char *inbuf, int wanted, bool& fNotEncrypted)
+{
+	fNotEncrypted = false;
+	//omni_mutex_lock l(m_readMutex);
+	// Status window and connection activity updates
+	// We comment this because it just takes too much time to the viewer thread
+	/*
+	HDC hdcX,hdcBits;
+	if (m_TrafficMonitor)
+	{
+		hdcX = GetDC(m_TrafficMonitor);
+		hdcBits = CreateCompatibleDC(hdcX);
+		SelectObject(hdcBits,m_bitmapBACK);
+		BitBlt(hdcX,1,1,22,20,hdcBits,0,0,SRCCOPY);
+		DeleteDC(hdcBits);
+		ReleaseDC(m_TrafficMonitor,hdcX);
+	}
+	*/
+
+	// m_BytesRead += wanted;
+	/*
+	m_BytesRead = fis->GetBytesRead();
+	SetDlgItemInt(m_hwndStatus, IDC_RECEIVED, m_BytesRead, false);
+	SetDlgItemInt(m_hwndStatus, IDC_SPEED, kbitsPerSecond, false);
+	*/
+	try
+	{
+		// sf@2002 - DSM Plugin
+		if (m_fUsePlugin)
+		{
+			if (m_pDSMPlugin->IsEnabled())
+			{
+				//omni_mutex_lock l(m_pDSMPlugin->m_RestMutex); 
+				//adzm - 2009-06-21
+				omni_mutex_conditional_lock l(m_pDSMPlugin->m_RestMutex, m_pPluginInterface ? false : true);
+
+				// If we must read already restored data from memory
+				if (m_fReadFromNetRectBuf)
+				{
+					memcpy(inbuf, m_pNetRectBuf + m_nNetRectBufOffset, wanted);
+					m_nNetRectBufOffset += wanted;
+					if (m_nNetRectBufOffset == m_nReadSize)
+					{
+						// Next ReadExact calls should read the socket
+						m_fReadFromNetRectBuf = false;
+						m_nNetRectBufOffset = 0;
+					}
+				}
+				// Read restored data from ZRLE mem netbuffer
+				else if (fis->GetReadFromMemoryBuffer())
+				{
+					fis->readBytes(inbuf, wanted);
+				}
+				else // read tansformed data from the socket (normal case)
+				{
+					//adzm 2009-06-21
+					// first just read 4 bytes and see if they are 'RFB '.
+					// if so, then this does not appear to be encrypted.					
+					char testBuffer[4];
+					fis->readBytes(testBuffer, 4);
+					if (memcmp(testBuffer, "RFB ", 4) == 0) {
+						// not encrypted!
+						fNotEncrypted = true;
+						memcpy(inbuf, testBuffer, 4);
+						fis->readBytes(inbuf+4, wanted-4);
+						return;
+					}
+
+
+					// Get the DSMPlugin destination buffer where to put transformed incoming data
+					// The number of bytes to read calculated from bufflen is given back in nTransDataLen
+					int nTransDataLen = 0;
+					BYTE* pTransBuffer = RestoreBufferStep1(NULL, wanted, &nTransDataLen);
+					if (pTransBuffer == NULL)
+					{
+						// m_pDSMPlugin->RestoreBufferUnlock();
+						throw WarningException(sz_L65);
+					}
+					
+					// Read bytes directly into Plugin Dest rest. buffer
+					//adzm 2009-06-21 - we already got 4 bytes
+					memcpy(pTransBuffer, testBuffer, 4);
+					fis->readBytes(pTransBuffer+4, nTransDataLen-4);
+					
+					// Ask plugin to restore data from its local rest. buffer into inbuf
+					int nRestDataLen = 0;
+					RestoreBufferStep2((BYTE*)inbuf, nTransDataLen, &nRestDataLen);
+
+					// Check if we actually get the real original data length
+					if (nRestDataLen != wanted)
+					{
+						throw WarningException(sz_L66);
+					}
+				}
+			}
+			else
+			{
+				fis->readBytes(inbuf, wanted);
+			}
+		}
+		else
+		{
+			fis->readBytes(inbuf, wanted);
+		}
+	}
+	//adzm 2009-07-05
+	catch (rdr::EndOfStream& e)
+	{
+		throw e;
+	}
+	catch (rdr::Exception& e)
+	{
+		vnclog.Print(0, "rdr::Exception (2): %s\n",e.str());
+		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L67);
+		throw ErrorException(sz_L69);
+	}
+
+	// Too slow !
+	/*
+	if (m_TrafficMonitor)
+	{
+		hdcX = GetDC(m_TrafficMonitor);
+		hdcBits = CreateCompatibleDC(hdcX);
+		SelectObject(hdcBits,m_bitmapNONE);
+		BitBlt(hdcX,1,1,22,20,hdcBits,0,0,SRCCOPY);
+		DeleteDC(hdcBits);
+		ReleaseDC(m_TrafficMonitor,hdcX);
+	}
+	*/
 }
 
 void ClientConnection::ReadExactProxy(char *inbuf, int wanted)
@@ -4698,7 +4906,7 @@ void ClientConnection::WriteExact(char *buf, int bytes)
 		if (m_pDSMPlugin->IsEnabled())
 		{
 			int nTransDataLen = 0;
-			pBuffer = (char*)(m_pDSMPlugin->TransformBuffer((BYTE*)buf, bytes, &nTransDataLen));
+			pBuffer = (char*)TransformBuffer((BYTE*)buf, bytes, &nTransDataLen);
 			if (pBuffer == NULL || (bytes > 0 && nTransDataLen == 0))
 				throw WarningException(sz_L68);
 			bytes = nTransDataLen;
@@ -4941,6 +5149,45 @@ void ClientConnection::ReadNewFBSize(rfbFramebufferUpdateRectHeader *pfburh)
 //
 // sf@2002 - DSMPlugin 
 //
+
+
+//
+// Tell the plugin to do its transformation on the source data buffer
+// Return: pointer on the new transformed buffer (allocated by the plugin)
+// nTransformedDataLen is the number of bytes contained in the transformed buffer
+//adzm - 2009-06-21
+BYTE* ClientConnection::TransformBuffer(BYTE* pDataBuffer, int nDataLen, int* pnTransformedDataLen)
+{
+	if (m_pPluginInterface) {
+		return m_pPluginInterface->TransformBuffer(pDataBuffer, nDataLen, pnTransformedDataLen);
+	} else {
+		return m_pDSMPlugin->TransformBuffer(pDataBuffer, nDataLen, pnTransformedDataLen);
+	}
+}
+
+
+// - If pRestoredDataBuffer = NULL, the plugin check its local buffer and return the pointer
+// - Otherwise, restore data contained in its rest. buffer and put the result in pRestoredDataBuffer
+//   pnRestoredDataLen is the number bytes put in pRestoredDataBuffers
+//adzm - 2009-06-21
+BYTE* ClientConnection::RestoreBufferStep1(BYTE* pRestoredDataBuffer, int nDataLen, int* pnRestoredDataLen)
+{	
+	if (m_pPluginInterface) {
+		return m_pPluginInterface->RestoreBuffer(pRestoredDataBuffer, nDataLen, pnRestoredDataLen);
+	} else {
+		return m_pDSMPlugin->RestoreBufferStep1(pRestoredDataBuffer, nDataLen, pnRestoredDataLen);
+	}
+}
+
+//adzm - 2009-06-21
+BYTE* ClientConnection::RestoreBufferStep2(BYTE* pRestoredDataBuffer, int nDataLen, int* pnRestoredDataLen)
+{	
+	if (m_pPluginInterface) {
+		return m_pPluginInterface->RestoreBuffer(pRestoredDataBuffer, nDataLen, pnRestoredDataLen);
+	} else {
+		return m_pDSMPlugin->RestoreBufferStep2(pRestoredDataBuffer, nDataLen, pnRestoredDataLen);
+	}
+}
 
 //
 // Ensures that the temporary "alignement" buffer in large enough 
