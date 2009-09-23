@@ -41,8 +41,7 @@ RSC=rc.exe
 # PROP Intermediate_Dir "Release"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "NDEBUG" /D "_WINDOWS" /D "WIN32" /YX /FD /c
-# ADD CPP /nologo /W3 /GX /O2 /I "..\..\.." /I "..\..\..\win32" /I "..\..\..\windll" /D "NDEBUG" /D "_WINDOWS" /D "WIN32" /D "NO_ASM" /D "WINDLL" /D "MSDOS" /D "USE_ZIPMAIN" /D "ZIPLIB" /FD /c
-# SUBTRACT CPP /YX
+# ADD CPP /MT /W3 /GX /I "..\..\.." /I "..\..\..\win32" /I "..\..\..\windll" /D "NDEBUG" /D "_WINDOWS" /D "WIN32" /D "NO_ASM" /D "WINDLL" /D "MSDOS" /D "USE_ZIPMAIN" /D "ZIPLIB" /FD
 # ADD BASE RSC /l 0x409
 # ADD RSC /l 0x409
 BSC32=bscmake.exe

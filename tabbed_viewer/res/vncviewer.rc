@@ -1276,7 +1276,7 @@ END
 // Bitmap
 //
 
-IDB_BITMAP12            BITMAP                  "stat\\bitmapnt.bmp"
+//IDB_BITMAP12            BITMAP                  "stat\\bitmapnt.bmp"
 #endif    // Dutch (Belgium) resources
 /////////////////////////////////////////////////////////////////////////////
 

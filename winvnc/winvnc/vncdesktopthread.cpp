@@ -356,7 +356,7 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 					//*******************************************************
 					if (!m_server->IsThereFileTransBusy())
 					if (m_desktop->m_displaychanged || !vncService::InputDesktopSelected() || m_desktop->m_hookswitch || (monitor_changed && !m_desktop->m_videodriver))
-							{
+					{
 								// Attempt to close the old hooks
 								// shutdown(true) driver is reinstalled without shutdown,(shutdown need a 640x480x8 switch)
 								vnclog.Print(LL_INTERR, VNCLOG("m_desktop->Shutdown"));

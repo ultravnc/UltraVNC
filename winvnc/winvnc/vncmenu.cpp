@@ -166,7 +166,14 @@ static inline VOID DisableAero(VOID)
 
 static void KillWallpaper()
 {
-	HideDesktop();
+	//only kill wallpaper if desktop is user desktop
+	HDESK desktop = GetThreadDesktop(GetCurrentThreadId());
+	DWORD dummy;
+	char new_name[256];
+	if (GetUserObjectInformation(desktop, UOI_NAME, &new_name, 256, &dummy))
+	{
+		if (strcmp(new_name,"Default")==NULL) HideDesktop();
+	}	
 }
 
 static void RestoreWallpaper()

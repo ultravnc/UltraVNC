@@ -3,42 +3,6 @@ Microsoft Developer Studio Workspace File, Format Version 6.00
 
 ###############################################################################
 
-Project: "french"=".\french\french.dsp" - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
-Project: "german"=".\german\german.dsp" - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
-Project: "japanese"=".\japanese\japanese.dsp" - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
 Project: "libjpeg"="..\libjpeg\libjpeg.dsp" - Package Owner=<4>
 
 Package=<5>
@@ -75,6 +39,18 @@ Package=<4>
 
 ###############################################################################
 
+Project: "unz32lib"="..\zipunzip_src\unzip\windll\vc6\lib\unz32lib.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "vncviewer"=".\vncviewer.dsp" - Package Owner=<4>
 
 Package=<5>
@@ -95,6 +71,24 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name libjpeg
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name unz32lib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name zip32
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "zip32"="..\zipunzip_src\zip20\windll\visualc\lib\zip32.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
 }}}
 
 ###############################################################################

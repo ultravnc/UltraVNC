@@ -55,7 +55,8 @@ void comment(unsigned int);
 extern LPSTR szCommentBuf;
 extern HANDLE hStr;
 extern HWND hWndMain;
-void __far __cdecl perror(const char *);
+void __far __cdecl pperror(const char *);
+int __far __cdecl printff(const char *format, ...);
 
 #endif /* _WINDLL_H */
 

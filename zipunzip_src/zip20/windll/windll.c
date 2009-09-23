@@ -139,7 +139,7 @@ return len;
 }
 
 /* fprintf clone for code in zip.c, etc. */
-int __far __cdecl fprintf(FILE *file, const char *format, ...)
+/*int __far __cdecl fprintf(FILE *file, const char *format, ...)
 {
 va_list argptr;
 HANDLE hMemory;
@@ -169,9 +169,9 @@ else
 GlobalUnlock(hMemory);
 GlobalFree(hMemory);
 return len;
-}
+}*/
 
-void __far __cdecl perror(const char *parm1)
+void __far __cdecl pperror(const char *parm1)
 {
 printf(parm1);
 }

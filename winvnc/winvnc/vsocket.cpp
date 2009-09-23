@@ -62,7 +62,7 @@ class VSocket;
 // Custom includes
 
 #include "VTypes.h"
-
+extern int G_SENDBUFFER;
 ////////////////////////////////////////////////////////
 // *** Lovely hacks to make Win32 work.  Hurrah!
 
@@ -342,6 +342,12 @@ VSocket::Accept()
   if (sock < 0)
     return NULL;
 
+  int optVal;
+  int optLen = sizeof(int);
+  getsockopt(sock, SOL_SOCKET, SO_SNDBUF, (char *)&optVal, &optLen); 
+  optVal=32000;
+  setsockopt(sock, SOL_SOCKET, SO_SNDBUF, (char *)&optVal, optLen); 
+
   // Accept an incoming connection
   if ((new_socket_id = accept(sock, NULL, 0)) < 0)
     return NULL;
@@ -518,20 +524,20 @@ VSocket::Send(const char *buff, const VCard bufflen)
 	buff2=(char*)buff;
 	unsigned int bufflen2=bufflen;
 
-	if (newsize >8192)
+	if (newsize >G_SENDBUFFER)
 	{
-		    memcpy(queuebuffer+queuebuffersize,buff2,8192-queuebuffersize);
-			send(sock,queuebuffer,8192,0);
-//			vnclog.Print(LL_SOCKERR, VNCLOG("SEND  %i\n") ,8192);
-			buff2+=(8192-queuebuffersize);
-			bufflen2-=(8192-queuebuffersize);
+		    memcpy(queuebuffer+queuebuffersize,buff2,G_SENDBUFFER-queuebuffersize);
+			send(sock,queuebuffer,G_SENDBUFFER,0);
+//			vnclog.Print(LL_SOCKERR, VNCLOG("SEND  %i\n") ,G_SENDBUFFER);
+			buff2+=(G_SENDBUFFER-queuebuffersize);
+			bufflen2-=(G_SENDBUFFER-queuebuffersize);
 			queuebuffersize=0;
-			while (bufflen2 > 8192)
+			while (bufflen2 > G_SENDBUFFER)
 			{
-				if (!send(sock,buff2,8192,0)) return false;
-//				vnclog.Print(LL_SOCKERR, VNCLOG("SEND 1 %i\n") ,8192);
-				buff2+=8192;
-				bufflen2-=8192;
+				if (!send(sock,buff2,G_SENDBUFFER,0)) return false;
+//				vnclog.Print(LL_SOCKERR, VNCLOG("SEND 1 %i\n") ,G_SENDBUFFER);
+				buff2+=G_SENDBUFFER;
+				bufflen2-=G_SENDBUFFER;
 			}
 	}
 	memcpy(queuebuffer+queuebuffersize,buff2,bufflen2);
@@ -551,20 +557,20 @@ VSocket::SendQueued(const char *buff, const VCard bufflen)
 	buff2=(char*)buff;
 	unsigned int bufflen2=bufflen;
 
-	if (newsize >8192)
+	if (newsize >G_SENDBUFFER)
 	{
-		    memcpy(queuebuffer+queuebuffersize,buff2,8192-queuebuffersize);
-			send(sock,queuebuffer,8192,0);
-		//	vnclog.Print(LL_SOCKERR, VNCLOG("SEND Q  %i\n") ,8192);
-			buff2+=(8192-queuebuffersize);
-			bufflen2-=(8192-queuebuffersize);
+		    memcpy(queuebuffer+queuebuffersize,buff2,G_SENDBUFFER-queuebuffersize);
+			send(sock,queuebuffer,G_SENDBUFFER,0);
+		//	vnclog.Print(LL_SOCKERR, VNCLOG("SEND Q  %i\n") ,G_SENDBUFFER);
+			buff2+=(G_SENDBUFFER-queuebuffersize);
+			bufflen2-=(G_SENDBUFFER-queuebuffersize);
 			queuebuffersize=0;
-			while (bufflen2 > 8192)
+			while (bufflen2 > G_SENDBUFFER)
 			{
-				if (!send(sock,buff2,8192,0)) return false;
-			//	vnclog.Print(LL_SOCKERR, VNCLOG("SEND Q  %i\n") ,8192);
-				buff2+=8192;
-				bufflen2-=8192;
+				if (!send(sock,buff2,G_SENDBUFFER,0)) return false;
+			//	vnclog.Print(LL_SOCKERR, VNCLOG("SEND Q  %i\n") ,G_SENDBUFFER);
+				buff2+=G_SENDBUFFER;
+				bufflen2-=G_SENDBUFFER;
 			}
 	}
 	memcpy(queuebuffer+queuebuffersize,buff2,bufflen2);

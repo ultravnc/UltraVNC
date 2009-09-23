@@ -107,9 +107,11 @@ PreLink_Cmds=cl /nologo /MTd /FoDebug\ /FdDebug\ /c buildtime.cpp
 # PROP Use_Debug_Libraries 0
 # PROP Output_Dir ".\Release"
 # PROP Intermediate_Dir ".\Release"
+# PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MT /W3 /GX /Ox /Ot /I "omnithread" /I ".." /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "__NT__" /D "_WINSTATIC" /D "__WIN32__" /D "_CRT_SECURE_NO_WARNINGS" /c
-# ADD CPP /nologo /MT /W3 /GX /Ox /Ot /I "omnithread" /I ".." /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "__NT__" /D "_WINSTATIC" /D "__WIN32__" /D "_CRT_SECURE_NO_WARNINGS" /c
+# ADD CPP /MT /W3 /GX /I "omnithread" /I ".." /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "__NT__" /D "_WINSTATIC" /D "__WIN32__" /c
+# SUBTRACT CPP /O<none>
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
@@ -120,7 +122,7 @@ BSC32=bscmake.exe
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib winmm.lib omnithread.lib wsock32.lib /nologo /subsystem:windows /incremental:yes /machine:IX86 /pdbtype:sept /libpath:"omnithread/Release"
 # SUBTRACT BASE LINK32 /pdb:none
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib winmm.lib omnithread.lib wsock32.lib /nologo /subsystem:windows /incremental:yes /machine:IX86 /nodefaultlib:"libc.lib" /pdbtype:sept /libpath:"omnithread/Release"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib winmm.lib omnithread.lib wsock32.lib Advapi32.lib /nologo /subsystem:windows /incremental:yes /machine:IX86 /nodefaultlib:"libc.lib" /pdbtype:sept /libpath:"omnithread/Release"
 # SUBTRACT LINK32 /pdb:none
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
@@ -319,6 +321,42 @@ SOURCE=res\vncviewer.ico
 # Begin Source File
 
 SOURCE=AboutBox.cpp
+DEP_CPP_ABOUT=\
+	"..\libjpeg\jconfig.h"\
+	"..\libjpeg\jerror.h"\
+	"..\libjpeg\jmorecfg.h"\
+	"..\libjpeg\jpegint.h"\
+	"..\libjpeg\jpeglib.h"\
+	"..\rdr\types.h"\
+	"..\rfb\rfbproto.h"\
+	"..\ZipUnZip32\ZipUnZip32.h"\
+	"..\zlib\zconf.h"\
+	"..\zlib\zlib.h"\
+	".\AccelKeys.h"\
+	".\ClientConnection.h"\
+	".\FileTransfer.h"\
+	".\FullScreenTitleBar.h"\
+	".\FullScreenTitleBarConst.h"\
+	".\KeyMap.h"\
+	".\KeyMapjap.h"\
+	".\keysym.h"\
+	".\keysymdef.h"\
+	".\keysymdefjap.h"\
+	".\Log.h"\
+	".\MRU.h"\
+	".\multimon.h"\
+	".\omnithread\nt.h"\
+	".\omnithread\omnithread.h"\
+	".\rfb.h"\
+	".\stdhdrs.h"\
+	".\TextChat.h"\
+	".\VNCOptions.h"\
+	".\vncviewer.h"\
+	".\VNCviewerApp.h"\
+	
+NODEP_CPP_ABOUT=\
+	".\omnithreadce.h"\
+	
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
@@ -346,6 +384,42 @@ SOURCE=AboutBox.h
 # Begin Source File
 
 SOURCE=AccelKeys.cpp
+DEP_CPP_ACCEL=\
+	"..\libjpeg\jconfig.h"\
+	"..\libjpeg\jerror.h"\
+	"..\libjpeg\jmorecfg.h"\
+	"..\libjpeg\jpegint.h"\
+	"..\libjpeg\jpeglib.h"\
+	"..\rdr\types.h"\
+	"..\rfb\rfbproto.h"\
+	"..\ZipUnZip32\ZipUnZip32.h"\
+	"..\zlib\zconf.h"\
+	"..\zlib\zlib.h"\
+	".\AccelKeys.h"\
+	".\ClientConnection.h"\
+	".\FileTransfer.h"\
+	".\FullScreenTitleBar.h"\
+	".\FullScreenTitleBarConst.h"\
+	".\KeyMap.h"\
+	".\KeyMapjap.h"\
+	".\keysym.h"\
+	".\keysymdef.h"\
+	".\keysymdefjap.h"\
+	".\Log.h"\
+	".\MRU.h"\
+	".\multimon.h"\
+	".\omnithread\nt.h"\
+	".\omnithread\omnithread.h"\
+	".\rfb.h"\
+	".\stdhdrs.h"\
+	".\TextChat.h"\
+	".\VNCOptions.h"\
+	".\vncviewer.h"\
+	".\VNCviewerApp.h"\
+	
+NODEP_CPP_ACCEL=\
+	".\omnithreadce.h"\
+	
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
@@ -373,6 +447,45 @@ SOURCE=AccelKeys.h
 # Begin Source File
 
 SOURCE=AuthDialog.cpp
+DEP_CPP_AUTHD=\
+	"..\common\win32_helpers.h"\
+	"..\libjpeg\jconfig.h"\
+	"..\libjpeg\jerror.h"\
+	"..\libjpeg\jmorecfg.h"\
+	"..\libjpeg\jpegint.h"\
+	"..\libjpeg\jpeglib.h"\
+	"..\rdr\types.h"\
+	"..\rfb\rfbproto.h"\
+	"..\ZipUnZip32\ZipUnZip32.h"\
+	"..\zlib\zconf.h"\
+	"..\zlib\zlib.h"\
+	".\AccelKeys.h"\
+	".\AuthDialog.h"\
+	".\ClientConnection.h"\
+	".\Exception.h"\
+	".\FileTransfer.h"\
+	".\FullScreenTitleBar.h"\
+	".\FullScreenTitleBarConst.h"\
+	".\KeyMap.h"\
+	".\KeyMapjap.h"\
+	".\keysym.h"\
+	".\keysymdef.h"\
+	".\keysymdefjap.h"\
+	".\Log.h"\
+	".\MRU.h"\
+	".\multimon.h"\
+	".\omnithread\nt.h"\
+	".\omnithread\omnithread.h"\
+	".\rfb.h"\
+	".\stdhdrs.h"\
+	".\TextChat.h"\
+	".\VNCOptions.h"\
+	".\vncviewer.h"\
+	".\VNCviewerApp.h"\
+	
+NODEP_CPP_AUTHD=\
+	".\omnithreadce.h"\
+	
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
@@ -423,6 +536,56 @@ SOURCE=buildtime.cpp
 # Begin Source File
 
 SOURCE=ClientConnection.cpp
+DEP_CPP_CLIEN=\
+	"..\common\win32_helpers.h"\
+	"..\DSMPlugin\DSMPlugin.h"\
+	"..\libjpeg\jconfig.h"\
+	"..\libjpeg\jerror.h"\
+	"..\libjpeg\jmorecfg.h"\
+	"..\libjpeg\jpegint.h"\
+	"..\libjpeg\jpeglib.h"\
+	"..\rdr\Exception.h"\
+	"..\rdr\FdInStream.h"\
+	"..\rdr\InStream.h"\
+	"..\rdr\types.h"\
+	"..\rdr\ZlibInStream.h"\
+	"..\rfb\dh.h"\
+	"..\rfb\rfbproto.h"\
+	"..\ZipUnZip32\ZipUnZip32.h"\
+	"..\zlib\zconf.h"\
+	"..\zlib\zlib.h"\
+	".\AboutBox.h"\
+	".\AccelKeys.h"\
+	".\AuthDialog.h"\
+	".\ClientConnection.h"\
+	".\Exception.h"\
+	".\FileTransfer.h"\
+	".\FullScreenTitleBar.h"\
+	".\FullScreenTitleBarConst.h"\
+	".\KeyMap.h"\
+	".\KeyMapjap.h"\
+	".\keysym.h"\
+	".\keysymdef.h"\
+	".\keysymdefjap.h"\
+	".\Log.h"\
+	".\LowLevelHook.h"\
+	".\MRU.h"\
+	".\multimon.h"\
+	".\omnithread\nt.h"\
+	".\omnithread\omnithread.h"\
+	".\rfb.h"\
+	".\SessionDialog.h"\
+	".\stdhdrs.h"\
+	".\TextChat.h"\
+	".\vncauth.h"\
+	".\VNCOptions.h"\
+	".\vncviewer.h"\
+	".\VNCviewerApp.h"\
+	
+NODEP_CPP_CLIEN=\
+	"..\DSMPlugin\omnithreadce.h"\
+	".\omnithreadce.h"\
+	
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
@@ -450,6 +613,42 @@ SOURCE=ClientConnection.h
 # Begin Source File
 
 SOURCE=ClientConnectionCacheRect.cpp
+DEP_CPP_CLIENT=\
+	"..\libjpeg\jconfig.h"\
+	"..\libjpeg\jerror.h"\
+	"..\libjpeg\jmorecfg.h"\
+	"..\libjpeg\jpegint.h"\
+	"..\libjpeg\jpeglib.h"\
+	"..\rdr\types.h"\
+	"..\rfb\rfbproto.h"\
+	"..\ZipUnZip32\ZipUnZip32.h"\
+	"..\zlib\zconf.h"\
+	"..\zlib\zlib.h"\
+	".\AccelKeys.h"\
+	".\ClientConnection.h"\
+	".\FileTransfer.h"\
+	".\FullScreenTitleBar.h"\
+	".\FullScreenTitleBarConst.h"\
+	".\KeyMap.h"\
+	".\KeyMapjap.h"\
+	".\keysym.h"\
+	".\keysymdef.h"\
+	".\keysymdefjap.h"\
+	".\Log.h"\
+	".\MRU.h"\
+	".\multimon.h"\
+	".\omnithread\nt.h"\
+	".\omnithread\omnithread.h"\
+	".\rfb.h"\
+	".\stdhdrs.h"\
+	".\TextChat.h"\
+	".\VNCOptions.h"\
+	".\vncviewer.h"\
+	".\VNCviewerApp.h"\
+	
+NODEP_CPP_CLIENT=\
+	".\omnithreadce.h"\
+	
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
@@ -473,6 +672,43 @@ SOURCE=ClientConnectionCacheRect.cpp
 # Begin Source File
 
 SOURCE=ClientConnectionClipboard.cpp
+DEP_CPP_CLIENTC=\
+	"..\libjpeg\jconfig.h"\
+	"..\libjpeg\jerror.h"\
+	"..\libjpeg\jmorecfg.h"\
+	"..\libjpeg\jpegint.h"\
+	"..\libjpeg\jpeglib.h"\
+	"..\rdr\types.h"\
+	"..\rfb\rfbproto.h"\
+	"..\ZipUnZip32\ZipUnZip32.h"\
+	"..\zlib\zconf.h"\
+	"..\zlib\zlib.h"\
+	".\AccelKeys.h"\
+	".\ClientConnection.h"\
+	".\Exception.h"\
+	".\FileTransfer.h"\
+	".\FullScreenTitleBar.h"\
+	".\FullScreenTitleBarConst.h"\
+	".\KeyMap.h"\
+	".\KeyMapjap.h"\
+	".\keysym.h"\
+	".\keysymdef.h"\
+	".\keysymdefjap.h"\
+	".\Log.h"\
+	".\MRU.h"\
+	".\multimon.h"\
+	".\omnithread\nt.h"\
+	".\omnithread\omnithread.h"\
+	".\rfb.h"\
+	".\stdhdrs.h"\
+	".\TextChat.h"\
+	".\VNCOptions.h"\
+	".\vncviewer.h"\
+	".\VNCviewerApp.h"\
+	
+NODEP_CPP_CLIENTC=\
+	".\omnithreadce.h"\
+	
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
@@ -496,6 +732,42 @@ SOURCE=ClientConnectionClipboard.cpp
 # Begin Source File
 
 SOURCE=ClientConnectionCopyRect.cpp
+DEP_CPP_CLIENTCO=\
+	"..\libjpeg\jconfig.h"\
+	"..\libjpeg\jerror.h"\
+	"..\libjpeg\jmorecfg.h"\
+	"..\libjpeg\jpegint.h"\
+	"..\libjpeg\jpeglib.h"\
+	"..\rdr\types.h"\
+	"..\rfb\rfbproto.h"\
+	"..\ZipUnZip32\ZipUnZip32.h"\
+	"..\zlib\zconf.h"\
+	"..\zlib\zlib.h"\
+	".\AccelKeys.h"\
+	".\ClientConnection.h"\
+	".\FileTransfer.h"\
+	".\FullScreenTitleBar.h"\
+	".\FullScreenTitleBarConst.h"\
+	".\KeyMap.h"\
+	".\KeyMapjap.h"\
+	".\keysym.h"\
+	".\keysymdef.h"\
+	".\keysymdefjap.h"\
+	".\Log.h"\
+	".\MRU.h"\
+	".\multimon.h"\
+	".\omnithread\nt.h"\
+	".\omnithread\omnithread.h"\
+	".\rfb.h"\
+	".\stdhdrs.h"\
+	".\TextChat.h"\
+	".\VNCOptions.h"\
+	".\vncviewer.h"\
+	".\VNCviewerApp.h"\
+	
+NODEP_CPP_CLIENTCO=\
+	".\omnithreadce.h"\
+	
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
@@ -519,6 +791,42 @@ SOURCE=ClientConnectionCopyRect.cpp
 # Begin Source File
 
 SOURCE=ClientConnectionCoRRE.cpp
+DEP_CPP_CLIENTCON=\
+	"..\libjpeg\jconfig.h"\
+	"..\libjpeg\jerror.h"\
+	"..\libjpeg\jmorecfg.h"\
+	"..\libjpeg\jpegint.h"\
+	"..\libjpeg\jpeglib.h"\
+	"..\rdr\types.h"\
+	"..\rfb\rfbproto.h"\
+	"..\ZipUnZip32\ZipUnZip32.h"\
+	"..\zlib\zconf.h"\
+	"..\zlib\zlib.h"\
+	".\AccelKeys.h"\
+	".\ClientConnection.h"\
+	".\FileTransfer.h"\
+	".\FullScreenTitleBar.h"\
+	".\FullScreenTitleBarConst.h"\
+	".\KeyMap.h"\
+	".\KeyMapjap.h"\
+	".\keysym.h"\
+	".\keysymdef.h"\
+	".\keysymdefjap.h"\
+	".\Log.h"\
+	".\MRU.h"\
+	".\multimon.h"\
+	".\omnithread\nt.h"\
+	".\omnithread\omnithread.h"\
+	".\rfb.h"\
+	".\stdhdrs.h"\
+	".\TextChat.h"\
+	".\VNCOptions.h"\
+	".\vncviewer.h"\
+	".\VNCviewerApp.h"\
+	
+NODEP_CPP_CLIENTCON=\
+	".\omnithreadce.h"\
+	
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
@@ -542,6 +850,42 @@ SOURCE=ClientConnectionCoRRE.cpp
 # Begin Source File
 
 SOURCE=ClientConnectionCursor.cpp
+DEP_CPP_CLIENTCONN=\
+	"..\libjpeg\jconfig.h"\
+	"..\libjpeg\jerror.h"\
+	"..\libjpeg\jmorecfg.h"\
+	"..\libjpeg\jpegint.h"\
+	"..\libjpeg\jpeglib.h"\
+	"..\rdr\types.h"\
+	"..\rfb\rfbproto.h"\
+	"..\ZipUnZip32\ZipUnZip32.h"\
+	"..\zlib\zconf.h"\
+	"..\zlib\zlib.h"\
+	".\AccelKeys.h"\
+	".\ClientConnection.h"\
+	".\FileTransfer.h"\
+	".\FullScreenTitleBar.h"\
+	".\FullScreenTitleBarConst.h"\
+	".\KeyMap.h"\
+	".\KeyMapjap.h"\
+	".\keysym.h"\
+	".\keysymdef.h"\
+	".\keysymdefjap.h"\
+	".\Log.h"\
+	".\MRU.h"\
+	".\multimon.h"\
+	".\omnithread\nt.h"\
+	".\omnithread\omnithread.h"\
+	".\rfb.h"\
+	".\stdhdrs.h"\
+	".\TextChat.h"\
+	".\VNCOptions.h"\
+	".\vncviewer.h"\
+	".\VNCviewerApp.h"\
+	
+NODEP_CPP_CLIENTCONN=\
+	".\omnithreadce.h"\
+	
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
@@ -565,6 +909,47 @@ SOURCE=ClientConnectionCursor.cpp
 # Begin Source File
 
 SOURCE=ClientConnectionFile.cpp
+DEP_CPP_CLIENTCONNE=\
+	"..\DSMPlugin\DSMPlugin.h"\
+	"..\libjpeg\jconfig.h"\
+	"..\libjpeg\jerror.h"\
+	"..\libjpeg\jmorecfg.h"\
+	"..\libjpeg\jpegint.h"\
+	"..\libjpeg\jpeglib.h"\
+	"..\rdr\types.h"\
+	"..\rfb\rfbproto.h"\
+	"..\ZipUnZip32\ZipUnZip32.h"\
+	"..\zlib\zconf.h"\
+	"..\zlib\zlib.h"\
+	".\AccelKeys.h"\
+	".\ClientConnection.h"\
+	".\Exception.h"\
+	".\FileTransfer.h"\
+	".\FullScreenTitleBar.h"\
+	".\FullScreenTitleBarConst.h"\
+	".\KeyMap.h"\
+	".\KeyMapjap.h"\
+	".\keysym.h"\
+	".\keysymdef.h"\
+	".\keysymdefjap.h"\
+	".\Log.h"\
+	".\MRU.h"\
+	".\multimon.h"\
+	".\omnithread\nt.h"\
+	".\omnithread\omnithread.h"\
+	".\rfb.h"\
+	".\SessionDialog.h"\
+	".\stdhdrs.h"\
+	".\TextChat.h"\
+	".\vncauth.h"\
+	".\VNCOptions.h"\
+	".\vncviewer.h"\
+	".\VNCviewerApp.h"\
+	
+NODEP_CPP_CLIENTCONNE=\
+	"..\DSMPlugin\omnithreadce.h"\
+	".\omnithreadce.h"\
+	
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
@@ -588,6 +973,42 @@ SOURCE=ClientConnectionFile.cpp
 # Begin Source File
 
 SOURCE=ClientConnectionFullScreen.cpp
+DEP_CPP_CLIENTCONNEC=\
+	"..\libjpeg\jconfig.h"\
+	"..\libjpeg\jerror.h"\
+	"..\libjpeg\jmorecfg.h"\
+	"..\libjpeg\jpegint.h"\
+	"..\libjpeg\jpeglib.h"\
+	"..\rdr\types.h"\
+	"..\rfb\rfbproto.h"\
+	"..\ZipUnZip32\ZipUnZip32.h"\
+	"..\zlib\zconf.h"\
+	"..\zlib\zlib.h"\
+	".\AccelKeys.h"\
+	".\ClientConnection.h"\
+	".\FileTransfer.h"\
+	".\FullScreenTitleBar.h"\
+	".\FullScreenTitleBarConst.h"\
+	".\KeyMap.h"\
+	".\KeyMapjap.h"\
+	".\keysym.h"\
+	".\keysymdef.h"\
+	".\keysymdefjap.h"\
+	".\Log.h"\
+	".\MRU.h"\
+	".\multimon.h"\
+	".\omnithread\nt.h"\
+	".\omnithread\omnithread.h"\
+	".\rfb.h"\
+	".\stdhdrs.h"\
+	".\TextChat.h"\
+	".\VNCOptions.h"\
+	".\vncviewer.h"\
+	".\VNCviewerApp.h"\
+	
+NODEP_CPP_CLIENTCONNEC=\
+	".\omnithreadce.h"\
+	
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
@@ -611,6 +1032,42 @@ SOURCE=ClientConnectionFullScreen.cpp
 # Begin Source File
 
 SOURCE=ClientConnectionHextile.cpp
+DEP_CPP_CLIENTCONNECT=\
+	"..\libjpeg\jconfig.h"\
+	"..\libjpeg\jerror.h"\
+	"..\libjpeg\jmorecfg.h"\
+	"..\libjpeg\jpegint.h"\
+	"..\libjpeg\jpeglib.h"\
+	"..\rdr\types.h"\
+	"..\rfb\rfbproto.h"\
+	"..\ZipUnZip32\ZipUnZip32.h"\
+	"..\zlib\zconf.h"\
+	"..\zlib\zlib.h"\
+	".\AccelKeys.h"\
+	".\ClientConnection.h"\
+	".\FileTransfer.h"\
+	".\FullScreenTitleBar.h"\
+	".\FullScreenTitleBarConst.h"\
+	".\KeyMap.h"\
+	".\KeyMapjap.h"\
+	".\keysym.h"\
+	".\keysymdef.h"\
+	".\keysymdefjap.h"\
+	".\Log.h"\
+	".\MRU.h"\
+	".\multimon.h"\
+	".\omnithread\nt.h"\
+	".\omnithread\omnithread.h"\
+	".\rfb.h"\
+	".\stdhdrs.h"\
+	".\TextChat.h"\
+	".\VNCOptions.h"\
+	".\vncviewer.h"\
+	".\VNCviewerApp.h"\
+	
+NODEP_CPP_CLIENTCONNECT=\
+	".\omnithreadce.h"\
+	
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
@@ -634,6 +1091,42 @@ SOURCE=ClientConnectionHextile.cpp
 # Begin Source File
 
 SOURCE=ClientConnectionRaw.cpp
+DEP_CPP_CLIENTCONNECTI=\
+	"..\libjpeg\jconfig.h"\
+	"..\libjpeg\jerror.h"\
+	"..\libjpeg\jmorecfg.h"\
+	"..\libjpeg\jpegint.h"\
+	"..\libjpeg\jpeglib.h"\
+	"..\rdr\types.h"\
+	"..\rfb\rfbproto.h"\
+	"..\ZipUnZip32\ZipUnZip32.h"\
+	"..\zlib\zconf.h"\
+	"..\zlib\zlib.h"\
+	".\AccelKeys.h"\
+	".\ClientConnection.h"\
+	".\FileTransfer.h"\
+	".\FullScreenTitleBar.h"\
+	".\FullScreenTitleBarConst.h"\
+	".\KeyMap.h"\
+	".\KeyMapjap.h"\
+	".\keysym.h"\
+	".\keysymdef.h"\
+	".\keysymdefjap.h"\
+	".\Log.h"\
+	".\MRU.h"\
+	".\multimon.h"\
+	".\omnithread\nt.h"\
+	".\omnithread\omnithread.h"\
+	".\rfb.h"\
+	".\stdhdrs.h"\
+	".\TextChat.h"\
+	".\VNCOptions.h"\
+	".\vncviewer.h"\
+	".\VNCviewerApp.h"\
+	
+NODEP_CPP_CLIENTCONNECTI=\
+	".\omnithreadce.h"\
+	
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
@@ -657,6 +1150,42 @@ SOURCE=ClientConnectionRaw.cpp
 # Begin Source File
 
 SOURCE=ClientConnectionRRE.cpp
+DEP_CPP_CLIENTCONNECTIO=\
+	"..\libjpeg\jconfig.h"\
+	"..\libjpeg\jerror.h"\
+	"..\libjpeg\jmorecfg.h"\
+	"..\libjpeg\jpegint.h"\
+	"..\libjpeg\jpeglib.h"\
+	"..\rdr\types.h"\
+	"..\rfb\rfbproto.h"\
+	"..\ZipUnZip32\ZipUnZip32.h"\
+	"..\zlib\zconf.h"\
+	"..\zlib\zlib.h"\
+	".\AccelKeys.h"\
+	".\ClientConnection.h"\
+	".\FileTransfer.h"\
+	".\FullScreenTitleBar.h"\
+	".\FullScreenTitleBarConst.h"\
+	".\KeyMap.h"\
+	".\KeyMapjap.h"\
+	".\keysym.h"\
+	".\keysymdef.h"\
+	".\keysymdefjap.h"\
+	".\Log.h"\
+	".\MRU.h"\
+	".\multimon.h"\
+	".\omnithread\nt.h"\
+	".\omnithread\omnithread.h"\
+	".\rfb.h"\
+	".\stdhdrs.h"\
+	".\TextChat.h"\
+	".\VNCOptions.h"\
+	".\vncviewer.h"\
+	".\VNCviewerApp.h"\
+	
+NODEP_CPP_CLIENTCONNECTIO=\
+	".\omnithreadce.h"\
+	
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
@@ -680,6 +1209,42 @@ SOURCE=ClientConnectionRRE.cpp
 # Begin Source File
 
 SOURCE=ClientConnectionTight.cpp
+DEP_CPP_CLIENTCONNECTION=\
+	"..\libjpeg\jconfig.h"\
+	"..\libjpeg\jerror.h"\
+	"..\libjpeg\jmorecfg.h"\
+	"..\libjpeg\jpegint.h"\
+	"..\libjpeg\jpeglib.h"\
+	"..\rdr\types.h"\
+	"..\rfb\rfbproto.h"\
+	"..\ZipUnZip32\ZipUnZip32.h"\
+	"..\zlib\zconf.h"\
+	"..\zlib\zlib.h"\
+	".\AccelKeys.h"\
+	".\ClientConnection.h"\
+	".\FileTransfer.h"\
+	".\FullScreenTitleBar.h"\
+	".\FullScreenTitleBarConst.h"\
+	".\KeyMap.h"\
+	".\KeyMapjap.h"\
+	".\keysym.h"\
+	".\keysymdef.h"\
+	".\keysymdefjap.h"\
+	".\Log.h"\
+	".\MRU.h"\
+	".\multimon.h"\
+	".\omnithread\nt.h"\
+	".\omnithread\omnithread.h"\
+	".\rfb.h"\
+	".\stdhdrs.h"\
+	".\TextChat.h"\
+	".\VNCOptions.h"\
+	".\vncviewer.h"\
+	".\VNCviewerApp.h"\
+	
+NODEP_CPP_CLIENTCONNECTION=\
+	".\omnithreadce.h"\
+	
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
@@ -703,6 +1268,45 @@ SOURCE=ClientConnectionTight.cpp
 # Begin Source File
 
 SOURCE=ClientConnectionUltra.cpp
+DEP_CPP_CLIENTCONNECTIONU=\
+	"..\libjpeg\jconfig.h"\
+	"..\libjpeg\jerror.h"\
+	"..\libjpeg\jmorecfg.h"\
+	"..\libjpeg\jpegint.h"\
+	"..\libjpeg\jpeglib.h"\
+	"..\lzo\lzoconf.h"\
+	"..\lzo\lzodefs.h"\
+	"..\lzo\minilzo.h"\
+	"..\rdr\types.h"\
+	"..\rfb\rfbproto.h"\
+	"..\ZipUnZip32\ZipUnZip32.h"\
+	"..\zlib\zconf.h"\
+	"..\zlib\zlib.h"\
+	".\AccelKeys.h"\
+	".\ClientConnection.h"\
+	".\FileTransfer.h"\
+	".\FullScreenTitleBar.h"\
+	".\FullScreenTitleBarConst.h"\
+	".\KeyMap.h"\
+	".\KeyMapjap.h"\
+	".\keysym.h"\
+	".\keysymdef.h"\
+	".\keysymdefjap.h"\
+	".\Log.h"\
+	".\MRU.h"\
+	".\multimon.h"\
+	".\omnithread\nt.h"\
+	".\omnithread\omnithread.h"\
+	".\rfb.h"\
+	".\stdhdrs.h"\
+	".\TextChat.h"\
+	".\VNCOptions.h"\
+	".\vncviewer.h"\
+	".\VNCviewerApp.h"\
+	
+NODEP_CPP_CLIENTCONNECTIONU=\
+	".\omnithreadce.h"\
+	
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
@@ -726,6 +1330,42 @@ SOURCE=ClientConnectionUltra.cpp
 # Begin Source File
 
 SOURCE=ClientConnectionZlib.cpp
+DEP_CPP_CLIENTCONNECTIONZ=\
+	"..\libjpeg\jconfig.h"\
+	"..\libjpeg\jerror.h"\
+	"..\libjpeg\jmorecfg.h"\
+	"..\libjpeg\jpegint.h"\
+	"..\libjpeg\jpeglib.h"\
+	"..\rdr\types.h"\
+	"..\rfb\rfbproto.h"\
+	"..\ZipUnZip32\ZipUnZip32.h"\
+	"..\zlib\zconf.h"\
+	"..\zlib\zlib.h"\
+	".\AccelKeys.h"\
+	".\ClientConnection.h"\
+	".\FileTransfer.h"\
+	".\FullScreenTitleBar.h"\
+	".\FullScreenTitleBarConst.h"\
+	".\KeyMap.h"\
+	".\KeyMapjap.h"\
+	".\keysym.h"\
+	".\keysymdef.h"\
+	".\keysymdefjap.h"\
+	".\Log.h"\
+	".\MRU.h"\
+	".\multimon.h"\
+	".\omnithread\nt.h"\
+	".\omnithread\omnithread.h"\
+	".\rfb.h"\
+	".\stdhdrs.h"\
+	".\TextChat.h"\
+	".\VNCOptions.h"\
+	".\vncviewer.h"\
+	".\VNCviewerApp.h"\
+	
+NODEP_CPP_CLIENTCONNECTIONZ=\
+	".\omnithreadce.h"\
+	
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
@@ -749,6 +1389,45 @@ SOURCE=ClientConnectionZlib.cpp
 # Begin Source File
 
 SOURCE=ClientConnectionZlibHex.cpp
+DEP_CPP_CLIENTCONNECTIONZL=\
+	"..\libjpeg\jconfig.h"\
+	"..\libjpeg\jerror.h"\
+	"..\libjpeg\jmorecfg.h"\
+	"..\libjpeg\jpegint.h"\
+	"..\libjpeg\jpeglib.h"\
+	"..\lzo\lzoconf.h"\
+	"..\lzo\lzodefs.h"\
+	"..\lzo\minilzo.h"\
+	"..\rdr\types.h"\
+	"..\rfb\rfbproto.h"\
+	"..\ZipUnZip32\ZipUnZip32.h"\
+	"..\zlib\zconf.h"\
+	"..\zlib\zlib.h"\
+	".\AccelKeys.h"\
+	".\ClientConnection.h"\
+	".\FileTransfer.h"\
+	".\FullScreenTitleBar.h"\
+	".\FullScreenTitleBarConst.h"\
+	".\KeyMap.h"\
+	".\KeyMapjap.h"\
+	".\keysym.h"\
+	".\keysymdef.h"\
+	".\keysymdefjap.h"\
+	".\Log.h"\
+	".\MRU.h"\
+	".\multimon.h"\
+	".\omnithread\nt.h"\
+	".\omnithread\omnithread.h"\
+	".\rfb.h"\
+	".\stdhdrs.h"\
+	".\TextChat.h"\
+	".\VNCOptions.h"\
+	".\vncviewer.h"\
+	".\VNCviewerApp.h"\
+	
+NODEP_CPP_CLIENTCONNECTIONZL=\
+	".\omnithreadce.h"\
+	
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
@@ -776,6 +1455,9 @@ SOURCE=COPYING.txt
 # Begin Source File
 
 SOURCE=d3des.c
+DEP_CPP_D3DES=\
+	".\d3des.h"\
+	
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
@@ -803,6 +1485,46 @@ SOURCE=d3des.h
 # Begin Source File
 
 SOURCE=Daemon.cpp
+DEP_CPP_DAEMO=\
+	"..\common\win32_helpers.h"\
+	"..\libjpeg\jconfig.h"\
+	"..\libjpeg\jerror.h"\
+	"..\libjpeg\jmorecfg.h"\
+	"..\libjpeg\jpegint.h"\
+	"..\libjpeg\jpeglib.h"\
+	"..\rdr\types.h"\
+	"..\rfb\rfbproto.h"\
+	"..\ZipUnZip32\ZipUnZip32.h"\
+	"..\zlib\zconf.h"\
+	"..\zlib\zlib.h"\
+	".\AboutBox.h"\
+	".\AccelKeys.h"\
+	".\ClientConnection.h"\
+	".\Daemon.h"\
+	".\Exception.h"\
+	".\FileTransfer.h"\
+	".\FullScreenTitleBar.h"\
+	".\FullScreenTitleBarConst.h"\
+	".\KeyMap.h"\
+	".\KeyMapjap.h"\
+	".\keysym.h"\
+	".\keysymdef.h"\
+	".\keysymdefjap.h"\
+	".\Log.h"\
+	".\MRU.h"\
+	".\multimon.h"\
+	".\omnithread\nt.h"\
+	".\omnithread\omnithread.h"\
+	".\rfb.h"\
+	".\stdhdrs.h"\
+	".\TextChat.h"\
+	".\VNCOptions.h"\
+	".\vncviewer.h"\
+	".\VNCviewerApp.h"\
+	
+NODEP_CPP_DAEMO=\
+	".\omnithreadce.h"\
+	
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
@@ -830,6 +1552,9 @@ SOURCE=Daemon.h
 # Begin Source File
 
 SOURCE=..\rfb\dh.cpp
+DEP_CPP_DH_CP=\
+	"..\rfb\dh.h"\
+	
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
@@ -857,6 +1582,14 @@ SOURCE=..\rfb\dh.h
 # Begin Source File
 
 SOURCE=..\DSMPlugin\DSMPlugin.cpp
+DEP_CPP_DSMPL=\
+	"..\DSMPlugin\DSMPlugin.h"\
+	".\omnithread\nt.h"\
+	".\omnithread\omnithread.h"\
+	
+NODEP_CPP_DSMPL=\
+	"..\DSMPlugin\omnithreadce.h"\
+	
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
@@ -884,6 +1617,13 @@ SOURCE=..\DSMPlugin\DSMPlugin.h
 # Begin Source File
 
 SOURCE=Exception.cpp
+DEP_CPP_EXCEP=\
+	"..\rfb\rfbproto.h"\
+	".\Exception.h"\
+	".\messbox.h"\
+	".\rfb.h"\
+	".\stdhdrs.h"\
+	
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
@@ -911,6 +1651,44 @@ SOURCE=Exception.h
 # Begin Source File
 
 SOURCE=FileTransfer.cpp
+DEP_CPP_FILET=\
+	"..\common\win32_helpers.h"\
+	"..\libjpeg\jconfig.h"\
+	"..\libjpeg\jerror.h"\
+	"..\libjpeg\jmorecfg.h"\
+	"..\libjpeg\jpegint.h"\
+	"..\libjpeg\jpeglib.h"\
+	"..\rdr\types.h"\
+	"..\rfb\rfbproto.h"\
+	"..\ZipUnZip32\ZipUnZip32.h"\
+	"..\zlib\zconf.h"\
+	"..\zlib\zlib.h"\
+	".\AccelKeys.h"\
+	".\ClientConnection.h"\
+	".\Exception.h"\
+	".\FileTransfer.h"\
+	".\FullScreenTitleBar.h"\
+	".\FullScreenTitleBarConst.h"\
+	".\KeyMap.h"\
+	".\KeyMapjap.h"\
+	".\keysym.h"\
+	".\keysymdef.h"\
+	".\keysymdefjap.h"\
+	".\Log.h"\
+	".\MRU.h"\
+	".\multimon.h"\
+	".\omnithread\nt.h"\
+	".\omnithread\omnithread.h"\
+	".\rfb.h"\
+	".\stdhdrs.h"\
+	".\TextChat.h"\
+	".\VNCOptions.h"\
+	".\vncviewer.h"\
+	".\VNCviewerApp.h"\
+	
+NODEP_CPP_FILET=\
+	".\omnithreadce.h"\
+	
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
@@ -937,34 +1715,17 @@ SOURCE=FileTransfer.h
 # End Source File
 # Begin Source File
 
-SOURCE=Flasher.cpp
-
-!IF  "$(CFG)" == "vncviewer - Win32 Debug"
-
-# ADD CPP /nologo /GX /GZ
-
-!ELSEIF  "$(CFG)" == "vncviewer - x64 Debug"
-
-# ADD CPP /nologo /GX /GZ
-
-!ELSEIF  "$(CFG)" == "vncviewer - Win32 Release"
-
-# ADD CPP /nologo /GX
-
-!ELSEIF  "$(CFG)" == "vncviewer - x64 Release"
-
-# ADD CPP /nologo /GX
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=Flasher.h
-# End Source File
-# Begin Source File
-
 SOURCE=FullScreenTitleBar.cpp
+DEP_CPP_FULLS=\
+	"..\common\win32_helpers.h"\
+	"..\rfb\rfbproto.h"\
+	".\FullScreenTitleBar.h"\
+	".\FullScreenTitleBarConst.h"\
+	".\Log.h"\
+	".\multimon.h"\
+	".\rfb.h"\
+	".\stdhdrs.h"\
+	
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
@@ -1000,6 +1761,42 @@ SOURCE=History.txt
 # Begin Source File
 
 SOURCE=KeyMap.cpp
+DEP_CPP_KEYMA=\
+	"..\libjpeg\jconfig.h"\
+	"..\libjpeg\jerror.h"\
+	"..\libjpeg\jmorecfg.h"\
+	"..\libjpeg\jpegint.h"\
+	"..\libjpeg\jpeglib.h"\
+	"..\rdr\types.h"\
+	"..\rfb\rfbproto.h"\
+	"..\ZipUnZip32\ZipUnZip32.h"\
+	"..\zlib\zconf.h"\
+	"..\zlib\zlib.h"\
+	".\AccelKeys.h"\
+	".\ClientConnection.h"\
+	".\FileTransfer.h"\
+	".\FullScreenTitleBar.h"\
+	".\FullScreenTitleBarConst.h"\
+	".\KeyMap.h"\
+	".\KeyMapjap.h"\
+	".\keysym.h"\
+	".\keysymdef.h"\
+	".\keysymdefjap.h"\
+	".\Log.h"\
+	".\MRU.h"\
+	".\multimon.h"\
+	".\omnithread\nt.h"\
+	".\omnithread\omnithread.h"\
+	".\rfb.h"\
+	".\stdhdrs.h"\
+	".\TextChat.h"\
+	".\VNCOptions.h"\
+	".\vncviewer.h"\
+	".\VNCviewerApp.h"\
+	
+NODEP_CPP_KEYMA=\
+	".\omnithreadce.h"\
+	
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
@@ -1027,6 +1824,42 @@ SOURCE=KeyMap.h
 # Begin Source File
 
 SOURCE=.\KeyMapjap.cpp
+DEP_CPP_KEYMAP=\
+	"..\libjpeg\jconfig.h"\
+	"..\libjpeg\jerror.h"\
+	"..\libjpeg\jmorecfg.h"\
+	"..\libjpeg\jpegint.h"\
+	"..\libjpeg\jpeglib.h"\
+	"..\rdr\types.h"\
+	"..\rfb\rfbproto.h"\
+	"..\ZipUnZip32\ZipUnZip32.h"\
+	"..\zlib\zconf.h"\
+	"..\zlib\zlib.h"\
+	".\AccelKeys.h"\
+	".\ClientConnection.h"\
+	".\FileTransfer.h"\
+	".\FullScreenTitleBar.h"\
+	".\FullScreenTitleBarConst.h"\
+	".\KeyMap.h"\
+	".\KeyMapjap.h"\
+	".\keysym.h"\
+	".\keysymdef.h"\
+	".\keysymdefjap.h"\
+	".\Log.h"\
+	".\MRU.h"\
+	".\multimon.h"\
+	".\omnithread\nt.h"\
+	".\omnithread\omnithread.h"\
+	".\rfb.h"\
+	".\stdhdrs.h"\
+	".\TextChat.h"\
+	".\VNCOptions.h"\
+	".\vncviewer.h"\
+	".\VNCviewerApp.h"\
+	
+NODEP_CPP_KEYMAP=\
+	".\omnithreadce.h"\
+	
 # End Source File
 # Begin Source File
 
@@ -1047,6 +1880,12 @@ SOURCE=LICENCE.txt
 # Begin Source File
 
 SOURCE=Log.cpp
+DEP_CPP_LOG_C=\
+	"..\rfb\rfbproto.h"\
+	".\Log.h"\
+	".\rfb.h"\
+	".\stdhdrs.h"\
+	
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
@@ -1074,6 +1913,10 @@ SOURCE=Log.h
 # Begin Source File
 
 SOURCE=LowLevelHook.cpp
+DEP_CPP_LOWLE=\
+	"..\common\win32_helpers.h"\
+	".\LowLevelHook.h"\
+	
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
@@ -1101,10 +1944,54 @@ SOURCE=LowLevelHook.h
 # Begin Source File
 
 SOURCE=.\MessBox2.cpp
+DEP_CPP_MESSB=\
+	"..\libjpeg\jconfig.h"\
+	"..\libjpeg\jerror.h"\
+	"..\libjpeg\jmorecfg.h"\
+	"..\libjpeg\jpegint.h"\
+	"..\libjpeg\jpeglib.h"\
+	"..\rdr\types.h"\
+	"..\rfb\rfbproto.h"\
+	"..\ZipUnZip32\ZipUnZip32.h"\
+	"..\zlib\zconf.h"\
+	"..\zlib\zlib.h"\
+	".\AccelKeys.h"\
+	".\ClientConnection.h"\
+	".\FileTransfer.h"\
+	".\FullScreenTitleBar.h"\
+	".\FullScreenTitleBarConst.h"\
+	".\KeyMap.h"\
+	".\KeyMapjap.h"\
+	".\keysym.h"\
+	".\keysymdef.h"\
+	".\keysymdefjap.h"\
+	".\Log.h"\
+	".\MRU.h"\
+	".\multimon.h"\
+	".\omnithread\nt.h"\
+	".\omnithread\omnithread.h"\
+	".\rfb.h"\
+	".\stdhdrs.h"\
+	".\TextChat.h"\
+	".\VNCOptions.h"\
+	".\vncviewer.h"\
+	".\VNCviewerApp.h"\
+	
+NODEP_CPP_MESSB=\
+	".\omnithreadce.h"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=..\lzo\minilzo.c
+DEP_CPP_MINIL=\
+	"..\lzo\lzoconf.h"\
+	"..\lzo\lzodefs.h"\
+	"..\lzo\minilzo.h"\
+	
+NODEP_CPP_MINIL=\
+	"..\lzo\lzo\lzo1x.h"\
+	
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
@@ -1128,6 +2015,9 @@ SOURCE=..\lzo\minilzo.c
 # Begin Source File
 
 SOURCE=MRU.cpp
+DEP_CPP_MRU_C=\
+	".\MRU.h"\
+	
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
@@ -1163,6 +2053,47 @@ SOURCE=rfb.h
 # Begin Source File
 
 SOURCE=SessionDialog.cpp
+DEP_CPP_SESSI=\
+	"..\common\win32_helpers.h"\
+	"..\DSMPlugin\DSMPlugin.h"\
+	"..\libjpeg\jconfig.h"\
+	"..\libjpeg\jerror.h"\
+	"..\libjpeg\jmorecfg.h"\
+	"..\libjpeg\jpegint.h"\
+	"..\libjpeg\jpeglib.h"\
+	"..\rdr\types.h"\
+	"..\rfb\rfbproto.h"\
+	"..\ZipUnZip32\ZipUnZip32.h"\
+	"..\zlib\zconf.h"\
+	"..\zlib\zlib.h"\
+	".\AccelKeys.h"\
+	".\ClientConnection.h"\
+	".\Exception.h"\
+	".\FileTransfer.h"\
+	".\FullScreenTitleBar.h"\
+	".\FullScreenTitleBarConst.h"\
+	".\KeyMap.h"\
+	".\KeyMapjap.h"\
+	".\keysym.h"\
+	".\keysymdef.h"\
+	".\keysymdefjap.h"\
+	".\Log.h"\
+	".\MRU.h"\
+	".\multimon.h"\
+	".\omnithread\nt.h"\
+	".\omnithread\omnithread.h"\
+	".\rfb.h"\
+	".\SessionDialog.h"\
+	".\stdhdrs.h"\
+	".\TextChat.h"\
+	".\VNCOptions.h"\
+	".\vncviewer.h"\
+	".\VNCviewerApp.h"\
+	
+NODEP_CPP_SESSI=\
+	"..\DSMPlugin\omnithreadce.h"\
+	".\omnithreadce.h"\
+	
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
@@ -1190,6 +2121,11 @@ SOURCE=SessionDialog.h
 # Begin Source File
 
 SOURCE=stdhdrs.cpp
+DEP_CPP_STDHD=\
+	"..\rfb\rfbproto.h"\
+	".\rfb.h"\
+	".\stdhdrs.h"\
+	
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
@@ -1217,6 +2153,45 @@ SOURCE=stdhdrs.h
 # Begin Source File
 
 SOURCE=TextChat.cpp
+DEP_CPP_TEXTC=\
+	"..\common\win32_helpers.h"\
+	"..\libjpeg\jconfig.h"\
+	"..\libjpeg\jerror.h"\
+	"..\libjpeg\jmorecfg.h"\
+	"..\libjpeg\jpegint.h"\
+	"..\libjpeg\jpeglib.h"\
+	"..\rdr\Exception.h"\
+	"..\rdr\types.h"\
+	"..\rfb\rfbproto.h"\
+	"..\ZipUnZip32\ZipUnZip32.h"\
+	"..\zlib\zconf.h"\
+	"..\zlib\zlib.h"\
+	".\AccelKeys.h"\
+	".\ClientConnection.h"\
+	".\Exception.h"\
+	".\FileTransfer.h"\
+	".\FullScreenTitleBar.h"\
+	".\FullScreenTitleBarConst.h"\
+	".\KeyMap.h"\
+	".\KeyMapjap.h"\
+	".\keysym.h"\
+	".\keysymdef.h"\
+	".\keysymdefjap.h"\
+	".\Log.h"\
+	".\MRU.h"\
+	".\multimon.h"\
+	".\omnithread\nt.h"\
+	".\omnithread\omnithread.h"\
+	".\rfb.h"\
+	".\stdhdrs.h"\
+	".\TextChat.h"\
+	".\VNCOptions.h"\
+	".\vncviewer.h"\
+	".\VNCviewerApp.h"\
+	
+NODEP_CPP_TEXTC=\
+	".\omnithreadce.h"\
+	
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
@@ -1248,6 +2223,13 @@ SOURCE=ToDo.txt
 # Begin Source File
 
 SOURCE=vncauth.c
+DEP_CPP_VNCAU=\
+	"..\rfb\rfbproto.h"\
+	".\d3des.h"\
+	".\rfb.h"\
+	".\stdhdrs.h"\
+	".\vncauth.h"\
+	
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
@@ -1275,6 +2257,44 @@ SOURCE=vncauth.h
 # Begin Source File
 
 SOURCE=VNCOptions.cpp
+DEP_CPP_VNCOP=\
+	"..\common\win32_helpers.h"\
+	"..\libjpeg\jconfig.h"\
+	"..\libjpeg\jerror.h"\
+	"..\libjpeg\jmorecfg.h"\
+	"..\libjpeg\jpegint.h"\
+	"..\libjpeg\jpeglib.h"\
+	"..\rdr\types.h"\
+	"..\rfb\rfbproto.h"\
+	"..\ZipUnZip32\ZipUnZip32.h"\
+	"..\zlib\zconf.h"\
+	"..\zlib\zlib.h"\
+	".\AccelKeys.h"\
+	".\ClientConnection.h"\
+	".\Exception.h"\
+	".\FileTransfer.h"\
+	".\FullScreenTitleBar.h"\
+	".\FullScreenTitleBarConst.h"\
+	".\KeyMap.h"\
+	".\KeyMapjap.h"\
+	".\keysym.h"\
+	".\keysymdef.h"\
+	".\keysymdefjap.h"\
+	".\Log.h"\
+	".\MRU.h"\
+	".\multimon.h"\
+	".\omnithread\nt.h"\
+	".\omnithread\omnithread.h"\
+	".\rfb.h"\
+	".\stdhdrs.h"\
+	".\TextChat.h"\
+	".\VNCOptions.h"\
+	".\vncviewer.h"\
+	".\VNCviewerApp.h"\
+	
+NODEP_CPP_VNCOP=\
+	".\omnithreadce.h"\
+	
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
@@ -1302,6 +2322,46 @@ SOURCE=VNCOptions.h
 # Begin Source File
 
 SOURCE=vncviewer.cpp
+DEP_CPP_VNCVI=\
+	"..\..\..\..\crash\crashrpt\include\crashrpt.h"\
+	"..\libjpeg\jconfig.h"\
+	"..\libjpeg\jerror.h"\
+	"..\libjpeg\jmorecfg.h"\
+	"..\libjpeg\jpegint.h"\
+	"..\libjpeg\jpeglib.h"\
+	"..\rdr\types.h"\
+	"..\rfb\rfbproto.h"\
+	"..\ZipUnZip32\ZipUnZip32.h"\
+	"..\zlib\zconf.h"\
+	"..\zlib\zlib.h"\
+	".\AccelKeys.h"\
+	".\ClientConnection.h"\
+	".\Daemon.h"\
+	".\Exception.h"\
+	".\FileTransfer.h"\
+	".\FullScreenTitleBar.h"\
+	".\FullScreenTitleBarConst.h"\
+	".\KeyMap.h"\
+	".\KeyMapjap.h"\
+	".\keysym.h"\
+	".\keysymdef.h"\
+	".\keysymdefjap.h"\
+	".\Log.h"\
+	".\MRU.h"\
+	".\multimon.h"\
+	".\omnithread\nt.h"\
+	".\omnithread\omnithread.h"\
+	".\rfb.h"\
+	".\stdhdrs.h"\
+	".\TextChat.h"\
+	".\VNCOptions.h"\
+	".\vncviewer.h"\
+	".\VNCviewerApp.h"\
+	".\VNCviewerApp32.h"\
+	
+NODEP_CPP_VNCVI=\
+	".\omnithreadce.h"\
+	
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
@@ -1335,6 +2395,43 @@ SOURCE=res\vncviewer.rc
 # Begin Source File
 
 SOURCE=VNCviewerApp.cpp
+DEP_CPP_VNCVIE=\
+	"..\libjpeg\jconfig.h"\
+	"..\libjpeg\jerror.h"\
+	"..\libjpeg\jmorecfg.h"\
+	"..\libjpeg\jpegint.h"\
+	"..\libjpeg\jpeglib.h"\
+	"..\rdr\types.h"\
+	"..\rfb\rfbproto.h"\
+	"..\ZipUnZip32\ZipUnZip32.h"\
+	"..\zlib\zconf.h"\
+	"..\zlib\zlib.h"\
+	".\AccelKeys.h"\
+	".\ClientConnection.h"\
+	".\Exception.h"\
+	".\FileTransfer.h"\
+	".\FullScreenTitleBar.h"\
+	".\FullScreenTitleBarConst.h"\
+	".\KeyMap.h"\
+	".\KeyMapjap.h"\
+	".\keysym.h"\
+	".\keysymdef.h"\
+	".\keysymdefjap.h"\
+	".\Log.h"\
+	".\MRU.h"\
+	".\multimon.h"\
+	".\omnithread\nt.h"\
+	".\omnithread\omnithread.h"\
+	".\rfb.h"\
+	".\stdhdrs.h"\
+	".\TextChat.h"\
+	".\VNCOptions.h"\
+	".\vncviewer.h"\
+	".\VNCviewerApp.h"\
+	
+NODEP_CPP_VNCVIE=\
+	".\omnithreadce.h"\
+	
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
@@ -1362,6 +2459,45 @@ SOURCE=VNCviewerApp.h
 # Begin Source File
 
 SOURCE=VNCviewerApp32.cpp
+DEP_CPP_VNCVIEW=\
+	"..\libjpeg\jconfig.h"\
+	"..\libjpeg\jerror.h"\
+	"..\libjpeg\jmorecfg.h"\
+	"..\libjpeg\jpegint.h"\
+	"..\libjpeg\jpeglib.h"\
+	"..\rdr\types.h"\
+	"..\rfb\rfbproto.h"\
+	"..\ZipUnZip32\ZipUnZip32.h"\
+	"..\zlib\zconf.h"\
+	"..\zlib\zlib.h"\
+	".\AccelKeys.h"\
+	".\ClientConnection.h"\
+	".\Daemon.h"\
+	".\Exception.h"\
+	".\FileTransfer.h"\
+	".\FullScreenTitleBar.h"\
+	".\FullScreenTitleBarConst.h"\
+	".\KeyMap.h"\
+	".\KeyMapjap.h"\
+	".\keysym.h"\
+	".\keysymdef.h"\
+	".\keysymdefjap.h"\
+	".\Log.h"\
+	".\MRU.h"\
+	".\multimon.h"\
+	".\omnithread\nt.h"\
+	".\omnithread\omnithread.h"\
+	".\rfb.h"\
+	".\stdhdrs.h"\
+	".\TextChat.h"\
+	".\VNCOptions.h"\
+	".\vncviewer.h"\
+	".\VNCviewerApp.h"\
+	".\VNCviewerApp32.h"\
+	
+NODEP_CPP_VNCVIEW=\
+	".\omnithreadce.h"\
+	
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
@@ -1389,6 +2525,9 @@ SOURCE=VNCviewerApp32.h
 # Begin Source File
 
 SOURCE=..\common\win32_helpers.cpp
+DEP_CPP_WIN32=\
+	"..\common\win32_helpers.h"\
+	
 # End Source File
 # Begin Source File
 
@@ -1397,6 +2536,60 @@ SOURCE=..\common\win32_helpers.h
 # Begin Source File
 
 SOURCE=..\ZipUnZip32\ZipUnzip32.cpp
+DEP_CPP_ZIPUN=\
+	"..\ZipUnZip32\ZipUnZip32.h"\
+	"..\zipunzip_src\unzip\globals.h"\
+	"..\zipunzip_src\unzip\unzip.h"\
+	"..\zipunzip_src\unzip\unzpriv.h"\
+	"..\zipunzip_src\unzip\win32\rsxntwin.h"\
+	"..\zipunzip_src\unzip\win32\w32cfg.h"\
+	"..\zipunzip_src\unzip\windll\structs.h"\
+	"..\zipunzip_src\zip20\api.h"\
+	"..\zipunzip_src\zip20\tailor.h"\
+	"..\zipunzip_src\zip20\win32\osdep.h"\
+	"..\zipunzip_src\zip20\zip.h"\
+	"..\zipunzip_src\zip20\ziperr.h"\
+	
+NODEP_CPP_ZIPUN=\
+	"..\zipunzip_src\unzip\acorn\riscos.h"\
+	"..\zipunzip_src\unzip\amiga\amiga.h"\
+	"..\zipunzip_src\unzip\aosvs\aosvs.h"\
+	"..\zipunzip_src\unzip\atheos\athcfg.h"\
+	"..\zipunzip_src\unzip\beos\beocfg.h"\
+	"..\zipunzip_src\unzip\flexos\flxcfg.h"\
+	"..\zipunzip_src\unzip\maccfg.h"\
+	"..\zipunzip_src\unzip\msdos\doscfg.h"\
+	"..\zipunzip_src\unzip\novell\nlmcfg.h"\
+	"..\zipunzip_src\unzip\os2\os2cfg.h"\
+	"..\zipunzip_src\unzip\os2\os2data.h"\
+	"..\zipunzip_src\unzip\qdos\izqdos.h"\
+	"..\zipunzip_src\unzip\tandem.h"\
+	"..\zipunzip_src\unzip\theos\thscfg.h"\
+	"..\zipunzip_src\unzip\unix\unxcfg.h"\
+	"..\zipunzip_src\unzip\vmmvs.h"\
+	"..\zipunzip_src\unzip\wince\punzip.h"\
+	"..\zipunzip_src\unzip\wince\wcecfg.h"\
+	"..\zipunzip_src\unzip\zlib.h"\
+	"..\zipunzip_src\zip20\acorn\osdep.h"\
+	"..\zipunzip_src\zip20\amiga\osdep.h"\
+	"..\zipunzip_src\zip20\aosvs\osdep.h"\
+	"..\zipunzip_src\zip20\atari\osdep.h"\
+	"..\zipunzip_src\zip20\atheos\osdep.h"\
+	"..\zipunzip_src\zip20\beos\osdep.h"\
+	"..\zipunzip_src\zip20\cmsmvs.h"\
+	"..\zipunzip_src\zip20\human68k\osdep.h"\
+	"..\zipunzip_src\zip20\macos\osdep.h"\
+	"..\zipunzip_src\zip20\msdos\osdep.h"\
+	"..\zipunzip_src\zip20\os2\osdep.h"\
+	"..\zipunzip_src\zip20\qdos\osdep.h"\
+	"..\zipunzip_src\zip20\tandem.h"\
+	"..\zipunzip_src\zip20\tanzip.h"\
+	"..\zipunzip_src\zip20\theos\osdep.h"\
+	"..\zipunzip_src\zip20\tops20\osdep.h"\
+	"..\zipunzip_src\zip20\unix\osdep.h"\
+	"..\zipunzip_src\zip20\vms\osdep.h"\
+	"..\zipunzip_src\zip20\zlib.h"\
+	
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 
@@ -1424,6 +2617,48 @@ SOURCE=..\ZipUnZip32\ZipUnZip32.h
 # Begin Source File
 
 SOURCE=zrle.cpp
+DEP_CPP_ZRLE_=\
+	"..\libjpeg\jconfig.h"\
+	"..\libjpeg\jerror.h"\
+	"..\libjpeg\jmorecfg.h"\
+	"..\libjpeg\jpegint.h"\
+	"..\libjpeg\jpeglib.h"\
+	"..\rdr\Exception.h"\
+	"..\rdr\FdInStream.h"\
+	"..\rdr\InStream.h"\
+	"..\rdr\types.h"\
+	"..\rdr\ZlibInStream.h"\
+	"..\rfb\rfbproto.h"\
+	"..\rfb\zrledecode.h"\
+	"..\rfb\zywrletemplate.c"\
+	"..\ZipUnZip32\ZipUnZip32.h"\
+	"..\zlib\zconf.h"\
+	"..\zlib\zlib.h"\
+	".\AccelKeys.h"\
+	".\ClientConnection.h"\
+	".\FileTransfer.h"\
+	".\FullScreenTitleBar.h"\
+	".\FullScreenTitleBarConst.h"\
+	".\KeyMap.h"\
+	".\KeyMapjap.h"\
+	".\keysym.h"\
+	".\keysymdef.h"\
+	".\keysymdefjap.h"\
+	".\Log.h"\
+	".\MRU.h"\
+	".\multimon.h"\
+	".\omnithread\nt.h"\
+	".\omnithread\omnithread.h"\
+	".\rfb.h"\
+	".\stdhdrs.h"\
+	".\TextChat.h"\
+	".\VNCOptions.h"\
+	".\vncviewer.h"\
+	".\VNCviewerApp.h"\
+	
+NODEP_CPP_ZRLE_=\
+	".\omnithreadce.h"\
+	
 
 !IF  "$(CFG)" == "vncviewer - Win32 Debug"
 

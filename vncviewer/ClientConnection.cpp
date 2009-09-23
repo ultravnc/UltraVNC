@@ -602,7 +602,7 @@ void ClientConnection::DoConnection()
 DWORD WINAPI ReconnectThreadProc(LPVOID lpParameter)
 {
 	ClientConnection *cc=(ClientConnection*)lpParameter;
-	Sleep( cc->m_autoReconnect * 1000 );
+	Sleep( cc->m_autoReconnect * 2500 );
 	try
 	{
 		cc->DoConnection();

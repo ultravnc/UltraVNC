@@ -45,7 +45,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="2"
+				Optimization="1"
 				InlineFunctionExpansion="1"
 				AdditionalIncludeDirectories="../../.."
 				PreprocessorDefinitions="NDEBUG;_WINDOWS;WIN32;WINDLL;DLL;UNZIPLIB;USE_EF_UT_TIME;ASM_CRC;_CRT_SECURE_NO_WARNINGS"
@@ -492,6 +492,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
+				FavorSizeOrSpeed="2"
 				AdditionalIncludeDirectories="../../.."
 				PreprocessorDefinitions="NDEBUG;_WINDOWS;WIN32;WINDLL;DLL;UNZIPLIB;USE_EF_UT_TIME;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"

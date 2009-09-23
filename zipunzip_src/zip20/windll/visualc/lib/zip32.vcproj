@@ -187,8 +187,9 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="2"
+				Optimization="1"
 				InlineFunctionExpansion="1"
+				FavorSizeOrSpeed="2"
 				AdditionalIncludeDirectories="..\..\..,..\..\..\win32,..\..\..\windll"
 				PreprocessorDefinitions="NDEBUG;_WINDOWS;WIN32;NO_ASM;WINDLL;MSDOS;USE_ZIPMAIN;ZIPLIB"
 				StringPooling="true"

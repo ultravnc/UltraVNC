@@ -55,6 +55,7 @@ extern HINSTANCE	hInstResDLL;
 typedef void (*vncEditSecurityFn) (HWND hwnd, HINSTANCE hInstance);
 vncEditSecurityFn vncEditSecurity = 0;
 DWORD GetExplorerLogonPid();
+int G_SENDBUFFER=8192;
 
 // Constructor & Destructor
 vncProperties::vncProperties()
@@ -2281,6 +2282,7 @@ void vncProperties::LoadUserPrefsFromIniFile()
 	m_pref_DisableLocalInputs=myIniFile.ReadInt("admin", "LocalInputsDisabled", m_pref_DisableLocalInputs);
 	m_pref_EnableJapInput=myIniFile.ReadInt("admin", "EnableJapInput", m_pref_EnableJapInput);
 	m_pref_clearconsole=myIniFile.ReadInt("admin", "clearconsole", m_pref_clearconsole);
+	G_SENDBUFFER=myIniFile.ReadInt("admin", "sendbuffer", G_SENDBUFFER);
 }
 
 

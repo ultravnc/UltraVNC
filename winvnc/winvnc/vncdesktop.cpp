@@ -1917,6 +1917,10 @@ void vncDesktop::SetSW(int x,int y)
 			}
 			return;
 	}
+	//SW is disabled seems to crash server
+	//until found and fixed we better disabled it to avoid
+	//this
+	return;
 
 	m_Single_hWnd=WindowFromPoint(point);
 
