@@ -36,14 +36,22 @@ public:
         static BOOL Initialize(HWND hwndMain);
         static BOOL Release();
 
+		static DWORD WINAPI HookThreadProc(LPVOID lpParam);
+
 private:
-        static BOOL GetScrollLockState() ;
+		// adzm 2009-09-25 - Different way to check the scroll lock state. Only query if we know it has changed.
+        static BOOL GetCurrentScrollLockState();
+		static BOOL CheckScrollLock();
+        static BOOL  g_fScrollLock;
+        static BOOL  g_fCheckScrollLock;
 
         static LRESULT CALLBACK VncLowLevelKbHookProc(INT nCode, WPARAM wParam, LPARAM lParam);
 
         static HWND g_hwndVNCViewer;
         static DWORD g_VncProcessID;
-        static BOOL  g_fHookActive;
-        static BOOL  g_fGlobalScrollLock;
         static HHOOK g_HookID;
+
+		// adzm 2009-09-25 - Hook installed from separate thread
+		static HANDLE g_hThread;
+		static DWORD g_nThreadID;
 };

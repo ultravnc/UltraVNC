@@ -164,6 +164,11 @@ extern char sz_H102[128];
 #define CB_SETHORIZONTALEXTENT 0x015e
 typedef BOOL (WINAPI *PGETDISKFREESPACEEX)(LPCSTR,PULARGE_INTEGER, PULARGE_INTEGER, PULARGE_INTEGER);
 
+
+#define FT_USE_MMTIMER
+
+static FileTransfer* g_FileTransferSingleton = NULL;
+
 static HWND hFTWnd = 0;
 static std::string make_temp_filename(const char *szRemoteFileName)
 {
@@ -282,6 +287,10 @@ FileTransfer::FileTransfer(VNCviewerApp *pApp, ClientConnection *pCC)
     m_dwLastChunkTime = 0;
     m_maxHistExtent = 0;
 	m_mmRes = -1; 
+	m_timerID = 0xFFFFFFFF;
+
+	// adzm 2009-08-02
+	memset(m_szLastLocalPath, 0, sizeof(m_szLastLocalPath));
 
 	for (int i = 0; i<3; i++)
 	{
@@ -319,38 +328,73 @@ FileTransfer::~FileTransfer()
 
 void FileTransfer::InitFTTimer()
 {
+#ifdef FT_USE_MMTIMER
 	if (m_mmRes != -1) return;
 
 	m_fSendFileChunk = false;
 	m_mmRes = timeSetEvent( 1, 0, (LPTIMECALLBACK)fpTimer, (DWORD)this, TIME_PERIODIC );
+#else
+
+	if (m_timerID != 0xFFFFFFFF) {
+		return;
+	}
+
+	g_FileTransferSingleton = this;
+	m_fSendFileChunk = false;
+	m_timerID = SetTimer(NULL, 0, USER_TIMER_MINIMUM, (TIMERPROC)fpTimerProc);
+#endif
 }
 
 
 void FileTransfer::KillFTTimer()
 {
+#ifdef FT_USE_MMTIMER
 	timeKillEvent(m_mmRes);
 	m_mmRes = -1;
+#else
+	
+	if (m_timerID == 0xFFFFFFFF) {
+		return;
+	}
+
+	KillTimer(NULL, m_timerID);
+	g_FileTransferSingleton = NULL;
+	m_timerID = 0xFFFFFFFF;
+#endif
 }
 
+void CALLBACK FileTransfer::fpTimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
+{
+	if (g_FileTransferSingleton != NULL) {
+		TimerCallback(g_FileTransferSingleton);
+	}
+}
 
 void CALLBACK FileTransfer::fpTimer(UINT uID, UINT uMsg, DWORD dwUser, DWORD dw1, DWORD dw2)
 {
 	FileTransfer* ft = (FileTransfer *) dwUser;
 
+	TimerCallback(ft);
+}
+
+void FileTransfer::TimerCallback(FileTransfer* ft)
+{
 	if (!ft->m_fFileUploadRunning) return;
 
 	if (!ft->m_fSendFileChunk)
 	{
 		ft->m_fSendFileChunk = true;
 
-		ft->m_dwLastChunkTime = timeGetTime();
+		//ft->m_dwLastChunkTime = timeGetTime();
+		ft->m_dwLastChunkTime = GetTickCount();
 
 		SendMessage(ft->m_pCC->m_hwndMain, FileTransferSendPacketMessage, (WPARAM) 0, (LPARAM) 0);
 
 		// sf@2005 - FileTransfer Temporization
 		// - Prevents the windows message stack to be blocked too much when transfering over slow connection
 		// - Gives more priority to screen updates during asynchronous filetransfer
-		long lDelta = timeGetTime() - ft->m_dwLastChunkTime;
+		//long lDelta = timeGetTime() - ft->m_dwLastChunkTime;
+		long lDelta = GetTickCount() - ft->m_dwLastChunkTime;
 		if (lDelta > 200)
 		{
 			//if (lDelta < 3000)
@@ -1063,6 +1107,17 @@ bool FileTransfer::ResolvePossibleShortcutFolder(HWND hWnd, LPSTR szFolder)
 			SetDlgItemText(hWnd, IDC_CURR_LOCAL, szP);
 		}
 		return true;
+	} else {		
+		strcpy(szP, szFolder);
+
+		int len = strlen(szP);
+
+		if (len > 2) {
+			if (GetFileAttributes(szP) & FILE_ATTRIBUTE_DIRECTORY) {
+				SetDlgItemText(hWnd, IDC_CURR_LOCAL, szP);
+				return true;
+			}
+		}
 	}
 	return false;
 }
@@ -1167,7 +1222,7 @@ void FileTransfer::PopulateLocalListBox(HWND hWnd, LPSTR szPath)
 				ofDir[strlen(ofDirT) - 4] = '\0';
 			} //PGM @ Advantig
 		}
-		else
+		else 
 			return;
 
 		GetDlgItemText(hWnd, IDC_CURR_LOCAL, ofDirT, sizeof(ofDirT));
@@ -1185,6 +1240,7 @@ void FileTransfer::PopulateLocalListBox(HWND hWnd, LPSTR szPath)
 			strcat(ofDirT, "\\");
 		SetDlgItemText(hWnd, IDC_CURR_LOCAL, ofDirT);
 	}
+
 	strcpy(ofDir, ofDirT);
 	strcat(ofDir, "*");
 
@@ -1217,6 +1273,13 @@ void FileTransfer::PopulateLocalListBox(HWND hWnd, LPSTR szPath)
 		sprintf(szLocalStatus, sz_H9); 
 		SetDlgItemText(hWnd, IDC_LOCAL_STATUS, szLocalStatus);
 		return;
+	} else {
+		// adzm 2009-08-02
+		lstrcpy(m_szLastLocalPath, ofDir);
+		int len = strlen(m_szLastLocalPath);
+		if (len > 2) { // truncate off the *
+			m_szLastLocalPath[len-1] = '\0';
+		}
 	}
 
 	while (bRet != 0)
@@ -2669,7 +2732,8 @@ bool FileTransfer::SendFile(long lSize, int nLen)
 
 	m_fFileUploadRunning = true;
     m_fFileUploadError = false;
-	m_dwLastChunkTime = timeGetTime();
+	//m_dwLastChunkTime = timeGetTime();
+	m_dwLastChunkTime = GetTickCount();
 	// m_nNotSent = 0;
 	// SendFileChunk();
 	return true;
@@ -3224,7 +3288,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 		{
 			// We have to wait for NetBuf flush
 			// !!!: Not necessary anymore - Pb solved on server side.
-			DWORD lTime = timeGetTime();
+			// DWORD lTime = timeGetTime();
 			// DWORD lLastTime = _this->m_pCC->m_lLastRfbRead;
 			// DWORD lDelta = abs(timeGetTime() - _this->m_pCC->m_lLastRfbRead);
 			if (true/*meGetTime() - _this->m_pCC->m_lLastRfbRead) > 1000 */)
@@ -3326,6 +3390,14 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 
 			// Populate the Local listboxes with local drives
 			_this->ListDrives(hWnd);
+
+			// adzm 2009-08-02 - Still list drives above in case this is incorrect, also to populate the dropdown combo
+			if (lstrlen(_this->m_szLastLocalPath) > 0) { 
+				if (GetFileAttributes(_this->m_szLastLocalPath) & FILE_ATTRIBUTE_DIRECTORY) {
+					// let's try to use the last path
+					_this->PopulateLocalListBox(hWnd, _this->m_szLastLocalPath);
+				}
+			}
 
 			// Populate the remote listboxes with remote drives if allowed by the server
 			if (false/*!_this->m_pCC->m_pEncrypt->IsEncryptionEnabled()*/)

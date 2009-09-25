@@ -77,6 +77,9 @@ public:
 	char				m_szNewFolderButtonLabel[64];
 	char				m_szRenameButtonLabel[64];
 
+	// adzm 2009-08-02
+	char				m_szLastLocalPath[_MAX_PATH];
+
 	__int64				m_nnFileSize;
 	DWORD				m_dwCurrentValue;
 	DWORD				m_dwCurrentPercent;
@@ -122,6 +125,7 @@ public:
 
 	DWORD				m_dwLastChunkTime;
 	MMRESULT			m_mmRes; 
+	UINT				m_timerID;
 
 	bool				bSortDirectionsL[3];
 	bool				bSortDirectionsR[3];
@@ -205,6 +209,8 @@ public:
 	void InitFTTimer();
 	void KillFTTimer();
 	static void CALLBACK fpTimer(UINT uID,	UINT uMsg, DWORD dwUser, DWORD dw1,	DWORD dw2);
+	static void CALLBACK fpTimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
+	static void TimerCallback(FileTransfer* ft);
 
 	static __int64 GetFileSizeFromString(char* szSize);
 	static FILETIME GetFileTimeFromString(char* szFileSystemTime);

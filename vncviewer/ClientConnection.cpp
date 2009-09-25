@@ -1765,6 +1765,7 @@ void ClientConnection::NegotiateProtocolVersion()
    /* if the connection is immediately closed, don't report anything, so
        that pmw's monitor can make test connections */
 
+	bool fNotEncrypted = false;
 	if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L89);
     try
 	{

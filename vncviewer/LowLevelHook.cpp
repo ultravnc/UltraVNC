@@ -31,19 +31,23 @@
 
 HWND LowLevelHook::g_hwndVNCViewer=NULL;
 DWORD LowLevelHook::g_VncProcessID=0;
-BOOL  LowLevelHook::g_fHookActive=FALSE;
+//BOOL  LowLevelHook::g_fHookActive=FALSE;
 HHOOK LowLevelHook::g_HookID=0;
-BOOL  LowLevelHook::g_fGlobalScrollLock=FALSE;
+BOOL  LowLevelHook::g_fCheckScrollLock=TRUE;
+BOOL  LowLevelHook::g_fScrollLock=FALSE;
+HANDLE LowLevelHook::g_hThread=NULL;
+DWORD LowLevelHook::g_nThreadID=0;
 
 BOOL LowLevelHook::Initialize(HWND hwndMain)
 {
         HINSTANCE hInstance = NULL ;
 
         g_hwndVNCViewer = NULL ;
-        g_fHookActive = GetScrollLockState() ;
+        //g_fHookActive = GetCurrentScrollLockState() ;
         g_VncProcessID = 0 ;
         g_HookID = 0 ;
-        g_fGlobalScrollLock = FALSE ;
+		g_fScrollLock=FALSE;
+        g_fCheckScrollLock = TRUE;
 
         //Store our window's handle
         g_hwndVNCViewer = hwndMain;
@@ -64,6 +68,12 @@ BOOL LowLevelHook::Initialize(HWND hwndMain)
         //with keypressed in other processes' windows
         GetWindowThreadProcessId(g_hwndVNCViewer,&g_VncProcessID);
 
+		// adzm 2009-09-25 - Install the hook on a different thread. We recieve the hook callbacks via the message pump, so
+		// by using it on the main connection thread, it could be delayed due to file transfers, etc. So now we have a dedicated
+		// thread that handles the low level keyboard hook.
+		g_hThread = CreateThread(NULL, 0, HookThreadProc, hInstance, 0, &g_nThreadID);
+
+		/*
         //Try to set the hook procedure
         g_HookID = SetWindowsHookEx(WH_KEYBOARD_LL,VncLowLevelKbHookProc,hInstance,0);
         if (g_HookID==0) {
@@ -74,23 +84,92 @@ BOOL LowLevelHook::Initialize(HWND hwndMain)
                 //Analyze why the error occured (might be because we're under Win98/95/ME?)
                 return FALSE ;
         }
+		*/
         
         return TRUE;
 }
 
+// adzm 2009-09-25 - Hook events handled on this thread
+DWORD WINAPI LowLevelHook::HookThreadProc(LPVOID lpParam)
+{	
+	HINSTANCE hInstance = (HINSTANCE)lpParam;
+
+	MSG msg;
+	BOOL bRet;
+
+	// ensure message queue
+	PeekMessage(&msg, NULL, WM_USER, WM_USER, PM_NOREMOVE);
+	
+    //Try to set the hook procedure
+    g_HookID = SetWindowsHookEx(WH_KEYBOARD_LL,VncLowLevelKbHookProc,hInstance,0);
+    if (g_HookID==0) {
+        DWORD dw = GetLastError();
+
+        //TODO:
+        //Analyze why the error occured (might be because we're under Win98/95/ME?)
+        //return FALSE ;
+    }
+
+	while( (bRet = GetMessage( &msg, NULL, 0, 0 )) != 0)
+	{ 
+		if (bRet == -1)
+		{
+			// handle the error and possibly exit
+		} else if (msg.message == WM_USER+1) {
+			PostQuitMessage(0);
+		} else {
+			TranslateMessage(&msg); 
+			DispatchMessage(&msg); 
+		}
+	}
+
+	CloseHandle(g_hThread);
+	g_hThread = NULL;
+
+	return 0;
+}
+
 BOOL LowLevelHook::Release()
 {
+	/*
         if (g_HookID!=0) {
                 return UnhookWindowsHookEx(g_HookID);
         }
         return FALSE;
+	*/
+
+	// adzm 2009-09-25 - Post a message to the thread to terminate
+	if (g_hThread) {
+		PostThreadMessage(g_nThreadID, WM_USER+1, 0, 0);
+		g_nThreadID = 0;
+		g_hThread = NULL;
+	}
+	return FALSE;
 }
 
-BOOL LowLevelHook::GetScrollLockState() 
+BOOL LowLevelHook::GetCurrentScrollLockState() 
 {
+	/*
   BYTE keyState[256];
   GetKeyboardState((LPBYTE)&keyState);
-  return (keyState[VK_SCROLL] & 1);
+  BYTE scrollState = keyState[VK_SCROLL];
+  return (keyState[VK_SCROLL] & 1) ? TRUE : FALSE;
+  */
+
+	// adzm 2009-09-25 - Use GetKeyState rather than GetKeyboardState
+	SHORT keyState = GetKeyState(VK_SCROLL);
+	return (keyState & 1) ? TRUE : FALSE;
+}
+
+// adzm 2009-09-25 - Different way to check the scroll lock state. Only query if we know it has changed.
+BOOL LowLevelHook::CheckScrollLock()
+{
+	if (g_fCheckScrollLock) {
+		g_fScrollLock = GetCurrentScrollLockState();
+		g_fCheckScrollLock = FALSE;
+	}
+
+	return g_fScrollLock;
 }
 
 LRESULT CALLBACK LowLevelHook::VncLowLevelKbHookProc(INT nCode, WPARAM wParam, LPARAM lParam)
@@ -107,21 +186,32 @@ LRESULT CALLBACK LowLevelHook::VncLowLevelKbHookProc(INT nCode, WPARAM wParam, L
 
                 //Get the process ID of the Active Window
                 //(The window with the input focus)
-                GetWindowThreadProcessId(GetFocus(),&ProcessID);
+				//HWND hwndCurrent = GetFocus();
+				// adzm 2009-09-25 - GetFocus can return NULL even if a window is in the foreground.
+				HWND hwndCurrent = GetForegroundWindow();
+                GetWindowThreadProcessId(hwndCurrent,&ProcessID);
+
+                fKeyDown = ( (wParam==WM_KEYDOWN) || (wParam==WM_SYSKEYDOWN) );
+
+				// adzm 2009-09-25 - We want to know if scroll lock was pressed regardless whether the VNC window
+				// is the current foreground window. Set a flag to ensure the state is checked next time we ask.
+				if (pkbdllhook->vkCode == VK_SCROLL) {
+                    if (!fKeyDown) {
+						g_fCheckScrollLock = TRUE;
+                    }
+				}
 
                 //only if this is "our" process (vncviewer's process)
                 //we should intecept the key-presses
+				// adzm 2009-09-25 - Call CheckScrollLock() which will query the scroll lock state if necessary
                 if (ProcessID==g_VncProcessID) {
-
-                        fKeyDown = ( (wParam==WM_KEYDOWN) || (wParam==WM_SYSKEYDOWN) );
-
                         switch (pkbdllhook->vkCode)
                         {
                                 //Print Screen Key 
                                 //      Request Full screen Update
                                 //      Simulate a "Request Refresh" from the System Menu
                         case VK_SNAPSHOT:
-                                if (fKeyDown && g_fHookActive) {
+                                if (fKeyDown && CheckScrollLock()) {
                                         PostMessage(g_hwndVNCViewer,WM_SYSCOMMAND,ID_REQUEST_REFRESH,0);
                                         fHandled = TRUE;
                                 }
@@ -131,7 +221,7 @@ LRESULT CALLBACK LowLevelHook::VncLowLevelKbHookProc(INT nCode, WPARAM wParam, L
                                 //      Toggle FullScreen On/Off
                                 //      Simulate a "FullScreen" from the System Menu
                         case VK_PAUSE:
-                                if (fKeyDown && g_fHookActive) {
+                                if (fKeyDown && CheckScrollLock()) {
                                         PostMessage(g_hwndVNCViewer,WM_SYSCOMMAND,ID_FULLSCREEN,0);
                                         fHandled = TRUE;
                                 }
@@ -142,7 +232,7 @@ LRESULT CALLBACK LowLevelHook::VncLowLevelKbHookProc(INT nCode, WPARAM wParam, L
                                 //      Simulate a "Send CONTROL up/down" from the System Menu
                         case VK_LCONTROL:
                         case VK_RCONTROL:
-                                if (g_fHookActive) {
+                                if (CheckScrollLock()) {
                                         if(fKeyDown)
                                                 PostMessage(g_hwndVNCViewer,WM_SYSCOMMAND,ID_CONN_CTLDOWN,0);
                                         else
@@ -155,7 +245,7 @@ LRESULT CALLBACK LowLevelHook::VncLowLevelKbHookProc(INT nCode, WPARAM wParam, L
                                 //      Simulate a "Send ALT up/down" from the System Menu
                         case VK_LMENU:
                         case VK_RMENU:
-                                if (g_fHookActive) {
+                                if (CheckScrollLock()) {
                                         if(fKeyDown)
                                                 PostMessage(g_hwndVNCViewer,WM_SYSCOMMAND,ID_CONN_ALTDOWN,0);
                                         else
@@ -164,7 +254,7 @@ LRESULT CALLBACK LowLevelHook::VncLowLevelKbHookProc(INT nCode, WPARAM wParam, L
                                 }
                                 break;
                         case VK_LWIN:
-                                if (g_fHookActive) {
+                                if (CheckScrollLock()) {
                                         if(fKeyDown)
                                                 PostMessage(g_hwndVNCViewer,WM_SYSCOMMAND,ID_VK_LWINDOWN,0);
                                         else
@@ -173,7 +263,7 @@ LRESULT CALLBACK LowLevelHook::VncLowLevelKbHookProc(INT nCode, WPARAM wParam, L
                                 }
                                 break;
 						case VK_RWIN:
-                                if (g_fHookActive) {
+                                if (CheckScrollLock()) {
                                         if(fKeyDown)
                                                 PostMessage(g_hwndVNCViewer,WM_SYSCOMMAND,ID_VK_RWINDOWN,0);
                                         else
@@ -182,7 +272,7 @@ LRESULT CALLBACK LowLevelHook::VncLowLevelKbHookProc(INT nCode, WPARAM wParam, L
                                 }
                                 break;
 						case VK_APPS:
-                                if (g_fHookActive) {
+                                if (CheckScrollLock()) {
                                         if(fKeyDown)
                                                 PostMessage(g_hwndVNCViewer,WM_SYSCOMMAND,ID_VK_APPSDOWN,0);
                                         else
@@ -199,17 +289,19 @@ LRESULT CALLBACK LowLevelHook::VncLowLevelKbHookProc(INT nCode, WPARAM wParam, L
                                 //Windows sets the scroll-lock LED on or off when the user PRESSes the scroll-lock key.
                                 //We'll check the LED state when the user RELEASEs the key, so the LED is already set.
                                 //If the LED/ScrollLock is ON, we'll activate the special key interception.
+								/*
                         case VK_SCROLL:
                                 if (!fKeyDown) {
-                                        g_fHookActive = GetScrollLockState(); 
+                                        g_fHookActive = GetCurrentScrollLockState(); 
                                 }
                                 break;
+								*/
 
 
                                 //SPACEBAR = When key interception is Active, no special handling is required for 'spacebar'.
                                 //But when key interception is turned off, I want ALT+SPACE to open the VNCViewer's System Menu.
                         case VK_SPACE:
-                                if (!g_fHookActive) {
+                                if (!CheckScrollLock()) {
                                         if (pkbdllhook->flags & LLKHF_ALTDOWN) {
                                                 if(!fKeyDown)
                                                         PostMessage(g_hwndVNCViewer,WM_SYSCOMMAND,0xF100,0x20); 
@@ -227,7 +319,7 @@ LRESULT CALLBACK LowLevelHook::VncLowLevelKbHookProc(INT nCode, WPARAM wParam, L
                                 //a TAB key to the VNCServer. so we simulate a TAB key pressed. 
                                 //(The ALT key down was already sent to the VNCServer when the user pressed ALT)
                         case VK_TAB:
-                                if (g_fHookActive) {
+                                if (CheckScrollLock()) {
                                         if (pkbdllhook->flags & LLKHF_ALTDOWN) {
                                                 if(fKeyDown)
                                                         PostMessage(g_hwndVNCViewer,WM_KEYDOWN,VK_TAB,0);
@@ -250,7 +342,7 @@ LRESULT CALLBACK LowLevelHook::VncLowLevelKbHookProc(INT nCode, WPARAM wParam, L
                                 //very well, so for now, we'll just block the ALT+ESCAPE combination.
                                 //(CTRL+ESC work OK, BTW)
                 case VK_ESCAPE:
-                                if (g_fHookActive) {
+                                if (CheckScrollLock()) {
                                         if (pkbdllhook->flags & LLKHF_ALTDOWN) {
                                                 fHandled = TRUE;
                                         }
