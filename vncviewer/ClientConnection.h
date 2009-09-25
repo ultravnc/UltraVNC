@@ -620,6 +620,7 @@ private:
 	HANDLE ThreadSocketTimeout;
 
     bool m_server_wants_keepalives;
+	UINT m_keepalive_timer;
 public:
 	int m_autoReconnect;
 	int reconnectcounter;

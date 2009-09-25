@@ -50,6 +50,8 @@ extern bool G_1111;
 const UINT MENU_ADD_CLIENT_MSG = RegisterWindowMessage("WinVNC.AddClient.Message");
 const UINT MENU_AUTO_RECONNECT_MSG = RegisterWindowMessage("WinVNC.AddAutoClient.Message");
 const UINT MENU_REPEATER_ID_MSG = RegisterWindowMessage("WinVNC.AddRepeaterID.Message");
+// adzm 2009-07-05 - Tray icon balloon tips
+const UINT MENU_TRAYICON_BALLOON_MSG = RegisterWindowMessage("WinVNC.TrayIconBalloon.Message");
  
 
 const UINT FileTransferSendPacketMessage = RegisterWindowMessage("UltraVNC.Viewer.FileTransferSendPacketMessage");
@@ -62,6 +64,8 @@ bool RunningAsAdministrator ();
 extern HINSTANCE	hInstResDLL;
 
 extern bool			fShutdownOrdered;
+
+extern BOOL SPECIAL_SC_PROMPT;
 
 // sf@2007 - WTS notifications stuff
 #define NOTIFY_FOR_THIS_SESSION 0
@@ -198,8 +202,14 @@ vncMenu::vncMenu(vncServer *server)
 	if (pfnFilter) pfnFilter(MENU_ADD_CLIENT_MSG, MSGFLT_ADD);
 	if (pfnFilter) pfnFilter(MENU_AUTO_RECONNECT_MSG, MSGFLT_ADD);
 	if (pfnFilter) pfnFilter(MENU_REPEATER_ID_MSG, MSGFLT_ADD);
+	// adzm 2009-07-05 - Tray icon balloon tips
+	if (pfnFilter) pfnFilter(MENU_TRAYICON_BALLOON_MSG, MSGFLT_ADD);
+
     FreeLibrary (hUser32);
 	
+	// adzm 2009-07-05 - Tray icon balloon tips
+	m_BalloonInfo = NULL;
+	m_BalloonTitle = NULL;
 
 	// Save the server pointer
 	m_server = server;
@@ -399,6 +409,17 @@ vncMenu::vncMenu(vncServer *server)
 vncMenu::~vncMenu()
 {
 	vnclog.Print(LL_INTERR, VNCLOG("vncmenu killed\n"));
+
+	// adzm 2009-07-05 - Tray icon balloon tips
+	if (m_BalloonInfo) {		
+		free(m_BalloonInfo);
+		m_BalloonInfo = NULL;
+	}
+	if (m_BalloonTitle) {
+		free(m_BalloonTitle);
+		m_BalloonTitle = NULL;
+	}
+
 	if (hWTSDll)
 	{
 		WTSUNREGISTERSESSIONNOTIFICATION FunctionWTSUnRegisterSessionNotification;
@@ -543,6 +564,9 @@ void GetIPAddrString(char *buffer, int buflen) {
 void
 vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 {
+	// adzm 2009-07-05
+	omni_mutex_lock sync(m_mutexTrayIcon);
+
 	// Create the tray icon message
 	m_nid.hWnd = m_hwnd;
 	m_nid.cbSize = sizeof(m_nid);
@@ -560,6 +584,33 @@ vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 		m_nid.dwState = 0;
 		m_nid.dwStateMask = NIS_HIDDEN;
 
+	}
+
+	// adzm 2009-07-05 - Tray icon balloon tips
+
+	if (m_BalloonInfo && (strlen(m_BalloonInfo) > 0)) {
+		m_nid.uFlags |= NIF_INFO;
+		strncpy(m_nid.szInfo, m_BalloonInfo, 255);
+		m_nid.szInfo[255] = '\0';
+
+		if (m_BalloonTitle && (strlen(m_BalloonTitle) > 0)) {
+			strncpy(m_nid.szInfoTitle, m_BalloonTitle, 63);
+			m_nid.szInfoTitle[63] = '\0';
+		} else {
+			strcpy(m_nid.szInfoTitle, "Remote Connection");
+		}
+
+		m_nid.uTimeout=10000; // minimum
+		m_nid.dwInfoFlags=NIIF_INFO;
+	}
+	
+	if (m_BalloonInfo) {		
+		free(m_BalloonInfo);
+		m_BalloonInfo = NULL;
+	}
+	if (m_BalloonTitle) {
+		free(m_BalloonTitle);
+		m_BalloonTitle = NULL;
 	}
 
 	//vnclog.Print(LL_INTINFO, VNCLOG("SendTRaymesg\n"));
@@ -619,6 +670,16 @@ vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 			EnableMenuItem(m_hmenu, ID_START_SERVICE,(vncService::IsInstalled() && !vncService::RunningAsService()) ? MF_ENABLED : MF_GRAYED);
 			EnableMenuItem(m_hmenu, ID_RUNASSERVICE,(!vncService::IsInstalled() &&!vncService::RunningAsService()) ? MF_ENABLED : MF_GRAYED);
 			EnableMenuItem(m_hmenu, ID_UNINSTALL_SERVICE,vncService::IsInstalled() ? MF_ENABLED : MF_GRAYED);
+
+			// adzm 2009-07-05
+			if (SPECIAL_SC_PROMPT) {
+				RemoveMenu(m_hmenu, ID_ADMIN_PROPERTIES, MF_BYCOMMAND);
+
+				RemoveMenu(m_hmenu, ID_CLOSE_SERVICE, MF_BYCOMMAND);
+				RemoveMenu(m_hmenu, ID_START_SERVICE, MF_BYCOMMAND);
+				RemoveMenu(m_hmenu, ID_RUNASSERVICE, MF_BYCOMMAND);
+				RemoveMenu(m_hmenu, ID_UNINSTALL_SERVICE, MF_BYCOMMAND);
+			}
 
 			if (msg == NIM_ADD)
 			{
@@ -1224,6 +1285,20 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			// Add Client message.  This message includes an IP address
 			// of a listening client, to which we should connect.
 
+			//adzm 2009-06-20 - Check for special add repeater client message
+			if (wParam == 0xFFFFFFFF && lParam == 0xFFFFFFFF) {
+				vncConnDialog *newconn = new vncConnDialog(_this->m_server);
+				if (newconn)
+				{
+					if (IDOK != newconn->DoDialog()) {
+						if (SPECIAL_SC_PROMPT && _this->m_server->AuthClientCount() == 0 && _this->m_server->UnauthClientCount() == 0) {
+							PostMessage(hwnd, WM_COMMAND, ID_CLOSE, 0);
+						}
+					}
+				}
+				return 0;
+			}
+
 			// If there is no IP address then show the connection dialog
 			if (!lParam) {
 				vncConnDialog *newconn = new vncConnDialog(_this->m_server);
@@ -1298,9 +1373,16 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 						// Set the ID for this client -- code taken from vncconndialog.cpp (ln:142)
 						tmpsock->Send(szId,250);
 						tmpsock->SetTimeout(0);
+						
+						// adzm 2009-07-05 - repeater IDs
+						// Add the new client to this server
+						// adzm 2009-08-02
+						_this->m_server->AddClient(tmpsock, TRUE, TRUE, 0, NULL, szId, szAdrName, nport);
+					} else {
+						// Add the new client to this server
+						// adzm 2009-08-02
+						_this->m_server->AddClient(tmpsock, TRUE, TRUE, 0, NULL, NULL, szAdrName, nport);
 					}
-					// Add the new client to this server
-					_this->m_server->AddClient(tmpsock, TRUE, TRUE);
 				} else {
 					delete tmpsock;
 					_this->m_server->AutoConnectRetry();
@@ -1317,8 +1399,51 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		  if (_this->m_server->IsClient(pClient)) pClient->SendFileChunk();
 		}
 
+		// adzm 2009-07-05 - Tray icon balloon tips
+		if (iMsg == MENU_TRAYICON_BALLOON_MSG) {
+			omni_mutex_lock sync(_this->m_mutexTrayIcon);
+
+			// adzm 2009-07-05 - Tray icon balloon tips
+			if (_this->m_BalloonInfo) {		
+				free(_this->m_BalloonInfo);
+				_this->m_BalloonInfo = NULL;
+			}
+			if (_this->m_BalloonTitle) {
+				free(_this->m_BalloonTitle);
+				_this->m_BalloonTitle = NULL;
+			}
+
+			char* szInfo = (char*)wParam;
+			char* szTitle = (char*)lParam;
+			
+			if (szInfo && (strlen(szInfo) > 0) ) {
+				_this->m_BalloonInfo = _strdup(szInfo);
+			}
+			if (szTitle && (strlen(szTitle) > 0) ) {
+				_this->m_BalloonTitle = _strdup(szTitle);
+			}
+
+			if (szInfo) {
+				free(szInfo);
+			}
+			if (szTitle) {
+				free(szTitle);
+			}
+
+			if (_this->IsIconSet) {
+				_this->SendTrayMsg(NIM_MODIFY, _this->m_nid.hIcon == _this->m_winvnc_icon ? FALSE : TRUE);
+			}
+		}
 	}
 
 	// Message not recognised
 	return DefWindowProc(hwnd, iMsg, wParam, lParam);
+}
+
+// adzm 2009-07-05 - Tray icon balloon tips
+BOOL vncMenu::NotifyBalloon(char* szInfo, char* szTitle)
+{
+	char* szInfoCopy = _strdup(szInfo);
+	char* szTitleCopy = _strdup(szTitle);
+	return PostToWinVNC(MENU_TRAYICON_BALLOON_MSG, (WPARAM)szInfoCopy, (LPARAM)szTitleCopy);
 }

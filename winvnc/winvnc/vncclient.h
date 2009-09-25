@@ -181,6 +181,43 @@ public:
 	void TriggerUpdate();
 	void UpdateCursorShape();
 
+	// adzm 2009-07-05 - repeater IDs
+	void SetRepeaterID(char* szid)
+	{
+		if (m_szRepeaterID) {
+			free(m_szRepeaterID);
+		}
+
+		m_szRepeaterID = NULL;
+
+		if (szid != NULL && strlen(szid) > 0) {
+			m_szRepeaterID = _strdup(szid);
+		}
+	};
+	char* GetRepeaterID() {return m_szRepeaterID;};
+
+	// adzm 2009-08-02
+	void SetHost(char* szHost)
+	{
+		if (m_szHost) {
+			free(m_szHost);
+		}
+
+		m_szHost = NULL;
+
+		if (szHost != NULL && strlen(szHost) > 0) {
+			m_szHost = _strdup(szHost);
+		}
+	};
+	char* GetHost() {return m_szHost;};
+
+	void SetHostPort(int port) {
+		m_hostPort = port;
+	};
+	int GetHostPort() {
+		return m_hostPort;
+	};
+
 	// sf@2004 - Asynchronous FileTransfer - Delta Transfer
 	int  GenerateFileChecksums(HANDLE hFile, char* lpCSBuffer, int nCSBufferSize);
 	bool ReceiveDestinationFileChecksums(int nSize, int nLen);
@@ -348,6 +385,12 @@ protected:
 
 	// The client thread
 	omni_thread		*m_thread;
+
+	// adzm 2009-07-05
+	char*			m_szRepeaterID;
+	// adzm 2009-08-02
+	char*			m_szHost;
+	int				m_hostPort;
 
 
 	// Count to indicate whether updates, clipboards, etc can be sent

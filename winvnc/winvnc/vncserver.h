@@ -91,6 +91,13 @@ public:
 	virtual vncClientId AddClient(VSocket *socket,
 		BOOL auth, BOOL shared, int capability,
 		/*BOOL keysenabled, BOOL ptrenabled,*/rfbProtocolVersionMsg *protocolMsg);
+	
+	// adzm 2009-07-05
+	// adzm 2009-08-02
+	virtual vncClientId AddClient(VSocket *socket,
+		BOOL auth, BOOL shared, int capability,
+		/*BOOL keysenabled, BOOL ptrenabled,*/rfbProtocolVersionMsg *protocolMsg,VString szRepeaterID,VString szHost,VCard port);
+
 	virtual BOOL Authenticated(vncClientId client);
 	virtual void KillClient(vncClientId client);
 	virtual void KillClient(LPSTR szClientName); // sf@2002
@@ -104,6 +111,7 @@ public:
 	virtual void WaitUntilAuthEmpty();
 
 	virtual void KillUnauthClients();
+	virtual void ListUnauthClients(HWND hListBox); // adzm 2009-07-05
 	virtual void WaitUntilUnauthEmpty();
 
 	// Are any clients ready to send updates?

@@ -761,6 +761,24 @@ vncService::PostAddNewClient(unsigned long ipaddress, unsigned short port)
 	return TRUE;
 }
 
+//adzm 2009-06-20
+// Static routine to tell a locally-running instance of the server
+// to prompt for a new ID to connect out to the repeater
+
+BOOL
+vncService::PostAddNewRepeaterClient()
+{
+	// assumes the -repeater command line set the repeater global variable.
+
+	// Post to the WinVNC menu window (usually expected to fail at program startup)
+	if (!PostToWinVNC(MENU_ADD_CLIENT_MSG, (WPARAM)0xFFFFFFFF, (LPARAM)0xFFFFFFFF))
+	{
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
 // Static routine to tell a locally-running instance of the server
 // about a reconnect
 

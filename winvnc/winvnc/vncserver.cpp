@@ -44,12 +44,17 @@
 #include "vncTimedMsgBox.h"
 #include "mmSystem.h" // sf@2002
 
+#include "vncmenu.h"
+
 #include "localization.h" // ACT : Add localization on messages
 bool g_Server_running;
 extern bool g_Desktop_running;
 extern bool g_DesktopThread_running;
 void*	vncServer::pThis;
 extern CDPI g_dpi;
+
+// adzm 2009-07-05
+extern BOOL SPECIAL_SC_PROMPT;
 
 // vncServer::UpdateTracker routines
 
@@ -440,12 +445,27 @@ vncClientId vncServer::AddClient(VSocket *socket, BOOL auth, BOOL shared, rfbPro
 	return AddClient(socket, auth, shared, /*FALSE,*/ 0, /*TRUE, TRUE,*/protocolMsg); 
 }
 
+// adzm 2009-07-05 - repeater IDs
 vncClientId vncServer::AddClient(VSocket *socket,
 					 BOOL auth,
 					 BOOL shared,
 					 int capability,
 					 /*BOOL keysenabled, BOOL ptrenabled,*/
 					 rfbProtocolVersionMsg *protocolMsg)
+{
+	return AddClient(socket, auth, shared, /*FALSE,*/ 0, /*TRUE, TRUE,*/protocolMsg, NULL, NULL, 0);
+}
+
+// adzm 2009-07-05 - repeater IDs
+vncClientId vncServer::AddClient(VSocket *socket,
+					 BOOL auth,
+					 BOOL shared,
+					 int capability,
+					 /*BOOL keysenabled, BOOL ptrenabled,*/
+					 rfbProtocolVersionMsg *protocolMsg,
+					 VString szRepeaterID,
+					 VString szHost,
+					 VCard port)
 {
 	vnclog.Print(LL_STATE, VNCLOG("AddClient() started\n"));
 	
@@ -481,6 +501,16 @@ vncClientId vncServer::AddClient(VSocket *socket,
 	client->EnablePointer(/*ptrenabled &&*/ m_enable_remote_inputs);
     client->EnableJap(/*ptrenabled &&*/ m_enable_jap_input ? true : false);
 
+	// adzm 2009-07-05 - repeater IDs
+	if (szRepeaterID) {
+		client->SetRepeaterID(szRepeaterID);
+	}
+	// adzm 2009-08-02
+	if (szHost) {
+		client->SetHost(szHost);
+	}
+	client->SetHostPort(port);
+
 	// Start the client
 	if (!client->Init(this, socket, auth, shared, clientid))
 	{
@@ -499,6 +529,33 @@ vncClientId vncServer::AddClient(VSocket *socket,
 	DoNotify(WM_SRV_CLIENT_CONNECT, 0, 0);
 
 	vnclog.Print(LL_INTINFO, VNCLOG("AddClient() done\n"));
+
+	// adzm 2009-07-05 - Balloon
+	if (SPECIAL_SC_PROMPT) {
+		vncClientList::iterator i;
+		char szInfo[256];
+		strcpy(szInfo, "Waiting for connection... ");
+
+		for (i = m_unauthClients.begin(); i != m_unauthClients.end(); i++)
+		{
+
+
+			vncClient* client = GetClient(*i);
+			if (client->GetRepeaterID() && (strlen(client->GetRepeaterID()) > 0) ) {
+				strncat_s(szInfo, 255, client->GetRepeaterID(), _TRUNCATE);
+			} else {
+				strncat_s(szInfo, 255, client->GetClientName(), _TRUNCATE);
+			}			
+			
+			// adzm 2009-07-05			
+			strncat_s(szInfo, 255, ", ", _TRUNCATE);
+		}
+
+		if (m_unauthClients.size() > 0) {
+			szInfo[strlen(szInfo) - 2] = '\0';
+			vncMenu::NotifyBalloon(szInfo, NULL);
+		}		
+	}
 
 	return clientid;
 }
@@ -554,13 +611,15 @@ vncServer::Authenticated(vncClientId clientid)
 //	vnclog.Print(LL_INTINFO, VNCLOG("Lock3\n"));
 	omni_mutex_lock l2(m_clientsLock);
 
+	vncClient *client = NULL;
+
 	// Search the unauthenticated client list
 	for (i = m_unauthClients.begin(); i != m_unauthClients.end(); i++)
 	{
 		// Is this the right client?
 		if ((*i) == clientid)
 		{
-			vncClient *client = GetClient(clientid);
+			client = GetClient(clientid);
 			
 
 			// Yes, so remove the client and add it to the auth list
@@ -607,6 +666,21 @@ vncServer::Authenticated(vncClientId clientid)
 
 	// Notify anyone interested of this event
 	DoNotify(WM_SRV_CLIENT_AUTHENTICATED, 0, 0);
+
+	// adzm 2009-07-05 - Balloon
+	if (SPECIAL_SC_PROMPT && (client != NULL) ) {
+		char szInfo[256];
+
+		if (client->GetRepeaterID() && (strlen(client->GetRepeaterID()) > 0) ) {
+			_snprintf(szInfo, 255, "Remote user successfully connected (%s) and is currently sharing your desktop.", client->GetRepeaterID());
+		} else {
+			_snprintf(szInfo, 255, "Remote user successfully connected (%s) and is currently sharing your desktop.", client->GetClientName());
+		}
+
+		szInfo[255] = '\0';
+
+		vncMenu::NotifyBalloon(szInfo, NULL);
+	}
 
 	vnclog.Print(LL_INTINFO, VNCLOG("Authenticated() done\n"));
 
@@ -743,11 +817,55 @@ void vncServer::ListAuthClients(HWND hListBox)
 
 	for (i = m_authClients.begin(); i != m_authClients.end(); i++)
 	{
-		SendMessage(hListBox, 
-					LB_ADDSTRING,
-					0,
-					(LPARAM) GetClient(*i)->GetClientName()
-					);
+		// adzm 2009-07-05
+		vncClient* client = GetClient(*i);
+		if (client->GetRepeaterID() && (strlen(client->GetRepeaterID()) > 0) ) {
+			char szDescription[256];
+			_snprintf(szDescription, 255, "%s - %s", client->GetRepeaterID(), client->GetClientName());
+			szDescription[255] = '\0';
+
+			SendMessage(hListBox, 
+						LB_ADDSTRING,
+						0,
+						(LPARAM) szDescription
+						);
+		} else {
+			SendMessage(hListBox, 
+						LB_ADDSTRING,
+						0,
+						(LPARAM) client->GetClientName()
+						);
+		}
+	}
+}
+
+// adzm 2009-07-05
+void vncServer::ListUnauthClients(HWND hListBox)
+{
+	vncClientList::iterator i;
+	omni_mutex_lock l(m_clientsLock);
+
+	for (i = m_unauthClients.begin(); i != m_unauthClients.end(); i++)
+	{
+		// adzm 2009-07-05
+		vncClient* client = GetClient(*i);
+		if (client->GetRepeaterID() && (strlen(client->GetRepeaterID()) > 0) ) {
+			char szDescription[256];
+			_snprintf(szDescription, 255, "%s - %s", client->GetRepeaterID(), client->GetClientName());
+			szDescription[255] = '\0';
+
+			SendMessage(hListBox, 
+						LB_ADDSTRING,
+						0,
+						(LPARAM) szDescription
+						);
+		} else {
+			SendMessage(hListBox, 
+						LB_ADDSTRING,
+						0,
+						(LPARAM) client->GetClientName()
+						);
+		}
 	}
 }
 
@@ -2321,9 +2439,14 @@ void vncServer::_actualTimerRetryHandler()
 				{
 					tmpsock->Send(m_szAutoReconnectId,250);
 					tmpsock->SetTimeout(0);
+					// adzm 2009-07-05 - repeater IDs
+					// Add the new client to this server
+					AddClient(tmpsock, TRUE, TRUE, 0, NULL, m_szAutoReconnectId, m_szAutoReconnectAdr, m_AutoReconnectPort);
+				} else {
+					// Add the new client to this server
+					// adzm 2009-08-02
+					AddClient(tmpsock, TRUE, TRUE, 0, NULL, NULL, m_szAutoReconnectAdr, m_AutoReconnectPort);
 				}
-				// Add the new client to this server
-				AddClient(tmpsock, TRUE, TRUE);
 			} else {
 				delete tmpsock;
 				m_retry_timeout = SetTimer( NULL, 0, (1000*30), (TIMERPROC)_timerRetryHandler );

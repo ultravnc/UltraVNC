@@ -49,7 +49,10 @@
 #define tbBorderWidth		2
 
 //About showing the window
-#define tbHideAtStartup		FALSE //Hide window when created
+//adzm 2009-06-21 - If we are waiting on a repeater connection, and tbHideAtStartup is FALSE, then
+//there will be a thin white line (and a hung window) while it waits to connect! TODO - this should
+//only apply (i think) if we are starting up in full screen.
+#define tbHideAtStartup		TRUE //Hide window when created
 #define tbPinNotPushedIn	TRUE //Is the pin pushed in or out at startup (sorry for invertion!)
 #define tbScrollWindow		TRUE //Animate window to scroll up/down
 #define tbScrollDelay		20	//Timer variable for scrolling the window (cycletime) [ms]

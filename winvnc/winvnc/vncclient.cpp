@@ -754,24 +754,30 @@ vncClientThread::InitVersion()
 	{
 		// Generate the server's protocol version
 		rfbProtocolVersionMsg protocolMsg;
-if (SPECIAL_SC_PROMPT)
-{
-	//This break rfb protocol, SC in ultravnc only  rfb 3.14/16
-	sprintf((char *)protocolMsg,
-			rfbProtocolVersionFormat,
-			rfbProtocolMajorVersion,
-			rfbProtocolMinorVersion +10+ (m_server->MSLogonRequired() ? 0 : 2));
-}
-else
-{
-		sprintf((char *)protocolMsg,
-				rfbProtocolVersionFormat,
-				rfbProtocolMajorVersion,
-				rfbProtocolMinorVersion + (m_server->MSLogonRequired() ? 0 : 2)); // 4: mslogon+FT,
-																			  // 6: VNClogon+FT
-}
+		if (SPECIAL_SC_PROMPT)
+		{
+			//This break rfb protocol, SC in ultravnc only  rfb 3.14/16
+			sprintf((char *)protocolMsg,
+					rfbProtocolVersionFormat,
+					rfbProtocolMajorVersion,
+					rfbProtocolMinorVersion +10+ (m_server->MSLogonRequired() ? 0 : 2));
+		}
+		else
+		{
+			sprintf((char *)protocolMsg,
+					rfbProtocolVersionFormat,
+					rfbProtocolMajorVersion,
+					rfbProtocolMinorVersion + (m_server->MSLogonRequired() ? 0 : 2)); // 4: mslogon+FT,
+																				  // 6: VNClogon+FT
+		}
 		// Send the protocol message
 		//m_socket->SetTimeout(0); // sf@2006 - Trying to fix neverending authentication bug - Not sure it's a good idea...
+		//adzm 2009-06-20 - if SC, wait for a connection, rather than timeout too quickly.
+		if (SPECIAL_SC_PROMPT) {
+			//adzm 2009-06-20 - TODO - perhaps this should only occur if we can determine we are using a repeater?
+			m_socket->SetTimeout(0);
+		}
+
 		if (!m_socket->SendExact((char *)&protocolMsg, sz_rfbProtocolVersionMsg))
 			return FALSE;
 
@@ -1399,6 +1405,20 @@ vncClientThread::run(void *arg)
 	// GET PROTOCOL VERSION
 	if (!InitVersion())
 	{
+		// adzm 2009-07-05
+		{
+			char szInfo[256];
+
+			if (m_client->GetRepeaterID() && (strlen(m_client->GetRepeaterID()) > 0) ) {
+				_snprintf(szInfo, 255, "Could not connect using %s!", m_client->GetRepeaterID());
+			} else {
+				_snprintf(szInfo, 255, "Could not connect to %s!", m_client->GetClientName());
+			}
+
+			szInfo[255] = '\0';
+
+			vncMenu::NotifyBalloon(szInfo, NULL);
+		}
 		m_server->RemoveClient(m_client->GetClientId());
 		
 		// wa@2005 - AutoReconnection attempt if required
@@ -3242,12 +3262,13 @@ vncClientThread::run(void *arg)
 	m_server->RemoveClient(m_client->GetClientId());
 
 	// sf@2003 - AutoReconnection attempt if required
-	if (!fShutdownOrdered)
+	if (!fShutdownOrdered) {
 		if (m_server->AutoReconnect())
 		{
 			vnclog.Print(LL_INTERR, VNCLOG("PostAddNewClient II\n"));
 			vncService::PostAddNewClient(1111, 1111);
 		}
+	}
 }
 
 // The vncClient itself
@@ -3369,6 +3390,12 @@ vncClient::vncClient() : Sendinput("USER32", "SendInput")
 	m_NewSWDesktop = 0;
 	NewsizeW = 0;
 	NewsizeH = 0;
+
+	
+	// adzm 2009-07-05
+	m_szRepeaterID = NULL; // as in, not using
+	m_szHost = NULL;
+	m_hostPort = 0;
 }
 
 vncClient::~vncClient()
@@ -3429,12 +3456,24 @@ vncClient::~vncClient()
 	if (SPECIAL_SC_EXIT && !fShutdownOrdered) // if fShutdownOrdered, hwnd may not be valid
 	{
 		//adzm 2009-06-20 - if we are SC, only exit if no other viewers are connected!
-		// (since multiple viewers is now allowed with the new DSM plugin)		
-		// We want that the server exit when the viewer exit
-		HWND hwnd=FindWindow("WinVNC Tray Icon",NULL);
-		if (hwnd) SendMessage(hwnd,WM_COMMAND,ID_CLOSE,0);
+		// (since multiple viewers is now allowed with the new DSM plugin)
+		// adzm 2009-08-02
+				
+		if ( (m_server == NULL) || (m_server && m_server->AuthClientCount() == 0) ) {
+			// We want that the server exit when the viewer exit
+			HWND hwnd=FindWindow("WinVNC Tray Icon",NULL);
+			if (hwnd) SendMessage(hwnd,WM_COMMAND,ID_CLOSE,0);
+		}
 	}
 
+	// adzm 2009-07-05
+	if (m_szRepeaterID) {
+		free(m_szRepeaterID);
+	}
+	// adzm 2009-08-02
+	if (m_szHost) {
+		free(m_szHost);
+	}
 }
 
 // Init

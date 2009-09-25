@@ -471,6 +471,9 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	hbmToolbigX = (HBITMAP)LoadImage(m_pApp->m_instance, "tlbarbigx.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_LOADMAP3DCOLORS);
 	hbmToolsmallX = (HBITMAP)LoadImage(m_pApp->m_instance, "tlbarsmallx.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_LOADMAP3DCOLORS);
 	rcth=NULL;
+	
+	m_keepalive_timer = 0;
+	m_emulate3ButtonsTimer = 0;
 }
 
 // helper functions for setting socket timeouts during file transfer
@@ -550,6 +553,9 @@ void ClientConnection::Run()
 	CreateDisplay();
 
 	DoConnection(); // sf@2007 - Autoreconnect - Must be done after windows creation, otherwise ReadServerInit does not initialise the title bar...
+
+	//adzm 2009-06-21 - if we are connected now, show the window
+	ShowWindow(m_hwndcn, SW_SHOW);
 
 	Createdib();
 	SizeWindow();
@@ -1183,12 +1189,17 @@ void ClientConnection::GTGBS_CreateToolbar()
 	TCHAR valname[256];
 	MRU *m_pMRU;
 	m_pMRU = new MRU(SESSION_MRU_KEY_NAME,26);
+	//adzm 2009-06-21 - show the proxy in the 'recent' box
+	if (m_fUseProxy && strlen(m_proxyhost) > 0) {		
+		TCHAR proxyname[MAX_HOST_NAME_LEN];
+		_snprintf(proxyname, MAX_HOST_NAME_LEN-1, "%s:%li (%s:%li)", m_host, m_port, m_proxyhost, m_proxyport);
+		SendMessage(m_logo_wnd, CB_ADDSTRING, 0, (LPARAM)proxyname);
+	}
     for (int i = 0; i < m_pMRU->NumItems(); i++) {
-                m_pMRU->GetItem(i, valname, 255);
-                int pos = SendMessage(m_logo_wnd, CB_ADDSTRING, 0, (LPARAM) valname);
-
-            }
-            SendMessage(m_logo_wnd, CB_SETCURSEL, 0, 0);
+        m_pMRU->GetItem(i, valname, 255);
+        int pos = SendMessage(m_logo_wnd, CB_ADDSTRING, 0, (LPARAM) valname);
+    }
+    SendMessage(m_logo_wnd, CB_SETCURSEL, 0, 0);
 	if (m_pMRU) delete m_pMRU;		
 
 }
@@ -1250,7 +1261,8 @@ void ClientConnection::CreateDisplay()
 
 
 	//ShowWindow(m_hwnd, SW_HIDE);
-	ShowWindow(m_hwndcn, SW_SHOW);
+	//ShowWindow(m_hwndcn, SW_SHOW);
+	//adzm 2009-06-21 - let's not show until connected.
 
 	// record which client created this window
     helper::SafeSetWindowUserData(m_hwndcn, (LONG)this);
@@ -1952,20 +1964,25 @@ void ClientConnection::NegotiateProtocolVersion()
 		ReadExact(mytext,size);
 		mytext[size]=0;
 
-		int returnvalue=MessageBox(m_hwndMain,   mytext,"Accept Incoming SC connection", MB_YESNO |  MB_TOPMOST);
-		if (returnvalue==IDNO) 
-		{
-			int nummer=0;
-			WriteExact((char *)&nummer,sizeof(int));
-			throw WarningException("You refused connection.....");
-		}
-		else
-		{
+		//adzm 2009-06-21 - auto-accept if specified
+		if (!m_opts.m_fAutoAcceptIncoming) {
+			int returnvalue=MessageBox(m_hwndMain,   mytext,"Accept Incoming SC connection", MB_YESNO |  MB_TOPMOST);
+			if (returnvalue==IDNO) 
+			{
+				int nummer=0;
+				WriteExact((char *)&nummer,sizeof(int));
+				throw WarningException("You refused connection.....");
+			}
+			else
+			{
+				int nummer=1;
+				WriteExact((char *)&nummer,sizeof(int));
+
+			}
+		} else {
 			int nummer=1;
 			WriteExact((char *)&nummer,sizeof(int));
-
-		}
-		
+		}		
 	}
 
 
@@ -2694,9 +2711,28 @@ void ClientConnection::CreateLocalFramebuffer()
 	if (m_hBitmap != NULL)
 		DeleteObject(m_hBitmap);
 
+	m_hBitmap = NULL;
+
 	m_hBitmap = CreateCompatibleBitmap(hdc, m_si.framebufferWidth, m_si.framebufferHeight);
+
+	if (m_hBitmap == NULL) {
+		//adzm - 2009-07-12 - Create a DIB (which will use system rather than video memory) if this fails
+		void* pvbits_dummy = NULL;
+		BITMAPINFO bmi;
+		::ZeroMemory(&bmi.bmiHeader, sizeof(bmi.bmiHeader));
+		bmi.bmiHeader.biSize = sizeof(bmi.bmiHeader);
+		bmi.bmiHeader.biWidth = m_si.framebufferWidth;
+		bmi.bmiHeader.biHeight = m_si.framebufferHeight;
+		bmi.bmiHeader.biPlanes = 1;
+		bmi.bmiHeader.biBitCount = 32;
+
+		m_hBitmap = CreateDIBSection(hdc, &bmi, DIB_RGB_COLORS, &pvbits_dummy, NULL, 0);
+	}
+	//adzm - 2009-06-21 - include the last error (most common cause is we are running out of memory for the
+	//new bitmap. We might even be able to work around this by creating a DIB section, but that would be
+	//slower for blits.)
 	if (m_hBitmap == NULL)
-		throw WarningException(sz_L61);
+		throw WarningException(sz_L61, GetLastError());
 	// Select this bitmap into the DC with an appropriate palette
 	ObjectSelector b(m_hBitmapDC, m_hBitmap);
 	PaletteSelector p(m_hBitmapDC, m_hPalette);
@@ -2706,6 +2742,19 @@ void ClientConnection::CreateLocalFramebuffer()
 	{
 		if (m_hCacheBitmap != NULL) DeleteObject(m_hCacheBitmap);
 		m_hCacheBitmap = CreateCompatibleBitmap(m_hBitmapDC, m_si.framebufferWidth, m_si.framebufferHeight);
+		if (m_hCacheBitmap == NULL) {
+			//adzm - 2009-07-12 - Create a DIB (which will use system rather than video memory) if this fails
+			void* pvbits_dummy = NULL;
+			BITMAPINFO bmi;
+			::ZeroMemory(&bmi.bmiHeader, sizeof(bmi.bmiHeader));
+			bmi.bmiHeader.biSize = sizeof(bmi.bmiHeader);
+			bmi.bmiHeader.biWidth = m_si.framebufferWidth;
+			bmi.bmiHeader.biHeight = m_si.framebufferHeight;
+			bmi.bmiHeader.biPlanes = 1;
+			bmi.bmiHeader.biBitCount = 32;
+
+			m_hCacheBitmap = CreateDIBSection(m_hBitmapDC, &bmi, DIB_RGB_COLORS, &pvbits_dummy, NULL, 0);
+		}
 		vnclog.Print(0, _T("Cache: Cache buffer bitmap creation\n"));
 	}
 	
@@ -3798,7 +3847,7 @@ void* ClientConnection::run_undetached(void* arg) {
                         time_t delta = now - lastrecv;
                         lastrecv = now;
                         char msg[255];
-                        sprintf(msg, "keepalive received %i64u seconds since last one\n", delta);
+                        sprintf(msg, "keepalive received %I64i seconds since last one\n", delta);
                         OutputDebugString(msg);
                     }
 #endif
@@ -3989,6 +4038,19 @@ void ClientConnection::SendAppropriateFramebufferUpdateRequest()
 			{
 				m_hCacheBitmapDC = CreateCompatibleDC(m_hBitmapDC);
 				m_hCacheBitmap = CreateCompatibleBitmap(m_hBitmapDC, m_si.framebufferWidth, m_si.framebufferHeight);
+				if (m_hCacheBitmap == NULL) {
+					//adzm - 2009-07-12 - Create a DIB (which will use system rather than video memory) if this fails
+					void* pvbits_dummy = NULL;
+					BITMAPINFO bmi;
+					::ZeroMemory(&bmi.bmiHeader, sizeof(bmi.bmiHeader));
+					bmi.bmiHeader.biSize = sizeof(bmi.bmiHeader);
+					bmi.bmiHeader.biWidth = m_si.framebufferWidth;
+					bmi.bmiHeader.biHeight = m_si.framebufferHeight;
+					bmi.bmiHeader.biPlanes = 1;
+					bmi.bmiHeader.biBitCount = 32;
+
+					m_hCacheBitmap = CreateDIBSection(m_hBitmapDC, &bmi, DIB_RGB_COLORS, &pvbits_dummy, NULL, 0);
+				}
 			}
 			ClearCache(); // Clear the cache
 			m_pendingCacheInit = true; // Order full update to synchronize both sides caches
@@ -4569,6 +4631,13 @@ void ClientConnection::ReadServerState()
         if (m_opts.m_keepAliveInterval >= (m_opts.m_FTTimeout - KEEPALIVE_HEADROOM))
           m_opts.m_keepAliveInterval = (m_opts.m_FTTimeout  - KEEPALIVE_HEADROOM); 
         vnclog.Print(1, _T("New keepalive interval %u"), m_opts.m_keepAliveInterval);
+		m_keepalive_timer = 1011;
+		KillTimer(m_hwndcn, m_keepalive_timer);
+		if (value > 0) {
+			SetTimer(m_hwndcn, m_keepalive_timer, value * 1000, NULL);
+		} else {
+			m_keepalive_timer = 0;
+		}
         break;
     default:
         vnclog.Print(1, _T("Ignoring unsupported state %u"), state);
@@ -6789,6 +6858,9 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 						_this->m_emulateKeyFlags);
 					KillTimer(_this->m_hwndcn, _this->m_emulate3ButtonsTimer);
 					_this->m_waitingOnEmulateTimer = false;
+				} else if (wParam != 0 && wParam == _this->m_keepalive_timer) {
+					// adzm 2009-08-02
+					_this->SendKeepAlive();
 				}
 				return 0;
 				

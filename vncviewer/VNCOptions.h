@@ -146,6 +146,8 @@ public:
     int m_FTTimeout;
     int m_keepAliveInterval;
 
+	//adzm - 2009-06-21
+	bool m_fAutoAcceptIncoming;
 
 	//adzm 2009-07-19
 	bool m_fAutoAcceptNoDSM;

@@ -114,6 +114,8 @@
 #define IDC_VIEWERS_LISTBOX             1055
 #define IDC_SINGLE_WINDOW               1056
 #define IDC_CLIENTTEXT                  1056
+#define IDC_VIEWERS_LISTBOX2            1056
+#define IDC_PENDING_LISTBOX             1056
 #define IDC_KILL_B                      1057
 #define IDC_NAME_APPLI                  1058
 #define IDC_TEXTCHAT_B                  1058
@@ -184,6 +186,9 @@
 #define IDC_VIDEO                       1125
 #define IDC_BUTTON1                     1126
 #define IDC_CLEAR                       1126
+#define IDC_CONNECTION_NUMBER_LABEL     1128
+#define IDC_CONNECTION_NUMBER_STATIC    1128
+#define IDC_CAPTION_STATIC              1129
 #define IDC_Path1                       1132
 #define IDC_Path2                       1133
 #define IDC_Path3                       1134
@@ -272,7 +277,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        155
 #define _APS_NEXT_COMMAND_VALUE         40019
-#define _APS_NEXT_CONTROL_VALUE         1127
+#define _APS_NEXT_CONTROL_VALUE         1130
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -62,6 +62,9 @@ const char	*szAppName = "WinVNC";
 DWORD		mainthreadId;
 BOOL		fRunningFromExternalService=false;
 
+//adzm 2009-06-20
+char* g_szRepeaterHost = NULL;
+
 // sf@2007 - New shutdown order handling stuff (with uvnc_service)
 bool			fShutdownOrdered = false;
 static HANDLE		hShutdownEvent = NULL;
@@ -77,6 +80,9 @@ bool PostAddAutoConnectClient_bool_null=false;
 
 bool PostAddConnectClient_bool=false;
 bool PostAddConnectClient_bool_null=false;
+
+//adzm 2009-06-20
+bool PostAddNewRepeaterClient_bool=false;
 
 char pszId_char[20];
 VCard32 address_vcard;
@@ -610,6 +616,62 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 			continue;
 		}
 
+		//adzm 2009-06-20
+		if (strncmp(&szCmdLine[i], winvncRepeater, strlen(winvncRepeater)) == 0)
+		{
+			// set the default repeater host
+			i+=strlen(winvncRepeater);
+
+			// First, we have to parse the command line to get the host to use
+			int start, end;
+			start=i;
+			while (szCmdLine[start] <= ' ' && szCmdLine[start] != 0) start++;
+			end = start;
+			while (szCmdLine[end] > ' ') end++;
+
+			// Was there a hostname (and optionally a port number) given?
+			if (end-start > 0)
+			{
+				if (g_szRepeaterHost) {
+					delete[] g_szRepeaterHost;
+					g_szRepeaterHost = NULL;
+				}
+				g_szRepeaterHost = new char[end-start+1];
+				if (g_szRepeaterHost != 0) {
+					strncpy(g_szRepeaterHost, &(szCmdLine[start]), end-start);
+					g_szRepeaterHost[end-start] = 0;
+					
+					// We can not contact a runnning service, permissions, so we must store the settings
+					// and process until the vncmenu has been started
+					vnclog.Print(LL_INTERR, VNCLOG("PostAddNewRepeaterClient I\n"));
+					if (!vncService::PostAddNewRepeaterClient())
+					{
+						PostAddNewRepeaterClient_bool=true;
+						port_int=0;
+						address_vcard=0;
+					}
+				}
+				i=end;
+				continue;
+			}
+			else 
+			{
+				/*
+				// Tell the server to show the Add New Client dialog
+				// We can not contact a runnning service, permissions, so we must store the settings
+				// and process until the vncmenu has been started
+				vnclog.Print(LL_INTERR, VNCLOG("PostAddNewClient IIII\n"));
+				if (!vncService::PostAddNewClient(0, 0))
+				{
+				PostAddNewClient_bool=true;
+				port_int=0;
+				address_vcard=0;
+				}
+				*/
+			}
+			continue;
+		}
+
 		// Either the user gave the -help option or there is something odd on the cmd-line!
 
 		// Show the usage dialog
@@ -719,6 +781,13 @@ DWORD WINAPI imp_desktop_thread(LPVOID lpParam)
 		PostAddNewClient_bool=false;
 		vnclog.Print(LL_INTERR, VNCLOG("PostAddNewClient IIIII\n"));
 		vncService::PostAddNewClient(address_vcard, port_int);
+	}
+	//adzm 2009-06-20
+	if (PostAddNewRepeaterClient_bool)
+	{
+		PostAddNewRepeaterClient_bool=false;
+		vnclog.Print(LL_INTERR, VNCLOG("PostAddNewRepeaterClient II\n"));
+		vncService::PostAddNewRepeaterClient();
 	}
 	MSG msg;
 	while (GetMessage(&msg,0,0,0) != 0 && !fShutdownOrdered)
@@ -845,5 +914,11 @@ int WinVNCAppMain()
 
 	if (hShutdownEvent)CloseHandle(hShutdownEvent);
 	vnclog.Print(LL_STATE, VNCLOG("################## SHUTING DOWN SERVER ####################\n"));
+
+	//adzm 2009-06-20
+	if (g_szRepeaterHost) {
+		delete[] g_szRepeaterHost;
+		g_szRepeaterHost = NULL;
+	}
 	return 1;
 };

@@ -93,6 +93,11 @@ public:
 	// Routine to make an already running copy of WinVNC form an outgoing
 	// connection to a new VNC client
 	static BOOL PostAddNewClient(unsigned long ipaddress, unsigned short port);
+
+	//adzm 2009-06-20
+	// Static routine to tell a locally-running instance of the server
+	// to prompt for a new ID to connect out to the repeater
+	static BOOL PostAddNewRepeaterClient();
 	
 	// Routine to make an already running copy of WinVNC deal with Auto Reconnect
 	// along with an ID
