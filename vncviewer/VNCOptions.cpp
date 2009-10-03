@@ -961,10 +961,10 @@ void VNCOptions::Load(char *fname)
       m_keepAliveInterval = (m_FTTimeout  - KEEPALIVE_HEADROOM); 
 
   //adzm 2009-06-21
-  m_fAutoAcceptIncoming = readInt("", (int)m_fAutoAcceptIncoming, fname) ? true : false;
+  m_fAutoAcceptIncoming = readInt("AutoAcceptIncoming", (int)m_fAutoAcceptIncoming, fname) ? true : false;
   
   //adzm 2009-07-19
-  m_fAutoAcceptNoDSM = readInt("", (int)m_fAutoAcceptNoDSM, fname) ? true : false;
+  m_fAutoAcceptNoDSM = readInt("AutoAcceptNoDSM", (int)m_fAutoAcceptNoDSM, fname) ? true : false;
 }
 
 // Record the path to the VNC viewer and the type
