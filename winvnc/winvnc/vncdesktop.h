@@ -413,6 +413,7 @@ protected:
 
 	// Boolean flag to indicate when the display resolution has changed
 	BOOL			m_displaychanged;
+	BOOL			b_syscolor;
 
 	// Boolean flag to indicate whether or not an update trigger message
 	// is already in the desktop thread message queue
