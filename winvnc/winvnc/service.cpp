@@ -678,8 +678,6 @@ void disconnect_remote_sessions()
 	   {
 		   LockWorkStationF=(pLockWorkStation)GetProcAddress(hlibuser32, "LockWorkStation"); 
 	   }
-	if (connect)
-	{
 	if (WinStationConnectF!=NULL && LockWorkStationF!=NULL)
 		{
 				DWORD ID=0;
@@ -697,7 +695,6 @@ void disconnect_remote_sessions()
 
 		}
 	Sleep(3000);
-	}
 
 	if (hlibwinsta)
         FreeLibrary(hlibwinsta);
