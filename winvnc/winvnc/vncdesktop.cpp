@@ -352,6 +352,7 @@ vncDesktop::vncDesktop()
 	m_hOldcursor = NULL; // sf@2002
 
 	m_displaychanged = FALSE;
+	b_syscolor=TRUE;
 	m_update_triggered = FALSE;
 	g_update_triggered = FALSE;
 
