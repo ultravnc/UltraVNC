@@ -693,7 +693,37 @@ vncDesktopThread::run_undetached(void *arg)
 	///
 	while (looping && !fShutdownOrdered)
 	{		
-		DWORD result=WaitForMultipleObjects(6,m_desktop->trigger_events,FALSE,100);
+		DWORD result;
+		newtick = timeGetTime();
+		int waittime;
+		waittime=100-(newtick-oldtick);
+		if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver) 
+		{
+			int fastcounter=0;
+			POINT cursorpos;
+			while (m_desktop->m_videodriver->oldaantal==m_desktop->pchanges_buf->counter)
+			{
+				Sleep(5);
+				fastcounter++;
+				if (fastcounter>20)
+				{
+					#ifdef _DEBUG
+										char			szText[256];
+										sprintf(szText,"fastcounter\n");
+										OutputDebugString(szText);		
+					#endif
+					break;
+				}
+				if (GetCursorPos(&cursorpos) && 
+										((cursorpos.x != oldcursorpos.x) ||
+										(cursorpos.y != oldcursorpos.y))) break;
+			}
+			waittime=0;
+		}
+		if (waittime<0) waittime=0;
+		if (waittime>100) waittime=100;
+
+		result=WaitForMultipleObjects(6,m_desktop->trigger_events,FALSE,waittime);
 		{
 			//#ifdef _DEBUG
 			//							char			szText[256];
@@ -825,11 +855,11 @@ vncDesktopThread::run_undetached(void *arg)
 								// CALCULATE CHANGES
 								m_desktop->m_UltraEncoder_used=m_desktop->m_server->IsThereAUltraEncodingClient();
 					//			vnclog.Print(LL_INTERR, VNCLOG("UpdateWanted B\n"));
-#ifdef _DEBUG
-//										char			szText[256];
-										sprintf(szText," m_desktop->m_server->UpdateWanted check\n");
-										OutputDebugString(szText);		
-#endif
+//#ifdef _DEBUG
+////										char			szText[256];
+//									sprintf(szText," m_desktop->m_server->UpdateWanted check\n");
+//										OutputDebugString(szText);		
+//#endif
 								if (m_desktop->m_server->UpdateWanted())
 								{
 #ifdef _DEBUG
