@@ -136,6 +136,14 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		vnclog.Print(LL_INTERR, VNCLOG("wmcreate  \n"));
 		break;
 	case WM_TIMER:
+		if (wParam==101)
+		{
+			//UNLOCK WM_SYSCOLOR
+			_this->b_syscolor=true;
+			KillTimer(hwnd, 101);
+			break;
+
+		}
 		if (_this->can_be_hooked)
 		{
 			if (wParam==100)
@@ -341,10 +349,14 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 				vnclog.Print(LL_INTERR, VNCLOG("Resolution switch detected, driver NOT active\n"));
 			
 		}
+		_this->b_syscolor=false;
+		SetTimer(hwnd,101,4000,NULL);
 		return 0;
 
 	case WM_SYSCOLORCHANGE:
 	case WM_PALETTECHANGED:
+		if (_this->b_syscolor)
+		{
 		// The palette colours have changed, so tell the server
 
 		// Get the system palette
@@ -353,6 +365,7 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 
 		// Update any palette-based clients, too
 		_this->m_server->UpdatePalette();
+		}
 		return 0;
 
 		// CLIPBOARD MESSAGES
