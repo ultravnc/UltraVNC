@@ -482,11 +482,11 @@ vncClientUpdateThread::run_undetached(void *arg)
 
 	while (1)
 	{
-#ifdef _DEBUG
-										char			szText[256];
-										sprintf(szText," run_undetached loop \n");
-										OutputDebugString(szText);		
-#endif
+//#ifdef _DEBUG
+//										char			szText[256];
+//										sprintf(szText," run_undetached loop \n");
+//										OutputDebugString(szText);		
+//#endif
 		// Block waiting for an update to send
 		{
 			omni_mutex_lock l(m_client->GetUpdateLock());
@@ -594,11 +594,11 @@ vncClientUpdateThread::run_undetached(void *arg)
 			// Fetch the incremental region
 			clipregion = m_client->m_incr_rgn;
 			m_client->m_incr_rgn.clear();
-#ifdef _DEBUG
-										char			szText[256];
-										sprintf(szText," UpdateWanted clear \n");
-										OutputDebugString(szText);		
-#endif
+//#ifdef _DEBUG
+//										char			szText[256];
+//										sprintf(szText," UpdateWanted clear \n");
+//										OutputDebugString(szText);		
+//#endif
 
 			// Get the clipboard data, if any
 			if (m_client->m_clipboard_text) {
@@ -1896,59 +1896,32 @@ vncClientThread::run(void *arg)
 			
 		case rfbFramebufferUpdateRequest:
 			// Read the rest of the message:
-#ifdef _DEBUG
-										char			szText[256];
-										sprintf(szText," rfbFramebufferUpdateRequest \n");
-										OutputDebugString(szText);		
-#endif
+//#ifdef _DEBUG
+//										char			szText[256];
+//										sprintf(szText," rfbFramebufferUpdateRequest \n");
+//										OutputDebugString(szText);		
+//#endif
 			if (!m_socket->ReadExact(((char *) &msg)+nTO, sz_rfbFramebufferUpdateRequestMsg-nTO))
 			{
 				connected = FALSE;
 				break;
 			}
-			/*{
-				m_client->Sendtimer.stop();
-				int sendtime=m_client->Sendtimer.read()*1000;
-				if (m_client->Totalsend>1500 && sendtime!=0) 
-					{
-						//vnclog.Print(LL_SOCKERR, VNCLOG("Send Size %i %i %i %i\n"),m_socket->Totalsend,sendtime,m_socket->Totalsend/sendtime,m_client->m_encodemgr.m_encoding);
-						m_client->timearray[m_client->m_encodemgr.m_encoding][m_client->roundrobin_counter]=sendtime;
-						m_client->sizearray[m_client->m_encodemgr.m_encoding][m_client->roundrobin_counter]=m_client->Totalsend;
-						m_client->Sendtimer.reset();
-						for (int j=0;j<17;j++)
-						{
-							int totsize=0;
-							int tottime=0;
-							for (int i=0;i<31;i++)
-								{
-								totsize+=m_client->sizearray[j][i];
-								tottime+=m_client->timearray[j][i];
-								}
-							if (tottime!=0 && totsize>1500)
-								vnclog.Print(LL_SOCKERR, VNCLOG("Send Size %i %i %i %i\n"),totsize,tottime,totsize/tottime,j);
-						}
-						m_client->roundrobin_counter++;
-						if (m_client->roundrobin_counter>30) m_client->roundrobin_counter=0;
-					}
-				m_client->Sendtimer.reset();
-				m_client->Totalsend=0;
-
-			}*/
 
 			{
 				rfb::Rect update;
-
 				// Get the specified rectangle as the region to send updates for
 				// Modif sf@2002 - Scaling.
 				update.tl.x = (Swap16IfLE(msg.fur.x) + m_client->m_SWOffsetx) * m_client->m_nScale;
 				update.tl.y = (Swap16IfLE(msg.fur.y) + m_client->m_SWOffsety) * m_client->m_nScale;
-			//	update.tl.x = 0;
-			//	update.tl.y = 0;
 				update.br.x = update.tl.x + Swap16IfLE(msg.fur.w) * m_client->m_nScale;
 				update.br.y = update.tl.y + Swap16IfLE(msg.fur.h) * m_client->m_nScale;
-			//	update.br.x = 2880;
-			//	update.br.y = 1200;
 				rfb::Region2D update_rgn = update;
+
+				//fullscreeen request, make it independed of the incremental rectangle
+				if (!msg.fur.incremental)
+				{
+					update_rgn=m_client->m_ScaledScreen;
+				}
 //				vnclog.Print(LL_SOCKERR, VNCLOG("Update asked for region %i %i %i %i %i\n"),update.tl.x,update.tl.y,update.br.x,update.br.y,m_client->m_SWOffsetx);
 
 				// RealVNC 336
@@ -1972,19 +1945,7 @@ vncClientThread::run(void *arg)
 						
 						// Tell the desktop grabber to fetch the region's latest state
 						m_client->m_encodemgr.m_buffer->m_desktop->QueueRect(update);
-					}
-					
-					/* RealVNC 336 (removed)
-					// Check that this client has an update thread
-					// The update thread never dissappears, and this is the only
-					// thread allowed to create it, so this can be done without locking.
-					if (!m_client->m_updatethread)
-					{
-						m_client->m_updatethread = new vncClientUpdateThread;
-						connected = (m_client->m_updatethread &&
-							m_client->m_updatethread->Init(m_client));
-					}
-					*/
+					}					
 
 					 // Kick the update thread (and create it if not there already)
 					m_client->m_encodemgr.m_buffer->m_desktop->TriggerUpdate();
