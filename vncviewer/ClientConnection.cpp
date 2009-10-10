@@ -3448,7 +3448,7 @@ ClientConnection::SendPointerEvent(int x, int y, int buttonMask)
 	SoftCursorMove(x, y);
     pe.x = Swap16IfLE(x);
     pe.y = Swap16IfLE(y);
-	WriteExact((char *)&pe, sz_rfbPointerEventMsg, rfbPointerEvent); // sf@2002 - For DSM Plugin
+	WriteExact((char *)&pe, sz_rfbPointerEventMsg, rfbPointerEvent,1); // sf@2002 - For DSM Plugin
 }
 
 //
@@ -3586,7 +3586,7 @@ ClientConnection::SendKeyEvent(CARD32 key, bool down)
     ke.type = rfbKeyEvent;
     ke.down = down ? 1 : 0;
     ke.key = Swap32IfLE(key);
-    WriteExact((char *)&ke, sz_rfbKeyEventMsg, rfbKeyEvent);
+    WriteExact((char *)&ke, sz_rfbKeyEventMsg, rfbKeyEvent,1);
     //vnclog.Print(0, _T("SendKeyEvent: key = x%04x status = %s ke.key=%d\n"), key, 
       //  down ? _T("down") : _T("up"),ke.key);
 }
@@ -4007,7 +4007,7 @@ ClientConnection::SendFramebufferUpdateRequest(int x, int y, int w, int h, bool 
     fur.h = Swap16IfLE(h);
 
 	//vnclog.Print(10, _T("Request %s update\n"), incremental ? _T("incremental") : _T("full"));	
-    WriteExact((char *)&fur, sz_rfbFramebufferUpdateRequestMsg, rfbFramebufferUpdateRequest);
+    WriteExact((char *)&fur, sz_rfbFramebufferUpdateRequestMsg, rfbFramebufferUpdateRequest,1);
 }
 
 inline void ClientConnection::SendIncrementalFramebufferUpdateRequest()
@@ -4152,7 +4152,7 @@ bool ClientConnection::SendSW(int x, int y)
 		sw.y = Swap16IfLE(y_scaled);
 	}
 	
-    WriteExact((char*)&sw, sz_rfbSetSWMsg, rfbSetSW);
+    WriteExact((char*)&sw, sz_rfbSetSWMsg, rfbSetSW,1);
 	m_SWselect=false;
     return true;
 }
@@ -4921,6 +4921,26 @@ void ClientConnection::ReadExactProxy(char *inbuf, int wanted)
 	buf[length] = '\0';
     vnclog.Print(10, _T("Read a %d-byte string\n"), length);
 }
+//NON BLOCKING
+int
+ClientConnection::Send(const char *buff, const unsigned int bufflen,int timeout)
+{
+	struct fd_set write_fds;
+	struct timeval tm;
+	int count;
+	int aa=0;
+
+	FD_ZERO(&write_fds);
+	FD_SET((unsigned int)m_sock, &write_fds);
+	tm.tv_sec = timeout;
+	tm.tv_usec = 0;
+	count = select(m_sock + 1, NULL, &write_fds, NULL, &tm);
+
+	if (count == 0) return 0; //timeout
+	if (count < 0 || count > 1) return 0;
+	if (FD_ISSET((unsigned int)m_sock, &write_fds)) aa=send(m_sock, buff, bufflen, 0);
+	return aa;
+}
 
 //
 // sf@2002 - DSM Plugin
@@ -4940,32 +4960,31 @@ void ClientConnection::WriteExact(char *buf, int bytes, CARD8 msgType)
 	}
 }
 
+void ClientConnection::WriteExact(char *buf, int bytes, CARD8 msgType,int timeout)
+{
+	if (!m_fUsePlugin)
+	{
+		WriteExact(buf, bytes,timeout);
+	}
+	else if (m_pDSMPlugin->IsEnabled())
+	{
+		// Send the transformed message type first 
+		WriteExact((char*)&msgType, sizeof(msgType),timeout);
+		// Then send the transformed rfb message content
+		WriteExact(buf, bytes,timeout);
+	}
+}
+
 // Sends the number of bytes specified from the buffer
 void ClientConnection::WriteExact(char *buf, int bytes)
 {
 
 	if (bytes == 0) return;
-	// Too slow
-	/*
-	HDC hdcX,hdcBits;
-	if (m_TrafficMonitor)
-	{
-		hdcX = GetDC(m_TrafficMonitor);
-		hdcBits = CreateCompatibleDC(hdcX);
-		SelectObject(hdcBits,m_bitmapFRONT);
-		BitBlt(hdcX,1,1,22,20,hdcBits,0,0,SRCCOPY);
-		DeleteDC(hdcBits);
-		ReleaseDC(m_TrafficMonitor,hdcX);
-	}
-	*/
 
 	omni_mutex_lock l(m_writeMutex);
 	//vnclog.Print(10, _T("  writing %d bytes\n"), bytes);
 
 	m_BytesSend += bytes;
-/*
-	SetDlgItemInt(m_hwndStatus,IDC_SEND,m_BytesSend,false);
-*/
 	int i = 0;
     int j;
 
@@ -5005,18 +5024,56 @@ void ClientConnection::WriteExact(char *buf, int bytes)
 		i += j;
     }
 
-	// Too slow
-	/*
-	if (m_TrafficMonitor)
+}
+
+// Sends the number of bytes specified from the buffer
+void ClientConnection::WriteExact(char *buf, int bytes,int timeout)
+{
+
+	if (bytes == 0) return;
+
+	omni_mutex_lock l(m_writeMutex);
+	//vnclog.Print(10, _T("  writing %d bytes\n"), bytes);
+
+	m_BytesSend += bytes;
+	int i = 0;
+    int j;
+
+	// sf@2002 - DSM Plugin
+	char *pBuffer = buf;
+	if (m_fUsePlugin)
 	{
-		hdcX = GetDC(m_TrafficMonitor);
-		hdcBits = CreateCompatibleDC(hdcX);
-		SelectObject(hdcBits,m_bitmapNONE);
-		BitBlt(hdcX,1,1,22,20,hdcBits,0,0,SRCCOPY);
-		DeleteDC(hdcBits);
-		ReleaseDC(m_TrafficMonitor,hdcX);
+		if (m_pDSMPlugin->IsEnabled())
+		{
+			int nTransDataLen = 0;
+			pBuffer = (char*)TransformBuffer((BYTE*)buf, bytes, &nTransDataLen);
+			if (pBuffer == NULL || (bytes > 0 && nTransDataLen == 0))
+				throw WarningException(sz_L68);
+			bytes = nTransDataLen;
+		}
 	}
-	*/
+
+    while (i < bytes)
+	{
+		j = Send(pBuffer+i, bytes-i, timeout);
+		if (j == SOCKET_ERROR || j==0)
+		{
+			LPVOID lpMsgBuf;
+			int err = ::GetLastError();
+			FormatMessage(     
+				FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+				FORMAT_MESSAGE_FROM_SYSTEM |     
+				FORMAT_MESSAGE_IGNORE_INSERTS, NULL,
+				err, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
+				(LPTSTR) &lpMsgBuf, 0, NULL ); // Process any inserts in lpMsgBuf.
+			vnclog.Print(1, _T("Socket error %d: %s\n"), err, lpMsgBuf);
+			LocalFree( lpMsgBuf );
+			m_running = false;
+
+			throw WarningException(sz_L69);
+		}
+		i += j;
+    }
 
 }
 
@@ -7254,7 +7311,7 @@ void ClientConnection::SendKeepAlive(bool bForce)
         rfbKeepAliveMsg kp;
         memset(&kp, 0, sizeof kp);
         kp.type = rfbKeepAlive;
-        WriteExact((char*)&kp, sz_rfbKeepAliveMsg, rfbKeepAlive);
+        WriteExact((char*)&kp, sz_rfbKeepAliveMsg, rfbKeepAlive,1);
     }
 }
 #pragma warning(default :4101)
