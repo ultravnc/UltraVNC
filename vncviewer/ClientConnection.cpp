@@ -3448,7 +3448,7 @@ ClientConnection::SendPointerEvent(int x, int y, int buttonMask)
 	SoftCursorMove(x, y);
     pe.x = Swap16IfLE(x);
     pe.y = Swap16IfLE(y);
-	WriteExact((char *)&pe, sz_rfbPointerEventMsg, rfbPointerEvent,1); // sf@2002 - For DSM Plugin
+	WriteExact_timeout((char *)&pe, sz_rfbPointerEventMsg, rfbPointerEvent,1); // sf@2002 - For DSM Plugin
 }
 
 //
@@ -3586,7 +3586,7 @@ ClientConnection::SendKeyEvent(CARD32 key, bool down)
     ke.type = rfbKeyEvent;
     ke.down = down ? 1 : 0;
     ke.key = Swap32IfLE(key);
-    WriteExact((char *)&ke, sz_rfbKeyEventMsg, rfbKeyEvent,1);
+    WriteExact_timeout((char *)&ke, sz_rfbKeyEventMsg, rfbKeyEvent,1);
     //vnclog.Print(0, _T("SendKeyEvent: key = x%04x status = %s ke.key=%d\n"), key, 
       //  down ? _T("down") : _T("up"),ke.key);
 }
@@ -4007,7 +4007,7 @@ ClientConnection::SendFramebufferUpdateRequest(int x, int y, int w, int h, bool 
     fur.h = Swap16IfLE(h);
 
 	//vnclog.Print(10, _T("Request %s update\n"), incremental ? _T("incremental") : _T("full"));	
-    WriteExact((char *)&fur, sz_rfbFramebufferUpdateRequestMsg, rfbFramebufferUpdateRequest,1);
+    WriteExact_timeout((char *)&fur, sz_rfbFramebufferUpdateRequestMsg, rfbFramebufferUpdateRequest,1);
 }
 
 inline void ClientConnection::SendIncrementalFramebufferUpdateRequest()
@@ -4152,7 +4152,7 @@ bool ClientConnection::SendSW(int x, int y)
 		sw.y = Swap16IfLE(y_scaled);
 	}
 	
-    WriteExact((char*)&sw, sz_rfbSetSWMsg, rfbSetSW,1);
+    WriteExact_timeout((char*)&sw, sz_rfbSetSWMsg, rfbSetSW,1);
 	m_SWselect=false;
     return true;
 }
@@ -4960,18 +4960,18 @@ void ClientConnection::WriteExact(char *buf, int bytes, CARD8 msgType)
 	}
 }
 
-void ClientConnection::WriteExact(char *buf, int bytes, CARD8 msgType,int timeout)
+void ClientConnection::WriteExact_timeout(char *buf, int bytes, CARD8 msgType,int timeout)
 {
 	if (!m_fUsePlugin)
 	{
-		WriteExact(buf, bytes,timeout);
+		WriteExact_timeout(buf, bytes,timeout);
 	}
 	else if (m_pDSMPlugin->IsEnabled())
 	{
 		// Send the transformed message type first 
-		WriteExact((char*)&msgType, sizeof(msgType),timeout);
+		WriteExact_timeout((char*)&msgType, sizeof(msgType),timeout);
 		// Then send the transformed rfb message content
-		WriteExact(buf, bytes,timeout);
+		WriteExact_timeout(buf, bytes,timeout);
 	}
 }
 
@@ -5027,7 +5027,7 @@ void ClientConnection::WriteExact(char *buf, int bytes)
 }
 
 // Sends the number of bytes specified from the buffer
-void ClientConnection::WriteExact(char *buf, int bytes,int timeout)
+void ClientConnection::WriteExact_timeout(char *buf, int bytes,int timeout)
 {
 
 	if (bytes == 0) return;
@@ -5055,6 +5055,7 @@ void ClientConnection::WriteExact(char *buf, int bytes,int timeout)
 
     while (i < bytes)
 	{
+		//j = send(m_sock, pBuffer+i, bytes-i, 0);
 		j = Send(pBuffer+i, bytes-i, timeout);
 		if (j == SOCKET_ERROR || j==0)
 		{
@@ -7311,7 +7312,7 @@ void ClientConnection::SendKeepAlive(bool bForce)
         rfbKeepAliveMsg kp;
         memset(&kp, 0, sizeof kp);
         kp.type = rfbKeepAlive;
-        WriteExact((char*)&kp, sz_rfbKeepAliveMsg, rfbKeepAlive,1);
+        WriteExact_timeout((char*)&kp, sz_rfbKeepAliveMsg, rfbKeepAlive,1);
     }
 }
 #pragma warning(default :4101)

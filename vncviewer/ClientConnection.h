@@ -333,11 +333,11 @@ private:
 	void ReadExactProxy(char *buf, int bytes);
 	void ReadString(char *buf, int length);
 	int Send(const char *buff, const unsigned int bufflen,int timeout);
-	void WriteExact(char *buf, int bytes,int timeout);
+	void WriteExact_timeout(char *buf, int bytes,int timeout);
 	void WriteExact(char *buf, int bytes);
 	void WriteExactProxy(char *buf, int bytes);
 	void WriteExact(char *buf, int bytes, CARD8 msgType); //sf@2002 - DSM Plugin
-	void WriteExact(char *buf, int bytes, CARD8 msgType,int timeout); //sf@2002 - DSM Plugin
+	void WriteExact_timeout(char *buf, int bytes, CARD8 msgType,int timeout); //sf@2002 - DSM Plugin
 	
 	void ReadExactProtocolVersion(char *buf, int bytes, bool& fNotEncrypted); //adzm 2009-06-21
 
