@@ -1896,11 +1896,11 @@ vncClientThread::run(void *arg)
 			
 		case rfbFramebufferUpdateRequest:
 			// Read the rest of the message:
-//#ifdef _DEBUG
-//										char			szText[256];
-//										sprintf(szText," rfbFramebufferUpdateRequest \n");
-//										OutputDebugString(szText);		
-//#endif
+#ifdef _DEBUG
+										char			szText[256];
+										sprintf(szText," rfbFramebufferUpdateRequest \n");
+										OutputDebugString(szText);		
+#endif
 			if (!m_socket->ReadExact(((char *) &msg)+nTO, sz_rfbFramebufferUpdateRequestMsg-nTO))
 			{
 				connected = FALSE;
@@ -1920,12 +1920,27 @@ vncClientThread::run(void *arg)
 				//fullscreeen request, make it independed of the incremental rectangle
 				if (!msg.fur.incremental)
 				{
+#ifdef _DEBUG
+										char			szText[256];
+										sprintf(szText,"FULL update request \n");
+										OutputDebugString(szText);		
+#endif
 					update_rgn=m_client->m_ScaledScreen;
 				}
+#ifdef _DEBUG
+										char			szText[256];
+										sprintf(szText,"Update asked for region %i %i %i %i %i \n",update.tl.x,update.tl.y,update.br.x,update.br.y,m_client->m_SWOffsetx);
+										OutputDebugString(szText);		
+#endif
 //				vnclog.Print(LL_SOCKERR, VNCLOG("Update asked for region %i %i %i %i %i\n"),update.tl.x,update.tl.y,update.br.x,update.br.y,m_client->m_SWOffsetx);
 
 				// RealVNC 336
 				if (update_rgn.is_empty()) {
+#ifdef _DEBUG
+										char			szText[256];
+										sprintf(szText,"FATAL! client update region is empty!\n");
+										OutputDebugString(szText);		
+#endif
 					vnclog.Print(LL_INTERR, VNCLOG("FATAL! client update region is empty!\n"));
 					connected = FALSE;
 					break;
@@ -3678,6 +3693,8 @@ vncClient::SendUpdate(rfb::SimpleUpdateTracker &update)
 				SendRFBMsg(rfbFramebufferUpdate, (BYTE *)&header,sz_rfbFramebufferUpdateMsg);
 				m_socket->SendExact((char *)&hdr, sizeof(hdr));
 				m_NewSWUpdateWaiting=false;
+				m_ScaledScreen = m_encodemgr.m_buffer->GetViewerSize();
+				m_nScale = m_encodemgr.m_buffer->GetScale();
 				return TRUE;
 			}
 		}

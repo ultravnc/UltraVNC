@@ -62,8 +62,6 @@ void ClientConnection::HandleHextileEncoding##bpp(int rx, int ry, int rw, int rh
                                                                               \
     for (y = ry; y < ry+rh; y += 16) {                                        \
 		omni_mutex_lock l(m_bitmapdcMutex);									  \
-		ObjectSelector b(m_hBitmapDC, m_hBitmap);							  \
-		PaletteSelector p(m_hBitmapDC, m_hPalette);							  \
 		for (x = rx; x < rx+rw; x += 16) {                                    \
             w = h = 16;                                                       \
             if (rx+rw - x < 16)                                               \
@@ -83,7 +81,7 @@ void ClientConnection::HandleHextileEncoding##bpp(int rx, int ry, int rw, int rh
                 ReadExact((char *)&bg, (bpp/8));                              \
 				bgcolor = COLOR_FROM_PIXEL##bpp##_ADDRESS(&bg);  			  \
 			}																  \
-            FillSolidRect(x,y,w,h,bgcolor);                                   \
+            FillSolidRect_ultra(x,y,w,h, m_myFormat.bitsPerPixel,(BYTE*)&bg);\
                                                                               \
             if (subencoding & rfbHextileForegroundSpecified)  {               \
                 ReadExact((char *)&fg, (bpp/8));                              \
@@ -104,12 +102,13 @@ void ClientConnection::HandleHextileEncoding##bpp(int rx, int ry, int rw, int rh
                                                                               \
                 for (i = 0; i < nSubrects; i++) {                             \
                     fgcolor = COLOR_FROM_PIXEL##bpp##_ADDRESS(ptr);           \
+					memcpy(&fg,ptr,bpp/8);									  \
 					ptr += (bpp/8);                                           \
                     sx = *ptr >> 4;                                           \
                     sy = *ptr++ & 0x0f;                                       \
                     sw = (*ptr >> 4) + 1;                                     \
                     sh = (*ptr++ & 0x0f) + 1;                                 \
-                    FillSolidRect(x+sx, y+sy, sw, sh, fgcolor);               \
+                    FillSolidRect_ultra(x+sx, y+sy, sw, sh, m_myFormat.bitsPerPixel,(BYTE*)&fg);\
                 }                                                             \
                                                                               \
             } else {                                                          \
@@ -120,7 +119,7 @@ void ClientConnection::HandleHextileEncoding##bpp(int rx, int ry, int rw, int rh
                     sy = *ptr++ & 0x0f;                                       \
                     sw = (*ptr >> 4) + 1;                                     \
                     sh = (*ptr++ & 0x0f) + 1;                                 \
-                    FillSolidRect(x+sx, y+sy, sw, sh, fgcolor);               \
+                    FillSolidRect_ultra(x+sx, y+sy, sw, sh, m_myFormat.bitsPerPixel,(BYTE*)&fg);\
                 }                                                             \
             }																\
 			/*Sleep(0);*/														  \

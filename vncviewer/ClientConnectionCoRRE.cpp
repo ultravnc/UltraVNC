@@ -56,7 +56,7 @@ void ClientConnection::ReadCoRRERect(rfbFramebufferUpdateRectHeader *pfburh)
     }
 
     // Draw the background of the rectangle
-    FillSolidRect(pfburh->r.x, pfburh->r.y, pfburh->r.w, pfburh->r.h, color);
+	FillSolidRect_ultra(pfburh->r.x, pfburh->r.y, pfburh->r.w, pfburh->r.h, m_myFormat.bitsPerPixel,pcolor);
 
     if (prreh->nSubrects == 0) return;
 
@@ -73,9 +73,7 @@ void ClientConnection::ReadCoRRERect(rfbFramebufferUpdateRectHeader *pfburh)
 	BYTE *p = (BYTE *) m_netbuf;
 
 	{
-		omni_mutex_lock l(m_bitmapdcMutex);									  \
-		ObjectSelector b(m_hBitmapDC, m_hBitmap);							  \
-		PaletteSelector ps(m_hBitmapDC, m_hPalette);							  \
+		omni_mutex_lock l(m_bitmapdcMutex);
 
 		for (CARD32 i = 0; i < prreh->nSubrects; i++) {
 			
@@ -95,7 +93,7 @@ void ClientConnection::ReadCoRRERect(rfbFramebufferUpdateRectHeader *pfburh)
 			rect.y = pRect->y + pfburh->r.y;
 			rect.w = pRect->w;
 			rect.h = pRect->h;
-			FillSolidRect(rect.x, rect.y, rect.w, rect.h, color);
+			FillSolidRect_ultra(rect.x, rect.y, rect.w, rect.h, m_myFormat.bitsPerPixel,p);
 			p+=subRectSize;
 		}
 	}

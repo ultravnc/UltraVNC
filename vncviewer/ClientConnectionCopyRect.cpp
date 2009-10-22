@@ -42,7 +42,7 @@ void ClientConnection::ReadCopyRect(rfbFramebufferUpdateRectHeader *pfburh) {
 	// (previously set to destination rectangle) to the source rect as well.
 	SoftCursorLockArea(cr.srcX, cr.srcY, pfburh->r.w, pfburh->r.h);
 
-	if (UltraFast && m_DIBbits)
+	if (m_DIBbits)
 		{
 		omni_mutex_lock l(m_bitmapdcMutex);
 		int bytesPerInputRow = m_si.framebufferWidth * m_myFormat.bitsPerPixel/8;
@@ -80,18 +80,4 @@ void ClientConnection::ReadCopyRect(rfbFramebufferUpdateRectHeader *pfburh) {
 			}
 		}
 	}
-	else
-	{
-		omni_mutex_lock l(m_bitmapdcMutex);									  
-		ObjectSelector b(m_hBitmapDC, m_hBitmap);							  
-		PaletteSelector p(m_hBitmapDC, m_hPalette);							  
-	
-		if (!BitBlt(
-			m_hBitmapDC,pfburh->r.x, pfburh->r.y, pfburh->r.w, pfburh->r.h,
-			m_hBitmapDC, cr.srcX, cr.srcY, SRCCOPY)) {
-			vnclog.Print(0, _T("Error in blit in ClientConnection::CopyRect\n"));
-		}
-	}
-
-
 }

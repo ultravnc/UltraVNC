@@ -90,6 +90,8 @@ void ClientConnection::ReadZlibHexRect(rfbFramebufferUpdateRectHeader *pfburh)
 
 COLORREF bgcolor = 0;
 COLORREF fgcolor = 0;
+BYTE pfgcolor[4];
+BYTE pbgcolor[4];
 
 #define DEFINE_HEXTILE(bpp)														\
 void ClientConnection::HandleZlibHexEncoding##bpp(int rx, int ry, int rw, int rh)		\
@@ -104,8 +106,6 @@ void ClientConnection::HandleZlibHexEncoding##bpp(int rx, int ry, int rw, int rh
 																				\
     for (y = ry; y < ry+rh; y += 16) {											\
 		omni_mutex_lock l(m_bitmapdcMutex);										\
-		ObjectSelector b(m_hBitmapDC, m_hBitmap);								\
-		PaletteSelector p(m_hBitmapDC, m_hPalette);								\
 		for (x = rx; x < rx+rw; x += 16) {										\
             w = h = 16;															\
             if (rx+rw - x < 16)													\
@@ -162,12 +162,14 @@ void ClientConnection::HandleZlibHexSubencodingStream##bpp(int x, int y, int w, 
 	if (subencoding & rfbHextileBackgroundSpecified) {							\
 		ReadExact((char *)&bg, (bpp/8));										\
 		bgcolor = COLOR_FROM_PIXEL##bpp##_ADDRESS(&bg);							\
+		memcpy(pbgcolor,&bg,bpp/8);												\
 	}																			\
-	FillSolidRect(x,y,w,h,bgcolor);												\
+	FillSolidRect_ultra(x,y,w,h, m_myFormat.bitsPerPixel,(BYTE*)pbgcolor);\
 																				\
 	if (subencoding & rfbHextileForegroundSpecified)  {							\
 		ReadExact((char *)&fg, (bpp/8));										\
 		fgcolor = COLOR_FROM_PIXEL##bpp##_ADDRESS(&fg);							\
+		memcpy(pfgcolor,&fg,bpp/8);												\
 	}																			\
 																				\
 	if (!(subencoding & rfbHextileAnySubrects)) {								\
@@ -184,12 +186,13 @@ void ClientConnection::HandleZlibHexSubencodingStream##bpp(int x, int y, int w, 
 																				\
 		for (i = 0; i < nSubrects; i++) {										\
 			fgcolor = COLOR_FROM_PIXEL##bpp##_ADDRESS(ptr);						\
+			memcpy(pfgcolor,ptr,bpp/8);											\
 			ptr += (bpp/8);														\
 			sx = *ptr >> 4;														\
 			sy = *ptr++ & 0x0f;													\
 			sw = (*ptr >> 4) + 1;												\
 			sh = (*ptr++ & 0x0f) + 1;											\
-			FillSolidRect(x+sx, y+sy, sw, sh, fgcolor);							\
+			FillSolidRect_ultra(x+sx, y+sy, sw, sh, m_myFormat.bitsPerPixel,(BYTE*)pfgcolor);\
 		}																		\
 																				\
 	} else {																	\
@@ -200,7 +203,7 @@ void ClientConnection::HandleZlibHexSubencodingStream##bpp(int x, int y, int w, 
 			sy = *ptr++ & 0x0f;													\
 			sw = (*ptr >> 4) + 1;												\
 			sh = (*ptr++ & 0x0f) + 1;											\
-			FillSolidRect(x+sx, y+sy, sw, sh, fgcolor);							\
+			FillSolidRect_ultra(x+sx, y+sy, sw, sh, m_myFormat.bitsPerPixel,(BYTE*)pfgcolor);\
 		}																		\
 	}																			\
 }																				\
@@ -222,14 +225,16 @@ void ClientConnection::HandleZlibHexSubencodingBuf##bpp(int x, int y, int w, int
 		bufIndex += (bpp/8);													\
 		/* ReadExact((char *)&bg, (bpp/8)); */									\
 		bgcolor = COLOR_FROM_PIXEL##bpp##_ADDRESS(&bg);							\
+		memcpy(pbgcolor,&bg,bpp/8);												\
 	}																			\
-	FillSolidRect(x,y,w,h,bgcolor);												\
+	FillSolidRect_ultra(x,y,w,h, m_myFormat.bitsPerPixel,(BYTE*)pbgcolor);\
 																				\
 	if (subencoding & rfbHextileForegroundSpecified)  {							\
 		fg = *((CARD##bpp *)(buffer + bufIndex));								\
 		bufIndex += (bpp/8);													\
 		/* ReadExact((char *)&fg, (bpp/8)); */									\
 		fgcolor = COLOR_FROM_PIXEL##bpp##_ADDRESS(&fg);							\
+		memcpy(pfgcolor,&fg,bpp/8);												\
 	}																			\
 																				\
 	if (!(subencoding & rfbHextileAnySubrects)) {								\
@@ -248,12 +253,13 @@ void ClientConnection::HandleZlibHexSubencodingBuf##bpp(int x, int y, int w, int
 																				\
 		for (i = 0; i < nSubrects; i++) {										\
 			fgcolor = COLOR_FROM_PIXEL##bpp##_ADDRESS(ptr);						\
+			memcpy(pfgcolor,ptr,bpp/8);											\
 			ptr += (bpp/8);														\
 			sx = *ptr >> 4;														\
 			sy = *ptr++ & 0x0f;													\
 			sw = (*ptr >> 4) + 1;												\
 			sh = (*ptr++ & 0x0f) + 1;											\
-			FillSolidRect(x+sx, y+sy, sw, sh, fgcolor);							\
+			FillSolidRect_ultra(x+sx, y+sy, sw, sh, m_myFormat.bitsPerPixel,(BYTE*)pfgcolor);\
 		}																		\
 																				\
 	} else {																	\
@@ -264,7 +270,7 @@ void ClientConnection::HandleZlibHexSubencodingBuf##bpp(int x, int y, int w, int
 			sy = *ptr++ & 0x0f;													\
 			sw = (*ptr >> 4) + 1;												\
 			sh = (*ptr++ & 0x0f) + 1;											\
-			FillSolidRect(x+sx, y+sy, sw, sh, fgcolor);							\
+			FillSolidRect_ultra(x+sx, y+sy, sw, sh, m_myFormat.bitsPerPixel,(BYTE*)pfgcolor);\
 		}																		\
 	}																			\
 }

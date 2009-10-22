@@ -54,11 +54,9 @@ void ClientConnection::ReadRRERect(rfbFramebufferUpdateRectHeader *pfburh)
 
 	// No other threads can use bitmap DC
 	omni_mutex_lock l(m_bitmapdcMutex);
-	ObjectSelector b(m_hBitmapDC, m_hBitmap);
-	PaletteSelector ps(m_hBitmapDC, m_hPalette);
 		
 	// Draw the background of the rectangle
-	FillSolidRect(pfburh->r.x, pfburh->r.y, pfburh->r.w, pfburh->r.h, color);
+	FillSolidRect_ultra(pfburh->r.x, pfburh->r.y, pfburh->r.w, pfburh->r.h, m_myFormat.bitsPerPixel,pcolor);
 	
     if (prreh->nSubrects == 0) return;
 	
@@ -88,7 +86,7 @@ void ClientConnection::ReadRRERect(rfbFramebufferUpdateRectHeader *pfburh)
 		rect.w = Swap16IfLE(pRect->w);
 		rect.h = Swap16IfLE(pRect->h);
 		
-		FillSolidRect(rect.x, rect.y, rect.w, rect.h, color);
+		FillSolidRect_ultra(rect.x, rect.y, rect.w, rect.h, m_myFormat.bitsPerPixel,p);
 		p+=subRectSize;
 	}
 }

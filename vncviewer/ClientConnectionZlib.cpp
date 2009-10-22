@@ -89,9 +89,7 @@ void ClientConnection::ReadZlibRect(rfbFramebufferUpdateRectHeader *pfburh,int X
 		BYTE *color=m_zlibbuf+(((pfburh->r.w*pfburh->r.h)+7)/8);
 		BYTE *color2=m_zlibbuf+(((pfburh->r.w*pfburh->r.h)+7)/8)+m_myFormat.bitsPerPixel/8;
 		// No other threads can use bitmap DC
-		omni_mutex_lock l(m_bitmapdcMutex);
-		ObjectSelector b(m_hBitmapDC, m_hBitmap);							  
-		PaletteSelector p(m_hBitmapDC, m_hPalette);							  
+		omni_mutex_lock l(m_bitmapdcMutex);						  
 
 		// This big switch is untidy but fast
 		switch (m_myFormat.bitsPerPixel) {
@@ -117,9 +115,7 @@ void ClientConnection::ReadZlibRect(rfbFramebufferUpdateRectHeader *pfburh,int X
 		BYTE *color=m_zlibbuf+(((pfburh->r.w*pfburh->r.h)+7)/8);
 		BYTE *databuffer=m_zlibbuf+(((pfburh->r.w*pfburh->r.h)+7)/8)+m_myFormat.bitsPerPixel/8;
 		// No other threads can use bitmap DC
-		omni_mutex_lock l(m_bitmapdcMutex);
-		ObjectSelector b(m_hBitmapDC, m_hBitmap);							  
-		PaletteSelector p(m_hBitmapDC, m_hPalette);							  
+		omni_mutex_lock l(m_bitmapdcMutex);						  
 
 		// This big switch is untidy but fast
 		switch (m_myFormat.bitsPerPixel) {
@@ -143,9 +139,7 @@ void ClientConnection::ReadZlibRect(rfbFramebufferUpdateRectHeader *pfburh,int X
 		mybool *maskbuffer=(mybool *)m_zlibbuf;
 		BYTE *databuffer=m_zlibbuf+(((pfburh->r.w*pfburh->r.h)+7)/8);
 		// No other threads can use bitmap DC
-		omni_mutex_lock l(m_bitmapdcMutex);
-		ObjectSelector b(m_hBitmapDC, m_hBitmap);							  
-		PaletteSelector p(m_hBitmapDC, m_hPalette);							  
+		omni_mutex_lock l(m_bitmapdcMutex);						  
 		int aantal=0;
 		// This big switch is untidy but fast
 		switch (m_myFormat.bitsPerPixel) {
@@ -169,9 +163,7 @@ void ClientConnection::ReadZlibRect(rfbFramebufferUpdateRectHeader *pfburh,int X
 		mybool *maskbuffer=(mybool *)m_zlibbuf;
 		BYTE *databuffer=m_zlibbuf+(((pfburh->r.w*pfburh->r.h)+7)/8);
 		// No other threads can use bitmap DC
-		omni_mutex_lock l(m_bitmapdcMutex);
-		ObjectSelector b(m_hBitmapDC, m_hBitmap);							  \
-		PaletteSelector p(m_hBitmapDC, m_hPalette);							  \
+		omni_mutex_lock l(m_bitmapdcMutex);	
 
 		// This big switch is untidy but fast
 		switch (m_myFormat.bitsPerPixel) {
@@ -226,9 +218,7 @@ void ClientConnection::ReadSolidRect(rfbFramebufferUpdateRectHeader *pfburh) {
 	SETUP_COLOR_SHORTCUTS;
 	
 		// No other threads can use bitmap DC
-		omni_mutex_lock l(m_bitmapdcMutex);
-		ObjectSelector b(m_hBitmapDC, m_hBitmap);							  
-		PaletteSelector p(m_hBitmapDC, m_hPalette);							  
+		omni_mutex_lock l(m_bitmapdcMutex);						  
 
 		// This big switch is untidy but fast
 		switch (m_myFormat.bitsPerPixel) {
@@ -302,9 +292,7 @@ void ClientConnection::ReadSolMonoZip(rfbFramebufferUpdateRectHeader *pfburh,HRG
 				SETUP_COLOR_SHORTCUTS;
 	
 				// No other threads can use bitmap DC
-				omni_mutex_lock l(m_bitmapdcMutex);
-				ObjectSelector b(m_hBitmapDC, m_hBitmap);							  
-				PaletteSelector p(m_hBitmapDC, m_hPalette);							  
+				omni_mutex_lock l(m_bitmapdcMutex);						  
 
 				// This big switch is untidy but fast
 				switch (m_myFormat.bitsPerPixel) {
@@ -332,9 +320,7 @@ void ClientConnection::ReadSolMonoZip(rfbFramebufferUpdateRectHeader *pfburh,HRG
 				BYTE *color2=pzipbuf+(((surh.r.w*surh.r.h)+7)/8)+m_myFormat.bitsPerPixel/8;
 
 				// No other threads can use bitmap DC
-				omni_mutex_lock l(m_bitmapdcMutex);
-				ObjectSelector b(m_hBitmapDC, m_hBitmap);							  
-				PaletteSelector p(m_hBitmapDC, m_hPalette);							  
+				omni_mutex_lock l(m_bitmapdcMutex);						  
 
 				// This big switch is untidy but fast
 				switch (m_myFormat.bitsPerPixel) {
@@ -361,8 +347,6 @@ void ClientConnection::ReadSolMonoZip(rfbFramebufferUpdateRectHeader *pfburh,HRG
 				BYTE *databuffer=pzipbuf+(((surh.r.w*surh.r.h)+7)/8);
 		
 				omni_mutex_lock l(m_bitmapdcMutex);
-				ObjectSelector b(m_hBitmapDC, m_hBitmap);							  
-				PaletteSelector p(m_hBitmapDC, m_hPalette);	
 				int aantal=0;
 
 				// This big switch is untidy but fast
@@ -388,9 +372,7 @@ void ClientConnection::ReadSolMonoZip(rfbFramebufferUpdateRectHeader *pfburh,HRG
 			{
 				UINT numpixels = surh.r.w * surh.r.h;
 				SETUP_COLOR_SHORTCUTS;
-				omni_mutex_lock l(m_bitmapdcMutex);
-				ObjectSelector b(m_hBitmapDC, m_hBitmap);							  
-				PaletteSelector p(m_hBitmapDC, m_hPalette);							  
+				omni_mutex_lock l(m_bitmapdcMutex);						  
 
 				// This big switch is untidy but fast
 				switch (m_myFormat.bitsPerPixel) {

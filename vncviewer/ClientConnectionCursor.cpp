@@ -134,11 +134,9 @@ void ClientConnection::ReadCursorShape(rfbFramebufferUpdateRectHeader *pfburh) {
 
 	{
 		omni_mutex_lock l(m_bitmapdcMutex);
-		ObjectSelector b1(m_hBitmapDC, m_hBitmap);
-		PaletteSelector ps1(m_hBitmapDC, m_hPalette);
-		m_hSavedAreaDC = CreateCompatibleDC(m_hBitmapDC);
-		m_hSavedAreaBitmap =
-			CreateCompatibleBitmap(m_hBitmapDC, rcWidth, rcHeight);
+		if (m_SavedAreaBIB) delete[] m_SavedAreaBIB;
+		m_SavedAreaBIB = new BYTE [rcWidth * rcHeight * m_myFormat.bitsPerPixel/8];
+
 	}
 
 	SoftCursorSaveArea();
@@ -259,8 +257,8 @@ void ClientConnection::SoftCursorFree() {
 	if (prevCursorSet) {
 		if (!rcCursorHidden)
 			SoftCursorRestoreArea();
-		DeleteObject(m_hSavedAreaBitmap);
-		DeleteDC(m_hSavedAreaDC);
+		delete[] m_SavedAreaBIB;
+		m_SavedAreaBIB=NULL;
 		delete[] rcSource;
 		rcSource=NULL;
 		delete[] rcMask;
@@ -300,14 +298,7 @@ void ClientConnection::SoftCursorSaveArea() {
 	int h = r.bottom - r.top;
 
 	omni_mutex_lock l(m_bitmapdcMutex);
-	ObjectSelector b1(m_hBitmapDC, m_hBitmap);
-	PaletteSelector ps1(m_hBitmapDC, m_hPalette);
-	ObjectSelector b2(m_hSavedAreaDC, m_hSavedAreaBitmap);
-	PaletteSelector ps2(m_hSavedAreaDC, m_hPalette);
-
-	if (!BitBlt(m_hSavedAreaDC, 0, 0, w, h, m_hBitmapDC, x, y, SRCCOPY)) {
-		vnclog.Print(0, _T("Error saving screen under cursor\n"));
-	}
+	if (m_DIBbits && m_SavedAreaBIB) Copyto0buffer(w, h, x, y,m_myFormat.bitsPerPixel/8,(BYTE*)m_DIBbits,m_SavedAreaBIB,m_si.framebufferWidth);
 }
 
 //
@@ -324,14 +315,7 @@ void ClientConnection::SoftCursorRestoreArea() {
 	int h = r.bottom - r.top;
 
 	omni_mutex_lock l(m_bitmapdcMutex);
-	ObjectSelector b1(m_hBitmapDC, m_hBitmap);
-	PaletteSelector ps1(m_hBitmapDC, m_hPalette);
-	ObjectSelector b2(m_hSavedAreaDC, m_hSavedAreaBitmap);
-	PaletteSelector ps2(m_hSavedAreaDC, m_hPalette);
-
-	if (!BitBlt(m_hBitmapDC, x, y, w, h, m_hSavedAreaDC, 0, 0, SRCCOPY)) {
-		vnclog.Print(0, _T("Error restoring screen under cursor\n"));
-	}
+	if (m_DIBbits && m_SavedAreaBIB) Copyfrom0buffer(w, h, x, y,m_myFormat.bitsPerPixel/8,m_SavedAreaBIB,(BYTE*)m_DIBbits,m_si.framebufferWidth);
 
 	InvalidateScreenRect(&r);
 }
@@ -346,8 +330,6 @@ void ClientConnection::SoftCursorDraw() {
 	int offset;
 
 	omni_mutex_lock l(m_bitmapdcMutex);
-	ObjectSelector b(m_hBitmapDC, m_hBitmap);
-	PaletteSelector p(m_hBitmapDC, m_hPalette);
 
 	SETUP_COLOR_SHORTCUTS;
 
@@ -359,7 +341,7 @@ void ClientConnection::SoftCursorDraw() {
 				if (x0 >= 0 && x0 < m_si.framebufferWidth) {
 					offset = y * rcWidth + x;
 					if (rcMask[offset]) {
-						SETPIXEL(m_hBitmapDC, x0, y0, rcSource[offset]);
+						if (m_DIBbits)ConvertPixel(x0,y0,m_myFormat.bitsPerPixel/8,(BYTE*)&rcSource[offset],(BYTE*)m_DIBbits,m_si.framebufferWidth);
 					}
 				}
 			}

@@ -26,7 +26,8 @@
 #define FILL_RECT(x,y,w,h,pix)                          \
     SETUP_COLOR_SHORTCUTS;                              \
     COLORREF color = COLOR_FROM_PIXEL8_ADDRESS(&pix);   \
-    FillSolidRect(x,y,w,h,color)
+    FillSolidRect_ultra(x,y,w,h, m_myFormat.bitsPerPixel,(BYTE*)&pix)
+
 #include <rfb/zrleDecode.h>
 #undef BPP
 #undef ZYWRLE_ENDIAN
@@ -41,7 +42,8 @@
 #define FILL_RECT(x,y,w,h,pix)                          \
     SETUP_COLOR_SHORTCUTS;                              \
     COLORREF color = COLOR_FROM_PIXEL16_ADDRESS(&pix);  \
-    FillSolidRect(x,y,w,h,color)
+    FillSolidRect_ultra(x,y,w,h, m_myFormat.bitsPerPixel,(BYTE*)&pix)
+
 #include <rfb/zrleDecode.h>
 #undef BPP
 #undef ZYWRLE_ENDIAN
@@ -59,7 +61,8 @@
 #define FILL_RECT(x,y,w,h,pix)                          \
     SETUP_COLOR_SHORTCUTS;                              \
     COLORREF color = COLOR_FROM_PIXEL32_ADDRESS(&pix);  \
-    FillSolidRect(x,y,w,h,color)
+    FillSolidRect_ultra(x,y,w,h, m_myFormat.bitsPerPixel,(BYTE*)&pix)
+
 
 #define BPP 32
 #define ZYWRLE_ENDIAN ENDIAN_LITTLE
@@ -82,8 +85,6 @@ void ClientConnection::zrleDecode(int x, int y, int w, int h)
   try {
     CheckBufferSize(rfbZRLETileWidth * rfbZRLETileHeight * 4);
     omni_mutex_lock l(m_bitmapdcMutex);
-    ObjectSelector b(m_hBitmapDC, m_hBitmap);
-    PaletteSelector p(m_hBitmapDC, m_hPalette);
 
 	if( zywrle ){
 	  if( !m_opts.m_enableJpegCompression ){

@@ -681,6 +681,7 @@ vncDesktopThread::run_undetached(void *arg)
 	bool looping=true;
 	SetEvent(m_desktop->restart_event);
 	///
+	Sleep(1000);
 	rgncache.assign_union(rfb::Region2D(m_desktop->m_Cliprect));
 	if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver)
 											{
@@ -862,11 +863,6 @@ vncDesktopThread::run_undetached(void *arg)
 //#endif
 								if (m_desktop->m_server->UpdateWanted())
 								{
-#ifdef _DEBUG
-										char			szText[256];
-										sprintf(szText," m_desktop->m_server->UpdateWanted \n");
-										OutputDebugString(szText);		
-#endif
 					//				vnclog.Print(LL_INTERR, VNCLOG("UpdateWanted N\n"));
 									//TEST4
 									// Re-render the mouse's old location if it's moved
@@ -1123,7 +1119,6 @@ vncDesktopThread::run_undetached(void *arg)
 									if (m_desktop->AviGen) m_desktop->AviGen->AddFrame((BYTE*)m_desktop->m_DIBbits);
 					#endif
 								}
-
 								newtick = timeGetTime(); // Better resolution than GetTickCount ;)		
 								//if (newtick-oldtick > 0)
 									//vnclog.Print(LL_INTINFO, VNCLOG("Elapsed Time for updates %ums\n"), newtick-oldtick);

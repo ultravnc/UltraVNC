@@ -57,12 +57,10 @@ void ClientConnection::SetFullScreenMode(bool enable)
 		GetWindowRect(m_hwndMain, &winrect);
 		int winwidth = winrect.right - winrect.left;
 		int winheight = winrect.bottom - winrect.top;
-		ObjectSelector b(m_hBitmapDC, m_hBitmap);
-		PaletteSelector p(m_hBitmapDC, m_hPalette);
 		RECT rect;
 		SetRect(&rect, 0,0, winwidth, winheight);
 		COLORREF bgcol = RGB(0x0, 0x0, 0x0);
-		FillSolidRect(&rect, bgcol);
+		FillSolidRect_ultra(0, 0, winwidth, winheight, m_myFormat.bitsPerPixel,(BYTE *) &bgcol);
 		// Update the whole screen 
 		SendFullFramebufferUpdateRequest();
 	}

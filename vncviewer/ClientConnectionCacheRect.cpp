@@ -56,14 +56,7 @@ void ClientConnection::SaveArea(RECT &r)
 	int h = r.bottom - r.top;
 
 	omni_mutex_lock l(m_bitmapdcMutex);
-	ObjectSelector b1(m_hBitmapDC, m_hBitmap);
-	PaletteSelector ps1(m_hBitmapDC, m_hPalette);
-	ObjectSelector b2(m_hCacheBitmapDC, m_hCacheBitmap);
-	PaletteSelector ps2(m_hCacheBitmapDC, m_hPalette);
-
-	if (m_hCacheBitmapDC!=NULL) if (!BitBlt(m_hCacheBitmapDC, x, y, w, h, m_hBitmapDC, x, y, SRCCOPY)) {
-		vnclog.Print(0, _T("Error saving screen\n"));
-	}
+	if (m_DIBbitsCache && m_DIBbits) Copybuffer(w, h, x, y,m_myFormat.bitsPerPixel/8,(BYTE*)m_DIBbits,(BYTE*)m_DIBbitsCache,m_si.framebufferWidth);
 }
 
 void ClientConnection::RestoreArea(RECT &r)
@@ -77,44 +70,7 @@ void ClientConnection::RestoreArea(RECT &r)
 
 	omni_mutex_lock l(m_bitmapdcMutex);
 
-	ObjectSelector b1(m_hBitmapDC, m_hBitmap);
-	PaletteSelector ps1(m_hBitmapDC, m_hPalette);
-	m_hTempBitmapDC = CreateCompatibleDC(m_hBitmapDC);
-	m_hTempBitmap = CreateCompatibleBitmap(m_hBitmapDC, w, h);
-	if (m_hTempBitmap == NULL) {
-		//adzm - 2009-07-12 - Create a DIB (which will use system rather than video memory) if this fails
-		void* pvbits_dummy = NULL;
-		BITMAPINFO bmi;
-		::ZeroMemory(&bmi.bmiHeader, sizeof(bmi.bmiHeader));
-		bmi.bmiHeader.biSize = sizeof(bmi.bmiHeader);
-		bmi.bmiHeader.biWidth = w;
-		bmi.bmiHeader.biHeight = h;
-		bmi.bmiHeader.biPlanes = 1;
-		bmi.bmiHeader.biBitCount = 32;
-
-		m_hTempBitmap = CreateDIBSection(m_hBitmapDC, &bmi, DIB_RGB_COLORS, &pvbits_dummy, NULL, 0);
-	}
-	ObjectSelector b3(m_hTempBitmapDC, m_hTempBitmap);
-	PaletteSelector ps3(m_hTempBitmapDC, m_hPalette);
-	ObjectSelector b2(m_hCacheBitmapDC, m_hCacheBitmap);
-	PaletteSelector ps2(m_hCacheBitmapDC, m_hPalette);
-
-	if (!BitBlt(m_hTempBitmapDC, 0, 0, w, h, m_hBitmapDC, x, y, SRCCOPY)) {
-		vnclog.Print(0, _T("Error saving temp bitmap\n"));
-	}
-
-	if (!BitBlt(m_hBitmapDC, x, y, w, h, m_hCacheBitmapDC, x, y, SRCCOPY)) {
-		vnclog.Print(0, _T("Error restoring screen\n"));
-	}
-
-	if (!BitBlt(m_hCacheBitmapDC, x, y, w, h, m_hTempBitmapDC, 0, 0, SRCCOPY)) {
-		vnclog.Print(0, _T("Error restoring screen under cursor\n"));
-	}
-	DeleteDC(m_hTempBitmapDC);
-	if (m_hTempBitmap != NULL)
-		DeleteObject(m_hTempBitmap);
-	if (m_hCacheBitmapDC != NULL)
-		DeleteObject(m_hTempBitmapDC);
+	if (m_DIBbitsCache && m_DIBbits)Switchbuffer(w, h, x, y,m_myFormat.bitsPerPixel/8,(BYTE*)m_DIBbits,(BYTE*)m_DIBbitsCache,m_si.framebufferWidth);
 }
 
 //
@@ -123,13 +79,7 @@ void ClientConnection::RestoreArea(RECT &r)
 void ClientConnection::ClearCache()
 {
 	if (!m_opts.m_fEnableCache) return;
-
-	if (!BitBlt(m_hCacheBitmapDC, 0, 0, 
-				m_si.framebufferWidth, m_si.framebufferHeight, 0, 0, 0, BLACKNESS))
-	{
-		vnclog.Print(0, _T("Cache: Error Clearing Cache buffer bitmap\n"));
-	}
-	vnclog.Print(0, _T("Cache: Reset Cache\n"));
+	if (m_DIBbitsCache) memset(m_DIBbitsCache,0,m_si.framebufferWidth * m_si.framebufferHeight *m_myFormat.bitsPerPixel/8);
 }
 
 

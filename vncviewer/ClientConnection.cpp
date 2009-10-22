@@ -304,9 +304,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_pApp = pApp;
 	m_dormant = false;
 	m_hBitmapDC = NULL;
-	m_hBitmap = NULL;
-	m_hCacheBitmapDC = NULL;
-	m_hCacheBitmap = NULL;
+	//m_hBitmap = NULL;
 	m_hPalette = NULL;
 	m_encPasswd[0] = '\0';
 	m_encPasswdMs[0] = '\0'; // act: add mspasswd storage
@@ -442,9 +440,10 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 //	m_FTtimer = 0;
 	skipprompt2=true;
 //	flash=NULL;
-	// UltraFast
+
 	m_hmemdc=NULL;
 	m_DIBbits=NULL;
+	m_DIBbitsCache=NULL;
 	m_membitmap=NULL;
 	m_BigToolbar=false;
 	strcpy(m_proxyhost,"");
@@ -463,7 +462,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_autoReconnect = m_opts.m_autoReconnect;
 	ThreadSocketTimeout=NULL;
 	m_statusThread=NULL;
-	m_hSavedAreaBitmap=NULL;
+	m_SavedAreaBIB=NULL;
     m_bClosedByUser = false;
     m_server_wants_keepalives = false;
 	hbmToolbig = (HBITMAP)LoadImage(m_pApp->m_instance, "tlbarbig.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_LOADMAP3DCOLORS);
@@ -1273,7 +1272,6 @@ void ClientConnection::CreateDisplay()
 	// Create a memory DC which we'll use for drawing to
 	// the local framebuffer
 	m_hBitmapDC = CreateCompatibleDC(NULL);
-	m_hCacheBitmapDC = CreateCompatibleDC(NULL);
 
 	// Set a suitable palette up
 	if (GetDeviceCaps(m_hBitmapDC, RASTERCAPS) & RC_PALETTE) {
@@ -2706,7 +2704,7 @@ void ClientConnection::CreateLocalFramebuffer()
 	// We create a bitmap which has the same pixel characteristics as
 	// the local display, in the hope that blitting will be faster.
 
-	TempDC hdc(m_hwndcn);
+	/*TempDC hdc(m_hwndcn);
 
 	if (m_hBitmap != NULL)
 		DeleteObject(m_hBitmap);
@@ -2736,29 +2734,13 @@ void ClientConnection::CreateLocalFramebuffer()
 	// Select this bitmap into the DC with an appropriate palette
 	ObjectSelector b(m_hBitmapDC, m_hBitmap);
 	PaletteSelector p(m_hBitmapDC, m_hPalette);
+
+
+	*/
 	// Modif RDV@2002 - Cache Encoding
 	// Modif sf@2002
-	if (m_opts.m_fEnableCache)
-	{
-		if (m_hCacheBitmap != NULL) DeleteObject(m_hCacheBitmap);
-		m_hCacheBitmap = CreateCompatibleBitmap(m_hBitmapDC, m_si.framebufferWidth, m_si.framebufferHeight);
-		if (m_hCacheBitmap == NULL) {
-			//adzm - 2009-07-12 - Create a DIB (which will use system rather than video memory) if this fails
-			void* pvbits_dummy = NULL;
-			BITMAPINFO bmi;
-			::ZeroMemory(&bmi.bmiHeader, sizeof(bmi.bmiHeader));
-			bmi.bmiHeader.biSize = sizeof(bmi.bmiHeader);
-			bmi.bmiHeader.biWidth = m_si.framebufferWidth;
-			bmi.bmiHeader.biHeight = m_si.framebufferHeight;
-			bmi.bmiHeader.biPlanes = 1;
-			bmi.bmiHeader.biBitCount = 32;
-
-			m_hCacheBitmap = CreateDIBSection(m_hBitmapDC, &bmi, DIB_RGB_COLORS, &pvbits_dummy, NULL, 0);
-		}
-		vnclog.Print(0, _T("Cache: Cache buffer bitmap creation\n"));
-	}
 	
-	RECT rect;
+	/*RECT rect;
 
 	SetRect(&rect, 0,0, m_si.framebufferWidth, m_si.framebufferHeight);
 	COLORREF bgcol = RGB(0, 0, 50);
@@ -2774,7 +2756,7 @@ void ClientConnection::CreateLocalFramebuffer()
 
 	SetBkColor(  m_hBitmapDC, oldbgcol);
 	SetTextColor(m_hBitmapDC, oldtxtcol);
-	InvalidateRect(m_hwndcn, NULL, FALSE);
+	InvalidateRect(m_hwndcn, NULL, FALSE);*/
 
 }
 
@@ -3007,7 +2989,6 @@ void ClientConnection::Createdib()
 
 	if (m_hmemdc != NULL) {DeleteDC(m_hmemdc);m_hmemdc = NULL;m_DIBbits=NULL;}
 	if (m_membitmap != NULL) {DeleteObject(m_membitmap);m_membitmap= NULL;}
-//	m_hmemdc = CreateCompatibleDC(hdc);
 	m_hmemdc = CreateCompatibleDC(m_hBitmapDC);
 	m_membitmap = CreateDIBSection(m_hmemdc, (BITMAPINFO*)&bi.bmiHeader, iUsage, &m_DIBbits, NULL, 0);
 
@@ -3019,20 +3000,6 @@ void ClientConnection::Createdib()
 		int r, g, b;
 		};
 		Colour rgbQ[256];
-        /*UINT num_entries;
-		num_entries =GetPaletteEntries(m_hPalette, 0, 0, NULL);              
-        size_t pal_size = sizeof(LOGPALETTE) +(num_entries - 1) * sizeof(PALETTEENTRY);
-        LOGPALETTE* pLogPal =(LOGPALETTE*) new unsigned char[pal_size];
-        UINT num_got = GetPaletteEntries( m_hPalette, 0, num_entries, pLogPal->palPalEntry);
-          for (UINT i=0; i<num_got; ++i)
-          {
-            rgbQ[i].rgbRed = pLogPal->palPalEntry[i].peRed;
-            rgbQ[i].rgbGreen = pLogPal->palPalEntry[i].peGreen;
-            rgbQ[i].rgbBlue = pLogPal-> palPalEntry[i].peBlue;
-          }
-
-         delete [] pLogPal;*/
-
 		 for (int i=0; i < (1<<(m_myFormat.depth)); i++) {
 			rgbQ[i].b = ((((i >> m_myFormat.blueShift) & m_myFormat.blueMax) * 65535) + m_myFormat.blueMax/2) / m_myFormat.blueMax;
 			rgbQ[i].g = ((((i >> m_myFormat.greenShift) & m_myFormat.greenMax) * 65535) + m_myFormat.greenMax/2) / m_myFormat.greenMax;
@@ -3047,6 +3014,12 @@ void ClientConnection::Createdib()
 		bi.color[ii].rgbReserved = 0;
 	}
 	SetDIBColorTable(m_hmemdc, 0, 256, bi.color);
+	}
+	if (m_opts.m_fEnableCache)
+	{
+		if (m_DIBbitsCache != NULL) delete [] m_DIBbitsCache;
+		m_DIBbitsCache= new BYTE[m_si.framebufferWidth*m_si.framebufferHeight*m_myFormat.bitsPerPixel/8];
+		vnclog.Print(0, _T("Cache: Cache buffer bitmap creation\n"));
 	}
 }
 // Closing down the connection.
@@ -3159,23 +3132,19 @@ ClientConnection::~ClientConnection()
 	if (m_desktopName_viewonly != NULL) delete [] m_desktopName_viewonly;
 	delete [] m_netbuf;
 
-	if (m_hCacheBitmapDC != NULL)
-			DeleteDC(m_hCacheBitmapDC);
-	if (m_hCacheBitmapDC != NULL)
-			DeleteObject(m_hCacheBitmapDC);
-	if (m_hCacheBitmap != NULL)
-		DeleteObject(m_hCacheBitmap);
+	if (m_DIBbitsCache!=NULL) delete []m_DIBbitsCache;
+	m_DIBbitsCache=NULL;
 	
 	if (m_hBitmapDC != NULL)
 		DeleteDC(m_hBitmapDC);
 	if (m_hBitmapDC != NULL)
 		DeleteObject(m_hBitmapDC);
-	if (m_hBitmap != NULL)
-		DeleteObject(m_hBitmap);
+//	if (m_hBitmap != NULL)
+//		DeleteObject(m_hBitmap);
 
 	if (m_hPalette != NULL)
 		DeleteObject(m_hPalette);
-	//UltraFast
+
 	if (m_hmemdc != NULL) {DeleteDC(m_hmemdc);m_hmemdc = NULL;m_DIBbits=NULL;}
 	if (m_membitmap != NULL) {DeleteObject(m_membitmap);m_membitmap = NULL;}
 //	if (flash) delete flash;
@@ -3197,7 +3166,8 @@ ClientConnection::~ClientConnection()
 	if (KillEvent) CloseHandle(KillEvent);
 	if (ThreadSocketTimeout) CloseHandle(ThreadSocketTimeout);
 	if (m_statusThread) CloseHandle(m_statusThread);
-	if (m_hSavedAreaBitmap) DeleteObject(m_hSavedAreaBitmap);
+	if (m_SavedAreaBIB) delete [] m_SavedAreaBIB;
+	m_SavedAreaBIB=NULL;
 	if (m_keymap) {
         delete m_keymap;
         m_keymap = NULL;
@@ -3448,7 +3418,7 @@ ClientConnection::SendPointerEvent(int x, int y, int buttonMask)
 	SoftCursorMove(x, y);
     pe.x = Swap16IfLE(x);
     pe.y = Swap16IfLE(y);
-	WriteExact_timeout((char *)&pe, sz_rfbPointerEventMsg, rfbPointerEvent,1); // sf@2002 - For DSM Plugin
+	WriteExact_timeout((char *)&pe, sz_rfbPointerEventMsg, rfbPointerEvent,5); // sf@2002 - For DSM Plugin
 }
 
 //
@@ -3586,7 +3556,7 @@ ClientConnection::SendKeyEvent(CARD32 key, bool down)
     ke.type = rfbKeyEvent;
     ke.down = down ? 1 : 0;
     ke.key = Swap32IfLE(key);
-    WriteExact_timeout((char *)&ke, sz_rfbKeyEventMsg, rfbKeyEvent,1);
+    WriteExact_timeout((char *)&ke, sz_rfbKeyEventMsg, rfbKeyEvent,5);
     //vnclog.Print(0, _T("SendKeyEvent: key = x%04x status = %s ke.key=%d\n"), key, 
       //  down ? _T("down") : _T("up"),ke.key);
 }
@@ -3616,7 +3586,7 @@ void ClientConnection::SendClientCutText(char *str, int len)
 inline void ClientConnection::DoBlit() 
 {
 
-	if (m_hBitmap == NULL) return;
+//	if (m_hBitmap == NULL) return;
 	if (!m_running) return;
 				
 	// No other threads can use bitmap DC
@@ -3626,8 +3596,8 @@ inline void ClientConnection::DoBlit()
 	HDC hdc = BeginPaint(m_hwndcn, &ps);
 
 	// Select and realize hPalette
-	PaletteSelector p(hdc, m_hPalette);
-	ObjectSelector b(m_hBitmapDC, m_hBitmap);
+//	PaletteSelector p(hdc, m_hPalette);
+//	ObjectSelector b(m_hBitmapDC, m_hBitmap);
 	
 	if (m_opts.m_delay) {
 		// Display the area to be updated for debugging purposes
@@ -3645,7 +3615,7 @@ inline void ClientConnection::DoBlit()
 		SetStretchBltMode(hdc, HALFTONE);
 		SetBrushOrgEx(hdc, 0,0, NULL);
 		{
-			if(UltraFast && m_hmemdc)
+			if(m_hmemdc)
 			{
 				ObjectSelector bb(m_hmemdc, m_membitmap);
 				StretchBlt(
@@ -3661,53 +3631,16 @@ inline void ClientConnection::DoBlit()
 				(ps.rcPaint.bottom-ps.rcPaint.top) * d / n, 
 				SRCCOPY);
 			}
-			else
-			{
-				if (!StretchBlt(
-					hdc, 
-					ps.rcPaint.left, 
-					ps.rcPaint.top, 
-					ps.rcPaint.right-ps.rcPaint.left, 
-					ps.rcPaint.bottom-ps.rcPaint.top, 
-					m_hBitmapDC, 
-					(ps.rcPaint.left+m_hScrollPos)     * d / n, 
-					(ps.rcPaint.top+m_vScrollPos)      * d / n,
-					(ps.rcPaint.right-ps.rcPaint.left) * d / n, 
-					(ps.rcPaint.bottom-ps.rcPaint.top) * d / n, 
-					SRCCOPY)) 
-				{
-					vnclog.Print(0, _T("Blit error %d\n"), GetLastError());
-					// throw ErrorException("Error in blit!\n");
-				};
-			}
 		}
 	}
 	else
 	{
-		if (UltraFast && m_hmemdc)
+		if (m_hmemdc)
 		{
 			ObjectSelector bb(m_hmemdc, m_membitmap);
 			BitBlt(hdc, ps.rcPaint.left, ps.rcPaint.top, 
 			ps.rcPaint.right-ps.rcPaint.left, ps.rcPaint.bottom-ps.rcPaint.top, 
 			m_hmemdc, ps.rcPaint.left+m_hScrollPos, ps.rcPaint.top+m_vScrollPos, SRCCOPY);
-		}
-		else
-		{
-			if (!BitBlt(
-					hdc,
-					ps.rcPaint.left,
-					ps.rcPaint.top , 
-					ps.rcPaint.right-ps.rcPaint.left,
-					ps.rcPaint.bottom-ps.rcPaint.top , 
-					m_hBitmapDC,
-					ps.rcPaint.left+m_hScrollPos,
-					//ps.rcPaint.top +m_vScrollPos- (m_TBr.bottom - m_TBr.top)  , SRCCOPY)) 
-					ps.rcPaint.top +m_vScrollPos,
-					SRCCOPY)) 
-			{
-				vnclog.Print(0, _T("Blit error %d\n"), GetLastError());
-				// throw ErrorException("Error in blit!\n");
-			}
 		}
 	}
 	EndPaint(m_hwndcn, &ps);
@@ -4007,7 +3940,7 @@ ClientConnection::SendFramebufferUpdateRequest(int x, int y, int w, int h, bool 
     fur.h = Swap16IfLE(h);
 
 	//vnclog.Print(10, _T("Request %s update\n"), incremental ? _T("incremental") : _T("full"));	
-    WriteExact_timeout((char *)&fur, sz_rfbFramebufferUpdateRequestMsg, rfbFramebufferUpdateRequest,1);
+    WriteExact_timeout((char *)&fur, sz_rfbFramebufferUpdateRequestMsg, rfbFramebufferUpdateRequest,5);
 }
 
 inline void ClientConnection::SendIncrementalFramebufferUpdateRequest()
@@ -4034,39 +3967,21 @@ void ClientConnection::SendAppropriateFramebufferUpdateRequest()
 		if (m_opts.m_fEnableCache)
 		{
 			// create viewer cache buffer if necessary
-			if (m_hCacheBitmap == NULL)
+			if (m_DIBbitsCache == NULL)
 			{
-				m_hCacheBitmapDC = CreateCompatibleDC(m_hBitmapDC);
-				m_hCacheBitmap = CreateCompatibleBitmap(m_hBitmapDC, m_si.framebufferWidth, m_si.framebufferHeight);
-				if (m_hCacheBitmap == NULL) {
-					//adzm - 2009-07-12 - Create a DIB (which will use system rather than video memory) if this fails
-					void* pvbits_dummy = NULL;
-					BITMAPINFO bmi;
-					::ZeroMemory(&bmi.bmiHeader, sizeof(bmi.bmiHeader));
-					bmi.bmiHeader.biSize = sizeof(bmi.bmiHeader);
-					bmi.bmiHeader.biWidth = m_si.framebufferWidth;
-					bmi.bmiHeader.biHeight = m_si.framebufferHeight;
-					bmi.bmiHeader.biPlanes = 1;
-					bmi.bmiHeader.biBitCount = 32;
-
-					m_hCacheBitmap = CreateDIBSection(m_hBitmapDC, &bmi, DIB_RGB_COLORS, &pvbits_dummy, NULL, 0);
-				}
+				m_DIBbitsCache= new BYTE[m_si.framebufferWidth*m_si.framebufferHeight*m_myFormat.bitsPerPixel/8];
 			}
 			ClearCache(); // Clear the cache
 			m_pendingCacheInit = true; // Order full update to synchronize both sides caches
 		}
-		else // No cache requested - The cache on the other side is to be cleared/deleted
-			 // Todo: fix the cache switching pb when viewer has been started without cache
+		else
 		{
-			/* causes balck rects after cache off/on
-			// Delete local cache
-			DeleteDC(m_hCacheBitmapDC);
-			if (m_hCacheBitmap != NULL) DeleteObject(m_hCacheBitmap);
-			if (m_hCacheBitmapDC != NULL) DeleteObject(m_hCacheBitmapDC);			
-			m_hCacheBitmap = NULL;
-			m_pendingCacheInit = false;
-			*/
+			if (m_DIBbitsCache!=NULL) delete []m_DIBbitsCache;
+			m_DIBbitsCache=NULL;
 		}
+
+		if (m_SavedAreaBIB) delete [] m_SavedAreaBIB;
+		m_SavedAreaBIB=NULL;
 		
 		rfbPixelFormat oldFormat = m_myFormat;
 		SetupPixelFormat();
@@ -4077,7 +3992,7 @@ void ClientConnection::SendAppropriateFramebufferUpdateRequest()
 		m_pendingFormatChange = false;
 
 		// If the pixel format has changed, or cache, or scale request whole screen
-		if (!PF_EQ(m_myFormat, oldFormat) || m_pendingCacheInit || m_pendingScaleChange)
+		if (true)//!PF_EQ(m_myFormat, oldFormat) || m_pendingCacheInit || m_pendingScaleChange)
 		{
 			SendFullFramebufferUpdateRequest();	
 		}
@@ -4152,7 +4067,7 @@ bool ClientConnection::SendSW(int x, int y)
 		sw.y = Swap16IfLE(y_scaled);
 	}
 	
-    WriteExact_timeout((char*)&sw, sz_rfbSetSWMsg, rfbSetSW,1);
+    WriteExact_timeout((char*)&sw, sz_rfbSetSWMsg, rfbSetSW,5);
 	m_SWselect=false;
     return true;
 }
@@ -4288,24 +4203,6 @@ inline void ClientConnection::ReadScreenUpdate()
 			SelectObject(hdcBits, hbrOld);
 			DeleteDC(hdcBits);
 			ReleaseDC(m_TrafficMonitor,hdcX);
-		}
-
-		//vnclog.Print(0, _T("encoding %d\n"), surh.encoding);
-		if (surh.encoding==rfbEncodingUltra || surh.encoding==rfbEncodingUltraZip)
-		{
-			UltraFast=true;
-		}
-		else
-		{
-		// sf@2003 - The only one that is missing in the test below is "raw"... maybe a "else" would be enought ?
-		/*
-		if (surh.encoding==rfbEncodingHextile || surh.encoding==rfbEncodingTight || surh.encoding==rfbEncodingZRLE
-			|| surh.encoding==rfbEncodingSolidColor || surh.encoding==rfbEncodingSolMonoZip
-			|| surh.encoding==rfbEncodingRRE || surh.encoding==rfbEncodingCoRRE|| surh.encoding==rfbEncodingZlib
-			|| surh.encoding==rfbEncodingZlibHex || surh.encoding==rfbEncodingXOR_Zlib|| surh.encoding==rfbEncodingXORMultiColor_Zlib
-		
-			)*/
-				UltraFast=false;
 		}
 
 		// sf@2004
@@ -4936,8 +4833,10 @@ ClientConnection::Send(const char *buff, const unsigned int bufflen,int timeout)
 	tm.tv_usec = 0;
 	count = select(m_sock + 1, NULL, &write_fds, NULL, &tm);
 
-	if (count == 0) return 0; //timeout
-	if (count < 0 || count > 1) return 0;
+	if (count == 0) 
+		return 0; //timeout
+	if (count < 0 || count > 1) 
+		return -1;
 	if (FD_ISSET((unsigned int)m_sock, &write_fds)) aa=send(m_sock, buff, bufflen, 0);
 	return aa;
 }
@@ -5070,8 +4969,8 @@ void ClientConnection::WriteExact_timeout(char *buf, int bytes,int timeout)
 			vnclog.Print(1, _T("Socket error %d: %s\n"), err, lpMsgBuf);
 			LocalFree( lpMsgBuf );
 			m_running = false;
-
-			throw WarningException(sz_L69);
+			return;
+			//throw WarningException(sz_L69);
 		}
 		i += j;
     }
@@ -5894,15 +5793,6 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							
 							if (_this->m_opts.DoDialog(true))
 							{
-								/*
-								// Modif sf@2002 - Cache
-								if (_this->m_opts.m_fEnableCache && _this->m_hCacheBitmap == NULL)
-								{
-									_this->m_hCacheBitmapDC = CreateCompatibleDC(_this->m_hBitmapDC);
-									_this->m_hCacheBitmap = CreateCompatibleBitmap(_this->m_hBitmapDC, _this->m_si.framebufferWidth, _this->m_si.framebufferHeight);
-									_this->m_pendingCacheInit = true;
-								}
-								*/
 								
 								// Modif sf@2002 - Server Scaling
 								_this->m_nServerScale = _this->m_opts.m_nServerScale;
@@ -7279,6 +7169,146 @@ ClientConnection:: ConvertAll(int width, int height, int xx, int yy,int bytes_pe
     }
 }
 
+void
+ClientConnection:: Copybuffer(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth)
+{
+	int bytesPerOutputRow = framebufferWidth * bytes_per_pixel;
+	BYTE *sourcepos,*destpos;
+	destpos = (BYTE *)dest + (bytesPerOutputRow * yy)+(xx * bytes_per_pixel);
+	sourcepos=(BYTE*)source + (bytesPerOutputRow * yy)+(xx * bytes_per_pixel);
+
+    int y;
+    width*=bytes_per_pixel;
+    for (y=0; y<height; y++) {
+        memcpy(destpos, sourcepos, width);
+        sourcepos = (BYTE*)sourcepos + bytesPerOutputRow;
+        destpos = (BYTE*)destpos + bytesPerOutputRow;
+    }
+}
+
+void
+ClientConnection:: Copyto0buffer(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth)
+{
+	int bytesPerOutputRow = framebufferWidth * bytes_per_pixel;
+	BYTE *sourcepos,*destpos;
+	destpos = (BYTE *)dest;
+	sourcepos=(BYTE*)source + (bytesPerOutputRow * yy)+(xx * bytes_per_pixel);
+
+    int y;
+    width*=bytes_per_pixel;
+    for (y=0; y<height; y++) {
+        memcpy(destpos, sourcepos, width);
+        sourcepos = (BYTE*)sourcepos + bytesPerOutputRow;
+        destpos = (BYTE*)destpos + width;
+    }
+}
+
+void
+ClientConnection:: Copyfrom0buffer(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth)
+{
+	int bytesPerOutputRow = framebufferWidth * bytes_per_pixel;
+	BYTE *sourcepos,*destpos;
+	destpos = (BYTE *)dest + (bytesPerOutputRow * yy)+(xx * bytes_per_pixel);
+	sourcepos=(BYTE*)source;
+
+    int y;
+    width*=bytes_per_pixel;
+    for (y=0; y<height; y++) {
+        memcpy(destpos, sourcepos, width);
+        sourcepos = (BYTE*)sourcepos + width;
+        destpos = (BYTE*)destpos + bytesPerOutputRow;
+    }
+}
+
+void
+ClientConnection:: Switchbuffer(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth)
+{
+	int bytesPerOutputRow = framebufferWidth * bytes_per_pixel;
+	BYTE *sourcepos,*destpos,*tempbuffer;
+	destpos = (BYTE *)dest + (bytesPerOutputRow * yy)+(xx * bytes_per_pixel);
+	sourcepos=(BYTE*)source + (bytesPerOutputRow * yy)+(xx * bytes_per_pixel);
+    int y;
+    width*=bytes_per_pixel;
+	tempbuffer=new BYTE[width];
+    for (y=0; y<height; y++) {
+		memcpy(tempbuffer, destpos, width);
+        memcpy(destpos, sourcepos, width);
+		memcpy(sourcepos,tempbuffer, width);
+        sourcepos = (BYTE*)sourcepos + bytesPerOutputRow;
+        destpos = (BYTE*)destpos + bytesPerOutputRow;
+    }
+	delete [] tempbuffer;
+}
+
+void
+ClientConnection:: ConvertPixel(int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth)
+{
+	int bytesPerInputRow = bytes_per_pixel;
+	int bytesPerOutputRow = framebufferWidth * bytes_per_pixel;
+	BYTE *sourcepos,*destpos;
+	destpos = (BYTE *)dest + (bytesPerOutputRow * yy)+(xx * bytes_per_pixel);
+	sourcepos=(BYTE*)source;
+    memcpy(destpos, sourcepos, bytes_per_pixel);
+}
+
+void
+ClientConnection:: ConvertPixel_to_bpp_from_32(int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth)
+{
+	int bytesPerInputRow = bytes_per_pixel;
+	int bytesPerOutputRow = framebufferWidth * bytes_per_pixel;
+	BYTE *destpos;
+	destpos = (BYTE *)dest + (bytesPerOutputRow * yy)+(xx * bytes_per_pixel);
+	BYTE r=source[0];
+	BYTE g=source[1];
+	BYTE b=source[2];
+	SETUP_COLOR_SHORTCUTS;
+	switch(bytes_per_pixel)
+	{
+	case 1:
+		{
+		unsigned char color=((r >> 5)<<5) | ((g>>5) << 2) | (b >> 6);
+		memcpy(destpos, &color, bytes_per_pixel);
+		}
+		break;
+	case 2:
+		{
+		unsigned short color;
+		if (gs==5) color=(r>>3 << 11)|(g>>2 << 5)|(b>>3);
+		else color=(r>>3 << 11)|(g>>3 << 5)|(b>>3)<<1;
+		memcpy(destpos, &color, bytes_per_pixel);
+		}
+		break;
+	case 4:
+		{
+		BYTE color[4];
+		color[0]=source[2];
+		color[1]=source[1];
+		color[2]=source[0];
+		color[3]=0;
+		memcpy(destpos, &color, bytes_per_pixel);
+		}
+		break;
+	}
+}
+
+void
+ClientConnection::SolidColor(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth)
+{
+	int bytesPerOutputRow = framebufferWidth * bytes_per_pixel;
+	BYTE *sourcepos,*destpos;
+	destpos = (BYTE *)dest + (bytesPerOutputRow * yy)+(xx * bytes_per_pixel);
+	sourcepos=(BYTE*)source;
+
+    int y,x;
+    for (y=0; y<height; y++) {
+		for (x=0; x< width;x++)
+			{
+				memcpy(destpos+x*bytes_per_pixel, sourcepos, bytes_per_pixel);
+			}
+        destpos = (BYTE*)destpos + bytesPerOutputRow;
+    }
+}
+
 bool
 ClientConnection:: Check_Rectangle_borders(int x,int y,int w,int h)
 {
@@ -7312,7 +7342,7 @@ void ClientConnection::SendKeepAlive(bool bForce)
         rfbKeepAliveMsg kp;
         memset(&kp, 0, sizeof kp);
         kp.type = rfbKeepAlive;
-        WriteExact_timeout((char*)&kp, sz_rfbKeepAliveMsg, rfbKeepAlive,1);
+        WriteExact_timeout((char*)&kp, sz_rfbKeepAliveMsg, rfbKeepAlive,5);
     }
 }
 #pragma warning(default :4101)

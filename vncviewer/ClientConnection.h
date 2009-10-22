@@ -283,8 +283,7 @@ private:
 
 	// Tight ClientConnectionCursor.cpp
 	bool prevCursorSet;
-	HDC m_hSavedAreaDC;
-	HBITMAP m_hSavedAreaBitmap;
+	BYTE *m_SavedAreaBIB;
 	COLORREF *rcSource;
 	bool *rcMask;
 	int rcHotX, rcHotY, rcWidth, rcHeight;
@@ -389,6 +388,10 @@ private:
 		r.top = y;		r.bottom = y + h;
 		FillSolidRect(&r, color);
 	};
+	inline void FillSolidRect_ultra(int x, int y, int w, int h, int bpp,BYTE *color) {
+		if (m_DIBbits) SolidColor(w, h, x, y,bpp/8,(BYTE*) color,(BYTE*)m_DIBbits,m_si.framebufferWidth);
+	};
+	
 
     // how many other windows are owned by this process?
     unsigned int CountProcessOtherWindows();
@@ -443,12 +446,9 @@ private:
 	//
 
 	// Bitmap for local copy of screen, and DC for writing to it.
-	HBITMAP m_hBitmap;
+	//HBITMAP m_hBitmap;
 	HDC		m_hBitmapDC;
 	HPALETTE m_hPalette;
-	// Bitmap for cache copy of screen, and DC for writing to it.
-	HBITMAP m_hCacheBitmap;
-	HDC		m_hCacheBitmapDC;
 
 #ifdef UNDER_CE
 	// Under WinCE this points to the DIB pixels.
@@ -603,13 +603,20 @@ private:
 	long zywrle;
 	long zywrle_level;
 	int zywrleBuf[rfbZRLETileWidth*rfbZRLETileHeight];
-	//UltraFast
+
 	void ConvertAll(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth);
+	void ConvertPixel(int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth);
+	void Copybuffer(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth);
+	void Copyto0buffer(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth);
+	void Copyfrom0buffer(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth);
+	void Switchbuffer(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth);
+	void ConvertPixel_to_bpp_from_32(int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth);
 	void SolidColor(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth);
 	HDC				m_hmemdc;
  	HBITMAP			m_membitmap;
  	VOID			*m_DIBbits;
-	bool			UltraFast;
+	BYTE			*m_DIBbitsCache;
+
 	void ClientConnection::Createdib();
 	bool Check_Rectangle_borders(int x,int y,int w,int h);
 	BOOL m_BigToolbar;
@@ -729,15 +736,7 @@ public:
 
 #define SETPIXELS(buffer, bpp, x, y, w, h)										\
 	{																			\
-		CARD##bpp *p = (CARD##bpp *) buffer;									\
-        register CARD##bpp pix;													\
-		for (int k = y; k < y+h; k++) {											\
-			for (int j = x; j < x+w; j++) {										\
-                    pix = *p;													\
-                    SETPIXEL(m_hBitmapDC, j,k, COLOR_FROM_PIXEL##bpp##(pix));	\
-					p++;														\
-			}																	\
-		}																		\
+			if (m_DIBbits) ConvertAll(w,h,x,y,bpp/8,(BYTE*)buffer,(BYTE*)m_DIBbits,m_si.framebufferWidth);\
 	}
 
 
@@ -747,7 +746,7 @@ public:
 		CARD32 *p = (CARD32 *) buffer;											\
 		for (int k = y; k < y+h; k++) {											\
 			for (int j = x; j < x+w; j++) {										\
-                    SETPIXEL(m_hBitmapDC, j,k, *p);	                            \
+							if (m_DIBbits) ConvertPixel_to_bpp_from_32(j,k,m_myFormat.bitsPerPixel/8,(BYTE*)p,(BYTE*)m_DIBbits,m_si.framebufferWidth);\
 					p++;														\
 			}																	\
 		}																		\
@@ -765,7 +764,7 @@ public:
 					if (result)													\
 						{														\
 						pix = *p;												\
-						SETPIXEL(m_hBitmapDC, j,k, COLOR_FROM_PIXEL##bpp##(pix));	\
+						if (m_DIBbits)ConvertPixel(j,k,bpp/8,(BYTE*)p,(BYTE*)m_DIBbits,m_si.framebufferWidth);\
 						p++;													\
 						aantal++;												\
 						}														\
@@ -787,13 +786,13 @@ public:
 					if (result)													\
 						{														\
 						pix = *p;												\
-						SETPIXEL(m_hBitmapDC, j,k, COLOR_FROM_PIXEL##bpp##(pix));	\
+						if (m_DIBbits)ConvertPixel(j,k,bpp/8,(BYTE*)p,(BYTE*)m_DIBbits,m_si.framebufferWidth);\
 						p++;													\
 						}														\
 					else														\
 						{														\
 						pix = *pc;												\
-						SETPIXEL(m_hBitmapDC, j,k, COLOR_FROM_PIXEL##bpp##(pix));\
+						if (m_DIBbits)ConvertPixel(j,k,bpp/8,(BYTE*)pc,(BYTE*)m_DIBbits,m_si.framebufferWidth);\
 						}														\
 					i++;														\
 			}																	\
@@ -813,12 +812,12 @@ public:
 					if (result)												\
 						{														\
 						pix = *pc2;												\
-						SETPIXEL(m_hBitmapDC, j,k, COLOR_FROM_PIXEL##bpp##(pix));	\
+						if (m_DIBbits)ConvertPixel(j,k,bpp/8,(BYTE*)pc2,(BYTE*)m_DIBbits,m_si.framebufferWidth);\
 						}														\
 					else														\
 						{														\
 						pix = *pc;												\
-						SETPIXEL(m_hBitmapDC, j,k, COLOR_FROM_PIXEL##bpp##(pix));\
+						if (m_DIBbits)ConvertPixel(j,k,bpp/8,(BYTE*)pc,(BYTE*)m_DIBbits,m_si.framebufferWidth);\
 						}														\
 					i++;														\
 			}																	\
@@ -833,7 +832,7 @@ public:
 		for (int k = y; k < y+h; k++) {											\
 			for (int j = x; j < x+w; j++) {										\
 						pix = *pc;												\
-						SETPIXEL(m_hBitmapDC, j,k, COLOR_FROM_PIXEL##bpp##(pix));\
+						if (m_DIBbits)ConvertPixel(j,k,bpp/8,(BYTE*)pc,(BYTE*)m_DIBbits,m_si.framebufferWidth);\
 					i++;														\
 			}																	\
 		}																		\

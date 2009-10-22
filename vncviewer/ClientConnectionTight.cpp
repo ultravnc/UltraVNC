@@ -67,17 +67,19 @@ void ClientConnection::ReadTightRect(rfbFramebufferUpdateRectHeader *pfburh)
   }
 
   /* Handle solid rectangles. */
+  BYTE colorpointer[4];
   if (comp_ctl == rfbTightFill) {
     COLORREF fillColour;
     if (m_myFormat.depth == 24 && m_myFormat.redMax == 0xFF &&
         m_myFormat.greenMax == 0xFF && m_myFormat.blueMax == 0xFF) {
       CARD8 fillColourBuf[3];
       ReadExact((char *)&fillColourBuf, 3);
+	  memcpy(colorpointer,&fillColourBuf, 3);
       fillColour = COLOR_FROM_PIXEL24_ADDRESS(fillColourBuf);
     } else {
       CARD32 fillColourBuf;
       ReadExact((char *)&fillColourBuf, m_myFormat.bitsPerPixel / 8);
-
+	  memcpy(colorpointer,&fillColourBuf, m_myFormat.bitsPerPixel / 8);
       SETUP_COLOR_SHORTCUTS;
 
       switch (m_myFormat.bitsPerPixel) {
@@ -93,11 +95,8 @@ void ClientConnection::ReadTightRect(rfbFramebufferUpdateRectHeader *pfburh)
     }
 
     omni_mutex_lock l(m_bitmapdcMutex);
-    ObjectSelector b(m_hBitmapDC, m_hBitmap);
-    PaletteSelector p(m_hBitmapDC, m_hPalette);
 
-    FillSolidRect(pfburh->r.x, pfburh->r.y, pfburh->r.w, pfburh->r.h,
-                  fillColour);
+    FillSolidRect_ultra(pfburh->r.x, pfburh->r.y, pfburh->r.w, pfburh->r.h, m_myFormat.bitsPerPixel,(BYTE*)colorpointer);
     return;
   }
 
@@ -156,9 +155,6 @@ void ClientConnection::ReadTightRect(rfbFramebufferUpdateRectHeader *pfburh)
     (this->*m_tightCurrentFilter)(pfburh->r.h);
 
     omni_mutex_lock l(m_bitmapdcMutex);
-    ObjectSelector b(m_hBitmapDC, m_hBitmap);
-    PaletteSelector p(m_hBitmapDC, m_hPalette);
-
     SETPIXELS_NOCONV(m_zlibbuf, pfburh->r.x, pfburh->r.y,
                      pfburh->r.w, pfburh->r.h);
 
@@ -243,8 +239,6 @@ void ClientConnection::ReadTightRect(rfbFramebufferUpdateRectHeader *pfburh)
         memcpy(m_netbuf, &m_netbuf[numRows * rowSize], extraBytes);
 
       omni_mutex_lock l(m_bitmapdcMutex);
-      ObjectSelector b(m_hBitmapDC, m_hBitmap);
-      PaletteSelector p(m_hBitmapDC, m_hPalette);
 
       SETPIXELS_NOCONV(m_zlibbuf, pfburh->r.x, pfburh->r.y + rowsProcessed,
                        pfburh->r.w, numRows);
@@ -562,8 +556,6 @@ void ClientConnection::DecompressJpegRect(int x, int y, int w, int h)
   }
 
   omni_mutex_lock l(m_bitmapdcMutex);
-  ObjectSelector b(m_hBitmapDC, m_hBitmap);
-  PaletteSelector p(m_hBitmapDC, m_hPalette);
 
   // Two scanlines: for 24bit and COLORREF samples
   CheckZlibBufferSize(2*2048*4);
