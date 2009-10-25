@@ -889,9 +889,10 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
 		case ID_CLOSE:
 			// User selected Close from the tray menu
+			fShutdownOrdered=TRUE;
+			Sleep(1000);
 			vnclog.Print(LL_INTINFO, VNCLOG("KillAuthClients() ID_CLOSE \n"));
 			_this->m_server->KillAuthClients();
-			fShutdownOrdered=TRUE;
 			PostMessage(hwnd, WM_CLOSE, 0, 0);
 			break;
 		case ID_UNINSTALL_SERVICE:
@@ -923,18 +924,18 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 					StartUPInfo.cb = sizeof(STARTUPINFO);
 			
 					CreateProcessAsUser(hPToken,NULL,dir,NULL,NULL,FALSE,DETACHED_PROCESS,NULL,NULL,&StartUPInfo,&ProcessInfo);
-					DWORD error=GetLastError();
+					DWORD errorcode=GetLastError();
 					if (process) CloseHandle(process);
 					if (Token) CloseHandle(Token);
-					if (error==1314)
+					if (errorcode==1314)
 					{
 						Set_uninstall_service_as_admin();
 					}
 
 					}
-					vnclog.Print(LL_INTINFO, VNCLOG("KillAuthClients() ID_CLOSE \n"));
-					_this->m_server->KillAuthClients();
 					fShutdownOrdered=TRUE;
+					vnclog.Print(LL_INTINFO, VNCLOG("KillAuthClients() ID_CLOSE \n"));
+					_this->m_server->KillAuthClients();					
 					PostMessage(hwnd, WM_CLOSE, 0, 0);
 				}
 			}
@@ -976,9 +977,10 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 						Set_install_service_as_admin();
 					}
 				}
+			fShutdownOrdered=TRUE;
+			Sleep(1000);
 			vnclog.Print(LL_INTINFO, VNCLOG("KillAuthClients() ID_CLOSE \n"));
 			_this->m_server->KillAuthClients();
-			fShutdownOrdered=TRUE;
 			PostMessage(hwnd, WM_CLOSE, 0, 0);
 			}
 			break;
@@ -1068,9 +1070,10 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 					{
 						Set_start_service_as_admin();
 					}
+					fShutdownOrdered=TRUE;
+					Sleep(1000);
 					vnclog.Print(LL_INTINFO, VNCLOG("KillAuthClients() ID_CLOSE \n"));
 					_this->m_server->KillAuthClients();
-					fShutdownOrdered=TRUE;
 					PostMessage(hwnd, WM_CLOSE, 0, 0);
 				}
 			}
@@ -1144,6 +1147,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			ResetAero();
 
 		vnclog.Print(LL_INTERR, VNCLOG("vncMenu WM_CLOSE call - All cleanup done\n"));
+		Sleep(2000);
 		DestroyWindow(hwnd);
 		break;
 		
@@ -1158,10 +1162,11 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			//shutdown or reboot
 			if((lParam & ENDSESSION_LOGOFF) != ENDSESSION_LOGOFF)
 			{
+				fShutdownOrdered=TRUE;
+				Sleep(1000);
 				vnclog.Print(LL_INTERR, VNCLOG("SHUTDOWN OS detected\n"));
 				vnclog.Print(LL_INTINFO, VNCLOG("KillAuthClients() ID_CLOSE \n"));
-				_this->m_server->KillAuthClients();
-				fShutdownOrdered=TRUE;
+				_this->m_server->KillAuthClients();				
 				PostMessage(hwnd, WM_CLOSE, 0, 0);
 				break;
 			}
@@ -1172,10 +1177,11 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			vnclog.Print(LL_INTERR, VNCLOG("Session ID %i\n"),SessionID);
 			if (SessionID!=0)
 			{
+				fShutdownOrdered=TRUE;
+				Sleep(1000);
 				vnclog.Print(LL_INTERR, VNCLOG("WM_QUERYENDSESSION session!=0\n"));
 				vnclog.Print(LL_INTINFO, VNCLOG("KillAuthClients() ID_CLOSE \n"));
-				_this->m_server->KillAuthClients();
-				fShutdownOrdered=TRUE;
+				_this->m_server->KillAuthClients();				
 				PostMessage(hwnd, WM_CLOSE, 0, 0);
 			}
 		}	
@@ -1443,7 +1449,17 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 // adzm 2009-07-05 - Tray icon balloon tips
 BOOL vncMenu::NotifyBalloon(char* szInfo, char* szTitle)
 {
-	char* szInfoCopy = _strdup(szInfo);
+	char* szInfoCopy = _strdup(szInfo); // TOFIX memory leak;
 	char* szTitleCopy = _strdup(szTitle);
-	return PostToWinVNC(MENU_TRAYICON_BALLOON_MSG, (WPARAM)szInfoCopy, (LPARAM)szTitleCopy);
+	BOOL returnvalue= PostToWinVNC(MENU_TRAYICON_BALLOON_MSG, (WPARAM)szInfoCopy, (LPARAM)szTitleCopy);
+	if (returnvalue==FALSE)
+	{
+			if (szInfoCopy) {
+				free(szInfoCopy);
+			}
+			if (szTitleCopy) {
+				free(szTitleCopy);
+			}
+	}
+	return returnvalue;
 }

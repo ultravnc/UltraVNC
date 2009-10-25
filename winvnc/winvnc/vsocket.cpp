@@ -212,6 +212,7 @@ VSocket::Close()
   //adzm 2009-06-20
   if (m_pPluginInterface) {
     delete m_pPluginInterface;
+	m_pPluginInterface=NULL;
   }
   return VTrue;
 }

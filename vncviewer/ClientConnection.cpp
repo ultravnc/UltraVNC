@@ -7266,7 +7266,19 @@ ClientConnection:: ConvertPixel_to_bpp_from_32(int xx, int yy,int bytes_per_pixe
 	{
 	case 1:
 		{
-		unsigned char color=((r >> 5)<<5) | ((g>>5) << 2) | (b >> 6);
+		unsigned char color;
+		if (gs==1) // 8 color
+		{
+			color=((r >> 7)<<2) | ((g>>7) << 1) | (b >> 7);
+		}
+		if (gs==2) // 64 color
+		{
+			color=((r >> 6)<<4) | ((g>>6) << 2) | (b >> 6);
+		}
+		if (gs==3) // 254 color
+		{
+			color=(r >> 5) | ((g>>5) << 3) | (b >> 6)<<6;
+		}
 		memcpy(destpos, &color, bytes_per_pixel);
 		}
 		break;

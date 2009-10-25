@@ -1110,14 +1110,34 @@ bool FileTransfer::ResolvePossibleShortcutFolder(HWND hWnd, LPSTR szFolder)
 	} else {		
 		strcpy(szP, szFolder);
 
-		int len = strlen(szP);
+		//PGM len of "[ C: ] - Local Disk" is always > 2
 
-		if (len > 2) {
-			if (GetFileAttributes(szP) & FILE_ATTRIBUTE_DIRECTORY) {
-				SetDlgItemText(hWnd, IDC_CURR_LOCAL, szP);
-				return true;
+		memset(szGUIDir, '\0', 64); //PGM 
+
+		strncpy_s(szGUIDir, szP, 2); //PGM 
+
+		if (strcmp(szGUIDir, "[ ")!=0) //PGM 
+
+		{ //PGM
+
+			int len = strlen(szP);
+
+
+
+			if (len > 2) {
+
+				if (GetFileAttributes(szP) & FILE_ATTRIBUTE_DIRECTORY) {
+
+					SetDlgItemText(hWnd, IDC_CURR_LOCAL, szP);
+
+					return true;
+
+				}
+
 			}
-		}
+
+		} //PGM
+
 	}
 	return false;
 }

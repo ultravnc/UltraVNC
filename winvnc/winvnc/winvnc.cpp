@@ -253,6 +253,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 
 		if (strncmp(&szCmdLine[i], winvncSettingshelper, strlen(winvncSettingshelper)) == 0)
 		{
+			Sleep(3000);
 			char mycommand[MAX_PATH];
 			i+=strlen(winvncSettingshelper);
 			strcpy( mycommand, &(szCmdLine[i+1]));
@@ -262,6 +263,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 
 		if (strncmp(&szCmdLine[i], winvncStopserviceHelper, strlen(winvncStopserviceHelper)) == 0)
 		{
+			Sleep(3000);
 			Set_stop_service_as_admin();
 			return 0;
 		}
@@ -284,22 +286,26 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 
 		if (strncmp(&szCmdLine[i], winvncStartserviceHelper, strlen(winvncStartserviceHelper)) == 0)
 		{
+			Sleep(3000);
 			Set_start_service_as_admin();
 			return 0;
 		}
 
 		if (strncmp(&szCmdLine[i], winvncInstallServiceHelper, strlen(winvncInstallServiceHelper)) == 0)
 			{
+				Sleep(3000);
 				Set_install_service_as_admin();
 				return 0;
 			}
 		if (strncmp(&szCmdLine[i], winvncUnInstallServiceHelper, strlen(winvncUnInstallServiceHelper)) == 0)
 			{
+				Sleep(3000);
 				Set_uninstall_service_as_admin();
 				return 0;
 			}
 		if (strncmp(&szCmdLine[i], winvncSecurityEditorHelper, strlen(winvncSecurityEditorHelper)) == 0)
 			{
+				Sleep(3000);
 				winvncSecurityEditorHelper_as_admin();
 				return 0;
 			}
@@ -482,7 +488,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 			{
 				end = start;
 				while (szCmdLine[end] > ' ') end++;
-
+				
 				pszId = new char[ end - start + 1 ];
 				if (pszId != 0) 
 				{
@@ -507,7 +513,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 					PostAddAutoConnectClient_bool=false;
 				}
 				else
+				{
 					strcpy(pszId_char,pszId);
+					//memory leak fix
+					delete [] pszId;
+				}
 			}
 			continue;
 		}
@@ -539,7 +549,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 					PostAddConnectClient_bool=false;
 				}
 				else
+				{
 					strcpy(pszId_char,pszId);
+					//memory leak fix
+					delete [] pszId;
+				}
 				}
 			continue;
 		}

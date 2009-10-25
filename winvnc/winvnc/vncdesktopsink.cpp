@@ -588,7 +588,7 @@ vncDesktop::InitWindow()
 	SetHook=NULL;
 
 	hModule = LoadLibrary(szCurrentDir);
-	hSCModule = LoadLibrary(szCurrentDirSC);
+	hSCModule = LoadLibrary(szCurrentDirSC);//TOFIX resource leak
 	if (hModule)
 		{
 			UnSetHooks = (UnSetHooksFn) GetProcAddress( hModule, "UnSetHooks" );
