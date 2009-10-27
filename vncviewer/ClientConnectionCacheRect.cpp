@@ -56,7 +56,8 @@ void ClientConnection::SaveArea(RECT &r)
 	int h = r.bottom - r.top;
 
 	omni_mutex_lock l(m_bitmapdcMutex);
-	if (m_DIBbitsCache && m_DIBbits) Copybuffer(w, h, x, y,m_myFormat.bitsPerPixel/8,(BYTE*)m_DIBbits,(BYTE*)m_DIBbitsCache,m_si.framebufferWidth);
+	if (m_DIBbitsCache && m_DIBbits) 
+		Copybuffer(w, h, x, y,m_myFormat.bitsPerPixel/8,(BYTE*)m_DIBbits,(BYTE*)m_DIBbitsCache,m_si.framebufferWidth);
 }
 
 void ClientConnection::RestoreArea(RECT &r)
@@ -70,7 +71,8 @@ void ClientConnection::RestoreArea(RECT &r)
 
 	omni_mutex_lock l(m_bitmapdcMutex);
 
-	if (m_DIBbitsCache && m_DIBbits)Switchbuffer(w, h, x, y,m_myFormat.bitsPerPixel/8,(BYTE*)m_DIBbits,(BYTE*)m_DIBbitsCache,m_si.framebufferWidth);
+	if (m_DIBbitsCache && m_DIBbits)
+		Switchbuffer(w, h, x, y,m_myFormat.bitsPerPixel/8,(BYTE*)m_DIBbits,(BYTE*)m_DIBbitsCache,m_si.framebufferWidth);
 }
 
 //
@@ -79,7 +81,8 @@ void ClientConnection::RestoreArea(RECT &r)
 void ClientConnection::ClearCache()
 {
 	if (!m_opts.m_fEnableCache) return;
-	if (m_DIBbitsCache) memset(m_DIBbitsCache,0,m_si.framebufferWidth * m_si.framebufferHeight *m_myFormat.bitsPerPixel/8);
+	if (m_DIBbitsCache) 
+		memset(m_DIBbitsCache,0,m_si.framebufferWidth * m_si.framebufferHeight *m_myFormat.bitsPerPixel/8);
 }
 
 

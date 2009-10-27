@@ -3875,6 +3875,10 @@ void* ClientConnection::run_undetached(void* arg) {
 			// sf@2002
 			// m_pFileTransfer->m_fFileTransferRunning = false;
 			// m_pTextChat->m_fTextChatRunning = false;
+			if (m_pPluginInterface) {
+			delete m_pPluginInterface;
+			m_pPluginInterface = NULL;
+			}
 			m_bKillThread = true;
 			PostMessage(m_hwndMain, WM_CLOSE, reconnectcounter, 1);
 		}
@@ -3960,7 +3964,13 @@ void ClientConnection::SendAppropriateFramebufferUpdateRequest()
 {
 	if (m_pendingFormatChange) 
 	{
-		vnclog.Print(3, _T("Requesting new pixel format\n") );
+		SoftCursorFree();
+		vnclog.Print(3, _T("Requesting new pixel format\n") );		
+		rfbPixelFormat oldFormat = m_myFormat;
+		SetupPixelFormat();
+		SetFormatAndEncodings();
+		Createdib();
+		m_pendingFormatChange = false;
 
 		// Cache init/reinit - A SetFormatAndEncoding() implies a cache reinit on server side
 		// Cache enabled, so it's going to be reallocated/reinited on server side
@@ -3982,14 +3992,6 @@ void ClientConnection::SendAppropriateFramebufferUpdateRequest()
 
 		if (m_SavedAreaBIB) delete [] m_SavedAreaBIB;
 		m_SavedAreaBIB=NULL;
-		
-		rfbPixelFormat oldFormat = m_myFormat;
-		SetupPixelFormat();
-		// tight cursor handling
-		SoftCursorFree();
-		SetFormatAndEncodings();
-		Createdib();
-		m_pendingFormatChange = false;
 
 		// If the pixel format has changed, or cache, or scale request whole screen
 		if (true)//!PF_EQ(m_myFormat, oldFormat) || m_pendingCacheInit || m_pendingScaleChange)
@@ -6181,6 +6183,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 			
 				case WM_CLOSE:
 					{
+						_this->m_keepalive_timer=0;
                         // April 8 2008 jdp
 						static bool boxopen=false;
 						if (boxopen) return 0;

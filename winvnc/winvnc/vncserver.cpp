@@ -1404,6 +1404,18 @@ vncServer::GetPassword(char *passwd)
 	memcpy(passwd, m_password, MAXPWLEN);
 }
 
+void //PGM
+vncServer::SetPassword2(const char *passwd2) //PGM
+{ //PGM
+	memcpy(m_password2, passwd2, MAXPWLEN); //PGM
+} //PGM
+
+void //PGM
+vncServer::GetPassword2(char *passwd2) //PGM
+{ //PGM
+	memcpy(passwd2, m_password2, MAXPWLEN); //PGM
+} //PGM
+
 // Remote input handling
 void
 vncServer::EnableRemoteInputs(BOOL enable)

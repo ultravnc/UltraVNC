@@ -2240,7 +2240,8 @@ void vncDesktop::SetBlockInputState(bool newstate)
 {
 	if (m_server->BlankMonitorEnabled())
     {
-        SetBlankMonitor(newstate);
+		if (!m_server->BlankInputsOnly()) //PGM
+	        SetBlankMonitor(newstate);
         SetDisableInput(newstate);
         m_bIsInputDisabledByClient = newstate;
     }

@@ -57,11 +57,11 @@ CTitleBar::CTitleBar(HINSTANCE hInst, HWND ParentWindow)
 CTitleBar::~CTitleBar()
 {
 	DeleteObject(Font);
-	if (m_hWnd) DestroyWindow(m_hWnd);
 	if (Pin) DestroyWindow(Pin);
 	if (Close) DestroyWindow(Close);
 	if (Maximize) DestroyWindow(Maximize);
 	if (Minimize) DestroyWindow(Minimize);
+	if (m_hWnd) DestroyWindow(m_hWnd);
 }
 
 //***************************************************************************************
@@ -167,7 +167,7 @@ void CTitleBar::CreateDisplay()
 	::SetWindowRgn(m_hWnd, Range, TRUE); // Added Jef Fix
 
 	//Close button
-	HWND Close=CreateWindow("STATIC",
+	Close=CreateWindow("STATIC",
 				"Close",
 				WS_CHILD | WS_VISIBLE | SS_NOTIFY | SS_OWNERDRAW,
                 tbWidth-tbRightSpace-tbcxPicture, tbTopSpace, tbcxPicture, tbcyPicture, m_hWnd,
@@ -176,7 +176,7 @@ void CTitleBar::CreateDisplay()
 				NULL);
 
 	//Maximize button
-	HWND Maximize=CreateWindow("STATIC",
+	Maximize=CreateWindow("STATIC",
 				"Maximize",
 				WS_CHILD | WS_VISIBLE | SS_NOTIFY | SS_OWNERDRAW,
                 tbWidth-tbRightSpace-(tbcxPicture*2)-(tbButtonSpace*1), tbTopSpace, tbcxPicture, tbcyPicture, m_hWnd,
@@ -185,7 +185,7 @@ void CTitleBar::CreateDisplay()
 				NULL);
 	
 	//Minimize button
-	HWND Minimize=CreateWindow("STATIC",
+	Minimize=CreateWindow("STATIC",
 				"Minimize",
 				WS_CHILD | WS_VISIBLE | SS_NOTIFY | SS_OWNERDRAW,
                 tbWidth-tbRightSpace-(tbcxPicture*3)-(tbButtonSpace*2), tbTopSpace, tbcxPicture, tbcyPicture, m_hWnd,

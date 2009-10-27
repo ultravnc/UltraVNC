@@ -773,7 +773,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				if (vncService::CurrentUser((char *) &newuser, sizeof(newuser)))
 				{
 					// Check whether the user name has changed!
-					if (_stricmp(newuser, _this->m_username) != 0 || _this->IconFaultCounter>10)
+					if (_stricmp(newuser, _this->m_username) != 0 || _this->IconFaultCounter>2)
 					{
 						Sleep(1000);
 						vnclog.Print(LL_INTINFO,

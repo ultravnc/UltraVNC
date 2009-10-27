@@ -228,6 +228,8 @@ public:
 	// form, not the plaintext form.  The buffer passwed MUST be MAXPWLEN in size.
 	virtual void SetPassword(const char *passwd);
 	virtual void GetPassword(char *passwd);
+	virtual void SetPassword2(const char *passwd2); //PGM
+	virtual void GetPassword2(char *passwd2); //PGM
 
 	// Remote input handling
 	virtual void EnableRemoteInputs(BOOL enable);
@@ -319,6 +321,8 @@ public:
 	virtual BOOL EnableFileTransfer(BOOL fEnable);
 	virtual BOOL BlankMonitorEnabled() {return m_fBlankMonitorEnabled;};
 	virtual void BlankMonitorEnabled(BOOL fEnable) {m_fBlankMonitorEnabled = fEnable;};
+	virtual BOOL BlankInputsOnly() {return m_fBlankInputsOnly;}; //PGM
+	virtual void BlankInputsOnly(BOOL fEnable) {m_fBlankInputsOnly = fEnable;}; //PGM
 	virtual BOOL MSLogonRequired();
 	virtual BOOL RequireMSLogon(BOOL fEnable);
 	virtual BOOL GetNewMSLogon();
@@ -452,6 +456,7 @@ protected:
 //	UINT				m_port_http; // TightVNC 1.2.7
 	BOOL				m_autoportselect;
 	char				m_password[MAXPWLEN];
+	char				m_password2[MAXPWLEN]; //PGM
 	BOOL				m_passwd_required;
 	BOOL				m_loopback_allowed;
 	BOOL				m_loopbackOnly;
@@ -529,6 +534,7 @@ protected:
 	// BOOL    m_fQueuingEnabled;
 	BOOL    m_fFileTransferEnabled;
 	BOOL    m_fBlankMonitorEnabled;
+	BOOL    m_fBlankInputsOnly; //PGM
 	int     m_nDefaultScale;
 
 	BOOL m_PrimaryEnabled;

@@ -56,7 +56,9 @@
 #define IDC_PASSWORD                    1009
 #define IDC_PASSWD_EDIT                 1009
 #define IDC_UPDATE_BORDER               1010
+#define IDC_PASSWORD_LABEL2             1010
 #define IDC_POLL_FULLSCREEN             1011
+#define IDC_PASSWORD2                   1011
 #define IDC_CONSOLE_ONLY                1012
 #define IDC_POLL_FOREGROUND             1013
 #define IDC_POLL_UNDER_CURSOR           1014
@@ -131,6 +133,7 @@
 #define IDC_VIRTUAL                     1068
 #define IDC_CONNECT_XDMCP               1069
 #define IDC_BLANK                       1070
+#define IDC_BLANK2                      1071
 #define IDC_TURBOMODE                   1075
 #define IDC_SEND_B                      1078
 #define IDC_LOG                         1079

@@ -1023,6 +1023,7 @@ vncClientThread::InitAuthenticate()
 
 			// Now create a 16-byte challenge
 			char challenge[16];
+			char challenge2[16]; //PGM
 			char challengems[64];
 			char response[16];
 			char responsems[64];
@@ -1030,6 +1031,7 @@ vncClientThread::InitAuthenticate()
 			char user[256];
 			char domain[256];
 			vncRandomBytes((BYTE *)&challenge);
+			memcpy(challenge2, challenge, 16); //PGM
 			vncRandomBytesMs((BYTE *)&challengems);
 
 			// Send the challenge to the client
@@ -1120,6 +1122,32 @@ vncClientThread::InitAuthenticate()
 						break;
 					}
 				}
+				if (!auth_ok) //PGM
+				{ //PGM
+					memset(password, '\0', MAXPWLEN); //PGM
+					m_server->GetPassword2(password); //PGM
+					vncPasswd::ToText plain2(password); //PGM
+					if ((strlen(plain2) > 0)) //PGM
+					{ //PGM
+						vnclog.Print(LL_INTINFO, "View-only password authentication"); //PGM
+						m_client->EnableKeyboard(false); //PGM
+						m_client->EnablePointer(false); //PGM
+						auth_ok = TRUE; //PGM
+
+						// Encrypt the view-only challenge bytes //PGM
+						vncEncryptBytes((BYTE *)&challenge2, plain2); //PGM
+
+						// Compare them to the response //PGM
+						for (int i=0; i<sizeof(challenge2); i++) //PGM
+						{ //PGM
+							if (challenge2[i] != response[i]) //PGM
+							{ //PGM
+								auth_ok = FALSE; //PGM
+								break; //PGM
+							} //PGM
+						} //PGM
+					} //PGM
+				} //PGM
 			}
 		}
 
@@ -2276,6 +2304,8 @@ vncClientThread::run(void *arg)
 			{
 				fUserOk = m_client->DoFTUserImpersonation();
 			}
+
+		    if (!m_client->m_keyboardenabled || !m_client->m_pointerenabled) fUserOk = false; //PGM
 
 			omni_mutex_lock l(m_client->GetUpdateLock());
 

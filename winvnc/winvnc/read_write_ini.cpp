@@ -33,6 +33,7 @@ LONG AllowEditClients;
 LONG FileTransferEnabled;
 LONG FTUserImpersonation;
 LONG BlankMonitorEnabled ;
+LONG BlankInputsOnly; //PGM
 LONG DefaultScale ;
 LONG CaptureAlphaBlending ;
 LONG BlackAlphaBlending ;
@@ -156,6 +157,7 @@ myIniFile_Out.WriteInt("admin", "AllowEditClients" ,AllowEditClients);
 FileTransferEnabled=myIniFile_In.ReadInt("admin", "FileTransferEnabled", true);
 FTUserImpersonation=myIniFile_In.ReadInt("admin", "FTUserImpersonation", true);
 BlankMonitorEnabled = myIniFile_In.ReadInt("admin", "BlankMonitorEnabled", true);
+BlankInputsOnly = myIniFile_In.ReadInt("admin", "BlankInputsOnly", false); //PGM
 DefaultScale = myIniFile_In.ReadInt("admin", "DefaultScale", 1);
 CaptureAlphaBlending = myIniFile_In.ReadInt("admin", "CaptureAlphaBlending", false); // sf@2005
 BlackAlphaBlending = myIniFile_In.ReadInt("admin", "BlackAlphaBlending", false); // sf@2005
@@ -168,6 +170,7 @@ Secundary = myIniFile_In.ReadInt("admin", "secundary", false);
 myIniFile_Out.WriteInt("admin", "FileTransferEnabled", FileTransferEnabled);
 myIniFile_Out.WriteInt("admin", "FTUserImpersonation", FTUserImpersonation);
 myIniFile_Out.WriteInt("admin", "BlankMonitorEnabled", BlankMonitorEnabled);
+myIniFile_Out.WriteInt("admin", "BlankInputsOnly", BlankInputsOnly); //PGM
 myIniFile_Out.WriteInt("admin", "DefaultScale", DefaultScale);
 myIniFile_Out.WriteInt("admin", "CaptureAlphaBlending", CaptureAlphaBlending);
 myIniFile_Out.WriteInt("admin", "BlackAlphaBlending", BlackAlphaBlending);
@@ -209,6 +212,9 @@ myIniFile_Out.WriteInt("admin", "QueryIfNoLogon", QueryIfNoLogon);
 
 myIniFile_In.ReadPassword(passwd,MAXPWLEN);
 myIniFile_Out.WritePassword(passwd);
+memset(passwd, '\0', MAXPWLEN); //PGM 
+myIniFile_In.ReadPassword2(passwd,MAXPWLEN); //PGM
+myIniFile_Out.WritePassword2(passwd); //PGM
 
 EnableRemoteInputs=myIniFile_In.ReadInt("admin", "InputsEnabled", 0);
 LockSettings=myIniFile_In.ReadInt("admin", "LockSetting", 0);
