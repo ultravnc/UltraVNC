@@ -285,7 +285,7 @@ LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg,
 					0,
 					0,
 					SRCCOPY);
-			SelectObject(hdcMem,hbrOld);
+			if (hbrOld) SelectObject(hdcMem,hbrOld);
             DeleteDC(hdcMem); 
             return TRUE; 
 		}

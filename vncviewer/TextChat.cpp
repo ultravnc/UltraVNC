@@ -477,6 +477,7 @@ BOOL CALLBACK TextChat::TextChatDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM wParam,
 				memset(_this->m_szTextBoxBuffer, 0, TEXTMAXSIZE); // Clear Chat area 
 				 //  Load and display diclaimer message
 				// sf@2005 - Only if the DSMplugin is used
+				if (_this->m_szRemoteText)
 				if (!_this->m_pCC->m_fUsePlugin)
 				{
 					if (LoadString(_this->m_pApp->m_instance, IDS_WARNING, _this->m_szRemoteText, TEXTMAXSIZE -1) )
@@ -484,8 +485,8 @@ BOOL CALLBACK TextChat::TextChatDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM wParam,
 				}
 			}
 
-			SetDlgItemText(hWnd, IDC_INPUTAREA_EDIT, _this->m_szLocalText);
-			SetDlgItemText(hWnd, IDC_CHATAREA_EDIT, _this->m_szTextBoxBuffer); // Chat area
+			if (_this->m_szLocalText) SetDlgItemText(hWnd, IDC_INPUTAREA_EDIT, _this->m_szLocalText);
+			if (_this->m_szTextBoxBuffer) SetDlgItemText(hWnd, IDC_CHATAREA_EDIT, _this->m_szTextBoxBuffer); // Chat area
 
 			// Scroll down the chat window
 			// The following seems necessary under W9x & Me if we want the Edit to scroll to bottom...

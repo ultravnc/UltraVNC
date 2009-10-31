@@ -220,10 +220,10 @@ bool FileTransfer::DeleteFileOrDirectory(TCHAR *srcpath)
 //
 //
 //
-FileTransfer::FileTransfer(VNCviewerApp *pApp, ClientConnection *pCC)
+FileTransfer::FileTransfer(VNCviewerApp *l_pApp, ClientConnection *pCC)
 {
 //	vnclog.Print(0, _T("FileTransfer\n"));
-	m_pApp	= pApp;
+	m_pApp	= l_pApp;
 	m_pCC	= pCC;
 	m_fAbort = false;
     m_fUserAbortedFileTransfer = false;
@@ -2000,7 +2000,7 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, int nLen)
 	ULARGE_INTEGER lpFreeBytesAvailable;
 	ULARGE_INTEGER lpTotalBytes;		
 	ULARGE_INTEGER lpTotalFreeBytes;
-	unsigned long dwFreeKBytes;
+	unsigned long dwFreeKBytes=0;
 	char *szDestPath = new char [strlen(m_szDestFileName) + 1];
 	memset(szDestPath, 0, strlen(m_szDestFileName) + 1);
 	strcpy(szDestPath, m_szDestFileName);
@@ -3325,13 +3325,13 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 		{
             helper::SafeSetWindowUserData(hWnd, lParam);
 
-            FileTransfer *_this = (FileTransfer *) lParam;
+            FileTransfer *l_this = (FileTransfer *) lParam;
             // CentreWindow(hWnd);
-			_this->hWnd = hWnd;
+			l_this->hWnd = hWnd;
 			hFTWnd = hWnd;
 
 			// Window always on top if Fullscreen On
-			if (_this->m_pCC->InFullScreenMode())
+			if (l_this->m_pCC->InFullScreenMode())
 			{
 				RECT Rect;
 				GetWindowRect(hWnd, &Rect);
@@ -3350,7 +3350,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 			const long lTitleBufSize=256;			
 			char szRemoteName[lTitleBufSize];
 			char szTitle[lTitleBufSize];
-			if (_snprintf(szRemoteName, 127 ,"%s", _this->m_pCC->m_desktopName) < 0 )
+			if (_snprintf(szRemoteName, 127 ,"%s", l_this->m_pCC->m_desktopName) < 0 )
 			{
 				szRemoteName[128-4]='.';
 				szRemoteName[128-3]='.';
@@ -3402,20 +3402,20 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 			ListView_SetExtendedListViewStyleEx(hWndList, LVS_EX_FULLROWSELECT, LVS_EX_FULLROWSELECT); 
 
 			// Create Icons List of ListViews
-			_this->InitListViewImagesList(GetDlgItem(hWnd, IDC_LOCAL_FILELIST));
-			_this->InitListViewImagesList(GetDlgItem(hWnd, IDC_REMOTE_FILELIST));
+			l_this->InitListViewImagesList(GetDlgItem(hWnd, IDC_LOCAL_FILELIST));
+			l_this->InitListViewImagesList(GetDlgItem(hWnd, IDC_REMOTE_FILELIST));
 			
 			// Create the status bar
 			HWND hStatusBar = CreateStatusWindow(WS_VISIBLE|WS_CHILD, sz_H36 , hWnd, IDC_STATUS);
 
 			// Populate the Local listboxes with local drives
-			_this->ListDrives(hWnd);
+			l_this->ListDrives(hWnd);
 
 			// adzm 2009-08-02 - Still list drives above in case this is incorrect, also to populate the dropdown combo
-			if (lstrlen(_this->m_szLastLocalPath) > 0) { 
-				if (GetFileAttributes(_this->m_szLastLocalPath) & FILE_ATTRIBUTE_DIRECTORY) {
+			if (lstrlen(l_this->m_szLastLocalPath) > 0) { 
+				if (GetFileAttributes(l_this->m_szLastLocalPath) & FILE_ATTRIBUTE_DIRECTORY) {
 					// let's try to use the last path
-					_this->PopulateLocalListBox(hWnd, _this->m_szLastLocalPath);
+					_this->PopulateLocalListBox(hWnd, l_this->m_szLastLocalPath);
 				}
 			}
 
@@ -3434,33 +3434,33 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 			}
 			else
 			{
-				_this->m_timer = SetTimer( hWnd, 3333,  1000, NULL);
-				_this->SetStatus(sz_H37);
+				l_this->m_timer = SetTimer( hWnd, 3333,  1000, NULL);
+				l_this->SetStatus(sz_H37);
 			}
 
 			// Save original (translated) buttons labels 
-			if (strlen(_this->m_szDeleteButtonLabel) == 0)
+			if (strlen(l_this->m_szDeleteButtonLabel) == 0)
 			{
 //				char szLbl[64];
 				HWND hB = GetDlgItem(hWnd, IDC_DELETE_B);
-				GetWindowText(hB, (LPSTR)_this->m_szDeleteButtonLabel, 64);
+				GetWindowText(hB, (LPSTR)l_this->m_szDeleteButtonLabel, 64);
 			}
 
-			if (strlen(_this->m_szNewFolderButtonLabel) == 0)
+			if (strlen(l_this->m_szNewFolderButtonLabel) == 0)
 			{
 //				char szLbl[64];
 				HWND hB = GetDlgItem(hWnd, IDC_NEWFOLDER_B);
-				GetWindowText(hB, (LPSTR)_this->m_szNewFolderButtonLabel, 64);
+				GetWindowText(hB, (LPSTR)l_this->m_szNewFolderButtonLabel, 64);
 			}
 
-			if (strlen(_this->m_szRenameButtonLabel) == 0)
+			if (strlen(l_this->m_szRenameButtonLabel) == 0)
 			{
 //				char szLbl[64];
 				HWND hB = GetDlgItem(hWnd, IDC_RENAME_B);
-				GetWindowText(hB, (LPSTR)_this->m_szRenameButtonLabel, 64);
+				GetWindowText(hB, (LPSTR)l_this->m_szRenameButtonLabel, 64);
 			}
 
-            _this->CheckButtonState(hWnd);
+            l_this->CheckButtonState(hWnd);
             return TRUE;
 		}
 		break;
@@ -4595,7 +4595,7 @@ void FileTransfer::InitListViewImagesList(HWND hListView)
 // Modif initiated by TAW. Thanks !
 int CALLBACK FileTransfer::ListViewLocalCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
 {
-	int iResult;
+	int iResult=0;
 	bool bSortDirection = true;
 	bool bRemoteList = false;
 	TCHAR szBuf1[255], szBuf2[255];

@@ -86,17 +86,17 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 	case WM_INITDIALOG:
 		{
             helper::SafeSetWindowUserData(hwnd, lParam);
-            SessionDialog *_this = (SessionDialog *) lParam;
+            SessionDialog *l_this = (SessionDialog *) lParam;
             CentreWindow(hwnd);
 			SetForegroundWindow(hwnd);
-			_this->m_pCC->m_hSessionDialog = hwnd;
+			l_this->m_pCC->m_hSessionDialog = hwnd;
 
             // Set up recently-used list
             HWND hcombo = GetDlgItem(  hwnd, IDC_HOSTNAME_EDIT);
             TCHAR valname[256];
 
-            for (int i = 0; i < _this->m_pMRU->NumItems(); i++) {
-                _this->m_pMRU->GetItem(i, valname, 255);
+            for (int i = 0; i < l_this->m_pMRU->NumItems(); i++) {
+                l_this->m_pMRU->GetItem(i, valname, 255);
                 int pos = SendMessage(hcombo, CB_ADDSTRING, 0, (LPARAM) valname);
 
             }
@@ -104,7 +104,7 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 
 			// sf@2002 - List available DSM Plugins
 			HWND hPlugins = GetDlgItem(hwnd, IDC_PLUGINS_COMBO);
-			int nPlugins = _this->m_pDSMPlugin->ListPlugins(hPlugins);
+			int nPlugins = l_this->m_pDSMPlugin->ListPlugins(hPlugins);
 			if (!nPlugins)
 			{
 				SendMessage(hPlugins, CB_ADDSTRING, 0, (LPARAM) sz_F11);
@@ -121,10 +121,10 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 			EnableWindow(hButton, FALSE); // sf@2009 - Disable plugin config button by default
 
 			//AaronP
-			if( strcmp( _this->m_pOpt->m_szDSMPluginFilename, "" ) != 0 && _this->m_pOpt->m_fUseDSMPlugin )
+			if( strcmp( l_this->m_pOpt->m_szDSMPluginFilename, "" ) != 0 && l_this->m_pOpt->m_fUseDSMPlugin )
 			{ 
 				int pos = SendMessage(hPlugins, CB_FINDSTRINGEXACT, -1,
-					(LPARAM)&(_this->m_pOpt->m_szDSMPluginFilename[0]));
+					(LPARAM)&(l_this->m_pOpt->m_szDSMPluginFilename[0]));
 
 				if( pos != CB_ERR )
 				{
@@ -138,25 +138,25 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 
 			TCHAR tmphost[256];
 			TCHAR tmphost2[256];
-			_tcscpy(tmphost, _this->m_pOpt->m_proxyhost);
+			_tcscpy(tmphost, l_this->m_pOpt->m_proxyhost);
 			if (strcmp(tmphost,"")!=NULL)
 			{
 			_tcscat(tmphost,":");
-			_tcscat(tmphost,_itoa(_this->m_pOpt->m_proxyport,tmphost2,10));
+			_tcscat(tmphost,_itoa(l_this->m_pOpt->m_proxyport,tmphost2,10));
 			SetDlgItemText(hwnd, IDC_PROXY_EDIT, tmphost);
 			}
 
 			HWND hViewOnly = GetDlgItem(hwnd, IDC_VIEWONLY_CHECK);
-			SendMessage(hViewOnly, BM_SETCHECK, _this->m_pOpt->m_ViewOnly, 0);
+			SendMessage(hViewOnly, BM_SETCHECK, l_this->m_pOpt->m_ViewOnly, 0);
 
 			HWND hAutoScaling = GetDlgItem(hwnd, IDC_AUTOSCALING_CHECK);
-			SendMessage(hAutoScaling, BM_SETCHECK, _this->m_pOpt->m_fAutoScaling, 0);
+			SendMessage(hAutoScaling, BM_SETCHECK, l_this->m_pOpt->m_fAutoScaling, 0);
 
 			HWND hExitCheck = GetDlgItem(hwnd, IDC_EXIT_CHECK); //PGM @ Advantig
-			SendMessage(hExitCheck, BM_SETCHECK, _this->m_pOpt->m_fExitCheck, 0); //PGM @ Advantig
+			SendMessage(hExitCheck, BM_SETCHECK, l_this->m_pOpt->m_fExitCheck, 0); //PGM @ Advantig
 
 			HWND hProxy = GetDlgItem(hwnd, IDC_PROXY_CHECK);
-			SendMessage(hProxy, BM_SETCHECK, _this->m_pOpt->m_fUseProxy, 0);
+			SendMessage(hProxy, BM_SETCHECK, l_this->m_pOpt->m_fUseProxy, 0);
 
 
 			// sf@2005 - Make the save settings optional but always enabled by default (for now)
@@ -166,10 +166,10 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 
 
 			// sf@2002 - Select Modem Option as default
-			_this->SetQuickOption(_this, hwnd);
+			l_this->SetQuickOption(l_this, hwnd);
 
-			_this->m_fFromOptions = false;
-			_this->m_fFromFile = false;
+			l_this->m_fFromOptions = false;
+			l_this->m_fFromFile = false;
 
             return TRUE;
 		}
@@ -410,7 +410,7 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 				// sf@2003 - The config button can be clicked several times with 
 				// different selected plugins...
 				bool fLoadIt = true;
-				char szParams[32];
+				char szParams[64];
 				strcpy(szParams, sz_F4);
 				// If a plugin is already loaded, check if it is the same that the one 
 				// we want to load.
@@ -457,7 +457,7 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 				memset(szFileName, '\0', MAX_PATH);
 				if (_this->m_pCC->LoadConnection(szFileName, true) != -1)
 				{
-					TCHAR szHost[128];
+					TCHAR szHost[250];
 					if (_this->m_pCC->m_port == 5900)
 						_tcscpy(szHost, _this->m_pCC->m_host);
 					else if (_this->m_pCC->m_port > 5900 && _this->m_pCC->m_port <= 5999)

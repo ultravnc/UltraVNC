@@ -780,9 +780,9 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
         ShowUsage(sz_D28);
         PostQuitMessage(1);
       } else {
-		  for (size_t i = 0, len = strlen(phost); i < len; i++)
+		  for (size_t l_i = 0, len = strlen(phost); l_i < len; l_i++)
 						{
-							phost[i] = toupper(phost[i]);
+							phost[l_i] = toupper(phost[l_i]);
 						} 
         _tcscpy(m_host_options, phost);
         m_connectionSpecified = true;
@@ -1123,7 +1123,7 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 		  
 
 		  // sf@2005 - New Color depth choice
-		  HWND hColorMode;
+		  HWND hColorMode=NULL;
 		  switch (_this->m_Use8Bit)
 		  {
 		  case rfbPFFullColors:
@@ -1148,7 +1148,7 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 			  hColorMode = GetDlgItem(hwnd, IDC_2GREYCOLORS_RADIO);
 			  break;
 		  }
-		  SendMessage(hColorMode, BM_SETCHECK,	true, 0);
+		  if (hColorMode) SendMessage(hColorMode, BM_SETCHECK,	true, 0);
 
    	      // sf@2005 - New color depth choice
 		  hColorMode = GetDlgItem(hwnd, IDC_FULLCOLORS_RADIO);
