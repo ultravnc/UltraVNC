@@ -3059,7 +3059,8 @@ void ClientConnection::SuspendThread()
 	// Reinit DSM stuff
 	m_nTO = 1;
 	LoadDSMPlugin(true);
-	m_fUseProxy = false;
+	// WHat is this doing here ???
+	// m_fUseProxy = false;  << repeater block after reconnect
 	m_pNetRectBuf = NULL;
 	m_fReadFromNetRectBuf = false; 
 	m_nNetRectBufOffset = 0;
@@ -5835,6 +5836,16 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						
 					case ID_FULLSCREEN: 
 						// Toggle full screen mode
+						if (!_this->InFullScreenMode()) //PGM
+
+						{ //PGM
+
+							SendMessage(hwnd,WM_SYSCOMMAND,(WPARAM)ID_NORMALSCREEN,(LPARAM)0); //PGM
+
+							Sleep(100); //PGM
+
+						} //PGM
+
 						_this->SetFullScreenMode(!_this->InFullScreenMode());
 						return 0;
 
@@ -6028,6 +6039,16 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						// Modif sf@2002
 					case ID_HALFSCREEN: 
 						{
+							if (_this->InFullScreenMode()) //PGM
+
+							{ //PGM
+
+								SendMessage(hwnd,WM_SYSCOMMAND,(WPARAM)ID_AUTOSCALING,(LPARAM)0); //PGM
+
+								return 0; //PGM
+
+							} //PGM
+
 							// Toggle halfSize screen mode (server side)
 							int nOldServerScale = _this->m_nServerScale;
 							

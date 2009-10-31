@@ -13,9 +13,12 @@ extern LONG AllowShutdown;
 extern LONG AllowProperties;
 extern LONG AllowEditClients;
 extern HINSTANCE hInst;
+extern char DSMPlugin[128]; //PGM
 #define MAXPWLEN 8
 extern char passwd[MAXPWLEN];
+extern char passwd2[MAXPWLEN]; //PGM
 char *plaintext;
+char *plaintext2; //PGM
 vncSetAuth m_vncauth;
 
 char* GetDSMPluginName();
@@ -415,6 +418,7 @@ BOOL CALLBACK security(HWND hwnd, UINT uMsg,WPARAM wParam, LPARAM lParam)
 			initdone2=false;
 			m_pDSMPlugin = new CDSMPlugin();
 			plaintext=vncDecryptPasswd(passwd);
+			plaintext2=vncDecryptPasswd(passwd2); //PGM
 			SendMessage(GetDlgItem(hwnd, IDC_MSLOGON_CHECKD), BM_SETCHECK, MSLogonRequired, 0);
 			SendMessage(GetDlgItem(hwnd, IDC_NEW_MSLOGON), BM_SETCHECK, NewMSLogon, 0);
 			SendMessage(GetDlgItem(hwnd, IDC_PASSRECK), BM_SETCHECK, AuthRequired, 0);
@@ -423,6 +427,7 @@ BOOL CALLBACK security(HWND hwnd, UINT uMsg,WPARAM wParam, LPARAM lParam)
 			SendMessage(GetDlgItem(hwnd, IDC_ALLOWPROP), BM_SETCHECK, AllowProperties, 0);
 			SendMessage(GetDlgItem(hwnd, IDC_PLUGIN_CHECK), BM_SETCHECK, UseDSMPlugin, 0);
 			SetDlgItemText(hwnd, IDC_PASSWORD, plaintext);
+			SetDlgItemText(hwnd, IDC_PASSWORD2, plaintext2); //PGM
 			BOOL bMSLogonChecked =
 				(SendDlgItemMessage(hwnd, IDC_MSLOGON_CHECKD,
 										BM_GETCHECK, 0, 0) == BST_CHECKED);
@@ -438,7 +443,8 @@ BOOL CALLBACK security(HWND hwnd, UINT uMsg,WPARAM wParam, LPARAM lParam)
 				SendMessage(hPlugins, CB_SETCURSEL, 0, 0);
 			}
 			else
-				SendMessage(hPlugins, CB_SELECTSTRING, 0, (LPARAM)GetDSMPluginName());
+//PGM				SendMessage(hPlugins, CB_SELECTSTRING, 0, (LPARAM)GetDSMPluginName());
+				SendMessage(hPlugins, CB_SELECTSTRING, 0, (LPARAM)DSMPlugin); //PGM
 
 			initdone2=true;
 			return TRUE;
@@ -550,17 +556,29 @@ BOOL CALLBACK security(HWND hwnd, UINT uMsg,WPARAM wParam, LPARAM lParam)
 			AllowEditClients=SendDlgItemMessage(hwnd, IDC_ALLOWEDIT, BM_GETCHECK, 0, 0);
 			AllowProperties=SendDlgItemMessage(hwnd, IDC_ALLOWPROP, BM_GETCHECK, 0, 0);
 			UseDSMPlugin=SendDlgItemMessage(hwnd, IDC_PLUGIN_CHECK, BM_GETCHECK, 0, 0);
-
-			char plaintext2[MAXPWLEN+1];
-			int len = GetDlgItemText(hwnd, IDC_PASSWORD, (LPSTR) &plaintext2, MAXPWLEN+1);
+			GetDlgItemText(hwnd, IDC_PLUGINS_COMBO, DSMPlugin, 128); //PGM
+			char plaintext1[MAXPWLEN+1]; //PGM
+			int len = GetDlgItemText(hwnd, IDC_PASSWORD, (LPSTR) &plaintext1, MAXPWLEN+1); //PGM
 			if (len == 0)
 					{
 						strcpy(passwd,"");
 					}
 			else
 					{
-						vncEncryptPasswd(plaintext2,passwd);
+						vncEncryptPasswd(plaintext1,passwd); //PGM
 					}
+
+			memset(plaintext1, '\0', 9); //PGM
+			len = 0; //PGM
+			len = GetDlgItemText(hwnd, IDC_PASSWORD2, (LPSTR) &plaintext1, MAXPWLEN+1); //PGM
+			if (len == 0) //PGM
+					{ //PGM
+						strcpy(passwd2,""); //PGM
+					} //PGM
+			else //PGM
+					{ //PGM
+						vncEncryptPasswd(plaintext1,passwd2); //PGM
+					} //PGM
 
 			return TRUE;
 			}

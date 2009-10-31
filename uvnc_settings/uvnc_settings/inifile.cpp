@@ -90,6 +90,18 @@ IniFile::WritePassword(char *value)
 		return (FALSE != WritePrivateProfileStruct("ultravnc","passwd", value,8,myInifile));
 }
 
+void //PGM
+IniFile::ReadPassword2(char *value,int valuesize) //PGM
+{ //PGM
+	GetPrivateProfileStruct("ultravnc","passwd2",value,8,myInifile); //PGM
+} //PGM
+
+bool //PGM
+IniFile::WritePassword2(char *value) //PGM
+{ //PGM
+		return (FALSE != WritePrivateProfileStruct("ultravnc","passwd2", value,8,myInifile)); //PGM
+} //PGM
+
 bool IniFile::IsWritable()
 {
     bool writable = WriteInt("Permissions", "isWritable",1);

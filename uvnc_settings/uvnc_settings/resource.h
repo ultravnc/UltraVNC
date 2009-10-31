@@ -32,6 +32,7 @@
 #define IDC_PLUGINS_COMBO               1015
 #define IDC_PLUGIN_BUTTON               1016
 #define IDC_FILETRANSFER                1017
+#define IDC_PASSWORD2                   1017
 #define IDC_FTUSERIMPERSONATION_CHECK   1018
 #define IDC_LOCKSETTING_NOTHING         1019
 #define IDC_LOCKSETTING_LOCK            1020
@@ -70,6 +71,7 @@
 #define IDC_CHECK4                      1053
 #define IDC_BLANK                       1053
 #define IDC_CHECKREP                    1053
+#define IDC_BLANK2                      1054
 #define IDC_POWER                       1055
 #define IDC_DISABLETRAY                 1057
 #define IDC_ALLOWSHUTDOWN               1058

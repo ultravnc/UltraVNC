@@ -58,6 +58,7 @@ LONG AllowEditClients=1;
 LONG FileTransferEnabled=0;
 LONG FTUserImpersonation;
 LONG BlankMonitorEnabled=0;
+LONG BlankInputsOnly=0; //PGM
 LONG DefaultScale=1;
 LONG CaptureAlphaBlending=1;
 LONG BlackAlphaBlending=1;
@@ -84,6 +85,7 @@ LONG LockSettings;
 LONG DisableLocalInputs;
 LONG EnableJapInput;
 char passwd[MAXPWLEN];
+char passwd2[MAXPWLEN]; //PGM
 
 LONG TurboMode=1;
 LONG PollUnderCursor=0;
@@ -116,15 +118,15 @@ INT_PTR CALLBACK PasswdProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
 	case WM_COMMAND:
 		if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
 		{
-			char plaintext2[MAXPWLEN+1];
-			int len = GetDlgItemText(hDlg, IDC_SFXPASSWD, (LPSTR) &plaintext2, MAXPWLEN+1);
+			char plaintext1[MAXPWLEN+1]; //PGM
+			int len = GetDlgItemText(hDlg, IDC_SFXPASSWD, (LPSTR) &plaintext1, MAXPWLEN+1); //PGM
 			if (len == 0)
 					{
 						strcpy(passwd,"");
 					}
 			else
 					{
-						vncEncryptPasswd(plaintext2,passwd);
+						vncEncryptPasswd(plaintext1,passwd); //PGM
 					}
 
 			EndDialog(hDlg, LOWORD(wParam));
@@ -164,6 +166,7 @@ myIniFile_Out.WriteInt("admin", "AllowEditClients" ,AllowEditClients);
 myIniFile_Out.WriteInt("admin", "FileTransferEnabled", FileTransferEnabled);
 myIniFile_Out.WriteInt("admin", "FTUserImpersonation", FTUserImpersonation);
 myIniFile_Out.WriteInt("admin", "BlankMonitorEnabled", BlankMonitorEnabled);
+myIniFile_Out.WriteInt("admin", "BlankInputsOnly", BlankInputsOnly); //PGM
 myIniFile_Out.WriteInt("admin", "DefaultScale", DefaultScale);
 myIniFile_Out.WriteInt("admin", "CaptureAlphaBlending", CaptureAlphaBlending);
 myIniFile_Out.WriteInt("admin", "BlackAlphaBlending", BlackAlphaBlending);
@@ -186,6 +189,7 @@ myIniFile_Out.WriteInt("admin", "secundary", Secundary);
 
 
 myIniFile_Out.WritePassword(passwd);
+myIniFile_Out.WritePassword2(passwd2); //PGM
 myIniFile_Out.WriteInt("admin", "InputsEnabled", EnableRemoteInputs);
 myIniFile_Out.WriteInt("admin", "LockSetting", LockSettings);
 myIniFile_Out.WriteInt("admin", "LocalInputsDisabled", DisableLocalInputs);	
@@ -234,6 +238,7 @@ myIniFile_Out.WriteInt("admin", "AllowEditClients" ,AllowEditClients);
 myIniFile_Out.WriteInt("admin", "FileTransferEnabled", FileTransferEnabled);
 myIniFile_Out.WriteInt("admin", "FTUserImpersonation", FTUserImpersonation);
 myIniFile_Out.WriteInt("admin", "BlankMonitorEnabled", BlankMonitorEnabled);
+myIniFile_Out.WriteInt("admin", "BlankInputsOnly", BlankInputsOnly); //PGM
 myIniFile_Out.WriteInt("admin", "DefaultScale", DefaultScale);
 myIniFile_Out.WriteInt("admin", "CaptureAlphaBlending", CaptureAlphaBlending);
 myIniFile_Out.WriteInt("admin", "BlackAlphaBlending", BlackAlphaBlending);
@@ -257,6 +262,7 @@ myIniFile_Out.WriteInt("admin", "secundary", Secundary);
 DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_PASSWD), 
 							NULL, (DLGPROC) PasswdProc, NULL);
 myIniFile_Out.WritePassword(passwd);
+myIniFile_Out.WritePassword2(passwd2); //PGM
 
 myIniFile_Out.WriteInt("admin", "InputsEnabled", EnableRemoteInputs);
 myIniFile_Out.WriteInt("admin", "LockSetting", LockSettings);
@@ -310,6 +316,7 @@ AllowEditClients=myIniFile_In.ReadInt("admin", "AllowEditClients", true);
 FileTransferEnabled=myIniFile_In.ReadInt("admin", "FileTransferEnabled", true);
 FTUserImpersonation=myIniFile_In.ReadInt("admin", "FTUserImpersonation", true);
 BlankMonitorEnabled = myIniFile_In.ReadInt("admin", "BlankMonitorEnabled", true);
+BlankInputsOnly = myIniFile_In.ReadInt("admin", "BlankInputsOnly", false); //PGM
 DefaultScale = myIniFile_In.ReadInt("admin", "DefaultScale", 1);
 CaptureAlphaBlending = myIniFile_In.ReadInt("admin", "CaptureAlphaBlending", false); // sf@2005
 BlackAlphaBlending = myIniFile_In.ReadInt("admin", "BlackAlphaBlending", false); // sf@2005
@@ -328,6 +335,7 @@ QueryTimeout=myIniFile_In.ReadInt("admin", "QueryTimeout", 0);
 QueryAccept=myIniFile_In.ReadInt("admin", "QueryAccept", 0);
 QueryIfNoLogon=myIniFile_In.ReadInt("admin", "QueryIfNoLogon", 0);
 myIniFile_In.ReadPassword(passwd,MAXPWLEN);
+myIniFile_In.ReadPassword2(passwd2,MAXPWLEN); //PGM
 EnableRemoteInputs=myIniFile_In.ReadInt("admin", "InputsEnabled", 0);
 LockSettings=myIniFile_In.ReadInt("admin", "LockSetting", 0);
 DisableLocalInputs=myIniFile_In.ReadInt("admin", "LocalInputsDisabled", 0);
@@ -425,8 +433,8 @@ BOOL CALLBACK DlgProc(HWND hwndDlg, UINT uMsg,
 			item.pszText = "Screen Capture";
 			TabCtrl_InsertItem(m_hTab, 4, &item);
 			item.pszText = "Misc/logging";
-			TabCtrl_InsertItem(m_hTab, 5, &item);
-			item.pszText = "Create SFX";
+			//TabCtrl_InsertItem(m_hTab, 5, &item);
+			//item.pszText = "Create SFX";
 			TabCtrl_InsertItem(m_hTab, 6, &item);
 			item.pszText = "Trouble Shooting";
 
