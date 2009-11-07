@@ -3415,7 +3415,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 			if (lstrlen(l_this->m_szLastLocalPath) > 0) { 
 				if (GetFileAttributes(l_this->m_szLastLocalPath) & FILE_ATTRIBUTE_DIRECTORY) {
 					// let's try to use the last path
-					_this->PopulateLocalListBox(hWnd, l_this->m_szLastLocalPath);
+					l_this->PopulateLocalListBox(hWnd, l_this->m_szLastLocalPath); //PGM
 				}
 			}
 
