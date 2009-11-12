@@ -744,7 +744,9 @@ vncDesktopThread::run_undetached(void *arg)
 			{
 				case WAIT_TIMEOUT:
 				case WAIT_OBJECT_0:
+				{
 				waiting_update=0;
+				omni_mutex_lock l(m_desktop->m_update_lock);
 				ResetEvent(m_desktop->trigger_events[0]);
 							{
 								//measure current cpu usage of winvnc
@@ -1122,16 +1124,11 @@ vncDesktopThread::run_undetached(void *arg)
 									if (m_desktop->AviGen) m_desktop->AviGen->AddFrame((BYTE*)m_desktop->m_DIBbits);
 					#endif
 								}
-								newtick = timeGetTime(); // Better resolution than GetTickCount ;)		
-								//if (newtick-oldtick > 0)
-									//vnclog.Print(LL_INTINFO, VNCLOG("Elapsed Time for updates %ums\n"), newtick-oldtick);
-								
-								// Now wait for more messages to be queued
-							}//peek message
+								newtick = timeGetTime(); 
+							}
+						}
 					break;
-				//case WAIT_OBJECT_0:
-				//	ResetEvent(m_desktop->trigger_events[0]);
-				//	break;
+
 				case WAIT_OBJECT_0+1:
 					ResetEvent(m_desktop->trigger_events[1]);
 					m_desktop->lock_region_add=true;
