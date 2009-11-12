@@ -427,6 +427,7 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 					cliptext = NULL;
 
 					// Now send the unix text to the server
+					omni_mutex_lock l(_this->m_update_lock);
 					_this->m_server->UpdateClipText(unixtext);
 
 					free(unixtext);

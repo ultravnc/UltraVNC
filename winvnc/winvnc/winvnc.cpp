@@ -103,6 +103,8 @@ void Set_uninstall_service_as_admin();
 void Set_install_service_as_admin();
 void winvncSecurityEditorHelper_as_admin();
 bool GetServiceName(TCHAR *pszAppPath, TCHAR *pszServiceName);
+void Open_homepage();
+void Open_forum();
 
 // [v1.0.2-jp1 fix] Load resouce from dll
 HINSTANCE	hInstResDLL;
@@ -283,6 +285,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 			}
 			return 0;
 		}
+
+		if (strncmp(&szCmdLine[i], winvncopenhomepage, strlen(winvncopenhomepage)) == 0)
+		{
+			Open_homepage();
+			return 0;
+		}
+
+		if (strncmp(&szCmdLine[i], winvncopenforum, strlen(winvncopenforum)) == 0)
+		{
+			Open_forum();
+			return 0;
+		}
+
 
 		if (strncmp(&szCmdLine[i], winvncStartserviceHelper, strlen(winvncStartserviceHelper)) == 0)
 		{

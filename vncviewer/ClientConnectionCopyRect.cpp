@@ -46,6 +46,11 @@ void ClientConnection::ReadCopyRect(rfbFramebufferUpdateRectHeader *pfburh) {
 		{
 		omni_mutex_lock l(m_bitmapdcMutex);
 		int bytesPerInputRow = m_si.framebufferWidth * m_myFormat.bitsPerPixel/8;
+
+		// Pitch
+		if (bytesPerInputRow % 4)
+		bytesPerInputRow += 4 - bytesPerInputRow % 4;
+
 		int bytesPerOutputRow = pfburh->r.w * m_myFormat.bitsPerPixel/8;
 		int OutputHeight=pfburh->r.h;
 		BYTE *sourcepos,*iptr,*destpos,*optr;

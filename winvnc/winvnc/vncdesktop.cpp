@@ -407,12 +407,12 @@ vncDesktop::vncDesktop()
 	m_input_desktop = 0;
 	m_home_desktop = 0;
 	idle_counter=0;
-	trigger_events[0]=CreateEvent(NULL,FALSE,FALSE,"timer");
-	trigger_events[1]=CreateEvent(NULL,FALSE,FALSE,"screenupdate");
-	trigger_events[2]=CreateEvent(NULL,FALSE,FALSE,"mouseupdate");
-	trigger_events[3]=CreateEvent(NULL,FALSE,FALSE,"user1");
-	trigger_events[4]=CreateEvent(NULL,FALSE,FALSE,"user2");
-	trigger_events[5]=CreateEvent(NULL,FALSE,FALSE,"quit");
+	trigger_events[0]=CreateEvent(NULL,TRUE,FALSE,"timer");
+	trigger_events[1]=CreateEvent(NULL,TRUE,FALSE,"screenupdate");
+	trigger_events[2]=CreateEvent(NULL,TRUE,FALSE,"mouseupdate");
+	trigger_events[3]=CreateEvent(NULL,TRUE,FALSE,"user1");
+	trigger_events[4]=CreateEvent(NULL,TRUE,FALSE,"user2");
+	trigger_events[5]=CreateEvent(NULL,TRUE,FALSE,"quit");
 	restart_event=CreateEvent(NULL,TRUE,TRUE,"restart");
 	rgnpump.clear();
 	lock_region_add=false;

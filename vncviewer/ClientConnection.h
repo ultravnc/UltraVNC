@@ -524,6 +524,8 @@ private:
 	int m_hScrollPos, m_hScrollMax, m_vScrollPos, m_vScrollMax;
 	// The current window size
 	int m_winwidth, m_winheight;
+	bool SB_HORZ_BOOL;
+	bool SB_VERT_BOOL;
 	__int64 m_BytesSend;
 	__int64 m_BytesRead;
 	HANDLE m_bitmapFRONT,m_bitmapBACK,m_bitmapNONE,m_logo_min;

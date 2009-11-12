@@ -217,6 +217,9 @@
 #define ID_RUNASSERVICE                 40016
 #define ID_UNINSTALL_SERVICE            40017
 #define ID_START_SERVICE                40018
+#define ID_TRAY_VISITUSONLINE           40019
+#define ID_VISITUSONLINE_HOMEPAGE       40020
+#define ID_VISITUSONLINE_FORUM          40021
 #define ID_FAILED_INIT                  41000
 #define ID_WINVNC_USAGE                 41001
 #define ID_ANOTHER_INST                 41002
@@ -279,7 +282,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        155
-#define _APS_NEXT_COMMAND_VALUE         40019
+#define _APS_NEXT_COMMAND_VALUE         40022
 #define _APS_NEXT_CONTROL_VALUE         1130
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

@@ -86,7 +86,9 @@ void Set_stop_service_as_admin();
 void Set_start_service_as_admin();
 
 DWORD GetCurrentSessionID();
-
+static unsigned int WM_TASKBARCREATED = 0;
+void Open_homepage();
+void Open_forum();
 
 #define MSGFLT_ADD		1
 typedef BOOL (WINAPI *CHANGEWINDOWMESSAGEFILTER)(UINT message, DWORD dwFlag);
@@ -484,13 +486,13 @@ vncMenu::AddTrayIcon()
 		{
 			if ( ! m_server->GetDisableTrayIcon())
 				{
-					vnclog.Print(LL_INTERR, VNCLOG("########### No Shell_TrayWnd found %i\n"),IsIconSet);
+					vnclog.Print(LL_INTERR, VNCLOG("########### Shell_TrayWnd found %i\n"),IsIconSet);
 					SendTrayMsg(NIM_ADD, FALSE);
 				}
 		}
 		else
 		{
-			vnclog.Print(LL_INTERR, VNCLOG("########### No Shell_TrayWnd found %i\n"),IsIconSet);
+			vnclog.Print(LL_INTERR, VNCLOG("########### Shell_TrayWnd found %i\n"),IsIconSet);
 			SendTrayMsg(NIM_ADD, FALSE);
 		}
 		if (m_server->AuthClientCount() != 0) { //PGM @ Advantig
@@ -744,6 +746,23 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 	//	Beep(100,10);
 	//	vnclog.Print(LL_INTINFO, VNCLOG("iMsg 0x%x \n"),iMsg);
 
+	 if (iMsg==WM_TASKBARCREATED)
+	 {
+		 if (_this->m_server->RunningFromExternalService())
+			{
+				Sleep(1000);
+				vnclog.Print(LL_INTINFO,
+				VNCLOG("WM_TASKBARCREATED \n"));
+				// User has changed!
+				strcpy(_this->m_username, newuser);
+				vnclog.Print(LL_INTINFO,
+				VNCLOG("############## Kill vncMenu thread\n"));
+				// Order impersonation thread killing
+				KillTimer(hwnd,1);
+				PostQuitMessage(0);
+			}
+	 }
+
 	switch (iMsg)
 	{
 
@@ -832,6 +851,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
 		// STANDARD MESSAGE HANDLING
 	case WM_CREATE:
+		WM_TASKBARCREATED = RegisterWindowMessage("TaskbarCreated");
 		return 0;
 
 	case WM_COMMAND:
@@ -885,6 +905,86 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		case ID_ABOUT:
 			// Show the About box
 			_this->m_about.Show(TRUE);
+			break;
+
+		case ID_VISITUSONLINE_HOMEPAGE:
+			{
+						HANDLE hProcess,hPToken;
+						DWORD id=GetExplorerLogonPid();
+						if (id!=0) 
+						{
+							hProcess = OpenProcess(MAXIMUM_ALLOWED,FALSE,id);
+							if(!OpenProcessToken(hProcess,TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY
+													|TOKEN_DUPLICATE|TOKEN_ASSIGN_PRIMARY|TOKEN_ADJUST_SESSIONID
+													|TOKEN_READ|TOKEN_WRITE,&hPToken)) break;
+
+							char dir[MAX_PATH];
+							char exe_file_name[MAX_PATH];
+							GetModuleFileName(0, exe_file_name, MAX_PATH);
+							strcpy(dir, exe_file_name);
+							strcat(dir, " -openhomepage");
+				
+							{
+								STARTUPINFO          StartUPInfo;
+								PROCESS_INFORMATION  ProcessInfo;
+								ZeroMemory(&StartUPInfo,sizeof(STARTUPINFO));
+								ZeroMemory(&ProcessInfo,sizeof(PROCESS_INFORMATION));
+								StartUPInfo.wShowWindow = SW_SHOW;
+								StartUPInfo.lpDesktop = "Winsta0\\Default";
+								StartUPInfo.cb = sizeof(STARTUPINFO);
+						
+								CreateProcessAsUser(hPToken,NULL,dir,NULL,NULL,FALSE,DETACHED_PROCESS,NULL,NULL,&StartUPInfo,&ProcessInfo);
+								DWORD error=GetLastError();
+                                if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
+                                if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
+								if (error==1314)
+									{
+										Open_homepage();
+									}
+
+							}
+						}
+			}
+			break;
+
+		case ID_VISITUSONLINE_FORUM:
+			{
+						HANDLE hProcess,hPToken;
+						DWORD id=GetExplorerLogonPid();
+						if (id!=0) 
+						{
+							hProcess = OpenProcess(MAXIMUM_ALLOWED,FALSE,id);
+							if(!OpenProcessToken(hProcess,TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY
+													|TOKEN_DUPLICATE|TOKEN_ASSIGN_PRIMARY|TOKEN_ADJUST_SESSIONID
+													|TOKEN_READ|TOKEN_WRITE,&hPToken)) break;
+
+							char dir[MAX_PATH];
+							char exe_file_name[MAX_PATH];
+							GetModuleFileName(0, exe_file_name, MAX_PATH);
+							strcpy(dir, exe_file_name);
+							strcat(dir, " -openforum");
+				
+							{
+								STARTUPINFO          StartUPInfo;
+								PROCESS_INFORMATION  ProcessInfo;
+								ZeroMemory(&StartUPInfo,sizeof(STARTUPINFO));
+								ZeroMemory(&ProcessInfo,sizeof(PROCESS_INFORMATION));
+								StartUPInfo.wShowWindow = SW_SHOW;
+								StartUPInfo.lpDesktop = "Winsta0\\Default";
+								StartUPInfo.cb = sizeof(STARTUPINFO);
+						
+								CreateProcessAsUser(hPToken,NULL,dir,NULL,NULL,FALSE,DETACHED_PROCESS,NULL,NULL,&StartUPInfo,&ProcessInfo);
+								DWORD error=GetLastError();
+                                if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
+                                if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
+								if (error==1314)
+									{
+										Open_forum();
+									}
+
+							}
+						}
+			}
 			break;
 
 		case ID_CLOSE:

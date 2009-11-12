@@ -646,9 +646,6 @@ vncDesktopThread::run_undetached(void *arg)
 	if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver)
 		m_desktop->m_buffer.SetAccuracy(4);
 
-	BOOL idle_skip = TRUE;
-	ULONG idle_skip_count = 0;
-
 	//init vars
 	m_desktop->m_SWSizeChanged=FALSE;
 	m_desktop->m_SWtoDesktop=FALSE;
@@ -679,6 +676,7 @@ vncDesktopThread::run_undetached(void *arg)
     //DWORD MIN_UPDATE_INTERVAL=33;
 	/////////////////////
 	bool looping=true;
+	int waiting_update=0;
 	SetEvent(m_desktop->restart_event);
 	///
 	Sleep(1000);
@@ -721,6 +719,10 @@ vncDesktopThread::run_undetached(void *arg)
 			}
 			waittime=0;
 		}
+		else
+		{
+			waittime=waittime-(waiting_update*10);
+		}
 		if (waittime<0) waittime=0;
 		if (waittime>100) waittime=100;
 
@@ -742,6 +744,7 @@ vncDesktopThread::run_undetached(void *arg)
 			{
 				case WAIT_TIMEOUT:
 				case WAIT_OBJECT_0:
+				waiting_update=0;
 				ResetEvent(m_desktop->trigger_events[0]);
 							{
 								//measure current cpu usage of winvnc
@@ -1130,15 +1133,14 @@ vncDesktopThread::run_undetached(void *arg)
 				//	ResetEvent(m_desktop->trigger_events[0]);
 				//	break;
 				case WAIT_OBJECT_0+1:
-					idle_skip = TRUE;
 					ResetEvent(m_desktop->trigger_events[1]);
 					m_desktop->lock_region_add=true;
 					rgncache.assign_union(m_desktop->rgnpump);
 					m_desktop->rgnpump.clear();
 					m_desktop->lock_region_add=false;
+					waiting_update++;
 					break;
 				case WAIT_OBJECT_0+2:
-					idle_skip = TRUE;
 					ResetEvent(m_desktop->trigger_events[2]);
 					break;
 				case WAIT_OBJECT_0+3:

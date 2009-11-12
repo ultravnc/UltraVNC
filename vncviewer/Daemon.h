@@ -42,7 +42,7 @@ protected:
 	void CheckTrayIcon();
 	void RemoveTrayIcon();
 	bool SendTrayMsg(DWORD msg);
-	SOCKET m_sock;
+	SOCKET m_deamon_sock;
 	HWND m_hwnd;
 	HMENU m_hmenu;
 	UINT m_timer;

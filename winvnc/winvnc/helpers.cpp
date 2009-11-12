@@ -360,6 +360,16 @@ Set_start_service_as_admin()
 
 }
 
+void Open_homepage()
+{
+	ShellExecute(0, "open", "http://www.uvnc.com", 0, 0, 1);
+}
+
+void Open_forum()
+{
+	ShellExecute(0, "open", "http://forum.uvnc.com", 0, 0, 1);
+}
+
 void
 Real_start_service()
 {

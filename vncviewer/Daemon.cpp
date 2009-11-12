@@ -88,8 +88,8 @@ Daemon::Daemon(int port)
     addr.sin_port = htons(port);
     addr.sin_addr.s_addr = INADDR_ANY;
 
-    m_sock = socket(AF_INET, SOCK_STREAM, 0);
-	if (!m_sock) throw WarningException(sz_I1);
+    m_deamon_sock = socket(AF_INET, SOCK_STREAM, 0);
+	if (!m_deamon_sock) throw WarningException(sz_I1);
     
 	try {
 		int one = 1, res = 0;
@@ -97,21 +97,21 @@ Daemon::Daemon(int port)
 		//if (res == SOCKET_ERROR) 
 		//  throw WarningException("Error setting Daemon socket options");
 		
-		res = bind(m_sock, (struct sockaddr *)&addr, sizeof(addr));
+		res = bind(m_deamon_sock, (struct sockaddr *)&addr, sizeof(addr));
 		if (res == SOCKET_ERROR)
 			throw WarningException(sz_I2);
 		
-		res = listen(m_sock, 5);
+		res = listen(m_deamon_sock, 5);
 		if (res == SOCKET_ERROR)
 			throw WarningException(sz_I3);
 	} catch (...) {
-		closesocket(m_sock);
-		m_sock = 0;
+		closesocket(m_deamon_sock);
+		m_deamon_sock = INVALID_SOCKET;
 		throw;
 	}
 	
 	// Send a message to specified window on an incoming connection
-	WSAAsyncSelect (m_sock,  m_hwnd,  WM_SOCKEVENT, FD_ACCEPT);
+	WSAAsyncSelect (m_deamon_sock,  m_hwnd,  WM_SOCKEVENT, FD_ACCEPT);
 
 	// Create the tray icon
 	AddTrayIcon();
@@ -187,7 +187,7 @@ LRESULT CALLBACK Daemon::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lPa
 			assert(HIWORD(lParam) == 0);
 			// A new socket created by accept might send messages to
 			// this procedure. We can ignore them.
-			if(wParam != _this->m_sock) {
+			if(wParam != _this->m_deamon_sock) {
 				return 0;
 			}
 
@@ -197,7 +197,7 @@ LRESULT CALLBACK Daemon::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lPa
 					struct sockaddr_in incoming;
 					int size_incoming=sizeof(incoming);
 					SOCKET hNewSock;
-					hNewSock = accept(_this->m_sock, (struct sockaddr *)&incoming,&size_incoming);
+					hNewSock = accept(_this->m_deamon_sock, (struct sockaddr *)&incoming,&size_incoming);
 					WSAAsyncSelect(hNewSock, hwnd, 0, 0);
 					unsigned long nbarg = 0;
 					ioctlsocket(hNewSock, FIONBIO, &nbarg);
@@ -208,6 +208,7 @@ LRESULT CALLBACK Daemon::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lPa
 
 					}else{ 
 						closesocket(hNewSock); 
+						hNewSock = INVALID_SOCKET;
 					} 
 					
 					break;
@@ -215,8 +216,8 @@ LRESULT CALLBACK Daemon::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lPa
 			case FD_READ:
 				{
 					unsigned long numbytes;
-					ioctlsocket(_this->m_sock, FIONREAD, &numbytes);
-					recv(_this->m_sock, _this->netbuf, numbytes, 0);
+					ioctlsocket(_this->m_deamon_sock, FIONREAD, &numbytes);
+					recv(_this->m_deamon_sock, _this->netbuf, numbytes, 0);
 					break;
 				}
 			case FD_CLOSE:
@@ -313,8 +314,8 @@ Daemon::~Daemon()
 	KillTimer(m_hwnd, m_timer);
 	RemoveTrayIcon();
 	DestroyMenu(m_hmenu);
-	if (m_sock!=NULL) shutdown(m_sock, SD_BOTH);
-	if (m_sock!=NULL) closesocket(m_sock);
+	if (m_deamon_sock!=NULL) shutdown(m_deamon_sock, SD_BOTH);
+	if (m_deamon_sock!=NULL) closesocket(m_deamon_sock);
 }
 
 

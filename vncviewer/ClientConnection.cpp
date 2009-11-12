@@ -233,6 +233,8 @@ ClientConnection::ClientConnection()
 	m_keymapJap = NULL;
 	//adzm - 2009-06-21
 	m_pPluginInterface = NULL;
+	SB_HORZ_BOOL=true;
+	SB_VERT_BOOL=true;
 }
 
 ClientConnection::ClientConnection(VNCviewerApp *pApp) 
@@ -1642,6 +1644,7 @@ DWORD WINAPI SocketTimeout(LPVOID lpParam)
 	if (havetobekilled)
 	{
 		closesocket(*sock);
+		*sock = INVALID_SOCKET;
 	}
 	return 0;
 }
@@ -1650,7 +1653,7 @@ void ClientConnection::Connect()
 	struct sockaddr_in thataddr;
 	int res;
 	if (!m_opts.m_NoStatus) GTGBS_ShowConnectWindow();
-	if (m_sock!=NULL) closesocket(m_sock);
+	if (m_sock!=NULL && m_sock!=INVALID_SOCKET) closesocket(m_sock);
 	m_sock = socket(PF_INET, SOCK_STREAM, 0);
 	if (m_hwndStatus) SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L43);
 	if (m_sock == INVALID_SOCKET) {if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L44);throw WarningException(sz_L44);}
@@ -3018,7 +3021,10 @@ void ClientConnection::Createdib()
 	if (m_opts.m_fEnableCache)
 	{
 		if (m_DIBbitsCache != NULL) delete [] m_DIBbitsCache;
-		m_DIBbitsCache= new BYTE[m_si.framebufferWidth*m_si.framebufferHeight*m_myFormat.bitsPerPixel/8];
+		int Pitch=m_si.framebufferWidth*m_myFormat.bitsPerPixel/8;
+		if (Pitch % 4)Pitch += 4 - Pitch % 4;
+
+		m_DIBbitsCache= new BYTE[Pitch*m_si.framebufferHeight];
 		vnclog.Print(0, _T("Cache: Cache buffer bitmap creation\n"));
 	}
 }
@@ -3980,7 +3986,10 @@ void ClientConnection::SendAppropriateFramebufferUpdateRequest()
 			// create viewer cache buffer if necessary
 			if (m_DIBbitsCache == NULL)
 			{
-				m_DIBbitsCache= new BYTE[m_si.framebufferWidth*m_si.framebufferHeight*m_myFormat.bitsPerPixel/8];
+				int Pitch=m_si.framebufferWidth*m_myFormat.bitsPerPixel/8;
+				if (Pitch % 4)Pitch += 4 - Pitch % 4;
+
+				m_DIBbitsCache= new BYTE[Pitch*m_si.framebufferHeight];
 			}
 			ClearCache(); // Clear the cache
 			m_pendingCacheInit = true; // Order full update to synchronize both sides caches
@@ -6142,18 +6151,22 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 #ifndef UNDER_CE
 				case WM_SIZING:
 					{
+						int a=GetSystemMetrics(SM_CYHSCROLL);
+						int b=GetSystemMetrics(SM_CXVSCROLL);
+						if(!_this->SB_HORZ_BOOL) a=0;
+						if (!_this->SB_VERT_BOOL) b=0;
 						// Don't allow sizing larger than framebuffer
 						RECT *lprc = (LPRECT) lParam;
 						switch (wParam) {
 						case WMSZ_RIGHT: 
 						case WMSZ_TOPRIGHT:
 						case WMSZ_BOTTOMRIGHT:
-							lprc->right = min(lprc->right, lprc->left + _this->m_fullwinwidth+1 );
+							lprc->right = min(lprc->right, lprc->left + (_this->m_fullwinwidth+b)+1 );
 							break;
 						case WMSZ_LEFT:
 						case WMSZ_TOPLEFT:
 						case WMSZ_BOTTOMLEFT:
-							lprc->left = max(lprc->left, lprc->right - _this->m_fullwinwidth);
+							lprc->left = max(lprc->left, lprc->right - (_this->m_fullwinwidth+b));
 							break;
 						}
 						
@@ -6162,17 +6175,17 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						case WMSZ_TOPLEFT:
 						case WMSZ_TOPRIGHT:
 							if (_this->m_opts.m_ShowToolbar)
-								lprc->top = max(lprc->top, lprc->bottom - _this->m_fullwinheight -_this->m_TBr.bottom);
+								lprc->top = max(lprc->top, lprc->bottom - (_this->m_fullwinheight+a) -_this->m_TBr.bottom);
 							else
-								lprc->top = max(lprc->top, lprc->bottom - _this->m_fullwinheight);
+								lprc->top = max(lprc->top, lprc->bottom - (_this->m_fullwinheight+a));
 							break;
 						case WMSZ_BOTTOM:
 						case WMSZ_BOTTOMLEFT:
 						case WMSZ_BOTTOMRIGHT:
 							if (_this->m_opts.m_ShowToolbar)
-								lprc->bottom = min(lprc->bottom, lprc->top + _this->m_fullwinheight + _this->m_TBr.bottom);
+								lprc->bottom = min(lprc->bottom, lprc->top + (_this->m_fullwinheight+a) + _this->m_TBr.bottom);
 							else
-								lprc->bottom = min(lprc->bottom, lprc->top + _this->m_fullwinheight);
+								lprc->bottom = min(lprc->bottom, lprc->top + (_this->m_fullwinheight+a));
 							break;
 						}
 						
@@ -6419,16 +6432,77 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						// we turn them off.  Under CE, the scroll bars are unchangeable.
 		
 #ifndef UNDER_CE
-						if (_this->InFullScreenMode() ||
-							_this->m_winwidth  >= _this->m_fullwinwidth  &&
-							_this->m_winheight >= (_this->m_fullwinheight + ((Rtb.bottom - Rtb.top) )) ) {
-							//_this->m_winheight >= _this->m_fullwinheight  ) {
-							ShowScrollBar(hwnd, SB_HORZ, FALSE);
-							ShowScrollBar(hwnd, SB_VERT, FALSE);
-						} else {
-							ShowScrollBar(hwnd, SB_HORZ, TRUE);
-							ShowScrollBar(hwnd, SB_VERT, TRUE);
+						int h_scrollbar=GetSystemMetrics(SM_CYHSCROLL);
+						int v_scrollbar=GetSystemMetrics(SM_CXVSCROLL);
+						int h=0;
+						int v=0;
+						if (_this->SB_HORZ_BOOL) h=h_scrollbar;
+						if (_this->SB_VERT_BOOL) v=v_scrollbar;
+
+
+						if (_this->InFullScreenMode())
+						{
+							_this->SB_HORZ_BOOL=false;
+							_this->SB_VERT_BOOL=false;
+							ShowScrollBar(hwnd, SB_HORZ, _this->SB_HORZ_BOOL);
+							ShowScrollBar(hwnd, SB_VERT, _this->SB_VERT_BOOL);
 						}
+						else
+						{
+
+							if (_this->m_winheight >= (_this->m_fullwinheight + (Rtb.bottom - Rtb.top) + h) )
+							{
+								_this->SB_VERT_BOOL=false;
+							}
+							else _this->SB_VERT_BOOL=true;
+
+							if(_this->m_winwidth  >= _this->m_fullwinwidth + v)
+									{
+										_this->SB_HORZ_BOOL=false;
+									}
+							else _this->SB_HORZ_BOOL=true;
+
+							if (_this->SB_HORZ_BOOL) h=h_scrollbar;
+							if (_this->SB_VERT_BOOL) v=v_scrollbar;
+
+							if (_this->m_winheight >= (_this->m_fullwinheight + (Rtb.bottom - Rtb.top) + h) )
+							{
+								_this->SB_VERT_BOOL=false;
+							}
+							else _this->SB_VERT_BOOL=true;
+
+							if(_this->m_winwidth  >= _this->m_fullwinwidth + v)
+									{
+										_this->SB_HORZ_BOOL=false;
+									}
+							else _this->SB_HORZ_BOOL=true;
+
+							if (_this->SB_HORZ_BOOL) h=h_scrollbar;
+							if (_this->SB_VERT_BOOL) v=v_scrollbar;
+
+							if (_this->m_winheight >= (_this->m_fullwinheight + (Rtb.bottom - Rtb.top) + h) )
+							{
+								_this->SB_VERT_BOOL=false;
+							}
+							else _this->SB_VERT_BOOL=true;
+
+							if(_this->m_winwidth  >= _this->m_fullwinwidth + v)
+									{
+										_this->SB_HORZ_BOOL=false;
+									}
+							else _this->SB_HORZ_BOOL=true;
+
+
+	
+
+							
+
+
+
+						ShowScrollBar(hwnd, SB_HORZ, _this->SB_HORZ_BOOL);
+						ShowScrollBar(hwnd, SB_VERT, _this->SB_VERT_BOOL);
+						}
+
 #endif
 					
 						// Update these for the record
@@ -7061,6 +7135,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 				
 #ifndef UNDER_CE
 			case WM_SIZING:
+				return 0;
 				{
 					// Don't allow sizing larger than framebuffer
 					RECT *lprc = (LPRECT) lParam;
@@ -7180,6 +7255,11 @@ ClientConnection:: ConvertAll(int width, int height, int xx, int yy,int bytes_pe
 {
 	int bytesPerInputRow = width * bytes_per_pixel;
 	int bytesPerOutputRow = framebufferWidth * bytes_per_pixel;
+	//8bit pitch need to be taken in account
+	if (bytesPerOutputRow % 4)
+		bytesPerOutputRow += 4 - bytesPerOutputRow % 4;
+
+
 	BYTE *sourcepos,*destpos;
 	destpos = (BYTE *)dest + (bytesPerOutputRow * yy)+(xx * bytes_per_pixel);
 	sourcepos=(BYTE*)source;
@@ -7197,6 +7277,9 @@ void
 ClientConnection:: Copybuffer(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth)
 {
 	int bytesPerOutputRow = framebufferWidth * bytes_per_pixel;
+	//8bit pitch need to be taken in account
+	if (bytesPerOutputRow % 4)
+		bytesPerOutputRow += 4 - bytesPerOutputRow % 4;
 	BYTE *sourcepos,*destpos;
 	destpos = (BYTE *)dest + (bytesPerOutputRow * yy)+(xx * bytes_per_pixel);
 	sourcepos=(BYTE*)source + (bytesPerOutputRow * yy)+(xx * bytes_per_pixel);
@@ -7214,6 +7297,9 @@ void
 ClientConnection:: Copyto0buffer(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth)
 {
 	int bytesPerOutputRow = framebufferWidth * bytes_per_pixel;
+	//8bit pitch need to be taken in account
+	if (bytesPerOutputRow % 4)
+		bytesPerOutputRow += 4 - bytesPerOutputRow % 4;
 	BYTE *sourcepos,*destpos;
 	destpos = (BYTE *)dest;
 	sourcepos=(BYTE*)source + (bytesPerOutputRow * yy)+(xx * bytes_per_pixel);
@@ -7231,6 +7317,9 @@ void
 ClientConnection:: Copyfrom0buffer(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth)
 {
 	int bytesPerOutputRow = framebufferWidth * bytes_per_pixel;
+	//8bit pitch need to be taken in account
+	if (bytesPerOutputRow % 4)
+		bytesPerOutputRow += 4 - bytesPerOutputRow % 4;
 	BYTE *sourcepos,*destpos;
 	destpos = (BYTE *)dest + (bytesPerOutputRow * yy)+(xx * bytes_per_pixel);
 	sourcepos=(BYTE*)source;
@@ -7248,6 +7337,9 @@ void
 ClientConnection:: Switchbuffer(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth)
 {
 	int bytesPerOutputRow = framebufferWidth * bytes_per_pixel;
+	//8bit pitch need to be taken in account
+	if (bytesPerOutputRow % 4)
+		bytesPerOutputRow += 4 - bytesPerOutputRow % 4;
 	BYTE *sourcepos,*destpos,*tempbuffer;
 	destpos = (BYTE *)dest + (bytesPerOutputRow * yy)+(xx * bytes_per_pixel);
 	sourcepos=(BYTE*)source + (bytesPerOutputRow * yy)+(xx * bytes_per_pixel);
@@ -7269,6 +7361,9 @@ ClientConnection:: ConvertPixel(int xx, int yy,int bytes_per_pixel,BYTE* source,
 {
 	int bytesPerInputRow = bytes_per_pixel;
 	int bytesPerOutputRow = framebufferWidth * bytes_per_pixel;
+	//8bit pitch need to be taken in account
+	if (bytesPerOutputRow % 4)
+		bytesPerOutputRow += 4 - bytesPerOutputRow % 4;
 	BYTE *sourcepos,*destpos;
 	destpos = (BYTE *)dest + (bytesPerOutputRow * yy)+(xx * bytes_per_pixel);
 	sourcepos=(BYTE*)source;
@@ -7280,6 +7375,9 @@ ClientConnection:: ConvertPixel_to_bpp_from_32(int xx, int yy,int bytes_per_pixe
 {
 	int bytesPerInputRow = bytes_per_pixel;
 	int bytesPerOutputRow = framebufferWidth * bytes_per_pixel;
+	//8bit pitch need to be taken in account
+	if (bytesPerOutputRow % 4)
+		bytesPerOutputRow += 4 - bytesPerOutputRow % 4;
 	BYTE *destpos;
 	destpos = (BYTE *)dest + (bytesPerOutputRow * yy)+(xx * bytes_per_pixel);
 	BYTE r=source[0];
@@ -7331,6 +7429,9 @@ void
 ClientConnection::SolidColor(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth)
 {
 	int bytesPerOutputRow = framebufferWidth * bytes_per_pixel;
+	//8bit pitch need to be taken in account
+	if (bytesPerOutputRow % 4)
+		bytesPerOutputRow += 4 - bytesPerOutputRow % 4;
 	BYTE *sourcepos,*destpos;
 	destpos = (BYTE *)dest + (bytesPerOutputRow * yy)+(xx * bytes_per_pixel);
 	sourcepos=(BYTE*)source;
