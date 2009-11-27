@@ -82,6 +82,13 @@ FdInStream::~FdInStream()
   delete [] start;
 }
 
+void
+FdInStream::Update_socket()
+{
+  // test, not used
+  //fd=INVALID_SOCKET;
+}
+
 
 int FdInStream::pos()
 {
@@ -228,6 +235,9 @@ int FdInStream::readWithTimeoutOrCallback(void* buf, int len)
   if (timing)
     before=Passedusecs();
 
+  if (fd==INVALID_SOCKET) 
+	  throw SystemException("read",errno);
+
   int n=0;
   if (!m_fReadFromNetRectBuf)
   {
@@ -241,11 +251,14 @@ int FdInStream::readWithTimeoutOrCallback(void* buf, int len)
 		  if (blockCallback) (*blockCallback)(blockCallbackArg);
 	  }
   }
-
+	if (fd==INVALID_SOCKET) 
+		throw SystemException("read",errno);
   bool fAlreadyCounted = false; // sf@2004 - Avoid to count the plugin processed bytes twice...
 
   while (true)
   {
+	  if (fd==INVALID_SOCKET) 
+		throw SystemException("read",errno);
 	// sf@2002 - DSM Plugin hack - Only necessary for ZRLE encoding
 	// If we must read already restored data from DSMPLugin memory  
 	if (m_fReadFromNetRectBuf)

@@ -125,6 +125,7 @@ vncServer::vncServer()
 {
 	// used for our retry timer proc;
 	pThis = this;
+	AutoReconnect_counter=0;
 
 	// Initialise some important stuffs...
 	g_Server_running=true;
@@ -639,7 +640,7 @@ vncServer::Authenticated(vncClientId clientid)
 				// Preset toggle prim/sec/both
 				if (Primary()) m_desktop->m_buffer.Display(1);
 				else m_desktop->m_buffer.Display(-1);
-				if (Secundary()) m_desktop->m_buffer.Display(2);
+				if (Secondary()) m_desktop->m_buffer.Display(2);
 				else m_desktop->m_buffer.Display(-2);
                 DWORD startup_status = 0;
 				if ((startup_status = m_desktop->Init(this)) != 0)

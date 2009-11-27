@@ -163,6 +163,7 @@ protected:
 	
 
 public:
+	int AutoReconnect_counter;
 	virtual void DoNotify(UINT message, WPARAM wparam, LPARAM lparam);
 	// Update handling, used by the screen server
 	virtual rfb::UpdateTracker &GetUpdateTracker() {return m_update_tracker;};
@@ -330,8 +331,8 @@ public:
 
 	virtual BOOL Primary() {return m_PrimaryEnabled;};
 	virtual void Primary(BOOL fEnable) {m_PrimaryEnabled = fEnable;};
-	virtual BOOL Secundary() {return m_SecundaryEnabled;};
-	virtual void Secundary(BOOL fEnable) {m_SecundaryEnabled = fEnable;};
+	virtual BOOL Secondary() {return m_SecondaryEnabled;};
+	virtual void Secondary(BOOL fEnable) {m_SecondaryEnabled = fEnable;};
 
 	// sf@2002 - DSM Plugin
 	virtual BOOL IsDSMPluginEnabled();
@@ -538,7 +539,7 @@ protected:
 	int     m_nDefaultScale;
 
 	BOOL m_PrimaryEnabled;
-	BOOL m_SecundaryEnabled;
+	BOOL m_SecondaryEnabled;
 
 	BOOL    m_fMSLogonRequired;
 	BOOL    m_fNewMSLogon;

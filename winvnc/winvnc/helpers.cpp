@@ -124,7 +124,7 @@ char SingleWindowName[32];
 char path[512];
 
 LONG Primary=1;
-LONG Secundary=0;
+LONG Secondary=0;
 LONG MaxCpu=40;
 
 
@@ -207,7 +207,7 @@ CaptureAlphaBlending = myIniFile_In.ReadInt("admin", "CaptureAlphaBlending", fal
 BlackAlphaBlending = myIniFile_In.ReadInt("admin", "BlackAlphaBlending", false); // sf@2005
 
 Primary = myIniFile_In.ReadInt("admin", "primary", true);
-Secundary = myIniFile_In.ReadInt("admin", "secundary", false);
+Secondary = myIniFile_In.ReadInt("admin", "secondary", false);
 
 myIniFile_Out.WriteInt("admin", "FileTransferEnabled", FileTransferEnabled);
 myIniFile_Out.WriteInt("admin", "FTUserImpersonation", FTUserImpersonation);
@@ -218,7 +218,7 @@ myIniFile_Out.WriteInt("admin", "CaptureAlphaBlending", CaptureAlphaBlending);
 myIniFile_Out.WriteInt("admin", "BlackAlphaBlending", BlackAlphaBlending);
 
 myIniFile_Out.WriteInt("admin", "primary", Primary);
-myIniFile_Out.WriteInt("admin", "secundary", Secundary);
+myIniFile_Out.WriteInt("admin", "secondary", Secondary);
 
 
 	// Connection prefs

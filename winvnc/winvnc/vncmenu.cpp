@@ -97,8 +97,6 @@ typedef BOOL (WINAPI *CHANGEWINDOWMESSAGEFILTER)(UINT message, DWORD dwFlag);
 
 
 
-
-
 static inline VOID UnloadDM(VOID) 
  { 
          pfnDwmEnableComposition = NULL; 
@@ -668,10 +666,10 @@ vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 			EnableMenuItem(m_hmenu, ID_OUTGOING_CONN,
 			m_properties.AllowEditClients() ? MF_ENABLED : MF_GRAYED);
 
-			EnableMenuItem(m_hmenu, ID_CLOSE_SERVICE,vncService::RunningAsService() ? MF_ENABLED : MF_GRAYED);
-			EnableMenuItem(m_hmenu, ID_START_SERVICE,(vncService::IsInstalled() && !vncService::RunningAsService()) ? MF_ENABLED : MF_GRAYED);
-			EnableMenuItem(m_hmenu, ID_RUNASSERVICE,(!vncService::IsInstalled() &&!vncService::RunningAsService()) ? MF_ENABLED : MF_GRAYED);
-			EnableMenuItem(m_hmenu, ID_UNINSTALL_SERVICE,vncService::IsInstalled() ? MF_ENABLED : MF_GRAYED);
+			EnableMenuItem(m_hmenu, ID_CLOSE_SERVICE,(vncService::RunningAsService()&&m_properties.AllowShutdown()) ? MF_ENABLED : MF_GRAYED);
+			EnableMenuItem(m_hmenu, ID_START_SERVICE,(vncService::IsInstalled() && !vncService::RunningAsService() && m_properties.AllowShutdown()) ? MF_ENABLED : MF_GRAYED);
+			EnableMenuItem(m_hmenu, ID_RUNASSERVICE,(!vncService::IsInstalled() &&!vncService::RunningAsService() && m_properties.AllowShutdown()) ? MF_ENABLED : MF_GRAYED);
+			EnableMenuItem(m_hmenu, ID_UNINSTALL_SERVICE,(vncService::IsInstalled()&&m_properties.AllowShutdown()) ? MF_ENABLED : MF_GRAYED);
 
 			// adzm 2009-07-05
 			if (SPECIAL_SC_PROMPT) {
@@ -773,11 +771,12 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
         // jdp reread some ini settings
         _this->m_properties.ReloadDynamicSettings();
 
+		// G_1111==true --> reconnect
 		if (G_1111==true)
 		{
 			if (_this->IsIconSet==true)
 			{
-				vnclog.Print(LL_INTERR, VNCLOG("IconSET\n"));
+				vnclog.Print(LL_INTERR, VNCLOG("Add client reconnect from timer\n"));
 				G_1111=false;
 				PostMessage(hwnd,MENU_ADD_CLIENT_MSG,1111,1111);
 			}
@@ -937,10 +936,10 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 								DWORD error=GetLastError();
                                 if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
                                 if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
-								if (error==1314)
-									{
-										Open_homepage();
-									}
+								//if (error==1314)
+								//	{
+								//		Open_homepage();
+								//	}
 
 							}
 						}
@@ -977,10 +976,10 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 								DWORD error=GetLastError();
                                 if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
                                 if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
-								if (error==1314)
-									{
-										Open_forum();
-									}
+								//if (error==1314)
+								//	{
+								//		Open_forum();
+								//	}
 
 							}
 						}

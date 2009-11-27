@@ -257,11 +257,11 @@ void ClientConnection::SoftCursorFree() {
 	if (prevCursorSet) {
 		if (!rcCursorHidden)
 			SoftCursorRestoreArea();
-		delete[] m_SavedAreaBIB;
+		if (m_SavedAreaBIB) delete[] m_SavedAreaBIB;
 		m_SavedAreaBIB=NULL;
-		delete[] rcSource;
+		if ( rcSource) delete[] rcSource;
 		rcSource=NULL;
-		delete[] rcMask;
+		if (rcMask) delete[] rcMask;
 		rcMask=NULL;
 		prevCursorSet = false;
 	}

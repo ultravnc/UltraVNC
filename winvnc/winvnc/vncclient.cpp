@@ -708,6 +708,7 @@ public:
 
 	// The main thread function
 	virtual void run(void *arg);
+	bool m_autoreconnectcounter_quit;
 
 protected:
 	virtual ~vncClientThread();
@@ -725,6 +726,9 @@ protected:
 vncClientThread::~vncClientThread()
 {
 	// If we have a client object then delete it
+	m_autoreconnectcounter_quit=true;
+	//needed to give autoreconnect (max 100) to quit
+	Sleep(200);
 	if (m_client != NULL)
 		delete m_client;
 }
@@ -738,6 +742,7 @@ vncClientThread::Init(vncClient *client, vncServer *server, VSocket *socket, BOO
 	m_client = client;
 	m_auth = auth;
 	m_shared = shared;
+	m_autoreconnectcounter_quit=false;
 
 	// Start the thread
 	start();
@@ -1452,12 +1457,20 @@ vncClientThread::run(void *arg)
 		// wa@2005 - AutoReconnection attempt if required
 		if (m_server->AutoReconnect())
 		{
+			for (int i=0;i<10*m_server->AutoReconnect_counter;i++)
+			{
+				Sleep(100);
+				if (m_autoreconnectcounter_quit) return;
+			}
+			m_server->AutoReconnect_counter+=10;
+			if (m_server->AutoReconnect_counter>1800) m_server->AutoReconnect_counter=1800;
 			vnclog.Print(LL_INTERR, VNCLOG("PostAddNewClient I\n"));
 			vncService::PostAddNewClient(1111, 1111);
 		}
 
 		return;
 	}
+	m_server->AutoReconnect_counter=0;
 	vnclog.Print(LL_INTINFO, VNCLOG("negotiated version\n"));
 
 	// AUTHENTICATE LINK
@@ -1953,7 +1966,13 @@ vncClientThread::run(void *arg)
 										sprintf(szText,"FULL update request \n");
 										OutputDebugString(szText);		
 #endif
-					update_rgn=m_client->m_ScaledScreen;
+
+					update.tl.x = (m_client->m_ScaledScreen.tl.x + m_client->m_SWOffsetx) * m_client->m_nScale;
+					update.tl.y = (m_client->m_ScaledScreen.tl.y + m_client->m_SWOffsety) * m_client->m_nScale;
+					update.br.x = update.tl.x + (m_client->m_ScaledScreen.br.x-m_client->m_ScaledScreen.tl.x) * m_client->m_nScale;
+					update.br.y = update.tl.y + (m_client->m_ScaledScreen.br.y-m_client->m_ScaledScreen.tl.y) * m_client->m_nScale;
+
+					update_rgn=update;
 				}
 #ifdef _DEBUG
 										char			szText[256];
@@ -3711,6 +3730,7 @@ vncClient::SendUpdate(rfb::SimpleUpdateTracker &update)
 	//The cleint ask a full update after screen_size change
 	if (m_NewSWUpdateWaiting) 
 		{
+			m_socket->ClearQueue();
 			rfbFramebufferUpdateRectHeader hdr;
 			if (m_use_NewSWSize) {
 				hdr.r.x = 0;

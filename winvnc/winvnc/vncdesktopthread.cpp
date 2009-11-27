@@ -746,7 +746,6 @@ vncDesktopThread::run_undetached(void *arg)
 				case WAIT_OBJECT_0:
 				{
 				waiting_update=0;
-				omni_mutex_lock l(m_desktop->m_update_lock);
 				ResetEvent(m_desktop->trigger_events[0]);
 							{
 								//measure current cpu usage of winvnc
@@ -866,6 +865,7 @@ vncDesktopThread::run_undetached(void *arg)
 //									sprintf(szText," m_desktop->m_server->UpdateWanted check\n");
 //										OutputDebugString(szText);		
 //#endif
+								omni_mutex_lock l(m_desktop->m_update_lock);
 								if (m_desktop->m_server->UpdateWanted())
 								{
 					//				vnclog.Print(LL_INTERR, VNCLOG("UpdateWanted N\n"));

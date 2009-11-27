@@ -479,6 +479,14 @@ vncDesktop::~vncDesktop()
 	for (int i=0;i<6;i++)
 	CloseHandle(trigger_events[i]);
 	CloseHandle(restart_event);
+	//problems, sync could be restarted in the little time the desktop thread was still running
+	//then this doesn't exist on desktop close and sink window crash
+	// Fix E. SAG
+	if (InitWindowThreadh)
+	{
+      vnclog.Print(LL_INTERR, VNCLOG("~vncDesktop:: second request to close InitWindowthread\n"));
+      StopInitWindowthread();
+	}
 }
 
 

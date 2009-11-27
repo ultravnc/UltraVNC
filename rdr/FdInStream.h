@@ -43,6 +43,7 @@ namespace rdr {
     void readBytes(void* data, int length);
     int bytesInBuf() { return end - ptr; }
 
+	void Update_socket();
     void startTiming();
     void stopTiming();
     unsigned int kbitsPerSecond();

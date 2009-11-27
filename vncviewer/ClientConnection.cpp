@@ -81,7 +81,7 @@ extern "C" {
 
 const UINT FileTransferSendPacketMessage = RegisterWindowMessage("UltraVNC.Viewer.FileTransferSendPacketMessage");
 extern bool g_passwordfailed;
-bool havetobekilled;
+bool havetobekilled=false;
 bool forcedexit=false;
 const UINT RebuildToolbarMessage = RegisterWindowMessage("UltraVNC.Viewer.RebuildToolbar");
 extern bool g_ConnectionLossAlreadyReported;
@@ -249,7 +249,7 @@ ClientConnection::ClientConnection(VNCviewerApp *pApp, SOCKET sock)
 	Init(pApp);
     if (m_opts.autoDetect)
 	{
-      m_opts.m_Use8Bit = rfbPF256Colors; //true;
+      m_opts.m_Use8Bit = rfbPFFullColors; //true;
 	  m_opts.m_fEnableCache = true; // sf@2002
 	}
 	m_sock = sock;
@@ -276,7 +276,7 @@ ClientConnection::ClientConnection(VNCviewerApp *pApp, LPTSTR host, int port)
 	Init(pApp);
     if (m_opts.autoDetect)
 	{
-		m_opts.m_Use8Bit = rfbPF256Colors; //true;
+		m_opts.m_Use8Bit = rfbPFFullColors; //true;
 		m_opts.m_fEnableCache = true; // sf@2002
 	}
 	_tcsncpy(m_host, host, MAX_HOST_NAME_LEN);
@@ -507,6 +507,8 @@ bool ClientConnection::SetRecvTimeout(int msecs)
 
 void ClientConnection::Run()
 {
+	havetobekilled=false;
+	forcedexit=false;
 	// Get the host name and port if we haven't got it
 	if (m_port == -1) 
 	{
@@ -520,20 +522,6 @@ void ClientConnection::Run()
 		// sf@2003 - Take command line quickoption into account
 		HandleQuickOption();
 	}
-
-	// Modif sf@2003 - In case Auto Mode is On with DSMPlugin, we disable ZRLE right now !
-	/*
-	if (m_opts.autoDetect)
-	{
-		if (m_pDSMPlugin->IsEnabled())
-		{
-			m_opts.m_PreferredEncoding = rfbEncodingTight;
-			m_opts.m_fEnableCache = false; // Cache does not work perfectly with Tight
-			m_opts.m_Use8Bit = true; // full colors as Tight is going to last at least 30s...
-			m_lLastChangeTime = timeGetTime(); // defer the first possible Auto encoding switching in 30s
-		}
-	}
-	*/
 
 	// add user option on command line
 	if ( (strlen(	m_pApp->m_options.m_cmdlnUser) > 0) && !m_pApp->m_options.m_NoMoreCommandLineUserPassword) // Fix by Act
@@ -572,6 +560,7 @@ void ClientConnection::Run()
 // sf@2007 - Autoreconnect
 void ClientConnection::DoConnection()
 {
+	havetobekilled=true;
 	// Connect if we're not already connected
 	if (m_sock == INVALID_SOCKET) 
 		if (strcmp(m_proxyhost,"") !=NULL && m_fUseProxy) 
@@ -603,7 +592,8 @@ void ClientConnection::DoConnection()
     SetFormatAndEncodings();
 
 	reconnectcounter=m_reconnectcounter;
- 
+	
+	havetobekilled=false;;
 }
 
 DWORD WINAPI ReconnectThreadProc(LPVOID lpParameter)
@@ -1592,7 +1582,7 @@ void ClientConnection::GetConnectDetails()
 					m_fUseProxy = sessdlg.m_fUseProxy;
 					if (m_opts.autoDetect)
 					{
-						m_opts.m_Use8Bit = rfbPF256Colors;
+						m_opts.m_Use8Bit = rfbPFFullColors;
 						m_opts.m_fEnableCache = true; // sf@2002
 					}
 				}
@@ -1612,7 +1602,7 @@ void ClientConnection::GetConnectDetails()
 			m_fUseProxy = sessdlg.m_fUseProxy;
 			if (m_opts.autoDetect)
 			{
-				m_opts.m_Use8Bit = rfbPF256Colors;
+				m_opts.m_Use8Bit = rfbPFFullColors;
 				m_opts.m_fEnableCache = true; // sf@2002
 			}
 		}
@@ -1638,9 +1628,8 @@ DWORD WINAPI SocketTimeout(LPVOID lpParam)
 	while (havetobekilled && !forcedexit)
 	{
 		Sleep(100);
-		counter++;
-		if (counter>50) break;
 	}
+
 	if (havetobekilled)
 	{
 		closesocket(*sock);
@@ -1688,11 +1677,9 @@ void ClientConnection::Connect()
 	thataddr.sin_port = htons(m_port);
 	///Force break after timeout
 	DWORD				  threadID;
-	ThreadSocketTimeout = CreateThread(NULL,0,SocketTimeout,(LPVOID)&m_sock,0,&threadID);
-	havetobekilled=true;
+	ThreadSocketTimeout = CreateThread(NULL,0,SocketTimeout,(LPVOID)&m_sock,0,&threadID);	
 	res = connect(m_sock, (LPSOCKADDR) &thataddr, sizeof(thataddr));
-	//Force break
-	havetobekilled=false;
+	
 	if (res == SOCKET_ERROR) 
 		{
 			int a=WSAGetLastError();
@@ -1749,6 +1736,9 @@ void ClientConnection::ConnectProxy()
 	if (m_hwndStatus)SetDlgItemInt(m_hwndStatus,IDC_PORT,m_proxyport,FALSE);
 	thataddr.sin_family = AF_INET;
 	thataddr.sin_port = htons(m_proxyport);
+
+	DWORD				  threadID;
+	ThreadSocketTimeout = CreateThread(NULL,0,SocketTimeout,(LPVOID)&m_sock,0,&threadID);	
 	
 	res = connect(m_sock, (LPSOCKADDR) &thataddr, sizeof(thataddr));
 	if (res == SOCKET_ERROR) {if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L48);throw WarningException(sz_L48,IDS_L48);}
@@ -1792,6 +1782,8 @@ void ClientConnection::NegotiateProtocolVersion()
 		SetEvent(KillEvent);
 		vnclog.Print(0, _T("Error reading protocol version: %s\n"),
                           c.str());
+		if (!Pressed_Cancel) 
+		{
 		if (m_fUsePlugin)
 			throw WarningException("Connection failed - Error reading Protocol Version\r\n\r\n"
 									"Possible causes:\r\n"
@@ -1808,7 +1800,7 @@ void ClientConnection::NegotiateProtocolVersion()
 									"- Another user is already listening on this ID\r\n"
 									"- Bad connection\r\n",1004
 									);
-
+		}
 		throw QuietException(c.str());
 	}
 	catch (Exception &c)
@@ -1816,6 +1808,8 @@ void ClientConnection::NegotiateProtocolVersion()
 		SetEvent(KillEvent);
 		vnclog.Print(0, _T("Error reading protocol version: %s\n"),
                           c.m_info);
+		if (!Pressed_Cancel) 
+		{
 		if (m_fUsePlugin)
 			throw WarningException("Connection failed - Error reading Protocol Version\r\n\n\r"
 									"Possible causes:\r\n"
@@ -1833,6 +1827,7 @@ void ClientConnection::NegotiateProtocolVersion()
 									"- Viewer and Server are not compatible (they use different RFB protocols)\r\n"
 									"- Bad connection\r\n",1004
 									);
+		}
 
 		throw QuietException(c.m_info);
 	}
@@ -3036,6 +3031,7 @@ void ClientConnection::KillThread()
 	m_running = false;
 
 	if (m_sock != INVALID_SOCKET) {
+		fis->Update_socket();
 		shutdown(m_sock, SD_BOTH);
 		closesocket(m_sock);
 		m_sock = INVALID_SOCKET;
@@ -4403,7 +4399,7 @@ inline void ClientConnection::ReadScreenUpdate()
 		{
 			m_nConfig = 1;
 			m_opts.m_PreferredEncoding = rfbEncodingHextile;
-			m_opts.m_Use8Bit = rfbPFFullColors; // Max colors
+			//m_opts.m_Use8Bit = rfbPFFullColors; // Max colors
 			m_opts.m_fEnableCache = false;
 			m_pendingFormatChange = true;
 			m_lLastChangeTime = timeGetTime();
@@ -4413,8 +4409,7 @@ inline void ClientConnection::ReadScreenUpdate()
 		{
 			m_nConfig = 2;
 			m_opts.m_PreferredEncoding = rfbEncodingZRLE; //rfbEncodingZlibHex;
-			m_opts.m_Use8Bit = rfbPF256Colors; 
-			// m_opts.m_compressLevel = 9;
+			//m_opts.m_Use8Bit = rfbPF256Colors; 
 			m_opts.m_fEnableCache = false;
 			m_pendingFormatChange = true;
 			m_lLastChangeTime = timeGetTime();
@@ -4424,8 +4419,7 @@ inline void ClientConnection::ReadScreenUpdate()
 		{
 			m_nConfig = 3;
 			m_opts.m_PreferredEncoding = rfbEncodingTight; // rfbEncodingZRLE;
-			m_opts.m_Use8Bit = rfbPF64Colors; 
-			// m_opts.m_compressLevel = 9;
+			//m_opts.m_Use8Bit = rfbPF64Colors; 
 			m_opts.m_fEnableCache = false;
 			m_pendingFormatChange = true;
 			m_lLastChangeTime = timeGetTime();
@@ -4440,22 +4434,10 @@ inline void ClientConnection::ReadScreenUpdate()
 		{
 			m_nConfig = 4;
 			m_opts.m_PreferredEncoding = rfbEncodingTight; //rfbEncodingZRLE;
-			m_opts.m_Use8Bit = rfbPF8Colors; 
-			// m_opts.m_compressLevel = 9; 
-			// m_opts.m_scaling = true;
-			// m_opts.m_scale_num = 2;
-			// m_opts.m_scale_den = 1;
-			// m_nServerScale = 2;
-			// m_opts.m_nServerScale = 2;
+			//m_opts.m_Use8Bit = rfbPF8Colors; 
 			m_opts.m_fEnableCache = false;
 			m_pendingFormatChange = true;
 		}
-		/*
-		if (m_nServerScale != nOldServerScale)
-		{
-			SendServerScale(m_nServerScale);
-		}
-		*/
 	}
 		
 	// Inform the other thread that an update is needed.

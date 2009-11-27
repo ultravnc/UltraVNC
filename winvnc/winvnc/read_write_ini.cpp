@@ -80,7 +80,7 @@ LONG FTTimeout = 30;
 char path[512];
 
 LONG Primary=1;
-LONG Secundary=0;
+LONG Secondary=0;
 //Beep(100,20000);
 BUseRegistry = myIniFile_In.ReadInt("admin", "UseRegistry", 0);
 if (!myIniFile_Out.WriteInt("admin", "UseRegistry", BUseRegistry))
@@ -164,7 +164,7 @@ BlackAlphaBlending = myIniFile_In.ReadInt("admin", "BlackAlphaBlending", false);
 FTTimeout = myIniFile_In.ReadInt("admin", "FileTransferTimeout", 30);
 
 Primary = myIniFile_In.ReadInt("admin", "primary", true);
-Secundary = myIniFile_In.ReadInt("admin", "secundary", false);
+Secondary = myIniFile_In.ReadInt("admin", "secondary", false);
 
 
 myIniFile_Out.WriteInt("admin", "FileTransferEnabled", FileTransferEnabled);
@@ -177,7 +177,7 @@ myIniFile_Out.WriteInt("admin", "BlackAlphaBlending", BlackAlphaBlending);
 myIniFile_Out.WriteInt("admin", "FileTransferTimeout", 30);
 
 myIniFile_Out.WriteInt("admin", "primary", Primary);
-myIniFile_Out.WriteInt("admin", "secundary", Secundary);
+myIniFile_Out.WriteInt("admin", "secondary", Secondary);
 
 	// Connection prefs
 SocketConnect=myIniFile_In.ReadInt("admin", "SocketConnect", true);

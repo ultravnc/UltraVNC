@@ -175,7 +175,7 @@ protected:
 	char m_pref_path111[500];
 	char m_Tempfile[MAX_PATH];
 	BOOL m_pref_Primary;
-	BOOL m_pref_Secundary;
+	BOOL m_pref_Secondary;
 
 private:
 	void InitPortSettings(HWND hwnd); // TightVNC 1.1.7
