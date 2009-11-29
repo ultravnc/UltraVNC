@@ -490,6 +490,12 @@ vncClientUpdateThread::run_undetached(void *arg)
 		// Block waiting for an update to send
 		{
 			omni_mutex_lock l(m_client->GetUpdateLock());
+			#ifdef _DEBUG
+					char			szText[256];
+					sprintf(szText," ++++++ Mutex lock clientupdatethread\n");
+					OutputDebugString(szText);		
+			#endif
+
 			m_client->m_incr_rgn.assign_union(clipregion);
 
 			// We block as long as updates are disabled, or the client
@@ -578,6 +584,8 @@ vncClientUpdateThread::run_undetached(void *arg)
 					m_client->m_socket->SendExact((char*)&rsmsg,
 													sz_rfbResizeFrameBufferMsg,
 													rfbResizeFrameBuffer);
+					m_client->m_ScaledScreen = m_client->m_encodemgr.m_buffer->GetViewerSize();
+					m_client->m_nScale = m_client->m_encodemgr.m_buffer->GetScale();
 				}
 
 				m_client->m_encodemgr.m_buffer->ClearCache();
@@ -593,17 +601,16 @@ vncClientUpdateThread::run_undetached(void *arg)
 
 			// Fetch the incremental region
 			clipregion = m_client->m_incr_rgn;
-			m_client->m_incr_rgn.clear();
-//#ifdef _DEBUG
-//										char			szText[256];
-//										sprintf(szText," UpdateWanted clear \n");
-//										OutputDebugString(szText);		
-//#endif
+			//m_client->m_incr_rgn.clear();
 
 			// Get the clipboard data, if any
 			if (m_client->m_clipboard_text) {
 				clipboard_text = m_client->m_clipboard_text;
 				m_client->m_clipboard_text = 0;
+			}
+			else
+			{
+				m_client->m_incr_rgn.clear();
 			}
 		
 			// Get the update details from the update tracker
@@ -638,8 +645,6 @@ vncClientUpdateThread::run_undetached(void *arg)
 				}
 			}
 		}
-		
-		}
 
 		// SEND THE CLIPBOARD
 		// If there is clipboard text to be sent then send it
@@ -672,11 +677,29 @@ vncClientUpdateThread::run_undetached(void *arg)
 			m_client->SendPalette();
 		}
 
-		// Send updates to the client - this implicitly clears
-		// the supplied update tracker
-		if (m_client->SendUpdate(update)) {
-			updates_sent++;
+		//add extra check to avoid buffer/encoder sync problems
+		if ((m_client->m_encodemgr.m_scrinfo.framebufferHeight == m_client->m_encodemgr.m_buffer->m_scrinfo.framebufferHeight) &&
+			(m_client->m_encodemgr.m_scrinfo.framebufferWidth == m_client->m_encodemgr.m_buffer->m_scrinfo.framebufferWidth) &&
+			(m_client->m_encodemgr.m_scrinfo.format.bitsPerPixel == m_client->m_encodemgr.m_buffer->m_scrinfo.format.bitsPerPixel))
+		{
+
+			// Send updates to the client - this implicitly clears
+			// the supplied update tracker
+			if (m_client->SendUpdate(update)) {
+				updates_sent++;
+			}
 			clipregion.clear();
+		}
+		else
+		{
+			int a=0; // just added for debug break
+		}
+
+			#ifdef _DEBUG
+//					char			szText[256];
+					sprintf(szText," ++++++ Mutex unlock clientupdatethread\n");
+					OutputDebugString(szText);		
+			#endif
 		}
 
 		yield();
@@ -725,10 +748,6 @@ protected:
 
 vncClientThread::~vncClientThread()
 {
-	// If we have a client object then delete it
-	m_autoreconnectcounter_quit=true;
-	//needed to give autoreconnect (max 100) to quit
-	Sleep(200);
 	if (m_client != NULL)
 		delete m_client;
 }
@@ -3211,6 +3230,13 @@ vncClientThread::run(void *arg)
 
 	}
 
+	if (fShutdownOrdered) {
+		m_autoreconnectcounter_quit=true;
+		//needed to give autoreconnect (max 100) to quit
+		Sleep(200);
+	}
+	
+
     if (m_client->m_fFileDownloadRunning)
     {
         m_client->m_fFileDownloadError = true;
@@ -3607,7 +3633,8 @@ vncClient::UpdateMouse()
 void
 vncClient::UpdateClipText(const char* text)
 {
-	omni_mutex_lock l(GetUpdateLock());
+	//This is already locked in the vncdesktopsynk
+	//omni_mutex_lock l(GetUpdateLock());
 	if (m_clipboard_text) {
 		free(m_clipboard_text);
 		m_clipboard_text = 0;
@@ -3624,38 +3651,38 @@ vncClient::UpdateCursorShape()
 }
 
 void
-vncClient::UpdatePalette()
+vncClient::UpdatePalette(bool lock)
 {
-	omni_mutex_lock l(GetUpdateLock());
+	if (lock) omni_mutex_lock l(GetUpdateLock());
 	m_palettechanged = TRUE;
 }
 
 void
-vncClient::UpdateLocalFormat()
+vncClient::UpdateLocalFormat(bool lock)
 {
-	DisableProtocol();
+	if (lock) DisableProtocol();
+	else DisableProtocol_no_mutex();
 	vnclog.Print(LL_INTERR, VNCLOG("updating local pixel format\n"));
 	m_encodemgr.SetServerFormat();
-	EnableProtocol();
+	if (lock) EnableProtocol();
+	else EnableProtocol_no_mutex();
 }
 
 BOOL
 vncClient::SetNewSWSize(long w,long h,BOOL Desktop)
 {
 	if (!m_use_NewSWSize) return FALSE;
-	DisableProtocol();
+	DisableProtocol_no_mutex();
 
 	vnclog.Print(LL_INTERR, VNCLOG("updating local pixel format and buffer size\n"));
 	m_encodemgr.SetServerFormat();
 	m_palettechanged = TRUE;
-	// no lock needed Called from desktopthread
 	if (Desktop) m_encodemgr.SetEncoding(0,TRUE);//0=dummy
-//	m_fullscreen = m_encodemgr.GetSize();
 	m_NewSWUpdateWaiting=true;
 	NewsizeW=w;
 	NewsizeH=h;
-	EnableProtocol();
-//	TriggerUpdateThread();
+	EnableProtocol_no_mutex();
+
 	return TRUE;
 }
 
@@ -3671,7 +3698,8 @@ void
 vncClient::DisableProtocol()
 {
 	BOOL disable = FALSE;
-	{	omni_mutex_lock l(GetUpdateLock());
+	{	 
+		omni_mutex_lock l(GetUpdateLock());
 		if (m_disable_protocol == 0)
 			disable = TRUE;
 		m_disable_protocol++;
@@ -3683,7 +3711,36 @@ vncClient::DisableProtocol()
 void
 vncClient::EnableProtocol()
 {
-	{	omni_mutex_lock l(GetUpdateLock());
+	{	 
+		omni_mutex_lock l(GetUpdateLock());
+		if (m_disable_protocol == 0) {
+			vnclog.Print(LL_INTERR, VNCLOG("protocol enabled too many times!\n"));
+			m_socket->Close();
+			return;
+		}
+		m_disable_protocol--;
+		if ((m_disable_protocol == 0) && m_updatethread)
+			m_updatethread->EnableUpdates(TRUE);
+	}
+}
+
+void
+vncClient::DisableProtocol_no_mutex()
+{
+	BOOL disable = FALSE;
+	{	 
+		if (m_disable_protocol == 0)
+			disable = TRUE;
+		m_disable_protocol++;
+		if (disable && m_updatethread)
+			m_updatethread->EnableUpdates(FALSE);
+	}
+}
+
+void
+vncClient::EnableProtocol_no_mutex()
+{
+	{	 
 		if (m_disable_protocol == 0) {
 			vnclog.Print(LL_INTERR, VNCLOG("protocol enabled too many times!\n"));
 			m_socket->Close();
@@ -3916,6 +3973,14 @@ vncClient::SendRectangle(const rfb::Rect &rect)
 	ScaledRect.br.y = rect.br.y / m_nScale;
 	ScaledRect.tl.x = rect.tl.x / m_nScale;
 	ScaledRect.br.x = rect.br.x / m_nScale;
+
+	//E. SAG
+	//Sometimes value's are out of bound
+	//verify recatangle to fit the viewport
+	//update.tl.x = (m_client->m_ScaledScreen.tl.x + m_client->m_SWOffsetx) * m_client->m_nScale;
+	//update.tl.y = (m_client->m_ScaledScreen.tl.y + m_client->m_SWOffsety) * m_client->m_nScale;
+	//update.br.x = update.tl.x + (m_client->m_ScaledScreen.br.x-m_client->m_ScaledScreen.tl.x) * m_client->m_nScale;
+	//update.br.y = update.tl.y + (m_client->m_ScaledScreen.br.y-m_client->m_ScaledScreen.tl.y) * m_client->m_nScale;
 
 
 	//	Totalsend+=(ScaledRect.br.x-ScaledRect.tl.x)*(ScaledRect.br.y-ScaledRect.tl.y);

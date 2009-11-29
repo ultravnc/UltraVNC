@@ -1292,7 +1292,7 @@ vncServer::UpdateCursorShape()
 }
 
 void
-vncServer::UpdatePalette()
+vncServer::UpdatePalette(bool lock)
 {
 	vncClientList::iterator i;
 	
@@ -1302,12 +1302,12 @@ vncServer::UpdatePalette()
 	for (i = m_authClients.begin(); i != m_authClients.end(); i++)
 	{
 		// Post the update
-		GetClient(*i)->UpdatePalette();
+		GetClient(*i)->UpdatePalette(lock);
 	}
 }
 
 void
-vncServer::UpdateLocalFormat()
+vncServer::UpdateLocalFormat(bool lock)
 {
 	vncClientList::iterator i;
 	
@@ -1317,7 +1317,7 @@ vncServer::UpdateLocalFormat()
 	for (i = m_authClients.begin(); i != m_authClients.end(); i++)
 	{
 		// Post the update
-		GetClient(*i)->UpdateLocalFormat();
+		GetClient(*i)->UpdateLocalFormat(lock);
 	}
 }
 

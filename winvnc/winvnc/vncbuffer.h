@@ -119,8 +119,6 @@ protected:
 
 	UINT		m_bytesPerRow;
 
-	rfbServerInitMsg	m_scrinfo;
-
 	// CACHE RDV
 	BOOL			m_use_cache;
 	BOOL			m_display_prim;
@@ -138,6 +136,7 @@ protected:
 	BOOL			m_cursorpending;
 
 public:
+	rfbServerInitMsg	m_scrinfo;
 	// vncEncodeMgr reads data from back buffer directly when encoding
 	BYTE		*m_backbuff;
 	UINT		m_backbuffsize;

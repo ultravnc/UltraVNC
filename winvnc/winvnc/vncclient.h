@@ -111,8 +111,8 @@ public:
 	// These all lock the UpdateLock themselves
 	virtual void UpdateMouse();
 	virtual void UpdateClipText(const char* text);
-	virtual void UpdatePalette();
-	virtual void UpdateLocalFormat();
+	virtual void UpdatePalette(bool lock);
+	virtual void UpdateLocalFormat(bool lock);
 
 	// Is the client waiting on an update?
 	// YES IFF there is an incremental update region,
@@ -158,6 +158,8 @@ public:
 	// Disable/enable protocol messages to the client
 	virtual void DisableProtocol();
 	virtual void EnableProtocol();
+	virtual void DisableProtocol_no_mutex();
+	virtual void EnableProtocol_no_mutex();
 	// resize desktop
 	virtual BOOL SetNewSWSize(long w,long h,BOOL desktop);
 	virtual void SetSWOffset(int x,int y);

@@ -1499,6 +1499,11 @@ vncDesktop::CaptureMouse(BYTE *scrBuff, UINT scrBuffSize)
 		if (IconInfo.hbmColor != NULL)
 			DeleteObject(IconInfo.hbmColor);
 	}
+	if (CursorPos.x<=0 || CursorPos.y<=0) 
+	{
+		//Error, cursor isn't on the visbale display.
+		return;
+	}
 
 	// Select the memory bitmap into the memory DC
 	HBITMAP oldbitmap;

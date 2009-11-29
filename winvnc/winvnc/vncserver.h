@@ -146,7 +146,7 @@ public:
 	virtual vncDesktop* GetDesktopPointer() {return m_desktop;}
 	virtual void SetNewSWSize(long w,long h,BOOL desktop);
 	virtual void SetSWOffset(int x,int y);
-	virtual void SetScreenOffset(int x,int y,int type);
+	virtual void SetScreenOffset(int x,int y,int type); //never locked
 
 	virtual BOOL All_clients_initialalized();
 
@@ -169,8 +169,8 @@ public:
 	virtual rfb::UpdateTracker &GetUpdateTracker() {return m_update_tracker;};
 	virtual void UpdateMouse();
 	virtual void UpdateClipText(const char* text);
-	virtual void UpdatePalette();
-	virtual void UpdateLocalFormat();
+	virtual void UpdatePalette(bool lock);
+	virtual void UpdateLocalFormat(bool lock);
 
 	// Polling mode handling
 	virtual void PollUnderCursor(BOOL enable) {m_poll_undercursor = enable;};

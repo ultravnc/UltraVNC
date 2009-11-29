@@ -321,7 +321,12 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 				{
 					if (XRichCursorEnabled) m_server->UpdateCursorShape();
 					/// We lock all buffers,,and also back the client thread update mechanism
-					omni_mutex_lock l(m_desktop->m_update_lock);				
+					omni_mutex_lock l(m_desktop->m_update_lock);
+					#ifdef _DEBUG
+					char			szText[256];
+					sprintf(szText," ++++++ Mutex lock display changes\n");
+					OutputDebugString(szText);		
+			#endif
 					// We remove all queue updates from the tracker
 					m_server->Clear_Update_Tracker();
 					// Also clear the current updates
@@ -414,7 +419,7 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 								}
 								vnclog.Print(LL_INTERR, VNCLOG("threadHandle2 \n"));
 
-							}
+					}
 					//*******************************************************
 					// end reinit
 					//*******************************************************
@@ -491,30 +496,35 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 					m_desktop->m_buffer.BlackBack();
 					InvalidateRect(NULL,NULL,TRUE);
 					rgncache.assign_union(rfb::Region2D(m_desktop->m_Cliprect));
-				}
-				//*******************************************************
-				// End Lock updates
-				// SetNewSWSize also Lock, else we get a deathlock
-				//*******************************************************
-		if (memcmp(&m_desktop->m_scrinfo.format, &oldscrinfo.format, sizeof(rfbPixelFormat)) != 0)
-			{
-				vnclog.Print(LL_INTERR, VNCLOG("Format changed\n"));
-				m_server->UpdatePalette();
-				m_server->UpdateLocalFormat();
-			}
+					
+					if (memcmp(&m_desktop->m_scrinfo, &oldscrinfo, sizeof(&m_desktop->m_scrinfo)) != 0)
+						{
+							vnclog.Print(LL_INTERR, VNCLOG("Format changed\n"));
+							m_server->UpdatePalette(false); // changed no lock ok
+							m_server->UpdateLocalFormat(false); // changed no lock ok
+						}
 
-		if (screensize_changed) 
-			{
-				screensize_changed=false;
-				m_server->SetNewSWSize(m_desktop->m_scrinfo.framebufferWidth,m_desktop->m_scrinfo.framebufferHeight,FALSE);
-				m_server->SetScreenOffset(m_desktop->m_ScreenOffsetx,m_desktop->m_ScreenOffsety,m_desktop->nr_monitors);
-			}
-		
-		if (monitor_changed)
-			{
-					monitor_changed=false;
-					m_server->SetNewSWSize(m_desktop->mymonitor[m_desktop->current_monitor-1].Width,m_desktop->mymonitor[m_desktop->current_monitor-1].Height,TRUE);
-			}
+					if (screensize_changed) 
+						{
+							screensize_changed=false;
+							m_server->SetNewSWSize(m_desktop->m_scrinfo.framebufferWidth,m_desktop->m_scrinfo.framebufferHeight,FALSE);//changed no lock ok
+							m_server->SetScreenOffset(m_desktop->m_ScreenOffsetx,m_desktop->m_ScreenOffsety,m_desktop->nr_monitors);// no lock ok
+						}
+					
+					if (monitor_changed)
+						{
+								monitor_changed=false;
+								m_server->SetNewSWSize(m_desktop->mymonitor[m_desktop->current_monitor-1].Width,m_desktop->mymonitor[m_desktop->current_monitor-1].Height,TRUE); //changed no lock ok
+						}
+
+		#ifdef _DEBUG
+					//char			szText[256];
+					sprintf(szText," ++++++ Mutex unlock display changes\n");
+					OutputDebugString(szText);		
+			#endif
+			}// end lock
+
+
 	}
 
 	return true;
@@ -844,12 +854,13 @@ vncDesktopThread::run_undetached(void *arg)
 										m_desktop->m_buffer.ClearCache();
 										m_desktop->m_buffer.BlackBack();
 									}
-								}
+
 								if (m_server->SingleWindow() && SWSizeChanged)
 									{
 										m_server->SetNewSWSize(m_desktop->m_SWWidth,m_desktop->m_SWHeight,FALSE);
 										m_server->SetScreenOffset(m_desktop->m_ScreenOffsetx,m_desktop->m_ScreenOffsety,m_desktop->nr_monitors);
 									}
+								}// end update lock
 								
 								////////////////////////////////////////////////////////////////////////////////
 								// END DYNAMIC CHANGES
