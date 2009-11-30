@@ -1039,10 +1039,10 @@ vncDesktopThread::run_undetached(void *arg)
 					//														vnclog.Print(LL_INTINFO, VNCLOG("6 %i %i %i %i \n"),rect.br.x,rect.br.y,rect.tl.x,rect.tl.y);
 																		}
 																m_server->UpdateCursorShape();
-															}
+																}
 											}
 										else if (!m_desktop->m_hookdriver)// If several clients, send them all the mouse updates
-											{
+											{												
 												// Render the mouse
 												//if (!m_desktop->VideoBuffer())
 												m_desktop->m_buffer.GrabMouse();
