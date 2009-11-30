@@ -687,12 +687,12 @@ vncClientUpdateThread::run_undetached(void *arg)
 			// the supplied update tracker
 			if (m_client->SendUpdate(update)) {
 				updates_sent++;
+				clipregion.clear();
 			}
-			clipregion.clear();
 		}
 		else
 		{
-			int a=0; // just added for debug break
+			clipregion.clear();
 		}
 
 			#ifdef _DEBUG
@@ -3973,15 +3973,6 @@ vncClient::SendRectangle(const rfb::Rect &rect)
 	ScaledRect.br.y = rect.br.y / m_nScale;
 	ScaledRect.tl.x = rect.tl.x / m_nScale;
 	ScaledRect.br.x = rect.br.x / m_nScale;
-
-	//E. SAG
-	//Sometimes value's are out of bound
-	//verify recatangle to fit the viewport
-	//update.tl.x = (m_client->m_ScaledScreen.tl.x + m_client->m_SWOffsetx) * m_client->m_nScale;
-	//update.tl.y = (m_client->m_ScaledScreen.tl.y + m_client->m_SWOffsety) * m_client->m_nScale;
-	//update.br.x = update.tl.x + (m_client->m_ScaledScreen.br.x-m_client->m_ScaledScreen.tl.x) * m_client->m_nScale;
-	//update.br.y = update.tl.y + (m_client->m_ScaledScreen.br.y-m_client->m_ScaledScreen.tl.y) * m_client->m_nScale;
-
 
 	//	Totalsend+=(ScaledRect.br.x-ScaledRect.tl.x)*(ScaledRect.br.y-ScaledRect.tl.y);
 
