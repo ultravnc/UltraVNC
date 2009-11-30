@@ -2061,8 +2061,8 @@ vncClientThread::run(void *arg)
 				{
 					// Convert the coords to Big Endian
 					// Modif sf@2002 - Scaling
-					msg.pe.x = (Swap16IfLE(msg.pe.x) + m_client->m_SWOffsetx+m_client->m_ScreenOffsetx) * m_client->m_nScale;
-					msg.pe.y = (Swap16IfLE(msg.pe.y) + m_client->m_SWOffsety+m_client->m_ScreenOffsety) * m_client->m_nScale;
+					msg.pe.x = (Swap16IfLE(msg.pe.x))* m_client->m_nScale + (m_client->m_SWOffsetx+m_client->m_ScreenOffsetx);
+					msg.pe.y = (Swap16IfLE(msg.pe.y))* m_client->m_nScale + (m_client->m_SWOffsety+m_client->m_ScreenOffsety);
 
 					// Work out the flags for this event
 					DWORD flags = MOUSEEVENTF_ABSOLUTE;
@@ -2150,8 +2150,8 @@ vncClientThread::run(void *arg)
 							{							
 								INPUT evt;
 								evt.type = INPUT_MOUSE;
-								msg.pe.x=msg.pe.x-g_dpi.ScaledScreenVirtualX();
-								msg.pe.y=msg.pe.y-g_dpi.ScaledScreenVirtualY();
+								msg.pe.x=msg.pe.x+g_dpi.ScaledScreenVirtualX();
+								msg.pe.y=msg.pe.y+g_dpi.ScaledScreenVirtualY();
 								evt.mi.dx = (msg.pe.x * 65535) / (g_dpi.ScaledScreenVirtualWidth()-1);
 								evt.mi.dy = (msg.pe.y* 65535) / (g_dpi.ScaledScreenVirtualHeight()-1);
 								evt.mi.dwFlags = flags | MOUSEEVENTF_VIRTUALDESK;
@@ -2265,6 +2265,10 @@ vncClientThread::run(void *arg)
 					}
 	
 				m_client->fNewScale = true;
+				m_client->m_encodemgr.m_buffer->m_desktop->m_cursorpos.br.x=m_client->m_encodemgr.m_buffer->m_desktop->m_cursorpos.br.x/msg.ssc.scale;
+				m_client->m_encodemgr.m_buffer->m_desktop->m_cursorpos.br.y=m_client->m_encodemgr.m_buffer->m_desktop->m_cursorpos.br.y/msg.ssc.scale;
+				m_client->m_encodemgr.m_buffer->m_desktop->m_cursorpos.tl.x=m_client->m_encodemgr.m_buffer->m_desktop->m_cursorpos.tl.x/msg.ssc.scale;
+				m_client->m_encodemgr.m_buffer->m_desktop->m_cursorpos.tl.y=m_client->m_encodemgr.m_buffer->m_desktop->m_cursorpos.tl.y/msg.ssc.scale;
 				InvalidateRect(NULL,NULL,TRUE);
 				m_client->TriggerUpdateThread();
 			}
@@ -3611,11 +3615,15 @@ vncClient::UpdateMouse()
     m_mousemoved=TRUE;
 	}
 	// nyama/marscha - PointerPos
+	// PointerPos code doesn take in account prim/secundary display
+	// offset needed
 	if (m_use_PointerPos && !m_cursor_pos_changed) {
 		POINT cursorPos;
 		GetCursorPos(&cursorPos);
 		cursorPos.x=g_dpi.UnscaleX(cursorPos.x);
 		cursorPos.y=g_dpi.UnscaleY(cursorPos.y);
+		cursorPos.x=cursorPos.x-m_ScreenOffsetx;
+		cursorPos.y=cursorPos.y-m_ScreenOffsety;
 		//vnclog.Print(LL_INTINFO, VNCLOG("UpdateMouse m_cursor_pos(%d, %d), new(%d, %d)\n"), 
 		//  m_cursor_pos.x, m_cursor_pos.y, cursorPos.x, cursorPos.y);
 		if (cursorPos.x != m_cursor_pos.x || cursorPos.y != m_cursor_pos.y) {

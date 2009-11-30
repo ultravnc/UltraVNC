@@ -1484,6 +1484,8 @@ vncDesktop::CaptureMouse(BYTE *scrBuff, UINT scrBuffSize)
 		return;
 	CursorPos.x=g_dpi.UnscaleX(CursorPos.x);
 	CursorPos.y=g_dpi.UnscaleY(CursorPos.y);
+	CursorPos.x -= m_ScreenOffsetx;
+	CursorPos.y -= m_ScreenOffsety;
 	//vnclog.Print(LL_INTINFO, VNCLOG("CursorPos %i %i\n"),CursorPos.x, CursorPos.y);
 	// Translate position for hotspot
 	if (GetIconInfo(m_hcursor, &IconInfo))
@@ -1499,8 +1501,18 @@ vncDesktop::CaptureMouse(BYTE *scrBuff, UINT scrBuffSize)
 		if (IconInfo.hbmColor != NULL)
 			DeleteObject(IconInfo.hbmColor);
 	}
-	if (CursorPos.x<=0 || CursorPos.y<=0) 
+	if (CursorPos.x<=0 || CursorPos.y<=0 || CursorPos.x>m_bmrect.br.x || CursorPos.y>m_bmrect.br.y) 
 	{
+		if ((m_cursorpos.tl.x<=0)||
+			(m_cursorpos.tl.y<=0)||
+			(m_cursorpos.br.x>m_bmrect.br.x)||
+			(m_cursorpos.br.y>m_bmrect.br.y))
+		{
+		m_cursorpos.tl.x=0;
+		m_cursorpos.tl.y=0;
+		m_cursorpos.br.x=16;
+		m_cursorpos.br.y=16;
+		}
 		//Error, cursor isn't on the visbale display.
 		return;
 	}
