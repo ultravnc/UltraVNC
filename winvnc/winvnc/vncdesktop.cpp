@@ -548,6 +548,8 @@ vncDesktop::Startup()
 										{
 											InitVideoDriver();
 										}
+									else 
+										vnclog.Print(LL_INTINFO, VNCLOG("no default desktop \n"));
 								}
 						}
 				}
@@ -903,7 +905,7 @@ vncDesktop::InitBitmap()
 		current_monitor=1;
 		if (asked_display==2 && nr_monitors>1) current_monitor=2;
 		if (asked_display==3 && nr_monitors>1) current_monitor=3;
-		if (current_monitor==3) current_monitor=1;
+		//if (current_monitor==3) current_monitor=1;
 
 		if (current_monitor==1)
 		{
@@ -930,8 +932,8 @@ vncDesktop::InitBitmap()
 		
 	}
 	if (current_monitor==3 && !VideoBuffer()) m_bmrect = rfb::Rect(0, 0,mymonitor[2].Width,mymonitor[2].Height);
-	if (current_monitor==2 && !VideoBuffer()) m_bmrect = rfb::Rect(0, 0,mymonitor[1].Width,mymonitor[1].Height);
-	if (current_monitor==1 && !VideoBuffer()) m_bmrect = rfb::Rect(0, 0,mymonitor[0].Width,mymonitor[0].Height);
+	else if (current_monitor==2 && !VideoBuffer()) m_bmrect = rfb::Rect(0, 0,mymonitor[1].Width,mymonitor[1].Height);
+	else if (current_monitor==1 && !VideoBuffer()) m_bmrect = rfb::Rect(0, 0,mymonitor[0].Width,mymonitor[0].Height);
 	else m_bmrect = rfb::Rect(0, 0,GetDeviceCaps(m_hrootdc, HORZRES),GetDeviceCaps(m_hrootdc, VERTRES));
 	vnclog.Print(LL_INTINFO, VNCLOG("bitmap dimensions are %d x %d\n"), m_bmrect.br.x, m_bmrect.br.y);
 
