@@ -1225,7 +1225,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				// double click: execute first menu item
 				SendMessage(_this->m_nid.hWnd,
 							WM_COMMAND, 
-							GetMenuItemID(submenu, 3),
+							GetMenuItemID(submenu, 0),
 							0);
 			}
 
