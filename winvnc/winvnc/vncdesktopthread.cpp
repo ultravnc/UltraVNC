@@ -497,7 +497,7 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 					InvalidateRect(NULL,NULL,TRUE);
 					rgncache.assign_union(rfb::Region2D(m_desktop->m_Cliprect));
 					
-					if (memcmp(&m_desktop->m_scrinfo.format, &oldscrinfo.format, sizeof(&m_desktop->m_scrinfo.format)) != 0)
+					if (memcmp(&m_desktop->m_scrinfo.format, &oldscrinfo.format, sizeof(rfbPixelFormat)) != 0)
 						{
 							vnclog.Print(LL_INTERR, VNCLOG("Format changed\n"));
 							m_server->UpdatePalette(false); // changed no lock ok
