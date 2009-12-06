@@ -405,6 +405,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_pendingCacheInit = false;
 	m_nServerScale = 1;
 	m_reconnectcounter = 0;
+	m_Is_Listening=0;
 
 	//ms logon
 	m_ms_logon=false;
@@ -3734,7 +3735,7 @@ void* ClientConnection::run_undetached(void* arg) {
 	m_nServerScale = m_opts.m_nServerScale;
 
 	m_reconnectcounter = m_opts.m_reconnectcounter;
-	if (m_opts.m_listening)m_reconnectcounter=0;
+	if (m_Is_Listening)m_reconnectcounter=0;
 	reconnectcounter = m_reconnectcounter;
 
 	if (m_nServerScale > 1) SendServerScale(m_nServerScale);
@@ -5769,7 +5770,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						break;
 						
 					case ID_NEWCONN:
-						_this->m_pApp->NewConnection();
+						_this->m_pApp->NewConnection(false);
 						return 0;
 						
 					case ID_CONN_SAVE_AS:
@@ -6710,7 +6711,7 @@ LRESULT CALLBACK ClientConnection::WndProcTBwin(HWND hwnd, UINT iMsg, WPARAM wPa
 								_tcscpy(fulldisplay, display);
 								vnclog.Print(0,_T("CLICKK %s\n"),fulldisplay);
 								ParseDisplay(fulldisplay, display, 256, &port);
-								_this->m_pApp->NewConnection(display,port);
+								_this->m_pApp->NewConnection(false,display,port);
 								}
 						}
 					break;

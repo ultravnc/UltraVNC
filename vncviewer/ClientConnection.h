@@ -156,6 +156,8 @@ public:
 
     void SendKeepAlive(bool bForce = false); // 16 july 2008 jdp
 
+	bool m_Is_Listening;
+
 private:
 	static LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam);
 	static LRESULT CALLBACK WndProcTBwin(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam);

@@ -204,7 +204,7 @@ LRESULT CALLBACK Daemon::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lPa
 					// Phil Money @ Advantig, LLC 7-9-2005
 					if (ListenMode){ 
 
-						pApp->NewConnection(hNewSock);
+						pApp->NewConnection(true,hNewSock);
 
 					}else{ 
 						closesocket(hNewSock); 
@@ -231,7 +231,7 @@ LRESULT CALLBACK Daemon::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lPa
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case ID_NEWCONN:
-			pApp->NewConnection();
+			pApp->NewConnection(false);
 			break;
 		case IDC_OPTIONBUTTON:
 			pApp->m_options.DoDialog();
