@@ -425,11 +425,11 @@
 				>
 			</File>
 			<File
-				RelativePath="res\background2.bmp"
+				RelativePath="res\stat\background2.bmp"
 				>
 			</File>
 			<File
-				RelativePath="res\stat\background2.bmp"
+				RelativePath="res\background2.bmp"
 				>
 			</File>
 			<File
@@ -549,11 +549,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Tango_l.bmp"
+				RelativePath=".\res\Tango_l.bmp"
 				>
 			</File>
 			<File
-				RelativePath=".\res\Tango_l.bmp"
+				RelativePath=".\Tango_l.bmp"
 				>
 			</File>
 			<File
@@ -565,19 +565,19 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Tango_s.bmp"
-				>
-			</File>
-			<File
 				RelativePath=".\res\Tango_s.bmp"
 				>
 			</File>
 			<File
-				RelativePath=".\Tango_sx.bmp"
+				RelativePath=".\Tango_s.bmp"
 				>
 			</File>
 			<File
 				RelativePath=".\res\Tango_sx.bmp"
+				>
+			</File>
+			<File
+				RelativePath=".\Tango_sx.bmp"
 				>
 			</File>
 			<File
@@ -633,7 +633,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\res\vncviewer.exe.x64.manifest"
+				RelativePath=".\res\vncviewer.exe.x86.manifest"
 				>
 			</File>
 			<File
