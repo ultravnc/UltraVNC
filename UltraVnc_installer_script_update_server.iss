@@ -4,11 +4,11 @@
 
 [Setup]
 AppName=UltraVNC
-AppVerName=UltraVNC 1.0.5.5
-AppVersion=1.0.5.5
-VersionInfoVersion=1.0.5.5
-AppPublisher=1.0.5.5
-AppCopyright=1.0.5.5
+AppVerName=UltraVNC 1.0.8.2
+AppVersion=1.0.8.2
+VersionInfoVersion=1.0.8.2
+AppPublisher=1.0.8.2
+AppCopyright=1.0.8.2
 AppPublisherURL={cm:PublisherURL}
 AppSupportURL={cm:SupportURL}
 AppUpdatesURL={cm:UpdatesURL}
@@ -24,7 +24,7 @@ AppID={#AppID}
 UninstallRestartComputer=true
 DirExistsWarning=no
 OutputDir=setupfile
-OutputBaseFilename=UltraVNC_update
+OutputBaseFilename=UltraVNC_1.0.8.2_update
 BackColorDirection=lefttoright
 UserInfoPage=false
 ShowLanguageDialog=yes
@@ -166,47 +166,25 @@ Source: Readme.txt; DestDir: {app}
 ; server files
 ; winvnc.exe needs to be first here because it triggers stopping WinVNC service/app.
 Source: winvnc.exe; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont()
-Source: logmessages.dll; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont()
-Source: vnchooks.dll; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont()
-; mslogon I files
-Source: logging.dll; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont()
-Source: authadmin.dll; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont()
-Source: workgrpdomnt4.dll; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont()
-Source: ldapauth.dll; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; MinVersion: 0,5.0; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont()
-Source: ldapauthnt4.dll; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; MinVersion: 0,4.0; OnlyBelowVersion: 0,5.0; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont()
-Source: ldapauth9x.dll; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; MinVersion: 4.0,0; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont()
-; mslogon II files
-Source: authSSP.dll; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; MinVersion: 0,1; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont()
-Source: MSLogonACL.exe; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; MinVersion: 0,1; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont()
-; viewer files
+
 Source: vncviewer.exe; DestDir: {app}; Components: UltraVNC_Viewer; Flags: restartreplace ignoreversion replacesameversion
-Source: vncviewer_tab.exe; DestDir: {app}; Components: UltraVNC_Viewer; Flags: restartreplace ignoreversion replacesameversion
-Source: {tmp}\SCHook.dll; DestDir: {app}; Components: UltraVNC_Server; Flags: external skipifsourcedoesntexist restartreplace ignoreversion replacesameversion
-Source: {tmp}\cad.exe; DestDir: {app}; Components: UltraVNC_Server; Flags: external skipifsourcedoesntexist restartreplace ignoreversion replacesameversion
-Source: {tmp}\drivers.zip; DestDir: {app}; Components: UltraVNC_Server; Flags: external skipifsourcedoesntexist restartreplace ignoreversion replacesameversion
-Source: plugins\MSRC4Plugin.dsm; DestDir: {app}
-Source: plugins\Whatsnew.txt; DestDir: {app}\Plugins
-Source: plugins\Licence.txt; DestDir: {app}\Plugins
-Source: plugins\MSRC4Plugin.dsm; DestDir: {app}\Plugins
-Source: plugins\Readme.txt; DestDir: {app}\Plugins
+
+Source: plugins_single_thread\MSRC4Plugin.dsm; DestDir: {app}
+Source: plugins_single_thread\Whatsnew.txt; DestDir: {app}
+Source: plugins_single_thread\Licence.txt; DestDir: {app}
+Source: plugins_single_thread\Readme_dsm.txt; DestDir: {app}
+Source: plugins_multi_thread\SecureVNCPlugin.dsm; DestDir: {app}
+Source: plugins_multi_thread\SecureVNCPluginARC4.dsm; DestDir: {app}
 
 Source: uvnc_settings.exe; DestDir: {app}
-Source: sfx\7-zip.dll; DestDir: {app}\sfx
-Source: sfx\7z.dll; DestDir: {app}\sfx
-Source: sfx\7z.exe; DestDir: {app}\sfx
-Source: sfx\7zip.sfx; DestDir: {app}\sfx
-Source: plugins\MSRC4Plugin.dsm; DestDir: {app}\sfx
-Source: SCHook.dll; DestDir: {app}\sfx
-Source: winvnc.exe; DestDir: {app}\sfx
+
 
 
 
 [Icons]
 Name: {userdesktop}\UltraVNC Server; Filename: {app}\winvnc.exe; Components: UltraVNC_Server UltraVNC_Server_S; IconIndex: 0; Tasks: desktopicon; Check: Can_cont()
 Name: {userdesktop}\UltraVNC Viewer; Filename: {app}\vncviewer.exe; IconIndex: 0; Components: UltraVNC_Viewer; Tasks: desktopicon
-
 Name: {group}\UltraVNC Viewer; FileName: {app}\vncviewer.exe; WorkingDir: {app}; IconIndex: 0; Components: UltraVNC_Viewer
-Name: {group}\UltraVNC Viewer DirectX; FileName: {app}\vncviewer_tab.exe; WorkingDir: {app}; IconIndex: 0; Components: UltraVNC_Viewer
 Name: {group}\UltraVNC Server; FileName: {app}\WinVNC.exe; WorkingDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; IconIndex: 0; Check: Can_cont()
 
 

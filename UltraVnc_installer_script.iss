@@ -4,11 +4,11 @@
 
 [Setup]
 AppName=UltraVNC
-AppVerName=UltraVNC 1.0.5.5
-AppVersion=1.0.5.5
-VersionInfoVersion=1.0.5.5
-AppPublisher=1.0.5.5
-AppCopyright=1.0.5.5
+AppVerName=UltraVNC 1.0.8.2
+AppVersion=1.0.8.2
+VersionInfoVersion=1.0.8.2
+AppPublisher=1.0.8.2
+AppCopyright=1.0.8.2
 AppPublisherURL={cm:PublisherURL}
 AppSupportURL={cm:SupportURL}
 AppUpdatesURL={cm:UpdatesURL}
@@ -24,7 +24,7 @@ AppID={#AppID}
 UninstallRestartComputer=true
 DirExistsWarning=no
 OutputDir=setupfile
-OutputBaseFilename=UltraVNC_1.0.5.5_Setup
+OutputBaseFilename=UltraVNC_1.0.8.2_Setup
 BackColorDirection=lefttoright
 UserInfoPage=false
 ShowLanguageDialog=yes
@@ -151,6 +151,9 @@ Name: desktopicon; Description: {cm:CreateDesktopIcons,UltraVNC}; Components: Ul
 Name: associate; Description: {cm:AssocFileExtension,UltraVNC Viewer,.vnc}; Components: UltraVNC_Viewer; Check: isTaskChecked('associate')
 Name: associate; Description: {cm:AssocFileExtension,UltraVNC Viewer,.vnc}; Components: UltraVNC_Viewer; Flags: unchecked; Check: not(isTaskChecked('associate'))
 
+Name: driver; Description: UltraVNC Server driver install; Components: UltraVNC_Server; Check: isTaskChecked('driver')
+Name: driver; Description: UltraVNC Server driver install; Components: UltraVNC_Server; Flags: unchecked; Check: not(isTaskChecked('driver'))
+
 
 [Files]
 ; component independent files
@@ -180,33 +183,41 @@ Source: authSSP.dll; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server
 Source: MSLogonACL.exe; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; MinVersion: 0,1; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont()
 ; viewer files
 Source: vncviewer.exe; DestDir: {app}; Components: UltraVNC_Viewer; Flags: restartreplace ignoreversion replacesameversion
-Source: vncviewer_tab.exe; DestDir: {app}; Components: UltraVNC_Viewer; Flags: restartreplace ignoreversion replacesameversion
+;Source: vncviewer_tab.exe; DestDir: {app}; Components: UltraVNC_Viewer; Flags: restartreplace ignoreversion replacesameversion
 Source: {tmp}\SCHook.dll; DestDir: {app}; Components: UltraVNC_Server; Flags: external skipifsourcedoesntexist restartreplace ignoreversion replacesameversion
 Source: {tmp}\cad.exe; DestDir: {app}; Components: UltraVNC_Server; Flags: external skipifsourcedoesntexist restartreplace ignoreversion replacesameversion
-Source: {tmp}\drivers.zip; DestDir: {app}; Components: UltraVNC_Server; Flags: external skipifsourcedoesntexist restartreplace ignoreversion replacesameversion
-Source: plugins\MSRC4Plugin.dsm; DestDir: {app}
-Source: plugins\Whatsnew.txt; DestDir: {app}\Plugins
-Source: plugins\Licence.txt; DestDir: {app}\Plugins
-Source: plugins\MSRC4Plugin.dsm; DestDir: {app}\Plugins
-Source: plugins\Readme.txt; DestDir: {app}\Plugins
+
+Source: {tmp}\license.txt; DestDir: {app}\driver; Components: UltraVNC_Server; Flags: external skipifsourcedoesntexist restartreplace ignoreversion replacesameversion
+Source: {tmp}\uninstall_silent.bat; DestDir: {app}\driver; Components: UltraVNC_Server; Flags: external skipifsourcedoesntexist restartreplace ignoreversion replacesameversion
+Source: {tmp}\install.bat; DestDir: {app}\driver; Components: UltraVNC_Server; Flags: external skipifsourcedoesntexist restartreplace ignoreversion replacesameversion
+Source: {tmp}\setupdrv.exe; DestDir: {app}\driver; Components: UltraVNC_Server; Flags: external skipifsourcedoesntexist restartreplace ignoreversion replacesameversion
+Source: {tmp}\install_silent.bat; DestDir: {app}\driver; Components: UltraVNC_Server; Flags: external skipifsourcedoesntexist restartreplace ignoreversion replacesameversion
+Source: {tmp}\uninstall.bat; DestDir: {app}\driver; Components: UltraVNC_Server; Flags: external skipifsourcedoesntexist restartreplace ignoreversion replacesameversion
+
+Source: {tmp}\mv2.cat; DestDir: {app}\driver\driver; Components: UltraVNC_Server; Flags: external skipifsourcedoesntexist restartreplace ignoreversion replacesameversion
+Source: {tmp}\mv2.dll; DestDir: {app}\driver\driver; Components: UltraVNC_Server; Flags: external skipifsourcedoesntexist restartreplace ignoreversion replacesameversion
+Source: {tmp}\mv2.sys; DestDir: {app}\driver\driver; Components: UltraVNC_Server; Flags: external skipifsourcedoesntexist restartreplace ignoreversion replacesameversion
+Source: {tmp}\mv2.inf; DestDir: {app}\driver\driver; Components: UltraVNC_Server; Flags: external skipifsourcedoesntexist restartreplace ignoreversion replacesameversion
+
+
+Source: plugins_single_thread\MSRC4Plugin.dsm; DestDir: {app}
+Source: plugins_single_thread\Whatsnew.txt; DestDir: {app}
+Source: plugins_single_thread\Licence.txt; DestDir: {app}
+Source: plugins_single_thread\Readme_dsm.txt; DestDir: {app}
+Source: plugins_multi_thread\SecureVNCPlugin.dsm; DestDir: {app}
+Source: plugins_multi_thread\SecureVNCPluginARC4.dsm; DestDir: {app}
+
 Source: uvnc_settings.exe; DestDir: {app}
-Source: sfx\7-zip.dll; DestDir: {app}\sfx
-Source: sfx\7z.dll; DestDir: {app}\sfx
-Source: sfx\7z.exe; DestDir: {app}\sfx
-Source: sfx\7zip.sfx; DestDir: {app}\sfx
-Source: plugins\MSRC4Plugin.dsm; DestDir: {app}\sfx
-Source: SCHook.dll; DestDir: {app}\sfx
-Source: winvnc.exe; DestDir: {app}\sfx
 
 
 
 [Icons]
 Name: {userdesktop}\UltraVNC Server; Filename: {app}\winvnc.exe; Components: UltraVNC_Server UltraVNC_Server_S; IconIndex: 0; Tasks: desktopicon; Check: Can_cont()
 Name: {userdesktop}\UltraVNC Viewer; Filename: {app}\vncviewer.exe; IconIndex: 0; Components: UltraVNC_Viewer; Tasks: desktopicon
-Name: {userdesktop}\UltraVNC Viewer Directx; Filename: {app}\vncviewer_tab.exe; IconIndex: 0; Components: UltraVNC_Viewer; Tasks: desktopicon
+;Name: {userdesktop}\UltraVNC Viewer Directx; Filename: {app}\vncviewer_tab.exe; IconIndex: 0; Components: UltraVNC_Viewer; Tasks: desktopicon
 
 Name: {group}\UltraVNC Viewer; FileName: {app}\vncviewer.exe; WorkingDir: {app}; IconIndex: 0; Components: UltraVNC_Viewer
-Name: {group}\UltraVNC Viewer Directx; FileName: {app}\vncviewer_tab.exe; WorkingDir: {app}; IconIndex: 0; Components: UltraVNC_Viewer
+;Name: {group}\UltraVNC Viewer Directx; FileName: {app}\vncviewer_tab.exe; WorkingDir: {app}; IconIndex: 0; Components: UltraVNC_Viewer
 Name: {group}\UltraVNC Server; FileName: {app}\WinVNC.exe; WorkingDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; IconIndex: 0; Check: Can_cont()
 
 
@@ -228,14 +239,17 @@ Root: HKCR; Subkey: VncViewer.Config\shell\open\command; ValueType: string; Valu
 
 [Run]
 Filename: {app}\WinVNC.exe; Parameters: -install; Flags: runhidden; Components: UltraVNC_Server UltraVNC_Server_S; Tasks: installservice; StatusMsg: {cm:Registering, UltraVNC}; Check: Can_cont()
+Filename: {app}\driver\setupdrv.exe; Parameters: install; Flags: runhidden; Components: UltraVNC_Server; Tasks: driver
 Filename: net; Parameters: start uvnc_service; Flags: runhidden; Components: UltraVNC_Server UltraVNC_Server_S; Tasks: startservice; StatusMsg: {cm:Starting,UltraVNC}
 filename: {sys}\netsh; Parameters: firewall add portopening TCP 5900 vnc5900; StatusMsg: {cm:firewall}; Flags: runhidden; MinVersion: 0,5.01; Components: UltraVNC_Server UltraVNC_Server_S; Check: Can_cont()
 Filename: {sys}\netsh; Parameters: firewall add portopening TCP 5800 vnc5800; StatusMsg: {cm:firewall}; Flags: runhidden; MinVersion: 0,5.01; Components: UltraVNC_Server UltraVNC_Server_S; Check: Can_cont()
+Filename: {sys}\netsh; Parameters: "firewall add allowedprogram ""{app}\winvnc.exe"" ""winvnc.exe"" ENABLE ALL"; StatusMsg: {cm:firewall}; Flags: runhidden; MinVersion: 0,5.01; Components: UltraVNC_Server UltraVNC_Server_S; Check: Can_cont()
 Filename: {sys}\netsh; Parameters: "firewall add allowedprogram ""{app}\vncviewer.exe"" ""vncviewer.exe"" ENABLE ALL"; StatusMsg: {cm:firewall}; Flags: runhidden; MinVersion: 0,5.01; Components: UltraVNC_Viewer
 
 [UninstallRun]
 Filename: net; Parameters: stop uvnc_service; Flags: runhidden; RunOnceId: StopVncService; Components: UltraVNC_Server UltraVNC_Server_S; StatusMsg: {cm:Stopping, UltraVNC}
 Filename: {app}\WinVNC.exe; Parameters: -uninstall; Flags: runhidden; RunOnceId: RemoveVncService; Components: UltraVNC_Server UltraVNC_Server_S; StatusMsg: {cm:Removing,UltraVNC}
+Filename: {app}\driver\setupdrv.exe; Parameters: uninstall; Flags: runhidden; RunOnceId: RemoveVncDriver; Components: UltraVNC_Server
 Filename: {sys}\netsh; Parameters: firewall delete portopening TCP 5900 vnc5900; StatusMsg: {cm:firewall}; Flags: runhidden; MinVersion: 0,5.01; Components: UltraVNC_Server UltraVNC_Server_S
 Filename: {sys}\netsh; Parameters: firewall delete portopening TCP 5800 vnc5800; StatusMsg: {cm:firewall}; Flags: runhidden; MinVersion: 0,5.01; Components: UltraVNC_Server UltraVNC_Server_S
 Filename: {sys}\netsh; Parameters: "firewall delete allowedprogram program=""{app}\vncviewer.exe"""; StatusMsg: {cm:firewall}; Flags: runhidden; MinVersion: 0,5.01; Components: UltraVNC_Viewer
@@ -272,6 +286,33 @@ external 'DestroyIcon@user32.dll stdcall';
 
 const
   DI_NORMAL = 3;
+
+function IsVista():Boolean;
+var
+  Version: TWindowsVersion;
+begin
+  Result:=False;
+  GetWindowsVersionEx(Version);
+  if Version.NTPlatform and (Version.Major = 6) then Result:=True;
+end;
+
+function IsXP():Boolean;
+var
+  Version: TWindowsVersion;
+begin
+  Result:=False;
+  GetWindowsVersionEx(Version);
+  if Version.NTPlatform and (Version.Major = 5) and not (Version.Minor = 0) then Result:=True;
+end;
+
+function Is2000():Boolean;
+var
+  Version: TWindowsVersion;
+begin
+  Result:=False;
+  GetWindowsVersionEx(Version);
+  if Version.NTPlatform and (Version.Major = 5) and (Version.Minor = 0) then Result:=True;
+end;
 
 function InitializeSetup(): Boolean;
 begin
@@ -382,10 +423,9 @@ end;
 
 procedure InitializeWizard;
 begin
-  CreateCustomPages;
-
-  ISToolCheckBox.Checked := GetPreviousData('ISTool', '1') = '1';
-  ISPPCheckBox.Checked := GetPreviousData('ISPP', '1') = '1';
+		CreateCustomPages;
+		ISToolCheckBox.Checked := GetPreviousData('ISTool', '1') = '1';
+		ISPPCheckBox.Checked := GetPreviousData('ISPP', '1') = '1';
 end;
 
 procedure RegisterPreviousData(PreviousDataKey: Integer);
@@ -421,16 +461,169 @@ begin
     FileName := ExpandConstant('{tmp}\SCHook.dll');
     isxdl_AddFile(URL, FileName);
   end;
-  if ISTool then begin
+  if ISTool and IsVista() then begin
     URL := 'http://sc.uvnc.com/cad.exe';
     FileName := ExpandConstant('{tmp}\cad.exe');
     isxdl_AddFile(URL, FileName);
   end;
-  if ISPP then begin
-    URL := 'http://sc.uvnc.com/drivers.zip';
-    FileName := ExpandConstant('{tmp}\drivers.zip');
+  if ISPP and IsVista()then begin
+    URL := 'http://sc.uvnc.com/driver/vista/license.txt';
+    FileName := ExpandConstant('{tmp}\license.txt');
     isxdl_AddFile(URL, FileName);
   end;
+  if ISPP and IsVista()then begin
+    URL := 'http://sc.uvnc.com/driver/vista/uninstall.bat';
+    FileName := ExpandConstant('{tmp}\uninstall.bat');
+    isxdl_AddFile(URL, FileName);
+  end;
+  if ISPP and IsVista()then begin
+    URL := 'http://sc.uvnc.com/driver/vista/uninstall_silent.bat';
+    FileName := ExpandConstant('{tmp}\uninstall_silent.bat');
+    isxdl_AddFile(URL, FileName);
+  end;
+  if ISPP and IsVista()then begin
+    URL := 'http://sc.uvnc.com/driver/vista/install.bat';
+    FileName := ExpandConstant('{tmp}\install.bat');
+    isxdl_AddFile(URL, FileName);
+  end;
+  if ISPP and IsVista()then begin
+    URL := 'http://sc.uvnc.com/driver/vista/setupdrv.exe';
+    FileName := ExpandConstant('{tmp}\setupdrv.exe');
+    isxdl_AddFile(URL, FileName);
+  end;
+  if ISPP and IsVista()then begin
+    URL := 'http://sc.uvnc.com/driver/vista/install_silent.bat';
+    FileName := ExpandConstant('{tmp}\install_silent.bat');
+    isxdl_AddFile(URL, FileName);
+  end;
+
+  if ISPP and IsVista()then begin
+    URL := 'http://sc.uvnc.com/driver/vista/driver/mv2.cat';
+    FileName := ExpandConstant('{tmp}\mv2.cat');
+    isxdl_AddFile(URL, FileName);
+  end;
+  if ISPP and IsVista()then begin
+    URL := 'http://sc.uvnc.com/driver/vista/driver/mv2.dll';
+    FileName := ExpandConstant('{tmp}\mv2.dll');
+    isxdl_AddFile(URL, FileName);
+  end;
+  if ISPP and IsVista()then begin
+    URL := 'http://sc.uvnc.com/driver/vista/driver/mv2.inf';
+    FileName := ExpandConstant('{tmp}\mv2.inf');
+    isxdl_AddFile(URL, FileName);
+  end;
+  if ISPP and IsVista()then begin
+    URL := 'http://sc.uvnc.com/driver/vista/driver/mv2.sys';
+    FileName := ExpandConstant('{tmp}\mv2.sys');
+    isxdl_AddFile(URL, FileName);
+  end;
+
+
+  if ISPP and Is2000()then begin
+    URL := 'http://sc.uvnc.com/driver/w2k/license.txt';
+    FileName := ExpandConstant('{tmp}\license.txt');
+    isxdl_AddFile(URL, FileName);
+  end;
+  if ISPP and Is2000()then begin
+    URL := 'http://sc.uvnc.com/driver/w2k/uninstall.bat';
+    FileName := ExpandConstant('{tmp}\uninstall.bat');
+    isxdl_AddFile(URL, FileName);
+  end;
+  if ISPP and Is2000()then begin
+    URL := 'http://sc.uvnc.com/driver/w2k/uninstall_silent.bat';
+    FileName := ExpandConstant('{tmp}\uninstall_silent.bat');
+    isxdl_AddFile(URL, FileName);
+  end;
+  if ISPP and Is2000()then begin
+    URL := 'http://sc.uvnc.com/driver/w2k/install.bat';
+    FileName := ExpandConstant('{tmp}\install.bat');
+    isxdl_AddFile(URL, FileName);
+  end;
+  if ISPP and Is2000()then begin
+    URL := 'http://sc.uvnc.com/driver/w2k/setupdrv.exe';
+    FileName := ExpandConstant('{tmp}\setupdrv.exe');
+    isxdl_AddFile(URL, FileName);
+  end;
+  if ISPP and Is2000()then begin
+    URL := 'http://sc.uvnc.com/driver/w2k/install_silent.bat';
+    FileName := ExpandConstant('{tmp}\install_silent.bat');
+    isxdl_AddFile(URL, FileName);
+  end;
+
+  if ISPP and Is2000()then begin
+    URL := 'http://sc.uvnc.com/driver/w2k/driver/mv2.cat';
+    FileName := ExpandConstant('{tmp}\mv2.cat');
+    isxdl_AddFile(URL, FileName);
+  end;
+  if ISPP and Is2000()then begin
+    URL := 'http://sc.uvnc.com/driver/w2k/driver/mv2.dll';
+    FileName := ExpandConstant('{tmp}\mv2.dll');
+    isxdl_AddFile(URL, FileName);
+  end;
+  if ISPP and Is2000()then begin
+    URL := 'http://sc.uvnc.com/driver/w2k/driver/mv2.inf';
+    FileName := ExpandConstant('{tmp}\mv2.inf');
+    isxdl_AddFile(URL, FileName);
+  end;
+  if ISPP and Is2000()then begin
+    URL := 'http://sc.uvnc.com/driver/w2k/driver/mv2.sys';
+    FileName := ExpandConstant('{tmp}\mv2.sys');
+    isxdl_AddFile(URL, FileName);
+  end;
+
+
+  if ISPP and IsXP()then begin
+    URL := 'http://sc.uvnc.com/driver/xp/license.txt';
+    FileName := ExpandConstant('{tmp}\license.txt');
+    isxdl_AddFile(URL, FileName);
+  end;
+  if ISPP and IsXP()then begin
+    URL := 'http://sc.uvnc.com/driver/xp/uninstall.bat';
+    FileName := ExpandConstant('{tmp}\uninstall.bat');
+    isxdl_AddFile(URL, FileName);
+  end;
+  if ISPP and IsXP()then begin
+    URL := 'http://sc.uvnc.com/driver/xp/uninstall_silent.bat';
+    FileName := ExpandConstant('{tmp}\uninstall_silent.bat');
+    isxdl_AddFile(URL, FileName);
+  end;
+  if ISPP and IsXP()then begin
+    URL := 'http://sc.uvnc.com/driver/xp/install.bat';
+    FileName := ExpandConstant('{tmp}\install.bat');
+    isxdl_AddFile(URL, FileName);
+  end;
+  if ISPP and IsXP()then begin
+    URL := 'http://sc.uvnc.com/driver/xp/setupdrv.exe';
+    FileName := ExpandConstant('{tmp}\setupdrv.exe');
+    isxdl_AddFile(URL, FileName);
+  end;
+  if ISPP and IsXP()then begin
+    URL := 'http://sc.uvnc.com/driver/xp/install_silent.bat';
+    FileName := ExpandConstant('{tmp}\install_silent.bat');
+    isxdl_AddFile(URL, FileName);
+  end;
+
+  if ISPP and IsXP()then begin
+    URL := 'http://sc.uvnc.com/driver/xp/driver/mv2.cat';
+    FileName := ExpandConstant('{tmp}\mv2.cat');
+    isxdl_AddFile(URL, FileName);
+  end;
+  if ISPP and IsXP()then begin
+    URL := 'http://sc.uvnc.com/driver/xp/driver/mv2.dll';
+    FileName := ExpandConstant('{tmp}\mv2.dll');
+    isxdl_AddFile(URL, FileName);
+  end;
+  if ISPP and IsXP()then begin
+    URL := 'http://sc.uvnc.com/driver/xp/driver/mv2.inf';
+    FileName := ExpandConstant('{tmp}\mv2.inf');
+    isxdl_AddFile(URL, FileName);
+  end;
+  if ISPP and IsXP()then begin
+    URL := 'http://sc.uvnc.com/driver/xp/driver/mv2.sys';
+    FileName := ExpandConstant('{tmp}\mv2.sys');
+    isxdl_AddFile(URL, FileName);
+  end;
+
 
   if isxdl_DownloadFiles(hWnd) <> 0 then
     FilesDownloaded := True
@@ -451,6 +644,42 @@ end;
 function ShouldSkipPage(PageID: Integer): Boolean;
 begin
   Result := Modifying and ((PageID = wpSelectDir) or (PageID = wpSelectProgramGroup) or ((PageID = ISToolPage.ID)));
+  if (PageID = ISToolPage.ID) then
+  begin
+    if IsComponentSelected('UltraVNC_Server_S') then
+    begin
+       ISToolCheckBox.Checked := False;
+       Result := True;
+    end;
+    if IsComponentSelected('UltraVNC_Viewer') and not IsComponentSelected('UltraVNC_Server') then
+    begin
+       ISToolCheckBox.Checked := False;
+       Result := True;
+    end;
+    if IsComponentSelected('UltraVNC_Server') then
+    begin
+       //ISToolCheckBox.Checked := True;
+       Result := False;
+    end;
+  end;
+  if (PageID = ISPPPage.ID) then
+  begin
+    if IsComponentSelected('UltraVNC_Server_S') then
+    begin
+       ISPPCheckBox.Checked := False;
+       Result := True;
+    end;
+    if IsComponentSelected('UltraVNC_Viewer') and not IsComponentSelected('UltraVNC_Server') then
+    begin
+       ISPPCheckBox.Checked := False;
+       Result := True;
+    end;
+    if IsComponentSelected('UltraVNC_Server') then
+    begin
+       //ISPPCheckBox.Checked := True;
+       Result := False;
+    end;
+  end;
 end;
 
 function ModifyingCheck: Boolean;
@@ -518,15 +747,6 @@ begin
       Result := true;
   end;
   end;
-end;
-
-function IsVista():Boolean;
-var
-  Version: TWindowsVersion;
-begin
-  Result:=False;
-  GetWindowsVersionEx(Version);
-  if Version.NTPlatform and (Version.Major = 6) then Result:=True;
 end;
 
 [Dirs]
