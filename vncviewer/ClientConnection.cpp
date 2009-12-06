@@ -6478,6 +6478,13 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 									}
 							else _this->SB_HORZ_BOOL=true;
 
+							if ((_this->m_winwidth  == _this->m_fullwinwidth)&& 
+							   (_this->m_winheight == (_this->m_fullwinheight + (Rtb.bottom - Rtb.top))))
+							{
+								_this->SB_VERT_BOOL=false;
+								_this->SB_HORZ_BOOL=false;
+							}
+
 
 	
 
