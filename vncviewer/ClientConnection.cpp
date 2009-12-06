@@ -1612,12 +1612,15 @@ void ClientConnection::GetConnectDetails()
 	// The config file may set various things in the app-level defaults which 
 	// we don't want to be used except for the first connection. So we clear them
 	// in the app defaults here.
+	if (!command_line)
+	{
 	m_pApp->m_options.m_host_options[0] = '\0';
 	m_pApp->m_options.m_port = -1;
 	m_pApp->m_options.m_proxyhost[0] = '\0';
 	m_pApp->m_options.m_proxyport = -1;
 	m_pApp->m_options.m_connectionSpecified = false;
 	m_pApp->m_options.m_configSpecified = false;
+	}
 
 }
 DWORD WINAPI SocketTimeout(LPVOID lpParam)
