@@ -28,10 +28,10 @@ class VNCviewerApp32 : public VNCviewerApp {
 public:
 	VNCviewerApp32(HINSTANCE hInstance, PSTR szCmdLine);
 
-	void NewConnection();
-	void NewConnection(TCHAR *host, int port);
-	void NewConnection(SOCKET sock);
-	void NewConnection(TCHAR *configFile);
+	void NewConnection(bool Is_Listening);
+	void NewConnection(bool Is_Listening,TCHAR *host, int port);
+	void NewConnection(bool Is_Listening,SOCKET sock);
+	void NewConnection(bool Is_Listening,TCHAR *configFile);
 
 	~VNCviewerApp32();
 private:

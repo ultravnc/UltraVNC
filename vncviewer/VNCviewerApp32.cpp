@@ -73,9 +73,10 @@ VNCviewerApp32::VNCviewerApp32(HINSTANCE hInstance, PSTR szCmdLine) :
 	
 	// These should maintain a list of connections.
 
-void VNCviewerApp32::NewConnection() {
+void VNCviewerApp32::NewConnection(bool Is_Listening) {
 	ClientConnection *pcc = new ClientConnection(this);
 	try {
+		pcc->m_Is_Listening=Is_Listening;
 		pcc->Run();
 	} catch (Exception &e) {
 //		DestroyWindow(pcc->m_hwndMain);
@@ -85,9 +86,10 @@ void VNCviewerApp32::NewConnection() {
 	} 
 }
 
-void VNCviewerApp32::NewConnection(TCHAR *host, int port) {
+void VNCviewerApp32::NewConnection(bool Is_Listening,TCHAR *host, int port) {
 	ClientConnection *pcc = new ClientConnection(this, host,port);
 	try {
+		pcc->m_Is_Listening=Is_Listening;
 		pcc->Run();
 	} catch (Exception &e) {
 //		DestroyWindow(pcc->m_hwndMain); 
@@ -97,9 +99,10 @@ void VNCviewerApp32::NewConnection(TCHAR *host, int port) {
 	} 
 }
 
-void VNCviewerApp32::NewConnection(SOCKET sock) {
+void VNCviewerApp32::NewConnection(bool Is_Listening,SOCKET sock) {
 	ClientConnection *pcc = new ClientConnection(this, sock);
 	try {
+		pcc->m_Is_Listening=Is_Listening;
 		pcc->Run();
 	} catch (Exception &e) {
 //		DestroyWindow(pcc->m_hwndMain); 

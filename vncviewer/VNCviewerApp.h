@@ -38,9 +38,9 @@ class VNCviewerApp {
 public:
 	VNCviewerApp(HINSTANCE hInstance, LPTSTR szCmdLine);
 
-	virtual void NewConnection() = 0;
-	virtual void NewConnection(TCHAR *host, int port) = 0;
-	virtual void NewConnection(SOCKET sock) = 0;
+	virtual void NewConnection(bool Is_Listening) = 0;
+	virtual void NewConnection(bool Is_Listening,TCHAR *host, int port) = 0;
+	virtual void NewConnection(bool Is_Listening,SOCKET sock) = 0;
 		
 	~VNCviewerApp();
 
