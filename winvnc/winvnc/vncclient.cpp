@@ -2061,8 +2061,12 @@ vncClientThread::run(void *arg)
 				{
 					// Convert the coords to Big Endian
 					// Modif sf@2002 - Scaling
-					msg.pe.x = (Swap16IfLE(msg.pe.x))* m_client->m_nScale + (m_client->m_SWOffsetx+m_client->m_ScreenOffsetx);
-					msg.pe.y = (Swap16IfLE(msg.pe.y))* m_client->m_nScale + (m_client->m_SWOffsety+m_client->m_ScreenOffsety);
+					msg.pe.x = (Swap16IfLE(msg.pe.x));
+					msg.pe.y = (Swap16IfLE(msg.pe.y));
+					//Error, msd.pe.x is defined as unsigned while with a negative secondary screen it's negative
+					//offset need to be used later in this function
+					msg.pe.x = (msg.pe.x)* m_client->m_nScale;// + (m_client->m_SWOffsetx+m_client->m_ScreenOffsetx);
+					msg.pe.y = (msg.pe.y)* m_client->m_nScale;// + (m_client->m_SWOffsety+m_client->m_ScreenOffsety);
 
 					// Work out the flags for this event
 					DWORD flags = MOUSEEVENTF_ABSOLUTE;
@@ -2133,13 +2137,12 @@ vncClientThread::run(void *arg)
 					// offset for multi display
 					int screenX, screenY, screenDepth;
 					m_server->GetScreenInfo(screenX, screenY, screenDepth);
-					//screenX=GetSystemMetrics(SM_CXVIRTUALSCREEN)*2;
-					//screenY=GetSystemMetrics(SM_CYVIRTUALSCREEN)*2;
-//					vnclog.Print(LL_INTINFO, VNCLOG("########mouse :%i %i %i %i \n"),screenX, screenY,m_client->m_ScreenOffsetx,m_client->m_ScreenOffsety );
+					// 1 , only one display, so always positive
+					//primary display always have (0,0) as corner
 					if (m_client->m_display_type==1)
-						{//primary display always have (0,0) as corner
-							unsigned long x = (msg.pe.x *  65535) / (screenX-1);
-							unsigned long y = (msg.pe.y * 65535) / (screenY-1);
+						{
+							unsigned long x = ((msg.pe.x + (m_client->m_SWOffsetx)) *  65535) / (screenX-1);
+							unsigned long y = ((msg.pe.y + (m_client->m_SWOffsety))* 65535) / (screenY-1);
 							// Do the pointer event
 							::mouse_event(flags, (DWORD) x, (DWORD) y, wheel_movement, 0);
 //							vnclog.Print(LL_INTINFO, VNCLOG("########mouse_event :%i %i \n"),x,y);
@@ -2150,10 +2153,10 @@ vncClientThread::run(void *arg)
 							{							
 								INPUT evt;
 								evt.type = INPUT_MOUSE;
-								msg.pe.x=msg.pe.x+g_dpi.ScaledScreenVirtualX();
-								msg.pe.y=msg.pe.y+g_dpi.ScaledScreenVirtualY();
-								evt.mi.dx = (msg.pe.x * 65535) / (g_dpi.ScaledScreenVirtualWidth()-1);
-								evt.mi.dy = (msg.pe.y* 65535) / (g_dpi.ScaledScreenVirtualHeight()-1);
+								int xx=msg.pe.x-g_dpi.ScaledScreenVirtualX()+ (m_client->m_SWOffsetx+m_client->m_ScreenOffsetx);
+								int yy=msg.pe.y-g_dpi.ScaledScreenVirtualY()+ (m_client->m_SWOffsety+m_client->m_ScreenOffsety);
+								evt.mi.dx = (xx * 65535) / (g_dpi.ScaledScreenVirtualWidth()-1);
+								evt.mi.dy = (yy* 65535) / (g_dpi.ScaledScreenVirtualHeight()-1);
 								evt.mi.dwFlags = flags | MOUSEEVENTF_VIRTUALDESK;
 								evt.mi.dwExtraInfo = 0;
 								evt.mi.mouseData = wheel_movement;
@@ -3622,8 +3625,8 @@ vncClient::UpdateMouse()
 		GetCursorPos(&cursorPos);
 		cursorPos.x=g_dpi.UnscaleX(cursorPos.x);
 		cursorPos.y=g_dpi.UnscaleY(cursorPos.y);
-		cursorPos.x=cursorPos.x-m_ScreenOffsetx;
-		cursorPos.y=cursorPos.y-m_ScreenOffsety;
+		cursorPos.x=cursorPos.x-(m_ScreenOffsetx+m_SWOffsetx);
+		cursorPos.y=cursorPos.y-(m_ScreenOffsety+m_SWOffsety);
 		//vnclog.Print(LL_INTINFO, VNCLOG("UpdateMouse m_cursor_pos(%d, %d), new(%d, %d)\n"), 
 		//  m_cursor_pos.x, m_cursor_pos.y, cursorPos.x, cursorPos.y);
 		if (cursorPos.x != m_cursor_pos.x || cursorPos.y != m_cursor_pos.y) {

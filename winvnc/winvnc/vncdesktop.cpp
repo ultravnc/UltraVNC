@@ -402,7 +402,7 @@ vncDesktop::vncDesktop()
 	DriverWantedSet=false;
 	can_be_hooked=false;
 
-	current_monitor=3;
+	multi_monitor=true;
     m_bIsInputDisabledByClient = false;
 	m_input_desktop = 0;
 	m_home_desktop = 0;
@@ -881,10 +881,9 @@ vncDesktop::InitBitmap()
 										m_ScreenOffsety=devmode.dmPosition.y;
 										if (m_hrootdc) DriverType=MIRROR;
 										Checkmonitors();
-										asked_display=m_buffer.GetDisplay();
-										current_monitor=1;
-										if (asked_display==2 && nr_monitors>1) current_monitor=2;
-										if (asked_display==3 && nr_monitors>1) current_monitor=3;
+										requested_multi_monitor=m_buffer.IsMultiMonitor();
+										multi_monitor=false;
+										if (requested_multi_monitor && nr_monitors>1) multi_monitor=true;
 									}
 							}
 					if (hUser32) FreeLibrary(hUser32);
@@ -901,25 +900,17 @@ vncDesktop::InitBitmap()
 		vnclog.Print(LL_INTERR, VNCLOG("No driver used \n"));
 		//Multi-Monitor changes
 		Checkmonitors();
-		asked_display=m_buffer.GetDisplay();
-		current_monitor=1;
-		if (asked_display==2 && nr_monitors>1) current_monitor=2;
-		if (asked_display==3 && nr_monitors>1) current_monitor=3;
-		//if (current_monitor==3) current_monitor=1;
+		requested_multi_monitor=m_buffer.IsMultiMonitor();
+		multi_monitor=false;
+		if (requested_multi_monitor && nr_monitors>1) multi_monitor=true;
 
-		if (current_monitor==1)
+		if (!multi_monitor)
 		{
 			m_hrootdc = CreateDC(("DISPLAY"),mymonitor[0].device,NULL,NULL);
 			m_ScreenOffsetx=mymonitor[0].offsetx;
 			m_ScreenOffsety=mymonitor[0].offsety;
 		}
-		if (current_monitor==2)
-		{
-			m_hrootdc =CreateDC(("DISPLAY"),mymonitor[1].device,NULL,NULL);
-			m_ScreenOffsetx=mymonitor[1].offsetx;
-			m_ScreenOffsety=mymonitor[1].offsety;
-		}
-		if (current_monitor==3)
+		else
 		{
 			m_hrootdc = GetDC(NULL);
 			m_ScreenOffsetx=mymonitor[2].offsetx;
@@ -931,9 +922,8 @@ vncDesktop::InitBitmap()
 		}
 		
 	}
-	if (current_monitor==3 && !VideoBuffer()) m_bmrect = rfb::Rect(0, 0,mymonitor[2].Width,mymonitor[2].Height);
-	else if (current_monitor==2 && !VideoBuffer()) m_bmrect = rfb::Rect(0, 0,mymonitor[1].Width,mymonitor[1].Height);
-	else if (current_monitor==1 && !VideoBuffer()) m_bmrect = rfb::Rect(0, 0,mymonitor[0].Width,mymonitor[0].Height);
+	if (multi_monitor && !VideoBuffer()) m_bmrect = rfb::Rect(0, 0,mymonitor[2].Width,mymonitor[2].Height);
+	else if (!VideoBuffer()) m_bmrect = rfb::Rect(0, 0,mymonitor[0].Width,mymonitor[0].Height);
 	else m_bmrect = rfb::Rect(0, 0,GetDeviceCaps(m_hrootdc, HORZRES),GetDeviceCaps(m_hrootdc, VERTRES));
 	vnclog.Print(LL_INTINFO, VNCLOG("bitmap dimensions are %d x %d\n"), m_bmrect.br.x, m_bmrect.br.y);
 
@@ -1431,10 +1421,29 @@ vncDesktop::CaptureScreen(const rfb::Rect &rect, BYTE *scrBuff, UINT scrBuffSize
 		DWORD t = timeGetTime();
 	#endif
 		// Capture screen into bitmap
-		BOOL blitok = BitBlt(m_hmemdc, rect.tl.x, rect.tl.y,
+		BOOL blitok = false;
+		if (multi_monitor)
+		{
+		blitok=BitBlt(m_hmemdc, 
+			 rect.tl.x,
+			 rect.tl.y,
+			(rect.br.x-rect.tl.x),
+			(rect.br.y-rect.tl.y),
+			m_hrootdc,
+			rect.tl.x+m_ScreenOffsetx,
+			rect.tl.y+m_ScreenOffsety,
+			(m_fCaptureAlphaBlending && !m_Black_window_active) ? (CAPTUREBLT | SRCCOPY) : SRCCOPY
+			);
+		}
+		else
+		{
+			blitok=BitBlt(m_hmemdc, 
+			 rect.tl.x,
+			 rect.tl.y,
 			(rect.br.x-rect.tl.x),
 			(rect.br.y-rect.tl.y),
 			m_hrootdc, rect.tl.x, rect.tl.y, (m_fCaptureAlphaBlending && !m_Black_window_active) ? (CAPTUREBLT | SRCCOPY) : SRCCOPY);
+		}
 	#if defined(_DEBUG)
 		DWORD e = timeGetTime() - t;
 		vnclog.Print(LL_INTWARN, VNCLOG("Blit (%u,%u - %u,%u) (%ux%u took %ums\n"), 
@@ -1503,12 +1512,12 @@ vncDesktop::CaptureMouse(BYTE *scrBuff, UINT scrBuffSize)
 		if (IconInfo.hbmColor != NULL)
 			DeleteObject(IconInfo.hbmColor);
 	}
-	if (CursorPos.x<=0 || CursorPos.y<=0 || CursorPos.x>m_bmrect.br.x || CursorPos.y>m_bmrect.br.y) 
+	if (CursorPos.x<=m_bmrect.tl.x || CursorPos.y<=m_bmrect.tl.y || CursorPos.x>=m_bmrect.br.x || CursorPos.y>=m_bmrect.br.y) 
 	{
-		if ((m_cursorpos.tl.x<=0)||
-			(m_cursorpos.tl.y<=0)||
-			(m_cursorpos.br.x>m_bmrect.br.x)||
-			(m_cursorpos.br.y>m_bmrect.br.y))
+		if ((m_cursorpos.tl.x<=m_bmrect.tl.x)||
+			(m_cursorpos.tl.y<=m_bmrect.tl.y)||
+			(m_cursorpos.br.x>=m_bmrect.br.x)||
+			(m_cursorpos.br.y>=m_bmrect.br.y))
 		{
 		m_cursorpos.tl.x=0;
 		m_cursorpos.tl.y=0;
@@ -1920,30 +1929,21 @@ void vncDesktop::SetSW(int x,int y)
 	POINT point;
 	point.x=x;
 	point.y=y;
-	vnclog.Print(LL_INTERR, VNCLOG("SETW %i %i\n"),x,y);
+	MONITORINFO monitorinfo;
+	monitorinfo.cbSize=sizeof(MONITORINFO);
+
+    helper::DynamicFn<LPGETMONITORINFO> GetMonitorInfo("USER32","GetMonitorInfoA");
+    helper::DynamicFn<LPMONITOTFROMPOINT> MonitorFromPoint("USER32","MonitorFromPointA");
+
 	if (x <= 5 && y<=5 && x>-5 && y>-5) 
 		{
-			switch(asked_display)
-			{
-				case 1:
-				m_buffer.Display(-1);
-				m_buffer.Display(2);
-				m_Single_hWnd=NULL;
-				//m_SWtoDesktop=TRUE;
-				break;
-				case 2:
-				m_buffer.Display(1);
-				m_buffer.Display(2);
-				m_Single_hWnd=NULL;
-				break;
-				case 3:
-				m_buffer.Display(1);
-				m_buffer.Display(-2);
-				m_Single_hWnd=NULL;
-				break;
-			}
+			// 2= multi monitor
+			// 1= single monitor
+			if (requested_multi_monitor)m_buffer.MultiMonitors(1);
+			else m_buffer.MultiMonitors(2);
+			m_Single_hWnd=NULL;
 			return;
-	}
+		}
 	//SW is disabled seems to crash server
 	//until found and fixed we better disabled it to avoid
 	//this
@@ -1953,27 +1953,18 @@ void vncDesktop::SetSW(int x,int y)
 
 	if (m_Single_hWnd==GetDesktopWindow())
 		{
-			MONITORINFO monitorinfo;
-			monitorinfo.cbSize=sizeof(MONITORINFO);
-
-            helper::DynamicFn<LPGETMONITORINFO> GetMonitorInfo("USER32","GetMonitorInfoA");
-            helper::DynamicFn<LPMONITOTFROMPOINT> MonitorFromPoint("USER32","MonitorFromPointA");
-
-
 			if (GetMonitorInfo.isValid() && MonitorFromPoint.isValid())
 			{
 				HMONITOR hmonitor= (*MonitorFromPoint)(point,MONITOR_DEFAULTTONEAREST);
 				(*GetMonitorInfo)(hmonitor,&monitorinfo);
 				if (monitorinfo.dwFlags ==MONITORINFOF_PRIMARY) 
 				{
-					m_buffer.Display(1);
-					m_buffer.Display(-2);
+					m_buffer.MultiMonitors(1);
 					m_Single_hWnd=NULL;
 				}
 				else
 				{
-					m_buffer.Display(-1);
-					m_buffer.Display(2);
+					m_buffer.MultiMonitors(2);
 					m_Single_hWnd=NULL;
 				}
 			}

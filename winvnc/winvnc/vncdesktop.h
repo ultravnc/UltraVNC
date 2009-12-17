@@ -497,8 +497,8 @@ BOOL DriverWantedSet;
 //Multi monitor
 monitor mymonitor[3];
 int nr_monitors;
-int current_monitor;
-int asked_display;
+bool multi_monitor;
+bool requested_multi_monitor;
 
 bool m_bIsInputDisabledByClient; // 28 March 2008 jdp
 #ifdef AVILOG

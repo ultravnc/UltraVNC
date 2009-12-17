@@ -638,10 +638,12 @@ vncServer::Authenticated(vncClientId clientid)
 					break;
 				}
 				// Preset toggle prim/sec/both
-				if (Primary()) m_desktop->m_buffer.Display(1);
-				else m_desktop->m_buffer.Display(-1);
-				if (Secondary()) m_desktop->m_buffer.Display(2);
-				else m_desktop->m_buffer.Display(-2);
+				// change, to get it final stable, we only gonna handle single and multi monitors
+				// 1=single monitor, 2 is multi monitor
+				m_desktop->m_buffer.MultiMonitors(1);
+				if (Secondary()) m_desktop->m_buffer.MultiMonitors(2);
+
+
                 DWORD startup_status = 0;
 				if ((startup_status = m_desktop->Init(this)) != 0)
 				{
