@@ -40,6 +40,12 @@ class vncService;
 
 BOOL PostToWinVNC(UINT message, WPARAM wParam, LPARAM lParam);
 
+//adzm 2010-02-10 - Only posts to the same process
+BOOL PostToThisWinVNC(UINT message, WPARAM wParam, LPARAM lParam);
+
+//adzm 2010-02-10 - Finds the appropriate VNC window
+HWND FindWinVNCWindow(bool bThisProcess);
+
 
 // The NT-specific code wrapper class
 class vncService

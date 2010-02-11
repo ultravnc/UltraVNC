@@ -276,13 +276,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 			hShutdownEvent = OpenEvent(EVENT_ALL_ACCESS, FALSE, "Global\\SessionEventUltra");
 			SetEvent(hShutdownEvent);
 			CloseHandle(hShutdownEvent);
-			HWND hservwnd;
-			hservwnd = FindWindow("WinVNC Tray Icon", NULL);
-			if (hservwnd!=NULL)
-			{
-				PostMessage(hservwnd, WM_COMMAND, 40002, 0);
-				PostMessage(hservwnd, WM_CLOSE, 0, 0);
-			}
+
+			//adzm 2010-02-10 - Finds the appropriate VNC window for any process. Sends this message to all of them!
+			HWND hservwnd = NULL;
+			do {
+				if (hservwnd!=NULL)
+				{
+					PostMessage(hservwnd, WM_COMMAND, 40002, 0);
+					PostMessage(hservwnd, WM_CLOSE, 0, 0);
+				}
+				hservwnd = FindWinVNCWindow(false);
+			} while (hservwnd!=NULL);
 			return 0;
 		}
 
@@ -897,8 +901,8 @@ int WinVNCAppMain()
 		{	
     		vnclog.Print(LL_INTINFO, VNCLOG("%s -- exiting\n"), sz_ID_ANOTHER_INST);
 			// We don't allow multiple instances!
-		if (!fRunningFromExternalService)
-			MessageBox(NULL, sz_ID_ANOTHER_INST, szAppName, MB_OK);
+			if (!fRunningFromExternalService)
+				MessageBox(NULL, sz_ID_ANOTHER_INST, szAppName, MB_OK);
 			return 0;
 		}
 	}

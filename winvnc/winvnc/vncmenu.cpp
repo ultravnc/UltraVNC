@@ -51,7 +51,9 @@ const UINT MENU_ADD_CLIENT_MSG = RegisterWindowMessage("WinVNC.AddClient.Message
 const UINT MENU_AUTO_RECONNECT_MSG = RegisterWindowMessage("WinVNC.AddAutoClient.Message");
 const UINT MENU_REPEATER_ID_MSG = RegisterWindowMessage("WinVNC.AddRepeaterID.Message");
 // adzm 2009-07-05 - Tray icon balloon tips
-const UINT MENU_TRAYICON_BALLOON_MSG = RegisterWindowMessage("WinVNC.TrayIconBalloon.Message");
+// adzm 2010-02-10 - Changed this window message (added 2) to prevent receiving the same message from older UltraVNC builds 
+// which will send this message between processes with process-local pointers to strings as the wParam and lParam
+const UINT MENU_TRAYICON_BALLOON_MSG = RegisterWindowMessage("WinVNC.TrayIconBalloon2.Message");
  
 
 const UINT FileTransferSendPacketMessage = RegisterWindowMessage("UltraVNC.Viewer.FileTransferSendPacketMessage");
@@ -1506,37 +1508,43 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
 		// adzm 2009-07-05 - Tray icon balloon tips
 		if (iMsg == MENU_TRAYICON_BALLOON_MSG) {
-			omni_mutex_lock sync(_this->m_mutexTrayIcon);
+			try {
+				omni_mutex_lock sync(_this->m_mutexTrayIcon);
 
-			// adzm 2009-07-05 - Tray icon balloon tips
-			if (_this->m_BalloonInfo) {		
-				free(_this->m_BalloonInfo);
-				_this->m_BalloonInfo = NULL;
-			}
-			if (_this->m_BalloonTitle) {
-				free(_this->m_BalloonTitle);
-				_this->m_BalloonTitle = NULL;
-			}
+				// adzm 2009-07-05 - Tray icon balloon tips
+				if (_this->m_BalloonInfo) {		
+					free(_this->m_BalloonInfo);
+					_this->m_BalloonInfo = NULL;
+				}
+				if (_this->m_BalloonTitle) {
+					free(_this->m_BalloonTitle);
+					_this->m_BalloonTitle = NULL;
+				}
 
-			char* szInfo = (char*)wParam;
-			char* szTitle = (char*)lParam;
-			
-			if (szInfo && (strlen(szInfo) > 0) ) {
-				_this->m_BalloonInfo = _strdup(szInfo);
-			}
-			if (szTitle && (strlen(szTitle) > 0) ) {
-				_this->m_BalloonTitle = _strdup(szTitle);
-			}
+				char* szInfo = (char*)wParam;
+				char* szTitle = (char*)lParam;
+				
+				if (szInfo && (strlen(szInfo) > 0) ) {
+					_this->m_BalloonInfo = _strdup(szInfo);
+				}
+				if (szTitle && (strlen(szTitle) > 0) ) {
+					_this->m_BalloonTitle = _strdup(szTitle);
+				}
 
-			if (szInfo) {
-				free(szInfo);
-			}
-			if (szTitle) {
-				free(szTitle);
-			}
+				if (szInfo) {
+					free(szInfo);
+				}
+				if (szTitle) {
+					free(szTitle);
+				}
 
-			if (_this->IsIconSet) {
-				_this->SendTrayMsg(NIM_MODIFY, _this->m_nid.hIcon == _this->m_winvnc_icon ? FALSE : TRUE);
+				if (_this->IsIconSet) {
+					_this->SendTrayMsg(NIM_MODIFY, _this->m_nid.hIcon == _this->m_winvnc_icon ? FALSE : TRUE);
+				}
+			} catch (...) {
+				// just in case
+				vnclog.Print(LL_INTWARN,
+					VNCLOG("Warning: exception handling balloon message\n"));
 			}
 		}
 	}
@@ -1550,7 +1558,9 @@ BOOL vncMenu::NotifyBalloon(char* szInfo, char* szTitle)
 {
 	char* szInfoCopy = _strdup(szInfo); // TOFIX memory leak;
 	char* szTitleCopy = _strdup(szTitle);
-	BOOL returnvalue= PostToWinVNC(MENU_TRAYICON_BALLOON_MSG, (WPARAM)szInfoCopy, (LPARAM)szTitleCopy);
+
+	//adzm 2010-02-10 - Only posts to the same process
+	BOOL returnvalue= PostToThisWinVNC(MENU_TRAYICON_BALLOON_MSG, (WPARAM)szInfoCopy, (LPARAM)szTitleCopy);
 	if (returnvalue==FALSE)
 	{
 			if (szInfoCopy) {

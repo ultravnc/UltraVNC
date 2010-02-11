@@ -3519,7 +3519,8 @@ vncClient::~vncClient()
 				
 		if ( (m_server == NULL) || (m_server && m_server->AuthClientCount() == 0) ) {
 			// We want that the server exit when the viewer exit
-			HWND hwnd=FindWindow("WinVNC Tray Icon",NULL);
+			//adzm 2010-02-10 - Finds the appropriate VNC window for this process
+			HWND hwnd=FindWinVNCWindow(true);
 			if (hwnd) SendMessage(hwnd,WM_COMMAND,ID_CLOSE,0);
 		}
 	}
