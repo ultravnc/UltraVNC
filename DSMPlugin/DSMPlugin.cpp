@@ -317,7 +317,7 @@ bool CDSMPlugin::LoadPlugin(char* szPlugin, bool fAllowMulti)
 		char szCurrentDir_szDllCopyName[MAX_PATH];
 		while (!fDllCopyCreated)
 		{
-			strcpy(szDllCopyName, szPlugin);
+			strcpy_s(szDllCopyName, 260,szPlugin);
 			szDllCopyName[strlen(szPlugin) - 4] = '\0'; //remove the ".dsm" extension
 			sprintf(szDllCopyName, "%s-tmp.d%d", szDllCopyName, i++);
 			//fDllCopyCreated = (FALSE != CopyFile(szPlugin, szDllCopyName, false));
@@ -333,8 +333,8 @@ bool CDSMPlugin::LoadPlugin(char* szPlugin, bool fAllowMulti)
 						char* p = strrchr(szCurrentDir, '\\');
 						*p = '\0';
 					}
-				char lpPathBuffer[512];
-				DWORD dwBufSize=512;
+				char lpPathBuffer[MAX_PATH];
+				DWORD dwBufSize=MAX_PATH;
 				DWORD dwRetVal;
 				dwRetVal = GetTempPath(dwBufSize,lpPathBuffer);
 				if (dwRetVal > dwBufSize || (dwRetVal == 0))

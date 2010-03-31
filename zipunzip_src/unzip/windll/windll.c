@@ -676,7 +676,8 @@ int WINAPI Wiz_Grep(LPSTR archive, LPSTR file, LPSTR pattern, int cmd,
 {
     int retcode = FALSE, compare;
     ulg i, j, patternLen, buflen;
-    char * sz, *p;
+    char * sz=NULL;
+	char *p;
     UzpBuffer retstr;
 
     /* Turn off any windows printing functions, as they may not have been
@@ -718,12 +719,13 @@ int WINAPI Wiz_Grep(LPSTR archive, LPSTR file, LPSTR pattern, int cmd,
     }
 
     sz = malloc(patternLen + 3); /* add two in case doing whole words only */
+	if (sz==NULL) return 0;
     if (cmd > 1) {
-        strcpy(sz, " ");
-        strcat(sz, pattern);
-        strcat(sz, " ");
+        strcpy_s(sz, patternLen + 3," ");
+        strcat_s(sz, patternLen + 3,pattern);
+        strcat_s(sz, patternLen + 3," ");
     } else
-        strcpy(sz, pattern);
+        strcpy_s(sz,patternLen + 3, pattern);
 
     if ((cmd == 0) || (cmd == 2)) {
         for (i = 0; i < strlen(sz); i++)

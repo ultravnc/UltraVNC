@@ -75,9 +75,12 @@ DWORD GetCurrentSessionID()
 	pWTSGetActiveConsoleSessionId WTSGetActiveConsoleSessionIdF=NULL;
 	WTSProcessIdToSessionIdF=NULL;
 
-	HMODULE  hlibkernel = LoadLibrary("kernel32.dll"); 
+	HMODULE  hlibkernel = LoadLibrary("kernel32.dll");
+	if (hlibkernel)
+	{
 	WTSGetActiveConsoleSessionIdF=(pWTSGetActiveConsoleSessionId)GetProcAddress(hlibkernel, "WTSGetActiveConsoleSessionId");
 	WTSProcessIdToSessionIdF=(pProcessIdToSessionId)GetProcAddress(hlibkernel, "ProcessIdToSessionId");
+	}
 	if (WTSGetActiveConsoleSessionIdF!=NULL)
 	   dwSessionId =WTSGetActiveConsoleSessionIdF();
 	else dwSessionId=0;
@@ -90,7 +93,7 @@ DWORD GetCurrentSessionID()
 			WTSProcessIdToSessionIdF( dw, &pSessionId );
 			dwSessionId=pSessionId;
 		}
-	FreeLibrary(hlibkernel);
+	if (hlibkernel) FreeLibrary(hlibkernel);
 	return dwSessionId;
 }
 
@@ -105,8 +108,11 @@ DWORD GetExplorerLogonPid()
 	WTSProcessIdToSessionIdF=NULL;
 
 	HMODULE  hlibkernel = LoadLibrary("kernel32.dll"); 
+	if (hlibkernel)
+	{
 	WTSGetActiveConsoleSessionIdF=(pWTSGetActiveConsoleSessionId)GetProcAddress(hlibkernel, "WTSGetActiveConsoleSessionId");
 	WTSProcessIdToSessionIdF=(pProcessIdToSessionId)GetProcAddress(hlibkernel, "ProcessIdToSessionId");
+	}
 	if (WTSGetActiveConsoleSessionIdF!=NULL)
 	   dwSessionId =WTSGetActiveConsoleSessionIdF();
 	else dwSessionId=0;
@@ -125,7 +131,7 @@ DWORD GetExplorerLogonPid()
     HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     if (hSnap == INVALID_HANDLE_VALUE)
     {
-		FreeLibrary(hlibkernel);
+		if (hlibkernel) FreeLibrary(hlibkernel);
         return 0 ;
     }
 
@@ -134,7 +140,7 @@ DWORD GetExplorerLogonPid()
     if (!Process32First(hSnap, &procEntry))
     {
 		CloseHandle(hSnap);
-		FreeLibrary(hlibkernel);
+		if (hlibkernel) FreeLibrary(hlibkernel);
         return 0 ;
     }
 
@@ -157,7 +163,7 @@ DWORD GetExplorerLogonPid()
 
     } while (Process32Next(hSnap, &procEntry));
 	CloseHandle(hSnap);
-	FreeLibrary(hlibkernel);
+	if (hlibkernel) FreeLibrary(hlibkernel);
 	return dwExplorerLogonPid;
 }
 

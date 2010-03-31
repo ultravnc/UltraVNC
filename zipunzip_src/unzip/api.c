@@ -116,8 +116,8 @@ void UZ_EXP UzpVersion2(UzpVer2 *version)
 #else
     version->flag = 0;
 #endif
-    strcpy(version->betalevel, UZ_BETALEVEL);
-    strcpy(version->date, UZ_VERSION_DATE);
+    strcpy_s(version->betalevel,10, UZ_BETALEVEL);
+    strcpy_s(version->date, 20,UZ_VERSION_DATE);
 
 #ifdef ZLIB_VERSION
     /* Although ZLIB_VERSION is a compile-time constant, we implement an
@@ -599,7 +599,7 @@ int UZ_EXP UzpValidate(char *archive, int AllCodes)
     }
 
     G.wildzipfn = (char *)malloc(FILNAMSIZ + 1);
-    strcpy(G.wildzipfn, archive);
+    strcpy_s(G.wildzipfn,FILNAMSIZ + 1, archive);
 #if (defined(WINDLL) && !defined(CRTL_CP_IS_ISO))
     _ISO_INTERN(G.wildzipfn);
 #endif

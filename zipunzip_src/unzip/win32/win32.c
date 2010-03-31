@@ -2343,9 +2343,9 @@ int checkdir(__G__ pathcomp, flag)
             return MPN_OK;
         if ((G.rootlen = strlen(pathcomp)) > 0) {
             int had_trailing_pathsep=FALSE, has_drive=FALSE, add_dot=FALSE;
-            char *tmproot;
-
-            if ((tmproot = (char *)malloc(G.rootlen+3)) == (char *)NULL) {
+            char *tmproot=NULL;
+			tmproot = (char *)malloc(G.rootlen+3);
+            if (tmproot == (char *)NULL) {
                 G.rootlen = 0;
                 return MPN_NOMEM;
             }
