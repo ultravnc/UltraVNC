@@ -84,6 +84,8 @@ public:
 	DWORD				m_dwCurrentValue;
 	DWORD				m_dwCurrentPercent;
 
+	DWORD				m_dwStartTick;
+
 	// File Sending (upload)
 	HANDLE				m_hSrcFile;
 	char				m_szSrcFileName[MAX_PATH + 32];

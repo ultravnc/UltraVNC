@@ -152,6 +152,9 @@ public:
 	//adzm 2009-07-19
 	bool m_fAutoAcceptNoDSM;
 
+	//adzm 2010-02-15
+	void CheckProxyAndHost();
+
 #ifdef UNDER_CE
 	// WinCE screen format for dialogs (Palm vs HPC)
 	int	m_palmpc;

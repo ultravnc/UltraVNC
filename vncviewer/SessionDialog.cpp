@@ -214,14 +214,50 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 
 			GetDlgItemText(hwnd, IDC_PROXY_EDIT, display, 256);
             _tcscpy(fulldisplay, display);
-            if (!ParseDisplay(display, tmphost, 255, &_this->m_proxyport)) {
-                MessageBox(hwnd, 
-                    sz_F8, 
-                    sz_F10, MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TOPMOST);
-            } else {
-                _tcscpy(_this->m_proxyhost, tmphost);
-                EndDialog(hwnd, TRUE);
-            }
+
+			//adzm 2010-02-15
+			if (strlen(display) > 0) {
+				TCHAR actualProxy[256];
+				strcpy(actualProxy, display);
+
+				if (strncmp(tmphost, "ID", 2) == 0) {
+
+					int numericId = _this->m_port;
+
+					int numberOfHosts = 1;
+					for (int i = 0; i < strlen(display); i++) {
+						if (display[i] == ';') {
+							numberOfHosts++;
+						}
+					}
+
+					if (numberOfHosts <= 1) {
+						// then hostname == actualhostname
+					} else {
+						int modulo = numericId % numberOfHosts;
+
+						char* szToken = strtok(display, ";");
+						while (szToken) {
+							if (modulo == 0) {
+								strcpy(actualProxy, szToken);
+								break;
+							}
+
+							modulo--;
+							szToken = strtok(NULL, ";");
+						}
+					}
+				}
+
+				if (!ParseDisplay(actualProxy, tmphost, 255, &_this->m_proxyport)) {
+					MessageBox(hwnd, 
+						sz_F8, 
+						sz_F10, MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TOPMOST);
+				} else {
+					_tcscpy(_this->m_proxyhost, tmphost);
+					EndDialog(hwnd, TRUE);
+				}
+			}
 
 			HWND hProxy = GetDlgItem(hwnd, IDC_PROXY_CHECK);
 			if (SendMessage(hProxy, BM_GETCHECK, 0, 0) == BST_CHECKED)

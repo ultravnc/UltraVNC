@@ -740,14 +740,23 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 			ArgError(sz_D27); // sf@ - Todo: put correct message here
 			continue;
 		}
-		TCHAR proxyhost[256];
+		
+		m_fUseProxy = true;
+		_tcscpy(m_proxyhost, args[j]);
+		//adzm 2010-02-15
+		CheckProxyAndHost();
+
+		/*
 		if (!ParseDisplay(args[j], proxyhost, 255, &m_proxyport)) {
 			ShowUsage(sz_D28);
 			PostQuitMessage(1);
 		} else {
 			m_fUseProxy = true;
 			_tcscpy(m_proxyhost, proxyhost);
+			//adzm 2010-02-15
+			CheckProxyAndHost();
 		}
+		*/
 	}
 	else if (SwitchMatch(args[j], _T("autoreconnect"))) 
 	{
@@ -785,6 +794,8 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 							phost[l_i] = toupper(phost[l_i]);
 						} 
         _tcscpy(m_host_options, phost);
+		//adzm 2010-02-15
+		CheckProxyAndHost();
         m_connectionSpecified = true;
       }
     }
@@ -802,7 +813,50 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
   delete [] args;
 }
 
+//adzm 2010-02-15
+void VNCOptions::CheckProxyAndHost()
+{
+	if (strlen(m_proxyhost) > 0) {
+		TCHAR actualProxy[256];
+		strcpy(actualProxy, m_proxyhost);
 
+		if (strlen(m_host_options) > 0) {
+			if (strncmp(m_host_options, "ID", 2) == 0) {
+
+				int numericId = m_port;
+
+				int numberOfHosts = 1;
+				for (size_t i = 0; i < strlen(m_proxyhost); i++) {
+					if (m_proxyhost[i] == ';') {
+						numberOfHosts++;
+					}
+				}
+
+				if (numberOfHosts <= 1) {
+					// then hostname == actualhostname
+				} else {
+					int modulo = numericId % numberOfHosts;
+
+					char* szToken = strtok(m_proxyhost, ";");
+					while (szToken) {
+						if (modulo == 0) {
+							strcpy(actualProxy, szToken);
+							break;
+						}
+
+						modulo--;
+						szToken = strtok(NULL, ";");
+					}
+				}
+			}
+
+			if (!ParseDisplay(actualProxy, m_proxyhost, 255, &m_proxyport)) {
+				ShowUsage(sz_D28);
+				PostQuitMessage(1);
+			}
+		}
+	}
+}
 
 void saveInt(char *name, int value, char *fname) 
 {

@@ -288,6 +288,7 @@ FileTransfer::FileTransfer(VNCviewerApp *l_pApp, ClientConnection *pCC)
     m_maxHistExtent = 0;
 	m_mmRes = -1; 
 	m_timerID = 0xFFFFFFFF;
+	m_dwStartTick = GetTickCount();
 
 	// adzm 2009-08-02
 	memset(m_szLastLocalPath, 0, sizeof(m_szLastLocalPath));
@@ -1795,7 +1796,7 @@ void FileTransfer::ListDrives(HWND hWnd)
 //
 void FileTransfer::SetTotalSize(HWND hWnd, DWORD dwTotalSize)
 {
-//	vnclog.Print(0, _T("SetTotalSize\n"));
+//	vnclog.Print(0, _T("SetTotalSize\n"));	
 	SendDlgItemMessage(hWnd, IDC_PROGRESS, PBM_SETPOS, (WPARAM)0, (LPARAM)0L);
 	SendDlgItemMessage(hWnd, IDC_PROGRESS, PBM_SETRANGE, (WPARAM)0, MAKELPARAM(0, m_nBlockSize));
 }
@@ -1819,9 +1820,13 @@ void FileTransfer::SetGauge(HWND hWnd, __int64 dwCount)
 	DWORD dwPercent = (DWORD)(((__int64)(dwSmallerCount) * 100 / dwSmallerFileSize));
 	if (dwPercent != m_dwCurrentPercent)
 	{
-		char szPercent[5];
-		sprintf(szPercent, "%d%%", dwPercent);
-		SetDlgItemText(hWnd, IDC_PERCENT, szPercent);
+		// adzm - Include the speed and kb total
+		char szPercentAndSpeed[255];
+		DWORD dwMsElapsed = GetTickCount() - m_dwStartTick;
+		double dKbTotal = double(dwCount) / 1024;
+		double dKbps = (dKbTotal / (double(dwMsElapsed) / 1000));
+		sprintf(szPercentAndSpeed, "%d%% (%4.0f kb @ ~%4.0f kb/s)", dwPercent, dKbTotal, dKbps);
+		SetDlgItemText(hWnd, IDC_PERCENT, szPercentAndSpeed);
 		m_dwCurrentPercent = dwPercent;
 	}
 }
@@ -2156,6 +2161,8 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, int nLen)
 
 	m_fFileDownloadError = false;
 	m_fFileDownloadRunning = true;
+
+	m_dwStartTick = GetTickCount();
 
 	// FT Backward compatibility DIRTY hack for DSMPlugin mode...
 	if (UsingOldProtocol() && m_pCC->m_fUsePlugin)
@@ -2502,7 +2509,7 @@ bool FileTransfer::OfferLocalFile(LPSTR szSrcFileName)
 
 	SetStatus(szStatus);
 	m_nnFileSize = n2SrcSize.QuadPart;
-	SetTotalSize(hWnd, m_nnFileSize); // In bytes
+	SetTotalSize(hWnd, (DWORD)m_nnFileSize); // In bytes
 	SetGauge(hWnd, 0); // In bytes
 	UpdateWindow(hWnd);
 
@@ -2754,6 +2761,7 @@ bool FileTransfer::SendFile(long lSize, int nLen)
     m_fFileUploadError = false;
 	//m_dwLastChunkTime = timeGetTime();
 	m_dwLastChunkTime = GetTickCount();
+	m_dwStartTick = GetTickCount();
 	// m_nNotSent = 0;
 	// SendFileChunk();
 	return true;
@@ -4168,6 +4176,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 		int icx;
 		int icy;
 		int lf_an;
+		int iProgressRight;
 		RECT rc;
 
 		if(wParam == SIZE_MINIMIZED)
@@ -4202,14 +4211,14 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 		MoveWindow(GetDlgItem(hWnd, IDC_REMOTE_STATUS),                lf_an+109, cy-85+4, lf_an,                   15, TRUE);
 
 		//Bottom
-		icx = cx-135-69;
+		iProgressRight = cx-6-97-6-180-6;
 		MoveWindow(GetDlgItem(hWnd, IDC_HS_STATIC),                  8,          cy-85+4+18+4,     39,                15, TRUE);
 		GetWindowRect(GetDlgItem(hWnd, IDC_HISTORY_CB), &rc);
 		MoveWindow(GetDlgItem(hWnd, IDC_HISTORY_CB),                65,            cy-85+4+18,  cx-69,  rc.bottom-rc.top, TRUE);
 		MoveWindow(GetDlgItem(hWnd, IDC_PR_STATIC),                  8,   cy-85+4+15+4+4+18+3,     56,                15, TRUE);
-		MoveWindow(GetDlgItem(hWnd, IDC_PROGRESS),                  65,   cy-85+4+15+4+4+18+2,    icx,                15, TRUE);
-		MoveWindow(GetDlgItem(hWnd, IDC_PERCENT),             65+icx+6, cy-85+4+10+4+4+18+4+2,     25,                12, TRUE);
-		MoveWindow(GetDlgItem(hWnd, IDC_GLOBAL_STATUS),  65+icx+6+25+3, cy-85+4+10+4+4+18+4+2,     97,                12, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDC_PROGRESS),                  65,   cy-85+4+15+4+4+18+2,    iProgressRight-65,  15, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDC_PERCENT),             cx-6-97-6-180, cy-85+4+10+4+4+18+4+2,     180,          12, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDC_GLOBAL_STATUS),  cx-6-97, cy-85+4+10+4+4+18+4+2,     97,					  12, TRUE);
 		GetWindowRect(GetDlgItem(hWnd, IDC_STATUS), &rc);
 		MoveWindow(GetDlgItem(hWnd, IDC_STATUS),                     0, cy-(rc.bottom-rc.top),     cx,  rc.bottom-rc.top, TRUE);
 
@@ -4326,6 +4335,13 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 		if (_this->m_timer != 0) KillTimer(hWnd, _this->m_timer);
 		EndDialog(hWnd, FALSE);
 		return TRUE;
+
+	case WM_SHOWWINDOW:
+		// adzm - fix for window not restoring when hidden via show desktop, win+d, etc
+		if (!wParam) {
+			_this->m_fVisible = false;
+		}
+		break;
 
 	}
 	/*
