@@ -115,6 +115,7 @@
 #define IDC_NORMAL                      1046
 #define IDC_ABORT_B                     1047
 #define IDC_CURR_LOCAL                  1048
+#define IDC_PLUGIN_STATUS               1048
 #define IDC_CURR_REMOTE                 1049
 #define IDC_LOCAL_LIST                  1052
 #define IDC_REMOTE_LIST                 1053
@@ -209,7 +210,6 @@
 #define IDC_RADIO2                      1161
 #define IDC_MANUAL                      1161
 #define IDC_CHECK2                      1162
-
 #define IDC_ENCODING_BASE               1999
 #define IDC_RAWRADIO                    2000
 #define IDC_RRERADIO                    2002

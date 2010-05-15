@@ -341,6 +341,9 @@ public:
 	virtual void SetDSMPluginName(char* szDSMPlugin);
 	virtual BOOL SetDSMPlugin(BOOL fForceReload);
 	virtual CDSMPlugin* GetDSMPluginPointer() { return m_pDSMPlugin;};
+	//adzm 2010-05-12 - dsmplugin config
+	virtual void SetDSMPluginConfig(char* szDSMPluginConfig);
+	virtual char* GetDSMPluginConfig() { return m_szDSMPluginConfig;};
 
 	// sf@2002 - Cursor handling
 	virtual void EnableXRichCursor(BOOL fEnable);
@@ -548,6 +551,8 @@ protected:
 	BOOL m_fDSMPluginEnabled;
 	char m_szDSMPlugin[128];
 	CDSMPlugin *m_pDSMPlugin;
+	//adzm 2010-05-12 - dsmplugin config
+	char m_szDSMPluginConfig[512];
 
 	// sf@2002 - Cursor handling
 	BOOL m_fXRichCursor; 

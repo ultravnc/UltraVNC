@@ -148,6 +148,10 @@ CDSMPlugin::CDSMPlugin()
 	m_PReset = NULL;
 	//adzm - 2009-06-21
 	m_PCreatePluginInterface = NULL;
+	//adzm 2010-05-10
+	m_PCreateIntegratedPluginInterface = NULL;
+	//adzm 2010-05-12 - dsmplugin config
+	m_PConfig = NULL;
 }
 
 //
@@ -191,10 +195,11 @@ char* CDSMPlugin::DescribePlugin(void)
 		 szDescription = (*m_PDescription)();
 		 if (szDescription != NULL)
 		 {
+			 //adzm 2010-05-10 - this was inconsistent with the way the plugins are written
 			MyStrToken(m_szPluginName, szDescription, 1, ',');
-			MyStrToken(m_szPluginAuthor, szDescription, 2, ',');
+			MyStrToken(m_szPluginVersion, szDescription, 2, ',');
 			MyStrToken(m_szPluginDate, szDescription, 3, ',');
-			MyStrToken(m_szPluginVersion, szDescription, 4, ',');
+			MyStrToken(m_szPluginAuthor, szDescription, 4, ',');
 			MyStrToken(m_szPluginFileName, szDescription, 5, ',');
 		 }
 		 return szDescription;
@@ -231,12 +236,19 @@ bool CDSMPlugin::ResetPlugin(void)
 //
 // szParams is the key (or password) that is transmitted to the loaded DSMplugin
 //
-bool CDSMPlugin::SetPluginParams(HWND hWnd, char* szParams)
+bool CDSMPlugin::SetPluginParams(HWND hWnd, char* szParams, char* szConfig, char** pszNewConfig)
 {
 	// TODO: Log events
-	int nRes = (*m_PSetParams)(hWnd, szParams);
-	if (nRes > 0) return true; else return false;
 
+	//adzm 2010-05-12 - dsmplugin config
+	if (m_PConfig) {
+		char* szNewConfig = NULL;
+		int nRes = (*m_PConfig)(hWnd, szParams, szConfig, pszNewConfig);		
+		if (nRes > 0) return true; else return false;
+	} else {
+		int nRes = (*m_PSetParams)(hWnd, szParams);
+		if (nRes > 0) return true; else return false;
+	}
 }
 
 
@@ -394,6 +406,10 @@ bool CDSMPlugin::LoadPlugin(char* szPlugin, bool fAllowMulti)
 	m_PReset           = (RESET)           GetProcAddress(m_hPDll, "Reset");
 	//adzm - 2009-06-21
 	m_PCreatePluginInterface	= (CREATEPLUGININTERFACE)	GetProcAddress(m_hPDll, "CreatePluginInterface");
+	//adzm 2010-05-10
+	m_PCreateIntegratedPluginInterface	= (CREATEINTEGRATEDPLUGININTERFACE)	GetProcAddress(m_hPDll, "CreateIntegratedPluginInterface");
+	//adzm 2010-05-12 - dsmplugin config
+	m_PConfig         = (CONFIG)           GetProcAddress(m_hPDll, "Config");
 
 	if (m_PStartup == NULL || m_PShutdown == NULL || m_PSetParams == NULL || m_PGetParams == NULL
 		|| m_PTransformBuffer == NULL || m_PRestoreBuffer == NULL || m_PFreeBuffer == NULL)
@@ -448,7 +464,23 @@ IPlugin* CDSMPlugin::CreatePluginInterface()
 
 bool CDSMPlugin::SupportsMultithreaded()
 {
-	return m_PCreatePluginInterface != NULL;
+	//adzm 2010-05-10
+	return m_PCreatePluginInterface != NULL || m_PCreateIntegratedPluginInterface != NULL;
+}
+
+//adzm 2010-05-10
+IIntegratedPlugin* CDSMPlugin::CreateIntegratedPluginInterface()
+{
+	if (m_PCreateIntegratedPluginInterface) {
+		return m_PCreateIntegratedPluginInterface();
+	} else {
+		return NULL;
+	}
+}
+
+bool CDSMPlugin::SupportsIntegrated()
+{
+	return m_PCreateIntegratedPluginInterface != NULL;
 }
 
 

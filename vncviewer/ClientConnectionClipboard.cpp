@@ -46,7 +46,12 @@ void ClientConnection::ProcessLocalClipboardChange()
 	
 	HWND hOwner = GetClipboardOwner();
 
-	if (m_pFileTransfer->m_fFileTransferRunning ||m_pFileTransfer->m_fFileUploadRunning || m_pFileTransfer->m_fFileDownloadRunning)
+	//adzm 2010-05-11 - Ignore clipboard while initializing (copying a password, for example, will end up sending a packet and causing a failure)
+	if (!m_running)
+	{
+		vnclog.Print(2, _T("Ignore Clipboard while initializing!\n"));
+	}
+	else if (m_pFileTransfer->m_fFileTransferRunning ||m_pFileTransfer->m_fFileUploadRunning || m_pFileTransfer->m_fFileDownloadRunning)
 	{
 		vnclog.Print(2, _T("Ignore Clipboard while FT is buzy!\n"));
 	}

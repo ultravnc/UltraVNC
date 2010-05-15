@@ -1014,7 +1014,163 @@ vncClientThread::InitAuthenticate()
 	}
 
 	// Authenticate the connection, if required
-	if (m_auth || (strlen(plain) == 0))
+	//adzm 2010-05-10	
+	if (m_socket->IsUsePluginEnabled() && m_server->GetDSMPluginPointer()->IsEnabled() && m_socket->GetIntegratedPlugin() != NULL)
+	{
+		BOOL auth_ok = FALSE;
+
+		// Send auth-required message
+		CARD32 auth_val = Swap32IfLE(rfbUltraVNC_SecureVNCPlugin);
+		if (!m_socket->SendExact((char *)&auth_val, sizeof(auth_val)))
+			return FALSE;
+
+		const char* plainPassword = plain;
+
+		if (!m_ms_logon && plainPassword && strlen(plainPassword) > 0) {
+			m_socket->GetIntegratedPlugin()->SetPasswordData((const BYTE*)plainPassword, strlen(plainPassword));
+		}
+
+		int nSequenceNumber = 0;
+		bool bSendChallenge = true;
+		do
+		{
+			BYTE* pChallenge = NULL;
+			int nChallengeLength = 0;
+
+			if (!m_socket->GetIntegratedPlugin()->GetChallenge(pChallenge, nChallengeLength, nSequenceNumber)) {
+				m_socket->GetIntegratedPlugin()->FreeMemory(pChallenge);
+				return FALSE;
+			}
+
+			WORD wChallengeLength = (WORD)nChallengeLength;
+
+			if (!m_socket->SendExact((const char*)&wChallengeLength, sizeof(wChallengeLength))) {
+				m_socket->GetIntegratedPlugin()->FreeMemory(pChallenge);
+				return FALSE;
+			}
+
+			if (!m_socket->SendExact((const char*)pChallenge, nChallengeLength)) {
+				m_socket->GetIntegratedPlugin()->FreeMemory(pChallenge);
+				return FALSE;
+			}
+
+			m_socket->GetIntegratedPlugin()->FreeMemory(pChallenge);
+
+			WORD wResponseLength = 0;
+			if (!m_socket->ReadExact((char*)&wResponseLength, sizeof(wResponseLength))) {
+				return FALSE;
+			}
+
+			BYTE* pResponseData = new BYTE[wResponseLength];
+			
+			if (!m_socket->ReadExact((char*)pResponseData, wResponseLength)) {
+				delete[] pResponseData;
+				return FALSE;
+			}
+
+			if (!m_socket->GetIntegratedPlugin()->HandleResponse(pResponseData, (int)wResponseLength, nSequenceNumber, bSendChallenge)) {
+				auth_ok = FALSE;
+				bSendChallenge = false;
+			} else if (!bSendChallenge) {
+				auth_ok = TRUE;
+			}
+
+			delete[] pResponseData;
+
+			nSequenceNumber++;
+		} while (bSendChallenge);
+
+		if (auth_ok && m_ms_logon) /*(mslogon && !oldmslogon) TODO*/
+		{
+			//adzm 2010-05-10 - this will set HandshakeComplete after sending the MsLogon authentication type packet
+			if (!AuthMsLogon())
+				auth_ok = FALSE;
+		} else {
+			// Did the authentication work?
+			CARD32 authmsg;
+			if (!auth_ok)
+			{
+				vnclog.Print(LL_CONNERR, VNCLOG("authentication failed\n"));
+				//////////////////
+				// LOG it also in the event
+				//////////////////
+				{
+					typedef BOOL (*LogeventFn)(char *machine);
+					LogeventFn Logevent = 0;
+					char szCurrentDir[MAX_PATH];
+					if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
+						{
+							char* p = strrchr(szCurrentDir, '\\');
+							*p = '\0';
+							strcat (szCurrentDir,"\\logging.dll");
+						}
+					HMODULE hModule = LoadLibrary(szCurrentDir);
+					if (hModule)
+						{
+							BOOL result=false;
+							Logevent = (LogeventFn) GetProcAddress( hModule, "LOGFAILED" );
+							Logevent((char *)m_client->GetClientName());
+							FreeLibrary(hModule);
+						}
+				}
+
+				//adzm 2010-05-11 - Send an explanatory message for the failure (if any)
+
+				const char* errmsg = m_socket->GetIntegratedPlugin()->GetLastErrorString();
+				CARD32 errlen = Swap32IfLE(strlen(errmsg));
+
+				if (errlen > 0) {
+					authmsg = Swap32IfLE(rfbVncAuthFailedEx);
+					if (!m_socket->SendExact((char *)&authmsg, sizeof(authmsg)))
+						return FALSE;
+					if (!m_socket->SendExact((char *)&errlen, sizeof(errlen)))
+						return FALSE;
+					if (!m_socket->SendExact(errmsg, strlen(errmsg)))
+						return FALSE;
+				} else {
+					authmsg = Swap32IfLE(rfbVncAuthFailed);
+					if (!m_socket->SendExact((char *)&authmsg, sizeof(authmsg)))
+						return FALSE;
+				}
+
+				return FALSE;
+			}
+			else
+			{
+				// Tell the client we're ok
+				authmsg = Swap32IfLE(rfbVncAuthOK);
+				//////////////////
+				// LOG it also in the event
+				//////////////////
+				if (!m_ms_logon){
+					typedef BOOL (*LogeventFn)(char *machine);
+					LogeventFn Logevent = 0;
+					char szCurrentDir[MAX_PATH];
+					if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
+						{
+							char* p = strrchr(szCurrentDir, '\\');
+							*p = '\0';
+							strcat (szCurrentDir,"\\logging.dll");
+						}
+					HMODULE hModule = LoadLibrary(szCurrentDir);
+					if (hModule)
+						{
+							BOOL result=false;
+							Logevent = (LogeventFn) GetProcAddress( hModule, "LOGLOGON" );
+							Logevent((char *)m_client->GetClientName());
+							FreeLibrary(hModule);
+						}
+				}
+				if (!m_socket->SendExact((char *)&authmsg, sizeof(authmsg)))
+					return FALSE;
+			}			
+
+			if (auth_ok) {			
+				m_socket->GetIntegratedPlugin()->SetHandshakeComplete();
+			}
+		}
+	}
+	else if (m_auth || (strlen(plain) == 0))
 	{
 		// Send no-auth-required message
 		CARD32 auth_val = Swap32IfLE(rfbNoAuth);
@@ -1288,6 +1444,12 @@ vncClientThread::AuthMsLogon() {
 	if (!m_socket->SendExact((char *)&auth_val, sizeof(auth_val)))
 		return FALSE;
 
+
+	//adzm 2010-05-10
+	if (m_socket->IsUsePluginEnabled() && m_server->GetDSMPluginPointer()->IsEnabled() && m_socket->GetIntegratedPlugin() != NULL) {
+		m_socket->GetIntegratedPlugin()->SetHandshakeComplete();
+	}
+
 	DH dh;
 	char gen[8], mod[8], pub[8], resp[8];
 	char user[256], passwd[64];
@@ -1413,6 +1575,9 @@ vncClientThread::run(void *arg)
 	{
 		m_socket->SetDSMPluginPointer(m_server->GetDSMPluginPointer());
 		vnclog.Print(LL_INTINFO, VNCLOG("DSMPlugin Pointer to socket OK\n"));
+
+		//adzm 2010-05-12 - dsmplugin config
+		m_socket->SetDSMPluginConfig(m_server->GetDSMPluginConfig());
 	}
 	else
 	{

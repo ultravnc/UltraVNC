@@ -183,6 +183,8 @@ typedef char rfbProtocolVersionMsg[13];	/* allow extra byte for null */
 #define rfbConnFailed 0
 #define rfbNoAuth 1
 #define rfbVncAuth 2
+//adzm 2010-05-10
+#define rfbUltraVNC_SecureVNCPlugin 17
 /* rfbMsLogon indicates UltraVNC's MS-Logon with (hopefully) better security */
 #define rfbMsLogon 0xfffffffa
 
@@ -211,6 +213,7 @@ typedef char rfbProtocolVersionMsg[13];	/* allow extra byte for null */
 #define rfbVncAuthOK 0
 #define rfbVncAuthFailed 1
 #define rfbVncAuthTooMany 2
+#define rfbVncAuthFailedEx 3 //adzm 2010-05-11 - Send an explanatory message for the failure (if any)
 
 
 /*-----------------------------------------------------------------------------

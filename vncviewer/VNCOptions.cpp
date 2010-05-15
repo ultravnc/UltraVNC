@@ -177,6 +177,9 @@ VNCOptions::VNCOptions()
   //adzm 2009-07-19
   m_fAutoAcceptNoDSM = false;
 
+  //adzm 2010-05-12
+  m_fRequireEncryption = false;
+
   // sf@2003 - Auto Scaling
   m_saved_scale_num = 100;
   m_saved_scale_den = 100;
@@ -329,6 +332,9 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
   
   //adzm 2009-07-19
   m_fAutoAcceptNoDSM = s.m_fAutoAcceptNoDSM;
+  
+  //adzm 2010-05-12
+  m_fRequireEncryption = s.m_fRequireEncryption;
 
 #ifdef UNDER_CE
   m_palmpc			= s.m_palmpc;
@@ -782,6 +788,11 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 		//adzm 2009-07-19
 		m_fAutoAcceptNoDSM = true;
 	}
+	else if (SwitchMatch(args[j], _T("requireencryption")))
+	{
+	    //adzm 2010-05-12
+	    m_fRequireEncryption = true;
+	}
 	else
 	{
       TCHAR phost[256];
@@ -931,6 +942,9 @@ void VNCOptions::Save(char *fname)
   
   //adzm 2009-07-19
   saveInt("AutoAcceptNoDSM",		m_fAutoAcceptNoDSM, fname);
+	    
+  //adzm 2010-05-12
+  saveInt("RequireEncryption",		m_fRequireEncryption, fname);
 }
 
 void VNCOptions::Load(char *fname)
@@ -1019,6 +1033,9 @@ void VNCOptions::Load(char *fname)
   
   //adzm 2009-07-19
   m_fAutoAcceptNoDSM = readInt("AutoAcceptNoDSM", (int)m_fAutoAcceptNoDSM, fname) ? true : false;
+
+  //adzm 2010-05-12
+  m_fRequireEncryption = readInt("RequireEncryption", (int)m_fRequireEncryption, fname) ? true : false;
 }
 
 // Record the path to the VNC viewer and the type
@@ -1073,23 +1090,24 @@ void VNCOptions::ShowUsage(LPTSTR info) {
     tmpinf = info;
   _stprintf(msg, 
 #ifdef UNDER_CE
-            _T("%s\n\rUsage includes:\n\r")
-            _T("vncviewer [/8bit] [/swapmouse] [/shared] [/belldeiconify] \n\r")
-            _T(" [/hpc | /palm] [/slow] [server:display] \n\r")
+            _T("%s\r\nUsage includes:\r\n")
+            _T("vncviewer [/8bit] [/swapmouse] [/shared] [/belldeiconify] \r\n")
+            _T(" [/hpc | /palm] [/slow] [server:display] \r\n")
             _T("For full details see documentation."),
 #else
-            _T("%s\n\rUsage includes:\n\r"
-               "  vncviewer [/8bit] [/swapmouse] [/shared] [/belldeiconify] \n\r"
-               "      [/listen [portnum]] [/fullscreen] [/viewonly] [/notoolbar]\n\r"
-               "      [/scale a/b] [/config configfile] [server:display] \n\r"
-			   "      [/emulate3] [/quickoption n] [/serverscale n]\n\r"
-			   "      [/askexit] [/user msuser] [/password clearpassword]\n\r" // Added silentexit //PGM@ Advantig.com
-			   "      [/nostatus] [/dsmplugin pluginfilename.dsm] [/autoscaling] \n\r"
-			   "      [/autoreconnect delayInSeconds] \n\r"
+            _T("%s\r\nUsage includes:\r\n"
+               "  vncviewer [/8bit] [/swapmouse] [/shared] [/belldeiconify]\r\n"
+               "      [/listen [portnum]] [/fullscreen] [/viewonly] [/notoolbar]\r\n"
+               "      [/scale a/b] [/config configfile] [server:display]\r\n"
+			   "      [/emulate3] [/quickoption n] [/serverscale n]\r\n"
+			   "      [/askexit] [/user msuser] [/password clearpassword]\r\n" // Added silentexit //PGM@ Advantig.com
+			   "      [/nostatus] [/dsmplugin pluginfilename.dsm] [/autoscaling]\r\n"
+			   "      [/autoreconnect delayInSeconds]\r\n"
 			   "      [/nohotkeys] [/proxy proxyhost [portnum]] [/256colors] [/64colors]\r\n"
 			   "      [/8colors] [/8greycolors] [/4greycolors] [/2greycolors]\r\n"
-			   "      [/encoding [zrle | zywrle | tight | zlib | zlibhex | ultra]] \r\n"
+			   "      [/encoding [zrle | zywrle | tight | zlib | zlibhex | ultra]]\r\n"
 			   "      [/autoacceptincoming] [/autoacceptnodsm] [/disablesponsor]\r\n" //adzm 2009-06-21, adzm 2009-07-19
+			   "      [/requireencryption]\r\n" //adzm 2010-05-12 
                "For full details see documentation."), 
 #endif
             tmpinf);

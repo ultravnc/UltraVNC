@@ -478,6 +478,8 @@ private:
 
 	//adzm - 2009-06-21
 	IPlugin* m_pPluginInterface;
+	//adzm 2010-05-10
+	IIntegratedPlugin* m_pIntegratedPluginInterface;
 	BYTE* TransformBuffer(BYTE* pDataBuffer, int nDataLen, int* nTransformedDataLen);
 	BYTE* RestoreBufferStep1(BYTE* pDataBuffer, int nDataLen, int* nRestoredDataLen);
 	BYTE* RestoreBufferStep2(BYTE* pDataBuffer, int nDataLen, int* nRestoredDataLen);

@@ -40,6 +40,8 @@
 AuthDialog::AuthDialog()
 {
 	m_passwd[0]=__T('\0');
+	//adzm 2010-05-12 - passphrase
+	m_bPassphraseMode = false;
 }
 
 AuthDialog::~AuthDialog()
@@ -116,7 +118,9 @@ BOOL CALLBACK AuthDialog::DlgProc1(  HWND hwnd,  UINT uMsg,
 		{
             helper::SafeSetWindowUserData(hwnd, lParam);
 			_this = (AuthDialog *) lParam;
-            Edit_LimitText(GetDlgItem(hwnd, IDC_PASSWD_EDIT), 8);
+			
+			//adzm 2010-05-12 - passphrase
+			Edit_LimitText(GetDlgItem(hwnd, IDC_PASSWD_EDIT), _this->m_bPassphraseMode ? 128 : 8);
 			CentreWindow(hwnd);
 			return TRUE;
 		}
@@ -141,4 +145,3 @@ BOOL CALLBACK AuthDialog::DlgProc1(  HWND hwnd,  UINT uMsg,
 	}
 	return 0;
 }
-

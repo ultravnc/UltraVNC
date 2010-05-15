@@ -152,6 +152,9 @@ public:
 	//adzm 2009-07-19
 	bool m_fAutoAcceptNoDSM;
 
+	//adzm 2010-05-12
+	bool m_fRequireEncryption;
+
 	//adzm 2010-02-15
 	void CheckProxyAndHost();
 

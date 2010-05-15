@@ -40,4 +40,8 @@ public:
 		WPARAM wParam, LPARAM lParam );
 	static BOOL CALLBACK DlgProc1(  HWND hwndDlg,  UINT uMsg, 
 		WPARAM wParam, LPARAM lParam );
+
+	
+	//adzm 2010-05-12 - passphrase
+	bool m_bPassphraseMode;
 };

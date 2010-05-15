@@ -233,6 +233,8 @@ ClientConnection::ClientConnection()
 	m_keymapJap = NULL;
 	//adzm - 2009-06-21
 	m_pPluginInterface = NULL;
+	//adzm 2010-05-10
+	m_pIntegratedPluginInterface = NULL;
 	SB_HORZ_BOOL=true;
 	SB_VERT_BOOL=true;
 }
@@ -350,6 +352,8 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_nZRLENetRectBufSize = 0;
 	//adzm - 2009-06-21
 	m_pPluginInterface = NULL;
+	//adzm 2010-05-10
+	m_pIntegratedPluginInterface = NULL;
 
 	// ZlibHex
 	m_decompStreamInited = false;
@@ -1430,6 +1434,8 @@ void ClientConnection::SetDSMPluginStuff()
 	if (m_pPluginInterface) {
 		delete m_pPluginInterface;
 		m_pPluginInterface = NULL;
+		//adzm 2010-05-10
+		m_pIntegratedPluginInterface = NULL;
 	}
 
 	if (m_pDSMPlugin->IsEnabled())
@@ -1473,7 +1479,17 @@ void ClientConnection::SetDSMPluginStuff()
 
 		//adzm - 2009-06-21
 		if (m_pDSMPlugin->SupportsMultithreaded()) {
-			m_pPluginInterface = m_pDSMPlugin->CreatePluginInterface();
+			//adzm 2010-05-10
+			if (m_pDSMPlugin->SupportsIntegrated()) {
+				m_pIntegratedPluginInterface = m_pDSMPlugin->CreateIntegratedPluginInterface();
+				m_pPluginInterface = m_pIntegratedPluginInterface;
+			} else {
+				m_pIntegratedPluginInterface = NULL;
+				m_pPluginInterface = m_pDSMPlugin->CreatePluginInterface();
+			}
+		} else {
+			m_pIntegratedPluginInterface = NULL;
+			m_pPluginInterface = NULL;
 		}
 	} else {
 		vnclog.Print(0, _T("DSMPlugin not enabled\n"));
@@ -1839,24 +1855,36 @@ void ClientConnection::NegotiateProtocolVersion()
     pv[sz_rfbProtocolVersionMsg] = 0;
 
 	//adzm 2009-06-21 - warn if we are trying to connect to an unencrypted server. but still allow it if desired.
-	if (m_fUsePlugin && fNotEncrypted) {
-		//SetSocketOptions / fDSMMode?
-		m_fUsePlugin = false;
+	//adzm 2010-05-10
+	if (m_fUsePlugin && fNotEncrypted && !m_pIntegratedPluginInterface) {
 
-		//adzm - 2009-06-21 - I don't set the plugin to be disabled here, just rely on m_fUsePlugin.
-		
-		//adzm - 2009-06-21
-		if (m_pPluginInterface) {
-			delete m_pPluginInterface;
-			m_pPluginInterface = NULL;
+		//adzm 2010-05-12
+		if (m_opts.m_fRequireEncryption) {
+			throw WarningException("The insecure connection was refused.");
 		}
+		else 
+		{
+			//SetSocketOptions / fDSMMode?
+			m_fUsePlugin = false;
 
-		//adzm 2009-07-19 - Auto-accept the connection if it is unencrypted if that option is specified
-		if (!m_opts.m_fAutoAcceptNoDSM) {
-			int returnvalue=MessageBox(m_hwndMain, "You have specified an encryption plugin, however this connection in unencrypted! Do you want to continue?", "Accept insecure SC connection", MB_YESNO | MB_ICONEXCLAMATION | MB_TOPMOST);
-			if (returnvalue==IDNO) 
+			//adzm - 2009-06-21 - I don't set the plugin to be disabled here, just rely on m_fUsePlugin.
+			
+			//adzm - 2009-06-21
+			if (m_pPluginInterface) {
+				delete m_pPluginInterface;
+				m_pPluginInterface = NULL;
+				//adzm 2010-05-10
+				m_pIntegratedPluginInterface = NULL;
+			}
+			if (!m_opts.m_fAutoAcceptNoDSM)
 			{
-				throw WarningException("You refused the insecure connection.");
+				//adzm 2009-07-19 - Auto-accept the connection if it is unencrypted if that option is specified
+
+				int returnvalue=MessageBox(m_hwndMain, "You have specified an encryption plugin, however this connection in unencrypted! Do you want to continue?", "Accept insecure connection", MB_YESNO | MB_ICONEXCLAMATION | MB_TOPMOST);
+				if (returnvalue==IDNO) 
+				{
+					throw WarningException("You refused the insecure connection.");
+				}
 			}
 		}
 	}
@@ -2091,6 +2119,201 @@ void ClientConnection::Authenticate()
 	ReadExact((char *)&authScheme, 4);
     authScheme = Swap32IfLE(authScheme);
 	if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L90);
+	
+	if (authScheme == rfbUltraVNC_SecureVNCPlugin)
+	{
+		if (!m_pIntegratedPluginInterface) {				
+			if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,"SecureVNCPlugin authentication failed (SecureVNCPlugin interface available)");
+			SetEvent(KillEvent);
+			throw ErrorException("SecureVNCPlugin authentication failed (no plugin interface available)");
+		}
+				
+		char passwd[256];
+		passwd[0] = '\0';
+		
+		if (strlen(m_clearPasswd)>0)
+		{
+			strcpy(passwd, m_clearPasswd);			
+		} 
+		else if (strlen((const char *) m_encPasswd)>0)
+		{  char * pw = vncDecryptPasswd(m_encPasswd);
+			strcpy(passwd, pw);
+			free(pw);
+		}
+		m_pIntegratedPluginInterface->SetPasswordData(NULL, 0);
+
+		int nSequenceNumber = 0;
+		bool bExpectChallenge = true;
+		bool bTriedNoPassword = false;
+		bool bSuccess = false;
+		bool bCancel = false;
+		do {
+
+			WORD wChallengeLength = 0;
+
+			ReadExact((char*)&wChallengeLength, sizeof(wChallengeLength));
+
+			BYTE* pChallengeData = new BYTE[wChallengeLength];
+
+			ReadExact((char*)pChallengeData, wChallengeLength);
+					
+			bool bPasswordOK = false;
+			bool bPassphraseRequired = false;
+			bSuccess = false;
+			do {
+				bSuccess = m_pIntegratedPluginInterface->HandleChallenge(pChallengeData, wChallengeLength, nSequenceNumber, bPasswordOK, bPassphraseRequired);
+				if (bSuccess && !bPasswordOK)
+				{
+					if (!bTriedNoPassword && strlen(passwd) > 0) {		
+						m_pIntegratedPluginInterface->SetPasswordData((const BYTE*)passwd, strlen(passwd));
+						bTriedNoPassword = true;
+					} else {
+						bTriedNoPassword = true;
+
+						AuthDialog ad;
+						//adzm 2010-05-12 - passphrase
+						ad.m_bPassphraseMode = bPassphraseRequired;
+						
+						if (ad.DoDialog(false))
+						{
+							strncpy(passwd, ad.m_passwd,254);
+							if (!bPassphraseRequired && strlen(passwd) > 8) {
+								passwd[8] = '\0';
+							}
+							
+							m_pIntegratedPluginInterface->SetPasswordData((const BYTE*)passwd, strlen(passwd));
+						}
+						else
+						{
+							bCancel = true; // cancel
+						}
+					}
+				}
+			} while (bSuccess && !bPasswordOK && !bCancel);
+
+			delete[] pChallengeData;
+			
+			if (bSuccess && !bCancel) {
+			
+				BYTE* pResponseData = NULL;
+				int nResponseLength = 0;
+				
+				m_pIntegratedPluginInterface->GetResponse(pResponseData, nResponseLength, nSequenceNumber, bExpectChallenge);
+				
+				WORD wResponseLength = (WORD)nResponseLength;
+				
+				WriteExact((char*)&wResponseLength, sizeof(wResponseLength));
+				
+				WriteExact((char*)pResponseData, nResponseLength);
+		
+				m_pIntegratedPluginInterface->FreeMemory(pResponseData);
+			}
+
+			nSequenceNumber++;
+		} while (bExpectChallenge && bSuccess);
+
+		if (bCancel) {
+			// cancelled
+			if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,"Authentication cancelled");
+			SetEvent(KillEvent);
+			throw ErrorException("Authentication cancelled");
+		} else if (!bSuccess) {
+			// other failure
+			if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,m_pIntegratedPluginInterface->GetLastErrorString());
+			SetEvent(KillEvent);
+			throw ErrorException(m_pIntegratedPluginInterface->GetLastErrorString());
+		}
+				
+		ReadExact((char *) &authResult, 4);
+		
+		authResult = Swap32IfLE(authResult);
+		
+		switch (authResult) 
+		{		
+		case rfbVncAuthOK:
+			if (m_hwndStatus)vnclog.Print(0, _T("VNC authentication succeeded\n"));
+			if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L55);
+		
+			//adzm 2010-05-10
+			m_pIntegratedPluginInterface->SetHandshakeComplete();
+			if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_PLUGIN_STATUS,m_pIntegratedPluginInterface->DescribeCurrentSettings());
+			g_passwordfailed=false;
+			break;
+		case rfbVncAuthFailed:
+			vnclog.Print(0, _T("VNC authentication failed!"));			
+			if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L56);
+//				if (flash) {flash->Killflash();}
+// 26 February 2008 jdp - speed up auth failure handling
+			SetEvent(KillEvent);
+			throw WarningException(sz_L57,IDS_L57);
+			break;
+		case rfbVncAuthFailedEx: 
+			vnclog.Print(0, _T("VNC authentication failed! Extended information available."));	
+			//adzm 2010-05-11 - Send an explanatory message for the failure (if any)
+			ReadExact((char *)&reasonLen, 4);
+			reasonLen = Swap32IfLE(reasonLen);
+			
+			CheckBufferSize(reasonLen+1);
+			ReadString(m_netbuf, reasonLen);
+			
+			vnclog.Print(0, _T("VNC authentication failed! Extended information: %s\n"), m_netbuf);
+			if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,m_netbuf);
+			throw WarningException(m_netbuf);
+			break;
+		case rfbVncAuthTooMany:
+			SetEvent(KillEvent);
+			throw WarningException(
+				sz_L58);
+			break;
+		case rfbMsLogon:		
+			//adzm 2010-05-10
+			m_pIntegratedPluginInterface->SetHandshakeComplete();
+			if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_PLUGIN_STATUS,m_pIntegratedPluginInterface->DescribeCurrentSettings());	
+			AuthMsLogon();
+			break;
+		default:
+			vnclog.Print(0, _T("Unknown VNC authentication result: %d\n"),
+				(int)authResult);
+//				if (flash) {flash->Killflash();}
+			throw ErrorException(sz_L59,IDS_L59);
+			break;
+		}
+		
+		return;
+	}
+
+	if (m_fUsePlugin && m_pIntegratedPluginInterface && authScheme != rfbConnFailed) 
+	{
+		//adzm 2010-05-12
+		if (m_opts.m_fRequireEncryption) {
+			throw WarningException("The insecure connection was refused.");
+		}
+		else
+		{
+			//SetSocketOptions / fDSMMode?
+			m_fUsePlugin = false;
+
+			//adzm - 2009-06-21 - I don't set the plugin to be disabled here, just rely on m_fUsePlugin.
+			
+			//adzm - 2009-06-21
+			if (m_pPluginInterface) {
+				delete m_pPluginInterface;
+				m_pPluginInterface = NULL;
+				//adzm 2010-05-10
+				m_pIntegratedPluginInterface = NULL;
+			}
+
+			//adzm 2009-07-19 - Auto-accept the connection if it is unencrypted if that option is specified
+			if (!m_opts.m_fAutoAcceptNoDSM) {
+				int returnvalue=MessageBox(m_hwndMain, "You have specified an encryption plugin, however this connection in unencrypted! Do you want to continue?", "Accept insecure connection", MB_YESNO | MB_ICONEXCLAMATION | MB_TOPMOST);
+				if (returnvalue==IDNO) 
+				{
+					throw WarningException("You refused the insecure connection.");
+				}
+			}
+		}
+	}
+	
     switch (authScheme) {
 		
     case rfbConnFailed:
@@ -2343,6 +2566,15 @@ void ClientConnection::Authenticate()
     case rfbMsLogon:
 		AuthMsLogon();
 		break;
+	case rfbUltraVNC_SecureVNCPlugin:
+		vnclog.Print(0, _T("SecureVNCPlugin authentication failed (SecureVNCPlugin plugin not available)"));
+		
+		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,"SecureVNCPlugin authentication failed (SecureVNCPlugin plugin not available)");
+//				if (flash) {flash->Killflash();}
+// 26 February 2008 jdp - speed up auth failure handling
+		SetEvent(KillEvent);
+		throw ErrorException("SecureVNCPlugin authentication failed (SecureVNCPlugin plugin not available)");
+		break;
 	default:
 		vnclog.Print(0, _T("Unknown authentication scheme from RFB server: %d\n"),
 			(int)authScheme);
@@ -2509,9 +2741,10 @@ void ClientConnection::ReadServerInit()
 	{
 			char szMess[255];
 			memset(szMess, 0, 255);
-			sprintf(szMess, "--- Ultr@VNC Viewer + %s-v%s",
+			sprintf(szMess, "--- Ultr@VNC Viewer + %s-v%s by %s ",
 					m_pDSMPlugin->GetPluginName(),
-					m_pDSMPlugin->GetPluginVersion()
+					m_pDSMPlugin->GetPluginVersion(),
+					m_pDSMPlugin->GetPluginAuthor()
 					);
 			strcat(m_desktopName, szMess);
 	}
@@ -3114,6 +3347,8 @@ ClientConnection::~ClientConnection()
 	if (m_pPluginInterface) {
 		delete m_pPluginInterface;
 		m_pPluginInterface = NULL;
+		//adzm 2010-05-10
+		m_pIntegratedPluginInterface = NULL;
 	}
 
 	// Modif sf@2002 - DSMPlugin handling
@@ -3883,8 +4118,10 @@ void* ClientConnection::run_undetached(void* arg) {
 			// m_pFileTransfer->m_fFileTransferRunning = false;
 			// m_pTextChat->m_fTextChatRunning = false;
 			if (m_pPluginInterface) {
-			delete m_pPluginInterface;
-			m_pPluginInterface = NULL;
+				delete m_pPluginInterface;
+				m_pPluginInterface = NULL;
+				//adzm 2010-05-10
+				m_pIntegratedPluginInterface = NULL;
 			}
 			m_bKillThread = true;
 			PostMessage(m_hwndMain, WM_CLOSE, reconnectcounter, 1);
@@ -4723,6 +4960,18 @@ void ClientConnection::ReadExactProtocolVersion(char *inbuf, int wanted, bool& f
 						return;
 					}
 
+					//adzm 2010-05-11
+					// if we have an encrypted start, and we are currently using an integrated inteface, reset
+					// and load the classic interface instead.
+					if (m_pIntegratedPluginInterface) {
+						// release the integrated interface
+						delete m_pIntegratedPluginInterface;
+						m_pIntegratedPluginInterface = NULL;
+						m_pPluginInterface = NULL;
+
+						// and load the classic interface						
+						m_pPluginInterface = m_pDSMPlugin->CreatePluginInterface();
+					}
 
 					// Get the DSMPlugin destination buffer where to put transformed incoming data
 					// The number of bytes to read calculated from bufflen is given back in nTransDataLen
@@ -5503,6 +5752,15 @@ LRESULT CALLBACK ClientConnection::GTGBS_StatusProc(HWND hwnd, UINT iMsg, WPARAM
 							_this->m_pDSMPlugin->GetPluginVersion()
 							);
 					SetDlgItemText(hwnd,IDC_STATUS, szMess);
+
+					//adzm 2010-05-10
+					if (_this->m_pIntegratedPluginInterface) {
+						SetDlgItemText(hwnd,IDC_PLUGIN_STATUS,_this->m_pIntegratedPluginInterface->DescribeCurrentSettings());
+					} else if (_this->m_pPluginInterface) {
+						SetDlgItemText(hwnd,IDC_PLUGIN_STATUS,"(plugin default encryption)");
+					} else {
+						SetDlgItemText(hwnd,IDC_PLUGIN_STATUS,"(no encryption)");
+					}
 				}
 				else
 					SetDlgItemText(hwnd,IDC_STATUS,sz_L49);

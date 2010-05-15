@@ -236,6 +236,10 @@ vncServer::vncServer()
 	m_fAutoRestart = false;
     m_ftTimeout = FT_RECV_TIMEOUT;
     m_keepAliveInterval = KEEPALIVE_INTERVAL;
+
+	
+	//adzm 2010-05-12 - dsmplugin config
+	m_szDSMPluginConfig[0] = '\0';
 }
 
 vncServer::~vncServer()
@@ -2278,7 +2282,8 @@ BOOL vncServer::SetDSMPlugin(BOOL bForceReload)
 		vnclog.Print(LL_INTINFO, VNCLOG("$$$$$$$$$$ SetDSMPlugin - SetPluginParams call \n"));
 
 
-		if (m_pDSMPlugin->SetPluginParams(NULL, szParams/*vncDecryptPasswd((char *)password)*/))
+		//adzm 2010-05-12 - dsmplugin config
+		if (m_pDSMPlugin->SetPluginParams(NULL, szParams/*vncDecryptPasswd((char *)password)*/, GetDSMPluginConfig(), NULL))
 		{
 			m_pDSMPlugin->SetEnabled(true); // The plugin is ready to be used
 			vnclog.Print(LL_INTINFO, VNCLOG("DSMPlugin Params OK\n"));
@@ -2303,6 +2308,12 @@ BOOL vncServer::SetDSMPlugin(BOOL bForceReload)
 	*/
 
 	return TRUE;
+}
+
+//adzm 2010-05-12 - dsmplugin config
+void vncServer::SetDSMPluginConfig(char* szDSMPluginConfig)
+{
+	strncpy_s(m_szDSMPluginConfig, sizeof(m_szDSMPluginConfig) - 1, szDSMPluginConfig, _TRUNCATE);
 }
 
 //
