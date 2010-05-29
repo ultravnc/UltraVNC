@@ -1017,6 +1017,9 @@ vncClientThread::InitAuthenticate()
 	//adzm 2010-05-10	
 	if (m_socket->IsUsePluginEnabled() && m_server->GetDSMPluginPointer()->IsEnabled() && m_socket->GetIntegratedPlugin() != NULL)
 	{
+		//adzm 2010-05-12 - dsmplugin config
+		m_socket->SetDSMPluginConfig(m_server->GetDSMPluginConfig());
+
 		BOOL auth_ok = FALSE;
 
 		// Send auth-required message
