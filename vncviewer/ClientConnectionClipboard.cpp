@@ -50,26 +50,87 @@ void ClientConnection::ProcessLocalClipboardChange()
 	if (!m_running)
 	{
 		vnclog.Print(2, _T("Ignore Clipboard while initializing!\n"));
+		//m_initialClipboardSeen = true;
+	}
+	else if (m_settingClipboardViewer)
+	{
+		vnclog.Print(2, _T("Ignore Clipboard while setting viewer!\n"));
+		//m_initialClipboardSeen = true;
 	}
 	else if (m_pFileTransfer->m_fFileTransferRunning ||m_pFileTransfer->m_fFileUploadRunning || m_pFileTransfer->m_fFileDownloadRunning)
 	{
 		vnclog.Print(2, _T("Ignore Clipboard while FT is buzy!\n"));
+		//m_initialClipboardSeen = true;
 	}
 	else if (hOwner == m_hwndcn) {
 		vnclog.Print(2, _T("We changed it - ignore!\n"));
-	} else if (!m_initialClipboardSeen) {
+	/*} else if (!m_initialClipboardSeen) {
 		vnclog.Print(2, _T("Don't send initial clipboard!\n"));
-		m_initialClipboardSeen = true;
-	} else if (!m_opts.m_DisableClipboard) {
-		
-		// The clipboard should not be modified by more than one thread at once
-		omni_mutex_lock l(m_clipMutex);
-		
+		m_initialClipboardSeen = true;*/
+	} else if (!m_opts.m_DisableClipboard && !m_opts.m_ViewOnly) {
+		// adzm - 2010-07 - Extended clipboard
+		UpdateRemoteClipboard();
+	}
+	// Pass the message to the next window in clipboard viewer chain
+	if (m_hwndNextViewer != NULL && m_hwndNextViewer != (HWND)INVALID_HANDLE_VALUE) {
+		vnclog.Print(6, _T("Passing WM_DRAWCLIPBOARD to 0x%08x\n"), m_hwndNextViewer);
+		// adzm - 2010-07 - Fix clipboard hangs
+		// use SendNotifyMessage instead of SendMessage so misbehaving or hung applications
+		// (like ourself before this) won't cause our thread to hang.
+		::SendNotifyMessage(m_hwndNextViewer, WM_DRAWCLIPBOARD , 0,0); 
+	} else {
+		vnclog.Print(6, _T("No next window in chain; WM_DRAWCLIPBOARD will not be passed\n"), m_hwndNextViewer);
+	}
+}
+
+// adzm - 2010-07 - Extended clipboard
+void ClientConnection::UpdateRemoteClipboard(CARD32 overrideFlags)
+{			
+	// The clipboard should not be modified by more than one thread at once
+	omni_mutex_lock l(m_clipMutex);
+	
+	if (m_clipboard.settings.m_bSupportsEx) {
+		ClipboardData newClipboard;
+
+		if (newClipboard.Load(m_hwndcn)) {
+			if (newClipboard.m_crc == m_clipboard.m_crc && overrideFlags == 0) {
+				vnclog.Print(6, _T("Ignoring extended SendClientCutText due to identical data\n"));
+				return;
+			}
+
+			m_clipboard.UpdateClipTextEx(newClipboard, overrideFlags);
+			
+			if (m_clipboard.m_bNeedToProvide) {
+				m_clipboard.m_bNeedToProvide = false;
+				int actualLen = m_clipboard.extendedClipboardDataMessage.GetDataLength();
+
+				rfbClientCutTextMsg message;
+				memset(&message, 0, sizeof(rfbClientCutTextMsg));
+				message.type = rfbClientCutText;
+
+				message.length = Swap32IfLE(-actualLen);
+				
+				WriteExact((char*)&message, sz_rfbClientCutTextMsg, rfbClientCutText);
+				WriteExact((char*)(m_clipboard.extendedClipboardDataMessage.GetData()), m_clipboard.extendedClipboardDataMessage.GetDataLength());
+			
+				vnclog.Print(6, _T("Sent extended clipboard\n"));
+			}
+
+			m_clipboard.extendedClipboardDataMessage.Reset();
+
+		} else {
+			vnclog.Print(6, _T("Failed to load local clipboard!\n"));
+		}
+	} else {		
+		vnclog.Print(6, _T("Checking clipboard...\n"));
 		if (OpenClipboard(m_hwndcn)) { 
+			vnclog.Print(6, _T("Opened...\n"));
 			HGLOBAL hglb = GetClipboardData(CF_TEXT); 
-			if (hglb == NULL) {
+			if (hglb == NULL) {				
+				vnclog.Print(6, _T("No CF_TEXT!\n"));
 				CloseClipboard();
 			} else {
+				vnclog.Print(6, _T("Got CF_TEXT!\n"));
 				LPSTR lpstr = (LPSTR) GlobalLock(hglb);  
 				
 				char *contents = new char[strlen(lpstr) + 1];
@@ -95,29 +156,80 @@ void ClientConnection::ProcessLocalClipboardChange()
 				delete [] contents; 
 				delete [] unixcontents;
 			}
+		} else {
+			vnclog.Print(1, _T("Failed to open clipboard! Last error 0x%08x\n"), GetLastError());
 		}
 	}
-	// Pass the message to the next window in clipboard viewer chain
-	::SendMessage(m_hwndNextViewer, WM_DRAWCLIPBOARD , 0,0); 
+}
+
+// adzm - 2010-07 - Extended clipboard
+void ClientConnection::UpdateRemoteClipboardCaps()
+{
+	if (!m_clipboard.settings.m_bSupportsEx) return;
+
+	ExtendedClipboardDataMessage extendedClipboardDataMessage;
+	
+	if (m_opts.m_DisableClipboard || m_opts.m_ViewOnly) {
+		// messages and formats that we can handle
+		extendedClipboardDataMessage.m_pExtendedData->flags = Swap32IfLE(clipCaps | clipText | clipRTF | clipHTML);
+
+		// now include our limits in order of enum value
+		extendedClipboardDataMessage.AppendInt(0);
+		extendedClipboardDataMessage.AppendInt(0);
+		extendedClipboardDataMessage.AppendInt(0);
+	} else {
+		m_clipboard.settings.PrepareCapsPacket(extendedClipboardDataMessage);
+	}
+
+	int actualLen = extendedClipboardDataMessage.GetDataLength();
+
+	rfbClientCutTextMsg message;
+	memset(&message, 0, sizeof(rfbClientCutTextMsg));
+	message.type = rfbClientCutText;
+
+	message.length = Swap32IfLE(-actualLen);
+	
+	WriteExact((char*)&message, sz_rfbClientCutTextMsg, rfbClientCutText);
+	WriteExact((char*)(extendedClipboardDataMessage.GetData()), extendedClipboardDataMessage.GetDataLength());
+}
+
+void ClientConnection::RequestRemoteClipboard()
+{
+	if (!m_clipboard.settings.m_bSupportsEx) return;
+
+	ExtendedClipboardDataMessage extendedClipboardDataMessage;
+
+	int actualLen = extendedClipboardDataMessage.GetDataLength();
+	extendedClipboardDataMessage.AddFlag(clipRequest | clipText | clipRTF | clipHTML);
+
+	rfbClientCutTextMsg message;
+	memset(&message, 0, sizeof(rfbClientCutTextMsg));
+	message.type = rfbClientCutText;
+
+	message.length = Swap32IfLE(-actualLen);
+	
+	WriteExact((char*)&message, sz_rfbClientCutTextMsg, rfbClientCutText);
+	WriteExact((char*)(extendedClipboardDataMessage.GetData()), extendedClipboardDataMessage.GetDataLength());
 }
 
 // We've read some text from the remote server, and
 // we need to copy it into the local clipboard.
 // Called by ClientConnection::ReadServerCutText()
-
-void ClientConnection::UpdateLocalClipboard(char *buf, int len) {
-	
-	if (m_opts.m_DisableClipboard)
+// adzm - 2010-07 - Extended clipboard
+void ClientConnection::UpdateLocalClipboard(char *buf, int len)
+{	
+	if (m_opts.m_DisableClipboard || m_opts.m_ViewOnly)
 		return;
 
 	// Copy to wincontents replacing LF with CR-LF
 	char *wincontents = new char[len * 2 + 1];
+
 	int j = 0;;
-	for (int i = 0; m_netbuf[i] != 0; i++, j++) {
-        if (buf[i] == '\x0a') {
+	for (int i = 0; buf[i] != 0; i++, j++) {
+		if (buf[i] == '\x0a') {
 			wincontents[j++] = '\x0d';
-            len++;
-        }
+			len++;
+		}
 		wincontents[j] = buf[i];
 	}
 	wincontents[j] = '\0';
@@ -127,27 +239,40 @@ void ClientConnection::UpdateLocalClipboard(char *buf, int len) {
         omni_mutex_lock l(m_clipMutex);
 
         if (!OpenClipboard(m_hwndcn)) {
-	        throw WarningException(sz_C1);
+			vnclog.Print(2, "UpdateLocalClipboard: Failed to open clipboard! Last error 0x%08x", GetLastError());
+			delete [] wincontents;
+	        //throw WarningException(sz_C1);
+			return;
         }
         if (! ::EmptyClipboard()) {
-	        throw WarningException(sz_C2);
+			vnclog.Print(2, "UpdateLocalClipboard: Failed to empty clipboard! Last error 0x%08x", GetLastError());
+			delete [] wincontents;
+			::CloseClipboard();
+	        //throw WarningException(sz_C2);
+			return;
         }
+			
+		int finalLen = strlen(wincontents) + 1;
 
         // Allocate a global memory object for the text. 
-        HGLOBAL hglbCopy = GlobalAlloc(GMEM_DDESHARE, (len +1) * sizeof(TCHAR));
+        HGLOBAL hglbCopy = GlobalAlloc(GMEM_DDESHARE, finalLen); // in bytes
         if (hglbCopy != NULL) { 
 	        // Lock the handle and copy the text to the buffer.  
 	        LPTSTR lptstrCopy = (LPTSTR) GlobalLock(hglbCopy); 
-	        memcpy(lptstrCopy, wincontents, len * sizeof(TCHAR)); 
-	        lptstrCopy[len] = (TCHAR) 0;    // null character 
+			memcpy(lptstrCopy, wincontents, finalLen); // in bytes
+	        lptstrCopy[finalLen - 1] = 0;    // null character 
 	        GlobalUnlock(hglbCopy);          // Place the handle on the clipboard.  
+			
+			m_clipboard.m_strLastCutText = wincontents;
+
 	        SetClipboardData(CF_TEXT, hglbCopy); 
         }
-
+		
         delete [] wincontents;
 
         if (! ::CloseClipboard()) {
-	        throw WarningException(sz_C3);
+			vnclog.Print(2, "UpdateLocalClipboard: Failed to close clipboard! Last error 0x%08x", GetLastError());
+	        //throw WarningException(sz_C3);
         }
     }
 }

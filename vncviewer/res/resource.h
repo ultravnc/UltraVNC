@@ -67,6 +67,12 @@
 #define IDB_BITMAPl                     198
 #define IDB_BITMAPlx                    199
 #define IDB_BITMAPs                     200
+#define ID_ENABLE_CLIPBOARD             201
+#define ID_CLIPBOARD_TEXT               202
+#define ID_CLIPBOARD_RTF                203
+#define ID_CLIPBOARD_HTML               204
+#define ID_CLIPBOARD_SEND               205
+#define ID_CLIPBOARD_RECV               206
 #define IDD_USER_NAME                   604
 #define ID_VK_LWINDOWN                  605
 #define ID_VK_RWINDOWN                  606
@@ -163,6 +169,7 @@
 #define IDC_INPUTAREA_EDIT              1113
 #define IDC_REMOTETEXT_EDIT             1114
 #define IDC_CLEAR_B                     1115
+#define IDC_PREEMPTIVEUPDATES           1115
 #define IDC_WARNING                     1116
 #define IDC_PERSITENT_CHECK             1117
 #define IDC_PERSISTENT_CHECK            1117

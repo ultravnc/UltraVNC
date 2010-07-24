@@ -154,6 +154,9 @@ public:
 
 	//adzm 2010-05-12
 	bool m_fRequireEncryption;
+	
+	//adzm 2010-07-04
+	bool m_preemptiveUpdates;
 
 	//adzm 2010-02-15
 	void CheckProxyAndHost();

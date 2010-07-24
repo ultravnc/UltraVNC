@@ -1,4 +1,4 @@
-/* crc32.h -- tables for rapid CRC calculation 
+/* crc32.h -- tables for rapid CRC calculation
  * Generated automatically by crc32.c
  */
 

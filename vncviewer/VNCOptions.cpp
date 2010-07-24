@@ -180,6 +180,9 @@ VNCOptions::VNCOptions()
   //adzm 2010-05-12
   m_fRequireEncryption = false;
 
+  //adzm 2010-07-04
+  m_preemptiveUpdates = false;
+
   // sf@2003 - Auto Scaling
   m_saved_scale_num = 100;
   m_saved_scale_den = 100;
@@ -335,6 +338,9 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
   
   //adzm 2010-05-12
   m_fRequireEncryption = s.m_fRequireEncryption;
+
+  //adzm 2010-07-04
+  m_preemptiveUpdates = s.m_preemptiveUpdates;
 
 #ifdef UNDER_CE
   m_palmpc			= s.m_palmpc;
@@ -793,6 +799,11 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 	    //adzm 2010-05-12
 	    m_fRequireEncryption = true;
 	}
+	else if (SwitchMatch(args[j], _T("preemptiveupdates")))
+	{
+	    //adzm 2010-07-04
+	    m_preemptiveUpdates = true;
+	}
 	else
 	{
       TCHAR phost[256];
@@ -945,6 +956,9 @@ void VNCOptions::Save(char *fname)
 	    
   //adzm 2010-05-12
   saveInt("RequireEncryption",		m_fRequireEncryption, fname);
+
+  //adzm 2010-07-04
+  saveInt("PreemptiveUpdates",		m_preemptiveUpdates, fname);
 }
 
 void VNCOptions::Load(char *fname)
@@ -1036,6 +1050,9 @@ void VNCOptions::Load(char *fname)
 
   //adzm 2010-05-12
   m_fRequireEncryption = readInt("RequireEncryption", (int)m_fRequireEncryption, fname) ? true : false;
+
+  //adzm 2010-07-04
+  m_preemptiveUpdates = readInt("PreemptiveUpdates", (int)m_preemptiveUpdates, fname) ? true : false;
 }
 
 // Record the path to the VNC viewer and the type
@@ -1326,6 +1343,11 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 		  
 		  HWND hExitCheck = GetDlgItem(hwnd, IDC_EXIT_CHECK); //PGM @ Advantig
 		  SendMessage(hExitCheck, BM_SETCHECK, _this->m_fExitCheck, 0); //PGM @ Advantig
+
+	  
+		  //adzm 2010-07-04
+		  HWND hpreemptiveUpdates = GetDlgItem(hwnd, IDC_PREEMPTIVEUPDATES);
+		  SendMessage(hpreemptiveUpdates, BM_SETCHECK, _this->m_preemptiveUpdates ? BST_CHECKED : BST_UNCHECKED, 0);
 		  
 		  return TRUE;
     }
@@ -1515,6 +1537,10 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 				RegSetValueEx(huser, "sponsor", 0, REG_DWORD, (LPBYTE) &val, sizeof(val));
 				if (huser != NULL) RegCloseKey(huser);
 			}
+
+			//adzm 2010-07-04
+			 HWND hpreemptiveUpdates = GetDlgItem(hwnd, IDC_PREEMPTIVEUPDATES);
+			 _this->m_preemptiveUpdates = (SendMessage(hpreemptiveUpdates, BM_GETCHECK, 0, 0) == BST_CHECKED) ? true : false;
 
 			  
 			  EndDialog(hwnd, TRUE);

@@ -168,9 +168,8 @@ static inline VOID DisableAero(VOID)
          UnloadDM(); 
  } 
 
-
-
-static void KillWallpaper()
+// adzm - 2010-07 - Disable more effects or font smoothing
+static bool IsUserDesktop()
 {
 	//only kill wallpaper if desktop is user desktop
 	HDESK desktop = GetThreadDesktop(GetCurrentThreadId());
@@ -178,13 +177,47 @@ static void KillWallpaper()
 	char new_name[256];
 	if (GetUserObjectInformation(desktop, UOI_NAME, &new_name, 256, &dummy))
 	{
-		if (strcmp(new_name,"Default")==NULL) HideDesktop();
+		if (strcmp(new_name,"Default")==NULL) {
+			return true;
+		}
 	}	
+
+	return false;
+}
+
+// adzm - 2010-07 - Disable more effects or font smoothing
+static void KillWallpaper()
+{
+	HideDesktop();
 }
 
 static void RestoreWallpaper()
 {
   RestoreDesktop();
+}
+
+// adzm - 2010-07 - Disable more effects or font smoothing
+static void KillEffects()
+{
+	DisableEffects();
+}
+
+// adzm - 2010-07 - Disable more effects or font smoothing
+static void RestoreEffects()
+{
+	EnableEffects();
+}
+
+// adzm - 2010-07 - Disable more effects or font smoothing
+static void KillFontSmoothing()
+{
+	DisableFontSmoothing();
+}
+
+// adzm - 2010-07 - Disable more effects or font smoothing
+static void RestoreFontSmoothing()
+{
+	EnableFontSmoothing();
 }
 
 // Implementation
@@ -454,6 +487,11 @@ vncMenu::~vncMenu()
 
 	if (m_server->RemoveWallpaperEnabled())
 		RestoreWallpaper();
+	// adzm - 2010-07 - Disable more effects or font smoothing
+	if (m_server->RemoveEffectsEnabled())
+		RestoreEffects();
+	if (m_server->RemoveFontSmoothingEnabled())
+		RestoreFontSmoothing();
 	if (m_server->RemoveAeroEnabled())
 		ResetAero();
 }
@@ -498,8 +536,15 @@ vncMenu::AddTrayIcon()
 			SendTrayMsg(NIM_ADD, FALSE);
 		}
 		if (m_server->AuthClientCount() != 0) { //PGM @ Advantig
-			if (m_server->RemoveWallpaperEnabled()) //PGM @ Advantig
-				KillWallpaper(); //PGM @ Advantig
+			// adzm - 2010-07 - Disable more effects or font smoothing
+			if (IsUserDesktop()) {				
+				if (m_server->RemoveWallpaperEnabled()) //PGM @ Advantig
+					KillWallpaper(); //PGM @ Advantig
+				if (m_server->RemoveEffectsEnabled())
+					KillEffects();
+				if (m_server->RemoveFontSmoothingEnabled())
+					KillFontSmoothing();
+			}
 			if (m_server->RemoveAeroEnabled()) //PGM @ Advantig
 				DisableAero(); //PGM @ Advantig
 		} //PGM @ Advantig
@@ -831,8 +876,15 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		_this->FlashTrayIcon(_this->m_server->AuthClientCount() != 0);
 
 		if (_this->m_server->AuthClientCount() != 0) {
-			if (_this->m_server->RemoveWallpaperEnabled())
-				KillWallpaper();
+			// adzm - 2010-07 - Disable more effects or font smoothing
+			if (IsUserDesktop()) {
+				if (_this->m_server->RemoveWallpaperEnabled())
+					KillWallpaper();
+				if (_this->m_server->RemoveEffectsEnabled())
+					KillEffects();
+				if (_this->m_server->RemoveFontSmoothingEnabled())
+					KillFontSmoothing();
+			}
 			if (_this->m_server->RemoveAeroEnabled()) // Moved, redundant if //PGM @ Advantig
 				DisableAero(); // Moved, redundant if //PGM @ Advantig
 		} else {
@@ -842,7 +894,13 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				Sleep(2000); // Added 2 second delay to help wallpaper restore //PGM @ Advantig
 				RestoreWallpaper();
 			} //PGM @ Advantig
-		}
+			// adzm - 2010-07 - Disable more effects or font smoothing
+			if (_this->m_server->RemoveEffectsEnabled()) {
+				RestoreEffects();
+			}
+			if (_this->m_server->RemoveFontSmoothingEnabled()) {
+				RestoreFontSmoothing();
+			}
 //PGM @ Advantig		if (_this->m_server->AuthClientCount() != 0) {
 //PGM @ Advantig			if (_this->m_server->RemoveAeroEnabled())
 //PGM @ Advantig				DisableAero();
@@ -1254,6 +1312,12 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		// tnatsni Wallpaper fix
 		if (_this->m_server->RemoveWallpaperEnabled())
 			RestoreWallpaper();
+		// adzm - 2010-07 - Disable more effects or font smoothing
+		if (_this->m_server->RemoveEffectsEnabled())
+			RestoreEffects();
+		if (_this->m_server->RemoveFontSmoothingEnabled())
+			RestoreFontSmoothing();
+		}
 		if (_this->m_server->RemoveAeroEnabled())
 			ResetAero();
 

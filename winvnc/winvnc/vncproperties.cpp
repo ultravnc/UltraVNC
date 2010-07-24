@@ -1777,6 +1777,9 @@ LABELUSERSETTINGS:
 	m_pref_LockSettings=-1;
 
 	m_pref_RemoveWallpaper=TRUE;
+	// adzm - 2010-07 - Disable more effects or font smoothing
+	m_pref_RemoveEffects=FALSE;
+	m_pref_RemoveFontSmoothing=FALSE;
 	m_pref_RemoveAero=TRUE;
     m_alloweditclients = TRUE;
 	m_allowshutdown = TRUE;
@@ -1898,6 +1901,9 @@ vncProperties::LoadUserPrefs(HKEY appkey)
 	m_pref_IdleTimeout=LoadInt(appkey, "IdleTimeout", m_pref_IdleTimeout);
 	
 	m_pref_RemoveWallpaper=LoadInt(appkey, "RemoveWallpaper", m_pref_RemoveWallpaper);
+	// adzm - 2010-07 - Disable more effects or font smoothing
+	m_pref_RemoveEffects=LoadInt(appkey, "RemoveEffects", m_pref_RemoveEffects);
+	m_pref_RemoveFontSmoothing=LoadInt(appkey, "RemoveFontSmoothing", m_pref_RemoveFontSmoothing);
 	m_pref_RemoveAero=LoadInt(appkey, "RemoveAero", m_pref_RemoveAero);
 
 	// Connection querying settings
@@ -1947,6 +1953,9 @@ vncProperties::ApplyUserPrefs()
 	m_server->SetQueryAccept(m_pref_QueryAccept);
 	m_server->SetAutoIdleDisconnectTimeout(m_pref_IdleTimeout);
 	m_server->EnableRemoveWallpaper(m_pref_RemoveWallpaper);
+	// adzm - 2010-07 - Disable more effects or font smoothing
+	m_server->EnableRemoveFontSmoothing(m_pref_RemoveFontSmoothing);
+	m_server->EnableRemoveEffects(m_pref_RemoveEffects);
 	m_server->EnableRemoveAero(m_pref_RemoveAero);
 
 	// Is the listening socket closing?
@@ -2201,6 +2210,10 @@ vncProperties::SaveUserPrefs(HKEY appkey)
 
 	// Wallpaper removal
 	SaveInt(appkey, "RemoveWallpaper", m_server->RemoveWallpaperEnabled());
+	// UI Effects
+	// adzm - 2010-07 - Disable more effects or font smoothing
+	SaveInt(appkey, "RemoveEffects", m_server->RemoveEffectsEnabled());
+	SaveInt(appkey, "RemoveFontSmoothing", m_server->RemoveFontSmoothingEnabled());
 	// Composit desktop removal
 	SaveInt(appkey, "RemoveAero", m_server->RemoveAeroEnabled());
 
@@ -2319,6 +2332,9 @@ void vncProperties::LoadFromIniFile()
 	m_pref_LockSettings=-1;
 
 	m_pref_RemoveWallpaper=TRUE;
+	// adzm - 2010-07 - Disable more effects or font smoothing
+	m_pref_RemoveEffects=FALSE;
+	m_pref_RemoveFontSmoothing=FALSE;
 	m_pref_RemoveAero=TRUE;
     m_alloweditclients = TRUE;
 	m_allowshutdown = TRUE;
@@ -2389,6 +2405,9 @@ void vncProperties::LoadUserPrefsFromIniFile()
 	m_pref_IdleTimeout=myIniFile.ReadInt("admin", "IdleTimeout", m_pref_IdleTimeout);
 	
 	m_pref_RemoveWallpaper=myIniFile.ReadInt("admin", "RemoveWallpaper", m_pref_RemoveWallpaper);
+	// adzm - 2010-07 - Disable more effects or font smoothing
+	m_pref_RemoveEffects=myIniFile.ReadInt("admin", "RemoveEffects", m_pref_RemoveEffects);
+	m_pref_RemoveFontSmoothing=myIniFile.ReadInt("admin", "RemoveFontSmoothing", m_pref_RemoveFontSmoothing);
 	m_pref_RemoveAero=myIniFile.ReadInt("admin", "RemoveAero", m_pref_RemoveAero);
 
 	// Connection querying settings
@@ -2513,6 +2532,10 @@ void vncProperties::SaveUserPrefsToIniFile()
 
 	// Wallpaper removal
 	myIniFile.WriteInt("admin", "RemoveWallpaper", m_server->RemoveWallpaperEnabled());
+	// UI Effects
+	// adzm - 2010-07 - Disable more effects or font smoothing
+	myIniFile.WriteInt("admin", "RemoveEffects", m_server->RemoveEffectsEnabled());
+	myIniFile.WriteInt("admin", "RemoveFontSmoothing", m_server->RemoveFontSmoothingEnabled());
 	// Composit desktop removal
 	myIniFile.WriteInt("admin", "RemoveAero", m_server->RemoveAeroEnabled());
 

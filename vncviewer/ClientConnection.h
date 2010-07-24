@@ -56,6 +56,9 @@ extern "C"
 
 #include "FullScreenTitleBar.h" //Added by: Lars Werner (http://lars.werner.no)
 
+// adzm - 2010-07 - Extended clipboard
+#include "common/clipboard.h"
+
 extern const UINT FileTransferSendPacketMessage;
 
 #ifndef max
@@ -129,7 +132,7 @@ public:
 	void GTGBS_CreateDisplay(void);
 	void GTGBS_ScrollToolbar(int dx, int dy);
 	void CreateButtons(BOOL mini,BOOL ultra);
-	ClientConnection();
+	//ClientConnection();
 	ClientConnection(VNCviewerApp *pApp);
 	ClientConnection(VNCviewerApp *pApp, SOCKET sock);
 	ClientConnection(VNCviewerApp *pApp, LPTSTR host, int port);
@@ -185,6 +188,8 @@ private:
 
 	void Init(VNCviewerApp *pApp);
 	void CreateDisplay();
+	// adzm - 2010-07 - Extended clipboard
+	void UpdateMenuItems();
 	void GTGBS_CreateToolbar();
 	HWND GTGBS_ShowConnectWindow();
 	//DWORD WINAPI GTGBS_ShowStatusWindow(LPVOID lpParameter);
@@ -323,9 +328,16 @@ private:
 
 	// ClientConnectionClipboard.cpp
 	void ProcessLocalClipboardChange();
+	// adzm - 2010-07 - Extended clipboard
+	void UpdateRemoteClipboard(CARD32 overrideFlags = 0);
+	void UpdateRemoteClipboardCaps();
+	void RequestRemoteClipboard();
 	void UpdateLocalClipboard(char *buf, int len);
 	void SendClientCutText(char *str, int len);
 	void ReadServerCutText();
+
+	// adzm - 2010-07 - Extended clipboard
+	Clipboard m_clipboard;
 
 	void ReadBell();
 	
@@ -524,6 +536,12 @@ private:
 	// Display connection info;
 	void ShowConnInfo();
 
+	// adzm - 2010-07 - Extended clipboard
+	HMENU m_hPopupMenuClipboard;
+	HMENU m_hPopupMenuClipboardFormats;
+	HMENU m_hPopupMenuDisplay;
+	HMENU m_hPopupMenuKeyboard;
+
 	// Window may be scrollable - these control the scroll position
 	int m_hScrollPos, m_hScrollMax, m_vScrollPos, m_vScrollMax;
 	// The current window size
@@ -549,7 +567,11 @@ private:
 	unsigned int m_minPixelBytes;
 	// Next window in clipboard chain
 	HWND m_hwndNextViewer; 
-	bool m_initialClipboardSeen;		
+	// adzm - 2010-07 - Fix clipboard hangs
+	//bool m_initialClipboardSeen;		
+	bool m_settingClipboardViewer;
+	void WatchClipboard();
+
 
 	// Are we waiting on a timer for emulating three buttons?
 	bool m_waitingOnEmulateTimer;

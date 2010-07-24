@@ -54,6 +54,9 @@ class vncServer;
 #include <omnithread.h>
 #include <list>
 
+// adzm - 2010-07 - Extended clipboard
+#include "common/clipboard.h"
+
 typedef BOOL (WINAPI *WTSREGISTERSESSIONNOTIFICATION)(HWND, DWORD);
 typedef BOOL (WINAPI *WTSUNREGISTERSESSIONNOTIFICATION)(HWND);
 #define WM_WTSSESSION_CHANGE            0x02B1
@@ -168,7 +171,9 @@ public:
 	// Update handling, used by the screen server
 	virtual rfb::UpdateTracker &GetUpdateTracker() {return m_update_tracker;};
 	virtual void UpdateMouse();
-	virtual void UpdateClipText(const char* text);
+	// adzm - 2010-07 - Extended clipboard
+	//virtual void UpdateClipText(const char* text);
+	virtual void UpdateClipTextEx(HWND hwndOwner, vncClient* excludeClient = NULL);
 	virtual void UpdatePalette(bool lock);
 	virtual void UpdateLocalFormat(bool lock);
 
@@ -197,6 +202,8 @@ public:
 
 	// Client manipulation of the clipboard
 	virtual void UpdateLocalClipText(LPSTR text);
+	// adzm - 2010-07 - Extended clipboard
+	virtual void UpdateLocalClipTextEx(ExtendedClipboardDataMessage& extendedClipboardDataMessage, vncClient* sourceClient);
 
 	// Name and port number handling
 	// TightVNC 1.2.7
@@ -311,6 +318,11 @@ public:
 	// Removal of desktop wallpaper, etc
 	virtual void EnableRemoveWallpaper(const BOOL enable) {m_remove_wallpaper = enable;};
 	virtual BOOL RemoveWallpaperEnabled() {return m_remove_wallpaper;};
+	// adzm - 2010-07 - Disable more effects or font smoothing
+	virtual void EnableRemoveEffects(const BOOL enable) {m_remove_effects = enable;};
+	virtual BOOL RemoveEffectsEnabled() {return m_remove_effects;};
+	virtual void EnableRemoveFontSmoothing(const BOOL enable) {m_remove_fontsmoothing = enable;};
+	virtual BOOL RemoveFontSmoothingEnabled() {return m_remove_fontsmoothing;};
 	// Removal of desktop composit desktop, etc
 	virtual void EnableRemoveAero(const BOOL enable) {m_remove_Aero = enable;};
 	virtual BOOL RemoveAeroEnabled() {return m_remove_Aero;};
@@ -478,6 +490,9 @@ protected:
 	UINT				m_retry_timeout;
 
 	BOOL				m_remove_wallpaper;
+	// adzm - 2010-07 - Disable more effects or font smoothing
+	BOOL				m_remove_effects;
+	BOOL				m_remove_fontsmoothing;
 	BOOL				m_remove_Aero;
 	BOOL				m_disableTrayIcon;
 	BOOL				m_AllowEditClients;

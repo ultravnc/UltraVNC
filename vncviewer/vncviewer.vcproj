@@ -287,6 +287,7 @@
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Release/vncviewer.pdb"
 				SubSystem="2"
+				OptimizeReferences="2"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
 				TargetMachine="1"
@@ -357,6 +358,7 @@
 				ProgramDataBaseFileName=".\Release/"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -378,7 +380,8 @@
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="omnithread/Release"
-				ProgramDatabaseFile=".\Release/vncviewer.pdb"
+				GenerateDebugInformation="true"
+				ProgramDatabaseFile=".\Release/vncviewer_64.pdb"
 				SubSystem="2"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
@@ -425,11 +428,11 @@
 				>
 			</File>
 			<File
-				RelativePath="res\background2.bmp"
+				RelativePath="res\stat\background2.bmp"
 				>
 			</File>
 			<File
-				RelativePath="res\stat\background2.bmp"
+				RelativePath="res\background2.bmp"
 				>
 			</File>
 			<File
@@ -557,15 +560,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Tango_lx.bmp"
-				>
-			</File>
-			<File
 				RelativePath=".\res\Tango_lx.bmp"
 				>
 			</File>
 			<File
-				RelativePath=".\Tango_s.bmp"
+				RelativePath=".\Tango_lx.bmp"
 				>
 			</File>
 			<File
@@ -573,11 +572,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Tango_sx.bmp"
+				RelativePath=".\Tango_s.bmp"
 				>
 			</File>
 			<File
 				RelativePath=".\res\Tango_sx.bmp"
+				>
+			</File>
+			<File
+				RelativePath=".\Tango_sx.bmp"
 				>
 			</File>
 			<File
@@ -1416,6 +1419,14 @@
 					PreprocessorDefinitions=""
 				/>
 			</FileConfiguration>
+		</File>
+		<File
+			RelativePath="..\common\Clipboard.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\common\Clipboard.h"
+			>
 		</File>
 		<File
 			RelativePath="COPYING.txt"

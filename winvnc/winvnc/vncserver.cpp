@@ -1267,6 +1267,8 @@ vncServer::UpdateMouse()
 	}
 }
 
+// adzm - 2010-07 - Extended clipboard
+/*
 void
 vncServer::UpdateClipText(const char* text)
 {
@@ -1279,6 +1281,30 @@ vncServer::UpdateClipText(const char* text)
 	{
 		// Post the update
 		GetClient(*i)->UpdateClipText(text);
+	}
+}
+*/
+
+
+// adzm - 2010-07 - Extended clipboard
+void
+vncServer::UpdateClipTextEx(HWND hwndOwner, vncClient* excludeClient)
+{
+	ClipboardData clipboardData;
+	if (clipboardData.Load(hwndOwner)) {
+		vncClientList::iterator i;
+		
+		omni_mutex_lock l(m_clientsLock);
+
+		// Post this update to all the connected clients
+		for (i = m_authClients.begin(); i != m_authClients.end(); i++)
+		{
+			// Post the update
+			vncClient* client = GetClient(*i);
+			if (client != excludeClient) {
+				client->UpdateClipTextEx(clipboardData);
+			}
+		}
 	}
 }
 
@@ -1335,6 +1361,18 @@ vncServer::UpdateLocalClipText(LPSTR text)
 
 	if (m_desktop != NULL)
 		m_desktop->SetClipText(text);
+}
+
+
+// adzm - 2010-07 - Extended clipboard
+void
+vncServer::UpdateLocalClipTextEx(ExtendedClipboardDataMessage& extendedClipboardDataMessage, vncClient* sourceClient)
+{
+//	vnclog.Print(LL_INTINFO, VNCLOG("Lock5\n"));
+	omni_mutex_lock l(m_desktopLock);
+
+	if (m_desktop != NULL)
+		m_desktop->SetClipTextEx(extendedClipboardDataMessage, sourceClient);
 }
 
 // Name and port number handling

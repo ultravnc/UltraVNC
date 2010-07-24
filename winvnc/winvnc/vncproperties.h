@@ -142,6 +142,9 @@ protected:
 	UINT m_pref_QueryTimeout;
 	UINT m_pref_IdleTimeout;
 	BOOL m_pref_RemoveWallpaper;
+	// adzm - 2010-07 - Disable more effects or font smoothing
+	BOOL m_pref_RemoveEffects;
+	BOOL m_pref_RemoveFontSmoothing;
 	BOOL m_pref_RemoveAero;
 	BOOL m_pref_EnableRemoteInputs;
 	int m_pref_LockSettings;

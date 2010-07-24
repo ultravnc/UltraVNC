@@ -837,10 +837,6 @@
 				>
 			</File>
 			<File
-				RelativePath="gzguts.h"
-				>
-			</File>
-			<File
 				RelativePath="inffast.h"
 				>
 			</File>

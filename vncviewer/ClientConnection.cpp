@@ -227,26 +227,30 @@ extern bool command_line;
 //  This first section contains bits which are generally called by the main
 //  program thread.
 // *************************************************************************
-ClientConnection::ClientConnection()
-{
-	m_keymap = NULL;
-	m_keymapJap = NULL;
-	//adzm - 2009-06-21
-	m_pPluginInterface = NULL;
-	//adzm 2010-05-10
-	m_pIntegratedPluginInterface = NULL;
-	SB_HORZ_BOOL=true;
-	SB_VERT_BOOL=true;
-}
+// adzm - 2010-07 - Extended clipboard
+//ClientConnection::ClientConnection()
+//	: fis(0), zis(0), m_clipboard(ClipboardSettings::defaultViewerCaps)
+//{
+//	m_keymap = NULL;
+//	m_keymapJap = NULL;
+//	//adzm - 2009-06-21
+//	m_pPluginInterface = NULL;
+//	//adzm 2010-05-10
+//	m_pIntegratedPluginInterface = NULL;
+//	SB_HORZ_BOOL=true;
+//	SB_VERT_BOOL=true;
+//}
 
+// adzm - 2010-07 - Extended clipboard
 ClientConnection::ClientConnection(VNCviewerApp *pApp) 
-  : fis(0), zis(0)
+	: fis(0), zis(0), m_clipboard(ClipboardSettings::defaultViewerCaps)
 {
 	Init(pApp);
 }
 
+// adzm - 2010-07 - Extended clipboard
 ClientConnection::ClientConnection(VNCviewerApp *pApp, SOCKET sock) 
-  : fis(0), zis(0)
+  : fis(0), zis(0), m_clipboard(ClipboardSettings::defaultViewerCaps)
 {
 	Init(pApp);
     if (m_opts.autoDetect)
@@ -272,8 +276,9 @@ ClientConnection::ClientConnection(VNCviewerApp *pApp, SOCKET sock)
 	};
 }
 
+// adzm - 2010-07 - Extended clipboard
 ClientConnection::ClientConnection(VNCviewerApp *pApp, LPTSTR host, int port)
-  : fis(0), zis(0)
+  : fis(0), zis(0), m_clipboard(ClipboardSettings::defaultViewerCaps)
 {
 	Init(pApp);
     if (m_opts.autoDetect)
@@ -304,7 +309,8 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_zlibbuf = NULL;
 	m_zlibbufsize = 0;
 	m_decompStreamInited = false;
-	m_hwndNextViewer = NULL;	
+	// adzm - 2010-07 - Fix clipboard hangs
+	m_hwndNextViewer = (HWND)INVALID_HANDLE_VALUE;	
 	m_pApp = pApp;
 	m_dormant = false;
 	m_hBitmapDC = NULL;
@@ -477,9 +483,17 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	hbmToolbigX = (HBITMAP)LoadImage(m_pApp->m_instance, "tlbarbigx.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_LOADMAP3DCOLORS);
 	hbmToolsmallX = (HBITMAP)LoadImage(m_pApp->m_instance, "tlbarsmallx.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_LOADMAP3DCOLORS);
 	rcth=NULL;
+
+	// adzm - 2010-07 - Extended clipboard
+	m_hPopupMenuClipboard = NULL;
+	m_hPopupMenuDisplay = NULL;
+	m_hPopupMenuKeyboard = NULL;
+	m_hPopupMenuClipboardFormats = NULL;
 	
 	m_keepalive_timer = 0;
 	m_emulate3ButtonsTimer = 0;
+
+	m_settingClipboardViewer = false;
 }
 
 // helper functions for setting socket timeouts during file transfer
@@ -550,6 +564,9 @@ void ClientConnection::Run()
 
 	//adzm 2009-06-21 - if we are connected now, show the window
 	ShowWindow(m_hwndcn, SW_SHOW);
+
+	// adzm - 2010-07 - Fix clipboard hangs - watch the clipboard now that our message pump will not be blocking on connection
+	WatchClipboard();
 
 	Createdib();
 	SizeWindow();
@@ -1304,31 +1321,68 @@ void ClientConnection::CreateDisplay()
 		AppendMenu(hsysmenu, MF_STRING, ID_DBUTTON,	sz_L18);
 		// AppendMenu(hsysmenu, MF_STRING, ID_BUTTON,	_T("Show Toolbar Buttons"));
 		AppendMenu(hsysmenu, MF_SEPARATOR, NULL, NULL);
-		AppendMenu(hsysmenu, MF_STRING, ID_DINPUT,	sz_L19);
-		AppendMenu(hsysmenu, MF_STRING, ID_INPUT,	sz_L20);
+		AppendMenu(hsysmenu, MF_STRING, ID_DINPUT,	sz_L19); // disable remote input
+		AppendMenu(hsysmenu, MF_STRING, ID_INPUT,	sz_L20); // enable remote input
+		// this seems logically placed here
+		AppendMenu(hsysmenu, MF_STRING, ID_VIEWONLYTOGGLE,	sz_L93); // Todo: translate
+
+		AppendMenu(hsysmenu, MF_SEPARATOR, NULL, NULL);
+
+#pragma message("TODO - Localize these new menu strings!")
+
+		// adzm - 2010-07 - Extended clipboard
+
+		m_hPopupMenuClipboard = CreatePopupMenu();
+		{
+			AppendMenu(m_hPopupMenuClipboard, MF_STRING, ID_ENABLE_CLIPBOARD,		"Enable Automatic Synchronization");
+			AppendMenu(m_hPopupMenuClipboard, MF_SEPARATOR, NULL, NULL);
+			
+			m_hPopupMenuClipboardFormats = CreatePopupMenu();
+			{
+				AppendMenu(m_hPopupMenuClipboardFormats, MF_STRING, ID_CLIPBOARD_TEXT,		"Text (Unicode)");
+				AppendMenu(m_hPopupMenuClipboardFormats, MF_STRING, ID_CLIPBOARD_RTF,		"Rich Text (RTF)");
+				AppendMenu(m_hPopupMenuClipboardFormats, MF_STRING, ID_CLIPBOARD_HTML,		"HTML");
+			}
+			AppendMenu(m_hPopupMenuClipboard, MF_POPUP, (UINT_PTR)m_hPopupMenuClipboardFormats, "Automatically Synchronized Formats");
+			AppendMenu(m_hPopupMenuClipboard, MF_SEPARATOR, NULL, NULL);
+			AppendMenu(m_hPopupMenuClipboard, MF_STRING, ID_CLIPBOARD_SEND,		"Send All Formats Now...");
+			AppendMenu(m_hPopupMenuClipboard, MF_STRING, ID_CLIPBOARD_RECV,		"Request All Formats Now...");
+		}
+		AppendMenu(hsysmenu, MF_POPUP, (UINT_PTR)m_hPopupMenuClipboard, "Clipboard");
+
+		AppendMenu(hsysmenu, MF_SEPARATOR, NULL, NULL);
+		m_hPopupMenuDisplay = CreatePopupMenu();
+		{
+			AppendMenu(m_hPopupMenuDisplay, MF_STRING, ID_FULLSCREEN,		sz_L24);
+			AppendMenu(m_hPopupMenuDisplay, MF_SEPARATOR, NULL, NULL);
+			AppendMenu(m_hPopupMenuDisplay, MF_STRING, ID_AUTOSCALING,		sz_L25);
+			// Modif sf@2002
+			AppendMenu(m_hPopupMenuDisplay, MF_STRING, ID_HALFSCREEN,		sz_L26);
+			AppendMenu(m_hPopupMenuDisplay, MF_STRING, ID_FUZZYSCREEN,		sz_L27);
+			AppendMenu(m_hPopupMenuDisplay, MF_STRING, ID_NORMALSCREEN,	sz_L28);
+			AppendMenu(m_hPopupMenuDisplay, MF_SEPARATOR, NULL, NULL);
+			AppendMenu(m_hPopupMenuDisplay, MF_STRING, ID_MAXCOLORS,		sz_L29);
+			AppendMenu(m_hPopupMenuDisplay, MF_STRING, ID_256COLORS,		sz_L30);
+		}
+		AppendMenu(hsysmenu, MF_POPUP, (UINT_PTR)m_hPopupMenuDisplay, "Display");
+
+		AppendMenu(hsysmenu, MF_SEPARATOR, NULL, NULL);
+		m_hPopupMenuKeyboard = CreatePopupMenu();
+		{
+ 			AppendMenu(m_hPopupMenuKeyboard, MF_STRING, ID_CONN_CTLALTDEL,	sz_L31);
+			AppendMenu(m_hPopupMenuKeyboard, MF_STRING, ID_CONN_CTLESC,		sz_L32);
+			AppendMenu(m_hPopupMenuKeyboard, MF_STRING, ID_CONN_CTLDOWN,	sz_L33);
+			AppendMenu(m_hPopupMenuKeyboard, MF_STRING, ID_CONN_CTLUP,		sz_L34);
+			AppendMenu(m_hPopupMenuKeyboard, MF_STRING, ID_CONN_ALTDOWN,	sz_L35);
+			AppendMenu(m_hPopupMenuKeyboard, MF_STRING, ID_CONN_ALTUP,		sz_L36);
+		}
+		AppendMenu(hsysmenu, MF_POPUP, (UINT_PTR)m_hPopupMenuKeyboard, "Keyboard");
+
+		// group connection options together
 		AppendMenu(hsysmenu, MF_SEPARATOR, NULL, NULL);
 		AppendMenu(hsysmenu, MF_STRING, IDC_OPTIONBUTTON,	sz_L21);
 		AppendMenu(hsysmenu, MF_STRING, ID_CONN_ABOUT,		sz_L22);
 		AppendMenu(hsysmenu, MF_STRING, ID_REQUEST_REFRESH,	sz_L23);
-		AppendMenu(hsysmenu, MF_STRING, ID_VIEWONLYTOGGLE,	sz_L93); // Todo: translate
-
-		AppendMenu(hsysmenu, MF_SEPARATOR, NULL, NULL);
-		AppendMenu(hsysmenu, MF_STRING, ID_FULLSCREEN,		sz_L24);
-		AppendMenu(hsysmenu, MF_STRING, ID_AUTOSCALING,		sz_L25);
-		// Modif sf@2002
-		AppendMenu(hsysmenu, MF_STRING, ID_HALFSCREEN,		sz_L26);
-		AppendMenu(hsysmenu, MF_STRING, ID_FUZZYSCREEN,		sz_L27);
-		AppendMenu(hsysmenu, MF_STRING, ID_NORMALSCREEN,	sz_L28);
-		AppendMenu(hsysmenu, MF_SEPARATOR, NULL, NULL);
-		AppendMenu(hsysmenu, MF_STRING, ID_MAXCOLORS,		sz_L29);
-		AppendMenu(hsysmenu, MF_STRING, ID_256COLORS,		sz_L30);
-		AppendMenu(hsysmenu, MF_SEPARATOR, NULL, NULL);
- 		AppendMenu(hsysmenu, MF_STRING, ID_CONN_CTLALTDEL,	sz_L31);
-		AppendMenu(hsysmenu, MF_STRING, ID_CONN_CTLESC,		sz_L32);
-		AppendMenu(hsysmenu, MF_STRING, ID_CONN_CTLDOWN,	sz_L33);
-		AppendMenu(hsysmenu, MF_STRING, ID_CONN_CTLUP,		sz_L34);
-		AppendMenu(hsysmenu, MF_STRING, ID_CONN_ALTDOWN,	sz_L35);
-		AppendMenu(hsysmenu, MF_STRING, ID_CONN_ALTUP,		sz_L36);
 		AppendMenu(hsysmenu, MF_SEPARATOR, NULL, NULL);
 		AppendMenu(hsysmenu, MF_STRING, ID_NEWCONN,			sz_L37);
 		AppendMenu(hsysmenu, MF_STRING | (m_serverInitiated ? MF_GRAYED : 0), 
@@ -1343,19 +1397,20 @@ void ClientConnection::CreateDisplay()
 	DrawMenuBar(m_hwndMain);
 	TheAccelKeys.SetWindowHandle(m_opts.m_NoHotKeys ? 0 : m_hwndMain);
 
-	CheckMenuItem(GetSystemMenu(m_hwndMain, FALSE),
-				  ID_DBUTTON,
-				  MF_BYCOMMAND | (m_opts.m_ShowToolbar ? MF_CHECKED :MF_UNCHECKED));
+	// adzm - 2010-07 - Extended clipboard
+	UpdateMenuItems();
 
-	CheckMenuItem(GetSystemMenu(m_hwndMain, FALSE),
-				  ID_AUTOSCALING,
-				  MF_BYCOMMAND | (m_opts.m_fAutoScaling ? MF_CHECKED :MF_UNCHECKED));
+	// adzm - 2010-07 - Fix clipboard hangs - we don't do this immediately anymore
+	//WatchClipboard();
 
-	CheckMenuItem(GetSystemMenu(m_hwndMain, FALSE),
-				  ID_VIEWONLYTOGGLE,
-				  MF_BYCOMMAND | (m_opts.m_ViewOnly ? MF_CHECKED :MF_UNCHECKED));
+	//Added by: Lars Werner (http://lars.werner.no)
+	if(TitleBar.GetSafeHwnd()==NULL) 
+		TitleBar.Create(m_pApp->m_instance, m_hwndMain);
+}
 
-
+// adzm - 2010-07 - Fix clipboard hangs
+void ClientConnection::WatchClipboard()
+{
 	// Set up clipboard watching
 #ifndef _WIN32_WCE
 	// We want to know when the clipboard changes, so
@@ -1363,15 +1418,70 @@ void ClientConnection::CreateDisplay()
 	// this will cause us to be notified immediately of
 	// the current state.
 	// We don't want to send that.
-	m_initialClipboardSeen = false;
-	m_hwndNextViewer = SetClipboardViewer(m_hwndcn); 	
+	//m_initialClipboardSeen = false;
+	m_settingClipboardViewer = true;
+	m_hwndNextViewer = SetClipboardViewer(m_hwndcn); 
+	vnclog.Print(6, "SetClipboardViewer to 0x%08x; next is 0x%08x. Last error 0x%08x", m_hwndcn, m_hwndNextViewer, GetLastError());
+	m_settingClipboardViewer = false;
 #endif
-
-	//Added by: Lars Werner (http://lars.werner.no)
-	if(TitleBar.GetSafeHwnd()==NULL) 
-		TitleBar.Create(m_pApp->m_instance, m_hwndMain);
 }
 
+// adzm - 2010-07 - Extended clipboard
+void ClientConnection::UpdateMenuItems()
+{
+	// system menu
+	HMENU hsysmenu = GetSystemMenu(m_hwndMain, FALSE);
+
+	CheckMenuItem(hsysmenu,
+				  ID_DBUTTON,
+				  MF_BYCOMMAND | (m_opts.m_ShowToolbar ? MF_CHECKED :MF_UNCHECKED));
+
+	CheckMenuItem(hsysmenu,
+				  ID_VIEWONLYTOGGLE,
+				  MF_BYCOMMAND | (m_opts.m_ViewOnly ? MF_CHECKED :MF_UNCHECKED));
+
+	// display menu
+	CheckMenuItem(m_hPopupMenuDisplay,
+				  ID_AUTOSCALING,
+				  MF_BYCOMMAND | (m_opts.m_fAutoScaling ? MF_CHECKED :MF_UNCHECKED));
+
+	// clipboard menu
+	CheckMenuItem(m_hPopupMenuClipboard,
+				  ID_ENABLE_CLIPBOARD,
+				  MF_BYCOMMAND | (m_opts.m_DisableClipboard ? MF_UNCHECKED : MF_CHECKED));
+
+	CheckMenuItem(m_hPopupMenuClipboardFormats,
+				  ID_CLIPBOARD_TEXT,
+				  MF_BYCOMMAND | ( (m_clipboard.settings.m_nLimitText > 0) ? MF_CHECKED : MF_UNCHECKED));
+
+	CheckMenuItem(m_hPopupMenuClipboardFormats,
+				  ID_CLIPBOARD_RTF,
+				  MF_BYCOMMAND | ( (m_clipboard.settings.m_nLimitRTF > 0) ? MF_CHECKED : MF_UNCHECKED));
+
+	CheckMenuItem(m_hPopupMenuClipboardFormats,
+				  ID_CLIPBOARD_HTML,
+				  MF_BYCOMMAND | ( (m_clipboard.settings.m_nLimitHTML > 0) ? MF_CHECKED : MF_UNCHECKED));
+
+	EnableMenuItem(m_hPopupMenuClipboard,
+				  ID_ENABLE_CLIPBOARD,
+				  m_opts.m_ViewOnly ? MF_DISABLED : MF_ENABLED);
+
+	EnableMenuItem(m_hPopupMenuClipboardFormats,
+				  ID_CLIPBOARD_TEXT,
+				  (m_opts.m_ViewOnly || m_opts.m_DisableClipboard || !m_clipboard.settings.m_bSupportsEx || !(m_clipboard.settings.m_remoteCaps & clipText)) ? MF_DISABLED : MF_ENABLED);
+
+	EnableMenuItem(m_hPopupMenuClipboardFormats,
+				  ID_CLIPBOARD_RTF,
+				  (m_opts.m_ViewOnly || m_opts.m_DisableClipboard || !m_clipboard.settings.m_bSupportsEx || !(m_clipboard.settings.m_remoteCaps & clipRTF)) ? MF_DISABLED : MF_ENABLED);
+
+	EnableMenuItem(m_hPopupMenuClipboardFormats,
+				  ID_CLIPBOARD_HTML,
+				  (m_opts.m_ViewOnly || m_opts.m_DisableClipboard || !m_clipboard.settings.m_bSupportsEx || !(m_clipboard.settings.m_remoteCaps & clipHTML)) ? MF_DISABLED : MF_ENABLED);	
+
+	EnableMenuItem(m_hPopupMenuClipboard,
+				  ID_CLIPBOARD_RECV,
+				  (!m_clipboard.settings.m_bSupportsEx) ? MF_DISABLED : MF_ENABLED);
+}
 
 //
 // sf@2002 - DSMPlugin loading and initialization if required
@@ -3196,6 +3306,10 @@ void ClientConnection::SetFormatAndEncodings()
     encs[se->nEncodings++] = Swap32IfLE(rfbEncodingServerState);
     encs[se->nEncodings++] = Swap32IfLE(rfbEncodingEnableKeepAlive);
     encs[se->nEncodings++] = Swap32IfLE(rfbEncodingFTProtocolVersion);
+
+	// adzm - 2010-07 - Extended clipboard
+	encs[se->nEncodings++] = Swap32IfLE(rfbEncodingExtendedClipboard);
+
     // sf@2002 - DSM Plugin
 	int nEncodings = se->nEncodings;
 	se->nEncodings = Swap16IfLE(se->nEncodings);
@@ -3810,14 +3924,35 @@ ClientConnection::SendKeyEvent(CARD32 key, bool down)
 
 void ClientConnection::SendClientCutText(char *str, int len)
 {
-	if (m_pFileTransfer->m_fFileTransferRunning && ( m_pFileTransfer->m_fVisible || m_pFileTransfer->UsingOldProtocol())) return;
-	if (m_pTextChat->m_fTextChatRunning && m_pTextChat->m_fVisible) return;
+	// adzm - 2010-07 - Extended clipboard
+	if (m_pFileTransfer->m_fFileTransferRunning && ( m_pFileTransfer->m_fVisible || m_pFileTransfer->UsingOldProtocol())) {
+		vnclog.Print(6, _T("Ignoring SendClientCutText due to in-progress file transfer\n"));
+		return;
+	}
+	if (m_pTextChat->m_fTextChatRunning && m_pTextChat->m_fVisible) {
+		vnclog.Print(6, _T("Ignoring SendClientCutText due to in-progress text chat\n"));
+		return;
+	}
+
+
+	std::string strStr(str);
+
+	if (!m_clipboard.m_strLastCutText.empty()) {
+		if (m_clipboard.m_strLastCutText.compare(strStr) == 0) {
+			vnclog.Print(6, _T("Ignoring SendClientCutText due to identical data\n"));
+			return;
+		}
+
+		m_clipboard.m_strLastCutText = "";
+	}
+
+	m_clipboard.m_strLastCutText = strStr;
 
 	rfbClientCutTextMsg cct;
 
-    cct.type = rfbClientCutText;
-    cct.length = Swap32IfLE(len);
-    WriteExact((char *)&cct, sz_rfbClientCutTextMsg, rfbClientCutText);
+	cct.type = rfbClientCutText;
+	cct.length = Swap32IfLE(len);
+	WriteExact((char *)&cct, sz_rfbClientCutTextMsg, rfbClientCutText);
 	WriteExact(str, len);
 	vnclog.Print(6, _T("Sent %d bytes of clipboard\n"), len);
 }
@@ -3843,9 +3978,13 @@ inline void ClientConnection::DoBlit()
 	
 	if (m_opts.m_delay) {
 		// Display the area to be updated for debugging purposes
+		/*
 		COLORREF oldbgcol = SetBkColor(hdc, RGB(0,0,0));
 		::ExtTextOut(hdc, 0, 0, ETO_OPAQUE, &ps.rcPaint, NULL, 0, NULL);
 		SetBkColor(hdc,oldbgcol);
+		*/
+		// adzm - 2010-07 - Works better this way
+		::FillRect(hdc, &ps.rcPaint, ::GetSysColorBrush(COLOR_DESKTOP));
 		::Sleep(m_pApp->m_options.m_delay);
 	}
 	
@@ -4325,6 +4464,13 @@ bool ClientConnection::SendSW(int x, int y)
 // A ScreenUpdate message has been received
 inline void ClientConnection::ReadScreenUpdate()
 {
+	//adzm 2010-07-04
+	bool bSentUpdateRequest = false;
+	if (m_opts.m_preemptiveUpdates) {
+		bSentUpdateRequest = true;
+		PostMessage(m_hwndcn, WM_REGIONUPDATED, NULL, NULL);
+	}
+
 	HDC hdcX,hdcBits;
 
 	bool fTimingAlreadyStopped = false;
@@ -4682,8 +4828,11 @@ inline void ClientConnection::ReadScreenUpdate()
 	}
 		
 	// Inform the other thread that an update is needed.
-	
-	PostMessage(m_hwndcn, WM_REGIONUPDATED, NULL, NULL);
+
+	//adzm 2010-07-04
+	if (!bSentUpdateRequest) {
+		PostMessage(m_hwndcn, WM_REGIONUPDATED, NULL, NULL);
+	}
 	DeleteObject(UpdateRegion);
 }	
 
@@ -4706,14 +4855,77 @@ void ClientConnection::ReadServerCutText()
 	vnclog.Print(6, _T("Read remote clipboard change\n"));
 	ReadExact(((char *) &sctm)+m_nTO, sz_rfbServerCutTextMsg-m_nTO);
 	int len = Swap32IfLE(sctm.length);
-	
-	CheckBufferSize(len);
-	if (len == 0) {
-		m_netbuf[0] = '\0';
-	} else {
-		ReadString(m_netbuf, len);
+
+	// adzm - 2010-07 - Extended clipboard
+	if (!m_clipboard.settings.m_bSupportsEx && len < 0) {
+		m_clipboard.settings.m_bSupportsEx = true;
 	}
-	UpdateLocalClipboard(m_netbuf, len);
+
+	if (len < 0 && m_clipboard.settings.m_bSupportsEx) {
+		vnclog.Print(6, _T("Read remote extended clipboard change\n"));
+		len = abs(len);
+
+		ExtendedClipboardDataMessage extendedClipboardDataMessage;
+
+		extendedClipboardDataMessage.EnsureBufferLength(len, false);
+
+		ReadExact((char*)extendedClipboardDataMessage.GetBuffer(), len);
+		
+		DWORD action = extendedClipboardDataMessage.GetFlags() & clipActionMask;
+
+		// clipCaps may be combined with other actions
+		if (action & clipCaps) {
+			action = clipCaps;
+		}
+
+		switch(action) {
+			case clipCaps:
+				m_clipboard.settings.HandleCapsPacket(extendedClipboardDataMessage);
+				UpdateRemoteClipboardCaps();
+				break;
+			case clipProvide:
+				{
+					ClipboardData newClipboard;
+
+					{
+						if (!m_opts.m_DisableClipboard && !m_opts.m_ViewOnly) {
+							omni_mutex_lock l(m_clipMutex);
+
+							if (newClipboard.Restore(m_hwndcn, extendedClipboardDataMessage)) {
+								vnclog.Print(6, _T("Successfuly restored new clipboard data\n"));
+								m_clipboard.m_crc = newClipboard.m_crc;
+								m_clipboard.m_notifiedRemoteFormats = 0;
+							} else {
+								vnclog.Print(6, _T("Failed to set new clipboard data\n"));
+							}
+						}
+					}
+				}
+				break;
+			case clipNotify:
+				m_clipboard.m_notifiedRemoteFormats |= (extendedClipboardDataMessage.GetFlags() & clipFormatMask);
+				break;
+			case clipRequest:
+				// no need for server to request anything at the moment.
+				break;
+			case clipPeek:		// irrelevant coming from server
+			default:
+				// unsupported or not implemented
+				break;
+		}
+	} else {	
+		if (len < 0) {
+			vnclog.Print(6, _T("Invalid clipboard data!\n"));
+			return;
+		}
+		CheckBufferSize(len);
+		if (len == 0) {
+			m_netbuf[0] = '\0';
+		} else {
+			ReadString(m_netbuf, len);
+		}
+		UpdateLocalClipboard(m_netbuf, len);
+	}
 }
 
 
@@ -5964,11 +6176,10 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 					// Toggle toolbar & toolbar menu option
 					case ID_DBUTTON:
 						_this->m_opts.m_ShowToolbar = !_this->m_opts.m_ShowToolbar;
-						CheckMenuItem(GetSystemMenu(_this->m_hwndMain, FALSE),
-							          ID_DBUTTON,
-									  MF_BYCOMMAND | (_this->m_opts.m_ShowToolbar ? MF_CHECKED :MF_UNCHECKED));
 						_this->SizeWindow();
 						_this->SetFullScreenMode(_this->InFullScreenMode());
+						// adzm - 2010-07 - Extended clipboard
+						//_this->UpdateMenuItems(); // Handled in WM_INITMENUPOPUP
 						break;
 						
 					/*
@@ -5981,12 +6192,11 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 
 					case ID_AUTOSCALING:
 						_this->m_opts.m_fAutoScaling = !_this->m_opts.m_fAutoScaling;
-						CheckMenuItem(GetSystemMenu(_this->m_hwndMain, FALSE),
-							          ID_AUTOSCALING,
-									  MF_BYCOMMAND | (_this->m_opts.m_fAutoScaling ? MF_CHECKED :MF_UNCHECKED));
 						_this->SizeWindow();
 						InvalidateRect(hwnd, NULL, TRUE);
 						_this->RealiseFullScreenMode();
+						// adzm - 2010-07 - Extended clipboard
+						//_this->UpdateMenuItems(); // Handled in WM_INITMENUPOPUP
 						break;
 
 					case ID_DINPUT:
@@ -6046,6 +6256,9 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							int prev_scale_den = _this->m_opts.m_scale_den;
 							bool fOldToolbarState = _this->m_opts.m_ShowToolbar;
 							bool nOldAutoMode = _this->m_opts.autoDetect;
+							// adzm - 2010-07 - Extended clipboard
+							bool bOldViewOnly = _this->m_opts.m_ViewOnly;
+							bool bOldDisableClipboard = _this->m_opts.m_DisableClipboard;
 							
 							if (_this->m_opts.DoDialog(true))
 							{
@@ -6072,10 +6285,23 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 									_this->m_pendingFormatChange = true;
 								}
 							}		
+
+							// adzm - 2010-07 - Extended clipboard
+							if ( (bOldViewOnly != _this->m_opts.m_ViewOnly) || (bOldDisableClipboard != _this->m_opts.m_DisableClipboard) )
+							{
+								_this->UpdateRemoteClipboardCaps();						
+
+								if (!_this->m_opts.m_ViewOnly && !_this->m_opts.m_DisableClipboard) {
+									_this->UpdateRemoteClipboard(); // update the clipboard if we are no longer view only and the clipboard is enabled
+								}
+							}
+
 							 if (nOldAutoMode != _this->m_opts.autoDetect)
 								 _this->m_nConfig = 0;
 							_this->OldEncodingStatusWindow = -2; // force update in status window
 							_this->m_fOptionsOpen = false;
+
+
 							return 0;
 						}
 						
@@ -6105,12 +6331,17 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 					case ID_VIEWONLYTOGGLE: 
 						// Toggle view only mode
 						_this->m_opts.m_ViewOnly = !_this->m_opts.m_ViewOnly;
-						// Todo update menu state
-						CheckMenuItem(GetSystemMenu(_this->m_hwndMain, FALSE),
-							          ID_VIEWONLYTOGGLE,
-									  MF_BYCOMMAND | (_this->m_opts.m_ViewOnly ? MF_CHECKED :MF_UNCHECKED));
+
+						// adzm - 2010-07 - Extended clipboard
 						if (_this->m_opts.m_ViewOnly) SetWindowText(_this->m_hwndMain, _this->m_desktopName_viewonly);
 						else SetWindowText(_this->m_hwndMain, _this->m_desktopName);
+						//_this->UpdateMenuItems(); // Handled in WM_INITMENUPOPUP
+						
+						_this->UpdateRemoteClipboardCaps();
+
+						if (!_this->m_opts.m_ViewOnly && !_this->m_opts.m_DisableClipboard) {
+							_this->UpdateRemoteClipboard(); // update the clipboard if we are no longer view only and the clipboard is enabled
+						}
 						return 0;
 						
 					case ID_REQUEST_REFRESH: 
@@ -6385,7 +6616,57 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							}
 							return 0;
 						}
-						
+
+					// adzm - 2010-07 - Extended clipboard
+					case ID_ENABLE_CLIPBOARD:						
+						_this->m_opts.m_DisableClipboard = !_this->m_opts.m_DisableClipboard;
+						_this->UpdateRemoteClipboardCaps();						
+
+						if (!_this->m_opts.m_ViewOnly && !_this->m_opts.m_DisableClipboard) {
+							_this->UpdateRemoteClipboard(); // update the clipboard if we are no longer view only and the clipboard is enabled
+						}
+						//_this->UpdateMenuItems(); // Handled in WM_INITMENUPOPUP
+						break;
+					case ID_CLIPBOARD_TEXT:
+						// currently just toggle between default limit and auto; an interface
+						// for limits will be useful once more complex (larger) formats are
+						// implemented.
+						_this->m_clipboard.settings.m_nLimitText = 
+							_this->m_clipboard.settings.m_nLimitText == 0 ? 
+								(_this->m_clipboard.settings.m_nRequestedLimitText == 0 ? 
+									ClipboardSettings::defaultLimit 
+								: _this->m_clipboard.settings.m_nRequestedLimitText)
+							: 0;
+						_this->UpdateRemoteClipboardCaps();
+						//_this->UpdateMenuItems(); // Handled in WM_INITMENUPOPUP
+						break;
+					case ID_CLIPBOARD_RTF:
+						_this->m_clipboard.settings.m_nLimitRTF = 
+							_this->m_clipboard.settings.m_nLimitRTF == 0 ? 
+								(_this->m_clipboard.settings.m_nRequestedLimitRTF == 0 ? 
+									ClipboardSettings::defaultLimit 
+								: _this->m_clipboard.settings.m_nRequestedLimitRTF)
+							: 0;
+						_this->UpdateRemoteClipboardCaps();
+						//_this->UpdateMenuItems(); // Handled in WM_INITMENUPOPUP
+						break;
+					case ID_CLIPBOARD_HTML:
+						_this->m_clipboard.settings.m_nLimitHTML = 
+							_this->m_clipboard.settings.m_nLimitHTML == 0 ? 
+								(_this->m_clipboard.settings.m_nRequestedLimitHTML == 0 ? 
+									ClipboardSettings::defaultLimit 
+								: _this->m_clipboard.settings.m_nRequestedLimitHTML)
+							: 0;
+						_this->UpdateRemoteClipboardCaps();
+						//_this->UpdateMenuItems(); // Handled in WM_INITMENUPOPUP
+						break;
+					case ID_CLIPBOARD_SEND:
+						_this->UpdateRemoteClipboard(clipProvide | clipText | clipRTF | clipHTML);
+						break;
+					case ID_CLIPBOARD_RECV:
+						_this->RequestRemoteClipboard();
+						break;
+											
 					} // end switch lowparam syscommand
 					
 					break;
@@ -6560,18 +6841,53 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						}
 						return 0;
 					}
+
+				// adzm - 2010-07 - Extended clipboard
+				case WM_INITMENUPOPUP:
+					{
+						_this->UpdateMenuItems();
+						break;
+					}
 					
 				case WM_DESTROY:
 					{
 #ifndef UNDER_CE
 						// Remove us from the clipboard viewer chain
-						BOOL res = ChangeClipboardChain( _this->m_hwndcn, _this->m_hwndNextViewer);
+						if (hwnd == _this->m_hwndcn && _this->m_hwndNextViewer != (HWND)INVALID_HANDLE_VALUE) {
+							BOOL res = ChangeClipboardChain( _this->m_hwndcn, _this->m_hwndNextViewer);
+							_this->m_hwndNextViewer = NULL;
+							vnclog.Print(6, _T("WndProc ChangeClipboardChain m_hwndcn 0x%08x / hwnd 0x%08x, 0x%08x (%li)\n"), _this->m_hwndcn, hwnd, _this->m_hwndNextViewer, res);
+						}
 #endif
 						if (_this->m_waitingOnEmulateTimer)
 						{
 							KillTimer(_this->m_hwndcn, _this->m_emulate3ButtonsTimer);
 							_this->m_waitingOnEmulateTimer = false;
 						}
+
+						// adzm - 2010-07 - Extended clipboard
+
+						if (_this->m_hPopupMenuClipboard) {
+							DestroyMenu(_this->m_hPopupMenuClipboard);
+							_this->m_hPopupMenuClipboard = NULL;
+						}
+
+						if (_this->m_hPopupMenuDisplay) {
+							DestroyMenu(_this->m_hPopupMenuDisplay);
+							_this->m_hPopupMenuDisplay = NULL;
+						}
+
+						if (_this->m_hPopupMenuKeyboard) {
+							DestroyMenu(_this->m_hPopupMenuKeyboard);
+							_this->m_hPopupMenuKeyboard = NULL;
+						}
+
+						if (_this->m_hPopupMenuClipboardFormats) {
+							DestroyMenu(_this->m_hPopupMenuClipboardFormats);
+							_this->m_hPopupMenuClipboardFormats = NULL;
+						}
+
+
 //						if (_this->m_FTtimer != 0) 
 //						{
 //							KillTimer(hwnd, _this->m_FTtimer);			
@@ -7327,7 +7643,11 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 				{
 				#ifndef UNDER_CE
 				// Remove us from the clipboard viewer chain
-				BOOL res = ChangeClipboardChain( hwnd, _this->m_hwndNextViewer);
+				if (hwnd == _this->m_hwndcn) {
+					BOOL res = ChangeClipboardChain( hwnd, _this->m_hwndNextViewer);
+					_this->m_hwndNextViewer = NULL;
+					vnclog.Print(6, _T("WndProchwnd ChangeClipboardChain hwnd 0x%08x / m_hwndcn 0x%08x, 0x%08x (%li)\n"), hwnd, _this->m_hwndcn, _this->m_hwndNextViewer, res);
+				}
 				#endif
 				if (_this->m_waitingOnEmulateTimer)
 				{
@@ -7449,17 +7769,23 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 				return 0;
 				
 			case WM_CHANGECBCHAIN:
-				{
+				{					
 					// The clipboard chain is changing
 					HWND hWndRemove = (HWND) wParam;     // handle of window being removed 
 					HWND hWndNext = (HWND) lParam;       // handle of next window in chain 
+					vnclog.Print(6, _T("WM_CHANGECBCHAIN remove 0x%08x, next 0x%08x (current m_hwndcn 0x%08x / hwnd 0x%08x, next 0x%08x)\n"), hWndRemove, hWndNext, _this->m_hwndcn, hwnd, _this->m_hwndNextViewer);
 					// If next window is closing, update our pointer.
 					if (hWndRemove == _this->m_hwndNextViewer)  
 						_this->m_hwndNextViewer = hWndNext;  
 					// Otherwise, pass the message to the next link.  
-					else if (_this->m_hwndNextViewer != NULL) 
-						::SendMessage(_this->m_hwndNextViewer, WM_CHANGECBCHAIN, 
-						(WPARAM) hWndRemove,  (LPARAM) hWndNext );  
+					else if (_this->m_hwndNextViewer != NULL && _this->m_hwndNextViewer != INVALID_HANDLE_VALUE) {
+						// adzm - 2010-07 - Fix clipboard hangs
+						// use SendNotifyMessage instead of SendMessage so misbehaving or hung applications
+						// (like ourself before this) won't cause our thread to hang.
+						::SendNotifyMessage(_this->m_hwndNextViewer, WM_CHANGECBCHAIN, 
+							(WPARAM) hWndRemove,  (LPARAM) hWndNext );  
+					}
+
 					return 0;
 					
 				}
@@ -7491,7 +7817,19 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 				
 			case WM_SETVIEWONLY:
 				{
-					_this->m_opts.m_ViewOnly = (wParam == 1);
+					{
+						// adzm - 2010-07 - Extended clipboard
+						bool bNewViewOnly = (wParam == 1);
+						bool bUpdateCaps = false;
+						if (_this->m_opts.m_ViewOnly != bNewViewOnly) {			
+							bUpdateCaps = true;
+						}
+						_this->m_opts.m_ViewOnly = bNewViewOnly;
+
+						if (bUpdateCaps) {
+							_this->UpdateRemoteClipboardCaps();
+						}
+					}
 					return TRUE;
 				}
 			// End Modif for VNCon MultiView support

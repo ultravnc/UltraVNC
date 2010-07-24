@@ -124,7 +124,8 @@ void ClientConnection::RealiseFullScreenMode()
 		int cy = mi.rcMonitor.bottom - y;
 		SetWindowPos(m_hwndMain, HWND_TOPMOST, x, y, cx+3, cy+3, SWP_FRAMECHANGED);
         TitleBar.MoveToMonitor(hMonitor);
-		CheckMenuItem(GetSystemMenu(m_hwndMain, FALSE), ID_FULLSCREEN, MF_BYCOMMAND|MF_CHECKED);
+		// adzm - 2010-07 - Extended clipboard
+		CheckMenuItem(m_hPopupMenuDisplay, ID_FULLSCREEN, MF_BYCOMMAND|MF_CHECKED);
 		if (m_opts.m_ShowToolbar)
 		SetWindowPos(m_hwndcn, m_hwndTBwin,0,m_TBr.bottom,m_winwidth, m_winheight, SWP_SHOWWINDOW);
 		else 
@@ -143,7 +144,8 @@ void ClientConnection::RealiseFullScreenMode()
 		style |= WS_DLGFRAME | WS_THICKFRAME;
 		SetWindowLong(m_hwndMain, GWL_STYLE, style);
 		SetWindowPos(m_hwndMain, HWND_NOTOPMOST, 0,0,100,100, SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED); //Modified by: Lars Werner (http://lars.werner.no) - Reason: Bugfix, The framework got invisible after moving, so a NCCALCSIZE needed to be called!
-		CheckMenuItem(GetSystemMenu(m_hwndMain, FALSE), ID_FULLSCREEN, MF_BYCOMMAND|MF_UNCHECKED);
+		// adzm - 2010-07 - Extended clipboard
+		CheckMenuItem(m_hPopupMenuDisplay, ID_FULLSCREEN, MF_BYCOMMAND|MF_UNCHECKED);
 
 		TitleBar.DisplayWindow(FALSE, TRUE); //Added by: Lars Werner (http://lars.werner.no)
 
