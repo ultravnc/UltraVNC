@@ -336,6 +336,8 @@ void ClientConnection::Init(VNCviewerApp *pApp)
     m_keymap->SetKeyMapOption2(true);
 
 	m_sock = INVALID_SOCKET;
+	//adzm 2010-08-01
+	m_LastSentTick = 0;
 	m_bKillThread = false;
 	m_threadStarted = true;
 	m_running = false;
@@ -4977,8 +4979,8 @@ void ClientConnection::ReadServerState()
         vnclog.Print(1, _T("New keepalive interval %u"), m_opts.m_keepAliveInterval);
 		m_keepalive_timer = 1011;
 		KillTimer(m_hwndcn, m_keepalive_timer);
-		if (value > 0) {
-			SetTimer(m_hwndcn, m_keepalive_timer, value * 1000, NULL);
+		if (m_opts.m_keepAliveInterval > 0) {
+			SetTimer(m_hwndcn, m_keepalive_timer, m_opts.m_keepAliveInterval * 1000, NULL);
 		} else {
 			m_keepalive_timer = 0;
 		}
@@ -5296,6 +5298,10 @@ ClientConnection::Send(const char *buff, const unsigned int bufflen,int timeout)
 		return 0; //timeout
 	if (count < 0 || count > 1) 
 		return -1;
+	
+	//adzm 2010-08-01
+	m_LastSentTick = GetTickCount();
+
 	if (FD_ISSET((unsigned int)m_sock, &write_fds)) aa=send(m_sock, buff, bufflen, 0);
 	return aa;
 }
@@ -5362,6 +5368,8 @@ void ClientConnection::WriteExact(char *buf, int bytes)
 
     while (i < bytes)
 	{
+		//adzm 2010-08-01
+		m_LastSentTick = GetTickCount();
 		j = send(m_sock, pBuffer+i, bytes-i, 0);
 		if (j == SOCKET_ERROR || j==0)
 		{
@@ -5458,6 +5466,8 @@ void ClientConnection::WriteExactProxy(char *buf, int bytes)
 
     while (i < bytes)
 	{
+		//adzm 2010-08-01
+		m_LastSentTick = GetTickCount();
 		j = send(m_sock, pBuffer+i, bytes-i, 0);
 		if (j == SOCKET_ERROR || j==0)
 		{
@@ -8051,17 +8061,29 @@ void ClientConnection::SendKeepAlive(bool bForce)
 {
     if (m_server_wants_keepalives) 
     {
-        static time_t lastSent = 0;
-        time_t now = time(&now);
-        time_t delta = now - lastSent;
+		//adzm 2010-08-01
+		if (m_keepalive_timer != 0) {
+			KillTimer(m_hwndcn, m_keepalive_timer);
+		}
 
-        if (!bForce && delta < m_opts.m_keepAliveInterval)
-            return;
+		//adzm 2010-08-01
+		DWORD nInterval = (DWORD)m_opts.m_keepAliveInterval * 1000;
+		DWORD nTicksSinceLastSent = GetTickCount() - m_LastSentTick;
 
-        lastSent = now;
+		if (!bForce && nTicksSinceLastSent < nInterval) {
+			//adzm 2010-08-01
+			DWORD nDelay = nInterval - nTicksSinceLastSent;
+			if (nDelay >= 100) {
+				if (m_keepalive_timer != 0) {
+					SetTimer(m_hwndcn, m_keepalive_timer, nDelay, NULL);
+				}
+				return;
+			}
+		}		
+
 #if defined(_DEBUG)
         char msg[255];
-        sprintf(msg, "keepalive requested %u seconds since last one\n", delta);
+        sprintf(msg, "keepalive requested %u ms since last one\n", nTicksSinceLastSent);
         OutputDebugString(msg);
 
 #endif
@@ -8069,6 +8091,10 @@ void ClientConnection::SendKeepAlive(bool bForce)
         memset(&kp, 0, sizeof kp);
         kp.type = rfbKeepAlive;
         WriteExact_timeout((char*)&kp, sz_rfbKeepAliveMsg, rfbKeepAlive,5);
+
+		if (m_keepalive_timer != 0 && m_opts.m_keepAliveInterval > 0) {
+			SetTimer(m_hwndcn, m_keepalive_timer, m_opts.m_keepAliveInterval * 1000, NULL);
+		}
     }
 }
 #pragma warning(default :4101)

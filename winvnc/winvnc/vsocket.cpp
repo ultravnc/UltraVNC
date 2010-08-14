@@ -140,6 +140,9 @@ VSocket::VSocket()
 	m_fWriteToNetRectBuf = false;
 	m_nNetRectBufOffset = 0;
 	queuebuffersize=0;
+	
+	//adzm 2010-08-01
+	m_LastSentTick = 0;
 }
 
 ////////////////////////////
@@ -526,6 +529,9 @@ VBool VSocket::SetRecvTimeout(VCard32 msecs)
 VInt
 VSocket::Send(const char *buff, const VCard bufflen)
 {
+	//adzm 2010-08-01
+	m_LastSentTick = GetTickCount();
+
 	unsigned int newsize=queuebuffersize+bufflen;
 	char *buff2;
 	buff2=(char*)buff;
@@ -565,7 +571,10 @@ VSocket::SendQueued(const char *buff, const VCard bufflen)
 	unsigned int bufflen2=bufflen;
 
 	if (newsize >G_SENDBUFFER)
-	{
+	{	
+			//adzm 2010-08-01
+			m_LastSentTick = GetTickCount();
+
 		    memcpy(queuebuffer+queuebuffersize,buff2,G_SENDBUFFER-queuebuffersize);
 			send(sock,queuebuffer,G_SENDBUFFER,0);
 		//	vnclog.Print(LL_SOCKERR, VNCLOG("SEND Q  %i\n") ,G_SENDBUFFER);
@@ -574,7 +583,9 @@ VSocket::SendQueued(const char *buff, const VCard bufflen)
 			queuebuffersize=0;
 			while (bufflen2 > G_SENDBUFFER)
 			{
-				if (!send(sock,buff2,G_SENDBUFFER,0)) return false;
+				if (!send(sock,buff2,G_SENDBUFFER,0)) return false;				
+				//adzm 2010-08-01
+				m_LastSentTick = GetTickCount();
 			//	vnclog.Print(LL_SOCKERR, VNCLOG("SEND Q  %i\n") ,G_SENDBUFFER);
 				buff2+=G_SENDBUFFER;
 				bufflen2-=G_SENDBUFFER;
@@ -688,7 +699,9 @@ VSocket::ClearQueue()
 {
 	if (queuebuffersize!=0)
   {
-	send(sock,queuebuffer,queuebuffersize,0);
+	//adzm 2010-08-01
+	m_LastSentTick = GetTickCount();
+	send(sock,queuebuffer,queuebuffersize,0);	
 	queuebuffersize=0;
   }
 }

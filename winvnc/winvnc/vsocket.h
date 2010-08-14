@@ -161,6 +161,8 @@ public:
   //adzm 2010-05-10
   IIntegratedPlugin* GetIntegratedPlugin() { return m_pIntegratedPluginInterface; };
 
+  //adzm 2010-08-01
+  DWORD GetLastSentTick() { return m_LastSentTick; };
 
 
   ////////////////////////////
@@ -168,6 +170,9 @@ public:
 protected:
   // The internal socket id
   int sock;	      
+
+  //adzm 2010-08-01
+  DWORD m_LastSentTick;
 
   CDSMPlugin* m_pDSMPlugin; // sf@2002 - DSMPlugin
   //adzm 2009-06-20

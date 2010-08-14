@@ -174,6 +174,8 @@ private:
 	HBITMAP hbmToolsmallX;
 
 	SOCKET m_sock;
+	//adzm 2010-08-01
+	DWORD m_LastSentTick;
 	bool m_serverInitiated;
 	HWND m_hwndcn, m_hbands,m_hwndTB,m_hwndTBwin,m_hwndStatus,m_TrafficMonitor,m_logo_wnd,m_button_wnd;
 	HANDLE m_statusThread;

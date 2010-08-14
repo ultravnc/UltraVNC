@@ -5469,13 +5469,12 @@ void vncClient::SendKeepAlive(bool bForce)
 {
     if (m_wants_KeepAlive && m_socket)
     {
-        static time_t lastSent = 0;
-        time_t now = time(&now);
-        time_t delta = now - lastSent;
-        if (!bForce && delta < m_server->GetKeepAliveInterval())
-            return;
+		//adzm 2010-08-01
+		DWORD nInterval = (DWORD)m_server->GetKeepAliveInterval() * 1000;
+		DWORD nTicksSinceLastSent = GetTickCount() - m_socket->GetLastSentTick();
 
-        lastSent = now;
+        if (!bForce && nTicksSinceLastSent < nInterval)
+            return;
 
         rfbKeepAliveMsg kp;
         memset(&kp, 0, sizeof kp);
