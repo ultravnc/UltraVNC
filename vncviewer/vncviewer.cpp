@@ -327,6 +327,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 
   // [v1.0.2-jp1 fix]
   //m_hInstResDLL = LoadLibrary("lang.dll");
+  SetDllDirectory("");
   m_hInstResDLL = LoadLibrary("vnclang.dll");
   
   if (m_hInstResDLL==NULL)
