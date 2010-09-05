@@ -78,7 +78,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="comctl32.lib winmm.lib omnithread.lib wsock32.lib"
+				AdditionalDependencies="comctl32.lib winmm.lib omnithread.lib ws2_32.lib"
 				OutputFile=".\Debug/vncviewer.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -180,7 +180,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="comctl32.lib winmm.lib omnithread.lib wsock32.lib"
+				AdditionalDependencies="comctl32.lib winmm.lib omnithread.lib ws2_32.lib"
 				OutputFile=".\Debug/vncviewer.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -278,7 +278,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="comctl32.lib winmm.lib omnithread.lib wsock32.lib"
+				AdditionalDependencies="comctl32.lib winmm.lib omnithread.lib ws2_32.lib"
 				OutputFile=".\Release/vncviewer.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -374,7 +374,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="comctl32.lib winmm.lib omnithread.lib wsock32.lib"
+				AdditionalDependencies="comctl32.lib winmm.lib omnithread.lib ws2_32.lib"
 				OutputFile=".\Release/vncviewer.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"

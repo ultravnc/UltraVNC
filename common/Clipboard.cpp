@@ -379,8 +379,6 @@ bool ClipboardData::Load(HWND hwndOwner) // will return false on failure
 
 				m_lengthRTF = nLength;
 
-				m_crc = crc32(m_crc, pData, nLength);
-
 				GlobalUnlock(hRTF);
 			}
 		}
@@ -406,8 +404,6 @@ bool ClipboardData::Load(HWND hwndOwner) // will return false on failure
 
 				m_lengthHTML = nLength;
 
-				m_crc = crc32(m_crc, pData, nLength);
-
 				GlobalUnlock(hHTML);
 			}
 		}
@@ -432,6 +428,7 @@ bool ClipboardData::Restore(HWND hwndOwner, ExtendedClipboardDataMessage& extend
 
 	int nCompressedDataLength = extendedClipboardDataMessage.GetBufferLength() - extendedClipboardDataMessage.GetDataLength();
 
+	m_crc = crc32(0L, Z_NULL, 0);
 	if (nCompressedDataLength == 0) {
 		// no data beyond the flags
 		return true;
@@ -451,6 +448,8 @@ bool ClipboardData::Restore(HWND hwndOwner, ExtendedClipboardDataMessage& extend
 			// get the incoming UTF-8 text
 			BYTE* pIncomingText = new BYTE[length];
 			compressedStream.readBytes(pIncomingText, length);
+
+			m_crc = crc32(m_crc, pIncomingText, length);
 
 			// now we have to translate to UTF-16
 			int nConvertedSize = MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)pIncomingText, length, NULL, 0);
@@ -502,6 +501,7 @@ bool ClipboardData::Restore(HWND hwndOwner, ExtendedClipboardDataMessage& extend
 
 			if (pData) {
 				compressedStream.readBytes(pData, length);
+
 				GlobalUnlock(hData);
 
 				if (::SetClipboardData(ClipboardSettings::formatRTF, hData)) {
@@ -530,6 +530,7 @@ bool ClipboardData::Restore(HWND hwndOwner, ExtendedClipboardDataMessage& extend
 
 			if (pData) {
 				compressedStream.readBytes(pData, length);
+
 				GlobalUnlock(hData);
 
 				if (!::SetClipboardData(ClipboardSettings::formatHTML, hData)) {

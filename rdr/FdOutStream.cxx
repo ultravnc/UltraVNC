@@ -21,7 +21,8 @@
 #include <errno.h>
 #include <sys/types.h>
 #ifdef _WIN32
-#include <winsock.h>
+// adzm 2010-08 - use winsock2
+#include <winsock2.h>
 #define write(s,b,l) send(s,(const char*)b,l,0)
 #undef errno
 #define errno WSAGetLastError()

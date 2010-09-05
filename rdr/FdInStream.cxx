@@ -21,7 +21,8 @@
 #include <errno.h>
 #include <sys/types.h>
 #ifdef _WIN32
-#include <winsock.h>
+// adzm 2010-08 - use winsock2
+#include <winsock2.h>
 #include <sys/timeb.h>
 #define read(s,b,l) recv(s,(char*)b,l,0)
 #undef errno

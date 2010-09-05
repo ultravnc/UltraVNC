@@ -798,6 +798,10 @@ public:
 	virtual BOOL InitVersion();
 	virtual BOOL InitAuthenticate();
 	virtual BOOL AuthMsLogon();
+	
+	// adzm 2010-08
+	virtual bool InitSocket();
+	virtual bool TryReconnect();
 
 	// The main thread function
 	virtual void run(void *arg);
@@ -864,20 +868,43 @@ vncClientThread::InitVersion()
 					rfbProtocolMinorVersion + (m_server->MSLogonRequired() ? 0 : 2)); // 4: mslogon+FT,
 																				  // 6: VNClogon+FT
 		}
-		// Send the protocol message
-		//m_socket->SetTimeout(0); // sf@2006 - Trying to fix neverending authentication bug - Not sure it's a good idea...
-		//adzm 2009-06-20 - if SC, wait for a connection, rather than timeout too quickly.
-		if (SPECIAL_SC_PROMPT) {
-			//adzm 2009-06-20 - TODO - perhaps this should only occur if we can determine we are using a repeater?
-			m_socket->SetTimeout(0);
+
+		// adzm 2010-08
+		bool bRetry = true;
+		bool bReady = false;
+		int nRetry = 0;
+		while (!bReady && bRetry) {
+			// Send the protocol message
+			//m_socket->SetTimeout(0); // sf@2006 - Trying to fix neverending authentication bug - Not sure it's a good idea...
+			//adzm 2009-06-20 - if SC, wait for a connection, rather than timeout too quickly.
+			if (SPECIAL_SC_PROMPT) {
+				//adzm 2009-06-20 - TODO - perhaps this should only occur if we can determine we are using a repeater?
+				m_socket->SetTimeout(0);
+			}
+
+			// Send our protocol version, and get the client's protocol version
+			if (!m_socket->SendExact((char *)&protocolMsg, sz_rfbProtocolVersionMsg) || 
+				!m_socket->ReadExact((char *)&protocol_ver, sz_rfbProtocolVersionMsg)) {
+				bReady = false;
+				// we need to reconnect!
+				
+				Sleep(min(nRetry * 1000, 30000));
+
+				if (TryReconnect()) {
+					// reconnect if in SC mode and not already using AutoReconnect
+					bRetry = true;
+					nRetry++;
+				} else {
+					bRetry = false;
+				}
+			} else {
+				bReady = true;
+			}
 		}
 
-		if (!m_socket->SendExact((char *)&protocolMsg, sz_rfbProtocolVersionMsg))
+		if (!bReady) {
 			return FALSE;
-
-		// Now, get the client's protocol version
-		if (!m_socket->ReadExact((char *)&protocol_ver, sz_rfbProtocolVersionMsg))
-			return FALSE;
+		}
 	}
 	else 
 		memcpy(protocol_ver,m_client->ProtocolVersionMsg, sz_rfbProtocolVersionMsg);
@@ -1620,25 +1647,9 @@ void GetIPString(char *buffer, int buflen)
     }
 }
 
-
-
-void
-vncClientThread::run(void *arg)
+// adzm 2010-08
+bool vncClientThread::InitSocket()
 {
-	// All this thread does is go into a socket-receive loop,
-	// waiting for stuff on the given socket
-
-	// IMPORTANT : ALWAYS call RemoveClient on the server before quitting
-	// this thread.
-    SetErrorMode(SEM_FAILCRITICALERRORS|SEM_NOOPENFILEERRORBOX);
-
-	vnclog.Print(LL_CLIENTS, VNCLOG("client connected : %s (%hd)\n"),
-								m_client->GetClientName(),
-								m_client->GetClientId());
-	// Save the handle to the thread's original desktop
-	HDESK home_desktop = GetThreadDesktop(GetCurrentThreadId());
-	HDESK input_desktop = 0;
-	
 	// To avoid people connecting and then halting the connection, set a timeout
 	if (!m_socket->SetTimeout(30000))
 		vnclog.Print(LL_INTERR, VNCLOG("failed to set socket timeout(%d)\n"), GetLastError());
@@ -1655,11 +1666,8 @@ vncClientThread::run(void *arg)
 	else
 	{
 		vnclog.Print(LL_INTINFO, VNCLOG("Invalid DSMPlugin Pointer\n"));
-		return;
+		return false;
 	}
-
-	// Initially blacklist the client so that excess connections from it get dropped
-	m_server->AddAuthHostsBlacklist(m_client->GetClientName());
 
 	// LOCK INITIAL SETUP
 	// All clients have the m_protocol_ready flag set to FALSE initially, to prevent
@@ -1679,7 +1687,7 @@ vncClientThread::run(void *arg)
 		if (!m_server->GetDSMPluginPointer()->SupportsMultithreaded() && m_server->AuthClientCount() > 0)
 		{
 			vnclog.Print(LL_CLIENTS, VNCLOG("A connection using DSM already exist - client rejected to avoid crash \n"));
-			return;
+			return false;
 		} 
 
 		//adzm 2009-06-20 - TODO - Not sure about this. what about pending connections via the repeater?
@@ -1692,6 +1700,84 @@ vncClientThread::run(void *arg)
 	else
 		m_client->m_encodemgr.EnableQueuing(true);
 
+	return true;
+}
+
+bool vncClientThread::TryReconnect()
+{
+	if (fShutdownOrdered || m_server->AutoReconnect() || !m_client->GetHost() || !m_client->GetRepeaterID()) {
+		return false;
+	}
+
+	if (m_socket) {
+		m_socket->Close();
+		if (m_client && m_client->m_socket) {
+			m_client->m_socket = NULL;
+		}
+		delete m_socket;
+		m_socket = NULL;
+	}
+
+	// Attempt to create a new socket
+	VSocket *tmpsock = new VSocket;
+	if (!tmpsock) {
+		return false;
+	}
+
+	m_socket = tmpsock;
+	if (m_client) {
+		m_client->m_socket = tmpsock;
+	}
+	
+	// Connect out to the specified host on the VNCviewer listen port
+	// To be really good, we should allow a display number here but
+	// for now we'll just assume we're connecting to display zero
+	m_socket->Create();
+	if (m_socket->Connect(m_client->GetHost(), m_client->GetHostPort()))	{
+		if (m_client->GetRepeaterID()) {
+			char finalidcode[_MAX_PATH];
+			//adzm 2010-08 - this was sending uninitialized data over the wire
+			ZeroMemory(finalidcode, sizeof(finalidcode));
+			strncpy(finalidcode, m_client->GetRepeaterID(), sizeof(finalidcode) - 1);
+
+			m_socket->Send(finalidcode,250);
+			m_socket->SetTimeout(0);
+
+			InitSocket();
+
+			return true;
+		}
+	}
+
+	return false;
+}
+
+void
+vncClientThread::run(void *arg)
+{
+	// All this thread does is go into a socket-receive loop,
+	// waiting for stuff on the given socket
+
+	// IMPORTANT : ALWAYS call RemoveClient on the server before quitting
+	// this thread.
+    SetErrorMode(SEM_FAILCRITICALERRORS|SEM_NOOPENFILEERRORBOX);
+
+	vnclog.Print(LL_CLIENTS, VNCLOG("client connected : %s (%hd)\n"),
+								m_client->GetClientName(),
+								m_client->GetClientId());
+	// Save the handle to the thread's original desktop
+	HDESK home_desktop = GetThreadDesktop(GetCurrentThreadId());
+	HDESK input_desktop = 0;
+
+	// Initially blacklist the client so that excess connections from it get dropped
+	m_server->AddAuthHostsBlacklist(m_client->GetClientName());
+
+	// adzm 2010-08
+	if (!InitSocket()) {
+		m_server->RemoveClient(m_client->GetClientId());
+		return;
+	}
+	
 	// GET PROTOCOL VERSION
 	if (!InitVersion())
 	{
@@ -3842,8 +3928,8 @@ vncClient::~vncClient()
 		//adzm 2009-06-20 - if we are SC, only exit if no other viewers are connected!
 		// (since multiple viewers is now allowed with the new DSM plugin)
 		// adzm 2009-08-02
-				
-		if ( (m_server == NULL) || (m_server && m_server->AuthClientCount() == 0) ) {
+		// adzm 2010-08 - stay alive if we have an UnauthClientCount as well, since another connection may be pending
+		if ( (m_server == NULL) || (m_server && m_server->AuthClientCount() == 0 && m_server->UnauthClientCount() == 0) ) {
 			// We want that the server exit when the viewer exit
 			//adzm 2010-02-10 - Finds the appropriate VNC window for this process
 			HWND hwnd=FindWinVNCWindow(true);

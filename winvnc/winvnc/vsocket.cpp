@@ -45,6 +45,7 @@ class VSocket;
 #ifdef __WIN32__
 #include <io.h>
 #include <winsock2.h>
+#include <mstcpip.h>
 #else
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -61,6 +62,7 @@ class VSocket;
 ////////////////////////////////////////////////////////
 // Custom includes
 
+#include <assert.h>
 #include "VTypes.h"
 extern unsigned int G_SENDBUFFER;
 ////////////////////////////////////////////////////////
@@ -122,6 +124,10 @@ VSocketSystem::~VSocketSystem()
 }
 
 ////////////////////////////
+
+
+// adzm 2010-08
+int VSocket::m_defaultSocketKeepAliveTimeout = 10000;
 
 VSocket::VSocket()
 {
@@ -190,10 +196,9 @@ VSocket::Create()
       return VFalse;
   }
   //#endif
-  if (setsockopt(sock, IPPROTO_TCP, TCP_NODELAY, (char *)&one, sizeof(one)))
-  {
-	  return VFalse;
-  }
+
+  // adzm 2010-08
+  SetDefaultSocketOptions();
 
   return VTrue;
 }
@@ -319,6 +324,10 @@ VSocket::Connect(const VString address, const VCard port)
 	return VFalse;
 #endif
 */
+  
+  // adzm 2010-08
+  SetDefaultSocketOptions();
+
   return VTrue;
 }
 
@@ -343,8 +352,6 @@ VSocket::Listen()
 VSocket *
 VSocket::Accept()
 {
-  const int one = 1;
-
   int new_socket_id;
   VSocket * new_socket;
 
@@ -372,10 +379,11 @@ VSocket::Accept()
   {
 	  shutdown(new_socket_id, SD_BOTH);
 	  closesocket(new_socket_id);
+	  return NULL;
   }
-
-  // Attempt to set the new socket's options
-  setsockopt(new_socket->sock, IPPROTO_TCP, TCP_NODELAY, (char *)&one, sizeof(one));
+  
+  // adzm 2010-08
+  new_socket->SetDefaultSocketOptions();
 
   // Put the socket into non-blocking mode
   return new_socket;
@@ -470,6 +478,52 @@ VSocket::Resolve(const VString address)
 
   // Return the resolved IP address as an integer
   return addr;
+}
+
+////////////////////////////
+
+// adzm 2010-08
+VBool
+VSocket::SetDefaultSocketOptions()
+{
+	VBool result = VTrue;
+
+	const int one = 1;
+
+	if (setsockopt(sock, IPPROTO_TCP, TCP_NODELAY, (const char *)&one, sizeof(one)))
+	{
+		result = VFalse;
+	}
+
+	int defaultSocketKeepAliveTimeout = m_defaultSocketKeepAliveTimeout;
+	if (defaultSocketKeepAliveTimeout > 0) {
+		if (setsockopt(sock, SOL_SOCKET, SO_KEEPALIVE, (const char *)&one, sizeof(one))) {
+			result = VFalse;
+		} else {
+			DWORD bytes_returned = 0;
+			tcp_keepalive keepalive_requested;
+			tcp_keepalive keepalive_returned;
+			ZeroMemory(&keepalive_requested, sizeof(keepalive_requested));
+			ZeroMemory(&keepalive_returned, sizeof(keepalive_returned));
+
+			keepalive_requested.onoff = 1;
+			keepalive_requested.keepalivetime = defaultSocketKeepAliveTimeout;
+			keepalive_requested.keepaliveinterval = 1000;
+			// 10 probes always used by default in Vista+; not changeable. 
+
+			if (0 != WSAIoctl(sock, SIO_KEEPALIVE_VALS, 
+					&keepalive_requested, sizeof(keepalive_requested), 
+					&keepalive_returned, sizeof(keepalive_returned), 
+					&bytes_returned, NULL, NULL))
+			{
+				result = VFalse;
+			}
+		}
+	}
+
+	assert(result);
+
+	return result;
 }
 
 ////////////////////////////

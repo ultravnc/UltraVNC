@@ -69,6 +69,7 @@ vncProperties::vncProperties()
 	m_fUseRegistry = FALSE;
     m_ftTimeout = FT_RECV_TIMEOUT;
     m_keepAliveInterval = KEEPALIVE_INTERVAL;
+	m_socketKeepAliveTimeout = SOCKET_KEEPALIVE_TIMEOUT; // adzm 2010-08
 	m_pref_Primary=true;
 	m_pref_Secondary=false;
 
@@ -413,7 +414,7 @@ vncProperties::DialogProc(HWND hwnd,
 	{
 
 	case WM_INITDIALOG:
-		{
+		{			
 			vnclog.Print(LL_INTINFO, VNCLOG("INITDIALOG properties\n"));
 			// Retrieve the Dialog box parameter and use it as a pointer
 			// to the calling vncProperties object
@@ -2366,8 +2367,13 @@ void vncProperties::LoadFromIniFile()
     if (m_keepAliveInterval >= (m_ftTimeout - KEEPALIVE_HEADROOM))
         m_keepAliveInterval = m_ftTimeout - KEEPALIVE_HEADROOM;
 
+	// adzm 2010-08
+	m_socketKeepAliveTimeout = myIniFile.ReadInt("admin", "SocketKeepAliveTimeout", m_socketKeepAliveTimeout); 
+	if (m_socketKeepAliveTimeout < 0) m_socketKeepAliveTimeout = 0;
+
     m_server->SetFTTimeout(m_ftTimeout);
     m_server->SetKeepAliveInterval(m_keepAliveInterval);
+	m_server->SetSocketKeepAliveTimeout(m_socketKeepAliveTimeout); // adzm 2010-08
     
 
 	ApplyUserPrefs();
@@ -2463,6 +2469,8 @@ void vncProperties::SaveToIniFile()
 	myIniFile.WriteInt("admin", "AllowEditClients", m_alloweditclients);
     myIniFile.WriteInt("admin", "FileTransferTimeout", m_ftTimeout);
     myIniFile.WriteInt("admin", "KeepAliveInterval", m_keepAliveInterval);
+	// adzm 2010-08
+    myIniFile.WriteInt("admin", "SocketKeepAliveTimeout", m_socketKeepAliveTimeout);
 
 	myIniFile.WriteInt("admin", "DisableTrayIcon", m_server->GetDisableTrayIcon());
 	myIniFile.WriteInt("admin", "MSLogonRequired", m_server->MSLogonRequired());

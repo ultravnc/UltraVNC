@@ -393,7 +393,6 @@ typedef struct {
 #define rfbEncodingQualityLevel9   0xFFFFFFE9
 
 // adzm - 2010-07 - Extended clipboard support
-// Havn't heard from the RealVNC folk; this will do for now.
 #define rfbEncodingExtendedClipboard  0xC0A1E5CE
 
 
@@ -951,6 +950,9 @@ typedef struct {
 #define sz_rfbKeepAliveMsg 1
 #define KEEPALIVE_INTERVAL 5
 #define KEEPALIVE_HEADROOM 1
+// adzm 2010-08
+#define SOCKET_KEEPALIVE_TIMEOUT 10000
+#define SOCKET_KEEPALIVE_INTERVAL 1000
 
 #define FT_RECV_TIMEOUT    30
 

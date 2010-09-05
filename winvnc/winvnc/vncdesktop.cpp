@@ -1677,7 +1677,9 @@ void vncDesktop::SetClipTextEx(ExtendedClipboardDataMessage& extendedClipboardDa
 		}
 	}
 
-	if (bRestored) {
+	// actually it is really confusing to other connected clients when this occurs
+	// we can re-enable if necessary by removing the check for a NULL sourceClient 
+	if (bRestored && m_clipboard_active && sourceClient == NULL) {
 		// we may need to notify other connected clients about the change.
 		GetServerPointer()->UpdateClipTextEx(Window(), sourceClient);
 	}

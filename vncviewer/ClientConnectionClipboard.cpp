@@ -68,13 +68,11 @@ void ClientConnection::ProcessLocalClipboardChange()
 		vnclog.Print(2, _T("Don't send initial clipboard!\n"));
 		m_initialClipboardSeen = true;*/
 	} else if (!m_opts.m_DisableClipboard && !m_opts.m_ViewOnly) {
-		// adzm - 2010-07 - Extended clipboard
 		UpdateRemoteClipboard();
 	}
 	// Pass the message to the next window in clipboard viewer chain
 	if (m_hwndNextViewer != NULL && m_hwndNextViewer != (HWND)INVALID_HANDLE_VALUE) {
 		vnclog.Print(6, _T("Passing WM_DRAWCLIPBOARD to 0x%08x\n"), m_hwndNextViewer);
-		// adzm - 2010-07 - Fix clipboard hangs
 		// use SendNotifyMessage instead of SendMessage so misbehaving or hung applications
 		// (like ourself before this) won't cause our thread to hang.
 		::SendNotifyMessage(m_hwndNextViewer, WM_DRAWCLIPBOARD , 0,0); 
@@ -82,6 +80,7 @@ void ClientConnection::ProcessLocalClipboardChange()
 		vnclog.Print(6, _T("No next window in chain; WM_DRAWCLIPBOARD will not be passed\n"), m_hwndNextViewer);
 	}
 }
+
 
 // adzm - 2010-07 - Extended clipboard
 void ClientConnection::UpdateRemoteClipboard(CARD32 overrideFlags)
@@ -165,6 +164,7 @@ void ClientConnection::UpdateRemoteClipboard(CARD32 overrideFlags)
 // adzm - 2010-07 - Extended clipboard
 void ClientConnection::UpdateRemoteClipboardCaps()
 {
+	omni_mutex_lock l(m_clipMutex);
 	if (!m_clipboard.settings.m_bSupportsEx) return;
 
 	ExtendedClipboardDataMessage extendedClipboardDataMessage;

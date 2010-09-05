@@ -237,6 +237,9 @@ vncServer::vncServer()
     m_ftTimeout = FT_RECV_TIMEOUT;
     m_keepAliveInterval = KEEPALIVE_INTERVAL;
 
+	// adzm 2010-08
+	m_socketKeepAliveTimeout = SOCKET_KEEPALIVE_TIMEOUT;
+
 	
 	//adzm 2010-05-12 - dsmplugin config
 	m_szDSMPluginConfig[0] = '\0';

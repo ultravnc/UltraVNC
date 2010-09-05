@@ -1451,10 +1451,10 @@ void ClientConnection::UpdateMenuItems()
 	CheckMenuItem(m_hPopupMenuClipboard,
 				  ID_ENABLE_CLIPBOARD,
 				  MF_BYCOMMAND | (m_opts.m_DisableClipboard ? MF_UNCHECKED : MF_CHECKED));
-
+	// don't allow text format to be interacted with
 	CheckMenuItem(m_hPopupMenuClipboardFormats,
 				  ID_CLIPBOARD_TEXT,
-				  MF_BYCOMMAND | ( (m_clipboard.settings.m_nLimitText > 0) ? MF_CHECKED : MF_UNCHECKED));
+				  MF_BYCOMMAND | MF_CHECKED | MF_GRAYED | MF_DISABLED);
 
 	CheckMenuItem(m_hPopupMenuClipboardFormats,
 				  ID_CLIPBOARD_RTF,
@@ -1468,10 +1468,10 @@ void ClientConnection::UpdateMenuItems()
 				  ID_ENABLE_CLIPBOARD,
 				  m_opts.m_ViewOnly ? MF_DISABLED : MF_ENABLED);
 
+	// don't allow text format to be interacted with
 	EnableMenuItem(m_hPopupMenuClipboardFormats,
 				  ID_CLIPBOARD_TEXT,
-				  (m_opts.m_ViewOnly || m_opts.m_DisableClipboard || !m_clipboard.settings.m_bSupportsEx || !(m_clipboard.settings.m_remoteCaps & clipText)) ? MF_DISABLED : MF_ENABLED);
-
+				  MF_DISABLED);
 	EnableMenuItem(m_hPopupMenuClipboardFormats,
 				  ID_CLIPBOARD_RTF,
 				  (m_opts.m_ViewOnly || m_opts.m_DisableClipboard || !m_clipboard.settings.m_bSupportsEx || !(m_clipboard.settings.m_remoteCaps & clipRTF)) ? MF_DISABLED : MF_ENABLED);
@@ -4882,16 +4882,19 @@ void ClientConnection::ReadServerCutText()
 
 		switch(action) {
 			case clipCaps:
-				m_clipboard.settings.HandleCapsPacket(extendedClipboardDataMessage);
-				UpdateRemoteClipboardCaps();
+				{
+					omni_mutex_lock l(m_clipMutex);
+					m_clipboard.settings.HandleCapsPacket(extendedClipboardDataMessage);
+					UpdateRemoteClipboardCaps();
+				}
 				break;
 			case clipProvide:
 				{
-					ClipboardData newClipboard;
-
 					{
 						if (!m_opts.m_DisableClipboard && !m_opts.m_ViewOnly) {
 							omni_mutex_lock l(m_clipMutex);
+
+							ClipboardData newClipboard;
 
 							if (newClipboard.Restore(m_hwndcn, extendedClipboardDataMessage)) {
 								vnclog.Print(6, _T("Successfuly restored new clipboard data\n"));
@@ -4905,7 +4908,10 @@ void ClientConnection::ReadServerCutText()
 				}
 				break;
 			case clipNotify:
-				m_clipboard.m_notifiedRemoteFormats |= (extendedClipboardDataMessage.GetFlags() & clipFormatMask);
+				{
+					omni_mutex_lock l(m_clipMutex);
+					m_clipboard.m_notifiedRemoteFormats |= (extendedClipboardDataMessage.GetFlags() & clipFormatMask);
+				}
 				break;
 			case clipRequest:
 				// no need for server to request anything at the moment.
@@ -5624,13 +5630,15 @@ void ClientConnection::CheckFileChunkBufferSize(int bufsize)
 //
 void ClientConnection::ReadNewFBSize(rfbFramebufferUpdateRectHeader *pfburh)
 {
+	//adzm 2010-09 - Clear the cache first, since it tries to clear based on m_si which is changing!
+	ClearCache();
+
 	// [v1.0.2-jp1 fix]
 	//m_si.framebufferWidth = pfburh->r.w;
 	//m_si.framebufferHeight = pfburh->r.h;
 	m_si.framebufferWidth = pfburh->r.w / m_nServerScale;
 	m_si.framebufferHeight = pfburh->r.h / m_nServerScale;
 
-	ClearCache();
 	CreateLocalFramebuffer();
     SendFullFramebufferUpdateRequest();
 	Createdib();
@@ -6874,7 +6882,6 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							KillTimer(_this->m_hwndcn, _this->m_emulate3ButtonsTimer);
 							_this->m_waitingOnEmulateTimer = false;
 						}
-
 						// adzm - 2010-07 - Extended clipboard
 
 						if (_this->m_hPopupMenuClipboard) {

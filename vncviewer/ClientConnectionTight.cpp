@@ -558,7 +558,9 @@ void ClientConnection::DecompressJpegRect(int x, int y, int w, int h)
   omni_mutex_lock l(m_bitmapdcMutex);
 
   // Two scanlines: for 24bit and COLORREF samples
-  CheckZlibBufferSize(2*2048*4);
+  // adzm 2010-08 - Increase zlib buffer size (from TightVNC)
+  const int maxRowWidth = 8192;
+  CheckZlibBufferSize(2*maxRowWidth*4);
 
   JSAMPROW rowPointer[1];
   rowPointer[0] = (JSAMPROW)m_zlibbuf;
@@ -569,11 +571,11 @@ void ClientConnection::DecompressJpegRect(int x, int y, int w, int h)
     if (jpegError) {
       break;
     }
-    pixelPtr = (COLORREF *)&m_zlibbuf[2048*4];
+    pixelPtr = (COLORREF *)&m_zlibbuf[maxRowWidth*4];
     for (int dx = 0; dx < w; dx++) {
       *pixelPtr++ = COLOR_FROM_PIXEL24_ADDRESS(&m_zlibbuf[dx*3]);
     }
-    SETPIXELS_NOCONV(&m_zlibbuf[2048*4], x, y + dy, w, 1);
+    SETPIXELS_NOCONV(&m_zlibbuf[maxRowWidth*4], x, y + dy, w, 1);
   }
 
   if (!jpegError)

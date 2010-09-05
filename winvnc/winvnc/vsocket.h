@@ -118,6 +118,12 @@ public:
   VBool SetTimeout(VCard32 msecs);
   VBool SetSendTimeout(VCard32 msecs);
   VBool SetRecvTimeout(VCard32 msecs);
+  
+  // adzm 2010-08
+  VBool SetDefaultSocketOptions();
+
+  // adzm 2010-08
+  static void SetSocketKeepAliveTimeoutDefault(int timeout) { m_defaultSocketKeepAliveTimeout = timeout; }
 
   bool VSocket::GetPeerAddress(char *address, int size);
   SOCKET GetChannel() const { return (SOCKET) sock; }
@@ -197,6 +203,9 @@ protected:
 
   char queuebuffer[9000];
   DWORD queuebuffersize;
+
+  // adzm 2010-08
+  static int m_defaultSocketKeepAliveTimeout;
 
 };
 

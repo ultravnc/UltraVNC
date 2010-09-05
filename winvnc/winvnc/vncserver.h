@@ -596,6 +596,8 @@ protected:
     bool m_fEnableKeepAlive;
     int m_ftTimeout;
     int m_keepAliveInterval;
+	// adzm 2010-08
+	int m_socketKeepAliveTimeout;
 	bool clearconsole;
 };
 

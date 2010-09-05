@@ -199,6 +199,9 @@ VNCOptions::VNCOptions()
 
   m_FTTimeout = FT_RECV_TIMEOUT;
   m_keepAliveInterval = KEEPALIVE_INTERVAL;
+  m_socketKeepAliveTimeout = SOCKET_KEEPALIVE_TIMEOUT; // adzm 2010-08
+
+  
   
 #ifdef UNDER_CE
   m_palmpc = false;
@@ -329,6 +332,7 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
   m_fExitCheck    = s.m_fExitCheck; //PGM @ Advantig
   m_FTTimeout =  s.m_FTTimeout;
   m_keepAliveInterval = s.m_keepAliveInterval;
+  m_socketKeepAliveTimeout = s.m_socketKeepAliveTimeout; // adzm 2010-08
 
   //adzm 2009-06-21
   m_fAutoAcceptIncoming = s.m_fAutoAcceptIncoming;
@@ -474,6 +478,16 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
         }
         if (m_keepAliveInterval >= (m_FTTimeout - KEEPALIVE_HEADROOM))
           m_keepAliveInterval = (m_FTTimeout - KEEPALIVE_HEADROOM); 
+        j++;
+      }
+	} else if ( SwitchMatch(args[j], _T("socketkeepalivetimeout"))) { // adzm 2010-08 
+      if (j+1 < i && args[j+1][0] >= '0' && args[j+1][0] <= '9') {
+        if (_stscanf(args[j+1], _T("%d"), &m_socketKeepAliveTimeout) != 1) {
+          ArgError(sz_D3);
+          continue;
+        }
+        if (m_socketKeepAliveTimeout < 0)
+            m_socketKeepAliveTimeout = 0;
         j++;
       }
     } else if ( SwitchMatch(args[j], _T("askexit"))) { //PGM @ Advantig
@@ -804,6 +818,11 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 	    //adzm 2010-07-04
 	    m_preemptiveUpdates = true;
 	}
+	else if (SwitchMatch(args[j], _T("enablecache")))
+	{
+	    //adzm 2010-08
+	    m_fEnableCache = true;
+	}
 	else
 	{
       TCHAR phost[256];
@@ -948,6 +967,8 @@ void VNCOptions::Save(char *fname)
   saveInt("FileTransferTimeout",    m_FTTimeout,    fname);
   saveInt("KeepAliveInterval",      m_keepAliveInterval,    fname);
 
+  saveInt("SocketKeepAliveTimeout", m_socketKeepAliveTimeout,    fname); // adzm 2010-08
+
   //adzm 2009-06-21
   saveInt("AutoAcceptIncoming",		m_fAutoAcceptIncoming, fname);
   
@@ -1041,6 +1062,10 @@ void VNCOptions::Load(char *fname)
   m_keepAliveInterval  = readInt("KeepAliveInterval", m_keepAliveInterval, fname);
   if (m_keepAliveInterval >= (m_FTTimeout - KEEPALIVE_HEADROOM))
       m_keepAliveInterval = (m_FTTimeout  - KEEPALIVE_HEADROOM); 
+
+  m_socketKeepAliveTimeout  = readInt("SocketKeepAliveTimeout", m_socketKeepAliveTimeout, fname); // adzm 2010-08
+  if (m_socketKeepAliveTimeout < 0)
+      m_socketKeepAliveTimeout = 0; 
 
   //adzm 2009-06-21
   m_fAutoAcceptIncoming = readInt("AutoAcceptIncoming", (int)m_fAutoAcceptIncoming, fname) ? true : false;

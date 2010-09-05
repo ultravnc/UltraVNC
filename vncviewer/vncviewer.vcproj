@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="vncviewer"
 	ProjectGUID="{357D07B6-0613-4B05-9D22-1764A49AC945}"
 	RootNamespace="vncviewer"
@@ -78,7 +78,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="comctl32.lib winmm.lib omnithread.lib wsock32.lib"
+				AdditionalDependencies="comctl32.lib winmm.lib omnithread.lib ws2_32.lib"
 				OutputFile=".\Debug/vncviewer.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -177,7 +177,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="comctl32.lib winmm.lib omnithread.lib wsock32.lib"
+				AdditionalDependencies="comctl32.lib winmm.lib omnithread.lib ws2_32.lib"
 				OutputFile=".\Debug/vncviewer.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -279,7 +279,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/LTCG"
-				AdditionalDependencies="comctl32.lib winmm.lib omnithread.lib wsock32.lib"
+				AdditionalDependencies="comctl32.lib winmm.lib omnithread.lib ws2_32.lib"
 				OutputFile=".\Release/vncviewer.exe"
 				LinkIncremental="0"
 				SuppressStartupBanner="true"
@@ -375,7 +375,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="comctl32.lib winmm.lib omnithread.lib wsock32.lib"
+				AdditionalDependencies="comctl32.lib winmm.lib omnithread.lib ws2_32.lib"
 				OutputFile=".\Release/vncviewer_64.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -428,11 +428,11 @@
 				>
 			</File>
 			<File
-				RelativePath="res\stat\background2.bmp"
+				RelativePath="res\background2.bmp"
 				>
 			</File>
 			<File
-				RelativePath="res\background2.bmp"
+				RelativePath="res\stat\background2.bmp"
 				>
 			</File>
 			<File
@@ -568,19 +568,19 @@
 				>
 			</File>
 			<File
-				RelativePath=".\res\Tango_s.bmp"
-				>
-			</File>
-			<File
 				RelativePath=".\Tango_s.bmp"
 				>
 			</File>
 			<File
-				RelativePath=".\res\Tango_sx.bmp"
+				RelativePath=".\res\Tango_s.bmp"
 				>
 			</File>
 			<File
 				RelativePath=".\Tango_sx.bmp"
+				>
+			</File>
+			<File
+				RelativePath=".\res\Tango_sx.bmp"
 				>
 			</File>
 			<File
@@ -633,10 +633,6 @@
 			</File>
 			<File
 				RelativePath="res\vnc64.BMP"
-				>
-			</File>
-			<File
-				RelativePath=".\res\vncviewer.exe.x64.manifest"
 				>
 			</File>
 			<File
