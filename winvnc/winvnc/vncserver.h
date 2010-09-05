@@ -429,6 +429,10 @@ public:
         m_keepAliveInterval = m_ftTimeout  - KEEPALIVE_HEADROOM;
     }
 
+	// adzm 2010-08
+	void SetSocketKeepAliveTimeout(int timeout)	{ m_socketKeepAliveTimeout = timeout > 0 ? timeout : 0; VSocket::SetSocketKeepAliveTimeoutDefault(m_socketKeepAliveTimeout); }
+	int GetSocketKeepAliveTimeout() { return m_socketKeepAliveTimeout; }
+
 	void TriggerUpdate();
 
 protected:
