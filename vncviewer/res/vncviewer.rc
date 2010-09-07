@@ -84,7 +84,6 @@ END
 // remains consistent on all systems.
 IDR_TRAY                ICON                    "idr_tray.ico"
 IDI_NET                 ICON                    "B46.ico"
-IDI_MAINICON            ICON                    "vncviewer.ico"
 IDI_FILE                ICON                    "file.ico"
 IDI_DIR                 ICON                    "dir.ico"
 IDI_DRIVE               ICON                    "drive.ico"

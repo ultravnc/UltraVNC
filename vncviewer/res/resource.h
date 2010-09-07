@@ -6,7 +6,6 @@
 #define IDR_TRAY                        101
 #define IDR_TRAYMENU                    103
 #define ID_CONN_ABOUT                   103
-#define IDI_MAINICON                    104
 #define ID_CONN_CTLDOWN                 104
 #define IDC_DOTCURSOR                   105
 #define ID_CONN_CTLUP                   105
