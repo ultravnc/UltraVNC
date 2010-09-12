@@ -4468,7 +4468,7 @@ inline void ClientConnection::ReadScreenUpdate()
 {
 	//adzm 2010-07-04
 	bool bSentUpdateRequest = false;
-	if (m_opts.m_preemptiveUpdates) {
+	if (m_opts.m_preemptiveUpdates && !m_pendingFormatChange) {
 		bSentUpdateRequest = true;
 		PostMessage(m_hwndcn, WM_REGIONUPDATED, NULL, NULL);
 	}
