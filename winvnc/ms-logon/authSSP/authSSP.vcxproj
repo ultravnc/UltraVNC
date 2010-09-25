@@ -84,14 +84,10 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.21006.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\..\..\Release\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\..\..\Release\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\..\..\Debug\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\..\..\Debug\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\</IntDir>
@@ -138,10 +134,6 @@
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <PrecompiledHeaderOutputFile>.\..\..\Release/authSSP.pch</PrecompiledHeaderOutputFile>
-      <AssemblerListingLocation>.\..\..\Release/</AssemblerListingLocation>
-      <ObjectFileName>.\..\..\Release/</ObjectFileName>
-      <ProgramDataBaseFileName>.\..\..\Release/</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
     </ClCompile>
@@ -151,17 +143,14 @@
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>comctl32.lib;netapi32.lib;delayimp.lib;aclui.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>.\..\..\Release/authSSP.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\authSSP.def</ModuleDefinitionFile>
       <DelayLoadDLLs>aclui.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>.\..\..\Release/authSSP.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
-      <ImportLibrary>.\..\..\Release/authSSP.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <Bscmake>
@@ -186,10 +175,6 @@
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <PrecompiledHeaderOutputFile>.\..\..\Release/authSSP.pch</PrecompiledHeaderOutputFile>
-      <AssemblerListingLocation>.\..\..\Release/</AssemblerListingLocation>
-      <ObjectFileName>.\..\..\Release/</ObjectFileName>
-      <ProgramDataBaseFileName>.\..\..\Release/</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
     </ClCompile>
@@ -199,17 +184,14 @@
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>comctl32.lib;netapi32.lib;delayimp.lib;aclui.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>.\..\..\Release/authSSP.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\authSSP.def</ModuleDefinitionFile>
       <DelayLoadDLLs>aclui.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>.\..\..\Release/authSSP.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
-      <ImportLibrary>.\..\..\Release/authSSP.lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <Bscmake>
@@ -233,10 +215,6 @@
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <PrecompiledHeaderOutputFile>.\..\..\Debug/authSSP.pch</PrecompiledHeaderOutputFile>
-      <AssemblerListingLocation>.\..\..\Debug/</AssemblerListingLocation>
-      <ObjectFileName>.\..\..\Debug/</ObjectFileName>
-      <ProgramDataBaseFileName>.\..\..\Debug/</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
@@ -247,17 +225,14 @@
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>comctl32.lib;netapi32.lib;delayimp.lib;aclui.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>.\..\..\Debug/authSSP.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\authSSP.def</ModuleDefinitionFile>
       <DelayLoadDLLs>aclui.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>.\..\..\Debug/authSSP.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
-      <ImportLibrary>.\..\..\Debug/authSSP.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <Bscmake>
@@ -281,10 +256,6 @@
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <PrecompiledHeaderOutputFile>.\..\..\Debug/authSSP.pch</PrecompiledHeaderOutputFile>
-      <AssemblerListingLocation>.\..\..\Debug/</AssemblerListingLocation>
-      <ObjectFileName>.\..\..\Debug/</ObjectFileName>
-      <ProgramDataBaseFileName>.\..\..\Debug/</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -295,17 +266,14 @@
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>comctl32.lib;netapi32.lib;delayimp.lib;aclui.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>.\..\..\Debug/authSSP.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\authSSP.def</ModuleDefinitionFile>
       <DelayLoadDLLs>aclui.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>.\..\..\Debug/authSSP.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
-      <ImportLibrary>.\..\..\Debug/authSSP.lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <Bscmake>
