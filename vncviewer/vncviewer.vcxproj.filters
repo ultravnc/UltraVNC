@@ -5,6 +5,12 @@
       <UniqueIdentifier>{e01f2b1b-a2d9-459b-95ea-a0a8fe91e837}</UniqueIdentifier>
       <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe</Extensions>
     </Filter>
+    <Filter Include="headers">
+      <UniqueIdentifier>{ac87e7a6-87cf-4eb9-b4c4-5b8116c4c578}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sources">
+      <UniqueIdentifier>{5bec4b45-0763-4856-b386-653b0deeff97}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\B46.ico">
@@ -179,88 +185,246 @@
     <None Include="VTune\vncviewer.vpj" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AboutBox.cpp" />
-    <ClCompile Include="AccelKeys.cpp" />
-    <ClCompile Include="AuthDialog.cpp" />
-    <ClCompile Include="buildtime.cpp" />
-    <ClCompile Include="ClientConnection.cpp" />
-    <ClCompile Include="ClientConnectionCacheRect.cpp" />
-    <ClCompile Include="ClientConnectionClipboard.cpp" />
-    <ClCompile Include="ClientConnectionCopyRect.cpp" />
-    <ClCompile Include="ClientConnectionCoRRE.cpp" />
-    <ClCompile Include="ClientConnectionCursor.cpp" />
-    <ClCompile Include="ClientConnectionFile.cpp" />
-    <ClCompile Include="ClientConnectionFullScreen.cpp" />
-    <ClCompile Include="ClientConnectionHextile.cpp" />
-    <ClCompile Include="ClientConnectionRaw.cpp" />
-    <ClCompile Include="ClientConnectionRRE.cpp" />
-    <ClCompile Include="ClientConnectionTight.cpp" />
-    <ClCompile Include="ClientConnectionUltra.cpp" />
-    <ClCompile Include="ClientConnectionZlib.cpp" />
-    <ClCompile Include="ClientConnectionZlibHex.cpp" />
-    <ClCompile Include="..\common\Clipboard.cpp" />
-    <ClCompile Include="d3des.c" />
-    <ClCompile Include="Daemon.cpp" />
-    <ClCompile Include="..\rfb\dh.cpp" />
-    <ClCompile Include="..\DSMPlugin\DSMPlugin.cpp" />
-    <ClCompile Include="Exception.cpp" />
-    <ClCompile Include="FileTransfer.cpp" />
-    <ClCompile Include="FullScreenTitleBar.cpp" />
-    <ClCompile Include="KeyMap.cpp" />
-    <ClCompile Include="KeyMapjap.cpp" />
-    <ClCompile Include="Log.cpp" />
-    <ClCompile Include="LowLevelHook.cpp" />
-    <ClCompile Include="MessBox2.cpp" />
-    <ClCompile Include="..\lzo\minilzo.c" />
-    <ClCompile Include="MRU.cpp" />
-    <ClCompile Include="SessionDialog.cpp" />
-    <ClCompile Include="stdhdrs.cpp" />
-    <ClCompile Include="TextChat.cpp" />
-    <ClCompile Include="vncauth.c" />
-    <ClCompile Include="VNCOptions.cpp" />
-    <ClCompile Include="vncviewer.cpp" />
-    <ClCompile Include="VNCviewerApp.cpp" />
-    <ClCompile Include="VNCviewerApp32.cpp" />
-    <ClCompile Include="..\common\win32_helpers.cpp" />
-    <ClCompile Include="..\ZipUnZip32\ZipUnzip32.cpp" />
-    <ClCompile Include="zrle.cpp" />
+    <ClCompile Include="AboutBox.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="AccelKeys.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="AuthDialog.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="buildtime.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientConnection.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientConnectionCacheRect.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientConnectionClipboard.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientConnectionCopyRect.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientConnectionCoRRE.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientConnectionCursor.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientConnectionFile.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientConnectionZlibHex.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientConnectionZlib.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientConnectionUltra.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientConnectionTight.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientConnectionRRE.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientConnectionRaw.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientConnectionHextile.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientConnectionFullScreen.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\Clipboard.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="d3des.c">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Daemon.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rfb\dh.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="FullScreenTitleBar.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="FileTransfer.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Exception.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DSMPlugin\DSMPlugin.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="KeyMap.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="KeyMapjap.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Log.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="LowLevelHook.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="MessBox2.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lzo\minilzo.c">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="MRU.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="SessionDialog.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="stdhdrs.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="TextChat.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="VNCOptions.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="vncviewer.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="VNCviewerApp.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="VNCviewerApp32.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\win32_helpers.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ZipUnZip32\ZipUnzip32.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="zrle.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="vncauth.c">
+      <Filter>sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AboutBox.h" />
-    <ClInclude Include="AccelKeys.h" />
-    <ClInclude Include="AuthDialog.h" />
-    <ClInclude Include="ClientConnection.h" />
-    <ClInclude Include="..\common\Clipboard.h" />
-    <ClInclude Include="d3des.h" />
-    <ClInclude Include="Daemon.h" />
-    <ClInclude Include="..\rfb\dh.h" />
-    <ClInclude Include="..\DSMPlugin\DSMPlugin.h" />
-    <ClInclude Include="Exception.h" />
-    <ClInclude Include="FileTransfer.h" />
-    <ClInclude Include="FullScreenTitleBar.h" />
-    <ClInclude Include="FullScreenTitleBarConst.h" />
-    <ClInclude Include="KeyMap.h" />
-    <ClInclude Include="KeyMapjap.h" />
-    <ClInclude Include="keysymdef.h" />
-    <ClInclude Include="keysymdefjap.h" />
-    <ClInclude Include="Log.h" />
-    <ClInclude Include="LowLevelHook.h" />
-    <ClInclude Include="MRU.h" />
-    <ClInclude Include="multimon.h" />
-    <ClInclude Include="res\resource.h" />
-    <ClInclude Include="rfb.h" />
-    <ClInclude Include="SessionDialog.h" />
-    <ClInclude Include="stdhdrs.h" />
-    <ClInclude Include="TextChat.h" />
-    <ClInclude Include="vncauth.h" />
-    <ClInclude Include="VNCOptions.h" />
-    <ClInclude Include="vncviewer.h" />
-    <ClInclude Include="VNCviewerApp.h" />
-    <ClInclude Include="VNCviewerApp32.h" />
-    <ClInclude Include="..\common\win32_helpers.h" />
-    <ClInclude Include="..\ZipUnZip32\ZipUnZip32.h" />
+    <ClInclude Include="AboutBox.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="AccelKeys.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="AuthDialog.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="ClientConnection.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\Clipboard.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="d3des.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Daemon.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rfb\dh.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DSMPlugin\DSMPlugin.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Exception.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="FileTransfer.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="FullScreenTitleBar.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="FullScreenTitleBarConst.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="KeyMap.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="KeyMapjap.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="keysymdef.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="keysymdefjap.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Log.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="LowLevelHook.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="MRU.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="multimon.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="res\resource.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="rfb.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="SessionDialog.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="stdhdrs.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ZipUnZip32\ZipUnZip32.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\win32_helpers.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="VNCviewerApp32.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="VNCviewerApp.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="vncviewer.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="VNCOptions.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="vncauth.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="TextChat.h">
+      <Filter>headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="res\vncviewer.rc" />
+    <ResourceCompile Include="res\vncviewer.rc">
+      <Filter>sources</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>
