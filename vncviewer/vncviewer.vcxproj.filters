@@ -320,6 +320,9 @@
     <ClCompile Include="vncauth.c">
       <Filter>sources</Filter>
     </ClCompile>
+    <ClCompile Include="clientauthrfb38.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AboutBox.h">

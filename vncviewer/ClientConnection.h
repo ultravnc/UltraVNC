@@ -204,10 +204,24 @@ private:
 	void Connect();
 	void ConnectProxy();
 	void SetSocketOptions();
+	///////////////////////////////////////////////
+#ifdef rfb38
+	void NegotiateProtocolVersionrfb38();
+	void Authenticaterfb38_Part1();
+	void Authenticaterfb38_Part2(CARD32 authScheme);
+	void ReadServerFailureMessage();	
+	CARD32 AuthVnc();
+	CARD32 AuthMSLOGON();
+	CARD32 AuthSecureVNCPlugin();
+	CARD32 AuthUltraVnc();
+	void HandleAuthResult(CARD32 AuthResult);
+	bool AuthSecureVNCPluginUsed;
+#else
 	void Authenticate();
-	// marscha@2006
-	void AuthMsLogon();
 	void NegotiateProtocolVersion();
+	void AuthMsLogon();
+#endif
+	////////////////////////////////////////////////
 	void NegotiateProxy();
 	void ReadServerInit();
 	void SendClientInit();

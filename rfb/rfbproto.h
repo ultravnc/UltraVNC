@@ -183,10 +183,25 @@ typedef char rfbProtocolVersionMsg[13];	/* allow extra byte for null */
 #define rfbConnFailed 0
 #define rfbNoAuth 1
 #define rfbVncAuth 2
+
+//
+#define rfb38
+
+#ifdef rfb38
+#define rfbUltraVNC 17
+#define rfbSubNoAuth 1
+#define rfbSubVncAuth 2
+#define rfSubbMsLogon 3
+#define rfbSubSecureVNCPlugin 4
+#define rfbSubSpecialSC_PROMP 1
+#define rfbSubSpecialSessionSelect 2
+#else
 //adzm 2010-05-10
 #define rfbUltraVNC_SecureVNCPlugin 17
+#endif
 /* rfbMsLogon indicates UltraVNC's MS-Logon with (hopefully) better security */
 #define rfbMsLogon 0xfffffffa
+
 
 /*
  * rfbConnFailed:	For some reason the connection failed (e.g. the server

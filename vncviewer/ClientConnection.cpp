@@ -600,9 +600,13 @@ void ClientConnection::DoConnection()
 	if (strcmp(m_proxyhost,"")!=NULL && m_fUseProxy)
 		NegotiateProxy();
 
+#ifdef rfb38
+	NegotiateProtocolVersionrfb38();
+	Authenticaterfb38_Part1();
+#else
 	NegotiateProtocolVersion();
-
 	Authenticate();
+#endif
 
 //	if (flash) {flash->Killflash();}
 	SendClientInit();
@@ -1892,7 +1896,7 @@ void ClientConnection::SetSocketOptions()
 		fis->SetDSMMode(m_pDSMPlugin->IsEnabled()); // sf@2003 - Special DSM mode for ZRLE encoding
 }
 
-
+#ifndef rfb38
 void ClientConnection::NegotiateProtocolVersion()
 {
 	rfbProtocolVersionMsg pv;
@@ -2127,10 +2131,12 @@ void ClientConnection::NegotiateProtocolVersion()
 
 
 	vnclog.Print(0, _T("Connected to RFB server, using protocol version %d.%d\n"),
-		rfbProtocolMajorVersion, rfbProtocolMinorVersion);
+		rfbProtocolMajorVersion, m_minorVersion);
 
 
 }
+
+#endif
 
 void ClientConnection::NegotiateProxy()
 {
@@ -2216,12 +2222,13 @@ void ClientConnection::NegotiateProxy()
     WriteExactProxy(tmphost,MAX_HOST_NAME_LEN);
 
 	vnclog.Print(0, _T("Connected to RFB server, using protocol version %d.%d\n"),
-		rfbProtocolMajorVersion, rfbProtocolMinorVersion);
+		rfbProtocolMajorVersion, m_minorVersion);
 	}
 
 
 }
 
+#ifndef rfb38
 void ClientConnection::Authenticate()
 {
 	CARD32 authScheme, reasonLen, authResult;
@@ -2796,6 +2803,7 @@ void ClientConnection::AuthMsLogon() {
 		throw ErrorException(sz_L59,IDS_L59);
 	}
 }
+#endif
 
 void ClientConnection::SendClientInit()
 {
