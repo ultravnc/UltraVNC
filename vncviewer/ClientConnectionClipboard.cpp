@@ -91,7 +91,7 @@ void ClientConnection::UpdateRemoteClipboard(CARD32 overrideFlags)
 	if (m_clipboard.settings.m_bSupportsEx) {
 		ClipboardData newClipboard;
 
-		if (newClipboard.Load(m_hwndcn)) {
+		if (newClipboard.Load(NULL)) {
 			if (newClipboard.m_crc == m_clipboard.m_crc && overrideFlags == 0) {
 				vnclog.Print(6, _T("Ignoring extended SendClientCutText due to identical data\n"));
 				return;
@@ -109,7 +109,8 @@ void ClientConnection::UpdateRemoteClipboard(CARD32 overrideFlags)
 
 				message.length = Swap32IfLE(-actualLen);
 				
-				WriteExact((char*)&message, sz_rfbClientCutTextMsg, rfbClientCutText);
+				//adzm 2010-09
+				WriteExactQueue((char*)&message, sz_rfbClientCutTextMsg, rfbClientCutText);
 				WriteExact((char*)(m_clipboard.extendedClipboardDataMessage.GetData()), m_clipboard.extendedClipboardDataMessage.GetDataLength());
 			
 				vnclog.Print(6, _T("Sent extended clipboard\n"));
@@ -162,7 +163,7 @@ void ClientConnection::UpdateRemoteClipboard(CARD32 overrideFlags)
 }
 
 // adzm - 2010-07 - Extended clipboard
-void ClientConnection::UpdateRemoteClipboardCaps()
+void ClientConnection::UpdateRemoteClipboardCaps(bool bSavePreferences)
 {
 	omni_mutex_lock l(m_clipMutex);
 	if (!m_clipboard.settings.m_bSupportsEx) return;
@@ -171,13 +172,16 @@ void ClientConnection::UpdateRemoteClipboardCaps()
 	
 	if (m_opts.m_DisableClipboard || m_opts.m_ViewOnly) {
 		// messages and formats that we can handle
-		extendedClipboardDataMessage.m_pExtendedData->flags = Swap32IfLE(clipCaps | clipText | clipRTF | clipHTML);
+		extendedClipboardDataMessage.m_pExtendedData->flags = Swap32IfLE(clipCaps | clipText | clipRTF | clipHTML | clipDIB);
 
 		// now include our limits in order of enum value
 		extendedClipboardDataMessage.AppendInt(0);
 		extendedClipboardDataMessage.AppendInt(0);
 		extendedClipboardDataMessage.AppendInt(0);
 	} else {
+		if (bSavePreferences) {
+			SaveClipboardPreferences();
+		}
 		m_clipboard.settings.PrepareCapsPacket(extendedClipboardDataMessage);
 	}
 
@@ -189,7 +193,8 @@ void ClientConnection::UpdateRemoteClipboardCaps()
 
 	message.length = Swap32IfLE(-actualLen);
 	
-	WriteExact((char*)&message, sz_rfbClientCutTextMsg, rfbClientCutText);
+	//adzm 2010-09
+	WriteExactQueue((char*)&message, sz_rfbClientCutTextMsg, rfbClientCutText);
 	WriteExact((char*)(extendedClipboardDataMessage.GetData()), extendedClipboardDataMessage.GetDataLength());
 }
 
@@ -200,7 +205,7 @@ void ClientConnection::RequestRemoteClipboard()
 	ExtendedClipboardDataMessage extendedClipboardDataMessage;
 
 	int actualLen = extendedClipboardDataMessage.GetDataLength();
-	extendedClipboardDataMessage.AddFlag(clipRequest | clipText | clipRTF | clipHTML);
+	extendedClipboardDataMessage.AddFlag(clipRequest | clipText | clipRTF | clipHTML | clipDIB);
 
 	rfbClientCutTextMsg message;
 	memset(&message, 0, sizeof(rfbClientCutTextMsg));
@@ -208,7 +213,8 @@ void ClientConnection::RequestRemoteClipboard()
 
 	message.length = Swap32IfLE(-actualLen);
 	
-	WriteExact((char*)&message, sz_rfbClientCutTextMsg, rfbClientCutText);
+	//adzm 2010-09
+	WriteExactQueue((char*)&message, sz_rfbClientCutTextMsg, rfbClientCutText);
 	WriteExact((char*)(extendedClipboardDataMessage.GetData()), extendedClipboardDataMessage.GetDataLength());
 }
 
@@ -275,4 +281,74 @@ void ClientConnection::UpdateLocalClipboard(char *buf, int len)
 	        //throw WarningException(sz_C3);
         }
     }
+}
+
+void ClientConnection::SaveClipboardPreferences()
+{
+	omni_mutex_lock l(m_clipMutex);
+
+	HKEY hRegKey;
+	if ( RegCreateKey(HKEY_CURRENT_USER, SETTINGS_KEY_NAME, &hRegKey)  != ERROR_SUCCESS ) {
+        hRegKey = NULL;
+	} else {
+			
+		DWORD dwClipboardPrefs = 0;
+		if (m_clipboard.settings.m_nLimitText > 0) {
+			dwClipboardPrefs |= clipText;
+		}
+		if (m_clipboard.settings.m_nLimitRTF > 0) {
+			dwClipboardPrefs |= clipRTF;
+		}
+		if (m_clipboard.settings.m_nLimitHTML > 0) {
+			dwClipboardPrefs |= clipHTML;
+		}
+
+		/*
+		DWORD valsize = sizeof(dwClipboardPrefs);
+		DWORD valtype = REG_DWORD;	
+		if ( RegQueryValueEx( hRegKey,  "ClipboardPrefs", NULL, &valtype, 
+			(LPBYTE) &dwPreferredMinimumMouseMoveInterval, &valsize) == ERROR_SUCCESS) {
+            dwMinimumMouseMoveInterval = dwPreferredMinimumMouseMoveInterval;
+		}
+		*/
+		DWORD valsize = sizeof(dwClipboardPrefs);
+		RegSetValueEx(hRegKey, "ClipboardPrefs", NULL, REG_DWORD, (LPBYTE)&dwClipboardPrefs, valsize);
+		RegCloseKey(hRegKey);
+	}
+}
+
+bool ClientConnection::LoadClipboardPreferences()
+{
+	omni_mutex_lock l(m_clipMutex);
+
+	DWORD dwClipboardPrefs = 0;
+
+	HKEY hRegKey;
+	if ( RegCreateKey(HKEY_CURRENT_USER, SETTINGS_KEY_NAME, &hRegKey)  != ERROR_SUCCESS ) {
+        hRegKey = NULL;
+		return false;
+	} else {
+		DWORD valsize = sizeof(dwClipboardPrefs);
+		DWORD valtype = REG_DWORD;	
+		if ( RegQueryValueEx( hRegKey,  "ClipboardPrefs", NULL, &valtype, 
+			(LPBYTE) &dwClipboardPrefs, &valsize) != ERROR_SUCCESS) {
+            dwClipboardPrefs = clipText | clipRTF | clipHTML;
+		} else {
+			dwClipboardPrefs |= clipText;
+		}
+		RegCloseKey(hRegKey);
+	}
+
+	/*
+	if (!(dwClipboardPrefs & clipText)) {
+		m_clipboard.settings.m_nLimitText = 0;
+	}
+	*/
+	if (!(dwClipboardPrefs & clipRTF)) {
+		m_clipboard.settings.m_nLimitRTF = 0;
+	}
+	if (!(dwClipboardPrefs & clipHTML)) {
+		m_clipboard.settings.m_nLimitHTML = 0;
+	}
+	return true;
 }

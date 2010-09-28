@@ -241,9 +241,23 @@ typedef char rfbProtocolVersionMsg[13];	/* allow extra byte for null */
  * access to this client by disconnecting all other clients.
  */
 
+// adzm 2010-09
+// while I hate to hijack this, I don't feel like I have too many options 
+//  1) I want to negotiate this before any actual async rfb messages are sent
+//  2) The only other option to fulfill 1 is to mess with the RFB protocol
+//     versions, which are enough of a mess without me helping.
+// So, downsides to using this approach? Servers that simply check for 
+// not zero will always assume this is allowing shared if anything else is sent.
+// I think that is a worthwhile sacrifice. We can always implement an option
+// to disable this if necessary.
 typedef struct {
-    CARD8 shared;
+    CARD8 flags; // rfbClientInitMsgFlags
 } rfbClientInitMsg;
+
+// adzm 2010-09
+typedef enum {
+	clientInitShared       = 0x01,
+} rfbClientInitMsgFlags;
 
 #define sz_rfbClientInitMsg 1
 
@@ -323,6 +337,8 @@ typedef struct {
 #endif
 #define rfbKeepAlive 13 // 16 July 2008 jdp -- bidirectional
 #define rfbPalmVNCSetScaleFactor 0xF // PalmVNC 1.4 & 2.0 SetScale Factor message
+// adzm 2010-09 - Notify streaming DSM plugin support
+#define rfbNotifyPluginStreaming 0x50
 
 
 
@@ -409,6 +425,8 @@ typedef struct {
 
 // adzm - 2010-07 - Extended clipboard support
 #define rfbEncodingExtendedClipboard  0xC0A1E5CE
+  // adzm 2010-09 - Notify streaming DSM plugin support
+#define rfbEncodingPluginStreaming       0xC0A1E5CF
 
 
 
@@ -730,6 +748,7 @@ typedef enum {
 	clipText		= 0x00000001,	// Unicode text (UTF-8 encoding)
 	clipRTF			= 0x00000002,	// Microsoft RTF format
 	clipHTML		= 0x00000004,	// Microsoft HTML clipboard format
+	clipDIB			= 0x00000008,	// Microsoft DIBv5
 	// line endings are not touched and remain as \r\n for Windows machines. Terminating NULL characters are preserved.
 
 	// Complex formats
@@ -739,7 +758,6 @@ typedef enum {
 	//
 	// Please note none of these are implemented yet, but seem obvious enough that their values are reserved here
 	// for posterity.
-	clipImage		= 0x00000008,	// Image formats
 	clipFiles		= 0x00000010,	// probably also more than one file
 	clipFormatMask	= 0x0000FFFF,
 
@@ -759,16 +777,14 @@ typedef enum {
 									// Currently, the defaults are the messages and formats defined in this initial implementation
 									// that are common to both server and viewer:
 									//    clipCaps | clipRequest | clipProvide | (clipNotify if viewer, clipPeek if server)
-									//    clipText | clipRTF | clipHTML
+									//    clipText | clipRTF | clipHTML | clipDIB
 									//    (Note that clipNotify is only relevant from server->viewer, and clipPeek is only relevant
 									//     from viewer->server. Therefore they are left out of the defaults but can be set with the
 									//     rest of the caps if desired.)
-									// However clipRTF and clipHTML are limited by default to 0 bytes, meaning that they will only
-									// notify the client rather than send the information automatically.
 									// It is also strongly recommended to set up maximum sizes for the formats since currently
 									// the data is sent synchronously and cannot be interrupted. If data exceeds the maximum size,
 									// then the server should send the clipNotify so the client may send clipRequest. Current default 
-									// limits were somewhat arbitrarily chosen as 20mb for text and zero for the others (notify only).
+									// limits were somewhat arbitrarily chosen as 2mb (10mb for text) and 0 for image
 									// Note that these limits are referring to the length of uncompressed data.
 	clipRequest		= 0x02000000,	// request clipboard data (should be combined with desired formats)
 									// Message should be empty
@@ -795,6 +811,14 @@ typedef enum {
 
 
 
+// adzm 2010-09 - Notify streaming DSM plugin support
+typedef struct {
+    CARD8 type;			/* always rfbServerCutText */
+    CARD8 pad1;
+    CARD16 flags; // reserved - always 0
+} rfbNotifyPluginStreamingMsg;
+
+#define sz_rfbNotifyPluginStreamingMsg	4
 
 
 /*-----------------------------------------------------------------------------
@@ -988,6 +1012,7 @@ typedef union {
 	rfbTextChatMsg tc;
     rfbServerStateMsg ss;
     rfbKeepAliveMsg kp;
+	rfbNotifyPluginStreamingMsg nsd;
 } rfbServerToClientMsg;
 
 

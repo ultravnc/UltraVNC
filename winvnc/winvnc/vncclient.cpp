@@ -653,6 +653,8 @@ vncClientUpdateThread::run_undetached(void *arg)
 		// But ssh is back working		
 		if (!m_client->m_fFileSessionOpen) {
 
+			bool bShouldFlush = false;
+
 			// adzm - 2010-07 - Extended clipboard
 			// send any clipboard data that should be sent automatically
 			if (m_client->m_clipboard.m_bNeedToProvide) {
@@ -667,11 +669,14 @@ vncClientUpdateThread::run_undetached(void *arg)
 
 					message.length = Swap32IfLE(-actualLen);
 
-					if (!m_client->SendRFBMsg(rfbServerCutText,
+					bShouldFlush = true;
+
+					//adzm 2010-09 - minimize packets. SendExact flushes the queue.
+					if (!m_client->SendRFBMsgQueue(rfbServerCutText,
 						(BYTE *) &message, sizeof(message))) {
 						m_client->m_socket->Close();
 					}
-					if (!m_client->m_socket->SendExact((char*)(m_client->m_clipboard.extendedClipboardDataMessage.GetData()), m_client->m_clipboard.extendedClipboardDataMessage.GetDataLength()))
+					if (!m_client->m_socket->SendExactQueue((char*)(m_client->m_clipboard.extendedClipboardDataMessage.GetData()), m_client->m_clipboard.extendedClipboardDataMessage.GetDataLength()))
 					{
 						m_client->m_socket->Close();
 					}
@@ -696,11 +701,15 @@ vncClientUpdateThread::run_undetached(void *arg)
 					unixtext[unixpos] = 0;
 
 					message.length = Swap32IfLE(strlen(unixtext));
-					if (!m_client->SendRFBMsg(rfbServerCutText,
+
+					bShouldFlush = true;
+
+					//adzm 2010-09 - minimize packets. SendExact flushes the queue.
+					if (!m_client->SendRFBMsgQueue(rfbServerCutText,
 						(BYTE *) &message, sizeof(message))) {
 						m_client->m_socket->Close();
 					}
-					if (!m_client->m_socket->SendExact(unixtext, strlen(unixtext)))
+					if (!m_client->m_socket->SendExactQueue(unixtext, strlen(unixtext)))
 					{
 						m_client->m_socket->Close();
 					}
@@ -724,7 +733,11 @@ vncClientUpdateThread::run_undetached(void *arg)
 
 					message.length = Swap32IfLE(-actualLen);
 
-					if (!m_client->SendRFBMsg(rfbServerCutText,
+					//adzm 2010-09 - minimize packets. SendExact flushes the queue.Queue
+
+					bShouldFlush = true;
+
+					if (!m_client->SendRFBMsgQueue(rfbServerCutText,
 						(BYTE *) &message, sizeof(message))) {
 						m_client->m_socket->Close();
 					}
@@ -734,6 +747,10 @@ vncClientUpdateThread::run_undetached(void *arg)
 					}
 				}
 				m_client->m_clipboard.extendedClipboardDataNotifyMessage.Reset();
+			}
+
+			if (bShouldFlush) {
+				m_client->m_socket->ClearQueue();
 			}
 		}
 
@@ -935,7 +952,8 @@ vncClientThread::InitVersion()
 		char mytext[1024];
 		getinfo(mytext);
 		int size=strlen(mytext);
-		if (!m_socket->SendExact((char *)&size, sizeof(int)))
+		//adzm 2010-09 - minimize packets. SendExact flushes the queue.
+		if (!m_socket->SendExactQueue((char *)&size, sizeof(int)))
 		return FALSE;
 		if (!m_socket->SendExact((char *)mytext, size))
 		return FALSE;
@@ -1020,9 +1038,10 @@ vncClientThread::InitAuthenticate()
 		CARD32 auth_val = Swap32IfLE(rfbConnFailed);
 		char *errmsg = "Your connection has been rejected.";
 		CARD32 errlen = Swap32IfLE(strlen(errmsg));
-		if (!m_socket->SendExact((char *)&auth_val, sizeof(auth_val)))
+		//adzm 2010-09 - minimize packets. SendExact flushes the queue.
+		if (!m_socket->SendExactQueue((char *)&auth_val, sizeof(auth_val)))
 			return FALSE;
-		if (!m_socket->SendExact((char *)&errlen, sizeof(errlen)))
+		if (!m_socket->SendExactQueue((char *)&errlen, sizeof(errlen)))
 			return FALSE;
 		m_socket->SendExact(errmsg, strlen(errmsg));
 		return FALSE;
@@ -1040,9 +1059,10 @@ vncClientThread::InitAuthenticate()
 			"Until a password is set, incoming connections cannot be accepted.";
 		CARD32 errlen = Swap32IfLE(strlen(errmsg));
 
-		if (!m_socket->SendExact((char *)&auth_val, sizeof(auth_val)))
+		//adzm 2010-09 - minimize packets. SendExact flushes the queue.
+		if (!m_socket->SendExactQueue((char *)&auth_val, sizeof(auth_val)))
 			return FALSE;
-		if (!m_socket->SendExact((char *)&errlen, sizeof(errlen)))
+		if (!m_socket->SendExactQueue((char *)&errlen, sizeof(errlen)))
 			return FALSE;
 		m_socket->SendExact(errmsg, strlen(errmsg));
 
@@ -1075,9 +1095,10 @@ vncClientThread::InitAuthenticate()
 				char *errmsg = "Local loop-back connections are disabled.";
 				CARD32 errlen = Swap32IfLE(strlen(errmsg));
 
-				if (!m_socket->SendExact((char *)&auth_val, sizeof(auth_val)))
+				//adzm 2010-09 - minimize packets. SendExact flushes the queue.
+				if (!m_socket->SendExactQueue((char *)&auth_val, sizeof(auth_val)))
 					return FALSE;
-				if (!m_socket->SendExact((char *)&errlen, sizeof(errlen)))
+				if (!m_socket->SendExactQueue((char *)&errlen, sizeof(errlen)))
 					return FALSE;
 				m_socket->SendExact(errmsg, strlen(errmsg));
 
@@ -1144,7 +1165,8 @@ vncClientThread::InitAuthenticate()
 
 			WORD wChallengeLength = (WORD)nChallengeLength;
 
-			if (!m_socket->SendExact((const char*)&wChallengeLength, sizeof(wChallengeLength))) {
+			//adzm 2010-09 - minimize packets. SendExact flushes the queue.
+			if (!m_socket->SendExactQueue((const char*)&wChallengeLength, sizeof(wChallengeLength))) {
 				m_socket->GetIntegratedPlugin()->FreeMemory(pChallenge);
 				return FALSE;
 			}
@@ -1221,9 +1243,10 @@ vncClientThread::InitAuthenticate()
 
 				if (errlen > 0) {
 					authmsg = Swap32IfLE(rfbVncAuthFailedEx);
-					if (!m_socket->SendExact((char *)&authmsg, sizeof(authmsg)))
+					//adzm 2010-09 - minimize packets. SendExact flushes the queue.
+					if (!m_socket->SendExactQueue((char *)&authmsg, sizeof(authmsg)))
 						return FALSE;
-					if (!m_socket->SendExact((char *)&errlen, sizeof(errlen)))
+					if (!m_socket->SendExactQueue((char *)&errlen, sizeof(errlen)))
 						return FALSE;
 					if (!m_socket->SendExact(errmsg, strlen(errmsg)))
 						return FALSE;
@@ -1319,7 +1342,8 @@ vncClientThread::InitAuthenticate()
 			if (m_ms_logon)
 			{
 				vnclog.Print(LL_INTINFO, "MS-Logon authentication");
-				if (!m_socket->SendExact(challengems, sizeof(challengems)))
+				//adzm 2010-09 - minimize packets. SendExact flushes the queue.
+				if (!m_socket->SendExactQueue(challengems, sizeof(challengems)))
 					return FALSE;
 				if (!m_socket->SendExact(challenge, sizeof(challenge)))
 						return FALSE;
@@ -1509,7 +1533,8 @@ vncClientThread::InitAuthenticate()
 				return FALSE;
 			}
 	}
-	if (!client_ini.shared && !m_shared)
+	// adzm 2010-09
+	if (!(client_ini.flags & clientInitShared) && !m_shared)
 	{
 		// Which client takes priority, existing or incoming?
 		if (m_server->ConnectPriority() < 1)
@@ -1559,9 +1584,10 @@ vncClientThread::AuthMsLogon() {
 	int64ToBytes(dh.getValue(DH_GEN), gen);
 	int64ToBytes(dh.getValue(DH_MOD), mod);
 	int64ToBytes(dh.createInterKey(), pub);
-		
-	if (!m_socket->SendExact(gen, sizeof(gen))) return FALSE;
-	if (!m_socket->SendExact(mod, sizeof(mod))) return FALSE;
+
+	//adzm 2010-09 - minimize packets. SendExact flushes the queue.	
+	if (!m_socket->SendExactQueue(gen, sizeof(gen))) return FALSE;
+	if (!m_socket->SendExactQueue(mod, sizeof(mod))) return FALSE;
 	if (!m_socket->SendExact(pub, sizeof(pub))) return FALSE;
 	if (!m_socket->ReadExact(resp, sizeof(resp))) return FALSE;
 	if (!m_socket->ReadExact(user, sizeof(user))) return FALSE;
@@ -1848,7 +1874,7 @@ vncClientThread::run(void *arg)
 	// Get the name of this desktop
 	// sf@2002 - v1.1.x - Complete the computer name with the IP address if necessary
 	bool fIP = false;
-    char desktopname[MAX_COMPUTERNAME_LENGTH + 1 + 256] = {0};
+    char desktopname[MAX_COMPUTERNAME_LENGTH + 3 + 256] = {0};
 	DWORD desktopnamelen = MAX_COMPUTERNAME_LENGTH + 1 + 256;
 	memset((char*)desktopname, 0, sizeof(desktopname));
 	if (GetComputerName(desktopname, &desktopnamelen))
@@ -1894,13 +1920,17 @@ vncClientThread::run(void *arg)
 	server_ini.format.greenMax = Swap16IfLE(server_ini.format.greenMax);
 	server_ini.format.blueMax = Swap16IfLE(server_ini.format.blueMax);
 
-	server_ini.nameLength = Swap32IfLE(strlen(desktopname));
-	if (!m_socket->SendExact((char *)&server_ini, sizeof(server_ini)))
+	CARD32 nNameLength = strlen(desktopname);
+
+	server_ini.nameLength = Swap32IfLE(nNameLength);
+
+	//adzm 2010-09 - minimize packets. SendExact flushes the queue.
+	if (!m_socket->SendExactQueue((char *)&server_ini, sizeof(server_ini)))
 	{
 		m_server->RemoveClient(m_client->GetClientId());
 		return;
 	}
-	if (!m_socket->SendExact(desktopname, strlen(desktopname)))
+	if (!m_socket->SendExact(desktopname, nNameLength))
 	{
 		m_server->RemoveClient(m_client->GetClientId());
 		return;
@@ -1936,6 +1966,8 @@ vncClientThread::run(void *arg)
     bool need_ft_version_msg =  false;
 	// adzm - 2010-07 - Extended clipboard
 	bool need_notify_extended_clipboard = false;
+	// adzm 2010-09 - Notify streaming DSM plugin support
+	bool need_notify_streaming_DSM = false;
 
 	while (connected)
 	{
@@ -1991,10 +2023,17 @@ vncClientThread::run(void *arg)
 			m_client->NotifyExtendedClipboardSupport();
 			need_notify_extended_clipboard = false;
 		}
+		// adzm 2010-09 - Notify streaming DSM plugin support
+		if (need_notify_streaming_DSM)
+		{
+			m_client->NotifyPluginStreamingSupport();
+			need_notify_streaming_DSM = false;
+		}
 		// sf@2002 - v1.1.2
 		int nTO = 1; // Type offset
 		// If DSM Plugin, we must read all the transformed incoming rfb messages (type included)
-		if (m_socket->IsUsePluginEnabled() && m_server->GetDSMPluginPointer()->IsEnabled())
+		// adzm 2010-09
+		if (!m_socket->IsPluginStreamingIn() && m_socket->IsUsePluginEnabled() && m_server->GetDSMPluginPointer()->IsEnabled())
 		{
 			if (!m_socket->ReadExact((char *)&msg.type, sizeof(msg.type)))
 			{
@@ -2239,6 +2278,13 @@ vncClientThread::run(void *arg)
 						need_notify_extended_clipboard = true;
 						m_client->m_clipboard.settings.m_bSupportsEx = true;
 						vnclog.Print(LL_INTINFO, VNCLOG("Extended clipboard protocol extension enabled\n"));
+						continue;
+					}
+
+					// adzm 2010-09 - Notify streaming DSM plugin support
+					if (Swap32IfLE(encoding) == rfbEncodingPluginStreaming) {
+						need_notify_streaming_DSM = true;
+						vnclog.Print(LL_INTINFO, VNCLOG("Streaming DSM support enabled\n"));
 						continue;
 					}
 
@@ -2573,7 +2619,7 @@ vncClientThread::run(void *arg)
 
 					switch(action) {
 						case clipCaps:
-							m_client->m_clipboard.settings.HandleCapsPacket(extendedClipboardDataMessage);
+							m_client->m_clipboard.settings.HandleCapsPacket(extendedClipboardDataMessage, true);
 							break;
 						case clipProvide:
 							m_server->UpdateLocalClipTextEx(extendedClipboardDataMessage, m_client);
@@ -2581,10 +2627,10 @@ vncClientThread::run(void *arg)
 						case clipRequest:
 						case clipPeek:
 							{
-								omni_mutex_lock l(m_server->GetDesktopPointer()->GetUpdateLock());
 								ClipboardData clipboardData;
 								
-								if (clipboardData.Load(m_server->GetDesktopPointer()->Window())) {
+								// only need an owner window when setting clipboard data -- by using NULL we can rely on fewer locks
+								if (clipboardData.Load(NULL)) {
 									m_client->UpdateClipTextEx(clipboardData, extendedClipboardDataMessage.GetFlags());
 								}
 							}
@@ -2909,8 +2955,9 @@ vncClientThread::run(void *arg)
 										ft.contentType = rfbFileChecksums;
 										ft.size = Swap32IfLE(nCSBufferSize);
 										ft.length = Swap32IfLE(nCSBufferLen);
-										m_socket->SendExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
-										m_socket->SendExact((char *)lpCSBuff, nCSBufferLen);
+										//adzm 2010-09 - minimize packets. SendExact flushes the queue.
+										m_socket->SendExactQueue((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
+										m_socket->SendExactQueue((char *)lpCSBuff, nCSBufferLen);
 										delete [] lpCSBuff;
 									}
 								}
@@ -2920,7 +2967,8 @@ vncClientThread::run(void *arg)
 						ft.contentType = rfbFileAcceptHeader;
 						ft.size = Swap32IfLE(dwDstSize); // File Size in bytes, 0xFFFFFFFF (-1) means error
 						ft.length = Swap32IfLE(strlen(m_client->m_szFullDestName));
-						m_socket->SendExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
+						//adzm 2010-09 - minimize packets. SendExact flushes the queue.
+						m_socket->SendExactQueue((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
 						m_socket->SendExact((char *)m_client->m_szFullDestName, strlen(m_client->m_szFullDestName));
 
 						if (dwDstSize == 0xFFFFFFFF)
@@ -2991,8 +3039,9 @@ vncClientThread::run(void *arg)
 							ft.contentType = rfbFileHeader;
 							ft.size = Swap32IfLE(0xffffffffu); // File Size in bytes, 0xFFFFFFFF (-1) means error
 							ft.length = Swap32IfLE(strlen(m_client->m_szSrcFileName));
-							m_socket->SendExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
-							m_socket->SendExact((char *)m_client->m_szSrcFileName, strlen(m_client->m_szSrcFileName));
+							//adzm 2010-09 - minimize packets. SendExact flushes the queue.
+							m_socket->SendExactQueue((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
+							m_socket->SendExactQueue((char *)m_client->m_szSrcFileName, strlen(m_client->m_szSrcFileName));
                             // 2 May 2008 jdp send the highpart too, else the client will hang
                             // sf@2004 - Improving huge file size handling
                             // TODO: what if we're speaking the old protocol, how can we tell? 
@@ -3086,8 +3135,9 @@ vncClientThread::run(void *arg)
 						ft.contentType = rfbFileHeader;
 						ft.size = Swap32IfLE(n2SrcSize.LowPart); // File Size in bytes, 0xFFFFFFFF (-1) means error
 						ft.length = Swap32IfLE(strlen(m_client->m_szSrcFileName));
-						m_socket->SendExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
-						m_socket->SendExact((char *)m_client->m_szSrcFileName, strlen(m_client->m_szSrcFileName));
+						//adzm 2010-09 - minimize packets. SendExact flushes the queue.
+						m_socket->SendExactQueue((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
+						m_socket->SendExactQueue((char *)m_client->m_szSrcFileName, strlen(m_client->m_szSrcFileName));
 						
 						// sf@2004 - Improving huge file size handling
 						CARD32 sizeH = Swap32IfLE(n2SrcSize.HighPart);
@@ -3299,7 +3349,8 @@ vncClientThread::run(void *arg)
 								ft.contentType = rfbDirPacket;
 								ft.contentParam = rfbADrivesList;
 								ft.length = Swap32IfLE((int)dwLen);
-								m_socket->SendExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
+								//adzm 2010-09 - minimize packets. SendExact flushes the queue.
+								m_socket->SendExactQueue((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
 								m_socket->SendExact((char *)szDrivesList, (int)dwLen);
 								}
 								break;
@@ -3364,10 +3415,11 @@ vncClientThread::run(void *arg)
 										break;
 									}
 
-									ft.length = Swap32IfLE(strlen(szDir)-1);										
-									m_socket->SendExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
+									ft.length = Swap32IfLE(strlen(szDir)-1);	
+									//adzm 2010-09 - minimize packets. SendExact flushes the queue.
+									m_socket->SendExactQueue((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
 									// sf@2004 - Also send back the full directory path to the viewer (necessary for Shorcuts)
-									m_socket->SendExact((char *)szDir, strlen(szDir)-1);
+									m_socket->SendExactQueue((char *)szDir, strlen(szDir)-1);
 
 
 									while ( fRet )
@@ -3393,8 +3445,9 @@ vncClientThread::run(void *arg)
 											memcpy(szFileSpec, &fd, nOptLen);
 
 											ft.length = Swap32IfLE(nOptLen);
-											m_socket->SendExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
-											m_socket->SendExact((char *)szFileSpec, nOptLen);
+											//adzm 2010-09 - minimize packets. SendExact flushes the queue.
+											m_socket->SendExactQueue((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
+											m_socket->SendExactQueue((char *)szFileSpec, nOptLen);
 										}
 										else if (strcmp(fd.cFileName, "."))
 										{
@@ -3406,8 +3459,9 @@ vncClientThread::run(void *arg)
 											memcpy(szFileSpec, &fd, nOptLen);
 
 											ft.length = Swap32IfLE(nOptLen);
-											m_socket->SendExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
-											m_socket->SendExact((char *)szFileSpec, nOptLen);
+											//adzm 2010-09 - minimize packets. SendExact flushes the queue.
+											m_socket->SendExactQueue((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
+											m_socket->SendExactQueue((char *)szFileSpec, nOptLen);
 
 										}
 										fRet = FindNextFile(ff, &fd);
@@ -3454,7 +3508,8 @@ vncClientThread::run(void *arg)
 									ft.size = fRet ? 0 : -1;
 									ft.length = msg.ft.length;
 
-									m_socket->SendExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
+									//adzm 2010-09 - minimize packets. SendExact flushes the queue.
+									m_socket->SendExactQueue((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
 									m_socket->SendExact((char *)szDir, (int)length);
                                     if (fRet)
                                         m_client->FTNewFolderHook(szDir);
@@ -3497,7 +3552,8 @@ vncClientThread::run(void *arg)
 									ft.size = fRet ? 0 : -1;
 									ft.length = Swap32IfLE(length);
 
-									m_socket->SendExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
+									//adzm 2010-09 - minimize packets. SendExact flushes the queue.
+									m_socket->SendExactQueue((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
 									m_socket->SendExact((char *)newname.c_str(), length);
                                     if (fRet)
                                         m_client->FTDeleteHook(szFile, isDir);
@@ -3541,7 +3597,8 @@ vncClientThread::run(void *arg)
 									ft.size = fRet ? 0 : -1;
 									ft.length = msg.ft.length;
 
-									m_socket->SendExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
+									//adzm 2010-09 - minimize packets. SendExact flushes the queue.
+									m_socket->SendExactQueue((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
 									m_socket->SendExact((char *)szNames, (int)length);
                                     if (fRet)
                                         m_client->FTRenameHook(szCurrentName, szNewName);
@@ -3632,6 +3689,18 @@ vncClientThread::run(void *arg)
 			}
 			break;
 #endif
+		// adzm 2010-09 - Notify streaming DSM plugin support
+        case rfbNotifyPluginStreaming:
+            if (sz_rfbNotifyPluginStreamingMsg > 1)
+            {
+			    if (!m_socket->ReadExact(((char *) &msg)+nTO, sz_rfbNotifyPluginStreamingMsg-nTO))
+			    {
+				    connected = FALSE;
+				    break;
+			    }
+            }
+			m_socket->SetPluginStreamingIn();
+            break;
 		default:
 			// Unknown message, so fail!
 			connected = FALSE;
@@ -4210,6 +4279,24 @@ vncClient::SendRFBMsg(CARD8 type, BYTE *buffer, int buflen)
 	return TRUE;
 }
 
+//adzm 2010-09 - minimize packets. SendExact flushes the queue.
+BOOL
+vncClient::SendRFBMsgQueue(CARD8 type, BYTE *buffer, int buflen)
+{
+	// Set the message type
+	((rfbServerToClientMsg *)buffer)->type = type;
+
+	// Send the message
+	if (!m_socket->SendExactQueue((char *) buffer, buflen, type))
+	{
+		vnclog.Print(LL_CONNERR, VNCLOG("failed to send RFB message to client\n"));
+
+		Kill();
+		return FALSE;
+	}
+	return TRUE;
+}
+
 
 BOOL
 vncClient::SendUpdate(rfb::SimpleUpdateTracker &update)
@@ -4237,7 +4324,8 @@ vncClient::SendUpdate(rfb::SimpleUpdateTracker &update)
 				hdr.encoding = Swap32IfLE(rfbEncodingNewFBSize);
 				rfbFramebufferUpdateMsg header;
 				header.nRects = Swap16IfLE(1);
-				SendRFBMsg(rfbFramebufferUpdate, (BYTE *)&header,sz_rfbFramebufferUpdateMsg);
+				//adzm 2010-09 - minimize packets. SendExact flushes the queue.
+				SendRFBMsgQueue(rfbFramebufferUpdate, (BYTE *)&header,sz_rfbFramebufferUpdateMsg);
 				m_socket->SendExact((char *)&hdr, sizeof(hdr));
 				m_NewSWUpdateWaiting=false;
 				m_ScaledScreen = m_encodemgr.m_buffer->GetViewerSize();
@@ -4325,7 +4413,8 @@ vncClient::SendUpdate(rfb::SimpleUpdateTracker &update)
 	// Otherwise, send <number of rectangles> header
 	rfbFramebufferUpdateMsg header;
 	header.nRects = Swap16IfLE(updates);
-	if (!SendRFBMsg(rfbFramebufferUpdate, (BYTE *) &header, sz_rfbFramebufferUpdateMsg))
+	//adzm 2010-09 - minimize packets. SendExact flushes the queue.
+	if (!SendRFBMsgQueue(rfbFramebufferUpdate, (BYTE *) &header, sz_rfbFramebufferUpdateMsg))
 		return TRUE;
 	
 	// CURSOR HANDLING
@@ -4426,7 +4515,8 @@ vncClient::SendRectangle(const rfb::Rect &rect)
 	// It is not compatible with DSM: we need to read/write data blocks of same 
 	// size on both sides in one shot
 	// We create a common method to send the data 
-	if (m_socket->IsUsePluginEnabled() && m_server->GetDSMPluginPointer()->IsEnabled())
+	// adzm 2010-09
+	if (!m_socket->IsPluginStreamingOut() && m_socket->IsUsePluginEnabled() && m_server->GetDSMPluginPointer()->IsEnabled())
 	{
 		// Tell the SendExact() calls to write into the local NetRectBuffer memory buffer
 		m_socket->SetWriteToNetRectBuffer(true);
@@ -4541,7 +4631,8 @@ vncClient::SendPalette()
 	setcmap.firstColour = Swap16IfLE(0);
 	setcmap.nColours = Swap16IfLE(ncolours);
 
-	if (!m_socket->SendExact((char *) &setcmap, sz_rfbSetColourMapEntriesMsg, rfbSetColourMapEntries))
+	//adzm 2010-09 - minimize packets. SendExact flushes the queue.
+	if (!m_socket->SendExactQueue((char *) &setcmap, sz_rfbSetColourMapEntriesMsg, rfbSetColourMapEntries))
 	{
 		delete [] rgbquad;
 		return FALSE;
@@ -4558,7 +4649,8 @@ vncClient::SendPalette()
 		pixeldata.g = Swap16IfLE(((CARD16)rgbquad[i].rgbGreen) << 8);
 		pixeldata.b = Swap16IfLE(((CARD16)rgbquad[i].rgbBlue) << 8);
 
-		if (!m_socket->SendExact((char *) &pixeldata, sizeof(pixeldata)))
+		//adzm 2010-09 - minimize packets. SendExact flushes the queue.
+		if (!m_socket->SendExactQueue((char *) &pixeldata, sizeof(pixeldata)))
 		{
 			delete [] rgbquad;
 			return FALSE;
@@ -4567,6 +4659,9 @@ vncClient::SendPalette()
 
 	// Delete the rgbquad data
 	delete [] rgbquad;
+
+	//adzm 2010-09 - minimize packets. SendExact flushes the queue.
+	m_socket->ClearQueue();
 
 	return TRUE;
 }
@@ -5159,12 +5254,14 @@ bool vncClient::SendFileChunk()
 			ft.contentType = rfbFilePacket;
 			ft.size = fCompressed ? Swap32IfLE(1) : Swap32IfLE(0); 
 			ft.length = fCompressed ? Swap32IfLE(nMaxCompSize) : Swap32IfLE(m_dwNbBytesRead);
-            connected = m_socket->SendExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer) == VTrue;
+
+			//adzm 2010-09 - minimize packets. SendExact flushes the queue.
+            connected = VFalse != m_socket->SendExactQueue((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
             if (connected) {
 			if (fCompressed)
-				m_socket->SendExact((char *)m_pCompBuff , nMaxCompSize);
+				connected = VFalse != m_socket->SendExact((char *)m_pCompBuff , nMaxCompSize);
 			else
-				m_socket->SendExact((char *)m_pBuff , m_dwNbBytesRead);
+				connected = VFalse != m_socket->SendExact((char *)m_pBuff , m_dwNbBytesRead);
 			}
             }
 		
@@ -5592,6 +5689,19 @@ void vncClient::NotifyExtendedClipboardSupport()
 	msg.type = rfbServerCutText;
 	msg.length = Swap32IfLE(-extendedDataMessage.GetDataLength());
 
-	m_socket->SendExact((char *)&msg, sz_rfbServerCutTextMsg, rfbServerCutText);
+	//adzm 2010-09 - minimize packets. SendExact flushes the queue.
+	m_socket->SendExactQueue((char *)&msg, sz_rfbServerCutTextMsg, rfbServerCutText);
 	m_socket->SendExact((char *)(extendedDataMessage.GetData()), extendedDataMessage.GetDataLength());
+}
+
+// adzm 2010-09 - Notify streaming DSM plugin support
+void vncClient::NotifyPluginStreamingSupport()
+{	
+	rfbNotifyPluginStreamingMsg msg;
+    memset(&msg, 0, sizeof(rfbNotifyPluginStreamingMsg));
+	msg.type = rfbNotifyPluginStreaming;
+
+	//adzm 2010-09 - minimize packets. SendExact flushes the queue.
+	m_socket->SendExact((char *)&msg, sz_rfbNotifyPluginStreamingMsg, rfbNotifyPluginStreaming);
+	m_socket->SetPluginStreamingOut();
 }

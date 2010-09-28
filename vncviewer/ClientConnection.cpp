@@ -336,6 +336,8 @@ void ClientConnection::Init(VNCviewerApp *pApp)
     m_keymap->SetKeyMapOption2(true);
 
 	m_sock = INVALID_SOCKET;
+	//adzm 2010-09
+	m_nQueueBufferLength = 0;
 	//adzm 2010-08-01
 	m_LastSentTick = 0;
 	m_bKillThread = false;
@@ -494,8 +496,15 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	
 	m_keepalive_timer = 0;
 	m_emulate3ButtonsTimer = 0;
+	// adzm 2010-09
+	m_flushMouseMoveTimer = 0;
 
 	m_settingClipboardViewer = false;
+	LoadClipboardPreferences();
+
+	//adzm 2010-09
+	m_fPluginStreamingIn = false;
+	m_fPluginStreamingOut = false;
 }
 
 // helper functions for setting socket timeouts during file transfer
@@ -1348,6 +1357,7 @@ void ClientConnection::CreateDisplay()
 				AppendMenu(m_hPopupMenuClipboardFormats, MF_STRING, ID_CLIPBOARD_TEXT,		"Text (Unicode)");
 				AppendMenu(m_hPopupMenuClipboardFormats, MF_STRING, ID_CLIPBOARD_RTF,		"Rich Text (RTF)");
 				AppendMenu(m_hPopupMenuClipboardFormats, MF_STRING, ID_CLIPBOARD_HTML,		"HTML");
+				AppendMenu(m_hPopupMenuClipboardFormats, MF_STRING, ID_CLIPBOARD_DIB,		"Image (Send or Request only)");
 			}
 			AppendMenu(m_hPopupMenuClipboard, MF_POPUP, (UINT_PTR)m_hPopupMenuClipboardFormats, "Automatically Synchronized Formats");
 			AppendMenu(m_hPopupMenuClipboard, MF_SEPARATOR, NULL, NULL);
@@ -1468,6 +1478,10 @@ void ClientConnection::UpdateMenuItems()
 				  ID_CLIPBOARD_HTML,
 				  MF_BYCOMMAND | ( (m_clipboard.settings.m_nLimitHTML > 0) ? MF_CHECKED : MF_UNCHECKED));
 
+	CheckMenuItem(m_hPopupMenuClipboardFormats,
+				  ID_CLIPBOARD_DIB,
+				  MF_BYCOMMAND | MF_UNCHECKED | MF_GRAYED | MF_DISABLED);
+
 	EnableMenuItem(m_hPopupMenuClipboard,
 				  ID_ENABLE_CLIPBOARD,
 				  m_opts.m_ViewOnly ? MF_DISABLED : MF_ENABLED);
@@ -1482,7 +1496,11 @@ void ClientConnection::UpdateMenuItems()
 
 	EnableMenuItem(m_hPopupMenuClipboardFormats,
 				  ID_CLIPBOARD_HTML,
-				  (m_opts.m_ViewOnly || m_opts.m_DisableClipboard || !m_clipboard.settings.m_bSupportsEx || !(m_clipboard.settings.m_remoteCaps & clipHTML)) ? MF_DISABLED : MF_ENABLED);	
+				  (m_opts.m_ViewOnly || m_opts.m_DisableClipboard || !m_clipboard.settings.m_bSupportsEx || !(m_clipboard.settings.m_remoteCaps & clipHTML)) ? MF_DISABLED : MF_ENABLED);
+
+	EnableMenuItem(m_hPopupMenuClipboardFormats,
+				  ID_CLIPBOARD_DIB,
+				  MF_DISABLED);	
 
 	EnableMenuItem(m_hPopupMenuClipboard,
 				  ID_CLIPBOARD_RECV,
@@ -2213,6 +2231,9 @@ void ClientConnection::NegotiateProxy()
 	{
 	TCHAR tmphost[MAX_HOST_NAME_LEN];
 	TCHAR tmphost2[256];
+	//adzm 2010-09
+	::ZeroMemory(tmphost, sizeof(tmphost));
+	::ZeroMemory(tmphost2, sizeof(tmphost2));
 	_tcscpy(tmphost,m_host);
 	if (strcmp(tmphost,"")!=NULL)
 	{
@@ -2807,8 +2828,12 @@ void ClientConnection::AuthMsLogon() {
 
 void ClientConnection::SendClientInit()
 {
-    rfbClientInitMsg ci;
-	ci.shared = m_opts.m_Shared;
+    rfbClientInitMsg ci;	
+	// adzm 2010-09
+	ci.flags = 0;
+	if (m_opts.m_Shared) {
+		ci.flags |= clientInitShared;
+	}
 
     WriteExact((char *)&ci, sz_rfbClientInitMsg); // sf@2002 - RSM Plugin
 }
@@ -3319,6 +3344,10 @@ void ClientConnection::SetFormatAndEncodings()
 
 	// adzm - 2010-07 - Extended clipboard
 	encs[se->nEncodings++] = Swap32IfLE(rfbEncodingExtendedClipboard);
+	// all multithreaded versions of the plugins support streaming
+	if (m_fUsePlugin && m_pDSMPlugin && m_pDSMPlugin->IsEnabled() && m_pDSMPlugin->SupportsMultithreaded()) {
+		encs[se->nEncodings++] = Swap32IfLE(rfbEncodingPluginStreaming);
+	}
 
     // sf@2002 - DSM Plugin
 	int nEncodings = se->nEncodings;
@@ -3395,7 +3424,9 @@ void ClientConnection::KillThread()
 		fis->Update_socket();
 		shutdown(m_sock, SD_BOTH);
 		closesocket(m_sock);
-		m_sock = INVALID_SOCKET;
+		m_sock = INVALID_SOCKET;		
+		//adzm 2010-09
+		m_nQueueBufferLength = 0;
 	}
 	WaitForSingleObject(KillEvent, 6000);
 }
@@ -3439,7 +3470,9 @@ void ClientConnection::SuspendThread()
 	{
 		shutdown(m_sock, SD_BOTH);
 		closesocket(m_sock);
-		m_sock = INVALID_SOCKET;
+		m_sock = INVALID_SOCKET;		
+		//adzm 2010-09
+		m_nQueueBufferLength = 0;
 	}
 }
 void
@@ -3491,7 +3524,9 @@ ClientConnection::~ClientConnection()
 	if (m_sock != INVALID_SOCKET) {
 		shutdown(m_sock, SD_BOTH);
 		closesocket(m_sock);
-		m_sock = INVALID_SOCKET;
+		m_sock = INVALID_SOCKET;		
+		//adzm 2010-09
+		m_nQueueBufferLength = 0;
 	}
 
 	if (m_desktopName != NULL) delete [] m_desktopName;
@@ -3581,8 +3616,30 @@ bool ClientConnection::ScrollScreen(int dx, int dy)
 
 // ProcessPointerEvent handles the delicate case of emulating 3 buttons
 // on a two button mouse, then passes events off to SubProcessPointerEvent.
-inline void ClientConnection::ProcessPointerEvent(int x, int y, DWORD keyflags, UINT msg) 
+inline bool ClientConnection::ProcessPointerEvent(int x, int y, DWORD keyflags, UINT msg) 
 {
+	//adzm 2010-09 - Throttle mousemove events
+	if (msg == WM_MOUSEMOVE) {
+		bool bMouseKeyDown = (keyflags & (MK_LBUTTON|MK_MBUTTON|MK_RBUTTON|MK_XBUTTON1|MK_XBUTTON2)) != 0;
+		if (m_PendingMouseMove.ShouldThrottle(bMouseKeyDown)) {
+			m_PendingMouseMove.x = x;
+			m_PendingMouseMove.y = y;
+			m_PendingMouseMove.keyflags = keyflags;
+			m_PendingMouseMove.bValid = true;
+
+			m_flushMouseMoveTimer = SetTimer(m_hwndcn, IDT_FLUSHMOUSEMOVETIMER, m_PendingMouseMove.dwMinimumMouseMoveInterval, NULL);
+
+			// this is the only time we will return false!
+			return false;
+		} else {
+			m_PendingMouseMove.bValid = false;
+			m_PendingMouseMove.dwLastSentMouseMove = GetTickCount();			
+		}
+	} else {
+		//adzm 2010-09 - If we are sending an input, ensure the mouse is moved to the last known spot before sending
+		//the input message
+		FlushThrottledMouseMove();
+	}
 	if (m_opts.m_Emul3Buttons) {
 		// XXX To be done:
 		// If this is a left or right press, the user may be 
@@ -3591,104 +3648,125 @@ inline void ClientConnection::ProcessPointerEvent(int x, int y, DWORD keyflags, 
 		// further presses, then we send the button press. 
 		// If a press of the other button, or any release, comes in
 		// before timer has expired, we cancel timer & take different action.
-	  if (m_waitingOnEmulateTimer)
-	    {
-	      if (msg == WM_LBUTTONUP || msg == WM_RBUTTONUP ||
-		  abs(x - m_emulateButtonPressedX) > m_opts.m_Emul3Fuzz ||
-		  abs(y - m_emulateButtonPressedY) > m_opts.m_Emul3Fuzz)
+		if (m_waitingOnEmulateTimer)
 		{
-		  // if button released or we moved too far then cancel.
-		  // First let the remote know where the button was down
-		  SubProcessPointerEvent(
-					 m_emulateButtonPressedX, 
-					 m_emulateButtonPressedY, 
-					 m_emulateKeyFlags);
-		  // Then tell it where we are now
-		  SubProcessPointerEvent(x, y, keyflags);
+			if (msg == WM_LBUTTONUP || msg == WM_RBUTTONUP ||
+				abs(x - m_emulateButtonPressedX) > m_opts.m_Emul3Fuzz ||
+				abs(y - m_emulateButtonPressedY) > m_opts.m_Emul3Fuzz)
+			{
+				// if button released or we moved too far then cancel.
+				// First let the remote know where the button was down
+				SubProcessPointerEvent(
+					m_emulateButtonPressedX, 
+					m_emulateButtonPressedY, 
+					m_emulateKeyFlags);
+				// Then tell it where we are now
+				SubProcessPointerEvent(x, y, keyflags);
+			}
+			else if (
+				(msg == WM_LBUTTONDOWN && (m_emulateKeyFlags & MK_RBUTTON))
+				|| (msg == WM_RBUTTONDOWN && (m_emulateKeyFlags & MK_LBUTTON)))
+			{
+				// Triggered an emulate; remove left and right buttons, put
+				// in middle one.
+				DWORD emulatekeys = keyflags & ~(MK_LBUTTON|MK_RBUTTON);
+				emulatekeys |= MK_MBUTTON;
+				SubProcessPointerEvent(x, y, emulatekeys);
+
+				m_emulatingMiddleButton = true;
+			}
+			else
+			{
+				// handle movement normally & don't kill timer.
+				// just remove the pressed button from the mask.
+				DWORD keymask = m_emulateKeyFlags & (MK_LBUTTON|MK_RBUTTON);
+				DWORD emulatekeys = keyflags & ~keymask;
+				SubProcessPointerEvent(x, y, emulatekeys);
+				return true;
+			}
+
+			// if we reached here, we don't need the timer anymore.
+			KillTimer(m_hwndcn, m_emulate3ButtonsTimer);
+			m_waitingOnEmulateTimer = false;
 		}
-	      else if (
-		       (msg == WM_LBUTTONDOWN && (m_emulateKeyFlags & MK_RBUTTON))
-		       || (msg == WM_RBUTTONDOWN && (m_emulateKeyFlags & MK_LBUTTON)))
+		else if (m_emulatingMiddleButton)
 		{
-		  // Triggered an emulate; remove left and right buttons, put
-		  // in middle one.
-		  DWORD emulatekeys = keyflags & ~(MK_LBUTTON|MK_RBUTTON);
-		  emulatekeys |= MK_MBUTTON;
-		  SubProcessPointerEvent(x, y, emulatekeys);
-		  
-		  m_emulatingMiddleButton = true;
+			if ((keyflags & MK_LBUTTON) == 0 && (keyflags & MK_RBUTTON) == 0)
+			{
+				// We finish emulation only when both buttons come back up.
+				m_emulatingMiddleButton = false;
+				SubProcessPointerEvent(x, y, keyflags);
+			}
+			else
+			{
+				// keep emulating.
+				DWORD emulatekeys = keyflags & ~(MK_LBUTTON|MK_RBUTTON);
+				emulatekeys |= MK_MBUTTON;
+				SubProcessPointerEvent(x, y, emulatekeys);
+			}
 		}
-	      else
+		else
 		{
-		  // handle movement normally & don't kill timer.
-		  // just remove the pressed button from the mask.
-		  DWORD keymask = m_emulateKeyFlags & (MK_LBUTTON|MK_RBUTTON);
-		  DWORD emulatekeys = keyflags & ~keymask;
-		  SubProcessPointerEvent(x, y, emulatekeys);
-		  return;
+			// Start considering emulation if we've pressed a button
+			// and the other isn't pressed.
+			if ( (msg == WM_LBUTTONDOWN && !(keyflags & MK_RBUTTON))
+				|| (msg == WM_RBUTTONDOWN && !(keyflags & MK_LBUTTON)))
+			{
+				// Start timer for emulation.
+				m_emulate3ButtonsTimer = 
+					SetTimer(
+					m_hwndcn, 
+					IDT_EMULATE3BUTTONSTIMER, 
+					m_opts.m_Emul3Timeout, 
+					NULL);
+
+				if (!m_emulate3ButtonsTimer)
+				{
+					vnclog.Print(0, _T("Failed to create timer for emulating 3 buttons"));
+					PostMessage(m_hwndMain, WM_CLOSE, 0, 1);
+					return true;
+				}
+
+				m_waitingOnEmulateTimer = true;
+
+				// Note that we don't send the event here; we're batching it for
+				// later.
+				m_emulateKeyFlags = keyflags;
+				m_emulateButtonPressedX = x;
+				m_emulateButtonPressedY = y;
+			}
+			else
+			{
+				// just send event noramlly
+				SubProcessPointerEvent(x, y, keyflags);
+			}
 		}
-	      
-	      // if we reached here, we don't need the timer anymore.
-	      KillTimer(m_hwndcn, m_emulate3ButtonsTimer);
-	      m_waitingOnEmulateTimer = false;
-	    }
-	  else if (m_emulatingMiddleButton)
-	    {
-	      if ((keyflags & MK_LBUTTON) == 0 && (keyflags & MK_RBUTTON) == 0)
-		{
-		  // We finish emulation only when both buttons come back up.
-		  m_emulatingMiddleButton = false;
-		  SubProcessPointerEvent(x, y, keyflags);
-		}
-	      else
-		{
-		  // keep emulating.
-		  DWORD emulatekeys = keyflags & ~(MK_LBUTTON|MK_RBUTTON);
-		  emulatekeys |= MK_MBUTTON;
-		  SubProcessPointerEvent(x, y, emulatekeys);
-		}
-	    }
-	  else
-	    {
-	      // Start considering emulation if we've pressed a button
-	      // and the other isn't pressed.
-	      if ( (msg == WM_LBUTTONDOWN && !(keyflags & MK_RBUTTON))
-		   || (msg == WM_RBUTTONDOWN && !(keyflags & MK_LBUTTON)))
-		{
-		  // Start timer for emulation.
-		  m_emulate3ButtonsTimer = 
-		    SetTimer(
-			     m_hwndcn, 
-			     IDT_EMULATE3BUTTONSTIMER, 
-			     m_opts.m_Emul3Timeout, 
-			     NULL);
-		  
-		  if (!m_emulate3ButtonsTimer)
-		    {
-		      vnclog.Print(0, _T("Failed to create timer for emulating 3 buttons"));
-		      PostMessage(m_hwndMain, WM_CLOSE, 0, 1);
-		      return;
-		    }
-		  
-		  m_waitingOnEmulateTimer = true;
-		  
-		  // Note that we don't send the event here; we're batching it for
-		  // later.
-		  m_emulateKeyFlags = keyflags;
-		  m_emulateButtonPressedX = x;
-		  m_emulateButtonPressedY = y;
-		}
-	      else
-		{
-		  // just send event noramlly
-		  SubProcessPointerEvent(x, y, keyflags);
-		}
-	    }
- 	}
+	}
 	else
-	  {
-	    SubProcessPointerEvent(x, y, keyflags);
-	  }
+	{
+		SubProcessPointerEvent(x, y, keyflags);
+	}
+
+	return true;
+}
+
+//adzm 2010-09 - Ensure the mouse is moved to the last known spot
+bool ClientConnection::FlushThrottledMouseMove()
+{
+	if (m_flushMouseMoveTimer != 0) {
+		KillTimer(m_hwndcn, m_flushMouseMoveTimer);
+		m_flushMouseMoveTimer = 0;
+	}
+	if (m_PendingMouseMove.bValid) {
+		m_PendingMouseMove.bValid = false;
+		m_PendingMouseMove.dwLastSentMouseMove = GetTickCount();
+
+		SubProcessPointerEvent(m_PendingMouseMove.x, m_PendingMouseMove.y, m_PendingMouseMove.keyflags);
+
+		return true;
+	}
+
+	return false;
 }
 
 // SubProcessPointerEvent takes windows positions and flags and converts 
@@ -3784,7 +3862,8 @@ ClientConnection::SendPointerEvent(int x, int y, int buttonMask)
 	SoftCursorMove(x, y);
     pe.x = Swap16IfLE(x);
     pe.y = Swap16IfLE(y);
-	WriteExact_timeout((char *)&pe, sz_rfbPointerEventMsg, rfbPointerEvent,5); // sf@2002 - For DSM Plugin
+	//adzm 2010-09
+	WriteExactQueue_timeout((char *)&pe, sz_rfbPointerEventMsg, rfbPointerEvent,5); // sf@2002 - For DSM Plugin
 }
 
 //
@@ -3922,7 +4001,8 @@ ClientConnection::SendKeyEvent(CARD32 key, bool down)
     ke.type = rfbKeyEvent;
     ke.down = down ? 1 : 0;
     ke.key = Swap32IfLE(key);
-    WriteExact_timeout((char *)&ke, sz_rfbKeyEventMsg, rfbKeyEvent,5);
+	//adzm 2010-09
+    WriteExactQueue_timeout((char *)&ke, sz_rfbKeyEventMsg, rfbKeyEvent,5);
     //vnclog.Print(0, _T("SendKeyEvent: key = x%04x status = %s ke.key=%d\n"), key, 
       //  down ? _T("down") : _T("up"),ke.key);
 }
@@ -3934,6 +4014,7 @@ ClientConnection::SendKeyEvent(CARD32 key, bool down)
 
 void ClientConnection::SendClientCutText(char *str, int len)
 {
+
 	// adzm - 2010-07 - Extended clipboard
 	if (m_pFileTransfer->m_fFileTransferRunning && ( m_pFileTransfer->m_fVisible || m_pFileTransfer->UsingOldProtocol())) {
 		vnclog.Print(6, _T("Ignoring SendClientCutText due to in-progress file transfer\n"));
@@ -3944,6 +4025,8 @@ void ClientConnection::SendClientCutText(char *str, int len)
 		return;
 	}
 
+
+	omni_mutex_lock l(m_clipMutex);
 
 	std::string strStr(str);
 
@@ -3962,7 +4045,8 @@ void ClientConnection::SendClientCutText(char *str, int len)
 
 	cct.type = rfbClientCutText;
 	cct.length = Swap32IfLE(len);
-	WriteExact((char *)&cct, sz_rfbClientCutTextMsg, rfbClientCutText);
+	//adzm 2010-09
+	WriteExactQueue((char *)&cct, sz_rfbClientCutTextMsg, rfbClientCutText);
 	WriteExact(str, len);
 	vnclog.Print(6, _T("Sent %d bytes of clipboard\n"), len);
 }
@@ -4146,7 +4230,7 @@ void* ClientConnection::run_undetached(void* arg) {
 			while (!m_bKillThread) 
 			{
 				// sf@2002 - DSM Plugin
-				if (!m_fUsePlugin)			
+				if (!m_fUsePlugin)		
 				{
 					msgType = fis->readU8();
 					m_nTO = 1; // Read the rest of the rfb message (normal case)
@@ -4157,7 +4241,15 @@ void* ClientConnection::run_undetached(void* arg) {
 					// We need it to know the type of rfb message that follows
 					// because we can't see the type inside the transformed rfb message.
 					ReadExact((char *)&msgType, sizeof(msgType));
-					m_nTO = 0; // we'll need to read the whole transformed rfb message that follows
+					// adzm 2010-09
+					if (m_fPluginStreamingIn)
+					{
+						m_nTO = 1; // we'll need to read the whole transformed rfb message that follows
+					}
+					else
+					{
+						m_nTO = 0; // we'll need to read the whole transformed rfb message that follows
+					}
 				}
 					
 				switch (msgType)
@@ -4232,7 +4324,10 @@ void* ClientConnection::run_undetached(void* arg) {
 					Createdib();
 					m_pendingScaleChange = true;
 					m_pendingFormatChange = true;
-					SendAppropriateFramebufferUpdateRequest();
+					//adzm 2010-09 - this could send in the middle of other sends by the ui thread! We can still use SendMessage to ensure
+					//it blocks until processed.
+					//SendAppropriateFramebufferUpdateRequest();					
+					SendMessage(m_hwndcn, WM_REGIONUPDATED, NULL, NULL);
 					
 					SizeWindow();
 					InvalidateRect(m_hwndcn, NULL, TRUE);
@@ -4245,6 +4340,17 @@ void* ClientConnection::run_undetached(void* arg) {
                     ReadServerState();
                     ::PostMessage(m_hwndMain, RebuildToolbarMessage, 0, 0);
                 }
+                    break;
+					
+				// adzm 2010-09 - Notify streaming DSM plugin support
+                case rfbNotifyPluginStreaming:
+                    if (sz_rfbNotifyPluginStreamingMsg > 1)
+                    {
+                  	rfbNotifyPluginStreamingMsg nspm;
+                	ReadExact(((char *) &nspm)+m_nTO, sz_rfbNotifyPluginStreamingMsg-m_nTO);
+                    }
+					m_fPluginStreamingIn = true;
+					PostMessage(m_hwndcn, WM_NOTIFYPLUGINSTREAMING, NULL, NULL);
                     break;
 				default:
 						  vnclog.Print(3, _T("Unknown message type x%02x\n"), msgType );
@@ -4537,7 +4643,8 @@ inline void ClientConnection::ReadScreenUpdate()
 		// Modif sf@2002 - DSM Plugin
 		// With DSM, all rects contents (excepted caches) are buffered into memory in one shot
 		// then they will be read in this buffer by the "regular" Read*Type*Rect() functions
-		if (m_fUsePlugin && m_pDSMPlugin->IsEnabled())
+		// adzm 2010-09
+		if (m_fUsePlugin && !m_fPluginStreamingIn && m_pDSMPlugin->IsEnabled())
 		{
 			if (!m_fReadFromNetRectBuf)
 			{
@@ -4570,7 +4677,11 @@ inline void ClientConnection::ReadScreenUpdate()
 					break;
 				}
 			}
-			
+		}
+
+		// adzm 2010-09
+		if (m_fUsePlugin && m_pDSMPlugin->IsEnabled())
+		{
 			// ZRLE special case
 			if (!fis->GetReadFromMemoryBuffer())
 			{
@@ -4611,7 +4722,8 @@ inline void ClientConnection::ReadScreenUpdate()
 		}
 
 		// sf@2004
-		if (m_fUsePlugin && m_pDSMPlugin->IsEnabled() && (m_fReadFromNetRectBuf || fis->GetReadFromMemoryBuffer()))
+		// adzm 2010-09
+		if (m_fUsePlugin && !m_fPluginStreamingIn && m_pDSMPlugin->IsEnabled() && (m_fReadFromNetRectBuf || fis->GetReadFromMemoryBuffer()))
 		{
 			fis->stopTiming();
 			kbitsPerSecond = fis->kbitsPerSecond();
@@ -4892,8 +5004,11 @@ void ClientConnection::ReadServerCutText()
 			case clipCaps:
 				{
 					omni_mutex_lock l(m_clipMutex);
-					m_clipboard.settings.HandleCapsPacket(extendedClipboardDataMessage);
-					UpdateRemoteClipboardCaps();
+					m_clipboard.settings.HandleCapsPacket(extendedClipboardDataMessage, false);
+				
+					//adzm 2010-09				
+					//UpdateRemoteClipboardCaps();
+					PostMessage(m_hwndcn, WM_UPDATEREMOTECLIPBOARDCAPS, NULL, NULL);
 				}
 				break;
 			case clipProvide:
@@ -4918,7 +5033,7 @@ void ClientConnection::ReadServerCutText()
 			case clipNotify:
 				{
 					omni_mutex_lock l(m_clipMutex);
-					m_clipboard.m_notifiedRemoteFormats |= (extendedClipboardDataMessage.GetFlags() & clipFormatMask);
+					m_clipboard.m_notifiedRemoteFormats = (extendedClipboardDataMessage.GetFlags() & clipFormatMask);
 				}
 				break;
 			case clipRequest:
@@ -5323,69 +5438,136 @@ ClientConnection::Send(const char *buff, const unsigned int bufflen,int timeout)
 //
 // sf@2002 - DSM Plugin
 //
-void ClientConnection::WriteExact(char *buf, int bytes, CARD8 msgType)
-{
-	if (!m_fUsePlugin)
+void ClientConnection::WriteTransformed(char *buf, int bytes, CARD8 msgType, bool bQueue)
+{	
+	// adzm 2010-09
+	if (!m_fUsePlugin || m_fPluginStreamingOut)
 	{
-		WriteExact(buf, bytes);
+		//adzm 2010-09
+		WriteTransformed(buf, bytes, bQueue);
 	}
 	else if (m_pDSMPlugin->IsEnabled())
 	{
 		// Send the transformed message type first 
-		WriteExact((char*)&msgType, sizeof(msgType));
+		//adzm 2010-09
+		WriteTransformed((char*)&msgType, sizeof(msgType), bQueue);
 		// Then send the transformed rfb message content
-		WriteExact(buf, bytes);
+		//adzm 2010-09
+		WriteTransformed(buf, bytes, bQueue);
 	}
 }
 
-void ClientConnection::WriteExact_timeout(char *buf, int bytes, CARD8 msgType,int timeout)
+//adzm 2010-09
+void ClientConnection::WriteExact(char *buf, int bytes, CARD8 msgType)
 {
-	if (!m_fUsePlugin)
+	WriteTransformed(buf, bytes, msgType, false);
+}
+
+//adzm 2010-09
+void ClientConnection::WriteTransformed_timeout(char *buf, int bytes, CARD8 msgType,int timeout, bool bQueue)
+{
+	// adzm 2010-09
+	if (!m_fUsePlugin || m_fPluginStreamingOut)
 	{
-		WriteExact_timeout(buf, bytes,timeout);
+		WriteTransformed_timeout(buf, bytes,timeout, bQueue);
 	}
 	else if (m_pDSMPlugin->IsEnabled())
 	{
 		// Send the transformed message type first 
-		WriteExact_timeout((char*)&msgType, sizeof(msgType),timeout);
+		WriteTransformed_timeout((char*)&msgType, sizeof(msgType),timeout, bQueue);
 		// Then send the transformed rfb message content
-		WriteExact_timeout(buf, bytes,timeout);
+		WriteTransformed_timeout(buf, bytes,timeout, bQueue);
+	}
+}
+
+//adzm 2010-09
+void ClientConnection::WriteExact_timeout(char *buf, int bytes, CARD8 msgType,int timeout)
+{
+	WriteTransformed_timeout(buf, bytes, msgType, timeout, false);
+}
+
+//adzm 2010-09
+// Sends the number of bytes specified from the buffer
+void ClientConnection::Write(char *buf, int bytes, bool bQueue, bool bTimeout, int timeout)
+{
+	omni_mutex_lock l(m_writeMutex);
+
+	if (bytes == 0 && (bQueue || (!bQueue && m_nQueueBufferLength == 0))) return;
+
+	// this will adjust buf and bytes to be < G_SENDBUFFER
+	FlushOutstandingWriteQueue(buf, bytes, bTimeout, timeout);
+
+	// append buf to any remaining data in the queue, since we know that m_nQueueBufferLength + bytes < G_SENDBUFFER
+	if (bytes > 0) {
+		memcpy(m_QueueBuffer + m_nQueueBufferLength, buf, bytes);
+		m_nQueueBufferLength += bytes;
+	}
+
+	if (!bQueue) {		
+		int i = 0;
+		int j = 0;
+		while (i < m_nQueueBufferLength)
+		{
+			//adzm 2010-08-01
+			m_LastSentTick = GetTickCount();
+			if (bTimeout) {
+				j = Send(m_QueueBuffer+i, m_nQueueBufferLength-i, timeout);
+			} else {
+				j = send(m_sock, m_QueueBuffer+i, m_nQueueBufferLength-i, 0);
+			}
+			if (j == SOCKET_ERROR || j==0)
+			{
+				LPVOID lpMsgBuf;
+				int err = ::GetLastError();
+				FormatMessage(     
+					FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+					FORMAT_MESSAGE_FROM_SYSTEM |     
+					FORMAT_MESSAGE_IGNORE_INSERTS, NULL,
+					err, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
+					(LPTSTR) &lpMsgBuf, 0, NULL ); // Process any inserts in lpMsgBuf.
+				vnclog.Print(1, _T("Socket error %d: %s\n"), err, lpMsgBuf);
+				LocalFree( lpMsgBuf );
+				m_running = false;
+
+				throw WarningException(sz_L69);
+			}
+			i += j;
+			m_BytesSend += j;
+		}
+
+		m_nQueueBufferLength = 0;
 	}
 }
 
 // Sends the number of bytes specified from the buffer
-void ClientConnection::WriteExact(char *buf, int bytes)
+void ClientConnection::FlushOutstandingWriteQueue(char*& buf2, int& bytes2, bool bTimeout, int timeout)
 {
-
-	if (bytes == 0) return;
-
 	omni_mutex_lock l(m_writeMutex);
-	//vnclog.Print(10, _T("  writing %d bytes\n"), bytes);
 
-	m_BytesSend += bytes;
-	int i = 0;
-    int j;
+	DWORD nNewSize = m_nQueueBufferLength + bytes2;
 
-	// sf@2002 - DSM Plugin
-	char *pBuffer = buf;
-	if (m_fUsePlugin)
-	{
-		if (m_pDSMPlugin->IsEnabled())
-		{
-			int nTransDataLen = 0;
-			pBuffer = (char*)TransformBuffer((BYTE*)buf, bytes, &nTransDataLen);
-			if (pBuffer == NULL || (bytes > 0 && nTransDataLen == 0))
-				throw WarningException(sz_L68);
-			bytes = nTransDataLen;
-		}
-	}
-
-    while (i < bytes)
-	{
+	while (nNewSize >= G_SENDBUFFER) {
 		//adzm 2010-08-01
 		m_LastSentTick = GetTickCount();
-		j = send(m_sock, pBuffer+i, bytes-i, 0);
-		if (j == SOCKET_ERROR || j==0)
+
+		int bufferFill = G_SENDBUFFER - m_nQueueBufferLength;
+
+		// add anything from buf2 to the queued packet
+		memcpy(m_QueueBuffer + m_nQueueBufferLength, buf2, bufferFill);
+
+		// adjust buf2
+		buf2 += bufferFill;
+		bytes2 -= bufferFill;
+
+		m_nQueueBufferLength = G_SENDBUFFER;
+
+		int sent = 0;
+		if (bTimeout) {
+			sent = Send(m_QueueBuffer, G_SENDBUFFER, timeout);
+		} else {
+			sent = send(m_sock, m_QueueBuffer, G_SENDBUFFER, 0);
+		}
+		if (sent == SOCKET_ERROR || sent==0)
 		{
 			LPVOID lpMsgBuf;
 			int err = ::GetLastError();
@@ -5401,13 +5583,27 @@ void ClientConnection::WriteExact(char *buf, int bytes)
 
 			throw WarningException(sz_L69);
 		}
-		i += j;
-    }
 
+		// adjust our stats
+		m_BytesSend += sent;
+
+		// adjust the current queue
+		nNewSize -= sent;
+		m_nQueueBufferLength -= sent;
+		// if not everything, move to the beginning of the queue
+		if ((G_SENDBUFFER - sent) != 0) {
+			memcpy(m_QueueBuffer, m_QueueBuffer + sent, G_SENDBUFFER - sent);
+		}
+	}
+}
+
+void ClientConnection::FlushWriteQueue(bool bTimeout, int timeout)
+{
+	Write(NULL, 0, false, bTimeout, timeout);
 }
 
 // Sends the number of bytes specified from the buffer
-void ClientConnection::WriteExact_timeout(char *buf, int bytes,int timeout)
+void ClientConnection::WriteTransformed(char *buf, int bytes, bool bQueue)
 {
 
 	if (bytes == 0) return;
@@ -5415,9 +5611,6 @@ void ClientConnection::WriteExact_timeout(char *buf, int bytes,int timeout)
 	omni_mutex_lock l(m_writeMutex);
 	//vnclog.Print(10, _T("  writing %d bytes\n"), bytes);
 
-	m_BytesSend += bytes;
-	int i = 0;
-    int j;
 
 	// sf@2002 - DSM Plugin
 	char *pBuffer = buf;
@@ -5433,75 +5626,86 @@ void ClientConnection::WriteExact_timeout(char *buf, int bytes,int timeout)
 		}
 	}
 
-    while (i < bytes)
-	{
-		//j = send(m_sock, pBuffer+i, bytes-i, 0);
-		j = Send(pBuffer+i, bytes-i, timeout);
-		if (j == SOCKET_ERROR || j==0)
-		{
-			LPVOID lpMsgBuf;
-			int err = ::GetLastError();
-			FormatMessage(     
-				FORMAT_MESSAGE_ALLOCATE_BUFFER | 
-				FORMAT_MESSAGE_FROM_SYSTEM |     
-				FORMAT_MESSAGE_IGNORE_INSERTS, NULL,
-				err, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
-				(LPTSTR) &lpMsgBuf, 0, NULL ); // Process any inserts in lpMsgBuf.
-			vnclog.Print(1, _T("Socket error %d: %s\n"), err, lpMsgBuf);
-			LocalFree( lpMsgBuf );
-			m_running = false;
-			return;
-			//throw WarningException(sz_L69);
-		}
-		i += j;
-    }
-
+	//adzm 2010-09
+	Write(pBuffer, bytes, bQueue);
 }
 
+//adzm 2010-09
+void ClientConnection::WriteExact(char *buf, int bytes)
+{
+	WriteTransformed(buf, bytes, false);
+}
 
+//adzm 2010-09
+void ClientConnection::WriteQueue(char *buf, int bytes)
+{
+	Write(buf, bytes, true);
+}
+
+void ClientConnection::WriteExactQueue(char *buf, int bytes)
+{
+	WriteTransformed(buf, bytes, true);
+}
+
+void ClientConnection::WriteExactQueue(char *buf, int bytes, CARD8 msgType)
+{
+	WriteTransformed(buf, bytes, msgType, true);
+}
+
+void ClientConnection::WriteExactQueue_timeout(char *buf, int bytes,int timeout)
+{
+	WriteTransformed_timeout(buf, bytes, timeout, true);
+}
+
+void ClientConnection::WriteExactQueue_timeout(char *buf, int bytes, CARD8 msgType,int timeout)
+{
+	WriteTransformed_timeout(buf, bytes, msgType, timeout, true);
+}
+
+// Sends the number of bytes specified from the buffer
+//adzm 2010-09
+void ClientConnection::WriteTransformed_timeout(char *buf, int bytes,int timeout, bool bQueue)
+{
+	if (bytes == 0) return;
+
+	omni_mutex_lock l(m_writeMutex);
+	//vnclog.Print(10, _T("  writing %d bytes\n"), bytes);
+	
+
+	// sf@2002 - DSM Plugin
+	char *pBuffer = buf;
+	if (m_fUsePlugin)
+	{
+		if (m_pDSMPlugin->IsEnabled())
+		{
+			int nTransDataLen = 0;
+			pBuffer = (char*)TransformBuffer((BYTE*)buf, bytes, &nTransDataLen);
+			if (pBuffer == NULL || (bytes > 0 && nTransDataLen == 0))
+				throw WarningException(sz_L68);
+			bytes = nTransDataLen;
+		}
+	}
+
+	Write_timeout(pBuffer, bytes, timeout, bQueue);
+}
+
+//adzm 2010-09
+void ClientConnection::WriteExact_timeout(char *buf, int bytes, int timeout)
+{
+	WriteTransformed_timeout(buf, bytes, timeout, false);
+}
+
+//adzm 2010-09
+void ClientConnection::Write_timeout(char *buf, int bytes,int timeout, bool bQueue)
+{
+	Write(buf, bytes, bQueue, true, timeout);
+}
 
 // Sends the number of bytes specified from the buffer
 void ClientConnection::WriteExactProxy(char *buf, int bytes)
 {
-
-	if (bytes == 0) return;
-	omni_mutex_lock l(m_writeMutex);
-	//vnclog.Print(10, _T("  writing %d bytes\n"), bytes);
-
-	m_BytesSend += bytes;
-/*
-	SetDlgItemInt(m_hwndStatus,IDC_SEND,m_BytesSend,false);
-*/
-	int i = 0;
-    int j;
-
-	// sf@2002 - DSM Plugin
-	char *pBuffer = buf;
-
-    while (i < bytes)
-	{
-		//adzm 2010-08-01
-		m_LastSentTick = GetTickCount();
-		j = send(m_sock, pBuffer+i, bytes-i, 0);
-		if (j == SOCKET_ERROR || j==0)
-		{
-			LPVOID lpMsgBuf;
-			int err = ::GetLastError();
-			FormatMessage(     
-				FORMAT_MESSAGE_ALLOCATE_BUFFER | 
-				FORMAT_MESSAGE_FROM_SYSTEM |     
-				FORMAT_MESSAGE_IGNORE_INSERTS, NULL,
-				err, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
-				(LPTSTR) &lpMsgBuf, 0, NULL ); // Process any inserts in lpMsgBuf.
-			vnclog.Print(1, _T("Socket error %d: %s\n"), err, lpMsgBuf);
-			LocalFree( lpMsgBuf );
-			m_running = false;
-
-			throw WarningException(sz_L69);
-		}
-		i += j;
-    }
-
+	//adzm 2010-09 - just call this function, it is named a bit more clearly than this one
+	Write(buf, bytes, false);
 }
 
 // Security fix for uvnc 1.0.5 and 1.0.2 (should be ok for all version...)
@@ -6378,26 +6582,38 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 					case ID_VK_LWINDOWN:
 						if (_this->m_opts.m_ViewOnly) return 0;
 						_this->SendKeyEvent(XK_Super_L, true);
+						//adzm 2010-09
+						_this->FlushWriteQueue(true, 5);
 						return 0;
 					case ID_VK_LWINUP:
 						if (_this->m_opts.m_ViewOnly) return 0;
 						_this->SendKeyEvent(XK_Super_L, false);
+						//adzm 2010-09
+						_this->FlushWriteQueue(true, 5);
 						return 0;
 					case ID_VK_RWINDOWN:
 						if (_this->m_opts.m_ViewOnly) return 0;
 						_this->SendKeyEvent(XK_Super_R, true);
+						//adzm 2010-09
+						_this->FlushWriteQueue(true, 5);
 						return 0;
 					case ID_VK_RWINUP:
 						if (_this->m_opts.m_ViewOnly) return 0;
 						_this->SendKeyEvent(XK_Super_R, false);
+						//adzm 2010-09
+						_this->FlushWriteQueue(true, 5);
 						return 0;
 					case ID_VK_APPSDOWN:
 						if (_this->m_opts.m_ViewOnly) return 0;
 						_this->SendKeyEvent(XK_Menu, true);
+						//adzm 2010-09
+						_this->FlushWriteQueue(true, 5);
 						return 0;
 					case ID_VK_APPSUP:
 						if (_this->m_opts.m_ViewOnly) return 0;
 						_this->SendKeyEvent(XK_Menu, false);
+						//adzm 2010-09
+						_this->FlushWriteQueue(true, 5);
 						return 0;
 
 						
@@ -6408,6 +6624,8 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						_this->SendKeyEvent(XK_Escape,true);
 						_this->SendKeyEvent(XK_Control_L,false);
 						_this->SendKeyEvent(XK_Escape,false);
+						//adzm 2010-09
+						_this->FlushWriteQueue(true, 5);
 						return 0;
 						
 					// Send Ctrl-Alt-Del
@@ -6419,26 +6637,36 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						_this->SendKeyEvent(XK_Delete,    false);
 						_this->SendKeyEvent(XK_Alt_L,     false);
 						_this->SendKeyEvent(XK_Control_L, false);
+						//adzm 2010-09
+						_this->FlushWriteQueue(true, 5);
 						return 0;
 						
 					case ID_CONN_CTLDOWN:
 						if (_this->m_opts.m_ViewOnly) return 0;
 						_this->SendKeyEvent(XK_Control_L, true);
+						//adzm 2010-09
+						_this->FlushWriteQueue(true, 5);
 						return 0;
 						
 					case ID_CONN_CTLUP:
 						if (_this->m_opts.m_ViewOnly) return 0;
 						_this->SendKeyEvent(XK_Control_L, false);
+						//adzm 2010-09
+						_this->FlushWriteQueue(true, 5);
 						return 0;
 						
 					case ID_CONN_ALTDOWN:
 						if (_this->m_opts.m_ViewOnly) return 0;
 						_this->SendKeyEvent(XK_Alt_L, true);
+						//adzm 2010-09
+						_this->FlushWriteQueue(true, 5);
 						return 0;
 						
 					case ID_CONN_ALTUP:
 						if (_this->m_opts.m_ViewOnly) return 0;
 						_this->SendKeyEvent(XK_Alt_L, false);
+						//adzm 2010-09
+						_this->FlushWriteQueue(true, 5);
 						return 0;
 						
 					case ID_CLOSEDAEMON:
@@ -6663,7 +6891,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 									ClipboardSettings::defaultLimit 
 								: _this->m_clipboard.settings.m_nRequestedLimitText)
 							: 0;
-						_this->UpdateRemoteClipboardCaps();
+						_this->UpdateRemoteClipboardCaps(true);
 						//_this->UpdateMenuItems(); // Handled in WM_INITMENUPOPUP
 						break;
 					case ID_CLIPBOARD_RTF:
@@ -6673,7 +6901,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 									ClipboardSettings::defaultLimit 
 								: _this->m_clipboard.settings.m_nRequestedLimitRTF)
 							: 0;
-						_this->UpdateRemoteClipboardCaps();
+						_this->UpdateRemoteClipboardCaps(true);
 						//_this->UpdateMenuItems(); // Handled in WM_INITMENUPOPUP
 						break;
 					case ID_CLIPBOARD_HTML:
@@ -6683,11 +6911,11 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 									ClipboardSettings::defaultLimit 
 								: _this->m_clipboard.settings.m_nRequestedLimitHTML)
 							: 0;
-						_this->UpdateRemoteClipboardCaps();
+						_this->UpdateRemoteClipboardCaps(true);
 						//_this->UpdateMenuItems(); // Handled in WM_INITMENUPOPUP
 						break;
 					case ID_CLIPBOARD_SEND:
-						_this->UpdateRemoteClipboard(clipProvide | clipText | clipRTF | clipHTML);
+						_this->UpdateRemoteClipboard(clipProvide | clipText | clipRTF | clipHTML | clipDIB);
 						break;
 					case ID_CLIPBOARD_RECV:
 						_this->RequestRemoteClipboard();
@@ -6756,6 +6984,8 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 					if (!_this->m_running) return 0;
 					if ( _this->m_opts.m_ViewOnly) return 0;
 					_this->m_keymap->ReleaseAllKeys(_this);
+					//adzm 2010-09
+					_this->FlushWriteQueue(true, 5);
 					/*
 					_this->SendKeyEvent(XK_Alt_L,     false);
 					_this->SendKeyEvent(XK_Control_L, false);
@@ -6944,6 +7174,8 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						if (!_this->m_running) return 0;
 						if ( _this->m_opts.m_ViewOnly) return 0;
 						_this->ProcessKeyEvent((int) wParam, (DWORD) lParam);
+						//adzm 2010-09
+						_this->FlushWriteQueue(true, 5);
 						return 0;
 					}
 
@@ -7205,8 +7437,11 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 					
 					// RealVNC 335 method
 				case WM_MOUSEWHEEL:
-					if (!_this->m_opts.m_ViewOnly)
+					if (!_this->m_opts.m_ViewOnly) {
 						_this->ProcessMouseWheel((SHORT)HIWORD(wParam));
+						//adzm 2010-09
+						_this->FlushWriteQueue(true, 5);
+					}
 					return 0;
 
 					
@@ -7356,6 +7591,9 @@ LRESULT CALLBACK ClientConnection::WndProcTBwin(HWND hwnd, UINT iMsg, WPARAM wPa
 							_this->SendKeyEvent(Key,false);
 						}
 						
+						//adzm 2010-09
+						_this->FlushWriteQueue(true, 5);
+						
 						
 						vnclog.Print(0,_T("END   Send Custom Key %d\n"),Key);
 					}
@@ -7482,23 +7720,42 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 				//_this->DoBlit();
 				_this->SendAppropriateFramebufferUpdateRequest();
 				return 0;
+
+			case WM_UPDATEREMOTECLIPBOARDCAPS:
+				//adzm 2010-09				
+				_this->UpdateRemoteClipboardCaps();
+				return 0;
+
+			case WM_NOTIFYPLUGINSTREAMING:				
+				// adzm 2010-09 - Notify streaming DSM plugin support
+				_this->NotifyPluginStreamingSupport();
+				return 0;
 				
 			case WM_PAINT:
 				_this->DoBlit();
 				return 0;
 				
 			case WM_TIMER:
-				if (wParam == _this->m_emulate3ButtonsTimer)
-				{
-					_this->SubProcessPointerEvent( 
-						_this->m_emulateButtonPressedX,
-						_this->m_emulateButtonPressedY,
-						_this->m_emulateKeyFlags);
-					KillTimer(_this->m_hwndcn, _this->m_emulate3ButtonsTimer);
-					_this->m_waitingOnEmulateTimer = false;
-				} else if (wParam != 0 && wParam == _this->m_keepalive_timer) {
-					// adzm 2009-08-02
-					_this->SendKeepAlive();
+				if (wParam !=0) {
+					if (wParam == _this->m_emulate3ButtonsTimer)
+					{
+						_this->SubProcessPointerEvent( 
+							_this->m_emulateButtonPressedX,
+							_this->m_emulateButtonPressedY,
+							_this->m_emulateKeyFlags);
+						//adzm 2010-09
+						_this->FlushWriteQueue(true, 5);
+						KillTimer(_this->m_hwndcn, _this->m_emulate3ButtonsTimer);
+						_this->m_waitingOnEmulateTimer = false;
+					} else if (wParam == _this->m_keepalive_timer) {
+						// adzm 2009-08-02
+						_this->SendKeepAlive();
+					} else if (wParam == _this->m_flushMouseMoveTimer) {
+						// adzm 2010-09						
+						if (_this->FlushThrottledMouseMove()) {
+							_this->FlushWriteQueue();
+						}
+					}
 				}
 				return 0;
 				
@@ -7530,7 +7787,10 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 							return 0;
 					}
 					if ( _this->m_opts.m_ViewOnly) return 0;
-					_this->ProcessPointerEvent(x,y, wParam, iMsg);
+					//adzm 2010-09
+					if (_this->ProcessPointerEvent(x,y, wParam, iMsg)) {					
+						_this->FlushWriteQueue(true, 5);
+					}
 					return 0;
 				}
 				
@@ -7542,6 +7802,8 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 					if (!_this->m_running) return 0;
 					if ( _this->m_opts.m_ViewOnly) return 0;
 					_this->ProcessKeyEvent((int) wParam, (DWORD) lParam);
+					//adzm 2010-09
+					_this->FlushWriteQueue(true, 5);
 					return 0;
 				}
 				
@@ -7562,6 +7824,8 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 					if (key > 32 && key < 127) {
 						_this->SendKeyEvent(wParam & 0xff, true);
 						_this->SendKeyEvent(wParam & 0xff, false);
+						//adzm 2010-09
+						_this->FlushWriteQueue(true, 5);
 					}
 					return 0;
 				}
@@ -7595,7 +7859,10 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 						
 						SetWindowPos(hwnd, hwndafter, 0,0,100,100, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
 					}
+					if (_this->m_opts.m_ViewOnly) return 0;
 					_this->m_keymap->ReleaseAllKeys(_this);
+					//adzm 2010-09
+					_this->FlushWriteQueue(true, 5);
 					/*	
 					vnclog.Print(6, _T("Losing focus - cancelling modifiers\n"));
 					_this->SendKeyEvent(XK_Alt_L,     false);
@@ -8112,4 +8379,42 @@ void ClientConnection::SendKeepAlive(bool bForce)
 		}
     }
 }
+
+//adzm 2010-09 - 
+ClientConnection::PendingMouseMove::PendingMouseMove()
+	: dwLastSentMouseMove(0),
+	x(0),
+	y(0),
+	keyflags(0),
+	bValid(false),
+	dwMinimumMouseMoveInterval(150)
+{	
+	HKEY hRegKey;
+	DWORD dwPreferredMinimumMouseMoveInterval = 0;
+	if ( RegCreateKey(HKEY_CURRENT_USER, SETTINGS_KEY_NAME, &hRegKey)  != ERROR_SUCCESS ) {
+        hRegKey = NULL;
+	} else {
+		DWORD valsize = sizeof(dwPreferredMinimumMouseMoveInterval);
+		DWORD valtype = REG_DWORD;	
+		if ( RegQueryValueEx( hRegKey,  "MinMouseMove", NULL, &valtype, 
+			(LPBYTE) &dwPreferredMinimumMouseMoveInterval, &valsize) == ERROR_SUCCESS) {
+            dwMinimumMouseMoveInterval = dwPreferredMinimumMouseMoveInterval;
+		}
+		RegCloseKey(hRegKey);
+	}
+}
+
+// adzm 2010-09 - Notify streaming DSM plugin support
+void ClientConnection::NotifyPluginStreamingSupport()
+{	
+	rfbNotifyPluginStreamingMsg msg;
+    memset(&msg, 0, sizeof(rfbNotifyPluginStreamingMsg));
+	msg.type = rfbNotifyPluginStreaming;
+
+	//adzm 2010-09 - minimize packets. SendExact flushes the queue.
+	WriteExact((char *)&msg, sz_rfbNotifyPluginStreamingMsg, rfbNotifyPluginStreaming);
+	m_fPluginStreamingOut = true;
+}
+
+
 #pragma warning(default :4101)

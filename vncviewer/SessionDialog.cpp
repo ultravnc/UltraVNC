@@ -225,7 +225,7 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 					int numericId = _this->m_port;
 
 					int numberOfHosts = 1;
-					for (int i = 0; i < strlen(display); i++) {
+					for (int i = 0; i < (int)strlen(display); i++) {
 						if (display[i] == ';') {
 							numberOfHosts++;
 						}

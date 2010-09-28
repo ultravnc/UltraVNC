@@ -1437,7 +1437,8 @@ void FileTransfer::RequestRemoteDirectoryContent(HWND hWnd, LPSTR szPath)
 	ft.contentType = rfbDirContentRequest;
     ft.contentParam = rfbRDirContent; // Directory content please
 	ft.length = Swap32IfLE(strlen(ofDir));
-    m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
+	//adzm 2010-09
+    m_pCC->WriteExactQueue((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
 	m_pCC->WriteExact((char *)ofDir, strlen(ofDir));
 
 	return;
@@ -1479,7 +1480,7 @@ void FileTransfer::PopulateRemoteListBox(HWND hWnd, int nLen)
 	m_fDirectoryReceptionRunning = true;
 
 	// FT Backward compatibility DIRTY hack for DSMPlugin mode...
-	if (UsingOldProtocol() && m_pCC->m_fUsePlugin)
+	if (UsingOldProtocol() && m_pCC->m_fUsePlugin && !m_pCC->m_fPluginStreamingIn)
 	{
 		m_pCC->m_nTO = 0;
 		ProcessFileTransferMsg();
@@ -1511,7 +1512,7 @@ void FileTransfer::ReceiveDirectoryItem(HWND hWnd, int nLen)
 	if (!PseudoYield(GetParent(hWnd))) return;
 
 	// FT Backward compatibility DIRTY hack for DSMPlugin mode...
-	if (UsingOldProtocol() && m_pCC->m_fUsePlugin)
+	if (UsingOldProtocol() && m_pCC->m_fUsePlugin && !m_pCC->m_fPluginStreamingIn)
 	{
 		m_pCC->m_nTO = 0;
 		ProcessFileTransferMsg();
@@ -1925,7 +1926,8 @@ void FileTransfer::RequestRemoteFile(LPSTR szRemoteFileName)
     ft.contentParam = 0;
 	ft.length = Swap32IfLE(strlen(szRemoteFileName));
 	ft.size = (m_pCC->kbitsPerSecond > 2048) ? Swap32IfLE(0) : Swap32IfLE(1); // 1 means "Enable compression" 
-    m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
+	//adzm 2010-09
+    m_pCC->WriteExactQueue((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
     m_pCC->WriteExact((char *)szRemoteFileName, strlen(szRemoteFileName));
 
 	return;
@@ -2137,8 +2139,9 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, int nLen)
 					ftm.contentType = rfbFileChecksums;
 					ftm.size = Swap32IfLE(nCSBufferSize);
 					ftm.length = Swap32IfLE(nCSBufferLen);
-					m_pCC->WriteExact((char *)&ftm, sz_rfbFileTransferMsg, rfbFileTransfer);
-					m_pCC->WriteExact((char *)lpCSBuff, nCSBufferLen);
+					//adzm 2010-09
+					m_pCC->WriteExactQueue((char *)&ftm, sz_rfbFileTransferMsg, rfbFileTransfer);
+					m_pCC->WriteExactQueue((char *)lpCSBuff, nCSBufferLen);
 				}
 			}
 		}
@@ -2165,7 +2168,7 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, int nLen)
 	m_dwStartTick = GetTickCount();
 
 	// FT Backward compatibility DIRTY hack for DSMPlugin mode...
-	if (UsingOldProtocol() && m_pCC->m_fUsePlugin)
+	if (UsingOldProtocol() && m_pCC->m_fUsePlugin && !m_pCC->m_fPluginStreamingIn)
 	{
 		m_pCC->m_nTO = 0;
 		ProcessFileTransferMsg();
@@ -2294,7 +2297,7 @@ bool FileTransfer::ReceiveFileChunk(int nLen, int nSize)
 	}
 
 	// FT Backward compatibility DIRTY hack for DSMPlugin mode...
-	if (UsingOldProtocol() && m_pCC->m_fUsePlugin)
+	if (UsingOldProtocol() && m_pCC->m_fUsePlugin && !m_pCC->m_fPluginStreamingIn)
 	{
 		m_pCC->m_nTO = 0;
 		ProcessFileTransferMsg();
@@ -2573,13 +2576,18 @@ bool FileTransfer::OfferLocalFile(LPSTR szSrcFileName)
     ft.contentParam = 0;
     ft.size = Swap32IfLE(n2SrcSize.LowPart); // File Size in bytes
 	ft.length = Swap32IfLE(strlen(szDstFileName));
-    m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
-	m_pCC->WriteExact((char *)szDstFileName, strlen(szDstFileName));
+	//adzm 2010-09
+    m_pCC->WriteExactQueue((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
+	m_pCC->WriteExactQueue((char *)szDstFileName, strlen(szDstFileName));
 
 	if (!UsingOldProtocol())
 	{
 		CARD32 sizeH = Swap32IfLE(n2SrcSize.HighPart);
 		m_pCC->WriteExact((char *)&sizeH, sizeof(CARD32));
+	}
+	else
+	{
+		m_pCC->FlushWriteQueue();
 	}
 
     // show the stop button
@@ -2867,10 +2875,11 @@ bool FileTransfer::SendFileChunk()
 			ft.contentType = rfbFilePacket;
 			ft.size = fCompressed ? Swap32IfLE(1) : Swap32IfLE(0); 
 			ft.length = fCompressed ? Swap32IfLE(nMaxCompSize) : Swap32IfLE(m_dwNbBytesRead);
-			    if(UsingOldProtocol())
-				m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg);
+			//adzm 2010-09
+			if(UsingOldProtocol())
+				m_pCC->WriteExactQueue((char *)&ft, sz_rfbFileTransferMsg);
 			else
-				m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
+				m_pCC->WriteExactQueue((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
 
 			if (fCompressed)
 				m_pCC->WriteExact((char *)m_pCC->m_filezipbuf, nMaxCompSize);
@@ -3000,7 +3009,8 @@ void FileTransfer::CreateRemoteDirectory(LPSTR szDir)
     ft.contentParam = rfbCDirCreate;
 	ft.size = 0;
 	ft.length = Swap32IfLE(strlen(szDir));
-    m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
+	//adzm 2010-09
+    m_pCC->WriteExactQueue((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
 	m_pCC->WriteExact((char *)szDir, strlen(szDir));
 	return;
 }
@@ -3018,7 +3028,8 @@ void FileTransfer::DeleteRemoteFile(std::string szFile)
 	ft.size = 0;
     size_t len = szFile.length();
 	ft.length = Swap32IfLE(len);
-    m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
+	//adzm 2010-09
+    m_pCC->WriteExactQueue((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
 	m_pCC->WriteExact((char *)szFile.c_str(), szFile.length());
 	return;
 }
@@ -3037,7 +3048,8 @@ void FileTransfer::RenameRemoteFileOrDirectory(LPSTR szCurrentName, LPSTR szNewN
     ft.contentParam = rfbCFileRename; // or rfbCDirRename ...
 	ft.size = 0;
 	ft.length = Swap32IfLE(strlen(szMsgContent));
-    m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
+	//adzm 2010-09
+    m_pCC->WriteExactQueue((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
 	m_pCC->WriteExact((char *)szMsgContent, strlen(szMsgContent));
 	return;
 }

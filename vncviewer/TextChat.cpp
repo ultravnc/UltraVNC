@@ -320,7 +320,8 @@ void TextChat::SendLocalText(void)
     rfbTextChatMsg tcm;
     tcm.type = rfbTextChat;
 	tcm.length = Swap32IfLE(strlen(m_szLocalText));
-    m_pCC->WriteExact((char *)&tcm, sz_rfbTextChatMsg, rfbTextChat);
+	//adzm 2010-09
+    m_pCC->WriteExactQueue((char *)&tcm, sz_rfbTextChatMsg, rfbTextChat);
 	m_pCC->WriteExact((char *)m_szLocalText, strlen(m_szLocalText));
 
 	//and we clear the input box

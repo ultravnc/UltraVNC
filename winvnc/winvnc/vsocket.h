@@ -144,6 +144,8 @@ public:
   VBool SendExact(const char *buff, const VCard bufflen);
   VBool SendExact(const char *buff, const VCard bufflen, unsigned char msgType); // sf@2002 - DSMPlugin
   VBool SendExactQueue(const char *buff, const VCard bufflen);
+  //adzm 2010-09 - minimize packets. SendExact flushes the queue.
+  VBool SendExactQueue(const char *buff, const VCard bufflen, unsigned char msgType);
   VBool ReadExact(char *buff, const VCard bufflen);
   void ClearQueue();
 
@@ -154,6 +156,11 @@ public:
   bool IsUsePluginEnabled(void) { return m_fUsePlugin;};
   //adzm 2010-05-12 - dsmplugin config
   void SetDSMPluginConfig(char* szDSMPluginConfig);
+  // adzm 2010-09
+  void SetPluginStreamingIn() { m_fPluginStreamingIn = true; }
+  void SetPluginStreamingOut() { m_fPluginStreamingOut = true; }
+  bool IsPluginStreamingIn(void) { return m_fPluginStreamingIn; }
+  bool IsPluginStreamingOut(void) { return m_fPluginStreamingOut; }
 
   void SetWriteToNetRectBuffer(bool fEnable) {m_fWriteToNetRectBuf = fEnable;}; 
   bool GetWriteToNetRectBuffer(void) {return m_fWriteToNetRectBuf;};
@@ -186,6 +193,8 @@ protected:
   //adzm 2010-05-10
   IIntegratedPlugin* m_pIntegratedPluginInterface;
   bool m_fUsePlugin;
+  bool m_fPluginStreamingIn; //adzm 2010-09
+  bool m_fPluginStreamingOut; //adzm 2010-09
   omni_mutex m_TransMutex;
   omni_mutex m_RestMutex;
   omni_mutex m_CheckMutex;

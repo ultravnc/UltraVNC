@@ -69,6 +69,10 @@ extern const UINT FileTransferSendPacketMessage;
 #define min(a,b)            (((a) < (b)) ? (a) : (b))
 #endif
 
+//adzm 2010-09
+// ethernet packet 1500 - 40 tcp/ip header - 8 PPPoE info
+#define G_SENDBUFFER 1452
+
 #define SETTINGS_KEY_NAME "Software\\ORL\\VNCviewer\\Settings"
 #define SETTINGS_KEY_NAME2 "Software\\ORL\\VNCviewer\\Settingss"
 #define MAX_HOST_NAME_LEN 250
@@ -174,6 +178,9 @@ private:
 	HBITMAP hbmToolsmallX;
 
 	SOCKET m_sock;
+	//adzm 2010-09
+	char m_QueueBuffer[G_SENDBUFFER];
+	DWORD m_nQueueBufferLength;
 	//adzm 2010-08-01
 	DWORD m_LastSentTick;
 	bool m_serverInitiated;
@@ -238,11 +245,37 @@ private:
 	void SendAppropriateFramebufferUpdateRequest();
 	void SendFramebufferUpdateRequest(int x, int y, int w, int h, bool incremental);
 	
-	void ProcessPointerEvent(int x, int y, DWORD keyflags, UINT msg);
+	//adzm 2010-09 - Now returns false if not processed
+	bool ProcessPointerEvent(int x, int y, DWORD keyflags, UINT msg);
  	void SubProcessPointerEvent(int x, int y, DWORD keyflags);
 	void ProcessMouseWheel(int delta); // RealVNC 335 method
 	void SendPointerEvent(int x, int y, int buttonMask);
     void ProcessKeyEvent(int virtkey, DWORD keyData);
+	//adzm 2010-09 - Ensure the mouse is moved to the last known spot
+	bool FlushThrottledMouseMove();
+
+	//adzm 2010-09
+	struct PendingMouseMove {
+		PendingMouseMove();
+
+		DWORD dwMinimumMouseMoveInterval; // 150ms
+		DWORD dwLastSentMouseMove;
+
+		int x;
+		int y;
+		DWORD keyflags;
+
+		bool bValid;
+
+		inline bool ShouldThrottle(bool bMouseKeyDown)
+		{
+			return 
+				(GetTickCount() - dwLastSentMouseMove) 
+				< 
+				(bMouseKeyDown ? (dwMinimumMouseMoveInterval / 2) : dwMinimumMouseMoveInterval);
+		};
+	};
+	PendingMouseMove m_PendingMouseMove;
 	
 	void ReadScreenUpdate();
 	void Update(RECT *pRect);
@@ -346,27 +379,56 @@ private:
 	void ProcessLocalClipboardChange();
 	// adzm - 2010-07 - Extended clipboard
 	void UpdateRemoteClipboard(CARD32 overrideFlags = 0);
-	void UpdateRemoteClipboardCaps();
+	void UpdateRemoteClipboardCaps(bool bSavePreferences = false);
 	void RequestRemoteClipboard();
 	void UpdateLocalClipboard(char *buf, int len);
 	void SendClientCutText(char *str, int len);
 	void ReadServerCutText();
+	void SaveClipboardPreferences();
+	bool LoadClipboardPreferences();
+	
+	// adzm 2010-09 - Notify streaming DSM plugin support
+	void NotifyPluginStreamingSupport();
 
 	// adzm - 2010-07 - Extended clipboard
 	Clipboard m_clipboard;
 
 	void ReadBell();
 	
-	void SendRFBMsg(CARD8 msgType, void* data, int length);
 	void ReadExact(char *buf, int bytes);
 	void ReadExactProxy(char *buf, int bytes);
 	void ReadString(char *buf, int length);
+
 	int Send(const char *buff, const unsigned int bufflen,int timeout);
-	void WriteExact_timeout(char *buf, int bytes,int timeout);
-	void WriteExact(char *buf, int bytes);
-	void WriteExactProxy(char *buf, int bytes);
+	//adzm 2010-09
+	void Write_timeout(char *buf, int bytes,int timeout, bool bQueue);
+	
+	void WriteTransformed_timeout(char *buf, int bytes, int timeout, bool bQueue); //adzm 2010-09
+	void WriteTransformed_timeout(char *buf, int bytes, CARD8 msgType, int timeout, bool bQueue); //sf@2002 - DSM Plugin
+
+	void WriteExact_timeout(char *buf, int bytes, int timeout);
+	void WriteExact_timeout(char *buf, int bytes, CARD8 msgType, int timeout); //sf@2002 - DSM Plugin
+
+	//adzm 2010-09
+	void Write(char *buf, int bytes, bool bQueue, bool bTimeout = false, int timeout = 0); // no DSM transform etc
+
+	void WriteTransformed(char *buf, int bytes, bool bQueue); //adzm 2010-09
+	void WriteTransformed(char *buf, int bytes, CARD8 msgType, bool bQueue); //sf@2002 - DSM Plugin
+
+	//adzm 2010-09
+	void WriteExact(char *buf, int bytes); //adzm 2010-09
+	void WriteExactProxy(char *buf, int bytes); // same as Write
 	void WriteExact(char *buf, int bytes, CARD8 msgType); //sf@2002 - DSM Plugin
-	void WriteExact_timeout(char *buf, int bytes, CARD8 msgType,int timeout); //sf@2002 - DSM Plugin
+
+	//adzm 2010-09
+	void WriteQueue(char *buf, int bytes); // no DSM transform etc
+	void WriteExactQueue(char *buf, int bytes);
+	void WriteExactQueue(char *buf, int bytes, CARD8 msgType); //sf@2002 - DSM Plugin
+	void WriteExactQueue_timeout(char *buf, int bytes,int timeout);
+	void WriteExactQueue_timeout(char *buf, int bytes, CARD8 msgType,int timeout); //sf@2002 - DSM Plugin
+
+	void FlushOutstandingWriteQueue(char*& buf2, int& bytes2, bool bTimeout = false, int timeout = 0);
+	void FlushWriteQueue(bool bTimeout = false, int timeout = 0);
 	
 	void ReadExactProtocolVersion(char *buf, int bytes, bool& fNotEncrypted); //adzm 2009-06-21
 
@@ -503,6 +565,8 @@ private:
 	int m_nTO;
 	CDSMPlugin *m_pDSMPlugin;
 	bool m_fUsePlugin;
+	bool m_fPluginStreamingIn; // adzm 2010-09
+	bool m_fPluginStreamingOut; // adzm 2010-09
 
 	//adzm - 2009-06-21
 	IPlugin* m_pPluginInterface;
@@ -599,6 +663,8 @@ private:
 	DWORD m_emulateKeyFlags;
 	int m_emulateButtonPressedX;
 	int m_emulateButtonPressedY;
+	// adzm 2010-09
+	UINT m_flushMouseMoveTimer;
 
 //	BmpFlasher *flash;
 

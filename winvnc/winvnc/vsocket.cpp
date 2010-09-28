@@ -149,6 +149,10 @@ VSocket::VSocket()
 	
 	//adzm 2010-08-01
 	m_LastSentTick = 0;
+
+	//adzm 2010-09
+	m_fPluginStreamingIn = false;
+	m_fPluginStreamingOut = false;
 }
 
 ////////////////////////////
@@ -591,7 +595,8 @@ VSocket::Send(const char *buff, const VCard bufflen)
 	buff2=(char*)buff;
 	unsigned int bufflen2=bufflen;
 
-	if (newsize >G_SENDBUFFER)
+	// adzm 2010-09 - flush as soon as we have a full buffer, not if we have exceeded it.
+	if (newsize >= G_SENDBUFFER)
 	{
 		    memcpy(queuebuffer+queuebuffersize,buff2,G_SENDBUFFER-queuebuffersize);
 			send(sock,queuebuffer,G_SENDBUFFER,0);
@@ -599,7 +604,8 @@ VSocket::Send(const char *buff, const VCard bufflen)
 			buff2+=(G_SENDBUFFER-queuebuffersize);
 			bufflen2-=(G_SENDBUFFER-queuebuffersize);
 			queuebuffersize=0;
-			while (bufflen2 > G_SENDBUFFER)
+			// adzm 2010-09 - flush as soon as we have a full buffer, not if we have exceeded it.
+			while (bufflen2 >= G_SENDBUFFER)
 			{
 				if (!send(sock,buff2,G_SENDBUFFER,0)) return false;
 //				vnclog.Print(LL_SOCKERR, VNCLOG("SEND 1 %i\n") ,G_SENDBUFFER);
@@ -609,8 +615,10 @@ VSocket::Send(const char *buff, const VCard bufflen)
 	}
 	memcpy(queuebuffer+queuebuffersize,buff2,bufflen2);
 	queuebuffersize+=bufflen2;
-	if (!send(sock,queuebuffer,queuebuffersize,0)) 
-        return false;
+	if (queuebuffersize > 0) {
+		if (!send(sock,queuebuffer,queuebuffersize,0)) 
+			return false;
+	}
 //	vnclog.Print(LL_SOCKERR, VNCLOG("SEND 2 %i\n") ,queuebuffersize);
 	queuebuffersize=0;
 	return bufflen;
@@ -623,8 +631,9 @@ VSocket::SendQueued(const char *buff, const VCard bufflen)
 	char *buff2;
 	buff2=(char*)buff;
 	unsigned int bufflen2=bufflen;
-
-	if (newsize >G_SENDBUFFER)
+	
+	// adzm 2010-09 - flush as soon as we have a full buffer, not if we have exceeded it.
+	if (newsize >= G_SENDBUFFER)
 	{	
 			//adzm 2010-08-01
 			m_LastSentTick = GetTickCount();
@@ -634,8 +643,10 @@ VSocket::SendQueued(const char *buff, const VCard bufflen)
 		//	vnclog.Print(LL_SOCKERR, VNCLOG("SEND Q  %i\n") ,G_SENDBUFFER);
 			buff2+=(G_SENDBUFFER-queuebuffersize);
 			bufflen2-=(G_SENDBUFFER-queuebuffersize);
-			queuebuffersize=0;
-			while (bufflen2 > G_SENDBUFFER)
+			queuebuffersize=0;			
+
+			// adzm 2010-09 - flush as soon as we have a full buffer, not if we have exceeded it.
+			while (bufflen2 >= G_SENDBUFFER)
 			{
 				if (!send(sock,buff2,G_SENDBUFFER,0)) return false;				
 				//adzm 2010-08-01
@@ -656,7 +667,8 @@ VBool
 VSocket::SendExact(const char *buff, const VCard bufflen, unsigned char msgType)
 {
 	//vnclog.Print(LL_SOCKERR, VNCLOG("SendExactMsg %i\n") ,bufflen);
-	if (m_fUsePlugin && m_pDSMPlugin->IsEnabled())
+	// adzm 2010-09
+	if (!IsPluginStreamingOut() && m_fUsePlugin && m_pDSMPlugin->IsEnabled())
 	{
 		// Send the transformed message type first
 		char t = (char)msgType;
@@ -670,10 +682,35 @@ VSocket::SendExact(const char *buff, const VCard bufflen, unsigned char msgType)
 	return VTrue;
 }
 
+
+//adzm 2010-09 - minimize packets. SendExact flushes the queue.
+VBool 
+VSocket::SendExactQueue(const char *buff, const VCard bufflen, unsigned char msgType)
+{
+	//vnclog.Print(LL_SOCKERR, VNCLOG("SendExactMsg %i\n") ,bufflen);
+	// adzm 2010-09
+	if (!IsPluginStreamingOut() && m_fUsePlugin && m_pDSMPlugin->IsEnabled())
+	{
+		// Send the transformed message type first
+		char t = (char)msgType;
+		SendExactQueue(&t, 1);
+		// Then we send the transformed rfb message content
+		SendExactQueue(buff, bufflen);
+	}
+	else
+		SendExactQueue(buff, bufflen);
+
+	return VTrue;
+}
+
 //////////////////////////////////////////
 VBool
 VSocket::SendExact(const char *buff, const VCard bufflen)
-{
+{	
+	//adzm 2010-09
+	if (bufflen <=0) {
+		return VTrue;
+	}
 //	vnclog.Print(LL_SOCKERR, VNCLOG("SendExact %i\n") ,bufflen);
 	// sf@2002 - DSMPlugin
 	VCard nBufflen = bufflen;
@@ -712,6 +749,10 @@ VSocket::SendExact(const char *buff, const VCard bufflen)
 VBool
 VSocket::SendExactQueue(const char *buff, const VCard bufflen)
 {
+	//adzm 2010-09
+	if (bufflen <=0) {
+		return VTrue;
+	}
 //	vnclog.Print(LL_SOCKERR, VNCLOG("SendExactQueue %i %i\n") ,bufflen,queuebuffersize);
 //	vnclog.Print(LL_SOCKERR, VNCLOG("socket size %i\n") ,bufflen);
 	// sf@2002 - DSMPlugin
@@ -783,7 +824,11 @@ VSocket::Read(char *buff, const VCard bufflen)
 
 VBool
 VSocket::ReadExact(char *buff, const VCard bufflen)
-{
+{	
+	//adzm 2010-09
+	if (bufflen <=0) {
+		return VTrue;
+	}
 	int n;
 	VCard currlen = bufflen;
     

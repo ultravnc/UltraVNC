@@ -55,7 +55,9 @@ extern HINSTANCE	hInstResDLL;
 typedef void (*vncEditSecurityFn) (HWND hwnd, HINSTANCE hInstance);
 vncEditSecurityFn vncEditSecurity = 0;
 DWORD GetExplorerLogonPid();
-unsigned int G_SENDBUFFER=8192;
+// ethernet packet 1500 - 40 tcp/ip header - 8 PPPoE info
+//unsigned int G_SENDBUFFER=8192;
+unsigned int G_SENDBUFFER=1452;
 
 // Constructor & Destructor
 vncProperties::vncProperties()

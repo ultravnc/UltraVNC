@@ -1372,10 +1372,31 @@ void
 vncServer::UpdateLocalClipTextEx(ExtendedClipboardDataMessage& extendedClipboardDataMessage, vncClient* sourceClient)
 {
 //	vnclog.Print(LL_INTINFO, VNCLOG("Lock5\n"));
-	omni_mutex_lock l(m_desktopLock);
+	{
+		omni_mutex_lock l(m_desktopLock);
 
-	if (m_desktop != NULL)
-		m_desktop->SetClipTextEx(extendedClipboardDataMessage, sourceClient);
+		if (m_desktop != NULL)
+			m_desktop->SetClipTextEx(extendedClipboardDataMessage);
+	}
+
+	// At this point we could notify other viewers and update their clipboards too, but in practice this is very confusing.
+	// Perhaps what should be done is to notify the viewers that the clipboard has changed?
+	// Worry about it later.
+	/*
+	{ 
+		omni_mutex_lock l(m_clientsLock);
+
+		// Post this update to all the connected clients
+		for (i = m_authClients.begin(); i != m_authClients.end(); i++)
+		{
+			// Post the update
+			vncClient* client = GetClient(*i);
+			if (client != excludeClient) {
+				client->UpdateClipTextEx(clipboardData, (CARD32)clipPeek);
+			}
+		}
+	}
+	*/
 }
 
 // Name and port number handling
@@ -1519,7 +1540,7 @@ vncServer::EnableJapInput(BOOL enable)
 void
 vncServer::Clearconsole(BOOL enable)
 {
-	clearconsole=enable;
+	clearconsole=(enable != FALSE);
 }
 
 

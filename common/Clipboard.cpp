@@ -188,21 +188,25 @@ CARD32 ExtendedClipboardDataMessage::GetFlags()
 const UINT ClipboardSettings::formatUnicodeText =	CF_UNICODETEXT;
 const UINT ClipboardSettings::formatRTF =			RegisterClipboardFormat("Rich Text Format");
 const UINT ClipboardSettings::formatHTML =			RegisterClipboardFormat("HTML Format");
+const UINT ClipboardSettings::formatDIB =			CF_DIBV5;
 
-const int ClipboardSettings::defaultLimitText =		((int)0x02000000); // 20 megabytes uncompressed. Pretty huge, but not a problem for a LAN. Better than the previous no limit, though.
-const int ClipboardSettings::defaultLimitRTF =		((int)0x00000000); // Initially zero for the others. That's why we have file transfers!
-const int ClipboardSettings::defaultLimitHTML =		((int)0x00000000);
+const int ClipboardSettings::defaultLimitText =		((int)0x00A00000); // 10 megabytes uncompressed. Pretty huge, but not a problem for a LAN. Better than the previous no limit, though.
+const int ClipboardSettings::defaultLimitRTF =		((int)0x00200000); // Limit these to 2 megabytes so they don't end up adding too much strain by being enabled by default
+const int ClipboardSettings::defaultLimitHTML =		((int)0x00200000); // besides, every 2mb rtf/html data I have seen will DEFLATE very well.
+const int ClipboardSettings::defaultLimitDIB =		((int)0x00000000); // no DIB by default
 
-const int ClipboardSettings::defaultLimit =			((int)0x02000000);
+const int ClipboardSettings::defaultLimit =			((int)0x00200000);
 
 ClipboardSettings::ClipboardSettings(CARD32 caps)
 	: m_bSupportsEx(false)
 	, m_nLimitText(defaultLimitText)
 	, m_nLimitRTF(defaultLimitRTF)
 	, m_nLimitHTML(defaultLimitHTML)
+	, m_nLimitDIB(defaultLimitDIB)
 	, m_nRequestedLimitText(m_nLimitText)
 	, m_nRequestedLimitRTF(m_nLimitRTF)
 	, m_nRequestedLimitHTML(m_nLimitHTML)
+	, m_nRequestedLimitDIB(m_nLimitDIB)
 	, m_remoteCaps(ClipboardSettings::defaultCaps)
 	, m_myCaps(caps)
 {
@@ -211,7 +215,7 @@ ClipboardSettings::ClipboardSettings(CARD32 caps)
 CARD32 ClipboardSettings::defaultCaps = 
 	(clipCaps | clipRequest | clipProvide)  // capabilities
 	| 
-	(clipText | clipRTF | clipHTML); // supports Unicode text, RTF, and HTML
+	(clipText | clipRTF | clipHTML | clipDIB); // supports Unicode text, RTF, and HTML, and DIB
 CARD32 ClipboardSettings::defaultViewerCaps = defaultCaps | clipNotify;
 CARD32 ClipboardSettings::defaultServerCaps = defaultCaps | clipPeek;
 
@@ -225,6 +229,7 @@ void ClipboardSettings::PrepareCapsPacket(ExtendedClipboardDataMessage& extended
 	extendedDataMessage.AppendInt(m_nLimitText);
 	extendedDataMessage.AppendInt(m_nLimitRTF);
 	extendedDataMessage.AppendInt(m_nLimitHTML);
+	extendedDataMessage.AppendInt(m_nLimitDIB);
 }
 
 void ClipboardSettings::HandleCapsPacket(ExtendedClipboardDataMessage& extendedDataMessage, bool bSetLimits)
@@ -234,28 +239,35 @@ void ClipboardSettings::HandleCapsPacket(ExtendedClipboardDataMessage& extendedD
 	m_remoteCaps = extendedDataMessage.GetFlags();	
 
 	if (m_remoteCaps & clipText) {
-		if (bSetLimits) {
-			m_nRequestedLimitText = m_nLimitText = (int)extendedDataMessage.ReadInt();			
-		}
+		m_nRequestedLimitText = (int)extendedDataMessage.ReadInt();		
 		nCount--;
 	} else {
-		m_nRequestedLimitText = m_nLimitText = 0;
+		m_nRequestedLimitText = 0;
 	}
 	if (m_remoteCaps & clipRTF) {
-		if (bSetLimits) {
-			m_nRequestedLimitRTF = m_nLimitRTF = (int)extendedDataMessage.ReadInt();
-		}
+		m_nRequestedLimitRTF = (int)extendedDataMessage.ReadInt();
 		nCount--;
 	} else {
-		m_nRequestedLimitRTF = m_nLimitRTF = 0;
+		m_nRequestedLimitRTF = 0;
 	}
 	if (m_remoteCaps & clipHTML) {
-		if (bSetLimits) {
-			m_nRequestedLimitHTML = m_nLimitHTML = (int)extendedDataMessage.ReadInt();
-		}
+		m_nRequestedLimitHTML = (int)extendedDataMessage.ReadInt();
 		nCount--;
 	} else {
-		m_nRequestedLimitHTML = m_nLimitHTML = 0;
+		m_nRequestedLimitHTML = 0;
+	}
+	if (m_remoteCaps & clipDIB) {
+		m_nRequestedLimitDIB = (int)extendedDataMessage.ReadInt();
+		nCount--;
+	} else {
+		m_nRequestedLimitDIB = 0;
+	}
+
+	if (bSetLimits) {
+		m_nLimitText = m_nRequestedLimitText;
+		m_nLimitRTF = m_nRequestedLimitRTF;
+		m_nLimitHTML = m_nRequestedLimitHTML;
+		m_nLimitDIB = m_nRequestedLimitDIB;
 	}
 
 	// read any unsupported values
@@ -281,9 +293,11 @@ ClipboardData::ClipboardData()
 	: m_lengthText(0)
 	, m_lengthRTF(0)
 	, m_lengthHTML(0)
+	, m_lengthDIB(0)
 	, m_pDataText(NULL)
 	, m_pDataRTF(NULL)
 	, m_pDataHTML(NULL)
+	, m_pDataDIB(NULL)
 	, m_crc(0)
 {
 }
@@ -298,10 +312,12 @@ void ClipboardData::FreeData()
 	delete[] m_pDataText;
 	delete[] m_pDataRTF;
 	delete[] m_pDataHTML;
+	delete[] m_pDataDIB;
 
 	m_pDataText = NULL;
 	m_pDataRTF = NULL;
 	m_pDataHTML = NULL;
+	m_pDataDIB = NULL;
 }
 
 bool ClipboardData::Load(HWND hwndOwner) // will return false on failure
@@ -409,7 +425,32 @@ bool ClipboardData::Load(HWND hwndOwner) // will return false on failure
 		}
 	}
 
-	return m_lengthText + m_lengthRTF + m_lengthHTML > 0;
+	// DIB
+	{
+		m_lengthDIB = 0;
+
+		HANDLE hDIB = NULL;
+		if (IsClipboardFormatAvailable(ClipboardSettings::formatDIB)) {
+			hDIB = ::GetClipboardData(ClipboardSettings::formatDIB);
+		}
+
+		if (hDIB) {
+			BYTE* pData = (BYTE*)GlobalLock(hDIB);
+			int nLength = (int)GlobalSize(hDIB);
+
+			if (pData != NULL && nLength > 0) {
+				
+				m_pDataDIB = new BYTE[nLength];
+				memcpy(m_pDataDIB, pData, nLength);
+
+				m_lengthDIB = nLength;
+
+				GlobalUnlock(hDIB);
+			}
+		}
+	}
+
+	return m_lengthText + m_lengthRTF + m_lengthHTML + m_lengthDIB > 0;
 }
 
 bool ClipboardData::Restore(HWND hwndOwner, ExtendedClipboardDataMessage& extendedClipboardDataMessage)
@@ -424,7 +465,7 @@ bool ClipboardData::Restore(HWND hwndOwner, ExtendedClipboardDataMessage& extend
 		return false;
 	}
 
-	m_lengthText = m_lengthRTF = m_lengthHTML = 0;
+	m_lengthText = m_lengthRTF = m_lengthHTML = m_lengthDIB = 0;
 
 	int nCompressedDataLength = extendedClipboardDataMessage.GetBufferLength() - extendedClipboardDataMessage.GetDataLength();
 
@@ -547,6 +588,35 @@ bool ClipboardData::Restore(HWND hwndOwner, ExtendedClipboardDataMessage& extend
 		}
 	}
 
+	if (extendedClipboardDataMessage.HasFlag(clipDIB)) {
+		length = (int)compressedStream.readU32();
+
+		if (length > 0) {
+			HGLOBAL hData = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, length);
+
+			if (!hData) return false;
+
+			BYTE* pData = (BYTE*)GlobalLock(hData);
+
+			if (pData) {
+				compressedStream.readBytes(pData, length);
+
+				GlobalUnlock(hData);
+
+				if (!::SetClipboardData(ClipboardSettings::formatDIB, hData)) {
+					hData = NULL;
+					m_lengthDIB = length;
+				} else {
+					bFailed = true;
+				}
+			}
+
+			if (hData) {
+				GlobalFree(hData);
+			}
+		}
+	}
+
 	// we can ignore everything else
 
 	return true;
@@ -581,6 +651,10 @@ bool Clipboard::UpdateClipTextEx(ClipboardData& clipboardData, CARD32 overrideFl
 		}
 		if (clipboardData.m_lengthHTML != 0) {
 			extendedClipboardDataNotifyMessage.AddFlag(clipHTML);
+			m_bNeedToNotify = true;
+		}
+		if (clipboardData.m_lengthDIB != 0) {
+			extendedClipboardDataNotifyMessage.AddFlag(clipDIB);
 			m_bNeedToNotify = true;
 		}
 	} else {
@@ -628,6 +702,18 @@ bool Clipboard::UpdateClipTextEx(ClipboardData& clipboardData, CARD32 overrideFl
 					compressedStream.writeU32(clipboardData.m_lengthHTML);
 					compressedStream.writeBytes(clipboardData.m_pDataHTML, clipboardData.m_lengthHTML);
 					extendedClipboardDataMessage.AddFlag(clipHTML);
+					m_bNeedToProvide = true;
+				} else {
+					m_bNeedToNotify = true;
+				}
+			}
+			if (clipboardData.m_lengthDIB != 0) {
+				extendedClipboardDataNotifyMessage.AddFlag(clipDIB);
+
+				if (clipboardData.m_lengthDIB <= settings.m_nLimitDIB || (overrideFlags & clipDIB)) {
+					compressedStream.writeU32(clipboardData.m_lengthDIB);
+					compressedStream.writeBytes(clipboardData.m_pDataDIB, clipboardData.m_lengthDIB);
+					extendedClipboardDataMessage.AddFlag(clipDIB);
 					m_bNeedToProvide = true;
 				} else {
 					m_bNeedToNotify = true;

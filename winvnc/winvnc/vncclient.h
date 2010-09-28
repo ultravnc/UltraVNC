@@ -258,12 +258,16 @@ public:
     void SendFTProtocolMsg();
 	// adzm - 2010-07 - Extended clipboard
 	void NotifyExtendedClipboardSupport();
+	// adzm 2010-09 - Notify streaming DSM plugin support
+	void NotifyPluginStreamingSupport();
 
 	// sf@2002 
 	// Update routines
 protected:
 	BOOL SendUpdate(rfb::SimpleUpdateTracker &update);
 	BOOL SendRFBMsg(CARD8 type, BYTE *buffer, int buflen);
+	//adzm 2010-09 - minimize packets. SendExact flushes the queue.
+	BOOL SendRFBMsgQueue(CARD8 type, BYTE *buffer, int buflen);
 	BOOL SendRectangles(const rfb::RectVector &rects);
 	BOOL SendRectangle(const rfb::Rect &rect);
 	BOOL SendCopyRect(const rfb::Rect &dest, const rfb::Point &source);

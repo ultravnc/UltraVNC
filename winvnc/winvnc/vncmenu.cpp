@@ -901,6 +901,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			if (_this->m_server->RemoveFontSmoothingEnabled()) {
 				RestoreFontSmoothing();
 			}
+		}
 //PGM @ Advantig		if (_this->m_server->AuthClientCount() != 0) {
 //PGM @ Advantig			if (_this->m_server->RemoveAeroEnabled())
 //PGM @ Advantig				DisableAero();
@@ -1317,7 +1318,6 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			RestoreEffects();
 		if (_this->m_server->RemoveFontSmoothingEnabled())
 			RestoreFontSmoothing();
-		}
 		if (_this->m_server->RemoveAeroEnabled())
 			ResetAero();
 

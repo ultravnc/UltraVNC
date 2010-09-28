@@ -72,6 +72,8 @@
 #define ID_CLIPBOARD_HTML               204
 #define ID_CLIPBOARD_SEND               205
 #define ID_CLIPBOARD_RECV               206
+#define IDT_FLUSHMOUSEMOVETIMER         207
+#define ID_CLIPBOARD_DIB                208
 #define IDD_USER_NAME                   604
 #define ID_VK_LWINDOWN                  605
 #define ID_VK_RWINDOWN                  606
@@ -521,7 +523,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        201
+#define _APS_NEXT_RESOURCE_VALUE        209
 #define _APS_NEXT_COMMAND_VALUE         50025
 #define _APS_NEXT_CONTROL_VALUE         1164
 #define _APS_NEXT_SYMED_VALUE           154

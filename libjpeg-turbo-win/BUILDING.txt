@@ -1,0 +1,328 @@
+*******************************************************************************
+**     Building on Unix Platforms, Cygwin, and MinGW
+*******************************************************************************
+
+==================
+Build Requirements
+==================
+
+-- autoconf 2.56 or later
+-- automake 1.7 or later
+-- libtool 1.4 or later
+   * If using MinGW, these can be obtained by installing the MSYS DTK
+
+-- NASM
+   * 0.98 or later is required for a 32-bit build
+   * NASM 2.05 or later is required for a 64-bit build
+   * NASM 2.07 or later is required for a 64-bit build on OS/X.  This can be
+     obtained from MacPorts (http://www.macports.org/).
+
+   The NASM 2.05 RPMs do not work on older Linux systems, such as Enterprise
+   Linux 4.  On such systems, you can easily build and install NASM 2.05
+   from the source RPM by executing the following as root:
+
+     ARCH=`uname -m`
+     wget http://www.nasm.us/pub/nasm/releasebuilds/2.05.01/nasm-2.05.01-1.src.rpm
+     rpmbuild --rebuild nasm-2.05.01-1.src.rpm
+     rpm -Uvh /usr/src/redhat/RPMS/$ARCH/nasm-2.05.01-1.$ARCH.rpm
+
+   NOTE: NASM build will fail if texinfo is not installed.
+
+-- GCC v4.1 or later recommended for best performance
+
+======================
+Building libjpeg-turbo
+======================
+
+The following procedure will build libjpeg-turbo on Linux, FreeBSD, 32-bit
+OS X, and Solaris/x86 systems (on Solaris, this generates a 32-bit library.
+See below for 64-bit build instructions.)
+
+  cd libjpeg-turbo
+  autoreconf -fiv
+  sh ./configure
+  make
+
+NOTE: Running autoreconf is only necessary if building libjpeg-turbo from the
+SVN repository.
+
+This will generate the following files under .libs/
+
+  libjpeg.a
+      Static link library for libjpeg-turbo
+
+  libjpeg.so.62.0.0 (Linux, Solaris)
+  libjpeg.62.dylib (OS X)
+  libjpeg-62.dll (MinGW)
+  cygjpeg-62.dll (Cygwin)
+      Shared library for libjpeg-turbo
+
+  libjpeg.so (Linux, Solaris)
+  libjpeg.dylib (OS X)
+  libjpeg.dll.a (Cygwin, MinGW)
+      Development stub for libjpeg-turbo shared library
+
+  libturbojpeg.a
+      Static link library for TurboJPEG/OSS
+
+  libturbojpeg.so (Linux, Solaris)
+  libturbojpeg.dylib (OS X)
+      Shared library and development stub for TurboJPEG/OSS
+
+  libturbojpeg.dll (MinGW)
+  cygturbojpeg.dll (Cygwin)
+      Shared library for TurboJPEG/OSS
+
+  libturbojpeg.dll.a (Cygwin, MinGW)
+      Development stub for TurboJPEG/OSS shared library
+
+========================
+Installing libjpeg-turbo
+========================
+
+If you intend to install these libraries and the associated header files, then
+replace 'make' in the instructions above with
+
+  make install prefix={base dir} libdir={library directory}
+
+For example,
+
+  make install prefix=/usr/local libdir=/usr/local/lib64
+
+will install the header files in /usr/local/include and the library files in
+/usr/local/lib64.  If 'prefix' and 'libdir' are not specified, then the default
+is to install the header files in /opt/libjpeg-turbo/include and the library
+files in /opt/libjpeg-turbo/lib.
+
+NOTE: You can specify a prefix of /usr and a libdir of, for instance,
+/usr/lib64 to overwrite the system's version of libjpeg.  If you do this,
+however, then be sure to BACK UP YOUR SYSTEM'S INSTALLATION OF LIBJPEG before
+overwriting it.  It is recommended that you instead install libjpeg-turbo into
+a non-system directory and manipulate the LD_LIBRARY_PATH or create sym links
+to force applications to use libjpeg-turbo instead of libjpeg.  See
+README-turbo.txt for more information.
+
+=============
+Build Recipes
+=============
+
+32-bit Library Build on 64-bit Linux
+------------------------------------
+
+Add
+
+  --host i686-pc-linux-gnu CFLAGS='-O3 -m32' CXXFLAGS='-O3 -m32' LDFLAGS=-m32
+
+to the configure command line.
+
+
+64-bit Library Build on 64-bit OS/X
+-----------------------------------
+
+Add
+
+  --host x86_64-apple-darwin NASM=/opt/local/bin/nasm
+
+to the configure command line.  NASM 2.07 or later from MacPorts must be
+installed.
+
+
+32-bit Library Build on 64-bit OS/X
+-----------------------------------
+
+Add
+
+  CFLAGS='-O3 -m32' CXXFLAGS='-O3 -m32' LDFLAGS=-m32
+
+to the configure command line.
+
+
+64-bit Backward-Compatible Library Build on 64-bit OS/X
+-------------------------------------------------------
+
+Add
+
+  --host x86_64-apple-darwin NASM=/opt/local/bin/nasm \
+  CFLAGS='-isysroot /Developer/SDKs/MacOSX10.4u.sdk \
+    -mmacosx-version-min=10.4 -O3' \
+    CXXFLAGS='-isysroot /Developer/SDKs/MacOSX10.4u.sdk \
+    -mmacosx-version-min=10.4 -O3' \
+    LDFLAGS='-isysroot /Developer/SDKs/MacOSX10.4u.sdk \
+    -mmacosx-version-min=10.4'
+
+to the configure command line.  The OS X 10.4 SDK, and NASM 2.07 or later from
+MacPorts, must be installed.
+
+
+32-bit Backward-Compatible Library Build on OS/X
+------------------------------------------------
+
+Add
+
+  CFLAGS='-isysroot /Developer/SDKs/MacOSX10.4u.sdk \
+    -mmacosx-version-min=10.4 -O3 -m32' \
+    CXXFLAGS='-isysroot /Developer/SDKs/MacOSX10.4u.sdk \
+    -mmacosx-version-min=10.4 -O3 -m32' \
+    LDFLAGS='-isysroot /Developer/SDKs/MacOSX10.4u.sdk \
+    -mmacosx-version-min=10.4 -m32'
+
+to the configure command line.  The OS X 10.4 SDK must be installed.
+
+
+64-bit Library Build on 64-bit Solaris
+--------------------------------------
+
+Add
+
+  --host x86_64-pc-solaris CFLAGS='-O3 -m64' CXXFLAGS='-O3 -m64' LDFLAGS=-m64
+
+to the configure command line.
+
+
+32-bit Library Build on 64-bit FreeBSD
+--------------------------------------
+
+Add
+
+  --host i386-unknown-freebsd CC='gcc -B /usr/lib32' CXX='g++ -B/usr/lib32' \
+    CFLAGS='-O3 -m32' CXXFLAGS='-O3 -m32' LDFLAGS='-B/usr/lib32'
+
+to the configure command line.  NASM 2.07 or later from FreeBSD ports must be
+installed.
+
+
+MinGW Build on Cygwin
+---------------------
+
+Add
+
+  --host mingw32
+
+to the configure command line.  This will produce libraries which do not
+depend on cygwin1.dll or other Cygwin DLL's.
+
+
+Sun Studio
+----------
+
+Add
+
+  CC=cc CXX=CC
+
+to the configure command line.  libjpeg-turbo will automatically be built with
+the maximum optimization level (-xO5) unless you override CFLAGS and CXXFLAGS.
+
+To build a 64-bit version of libjpeg-turbo using Sun Studio, add
+
+  --host x86_64-pc-solaris CC=cc CXX=CC CFLAGS='-xO5 -m64' \
+    CXXFLAGS='-xO5 -m64' LDFLAGS=-m64
+
+to the configure command line.
+
+
+*******************************************************************************
+**     Building on Windows (Visual C++)
+*******************************************************************************
+
+==================
+Build Requirements
+==================
+
+-- GNU Make v3.7 or later
+   * Can be found in MSYS (http://www.mingw.org/download.shtml) or
+     Cygwin (http://www.cygwin.com/)
+
+-- Windows SDK for Windows Server 2008 and .NET Framework 3.5 (or a later
+   version)
+
+   http://msdn.microsoft.com/en-us/windows/dd146047.aspx
+
+   * The Windows SDK includes both 32-bit and 64-bit Visual C++ compilers and
+     everything necessary to build libjpeg-turbo.  If you do not already have
+     Visual C++ installed, then this is the recommended solution.  Also tested
+     with Microsoft Visual C++ 2008 Express Edition (both are free downloads.)
+   * Add the compiler and SDK binary directories (for instance,
+     c:\Program Files\Microsoft Visual Studio 9.0\VC\BIN;
+     c:\Program Files\Microsoft Visual Studio 9.0\Common7\IDE;
+     c:\Program Files\Microsoft SDKs\Windows\v6.1\bin)
+     to the system or user PATH environment variable prior to building
+     libjpeg-turbo.
+   * Add the compiler and SDK include directories (for instance,
+     c:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE;
+     c:\Program Files\Microsoft SDKs\Windows\v6.1\include)
+     to the system or user INCLUDE environment variable prior to building
+     libjpeg-turbo.
+   * Add the compiler library directory (for instance,
+     c:\Program Files\Microsoft Visual Studio 9.0\VC\LIB;
+     c:\Program Files\Microsoft SDKs\Windows\v6.1\lib)
+     to the system or user LIB environment variable prior to building
+     libjpeg-turbo.
+
+-- NASM (http://www.nasm.us/) 0.98 or later (NASM 2.05 or later is required for
+   a 64-bit build)
+
+======================
+Building libjpeg-turbo
+======================
+
+  cd libjpeg-turbo
+  make -f win/Makefile
+
+This will generate the following files under libjpeg-turbo\windows\:
+
+  jpeg-static.lib        Static link library for libjpeg-turbo
+  jpeg62.dll             Shared library for libjpeg-turbo
+  jpeg.lib               Development stub for libjpeg-turbo shared library
+  turbojpeg-static.lib   Static link library for TurboJPEG/OSS
+  turbojpeg.dll          Shared library for TurboJPEG/OSS
+  turbojpeg.lib          Development stub for TurboJPEG/OSS shared library
+
+If a 64-bit Windows platform is detected, then the build system will attempt
+to build a 64-bit version of libjpeg-turbo.  You can override this by running
+
+  make -f win/Makefile WIN64=no
+
+
+*******************************************************************************
+**     Creating Release Packages
+*******************************************************************************
+
+The following commands can be used to create various types of release packages:
+
+make rpm
+
+  Create RedHat-style binary RPM package.  Requires RPM v4 or later.
+
+make srpm
+
+  This runs 'make dist' to create a pristine source tarball, then creates a
+  RedHat-style source RPM package from the tarball.  Requires RPM v4 or later.
+
+make deb
+
+  Create Debian-style binary package.  Requires dpkg.
+
+make dmg
+
+  Create Macintosh package/disk image.  This requires the PackageMaker
+  application, which must be installed in /Developer/Applications/Utilities.
+
+make udmg
+
+  On 64-bit OS X systems, this creates a version of the Macintosh package and
+  disk image which contains universal i386/x86-64 binaries.  The 32-bit fork of
+  these binaries is backward compatible with OS X 10.4 and later.  The 64-bit
+  fork can be made backward compatible as well by using the instructions in
+  the "Build Recipes" section.  OS X 10.4 compatibility SDK required.
+
+make nsi
+
+  When using MinGW, this creates a Win32 installer for the GCC version of the
+  libjpeg-turbo SDK.  This requires the Nullsoft Install System
+  (http://nsis.sourceforge.net/.)  makensis.exe should be in your PATH.
+
+make -f win/Makefile nsi
+
+  This creates a Win32 installer for the Visual C++ version of the
+  libjpeg-turbo SDK.  This requires the Nullsoft Install System
+  (http://nsis.sourceforge.net/.)  makensis.exe should be in your PATH.

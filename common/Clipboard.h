@@ -81,6 +81,7 @@ struct ClipboardSettings {
 	static CARD32 defaultViewerCaps;
 	static CARD32 defaultServerCaps;
 
+	static const UINT formatDIB;
 	static const UINT formatHTML;
 	static const UINT formatRTF;
 	static const UINT formatUnicodeText;
@@ -88,6 +89,7 @@ struct ClipboardSettings {
 	static const int defaultLimitText;
 	static const int defaultLimitRTF;
 	static const int defaultLimitHTML;
+	static const int defaultLimitDIB;
 
 	static const int defaultLimit;
 
@@ -98,10 +100,12 @@ struct ClipboardSettings {
 	int m_nLimitText;
 	int m_nLimitRTF;
 	int m_nLimitHTML;
+	int m_nLimitDIB;
 
 	int m_nRequestedLimitText;
 	int m_nRequestedLimitRTF;
 	int m_nRequestedLimitHTML;
+	int m_nRequestedLimitDIB;
 
 	CARD32 m_myCaps;
 
@@ -109,7 +113,7 @@ struct ClipboardSettings {
 
 	void PrepareCapsPacket(ExtendedClipboardDataMessage& extendedDataMessage);
 
-	void HandleCapsPacket(ExtendedClipboardDataMessage& extendedDataMessage, bool bSetLimits = true);
+	void HandleCapsPacket(ExtendedClipboardDataMessage& extendedDataMessage, bool bSetLimits);
 };
 
 struct ClipboardHolder {
@@ -130,10 +134,12 @@ struct ClipboardData {
 	int m_lengthText;
 	int m_lengthRTF;
 	int m_lengthHTML;
+	int m_lengthDIB;
 
 	BYTE* m_pDataText;
 	BYTE* m_pDataRTF;
 	BYTE* m_pDataHTML;
+	BYTE* m_pDataDIB;
 
 	void FreeData();
 
