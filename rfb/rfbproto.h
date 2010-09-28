@@ -161,11 +161,14 @@ typedef struct {
  * The format string below can be used in sprintf or sscanf to generate or
  * decode the version string respectively.
  */
-
+#define rfb38
 #define rfbProtocolVersionFormat "RFB %03d.%03d\n"
 #define rfbProtocolMajorVersion 3
+#ifdef rfb38
+#define rfbProtocolMinorVersion 8
+#else
 #define rfbProtocolMinorVersion 4 // Reserved to UltravNC ! (as well as "6")
-
+#endif
 typedef char rfbProtocolVersionMsg[13];	/* allow extra byte for null */
 
 #define sz_rfbProtocolVersionMsg 12
@@ -184,9 +187,6 @@ typedef char rfbProtocolVersionMsg[13];	/* allow extra byte for null */
 #define rfbNoAuth 1
 #define rfbVncAuth 2
 
-//
-#define rfb38
-
 #ifdef rfb38
 #define rfbUltraVNC 17
 #define rfbSubNoAuth 1
@@ -195,7 +195,7 @@ typedef char rfbProtocolVersionMsg[13];	/* allow extra byte for null */
 #define rfbSubSecureVNCPlugin 4
 #define rfbSubSpecialSC_PROMP 1
 #define rfbSubSpecialSessionSelect 2
-#else
+//#else
 //adzm 2010-05-10
 #define rfbUltraVNC_SecureVNCPlugin 17
 #endif

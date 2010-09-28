@@ -524,4 +524,53 @@ protected:
     bool        m_wants_KeepAlive;
 };
 
+
+// vncClient thread class
+
+class vncClientThread : public omni_thread
+{
+public:
+
+	// Init
+	virtual BOOL Init(vncClient *client,
+		vncServer *server,
+		VSocket *socket,
+		BOOL auth,
+		BOOL shared);
+
+	// Sub-Init routines
+	virtual BOOL InitVersion();
+	virtual BOOL InitAuthenticate();
+	virtual BOOL AuthMsLogon();
+
+#ifdef rfb38
+	BOOL FilterClients();
+	BOOL CheckEmptyPasswd();
+	BOOL CheckLoopBack();
+	BOOL VNCAUTH();
+	CARD32 AuthMSLOGON();
+	BOOL SecureVNCPlugin();
+	void Logging(bool value);
+#endif	 
+	// adzm 2010-08
+	virtual bool InitSocket();
+	virtual bool TryReconnect();
+
+	// The main thread function
+	virtual void run(void *arg);
+	bool m_autoreconnectcounter_quit;
+
+protected:
+	virtual ~vncClientThread();
+
+	// Fields
+protected:
+	VSocket *m_socket;
+	vncServer *m_server;
+	vncClient *m_client;
+	BOOL m_auth;
+	BOOL m_shared;
+	BOOL m_ms_logon;
+	int major, minor;
+};
 #endif

@@ -781,7 +781,7 @@ CARD32  ClientConnection::AuthUltraVnc()
 		}
 	}
 
-	if (rfbSubSpecialSC_PROMP==1)
+	if (rfbSubSpecialSC_PROMP==SpecialHandling)
 	{
 		int size;
 		ReadExact((char *)&size,sizeof(int));
@@ -844,7 +844,7 @@ CARD32  ClientConnection::AuthUltraVnc()
 	}
 
 	// For V2 only
-	if (rfbSubSpecialSessionSelect==1 && (server_version>=2) && authResult!=rfbVncAuthFailed)
+	if (rfbSubSpecialSessionSelect==SpecialHandling && (server_version>=2) && authResult!=rfbVncAuthFailed)
 	{
 		//TODO
 	}

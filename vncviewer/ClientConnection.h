@@ -962,5 +962,4 @@ public:
 		if (bit_nr==6) result=mask[byte_nr].b6;		\
 		if (bit_nr==7) result=mask[byte_nr].b7;		\
 	}
-
 #endif

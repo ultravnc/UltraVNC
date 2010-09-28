@@ -798,45 +798,6 @@ vncClientUpdateThread::run_undetached(void *arg)
 	return 0;
 }
 
-// vncClient thread class
-
-class vncClientThread : public omni_thread
-{
-public:
-
-	// Init
-	virtual BOOL Init(vncClient *client,
-		vncServer *server,
-		VSocket *socket,
-		BOOL auth,
-		BOOL shared);
-
-	// Sub-Init routines
-	virtual BOOL InitVersion();
-	virtual BOOL InitAuthenticate();
-	virtual BOOL AuthMsLogon();
-	
-	// adzm 2010-08
-	virtual bool InitSocket();
-	virtual bool TryReconnect();
-
-	// The main thread function
-	virtual void run(void *arg);
-	bool m_autoreconnectcounter_quit;
-
-protected:
-	virtual ~vncClientThread();
-
-	// Fields
-protected:
-	VSocket *m_socket;
-	vncServer *m_server;
-	vncClient *m_client;
-	BOOL m_auth;
-	BOOL m_shared;
-	BOOL m_ms_logon;
-};
-
 vncClientThread::~vncClientThread()
 {
 	if (m_client != NULL)
@@ -860,6 +821,7 @@ vncClientThread::Init(vncClient *client, vncServer *server, VSocket *socket, BOO
 	return TRUE;
 }
 
+#ifndef rfb38
 BOOL
 vncClientThread::InitVersion()
 {
@@ -1558,6 +1520,9 @@ vncClientThread::InitAuthenticate()
 	return m_server->Authenticated(m_client->GetClientId());
 }
 
+#endif
+
+
 // marscha@2006: Try to better hide the windows password.
 // I know that this is no breakthrough in modern cryptography.
 // It's just a patch/kludge/workaround.
@@ -1615,6 +1580,7 @@ vncClientThread::AuthMsLogon() {
 	}
 	return TRUE;
 }
+
 
 void
 ClearKeyState(BYTE key)
