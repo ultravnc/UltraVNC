@@ -1,7 +1,7 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libjpeg-turbo-win", "libjpeg-turbo-win.vcproj", "{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}"
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libjpeg-turbo-win", "libjpeg-turbo-win.vcxproj", "{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

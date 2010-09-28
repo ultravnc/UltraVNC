@@ -850,7 +850,8 @@ vncClientThread::InitAuthenticate()
 				return FALSE;
 			}
 	}
-	if (!client_ini.shared && !m_shared)
+	// adzm 2010-09
+	if (!(client_ini.flags & clientInitShared) && !m_shared)
 	{
 		// Which client takes priority, existing or incoming?
 		if (m_server->ConnectPriority() < 1)
