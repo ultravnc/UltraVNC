@@ -1522,7 +1522,7 @@ vncClientThread::InitAuthenticate()
 
 #endif
 
-*
+/*
 // marscha@2006: Try to better hide the windows password.
 // I know that this is no breakthrough in modern cryptography.
 // It's just a patch/kludge/workaround.

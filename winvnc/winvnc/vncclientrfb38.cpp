@@ -568,6 +568,12 @@ BOOL vncClientThread::SecureVNCPlugin()
 		if (!result) {
 			vnclog.Print(LL_CONNERR, VNCLOG("authentication failed\n"));
 			auth_ok = FALSE;
+			//Reason is needed rfb38
+			char *errmsg = "Wrong User /password";
+			CARD32 errlen = Swap32IfLE(strlen(errmsg));
+			if (!m_socket->SendExact((char *)&errlen, sizeof(errlen)))
+				return FALSE;
+			m_socket->SendExact(errmsg, strlen(errmsg));
 			return FALSE;
 		}
 
@@ -592,6 +598,12 @@ BOOL vncClientThread::SecureVNCPlugin()
 				authmsg = Swap32IfLE(rfbVncAuthFailed);
 				if (!m_socket->SendExact((char *)&authmsg, sizeof(authmsg)))
 					return FALSE;
+				// Reason is needed rfb38
+				char *errmsg = "Wrong password";
+				CARD32 errlen = Swap32IfLE(strlen(errmsg));
+				if (!m_socket->SendExact((char *)&errlen, sizeof(errlen)))
+					return FALSE;
+				m_socket->SendExact(errmsg, strlen(errmsg));
 			}
 			return FALSE;
 		}
