@@ -541,14 +541,16 @@ public:
 	// Sub-Init routines
 	virtual BOOL InitVersion();
 	virtual BOOL InitAuthenticate();
+#ifndef rfb38
 	virtual BOOL AuthMsLogon();
+#endif
 
 #ifdef rfb38
 	BOOL FilterClients();
 	BOOL CheckEmptyPasswd();
 	BOOL CheckLoopBack();
 	BOOL VNCAUTH();
-	CARD32 AuthMSLOGON();
+	int AuthMSLOGON();
 	BOOL SecureVNCPlugin();
 	void Logging(bool value);
 #endif	 

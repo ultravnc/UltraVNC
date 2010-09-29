@@ -395,7 +395,7 @@ BOOL vncClientThread::VNCAUTH()
 }
 
 
-CARD32  
+int  
 vncClientThread::AuthMSLOGON() {
 	//adzm 2010-05-10
 	if (m_socket->IsUsePluginEnabled() && m_server->GetDSMPluginPointer()->IsEnabled() && m_socket->GetIntegratedPlugin() != NULL) {
@@ -430,9 +430,7 @@ vncClientThread::AuthMSLOGON() {
 		m_client->EnableKeyboard(false);
 		m_client->EnablePointer(false);
 	}
-
-	CARD32 authmsg = Swap32IfLE(result ? rfbVncAuthOK : rfbVncAuthFailed);
-	return authmsg;
+	return result;
 }
 
 void vncClientThread::Logging(bool value)
@@ -549,8 +547,30 @@ BOOL vncClientThread::SecureVNCPlugin()
 	if (auth_ok && m_ms_logon) 
 	{
 		//adzm 2010-05-10 - this will set HandshakeComplete after sending the MsLogon authentication type packet
-		if (!AuthMsLogon())
+		vnclog.Print(LL_INTINFO, "MS-Logon (DH) authentication");
+		CARD32 auth_val = Swap32IfLE(rfbMsLogon);
+		if (!m_socket->SendExact((char *)&auth_val, sizeof(auth_val)))
+		{
 			auth_ok = FALSE;
+			return FALSE;
+		}
+
+		int result;
+		result = AuthMSLOGON();
+		CARD32 authmsg = Swap32IfLE(result ? rfbVncAuthOK : rfbVncAuthFailed);
+
+		if (!m_socket->SendExact((char *)&authmsg, sizeof(authmsg)))
+		{
+			auth_ok = FALSE;
+			return FALSE;
+		}
+		
+		if (!result) {
+			vnclog.Print(LL_CONNERR, VNCLOG("authentication failed\n"));
+			auth_ok = FALSE;
+			return FALSE;
+		}
+
 	} else {
 		// Did the authentication work?
 		CARD32 authmsg;
@@ -707,14 +727,20 @@ vncClientThread::InitAuthenticate()
 		{
 			authmsg = Swap32IfLE(rfbVncAuthOK);
 			Logging(true);
+			if (!m_socket->SendExact((char *)&authmsg, sizeof(authmsg)))
+				return FALSE;
 		}
 		else
 		{
 			authmsg = Swap32IfLE(rfbVncAuthFailed);
 			Logging(false);
+			if (!m_socket->SendExact((char *)&authmsg, sizeof(authmsg))) return FALSE;
+			char *errmsg = "Wrong Password";
+			CARD32 errlen = Swap32IfLE(strlen(errmsg));
+			if (!m_socket->SendExact((char *)&errlen, sizeof(errlen))) return FALSE;
+			m_socket->SendExact(errmsg, strlen(errmsg));
+			return FALSE;
 		}
-		if (!m_socket->SendExact((char *)&authmsg, sizeof(authmsg)))
-				return FALSE;
 
 	}
 	else if (AuthenticationType==rfbNoAuth)
@@ -789,23 +815,36 @@ vncClientThread::InitAuthenticate()
 				{
 					authmsg = Swap32IfLE(rfbVncAuthOK);
 					Logging(true);
+					if (!m_socket->SendExact((char *)&authmsg, sizeof(authmsg)))
+					return FALSE;
 				}
 			else
 				{
 					authmsg = Swap32IfLE(rfbVncAuthFailed);
 					Logging(false);
-				}
-			if (!m_socket->SendExact((char *)&authmsg, sizeof(authmsg)))
-				return FALSE;
+					if (!m_socket->SendExact((char *)&authmsg, sizeof(authmsg))) return FALSE;
+					////
+					char *errmsg = "Wrong Password";
+					CARD32 errlen = Swap32IfLE(strlen(errmsg));
+					if (!m_socket->SendExact((char *)&errlen, sizeof(errlen))) return FALSE;
+					m_socket->SendExact(errmsg, strlen(errmsg));
+					return FALSE;
+				}			
 		}
 		else if (SubAuth==rfSubbMsLogon)
 		{
 
-			CARD32 authmsg=AuthMSLOGON();
+			int result;
+			result = AuthMSLOGON();
+			CARD32 authmsg = Swap32IfLE(result ? rfbVncAuthOK : rfbVncAuthFailed);
 			if (!m_socket->SendExact((char *)&authmsg, sizeof(authmsg)))
 				return FALSE;
 		
-			if (!authmsg) {
+			if (!result) {
+				char *errmsg = "Wrong user or Password";
+				CARD32 errlen = Swap32IfLE(strlen(errmsg));
+				if (!m_socket->SendExact((char *)&errlen, sizeof(errlen))) return FALSE;
+				m_socket->SendExact(errmsg, strlen(errmsg));
 				vnclog.Print(LL_CONNERR, VNCLOG("authentication failed\n"));
 				Logging(false);
 				return FALSE;
@@ -831,8 +870,12 @@ vncClientThread::InitAuthenticate()
 		//Can never happen
 		CARD32 authmsg;
 		authmsg = Swap32IfLE(rfbVncAuthFailed);
-		if (!m_socket->SendExact((char *)&authmsg, sizeof(authmsg)))
-			return FALSE;
+		if (!m_socket->SendExact((char *)&authmsg, sizeof(authmsg))) return FALSE;
+		char *errmsg = "Unknown errer code 3";
+		CARD32 errlen = Swap32IfLE(strlen(errmsg));
+		if (!m_socket->SendExact((char *)&errlen, sizeof(errlen))) return FALSE;
+		m_socket->SendExact(errmsg, strlen(errmsg));
+		return FALSE;
 	}	
 
 	// Read the client's initialisation message

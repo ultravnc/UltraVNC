@@ -422,28 +422,7 @@ void ClientConnection::Authenticaterfb38_Part1()
 		}
 	}
 
-	switch (authScheme) 
-	{
-    case rfbNoAuth:
-		Authenticaterfb38_Part2(rfbNoAuth);
-		break;
-    case rfbVncAuth:
-		Authenticaterfb38_Part2(rfbVncAuth);
-		break;
-
-	case rfbUltraVNC:
-		Authenticaterfb38_Part2(rfbUltraVNC);
-		break;
-    case rfbMsLogon:
-		Authenticaterfb38_Part2(rfbMsLogon);
-		break;
-
-	default:	// should never happen
-		vnclog.Print(0, _T("Unknwon Security Type \n"));
-		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,"Unknwon Security Type");
-		throw WarningException("Unknwon Security Type");
-    }
-
+	Authenticaterfb38_Part2(authScheme);
 }
 
 void ClientConnection::Authenticaterfb38_Part2(CARD32 authScheme)
