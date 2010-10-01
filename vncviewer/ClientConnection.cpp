@@ -8463,7 +8463,7 @@ ClientConnection::PendingMouseMove::PendingMouseMove()
 	y(0),
 	keyflags(0),
 	bValid(false),
-	dwMinimumMouseMoveInterval(150)
+	dwMinimumMouseMoveInterval(0) // changed to 0 from 150; need to have an interface for this
 {	
 	HKEY hRegKey;
 	DWORD dwPreferredMinimumMouseMoveInterval = 0;
