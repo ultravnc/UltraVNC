@@ -488,9 +488,13 @@ BOOL vncClientThread::SecureVNCPlugin()
 	BOOL auth_ok = FALSE;
 
 	// Send auth-required message
+	// adzm - if 3.8, we've already sent this. But this may need revisited for those still using
+	// the unofficial versions before 3.8
+	/*
 	CARD32 auth_val = Swap32IfLE(rfbUltraVNC_SecureVNCPlugin);
 	if (!m_socket->SendExact((char *)&auth_val, sizeof(auth_val)))
 		return FALSE;
+	*/
 
 	const char* plainPassword = plain;
 
