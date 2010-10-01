@@ -31,12 +31,20 @@
 #include "Log.h"
 #include "AccelKeys.h"
 
-#define WM_SOCKEVENT WM_USER+1
+#define WM_SOCKEVENT WM_APP+1
 #define WM_TRAYNOTIFY WM_SOCKEVENT+1
-#define WM_REGIONUPDATED WM_TRAYNOTIFY+1
 //adzm 2010-09
-#define WM_UPDATEREMOTECLIPBOARDCAPS WM_REGIONUPDATED+1
+#define WM_REQUESTUPDATE WM_TRAYNOTIFY+1
+	// WM_REQUESTUPDATE (wParam, lParam)
+	// wParam: 
+	//		0x00000000 = Full Framebuffer Update Request
+	//		0x00000001 = Incremental Framebuffer Update Request
+	//		0xFFFFFFFF = 'Appropriate' Framebuffer Update Request
+//adzm 2010-09
+#define WM_UPDATEREMOTECLIPBOARDCAPS WM_REQUESTUPDATE+1
 #define WM_NOTIFYPLUGINSTREAMING WM_UPDATEREMOTECLIPBOARDCAPS+1
+//adzm 2010-09
+#define WM_SENDKEEPALIVE WM_NOTIFYPLUGINSTREAMING+1
 
 // The Application
 extern VNCviewerApp *pApp;

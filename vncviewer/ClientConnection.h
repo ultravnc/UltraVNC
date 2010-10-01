@@ -118,6 +118,7 @@ namespace rdr { class InStream; class FdInStream; class ZlibInStream; }
 
 class ClientConnection  : public omni_thread
 {
+	friend DWORD WINAPI ReconnectThreadProc(LPVOID);
 public:
 
 	HWND m_hSessionDialog;
@@ -161,7 +162,9 @@ public:
 
 	void SendKeyEvent(CARD32 key, bool down);
 
-    void SendKeepAlive(bool bForce = false); // 16 july 2008 jdp
+	// adzm 2010-09
+	void SendKeepAlive(bool bForce, bool bAsync);
+    void Internal_SendKeepAlive(bool bForce); // 16 july 2008 jdp
 
 	bool m_Is_Listening;
 
@@ -240,10 +243,17 @@ private:
 	void SetFormatAndEncodings();
 	void SendSetPixelFormat(rfbPixelFormat newFormat);
 
-	void SendIncrementalFramebufferUpdateRequest();
-	
-	void SendAppropriateFramebufferUpdateRequest();
-	void SendFramebufferUpdateRequest(int x, int y, int w, int h, bool incremental);
+	// adzm 2010-09
+	void HandleFramebufferUpdateRequest(WPARAM wParam, LPARAM lParam);
+	void SendIncrementalFramebufferUpdateRequest(bool bAsync);	
+	void SendFullFramebufferUpdateRequest(bool bAsync);
+	void SendAppropriateFramebufferUpdateRequest(bool bAsync);
+	void SendFramebufferUpdateRequest(WPARAM requestType, bool bAsync);
+
+	void Internal_SendIncrementalFramebufferUpdateRequest();	
+	void Internal_SendFullFramebufferUpdateRequest();
+	void Internal_SendAppropriateFramebufferUpdateRequest();
+	void Internal_SendFramebufferUpdateRequest(int x, int y, int w, int h, bool incremental);
 	
 	//adzm 2010-09 - Now returns false if not processed
 	bool ProcessPointerEvent(int x, int y, DWORD keyflags, UINT msg);
@@ -747,7 +757,6 @@ public:
 	void DoConnection();
 	bool m_bKillThread;
 	bool m_running;
-	void SendFullFramebufferUpdateRequest();
 	HWND m_hwndMain;
 	HANDLE rcth;
 };

@@ -62,7 +62,8 @@ void ClientConnection::SetFullScreenMode(bool enable)
 		COLORREF bgcol = RGB(0x0, 0x0, 0x0);
 		FillSolidRect_ultra(0, 0, winwidth, winheight, m_myFormat.bitsPerPixel,(BYTE *) &bgcol);
 		// Update the whole screen 
-		SendFullFramebufferUpdateRequest();
+		//adzm 2010-09
+		SendFullFramebufferUpdateRequest(false);
 	}
 }
 

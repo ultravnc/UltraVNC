@@ -173,7 +173,8 @@ void TextChat::ProcessTextChatMsg()
 		// On Server notif, request FullScreen update
 		if (!m_fTextChatRunning) return;
 		m_fTextChatRunning = false;
-		m_pCC->SendAppropriateFramebufferUpdateRequest();
+		//adzm 2010-09 - all socket writes must remain on a single thread, but we only need an async request here
+		m_pCC->SendAppropriateFramebufferUpdateRequest(true);
 		return;
 	}
 	else
@@ -372,8 +373,9 @@ void TextChat::ShowChatWindow(bool fVisible)
 
 	m_fVisible = fVisible; // This enables screen updates to be processed in ClientConnection
 	// Refresh screen view if Chat window has been hidden
+	//adzm 2010-09 - all socket writes must remain on a single thread, but we only need an async request here
 	if (!fVisible)
-		m_pCC->SendAppropriateFramebufferUpdateRequest();
+		m_pCC->SendAppropriateFramebufferUpdateRequest(true);
 }
 
 // [v1.0.2-jp1 fix]

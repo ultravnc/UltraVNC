@@ -437,8 +437,9 @@ void FileTransfer::ShowFileTransferWindow(bool fVisible)
 
 	m_fVisible = fVisible; // This enables screen updates to be processed in ClientConnection
 	// Refresh screen view if FileTransfer window has been hidden
+	//adzm 2010-09 - all socket writes must remain on a single thread, but we only need an async request here
 	if (!fVisible)
-		m_pCC->SendAppropriateFramebufferUpdateRequest();
+		m_pCC->SendAppropriateFramebufferUpdateRequest(true);
 }
 
 
@@ -573,7 +574,8 @@ void FileTransfer::ProcessFileTransferMsg(void)
 	case rfbFilePacket:
         m_pCC->SetRecvTimeout();
 		ReceiveFileChunk(Swap32IfLE(ft.length), Swap32IfLE(ft.size));
-        m_pCC->SendKeepAlive();
+		// adzm 2010-09
+        m_pCC->SendKeepAlive(false, true);
 		break;
 
 	// Should never be handled here but in the File Transfer Loop
@@ -2317,7 +2319,8 @@ bool FileTransfer::FinishFileReception()
 
 	m_fFileDownloadRunning = false;
     m_pCC->SetRecvTimeout(0);
-    m_pCC->SendKeepAlive(true);
+	// adzm 2010-09
+    m_pCC->SendKeepAlive(false, true);
 
 	// sf@2004 - Delta transfer
 	SetEndOfFile(m_hDestFile);

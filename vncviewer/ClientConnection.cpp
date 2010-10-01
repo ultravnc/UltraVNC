@@ -643,7 +643,9 @@ DWORD WINAPI ReconnectThreadProc(LPVOID lpParameter)
 		cc->m_bKillThread = false;
 		cc->m_running = true;
 
-		cc->SendFullFramebufferUpdateRequest();
+		//adzm 2010-09 - Not sure about this one, but honestly i've never had the reconnect stuff work reliably for me, so I'll just let this
+		//call into the internal function rather than deal with messages
+		cc->Internal_SendFullFramebufferUpdateRequest();
 	}
 	catch (Exception &e)
 	{
@@ -666,7 +668,9 @@ void ClientConnection::Reconnect()
 		m_bKillThread = false;
 		m_running = true;
 
-		SendFullFramebufferUpdateRequest();
+		//adzm 2010-09 - Not sure about this one, but honestly i've never had the reconnect stuff work reliably for me, so I'll just let this
+		//call into the internal function rather than deal with messages
+		Internal_SendFullFramebufferUpdateRequest();
 	}
 	catch (Exception &e)
 	{
@@ -3232,7 +3236,7 @@ void ClientConnection::SetFormatAndEncodings()
     spf.format.greenMax = Swap16IfLE(spf.format.greenMax);
     spf.format.blueMax = Swap16IfLE(spf.format.blueMax);
 
-    WriteExact((char *)&spf, sz_rfbSetPixelFormatMsg, rfbSetPixelFormat);
+    WriteExactQueue((char *)&spf, sz_rfbSetPixelFormatMsg, rfbSetPixelFormat);
 
     // The number of bytes required to hold at least one pixel.
 	m_minPixelBytes = (m_myFormat.bitsPerPixel + 7) >> 3;
@@ -4208,7 +4212,8 @@ void* ClientConnection::run_undetached(void* arg) {
 
 	if (m_nServerScale > 1) SendServerScale(m_nServerScale);
 
-	SendFullFramebufferUpdateRequest();
+	//adzm 2010-09 - all socket writes must remain on a single thread
+	SendFullFramebufferUpdateRequest(false);
 
 	SizeWindow();
 	RealiseFullScreenMode();
@@ -4327,7 +4332,9 @@ void* ClientConnection::run_undetached(void* arg) {
 					//adzm 2010-09 - this could send in the middle of other sends by the ui thread! We can still use SendMessage to ensure
 					//it blocks until processed.
 					//SendAppropriateFramebufferUpdateRequest();					
-					SendMessage(m_hwndcn, WM_REGIONUPDATED, NULL, NULL);
+					//SendMessage(m_hwndcn, WM_REGIONUPDATED, NULL, NULL);
+					//adzm 2010-09 - This function delegates the processing to the UI thread now, basically doing the same as the sendmessage above.
+					SendAppropriateFramebufferUpdateRequest(false);			
 					
 					SizeWindow();
 					InvalidateRect(m_hwndcn, NULL, TRUE);
@@ -4423,8 +4430,7 @@ void* ClientConnection::run_undetached(void* arg) {
 // Requesting screen updates from the server
 //
 
-inline void
-ClientConnection::SendFramebufferUpdateRequest(int x, int y, int w, int h, bool incremental)
+void ClientConnection::Internal_SendFramebufferUpdateRequest(int x, int y, int w, int h, bool incremental)
 {
 	if (m_pFileTransfer->m_fFileTransferRunning && ( m_pFileTransfer->m_fVisible || m_pFileTransfer->UsingOldProtocol())) return;
 	if (m_pTextChat->m_fTextChatRunning && m_pTextChat->m_fVisible) return;
@@ -4446,20 +4452,64 @@ ClientConnection::SendFramebufferUpdateRequest(int x, int y, int w, int h, bool 
     WriteExact_timeout((char *)&fur, sz_rfbFramebufferUpdateRequestMsg, rfbFramebufferUpdateRequest,5);
 }
 
-inline void ClientConnection::SendIncrementalFramebufferUpdateRequest()
+
+void ClientConnection::HandleFramebufferUpdateRequest(WPARAM wParam, LPARAM lParam)
 {
-    SendFramebufferUpdateRequest(0, 0, m_si.framebufferWidth,
+	switch (wParam) {
+		case 0x00000001:
+			// Incremental
+			Internal_SendIncrementalFramebufferUpdateRequest();
+			break;
+		case 0xFFFFFFFF:
+			// Appropriate:
+			Internal_SendAppropriateFramebufferUpdateRequest();
+			break;
+		case 0x00000000:
+		default:
+			// Full
+			Internal_SendFullFramebufferUpdateRequest();
+			break;
+	}
+}
+
+void ClientConnection::SendIncrementalFramebufferUpdateRequest(bool bAsync)
+{
+	SendFramebufferUpdateRequest(0x00000001, bAsync);
+}
+
+void ClientConnection::SendFullFramebufferUpdateRequest(bool bAsync)
+{
+	SendFramebufferUpdateRequest(0x00000000, bAsync);
+}
+
+void ClientConnection::SendAppropriateFramebufferUpdateRequest(bool bAsync)
+{
+	SendFramebufferUpdateRequest(0xFFFFFFFF, bAsync);
+}
+
+void ClientConnection::SendFramebufferUpdateRequest(WPARAM requestType, bool bAsync)
+{
+	if (bAsync) {
+		PostMessage(m_hwndcn, WM_REQUESTUPDATE, (WPARAM)requestType, (LPARAM)0);
+	} else {
+		SendMessage(m_hwndcn, WM_REQUESTUPDATE, (WPARAM)requestType, (LPARAM)0);
+	}
+}
+
+void ClientConnection::Internal_SendIncrementalFramebufferUpdateRequest()
+{
+    Internal_SendFramebufferUpdateRequest(0, 0, m_si.framebufferWidth,
 					m_si.framebufferHeight, true);
 }
 
-void ClientConnection::SendFullFramebufferUpdateRequest()
+void ClientConnection::Internal_SendFullFramebufferUpdateRequest()
 {
-    SendFramebufferUpdateRequest(0, 0, m_si.framebufferWidth,
+    Internal_SendFramebufferUpdateRequest(0, 0, m_si.framebufferWidth,
 					m_si.framebufferHeight, false);
 }
 
 
-void ClientConnection::SendAppropriateFramebufferUpdateRequest()
+void ClientConnection::Internal_SendAppropriateFramebufferUpdateRequest()
 {
 	if (m_pendingFormatChange) 
 	{
@@ -4498,11 +4548,11 @@ void ClientConnection::SendAppropriateFramebufferUpdateRequest()
 		// If the pixel format has changed, or cache, or scale request whole screen
 		if (true)//!PF_EQ(m_myFormat, oldFormat) || m_pendingCacheInit || m_pendingScaleChange)
 		{
-			SendFullFramebufferUpdateRequest();	
+			Internal_SendFullFramebufferUpdateRequest();	
 		}
 		else
 		{
-			SendIncrementalFramebufferUpdateRequest();
+			Internal_SendIncrementalFramebufferUpdateRequest();
 		}
 		m_pendingScaleChange = false;
 		m_pendingCacheInit = false;
@@ -4510,7 +4560,7 @@ void ClientConnection::SendAppropriateFramebufferUpdateRequest()
 	else 
 	{
 		if (!m_dormant)
-			SendIncrementalFramebufferUpdateRequest();
+			Internal_SendIncrementalFramebufferUpdateRequest();
 	}
 }
 
@@ -4584,7 +4634,9 @@ inline void ClientConnection::ReadScreenUpdate()
 	bool bSentUpdateRequest = false;
 	if (m_opts.m_preemptiveUpdates && !m_pendingFormatChange) {
 		bSentUpdateRequest = true;
-		PostMessage(m_hwndcn, WM_REGIONUPDATED, NULL, NULL);
+		//PostMessage(m_hwndcn, WM_REGIONUPDATED, NULL, NULL);
+		//adzm 2010-09 - We can simply call SendAppropriateFramebufferUpdateRequest now, with a true bAsync param so the request is posted rather than sent.
+		SendAppropriateFramebufferUpdateRequest(true);
 	}
 
 	HDC hdcX,hdcBits;
@@ -4953,7 +5005,8 @@ inline void ClientConnection::ReadScreenUpdate()
 
 	//adzm 2010-07-04
 	if (!bSentUpdateRequest) {
-		PostMessage(m_hwndcn, WM_REGIONUPDATED, NULL, NULL);
+		//adzm 2010-09 - We can simply call SendAppropriateFramebufferUpdateRequest now, with a true bAsync param so the request is posted rather than sent.
+		SendAppropriateFramebufferUpdateRequest(true);
 	}
 	DeleteObject(UpdateRegion);
 }	
@@ -4964,8 +5017,10 @@ void ClientConnection::SetDormant(bool newstate)
 {
 	vnclog.Print(5, _T("%s dormant mode\n"), newstate ? _T("Entering") : _T("Leaving"));
 	m_dormant = newstate;
-	if (!m_dormant)
-		SendIncrementalFramebufferUpdateRequest();
+	if (!m_dormant) {
+		//adzm 2010-09
+		SendIncrementalFramebufferUpdateRequest(false);
+	}
 }
 
 // The server has copied some text to the clipboard - put it 
@@ -5852,11 +5907,13 @@ void ClientConnection::ReadNewFBSize(rfbFramebufferUpdateRectHeader *pfburh)
 	m_si.framebufferHeight = pfburh->r.h / m_nServerScale;
 
 	CreateLocalFramebuffer();
-    SendFullFramebufferUpdateRequest();
+	//adzm 2010-09 - all socket writes must remain on a single thread, so do a synchronous update request
+    SendFullFramebufferUpdateRequest(false);
 	Createdib();
 	m_pendingScaleChange = true;
 	m_pendingFormatChange = true;
-	SendAppropriateFramebufferUpdateRequest();
+	//adzm 2010-09 - all socket writes must remain on a single thread, so do a synchronous update request
+	SendAppropriateFramebufferUpdateRequest(false);
 	SizeWindow();
 	InvalidateRect(m_hwndcn, NULL, TRUE);
 	RealiseFullScreenMode();
@@ -6576,7 +6633,8 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						
 					case ID_REQUEST_REFRESH: 
 						// Request a full-screen update
-						_this->SendFullFramebufferUpdateRequest();
+						//adzm 2010-09
+						_this->SendFullFramebufferUpdateRequest(false);
 						return 0;
 	
 					case ID_VK_LWINDOWN:
@@ -6715,8 +6773,9 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						_this->m_pFileTransfer->m_fFileTransferRunning = false;
 						// Refresh Screen
 						// _this->SendFullFramebufferUpdateRequest();
+						//adzm 2010-09
 						if (_this->m_pFileTransfer->m_fVisible || _this->m_pFileTransfer->UsingOldProtocol())
-							_this->SendAppropriateFramebufferUpdateRequest();
+							_this->SendAppropriateFramebufferUpdateRequest(false);
 						return 0;
 						
 						// sf@2002 - Text Chat
@@ -7716,9 +7775,10 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 				SetTimer(_this->m_hwndcn,3335, 1000, NULL);
 				return 0;
 				
-			case WM_REGIONUPDATED:
+			case WM_REQUESTUPDATE:
 				//_this->DoBlit();
-				_this->SendAppropriateFramebufferUpdateRequest();
+				//_this->SendAppropriateFramebufferUpdateRequest();
+				_this->HandleFramebufferUpdateRequest(wParam, lParam);
 				return 0;
 
 			case WM_UPDATEREMOTECLIPBOARDCAPS:
@@ -7735,6 +7795,11 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 				_this->DoBlit();
 				return 0;
 				
+			case WM_SENDKEEPALIVE:
+				// adzm 2010-09
+				_this->Internal_SendKeepAlive(wParam == 1);
+				return 0;
+				
 			case WM_TIMER:
 				if (wParam !=0) {
 					if (wParam == _this->m_emulate3ButtonsTimer)
@@ -7749,7 +7814,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 						_this->m_waitingOnEmulateTimer = false;
 					} else if (wParam == _this->m_keepalive_timer) {
 						// adzm 2009-08-02
-						_this->SendKeepAlive();
+						_this->SendKeepAlive(false, true);
 					} else if (wParam == _this->m_flushMouseMoveTimer) {
 						// adzm 2010-09						
 						if (_this->FlushThrottledMouseMove()) {
@@ -8339,7 +8404,18 @@ ClientConnection:: Check_Rectangle_borders(int x,int y,int w,int h)
 	return true;
 }
 
-void ClientConnection::SendKeepAlive(bool bForce)
+// adzm 2010-09
+void ClientConnection::SendKeepAlive(bool bForce, bool bAsync)
+{
+	if (bAsync) {
+		PostMessage(m_hwndcn, WM_SENDKEEPALIVE, (WPARAM)(bForce ? 1 : 0), (LPARAM)0);
+	} else {
+		SendMessage(m_hwndcn, WM_SENDKEEPALIVE, (WPARAM)(bForce ? 1 : 0), (LPARAM)0);
+	}
+}
+
+// adzm 2010-09
+void ClientConnection::Internal_SendKeepAlive(bool bForce)
 {
     if (m_server_wants_keepalives) 
     {
