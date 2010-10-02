@@ -147,7 +147,7 @@ public:
   //adzm 2010-09 - minimize packets. SendExact flushes the queue.
   VBool SendExactQueue(const char *buff, const VCard bufflen, unsigned char msgType);
   VBool ReadExact(char *buff, const VCard bufflen);
-  void ClearQueue();
+  VBool ClearQueue();
 
   // sf@2002 - DSMPlugin
   //adzm 2009-06-20

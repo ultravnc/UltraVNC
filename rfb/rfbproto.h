@@ -161,14 +161,55 @@ typedef struct {
  * The format string below can be used in sprintf or sscanf to generate or
  * decode the version string respectively.
  */
-#define rfb38
 #define rfbProtocolVersionFormat "RFB %03d.%03d\n"
 #define rfbProtocolMajorVersion 3
-#ifdef rfb38
 #define rfbProtocolMinorVersion 8
-#else
-#define rfbProtocolMinorVersion 4 // Reserved to UltravNC ! (as well as "6")
-#endif
+//#define rfbProtocolMinorVersion 4 // Reserved to UltravNC ! (as well as "6")
+
+//adzm 2010-09
+/*
+ For clarity, I'll explain the way the protocol version numbers worked before RFB 3.8
+
+ The 'base' minor version was 4, eg 3.4
+ If mslogon is NOT enabled:
+   2 is added to the base (3.6, 3.16 if SC_PROMPT)
+   Note that recent uvnc servers simply send rfbMsLogon as an auth type which makes this entirely unnecessary
+ If SC_PROMPT is enabled:
+   10 is added to the base (3.14, 3.16 if NOT mslogon)
+
+ In summary, 3.6 is 'standard'. 3.4 if using mslogon, 3.14 if mslogon + sc_prompt, 3.16 if sc_prompt and not mslogon
+
+ Now the server sends the version, and the viewer negotiates the version to send back.
+
+ The viewer handles the minor version as thus:
+ (note that 'file transfer' is a generic term for various ultravnc features, such as chat, etc)
+ 4 - mslogon, file transfer
+ 6 - file transfer
+ 14 - mslogon, file transfer, SC_PROMPT
+ 16 - file transfer, SC_PROMPT
+ <=3 - nothing special
+ if minor version falls into any of the above categories, the same version is echoed back to the server
+ otherwise, the default (3.4) is sent.
+
+   After receiving the viewer's version, if still 3.14 or 3.16, then SC_PROMPT is enabled:
+     a string describing the machine is sent immediately after the version negotiation.
+     Format of message is the length of string (little endian), followed by the string.
+     The viewer sends back a 32-bit int (little endian) value of 1 to accept, or 0 to refuse the connection
+
+ RFB 3.8 changes:
+  mslogon is part of the authentication enum, and has been for a while. we don't need it in the RFB version any longer.
+  SC_PROMPT is definitely a strange beast, and one that is unique enough to uvnc that I think we can continue
+    the way we have been. So for SC_PROMPT, we can just send RFB 003.018\n. We really want to know about this
+    before the connection continues further.
+
+ In summary, server will now always send 3.8 unless it needs to send 3.18 for SC_PROMPT.
+   in both situations, the old uvnc viewer will reply with 3.4
+   the server can easily disable the SC_PROMPT stuff if the viewer does not indicate that it can support it.
+ Downside is that old viewers will no longer have file transfer and text chat available,
+   but that kind of stuff should have been negotiated via pseudoencodings anyway!
+   Since the basic VNC functionality remains, I think that is acceptable.
+*/
+
 typedef char rfbProtocolVersionMsg[13];	/* allow extra byte for null */
 
 #define sz_rfbProtocolVersionMsg 12
@@ -183,24 +224,76 @@ typedef char rfbProtocolVersionMsg[13];	/* allow extra byte for null */
  * version 3.0 of the protocol this may have one of the following values:
  */
 
+// adzm 2010-09
+/*
+ pre-RFB 3.8 -- rfbUltraVNC_SecureVNCPlugin extension
+
+ If using SecureVNCPlugin (or any plugin that uses the integrated plugin architecture) the unofficial 1.0.8.2 version sends
+ the auth type rfbUltraVNC_SecureVNCPlugin.
+
+ The intention of this auth type is to act as a 'master' and once complete, allow other authentication types to occur
+ over the now-encrypted communication channel.
+
+ So, server sends 32-bit network order int for rfbUltraVNC_SecureVNCPlugin and the loop begins:
+   server sends 16-bit little-endian challenge length, followed by the challenge
+   viewer responds with 16-bit little-endian response length, followed by the response
+   this continues until the plugin says to stop the loop. Currently the SecureVNC plugin only
+     does one loop, but this functionality exists in order to implement more complicated handshakes.
+ 
+ If there was a failure, and an error message is available, rfbVncAuthFailedEx (3) is sent followed by the length of the
+   error string and then the error string
+ If there was a failure, and no error message is available, simply send rfbVncAuthFailed (1)
+ otherwise, if using mslogon, send rfbMsLogon, and if not using mslogon, send rfbVncAuthOK(0)
+
+ at this point the handshake is 'complete' and all further communication is encrypted.
+
+ if using mslogon, mslogon authentication will now occur (since the rfbMsLogon packet was sent)
+
+ RFB 3.8 changes
+
+ Now we send a byte for # of supported auth types, and then a byte for each auth type.
+
+ rfbUltraVNC is not being used for anything, although rfbUltraVNC_SecureVNCPlugin has been established somewhat.
+ Like a lot of these things, most of the values in the authentication range will end up going unused.
+ 
+ Rather than complicate things further, I hereby declare this scheme: the top 4 bits will define the 'owner'
+ of that set of values, and the bottom 4 bits will define the type. All of the values in the RFB 3.8 spec
+ can then be covered by 0x0 and 0x1 for the top 4 bits.
+
+                              mask
+ RealVNC-approved values:     0x0F
+ RealVNC-approved values:     0x1F
+ reserved:                    0x2F
+ reserved:                    0x3F
+ reserved:                    0x4F
+ reserved:                    0x5F
+ reserved:                    0x6F
+ UltraVNC:                    0x7F
+ TightVNC:                    0x8F
+ reserved:                    0x9F
+ reserved:                    0xAF
+ reserved:                    0xBF
+ reserved:                    0xCF
+ reserved:                    0xDF
+ reserved:                    0xEF
+ reserved:                    0xFF
+*/
+
 #define rfbConnFailed 0
+#define rfbInvalidAuth 0
 #define rfbNoAuth 1
 #define rfbVncAuth 2
-
-#ifdef rfb38
-#define rfbUltraVNC 17
-#define rfbSubNoAuth 1
-#define rfbSubVncAuth 2
-#define rfSubbMsLogon 3
-#define rfbSubSecureVNCPlugin 4
-#define rfbSubSpecialSC_PROMP 1
-#define rfbSubSpecialSessionSelect 2
-//#else
-//adzm 2010-05-10
 #define rfbUltraVNC_SecureVNCPlugin 17
-#endif
-/* rfbMsLogon indicates UltraVNC's MS-Logon with (hopefully) better security */
-#define rfbMsLogon 0xfffffffa
+// adzm 2010-09 - After rfbUltraVNC_SecureVNCPlugin, the auth repeats itself
+// this allows nested authentication methods on top of the SecureVNC plugin.
+
+// adzm 2010-09 - Ultra subtypes - SecureVNCPlugin will remain as the Ultra value
+#define rfbUltraVNC_MsLogon 0x70
+
+//adzm 2010-05-10 - for backwards compatibility with pre-3.8
+#define rfbLegacy_MsLogon 0xfffffffa // UltraVNC's MS-Logon with (hopefully) better security
+
+// please see ABOVE these definitions for more discussion on authentication
 
 
 /*
@@ -227,8 +320,12 @@ typedef char rfbProtocolVersionMsg[13];	/* allow extra byte for null */
 
 #define rfbVncAuthOK 0
 #define rfbVncAuthFailed 1
+// neither of these are used any longer in RFB 3.8
 #define rfbVncAuthTooMany 2
 #define rfbVncAuthFailedEx 3 //adzm 2010-05-11 - Send an explanatory message for the failure (if any)
+
+// adzm 2010-09 - rfbUltraVNC_SecureVNCPlugin may send this to restart authentication over a now-secure channel
+#define rfbVncAuthContinue 0xFFFFFFFF
 
 
 /*-----------------------------------------------------------------------------
@@ -241,15 +338,7 @@ typedef char rfbProtocolVersionMsg[13];	/* allow extra byte for null */
  * access to this client by disconnecting all other clients.
  */
 
-// adzm 2010-09
-// while I hate to hijack this, I don't feel like I have too many options 
-//  1) I want to negotiate this before any actual async rfb messages are sent
-//  2) The only other option to fulfill 1 is to mess with the RFB protocol
-//     versions, which are enough of a mess without me helping.
-// So, downsides to using this approach? Servers that simply check for 
-// not zero will always assume this is allowing shared if anything else is sent.
-// I think that is a worthwhile sacrifice. We can always implement an option
-// to disable this if necessary.
+// adzm 2010-09 - worked around this after all, but left the enum in here anyway.
 typedef struct {
     CARD8 flags; // rfbClientInitMsgFlags
 } rfbClientInitMsg;

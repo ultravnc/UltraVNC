@@ -45,6 +45,7 @@ typedef SHORT vncClientId;
 #include <list>
 #include <string>
 #include <vector>
+#include <algorithm>
 #include "common/win32_helpers.h"
 
 typedef std::list<vncClientId> vncClientList;
@@ -541,19 +542,19 @@ public:
 	// Sub-Init routines
 	virtual BOOL InitVersion();
 	virtual BOOL InitAuthenticate();
-#ifndef rfb38
-	virtual BOOL AuthMsLogon();
-#endif
+	virtual BOOL AuthenticateClient(std::vector<CARD8>& current_auth);
+	virtual BOOL AuthenticateLegacyClient();
 
-#ifdef rfb38
+	BOOL AuthSecureVNCPlugin(std::string& auth_message); // must SetHandshakeComplete after sending auth result!
+	BOOL AuthMsLogon(std::string& auth_message);
+	BOOL AuthVnc(std::string& auth_message);
+
 	BOOL FilterClients();
 	BOOL CheckEmptyPasswd();
 	BOOL CheckLoopBack();
-	BOOL VNCAUTH();
-	int AuthMSLOGON();
-	BOOL SecureVNCPlugin();
-	void Logging(bool value);
-#endif	 
+	void LogAuthResult(bool success);
+	void SendConnFailed(const char* szMessage);
+
 	// adzm 2010-08
 	virtual bool InitSocket();
 	virtual bool TryReconnect();
@@ -573,6 +574,7 @@ protected:
 	BOOL m_auth;
 	BOOL m_shared;
 	BOOL m_ms_logon;
-	int major, minor;
+	int m_major;
+	int m_minor;
 };
 #endif

@@ -609,13 +609,10 @@ void ClientConnection::DoConnection()
 	if (strcmp(m_proxyhost,"")!=NULL && m_fUseProxy)
 		NegotiateProxy();
 
-#ifdef rfb38
-	NegotiateProtocolVersionrfb38();
-	Authenticaterfb38_Part1();
-#else
 	NegotiateProtocolVersion();
-	Authenticate();
-#endif
+
+	std::vector<CARD32> current_auth;
+	Authenticate(current_auth);
 
 //	if (flash) {flash->Killflash();}
 	SendClientInit();
@@ -1918,7 +1915,6 @@ void ClientConnection::SetSocketOptions()
 		fis->SetDSMMode(m_pDSMPlugin->IsEnabled()); // sf@2003 - Special DSM mode for ZRLE encoding
 }
 
-#ifndef rfb38
 void ClientConnection::NegotiateProtocolVersion()
 {
 	rfbProtocolVersionMsg pv;
@@ -1942,7 +1938,7 @@ void ClientConnection::NegotiateProtocolVersion()
                           c.str());
 		if (!Pressed_Cancel) 
 		{
-		if (m_fUsePlugin)
+		if (m_fUsePlugin && m_pIntegratedPluginInterface == NULL)
 			throw WarningException("Connection failed - Error reading Protocol Version\r\n\r\n"
 									"Possible causes:\r\n"
 									"- You've forgotten to select a DSMPlugin and the Server uses a DSMPlugin\r\n"
@@ -1968,7 +1964,7 @@ void ClientConnection::NegotiateProtocolVersion()
                           c.m_info);
 		if (!Pressed_Cancel) 
 		{
-		if (m_fUsePlugin)
+		if (m_fUsePlugin && m_pIntegratedPluginInterface == NULL)
 			throw WarningException("Connection failed - Error reading Protocol Version\r\n\n\r"
 									"Possible causes:\r\n"
 									"- You've forgotten to select a DSMPlugin and the Server uses a DSMPlugin\r\n"
@@ -2038,17 +2034,10 @@ void ClientConnection::NegotiateProtocolVersion()
 	}
 	*/
 
-	// XXX This is a hack.  Under CE we just return to the server the
-	// version number it gives us without parsing it.  
-	// Too much hassle replacing sscanf for now. Fix this!
-#ifdef UNDER_CE
-	m_majorVersion = rfbProtocolMajorVersion;
-	m_minorVersion = rfbProtocolMinorVersion;
-#else
     if (sscanf(pv,rfbProtocolVersionFormat,&m_majorVersion,&m_minorVersion) != 2)
 	{
 		SetEvent(KillEvent);
-		if (m_fUsePlugin)
+		if (m_fUsePlugin && m_pIntegratedPluginInterface == NULL)
 			throw WarningException("Connection failed - Invalid protocol !\r\n\r\n"
 									"Possible causes:\r\r"
 									"- You've forgotten to select a DSMPlugin and the Server uses a DSMPlugin\r\n"
@@ -2080,9 +2069,18 @@ void ClientConnection::NegotiateProtocolVersion()
 		m_ms_logon = true;
 		m_fServerKnowsFileTransfer = true;
 	}
-	if (m_minorVersion == 6) // 6 because 5 already used in TightVNC viewer for some reason
+	else if (m_minorVersion == 6) // 6 because 5 already used in TightVNC viewer for some reason
 	{
-		m_ms_logon = false;
+		m_fServerKnowsFileTransfer = true;
+	}
+	else if (m_minorVersion == 7) // adzm 2010-09 - RFB 3.8
+	{
+#pragma message("RFB3.8 - m_fServerKnowsFileTransfer should be set via an encoding")
+		m_fServerKnowsFileTransfer = true;
+	}
+	else if (m_minorVersion == 8) // adzm 2010-09 - RFB 3.8
+	{
+#pragma message("RFB3.8 - m_fServerKnowsFileTransfer should be set via an encoding")
 		m_fServerKnowsFileTransfer = true;
 	}
 	// Added for SC so we can do something before actual data transfer start
@@ -2092,6 +2090,10 @@ void ClientConnection::NegotiateProtocolVersion()
 		m_fServerKnowsFileTransfer = true;
 	}
 	else if ( m_minorVersion == 16)
+	{
+		m_fServerKnowsFileTransfer = true;
+	}
+	else if ( m_minorVersion == 18)
 	{
 		m_fServerKnowsFileTransfer = true;
 	}
@@ -2111,10 +2113,9 @@ void ClientConnection::NegotiateProtocolVersion()
     }
 
     sprintf(pv,rfbProtocolVersionFormat, m_majorVersion, m_minorVersion);
-#endif
 
     WriteExact(pv, sz_rfbProtocolVersionMsg);
-	if (m_minorVersion == 14 || m_minorVersion == 16)
+	if (m_minorVersion == 14 || m_minorVersion == 16 || m_minorVersion == 18) // adzm 2010-09
 	{
 		int size;
 		ReadExact((char *)&size,sizeof(int));
@@ -2122,7 +2123,7 @@ void ClientConnection::NegotiateProtocolVersion()
 		//block
 		if (size<0 || size >1024)
 		{
-			throw WarningException("Buffer to big, ");
+			throw WarningException("Buffer too big, ");
 			if (size<0) size=0;
 			if (size>1024) size=1024;
 		}
@@ -2132,12 +2133,12 @@ void ClientConnection::NegotiateProtocolVersion()
 
 		//adzm 2009-06-21 - auto-accept if specified
 		if (!m_opts.m_fAutoAcceptIncoming) {
-			int returnvalue=MessageBox(m_hwndMain,   mytext,"Accept Incoming SC connection", MB_YESNO |  MB_TOPMOST);
+			int returnvalue=MessageBox(m_hwndMain,   mytext,"Accept Incoming SC Connection", MB_YESNO |  MB_TOPMOST);
 			if (returnvalue==IDNO) 
 			{
 				int nummer=0;
 				WriteExact((char *)&nummer,sizeof(int));
-				throw WarningException("You refused connection.....");
+				throw WarningException("You refused the connection");
 			}
 			else
 			{
@@ -2148,17 +2149,20 @@ void ClientConnection::NegotiateProtocolVersion()
 		} else {
 			int nummer=1;
 			WriteExact((char *)&nummer,sizeof(int));
-		}		
+		}	
+
+		m_minorVersion -= 10;
 	}
 
 
 	vnclog.Print(0, _T("Connected to RFB server, using protocol version %d.%d\n"),
 		rfbProtocolMajorVersion, m_minorVersion);
 
-
+	if (m_minorVersion >= 7 && m_pIntegratedPluginInterface) {
+		m_fPluginStreamingIn = true;
+		m_fPluginStreamingOut = true;
+	}
 }
-
-#endif
 
 void ClientConnection::NegotiateProxy()
 {
@@ -2253,180 +2257,82 @@ void ClientConnection::NegotiateProxy()
 
 }
 
-#ifndef rfb38
-void ClientConnection::Authenticate()
+void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 {
-	CARD32 authScheme, reasonLen, authResult;
-    CARD8 challenge[CHALLENGESIZE];
-	CARD8 challengems[CHALLENGESIZEMS];
-	
-	ReadExact((char *)&authScheme, 4);
-    authScheme = Swap32IfLE(authScheme);
-	if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L90);
-	
-	if (authScheme == rfbUltraVNC_SecureVNCPlugin)
-	{
-		if (!m_pIntegratedPluginInterface) {				
-			if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,"SecureVNCPlugin authentication failed (SecureVNCPlugin interface available)");
-			SetEvent(KillEvent);
-			throw ErrorException("SecureVNCPlugin authentication failed (no plugin interface available)");
-		}
-				
-		char passwd[256];
-		passwd[0] = '\0';
-		
-		if (strlen(m_clearPasswd)>0)
-		{
-			strcpy(passwd, m_clearPasswd);			
-		} 
-		else if (strlen((const char *) m_encPasswd)>0)
-		{  char * pw = vncDecryptPasswd(m_encPasswd);
-			strcpy(passwd, pw);
-			free(pw);
-		}
-		m_pIntegratedPluginInterface->SetPasswordData(NULL, 0);
+	CARD32 authScheme = rfbInvalidAuth;
 
-		int nSequenceNumber = 0;
-		bool bExpectChallenge = true;
-		bool bTriedNoPassword = false;
-		bool bSuccess = false;
-		bool bCancel = false;
-		do {
+	// adzm 2010-09
+	if (m_minorVersion < 7) {	
+		ReadExact((char *)&authScheme, sizeof(authScheme));
+		authScheme = Swap32IfLE(authScheme);
+	} else {		
+		CARD8 authAllowedLength = 0;
+		ReadExact((char *)&authAllowedLength, sizeof(authAllowedLength));
+		if (authAllowedLength == 0) {
+			authScheme = rfbConnFailed;
+		} else {
+			CARD8 authAllowed[256];
+			ReadExact((char *)authAllowed, authAllowedLength);
 
-			WORD wChallengeLength = 0;
-
-			ReadExact((char*)&wChallengeLength, sizeof(wChallengeLength));
-
-			BYTE* pChallengeData = new BYTE[wChallengeLength];
-
-			ReadExact((char*)pChallengeData, wChallengeLength);
-					
-			bool bPasswordOK = false;
-			bool bPassphraseRequired = false;
-			bSuccess = false;
-			do {
-				bSuccess = m_pIntegratedPluginInterface->HandleChallenge(pChallengeData, wChallengeLength, nSequenceNumber, bPasswordOK, bPassphraseRequired);
-				if (bSuccess && !bPasswordOK)
-				{
-					if (!bTriedNoPassword && strlen(passwd) > 0) {		
-						m_pIntegratedPluginInterface->SetPasswordData((const BYTE*)passwd, strlen(passwd));
-						bTriedNoPassword = true;
-					} else {
-						bTriedNoPassword = true;
-
-						AuthDialog ad;
-						//adzm 2010-05-12 - passphrase
-						ad.m_bPassphraseMode = bPassphraseRequired;
-						
-						if (ad.DoDialog(false))
-						{
-							strncpy(passwd, ad.m_passwd,254);
-							if (!bPassphraseRequired && strlen(passwd) > 8) {
-								passwd[8] = '\0';
-							}
-							
-							m_pIntegratedPluginInterface->SetPasswordData((const BYTE*)passwd, strlen(passwd));
-						}
-						else
-						{
-							bCancel = true; // cancel
-						}
-					}
+			std::vector<CARD8> auth_supported;
+			for (int i = 0; i < authAllowedLength; i++) {
+				if (std::find(current_auth.begin(), current_auth.end(), (CARD32)authAllowed[i]) != current_auth.end()) {
+					// only once max per scheme
+					continue;
 				}
-			} while (bSuccess && !bPasswordOK && !bCancel);
 
-			delete[] pChallengeData;
-			
-			if (bSuccess && !bCancel) {
-			
-				BYTE* pResponseData = NULL;
-				int nResponseLength = 0;
-				
-				m_pIntegratedPluginInterface->GetResponse(pResponseData, nResponseLength, nSequenceNumber, bExpectChallenge);
-				
-				WORD wResponseLength = (WORD)nResponseLength;
-				
-				WriteExact((char*)&wResponseLength, sizeof(wResponseLength));
-				
-				WriteExact((char*)pResponseData, nResponseLength);
-		
-				m_pIntegratedPluginInterface->FreeMemory(pResponseData);
+				switch (authAllowed[i]) {
+				case rfbUltraVNC_SecureVNCPlugin:
+				case rfbUltraVNC_MsLogon:
+				case rfbVncAuth:
+				case rfbNoAuth:
+					auth_supported.push_back(authAllowed[i]);
+					break;
+				}
 			}
 
-			nSequenceNumber++;
-		} while (bExpectChallenge && bSuccess);
+			if (!auth_supported.empty()) {
+				std::vector<CARD8> auth_priority(4);
+				auth_priority[0] = rfbUltraVNC_SecureVNCPlugin;
+				auth_priority[1] = rfbUltraVNC_MsLogon;
+				auth_priority[2] = rfbVncAuth;
+				auth_priority[3] = rfbNoAuth;
 
-		if (bCancel) {
-			// cancelled
-			if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,"Authentication cancelled");
-			SetEvent(KillEvent);
-			throw ErrorException("Authentication cancelled");
-		} else if (!bSuccess) {
-			// other failure
-			if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,m_pIntegratedPluginInterface->GetLastErrorString());
-			SetEvent(KillEvent);
-			throw ErrorException(m_pIntegratedPluginInterface->GetLastErrorString());
-		}
-				
-		ReadExact((char *) &authResult, 4);
-		
-		authResult = Swap32IfLE(authResult);
-		
-		switch (authResult) 
-		{		
-		case rfbVncAuthOK:
-			if (m_hwndStatus)vnclog.Print(0, _T("VNC authentication succeeded\n"));
-			if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L55);
-		
-			//adzm 2010-05-10
-			m_pIntegratedPluginInterface->SetHandshakeComplete();
-			if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_PLUGIN_STATUS,m_pIntegratedPluginInterface->DescribeCurrentSettings());
-			g_passwordfailed=false;
-			break;
-		case rfbVncAuthFailed:
-			vnclog.Print(0, _T("VNC authentication failed!"));			
-			if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L56);
-//				if (flash) {flash->Killflash();}
-// 26 February 2008 jdp - speed up auth failure handling
-			SetEvent(KillEvent);
-			throw WarningException(sz_L57,IDS_L57);
-			break;
-		case rfbVncAuthFailedEx: 
-			vnclog.Print(0, _T("VNC authentication failed! Extended information available."));	
-			//adzm 2010-05-11 - Send an explanatory message for the failure (if any)
-			ReadExact((char *)&reasonLen, 4);
-			reasonLen = Swap32IfLE(reasonLen);
+				for (std::vector<CARD8>::iterator best_auth_it = auth_priority.begin(); best_auth_it != auth_priority.end(); best_auth_it++) {
+					if (std::find(auth_supported.begin(), auth_supported.end(), (CARD32)(*best_auth_it)) != auth_supported.end()) {
+						authScheme = *best_auth_it;
+						break;
+					}
+				}
+			}
+
+			if (authScheme == rfbInvalidAuth) {
+				throw WarningException("No supported authentication methods!");
+			}
 			
-			CheckBufferSize(reasonLen+1);
-			ReadString(m_netbuf, reasonLen);
-			
-			vnclog.Print(0, _T("VNC authentication failed! Extended information: %s\n"), m_netbuf);
-			if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,m_netbuf);
-			throw WarningException(m_netbuf);
-			break;
-		case rfbVncAuthTooMany:
-			SetEvent(KillEvent);
-			throw WarningException(
-				sz_L58);
-			break;
-		case rfbMsLogon:		
-			//adzm 2010-05-10
-			m_pIntegratedPluginInterface->SetHandshakeComplete();
-			if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_PLUGIN_STATUS,m_pIntegratedPluginInterface->DescribeCurrentSettings());	
-			AuthMsLogon();
-			break;
-		default:
-			vnclog.Print(0, _T("Unknown VNC authentication result: %d\n"),
-				(int)authResult);
-//				if (flash) {flash->Killflash();}
-			throw ErrorException(sz_L59,IDS_L59);
-			break;
+			CARD8 authSchemeMsg = (CARD8)authScheme;
+			WriteExact((char *)&authSchemeMsg, sizeof(authSchemeMsg));
 		}
-		
-		return;
 	}
 
-	if (m_fUsePlugin && m_pIntegratedPluginInterface && authScheme != rfbConnFailed) 
+	AuthenticateServer(authScheme, current_auth);
+}
+
+void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>& current_auth)
+{
+	if (current_auth.size() > 1) {
+		vnclog.Print(0, _T("Cannot layer more than two authentication schemes\n"), authScheme);
+		throw ErrorException("Cannot layer more than two authentication schemes\n");
+	}
+
+	CARD32 reasonLen;
+	CARD32 authResult;
+
+	if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L90);
+
+	bool bSecureVNCPluginActive = std::find(current_auth.begin(), current_auth.end(), rfbUltraVNC_SecureVNCPlugin) != current_auth.end();
+	
+	if (!bSecureVNCPluginActive && m_fUsePlugin && m_pIntegratedPluginInterface && authScheme != rfbConnFailed && authScheme != rfbUltraVNC_SecureVNCPlugin) 
 	{
 		//adzm 2010-05-12
 		if (m_opts.m_fRequireEncryption) {
@@ -2458,9 +2364,29 @@ void ClientConnection::Authenticate()
 		}
 	}
 	
-    switch (authScheme) {
-		
-    case rfbConnFailed:
+	switch(authScheme)
+	{
+	case rfbUltraVNC_SecureVNCPlugin:
+		if (bSecureVNCPluginActive) {
+			vnclog.Print(0, _T("Cannot layer multiple SecureVNC plugin authentication schemes\n"), authScheme);
+			throw WarningException("Cannot layer multiple SecureVNC plugin authentication schemes\n");
+		}
+		AuthSecureVNCPlugin();
+		break;
+	case rfbUltraVNC_MsLogon:
+	case rfbLegacy_MsLogon:
+		AuthMsLogon();
+		break;
+	case rfbVncAuth:
+		AuthVnc();
+		break;
+	case rfbNoAuth:
+		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L92);
+		vnclog.Print(0, _T("No authentication needed\n"));
+		current_auth.push_back(authScheme);
+		return;
+		break;
+	case rfbConnFailed:
 		ReadExact((char *)&reasonLen, 4);
 		reasonLen = Swap32IfLE(reasonLen);
 		
@@ -2470,267 +2396,207 @@ void ClientConnection::Authenticate()
 		vnclog.Print(0, _T("RFB connection failed, reason: %s\n"), m_netbuf);
 		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L91);
 		throw WarningException(m_netbuf);
-        break;
-		
-    case rfbNoAuth:
-		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L92);
-		vnclog.Print(0, _T("No authentication needed\n"));
 		break;
-		
-    case rfbVncAuth:
-		{
-            if ((m_majorVersion == 3) && (m_minorVersion < 3)) 
-			{
-                /* if server is 3.2 we can't use the new authentication */
-                vnclog.Print(0, _T("Can't use IDEA authentication\n"));
+	default:		
+		vnclog.Print(0, _T("RFB connection failed, unknown authentication method: %lu\n"), authScheme);
+		throw ErrorException("Unknown authentication method!");
+		break;
+	}
 
-                MessageBox(m_hwndMain,
-                    sz_L51, 
-                    sz_L52, 
-                    MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST);
+	current_auth.push_back(authScheme);
 
-                throw WarningException("Can't use IDEA authentication any more!");
-            }
-			// rdv@2002 - v1.1.x
-			char passwd[256];
-			char domain[256];
-			char user[256];
+	// Read the authentication response
+	ReadExact((char *)&authResult, sizeof(authResult));	
+	authResult = Swap32IfLE(authResult);
 
-			memset(passwd, 0, sizeof(char)*256);
-			memset(domain, 0, sizeof(char)*256);
-			memset(user, 0, sizeof(char)*256);
-
-			// We NOT ignore the clear password in case of ms_logon !
-			// finally done !! : Add ms_user & ms_password command line params
-			// act: add user option on command line
-			if (m_ms_logon) 
-			{	// mslogon required
-				// if user cmd line option is not specified, cmd line passwd must be cleared
-				// the same if user is provided and not password
-				if (strlen(m_cmdlnUser)>0)  
-				{	if (strlen(m_clearPasswd)>0)
-					{  //user and password are not empty
-					    strcpy(user, m_cmdlnUser);
-						strcpy(passwd, m_clearPasswd);
-					}
-					else memset(m_cmdlnUser, 0, sizeof(m_cmdlnUser)); // user without password
-				}
-				else
-					memset(m_clearPasswd, 0, sizeof(m_clearPasswd));
-
-			}
-
-			// Was the password already specified in a config file or entered for DSMPlugin ?
-			// Modif sf@2002 - A clear password can be transmitted via the vncviewer command line
-			if (strlen(m_clearPasswd)>0)
-			{
-				strcpy(passwd, m_clearPasswd);
-			    if (m_ms_logon) strcpy(user, m_cmdlnUser);
-			    
-			} 
-			else if (strlen((const char *) m_encPasswd)>0)
-			{  char * pw = vncDecryptPasswd(m_encPasswd);
-				strcpy(passwd, pw);
-				free(pw);
-			}
-			else if (strlen((const char *) m_encPasswdMs)>0)
-			{  char * pw = vncDecryptPasswdMs(m_encPasswdMs);
-			   strcpy(passwd, pw);
-			   free(pw);
-			   strcpy(user, m_ms_user);
-			}
-			else 
-			{
-				AuthDialog ad;
-				///////////////ppppppppppppppppppppppppppppppppppppppppp
-				if (ad.DoDialog(m_ms_logon))
-				{
-//					flash = new BmpFlasher;
-					#ifndef UNDER_CE
-					strncpy(passwd, ad.m_passwd,254);
-					strncpy(user, ad.m_user,254);
-					strncpy(domain, ad.m_domain,254);
-					#else
-					int origlen = _tcslen(ad.m_passwd);
-					int newlen = WideCharToMultiByte(
-						CP_ACP,    // code page
-						0,         // performance and mapping flags
-						ad.m_passwd, // address of wide-character string
-						origlen,   // number of characters in string
-						passwd,    // address of buffer for new string
-						255,       // size of buffer
-						NULL, NULL );
-					
-					passwd[newlen]= '\0';
-					//user
-					origlen = _tcslen(ad.m_user);
-					newlen = WideCharToMultiByte(
-						CP_ACP,    // code page
-						0,         // performance and mapping flags
-						ad.m_user, // address of wide-character string
-						origlen,   // number of characters in string
-						user,    // address of buffer for new string
-						255,       // size of buffer
-						NULL, NULL );
-					
-					user[newlen]= '\0';
-					//domain
-					origlen = _tcslen(ad.m_domain);
-					newlen = WideCharToMultiByte(
-						CP_ACP,    // code page
-						0,         // performance and mapping flags
-						ad.m_domain, // address of wide-character string
-						origlen,   // number of characters in string
-						domain,    // address of buffer for new string
-						255,       // size of buffer
-						NULL, NULL );
-					
-					domain[newlen]= '\0';
-#endif
-					if (strlen(user)==0 ||!m_ms_logon)//need longer passwd for ms
-						{
-							if (strlen(passwd) == 0) {
-//								if (flash) {flash->Killflash();}
-								vnclog.Print(0, _T("Password had zero length\n"));
-								throw WarningException(sz_L53);
-							}
-							if (strlen(passwd) > 8) {
-								passwd[8] = '\0';
-							}
-						}
-					if (m_ms_logon) 
-					{
-						vncEncryptPasswdMs(m_encPasswdMs, passwd);
-						strcpy(m_ms_user, user);
-					}
-					else
-						vncEncryptPasswd(m_encPasswd, passwd);
-				} 
-				else 
-				{
-//					if (flash) {flash->Killflash();}
-					throw QuietException(sz_L54);
-				}
-			}
-			/*
-			// sf@2002 - DSM Plugin
-			if (m_pDSMPlugin->IsEnabled())
-			{
-				// Initialize the DSL Plugin with the entered password
-				if (!m_pDSMPlugin->SetPluginParams(NULL, passwd))
-				{
-					m_pDSMPlugin->SetEnabled(false);
-					m_fUsePlugin = false;
-					vnclog.Print(0, _T("DSMPlugin cannot be configured\n"));
-					throw WarningException("DSMPlugin cannot be configured");
-				}
-
-				m_fUsePlugin = true;
-
-				// TODO: Make a special challenge with time stamp 
-				// to prevent recording the logon session for later replay
-
-			}
-			*/
-
-			// sf@2002 
-			// m_ms_logon = false;
-			if (m_ms_logon) ReadExact((char *)challengems, CHALLENGESIZEMS);
-			ReadExact((char *)challenge, CHALLENGESIZE);
-
-			// MS logon
-			if (m_ms_logon) 
-			{
-				int i=0;
-				for (i=0;i<32;i++)
-				{
-					challengems[i]=m_encPasswdMs[i]^challengems[i];
-				}
-				WriteExact((char *) user, sizeof(char)*256);
-				WriteExact((char *) domain, sizeof(char)*256);
-				WriteExact((char *) challengems, CHALLENGESIZEMS);
-				vncEncryptBytes(challenge, passwd);
-
-				/* Lose the plain-text password from memory */
-				int nLen = (int)strlen(passwd);
-				for ( i=0; i< nLen; i++) {
-					passwd[i] = '\0';
-				}
+	if (m_pIntegratedPluginInterface && authScheme == rfbUltraVNC_SecureVNCPlugin) {
+		m_pIntegratedPluginInterface->SetHandshakeComplete();
+		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_PLUGIN_STATUS,m_pIntegratedPluginInterface->DescribeCurrentSettings());	
+	}
+	
+	switch (authResult) 
+	{		
+	case rfbVncAuthOK:
+		if (m_hwndStatus)vnclog.Print(0, _T("VNC authentication succeeded\n"));
+		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L55);
+	
+		g_passwordfailed=false;
+		break;
+	case rfbVncAuthFailed:
+	case rfbVncAuthFailedEx: 
+		vnclog.Print(0, _T("VNC authentication failed!"));			
+		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L56);
+		if (m_minorVersion >= 7 || authResult == rfbVncAuthFailedEx) {
+			vnclog.Print(0, _T("VNC authentication failed! Extended information available."));	
+			//adzm 2010-05-11 - Send an explanatory message for the failure (if any)
+			ReadExact((char *)&reasonLen, 4);
+			reasonLen = Swap32IfLE(reasonLen);
 			
-				WriteExact((char *) challenge, CHALLENGESIZE);
-			}
-			else // Regular VNC logon
-			{
-				vncEncryptBytes(challenge, passwd);
-
-				/* Lose the plain-text password from memory */
-				int nLen = (int)strlen(passwd);
-				for (int i=0; i< nLen; i++) {
-					passwd[i] = '\0';
-				}
+			CheckBufferSize(reasonLen+1);
+			ReadString(m_netbuf, reasonLen);
 			
-				WriteExact((char *) challenge, CHALLENGESIZE);
-			}
-			ReadExact((char *) &authResult, 4);
-			
-			authResult = Swap32IfLE(authResult);
-			
-			switch (authResult) 
-			{
-			case rfbVncAuthOK:
-				if (m_hwndStatus)vnclog.Print(0, _T("VNC authentication succeeded\n"));
-				SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L55);
-				g_passwordfailed=false;
-				break;
-			case rfbVncAuthFailed:
-				vnclog.Print(0, _T("VNC authentication failed!"));
-				
-				// Fix by Act: suppress command line password if it's wrong.
-			    m_pApp->m_options.m_NoMoreCommandLineUserPassword = TRUE;
-					
-
-				g_passwordfailed=true;
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L56);
-//				if (flash) {flash->Killflash();}
-// 26 February 2008 jdp - speed up auth failure handling
-				SetEvent(KillEvent);
-				throw WarningException(sz_L57,IDS_L57);
-			case rfbVncAuthTooMany:
-				SetEvent(KillEvent);
-				throw WarningException(
-					sz_L58);
-			default:
-				vnclog.Print(0, _T("Unknown VNC authentication result: %d\n"),
-					(int)authResult);
-//				if (flash) {flash->Killflash();}
-				throw ErrorException(sz_L59,IDS_L59);
-			}
-			break;
+			vnclog.Print(0, _T("VNC authentication failed! Extended information: %s\n"), m_netbuf);
+			if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,m_netbuf);
+			throw WarningException(m_netbuf);
+		} else {
+			vnclog.Print(0, _T("VNC authentication failed!"));	
+			SetEvent(KillEvent);
+			throw WarningException(sz_L57,IDS_L57);
 		}
-    case rfbMsLogon:
+		break;
+	case rfbVncAuthTooMany:
+		SetEvent(KillEvent);
+		throw WarningException(
+			sz_L58);
+		break;
+	case rfbLegacy_MsLogon:
+		if (m_minorVersion >= 7) {
+			vnclog.Print(0, _T("Invalid auth response for protocol version.\n"));	
+			throw ErrorException("Invalid auth response");
+		}
+		if ((authScheme != rfbUltraVNC_SecureVNCPlugin) || !m_pIntegratedPluginInterface) {
+			vnclog.Print(0, _T("Invalid auth response response\n"));	
+			throw ErrorException("Invalid auth response");
+		}
+		//adzm 2010-05-10
 		AuthMsLogon();
 		break;
-	case rfbUltraVNC_SecureVNCPlugin:
-		vnclog.Print(0, _T("SecureVNCPlugin authentication failed (SecureVNCPlugin plugin not available)"));
-		
-		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,"SecureVNCPlugin authentication failed (SecureVNCPlugin plugin not available)");
-//				if (flash) {flash->Killflash();}
-// 26 February 2008 jdp - speed up auth failure handling
-		SetEvent(KillEvent);
-		throw ErrorException("SecureVNCPlugin authentication failed (SecureVNCPlugin plugin not available)");
+	case rfbVncAuthContinue:
+		if (m_minorVersion < 7) {
+			vnclog.Print(0, _T("Invalid auth continue response for protocol version.\n"));	
+			throw ErrorException("Invalid auth continue response");
+		}
+		if (authScheme != rfbUltraVNC_SecureVNCPlugin) {
+			vnclog.Print(0, _T("Invalid auth continue response\n"));	
+			throw ErrorException("Invalid auth continue response");
+		}
+		if (current_auth.size() > 1) {
+			vnclog.Print(0, _T("Cannot layer more than two authentication schemes\n"), authScheme);
+			throw ErrorException("Cannot layer more than two authentication schemes\n");
+		}
+		Authenticate(current_auth);
 		break;
 	default:
-		vnclog.Print(0, _T("Unknown authentication scheme from RFB server: %d\n"),
-			(int)authScheme);
-//		if (flash) {flash->Killflash();}
-		throw ErrorException(sz_L60,IDS_L60);
-    }
+		vnclog.Print(0, _T("Unknown VNC authentication result: %d\n"),
+			(int)authResult);
+//				if (flash) {flash->Killflash();}
+		throw ErrorException(sz_L59,IDS_L59);
+		break;
+	}
+	
+	return;
 }
+
+void ClientConnection::AuthSecureVNCPlugin()
+{
+	if (!m_pIntegratedPluginInterface) {				
+		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,"SecureVNCPlugin authentication failed (SecureVNCPlugin interface available)");
+		SetEvent(KillEvent);
+		throw ErrorException("SecureVNCPlugin authentication failed (no plugin interface available)");
+	}
+			
+	char passwd[256];
+	passwd[0] = '\0';
+	
+	if (strlen(m_clearPasswd)>0)
+	{
+		strcpy(passwd, m_clearPasswd);			
+	} 
+	else if (strlen((const char *) m_encPasswd)>0)
+	{  char * pw = vncDecryptPasswd(m_encPasswd);
+		strcpy(passwd, pw);
+		free(pw);
+	}
+	m_pIntegratedPluginInterface->SetPasswordData(NULL, 0);
+
+	int nSequenceNumber = 0;
+	bool bExpectChallenge = true;
+	bool bTriedNoPassword = false;
+	bool bSuccess = false;
+	bool bCancel = false;
+	do {
+
+		WORD wChallengeLength = 0;
+
+		ReadExact((char*)&wChallengeLength, sizeof(wChallengeLength));
+
+		BYTE* pChallengeData = new BYTE[wChallengeLength];
+
+		ReadExact((char*)pChallengeData, wChallengeLength);
+				
+		bool bPasswordOK = false;
+		bool bPassphraseRequired = false;
+		bSuccess = false;
+		do {
+			bSuccess = m_pIntegratedPluginInterface->HandleChallenge(pChallengeData, wChallengeLength, nSequenceNumber, bPasswordOK, bPassphraseRequired);
+			if (bSuccess && !bPasswordOK)
+			{
+				if (!bTriedNoPassword && strlen(passwd) > 0) {		
+					m_pIntegratedPluginInterface->SetPasswordData((const BYTE*)passwd, strlen(passwd));
+					bTriedNoPassword = true;
+				} else {
+					bTriedNoPassword = true;
+
+					AuthDialog ad;
+					//adzm 2010-05-12 - passphrase
+					ad.m_bPassphraseMode = bPassphraseRequired;
+					
+					if (ad.DoDialog(false))
+					{
+						strncpy(passwd, ad.m_passwd,254);
+						if (!bPassphraseRequired && strlen(passwd) > 8) {
+							passwd[8] = '\0';
+						}
+						
+						m_pIntegratedPluginInterface->SetPasswordData((const BYTE*)passwd, strlen(passwd));
+					}
+					else
+					{
+						bCancel = true; // cancel
+					}
+				}
+			}
+		} while (bSuccess && !bPasswordOK && !bCancel);
+
+		delete[] pChallengeData;
+		
+		if (bSuccess && !bCancel) {
+		
+			BYTE* pResponseData = NULL;
+			int nResponseLength = 0;
+			
+			m_pIntegratedPluginInterface->GetResponse(pResponseData, nResponseLength, nSequenceNumber, bExpectChallenge);
+			
+			WORD wResponseLength = (WORD)nResponseLength;
+			
+			WriteExact((char*)&wResponseLength, sizeof(wResponseLength));
+			
+			WriteExact((char*)pResponseData, nResponseLength);
+	
+			m_pIntegratedPluginInterface->FreeMemory(pResponseData);
+		}
+
+		nSequenceNumber++;
+	} while (bExpectChallenge && bSuccess);
+
+	if (bCancel) {
+		// cancelled
+		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,"Authentication cancelled");
+		SetEvent(KillEvent);
+		throw ErrorException("Authentication cancelled");
+	} else if (!bSuccess) {
+		// other failure
+		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,m_pIntegratedPluginInterface->GetLastErrorString());
+		SetEvent(KillEvent);
+		throw ErrorException(m_pIntegratedPluginInterface->GetLastErrorString());
+	}
+}	
 
 // marscha@2006: Try to better hide the windows password.
 // I know that this is no breakthrough in modern cryptography.
 // It's just a patch/kludge/workaround.
-void ClientConnection::AuthMsLogon() {
+void ClientConnection::AuthMsLogon() 
+{
 	char gen[8], mod[8], pub[8], resp[8];
 	char user[256], passwd[64];
 	unsigned char key[8];
@@ -2799,36 +2665,69 @@ void ClientConnection::AuthMsLogon() {
 	vncEncryptBytes2((unsigned char*) user, sizeof(user), key);
 	vncEncryptBytes2((unsigned char*) passwd, sizeof(passwd), key);
 	
-	WriteExact(user, sizeof(user));
+	WriteExactQueue(user, sizeof(user));
 	WriteExact(passwd, sizeof(passwd));
-
-
-	CARD32 authResult;
-	ReadExact((char *) &authResult, 4);
-	
-	authResult = Swap32IfLE(authResult);
-	
-	switch (authResult) {
-	case rfbVncAuthOK:
-		vnclog.Print(0, _T("MS-Logon (DH) authentication succeeded.\n"));
-		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L55);
-		g_passwordfailed=false;
-		break;
-	case rfbVncAuthFailed:
-		vnclog.Print(0, _T("MS-Logon (DH) authentication failed!\n"));
-		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L56);
-		m_pApp->m_options.m_NoMoreCommandLineUserPassword = TRUE; // Fix by Act
-		g_passwordfailed=true;
-		throw WarningException(sz_L57,IDS_L57);
-	case rfbVncAuthTooMany:
-		throw WarningException(sz_L58,IDS_L58);
-	default:
-		vnclog.Print(0, _T("Unknown MS-Logon (DH) authentication result: %d\n"),
-			(int)authResult);
-		throw ErrorException(sz_L59,IDS_L59);
-	}
 }
-#endif
+
+
+void ClientConnection::AuthVnc()
+{
+	CARD8 challenge[CHALLENGESIZE];
+	CARD32 authResult=rfbVncAuthFailed;
+	if ((m_majorVersion == 3) && (m_minorVersion < 3)) 
+	{
+		/* if server is 3.2 we can't use the new authentication */
+		vnclog.Print(0, _T("Can't use IDEA authentication\n"));
+		MessageBox(m_hwndMain,sz_L51, sz_L52, MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST);
+		throw WarningException("Can't use IDEA authentication any more!");
+	}
+	// rdv@2002 - v1.1.x
+	char passwd[256];
+	memset(passwd, 0, sizeof(char)*256);		
+	// Was the password already specified in a config file or entered for DSMPlugin ?
+	// Modif sf@2002 - A clear password can be transmitted via the vncviewer command line
+	if (strlen(m_clearPasswd)>0)
+	{
+		strcpy(passwd, m_clearPasswd);
+	} 
+	else if (strlen((const char *) m_encPasswd)>0)
+	{
+		char * pw = vncDecryptPasswd(m_encPasswd);
+		strcpy(passwd, pw);
+		free(pw);
+	}
+	else 
+	{
+		AuthDialog ad;
+		if (ad.DoDialog(false))
+		{
+			strncpy(passwd, ad.m_passwd,254);					
+			if (strlen(passwd) == 0) 
+			{
+				vnclog.Print(0, _T("Password had zero length\n"));
+				throw WarningException(sz_L53);
+			}
+			if (strlen(passwd) > 8) 
+			{
+				passwd[8] = '\0';
+			}
+			vncEncryptPasswd(m_encPasswd, passwd);
+		} 
+		else 
+		{
+			throw QuietException(sz_L54);
+		}
+	}
+	ReadExact((char *)challenge, CHALLENGESIZE);			
+	vncEncryptBytes(challenge, passwd);
+	/* Lose the plain-text password from memory */
+	int nLen = (int)strlen(passwd);
+	for (int i=0; i< nLen; i++) 
+	{
+		passwd[i] = '\0';
+	}			
+	WriteExact((char *) challenge, CHALLENGESIZE);
+}
 
 void ClientConnection::SendClientInit()
 {
@@ -5181,6 +5080,9 @@ void ClientConnection::ReadServerState()
 // Reads the number of bytes specified into the buffer given
 void ClientConnection::ReadExact(char *inbuf, int wanted)
 {
+	if (wanted == 0) {
+		return;
+	}
 	//omni_mutex_lock l(m_readMutex);
 	// Status window and connection activity updates
 	// We comment this because it just takes too much time to the viewer thread
@@ -5435,6 +5337,9 @@ void ClientConnection::ReadExactProtocolVersion(char *inbuf, int wanted, bool& f
 
 void ClientConnection::ReadExactProxy(char *inbuf, int wanted)
 {
+	if (wanted == 0) {
+		return;
+	}
 	//omni_mutex_lock l(m_readMutex);
 	// Status window and connection activity updates
 	// We comment this because it just takes too much time to the viewer thread
@@ -8491,6 +8396,3 @@ void ClientConnection::NotifyPluginStreamingSupport()
 	WriteExact((char *)&msg, sz_rfbNotifyPluginStreamingMsg, rfbNotifyPluginStreaming);
 	m_fPluginStreamingOut = true;
 }
-
-
-#pragma warning(default :4101)

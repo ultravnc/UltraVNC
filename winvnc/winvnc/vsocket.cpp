@@ -789,16 +789,19 @@ VSocket::SendExactQueue(const char *buff, const VCard bufflen)
   return result == (VInt)nBufflen;
 }
 ///////////////////////////////
-void
+VBool
 VSocket::ClearQueue()
 {
 	if (queuebuffersize!=0)
   {
 	//adzm 2010-08-01
 	m_LastSentTick = GetTickCount();
-	send(sock,queuebuffer,queuebuffersize,0);	
+	//adzm 2010-09 - return a bool in ClearQueue
+	if (!send(sock,queuebuffer,queuebuffersize,0))
+		return VFalse;
 	queuebuffersize=0;
   }
+  return VTrue;
 }
 ////////////////////////////
 

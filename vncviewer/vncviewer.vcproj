@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="vncviewer"
 	ProjectGUID="{357D07B6-0613-4B05-9D22-1764A49AC945}"
 	RootNamespace="vncviewer"
@@ -428,11 +428,11 @@
 				>
 			</File>
 			<File
-				RelativePath="res\stat\background2.bmp"
+				RelativePath="res\background2.bmp"
 				>
 			</File>
 			<File
-				RelativePath="res\background2.bmp"
+				RelativePath="res\stat\background2.bmp"
 				>
 			</File>
 			<File
@@ -560,15 +560,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Tango_lx.bmp"
-				>
-			</File>
-			<File
 				RelativePath=".\res\Tango_lx.bmp"
 				>
 			</File>
 			<File
-				RelativePath=".\res\Tango_s.bmp"
+				RelativePath=".\Tango_lx.bmp"
 				>
 			</File>
 			<File
@@ -576,11 +572,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\res\Tango_sx.bmp"
+				RelativePath=".\res\Tango_s.bmp"
 				>
 			</File>
 			<File
 				RelativePath=".\Tango_sx.bmp"
+				>
+			</File>
+			<File
+				RelativePath=".\res\Tango_sx.bmp"
 				>
 			</File>
 			<File
@@ -811,10 +811,6 @@
 					PreprocessorDefinitions=""
 				/>
 			</FileConfiguration>
-		</File>
-		<File
-			RelativePath=".\clientauthrfb38.cpp"
-			>
 		</File>
 		<File
 			RelativePath="ClientConnection.cpp"
