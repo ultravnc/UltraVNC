@@ -287,7 +287,7 @@ typedef char rfbProtocolVersionMsg[13];	/* allow extra byte for null */
 // adzm 2010-09 - After rfbUltraVNC, auth repeats via rfbVncAuthContinue
 
 // adzm 2010-09 - Ultra subtypes - SecureVNCPlugin will remain as the Ultra value
-//#define rfbUltraVNC_MsLogonIAuth 0x70 // we don't seem to ever send this any more?
+#define rfbUltraVNC_MsLogonIAuth 0x70
 
 	// mslogonI never seems to be used anymore -- the old code would say if (m_ms_logon) AuthMsLogon (II) else AuthVnc
 	// and within AuthVnc would be if (m_ms_logon) { /* mslogon code */ }. That could never be hit since the first case

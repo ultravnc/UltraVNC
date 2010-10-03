@@ -422,7 +422,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_Is_Listening=0;
 
 	//ms logon
-	m_ms_logon=false;
+	m_ms_logon_I_legacy=false;
 
 	// sf@2002 - FileTransfer on server
 	m_fServerKnowsFileTransfer = false;
@@ -2066,7 +2066,7 @@ void ClientConnection::NegotiateProtocolVersion()
 	// Minor = 6 means that server support FileTransfer and requires normal VNC logon
 	if (m_minorVersion == 4)
 	{
-		m_ms_logon = true;
+		m_ms_logon_I_legacy = true;
 		m_fServerKnowsFileTransfer = true;
 	}
 	else if (m_minorVersion == 6) // 6 because 5 already used in TightVNC viewer for some reason
@@ -2075,25 +2075,23 @@ void ClientConnection::NegotiateProtocolVersion()
 	}
 	else if (m_minorVersion == 7) // adzm 2010-09 - RFB 3.8
 	{
-#pragma message("RFB3.8 - m_fServerKnowsFileTransfer should be set via an encoding")
-		m_fServerKnowsFileTransfer = true;
+		// adzm2010-10 - RFB3.8 - m_fServerKnowsFileTransfer set during rfbUltraVNC auth
 	}
 	else if (m_minorVersion == 8) // adzm 2010-09 - RFB 3.8
 	{
-#pragma message("RFB3.8 - m_fServerKnowsFileTransfer should be set via an encoding")
-		m_fServerKnowsFileTransfer = true;
+		// adzm2010-10 - RFB3.8 - m_fServerKnowsFileTransfer set during rfbUltraVNC auth
 	}
 	// Added for SC so we can do something before actual data transfer start
 	if (m_minorVersion == 14 )
 	{
-		m_ms_logon = true;
+		m_ms_logon_I_legacy = true;
 		m_fServerKnowsFileTransfer = true;
 	}
 	else if ( m_minorVersion == 16)
 	{
 		m_fServerKnowsFileTransfer = true;
 	}
-	else if ( m_minorVersion == 18)
+	else if ( m_minorVersion == 18) // adzm 2010-09 - RFB 3.8
 	{
 		m_fServerKnowsFileTransfer = true;
 	}
@@ -2265,6 +2263,16 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 	if (m_minorVersion < 7) {	
 		ReadExact((char *)&authScheme, sizeof(authScheme));
 		authScheme = Swap32IfLE(authScheme);
+
+		// adzm 2010-10 - TRanslate legacy constants into new 3.8-era constants
+		switch (authScheme) {
+			case rfbLegacy_SecureVNCPlugin:
+				authScheme = rfbUltraVNC_SecureVNCPluginAuth;
+				break;
+			case rfbLegacy_MsLogon:
+				authScheme = rfbUltraVNC_MsLogonIIAuth;
+				break;
+		}
 	} else {		
 		CARD8 authAllowedLength = 0;
 		ReadExact((char *)&authAllowedLength, sizeof(authAllowedLength));
@@ -2282,8 +2290,9 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 				}
 
 				switch (authAllowed[i]) {
-				case rfbUltraVNC_SecureVNCPlugin:
-				case rfbUltraVNC_MsLogon:
+				case rfbUltraVNC:
+				case rfbUltraVNC_SecureVNCPluginAuth:
+				case rfbUltraVNC_MsLogonIIAuth:
 				case rfbVncAuth:
 				case rfbNoAuth:
 					auth_supported.push_back(authAllowed[i]);
@@ -2292,11 +2301,12 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 			}
 
 			if (!auth_supported.empty()) {
-				std::vector<CARD8> auth_priority(4);
-				auth_priority[0] = rfbUltraVNC_SecureVNCPlugin;
-				auth_priority[1] = rfbUltraVNC_MsLogon;
-				auth_priority[2] = rfbVncAuth;
-				auth_priority[3] = rfbNoAuth;
+				std::vector<CARD8> auth_priority;
+				auth_priority.push_back(rfbUltraVNC);
+				auth_priority.push_back(rfbUltraVNC_SecureVNCPluginAuth);
+				auth_priority.push_back(rfbUltraVNC_MsLogonIIAuth);
+				auth_priority.push_back(rfbVncAuth);
+				auth_priority.push_back(rfbNoAuth);
 
 				for (std::vector<CARD8>::iterator best_auth_it = auth_priority.begin(); best_auth_it != auth_priority.end(); best_auth_it++) {
 					if (std::find(auth_supported.begin(), auth_supported.end(), (CARD32)(*best_auth_it)) != auth_supported.end()) {
@@ -2330,9 +2340,9 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 
 	if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L90);
 
-	bool bSecureVNCPluginActive = std::find(current_auth.begin(), current_auth.end(), rfbUltraVNC_SecureVNCPlugin) != current_auth.end();
+	bool bSecureVNCPluginActive = std::find(current_auth.begin(), current_auth.end(), rfbUltraVNC_SecureVNCPluginAuth) != current_auth.end();
 	
-	if (!bSecureVNCPluginActive && m_fUsePlugin && m_pIntegratedPluginInterface && authScheme != rfbConnFailed && authScheme != rfbUltraVNC_SecureVNCPlugin) 
+	if (!bSecureVNCPluginActive && m_fUsePlugin && m_pIntegratedPluginInterface && authScheme != rfbConnFailed && authScheme != rfbUltraVNC_SecureVNCPluginAuth) 
 	{
 		//adzm 2010-05-12
 		if (m_opts.m_fRequireEncryption) {
@@ -2366,19 +2376,27 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 	
 	switch(authScheme)
 	{
-	case rfbUltraVNC_SecureVNCPlugin:
+	case rfbUltraVNC:
+		m_fServerKnowsFileTransfer = true;
+		break;
+	case rfbUltraVNC_SecureVNCPluginAuth:
 		if (bSecureVNCPluginActive) {
 			vnclog.Print(0, _T("Cannot layer multiple SecureVNC plugin authentication schemes\n"), authScheme);
 			throw WarningException("Cannot layer multiple SecureVNC plugin authentication schemes\n");
 		}
 		AuthSecureVNCPlugin();
 		break;
-	case rfbUltraVNC_MsLogon:
-	case rfbLegacy_MsLogon:
-		AuthMsLogon();
+	case rfbUltraVNC_MsLogonIIAuth:
+		AuthMsLogonII();
 		break;
+	case rfbUltraVNC_MsLogonIAuth:
+		m_ms_logon_I_legacy = true;
 	case rfbVncAuth:
-		AuthVnc();
+		if (m_ms_logon_I_legacy) {
+			AuthMsLogonI();
+		} else {
+			AuthVnc();
+		}
 		break;
 	case rfbNoAuth:
 		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L92);
@@ -2409,7 +2427,7 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 	ReadExact((char *)&authResult, sizeof(authResult));	
 	authResult = Swap32IfLE(authResult);
 
-	if (m_pIntegratedPluginInterface && authScheme == rfbUltraVNC_SecureVNCPlugin) {
+	if (m_pIntegratedPluginInterface && authScheme == rfbUltraVNC_SecureVNCPluginAuth) {
 		m_pIntegratedPluginInterface->SetHandshakeComplete();
 		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_PLUGIN_STATUS,m_pIntegratedPluginInterface->DescribeCurrentSettings());	
 	}
@@ -2454,25 +2472,25 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 			vnclog.Print(0, _T("Invalid auth response for protocol version.\n"));	
 			throw ErrorException("Invalid auth response");
 		}
-		if ((authScheme != rfbUltraVNC_SecureVNCPlugin) || !m_pIntegratedPluginInterface) {
+		if ((authScheme != rfbUltraVNC_SecureVNCPluginAuth) || !m_pIntegratedPluginInterface) {
 			vnclog.Print(0, _T("Invalid auth response response\n"));	
 			throw ErrorException("Invalid auth response");
 		}
 		//adzm 2010-05-10
-		AuthMsLogon();
+		AuthMsLogonII();
 		break;
 	case rfbVncAuthContinue:
 		if (m_minorVersion < 7) {
 			vnclog.Print(0, _T("Invalid auth continue response for protocol version.\n"));	
 			throw ErrorException("Invalid auth continue response");
 		}
-		if (authScheme != rfbUltraVNC_SecureVNCPlugin) {
+		if (authScheme != rfbUltraVNC_SecureVNCPluginAuth && authScheme != rfbUltraVNC) {
 			vnclog.Print(0, _T("Invalid auth continue response\n"));	
 			throw ErrorException("Invalid auth continue response");
 		}
-		if (current_auth.size() > 1) {
-			vnclog.Print(0, _T("Cannot layer more than two authentication schemes\n"), authScheme);
-			throw ErrorException("Cannot layer more than two authentication schemes\n");
+		if (current_auth.size() > 5) { // arbitrary
+			vnclog.Print(0, _T("Cannot layer more than six authentication schemes\n"), authScheme);
+			throw ErrorException("Cannot layer more than six authentication schemes\n");
 		}
 		Authenticate(current_auth);
 		break;
@@ -2595,7 +2613,7 @@ void ClientConnection::AuthSecureVNCPlugin()
 // marscha@2006: Try to better hide the windows password.
 // I know that this is no breakthrough in modern cryptography.
 // It's just a patch/kludge/workaround.
-void ClientConnection::AuthMsLogon() 
+void ClientConnection::AuthMsLogonII() 
 {
 	char gen[8], mod[8], pub[8], resp[8];
 	char user[256], passwd[64];
@@ -2645,7 +2663,8 @@ void ClientConnection::AuthMsLogon()
 	else
 	{
 	AuthDialog ad;
-	if (ad.DoDialog(m_ms_logon, true)) {
+	// adzm 2010-10 - RFB3.8 - the 'mslogon' param woudl always be true here
+	if (ad.DoDialog(true, true)) {
 #ifndef UNDER_CE
 		strncpy(passwd, ad.m_passwd, 64);
 		strncpy(user, ad.m_user, 254);
@@ -2667,6 +2686,126 @@ void ClientConnection::AuthMsLogon()
 	
 	WriteExactQueue(user, sizeof(user));
 	WriteExact(passwd, sizeof(passwd));
+}
+
+void ClientConnection::AuthMsLogonI() 
+{
+	if (!m_ms_logon_I_legacy) {		
+		vnclog.Print(0, _T("AuthMsLogonI should not be called!\n"));
+		throw WarningException("AuthMsLogonI should not be called!\n");
+	}
+
+    CARD8 challenge[CHALLENGESIZE];
+	CARD8 challengems[CHALLENGESIZEMS];
+
+	// rdv@2002 - v1.1.x
+	char passwd[256];
+	char domain[256];
+	char user[256];
+
+	memset(passwd, 0, sizeof(char)*256);
+	memset(domain, 0, sizeof(char)*256);
+	memset(user, 0, sizeof(char)*256);
+
+	// We NOT ignore the clear password in case of ms_logon !
+	// finally done !! : Add ms_user & ms_password command line params
+	// act: add user option on command line
+	if (m_ms_logon_I_legacy) 
+	{	// mslogon required
+		// if user cmd line option is not specified, cmd line passwd must be cleared
+		// the same if user is provided and not password
+		if (strlen(m_cmdlnUser)>0)  
+		{	if (strlen(m_clearPasswd)>0)
+			{  //user and password are not empty
+			    strcpy(user, m_cmdlnUser);
+				strcpy(passwd, m_clearPasswd);
+			}
+			else memset(m_cmdlnUser, 0, sizeof(m_cmdlnUser)); // user without password
+		}
+		else
+			memset(m_clearPasswd, 0, sizeof(m_clearPasswd));
+
+	}
+
+	// Was the password already specified in a config file or entered for DSMPlugin ?
+	// Modif sf@2002 - A clear password can be transmitted via the vncviewer command line
+	if (strlen(m_clearPasswd)>0)
+	{
+		strcpy(passwd, m_clearPasswd);
+	    if (m_ms_logon_I_legacy) strcpy(user, m_cmdlnUser);
+	    
+	} 
+	else if (strlen((const char *) m_encPasswd)>0)
+	{  char * pw = vncDecryptPasswd(m_encPasswd);
+		strcpy(passwd, pw);
+		free(pw);
+	}
+	else if (strlen((const char *) m_encPasswdMs)>0)
+	{  char * pw = vncDecryptPasswdMs(m_encPasswdMs);
+	   strcpy(passwd, pw);
+	   free(pw);
+	   strcpy(user, m_ms_user);
+	}
+	else 
+	{
+		AuthDialog ad;
+		///////////////ppppppppppppppppppppppppppppppppppppppppp // adzm 2010-10 - what?
+		if (ad.DoDialog(true))
+		{
+//					flash = new BmpFlasher;
+			strncpy(passwd, ad.m_passwd,254);
+			strncpy(user, ad.m_user,254);
+			strncpy(domain, ad.m_domain,254);
+			if (strlen(user)==0 ||!m_ms_logon_I_legacy)//need longer passwd for ms
+				{
+					if (strlen(passwd) == 0) {
+//								if (flash) {flash->Killflash();}
+						vnclog.Print(0, _T("Password had zero length\n"));
+						throw WarningException(sz_L53);
+					}
+					if (strlen(passwd) > 8) {
+						passwd[8] = '\0';
+					}
+				}
+			if (m_ms_logon_I_legacy) 
+			{
+				vncEncryptPasswdMs(m_encPasswdMs, passwd);
+				strcpy(m_ms_user, user);
+			}
+		} 
+		else 
+		{
+//					if (flash) {flash->Killflash();}
+			throw QuietException(sz_L54);
+		}
+	}
+
+	// sf@2002 
+	// m_ms_logon = false;
+	if (m_ms_logon_I_legacy) ReadExact((char *)challengems, CHALLENGESIZEMS);
+	ReadExact((char *)challenge, CHALLENGESIZE);
+
+	// MS logon
+	if (m_ms_logon_I_legacy) 
+	{
+		int i=0;
+		for (i=0;i<32;i++)
+		{
+			challengems[i]=m_encPasswdMs[i]^challengems[i];
+		}
+		WriteExact((char *) user, sizeof(char)*256);
+		WriteExact((char *) domain, sizeof(char)*256);
+		WriteExact((char *) challengems, CHALLENGESIZEMS);
+		vncEncryptBytes(challenge, passwd);
+
+		/* Lose the plain-text password from memory */
+		int nLen = (int)strlen(passwd);
+		for ( i=0; i< nLen; i++) {
+			passwd[i] = '\0';
+		}
+	
+		WriteExact((char *) challenge, CHALLENGESIZE);
+	}
 }
 
 
