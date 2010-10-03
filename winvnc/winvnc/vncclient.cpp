@@ -901,15 +901,14 @@ vncClientThread::InitVersion()
 	if (m_major != rfbProtocolMajorVersion)
 		return FALSE;
 
-	// adzm 2010-09 - see rfbproto.h for more discussion on all this
 	m_ms_logon = m_server->MSLogonRequired();
 	vnclog.Print(LL_INTINFO, VNCLOG("m_ms_logon set to %s"), m_ms_logon ? "true" : "false");
 
-#pragma message("TODO - RFB3.8 - UltraViewer is used for text chat. Should be handled in an encoding message. This prevents 3.8 server-initiated text chat.")
-	if (m_minor == 4 || m_minor == 6 ) {
-		m_client->SetUltraViewer(true);
-	}
-	else if (SPECIAL_SC_PROMPT && (m_minor ==14 || m_minor == 16 || m_minor == 18))
+#pragma message("RFB 3.8 - Remove or modify SC_PROMPT to not use special protocol numbers")
+	// adzm 2010-09 - see rfbproto.h for more discussion on all this
+	m_client->SetUltraViewer(false); // sf@2005 - Fix Open TextChat from server bug 
+	// UltraViewer will be set when viewer responds with rfbUltraVNC Auth type
+	if (SPECIAL_SC_PROMPT && (m_minor == 18))
 	{
 		//SC
 		m_client->SetUltraViewer(true);
@@ -930,7 +929,6 @@ vncClientThread::InitVersion()
 
 		m_minor -= 10;
 	}
-	else m_client->SetUltraViewer(false); // sf@2005 - Fix Open TextChat from server bug 
 	
 	if ( (m_minor >= 7) && m_socket->IsUsePluginEnabled() && m_server->GetDSMPluginPointer()->IsEnabled() && m_socket->GetIntegratedPlugin() != NULL) {
 		m_socket->SetPluginStreamingIn();
@@ -1214,13 +1212,19 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth)
 	std::vector<CARD8> auth_types;
 	
 	// obviously needs to be one that we suggested in the first place
-	bool bSecureVNCPluginActive = std::find(current_auth.begin(), current_auth.end(), rfbUltraVNC_SecureVNCPlugin) != current_auth.end();
+	bool bSecureVNCPluginActive = std::find(current_auth.begin(), current_auth.end(), rfbUltraVNC_SecureVNCPluginAuth) != current_auth.end();
+
+	if (current_auth.empty()) {
+		// send the UltraVNC auth type to identify ourselves as an UltraVNC server, but only initially
+		auth_types.push_back(rfbUltraVNC);
+	}
 
 	// encryption takes priority over everything, for now at least.
 	// would be useful to have a host list to configure these settings.
+	// Include the SecureVNCPluginAuth type for those that support it but are not UltraVNC viewers
 	if (!bSecureVNCPluginActive && m_socket->IsUsePluginEnabled() && m_server->GetDSMPluginPointer()->IsEnabled() && m_socket->GetIntegratedPlugin() != NULL)
 	{
-		auth_types.push_back(rfbUltraVNC_SecureVNCPlugin);
+		auth_types.push_back(rfbUltraVNC_SecureVNCPluginAuth);
 	}
 	else
 	{			
@@ -1229,19 +1233,18 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth)
 		m_server->GetPassword(password);
 		vncPasswd::ToText plain(password);
 
-		if (m_ms_logon)
+		if (!m_auth && m_ms_logon)
 		{
-			auth_types.push_back(rfbUltraVNC_MsLogon);
+			auth_types.push_back(rfbUltraVNC_MsLogonIIAuth);
 		}
-			
-		if (strlen(plain) > 0)
+		else
 		{
-			auth_types.push_back(rfbVncAuth);
-		}
-
-		if (m_auth || (strlen(plain) == 0))
-		{
-			auth_types.push_back(rfbNoAuth);
+			if (m_auth || (strlen(plain) == 0))
+			{
+				auth_types.push_back(rfbNoAuth);
+			} else {
+				auth_types.push_back(rfbVncAuth);
+			}
 		}
 	}
 
@@ -1270,15 +1273,23 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth)
 		return FALSE;
 	}
 
+	// mslogonI never seems to be used anymore -- the old code would say if (m_ms_logon) AuthMsLogon (II) else AuthVnc
+	// and within AuthVnc would be if (m_ms_logon) { /* mslogon code */ }. THat could never be hit since the first case
+	// would always match!
+
 	// Authenticate the connection, if required
 	BOOL auth_success = FALSE;
 	std::string auth_message;
 	switch (auth_accepted)
 	{
-	case rfbUltraVNC_SecureVNCPlugin:
+	case rfbUltraVNC:
+		m_client->SetUltraViewer(true);
+		auth_success = true;
+		break;
+	case rfbUltraVNC_SecureVNCPluginAuth:
 		auth_success = AuthSecureVNCPlugin(auth_message);	
 		break;
-	case rfbUltraVNC_MsLogon:
+	case rfbUltraVNC_MsLogonIIAuth:
 		auth_success = AuthMsLogon(auth_message);
 		break;
 	case rfbVncAuth:
@@ -1289,19 +1300,20 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth)
 		auth_success = TRUE;
 		break;
 	}
-
-	current_auth.push_back(auth_accepted);
-
 	// Log authentication success or failure
 	LogAuthResult(auth_success ? true : false);
 
 	// Return the result
 	CARD32 auth_result = rfbVncAuthFailed;
 	if (auth_success) {
+		current_auth.push_back(auth_accepted);
+
 		// continue the authentication if mslogon is enabled. any method of authentication should
 		// work out fine with this method. Currently we limit ourselves to only one layer beyond
 		// the plugin to avoid deep recursion, but that can easily be changed if necessary.
-		if (m_ms_logon && auth_accepted == rfbUltraVNC_SecureVNCPlugin && m_socket->GetIntegratedPlugin() && current_auth.size() == 1) {
+		if (m_ms_logon && auth_accepted == rfbUltraVNC_SecureVNCPluginAuth && m_socket->GetIntegratedPlugin()) {
+			auth_result = rfbVncAuthContinue;
+		} else if (auth_accepted == rfbUltraVNC) {
 			auth_result = rfbVncAuthContinue;
 		} else {
 			auth_result = rfbVncAuthOK;
@@ -1329,14 +1341,13 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth)
 		return FALSE;
 	
 	//adzm 2010-09 - Set handshake complete if integrated plugin finished auth
-	if (auth_success && auth_accepted == rfbUltraVNC_SecureVNCPlugin && m_socket->GetIntegratedPlugin()) {			
-		m_socket->GetIntegratedPlugin()->SetHandshakeComplete();
+	if (auth_success && auth_accepted == rfbUltraVNC_SecureVNCPluginAuth && m_socket->GetIntegratedPlugin()) {			
+		m_socket->GetIntegratedPlugin()->SetHandshakeComplete();	
+	}
 
-		// the SecureVNC Plugin auth is designed to optionally have another layer of auth beyond it
-		if (auth_result == rfbVncAuthContinue) {
-			if (!AuthenticateClient(current_auth)) {
-				return FALSE;
-			}
+	if (auth_success && auth_result == rfbVncAuthContinue) {
+		if (!AuthenticateClient(current_auth)) {
+			return FALSE;
 		}
 	}
 
@@ -1355,7 +1366,7 @@ BOOL vncClientThread::AuthenticateLegacyClient()
 
 	if (m_socket->IsUsePluginEnabled() && m_server->GetDSMPluginPointer()->IsEnabled() && m_socket->GetIntegratedPlugin() != NULL)
 	{
-		auth_type = rfbUltraVNC_SecureVNCPlugin;
+		auth_type = rfbLegacy_SecureVNCPlugin;
 	}
 	else if (m_ms_logon)
 	{
@@ -1385,10 +1396,10 @@ BOOL vncClientThread::AuthenticateLegacyClient()
 	std::string auth_message;
 	switch (auth_type)
 	{
-	case rfbUltraVNC_SecureVNCPlugin:
+	case rfbLegacy_SecureVNCPlugin:
 		auth_success = AuthSecureVNCPlugin(auth_message);	
 		break;
-	case rfbUltraVNC_MsLogon:
+	case rfbLegacy_MsLogon:
 		auth_success = AuthMsLogon(auth_message);
 		break;
 	case rfbVncAuth:
@@ -1419,7 +1430,7 @@ BOOL vncClientThread::AuthenticateLegacyClient()
 	}
 	
 	//adzm 2010-09 - Set handshake complete if integrated plugin finished auth
-	if (auth_success && auth_type == rfbUltraVNC_SecureVNCPlugin && m_socket->GetIntegratedPlugin()) {			
+	if (auth_success && auth_type == rfbLegacy_SecureVNCPlugin && m_socket->GetIntegratedPlugin()) {			
 		m_socket->GetIntegratedPlugin()->SetHandshakeComplete();
 	}
 

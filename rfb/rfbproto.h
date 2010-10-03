@@ -283,14 +283,21 @@ typedef char rfbProtocolVersionMsg[13];	/* allow extra byte for null */
 #define rfbInvalidAuth 0
 #define rfbNoAuth 1
 #define rfbVncAuth 2
-#define rfbUltraVNC_SecureVNCPlugin 17
-// adzm 2010-09 - After rfbUltraVNC_SecureVNCPlugin, the auth repeats itself
-// this allows nested authentication methods on top of the SecureVNC plugin.
+#define rfbUltraVNC 17
+// adzm 2010-09 - After rfbUltraVNC, auth repeats via rfbVncAuthContinue
 
 // adzm 2010-09 - Ultra subtypes - SecureVNCPlugin will remain as the Ultra value
-#define rfbUltraVNC_MsLogon 0x70
+//#define rfbUltraVNC_MsLogonIAuth 0x70 // we don't seem to ever send this any more?
+
+	// mslogonI never seems to be used anymore -- the old code would say if (m_ms_logon) AuthMsLogon (II) else AuthVnc
+	// and within AuthVnc would be if (m_ms_logon) { /* mslogon code */ }. That could never be hit since the first case
+	// would always match!
+
+#define rfbUltraVNC_MsLogonIIAuth 0x71
+#define rfbUltraVNC_SecureVNCPluginAuth 0x72
 
 //adzm 2010-05-10 - for backwards compatibility with pre-3.8
+#define rfbLegacy_SecureVNCPlugin 17
 #define rfbLegacy_MsLogon 0xfffffffa // UltraVNC's MS-Logon with (hopefully) better security
 
 // please see ABOVE these definitions for more discussion on authentication
@@ -324,7 +331,7 @@ typedef char rfbProtocolVersionMsg[13];	/* allow extra byte for null */
 #define rfbVncAuthTooMany 2
 #define rfbVncAuthFailedEx 3 //adzm 2010-05-11 - Send an explanatory message for the failure (if any)
 
-// adzm 2010-09 - rfbUltraVNC_SecureVNCPlugin may send this to restart authentication over a now-secure channel
+// adzm 2010-09 - rfbUltraVNC or other auths may send this to restart authentication (perhaps over a now-secure channel)
 #define rfbVncAuthContinue 0xFFFFFFFF
 
 
