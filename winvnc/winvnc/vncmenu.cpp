@@ -122,16 +122,16 @@ static inline BOOL LoadDM(VOID)
 
 
 
-bool disable_aero_set=false;
+//bool disable_aero_set=false;
 static inline VOID DisableAero(VOID) 
  { 
-	     if (disable_aero_set)
+	    /* if (disable_aero_set)
 		 {
 			 vnclog.Print(LL_INTINFO, VNCLOG("DisableAero already done %i \n"),AeroWasEnabled);
 			 return;
-		 }
+		 }*/
          BOOL pfnDwmEnableCompositiond = FALSE; 
-         AeroWasEnabled = FALSE; 
+         //AeroWasEnabled = FALSE; 
   
          if (!LoadDM()) 
                  return; 
@@ -141,16 +141,15 @@ static inline VOID DisableAero(VOID)
          else 
                  return; 
   
-         AeroWasEnabled = pfnDwmEnableCompositiond;
-		 disable_aero_set=true;
-		 vnclog.Print(LL_INTINFO, VNCLOG("DisableAero %i \n"),AeroWasEnabled);
-          if (!AeroWasEnabled)
+		 //disable_aero_set=true;
+		 vnclog.Print(LL_INTINFO, VNCLOG("DisableAero %i \n"),pfnDwmEnableCompositiond);
+          if (!pfnDwmEnableCompositiond)
 			  return; 
+
   
-         if (pfnDwmEnableComposition && SUCCEEDED(pfnDwmEnableComposition(FALSE))) 
-                 ; 
-         else 
-                 ;
+		  if (pfnDwmEnableComposition && SUCCEEDED(pfnDwmEnableComposition(FALSE))) {			  
+			AeroWasEnabled = pfnDwmEnableCompositiond;
+		  }
 		 
  } 
   
@@ -164,7 +163,7 @@ static inline VOID DisableAero(VOID)
                  else 
                          ; 
          } 
-		 disable_aero_set=false;
+		 //disable_aero_set=false;
          UnloadDM(); 
  } 
 

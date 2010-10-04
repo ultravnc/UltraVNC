@@ -1296,8 +1296,10 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth)
 		auth_success = AuthVnc(auth_message);
 		break;
 	case rfbNoAuth:
-	default:
 		auth_success = TRUE;
+		break;
+	default:
+		auth_success = FALSE;
 		break;
 	}
 	// Log authentication success or failure
@@ -1351,7 +1353,11 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth)
 		}
 	}
 
-	return TRUE;
+	if (auth_success) {
+		return TRUE;
+	} else {
+		return FALSE;
+	}
 }
 
 
@@ -1406,8 +1412,10 @@ BOOL vncClientThread::AuthenticateLegacyClient()
 		auth_success = AuthVnc(auth_message);
 		break;
 	case rfbNoAuth:
-	default:
 		auth_success = TRUE;
+		break;
+	default:
+		auth_success = FALSE;
 		break;
 	}
 
@@ -1423,18 +1431,17 @@ BOOL vncClientThread::AuthenticateLegacyClient()
 	CARD32 auth_result_msg = Swap32IfLE(auth_result);
 	if (!m_socket->SendExact((char *)&auth_result_msg, sizeof(auth_result_msg)))
 		return FALSE;
-
-	// Send a failure reason	
-	if (!auth_success) {
-		return FALSE;
-	}
 	
 	//adzm 2010-09 - Set handshake complete if integrated plugin finished auth
 	if (auth_success && auth_type == rfbLegacy_SecureVNCPlugin && m_socket->GetIntegratedPlugin()) {			
 		m_socket->GetIntegratedPlugin()->SetHandshakeComplete();
 	}
 
-	return TRUE;
+	if (auth_success) {
+		return TRUE;
+	} else {
+		return FALSE;
+	}
 }
 
 // must SetHandshakeComplete after sending auth result!
@@ -1466,7 +1473,7 @@ BOOL vncClientThread::AuthSecureVNCPlugin(std::string& auth_message)
 
 		WORD wChallengeLength = (WORD)nChallengeLength;
 
-		if (!m_socket->SendExact((const char*)&wChallengeLength, sizeof(wChallengeLength))) {
+		if (!m_socket->SendExactQueue((const char*)&wChallengeLength, sizeof(wChallengeLength))) {
 			m_socket->GetIntegratedPlugin()->FreeMemory(pChallenge);
 			return FALSE;
 		}
@@ -1557,7 +1564,7 @@ BOOL vncClientThread::AuthVnc(std::string& auth_message)
 	m_server->GetPassword(password);
 	vncPasswd::ToText plain(password);
 
-	BOOL auth_ok = TRUE;
+	BOOL auth_ok = FALSE;
 	{
 		// Now create a 16-byte challenge
 		char challenge[16];
