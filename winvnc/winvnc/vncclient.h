@@ -549,7 +549,8 @@ public:
 	BOOL AuthMsLogon(std::string& auth_message);
 	BOOL AuthVnc(std::string& auth_message);
 
-	BOOL FilterClients();
+	BOOL FilterClients_Blacklist();
+	BOOL FilterClients_Ask_Permission();
 	BOOL CheckEmptyPasswd();
 	BOOL CheckLoopBack();
 	void LogAuthResult(bool success);

@@ -938,11 +938,12 @@ vncClientThread::InitVersion()
 	return TRUE;
 }
 
-
+// RDV 2010-4-10
+// Ask user Permission Accept/Reject
+// Interactive, destop depended
 BOOL
-vncClientThread::FilterClients()
+vncClientThread::FilterClients_Ask_Permission()
 {
-
 	// Verify the peer host name against the AuthHosts string
 	vncServer::AcceptQueryReject verified;
 	if (m_auth) {
@@ -1000,7 +1001,26 @@ vncClientThread::FilterClients()
     }
 
 	if (verified == vncServer::aqrReject) {
-		SendConnFailed("Your connection has been rejected.");
+		return FALSE;
+	}
+	return TRUE;
+}
+
+// RDV 2010-4-10
+// Filter Blacklisted are refused connection
+// Not interactive, not destop depended
+BOOL
+vncClientThread::FilterClients_Blacklist()
+{
+	// Verify the peer host name against the AuthHosts string
+	vncServer::AcceptQueryReject verified;
+	if (m_auth) {
+		verified = vncServer::aqrAccept;
+	} else {
+		verified = m_server->VerifyHost(m_socket->GetPeerName());
+	}
+
+	if (verified == vncServer::aqrReject) {
 		return FALSE;
 	}
 	return TRUE;
@@ -1077,6 +1097,8 @@ vncClientThread::CheckLoopBack()
 	return TRUE;
 }
 
+//WARNING  USING THIS FUNCTION AT A WRONG PLACE
+//SEND  0 ---> rfbVncAuthOK
 void vncClientThread::SendConnFailed(const char* szMessage)
 {
 	//adzm 2010-09 - minimize packets. SendExact flushes the queue.
@@ -1148,8 +1170,13 @@ BOOL
 vncClientThread::InitAuthenticate()
 {
 	vnclog.Print(LL_INTINFO, "Entered InitAuthenticate\n");
-
-	if (!FilterClients()) return FALSE;
+	// RDV 2010-4-10
+	// Split Filter in desktop in/depended
+	if (!FilterClients_Blacklist())
+		{
+			SendConnFailed("Your connection has been rejected.");
+			return FALSE;
+		}
 	if (!CheckEmptyPasswd()) return FALSE;
 	if (!CheckLoopBack()) return FALSE;
 
@@ -1160,6 +1187,12 @@ vncClientThread::InitAuthenticate()
 			return FALSE;
 		}
 	} else {
+		// RDV 2010-4-10
+		if (!FilterClients_Ask_Permission())
+			{
+				SendConnFailed("Your connection has been rejected.");
+				return FALSE;
+			}
 		if (!AuthenticateLegacyClient()) {
 			return FALSE;
 		}
@@ -1322,6 +1355,21 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth)
 		}
 	}
 
+	// RDV 2010-4-10
+	// This is a good spot for asking the user permission Accept/Reject
+	// Only when auth_result == rfbVncAuthOK, in all other cases it isn't needed
+	// If user reject connection, we set 
+	// auth_result = rfbVncAuthFailed and auth_success==false
+	if (auth_result == rfbVncAuthOK)
+	{
+		BOOL result=FilterClients_Ask_Permission();
+		if (!result)
+		{
+			auth_result = rfbVncAuthFailed;
+			auth_success = false;
+		}
+	}
+
 	CARD32 auth_result_msg = Swap32IfLE(auth_result);
 	if (!m_socket->SendExactQueue((char *)&auth_result_msg, sizeof(auth_result_msg)))
 		return FALSE;
@@ -1393,9 +1441,15 @@ BOOL vncClientThread::AuthenticateLegacyClient()
 		return FALSE;
 	}
 
+	// RDV 2010-4-10
+	// CARD32, byte swap is needed
+	auth_type=Swap32IfLE(auth_type);
 	// adzm 2010-09 - Send the single auth type
 	if (!m_socket->SendExact((const char*)&auth_type, sizeof(auth_type)))
 		return FALSE;
+	// RDV 2010-4-10
+	// CARD32, reset original
+	auth_type=Swap32IfLE(auth_type);
 
 	// Authenticate the connection, if required
 	BOOL auth_success = FALSE;
