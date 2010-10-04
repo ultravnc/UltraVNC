@@ -1592,6 +1592,7 @@ BOOL vncClientThread::AuthVnc(std::string& auth_message)
 			// Encrypt the challenge bytes
 			vncEncryptBytes((BYTE *)&challenge, plain);
 
+			auth_ok = TRUE;
 			// Compare them to the response
 			for (int i=0; i<sizeof(challenge); i++)
 			{
