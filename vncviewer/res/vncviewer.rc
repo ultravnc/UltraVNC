@@ -13,13 +13,11 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Japanese resources
+// Japanese (Japan) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
-#ifdef _WIN32
 LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
 #pragma code_page(932)
-#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -27,18 +25,16 @@ LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
 //
 
 IDC_FINGER              CURSOR                  "Finger.cur"
-#endif    // Japanese resources
+#endif    // Japanese (Japan) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// English (U.S.) resources
+// English (United States) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -93,7 +89,7 @@ IDI_DRIVE               ICON                    "drive.ico"
 // Menu
 //
 
-IDR_TRAYMENU MENU 
+IDR_TRAYMENU MENU
 BEGIN
     POPUP "t"
     BEGIN
@@ -107,7 +103,7 @@ BEGIN
     END
 END
 
-IDR_tbMENU MENU 
+IDR_tbMENU MENU
 BEGIN
     POPUP "Rightclick menu for FullScreenCaption"
     BEGIN
@@ -274,7 +270,7 @@ BEGIN
     GROUPBOX        "",IDC_STATIC,4,136,237,42
 END
 
-IDD_SERVINFO_DLG DIALOG  0, 0, 224, 170
+IDD_SERVINFO_DLG DIALOG 0, 0, 224, 170
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "RFB Server information"
 FONT 8, "MS Shell Dlg"
@@ -456,7 +452,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_OPTIONDIALOG, DIALOG
     BEGIN
@@ -683,12 +679,12 @@ END
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDR_TRAY                "Ultr@VNC Viewer listening"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     ID_CLOSEDAEMON          "Stop listening for incoming connections"
     ID_SHOWWINDOW           "Display a connection window"
@@ -697,7 +693,7 @@ BEGIN
     ID_BUTTON_FTRANS        "FileTansfer"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     ID_BUTTON_DINPUT        "Disable buttons"
     ID_BUTTON_DBUTTON       "Disable server mouse and keyboard"
@@ -714,12 +710,12 @@ BEGIN
     IDS_B3                  "VNC error"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDC_OPTIONBUTTON        "Set the options to be used for new connections"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_C1                  "Failed to open clipboard\n"
     IDS_C2                  "Failed to empty clipboard\n"
@@ -739,7 +735,7 @@ BEGIN
     IDS_D13                 "Invalid loglevel specified"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_D14                 "No logfile specified"
     IDS_D15                 "Invalid logfile specified"
@@ -759,7 +755,7 @@ BEGIN
     IDS_E1                  "Unable to load the Rich Edit (RICHED32.DLL) control!"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_E2                  "Rich Edit Dll Loading"
     IDS_F1                  "The Plugin cannot be loaded.\n\rPlease check its integrity."
@@ -777,7 +773,7 @@ BEGIN
     IDS_H1                  " > WARNING: File Transfer is Disabled on the Remote Machine"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_H2                  " > WARNING: File Transfer is Disabled on the Remote Machine"
     IDS_H3                  "File Transfer permission denied: disabled or unknown user or version incompatibility"
@@ -797,7 +793,7 @@ BEGIN
     IDS_H17                 "File"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_H18                 "successfully RECEIVED..."
     IDS_H19                 "ERROR: Transfer of File"
@@ -817,7 +813,7 @@ BEGIN
     IDS_H33                 "Unable to delete the File"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_H34                 "has been deleted on the Remote Machine"
     IDS_H35                 "File Transfer with"
@@ -837,7 +833,7 @@ BEGIN
     IDS_H49                 "Unable to delete the Local File"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_H50                 "has been Deleted"
     IDS_H51                 "Are you sure you want to Delete the REMOTE File"
@@ -857,7 +853,7 @@ BEGIN
     IDS_K3                  "Do you want to save the password in this file?\n\r (Yes) Saving a password to a file is unsecure."
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_K4                  "Security warning"
     IDS_K5                  "Error reading host name from file"
@@ -877,7 +873,7 @@ BEGIN
     IDS_L12                 "Open File Transfer..."
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_L13                 "Select Single Window"
     IDS_L14                 "Select Full Desktop / Switch monitor(driver only)"
@@ -897,7 +893,7 @@ BEGIN
     IDS_L28                 "&Normal screen \tCtrl+F11"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_L29                 "&Full Colors"
     IDS_L30                 "&256  Colors"
@@ -917,7 +913,7 @@ BEGIN
     IDS_L44                 "Error creating socket !"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_L45                 "Lookup server address ..."
     IDS_L46                 "Failed to get server address !"
@@ -937,7 +933,7 @@ BEGIN
     IDS_L60                 "Unknown authentication scheme!"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_L61                 "Error creating local image of screen."
     IDS_L62                 "Please wait - Initial screen loading..."
@@ -957,7 +953,7 @@ BEGIN
     IDS_L76                 "Closing VNCviewer"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_L77                 "The connected VNC Server doesn't support UltraVNC File Transfer !"
     IDS_L78                 "Unavailable Functionnality"
@@ -977,7 +973,7 @@ BEGIN
     IDS_L92                 "No authentication needed"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_H58                 "File(s)/Folder(s)"
     IDS_H59                 "Decompressing Folder"
@@ -997,7 +993,7 @@ BEGIN
     IDS_H73                 "The LOCAL Folder"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_M1                  "One File or Directory can be renamed at a time"
     IDS_M2                  "File & Directory Rename Warning"
@@ -1017,14 +1013,14 @@ BEGIN
     IDS_L93                 "View Only... \tCtrl+Alt+F3"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_H101                "Folder Transfer Warning"
     IDS_H102                "a file or folder of that name already exists."
     IDS_L94                 "Server closed connection"
 END
 
-#endif    // English (U.S.) resources
+#endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -1032,10 +1028,8 @@ END
 // Dutch (Netherlands) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NLD)
-#ifdef _WIN32
 LANGUAGE LANG_DUTCH, SUBLANG_DUTCH
 #pragma code_page(1252)
-#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1054,10 +1048,8 @@ IDB_BITMAPs             BITMAP                  "Tango_s.bmp"
 // Dutch (Belgium) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NLB)
-#ifdef _WIN32
 LANGUAGE LANG_DUTCH, SUBLANG_DUTCH_BELGIAN
 #pragma code_page(1252)
-#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1067,6 +1059,41 @@ LANGUAGE LANG_DUTCH, SUBLANG_DUTCH_BELGIAN
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDR_TRAY_DISABLED       ICON                    "idr_tray_disabled.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_SESSIONSELECTOR DIALOGEX 0, 0, 316, 183
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Session Selector"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,205,162,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,259,162,50,14
+    CONTROL         "",IDC_LIST1,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_NOLABELWRAP | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,7,302,149
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_SESSIONSELECTOR, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 309
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 176
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
 
 /////////////////////////////////////////////////////////////////////////////
 //

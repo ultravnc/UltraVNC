@@ -241,6 +241,8 @@ extern bool command_line;
 //	SB_VERT_BOOL=true;
 //}
 
+BOOL CALLBACK DialogProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam);
+
 // adzm - 2010-07 - Extended clipboard
 ClientConnection::ClientConnection(VNCviewerApp *pApp) 
 	: fis(0), zis(0), m_clipboard(ClipboardSettings::defaultViewerCaps)
@@ -2479,6 +2481,136 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 		//adzm 2010-05-10
 		AuthMsLogonII();
 		break;
+	case rfbUltraVNC_SessionSelect:
+		{
+		if (m_minorVersion < 7) {
+			vnclog.Print(0, _T("Invalid auth continue response for protocol version.\n"));	
+			throw ErrorException("Invalid auth continue response");
+		}
+
+		INITCOMMONCONTROLSEX InitCtrls;
+		InitCtrls.dwICC = ICC_LISTVIEW_CLASSES|ICC_INTERNET_CLASSES;
+		InitCtrls.dwSize = sizeof(INITCOMMONCONTROLSEX);
+		BOOL bRet = InitCommonControlsEx(&InitCtrls);
+		int tt=DialogBoxParam(m_pApp->m_instance, MAKEINTRESOURCE(IDD_SESSIONSELECTOR), NULL, (DLGPROC)DialogProc,(LPARAM)this);
+		WriteExact((char *)&tt,sizeof(int));
+
+
+
+		CARD32 real_authResult;
+		ReadExact((char *)&real_authResult, sizeof(real_authResult));	
+		real_authResult = Swap32IfLE(real_authResult);
+		switch (real_authResult)
+		{
+			case rfbVncAuthOK:
+				if (m_hwndStatus)vnclog.Print(0, _T("VNC authentication succeeded\n"));
+				if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L55);
+	
+				g_passwordfailed=false;
+				break;
+			default : 
+				vnclog.Print(0, _T("VNC authentication failed!"));			
+				if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L56);
+				if (m_minorVersion >= 7 || authResult == rfbVncAuthFailedEx) {
+					vnclog.Print(0, _T("VNC authentication failed! Extended information available."));	
+					//adzm 2010-05-11 - Send an explanatory message for the failure (if any)
+					ReadExact((char *)&reasonLen, 4);
+					reasonLen = Swap32IfLE(reasonLen);
+			
+					CheckBufferSize(reasonLen+1);
+					ReadString(m_netbuf, reasonLen);
+			
+					vnclog.Print(0, _T("VNC authentication failed! Extended information: %s\n"), m_netbuf);
+					if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,m_netbuf);
+					throw WarningException(m_netbuf);
+				} else {
+					vnclog.Print(0, _T("VNC authentication failed!"));	
+					SetEvent(KillEvent);
+					throw WarningException(sz_L57,IDS_L57);
+				}
+				break;
+		}
+		}
+		break;
+
+	case rfbUltraVNC_ScPromt:
+		{
+		if (m_minorVersion < 7) {
+			vnclog.Print(0, _T("Invalid auth continue response for protocol version.\n"));	
+			throw ErrorException("Invalid auth continue response");
+		}
+		/// SHOW Messagebox 
+		int size;
+		ReadExact((char *)&size,sizeof(int));
+		char mytext[1025]; //10k
+		//block
+		if (size<0 || size >1024)
+		{
+			throw WarningException("Buffer too big, ");
+			if (size<0) size=0;
+			if (size>1024) size=1024;
+		}
+
+		ReadExact(mytext,size);
+		mytext[size]=0;
+
+		//adzm 2009-06-21 - auto-accept if specified
+		if (!m_opts.m_fAutoAcceptIncoming) {
+			int returnvalue=MessageBox(m_hwndMain,   mytext,"Accept Incoming SC Connection", MB_YESNO |  MB_TOPMOST);
+			if (returnvalue==IDNO) 
+			{
+				int nummer=0;
+				WriteExact((char *)&nummer,sizeof(int));
+				//throw WarningException("You refused the connection");
+			}
+			else
+			{
+				int nummer=1;
+				WriteExact((char *)&nummer,sizeof(int));
+
+			}
+		} else {
+			int nummer=1;
+			WriteExact((char *)&nummer,sizeof(int));
+		}	
+
+		
+		CARD32 real_authResult;
+		ReadExact((char *)&real_authResult, sizeof(real_authResult));	
+		real_authResult = Swap32IfLE(real_authResult);
+		switch (real_authResult)
+		{
+			case rfbVncAuthOK:
+				if (m_hwndStatus)vnclog.Print(0, _T("VNC authentication succeeded\n"));
+				if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L55);
+	
+				g_passwordfailed=false;
+				break;
+			default : 
+				vnclog.Print(0, _T("VNC authentication failed!"));			
+				if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L56);
+				if (m_minorVersion >= 7 || authResult == rfbVncAuthFailedEx) {
+					vnclog.Print(0, _T("VNC authentication failed! Extended information available."));	
+					//adzm 2010-05-11 - Send an explanatory message for the failure (if any)
+					ReadExact((char *)&reasonLen, 4);
+					reasonLen = Swap32IfLE(reasonLen);
+			
+					CheckBufferSize(reasonLen+1);
+					ReadString(m_netbuf, reasonLen);
+			
+					vnclog.Print(0, _T("VNC authentication failed! Extended information: %s\n"), m_netbuf);
+					if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,m_netbuf);
+					throw WarningException(m_netbuf);
+				} else {
+					vnclog.Print(0, _T("VNC authentication failed!"));	
+					SetEvent(KillEvent);
+					throw WarningException(sz_L57,IDS_L57);
+				}
+				break;
+		}
+		}
+		break;
+
 	case rfbVncAuthContinue:
 		if (m_minorVersion < 7) {
 			vnclog.Print(0, _T("Invalid auth continue response for protocol version.\n"));	
@@ -8534,4 +8666,173 @@ void ClientConnection::NotifyPluginStreamingSupport()
 	//adzm 2010-09 - minimize packets. SendExact flushes the queue.
 	WriteExact((char *)&msg, sz_rfbNotifyPluginStreamingMsg, rfbNotifyPluginStreaming);
 	m_fPluginStreamingOut = true;
+}
+
+
+static HWND hList=NULL;  // List View identifier
+LVCOLUMN LvCol; // Make Coluom struct for ListView
+LVITEM LvItem;  // ListView Item struct
+int iSelect=0;
+int flag=0;
+HWND hEdit=NULL;
+
+BOOL CALLBACK DialogProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
+{
+//	if ((Message!=WM_TIMER || Message!=WM_CLOSE) && scanner) return false;
+  switch(Message)
+  {
+		case WM_CLOSE:
+			{
+			     EndDialog(hWnd,0); // kill dialog
+			}
+			break;
+
+		case WM_NOTIFY:
+		{
+			switch(LOWORD(wParam))
+			{
+			    case IDC_LIST1: 
+                if(((LPNMHDR)lParam)->code == NM_DBLCLK)
+				{
+				  char Text[255]={0};  
+				  char Temp[255]={0};
+				  char Temp1[255]={0};
+				  int iSlected=0;
+				  int j=0;
+
+				  iSlected=SendMessage(hList,LVM_GETNEXTITEM,-1,LVNI_FOCUSED);
+				  
+				  if(iSlected==-1)
+				  {
+                    MessageBox(hWnd,"No Items in ListView","Error",MB_OK|MB_ICONINFORMATION);
+					break;
+				  }
+
+				  memset(&LvItem,0,sizeof(LvItem));
+                  LvItem.mask=LVIF_TEXT;
+				  LvItem.iSubItem=0;
+				  LvItem.pszText=Text;
+				  LvItem.cchTextMax=256;
+				  LvItem.iItem=iSlected;                  
+				  SendMessage(hList,LVM_GETITEMTEXT, iSlected, (LPARAM)&LvItem);				  
+				  EndDialog(hWnd,iSlected+1);				 
+
+				}
+				if(((LPNMHDR)lParam)->code == NM_CLICK)
+				{
+					iSelect=SendMessage(hList,LVM_GETNEXTITEM,-1,LVNI_FOCUSED);
+				    
+					if(iSelect==-1)
+					{
+                      MessageBox(hWnd,"No Vnc server selected","Error",MB_OK|MB_ICONINFORMATION);
+					  break;
+					}
+					flag=1;
+				}
+
+				if(((LPNMHDR)lParam)->code == LVN_BEGINLABELEDIT)
+				{
+                  hEdit=ListView_GetEditControl(hList);
+				}
+				
+				if(((LPNMHDR)lParam)->code == LVN_ENDLABELEDIT)
+				{
+					int iIndex;
+					char text[255]="";
+					iIndex=SendMessage(hList,LVM_GETNEXTITEM,-1,LVNI_FOCUSED);
+				    LvItem.iSubItem=0;
+                    LvItem.pszText=text;
+                    GetWindowText(hEdit, text, sizeof(text));
+					SendMessage(hList,LVM_SETITEMTEXT,(WPARAM)iIndex,(LPARAM)&LvItem);
+				}
+				break;
+			}
+			return 0;
+		}
+
+		case WM_PAINT:
+			{
+				InvalidateRect(hWnd,NULL,true);
+				return 0;
+			}
+			break;
+
+		// This Window Message is the heart of the dialog  //
+		//================================================//
+		case WM_INITDIALOG:
+			{
+				CentreWindow(hWnd);
+				ClientConnection *cc=(ClientConnection*)lParam;
+
+                SetFocus(hWnd);
+				hList=GetDlgItem(hWnd,IDC_LIST1); // get the ID of the ListView
+				SendMessage(hList,LVM_SETEXTENDEDLISTVIEWSTYLE,0,LVS_EX_FULLROWSELECT); // Set style
+
+				// Here we put the info on the Coulom headers
+				// this is not data, only name of each header we like
+                memset(&LvCol,0,sizeof(LvCol)); // Reset Coluom
+				LvCol.mask=LVCF_TEXT|LVCF_WIDTH|LVCF_SUBITEM; // Type of mask
+				LvCol.cx=0x100;                                // width between each coloum
+				LvCol.pszText="Select Helpdesk to connect to .......";                     // First Header
+// 				LvCol.cx=0x60;
+
+				// Inserting Couloms as much as we want
+				SendMessage(hList,LVM_INSERTCOLUMN,0,(LPARAM)&LvCol); // Insert/Show the coloum
+                memset(&LvItem,0,sizeof(LvItem)); // Reset Item Struct
+				
+				//  Setting properties Of Items:
+
+				LvItem.mask=LVIF_TEXT;   // Text Style
+				LvItem.cchTextMax = 256; // Max size of test
+                
+				LvItem.iItem=0;          // choose item  
+				LvItem.iSubItem=0;       // Put in first coluom
+				LvItem.pszText="Item 0"; // Text to display (can be from a char variable) (Items)
+
+				int iItem=0;
+				CARD8 nr_lines;
+				cc->ReadExact((char *)&nr_lines, sizeof(nr_lines));	
+				char line[128];
+				for ( int a=0;a<nr_lines;a++)
+				{
+					memset(line,0,128);
+					cc->ReadExact((char *)line, sizeof(128));	
+					iItem=SendMessage(hList,LVM_GETITEMCOUNT,0,0);
+					LvItem.iItem=iItem;            // choose item  
+					LvItem.iSubItem=0;         // Put in first coluom
+					LvItem.pszText=line;
+					SendMessage(hList,LVM_INSERTITEM,0,(LPARAM)&LvItem);	
+					iItem++;
+				}										
+				return TRUE; // Always True			
+			}
+			break;
+
+     // This Window Message will control the dialog  //
+	//==============================================//
+        case WM_COMMAND:
+			switch (LOWORD(wParam))
+				{
+					case IDOK:
+						{
+						 int iSlected=0;
+						  iSlected=SendMessage(hList,LVM_GETNEXTITEM,-1,LVNI_FOCUSED);				  
+						  if(iSlected==-1)
+						  {
+							MessageBox(hWnd,"No Items in ListView","Error",MB_OK|MB_ICONINFORMATION);
+							break;
+						  }
+						EndDialog(hWnd,iSlected+1); // kill dialog
+						}
+						break;
+					case IDCANCEL:
+						EndDialog(hWnd,0);
+						break;
+					}
+			break;
+    
+	    default:return FALSE;
+    }
+
+	return TRUE;
 }

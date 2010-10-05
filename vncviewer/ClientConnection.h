@@ -399,7 +399,7 @@ private:
 
 	void ReadBell();
 	
-	void ReadExact(char *buf, int bytes);
+	
 	void ReadExactProxy(char *buf, int bytes);
 	void ReadString(char *buf, int length);
 
@@ -753,6 +753,7 @@ public:
 	bool m_running;
 	HWND m_hwndMain;
 	HANDLE rcth;
+	void ReadExact(char *buf, int bytes);
 };
 
 // Some handy classes for temporary GDI object selection

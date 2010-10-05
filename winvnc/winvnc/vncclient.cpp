@@ -1362,11 +1362,72 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth)
 	// auth_result = rfbVncAuthFailed and auth_success==false
 	if (auth_result == rfbVncAuthOK)
 	{
-		BOOL result=FilterClients_Ask_Permission();
-		if (!result)
+
+		// Check if viewer accept connection
+		if (SPECIAL_SC_PROMPT || SPECIAL_SC_EXIT)
+		{
+		CARD32 auth_result_msg = Swap32IfLE(rfbUltraVNC_ScPromt);
+		if (!m_socket->SendExact((char *)&auth_result_msg, sizeof(auth_result_msg)))
+			return FALSE;
+
+		char mytext[1024];
+		getinfo(mytext);
+		int size=strlen(mytext);
+		//adzm 2010-09 - minimize packets. SendExact flushes the queue.
+		if (!m_socket->SendExactQueue((char *)&size, sizeof(int)))
+			return FALSE;
+		if (!m_socket->SendExact((char *)mytext, size))
+			return FALSE;
+		int nummer;
+		if (!m_socket->ReadExact((char *)&nummer, sizeof(int)))
+		{
+			return FALSE;
+		}
+		if (nummer==0)
 		{
 			auth_result = rfbVncAuthFailed;
 			auth_success = false;
+		}
+		}
+		else if (false)  //totest set to true
+		{
+			//Fake Function
+			CARD32 auth_result_msg = Swap32IfLE(rfbUltraVNC_SessionSelect);
+			if (!m_socket->SendExact((char *)&auth_result_msg, sizeof(auth_result_msg)))
+				return FALSE;
+			CARD8 Items=3;
+			if (!m_socket->SendExact((char *)&Items, sizeof(Items)))
+				return FALSE;
+			char line1[128];
+			char line2[128];
+			char line3[128];
+			strcpy(line1,"line1 ");
+			strcpy(line2,"line22 ");
+			strcpy(line3,"line312 123 ");
+			if (!m_socket->SendExact((char *)line1, 128))
+				return FALSE;
+			if (!m_socket->SendExact((char *)line2, 128))
+				return FALSE;
+			if (!m_socket->SendExact((char *)line3, 128))
+				return FALSE;
+			int nummer;
+			if (!m_socket->ReadExact((char *)&nummer, sizeof(int)))
+			{
+				return FALSE;
+			}
+			int a=0;
+
+		}
+
+		// If not rejected by viewer
+		if (auth_result != rfbVncAuthFailed)
+		{
+			BOOL result=FilterClients_Ask_Permission();
+			if (!result)
+			{
+				auth_result = rfbVncAuthFailed;
+				auth_success = false;
+			}
 		}
 	}
 

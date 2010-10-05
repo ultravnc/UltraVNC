@@ -74,6 +74,8 @@
 #define ID_CLIPBOARD_RECV               206
 #define IDT_FLUSHMOUSEMOVETIMER         207
 #define ID_CLIPBOARD_DIB                208
+#define IDD_DIALOG1                     209
+#define IDD_SESSIONSELECTOR             209
 #define IDD_USER_NAME                   604
 #define ID_VK_LWINDOWN                  605
 #define ID_VK_RWINDOWN                  606
@@ -218,6 +220,7 @@
 #define IDC_RADIO2                      1161
 #define IDC_MANUAL                      1161
 #define IDC_CHECK2                      1162
+#define IDC_LIST1                       1164
 #define IDC_ENCODING_BASE               1999
 #define IDC_RAWRADIO                    2000
 #define IDC_RRERADIO                    2002
@@ -523,9 +526,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        209
+#define _APS_NEXT_RESOURCE_VALUE        210
 #define _APS_NEXT_COMMAND_VALUE         50025
-#define _APS_NEXT_CONTROL_VALUE         1164
+#define _APS_NEXT_CONTROL_VALUE         1165
 #define _APS_NEXT_SYMED_VALUE           154
 #endif
 #endif
