@@ -201,6 +201,8 @@ VNCOptions::VNCOptions()
   m_keepAliveInterval = KEEPALIVE_INTERVAL;
   m_socketKeepAliveTimeout = SOCKET_KEEPALIVE_TIMEOUT; // adzm 2010-08
 
+  m_throttleMouse = 0; // adzm 2010-10
+
   
   
 #ifdef UNDER_CE
@@ -333,6 +335,8 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
   m_FTTimeout =  s.m_FTTimeout;
   m_keepAliveInterval = s.m_keepAliveInterval;
   m_socketKeepAliveTimeout = s.m_socketKeepAliveTimeout; // adzm 2010-08
+
+  m_throttleMouse = s.m_throttleMouse; // adzm 2010-10
 
   //adzm 2009-06-21
   m_fAutoAcceptIncoming = s.m_fAutoAcceptIncoming;
@@ -823,6 +827,18 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 	    //adzm 2010-08
 	    m_fEnableCache = true;
 	}
+	else if (SwitchMatch(args[j], _T("throttlemouse")))
+	{
+	    //adzm 2010-10
+		if (++j == i) {
+			ArgError(sz_D22);
+			continue;
+		}
+		if (_stscanf(args[j], _T("%d"), &m_throttleMouse) != 1) {
+			ArgError(sz_D23);
+			continue;
+		}
+	}
 	else
 	{
       TCHAR phost[256];
@@ -969,6 +985,8 @@ void VNCOptions::Save(char *fname)
 
   saveInt("SocketKeepAliveTimeout", m_socketKeepAliveTimeout,    fname); // adzm 2010-08
 
+  saveInt("ThrottleMouse", m_throttleMouse,    fname); // adzm 2010-10
+
   //adzm 2009-06-21
   saveInt("AutoAcceptIncoming",		m_fAutoAcceptIncoming, fname);
   
@@ -1067,6 +1085,8 @@ void VNCOptions::Load(char *fname)
   if (m_socketKeepAliveTimeout < 0)
       m_socketKeepAliveTimeout = 0; 
 
+  m_throttleMouse = readInt("ThrottleMouse", m_throttleMouse, fname); // adzm 2010-10
+
   //adzm 2009-06-21
   m_fAutoAcceptIncoming = readInt("AutoAcceptIncoming", (int)m_fAutoAcceptIncoming, fname) ? true : false;
   
@@ -1149,7 +1169,7 @@ void VNCOptions::ShowUsage(LPTSTR info) {
 			   "      [/8colors] [/8greycolors] [/4greycolors] [/2greycolors]\r\n"
 			   "      [/encoding [zrle | zywrle | tight | zlib | zlibhex | ultra]]\r\n"
 			   "      [/autoacceptincoming] [/autoacceptnodsm] [/disablesponsor]\r\n" //adzm 2009-06-21, adzm 2009-07-19
-			   "      [/requireencryption]\r\n" //adzm 2010-05-12 
+			   "      [/requireencryption] [/enablecache] [/throttlemouse n] [/socketkeepalivetimeout n]\r\n" //adzm 2010-05-12 
                "For full details see documentation."), 
 #endif
             tmpinf);

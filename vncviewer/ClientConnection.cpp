@@ -507,6 +507,9 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	//adzm 2010-09
 	m_fPluginStreamingIn = false;
 	m_fPluginStreamingOut = false;
+
+	//adzm 2010-10
+	m_PendingMouseMove.dwMinimumMouseMoveInterval = m_opts.m_throttleMouse;
 }
 
 // helper functions for setting socket timeouts during file transfer
@@ -2084,7 +2087,7 @@ void ClientConnection::NegotiateProtocolVersion()
 		// adzm2010-10 - RFB3.8 - m_fServerKnowsFileTransfer set during rfbUltraVNC auth
 	}
 	// Added for SC so we can do something before actual data transfer start
-	if (m_minorVersion == 14 )
+	else if (m_minorVersion == 14 )
 	{
 		m_ms_logon_I_legacy = true;
 		m_fServerKnowsFileTransfer = true;

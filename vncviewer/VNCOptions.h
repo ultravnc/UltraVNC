@@ -87,6 +87,7 @@ public:
 	bool	m_DeiconifyOnBell;
 	bool	m_DisableClipboard;
 	int     m_localCursor;
+	int     m_throttleMouse; // adzm 2010-10
 	bool	m_scaling;
 	bool    m_fAutoScaling;
 	int		m_scale_num, m_scale_den; // Numerator & denominator
