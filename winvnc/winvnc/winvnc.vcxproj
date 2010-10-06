@@ -1323,7 +1323,6 @@
     <None Include="res\vnccanvas.class" />
     <None Include="res\vncviewer.class" />
     <None Include="res\vncviewer.jar" />
-    <None Include="winvnc.exe.x86.manifest" />
     <None Include="res\winvnc.ico" />
     <None Include="res\world3a.ico" />
     <None Include="res\ww-grn-sq2.ico" />

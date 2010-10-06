@@ -514,9 +514,6 @@
       <Filter>Header Files</Filter>
     </None>
     <None Include="VTune\winvnc.vpj" />
-    <None Include="winvnc.exe.x86.manifest">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="res\ftpframe$strcomp.class" />
   </ItemGroup>
 </Project>

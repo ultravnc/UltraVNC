@@ -833,37 +833,20 @@ vncClientThread::InitVersion()
 	if (strcmp(m_client->ProtocolVersionMsg,"0.0.0.0")==NULL)
 	{
 		// Generate the server's protocol version
-		rfbProtocolVersionMsg protocolMsg;
-		
-		// adzm 2010-09 - no more mslogon modifications
-		if (SPECIAL_SC_PROMPT)
-		{
-			//This break rfb protocol, SC in ultravnc only  rfb 3.14/16/18
-			sprintf((char *)protocolMsg,
-					rfbProtocolVersionFormat,
-					rfbProtocolMajorVersion,
-					rfbProtocolMinorVersion + 10);
-		}
-		else
-		{
-			sprintf((char *)protocolMsg,
+		// RDV 2010-6-10 
+		// removed SPECIAL_SC_PROMPT
+		rfbProtocolVersionMsg protocolMsg;		
+		sprintf((char *)protocolMsg,
 					rfbProtocolVersionFormat,
 					rfbProtocolMajorVersion,
 					rfbProtocolMinorVersion);
-		}
-
 		// adzm 2010-08
 		bool bRetry = true;
 		bool bReady = false;
 		int nRetry = 0;
 		while (!bReady && bRetry) {
-			// Send the protocol message
-			//m_socket->SetTimeout(0); // sf@2006 - Trying to fix neverending authentication bug - Not sure it's a good idea...
-			//adzm 2009-06-20 - if SC, wait for a connection, rather than timeout too quickly.
-			if (SPECIAL_SC_PROMPT || SPECIAL_SC_EXIT) {
-				//adzm 2009-06-20 - TODO - perhaps this should only occur if we can determine we are using a repeater?
-				m_socket->SetTimeout(0);
-			}
+			// RDV 2010-6-10 
+			// removed SPECIAL_SC_PROMPT
 
 			// Send our protocol version, and get the client's protocol version
 			if (!m_socket->SendExact((char *)&protocolMsg, sz_rfbProtocolVersionMsg) || 
@@ -904,31 +887,11 @@ vncClientThread::InitVersion()
 	m_ms_logon = m_server->MSLogonRequired();
 	vnclog.Print(LL_INTINFO, VNCLOG("m_ms_logon set to %s"), m_ms_logon ? "true" : "false");
 
-#pragma message("RFB 3.8 - Remove or modify SC_PROMPT to not use special protocol numbers")
 	// adzm 2010-09 - see rfbproto.h for more discussion on all this
 	m_client->SetUltraViewer(false); // sf@2005 - Fix Open TextChat from server bug 
 	// UltraViewer will be set when viewer responds with rfbUltraVNC Auth type
-	if (SPECIAL_SC_PROMPT && (m_minor == 18))
-	{
-		//SC
-		m_client->SetUltraViewer(true);
-		char mytext[1024];
-		getinfo(mytext);
-		int size=strlen(mytext);
-		//adzm 2010-09 - minimize packets. SendExact flushes the queue.
-		if (!m_socket->SendExactQueue((char *)&size, sizeof(int)))
-			return FALSE;
-		if (!m_socket->SendExact((char *)mytext, size))
-			return FALSE;
-		int nummer;
-		if (!m_socket->ReadExact((char *)&nummer, sizeof(int)))
-		{
-			return FALSE;
-		}
-		if (nummer==0) return FALSE;
-
-		m_minor -= 10;
-	}
+	// RDV 2010-6-10 
+	// removed SPECIAL_SC_PROMPT
 	
 	if ( (m_minor >= 7) && m_socket->IsUsePluginEnabled() && m_server->GetDSMPluginPointer()->IsEnabled() && m_socket->GetIntegratedPlugin() != NULL) {
 		m_socket->SetPluginStreamingIn();
