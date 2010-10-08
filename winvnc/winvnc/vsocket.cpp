@@ -86,6 +86,7 @@ const VInt rfbMaxClientWait = 5000;
 ////////////////////////////
 // Socket implementation initialisation
 static WORD winsockVersion = 0;
+bool sendall(SOCKET RemoteSocket,char *buff,unsigned int bufflen,int dummy);
 
 VSocketSystem::VSocketSystem()
 {
@@ -599,7 +600,7 @@ VSocket::Send(const char *buff, const VCard bufflen)
 	if (newsize >= G_SENDBUFFER)
 	{
 		    memcpy(queuebuffer+queuebuffersize,buff2,G_SENDBUFFER-queuebuffersize);
-			send(sock,queuebuffer,G_SENDBUFFER,0);
+			if (!sendall(sock,queuebuffer,G_SENDBUFFER,0)) return FALSE;
 //			vnclog.Print(LL_SOCKERR, VNCLOG("SEND  %i\n") ,G_SENDBUFFER);
 			buff2+=(G_SENDBUFFER-queuebuffersize);
 			bufflen2-=(G_SENDBUFFER-queuebuffersize);
@@ -607,7 +608,7 @@ VSocket::Send(const char *buff, const VCard bufflen)
 			// adzm 2010-09 - flush as soon as we have a full buffer, not if we have exceeded it.
 			while (bufflen2 >= G_SENDBUFFER)
 			{
-				if (!send(sock,buff2,G_SENDBUFFER,0)) return false;
+				if (!sendall(sock,buff2,G_SENDBUFFER,0)) return false;
 //				vnclog.Print(LL_SOCKERR, VNCLOG("SEND 1 %i\n") ,G_SENDBUFFER);
 				buff2+=G_SENDBUFFER;
 				bufflen2-=G_SENDBUFFER;
@@ -616,7 +617,7 @@ VSocket::Send(const char *buff, const VCard bufflen)
 	memcpy(queuebuffer+queuebuffersize,buff2,bufflen2);
 	queuebuffersize+=bufflen2;
 	if (queuebuffersize > 0) {
-		if (!send(sock,queuebuffer,queuebuffersize,0)) 
+		if (!sendall(sock,queuebuffer,queuebuffersize,0)) 
 			return false;
 	}
 //	vnclog.Print(LL_SOCKERR, VNCLOG("SEND 2 %i\n") ,queuebuffersize);
@@ -639,7 +640,7 @@ VSocket::SendQueued(const char *buff, const VCard bufflen)
 			m_LastSentTick = GetTickCount();
 
 		    memcpy(queuebuffer+queuebuffersize,buff2,G_SENDBUFFER-queuebuffersize);
-			send(sock,queuebuffer,G_SENDBUFFER,0);
+			if (!sendall(sock,queuebuffer,G_SENDBUFFER,0)) return FALSE;
 		//	vnclog.Print(LL_SOCKERR, VNCLOG("SEND Q  %i\n") ,G_SENDBUFFER);
 			buff2+=(G_SENDBUFFER-queuebuffersize);
 			bufflen2-=(G_SENDBUFFER-queuebuffersize);
@@ -648,7 +649,7 @@ VSocket::SendQueued(const char *buff, const VCard bufflen)
 			// adzm 2010-09 - flush as soon as we have a full buffer, not if we have exceeded it.
 			while (bufflen2 >= G_SENDBUFFER)
 			{
-				if (!send(sock,buff2,G_SENDBUFFER,0)) return false;				
+				if (!sendall(sock,buff2,G_SENDBUFFER,0)) return false;				
 				//adzm 2010-08-01
 				m_LastSentTick = GetTickCount();
 			//	vnclog.Print(LL_SOCKERR, VNCLOG("SEND Q  %i\n") ,G_SENDBUFFER);
@@ -797,7 +798,7 @@ VSocket::ClearQueue()
 	//adzm 2010-08-01
 	m_LastSentTick = GetTickCount();
 	//adzm 2010-09 - return a bool in ClearQueue
-	if (!send(sock,queuebuffer,queuebuffersize,0))
+	if (!sendall(sock,queuebuffer,queuebuffersize,0)) 
 		return VFalse;
 	queuebuffersize=0;
   }
@@ -1085,6 +1086,40 @@ VSocket::ReadSelect(VCard to)
  	return false;
  }
 #endif
+
+extern bool			fShutdownOrdered;
+bool
+sendall(SOCKET RemoteSocket,char *buff,unsigned int bufflen,int dummy)
+{
+int val =0;
+	unsigned int totsend=0;
+	while (totsend <bufflen)
+	  {
+		struct fd_set write_fds;
+		struct timeval tm;
+		int count;
+		int aa=0;
+		do {
+			FD_ZERO(&write_fds);
+			FD_SET(RemoteSocket, &write_fds);
+			tm.tv_sec = 0;
+			tm.tv_usec = 150;
+			count = select(RemoteSocket+ 1, NULL, &write_fds, NULL, &tm);
+		} while (count == 0&& !fShutdownOrdered);
+		if (fShutdownOrdered) return 0;
+		if (count < 0 || count > 1) return 0;
+		if (FD_ISSET(RemoteSocket, &write_fds)) 
+		{
+			val=send(RemoteSocket, buff+totsend, bufflen-totsend, 0);
+		}
+		if (val==0) 
+			return false;
+		if (val==SOCKET_ERROR) 
+			return false;
+		totsend+=val;
+	  }
+	return 1;
+}
 
 
 
