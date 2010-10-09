@@ -221,6 +221,8 @@
 #define IDC_MANUAL                      1161
 #define IDC_CHECK2                      1162
 #define IDC_LIST1                       1164
+#define IDC_EDIT1                       1165
+#define IDC_MOUSE_THROTTLE              1165
 #define IDC_ENCODING_BASE               1999
 #define IDC_RAWRADIO                    2000
 #define IDC_RRERADIO                    2002
@@ -528,7 +530,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        210
 #define _APS_NEXT_COMMAND_VALUE         50025
-#define _APS_NEXT_CONTROL_VALUE         1165
+#define _APS_NEXT_CONTROL_VALUE         1166
 #define _APS_NEXT_SYMED_VALUE           154
 #endif
 #endif

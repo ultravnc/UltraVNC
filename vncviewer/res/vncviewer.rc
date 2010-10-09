@@ -13,11 +13,13 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Japanese (Japan) resources
+// Japanese resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+#ifdef _WIN32
 LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
 #pragma code_page(932)
+#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -25,16 +27,18 @@ LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
 //
 
 IDC_FINGER              CURSOR                  "Finger.cur"
-#endif    // Japanese (Japan) resources
+#endif    // Japanese resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// English (United States) resources
+// English (U.S.) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
+#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -89,7 +93,7 @@ IDI_DRIVE               ICON                    "drive.ico"
 // Menu
 //
 
-IDR_TRAYMENU MENU
+IDR_TRAYMENU MENU 
 BEGIN
     POPUP "t"
     BEGIN
@@ -103,7 +107,7 @@ BEGIN
     END
 END
 
-IDR_tbMENU MENU
+IDR_tbMENU MENU 
 BEGIN
     POPUP "Rightclick menu for FullScreenCaption"
     BEGIN
@@ -120,12 +124,12 @@ END
 // Dialog
 //
 
-IDD_OPTIONDIALOG DIALOGEX 0, 0, 323, 217
+IDD_OPTIONDIALOG DIALOGEX 0, 0, 335, 233
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION " Connection Options..."
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
-    GROUPBOX        "Format and Encoding",IDC_STATIC,4,2,150,166
+    GROUPBOX        "Format and Encoding",IDC_STATIC,4,2,160,166
     CONTROL         "Auto select best settings",IDC_AUTODETECT,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,10,12,136,12
     GROUPBOX        "",IDC_STATIC,9,22,72,86
     CONTROL         "ZRLE",IDC_ZRLERADIO,"Button",BS_AUTORADIOBUTTON,12,30,31,10
@@ -152,41 +156,43 @@ BEGIN
     CONTROL         "Jpeg (Tight) - Quality:",IDC_ALLOW_JPEG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,140,84,10
     EDITTEXT        IDC_QUALITYLEVEL,113,141,14,12,ES_AUTOHSCROLL
     CONTROL         "Preemptive Updates",IDC_PREEMPTIVEUPDATES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,151,81,10
-    GROUPBOX        "Misc",IDC_STATIC,4,170,150,45
+    GROUPBOX        "Misc",IDC_STATIC,4,170,160,58
     CONTROL         "Share the Server",IDC_SHARED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,180,71,10
     CONTROL         "Deiconify on Bell",IDC_BELLDEICONIFY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,191,137,8
     CONTROL         "Disable clipboard transfer",IDC_DISABLECLIPBOARD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,200,138,10
-    GROUPBOX        "Mouse and Keyboard",IDC_STATIC,159,2,159,85
-    CONTROL         "Emulate 3 Buttons (with 2-button click)",IDC_EMULATECHECK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,166,15,139,10
-    CONTROL         "Swap mouse buttons 2 and 3",ID_SESSION_SWAPMOUSE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,166,27,126,10
-    CONTROL         "Japanese keyboard",IDC_JAPKEYBOARD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,166,39,78,10
-    CONTROL         "Track remote cursor locally",IDC_CSHAPE_ENABLE_RADIO,
-                    "Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,165,52,144,10
-    CONTROL         "Let remote server deal with mouse cursor",IDC_CSHAPE_DISABLE_RADIO,
-                    "Button",BS_AUTORADIOBUTTON,165,63,147,10
-    CONTROL         "Don't show remote cursor",IDC_CSHAPE_IGNORE_RADIO,
-                    "Button",BS_AUTORADIOBUTTON,165,74,142,10
-    GROUPBOX        "Display",IDC_STATIC,159,90,159,77
-    CONTROL         "Show Buttons Bar (""Toolbar"")",IDC_SHOWTOOLBAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,166,102,109,10
-    EDITTEXT        IDC_SCALE_NUM,276,102,15,12,ES_AUTOHSCROLL | ES_NUMBER | NOT WS_VISIBLE
-    EDITTEXT        IDC_SCALE_DEN,294,102,14,12,ES_AUTOHSCROLL | ES_NUMBER | NOT WS_VISIBLE
-    CONTROL         "View only (inputs ignored)",IDC_VIEWONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,166,113,129,10
-    CONTROL         "Full-screen mode",IDC_FULLSCREEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,166,125,114,8
-    LTEXT           "Viewer Scale :",IDC_STATIC,165,139,47,8
-    CONTROL         "Auto",IDC_SCALING,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,220,139,36,10
-    LTEXT           "by",IDC_STATIC,259,139,10,8
-    COMBOBOX        IDC_SCALE_CB,272,137,30,117,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    CTEXT           "%",IDC_STATIC,303,140,8,8,0,WS_EX_TRANSPARENT
-    LTEXT           "Server Screen Scale by :",IDC_STATIC,165,152,80,8
-    LTEXT           "1  /",IDC_STATIC,253,153,12,8
-    EDITTEXT        IDC_SERVER_SCALE,271,153,14,12,ES_AUTOHSCROLL
-    EDITTEXT        IDC_SERVER_RECON,159,170,16,12,ES_AUTOHSCROLL
-    LTEXT           "number of times the reconnect is attempted",IDC_STATIC,180,171,143,11
     CONTROL         "Do not display the sponsor advertisement",IDC_CHECK1,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,163,187,145,10
-    DEFPUSHBUTTON   "OK",IDOK,214,202,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,269,202,50,14
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,210,145,10
+    GROUPBOX        "Mouse and Keyboard",IDC_STATIC,174,2,159,100
+    CONTROL         "Emulate 3 Buttons (with 2-button click)",IDC_EMULATECHECK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,15,139,10
+    CONTROL         "Swap mouse buttons 2 and 3",ID_SESSION_SWAPMOUSE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,27,126,10
+    CONTROL         "Japanese keyboard",IDC_JAPKEYBOARD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,39,78,10
+    CONTROL         "Track remote cursor locally",IDC_CSHAPE_ENABLE_RADIO,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,179,52,144,10
+    CONTROL         "Let remote server deal with mouse cursor",IDC_CSHAPE_DISABLE_RADIO,
+                    "Button",BS_AUTORADIOBUTTON,179,63,147,10
+    CONTROL         "Don't show remote cursor",IDC_CSHAPE_IGNORE_RADIO,
+                    "Button",BS_AUTORADIOBUTTON,179,74,142,10
+    EDITTEXT        IDC_MOUSE_THROTTLE,179,86,22,12,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "Mouse event throttle (milliseconds)",IDC_STATIC,205,88,116,11
+    GROUPBOX        "Display",IDC_STATIC,174,104,159,77
+    CONTROL         "Show Buttons Bar (""Toolbar"")",IDC_SHOWTOOLBAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,116,109,10
+    EDITTEXT        IDC_SCALE_NUM,279,116,15,12,ES_AUTOHSCROLL | ES_NUMBER | NOT WS_VISIBLE
+    EDITTEXT        IDC_SCALE_DEN,308,116,14,12,ES_AUTOHSCROLL | ES_NUMBER | NOT WS_VISIBLE
+    CONTROL         "View only (inputs ignored)",IDC_VIEWONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,127,129,10
+    CONTROL         "Full-screen mode",IDC_FULLSCREEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,139,114,8
+    LTEXT           "Viewer Scale :",IDC_STATIC,179,153,47,8
+    CONTROL         "Auto",IDC_SCALING,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,234,153,36,10
+    LTEXT           "by",IDC_STATIC,262,153,10,8
+    COMBOBOX        IDC_SCALE_CB,286,151,30,117,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    CTEXT           "%",IDC_STATIC,306,154,8,8,0,WS_EX_TRANSPARENT
+    LTEXT           "Server Screen Scale by :",IDC_STATIC,179,166,80,8
+    LTEXT           "1  /",IDC_STATIC,267,167,12,8
+    EDITTEXT        IDC_SERVER_SCALE,285,167,14,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_SERVER_RECON,178,184,16,12,ES_AUTOHSCROLL
+    LTEXT           "reconnection attempts",IDC_STATIC,199,185,85,11
+    DEFPUSHBUTTON   "OK",IDOK,225,215,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,280,215,50,14
     GROUPBOX        "",IDC_STATIC,84,22,65,86,WS_GROUP
 END
 
@@ -270,7 +276,7 @@ BEGIN
     GROUPBOX        "",IDC_STATIC,4,136,237,42
 END
 
-IDD_SERVINFO_DLG DIALOG 0, 0, 224, 170
+IDD_SERVINFO_DLG DIALOG  0, 0, 224, 170
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "RFB Server information"
 FONT 8, "MS Shell Dlg"
@@ -452,12 +458,13 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO
+GUIDELINES DESIGNINFO 
 BEGIN
     IDD_OPTIONDIALOG, DIALOG
     BEGIN
-        RIGHTMARGIN, 318
+        RIGHTMARGIN, 330
         VERTGUIDE, 164
+        BOTTOMMARGIN, 217
         HORZGUIDE, 168
     END
 
@@ -679,12 +686,12 @@ END
 // String Table
 //
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDR_TRAY                "Ultr@VNC Viewer listening"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     ID_CLOSEDAEMON          "Stop listening for incoming connections"
     ID_SHOWWINDOW           "Display a connection window"
@@ -693,7 +700,7 @@ BEGIN
     ID_BUTTON_FTRANS        "FileTansfer"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     ID_BUTTON_DINPUT        "Disable buttons"
     ID_BUTTON_DBUTTON       "Disable server mouse and keyboard"
@@ -710,12 +717,12 @@ BEGIN
     IDS_B3                  "VNC error"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDC_OPTIONBUTTON        "Set the options to be used for new connections"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDS_C1                  "Failed to open clipboard\n"
     IDS_C2                  "Failed to empty clipboard\n"
@@ -735,7 +742,7 @@ BEGIN
     IDS_D13                 "Invalid loglevel specified"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDS_D14                 "No logfile specified"
     IDS_D15                 "Invalid logfile specified"
@@ -755,7 +762,7 @@ BEGIN
     IDS_E1                  "Unable to load the Rich Edit (RICHED32.DLL) control!"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDS_E2                  "Rich Edit Dll Loading"
     IDS_F1                  "The Plugin cannot be loaded.\n\rPlease check its integrity."
@@ -773,7 +780,7 @@ BEGIN
     IDS_H1                  " > WARNING: File Transfer is Disabled on the Remote Machine"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDS_H2                  " > WARNING: File Transfer is Disabled on the Remote Machine"
     IDS_H3                  "File Transfer permission denied: disabled or unknown user or version incompatibility"
@@ -793,7 +800,7 @@ BEGIN
     IDS_H17                 "File"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDS_H18                 "successfully RECEIVED..."
     IDS_H19                 "ERROR: Transfer of File"
@@ -813,7 +820,7 @@ BEGIN
     IDS_H33                 "Unable to delete the File"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDS_H34                 "has been deleted on the Remote Machine"
     IDS_H35                 "File Transfer with"
@@ -833,7 +840,7 @@ BEGIN
     IDS_H49                 "Unable to delete the Local File"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDS_H50                 "has been Deleted"
     IDS_H51                 "Are you sure you want to Delete the REMOTE File"
@@ -853,7 +860,7 @@ BEGIN
     IDS_K3                  "Do you want to save the password in this file?\n\r (Yes) Saving a password to a file is unsecure."
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDS_K4                  "Security warning"
     IDS_K5                  "Error reading host name from file"
@@ -873,7 +880,7 @@ BEGIN
     IDS_L12                 "Open File Transfer..."
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDS_L13                 "Select Single Window"
     IDS_L14                 "Select Full Desktop / Switch monitor(driver only)"
@@ -893,7 +900,7 @@ BEGIN
     IDS_L28                 "&Normal screen \tCtrl+F11"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDS_L29                 "&Full Colors"
     IDS_L30                 "&256  Colors"
@@ -913,7 +920,7 @@ BEGIN
     IDS_L44                 "Error creating socket !"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDS_L45                 "Lookup server address ..."
     IDS_L46                 "Failed to get server address !"
@@ -933,7 +940,7 @@ BEGIN
     IDS_L60                 "Unknown authentication scheme!"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDS_L61                 "Error creating local image of screen."
     IDS_L62                 "Please wait - Initial screen loading..."
@@ -953,7 +960,7 @@ BEGIN
     IDS_L76                 "Closing VNCviewer"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDS_L77                 "The connected VNC Server doesn't support UltraVNC File Transfer !"
     IDS_L78                 "Unavailable Functionnality"
@@ -973,7 +980,7 @@ BEGIN
     IDS_L92                 "No authentication needed"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDS_H58                 "File(s)/Folder(s)"
     IDS_H59                 "Decompressing Folder"
@@ -993,7 +1000,7 @@ BEGIN
     IDS_H73                 "The LOCAL Folder"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDS_M1                  "One File or Directory can be renamed at a time"
     IDS_M2                  "File & Directory Rename Warning"
@@ -1013,14 +1020,14 @@ BEGIN
     IDS_L93                 "View Only... \tCtrl+Alt+F3"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDS_H101                "Folder Transfer Warning"
     IDS_H102                "a file or folder of that name already exists."
     IDS_L94                 "Server closed connection"
 END
 
-#endif    // English (United States) resources
+#endif    // English (U.S.) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -1028,8 +1035,10 @@ END
 // Dutch (Netherlands) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NLD)
+#ifdef _WIN32
 LANGUAGE LANG_DUTCH, SUBLANG_DUTCH
 #pragma code_page(1252)
+#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1048,8 +1057,10 @@ IDB_BITMAPs             BITMAP                  "Tango_s.bmp"
 // Dutch (Belgium) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NLB)
+#ifdef _WIN32
 LANGUAGE LANG_DUTCH, SUBLANG_DUTCH_BELGIAN
 #pragma code_page(1252)
+#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1082,7 +1093,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO
+GUIDELINES DESIGNINFO 
 BEGIN
     IDD_SESSIONSELECTOR, DIALOG
     BEGIN

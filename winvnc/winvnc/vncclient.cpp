@@ -1329,7 +1329,7 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth)
 		// Check if viewer accept connection
 		if (SPECIAL_SC_PROMPT || SPECIAL_SC_EXIT)
 		{
-		CARD32 auth_result_msg = Swap32IfLE(rfbUltraVNC_ScPromt);
+		CARD32 auth_result_msg = Swap32IfLE(rfbUltraVNC_SCPrompt);
 		if (!m_socket->SendExact((char *)&auth_result_msg, sizeof(auth_result_msg)))
 			return FALSE;
 

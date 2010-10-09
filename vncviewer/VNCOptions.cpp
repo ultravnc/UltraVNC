@@ -1393,6 +1393,9 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 		  //adzm 2010-07-04
 		  HWND hpreemptiveUpdates = GetDlgItem(hwnd, IDC_PREEMPTIVEUPDATES);
 		  SendMessage(hpreemptiveUpdates, BM_SETCHECK, _this->m_preemptiveUpdates ? BST_CHECKED : BST_UNCHECKED, 0);
+
+		  //adzm 2010-10
+		  SetDlgItemInt(hwnd, IDC_MOUSE_THROTTLE, _this->m_throttleMouse, FALSE);
 		  
 		  return TRUE;
     }
@@ -1586,6 +1589,14 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 			//adzm 2010-07-04
 			 HWND hpreemptiveUpdates = GetDlgItem(hwnd, IDC_PREEMPTIVEUPDATES);
 			 _this->m_preemptiveUpdates = (SendMessage(hpreemptiveUpdates, BM_GETCHECK, 0, 0) == BST_CHECKED) ? true : false;
+
+			 
+			  //adzm 2010-10
+			 BOOL bGotInt = FALSE;
+			  UINT nThrottle = GetDlgItemInt(hwnd, IDC_MOUSE_THROTTLE, &bGotInt, FALSE);
+			  if (bGotInt) {
+				  _this->m_throttleMouse = (int)nThrottle;
+			  }
 
 			  
 			  EndDialog(hwnd, TRUE);

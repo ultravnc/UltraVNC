@@ -2536,7 +2536,7 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 		}
 		break;
 
-	case rfbUltraVNC_ScPromt:
+	case rfbUltraVNC_SCPrompt:
 		{
 		if (m_minorVersion < 7) {
 			vnclog.Print(0, _T("Invalid auth continue response for protocol version.\n"));	
@@ -2619,10 +2619,10 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 			vnclog.Print(0, _T("Invalid auth continue response for protocol version.\n"));	
 			throw ErrorException("Invalid auth continue response");
 		}
-		if (authScheme != rfbUltraVNC_SecureVNCPluginAuth && authScheme != rfbUltraVNC) {
+		/*if (authScheme != rfbUltraVNC_SecureVNCPluginAuth && authScheme != rfbUltraVNC) {
 			vnclog.Print(0, _T("Invalid auth continue response\n"));	
 			throw ErrorException("Invalid auth continue response");
-		}
+		}*/
 		if (current_auth.size() > 5) { // arbitrary
 			vnclog.Print(0, _T("Cannot layer more than six authentication schemes\n"), authScheme);
 			throw ErrorException("Cannot layer more than six authentication schemes\n");
@@ -6750,6 +6750,9 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 										_this->SizeWindow();
 									_this->m_pendingFormatChange = true;
 								}
+
+								// adzm 2010-10
+								_this->m_PendingMouseMove.dwMinimumMouseMoveInterval = _this->m_opts.m_throttleMouse;
 							}		
 
 							// adzm - 2010-07 - Extended clipboard
@@ -8644,6 +8647,8 @@ ClientConnection::PendingMouseMove::PendingMouseMove()
 	bValid(false),
 	dwMinimumMouseMoveInterval(0) // changed to 0 from 150; need to have an interface for this
 {	
+	//adzm 2010-10 - This is in the standard options dialog now.
+	/*
 	HKEY hRegKey;
 	DWORD dwPreferredMinimumMouseMoveInterval = 0;
 	if ( RegCreateKey(HKEY_CURRENT_USER, SETTINGS_KEY_NAME, &hRegKey)  != ERROR_SUCCESS ) {
@@ -8657,6 +8662,7 @@ ClientConnection::PendingMouseMove::PendingMouseMove()
 		}
 		RegCloseKey(hRegKey);
 	}
+	*/
 }
 
 // adzm 2010-09 - Notify streaming DSM plugin support
