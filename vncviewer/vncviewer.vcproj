@@ -552,19 +552,19 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Tango_l.bmp"
-				>
-			</File>
-			<File
 				RelativePath=".\res\Tango_l.bmp"
 				>
 			</File>
 			<File
-				RelativePath=".\res\Tango_lx.bmp"
+				RelativePath=".\Tango_l.bmp"
 				>
 			</File>
 			<File
 				RelativePath=".\Tango_lx.bmp"
+				>
+			</File>
+			<File
+				RelativePath=".\res\Tango_lx.bmp"
 				>
 			</File>
 			<File
