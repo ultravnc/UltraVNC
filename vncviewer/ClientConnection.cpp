@@ -8805,7 +8805,7 @@ BOOL CALLBACK DialogProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 				for ( int a=0;a<nr_lines;a++)
 				{
 					memset(line,0,128);
-					cc->ReadExact((char *)line, sizeof(128));	
+					cc->ReadExact((char *)line, 128);	
 					iItem=SendMessage(hList,LVM_GETITEMCOUNT,0,0);
 					LvItem.iItem=iItem;            // choose item  
 					LvItem.iSubItem=0;         // Put in first coluom
