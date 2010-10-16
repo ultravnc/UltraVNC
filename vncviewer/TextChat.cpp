@@ -139,7 +139,7 @@ void TextChat::SetTextFormat(bool bBold /*= false */, bool bItalic /*= false*/
 		}
 		cf.crTextColor = dwColor;					// set color in AABBGGRR mode (alpha-RGB)
 		cf.yHeight = nSize;							// set size in points
-		strcpy( cf.szFaceName, szFaceName);
+		strcpy_s( cf.szFaceName,32, szFaceName);
 													
 		SendDlgItemMessage( m_hDlg, IDC_CHATAREA_EDIT, EM_SETCHARFORMAT, SCF_SELECTION, (LPARAM)&cf );
 	}
