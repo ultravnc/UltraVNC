@@ -2406,8 +2406,8 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 	case rfbNoAuth:
 		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L92);
 		vnclog.Print(0, _T("No authentication needed\n"));
-		current_auth.push_back(authScheme);
-		return;
+//		current_auth.push_back(authScheme);
+//		return;
 		break;
 	case rfbConnFailed:
 		ReadExact((char *)&reasonLen, 4);
