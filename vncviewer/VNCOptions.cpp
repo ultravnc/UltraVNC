@@ -293,27 +293,27 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
   m_saved_scale_den = s.m_saved_scale_den;
   m_saved_scaling   = s.m_saved_scaling;
 
-  strcpy(m_szDSMPluginFilename, s.m_szDSMPluginFilename);
+  strcpy_s(m_szDSMPluginFilename, 260,s.m_szDSMPluginFilename);
   
-  strcpy(m_host_options, s.m_host_options);
+  strcpy_s(m_host_options, 256,s.m_host_options);
   m_port				= s.m_port;
 
-  strcpy(m_proxyhost, s.m_proxyhost);
+  strcpy_s(m_proxyhost, 256,s.m_proxyhost);
   m_proxyport				= s.m_proxyport;
   m_fUseProxy	      = s.m_fUseProxy;
   
-  strcpy(m_kbdname, s.m_kbdname);
+  strcpy_s(m_kbdname, 9,s.m_kbdname);
   m_kbdSpecified		= s.m_kbdSpecified;
 	
   m_logLevel			= s.m_logLevel;
   m_logToConsole		= s.m_logToConsole;
   m_logToFile			= s.m_logToFile;
-  strcpy(m_logFilename, s.m_logFilename);
+  strcpy_s(m_logFilename,260, s.m_logFilename);
 
   m_delay				= s.m_delay;
   m_connectionSpecified = s.m_connectionSpecified;
   m_configSpecified   = s.m_configSpecified;
-  strcpy(m_configFilename, s.m_configFilename);
+  strcpy_s(m_configFilename, 260,s.m_configFilename);
 
   m_listening			= s.m_listening;
   m_listenPort			= s.m_listenPort;
@@ -917,7 +917,7 @@ void VNCOptions::CheckProxyAndHost()
 
 void saveInt(char *name, int value, char *fname) 
 {
-  char buf[4];
+  char buf[10];
   sprintf(buf, "%d", value); 
   WritePrivateProfileString("options", name, buf, fname);
 }
