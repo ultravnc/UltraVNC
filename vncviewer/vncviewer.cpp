@@ -310,6 +310,32 @@ HINSTANCE m_hInstResDLL;
 #include "C:/DATA/crash/crashrpt/include/crashrpt.h"
 #pragma comment(lib, "C:/DATA/crash/crashrpt/lib/crashrpt")
 #endif
+typedef void (CALLBACK* LPFNSETDLLDIRECTORY)(LPCTSTR);
+static LPFNSETDLLDIRECTORY MySetDllDirectory = NULL;
+
+static BOOL read_reg_string(HKEY key, char* sub_key, char* val_name, LPBYTE data, LPDWORD data_len) {
+        HKEY hkey;
+        BOOL ret = FALSE;
+        int retv;
+
+        if(ERROR_SUCCESS == RegOpenKeyEx(key, 
+                                         sub_key, 
+					 0,  KEY_QUERY_VALUE, &hkey)) {
+                if(ERROR_SUCCESS == (retv=RegQueryValueEx(hkey, val_name, 0, NULL, data, data_len)))
+                        ret = TRUE;
+                else
+                        vnclog.Print(3,"Could not read reg key '%s' subkey '%s' value: '%s'\nError: %u\n",
+                               ((key == HKEY_LOCAL_MACHINE) ? "HKLM" : (key == HKEY_CURRENT_USER) ? "HKCU" : "???"),
+                               sub_key, val_name, (UINT)GetLastError());
+                RegCloseKey(key);
+        }
+        else
+                vnclog.Print(3,"Could not open reg subkey: %s\nError: %u\n", sub_key, (UINT)GetLastError());
+
+        return ret;
+}
+
+
 
 #ifdef UNDER_CE
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR szCmdLine, int iCmdShow)
@@ -327,7 +353,57 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 
   // [v1.0.2-jp1 fix]
   //m_hInstResDLL = LoadLibrary("lang.dll");
-  SetDllDirectory("");
+  HMODULE hmod;
+  HKEY hkey;
+  if((hmod=GetModuleHandle("kernel32.dll"))) 
+  {
+	MySetDllDirectory = (LPFNSETDLLDIRECTORY)GetProcAddress(hmod, "SetDllDirectoryA");
+	if(MySetDllDirectory)  MySetDllDirectory("");
+	else
+	{
+		OSVERSIONINFO osinfo;
+		osinfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+		GetVersionEx(&osinfo);
+		if((osinfo.dwMajorVersion == 5 && osinfo.dwMinorVersion == 0 && strcmp(osinfo.szCSDVersion, "Service Pack 3") >= 0) ||
+                   (osinfo.dwMajorVersion == 5 &&  osinfo.dwMinorVersion == 1 && strcmp(osinfo.szCSDVersion, "") >= 0)) 
+		{
+			DWORD regval = 1;
+                        DWORD reglen = sizeof(DWORD);
+
+                        vnclog.Print(3,"Using Win2k (SP3+) / WinXP (No SP).. Checking SafeDllSearch\n");
+                        read_reg_string(HKEY_LOCAL_MACHINE,
+                                        "System\\CurrentControlSet\\Control\\Session Manager",
+                                        "SafeDllSearchMode",
+                                        (LPBYTE)&regval,
+                                        &reglen);
+
+                        if(regval != 0) {
+                                vnclog.Print(3,"Trying to set SafeDllSearchMode to 0\n");
+                                regval = 0;
+                                if(RegOpenKeyEx(HKEY_LOCAL_MACHINE, 
+                                                "System\\CurrentControlSet\\Control\\Session Manager", 
+                                                0,  KEY_SET_VALUE, &hkey) == ERROR_SUCCESS) {
+                                        if(RegSetValueEx(hkey, 
+                                                         "SafeDllSearchMode",
+                                                         0,
+                                                         REG_DWORD,
+                                                         (LPBYTE) &regval,
+                                                         sizeof(DWORD)) != ERROR_SUCCESS)
+                                                vnclog.Print(3,"Error writing SafeDllSearchMode. Error: %u\n",(UINT)GetLastError());
+                                        RegCloseKey(hkey);
+                                }
+                                else
+                                        vnclog.Print(3,"Error opening Session Manager key for writing. Error: %u\n",(UINT)GetLastError());
+                        }
+                        else
+                                vnclog.Print(3,"SafeDllSearchMode is set to 0\n");
+
+
+		}
+
+
+	}
+  }
   m_hInstResDLL = LoadLibrary("vnclang.dll");
   
   if (m_hInstResDLL==NULL)
