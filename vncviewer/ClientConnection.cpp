@@ -4915,12 +4915,15 @@ inline void ClientConnection::ReadScreenUpdate()
 					// Get the size of the rectangle data buffer
 					ReadExact((char*)&(m_nZRLEReadSize), sizeof(CARD32));
 					m_nZRLEReadSize = Swap32IfLE(m_nZRLEReadSize);
+					int tempsize=m_nZRLEReadSize;
 					// Read the whole  rect buffer and put the result in m_netbuf
-					CheckZRLENetRectBufferSize((int)(m_nZRLEReadSize));
-					CheckBufferSize((int)(m_nZRLEReadSize)); // sf@2003
-					ReadExact((char*)(m_pZRLENetRectBuf), (int)(m_nZRLEReadSize));
+					CheckZRLENetRectBufferSize((int)(m_nZRLEReadSize)+4);
+					CheckBufferSize((int)(m_nZRLEReadSize)+4); // sf@2003
+					ReadExact((char*)(m_pZRLENetRectBuf+4), (int)(m_nZRLEReadSize));
 					// Tell the following Read() function calls to Read Data from memory
-					fis->SetReadFromMemoryBuffer(m_nZRLEReadSize, (char*)(m_pZRLENetRectBuf));
+					tempsize = Swap32IfLE(tempsize);
+					memcpy(m_pZRLENetRectBuf,(char*)&tempsize,4);
+					fis->SetReadFromMemoryBuffer(m_nZRLEReadSize+4, (char*)(m_pZRLENetRectBuf));
 				}
 			}
 		}
