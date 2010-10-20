@@ -615,7 +615,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 						// We can not contact a runnning service, permissions, so we must store the settings
 						// and process until the vncmenu has been started
 						vnclog.Print(LL_INTERR, VNCLOG("PostAddNewClient III \n"));
-						if (!vncService::PostAddNewClient(address, port))
+						if (!vncService::PostAddNewClientInit(address, port))
 						{
 						PostAddNewClient_bool=true;
 						port_int=port;
