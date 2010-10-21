@@ -655,7 +655,7 @@ DWORD WINAPI ReconnectThreadProc(LPVOID lpParameter)
 			e.Report();
 		cc->reconnectcounter--;
 		if (cc->reconnectcounter<0) cc->reconnectcounter=0;
-		PostMessage(cc->m_hwndMain, WM_CLOSE, cc->reconnectcounter, 1);
+		//PostMessage(cc->m_hwndMain, WM_CLOSE, cc->reconnectcounter, 1);
 	}
 	return 0;
 }
@@ -3655,6 +3655,8 @@ void ClientConnection::SuspendThread()
 		//adzm 2010-09
 		m_nQueueBufferLength = 0;
 	}
+	m_fPluginStreamingIn = false;
+	m_fPluginStreamingOut = false;
 }
 void
 ClientConnection::CloseWindows()
