@@ -2297,6 +2297,8 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 				switch (authAllowed[i]) {
 				case rfbUltraVNC:
 				case rfbUltraVNC_SecureVNCPluginAuth:
+				case rfbUltraVNC_SCPrompt: // adzm 2010-10
+				case rfbUltraVNC_SessionSelect:
 				case rfbUltraVNC_MsLogonIIAuth:
 				case rfbVncAuth:
 				case rfbNoAuth:
@@ -2309,6 +2311,8 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 				std::vector<CARD8> auth_priority;
 				auth_priority.push_back(rfbUltraVNC);
 				auth_priority.push_back(rfbUltraVNC_SecureVNCPluginAuth);
+				auth_priority.push_back(rfbUltraVNC_SCPrompt); // adzm 2010-10
+				auth_priority.push_back(rfbUltraVNC_SessionSelect);
 				auth_priority.push_back(rfbUltraVNC_MsLogonIIAuth);
 				auth_priority.push_back(rfbVncAuth);
 				auth_priority.push_back(rfbNoAuth);
@@ -2335,7 +2339,7 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 
 void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>& current_auth)
 {
-	if (current_auth.size() > 1) {
+	if (current_auth.size() > 5) {
 		vnclog.Print(0, _T("Cannot layer more than two authentication schemes\n"), authScheme);
 		throw ErrorException("Cannot layer more than two authentication schemes\n");
 	}
@@ -2347,7 +2351,7 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 
 	bool bSecureVNCPluginActive = std::find(current_auth.begin(), current_auth.end(), rfbUltraVNC_SecureVNCPluginAuth) != current_auth.end();
 	
-	if (!bSecureVNCPluginActive && m_fUsePlugin && m_pIntegratedPluginInterface && authScheme != rfbConnFailed && authScheme != rfbUltraVNC_SecureVNCPluginAuth && authScheme != rfbUltraVNC) 
+	if (!bSecureVNCPluginActive && m_fUsePlugin && m_pIntegratedPluginInterface && !authScheme != rfbConnFailed && authScheme != rfbUltraVNC_SecureVNCPluginAuth && authScheme != rfbUltraVNC) 
 	{
 		//adzm 2010-05-12
 		if (m_opts.m_fRequireEncryption) {
@@ -2402,6 +2406,12 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 		} else {
 			AuthVnc();
 		}
+		break;
+	case rfbUltraVNC_SCPrompt:
+		AuthSCPrompt();
+		break;
+	case rfbUltraVNC_SessionSelect:
+		AuthSessionSelect();
 		break;
 	case rfbNoAuth:
 		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L92);
@@ -2488,145 +2498,11 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 		//adzm 2010-05-10
 		AuthMsLogonII();
 		break;
-	case rfbUltraVNC_SessionSelect:
-		{
-		if (m_minorVersion < 7) {
-			vnclog.Print(0, _T("Invalid auth continue response for protocol version.\n"));	
-			throw ErrorException("Invalid auth continue response");
-		}
-
-		INITCOMMONCONTROLSEX InitCtrls;
-		InitCtrls.dwICC = ICC_LISTVIEW_CLASSES|ICC_INTERNET_CLASSES;
-		InitCtrls.dwSize = sizeof(INITCOMMONCONTROLSEX);
-		BOOL bRet = InitCommonControlsEx(&InitCtrls);
-		int tt=DialogBoxParam(m_pApp->m_instance, MAKEINTRESOURCE(IDD_SESSIONSELECTOR), NULL, (DLGPROC)DialogProc,(LPARAM)this);
-		WriteExact((char *)&tt,sizeof(int));
-
-
-
-		CARD32 real_authResult;
-		ReadExact((char *)&real_authResult, sizeof(real_authResult));	
-		real_authResult = Swap32IfLE(real_authResult);
-		switch (real_authResult)
-		{
-			case rfbVncAuthOK:
-				if (m_hwndStatus)vnclog.Print(0, _T("VNC authentication succeeded\n"));
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L55);
-	
-				g_passwordfailed=false;
-				break;
-			default : 
-				vnclog.Print(0, _T("VNC authentication failed!"));			
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L56);
-				if (m_minorVersion >= 7 || authResult == rfbVncAuthFailedEx) {
-					vnclog.Print(0, _T("VNC authentication failed! Extended information available."));	
-					//adzm 2010-05-11 - Send an explanatory message for the failure (if any)
-					ReadExact((char *)&reasonLen, 4);
-					reasonLen = Swap32IfLE(reasonLen);
-			
-					CheckBufferSize(reasonLen+1);
-					ReadString(m_netbuf, reasonLen);
-			
-					vnclog.Print(0, _T("VNC authentication failed! Extended information: %s\n"), m_netbuf);
-					if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,m_netbuf);
-					throw WarningException(m_netbuf);
-				} else {
-					vnclog.Print(0, _T("VNC authentication failed!"));	
-					SetEvent(KillEvent);
-					throw WarningException(sz_L57,IDS_L57);
-				}
-				break;
-		}
-		}
-		break;
-
-	case rfbUltraVNC_SCPrompt:
-		{
-		if (m_minorVersion < 7) {
-			vnclog.Print(0, _T("Invalid auth continue response for protocol version.\n"));	
-			throw ErrorException("Invalid auth continue response");
-		}
-		/// SHOW Messagebox 
-		int size;
-		ReadExact((char *)&size,sizeof(int));
-		char mytext[1025]; //10k
-		//block
-		if (size<0 || size >1024)
-		{
-			throw WarningException("Buffer too big, ");
-			if (size<0) size=0;
-			if (size>1024) size=1024;
-		}
-
-		ReadExact(mytext,size);
-		mytext[size]=0;
-
-		//adzm 2009-06-21 - auto-accept if specified
-		if (!m_opts.m_fAutoAcceptIncoming) {
-			int returnvalue=MessageBox(m_hwndMain,   mytext,"Accept Incoming SC Connection", MB_YESNO |  MB_TOPMOST);
-			if (returnvalue==IDNO) 
-			{
-				int nummer=0;
-				WriteExact((char *)&nummer,sizeof(int));
-				//throw WarningException("You refused the connection");
-			}
-			else
-			{
-				int nummer=1;
-				WriteExact((char *)&nummer,sizeof(int));
-
-			}
-		} else {
-			int nummer=1;
-			WriteExact((char *)&nummer,sizeof(int));
-		}	
-
-		
-		CARD32 real_authResult;
-		ReadExact((char *)&real_authResult, sizeof(real_authResult));	
-		real_authResult = Swap32IfLE(real_authResult);
-		switch (real_authResult)
-		{
-			case rfbVncAuthOK:
-				if (m_hwndStatus)vnclog.Print(0, _T("VNC authentication succeeded\n"));
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L55);
-	
-				g_passwordfailed=false;
-				break;
-			default : 
-				vnclog.Print(0, _T("VNC authentication failed!"));			
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L56);
-				if (m_minorVersion >= 7 || authResult == rfbVncAuthFailedEx) {
-					vnclog.Print(0, _T("VNC authentication failed! Extended information available."));	
-					//adzm 2010-05-11 - Send an explanatory message for the failure (if any)
-					ReadExact((char *)&reasonLen, 4);
-					reasonLen = Swap32IfLE(reasonLen);
-			
-					CheckBufferSize(reasonLen+1);
-					ReadString(m_netbuf, reasonLen);
-			
-					vnclog.Print(0, _T("VNC authentication failed! Extended information: %s\n"), m_netbuf);
-					if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,m_netbuf);
-					throw WarningException(m_netbuf);
-				} else {
-					vnclog.Print(0, _T("VNC authentication failed!"));	
-					SetEvent(KillEvent);
-					throw WarningException(sz_L57,IDS_L57);
-				}
-				break;
-		}
-		}
-		break;
-
 	case rfbVncAuthContinue:
 		if (m_minorVersion < 7) {
 			vnclog.Print(0, _T("Invalid auth continue response for protocol version.\n"));	
 			throw ErrorException("Invalid auth continue response");
 		}
-		/*if (authScheme != rfbUltraVNC_SecureVNCPluginAuth && authScheme != rfbUltraVNC) {
-			vnclog.Print(0, _T("Invalid auth continue response\n"));	
-			throw ErrorException("Invalid auth continue response");
-		}*/
 		if (current_auth.size() > 5) { // arbitrary
 			vnclog.Print(0, _T("Cannot layer more than six authentication schemes\n"), authScheme);
 			throw ErrorException("Cannot layer more than six authentication schemes\n");
@@ -3005,6 +2881,57 @@ void ClientConnection::AuthVnc()
 		passwd[i] = '\0';
 	}			
 	WriteExact((char *) challenge, CHALLENGESIZE);
+}
+
+void ClientConnection::AuthSCPrompt()
+{
+	if (m_minorVersion < 7) {
+		vnclog.Print(0, _T("Invalid auth continue response for protocol version.\n"));	
+		throw ErrorException("Invalid auth continue response");
+	}
+	/// SHOW Messagebox 
+	int size;
+	ReadExact((char *)&size,sizeof(int));
+	char mytext[1025]; //10k
+	//block
+	if (size<0 || size >1024)
+	{
+		throw WarningException("Buffer too big, ");
+		if (size<0) size=0;
+		if (size>1024) size=1024;
+	}
+
+	ReadExact(mytext,size);
+	mytext[size]=0;
+
+	//adzm 2009-06-21 - auto-accept if specified
+	int accepted = 0;
+	if (!m_opts.m_fAutoAcceptIncoming) {
+		int returnvalue=MessageBox(m_hwndMain,   mytext,"Accept Incoming SC Connection", MB_YESNO |  MB_TOPMOST);
+		if (returnvalue != IDNO) 
+		{
+			accepted = 1;
+		}
+	} else {
+		accepted = 1;
+	}
+
+	WriteExact((char *)&accepted,sizeof(accepted));
+}
+
+void ClientConnection::AuthSessionSelect()
+{	
+	if (m_minorVersion < 7) {
+		vnclog.Print(0, _T("Invalid auth continue response for protocol version.\n"));	
+		throw ErrorException("Invalid auth continue response");
+	}
+
+	INITCOMMONCONTROLSEX InitCtrls;
+	InitCtrls.dwICC = ICC_LISTVIEW_CLASSES|ICC_INTERNET_CLASSES;
+	InitCtrls.dwSize = sizeof(INITCOMMONCONTROLSEX);
+	BOOL bRet = InitCommonControlsEx(&InitCtrls);
+	int tt=DialogBoxParam(m_pApp->m_instance, MAKEINTRESOURCE(IDD_SESSIONSELECTOR), NULL, (DLGPROC)DialogProc,(LPARAM)this);
+	WriteExact((char *)&tt,sizeof(int));
 }
 
 void ClientConnection::SendClientInit()
@@ -7802,6 +7729,9 @@ LRESULT CALLBACK ClientConnection::WndProcTBwin(HWND hwnd, UINT iMsg, WPARAM wPa
 								_tcscpy(fulldisplay, display);
 								vnclog.Print(0,_T("CLICKK %s\n"),fulldisplay);
 								ParseDisplay(fulldisplay, display, 256, &port);
+								if (strcmp(display, "ID") == 0) {
+									return TRUE;
+								}
 								_this->m_pApp->NewConnection(false,display,port);
 								}
 						}

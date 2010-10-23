@@ -416,11 +416,15 @@ void FileTransfer::TimerCallback(FileTransfer* ft)
 void FileTransfer::ShowFileTransferWindow(bool fVisible)
 {
 //	vnclog.Print(0, _T("ShowFileTransferWindow\n"));
-    if (m_fVisible == fVisible)
-        return;
+	bool bChanged = false;
+	if (m_fVisible != fVisible) {
+		bChanged = true;
+	}
 
 	ShowWindow(hWnd, fVisible ? SW_RESTORE : SW_MINIMIZE);
-	SetForegroundWindow(hWnd);
+	if (fVisible) {
+		SetForegroundWindow(hWnd);
+	}
 	// Put the FT Windows always on Top if fullscreen
 	if (fVisible && m_pCC->InFullScreenMode())
 	{
@@ -438,7 +442,7 @@ void FileTransfer::ShowFileTransferWindow(bool fVisible)
 	m_fVisible = fVisible; // This enables screen updates to be processed in ClientConnection
 	// Refresh screen view if FileTransfer window has been hidden
 	//adzm 2010-09 - all socket writes must remain on a single thread, but we only need an async request here
-	if (!fVisible)
+	if (bChanged && !fVisible)
 		m_pCC->SendAppropriateFramebufferUpdateRequest(true);
 }
 
