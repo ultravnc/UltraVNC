@@ -655,7 +655,8 @@ DWORD WINAPI ReconnectThreadProc(LPVOID lpParameter)
 			e.Report();
 		cc->reconnectcounter--;
 		if (cc->reconnectcounter<0) cc->reconnectcounter=0;
-		//PostMessage(cc->m_hwndMain, WM_CLOSE, cc->reconnectcounter, 1);
+		//Seems is needed, countdown stop
+		PostMessage(cc->m_hwndMain, WM_CLOSE, cc->reconnectcounter, 1);
 	}
 	return 0;
 }
@@ -1524,6 +1525,9 @@ void ClientConnection::LoadDSMPlugin(bool fForceReload)
 		if (m_pDSMPlugin->IsLoaded() && fForceReload)
 		{
 			m_pDSMPlugin->UnloadPlugin();
+			//unloaded, interface doesn't exist anymore
+			m_pPluginInterface = NULL;
+			m_pIntegratedPluginInterface = NULL;
 			m_pDSMPlugin->SetEnabled(false);
 		}
 
@@ -4423,13 +4427,13 @@ void* ClientConnection::run_undetached(void* arg) {
 				// the viewer window
 				case rfbResizeFrameBuffer:
 				{
+					ClearCache();
 					rfbResizeFrameBufferMsg rsmsg;
 					ReadExact(((char*)&rsmsg) + m_nTO, sz_rfbResizeFrameBufferMsg - m_nTO);
 
 					m_si.framebufferWidth = Swap16IfLE(rsmsg.framebufferWidth);
 					m_si.framebufferHeight = Swap16IfLE(rsmsg.framebufferHeigth);
-
-					ClearCache();
+					
 					CreateLocalFramebuffer();
 					// SendFullFramebufferUpdateRequest();
 					Createdib();
@@ -4845,6 +4849,19 @@ inline void ClientConnection::ReadScreenUpdate()
 			{
 				if ((surh.encoding == rfbEncodingZYWRLE)||(surh.encoding == rfbEncodingZRLE))
 				{
+					if (m_minorVersion==6 || m_minorVersion==4 || m_minorVersion==16 || m_minorVersion==14)
+					{
+						ReadExact((char*)&(m_nZRLEReadSize), sizeof(CARD32));
+						m_nZRLEReadSize = Swap32IfLE(m_nZRLEReadSize);
+
+						CheckZRLENetRectBufferSize((int)(m_nZRLEReadSize));
+						CheckBufferSize((int)(m_nZRLEReadSize)); // sf@2003
+						ReadExact((char*)(m_pZRLENetRectBuf), (int)(m_nZRLEReadSize));
+						fis->SetReadFromMemoryBuffer(m_nZRLEReadSize, (char*)(m_pZRLENetRectBuf));
+
+					}
+					else
+					{
 					// Get the size of the rectangle data buffer
 					ReadExact((char*)&(m_nZRLEReadSize), sizeof(CARD32));
 					m_nZRLEReadSize = Swap32IfLE(m_nZRLEReadSize);
@@ -4857,6 +4874,7 @@ inline void ClientConnection::ReadScreenUpdate()
 					tempsize = Swap32IfLE(tempsize);
 					memcpy(m_pZRLENetRectBuf,(char*)&tempsize,4);
 					fis->SetReadFromMemoryBuffer(m_nZRLEReadSize+4, (char*)(m_pZRLENetRectBuf));
+					}
 				}
 			}
 		}
@@ -6630,8 +6648,15 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						if (_this->m_hwndStatus)ShowWindow(_this->m_hwndStatus,SW_MINIMIZE);
 						break;
 
-					case SC_MAXIMIZE: //Added by: Lars Werner (http://lars.werner.no)
+					case SC_MAXIMIZE:
+						// Toggle full screen mode
+						if (!_this->InFullScreenMode()) 
+						{ 
+							SendMessage(hwnd,WM_SYSCOMMAND,(WPARAM)ID_NORMALSCREEN,(LPARAM)0); 
+							Sleep(100); 
+						} 
 						_this->SetFullScreenMode(!_this->InFullScreenMode());
+						return 0;
 						break;
 						
 					case SC_RESTORE:
@@ -7241,7 +7266,11 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
                             ::ShowWindow(hwnd, SW_HIDE);
 							//make sure reconnecthread is closed before closing mother
 							forcedexit=true;
-							if(_this->rcth) WaitForSingleObject(_this->rcth,10000);
+							if(_this->rcth) 
+								{
+									WaitForSingleObject(_this->rcth,10000);
+									CloseHandle(_this->rcth);
+								}
 							_this->rcth=NULL;
 							// Close the worker thread
 							_this->KillThread();
@@ -7267,10 +7296,27 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							_this->SuspendThread();
 							//_this->Reconnect()
 							DWORD dw;
+							//Give time to close reconnect thread
+							Sleep(1000);
 							//should never happen, but jjust in case, make sure no 2 are runnning
-							if(_this->rcth) WaitForSingleObject(_this->rcth,10000);
-							_this->rcth=NULL;
-							_this->rcth=CreateThread(NULL,0,ReconnectThreadProc,_this,0,&dw);
+							if(_this->rcth) {
+								DWORD dwWaitResult=WaitForSingleObject(_this->rcth,1000);
+								switch (dwWaitResult)
+								{
+										case WAIT_OBJECT_0:
+											CloseHandle(_this->rcth);
+											_this->rcth=NULL;
+											_this->rcth=CreateThread(NULL,0,ReconnectThreadProc,_this,0,&dw);
+											break;
+										case WAIT_TIMEOUT:
+											//reconnect still running, doubble call ignore
+											break;
+
+
+								}
+							}
+							else
+								_this->rcth=CreateThread(NULL,0,ReconnectThreadProc,_this,0,&dw);
 						}
 						return 0;
 					}
