@@ -4633,6 +4633,7 @@ void ClientConnection::Internal_SendAppropriateFramebufferUpdateRequest()
 
 		// Cache init/reinit - A SetFormatAndEncoding() implies a cache reinit on server side
 		// Cache enabled, so it's going to be reallocated/reinited on server side
+		omni_mutex_lock l(m_cursorMutex);
 		if (m_opts.m_fEnableCache)
 		{
 			// create viewer cache buffer if necessary
@@ -4651,7 +4652,6 @@ void ClientConnection::Internal_SendAppropriateFramebufferUpdateRequest()
 			if (m_DIBbitsCache!=NULL) delete []m_DIBbitsCache;
 			m_DIBbitsCache=NULL;
 		}
-
 		if (m_SavedAreaBIB) delete [] m_SavedAreaBIB;
 		m_SavedAreaBIB=NULL;
 
@@ -8409,6 +8409,7 @@ ClientConnection:: Copybuffer(int width, int height, int xx, int yy,int bytes_pe
 void
 ClientConnection:: Copyto0buffer(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth)
 {
+
 	int bytesPerOutputRow = framebufferWidth * bytes_per_pixel;
 	//8bit pitch need to be taken in account
 	if (bytesPerOutputRow % 4)
@@ -8416,14 +8417,15 @@ ClientConnection:: Copyto0buffer(int width, int height, int xx, int yy,int bytes
 	BYTE *sourcepos,*destpos;
 	destpos = (BYTE *)dest;
 	sourcepos=(BYTE*)source + (bytesPerOutputRow * yy)+(xx * bytes_per_pixel);
+		int y;
+		width*=bytes_per_pixel;
+		for (y=0; y<height; y++) {
+			memcpy(destpos, sourcepos, width);
+			sourcepos = (BYTE*)sourcepos + bytesPerOutputRow;
+			destpos = (BYTE*)destpos + width;
+		}
 
-    int y;
-    width*=bytes_per_pixel;
-    for (y=0; y<height; y++) {
-        memcpy(destpos, sourcepos, width);
-        sourcepos = (BYTE*)sourcepos + bytesPerOutputRow;
-        destpos = (BYTE*)destpos + width;
-    }
+
 }
 
 void

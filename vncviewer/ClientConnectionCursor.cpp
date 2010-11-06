@@ -47,6 +47,12 @@ void ClientConnection::ReadCursorShape(rfbFramebufferUpdateRectHeader *pfburh) {
 	if (pfburh->r.w * pfburh->r.h == 0)
 		return;
 
+	if (pfburh->r.x>m_si.framebufferWidth)return;
+	if (pfburh->r.y>m_si.framebufferHeight)return;
+	if (pfburh->r.x<0)return;
+	if (pfburh->r.x<0)return;
+
+
 	// Ignore cursor shape updates if requested by user
 	if (m_opts.m_ignoreShapeUpdates) {
 		int bytesToSkip = (pfburh->encoding == rfbEncodingXCursor) ?
@@ -136,7 +142,6 @@ void ClientConnection::ReadCursorShape(rfbFramebufferUpdateRectHeader *pfburh) {
 		omni_mutex_lock l(m_bitmapdcMutex);
 		if (m_SavedAreaBIB) delete[] m_SavedAreaBIB;
 		m_SavedAreaBIB = new BYTE [rcWidth * rcHeight * m_myFormat.bitsPerPixel/8];
-
 	}
 
 	SoftCursorSaveArea();
