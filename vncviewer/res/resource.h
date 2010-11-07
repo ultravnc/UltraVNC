@@ -220,6 +220,7 @@
 #define IDC_RADIO2                      1161
 #define IDC_MANUAL                      1161
 #define IDC_CHECK2                      1162
+#define IDC_DIRECTX                     1162
 #define IDC_LIST1                       1164
 #define IDC_EDIT1                       1165
 #define IDC_MOUSE_THROTTLE              1165

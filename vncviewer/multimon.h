@@ -28,7 +28,10 @@ extern "C" {            /* Assume C declarations for C++ */
 #define SM_CMONITORS            80
 #define SM_SAMEDISPLAYFORMAT    81
 
-DECLARE_HANDLE(HMONITOR);
+#if !defined(HMONITOR_DECLARED) && (WINVER < 0x0500)
+    #define HMONITOR_DECLARED
+    DECLARE_HANDLE(HMONITOR);
+#endif
 
 #define MONITOR_DEFAULTTONULL       0x00000000
 #define MONITOR_DEFAULTTOPRIMARY    0x00000001

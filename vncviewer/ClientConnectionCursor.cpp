@@ -149,7 +149,6 @@ void ClientConnection::ReadCursorShape(rfbFramebufferUpdateRectHeader *pfburh) {
 
 	rcCursorHidden = false;
 	rcLockSet = false;
-
 	prevCursorSet = true;
 }
 

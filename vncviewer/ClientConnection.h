@@ -61,7 +61,7 @@ extern "C"
 
 #include <vector>
 #include <algorithm>
-
+#include "./directx/directxviewer.h"
 extern const UINT FileTransferSendPacketMessage;
 
 #ifndef max
@@ -747,6 +747,8 @@ private:
 
     bool m_server_wants_keepalives;
 	UINT m_keepalive_timer;
+	ViewerDirectxClass directx_output;
+	bool directx_used;
 public:
 	int m_autoReconnect;
 	int reconnectcounter;

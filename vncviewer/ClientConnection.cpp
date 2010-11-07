@@ -85,6 +85,8 @@ bool havetobekilled=false;
 bool forcedexit=false;
 const UINT RebuildToolbarMessage = RegisterWindowMessage("UltraVNC.Viewer.RebuildToolbar");
 extern bool g_ConnectionLossAlreadyReported;
+extern bool paintbuzy;
+#define FAILED(hr) (((HRESULT)(hr)) < 0)
 
 /*
  * Macro to compare pixel formats.
@@ -510,6 +512,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 
 	//adzm 2010-10
 	m_PendingMouseMove.dwMinimumMouseMoveInterval = m_opts.m_throttleMouse;
+	directx_used=false;
 }
 
 // helper functions for setting socket timeouts during file transfer
@@ -3042,39 +3045,6 @@ void ClientConnection::SizeWindow()
 		//case one, does the scaling fit the window include borders?
 		int clientwidth=m_si.framebufferWidth*m_opts.m_scale_den/m_opts.m_scale_num;
 		int clientheight=m_si.framebufferHeight*m_opts.m_scale_den/m_opts.m_scale_num;
-
-		/*if ((workwidth>=clientwidth+dx) && (workheight>=clientheight+dy))
-		{
-			//we can scale the clientarea
-			widthwindow=clientwidth+dx;
-			heightwindow=clientheight+dy;
-			int widthclientwindow=clientwidth;
-			int heightclientwindow=clientheight;
-			int horizontalRatio= (int) ((widthclientwindow*100)/m_si.framebufferWidth);
-			int verticalRatio = (int) ((heightclientwindow*100)/m_si.framebufferHeight);
-			int Ratio= min(verticalRatio, horizontalRatio);
-			m_opts.m_scale_num =Ratio;
-			m_opts.m_scale_den = 100;
-			m_opts.m_scaling = true; 
-			m_fScalingDone = true;
-
-		}
-		else if ((workwidth>=clientwidth) && (workheight>=clientheight))
-		{
-			// we need to scale the window
-			widthwindow=clientwidth;
-			heightwindow=clientheight;
-			int widthclientwindow=clientwidth-dx;
-			int heightclientwindow=clientheight-dy;
-			int horizontalRatio= (int) ((widthclientwindow*100)/m_si.framebufferWidth);
-			int verticalRatio = (int) ((heightclientwindow*100)/m_si.framebufferHeight);
-			int Ratio= min(verticalRatio, horizontalRatio);
-			m_opts.m_scale_num =Ratio;
-			m_opts.m_scale_den = 100;
-			m_opts.m_scaling = true; 
-			m_fScalingDone = true;
-		}
-		else*/
 		{
 			// we change the scaling to fit the window
 			// max windows size including borders etc..
@@ -3083,11 +3053,6 @@ void ClientConnection::SizeWindow()
 			int Ratio= min(verticalRatio, horizontalRatio);
 			widthwindow=m_si.framebufferWidth*Ratio/100;
 			heightwindow=m_si.framebufferHeight*Ratio/100;
-			/*int widthclientwindow=widthwindow-dx;
-			int heightclientwindow=heightwindow-dy;
-			horizontalRatio= (int) ((widthclientwindow*100)/m_si.framebufferWidth);
-			verticalRatio = (int) ((heightclientwindow*100)/m_si.framebufferHeight);
-			Ratio= min(verticalRatio, horizontalRatio);*/
 			m_opts.m_scale_num =Ratio;
 			m_opts.m_scale_den = 100;
 			m_opts.m_scaling = true; 
@@ -3120,11 +3085,6 @@ void ClientConnection::SizeWindow()
 	AdjustWindowRectEx(&fullwinrect, 
 			   GetWindowLong(m_hwndcn, GWL_STYLE) & ~WS_VSCROLL & ~WS_HSCROLL, 
 			   FALSE, GetWindowLong(m_hwndcn, GWL_EXSTYLE));
-	/*
-	AdjustWindowRectEx(&fullwinrect, 
-			   GetWindowLong(m_hwndMain, GWL_STYLE), 
-			   FALSE, GetWindowLong(m_hwndMain, GWL_EXSTYLE));
-	*/
 
 	m_fullwinwidth = fullwinrect.right - fullwinrect.left;
 	m_fullwinheight = (fullwinrect.bottom - fullwinrect.top);
@@ -3142,10 +3102,6 @@ void ClientConnection::SizeWindow()
 	}
 
    // Hauptfenster positionieren
-	/*
-	SetRect(&fullwinrect, 0, 0, m_si.framebufferWidth * m_opts.m_scale_num / m_opts.m_scale_den, 
-								m_si.framebufferHeight* m_opts.m_scale_num / m_opts.m_scale_den );
-	*/
 	AdjustWindowRectEx(&fullwinrect, 
 					   GetWindowLong(m_hwndMain, GWL_STYLE) & ~WS_VSCROLL & ~WS_HSCROLL, 
 					   FALSE, GetWindowLong(m_hwndMain, GWL_EXSTYLE));
@@ -3192,64 +3148,6 @@ void ClientConnection::SizeWindow()
 void ClientConnection::CreateLocalFramebuffer()
 {
 	omni_mutex_lock l(m_bitmapdcMutex);
-	
-	// We create a bitmap which has the same pixel characteristics as
-	// the local display, in the hope that blitting will be faster.
-
-	/*TempDC hdc(m_hwndcn);
-
-	if (m_hBitmap != NULL)
-		DeleteObject(m_hBitmap);
-
-	m_hBitmap = NULL;
-
-	m_hBitmap = CreateCompatibleBitmap(hdc, m_si.framebufferWidth, m_si.framebufferHeight);
-
-	if (m_hBitmap == NULL) {
-		//adzm - 2009-07-12 - Create a DIB (which will use system rather than video memory) if this fails
-		void* pvbits_dummy = NULL;
-		BITMAPINFO bmi;
-		::ZeroMemory(&bmi.bmiHeader, sizeof(bmi.bmiHeader));
-		bmi.bmiHeader.biSize = sizeof(bmi.bmiHeader);
-		bmi.bmiHeader.biWidth = m_si.framebufferWidth;
-		bmi.bmiHeader.biHeight = m_si.framebufferHeight;
-		bmi.bmiHeader.biPlanes = 1;
-		bmi.bmiHeader.biBitCount = 32;
-
-		m_hBitmap = CreateDIBSection(hdc, &bmi, DIB_RGB_COLORS, &pvbits_dummy, NULL, 0);
-	}
-	//adzm - 2009-06-21 - include the last error (most common cause is we are running out of memory for the
-	//new bitmap. We might even be able to work around this by creating a DIB section, but that would be
-	//slower for blits.)
-	if (m_hBitmap == NULL)
-		throw WarningException(sz_L61, GetLastError());
-	// Select this bitmap into the DC with an appropriate palette
-	ObjectSelector b(m_hBitmapDC, m_hBitmap);
-	PaletteSelector p(m_hBitmapDC, m_hPalette);
-
-
-	*/
-	// Modif RDV@2002 - Cache Encoding
-	// Modif sf@2002
-	
-	/*RECT rect;
-
-	SetRect(&rect, 0,0, m_si.framebufferWidth, m_si.framebufferHeight);
-	COLORREF bgcol = RGB(0, 0, 50);
-	FillSolidRect(&rect, bgcol);
-	
-	COLORREF oldbgcol  = SetBkColor(  m_hBitmapDC, bgcol);
-	COLORREF oldtxtcol = SetTextColor(m_hBitmapDC, RGB(255,255,255));
-	rect.right = m_si.framebufferWidth / 2;
-	rect.bottom = m_si.framebufferHeight / 2;
-	
-	DrawText (m_hBitmapDC, sz_L62, -1, &rect,
-		DT_SINGLELINE | DT_CENTER | DT_VCENTER);
-
-	SetBkColor(  m_hBitmapDC, oldbgcol);
-	SetTextColor(m_hBitmapDC, oldtxtcol);
-	InvalidateRect(m_hwndcn, NULL, FALSE);*/
-
 }
 
 void ClientConnection::SetupPixelFormat() {
@@ -3487,6 +3385,11 @@ void ClientConnection::Createdib()
     bi.mask.green = m_myFormat.greenMax << m_myFormat.greenShift;
     bi.mask.blue = m_myFormat.blueMax << m_myFormat.blueShift;
 
+	if (directx_used) 
+		{
+			directx_output.DestroyD3D();
+			directx_used=false;
+		}
 	if (m_hmemdc != NULL) {DeleteDC(m_hmemdc);m_hmemdc = NULL;m_DIBbits=NULL;}
 	if (m_membitmap != NULL) {DeleteObject(m_membitmap);m_membitmap= NULL;}
 	m_hmemdc = CreateCompatibleDC(m_hBitmapDC);
@@ -3524,6 +3427,25 @@ void ClientConnection::Createdib()
 		m_DIBbitsCache= new BYTE[Pitch*m_si.framebufferHeight];
 		vnclog.Print(0, _T("Cache: Cache buffer bitmap creation\n"));
 	}
+	if (m_opts.m_Directx)
+	if (!FAILED(directx_output.InitD3D(m_hwndcn, m_si.framebufferWidth, m_si.framebufferHeight, false)))
+			{
+				if (directx_output.m_directxformat.bitsPerPixel ==m_myFormat.bitsPerPixel)
+					{
+						directx_used=true;
+						m_myFormat.redShift=directx_output.m_directxformat.redShift;
+						m_myFormat.greenShift=directx_output.m_directxformat.greenShift;
+						m_myFormat.redShift=directx_output.m_directxformat.blueShift;
+
+						if (m_hmemdc != NULL) {DeleteDC(m_hmemdc);m_hmemdc = NULL;m_DIBbits=NULL;}
+						if (m_membitmap != NULL) {DeleteObject(m_membitmap);m_membitmap= NULL;}
+					}
+				else
+					{
+						directx_output.DestroyD3D();
+						directx_used=false;
+					}
+			}
 }
 // Closing down the connection.
 // Close the socket, kill the thread.
@@ -3659,6 +3581,12 @@ ClientConnection::~ClientConnection()
 
 	if (m_hPalette != NULL)
 		DeleteObject(m_hPalette);
+
+	if (directx_used) 
+		{
+			directx_used=false;
+			directx_output.DestroyD3D();
+		}
 
 	if (m_hmemdc != NULL) {DeleteDC(m_hmemdc);m_hmemdc = NULL;m_DIBbits=NULL;}
 	if (m_membitmap != NULL) {DeleteObject(m_membitmap);m_membitmap = NULL;}
@@ -3911,6 +3839,15 @@ inline void ClientConnection::SubProcessPointerEvent(int x, int y, DWORD keyflag
 			(x + m_hScrollPos) * m_opts.m_scale_den / m_opts.m_scale_num;
 		int y_scaled =
 			(y + m_vScrollPos) * m_opts.m_scale_den / m_opts.m_scale_num;
+
+		if (directx_used)
+		{
+			x_scaled = (x ) *  m_si.framebufferWidth /m_cliwidth ;
+			if(m_opts.m_ShowToolbar) y_scaled =(y) * m_si.framebufferHeight / (m_cliheight-m_TBr.bottom) ;
+			else y_scaled =(y) * m_si.framebufferHeight / m_cliheight ;
+							
+			
+		}
 
 		SendPointerEvent(x_scaled, y_scaled, mask);
 
@@ -4180,57 +4117,65 @@ inline void ClientConnection::DoBlit()
 	PAINTSTRUCT ps;
 	HDC hdc = BeginPaint(m_hwndcn, &ps);
 
-	// Select and realize hPalette
-//	PaletteSelector p(hdc, m_hPalette);
-//	ObjectSelector b(m_hBitmapDC, m_hBitmap);
-	
-	if (m_opts.m_delay) {
-		// Display the area to be updated for debugging purposes
-		/*
-		COLORREF oldbgcol = SetBkColor(hdc, RGB(0,0,0));
-		::ExtTextOut(hdc, 0, 0, ETO_OPAQUE, &ps.rcPaint, NULL, 0, NULL);
-		SetBkColor(hdc,oldbgcol);
-		*/
-		// adzm - 2010-07 - Works better this way
-		::FillRect(hdc, &ps.rcPaint, ::GetSysColorBrush(COLOR_DESKTOP));
-		::Sleep(m_pApp->m_options.m_delay);
-	}
-	
-	if (m_opts.m_scaling)
+	if (directx_used)
 	{
-		int n = m_opts.m_scale_num;
-		int d = m_opts.m_scale_den;
-		
-		SetStretchBltMode(hdc, HALFTONE);
-		SetBrushOrgEx(hdc, 0,0, NULL);
-		{
-			if(m_hmemdc)
-			{
-				ObjectSelector bb(m_hmemdc, m_membitmap);
-				StretchBlt(
-				hdc, 
-				ps.rcPaint.left, 
-				ps.rcPaint.top, 
-				ps.rcPaint.right-ps.rcPaint.left, 
-				ps.rcPaint.bottom-ps.rcPaint.top, 
-				m_hmemdc, 
-				(ps.rcPaint.left+m_hScrollPos)     * d / n, 
-				(ps.rcPaint.top+m_vScrollPos)      * d / n,
-				(ps.rcPaint.right-ps.rcPaint.left) * d / n, 
-				(ps.rcPaint.bottom-ps.rcPaint.top) * d / n, 
-				SRCCOPY);
-			}
-		}
+		directx_output.paint();
 	}
 	else
 	{
-		if (m_hmemdc)
-		{
-			ObjectSelector bb(m_hmemdc, m_membitmap);
-			BitBlt(hdc, ps.rcPaint.left, ps.rcPaint.top, 
-			ps.rcPaint.right-ps.rcPaint.left, ps.rcPaint.bottom-ps.rcPaint.top, 
-			m_hmemdc, ps.rcPaint.left+m_hScrollPos, ps.rcPaint.top+m_vScrollPos, SRCCOPY);
+		// Select and realize hPalette
+	//	PaletteSelector p(hdc, m_hPalette);
+	//	ObjectSelector b(m_hBitmapDC, m_hBitmap);
+	
+		if (m_opts.m_delay) {
+			// Display the area to be updated for debugging purposes
+			/*
+			COLORREF oldbgcol = SetBkColor(hdc, RGB(0,0,0));
+			::ExtTextOut(hdc, 0, 0, ETO_OPAQUE, &ps.rcPaint, NULL, 0, NULL);
+			SetBkColor(hdc,oldbgcol);
+			*/
+			// adzm - 2010-07 - Works better this way
+			::FillRect(hdc, &ps.rcPaint, ::GetSysColorBrush(COLOR_DESKTOP));
+			::Sleep(m_pApp->m_options.m_delay);
 		}
+	
+		if (m_opts.m_scaling)
+		{
+			int n = m_opts.m_scale_num;
+			int d = m_opts.m_scale_den;
+		
+			SetStretchBltMode(hdc, HALFTONE);
+			SetBrushOrgEx(hdc, 0,0, NULL);
+			{
+				if(m_hmemdc)
+				{
+					ObjectSelector bb(m_hmemdc, m_membitmap);
+					StretchBlt(
+					hdc, 
+					ps.rcPaint.left, 
+					ps.rcPaint.top, 
+					ps.rcPaint.right-ps.rcPaint.left, 
+					ps.rcPaint.bottom-ps.rcPaint.top, 
+					m_hmemdc, 
+					(ps.rcPaint.left+m_hScrollPos)     * d / n, 
+					(ps.rcPaint.top+m_vScrollPos)      * d / n,
+					(ps.rcPaint.right-ps.rcPaint.left) * d / n, 
+					(ps.rcPaint.bottom-ps.rcPaint.top) * d / n, 
+					SRCCOPY);
+				}
+			}
+		}
+		else
+		{
+			if (m_hmemdc)
+			{
+				ObjectSelector bb(m_hmemdc, m_membitmap);
+				BitBlt(hdc, ps.rcPaint.left, ps.rcPaint.top, 
+				ps.rcPaint.right-ps.rcPaint.left, ps.rcPaint.bottom-ps.rcPaint.top, 
+				m_hmemdc, ps.rcPaint.left+m_hScrollPos, ps.rcPaint.top+m_vScrollPos, SRCCOPY);
+			}
+		}
+
 	}
 	EndPaint(m_hwndcn, &ps);
 
@@ -4920,78 +4865,97 @@ inline void ClientConnection::ReadScreenUpdate()
 		switch (surh.encoding)
 		{
 		case rfbEncodingHextile:
+			if (directx_used) m_DIBbits=directx_output.Preupdate((unsigned char *)m_DIBbits);
 			SaveArea(cacherect);
 			ReadHextileRect(&surh);
 			EncodingStatusWindow=rfbEncodingHextile;
 			break;
 		case rfbEncodingUltra:
+			if (directx_used) m_DIBbits=directx_output.Preupdate((unsigned char *)m_DIBbits);
 			ReadUltraRect(&surh);
 			EncodingStatusWindow=rfbEncodingUltra;
 			break;
 		case rfbEncodingUltraZip:
+			if (directx_used) m_DIBbits=directx_output.Preupdate((unsigned char *)m_DIBbits);
 			ReadUltraZip(&surh,&UpdateRegion);
 			break;
 		case rfbEncodingRaw:
+			if (directx_used) m_DIBbits=directx_output.Preupdate((unsigned char *)m_DIBbits);
 			SaveArea(cacherect);
 			ReadRawRect(&surh);
 			EncodingStatusWindow=rfbEncodingRaw;
 			break;
 		case rfbEncodingCopyRect:
+			if (directx_used) m_DIBbits=directx_output.Preupdate((unsigned char *)m_DIBbits);
 			ReadCopyRect(&surh);
 			break;
 		case rfbEncodingCache:
+			if (directx_used) m_DIBbits=directx_output.Preupdate((unsigned char *)m_DIBbits);
 			ReadCacheRect(&surh);
 			break;
 		case rfbEncodingCacheZip:
+			if (directx_used) m_DIBbits=directx_output.Preupdate((unsigned char *)m_DIBbits);
 			ReadCacheZip(&surh,&UpdateRegion);
 			break;
 		case rfbEncodingSolMonoZip:
+			if (directx_used) m_DIBbits=directx_output.Preupdate((unsigned char *)m_DIBbits);
 			ReadSolMonoZip(&surh,&UpdateRegion);
 			break;
 		case rfbEncodingRRE:
+			if (directx_used) m_DIBbits=directx_output.Preupdate((unsigned char *)m_DIBbits);
 			SaveArea(cacherect);
 			ReadRRERect(&surh);
 			EncodingStatusWindow=rfbEncodingRRE;
 			break;
 		case rfbEncodingCoRRE:
+			if (directx_used) m_DIBbits=directx_output.Preupdate((unsigned char *)m_DIBbits);
 			SaveArea(cacherect);
 			ReadCoRRERect(&surh);
 			EncodingStatusWindow=rfbEncodingCoRRE;
 			break;
 		case rfbEncodingZlib:
+			if (directx_used) m_DIBbits=directx_output.Preupdate((unsigned char *)m_DIBbits);
 			SaveArea(cacherect);
 			ReadZlibRect(&surh,0);
 			EncodingStatusWindow=rfbEncodingZlib;
 			break;
 		case rfbEncodingZlibHex:
+			if (directx_used) m_DIBbits=directx_output.Preupdate((unsigned char *)m_DIBbits);
 			SaveArea(cacherect);
 			ReadZlibHexRect(&surh);
 			EncodingStatusWindow=rfbEncodingZlibHex;
 			break;
 		case rfbEncodingXOR_Zlib:
+			if (directx_used) m_DIBbits=directx_output.Preupdate((unsigned char *)m_DIBbits);
 			SaveArea(cacherect);
 			ReadZlibRect(&surh,1);
 			break;
 		case rfbEncodingXORMultiColor_Zlib:
+			if (directx_used) m_DIBbits=directx_output.Preupdate((unsigned char *)m_DIBbits);
 			SaveArea(cacherect);
 			ReadZlibRect(&surh,2);
 			break;
 		case rfbEncodingXORMonoColor_Zlib:
+			if (directx_used) m_DIBbits=directx_output.Preupdate((unsigned char *)m_DIBbits);
 			SaveArea(cacherect);
 			ReadZlibRect(&surh,3);
 			break;
 		case rfbEncodingSolidColor:
+			if (directx_used) m_DIBbits=directx_output.Preupdate((unsigned char *)m_DIBbits);
 			SaveArea(cacherect);
 			ReadSolidRect(&surh);
 			break;
 		case rfbEncodingZRLE:
+			if (directx_used) m_DIBbits=directx_output.Preupdate((unsigned char *)m_DIBbits);
 			zywrle = 0;
 		case rfbEncodingZYWRLE:
+			if (directx_used) m_DIBbits=directx_output.Preupdate((unsigned char *)m_DIBbits);
 			SaveArea(cacherect);
 			zrleDecode(surh.r.x, surh.r.y, surh.r.w, surh.r.h);
 			EncodingStatusWindow=zywrle ? rfbEncodingZYWRLE : rfbEncodingZRLE;
 			break;
 		case rfbEncodingTight:
+			if (directx_used) m_DIBbits=directx_output.Preupdate((unsigned char *)m_DIBbits);
 			SaveArea(cacherect);
 			ReadTightRect(&surh);
 			EncodingStatusWindow=rfbEncodingTight;
@@ -5038,11 +5002,13 @@ inline void ClientConnection::ReadScreenUpdate()
 			rect.top    = surh.r.y;
 			rect.right  = surh.r.x + surh.r.w ;
 			rect.bottom = surh.r.y + surh.r.h; 
-			InvalidateScreenRect(&rect); 			
+			if (!directx_used)
+				InvalidateScreenRect(&rect); 			
 		}
 		else if (surh.encoding !=rfbEncodingNewFBSize)
 		{
-			InvalidateRgn(m_hwndcn, UpdateRegion, FALSE);
+			if (!directx_used)
+				InvalidateRgn(m_hwndcn, UpdateRegion, FALSE);
 			HRGN tempregion=CreateRectRgn(0,0,0,0);
 			CombineRgn(UpdateRegion,UpdateRegion,tempregion,RGN_AND);
 			DeleteObject(tempregion);
@@ -5060,6 +5026,11 @@ inline void ClientConnection::ReadScreenUpdate()
 		}
 
 		SoftCursorUnlockScreen();
+	}
+
+	if (directx_used)
+	{
+		InvalidateRect(m_hwndcn, NULL, TRUE);
 	}
 
 	if (!fTimingAlreadyStopped)
@@ -7131,6 +7102,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 				
 #ifndef UNDER_CE
 				case WM_SIZING:
+					if (_this->directx_used) return 0;
 					{
 						int a=GetSystemMetrics(SM_CYHSCROLL);
 						int b=GetSystemMetrics(SM_CXVSCROLL);
@@ -7480,7 +7452,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						if (_this->SB_VERT_BOOL) v=v_scrollbar;
 
 
-						if (_this->InFullScreenMode())
+						if (_this->InFullScreenMode() || _this->directx_used)
 						{
 							_this->SB_HORZ_BOOL=false;
 							_this->SB_VERT_BOOL=false;
@@ -7555,6 +7527,20 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						// Update these for the record
 						// And consider that in full-screen mode the window
 						// is actually bigger than the remote screen.
+						if (_this->directx_used)
+						{
+							GetClientRect(hwnd, &rect);
+						
+						_this->m_cliwidth = rect.right - rect.left;
+						_this->m_cliheight = (int)(rect.bottom - rect.top);
+						
+						if (_this->m_opts.m_ShowToolbar)
+							SetWindowPos(_this->m_hwndcn, _this->m_hwndTBwin, 0, _this->m_TBr.bottom, _this->m_cliwidth, _this->m_cliheight-_this->m_TBr.bottom, SWP_SHOWWINDOW);
+						else SetWindowPos(_this->m_hwndcn, _this->m_hwndTBwin, 0, 0, _this->m_cliwidth, _this->m_cliheight, SWP_SHOWWINDOW);
+						InvalidateRect(_this->m_hwndcn,&rect,false);
+						}
+						else
+						{
 						GetClientRect(hwnd, &rect);
 						
 						_this->m_cliwidth = min( (int)(rect.right - rect.left), 
@@ -7595,6 +7581,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						_this->m_hScrollPos = newhpos;
 						_this->m_vScrollPos = newvpos;
 						_this->UpdateScrollbars();
+						}
 						
 						
 					//Added by: Lars Werner (http://lars.werner.no)
@@ -7959,7 +7946,9 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 				return 0;
 				
 			case WM_PAINT:
+				paintbuzy=true;
 				_this->DoBlit();
+				paintbuzy=false;
 				return 0;
 				
 			case WM_SENDKEEPALIVE:

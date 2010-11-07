@@ -11,6 +11,9 @@
     <Filter Include="sources">
       <UniqueIdentifier>{5bec4b45-0763-4856-b386-653b0deeff97}</UniqueIdentifier>
     </Filter>
+    <Filter Include="direct3D">
+      <UniqueIdentifier>{689f695b-3e2a-44fa-830b-6ed89b3cc6a7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\B46.ico">
@@ -320,6 +323,9 @@
     <ClCompile Include="vncauth.c">
       <Filter>sources</Filter>
     </ClCompile>
+    <ClCompile Include="directx\directxviewer.cpp">
+      <Filter>direct3D</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AboutBox.h">
@@ -420,6 +426,9 @@
     </ClInclude>
     <ClInclude Include="TextChat.h">
       <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="directx\directxviewer.h">
+      <Filter>direct3D</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

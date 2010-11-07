@@ -65,6 +65,7 @@ public:
 	bool	m_NoStatus;
 	bool	m_NoHotKeys;
 	bool	m_FullScreen;
+	bool	m_Directx;
 	bool    m_ShowToolbar;
 
     bool	autoDetect;

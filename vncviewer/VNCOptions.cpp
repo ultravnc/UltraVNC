@@ -94,6 +94,7 @@ VNCOptions::VNCOptions()
 	
   m_ViewOnly = false;
   m_FullScreen = false;
+  m_Directx = false;
   autoDetect = true;
   m_Use8Bit = rfbPFFullColors; //false;
   m_ShowToolbar = true;
@@ -264,6 +265,7 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
   m_ViewOnly			= s.m_ViewOnly;
   m_NoStatus			= s.m_NoStatus;
   m_FullScreen		= s.m_FullScreen;
+  m_Directx		= s.m_Directx;
   autoDetect = s.autoDetect;
   m_Use8Bit			= s.m_Use8Bit;
   m_PreferredEncoding = s.m_PreferredEncoding;
@@ -510,6 +512,8 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
       m_fAutoScaling = true;
     } else if ( SwitchMatch(args[j], _T("fullscreen"))) {
       m_FullScreen = true;
+	 } else if ( SwitchMatch(args[j], _T("directx"))) {
+      m_Directx = true;
     } else if ( SwitchMatch(args[j], _T("noauto"))) {
       autoDetect = false;
 	  m_quickoption = 0;
@@ -942,6 +946,7 @@ void VNCOptions::Save(char *fname)
   saveInt("showtoolbar",			m_ShowToolbar,		fname);
   saveInt("AutoScaling",            m_fAutoScaling,     fname);
   saveInt("fullscreen",			m_FullScreen,		fname);
+  saveInt("directx",			m_Directx,		fname);
   saveInt("autoDetect", autoDetect, fname);
   saveInt("8bit",					m_Use8Bit,			fname);
   saveInt("shared",				m_Shared,			fname);
@@ -1015,6 +1020,7 @@ void VNCOptions::Load(char *fname)
   m_ShowToolbar =			readInt("showtoolbar",			m_ShowToolbar,		fname) != 0;
   m_fAutoScaling =      readInt("AutoScaling",			m_fAutoScaling,		fname) != 0;
   m_FullScreen =			readInt("fullscreen",		m_FullScreen,	fname) != 0;
+  m_Directx =			readInt("directx",		m_Directx,	fname) != 0;
   autoDetect = readInt("autoDetect", autoDetect, fname) != 0;
   m_Use8Bit =				readInt("8bit",				m_Use8Bit,		fname);
   m_Shared =				readInt("shared",			m_Shared,		fname) != 0;
@@ -1349,6 +1355,9 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 #ifndef UNDER_CE
 		  HWND hFullScreen = GetDlgItem(hwnd, IDC_FULLSCREEN);
 		  SendMessage(hFullScreen, BM_SETCHECK, _this->m_FullScreen, 0);
+
+		  HWND hDirectx = GetDlgItem(hwnd, IDC_DIRECTX);
+		  SendMessage(hDirectx, BM_SETCHECK, _this->m_Directx, 0);
 		  
 		  HWND hEmulate = GetDlgItem(hwnd, IDC_EMULATECHECK);
 		  SendMessage(hEmulate, BM_SETCHECK, _this->m_Emul3Buttons, 0);
@@ -1522,6 +1531,10 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 			  HWND hFullScreen = GetDlgItem(hwnd, IDC_FULLSCREEN);
 			  _this->m_FullScreen = 
 				  (SendMessage(hFullScreen, BM_GETCHECK, 0, 0) == BST_CHECKED);
+
+			   HWND hDirectx = GetDlgItem(hwnd, IDC_DIRECTX);
+			  _this->m_Directx = 
+				  (SendMessage(hDirectx, BM_GETCHECK, 0, 0) == BST_CHECKED);
 			  
 			  HWND hEmulate = GetDlgItem(hwnd, IDC_EMULATECHECK);
 			  _this->m_Emul3Buttons =
