@@ -354,7 +354,9 @@ void Set_Safemode()
 			}
 			else
 			{
-					char systemroot[150];
+
+#ifdef _X64
+			char systemroot[150];
 			GetEnvironmentVariable("SystemRoot", systemroot, 150);
 			char exe_file_name[MAX_PATH];
 			char parameters[MAX_PATH];
@@ -373,6 +375,41 @@ void Set_Safemode()
 			shExecInfo.nShow = SW_HIDE;
 			shExecInfo.hInstApp = NULL;
 			ShellExecuteEx(&shExecInfo);
+#else
+
+			typedef BOOL (WINAPI *LPFN_Wow64DisableWow64FsRedirection)(PVOID* OldValue);
+			typedef BOOL (WINAPI *LPFN_Wow64RevertWow64FsRedirection)(PVOID OldValue);
+			PVOID OldValue;  
+			LPFN_Wow64DisableWow64FsRedirection pfnWow64DisableWowFsRedirection = (LPFN_Wow64DisableWow64FsRedirection)GetProcAddress(GetModuleHandle("kernel32"),"Wow64DisableWow64FsRedirection");
+			LPFN_Wow64RevertWow64FsRedirection pfnWow64RevertWow64FsRedirection = (LPFN_Wow64RevertWow64FsRedirection)GetProcAddress(GetModuleHandle("kernel32"),"Wow64RevertWow64FsRedirection");
+			if (pfnWow64DisableWowFsRedirection && pfnWow64RevertWow64FsRedirection) 
+			{
+				if(TRUE == pfnWow64DisableWowFsRedirection(&OldValue))
+					{
+						char systemroot[150];
+						GetEnvironmentVariable("SystemRoot", systemroot, 150);
+						char exe_file_name[MAX_PATH];
+						char parameters[MAX_PATH];
+						strcpy(exe_file_name,systemroot);
+						strcat(exe_file_name,"\\system32\\");
+						strcat(exe_file_name,"bcdedit.exe");
+						strcpy(parameters,"/set safeboot network");
+						SHELLEXECUTEINFO shExecInfo;
+						shExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
+						shExecInfo.fMask = NULL;
+						shExecInfo.hwnd = GetForegroundWindow();
+						shExecInfo.lpVerb = "runas";
+						shExecInfo.lpFile = exe_file_name;
+						shExecInfo.lpParameters = parameters;
+						shExecInfo.lpDirectory = NULL;
+						shExecInfo.nShow = SW_HIDE;
+						shExecInfo.hInstApp = NULL;
+						ShellExecuteEx(&shExecInfo);
+						pfnWow64RevertWow64FsRedirection(OldValue);
+					}
+			}
+#endif
+
 			}
 }
 
@@ -460,6 +497,7 @@ void Restore_safemode()
 		}
 	else
 		{
+#ifdef _X64
 			char systemroot[150];
 			GetEnvironmentVariable("SystemRoot", systemroot, 150);
 			char exe_file_name[MAX_PATH];
@@ -479,6 +517,39 @@ void Restore_safemode()
 			shExecInfo.nShow = SW_HIDE;
 			shExecInfo.hInstApp = NULL;
 			ShellExecuteEx(&shExecInfo);
+#else
+			typedef BOOL (WINAPI *LPFN_Wow64DisableWow64FsRedirection)(PVOID* OldValue);
+			typedef BOOL (WINAPI *LPFN_Wow64RevertWow64FsRedirection)(PVOID OldValue);
+			PVOID OldValue;  
+			LPFN_Wow64DisableWow64FsRedirection pfnWow64DisableWowFsRedirection = (LPFN_Wow64DisableWow64FsRedirection)GetProcAddress(GetModuleHandle("kernel32"),"Wow64DisableWow64FsRedirection");
+			LPFN_Wow64RevertWow64FsRedirection pfnWow64RevertWow64FsRedirection = (LPFN_Wow64RevertWow64FsRedirection)GetProcAddress(GetModuleHandle("kernel32"),"Wow64RevertWow64FsRedirection");
+			if (pfnWow64DisableWowFsRedirection && pfnWow64RevertWow64FsRedirection) 
+			{
+				if(TRUE == pfnWow64DisableWowFsRedirection(&OldValue))
+					{
+						char systemroot[150];
+						GetEnvironmentVariable("SystemRoot", systemroot, 150);
+						char exe_file_name[MAX_PATH];
+						char parameters[MAX_PATH];
+						strcpy(exe_file_name,systemroot);
+						strcat(exe_file_name,"\\system32\\");
+						strcat(exe_file_name,"bcdedit.exe");
+						strcpy(parameters,"/deletevalue safeboot");
+						SHELLEXECUTEINFO shExecInfo;
+						shExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
+						shExecInfo.fMask = NULL;
+						shExecInfo.hwnd = GetForegroundWindow();
+						shExecInfo.lpVerb = "runas";
+						shExecInfo.lpFile = exe_file_name;
+						shExecInfo.lpParameters = parameters;
+						shExecInfo.lpDirectory = NULL;
+						shExecInfo.nShow = SW_HIDE;
+						shExecInfo.hInstApp = NULL;
+						ShellExecuteEx(&shExecInfo);
+						pfnWow64RevertWow64FsRedirection(OldValue);
+					}
+			}
+#endif
 		}
 }
 
