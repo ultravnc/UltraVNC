@@ -3,6 +3,7 @@
 
 int pitch=0;
 bool paintbuzy;
+#define ID_REQUEST_REFRESH              111
 
 static INT MaskToShift(DWORD mask)
 {
@@ -76,7 +77,7 @@ ViewerDirectxClass::DestroyD3D(void)
 }
 
 HRESULT
-ViewerDirectxClass::InitD3D(HWND hwnd, int width, int height, bool fullscreen)
+ViewerDirectxClass::InitD3D(HWND hwnd, HWND hwndm,int width, int height, bool fullscreen,int bit,int shift)
 {
 	
 	if (!D3DLibrary) return E_FAIL;
@@ -84,6 +85,9 @@ ViewerDirectxClass::InitD3D(HWND hwnd, int width, int height, bool fullscreen)
 	parent_hwnd=hwnd;
 	mwidth=width;
 	mheight=height;
+	mbit=bit;
+	mshift=shift;
+	hwnd_sendm=hwndm;
 	// create the IDirect3D9 object
 	pD3D9 = (*d3dCreate)(D3D_SDK_VERSION);
 
@@ -104,7 +108,23 @@ ViewerDirectxClass::InitD3D(HWND hwnd, int width, int height, bool fullscreen)
 	d3dpp.BackBufferWidth = width;
 	d3dpp.BackBufferHeight = height;
 	d3dpp.BackBufferCount = 2;
+		if (bit==32) 
+	{
 	format=d3ddm.Format;
+	}
+	else if (bit==16)
+	{
+		if (shift==MaskToShift(0xF800))
+		{
+			d3ddm.Format=D3DFMT_R5G6B5;
+			format=d3ddm.Format;
+		}
+		if (shift==MaskToShift(0x7c00))
+		{
+			d3ddm.Format=D3DFMT_A1R5G5B5;
+			format=d3ddm.Format;
+		}
+	}
 	d3dpp.BackBufferFormat = d3ddm.Format;
 	d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
 	d3dpp.Windowed = !fullscreen;
@@ -224,6 +244,7 @@ ViewerDirectxClass::InitD3D(HWND hwnd, int width, int height, bool fullscreen)
 	m_directxformat.blueShift=MaskToShift(m_directxformat.blueMask);
 	}
 	//edMask = 0x7c00; greenMask = 0x03e0; blueMask = 0x001f;
+	PostMessage(hwnd_sendm,WM_SYSCOMMAND,ID_REQUEST_REFRESH,0);
 	return S_OK;
 }
 
@@ -238,6 +259,8 @@ ViewerDirectxClass::ReInitD3D()
 	HWND hwnd=parent_hwnd;
 	int width=mwidth;
 	int height=mheight;
+	int bit=mbit;
+	int shift=mshift;
 	bool fullscreen=false;
 	// create the IDirect3D9 object
 	pD3D9 = (*d3dCreate)(D3D_SDK_VERSION);
@@ -259,7 +282,23 @@ ViewerDirectxClass::ReInitD3D()
 	d3dpp.BackBufferWidth = width;
 	d3dpp.BackBufferHeight = height;
 	d3dpp.BackBufferCount = 2;
+	if (bit==32) 
+	{
 	format=d3ddm.Format;
+	}
+	else if (bit==16)
+	{
+		if (shift==MaskToShift(0xF800))
+		{
+			d3ddm.Format=D3DFMT_R5G6B5;
+			format=d3ddm.Format;
+		}
+		if (shift==MaskToShift(0x7c00))
+		{
+			d3ddm.Format=D3DFMT_A1R5G5B5;
+			format=d3ddm.Format;
+		}
+	}
 	d3dpp.BackBufferFormat = d3ddm.Format;
 	d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
 	d3dpp.Windowed = !fullscreen;
@@ -379,6 +418,7 @@ ViewerDirectxClass::ReInitD3D()
 	m_directxformat.blueShift=MaskToShift(m_directxformat.blueMask);
 	}
 	//edMask = 0x7c00; greenMask = 0x03e0; blueMask = 0x001f;
+	PostMessage(hwnd_sendm,WM_SYSCOMMAND,ID_REQUEST_REFRESH,0);
 	return S_OK;
 }
 
@@ -508,8 +548,8 @@ ViewerDirectxClass:: Preupdate(unsigned char * bits)
 		counter++;
 		if (counter>20) 
 		{
-			Sleep(500);
-			Beep(5000,500);
+			Sleep(1500);
+//			Beep(5000,500);
 //			directx_disabled=true;
 //			directx_disabled_changed=true;
 			DestroyD3D();

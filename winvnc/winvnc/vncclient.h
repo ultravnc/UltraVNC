@@ -523,6 +523,7 @@ protected:
     bool        m_wants_ServerStateUpdates;
     bool        m_bClientHasBlockedInput;
     bool        m_wants_KeepAlive;
+	bool		m_session_supported;
 };
 
 

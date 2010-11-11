@@ -26,7 +26,7 @@ class ViewerDirectxClass
 public:
 	ViewerDirectxClass();
 	virtual ~ViewerDirectxClass();
-	HRESULT InitD3D(HWND hwnd, int width, int height, bool fullscreen);
+	HRESULT InitD3D(HWND hwnd, HWND hwndm, int width, int height, bool fullscreen,int bit,int shift);
 	HRESULT ReInitD3D();
 	void DestroyD3D(void);
 	unsigned char *Preupdate(unsigned char * bits);
@@ -47,8 +47,11 @@ bool paintdevice();
 bool valid();
 bool directxlocked;
 HWND parent_hwnd;
+HWND hwnd_sendm;
 int mwidth;
 int mheight;
+int mbit;
+int mshift;
 int m_nummer;
 bool devicelost;
 //////////////////////

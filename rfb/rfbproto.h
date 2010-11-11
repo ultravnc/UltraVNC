@@ -438,6 +438,9 @@ typedef struct {
 // adzm 2010-09 - Notify streaming DSM plugin support
 #define rfbNotifyPluginStreaming 0x50
 
+#define rfbRequestSession 20
+#define rfbSetSession 21
+
 
 
 /*****************************************************************************
@@ -475,6 +478,7 @@ typedef struct {
 #define rfbEncodingServerState              0xFFFF8000
 #define rfbEncodingEnableKeepAlive          0xFFFF8001
 #define rfbEncodingFTProtocolVersion    	0xFFFF8002
+#define rfbEncodingpseudoSession    		0xFFFF8003
 
 // Same encoder number as in tight 
 /*
@@ -1084,7 +1088,18 @@ typedef struct {
     CARD8 type;
 } rfbKeepAliveMsg;
 
+typedef struct {
+    CARD8 type;
+} rfbRequestSessionMsg;
+
+typedef struct {
+    CARD8 type;
+	CARD8 number;
+} rfbSetSessionMsg;
+
 #define sz_rfbKeepAliveMsg 1
+#define sz_rfbRequestSessionMsg 1
+#define sz_rfbSetSessionMsg 2
 #define KEEPALIVE_INTERVAL 5
 #define KEEPALIVE_HEADROOM 1
 // adzm 2010-08
@@ -1111,6 +1126,7 @@ typedef union {
     rfbServerStateMsg ss;
     rfbKeepAliveMsg kp;
 	rfbNotifyPluginStreamingMsg nsd;
+	rfbRequestSessionMsg rs;
 } rfbServerToClientMsg;
 
 
@@ -1371,4 +1387,6 @@ typedef union {
 	rfbSetSWMsg sw;
 	rfbTextChatMsg tc;
     rfbKeepAliveMsg kp;
+	rfbRequestSessionMsg rs;
+	rfbSetSessionMsg ss;
 } rfbClientToServerMsg;

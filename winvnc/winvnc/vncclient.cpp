@@ -2415,6 +2415,12 @@ vncClientThread::run(void *arg)
                         continue;
 					}
 					// 21 March 2008 jdp  - client wants keepalive messages
+					if (Swap32IfLE(encoding) == rfbEncodingpseudoSession) {
+						m_client->m_session_supported=true;
+						vnclog.Print(LL_INTINFO, VNCLOG("KeepAlive protocol extension enabled\n"));
+                        continue;
+					}
+
 					if (Swap32IfLE(encoding) == rfbEncodingEnableKeepAlive) {
 						m_client->m_wants_KeepAlive = true;
                         m_server->EnableKeepAlives(true);
@@ -2422,6 +2428,7 @@ vncClientThread::run(void *arg)
 						vnclog.Print(LL_INTINFO, VNCLOG("KeepAlive protocol extension enabled\n"));
                         continue;
 					}
+
 					if (Swap32IfLE(encoding) == rfbEncodingFTProtocolVersion) {
                         need_ft_version_msg = true;
 						vnclog.Print(LL_INTINFO, VNCLOG("FTProtocolVersion protocol extension enabled\n"));
@@ -4077,6 +4084,7 @@ vncClient::vncClient() : Sendinput("USER32", "SendInput"), m_clipboard(Clipboard
     m_wants_ServerStateUpdates =  false;
     m_bClientHasBlockedInput = false;
     m_wants_KeepAlive = false;
+	m_session_supported = false;
     m_fFileSessionOpen = false;
 	m_pBuff = 0;
 	m_pCompBuff = 0;

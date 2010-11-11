@@ -3351,6 +3351,7 @@ void ClientConnection::SetFormatAndEncodings()
     encs[se->nEncodings++] = Swap32IfLE(rfbEncodingServerState);
     encs[se->nEncodings++] = Swap32IfLE(rfbEncodingEnableKeepAlive);
     encs[se->nEncodings++] = Swap32IfLE(rfbEncodingFTProtocolVersion);
+	encs[se->nEncodings++] = Swap32IfLE(rfbEncodingpseudoSession);
 
 	// adzm - 2010-07 - Extended clipboard
 	encs[se->nEncodings++] = Swap32IfLE(rfbEncodingExtendedClipboard);
@@ -3427,8 +3428,8 @@ void ClientConnection::Createdib()
 		m_DIBbitsCache= new BYTE[Pitch*m_si.framebufferHeight];
 		vnclog.Print(0, _T("Cache: Cache buffer bitmap creation\n"));
 	}
-	if (m_opts.m_Directx)
-	if (!FAILED(directx_output.InitD3D(m_hwndcn, m_si.framebufferWidth, m_si.framebufferHeight, false)))
+	if (m_opts.m_Directx && (m_myFormat.bitsPerPixel==32 || m_myFormat.bitsPerPixel==16))
+	if (!FAILED(directx_output.InitD3D(m_hwndcn,m_hwndMain, m_si.framebufferWidth, m_si.framebufferHeight, false,m_myFormat.bitsPerPixel,m_myFormat.redShift)))
 			{
 				if (directx_output.m_directxformat.bitsPerPixel ==m_myFormat.bitsPerPixel)
 					{
@@ -4333,6 +4334,8 @@ void* ClientConnection::run_undetached(void* arg) {
                 	ReadExact(((char *) &kp)+m_nTO, sz_rfbKeepAliveMsg-m_nTO);
                     }
                     break;
+				case rfbRequestSession:
+					break;
 				case rfbFramebufferUpdate:
 					ReadScreenUpdate();
 					break;
