@@ -15,7 +15,7 @@ IDC_REMOVE_WALLPAPER
 IDC_CHECKDRIVER*/
 
 extern LONG Primary;
-extern LONG Secundary;
+extern LONG Secondary;
 extern LONG TurboMode;
 extern LONG PollUnderCursor;
 extern LONG PollForeground;
@@ -54,7 +54,7 @@ BOOL CALLBACK DlgProcCAP(HWND hwnd, UINT uMsg,
 			EnableWindow(GetDlgItem(hwnd, IDC_ONEVENT_ONLY),PollUnderCursor ||PollForeground);
 
 			SendMessage(GetDlgItem(hwnd, IDC_PRIM),BM_SETCHECK,Primary,0);
-			SendMessage(GetDlgItem(hwnd, IDC_SEC),BM_SETCHECK,Secundary,0);
+			SendMessage(GetDlgItem(hwnd, IDC_SEC),BM_SETCHECK,Secondary,0);
 
 			initdone5=true;
 			return TRUE;
@@ -73,7 +73,7 @@ BOOL CALLBACK DlgProcCAP(HWND hwnd, UINT uMsg,
 				PollOnEventOnly=SendDlgItemMessage(hwnd, IDC_ONEVENT_ONLY, BM_GETCHECK, 0, 0);
 				Driver=SendDlgItemMessage(hwnd, IDC_DRIVER, BM_GETCHECK, 0, 0);
 				Primary=SendDlgItemMessage(hwnd, IDC_PRIM, BM_GETCHECK, 0, 0);
-				Secundary=SendDlgItemMessage(hwnd, IDC_SEC, BM_GETCHECK, 0, 0);
+				Secondary=SendDlgItemMessage(hwnd, IDC_SEC, BM_GETCHECK, 0, 0);
 				Hook=SendDlgItemMessage(hwnd, IDC_HOOK, BM_GETCHECK, 0, 0);
 				CaptureAlphaBlending=SendDlgItemMessage(hwnd, IDC_ALPHA, BM_GETCHECK, 0, 0);
 				RemoveWallpaper=SendDlgItemMessage(hwnd, IDC_REMOVE_WALLPAPER, BM_GETCHECK, 0, 0);

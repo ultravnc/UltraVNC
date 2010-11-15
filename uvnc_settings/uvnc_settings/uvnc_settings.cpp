@@ -104,7 +104,7 @@ LONG kickrdp=0;
 char servicecmdline[256]=("\0");
 
 LONG Primary=1;
-LONG Secundary=0;
+LONG Secondary=0;
 
 int vncEncryptPasswd(char *passwd, char *encryptedPasswd);
 INT_PTR CALLBACK PasswdProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
@@ -185,7 +185,7 @@ myIniFile_Out.WriteInt("admin", "QueryAccept", QueryAccept);
 myIniFile_Out.WriteInt("admin", "QueryIfNoLogon", QueryIfNoLogon);
 
 myIniFile_Out.WriteInt("admin", "primary", Primary);
-myIniFile_Out.WriteInt("admin", "secundary", Secundary);
+myIniFile_Out.WriteInt("admin", "secondary", Secondary);
 
 
 myIniFile_Out.WritePassword(passwd);
@@ -257,7 +257,7 @@ myIniFile_Out.WriteInt("admin", "QueryAccept", QueryAccept);
 myIniFile_Out.WriteInt("admin", "QueryIfNoLogon", QueryIfNoLogon);
 
 myIniFile_Out.WriteInt("admin", "primary", Primary);
-myIniFile_Out.WriteInt("admin", "secundary", Secundary);
+myIniFile_Out.WriteInt("admin", "secondary", Secondary);
 
 DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_PASSWD), 
 							NULL, (DLGPROC) PasswdProc, NULL);
@@ -342,7 +342,7 @@ DisableLocalInputs=myIniFile_In.ReadInt("admin", "LocalInputsDisabled", 0);
 EnableJapInput=myIniFile_In.ReadInt("admin", "EnableJapInput", 0);
 
 Primary=myIniFile_In.ReadInt("admin", "primary", true);
-Secundary=myIniFile_In.ReadInt("admin", "secundary", false);
+Secondary=myIniFile_In.ReadInt("admin", "secondary", false);
 
 TurboMode = myIniFile_In.ReadInt("poll", "TurboMode", 0);
 PollUnderCursor=myIniFile_In.ReadInt("poll", "PollUnderCursor", 0);

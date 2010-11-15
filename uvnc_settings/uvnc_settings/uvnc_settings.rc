@@ -244,7 +244,7 @@ BEGIN
     CONTROL         "Remove Wallpaper while connected",IDC_REMOVE_WALLPAPER,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,151,129,10
     CONTROL         "Show Primary Display",IDC_PRIM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,45,111,84,10
-    CONTROL         "Show Secundary Display",IDC_SEC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,139,111,94,10
+    CONTROL         "Show Secondary Display",IDC_SEC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,139,111,94,10
 END
 
 IDD_OPTION7 DIALOGEX 0, 0, 260, 180
@@ -437,6 +437,58 @@ BEGIN
 END
 
 #endif    // Dutch (Netherlands) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Dutch (Belgium) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NLB)
+#ifdef _WIN32
+LANGUAGE LANG_DUTCH, SUBLANG_DUTCH_BELGIAN
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x17L
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "081304b0"
+        BEGIN
+            VALUE "Comments", "Standalone ultravnc.ini editor"
+            VALUE "CompanyName", "uvnc bvba"
+            VALUE "FileDescription", "uvnc_set Application"
+            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "InternalName", "uvnc_set"
+            VALUE "LegalCopyright", "Copyright (C) 2010"
+            VALUE "OriginalFilename", "uvnc_set.exe"
+            VALUE "ProductName", "uvnc_set Application"
+            VALUE "ProductVersion", "1, 0, 0, 1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x813, 1200
+    END
+END
+
+#endif    // Dutch (Belgium) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
