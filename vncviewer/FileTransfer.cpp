@@ -49,7 +49,11 @@
 #include "Exception.h"
 #include "commctrl.h"
 #include "shlobj.h"
+#ifdef IPP
+#include "../ipp_zlib/src/zlib/zlib.h"
+#else
 #include "zlib/zlib.h"
+#endif
 #include "Log.h"
 #include <string>
 #include <vector>

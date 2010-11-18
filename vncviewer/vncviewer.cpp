@@ -335,6 +335,9 @@ static BOOL read_reg_string(HKEY key, char* sub_key, char* val_name, LPBYTE data
         return ret;
 }
 
+#ifdef IPP
+void InitIpp();
+#endif
 
 
 #ifdef UNDER_CE
@@ -343,6 +346,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR szCmdLin
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow)
 #endif
 {
+#ifdef IPP
+	InitIpp();
+#endif
   #ifdef CRASHRPT
 	Install(NULL, _T("ultravnc@skynet.be"), _T(""));
   #endif

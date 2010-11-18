@@ -30,7 +30,11 @@
 #include "stdhdrs.h"
 #include "vncviewer.h"
 #include "ClientConnection.h"
-#include "zlib\zlib.h"
+#ifdef IPP
+#include "../ipp_zlib/src/zlib/zlib.h"
+#else
+#include "zlib/zlib.h"
+#endif
 
 void ClientConnection::ReadZlibRect(rfbFramebufferUpdateRectHeader *pfburh,int XOR) {
 

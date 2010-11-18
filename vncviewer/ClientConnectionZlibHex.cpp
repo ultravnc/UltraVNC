@@ -31,7 +31,11 @@
 #include "stdhdrs.h"
 #include "vncviewer.h"
 #include "ClientConnection.h"
-#include "zlib\zlib.h"
+#ifdef IPP
+#include "../ipp_zlib/src/zlib/zlib.h"
+#else
+#include "zlib/zlib.h"
+#endif
 #include "lzo/minilzo.h"
 
 bool ClientConnection::zlibDecompress(unsigned char *from_buf, unsigned char *to_buf, unsigned int count, unsigned int size, z_stream *decompressor)

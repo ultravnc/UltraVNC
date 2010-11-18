@@ -244,7 +244,7 @@ ViewerDirectxClass::InitD3D(HWND hwnd, HWND hwndm,int width, int height, bool fu
 	m_directxformat.blueShift=MaskToShift(m_directxformat.blueMask);
 	}
 	//edMask = 0x7c00; greenMask = 0x03e0; blueMask = 0x001f;
-	PostMessage(hwnd_sendm,WM_SYSCOMMAND,ID_REQUEST_REFRESH,0);
+	//PostMessage(hwnd_sendm,WM_SYSCOMMAND,ID_REQUEST_REFRESH,0);
 	return S_OK;
 }
 
@@ -418,7 +418,7 @@ ViewerDirectxClass::ReInitD3D()
 	m_directxformat.blueShift=MaskToShift(m_directxformat.blueMask);
 	}
 	//edMask = 0x7c00; greenMask = 0x03e0; blueMask = 0x001f;
-	PostMessage(hwnd_sendm,WM_SYSCOMMAND,ID_REQUEST_REFRESH,0);
+	//PostMessage(hwnd_sendm,WM_SYSCOMMAND,ID_REQUEST_REFRESH,0);
 	return S_OK;
 }
 

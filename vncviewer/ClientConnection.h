@@ -40,7 +40,11 @@
 #include "KeyMap.h"
 #include "KeyMapJap.h"
 #include <rdr/types.h>
+#ifdef IPP
+#include "../ipp_zlib/src/zlib/zlib.h"
+#else
 #include "zlib/zlib.h"
+#endif
 extern "C"
 {
 	#include "libjpeg/jpeglib.h" // For Tight encoding

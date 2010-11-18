@@ -19,7 +19,7 @@
 #include "ZlibOutStream.h"
 #include "Exception.h"
 #ifdef IPP
-#include "../ipp_zlib/zlib.h"
+#include "../ipp_zlib/src/zlib/zlib.h"
 #else
 #include "../zlib/zlib.h"
 #endif
