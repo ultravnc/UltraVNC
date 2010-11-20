@@ -2424,7 +2424,7 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L92);
 		vnclog.Print(0, _T("No authentication needed\n"));
 //		current_auth.push_back(authScheme);
-		if (m_minorVersion < 7)
+		if (m_minorVersion < 8)
 			{
 				current_auth.push_back(authScheme);
 				return;

@@ -324,6 +324,7 @@ public:
 
 	// The current mouse position
 	rfb::Rect		m_cursorpos;
+	void WriteMessageOnScreen(char*,BYTE *scrBuff, UINT scrBuffSize);
 
 	// Implementation
 protected:
