@@ -835,6 +835,7 @@ void vncMenu::Shutdown(bool kill_client)
 	if (kill_client) m_server->KillAuthClients();
 }
 
+extern BOOL G_HTTP;
 
 char newuser[UNLEN+1];
 // Process window messages
@@ -1733,6 +1734,21 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			if (tmpsock) {
 
 				// Connect out to the specified host on the VNCviewer listen port
+				if (G_HTTP)
+				{
+					if (tmpsock->Http_CreateConnect(szAdrName))
+					{
+						_this->m_server->AddClient(tmpsock, TRUE, TRUE, 0, NULL, NULL, szAdrName, nport);
+					}
+					else
+					{
+						delete tmpsock;
+						_this->m_server->AutoConnectRetry();
+					}
+
+				}
+				else
+				{
 				tmpsock->Create();
 				if (tmpsock->Connect(szAdrName, nport)) {
 					if ( bId )
@@ -1754,6 +1770,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				} else {
 					delete tmpsock;
 					_this->m_server->AutoConnectRetry();
+				}
 				}
 			}
 		
