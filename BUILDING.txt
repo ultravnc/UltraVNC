@@ -1,6 +1,0 @@
-BUILDING WINVNC
-===============
-
-Both the WinVNC and VNCViewer programs can be built using the supplied Release or Debug build settings.
-
-
