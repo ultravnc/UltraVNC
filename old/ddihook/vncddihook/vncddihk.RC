@@ -1,0 +1,15 @@
+// --------------------------------------------------------------------------
+//
+//  PATCH.RC
+//
+// --------------------------------------------------------------------------
+
+#define NASH
+#define VER_FILETYPE                VFT_DLL
+#define VER_FILESUBTYPE             VFT_UNKNOWN
+#define VER_FILEDESCRIPTION_STR     "Win16 vncddihk dll"
+#define VER_INTERNALNAME_STR        "vncddihk"
+#define VER_LEGALCOPYRIGHT_YEARS    "2002-"
+#define VER_ORIGINALFILENAME_STR    "vncddihk.DLL"
+
+
