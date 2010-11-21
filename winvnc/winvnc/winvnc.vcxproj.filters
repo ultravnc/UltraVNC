@@ -228,6 +228,9 @@
     <ClCompile Include="..\..\common\Clipboard.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="httpconnect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\common\win32_helpers.h">
@@ -420,6 +423,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="winvnc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="httpconnect.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
