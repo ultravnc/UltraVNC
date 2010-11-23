@@ -35,45 +35,36 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>Intel C++ Compiler XE 12.0</PlatformToolset>
-    <UseIntelIPP>true</UseIntelIPP>
-    <UseIntelTBB>true</UseIntelTBB>
-    <UseIntelMKL>Parallel</UseIntelMKL>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>Intel C++ Compiler XE 12.0</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>Intel C++ Compiler XE 12.0</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='IPP|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
-    <UseIntelIPP>true</UseIntelIPP>
-    <UseIntelTBB>true</UseIntelTBB>
-    <UseILP64Interfaces>true</UseILP64Interfaces>
-    <PlatformToolset>Intel C++ Compiler XE 12.0</PlatformToolset>
-    <UseIntelMKL>Parallel</UseIntelMKL>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
-    <UseIntelIPP>true</UseIntelIPP>
-    <PlatformToolset>Intel C++ Compiler XE 12.0</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <UseIntelIPP>false</UseIntelIPP>
+    <UseIntelTBB>false</UseIntelTBB>
+    <UseIntelMKL>No</UseIntelMKL>
+    <UseILP64Interfaces>false</UseILP64Interfaces>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>Intel C++ Compiler XE 12.0</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -107,7 +98,7 @@
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='IPP|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='IPP|Win32'">$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='IPP|Win32'">$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='IPP|Win32'">false</LinkIncremental>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='IPP|x64'">$(Platform)\$(Configuration)\</OutDir>
@@ -190,7 +181,7 @@
       </HeaderFileName>
     </Midl>
     <ClCompile>
-      <Optimization>Disabled</Optimization>
+      <Optimization>Full</Optimization>
       <AdditionalIncludeDirectories>..\omnithread;..;..\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;__x86__;__WIN32__;WIN32;_WINDOWS;_WIN32_WINNT=0x501;XMD_H;_WINSTATIC;_CRT_SECURE_NO_WARNINGS;_VC80;_X64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
@@ -249,8 +240,6 @@
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -297,6 +286,13 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ProgramDataBaseFileName>$(IntDir)vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;_X64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -330,10 +326,10 @@
       </HeaderFileName>
     </Midl>
     <ClCompile>
-      <Optimization>MaxSpeedHighLevel</Optimization>
+      <Optimization>Full</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <AdditionalIncludeDirectories>..\omnithread;..;..\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -341,20 +337,13 @@
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeaderOutputFile>.\..\Release/winvnc.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\..\Release/</AssemblerListingLocation>
+      <ObjectFileName>.\..\Release/</ObjectFileName>
+      <ProgramDataBaseFileName>.\..\Release/</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
-      <ObjectFileName>$(IntDir)</ObjectFileName>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <InterproceduralOptimization>SingleFile</InterproceduralOptimization>
-      <OptimizeForWindowsApplication>true</OptimizeForWindowsApplication>
-      <EnableMatrixMultiplyLibraryCall>Yes</EnableMatrixMultiplyLibraryCall>
-      <Parallelization>false</Parallelization>
-      <UseIntelOptimizedHeaders>true</UseIntelOptimizedHeaders>
-      <StructMemberAlignment>16Bytes</StructMemberAlignment>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions3</EnableEnhancedInstructionSet>
-      <GenerateAlternateCodePaths>SSE42</GenerateAlternateCodePaths>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -365,15 +354,16 @@
     </PreLinkEvent>
     <Link>
       <AdditionalOptions>/LTCG %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;comctl32.lib;wtsapi32.lib;userenv.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wsock32.lib;winmm.lib;version.lib;comctl32.lib;wtsapi32.lib;userenv.lib;ippjemerged.lib;ippiemerged.lib;ippsemerged.lib;ippjmerged.lib;ippimerged.lib;ippsmerged.lib;ippcorel.lib;ippdcemerged.lib;ippdcmerged.lib;ippcpmerged.lib;ippcpemerged.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>.\..\Release/winvnc.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateManifest>true</GenerateManifest>
+      <ProgramDatabaseFile>.\..\Release/winvnc.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
       <TargetMachine>MachineX86</TargetMachine>
-      <LinkStatus>false</LinkStatus>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -391,28 +381,20 @@
       </HeaderFileName>
     </Midl>
     <ClCompile>
-      <Optimization>MaxSpeedHighLevel</Optimization>
-      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>..\omnithread;..;..\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;__x86__;__WIN32__;WIN32;_WINDOWS;_WIN32_WINNT=0x501;XMD_H;_WINSTATIC;_VC80;_CRT_SECURE_NO_WARNINGS;_X64;IPP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;__x86__;__WIN32__;WIN32;_WINDOWS;_WIN32_WINNT=0x501;XMD_H;_WINSTATIC;_VC80;_CRT_SECURE_NO_WARNINGS;_X64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeaderOutputFile>.\..\Release/winvnc.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\..\Release/</AssemblerListingLocation>
+      <ObjectFileName>.\..\Release/</ObjectFileName>
+      <ProgramDataBaseFileName>.\..\Release/</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <StructMemberAlignment>16Bytes</StructMemberAlignment>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
-      <InterproceduralOptimization>SingleFile</InterproceduralOptimization>
-      <OptimizeForWindowsApplication>true</OptimizeForWindowsApplication>
-      <EnableMatrixMultiplyLibraryCall>Yes</EnableMatrixMultiplyLibraryCall>
-      <Parallelization>false</Parallelization>
-      <UseIntelOptimizedHeaders>true</UseIntelOptimizedHeaders>
-      <GenerateAlternateCodePaths>SSE42</GenerateAlternateCodePaths>
-      <UseProcessorExtensions>None</UseProcessorExtensions>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -422,8 +404,10 @@
       <Command>cl /nologo /MT /Fo..\Release\ /Fd..\Release\ /c buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
-      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;comctl32.lib;wtsapi32.lib;userenv.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wsock32.lib;winmm.lib;version.lib;comctl32.lib;wtsapi32.lib;userenv.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>.\..\Release/winvnc.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
+      <ProgramDatabaseFile>.\..\Release/winvnc.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
@@ -525,6 +509,7 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="httpconnect.cpp" />
     <ClCompile Include="inifile.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -1264,6 +1249,7 @@
     <ClInclude Include="dpi.h" />
     <ClInclude Include="..\..\DSMPlugin\DSMPlugin.h" />
     <ClInclude Include="HideDesktop.h" />
+    <ClInclude Include="httpconnect.h" />
     <ClInclude Include="inifile.h" />
     <ClInclude Include="IPC.h" />
     <ClInclude Include="keysymdef.h" />
@@ -1371,8 +1357,8 @@
     <None Include="VTune\winvnc.vpj" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\ipp_zlib\ipp_zlib.vcxproj">
-      <Project>{4ede86bd-98d5-2925-06d3-95e4de8927e3}</Project>
+    <ProjectReference Include="..\..\libjpeg-turbo-win\libjpeg-turbo-win.vcxproj">
+      <Project>{04f91fa4-2d94-4803-ba3b-b61fbef0abe3}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\libjpeg\libjpeg.vcxproj">
       <Project>{181769cb-5295-452f-a421-fe1f9ed2022a}</Project>
@@ -1385,6 +1371,9 @@
     </ProjectReference>
     <ProjectReference Include="..\..\zipunzip_src\zip20\windll\visualc\lib\zip32.vcxproj">
       <Project>{e8ba959f-b652-4bab-9ea7-8e9fc8d7f39c}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\zlib\zlib.vcxproj">
+      <Project>{85445bb7-b95b-4de1-ba52-7311aa700a27}</Project>
     </ProjectReference>
     <ProjectReference Include="..\omnithread\omnithread.vcxproj">
       <Project>{e52b9956-fe67-47f7-bc4f-67cc5a64b708}</Project>

@@ -33,42 +33,32 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='IPP|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
-    <PlatformToolset>Intel C++ Compiler XE 12.0</PlatformToolset>
-    <UseIntelIPP>true</UseIntelIPP>
-    <UseIntelTBB>true</UseIntelTBB>
-    <UseIntelMKL>Parallel</UseIntelMKL>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
-    <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>Intel C++ Compiler XE 12.0</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
-    <PlatformToolset>Intel C++ Compiler XE 12.0</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='IPP|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
-    <UseIntelIPP>true</UseIntelIPP>
-    <UseIntelTBB>true</UseIntelTBB>
-    <UseILP64Interfaces>true</UseILP64Interfaces>
-    <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>Intel C++ Compiler XE 12.0</PlatformToolset>
-    <UseIntelMKL>Parallel</UseIntelMKL>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
-    <UseIntelIPP>true</UseIntelIPP>
-    <PlatformToolset>Intel C++ Compiler XE 12.0</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <UseIntelIPP>false</UseIntelIPP>
+    <UseIntelTBB>false</UseIntelTBB>
+    <UseIntelMKL>No</UseIntelMKL>
+    <UseILP64Interfaces>false</UseILP64Interfaces>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
-    <PlatformToolset>Intel C++ Compiler XE 12.0</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -98,7 +88,7 @@
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\</IntDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='IPP|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='IPP|Win32'">$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='IPP|Win32'">$(Configuration)\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='IPP|x64'">$(Platform)\$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='IPP|x64'">$(Platform)\$(Configuration)\</IntDir>
@@ -148,7 +138,7 @@
       <TargetEnvironment>X64</TargetEnvironment>
     </Midl>
     <ClCompile>
-      <Optimization>Disabled</Optimization>
+      <Optimization>Full</Optimization>
       <PreprocessorDefinitions>_DEBUG;WIN32;_WINDOWS;__NT__;_WINSTATIC;__WIN32__;_WIN32_WINNT=0x400;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>
       </ExceptionHandling>
@@ -171,8 +161,8 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <Optimization>Full</Optimization>
-      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <PreprocessorDefinitions>NDEBUG;WIN32;_WINDOWS;__NT__;_WINSTATIC;__WIN32__;_WIN32_WINNT=0x400;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>
@@ -181,10 +171,6 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <ResourceCompile>
       <Culture>0x0409</Culture>
@@ -213,6 +199,13 @@
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ProgramDataBaseFileName>$(IntDir)vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
     </ClCompile>
     <ResourceCompile>
       <Culture>0x0409</Culture>
@@ -228,37 +221,27 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='IPP|Win32'">
     <ClCompile>
-      <Optimization>MaxSpeedHighLevel</Optimization>
-      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <PreprocessorDefinitions>NDEBUG;WIN32;_WINDOWS;__NT__;_WINSTATIC;__WIN32__;_WIN32_WINNT=0x400;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>
       </ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeaderOutputFile>.\Release/omnithread.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\Release/</AssemblerListingLocation>
+      <ObjectFileName>.\Release/</ObjectFileName>
+      <ProgramDataBaseFileName>.\Release/</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
-      <ObjectFileName>$(IntDir)</ObjectFileName>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
-      <InterproceduralOptimization>SingleFile</InterproceduralOptimization>
-      <OptimizeForWindowsApplication>true</OptimizeForWindowsApplication>
-      <EnableMatrixMultiplyLibraryCall>Yes</EnableMatrixMultiplyLibraryCall>
-      <Parallelization>false</Parallelization>
-      <UseIntelOptimizedHeaders>true</UseIntelOptimizedHeaders>
-      <StructMemberAlignment>16Bytes</StructMemberAlignment>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions3</EnableEnhancedInstructionSet>
-      <GenerateAlternateCodePaths>SSE42</GenerateAlternateCodePaths>
     </ClCompile>
     <ResourceCompile>
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Lib>
+      <OutputFile>.\Release\omnithread.lib</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <TargetMachine>
-      </TargetMachine>
     </Lib>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -270,39 +253,27 @@
       <TargetEnvironment>X64</TargetEnvironment>
     </Midl>
     <ClCompile>
-      <Optimization>MaxSpeedHighLevel</Optimization>
-      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <PreprocessorDefinitions>NDEBUG;WIN32;_WINDOWS;__NT__;_WINSTATIC;__WIN32__;_WIN32_WINNT=0x400;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>
       </ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeaderOutputFile>.\Release/omnithread.pch</PrecompiledHeaderOutputFile>
       <AssemblerListingLocation>.\Release/</AssemblerListingLocation>
       <ObjectFileName>.\Release/</ObjectFileName>
       <ProgramDataBaseFileName>.\Release/</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <StructMemberAlignment>16Bytes</StructMemberAlignment>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
-      <InterproceduralOptimization>SingleFile</InterproceduralOptimization>
-      <OptimizeForWindowsApplication>true</OptimizeForWindowsApplication>
-      <EnableMatrixMultiplyLibraryCall>Yes</EnableMatrixMultiplyLibraryCall>
-      <Parallelization>false</Parallelization>
-      <UseIntelOptimizedHeaders>true</UseIntelOptimizedHeaders>
-      <GenerateAlternateCodePaths>SSE42</GenerateAlternateCodePaths>
-      <UseProcessorExtensions>None</UseProcessorExtensions>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <ResourceCompile>
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Lib>
+      <OutputFile>.\Release\omnithread.lib</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <TargetMachine>MachineX64</TargetMachine>
     </Lib>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>

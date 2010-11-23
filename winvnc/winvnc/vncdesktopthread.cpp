@@ -700,6 +700,7 @@ vncDesktopThread::run_undetached(void *arg)
 
 	InvalidateRect(NULL,NULL,TRUE);
 	oldtick=timeGetTime();
+	oldtick2=timeGetTime();
 	int fullpollcounter=0;
 	//*******************************************************
 	// END INIT
@@ -1013,6 +1014,11 @@ vncDesktopThread::run_undetached(void *arg)
 										// after a m_hookdriver switching from on to off 
 										// (and m_hookdll from off to on) that causes mouse cursor garbage,
 										// or missing mouse cursor.
+										char tempchar[10];
+										itoa(1000/((newtick-oldtick2)),tempchar,10);
+										oldtick2=newtick;
+										m_desktop->m_buffer.WriteMessageOnScreen(tempchar);
+
 										if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver)
 											{
 												m_desktop->m_buffer.GrabRegion(rgncache,true,capture);

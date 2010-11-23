@@ -9,14 +9,6 @@
       <Configuration>Debug</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="IPP|Win32">
-      <Configuration>IPP</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="IPP|x64">
-      <Configuration>IPP</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
@@ -37,21 +29,11 @@
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='IPP|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
-    <CharacterSet>MultiByte</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
-    <CharacterSet>MultiByte</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='IPP|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -66,16 +48,10 @@
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='IPP|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
-  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='IPP|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
@@ -87,15 +63,11 @@
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='IPP|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='IPP|Win32'">$(Configuration)\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='IPP|x64'">$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\</IntDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='IPP|x64'">$(Platform)\$(Configuration)\</IntDir>
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
@@ -103,17 +75,11 @@
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
-    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='IPP|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
-    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='IPP|Win32'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
-    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='IPP|Win32'" />
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
-    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='IPP|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
-    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='IPP|x64'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
-    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='IPP|x64'" />
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -134,22 +100,6 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <Optimization>Full</Optimization>
-      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-    </ClCompile>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='IPP|Win32'">
-    <ClCompile>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
-      <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -179,30 +129,13 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='IPP|x64'">
-    <Midl>
-      <TargetEnvironment>X64</TargetEnvironment>
-    </Midl>
-    <ClCompile>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-    </ClCompile>
-    <Lib>
-      <TargetMachine>MachineX64</TargetMachine>
-    </Lib>
-  </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AVIGenerator.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='IPP|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='IPP|x64'">Create</PrecompiledHeader>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
