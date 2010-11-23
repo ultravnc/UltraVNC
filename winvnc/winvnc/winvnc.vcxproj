@@ -1360,9 +1360,6 @@
     <ProjectReference Include="..\..\libjpeg-turbo-win\libjpeg-turbo-win.vcxproj">
       <Project>{04f91fa4-2d94-4803-ba3b-b61fbef0abe3}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\libjpeg\libjpeg.vcxproj">
-      <Project>{181769cb-5295-452f-a421-fe1f9ed2022a}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\..\rdr\rdr.vcxproj">
       <Project>{f5244002-0fff-4f19-a941-fcce1861f132}</Project>
     </ProjectReference>
