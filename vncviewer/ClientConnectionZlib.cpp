@@ -31,9 +31,9 @@
 #include "vncviewer.h"
 #include "ClientConnection.h"
 #ifdef IPP
-#include "../ipp_zlib/src/zlib/zlib.h"
+#include "../ipp_zlib/src/zlib-1.2.5/zlib.h"
 #else
-#include "zlib/zlib.h"
+#include "zlib-1.2.5/zlib.h"
 #endif
 
 void ClientConnection::ReadZlibRect(rfbFramebufferUpdateRectHeader *pfburh,int XOR) {

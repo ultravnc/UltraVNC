@@ -811,9 +811,8 @@
       <Project>{e8ba959f-b652-4bab-9ea7-8e9fc8d7f39c}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\zlib\zlib.vcxproj">
-      <Project>{85445bb7-b95b-4de1-ba52-7311aa700a27}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    <ProjectReference Include="..\zlib-1.2.5\contrib\vstudio\vc10\zlibstat.vcxproj">
+      <Project>{745dec58-ebb3-47a9-a9b8-4c6627c01bf8}</Project>
     </ProjectReference>
     <ProjectReference Include="omnithread\omnithread.vcxproj">
       <Project>{ab1ce62f-4a4d-4daa-831d-5c93ad68f5f1}</Project>
