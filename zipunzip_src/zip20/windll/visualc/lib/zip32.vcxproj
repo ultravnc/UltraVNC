@@ -149,6 +149,7 @@
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <StructMemberAlignment>16Bytes</StructMemberAlignment>
     </ClCompile>
     <ResourceCompile>
       <Culture>0x0409</Culture>

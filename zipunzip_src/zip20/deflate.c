@@ -258,7 +258,7 @@ local config configuration_table[10] = {
 local void fill_window   OF((void));
 local ulg deflate_fast   OF((void));
 
-      int  longest_match OF((IPos cur_match));
+      int  longest_match2 OF((IPos cur_match));
 #if defined(ASMV) && !defined(RISCOS)
       void match_init OF((void)); /* asm code initialization */
 #endif
@@ -410,7 +410,7 @@ void lm_free()
  * match.S. The code is functionally equivalent, so you can use the C version
  * if desired.
  */
-int longest_match(cur_match)
+int longest_match2(cur_match)
     IPos cur_match;                             /* current match */
 {
     unsigned chain_length = max_chain_length;   /* max hash chain length */
@@ -702,7 +702,7 @@ local ulg deflate_fast()
              */
             if ((unsigned)nice_match > lookahead) nice_match = (int)lookahead;
 #  endif
-            match_length = longest_match (hash_head);
+            match_length = longest_match2 (hash_head);
             /* longest_match() sets match_start */
             if (match_length > lookahead) match_length = lookahead;
 #endif
@@ -811,7 +811,7 @@ ulg deflate_copy()
              */
             if ((unsigned)nice_match > lookahead) nice_match = (int)lookahead;
 #  endif
-            match_length = longest_match (hash_head);
+            match_length = longest_match2 (hash_head);
             /* longest_match() sets match_start */
             if (match_length > lookahead) match_length = lookahead;
 #endif

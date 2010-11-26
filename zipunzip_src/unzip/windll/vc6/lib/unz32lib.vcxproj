@@ -342,6 +342,7 @@
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <StructMemberAlignment>16Bytes</StructMemberAlignment>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>

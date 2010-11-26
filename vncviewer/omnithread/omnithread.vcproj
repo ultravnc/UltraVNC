@@ -182,11 +182,15 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="2"
-				InlineFunctionExpansion="1"
+				Optimization="3"
+				InlineFunctionExpansion="2"
+				EnableIntrinsicFunctions="true"
+				FavorSizeOrSpeed="1"
+				WholeProgramOptimization="true"
 				PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;__NT__;_WINSTATIC;__WIN32__;_WIN32_WINNT=0x400"
 				StringPooling="true"
 				RuntimeLibrary="0"
+				StructMemberAlignment="5"
 				EnableFunctionLevelLinking="true"
 				PrecompiledHeaderFile=".\Release/omnithread.pch"
 				AssemblerListingLocation=".\Release/"

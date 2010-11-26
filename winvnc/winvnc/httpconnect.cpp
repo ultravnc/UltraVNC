@@ -91,7 +91,6 @@ void *
 httpconnect::xmalloc (size_t size)
 {
     void *ret = malloc(size);
-    if (ret == NULL)
     return ret;
 }
 

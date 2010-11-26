@@ -122,6 +122,10 @@
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">H:\ultravnc_195\UltraVNC Project Root\UltraVNC\lib\release\x86;$(LibraryPath)</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">H:\ultravnc_195\UltraVNC Project Root\UltraVNC\lib\release\x64;$(LibraryPath)</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">H:\ultravnc_195\UltraVNC Project Root\UltraVNC\lib\debug\x64;$(LibraryPath)</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">H:\ultravnc_195\UltraVNC Project Root\UltraVNC\lib\debug\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
@@ -1369,8 +1373,8 @@
     <ProjectReference Include="..\..\zipunzip_src\zip20\windll\visualc\lib\zip32.vcxproj">
       <Project>{e8ba959f-b652-4bab-9ea7-8e9fc8d7f39c}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\zlib\zlib.vcxproj">
-      <Project>{85445bb7-b95b-4de1-ba52-7311aa700a27}</Project>
+    <ProjectReference Include="..\..\zlib-1.2.5\contrib\vstudio\vc10\zlibstat.vcxproj">
+      <Project>{745dec58-ebb3-47a9-a9b8-4c6627c01bf8}</Project>
     </ProjectReference>
     <ProjectReference Include="..\omnithread\omnithread.vcxproj">
       <Project>{e52b9956-fe67-47f7-bc4f-67cc5a64b708}</Project>

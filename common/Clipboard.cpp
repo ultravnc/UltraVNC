@@ -44,7 +44,7 @@
 #ifdef IPP
 #include "..\..\ipp_zlib\src\zlib\zlib.h"
 #else
-#include <zlib/zlib.h>
+#include <zlib-1.2.5/zlib.h>
 #endif
 
 
