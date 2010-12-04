@@ -18,7 +18,7 @@
 //
 // If the source code for the program is not available from the place from
 // which you received this file, check 
-// http://ultravnc.sourceforge.net/
+// http://www.uvnc.com/
 ////////////////////////////////////////////////////////////////////////////
 //
 // DSMPlugin.h: interface for the CDSMPlugin class.
