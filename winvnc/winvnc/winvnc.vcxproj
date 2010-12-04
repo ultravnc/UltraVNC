@@ -1250,15 +1250,12 @@
     <ClInclude Include="..\..\ZipUnZip32\ZipUnZip32.h" />
     <ClInclude Include="d3des.h" />
     <ClInclude Include="..\..\rfb\dh.h" />
-    <ClInclude Include="dpi.h" />
     <ClInclude Include="..\..\DSMPlugin\DSMPlugin.h" />
     <ClInclude Include="HideDesktop.h" />
     <ClInclude Include="httpconnect.h" />
     <ClInclude Include="inifile.h" />
     <ClInclude Include="IPC.h" />
     <ClInclude Include="keysymdef.h" />
-    <ClInclude Include="LinkLabel.h" />
-    <ClInclude Include="MultiMon.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="rfb.h" />
     <ClInclude Include="rfbMisc.h" />
@@ -1278,7 +1275,6 @@
     <ClInclude Include="vncbuffer.h" />
     <ClInclude Include="vncclient.h" />
     <ClInclude Include="vncconndialog.h" />
-    <ClInclude Include="vnccorbaconnect.h" />
     <ClInclude Include="vncdesktop.h" />
     <ClInclude Include="vncdesktopthread.h" />
     <ClInclude Include="vncencodecorre.h" />
@@ -1300,7 +1296,6 @@
     <ClInclude Include="vncpasswd.h" />
     <ClInclude Include="vncproperties.h" />
     <ClInclude Include="vncpropertiesPoll.h" />
-    <ClInclude Include="vncpropPath.h" />
     <ClInclude Include="vncserver.h" />
     <ClInclude Include="vncservice.h" />
     <ClInclude Include="vncsetauth.h" />

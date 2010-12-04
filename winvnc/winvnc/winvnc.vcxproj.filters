@@ -254,9 +254,6 @@
     <ClInclude Include="d3des.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="dpi.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Dtwinver.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -270,12 +267,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="keysymdef.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="LinkLabel.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MultiMon.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
@@ -330,9 +321,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="vncconndialog.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vnccorbaconnect.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="vncdesktop.h">
@@ -396,9 +384,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="vncpropertiesPoll.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vncpropPath.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="vncserver.h">
