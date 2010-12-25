@@ -169,6 +169,7 @@ public:
 	virtual BOOL SetNewSWSize(long w,long h,BOOL desktop);
 	virtual void SetSWOffset(int x,int y);
 	virtual void SetScreenOffset(int x,int y,int type);
+	virtual void InitialUpdate(bool value);
 
 	virtual TextChat* GetTextChatPointer() { return m_pTextChat; }; // sf@2002
 	virtual void SetUltraViewer(bool fTrue) { m_fUltraViewer = fTrue;};
@@ -293,6 +294,7 @@ protected:
 	CARD32 m_state;
 	CARD32 m_value;
 	bool m_want_update_state; 
+	int unlockcounter;
 
 
 	// Specialised client-side UpdateTracker
@@ -531,6 +533,7 @@ protected:
 	bool		m_Support_rfbSetServerInput;
     bool        m_wants_KeepAlive;
 	bool		m_session_supported;
+	bool		m_initial_update;
 };
 
 
