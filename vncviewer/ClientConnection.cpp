@@ -647,10 +647,11 @@ DWORD WINAPI ReconnectThreadProc(LPVOID lpParameter)
 		cc->DoConnection();
 		cc->m_bKillThread = false;
 		cc->m_running = true;
-
+		cc->m_pendingFormatChange=true;
 		//adzm 2010-09 - Not sure about this one, but honestly i've never had the reconnect stuff work reliably for me, so I'll just let this
 		//call into the internal function rather than deal with messages
-		cc->Internal_SendFullFramebufferUpdateRequest();
+		if (cc->m_nServerScale > 1) cc->SendServerScale(cc->m_nServerScale);
+		cc->Internal_SendAppropriateFramebufferUpdateRequest();
 	}
 	catch (Exception &e)
 	{
@@ -676,7 +677,8 @@ void ClientConnection::Reconnect()
 
 		//adzm 2010-09 - Not sure about this one, but honestly i've never had the reconnect stuff work reliably for me, so I'll just let this
 		//call into the internal function rather than deal with messages
-		Internal_SendFullFramebufferUpdateRequest();
+		if (m_nServerScale > 1) SendServerScale(m_nServerScale);
+		Internal_SendAppropriateFramebufferUpdateRequest();
 	}
 	catch (Exception &e)
 	{
@@ -4571,7 +4573,15 @@ void ClientConnection::Internal_SendAppropriateFramebufferUpdateRequest()
 {
 	if (m_pendingFormatChange) 
 	{
-		SoftCursorFree();
+		if (prevCursorSet) {
+		if (m_SavedAreaBIB) delete[] m_SavedAreaBIB;
+		m_SavedAreaBIB=NULL;
+		if ( rcSource) delete[] rcSource;
+		rcSource=NULL;
+		if (rcMask) delete[] rcMask;
+		rcMask=NULL;
+		prevCursorSet = false;
+		}
 		vnclog.Print(3, _T("Requesting new pixel format\n") );		
 		rfbPixelFormat oldFormat = m_myFormat;
 		SetupPixelFormat();
