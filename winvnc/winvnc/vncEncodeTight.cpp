@@ -1471,7 +1471,7 @@ vncEncodeTight::SendJpegRect(BYTE *dst, int w, int h, int quality)
 	jpeg_set_defaults(&cinfo);
 	jpeg_set_quality(&cinfo, quality, TRUE);
 
-	JpegSetDstManager (&cinfo, dst, w * h * (m_localformat.bitsPerPixel / 8));
+	JpegSetDstManager (&cinfo, (JOCTET*)dst, w * h * (m_localformat.bitsPerPixel / 8));
 
 	jpeg_start_compress(&cinfo, TRUE);
 

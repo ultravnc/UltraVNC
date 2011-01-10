@@ -25,13 +25,13 @@
 #if !defined(_WINVNC_VNCDESKTOPTHREAD)
 #define _WINVNC_VNCDESKTOPTHREAD
 #include "stdhdrs.h"
-#include "vncServer.h"
-#include "vncKeymap.h"
-#include "vncDesktop.h"
-#include "vncService.h"
+#include "vncserver.h"
+#include "vnckeymap.h"
+#include "vncdesktop.h"
+#include "vncservice.h"
 #include "mmsystem.h"
-#include "ipc.h"
-#include "cpuusage.h"
+#include "IPC.h"
+#include "CpuUsage.h"
 
 typedef struct _CURSORINFO
 {
@@ -88,7 +88,7 @@ protected:
 	};
 private:
 	bool handle_display_change(HANDLE& threadhandle, rfb::Region2D& rgncache, rfb::SimpleUpdateTracker& clipped_updates, rfb::ClippedUpdateTracker& updates);
-	void vncDesktopThread::do_polling(HANDLE& threadHandle, rfb::Region2D& rgncache, int& fullpollcounter, bool cursormoved);
+	void do_polling(HANDLE& threadHandle, rfb::Region2D& rgncache, int& fullpollcounter, bool cursormoved);
 
 public:
 	virtual BOOL Init(vncDesktop *desktop, vncServer *server);

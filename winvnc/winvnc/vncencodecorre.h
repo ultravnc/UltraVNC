@@ -34,7 +34,7 @@ class vncEncodeCoRRE;
 #define _WINVNC_ENCODECORRE
 #pragma once
 
-#include "vncEncoder.h"
+#include "vncencoder.h"
 
 // Class definition
 

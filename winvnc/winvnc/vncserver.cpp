@@ -36,17 +36,17 @@
 #include <lmcons.h>
 
 // Custom
-#include "WinVNC.h"
-#include "vncServer.h"
-#include "vncSockConnect.h"
-#include "vncClient.h"
-#include "vncService.h"
-#include "vncTimedMsgBox.h"
-#include "mmSystem.h" // sf@2002
+#include "winvnc.h"
+#include "vncserver.h"
+#include "vncsockconnect.h"
+#include "vncclient.h"
+#include "vncservice.h"
+#include "vnctimedmsgbox.h"
+#include "mmsystem.h" // sf@2002
 
 #include "vncmenu.h"
 
-#include "localization.h" // ACT : Add localization on messages
+#include "Localization.h" // ACT : Add localization on messages
 bool g_Server_running;
 extern bool g_Desktop_running;
 extern bool g_DesktopThread_running;
@@ -1716,7 +1716,7 @@ vncServer::EnableXDMCPConnect(BOOL enable)
 		       NULL,             // Process handle not inheritable. 
 		        NULL,             // Thread handle not inheritable. 
 		       FALSE,            // Set handle inheritance to FALSE. 
-		       NULL,                // No creation flags. 
+		       0,                // No creation flags. 
 		       NULL,             // Use parent's environment block. 
 		       ".\\xdmcp",             // Use parent's starting directory. 
 		       &ssi,              // Pointer to STARTUPINFO structure.

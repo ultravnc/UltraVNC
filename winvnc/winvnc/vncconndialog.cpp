@@ -27,14 +27,15 @@
 // to forge outgoing connections to VNC-viewer 
 
 #include "stdhdrs.h"
-#include "vncConnDialog.h"
-#include "WinVNC.h"
+#include "vncconndialog.h"
+#include "winvnc.h"
 
 #include "resource.h"
 #include "common/win32_helpers.h"
 
+#include <ctype.h>
 
-#include "localization.h" // ACT : Add localization on messages
+#include "Localization.h" // ACT : Add localization on messages
 
 //	[v1.0.2-jp1 fix] Load resouce from dll
 extern HINSTANCE	hInstResDLL;
@@ -63,7 +64,7 @@ INT_PTR vncConnDialog::DoDialog()
 	//DialogBoxParam(hAppInstance, MAKEINTRESOURCE(IDD_OUTGOING_CONN), 	
 	//adzm 2009-06-20 - Return the result
 	INT_PTR nResult = DialogBoxParam(hInstResDLL, MAKEINTRESOURCE(IDD_OUTGOING_CONN), 
-		NULL, (DLGPROC) vncConnDlgProc, (LONG) this);
+		NULL, (DLGPROC) vncConnDlgProc, (LONG_PTR) this);
 	delete this;
 	return nResult;
 }
@@ -240,7 +241,7 @@ BOOL CALLBACK vncConnDialog::vncConnDlgProc(HWND hwnd,
 			// Get the hostname of the VNCviewer
 			GetDlgItemText(hwnd, IDC_HOSTNAME_EDIT, hostname, _MAX_PATH);
 			GetDlgItemText(hwnd, IDC_IDCODE, idcode, _MAX_PATH);
-			if (strcmp(idcode,"")==NULL) id=false;
+			if (strcmp(idcode,"")==0) id=false;
 			else id=true;
 
 			strcpy(actualhostname, hostname);

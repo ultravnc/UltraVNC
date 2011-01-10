@@ -36,7 +36,7 @@ class vncEncodeUltra;
 #define _WINVNC_EncodeULTRA
 #pragma once
 
-#include "vncEncoder.h"
+#include "vncencoder.h"
 #include "lzo/minilzo.h"
 
 // Minimum Ultra rectangle size in bytes.  Anything smaller will

@@ -35,7 +35,7 @@ class VSocket;
 #if (!defined(_ATT_VSOCKET_DEFINED))
 #define _ATT_VSOCKET_DEFINED
 
-#include "VTypes.h"
+#include "vtypes.h"
 #include <DSMPlugin/DSMPlugin.h>
 
 ////////////////////////////
@@ -125,7 +125,7 @@ public:
   // adzm 2010-08
   static void SetSocketKeepAliveTimeoutDefault(int timeout) { m_defaultSocketKeepAliveTimeout = timeout; }
 
-  bool VSocket::GetPeerAddress(char *address, int size);
+  bool GetPeerAddress(char *address, int size);
 
   VBool Http_CreateConnect(const VString address);
   SOCKET GetChannel() const { return (SOCKET) sock; }

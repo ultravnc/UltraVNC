@@ -45,7 +45,7 @@ void *memcpy_amd(void *dest, const void *src, size_t n);
 bool CheckVideoDriver(bool);
 #define MAXPATH 256
 
-#include "VNCLog.h"
+#include "vnclog.h"
 extern VNCLog vnclog;
 
 // No logging at all

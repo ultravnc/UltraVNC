@@ -36,9 +36,9 @@ class vncEncoder;
 #define RFBENCODER_DEFINED
 #pragma once
 
-#include "vncBuffer.h"
+#include "vncbuffer.h"
 #include "translate.h"
-#include "Vsocket.h"
+#include "vsocket.h"
 #include "vncmemcpy.h"
 
 // Class definition

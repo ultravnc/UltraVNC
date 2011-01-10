@@ -30,7 +30,7 @@
 // Common classes for dealing with the clipboard, including serializing and deserializing compressed data, hashing and comparing, etc.
 // Used by server and viewer.
 
-#include "clipboard.h"
+#include "Clipboard.h"
 
 
 #define VC_EXTRALEAN

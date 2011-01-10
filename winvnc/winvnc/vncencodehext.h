@@ -34,7 +34,7 @@ class vncEncodeHexT;
 #define _WINVNC_ENCODEHEXTILE
 #pragma once
 
-#include "vncEncoder.h"
+#include "vncencoder.h"
 
 // Class definition
 

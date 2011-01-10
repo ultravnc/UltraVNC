@@ -29,21 +29,23 @@
 // Implementation of a system tray icon & menu for WinVNC
 
 #include "stdhdrs.h"
-#include "WinVNC.h"
-#include "vncService.h"
-#include "vncConnDialog.h"
+#include "winvnc.h"
+#include "vncservice.h"
+#include "vncconndialog.h"
 #include <lmcons.h>
 #include <wininet.h>
 #include <shlobj.h>
 
 // Header
 
-#include "vncMenu.h"
+#include "vncmenu.h"
 #include "HideDesktop.h"
 #include "common/win32_helpers.h"
 
+#ifndef __GNUC__
 // [v1.0.2-jp1 fix]
 #pragma comment(lib, "imm32.lib")
+#endif
 
 extern bool G_1111;
 // Constants
@@ -179,7 +181,7 @@ static bool IsUserDesktop()
 	char new_name[256];
 	if (GetUserObjectInformation(desktop, UOI_NAME, &new_name, 256, &dummy))
 	{
-		if (strcmp(new_name,"Default")==NULL) {
+		if (strcmp(new_name,"Default")==0) {
 			return true;
 		}
 	}	
@@ -305,7 +307,7 @@ vncMenu::vncMenu(vncServer *server)
 	}
 
 	// record which client created this window
-    helper::SafeSetWindowUserData(m_hwnd, (LONG) this);
+    helper::SafeSetWindowUserData(m_hwnd, (LONG_PTR) this);
 
 	// Ask the server object to notify us of stuff
 	server->AddNotify(m_hwnd);
@@ -1067,7 +1069,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 								StartUPInfo.cb = sizeof(STARTUPINFO);
 						
 								CreateProcessAsUser(hPToken,NULL,dir,NULL,NULL,FALSE,DETACHED_PROCESS,NULL,NULL,&StartUPInfo,&ProcessInfo);
-								DWORD error=GetLastError();
+								GetLastError();
                                 if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
                                 if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
 								//if (error==1314)
@@ -1107,7 +1109,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 								StartUPInfo.cb = sizeof(STARTUPINFO);
 						
 								CreateProcessAsUser(hPToken,NULL,dir,NULL,NULL,FALSE,DETACHED_PROCESS,NULL,NULL,&StartUPInfo,&ProcessInfo);
-								DWORD error=GetLastError();
+								GetLastError();
                                 if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
                                 if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
 								//if (error==1314)
@@ -1622,7 +1624,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		{
 			char szId[MAX_PATH] = {0};
 			UINT ret = 0;
-			if ( lParam != NULL )
+			if ( lParam != 0 )
 			{
 				ret = GlobalGetAtomName( (ATOM)lParam, szId, sizeof( szId ) );
 				GlobalDeleteAtom( (ATOM)lParam );
@@ -1639,7 +1641,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
  		{
 			char szId[MAX_PATH] = {0};
 			UINT ret = 0;
-			if ( lParam != NULL )
+			if ( lParam != 0 )
 			{
 				ret = GlobalGetAtomName( (ATOM)lParam, szId, sizeof( szId ) );
 				GlobalDeleteAtom( (ATOM)lParam );
@@ -1671,7 +1673,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			// of a listening client, to which we should connect.
 
 			//adzm 2009-06-20 - Check for special add repeater client message
-			if (wParam == 0xFFFFFFFF && lParam == 0xFFFFFFFF) {
+			if (wParam == 0xFFFFFFFF && (ULONG) lParam == 0xFFFFFFFF) {
 				vncConnDialog *newconn = new vncConnDialog(_this->m_server);
 				if (newconn)
 				{

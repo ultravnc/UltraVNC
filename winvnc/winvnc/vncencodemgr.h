@@ -38,16 +38,16 @@ class vncEncodeMgr;
 
 // Includes
 
-#include "vncEncoder.h"
-#include "vncEncodeRRE.h"
-#include "vncEncodeCoRRE.h"
-#include "vncEncodeHexT.h"
-#include "vncEncodeZRLE.h"
+#include "vncencoder.h"
+#include "vncencoderre.h"
+#include "vncencodecorre.h"
+#include "vncencodehext.h"
+#include "vncencodezrle.h"
 #include "vncEncodeZlib.h"
 #include "vncEncodeZlibHex.h"
 #include "vncEncodeTight.h"
 #include "vncEncodeUltra.h"
-#include "vncBuffer.h"
+#include "vncbuffer.h"
 
 //
 // -=- Define the Encoding Manager interface

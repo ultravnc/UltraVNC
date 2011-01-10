@@ -36,7 +36,7 @@ class vncEncodeZlib;
 #define _WINVNC_ENCODEZLIB
 #pragma once
 
-#include "vncEncoder.h"
+#include "vncencoder.h"
 #ifdef IPP
 #include "..\..\ipp_zlib\src\zlib\zlib.h"
 #else

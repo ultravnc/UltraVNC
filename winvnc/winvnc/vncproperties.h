@@ -32,10 +32,10 @@ class vncProperties;
 #include <objbase.h>
 
 #include "stdhdrs.h"
-#include "vncServer.h"
-#include "vncSetAuth.h"
+#include "vncserver.h"
+#include "vncsetauth.h"
 #include "inifile.h"
-#include <Userenv.h>
+#include <userenv.h>
 // The vncProperties class itself
 class vncProperties
 {

@@ -87,6 +87,6 @@ namespace rfb {
 
 };
 
-#endif __RFB_REGION_WIN32_INCLUDED__
+#endif /* __RFB_REGION_WIN32_INCLUDED__ */
 
 

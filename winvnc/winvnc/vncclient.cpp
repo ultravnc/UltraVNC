@@ -41,34 +41,37 @@
 // Includes
 #include "stdhdrs.h"
 #include <omnithread.h>
+#include <string>
+#include <sstream>
 #include "resource.h"
 
 // Custom
-#include "vncServer.h"
-#include "vncClient.h"
-#include "VSocket.h"
-#include "vncDesktop.h"
+#include "vncserver.h"
+#include "vncclient.h"
+#include "vsocket.h"
+#include "vncdesktop.h"
 #include "rfbRegion.h"
-#include "vncBuffer.h"
-#include "vncService.h"
-#include "vncPasswd.h"
-#include "vncAcceptDialog.h"
-#include "vncKeymap.h"
-#include "vncMenu.h"
+#include "vncbuffer.h"
+#include "vncservice.h"
+#include "vncpasswd.h"
+#include "vncacceptdialog.h"
+#include "vnckeymap.h"
+#include "vncmenu.h"
 
 #include "rfb/dh.h"
-#include "vncAuth.h"
+#include "vncauth.h"
 
 #ifdef IPP
 #include "..\..\ipp_zlib\src\zlib\zlib.h"
 #else
 #include "zlib-1.2.5/zlib.h"
 #endif
-#include "mmSystem.h" // sf@2002
+#include "mmsystem.h" // sf@2002
 #include "sys/types.h"
 #include "sys/stat.h"
 
 #include <string>
+#include <iterator>
 #include <shlobj.h>
 #include "vncOSVersion.h"
 #include "common/win32_helpers.h"
@@ -152,7 +155,7 @@ bool replaceFile(const char *src, const char *dst)
 
     return status;
 }
-#include "localization.h" // Act : add localization on messages
+#include "Localization.h" // Act : add localization on messages
 typedef BOOL (WINAPI *PGETDISKFREESPACEEX)(LPCSTR,PULARGE_INTEGER, PULARGE_INTEGER, PULARGE_INTEGER);
 
 DWORD GetExplorerLogonPid();
@@ -829,7 +832,7 @@ vncClientThread::InitVersion()
 
 	rfbProtocolVersionMsg protocol_ver;
 	protocol_ver[12] = 0;
-	if (strcmp(m_client->ProtocolVersionMsg,"0.0.0.0")==NULL)
+	if (strcmp(m_client->ProtocolVersionMsg,"0.0.0.0")==0)
 	{
 		// Generate the server's protocol version
 		// RDV 2010-6-10 
@@ -875,7 +878,7 @@ vncClientThread::InitVersion()
 		memcpy(protocol_ver,m_client->ProtocolVersionMsg, sz_rfbProtocolVersionMsg);
 
 	// sf@2006 - Trying to fix neverending authentication bug - Check if this is RFB protocole
-	if (strncmp(protocol_ver,"RFB", 3)!=NULL)
+	if (strncmp(protocol_ver,"RFB", 3)!=0)
 		return FALSE;
 
 	// Check viewer's the protocol version

@@ -31,15 +31,16 @@
 
 // Header
 
-#include "vncService.h"
+#include "vncservice.h"
 
+#include <cassert>
 #include <lmcons.h>
 #include "omnithread.h"
-#include "WinVNC.h"
-#include "vncMenu.h"
-#include "vncTimedMsgBox.h"
+#include "winvnc.h"
+#include "vncmenu.h"
+#include "vnctimedmsgbox.h"
 
-#include "localization.h" // Act : add localization on messages
+#include "Localization.h" // Act : add localization on messages
 
 
 // OS-SPECIFIC ROUTINES
@@ -671,7 +672,7 @@ vncService::InputDesktopSelected()
 			if (!m_fRunningFromExternalService)return 2;
 			return 0;
 		}
-		_ASSERT(dummy <= 256);
+		assert(dummy <= 256);
 		if (!GetUserObjectInformation(inputdesktop, UOI_NAME, &inputname, 256, &dummy)) {
 			if (!CloseDesktop(inputdesktop))
 				vnclog.Print(LL_INTERR, VNCLOG("failed to close input desktop\n"));
@@ -680,7 +681,7 @@ vncService::InputDesktopSelected()
 			if (!m_fRunningFromExternalService)return 2;
 			return 0;
 		}
-		_ASSERT(dummy <= 256);
+		assert(dummy <= 256);
 
 		if (!CloseDesktop(inputdesktop))
 			vnclog.Print(LL_INTERR, VNCLOG("failed to close input desktop\n"));
@@ -874,25 +875,25 @@ vncService::PostAddNewRepeaterClient()
 BOOL
 vncService::PostAddAutoConnectClient( const char* pszId )
 {
-	ATOM aId = NULL;
+	ATOM aId = INVALID_ATOM;
 	if ( pszId )
 	{
 		aId = GlobalAddAtom( pszId );
 //		delete pszId;
 	}
-	return ( PostToWinVNC(MENU_AUTO_RECONNECT_MSG, NULL, (LPARAM)aId) );
+	return ( PostToWinVNC(MENU_AUTO_RECONNECT_MSG, 0, (LPARAM)aId) );
 }
 
 BOOL
 vncService::PostAddConnectClient( const char* pszId )
 {
-	ATOM aId = NULL;
+	ATOM aId = INVALID_ATOM;
 	if ( pszId )
 	{
 		aId = GlobalAddAtom( pszId );
 //		delete pszId;
 	}
-	return ( PostToWinVNC(MENU_REPEATER_ID_MSG, NULL, (LPARAM)aId) );
+	return ( PostToWinVNC(MENU_REPEATER_ID_MSG, 0, (LPARAM)aId) );
 }
 
 BOOL

@@ -112,7 +112,6 @@ vncAccessControl::SetSD(PSECURITY_DESCRIPTOR pSD){
 	BOOL bDaclPresent = FALSE;
 	BOOL bDaclDefaulted = FALSE;
 	PACL pDACL = NULL;
-	PACL pNewACL = NULL;
 
 	GetSecurityDescriptorDacl(pSD, &bDaclPresent, &pDACL, &bDaclDefaulted);
 
@@ -127,7 +126,7 @@ vncAccessControl::SetSD(PSECURITY_DESCRIPTOR pSD){
 PSID
 vncAccessControl::GetOwnerSID(void){
 	PSID pAdminSid = NULL;
-	SID_IDENTIFIER_AUTHORITY SIDAuth = SECURITY_NT_AUTHORITY;
+	SID_IDENTIFIER_AUTHORITY SIDAuth = { SECURITY_NT_AUTHORITY };
 	// Create a SID for the BUILTIN\Administrators group.
 	AllocateAndInitializeSid( &SIDAuth, 2,
 		SECURITY_BUILTIN_DOMAIN_RID,

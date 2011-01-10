@@ -89,7 +89,7 @@ vncDesktop::StartInitWindowthread()
 	vnclog.Print(LL_INTINFO, VNCLOG("StartInitWindowthread \n"));
 	if (GetUserObjectInformation(desktop, UOI_NAME, &new_name, 256, &dummy))
 	{
-		if (strcmp(new_name,"Default")==NULL)
+		if (strcmp(new_name,"Default")==0)
 		{
 			vnclog.Print(LL_INTINFO, VNCLOG("StartInitWindowthread default desk\n"));
 			if (InitWindowThreadh==NULL)
@@ -513,7 +513,7 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 }
 //////////////////////////////////////////////////////////////////////////////////////////
 
-ATOM m_wndClass = 0;
+ATOM m_wndClass = INVALID_ATOM;
 
 BOOL
 vncDesktop::InitWindow()
@@ -606,7 +606,7 @@ vncDesktop::InitWindow()
 	}
 
 	// Set the "this" pointer for the window
-    helper::SafeSetWindowUserData(m_hwnd, (long)this);
+    helper::SafeSetWindowUserData(m_hwnd, (LONG_PTR)this);
 
 	// Enable clipboard hooking
 	// adzm - 2010-07 - Fix clipboard hangs

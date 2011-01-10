@@ -32,16 +32,16 @@
 
 #include "stdhdrs.h"
 #include "lmcons.h"
-#include "vncService.h"
+#include "vncservice.h"
 
-#include "WinVNC.h"
-#include "vncPropertiesPoll.h"
-#include "vncServer.h"
+#include "winvnc.h"
+#include "vncpropertiesPoll.h"
+#include "vncserver.h"
 #include "vncOSVersion.h"
 #include "common/win32_helpers.h"
 
 
-#include "localization.h" // ACT : Add localization on messages
+#include "Localization.h" // ACT : Add localization on messages
 
 // [v1.0.2-jp1 fix] Load resouce from dll
 extern HINSTANCE	hInstResDLL;
@@ -224,7 +224,7 @@ vncPropertiesPoll::Show(BOOL show, BOOL usersettings)
 				    MAKEINTRESOURCE(IDD_PROPERTIES), 
 				    NULL,
 				    (DLGPROC) DialogProcPoll,
-				    (LONG) this);
+				    (LONG_PTR) this);
 
 				if (!m_returncode_valid)
 				    result = IDCANCEL;

@@ -88,7 +88,7 @@ DynamicFnBase::DynamicFnBase(const TCHAR* dllName, const char* fnName) : dllHand
   if (!dllHandle) {
     return;
   }
-  fnPtr = GetProcAddress(dllHandle, fnName);
+  fnPtr = (void *) GetProcAddress(dllHandle, fnName);
 }
 
 DynamicFnBase::~DynamicFnBase() {

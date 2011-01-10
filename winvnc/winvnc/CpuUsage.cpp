@@ -26,7 +26,7 @@
 #include <tchar.h>
 #include <time.h>
 #include <windows.h>
-#include "cpuUsage.h"
+#include "CpuUsage.h"
 
 DWORD CProcessorUsage::s_TickMark = 0;
 __int64  CProcessorUsage::s_time = 0;

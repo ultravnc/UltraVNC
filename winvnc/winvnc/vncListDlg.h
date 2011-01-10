@@ -26,7 +26,7 @@ class vncListDlg;
 #define _WINVNC_VNCLISTDLG
 
 #include "stdhdrs.h"
-#include "vncServer.h"
+#include "vncserver.h"
 
 
 class vncListDlg

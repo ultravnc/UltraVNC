@@ -34,7 +34,7 @@ class vncEncodeTight;
 #define _WINVNC_ENCODETIGHT
 #pragma once
 
-#include "vncEncoder.h"
+#include "vncencoder.h"
 
 #ifdef IPP
 #include "..\..\ipp_zlib\src\zlib\zlib.h"
@@ -49,6 +49,7 @@ extern "C"
 #include "libjpeg/jpeglib.h"
 #endif
 }
+#include <math.h>
 
 // Minimum amount of data to be compressed. This value should not be
 // changed, doing so will break compatibility with existing clients.

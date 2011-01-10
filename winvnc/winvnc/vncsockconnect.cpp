@@ -27,9 +27,9 @@
 // Implementation of the listening socket class
 
 #include "stdhdrs.h"
-#include "VSocket.h"
-#include "vncSockConnect.h"
-#include "vncServer.h"
+#include "vsocket.h"
+#include "vncsockconnect.h"
+#include "vncserver.h"
 #include <omnithread.h>
 
 #ifdef HTTP_SAMEPORT

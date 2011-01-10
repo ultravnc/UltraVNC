@@ -24,7 +24,7 @@
 
 #include "stdhdrs.h"
 #include <windows.h>
-#include <Wtsapi32.h>
+#include <wtsapi32.h>
 #include "common/win32_helpers.h"
 
 static void WINAPI service_main(DWORD, LPTSTR *);

@@ -39,9 +39,10 @@ class vncHTTPConnect;
 
 // Includes
 #include "stdhdrs.h"
-#include "VSocket.h"
-#include "vncServer.h"
+#include "vsocket.h"
 #include <omnithread.h>
+
+class vncServer;
 
 // The vncHTTPConnect class itself
 class vncHTTPConnect

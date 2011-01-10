@@ -25,7 +25,7 @@
 
 #include "stdhdrs.h"
 #include <io.h>
-#include "VNCLog.h"
+#include "vnclog.h"
 #include "inifile.h"
 
 //////////////////////////////////////////////////////////////////////

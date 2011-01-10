@@ -31,7 +31,7 @@
 // into smaller, 16x16 rectangles and encodes these using the
 // optimised Hextile sub-encodings.
 
-#include "vncEncodeHexT.h"
+#include "vncencodehext.h"
 #include "rfb.h"
 #include "rfbMisc.h"
 #include <stdlib.h>

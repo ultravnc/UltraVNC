@@ -31,7 +31,7 @@
 #include "stdhdrs.h"
 #include "omnithread.h"
 
-#include "vncTimedMsgBox.h"
+#include "vnctimedmsgbox.h"
 
 // The message-box delay
 const UINT TIMED_MSGBOX_DELAY = 1000;

@@ -22,10 +22,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#include <algorithm>
 #include "stdhdrs.h"
 #include "inifile.h"
 #include <string>
-#include <algorithm>
 #include <cctype>
 
 //  We first use shellexecute with "runas"

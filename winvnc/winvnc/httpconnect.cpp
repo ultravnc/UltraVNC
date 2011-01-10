@@ -1143,6 +1143,8 @@ httpconnect::basic_auth (SOCKET s)
 int
 httpconnect::begin_http_relay( SOCKET s )
 {
+	char auth_www[] = "WWW-Authenticate:";
+	char auth_proxy[] = "Proxy-Authenticate:";
     char buf[1024];
     int result;
     char *auth_what;
@@ -1192,7 +1194,7 @@ httpconnect::begin_http_relay( SOCKET s )
         if (proxy_auth_type != PROXY_AUTH_NONE) {
             return START_ERROR;
         }
-        auth_what = (result == 401) ? "WWW-Authenticate:" : "Proxy-Authenticate:";
+        auth_what = (result == 401) ? auth_www : auth_proxy;
         do {
             if ( line_input(s, buf, sizeof(buf)) ) {
                 break;
@@ -1392,10 +1394,10 @@ httpconnect::Get_https_socket(char *port, char *host)
 	memset (proxy,0,sizeof(proxy));
 	TCHAR * pch=NULL;
 	long ProxyEnable=0;
-	pfnWinHttpGetIEProxyConfig pWHGIEPC;
+	pfnWinHttpGetIEProxyConfig pWHGIEPC = NULL;
 	HMODULE hModWH=NULL;
 	//New function, ask current user proxy
-	if (hModWH = LoadLibrary("winhttp.dll")) {
+	if ((hModWH = LoadLibrary("winhttp.dll"))) {
 	pWHGIEPC = (pfnWinHttpGetIEProxyConfig) (GetProcAddress(hModWH, "WinHttpGetIEProxyConfigForCurrentUser"));
 	}
 	WINHTTP_CURRENT_USER_IE_PROXY_CONFIG MyProxyConfig;

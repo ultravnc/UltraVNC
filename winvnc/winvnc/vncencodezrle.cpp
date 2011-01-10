@@ -19,7 +19,7 @@
 // which you received this file, check http://www.realvnc.com/ or contact
 // the authors on info@realvnc.com for information on obtaining it.
 
-#include "vncEncodeZRLE.h"
+#include "vncencodezrle.h"
 #include "rfb.h"
 #include "rfbMisc.h"
 #include <stdlib.h>
@@ -97,7 +97,7 @@ vncEncodeZRLE::~vncEncodeZRLE()
 {
   delete mos;
   delete zos;
-  delete [] beforeBuf;
+  delete [] (rdr::U32 *) beforeBuf;
 }
 
 void vncEncodeZRLE::Init()

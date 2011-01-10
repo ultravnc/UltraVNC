@@ -27,10 +27,10 @@
 
 // Implementation of service-oriented functionality of WinVNC
 #include <windows.h>
-#include <Userenv.h>
-#include <WtsApi32.h>
+#include <userenv.h>
+#include <wtsapi32.h>
 #include <stdio.h>
-#include <Tlhelp32.h>
+#include <tlhelp32.h>
 #include "inifile.h"
 #include "common/win32_helpers.h"
 
@@ -745,7 +745,7 @@ void wait_for_existing_process()
     }
 }
 
-#include <Sddl.h>
+#include <sddl.h>
 SECURITY_ATTRIBUTES secAttr;
 extern SERVICE_STATUS serviceStatus;
 
@@ -850,7 +850,7 @@ void monitor_sessions()
 				strcat(mycommand,WORKDIR);//set the directory
 				strcat(mycommand,"\\");
 				strcat(mycommand,"cad.exe");
-				int nr=(int)ShellExecute(GetDesktopWindow(), "open", mycommand, "", 0, SW_SHOWNORMAL);
+				(void)ShellExecute(GetDesktopWindow(), "open", mycommand, "", 0, SW_SHOWNORMAL);
 			}
 			if (Inst) FreeLibrary(Inst);
 			}

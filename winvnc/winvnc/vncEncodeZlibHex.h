@@ -40,7 +40,7 @@ class vncEncodeZlibHex;
 #define _WINVNC_ENCODEZLIBHEX
 #pragma once
 
-#include "vncEncoder.h"
+#include "vncencoder.h"
 
 #ifdef IPP
 #include "..\..\ipp_zlib\src\zlib\zlib.h"

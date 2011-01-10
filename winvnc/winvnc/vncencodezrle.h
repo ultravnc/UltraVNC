@@ -22,7 +22,7 @@
 #ifndef _WINVNC_ENCODEZRLE
 #define _WINVNC_ENCODEZRLE
 
-#include "vncEncoder.h"
+#include "vncencoder.h"
 
 namespace rdr { class ZlibOutStream; class MemOutStream; }
 

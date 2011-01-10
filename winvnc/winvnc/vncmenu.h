@@ -33,10 +33,10 @@ class vncMenu;
 
 #include "stdhdrs.h"
 #include <lmcons.h>
-#include "vncServer.h"
-#include "vncProperties.h"
-#include "vncPropertiesPoll.h"
-#include "vncAbout.h"
+#include "vncserver.h"
+#include "vncproperties.h"
+#include "vncpropertiesPoll.h"
+#include "vncabout.h"
 #include "vncListDlg.h"
 
 // Constants

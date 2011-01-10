@@ -26,14 +26,14 @@
 // to query whether or not to accept incoming connections.
 
 #include "stdhdrs.h"
-#include "vncAcceptDialog.h"
-#include "WinVNC.h"
-#include "vncService.h"
+#include "vncacceptdialog.h"
+#include "winvnc.h"
+#include "vncservice.h"
 
 #include "resource.h"
 #include "common/win32_helpers.h"
 
-#include "localization.h" // Act : add localization on messages
+#include "Localization.h" // Act : add localization on messages
 
 //	[v1.0.2-jp1 fix] Load resouce from dll
 extern HINSTANCE	hInstResDLL;
@@ -63,7 +63,7 @@ BOOL vncAcceptDialog::DoDialog()
 	//	[v1.0.2-jp1 fix]
 	//int retVal = DialogBoxParam(hAppInstance, MAKEINTRESOURCE(IDD_ACCEPT_CONN), 
 	int retVal = DialogBoxParam(hInstResDLL, MAKEINTRESOURCE(IDD_ACCEPT_CONN), 
-		NULL, (DLGPROC) vncAcceptDlgProc, (LONG) this);
+		NULL, (DLGPROC) vncAcceptDlgProc, (LONG_PTR) this);
 	delete this;
 	switch (retVal) 
 	{

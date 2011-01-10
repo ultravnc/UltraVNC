@@ -38,7 +38,7 @@ class VSocket;
 #ifdef _VC80
 #include <iostream>
 #else
-#include <iostream.h>
+#include <iostream>
 #endif
 
 #include <stdio.h>
@@ -63,7 +63,7 @@ class VSocket;
 // Custom includes
 
 #include <assert.h>
-#include "VTypes.h"
+#include "vtypes.h"
 extern unsigned int G_SENDBUFFER;
 ////////////////////////////////////////////////////////
 // *** Lovely hacks to make Win32 work.  Hurrah!
@@ -77,7 +77,7 @@ extern unsigned int G_SENDBUFFER;
 ////////////////////////////////////////////////////////
 // Socket implementation
 
-#include "VSocket.h"
+#include "vsocket.h"
 
 // The socket timeout value (currently 5 seconds, for no reason...)
 // *** THIS IS NOT CURRENTLY USED ANYWHERE

@@ -92,7 +92,7 @@ public:
 	inline FromClear()
 	{
 	    vnclog.Print(LL_INTINFO, VNCLOG("PASSWD : FromClear called\n"));
-	    vncEncryptPasswd("", encrypted);
+	    vncEncryptPasswd((char*)"", encrypted);
 	}
 	inline ~FromClear()
 	{

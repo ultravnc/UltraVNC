@@ -33,7 +33,7 @@
 // & height.  This results in better granularity to use for deciding
 // whether to send RAW or CoRRE/RRE. 
 
-#include "vncEncodeCoRRE.h"
+#include "vncencodecorre.h"
 #include "rfb.h"
 #include "rfbMisc.h"
 #include <stdlib.h>

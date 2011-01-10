@@ -40,7 +40,9 @@ typedef SHORT vncClientId;
 
 #if (!defined(_WINVNC_VNCCLIENT))
 #define _WINVNC_VNCCLIENT
+#ifndef __GNUC__
 #pragma warning(disable : 4786)
+#endif
 
 #include <list>
 #include <string>
@@ -52,20 +54,20 @@ typedef std::list<vncClientId> vncClientList;
 
 // Includes
 #include "stdhdrs.h"
-#include "VSocket.h"
+#include "vsocket.h"
 #include <omnithread.h>
 
 // Custom
-#include "vncDesktop.h"
+#include "vncdesktop.h"
 #include "rfbRegion.h"
 #include "rfbUpdateTracker.h"
-#include "vncBuffer.h"
-#include "vncEncodeMgr.h"
+#include "vncbuffer.h"
+#include "vncencodemgr.h"
 #include "TextChat.h" // sf@2002 - TextChat
 #include "ZipUnZip32/zipUnZip32.h"
 //#include "timer.h"
 // adzm - 2010-07 - Extended clipboard
-#include "common/clipboard.h"
+#include "common/Clipboard.h"
 
 // The vncClient class itself
 typedef UINT (WINAPI *pSendinput)(UINT,LPINPUT,INT);
@@ -73,6 +75,7 @@ typedef UINT (WINAPI *pSendinput)(UINT,LPINPUT,INT);
 #define SPI_SETMOUSESPEED         0x0071
 #define MOUSEEVENTF_VIRTUALDESK	  0x4000
 
+class vncClientUpdateThread;
 
 #define FT_PROTO_VERSION_OLD 1  // <= RC18 server.. "fOldFTPRotocole" version
 #define FT_PROTO_VERSION_2   2  // base ft protocol

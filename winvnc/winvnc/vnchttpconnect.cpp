@@ -30,11 +30,13 @@
 // Implementation of the HTTP server class
 
 #include "stdhdrs.h"
-#include "VSocket.h"
-#include "vncHTTPConnect.h"
-#include "vncServer.h"
+#include "vsocket.h"
+#include "vnchttpconnect.h"
+#include "vncserver.h"
 #include <omnithread.h>
 #include "resource.h"
+
+#include <ctype.h>
 
 //	[v1.0.2-jp1 fix]
 extern	HINSTANCE	hInstResDLL;

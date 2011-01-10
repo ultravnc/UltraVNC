@@ -22,42 +22,21 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#include "stdhdrs.h"
+#include "omnithread.h"
+#include <objbase.h>
 #include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 // Marscha@2004 - authSSP: from stdhdrs.h, required for logging
-#include "VNCLog.h"
+#include "vnclog.h"
 extern VNCLog vnclog;
 #include "inifile.h"
 
-// No logging at all
-#define LL_NONE		0
-// Log server startup/shutdown
-#define LL_STATE	0
-// Log connect/disconnect
-#define LL_CLIENTS	1
-// Log connection errors (wrong pixfmt, etc)
-#define LL_CONNERR	0
-// Log socket errors
-#define LL_SOCKERR	4
-// Log internal errors
-#define LL_INTERR	0
-
-// Log internal warnings
-#define LL_INTWARN	8
-// Log internal info
-#define LL_INTINFO	9
-// Log socket errors
-#define LL_SOCKINFO	10
-// Log everything, including internal table setup, etc.
-#define LL_ALL		10
-
-// Macros for sticking in the current file name
-#define VNCLOG(s)	(__FILE__ " : " s)
 // Marscha@2004 - authSSP: end of change
 
-#include "localization.h" // Act : add localization on messages
+#include "Localization.h" // Act : add localization on messages
 
 typedef BOOL (*CheckUserGroupPasswordFn)( char * userin,char *password,char *machine,char *group,int locdom);
 CheckUserGroupPasswordFn CheckUserGroupPassword = 0;
@@ -601,7 +580,7 @@ int CheckUserGroupPasswordUni2(char * userin,char *password,const char *machine)
 	// Group is not used...admin access rights is needed
 	// MS keep changes there security model for each version....
 	//////////////////////////////////////////////////
-if (strcmp(pszgroup1,"")!=NULL)
+if (strcmp(pszgroup1,"")!=0)
 {
 	
 	///////////////////////////////////////////////////
@@ -721,7 +700,7 @@ if (strcmp(pszgroup1,"")!=NULL)
 	if (result==1) goto accessOK;
 }
 /////////////////////////////////////////////////
-if (strcmp(pszgroup2,"")!=NULL)
+if (strcmp(pszgroup2,"")!=0)
 {
 	///////////////////////////////////////////////////
 	// NT4 domain and workgroups
@@ -840,7 +819,7 @@ if (strcmp(pszgroup2,"")!=NULL)
 	if (result==1) goto accessOK;
 }
 ////////////////////////////
-if (strcmp(pszgroup3,"")!=NULL)
+if (strcmp(pszgroup3,"")!=0)
 {
 	///////////////////////////////////////////////////
 	// NT4 domain and workgroups

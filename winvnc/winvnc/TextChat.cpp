@@ -29,7 +29,7 @@
 #include "richedit.h"
 #include "common/win32_helpers.h"
 
-#include "localization.h" // Act : add localization on messages
+#include "Localization.h" // Act : add localization on messages
 
 #define TEXTMAXSIZE 16384
 #define MAXNAMESIZE	128 // MAX_COMPUTERNAME_LENGTH+1 (32)
@@ -47,7 +47,7 @@ extern HINSTANCE	hAppInstance;
 //
 //
 //
-#include <Mmsystem.h>
+#include <mmsystem.h>
 BOOL PlayResource(LPSTR lpName)
 {
     /*BOOL bRtn;
@@ -186,8 +186,8 @@ void TextChat::ShowChatWindow(bool fVisible)
 //
 // Set text format to a selection in the Chat area
 //
-void TextChat::SetTextFormat(bool bBold /*= false */, bool bItalic /*= false*/
-	, long nSize /*= 0x75*/, const char* szFaceName /*= "MS Sans Serif"*/, DWORD dwColor /*= BLACK*/)
+void TextChat::SetTextFormat(bool bBold /* = false */, bool bItalic /* = false*/
+	, long nSize /* = 0x75*/, const char* szFaceName /* = "MS Sans Serif"*/, DWORD dwColor /* = BLACK*/)
 {
 	if ( GetDlgItem( m_hDlg, IDC_CHATAREA_EDIT ) )  //  Sanity Check
 	{		
@@ -292,7 +292,7 @@ void TextChat::SendTextChatRequest(int nMsg)
 // Output messages in the chat area 
 //
 //
-void TextChat::PrintMessage(const char* szMessage,const char* szSender,DWORD dwColor /*= BLACK*/)
+void TextChat::PrintMessage(const char* szMessage,const char* szSender,DWORD dwColor /* = BLACK*/)
 {
 	// char szTextBoxBuffer[TEXTMAXSIZE];			
 	// memset(szTextBoxBuffer,0,TEXTMAXSIZE);			

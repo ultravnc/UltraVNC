@@ -36,13 +36,13 @@
 
 ////////////////////////////
 // Custom headers
-#include "VSocket.h"
-#include "WinVNC.h"
+#include "vsocket.h"
+#include "winvnc.h"
 
-#include "vncServer.h"
-#include "vncMenu.h"
-#include "vncInstHandler.h"
-#include "vncService.h"
+#include "vncserver.h"
+#include "vncmenu.h"
+#include "vncinsthandler.h"
+#include "vncservice.h"
 ///unload driver
 #include "vncOSVersion.h"
 #include "videodriver.h"
@@ -52,7 +52,7 @@ void InitIpp();
 #endif
 
 #define LOCALIZATION_MESSAGES   // ACT: full declaration instead on extern ones
-#include "localization.h" // Act : add localization on messages
+#include "Localization.h" // Act : add localization on messages
 
 
 
@@ -934,7 +934,7 @@ void InitSDTimer()
 {
 	if (mmRes != -1) return;
 	vnclog.Print(LL_INTERR, VNCLOG("****************** Init SDTimer\n"));
-	mmRes = timeSetEvent( 2000, 0, (LPTIMECALLBACK)fpTimer, NULL, TIME_PERIODIC );
+	mmRes = timeSetEvent( 2000, 0, (LPTIMECALLBACK)fpTimer, 0, TIME_PERIODIC );
 }
 
 

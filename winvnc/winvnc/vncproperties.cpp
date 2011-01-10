@@ -32,16 +32,16 @@
 
 #include "stdhdrs.h"
 #include "lmcons.h"
-#include "vncService.h"
+#include "vncservice.h"
 
-#include "WinVNC.h"
-#include "vncProperties.h"
-#include "vncServer.h"
-#include "vncPasswd.h"
+#include "winvnc.h"
+#include "vncproperties.h"
+#include "vncserver.h"
+#include "vncpasswd.h"
 #include "vncOSVersion.h"
 #include "common/win32_helpers.h"
 
-#include "localization.h" // ACT : Add localization on messages
+#include "Localization.h" // ACT : Add localization on messages
 
 //extern HINSTANCE g_hInst;
 
@@ -342,7 +342,7 @@ vncProperties::ShowAdmin(BOOL show, BOOL usersettings)
 				    MAKEINTRESOURCE(IDD_PROPERTIES1), 
 				    NULL,
 				    (DLGPROC) DialogProc,
-				    (LONG) this);
+				    (LONG_PTR) this);
 
 				if (!m_returncode_valid)
 				    result = IDCANCEL;

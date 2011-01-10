@@ -26,7 +26,7 @@
 
 #include "stdhdrs.h"
 
-#include "WinVNC.h"
+#include "winvnc.h"
 #include "vncListDlg.h"
 #include "common/win32_helpers.h"
 
@@ -70,7 +70,7 @@ void vncListDlg::Display()
 						MAKEINTRESOURCE(IDD_LIST_DLG), 
 						NULL,
 						(DLGPROC) DialogProc,
-						(LONG) this
+						(LONG_PTR) this
 						);
 	}
 }

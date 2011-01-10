@@ -29,9 +29,9 @@
 
 #include "stdhdrs.h"
 
-#include "WinVNC.h"
-#include "vncsetAuth.h"
-#include "vncService.h"
+#include "winvnc.h"
+#include "vncsetauth.h"
+#include "vncservice.h"
 #include "common/win32_helpers.h"
 
 #define MAXSTRING 254
@@ -454,7 +454,7 @@ vncSetAuth::Show(BOOL show)
 				MAKEINTRESOURCE(IDD_MSLOGON), 
 				NULL,
 				(DLGPROC) DialogProc,
-				(LONG) this);
+				(LONG_PTR) this);
 		}
 	}
 }

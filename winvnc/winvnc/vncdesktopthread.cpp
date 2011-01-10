@@ -607,10 +607,11 @@ void vncDesktopThread::do_polling(HANDLE& threadHandle, rfb::Region2D& rgncache,
 		if (timeSinceLastMouseMove > 15) // 150 ms pause after a Mouse move 
 		{
 			++fullpollcounter;
+			rfb::Rect r = m_desktop->GetSize();
 			// THIS FUNCTION IS A PIG. It uses too much CPU on older machines (PIII, P4)
 			if (vncService::InputDesktopSelected()!=2)
 			{
-				if (m_desktop->FastDetectChanges(rgncache, m_desktop->GetSize(), 0, true)) capture=false;
+				if (m_desktop->FastDetectChanges(rgncache, r, 0, true)) capture=false;
 			}
 			else
 			{

@@ -28,9 +28,9 @@ class vncPropertiesPoll;
 
 // Includes
 #include "stdhdrs.h"
-#include "vncServer.h"
+#include "vncserver.h"
 #include "inifile.h"
-#include <Userenv.h>
+#include <userenv.h>
 // The vncPropertiesPoll class itself
 class vncPropertiesPoll
 {

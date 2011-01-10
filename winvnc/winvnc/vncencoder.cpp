@@ -26,8 +26,8 @@
 
 // vncEncoder - Object used to encode data for RFB
 
-#include "vncEncoder.h"
-#include "vncBuffer.h"
+#include "vncencoder.h"
+#include "vncbuffer.h"
 
 // Pixel format used internally when the client is palette-based & server is truecolour
 

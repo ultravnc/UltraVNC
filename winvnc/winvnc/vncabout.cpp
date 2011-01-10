@@ -29,8 +29,8 @@
 
 #include "stdhdrs.h"
 
-#include "WinVNC.h"
-#include "vncAbout.h"
+#include "winvnc.h"
+#include "vncabout.h"
 
 //	[v1.0.2-jp1 fix] Load resouce from dll
 extern HINSTANCE	hInstResDLL;
@@ -138,7 +138,7 @@ vncAbout::Show(BOOL show)
 				MAKEINTRESOURCE(IDD_ABOUT), 
 				NULL,
 				(DLGPROC) DialogProc,
-				(LONG) this);
+				(LONG_PTR) this);
 		}
 	}
 }

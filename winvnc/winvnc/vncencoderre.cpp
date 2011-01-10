@@ -30,7 +30,7 @@
 // to RRE encoder.  RRE is much more efficient than RAW format on
 // most screen data.
 
-#include "vncEncodeRRE.h"
+#include "vncencoderre.h"
 
 vncEncodeRRE::vncEncodeRRE()
 {

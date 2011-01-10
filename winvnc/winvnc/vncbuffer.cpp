@@ -31,10 +31,10 @@
 
 // Header
 
-#include "vncDesktop.h"
+#include "vncdesktop.h"
 #include "rfbMisc.h"
 
-#include "vncBuffer.h"
+#include "vncbuffer.h"
 
 vncBuffer::vncBuffer()
 {

@@ -28,7 +28,7 @@
 // one instance is running
 
 #include "stdhdrs.h"
-#include "vncInstHandler.h"
+#include "vncinsthandler.h"
 
 // Name of the mutex
 

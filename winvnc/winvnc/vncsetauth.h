@@ -33,7 +33,7 @@ class vncSetAuth;
 
 // Includes
 #include "stdhdrs.h"
-#include "vncServer.h"
+#include "vncserver.h"
 
 // The vncSetAuth class itself
 class vncSetAuth

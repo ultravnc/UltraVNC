@@ -24,9 +24,9 @@
 
 //  Copyright (C) 2000 Const Kaplinsky. All Rights Reserved.
 
-#include "vncEncoder.h"
-#include "vncBuffer.h"
-#include "vncDesktop.h"
+#include "vncencoder.h"
+#include "vncbuffer.h"
+#include "vncdesktop.h"
 
 //
 // New code implementing cursor shape updates.

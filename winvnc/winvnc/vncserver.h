@@ -43,11 +43,11 @@ class vncServer;
 #define _WINVNC_VNCSERVER
 
 // Custom
-#include "vncSockConnect.h"
-#include "vncHTTPConnect.h"
-#include "vncClient.h"
+#include "vncsockconnect.h"
+#include "vnchttpconnect.h"
+#include "vncclient.h"
 #include "rfbRegion.h"
-#include "vncPasswd.h"
+#include "vncpasswd.h"
 
 // Includes
 #include "stdhdrs.h"
@@ -55,7 +55,7 @@ class vncServer;
 #include <list>
 
 // adzm - 2010-07 - Extended clipboard
-#include "common/clipboard.h"
+#include "common/Clipboard.h"
 
 typedef BOOL (WINAPI *WTSREGISTERSESSIONNOTIFICATION)(HWND, DWORD);
 typedef BOOL (WINAPI *WTSUNREGISTERSESSIONNOTIFICATION)(HWND);

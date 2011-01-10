@@ -24,7 +24,7 @@
 
 #include "stdhdrs.h"
 #include "lmcons.h"
-#include "vncService.h"
+#include "vncservice.h"
 #include "vncOSVersion.h"
 #include "common/ScopeGuard.h"
 

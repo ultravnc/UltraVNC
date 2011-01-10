@@ -28,7 +28,7 @@ class vncConnDialog;
 
 #pragma once
 
-#include "vncServer.h"
+#include "vncserver.h"
 
 // Outgoing connection dialog.  This allows people running VNC servers on
 // Win32 platforms to _push_ their displays out to other people's screens

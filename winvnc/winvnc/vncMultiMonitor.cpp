@@ -29,18 +29,18 @@
 // Custom headers
 //#include <WinAble.h>
 #include <omnithread.h>
-#include "WinVNC.h"
-#include "VNCHooks\VNCHooks.h"
-#include "vncServer.h"
-#include "vncKeymap.h"
+#include "winvnc.h"
+#include "vnchooks/VNCHooks.h"
+#include "vncserver.h"
+#include "vnckeymap.h"
 #include "rfbRegion.h"
 #include "rfbRect.h"
-#include "vncDesktop.h"
-#include "vncService.h"
+#include "vncdesktop.h"
+#include "vncservice.h"
 // Modif rdv@2002 - v1.1.x - videodriver
 #include "vncOSVersion.h"
 
-#include "mmSystem.h" // sf@2002
+#include "mmsystem.h" // sf@2002
 #include "TextChat.h" // sf@2002
 #include "vncdesktopthread.h"
 #include "common/win32_helpers.h"

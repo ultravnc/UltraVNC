@@ -28,7 +28,8 @@
 // virtual keycodes.  Now it actually does the local-end simulation of
 // key presses, to keep this messy code on one place!
 #pragma warning(disable : 4786)
-#include "vncKeymap.h"
+#include "vncservice.h"
+#include "vnckeymap.h"
 #include <rdr/types.h>
 #define XK_MISCELLANY
 #define XK_LATIN1
@@ -41,7 +42,6 @@
 #define XK_KATAKANA
 
 #include "keysymdef.h"
-#include "vncService.h"
 
 //	[v1.0.2-jp1 fix] IOport's patch (Include "ime.h" for IME control)
 #include <ime.h>

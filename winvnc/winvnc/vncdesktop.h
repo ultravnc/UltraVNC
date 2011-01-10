@@ -44,7 +44,7 @@ class vncDesktop;
 class vncServer;
 #include "rfbRegion.h"
 #include "rfbUpdateTracker.h"
-#include "vncBuffer.h"
+#include "vncbuffer.h"
 #include "translate.h"
 #include <omnithread.h>
 
@@ -54,12 +54,12 @@ class vncServer;
 // Modif sf@2002 - v1.1.0
 #include <list>
 #include <set>
-#include "textchat.h"
+#include "TextChat.h"
 #ifdef AVILOG
 #include "avilog/avilog/AVIGenerator.h"
 #endif
 // adzm - 2010-07 - Extended clipboard
-#include "common/clipboard.h"
+#include "common/Clipboard.h"
 //#define COMPILE_MULTIMON_STUBS
 //#include "Multimon.h"
 #ifndef SM_CMONITORS

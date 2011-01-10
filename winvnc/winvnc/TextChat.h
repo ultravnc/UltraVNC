@@ -67,7 +67,7 @@ public:
 	void SendLocalText(void);
 	void PrintMessage(const char* szMessage, const char* szSender, DWORD color = BLACK);
 	void SetTextFormat(bool bBold = false, bool bItalic = false, long nSize = 0x75, const char* szFaceName = "MS Sans Serif", DWORD dwColor = BLACK);
-	void TextChat::ShowChatWindow(bool fVisible);
+	void ShowChatWindow(bool fVisible);
 };
 
 #endif 

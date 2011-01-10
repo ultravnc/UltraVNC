@@ -31,6 +31,10 @@
 #define CHALLENGESIZE 16
 #define CHALLENGESIZEMS 64
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 extern int vncEncryptPasswd(char *passwd, char *fname);
 extern char *vncDecryptPasswd(char *fname);
 extern char *vncDecryptPasswdMs(char *fname);
@@ -39,3 +43,6 @@ extern void vncRandomBytesMs(unsigned char *bytes);
 extern void vncEncryptBytes(unsigned char *bytes, const char *passwd);
 // marscha
 extern void vncDecryptBytes(unsigned char *bytes, const int length, const unsigned char *key);
+#ifdef __cplusplus
+}
+#endif

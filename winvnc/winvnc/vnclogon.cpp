@@ -1,7 +1,7 @@
 #include "stdhdrs.h"
 #include "resource.h"
 #include <omnithread.h>
-#include "vncDesktop.h"
+#include "vncdesktop.h"
 #include "vnclogon.h"
 
 

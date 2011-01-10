@@ -33,18 +33,18 @@
 // Custom headers
 //#include <WinAble.h>
 #include <omnithread.h>
-#include "WinVNC.h"
-#include "VNCHooks\VNCHooks.h"
-#include "vncServer.h"
-#include "vncKeymap.h"
+#include "winvnc.h"
+#include "vnchooks/VNCHooks.h"
+#include "vncserver.h"
+#include "vnckeymap.h"
 #include "rfbRegion.h"
 #include "rfbRect.h"
-#include "vncDesktop.h"
-#include "vncService.h"
+#include "vncdesktop.h"
+#include "vncservice.h"
 // Modif rdv@2002 - v1.1.x - videodriver
 #include "vncOSVersion.h"
 
-#include "mmSystem.h" // sf@2002
+#include "mmsystem.h" // sf@2002
 #include "TextChat.h" // sf@2002
 #include "vncdesktopthread.h"
 #include "common/win32_helpers.h"
@@ -252,7 +252,9 @@ bool vncDesktop::FastDetectChanges(rfb::Region2D &rgn, rfb::Rect &rect, int nZon
 			// If init list
 			if (fInitGrid)
 			{
+				int off = iPixelColor - pThePixelGrid->begin();
 			   pThePixelGrid->push_back(PixelColor);
+				iPixelColor = pThePixelGrid->begin() + off;
 			   // vnclog.Print(LL_INTINFO, VNCLOG("### PixelsGrid Init : Pixel xo=%d - yo=%d - C=%ld\n"), xo, yo, (long)PixelColor); 
 			   continue;
 			}
@@ -549,7 +551,7 @@ vncDesktop::Startup()
 							char new_name[256];
 							if (GetUserObjectInformation(desktop, UOI_NAME, &new_name, 256, &dummy))
 								{
-									if (strcmp(new_name,"Default")==NULL)
+									if (strcmp(new_name,"Default")==0)
 										{
 											InitVideoDriver();
 										}
@@ -2269,7 +2271,7 @@ void vncDesktop::StartStopddihook(BOOL enabled)
 		ZeroMemory( &ssi, sizeof(ssi) );
 		ssi.cb = sizeof(ssi);
 		// Start the child process. 
-		if( !CreateProcess( NULL,szCurrentDir, NULL,NULL,FALSE,NULL,NULL,NULL,&ssi,&ppi ) ) 
+		if( !CreateProcess( NULL,szCurrentDir, NULL,NULL,FALSE,0,NULL,NULL,&ssi,&ppi ) ) 
 		{
 			vnclog.Print(LL_INTERR, VNCLOG("set ddihooks Failed\n"));
 			ddihook=false;
