@@ -53,14 +53,14 @@ void ClientConnection::SetFullScreenMode(bool enable)
 	// Clear the Window (in black)
     if (m_opts.m_nServerScale > 1)
 	{
-		RECT winrect;
+		/*RECT winrect;
 		GetWindowRect(m_hwndMain, &winrect);
 		int winwidth = winrect.right - winrect.left;
 		int winheight = winrect.bottom - winrect.top;
 		RECT rect;
 		SetRect(&rect, 0,0, winwidth, winheight);
 		COLORREF bgcol = RGB(0x0, 0x0, 0x0);
-		FillSolidRect_ultra(0, 0, winwidth, winheight, m_myFormat.bitsPerPixel,(BYTE *) &bgcol);
+		FillSolidRect_ultra(0, 0, winwidth, winheight, m_myFormat.bitsPerPixel,(BYTE *) &bgcol);*/
 		// Update the whole screen 
 		//adzm 2010-09
 		SendFullFramebufferUpdateRequest(false);

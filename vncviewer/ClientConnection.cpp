@@ -7033,7 +7033,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 					case ID_NORMALSCREEN: 
 						{
 							// Toggle normal screen
-							int nOldServerScale = _this->m_nServerScale;
+							/*int nOldServerScale = _this->m_nServerScale;
 							
 							_this->m_opts.m_fAutoScaling = false;
 							_this->m_nServerScale = 1;
@@ -7053,7 +7053,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 								InvalidateRect(hwnd, NULL, TRUE);
 								_this->SetFullScreenMode(false);	
 								_this->m_pendingFormatChange = true;
-							}
+							}*/
 							return 0;
 						}
 
