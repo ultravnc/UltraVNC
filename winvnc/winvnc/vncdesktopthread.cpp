@@ -762,7 +762,6 @@ vncDesktopThread::run_undetached(void *arg)
 												m_desktop->m_buffer.GrabRegion(rgncache,false,true);
 											}
 	//telling running viewers to wait until first update, done
-	m_server->InitialUpdate(true);
 
 	while (looping && !fShutdownOrdered)
 	{		
@@ -1178,7 +1177,7 @@ vncDesktopThread::run_undetached(void *arg)
 										//This is very cpu intensive, only check once for all viewers
 										if (!checkrgn.is_empty())
 											m_desktop->m_buffer.CheckRegion(changedrgn,cachedrgn, checkrgn);
-
+										m_server->InitialUpdate(true);
 										updates.add_changed(changedrgn);
 										updates.add_cached(cachedrgn);
 												

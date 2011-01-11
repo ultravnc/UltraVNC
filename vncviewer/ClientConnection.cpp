@@ -3397,6 +3397,7 @@ void ClientConnection::Createdib()
 	if (m_membitmap != NULL) {DeleteObject(m_membitmap);m_membitmap= NULL;}
 	m_hmemdc = CreateCompatibleDC(m_hBitmapDC);
 	m_membitmap = CreateDIBSection(m_hmemdc, (BITMAPINFO*)&bi.bmiHeader, iUsage, &m_DIBbits, NULL, 0);
+	memset((char*)m_DIBbits,128,bi.bmiHeader.biSizeImage); 
 
 	ObjectSelector bb(m_hmemdc, m_membitmap);
 
