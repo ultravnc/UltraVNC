@@ -1387,7 +1387,7 @@ void ClientConnection::CreateDisplay()
 			// Modif sf@2002
 			AppendMenu(m_hPopupMenuDisplay, MF_STRING, ID_HALFSCREEN,		sz_L26);
 			AppendMenu(m_hPopupMenuDisplay, MF_STRING, ID_FUZZYSCREEN,		sz_L27);
-			AppendMenu(m_hPopupMenuDisplay, MF_STRING, ID_NORMALSCREEN,	sz_L28);
+			AppendMenu(m_hPopupMenuDisplay, MF_STRING, ID_NORMALSCREEN2,	sz_L28);
 			AppendMenu(m_hPopupMenuDisplay, MF_SEPARATOR, NULL, NULL);
 			AppendMenu(m_hPopupMenuDisplay, MF_STRING, ID_MAXCOLORS,		sz_L29);
 			AppendMenu(m_hPopupMenuDisplay, MF_STRING, ID_256COLORS,		sz_L30);
@@ -7055,6 +7055,33 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 								_this->SetFullScreenMode(false);	
 								_this->m_pendingFormatChange = true;
 							}*/
+							return 0;
+						}
+
+					case ID_NORMALSCREEN2: 
+						{
+							// Toggle normal screen
+							int nOldServerScale = _this->m_nServerScale;
+							
+							_this->m_opts.m_fAutoScaling = false;
+							_this->m_nServerScale = 1;
+							_this->m_opts.m_nServerScale = 1;
+							_this->m_opts.m_scaling = false;
+							_this->m_opts.m_scale_num = 100;
+							_this->m_opts.m_scale_den = 100;
+							
+							if (_this->m_nServerScale != nOldServerScale)
+							{
+								_this->SendServerScale(_this->m_nServerScale);
+								// _this->m_pendingFormatChange = true;
+							}
+							else
+							{
+								_this->SizeWindow();
+								InvalidateRect(hwnd, NULL, TRUE);
+								_this->SetFullScreenMode(false);	
+								_this->m_pendingFormatChange = true;
+							}
 							return 0;
 						}
 

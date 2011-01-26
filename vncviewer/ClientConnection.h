@@ -561,9 +561,6 @@ private:
     KeyMap *m_keymap;
 	KeyMapJap *m_keymapJap;
 
-	// RFB settings
-	VNCOptions m_opts;
-
 	FileTransfer *m_pFileTransfer; // Modif sf@2002 - FileTransfer
 	TextChat *m_pTextChat;			// Modif sf@2002 - Text Chat
 	int m_nServerScale; 	       // Modif sf@2002 - Server Scaling
@@ -754,6 +751,8 @@ private:
 	ViewerDirectxClass directx_output;
 	bool directx_used;
 public:
+	// RFB settings
+	VNCOptions m_opts;
 	int m_autoReconnect;
 	int reconnectcounter;
 	void DoConnection();

@@ -351,6 +351,7 @@
 #define IDS_H27                         50105
 #define ID_DBUTTON                      50106
 #define IDS_H28                         50106
+#define ID_NORMALSCREEN2                50107
 #define IDS_H29                         50107
 #define ID_DINPUT                       50108
 #define IDS_H30                         50108

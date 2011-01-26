@@ -76,7 +76,7 @@ AccelKeys::AccelKeys()
 
 	AccelTable[i].fVirt = FVIRTKEY | FCONTROL | FNOINVERT;
 	AccelTable[i].key = VK_F11;
-	AccelTable[i++].cmd = ID_NORMALSCREEN;
+	AccelTable[i++].cmd = ID_NORMALSCREEN2;
 
 	AccelTable[i].fVirt = FVIRTKEY | FCONTROL | FALT | FNOINVERT;
 	AccelTable[i].key = VK_F11;
