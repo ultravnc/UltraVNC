@@ -69,6 +69,7 @@ extern "C" {
 
 #include <DSMPlugin/DSMPlugin.h> // sf@2002
 #include "common/win32_helpers.h"
+#include "display.h"
 
 // [v1.0.2-jp1 fix]
 #pragma comment(lib, "imm32.lib")
@@ -1823,13 +1824,14 @@ void ClientConnection::Connect()
 	// The host may be specified as a dotted address "a.b.c.d"
 	// Try that first
 	thataddr.sin_addr.s_addr = inet_addr(m_host);
-	
+
 	// If it wasn't one of those, do gethostbyname
 	if (thataddr.sin_addr.s_addr == INADDR_NONE) {
 		LPHOSTENT lphost;
 		lphost = gethostbyname(m_host);
 		
-		if (lphost == NULL) { 
+		if (lphost == NULL) 
+		{ 
 			//if(myDialog!=0)DestroyWindow(myDialog);
 			SetEvent(KillEvent);
 			if (m_hwndStatus) SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L46);
@@ -3022,8 +3024,13 @@ void ClientConnection::SizeWindow()
 {
 	// Find how large the desktop work area is
 	RECT workrect;
-
-	SystemParametersInfo(SPI_GETWORKAREA, 0, &workrect, 0);
+	tempdisplayclass tdc;
+	tdc.Init();
+	workrect.left=tdc.monarray[m_opts.m_selected_screen].wl;
+	workrect.right=tdc.monarray[m_opts.m_selected_screen].wr;
+	workrect.top=tdc.monarray[m_opts.m_selected_screen].wt;
+	workrect.bottom=tdc.monarray[m_opts.m_selected_screen].wb;
+	//SystemParametersInfo(SPI_GETWORKAREA, 0, &workrect, 0);
 	int workwidth = workrect.right -  workrect.left;
 	int workheight = workrect.bottom - workrect.top;
 	vnclog.Print(2, _T("Screen work area is %d x %d\n"), workwidth, workheight);
@@ -3118,11 +3125,23 @@ void ClientConnection::SizeWindow()
 		m_winheight = min(m_fullwinheight + m_TBr.bottom + m_TBr.top , workheight);
 	else
 		m_winheight = min(m_fullwinheight, workheight);
-
+	int aa=GetSystemMetrics(SM_CXBORDER)+GetSystemMetrics(SM_CXHSCROLL);
+	int bb=tdc.monarray[1].wr-tdc.monarray[1].wl+aa;
+	if (m_opts.m_selected_screen==0 && (m_fullwinwidth <= bb )) //fit on primary
+		// -20 for border
+	{
+		SetWindowPos(m_hwndMain, HWND_TOP,
+				tdc.monarray[1].wl + ((tdc.monarray[1].wr-tdc.monarray[1].wl)-m_winwidth) / 2,
+				tdc.monarray[1].wt + ((tdc.monarray[1].wb-tdc.monarray[1].wt)-m_winheight) / 2,
+				m_winwidth, m_winheight, SWP_SHOWWINDOW);
+	}
+	else
+	{
 	SetWindowPos(m_hwndMain, HWND_TOP,
 				workrect.left + (workwidth-m_winwidth) / 2,
 				workrect.top + (workheight-m_winheight) / 2,
 				m_winwidth, m_winheight, SWP_SHOWWINDOW);
+	}
 
 	SetForegroundWindow(m_hwndMain);
 
@@ -3527,7 +3546,7 @@ ClientConnection::~ClientConnection()
 {
 	if (m_hwndStatus)
 		EndDialog(m_hwndStatus,0);
-
+	Sleep(500);
 	if (m_pNetRectBuf != NULL)
 		delete [] m_pNetRectBuf;
 	LowLevelHook::Release();
@@ -3611,7 +3630,12 @@ ClientConnection::~ClientConnection()
 	if (rcMask!=NULL)
 		delete[] rcMask;
 	if (KillEvent) CloseHandle(KillEvent);
-	if (ThreadSocketTimeout) CloseHandle(ThreadSocketTimeout);
+	if (ThreadSocketTimeout)
+	{
+	havetobekilled=false; //force SocketTimeout thread to quit
+	WaitForSingleObject(ThreadSocketTimeout,5000);
+	CloseHandle(ThreadSocketTimeout);
+	}
 	if (m_statusThread) CloseHandle(m_statusThread);
 	if (m_SavedAreaBIB) delete [] m_SavedAreaBIB;
 	m_SavedAreaBIB=NULL;
@@ -8787,7 +8811,7 @@ BOOL CALLBACK DialogProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 		//================================================//
 		case WM_INITDIALOG:
 			{
-				CentreWindow(hWnd);
+				//CentreWindow(hWnd);
 				ClientConnection *cc=(ClientConnection*)lParam;
 
                 SetFocus(hWnd);

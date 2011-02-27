@@ -26,6 +26,7 @@
 #include "stdhdrs.h"
 #include "vncviewer.h"
 #include "Exception.h"
+#include "display.h"
 
 // [v1.0.2-jp1 fix] Support "LinkLabel"
 //#include "LinkLabel.h"
@@ -410,7 +411,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 
 	}
   }
-  m_hInstResDLL = LoadLibrary("vnclang.dll");
+
+  //limit the vnclang.dll searchpath to avoid
+  char szCurrentDir[MAX_PATH];
+  char szCurrentDir_vnclangdll[MAX_PATH];
+  if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
+	{
+		char* p = strrchr(szCurrentDir, '\\');
+		*p = '\0';
+	}
+  strcpy (szCurrentDir_vnclangdll,szCurrentDir);
+  strcat (szCurrentDir_vnclangdll,"\\");
+  strcat (szCurrentDir_vnclangdll,"vnclang.dll");
+  m_hInstResDLL = LoadLibrary(szCurrentDir_vnclangdll);
+
   
   if (m_hInstResDLL==NULL)
   {
@@ -739,6 +753,14 @@ void CentreWindow(HWND hwnd)
 	
 	// Find how large the desktop work area is
 	SystemParametersInfo(SPI_GETWORKAREA, 0, &workrect, 0);
+	//RECT workrect;
+	/*tempdisplayclass tdc;
+	tdc.Init();
+	workrect.left=tdc.monarray[selected_screen].wl;
+	workrect.right=tdc.monarray[selected_screen].wr;
+	workrect.top=tdc.monarray[selected_screen].wt;
+	workrect.bottom=tdc.monarray[selected_screen].wb;*/
+
 	int workwidth = workrect.right -  workrect.left;
 	int workheight = workrect.bottom - workrect.top;
 	

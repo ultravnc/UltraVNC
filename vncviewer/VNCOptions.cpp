@@ -170,6 +170,7 @@ VNCOptions::VNCOptions()
   m_fUseDSMPlugin = false;
   g_disable_sponsor= false;
   m_fUseProxy = false;
+  m_selected_screen=1;
   m_szDSMPluginFilename[0] = '\0';
 
   //adzm - 2009-06-21
@@ -303,6 +304,7 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
   strcpy_s(m_proxyhost, 256,s.m_proxyhost);
   m_proxyport				= s.m_proxyport;
   m_fUseProxy	      = s.m_fUseProxy;
+  m_selected_screen		=s.m_selected_screen;
   
   strcpy_s(m_kbdname, 9,s.m_kbdname);
   m_kbdSpecified		= s.m_kbdSpecified;
@@ -980,6 +982,8 @@ void VNCOptions::Save(char *fname)
   saveInt("UseDSMPlugin",			m_fUseDSMPlugin,	fname);
   saveInt("UseProxy",				m_fUseProxy,	fname);
   saveInt("sponsor",				g_disable_sponsor,	fname);
+  saveInt("selectedscreen",				m_selected_screen,	fname);
+
 
   WritePrivateProfileString("options", "DSMPlugin", m_szDSMPluginFilename, fname);
   //saveInt("AutoReconnect", m_autoReconnect,	fname);
@@ -1056,6 +1060,8 @@ void VNCOptions::Load(char *fname)
   m_quickoption  =		readInt("QuickOption",		m_quickoption, fname);
   m_fUseDSMPlugin =		readInt("UseDSMPlugin",		m_fUseDSMPlugin, fname) != 0;
   m_fUseProxy =			readInt("UseProxy",			m_fUseProxy, fname) != 0;
+
+  m_selected_screen=			readInt("selectedscreen",			m_selected_screen, fname) != 0;
   GetPrivateProfileString("options", "DSMPlugin", "NoPlugin", m_szDSMPluginFilename, MAX_PATH, fname);
   if (!g_disable_sponsor) g_disable_sponsor=readInt("sponsor",			g_disable_sponsor, fname) != 0;
 
@@ -1392,7 +1398,7 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 		  HWND hsponsor = GetDlgItem(hwnd, IDC_CHECK1);
 		  SendMessage(hsponsor, BM_SETCHECK, g_disable_sponsor, 1);
 		  
-		  CentreWindow(hwnd);
+		  //CentreWindow(hwnd);
 		  SetForegroundWindow(hwnd);
 		  
 		  HWND hExitCheck = GetDlgItem(hwnd, IDC_EXIT_CHECK); //PGM @ Advantig

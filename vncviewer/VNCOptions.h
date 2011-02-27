@@ -130,6 +130,8 @@ public:
 	int     m_proxyport;
 	bool	m_fUseProxy;
 
+	int m_selected_screen;
+
     // Logging
     int     m_logLevel;
     bool    m_logToFile, m_logToConsole;

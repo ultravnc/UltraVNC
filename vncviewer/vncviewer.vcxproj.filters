@@ -326,6 +326,9 @@
     <ClCompile Include="directx\directxviewer.cpp">
       <Filter>direct3D</Filter>
     </ClCompile>
+    <ClCompile Include="display.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AboutBox.h">
@@ -429,6 +432,9 @@
     </ClInclude>
     <ClInclude Include="directx\directxviewer.h">
       <Filter>direct3D</Filter>
+    </ClInclude>
+    <ClInclude Include="display.h">
+      <Filter>sources</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

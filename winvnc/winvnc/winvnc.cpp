@@ -120,6 +120,11 @@ void Reboot_in_safemode_elevated();
 void Reboot_in_safemode();
 void delete_softwareCAD_elevated();
 void delete_softwareCAD();
+void Reboot_with_force_reboot_elevated();
+void Reboot_with_force_reboot();
+
+//HACK to use name in autoreconnect from service with dyn dns
+char dnsname[255];
 
 
 // winvnc.exe will also be used for helper exe
@@ -131,8 +136,23 @@ Myinit(HINSTANCE hInstance)
 	setbuf(stderr, 0);
 
 	// [v1.0.2-jp1 fix] Load resouce from dll
+
 	hInstResDLL = NULL;
-	hInstResDLL = LoadLibrary("vnclang_server.dll");
+
+	 //limit the vnclang.dll searchpath to avoid
+	char szCurrentDir[MAX_PATH];
+	char szCurrentDir_vnclangdll[MAX_PATH];
+	if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
+	{
+		char* p = strrchr(szCurrentDir, '\\');
+		*p = '\0';
+	}
+	strcpy (szCurrentDir_vnclangdll,szCurrentDir);
+	strcat (szCurrentDir_vnclangdll,"\\");
+	strcat (szCurrentDir_vnclangdll,"vnclang_server.dll");
+
+	hInstResDLL = LoadLibrary(szCurrentDir_vnclangdll);
+
 	if (hInstResDLL == NULL)
 	{
 		hInstResDLL = hInstance;
@@ -204,7 +224,21 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 
 	// [v1.0.2-jp1 fix] Load resouce from dll
 	hInstResDLL = NULL;
-	hInstResDLL = LoadLibrary("vnclang_server.dll");
+
+	 //limit the vnclang.dll searchpath to avoid
+	char szCurrentDir[MAX_PATH];
+	char szCurrentDir_vnclangdll[MAX_PATH];
+	if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
+	{
+		char* p = strrchr(szCurrentDir, '\\');
+		*p = '\0';
+	}
+	strcpy (szCurrentDir_vnclangdll,szCurrentDir);
+	strcat (szCurrentDir_vnclangdll,"\\");
+	strcat (szCurrentDir_vnclangdll,"vnclang_server.dll");
+
+	hInstResDLL = LoadLibrary(szCurrentDir_vnclangdll);
+
 	if (hInstResDLL == NULL)
 	{
 		hInstResDLL = hInstance;
@@ -361,6 +395,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 				return 0;
 			}
 
+		if (strncmp(&szCmdLine[i], winvncRebootForceHelper, strlen(winvncRebootForceHelper)) == 0)
+			{
+				Sleep(3000);
+				Reboot_with_force_reboot_elevated();
+				return 0;
+			}
+
 		if (strncmp(&szCmdLine[i], winvncSecurityEditorHelper, strlen(winvncSecurityEditorHelper)) == 0)
 			{
 				Sleep(3000);
@@ -412,6 +453,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 		if (strncmp(&szCmdLine[i], winvncRebootSafe, strlen(winvncRebootSafe)) == 0)
 		{
 			Reboot_in_safemode();
+			return 0;
+		}
+
+		if (strncmp(&szCmdLine[i], winvncRebootForce, strlen(winvncRebootForce)) == 0)
+		{
+			Reboot_with_force_reboot();
 			return 0;
 		}
 
@@ -672,6 +719,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 						}
 					}
 					vnclog.Print(LL_STATE, VNCLOG("test... %s %d\n"),name,port);
+					strcpy_s(dnsname,name);
 					VCard32 address = VSocket::Resolve(name);
 					delete [] name;
 					if (address != 0) {

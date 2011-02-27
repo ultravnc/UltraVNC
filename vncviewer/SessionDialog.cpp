@@ -33,6 +33,7 @@
 #include <shlobj.h>
 #include <sys/stat.h>
 #include <direct.h>
+#include "display.h"
 
 #define SESSION_MRU_KEY_NAME _T("Software\\ORL\\VNCviewer\\MRU")
 #define NUM_MRU_ENTRIES 8
@@ -74,12 +75,20 @@ int SessionDialog::DoDialog()
 		NULL, (DLGPROC) SessDlgProc, (LONG) this);
 }
 
+static bool notset=true;
+static int selected=1;
+
 BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam, LPARAM lParam ) {
 	// This is a static method, so we don't know which instantiation we're 
 	// dealing with. But we can get a pseudo-this from the parameter to 
 	// WM_INITDIALOG, which we therafter store with the window and retrieve
 	// as follows:
     SessionDialog*_this = helper::SafeGetWindowUserData<SessionDialog>(hwnd);
+	if (_this!=NULL && notset) 
+		{
+			selected=_this->m_pOpt->m_selected_screen;
+			notset=false;
+		}
 
 	switch (uMsg) {
 
@@ -87,9 +96,19 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 		{
             helper::SafeSetWindowUserData(hwnd, lParam);
             SessionDialog *l_this = (SessionDialog *) lParam;
-            CentreWindow(hwnd);
+            //CentreWindow(hwnd);
 			SetForegroundWindow(hwnd);
 			l_this->m_pCC->m_hSessionDialog = hwnd;
+
+			//List monitors
+			tempdisplayclass tdc;
+			tdc.Init();
+			HWND hcomboscreen = GetDlgItem(  hwnd, IDC_SCREEN);		
+            for (int i = 0; i < tdc.nr_monitors+1; i++) {
+                int pos = SendMessage(hcomboscreen, CB_ADDSTRING, 0, (LPARAM) tdc.monarray[i].buttontext);
+
+            }
+            SendMessage(hcomboscreen, CB_SETCURSEL, selected, 0);
 
             // Set up recently-used list
             HWND hcombo = GetDlgItem(  hwnd, IDC_HOSTNAME_EDIT);
@@ -194,6 +213,8 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 			// sf@2005
 			HWND hSave = GetDlgItem(hwnd, IDC_SETDEFAULT_CHECK);
 			_this->m_pCC->saved_set = SendMessage(hSave, BM_GETCHECK, 0, 0) == BST_CHECKED;
+
+			_this->m_pOpt->m_selected_screen=SendMessage(GetDlgItem(  hwnd, IDC_SCREEN),CB_GETCURSEL,0,0);
 
 			GetDlgItemText(hwnd, IDC_HOSTNAME_EDIT, display, 256);
             _tcscpy(fulldisplay, display);

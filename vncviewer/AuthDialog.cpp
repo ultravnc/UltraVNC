@@ -73,7 +73,7 @@ BOOL CALLBACK AuthDialog::DlgProc(  HWND hwnd,  UINT uMsg,
 			_this = (AuthDialog *) lParam;
 
             Edit_LimitText(GetDlgItem(hwnd, IDC_PASSWD_EDIT), 32);
-			CentreWindow(hwnd);
+			//CentreWindow(hwnd);
 			SetForegroundWindow(hwnd);
 			return TRUE;
 		}
@@ -121,7 +121,7 @@ BOOL CALLBACK AuthDialog::DlgProc1(  HWND hwnd,  UINT uMsg,
 			
 			//adzm 2010-05-12 - passphrase
 			Edit_LimitText(GetDlgItem(hwnd, IDC_PASSWD_EDIT), _this->m_bPassphraseMode ? 128 : 8);
-			CentreWindow(hwnd);
+			//CentreWindow(hwnd);
 			return TRUE;
 		}
 	case WM_COMMAND:

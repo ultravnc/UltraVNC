@@ -1800,7 +1800,8 @@ void GetIPString(char *buffer, int buflen)
 		return;
     }
 
-    HOSTENT *ph = gethostbyname(namebuf);
+    HOSTENT *ph = NULL;
+	ph=gethostbyname(namebuf);
     if (!ph)
 	{
 		strncpy(buffer, "IP address unavailable", buflen);
@@ -4389,6 +4390,16 @@ vncClient::SetNewSWSize(long w,long h,BOOL Desktop)
 	return TRUE;
 }
 
+BOOL
+vncClient::SetNewSWSizeFR(long w,long h,BOOL Desktop)
+{
+	if (!m_use_NewSWSize) return FALSE;
+	m_NewSWUpdateWaiting=true;
+	NewsizeW=w;
+	NewsizeH=h;
+	return TRUE;
+}
+
 // Functions used to set and retrieve the client settings
 const char*
 vncClient::GetClientName()
@@ -5820,7 +5831,9 @@ bool vncClient::DoFTUserImpersonation()
 void vncClient::UndoFTUserImpersonation()
 {
 	//vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::UNDoFTUserImpersonation - Call\n"));
-	omni_mutex_lock l(GetUpdateLock());
+	//moved to after returns, Is this lock realy needed if no revert is done ?
+	//
+	//omni_mutex_lock l(GetUpdateLock());
 
 	if (!m_fFTUserImpersonatedOk) return;
 	if (m_fFileDownloadRunning) return;
@@ -5830,6 +5843,7 @@ void vncClient::UndoFTUserImpersonation()
 	vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::UNDoFTUserImpersonation - 1\n"));
 	DWORD lTime = timeGetTime();
 	if (lTime - m_lLastFTUserImpersonationTime < 10000) return;
+	omni_mutex_lock l(GetUpdateLock());
 	vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::UNDoFTUserImpersonation - Impersonationtoken exists\n"));
 	RevertToSelf();
 	m_fFTUserImpersonatedOk = false;

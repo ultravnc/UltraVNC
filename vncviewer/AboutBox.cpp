@@ -105,7 +105,7 @@ static LRESULT CALLBACK AboutDlgProc(HWND hwnd, UINT iMsg,
 	switch (iMsg) {
 	case WM_INITDIALOG:
 		{
-			CentreWindow(hwnd);
+			//CentreWindow(hwnd);
 			SetForegroundWindow(hwnd);
             extern char buildtime[];
             SetDlgItemText(hwnd, IDC_BUILDTIME, buildtime);

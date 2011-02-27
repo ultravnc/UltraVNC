@@ -4400,7 +4400,7 @@ BOOL CALLBACK FileTransfer::FTParamDlgProc(  HWND hwnd,  UINT uMsg, WPARAM wPara
 		{
             helper::SafeSetWindowUserData(hwnd, lParam);
 			_this = (FileTransfer *) lParam;
-			CentreWindow(hwnd);
+			//CentreWindow(hwnd);
 
 			// Set Title
 			SetWindowText(hwnd, _this->m_szFTParamTitle);
@@ -4477,7 +4477,7 @@ BOOL CALLBACK FileTransfer::FTConfirmDlgProc(  HWND hwnd,  UINT uMsg, WPARAM wPa
 		{
             helper::SafeSetWindowUserData(hwnd, lParam);
 			_this = (FileTransfer *) lParam;
-			CentreWindow(hwnd);
+			//CentreWindow(hwnd);
 
 			// Set Title
 			SetWindowText(hwnd, _this->m_szFTConfirmTitle);

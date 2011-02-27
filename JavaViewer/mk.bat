@@ -1,2 +1,2 @@
-c:\sam\jdk1.3.1_15\bin\javac.exe *.java
-c:\sam\jdk1.3.1_15\bin\jar.exe cf VncViewer.jar *.class
+"C:\Program Files\Java\jdk1.6.0_23\bin\javac.exe" -Xlint *.java
+"C:\Program Files\Java\jdk1.6.0_23\bin\jar.exe" cf VncViewer.jar *.class

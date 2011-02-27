@@ -141,7 +141,7 @@ void ClientConnection::ReadCursorShape(rfbFramebufferUpdateRectHeader *pfburh) {
 	{
 		omni_mutex_lock l(m_bitmapdcMutex);
 		if (m_SavedAreaBIB) delete[] m_SavedAreaBIB;
-		m_SavedAreaBIB = new BYTE [rcWidth * rcHeight * m_myFormat.bitsPerPixel/8];
+		m_SavedAreaBIB = new BYTE [rcWidth * rcHeight * m_myFormat.bitsPerPixel];
 	}
 
 	SoftCursorSaveArea();

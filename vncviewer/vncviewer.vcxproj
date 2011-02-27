@@ -567,6 +567,7 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="directx\directxviewer.cpp" />
+    <ClCompile Include="display.cpp" />
     <ClCompile Include="Exception.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -757,6 +758,7 @@
     <ClInclude Include="..\rfb\dh.h" />
     <ClInclude Include="..\DSMPlugin\DSMPlugin.h" />
     <ClInclude Include="directx\directxviewer.h" />
+    <ClInclude Include="display.h" />
     <ClInclude Include="Exception.h" />
     <ClInclude Include="FileTransfer.h" />
     <ClInclude Include="FullScreenTitleBar.h" />

@@ -454,11 +454,11 @@
 				>
 			</File>
 			<File
-				RelativePath="res\stat\background2.bmp"
+				RelativePath="res\background2.bmp"
 				>
 			</File>
 			<File
-				RelativePath="res\background2.bmp"
+				RelativePath="res\stat\background2.bmp"
 				>
 			</File>
 			<File
@@ -503,6 +503,14 @@
 			</File>
 			<File
 				RelativePath="res\dir.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\display.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\display.h"
 				>
 			</File>
 			<File
@@ -594,19 +602,19 @@
 				>
 			</File>
 			<File
-				RelativePath=".\res\Tango_s.bmp"
-				>
-			</File>
-			<File
 				RelativePath=".\Tango_s.bmp"
 				>
 			</File>
 			<File
-				RelativePath=".\res\Tango_sx.bmp"
+				RelativePath=".\res\Tango_s.bmp"
 				>
 			</File>
 			<File
 				RelativePath=".\Tango_sx.bmp"
+				>
+			</File>
+			<File
+				RelativePath=".\res\Tango_sx.bmp"
 				>
 			</File>
 			<File
