@@ -2117,6 +2117,12 @@ void ClientConnection::NegotiateProtocolVersion()
         /* if server is 3.2 we can't use the new authentication */
 		vnclog.Print(0, _T("Can't use IDEA authentication\n"));
         /* This will be reported later if authentication is requested*/
+	}
+	else if ((m_majorVersion == 3) && (m_minorVersion == 3)) {
+		
+        /* if server is 3.2 we can't use the new authentication */
+		vnclog.Print(0, _T("RFB version 3.3, Legacy \n"));
+        /* This will be reported later if authentication is requested*/
 
     } else {
 		
@@ -4140,7 +4146,7 @@ inline void ClientConnection::DoBlit()
 	if (!m_running) return;
 				
 	// No other threads can use bitmap DC
-	omni_mutex_lock l(m_bitmapdcMutex);
+	//omni_mutex_lock l(m_bitmapdcMutex);
 
 	PAINTSTRUCT ps;
 	HDC hdc = BeginPaint(m_hwndcn, &ps);
