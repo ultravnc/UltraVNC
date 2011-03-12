@@ -624,7 +624,7 @@ vncClientUpdateThread::run_undetached(void *arg)
 			// Render the mouse if required
 
 		if (updates_sent > 1 ) m_client->m_cursor_update_pending = m_client->m_encodemgr.WasCursorUpdatePending();
-		if (updates_sent == 1 ) m_client->m_cursor_update_pending = true;
+		//if (updates_sent == 1 ) m_client->m_cursor_update_pending = true;
 
 		if (!m_client->m_cursor_update_sent && !m_client->m_cursor_update_pending) 
 			{

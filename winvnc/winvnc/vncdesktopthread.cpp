@@ -785,7 +785,7 @@ vncDesktopThread::run_undetached(void *arg)
 		DWORD result;
 		newtick = timeGetTime();
 		int waittime;
-		waittime=200;
+		waittime=33;
 		if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver) 
 		{
 			int fastcounter=0;
