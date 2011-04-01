@@ -2,7 +2,6 @@
  * jmorecfg.h
  *
  * Copyright (C) 1991-1997, Thomas G. Lane.
- * Copyright (C) 2009, D. R. Commander.
  * This file is part of the Independent JPEG Group's software.
  * For conditions of distribution and use, see the accompanying README file.
  *
@@ -63,11 +62,11 @@ typedef unsigned char JSAMPLE;
 #else /* not HAVE_UNSIGNED_CHAR */
 
 typedef char JSAMPLE;
-#ifdef __CHAR_UNSIGNED__
+#ifdef CHAR_IS_UNSIGNED
 #define GETJSAMPLE(value)  ((int) (value))
 #else
 #define GETJSAMPLE(value)  ((int) (value) & 0xFF)
-#endif /* __CHAR_UNSIGNED__ */
+#endif /* CHAR_IS_UNSIGNED */
 
 #endif /* HAVE_UNSIGNED_CHAR */
 
@@ -114,11 +113,11 @@ typedef unsigned char JOCTET;
 #else /* not HAVE_UNSIGNED_CHAR */
 
 typedef char JOCTET;
-#ifdef __CHAR_UNSIGNED__
+#ifdef CHAR_IS_UNSIGNED
 #define GETJOCTET(value)  (value)
 #else
 #define GETJOCTET(value)  ((value) & 0xFF)
-#endif /* __CHAR_UNSIGNED__ */
+#endif /* CHAR_IS_UNSIGNED */
 
 #endif /* HAVE_UNSIGNED_CHAR */
 
@@ -135,11 +134,11 @@ typedef char JOCTET;
 #ifdef HAVE_UNSIGNED_CHAR
 typedef unsigned char UINT8;
 #else /* not HAVE_UNSIGNED_CHAR */
-#ifdef __CHAR_UNSIGNED__
+#ifdef CHAR_IS_UNSIGNED
 typedef char UINT8;
-#else /* not __CHAR_UNSIGNED__ */
+#else /* not CHAR_IS_UNSIGNED */
 typedef short UINT8;
-#endif /* __CHAR_UNSIGNED__ */
+#endif /* CHAR_IS_UNSIGNED */
 #endif /* HAVE_UNSIGNED_CHAR */
 
 /* UINT16 must hold at least the values 0..65535. */
@@ -159,7 +158,7 @@ typedef short INT16;
 /* INT32 must hold at least signed 32-bit values. */
 
 #ifndef XMD_H			/* X11/xmd.h correctly defines INT32 */
-typedef long INT32;
+typedef int INT32;
 #endif
 
 /* Datatype used for image dimensions.  The JPEG standard only supports
@@ -209,12 +208,14 @@ typedef unsigned int JDIMENSION;
  * by just saying "FAR *" where such a pointer is needed.  In a few places
  * explicit coding is needed; see uses of the NEED_FAR_POINTERS symbol.
  */
-
+#ifndef FAR
 #ifdef NEED_FAR_POINTERS
 #define FAR  far
 #else
 #define FAR
 #endif
+#endif
+
 
 
 /*
@@ -368,3 +369,4 @@ static const int rgb_pixelsize[JPEG_NUMCS] = {
 #endif
 
 #endif /* JPEG_INTERNAL_OPTIONS */
+

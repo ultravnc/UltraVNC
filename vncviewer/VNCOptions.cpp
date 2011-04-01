@@ -91,6 +91,7 @@ VNCOptions::VNCOptions()
   m_UseEnc[rfbEncodingZRLE] = true;
   m_UseEnc[rfbEncodingZYWRLE] = true;
   m_UseEnc[rfbEncodingUltra] = true;
+  m_UseEnc[rfbEncodingUltra2] = true;
 	
   m_ViewOnly = false;
   m_FullScreen = false;
@@ -168,6 +169,7 @@ VNCOptions::VNCOptions()
   m_clearPassword[0] = '\0';		// sf@2002
   m_quickoption = 1;				// sf@2002 - Auto Mode as default
   m_fUseDSMPlugin = false;
+  m_oldplugin=false;
   g_disable_sponsor= false;
   m_fUseProxy = false;
   m_selected_screen=1;
@@ -683,7 +685,9 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 				enc = rfbEncodingTight;
 			} else if (_tcsicmp(args[j], _T("ultra")) == 0) {
 				enc = rfbEncodingUltra;
-			} else if (_tcsicmp(args[j], _T("zrle")) == 0) { 
+			} else if (_tcsicmp(args[j], _T("ultra2")) == 0) {
+				enc = rfbEncodingUltra2;
+			}else if (_tcsicmp(args[j], _T("zrle")) == 0) { 
 				enc = rfbEncodingZRLE; 
 			} else if (_tcsicmp(args[j], _T("zywrle")) == 0) { 
 				enc = rfbEncodingZYWRLE; 
@@ -1430,11 +1434,14 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 					  _this->m_PreferredEncoding = i;
 			  }
 
-			// [v1.0.2-jp2 fix-->]
+			/*// [v1.0.2-jp2 fix-->]
 			  if (SendMessage(GetDlgItem(hwnd, IDC_ULTRA), BM_GETCHECK, 0, 0) == BST_CHECKED){
 					SendMessage(GetDlgItem(hwnd, ID_SESSION_SET_CRECT), BM_SETCHECK, false, 0);
 			  }
-			// [<--v1.0.2-jp2 fix]
+			   if (SendMessage(GetDlgItem(hwnd, IDC_ULTRA2), BM_GETCHECK, 0, 0) == BST_CHECKED){
+					SendMessage(GetDlgItem(hwnd, ID_SESSION_SET_CRECT), BM_SETCHECK, false, 0);
+			  }
+			// [<--v1.0.2-jp2 fix]*/
 			  
 			  HWND hCopyRect = GetDlgItem(hwnd, ID_SESSION_SET_CRECT);
 			  _this->m_UseEnc[rfbEncodingCopyRect] =
@@ -1691,7 +1698,7 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 		bool ultra=IsDlgButtonChecked(hwnd, IDC_ULTRA) ? true : false;
 		if (ultra)
 		{
-	 	    HWND hCache = GetDlgItem(hwnd, ID_SESSION_SET_CACHE);
+	 	   /* HWND hCache = GetDlgItem(hwnd, ID_SESSION_SET_CACHE);
 			SendMessage(hCache, BM_SETCHECK, false, 0);
 			// [v1.0.2-jp2 fix-->]
 			HWND hCopyRect = GetDlgItem(hwnd, ID_SESSION_SET_CRECT);
@@ -1702,7 +1709,59 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 			HWND hRemoteCursor2 = GetDlgItem(hwnd, IDC_CSHAPE_ENABLE_RADIO);
 			SendMessage(hRemoteCursor2, BM_SETCHECK,false, 0);
 			HWND hRemoteCursor3 = GetDlgItem(hwnd, IDC_CSHAPE_IGNORE_RADIO);
-			SendMessage(hRemoteCursor3, BM_SETCHECK,false, 0);
+			SendMessage(hRemoteCursor3, BM_SETCHECK,false, 0);*/
+		}
+		return TRUE;
+		}
+	case IDC_256COLORS_RADIO:
+	case IDC_64COLORS_RADIO:
+	case IDC_8COLORS_RADIO:
+	case IDC_8GREYCOLORS_RADIO:
+	case IDC_4GREYCOLORS_RADIO:
+	case IDC_2GREYCOLORS_RADIO:
+		{
+		bool ultra2=IsDlgButtonChecked(hwnd, IDC_ULTRA2) ? true : false;
+		if (ultra2)
+		{
+			HWND hultra = GetDlgItem(hwnd, IDC_ULTRA2);
+			SendMessage(hultra, BM_SETCHECK, false, 0);
+			hultra = GetDlgItem(hwnd, IDC_ULTRA);	
+			SendMessage(hultra, BM_SETCHECK, true, 0);
+		}
+		}
+		break;
+	case IDC_ULTRA2:
+		{
+		bool ultra2=IsDlgButtonChecked(hwnd, IDC_ULTRA2) ? true : false;
+		if (ultra2)
+		{
+			HWND hColorMode = GetDlgItem(hwnd, IDC_FULLCOLORS_RADIO);
+			SendMessage(hColorMode, BM_SETCHECK, true, 0);
+			hColorMode = GetDlgItem(hwnd, IDC_256COLORS_RADIO);	
+			SendMessage(hColorMode, BM_SETCHECK, false, 0);
+			hColorMode = GetDlgItem(hwnd, IDC_64COLORS_RADIO);			  
+			SendMessage(hColorMode, BM_SETCHECK, false, 0);
+			hColorMode = GetDlgItem(hwnd, IDC_8COLORS_RADIO);			  
+			SendMessage(hColorMode, BM_SETCHECK, false, 0);
+			hColorMode = GetDlgItem(hwnd, IDC_8GREYCOLORS_RADIO);			  
+			SendMessage(hColorMode, BM_SETCHECK, false, 0);
+			hColorMode = GetDlgItem(hwnd, IDC_4GREYCOLORS_RADIO);			  
+			SendMessage(hColorMode, BM_SETCHECK, false, 0);
+			hColorMode = GetDlgItem(hwnd, IDC_2GREYCOLORS_RADIO);			  
+			SendMessage(hColorMode, BM_SETCHECK, false, 0);
+
+	 	    /*HWND hCache = GetDlgItem(hwnd, ID_SESSION_SET_CACHE);
+			SendMessage(hCache, BM_SETCHECK, false, 0);
+			// [v1.0.2-jp2 fix-->]
+			HWND hCopyRect = GetDlgItem(hwnd, ID_SESSION_SET_CRECT);
+			SendMessage(hCopyRect, BM_SETCHECK, false, 0);
+			// [<--v1.0.2-jp2 fix]
+			HWND hRemoteCursor = GetDlgItem(hwnd, IDC_CSHAPE_DISABLE_RADIO);
+			SendMessage(hRemoteCursor, BM_SETCHECK,	true, 0);
+			HWND hRemoteCursor2 = GetDlgItem(hwnd, IDC_CSHAPE_ENABLE_RADIO);
+			SendMessage(hRemoteCursor2, BM_SETCHECK,false, 0);
+			HWND hRemoteCursor3 = GetDlgItem(hwnd, IDC_CSHAPE_IGNORE_RADIO);
+			SendMessage(hRemoteCursor3, BM_SETCHECK,false, 0);*/
 		}
 		return TRUE;
 		}

@@ -109,6 +109,7 @@ public:
 	// Modif sz@2002 - DSM Plugin
 	bool	m_fUseDSMPlugin;
 	TCHAR   m_szDSMPluginFilename[_MAX_PATH];
+	bool	m_oldplugin;
 
 	// sf@2003 - Autoscaling
 	int m_saved_scale_num; 

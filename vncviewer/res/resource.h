@@ -235,6 +235,7 @@
 #define IDC_TIGHTRADIO                  2007
 #define IDC_ZLIBHEXRADIO                2008
 #define IDC_ULTRA                       2009
+#define IDC_ULTRA2                      2010
 #define IDC_ZRLERADIO                   2016
 #define IDC_ZYWRLERADIO                 2017
 #define IDC_LAST_ENCODING               2018

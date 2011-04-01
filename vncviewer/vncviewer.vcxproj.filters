@@ -329,6 +329,9 @@
     <ClCompile Include="display.cpp">
       <Filter>sources</Filter>
     </ClCompile>
+    <ClCompile Include="ClientConnectionUltra2.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AboutBox.h">

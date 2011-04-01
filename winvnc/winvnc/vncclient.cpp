@@ -2223,11 +2223,11 @@ vncClientThread::run(void *arg)
 				break;
 			}
 		}
-#ifdef _DEBUG
+/*#ifdef _DEBUG
 										char			szText[256];
 										sprintf(szText," msg.type %i \n",msg.type);
 										OutputDebugString(szText);		
-#endif
+#endif*/
 		// What to do is determined by the message id
 		switch(msg.type)
 		{
@@ -2519,11 +2519,11 @@ vncClientThread::run(void *arg)
 			
 		case rfbFramebufferUpdateRequest:
 			// Read the rest of the message:
-#ifdef _DEBUG
+/*#ifdef _DEBUG
 										char			szText[256];
 										sprintf(szText," rfbFramebufferUpdateRequest \n");
 										OutputDebugString(szText);		
-#endif
+#endif*/
 			if (!m_socket->ReadExact(((char *) &msg)+nTO, sz_rfbFramebufferUpdateRequestMsg-nTO))
 			{
 				connected = FALSE;
@@ -2565,11 +2565,11 @@ vncClientThread::run(void *arg)
 
 					update_rgn=update;
 				}
-#ifdef _DEBUG
+/*#ifdef _DEBUG
 										char			szText[256];
 										sprintf(szText,"Update asked for region %i %i %i %i %i \n",update.tl.x,update.tl.y,update.br.x,update.br.y,m_client->m_SWOffsetx);
 										OutputDebugString(szText);		
-#endif
+#endif*/
 //				vnclog.Print(LL_SOCKERR, VNCLOG("Update asked for region %i %i %i %i %i\n"),update.tl.x,update.tl.y,update.br.x,update.br.y,m_client->m_SWOffsetx);
 
 				// RealVNC 336
@@ -4501,7 +4501,7 @@ vncClient::SendRFBMsgQueue(CARD8 type, BYTE *buffer, int buflen)
 	}
 	return TRUE;
 }
-
+#define min(a, b)  (((a) < (b)) ? (a) : (b))
 
 BOOL
 vncClient::SendUpdate(rfb::SimpleUpdateTracker &update)
@@ -4544,7 +4544,6 @@ vncClient::SendUpdate(rfb::SimpleUpdateTracker &update)
 	// Find out how many rectangles in total will be updated
 	// This includes copyrects and changed rectangles split
 	// up by codings such as CoRRE.
-
 	int updates = 0;
 	int numsubrects = 0;
 	updates += update_info.copied.size();
@@ -4591,9 +4590,9 @@ vncClient::SendUpdate(rfb::SimpleUpdateTracker &update)
 			// Skip rest rectangles if an encoder will use LastRect extension.
 			if (numsubrects == 0) {
 				updates = 0xFFFF;
-				break;
+				//break;
 			}	
-			updates += numsubrects;
+			else updates += numsubrects;
 			//vnclog.Print(LL_INTERR, "cached2 %d\n", updates);
 		}
 	}
@@ -4665,7 +4664,6 @@ vncClient::SendUpdate(rfb::SimpleUpdateTracker &update)
 	
 	if (!SendRectangles(update_info.changed))
 		return FALSE;
-
 	// Tight specific - Send LastRect marker if needed.
 	if (updates == 0xFFFF)
 	{
@@ -4686,17 +4684,57 @@ vncClient::SendRectangles(const rfb::RectVector &rects)
 #ifdef DSHOW
 	MutexAutoLock l_Lock(&m_hmtxEncodeAccess);
 #endif
-//	rfb::Rect rect;
 	rfb::RectVector::const_iterator i;
+	rfb::Rect rect;
+	int x,y;
+	int Blocksize=254;
+	int BlocksizeX=254;
+
 
 	// Work through the list of rectangles, sending each one
 	for (i=rects.begin();i!=rects.end();i++) {
-		if (!SendRectangle(*i))
-			return FALSE;
-	}
+		if (m_encodemgr.ultra2_encoder_in_use)
+		{
+			//We want smaller rect, so data can be send and decoded while handling next update
+			rect.tl.x=(*i).tl.x;
+			rect.br.x=(*i).br.x;
+			rect.tl.y=(*i).tl.y;
+			rect.br.y=(*i).br.y;
 
+			if ((rect.br.x-rect.tl.x) * (rect.br.y-rect.tl.y) > Blocksize*BlocksizeX )
+			{
+ 
+			for (y = rect.tl.y; y < rect.br.y; y += Blocksize)
+			{
+				int blockbottom = min(y + Blocksize, rect.br.y);
+				for (x = rect.tl.x; x < rect.br.x; x += BlocksizeX)
+					{
+ 
+					   int blockright = min(x+BlocksizeX, rect.br.x);
+					   rfb::Rect tilerect;
+					   tilerect.tl.x=x;
+					   tilerect.br.x=blockright;
+					   tilerect.tl.y=y;
+					   tilerect.br.y=blockbottom;
+					   if (!SendRectangle(tilerect)) return FALSE;
+					}
+			}
+			}
+			else
+			{
+				if (!SendRectangle(rect)) return FALSE;
+			}
+
+		}
+		else
+		{
+		if (!SendRectangle(*i)) return FALSE;
+		}
+	}
 	return TRUE;
 }
+
+
 
 // Tell the encoder to send a single rectangle
 BOOL

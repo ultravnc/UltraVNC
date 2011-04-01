@@ -47,7 +47,7 @@
 #endif
 extern "C"
 {
-	#include "libjpeg/jpeglib.h" // For Tight encoding
+	#include "libjpeg-turbo-win/jpeglib.h" // For Tight encoding
 }
 #include "FileTransfer.h" // sf@2002
 #include "TextChat.h" // sf@2002
@@ -295,6 +295,8 @@ private:
     
 	void ReadRawRect(rfbFramebufferUpdateRectHeader *pfburh);
 	void ReadUltraRect(rfbFramebufferUpdateRectHeader *pfburh);
+	void ReadUltra2Rect(rfbFramebufferUpdateRectHeader *pfburh);
+	void DecompressJpegRect(BYTE *src, int srclen, BYTE *dst, int dst_size,int w, int h,rfbPixelFormat m_remoteformat);
 	void ReadUltraZip(rfbFramebufferUpdateRectHeader *pfburh,HRGN *prgn);
 	void ReadCopyRect(rfbFramebufferUpdateRectHeader *pfburh);
     void ReadRRERect(rfbFramebufferUpdateRectHeader *pfburh);

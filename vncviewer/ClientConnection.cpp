@@ -1540,6 +1540,10 @@ void ClientConnection::LoadDSMPlugin(bool fForceReload)
 		if (!m_pDSMPlugin->IsLoaded())
 		{
 			m_pDSMPlugin->LoadPlugin(m_opts.m_szDSMPluginFilename, m_opts.m_listening);
+			if (strcmp(m_opts.m_szDSMPluginFilename,"MSRC4Plugin.dsm")==NULL) m_opts.m_oldplugin=true;
+			else m_opts.m_oldplugin=false; 
+			if (strcmp(m_opts.m_szDSMPluginFilename,"ARC4plugin.dsm")==NULL) m_opts.m_oldplugin=true;
+			else m_opts.m_oldplugin=false; 
 			if (m_pDSMPlugin->IsLoaded())
 			{
 				if (m_pDSMPlugin->InitPlugin())
@@ -1592,7 +1596,7 @@ void ClientConnection::SetDSMPluginStuff()
 	{
 		vnclog.Print(0, _T("DSMPlugin enabled\n"));
 		char szParams[256+16];
-
+		//strcpy(szParams,m_pDSMPlugin->GetPluginParams());
 		// Does the plugin need the VNC password to do its job ?
 		if (!_stricmp(m_pDSMPlugin->GetPluginParams(), "VNCPasswordNeeded"))
 		{
@@ -2006,7 +2010,7 @@ void ClientConnection::NegotiateProtocolVersion()
 
 	//adzm 2009-06-21 - warn if we are trying to connect to an unencrypted server. but still allow it if desired.
 	//adzm 2010-05-10
-	if (m_fUsePlugin && fNotEncrypted && !m_pIntegratedPluginInterface) {
+	if (m_fUsePlugin && fNotEncrypted /*&& !m_pIntegratedPluginInterface*/) {
 
 		//adzm 2010-05-12
 		if (m_opts.m_fRequireEncryption) {
@@ -3464,7 +3468,7 @@ void ClientConnection::Createdib()
 						directx_used=true;
 						m_myFormat.redShift=directx_output.m_directxformat.redShift;
 						m_myFormat.greenShift=directx_output.m_directxformat.greenShift;
-						m_myFormat.redShift=directx_output.m_directxformat.blueShift;
+						m_myFormat.blueShift=directx_output.m_directxformat.blueShift;
 
 						if (m_hmemdc != NULL) {DeleteDC(m_hmemdc);m_hmemdc = NULL;m_DIBbits=NULL;}
 						if (m_membitmap != NULL) {DeleteObject(m_membitmap);m_membitmap= NULL;}
@@ -4806,6 +4810,7 @@ inline void ClientConnection::ReadScreenUpdate()
 				case rfbEncodingCoRRE:
 				case rfbEncodingHextile:
 				case rfbEncodingUltra:
+				case rfbEncodingUltra2:
 				case rfbEncodingZlib:
 				case rfbEncodingXOR_Zlib:
 				case rfbEncodingXORMultiColor_Zlib:
@@ -4838,7 +4843,7 @@ inline void ClientConnection::ReadScreenUpdate()
 			{
 				if ((surh.encoding == rfbEncodingZYWRLE)||(surh.encoding == rfbEncodingZRLE))
 				{
-					if (m_minorVersion==6 || m_minorVersion==4 || m_minorVersion==16 || m_minorVersion==14)
+					if (m_minorVersion==6 || m_minorVersion==4 || m_minorVersion==16 || m_minorVersion==14 || m_opts.m_oldplugin)
 					{
 						ReadExact((char*)&(m_nZRLEReadSize), sizeof(CARD32));
 						m_nZRLEReadSize = Swap32IfLE(m_nZRLEReadSize);
@@ -4918,6 +4923,11 @@ inline void ClientConnection::ReadScreenUpdate()
 			if (directx_used) m_DIBbits=directx_output.Preupdate((unsigned char *)m_DIBbits);
 			ReadUltraRect(&surh);
 			EncodingStatusWindow=rfbEncodingUltra;
+			break;
+		case rfbEncodingUltra2:
+			if (directx_used) m_DIBbits=directx_output.Preupdate((unsigned char *)m_DIBbits);
+			ReadUltra2Rect(&surh);
+			EncodingStatusWindow=rfbEncodingUltra2;
 			break;
 		case rfbEncodingUltraZip:
 			if (directx_used) m_DIBbits=directx_output.Preupdate((unsigned char *)m_DIBbits);
@@ -5046,16 +5056,17 @@ inline void ClientConnection::ReadScreenUpdate()
 			rect.top    = surh.r.y;
 			rect.right  = surh.r.x + surh.r.w ;
 			rect.bottom = surh.r.y + surh.r.h; 
-			if (!directx_used)
-				InvalidateScreenRect(&rect); 			
+
+			if (!directx_used)InvalidateRegion(&rect,&UpdateRegion);
+				//InvalidateScreenRect(&rect); 			
 		}
 		else if (surh.encoding !=rfbEncodingNewFBSize)
 		{
-			if (!directx_used)
+			/*if (!directx_used)
 				InvalidateRgn(m_hwndcn, UpdateRegion, FALSE);
 			HRGN tempregion=CreateRectRgn(0,0,0,0);
 			CombineRgn(UpdateRegion,UpdateRegion,tempregion,RGN_AND);
-			DeleteObject(tempregion);
+			DeleteObject(tempregion);*/
 		}
 
 		if (m_TrafficMonitor)
@@ -5075,6 +5086,13 @@ inline void ClientConnection::ReadScreenUpdate()
 	if (directx_used)
 	{
 		InvalidateRect(m_hwndcn, NULL, TRUE);
+	}
+	else
+	{
+		InvalidateRgn(m_hwndcn, UpdateRegion, FALSE);
+		HRGN tempregion=CreateRectRgn(0,0,0,0);
+		CombineRgn(UpdateRegion,UpdateRegion,tempregion,RGN_AND);
+		DeleteObject(tempregion);
 	}
 
 	if (!fTimingAlreadyStopped)
@@ -6227,6 +6245,9 @@ void ClientConnection::UpdateStatusFields()
 				break;
 			case rfbEncodingUltra:		
 				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "Ultra, Cache" : "Ultra");
+				break;
+			case rfbEncodingUltra2:		
+				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "Ultra2, Cache" : "Ultra2");
 				break;
 			case rfbEncodingZlib:		
 				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "XORZlib, Cache" : "XORZlib");

@@ -416,8 +416,8 @@
 	</Configurations>
 	<References>
 		<ProjectReference
-			ReferencedProjectIdentifier="{181769CB-5295-452F-A421-FE1F9ED2022A}"
-			RelativePathToProject="..\libjpeg\libjpeg.vcproj"
+			ReferencedProjectIdentifier="{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}"
+			RelativePathToProject="..\libjpeg-turbo-win\libjpeg-turbo-win.vcproj"
 		/>
 		<ProjectReference
 			ReferencedProjectIdentifier="{AB1CE62F-4A4D-4DAA-831D-5C93AD68F5F1}"
@@ -454,11 +454,11 @@
 				>
 			</File>
 			<File
-				RelativePath="res\background2.bmp"
+				RelativePath="res\stat\background2.bmp"
 				>
 			</File>
 			<File
-				RelativePath="res\stat\background2.bmp"
+				RelativePath="res\background2.bmp"
 				>
 			</File>
 			<File
@@ -594,15 +594,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\res\Tango_lx.bmp"
-				>
-			</File>
-			<File
 				RelativePath=".\Tango_lx.bmp"
 				>
 			</File>
 			<File
-				RelativePath=".\Tango_s.bmp"
+				RelativePath=".\res\Tango_lx.bmp"
 				>
 			</File>
 			<File
@@ -610,11 +606,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Tango_sx.bmp"
+				RelativePath=".\Tango_s.bmp"
 				>
 			</File>
 			<File
 				RelativePath=".\res\Tango_sx.bmp"
+				>
+			</File>
+			<File
+				RelativePath=".\Tango_sx.bmp"
 				>
 			</File>
 			<File
@@ -1381,6 +1381,10 @@
 					PreprocessorDefinitions=""
 				/>
 			</FileConfiguration>
+		</File>
+		<File
+			RelativePath=".\ClientConnectionUltra2.cpp"
+			>
 		</File>
 		<File
 			RelativePath="ClientConnectionZlib.cpp"

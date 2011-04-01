@@ -458,6 +458,7 @@ typedef struct {
 #define rfbEncodingTight   7
 #define rfbEncodingZlibHex 8
 #define rfbEncodingUltra	9
+#define rfbEncodingUltra2	10
 #define rfbEncodingZRLE 16
 // nyama/2006/08/02:new YUV-Wavlet lossy codec based on ZRLE
 #define rfbEncodingZYWRLE 17
