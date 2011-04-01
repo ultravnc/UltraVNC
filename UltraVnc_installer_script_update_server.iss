@@ -4,9 +4,9 @@
 
 [Setup]
 AppName=UltraVNC
-AppVerName=UltraVNC 1.0.9.5
-AppVersion=1.0.9.5
-VersionInfoVersion=1.0.9.5
+AppVerName=UltraVNC 1.0.9.6
+AppVersion=1.0.9.6
+VersionInfoVersion=1.0.9.6
 AppPublisher=uvnc bvba
 AppCopyright=UltraVnc Team
 AppPublisherURL={cm:PublisherURL}
@@ -24,7 +24,7 @@ AppID={#AppID}
 UninstallRestartComputer=true
 DirExistsWarning=no
 OutputDir=setupfile
-OutputBaseFilename=UltraVNC_1.0.9.5_update
+OutputBaseFilename=UltraVNC_1.0.9.6_update
 BackColorDirection=lefttoright
 UserInfoPage=false
 ShowLanguageDialog=yes
@@ -50,7 +50,7 @@ SignTool=signing
 VersionInfoCompany=uvnc bvba
 VersionInfoCopyright=UltraVnc Team
 VersionInfoProductName=UltraVnc 
-VersionInfoProductVersion=1.0.9.5
+VersionInfoProductVersion=1.0.9.6
 UninstallDisplayName=UltraVnc
 
 [Languages]
@@ -319,7 +319,6 @@ begin
 end;
 
 [Dirs]
-Name: {app}\Plugins; Components: ; Tasks: ; Languages: 
 
 [InnoIDE_Settings]
 LogFileOverwrite=false
