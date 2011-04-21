@@ -809,6 +809,20 @@ bool vncServer::IsUltraVncViewer()
 	return false;
 }
 
+bool vncServer::AreThereMultipleViewers()
+{
+	vncClientList::iterator i;
+	omni_mutex_lock l(m_clientsLock);
+	vncClient *pClient = NULL;
+	int a=0;
+	for (i = m_authClients.begin(); i != m_authClients.end(); i++)
+	{	
+		a++;
+	}
+	if (a<=1) return false;
+	else return true;
+}
+
 
 void
 vncServer::KillAuthClients()

@@ -1065,7 +1065,7 @@ void VNCOptions::Load(char *fname)
   m_fUseDSMPlugin =		readInt("UseDSMPlugin",		m_fUseDSMPlugin, fname) != 0;
   m_fUseProxy =			readInt("UseProxy",			m_fUseProxy, fname) != 0;
 
-  m_selected_screen=			readInt("selectedscreen",			m_selected_screen, fname) != 0;
+  m_selected_screen=			readInt("selectedscreen",			m_selected_screen, fname);
   GetPrivateProfileString("options", "DSMPlugin", "NoPlugin", m_szDSMPluginFilename, MAX_PATH, fname);
   if (!g_disable_sponsor) g_disable_sponsor=readInt("sponsor",			g_disable_sponsor, fname) != 0;
 

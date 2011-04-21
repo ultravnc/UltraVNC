@@ -2010,7 +2010,8 @@ void ClientConnection::NegotiateProtocolVersion()
 
 	//adzm 2009-06-21 - warn if we are trying to connect to an unencrypted server. but still allow it if desired.
 	//adzm 2010-05-10
-	if (m_fUsePlugin && fNotEncrypted /*&& !m_pIntegratedPluginInterface*/) {
+	//1096 !m_pIntegratedPluginInterface is NEEDED
+	if (m_fUsePlugin && fNotEncrypted && !m_pIntegratedPluginInterface) {
 
 		//adzm 2010-05-12
 		if (m_opts.m_fRequireEncryption) {
@@ -2372,7 +2373,7 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 
 	bool bSecureVNCPluginActive = std::find(current_auth.begin(), current_auth.end(), rfbUltraVNC_SecureVNCPluginAuth) != current_auth.end();
 	
-	if (!bSecureVNCPluginActive && m_fUsePlugin && m_pIntegratedPluginInterface && !authScheme != rfbConnFailed && authScheme != rfbUltraVNC_SecureVNCPluginAuth && authScheme != rfbUltraVNC) 
+	if (!bSecureVNCPluginActive && m_fUsePlugin && m_pIntegratedPluginInterface && authScheme != rfbConnFailed && authScheme != rfbUltraVNC_SecureVNCPluginAuth && authScheme != rfbUltraVNC) 
 	{
 		//adzm 2010-05-12
 		if (m_opts.m_fRequireEncryption) {
@@ -6427,8 +6428,18 @@ LRESULT CALLBACK ClientConnection::GTGBS_StatusProc(HWND hwnd, UINT iMsg, WPARAM
 					} else if (_this->m_pPluginInterface) {
 						SetDlgItemText(hwnd,IDC_PLUGIN_STATUS,"(plugin default encryption)");
 					} else {
-						SetDlgItemText(hwnd,IDC_PLUGIN_STATUS,"(no encryption)");
+						if (_this->m_opts.m_oldplugin)
+						{
+							if (_stricmp(_this->m_pDSMPlugin->GetPluginParams(), "NoPassword")) SetDlgItemText(hwnd,IDC_PLUGIN_STATUS,"(old plugin, rc4.key, encryption)");
+							else SetDlgItemText(hwnd,IDC_PLUGIN_STATUS,"(old plugin, encryption)");
+						}
+						else SetDlgItemText(hwnd,IDC_PLUGIN_STATUS,"(no encryption)");
 					}
+
+					//Problem, old plugins don't have xxPluginInterface
+					// they always say no encryption
+
+
 				}
 				else
 					SetDlgItemText(hwnd,IDC_STATUS,sz_L49);

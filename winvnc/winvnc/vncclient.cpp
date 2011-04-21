@@ -624,7 +624,7 @@ vncClientUpdateThread::run_undetached(void *arg)
 			// Render the mouse if required
 
 		if (updates_sent > 1 ) m_client->m_cursor_update_pending = m_client->m_encodemgr.WasCursorUpdatePending();
-		//if (updates_sent == 1 ) m_client->m_cursor_update_pending = true;
+		updates_sent++;
 
 		if (!m_client->m_cursor_update_sent && !m_client->m_cursor_update_pending) 
 			{
@@ -2023,7 +2023,8 @@ vncClientThread::run(void *arg)
 	// Modif sf@2002 - Scaling
 	{
 	omni_mutex_lock l(m_client->GetUpdateLock());
-	m_client->m_encodemgr.m_buffer->SetScale(m_server->GetDefaultScale()); // v1.1.2
+	if (m_server->AreThereMultipleViewers()==false)
+		m_client->m_encodemgr.m_buffer->SetScale(m_server->GetDefaultScale()); // v1.1.2
 	}
 	m_client->m_ScaledScreen = m_client->m_encodemgr.m_buffer->GetViewerSize();
 	m_client->m_nScale = m_client->m_encodemgr.m_buffer->GetScale();
@@ -2872,8 +2873,10 @@ vncClientThread::run(void *arg)
 		// Modif sf@2002 - Scaling
 		// Server Scaling Message received
 		case rfbPalmVNCSetScaleFactor:
-			m_client->m_fPalmVNCScaling = true;
+			if (m_server->AreThereMultipleViewers()==false)
+					m_client->m_fPalmVNCScaling = true;
 		case rfbSetScale: // Specific PalmVNC SetScaleFactor
+			// need to be ignored if multiple viewers are running, else buffer change on the fly and one of the viewers crash.
 			{
 			// m_client->m_fPalmVNCScaling = false;
 			// Read the rest of the message 
@@ -2893,7 +2896,7 @@ vncClientThread::run(void *arg)
 					break;
 				}
 			}
-
+			if (m_server->AreThereMultipleViewers()==true) break;
 			// Only accept reasonable scales...
 			if (msg.ssc.scale < 1 || msg.ssc.scale > 9) break;
 			m_client->m_nScale_viewer = msg.ssc.scale;

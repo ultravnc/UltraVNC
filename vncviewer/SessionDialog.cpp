@@ -306,8 +306,7 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 				{
 					_this->m_pDSMPlugin->LoadPlugin(szPlugin, _this->m_pOpt->m_listening);
 					if (strcmp(_this->m_pOpt->m_szDSMPluginFilename,"MSRC4Plugin.dsm")==NULL) _this->m_pOpt->m_oldplugin=true;
-					else _this->m_pOpt->m_oldplugin=false; 
-					if (strcmp(_this->m_pOpt->m_szDSMPluginFilename,"ARC4plugin.dsm")==NULL) _this->m_pOpt->m_oldplugin=true;
+					else if (strcmp(_this->m_pOpt->m_szDSMPluginFilename,"ARC4plugin.dsm")==NULL) _this->m_pOpt->m_oldplugin=true;
 					else _this->m_pOpt->m_oldplugin=false; 
 					if (_this->m_pDSMPlugin->IsLoaded())
 					{
@@ -348,8 +347,7 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 						// Load the new selected one
 						_this->m_pDSMPlugin->LoadPlugin(szPlugin, _this->m_pOpt->m_listening);
 						if (strcmp(_this->m_pOpt->m_szDSMPluginFilename,"MSRC4Plugin.dsm")==NULL) _this->m_pOpt->m_oldplugin=true;
-						else _this->m_pOpt->m_oldplugin=false; 
-						if (strcmp(_this->m_pOpt->m_szDSMPluginFilename,"ARC4plugin.dsm")==NULL) _this->m_pOpt->m_oldplugin=true;
+						else if (strcmp(_this->m_pOpt->m_szDSMPluginFilename,"ARC4plugin.dsm")==NULL) _this->m_pOpt->m_oldplugin=true;
 						else _this->m_pOpt->m_oldplugin=false;
 					}
 
@@ -505,8 +503,7 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 					// even mandatory for the plugin (specific params saving and so on...)
 					// The plugin receives environnement info but isn't inited at this point
 					if (strcmp(_this->m_pOpt->m_szDSMPluginFilename,"MSRC4Plugin.dsm")==NULL) _this->m_pOpt->m_oldplugin=true;
-					else _this->m_pOpt->m_oldplugin=false; 
-					if (strcmp(_this->m_pOpt->m_szDSMPluginFilename,"ARC4plugin.dsm")==NULL) _this->m_pOpt->m_oldplugin=true;
+					else if (strcmp(_this->m_pOpt->m_szDSMPluginFilename,"ARC4plugin.dsm")==NULL) _this->m_pOpt->m_oldplugin=true;
 					else _this->m_pOpt->m_oldplugin=false;
 					_this->m_pDSMPlugin->SetPluginParams(hwnd, szParams);
 				}
