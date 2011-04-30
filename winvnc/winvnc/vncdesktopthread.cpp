@@ -602,7 +602,7 @@ void vncDesktopThread::do_polling(HANDLE& threadHandle, rfb::Region2D& rgncache,
 
 	//if (cursormoved)
 	//	m_lLastMouseMoveTime = lTime;
-	
+	if (cursormoved) m_desktop->idle_counter=0;
 	if ((m_desktop->m_server->PollFullScreen() /*&& !cursormoved*/) || (!m_desktop->can_be_hooked && !cursormoved))
 	{
 		int timeSinceLastMouseMove = lTime - m_lLastMouseMoveTime;

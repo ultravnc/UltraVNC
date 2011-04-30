@@ -305,13 +305,16 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 				if (!_this->m_pDSMPlugin->IsLoaded())
 				{
 					_this->m_pDSMPlugin->LoadPlugin(szPlugin, _this->m_pOpt->m_listening);
-					if (strcmp(_this->m_pOpt->m_szDSMPluginFilename,"MSRC4Plugin.dsm")==NULL) _this->m_pOpt->m_oldplugin=true;
-					else if (strcmp(_this->m_pOpt->m_szDSMPluginFilename,"ARC4plugin.dsm")==NULL) _this->m_pOpt->m_oldplugin=true;
-					else _this->m_pOpt->m_oldplugin=false; 
 					if (_this->m_pDSMPlugin->IsLoaded())
 					{
 						if (_this->m_pDSMPlugin->InitPlugin())
 						{
+							char szDsmName[8]; //PGM
+							strncpy_s(szDsmName, _this->m_pDSMPlugin->GetPluginName(), 6); //PGM 
+							if (strcmp(szDsmName,"MS RC4")==NULL) //PGM
+								_this->m_pOpt->m_oldplugin=true; //PGM
+							else //PGM
+								_this->m_pOpt->m_oldplugin=false;
 							_this->m_pDSMPlugin->SetEnabled(true);
 							_this->m_pDSMPlugin->DescribePlugin();
 						}
@@ -346,15 +349,18 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 						_this->m_pDSMPlugin->UnloadPlugin();
 						// Load the new selected one
 						_this->m_pDSMPlugin->LoadPlugin(szPlugin, _this->m_pOpt->m_listening);
-						if (strcmp(_this->m_pOpt->m_szDSMPluginFilename,"MSRC4Plugin.dsm")==NULL) _this->m_pOpt->m_oldplugin=true;
-						else if (strcmp(_this->m_pOpt->m_szDSMPluginFilename,"ARC4plugin.dsm")==NULL) _this->m_pOpt->m_oldplugin=true;
-						else _this->m_pOpt->m_oldplugin=false;
 					}
 
 					if (_this->m_pDSMPlugin->IsLoaded())
 					{
 						if (_this->m_pDSMPlugin->InitPlugin())
 						{
+							char szDsmName[8]; //PGM
+							strncpy_s(szDsmName, _this->m_pDSMPlugin->GetPluginName(), 6); //PGM 
+							if (strcmp(szDsmName,"MS RC4")==NULL) //PGM
+								_this->m_pOpt->m_oldplugin=true; //PGM
+							else //PGM
+								_this->m_pOpt->m_oldplugin=false;
 							_this->m_pDSMPlugin->SetEnabled(true);
 							_this->m_pDSMPlugin->DescribePlugin();
 						}
@@ -502,9 +508,6 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 					// Knowing the environnement ("viewer") right now can be usefull or
 					// even mandatory for the plugin (specific params saving and so on...)
 					// The plugin receives environnement info but isn't inited at this point
-					if (strcmp(_this->m_pOpt->m_szDSMPluginFilename,"MSRC4Plugin.dsm")==NULL) _this->m_pOpt->m_oldplugin=true;
-					else if (strcmp(_this->m_pOpt->m_szDSMPluginFilename,"ARC4plugin.dsm")==NULL) _this->m_pOpt->m_oldplugin=true;
-					else _this->m_pOpt->m_oldplugin=false;
 					_this->m_pDSMPlugin->SetPluginParams(hwnd, szParams);
 				}
 				else

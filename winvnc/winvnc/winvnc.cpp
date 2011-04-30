@@ -126,7 +126,6 @@ void Reboot_with_force_reboot();
 //HACK to use name in autoreconnect from service with dyn dns
 char dnsname[255];
 
-
 // winvnc.exe will also be used for helper exe
 // This allow us to minimize the number of seperate exe
 bool
@@ -598,6 +597,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 		{
 			G_HTTP=true;
 			i+=strlen(winvnchttp);
+			continue;
+		}
+
+		if (strncmp(&szCmdLine[i], winvncStopReconnect, strlen(winvncStopReconnect)) == 0)
+		{
+			i+=strlen(winvncStopReconnect);
+			vncService::PostAddStopConnectClient();
 			continue;
 		}
 

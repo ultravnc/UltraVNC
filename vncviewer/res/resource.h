@@ -226,6 +226,8 @@
 #define IDC_MOUSE_THROTTLE              1165
 #define IDC_COMBO2                      1166
 #define IDC_SCREEN                      1166
+#define IDC_EDIT2                       1167
+#define IDC_SERVER_RECON_TIME           1167
 #define IDC_ENCODING_BASE               1999
 #define IDC_RAWRADIO                    2000
 #define IDC_RRERADIO                    2002
@@ -535,7 +537,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        210
 #define _APS_NEXT_COMMAND_VALUE         50025
-#define _APS_NEXT_CONTROL_VALUE         1167
+#define _APS_NEXT_CONTROL_VALUE         1168
 #define _APS_NEXT_SYMED_VALUE           154
 #endif
 #endif

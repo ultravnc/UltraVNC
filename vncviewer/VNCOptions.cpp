@@ -798,6 +798,15 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 		}
 		*/
 	}
+	else if (SwitchMatch(args[j], _T("reconnectcounter"))) 
+	{
+        if (++j == i) {
+            ArgError(_T("You must specify a reconnect counter number"));
+            PostQuitMessage(1);
+            continue;
+        }
+		_stscanf(args[j], _T("%d"), &m_reconnectcounter);
+	}
 	else if (SwitchMatch(args[j], _T("autoreconnect"))) 
 	{
         if (++j == i) {
@@ -990,7 +999,7 @@ void VNCOptions::Save(char *fname)
 
 
   WritePrivateProfileString("options", "DSMPlugin", m_szDSMPluginFilename, fname);
-  //saveInt("AutoReconnect", m_autoReconnect,	fname);
+  saveInt("AutoReconnect", m_autoReconnect,	fname);
  
   saveInt("ExitCheck",				m_fExitCheck,	fname); //PGM @ Advantig
   saveInt("FileTransferTimeout",    m_FTTimeout,    fname);
@@ -1086,7 +1095,7 @@ void VNCOptions::Load(char *fname)
 		}
   }
 
-  //m_autoReconnect =		readInt("AutoReconnect",	m_autoReconnect, fname) != 0;
+  m_autoReconnect =		readInt("AutoReconnect",	m_autoReconnect, fname);
   
   m_fExitCheck =		readInt("ExitCheck", m_fExitCheck,  fname) != 0; //PGM @ Advantig
   m_FTTimeout  = readInt("FileTransferTimeout", m_FTTimeout, fname);
@@ -1181,6 +1190,7 @@ void VNCOptions::ShowUsage(LPTSTR info) {
 			   "      [/askexit] [/user msuser] [/password clearpassword]\r\n" // Added silentexit //PGM@ Advantig.com
 			   "      [/nostatus] [/dsmplugin pluginfilename.dsm] [/autoscaling]\r\n"
 			   "      [/autoreconnect delayInSeconds]\r\n"
+			   "      [/reconnectcounter number_reconnect_attempt]\r\n"
 			   "      [/nohotkeys] [/proxy proxyhost [portnum]] [/256colors] [/64colors]\r\n"
 			   "      [/8colors] [/8greycolors] [/4greycolors] [/2greycolors]\r\n"
 			   "      [/encoding [zrle | zywrle | tight | zlib | zlibhex | ultra]]\r\n"
@@ -1355,6 +1365,9 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 		  if (_this->m_Shared)
 		  SetDlgItemInt( hwnd, IDC_SERVER_RECON, _this->m_reconnectcounter, FALSE);
 		  else SetDlgItemInt( hwnd, IDC_SERVER_RECON, 0, FALSE);
+		  if (_this->m_Shared)
+		  SetDlgItemInt( hwnd, IDC_SERVER_RECON_TIME, _this->m_autoReconnect, FALSE);
+		  else SetDlgItemInt( hwnd, IDC_SERVER_RECON_TIME, 0, FALSE);
 		  
 		  // Modif sf@2002 - Cache 
 		  HWND hCache = GetDlgItem(hwnd, ID_SESSION_SET_CACHE);
@@ -1537,6 +1550,9 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 			 if (_this->m_Shared)
 			  _this->m_reconnectcounter = GetDlgItemInt( hwnd, IDC_SERVER_RECON, NULL, TRUE);
 			 else _this->m_reconnectcounter=0;
+			 if (_this->m_Shared)
+			  _this->m_autoReconnect = GetDlgItemInt( hwnd, IDC_SERVER_RECON_TIME, NULL, TRUE);
+			 else _this->m_autoReconnect=0;
 
 
 			  

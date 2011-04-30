@@ -642,7 +642,7 @@ void ClientConnection::DoConnection()
 DWORD WINAPI ReconnectThreadProc(LPVOID lpParameter)
 {
 	ClientConnection *cc=(ClientConnection*)lpParameter;
-	Sleep( cc->m_autoReconnect * 2500 );
+	Sleep( cc->m_autoReconnect * 1000 );
 	try
 	{
 		cc->DoConnection();
@@ -1540,14 +1540,18 @@ void ClientConnection::LoadDSMPlugin(bool fForceReload)
 		if (!m_pDSMPlugin->IsLoaded())
 		{
 			m_pDSMPlugin->LoadPlugin(m_opts.m_szDSMPluginFilename, m_opts.m_listening);
-			if (strcmp(m_opts.m_szDSMPluginFilename,"MSRC4Plugin.dsm")==NULL) m_opts.m_oldplugin=true;
-			else m_opts.m_oldplugin=false; 
-			if (strcmp(m_opts.m_szDSMPluginFilename,"ARC4plugin.dsm")==NULL) m_opts.m_oldplugin=true;
-			else m_opts.m_oldplugin=false; 
 			if (m_pDSMPlugin->IsLoaded())
 			{
 				if (m_pDSMPlugin->InitPlugin())
 				{
+					//detect old_plugin
+					char szDsmName[8]; //PGM
+					strncpy_s(szDsmName, m_pDSMPlugin->GetPluginName(), 6); //PGM 
+					if (strcmp(szDsmName,"MS RC4")==NULL) //PGM
+					m_opts.m_oldplugin=true; //PGM
+					else //PGM
+					m_opts.m_oldplugin=false; //PGM
+
 					m_pDSMPlugin->SetEnabled(true);
 					m_pDSMPlugin->DescribePlugin();
 					/*
@@ -4301,6 +4305,7 @@ void* ClientConnection::run_undetached(void* arg) {
 	m_nServerScale = m_opts.m_nServerScale;
 
 	m_reconnectcounter = m_opts.m_reconnectcounter;
+	m_autoReconnect = m_opts.m_autoReconnect;
 	if (m_Is_Listening)m_reconnectcounter=0;
 	reconnectcounter = m_reconnectcounter;
 
@@ -6430,8 +6435,10 @@ LRESULT CALLBACK ClientConnection::GTGBS_StatusProc(HWND hwnd, UINT iMsg, WPARAM
 					} else {
 						if (_this->m_opts.m_oldplugin)
 						{
-							if (_stricmp(_this->m_pDSMPlugin->GetPluginParams(), "NoPassword")) SetDlgItemText(hwnd,IDC_PLUGIN_STATUS,"(old plugin, rc4.key, encryption)");
-							else SetDlgItemText(hwnd,IDC_PLUGIN_STATUS,"(old plugin, encryption)");
+							if (_stricmp(_this->m_pDSMPlugin->GetPluginParams(), "NoPassword")==0) 
+								SetDlgItemText(hwnd,IDC_PLUGIN_STATUS,"(old plugin, rc4.key, encryption)");
+							else 
+								SetDlgItemText(hwnd,IDC_PLUGIN_STATUS,"(old plugin, encryption)");
 						}
 						else SetDlgItemText(hwnd,IDC_PLUGIN_STATUS,"(no encryption)");
 					}

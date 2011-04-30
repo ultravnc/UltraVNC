@@ -353,7 +353,7 @@ void vncBuffer::CheckRect(rfb::Region2D &dest, rfb::Region2D &cacheRgn, const rf
 	ScaledRect.tl.y = ((srect.tl.y < 0)? 0: srect.tl.y) / m_nScale;
 
 	ScaledRect.br.x = ((srect.br.x < 0)? 0: srect.br.x) / m_nScale;
-	ScaledRect.br.y = ((srect.br.x < 0)? 0: srect.br.x) / m_nScale;
+	ScaledRect.br.y = ((srect.br.y < 0)? 0: srect.br.y) / m_nScale;
 
 	
 
