@@ -28,7 +28,8 @@
 #define STRICT
 #endif
 
-#define HTTP_SAMEPORT
+//compile special case, rfb port is used for java and rfb
+//#define HTTP_SAMEPORT
 
 #include <winsock2.h>
 #include <windows.h>
