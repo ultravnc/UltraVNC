@@ -170,7 +170,7 @@ VNCOptions::VNCOptions()
   m_quickoption = 1;				// sf@2002 - Auto Mode as default
   m_fUseDSMPlugin = false;
   m_oldplugin=false;
-  g_disable_sponsor= false;
+  //g_disable_sponsor= false;
   m_fUseProxy = false;
   m_selected_screen=1;
   m_szDSMPluginFilename[0] = '\0';

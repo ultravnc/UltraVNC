@@ -186,7 +186,7 @@ Myinit(HINSTANCE hInstance)
 	VSocketSystem socksys;
 	if (!socksys.Initialised())
 	{
-		MessageBox(NULL, sz_ID_FAILED_INIT, szAppName, MB_OK);
+		MessageBoxSecure(NULL, sz_ID_FAILED_INIT, szAppName, MB_OK);
 		return 0;
 	}
 	return 1;
@@ -216,6 +216,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 #ifdef CRASHRPT
 	Install(NULL, _T("ultravnc@skynet.be"), _T(""));
 #endif
+	bool Injected_autoreconnect=false;
 	SPECIAL_SC_EXIT=false;
 	SPECIAL_SC_PROMPT=false;
 	SetOSVersion();
@@ -286,7 +287,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 	VSocketSystem socksys;
 	if (!socksys.Initialised())
 	{
-		MessageBox(NULL, sz_ID_FAILED_INIT, szAppName, MB_OK);
+		MessageBoxSecure(NULL, sz_ID_FAILED_INIT, szAppName, MB_OK);
 		return 0;
 	}
     // look up the current service name in the registry.
@@ -603,7 +604,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 		if (strncmp(&szCmdLine[i], winvncStopReconnect, strlen(winvncStopReconnect)) == 0)
 		{
 			i+=strlen(winvncStopReconnect);
-			vncService::PostAddStopConnectClient();
+			vncService::PostAddStopConnectClientAll();
 			continue;
 		}
 
@@ -613,7 +614,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 			// on the command line !
 			// wa@2005 -- added support for the AutoReconnectId
 			i+=strlen(winvncAutoReconnect);
-
+			Injected_autoreconnect=true;
 			int start, end;
 			char* pszId = NULL;
 			start = i;
@@ -696,6 +697,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 
 		if (strncmp(&szCmdLine[i], winvncConnect, strlen(winvncConnect)) == 0)
 		{
+			if (!Injected_autoreconnect)
+			{
+				vncService::PostAddStopConnectClient();
+			}
 			// Add a new client to an existing copy of winvnc
 			i+=strlen(winvncConnect);
 
@@ -826,7 +831,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 		// Either the user gave the -help option or there is something odd on the cmd-line!
 
 		// Show the usage dialog
-		MessageBox(NULL, winvncUsageText, sz_ID_WINVNC_USAGE, MB_OK | MB_ICONINFORMATION);
+		MessageBoxSecure(NULL, winvncUsageText, sz_ID_WINVNC_USAGE, MB_OK | MB_ICONINFORMATION);
 		break;
 	};
 
@@ -1025,7 +1030,7 @@ int WinVNCAppMain()
     		vnclog.Print(LL_INTINFO, VNCLOG("%s -- exiting\n"), sz_ID_ANOTHER_INST);
 			// We don't allow multiple instances!
 			if (!fRunningFromExternalService)
-				MessageBox(NULL, sz_ID_ANOTHER_INST, szAppName, MB_OK);
+				MessageBoxSecure(NULL, sz_ID_ANOTHER_INST, szAppName, MB_OK);
 			return 0;
 		}
 	}

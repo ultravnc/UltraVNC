@@ -816,7 +816,12 @@ vncClientThread::Init(vncClient *client, vncServer *server, VSocket *socket, BOO
 	m_auth = auth;
 	m_shared = shared;
 	m_autoreconnectcounter_quit=false;
+	m_client->m_Autoreconnect=m_server->AutoReconnect();
+	m_server->AutoReconnect(false);
 
+	m_AutoReconnectPort=m_server->AutoReconnectPort();
+	strcpy(m_szAutoReconnectAdr,m_server->AutoReconnectAdr());
+	strcpy(m_szAutoReconnectId,m_server->AutoReconnectId());
 	// Start the thread
 	start();
 
@@ -1890,7 +1895,7 @@ bool vncClientThread::InitSocket()
 
 bool vncClientThread::TryReconnect()
 {
-	if (fShutdownOrdered || m_server->AutoReconnect() || !m_client->GetHost() || !m_client->GetRepeaterID()) {
+	if (fShutdownOrdered || m_client->m_Autoreconnect || !m_client->GetHost() || !m_client->GetRepeaterID()) {
 		return false;
 	}
 
@@ -1982,7 +1987,7 @@ vncClientThread::run(void *arg)
 		m_server->RemoveClient(m_client->GetClientId());
 		
 		// wa@2005 - AutoReconnection attempt if required
-		if (m_server->AutoReconnect())
+		if (m_client->m_Autoreconnect)
 		{
 			for (int i=0;i<10*m_server->AutoReconnect_counter;i++)
 			{
@@ -1992,6 +1997,11 @@ vncClientThread::run(void *arg)
 			m_server->AutoReconnect_counter+=10;
 			if (m_server->AutoReconnect_counter>1800) m_server->AutoReconnect_counter=1800;
 			vnclog.Print(LL_INTERR, VNCLOG("PostAddNewClient I\n"));
+			m_server->AutoReconnect(m_client->m_Autoreconnect);
+			m_server->AutoReconnectPort(m_AutoReconnectPort);
+			m_server->AutoReconnectAdr(m_szAutoReconnectAdr);
+			m_server->AutoReconnectId(m_szAutoReconnectId);
+
 			vncService::PostAddNewClient(1111, 1111);
 		}
 
@@ -2942,20 +2952,21 @@ vncClientThread::run(void *arg)
 		#endif
                 // only allow change if this is the client that originally changed the input state
 				/// fix by PGM (pgmoney)
-				if (!m_server->GetDesktopPointer()->GetBlockInputState() && !m_client->m_bClientHasBlockedInput && msg.sim.status==1) 
+				if (!m_server->GetDesktopPointer()->GetBlockInputState() && msg.sim.status==1) 
 					{ 
 						CARD32 state = rfbServerState_Enabled; 
 						m_client->m_encodemgr.m_buffer->m_desktop->SetBlockInputState(true); 
 						m_client->m_bClientHasBlockedInput = (true);
 					} 
-				if (m_server->GetDesktopPointer()->GetBlockInputState() && m_client->m_bClientHasBlockedInput && msg.sim.status==0)
+
+				else if (m_server->GetDesktopPointer()->GetBlockInputState() && m_client->m_bClientHasBlockedInput && msg.sim.status==0)
 					{
 						CARD32 state = rfbServerState_Disabled; 
 						m_client->m_encodemgr.m_buffer->m_desktop->SetBlockInputState(FALSE);
 						m_client->m_bClientHasBlockedInput = (FALSE); 
 					} 
 
-				if (!m_server->GetDesktopPointer()->GetBlockInputState() && !m_client->m_bClientHasBlockedInput && msg.sim.status==0)
+				else if (!m_server->GetDesktopPointer()->GetBlockInputState() && !m_client->m_bClientHasBlockedInput && msg.sim.status==0)
 					{
 						CARD32 state = rfbServerState_Disabled; 
 						m_client->m_encodemgr.m_buffer->m_desktop->SetBlockInputState(FALSE);
@@ -3029,7 +3040,7 @@ vncClientThread::run(void *arg)
 						// Read in the Name of the file to create
 						if (!m_socket->ReadExact(m_client->m_szFullDestName, length)) 
 						{
-							//MessageBox(NULL, "1. Abort !", "Ultra WinVNC", MB_OK);
+							//MessageBoxSecure(NULL, "1. Abort !", "Ultra WinVNC", MB_OK);
 							// vnclog.Print(LL_INTINFO, VNCLOG("*** FileTransfer: Failed to receive FileName from Viewer. Abort !\n"));
 							break;
 						}
@@ -3040,7 +3051,7 @@ vncClientThread::run(void *arg)
 						CARD32 sizeHtmp = 0;
 						if (!m_socket->ReadExact((char*)&sizeHtmp, sizeof(CARD32)))
 						{
-							//MessageBox(NULL, "2. Abort !", "Ultra WinVNC", MB_OK);
+							//MessageBoxSecure(NULL, "2. Abort !", "Ultra WinVNC", MB_OK);
 							//vnclog.Print(LL_INTINFO, VNCLOG("*** FileTransfer: Failed to receive SizeH from Viewer. Abort !\n"));
 							break;
 						}
@@ -3180,7 +3191,7 @@ vncClientThread::run(void *arg)
 								m_client->m_pBuff = NULL;
 							}
 
-							//MessageBox(NULL, "3. Abort !", "Ultra WinVNC", MB_OK);
+							//MessageBoxSecure(NULL, "3. Abort !", "Ultra WinVNC", MB_OK);
 							//vnclog.Print(LL_INTINFO, VNCLOG("*** FileTransfer: Wrong Dest File size. Abort !\n"));
                             m_client->FTDownloadFailureHook();
 							break;
@@ -3212,7 +3223,7 @@ vncClientThread::run(void *arg)
 						// Read in the Name of the file to create
 						if (!m_socket->ReadExact(m_client->m_szSrcFileName, length))
 						{
-							//MessageBox(NULL, "4. Abort !", "Ultra WinVNC", MB_OK);
+							//MessageBoxSecure(NULL, "4. Abort !", "Ultra WinVNC", MB_OK);
 							//vnclog.Print(LL_INTINFO, VNCLOG("*** FileTransfer: Cannot read requested filename. Abort !\n"));
 							break;
 						}
@@ -3225,7 +3236,7 @@ vncClientThread::run(void *arg)
 						int nDirZipRet = m_client->ZipPossibleDirectory(m_client->m_szSrcFileName);
 						if (nDirZipRet == -1)
 						{
-							//MessageBox(NULL, "5. Abort !", "Ultra WinVNC", MB_OK);
+							//MessageBoxSecure(NULL, "5. Abort !", "Ultra WinVNC", MB_OK);
 							//vnclog.Print(LL_INTINFO, VNCLOG("*** FileTransfer: Failed to zip requested dir. Abort !\n"));
 
 							//	[v1.0.2-jp1 fix] Empty directory receive problem
@@ -3341,7 +3352,7 @@ vncClientThread::run(void *arg)
 						// delete [] szSrcFileName;
 						if (n2SrcSize.LowPart == 0xFFFFFFFF && n2SrcSize.HighPart == 0xFFFFFFFF)
 						{
-							//MessageBox(NULL, "6. Abort !", "Ultra WinVNC", MB_OK);
+							//MessageBoxSecure(NULL, "6. Abort !", "Ultra WinVNC", MB_OK);
 							//vnclog.Print(LL_INTINFO, VNCLOG("*** FileTransfer: Wrong Src File size. Abort !\n"));
                             m_client->FTUploadFailureHook();
 							break; // If error, we don't send anything else
@@ -3365,7 +3376,7 @@ vncClientThread::run(void *arg)
 						{
 							helper::close_handle(m_client->m_hSrcFile);
                             m_client->FTUploadFailureHook();
-							// MessageBox(NULL, "7. Abort !", "Ultra WinVNC", MB_OK);
+							// MessageBoxSecure(NULL, "7. Abort !", "Ultra WinVNC", MB_OK);
 							//vnclog.Print(LL_INTINFO, VNCLOG("*** FileTransfer: File not created on client side. Abort !\n"));
 							break;
 						}
@@ -3375,7 +3386,7 @@ vncClientThread::run(void *arg)
 						if (m_client->m_pBuff == NULL)
 						{
 							helper::close_handle(m_client->m_hSrcFile);
-							//MessageBox(NULL, "8. Abort !", "Ultra WinVNC", MB_OK);
+							//MessageBoxSecure(NULL, "8. Abort !", "Ultra WinVNC", MB_OK);
 							//vnclog.Print(LL_INTINFO, VNCLOG("*** FileTransfer: rfbFileHeader - Unable to allocate buffer. Abort !\n"));
                             m_client->FTUploadFailureHook();
 							break;
@@ -3391,7 +3402,7 @@ vncClientThread::run(void *arg)
 								delete [] m_client->m_pBuff;
 								m_client->m_pBuff = NULL;
 							}
-							//MessageBox(NULL, "9. Abort !", "Ultra WinVNC", MB_OK);
+							//MessageBoxSecure(NULL, "9. Abort !", "Ultra WinVNC", MB_OK);
 							//vnclog.Print(LL_INTINFO, VNCLOG("*** FileTransfer: rfbFileHeader - Unable to allocate comp. buffer. Abort !\n"));
                             m_client->FTUploadFailureHook();
 							break;
@@ -3994,9 +4005,13 @@ vncClientThread::run(void *arg)
 
 	// sf@2003 - AutoReconnection attempt if required
 	if (!fShutdownOrdered) {
-		if (m_server->AutoReconnect())
+		if (m_client->m_Autoreconnect)
 		{
 			vnclog.Print(LL_INTERR, VNCLOG("PostAddNewClient II\n"));
+			m_server->AutoReconnect(m_client->m_Autoreconnect);
+			m_server->AutoReconnectPort(m_AutoReconnectPort);
+			m_server->AutoReconnectAdr(m_szAutoReconnectAdr);
+			m_server->AutoReconnectId(m_szAutoReconnectId);
 			vncService::PostAddNewClient(1111, 1111);
 		}
 	}
@@ -4775,6 +4790,10 @@ vncClient::SendRectangle(const rfb::Rect &rect)
 		// m_socket->CheckNetRectBufferSize((int)(m_encodemgr.GetClientBuffSize() * 2));
 		m_socket->CheckNetRectBufferSize((int)(m_encodemgr.m_buffer->m_desktop->ScreenBuffSize() * 3 / 2));
 		UINT bytes = m_encodemgr.EncodeRect(ScaledRect, m_socket);
+		if (bytes == 0)
+		{
+			return true;
+		}
 		m_socket->SetWriteToNetRectBuffer(false);
 
 		BYTE* pDataBuffer = NULL;
@@ -4784,6 +4803,13 @@ vncClient::SendRectangle(const rfb::Rect &rect)
 		if (m_socket->GetNetRectBufOffset() > 0)
 		{
 			TheSize = m_socket->GetNetRectBufOffset();
+#ifdef _DEBUG
+					char			szText[256];
+					DWORD error=GetLastError();
+					sprintf(szText," ++++++ crashtest TheSize %i \n",TheSize);
+					SetLastError(0);
+					OutputDebugString(szText);		
+	#endif
 			m_socket->SetNetRectBufOffset(0);
 			pDataBuffer = m_socket->GetNetRectBuf();
 			// Add the rest to the data buffer if it exists
@@ -4795,6 +4821,13 @@ vncClient::SendRectangle(const rfb::Rect &rect)
 		else // If all data was stored in m_clientbuffer
 		{
 			TheSize = bytes;
+#ifdef _DEBUG
+					char			szText[256];
+					DWORD error=GetLastError();
+					sprintf(szText," ++++++ crashtest TheSize2 %i \n",TheSize);
+					SetLastError(0);
+					OutputDebugString(szText);		
+	#endif
 			bytes = 0;
 			pDataBuffer = m_encodemgr.GetClientBuffer();
 		}
@@ -4804,6 +4837,13 @@ vncClient::SendRectangle(const rfb::Rect &rect)
 
 		// Send the size of the following rects data buffer
 		CARD32 Size = (CARD32)(TheSize + bytes - sz_rfbFramebufferUpdateRectHeader);
+#ifdef _DEBUG
+					char			szText[256];
+					DWORD error=GetLastError();
+					sprintf(szText," ++++++ crashtest Size %i %i\n",Size,bytes);
+					SetLastError(0);
+					OutputDebugString(szText);		
+	#endif
 		Size = Swap32IfLE(Size);
 		m_socket->SendExactQueue((char*)&Size, sizeof(CARD32));
 		// Send the data buffer

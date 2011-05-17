@@ -1545,9 +1545,7 @@ void ClientConnection::LoadDSMPlugin(bool fForceReload)
 				if (m_pDSMPlugin->InitPlugin())
 				{
 					//detect old_plugin
-					char szDsmName[8]; //PGM
-					strncpy_s(szDsmName, m_pDSMPlugin->GetPluginName(), 6); //PGM 
-					if (strcmp(szDsmName,"MS RC4")==NULL) //PGM
+					if (!m_pDSMPlugin->SupportsMultithreaded()) //PGM
 					m_opts.m_oldplugin=true; //PGM
 					else //PGM
 					m_opts.m_oldplugin=false; //PGM

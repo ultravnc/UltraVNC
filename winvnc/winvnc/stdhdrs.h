@@ -28,6 +28,8 @@
 #define STRICT
 #endif
 
+#define HTTP_SAMEPORT
+
 #include <winsock2.h>
 #include <windows.h>
 #include <shellapi.h>
@@ -81,3 +83,4 @@ extern VNCLog vnclog;
 //#endif
 //#define memcpy memcpy_amd
 //remove comment to compiler for >=athlon  or >=PIII
+DWORD MessageBoxSecure(HWND hWnd,LPCTSTR lpText,LPCTSTR lpCaption,UINT uType);

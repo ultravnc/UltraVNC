@@ -309,12 +309,11 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 					{
 						if (_this->m_pDSMPlugin->InitPlugin())
 						{
-							char szDsmName[8]; //PGM
-							strncpy_s(szDsmName, _this->m_pDSMPlugin->GetPluginName(), 6); //PGM 
-							if (strcmp(szDsmName,"MS RC4")==NULL) //PGM
+							if (!_this->m_pDSMPlugin->SupportsMultithreaded())
 								_this->m_pOpt->m_oldplugin=true; //PGM
 							else //PGM
 								_this->m_pOpt->m_oldplugin=false;
+
 							_this->m_pDSMPlugin->SetEnabled(true);
 							_this->m_pDSMPlugin->DescribePlugin();
 						}
@@ -355,9 +354,7 @@ BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam
 					{
 						if (_this->m_pDSMPlugin->InitPlugin())
 						{
-							char szDsmName[8]; //PGM
-							strncpy_s(szDsmName, _this->m_pDSMPlugin->GetPluginName(), 6); //PGM 
-							if (strcmp(szDsmName,"MS RC4")==NULL) //PGM
+							if (!_this->m_pDSMPlugin->SupportsMultithreaded())
 								_this->m_pOpt->m_oldplugin=true; //PGM
 							else //PGM
 								_this->m_pOpt->m_oldplugin=false;

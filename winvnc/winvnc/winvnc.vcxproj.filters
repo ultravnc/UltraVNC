@@ -515,5 +515,19 @@
     </None>
     <None Include="VTune\winvnc.vpj" />
     <None Include="res\ftpframe$strcomp.class" />
+    <None Include="res\mslogon\AuthPanel.class" />
+    <None Include="res\mslogon\ButtonPanel.class" />
+    <None Include="res\mslogon\ClipboardFrame.class" />
+    <None Include="res\mslogon\DesCipher.class" />
+    <None Include="res\mslogon\DH.class" />
+    <None Include="res\mslogon\FTPFrame$StrComp.class" />
+    <None Include="res\mslogon\FTPFrame.class" />
+    <None Include="res\mslogon\OptionsFrame.class" />
+    <None Include="res\mslogon\RecordingFrame.class" />
+    <None Include="res\mslogon\RfbProto.class" />
+    <None Include="res\mslogon\SessionRecorder.class" />
+    <None Include="res\mslogon\VncCanvas.class" />
+    <None Include="res\mslogon\VncViewer.jar" />
+    <None Include="res\mslogon\VncViewer.class" />
   </ItemGroup>
 </Project>

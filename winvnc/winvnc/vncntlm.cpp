@@ -505,7 +505,7 @@ int CheckUserGroupPasswordUni(char * userin,char *password,const char *machine)
 		} else {
 			LPCTSTR sz_ID_AUTHSSP_NOT_FO = // to be moved to localization.h
 				"You selected ms-logon, but authSSP.dll\nwas not found.Check you installation";
-			MessageBox(NULL, sz_ID_AUTHSSP_NOT_FO, sz_ID_WARNING, MB_OK);
+			MessageBoxSecure(NULL, sz_ID_AUTHSSP_NOT_FO, sz_ID_WARNING, MB_OK);
 		}
 	} else 
 		result = CheckUserGroupPasswordUni2(userin, password, machine);
@@ -580,6 +580,35 @@ int CheckUserGroupPasswordUni2(char * userin,char *password,const char *machine)
 	// Group is not used...admin access rights is needed
 	// MS keep changes there security model for each version....
 	//////////////////////////////////////////////////
+////////////////////////////////////////////////////
+if (strcmp(pszgroup1,"")==0 && strcmp(pszgroup2,"")==0 && strcmp(pszgroup3,"")==0)
+	if ( NT4OS || W2KOS){
+		char szCurrentDir[MAX_PATH];
+		if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
+		{
+			char* p = strrchr(szCurrentDir, '\\');
+			if (p == NULL) return false;
+			*p = '\0';
+			strcat (szCurrentDir,"\\authadmin.dll");
+		}
+		HMODULE hModule = LoadLibrary(szCurrentDir);
+		if (hModule)
+			{
+				CheckUserGroupPassword = (CheckUserGroupPasswordFn) GetProcAddress( hModule, "CUGP" );
+				HRESULT hr = CoInitialize(NULL);
+				result=CheckUserGroupPassword(userin,password,clientname,pszgroup1,locdom1);
+				CoUninitialize();
+				FreeLibrary(hModule);
+			}
+		else 
+			{
+				MessageBoxSecure(NULL, "authadmin.dll not found", sz_ID_WARNING, MB_OK);
+				result=0;
+			}
+
+	}
+	if (result==1) goto accessOK;
+
 if (strcmp(pszgroup1,"")!=0)
 {
 	
@@ -605,30 +634,11 @@ if (strcmp(pszgroup1,"")!=0)
 				CoUninitialize();
 				FreeLibrary(hModule);
 			}
-		else MessageBox(NULL, sz_ID_AUTH_NOT_FO, sz_ID_WARNING, MB_OK);
-
-	}
-	if (result==1) goto accessOK;
-	////////////////////////////////////////////////////
-	if ( NT4OS || W2KOS){
-		char szCurrentDir[MAX_PATH];
-		if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
-		{
-			char* p = strrchr(szCurrentDir, '\\');
-			if (p == NULL) return false;
-			*p = '\0';
-			strcat (szCurrentDir,"\\authadmin.dll");
-		}
-		HMODULE hModule = LoadLibrary(szCurrentDir);
-		if (hModule)
+		else
 			{
-				CheckUserGroupPassword = (CheckUserGroupPasswordFn) GetProcAddress( hModule, "CUGP" );
-				HRESULT hr = CoInitialize(NULL);
-				result=CheckUserGroupPassword(userin,password,clientname,pszgroup1,locdom1);
-				CoUninitialize();
-				FreeLibrary(hModule);
+				MessageBoxSecure(NULL, "workgrpdomnt4.dll not found", sz_ID_WARNING, MB_OK);
+				result=0;
 			}
-		else MessageBox(NULL, sz_ID_AUTH_NOT_FO, sz_ID_WARNING, MB_OK);
 
 	}
 	if (result==1) goto accessOK;
@@ -652,6 +662,11 @@ if (strcmp(pszgroup1,"")!=0)
 				CoUninitialize();
 				FreeLibrary(hModule);
 			}
+		else 
+			{
+				MessageBoxSecure(NULL, "ldapauth.dll not found", sz_ID_WARNING, MB_OK);
+				result=0;
+			}
 	}
 	if (result==1) goto accessOK;
 	//////////////////////////////////////////////////////////////////////
@@ -674,6 +689,11 @@ if (strcmp(pszgroup1,"")!=0)
 				CoUninitialize();
 				FreeLibrary(hModule);
 			}
+		else 
+			{
+				MessageBoxSecure(NULL, "ldapauthnt4.dll not found", sz_ID_WARNING, MB_OK);
+				result=0;
+			}
 	}
 	if (result==1) goto accessOK;
 	//////////////////////////////////////////////////////////////////////
@@ -695,6 +715,11 @@ if (strcmp(pszgroup1,"")!=0)
 				result=CheckUserGroupPassword(userin,password,clientname,pszgroup1,locdom1);
 				CoUninitialize();
 				FreeLibrary(hModule);
+			}
+		else 
+			{
+				MessageBoxSecure(NULL, "ldapauth9x.dll not found", sz_ID_WARNING, MB_OK);
+				result=0;
 			}
 	}
 	if (result==1) goto accessOK;
@@ -724,7 +749,11 @@ if (strcmp(pszgroup2,"")!=0)
 				CoUninitialize();
 				FreeLibrary(hModule);
 			}
-		else MessageBox(NULL, sz_ID_AUTH_NOT_FO, sz_ID_WARNING, MB_OK);
+		else 
+			{
+				MessageBoxSecure(NULL, "workgrpdomnt4.dll not found", sz_ID_WARNING, MB_OK);
+				result=0;
+			}
 
 	}
 	if (result==1) goto accessOK;
@@ -747,7 +776,11 @@ if (strcmp(pszgroup2,"")!=0)
 				CoUninitialize();
 				FreeLibrary(hModule);
 			}
-		else MessageBox(NULL, sz_ID_AUTH_NOT_FO, sz_ID_WARNING, MB_OK);
+		else 
+			{
+				MessageBoxSecure(NULL, "authadmin.dll not found", sz_ID_WARNING, MB_OK);
+				result=0;
+			}
 
 	}
 	if (result==1) goto accessOK;
@@ -771,6 +804,11 @@ if (strcmp(pszgroup2,"")!=0)
 				CoUninitialize();
 				FreeLibrary(hModule);
 			}
+		else 
+			{
+				MessageBoxSecure(NULL, "ldapauth.dll not found", sz_ID_WARNING, MB_OK);
+				result=0;
+			}
 	}
 	if (result==1) goto accessOK;
 	///////////////////////////////////////////////////////////////////////
@@ -793,6 +831,11 @@ if (strcmp(pszgroup2,"")!=0)
 				CoUninitialize();
 				FreeLibrary(hModule);
 			}
+		else 
+			{
+				MessageBoxSecure(NULL, "ldapauthnt4.dll not found", sz_ID_WARNING, MB_OK);
+				result=0;
+			}
 	}
 	if (result==1) goto accessOK;
 	///////////////////////////////////////////////////////////////////////
@@ -814,6 +857,11 @@ if (strcmp(pszgroup2,"")!=0)
 				result=CheckUserGroupPassword(userin,password,clientname,pszgroup2,locdom2);
 				CoUninitialize();
 				FreeLibrary(hModule);
+			}
+		else 
+			{
+				MessageBoxSecure(NULL, "ldapauth9x.dll not found", sz_ID_WARNING, MB_OK);
+				result=0;
 			}
 	}
 	if (result==1) goto accessOK;
@@ -843,7 +891,11 @@ if (strcmp(pszgroup3,"")!=0)
 				CoUninitialize();
 				FreeLibrary(hModule);
 			}
-		else MessageBox(NULL, sz_ID_AUTH_NOT_FO, sz_ID_WARNING, MB_OK);
+		else 
+			{
+				MessageBoxSecure(NULL, "workgrpdomnt4.dll not found", sz_ID_WARNING, MB_OK);
+				result=0;
+			}
 
 	}
 	if (result==1) goto accessOK;
@@ -866,7 +918,11 @@ if (strcmp(pszgroup3,"")!=0)
 				CoUninitialize();
 				FreeLibrary(hModule);
 			}
-		else MessageBox(NULL, sz_ID_AUTH_NOT_FO, sz_ID_WARNING, MB_OK);
+		else 
+			{
+				MessageBoxSecure(NULL, "authadmin.dll not found", sz_ID_WARNING, MB_OK);
+				result=0;
+			}
 
 	}
 	if (result==1) goto accessOK;
@@ -890,6 +946,11 @@ if (strcmp(pszgroup3,"")!=0)
 				CoUninitialize();
 				FreeLibrary(hModule);
 			}
+		else 
+			{
+				MessageBoxSecure(NULL, "ldapauth.dll not found", sz_ID_WARNING, MB_OK);
+				result=0;
+			}
 	}
 	if (result==1) goto accessOK;
 	///////////////////////////////////////////////////////////////////
@@ -912,6 +973,11 @@ if (strcmp(pszgroup3,"")!=0)
 				CoUninitialize();
 				FreeLibrary(hModule);
 			}
+		else 
+			{
+				MessageBoxSecure(NULL, "ldapauthnt4.dll not found", sz_ID_WARNING, MB_OK);
+				result=0;
+			}
 		}
 		if (result==1) goto accessOK2;
 		///////////////////////////////////////////////////////////////////
@@ -933,6 +999,11 @@ if (strcmp(pszgroup3,"")!=0)
 				result=CheckUserGroupPassword(userin,password,clientname,pszgroup3,locdom3);
 				CoUninitialize();
 				FreeLibrary(hModule);
+			}
+		else 
+			{
+				MessageBoxSecure(NULL, "ldapauth9x.dll not found", sz_ID_WARNING, MB_OK);
+				result=0;
 			}
 		}
 		if (result==1) goto accessOK2;
