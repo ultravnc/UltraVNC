@@ -751,6 +751,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 						PostAddNewClient_bool=true;
 						port_int=0;
 						address_vcard=0;
+						Sleep(2000);
+						Beep(200,1000);
+						return 0;
 					}
 				}
 				i=end;
