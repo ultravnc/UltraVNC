@@ -20,10 +20,9 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the VNC system is not available from the place 
+// If the source code for the VNC system is not available from the place
 // whence you received this file, check http://www.uk.research.att.com/vnc or contact
 // the authors on vnc@uk.research.att.com for information on obtaining it.
-
 
 // ScrBuffer implementation
 
@@ -95,11 +94,10 @@ vncBuffer::~vncBuffer()
 	}
 	m_ScaledSize = 0;
 
-
 	m_backbuffsize = 0;
 }
 
-BOOL 
+BOOL
 vncBuffer::SetDesktop(vncDesktop *desktop)
 {
 	// Called from vncdesktop startup
@@ -117,11 +115,10 @@ try
 		return m_desktop->GetSize();
 	}
 	catch (...)
-	{	
+	{
 		//return rfb::Rect(0, 0, m_scrinfo.framebufferWidth, m_scrinfo.framebufferHeight);
 		return rfb::Rect(0, 0, 0, 0);
 	}
-
 }
 
 // Modif sf@2002 - Scaling
@@ -129,7 +126,6 @@ UINT vncBuffer::GetScale()
 {
 	return m_nScale;
 }
-
 
 BOOL vncBuffer::SetScale(int nScale)
 {
@@ -160,10 +156,9 @@ BOOL vncBuffer::SetScale(int nScale)
 		ZeroMemory(m_ScaledBuff, m_desktop->ScreenBuffSize());
 		ZeroMemory(m_backbuff, m_desktop->ScreenBuffSize());
 	}
-	
+
 	return TRUE;
 }
-
 
 rfb::Rect vncBuffer::GetViewerSize()
 {
@@ -171,7 +166,6 @@ rfb::Rect vncBuffer::GetViewerSize()
 	rect=m_desktop->GetSize();
 	return rfb::Rect(rect.tl.x,rect.tl.y, rect.br.x / m_nScale, rect.br.y / m_nScale);
 }
-
 
 rfbPixelFormat
 vncBuffer::GetLocalFormat()
@@ -208,7 +202,7 @@ vncBuffer::CheckBuffer()
 
 		// Check whether or not the vncDesktop is using fast blits
 		// Modif rdv@2002 - v1.1.x - Videodriver
-		
+
 		m_mainbuff = (BYTE *)m_desktop->OptimisedBlitBuffer();
 		if (m_mainbuff) {
 			// Prevent us from freeing the DIBsection buffer
@@ -258,7 +252,7 @@ vncBuffer::CheckBuffer()
 		// Problem, driver buffer is not writable
 		// so we always need a m_scalednuff
 		/// If scale==1 we don't need to allocate the memory
-		/*if (m_nScale > 1) 
+		/*if (m_nScale > 1)
 		{*/
             if (m_ScaledSize != m_desktop->ScreenBuffSize())
             {
@@ -288,7 +282,6 @@ vncBuffer::CheckBuffer()
 
 		if (m_nScale > 1) */
 			memcpy(m_ScaledBuff, m_mainbuff, m_desktop->ScreenBuffSize());
-
 	}
 
 	vnclog.Print(LL_INTINFO, VNCLOG("local buffer=%d\n"), m_backbuffsize);
@@ -296,10 +289,9 @@ vncBuffer::CheckBuffer()
 	return TRUE;
 }
 
-
 // Modif sf@2002 - v1.1.0
 //
-// Set the accuracy divider factor 
+// Set the accuracy divider factor
 // that is utilized in the GetChangedRegion function
 // for changes detection in Rectangles.
 // The higher the value the less accuracy.
@@ -323,7 +315,6 @@ bool vncBuffer::VideDriverUsed()
 	return m_videodriverused;
 }
 
-
 // Check a specified rectangle for changes and fill the region with
 // the changed subrects
 //#pragma function(memcpy,Save_memcmp)
@@ -336,7 +327,7 @@ void vncBuffer::CheckRect(rfb::Region2D &dest, rfb::Region2D &cacheRgn, const rf
 					DWORD error=GetLastError();
 					sprintf(szText,"CheckRect ++++++++++++++++ %i %i %i %i  \n",srcrect.tl.x,srcrect.br.x,srcrect.tl.y,srcrect.br.y);
 					SetLastError(0);
-					OutputDebugString(szText);		
+					OutputDebugString(szText);
 #endif*/
 	//only called from desktopthread
 	if (!FastCheckMainbuffer())
@@ -355,9 +346,6 @@ void vncBuffer::CheckRect(rfb::Region2D &dest, rfb::Region2D &cacheRgn, const rf
 	ScaledRect.br.x = ((srect.br.x < 0)? 0: srect.br.x) / m_nScale;
 	ScaledRect.br.y = ((srect.br.y < 0)? 0: srect.br.y) / m_nScale;
 
-	
-
-
 	int x, y;
 	UINT ay, by;
 
@@ -373,13 +361,13 @@ void vncBuffer::CheckRect(rfb::Region2D &dest, rfb::Region2D &cacheRgn, const rf
 	// Problem, driver buffer is not writable
 	// so we always need a m_scalednuff
 	unsigned char *TheBuffer;
-	if (m_nScale == 1 && !m_videodriverused)
+	if (m_nScale == 1 && !m_videodriverused && !m_fGreyPalette )
 		TheBuffer = m_mainbuff;
 	else
 		TheBuffer = m_ScaledBuff;
 
 	// sf@2004 - Optimization (attempt...)
-	int nOptimizedBlockSize; 
+	int nOptimizedBlockSize;
 	bool fSmallRect = false;
 	if (ScaledRect.br.x - ScaledRect.tl.x < 16)
 	{
@@ -516,7 +504,7 @@ void vncBuffer::CheckRect(rfb::Region2D &dest, rfb::Region2D &cacheRgn, const rf
 			const UINT blockright = min(x+nOptimizedBlockSize, ScaledRect.br.x);
 			const UINT bytesPerBlockRow = (blockright-x) * bytesPerPixel;
 
-			// Modif sf@2002 
+			// Modif sf@2002
 			unsigned char *y_o_ptr = o_block_ptr;
 			unsigned char *y_n_ptr = n_block_ptr;
 
@@ -618,7 +606,7 @@ vncBuffer::GrabRegion(rfb::Region2D &src,BOOL driver,BOOL capture)
 			}
 	}
 	src.get_rects(rects, 1, 1);
-	if (rects.empty()) 
+	if (rects.empty())
 		{
 			return;
 		}
@@ -627,7 +615,6 @@ vncBuffer::GrabRegion(rfb::Region2D &src,BOOL driver,BOOL capture)
 	for (i = rects.begin(); i != rects.end(); i++)
 	{
 		rfb::Rect current = *i;
-
 
 		// Check that this rectangle is part of this capture region
 		if (current.tl.y > grabRect.br.y)
@@ -666,14 +653,12 @@ vncBuffer::CheckRegion(rfb::Region2D &dest,rfb::Region2D &cacheRgn ,const rfb::R
 	}
 }
 
-
-
 // Reduce possible colors to 8 shades of gray
 int To8GreyColors(int r, int g, int b)
 {
     int Value;
     Value = (r*11 + g*16 +b*5 ) / 32;
-	
+
 	if (Value <= 0x20)
 		return 0x101010;
 	else if (Value <= 0x40)
@@ -689,9 +674,8 @@ int To8GreyColors(int r, int g, int b)
 	else if (Value <= 0xe0)
 		return 0xd0d0d0;
 	else
-		return 0xf0f0f0;  
+		return 0xf0f0f0;
 }
- 
 
 // Modif sf@2002 - Scaling
 void vncBuffer::ScaleRect(rfb::Rect &rect)
@@ -703,12 +687,12 @@ void vncBuffer::ScaleRect(rfb::Rect &rect)
 
     // this construct is faster than the old method -- it has no jumps, so there's no chance of
     // branch mispredictions, and it generates better asm code .
-    fCanReduceColors = (((m_scrinfo.format.redMax ^ m_scrinfo.format.blueMax ^ 
+    fCanReduceColors = (((m_scrinfo.format.redMax ^ m_scrinfo.format.blueMax ^
                         m_scrinfo.format.greenMax ^ 0xff) == 0)  && m_fGreyPalette);
 
 #if 0
-	if ((m_scrinfo.format.redMax == 255) 
-		&& 
+	if ((m_scrinfo.format.redMax == 255)
+		&&
 		(m_scrinfo.format.blueMax == 255)
 		&&
 		(m_scrinfo.format.greenMax == 255)
@@ -740,7 +724,7 @@ void vncBuffer::ScaleRect(rfb::Rect &rect)
 	ScaledRect.br.x = rect.br.x / m_nScale;
 
 	// Copy and scale data from screen Main buffer to Scaled buffer
-	BYTE *pMain   =	m_mainbuff + (rect.tl.y * m_bytesPerRow) + 
+	BYTE *pMain   =	m_mainbuff + (rect.tl.y * m_bytesPerRow) +
 					(rect.tl.x * m_scrinfo.format.bitsPerPixel / 8);
 	BYTE *pScaled = m_ScaledBuff + (ScaledRect.tl.y * m_bytesPerRow) +
 					(ScaledRect.tl.x * m_scrinfo.format.bitsPerPixel / 8);
@@ -752,14 +736,14 @@ void vncBuffer::ScaleRect(rfb::Rect &rect)
 	// Pixels Blending (takes the "medium" pixel of each m_Scale*m_nScale square)
 	// This TrueColor Pixel blending routine comes from the Harakan's WinVNC with Server Side Scaling
 	// Extension. It replaces my own buggy Blending function that given *ugly* results.
-	if (m_nScale == 1 && !m_videodriverused)
+	if (m_nScale == 1 && !m_videodriverused && !m_fGreyPalette)
 	{
 		//nothing to do, we use the current buffer
 		//Thebuffer=mainbuffer
 		//This avoid the memcpy, on slower systems this give
 		// a real speed boost.
 	}
-	else if (m_scrinfo.format.trueColour && m_nScale!=1)
+	else if ((m_scrinfo.format.trueColour && m_nScale!=1) || m_fGreyPalette)
 	{
 		unsigned long lRed;
 		unsigned long lGreen;
@@ -770,10 +754,10 @@ void vncBuffer::ScaleRect(rfb::Rect &rect)
 		// For each line of the Destination ScaledRect
 		for (int y = ScaledRect.tl.y; y < ScaledRect.br.y; y++)
 		{
-			// For each Pixel of the line 
+			// For each Pixel of the line
 			for (int x = 0; x < (ScaledRect.br.x - ScaledRect.tl.x); x++)
 			{
-				lRed   = 0; 
+				lRed   = 0;
 				lGreen = 0;
 				lBlue  = 0;
 				// Take a m_Scale*m_nScale square of pixels in the Main Buffer
@@ -807,8 +791,8 @@ void vncBuffer::ScaleRect(rfb::Rect &rect)
 				{
 					// Calculate the resulting "medium" pixel
 					lScaledPixel = (lRed << m_scrinfo.format.redShift) + (lGreen << m_scrinfo.format.greenShift) + (lBlue << m_scrinfo.format.blueShift);
-				} 
-				
+				}
+
 				// Copy the resulting pixel in the Scaled Buffer
 				for (UINT b = 0; b < nBytesPerPixel; b++)
 				{
@@ -817,12 +801,12 @@ void vncBuffer::ScaleRect(rfb::Rect &rect)
 			}
 			// Move the buffers' pointers to their next "line"
 			pMain   += (m_bytesPerRow * m_nScale); // Skip m_nScale raws of the mainbuffer's Rect
-			pScaled += m_bytesPerRow; 
+			pScaled += m_bytesPerRow;
 		}
 	}
 	// Keep only the topleft pixel of each MainBuffer's m_Scale*m_nScale block
 	// Very incurate method...but bearable result in 256 and 16bit colors modes.
-	else 
+	else
 	{
 		UINT nBytesPerPixel = (m_scrinfo.format.bitsPerPixel / 8);
 		for (int y = ScaledRect.tl.y; y < ScaledRect.br.y; y++)
@@ -839,19 +823,18 @@ void vncBuffer::ScaleRect(rfb::Rect &rect)
 	}
 }
 
-
 // Modif sf@2005 - Grey Scale transformation
 // Ok, it's a little wild to do it here... should be done in Translate.cpp,..
 void vncBuffer::GreyScaleRect(rfb::Rect &rect)
 {
 	bool fCanReduceColors = true;
-    fCanReduceColors = (((m_scrinfo.format.redMax ^ m_scrinfo.format.blueMax ^ 
+    fCanReduceColors = (((m_scrinfo.format.redMax ^ m_scrinfo.format.blueMax ^
                         m_scrinfo.format.greenMax ^ 0xff) == 0)  && m_fGreyPalette);
 #if 0
     //JK 26th Jan, 2005: Color conversion to 8 shades of gray added,
 	//at the moment only works if server has 24/32-bit color
-	if ((m_scrinfo.format.redMax == 255) 
-		&& 
+	if ((m_scrinfo.format.redMax == 255)
+		&&
 		(m_scrinfo.format.blueMax == 255)
 		&&
 		(m_scrinfo.format.greenMax == 255)
@@ -879,11 +862,11 @@ void vncBuffer::GreyScaleRect(rfb::Rect &rect)
 	ScaledRect.br.x = rect.br.x / m_nScale;
 
 	// Copy and scale data from screen Main buffer to Scaled buffer
-	BYTE *pMain   =	m_mainbuff + (rect.tl.y * m_bytesPerRow) + 
+	BYTE *pMain   =	m_mainbuff + (rect.tl.y * m_bytesPerRow) +
 					(rect.tl.x * m_scrinfo.format.bitsPerPixel / 8);
 	BYTE *pScaled = m_ScaledBuff + (ScaledRect.tl.y * m_bytesPerRow) +
 					(ScaledRect.tl.x * m_scrinfo.format.bitsPerPixel / 8);
-	
+
 	UINT nBytesPerPixel = (m_scrinfo.format.bitsPerPixel / 8);
 
 	unsigned long lRed;
@@ -903,7 +886,7 @@ void vncBuffer::GreyScaleRect(rfb::Rect &rect)
 			lGreen = (lPixel >> m_scrinfo.format.greenShift) & m_scrinfo.format.greenMax;
 			lBlue  = (lPixel >> m_scrinfo.format.blueShift) & m_scrinfo.format.blueMax;
 			lPixel = To8GreyColors(lRed, lGreen, lBlue);
-			
+
 			for (UINT bb = 0; bb < nBytesPerPixel; bb++)
 				pScaled[(x * nBytesPerPixel) + bb] = (lPixel >> (8 * bb)) & 0xFF;
 			}
@@ -932,15 +915,13 @@ vncBuffer::GrabRect(const rfb::Rect &rect,BOOL driver,BOOL capture)
 	// if (m_nScale > 1) ScaleRect(rfb::Rect(rect.tl.x, rect.tl.y, rect.br.x, rect.br.y)); // sf@2002 - Waste of time !!!
 	// Problem, driver buffer is not writable
 	// so we always need a m_scalednuff
-	/*if (m_nScale > 1) 
+	/*if (m_nScale > 1)
 		ScaleRect(TheRect);
 	else if (m_fGreyPalette)
 		GreyScaleRect(TheRect);*/
 	if (m_fGreyPalette)GreyScaleRect(TheRect);
 	else ScaleRect(TheRect);
-
 }
-
 
 void
 vncBuffer::CopyRect(const rfb::Rect &dest, const rfb::Point &delta)
@@ -962,7 +943,6 @@ vncBuffer::CopyRect(const rfb::Rect &dest, const rfb::Point &delta)
 
 	ClearCacheRect(ScaledSource);
 	ClearCacheRect(ScaledDest);
-
 
 	// Copy the data from one part of the back-buffer to another!
 	const UINT bytesPerPixel = m_scrinfo.format.bitsPerPixel / 8;
@@ -995,7 +975,6 @@ vncBuffer::CopyRect(const rfb::Rect &dest, const rfb::Point &delta)
 	}
 }
 
-
 void
 vncBuffer::ClearCache()
 {
@@ -1018,7 +997,7 @@ vncBuffer::ClearCache()
 		{
 			memset(cacheptr, nValue++, bytesPerLine);
 			cacheptr+=m_bytesPerRow;
-			if (nValue == 255) nValue = 0; 
+			if (nValue == 255) nValue = 0;
 		}
 	}
 }
@@ -1038,7 +1017,7 @@ vncBuffer::ClearCacheRect(const rfb::Rect &dest)
 		{
 			memset(cacheptr, nValue++, bytesPerLine);
 			cacheptr+=m_bytesPerRow;
-			if (nValue == 255) nValue = 0; 
+			if (nValue == 255) nValue = 0;
 		}
 	}
 }
@@ -1073,7 +1052,7 @@ vncBuffer::BlackBack()
 		{
 			memset(backptr, nValue, bytesPerLine);
 			backptr+=m_bytesPerRow;
-			if (nValue == 255) nValue = 0; 
+			if (nValue == 255) nValue = 0;
 		}
 }
 
@@ -1086,7 +1065,7 @@ vncBuffer::GrabMouse()
 
 	// Modif sf@2002 - Scaling
 	rfb::Rect rect = m_desktop->MouseRect();
-	
+
 	// Problem, driver buffer is not writable
 		// so we always need a m_scalednuff
 	/*if (m_nScale > 1) */
@@ -1112,7 +1091,6 @@ vncBuffer::FastCheckMainbuffer() {
 		}
 	return TRUE;
 }
-
 
 // sf@2005
 void vncBuffer::EnableGreyPalette(BOOL enable)
@@ -1178,8 +1156,6 @@ vncBuffer::IsMultiMonitor()
 	else return true;
 }
 
-
-					   
 bool
 vncBuffer::ClipRect(int *x, int *y, int *w, int *h,
 	    int cx, int cy, int cw, int ch) {

@@ -2234,11 +2234,11 @@ vncClientThread::run(void *arg)
 				break;
 			}
 		}
-/*#ifdef _DEBUG
+#ifdef _DEBUG
 										char			szText[256];
 										sprintf(szText," msg.type %i \n",msg.type);
 										OutputDebugString(szText);		
-#endif*/
+#endif
 		// What to do is determined by the message id
 		switch(msg.type)
 		{

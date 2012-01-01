@@ -18,7 +18,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the VNC system is not available from the place 
+// If the source code for the VNC system is not available from the place
 // whence you received this file, check http://www.uk.research.att.com/vnc or contact
 // the authors on vnc@uk.research.att.com for information on obtaining it.
 
@@ -54,8 +54,6 @@ void InitIpp();
 #define LOCALIZATION_MESSAGES   // ACT: full declaration instead on extern ones
 #include "Localization.h" // Act : add localization on messages
 
-
-
 // Application instance and name
 HINSTANCE	hAppInstance;
 const char	*szAppName = "WinVNC";
@@ -72,7 +70,6 @@ HANDLE		hShutdownEventcad = NULL;
 MMRESULT			mmRes;
 
 void WRITETOLOG(char *szText, int size, DWORD *byteswritten, void *);
-
 
 //// Handle Old PostAdd message
 bool PostAddAutoConnectClient_bool=false;
@@ -181,7 +178,6 @@ Myinit(HINSTANCE hInstance)
 	hAppInstance = hInstance;
 	mainthreadId = GetCurrentThreadId();
 
-
 	// Initialise the VSocket system
 	VSocketSystem socksys;
 	if (!socksys.Initialised())
@@ -282,7 +278,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 	hAppInstance = hInstance;
 	mainthreadId = GetCurrentThreadId();
 
-
 	// Initialise the VSocket system
 	VSocketSystem socksys;
 	if (!socksys.Initialised())
@@ -298,7 +293,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 	for (i = 0; i < strlen(szCmdLine); i++)
 	{
 		szCmdLine[i] = tolower(szCmdLine[i]);
-	} 
+	}
 	BOOL argfound = FALSE;
 	for (i = 0; i < strlen(szCmdLine); i++)
 	{
@@ -354,7 +349,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 			Open_forum();
 			return 0;
 		}
-
 
 		if (strncmp(&szCmdLine[i], winvncStartserviceHelper, strlen(winvncStartserviceHelper)) == 0)
 		{
@@ -514,7 +508,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 			}
 		if (strncmp(&szCmdLine[i], winvncUnInstallService, strlen(winvncUnInstallService)) == 0)
 			{
-				char command[MAX_PATH + 32]; // 29 January 2008 jdp 
+				char command[MAX_PATH + 32]; // 29 January 2008 jdp
                 // rest of command line service name, if provided.
                 char *pServiceName = &szCmdLine[i];
                 // skip over command switch, find next whitepace
@@ -549,14 +543,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 				return 0;
 			}
 
-
-
 		if (strncmp(&szCmdLine[i], winvncRunService, strlen(winvncRunService)) == 0)
 		{
 			//Run as service
 			if (!Myinit(hInstance)) return 0;
 			fRunningFromExternalService = true;
-			vncService::RunningFromExternalService(true); 
+			vncService::RunningFromExternalService(true);
 			return WinVNCAppMain();
 		}
 
@@ -620,23 +612,23 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 			start = i;
 			// skip any spaces and grab the parameter
 			while (szCmdLine[start] <= ' ' && szCmdLine[start] != 0) start++;
-			
+
 			if ( strncmp( &szCmdLine[start], winvncAutoReconnectId, strlen(winvncAutoReconnectId) ) == 0 )
 			{
 				end = start;
 				while (szCmdLine[end] > ' ') end++;
-				
+
 				pszId = new char[ end - start + 1 ];
-				if (pszId != 0) 
+				if (pszId != 0)
 				{
 					strncpy( pszId, &(szCmdLine[start]), end - start );
 					pszId[ end - start ] = 0;
 					pszId = _strupr( pszId );
 				}
-//multiple spaces between autoreconnect and id 
+//multiple spaces between autoreconnect and id
 				i = end;
 			}// end of condition we found the ID: parameter
-			
+
 			// NOTE:  id must be NULL or the ID:???? (pointer will get deleted when message is processed)
 			// We can not contact a runnning service, permissions, so we must store the settings
 			// and process until the vncmenu has been started
@@ -659,7 +651,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 			continue;
 		}
 
-			
 		if ( strncmp( &szCmdLine[i], winvncReconnectId, strlen(winvncReconnectId) ) == 0 )
 			{
 				i+=strlen("-");
@@ -670,7 +661,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 				while (szCmdLine[end] > ' ') end++;
 
 				pszId = new char[ end - start + 1 ];
-				if (pszId != 0) 
+				if (pszId != 0)
 				{
 					strncpy( pszId, &(szCmdLine[start]), end - start );
 					pszId[ end - start ] = 0;
@@ -752,14 +743,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 						port_int=0;
 						address_vcard=0;
 						Sleep(2000);
-						Beep(200,1000);
+						//Beep(200,1000);
 						return 0;
 					}
 				}
 				i=end;
 				continue;
 			}
-			else 
+			else
 			{
 				// Tell the server to show the Add New Client dialog
 				// We can not contact a runnning service, permissions, so we must store the settings
@@ -799,7 +790,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 				if (g_szRepeaterHost != 0) {
 					strncpy(g_szRepeaterHost, &(szCmdLine[start]), end-start);
 					g_szRepeaterHost[end-start] = 0;
-					
+
 					// We can not contact a runnning service, permissions, so we must store the settings
 					// and process until the vncmenu has been started
 					vnclog.Print(LL_INTERR, VNCLOG("PostAddNewRepeaterClient I\n"));
@@ -813,7 +804,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 				i=end;
 				continue;
 			}
-			else 
+			else
 			{
 				/*
 				// Tell the server to show the Add New Client dialog
@@ -848,7 +839,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 	return 0;
 }
 
-
 // rdv&sf@2007 - New TrayIcon impuDEsktop/impersonation thread stuff
 
 DWORD WINAPI imp_desktop_thread(LPVOID lpParam)
@@ -866,7 +856,7 @@ DWORD WINAPI imp_desktop_thread(LPVOID lpParam)
 
 	if (desktop == NULL)
 		vnclog.Print(LL_INTERR, VNCLOG("OpenInputdesktop Error \n"));
-	else 
+	else
 		vnclog.Print(LL_INTERR, VNCLOG("OpenInputdesktop OK\n"));
 
 	HDESK old_desktop = GetThreadDesktop(GetCurrentThreadId());
@@ -934,7 +924,6 @@ DWORD WINAPI imp_desktop_thread(LPVOID lpParam)
 	if (PostAddConnectClient_bool_null)
 		vncService::PostAddConnectClient( NULL );
 
-
 	if (PostAddNewClient_bool)
 	{
 		PostAddNewClient_bool=false;
@@ -971,9 +960,7 @@ DWORD WINAPI imp_desktop_thread(LPVOID lpParam)
 	CloseDesktop(desktop);
 //	RevertToSelf();
 	return 0;
-
 }
-
 
 // sf@2007 - For now we use a mmtimer to test the shutdown event periodically
 // Maybe there's a less rude method...
@@ -999,7 +986,6 @@ void InitSDTimer()
 	mmRes = timeSetEvent( 2000, 0, (LPTIMECALLBACK)fpTimer, 0, TIME_PERIODIC );
 }
 
-
 void KillSDTimer()
 {
 	vnclog.Print(LL_INTERR, VNCLOG("****************** Kill SDTimer\n"));
@@ -1007,13 +993,10 @@ void KillSDTimer()
 	mmRes = -1;
 }
 
-
-
 // This is the main routine for WinVNC when running as an application
 // (under Windows 95 or Windows NT)
 // Under NT, WinVNC can also run as a service.  The WinVNCServerMain routine,
 // defined in the vncService header, is used instead when running as a service.
-
 
 int WinVNCAppMain()
 {
@@ -1029,7 +1012,7 @@ int WinVNCAppMain()
 	if (!multi) // this allow to overwrite the multiple instance check
 	{
 		if (!instancehan->Init())
-		{	
+		{
     		vnclog.Print(LL_INTINFO, VNCLOG("%s -- exiting\n"), sz_ID_ANOTHER_INST);
 			// We don't allow multiple instances!
 			if (!fRunningFromExternalService)
@@ -1046,7 +1029,7 @@ int WinVNCAppMain()
 	server.SetName(szAppName);
 	vnclog.Print(LL_STATE, VNCLOG("server created ok\n"));
 	///uninstall driver before cont
-	
+
 	// sf@2007 - Set Application0 special mode
 	server.RunningFromExternalService(fRunningFromExternalService);
 
@@ -1068,7 +1051,7 @@ int WinVNCAppMain()
 		DWORD dwTId;
 		threadHandle = CreateThread(NULL, 0, imp_desktop_thread, &server, 0, &dwTId);
 
-		if (threadHandle)  
+		if (threadHandle)
 		{
 			WaitForSingleObject( threadHandle, INFINITE );
 			CloseHandle(threadHandle);
