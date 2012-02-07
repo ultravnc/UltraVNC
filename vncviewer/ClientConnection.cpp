@@ -27,14 +27,12 @@
 // whence you received this file, check http://www.uk.research.att.com/vnc or contact
 // the authors on vnc@uk.research.att.com for information on obtaining it.
 
-
 // Many thanks to Randy Brown <rgb@inven.com> for providing the 3-button
 // emulation code.
 
 // This is the main source for a ClientConnection object.
 // It handles almost everything to do with a connection to a server.
 // The decoding of specific rectangle encodings is done in separate files.
-
 
 #define _WIN32_WINDOWS 0x0410
 #define WINVER 0x0400
@@ -220,12 +218,10 @@ extern char sz_F5[128];
 extern char sz_F6[64];
 extern bool command_line;
 
-
-
 // *************************************************************************
 //  A Client connection involves two threads - the main one which sets up
-//  connections and processes window messages and inputs, and a 
-//  client-specific one which receives, decodes and draws output data 
+//  connections and processes window messages and inputs, and a
+//  client-specific one which receives, decodes and draws output data
 //  from the remote server.
 //  This first section contains bits which are generally called by the main
 //  program thread.
@@ -247,14 +243,14 @@ extern bool command_line;
 BOOL CALLBACK DialogProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam);
 
 // adzm - 2010-07 - Extended clipboard
-ClientConnection::ClientConnection(VNCviewerApp *pApp) 
+ClientConnection::ClientConnection(VNCviewerApp *pApp)
 	: fis(0), zis(0), m_clipboard(ClipboardSettings::defaultViewerCaps)
 {
 	Init(pApp);
 }
 
 // adzm - 2010-07 - Extended clipboard
-ClientConnection::ClientConnection(VNCviewerApp *pApp, SOCKET sock) 
+ClientConnection::ClientConnection(VNCviewerApp *pApp, SOCKET sock)
   : fis(0), zis(0), m_clipboard(ClipboardSettings::defaultViewerCaps)
 {
 	Init(pApp);
@@ -267,12 +263,12 @@ ClientConnection::ClientConnection(VNCviewerApp *pApp, SOCKET sock)
 	m_serverInitiated = true;
 	struct sockaddr_in svraddr;
 	int sasize = sizeof(svraddr);
-	if (getpeername(sock, (struct sockaddr *) &svraddr, 
+	if (getpeername(sock, (struct sockaddr *) &svraddr,
 		&sasize) != SOCKET_ERROR) {
-		_stprintf(m_host, _T("%d.%d.%d.%d"), 
-			svraddr.sin_addr.S_un.S_un_b.s_b1, 
-			svraddr.sin_addr.S_un.S_un_b.s_b2, 
-			svraddr.sin_addr.S_un.S_un_b.s_b3, 
+		_stprintf(m_host, _T("%d.%d.%d.%d"),
+			svraddr.sin_addr.S_un.S_un_b.s_b1,
+			svraddr.sin_addr.S_un.S_un_b.s_b2,
+			svraddr.sin_addr.S_un.S_un_b.s_b3,
 			svraddr.sin_addr.S_un.S_un_b.s_b4);
 		m_port = svraddr.sin_port;
 	} else {
@@ -315,7 +311,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_zlibbufsize = 0;
 	m_decompStreamInited = false;
 	// adzm - 2010-07 - Fix clipboard hangs
-	m_hwndNextViewer = (HWND)INVALID_HANDLE_VALUE;	
+	m_hwndNextViewer = (HWND)INVALID_HANDLE_VALUE;
 	m_pApp = pApp;
 	m_dormant = false;
 	m_hBitmapDC = NULL;
@@ -356,12 +352,12 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_fUsePlugin = false;
 	m_fUseProxy = false;
 	m_pNetRectBuf = NULL;
-	m_fReadFromNetRectBuf = false;  // 
+	m_fReadFromNetRectBuf = false;  //
 	m_nNetRectBufOffset = 0;
 	m_nReadSize = 0;
 	m_nNetRectBufSize = 0;
 	m_pZRLENetRectBuf = NULL;
-	m_fReadFromZRLENetRectBuf = false;  // 
+	m_fReadFromZRLENetRectBuf = false;  //
 	m_nZRLENetRectBufOffset = 0;
 	m_nZRLEReadSize = 0;
 	m_nZRLENetRectBufSize = 0;
@@ -395,7 +391,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
     kbitsPerSecond = 0;
 	avg_kbitsPerSecond = 0;
 	m_lLastChangeTimeTimeout = 0;
-	m_lLastChangeTime = timeGetTime(); 
+	m_lLastChangeTime = timeGetTime();
 						   // timeGetTime Fisr time switch is unstable... wait 30 seconds
 						  // 0 because we want the first encoding switching to occur quickly
 	                     // (in Auto mode, ZRLE is used: pointless over a LAN)
@@ -410,14 +406,14 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	rcCursorY = 0;
 
 	// Modif sf@2002 - FileTransfer
-	m_pFileTransfer = new FileTransfer(m_pApp, this); 	
+	m_pFileTransfer = new FileTransfer(m_pApp, this);
 	m_filezipbuf = NULL;
 	m_filezipbufsize = 0;
 	m_filechunkbuf = NULL;
 	m_filechunkbufsize = 0;
 
 	// Modif sf@2002 - Text Chat
-	m_pTextChat = new TextChat(m_pApp, this); 	
+	m_pTextChat = new TextChat(m_pApp, this);
 
 	// Modif sf@2002 - Scaling
 	m_pendingScaleChange = false;
@@ -476,7 +472,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_zipbuf=NULL;
 	m_filezipbuf=NULL;
 	m_filechunkbuf=NULL;
-	m_zlibbuf=NULL; 
+	m_zlibbuf=NULL;
 	rcSource=NULL;
 	rcMask=NULL;
 	zywrle_level = 1;
@@ -498,7 +494,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_hPopupMenuDisplay = NULL;
 	m_hPopupMenuKeyboard = NULL;
 	m_hPopupMenuClipboardFormats = NULL;
-	
+
 	m_keepalive_timer = 0;
 	m_emulate3ButtonsTimer = 0;
 	// adzm 2010-09
@@ -537,8 +533,7 @@ bool ClientConnection::SetRecvTimeout(int msecs)
 	return true;
 }
 
-
-// 
+//
 // Run() creates the connection if necessary, does the initial negotiations
 // and then starts the thread running which does the output (update) processing.
 // If Run throws an Exception, the caller must delete the ClientConnection object.
@@ -549,7 +544,7 @@ void ClientConnection::Run()
 	havetobekilled=false;
 	forcedexit=false;
 	// Get the host name and port if we haven't got it
-	if (m_port == -1) 
+	if (m_port == -1)
 	{
 		GetConnectDetails();
 		// sf@2002 - DSM Plugin loading if required
@@ -595,7 +590,7 @@ void ClientConnection::Run()
 	// The rest of the processing continues in run_undetached.
 	LowLevelHook::Initialize(m_hwndMain);
 	start_undetached();
-	
+
 	EndDialog(m_hwndStatus,0);
 }
 
@@ -604,15 +599,15 @@ void ClientConnection::DoConnection()
 {
 	havetobekilled=true;
 	// Connect if we're not already connected
-	if (m_sock == INVALID_SOCKET) 
-		if (strcmp(m_proxyhost,"") !=NULL && m_fUseProxy) 
+	if (m_sock == INVALID_SOCKET)
+		if (strcmp(m_proxyhost,"") !=NULL && m_fUseProxy)
 			ConnectProxy();
 		else
 			Connect();
 
 	SetSocketOptions();
 
-	SetDSMPluginStuff(); // The Plugin is now activated BEFORE the protocol negociation 
+	SetDSMPluginStuff(); // The Plugin is now activated BEFORE the protocol negociation
 						 // so ALL the communication data travel through the DSMPlugin
 
 	if (strcmp(m_proxyhost,"")!=NULL && m_fUseProxy)
@@ -635,7 +630,7 @@ void ClientConnection::DoConnection()
     SetFormatAndEncodings();
 
 	reconnectcounter=m_reconnectcounter;
-	
+
 	havetobekilled=false;;
 }
 
@@ -666,7 +661,6 @@ DWORD WINAPI ReconnectThreadProc(LPVOID lpParameter)
 	return 0;
 }
 
-
 void ClientConnection::Reconnect()
 {
 	Sleep( m_autoReconnect * 1000 );
@@ -691,7 +685,6 @@ void ClientConnection::Reconnect()
 	}
 }
 
-
 HWND ClientConnection::GTGBS_ShowConnectWindow()
 {
 	DWORD				  threadID;
@@ -709,10 +702,10 @@ HWND ClientConnection::GTGBS_ShowConnectWindow()
 
 void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 {
-	if (ultra)	  
+	if (ultra)
 	{
 		int nr_buttons = 14;
-		TBADDBITMAP tbab; 
+		TBADDBITMAP tbab;
 		TBBUTTON tbButtons []=
 		{
 			{0,ID_BUTTON_CAD,TBSTATE_ENABLED,TBSTYLE_BUTTON,0L,0},
@@ -729,9 +722,8 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 			{11,ID_BUTTON_SW,TBSTATE_ENABLED,TBSTYLE_BUTTON,0L,11},
 			{12,ID_BUTTON_DESKTOP,TBSTATE_ENABLED,TBSTYLE_BUTTON,0L,12},
 			{13,ID_BUTTON_TEXTCHAT,TBSTATE_ENABLED,TBSTYLE_BUTTON,0L,13},
-			
 		};
-		static char *szTips[14] = 
+		static char *szTips[14] =
 		{
 				sz_L2,
 				sz_L3,
@@ -769,7 +761,7 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 					{
 						m_hwndTB = CreateToolbarEx(
 						m_hwndTBwin
-						,WS_CHILD | TBSTYLE_WRAPABLE | WS_VISIBLE |TBSTYLE_TOOLTIPS |CCS_NORESIZE| TBSTYLE_FLAT | TBSTYLE_TRANSPARENT 
+						,WS_CHILD | TBSTYLE_WRAPABLE | WS_VISIBLE |TBSTYLE_TOOLTIPS |CCS_NORESIZE| TBSTYLE_FLAT | TBSTYLE_TRANSPARENT
 						,IDR_TOOLBAR
 						,nr_buttons
 						,NULL
@@ -786,7 +778,7 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 				{
 						m_hwndTB = CreateToolbarEx(
 						m_hwndTBwin
-						,WS_CHILD | TBSTYLE_WRAPABLE | WS_VISIBLE |TBSTYLE_TOOLTIPS |CCS_NORESIZE | TBSTYLE_FLAT | TBSTYLE_TRANSPARENT 
+						,WS_CHILD | TBSTYLE_WRAPABLE | WS_VISIBLE |TBSTYLE_TOOLTIPS |CCS_NORESIZE | TBSTYLE_FLAT | TBSTYLE_TRANSPARENT
 						,IDR_TOOLBAR
 						,nr_buttons
 						,NULL
@@ -806,7 +798,7 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 				{
 					m_hwndTB = CreateToolbarEx(
 						m_hwndTBwin
-						,WS_CHILD | TBSTYLE_WRAPABLE | WS_VISIBLE |TBSTYLE_TOOLTIPS |CCS_NORESIZE| TBSTYLE_FLAT | TBSTYLE_TRANSPARENT 
+						,WS_CHILD | TBSTYLE_WRAPABLE | WS_VISIBLE |TBSTYLE_TOOLTIPS |CCS_NORESIZE| TBSTYLE_FLAT | TBSTYLE_TRANSPARENT
 						,IDR_TOOLBAR
 						,nr_buttons
 						,NULL
@@ -823,7 +815,7 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 				{
 					m_hwndTB = CreateToolbarEx(
 						m_hwndTBwin
-						,WS_CHILD | TBSTYLE_WRAPABLE | WS_VISIBLE |TBSTYLE_TOOLTIPS |CCS_NORESIZE | TBSTYLE_FLAT | TBSTYLE_TRANSPARENT 
+						,WS_CHILD | TBSTYLE_WRAPABLE | WS_VISIBLE |TBSTYLE_TOOLTIPS |CCS_NORESIZE | TBSTYLE_FLAT | TBSTYLE_TRANSPARENT
 						,IDR_TOOLBAR
 						,nr_buttons
 						,NULL
@@ -860,14 +852,13 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 						// new color
 						buttonmap=IDB_BITMAPlx;
 						minibuttonmap=IDB_BITMAPsx;
-
 					}
 		if (mini)
 		{
 			m_hwndTB = CreateToolbarEx(
 				m_hwndTBwin
-				//,WS_CHILD|WS_BORDER|WS_VISIBLE|TBSTYLE_TOOLTIPS|TBSTYLE_WRAPABLE|TB_AUTOSIZE 
-				,WS_CHILD | TBSTYLE_WRAPABLE | WS_VISIBLE |TBSTYLE_TOOLTIPS |CCS_NORESIZE| TBSTYLE_FLAT | TBSTYLE_TRANSPARENT 
+				//,WS_CHILD|WS_BORDER|WS_VISIBLE|TBSTYLE_TOOLTIPS|TBSTYLE_WRAPABLE|TB_AUTOSIZE
+				,WS_CHILD | TBSTYLE_WRAPABLE | WS_VISIBLE |TBSTYLE_TOOLTIPS |CCS_NORESIZE| TBSTYLE_FLAT | TBSTYLE_TRANSPARENT
 				,IDR_TOOLBAR
 				,nr_buttons
 				,(HINSTANCE)m_pApp->m_instance
@@ -884,8 +875,8 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 		{
 			m_hwndTB = CreateToolbarEx(
 				m_hwndTBwin
-				//,WS_CHILD|WS_BORDER|WS_VISIBLE|TBSTYLE_TOOLTIPS|TBSTYLE_WRAPABLE|TB_AUTOSIZE 
-				,WS_CHILD | TBSTYLE_WRAPABLE | WS_VISIBLE |TBSTYLE_TOOLTIPS |CCS_NORESIZE | TBSTYLE_FLAT | TBSTYLE_TRANSPARENT 
+				//,WS_CHILD|WS_BORDER|WS_VISIBLE|TBSTYLE_TOOLTIPS|TBSTYLE_WRAPABLE|TB_AUTOSIZE
+				,WS_CHILD | TBSTYLE_WRAPABLE | WS_VISIBLE |TBSTYLE_TOOLTIPS |CCS_NORESIZE | TBSTYLE_FLAT | TBSTYLE_TRANSPARENT
 				,IDR_TOOLBAR
 				,nr_buttons
 				,(HINSTANCE)m_pApp->m_instance
@@ -899,7 +890,7 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 				,sizeof(TBBUTTON));
 		}
 		}
-		
+
 		tbab.hInst = m_pApp->m_instance;
 		tbab.nID = IDB_BITMAPl;
 		stdidx = SendMessage(m_hwndTB,TB_ADDBITMAP,6,(LPARAM)&tbab);
@@ -907,11 +898,10 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 		RECT wrect;
 		RECT trect;
 		SendMessage(m_hwndTB,TB_SETROWS,(WPARAM) MAKEWPARAM (2, true),(LPARAM) (LPRECT) (&trect));
-		
+
 		GetClientRect(m_hwndTB,&tbrect);
 		GetClientRect(m_hwndTBwin,&wrect);
-		
-		
+
 		m_hwndTT = CreateWindow(
 			TOOLTIPS_CLASS,
 			(LPSTR)NULL,
@@ -924,28 +914,27 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 			(HMENU)NULL,
 			(HINSTANCE)m_pApp->m_instance,
 			NULL);
-		
+
         // 6 May 2008 jdp make topmost so they display in fullscreen mode
         ::SetWindowPos(m_hwndTT, HWND_TOPMOST,0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
 		DWORD buttonWidth = LOWORD(SendMessage(m_hwndTB,TB_GETBUTTONSIZE,(WPARAM)0,(LPARAM)0));
 		DWORD buttonHeight = HIWORD(SendMessage(m_hwndTB,TB_GETBUTTONSIZE,(WPARAM)0,(LPARAM)0));
-		
-		for (row = 0; row < 1 ; row++ ) 
-			for (col = 0; col < nr_buttons; col++) { 
-				ti.cbSize = sizeof(TOOLINFO); 
-				ti.uFlags = 0 ; 
-				ti.hwnd = m_hwndTB; 
-				ti.hinst = m_pApp->m_instance; 
-				ti.uId = (UINT) id; 
-				ti.lpszText = (LPSTR) szTips[id++]; 
-				ti.rect.left = col * buttonWidth; 
-				ti.rect.top = row * buttonHeight; 
-				ti.rect.right = ti.rect.left + buttonWidth; 
-				ti.rect.bottom = ti.rect.top + buttonHeight; 
-				
-				SendMessage(m_hwndTT, TTM_ADDTOOL, 0, 
-                    (LPARAM) (LPTOOLINFO) &ti); 
-				
+
+		for (row = 0; row < 1 ; row++ )
+			for (col = 0; col < nr_buttons; col++) {
+				ti.cbSize = sizeof(TOOLINFO);
+				ti.uFlags = 0 ;
+				ti.hwnd = m_hwndTB;
+				ti.hinst = m_pApp->m_instance;
+				ti.uId = (UINT) id;
+				ti.lpszText = (LPSTR) szTips[id++];
+				ti.rect.left = col * buttonWidth;
+				ti.rect.top = row * buttonHeight;
+				ti.rect.right = ti.rect.left + buttonWidth;
+				ti.rect.bottom = ti.rect.top + buttonHeight;
+
+				SendMessage(m_hwndTT, TTM_ADDTOOL, 0,
+                    (LPARAM) (LPTOOLINFO) &ti);
 			}
 			SendMessage(m_hwndTB,TB_SETTOOLTIPS,(WPARAM)(HWND)m_hwndTT,(LPARAM)0);
 			SendMessage(m_hwndTT,TTM_SETTIPBKCOLOR,(WPARAM)(COLORREF)0x00404040,(LPARAM)0);
@@ -960,7 +949,7 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 	else
 	{
 		int nr_buttons=9;
-		TBADDBITMAP tbab; 
+		TBADDBITMAP tbab;
 		TBBUTTON tbButtons []=
 		{
 			{0,ID_BUTTON_CAD,TBSTATE_ENABLED,TBSTYLE_BUTTON,0L,0},
@@ -972,9 +961,8 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 			{6,ID_BUTTON_INFO,TBSTATE_ENABLED,TBSTYLE_BUTTON,0L,6},
 			{7,ID_BUTTON_END,TBSTATE_ENABLED,TBSTYLE_BUTTON,0L,7},
 			{8,ID_BUTTON_DBUTTON,TBSTATE_ENABLED,TBSTYLE_BUTTON,0L,8},
-			
 		};
-		static char *szTips[9] = 
+		static char *szTips[9] =
 		{
 			sz_L2,
 				sz_L3,
@@ -989,7 +977,7 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 		int stdidx;
 		HWND m_hwndTT;
 		int row,col;
-		TOOLINFO ti; 
+		TOOLINFO ti;
 		int id=0;
 		RECT clr;
 		InitCommonControls();
@@ -1002,8 +990,8 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 		{
 			m_hwndTB = CreateToolbarEx(
 				m_hwndTBwin
-				//,WS_CHILD|WS_BORDER|WS_VISIBLE|TBSTYLE_TOOLTIPS|TBSTYLE_WRAPABLE|TB_AUTOSIZE 
-				,WS_CHILD | TBSTYLE_WRAPABLE | WS_VISIBLE |TBSTYLE_TOOLTIPS |CCS_NORESIZE | TBSTYLE_FLAT | TBSTYLE_TRANSPARENT 
+				//,WS_CHILD|WS_BORDER|WS_VISIBLE|TBSTYLE_TOOLTIPS|TBSTYLE_WRAPABLE|TB_AUTOSIZE
+				,WS_CHILD | TBSTYLE_WRAPABLE | WS_VISIBLE |TBSTYLE_TOOLTIPS |CCS_NORESIZE | TBSTYLE_FLAT | TBSTYLE_TRANSPARENT
 				,IDR_TOOLBAR
 				,nr_buttons
 				,(HINSTANCE)m_pApp->m_instance
@@ -1020,8 +1008,8 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 		{
 			m_hwndTB = CreateToolbarEx(
 				m_hwndTBwin
-				//,WS_CHILD|WS_BORDER|WS_VISIBLE|TBSTYLE_TOOLTIPS|TBSTYLE_WRAPABLE|TB_AUTOSIZE 
-				,WS_CHILD | TBSTYLE_WRAPABLE | WS_VISIBLE |TBSTYLE_TOOLTIPS |CCS_NORESIZE | TBSTYLE_FLAT | TBSTYLE_TRANSPARENT 
+				//,WS_CHILD|WS_BORDER|WS_VISIBLE|TBSTYLE_TOOLTIPS|TBSTYLE_WRAPABLE|TB_AUTOSIZE
+				,WS_CHILD | TBSTYLE_WRAPABLE | WS_VISIBLE |TBSTYLE_TOOLTIPS |CCS_NORESIZE | TBSTYLE_FLAT | TBSTYLE_TRANSPARENT
 				,IDR_TOOLBAR
 				,nr_buttons
 				,(HINSTANCE)m_pApp->m_instance
@@ -1034,7 +1022,7 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 				,20
 				,sizeof(TBBUTTON));
 		}
-		
+
 		tbab.hInst = m_pApp->m_instance;
 		tbab.nID = IDB_BITMAPl;
 		stdidx = SendMessage(m_hwndTB,TB_ADDBITMAP,6,(LPARAM)&tbab);
@@ -1042,11 +1030,10 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 		RECT wrect;
 		RECT trect;
 		SendMessage(m_hwndTB,TB_SETROWS,(WPARAM) MAKEWPARAM (2, true),(LPARAM) (LPRECT) (&trect));
-		
+
 		GetClientRect(m_hwndTB,&tbrect);
 		GetClientRect(m_hwndTBwin,&wrect);
-		
-		
+
 		m_hwndTT = CreateWindow(
 			TOOLTIPS_CLASS,
 			(LPSTR)NULL,
@@ -1059,35 +1046,34 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 			(HMENU)NULL,
 			(HINSTANCE)m_pApp->m_instance,
 			NULL);
-		
+
         // 6 May 2008 jdp make topmost so they display in fullscreen mode
         ::SetWindowPos(m_hwndTT, HWND_TOPMOST,0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
-		
+
 		DWORD buttonWidth = LOWORD(SendMessage(m_hwndTB,TB_GETBUTTONSIZE,(WPARAM)0,(LPARAM)0));
 		DWORD buttonHeight = HIWORD(SendMessage(m_hwndTB,TB_GETBUTTONSIZE,(WPARAM)0,(LPARAM)0));
-		
-		for (row = 0; row < 1 ; row++ ) 
-			for (col = 0; col < nr_buttons; col++) { 
-				ti.cbSize = sizeof(TOOLINFO); 
-				ti.uFlags = 0 ; 
-				ti.hwnd = m_hwndTB; 
-				ti.hinst = m_pApp->m_instance; 
-				ti.uId = (UINT) id; 
-				ti.lpszText = (LPSTR) szTips[id++]; 
-				ti.rect.left = col * buttonWidth; 
-				ti.rect.top = row * buttonHeight; 
-				ti.rect.right = ti.rect.left + buttonWidth; 
-				ti.rect.bottom = ti.rect.top + buttonHeight; 
-				
-				SendMessage(m_hwndTT, TTM_ADDTOOL, 0, 
-                    (LPARAM) (LPTOOLINFO) &ti); 
-				
+
+		for (row = 0; row < 1 ; row++ )
+			for (col = 0; col < nr_buttons; col++) {
+				ti.cbSize = sizeof(TOOLINFO);
+				ti.uFlags = 0 ;
+				ti.hwnd = m_hwndTB;
+				ti.hinst = m_pApp->m_instance;
+				ti.uId = (UINT) id;
+				ti.lpszText = (LPSTR) szTips[id++];
+				ti.rect.left = col * buttonWidth;
+				ti.rect.top = row * buttonHeight;
+				ti.rect.right = ti.rect.left + buttonWidth;
+				ti.rect.bottom = ti.rect.top + buttonHeight;
+
+				SendMessage(m_hwndTT, TTM_ADDTOOL, 0,
+                    (LPARAM) (LPTOOLINFO) &ti);
 			}
 			SendMessage(m_hwndTB,TB_SETTOOLTIPS,(WPARAM)(HWND)m_hwndTT,(LPARAM)0);
 			SendMessage(m_hwndTT,TTM_SETTIPBKCOLOR,(WPARAM)(COLORREF)0x0000ff00,(LPARAM)0);
 			SendMessage(m_hwndTT,TTM_SETTIPTEXTCOLOR,(WPARAM)(COLORREF)0x00000000,(LPARAM)0);
 			SendMessage(m_hwndTT,TTM_SETDELAYTIME,(WPARAM)(DWORD)TTDT_INITIAL,(LPARAM)(INT) MAKELONG(200,0));
-            
+
             helper::SafeSetWindowUserData(m_hwndTBwin, (LONG)this);
 
 			ShowWindow(m_hwndTB, SW_SHOW);
@@ -1120,7 +1106,6 @@ void ClientConnection::RebuildToolbar(HWND hwnd)
 
 void ClientConnection::GTGBS_CreateToolbar()
 {
-
 	RECT clr;
 	WNDCLASS wndclass;
 
@@ -1149,7 +1134,7 @@ void ClientConnection::GTGBS_CreateToolbar()
 	RegisterClass(&wndclass);
 
 	const DWORD winstyle = WS_CHILD ;
-		
+
 	GetClientRect(m_hwndMain,&clr);
 	m_hwndTBwin = CreateWindowEx(
 					//WS_EX_TOPMOST  ,
@@ -1159,23 +1144,23 @@ void ClientConnection::GTGBS_CreateToolbar()
 					winstyle,
 					0,
 					0,
-					clr.right - clr.left,	
+					clr.right - clr.left,
 					28,
 					//m_hwnd,                // Parent handle
 					m_hwndMain,
 					NULL,                // Menu handle
 					m_pApp->m_instance,
 					NULL);
-	
+
 	ShowWindow(m_hwndTBwin, SW_HIDE);
 	//////////////////////////////////////////////////
 	if ((clr.right-clr.left)>140+85+14*24)
 		CreateButtons(false,m_fServerKnowsFileTransfer);
-	else 
+	else
 		CreateButtons(true,m_fServerKnowsFileTransfer);
 	//////////////////////////////////////////////////
 	RECT r;
-	
+
 	GetClientRect(m_hwndTBwin,&r);
 	m_TrafficMonitor = CreateWindowEx(WS_EX_NOPARENTNOTIFY | WS_EX_CLIENTEDGE,
 											"Static",
@@ -1231,7 +1216,7 @@ void ClientConnection::GTGBS_CreateToolbar()
 	MRU *m_pMRU;
 	m_pMRU = new MRU(SESSION_MRU_KEY_NAME,26);
 	//adzm 2009-06-21 - show the proxy in the 'recent' box
-	if (m_fUseProxy && strlen(m_proxyhost) > 0) {		
+	if (m_fUseProxy && strlen(m_proxyhost) > 0) {
 		TCHAR proxyname[MAX_HOST_NAME_LEN];
 		_snprintf(proxyname, MAX_HOST_NAME_LEN-1, "%s:%li (%s:%li)", m_host, m_port, m_proxyhost, m_proxyport);
 		SendMessage(m_logo_wnd, CB_ADDSTRING, 0, (LPARAM)proxyname);
@@ -1241,12 +1226,11 @@ void ClientConnection::GTGBS_CreateToolbar()
         int pos = SendMessage(m_logo_wnd, CB_ADDSTRING, 0, (LPARAM) valname);
     }
     SendMessage(m_logo_wnd, CB_SETCURSEL, 0, 0);
-	if (m_pMRU) delete m_pMRU;		
-
+	if (m_pMRU) delete m_pMRU;
 }
 //////////////////////////////////////////////////////////
 
-void ClientConnection::CreateDisplay() 
+void ClientConnection::CreateDisplay()
 {
 #ifdef _WIN32_WCE
 	//const DWORD winstyle = WS_VSCROLL | WS_HSCROLL | WS_CAPTION | WS_SYSMENU;
@@ -1300,7 +1284,6 @@ void ClientConnection::CreateDisplay()
 			      m_pApp->m_instance,
 			      NULL);
 
-
 	//ShowWindow(m_hwnd, SW_HIDE);
 	//ShowWindow(m_hwndcn, SW_SHOW);
 	//adzm 2009-06-21 - let's not show until connected.
@@ -1310,14 +1293,13 @@ void ClientConnection::CreateDisplay()
 
 //	SendMessage(m_hwnd,WM_CREATE,0,0);
 
-
 	// Create a memory DC which we'll use for drawing to
 	// the local framebuffer
 	m_hBitmapDC = CreateCompatibleDC(NULL);
 
 	// Set a suitable palette up
 	if (GetDeviceCaps(m_hBitmapDC, RASTERCAPS) & RC_PALETTE) {
-		vnclog.Print(3, _T("Palette-based display - %d entries, %d reserved\n"), 
+		vnclog.Print(3, _T("Palette-based display - %d entries, %d reserved\n"),
 			GetDeviceCaps(m_hBitmapDC, SIZEPALETTE), GetDeviceCaps(m_hBitmapDC, NUMRESERVED));
 		BYTE buf[sizeof(LOGPALETTE)+216*sizeof(PALETTEENTRY)];
 		LOGPALETTE *plp = (LOGPALETTE *) buf;
@@ -1325,7 +1307,7 @@ void ClientConnection::CreateDisplay()
 		for (int r = 5; r >= 0; r--) {
 			for (int g = 5; g >= 0; g--) {
 				for (int b = 5; b >= 0; b--) {
-					plp->palPalEntry[pepos].peRed   = r * 255 / 5; 	
+					plp->palPalEntry[pepos].peRed   = r * 255 / 5;
 					plp->palPalEntry[pepos].peGreen = g * 255 / 5;
 					plp->palPalEntry[pepos].peBlue  = b * 255 / 5;
 					plp->palPalEntry[pepos].peFlags  = NULL;
@@ -1364,7 +1346,7 @@ void ClientConnection::CreateDisplay()
 		{
 			AppendMenu(m_hPopupMenuClipboard, MF_STRING, ID_ENABLE_CLIPBOARD,		"Enable Automatic Synchronization");
 			AppendMenu(m_hPopupMenuClipboard, MF_SEPARATOR, NULL, NULL);
-			
+
 			m_hPopupMenuClipboardFormats = CreatePopupMenu();
 			{
 				AppendMenu(m_hPopupMenuClipboardFormats, MF_STRING, ID_CLIPBOARD_TEXT,		"Text (Unicode)");
@@ -1414,7 +1396,7 @@ void ClientConnection::CreateDisplay()
 		AppendMenu(hsysmenu, MF_STRING, ID_REQUEST_REFRESH,	sz_L23);
 		AppendMenu(hsysmenu, MF_SEPARATOR, NULL, NULL);
 		AppendMenu(hsysmenu, MF_STRING, ID_NEWCONN,			sz_L37);
-		AppendMenu(hsysmenu, MF_STRING | (m_serverInitiated ? MF_GRAYED : 0), 
+		AppendMenu(hsysmenu, MF_STRING | (m_serverInitiated ? MF_GRAYED : 0),
 			ID_CONN_SAVE_AS,	sz_L38);
 	}
     AppendMenu(hsysmenu, MF_SEPARATOR, NULL, NULL);
@@ -1433,7 +1415,7 @@ void ClientConnection::CreateDisplay()
 	//WatchClipboard();
 
 	//Added by: Lars Werner (http://lars.werner.no)
-	if(TitleBar.GetSafeHwnd()==NULL) 
+	if(TitleBar.GetSafeHwnd()==NULL)
 		TitleBar.Create(m_pApp->m_instance, m_hwndMain);
 }
 
@@ -1449,7 +1431,7 @@ void ClientConnection::WatchClipboard()
 	// We don't want to send that.
 	//m_initialClipboardSeen = false;
 	m_settingClipboardViewer = true;
-	m_hwndNextViewer = SetClipboardViewer(m_hwndcn); 
+	m_hwndNextViewer = SetClipboardViewer(m_hwndcn);
 	vnclog.Print(6, "SetClipboardViewer to 0x%08x; next is 0x%08x. Last error 0x%08x", m_hwndcn, m_hwndNextViewer, GetLastError());
 	m_settingClipboardViewer = false;
 #endif
@@ -1513,7 +1495,7 @@ void ClientConnection::UpdateMenuItems()
 
 	EnableMenuItem(m_hPopupMenuClipboardFormats,
 				  ID_CLIPBOARD_DIB,
-				  MF_DISABLED);	
+				  MF_DISABLED);
 
 	EnableMenuItem(m_hPopupMenuClipboard,
 				  ID_CLIPBOARD_RECV,
@@ -1553,7 +1535,7 @@ void ClientConnection::LoadDSMPlugin(bool fForceReload)
 					m_pDSMPlugin->SetEnabled(true);
 					m_pDSMPlugin->DescribePlugin();
 					/*
-					MessageBox(NULL, 
+					MessageBox(NULL,
 					_T(_this->m_pDSMPlugin->DescribePlugin()),
 					_T("Plugin Description"), MB_OK | MB_ICONEXCLAMATION );
 					*/
@@ -1562,7 +1544,7 @@ void ClientConnection::LoadDSMPlugin(bool fForceReload)
 				{
 					m_pDSMPlugin->SetEnabled(false);
 					MessageBox(m_hwndMain,
-						sz_F1, 
+						sz_F1,
 						sz_F6, MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TOPMOST);
 					return;
 				}
@@ -1571,7 +1553,7 @@ void ClientConnection::LoadDSMPlugin(bool fForceReload)
 			{
 				m_pDSMPlugin->SetEnabled(false);
 				MessageBox(m_hwndMain,
-					sz_F5, 
+					sz_F5,
 					sz_F6, MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TOPMOST);
 				return;
 			}
@@ -1580,12 +1562,11 @@ void ClientConnection::LoadDSMPlugin(bool fForceReload)
 	return;
 }
 
-
 //
 // Get & Set the VNC password for the DSMPlugin if necessary
-// 
+//
 void ClientConnection::SetDSMPluginStuff()
-{	
+{
 	//adzm - 2009-06-21
 	if (m_pPluginInterface) {
 		delete m_pPluginInterface;
@@ -1608,7 +1589,7 @@ void ClientConnection::SetDSMPluginStuff()
 			{
 				AuthDialog ad;
 				if (ad.DoDialog(false))
-				{	
+				{
 					strncpy(m_clearPasswd, ad.m_passwd,254);
 				}
 			}
@@ -1652,7 +1633,6 @@ void ClientConnection::SetDSMPluginStuff()
 	}
 }
 
-
 //
 //
 //
@@ -1662,7 +1642,7 @@ void ClientConnection::HandleQuickOption()
 	{
 	case 1:
 		m_opts.m_PreferredEncoding = rfbEncodingZRLE;
-		m_opts.m_Use8Bit = rfbPFFullColors; //false; 
+		m_opts.m_Use8Bit = rfbPFFullColors; //false;
 		m_opts.m_fEnableCache = true;
 		m_opts.autoDetect = true;
 		break;
@@ -1679,7 +1659,7 @@ void ClientConnection::HandleQuickOption()
 
 	case 3:
 		m_opts.m_PreferredEncoding = rfbEncodingZRLE; // rfbEncodingZlibHex;
-		m_opts.m_Use8Bit = rfbPF256Colors; //false; 
+		m_opts.m_Use8Bit = rfbPF256Colors; //false;
 		m_opts.autoDetect = false;
 		m_opts.m_fEnableCache = false;
 //		m_opts.m_localCursor = NOCURSOR;
@@ -1687,7 +1667,7 @@ void ClientConnection::HandleQuickOption()
 
 	case 4:
 		m_opts.m_PreferredEncoding = rfbEncodingZRLE;
-		m_opts.m_Use8Bit = rfbPF64Colors; //true; 
+		m_opts.m_Use8Bit = rfbPF64Colors; //true;
 		m_opts.autoDetect = false;
 		m_opts.m_fEnableCache = true;
 		break;
@@ -1695,8 +1675,8 @@ void ClientConnection::HandleQuickOption()
 	case 5:
 		m_opts.m_PreferredEncoding = rfbEncodingZRLE;
 		m_opts.m_Use8Bit = rfbPF8Colors; //true;
-		// m_opts.m_scaling = true; 
-		// m_opts.m_scale_num = 200; 
+		// m_opts.m_scaling = true;
+		// m_opts.m_scale_num = 200;
 		// m_opts.m_scale_den = 100;
 		// m_opts.m_nServerScale = 2;
 		m_opts.m_enableJpegCompression = false;
@@ -1720,13 +1700,12 @@ void ClientConnection::HandleQuickOption()
 	default: // 0 can be set by noauto command line option. Do not chnage any setting in this case
 		/* sf@2005
 		m_opts.m_PreferredEncoding = rfbEncodingZRLE;
-		m_opts.m_Use8Bit = rfbPF256Colors; //false; 
+		m_opts.m_Use8Bit = rfbPF256Colors; //false;
 		m_opts.m_fEnableCache = true;
 		m_opts.autoDetect = false;
 		*/
 		break;
 	}
-
 }
 
 void ClientConnection::GetConnectDetails()
@@ -1779,10 +1758,9 @@ void ClientConnection::GetConnectDetails()
 				m_opts.m_fEnableCache = true; // sf@2002
 			}
 		}
-		
 	}
-	// This is a bit of a hack: 
-	// The config file may set various things in the app-level defaults which 
+	// This is a bit of a hack:
+	// The config file may set various things in the app-level defaults which
 	// we don't want to be used except for the first connection. So we clear them
 	// in the app defaults here.
 	if (!command_line)
@@ -1794,7 +1772,6 @@ void ClientConnection::GetConnectDetails()
 	m_pApp->m_options.m_connectionSpecified = false;
 	m_pApp->m_options.m_configSpecified = false;
 	}
-
 }
 DWORD WINAPI SocketTimeout(LPVOID lpParam)
 {
@@ -1835,17 +1812,17 @@ void ClientConnection::Connect()
 	if (thataddr.sin_addr.s_addr == INADDR_NONE) {
 		LPHOSTENT lphost;
 		lphost = gethostbyname(m_host);
-		
-		if (lphost == NULL) 
-		{ 
+
+		if (lphost == NULL)
+		{
 			//if(myDialog!=0)DestroyWindow(myDialog);
 			SetEvent(KillEvent);
 			if (m_hwndStatus) SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L46);
-			throw WarningException(sz_L46,IDS_L46); 
+			throw WarningException(sz_L46,IDS_L46);
 		};
 		thataddr.sin_addr.s_addr = ((LPIN_ADDR) lphost->h_addr)->s_addr;
 	};
-	
+
 	if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L47);
 	if (m_hwndStatus)ShowWindow(m_hwndStatus,SW_SHOW);
 	if (m_hwndStatus)UpdateWindow(m_hwndStatus);
@@ -1854,14 +1831,14 @@ void ClientConnection::Connect()
 	thataddr.sin_port = htons(m_port);
 	///Force break after timeout
 	DWORD				  threadID;
-	ThreadSocketTimeout = CreateThread(NULL,0,SocketTimeout,(LPVOID)&m_sock,0,&threadID);	
+	ThreadSocketTimeout = CreateThread(NULL,0,SocketTimeout,(LPVOID)&m_sock,0,&threadID);
 	res = connect(m_sock, (LPSOCKADDR) &thataddr, sizeof(thataddr));
-	
-	if (res == SOCKET_ERROR) 
+
+	if (res == SOCKET_ERROR)
 		{
 			int a=WSAGetLastError();
 			vnclog.Print(0, _T("socket error %i\n"),a);
-			if(a==6) 
+			if(a==6)
 				Sleep(5000);
 			if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L48);
 			SetEvent(KillEvent);
@@ -1880,7 +1857,7 @@ void ClientConnection::ConnectProxy()
 	struct sockaddr_in thataddr;
 	int res;
 	if (!m_opts.m_NoStatus) GTGBS_ShowConnectWindow();
-	
+
 	m_sock = socket(PF_INET, SOCK_STREAM, 0);
 	if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L43);
 	if (m_sock == INVALID_SOCKET) {if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L44);throw WarningException(sz_L44);}
@@ -1892,21 +1869,21 @@ void ClientConnection::ConnectProxy()
 	// The host may be specified as a dotted address "a.b.c.d"
 	// Try that first
 	thataddr.sin_addr.s_addr = inet_addr(m_proxyhost);
-	
+
 	// If it wasn't one of those, do gethostbyname
 	if (thataddr.sin_addr.s_addr == INADDR_NONE) {
 		LPHOSTENT lphost;
 		lphost = gethostbyname(m_proxyhost);
-		
-		if (lphost == NULL) { 
+
+		if (lphost == NULL) {
 			//if(myDialog!=0)DestroyWindow(myDialog);
 			SetEvent(KillEvent);
 			if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L46);
-			throw WarningException(sz_L46); 
+			throw WarningException(sz_L46);
 		};
 		thataddr.sin_addr.s_addr = ((LPIN_ADDR) lphost->h_addr)->s_addr;
 	};
-	
+
 	if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L47);
 	if (m_hwndStatus)ShowWindow(m_hwndStatus,SW_SHOW);
 	if (m_hwndStatus)UpdateWindow(m_hwndStatus);
@@ -1915,8 +1892,8 @@ void ClientConnection::ConnectProxy()
 	thataddr.sin_port = htons(m_proxyport);
 
 	DWORD				  threadID;
-	ThreadSocketTimeout = CreateThread(NULL,0,SocketTimeout,(LPVOID)&m_sock,0,&threadID);	
-	
+	ThreadSocketTimeout = CreateThread(NULL,0,SocketTimeout,(LPVOID)&m_sock,0,&threadID);
+
 	res = connect(m_sock, (LPSOCKADDR) &thataddr, sizeof(thataddr));
 	if (res == SOCKET_ERROR) {if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L48);throw WarningException(sz_L48,IDS_L48);}
 	vnclog.Print(0, _T("Connected to %s port %d\n"), m_proxyhost, m_proxyport);
@@ -1926,7 +1903,7 @@ void ClientConnection::ConnectProxy()
 	if (m_hwndStatus)UpdateWindow(m_hwndStatus);
 }
 
-void ClientConnection::SetSocketOptions() 
+void ClientConnection::SetSocketOptions()
 {
 	// Disable Nagle's algorithm
 	BOOL nodelayval = TRUE;
@@ -1958,7 +1935,7 @@ void ClientConnection::NegotiateProtocolVersion()
 		SetEvent(KillEvent);
 		vnclog.Print(0, _T("Error reading protocol version: %s\n"),
                           c.str());
-		if (!Pressed_Cancel) 
+		if (!Pressed_Cancel)
 		{
 		if (m_fUsePlugin && m_pIntegratedPluginInterface == NULL)
 			throw WarningException("Connection failed - Error reading Protocol Version\r\n\r\n"
@@ -1984,7 +1961,7 @@ void ClientConnection::NegotiateProtocolVersion()
 		SetEvent(KillEvent);
 		vnclog.Print(0, _T("Error reading protocol version: %s\n"),
                           c.m_info);
-		if (!Pressed_Cancel) 
+		if (!Pressed_Cancel)
 		{
 		if (m_fUsePlugin && m_pIntegratedPluginInterface == NULL)
 			throw WarningException("Connection failed - Error reading Protocol Version\r\n\n\r"
@@ -2014,18 +1991,17 @@ void ClientConnection::NegotiateProtocolVersion()
 	//adzm 2010-05-10
 	//1096 !m_pIntegratedPluginInterface is NEEDED
 	if (m_fUsePlugin && fNotEncrypted && !m_pIntegratedPluginInterface) {
-
 		//adzm 2010-05-12
 		if (m_opts.m_fRequireEncryption) {
 			throw WarningException("The insecure connection was refused.");
 		}
-		else 
+		else
 		{
 			//SetSocketOptions / fDSMMode?
 			m_fUsePlugin = false;
 
 			//adzm - 2009-06-21 - I don't set the plugin to be disabled here, just rely on m_fUsePlugin.
-			
+
 			//adzm - 2009-06-21
 			if (m_pPluginInterface) {
 				delete m_pPluginInterface;
@@ -2038,7 +2014,7 @@ void ClientConnection::NegotiateProtocolVersion()
 				//adzm 2009-07-19 - Auto-accept the connection if it is unencrypted if that option is specified
 
 				int returnvalue=MessageBox(m_hwndMain, "You have specified an encryption plugin, however this connection in unencrypted! Do you want to continue?", "Accept insecure connection", MB_YESNO | MB_ICONEXCLAMATION | MB_TOPMOST);
-				if (returnvalue==IDNO) 
+				if (returnvalue==IDNO)
 				{
 					throw WarningException("You refused the insecure connection.");
 				}
@@ -2076,7 +2052,6 @@ void ClientConnection::NegotiateProtocolVersion()
 									"- You've forgotten to select a DSMPlugin and the Server uses a DSMPlugin\r\n"
 									"- Viewer and Server are not compatible (they use different RFB protocols)\r\n"
 									);
-
     }
 
     vnclog.Print(0, _T("RFB server supports protocol version %d.%d\n"),
@@ -2120,23 +2095,18 @@ void ClientConnection::NegotiateProtocolVersion()
 	}
 
     else if ((m_majorVersion == 3) && (m_minorVersion < 3)) {
-		
         /* if server is 3.2 we can't use the new authentication */
 		vnclog.Print(0, _T("Can't use IDEA authentication\n"));
         /* This will be reported later if authentication is requested*/
 	}
 	else if ((m_majorVersion == 3) && (m_minorVersion == 3)) {
-		
         /* if server is 3.2 we can't use the new authentication */
 		vnclog.Print(0, _T("RFB version 3.3, Legacy \n"));
         /* This will be reported later if authentication is requested*/
-
     } else {
-		
         /* any other server version, just tell the server what we want */
 		m_majorVersion = rfbProtocolMajorVersion;
 		m_minorVersion = rfbProtocolMinorVersion; // always 4 for Ultra Viewer
-
     }
 
     sprintf(pv,rfbProtocolVersionFormat, m_majorVersion, m_minorVersion);
@@ -2161,7 +2131,7 @@ void ClientConnection::NegotiateProtocolVersion()
 		//adzm 2009-06-21 - auto-accept if specified
 		if (!m_opts.m_fAutoAcceptIncoming) {
 			int returnvalue=MessageBox(m_hwndMain,   mytext,"Accept Incoming SC Connection", MB_YESNO |  MB_TOPMOST);
-			if (returnvalue==IDNO) 
+			if (returnvalue==IDNO)
 			{
 				int nummer=0;
 				WriteExact((char *)&nummer,sizeof(int));
@@ -2171,16 +2141,14 @@ void ClientConnection::NegotiateProtocolVersion()
 			{
 				int nummer=1;
 				WriteExact((char *)&nummer,sizeof(int));
-
 			}
 		} else {
 			int nummer=1;
 			WriteExact((char *)&nummer,sizeof(int));
-		}	
+		}
 
 		m_minorVersion -= 10;
 	}
-
 
 	vnclog.Print(0, _T("Connected to RFB server, using protocol version %d.%d\n"),
 		rfbProtocolMajorVersion, m_minorVersion);
@@ -2280,8 +2248,6 @@ void ClientConnection::NegotiateProxy()
 	vnclog.Print(0, _T("Connected to RFB server, using protocol version %d.%d\n"),
 		rfbProtocolMajorVersion, m_minorVersion);
 	}
-
-
 }
 
 void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
@@ -2289,7 +2255,7 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 	CARD32 authScheme = rfbInvalidAuth;
 
 	// adzm 2010-09
-	if (m_minorVersion < 7) {	
+	if (m_minorVersion < 7) {
 		ReadExact((char *)&authScheme, sizeof(authScheme));
 		authScheme = Swap32IfLE(authScheme);
 
@@ -2302,7 +2268,7 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 				authScheme = rfbUltraVNC_MsLogonIIAuth;
 				break;
 		}
-	} else {		
+	} else {
 		CARD8 authAllowedLength = 0;
 		ReadExact((char *)&authAllowedLength, sizeof(authAllowedLength));
 		if (authAllowedLength == 0) {
@@ -2352,7 +2318,7 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 			if (authScheme == rfbInvalidAuth) {
 				throw WarningException("No supported authentication methods!");
 			}
-			
+
 			CARD8 authSchemeMsg = (CARD8)authScheme;
 			WriteExact((char *)&authSchemeMsg, sizeof(authSchemeMsg));
 		}
@@ -2374,8 +2340,8 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 	if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L90);
 
 	bool bSecureVNCPluginActive = std::find(current_auth.begin(), current_auth.end(), rfbUltraVNC_SecureVNCPluginAuth) != current_auth.end();
-	
-	if (!bSecureVNCPluginActive && m_fUsePlugin && m_pIntegratedPluginInterface && authScheme != rfbConnFailed && authScheme != rfbUltraVNC_SecureVNCPluginAuth && authScheme != rfbUltraVNC) 
+
+	if (!bSecureVNCPluginActive && m_fUsePlugin && m_pIntegratedPluginInterface && authScheme != rfbConnFailed && authScheme != rfbUltraVNC_SecureVNCPluginAuth && authScheme != rfbUltraVNC)
 	{
 		//adzm 2010-05-12
 		if (m_opts.m_fRequireEncryption) {
@@ -2387,7 +2353,7 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 			m_fUsePlugin = false;
 
 			//adzm - 2009-06-21 - I don't set the plugin to be disabled here, just rely on m_fUsePlugin.
-			
+
 			//adzm - 2009-06-21
 			if (m_pPluginInterface) {
 				delete m_pPluginInterface;
@@ -2399,14 +2365,14 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 			//adzm 2009-07-19 - Auto-accept the connection if it is unencrypted if that option is specified
 			if (!m_opts.m_fAutoAcceptNoDSM) {
 				int returnvalue=MessageBox(m_hwndMain, "You have specified an encryption plugin, however this connection in unencrypted! Do you want to continue?", "Accept insecure connection", MB_YESNO | MB_ICONEXCLAMATION | MB_TOPMOST);
-				if (returnvalue==IDNO) 
+				if (returnvalue==IDNO)
 				{
 					throw WarningException("You refused the insecure connection.");
 				}
 			}
 		}
 	}
-	
+
 	switch(authScheme)
 	{
 	case rfbUltraVNC:
@@ -2450,15 +2416,15 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 	case rfbConnFailed:
 		ReadExact((char *)&reasonLen, 4);
 		reasonLen = Swap32IfLE(reasonLen);
-		
+
 		CheckBufferSize(reasonLen+1);
 		ReadString(m_netbuf, reasonLen);
-		
+
 		vnclog.Print(0, _T("RFB connection failed, reason: %s\n"), m_netbuf);
 		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L91);
 		throw WarningException(m_netbuf);
 		break;
-	default:		
+	default:
 		vnclog.Print(0, _T("RFB connection failed, unknown authentication method: %lu\n"), authScheme);
 		throw ErrorException("Unknown authentication method!");
 		break;
@@ -2467,40 +2433,40 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 	current_auth.push_back(authScheme);
 
 	// Read the authentication response
-	ReadExact((char *)&authResult, sizeof(authResult));	
+	ReadExact((char *)&authResult, sizeof(authResult));
 	authResult = Swap32IfLE(authResult);
 
 	if (m_pIntegratedPluginInterface && authScheme == rfbUltraVNC_SecureVNCPluginAuth) {
 		m_pIntegratedPluginInterface->SetHandshakeComplete();
-		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_PLUGIN_STATUS,m_pIntegratedPluginInterface->DescribeCurrentSettings());	
+		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_PLUGIN_STATUS,m_pIntegratedPluginInterface->DescribeCurrentSettings());
 	}
-	
-	switch (authResult) 
-	{		
+
+	switch (authResult)
+	{
 	case rfbVncAuthOK:
 		if (m_hwndStatus)vnclog.Print(0, _T("VNC authentication succeeded\n"));
 		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L55);
-	
+
 		g_passwordfailed=false;
 		break;
 	case rfbVncAuthFailed:
-	case rfbVncAuthFailedEx: 
-		vnclog.Print(0, _T("VNC authentication failed!"));			
+	case rfbVncAuthFailedEx:
+		vnclog.Print(0, _T("VNC authentication failed!"));
 		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L56);
 		if (m_minorVersion >= 7 || authResult == rfbVncAuthFailedEx) {
-			vnclog.Print(0, _T("VNC authentication failed! Extended information available."));	
+			vnclog.Print(0, _T("VNC authentication failed! Extended information available."));
 			//adzm 2010-05-11 - Send an explanatory message for the failure (if any)
 			ReadExact((char *)&reasonLen, 4);
 			reasonLen = Swap32IfLE(reasonLen);
-			
+
 			CheckBufferSize(reasonLen+1);
 			ReadString(m_netbuf, reasonLen);
-			
+
 			vnclog.Print(0, _T("VNC authentication failed! Extended information: %s\n"), m_netbuf);
 			if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,m_netbuf);
 			throw WarningException(m_netbuf);
 		} else {
-			vnclog.Print(0, _T("VNC authentication failed!"));	
+			vnclog.Print(0, _T("VNC authentication failed!"));
 			SetEvent(KillEvent);
 			throw WarningException(sz_L57,IDS_L57);
 		}
@@ -2512,11 +2478,11 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 		break;
 	case rfbLegacy_MsLogon:
 		if (m_minorVersion >= 7) {
-			vnclog.Print(0, _T("Invalid auth response for protocol version.\n"));	
+			vnclog.Print(0, _T("Invalid auth response for protocol version.\n"));
 			throw ErrorException("Invalid auth response");
 		}
 		if ((authScheme != rfbUltraVNC_SecureVNCPluginAuth) || !m_pIntegratedPluginInterface) {
-			vnclog.Print(0, _T("Invalid auth response response\n"));	
+			vnclog.Print(0, _T("Invalid auth response response\n"));
 			throw ErrorException("Invalid auth response");
 		}
 		//adzm 2010-05-10
@@ -2524,7 +2490,7 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 		break;
 	case rfbVncAuthContinue:
 		if (m_minorVersion < 7) {
-			vnclog.Print(0, _T("Invalid auth continue response for protocol version.\n"));	
+			vnclog.Print(0, _T("Invalid auth continue response for protocol version.\n"));
 			throw ErrorException("Invalid auth continue response");
 		}
 		if (current_auth.size() > 5) { // arbitrary
@@ -2540,25 +2506,25 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 		throw ErrorException(sz_L59,IDS_L59);
 		break;
 	}
-	
+
 	return;
 }
 
 void ClientConnection::AuthSecureVNCPlugin()
 {
-	if (!m_pIntegratedPluginInterface) {				
+	if (!m_pIntegratedPluginInterface) {
 		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,"SecureVNCPlugin authentication failed (SecureVNCPlugin interface available)");
 		SetEvent(KillEvent);
 		throw ErrorException("SecureVNCPlugin authentication failed (no plugin interface available)");
 	}
-			
+
 	char passwd[256];
 	passwd[0] = '\0';
-	
+
 	if (strlen(m_clearPasswd)>0)
 	{
-		strcpy(passwd, m_clearPasswd);			
-	} 
+		strcpy(passwd, m_clearPasswd);
+	}
 	else if (strlen((const char *) m_encPasswd)>0)
 	{  char * pw = vncDecryptPasswd(m_encPasswd);
 		strcpy(passwd, pw);
@@ -2572,7 +2538,6 @@ void ClientConnection::AuthSecureVNCPlugin()
 	bool bSuccess = false;
 	bool bCancel = false;
 	do {
-
 		WORD wChallengeLength = 0;
 
 		ReadExact((char*)&wChallengeLength, sizeof(wChallengeLength));
@@ -2580,7 +2545,7 @@ void ClientConnection::AuthSecureVNCPlugin()
 		BYTE* pChallengeData = new BYTE[wChallengeLength];
 
 		ReadExact((char*)pChallengeData, wChallengeLength);
-				
+
 		bool bPasswordOK = false;
 		bool bPassphraseRequired = false;
 		bSuccess = false;
@@ -2588,7 +2553,7 @@ void ClientConnection::AuthSecureVNCPlugin()
 			bSuccess = m_pIntegratedPluginInterface->HandleChallenge(pChallengeData, wChallengeLength, nSequenceNumber, bPasswordOK, bPassphraseRequired);
 			if (bSuccess && !bPasswordOK)
 			{
-				if (!bTriedNoPassword && strlen(passwd) > 0) {		
+				if (!bTriedNoPassword && strlen(passwd) > 0) {
 					m_pIntegratedPluginInterface->SetPasswordData((const BYTE*)passwd, strlen(passwd));
 					bTriedNoPassword = true;
 				} else {
@@ -2597,14 +2562,14 @@ void ClientConnection::AuthSecureVNCPlugin()
 					AuthDialog ad;
 					//adzm 2010-05-12 - passphrase
 					ad.m_bPassphraseMode = bPassphraseRequired;
-					
+
 					if (ad.DoDialog(false))
 					{
 						strncpy(passwd, ad.m_passwd,254);
 						if (!bPassphraseRequired && strlen(passwd) > 8) {
 							passwd[8] = '\0';
 						}
-						
+
 						m_pIntegratedPluginInterface->SetPasswordData((const BYTE*)passwd, strlen(passwd));
 					}
 					else
@@ -2616,20 +2581,19 @@ void ClientConnection::AuthSecureVNCPlugin()
 		} while (bSuccess && !bPasswordOK && !bCancel);
 
 		delete[] pChallengeData;
-		
+
 		if (bSuccess && !bCancel) {
-		
 			BYTE* pResponseData = NULL;
 			int nResponseLength = 0;
-			
+
 			m_pIntegratedPluginInterface->GetResponse(pResponseData, nResponseLength, nSequenceNumber, bExpectChallenge);
-			
+
 			WORD wResponseLength = (WORD)nResponseLength;
-			
+
 			WriteExact((char*)&wResponseLength, sizeof(wResponseLength));
-			
+
 			WriteExact((char*)pResponseData, nResponseLength);
-	
+
 			m_pIntegratedPluginInterface->FreeMemory(pResponseData);
 		}
 
@@ -2647,12 +2611,12 @@ void ClientConnection::AuthSecureVNCPlugin()
 		SetEvent(KillEvent);
 		throw ErrorException(m_pIntegratedPluginInterface->GetLastErrorString());
 	}
-}	
+}
 
 // marscha@2006: Try to better hide the windows password.
 // I know that this is no breakthrough in modern cryptography.
 // It's just a patch/kludge/workaround.
-void ClientConnection::AuthMsLogonII() 
+void ClientConnection::AuthMsLogonII()
 {
 	char gen[8], mod[8], pub[8], resp[8];
 	char user[256], passwd[64];
@@ -2660,11 +2624,11 @@ void ClientConnection::AuthMsLogonII()
 
 //act: clearPasswd must NOT be cleared, because of use of user command line
 //line commented:	memset(m_clearPasswd, 0, sizeof(m_clearPasswd)); // ??
-	
+
 	ReadExact(gen, sizeof(gen));
 	ReadExact(mod, sizeof(mod));
 	ReadExact(resp, sizeof(resp));
-		
+
 	DH dh(bytesToInt64(gen), bytesToInt64(mod));
 	int64ToBytes(dh.createInterKey(), pub);
 
@@ -2722,14 +2686,14 @@ void ClientConnection::AuthMsLogonII()
 	}
 	vncEncryptBytes2((unsigned char*) user, sizeof(user), key);
 	vncEncryptBytes2((unsigned char*) passwd, sizeof(passwd), key);
-	
+
 	WriteExactQueue(user, sizeof(user));
 	WriteExact(passwd, sizeof(passwd));
 }
 
-void ClientConnection::AuthMsLogonI() 
+void ClientConnection::AuthMsLogonI()
 {
-	if (!m_ms_logon_I_legacy) {		
+	if (!m_ms_logon_I_legacy) {
 		vnclog.Print(0, _T("AuthMsLogonI should not be called!\n"));
 		throw WarningException("AuthMsLogonI should not be called!\n");
 	}
@@ -2749,11 +2713,11 @@ void ClientConnection::AuthMsLogonI()
 	// We NOT ignore the clear password in case of ms_logon !
 	// finally done !! : Add ms_user & ms_password command line params
 	// act: add user option on command line
-	if (m_ms_logon_I_legacy) 
+	if (m_ms_logon_I_legacy)
 	{	// mslogon required
 		// if user cmd line option is not specified, cmd line passwd must be cleared
 		// the same if user is provided and not password
-		if (strlen(m_cmdlnUser)>0)  
+		if (strlen(m_cmdlnUser)>0)
 		{	if (strlen(m_clearPasswd)>0)
 			{  //user and password are not empty
 			    strcpy(user, m_cmdlnUser);
@@ -2763,7 +2727,6 @@ void ClientConnection::AuthMsLogonI()
 		}
 		else
 			memset(m_clearPasswd, 0, sizeof(m_clearPasswd));
-
 	}
 
 	// Was the password already specified in a config file or entered for DSMPlugin ?
@@ -2772,8 +2735,7 @@ void ClientConnection::AuthMsLogonI()
 	{
 		strcpy(passwd, m_clearPasswd);
 	    if (m_ms_logon_I_legacy) strcpy(user, m_cmdlnUser);
-	    
-	} 
+	}
 	else if (strlen((const char *) m_encPasswd)>0)
 	{  char * pw = vncDecryptPasswd(m_encPasswd);
 		strcpy(passwd, pw);
@@ -2785,7 +2747,7 @@ void ClientConnection::AuthMsLogonI()
 	   free(pw);
 	   strcpy(user, m_ms_user);
 	}
-	else 
+	else
 	{
 		AuthDialog ad;
 		///////////////ppppppppppppppppppppppppppppppppppppppppp // adzm 2010-10 - what?
@@ -2806,26 +2768,26 @@ void ClientConnection::AuthMsLogonI()
 						passwd[8] = '\0';
 					}
 				}
-			if (m_ms_logon_I_legacy) 
+			if (m_ms_logon_I_legacy)
 			{
 				vncEncryptPasswdMs(m_encPasswdMs, passwd);
 				strcpy(m_ms_user, user);
 			}
-		} 
-		else 
+		}
+		else
 		{
 //					if (flash) {flash->Killflash();}
 			throw QuietException(sz_L54);
 		}
 	}
 
-	// sf@2002 
+	// sf@2002
 	// m_ms_logon = false;
 	if (m_ms_logon_I_legacy) ReadExact((char *)challengems, CHALLENGESIZEMS);
 	ReadExact((char *)challenge, CHALLENGESIZE);
 
 	// MS logon
-	if (m_ms_logon_I_legacy) 
+	if (m_ms_logon_I_legacy)
 	{
 		int i=0;
 		for (i=0;i<32;i++)
@@ -2842,17 +2804,16 @@ void ClientConnection::AuthMsLogonI()
 		for ( i=0; i< nLen; i++) {
 			passwd[i] = '\0';
 		}
-	
+
 		WriteExact((char *) challenge, CHALLENGESIZE);
 	}
 }
-
 
 void ClientConnection::AuthVnc()
 {
 	CARD8 challenge[CHALLENGESIZE];
 	CARD32 authResult=rfbVncAuthFailed;
-	if ((m_majorVersion == 3) && (m_minorVersion < 3)) 
+	if ((m_majorVersion == 3) && (m_minorVersion < 3))
 	{
 		/* if server is 3.2 we can't use the new authentication */
 		vnclog.Print(0, _T("Can't use IDEA authentication\n"));
@@ -2861,59 +2822,59 @@ void ClientConnection::AuthVnc()
 	}
 	// rdv@2002 - v1.1.x
 	char passwd[256];
-	memset(passwd, 0, sizeof(char)*256);		
+	memset(passwd, 0, sizeof(char)*256);
 	// Was the password already specified in a config file or entered for DSMPlugin ?
 	// Modif sf@2002 - A clear password can be transmitted via the vncviewer command line
 	if (strlen(m_clearPasswd)>0)
 	{
 		strcpy(passwd, m_clearPasswd);
-	} 
+	}
 	else if (strlen((const char *) m_encPasswd)>0)
 	{
 		char * pw = vncDecryptPasswd(m_encPasswd);
 		strcpy(passwd, pw);
 		free(pw);
 	}
-	else 
+	else
 	{
 		AuthDialog ad;
 		if (ad.DoDialog(false))
 		{
-			strncpy(passwd, ad.m_passwd,254);					
-			if (strlen(passwd) == 0) 
+			strncpy(passwd, ad.m_passwd,254);
+			if (strlen(passwd) == 0)
 			{
 				vnclog.Print(0, _T("Password had zero length\n"));
 				throw WarningException(sz_L53);
 			}
-			if (strlen(passwd) > 8) 
+			if (strlen(passwd) > 8)
 			{
 				passwd[8] = '\0';
 			}
 			vncEncryptPasswd(m_encPasswd, passwd);
-		} 
-		else 
+		}
+		else
 		{
 			throw QuietException(sz_L54);
 		}
 	}
-	ReadExact((char *)challenge, CHALLENGESIZE);			
+	ReadExact((char *)challenge, CHALLENGESIZE);
 	vncEncryptBytes(challenge, passwd);
 	/* Lose the plain-text password from memory */
 	int nLen = (int)strlen(passwd);
-	for (int i=0; i< nLen; i++) 
+	for (int i=0; i< nLen; i++)
 	{
 		passwd[i] = '\0';
-	}			
+	}
 	WriteExact((char *) challenge, CHALLENGESIZE);
 }
 
 void ClientConnection::AuthSCPrompt()
 {
 	if (m_minorVersion < 7) {
-		vnclog.Print(0, _T("Invalid auth continue response for protocol version.\n"));	
+		vnclog.Print(0, _T("Invalid auth continue response for protocol version.\n"));
 		throw ErrorException("Invalid auth continue response");
 	}
-	/// SHOW Messagebox 
+	/// SHOW Messagebox
 	int size;
 	ReadExact((char *)&size,sizeof(int));
 	char mytext[1025]; //10k
@@ -2932,7 +2893,7 @@ void ClientConnection::AuthSCPrompt()
 	int accepted = 0;
 	if (!m_opts.m_fAutoAcceptIncoming) {
 		int returnvalue=MessageBox(m_hwndMain,   mytext,"Accept Incoming SC Connection", MB_YESNO |  MB_TOPMOST);
-		if (returnvalue != IDNO) 
+		if (returnvalue != IDNO)
 		{
 			accepted = 1;
 		}
@@ -2944,9 +2905,9 @@ void ClientConnection::AuthSCPrompt()
 }
 
 void ClientConnection::AuthSessionSelect()
-{	
+{
 	if (m_minorVersion < 7) {
-		vnclog.Print(0, _T("Invalid auth continue response for protocol version.\n"));	
+		vnclog.Print(0, _T("Invalid auth continue response for protocol version.\n"));
 		throw ErrorException("Invalid auth continue response");
 	}
 
@@ -2960,7 +2921,7 @@ void ClientConnection::AuthSessionSelect()
 
 void ClientConnection::SendClientInit()
 {
-    rfbClientInitMsg ci;	
+    rfbClientInitMsg ci;
 	// adzm 2010-09
 	ci.flags = 0;
 	if (m_opts.m_Shared) {
@@ -2973,7 +2934,6 @@ void ClientConnection::SendClientInit()
 void ClientConnection::ReadServerInit()
 {
     ReadExact((char *)&m_si, sz_rfbServerInitMsg);
-	
 
     m_si.framebufferWidth = Swap16IfLE(m_si.framebufferWidth);
     m_si.framebufferHeight = Swap16IfLE(m_si.framebufferHeight);
@@ -2981,7 +2941,7 @@ void ClientConnection::ReadServerInit()
     m_si.format.greenMax = Swap16IfLE(m_si.format.greenMax);
     m_si.format.blueMax = Swap16IfLE(m_si.format.blueMax);
     m_si.nameLength = Swap32IfLE(m_si.nameLength);
-	
+
     m_desktopName = new TCHAR[m_si.nameLength + 4 + 256];
 	m_desktopName_viewonly = new TCHAR[m_si.nameLength + 4 + 256+16];
 
@@ -2989,8 +2949,8 @@ void ClientConnection::ReadServerInit()
     char *deskNameBuf = new char[m_si.nameLength + 4];
 
 	ReadString(deskNameBuf, m_si.nameLength);
-    
-	MultiByteToWideChar( CP_ACP,   MB_PRECOMPOSED, 
+
+	MultiByteToWideChar( CP_ACP,   MB_PRECOMPOSED,
 			     deskNameBuf, m_si.nameLength,
 			     m_desktopName, m_si.nameLength+1);
     delete deskNameBuf;
@@ -2998,7 +2958,7 @@ void ClientConnection::ReadServerInit()
     ReadString(m_desktopName, m_si.nameLength);
 #endif
     // TCHAR tcDummy [MAX_PATH * 3];
-	
+
 	// sprintf(tcDummy,"%s ",m_desktopName);
 	strcat(m_desktopName, " ");
 
@@ -3012,7 +2972,7 @@ void ClientConnection::ReadServerInit()
 	vnclog.Print(1, _T("Geometry %d x %d depth %d\n"),
 		m_si.framebufferWidth, m_si.framebufferHeight, m_si.format.depth );
 
-	//SetWindowText(m_hwndMain, m_desktopName);	
+	//SetWindowText(m_hwndMain, m_desktopName);
 	//adzm 2009-06-21 - if we decide to connect even though it is unencrypted, do not show the plugin info
 	if (m_pDSMPlugin->IsEnabled() && m_fUsePlugin)
 	{
@@ -3050,7 +3010,7 @@ void ClientConnection::SizeWindow()
 
 	int widthwindow,heightwindow;
 
-	// sf@2003 - AutoScaling 
+	// sf@2003 - AutoScaling
 	if (m_opts.m_fAutoScaling && !m_fScalingDone)
 	{
 		// We save the scales values coming from options
@@ -3077,11 +3037,11 @@ void ClientConnection::SizeWindow()
 			heightwindow=m_si.framebufferHeight*Ratio/100;
 			m_opts.m_scale_num =Ratio;
 			m_opts.m_scale_den = 100;
-			m_opts.m_scaling = true; 
+			m_opts.m_scaling = true;
 			m_fScalingDone = true;
 		}
 	}
-	
+
 	if (!m_opts.m_fAutoScaling && m_fScalingDone)
 	{
 		// Restore scale values to the original options values
@@ -3101,11 +3061,11 @@ void ClientConnection::SizeWindow()
 		SetRect(&fullwinrect, 0, 0,
 				m_si.framebufferWidth * m_opts.m_scale_num / m_opts.m_scale_den,
 				m_si.framebufferHeight * m_opts.m_scale_num / m_opts.m_scale_den);
-	else 
+	else
 		SetRect(&fullwinrect, 0, 0, m_si.framebufferWidth, m_si.framebufferHeight);
 
-	AdjustWindowRectEx(&fullwinrect, 
-			   GetWindowLong(m_hwndcn, GWL_STYLE) & ~WS_VSCROLL & ~WS_HSCROLL, 
+	AdjustWindowRectEx(&fullwinrect,
+			   GetWindowLong(m_hwndcn, GWL_STYLE) & ~WS_VSCROLL & ~WS_HSCROLL,
 			   FALSE, GetWindowLong(m_hwndcn, GWL_EXSTYLE));
 
 	m_fullwinwidth = fullwinrect.right - fullwinrect.left;
@@ -3117,15 +3077,15 @@ void ClientConnection::SizeWindow()
 	//SetWindowPos(m_hwnd, HWND_TOP,
 	if (m_opts.m_ShowToolbar)
 		SetWindowPos(m_hwndcn, m_hwndTBwin, 0, m_TBr.bottom, m_winwidth, m_winheight, SWP_SHOWWINDOW);
-	else 
+	else
 	{
 		SetWindowPos(m_hwndcn, m_hwndTBwin, 0, 0, m_winwidth, m_winheight, SWP_SHOWWINDOW);
 		SetWindowPos(m_hwndTBwin, NULL ,0, 0, 0, 0, SWP_HIDEWINDOW);
 	}
 
    // Hauptfenster positionieren
-	AdjustWindowRectEx(&fullwinrect, 
-					   GetWindowLong(m_hwndMain, GWL_STYLE) & ~WS_VSCROLL & ~WS_HSCROLL, 
+	AdjustWindowRectEx(&fullwinrect,
+					   GetWindowLong(m_hwndMain, GWL_STYLE) & ~WS_VSCROLL & ~WS_HSCROLL,
 					   FALSE, GetWindowLong(m_hwndMain, GWL_EXSTYLE));
 
 	m_fullwinwidth = fullwinrect.right - fullwinrect.left;
@@ -3173,7 +3133,6 @@ void ClientConnection::SizeWindow()
 		ShowWindow(m_hwndTBwin, SW_SHOW);
 	else
 		ShowWindow(m_hwndTB, SW_HIDE);
-
 }
 
 // We keep a local copy of the whole screen.  This is not strictly necessary
@@ -3187,7 +3146,7 @@ void ClientConnection::CreateLocalFramebuffer()
 void ClientConnection::SetupPixelFormat() {
 	// Have we requested a reduction to 8-bit?
     if (m_opts.m_Use8Bit)
-	{		
+	{
 		switch (m_opts.m_Use8Bit)
 		{
 		case rfbPF256Colors:
@@ -3209,19 +3168,17 @@ void ClientConnection::SetupPixelFormat() {
 			m_myFormat = vnc8bitFormat_2Grey;
 			break;
 		}
-		vnclog.Print(2, _T("Requesting 8-bit truecolour\n"));  
+		vnclog.Print(2, _T("Requesting 8-bit truecolour\n"));
 		// We don't support colormaps so we'll ask the server to convert
     }
 	else if (!m_si.format.trueColour)
 	{
-        
         // We'll just request a standard 16-bit truecolor
         vnclog.Print(2, _T("Requesting 16-bit truecolour\n"));
         m_myFormat = vnc16bitFormat;
     }
 	else
 	{
-
 		// Normally we just use the sever's format suggestion
 		m_myFormat = m_si.format;
         m_myFormat.bigEndian = 0; // except always little endian
@@ -3239,23 +3196,21 @@ void ClientConnection::SetupPixelFormat() {
 		// start of the code if we wanted to do it.
 
 		if (false) {
-		
 			// Get a DC for the root window
 			TempDC hrootdc(NULL);
 			int localBitsPerPixel = GetDeviceCaps(hrootdc, BITSPIXEL);
 			int localRasterCaps	  = GetDeviceCaps(hrootdc, RASTERCAPS);
-			vnclog.Print(2, _T("Memory DC has depth of %d and %s pallete-based.\n"), 
+			vnclog.Print(2, _T("Memory DC has depth of %d and %s pallete-based.\n"),
 				localBitsPerPixel, (localRasterCaps & RC_PALETTE) ? "is" : "is not");
-			
+
 			// If we're using truecolor, and the server has more bits than we do
-			if ( (localBitsPerPixel > m_myFormat.depth) && 
+			if ( (localBitsPerPixel > m_myFormat.depth) &&
 				! (localRasterCaps & RC_PALETTE)) {
 				m_myFormat.depth = localBitsPerPixel;
 
 				// create a bitmap compatible with the current display
 				// call GetDIBits twice to get the colour info.
 				// set colour masks and shifts
-				
 			}
 		}
 	}
@@ -3263,11 +3218,10 @@ void ClientConnection::SetupPixelFormat() {
 	// The endian will be set before sending
 }
 
-
 void ClientConnection::SetFormatAndEncodings()
 {
 	// Set pixel format to myFormat
-    
+
 	rfbSetPixelFormatMsg spf;
 
     spf.type = rfbSetPixelFormat;
@@ -3286,7 +3240,7 @@ void ClientConnection::SetFormatAndEncodings()
     rfbSetEncodingsMsg *se = (rfbSetEncodingsMsg *)buf;
     CARD32 *encs = (CARD32 *)(&buf[sz_rfbSetEncodingsMsg]);
     int len = 0;
-	
+
     se->type = rfbSetEncodings;
     se->nEncodings = 0;
 
@@ -3315,7 +3269,7 @@ void ClientConnection::SetFormatAndEncodings()
 					zywrle = 0;
 				}
 			}
-			else 
+			else
 			{
 				m_opts.m_PreferredEncoding--;
 			}
@@ -3351,7 +3305,7 @@ void ClientConnection::SetFormatAndEncodings()
 
 	// Tight - Request cursor shape updates if enabled by user
 	if (m_opts.m_requestShapeUpdates) {
-		encs[se->nEncodings++] = Swap32IfLE(rfbEncodingXCursor);
+		//encs[se->nEncodings++] = Swap32IfLE(rfbEncodingXCursor);
 		encs[se->nEncodings++] = Swap32IfLE(rfbEncodingRichCursor);
 		if (!m_opts.m_ignoreShapeUpdates)
 			encs[se->nEncodings++] = Swap32IfLE(rfbEncodingPointerPos); // marscha PointerPos
@@ -3381,7 +3335,7 @@ void ClientConnection::SetFormatAndEncodings()
 	}
 
     // len = sz_rfbSetEncodingsMsg + se->nEncodings * 4;
-	
+
     encs[se->nEncodings++] = Swap32IfLE(rfbEncodingServerState);
     encs[se->nEncodings++] = Swap32IfLE(rfbEncodingEnableKeepAlive);
     encs[se->nEncodings++] = Swap32IfLE(rfbEncodingFTProtocolVersion);
@@ -3407,7 +3361,7 @@ void ClientConnection::Createdib()
 	BitmapInfo bi;
 	UINT iUsage;
     memset(&bi, 0, sizeof(bi));
-	
+
 	iUsage = m_myFormat.trueColour ? DIB_RGB_COLORS : DIB_PAL_COLORS;
     bi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
     bi.bmiHeader.biBitCount = m_myFormat.bitsPerPixel;
@@ -3420,7 +3374,7 @@ void ClientConnection::Createdib()
     bi.mask.green = m_myFormat.greenMax << m_myFormat.greenShift;
     bi.mask.blue = m_myFormat.blueMax << m_myFormat.blueShift;
 
-	if (directx_used) 
+	if (directx_used)
 		{
 			directx_output.DestroyD3D();
 			directx_used=false;
@@ -3429,7 +3383,7 @@ void ClientConnection::Createdib()
 	if (m_membitmap != NULL) {DeleteObject(m_membitmap);m_membitmap= NULL;}
 	m_hmemdc = CreateCompatibleDC(m_hBitmapDC);
 	m_membitmap = CreateDIBSection(m_hmemdc, (BITMAPINFO*)&bi.bmiHeader, iUsage, &m_DIBbits, NULL, 0);
-	memset((char*)m_DIBbits,128,bi.bmiHeader.biSizeImage); 
+	memset((char*)m_DIBbits,128,bi.bmiHeader.biSizeImage);
 
 	ObjectSelector bb(m_hmemdc, m_membitmap);
 
@@ -3494,14 +3448,12 @@ void ClientConnection::KillThread()
 		fis->Update_socket();
 		shutdown(m_sock, SD_BOTH);
 		closesocket(m_sock);
-		m_sock = INVALID_SOCKET;		
+		m_sock = INVALID_SOCKET;
 		//adzm 2010-09
 		m_nQueueBufferLength = 0;
 	}
 	WaitForSingleObject(KillEvent, 6000);
 }
-
-
 
 // sf@2007 - AutoReconnect
 // When we want to autoreconnect we don't really kill the working thread
@@ -3526,7 +3478,7 @@ void ClientConnection::SuspendThread()
 	// WHat is this doing here ???
 	// m_fUseProxy = false;  << repeater block after reconnect
 	m_pNetRectBuf = NULL;
-	m_fReadFromNetRectBuf = false; 
+	m_fReadFromNetRectBuf = false;
 	m_nNetRectBufOffset = 0;
 	m_nReadSize = 0;
 	m_nNetRectBufSize = 0;
@@ -3540,7 +3492,7 @@ void ClientConnection::SuspendThread()
 	{
 		shutdown(m_sock, SD_BOTH);
 		closesocket(m_sock);
-		m_sock = INVALID_SOCKET;		
+		m_sock = INVALID_SOCKET;
 		//adzm 2010-09
 		m_nQueueBufferLength = 0;
 	}
@@ -3565,7 +3517,7 @@ ClientConnection::~ClientConnection()
 	LowLevelHook::Release();
 
 	// Modif sf@2002 - FileTransfer
-	if (m_pFileTransfer) 
+	if (m_pFileTransfer)
 		delete(m_pFileTransfer);
 
 	// Modif sf@2002 - Text Chat
@@ -3596,7 +3548,7 @@ ClientConnection::~ClientConnection()
 	if (m_sock != INVALID_SOCKET) {
 		shutdown(m_sock, SD_BOTH);
 		closesocket(m_sock);
-		m_sock = INVALID_SOCKET;		
+		m_sock = INVALID_SOCKET;
 		//adzm 2010-09
 		m_nQueueBufferLength = 0;
 	}
@@ -3607,7 +3559,7 @@ ClientConnection::~ClientConnection()
 
 	if (m_DIBbitsCache!=NULL) delete []m_DIBbitsCache;
 	m_DIBbitsCache=NULL;
-	
+
 	if (m_hBitmapDC != NULL)
 		DeleteDC(m_hBitmapDC);
 	if (m_hBitmapDC != NULL)
@@ -3618,7 +3570,7 @@ ClientConnection::~ClientConnection()
 	if (m_hPalette != NULL)
 		DeleteObject(m_hPalette);
 
-	if (directx_used) 
+	if (directx_used)
 		{
 			directx_used=false;
 			directx_output.DestroyD3D();
@@ -3664,7 +3616,7 @@ ClientConnection::~ClientConnection()
 
 // You can specify a dx & dy outside the limits; the return value will
 // tell you whether it actually scrolled.
-bool ClientConnection::ScrollScreen(int dx, int dy) 
+bool ClientConnection::ScrollScreen(int dx, int dy)
 {
 	dx = max(dx, -m_hScrollPos);
 	dx = min(dx, m_hScrollMax-(m_cliwidth)-m_hScrollPos);
@@ -3678,28 +3630,26 @@ bool ClientConnection::ScrollScreen(int dx, int dy)
 		GetClientRect(m_hwndMain, &clirect);
 		if (m_opts.m_ShowToolbar)
 			GetClientRect(m_hwndTBwin, &Rtb);
-		else 
+		else
 			{
 				Rtb.top=0;
 				Rtb.bottom=0;
 			}
-		
+
 		clirect.top += Rtb.top;
 		clirect.bottom += Rtb.bottom;
 		ScrollWindowEx(m_hwndcn, -dx, -dy, NULL, &clirect, NULL, NULL,  SW_INVALIDATE);
 		UpdateScrollbars();
 		UpdateWindow(m_hwndcn);
-		
+
 		return true;
 	}
 	return false;
 }
 
-
-
 // ProcessPointerEvent handles the delicate case of emulating 3 buttons
 // on a two button mouse, then passes events off to SubProcessPointerEvent.
-inline bool ClientConnection::ProcessPointerEvent(int x, int y, DWORD keyflags, UINT msg) 
+inline bool ClientConnection::ProcessPointerEvent(int x, int y, DWORD keyflags, UINT msg)
 {
 	//adzm 2010-09 - Throttle mousemove events
 	if (msg == WM_MOUSEMOVE) {
@@ -3716,7 +3666,7 @@ inline bool ClientConnection::ProcessPointerEvent(int x, int y, DWORD keyflags, 
 			return false;
 		} else {
 			m_PendingMouseMove.bValid = false;
-			m_PendingMouseMove.dwLastSentMouseMove = GetTickCount();			
+			m_PendingMouseMove.dwLastSentMouseMove = GetTickCount();
 		}
 	} else {
 		//adzm 2010-09 - If we are sending an input, ensure the mouse is moved to the last known spot before sending
@@ -3725,10 +3675,10 @@ inline bool ClientConnection::ProcessPointerEvent(int x, int y, DWORD keyflags, 
 	}
 	if (m_opts.m_Emul3Buttons) {
 		// XXX To be done:
-		// If this is a left or right press, the user may be 
+		// If this is a left or right press, the user may be
 		// about to press the other button to emulate a middle press.
 		// We need to start a timer, and if it expires without any
-		// further presses, then we send the button press. 
+		// further presses, then we send the button press.
 		// If a press of the other button, or any release, comes in
 		// before timer has expired, we cancel timer & take different action.
 		if (m_waitingOnEmulateTimer)
@@ -3740,8 +3690,8 @@ inline bool ClientConnection::ProcessPointerEvent(int x, int y, DWORD keyflags, 
 				// if button released or we moved too far then cancel.
 				// First let the remote know where the button was down
 				SubProcessPointerEvent(
-					m_emulateButtonPressedX, 
-					m_emulateButtonPressedY, 
+					m_emulateButtonPressedX,
+					m_emulateButtonPressedY,
 					m_emulateKeyFlags);
 				// Then tell it where we are now
 				SubProcessPointerEvent(x, y, keyflags);
@@ -3796,11 +3746,11 @@ inline bool ClientConnection::ProcessPointerEvent(int x, int y, DWORD keyflags, 
 				|| (msg == WM_RBUTTONDOWN && !(keyflags & MK_LBUTTON)))
 			{
 				// Start timer for emulation.
-				m_emulate3ButtonsTimer = 
+				m_emulate3ButtonsTimer =
 					SetTimer(
-					m_hwndcn, 
-					IDT_EMULATE3BUTTONSTIMER, 
-					m_opts.m_Emul3Timeout, 
+					m_hwndcn,
+					IDT_EMULATE3BUTTONSTIMER,
+					m_opts.m_Emul3Timeout,
 					NULL);
 
 				if (!m_emulate3ButtonsTimer)
@@ -3852,13 +3802,13 @@ bool ClientConnection::FlushThrottledMouseMove()
 	return false;
 }
 
-// SubProcessPointerEvent takes windows positions and flags and converts 
+// SubProcessPointerEvent takes windows positions and flags and converts
 // them into VNC ones.
 
 inline void ClientConnection::SubProcessPointerEvent(int x, int y, DWORD keyflags)
 {
 	int mask;
-  
+
 	if (m_opts.m_SwapMouse) {
 		mask = ( ((keyflags & MK_LBUTTON) ? rfbButton1Mask : 0) |
 				 ((keyflags & MK_MBUTTON) ? rfbButton3Mask : 0) |
@@ -3886,8 +3836,6 @@ inline void ClientConnection::SubProcessPointerEvent(int x, int y, DWORD keyflag
 			x_scaled = (x ) *  m_si.framebufferWidth /m_cliwidth ;
 			if(m_opts.m_ShowToolbar) y_scaled =(y) * m_si.framebufferHeight / (m_cliheight-m_TBr.bottom) ;
 			else y_scaled =(y) * m_si.framebufferHeight / m_cliheight ;
-							
-			
 		}
 
 		SendPointerEvent(x_scaled, y_scaled, mask);
@@ -3904,10 +3852,9 @@ inline void ClientConnection::SubProcessPointerEvent(int x, int y, DWORD keyflag
 	}
 }
 
-
 //
 // RealVNC 335 method
-// 
+//
 inline void ClientConnection::ProcessMouseWheel(int delta)
 {
   int wheelMask = rfbWheelUpMask;
@@ -3921,7 +3868,6 @@ inline void ClientConnection::ProcessMouseWheel(int delta)
     delta -= 120;
   }
 }
-
 
 //
 // SendPointerEvent.
@@ -3940,7 +3886,7 @@ ClientConnection::SendPointerEvent(int x, int y, int buttonMask)
 	if ((newtick-oldtick)<100) return;
 	oldtick=newtick;
 	*/
-    
+
 	rfbPointerEventMsg pe;
 
     oldPointerX = x;
@@ -3976,10 +3922,10 @@ ClientConnection::SendPointerEvent(int x, int y, int buttonMask)
 //    a German user types this combination, he doesn't mean Ctrl-@.
 //    So for this we will send, in total:
 //
-//      Ctrl-Down, Alt-Down,   
+//      Ctrl-Down, Alt-Down,
 //                 (when we get the AltGr pressed)
 //
-//      Alt-Up, Ctrl-Up, @-Down, Ctrl-Down, Alt-Down 
+//      Alt-Up, Ctrl-Up, @-Down, Ctrl-Down, Alt-Down
 //                 (when we discover that this is @ being pressed)
 //
 //      Alt-Up, Ctrl-Up, @-Up, Ctrl-Down, Alt-Down
@@ -4008,7 +3954,7 @@ inline void ClientConnection::ProcessKeyEvent(int virtKey, DWORD keyData)
     char keyname[32];
     if (GetKeyNameText(  keyData,keyname, 31)) {
 //        vnclog.Print(4, _T("Process key: %s (keyData %04x): virtkey %04x "), keyname, keyData,virtkey);
-//		if (virtkey==0x00dd) 
+//		if (virtkey==0x00dd)
 //			vnclog.Print(4, _T("Process key: %s (keyData %04x): virtkey %04x "), keyname, keyData,virtkey);
     };
 #endif
@@ -4026,10 +3972,9 @@ inline void ClientConnection::ProcessKeyEvent(int virtKey, DWORD keyData)
 	}
 	else
 	{
-
 		try {
-			KeyActionSpec kas = m_keymapJap->PCtoX(virtKey, keyData);    
-			
+			KeyActionSpec kas = m_keymapJap->PCtoX(virtKey, keyData);
+
 			if (kas.releaseModifiers & KEYMAP_LCONTROL) {
 				SendKeyEvent(XK_Control_L, false );
 				vnclog.Print(5, _T("fake L Ctrl raised\n"));
@@ -4046,13 +3991,13 @@ inline void ClientConnection::ProcessKeyEvent(int virtKey, DWORD keyData)
 				SendKeyEvent(XK_Alt_R, false );
 				vnclog.Print(5, _T("fake R Alt raised\n"));
 			}
-			
+
 			for (int i = 0; kas.keycodes[i] != XK_VoidSymbol && i < MaxKeysPerKey; i++) {
 				SendKeyEvent(kas.keycodes[i], down );
-				//vnclog.Print(4, _T("Sent keysym %04x (%s)\n"), 
+				//vnclog.Print(4, _T("Sent keysym %04x (%s)\n"),
 				//	kas.keycodes[i], down ? _T("press") : _T("release"));
 			}
-			
+
 			if (kas.releaseModifiers & KEYMAP_RALT) {
 				SendKeyEvent(XK_Alt_R, true );
 				vnclog.Print(5, _T("fake R Alt pressed\n"));
@@ -4075,7 +4020,6 @@ inline void ClientConnection::ProcessKeyEvent(int virtKey, DWORD keyData)
 			PostMessage(m_hwndMain, WM_CLOSE, 4, 1);
 		}
 	}
-
 }
 
 //
@@ -4095,7 +4039,7 @@ ClientConnection::SendKeyEvent(CARD32 key, bool down)
     ke.key = Swap32IfLE(key);
 	//adzm 2010-09
     WriteExactQueue_timeout((char *)&ke, sz_rfbKeyEventMsg, rfbKeyEvent,5);
-    //vnclog.Print(0, _T("SendKeyEvent: key = x%04x status = %s ke.key=%d\n"), key, 
+    //vnclog.Print(0, _T("SendKeyEvent: key = x%04x status = %s ke.key=%d\n"), key,
       //  down ? _T("down") : _T("up"),ke.key);
 }
 
@@ -4106,7 +4050,6 @@ ClientConnection::SendKeyEvent(CARD32 key, bool down)
 
 void ClientConnection::SendClientCutText(char *str, int len)
 {
-
 	// adzm - 2010-07 - Extended clipboard
 	if (m_pFileTransfer->m_fFileTransferRunning && ( m_pFileTransfer->m_fVisible || m_pFileTransfer->UsingOldProtocol())) {
 		vnclog.Print(6, _T("Ignoring SendClientCutText due to in-progress file transfer\n"));
@@ -4116,7 +4059,6 @@ void ClientConnection::SendClientCutText(char *str, int len)
 		vnclog.Print(6, _T("Ignoring SendClientCutText due to in-progress text chat\n"));
 		return;
 	}
-
 
 	omni_mutex_lock l(m_clipMutex);
 
@@ -4146,12 +4088,11 @@ void ClientConnection::SendClientCutText(char *str, int len)
 
 // Copy any updated areas from the bitmap onto the screen.
 
-inline void ClientConnection::DoBlit() 
+inline void ClientConnection::DoBlit()
 {
-
 //	if (m_hBitmap == NULL) return;
 	if (!m_running) return;
-				
+
 	// No other threads can use bitmap DC
 	//omni_mutex_lock l(m_bitmapdcMutex);
 
@@ -4167,7 +4108,7 @@ inline void ClientConnection::DoBlit()
 		// Select and realize hPalette
 	//	PaletteSelector p(hdc, m_hPalette);
 	//	ObjectSelector b(m_hBitmapDC, m_hBitmap);
-	
+
 		if (m_opts.m_delay) {
 			// Display the area to be updated for debugging purposes
 			/*
@@ -4179,12 +4120,12 @@ inline void ClientConnection::DoBlit()
 			::FillRect(hdc, &ps.rcPaint, ::GetSysColorBrush(COLOR_DESKTOP));
 			::Sleep(m_pApp->m_options.m_delay);
 		}
-	
+
 		if (m_opts.m_scaling)
 		{
 			int n = m_opts.m_scale_num;
 			int d = m_opts.m_scale_den;
-		
+
 			SetStretchBltMode(hdc, HALFTONE);
 			SetBrushOrgEx(hdc, 0,0, NULL);
 			{
@@ -4192,16 +4133,16 @@ inline void ClientConnection::DoBlit()
 				{
 					ObjectSelector bb(m_hmemdc, m_membitmap);
 					StretchBlt(
-					hdc, 
-					ps.rcPaint.left, 
-					ps.rcPaint.top, 
-					ps.rcPaint.right-ps.rcPaint.left, 
-					ps.rcPaint.bottom-ps.rcPaint.top, 
-					m_hmemdc, 
-					(ps.rcPaint.left+m_hScrollPos)     * d / n, 
+					hdc,
+					ps.rcPaint.left,
+					ps.rcPaint.top,
+					ps.rcPaint.right-ps.rcPaint.left,
+					ps.rcPaint.bottom-ps.rcPaint.top,
+					m_hmemdc,
+					(ps.rcPaint.left+m_hScrollPos)     * d / n,
 					(ps.rcPaint.top+m_vScrollPos)      * d / n,
-					(ps.rcPaint.right-ps.rcPaint.left) * d / n, 
-					(ps.rcPaint.bottom-ps.rcPaint.top) * d / n, 
+					(ps.rcPaint.right-ps.rcPaint.left) * d / n,
+					(ps.rcPaint.bottom-ps.rcPaint.top) * d / n,
 					SRCCOPY);
 				}
 			}
@@ -4211,18 +4152,16 @@ inline void ClientConnection::DoBlit()
 			if (m_hmemdc)
 			{
 				ObjectSelector bb(m_hmemdc, m_membitmap);
-				BitBlt(hdc, ps.rcPaint.left, ps.rcPaint.top, 
-				ps.rcPaint.right-ps.rcPaint.left, ps.rcPaint.bottom-ps.rcPaint.top, 
+				BitBlt(hdc, ps.rcPaint.left, ps.rcPaint.top,
+				ps.rcPaint.right-ps.rcPaint.left, ps.rcPaint.bottom-ps.rcPaint.top,
 				m_hmemdc, ps.rcPaint.left+m_hScrollPos, ps.rcPaint.top+m_vScrollPos, SRCCOPY);
 			}
 		}
-
 	}
 	EndPaint(m_hwndcn, &ps);
-
 }
 
-inline void ClientConnection::UpdateScrollbars() 
+inline void ClientConnection::UpdateScrollbars()
 {
 	// We don't update the actual scrollbar info in full-screen mode
 	// because it causes them to flicker.
@@ -4232,25 +4171,24 @@ inline void ClientConnection::UpdateScrollbars()
 	scri.cbSize = sizeof(scri);
 	scri.fMask = SIF_ALL;
 	scri.nMin = 0;
-	scri.nMax = m_hScrollMax; 
+	scri.nMax = m_hScrollMax;
 	scri.nPage= m_cliwidth;
-	scri.nPos = m_hScrollPos; 
-	
-	if (setInfo) 
+	scri.nPos = m_hScrollPos;
+
+	if (setInfo)
 		SetScrollInfo(m_hwndMain, SB_HORZ, &scri, TRUE);
-	
+
 	scri.cbSize = sizeof(scri);
 	scri.fMask = SIF_ALL;
 	scri.nMin = 0;
 
 	scri.nMax = m_vScrollMax ;
 	scri.nPage= m_cliheight;
-	scri.nPos = m_vScrollPos; 
-	
-	if (setInfo) 
+	scri.nPos = m_vScrollPos;
+
+	if (setInfo)
 		SetScrollInfo(m_hwndMain, SB_VERT, &scri, TRUE);
 }
-
 
 void ClientConnection::ShowConnInfo()
 {
@@ -4274,9 +4212,9 @@ void ClientConnection::ShowConnInfo()
 		_T("Current keyboard name: %s\n\r\n\r")
 		_T("Using Plugin : %s - %s\n\r\n\r"), // sf@2002 - v1.1.2
 		m_desktopName, m_host, m_port,
-		strcmp(m_proxyhost,"") ? m_proxyhost : "", 
-		strcmp(m_proxyhost,"") ? "Port" : "", 
-		strcmp(m_proxyhost,"") ? _itoa(m_proxyport, num, 10) : "", 
+		strcmp(m_proxyhost,"") ? m_proxyhost : "",
+		strcmp(m_proxyhost,"") ? "Port" : "",
+		strcmp(m_proxyhost,"") ? _itoa(m_proxyport, num, 10) : "",
 		m_si.framebufferWidth, m_si.framebufferHeight,
                 m_si.format.depth,
 		m_myFormat.depth, kbitsPerSecond,
@@ -4292,9 +4230,7 @@ void ClientConnection::ShowConnInfo()
 //  They finish the initialisation, then chiefly read data from the server.
 // ********************************************************************
 
-
 void* ClientConnection::run_undetached(void* arg) {
-
 	vnclog.Print(9,_T("Update-processing thread started\n"));
 
 	m_threadStarted = true;
@@ -4325,21 +4261,21 @@ void* ClientConnection::run_undetached(void* arg) {
     rdr::U8 msgType;
 
 	// sf@2007 - AutoReconnect
-	while (m_autoReconnect > 0) 
+	while (m_autoReconnect > 0)
 	{
 		try
 		{
-			while (!m_bKillThread) 
+			while (!m_bKillThread)
 			{
 				// sf@2002 - DSM Plugin
-				if (!m_fUsePlugin)		
+				if (!m_fUsePlugin)
 				{
 					msgType = fis->readU8();
 					m_nTO = 1; // Read the rest of the rfb message (normal case)
 				}
 				else if (m_pDSMPlugin->IsEnabled())
 				{
-					// Read the additional type char sent by the DSM Plugin (server) 
+					// Read the additional type char sent by the DSM Plugin (server)
 					// We need it to know the type of rfb message that follows
 					// because we can't see the type inside the transformed rfb message.
 					ReadExact((char *)&msgType, sizeof(msgType));
@@ -4353,7 +4289,7 @@ void* ClientConnection::run_undetached(void* arg) {
 						m_nTO = 0; // we'll need to read the whole transformed rfb message that follows
 					}
 				}
-					
+
 				switch (msgType)
 				{
                 case rfbKeepAlive:
@@ -4400,9 +4336,9 @@ void* ClientConnection::run_undetached(void* arg) {
 					{
 					// vnclog.Print(0, _T("rfbFileTransfer\n") );
 					// m_pFileTransfer->ProcessFileTransferMsg();
-					// sf@2005 - FileTransfer rfbMessage and screen updates must be sent/received 
+					// sf@2005 - FileTransfer rfbMessage and screen updates must be sent/received
 					// by the same thread
-					SendMessage(m_hwndMain, FileTransferSendPacketMessage, 1, 0); 
+					SendMessage(m_hwndMain, FileTransferSendPacketMessage, 1, 0);
 					}
 					break;
 
@@ -4422,7 +4358,7 @@ void* ClientConnection::run_undetached(void* arg) {
 
 					m_si.framebufferWidth = Swap16IfLE(rsmsg.framebufferWidth);
 					m_si.framebufferHeight = Swap16IfLE(rsmsg.framebufferHeigth);
-					
+
 					CreateLocalFramebuffer();
 					// SendFullFramebufferUpdateRequest();
 					Createdib();
@@ -4430,14 +4366,14 @@ void* ClientConnection::run_undetached(void* arg) {
 					m_pendingFormatChange = true;
 					//adzm 2010-09 - this could send in the middle of other sends by the ui thread! We can still use SendMessage to ensure
 					//it blocks until processed.
-					//SendAppropriateFramebufferUpdateRequest();					
+					//SendAppropriateFramebufferUpdateRequest();
 					//SendMessage(m_hwndcn, WM_REGIONUPDATED, NULL, NULL);
 					//adzm 2010-09 - This function delegates the processing to the UI thread now, basically doing the same as the sendmessage above.
-					SendAppropriateFramebufferUpdateRequest(false);			
-					
+					SendAppropriateFramebufferUpdateRequest(false);
+
 					SizeWindow();
 					InvalidateRect(m_hwndcn, NULL, TRUE);
-					RealiseFullScreenMode();	
+					RealiseFullScreenMode();
 					break;
 				}
 
@@ -4447,7 +4383,7 @@ void* ClientConnection::run_undetached(void* arg) {
                     ::PostMessage(m_hwndMain, RebuildToolbarMessage, 0, 0);
                 }
                     break;
-					
+
 				// adzm 2010-09 - Notify streaming DSM plugin support
                 case rfbNotifyPluginStreaming:
                     if (sz_rfbNotifyPluginStreamingMsg > 1)
@@ -4471,7 +4407,6 @@ void* ClientConnection::run_undetached(void* arg) {
 				}
 				// yield();
 			}
-        
 		}
 		catch (Exception &)
 		{
@@ -4524,7 +4459,6 @@ void* ClientConnection::run_undetached(void* arg) {
 	return this;
 }
 
-
 //
 // Requesting screen updates from the server
 //
@@ -4547,10 +4481,9 @@ void ClientConnection::Internal_SendFramebufferUpdateRequest(int x, int y, int w
     fur.w = Swap16IfLE(w);
     fur.h = Swap16IfLE(h);
 
-	//vnclog.Print(10, _T("Request %s update\n"), incremental ? _T("incremental") : _T("full"));	
+	//vnclog.Print(10, _T("Request %s update\n"), incremental ? _T("incremental") : _T("full"));
     WriteExact_timeout((char *)&fur, sz_rfbFramebufferUpdateRequestMsg, rfbFramebufferUpdateRequest,5);
 }
-
 
 void ClientConnection::HandleFramebufferUpdateRequest(WPARAM wParam, LPARAM lParam)
 {
@@ -4607,10 +4540,9 @@ void ClientConnection::Internal_SendFullFramebufferUpdateRequest()
 					m_si.framebufferHeight, false);
 }
 
-
 void ClientConnection::Internal_SendAppropriateFramebufferUpdateRequest()
 {
-	if (m_pendingFormatChange) 
+	if (m_pendingFormatChange)
 	{
 		if (prevCursorSet) {
 		if (m_SavedAreaBIB) delete[] m_SavedAreaBIB;
@@ -4621,7 +4553,7 @@ void ClientConnection::Internal_SendAppropriateFramebufferUpdateRequest()
 		rcMask=NULL;
 		prevCursorSet = false;
 		}
-		vnclog.Print(3, _T("Requesting new pixel format\n") );		
+		vnclog.Print(3, _T("Requesting new pixel format\n") );
 		rfbPixelFormat oldFormat = m_myFormat;
 		SetupPixelFormat();
 		SetFormatAndEncodings();
@@ -4655,7 +4587,7 @@ void ClientConnection::Internal_SendAppropriateFramebufferUpdateRequest()
 		// If the pixel format has changed, or cache, or scale request whole screen
 		if (true)//!PF_EQ(m_myFormat, oldFormat) || m_pendingCacheInit || m_pendingScaleChange)
 		{
-			Internal_SendFullFramebufferUpdateRequest();	
+			Internal_SendFullFramebufferUpdateRequest();
 		}
 		else
 		{
@@ -4664,7 +4596,7 @@ void ClientConnection::Internal_SendAppropriateFramebufferUpdateRequest()
 		m_pendingScaleChange = false;
 		m_pendingCacheInit = false;
 	}
-	else 
+	else
 	{
 		if (!m_dormant)
 			Internal_SendIncrementalFramebufferUpdateRequest();
@@ -4688,7 +4620,7 @@ bool ClientConnection::SendServerScale(int nScale)
 }
 
 //
-// Modif rdv@2002 - Set Server input 
+// Modif rdv@2002 - Set Server input
 //
 bool ClientConnection::SendServerInput(BOOL enabled)
 {
@@ -4722,17 +4654,16 @@ bool ClientConnection::SendSW(int x, int y)
 			(x + m_hScrollPos) * m_opts.m_scale_den / m_opts.m_scale_num;
 		int y_scaled =
 			(y + m_vScrollPos) * m_opts.m_scale_den / m_opts.m_scale_num;
-		
+
 		sw.type = rfbSetSW;
 		sw.x = Swap16IfLE(x_scaled);
 		sw.y = Swap16IfLE(y_scaled);
 	}
-	
+
     WriteExact_timeout((char*)&sw, sz_rfbSetSWMsg, rfbSetSW,5);
 	m_SWselect=false;
     return true;
 }
-
 
 // A ScreenUpdate message has been received
 inline void ClientConnection::ReadScreenUpdate()
@@ -4750,15 +4681,15 @@ inline void ClientConnection::ReadScreenUpdate()
 
 	bool fTimingAlreadyStopped = false;
 	fis->startTiming();
-	
+
 	rfbFramebufferUpdateMsg sut;
 	ReadExact(((char *) &sut)+m_nTO, sz_rfbFramebufferUpdateMsg-m_nTO);
     sut.nRects = Swap16IfLE(sut.nRects);
 	HRGN UpdateRegion=CreateRectRgn(0,0,0,0);
 	bool Recover_from_sync=false;
-	
+
     //if (sut.nRects == 0) return;  XXX tjr removed this - is this OK?
-	
+
 	for (UINT i=0; i < sut.nRects; i++)
 	{
 		rfbFramebufferUpdateRectHeader surh;
@@ -4770,17 +4701,17 @@ inline void ClientConnection::ReadScreenUpdate()
 		surh.encoding = Swap32IfLE(surh.encoding);
 		// vnclog.Print(0, _T("%d %d\n"), i,sut.nRects);
 		//vnclog.Print(0, _T("encoding %d\n"), surh.encoding);
-		
+
 		// Tight - If lastrect we must quit this loop (nRects = 0xFFFF)
 		if (surh.encoding == rfbEncodingLastRect)
 			break;
-		
+
 		if (surh.encoding == rfbEncodingNewFBSize)
 		{
 			ReadNewFBSize(&surh);
 			break;
 		}
-		
+
 		// Tight cursor handling
 		if ( surh.encoding == rfbEncodingXCursor ||
 			surh.encoding == rfbEncodingRichCursor )
@@ -4788,8 +4719,8 @@ inline void ClientConnection::ReadScreenUpdate()
 			ReadCursorShape(&surh);
 			continue;
 		}
-		
-        // marscha PointerPos	
+
+        // marscha PointerPos
 		if (surh.encoding == rfbEncodingPointerPos) {
 			//vnclog.Print(0, _T("reading cursorPos (%d,%d)\n"), surh.r.x, surh.r.y);
 			ReadCursorPos(&surh);
@@ -4798,7 +4729,7 @@ inline void ClientConnection::ReadScreenUpdate()
 
 		if (surh.encoding !=rfbEncodingNewFBSize && surh.encoding != rfbEncodingCacheZip && surh.encoding != rfbEncodingSolMonoZip && surh.encoding !=rfbEncodingUltraZip)
 			SoftCursorLockArea(surh.r.x, surh.r.y, surh.r.w, surh.r.h);
-		
+
 		// Modif sf@2002 - DSM Plugin
 		// With DSM, all rects contents (excepted caches) are buffered into memory in one shot
 		// then they will be read in this buffer by the "regular" Read*Type*Rect() functions
@@ -4810,7 +4741,7 @@ inline void ClientConnection::ReadScreenUpdate()
 				switch (surh.encoding)
 				{
 				case rfbEncodingRaw:
-				case rfbEncodingRRE: 
+				case rfbEncodingRRE:
 				case rfbEncodingCoRRE:
 				case rfbEncodingHextile:
 				case rfbEncodingUltra:
@@ -4856,7 +4787,6 @@ inline void ClientConnection::ReadScreenUpdate()
 						CheckBufferSize((int)(m_nZRLEReadSize)); // sf@2003
 						ReadExact((char*)(m_pZRLENetRectBuf), (int)(m_nZRLEReadSize));
 						fis->SetReadFromMemoryBuffer(m_nZRLEReadSize, (char*)(m_pZRLENetRectBuf));
-
 					}
 					else
 					{
@@ -4876,7 +4806,7 @@ inline void ClientConnection::ReadScreenUpdate()
 				}
 			}
 		}
-		
+
 		RECT cacherect;
 		if (m_opts.m_fEnableCache)
 		{
@@ -4907,7 +4837,7 @@ inline void ClientConnection::ReadScreenUpdate()
 			if (avg_kbitsPerSecond==0) avg_kbitsPerSecond=kbitsPerSecond;
 			else
 			{
-			if (kbitsPerSecond>= avg_kbitsPerSecond/2 && kbitsPerSecond<=avg_kbitsPerSecond*3/2) 
+			if (kbitsPerSecond>= avg_kbitsPerSecond/2 && kbitsPerSecond<=avg_kbitsPerSecond*3/2)
 				avg_kbitsPerSecond=(avg_kbitsPerSecond+kbitsPerSecond)/2;
 			else avg_kbitsPerSecond=(3*avg_kbitsPerSecond+kbitsPerSecond)/4;
 			}
@@ -5041,28 +4971,28 @@ inline void ClientConnection::ReadScreenUpdate()
 					Sleep(200);
 					i++;
 				}
-				else break;   
+				else break;
 			}
 			vnclog.Print(0, _T("Buffer cleared, sync should be back OK..Continue \n"));
 			Recover_from_sync=true;
 			break;
 		}
-		if (Recover_from_sync) 
+		if (Recover_from_sync)
 		{
 		    Recover_from_sync=false;
 			break;
 		}
-		
+
 		if (surh.encoding !=rfbEncodingNewFBSize && surh.encoding != rfbEncodingCacheZip && surh.encoding != rfbEncodingSolMonoZip && surh.encoding != rfbEncodingUltraZip)
 		{
 			RECT rect;
 			rect.left   = surh.r.x;
 			rect.top    = surh.r.y;
 			rect.right  = surh.r.x + surh.r.w ;
-			rect.bottom = surh.r.y + surh.r.h; 
+			rect.bottom = surh.r.y + surh.r.h;
 
 			if (!directx_used)InvalidateRegion(&rect,&UpdateRegion);
-				//InvalidateScreenRect(&rect); 			
+				//InvalidateScreenRect(&rect);
 		}
 		else if (surh.encoding !=rfbEncodingNewFBSize)
 		{
@@ -5129,28 +5059,28 @@ inline void ClientConnection::ReadScreenUpdate()
 			m_pendingFormatChange = true;
 			m_lLastChangeTime = timeGetTime();
 		}
-		// Medium connection speed 
+		// Medium connection speed
 		else if (avg_kbitsPerSecond < 256 && avg_kbitsPerSecond > 128 && (m_nConfig != 2))
 		{
 			m_nConfig = 2;
 			m_opts.m_PreferredEncoding = rfbEncodingZRLE; //rfbEncodingZlibHex;
-			//m_opts.m_Use8Bit = rfbPF256Colors; 
+			//m_opts.m_Use8Bit = rfbPF256Colors;
 			m_opts.m_fEnableCache = false;
 			m_pendingFormatChange = true;
 			m_lLastChangeTime = timeGetTime();
 		}
-		// Modem (including cable modem) connection speed 
+		// Modem (including cable modem) connection speed
 		else if (avg_kbitsPerSecond < 128 && avg_kbitsPerSecond > 19 && (m_nConfig != 3))
 		{
 			m_nConfig = 3;
 			m_opts.m_PreferredEncoding = rfbEncodingTight; // rfbEncodingZRLE;
-			//m_opts.m_Use8Bit = rfbPF64Colors; 
+			//m_opts.m_Use8Bit = rfbPF64Colors;
 			m_opts.m_fEnableCache = false;
 			m_pendingFormatChange = true;
 			m_lLastChangeTime = timeGetTime();
 		}
-		
-		// Slow Modem connection speed 
+
+		// Slow Modem connection speed
 		// Not sure it's a good thing in Auto mode...because in some cases
 		// (CTRL-ALT-DEL, initial screen loading, connection short hangups...)
 		// the speed can be momentary VERY slow. The fast fuzzy/normal modes switching
@@ -5159,12 +5089,12 @@ inline void ClientConnection::ReadScreenUpdate()
 		{
 			m_nConfig = 4;
 			m_opts.m_PreferredEncoding = rfbEncodingTight; //rfbEncodingZRLE;
-			//m_opts.m_Use8Bit = rfbPF8Colors; 
+			//m_opts.m_Use8Bit = rfbPF8Colors;
 			m_opts.m_fEnableCache = false;
 			m_pendingFormatChange = true;
 		}
 	}
-		
+
 	// Inform the other thread that an update is needed.
 
 	//adzm 2010-07-04
@@ -5173,24 +5103,22 @@ inline void ClientConnection::ReadScreenUpdate()
 		SendAppropriateFramebufferUpdateRequest(true);
 	}
 	DeleteObject(UpdateRegion);
-}	
-
-
+}
 
 void ClientConnection::SetDormant(bool newstate)
 {
 	vnclog.Print(5, _T("%s dormant mode\n"), newstate ? _T("Entering") : _T("Leaving"));
 	m_dormant = newstate;
-	if (!m_dormant) {
+	if (!m_dormant && m_running) {
 		//adzm 2010-09
 		SendIncrementalFramebufferUpdateRequest(false);
 	}
 }
 
-// The server has copied some text to the clipboard - put it 
+// The server has copied some text to the clipboard - put it
 // in the local clipboard too.
 
-void ClientConnection::ReadServerCutText() 
+void ClientConnection::ReadServerCutText()
 {
 	rfbServerCutTextMsg sctm;
 	vnclog.Print(6, _T("Read remote clipboard change\n"));
@@ -5211,7 +5139,7 @@ void ClientConnection::ReadServerCutText()
 		extendedClipboardDataMessage.EnsureBufferLength(len, false);
 
 		ReadExact((char*)extendedClipboardDataMessage.GetBuffer(), len);
-		
+
 		DWORD action = extendedClipboardDataMessage.GetFlags() & clipActionMask;
 
 		// clipCaps may be combined with other actions
@@ -5224,8 +5152,8 @@ void ClientConnection::ReadServerCutText()
 				{
 					omni_mutex_lock l(m_clipMutex);
 					m_clipboard.settings.HandleCapsPacket(extendedClipboardDataMessage, false);
-				
-					//adzm 2010-09				
+
+					//adzm 2010-09
 					//UpdateRemoteClipboardCaps();
 					PostMessage(m_hwndcn, WM_UPDATEREMOTECLIPBOARDCAPS, NULL, NULL);
 				}
@@ -5263,7 +5191,7 @@ void ClientConnection::ReadServerCutText()
 				// unsupported or not implemented
 				break;
 		}
-	} else {	
+	} else {
 		if (len < 0) {
 			vnclog.Print(6, _T("Invalid clipboard data!\n"));
 			return;
@@ -5278,8 +5206,7 @@ void ClientConnection::ReadServerCutText()
 	}
 }
 
-
-void ClientConnection::ReadBell() 
+void ClientConnection::ReadBell()
 {
 	rfbBellMsg bm;
 	ReadExact(((char *) &bm)+m_nTO, sz_rfbBellMsg-m_nTO);
@@ -5288,7 +5215,7 @@ void ClientConnection::ReadBell()
 	MessageBeep( MB_OK );
 	#else
 
-	if (! ::PlaySound("VNCViewerBell", NULL, 
+	if (! ::PlaySound("VNCViewerBell", NULL,
 		SND_APPLICATION | SND_ALIAS | SND_NODEFAULT | SND_ASYNC) ) {
 		::Beep(440, 125);
 	}
@@ -5323,7 +5250,7 @@ void ClientConnection::ReadServerState()
     case rfbKeepAliveInterval:
         m_opts.m_keepAliveInterval = value;
         if (m_opts.m_keepAliveInterval >= (m_opts.m_FTTimeout - KEEPALIVE_HEADROOM))
-          m_opts.m_keepAliveInterval = (m_opts.m_FTTimeout  - KEEPALIVE_HEADROOM); 
+          m_opts.m_keepAliveInterval = (m_opts.m_FTTimeout  - KEEPALIVE_HEADROOM);
         vnclog.Print(1, _T("New keepalive interval %u"), m_opts.m_keepAliveInterval);
 		m_keepalive_timer = 1011;
 		KillTimer(m_hwndcn, m_keepalive_timer);
@@ -5338,7 +5265,6 @@ void ClientConnection::ReadServerState()
         break;
     }
 }
-
 
 // General utilities -------------------------------------------------
 
@@ -5377,7 +5303,7 @@ void ClientConnection::ReadExact(char *inbuf, int wanted)
 		{
 			if (m_pDSMPlugin->IsEnabled())
 			{
-				//omni_mutex_lock l(m_pDSMPlugin->m_RestMutex); 
+				//omni_mutex_lock l(m_pDSMPlugin->m_RestMutex);
 				//adzm - 2009-06-21
 				omni_mutex_conditional_lock l(m_pDSMPlugin->m_RestMutex, m_pPluginInterface ? false : true);
 
@@ -5409,14 +5335,14 @@ void ClientConnection::ReadExact(char *inbuf, int wanted)
 						// m_pDSMPlugin->RestoreBufferUnlock();
 						throw WarningException(sz_L65);
 					}
-					
+
 					// Read bytes directly into Plugin Dest rest. buffer
 					fis->readBytes(pTransBuffer, nTransDataLen);
-					
+
 					// Ask plugin to restore data from its local rest. buffer into inbuf
 					int nRestDataLen = 0;
 					RestoreBufferStep2((BYTE*)inbuf, nTransDataLen, &nRestDataLen);
-					
+
 					// Check if we actually get the real original data length
 					if (nRestDataLen != wanted)
 					{
@@ -5453,7 +5379,6 @@ void ClientConnection::ReadExact(char *inbuf, int wanted)
 		ReleaseDC(m_TrafficMonitor,hdcX);
 	}
 	*/
-
 }
 
 //adzm 2009-06-21
@@ -5489,7 +5414,7 @@ void ClientConnection::ReadExactProtocolVersion(char *inbuf, int wanted, bool& f
 		{
 			if (m_pDSMPlugin->IsEnabled())
 			{
-				//omni_mutex_lock l(m_pDSMPlugin->m_RestMutex); 
+				//omni_mutex_lock l(m_pDSMPlugin->m_RestMutex);
 				//adzm - 2009-06-21
 				omni_mutex_conditional_lock l(m_pDSMPlugin->m_RestMutex, m_pPluginInterface ? false : true);
 
@@ -5514,7 +5439,7 @@ void ClientConnection::ReadExactProtocolVersion(char *inbuf, int wanted, bool& f
 				{
 					//adzm 2009-06-21
 					// first just read 4 bytes and see if they are 'RFB '.
-					// if so, then this does not appear to be encrypted.					
+					// if so, then this does not appear to be encrypted.
 					char testBuffer[4];
 					fis->readBytes(testBuffer, 4);
 					if (memcmp(testBuffer, "RFB ", 4) == 0) {
@@ -5534,7 +5459,7 @@ void ClientConnection::ReadExactProtocolVersion(char *inbuf, int wanted, bool& f
 						m_pIntegratedPluginInterface = NULL;
 						m_pPluginInterface = NULL;
 
-						// and load the classic interface						
+						// and load the classic interface
 						m_pPluginInterface = m_pDSMPlugin->CreatePluginInterface();
 					}
 
@@ -5547,12 +5472,12 @@ void ClientConnection::ReadExactProtocolVersion(char *inbuf, int wanted, bool& f
 						// m_pDSMPlugin->RestoreBufferUnlock();
 						throw WarningException(sz_L65);
 					}
-					
+
 					// Read bytes directly into Plugin Dest rest. buffer
 					//adzm 2009-06-21 - we already got 4 bytes
 					memcpy(pTransBuffer, testBuffer, 4);
 					fis->readBytes(pTransBuffer+4, nTransDataLen-4);
-					
+
 					// Ask plugin to restore data from its local rest. buffer into inbuf
 					int nRestDataLen = 0;
 					RestoreBufferStep2((BYTE*)inbuf, nTransDataLen, &nRestDataLen);
@@ -5608,10 +5533,9 @@ void ClientConnection::ReadExactProxy(char *inbuf, int wanted)
 	//omni_mutex_lock l(m_readMutex);
 	// Status window and connection activity updates
 	// We comment this because it just takes too much time to the viewer thread
-	
+
 	try
 	{
-		
 		{
 			fis->readBytes(inbuf, wanted);
 		}
@@ -5622,10 +5546,9 @@ void ClientConnection::ReadExactProxy(char *inbuf, int wanted)
 		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L67);
 		throw QuietException(e.str());
 	}
-
 }
 
-// Read the number of bytes and return them zero terminated in the buffer 
+// Read the number of bytes and return them zero terminated in the buffer
 /*inline*/ void ClientConnection::ReadString(char *buf, int length)
 {
 	if (length > 0)
@@ -5648,11 +5571,11 @@ ClientConnection::Send(const char *buff, const unsigned int bufflen,int timeout)
 	tm.tv_usec = 0;
 	count = select(m_sock + 1, NULL, &write_fds, NULL, &tm);
 
-	if (count == 0) 
+	if (count == 0)
 		return 0; //timeout
-	if (count < 0 || count > 1) 
+	if (count < 0 || count > 1)
 		return -1;
-	
+
 	//adzm 2010-08-01
 	m_LastSentTick = GetTickCount();
 
@@ -5664,7 +5587,7 @@ ClientConnection::Send(const char *buff, const unsigned int bufflen,int timeout)
 // sf@2002 - DSM Plugin
 //
 void ClientConnection::WriteTransformed(char *buf, int bytes, CARD8 msgType, bool bQueue)
-{	
+{
 	// adzm 2010-09
 	if (!m_fUsePlugin || m_fPluginStreamingOut)
 	{
@@ -5673,7 +5596,7 @@ void ClientConnection::WriteTransformed(char *buf, int bytes, CARD8 msgType, boo
 	}
 	else if (m_pDSMPlugin->IsEnabled())
 	{
-		// Send the transformed message type first 
+		// Send the transformed message type first
 		//adzm 2010-09
 		WriteTransformed((char*)&msgType, sizeof(msgType), bQueue);
 		// Then send the transformed rfb message content
@@ -5698,7 +5621,7 @@ void ClientConnection::WriteTransformed_timeout(char *buf, int bytes, CARD8 msgT
 	}
 	else if (m_pDSMPlugin->IsEnabled())
 	{
-		// Send the transformed message type first 
+		// Send the transformed message type first
 		WriteTransformed_timeout((char*)&msgType, sizeof(msgType),timeout, bQueue);
 		// Then send the transformed rfb message content
 		WriteTransformed_timeout(buf, bytes,timeout, bQueue);
@@ -5728,7 +5651,7 @@ void ClientConnection::Write(char *buf, int bytes, bool bQueue, bool bTimeout, i
 		m_nQueueBufferLength += bytes;
 	}
 
-	if (!bQueue) {		
+	if (!bQueue) {
 		int i = 0;
 		int j = 0;
 		while (i < m_nQueueBufferLength)
@@ -5744,9 +5667,9 @@ void ClientConnection::Write(char *buf, int bytes, bool bQueue, bool bTimeout, i
 			{
 				LPVOID lpMsgBuf;
 				int err = ::GetLastError();
-				FormatMessage(     
-					FORMAT_MESSAGE_ALLOCATE_BUFFER | 
-					FORMAT_MESSAGE_FROM_SYSTEM |     
+				FormatMessage(
+					FORMAT_MESSAGE_ALLOCATE_BUFFER |
+					FORMAT_MESSAGE_FROM_SYSTEM |
 					FORMAT_MESSAGE_IGNORE_INSERTS, NULL,
 					err, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
 					(LPTSTR) &lpMsgBuf, 0, NULL ); // Process any inserts in lpMsgBuf.
@@ -5796,9 +5719,9 @@ void ClientConnection::FlushOutstandingWriteQueue(char*& buf2, int& bytes2, bool
 		{
 			LPVOID lpMsgBuf;
 			int err = ::GetLastError();
-			FormatMessage(     
-				FORMAT_MESSAGE_ALLOCATE_BUFFER | 
-				FORMAT_MESSAGE_FROM_SYSTEM |     
+			FormatMessage(
+				FORMAT_MESSAGE_ALLOCATE_BUFFER |
+				FORMAT_MESSAGE_FROM_SYSTEM |
 				FORMAT_MESSAGE_IGNORE_INSERTS, NULL,
 				err, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
 				(LPTSTR) &lpMsgBuf, 0, NULL ); // Process any inserts in lpMsgBuf.
@@ -5830,12 +5753,10 @@ void ClientConnection::FlushWriteQueue(bool bTimeout, int timeout)
 // Sends the number of bytes specified from the buffer
 void ClientConnection::WriteTransformed(char *buf, int bytes, bool bQueue)
 {
-
 	if (bytes == 0) return;
 
 	omni_mutex_lock l(m_writeMutex);
 	//vnclog.Print(10, _T("  writing %d bytes\n"), bytes);
-
 
 	// sf@2002 - DSM Plugin
 	char *pBuffer = buf;
@@ -5895,7 +5816,6 @@ void ClientConnection::WriteTransformed_timeout(char *buf, int bytes,int timeout
 
 	omni_mutex_lock l(m_writeMutex);
 	//vnclog.Print(10, _T("  writing %d bytes\n"), bytes);
-	
 
 	// sf@2002 - DSM Plugin
 	char *pBuffer = buf;
@@ -5936,7 +5856,6 @@ void ClientConnection::WriteExactProxy(char *buf, int bytes)
 // Security fix for uvnc 1.0.5 and 1.0.2 (should be ok for all version...)
 // Replace the corresponding functions with the following fixed ones in vncviewer\ClientConnection.cpp file
 
-
 // Makes sure netbuf is at least as big as the specified size.
 // Note that netbuf itself may change as a result of this call.
 // Throws an exception on failure.
@@ -5965,7 +5884,6 @@ void ClientConnection::CheckBufferSize(int bufsize)
 	m_netbufsize=bufsize + 256;
 	vnclog.Print(4, _T("bufsize expanded to %d\n"), m_netbufsize);
 }
-
 
 // Makes sure zipbuf is at least as big as the specified size.
 // Note that zlibbuf itself may change as a result of this call.
@@ -5997,8 +5915,6 @@ void ClientConnection::CheckZipBufferSize(int bufsize)
 	m_zipbuf = newbuf;
 	m_zipbufsize = bufsize + 256;
 	vnclog.Print(4, _T("zipbufsize expanded to %d\n"), m_zipbufsize);
-
-
 }
 
 void ClientConnection::CheckFileZipBufferSize(int bufsize)
@@ -6029,7 +5945,6 @@ void ClientConnection::CheckFileZipBufferSize(int bufsize)
 	vnclog.Print(4, _T("zipbufsize expanded to %d\n"), m_filezipbufsize);
 }
 
-
 void ClientConnection::CheckFileChunkBufferSize(int bufsize)
 {
 	// sf@2009 - Sanity check
@@ -6049,17 +5964,12 @@ void ClientConnection::CheckFileChunkBufferSize(int bufsize)
 		throw ErrorException(sz_L71);
 	}
 
-
 	if (m_filechunkbuf != NULL)
 		delete [] m_filechunkbuf;
 	m_filechunkbuf = newbuf;
 	m_filechunkbufsize = bufsize + 256;
 	vnclog.Print(4, _T("m_filechunkbufsize expanded to %d\n"), m_filechunkbufsize);
-
-
 }
-
-
 
 // Processing NewFBSize pseudo-rectangle. Create new framebuffer of
 // the size specified in pfburh->r.w and pfburh->r.h, and change the
@@ -6090,9 +6000,8 @@ void ClientConnection::ReadNewFBSize(rfbFramebufferUpdateRectHeader *pfburh)
 }
 
 //
-// sf@2002 - DSMPlugin 
+// sf@2002 - DSMPlugin
 //
-
 
 //
 // Tell the plugin to do its transformation on the source data buffer
@@ -6108,13 +6017,12 @@ BYTE* ClientConnection::TransformBuffer(BYTE* pDataBuffer, int nDataLen, int* pn
 	}
 }
 
-
 // - If pRestoredDataBuffer = NULL, the plugin check its local buffer and return the pointer
 // - Otherwise, restore data contained in its rest. buffer and put the result in pRestoredDataBuffer
 //   pnRestoredDataLen is the number bytes put in pRestoredDataBuffers
 //adzm - 2009-06-21
 BYTE* ClientConnection::RestoreBufferStep1(BYTE* pRestoredDataBuffer, int nDataLen, int* pnRestoredDataLen)
-{	
+{
 	if (m_pPluginInterface) {
 		return m_pPluginInterface->RestoreBuffer(pRestoredDataBuffer, nDataLen, pnRestoredDataLen);
 	} else {
@@ -6124,7 +6032,7 @@ BYTE* ClientConnection::RestoreBufferStep1(BYTE* pRestoredDataBuffer, int nDataL
 
 //adzm - 2009-06-21
 BYTE* ClientConnection::RestoreBufferStep2(BYTE* pRestoredDataBuffer, int nDataLen, int* pnRestoredDataLen)
-{	
+{
 	if (m_pPluginInterface) {
 		return m_pPluginInterface->RestoreBuffer(pRestoredDataBuffer, nDataLen, pnRestoredDataLen);
 	} else {
@@ -6133,7 +6041,7 @@ BYTE* ClientConnection::RestoreBufferStep2(BYTE* pRestoredDataBuffer, int nDataL
 }
 
 //
-// Ensures that the temporary "alignement" buffer in large enough 
+// Ensures that the temporary "alignement" buffer in large enough
 //
 inline void ClientConnection::CheckNetRectBufferSize(int nBufSize)
 {
@@ -6142,7 +6050,7 @@ inline void ClientConnection::CheckNetRectBufferSize(int nBufSize)
 	omni_mutex_lock l(m_NetRectBufferMutex);
 
 	BYTE *newbuf = new BYTE[nBufSize + 256];
-	if (newbuf == NULL) 
+	if (newbuf == NULL)
 	{
 		// Error
 	}
@@ -6153,9 +6061,8 @@ inline void ClientConnection::CheckNetRectBufferSize(int nBufSize)
 	m_nNetRectBufSize = nBufSize + 256;
 }
 
-
 //
-// Ensures that the temporary "alignement" buffer in large enough 
+// Ensures that the temporary "alignement" buffer in large enough
 //
 inline void ClientConnection::CheckZRLENetRectBufferSize(int nBufSize)
 {
@@ -6164,7 +6071,7 @@ inline void ClientConnection::CheckZRLENetRectBufferSize(int nBufSize)
 	omni_mutex_lock l(m_ZRLENetRectBufferMutex);
 
 	BYTE *newbuf = new BYTE[nBufSize + 256];
-	if (newbuf == NULL) 
+	if (newbuf == NULL)
 	{
 		// Error
 	}
@@ -6175,11 +6082,9 @@ inline void ClientConnection::CheckZRLENetRectBufferSize(int nBufSize)
 	m_nZRLENetRectBufSize = nBufSize + 256;
 }
 
-
-
 //
 // Format file size so it is user friendly to read
-// 
+//
 void ClientConnection::GetFriendlySizeString(__int64 Size, char* szText)
 {
 	szText[0] = '\0';
@@ -6209,7 +6114,7 @@ void ClientConnection::GetFriendlySizeString(__int64 Size, char* szText)
 
 //
 // sf@2002
-// 
+//
 void ClientConnection::UpdateStatusFields()
 {
 	char szText[256];
@@ -6235,37 +6140,37 @@ void ClientConnection::UpdateStatusFields()
 			OldEncodingStatusWindow = EncodingStatusWindow;
 			switch (EncodingStatusWindow)
 			{
-			case rfbEncodingRaw:		
+			case rfbEncodingRaw:
 				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "Raw, Cache" : "Raw");
-				break;	
-			case rfbEncodingRRE:			
+				break;
+			case rfbEncodingRRE:
 				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "RRE, Cache" : "RRE");
 				break;
 			case rfbEncodingCoRRE:
 				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "CoRRE, Cache" : "CoRRE");
 				break;
-			case rfbEncodingHextile:		
+			case rfbEncodingHextile:
 				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "Hextile, Cache" : "Hextile");
 				break;
-			case rfbEncodingUltra:		
+			case rfbEncodingUltra:
 				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "Ultra, Cache" : "Ultra");
 				break;
-			case rfbEncodingUltra2:		
+			case rfbEncodingUltra2:
 				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "Ultra2, Cache" : "Ultra2");
 				break;
-			case rfbEncodingZlib:		
+			case rfbEncodingZlib:
 				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "XORZlib, Cache" : "XORZlib");
 				break;
-  			case rfbEncodingZRLE:		
+  			case rfbEncodingZRLE:
 				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "ZRLE, Cache" :"ZRLE");
   				break;
-  			case rfbEncodingZYWRLE:		
+  			case rfbEncodingZYWRLE:
 				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "ZYWRLE, Cache" :"ZYWRLE");
   				break;
 			case rfbEncodingTight:
 				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "Tight, Cache" : "Tight");
-				break; 
-			case rfbEncodingZlibHex:		
+				break;
+			case rfbEncodingZlibHex:
 				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "ZlibHex, Cache" : "ZlibHex");
 				break;
 			}
@@ -6273,9 +6178,7 @@ void ClientConnection::UpdateStatusFields()
 	}
 	else
 		OldEncodingStatusWindow = -1;
-
 }
-
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -6283,7 +6186,6 @@ void ClientConnection::UpdateStatusFields()
 
 void ClientConnection::GTGBS_ScrollToolbar(int dx, int dy)
 {
-
 /*	dx = max(dx, -m_hScrollPos);
 	dx = min(dx, m_hScrollMax-(m_cliwidth)-m_hScrollPos);
 	dy = max(dy, -m_vScrollPos);
@@ -6326,11 +6228,10 @@ void ClientConnection::GTGBS_CreateDisplay()
 
 	RegisterClass(&wndclass);
 
-
 #ifdef _WIN32_WCE
 	const DWORD winstyle = WS_VSCROLL | WS_HSCROLL | WS_CAPTION | WS_SYSMENU;
 #else
-	const DWORD winstyle = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | 
+	const DWORD winstyle = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU |
 	  WS_MINIMIZEBOX |WS_MAXIMIZEBOX | WS_THICKFRAME | WS_VSCROLL | WS_HSCROLL;
 #endif
 
@@ -6351,7 +6252,6 @@ void ClientConnection::GTGBS_CreateDisplay()
 	// [v1.0.2-jp1 fix]
 	ImmAssociateContext(m_hwndMain, NULL);
     helper::SafeSetWindowUserData(m_hwndMain, (LONG)this);
-
 }
 
 //
@@ -6367,15 +6267,13 @@ LRESULT CALLBACK ClientConnection::GTGBS_ShowStatusWindow(LPVOID lpParameter)
 	return 0;
 }
 
-
 //
 //
 //
 LRESULT CALLBACK ClientConnection::GTGBS_StatusProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 {
-
     ClientConnection* _this = helper::SafeGetWindowUserData<ClientConnection>(hwnd);
-	
+
 	switch (iMsg)
 	{
 	case WM_INITDIALOG:
@@ -6383,21 +6281,21 @@ LRESULT CALLBACK ClientConnection::GTGBS_StatusProc(HWND hwnd, UINT iMsg, WPARAM
 			// sf@2002 - Make the window always on top
 			RECT Rect;
 			GetWindowRect(hwnd, &Rect);
-			SetWindowPos(hwnd, 
+			SetWindowPos(hwnd,
 				HWND_TOPMOST,
 				Rect.left,
 				Rect.top,
 				Rect.right - Rect.left,
 				Rect.bottom - Rect.top,
 				SWP_SHOWWINDOW);
-			
+
 			char wt[MAX_PATH];
 			ClientConnection *_this = (ClientConnection *)lParam;
             helper::SafeSetWindowUserData(hwnd, lParam);
 
 			SetDlgItemInt(hwnd,IDC_RECEIVED,_this->m_BytesRead,false);
 			SetDlgItemInt(hwnd,IDC_SEND,_this->m_BytesSend,false);
-			
+
 			if (_this->m_host != NULL) {
 				SetDlgItemText(hwnd,IDC_VNCSERVER,_this->m_host);
 				sprintf(wt,"%s %s",sz_L72,_this->m_host);
@@ -6406,12 +6304,12 @@ LRESULT CALLBACK ClientConnection::GTGBS_StatusProc(HWND hwnd, UINT iMsg, WPARAM
 				SetDlgItemText(hwnd,IDC_VNCSERVER,_T(""));
 				SetWindowText(hwnd,sz_L73);
 			}
-			
+
 			if(_this->m_port != NULL)
 				SetDlgItemInt(hwnd,IDC_PORT,_this->m_port,FALSE);
 			else
 				SetDlgItemText(hwnd,IDC_PORT,_T(""));
-			
+
 			if(_this->m_sock != NULL )
 			{
 				if (_this->m_pDSMPlugin->IsEnabled())
@@ -6433,9 +6331,9 @@ LRESULT CALLBACK ClientConnection::GTGBS_StatusProc(HWND hwnd, UINT iMsg, WPARAM
 					} else {
 						if (_this->m_opts.m_oldplugin)
 						{
-							if (_stricmp(_this->m_pDSMPlugin->GetPluginParams(), "NoPassword")==0) 
+							if (_stricmp(_this->m_pDSMPlugin->GetPluginParams(), "NoPassword")==0)
 								SetDlgItemText(hwnd,IDC_PLUGIN_STATUS,"(old plugin, rc4.key, encryption)");
-							else 
+							else
 								SetDlgItemText(hwnd,IDC_PLUGIN_STATUS,"(old plugin, encryption)");
 						}
 						else SetDlgItemText(hwnd,IDC_PLUGIN_STATUS,"(no encryption)");
@@ -6443,18 +6341,15 @@ LRESULT CALLBACK ClientConnection::GTGBS_StatusProc(HWND hwnd, UINT iMsg, WPARAM
 
 					//Problem, old plugins don't have xxPluginInterface
 					// they always say no encryption
-
-
 				}
 				else
 					SetDlgItemText(hwnd,IDC_STATUS,sz_L49);
-				
 			}
 			else
 			{
 				SetDlgItemText(hwnd,IDC_STATUS,sz_L74);
 			}
-			
+
 			//CentreWindow(hwnd);
 			ShowWindow(hwnd,SW_SHOW);
 			_this->m_hwndStatus = hwnd;
@@ -6465,7 +6360,6 @@ LRESULT CALLBACK ClientConnection::GTGBS_StatusProc(HWND hwnd, UINT iMsg, WPARAM
 				// sf@2002
 				if (!_this->m_nStatusTimer)
 					_this->m_nStatusTimer = SetTimer( hwnd, 3333, 1000, NULL);
-				
 			} else {
 				//Verbindungsaufbau status
 				ShowWindow(GetDlgItem(hwnd,IDQUIT),SW_SHOW);
@@ -6474,7 +6368,7 @@ LRESULT CALLBACK ClientConnection::GTGBS_StatusProc(HWND hwnd, UINT iMsg, WPARAM
 				HMENU hMenu = GetSystemMenu(hwnd,0);
 				EnableMenuItem(hMenu,SC_CLOSE,MF_BYCOMMAND | MF_GRAYED);
 			}
-			
+
 			return TRUE;
 		}
 	case WM_CLOSE:
@@ -6497,25 +6391,25 @@ LRESULT CALLBACK ClientConnection::GTGBS_StatusProc(HWND hwnd, UINT iMsg, WPARAM
 				PostQuitMessage(0);
 				ClientConnection *_this = (ClientConnection *) GetWindowLong(hwnd, GWL_USERDATA);
 				_this->KillThread();
-				
+
 				//EndDialog(hwnd, TRUE);
 			}*/
 			return TRUE;
-		} 
-		
+		}
+
 		// sf@2002 - Every timer tic, we update the status values (speed, Sent, received, Encoder)
 	case WM_TIMER:
 		{
 			_this->UpdateStatusFields();
 			return TRUE;
 		}
-		
+
 	case WM_DESTROY:
 		{
 			// sf@2002 - Destroy the status timer... TODO: improve this
-			if (_this->m_nStatusTimer != 0) 
+			if (_this->m_nStatusTimer != 0)
 			{
-				KillTimer(hwnd, _this->m_nStatusTimer);			
+				KillTimer(hwnd, _this->m_nStatusTimer);
 				_this->m_nStatusTimer = 0;
 			}
 			_this->OldEncodingStatusWindow = -1;
@@ -6531,7 +6425,6 @@ LRESULT CALLBACK ClientConnection::GTGBS_StatusProc(HWND hwnd, UINT iMsg, WPARAM
 //
 LRESULT CALLBACK ClientConnection::GTGBS_SendCustomKey_proc(HWND Dlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
 {
-	
 	switch (iMsg)
 	{
 	case WM_INITDIALOG:
@@ -6541,7 +6434,7 @@ LRESULT CALLBACK ClientConnection::GTGBS_SendCustomKey_proc(HWND Dlg, UINT iMsg,
 			// Window always on top
 			RECT Rect;
 			GetWindowRect(Dlg, &Rect);
-			SetWindowPos(Dlg, 
+			SetWindowPos(Dlg,
 				HWND_TOPMOST,
 				Rect.left,
 				Rect.top,
@@ -6568,23 +6461,22 @@ LRESULT CALLBACK ClientConnection::GTGBS_SendCustomKey_proc(HWND Dlg, UINT iMsg,
 			if (LOWORD(wParam) == IDOK) {
 				if (SendMessage(GetDlgItem(Dlg,IDC_STRG), BM_GETCHECK, 0, 0) == BST_CHECKED)
 					STRG=1;
-				
+
 				if (SendMessage(GetDlgItem(Dlg,IDC_ALT), BM_GETCHECK, 0, 0) == BST_CHECKED)
 					ALT=1;
-				
+
 				if (SendMessage(GetDlgItem(Dlg,IDC_ALTGR), BM_GETCHECK, 0, 0) == BST_CHECKED)
 					ALTGR=1;
-				
-				
+
 				Key = GetDlgItemInt(Dlg,IDC_CUSTOM_KEY,&Okay,FALSE);
-				
+
 				if (ALT!=0)
 					Key |=KEYMAP_LALT_FLAG;
 				if (ALTGR != 0)
 					Key |= KEYMAP_RALT_FLAG;
 				if (STRG != 0)
 					Key |= KEYMAP_RCONTROL_FLAG;
-				
+
 				if (Okay)
 					{
                     helper::SafeSetMsgResult(Dlg, Key);
@@ -6603,18 +6495,17 @@ LRESULT CALLBACK ClientConnection::GTGBS_SendCustomKey_proc(HWND Dlg, UINT iMsg,
 //
 LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 {
-	
-	// This is a static method, so we don't know which instantiation we're 
+	// This is a static method, so we don't know which instantiation we're
 	// dealing with.  But we've stored a 'pseudo-this' in the window data.
     ClientConnection *_this = helper::SafeGetWindowUserData<ClientConnection>(hwnd);
-	
+
 	if (_this == NULL)
 		return DefWindowProc(hwnd, iMsg, wParam, lParam);
 
 	// HWND parent;
 
 	{
-		// Main Window 
+		// Main Window
 		// if ( hwnd == _this->m_hwndMain)
 		{
 			switch (iMsg)
@@ -6636,7 +6527,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							_this->m_SWselect=true;
 						}
 						break;
-						
+
 					case ID_DESKTOP:
 						if (!_this->m_SWselect)
 						{
@@ -6644,7 +6535,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							_this->SendSW(9999,9999);
 						}
 						break;
-						
+
 					// Toggle toolbar & toolbar menu option
 					case ID_DBUTTON:
 						_this->m_opts.m_ShowToolbar = !_this->m_opts.m_ShowToolbar;
@@ -6653,14 +6544,14 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						// adzm - 2010-07 - Extended clipboard
 						//_this->UpdateMenuItems(); // Handled in WM_INITMENUPOPUP
 						break;
-						
+
 					/*
 					case ID_BUTTON:
 						_this->m_opts.m_ShowToolbar=true;
 						_this->SizeWindow();
 						_this->SetFullScreenMode(_this->InFullScreenMode());
 						break;
-					*/	
+					*/
 
 					case ID_AUTOSCALING:
 						_this->m_opts.m_fAutoScaling = !_this->m_opts.m_fAutoScaling;
@@ -6682,7 +6573,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						if (_this->m_opts.m_ViewOnly) return 0;
 						_this->SendServerInput(true);
 						break;
-						
+
 					case ID_INPUT:
 						_this->m_remote_mouse_disable = false;
 						if (_this->m_opts.m_ShowToolbar)
@@ -6694,7 +6585,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						if (_this->m_opts.m_ViewOnly) return 0;
 						_this->SendServerInput(false);
 						break;
-						
+
 					case SC_MINIMIZE:
 						_this->SetDormant(true);
 						if (_this->m_hwndStatus)ShowWindow(_this->m_hwndStatus,SW_MINIMIZE);
@@ -6702,33 +6593,33 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 
 					case SC_MAXIMIZE:
 						// Toggle full screen mode
-						if (!_this->InFullScreenMode()) 
-						{ 
-							SendMessage(hwnd,WM_SYSCOMMAND,(WPARAM)ID_NORMALSCREEN,(LPARAM)0); 
-							Sleep(100); 
-						} 
+						if (!_this->InFullScreenMode())
+						{
+							SendMessage(hwnd,WM_SYSCOMMAND,(WPARAM)ID_NORMALSCREEN,(LPARAM)0);
+							Sleep(100);
+						}
 						_this->SetFullScreenMode(!_this->InFullScreenMode());
 						return 0;
 						break;
-						
+
 					case SC_RESTORE:
 						_this->SetDormant(false);
 						if (_this->m_hwndStatus)ShowWindow(_this->m_hwndStatus,SW_NORMAL);
 						break;
-						
+
 					case ID_NEWCONN:
 						_this->m_pApp->NewConnection(false);
 						return 0;
-						
+
 					case ID_CONN_SAVE_AS:
 						_this->SaveConnection();
 						return 0;
-						
-					case IDC_OPTIONBUTTON: 
+
+					case IDC_OPTIONBUTTON:
 						{
 							if (_this->m_fOptionsOpen) return 0;
 							_this->m_fOptionsOpen = true;
-							
+
 							// Modif sf@2002 - Server Scaling
 							int nOldServerScale = _this->m_nServerScale;
 							int prev_scale_num = _this->m_opts.m_scale_num;
@@ -6738,10 +6629,9 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							// adzm - 2010-07 - Extended clipboard
 							bool bOldViewOnly = _this->m_opts.m_ViewOnly;
 							bool bOldDisableClipboard = _this->m_opts.m_DisableClipboard;
-							
+
 							if (_this->m_opts.DoDialog(true))
 							{
-								
 								// Modif sf@2002 - Server Scaling
 								_this->m_nServerScale = _this->m_opts.m_nServerScale;
 								if (_this->m_nServerScale != nOldServerScale)
@@ -6766,12 +6656,12 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 
 								// adzm 2010-10
 								_this->m_PendingMouseMove.dwMinimumMouseMoveInterval = _this->m_opts.m_throttleMouse;
-							}		
+							}
 
 							// adzm - 2010-07 - Extended clipboard
 							if ( (bOldViewOnly != _this->m_opts.m_ViewOnly) || (bOldDisableClipboard != _this->m_opts.m_DisableClipboard) )
 							{
-								_this->UpdateRemoteClipboardCaps();						
+								_this->UpdateRemoteClipboardCaps();
 
 								if (!_this->m_opts.m_ViewOnly && !_this->m_opts.m_DisableClipboard) {
 									_this->UpdateRemoteClipboard(); // update the clipboard if we are no longer view only and the clipboard is enabled
@@ -6783,34 +6673,31 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							_this->OldEncodingStatusWindow = -2; // force update in status window
 							_this->m_fOptionsOpen = false;
 
-
 							return 0;
 						}
-						
+
 					case IDD_APP_ABOUT:
 						ShowAboutBox();
 						return 0;
-						
+
 					case ID_CONN_ABOUT:
 						_this->ShowConnInfo();
 						return 0;
-						
-					case ID_FULLSCREEN: 
+
+					case ID_FULLSCREEN:
 						// Toggle full screen mode
 						if (!_this->InFullScreenMode()) //PGM
 
 						{ //PGM
-
 							SendMessage(hwnd,WM_SYSCOMMAND,(WPARAM)ID_NORMALSCREEN,(LPARAM)0); //PGM
 
 							Sleep(100); //PGM
-
 						} //PGM
 
 						_this->SetFullScreenMode(!_this->InFullScreenMode());
 						return 0;
 
-					case ID_VIEWONLYTOGGLE: 
+					case ID_VIEWONLYTOGGLE:
 						// Toggle view only mode
 						_this->m_opts.m_ViewOnly = !_this->m_opts.m_ViewOnly;
 
@@ -6818,20 +6705,20 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						if (_this->m_opts.m_ViewOnly) SetWindowText(_this->m_hwndMain, _this->m_desktopName_viewonly);
 						else SetWindowText(_this->m_hwndMain, _this->m_desktopName);
 						//_this->UpdateMenuItems(); // Handled in WM_INITMENUPOPUP
-						
+
 						_this->UpdateRemoteClipboardCaps();
 
 						if (!_this->m_opts.m_ViewOnly && !_this->m_opts.m_DisableClipboard) {
 							_this->UpdateRemoteClipboard(); // update the clipboard if we are no longer view only and the clipboard is enabled
 						}
 						return 0;
-						
-					case ID_REQUEST_REFRESH: 
+
+					case ID_REQUEST_REFRESH:
 						// Request a full-screen update
 						//adzm 2010-09
 						_this->SendFullFramebufferUpdateRequest(false);
 						return 0;
-	
+
 					case ID_VK_LWINDOWN:
 						if (_this->m_opts.m_ViewOnly) return 0;
 						_this->SendKeyEvent(XK_Super_L, true);
@@ -6869,7 +6756,6 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						_this->FlushWriteQueue(true, 5);
 						return 0;
 
-						
 					// Send START Button
 					case ID_CONN_CTLESC:
 						if (_this->m_opts.m_ViewOnly) return 0;
@@ -6880,7 +6766,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						//adzm 2010-09
 						_this->FlushWriteQueue(true, 5);
 						return 0;
-						
+
 					// Send Ctrl-Alt-Del
 					case ID_CONN_CTLALTDEL:
 						if (_this->m_opts.m_ViewOnly) return 0;
@@ -6893,49 +6779,49 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						//adzm 2010-09
 						_this->FlushWriteQueue(true, 5);
 						return 0;
-						
+
 					case ID_CONN_CTLDOWN:
 						if (_this->m_opts.m_ViewOnly) return 0;
 						_this->SendKeyEvent(XK_Control_L, true);
 						//adzm 2010-09
 						_this->FlushWriteQueue(true, 5);
 						return 0;
-						
+
 					case ID_CONN_CTLUP:
 						if (_this->m_opts.m_ViewOnly) return 0;
 						_this->SendKeyEvent(XK_Control_L, false);
 						//adzm 2010-09
 						_this->FlushWriteQueue(true, 5);
 						return 0;
-						
+
 					case ID_CONN_ALTDOWN:
 						if (_this->m_opts.m_ViewOnly) return 0;
 						_this->SendKeyEvent(XK_Alt_L, true);
 						//adzm 2010-09
 						_this->FlushWriteQueue(true, 5);
 						return 0;
-						
+
 					case ID_CONN_ALTUP:
 						if (_this->m_opts.m_ViewOnly) return 0;
 						_this->SendKeyEvent(XK_Alt_L, false);
 						//adzm 2010-09
 						_this->FlushWriteQueue(true, 5);
 						return 0;
-						
+
 					case ID_CLOSEDAEMON:
 						if (MessageBox(hwnd, sz_L75,
-							sz_L76, 
+							sz_L76,
 							MB_YESNO | MB_ICONQUESTION | MB_DEFBUTTON2) == IDYES)
 							PostQuitMessage(0);
 						return 0;
-						
+
 						// Modif sf@2002 - FileTransfer
-					case ID_FILETRANSFER: 
+					case ID_FILETRANSFER:
 						// Check if the Server knows FileTransfer
 						if (!_this->m_fServerKnowsFileTransfer)
 						{
 							MessageBox(hwnd, sz_L77,
-								sz_L78, 
+								sz_L78,
 								MB_OK | MB_ICONINFORMATION | MB_SETFOREGROUND | MB_TOPMOST);
 							return 0;
 						}
@@ -6945,8 +6831,8 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							_this->m_pFileTransfer->ShowFileTransferWindow(true);
 							return 0;
 							/*
-							MessageBox(NULL, sz_L79, 
-								sz_L80, 
+							MessageBox(NULL, sz_L79,
+								sz_L80,
 								MB_OK | MB_ICONINFORMATION | MB_SETFOREGROUND | MB_TOPMOST);
 							return 0;
 							*/
@@ -6972,7 +6858,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						if (_this->m_pFileTransfer->m_fVisible || _this->m_pFileTransfer->UsingOldProtocol())
 							_this->SendAppropriateFramebufferUpdateRequest(false);
 						return 0;
-						
+
 						// sf@2002 - Text Chat
 					case ID_TEXTCHAT:
 						// We use same flag as FT for now
@@ -6980,7 +6866,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						if (!_this->m_fServerKnowsFileTransfer)
 						{
 							MessageBox(hwnd, sz_L81,
-								sz_L82, 
+								sz_L82,
 								MB_OK | MB_ICONINFORMATION | MB_SETFOREGROUND | MB_TOPMOST);
 							return 0;
 						}
@@ -6989,8 +6875,8 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							_this->m_pTextChat->ShowChatWindow(true);
 							return 0;
 							/*
-							MessageBox(NULL, sz_L83, 
-								sz_L84, 
+							MessageBox(NULL, sz_L83,
+								sz_L84,
 								MB_OK | MB_ICONINFORMATION | MB_SETFOREGROUND | MB_TOPMOST);
 							return 0;
 							*/
@@ -7007,9 +6893,9 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						_this->m_pTextChat->m_fTextChatRunning = true;
 						_this->m_pTextChat->DoDialog();
 						return 0;
-						
+
 						// sf@2002
-					case ID_MAXCOLORS: 
+					case ID_MAXCOLORS:
 						if (_this->m_opts.m_Use8Bit)
 						{
 							_this->m_opts.m_Use8Bit = rfbPFFullColors; //false;
@@ -7017,9 +6903,9 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							InvalidateRect(hwnd, NULL, TRUE);
 						}
 						return 0;
-						
+
 						// sf@2002
-					case ID_256COLORS: 
+					case ID_256COLORS:
 						// if (!_this->m_opts.m_Use8Bit)
 						{
 							_this->m_opts.m_Use8Bit = rfbPF256Colors; //true;
@@ -7027,23 +6913,21 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							InvalidateRect(hwnd, NULL, TRUE);
 						}
 						return 0;
-						
+
 						// Modif sf@2002
-					case ID_HALFSCREEN: 
+					case ID_HALFSCREEN:
 						{
 							if (_this->InFullScreenMode()) //PGM
 
 							{ //PGM
-
 								SendMessage(hwnd,WM_SYSCOMMAND,(WPARAM)ID_AUTOSCALING,(LPARAM)0); //PGM
 
 								return 0; //PGM
-
 							} //PGM
 
 							// Toggle halfSize screen mode (server side)
 							int nOldServerScale = _this->m_nServerScale;
-							
+
 							// Modif sf@2002 - Server Scaling
 							_this->m_opts.m_fAutoScaling = false;
 							_this->m_nServerScale = 2;
@@ -7051,7 +6935,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							_this->m_opts.m_scaling = true;
 							_this->m_opts.m_scale_num = 100;
 							_this->m_opts.m_scale_den = 100;
-							
+
 							if (_this->m_nServerScale != nOldServerScale)
 							{
 								_this->SendServerScale(_this->m_nServerScale);
@@ -7061,18 +6945,18 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							{
 								_this->SizeWindow();
 								InvalidateRect(hwnd, NULL, TRUE);
-								_this->RealiseFullScreenMode();	
+								_this->RealiseFullScreenMode();
 								_this->m_pendingFormatChange = true;
 							}
 							return 0;
 						}
-						
+
 						// Modif sf@2002
-					case ID_FUZZYSCREEN: 
+					case ID_FUZZYSCREEN:
 						{
 							// Toggle fuzzy screen mode (server side)
 							int nOldServerScale = _this->m_nServerScale;
-							
+
 							// We don't forbid AutoScaling if selected
 							// so the viewer zoom factor is more accurate
 							_this->m_nServerScale = 2;
@@ -7080,7 +6964,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							_this->m_opts.m_scaling = true;
 							_this->m_opts.m_scale_num = 200;
 							_this->m_opts.m_scale_den = 100;
-							
+
 							if (_this->m_nServerScale != nOldServerScale)
 							{
 								_this->SendServerScale(_this->m_nServerScale);
@@ -7090,26 +6974,26 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							{
 								_this->SizeWindow();
 								InvalidateRect(hwnd, NULL, TRUE);
-								_this->RealiseFullScreenMode();	
+								_this->RealiseFullScreenMode();
 								_this->m_pendingFormatChange = true;
 							}
-							
+
 							return 0;
 						}
-						
+
 						// Modif sf@2002
-					case ID_NORMALSCREEN: 
+					case ID_NORMALSCREEN:
 						{
 							// Toggle normal screen
 							/*int nOldServerScale = _this->m_nServerScale;
-							
+
 							_this->m_opts.m_fAutoScaling = false;
 							_this->m_nServerScale = 1;
 							_this->m_opts.m_nServerScale = 1;
 							_this->m_opts.m_scaling = false;
 							_this->m_opts.m_scale_num = 100;
 							_this->m_opts.m_scale_den = 100;
-							
+
 							if (_this->m_nServerScale != nOldServerScale)
 							{
 								_this->SendServerScale(_this->m_nServerScale);
@@ -7119,24 +7003,24 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							{
 								_this->SizeWindow();
 								InvalidateRect(hwnd, NULL, TRUE);
-								_this->SetFullScreenMode(false);	
+								_this->SetFullScreenMode(false);
 								_this->m_pendingFormatChange = true;
 							}*/
 							return 0;
 						}
 
-					case ID_NORMALSCREEN2: 
+					case ID_NORMALSCREEN2:
 						{
 							// Toggle normal screen
 							int nOldServerScale = _this->m_nServerScale;
-							
+
 							_this->m_opts.m_fAutoScaling = false;
 							_this->m_nServerScale = 1;
 							_this->m_opts.m_nServerScale = 1;
 							_this->m_opts.m_scaling = false;
 							_this->m_opts.m_scale_num = 100;
 							_this->m_opts.m_scale_den = 100;
-							
+
 							if (_this->m_nServerScale != nOldServerScale)
 							{
 								_this->SendServerScale(_this->m_nServerScale);
@@ -7146,16 +7030,16 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							{
 								_this->SizeWindow();
 								InvalidateRect(hwnd, NULL, TRUE);
-								_this->SetFullScreenMode(false);	
+								_this->SetFullScreenMode(false);
 								_this->m_pendingFormatChange = true;
 							}
 							return 0;
 						}
 
 					// adzm - 2010-07 - Extended clipboard
-					case ID_ENABLE_CLIPBOARD:						
+					case ID_ENABLE_CLIPBOARD:
 						_this->m_opts.m_DisableClipboard = !_this->m_opts.m_DisableClipboard;
-						_this->UpdateRemoteClipboardCaps();						
+						_this->UpdateRemoteClipboardCaps();
 
 						if (!_this->m_opts.m_ViewOnly && !_this->m_opts.m_DisableClipboard) {
 							_this->UpdateRemoteClipboard(); // update the clipboard if we are no longer view only and the clipboard is enabled
@@ -7166,30 +7050,30 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						// currently just toggle between default limit and auto; an interface
 						// for limits will be useful once more complex (larger) formats are
 						// implemented.
-						_this->m_clipboard.settings.m_nLimitText = 
-							_this->m_clipboard.settings.m_nLimitText == 0 ? 
-								(_this->m_clipboard.settings.m_nRequestedLimitText == 0 ? 
-									ClipboardSettings::defaultLimit 
+						_this->m_clipboard.settings.m_nLimitText =
+							_this->m_clipboard.settings.m_nLimitText == 0 ?
+								(_this->m_clipboard.settings.m_nRequestedLimitText == 0 ?
+									ClipboardSettings::defaultLimit
 								: _this->m_clipboard.settings.m_nRequestedLimitText)
 							: 0;
 						_this->UpdateRemoteClipboardCaps(true);
 						//_this->UpdateMenuItems(); // Handled in WM_INITMENUPOPUP
 						break;
 					case ID_CLIPBOARD_RTF:
-						_this->m_clipboard.settings.m_nLimitRTF = 
-							_this->m_clipboard.settings.m_nLimitRTF == 0 ? 
-								(_this->m_clipboard.settings.m_nRequestedLimitRTF == 0 ? 
-									ClipboardSettings::defaultLimit 
+						_this->m_clipboard.settings.m_nLimitRTF =
+							_this->m_clipboard.settings.m_nLimitRTF == 0 ?
+								(_this->m_clipboard.settings.m_nRequestedLimitRTF == 0 ?
+									ClipboardSettings::defaultLimit
 								: _this->m_clipboard.settings.m_nRequestedLimitRTF)
 							: 0;
 						_this->UpdateRemoteClipboardCaps(true);
 						//_this->UpdateMenuItems(); // Handled in WM_INITMENUPOPUP
 						break;
 					case ID_CLIPBOARD_HTML:
-						_this->m_clipboard.settings.m_nLimitHTML = 
-							_this->m_clipboard.settings.m_nLimitHTML == 0 ? 
-								(_this->m_clipboard.settings.m_nRequestedLimitHTML == 0 ? 
-									ClipboardSettings::defaultLimit 
+						_this->m_clipboard.settings.m_nLimitHTML =
+							_this->m_clipboard.settings.m_nLimitHTML == 0 ?
+								(_this->m_clipboard.settings.m_nRequestedLimitHTML == 0 ?
+									ClipboardSettings::defaultLimit
 								: _this->m_clipboard.settings.m_nRequestedLimitHTML)
 							: 0;
 						_this->UpdateRemoteClipboardCaps(true);
@@ -7201,13 +7085,11 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 					case ID_CLIPBOARD_RECV:
 						_this->RequestRemoteClipboard();
 						break;
-											
 					} // end switch lowparam syscommand
-					
-					break;
 
+					break;
 				}//end case wm_syscommand
-				
+
 #ifndef UNDER_CE
 				case WM_SIZING:
 					if (_this->directx_used) return 0;
@@ -7219,7 +7101,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						// Don't allow sizing larger than framebuffer
 						RECT *lprc = (LPRECT) lParam;
 						switch (wParam) {
-						case WMSZ_RIGHT: 
+						case WMSZ_RIGHT:
 						case WMSZ_TOPRIGHT:
 						case WMSZ_BOTTOMRIGHT:
 							lprc->right = min(lprc->right, lprc->left + (_this->m_fullwinwidth+b)+1 );
@@ -7230,7 +7112,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							lprc->left = max(lprc->left, lprc->right - (_this->m_fullwinwidth+b));
 							break;
 						}
-						
+
 						switch (wParam) {
 						case WMSZ_TOP:
 						case WMSZ_TOPLEFT:
@@ -7249,7 +7131,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 								lprc->bottom = min(lprc->bottom, lprc->top + (_this->m_fullwinheight+a));
 							break;
 						}
-						
+
 						return 0;
 					}
 #endif
@@ -7257,10 +7139,10 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 					_this->SetDormant(false);
 					return true;
 
-				case WM_SETFOCUS:		
+				case WM_SETFOCUS:
 					TheAccelKeys.SetWindowHandle(_this->m_opts.m_NoHotKeys ? 0 : hwnd);
 					_this->m_keymap->Reset();
-					return 0;			
+					return 0;
 
 				case WM_KILLFOCUS:
 					if (!_this->m_running) return 0;
@@ -7276,8 +7158,8 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 					_this->SendKeyEvent(XK_Control_R, false);
 					_this->SendKeyEvent(XK_Shift_R,   false);
 					*/
-					return 0; 
-			
+					return 0;
+
 				case WM_CLOSE:
 					{
 						_this->m_keepalive_timer=0;
@@ -7307,11 +7189,11 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
                             }
 							_this->m_pFileTransfer->ShowFileTransferWindow(true);
 							MessageBox(hwnd, sz_L85,
-								sz_L88, 
+								sz_L88,
 								MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST);
 							return 0;
 						}
-												
+
 						// sf@2002 - Do not close vncviewer if the Text Chat GUI is open !
 						if (_this->m_pTextChat->m_fTextChatRunning)
 						{
@@ -7323,15 +7205,15 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 
 							_this->m_pTextChat->ShowChatWindow(true);
 							MessageBox(hwnd, sz_L86,
-								sz_L88, 
+								sz_L88,
 								MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST);
 							return 0;
 						}
-						
+
 						if (_this->m_fOptionsOpen)
 						{
                             MessageBox(hwnd, sz_L87,
-								sz_L88, 
+								sz_L88,
 								MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST);
 							return 0;
 						}
@@ -7346,7 +7228,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
                             ::ShowWindow(hwnd, SW_HIDE);
 							//make sure reconnecthread is closed before closing mother
 							forcedexit=true;
-							if(_this->rcth) 
+							if(_this->rcth)
 								{
 									WaitForSingleObject(_this->rcth,10000);
 									CloseHandle(_this->rcth);
@@ -7391,8 +7273,6 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 										case WAIT_TIMEOUT:
 											//reconnect still running, doubble call ignore
 											break;
-
-
 								}
 							}
 							else
@@ -7407,7 +7287,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						_this->UpdateMenuItems();
 						break;
 					}
-					
+
 				case WM_DESTROY:
 					{
 #ifndef UNDER_CE
@@ -7445,13 +7325,12 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							_this->m_hPopupMenuClipboardFormats = NULL;
 						}
 
-
-//						if (_this->m_FTtimer != 0) 
+//						if (_this->m_FTtimer != 0)
 //						{
-//							KillTimer(hwnd, _this->m_FTtimer);			
+//							KillTimer(hwnd, _this->m_FTtimer);
 //							_this->m_FTtimer = 0;
 //						}
-						
+
 						//_this->m_hwnd = 0;
 						// We are currently in the main thread.
 						// The worker thread should be about to finish if
@@ -7462,7 +7341,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						} catch (omni_thread_invalid& e) {
 							// The thread probably hasn't been started yet,
 						}
-						
+
 						//PostQuitMessage(0);
 						return 0;
 					}
@@ -7485,7 +7364,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 				case WM_DEADCHAR:
 				case WM_SYSDEADCHAR:
 					return 0;
-					
+
 				case WM_WINDOWPOSCHANGED:
 				case WM_SIZE:
 					{
@@ -7511,7 +7390,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 								_this->CreateButtons(false,_this->m_fServerKnowsFileTransfer);
 								}
 							}
-							else 
+							else
 							{
 								if (_this->m_BigToolbar)
 								{
@@ -7543,14 +7422,13 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						}
 						else
 						{
-							Rtb.top=0;Rtb.bottom=0;	
+							Rtb.top=0;Rtb.bottom=0;
 						}
-						
-						
+
 						// If the current window size would be large enough to hold the
 						// whole screen without scrollbars, or if we're full-screen,
 						// we turn them off.  Under CE, the scroll bars are unchangeable.
-		
+
 #ifndef UNDER_CE
 						int h_scrollbar=GetSystemMetrics(SM_CYHSCROLL);
 						int v_scrollbar=GetSystemMetrics(SM_CXVSCROLL);
@@ -7558,7 +7436,6 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						int v=0;
 						if (_this->SB_HORZ_BOOL) h=h_scrollbar;
 						if (_this->SB_VERT_BOOL) v=v_scrollbar;
-
 
 						if (_this->InFullScreenMode() || _this->directx_used)
 						{
@@ -7569,7 +7446,6 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						}
 						else
 						{
-
 							if (_this->m_winheight >= (_this->m_fullwinheight + (Rtb.bottom - Rtb.top) + h) )
 							{
 								_this->SB_VERT_BOOL=false;
@@ -7612,36 +7488,29 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 									}
 							else _this->SB_HORZ_BOOL=true;
 
-							if ((_this->m_winwidth  == _this->m_fullwinwidth)&& 
+							if ((_this->m_winwidth  == _this->m_fullwinwidth)&&
 							   (_this->m_winheight == (_this->m_fullwinheight + (Rtb.bottom - Rtb.top))))
 							{
 								_this->SB_VERT_BOOL=false;
 								_this->SB_HORZ_BOOL=false;
 							}
 
-
-	
-
-							
-
-
-
 						ShowScrollBar(hwnd, SB_HORZ, _this->SB_HORZ_BOOL);
 						ShowScrollBar(hwnd, SB_VERT, _this->SB_VERT_BOOL);
 						}
 
 #endif
-					
+
 						// Update these for the record
 						// And consider that in full-screen mode the window
 						// is actually bigger than the remote screen.
 						if (_this->directx_used)
 						{
 							GetClientRect(hwnd, &rect);
-						
+
 						_this->m_cliwidth = rect.right - rect.left;
 						_this->m_cliheight = (int)(rect.bottom - rect.top);
-						
+
 						if (_this->m_opts.m_ShowToolbar)
 							SetWindowPos(_this->m_hwndcn, _this->m_hwndTBwin, 0, _this->m_TBr.bottom, _this->m_cliwidth, _this->m_cliheight-_this->m_TBr.bottom, SWP_SHOWWINDOW);
 						else SetWindowPos(_this->m_hwndcn, _this->m_hwndTBwin, 0, 0, _this->m_cliwidth, _this->m_cliheight, SWP_SHOWWINDOW);
@@ -7650,8 +7519,8 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						else
 						{
 						GetClientRect(hwnd, &rect);
-						
-						_this->m_cliwidth = min( (int)(rect.right - rect.left), 
+
+						_this->m_cliwidth = min( (int)(rect.right - rect.left),
 							                     (int)(_this->m_si.framebufferWidth * _this->m_opts.m_scale_num / _this->m_opts.m_scale_den));
 						if (_this->m_opts.m_ShowToolbar)
 							_this->m_cliheight = min( (int)rect.bottom - rect.top ,
@@ -7659,39 +7528,38 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						else
 							_this->m_cliheight = min( (int)(rect.bottom - rect.top) ,
 							                          (int)(_this->m_si.framebufferHeight * _this->m_opts.m_scale_num / _this->m_opts.m_scale_den));
-						
+
 						_this->m_hScrollMax = (int)_this->m_si.framebufferWidth * _this->m_opts.m_scale_num / _this->m_opts.m_scale_den;
 						if (_this->m_opts.m_ShowToolbar)
 							_this->m_vScrollMax = (int)(_this->m_si.framebufferHeight *
 							                            _this->m_opts.m_scale_num / _this->m_opts.m_scale_den)
 														+ _this->m_TBr.bottom;
-						else 
+						else
 							_this->m_vScrollMax = (int)(_this->m_si.framebufferHeight*
 							                           _this->m_opts.m_scale_num / _this->m_opts.m_scale_den);
-						
+
 						int newhpos, newvpos;
-						newhpos = max(0, 
-							          min(_this->m_hScrollPos, 
+						newhpos = max(0,
+							          min(_this->m_hScrollPos,
 					                      _this->m_hScrollMax - max(_this->m_cliwidth, 0)
 										 )
 									 );
 						newvpos = max(0,
-							          min(_this->m_vScrollPos, 
+							          min(_this->m_vScrollPos,
 							              _this->m_vScrollMax - max(_this->m_cliheight, 0)
 										 )
 								     );
-						
+
 						ScrollWindowEx(_this->m_hwndcn,
 							           _this->m_hScrollPos - newhpos,
 									   _this->m_vScrollPos - newvpos,
 							           NULL, &rect, NULL, NULL,  SW_INVALIDATE);
-						
+
 						_this->m_hScrollPos = newhpos;
 						_this->m_vScrollPos = newvpos;
 						_this->UpdateScrollbars();
 						}
-						
-						
+
 					//Added by: Lars Werner (http://lars.werner.no)
 					if(wParam==SIZE_MAXIMIZED&&_this->InFullScreenMode()==FALSE)
 					{
@@ -7699,7 +7567,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						//MessageBox(NULL,"Fullscreeen from maximizehora...","KAKE",MB_OK);
 						//return 0;
 					}
-				
+
 					//Modified by: Lars Werner (http://lars.werner.no)
 					if(_this->InFullScreenMode()==TRUE)
 						return 0;
@@ -7726,10 +7594,10 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							dx = pos - _this->m_hScrollPos;
 						}
 						_this->ScrollScreen(dx,0);
-						
+
 						return 0;
 					}
-					
+
 				case WM_VSCROLL:
 					{
 						int dy = 0;
@@ -7749,10 +7617,10 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							dy = pos - _this->m_vScrollPos;
 						}
 						_this->ScrollScreen(0,dy);
-						
+
 						return 0;
 					}
-					
+
 					// RealVNC 335 method
 				case WM_MOUSEWHEEL:
 					if (!_this->m_opts.m_ViewOnly) {
@@ -7762,7 +7630,6 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 					}
 					return 0;
 
-					
 				//Added by: Lars Werner (http://lars.werner.no) - These is the custom messages from the TitleBar
 				case tbWM_CLOSE:
 					SendMessage(_this->m_hwndMain, WM_CLOSE,NULL,0);
@@ -7778,7 +7645,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 					_this->SetFullScreenMode(FALSE);
 					return 0;
 			} // end of iMsg switch
-			
+
 			//return DefWindowProc(hwnd, iMsg, wParam, lParam);
 
 			// Process asynchronous FileTransfer in this thread
@@ -7802,16 +7669,14 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 			        SendMessage(hwnd,WM_SIZE,(WPARAM)ID_DINPUT,(LPARAM)0);
 		        }
             }
-
 		} // End if Main Window
 	}
-	
+
 	return DefWindowProc(hwnd, iMsg, wParam, lParam);
-	
+
 	// We know about an unused variable here.
 #pragma warning(disable : 4101)
 }
-
 
 //
 //
@@ -7826,7 +7691,7 @@ LRESULT CALLBACK ClientConnection::WndProcTBwin(HWND hwnd, UINT iMsg, WPARAM wPa
 	if (_this->m_opts.m_ShowToolbar==true)
 		{
 			parent = _this->m_hwndMain;
-			switch (iMsg) 
+			switch (iMsg)
 			{
 			case WM_PAINT:
 				{
@@ -7843,7 +7708,7 @@ LRESULT CALLBACK ClientConnection::WndProcTBwin(HWND hwnd, UINT iMsg, WPARAM wPa
 						}
 					break;
 				}
-				
+
 			case WM_COMMAND:
 				if (LOWORD(wParam) == ID_BUTTON_INFO)
 				{
@@ -7880,7 +7745,6 @@ LRESULT CALLBACK ClientConnection::WndProcTBwin(HWND hwnd, UINT iMsg, WPARAM wPa
 					return TRUE;
 				}
 
-				
 				if (LOWORD(wParam) == ID_BUTTON_SEP)
 				{
 					UINT Key;
@@ -7901,7 +7765,6 @@ LRESULT CALLBACK ClientConnection::WndProcTBwin(HWND hwnd, UINT iMsg, WPARAM wPa
 							_this->SendKeyEvent(Key ^ KEYMAP_RALT_FLAG,false);
 							_this->SendKeyEvent(XK_Alt_R,false);
 							_this->SendKeyEvent(XK_Control_R,false);
-							
 						}else if ( (Key &  KEYMAP_RCONTROL_FLAG) == KEYMAP_RCONTROL_FLAG){
 							_this->SendKeyEvent(XK_Control_R,true);
 							_this->SendKeyEvent(Key ^ KEYMAP_RCONTROL_FLAG,true);
@@ -7911,37 +7774,36 @@ LRESULT CALLBACK ClientConnection::WndProcTBwin(HWND hwnd, UINT iMsg, WPARAM wPa
 							_this->SendKeyEvent(Key,true);
 							_this->SendKeyEvent(Key,false);
 						}
-						
+
 						//adzm 2010-09
 						_this->FlushWriteQueue(true, 5);
-						
-						
+
 						vnclog.Print(0,_T("END   Send Custom Key %d\n"),Key);
 					}
 					SetForegroundWindow(_this->m_hwndcn);
-					
+
 					return 0;
 				}
 
-				if (LOWORD(wParam) == ID_BUTTON_END ) 
+				if (LOWORD(wParam) == ID_BUTTON_END )
 				{
 					SendMessage(parent,WM_CLOSE,(WPARAM)0,(LPARAM)0);
 					return 0;
 				}
-				
-				if (LOWORD(wParam) == ID_BUTTON_CAD ) 
+
+				if (LOWORD(wParam) == ID_BUTTON_CAD )
 				{
 					SendMessage(parent,WM_SYSCOMMAND,(WPARAM)ID_CONN_CTLALTDEL,(LPARAM)0);
 					return 0;
 				}
-				
-				if (LOWORD(wParam) == ID_BUTTON_FULLSCREEN ) 
+
+				if (LOWORD(wParam) == ID_BUTTON_FULLSCREEN )
 				{
 					SendMessage(parent,WM_SYSCOMMAND,(WPARAM)ID_FULLSCREEN,(LPARAM)0);
 					return 0;
 				}
-			
-				if (LOWORD(wParam) == ID_BUTTON_FTRANS ) 
+
+				if (LOWORD(wParam) == ID_BUTTON_FTRANS )
 				{
 					if (_this->m_pFileTransfer->m_fFileTransferRunning)
 					{
@@ -7951,26 +7813,26 @@ LRESULT CALLBACK ClientConnection::WndProcTBwin(HWND hwnd, UINT iMsg, WPARAM wPa
 						SendMessage(parent,WM_SYSCOMMAND,(WPARAM)ID_FILETRANSFER,(LPARAM)0);
 					return 0;
 				}
-				
-				if (LOWORD(wParam) == ID_BUTTON_DBUTTON ) 
+
+				if (LOWORD(wParam) == ID_BUTTON_DBUTTON )
 				{
 					SendMessage(parent,WM_SYSCOMMAND,(WPARAM)ID_DBUTTON,(LPARAM)0);
 					return 0;
 				}
-				
-				if (LOWORD(wParam) == ID_BUTTON_SW ) 
+
+				if (LOWORD(wParam) == ID_BUTTON_SW )
 				{
 					SendMessage(parent,WM_SYSCOMMAND,(WPARAM)ID_SW,(LPARAM)0);
 					return 0;
 				}
-				
-				if (LOWORD(wParam) == ID_BUTTON_DESKTOP ) 
+
+				if (LOWORD(wParam) == ID_BUTTON_DESKTOP )
 				{
 					SendMessage(parent,WM_SYSCOMMAND,(WPARAM)ID_DESKTOP,(LPARAM)0);
 					return 0;
 				}
-				
-				if (LOWORD(wParam) == ID_BUTTON_TEXTCHAT ) 
+
+				if (LOWORD(wParam) == ID_BUTTON_TEXTCHAT )
 				{
 					if (_this->m_pTextChat->m_fTextChatRunning)
 					{
@@ -7980,8 +7842,8 @@ LRESULT CALLBACK ClientConnection::WndProcTBwin(HWND hwnd, UINT iMsg, WPARAM wPa
 						SendMessage(parent,WM_SYSCOMMAND,(WPARAM)ID_TEXTCHAT,(LPARAM)0);
 					return 0;
 				}
-				
-				if (LOWORD(wParam) == ID_BUTTON_DINPUT ) 
+
+				if (LOWORD(wParam) == ID_BUTTON_DINPUT )
 				{
 					if (_this->m_remote_mouse_disable)
 					{
@@ -7997,20 +7859,20 @@ LRESULT CALLBACK ClientConnection::WndProcTBwin(HWND hwnd, UINT iMsg, WPARAM wPa
 					}
 					return 0;
 				}
-				
-				if (LOWORD(wParam) == ID_BUTTON_PROPERTIES ) 
+
+				if (LOWORD(wParam) == ID_BUTTON_PROPERTIES )
 				{
 					SendMessage(parent,WM_SYSCOMMAND,(WPARAM)IDC_OPTIONBUTTON,(LPARAM)0);
 					return 0;
 				}
-				
-				if (LOWORD(wParam) == ID_BUTTON_REFRESH ) 
+
+				if (LOWORD(wParam) == ID_BUTTON_REFRESH )
 				{
 					SendMessage(parent,WM_SYSCOMMAND,(WPARAM)ID_REQUEST_REFRESH,(LPARAM)0);
 					return 0;
 				}
-				
-				if (LOWORD(wParam) == ID_BUTTON_STRG_ESC ) 
+
+				if (LOWORD(wParam) == ID_BUTTON_STRG_ESC )
 				{
 					SendMessage(parent,WM_SYSCOMMAND,(WPARAM)ID_CONN_CTLESC,(LPARAM)0);
 					return 0;
@@ -8020,23 +7882,21 @@ LRESULT CALLBACK ClientConnection::WndProcTBwin(HWND hwnd, UINT iMsg, WPARAM wPa
 return DefWindowProc(hwnd, iMsg, wParam, lParam);
 }
 
-
 //
 //
 //
 LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 {
-	
 	//	HWND parent;
     ClientConnection *_this = helper::SafeGetWindowUserData<ClientConnection>(hwnd);
 
 	if (_this == NULL) return DefWindowProc(hwnd, iMsg, wParam, lParam);
-	switch (iMsg) 
-			{				
+	switch (iMsg)
+			{
 			case WM_CREATE:
 				SetTimer(_this->m_hwndcn,3335, 1000, NULL);
 				return 0;
-				
+
 			case WM_REQUESTUPDATE:
 				//_this->DoBlit();
 				//_this->SendAppropriateFramebufferUpdateRequest();
@@ -8044,31 +7904,31 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 				return 0;
 
 			case WM_UPDATEREMOTECLIPBOARDCAPS:
-				//adzm 2010-09				
+				//adzm 2010-09
 				_this->UpdateRemoteClipboardCaps();
 				return 0;
 
-			case WM_NOTIFYPLUGINSTREAMING:				
+			case WM_NOTIFYPLUGINSTREAMING:
 				// adzm 2010-09 - Notify streaming DSM plugin support
 				_this->NotifyPluginStreamingSupport();
 				return 0;
-				
+
 			case WM_PAINT:
 				paintbuzy=true;
 				_this->DoBlit();
 				paintbuzy=false;
 				return 0;
-				
+
 			case WM_SENDKEEPALIVE:
 				// adzm 2010-09
 				_this->Internal_SendKeepAlive(wParam == 1);
 				return 0;
-				
+
 			case WM_TIMER:
 				if (wParam !=0) {
 					if (wParam == _this->m_emulate3ButtonsTimer)
 					{
-						_this->SubProcessPointerEvent( 
+						_this->SubProcessPointerEvent(
 							_this->m_emulateButtonPressedX,
 							_this->m_emulateButtonPressedY,
 							_this->m_emulateKeyFlags);
@@ -8080,17 +7940,17 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 						// adzm 2009-08-02
 						_this->SendKeepAlive(false, true);
 					} else if (wParam == _this->m_flushMouseMoveTimer) {
-						// adzm 2010-09						
+						// adzm 2010-09
 						if (_this->FlushThrottledMouseMove()) {
 							_this->FlushWriteQueue();
 						}
 					}
 				}
 				return 0;
-				
+
 			case WM_LBUTTONDOWN:
 			case WM_LBUTTONUP:
-				if (_this->m_SWselect) 
+				if (_this->m_SWselect)
 				{
 					_this->m_SWpoint.x=LOWORD(lParam);
 					_this->m_SWpoint.y=HIWORD(lParam);
@@ -8117,12 +7977,12 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 					}
 					if ( _this->m_opts.m_ViewOnly) return 0;
 					//adzm 2010-09
-					if (_this->ProcessPointerEvent(x,y, wParam, iMsg)) {					
+					if (_this->ProcessPointerEvent(x,y, wParam, iMsg)) {
 						_this->FlushWriteQueue(true, 5);
 					}
 					return 0;
 				}
-				
+
 			case WM_KEYDOWN:
 			case WM_KEYUP:
 			case WM_SYSKEYDOWN:
@@ -8135,7 +7995,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 					_this->FlushWriteQueue(true, 5);
 					return 0;
 				}
-				
+
 			case WM_CHAR:
 			case WM_SYSCHAR:
 #ifdef UNDER_CE
@@ -8148,7 +8008,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 						key == 0x20 ||   // space
 						key == 0x08)     // backspace
 						return 0;
-					
+
 					if (key < 32) key += 64;  // map ctrl-keys onto alphabet
 					if (key > 32 && key < 127) {
 						_this->SendKeyEvent(wParam & 0xff, true);
@@ -8162,7 +8022,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 			case WM_DEADCHAR:
 			case WM_SYSDEADCHAR:
 				return 0;
-				
+
 			case WM_SETFOCUS:
 				if (_this->InFullScreenMode())
 					SetWindowPos(hwnd, HWND_TOPMOST, 0,0,100,100, SWP_NOMOVE | SWP_NOSIZE);
@@ -8172,27 +8032,26 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 				// Cacnel modifiers when we lose focus
 			case WM_KILLFOCUS:
 				{
-					
 					if (!_this->m_running) return 0;
 					if (_this->InFullScreenMode()) {
 						// We must top being topmost, but we want to choose our
 						// position carefully.
 						HWND foreground = GetForegroundWindow();
 						HWND hwndafter = NULL;
-						if ((foreground == NULL) || 
+						if ((foreground == NULL) ||
 							(GetWindowLong(foreground, GWL_EXSTYLE) & WS_EX_TOPMOST)) {
 							hwndafter = HWND_NOTOPMOST;
 						} else {
-							hwndafter = GetNextWindow(foreground, GW_HWNDNEXT); 
+							hwndafter = GetNextWindow(foreground, GW_HWNDNEXT);
 						}
-						
+
 						SetWindowPos(hwnd, hwndafter, 0,0,100,100, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
 					}
 					if (_this->m_opts.m_ViewOnly) return 0;
 					_this->m_keymap->ReleaseAllKeys(_this);
 					//adzm 2010-09
 					_this->FlushWriteQueue(true, 5);
-					/*	
+					/*
 					vnclog.Print(6, _T("Losing focus - cancelling modifiers\n"));
 					_this->SendKeyEvent(XK_Alt_L,     false);
 					_this->SendKeyEvent(XK_Control_L, false);
@@ -8228,17 +8087,17 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 					{
 						_this->m_pFileTransfer->ShowFileTransferWindow(true);
 						MessageBox(hwnd, sz_L85,
-							sz_L88, 
+							sz_L88,
 							MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST);
 						return 0;
 					}
-					
+
 					// sf@2002 - Do not close vncviewer if the Text Chat GUI is open !
 					if (_this->m_pTextChat->m_fTextChatRunning)
 					{
 						_this->m_pTextChat->ShowChatWindow(true);
 						MessageBox(hwnd, sz_L86,
-							sz_L88, 
+							sz_L88,
 							MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST);
 						return 0;
 					}
@@ -8246,11 +8105,11 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 					if (_this->m_fOptionsOpen)
 					{
 						MessageBox(hwnd, sz_L87,
-							sz_L88, 
+							sz_L88,
 							MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST);
 						return 0;
 					}
-					
+
                     // 8 April 2008 jdp
                     ::ShowWindow(hwnd, SW_HIDE);
 					// Close the worker thread as well
@@ -8259,7 +8118,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 					DestroyWindow(hwnd);
 					return 0;
 				}
-				
+
 			case WM_DESTROY:
 				{
 				#ifndef UNDER_CE
@@ -8287,22 +8146,21 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 				  } catch (omni_thread_invalid& e) {
 				  // The thread probably hasn't been started yet,
 				  }*/
-				  
+
 					return 0;
 				}
-				
-				
+
 			case WM_QUERYNEWPALETTE:
 				{
 					TempDC hDC(hwnd);
-					
+
 					// Select and realize hPalette
 					PaletteSelector p(hDC, _this->m_hPalette);
 					InvalidateRect(hwnd, NULL, FALSE);
 					UpdateWindow(hwnd);
 					return TRUE;
 				}
-				
+
 			case WM_PALETTECHANGED:
 				// If this application did not change the palette, select
 				// and realize this application's palette
@@ -8321,10 +8179,9 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 					InvalidateRect(hwnd, NULL, FALSE);
 					UpdateWindow(hwnd);
 #endif
-					
 				}
 				break;
-				
+
 #ifndef UNDER_CE
 			case WM_SIZING:
 				return 0;
@@ -8332,7 +8189,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 					// Don't allow sizing larger than framebuffer
 					RECT *lprc = (LPRECT) lParam;
 					switch (wParam) {
-					case WMSZ_RIGHT: 
+					case WMSZ_RIGHT:
 					case WMSZ_TOPRIGHT:
 					case WMSZ_BOTTOMRIGHT:
 						lprc->right = min(lprc->right, lprc->left + _this->m_fullwinwidth+1);
@@ -8343,7 +8200,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 						lprc->left = max(lprc->left, lprc->right - _this->m_fullwinwidth);
 						break;
 					}
-					
+
 					switch (wParam) {
 					case WMSZ_TOP:
 					case WMSZ_TOPLEFT:
@@ -8356,16 +8213,16 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 						lprc->bottom = min(lprc->bottom, lprc->top + _this->m_fullwinheight);
 						break;
 					}
-					
+
 					return 0;
 				}
-				
+
 			case WM_SETCURSOR:
 				{
 					// if we have the focus, let the cursor change as normal
-					if (GetFocus() == hwnd) 
+					if (GetFocus() == hwnd)
 						break;
-					
+
 					HCURSOR h;
 					switch (_this->m_opts.m_localCursor) {
 					case NOCURSOR:
@@ -8380,35 +8237,33 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 					}
 					if (_this->m_SWselect) h= LoadCursor(_this->m_pApp->m_instance, MAKEINTRESOURCE(IDC_CURSOR1));
 					SetCursor(h);
-					
+
 					return 0;
 				}
-				
-				
+
 			case WM_DRAWCLIPBOARD:
 				_this->ProcessLocalClipboardChange();
 				return 0;
-				
+
 			case WM_CHANGECBCHAIN:
-				{					
+				{
 					// The clipboard chain is changing
-					HWND hWndRemove = (HWND) wParam;     // handle of window being removed 
-					HWND hWndNext = (HWND) lParam;       // handle of next window in chain 
+					HWND hWndRemove = (HWND) wParam;     // handle of window being removed
+					HWND hWndNext = (HWND) lParam;       // handle of next window in chain
 					vnclog.Print(6, _T("WM_CHANGECBCHAIN remove 0x%08x, next 0x%08x (current m_hwndcn 0x%08x / hwnd 0x%08x, next 0x%08x)\n"), hWndRemove, hWndNext, _this->m_hwndcn, hwnd, _this->m_hwndNextViewer);
 					// If next window is closing, update our pointer.
-					if (hWndRemove == _this->m_hwndNextViewer)  
-						_this->m_hwndNextViewer = hWndNext;  
-					// Otherwise, pass the message to the next link.  
+					if (hWndRemove == _this->m_hwndNextViewer)
+						_this->m_hwndNextViewer = hWndNext;
+					// Otherwise, pass the message to the next link.
 					else if (_this->m_hwndNextViewer != NULL && _this->m_hwndNextViewer != INVALID_HANDLE_VALUE) {
 						// adzm - 2010-07 - Fix clipboard hangs
 						// use SendNotifyMessage instead of SendMessage so misbehaving or hung applications
 						// (like ourself before this) won't cause our thread to hang.
-						::SendNotifyMessage(_this->m_hwndNextViewer, WM_CHANGECBCHAIN, 
-							(WPARAM) hWndRemove,  (LPARAM) hWndNext );  
+						::SendNotifyMessage(_this->m_hwndNextViewer, WM_CHANGECBCHAIN,
+							(WPARAM) hWndRemove,  (LPARAM) hWndNext );
 					}
 
 					return 0;
-					
 				}
 #endif
 
@@ -8420,11 +8275,10 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 					wPar = MAKEWPARAM(_this->m_hScrollMax, _this->m_vScrollMax);
 					SendMessage((HWND)wParam, WM_GETSCALING, wPar, lParam);
 					return TRUE;
-					
 				}
-				
+
 			case WM_SETSCALING:
-				{          
+				{
 					_this->m_opts.m_scaling = true;
 					_this->m_opts.m_scale_num = wParam;
 					_this->m_opts.m_scale_den = lParam;
@@ -8433,16 +8287,15 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 					_this->SizeWindow();
 					InvalidateRect(hwnd, NULL, TRUE);
 					return TRUE;
-					
 				}
-				
+
 			case WM_SETVIEWONLY:
 				{
 					{
 						// adzm - 2010-07 - Extended clipboard
 						bool bNewViewOnly = (wParam == 1);
 						bool bUpdateCaps = false;
-						if (_this->m_opts.m_ViewOnly != bNewViewOnly) {			
+						if (_this->m_opts.m_ViewOnly != bNewViewOnly) {
 							bUpdateCaps = true;
 						}
 						_this->m_opts.m_ViewOnly = bNewViewOnly;
@@ -8454,10 +8307,8 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 					return TRUE;
 				}
 			// End Modif for VNCon MultiView support
+			}//end switch (iMsg)
 
-
-			}//end switch (iMsg) 
-			
 			return DefWindowProc(hwnd, iMsg, wParam, lParam);
 }
 void
@@ -8468,7 +8319,6 @@ ClientConnection:: ConvertAll(int width, int height, int xx, int yy,int bytes_pe
 	//8bit pitch need to be taken in account
 	if (bytesPerOutputRow % 4)
 		bytesPerOutputRow += 4 - bytesPerOutputRow % 4;
-
 
 	BYTE *sourcepos,*destpos;
 	destpos = (BYTE *)dest + (bytesPerOutputRow * yy)+(xx * bytes_per_pixel);
@@ -8506,7 +8356,6 @@ ClientConnection:: Copybuffer(int width, int height, int xx, int yy,int bytes_pe
 void
 ClientConnection:: Copyto0buffer(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth)
 {
-
 	int bytesPerOutputRow = framebufferWidth * bytes_per_pixel;
 	//8bit pitch need to be taken in account
 	if (bytesPerOutputRow % 4)
@@ -8521,8 +8370,6 @@ ClientConnection:: Copyto0buffer(int width, int height, int xx, int yy,int bytes
 			sourcepos = (BYTE*)sourcepos + bytesPerOutputRow;
 			destpos = (BYTE*)destpos + width;
 		}
-
-
 }
 
 void
@@ -8683,7 +8530,7 @@ void ClientConnection::SendKeepAlive(bool bForce, bool bAsync)
 // adzm 2010-09
 void ClientConnection::Internal_SendKeepAlive(bool bForce)
 {
-    if (m_server_wants_keepalives) 
+    if (m_server_wants_keepalives)
     {
 		//adzm 2010-08-01
 		if (m_keepalive_timer != 0) {
@@ -8703,7 +8550,7 @@ void ClientConnection::Internal_SendKeepAlive(bool bForce)
 				}
 				return;
 			}
-		}		
+		}
 
 #if defined(_DEBUG)
         char msg[255];
@@ -8722,7 +8569,7 @@ void ClientConnection::Internal_SendKeepAlive(bool bForce)
     }
 }
 
-//adzm 2010-09 - 
+//adzm 2010-09 -
 ClientConnection::PendingMouseMove::PendingMouseMove()
 	: dwLastSentMouseMove(0),
 	x(0),
@@ -8730,7 +8577,7 @@ ClientConnection::PendingMouseMove::PendingMouseMove()
 	keyflags(0),
 	bValid(false),
 	dwMinimumMouseMoveInterval(0) // changed to 0 from 150; need to have an interface for this
-{	
+{
 	//adzm 2010-10 - This is in the standard options dialog now.
 	/*
 	HKEY hRegKey;
@@ -8739,8 +8586,8 @@ ClientConnection::PendingMouseMove::PendingMouseMove()
         hRegKey = NULL;
 	} else {
 		DWORD valsize = sizeof(dwPreferredMinimumMouseMoveInterval);
-		DWORD valtype = REG_DWORD;	
-		if ( RegQueryValueEx( hRegKey,  "MinMouseMove", NULL, &valtype, 
+		DWORD valtype = REG_DWORD;
+		if ( RegQueryValueEx( hRegKey,  "MinMouseMove", NULL, &valtype,
 			(LPBYTE) &dwPreferredMinimumMouseMoveInterval, &valsize) == ERROR_SUCCESS) {
             dwMinimumMouseMoveInterval = dwPreferredMinimumMouseMoveInterval;
 		}
@@ -8751,7 +8598,7 @@ ClientConnection::PendingMouseMove::PendingMouseMove()
 
 // adzm 2010-09 - Notify streaming DSM plugin support
 void ClientConnection::NotifyPluginStreamingSupport()
-{	
+{
 	rfbNotifyPluginStreamingMsg msg;
     memset(&msg, 0, sizeof(rfbNotifyPluginStreamingMsg));
 	msg.type = rfbNotifyPluginStreaming;
@@ -8760,7 +8607,6 @@ void ClientConnection::NotifyPluginStreamingSupport()
 	WriteExact((char *)&msg, sz_rfbNotifyPluginStreamingMsg, rfbNotifyPluginStreaming);
 	m_fPluginStreamingOut = true;
 }
-
 
 static HWND hList=NULL;  // List View identifier
 LVCOLUMN LvCol; // Make Coluom struct for ListView
@@ -8784,17 +8630,17 @@ BOOL CALLBACK DialogProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 		{
 			switch(LOWORD(wParam))
 			{
-			    case IDC_LIST1: 
+			    case IDC_LIST1:
                 if(((LPNMHDR)lParam)->code == NM_DBLCLK)
 				{
-				  char Text[255]={0};  
+				  char Text[255]={0};
 				  char Temp[255]={0};
 				  char Temp1[255]={0};
 				  int iSlected=0;
 				  int j=0;
 
 				  iSlected=SendMessage(hList,LVM_GETNEXTITEM,-1,LVNI_FOCUSED);
-				  
+
 				  if(iSlected==-1)
 				  {
                     MessageBox(hWnd,"No Items in ListView","Error",MB_OK|MB_ICONINFORMATION);
@@ -8806,15 +8652,14 @@ BOOL CALLBACK DialogProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 				  LvItem.iSubItem=0;
 				  LvItem.pszText=Text;
 				  LvItem.cchTextMax=256;
-				  LvItem.iItem=iSlected;                  
-				  SendMessage(hList,LVM_GETITEMTEXT, iSlected, (LPARAM)&LvItem);				  
-				  EndDialog(hWnd,iSlected+1);				 
-
+				  LvItem.iItem=iSlected;
+				  SendMessage(hList,LVM_GETITEMTEXT, iSlected, (LPARAM)&LvItem);
+				  EndDialog(hWnd,iSlected+1);
 				}
 				if(((LPNMHDR)lParam)->code == NM_CLICK)
 				{
 					iSelect=SendMessage(hList,LVM_GETNEXTITEM,-1,LVNI_FOCUSED);
-				    
+
 					if(iSelect==-1)
 					{
                       MessageBox(hWnd,"No Vnc server selected","Error",MB_OK|MB_ICONINFORMATION);
@@ -8827,7 +8672,7 @@ BOOL CALLBACK DialogProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 				{
                   hEdit=ListView_GetEditControl(hList);
 				}
-				
+
 				if(((LPNMHDR)lParam)->code == LVN_ENDLABELEDIT)
 				{
 					int iIndex;
@@ -8872,32 +8717,32 @@ BOOL CALLBACK DialogProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 				// Inserting Couloms as much as we want
 				SendMessage(hList,LVM_INSERTCOLUMN,0,(LPARAM)&LvCol); // Insert/Show the coloum
                 memset(&LvItem,0,sizeof(LvItem)); // Reset Item Struct
-				
+
 				//  Setting properties Of Items:
 
 				LvItem.mask=LVIF_TEXT;   // Text Style
 				LvItem.cchTextMax = 256; // Max size of test
-                
-				LvItem.iItem=0;          // choose item  
+
+				LvItem.iItem=0;          // choose item
 				LvItem.iSubItem=0;       // Put in first coluom
 				LvItem.pszText="Item 0"; // Text to display (can be from a char variable) (Items)
 
 				int iItem=0;
 				CARD8 nr_lines;
-				cc->ReadExact((char *)&nr_lines, sizeof(nr_lines));	
+				cc->ReadExact((char *)&nr_lines, sizeof(nr_lines));
 				char line[128];
 				for ( int a=0;a<nr_lines;a++)
 				{
 					memset(line,0,128);
-					cc->ReadExact((char *)line, 128);	
+					cc->ReadExact((char *)line, 128);
 					iItem=SendMessage(hList,LVM_GETITEMCOUNT,0,0);
-					LvItem.iItem=iItem;            // choose item  
+					LvItem.iItem=iItem;            // choose item
 					LvItem.iSubItem=0;         // Put in first coluom
 					LvItem.pszText=line;
-					SendMessage(hList,LVM_INSERTITEM,0,(LPARAM)&LvItem);	
+					SendMessage(hList,LVM_INSERTITEM,0,(LPARAM)&LvItem);
 					iItem++;
-				}										
-				return TRUE; // Always True			
+				}
+				return TRUE; // Always True
 			}
 			break;
 
@@ -8909,7 +8754,7 @@ BOOL CALLBACK DialogProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 					case IDOK:
 						{
 						 int iSlected=0;
-						  iSlected=SendMessage(hList,LVM_GETNEXTITEM,-1,LVNI_FOCUSED);				  
+						  iSlected=SendMessage(hList,LVM_GETNEXTITEM,-1,LVNI_FOCUSED);
 						  if(iSlected==-1)
 						  {
 							MessageBox(hWnd,"No Items in ListView","Error",MB_OK|MB_ICONINFORMATION);
@@ -8923,7 +8768,7 @@ BOOL CALLBACK DialogProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 						break;
 					}
 			break;
-    
+
 	    default:return FALSE;
     }
 
