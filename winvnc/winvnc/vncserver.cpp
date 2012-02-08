@@ -222,7 +222,7 @@ vncServer::vncServer()
 
 	// sf@2005 - No FT User Impersonnation
 	m_fFTUserImpersonation = true;
-	m_fCaptureAlphaBlending = false;
+	m_fCaptureAlphaBlending = true;
 	m_fBlackAlphaBlending = false;
 
 	m_impersonationtoken=NULL; //byteboon

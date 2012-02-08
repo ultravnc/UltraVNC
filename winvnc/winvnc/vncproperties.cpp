@@ -1807,7 +1807,7 @@ LABELUSERSETTINGS:
 	m_pref_BlankInputsOnly = FALSE;
 	m_pref_QueryIfNoLogon = FALSE;
 	m_pref_DefaultScale = 1;
-	m_pref_CaptureAlphaBlending = FALSE; 
+	m_pref_CaptureAlphaBlending = TRUE; 
 	m_pref_BlackAlphaBlending = FALSE; 
 //	m_pref_GammaGray = FALSE;			// [v1.0.2-jp1 fix]
 
@@ -2363,7 +2363,7 @@ void vncProperties::LoadFromIniFile()
 	m_pref_BlankInputsOnly = FALSE;
 	m_pref_QueryIfNoLogon = FALSE;
 	m_pref_DefaultScale = 1;
-	m_pref_CaptureAlphaBlending = FALSE; 
+	m_pref_CaptureAlphaBlending = TRUE; 
 	m_pref_BlackAlphaBlending = FALSE; 
 
 	LoadUserPrefsFromIniFile();
