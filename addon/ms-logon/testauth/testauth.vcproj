@@ -4,6 +4,7 @@
 	Version="9,00"
 	Name="testauth"
 	ProjectGUID="{C05BE60B-FBDF-430F-B041-5089262E8FB5}"
+	RootNamespace="testauth"
 	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
@@ -279,6 +280,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="signtool.exe sign /f c:\uvnccert.pfx /p emptypassword /v /t http://timestamp.globalsign.com/scripts/timstamp.dll $(OutDir)/$(TargetName)$(TargetExt)"
 			/>
 		</Configuration>
 		<Configuration

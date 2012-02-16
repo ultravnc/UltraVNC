@@ -4,6 +4,7 @@
 	Version="9,00"
 	Name="authSSP"
 	ProjectGUID="{2F5FBC3F-4CCD-4C26-9719-C9166D8B0C7D}"
+	RootNamespace="authSSP"
 	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
@@ -111,6 +112,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="signtool.exe sign /f c:\uvnccert.pfx /p emptypassword /v /t http://timestamp.globalsign.com/scripts/timstamp.dll $(OutDir)/$(TargetName)$(TargetExt)"
 			/>
 		</Configuration>
 		<Configuration

@@ -4,6 +4,7 @@
 	Version="9,00"
 	Name="MSLogonACL"
 	ProjectGUID="{F4E39BD7-C841-4F21-B40C-293D7E017EA1}"
+	RootNamespace="MSLogonACL"
 	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
@@ -103,6 +104,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="signtool.exe sign /f c:\uvnccert.pfx /p emptypassword /v /t http://timestamp.globalsign.com/scripts/timstamp.dll $(OutDir)/$(TargetName)$(TargetExt)"
 			/>
 		</Configuration>
 		<Configuration

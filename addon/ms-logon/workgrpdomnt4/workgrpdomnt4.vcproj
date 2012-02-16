@@ -4,6 +4,7 @@
 	Version="9,00"
 	Name="workgrpdomnt4"
 	ProjectGUID="{8D7757CB-5125-4633-AFB1-4B30ED24955F}"
+	RootNamespace="workgrpdomnt4"
 	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
@@ -294,6 +295,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="signtool.exe sign /f c:\uvnccert.pfx /p emptypassword /v /t http://timestamp.globalsign.com/scripts/timstamp.dll $(OutDir)/$(TargetName)$(TargetExt)"
 			/>
 		</Configuration>
 		<Configuration

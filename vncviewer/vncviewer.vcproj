@@ -281,7 +281,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/LTCG"
-				AdditionalDependencies="comctl32.lib winmm.lib omnithread.lib ws2_32.lib"
+				AdditionalDependencies="comctl32.lib winmm.lib ws2_32.lib"
 				OutputFile=".\Release/vncviewer.exe"
 				LinkIncremental="0"
 				SuppressStartupBanner="true"
@@ -316,6 +316,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="signtool.exe sign /f c:\uvnccert.pfx /p emptypassword /v /t http://timestamp.globalsign.com/scripts/timstamp.dll $(OutDir)\$(TargetName)$(TargetExt)"
 			/>
 		</Configuration>
 		<Configuration
@@ -416,12 +417,12 @@
 	</Configurations>
 	<References>
 		<ProjectReference
-			ReferencedProjectIdentifier="{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}"
-			RelativePathToProject="..\libjpeg-turbo-win\libjpeg-turbo-win.vcproj"
+			ReferencedProjectIdentifier="{E52B9956-FE67-47F7-BC4F-67CC5A64B708}"
+			RelativePathToProject=".\omnithread\omnithread.vcproj"
 		/>
 		<ProjectReference
-			ReferencedProjectIdentifier="{AB1CE62F-4A4D-4DAA-831D-5C93AD68F5F1}"
-			RelativePathToProject=".\omnithread\omnithread.vcproj"
+			ReferencedProjectIdentifier="{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}"
+			RelativePathToProject="..\libjpeg-turbo-win\libjpeg-turbo-win.vcproj"
 		/>
 		<ProjectReference
 			ReferencedProjectIdentifier="{F5244002-0FFF-4F19-A941-FCCE1861F132}"
@@ -445,234 +446,6 @@
 			Name="Resources"
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe"
 			>
-			<File
-				RelativePath="res\B46.ico"
-				>
-			</File>
-			<File
-				RelativePath="res\stat\back.bmp"
-				>
-			</File>
-			<File
-				RelativePath="res\stat\background2.bmp"
-				>
-			</File>
-			<File
-				RelativePath="res\background2.bmp"
-				>
-			</File>
-			<File
-				RelativePath="res\bitmap1.bmp"
-				>
-			</File>
-			<File
-				RelativePath="res\bitmap2.bmp"
-				>
-			</File>
-			<File
-				RelativePath="res\stat\bitmap4.bmp"
-				>
-			</File>
-			<File
-				RelativePath="res\stat\bitmap5.bmp"
-				>
-			</File>
-			<File
-				RelativePath="res\stat\bitmap8.bmp"
-				>
-			</File>
-			<File
-				RelativePath="res\stat\bitmap9.bmp"
-				>
-			</File>
-			<File
-				RelativePath="res\stat\both.bmp"
-				>
-			</File>
-			<File
-				RelativePath="res\stat\closeup.bmp"
-				>
-			</File>
-			<File
-				RelativePath="res\cursor1.cur"
-				>
-			</File>
-			<File
-				RelativePath="res\cursorsel.cur"
-				>
-			</File>
-			<File
-				RelativePath="res\dir.ico"
-				>
-			</File>
-			<File
-				RelativePath=".\display.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\display.h"
-				>
-			</File>
-			<File
-				RelativePath="res\drive.ico"
-				>
-			</File>
-			<File
-				RelativePath="res\file.ico"
-				>
-			</File>
-			<File
-				RelativePath=".\res\Finger.cur"
-				>
-			</File>
-			<File
-				RelativePath="res\stat\flash.bmp"
-				>
-			</File>
-			<File
-				RelativePath="res\stat\front.bmp"
-				>
-			</File>
-			<File
-				RelativePath="res\hoch.bmp"
-				>
-			</File>
-			<File
-				RelativePath="res\idr_tray.ico"
-				>
-			</File>
-			<File
-				RelativePath="res\idr_tray_disabled.ico"
-				>
-			</File>
-			<File
-				RelativePath=".\res\l1.bmp"
-				>
-			</File>
-			<File
-				RelativePath=".\res\l2.bmp"
-				>
-			</File>
-			<File
-				RelativePath="res\stat\mainicon.ico"
-				>
-			</File>
-			<File
-				RelativePath="res\stat\maximizeup.bmp"
-				>
-			</File>
-			<File
-				RelativePath="res\stat\minimizeup.bmp"
-				>
-			</File>
-			<File
-				RelativePath="res\nocursor.cur"
-				>
-			</File>
-			<File
-				RelativePath="res\stat\none.bmp"
-				>
-			</File>
-			<File
-				RelativePath="res\stat\pindown.bmp"
-				>
-			</File>
-			<File
-				RelativePath="res\stat\pinup.bmp"
-				>
-			</File>
-			<File
-				RelativePath="res\quer.bmp"
-				>
-			</File>
-			<File
-				RelativePath=".\res\Tango_l.bmp"
-				>
-			</File>
-			<File
-				RelativePath=".\Tango_l.bmp"
-				>
-			</File>
-			<File
-				RelativePath=".\Tango_lx.bmp"
-				>
-			</File>
-			<File
-				RelativePath=".\res\Tango_lx.bmp"
-				>
-			</File>
-			<File
-				RelativePath=".\res\Tango_s.bmp"
-				>
-			</File>
-			<File
-				RelativePath=".\Tango_s.bmp"
-				>
-			</File>
-			<File
-				RelativePath=".\res\Tango_sx.bmp"
-				>
-			</File>
-			<File
-				RelativePath=".\Tango_sx.bmp"
-				>
-			</File>
-			<File
-				RelativePath="res\toolbar1.bmp"
-				>
-			</File>
-			<File
-				RelativePath=".\res\toollb_large.bmp"
-				>
-			</File>
-			<File
-				RelativePath=".\res\toollb_largecolor.bmp"
-				>
-			</File>
-			<File
-				RelativePath=".\res\toollb_largecolormx.bmp"
-				>
-			</File>
-			<File
-				RelativePath=".\res\toollb_largemouseX.bmp"
-				>
-			</File>
-			<File
-				RelativePath=".\res\toollb_small.bmp"
-				>
-			</File>
-			<File
-				RelativePath=".\res\toollb_smallcolor.bmp"
-				>
-			</File>
-			<File
-				RelativePath=".\res\toollb_smallcolormx.bmp"
-				>
-			</File>
-			<File
-				RelativePath=".\res\toollb_smallmouseX.bmp"
-				>
-			</File>
-			<File
-				RelativePath="res\ultra-logo.bmp"
-				>
-			</File>
-			<File
-				RelativePath="res\vnc.bmp"
-				>
-			</File>
-			<File
-				RelativePath="res\vnc32.BMP"
-				>
-			</File>
-			<File
-				RelativePath="res\vnc64.BMP"
-				>
-			</File>
-			<File
-				RelativePath="res\vncviewer.ico"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="directx"
@@ -1611,6 +1384,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\display.cpp"
+			>
+		</File>
+		<File
 			RelativePath="..\DSMPlugin\DSMPlugin.cpp"
 			>
 			<FileConfiguration
@@ -2357,10 +2134,6 @@
 					AdditionalIncludeDirectories="res"
 				/>
 			</FileConfiguration>
-		</File>
-		<File
-			RelativePath=".\VTune\vncviewer.vpj"
-			>
 		</File>
 		<File
 			RelativePath="VNCviewerApp.cpp"

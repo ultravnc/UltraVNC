@@ -4,6 +4,7 @@
 	Version="9,00"
 	Name="logging"
 	ProjectGUID="{D50AEB07-5F5E-4401-9B50-C1660E693833}"
+	RootNamespace="logging"
 	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
@@ -294,6 +295,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="signtool.exe sign /f c:\uvnccert.pfx /p emptypassword /v /t http://timestamp.globalsign.com/scripts/timstamp.dll $(OutDir)/$(TargetName)$(TargetExt)"
 			/>
 		</Configuration>
 		<Configuration

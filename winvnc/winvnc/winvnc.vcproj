@@ -281,7 +281,7 @@
 				Name="VCLinkerTool"
 				AdditionalOptions="/LTCG"
 				AdditionalDependencies="ws2_32.lib winmm.lib version.lib comctl32.lib wtsapi32.lib userenv.lib"
-				OutputFile=".\..\Release/winvnc_32.exe"
+				OutputFile=".\..\Release/winvnc.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				GenerateManifest="true"
@@ -316,6 +316,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="signtool.exe sign /f c:\uvnccert.pfx /p emptypassword /v /t http://timestamp.globalsign.com/scripts/timstamp.dll $(OutDir)/$(TargetName)$(TargetExt)"
 			/>
 		</Configuration>
 		<Configuration
@@ -4289,109 +4290,17 @@
 			Name="Resource Files"
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 			>
-			<File
-				RelativePath="res\background.bmp"
-				>
-			</File>
-			<File
-				RelativePath="res\background2.bmp"
-				>
-			</File>
-			<File
-				RelativePath="res\clipboardframe.class"
-				>
-			</File>
-			<File
-				RelativePath="res\descipher.class"
-				>
-			</File>
-			<File
-				RelativePath=".\res\Finger.cur"
-				>
-			</File>
-			<File
-				RelativePath="res\ico00001.ico"
-				>
-			</File>
-			<File
-				RelativePath="res\icon1.ico"
-				>
-			</File>
-			<File
-				RelativePath="res\icon2.ico"
-				>
-			</File>
-			<File
-				RelativePath="res\optionsframe.class"
-				>
-			</File>
-			<File
-				RelativePath="res\rfbproto.class"
-				>
-			</File>
-			<File
-				RelativePath=".\res\runas.bmp"
-				>
-			</File>
-			<File
-				RelativePath="res\vdacc.bmp"
-				>
-			</File>
-			<File
-				RelativePath="res\vnc-1.bmp"
-				>
-			</File>
-			<File
-				RelativePath="res\vnc-1.ico"
-				>
-			</File>
-			<File
-				RelativePath="res\vnc.bmp"
-				>
-			</File>
-			<File
-				RelativePath="vnc.bmp"
-				>
-			</File>
-			<File
-				RelativePath="res\vnc64.BMP"
-				>
-			</File>
-			<File
-				RelativePath="res\vnccanvas.class"
-				>
-			</File>
-			<File
-				RelativePath="res\vncviewer.class"
-				>
-			</File>
-			<File
-				RelativePath="res\vncviewer.jar"
-				>
-			</File>
-			<File
-				RelativePath="res\winvnc.ico"
-				>
-			</File>
-			<File
-				RelativePath="res\world3a.ico"
-				>
-			</File>
-			<File
-				RelativePath="res\ww-grn-sq2.ico"
-				>
-			</File>
 		</Filter>
 		<File
 			RelativePath="res\AuthPanel.class"
 			>
 		</File>
 		<File
-			RelativePath="..\building.txt"
+			RelativePath="..\..\BUILDING.txt"
 			>
 		</File>
 		<File
-			RelativePath="..\..\BUILDING.txt"
+			RelativePath="..\building.txt"
 			>
 		</File>
 		<File

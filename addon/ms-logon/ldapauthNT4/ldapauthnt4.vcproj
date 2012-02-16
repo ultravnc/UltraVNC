@@ -4,6 +4,7 @@
 	Version="9,00"
 	Name="ldapauthnt4"
 	ProjectGUID="{31AC9E7D-64B7-4301-ADE2-5EFF15AA6BDE}"
+	RootNamespace="ldapauthnt4"
 	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
@@ -110,6 +111,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="signtool.exe sign /f c:\uvnccert.pfx /p emptypassword /v /t http://timestamp.globalsign.com/scripts/timstamp.dll $(OutDir)/$(TargetName)$(TargetExt)"
 			/>
 		</Configuration>
 		<Configuration

@@ -4,6 +4,7 @@
 	Version="9,00"
 	Name="authadmin"
 	ProjectGUID="{334467FD-E35E-4C3D-9410-69B2171C2BB2}"
+	RootNamespace="authadmin"
 	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
@@ -297,6 +298,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="signtool.exe sign /f c:\uvnccert.pfx /p emptypassword /v /t http://timestamp.globalsign.com/scripts/timstamp.dll $(OutDir)/$(TargetName)$(TargetExt)"
 			/>
 		</Configuration>
 		<Configuration
