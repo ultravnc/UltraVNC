@@ -4,9 +4,9 @@
 
 [Setup]
 AppName=UltraVNC
-AppVerName=UltraVNC 1.0.9.6
-AppVersion=1.0.9.6
-VersionInfoVersion=1.0.9.6
+AppVerName=UltraVNC 1.0.962
+AppVersion=1.0.9.62
+VersionInfoVersion=1.0.962
 AppPublisher=uvnc bvba
 AppCopyright=UltraVnc Team
 AppPublisherURL={cm:PublisherURL}
@@ -24,7 +24,7 @@ AppID={#AppID}
 UninstallRestartComputer=true
 DirExistsWarning=no
 OutputDir=setupfile
-OutputBaseFilename=UltraVNC_1.0.9.6_Setup
+OutputBaseFilename=UltraVNC_1.0.9.6.2_Setup
 BackColorDirection=lefttoright
 UserInfoPage=false
 ShowLanguageDialog=yes
@@ -42,15 +42,15 @@ SetupIconFile=UltraVNC.ico
 WizardImageFile=UltraVNC-splash.bmp
 WizardSmallImageFile=UltraVNC-logo.bmp
 InfoAfterFile=Readme.txt
-InfoBeforeFile=Whatsnew.txt
-LicenseFile=Licence.txt
+InfoBeforeFile=Whatsnew.rtf
+LicenseFile=Licence.rtf
 InternalCompressLevel=Ultra
 SolidCompression=true
 SignTool=signing
 VersionInfoCompany=uvnc bvba
 VersionInfoCopyright=UltraVnc Team
 VersionInfoProductName=UltraVnc 
-VersionInfoProductVersion=1.0.9.6
+VersionInfoProductVersion=1.0.962
 UninstallDisplayName=UltraVnc
 
 [Languages]
@@ -169,31 +169,32 @@ Source: WizModernSmallImage-IS.bmp; Flags: dontcopy
 
 Source: check_install.exe; DestDir: {app}; Components: UltraVNC_Server_S; BeforeInstall: StopVNC_S; Flags: restartreplace
 Source: check_install.exe; DestDir: {app}; Components: UltraVNC_Server; BeforeInstall: StopVNC; Flags: restartreplace
-Source: Whatsnew.txt; DestDir: {app}
-Source: Licence.txt; DestDir: {app}
+Source: Whatsnew.rtf; DestDir: {app}
+Source: Licence.rtf; DestDir: {app}
 Source: Readme.txt; DestDir: {app}
 ; server files
 ; winvnc.exe needs to be first here because it triggers stopping WinVNC service/app.
 Source: winvnc.exe; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont(); MinVersion: ,5.1.2600;
-Source: logmessages.dll; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont()
-Source: vnchooks.dll; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont()
+Source: logmessages.dll; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont(); MinVersion: ,5.1.2600;
+Source: vnchooks.dll; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont(); MinVersion: ,5.1.2600;
 ; mslogon I files
-Source: logging.dll; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont()
-Source: authadmin.dll; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont()
-Source: workgrpdomnt4.dll; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont()
-Source: ldapauth.dll; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; MinVersion: 0,5.0; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont()
-Source: ldapauthnt4.dll; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; MinVersion: 0,4.0; OnlyBelowVersion: 0,5.0; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont()
-Source: ldapauth9x.dll; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; MinVersion: 4.0,0; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont()
+Source: logging.dll; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont(); MinVersion: ,5.1.2600;
+Source: authadmin.dll; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont(); MinVersion: ,5.1.2600;
+Source: workgrpdomnt4.dll; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont(); MinVersion: ,5.1.2600;
+Source: ldapauth.dll; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S;  Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont(); MinVersion: ,5.1.2600;
+Source: ldapauthnt4.dll; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S;  Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont(); MinVersion: ,5.1.2600;
+Source: ldapauth9x.dll; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S;  Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont(); MinVersion: ,5.1.2600;
 ; mslogon II files
-Source: authSSP.dll; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; MinVersion: 0,1; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont()
-Source: MSLogonACL.exe; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; MinVersion: 0,1; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont()
+Source: authSSP.dll; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S;  Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont(); MinVersion: ,5.1.2600;
+Source: MSLogonACL.exe; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S;  Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont(); MinVersion: ,5.1.2600;
 ; viewer files
 Source: vncviewer.exe; DestDir: {app}; Components: UltraVNC_Viewer; Flags: restartreplace ignoreversion replacesameversion; MinVersion: ,5.1.2600; 
 ;Source: vncviewer_tab.exe; DestDir: {app}; Components: UltraVNC_Viewer; Flags: restartreplace ignoreversion replacesameversion
 Source: {tmp}\SCHook.dll; DestDir: {app}; Components: UltraVNC_Server; Flags: external skipifsourcedoesntexist restartreplace ignoreversion replacesameversion
 ;Source: {tmp}\cad.exe; DestDir: {app}; Components: UltraVNC_Server; Flags: external skipifsourcedoesntexist restartreplace ignoreversion replacesameversion
 Source: sas.dll; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont(); MinVersion: ,6.0.6000; OnlyBelowVersion: 0,6.1.7600; 
-
+Source: setcad.exe; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S;  Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont(); MinVersion: ,5.1.2600;
+Source: setpasswd.exe; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S;  Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont(); MinVersion: ,5.1.2600;
 
 Source: {tmp}\license.txt; DestDir: {app}\driver; Components: UltraVNC_Server; Flags: external skipifsourcedoesntexist restartreplace ignoreversion replacesameversion
 Source: {tmp}\uninstall_silent.bat; DestDir: {app}\driver; Components: UltraVNC_Server; Flags: external skipifsourcedoesntexist restartreplace ignoreversion replacesameversion
@@ -208,10 +209,30 @@ Source: {tmp}\mv2.sys; DestDir: {app}\driver\driver; Components: UltraVNC_Server
 Source: {tmp}\mv2.inf; DestDir: {app}\driver\driver; Components: UltraVNC_Server; Flags: external skipifsourcedoesntexist restartreplace ignoreversion replacesameversion
 
 Source: plugins_multi_thread\SecureVNCPlugin.dsm; DestDir: {app}
+Source: plugins_multi_thread\MSRC4Plugin_for_sc.dsm; DestDir: {app}
 
-Source: uvnc_settings.exe; DestDir: {app}
+Source: uvnc_settings.exe; DestDir: {app};Components: UltraVNC_Server UltraVNC_Server_S; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont(); MinVersion: ,5.1.2600;
 Source: w2k\winvnc.exe; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont(); OnlyBelowVersion: 0,5.1.2600; MinVersion: ,5.0.2195; 
 Source: w2k\vncviewer.exe; DestDir: {app}; Components: UltraVNC_Viewer; Flags: restartreplace ignoreversion replacesameversion; OnlyBelowVersion: 0,5.1.2600; MinVersion: ,5.0.2195; 
+Source: w2k\authadmin.dll; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont(); OnlyBelowVersion: 0,5.1.2600; MinVersion: ,5.0.2195; 
+Source: w2k\authSSP.dll; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont(); OnlyBelowVersion: 0,5.1.2600; MinVersion: ,5.0.2195; 
+Source: w2k\ldapauth.dll; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont(); OnlyBelowVersion: 0,5.1.2600; MinVersion: ,5.0.2195; 
+Source: w2k\ldapauth9x.dll; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont(); OnlyBelowVersion: 0,5.1.2600; MinVersion: ,5.0.2195; 
+Source: w2k\ldapauthnt4.dll; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont(); OnlyBelowVersion: 0,5.1.2600; MinVersion: ,5.0.2195; 
+Source: w2k\logging.dll; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont(); OnlyBelowVersion: 0,5.1.2600; MinVersion: ,5.0.2195; 
+Source: w2k\logmessages.dll; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont(); OnlyBelowVersion: 0,5.1.2600; MinVersion: ,5.0.2195; 
+Source: w2k\MSLogonACL.exe; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont(); OnlyBelowVersion: 0,5.1.2600; MinVersion: ,5.0.2195; 
+Source: w2k\setcad.exe; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont(); OnlyBelowVersion: 0,5.1.2600; MinVersion: ,5.0.2195; 
+Source: w2k\setpasswd.exe; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont(); OnlyBelowVersion: 0,5.1.2600; MinVersion: ,5.0.2195; 
+Source: w2k\testauth.exe; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont(); OnlyBelowVersion: 0,5.1.2600; MinVersion: ,5.0.2195; 
+Source: w2k\uvnc_settings.exe; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont(); OnlyBelowVersion: 0,5.1.2600; MinVersion: ,5.0.2195; 
+Source: w2k\vnchooks.dll; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont(); OnlyBelowVersion: 0,5.1.2600; MinVersion: ,5.0.2195; 
+Source: w2k\vncviewer.exe; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont(); OnlyBelowVersion: 0,5.1.2600; MinVersion: ,5.0.2195; 
+Source: w2k\vncviewer.zip; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont(); OnlyBelowVersion: 0,5.1.2600; MinVersion: ,5.0.2195; 
+Source: w2k\winvnc.exe; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont(); OnlyBelowVersion: 0,5.1.2600; MinVersion: ,5.0.2195; 
+Source: w2k\winvnc.zip; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont(); OnlyBelowVersion: 0,5.1.2600; MinVersion: ,5.0.2195; 
+Source: w2k\workgrpdomnt4.dll; DestDir: {app}; Components: UltraVNC_Server UltraVNC_Server_S; Flags: restartreplace ignoreversion replacesameversion; Check: Can_cont(); OnlyBelowVersion: 0,5.1.2600; MinVersion: ,5.0.2195; 
+
 
 
 [Icons]
@@ -241,6 +262,8 @@ Root: HKCR; Subkey: VncViewer.Config\DefaultIcon; ValueType: string; ValueName: 
 Root: HKCR; Subkey: VncViewer.Config\shell\open\command; ValueType: string; ValueName: ; ValueData: """{app}\vncviewer.exe"" -config ""%1"""; Tasks: associate
 
 [Run]
+Filename: {app}\setpasswd.exe; Flags: runhidden; Components: UltraVNC_Server UltraVNC_Server_S;  Check: Can_cont()
+Filename: {app}\setcad.exe; Flags: runhidden; Components: UltraVNC_Server UltraVNC_Server_S;  Check: Can_cont()
 Filename: {app}\WinVNC.exe; Parameters: -install; Flags: runhidden; Components: UltraVNC_Server UltraVNC_Server_S; Tasks: installservice; StatusMsg: {cm:Registering, UltraVNC}; Check: Can_cont()
 Filename: {app}\driver\setupdrv.exe; Parameters: install; Flags: runhidden; Components: UltraVNC_Server; Tasks: driver
 Filename: net; Parameters: start uvnc_service; Flags: runhidden; Components: UltraVNC_Server UltraVNC_Server_S; Tasks: startservice; StatusMsg: {cm:Starting,UltraVNC}
@@ -750,4 +773,3 @@ end;
 
 [InnoIDE_Settings]
 LogFileOverwrite=false
-
