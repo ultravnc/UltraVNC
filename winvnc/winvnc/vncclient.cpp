@@ -930,7 +930,15 @@ vncClientThread::FilterClients_Ask_Permission()
 		if (verified == vncServer::aqrQuery) {
             // 10 Dec 2008 jdp reject/accept all incoming connections if the workstation is locked
             if (vncService::IsWSLocked() && !m_server->QueryIfNoLogon()) {
-                verified = m_server->QueryAccept() == 1 ? vncServer::aqrAccept : vncServer::aqrReject;
+				if (m_server->QueryAcceptLocked())
+				{
+					verified = m_server->QueryAccept() == 1 ? vncServer::aqrAccept : vncServer::aqrReject;
+				}
+				else
+				{
+					//m_queryaccept==2, new method to allow accept on locked user
+					verified = vncServer::aqrAccept;
+				}
             } else {
 
 			vncAcceptDialog *acceptDlg = new vncAcceptDialog(m_server->QueryTimeout(),m_server->QueryAccept(), m_socket->GetPeerName());

@@ -33,12 +33,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_11276E5D18D1F8A028D0E38F745FFA00"
-        "OwnerKey" = "8:_0F3E5B898783469D8773791F4330AA21"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_1D605486DA064476BC03795B9D1F0A1D"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -75,24 +69,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_42FE7889F2707625AD708AD6969D5CE5"
-        "OwnerKey" = "8:_26A88B0595B5471B8B4F81FFBB8B5087"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_42FE7889F2707625AD708AD6969D5CE5"
-        "OwnerKey" = "8:_7E9202FA9ECA4F4E821B4ABFAFEE00A5"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_42FE7889F2707625AD708AD6969D5CE5"
-        "OwnerKey" = "8:_9FFC46783A7F4BCB9DDA60B790D35975"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_496FDBFD8E724200972D9572D0438D7C"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -101,12 +77,6 @@
         {
         "MsmKey" = "8:_4B3ED6558E87467BB79B5F245A6A7814"
         "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_50910BA94DBDE9C3BDC8B91C1759A097"
-        "OwnerKey" = "8:_052BCE00FB0641489B715C8ACA9657CA"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -154,12 +124,6 @@
         "Entry"
         {
         "MsmKey" = "8:_D9CCD7A410A61576D752DC9362953245"
-        "OwnerKey" = "8:_0F3E5B898783469D8773791F4330AA21"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_D9CCD7A410A61576D752DC9362953245"
         "OwnerKey" = "8:_E7889E76F1B34653A90C53D3F997EBAF"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -172,31 +136,7 @@
         "Entry"
         {
         "MsmKey" = "8:_E8EBA67D0DF2389006367EE66F35B612"
-        "OwnerKey" = "8:_052BCE00FB0641489B715C8ACA9657CA"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_E8EBA67D0DF2389006367EE66F35B612"
         "OwnerKey" = "8:_E7889E76F1B34653A90C53D3F997EBAF"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_F8102562A64423CDCAC1C20AD91D5EEB"
-        "OwnerKey" = "8:_2C1853F772494048B3B26B78A53486F4"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_F8102562A64423CDCAC1C20AD91D5EEB"
-        "OwnerKey" = "8:_30A3C3ED62BD436097EAA36546BB4380"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_F8102562A64423CDCAC1C20AD91D5EEB"
-        "OwnerKey" = "8:_7E9202FA9ECA4F4E821B4ABFAFEE00A5"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -359,26 +299,6 @@
         }
         "File"
         {
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_11276E5D18D1F8A028D0E38F745FFA00"
-            {
-            "SourcePath" = "8:IPHLPAPI.DLL"
-            "TargetName" = "8:IPHLPAPI.DLL"
-            "Tag" = "8:"
-            "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:TRUE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_21D3AD3D5C2D41B8BD9742DEAED2D472"
             {
             "SourcePath" = "8:..\\..\\..\\..\\..\\Files\\logmessages.dll"
@@ -399,26 +319,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_42FE7889F2707625AD708AD6969D5CE5"
-            {
-            "SourcePath" = "8:ACTIVEDS.dll"
-            "TargetName" = "8:ACTIVEDS.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:TRUE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4B3ED6558E87467BB79B5F245A6A7814"
             {
             "SourcePath" = "8:..\\..\\..\\..\\..\\Files\\plugins\\SecureVNCPlugin64.dsm"
@@ -437,26 +337,6 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_50910BA94DBDE9C3BDC8B91C1759A097"
-            {
-            "SourcePath" = "8:COMDLG32.dll"
-            "TargetName" = "8:COMDLG32.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:TRUE"
-            "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_708256351F4C475AB626FAA03B08F954"
@@ -517,66 +397,6 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D9CCD7A410A61576D752DC9362953245"
-            {
-            "SourcePath" = "8:VERSION.dll"
-            "TargetName" = "8:VERSION.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:TRUE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E8EBA67D0DF2389006367EE66F35B612"
-            {
-            "SourcePath" = "8:IMM32.dll"
-            "TargetName" = "8:IMM32.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:TRUE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F8102562A64423CDCAC1C20AD91D5EEB"
-            {
-            "SourcePath" = "8:NETAPI32.dll"
-            "TargetName" = "8:NETAPI32.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:TRUE"
-            "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F84C0DFF34AB4B4FBCA386D383F5AC14"
@@ -666,15 +486,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:UltraVnc"
-        "ProductCode" = "8:{8C5C331A-97D6-46DE-BFF4-8424BD06A888}"
-        "PackageCode" = "8:{002FF0CB-5CBA-4042-BC6B-836A48EDC9D0}"
+        "ProductCode" = "8:{4ABD1242-7176-49CC-A128-AB9506C72DC7}"
+        "PackageCode" = "8:{1AE3B19B-F9CC-4859-92EA-FBACEED99CE0}"
         "UpgradeCode" = "8:{25A3A242-EEA3-4731-A2D0-E990D2EA5A23}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.0.962"
+        "ProductVersion" = "8:1.0.963"
         "Manufacturer" = "8:uvnc bvba"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:http://support.uvnc.com"
@@ -1945,7 +1765,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_052BCE00FB0641489B715C8ACA9657CA"
             {
-            "SourcePath" = "8:..\\Release\\vncviewer.exe"
+            "SourcePath" = "8:..\\Debug\\vncviewer.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -1973,7 +1793,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_057C03B3B6C348A59E8D997A9884CC96"
             {
-            "SourcePath" = "8:..\\Release\\logging.dll"
+            "SourcePath" = "8:..\\Debug\\logging.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2001,7 +1821,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_0F3E5B898783469D8773791F4330AA21"
             {
-            "SourcePath" = "8:..\\Release\\uvnc_settings.exe"
+            "SourcePath" = "8:..\\Debug\\uvnc_settings.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2029,7 +1849,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_1D605486DA064476BC03795B9D1F0A1D"
             {
-            "SourcePath" = "8:..\\Release\\authSSP.dll"
+            "SourcePath" = "8:..\\Debug\\authSSP.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2057,7 +1877,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_2499FE2BC2EC43FC827586F2B36F2483"
             {
-            "SourcePath" = "8:..\\..\\addon\\Release\\testauth.exe"
+            "SourcePath" = "8:..\\Debug\\testauth.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2085,7 +1905,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_26A88B0595B5471B8B4F81FFBB8B5087"
             {
-            "SourcePath" = "8:..\\Release\\ldapauth.dll"
+            "SourcePath" = "8:..\\Debug\\ldapauth.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2113,7 +1933,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_2C1853F772494048B3B26B78A53486F4"
             {
-            "SourcePath" = "8:..\\Release\\MSLogonACL.exe"
+            "SourcePath" = "8:..\\Debug\\MSLogonACL.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2141,7 +1961,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_30A3C3ED62BD436097EAA36546BB4380"
             {
-            "SourcePath" = "8:..\\Release\\authadmin.dll"
+            "SourcePath" = "8:..\\Debug\\authadmin.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2169,7 +1989,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_496FDBFD8E724200972D9572D0438D7C"
             {
-            "SourcePath" = "8:..\\Release\\setpasswd.exe"
+            "SourcePath" = "8:..\\Debug\\setpasswd.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2197,7 +2017,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_7E9202FA9ECA4F4E821B4ABFAFEE00A5"
             {
-            "SourcePath" = "8:..\\Release\\ldapauthnt4.dll"
+            "SourcePath" = "8:..\\Debug\\ldapauthnt4.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2225,7 +2045,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_87DB62653B71411E93DD76EF68D97A39"
             {
-            "SourcePath" = "8:..\\Release\\workgrpdomnt4.dll"
+            "SourcePath" = "8:..\\Debug\\workgrpdomnt4.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2253,7 +2073,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_9FFC46783A7F4BCB9DDA60B790D35975"
             {
-            "SourcePath" = "8:..\\Release\\ldapauth9x.dll"
+            "SourcePath" = "8:..\\Debug\\ldapauth9x.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2281,7 +2101,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_B0AE7F7B374D4940BFC810B4E4ED9394"
             {
-            "SourcePath" = "8:..\\Release\\setcad.exe"
+            "SourcePath" = "8:..\\Debug\\setcad.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2309,7 +2129,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_E7889E76F1B34653A90C53D3F997EBAF"
             {
-            "SourcePath" = "8:..\\Release\\winvnc.exe"
+            "SourcePath" = "8:..\\Debug\\winvnc.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2337,7 +2157,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_FE82FF2D562E4B80928D6FEB67F9F479"
             {
-            "SourcePath" = "8:..\\Release\\vnchooks.dll"
+            "SourcePath" = "8:..\\Debug\\vnchooks.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"

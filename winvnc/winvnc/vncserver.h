@@ -299,7 +299,16 @@ public:
 	virtual void SetQuerySetting(const UINT setting) {m_querysetting = setting;};
 	virtual UINT QuerySetting() {return m_querysetting;};
 	virtual void SetQueryAccept(const UINT setting) {m_queryaccept = setting;};
-	virtual UINT QueryAccept() {return m_queryaccept;};
+	virtual UINT QueryAccept() 
+	{
+		if (m_queryaccept==2) return 0;
+		else return m_queryaccept;
+	};
+	virtual UINT QueryAcceptLocked() 
+	{
+		if (m_queryaccept==2) return 0;
+		else return 1;
+	};
 	virtual void SetQueryTimeout(const UINT setting) {m_querytimeout = setting;};
 	virtual UINT QueryTimeout() {return m_querytimeout;};
 
