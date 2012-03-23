@@ -898,7 +898,7 @@ if (strcmp(pszgroup3,"")!=0)
 			}
 
 	}
-	if (result==1) goto accessOK;
+	if (result==1) goto accessOK2;
 	////////////////////////////////////////////////////////
 	if ( NT4OS || W2KOS){
 		char szCurrentDir[MAX_PATH];
@@ -925,7 +925,7 @@ if (strcmp(pszgroup3,"")!=0)
 			}
 
 	}
-	if (result==1) goto accessOK;
+	if (result==1) goto accessOK2;
 	////////////////////////////////////////////////////////////////
 	if (CheckAD() && W2KOS && (locdom3==2||locdom3==3))
 	{
@@ -952,7 +952,7 @@ if (strcmp(pszgroup3,"")!=0)
 				result=0;
 			}
 	}
-	if (result==1) goto accessOK;
+	if (result==1) goto accessOK2;
 	///////////////////////////////////////////////////////////////////
 	if (CheckAD() && NT4OS && CheckDsGetDcNameW() && (locdom3==2||locdom3==3))
 	{

@@ -496,6 +496,13 @@ vncDesktop::vncDesktop()
 	nr_rects=0;
 	iconregion.clear();
 	blankmonitorstate=false;
+
+// JnZn558
+	m_current_monitor = MULTI_MON_PRIMARY;
+	m_old_monitor = MULTI_MON_PRIMARY;
+	m_ScreenWidth = 0;
+	m_ScreenHeight = 0;
+//
 }
 
 vncDesktop::~vncDesktop()
@@ -958,7 +965,8 @@ vncDesktop::InitBitmap()
 								if (DriverFound)
 									{
 										deviceName = (LPSTR)&dd.DeviceName[0];
-										m_hrootdc = CreateDC("DISPLAY",deviceName,NULL,NULL);
+										// JnZn558 m_hrootdc = CreateDC("DISPLAY",deviceName,NULL,NULL);
+										m_hrootdc = GetDC(NULL);
 										BOOL change = EnumDisplaySettings(deviceName,ENUM_CURRENT_SETTINGS,&devmode);
 										m_ScreenOffsetx=devmode.dmPosition.x;
 										m_ScreenOffsety=devmode.dmPosition.y;
@@ -979,6 +987,7 @@ vncDesktop::InitBitmap()
 		EnumWindows((WNDENUMPROC)EnumWindowsHnd, (LPARAM) this);
 	}
 
+
 	if (m_hrootdc == NULL) {
 		vnclog.Print(LL_INTERR, VNCLOG("No driver used \n"));
 		//Multi-Monitor changes
@@ -986,7 +995,8 @@ vncDesktop::InitBitmap()
 		requested_multi_monitor=m_buffer.IsMultiMonitor();
 		multi_monitor=false;
 		if (requested_multi_monitor && nr_monitors>1) multi_monitor=true;
-
+		
+		/* JnZn558
 		if (!multi_monitor)
 		{
 			m_hrootdc = CreateDC(("DISPLAY"),mymonitor[0].device,NULL,NULL);
@@ -996,18 +1006,31 @@ vncDesktop::InitBitmap()
 		else
 		{
 			m_hrootdc = GetDC(NULL);
+			
 			m_ScreenOffsetx=mymonitor[2].offsetx;
-			m_ScreenOffsety=mymonitor[2].offsety;;
+			m_ScreenOffsety=mymonitor[2].offsety;
+			
+			
 		}
+		*/
+		m_hrootdc = GetDC(NULL);
 		if (m_hrootdc == NULL) {
 				vnclog.Print(LL_INTERR, VNCLOG("Failed m_rootdc \n"));
 				return ERROR_DESKTOP_NO_ROOTDC;
 		}
 		
 	}
-	if (multi_monitor && !VideoBuffer()) m_bmrect = rfb::Rect(0, 0,mymonitor[2].Width,mymonitor[2].Height);
+
+	m_ScreenOffsetx=mymonitor[3].offsetx;
+	m_ScreenOffsety=mymonitor[3].offsety;
+	m_ScreenWidth = mymonitor[3].Width;
+	m_ScreenHeight = mymonitor[3].Height;
+	
+	// JnZn558 if (multi_monitor && !VideoBuffer()) m_bmrect = rfb::Rect(0, 0,mymonitor[2].Width,mymonitor[2].Height);
+	if (multi_monitor && !VideoBuffer()) m_bmrect = rfb::Rect(0, 0,mymonitor[3].Width,mymonitor[3].Height);
 	else if (!VideoBuffer()) m_bmrect = rfb::Rect(0, 0,mymonitor[0].Width,mymonitor[0].Height);
-	else m_bmrect = rfb::Rect(0, 0,GetDeviceCaps(m_hrootdc, HORZRES),GetDeviceCaps(m_hrootdc, VERTRES));
+	// JnZn558 else m_bmrect = rfb::Rect(0, 0,GetDeviceCaps(m_hrootdc, HORZRES),GetDeviceCaps(m_hrootdc, VERTRES));
+	else m_bmrect = rfb::Rect(m_ScreenOffsetx, m_ScreenOffsety,m_ScreenWidth,m_ScreenHeight);
 	vnclog.Print(LL_INTINFO, VNCLOG("bitmap dimensions are %d x %d\n"), m_bmrect.br.x, m_bmrect.br.y);
 
 	// Create a compatible memory DC
@@ -1165,8 +1188,13 @@ vncDesktop::SetPixFormat()
 	m_scrinfo.format.bigEndian = 0;
 
 	// Set up the native buffer width, height and format
+	/* JnZn558
 	m_scrinfo.framebufferWidth = (CARD16) (m_bmrect.br.x - m_bmrect.tl.x);		// Swap endian before actually sending
 	m_scrinfo.framebufferHeight = (CARD16) (m_bmrect.br.y - m_bmrect.tl.y);	// Swap endian before actually sending
+	*/
+
+	m_scrinfo.framebufferWidth = (CARD16) (m_bmrect.br.x - ((m_bmrect.tl.x < 0)? 0: m_bmrect.tl.x));		// Swap endian before actually sending
+	m_scrinfo.framebufferHeight = (CARD16) (m_bmrect.br.y - ((m_bmrect.tl.y < 0)? 0: m_bmrect.tl.y));	// Swap endian before actually sending
 	m_scrinfo.format.bitsPerPixel = (CARD8) m_bminfo.bmi.bmiHeader.biBitCount;
 	m_scrinfo.format.depth        = (CARD8) m_bminfo.bmi.bmiHeader.biBitCount;
 
@@ -2074,8 +2102,48 @@ void vncDesktop::SetSW(int x,int y)
 		{
 			// 2= multi monitor
 			// 1= single monitor
+			/* yz
 			if (requested_multi_monitor)m_buffer.MultiMonitors(1);
 			else m_buffer.MultiMonitors(2);
+			*/
+			switch (nr_monitors) {
+			case 2:
+				{
+					if (m_current_monitor == MULTI_MON_PRIMARY) {
+						m_current_monitor = MULTI_MON_SECOND;
+						m_buffer.MultiMonitors(1);
+					} else if (m_current_monitor == MULTI_MON_SECOND) {
+						m_current_monitor = MULTI_MON_ALL;
+						m_buffer.MultiMonitors(2);
+					} else if (m_current_monitor == MULTI_MON_ALL) {
+						m_buffer.MultiMonitors(1);
+						m_current_monitor = MULTI_MON_PRIMARY;
+					} 
+				} break;
+			case 3:
+				{
+					if (m_current_monitor == MULTI_MON_PRIMARY) {
+						m_current_monitor = MULTI_MON_SECOND;
+						m_buffer.MultiMonitors(1);
+					} else if (m_current_monitor == MULTI_MON_SECOND) {
+						m_current_monitor = MULTI_MON_THIRD;
+						m_buffer.MultiMonitors(1);
+					} else if (m_current_monitor == MULTI_MON_THIRD) {
+						m_current_monitor = MULTI_MON_FIRST_TWO;
+						m_buffer.MultiMonitors(2);
+					} else if (m_current_monitor == MULTI_MON_FIRST_TWO) {
+						m_current_monitor = MULTI_MON_LAST_TWO;
+						m_buffer.MultiMonitors(2);
+					} else if (m_current_monitor == MULTI_MON_LAST_TWO) {
+						m_current_monitor = MULTI_MON_ALL;
+						m_buffer.MultiMonitors(2);
+					} else if (m_current_monitor == MULTI_MON_ALL) {
+						m_current_monitor = MULTI_MON_PRIMARY;
+						m_buffer.MultiMonitors(1);
+					} 
+				} break;
+			}
+
 			m_Single_hWnd=NULL;
 			return;
 		}
@@ -2191,9 +2259,14 @@ BOOL vncDesktop::InitVideoDriver()
 		}
 	if (nr_monitors>1)
 		{
+			/* JnZn558
 			m_ScreenOffsetx=mymonitor[2].offsetx;
 			m_ScreenOffsety=mymonitor[2].offsety;
 			m_videodriver->VIDEODRIVER_start(mymonitor[2].offsetx,mymonitor[2].offsety,mymonitor[2].Width,mymonitor[2].Height);
+			*/
+			m_ScreenOffsetx=mymonitor[3].offsetx;
+			m_ScreenOffsety=mymonitor[3].offsety;
+			m_videodriver->VIDEODRIVER_start(mymonitor[3].offsetx,mymonitor[3].offsety,mymonitor[3].Width,mymonitor[3].Height);
 		}		
 	vnclog.Print(LL_INTERR, VNCLOG("Start Mirror driver\n"));
 	m_hookdriver=true;

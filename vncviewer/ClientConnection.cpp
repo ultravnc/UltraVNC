@@ -6531,7 +6531,8 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 					case ID_DESKTOP:
 						if (!_this->m_SWselect)
 						{
-							_this->m_SWselect=true;
+							//multimon switch
+							//_this->m_SWselect=true;
 							_this->SendSW(9999,9999);
 						}
 						break;

@@ -62,6 +62,16 @@ class vncServer;
 #include "common/Clipboard.h"
 //#define COMPILE_MULTIMON_STUBS
 //#include "Multimon.h"
+
+// JnZn558
+#define MULTI_MON_PRIMARY		1
+#define MULTI_MON_SECOND		2
+#define MULTI_MON_THIRD			3
+#define MULTI_MON_FIRST_TWO		4
+#define MULTI_MON_LAST_TWO		5
+#define MULTI_MON_ALL			6
+//
+
 #ifndef SM_CMONITORS
 
 #define SM_XVIRTUALSCREEN       76
@@ -221,6 +231,11 @@ private:
 
 class vncDesktop
 {
+// JnZn558
+protected:
+	int m_current_monitor;
+	int m_old_monitor;
+//
 
 // Fields
 public:
@@ -290,6 +305,10 @@ public:
 	BOOL VideoBuffer();
 	int m_ScreenOffsetx;
 	int m_ScreenOffsety;
+	// JnZn558
+	int m_ScreenWidth;
+	int m_ScreenHeight;
+	//
 	int DriverType;
 	DWORD color[10];
 	// added jeff
@@ -310,6 +329,9 @@ public:
 	int GetNrMonitors();
 	void GetPrimaryDevice();
 	void GetSecondaryDevice();
+	// JnZn558
+	void GetThirdDevice();
+	//
 	void Checkmonitors();
     // 28 Mar 2008 jdp
     void SetBlockInputState(bool newstate);
@@ -516,7 +538,7 @@ BOOL HookWanted;
 BOOL DriverWantedSet;
 
 //Multi monitor
-monitor mymonitor[3];
+monitor mymonitor[4];
 int nr_monitors;
 bool multi_monitor;
 bool requested_multi_monitor;

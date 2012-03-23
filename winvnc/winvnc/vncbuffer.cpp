@@ -55,8 +55,8 @@ vncBuffer::vncBuffer()
 
 	nRowIndex = 0;
 	m_cursorpending = false;
-	m_single_monitor=1;
-	m_multi_monitor=0;
+	m_single_monitor=0;
+	m_multi_monitor=1;
 
 	// sf@2005 - Grey Palette
 	m_fGreyPalette = false;
@@ -718,10 +718,11 @@ void vncBuffer::ScaleRect(rfb::Rect &rect)
 	rect.br.x = (rect.br.x - (rect.br.x % m_nScale)) + m_nScale - 1;
 
 	rfb::Rect ScaledRect;
-	ScaledRect.tl.y = rect.tl.y / m_nScale;
-	ScaledRect.br.y = rect.br.y / m_nScale;
-	ScaledRect.tl.x = rect.tl.x / m_nScale;
-	ScaledRect.br.x = rect.br.x / m_nScale;
+
+	 ScaledRect.tl.y = ((rect.tl.y < 0)?0:rect.tl.y) / m_nScale;
+	 ScaledRect.br.y = ((rect.br.y < 0)?0:rect.br.y) / m_nScale;
+	 ScaledRect.tl.x = ((rect.tl.x < 0)?0:rect.tl.x) / m_nScale;
+	 ScaledRect.br.x = ((rect.br.x < 0)?0:rect.br.x) / m_nScale;	
 
 	// Copy and scale data from screen Main buffer to Scaled buffer
 	BYTE *pMain   =	m_mainbuff + (rect.tl.y * m_bytesPerRow) +

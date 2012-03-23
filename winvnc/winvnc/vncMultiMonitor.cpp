@@ -50,6 +50,7 @@ vncDesktop::Checkmonitors()
 {
   nr_monitors=GetNrMonitors();
   DEVMODE devMode;
+
   if (nr_monitors>0)
   {
 	if(OSversion()==1 || OSversion()==2 || OSversion()==4 )GetPrimaryDevice();
@@ -73,12 +74,32 @@ vncDesktop::Checkmonitors()
 	mymonitor[1].Height=devMode.dmPelsHeight;
 	mymonitor[1].Depth=devMode.dmBitsPerPel;
   }
-	///
+
+  // JnZn558
+  if (nr_monitors>2)
+  {
+	GetThirdDevice();
+	devMode.dmSize = sizeof(DEVMODE);
+	EnumDisplaySettings(mymonitor[2].device, ENUM_CURRENT_SETTINGS, &devMode);
+	mymonitor[2].offsetx=devMode.dmPosition.x;
+	mymonitor[2].offsety=devMode.dmPosition.y;
+	mymonitor[2].Width=devMode.dmPelsWidth;
+	mymonitor[2].Height=devMode.dmPelsHeight;
+	mymonitor[2].Depth=devMode.dmBitsPerPel;
+  }
+  //
+	/* JnZn558
     mymonitor[2].offsetx=GetSystemMetrics(SM_XVIRTUALSCREEN);
     mymonitor[2].offsety=GetSystemMetrics(SM_YVIRTUALSCREEN);
     mymonitor[2].Width=GetSystemMetrics(SM_CXVIRTUALSCREEN);
     mymonitor[2].Height=GetSystemMetrics(SM_CYVIRTUALSCREEN);
 	mymonitor[2].Depth=mymonitor[0].Depth;//depth primary monitor is used
+	*/
+	mymonitor[3].offsetx=GetSystemMetrics(SM_XVIRTUALSCREEN);
+    mymonitor[3].offsety=GetSystemMetrics(SM_YVIRTUALSCREEN);
+    mymonitor[3].Width=GetSystemMetrics(SM_CXVIRTUALSCREEN);
+    mymonitor[3].Height=GetSystemMetrics(SM_CYVIRTUALSCREEN);
+	mymonitor[3].Depth=mymonitor[0].Depth;//depth primary monitor is used
 
 }
 
@@ -126,6 +147,7 @@ vncDesktop::GetPrimaryDevice()
 						if (!(dd.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER))
 						{
 							strcpy(mymonitor[0].device,(char *)dd.DeviceName);
+							break;
 						}
 
 			}
@@ -151,8 +173,38 @@ vncDesktop::GetSecondaryDevice()
 						if (!(dd.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER))
 						{
 							strcpy(mymonitor[1].device,(char *)dd.DeviceName);
+							break;
 						}
 
+			}
+	}
+}
+
+void
+vncDesktop::GetThirdDevice()
+{
+	int i;
+    int j=0;
+    helper::DynamicFn<pEnumDisplayDevices> pd("USER32","EnumDisplayDevicesA");
+
+    if (pd.isValid())
+    {
+        DISPLAY_DEVICE dd;
+        ZeroMemory(&dd, sizeof(dd));
+        dd.cb = sizeof(dd);
+        for (i=0; (*pd)(NULL, i, &dd, 0); i++)
+			{
+				if (dd.StateFlags & DISPLAY_DEVICE_ATTACHED_TO_DESKTOP)
+					if (!(dd.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE)) {
+						j++;
+						if (!(dd.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER))
+						{
+							if (j == 3) {
+								strcpy(mymonitor[2].device,(char *)dd.DeviceName);
+								break;
+							}
+						}
+					}
 			}
 	}
 }

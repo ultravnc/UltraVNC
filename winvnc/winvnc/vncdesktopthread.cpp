@@ -335,7 +335,10 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 			vncService::InputDesktopSelected()==0 ||							//handle logon and screensaver desktops
 			m_desktop->m_SWtoDesktop ||										//switch from SW to full desktop or visa versa
 			m_desktop->m_hookswitch||										//hook change request
-			m_desktop->requested_multi_monitor!=m_desktop->m_buffer.IsMultiMonitor()		//monitor change request
+			m_desktop->requested_multi_monitor!=m_desktop->m_buffer.IsMultiMonitor() ||		//monitor change request
+			// JnZn558
+			m_desktop->m_old_monitor != m_desktop->m_current_monitor
+			//
 			) )
 			{
 				// We need to wait until viewer has send if he support Size changes
@@ -393,8 +396,19 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 							m_desktop->multi_monitor=true;
 							if (m_desktop->requested_multi_monitor && m_desktop->nr_monitors>1) m_desktop->multi_monitor=true;
 							else m_desktop->multi_monitor=false;							
-							if ( old_monitor!=m_desktop->multi_monitor) monitor_changed=true;
+							if ( old_monitor!=m_desktop->multi_monitor) {
+								monitor_changed=true;
+								m_desktop->m_old_monitor = m_desktop->m_current_monitor;
+							}
 						}
+					// JnZn558
+					else
+					{
+						if (m_desktop->m_old_monitor != m_desktop->m_current_monitor) {
+							monitor_changed = true;
+							m_desktop->m_old_monitor = m_desktop->m_current_monitor;
+						}
+					}
 
 					//*******************************************************
 					// Reinitialize buffers,color, etc
@@ -501,6 +515,10 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 							updates.set_clip_region(m_desktop->m_Cliprect);
 							m_desktop->m_buffer.ClearCache();
 						}
+
+					// JnZn558
+					RECT rc = { 0 };
+					//
 					if (monitor_changed)
 					{
 						// we are using the driver, so a monitor change is a view change, like a special kind of single window
@@ -510,6 +528,7 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 						// Cliprect, buffer coordinates
 						if (m_desktop->multi_monitor)
 						{
+							/* JnZn558
 							m_desktop->m_SWOffsetx=0;
 							m_desktop->m_SWOffsety=0;
 							m_server->SetSWOffset(m_desktop->m_SWOffsetx,m_desktop->m_SWOffsety);
@@ -518,9 +537,114 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 							m_desktop->m_Cliprect.tl.y=0;
 							m_desktop->m_Cliprect.br.x=m_desktop->mymonitor[2].offsetx+m_desktop->mymonitor[2].Width-m_desktop->mymonitor[2].offsetx;
 							m_desktop->m_Cliprect.br.y=m_desktop->mymonitor[2].offsety+m_desktop->mymonitor[2].Height-m_desktop->mymonitor[2].offsety;
+							*/
+
+							vnclog.Print(LL_INTINFO, VNCLOG("Request Monitor %d\n"), m_desktop->m_current_monitor);
+							int mon[2] = {0};
+							switch (m_desktop->m_current_monitor) {
+								case MULTI_MON_FIRST_TWO:
+								{
+									mon[0] = 3;
+									mon[1] = 3;
+									if (m_desktop->nr_monitors > 2) {
+										if ((m_desktop->mymonitor[0].offsetx < m_desktop->mymonitor[1].offsetx && m_desktop->mymonitor[1].offsetx < m_desktop->mymonitor[2].offsetx) ||
+											(m_desktop->mymonitor[1].offsetx < m_desktop->mymonitor[0].offsetx && m_desktop->mymonitor[0].offsetx < m_desktop->mymonitor[2].offsetx)) {
+											mon[0] = 0;
+											mon[1] = 1;
+										}
+										if ((m_desktop->mymonitor[0].offsetx < m_desktop->mymonitor[2].offsetx && m_desktop->mymonitor[2].offsetx < m_desktop->mymonitor[1].offsetx) ||
+											(m_desktop->mymonitor[2].offsetx < m_desktop->mymonitor[0].offsetx && m_desktop->mymonitor[0].offsetx < m_desktop->mymonitor[2].offsetx)) {
+											mon[0] = 0;
+											mon[1] = 2;
+										}
+										if ((m_desktop->mymonitor[1].offsetx < m_desktop->mymonitor[2].offsetx && m_desktop->mymonitor[2].offsetx < m_desktop->mymonitor[0].offsetx) ||
+											(m_desktop->mymonitor[2].offsetx < m_desktop->mymonitor[1].offsetx && m_desktop->mymonitor[1].offsetx < m_desktop->mymonitor[0].offsetx)) {
+											mon[0] = 1;
+											mon[1] = 2;
+										}
+									}
+									m_desktop->m_SWOffsetx=min(m_desktop->mymonitor[mon[0]].offsetx, m_desktop->mymonitor[mon[1]].offsetx);
+									m_desktop->m_SWOffsety=min(m_desktop->mymonitor[mon[0]].offsety, m_desktop->mymonitor[mon[1]].offsety);
+									m_server->SetSWOffset(m_desktop->m_SWOffsetx,m_desktop->m_SWOffsety);
+
+									m_desktop->m_Cliprect.tl.x=m_desktop->m_SWOffsetx;
+									m_desktop->m_Cliprect.tl.y=m_desktop->m_SWOffsety;
+
+									if (m_desktop->mymonitor[mon[0]].offsetx < m_desktop->mymonitor[mon[1]].offsetx)
+										m_desktop->m_Cliprect.br.x=m_desktop->mymonitor[mon[1]].offsetx+m_desktop->mymonitor[mon[1]].Width;											
+									else
+										m_desktop->m_Cliprect.br.x=m_desktop->mymonitor[mon[0]].offsetx+m_desktop->mymonitor[mon[0]].Width;
+										
+									m_desktop->m_Cliprect.br.y=max(m_desktop->mymonitor[mon[0]].Height,m_desktop->mymonitor[mon[1]].Height);
+
+									rc.right = m_desktop->m_Cliprect.br.x - m_desktop->m_Cliprect.tl.x;
+									rc.bottom = m_desktop->m_Cliprect.br.y;
+
+									vnclog.Print(LL_INTINFO, VNCLOG("First two Monitor: width = %d height = %d\n"), rc.right, rc.bottom);
+								} break;
+
+								case MULTI_MON_LAST_TWO:
+								{
+									mon[0] = 3;
+									mon[1] = 3;
+									if (m_desktop->nr_monitors > 2) {
+										if ((m_desktop->mymonitor[0].offsetx < m_desktop->mymonitor[1].offsetx && m_desktop->mymonitor[1].offsetx < m_desktop->mymonitor[2].offsetx) ||
+											(m_desktop->mymonitor[0].offsetx < m_desktop->mymonitor[2].offsetx && m_desktop->mymonitor[2].offsetx < m_desktop->mymonitor[1].offsetx))
+										{
+											mon[0] = 1;
+											mon[1] = 2;
+										}
+										if ((m_desktop->mymonitor[1].offsetx < m_desktop->mymonitor[0].offsetx && m_desktop->mymonitor[0].offsetx < m_desktop->mymonitor[2].offsetx) ||
+											(m_desktop->mymonitor[1].offsetx < m_desktop->mymonitor[2].offsetx && m_desktop->mymonitor[2].offsetx < m_desktop->mymonitor[0].offsetx))
+										{
+											mon[0] = 0;
+											mon[1] = 2;
+										}
+										if ((m_desktop->mymonitor[2].offsetx < m_desktop->mymonitor[1].offsetx && m_desktop->mymonitor[1].offsetx < m_desktop->mymonitor[0].offsetx) ||
+											(m_desktop->mymonitor[2].offsetx < m_desktop->mymonitor[0].offsetx && m_desktop->mymonitor[0].offsetx < m_desktop->mymonitor[1].offsetx))
+										{
+											mon[0] = 0;
+											mon[1] = 1;
+										}
+									}
+									m_desktop->m_SWOffsetx=min(m_desktop->mymonitor[mon[0]].offsetx, m_desktop->mymonitor[mon[1]].offsetx);
+									m_desktop->m_SWOffsety=min(m_desktop->mymonitor[mon[0]].offsety, m_desktop->mymonitor[mon[1]].offsety);
+
+									m_server->SetSWOffset(m_desktop->m_SWOffsetx,m_desktop->m_SWOffsety);
+
+									m_desktop->m_Cliprect.tl.x=m_desktop->m_SWOffsetx;
+									m_desktop->m_Cliprect.tl.y=m_desktop->m_SWOffsety;
+										
+									if (m_desktop->mymonitor[mon[0]].offsetx < m_desktop->mymonitor[mon[1]].offsetx)
+										m_desktop->m_Cliprect.br.x=m_desktop->mymonitor[mon[1]].offsetx+m_desktop->mymonitor[mon[1]].Width;		
+									else
+										m_desktop->m_Cliprect.br.x=m_desktop->mymonitor[mon[0]].offsetx+m_desktop->mymonitor[mon[0]].Width;
+									m_desktop->m_Cliprect.br.y=max(m_desktop->mymonitor[0].Height, m_desktop->mymonitor[mon[1]].Height);
+									rc.right = m_desktop->m_Cliprect.br.x - m_desktop->m_Cliprect.tl.x;
+									rc.bottom = m_desktop->m_Cliprect.br.y;
+									vnclog.Print(LL_INTINFO, VNCLOG("Last two monitor: width = %d height = %d\n"), rc.right, rc.bottom);
+								} break;
+
+								default:
+								{
+									m_desktop->m_SWOffsetx=m_desktop->mymonitor[3].offsetx;
+									m_desktop->m_SWOffsety=m_desktop->mymonitor[3].offsety;
+									m_server->SetSWOffset(m_desktop->m_SWOffsetx,m_desktop->m_SWOffsety);
+									
+									m_desktop->m_Cliprect.tl.x=m_desktop->m_SWOffsetx;
+									m_desktop->m_Cliprect.tl.y=m_desktop->m_SWOffsety;
+									m_desktop->m_Cliprect.br.x=m_desktop->mymonitor[3].offsetx+m_desktop->mymonitor[3].Width;
+									m_desktop->m_Cliprect.br.y=m_desktop->mymonitor[3].offsety+m_desktop->mymonitor[3].Height;
+									rc.right = m_desktop->mymonitor[3].Width;
+									rc.bottom = m_desktop->mymonitor[3].Height;
+
+									vnclog.Print(LL_INTINFO, VNCLOG("All Monitor: width = %d height = %d\n"), rc.right, rc.bottom);
+								}
+							}
 						}
 						else
 						{
+							/* JnZn558
 							m_desktop->m_SWOffsetx=m_desktop->mymonitor[0].offsetx-m_desktop->mymonitor[2].offsetx;
 							m_desktop->m_SWOffsety=m_desktop->mymonitor[0].offsety-m_desktop->mymonitor[2].offsety;
 							m_server->SetSWOffset(m_desktop->m_SWOffsetx,m_desktop->m_SWOffsety);
@@ -529,6 +653,21 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 							m_desktop->m_Cliprect.tl.y=m_desktop->mymonitor[0].offsety-m_desktop->mymonitor[2].offsety;
 							m_desktop->m_Cliprect.br.x=m_desktop->mymonitor[0].offsetx+m_desktop->mymonitor[0].Width-m_desktop->mymonitor[2].offsetx;
 							m_desktop->m_Cliprect.br.y=m_desktop->mymonitor[0].offsety+m_desktop->mymonitor[0].Height-m_desktop->mymonitor[2].offsety;
+							*/
+							int nCurrentMon = m_desktop->m_current_monitor - 1;
+								
+							m_desktop->m_SWOffsetx=m_desktop->mymonitor[nCurrentMon].offsetx;
+							m_desktop->m_SWOffsety=m_desktop->mymonitor[nCurrentMon].offsety;
+							m_server->SetSWOffset(m_desktop->m_SWOffsetx,m_desktop->m_SWOffsety);
+
+							m_desktop->m_Cliprect.tl.x=m_desktop->mymonitor[nCurrentMon].offsetx;
+							m_desktop->m_Cliprect.tl.y=m_desktop->mymonitor[nCurrentMon].offsety;
+							m_desktop->m_Cliprect.br.x=m_desktop->mymonitor[nCurrentMon].offsetx+m_desktop->mymonitor[nCurrentMon].Width;
+							m_desktop->m_Cliprect.br.y=m_desktop->mymonitor[nCurrentMon].offsety+m_desktop->mymonitor[nCurrentMon].Height;
+							
+							rc.right = m_desktop->mymonitor[nCurrentMon].Width;
+							rc.bottom = m_desktop->mymonitor[nCurrentMon].Height;
+							vnclog.Print(LL_INTINFO, VNCLOG("Monitor %d: width = %d height = %d\n"), m_desktop->m_current_monitor, rc.right, rc.bottom);
 						}
 
 
@@ -566,10 +705,13 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 					if (monitor_changed)
 						{
 								monitor_changed=false;
+							/* yz
 								if (m_desktop->multi_monitor)
 									m_server->SetNewSWSize(m_desktop->mymonitor[2].Width,m_desktop->mymonitor[2].Height,TRUE); //changed no lock ok
 								else
 									m_server->SetNewSWSize(m_desktop->mymonitor[0].Width,m_desktop->mymonitor[0].Height,TRUE); //changed no lock ok
+							*/
+							m_server->SetNewSWSize(rc.right,rc.bottom,TRUE); //changed no lock ok	
 						}
 
 		/*#ifdef _DEBUG
@@ -1239,6 +1381,9 @@ vncDesktopThread::run_undetached(void *arg)
 											{
 												m_server->InitialUpdate(true);
 												initialupdate=true;
+												// JnZn558
+												m_desktop->m_old_monitor = MULTI_MON_ALL;
+												//
 											}
 										updates.add_changed(changedrgn);
 										updates.add_cached(cachedrgn);
