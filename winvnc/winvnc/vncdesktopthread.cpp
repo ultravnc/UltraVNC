@@ -1263,7 +1263,7 @@ vncDesktopThread::run_undetached(void *arg)
 														{
 																m_desktop->m_hOldcursor = m_desktop->m_hcursor;
 																m_desktop->m_buffer.SetCursorPending(TRUE);
-																if (!m_desktop->m_hookdriver) m_desktop->m_buffer.GrabMouse(); // Grab mouse cursor in all cases
+																if (!m_desktop->m_hookdriver  || !m_desktop->can_be_hooked) m_desktop->m_buffer.GrabMouse(); // Grab mouse cursor in all cases
 																m_desktop->m_server->UpdateMouse();
 																rfb::Rect rect;
 																int x = m_desktop->m_cursorpos.tl.x;
@@ -1284,7 +1284,7 @@ vncDesktopThread::run_undetached(void *arg)
 																m_server->UpdateCursorShape();
 																}
 											}
-										else if (!m_desktop->m_hookdriver)// If several clients, send them all the mouse updates
+										else if (!m_desktop->m_hookdriver  || !m_desktop->can_be_hooked)// If several clients, send them all the mouse updates
 											{												
 												// Render the mouse
 												//if (!m_desktop->VideoBuffer())
