@@ -18,27 +18,15 @@
 // Dutch (Netherlands) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NLD)
-#ifdef _WIN32
 LANGUAGE LANG_DUTCH, SUBLANG_DUTCH
 #pragma code_page(1252)
-#endif //_WIN32
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Icon
-//
-
-// Icon with lowest ID value placed first to ensure application icon
-// remains consistent on all systems.
-IDI_UVNC_SETTINGS       ICON                    "uvnc_settings.ico"
-IDI_SMALL               ICON                    "small.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Menu
 //
 
-IDC_UVNC_SETTINGS MENU 
+IDC_UVNC_SETTINGS MENU
 BEGIN
     POPUP "&File"
     BEGIN
@@ -56,7 +44,7 @@ END
 // Accelerator
 //
 
-IDC_UVNC_SETTINGS ACCELERATORS 
+IDC_UVNC_SETTINGS ACCELERATORS
 BEGIN
     "?",            IDM_ABOUT,              ASCII,  ALT
     "/",            IDM_ABOUT,              ASCII,  ALT
@@ -68,7 +56,7 @@ END
 // Dialog
 //
 
-IDD_MSLOGON DIALOG  0, 0, 186, 166
+IDD_MSLOGON DIALOG 0, 0, 186, 166
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "MS logon setup"
 FONT 8, "MS Shell Dlg"
@@ -213,8 +201,9 @@ BEGIN
     EDITTEXT        IDQUERYTIMEOUT,167,40,22,14,ES_AUTOHSCROLL
     LTEXT           "Seconds",IDC_STATIC,198,43,28,8
     LTEXT           "Default action: ",IDC_STATIC,16,58,50,8
-    CONTROL         "Refuse",IDC_DREFUSE,"Button",BS_AUTORADIOBUTTON,81,57,39,10
-    CONTROL         "Accept",IDC_DACCEPT,"Button",BS_AUTORADIOBUTTON,131,57,38,10
+    CONTROL         "Refuse",IDC_DREFUSE,"Button",BS_AUTORADIOBUTTON,67,55,39,10
+    CONTROL         "Accept",IDC_DACCEPT,"Button",BS_AUTORADIOBUTTON,117,55,38,10
+    CONTROL         "Refuse (allow locked)",IDC_DRefuseOnly,"Button",BS_AUTORADIOBUTTON,166,55,84,10
     EDITTEXT        IDC_AUTHHOST,60,67,188,14,ES_AUTOHSCROLL
     LTEXT           "AuthHosts:",IDC_STATIC,15,70,37,8
     CONTROL         "Query If No Logon",IDC_QNOLOGON,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,86,71,10
@@ -329,12 +318,12 @@ BEGIN
     LTEXT           "Viewer Port",IDC_STATIC,209,107,38,8
 END
 
-IDD_ABOUTBOX DIALOG  22, 17, 230, 75
+IDD_ABOUTBOX DIALOG 22, 17, 230, 75
 STYLE DS_SETFONT | DS_MODALFRAME | WS_CAPTION | WS_SYSMENU
 CAPTION "About"
 FONT 8, "MS Shell Dlg"
 BEGIN
-    ICON            IDI_UVNC_SETTINGS,IDC_MYICON,14,9,16,16
+    ICON            107,IDC_MYICON,14,9,16,16
     LTEXT           "uvnc_settings Version 1.0",IDC_STATIC,49,10,119,8,SS_NOPREFIX
     LTEXT           "Copyright (C) 2008",IDC_STATIC,49,20,119,8
     DEFPUSHBUTTON   "OK",IDOK,195,6,30,11,WS_GROUP
@@ -375,7 +364,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_PASSWD, DIALOG
     BEGIN
@@ -430,7 +419,7 @@ END
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_APP_TITLE           "uvnc_settings"
     IDC_UVNC_SETTINGS       "UVNC_SETTINGS"
@@ -444,10 +433,17 @@ END
 // Dutch (Belgium) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NLB)
-#ifdef _WIN32
 LANGUAGE LANG_DUTCH, SUBLANG_DUTCH_BELGIAN
 #pragma code_page(1252)
-#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_ICON1               ICON                    "settings.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //

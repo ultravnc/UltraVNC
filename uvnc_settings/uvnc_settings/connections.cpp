@@ -23,6 +23,7 @@ BOOL CALLBACK DlgProcCON(HWND hwnd, UINT uMsg,
 			SendMessage(GetDlgItem(hwnd, IDQUERY), BM_SETCHECK, queryEnabled, 0);
 			EnableWindow(GetDlgItem(hwnd, IDQUERYTIMEOUT), queryEnabled);
 			EnableWindow(GetDlgItem(hwnd, IDC_DREFUSE), queryEnabled);
+			EnableWindow(GetDlgItem(hwnd, IDC_DRefuseOnly), queryEnabled);
 			EnableWindow(GetDlgItem(hwnd, IDC_DACCEPT), queryEnabled);
 			EnableWindow(GetDlgItem(hwnd, IDC_QNOLOGON), queryEnabled);
 			EnableWindow(GetDlgItem(hwnd, IDC_AUTHHOST), queryEnabled);
@@ -39,6 +40,9 @@ BOOL CALLBACK DlgProcCON(HWND hwnd, UINT uMsg,
 				break;
 			case 1:
 				hQuerySetting = GetDlgItem(hwnd, IDC_DACCEPT);
+				break;
+			case 2:
+				hQuerySetting = GetDlgItem(hwnd, IDC_DRefuseOnly);
 				break;
 			default:
 				hQuerySetting = GetDlgItem(hwnd, IDC_DREFUSE);
@@ -101,6 +105,7 @@ BOOL CALLBACK DlgProcCON(HWND hwnd, UINT uMsg,
 			SendMessage(GetDlgItem(hwnd, IDQUERY), BM_SETCHECK, queryEnabled, 0);
 			EnableWindow(GetDlgItem(hwnd, IDQUERYTIMEOUT), queryEnabled);
 			EnableWindow(GetDlgItem(hwnd, IDC_DREFUSE), queryEnabled);
+			EnableWindow(GetDlgItem(hwnd, IDC_DRefuseOnly), queryEnabled);
 			EnableWindow(GetDlgItem(hwnd, IDC_DACCEPT), queryEnabled);
 			EnableWindow(GetDlgItem(hwnd, IDC_QNOLOGON), queryEnabled);
 			EnableWindow(GetDlgItem(hwnd, IDC_AUTHHOST), queryEnabled);
@@ -129,6 +134,10 @@ BOOL CALLBACK DlgProcCON(HWND hwnd, UINT uMsg,
 				} else if (SendMessage(GetDlgItem(hwnd, IDC_DACCEPT), BM_GETCHECK, 0, 0)
 					== BST_CHECKED) {
 					QueryAccept=1;
+				} 
+				else if (SendMessage(GetDlgItem(hwnd, IDC_DRefuseOnly), BM_GETCHECK, 0, 0)
+					== BST_CHECKED) {
+					QueryAccept=2;
 				} 
 
 				if (SendMessage(GetDlgItem(hwnd, IDC_MV1), BM_GETCHECK, 0, 0)
