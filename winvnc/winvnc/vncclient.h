@@ -112,6 +112,7 @@ public:
 
 	// Client manipulation functions for use by the server
 	virtual void SetBuffer(vncBuffer *buffer);
+	bool	NotifyUpdate(rfbFramebufferUpdateRequestMsg fur);
 
 	// Update handling functions
 	// These all lock the UpdateLock themselves

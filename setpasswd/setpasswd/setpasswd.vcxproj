@@ -141,7 +141,7 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>signtool.exe sign /f c:\uvnccert.pfx /p emptypassword /v /t http://timestamp.globalsign.com/scripts/timstamp.dll "$(OutDir)$(TargetName)$(TargetExt)"</Command>
+      <Command>signtool.exe sign /f c:\uvnccert.pfx /p changeme /v /t http://timestamp.globalsign.com/scripts/timstamp.dll "$(OutDir)$(TargetName)$(TargetExt)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -165,7 +165,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
     </Link>
     <PostBuildEvent>
-      <Command>signtool.exe sign /f c:\uvnccert.pfx /p emptypassword /v /t http://timestamp.globalsign.com/scripts/timstamp.dll "$(OutDir)$(TargetName)$(TargetExt)"</Command>
+      <Command>signtool.exe sign /f c:\uvnccert.pfx /p changeme /v /t http://timestamp.globalsign.com/scripts/timstamp.dll "$(OutDir)$(TargetName)$(TargetExt)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

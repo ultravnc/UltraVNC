@@ -295,7 +295,7 @@ public:
 
     ~omni_condition(void);
 
-    void wait(void);
+    bool wait(DWORD dwTimeout=INFINITE);
 	// wait for the condition variable to be signalled.  The mutex is
 	// implicitly released before waiting and locked again after waking up.
 	// If wait() is called by multiple threads, a signal may wake up more

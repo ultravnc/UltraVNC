@@ -296,7 +296,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="signtool.exe sign /f c:\uvnccert.pfx /p emptypassword /v /t http://timestamp.globalsign.com/scripts/timstamp.dll $(OutDir)/$(TargetName)$(TargetExt)"
+				CommandLine="signtool.exe sign /f c:\uvnccert.pfx /p changeme /v /t http://timestamp.globalsign.com/scripts/timstamp.dll $(OutDir)/$(TargetName)$(TargetExt)"
 			/>
 		</Configuration>
 		<Configuration

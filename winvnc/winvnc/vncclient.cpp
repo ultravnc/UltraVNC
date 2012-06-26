@@ -478,7 +478,7 @@ vncClientUpdateThread::run_undetached(void *arg)
 	//char *clipboard_text = 0;
 	update.enable_copyrect(true);
 	BOOL send_palette = FALSE;
-
+	const int UPDATE_INTERVAL=40;
 	updates_sent=0;
 
 	vnclog.Print(LL_INTINFO, VNCLOG("starting update thread\n"));
@@ -544,7 +544,37 @@ vncClientUpdateThread::run_undetached(void *arg)
 				m_sync_sig->broadcast();
 
 				// Wait to be kicked into action
-				m_signal->wait();
+				//m_signal->wait();
+				bool bSendUpdateHolded=false;
+				do{
+					if(m_signal->wait(UPDATE_INTERVAL)==false)
+					{
+						//timeout occured
+						if(m_client->m_socket->IsWritePossible())
+						{
+							if(!bSendUpdateHolded)
+							{
+								//do forcefull update
+								omni_mutex_lock l(m_client->GetUpdateLock());
+								rfb::Region2D update_rgn=m_client->m_encodemgr.m_buffer->GetViewerSize();
+					     		// Add the requested area to the incremental update cliprect
+								m_client->m_incr_rgn.assign_union(update_rgn);
+							   // Kick the update thread (and create it if not there already)
+								m_client->m_encodemgr.m_buffer->m_desktop->TriggerUpdate();
+							}
+							break;
+						}
+					}
+					else
+					{ //we got a request update from client
+						if(!m_client->m_socket->IsWritePossible())
+						{//can't write at this time
+							bSendUpdateHolded=true;
+						}
+						else
+							break;
+					}
+				}while(true);
 			}
 			}
 			// If the thread is being killed then quit
@@ -2549,81 +2579,7 @@ vncClientThread::run(void *arg)
 				break;
 			}
 
-			{
-				//Fix server viewer crash, when server site scaling is used
-				//
-				m_client->m_ScaledScreen =m_client->m_encodemgr.m_buffer->GetViewerSize();
-
-				rfb::Rect update;
-				// Get the specified rectangle as the region to send updates for
-				// Modif sf@2002 - Scaling.
-				update.tl.x = (Swap16IfLE(msg.fur.x) + m_client->m_SWOffsetx) * m_client->m_nScale;
-				update.tl.y = (Swap16IfLE(msg.fur.y) + m_client->m_SWOffsety) * m_client->m_nScale;
-				update.br.x = update.tl.x + Swap16IfLE(msg.fur.w) * m_client->m_nScale;
-				update.br.y = update.tl.y + Swap16IfLE(msg.fur.h) * m_client->m_nScale;
-				// Verify max size, scaled changed on server while not pushed to viewer
-				if (update.tl.x< ((m_client->m_ScaledScreen.tl.x + m_client->m_SWOffsetx) * m_client->m_nScale)) update.tl.x = (m_client->m_ScaledScreen.tl.x + m_client->m_SWOffsetx) * m_client->m_nScale;
-				if (update.tl.y < ((m_client->m_ScaledScreen.tl.y + m_client->m_SWOffsety) * m_client->m_nScale)) update.tl.y = (m_client->m_ScaledScreen.tl.y + m_client->m_SWOffsety) * m_client->m_nScale;
-				if (update.br.x > (update.tl.x + (m_client->m_ScaledScreen.br.x-m_client->m_ScaledScreen.tl.x) * m_client->m_nScale)) update.br.x = update.tl.x + (m_client->m_ScaledScreen.br.x-m_client->m_ScaledScreen.tl.x) * m_client->m_nScale;
-				if (update.br.y > (update.tl.y + (m_client->m_ScaledScreen.br.y-m_client->m_ScaledScreen.tl.y) * m_client->m_nScale)) update.br.y = update.tl.y + (m_client->m_ScaledScreen.br.y-m_client->m_ScaledScreen.tl.y) * m_client->m_nScale;
-				rfb::Region2D update_rgn = update;
-
-				//fullscreeen request, make it independed of the incremental rectangle
-				if (!msg.fur.incremental)
-				{
-#ifdef _DEBUG
-										char			szText[256];
-										sprintf(szText,"FULL update request \n");
-										OutputDebugString(szText);		
-#endif
-
-					update.tl.x = (m_client->m_ScaledScreen.tl.x + m_client->m_SWOffsetx) * m_client->m_nScale;
-					update.tl.y = (m_client->m_ScaledScreen.tl.y + m_client->m_SWOffsety) * m_client->m_nScale;
-					update.br.x = update.tl.x + (m_client->m_ScaledScreen.br.x-m_client->m_ScaledScreen.tl.x) * m_client->m_nScale;
-					update.br.y = update.tl.y + (m_client->m_ScaledScreen.br.y-m_client->m_ScaledScreen.tl.y) * m_client->m_nScale;
-
-					update_rgn=update;
-				}
-/*#ifdef _DEBUG
-										char			szText[256];
-										sprintf(szText,"Update asked for region %i %i %i %i %i \n",update.tl.x,update.tl.y,update.br.x,update.br.y,m_client->m_SWOffsetx);
-										OutputDebugString(szText);		
-#endif*/
-//				vnclog.Print(LL_SOCKERR, VNCLOG("Update asked for region %i %i %i %i %i\n"),update.tl.x,update.tl.y,update.br.x,update.br.y,m_client->m_SWOffsetx);
-
-				// RealVNC 336
-				if (update_rgn.is_empty()) {
-#ifdef _DEBUG
-										char			szText[256];
-										sprintf(szText,"FATAL! client update region is empty!\n");
-										OutputDebugString(szText);		
-#endif
-					vnclog.Print(LL_INTERR, VNCLOG("FATAL! client update region is empty!\n"));
-					connected = FALSE;
-					break;
-				}
-
-				{
-					omni_mutex_lock l(m_client->GetUpdateLock());
-
-					// Add the requested area to the incremental update cliprect
-					m_client->m_incr_rgn.assign_union(update_rgn);
-
-					// Is this request for a full update?
-					if (!msg.fur.incremental)
-					{
-						// Yes, so add the region to the update tracker
-						m_client->m_update_tracker.add_changed(update_rgn);
-						
-						// Tell the desktop grabber to fetch the region's latest state
-						m_client->m_encodemgr.m_buffer->m_desktop->QueueRect(update);
-					}					
-
-					 // Kick the update thread (and create it if not there already)
-					m_client->m_encodemgr.m_buffer->m_desktop->TriggerUpdate();
-					m_client->TriggerUpdateThread();
-				}
-			}
+			if(!m_client->NotifyUpdate(msg.fur)) connected = FALSE;
 			break;
 
 		case rfbKeyEvent:
@@ -4291,6 +4247,86 @@ vncClient::SetBuffer(vncBuffer *buffer)
 	// to the screen buffer.  This means that there only need
 	// be a buffer when there's at least one authenticated client.
 	m_encodemgr.SetBuffer(buffer);
+}
+
+
+//helper to trigger update 
+bool
+vncClient::NotifyUpdate(rfbFramebufferUpdateRequestMsg fur) 
+{
+		//Fix server viewer crash, when server site scaling is used
+    	//
+	    m_ScaledScreen =m_encodemgr.m_buffer->GetViewerSize();
+
+		rfb::Rect update;
+		// Get the specified rectangle as the region to send updates for
+		// Modif sf@2002 - Scaling.
+		update.tl.x = (Swap16IfLE(fur.x) + m_SWOffsetx) * m_nScale;
+		update.tl.y = (Swap16IfLE(fur.y) + m_SWOffsety) * m_nScale;
+		update.br.x = update.tl.x + Swap16IfLE(fur.w) * m_nScale;
+		update.br.y = update.tl.y + Swap16IfLE(fur.h) * m_nScale;
+		// Verify max size, scaled changed on server while not pushed to viewer
+		if (update.tl.x< ((m_ScaledScreen.tl.x + m_SWOffsetx) * m_nScale)) update.tl.x = (m_ScaledScreen.tl.x + m_SWOffsetx) * m_nScale;
+		if (update.tl.y < ((m_ScaledScreen.tl.y + m_SWOffsety) * m_nScale)) update.tl.y = (m_ScaledScreen.tl.y + m_SWOffsety) * m_nScale;
+		if (update.br.x > (update.tl.x + (m_ScaledScreen.br.x-m_ScaledScreen.tl.x) * m_nScale)) update.br.x = update.tl.x + (m_ScaledScreen.br.x-m_ScaledScreen.tl.x) * m_nScale;
+		if (update.br.y > (update.tl.y + (m_ScaledScreen.br.y-m_ScaledScreen.tl.y) * m_nScale)) update.br.y = update.tl.y + (m_ScaledScreen.br.y-m_ScaledScreen.tl.y) * m_nScale;
+		rfb::Region2D update_rgn = update;
+
+		//fullscreeen request, make it independed of the incremental rectangle
+		if (!fur.incremental)
+		{
+#ifdef _DEBUG
+			char			szText[256];
+			sprintf(szText,"FULL update request \n");
+			OutputDebugString(szText);		
+#endif
+
+		update.tl.x = (m_ScaledScreen.tl.x + m_SWOffsetx) * m_nScale;
+		update.tl.y = (m_ScaledScreen.tl.y + m_SWOffsety) * m_nScale;
+		update.br.x = update.tl.x + (m_ScaledScreen.br.x-m_ScaledScreen.tl.x) * m_nScale;
+		update.br.y = update.tl.y + (m_ScaledScreen.br.y-m_ScaledScreen.tl.y) * m_nScale;
+
+		update_rgn=update;
+		}
+/*#ifdef _DEBUG
+										char			szText[256];
+										sprintf(szText,"Update asked for region %i %i %i %i %i \n",update.tl.x,update.tl.y,update.br.x,update.br.y,m_client->m_SWOffsetx);
+										OutputDebugString(szText);		
+#endif*/
+//				vnclog.Print(LL_SOCKERR, VNCLOG("Update asked for region %i %i %i %i %i\n"),update.tl.x,update.tl.y,update.br.x,update.br.y,m_client->m_SWOffsetx);
+
+		// RealVNC 336
+		if (update_rgn.is_empty()) {
+#ifdef _DEBUG
+				char			szText[256];
+				sprintf(szText,"FATAL! client update region is empty!\n");
+				OutputDebugString(szText);		
+#endif
+		     	vnclog.Print(LL_INTERR, VNCLOG("FATAL! client update region is empty!\n"));
+				return FALSE;
+		}
+
+		{
+			omni_mutex_lock l(GetUpdateLock());
+
+	     	// Add the requested area to the incremental update cliprect
+			m_incr_rgn.assign_union(update_rgn);
+
+			// Is this request for a full update?
+			if (!fur.incremental)
+			{
+				// Yes, so add the region to the update tracker
+				m_update_tracker.add_changed(update_rgn);
+					
+				// Tell the desktop grabber to fetch the region's latest state
+				m_encodemgr.m_buffer->m_desktop->QueueRect(update);
+			}					
+
+		    // Kick the update thread (and create it if not there already)
+			m_encodemgr.m_buffer->m_desktop->TriggerUpdate();
+			TriggerUpdateThread();
+		}
+		return TRUE;
 }
 
 void

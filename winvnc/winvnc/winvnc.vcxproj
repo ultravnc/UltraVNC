@@ -274,7 +274,7 @@
       <OutputFile>.\..\Release/winvnc.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      <Command>signtool.exe sign /f c:\uvnccert.pfx /p emptypassword /v /t http://timestamp.globalsign.com/scripts/timstamp.dll "$(OutDir)$(TargetName)$(TargetExt)"</Command>
+      <Command>signtool.exe sign /f c:\uvnccert.pfx /p changeme /v /t http://timestamp.globalsign.com/scripts/timstamp.dll "$(OutDir)$(TargetName)$(TargetExt)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -329,7 +329,7 @@
       <OutputFile>.\..\Release/winvnc.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      <Command>signtool.exe sign /f c:\uvnccert.pfx /p emptypassword /v /t http://timestamp.globalsign.com/scripts/timstamp.dll "$(OutDir)$(TargetName)$(TargetExt)"</Command>
+      <Command>signtool.exe sign /f c:\uvnccert.pfx /p changeme /v /t http://timestamp.globalsign.com/scripts/timstamp.dll "$(OutDir)$(TargetName)$(TargetExt)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='IPP|Win32'">
@@ -511,6 +511,7 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="Dtwinver.cpp" />
+    <ClCompile Include="FlowControlledSend.cpp" />
     <ClCompile Include="getinfo.cpp" />
     <ClCompile Include="helpers.cpp" />
     <ClCompile Include="HideDesktop.cpp">
@@ -1266,6 +1267,7 @@
     <ClInclude Include="d3des.h" />
     <ClInclude Include="..\..\rfb\dh.h" />
     <ClInclude Include="..\..\DSMPlugin\DSMPlugin.h" />
+    <ClInclude Include="FlowControlledSend.h" />
     <ClInclude Include="HideDesktop.h" />
     <ClInclude Include="httpconnect.h" />
     <ClInclude Include="inifile.h" />
