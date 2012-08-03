@@ -15,12 +15,6 @@
     {
         "Entry"
         {
-        "MsmKey" = "8:_052BCE00FB0641489B715C8ACA9657CA"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_057C03B3B6C348A59E8D997A9884CC96"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -88,25 +82,19 @@
         "Entry"
         {
         "MsmKey" = "8:_42FE7889F2707625AD708AD6969D5CE5"
-        "OwnerKey" = "8:_9FFC46783A7F4BCB9DDA60B790D35975"
+        "OwnerKey" = "8:_7E9202FA9ECA4F4E821B4ABFAFEE00A5"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_42FE7889F2707625AD708AD6969D5CE5"
-        "OwnerKey" = "8:_7E9202FA9ECA4F4E821B4ABFAFEE00A5"
+        "OwnerKey" = "8:_9FFC46783A7F4BCB9DDA60B790D35975"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_496FDBFD8E724200972D9572D0438D7C"
         "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_50910BA94DBDE9C3BDC8B91C1759A097"
-        "OwnerKey" = "8:_052BCE00FB0641489B715C8ACA9657CA"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -178,12 +166,6 @@
         "Entry"
         {
         "MsmKey" = "8:_E8EBA67D0DF2389006367EE66F35B612"
-        "OwnerKey" = "8:_052BCE00FB0641489B715C8ACA9657CA"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_E8EBA67D0DF2389006367EE66F35B612"
         "OwnerKey" = "8:_E7889E76F1B34653A90C53D3F997EBAF"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -196,13 +178,13 @@
         "Entry"
         {
         "MsmKey" = "8:_F8102562A64423CDCAC1C20AD91D5EEB"
-        "OwnerKey" = "8:_7E9202FA9ECA4F4E821B4ABFAFEE00A5"
+        "OwnerKey" = "8:_30A3C3ED62BD436097EAA36546BB4380"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_F8102562A64423CDCAC1C20AD91D5EEB"
-        "OwnerKey" = "8:_30A3C3ED62BD436097EAA36546BB4380"
+        "OwnerKey" = "8:_7E9202FA9ECA4F4E821B4ABFAFEE00A5"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -429,26 +411,6 @@
             {
             "SourcePath" = "8:ACTIVEDS.dll"
             "TargetName" = "8:ACTIVEDS.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:TRUE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_50910BA94DBDE9C3BDC8B91C1759A097"
-            {
-            "SourcePath" = "8:COMDLG32.dll"
-            "TargetName" = "8:COMDLG32.dll"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
             "Condition" = "8:"
@@ -866,7 +828,7 @@
             "Target" = "8:_8E29FEC8D8F44EA898A22D8310862267"
             "Folder" = "8:_97AE57B765F34429BF8EAA1F4067FFD5"
             "WorkingFolder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
-            "Icon" = "8:_052BCE00FB0641489B715C8ACA9657CA"
+            "Icon" = "8:"
             "Feature" = "8:"
             }
             "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_97F4C62031BD43429340CBDC5914135E"
@@ -877,10 +839,10 @@
             "ShowCmd" = "3:1"
             "IconIndex" = "3:101"
             "Transitive" = "11:FALSE"
-            "Target" = "8:_052BCE00FB0641489B715C8ACA9657CA"
+            "Target" = "8:"
             "Folder" = "8:_24665A4E9C2843369A076809668F5E3C"
             "WorkingFolder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
-            "Icon" = "8:_052BCE00FB0641489B715C8ACA9657CA"
+            "Icon" = "8:"
             "Feature" = "8:"
             }
             "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_B1897D1FD5ED46C6A74FA623BEF02AFD"
@@ -891,10 +853,10 @@
             "ShowCmd" = "3:1"
             "IconIndex" = "3:101"
             "Transitive" = "11:FALSE"
-            "Target" = "8:_052BCE00FB0641489B715C8ACA9657CA"
+            "Target" = "8:"
             "Folder" = "8:_97AE57B765F34429BF8EAA1F4067FFD5"
             "WorkingFolder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
-            "Icon" = "8:_052BCE00FB0641489B715C8ACA9657CA"
+            "Icon" = "8:"
             "Feature" = "8:"
             }
             "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_D6A42525FBAD48DC8428C8AD86945D7A"
@@ -1969,34 +1931,6 @@
         }
         "ProjectOutput"
         {
-            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_052BCE00FB0641489B715C8ACA9657CA"
-            {
-            "SourcePath" = "8:..\\Release\\vncviewer.exe"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
-            "Condition" = "8:VIEWER=1"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            "ProjectOutputGroupRegister" = "3:1"
-            "OutputConfiguration" = "8:"
-            "OutputGroupCanonicalName" = "8:Built"
-            "OutputProjectGuid" = "8:{357D07B6-0613-4B05-9D22-1764A49AC945}"
-            "ShowKeyOutput" = "11:TRUE"
-                "ExcludeFilters"
-                {
-                }
-            }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_057C03B3B6C348A59E8D997A9884CC96"
             {
             "SourcePath" = "8:..\\Release\\logging.dll"
