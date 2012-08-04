@@ -34,7 +34,7 @@
 #ifdef UNDER_CE
 #include "omnithreadce.h"
 #else
-#include "omnithread.h"
+#include "omnithread/omnithread.h"
 #include "VNCviewerApp32.h"
 #endif
 

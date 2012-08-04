@@ -45,7 +45,7 @@
 #include "omnithreadce.h"
 #define SD_BOTH 0x02
 #else
-#include "omnithread.h"
+#include "omnithread/omnithread.h"
 #endif
 
 #include "ClientConnection.h"
