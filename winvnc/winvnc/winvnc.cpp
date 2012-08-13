@@ -158,8 +158,8 @@ Myinit(HINSTANCE hInstance)
     //Load all messages from ressource file
     Load_Localization(hInstResDLL) ;
 	vnclog.SetFile();
-//	vnclog.SetMode(2);
-//	vnclog.SetLevel(10);
+	//vnclog.SetMode(4);
+	//vnclog.SetLevel(10);
 
 #ifdef _DEBUG
 	{
@@ -258,8 +258,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 	//strcat(WORKDIR,"WinVNC.log");
 
 	vnclog.SetFile();
-//	vnclog.SetMode(2);
-//	vnclog.SetLevel(10);
+	//vnclog.SetMode(4);
+	//vnclog.SetLevel(10);
 
 #ifdef _DEBUG
 	{

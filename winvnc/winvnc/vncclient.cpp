@@ -519,7 +519,6 @@ vncClientUpdateThread::run_undetached(void *arg)
 				// Issue the synchronisation signal, to tell other threads
 				// where we have got to
 				m_sync_sig->broadcast();
-
 				// Wait to be kicked into action
 				m_signal->wait();
 			}
@@ -543,14 +542,14 @@ vncClientUpdateThread::run_undetached(void *arg)
 				// where we have got to
 				m_sync_sig->broadcast();
 
-				// Wait to be kicked into action
-				//m_signal->wait();
+				// Wait to be kicked into action				
+#ifdef FLOWCONTROL
 				bool bSendUpdateHolded=false;
 				do{
 					if(m_signal->wait(UPDATE_INTERVAL)==false)
 					{
 						//timeout occured
-						if(m_client->m_socket->IsWritePossible())
+						if(m_client->m_socket->IsWritePossible() || !m_client->m_socket->IsActive())
 						{
 							if(!bSendUpdateHolded)
 							{
@@ -567,7 +566,7 @@ vncClientUpdateThread::run_undetached(void *arg)
 					}
 					else
 					{ //we got a request update from client
-						if(!m_client->m_socket->IsWritePossible())
+						if(!m_client->m_socket->IsWritePossible()|| !m_client->m_socket->IsActive())
 						{//can't write at this time
 							bSendUpdateHolded=true;
 						}
@@ -575,6 +574,10 @@ vncClientUpdateThread::run_undetached(void *arg)
 							break;
 					}
 				}while(true);
+#else
+				m_signal->wait();
+				//m_signal->wait(UPDATE_INTERVAL*10);
+#endif
 			}
 			}
 			// If the thread is being killed then quit
@@ -2069,11 +2072,11 @@ vncClientThread::run(void *arg)
 //	m_client->m_fullscreen = m_client->m_encodemgr.GetSize();
 
 	// Modif sf@2002 - Scaling
-	{
-	omni_mutex_lock l(m_client->GetUpdateLock());
 	if (m_server->AreThereMultipleViewers()==false)
-		m_client->m_encodemgr.m_buffer->SetScale(m_server->GetDefaultScale()); // v1.1.2
-	}
+		{
+			omni_mutex_lock l(m_client->GetUpdateLock());
+			m_client->m_encodemgr.m_buffer->SetScale(m_server->GetDefaultScale()); // v1.1.2
+		}
 	m_client->m_ScaledScreen = m_client->m_encodemgr.m_buffer->GetViewerSize();
 	m_client->m_nScale = m_client->m_encodemgr.m_buffer->GetScale();
 
@@ -2272,11 +2275,11 @@ vncClientThread::run(void *arg)
 				break;
 			}
 		}
-#ifdef _DEBUG
+/*#ifdef _DEBUG
 										char			szText[256];
 										sprintf(szText," msg.type %i \n",msg.type);
 										OutputDebugString(szText);		
-#endif
+#endif*/
 		// What to do is determined by the message id
 		switch(msg.type)
 		{

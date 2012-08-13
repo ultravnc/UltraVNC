@@ -30,6 +30,8 @@
 // The VSocket class provides simple socket functionality,
 // independent of platform.  Hurrah.
 
+#define FLOWCONTROL
+
 class VSocket;
 
 #if (!defined(_ATT_VSOCKET_DEFINED))
@@ -179,8 +181,10 @@ public:
   //adzm 2010-08-01
   DWORD GetLastSentTick() { return m_LastSentTick; };
   IIntegratedPlugin* m_pIntegratedPluginInterface;
-
+#ifdef FLOWCONTROL
   int IsWritePossible(DWORD dwBytesWriteNeeded=1500);
+  BOOL IsActive();
+#endif
   ////////////////////////////
   // Internal structures
 protected:
@@ -194,7 +198,9 @@ protected:
   //adzm 2009-06-20
   IPlugin* m_pPluginInterface;
   //adzm 2010-05-10
+#ifdef FLOWCONTROL
   CFlowControlledSend *m_pSendManager;
+#endif
   bool m_fUsePlugin;
   bool m_fPluginStreamingIn; //adzm 2010-09
   bool m_fPluginStreamingOut; //adzm 2010-09

@@ -399,7 +399,8 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		_this->SetPalette();
 
 		// Update any palette-based clients, too
-		_this->m_server->UpdatePalette(true);
+		//set to flase to avoid deadlock
+		_this->m_server->UpdatePalette(false);
 		}
 		return 0;
 

@@ -169,6 +169,12 @@ BOOL CFlowControlledSend::sendall(char *buff,unsigned int bufflen,int dummy)
 	}
 	return TRUE;
 }
+
+
+BOOL CFlowControlledSend::IsActive()
+{
+	return m_bBDPQuerySupported;
+}
 //check how many bytes can be written
 DWORD	CFlowControlledSend::CanWrite(DWORD dwBytesWriteNeeded,LPWRITE_FREE writeCallback,LPVOID lpParam)
 {

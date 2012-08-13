@@ -154,7 +154,9 @@ VSocket::VSocket()
 	//adzm 2010-09
 	m_fPluginStreamingIn = false;
 	m_fPluginStreamingOut = false;
+#ifdef FLOWCONTROL
 	m_pSendManager=NULL;
+#endif
 }
 
 ////////////////////////////
@@ -213,8 +215,10 @@ VSocket::Create()
 
   // adzm 2010-08
   SetDefaultSocketOptions();
+#ifdef FLOWCONTROL
   m_pSendManager = new CFlowControlledSend(); 
   m_pSendManager->Init(  sock);
+#endif
   return VTrue;
 }
 
@@ -226,11 +230,13 @@ VSocket::Close()
   if (sock >= 0)
     {
 	  vnclog.Print(LL_SOCKINFO, VNCLOG("closing socket\n"));
+#ifdef FLOWCONTROL
 	  if(m_pSendManager)
 	  {
 		m_pSendManager->Close();
 		m_pSendManager=NULL;
 	  }
+#endif
 	  shutdown(sock, SD_BOTH);
 #ifdef __WIN32__
 	  closesocket(sock);
@@ -393,8 +399,10 @@ VSocket::Accept()
   if (new_socket != NULL)
   {
       new_socket->sock = new_socket_id;
+#ifdef FLOWCONTROL
 	  new_socket->m_pSendManager = new CFlowControlledSend();
 	  new_socket->m_pSendManager->Init(  new_socket_id);
+#endif
   }
   else
   {
@@ -616,8 +624,11 @@ VSocket::Send(const char *buff, const VCard bufflen)
 	if (newsize >= G_SENDBUFFER)
 	{
 		    memcpy(queuebuffer+queuebuffersize,buff2,G_SENDBUFFER-queuebuffersize);
+#ifdef FLOWCONTROL
 			if (!m_pSendManager->sendall(queuebuffer,G_SENDBUFFER,0)) return FALSE;
-//			if (!sendall(sock,queuebuffer,G_SENDBUFFER,0)) return FALSE;
+#else
+			if (!sendall(sock,queuebuffer,G_SENDBUFFER,0)) return FALSE;
+#endif
 //			vnclog.Print(LL_SOCKERR, VNCLOG("SEND  %i\n") ,G_SENDBUFFER);
 			buff2+=(G_SENDBUFFER-queuebuffersize);
 			bufflen2-=(G_SENDBUFFER-queuebuffersize);
@@ -625,8 +636,11 @@ VSocket::Send(const char *buff, const VCard bufflen)
 			// adzm 2010-09 - flush as soon as we have a full buffer, not if we have exceeded it.
 			while (bufflen2 >= G_SENDBUFFER)
 			{
+#ifdef FLOWCONTROL
 				if (!m_pSendManager->sendall(buff2,G_SENDBUFFER,0)) return false;
-//				if (!sendall(sock,buff2,G_SENDBUFFER,0)) return false;
+#else
+				if (!sendall(sock,buff2,G_SENDBUFFER,0)) return false;
+#endif
 //				vnclog.Print(LL_SOCKERR, VNCLOG("SEND 1 %i\n") ,G_SENDBUFFER);
 				buff2+=G_SENDBUFFER;
 				bufflen2-=G_SENDBUFFER;
@@ -635,8 +649,11 @@ VSocket::Send(const char *buff, const VCard bufflen)
 	memcpy(queuebuffer+queuebuffersize,buff2,bufflen2);
 	queuebuffersize+=bufflen2;
 	if (queuebuffersize > 0) {
+#ifdef FLOWCONTROL
 		if (!m_pSendManager->sendall(queuebuffer,queuebuffersize,0))
-		//if (!sendall(sock,queuebuffer,queuebuffersize,0)) 
+#else
+		if (!sendall(sock,queuebuffer,queuebuffersize,0)) 
+#endif
 			return false;
 	}
 //	vnclog.Print(LL_SOCKERR, VNCLOG("SEND 2 %i\n") ,queuebuffersize);
@@ -659,8 +676,11 @@ VSocket::SendQueued(const char *buff, const VCard bufflen)
 			m_LastSentTick = GetTickCount();
 
 		    memcpy(queuebuffer+queuebuffersize,buff2,G_SENDBUFFER-queuebuffersize);
+#ifdef FLOWCONTROL
 			if (!m_pSendManager->sendall(queuebuffer,G_SENDBUFFER,0)) return FALSE;
-			//if (!sendall(sock,queuebuffer,G_SENDBUFFER,0)) return FALSE;
+#else
+			if (!sendall(sock,queuebuffer,G_SENDBUFFER,0)) return FALSE;
+#endif
 		//	vnclog.Print(LL_SOCKERR, VNCLOG("SEND Q  %i\n") ,G_SENDBUFFER);
 			buff2+=(G_SENDBUFFER-queuebuffersize);
 			bufflen2-=(G_SENDBUFFER-queuebuffersize);
@@ -669,8 +689,11 @@ VSocket::SendQueued(const char *buff, const VCard bufflen)
 			// adzm 2010-09 - flush as soon as we have a full buffer, not if we have exceeded it.
 			while (bufflen2 >= G_SENDBUFFER)
 			{
+#ifdef FLOWCONTROL
 				if (!m_pSendManager->sendall(buff2,G_SENDBUFFER,0)) return false;
-				//if (!sendall(sock,buff2,G_SENDBUFFER,0)) return false;				
+#else
+				if (!sendall(sock,buff2,G_SENDBUFFER,0)) return false;				
+#endif
 				//adzm 2010-08-01
 				m_LastSentTick = GetTickCount();
 			//	vnclog.Print(LL_SOCKERR, VNCLOG("SEND Q  %i\n") ,G_SENDBUFFER);
@@ -824,8 +847,11 @@ VSocket::ClearQueue()
 	//adzm 2010-08-01
 	m_LastSentTick = GetTickCount();
 	//adzm 2010-09 - return a bool in ClearQueue
+#ifdef FLOWCONTROL
 	if (!m_pSendManager->sendall(queuebuffer,queuebuffersize,0))
-	//if (!sendall(sock,queuebuffer,queuebuffersize,0)) 
+#else
+	if (!sendall(sock,queuebuffer,queuebuffersize,0)) 
+#endif
 		return VFalse;
 	queuebuffersize=0;
   }
@@ -1116,12 +1142,19 @@ VSocket::ReadSelect(VCard to)
  }
 #endif
 
+#ifdef FLOWCONTROL
 //check if bandwidth available
 int VSocket::IsWritePossible(DWORD dwBytesWriteNeeded)
 {
 	return m_pSendManager->CanWrite(dwBytesWriteNeeded,NULL,NULL);
 }
 
+BOOL VSocket::IsActive()
+{
+	return m_pSendManager->IsActive();
+}
+
+#endif
 
 extern bool			fShutdownOrdered;
 bool

@@ -33,6 +33,7 @@ public:
 		BOOL Close();
 	BOOL		sendall(char *buff,unsigned int bufflen,int dummy);
 	DWORD		CanWrite(DWORD dwBytesWriteNeeded,LPWRITE_FREE writeCallback,LPVOID lpParam);
+	BOOL		IsActive();
 private:
 	typedef struct ___OVERLAPPED_SEND_INFO{
 		WSAOVERLAPPED	Overlap;
@@ -61,5 +62,5 @@ private:
 	static t_GetPerTcpConnectionEStats      s_pGetPerTcpConnectionEStats;
 	static t_SetPerTcpConnectionEStats      s_pSetPerTcpConnectionEStats;
 	MIB_TCPROW                              m_SocketInfo;
-	BOOL									InitTCPStats();
+	BOOL									InitTCPStats();	
 };
