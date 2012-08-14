@@ -103,7 +103,7 @@ PixelCaptureEngine::PixelCaptureEngine()
 			m_bIsVista=false;
 	}
 void
-PixelCaptureEngine::PixelCaptureEngineInit(HDC rootdc, HDC memdc, HBITMAP membitmap, bool bCaptureAlpha, void *dibbits, int bpp, int bpr)
+PixelCaptureEngine::PixelCaptureEngineInit(HDC rootdc, HDC memdc, HBITMAP membitmap, bool bCaptureAlpha, void *dibbits, int bpp, int bpr,int offsetx,int offsety)
 	{
 		m_hmemdc=memdc;
 		m_membitmap=membitmap;
@@ -113,6 +113,8 @@ PixelCaptureEngine::PixelCaptureEngineInit(HDC rootdc, HDC memdc, HBITMAP membit
 		m_hrootdc=rootdc;
 		m_bytesPerPixel=bpp;
 		m_bytesPerRow=bpr;
+		m_ScreenOffsetx=offsetx;
+		m_ScreenOffsety=offsety;
 	}
 
 bool
@@ -125,7 +127,7 @@ PixelCaptureEngine::CaptureRect(const rfb::Rect& rect)
 					return false;
 
 				// Capture screen into bitmap
-				BOOL blitok = BitBlt(m_hmemdc, 0, 0, rect.width(), rect.height(), m_hrootdc, rect.tl.x, rect.tl.y, 
+				BOOL blitok = BitBlt(m_hmemdc, 0, 0, rect.width(), rect.height(), m_hrootdc, rect.tl.x+m_ScreenOffsetx, rect.tl.y+m_ScreenOffsety, 
 									 m_bCaptureAlpha ? (CAPTUREBLT | SRCCOPY) : SRCCOPY);
 				return blitok ? true : false;
 		}
@@ -243,7 +245,7 @@ bool vncDesktop::FastDetectChanges(rfb::Region2D &rgn, rfb::Rect &rect, int nZon
 	}
 
 	PixelEngine.PixelCaptureEngineInit(m_hrootdc, m_hmemdc, m_membitmap, m_fCaptureAlphaBlending && !m_Black_window_active, 
-		                           m_DIBbits, m_scrinfo.format.bitsPerPixel / 8, m_bytesPerRow);
+		                           m_DIBbits, m_scrinfo.format.bitsPerPixel / 8, m_bytesPerRow,m_ScreenOffsetx,m_ScreenOffsety);
 	// We test one zone at a time 
 	// vnclog.Print(LL_INTINFO, VNCLOG("### Polling Grid %d - SubGrid %d\n"), nZone, m_nGridCycle); 
 	GridsList::iterator iGrid;
@@ -314,8 +316,8 @@ bool vncDesktop::FastDetectChanges(rfb::Region2D &rgn, rfb::Rect &rect, int nZon
 				POINT point;
 				RECT rect;
 
-				point.x = xo;
-				point.y = yo;
+				point.x = xo+m_ScreenOffsetx;
+				point.y = yo+m_ScreenOffsety;
 
 				// Find the smallest, non-hidden, non-disabled Window containing this pixel
 				// REM: We don't use ChildWindowFromPoint because we don't want of hidden windows
@@ -1028,7 +1030,12 @@ vncDesktop::InitBitmap()
 	
 	// JnZn558 if (multi_monitor && !VideoBuffer()) m_bmrect = rfb::Rect(0, 0,mymonitor[2].Width,mymonitor[2].Height);
 	if (multi_monitor && !VideoBuffer()) m_bmrect = rfb::Rect(0, 0,mymonitor[3].Width,mymonitor[3].Height);
-	else if (!VideoBuffer()) m_bmrect = rfb::Rect(0, 0,mymonitor[0].Width,mymonitor[0].Height);
+	else if (!VideoBuffer()) 
+		{
+			m_bmrect = rfb::Rect(0, 0,mymonitor[0].Width,mymonitor[0].Height);
+			m_ScreenOffsetx=mymonitor[0].offsetx;
+			m_ScreenOffsety=mymonitor[0].offsety;
+		}
 	// JnZn558 else m_bmrect = rfb::Rect(0, 0,GetDeviceCaps(m_hrootdc, HORZRES),GetDeviceCaps(m_hrootdc, VERTRES));
 	else m_bmrect = rfb::Rect(m_ScreenOffsetx, m_ScreenOffsety,m_ScreenWidth,m_ScreenHeight);
 	vnclog.Print(LL_INTINFO, VNCLOG("bitmap dimensions are %d x %d\n"), m_bmrect.br.x, m_bmrect.br.y);
@@ -1637,8 +1644,8 @@ vncDesktop::CaptureMouse(BYTE *scrBuff, UINT scrBuffSize)
 	// Get the cursor position
 	if (!GetCursorPos(&CursorPos))
 		return;
-	CursorPos.x -= m_ScreenOffsetx;
-	CursorPos.y -= m_ScreenOffsety;
+	//CursorPos.x -= m_ScreenOffsetx;
+	//CursorPos.y -= m_ScreenOffsety;
 	//vnclog.Print(LL_INTINFO, VNCLOG("CursorPos %i %i\n"),CursorPos.x, CursorPos.y);
 	// Translate position for hotspot
 	if (GetIconInfo(m_hcursor, &IconInfo))
