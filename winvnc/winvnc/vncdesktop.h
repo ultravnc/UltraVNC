@@ -211,7 +211,7 @@ class PixelCaptureEngine
 public:
 	PixelCaptureEngine();
 	~PixelCaptureEngine();
-	void PixelCaptureEngineInit(HDC rootdc, HDC memdc, HBITMAP membitmap, bool bCaptureAlpha, void *dibbits, int bpp, int bpr);
+	void PixelCaptureEngineInit(HDC rootdc, HDC memdc, HBITMAP membitmap, bool bCaptureAlpha, void *dibbits, int bpp, int bpr,int offsetx,int offsety);
 	bool CaptureRect(const rfb::Rect& rect);
 	COLORREF CapturePixel(int x, int y);
 	void ReleaseCapture();
@@ -227,6 +227,8 @@ private:
 	bool		m_bCaptureAlpha;
 	int			m_bytesPerPixel;
 	int			m_bytesPerRow;
+	int m_ScreenOffsetx;
+	int m_ScreenOffsety;
 };
 
 class vncDesktop
