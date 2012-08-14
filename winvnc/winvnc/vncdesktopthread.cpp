@@ -1102,16 +1102,12 @@ vncDesktopThread::run_undetached(void *arg)
 								if (m_desktop->m_server->UpdateWanted())
 								{
 									oldtick=newtick;
-					//				vnclog.Print(LL_INTERR, VNCLOG("UpdateWanted N\n"));
-									//TEST4
-									// Re-render the mouse's old location if it's moved
 									bool cursormoved = false;
 									POINT cursorpos;
 									if (GetCursorPos(&cursorpos) && 
 										((cursorpos.x != oldcursorpos.x) ||
 										(cursorpos.y != oldcursorpos.y)))
 									{
-					//					vnclog.Print(LL_INTERR, VNCLOG("UpdateWanted M %i %i %i %i\n"),cursorpos.x, oldcursorpos.x,cursorpos.y,oldcursorpos.y);
 										cursormoved = TRUE;
 										oldcursorpos = rfb::Point(cursorpos);
 										// nyama/marscha - PointerPos. Inform clients about mouse move.
