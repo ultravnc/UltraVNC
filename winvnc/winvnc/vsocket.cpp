@@ -1146,12 +1146,14 @@ VSocket::ReadSelect(VCard to)
 //check if bandwidth available
 int VSocket::IsWritePossible(DWORD dwBytesWriteNeeded)
 {
-	return m_pSendManager->CanWrite(dwBytesWriteNeeded,NULL,NULL);
+	if (m_pSendManager) return m_pSendManager->CanWrite(dwBytesWriteNeeded,NULL,NULL);
+	else return 0;
 }
 
 BOOL VSocket::IsActive()
 {
-	return m_pSendManager->IsActive();
+	if (m_pSendManager) return m_pSendManager->IsActive();
+	else return 0;
 }
 
 #endif
