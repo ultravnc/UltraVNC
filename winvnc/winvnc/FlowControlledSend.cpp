@@ -127,7 +127,7 @@ BOOL CFlowControlledSend::Close()
 //new overlapped send keeps only congestion window size pending
 BOOL CFlowControlledSend::sendall(char *buff,unsigned int bufflen,int dummy)
 {
-	LPOVERLAPPED_SEND_INFO		pInfo=new OVERLAPPED_SEND_INFO;
+	
 	WSABUF						DataBuf={0};
     DWORD						dwSentBytes=0;
 
@@ -139,6 +139,8 @@ BOOL CFlowControlledSend::sendall(char *buff,unsigned int bufflen,int dummy)
 	{
 		return ::sendall(m_RemoteSock,buff,bufflen,dummy);
 	}
+
+	LPOVERLAPPED_SEND_INFO		pInfo=new OVERLAPPED_SEND_INFO;
 	//queue the send to the writing thread 
 	DataBuf.buf = (CHAR*)pInfo->bySendData;
 	DataBuf.len=pInfo->dwLen= bufflen; 
@@ -146,12 +148,12 @@ BOOL CFlowControlledSend::sendall(char *buff,unsigned int bufflen,int dummy)
 	pInfo->Overlap.hEvent = WSACreateEvent();
 	INT iRet = WSASend(m_RemoteSock,&DataBuf,1,&dwSentBytes,0,&pInfo->Overlap,NULL);
 	INT iLasterr = WSAGetLastError();
-	if ((iRet == SOCKET_ERROR) &&
-         (WSA_IO_PENDING != iLasterr)
-			)
+	if ((iRet == SOCKET_ERROR) &&(WSA_IO_PENDING != iLasterr))
 	{
+		delete pInfo;
 		return FALSE;
 	}
+
 	if(iRet == ERROR_SUCCESS && dwSentBytes==bufflen )
 	{
 		//sent completed immmediately
@@ -167,6 +169,7 @@ BOOL CFlowControlledSend::sendall(char *buff,unsigned int bufflen,int dummy)
 		m_Sendlist.push_front(pInfo); 
 		SetEvent(m_hDataReady);
 	}
+	delete pInfo;
 	return TRUE;
 }
 
@@ -274,6 +277,7 @@ void* CFlowControlledSend::run_undetached(void * arg)
 
 	WSACloseEvent(pBDPChangeOvlap->hEvent );
 	delete pBDPChangeOvlap;
+	delete pWaitHandles;
 
 	return 0;
 }
