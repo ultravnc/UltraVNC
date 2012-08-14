@@ -128,7 +128,6 @@ vncDesktop::StartInitWindowthread()
 			vnclog.Print(LL_INTINFO, VNCLOG("StartInitWindowthread no default desk\n"));
 		}
 	}
-	can_be_hooked=false;
 }
 
 DWORD WINAPI
