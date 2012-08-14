@@ -546,13 +546,9 @@ vncClientUpdateThread::run_undetached(void *arg)
 #ifdef FLOWCONTROL
 				bool bSendUpdateHolded=false;
 				do{
-					if(m_signal->wait(UPDATE_INTERVAL)==false)
+					if(m_signal->wait(UPDATE_INTERVAL*100)==false)
 					{
-						//timeout occured
-						if(m_client->m_socket->IsWritePossible() || !m_client->m_socket->IsActive())
 						{
-							if(!bSendUpdateHolded)
-							{
 								//do forcefull update
 								omni_mutex_lock l(m_client->GetUpdateLock());
 								rfb::Region2D update_rgn=m_client->m_encodemgr.m_buffer->GetViewerSize();
@@ -561,22 +557,12 @@ vncClientUpdateThread::run_undetached(void *arg)
 							   // Kick the update thread (and create it if not there already)
 								m_client->m_encodemgr.m_buffer->m_desktop->TriggerUpdate();
 							}
-							break;
-						}
+
 					}
-					else
-					{ //we got a request update from client
-						if(!m_client->m_socket->IsWritePossible()|| !m_client->m_socket->IsActive())
-						{//can't write at this time
-							bSendUpdateHolded=true;
-						}
-						else
-							break;
-					}
+					else break;
 				}while(true);
 #else
 				m_signal->wait();
-				//m_signal->wait(UPDATE_INTERVAL*10);
 #endif
 			}
 			}
