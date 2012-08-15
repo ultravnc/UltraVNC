@@ -92,13 +92,13 @@ vncDesktopThread::Handle_Ringbuffer(mystruct *ringbuffer,rfb::Region2D &rgncache
 				rect.tl.y-=m_desktop->m_ScreenOffsety;
 				rect.br.y-=m_desktop->m_ScreenOffsety;
 				vnclog.Print(LL_INTERR, VNCLOG("REct %i %i %i %i  \n"),rect.tl.x,rect.br.x,rect.tl.y,rect.br.y);
-	#ifdef _DEBUG
+	/*#ifdef _DEBUG
 					char			szText[256];
 					DWORD error=GetLastError();
 					sprintf(szText,"REct1 %i %i %i %i  \n",rect.tl.x,rect.br.x,rect.tl.y,rect.br.y);
 					SetLastError(0);
 					OutputDebugString(szText);		
-	#endif			
+	#endif*/			
 				rect = rect.intersect(m_desktop->m_Cliprect);
 				if (!rect.is_empty())
 				{
@@ -146,13 +146,13 @@ vncDesktopThread::Handle_Ringbuffer(mystruct *ringbuffer,rfb::Region2D &rgncache
 				rect.tl.y-=m_desktop->m_ScreenOffsety;
 				rect.br.y-=m_desktop->m_ScreenOffsety;
 				//vnclog.Print(LL_INTERR, VNCLOG("REct %i %i %i %i  \n"),rect.tl.x,rect.br.x,rect.tl.y,rect.br.y);
-#ifdef _DEBUG
+/*#ifdef _DEBUG
 					char			szText[256];
 					DWORD error=GetLastError();
 					sprintf(szText,"REct2 %i %i %i %i  \n",rect.tl.x,rect.br.x,rect.tl.y,rect.br.y);
 					SetLastError(0);
 					OutputDebugString(szText);		
-	#endif				
+	#endif		*/		
 				rect = rect.intersect(m_desktop->m_Cliprect);
 				if (!rect.is_empty())
 				{

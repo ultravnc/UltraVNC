@@ -137,9 +137,9 @@ BEGIN
     CONTROL         "Poll Console Windows Only",IDC_CONSOLE_ONLY,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,117,26,99,15
     CONTROL         "Poll On Event Only",IDC_ONEVENT_ONLY,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,117,39,78,12
     CONTROL         "System HookDll",IDC_HOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,56,66,10
-    CONTROL         "Video Hook Driver",IDC_DRIVER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,68,74,10
-    CONTROL         "Low Accuracy ( Turbo Speed )",IDC_TURBOMODE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,81,112,10
-    PUSHBUTTON      "Check the Video Hook Driver",IDC_CHECKDRIVER,92,67,121,11
+    CONTROL         "Mirror Driver",IDC_DRIVER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,68,74,10
+    CONTROL         "Low Accuracy ( Turbo Speed )",IDC_TURBOMODE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,96,112,10
+    PUSHBUTTON      "Check the Mirror Driver",IDC_CHECKDRIVER,92,67,121,11
     GROUPBOX        "Single Window Sharing",IDC_STATIC,5,124,214,47,BS_LEFT
     CONTROL         "Share only the Server Window Named :",IDC_SINGLE_WINDOW,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,137,188,10
@@ -147,8 +147,9 @@ BEGIN
     DEFPUSHBUTTON   "&OK",IDOK,82,174,44,14
     PUSHBUTTON      "&Apply",IDC_APPLY,131,174,43,14
     PUSHBUTTON      "&Cancel",IDCANCEL,178,174,41,14
-    EDITTEXT        IDC_MAXCPU,54,99,40,14,ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           "Max Cpu :",IDC_STATIC,14,102,34,8
+    EDITTEXT        IDC_MAXCPU,54,106,40,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "Max Cpu :",IDC_STATIC,14,109,34,8
+    LTEXT           "Elevated access needed: Service or run as admin",IDC_STATIC,39,80,159,12
 END
 
 IDD_PROPERTIES1 DIALOGEX 0, 0, 390, 297
@@ -250,6 +251,7 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,210,204,54,16
     CONTROL         153,IDC_VNCLOGO,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_SUNKEN,7,5,269,199,WS_EX_TRANSPARENT
 END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -364,6 +366,7 @@ BEGIN
 END
 #endif    // APSTUDIO_INVOKED
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Version
@@ -405,6 +408,7 @@ BEGIN
     END
 END
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Menu
@@ -441,6 +445,7 @@ BEGIN
         MENUITEM "&Close VNC Connections",      ID_CLOSE
     END
 END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -487,11 +492,11 @@ BEGIN
     ID_WINVNC_ERROR         "WinVNC Error"
     ID_WINVNC_WARNIN        "WinVNC Warning"
     ID_PLUGIN_LOADIN        "Plugin Loading"
-    ID_NO_PASSWD_NO_OVERRIDE_ERR
+    ID_NO_PASSWD_NO_OVERRIDE_ERR 
                             "No password has been set & this machine has been preconfigured to prevent users from setting their own.\nYou must contact a System Administrator to configure WinVNC properly."
-    ID_NO_PASSWD_NO_OVERRIDE_WARN
+    ID_NO_PASSWD_NO_OVERRIDE_WARN 
                             "WARNING : This machine has been preconfigured to allow un-authenticated\nconnections to be accepted and to prevent users from enabling authentication."
-    ID_NO_PASSWD_NO_LOGON_WARN
+    ID_NO_PASSWD_NO_LOGON_WARN 
                             "WARNING : This machine has no default password set.  WinVNC will present the Default Properties dialog now to allow one to be entered."
 END
 
@@ -499,7 +504,7 @@ STRINGTABLE
 BEGIN
     ID_NO_OVERRIDE_ERR      "This machine has been preconfigured with WinVNC settings, which cannot be overridden by individual users.  The preconfigured settings may be modified only by a System Administrator."
     ID_NO_CURRENT_USER_ERR  "The WinVNC settings for the current user are unavailable at present."
-    ID_CANNOT_EDIT_DEFAULT_PREFS
+    ID_CANNOT_EDIT_DEFAULT_PREFS 
                             "You do not have sufficient priviliges to edit the default local WinVNC settings."
     ID_NO_PASSWORD_WARN     "WARNING : Running WinVNC without setting a password is a dangerous security risk!\nUntil you set a password, WinVNC will not accept incoming connections."
     ID_PLUGIN_NOT_LOAD      "The Plugin cannot be loaded.\n\rPlease check its integrity."
@@ -539,6 +544,7 @@ END
 #endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 
+
 /////////////////////////////////////////////////////////////////////////////
 // English (United Kingdom) resources
 
@@ -552,18 +558,18 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE
+1 TEXTINCLUDE 
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE
+2 TEXTINCLUDE 
 BEGIN
     "#include ""afxres.h""\r\n"
     "\0"
 END
 
-3 TEXTINCLUDE
+3 TEXTINCLUDE 
 BEGIN
     "\r\n"
     "\0"
@@ -573,6 +579,7 @@ END
 
 #endif    // English (United Kingdom) resources
 /////////////////////////////////////////////////////////////////////////////
+
 
 /////////////////////////////////////////////////////////////////////////////
 // Dutch (Belgium) resources
@@ -633,6 +640,7 @@ BEGIN
     LTEXT           "3",IDC_STATIC,11,56,8,8
 END
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // DESIGNINFO
@@ -660,6 +668,7 @@ BEGIN
 END
 #endif    // APSTUDIO_INVOKED
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // JAVAARCHIVE
@@ -686,11 +695,15 @@ IDB_LOGO64              BITMAP                  "res\\vnc-1.bmp"
 #endif    // Dutch (Belgium) resources
 /////////////////////////////////////////////////////////////////////////////
 
+
+
 #ifndef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
 //
 // Generated from the TEXTINCLUDE 3 resource.
 //
 
+
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
+
