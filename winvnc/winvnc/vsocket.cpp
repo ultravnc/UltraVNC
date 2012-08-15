@@ -64,7 +64,7 @@ class VSocket;
 
 #include <assert.h>
 #include "vtypes.h"
-extern unsigned int G_SENDBUFFER;
+extern unsigned int G_SENDBUFFER_EX;
 ////////////////////////////////////////////////////////
 // *** Lovely hacks to make Win32 work.  Hurrah!
 
@@ -154,9 +154,12 @@ VSocket::VSocket()
 	//adzm 2010-09
 	m_fPluginStreamingIn = false;
 	m_fPluginStreamingOut = false;
-#ifdef FLOWCONTROL
-	m_pSendManager=NULL;
-#endif
+	s_hIPHlp = ::LoadLibrary("Iphlpapi.dll");
+	if(s_hIPHlp ){
+		s_pGetPerTcpConnectionEStats = (t_GetPerTcpConnectionEStats) ::GetProcAddress(s_hIPHlp, "GetPerTcpConnectionEStats");
+		s_pSetPerTcpConnectionEStats = (t_SetPerTcpConnectionEStats) ::GetProcAddress(s_hIPHlp, "SetPerTcpConnectionEStats");
+	  }
+	G_SENDBUFFER=G_SENDBUFFER_EX;
 }
 
 ////////////////////////////
@@ -165,9 +168,11 @@ VSocket::~VSocket()
 {
   // Close the socket
   Close();
-
   if (m_pNetRectBuf != NULL)
  	delete [] m_pNetRectBuf;
+
+  if(s_hIPHlp ) 
+	  FreeLibrary(s_hIPHlp);
 
 }
 
@@ -196,17 +201,6 @@ VSocket::Create()
       return VFalse;
     }
 
-  // Set the socket options:
-//#ifndef WIN32
-  // sf@2006 - Trying to fix the neverending authentication bug
-  /*
-  // Usefull for NT4 ?
-  if (setsockopt(sock, SOL_SOCKET, SO_KEEPALIVE, (char *)&one, sizeof(one)))
-    {
-      return VFalse;
-    }
-  */
-  // sf@2006 - Trying to fix the neverending authentication bug
   if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (char *)&one, sizeof(one)))
   {
       return VFalse;
@@ -215,10 +209,6 @@ VSocket::Create()
 
   // adzm 2010-08
   SetDefaultSocketOptions();
-#ifdef FLOWCONTROL
-  m_pSendManager = new CFlowControlledSend(); 
-  m_pSendManager->Init(  sock);
-#endif
   return VTrue;
 }
 
@@ -230,13 +220,6 @@ VSocket::Close()
   if (sock >= 0)
     {
 	  vnclog.Print(LL_SOCKINFO, VNCLOG("closing socket\n"));
-#ifdef FLOWCONTROL
-	  if(m_pSendManager)
-	  {
-		m_pSendManager->Close();
-		m_pSendManager=NULL;
-	  }
-#endif
 	  shutdown(sock, SD_BOTH);
 #ifdef __WIN32__
 	  closesocket(sock);
@@ -336,20 +319,6 @@ VSocket::Connect(const VString address, const VCard port)
   // Actually connect the socket
   if (connect(sock, (struct sockaddr *)&addr, sizeof(addr)) != 0)
     return VFalse;
-
-  // sf@2006 - Trying to fix the neverending authentication bug
-  // Put the socket into non-blocking mode
-/*
-#ifdef __WIN32__
-  u_long arg = 1;
-  if (ioctlsocket(sock, FIONBIO, &arg) != 0)
-	return VFalse;
-#else
-  if (fcntl(sock, F_SETFL, O_NDELAY) != 0)
-	return VFalse;
-#endif
-*/
-  
   // adzm 2010-08
   SetDefaultSocketOptions();
 
@@ -387,8 +356,8 @@ VSocket::Accept()
   int optVal;
   int optLen = sizeof(int);
   getsockopt(sock, SOL_SOCKET, SO_SNDBUF, (char *)&optVal, &optLen); 
-  optVal=32000;
-  //setsockopt(sock, SOL_SOCKET, SO_SNDBUF, (char *)&optVal, optLen); 
+  optVal=32*1024;
+  setsockopt(sock, SOL_SOCKET, SO_SNDBUF, (char *)&optVal, optLen); 
 
   // Accept an incoming connection
   if ((new_socket_id = accept(sock, NULL, 0)) < 0)
@@ -399,10 +368,6 @@ VSocket::Accept()
   if (new_socket != NULL)
   {
       new_socket->sock = new_socket_id;
-#ifdef FLOWCONTROL
-	  new_socket->m_pSendManager = new CFlowControlledSend();
-	  new_socket->m_pSendManager->Init(  new_socket_id);
-#endif
   }
   else
   {
@@ -410,7 +375,6 @@ VSocket::Accept()
 	  closesocket(new_socket_id);
 	  return NULL;
   }
-  
   // adzm 2010-08
   new_socket->SetDefaultSocketOptions();
 
@@ -552,6 +516,30 @@ VSocket::SetDefaultSocketOptions()
 
 	assert(result);
 
+	{
+	sockaddr_in skaddr={0};
+	int	iSockSize=sizeof(sockaddr_in); 		
+	//initialise socket row value
+	getsockname(sock,(sockaddr*)&skaddr,&iSockSize);
+	m_SocketInfo.dwState =MIB_TCP_STATE_ESTAB;
+	m_SocketInfo.dwLocalAddr=skaddr.sin_addr.S_un.S_addr;
+	m_SocketInfo.dwLocalPort=skaddr.sin_port;
+	getpeername(sock,(sockaddr*)&skaddr,&iSockSize);
+	m_SocketInfo.dwRemoteAddr=skaddr.sin_addr.S_un.S_addr;
+	m_SocketInfo.dwRemotePort=skaddr.sin_port;
+
+	PUCHAR rw = NULL;
+	TCP_ESTATS_SND_CONG_RW_v0	  enableInfo={0};
+	ULONG iRet, lSize = 0;
+	//enable tcp stats 
+	rw = (PUCHAR) & enableInfo;
+	enableInfo.EnableCollection=TRUE;
+	lSize = sizeof (TCP_ESTATS_SND_CONG_RW_v0); 
+	iRet = s_pSetPerTcpConnectionEStats((PMIB_TCPROW) &m_SocketInfo, TcpConnectionEstatsSndCong, rw, 0, lSize, 0);
+	CanUseFlow=false;
+	if (iRet==ERROR_SUCCESS) CanUseFlow=true;
+  } 
+
 	return result;
 }
 
@@ -624,11 +612,7 @@ VSocket::Send(const char *buff, const VCard bufflen)
 	if (newsize >= G_SENDBUFFER)
 	{
 		    memcpy(queuebuffer+queuebuffersize,buff2,G_SENDBUFFER-queuebuffersize);
-#ifdef FLOWCONTROL
-			if (!m_pSendManager->sendall(queuebuffer,G_SENDBUFFER,0)) return FALSE;
-#else
 			if (!sendall(sock,queuebuffer,G_SENDBUFFER,0)) return FALSE;
-#endif
 //			vnclog.Print(LL_SOCKERR, VNCLOG("SEND  %i\n") ,G_SENDBUFFER);
 			buff2+=(G_SENDBUFFER-queuebuffersize);
 			bufflen2-=(G_SENDBUFFER-queuebuffersize);
@@ -636,11 +620,7 @@ VSocket::Send(const char *buff, const VCard bufflen)
 			// adzm 2010-09 - flush as soon as we have a full buffer, not if we have exceeded it.
 			while (bufflen2 >= G_SENDBUFFER)
 			{
-#ifdef FLOWCONTROL
-				if (!m_pSendManager->sendall(buff2,G_SENDBUFFER,0)) return false;
-#else
 				if (!sendall(sock,buff2,G_SENDBUFFER,0)) return false;
-#endif
 //				vnclog.Print(LL_SOCKERR, VNCLOG("SEND 1 %i\n") ,G_SENDBUFFER);
 				buff2+=G_SENDBUFFER;
 				bufflen2-=G_SENDBUFFER;
@@ -649,11 +629,7 @@ VSocket::Send(const char *buff, const VCard bufflen)
 	memcpy(queuebuffer+queuebuffersize,buff2,bufflen2);
 	queuebuffersize+=bufflen2;
 	if (queuebuffersize > 0) {
-#ifdef FLOWCONTROL
-		if (!m_pSendManager->sendall(queuebuffer,queuebuffersize,0))
-#else
 		if (!sendall(sock,queuebuffer,queuebuffersize,0)) 
-#endif
 			return false;
 	}
 //	vnclog.Print(LL_SOCKERR, VNCLOG("SEND 2 %i\n") ,queuebuffersize);
@@ -676,11 +652,7 @@ VSocket::SendQueued(const char *buff, const VCard bufflen)
 			m_LastSentTick = GetTickCount();
 
 		    memcpy(queuebuffer+queuebuffersize,buff2,G_SENDBUFFER-queuebuffersize);
-#ifdef FLOWCONTROL
-			if (!m_pSendManager->sendall(queuebuffer,G_SENDBUFFER,0)) return FALSE;
-#else
 			if (!sendall(sock,queuebuffer,G_SENDBUFFER,0)) return FALSE;
-#endif
 		//	vnclog.Print(LL_SOCKERR, VNCLOG("SEND Q  %i\n") ,G_SENDBUFFER);
 			buff2+=(G_SENDBUFFER-queuebuffersize);
 			bufflen2-=(G_SENDBUFFER-queuebuffersize);
@@ -689,11 +661,7 @@ VSocket::SendQueued(const char *buff, const VCard bufflen)
 			// adzm 2010-09 - flush as soon as we have a full buffer, not if we have exceeded it.
 			while (bufflen2 >= G_SENDBUFFER)
 			{
-#ifdef FLOWCONTROL
-				if (!m_pSendManager->sendall(buff2,G_SENDBUFFER,0)) return false;
-#else
 				if (!sendall(sock,buff2,G_SENDBUFFER,0)) return false;				
-#endif
 				//adzm 2010-08-01
 				m_LastSentTick = GetTickCount();
 			//	vnclog.Print(LL_SOCKERR, VNCLOG("SEND Q  %i\n") ,G_SENDBUFFER);
@@ -847,14 +815,11 @@ VSocket::ClearQueue()
 	//adzm 2010-08-01
 	m_LastSentTick = GetTickCount();
 	//adzm 2010-09 - return a bool in ClearQueue
-#ifdef FLOWCONTROL
-	if (!m_pSendManager->sendall(queuebuffer,queuebuffersize,0))
-#else
 	if (!sendall(sock,queuebuffer,queuebuffersize,0)) 
-#endif
 		return VFalse;
 	queuebuffersize=0;
   }
+  GetOptimalSndBuf();
   return VTrue;
 }
 ////////////////////////////
@@ -1142,22 +1107,6 @@ VSocket::ReadSelect(VCard to)
  }
 #endif
 
-#ifdef FLOWCONTROL
-//check if bandwidth available
-int VSocket::IsWritePossible(DWORD dwBytesWriteNeeded)
-{
-	if (m_pSendManager) return m_pSendManager->CanWrite(dwBytesWriteNeeded,NULL,NULL);
-	else return 0;
-}
-
-BOOL VSocket::IsActive()
-{
-	if (m_pSendManager) return m_pSendManager->IsActive();
-	else return 0;
-}
-
-#endif
-
 extern bool			fShutdownOrdered;
 bool
 sendall(SOCKET RemoteSocket,char *buff,unsigned int bufflen,int dummy)
@@ -1192,6 +1141,37 @@ int val =0;
 		totsend+=val;
 	  }
 	return 1;
+}
+
+//method to get congestion window
+bool VSocket::GetOptimalSndBuf()
+{
+  if (!CanUseFlow) 
+	  {
+		  G_SENDBUFFER=	G_SENDBUFFER_EX;
+		  return TRUE;
+		}
+
+   ULONG							iRet, lSize = 0;
+   PUCHAR							rw = NULL;
+   TCP_ESTATS_SND_CONG_ROD_v0		 cwInfo={0};
+
+   if(s_pSetPerTcpConnectionEStats==0)return FALSE;
+
+   lSize= sizeof (cwInfo);
+   rw = (PUCHAR) & cwInfo;
+   iRet = s_pGetPerTcpConnectionEStats(&m_SocketInfo,TcpConnectionEstatsSndCong,NULL,0,0,NULL,0,0,rw,0,lSize);
+
+   if(iRet!=ERROR_SUCCESS)
+   {
+	   G_SENDBUFFER=	G_SENDBUFFER_EX;
+	   return TRUE;
+   }
+
+   if (cwInfo.CurCwnd<9000 && cwInfo.CurCwnd>0) 
+		G_SENDBUFFER= cwInfo.CurCwnd; 
+
+	return TRUE;
 }
 
 

@@ -515,7 +515,6 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="Dtwinver.cpp" />
-    <ClCompile Include="FlowControlledSend.cpp" />
     <ClCompile Include="getinfo.cpp" />
     <ClCompile Include="helpers.cpp" />
     <ClCompile Include="HideDesktop.cpp">
@@ -1271,7 +1270,6 @@
     <ClInclude Include="d3des.h" />
     <ClInclude Include="..\..\rfb\dh.h" />
     <ClInclude Include="..\..\DSMPlugin\DSMPlugin.h" />
-    <ClInclude Include="FlowControlledSend.h" />
     <ClInclude Include="HideDesktop.h" />
     <ClInclude Include="httpconnect.h" />
     <ClInclude Include="inifile.h" />

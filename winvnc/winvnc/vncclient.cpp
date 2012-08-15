@@ -541,29 +541,26 @@ vncClientUpdateThread::run_undetached(void *arg)
 				// Issue the synchronisation signal, to tell other threads
 				// where we have got to
 				m_sync_sig->broadcast();
-
-				// Wait to be kicked into action				
-#ifdef FLOWCONTROL
-				bool bSendUpdateHolded=false;
 				do{
 					if(m_signal->wait(UPDATE_INTERVAL*100)==false)
 					{
 						{
-								//do forcefull update
+								//do forcefull update after 4 seconds
 								omni_mutex_lock l(m_client->GetUpdateLock());
 								rfb::Region2D update_rgn=m_client->m_encodemgr.m_buffer->GetViewerSize();
 					     		// Add the requested area to the incremental update cliprect
 								m_client->m_incr_rgn.assign_union(update_rgn);
 							   // Kick the update thread (and create it if not there already)
 								m_client->m_encodemgr.m_buffer->m_desktop->TriggerUpdate();
-							}
+						}
 
 					}
-					else break;
+					else 
+						{
+							break;
+						}
 				}while(true);
-#else
-				m_signal->wait();
-#endif
+				//m_signal->wait();
 			}
 			}
 			// If the thread is being killed then quit

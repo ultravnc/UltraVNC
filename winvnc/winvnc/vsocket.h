@@ -30,7 +30,7 @@
 // The VSocket class provides simple socket functionality,
 // independent of platform.  Hurrah.
 
-#define FLOWCONTROL
+//#define FLOWCONTROL
 
 class VSocket;
 
@@ -39,8 +39,20 @@ class VSocket;
 
 #include "vtypes.h"
 #include <DSMPlugin/DSMPlugin.h>
-#include "FlowControlledSend.h"
 ////////////////////////////
+#include <Iphlpapi.h>
+extern "C" {
+        typedef ULONG (WINAPI *t_GetPerTcpConnectionEStats)(
+                PMIB_TCPROW Row, TCP_ESTATS_TYPE EstatsType,
+                PUCHAR Rw, ULONG RwVersion, ULONG RwSize,
+                PUCHAR Ros, ULONG RosVersion, ULONG RosSize,
+                PUCHAR Rod, ULONG RodVersion, ULONG RodSize);
+       typedef ULONG (WINAPI *t_SetPerTcpConnectionEStats)(
+                PMIB_TCPROW Row, TCP_ESTATS_TYPE EstatsType,
+                PUCHAR Rw, ULONG RwVersion, ULONG RwSize,
+				ULONG Offset);
+}
+
 // Socket implementation
 
 // Create one or more VSocketSystem objects per application
@@ -181,10 +193,6 @@ public:
   //adzm 2010-08-01
   DWORD GetLastSentTick() { return m_LastSentTick; };
   IIntegratedPlugin* m_pIntegratedPluginInterface;
-#ifdef FLOWCONTROL
-  int IsWritePossible(DWORD dwBytesWriteNeeded=1500);
-  BOOL IsActive();
-#endif
   ////////////////////////////
   // Internal structures
 protected:
@@ -198,9 +206,6 @@ protected:
   //adzm 2009-06-20
   IPlugin* m_pPluginInterface;
   //adzm 2010-05-10
-#ifdef FLOWCONTROL
-  CFlowControlledSend *m_pSendManager;
-#endif
   bool m_fUsePlugin;
   bool m_fPluginStreamingIn; //adzm 2010-09
   bool m_fPluginStreamingOut; //adzm 2010-09
@@ -225,6 +230,13 @@ protected:
   // adzm 2010-08
   static int m_defaultSocketKeepAliveTimeout;
 
+  HMODULE s_hIPHlp;
+  t_GetPerTcpConnectionEStats	s_pGetPerTcpConnectionEStats;
+  t_SetPerTcpConnectionEStats	s_pSetPerTcpConnectionEStats;
+  MIB_TCPROW					m_SocketInfo;
+  bool							CanUseFlow;
+  bool							GetOptimalSndBuf();
+  int							G_SENDBUFFER;
 };
 
 #endif // _ATT_VSOCKET_DEFINED
