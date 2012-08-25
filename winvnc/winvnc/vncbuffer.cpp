@@ -129,28 +129,8 @@ UINT vncBuffer::GetScale()
 
 BOOL vncBuffer::SetScale(int nScale)
 {
-	//called by
-	//vncClientThread::run(void *arg) Lock Added
-	// case rfbSetScale:  Lock Added OK
-
 	m_nScale = nScale;
-
-	// Problem, driver buffer is not writable
-	// so we always need a m_scalednuff
-	/*if (m_nScale == 1)
 	{
-		//if (m_mainbuff)memcpy(m_ScaledBuff, m_mainbuff, m_desktop->ScreenBuffSize());
-		//else ZeroMemory(m_ScaledBuff, m_desktop->ScreenBuffSize());
-		if (!CheckBuffer()) // added to remove scaled buffer
-            return FALSE;
-		if (m_mainbuff)memcpy(m_backbuff, m_mainbuff, m_desktop->ScreenBuffSize());
-		else ZeroMemory(m_ScaledBuff, m_desktop->ScreenBuffSize());
-	}
-	else
-	*/
-	{
-		// sf@2002 - Idealy, we must do a ScaleRect of the whole screen here.
-		// ScaleRect(rfb::Rect(0, 0, m_scrinfo.framebufferWidth / m_nScale, m_scrinfo.framebufferHeight / m_nScale));
 		if (!CheckBuffer())//added to create scaled buffer
             return FALSE;
 		ZeroMemory(m_ScaledBuff, m_desktop->ScreenBuffSize());

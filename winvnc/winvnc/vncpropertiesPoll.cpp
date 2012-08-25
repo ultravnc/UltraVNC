@@ -745,10 +745,10 @@ LABELUSERSETTINGS:
 	vnclog.Print(LL_INTINFO, VNCLOG("clearing user settings\n"));
 	m_pref_TurboMode = ((vncService::VersionMajor() >= 6) ? TRUE : FALSE);
 	m_pref_PollUnderCursor=FALSE;
-	m_pref_PollForeground= TRUE;
-	m_pref_PollFullScreen= ((vncService::VersionMajor() >= 6) ? FALSE : TRUE);
+	m_pref_PollForeground= FALSE;
+	m_pref_PollFullScreen= ((vncService::VersionMajor() >= 6) ? TRUE : FALSE);
 	m_pref_PollConsoleOnly=FALSE;
-	m_pref_PollOnEventOnly=TRUE;
+	m_pref_PollOnEventOnly=FALSE;
 	m_pref_MaxCpu=40;
 	m_pref_Driver=CheckVideoDriver(0);
 	m_pref_Hook=TRUE;
@@ -959,10 +959,10 @@ void vncPropertiesPoll::LoadFromIniFile()
 	
 	m_pref_TurboMode = ((vncService::VersionMajor() >= 6) ? TRUE : FALSE);
 	m_pref_PollUnderCursor=FALSE;
-	m_pref_PollForeground= TRUE;
-	m_pref_PollFullScreen= ((vncService::VersionMajor() >= 6) ? FALSE : TRUE);
+	m_pref_PollForeground= FALSE;
+	m_pref_PollFullScreen= ((vncService::VersionMajor() >= 6) ? TRUE : FALSE);
 	m_pref_PollConsoleOnly=FALSE;
-	m_pref_PollOnEventOnly=TRUE;
+	m_pref_PollOnEventOnly=FALSE;
 	m_pref_MaxCpu=40;
 	m_pref_Driver=CheckVideoDriver(0);
 	m_pref_Hook=TRUE;

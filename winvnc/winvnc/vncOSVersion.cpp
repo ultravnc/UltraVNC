@@ -24,6 +24,7 @@
 
 #include <windows.h>
 int OSTYPE=4;
+bool WIN8=false;
 void
 SetOSVersion()
 {
@@ -36,8 +37,10 @@ SetOSVersion()
 	switch(OSversion.dwPlatformId)
 	{
 		case VER_PLATFORM_WIN32_NT:
+								  if(OSversion.dwMajorVersion==6 && OSversion.dwMinorVersion==2)
+									 WIN8=1;	
 								  if(OSversion.dwMajorVersion==5 && OSversion.dwMinorVersion==0)
-									 OSTYPE=1;							    
+									 OSTYPE=1;	
 								  if(OSversion.dwMajorVersion==5 && OSversion.dwMinorVersion==1)
 									 OSTYPE=1;
 								  if(OSversion.dwMajorVersion==5)

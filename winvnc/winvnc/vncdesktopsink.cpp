@@ -33,6 +33,7 @@ typedef BOOL (WINAPI *CHANGEWINDOWMESSAGEFILTER)(UINT message, DWORD dwFlag);
 int OSversion();
 DWORD WINAPI Driverwatch(LPVOID lpParam);
 DWORD WINAPI InitWindowThread(LPVOID lpParam);
+extern bool WIN8;
 
 void
 vncDesktop::ShutdownInitWindowthread()
@@ -41,6 +42,17 @@ vncDesktop::ShutdownInitWindowthread()
 	// but ignore info
 	can_be_hooked=false;
 	vnclog.Print(LL_INTINFO, VNCLOG("ShutdownInitWindowthread \n"));
+
+	if (startw8)
+		{
+#ifdef _DEBUG
+					char			szText[256];
+					sprintf(szText,"StartStophookdll(0) \n");
+					OutputDebugString(szText);		
+#endif
+			StartStophookdll(0);
+			Hookdll_Changed = true;
+		}
 }
 
 void
@@ -165,7 +177,13 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 			if (wParam==100)
 			{
 					KillTimer(hwnd, 100); 
-					if (_this->SetHook)
+					if (_this->startw8)
+					{
+						_this->startw8(!_this->multi_monitor);
+						vnclog.Print(LL_INTERR, VNCLOG("set W8 hooks OK\n"));
+						_this->m_hookinited = TRUE;
+					}
+					else if (_this->SetHook)
 					{
 						_this->SetHook(hwnd);
 						vnclog.Print(LL_INTERR, VNCLOG("set SC hooks OK\n"));
@@ -210,7 +228,7 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		if (wParam==1)
 			{
 				if (_this->m_hookinited==FALSE)
-				SetTimer(hwnd,100,4000,NULL);
+							SetTimer(hwnd,100,1000,NULL);
 			}
 		else if (wParam==2)
 		{
@@ -233,6 +251,11 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		else if (_this->m_hookinited)
 			{
 				_this->m_hookinited=FALSE;
+				if (_this->stopw8)
+				{
+					vnclog.Print(LL_INTERR, VNCLOG("unset W8 hooks OK\n"));
+					_this->stopw8();
+				}
 				if (_this->UnSetHook)
 				{
 					vnclog.Print(LL_INTERR, VNCLOG("unset SC hooks OK\n"));
@@ -286,8 +309,12 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		if (_this->m_hnextviewer!=NULL) ChangeClipboardChain(hwnd, _this->m_hnextviewer);
 		_this->m_hnextviewer=NULL;
 		if (_this->m_hookinited)
-			{
-				_this->m_hookinited=FALSE;
+			{				
+				if (_this->stopw8)
+				{
+					vnclog.Print(LL_INTERR, VNCLOG("unset W8 hooks OK\n"));
+					_this->stopw8();
+				}
 				if (_this->UnSetHook)
 				{
 					vnclog.Print(LL_INTERR, VNCLOG("unset SC hooks OK\n"));
@@ -299,6 +326,7 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 					vnclog.Print(LL_INTERR, VNCLOG("Unsethooks Failed\n"));
 				else vnclog.Print(LL_INTERR, VNCLOG("Unsethooks OK\n"));
 				}
+				_this->m_hookinited=FALSE;
 				
 			}
 		vnclog.Print(LL_INTERR, VNCLOG("WM_DESTROY\n"));
@@ -649,6 +677,22 @@ vncDesktop::InitWindow()
 			strcat (szCurrentDirSC,"\\schook.dll");
 #endif
 		}
+	hW8Module=NULL;
+	char szCurrentDirW8[MAX_PATH];
+	if (WIN8)
+	{		
+		if (GetModuleFileName(NULL, szCurrentDirW8, MAX_PATH))
+		{
+			char* p = strrchr(szCurrentDirW8, '\\');
+			if (p == NULL) return 0;
+			*p = '\0';
+#ifdef _X64
+			strcat (szCurrentDirW8,"\\w8hook64.dll");
+#else
+			strcat (szCurrentDirW8,"\\w8hook.dll");
+#endif
+		}
+	}
 
 	UnSetHooks=NULL;
 	SetMouseFilterHook=NULL;
@@ -662,6 +706,7 @@ vncDesktop::InitWindow()
 
 	hModule = LoadLibrary(szCurrentDir);
 	hSCModule = LoadLibrary(szCurrentDirSC);//TOFIX resource leak
+	if (WIN8) hW8Module = LoadLibrary(szCurrentDirW8);
 	if (hModule)
 		{
 			UnSetHooks = (UnSetHooksFn) GetProcAddress( hModule, "UnSetHooks" );
@@ -676,6 +721,16 @@ vncDesktop::InitWindow()
 			SetMouseFilterHooks  = (SetMouseFilterHookFn) GetProcAddress( hSCModule, "SetMouseFilterHook" );
 			SetKeyboardFilterHooks  = (SetKeyboardFilterHookFn) GetProcAddress( hSCModule, "SetKeyboardFilterHook" );
 		}
+	startw8=nullptr;
+	stopw8=nullptr;
+	capturew8=nullptr;
+	if (hW8Module)
+		{
+			startw8=(StartW8)GetProcAddress(hW8Module,"StartW8");
+			stopw8=(StopW8)GetProcAddress(hW8Module,"StopW8");
+			capturew8=(CaptureW8)GetProcAddress(hW8Module,"CaptureW8");
+		}
+
 	///////////////////////////////////////////////
 	vnclog.Print(LL_INTERR, VNCLOG("OOOOOOOOOOOO start dispatch\n"));
 	MSG msg;
@@ -743,6 +798,7 @@ vncDesktop::InitWindow()
 
 	if (hModule)FreeLibrary(hModule);
 	if (hSCModule)FreeLibrary(hSCModule);
+	if (hW8Module)FreeLibrary(hW8Module);
 	SetThreadDesktop(old_desktop);
     CloseDesktop(desktop);
 	///////////////////////

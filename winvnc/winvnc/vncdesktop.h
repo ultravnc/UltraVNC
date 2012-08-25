@@ -192,6 +192,9 @@ typedef BOOL (WINAPI*  pBlockInput) (BOOL);
 typedef BOOL (WINAPI* LPGETMONITORINFO)(HMONITOR, LPMONITORINFO);
 typedef HMONITOR (WINAPI* LPMONITOTFROMPOINT) (POINT,DWORD);
 
+typedef BOOL (*StartW8)(bool primonly);
+typedef BOOL (*StopW8)(void);
+typedef BOOL (*CaptureW8)(void);
 
 // Class definition
 // multi monitor
@@ -497,12 +500,14 @@ protected:
 	BOOL m_hookswitch;
 	BOOL Hookdll_Changed;
 	BOOL m_hookinited;
+	BOOL m_bitmappointer;
 	HANDLE m_hddihook;
 	void StartStopddihook(BOOL enabled);
 	void StartStophookdll(BOOL enabled);
 	void InitHookSettings();
 	HMODULE hModule;
 	HMODULE hSCModule;
+	HMODULE hW8Module;
 	SetHooksFn SetHooks;
 	UnSetHooksFn  UnSetHooks;
 	SetHookFn SetHook;
@@ -512,6 +517,10 @@ protected:
 	//hooks in schook Hook(s)
 	SetKeyboardFilterHookFn SetKeyboardFilterHooks;
 	SetMouseFilterHookFn SetMouseFilterHooks;
+
+	StartW8 startw8;
+	StopW8 stopw8;
+	CaptureW8 capturew8;
 
 
 	pBlockInput pbi;

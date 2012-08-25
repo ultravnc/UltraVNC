@@ -1595,12 +1595,12 @@ vncDesktop::CaptureScreen(const rfb::Rect &rect, BYTE *scrBuff, UINT scrBuffSize
 			(rect.br.y-rect.tl.y),
 			m_hrootdc, rect.tl.x, rect.tl.y, (m_fCaptureAlphaBlending && !m_Black_window_active) ? (CAPTUREBLT | SRCCOPY) : SRCCOPY);
 		}
-	#if defined(_DEBUG)
+	/*#if defined(_DEBUG)
 		DWORD e = timeGetTime() - t;
 		vnclog.Print(LL_INTWARN, VNCLOG("Blit (%u,%u - %u,%u) (%ux%u took %ums\n"), 
 			rect.tl.x, rect.tl.y, rect.br.x, rect.br.y,
 			rect.width(), rect.height(), e);
-	#endif
+	#endif*/
 	#if 0
 		//*******************************
 		static int cycle(0);
@@ -2455,7 +2455,7 @@ void vncDesktop::StartStopddihook(BOOL enabled)
 
 void vncDesktop::StartStophookdll(BOOL enabled)
 {
-	vnclog.Print(LL_INTERR, VNCLOG("PostMessage(m_hwnd, WM_HOOKCHANGE \n"));
+	vnclog.Print(LL_INTERR, VNCLOG("PostMessage(m_hwnd, WM_HOOKCHANGE %i\n",enabled));
 	PostMessage(m_hwnd, WM_HOOKCHANGE, enabled, 0);
 }
 

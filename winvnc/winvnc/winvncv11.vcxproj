@@ -30,6 +30,7 @@
     <ProjectGuid>{C05AE605-1250-4F58-911B-EC99AE2C25AF}</ProjectGuid>
     <RootNamespace>winvnc</RootNamespace>
     <VCTargetsPath Condition="'$(VCTargetsPath11)' != '' and '$(VSVersion)' == '' and $(VisualStudioVersion) == ''">$(VCTargetsPath11)</VCTargetsPath>
+    <ProjectName>winvnc</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='IPP|Win32'" Label="Configuration">
@@ -518,7 +519,6 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="Dtwinver.cpp" />
-    <ClCompile Include="FlowControlledSend.cpp" />
     <ClCompile Include="getinfo.cpp" />
     <ClCompile Include="helpers.cpp" />
     <ClCompile Include="HideDesktop.cpp">
@@ -1274,7 +1274,6 @@
     <ClInclude Include="d3des.h" />
     <ClInclude Include="..\..\rfb\dh.h" />
     <ClInclude Include="..\..\DSMPlugin\DSMPlugin.h" />
-    <ClInclude Include="FlowControlledSend.h" />
     <ClInclude Include="HideDesktop.h" />
     <ClInclude Include="httpconnect.h" />
     <ClInclude Include="inifile.h" />
@@ -1395,6 +1394,9 @@
     <None Include="VTune\winvnc.vpj" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\w8hook\w8hook\w8hook.vcxproj">
+      <Project>{dd7b168b-30ed-686c-bb27-ede3da7446bc}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\libjpeg-turbo-win\libjpeg-turbo-winv11.vcxproj">
       <Project>{04f91fa4-2d94-4803-ba3b-b61fbef0abe3}</Project>
     </ProjectReference>
