@@ -108,7 +108,7 @@ HRESULT CAVIGenerator::InitEngine()
 	AVICOMPRESSOPTIONS opts;
 	AVICOMPRESSOPTIONS FAR * aopts[1] = {&opts};
 
-	TCHAR szBuffer[1024];
+	TCHAR szBuffer[1024]="";
 	HRESULT hr;
 
 	strcpy(m_sError,"Ok");
