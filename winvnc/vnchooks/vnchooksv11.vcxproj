@@ -248,7 +248,7 @@
       <OutputFile>.\..\Release/vnchooks.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      <Command>C:\UltraVnc\UltraVnc_Installer\VS2010\codesigningv3\signtool.exe sign /f C:\UltraVnc\UltraVnc_Installer\VS2010\codesigningv3\uvnccert.pfx /p changeme /v /t http://timestamp.globalsign.com/scripts/timstamp.dll "$(OutDir)$(TargetName)$(TargetExt)"</Command>
+      <Command>C:\UltraVnc\codesigningv3\signtool.exe sign /f C:\UltraVnc\codesigningv3\uvnccert.pfx /p changeme /v /t http://timestamp.globalsign.com/scripts/timstamp.dll "$(OutDir)$(TargetName)$(TargetExt)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -289,9 +289,8 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\VNCHooks.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <DataExecutionPrevention>
-      </DataExecutionPrevention>
+      <RandomizedBaseAddress>true</RandomizedBaseAddress>
+      <DataExecutionPrevention>true</DataExecutionPrevention>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <Bscmake>
@@ -299,7 +298,7 @@
       <OutputFile>.\..\Release/vnchooks.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      <Command>signtool.exe sign /f c:\uvnccert.pfx /p changeme /v /t http://timestamp.globalsign.com/scripts/timstamp.dll "$(OutDir)$(TargetName)$(TargetExt)"</Command>
+      <Command>C:\UltraVnc\codesigningv3\signtool.exe sign /f C:\UltraVnc\codesigningv3\uvnccert.pfx /p changeme /v /t http://timestamp.globalsign.com/scripts/timstamp.dll "$(OutDir)$(TargetName)$(TargetExt)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='IPP|Win32'">

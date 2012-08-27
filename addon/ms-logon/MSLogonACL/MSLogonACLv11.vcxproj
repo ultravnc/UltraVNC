@@ -29,6 +29,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F4E39BD7-C841-4F21-B40C-293D7E017EA1}</ProjectGuid>
     <VCTargetsPath Condition="'$(VCTargetsPath11)' != '' and '$(VSVersion)' == '' and $(VisualStudioVersion) == ''">$(VCTargetsPath11)</VCTargetsPath>
+    <ProjectName>MSLogonACL</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='IPP|Win32'" Label="Configuration">
@@ -160,7 +161,7 @@
       <OutputFile>.\..\..\Release/MSLogonACL.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      <Command>C:\UltraVnc\UltraVnc_Installer\VS2010\codesigningv3\signtool.exe sign /f C:\UltraVnc\UltraVnc_Installer\VS2010\codesigningv3\uvnccert.pfx /p changeme /v /t http://timestamp.globalsign.com/scripts/timstamp.dll "$(OutDir)$(TargetName)$(TargetExt)"</Command>
+      <Command>C:\UltraVnc\codesigningv3\signtool.exe sign /f C:\UltraVnc\codesigningv3\uvnccert.pfx /p changeme /v /t http://timestamp.globalsign.com/scripts/timstamp.dll "$(OutDir)$(TargetName)$(TargetExt)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -189,9 +190,8 @@
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;netapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <SubSystem>Console</SubSystem>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <DataExecutionPrevention>
-      </DataExecutionPrevention>
+      <RandomizedBaseAddress>true</RandomizedBaseAddress>
+      <DataExecutionPrevention>true</DataExecutionPrevention>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <Bscmake>
@@ -199,7 +199,7 @@
       <OutputFile>.\..\..\Release/MSLogonACL.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      <Command>signtool.exe sign /f c:\uvnccert.pfx /p changeme /v /t http://timestamp.globalsign.com/scripts/timstamp.dll "$(OutDir)$(TargetName)$(TargetExt)"</Command>
+      <Command>C:\UltraVnc\codesigningv3\signtool.exe sign /f C:\UltraVnc\codesigningv3\uvnccert.pfx /p changeme /v /t http://timestamp.globalsign.com/scripts/timstamp.dll "$(OutDir)$(TargetName)$(TargetExt)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
