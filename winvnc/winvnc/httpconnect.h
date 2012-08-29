@@ -118,7 +118,7 @@
 #define socket_errno() WSAGetLastError()
 #define popen _popen
 
-#define ECONNRESET WSAECONNRESET
+//#define ECONNRESET WSAECONNRESET
 #define MAX_DIRECT_ADDR_LIST 256
 
 #define PUT_BYTE(ptr,data) (*(unsigned char*)ptr = data)
