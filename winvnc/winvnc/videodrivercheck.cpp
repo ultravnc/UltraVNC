@@ -28,6 +28,7 @@
 
 DWORD MessageBoxSecure(HWND hWnd,LPCTSTR lpText,LPCTSTR lpCaption,UINT uType);
 typedef BOOL (WINAPI* pEnumDisplayDevices)(PVOID,DWORD,PVOID,DWORD);
+extern int g_video_info;
 
 /*bool CheckDriver2(void)
 {
@@ -63,17 +64,15 @@ BOOL GetDllProductVersion(char* dllName, char *vBuffer, int size)
    if( !dllName || !vBuffer )
       return(FALSE);
 
-//   DWORD sName = GetModuleFileName(NULL, fileName, sizeof(fileName));
-// FYI only
-    /*char systemroot[150];
-	GetEnvironmentVariable("SystemRoot", systemroot, 150);
-	char exe_file_name[MAX_PATH];
-	strcpy(exe_file_name,systemroot);
-	strcat(exe_file_name,"\\system32\\driver\\");
-	strcat(exe_file_name,dllName);*/
-
    DWORD sVersion = GetFileVersionInfoSize(dllName, &rBuffer);
-   if (sVersion==0) return (FALSE);
+   DWORD myerror=GetLastError();
+   if (sVersion==0)
+	   {
+		   strcpy(vBuffer,"Fail: Using 32bit winvnc.exe with  a 64bit driver? \n");		   
+		   return (FALSE);
+		}
+
+
    versionInfo = new char[sVersion];
 
    BOOL resultVersion = GetFileVersionInfo(dllName,
@@ -152,34 +151,49 @@ CheckVideoDriver(bool Box)
 					if(Box)
 					{
 						char buf[512];
+						char buf2[512];
+						strcpy(buf,"");
+						strcpy(buf2,"");
+						strcpy(buf2,"Driver found. \n");
 						GetDllProductVersion("mv2.dll",buf,512);
+						if (strcmp(buf,"1.00.22")==NULL)
+						{
+							strcat(buf2,"Driver version OK \n");
+						}
+						else
+						{
+							strcat(buf2,"Driver verion is not 1.00.22 \n");
+							strcat(buf2,buf);
+							strcat(buf2," \n");
+						}
+
 						if (dd.StateFlags & DISPLAY_DEVICE_ATTACHED_TO_DESKTOP)
 						{
-							strcat(buf," driver Active");
+							strcat(buf2," driver Active");
 							HDC testdc=NULL;
 							deviceName = (LPSTR)&dd.DeviceName[0];
 							testdc = CreateDC("DISPLAY",deviceName,NULL,NULL);	
 							if (testdc)
 							{
 								DeleteDC(testdc);
-								strcat(buf," access ok");
+								strcat(buf2," access ok");
 							}
 							else
 							{
-								strcat(buf," access denied, permission problem");
+								strcat(buf2," access denied, permission problem");
 							}
 						}
 						else
-							strcat(buf," driver Not Active");
-						    
-						MessageBoxSecure(NULL,buf,"driver info: required version 1.22",0);
+							strcat(buf2,"Driver Not Activated, is the viewer current connected ?\n");
+						    if (g_video_info==0) strcat(buf2,"Is winvnc started with run as admin, no permission to start mirror driver? \n");
+						MessageBoxSecure(NULL,buf2,buf,0);
 					}
 					return true;
 				//deviceName = (LPSTR)&dd.DeviceName[0];
 				//m_hrootdc = CreateDC("DISPLAY",deviceName,NULL,NULL);	
 				//if (m_hrootdc) DeleteDC(m_hrootdc);
 				}
-				else if(Box) MessageBoxSecure(NULL,"Driver not found: Perhaps you need to reboot after install","driver info: required version 1.22",0);
+				else if(Box) MessageBoxSecure(NULL,"Driver not found: Perhaps you need to reboot after install","driver info: required version 1.00.22",0);
 			}
 	if (hUser32) FreeLibrary(hUser32);	
 	return false;

@@ -152,7 +152,7 @@ CheckVideoDriver(bool Box)
 					}
 					return true;
 				}
-				else if(Box) MessageBox(NULL,"Driver not found: Perhaps you need to reboot after install","driver info: required version 1.22",0);
+				else if(Box) MessageBox(NULL,"Driver not found: Perhaps you need to reboot after install","driver info: required version 1.00.22",0);
 			}
 	if (hUser32) FreeLibrary(hUser32);	
 	return false;
