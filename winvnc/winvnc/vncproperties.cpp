@@ -1742,7 +1742,7 @@ vncProperties::Load(BOOL usersettings)
 	}
 
 	if (m_server->LoopbackOnly()) m_server->SetLoopbackOk(true);
-	else m_server->SetLoopbackOk(LoadInt(hkLocal, "AllowLoopback", false));
+	else m_server->SetLoopbackOk(LoadInt(hkLocal, "AllowLoopback", true));
 	m_server->SetAuthRequired(LoadInt(hkLocal, "AuthRequired", true));
 
 	m_server->SetConnectPriority(LoadInt(hkLocal, "ConnectPriority", 0));
@@ -1785,11 +1785,11 @@ LABELUSERSETTINGS:
 	m_pref_clearconsole=FALSE;
 	m_pref_LockSettings=-1;
 
-	m_pref_RemoveWallpaper=TRUE;
+	m_pref_RemoveWallpaper=FALSE;
 	// adzm - 2010-07 - Disable more effects or font smoothing
 	m_pref_RemoveEffects=FALSE;
 	m_pref_RemoveFontSmoothing=FALSE;
-	m_pref_RemoveAero=TRUE;
+	m_pref_RemoveAero=FALSE;
     m_alloweditclients = TRUE;
 	m_allowshutdown = TRUE;
 	m_allowproperties = TRUE;
@@ -2301,7 +2301,7 @@ void vncProperties::LoadFromIniFile()
 	myIniFile.ReadString("admin", "DSMPluginConfig", m_pref_DSMPluginConfig, 512);
 
 	if (m_server->LoopbackOnly()) m_server->SetLoopbackOk(true);
-	else m_server->SetLoopbackOk(myIniFile.ReadInt("admin", "AllowLoopback", false));
+	else m_server->SetLoopbackOk(myIniFile.ReadInt("admin", "AllowLoopback", true));
 	m_server->SetAuthRequired(myIniFile.ReadInt("admin", "AuthRequired", true));
 
 	m_server->SetConnectPriority(myIniFile.ReadInt("admin", "ConnectPriority", 0));
@@ -2342,11 +2342,11 @@ void vncProperties::LoadFromIniFile()
 	m_pref_clearconsole=FALSE;
 	m_pref_LockSettings=-1;
 
-	m_pref_RemoveWallpaper=TRUE;
+	m_pref_RemoveWallpaper=FALSE;
 	// adzm - 2010-07 - Disable more effects or font smoothing
 	m_pref_RemoveEffects=FALSE;
 	m_pref_RemoveFontSmoothing=FALSE;
-	m_pref_RemoveAero=TRUE;
+	m_pref_RemoveAero=FALSE;
     m_alloweditclients = TRUE;
 	m_allowshutdown = TRUE;
 	m_allowproperties = TRUE;

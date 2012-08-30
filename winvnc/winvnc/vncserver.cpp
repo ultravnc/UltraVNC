@@ -168,7 +168,7 @@ vncServer::vncServer()
 	
 	// General options
 	m_loopbackOnly = FALSE;
-	m_loopback_allowed = FALSE;
+	m_loopback_allowed = TRUE;
 	m_lock_on_exit = 0;
 	m_connect_pri = 0;
 	m_disableTrayIcon = FALSE;

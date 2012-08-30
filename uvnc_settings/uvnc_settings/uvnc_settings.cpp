@@ -44,7 +44,7 @@ LONG DebugLevel=10;
 LONG DisableTrayIcon;
 LONG LoopbackOnly;
 LONG UseDSMPlugin;
-LONG AllowLoopback;
+LONG AllowLoopback=1;
 LONG AuthRequired;
 LONG ConnectPriority;
 
@@ -72,8 +72,8 @@ LONG PortNumber=5900;
 LONG HttpPortNumber;
 LONG IdleTimeout;
 
-LONG RemoveWallpaper=1;
-LONG RemoveAero=1;
+LONG RemoveWallpaper=0;
+LONG RemoveAero=0;
 
 LONG QuerySetting=1;
 LONG QueryTimeout=10;
@@ -305,7 +305,7 @@ DebugLevel=myIniFile_In.ReadInt("admin", "DebugLevel", 0);
 DisableTrayIcon=myIniFile_In.ReadInt("admin", "DisableTrayIcon", false);
 LoopbackOnly=myIniFile_In.ReadInt("admin", "LoopbackOnly", false);
 UseDSMPlugin=myIniFile_In.ReadInt("admin", "UseDSMPlugin", false);
-AllowLoopback=myIniFile_In.ReadInt("admin", "AllowLoopback", false);
+AllowLoopback=myIniFile_In.ReadInt("admin", "AllowLoopback", true);
 AuthRequired=myIniFile_In.ReadInt("admin", "AuthRequired", true);
 ConnectPriority=myIniFile_In.ReadInt("admin", "ConnectPriority", 0);
 myIniFile_In.ReadString("admin", "DSMPlugin",DSMPlugin,128);

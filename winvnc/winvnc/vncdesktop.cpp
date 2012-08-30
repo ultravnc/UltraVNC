@@ -2455,7 +2455,7 @@ void vncDesktop::StartStopddihook(BOOL enabled)
 
 void vncDesktop::StartStophookdll(BOOL enabled)
 {
-	vnclog.Print(LL_INTERR, VNCLOG("PostMessage(m_hwnd, WM_HOOKCHANGE %i\n",enabled));
+//	vnclog.Print(LL_INTERR, VNCLOG("PostMessage(m_hwnd, WM_HOOKCHANGE %i\n",enabled));
 	PostMessage(m_hwnd, WM_HOOKCHANGE, enabled, 0);
 }
 
