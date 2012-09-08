@@ -231,6 +231,7 @@ private:
 	void AuthMsLogonI();
 	void AuthMsLogonII();
 	void AuthSecureVNCPlugin();
+	void AuthSecureVNCPlugin_old();
 	////////////////////////////////////////////////
 	void NegotiateProxy();
 	void ReadServerInit();

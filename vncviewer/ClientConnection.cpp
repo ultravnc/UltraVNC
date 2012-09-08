@@ -2262,7 +2262,7 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 		// adzm 2010-10 - TRanslate legacy constants into new 3.8-era constants
 		switch (authScheme) {
 			case rfbLegacy_SecureVNCPlugin:
-				authScheme = rfbUltraVNC_SecureVNCPluginAuth;
+				authScheme = rfbUltraVNC_SecureVNCPluginAuth_new;
 				break;
 			case rfbLegacy_MsLogon:
 				authScheme = rfbUltraVNC_MsLogonIIAuth;
@@ -2287,6 +2287,7 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 				switch (authAllowed[i]) {
 				case rfbUltraVNC:
 				case rfbUltraVNC_SecureVNCPluginAuth:
+				case rfbUltraVNC_SecureVNCPluginAuth_new:
 				case rfbUltraVNC_SCPrompt: // adzm 2010-10
 				case rfbUltraVNC_SessionSelect:
 				case rfbUltraVNC_MsLogonIIAuth:
@@ -2300,7 +2301,8 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 			if (!auth_supported.empty()) {
 				std::vector<CARD8> auth_priority;
 				auth_priority.push_back(rfbUltraVNC);
-				auth_priority.push_back(rfbUltraVNC_SecureVNCPluginAuth);
+				auth_priority.push_back(rfbUltraVNC_SecureVNCPluginAuth_new);
+				auth_priority.push_back(rfbUltraVNC_SecureVNCPluginAuth);				
 				auth_priority.push_back(rfbUltraVNC_SCPrompt); // adzm 2010-10
 				auth_priority.push_back(rfbUltraVNC_SessionSelect);
 				auth_priority.push_back(rfbUltraVNC_MsLogonIIAuth);
@@ -2341,7 +2343,7 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 
 	bool bSecureVNCPluginActive = std::find(current_auth.begin(), current_auth.end(), rfbUltraVNC_SecureVNCPluginAuth) != current_auth.end();
 
-	if (!bSecureVNCPluginActive && m_fUsePlugin && m_pIntegratedPluginInterface && authScheme != rfbConnFailed && authScheme != rfbUltraVNC_SecureVNCPluginAuth && authScheme != rfbUltraVNC)
+	if (!bSecureVNCPluginActive && m_fUsePlugin && m_pIntegratedPluginInterface && authScheme != rfbConnFailed && authScheme != rfbUltraVNC_SecureVNCPluginAuth  && authScheme != rfbUltraVNC_SecureVNCPluginAuth_new && authScheme != rfbUltraVNC)
 	{
 		//adzm 2010-05-12
 		if (m_opts.m_fRequireEncryption) {
@@ -2378,12 +2380,19 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 	case rfbUltraVNC:
 		m_fServerKnowsFileTransfer = true;
 		break;
-	case rfbUltraVNC_SecureVNCPluginAuth:
+	case rfbUltraVNC_SecureVNCPluginAuth_new:
 		if (bSecureVNCPluginActive) {
 			vnclog.Print(0, _T("Cannot layer multiple SecureVNC plugin authentication schemes\n"), authScheme);
 			throw WarningException("Cannot layer multiple SecureVNC plugin authentication schemes\n");
 		}
 		AuthSecureVNCPlugin();
+		break;
+	case rfbUltraVNC_SecureVNCPluginAuth:
+		if (bSecureVNCPluginActive) {
+			vnclog.Print(0, _T("Cannot layer multiple SecureVNC plugin authentication schemes\n"), authScheme);
+			throw WarningException("Cannot layer multiple SecureVNC plugin authentication schemes\n");
+		}
+		AuthSecureVNCPlugin_old();
 		break;
 	case rfbUltraVNC_MsLogonIIAuth:
 		AuthMsLogonII();
@@ -2439,7 +2448,7 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 	if (m_pIntegratedPluginInterface && authScheme == rfbUltraVNC_SecureVNCPluginAuth) {
 		m_pIntegratedPluginInterface->SetHandshakeComplete();
 		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_PLUGIN_STATUS,m_pIntegratedPluginInterface->DescribeCurrentSettings());
-	}
+	}	
 
 	switch (authResult)
 	{
@@ -2556,14 +2565,129 @@ void ClientConnection::AuthSecureVNCPlugin()
 				if (!bTriedNoPassword && strlen(passwd) > 0) {
 					m_pIntegratedPluginInterface->SetPasswordData((const BYTE*)passwd, strlen(passwd));
 					bTriedNoPassword = true;
-				} else {
-					bTriedNoPassword = true;
+				} 
+			}
+		} while (bSuccess && !bPasswordOK && !bCancel);
 
+		delete[] pChallengeData;
+
+		if (bSuccess && !bCancel) {
+			BYTE* pResponseData = NULL;
+			int nResponseLength = 0;
+
+			m_pIntegratedPluginInterface->GetResponse(pResponseData, nResponseLength, nSequenceNumber, bExpectChallenge);
+
+			WORD wResponseLength = (WORD)nResponseLength;
+
+			WriteExact((char*)&wResponseLength, sizeof(wResponseLength));
+
+			WriteExact((char*)pResponseData, nResponseLength);
+
+			if (m_pIntegratedPluginInterface) {
+				m_pIntegratedPluginInterface->SetHandshakeComplete();
+				if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_PLUGIN_STATUS,m_pIntegratedPluginInterface->DescribeCurrentSettings());
+				}
+
+				WORD lengt=0;
+
+				AuthDialog ad;
+					//adzm 2010-05-12 - passphrase
+				ad.m_bPassphraseMode = bPassphraseRequired;
+
+				if (ad.DoDialog(false))
+					{
+						strncpy(passwd, ad.m_passwd,254);
+						if (!bPassphraseRequired && strlen(passwd) > 8) {
+							passwd[8] = '\0';
+						}
+						lengt=strlen(passwd);												
+					}
+				else
+					{
+						bCancel = true; // cancel
+					}			
+				WriteExact((char*)&lengt, sizeof(lengt));
+				WriteExact((char*)passwd, lengt);
+
+			m_pIntegratedPluginInterface->FreeMemory(pResponseData);
+		}
+
+		nSequenceNumber++;
+	} while (bExpectChallenge && bSuccess);
+
+	if (bCancel) {
+		// cancelled
+		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,"Authentication cancelled");
+		SetEvent(KillEvent);
+		throw ErrorException("Authentication cancelled");
+	} else if (!bSuccess) {
+		// other failure
+		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,m_pIntegratedPluginInterface->GetLastErrorString());
+		SetEvent(KillEvent);
+		throw ErrorException(m_pIntegratedPluginInterface->GetLastErrorString());
+	}
+}
+
+
+void ClientConnection::AuthSecureVNCPlugin_old()
+{
+	if (!m_pIntegratedPluginInterface) {
+		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,"SecureVNCPlugin authentication failed (SecureVNCPlugin interface available)");
+		SetEvent(KillEvent);
+		throw ErrorException("SecureVNCPlugin authentication failed (no plugin interface available)");
+	}
+
+	char passwd[256];
+	passwd[0] = '\0';
+
+	if (strlen(m_clearPasswd)>0)
+	{
+		strcpy(passwd, m_clearPasswd);
+	}
+	else if (strlen((const char *) m_encPasswd)>0)
+	{  char * pw = vncDecryptPasswd(m_encPasswd);
+		strcpy(passwd, pw);
+		free(pw);
+	}
+	m_pIntegratedPluginInterface->SetPasswordData(NULL, 0);
+
+	int nSequenceNumber = 0;
+	bool bExpectChallenge = true;
+	bool bTriedNoPassword = false;
+	bool bSuccess = false;
+	bool bCancel = false;
+	do {
+		WORD wChallengeLength = 0;
+
+		ReadExact((char*)&wChallengeLength, sizeof(wChallengeLength));
+
+		BYTE* pChallengeData = new BYTE[wChallengeLength];
+
+		ReadExact((char*)pChallengeData, wChallengeLength);
+
+		bool bPasswordOK = false;
+		bool bPassphraseRequired = false;
+		bSuccess = false;
+		do {
+			bSuccess = m_pIntegratedPluginInterface->HandleChallenge(pChallengeData, wChallengeLength, nSequenceNumber, bPasswordOK, bPassphraseRequired);
+			if (bSuccess && !bPasswordOK)
+			{
+				if (!bTriedNoPassword && strlen(passwd) > 0) {
+					m_pIntegratedPluginInterface->SetPasswordData((const BYTE*)passwd, strlen(passwd));
+					bTriedNoPassword = true;
+				} 
+				else {
+					bTriedNoPassword = true;
+					if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,"WARNING: Server should be upgraded");
+					Sleep(3000);
+					if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,"Using the vncpasswd as encryption key");
+					Sleep(3000);
+					if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,"is not save.  Password can be hacked !!");
 					AuthDialog ad;
 					//adzm 2010-05-12 - passphrase
 					ad.m_bPassphraseMode = bPassphraseRequired;
 
-					if (ad.DoDialog(false))
+					if (ad.DoDialog(false,false,true))
 					{
 						strncpy(passwd, ad.m_passwd,254);
 						if (!bPassphraseRequired && strlen(passwd) > 8) {
@@ -2593,6 +2717,10 @@ void ClientConnection::AuthSecureVNCPlugin()
 			WriteExact((char*)&wResponseLength, sizeof(wResponseLength));
 
 			WriteExact((char*)pResponseData, nResponseLength);
+
+			if (m_pIntegratedPluginInterface) {
+				if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_PLUGIN_STATUS,"Encryption initialized.");
+			}
 
 			m_pIntegratedPluginInterface->FreeMemory(pResponseData);
 		}

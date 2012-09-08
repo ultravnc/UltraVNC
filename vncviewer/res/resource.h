@@ -210,6 +210,7 @@
 #define IDC_BUTTON2                     1149
 #define IDD_APP_MESSAGE1                1150
 #define IDD_APP_MESSAGE2                1151
+#define IDD_AUTH_DIALOG3                1152
 #define IDC_CHECK1                      1154
 #define IDC_SERVER_RECON                1155
 #define IDC_CUSTOM1                     1156

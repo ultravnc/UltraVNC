@@ -564,6 +564,7 @@ public:
 	virtual BOOL AuthenticateLegacyClient();
 
 	BOOL AuthSecureVNCPlugin(std::string& auth_message); // must SetHandshakeComplete after sending auth result!
+	BOOL AuthSecureVNCPlugin_old(std::string& auth_message);
 	BOOL AuthMsLogon(std::string& auth_message);
 	BOOL AuthVnc(std::string& auth_message);
 	BOOL AuthSCPrompt(std::string& auth_message); // adzm 2010-10

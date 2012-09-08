@@ -296,7 +296,10 @@ typedef char rfbProtocolVersionMsg[13];	/* allow extra byte for null */
 	// would always match!
 
 #define rfbUltraVNC_MsLogonIIAuth 0x71
+//Handshake needed to change for a possible security leak
+//Only new viewers can connect
 #define rfbUltraVNC_SecureVNCPluginAuth 0x72
+#define rfbUltraVNC_SecureVNCPluginAuth_new 0x73
 
 //adzm 2010-05-10 - for backwards compatibility with pre-3.8
 #define rfbLegacy_SecureVNCPlugin 17

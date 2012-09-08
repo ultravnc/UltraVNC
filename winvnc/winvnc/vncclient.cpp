@@ -1241,7 +1241,7 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth)
 	const bool bUseSessionSelect = false;
 	
 	// obviously needs to be one that we suggested in the first place
-	bool bSecureVNCPluginActive = std::find(current_auth.begin(), current_auth.end(), rfbUltraVNC_SecureVNCPluginAuth) != current_auth.end();
+	bool bSecureVNCPluginActive = std::find(current_auth.begin(), current_auth.end(), rfbUltraVNC_SecureVNCPluginAuth_new) != current_auth.end();
 	bool bSCPromptActive = std::find(current_auth.begin(), current_auth.end(), rfbUltraVNC_SCPrompt) != current_auth.end();
 	bool bSessionSelectActive = std::find(current_auth.begin(), current_auth.end(), rfbUltraVNC_SessionSelect) != current_auth.end();
 
@@ -1255,7 +1255,8 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth)
 	// Include the SecureVNCPluginAuth type for those that support it but are not UltraVNC viewers
 	if (!bSecureVNCPluginActive && m_socket->IsUsePluginEnabled() && m_server->GetDSMPluginPointer()->IsEnabled() && m_socket->GetIntegratedPlugin() != NULL)
 	{
-		auth_types.push_back(rfbUltraVNC_SecureVNCPluginAuth);
+		auth_types.push_back(rfbUltraVNC_SecureVNCPluginAuth_new);
+		auth_types.push_back(rfbUltraVNC_SecureVNCPluginAuth);		
 	}
 	else if ( (SPECIAL_SC_PROMPT || SPECIAL_SC_EXIT) && !bSCPromptActive ) 
 	{
@@ -1320,6 +1321,7 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth)
 
 	// Authenticate the connection, if required
 	BOOL auth_success = FALSE;
+	BOOL version_warning = FALSE;
 	std::string auth_message;
 	switch (auth_accepted)
 	{
@@ -1327,8 +1329,13 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth)
 		m_client->SetUltraViewer(true);
 		auth_success = true;
 		break;
-	case rfbUltraVNC_SecureVNCPluginAuth:
+	case rfbUltraVNC_SecureVNCPluginAuth_new:
 		auth_success = AuthSecureVNCPlugin(auth_message);	
+		break;
+	case rfbUltraVNC_SecureVNCPluginAuth:
+		auth_success=AuthSecureVNCPlugin_old(auth_message);	
+		auth_success = 0;
+		version_warning = 1;
 		break;
 	case rfbUltraVNC_MsLogonIIAuth:
 		auth_success = AuthMsLogon(auth_message);
@@ -1356,13 +1363,13 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth)
 
 	// Return the result
 	CARD32 auth_result = rfbVncAuthFailed;
-	if (auth_success) {
+	if (auth_success==1) {
 		current_auth.push_back(auth_accepted);
 
 		// continue the authentication if mslogon is enabled. any method of authentication should
 		// work out fine with this method. Currently we limit ourselves to only one layer beyond
 		// the plugin to avoid deep recursion, but that can easily be changed if necessary.
-		if (m_ms_logon && auth_accepted == rfbUltraVNC_SecureVNCPluginAuth && m_socket->GetIntegratedPlugin()) {
+		if (m_ms_logon && auth_accepted == rfbUltraVNC_SecureVNCPluginAuth_new && m_socket->GetIntegratedPlugin()) {
 			auth_result = rfbVncAuthContinue;
 		} else if (auth_accepted == rfbUltraVNC) {
 			auth_result = rfbVncAuthContinue;
@@ -1401,8 +1408,16 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth)
 	if (!m_socket->SendExactQueue((char *)&auth_result_msg, sizeof(auth_result_msg)))
 		return FALSE;
 
+	//adzm 2010-09 - Set handshake complete if integrated plugin finished auth
+	/*if ((auth_success || auth_accepted == rfbUltraVNC_SecureVNCPluginAuth) && (auth_accepted == rfbUltraVNC_SecureVNCPluginAuth_new || auth_accepted == rfbUltraVNC_SecureVNCPluginAuth) && m_socket->GetIntegratedPlugin()) {			
+		m_socket->GetIntegratedPlugin()->SetHandshakeComplete();	
+	}*/
+	if ((auth_success || auth_accepted == rfbUltraVNC_SecureVNCPluginAuth) && ( auth_accepted == rfbUltraVNC_SecureVNCPluginAuth) && m_socket->GetIntegratedPlugin()) {			
+		m_socket->GetIntegratedPlugin()->SetHandshakeComplete();	
+	}
+
 	// Send a failure reason	
-	if (!auth_success) {
+	if (!auth_success && !version_warning) {
 		if (auth_message.empty()) {
 			auth_message = "authentication rejected";
 		}
@@ -1414,13 +1429,20 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth)
 		return FALSE;
 	}
 
+	else if (!auth_success) {
+		if (auth_message.empty()) {
+			auth_message = "Server require a higher viewer version.";
+		}
+		CARD32 auth_message_length = Swap32IfLE(auth_message.length());
+		if (!m_socket->SendExactQueue((char *)&auth_message_length, sizeof(auth_message_length)))
+			return FALSE;
+		if (!m_socket->SendExact(auth_message.c_str(), auth_message.length()))
+			return FALSE;
+		return FALSE;
+	}
+
 	if (!m_socket->ClearQueue())
 		return FALSE;
-	
-	//adzm 2010-09 - Set handshake complete if integrated plugin finished auth
-	if (auth_success && auth_accepted == rfbUltraVNC_SecureVNCPluginAuth && m_socket->GetIntegratedPlugin()) {			
-		m_socket->GetIntegratedPlugin()->SetHandshakeComplete();	
-	}
 
 	if (auth_success && auth_result == rfbVncAuthContinue) {
 		if (!AuthenticateClient(current_auth)) {
@@ -1550,9 +1572,9 @@ BOOL vncClientThread::AuthSecureVNCPlugin(std::string& auth_message)
 
 	const char* plainPassword = plain;
 
-	if (!m_ms_logon && plainPassword && strlen(plainPassword) > 0) {
+	/*if (!m_ms_logon && plainPassword && strlen(plainPassword) > 0) {
 		m_socket->GetIntegratedPlugin()->SetPasswordData((const BYTE*)plainPassword, strlen(plainPassword));
-	}
+	}*/
 
 	int nSequenceNumber = 0;
 	bool bSendChallenge = true;
@@ -1600,6 +1622,93 @@ BOOL vncClientThread::AuthSecureVNCPlugin(std::string& auth_message)
 		}
 
 		delete[] pResponseData;
+
+		m_socket->GetIntegratedPlugin()->SetHandshakeComplete();	
+
+
+		if (!m_socket->ReadExact((char*)&wResponseLength, sizeof(wResponseLength))) {
+			return FALSE;
+		}
+		if (wResponseLength>2024) return FALSE;
+		pResponseData = new BYTE[wResponseLength];
+		
+		if (!m_socket->ReadExact((char*)pResponseData, wResponseLength)) {
+			delete[] pResponseData;
+			return FALSE;
+		}		
+		if (memcmp(plain,pResponseData,strlen(plain))!=NULL) auth_ok=false;
+		delete[] pResponseData;
+		nSequenceNumber++;
+	} while (bSendChallenge);
+
+	if (auth_ok) {
+		return TRUE;
+	} else {
+		return FALSE;
+	}
+}
+
+// must SetHandshakeComplete after sending auth result!
+BOOL vncClientThread::AuthSecureVNCPlugin_old(std::string& auth_message)
+{
+	char password[MAXPWLEN];
+	m_server->GetPassword(password);
+	vncPasswd::ToText plain(password);
+	m_socket->SetDSMPluginConfig(m_server->GetDSMPluginConfig());
+	BOOL auth_ok = FALSE;
+
+	const char* plainPassword = plain;
+
+	/*if (!m_ms_logon && plainPassword && strlen(plainPassword) > 0) {
+		m_socket->GetIntegratedPlugin()->SetPasswordData((const BYTE*)plainPassword, strlen(plainPassword));
+	}*/
+
+	int nSequenceNumber = 0;
+	bool bSendChallenge = true;
+	do
+	{
+		BYTE* pChallenge = NULL;
+		int nChallengeLength = 0;
+		if (!m_socket->GetIntegratedPlugin()->GetChallenge(pChallenge, nChallengeLength, nSequenceNumber)) {
+			m_socket->GetIntegratedPlugin()->FreeMemory(pChallenge);
+			auth_message = m_socket->GetIntegratedPlugin()->GetLastErrorString();
+			return FALSE;
+		}
+
+		WORD wChallengeLength = (WORD)nChallengeLength;
+
+		if (!m_socket->SendExactQueue((const char*)&wChallengeLength, sizeof(wChallengeLength))) {
+			m_socket->GetIntegratedPlugin()->FreeMemory(pChallenge);
+			return FALSE;
+		}
+
+		if (!m_socket->SendExact((const char*)pChallenge, nChallengeLength)) {
+			m_socket->GetIntegratedPlugin()->FreeMemory(pChallenge);
+			return FALSE;
+		}
+
+		m_socket->GetIntegratedPlugin()->FreeMemory(pChallenge);
+		WORD wResponseLength = 0;
+		if (!m_socket->ReadExact((char*)&wResponseLength, sizeof(wResponseLength))) {
+			return FALSE;
+		}
+
+		BYTE* pResponseData = new BYTE[wResponseLength];
+		
+		if (!m_socket->ReadExact((char*)pResponseData, wResponseLength)) {
+			delete[] pResponseData;
+			return FALSE;
+		}
+
+		if (!m_socket->GetIntegratedPlugin()->HandleResponse(pResponseData, (int)wResponseLength, nSequenceNumber, bSendChallenge)) {
+			auth_message = m_socket->GetIntegratedPlugin()->GetLastErrorString();
+			auth_ok = FALSE;
+			bSendChallenge = false;
+		} else if (!bSendChallenge) {
+			auth_ok = TRUE;
+		}
+
+		delete[] pResponseData;		
 		nSequenceNumber++;
 	} while (bSendChallenge);
 

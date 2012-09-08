@@ -32,7 +32,7 @@ class AuthDialog
 public:
 	AuthDialog();
 	virtual ~AuthDialog();
-	int DoDialog(bool ms_logon, bool isSecure = false);
+	int DoDialog(bool ms_logon, bool isSecure = false,bool warning = false);
 	TCHAR m_passwd[256];
 	TCHAR m_domain[256];
 	TCHAR m_user[256];

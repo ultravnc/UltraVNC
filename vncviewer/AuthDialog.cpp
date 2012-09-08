@@ -48,11 +48,12 @@ AuthDialog::~AuthDialog()
 {
 }
 
-int AuthDialog::DoDialog(bool ms_logon, bool isSecure)
+int AuthDialog::DoDialog(bool ms_logon, bool isSecure, bool warning)
 {
 	if (isSecure) return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG), NULL, (DLGPROC) DlgProc, (LONG) this);
 	else if (ms_logon) return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG2), NULL, (DLGPROC) DlgProc, (LONG) this);
-	else return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG1), NULL, (DLGPROC) DlgProc1, (LONG) this);
+	else if (warning) return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG1), NULL, (DLGPROC) DlgProc1, (LONG) this);
+	else return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG3), NULL, (DLGPROC) DlgProc1, (LONG) this);
 }
 
 BOOL CALLBACK AuthDialog::DlgProc(  HWND hwnd,  UINT uMsg,  
