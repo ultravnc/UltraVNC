@@ -20,8 +20,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory=".\Debug"
-			IntermediateDirectory=".\Debug"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
@@ -55,9 +55,6 @@
 				MinimalRebuild="true"
 				RuntimeLibrary="1"
 				PrecompiledHeaderFile=".\Debug/vncviewer.pch"
-				AssemblerListingLocation=".\Debug/"
-				ObjectFile=".\Debug/"
-				ProgramDataBaseFileName=".\Debug/"
 				BrowseInformation="1"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
@@ -78,11 +75,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="comctl32.lib winmm.lib omnithread.lib ws2_32.lib"
-				OutputFile=".\Debug/vncviewer.exe"
+				AdditionalDependencies="comctl32.lib winmm.lib ws2_32.lib zlibstat.lib"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="./omnithread/Debug"
+				AdditionalLibraryDirectories="./debug"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/vncviewer.pdb"
 				GenerateMapFile="true"
@@ -290,8 +286,8 @@
 				ProgramDatabaseFile=".\Release/vncviewer.pdb"
 				SubSystem="2"
 				OptimizeReferences="2"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
+				RandomizedBaseAddress="2"
+				DataExecutionPrevention="2"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -317,6 +313,7 @@
 			<Tool
 				Name="VCPostBuildEventTool"
 				CommandLine="signtool.exe sign /f c:\uvnccert.pfx /p changeme /v /t http://timestamp.globalsign.com/scripts/timstamp.dll $(OutDir)\$(TargetName)$(TargetExt)"
+				ExcludedFromBuild="true"
 			/>
 		</Configuration>
 		<Configuration
@@ -417,10 +414,6 @@
 	</Configurations>
 	<References>
 		<ProjectReference
-			ReferencedProjectIdentifier="{E52B9956-FE67-47F7-BC4F-67CC5A64B708}"
-			RelativePathToProject=".\omnithread\omnithread.vcproj"
-		/>
-		<ProjectReference
 			ReferencedProjectIdentifier="{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}"
 			RelativePathToProject="..\libjpeg-turbo-win\libjpeg-turbo-win.vcproj"
 		/>
@@ -439,6 +432,10 @@
 		<ProjectReference
 			ReferencedProjectIdentifier="{745DEC58-EBB3-47A9-A9B8-4C6627C01BF8}"
 			RelativePathToProject="..\zlib-1.2.5\contrib\vstudio\vc9\zlibstat.vcproj"
+		/>
+		<ProjectReference
+			ReferencedProjectIdentifier="{AB1CE62F-4A4D-4DAA-831D-5C93AD68F5F1}"
+			RelativePathToProject=".\omnithread\omnithread.vcproj"
 		/>
 	</References>
 	<Files>

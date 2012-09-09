@@ -306,13 +306,13 @@ Global
 		{745DEC58-EBB3-47A9-A9B8-4C6627C01BF8}.ReleaseWithoutAsm|Win32.Build.0 = ReleaseWithoutAsm|Win32
 		{745DEC58-EBB3-47A9-A9B8-4C6627C01BF8}.ReleaseWithoutAsm|x64.ActiveCfg = ReleaseWithoutAsm|x64
 		{745DEC58-EBB3-47A9-A9B8-4C6627C01BF8}.ReleaseWithoutAsm|x64.Build.0 = ReleaseWithoutAsm|x64
-		{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}.ASM Debug|Win32.ActiveCfg = ReleaseDll-Static|x64
+		{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}.ASM Debug|Win32.ActiveCfg = ReleaseDll-Static|Win32
 		{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}.ASM Debug|x64.ActiveCfg = ReleaseDll-Static|x64
 		{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}.ASM Debug|x64.Build.0 = ReleaseDll-Static|x64
 		{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}.ASM Release|Win32.ActiveCfg = ReleaseDll-Static|x64
 		{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}.ASM Release|x64.ActiveCfg = ReleaseDll-Static|x64
 		{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}.ASM Release|x64.Build.0 = ReleaseDll-Static|x64
-		{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}.Debug|Win32.ActiveCfg = DebugDll-Static|x64
+		{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}.Debug|Win32.ActiveCfg = DebugLib-Static|Win32
 		{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}.Debug|x64.ActiveCfg = DebugDll-Static|x64
 		{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}.Debug|x64.Build.0 = DebugDll-Static|x64
 		{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}.DebugDll|Win32.ActiveCfg = DebugDll|Win32

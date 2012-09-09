@@ -269,8 +269,8 @@
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\Release/vnchooks.pdb"
 				OptimizeReferences="2"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
+				RandomizedBaseAddress="2"
+				DataExecutionPrevention="2"
 				ImportLibrary=".\..\Release/vnchooks.lib"
 				TargetMachine="1"
 			/>

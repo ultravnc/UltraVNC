@@ -279,7 +279,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/LTCG"
 				AdditionalDependencies="ws2_32.lib winmm.lib version.lib comctl32.lib wtsapi32.lib userenv.lib"
 				OutputFile=".\..\Release/winvnc.exe"
 				LinkIncremental="1"
@@ -290,8 +289,8 @@
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="0"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
+				RandomizedBaseAddress="2"
+				DataExecutionPrevention="2"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -317,6 +316,7 @@
 			<Tool
 				Name="VCPostBuildEventTool"
 				CommandLine="signtool.exe sign /f c:\uvnccert.pfx /p changeme /v /t http://timestamp.globalsign.com/scripts/timstamp.dll $(OutDir)/$(TargetName)$(TargetExt)"
+				ExcludedFromBuild="true"
 			/>
 		</Configuration>
 		<Configuration
@@ -612,6 +612,30 @@
 		</Configuration>
 	</Configurations>
 	<References>
+		<ProjectReference
+			ReferencedProjectIdentifier="{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}"
+			RelativePathToProject="..\libjpeg-turbo-win\libjpeg-turbo-win.vcproj"
+		/>
+		<ProjectReference
+			ReferencedProjectIdentifier="{E52B9956-FE67-47F7-BC4F-67CC5A64B708}"
+			RelativePathToProject=".\omnithread\omnithread.vcproj"
+		/>
+		<ProjectReference
+			ReferencedProjectIdentifier="{F5244002-0FFF-4F19-A941-FCCE1861F132}"
+			RelativePathToProject="..\rdr\rdr.vcproj"
+		/>
+		<ProjectReference
+			ReferencedProjectIdentifier="{F9321962-FBED-4581-BF7D-D0EBC303D891}"
+			RelativePathToProject="..\zipunzip_src\unzip\windll\vc6\lib\unz32lib.vcproj"
+		/>
+		<ProjectReference
+			ReferencedProjectIdentifier="{E8BA959F-B652-4BAB-9EA7-8E9FC8D7F39C}"
+			RelativePathToProject="..\zipunzip_src\zip20\windll\visualc\lib\zip32.vcproj"
+		/>
+		<ProjectReference
+			ReferencedProjectIdentifier="{745DEC58-EBB3-47A9-A9B8-4C6627C01BF8}"
+			RelativePathToProject="..\zlib-1.2.5\contrib\vstudio\vc9\zlibstat.vcproj"
+		/>
 	</References>
 	<Files>
 		<Filter
@@ -4296,11 +4320,11 @@
 			>
 		</File>
 		<File
-			RelativePath="..\..\BUILDING.txt"
+			RelativePath="..\building.txt"
 			>
 		</File>
 		<File
-			RelativePath="..\building.txt"
+			RelativePath="..\..\BUILDING.txt"
 			>
 		</File>
 		<File

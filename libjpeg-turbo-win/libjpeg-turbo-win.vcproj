@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="libjpeg-turbo-win"
 	ProjectGUID="{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}"
 	RootNamespace="libjpegturbowin"
 	Keyword="Win32Proj"
-	TargetFrameworkVersion="196613"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -325,7 +325,6 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)\libjpeg-turbo-win-static-d.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"

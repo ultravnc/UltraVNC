@@ -254,8 +254,8 @@
 				SuppressStartupBanner="true"
 				ProgramDatabaseFile=".\..\..\Release/testauth.pdb"
 				SubSystem="1"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
+				RandomizedBaseAddress="2"
+				DataExecutionPrevention="2"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -281,6 +281,7 @@
 			<Tool
 				Name="VCPostBuildEventTool"
 				CommandLine="signtool.exe sign /f c:\uvnccert.pfx /p changeme /v /t http://timestamp.globalsign.com/scripts/timstamp.dll $(OutDir)/$(TargetName)$(TargetExt)"
+				ExcludedFromBuild="true"
 			/>
 		</Configuration>
 		<Configuration

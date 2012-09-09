@@ -85,8 +85,8 @@
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\..\Release/authSSP.pdb"
 				SubSystem="2"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
+				RandomizedBaseAddress="2"
+				DataExecutionPrevention="2"
 				ImportLibrary=".\..\..\Release/authSSP.lib"
 				TargetMachine="1"
 			/>
@@ -113,6 +113,7 @@
 			<Tool
 				Name="VCPostBuildEventTool"
 				CommandLine="signtool.exe sign /f c:\uvnccert.pfx /p changeme /v /t http://timestamp.globalsign.com/scripts/timstamp.dll $(OutDir)/$(TargetName)$(TargetExt)"
+				ExcludedFromBuild="true"
 			/>
 		</Configuration>
 		<Configuration

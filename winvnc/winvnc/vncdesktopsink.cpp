@@ -17,7 +17,7 @@
 //  USA.
 //
 // If the source code for the program is not available from the place from
-// which you received this file, check 
+// which you received this file, check
 // http://www.uvnc.com/
 //
 ////////////////////////////////////////////////////////////////////////////
@@ -48,7 +48,7 @@ vncDesktop::ShutdownInitWindowthread()
 #ifdef _DEBUG
 					char			szText[256];
 					sprintf(szText,"StartStophookdll(0) \n");
-					OutputDebugString(szText);		
+					OutputDebugString(szText);
 #endif
 			StartStophookdll(0);
 			Hookdll_Changed = true;
@@ -176,7 +176,7 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		{
 			if (wParam==100)
 			{
-					KillTimer(hwnd, 100); 
+					KillTimer(hwnd, 100);
 					if (_this->startw8)
 					{
 						_this->startw8(!_this->multi_monitor);
@@ -204,8 +204,8 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 							// Switch on full screen polling, so they can see something, at least...
 							_this->m_server->PollFullScreen(TRUE);
 							_this->m_hookinited = FALSE;
-						} 
-						else 
+						}
+						else
 						{
 							vnclog.Print(LL_INTERR, VNCLOG("set hooks OK\n"));
 							_this->m_hookinited = TRUE;
@@ -233,7 +233,7 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		else if (wParam==2)
 		{
 			if (_this->m_hookinited)
-				{						
+				{
 					if (_this->SetHook)
 					{
 						if (_this->SetKeyboardFilterHooks) _this->SetKeyboardFilterHooks( _this->m_bIsInputDisabledByClient || _this->m_server->LocalInputsDisabled());
@@ -241,11 +241,9 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 					}
 					else if (_this->SetHooks)
 					{
-
 						if (_this->SetKeyboardFilterHook) _this->SetKeyboardFilterHook( _this->m_bIsInputDisabledByClient || _this->m_server->LocalInputsDisabled());
 						if (_this->SetMouseFilterHook) _this->SetMouseFilterHook( _this->m_bIsInputDisabledByClient || _this->m_server->LocalInputsDisabled());
 					}
-
 				}
 		}
 		else if (_this->m_hookinited)
@@ -267,13 +265,12 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 					vnclog.Print(LL_INTERR, VNCLOG("Unsethooks Failed\n"));
 				else vnclog.Print(LL_INTERR, VNCLOG("Unsethooks OK\n"));
 				}
-				
 			}
 		return true;
 
 	case WM_QUERYENDSESSION:
 
-		/*if (OSversion()==2) 
+		/*if (OSversion()==2)
 		{
 		if (_this->m_hnextviewer!=NULL) ChangeClipboardChain(hwnd, _this->m_hnextviewer);
 		_this->m_hnextviewer=NULL;
@@ -291,7 +288,6 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 					vnclog.Print(LL_INTERR, VNCLOG("Unsethooks Failed\n"));
 				else vnclog.Print(LL_INTERR, VNCLOG("Unsethooks OK\n"));
 				}
-				
 			}
 		vnclog.Print(LL_INTERR, VNCLOG("WM_QUERYENDSESSION\n"));
 		PostQuitMessage(0);
@@ -304,12 +300,12 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		_this->m_hnextviewer=NULL;
 		DestroyWindow(hwnd);
 		break;
-	case WM_DESTROY:		
-		KillTimer(hwnd, 100); 
+	case WM_DESTROY:
+		KillTimer(hwnd, 100);
 		if (_this->m_hnextviewer!=NULL) ChangeClipboardChain(hwnd, _this->m_hnextviewer);
 		_this->m_hnextviewer=NULL;
 		if (_this->m_hookinited)
-			{				
+			{
 				if (_this->stopw8)
 				{
 					vnclog.Print(LL_INTERR, VNCLOG("unset W8 hooks OK\n"));
@@ -327,7 +323,6 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 				else vnclog.Print(LL_INTERR, VNCLOG("Unsethooks OK\n"));
 				}
 				_this->m_hookinited=FALSE;
-				
 			}
 		vnclog.Print(LL_INTERR, VNCLOG("WM_DESTROY\n"));
 		break;
@@ -373,9 +368,8 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 							}
 						_this->QueueRect(rfb::Rect(atoi(split[0]), atoi(split[1]), atoi(split[2]), atoi(split[3])));
 					}
-					
 			}
-			//vnclog.Print(LL_INTINFO, VNCLOG("copydata\n"));	
+			//vnclog.Print(LL_INTINFO, VNCLOG("copydata\n"));
         }
 			return 0;
 
@@ -397,7 +391,7 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 				_this->m_displaychanged = TRUE;
 				_this->m_hookdriver=true;
 				_this->m_videodriver->blocked=true;
-				vnclog.Print(LL_INTERR, VNCLOG("Resolution switch detected, driver active\n"));	
+				vnclog.Print(LL_INTERR, VNCLOG("Resolution switch detected, driver active\n"));
 			}
 			else
 			{
@@ -406,12 +400,11 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 				vnclog.Print(LL_INTERR, VNCLOG("Resolution switch by driver activation removed\n"));
 			}
 		}
-		else 
+		else
 		{
 				_this->m_displaychanged = TRUE;
 				_this->m_hookdriver=true;
 				vnclog.Print(LL_INTERR, VNCLOG("Resolution switch detected, driver NOT active\n"));
-			
 		}
 		return 0;
 
@@ -438,7 +431,7 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		if ((HWND)wParam == _this->m_hnextviewer)
 			_this->m_hnextviewer = (HWND)lParam;
 		else
-			if (_this->m_hnextviewer != NULL) {				
+			if (_this->m_hnextviewer != NULL) {
 				// adzm - 2010-07 - Fix clipboard hangs
 				// use SendNotifyMessage instead of SendMessage so misbehaving or hung applications
 				// won't cause our thread to hang.
@@ -526,11 +519,11 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		if (_this->m_hnextviewer != NULL)
 		{
 			// adzm - 2010-07 - Fix clipboard hangs
-			// Pass the message to the next window in clipboard viewer chain.  
-			
+			// Pass the message to the next window in clipboard viewer chain.
+
 			// use SendNotifyMessage instead of SendMessage so misbehaving or hung applications
 			// won't cause our thread to hang.
-			return SendNotifyMessage(_this->m_hnextviewer, WM_DRAWCLIPBOARD, wParam, lParam); 
+			return SendNotifyMessage(_this->m_hnextviewer, WM_DRAWCLIPBOARD, wParam, lParam);
 		}
 
 		return 0;
@@ -548,7 +541,7 @@ BOOL
 vncDesktop::InitWindow()
 {
 	vnclog.Print(LL_INTERR, VNCLOG("InitWindow called\n"));
-	
+
 	HDESK desktop;
 	desktop = OpenInputDesktop(0, FALSE,
 								DESKTOP_CREATEMENU | DESKTOP_CREATEWINDOW |
@@ -559,7 +552,7 @@ vncDesktop::InitWindow()
 
 	if (desktop == NULL)
 		vnclog.Print(LL_INTERR, VNCLOG("InitWindow:OpenInputdesktop Error \n"));
-	else 
+	else
 		vnclog.Print(LL_INTERR, VNCLOG("InitWindow:OpenInputdesktop OK\n"));
 
 	HDESK old_desktop = GetThreadDesktop(GetCurrentThreadId());
@@ -588,8 +581,6 @@ vncDesktop::InitWindow()
 	if (pfnFilter) pfnFilter(WM_QUIT, MSGFLT_ADD);
 	if (pfnFilter) pfnFilter(WM_SHUTDOWN, MSGFLT_ADD);
 
-
-	
 	if (m_wndClass == 0) {
 		// Create the window class
 		WNDCLASSEX wndclass;
@@ -680,7 +671,7 @@ vncDesktop::InitWindow()
 	hW8Module=NULL;
 	char szCurrentDirW8[MAX_PATH];
 	if (WIN8)
-	{		
+	{
 		if (GetModuleFileName(NULL, szCurrentDirW8, MAX_PATH))
 		{
 			char* p = strrchr(szCurrentDirW8, '\\');
@@ -721,9 +712,9 @@ vncDesktop::InitWindow()
 			SetMouseFilterHooks  = (SetMouseFilterHookFn) GetProcAddress( hSCModule, "SetMouseFilterHook" );
 			SetKeyboardFilterHooks  = (SetKeyboardFilterHookFn) GetProcAddress( hSCModule, "SetKeyboardFilterHook" );
 		}
-	startw8=nullptr;
-	stopw8=nullptr;
-	capturew8=nullptr;
+	startw8=NULL;
+	stopw8=NULL;
+	capturew8=NULL;
 	if (hW8Module)
 		{
 			startw8=(StartW8)GetProcAddress(hW8Module,"StartW8");
@@ -740,7 +731,7 @@ vncDesktop::InitWindow()
 		if (PeekMessage(&msg,NULL,0,0,PM_REMOVE))
 		{
 			vnclog.Print(LL_INTERR, VNCLOG("OOOOOOOOOOOO %i %i\n"),msg.message,msg.hwnd);
-			if (msg.message==WM_QUIT || fShutdownOrdered)		
+			if (msg.message==WM_QUIT || fShutdownOrdered)
 				{
 					vnclog.Print(LL_INTERR, VNCLOG("OOOOOOOOOOOO called wm_quit\n"));
 					DestroyWindow(m_hwnd);
@@ -767,7 +758,7 @@ vncDesktop::InitWindow()
 					rect.tl.y-=m_ScreenOffsety;
 					rect.br.y-=m_ScreenOffsety;
 					vnclog.Print(LL_INTERR, VNCLOG("REct3 %i %i %i %i  \n"),rect.tl.x,rect.br.x,rect.tl.y,rect.br.y);
-				
+
 					rect = rect.intersect(m_Cliprect);
 					if (!rect.is_empty())
 						{
