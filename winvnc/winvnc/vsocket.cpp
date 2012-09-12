@@ -535,9 +535,13 @@ VSocket::SetDefaultSocketOptions()
 	rw = (PUCHAR) & enableInfo;
 	enableInfo.EnableCollection=TRUE;
 	lSize = sizeof (TCP_ESTATS_SND_CONG_RW_v0); 
+	if (s_pSetPerTcpConnectionEStats)
+	{
 	iRet = s_pSetPerTcpConnectionEStats((PMIB_TCPROW) &m_SocketInfo, TcpConnectionEstatsSndCong, rw, 0, lSize, 0);
 	CanUseFlow=false;
 	if (iRet==ERROR_SUCCESS) CanUseFlow=true;
+	}
+	else CanUseFlow=true;
   } 
 
 	return result;
