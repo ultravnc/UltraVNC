@@ -39,7 +39,11 @@
 #ifdef UNDER_CE
 #include "omnithreadce.h"
 #else
+#ifdef _VNCVIEWER
+#include "../vncviewer/omnithread/omnithread.h"
+#else
 #include "omnithread.h"
+#endif
 #endif
 
 #include "windows.h"
