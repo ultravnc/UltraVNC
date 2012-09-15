@@ -73,7 +73,7 @@ Daemon::Daemon(int port)
 				NULL);
 	
 	// record which client created this window
-    helper::SafeSetWindowUserData(m_hwnd, (LONG)this);
+    helper::SafeSetWindowUserData(m_hwnd, (LONG_PTR)this);
 
 	// Load a popup menu
 	m_hmenu = LoadMenu(pApp->m_instance, MAKEINTRESOURCE(IDR_TRAYMENU));

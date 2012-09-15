@@ -66,34 +66,52 @@ SessionDialog::~SessionDialog()
     delete m_pMRU;
 }
 
+BOOL CALLBACK SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam, LPARAM lParam );
 // It's exceedingly unlikely, but possible, that if two modal dialogs were
 // closed at the same time, the static variables used for transfer between 
 // window procedure and this method could overwrite each other.
 int SessionDialog::DoDialog()
 {
  	return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_SESSION_DLG), 
-		NULL, (DLGPROC) SessDlgProc, (LONG) this);
+		NULL, (DLGPROC) SessDlgProc, (LONG_PTR) this);
 }
 
 static bool notset=true;
 static int selected=1;
 
-BOOL CALLBACK SessionDialog::SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam, LPARAM lParam ) {
+BOOL CALLBACK SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam, LPARAM lParam ) {
 	// This is a static method, so we don't know which instantiation we're 
 	// dealing with. But we can get a pseudo-this from the parameter to 
 	// WM_INITDIALOG, which we therafter store with the window and retrieve
 	// as follows:
-    SessionDialog*_this = helper::SafeGetWindowUserData<SessionDialog>(hwnd);
+    /*SessionDialog*_this = helper::SafeGetWindowUserData<SessionDialog>(hwnd);
+	if (_this!=NULL && notset) 
+		{
+			selected=_this->m_pOpt->m_selected_screen;
+			notset=false;
+		}*/
+
+	SessionDialog* _this;
+    if(uMsg == WM_INITDIALOG){
+      _this = (SessionDialog*)lParam;
+     helper::SafeSetWindowUserData(hwnd, lParam);
+    }
+    else
+      _this= (SessionDialog*)helper::SafeGetWindowUserData<SessionDialog>(hwnd);
 	if (_this!=NULL && notset) 
 		{
 			selected=_this->m_pOpt->m_selected_screen;
 			notset=false;
 		}
 
+
+
+
 	switch (uMsg) {
 
 	case WM_INITDIALOG:
 		{
+
             helper::SafeSetWindowUserData(hwnd, lParam);
             SessionDialog *l_this = (SessionDialog *) lParam;
             //CentreWindow(hwnd);

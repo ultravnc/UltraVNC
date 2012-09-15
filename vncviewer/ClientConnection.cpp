@@ -887,7 +887,7 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 				,20
 				,20
 				,20
-				,sizeof(TBBUTTON));
+				,sizeof(TBBUTTON)); 
 		}
 		}
 
@@ -914,7 +914,7 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 			(HMENU)NULL,
 			(HINSTANCE)m_pApp->m_instance,
 			NULL);
-
+		
         // 6 May 2008 jdp make topmost so they display in fullscreen mode
         ::SetWindowPos(m_hwndTT, HWND_TOPMOST,0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
 		DWORD buttonWidth = LOWORD(SendMessage(m_hwndTB,TB_GETBUTTONSIZE,(WPARAM)0,(LPARAM)0));
@@ -939,9 +939,7 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 			SendMessage(m_hwndTB,TB_SETTOOLTIPS,(WPARAM)(HWND)m_hwndTT,(LPARAM)0);
 			SendMessage(m_hwndTT,TTM_SETTIPBKCOLOR,(WPARAM)(COLORREF)0x00404040,(LPARAM)0);
 			SendMessage(m_hwndTT,TTM_SETTIPTEXTCOLOR,(WPARAM)(COLORREF)0x00F5B28D,(LPARAM)0);
-			SendMessage(m_hwndTT,TTM_SETDELAYTIME,(WPARAM)(DWORD)TTDT_INITIAL,(LPARAM)(INT) MAKELONG(200,0));
-
-            helper::SafeSetWindowUserData(m_hwndTBwin, (LONG)this);
+			SendMessage(m_hwndTT,TTM_SETDELAYTIME,(WPARAM)(DWORD)TTDT_INITIAL,(LPARAM)(INT) MAKELONG(200,0));           
 
 			ShowWindow(m_hwndTB, SW_SHOW);
 			ShowWindow(m_hwndTBwin, SW_SHOW);
@@ -1072,9 +1070,7 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 			SendMessage(m_hwndTB,TB_SETTOOLTIPS,(WPARAM)(HWND)m_hwndTT,(LPARAM)0);
 			SendMessage(m_hwndTT,TTM_SETTIPBKCOLOR,(WPARAM)(COLORREF)0x0000ff00,(LPARAM)0);
 			SendMessage(m_hwndTT,TTM_SETTIPTEXTCOLOR,(WPARAM)(COLORREF)0x00000000,(LPARAM)0);
-			SendMessage(m_hwndTT,TTM_SETDELAYTIME,(WPARAM)(DWORD)TTDT_INITIAL,(LPARAM)(INT) MAKELONG(200,0));
-
-            helper::SafeSetWindowUserData(m_hwndTBwin, (LONG)this);
+			SendMessage(m_hwndTT,TTM_SETDELAYTIME,(WPARAM)(DWORD)TTDT_INITIAL,(LPARAM)(INT) MAKELONG(200,0));            
 
 			ShowWindow(m_hwndTB, SW_SHOW);
 			ShowWindow(m_hwndTBwin, SW_SHOW);
@@ -1151,7 +1147,7 @@ void ClientConnection::GTGBS_CreateToolbar()
 					NULL,                // Menu handle
 					m_pApp->m_instance,
 					NULL);
-
+	helper::SafeSetWindowUserData(m_hwndTBwin, (LONG_PTR)this);
 	ShowWindow(m_hwndTBwin, SW_HIDE);
 	//////////////////////////////////////////////////
 	if ((clr.right-clr.left)>140+85+14*24)
@@ -1282,14 +1278,14 @@ void ClientConnection::CreateDisplay()
 				  m_hwndMain,
 			      NULL,                // Menu handle
 			      m_pApp->m_instance,
-			      NULL);
+			      (LPVOID)this);
 
 	//ShowWindow(m_hwnd, SW_HIDE);
 	//ShowWindow(m_hwndcn, SW_SHOW);
 	//adzm 2009-06-21 - let's not show until connected.
 
 	// record which client created this window
-    helper::SafeSetWindowUserData(m_hwndcn, (LONG)this);
+    helper::SafeSetWindowUserData(m_hwndcn, (LONG_PTR)this);
 
 //	SendMessage(m_hwnd,WM_CREATE,0,0);
 
@@ -3043,7 +3039,7 @@ void ClientConnection::AuthSessionSelect()
 	InitCtrls.dwICC = ICC_LISTVIEW_CLASSES|ICC_INTERNET_CLASSES;
 	InitCtrls.dwSize = sizeof(INITCOMMONCONTROLSEX);
 	BOOL bRet = InitCommonControlsEx(&InitCtrls);
-	int tt=DialogBoxParam(m_pApp->m_instance, MAKEINTRESOURCE(IDD_SESSIONSELECTOR), NULL, (DLGPROC)DialogProc,(LPARAM)this);
+	int tt=DialogBoxParam(m_pApp->m_instance, MAKEINTRESOURCE(IDD_SESSIONSELECTOR), NULL, (DLGPROC)DialogProc,(LONG_PTR)this);
 	WriteExact((char *)&tt,sizeof(int));
 }
 
@@ -6374,12 +6370,11 @@ void ClientConnection::GTGBS_CreateDisplay()
 			  NULL,                // Parent handle
 			  NULL,                // Menu handle
 			  m_pApp->m_instance,
-			  NULL);
-	//ShowWindow(m_hwndMain,SW_SHOW);
+			  (LPVOID)this);
+	helper::SafeSetWindowUserData(m_hwndMain, (LONG_PTR)this);
 
 	// [v1.0.2-jp1 fix]
-	ImmAssociateContext(m_hwndMain, NULL);
-    helper::SafeSetWindowUserData(m_hwndMain, (LONG)this);
+	ImmAssociateContext(m_hwndMain, NULL);    
 }
 
 //
@@ -6390,7 +6385,7 @@ LRESULT CALLBACK ClientConnection::GTGBS_ShowStatusWindow(LPVOID lpParameter)
 	ClientConnection *_this = (ClientConnection*)lpParameter;
 
 	 _this->m_fStatusOpen = true;
-	DialogBoxParam(_this->m_pApp->m_instance,MAKEINTRESOURCE(IDD_STATUS),NULL,(DLGPROC)ClientConnection::GTGBS_StatusProc,(LPARAM)_this);
+	DialogBoxParam(_this->m_pApp->m_instance,MAKEINTRESOURCE(IDD_STATUS),NULL,(DLGPROC)ClientConnection::GTGBS_StatusProc,(LONG_PTR)_this);
 	// _this->m_fStatusOpen = false;
 	return 0;
 }
@@ -6623,9 +6618,19 @@ LRESULT CALLBACK ClientConnection::GTGBS_SendCustomKey_proc(HWND Dlg, UINT iMsg,
 //
 LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 {
+     ClientConnection *_this= (ClientConnection*)helper::SafeGetWindowUserData<ClientConnection>(hwnd);
+	 if( iMsg==WM_CREATE )
+		 {
+		 _this = (ClientConnection*)((CREATESTRUCT*)lParam)->lpCreateParams;
+		 helper::SafeSetWindowUserData(hwnd, (LONG_PTR)_this);
+		 //SetWindowLongPtr( hwnd, GWLP_USERDATA, (LONG_PTR)_this );
+		 }
+
+
+
 	// This is a static method, so we don't know which instantiation we're
 	// dealing with.  But we've stored a 'pseudo-this' in the window data.
-    ClientConnection *_this = helper::SafeGetWindowUserData<ClientConnection>(hwnd);
+//    ClientConnection *_this = helper::SafeGetWindowUserData<ClientConnection>(hwnd);
 
 	if (_this == NULL)
 		return DefWindowProc(hwnd, iMsg, wParam, lParam);
@@ -8023,6 +8028,8 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 	switch (iMsg)
 			{
 			case WM_CREATE:
+				_this = (ClientConnection*)((CREATESTRUCT*)lParam)->lpCreateParams;
+				helper::SafeSetWindowUserData(hwnd, (LONG_PTR)_this);
 				SetTimer(_this->m_hwndcn,3335, 1000, NULL);
 				return 0;
 

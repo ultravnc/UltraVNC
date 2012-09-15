@@ -1875,18 +1875,6 @@ vncServer::GetScreenInfo(int &width, int &height, int &depth)
 			}//membitmap
 			if (hrootdc != NULL) ReleaseDC(NULL, hrootdc);
 		}//rootdc
-	
-		// No, so create a dummy desktop and interrogate it
-	/*	if (!desktop.Init(this))
-		{
-			scrinfo.framebufferWidth = 0;
-			scrinfo.framebufferHeight = 0;
-			scrinfo.format.bitsPerPixel = 0;
-		}
-		else
-		{
-			desktop.FillDisplayInfo(&scrinfo);
-		}*/
 	}
 	else
 	{

@@ -3250,7 +3250,7 @@ bool FileTransfer::IsDirectoryGetIt(char* szName)
 int FileTransfer::DoDialog()
 {
  	return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_FILETRANSFER_DLG), 
-		NULL, (DLGPROC) FileTransferDlgProc, (LONG) this);
+		NULL, (DLGPROC) FileTransferDlgProc, (LONG_PTR) this);
 }
 
 
@@ -4387,7 +4387,7 @@ int FileTransfer::DoFTParamDialog(LPSTR szTitle, LPSTR szComment)
 {
 	strcpy(m_szFTParamTitle, szTitle);
 	strcpy(m_szFTParamComment, szComment);
-	return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_FTPARAM_DLG), hWnd, (DLGPROC) FTParamDlgProc, (LONG) this);
+	return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_FTPARAM_DLG), hWnd, (DLGPROC) FTParamDlgProc, (LONG_PTR) this);
 }
 
 
@@ -4464,7 +4464,7 @@ int FileTransfer::DoFTConfirmDialog(LPSTR szTitle, LPSTR szComment)
 {
 	strcpy(m_szFTConfirmTitle, szTitle);
 	strcpy(m_szFTConfirmComment, szComment);
-	return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_FTCONFIRM_DLG), hWnd, (DLGPROC) FTConfirmDlgProc, (LONG) this);
+	return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_FTCONFIRM_DLG), hWnd, (DLGPROC) FTConfirmDlgProc, (LONG_PTR) this);
 }
 
 

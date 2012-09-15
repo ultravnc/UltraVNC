@@ -150,7 +150,7 @@ void CTitleBar::CreateDisplay()
 			      hInstance,
 			      NULL);
 
-    helper::SafeSetWindowUserData(m_hWnd, (long)this);
+    helper::SafeSetWindowUserData(m_hWnd, (LONG_PTR)this);
 	//Set region to window so it is non rectangular
 	HRGN Range;
 	POINT Points[4];
@@ -203,7 +203,7 @@ void CTitleBar::CreateDisplay()
 				NULL);
 
 	//Set the creation of the window
-    helper::SafeSetWindowUserData(m_hWnd, (LONG)this);
+    helper::SafeSetWindowUserData(m_hWnd, (LONG_PTR)this);
 
 	//Load pictures
 	this->LoadPictures();

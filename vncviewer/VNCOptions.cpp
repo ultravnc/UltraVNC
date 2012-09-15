@@ -1207,7 +1207,7 @@ int VNCOptions::DoDialog(bool running)
 {
   m_running = running;
   return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_OPTIONDIALOG), 
-                        NULL, (DLGPROC) OptDlgProc, (LONG) this);
+                        NULL, (DLGPROC) OptDlgProc, (LONG_PTR) this);
 }
 
 void VNCOptions::CancelDialog()

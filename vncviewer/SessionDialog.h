@@ -49,12 +49,17 @@ public:
 //	TCHAR m_remotehost[256];
    	virtual ~SessionDialog();
 
-private:
 	ClientConnection *m_pCC;
 	VNCOptions *m_pOpt;
 	MRU *m_pMRU;
 	CDSMPlugin* m_pDSMPlugin; // sf@2002
-	static BOOL CALLBACK SessDlgProc(  HWND hwndDlg,  UINT uMsg, 
-		WPARAM wParam, LPARAM lParam );
+
+private:
+	//ClientConnection *m_pCC;
+	//VNCOptions *m_pOpt;
+	//MRU *m_pMRU;
+	//CDSMPlugin* m_pDSMPlugin; // sf@2002
+	//static BOOL CALLBACK SessDlgProc(  HWND hwndDlg,  UINT uMsg, 
+	//	WPARAM wParam, LPARAM lParam );
 
 };

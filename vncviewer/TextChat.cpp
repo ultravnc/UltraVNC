@@ -240,20 +240,20 @@ void TextChat::PrintMessage(const char* szMessage,const char* szSender,DWORD dwC
 		_tzset();
 		_strtime(tbuffer);
 
-		SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT,WM_GETTEXT, TEXTMAXSIZE-1,(LONG)m_szTextBoxBuffer);
+		SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT,WM_GETTEXT, TEXTMAXSIZE-1,(LPARAM)m_szTextBoxBuffer);
 		cr.cpMax = strlen(m_szTextBoxBuffer);	 // Select the last caracter to make the text insertion
 		cr.cpMin  = cr.cpMax;
-		SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT,EM_EXSETSEL,0,(LONG) &cr);
+		SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT,EM_EXSETSEL,0,(LPARAM) &cr);
 		SetTextFormat(false, false, 0x75, "MS Sans Serif", GREY);
 		_snprintf(m_szTextBoxBuffer, TEXTMAXSIZE-1, "[%s]", tbuffer);		
-		SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT,EM_REPLACESEL,FALSE,(LONG)m_szTextBoxBuffer); // Replace the selection with the message
+		SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT,EM_REPLACESEL,FALSE,(LPARAM)m_szTextBoxBuffer); // Replace the selection with the message
 		*/
 
 		// Sender
-		// SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT,WM_GETTEXT, TEXTMAXSIZE-1,(LONG)m_szTextBoxBuffer);
+		// SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT,WM_GETTEXT, TEXTMAXSIZE-1,(LPARAM)m_szTextBoxBuffer);
 		cr.cpMax = nLen; //strlen(m_szTextBoxBuffer);	 // Select the last caracter to make the text insertion
 		cr.cpMin  = cr.cpMax;
-		SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT, EM_EXSETSEL, 0, (LONG)&cr);
+		SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT, EM_EXSETSEL, 0, (LPARAM)&cr);
 		/***/
 
 		// [v1.0.2-jp1 fix-->]
@@ -267,16 +267,16 @@ void TextChat::PrintMessage(const char* szMessage,const char* szSender,DWORD dwC
 		// [<--v1.0.2-jp1 fix]
 
 		_snprintf(m_szTextBoxBuffer, MAXNAMESIZE-1 + 4, "<%s>: ", szSender);		
-		SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT,EM_REPLACESEL,FALSE,(LONG)m_szTextBoxBuffer); // Replace the selection with the message
+		SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT,EM_REPLACESEL,FALSE,(LPARAM)m_szTextBoxBuffer); // Replace the selection with the message
 	}
 
 	nLen = SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT, EM_GETTEXTLENGTHEX, (WPARAM)&lpG, 0L);
 	if (szMessage != NULL) //print the sender's message
 	{	
-		SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT,WM_GETTEXT, TEXTMAXSIZE-1,(LONG)m_szTextBoxBuffer);
+		SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT,WM_GETTEXT, TEXTMAXSIZE-1,(LPARAM)m_szTextBoxBuffer);
 		cr.cpMax = nLen; //strlen(m_szTextBoxBuffer);	 // Select the last caracter to make the text insertion
 		cr.cpMin  = cr.cpMax;
-		SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT,EM_EXSETSEL,0,(LONG) &cr);
+		SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT,EM_EXSETSEL,0,(LPARAM) &cr);
 		/***/
 		// [v1.0.2-jp1 fix-->]
 		//SetTextFormat(false, false, 0x75, "MS Sans Serif", dwColor != GREY ? BLACK : GREY);	
@@ -289,7 +289,7 @@ void TextChat::PrintMessage(const char* szMessage,const char* szSender,DWORD dwC
 		// [<--v1.0.2-jp1 fix]
 
 		_snprintf(m_szTextBoxBuffer, TEXTMAXSIZE-1, "%s", szMessage);		
-		SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT, EM_REPLACESEL, FALSE, (LONG)m_szTextBoxBuffer); 
+		SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT, EM_REPLACESEL, FALSE, (LPARAM)m_szTextBoxBuffer); 
 	}
 
 	// Scroll down the chat window
@@ -337,7 +337,7 @@ void TextChat::SendLocalText(void)
 int TextChat::DoDialog()
 {
  	return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_TEXTCHAT_DLG), 
-							NULL, (DLGPROC) TextChatDlgProc, (LONG) this);
+							NULL, (DLGPROC) TextChatDlgProc, (LONG_PTR) this);
 }
 
 
