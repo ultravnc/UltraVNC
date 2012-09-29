@@ -1,4 +1,4 @@
-//  Copyright (C) 2002 Ultr@VNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002 UltraVNC Team Members. All Rights Reserved.
 //  Copyright (C) 2000-2002 Const Kaplinsky. All Rights Reserved.
 //  Copyright (C) 2002 RealVNC Ltd. All Rights Reserved.
 //  Copyright (C) 1999 AT&T Laboratories Cambridge. All Rights Reserved.
@@ -75,6 +75,7 @@
 #include <shlobj.h>
 #include "vncOSVersion.h"
 #include "common/win32_helpers.h"
+#include "uvncUiAccess.h"
 
 bool isDirectoryTransfer(const char *szFileName);
 extern BOOL SPECIAL_SC_PROMPT;

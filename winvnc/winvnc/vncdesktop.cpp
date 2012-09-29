@@ -1,4 +1,4 @@
-//  Copyright (C) 2002 Ultr@VNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002 UltraVNC Team Members. All Rights Reserved.
 //  Copyright (C) 2000-2002 Const Kaplinsky. All Rights Reserved.
 //  Copyright (C) 2002 RealVNC Ltd. All Rights Reserved.
 //  Copyright (C) 1999 AT&T Laboratories Cambridge. All Rights Reserved.
@@ -2195,7 +2195,7 @@ void vncDesktop::SetSW(int x,int y)
 }
 
 /***************************************************************************
-* Ultravnc use 2 different software hooking methods 
+* UltraVNC use 2 different software hooking methods 
 * hookdll: Hook the messages between the windows (nt,9.x)
 * ddihook: Hook the messages to the video buffer (9.x)
 * Driver hooking

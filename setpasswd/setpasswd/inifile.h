@@ -2,7 +2,7 @@
 #if (!defined(_WINVNC_INIFILE))
 #define _WINVNC_INIFILE
 
-#define INIFILE_NAME "ultravnc.ini"
+#define INIFILE_NAME "UltraVNC.ini"
 
 class IniFile
 {

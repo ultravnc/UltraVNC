@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002-2010 Ultr@VNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002-2010 UltraVNC Team Members. All Rights Reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@
 #include "vncdesktop.h"
 #include "vncservice.h"
 #include <string.h>
+#include "uvncUiAccess.h"
 
 #define MSGFLT_ADD		1
 typedef BOOL (WINAPI *CHANGEWINDOWMESSAGEFILTER)(UINT message, DWORD dwFlag);
@@ -85,7 +86,7 @@ vncDesktop::StopInitWindowthread()
 		else
 		{
 			vnclog.Print(LL_INTINFO, VNCLOG("initwindowthread already closed \n"));
-		}
+		}		
 }
 
 void
@@ -145,8 +146,10 @@ vncDesktop::StartInitWindowthread()
 DWORD WINAPI
 InitWindowThread(LPVOID lpParam)
 {
+	keybd_initialize();
 	vncDesktop *mydesk=(vncDesktop*)lpParam;
 	mydesk->InitWindow();
+	keybd_delete();
 	return 0;
 }
 
@@ -624,7 +627,7 @@ vncDesktop::InitWindow()
 		SetEvent(restart_event);
 		return FALSE;
 	}
-
+	SetTimer(m_hwnd,100,10000,NULL);
 	// Set the "this" pointer for the window
     helper::SafeSetWindowUserData(m_hwnd, (LONG_PTR)this);
 
@@ -728,10 +731,15 @@ vncDesktop::InitWindow()
 	SetEvent(restart_event);
 	while (TRUE)
 	{
+		
 		if (PeekMessage(&msg,NULL,0,0,PM_REMOVE))
 		{
 			vnclog.Print(LL_INTERR, VNCLOG("OOOOOOOOOOOO %i %i\n"),msg.message,msg.hwnd);
-			if (msg.message==WM_QUIT || fShutdownOrdered)
+			if (msg.message==WM_TIMER)
+			{
+				keepalive();
+			}			
+			else if (msg.message==WM_QUIT || fShutdownOrdered)
 				{
 					vnclog.Print(LL_INTERR, VNCLOG("OOOOOOOOOOOO called wm_quit\n"));
 					DestroyWindow(m_hwnd);
@@ -786,7 +794,7 @@ vncDesktop::InitWindow()
 		}
 		else WaitMessage();
 	}
-
+	KillTimer(m_hwnd,100);
 	if (hModule)FreeLibrary(hModule);
 	if (hSCModule)FreeLibrary(hSCModule);
 	if (hW8Module)FreeLibrary(hW8Module);

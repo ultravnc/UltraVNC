@@ -1,4 +1,4 @@
-//  Copyright (C) 2002 Ultr@VNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002 UltraVNC Team Members. All Rights Reserved.
 //  Copyright (C) 2000 Const Kaplinsky. All Rights Reserved.
 //  Copyright (C) 2002 RealVNC Ltd. All Rights Reserved.
 //  Copyright (C) 1999 AT&T Laboratories Cambridge. All Rights Reserved.
@@ -48,7 +48,7 @@ const char HTTP_MSG_OK []			="HTTP/1.0 200 OK\r\n\r\n";
 const char HTTP_FMT_INDEX[]			="<HTML><TITLE>VNC desktop [%.256s]</TITLE>\n"
 	"<APPLET CODE=vncviewer.class ARCHIVE=vncviewer.jar WIDTH=%d HEIGHT=%d>\n"
 	"<param name=PORT value=%d></APPLET></HTML>\n";
-const char HTTP_MSG_NOSOCKCONN []	="<HTML><TITLE>Ultr@VNC desktop</TITLE>\n"
+const char HTTP_MSG_NOSOCKCONN []	="<HTML><TITLE>UltraVNC desktop</TITLE>\n"
 	"<BODY>The requested desktop is not configured to accept incoming connections.</BODY>\n"
 	"</HTML>\n";
 const char HTTP_MSG_NOSUCHFILE []	="HTTP/1.0 404 Not found\r\n\r\n"
@@ -99,13 +99,13 @@ const char HTTP_FMT_INDEX[] =
 "    </APPLET>"*/
 "  </SPAN>\n"
 // "    <BR>\n"
-// "    <A href=\"http://ultravnc.sf.net\">Ultr@VNC Home Page</A></HTML>\n" // sf@2002: don't waste space 
+// "    <A href=\"http://UltraVNC.sf.net\">UltraVNC Home Page</A></HTML>\n" // sf@2002: don't waste space 
 "  </BODY>\n"
 "</HTML>\n";
 
 const char HTTP_MSG_NOSOCKCONN [] =
 "<HTML>\n"
-"  <HEAD><TITLE>Ultr@VNC desktop</TITLE></HEAD>\n"
+"  <HEAD><TITLE>UltraVNC desktop</TITLE></HEAD>\n"
 "  <BODY>\n"
 "    <H1>Connections Disabled</H1>\n"
 "    The requested desktop is not configured to accept incoming connections.\n"
@@ -114,7 +114,7 @@ const char HTTP_MSG_NOSOCKCONN [] =
 
 const char HTTP_MSG_BADPARAMS [] =
 "<HTML>\n"
-"  <HEAD><TITLE>Ultr@VNC desktop</TITLE></HEAD>\n"
+"  <HEAD><TITLE>UltraVNC desktop</TITLE></HEAD>\n"
 "  <BODY>\n"
 "    <H1>Bad Parameters</H1>\n"
 "    The sequence of applet parameters specified within the URL is invalid.\n"

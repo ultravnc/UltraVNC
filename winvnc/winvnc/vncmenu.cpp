@@ -1,4 +1,4 @@
-//  Copyright (C) 2002 Ultr@VNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002 UltraVNC Team Members. All Rights Reserved.
 //  Copyright (C) 2002 RealVNC Ltd. All Rights Reserved.
 //  Copyright (C) 1999 AT&T Laboratories Cambridge. All Rights Reserved.
 //
@@ -514,7 +514,7 @@ void
 vncMenu::AddTrayIcon()
 {
 	//vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::AddTrayIcon \n"));
-	vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::AddTrayIcon - UserName = %s\n"), m_username);
+	//vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::AddTrayIcon - UserName = %s\n"), m_username);
 
 	// If the user name is non-null then we have a user!
 	if (strcmp(m_username, "") != 0 && strcmp(m_username, "SYSTEM") != 0)
@@ -526,14 +526,14 @@ vncMenu::AddTrayIcon()
 		if (!tray)
 		{
 			IsIconSet=false;
-			vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::AddTrayIcon - User exists, traywnd is not found reset when counter reach %i=3\n"),IconFaultCounter);
+			//vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::AddTrayIcon - User exists, traywnd is not found reset when counter reach %i=3\n"),IconFaultCounter);
 			IconFaultCounter++;
 			m_server->TriggerUpdate();
 			return;
 		}
 		else
 		{
-			vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::AddTrayIcon - ADD Tray Icon call\n"));
+			//vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::AddTrayIcon - ADD Tray Icon call\n"));
 		}
 
 		if (osvi.dwPlatformId==VER_PLATFORM_WIN32_NT && osvi.dwMinorVersion==0 && osvi.dwMajorVersion==5)
@@ -627,6 +627,7 @@ vncMenu::GetIPAddrString(char *buffer, int buflen) {
 		{
 			if (strcmp(buffer,old_buffer)!=NULL) //ip changed
 			{
+				vnclog.Print(LL_INTERR, VNCLOG("IP interface change detected %s %s\n"),buffer,old_buffer);
 				if (m_server->SockConnected())
 				{
 					// if connected restart
@@ -932,7 +933,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		}
 
 
-		vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::TIMER TrayIcon 5s hack\n"));
+		//vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::TIMER TrayIcon 5s hack\n"));
 
 		if (_this->m_server->RunningFromExternalService())
 			{
@@ -959,7 +960,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		// *** HACK for running servicified
 		if (vncService::RunningAsService())
 			{
-				vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::TIMER TrayIcon 5s hack call - Runningasservice\n"));
+				//vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::TIMER TrayIcon 5s hack call - Runningasservice\n"));
 				// Attempt to add the icon if it's not already there
 				_this->AddTrayIcon();
 				// Trigger a check of the current user

@@ -288,10 +288,10 @@
 #define ID_SERV_SUCCESS_INST            41042
 #define ID_SERV_SUCCESS_REG             41043
 #define ID_SERV_SUCCESS_UNREG           41044
-#define ID_ULTRAVNC_TEXTCHAT            41045
-#define ID_ULTRAVNC_WARNING             41046
+#define ID_UltraVNC_TEXTCHAT            41045
+#define ID_UltraVNC_WARNING             41046
 #define ID_NO_PLUGIN_DETECT             41047
-#define ID_CHAT_WITH_S_ULTRAVNC         41048
+#define ID_CHAT_WITH_S_UltraVNC         41048
 #define ID_CURRENT_USER_PROP            41049
 #define ID_DEFAULT_SYST_PROP            41050
 #define ID_AUTOREJECT_U                 41051

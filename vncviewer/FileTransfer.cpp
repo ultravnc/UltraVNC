@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002-2007 Ultr@VNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002-2007 UltraVNC Team Members. All Rights Reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 //
 // If the source code for the program is not available from the place from
 // which you received this file, check 
-// http://ultravnc.sourceforge.net/
+// http://www.uvnc.com
 //
 ////////////////////////////////////////////////////////////////////////////
 
@@ -3388,7 +3388,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 				szRemoteName[128-2]='.';
 				szRemoteName[128-1]=0x00;
 			}	
-			_snprintf(szTitle, lTitleBufSize-1," %s < %s>  -  Ultr@VNC", sz_H35,szRemoteName);
+			_snprintf(szTitle, lTitleBufSize-1," %s < %s>  -  UltraVNC", sz_H35,szRemoteName);
 			SetWindowText(hWnd, szTitle);
 
 			// Create all the columns of the Files ListViews

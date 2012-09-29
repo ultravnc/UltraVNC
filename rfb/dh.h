@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002-2010 Ultr@VNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002-2010 UltraVNC Team Members. All Rights Reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@
 
 // Enjoy.
 
-// Adopted to ms-logon for ultravnc by marscha, 2006.
+// Adopted to ms-logon for UltraVNC by marscha, 2006.
 
 #ifndef __RFB_DH_H__
 #define __RFB_DH_H__

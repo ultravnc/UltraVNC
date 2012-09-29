@@ -1,4 +1,4 @@
-//  Copyright (C) 2007 Ultr@VNC Team Members. All Rights Reserved.
+//  Copyright (C) 2007 UltraVNC Team Members. All Rights Reserved.
 //  Copyright (C) 1999 AT&T Laboratories Cambridge. All Rights Reserved.
 //
 //  This file is part of the VNC system.
@@ -210,7 +210,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 	InitIpp();
 #endif
 #ifdef CRASHRPT
-	Install(NULL, _T("ultravnc@skynet.be"), _T(""));
+	Install(NULL, _T("UltraVNC@skynet.be"), _T(""));
 #endif
 	bool Injected_autoreconnect=false;
 	SPECIAL_SC_EXIT=false;
@@ -1003,7 +1003,7 @@ int WinVNCAppMain()
 	SetOSVersion();
 	vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - WinVNCAPPMain\n"));
 #ifdef CRASH_ENABLED
-	LPVOID lpvState = Install(NULL,  "rudi.de.vos@skynet.be", "UltraVnc");
+	LPVOID lpvState = Install(NULL,  "rudi.de.vos@skynet.be", "UltraVNC");
 #endif
 
 	// Set this process to be the last application to be shut down.

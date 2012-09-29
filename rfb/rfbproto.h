@@ -1,5 +1,5 @@
 /*
-//  Copyright (C) 2002 Ultr@VNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002 UltraVNC Team Members. All Rights Reserved.
 //  Copyright (C) 2000-2002 Const Kaplinsky. All Rights Reserved.
  *  Copyright (C) 2002 RealVNC Ltd.  All Rights Reserved.
  *  Copyright (C) 1999 AT&T Laboratories Cambridge.  All Rights Reserved.
@@ -164,7 +164,7 @@ typedef struct {
 #define rfbProtocolVersionFormat "RFB %03d.%03d\n"
 #define rfbProtocolMajorVersion 3
 #define rfbProtocolMinorVersion 8
-//#define rfbProtocolMinorVersion 4 // Reserved to UltravNC ! (as well as "6")
+//#define rfbProtocolMinorVersion 4 // Reserved to UltraVNC ! (as well as "6")
 
 //adzm 2010-09
 /*
@@ -182,7 +182,7 @@ typedef struct {
  Now the server sends the version, and the viewer negotiates the version to send back.
 
  The viewer handles the minor version as thus:
- (note that 'file transfer' is a generic term for various ultravnc features, such as chat, etc)
+ (note that 'file transfer' is a generic term for various UltraVNC features, such as chat, etc)
  4 - mslogon, file transfer
  6 - file transfer
  14 - mslogon, file transfer, SC_PROMPT

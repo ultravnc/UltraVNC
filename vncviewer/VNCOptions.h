@@ -1,4 +1,4 @@
-//  Copyright (C) 2002 Ultr@VNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002 UltraVNC Team Members. All Rights Reserved.
 //
 //  Copyright (C) 2000-2002 Const Kaplinsky. All Rights Reserved.
 //

@@ -125,7 +125,7 @@ END
 IDD_PARENT DIALOGEX 0, 0, 277, 231
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION
 EXSTYLE WS_EX_CONTEXTHELP | WS_EX_CONTROLPARENT
-CAPTION "UltraVnc settings"
+CAPTION "UltraVNC settings"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     PUSHBUTTON      "&OK",IDOK,140,210,75,14
@@ -150,7 +150,7 @@ BEGIN
     PUSHBUTTON      "Configure MS Logon Groups",IDC_MSLOGON,62,58,132,14
     GROUPBOX        "Advanced",IDC_STATIC,11,75,236,40
     CONTROL         "Password Required",IDC_PASSRECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,93,77,10
-    CONTROL         "Allow shutdown UltraVnc",IDC_ALLOWSHUTDOWN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,115,82,95,10
+    CONTROL         "Allow shutdown UltraVNC",IDC_ALLOWSHUTDOWN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,115,82,95,10
     CONTROL         "Allow edit clients",IDC_ALLOWEDIT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,115,92,69,10
     CONTROL         "Allow properties",IDC_ALLOWPROP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,115,102,67,10
     GROUPBOX        "Encryption",IDC_STATIC,11,118,236,47
@@ -467,7 +467,7 @@ BEGIN
     BEGIN
         BLOCK "081304b0"
         BEGIN
-            VALUE "Comments", "Standalone ultravnc.ini editor"
+            VALUE "Comments", "Standalone UltraVNC.ini editor"
             VALUE "CompanyName", "uvnc bvba"
             VALUE "FileDescription", "uvnc_set Application"
             VALUE "FileVersion", "1, 0, 0, 1"

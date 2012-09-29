@@ -1,4 +1,4 @@
-//  Copyright (C) 2002 Ultr@VNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002 UltraVNC Team Members. All Rights Reserved.
 //  Copyright (C) 2002 RealVNC Ltd. All Rights Reserved.
 //  Copyright (C) 1999 AT&T Laboratories Cambridge. All Rights Reserved.
 //
@@ -145,7 +145,7 @@ public:
 	BYTE		*m_cachebuff;
 	BYTE		*m_mainbuff;
 	vncDesktop	*m_desktop;
-//	Ultravncmemcpy mem;
+//	UltraVNCmemcpy mem;
 	BOOL			m_cursor_shape_cleared;
 
 	// sf@2005 - Grey palette

@@ -52,7 +52,7 @@ IDR_FTPFRAMESTRCOMP_CLASS JAVACLASS               "res\\ftpframe$strcomp.class"
 
 IDD_TEXTCHAT_DLG DIALOGEX 0, 0, 308, 177
 STYLE DS_SETFONT | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_THICKFRAME
-CAPTION " Chat - Ultr@VNC"
+CAPTION " Chat - UltraVNC"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     EDITTEXT        IDC_INPUTAREA_EDIT,4,135,255,39,ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN | NOT WS_BORDER | WS_VSCROLL,WS_EX_STATICEDGE
@@ -126,7 +126,7 @@ END
 
 IDD_PROPERTIES DIALOGEX 0, 0, 224, 191
 STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
-CAPTION " Ultr@VNC Server Property Page"
+CAPTION " UltraVNC Server Property Page"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     GROUPBOX        "Server Screen Updates Handling",IDC_UPDATE_BORDER,6,2,214,118
@@ -528,17 +528,17 @@ BEGIN
     ID_SERV_SUCCESS_INST    "The WinVNC service was successfully installed\nThe service will start now and will automatically\nbe run the next time this machine is reset"
     ID_SERV_SUCCESS_REG     "The WinVNC service was successfully registered\nThe service may be started from the Control Panel, and will\nautomatically be run the next time this machine is reset"
     ID_SERV_SUCCESS_UNREG   "The WinVNC service has been unregistered"
-    ID_ULTRAVNC_TEXTCHAT    "The selected client is not an Ultr@VNC Viewer !\nIt presumably does not support TextChat\n"
-    ID_ULTRAVNC_WARNING     "Ultr@VNC Warning"
+    ID_UltraVNC_TEXTCHAT    "The selected client is not an UltraVNC Viewer !\nIt presumably does not support TextChat\n"
+    ID_UltraVNC_WARNING     "UltraVNC Warning"
     ID_NO_PLUGIN_DETECT     "No Plugin detected..."
-    ID_CHAT_WITH_S_ULTRAVNC " Chat with <%s> - Ultr@VNC"
+    ID_CHAT_WITH_S_UltraVNC " Chat with <%s> - UltraVNC"
     ID_CURRENT_USER_PROP    "WinVNC: Current User Properties"
     ID_DEFAULT_SYST_PROP    "WinVNC: Default Local System Properties"
     ID_AUTOREJECT_U         "AutoReject:%u"
     ID_AUTOACCEPT_U         "AutoAccept:%u"
     ID_CADERROR             "Ctrl-alt-del require service, no permission"
     ID_CADERRORFILE         "The file cad.exe was not found in the same folder as winvnc"
-    ID_CADPERMISSION        "Permission denied on cad.exe, Ultravnc must be installed in ""program files"" else special cad permission is refused."
+    ID_CADPERMISSION        "Permission denied on cad.exe, UltraVNC must be installed in ""program files"" else special cad permission is refused."
 END
 
 #endif    // English (United States) resources

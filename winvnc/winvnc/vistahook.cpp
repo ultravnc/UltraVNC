@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002-2010 Ultr@VNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002-2010 UltraVNC Team Members. All Rights Reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -462,14 +462,14 @@ DWORD WINAPI Cadthread(LPVOID lpParam)
 		if ( nr==SE_ERR_ACCESSDENIED )
 			vncTimedMsgBox::Do(
 									sz_ID_CADPERMISSION,
-									sz_ID_ULTRAVNC_WARNING,
+									sz_ID_UltraVNC_WARNING,
 									MB_ICONINFORMATION | MB_OK
 									);
 
 		if ( nr==ERROR_PATH_NOT_FOUND || nr==ERROR_FILE_NOT_FOUND)
 			vncTimedMsgBox::Do(
 									sz_ID_CADERRORFILE,
-									sz_ID_ULTRAVNC_WARNING,
+									sz_ID_UltraVNC_WARNING,
 									MB_ICONINFORMATION | MB_OK
 									);
 

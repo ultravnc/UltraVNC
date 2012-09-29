@@ -1,4 +1,4 @@
-//  Copyright (C) 2002 Ultr@Vnc Team Members. All Rights Reserved.
+//  Copyright (C) 2002 UltraVNC Team Members. All Rights Reserved.
 //  Copyright (C) 2000-2002 Const Kaplinsky. All Rights Reserved.
 //  Copyright (C) 2002 RealVNC Ltd. All Rights Reserved.
 //  Copyright (C) 1999 AT&T Laboratories Cambridge. All Rights Reserved.
@@ -783,8 +783,8 @@ void vncServer::TextChatClient(LPSTR szClientName)
 			{
 				vnclog.Print(LL_INTINFO, VNCLOG("Client %s is not Ultra. Doesn't know TextChat\n"), szClientName);
 				vncTimedMsgBox::Do(
-									sz_ID_ULTRAVNC_TEXTCHAT,
-									sz_ID_ULTRAVNC_WARNING,
+									sz_ID_UltraVNC_TEXTCHAT,
+									sz_ID_UltraVNC_WARNING,
 									MB_ICONINFORMATION | MB_OK
 									);
 				break;
@@ -797,7 +797,7 @@ void vncServer::TextChatClient(LPSTR szClientName)
 	vnclog.Print(LL_INTINFO, VNCLOG("KillClient() from name done\n"));
 }
 
-bool vncServer::IsUltraVncViewer()
+bool vncServer::IsUltraVNCViewer()
 {
 	vncClientList::iterator i;
 	omni_mutex_lock l(m_clientsLock);

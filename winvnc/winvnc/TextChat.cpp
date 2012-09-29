@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002 Ultr@VNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002 UltraVNC Team Members. All Rights Reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -550,7 +550,7 @@ INT_PTR CALLBACK TextChat::TextChatDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM wPar
 			const long lTitleBufSize = 256;			
 			char szTitle[lTitleBufSize];
 			
-			_snprintf(szTitle,lTitleBufSize-1, sz_ID_CHAT_WITH_S_ULTRAVNC,_this->m_szRemoteName);
+			_snprintf(szTitle,lTitleBufSize-1, sz_ID_CHAT_WITH_S_UltraVNC,_this->m_szRemoteName);
 			SetWindowText(hWnd, szTitle);			
 
 			memset(_this->m_szLocalText, 0, TEXTMAXSIZE);

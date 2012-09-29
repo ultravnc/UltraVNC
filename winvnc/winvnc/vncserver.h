@@ -1,4 +1,4 @@
-//  Copyright (C) 2002 Ultr@VNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002 UltraVNC Team Members. All Rights Reserved.
 //  Copyright (C) 2000-2002 Const Kaplinsky. All Rights Reserved.
 //  Copyright (C) 2002 RealVNC Ltd. All Rights Reserved.
 //  Copyright (C) 1999 AT&T Laboratories Cambridge. All Rights Reserved.
@@ -105,7 +105,7 @@ public:
 	virtual void KillClient(vncClientId client);
 	virtual void KillClient(LPSTR szClientName); // sf@2002
 	virtual void TextChatClient(LPSTR szClientName); // sf@2002
-	bool IsUltraVncViewer();
+	bool IsUltraVNCViewer();
 	bool AreThereMultipleViewers();
 
 	virtual UINT AuthClientCount();

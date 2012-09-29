@@ -21,7 +21,7 @@ void create_config_txt(char *cmd)
 
 	ofstream outFile(szFileName);
 	outFile << ";!@Install@!UTF-8!\n";
-	outFile << "Title=\"UltraVnc\"\n";
+	outFile << "Title=\"UltraVNC\"\n";
 	outFile << "RunProgram=\"winvnc.exe ";
 	outFile << cmd;
 	outFile << "\"\n";
@@ -66,7 +66,7 @@ create_uvnc_ini()
 		char* p = strrchr(szFileName, '\\');
 		if (p == NULL) return;
 			*p = '\0';
-		strcat (szFileName,"\\sfx\\ultravnc.ini");
+		strcat (szFileName,"\\sfx\\UltraVNC.ini");
 		}
 	Save_settings_sfx(szFileName);
 }
@@ -103,7 +103,7 @@ void createsfx3(char *cmd,char *cmd2)
 	create_uvnc_ini();
 	strcpy(szcmd,szFileName);
 	strcat(szcmd,"7z.exe");
-	ShellExecute(NULL,"open",szcmd,"a -mx=9 -t7z 7zip.7z winvnc.exe schook.dll MSRC4Plugin.dsm ultravnc.ini",szFileName,SW_SHOW);
+	ShellExecute(NULL,"open",szcmd,"a -mx=9 -t7z 7zip.7z winvnc.exe schook.dll MSRC4Plugin.dsm UltraVNC.ini",szFileName,SW_SHOW);
 
 	char szcmd1[MAX_PATH];
 	char szcmd2[MAX_PATH];

@@ -1,4 +1,4 @@
-//  Copyright (C) 2002 Ultr@VNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002 UltraVNC Team Members. All Rights Reserved.
 //
 //  Copyright (C) 2000-2002 Const Kaplinsky. All Rights Reserved.
 //
@@ -3102,7 +3102,7 @@ void ClientConnection::ReadServerInit()
 	{
 			char szMess[255];
 			memset(szMess, 0, 255);
-			sprintf(szMess, "--- Ultr@VNC Viewer + %s-v%s by %s ",
+			sprintf(szMess, "--- UltraVNC Viewer + %s-v%s by %s ",
 					m_pDSMPlugin->GetPluginName(),
 					m_pDSMPlugin->GetPluginVersion(),
 					m_pDSMPlugin->GetPluginAuthor()
@@ -7384,7 +7384,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							char temp[10];
 							char wtext[150];
 							_itoa(wParam,temp,10);
-							strcpy(wtext,"Ultr@VNC Viewer - Connection dropped, trying to reconnect (");
+							strcpy(wtext,"UltraVNC Viewer - Connection dropped, trying to reconnect (");
 							strcat(wtext,temp);
 							strcat(wtext,")");
 							SetWindowText(_this->m_hwndMain, wtext);

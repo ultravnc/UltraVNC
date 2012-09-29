@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002-2010 Ultr@VNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002-2010 UltraVNC Team Members. All Rights Reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
 
 #include "vncdesktopthread.h"
 #include "vncOSVersion.h"
+#include "uvncUiAccess.h"
 bool g_DesktopThread_running;
 bool g_update_triggered;
 DWORD WINAPI hookwatch(LPVOID lpParam);
@@ -884,7 +885,7 @@ vncDesktopThread::run_undetached(void *arg)
 	m_desktop->KillScreenSaver();
 	{
 		keybd_event(VK_CONTROL, 0, 0, 0);
-        keybd_event(VK_CONTROL, 0, KEYEVENTF_KEYUP, 0);
+        keybd_uni_event(VK_CONTROL, 0, KEYEVENTF_KEYUP, 0);
 		Sleep(500); //Give screen some time to kill screensaver
 	}
     DWORD startup_error;
@@ -987,7 +988,7 @@ vncDesktopThread::run_undetached(void *arg)
 			MIN_UPDATE_INTERVAL_MIN=50;
 			MIN_UPDATE_INTERVAL_MAX=1000;
 		}
-	if (m_server->IsUltraVncViewer()) first_run=true;
+	if (m_server->IsUltraVNCViewer()) first_run=true;
 	else first_run=false;
 
 	while (looping && !fShutdownOrdered)

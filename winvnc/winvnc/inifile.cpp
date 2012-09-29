@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002-2010 Ultr@VNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002-2010 UltraVNC Team Members. All Rights Reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -177,29 +177,29 @@ IniFile::ReadString(char *key1, char *key2,char *value,int valuesize)
 void 
 IniFile::ReadPassword(char *value,int valuesize)
 {
-	//int size=ReadInt("ultravnc", "passwdsize",0);
+	//int size=ReadInt("UltraVNC", "passwdsize",0);
 	//vnclog.Print(LL_INTERR, VNCLOG("%s \n"),myInifilePasswd);
-	GetPrivateProfileStruct("ultravnc","passwd",value,8,myInifile);
+	GetPrivateProfileStruct("UltraVNC","passwd",value,8,myInifile);
 }
 
 void //PGM
 IniFile::ReadPassword2(char *value,int valuesize) //PGM
 { //PGM
-	GetPrivateProfileStruct("ultravnc","passwd2",value,8,myInifile); //PGM
+	GetPrivateProfileStruct("UltraVNC","passwd2",value,8,myInifile); //PGM
 } //PGM
 
 bool
 IniFile::WritePassword(char *value)
 {
-		//WriteInt("ultravnc", "passwdsize",sizeof(value));
+		//WriteInt("UltraVNC", "passwdsize",sizeof(value));
 		//vnclog.Print(LL_INTERR, VNCLOG("%s \n"),myInifile);
-		return (FALSE != WritePrivateProfileStruct("ultravnc","passwd", value,8,myInifile));
+		return (FALSE != WritePrivateProfileStruct("UltraVNC","passwd", value,8,myInifile));
 }
 
 bool //PGM
 IniFile::WritePassword2(char *value) //PGM
 { //PGM
-		return (FALSE != WritePrivateProfileStruct("ultravnc","passwd2", value,8,myInifile)); //PGM
+		return (FALSE != WritePrivateProfileStruct("UltraVNC","passwd2", value,8,myInifile)); //PGM
 } //PGM
 
 bool IniFile::IsWritable()

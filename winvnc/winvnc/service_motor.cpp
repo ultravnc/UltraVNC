@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002-2010 Ultr@VNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002-2010 UltraVNC Team Members. All Rights Reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -233,7 +233,7 @@ int install_service(void) {
 		if (myerror==ERROR_SERVICE_EXISTS)
 		{
 			//MessageBoxSecure(NULL, "Failed: Already exist",
-            //"UltraVnc", MB_ICONERROR);
+            //"UltraVNC", MB_ICONERROR);
 			CloseServiceHandle(scm);
 			return 1;
 		}
@@ -296,7 +296,7 @@ int uninstall_service(void) {
     }
     if(serviceStatus.dwCurrentState!=SERVICE_STOPPED) {
         //MessageBoxSecure(NULL, "The service is still running, disable it first",
-        //    "UltraVnc", MB_ICONERROR);
+        //    "UltraVNC", MB_ICONERROR);
         CloseServiceHandle(service);
         CloseServiceHandle(scm);
 		Sleep(2500);uninstall_service();

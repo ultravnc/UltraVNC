@@ -1,4 +1,4 @@
-//  Copyright (C) 2002 Ultr@VNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002 UltraVNC Team Members. All Rights Reserved.
 //  Copyright (C) 2000-2002 Const Kaplinsky. All Rights Reserved.
 //  Copyright (C) 2002 RealVNC Ltd. All Rights Reserved.
 //  Copyright (C) 1999 AT&T Laboratories Cambridge. All Rights Reserved.
@@ -133,7 +133,7 @@ protected:
 	BOOL				m_use_xcursor;			// XCursor cursor shape updates allowed.
 	BOOL				m_use_richcursor;		// RichCursor cursor shape updates allowed.
 
-//	Ultravncmemcpy mem;
+//	UltraVNCmemcpy mem;
 };
 
 #endif // vncENCODER_DEFINED

@@ -18,7 +18,7 @@
 
 // Enjoy.
 
-// Adopted to ms-logon for ultravnc by marscha, 2006.
+// Adopted to ms-logon for UltraVNC by marscha, 2006.
 
 #include "dh.h"
 #include <tchar.h>

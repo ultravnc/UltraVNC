@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002 Ultr@VNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002 UltraVNC Team Members. All Rights Reserved.
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 //
 // If the source code for the program is not available from the place from
 // which you received this file, check 
-// http://ultravnc.sourceforge.net/
+// http://www.uvnc.com
 //
 ////////////////////////////////////////////////////////////////////////////
 
@@ -53,7 +53,8 @@ TextChat::TextChat(VNCviewerApp *pApp, ClientConnection *pCC)
 	m_pApp	= pApp;
 	m_pCC	= pCC;
 	m_fTextChatRunning = false;
-	m_fVisible = true;
+	//test m_fVisible always false
+	m_fVisible = false;
 	
 	m_fPersistentTexts = false;
 	m_szLocalText = new char [TEXTMAXSIZE];
@@ -370,8 +371,8 @@ void TextChat::ShowChatWindow(bool fVisible)
 					Rect.bottom - Rect.top,
 					SWP_SHOWWINDOW);
 	}
-
-	m_fVisible = fVisible; // This enables screen updates to be processed in ClientConnection
+	//test m_fVisible always false
+	//m_fVisible = fVisible; // This enables screen updates to be processed in ClientConnection
 	// Refresh screen view if Chat window has been hidden
 	//adzm 2010-09 - all socket writes must remain on a single thread, but we only need an async request here
 	if (!fVisible)
@@ -462,7 +463,7 @@ BOOL CALLBACK TextChat::TextChatDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM wParam,
 			const long lTitleBufSize=256;			
 			char szTitle[lTitleBufSize];
 			
-			_snprintf(szTitle,lTitleBufSize-1," Chat with <%s> - Ultr@VNC",_this->m_szRemoteName);
+			_snprintf(szTitle,lTitleBufSize-1," Chat with <%s> - UltraVNC",_this->m_szRemoteName);
 			SetWindowText(hWnd, szTitle);			
 
 			// Trunc the remote name for display in Chat Area before the first parenthesis, if any.
