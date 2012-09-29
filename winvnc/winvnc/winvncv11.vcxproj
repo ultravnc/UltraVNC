@@ -282,6 +282,7 @@
       <DataExecutionPrevention>true</DataExecutionPrevention>
       <TargetMachine>MachineX86</TargetMachine>
       <Profile>true</Profile>
+      <UACUIAccess>false</UACUIAccess>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>

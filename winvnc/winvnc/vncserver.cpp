@@ -783,8 +783,8 @@ void vncServer::TextChatClient(LPSTR szClientName)
 			{
 				vnclog.Print(LL_INTINFO, VNCLOG("Client %s is not Ultra. Doesn't know TextChat\n"), szClientName);
 				vncTimedMsgBox::Do(
-									sz_ID_UltraVNC_TEXTCHAT,
-									sz_ID_UltraVNC_WARNING,
+									sz_ID_ULTRAVNC_TEXTCHAT,
+									sz_ID_ULTRAVNC_WARNING,
 									MB_ICONINFORMATION | MB_OK
 									);
 				break;

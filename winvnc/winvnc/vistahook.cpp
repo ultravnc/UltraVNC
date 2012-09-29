@@ -462,14 +462,14 @@ DWORD WINAPI Cadthread(LPVOID lpParam)
 		if ( nr==SE_ERR_ACCESSDENIED )
 			vncTimedMsgBox::Do(
 									sz_ID_CADPERMISSION,
-									sz_ID_UltraVNC_WARNING,
+									sz_ID_ULTRAVNC_WARNING,
 									MB_ICONINFORMATION | MB_OK
 									);
 
 		if ( nr==ERROR_PATH_NOT_FOUND || nr==ERROR_FILE_NOT_FOUND)
 			vncTimedMsgBox::Do(
 									sz_ID_CADERRORFILE,
-									sz_ID_UltraVNC_WARNING,
+									sz_ID_ULTRAVNC_WARNING,
 									MB_ICONINFORMATION | MB_OK
 									);
 
