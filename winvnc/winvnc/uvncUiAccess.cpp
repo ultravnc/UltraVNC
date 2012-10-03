@@ -4,11 +4,65 @@ comm_serv *keyEventFn=NULL;
 comm_serv *StopeventFn=NULL;
 comm_serv *StarteventFn=NULL;
 
+void Shellexecuteforuiaccess()
+{		
+		char WORKDIR[MAX_PATH];
+		if (GetModuleFileName(NULL, WORKDIR, MAX_PATH))
+				{
+				char* p = strrchr(WORKDIR, '\\');
+				if (p == NULL) return;
+				*p = '\0';
+				}
+		strcat(WORKDIR,"\\uvnckeyboardhelper.exe");
+	
+		FILE *fp = fopen(WORKDIR,"rb");
+		if(fp) fclose(fp);
+		else  return;
+				
+		SHELLEXECUTEINFO shExecInfo;
+		memset(&shExecInfo,0,sizeof(shExecInfo));
+		shExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
+		shExecInfo.fMask = NULL;
+		shExecInfo.hwnd = NULL;
+		shExecInfo.lpVerb = "runas";
+		shExecInfo.lpFile = WORKDIR;
+		shExecInfo.lpParameters ="";
+		shExecInfo.lpDirectory = NULL;
+		shExecInfo.nShow = SW_HIDE;
+		shExecInfo.hInstApp = NULL;
+		ShellExecuteEx(&shExecInfo);
+}
+
+ int keycounter =0;
 void keepalive()
 {
 	unsigned char Invalue=12;
 	unsigned char Outvalue=0;
-	if (StarteventFn) StarteventFn->Call_Fnction_no_feedback_data((char*)&Invalue,(char*)&Outvalue);
+	if (StarteventFn) StarteventFn->Call_Fnction_Long_Timeout((char*)&Invalue,(char*)&Outvalue,5);
+	if (Invalue!=Outvalue)
+	{
+		if (keyEventFn)delete keyEventFn;
+			keyEventFn=NULL;
+		if (StopeventFn)delete StopeventFn;
+			StopeventFn=NULL;
+		if (StarteventFn)delete StarteventFn;
+			StarteventFn=NULL;
+		//Try to reinit the keyboard
+		keybd_initialize();
+		keycounter++;
+		if (keycounter>3) goto error;
+	}
+	else keycounter=0;
+	return;
+	// This disable the keyboard helper, better to have something
+	error:
+	if (keyEventFn)delete keyEventFn;
+			keyEventFn=NULL;
+	if (StopeventFn)delete StopeventFn;
+			StopeventFn=NULL;
+	if (StarteventFn)delete StarteventFn;
+			StarteventFn=NULL;
+
 }
 
 void keybd_uni_event(_In_  BYTE bVk,_In_  BYTE bScan,_In_  DWORD dwFlags,_In_  ULONG_PTR dwExtraInfo)
@@ -29,46 +83,19 @@ void keybd_initialize()
 	keyEventFn=new comm_serv;
 	StopeventFn=new comm_serv;
 	StarteventFn=new comm_serv;
-	keyEventFn->Init("keyEvent",sizeof(keyEventdata),0,false,true);
-	StopeventFn->Init("stop_event",0,0,false,true);
-	StarteventFn->Init("start_event",1,1,false,true);
-	char WORKDIR[MAX_PATH];
-	if (GetModuleFileName(NULL, WORKDIR, MAX_PATH))
-			{
-			char* p = strrchr(WORKDIR, '\\');
-			if (p == NULL) return;
-			*p = '\0';
-			}
-	strcat(WORKDIR,"\\uvnckeyboardhelper.exe");
-
-	FILE *fp = fopen(WORKDIR,"rb");
-	if(fp) fclose(fp);
-	else  goto error;
-
-	SHELLEXECUTEINFO shExecInfo;
-	memset(&shExecInfo,0,sizeof(shExecInfo));
-	shExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
-	shExecInfo.fMask = NULL;
-	shExecInfo.hwnd = NULL;
-	shExecInfo.lpVerb = "open";
-	shExecInfo.lpFile = WORKDIR;
-	shExecInfo.lpParameters ="";
-	shExecInfo.lpDirectory = NULL;
-	shExecInfo.nShow = SW_HIDE;
-	shExecInfo.hInstApp = NULL;
-	if (ShellExecuteEx(&shExecInfo))
+	if (!keyEventFn->Init("keyEvent",sizeof(keyEventdata),0,false,true)) goto error;
+	if (!StopeventFn->Init("stop_event",0,0,false,true)) goto error;
+	if (!StarteventFn->Init("start_event",1,1,false,true)) goto error;	
+	Shellexecuteforuiaccess();
+	Sleep(1000);
+	unsigned char Invalue=12;
+	unsigned char Outvalue=0;
+	StarteventFn->Call_Fnction_Long_Timeout((char*)&Invalue,(char*)&Outvalue,5);
+	if (Invalue!=Outvalue)
 	{
-		Sleep(1000);
-		unsigned char Invalue=12;
-		unsigned char Outvalue=0;
-		StarteventFn->Call_Fnction_Long_Timeout((char*)&Invalue,(char*)&Outvalue,2);
-		if (Invalue!=Outvalue)
-		{
-			 goto error;
-		}
-		return;
+		 goto error;
 	}
-	else goto error;
+	return;
 	
 	return;
 error:

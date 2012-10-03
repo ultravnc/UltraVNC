@@ -627,7 +627,7 @@ vncDesktop::InitWindow()
 		SetEvent(restart_event);
 		return FALSE;
 	}
-	SetTimer(m_hwnd,100,10000,NULL);
+	SetTimer(m_hwnd,1001,10000,NULL);
 	// Set the "this" pointer for the window
     helper::SafeSetWindowUserData(m_hwnd, (LONG_PTR)this);
 
@@ -737,7 +737,7 @@ vncDesktop::InitWindow()
 			vnclog.Print(LL_INTERR, VNCLOG("OOOOOOOOOOOO %i %i\n"),msg.message,msg.hwnd);
 			if (msg.message==WM_TIMER)
 			{
-				keepalive();
+				if(msg.wParam==1001) keepalive();
 			}			
 			else if (msg.message==WM_QUIT || fShutdownOrdered)
 				{
@@ -794,7 +794,7 @@ vncDesktop::InitWindow()
 		}
 		else WaitMessage();
 	}
-	KillTimer(m_hwnd,100);
+	KillTimer(m_hwnd,1001);
 	if (hModule)FreeLibrary(hModule);
 	if (hSCModule)FreeLibrary(hSCModule);
 	if (hW8Module)FreeLibrary(hW8Module);

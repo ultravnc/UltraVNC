@@ -119,6 +119,7 @@ void delete_softwareCAD_elevated();
 void delete_softwareCAD();
 void Reboot_with_force_reboot_elevated();
 void Reboot_with_force_reboot();
+void Shellexecuteforuiaccess();
 
 //HACK to use name in autoreconnect from service with dyn dns
 char dnsname[255];
@@ -375,7 +376,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 				Sleep(3000);
 				Enable_softwareCAD_elevated();
 				return 0;
-			}
+			}		 
 		if (strncmp(&szCmdLine[i], winvncdelSoftwarecadHelper, strlen(winvncdelSoftwarecadHelper)) == 0)
 			{
 				Sleep(3000);
