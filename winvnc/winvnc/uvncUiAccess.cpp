@@ -4,6 +4,8 @@ comm_serv *keyEventFn=NULL;
 comm_serv *StopeventFn=NULL;
 comm_serv *StarteventFn=NULL;
 
+extern bool WIN8;
+
 void Shellexecuteforuiaccess()
 {		
 		char WORKDIR[MAX_PATH];
@@ -36,9 +38,11 @@ void Shellexecuteforuiaccess()
  int keycounter =0;
 void keepalive()
 {
+	if (!WIN8) return;
 	unsigned char Invalue=12;
 	unsigned char Outvalue=0;
 	if (StarteventFn) StarteventFn->Call_Fnction_Long_Timeout((char*)&Invalue,(char*)&Outvalue,5);
+	else goto error;
 	if (Invalue!=Outvalue)
 	{
 		if (keyEventFn)delete keyEventFn;
@@ -67,7 +71,7 @@ void keepalive()
 
 void keybd_uni_event(_In_  BYTE bVk,_In_  BYTE bScan,_In_  DWORD dwFlags,_In_  ULONG_PTR dwExtraInfo)
 {
-	 if (keyEventFn==NULL) keybd_event(bVk,bScan,dwFlags,dwExtraInfo);
+	 if (keyEventFn==NULL || !WIN8) keybd_event(bVk,bScan,dwFlags,dwExtraInfo);
 	 else 
 	 {
 		keyEventdata ked;
@@ -80,6 +84,7 @@ void keybd_uni_event(_In_  BYTE bVk,_In_  BYTE bScan,_In_  DWORD dwFlags,_In_  U
 
 void keybd_initialize()
 {
+	if (!WIN8) return;
 	keyEventFn=new comm_serv;
 	StopeventFn=new comm_serv;
 	StarteventFn=new comm_serv;
@@ -109,6 +114,7 @@ error:
 
 void keybd_delete()
 {
+	if (!WIN8) return;
 	if (StopeventFn) StopeventFn->Call_Fnction_no_feedback();
 	if (keyEventFn)delete keyEventFn;
 	keyEventFn=NULL;

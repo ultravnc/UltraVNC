@@ -37,7 +37,7 @@ SetOSVersion()
 	switch(OSversion.dwPlatformId)
 	{
 		case VER_PLATFORM_WIN32_NT:
-								  if(OSversion.dwMajorVersion==6 && OSversion.dwMinorVersion==2)
+								  if(OSversion.dwMajorVersion==6 && OSversion.dwMinorVersion>=2)
 									 WIN8=1;	
 								  if(OSversion.dwMajorVersion==5 && OSversion.dwMinorVersion==0)
 									 OSTYPE=1;	
