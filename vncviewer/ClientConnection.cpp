@@ -2338,6 +2338,7 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 	if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L90);
 
 	bool bSecureVNCPluginActive = std::find(current_auth.begin(), current_auth.end(), rfbUltraVNC_SecureVNCPluginAuth) != current_auth.end();
+	if (!bSecureVNCPluginActive) bSecureVNCPluginActive = std::find(current_auth.begin(), current_auth.end(), rfbUltraVNC_SecureVNCPluginAuth_new) != current_auth.end();
 
 	if (!bSecureVNCPluginActive && m_fUsePlugin && m_pIntegratedPluginInterface && authScheme != rfbConnFailed && authScheme != rfbUltraVNC_SecureVNCPluginAuth  && authScheme != rfbUltraVNC_SecureVNCPluginAuth_new && authScheme != rfbUltraVNC)
 	{
@@ -2542,6 +2543,7 @@ void ClientConnection::AuthSecureVNCPlugin()
 	bool bTriedNoPassword = false;
 	bool bSuccess = false;
 	bool bCancel = false;
+	char passphraseused=0;
 	do {
 		WORD wChallengeLength = 0;
 
@@ -2550,10 +2552,12 @@ void ClientConnection::AuthSecureVNCPlugin()
 		BYTE* pChallengeData = new BYTE[wChallengeLength];
 
 		ReadExact((char*)pChallengeData, wChallengeLength);
+		ReadExact(&passphraseused, 1);
 
 		bool bPasswordOK = false;
 		bool bPassphraseRequired = false;
 		bSuccess = false;
+		int counter=0;
 		do {
 			bSuccess = m_pIntegratedPluginInterface->HandleChallenge(pChallengeData, wChallengeLength, nSequenceNumber, bPasswordOK, bPassphraseRequired);
 			if (bSuccess && !bPasswordOK)
@@ -2563,6 +2567,8 @@ void ClientConnection::AuthSecureVNCPlugin()
 					bTriedNoPassword = true;
 				} 
 			}
+			counter++;
+			if (counter>3) bSuccess=false;
 		} while (bSuccess && !bPasswordOK && !bCancel);
 
 		delete[] pChallengeData;
@@ -2584,11 +2590,13 @@ void ClientConnection::AuthSecureVNCPlugin()
 				if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_PLUGIN_STATUS,m_pIntegratedPluginInterface->DescribeCurrentSettings());
 				}
 
+			if (passphraseused!=2)
+			{
 				WORD lengt=0;
 
 				AuthDialog ad;
 					//adzm 2010-05-12 - passphrase
-				ad.m_bPassphraseMode = bPassphraseRequired;
+				ad.m_bPassphraseMode = passphraseused;
 
 				if (ad.DoDialog(false))
 					{
@@ -2604,6 +2612,7 @@ void ClientConnection::AuthSecureVNCPlugin()
 					}			
 				WriteExact((char*)&lengt, sizeof(lengt));
 				WriteExact((char*)passwd, lengt);
+			}
 
 			m_pIntegratedPluginInterface->FreeMemory(pResponseData);
 		}

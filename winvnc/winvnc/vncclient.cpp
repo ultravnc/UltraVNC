@@ -1565,14 +1565,25 @@ BOOL vncClientThread::AuthenticateLegacyClient()
 // must SetHandshakeComplete after sending auth result!
 BOOL vncClientThread::AuthSecureVNCPlugin(std::string& auth_message)
 {
+	bool bPassphrase=false;
 	char password[MAXPWLEN];
 	m_server->GetPassword(password);
 	vncPasswd::ToText plain(password);
-	m_socket->SetDSMPluginConfig(m_server->GetDSMPluginConfig());
+	ConfigHelper ConfigHelpervar(m_server->GetDSMPluginConfig());
+	if (strlen(ConfigHelpervar.m_szPassphrase)>0)
+	{
+		bPassphrase=true;
+		ConfigHelpervar.SetConfigHelper(ConfigHelpervar.m_dwFlags,"");
+		m_socket->SetDSMPluginConfig(ConfigHelpervar.m_szConfig);
+	}
+	else
+	{
+		m_socket->SetDSMPluginConfig(m_server->GetDSMPluginConfig());
+	}
+
 	BOOL auth_ok = FALSE;
 
-	const char* plainPassword = plain;
-
+	const char* plainPassword = plain;	
 	/*if (!m_ms_logon && plainPassword && strlen(plainPassword) > 0) {
 		m_socket->GetIntegratedPlugin()->SetPasswordData((const BYTE*)plainPassword, strlen(plainPassword));
 	}*/
@@ -1601,12 +1612,21 @@ BOOL vncClientThread::AuthSecureVNCPlugin(std::string& auth_message)
 			return FALSE;
 		}
 
+		char passphraseused=bPassphrase;
+		if (m_ms_logon) passphraseused=2;
+		if (!m_socket->SendExact((const char*)&passphraseused, 1)) {
+			m_socket->GetIntegratedPlugin()->FreeMemory(pChallenge);
+			return FALSE;
+		}
+
+
+
 		m_socket->GetIntegratedPlugin()->FreeMemory(pChallenge);
 		WORD wResponseLength = 0;
 		if (!m_socket->ReadExact((char*)&wResponseLength, sizeof(wResponseLength))) {
 			return FALSE;
 		}
-
+		if (wResponseLength>2024) return FALSE;
 		BYTE* pResponseData = new BYTE[wResponseLength];
 		
 		if (!m_socket->ReadExact((char*)pResponseData, wResponseLength)) {
@@ -1627,18 +1647,25 @@ BOOL vncClientThread::AuthSecureVNCPlugin(std::string& auth_message)
 		m_socket->GetIntegratedPlugin()->SetHandshakeComplete();	
 
 
-		if (!m_socket->ReadExact((char*)&wResponseLength, sizeof(wResponseLength))) {
-			return FALSE;
-		}
-		if (wResponseLength>2024) return FALSE;
-		pResponseData = new BYTE[wResponseLength];
+		if (!m_ms_logon)
+		{
+			if (!m_socket->ReadExact((char*)&wResponseLength, sizeof(wResponseLength))) {
+				return FALSE;
+			}
+			if (wResponseLength>2024) return FALSE;
+			pResponseData = new BYTE[wResponseLength];
 		
-		if (!m_socket->ReadExact((char*)pResponseData, wResponseLength)) {
+			if (!m_socket->ReadExact((char*)pResponseData, wResponseLength)) {
+				delete[] pResponseData;
+				return FALSE;
+			}		
+			if (bPassphrase==false)
+				{
+					if (memcmp(plain,pResponseData,strlen(plain))!=NULL) auth_ok=false;
+				}
+			else if (memcmp(ConfigHelpervar.m_szPassphrase,pResponseData,strlen(ConfigHelpervar.m_szPassphrase))!=NULL) auth_ok=false;
 			delete[] pResponseData;
-			return FALSE;
 		}		
-		if (memcmp(plain,pResponseData,strlen(plain))!=NULL) auth_ok=false;
-		delete[] pResponseData;
 		nSequenceNumber++;
 	} while (bSendChallenge);
 
@@ -1660,9 +1687,9 @@ BOOL vncClientThread::AuthSecureVNCPlugin_old(std::string& auth_message)
 
 	const char* plainPassword = plain;
 
-	/*if (!m_ms_logon && plainPassword && strlen(plainPassword) > 0) {
+	if (!m_ms_logon && plainPassword && strlen(plainPassword) > 0) {
 		m_socket->GetIntegratedPlugin()->SetPasswordData((const BYTE*)plainPassword, strlen(plainPassword));
-	}*/
+	}
 
 	int nSequenceNumber = 0;
 	bool bSendChallenge = true;
@@ -1985,7 +2012,7 @@ bool vncClientThread::InitSocket()
 		vnclog.Print(LL_INTINFO, VNCLOG("DSMPlugin Pointer to socket OK\n"));
 
 		//adzm 2010-05-12 - dsmplugin config
-		m_socket->SetDSMPluginConfig(m_server->GetDSMPluginConfig());
+		//m_socket->SetDSMPluginConfig(m_server->GetDSMPluginConfig());
 	}
 	else
 	{

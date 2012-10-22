@@ -983,7 +983,7 @@ void VSocket::SetDSMPluginPointer(CDSMPlugin* pDSMPlugin)
 void VSocket::SetDSMPluginConfig(char* szDSMPluginConfig)
 {
 	if (m_pIntegratedPluginInterface) {
-		m_pIntegratedPluginInterface->SetServerOptions(szDSMPluginConfig);
+		m_pIntegratedPluginInterface->SetServerOptions(szDSMPluginConfig);		
 	}
 }
 

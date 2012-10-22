@@ -195,4 +195,33 @@ private:
 	// omni_mutex m_RestMutex;
 };
 
+class ConfigHelper
+{
+public:
+	void SetConfigHelper(DWORD dwFlags, char* szPassphrase);
+	ConfigHelper(const char* szConfig);
+	~ConfigHelper();
+
+
+
+	DWORD m_dwFlags;
+	char* m_szConfig;
+	char* m_szPassphrase;
+};
+
+class Base64
+{
+public:
+	static void encode(const char* szIn, char* szOut);
+	static void decode(const char* szIn, char* szOut);
+
+protected:
+	static const char cb64[];
+	static const char cd64[];
+
+	static void encodeblock(BYTE in[3], BYTE out[4], int len);
+	static void decodeblock(BYTE in[4], BYTE out[3]);
+};
+
+
 #endif
