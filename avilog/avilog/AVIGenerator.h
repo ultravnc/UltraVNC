@@ -105,7 +105,7 @@ public:
 	//! returns a pointer to bitmap info
 	LPBITMAPINFOHEADER GetBitmapHeader()							{	return &m_bih;};
 	//! sets the name of the ouput file (should be .avi)
-	void SetFileName(LPCTSTR _sFileName)							{	strcpy(m_sFile,_sFileName); MakeExtAvi();};
+	void SetFileName(LPCTSTR _sFileName)							{	strcpy_s(m_sFile,_sFileName); MakeExtAvi();};
 	//! Sets FrameRate (should equal or greater than one)
 	void SetRate(DWORD dwRate)										{	m_dwRate=dwRate;};
 	//@}

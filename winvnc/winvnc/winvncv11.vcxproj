@@ -1406,11 +1406,47 @@
     <ProjectReference Include="..\..\..\w8hook\w8hook\w8hook.vcxproj">
       <Project>{dd7b168b-30ed-686c-bb27-ede3da7446bc}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\addon\ms-logon\authadm\authadminv11.vcxproj">
+      <Project>{334467fd-e35e-4c3d-9410-69b2171c2bb2}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\addon\ms-logon\authSSP\authSSPv11.vcxproj">
+      <Project>{2f5fbc3f-4ccd-4c26-9719-c9166d8b0c7d}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\addon\ms-logon\ldapauth9x\ldapauth9xv11.vcxproj">
+      <Project>{caa83204-ebf8-4369-b152-011ea957784c}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\addon\ms-logon\ldapauthNT4\ldapauthnt4v11.vcxproj">
+      <Project>{31ac9e7d-64b7-4301-ade2-5eff15aa6bde}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\addon\ms-logon\ldapauth\ldapauthv11.vcxproj">
+      <Project>{bc78a3c8-2280-42ab-bb6f-14fb674e2a0c}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\addon\ms-logon\logging\loggingv11.vcxproj">
+      <Project>{d50aeb07-5f5e-4401-9b50-c1660e693833}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\addon\ms-logon\MSLogonACL\MSLogonACLv11.vcxproj">
+      <Project>{f4e39bd7-c841-4f21-b40c-293d7e017ea1}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\addon\ms-logon\testauth\testauthv11.vcxproj">
+      <Project>{c05be60b-fbdf-430f-b041-5089262e8fb5}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\addon\ms-logon\workgrpdomnt4\workgrpdomnt4v11.vcxproj">
+      <Project>{8d7757cb-5125-4633-afb1-4b30ed24955f}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\libjpeg-turbo-win\libjpeg-turbo-winv11.vcxproj">
       <Project>{04f91fa4-2d94-4803-ba3b-b61fbef0abe3}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\rdr\rdrv11.vcxproj">
       <Project>{f5244002-0fff-4f19-a941-fcce1861f132}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\setcad\setcad\setcadv11.vcxproj">
+      <Project>{3f5ab9e4-c106-43e2-98d2-718292ad4a9a}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\setpasswd\setpasswd\setpasswdv11.vcxproj">
+      <Project>{7ddbfa32-44f6-44ca-bdbe-cf8b32edc6b1}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\uvnc_settings\uvnc_settings\uvnc_settingsv11.vcxproj">
+      <Project>{3b4d8565-e321-48b6-bf15-4eb7adec6bfc}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\zipunzip_src\unzip\windll\vc6\lib\unz32libv11.vcxproj">
       <Project>{f9321962-fbed-4581-bf7d-d0ebc303d891}</Project>
@@ -1423,6 +1459,9 @@
     </ProjectReference>
     <ProjectReference Include="..\omnithread\omnithreadv11.vcxproj">
       <Project>{e52b9956-fe67-47f7-bc4f-67cc5a64b708}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\vnchooks\vnchooksv11.vcxproj">
+      <Project>{1d18e045-6b72-43f4-acbd-3e679a3de349}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -10,10 +10,10 @@ char WORKDIR[MAX_PATH];
 		if (p == NULL) return;
 		*p = '\0';
 		}
-	strcpy(myInifile,"");
-	strcat(myInifile,WORKDIR);//set the directory
-	strcat(myInifile,"\\");
-	strcat(myInifile,INIFILE_NAME);
+	strcpy_s(myInifile,"");
+	strcat_s(myInifile,WORKDIR);//set the directory
+	strcat_s(myInifile,"\\");
+	strcat_s(myInifile,INIFILE_NAME);
 }
 
 void
@@ -26,16 +26,16 @@ char WORKDIR[MAX_PATH];
 		if (p == NULL) return;
 		*p = '\0';
 		}
-	strcpy(myInifile,"");
-	strcat(myInifile,WORKDIR);//set the directory
-	strcat(myInifile,"\\");
-	strcat(myInifile,INIFILE_NAME);
+	strcpy_s(myInifile,"");
+	strcat_s(myInifile,WORKDIR);//set the directory
+	strcat_s(myInifile,"\\");
+	strcat_s(myInifile,INIFILE_NAME);
 }
 
 void
 IniFile::IniFileSetTemp(char *lpCmdLine)
 {
-	strcpy(myInifile,lpCmdLine);
+	strcpy_s(myInifile,lpCmdLine);
 }
 
 IniFile::~IniFile()

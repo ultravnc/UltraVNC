@@ -402,14 +402,14 @@ int main(int argc, char* argv[])
 	memset(passwd2,0,8);
 	if (argc==2)
 	{
-		strcpy(passwd,argv[1]);
+		strcpy_s(passwd,argv[1]);
 		myIniFile.WritePassword(passwd);
 		//gen_random(passwd2,8);
 		//myIniFile.WritePassword2(passwd2);
 	}
 	if (argc==3)
 	{
-		strcpy(passwd,argv[1]);
+		strcpy_s(passwd,argv[1]);
 		myIniFile.WritePassword(passwd);
 		//strcpy(passwd2,argv[2]);
 		//myIniFile.WritePassword2(passwd2);

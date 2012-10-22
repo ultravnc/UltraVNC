@@ -33,5 +33,6 @@ Enable_softwareCAD()
 
 int _tmain(int argc, _TCHAR* argv[])
 {
+	Enable_softwareCAD();
 	return 0;
 }

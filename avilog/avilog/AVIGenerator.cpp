@@ -37,12 +37,12 @@ CAVIGenerator::CAVIGenerator(LPCTSTR sFileName,LPCTSTR sPath, LPBITMAPINFOHEADER
 : m_dwRate(dwRate),
 m_pAVIFile(NULL), m_pStream(NULL), m_pStreamCompressed(NULL)
 {
-		strcpy(m_sFile,sPath);
-		strcpy(mypath,sPath);
-		strcat(mypath,"\\");
-		strcat(mypath,"codec.cfg");
-		strcat(m_sFile,"\\");
-		strcat(m_sFile,sFileName);
+		strcpy_s(m_sFile,sPath);
+		strcpy_s(mypath,sPath);
+		strcat_s(mypath,"\\");
+		strcat_s(mypath,"codec.cfg");
+		strcat_s(m_sFile,"\\");
+		strcat_s(m_sFile,sFileName);
 		MakeExtAvi();
 		SetBitmapHeader(lpbih);
 }
@@ -111,14 +111,14 @@ HRESULT CAVIGenerator::InitEngine()
 	TCHAR szBuffer[1024]="";
 	HRESULT hr;
 
-	strcpy(m_sError,"Ok");
+	strcpy_s(m_sError,"Ok");
 
 	// Step 0 : Let's make sure we are running on 1.1 
 	DWORD wVer = HIWORD(VideoForWindowsVersion());
 	if (wVer < 0x010a)
 	{
 		 // oops, we are too old, blow out of here 
-		strcpy(m_sError,"Version of Video for Windows too old. Come on, join the 21th century!");
+		strcpy_s(m_sError,"Version of Video for Windows too old. Come on, join the 21th century!");
 		return S_FALSE;
 	}
 
@@ -135,24 +135,24 @@ HRESULT CAVIGenerator::InitEngine()
 	if (hr != AVIERR_OK)
 	{
 		_tprintf(szBuffer,_T("AVI Engine failed to initialize. Check filename %s."),m_sFile);
-		strcpy(m_sError,szBuffer);
+		strcpy_s(m_sError,szBuffer);
 		// Check it succeded.
 		switch(hr)
 		{
 		case AVIERR_BADFORMAT: 
-			strcat(m_sError,"The file couldn't be read, indicating a corrupt file or an unrecognized format.");
+			strcat_s(m_sError,"The file couldn't be read, indicating a corrupt file or an unrecognized format.");
 			break;
 		case AVIERR_MEMORY:		
-			strcat(m_sError,"The file could not be opened because of insufficient memory."); 
+			strcat_s(m_sError,"The file could not be opened because of insufficient memory."); 
 			break;
 		case AVIERR_FILEREAD:
-			strcat(m_sError,"A disk error occurred while reading the file."); 
+			strcat_s(m_sError,"A disk error occurred while reading the file."); 
 			break;
 		case AVIERR_FILEOPEN:		
-			strcat(m_sError,"A disk error occurred while opening the file.");
+			strcat_s(m_sError,"A disk error occurred while opening the file.");
 			break;
 		case REGDB_E_CLASSNOTREG:		
-			strcat(m_sError,"According to the registry, the type of file specified in AVIFileOpen does not have a handler to process it");
+			strcat_s(m_sError,"According to the registry, the type of file specified in AVIFileOpen does not have a handler to process it");
 			break;
 		}
 
@@ -178,10 +178,10 @@ HRESULT CAVIGenerator::InitEngine()
 	// Check it succeded.
 	if (hr != AVIERR_OK)
 	{
-		strcpy(m_sError,"AVI Stream creation failed. Check Bitmap info.");
+		strcpy_s(m_sError,"AVI Stream creation failed. Check Bitmap info.");
 		if (hr==AVIERR_READONLY)
 		{
-			strcat(m_sError," Read only file.");
+			strcat_s(m_sError," Read only file.");
 		}
 		return hr;
 	}
@@ -236,18 +236,18 @@ HRESULT CAVIGenerator::InitEngine()
 
 	if (hr != AVIERR_OK)
 	{
-		strcpy(m_sError,"AVI Compressed Stream creation failed.");
+		strcpy_s(m_sError,"AVI Compressed Stream creation failed.");
 		
 		switch(hr)
 		{
 		case AVIERR_NOCOMPRESSOR:
-			strcat(m_sError," A suitable compressor cannot be found.");
+			strcat_s(m_sError," A suitable compressor cannot be found.");
 				break;
 		case AVIERR_MEMORY:
-			strcat(m_sError," There is not enough memory to complete the operation.");
+			strcat_s(m_sError," There is not enough memory to complete the operation.");
 				break; 
 		case AVIERR_UNSUPPORTED:
-			strcat(m_sError,"Compression is not supported for this type of data. This error might be returned if you try to compress data that is not audio or video.");
+			strcat_s(m_sError,"Compression is not supported for this type of data. This error might be returned if you try to compress data that is not audio or video.");
 			break;
 		}
 
@@ -263,7 +263,7 @@ HRESULT CAVIGenerator::InitEngine()
 
 	if (hr != AVIERR_OK)
 	{
-		strcpy(m_sError,"AVI Compressed Stream format setting failed.");
+		strcpy_s(m_sError,"AVI Compressed Stream format setting failed.");
 		// releasing memory allocated by AVISaveOptionFree
 		if (delete_needed)AVISaveOptionsFree(1,(LPAVICOMPRESSOPTIONS FAR *) &aopts);
 		return hr;
@@ -370,6 +370,6 @@ void CAVIGenerator::MakeExtAvi()
 	// finding avi
 	if( _tcsstr(m_sFile,"avi")==NULL )
 	{
-		strcat(m_sFile,".avi");
+		strcat_s(m_sFile,".avi");
 	}
 }

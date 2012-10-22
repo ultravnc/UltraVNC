@@ -65,14 +65,14 @@ BOOL CALLBACK DlgProcSFX2(HWND hwnd, UINT uMsg,WPARAM wParam, LPARAM lParam)
 						strcpy(servercmd,"-autoreconnect -connect ");
 						strcat(servercmd,strExternIP);
 						strcat(servercmd,":");
-						strcat(servercmd,itoa(testport,temp,10));
+						strcat(servercmd,_itoa(testport,temp,10));
 					}
 				else if (!rep && !autore)
 					{
 						strcpy(servercmd,"-connect ");
 						strcat(servercmd,strExternIP);
 						strcat(servercmd,":");
-						strcat(servercmd,itoa(testport,temp,10));
+						strcat(servercmd,_itoa(testport,temp,10));
 					}
 				else if( rep && autore)
 					{
@@ -121,14 +121,14 @@ BOOL CALLBACK DlgProcSFX2(HWND hwnd, UINT uMsg,WPARAM wParam, LPARAM lParam)
 						strcpy(servercmd,"-autoreconnect -connect ");
 						strcat(servercmd,strLocalIP);
 						strcat(servercmd,":");
-						strcat(servercmd,itoa(testport,temp,10));
+						strcat(servercmd,_itoa(testport,temp,10));
 					}
 				else if (!rep && !autore)
 					{
 						strcpy(servercmd,"-connect ");
 						strcat(servercmd,strLocalIP);
 						strcat(servercmd,":");
-						strcat(servercmd,itoa(testport,temp,10));
+						strcat(servercmd,_itoa(testport,temp,10));
 					}
 				else if( rep && autore)
 					{
@@ -181,7 +181,7 @@ BOOL CALLBACK DlgProcSFX2(HWND hwnd, UINT uMsg,WPARAM wParam, LPARAM lParam)
 			{
 				char temp[10];
 				strcpy(viewercmd,"-listen ");
-				strcat(viewercmd,itoa(testport,temp,10));
+				strcat(viewercmd,_itoa(testport,temp,10));
 				strcat(viewercmd," -autoreconnect 3");
 
 				if (SendMessage(GetDlgItem(hwnd, IDC_CHECKUSEENCRYPTION), BM_GETCHECK, 0, 0)== BST_CHECKED)
@@ -370,7 +370,7 @@ BOOL CALLBACK DlgProcSFX2(HWND hwnd, UINT uMsg,WPARAM wParam, LPARAM lParam)
 				else
 				{
 					strcpy(viewercmd,"-listen ");
-					strcat(viewercmd,itoa(testport,temp,10));
+					strcat(viewercmd,_itoa(testport,temp,10));
 					strcat(viewercmd," -autoreconnect 3");
 					if (SendMessage(GetDlgItem(hwnd, IDC_CHECKUSEENCRYPTION), BM_GETCHECK, 0, 0)== BST_CHECKED)
 							{
@@ -399,14 +399,14 @@ BOOL CALLBACK DlgProcSFX2(HWND hwnd, UINT uMsg,WPARAM wParam, LPARAM lParam)
 						strcpy(servercmd,"-autoreconnect -connect ");
 						strcat(servercmd,strExternIP);
 						strcat(servercmd,":");
-						strcat(servercmd,itoa(testport,temp,10));
+						strcat(servercmd,_itoa(testport,temp,10));
 					}
 				else if (!rep && !autore)
 					{
 						strcpy(servercmd,"-connect ");
 						strcat(servercmd,strExternIP);
 						strcat(servercmd,":");
-						strcat(servercmd,itoa(testport,temp,10));
+						strcat(servercmd,_itoa(testport,temp,10));
 					}
 				else if( rep && autore)
 					{
@@ -453,14 +453,14 @@ BOOL CALLBACK DlgProcSFX2(HWND hwnd, UINT uMsg,WPARAM wParam, LPARAM lParam)
 						strcpy(servercmd,"-autoreconnect -connect ");
 						strcat(servercmd,strLocalIP);
 						strcat(servercmd,":");
-						strcat(servercmd,itoa(testport,temp,10));
+						strcat(servercmd,_itoa(testport,temp,10));
 					}
 				else if (!rep && !autore)
 					{
 						strcpy(servercmd,"-connect ");
 						strcat(servercmd,strLocalIP);
 						strcat(servercmd,":");
-						strcat(servercmd,itoa(testport,temp,10));
+						strcat(servercmd,_itoa(testport,temp,10));
 					}
 				else if( rep && autore)
 					{
