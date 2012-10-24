@@ -1711,6 +1711,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\uvncUiAccess.cpp"
+				>
+			</File>
+			<File
 				RelativePath="videodriver.cpp"
 				>
 				<FileConfiguration
@@ -4320,11 +4324,11 @@
 			>
 		</File>
 		<File
-			RelativePath="..\building.txt"
+			RelativePath="..\..\BUILDING.txt"
 			>
 		</File>
 		<File
-			RelativePath="..\..\BUILDING.txt"
+			RelativePath="..\building.txt"
 			>
 		</File>
 		<File
