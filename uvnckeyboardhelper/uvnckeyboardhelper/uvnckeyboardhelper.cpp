@@ -604,7 +604,6 @@ DWORD WINAPI Cadthread(LPVOID lpParam)
 		switch(dwEvent)
 				{
 					case WAIT_OBJECT_0 + 0: 
-						Beep(3000,100);
 						keyEventdata ked;
 						keyEventFn.ReadData((char*)&ked);
 						keybd_event(ked.bVk,    ked.bScan,ked.dwflags,0);
