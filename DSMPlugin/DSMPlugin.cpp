@@ -641,6 +641,9 @@ ConfigHelper::ConfigHelper(const char* szConfig)
 	, m_szPassphrase(NULL)
 	, m_dwFlags(0x01 | 0x4000 | 0x00100000)
 {
+	m_szPassphrase = new char[256];
+	m_szPassphrase[0] = '\0';
+
 	if (szConfig == NULL) return;
 
 	const char* szHeader = "SecureVNC;0;";
@@ -658,8 +661,8 @@ ConfigHelper::ConfigHelper(const char* szConfig)
 		m_dwFlags = dwFlags;
 
 		if (szEnd && szEnd != szConfig) {
-			m_szPassphrase = new char[256];
-			m_szPassphrase[0] = '\0';
+			//m_szPassphrase = new char[256];
+			//m_szPassphrase[0] = '\0';
 
 			char szEncoded[256];
 			szEncoded[0] = '\0';

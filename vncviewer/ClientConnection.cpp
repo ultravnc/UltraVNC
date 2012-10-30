@@ -2597,6 +2597,7 @@ void ClientConnection::AuthSecureVNCPlugin()
 				AuthDialog ad;
 					//adzm 2010-05-12 - passphrase
 				ad.m_bPassphraseMode = passphraseused;
+				bPassphraseRequired= passphraseused;
 
 				if (ad.DoDialog(false))
 					{
