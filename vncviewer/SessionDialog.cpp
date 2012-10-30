@@ -594,6 +594,9 @@ BOOL CALLBACK SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam, LPARAM lParam
 
 		break;
 
+	case WM_CLOSE:
+		EndDialog(hwnd, FALSE);
+		return FALSE;
 	case WM_DESTROY:
 		EndDialog(hwnd, FALSE);
 		return TRUE;

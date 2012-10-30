@@ -391,7 +391,11 @@ BEGIN
         BEGIN
             VALUE "Comments", "UltraVNC - Remote Control for all"
             VALUE "CompanyName", "UltraVNC"
+#ifdef _X64
+			VALUE "FileDescription", "VNC server for X64"
+#else
             VALUE "FileDescription", "VNC server for win32"
+#endif
             VALUE "FileVersion", "1.1.1"
             VALUE "InternalName", "WinVNC"
             VALUE "LegalCopyright", "Copyright © 2010 UltraVNC"
