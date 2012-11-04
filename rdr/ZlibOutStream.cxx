@@ -62,7 +62,7 @@ void ZlibOutStream::setUnderlying(OutStream* os)
 
 int ZlibOutStream::length()
 {
-  return offset + ptr - start;
+  return (int)(offset + ptr - start);
 }
 
 void ZlibOutStream::flush()
