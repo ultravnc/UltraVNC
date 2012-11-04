@@ -279,6 +279,46 @@ bool vncDesktop::FastDetectChanges(rfb::Region2D &rgn, rfb::Rect &rect, int nZon
 	// Try to detect if screen is almost idle
 	// no need to poll static screens very fast, it only use cpu
 	change_found=0;
+	//Detect text faster
+	//If the caret change use a 64x64 for his last position
+	 	static	DWORD	dwCurrentThreadId = GetCurrentThreadId();
+ 	static	HWND	hWindow = GetForegroundWindow();
+ 	static	DWORD	dwWindowThreadId = GetWindowThreadProcessId(hWindow, NULL);
+ 	HWND	hCurrentWindow = GetForegroundWindow();
+ 	if (hCurrentWindow != hWindow )
+ 	{
+ 		// Release
+ 		AttachThreadInput(dwCurrentThreadId, dwWindowThreadId, FALSE);
+		hWindow = hCurrentWindow;
+ 		dwWindowThreadId = GetWindowThreadProcessId(hWindow, NULL);
+		AttachThreadInput(dwCurrentThreadId, dwWindowThreadId, TRUE);
+ 	}
+
+
+	POINT	pt;
+ 	if (GetCaretPos(&pt))
+ 	{
+		HWND hwnd=GetForegroundWindow();
+ 		if (hwnd) ClientToScreen(GetFocus(), &pt);
+ 	}
+	if (old_caret_pt.x!=pt.x || old_caret_pt.y!=pt.y)
+	{		
+		RECT rect;
+		rect.left=old_caret_pt.x-m_ScreenOffsetx;
+		rect.right=old_caret_pt.x-m_ScreenOffsetx+64;
+		rect.top=old_caret_pt.y-m_ScreenOffsety;
+		rect.bottom=old_caret_pt.y-m_ScreenOffsety+64;
+		rfb::Rect wrect = rfb::Rect(rect).intersect(m_Cliprect);
+		if (!wrect.is_empty())
+			{
+				rgn.assign_union(wrect);
+			}
+
+		old_caret_pt.x=pt.x;
+		old_caret_pt.y=pt.y;
+	}
+
+
 	// We walk our way through the Grids
 	for (y = rect.tl.y; y < (rect.br.y -nOffset -1) ; y += PIXEL_BLOCK_SIZE)
 	{
@@ -504,6 +544,8 @@ vncDesktop::vncDesktop()
 	m_old_monitor = MULTI_MON_PRIMARY;
 	m_ScreenWidth = 0;
 	m_ScreenHeight = 0;
+	old_caret_pt.x=0;
+	old_caret_pt.y=0;
 //
 }
 

@@ -25,6 +25,7 @@
 #include "vncdesktopthread.h"
 #include "vncOSVersion.h"
 #include "uvncUiAccess.h"
+extern keybd_class *keybd_class_instance;
 bool g_DesktopThread_running;
 bool g_update_triggered;
 DWORD WINAPI hookwatch(LPVOID lpParam);
@@ -829,12 +830,6 @@ void vncDesktopThread::do_polling(HANDLE& threadHandle, rfb::Region2D& rgncache,
 				capture=false;
 			}
 
-			/*#ifdef _DEBUG
-										char			szText[256];
-										sprintf(szText," Capture %i\n",capture);
-										OutputDebugString(szText);		
-			#endif*/
-
 			// force full screen scan every three seconds after the mouse stops moving
 			if (fullpollcounter > 200) 
 			{
@@ -884,8 +879,8 @@ vncDesktopThread::run_undetached(void *arg)
 	// Attempt to initialise and return success or failure
 	m_desktop->KillScreenSaver();
 	{
-		keybd_event(VK_CONTROL, 0, 0, 0);
-        keybd_uni_event(VK_CONTROL, 0, KEYEVENTF_KEYUP, 0);
+		if (keybd_class_instance)keybd_class_instance->keybd_uni_event(VK_CONTROL, 0, 0, 0);
+        if (keybd_class_instance)keybd_class_instance->keybd_uni_event(VK_CONTROL, 0, KEYEVENTF_KEYUP, 0);
 		Sleep(500); //Give screen some time to kill screensaver
 	}
     DWORD startup_error;

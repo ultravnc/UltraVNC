@@ -43,6 +43,7 @@
 
 #include "keysymdef.h"
 #include "uvncUiAccess.h"
+extern keybd_class *keybd_class_instance;
 //	[v1.0.2-jp1 fix] IOport's patch (Include "ime.h" for IME control)
 #include <ime.h>
  
@@ -346,7 +347,7 @@ rdr::U16 ascii_to_x[256] = {
 // the appropriate scancode corresponding to the supplied virtual keycode.
 
 inline void doKeyboardEvent(BYTE vkCode, DWORD flags) {
-  keybd_uni_event(vkCode, MapVirtualKey(vkCode, 0), flags, 0);
+  if (keybd_class_instance)keybd_class_instance->keybd_uni_event(vkCode, MapVirtualKey(vkCode, 0), flags, 0);
 }
 
 // KeyStateModifier is a class which helps simplify generating a "fake" press
@@ -614,7 +615,7 @@ public:
 
               vnclog.Print(LL_INTWARN, " Simulating ALT+%d%d%d\n", a0, a1 ,a2);
 
-			  keybd_uni_event(VK_MENU,MapVirtualKey( VK_MENU, 0 ), 0 ,0);
+			  if (keybd_class_instance)keybd_class_instance->keybd_uni_event(VK_MENU,MapVirtualKey( VK_MENU, 0 ), 0 ,0);
               /**
                 Pressing the Alt+NNN combinations without leading zero (for example, Alt+20, Alt+130, Alt+221) 
                 will insert characters from the Extended ASCII (or MS DOS ASCII, or OEM) table. The character 
@@ -631,15 +632,15 @@ public:
 
               **/
               // jdp 11 December 2008 - Need the leading 0! 
-			  keybd_uni_event(VK_NUMPAD0,    MapVirtualKey(VK_NUMPAD0,    0), 0, 0);
-			  keybd_uni_event(VK_NUMPAD0,    MapVirtualKey(VK_NUMPAD0,    0),KEYEVENTF_KEYUP,0);
-			  keybd_uni_event(VK_NUMPAD0+a0, MapVirtualKey(VK_NUMPAD0+a0, 0), 0, 0);
-			  keybd_uni_event(VK_NUMPAD0+a0, MapVirtualKey(VK_NUMPAD0+a0, 0),KEYEVENTF_KEYUP,0);
-			  keybd_uni_event(VK_NUMPAD0+a1, MapVirtualKey(VK_NUMPAD0+a1, 0),0,0);
-			  keybd_uni_event(VK_NUMPAD0+a1, MapVirtualKey(VK_NUMPAD0+a1, 0),KEYEVENTF_KEYUP, 0);
-			  keybd_uni_event(VK_NUMPAD0+a2, MapVirtualKey(VK_NUMPAD0+a2, 0) ,0, 0);
-			  keybd_uni_event(VK_NUMPAD0+a2, MapVirtualKey(VK_NUMPAD0+a2, 0),KEYEVENTF_KEYUP, 0);
-			  keybd_uni_event(VK_MENU, MapVirtualKey( VK_MENU, 0 ),KEYEVENTF_KEYUP, 0);
+			  if (keybd_class_instance)keybd_class_instance->keybd_uni_event(VK_NUMPAD0,    MapVirtualKey(VK_NUMPAD0,    0), 0, 0);
+			  if (keybd_class_instance)keybd_class_instance->keybd_uni_event(VK_NUMPAD0,    MapVirtualKey(VK_NUMPAD0,    0),KEYEVENTF_KEYUP,0);
+			  if (keybd_class_instance)keybd_class_instance->keybd_uni_event(VK_NUMPAD0+a0, MapVirtualKey(VK_NUMPAD0+a0, 0), 0, 0);
+			  if (keybd_class_instance)keybd_class_instance->keybd_uni_event(VK_NUMPAD0+a0, MapVirtualKey(VK_NUMPAD0+a0, 0),KEYEVENTF_KEYUP,0);
+			  if (keybd_class_instance)keybd_class_instance->keybd_uni_event(VK_NUMPAD0+a1, MapVirtualKey(VK_NUMPAD0+a1, 0),0,0);
+			  if (keybd_class_instance)keybd_class_instance->keybd_uni_event(VK_NUMPAD0+a1, MapVirtualKey(VK_NUMPAD0+a1, 0),KEYEVENTF_KEYUP, 0);
+			  if (keybd_class_instance)keybd_class_instance->keybd_uni_event(VK_NUMPAD0+a2, MapVirtualKey(VK_NUMPAD0+a2, 0) ,0, 0);
+			  if (keybd_class_instance)keybd_class_instance->keybd_uni_event(VK_NUMPAD0+a2, MapVirtualKey(VK_NUMPAD0+a2, 0),KEYEVENTF_KEYUP, 0);
+			  if (keybd_class_instance)keybd_class_instance->keybd_uni_event(VK_MENU, MapVirtualKey( VK_MENU, 0 ),KEYEVENTF_KEYUP, 0);
 			  return;
 			  }
         }

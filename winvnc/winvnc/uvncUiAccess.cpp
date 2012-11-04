@@ -1,12 +1,92 @@
 #include "uvncUiAccess.h"
 
-comm_serv *keyEventFn=NULL;
-comm_serv *StopeventFn=NULL;
-comm_serv *StarteventFn=NULL;
-
 extern bool WIN8;
+keybd_class *keybd_class_instance=NULL;
 
-void Shellexecuteforuiaccess()
+keybd_class::keybd_class()
+{
+	InitializeCriticalSection(&CriticalSection); 	
+	keyEventFn=NULL;
+	StopeventFn=NULL;
+	StarteventFn=NULL;
+	keycounter =0;
+	if (!WIN8) return;
+
+	EnterCriticalSection(&CriticalSection);
+	keyEventFn=new comm_serv;
+	StopeventFn=new comm_serv;
+	StarteventFn=new comm_serv;
+	if (!keyEventFn->Init("keyEvent",sizeof(keyEventdata),0,false,true)) goto error;
+	if (!StopeventFn->Init("stop_event",0,0,false,true)) goto error;
+	if (!StarteventFn->Init("start_event",1,1,false,true)) goto error;	
+	Shellexecuteforuiaccess();
+	Sleep(1000);
+	unsigned char Invalue=12;
+	unsigned char Outvalue=0;
+	StarteventFn->Call_Fnction_Long_Timeout((char*)&Invalue,(char*)&Outvalue,5);
+	if (Invalue!=Outvalue)
+	{
+		 goto error;
+	}
+	LeaveCriticalSection(&CriticalSection);
+	return;
+error:
+	if (keyEventFn)delete keyEventFn;
+			keyEventFn=NULL;
+	if (StopeventFn)delete StopeventFn;
+			StopeventFn=NULL;
+	if (StarteventFn)delete StarteventFn;
+			StarteventFn=NULL;
+	LeaveCriticalSection(&CriticalSection);
+	return;
+}
+
+keybd_class::~keybd_class()
+{
+	if (!WIN8) goto end;
+	EnterCriticalSection(&CriticalSection);
+	if (StopeventFn) StopeventFn->Call_Fnction_no_feedback();
+	if (keyEventFn)delete keyEventFn;
+	keyEventFn=NULL;
+	if (StopeventFn)delete StopeventFn;
+	StopeventFn=NULL;
+	if (StarteventFn)delete StarteventFn;
+	StarteventFn=NULL;
+	LeaveCriticalSection(&CriticalSection);
+end:	
+	DeleteCriticalSection(&CriticalSection);
+}
+
+void keybd_class::keybd_initialize()
+{		
+	keycounter =0;
+	if (!WIN8) return;
+	keyEventFn=new comm_serv;
+	StopeventFn=new comm_serv;
+	StarteventFn=new comm_serv;
+	if (!keyEventFn->Init("keyEvent",sizeof(keyEventdata),0,false,true)) goto error;
+	if (!StopeventFn->Init("stop_event",0,0,false,true)) goto error;
+	if (!StarteventFn->Init("start_event",1,1,false,true)) goto error;	
+	Shellexecuteforuiaccess();
+	Sleep(1000);
+	unsigned char Invalue=12;
+	unsigned char Outvalue=0;
+	StarteventFn->Call_Fnction_Long_Timeout((char*)&Invalue,(char*)&Outvalue,5);
+	if (Invalue!=Outvalue)
+	{
+		 goto error;
+	}
+	return;
+error:
+	if (keyEventFn)delete keyEventFn;
+			keyEventFn=NULL;
+	if (StopeventFn)delete StopeventFn;
+			StopeventFn=NULL;
+	if (StarteventFn)delete StarteventFn;
+			StarteventFn=NULL;
+}
+
+void keybd_class::Shellexecuteforuiaccess()
 {		
 		char WORKDIR[MAX_PATH];
 		if (GetModuleFileName(NULL, WORKDIR, MAX_PATH))
@@ -35,10 +115,10 @@ void Shellexecuteforuiaccess()
 		ShellExecuteEx(&shExecInfo);
 }
 
- int keycounter =0;
-void keepalive()
+void keybd_class::keepalive()
 {
 	if (!WIN8) return;
+	EnterCriticalSection(&CriticalSection);
 	unsigned char Invalue=12;
 	unsigned char Outvalue=0;
 	if (StarteventFn) StarteventFn->Call_Fnction_Long_Timeout((char*)&Invalue,(char*)&Outvalue,5);
@@ -57,52 +137,9 @@ void keepalive()
 		if (keycounter>3) goto error;
 	}
 	else keycounter=0;
+	LeaveCriticalSection(&CriticalSection);
 	return;
 	// This disable the keyboard helper, better to have something
-	error:
-	if (keyEventFn)delete keyEventFn;
-			keyEventFn=NULL;
-	if (StopeventFn)delete StopeventFn;
-			StopeventFn=NULL;
-	if (StarteventFn)delete StarteventFn;
-			StarteventFn=NULL;
-
-}
-
-void keybd_uni_event(_In_  BYTE bVk,_In_  BYTE bScan,_In_  DWORD dwFlags,_In_  ULONG_PTR dwExtraInfo)
-{
-	 if (keyEventFn==NULL || !WIN8) keybd_event(bVk,bScan,dwFlags,dwExtraInfo);
-	 else 
-	 {
-		keyEventdata ked;
-		ked.bVk=bVk;
-		ked.bScan=bScan;	
-		ked.dwflags=dwFlags;
-		keyEventFn->Call_Fnction((char*)&ked,NULL);
-	 }
-}
-
-void keybd_initialize()
-{
-	if (!WIN8) return;
-	keyEventFn=new comm_serv;
-	StopeventFn=new comm_serv;
-	StarteventFn=new comm_serv;
-	if (!keyEventFn->Init("keyEvent",sizeof(keyEventdata),0,false,true)) goto error;
-	if (!StopeventFn->Init("stop_event",0,0,false,true)) goto error;
-	if (!StarteventFn->Init("start_event",1,1,false,true)) goto error;	
-	Shellexecuteforuiaccess();
-	Sleep(1000);
-	unsigned char Invalue=12;
-	unsigned char Outvalue=0;
-	StarteventFn->Call_Fnction_Long_Timeout((char*)&Invalue,(char*)&Outvalue,5);
-	if (Invalue!=Outvalue)
-	{
-		 goto error;
-	}
-	return;
-	
-	return;
 error:
 	if (keyEventFn)delete keyEventFn;
 			keyEventFn=NULL;
@@ -110,19 +147,29 @@ error:
 			StopeventFn=NULL;
 	if (StarteventFn)delete StarteventFn;
 			StarteventFn=NULL;
+	LeaveCriticalSection(&CriticalSection);
+	return;
 }
 
-void keybd_delete()
+void keybd_class::keybd_uni_event(_In_  BYTE bVk,_In_  BYTE bScan,_In_  DWORD dwFlags,_In_  ULONG_PTR dwExtraInfo)
 {
-	if (!WIN8) return;
-	if (StopeventFn) StopeventFn->Call_Fnction_no_feedback();
-	if (keyEventFn)delete keyEventFn;
-	keyEventFn=NULL;
-	if (StopeventFn)delete StopeventFn;
-	StopeventFn=NULL;
-	if (StarteventFn)delete StarteventFn;
-	StarteventFn=NULL;
+	 if (keyEventFn==NULL || !WIN8) 
+	 {
+		 keybd_event(bVk,bScan,dwFlags,dwExtraInfo);
+	 }
+	 else 
+	 {
+		EnterCriticalSection(&CriticalSection);
+		keyEventdata ked;
+		ked.bVk=bVk;
+		ked.bScan=bScan;	
+		ked.dwflags=dwFlags;
+		if (keyEventFn) keyEventFn->Call_Fnction((char*)&ked,NULL);
+		LeaveCriticalSection(&CriticalSection);
+	 }
 }
+
+
 
 comm_serv::comm_serv()
 {
@@ -388,100 +435,6 @@ bool comm_serv::Init(char *name,int IN_datasize_IN,int IN_datasize_OUT,bool app,
 		}
 	}
 	return true;
-}
-
-
-HANDLE comm_serv::InitFileHandle(char *name,int IN_datasize_IN,int IN_datasize_OUT,bool app,bool master)
-{
-	datasize_IN=IN_datasize_IN;
-	datasize_OUT=IN_datasize_OUT;
-	create_sec_attribute();
-	char savename[42];
-	strcpy_s(savename,42,name);
-	if (app)
-	{
-		strcpy_s(filemapping_IN,64,"");
-		strcpy_s(filemapping_OUT,64,"");
-		strcpy_s(event_IN,64,"");
-		strcpy_s(event_IN_DONE,64,"");
-		strcpy_s(event_OUT,64,"");
-		strcpy_s(event_OUT_DONE,64,"");
-
-		strcat_s(filemapping_IN,64,name);
-		strcat_s(filemapping_IN,64,"fm_IN");
-		strcat_s(filemapping_OUT,64,name);
-		strcat_s(filemapping_OUT,64,"fm_OUT");
-		strcat_s(event_IN,64,name);
-		strcat_s(event_IN,64,"event_IN");
-		strcat_s(event_IN_DONE,64,name);
-		strcat_s(event_IN_DONE,64,"event_IN_DONE");
-		strcat_s(event_OUT,64,name);
-		strcat_s(event_OUT,64,"event_OUT");
-		strcat_s(event_OUT_DONE,64,name);
-		strcat_s(event_OUT_DONE,64,"event_OUT_DONE");
-	}
-	else
-	{
-		strcpy_s(filemapping_IN,64,"Global\\");
-		strcpy_s(filemapping_OUT,64,"Global\\");
-		strcpy_s(event_IN,64,"Global\\");
-		strcpy_s(event_IN_DONE,64,"Global\\");
-		strcpy_s(event_OUT,64,"Global\\");
-		strcpy_s(event_OUT_DONE,64,"Global\\");
-
-		strcat_s(filemapping_IN,64,name);
-		strcat_s(filemapping_IN,64,"fm_IN");
-		strcat_s(filemapping_OUT,64,name);
-		strcat_s(filemapping_OUT,64,"fm_OUT");
-		strcat_s(event_IN,64,name);
-		strcat_s(event_IN,64,"event_IN");
-		strcat_s(event_IN_DONE,64,name);
-		strcat_s(event_IN_DONE,64,"event_IN_DONE");
-		strcat_s(event_OUT,64,name);
-		strcat_s(event_OUT,64,"event_OUT");
-		strcat_s(event_OUT_DONE,64,name);
-		strcat_s(event_OUT_DONE,64,"event_OUT_DONE");
-	}
-
-	if (master)
-	{
-	if (!app)
-	{
-		if (datasize_IN!=0)
-		{
-		hMapFile_IN = CreateFileMapping(INVALID_HANDLE_VALUE,&secAttr,PAGE_READWRITE,0,datasize_IN,filemapping_IN);
-		if (hMapFile_IN == NULL) return NULL;
-		}
-	}
-	else
-	{
-		if (datasize_IN!=0)
-		{
-		hMapFile_IN = CreateFileMapping(INVALID_HANDLE_VALUE,NULL,PAGE_READWRITE,0,datasize_IN,filemapping_IN);
-		if (hMapFile_IN == NULL) return NULL;
-		}
-	}
-	}
-	else
-	{
-		if (!app)
-		{
-			if (datasize_IN!=0)
-			{
-			hMapFile_IN = OpenFileMapping(FILE_MAP_ALL_ACCESS,FALSE,filemapping_IN);
-			if (hMapFile_IN == NULL) return NULL;
-			}
-		}
-		else
-		{
-			if (datasize_IN!=0)
-			{
-			hMapFile_IN = OpenFileMapping(FILE_MAP_ALL_ACCESS,FALSE,filemapping_IN);
-			if (hMapFile_IN == NULL) return NULL;
-			}
-		}
-	}
-	return hMapFile_IN;
 }
 
 //service call session function

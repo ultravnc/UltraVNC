@@ -76,7 +76,7 @@
 #include "vncOSVersion.h"
 #include "common/win32_helpers.h"
 #include "uvncUiAccess.h"
-
+extern keybd_class *keybd_class_instance;
 bool isDirectoryTransfer(const char *szFileName);
 extern BOOL SPECIAL_SC_PROMPT;
 extern BOOL SPECIAL_SC_EXIT;
@@ -1944,10 +1944,10 @@ ClearKeyState(BYTE key)
 	if(keyState[key] & 1)
 	{
 		// Simulate the key being pressed
-		keybd_event(key, 0, KEYEVENTF_EXTENDEDKEY, 0);
+		keybd_class_instance->keybd_uni_event(key, 0, KEYEVENTF_EXTENDEDKEY, 0);
 
 		// Simulate it being release
-		keybd_event(key, 0, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+		keybd_class_instance->keybd_uni_event(key, 0, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
 	}
 }
 
