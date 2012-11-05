@@ -210,7 +210,7 @@ public:
 
 	void InitFTTimer();
 	void KillFTTimer();
-	static void CALLBACK fpTimer(UINT uID,	UINT uMsg, DWORD dwUser, DWORD dw1,	DWORD dw2);
+	static void CALLBACK fpTimer(UINT uID,	UINT uMsg, DWORD_PTR dwUser, DWORD_PTR dw1,	DWORD_PTR dw2);
 	static void CALLBACK fpTimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
 	static void TimerCallback(FileTransfer* ft);
 

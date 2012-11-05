@@ -337,7 +337,7 @@ void FileTransfer::InitFTTimer()
 	if (m_mmRes != -1) return;
 
 	m_fSendFileChunk = false;
-	m_mmRes = timeSetEvent( 1, 0, (LPTIMECALLBACK)fpTimer, (DWORD)this, TIME_PERIODIC );
+	m_mmRes = timeSetEvent( 1, 0, (LPTIMECALLBACK)fpTimer, (DWORD_PTR)this, TIME_PERIODIC );
 #else
 
 	if (m_timerID != 0xFFFFFFFF) {
@@ -375,7 +375,7 @@ void CALLBACK FileTransfer::fpTimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, 
 	}
 }
 
-void CALLBACK FileTransfer::fpTimer(UINT uID, UINT uMsg, DWORD dwUser, DWORD dw1, DWORD dw2)
+void CALLBACK FileTransfer::fpTimer(UINT uID, UINT uMsg, DWORD_PTR dwUser, DWORD_PTR dw1, DWORD_PTR dw2)
 {
 	FileTransfer* ft = (FileTransfer *) dwUser;
 
