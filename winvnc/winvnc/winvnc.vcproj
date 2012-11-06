@@ -4318,9 +4318,29 @@
 			Name="Resource Files"
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 			>
+			<File
+				RelativePath=".\res\Finger.cur"
+				>
+			</File>
+			<File
+				RelativePath=".\res\icon2.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\res\vnc-1.bmp"
+				>
+			</File>
+			<File
+				RelativePath=".\res\world3a.ico"
+				>
+			</File>
 		</Filter>
 		<File
 			RelativePath="res\AuthPanel.class"
+			>
+		</File>
+		<File
+			RelativePath=".\res\mslogon\AuthPanel.class"
 			>
 		</File>
 		<File
@@ -4336,7 +4356,31 @@
 			>
 		</File>
 		<File
+			RelativePath=".\res\mslogon\ButtonPanel.class"
+			>
+		</File>
+		<File
+			RelativePath=".\res\mslogon\ClipboardFrame.class"
+			>
+		</File>
+		<File
+			RelativePath=".\res\clipboardframe.class"
+			>
+		</File>
+		<File
+			RelativePath=".\res\descipher.class"
+			>
+		</File>
+		<File
+			RelativePath=".\res\mslogon\DesCipher.class"
+			>
+		</File>
+		<File
 			RelativePath="res\DH.class"
+			>
+		</File>
+		<File
+			RelativePath=".\res\mslogon\DH.class"
 			>
 		</File>
 		<File
@@ -4344,7 +4388,15 @@
 			>
 		</File>
 		<File
+			RelativePath=".\res\mslogon\FTPFrame$StrComp.class"
+			>
+		</File>
+		<File
 			RelativePath=".\res\ftpframe$strcomp.class"
+			>
+		</File>
+		<File
+			RelativePath=".\res\mslogon\FTPFrame.class"
 			>
 		</File>
 		<File
@@ -4360,6 +4412,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\res\mslogon\OptionsFrame.class"
+			>
+		</File>
+		<File
+			RelativePath=".\res\optionsframe.class"
+			>
+		</File>
+		<File
 			RelativePath="..\README_BINARY.txt"
 			>
 		</File>
@@ -4368,7 +4428,47 @@
 			>
 		</File>
 		<File
+			RelativePath=".\res\mslogon\RecordingFrame.class"
+			>
+		</File>
+		<File
+			RelativePath=".\res\rfbproto.class"
+			>
+		</File>
+		<File
+			RelativePath=".\res\mslogon\RfbProto.class"
+			>
+		</File>
+		<File
+			RelativePath=".\res\mslogon\SessionRecorder.class"
+			>
+		</File>
+		<File
 			RelativePath="res\SessionRecorder.class"
+			>
+		</File>
+		<File
+			RelativePath=".\res\mslogon\VncCanvas.class"
+			>
+		</File>
+		<File
+			RelativePath=".\res\vnccanvas.class"
+			>
+		</File>
+		<File
+			RelativePath=".\res\vncviewer.class"
+			>
+		</File>
+		<File
+			RelativePath=".\res\mslogon\VncViewer.class"
+			>
+		</File>
+		<File
+			RelativePath=".\res\mslogon\VncViewer.jar"
+			>
+		</File>
+		<File
+			RelativePath=".\res\vncviewer.jar"
 			>
 		</File>
 		<File

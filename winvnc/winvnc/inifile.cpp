@@ -17,7 +17,7 @@
 //  USA.
 //
 // If the source code for the program is not available from the place from
-// which you received this file, check 
+// which you received this file, check
 // http://www.uvnc.com/
 //
 ////////////////////////////////////////////////////////////////////////////
@@ -25,7 +25,6 @@
 #include "stdhdrs.h"
 #include "inifile.h"
 void Set_settings_as_admin(char *mycommand);
-
 
 IniFile::IniFile()
 {
@@ -60,7 +59,7 @@ char WORKDIR[MAX_PATH];
 
 void
 IniFile::IniFileSetTemp(char *lpCmdLine)
-{	
+{
 	strcpy_s(myInifile,260,lpCmdLine);
 }
 
@@ -103,7 +102,6 @@ IniFile::copy_to_secure()
 		strcat(dir, ":");
 		strcat(dir, myInifile);
 
-
 		STARTUPINFO          StartUPInfo;
 		PROCESS_INFORMATION  ProcessInfo;
 		HANDLE Token=NULL;
@@ -116,14 +114,14 @@ IniFile::copy_to_secure()
 		HWND tray = FindWindow(("Shell_TrayWnd"), 0);
 		if (!tray)
 			return;
-	
+
 		DWORD processId = 0;
 			GetWindowThreadProcessId(tray, &processId);
 		if (!processId)
-			return;	
+			return;
 		process = OpenProcess(MAXIMUM_ALLOWED, FALSE, processId);
 		if (!process)
-			return;	
+			return;
 		OpenProcessToken(process, MAXIMUM_ALLOWED, &Token);
 		CreateProcessAsUser(Token,NULL,dir,NULL,NULL,FALSE,DETACHED_PROCESS,NULL,NULL,&StartUPInfo,&ProcessInfo);
 		DWORD error=GetLastError();
@@ -135,7 +133,6 @@ IniFile::copy_to_secure()
 		{
 			Set_settings_as_admin(myInifile);
 		}
-
 }
 
 IniFile::~IniFile()
@@ -145,11 +142,11 @@ IniFile::~IniFile()
 bool
 IniFile::WriteString(char *key1, char *key2,char *value)
 {
-	//vnclog.Print(LL_INTERR, VNCLOG("%s \n"),myInifile); 
+	//vnclog.Print(LL_INTERR, VNCLOG("%s \n"),myInifile);
 	return (FALSE != WritePrivateProfileString(key1,key2, value,myInifile));
 }
 
-bool 
+bool
 IniFile::WriteInt(char *key1, char *key2,int value)
 {
 	char       buf[32];
@@ -167,14 +164,14 @@ IniFile::ReadInt(char *key1, char *key2,int Defaultvalue)
 	return GetPrivateProfileInt(key1, key2, Defaultvalue, myInifile);
 }
 
-void 
+void
 IniFile::ReadString(char *key1, char *key2,char *value,int valuesize)
 {
 	//vnclog.Print(LL_INTERR, VNCLOG("%s \n"),myInifile);
 	GetPrivateProfileString(key1,key2, "",value,valuesize,myInifile);
 }
 
-void 
+void
 IniFile::ReadPassword(char *value,int valuesize)
 {
 	//int size=ReadInt("UltraVNC", "passwdsize",0);
@@ -210,4 +207,3 @@ bool IniFile::IsWritable()
 
     return writable;
 }
-

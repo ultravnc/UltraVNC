@@ -207,6 +207,7 @@
 #define IDC_CONNECTION_NUMBER_LABEL     1128
 #define IDC_CONNECTION_NUMBER_STATIC    1128
 #define IDC_CAPTION_STATIC              1129
+#define IDC_ACCEPTLOGO                  1131
 #define IDC_Path1                       1132
 #define IDC_Path2                       1133
 #define IDC_Path3                       1134
@@ -306,7 +307,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        170
 #define _APS_NEXT_COMMAND_VALUE         40030
-#define _APS_NEXT_CONTROL_VALUE         1131
+#define _APS_NEXT_CONTROL_VALUE         1132
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

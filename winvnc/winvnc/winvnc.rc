@@ -13,11 +13,13 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (United States) resources
+// English (U.S.) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
+#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -87,11 +89,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,8,135,54,16
     CONTROL         139,IDC_VNCLOGO,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_SUNKEN,7,5,53,46,WS_EX_TRANSPARENT
-#ifdef _X64
-	LTEXT			"UltraVNC X64 Server 1.1.3",IDC_VERSION,73,5,195,11
-#else
-	LTEXT           "UltraVNC Win32 Server 1.1.3",IDC_VERSION,73,5,195,11
-#endif
+    LTEXT           "UltraVNC Win32 Server 1.1.3",IDC_VERSION,73,5,195,11
     LTEXT           "Copyright © 2002-2012 UltraVNC Team\nCopyright © 2001-2002 Sam - eSVNC \nCopyright © 1999-2002 Rudi D. V. - VdaccVNC \nCopyright © 2001 Harakan Software - PalmVNC\nCopyright © 1999-2002 Const. Kaplinsky - TightVNC \n",IDC_NAME,74,27,202,41
     LTEXT           "For more Information and Links please visit: \nhttp://www.uvnc.com",IDC_WWW,74,135,141,19
     LTEXT           "Build:",IDC_BUILDTEXT,74,16,20,10
@@ -122,10 +120,11 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     PUSHBUTTON      "&Accept",IDACCEPT,7,74,53,14
     DEFPUSHBUTTON   "&Reject",IDREJECT,130,74,49,14
-    CTEXT           "WinVNC has received an incoming connection from",IDC_STATIC_TEXT1,7,7,172,17,SS_CENTERIMAGE
-    CTEXT           "<unknown host>",IDC_ACCEPT_IP,7,30,172,16,SS_CENTERIMAGE
-    CTEXT           "Do you wish to Accept or Reject the connection?",IDC_STATIC_TEXT,7,50,172,15,SS_CENTERIMAGE
+    LTEXT           "WinVNC has received an incoming connection from",IDC_STATIC_TEXT1,7,7,107,36
+    CTEXT           "<unknown host>",IDC_ACCEPT_IP,5,47,172,9,SS_CENTERIMAGE
+    CTEXT           "Do you wish to Accept or Reject the connection?",IDC_STATIC_TEXT,7,58,172,15,SS_CENTERIMAGE
     CTEXT           "AutoReject:",IDC_ACCEPT_TIMEOUT,60,74,70,14,SS_CENTERIMAGE
+    CONTROL         139,IDC_ACCEPTLOGO,"Static",SS_BITMAP,130,7,43,39
 END
 
 IDD_PROPERTIES DIALOGEX 0, 0, 224, 191
@@ -256,13 +255,14 @@ BEGIN
     CONTROL         153,IDC_VNCLOGO,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_SUNKEN,7,5,269,199,WS_EX_TRANSPARENT
 END
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // DESIGNINFO
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO
+GUIDELINES DESIGNINFO 
 BEGIN
     IDD_TEXTCHAT_DLG, DIALOG
     BEGIN
@@ -369,6 +369,7 @@ BEGIN
 END
 #endif    // APSTUDIO_INVOKED
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Version
@@ -393,11 +394,7 @@ BEGIN
         BEGIN
             VALUE "Comments", "UltraVNC - Remote Control for all"
             VALUE "CompanyName", "UltraVNC"
-#ifdef _X64
-			VALUE "FileDescription", "VNC server for X64"
-#else
             VALUE "FileDescription", "VNC server for win32"
-#endif
             VALUE "FileVersion", "1.1.3"
             VALUE "InternalName", "WinVNC"
             VALUE "LegalCopyright", "Copyright © 2010 UltraVNC"
@@ -414,12 +411,13 @@ BEGIN
     END
 END
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Menu
 //
 
-IDR_TRAYMENU MENU
+IDR_TRAYMENU MENU 
 BEGIN
     POPUP "tray"
     BEGIN
@@ -451,6 +449,7 @@ BEGIN
     END
 END
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // JAVAARCHIVE
@@ -463,13 +462,13 @@ IDR_VNCVIEWER_JAR       JAVAARCHIVE             "res\\vncviewer.jar"
 // String Table
 //
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDI_WINVNC              "WinVNC"
     IDS_WARNING             "WARNING: By default, this session do not use any encryption whatsoever. Please do not use it to send sensitive data unless you are sure your connection is secure.\n\n"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     ID_FAILED_INIT          "Failed to initialise the socket system"
     ID_WINVNC_USAGE         "WinVNC Usage"
@@ -481,7 +480,7 @@ BEGIN
     ID_SERV_FAIL_ST         "The WinVNC service failed to start"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     ID_SERV_CT_MISS         "The Service Control Manager could not be contacted - the WinVNC service was not registered"
     ID_SERV_OLD_REG         "The WinVNC service is already registered"
@@ -496,19 +495,19 @@ BEGIN
     ID_WINVNC_ERROR         "WinVNC Error"
     ID_WINVNC_WARNIN        "WinVNC Warning"
     ID_PLUGIN_LOADIN        "Plugin Loading"
-    ID_NO_PASSWD_NO_OVERRIDE_ERR
+    ID_NO_PASSWD_NO_OVERRIDE_ERR 
                             "No password has been set & this machine has been preconfigured to prevent users from setting their own.\nYou must contact a System Administrator to configure WinVNC properly."
-    ID_NO_PASSWD_NO_OVERRIDE_WARN
+    ID_NO_PASSWD_NO_OVERRIDE_WARN 
                             "WARNING : This machine has been preconfigured to allow un-authenticated\nconnections to be accepted and to prevent users from enabling authentication."
-    ID_NO_PASSWD_NO_LOGON_WARN
+    ID_NO_PASSWD_NO_LOGON_WARN 
                             "WARNING : This machine has no default password set.  WinVNC will present the Default Properties dialog now to allow one to be entered."
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     ID_NO_OVERRIDE_ERR      "This machine has been preconfigured with WinVNC settings, which cannot be overridden by individual users.  The preconfigured settings may be modified only by a System Administrator."
     ID_NO_CURRENT_USER_ERR  "The WinVNC settings for the current user are unavailable at present."
-    ID_CANNOT_EDIT_DEFAULT_PREFS
+    ID_CANNOT_EDIT_DEFAULT_PREFS 
                             "You do not have sufficient priviliges to edit the default local WinVNC settings."
     ID_NO_PASSWORD_WARN     "WARNING : Running WinVNC without setting a password is a dangerous security risk!\nUntil you set a password, WinVNC will not accept incoming connections."
     ID_PLUGIN_NOT_LOAD      "The Plugin cannot be loaded.\n\rPlease check its integrity."
@@ -525,7 +524,7 @@ BEGIN
     ID_UNABLE_PROC_MSLOGON  "Unable to process MS logon"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     ID_RICHED32_UNLOAD      "Unable to load the Rich Edit (RICHED32.DLL) control!"
     ID_RICHED32_DLL_LD      "Rich Edit Dll Loading"
@@ -545,15 +544,18 @@ BEGIN
     ID_CADPERMISSION        "Permission denied on cad.exe, UltraVNC must be installed in ""program files"" else special cad permission is refused."
 END
 
-#endif    // English (United States) resources
+#endif    // English (U.S.) resources
 /////////////////////////////////////////////////////////////////////////////
 
+
 /////////////////////////////////////////////////////////////////////////////
-// English (United Kingdom) resources
+// English (U.K.) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENG)
+#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
 #pragma code_page(1252)
+#endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -561,18 +563,18 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE
+1 TEXTINCLUDE 
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE
+2 TEXTINCLUDE 
 BEGIN
     "#include ""afxres.h""\r\n"
     "\0"
 END
 
-3 TEXTINCLUDE
+3 TEXTINCLUDE 
 BEGIN
     "\r\n"
     "\0"
@@ -580,15 +582,18 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-#endif    // English (United Kingdom) resources
+#endif    // English (U.K.) resources
 /////////////////////////////////////////////////////////////////////////////
+
 
 /////////////////////////////////////////////////////////////////////////////
 // Dutch (Belgium) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NLB)
+#ifdef _WIN32
 LANGUAGE LANG_DUTCH, SUBLANG_DUTCH_BELGIAN
 #pragma code_page(1252)
+#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -642,13 +647,14 @@ BEGIN
     LTEXT           "3",IDC_STATIC,11,56,8,8
 END
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // DESIGNINFO
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO
+GUIDELINES DESIGNINFO 
 BEGIN
     IDD_MSLOGON, DIALOG
     BEGIN
@@ -668,6 +674,7 @@ BEGIN
     END
 END
 #endif    // APSTUDIO_INVOKED
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -695,11 +702,15 @@ IDB_LOGO64              BITMAP                  "res\\vnc-1.bmp"
 #endif    // Dutch (Belgium) resources
 /////////////////////////////////////////////////////////////////////////////
 
+
+
 #ifndef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
 //
 // Generated from the TEXTINCLUDE 3 resource.
 //
 
+
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
+

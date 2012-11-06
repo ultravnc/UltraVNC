@@ -17,7 +17,7 @@
 //  USA.
 //
 // If the source code for the program is not available from the place from
-// which you received this file, check 
+// which you received this file, check
 // http://www.uvnc.com/
 //
 ////////////////////////////////////////////////////////////////////////////
@@ -65,7 +65,6 @@ Set_settings_as_admin(char *mycommand)
 	shExecInfo.hInstApp = NULL;
 	ShellExecuteEx(&shExecInfo);
 }
-
 
 void Copy_to_Secure_from_temp_helper(char *lpCmdLine)
 {
@@ -146,6 +145,7 @@ LONG Virtual;
 LONG SingleWindow=0;
 char SingleWindowName[32];
 char path[512];
+char accept_reject_mesg[512];
 LONG MaxCpu=40;
 
 //adzm 2010-05-30 - dsmplugin config
@@ -154,7 +154,6 @@ char DSMPluginConfig[512];
 
 LONG Primary=1;
 LONG Secondary=0;
-
 
 BUseRegistry = myIniFile_In.ReadInt("admin", "UseRegistry", 0);
 if (!myIniFile_Out.WriteInt("admin", "UseRegistry", BUseRegistry))
@@ -169,15 +168,12 @@ myIniFile_Out.WriteInt("admin", "MSLogonRequired", MSLogonRequired);
 NewMSLogon=myIniFile_In.ReadInt("admin", "NewMSLogon", false);
 myIniFile_Out.WriteInt("admin", "NewMSLogon", NewMSLogon);
 
-
 myIniFile_In.ReadString("admin_auth","group1",group1,150);
 myIniFile_In.ReadString("admin_auth","group2",group2,150);
 myIniFile_In.ReadString("admin_auth","group3",group3,150);
 myIniFile_Out.WriteString("admin_auth", "group1",group1);
 myIniFile_Out.WriteString("admin_auth", "group2",group2);
 myIniFile_Out.WriteString("admin_auth", "group3",group3);
-
-
 
 locdom1=myIniFile_In.ReadInt("admin_auth", "locdom1",0);
 locdom2=myIniFile_In.ReadInt("admin_auth", "locdom2",0);
@@ -186,10 +182,10 @@ myIniFile_Out.WriteInt("admin_auth", "locdom1", locdom1);
 myIniFile_Out.WriteInt("admin_auth", "locdom2", locdom2);
 myIniFile_Out.WriteInt("admin_auth", "locdom3", locdom3);
 
-
 DebugMode=myIniFile_In.ReadInt("admin", "DebugMode", 0);
 Avilog=myIniFile_In.ReadInt("admin", "Avilog", 0);
 myIniFile_In.ReadString("admin", "path", path,512);
+myIniFile_In.ReadString("admin", "accept_reject_mesg", accept_reject_mesg,512);
 DebugLevel=myIniFile_In.ReadInt("admin", "DebugLevel", 0);
 DisableTrayIcon=myIniFile_In.ReadInt("admin", "DisableTrayIcon", false);
 LoopbackOnly=myIniFile_In.ReadInt("admin", "LoopbackOnly", false);
@@ -197,6 +193,7 @@ LoopbackOnly=myIniFile_In.ReadInt("admin", "LoopbackOnly", false);
 myIniFile_Out.WriteInt("admin", "DebugMode", DebugMode);
 myIniFile_Out.WriteInt("admin", "Avilog", Avilog);
 myIniFile_Out.WriteString("admin", "path", path);
+myIniFile_Out.WriteString("admin", "accept_reject_mesg", accept_reject_mesg);
 myIniFile_Out.WriteInt("admin", "DebugLevel", DebugLevel);
 myIniFile_Out.WriteInt("admin", "DisableTrayIcon", DisableTrayIcon);
 myIniFile_Out.WriteInt("admin", "LoopbackOnly", LoopbackOnly);
@@ -210,7 +207,6 @@ myIniFile_Out.WriteInt("admin", "UseDSMPlugin", UseDSMPlugin);
 myIniFile_Out.WriteInt("admin", "AllowLoopback", AllowLoopback);
 myIniFile_Out.WriteInt("admin", "AuthRequired", AuthRequired);
 myIniFile_Out.WriteInt("admin", "ConnectPriority", ConnectPriority);
-
 
 myIniFile_In.ReadString("admin", "DSMPlugin",DSMPlugin,128);
 myIniFile_In.ReadString("admin", "AuthHosts",authhosts,150);
@@ -228,7 +224,6 @@ AllowEditClients=myIniFile_In.ReadInt("admin", "AllowEditClients", true);
 myIniFile_Out.WriteInt("admin", "AllowShutdown" ,AllowShutdown);
 myIniFile_Out.WriteInt("admin", "AllowProperties" ,AllowProperties);
 myIniFile_Out.WriteInt("admin", "AllowEditClients" ,AllowEditClients);
-
 
 FileTransferEnabled=myIniFile_In.ReadInt("admin", "FileTransferEnabled", true);
 FTUserImpersonation=myIniFile_In.ReadInt("admin", "FTUserImpersonation", true);
@@ -252,7 +247,6 @@ myIniFile_Out.WriteInt("admin", "BlackAlphaBlending", BlackAlphaBlending);
 myIniFile_Out.WriteInt("admin", "primary", Primary);
 myIniFile_Out.WriteInt("admin", "secondary", Secondary);
 
-
 	// Connection prefs
 SocketConnect=myIniFile_In.ReadInt("admin", "SocketConnect", true);
 HTTPConnect=myIniFile_In.ReadInt("admin", "HTTPConnect", true);
@@ -268,7 +262,7 @@ myIniFile_Out.WriteInt("admin", "AutoPortSelect", AutoPortSelect);
 myIniFile_Out.WriteInt("admin", "PortNumber", PortNumber);
 myIniFile_Out.WriteInt("admin", "HTTPPortNumber", HttpPortNumber);
 myIniFile_Out.WriteInt("admin", "IdleTimeout", IdleTimeout);
-	
+
 RemoveWallpaper=myIniFile_In.ReadInt("admin", "RemoveWallpaper", 0);
 RemoveAero=myIniFile_In.ReadInt("admin", "RemoveAero", 0);
 myIniFile_Out.WriteInt("admin", "RemoveWallpaper", RemoveWallpaper);
@@ -286,7 +280,7 @@ myIniFile_Out.WriteInt("admin", "QueryIfNoLogon", QueryIfNoLogon);
 
 myIniFile_In.ReadPassword(passwd,MAXPWLEN);
 myIniFile_Out.WritePassword(passwd);
-memset(passwd, '\0', MAXPWLEN); //PGM 
+memset(passwd, '\0', MAXPWLEN); //PGM
 myIniFile_In.ReadPassword2(passwd,MAXPWLEN); //PGM
 myIniFile_Out.WritePassword2(passwd); //PGM
 
@@ -299,12 +293,10 @@ clearconsole=myIniFile_In.ReadInt("admin", "clearconsole", 0);
 
 myIniFile_Out.WriteInt("admin", "InputsEnabled", EnableRemoteInputs);
 myIniFile_Out.WriteInt("admin", "LockSetting", LockSettings);
-myIniFile_Out.WriteInt("admin", "LocalInputsDisabled", DisableLocalInputs);	
-myIniFile_Out.WriteInt("admin", "EnableJapInput", EnableJapInput);	
+myIniFile_Out.WriteInt("admin", "LocalInputsDisabled", DisableLocalInputs);
+myIniFile_Out.WriteInt("admin", "EnableJapInput", EnableJapInput);
 myIniFile_Out.WriteInt("admin", "kickrdp", kickrdp);
 myIniFile_Out.WriteInt("admin", "clearconsole", clearconsole);
-
-
 
 TurboMode = myIniFile_In.ReadInt("poll", "TurboMode", 0);
 PollUnderCursor=myIniFile_In.ReadInt("poll", "PollUnderCursor", 0);
@@ -363,13 +355,12 @@ Set_stop_service_as_admin()
 	shExecInfo.nShow = SW_SHOWNORMAL;
 	shExecInfo.hInstApp = NULL;
 	ShellExecuteEx(&shExecInfo);
-
 }
 
 void
 Real_stop_service()
 {
-    char command[MAX_PATH + 32]; // 29 January 2008 jdp 
+    char command[MAX_PATH + 32]; // 29 January 2008 jdp
     _snprintf(command, sizeof command, "net stop \"%s\"", service_name);
 	WinExec(command,SW_HIDE);
 }
@@ -392,7 +383,6 @@ Set_start_service_as_admin()
 	shExecInfo.nShow = SW_SHOWNORMAL;
 	shExecInfo.hInstApp = NULL;
 	ShellExecuteEx(&shExecInfo);
-
 }
 
 void Open_homepage()
@@ -408,7 +398,7 @@ void Open_forum()
 void
 Real_start_service()
 {
-    char command[MAX_PATH + 32]; // 29 January 2008 jdp 
+    char command[MAX_PATH + 32]; // 29 January 2008 jdp
     _snprintf(command, sizeof command, "net start \"%s\"", service_name);
 	WinExec(command,SW_HIDE);
 }
@@ -431,7 +421,6 @@ Set_install_service_as_admin()
 	shExecInfo.nShow = SW_SHOWNORMAL;
 	shExecInfo.hInstApp = NULL;
 	ShellExecuteEx(&shExecInfo);
-
 }
 
 void
@@ -452,7 +441,6 @@ Set_uninstall_service_as_admin()
 	shExecInfo.nShow = SW_SHOWNORMAL;
 	shExecInfo.hInstApp = NULL;
 	ShellExecuteEx(&shExecInfo);
-
 }
 
 void
@@ -596,7 +584,7 @@ DWORD MessageBoxSecure(HWND hWnd,LPCTSTR lpText,LPCTSTR lpCaption,UINT uType)
 		desktop = OpenInputDesktop(0, FALSE,DESKTOP_CREATEMENU | DESKTOP_CREATEWINDOW |DESKTOP_ENUMERATE | DESKTOP_HOOKCONTROL |DESKTOP_WRITEOBJECTS | DESKTOP_READOBJECTS |DESKTOP_SWITCHDESKTOP | GENERIC_WRITE);
 		old_desktop = GetThreadDesktop(GetCurrentThreadId());
 		if (desktop && 	old_desktop && old_desktop!=desktop)
-			{					
+			{
 					SetThreadDesktop(desktop);
 					retunvalue=MessageBox(hWnd,lpText,lpCaption,uType);
 					SetThreadDesktop(old_desktop);
