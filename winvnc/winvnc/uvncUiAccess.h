@@ -18,18 +18,6 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
-//
-//
-// Functions to hide the Windows Desktop
-//
-// This hides three variants:
-//	- Desktop Patterns  (WIN.INI [Desktop] Pattern=)
-//	- Desktop Wallpaper (.bmp [and JPEG on Windows XP])
-//	- Active Desktop
-//
-// Written by Ed Hardebeck - Glance Networks, Inc.
-// With some code from Paul DiLascia, MSDN Magazine - May 2001
-//
 
 #ifndef _G_UIACCESS_H_
 #define _G_UIACCESS_H_
