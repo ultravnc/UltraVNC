@@ -281,7 +281,7 @@ bool vncDesktop::FastDetectChanges(rfb::Region2D &rgn, rfb::Rect &rect, int nZon
 	change_found=0;
 	//Detect text faster
 	//If the caret change use a 64x64 for his last position
-	 	static	DWORD	dwCurrentThreadId = GetCurrentThreadId();
+	static	DWORD	dwCurrentThreadId = GetCurrentThreadId();
  	static	HWND	hWindow = GetForegroundWindow();
  	static	DWORD	dwWindowThreadId = GetWindowThreadProcessId(hWindow, NULL);
  	HWND	hCurrentWindow = GetForegroundWindow();

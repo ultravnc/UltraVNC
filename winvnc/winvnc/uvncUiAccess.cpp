@@ -1,92 +1,14 @@
 #include "uvncUiAccess.h"
 
+comm_serv *keyEventFn=NULL;
+comm_serv *StopeventFn=NULL;
+comm_serv *StarteventFn=NULL;
+
 extern bool WIN8;
-keybd_class *keybd_class_instance=NULL;
+CRITICAL_SECTION keyb_crit;
+bool crit_init=false;
 
-keybd_class::keybd_class()
-{
-	InitializeCriticalSection(&CriticalSection); 	
-	keyEventFn=NULL;
-	StopeventFn=NULL;
-	StarteventFn=NULL;
-	keycounter =0;
-	if (!WIN8) return;
-
-	EnterCriticalSection(&CriticalSection);
-	keyEventFn=new comm_serv;
-	StopeventFn=new comm_serv;
-	StarteventFn=new comm_serv;
-	if (!keyEventFn->Init("keyEvent",sizeof(keyEventdata),0,false,true)) goto error;
-	if (!StopeventFn->Init("stop_event",0,0,false,true)) goto error;
-	if (!StarteventFn->Init("start_event",1,1,false,true)) goto error;	
-	Shellexecuteforuiaccess();
-	Sleep(1000);
-	unsigned char Invalue=12;
-	unsigned char Outvalue=0;
-	StarteventFn->Call_Fnction_Long_Timeout((char*)&Invalue,(char*)&Outvalue,5);
-	if (Invalue!=Outvalue)
-	{
-		 goto error;
-	}
-	LeaveCriticalSection(&CriticalSection);
-	return;
-error:
-	if (keyEventFn)delete keyEventFn;
-			keyEventFn=NULL;
-	if (StopeventFn)delete StopeventFn;
-			StopeventFn=NULL;
-	if (StarteventFn)delete StarteventFn;
-			StarteventFn=NULL;
-	LeaveCriticalSection(&CriticalSection);
-	return;
-}
-
-keybd_class::~keybd_class()
-{
-	if (!WIN8) goto end;
-	EnterCriticalSection(&CriticalSection);
-	if (StopeventFn) StopeventFn->Call_Fnction_no_feedback();
-	if (keyEventFn)delete keyEventFn;
-	keyEventFn=NULL;
-	if (StopeventFn)delete StopeventFn;
-	StopeventFn=NULL;
-	if (StarteventFn)delete StarteventFn;
-	StarteventFn=NULL;
-	LeaveCriticalSection(&CriticalSection);
-end:	
-	DeleteCriticalSection(&CriticalSection);
-}
-
-void keybd_class::keybd_initialize()
-{		
-	keycounter =0;
-	if (!WIN8) return;
-	keyEventFn=new comm_serv;
-	StopeventFn=new comm_serv;
-	StarteventFn=new comm_serv;
-	if (!keyEventFn->Init("keyEvent",sizeof(keyEventdata),0,false,true)) goto error;
-	if (!StopeventFn->Init("stop_event",0,0,false,true)) goto error;
-	if (!StarteventFn->Init("start_event",1,1,false,true)) goto error;	
-	Shellexecuteforuiaccess();
-	Sleep(1000);
-	unsigned char Invalue=12;
-	unsigned char Outvalue=0;
-	StarteventFn->Call_Fnction_Long_Timeout((char*)&Invalue,(char*)&Outvalue,5);
-	if (Invalue!=Outvalue)
-	{
-		 goto error;
-	}
-	return;
-error:
-	if (keyEventFn)delete keyEventFn;
-			keyEventFn=NULL;
-	if (StopeventFn)delete StopeventFn;
-			StopeventFn=NULL;
-	if (StarteventFn)delete StarteventFn;
-			StarteventFn=NULL;
-}
-
-void keybd_class::Shellexecuteforuiaccess()
+void Shellexecuteforuiaccess()
 {		
 		char WORKDIR[MAX_PATH];
 		if (GetModuleFileName(NULL, WORKDIR, MAX_PATH))
@@ -115,10 +37,12 @@ void keybd_class::Shellexecuteforuiaccess()
 		ShellExecuteEx(&shExecInfo);
 }
 
-void keybd_class::keepalive()
+ int keycounter =0;
+void keepalive()
 {
 	if (!WIN8) return;
-	EnterCriticalSection(&CriticalSection);
+
+	EnterCriticalSection(&keyb_crit);
 	unsigned char Invalue=12;
 	unsigned char Outvalue=0;
 	if (StarteventFn) StarteventFn->Call_Fnction_Long_Timeout((char*)&Invalue,(char*)&Outvalue,5);
@@ -132,14 +56,74 @@ void keybd_class::keepalive()
 		if (StarteventFn)delete StarteventFn;
 			StarteventFn=NULL;
 		//Try to reinit the keyboard
-		keybd_initialize();
+		keybd_initialize_no_crit();
 		keycounter++;
 		if (keycounter>3) goto error;
 	}
 	else keycounter=0;
-	LeaveCriticalSection(&CriticalSection);
+	LeaveCriticalSection(&keyb_crit);
 	return;
 	// This disable the keyboard helper, better to have something
+	error:
+	if (keyEventFn)delete keyEventFn;
+			keyEventFn=NULL;
+	if (StopeventFn)delete StopeventFn;
+			StopeventFn=NULL;
+	if (StarteventFn)delete StarteventFn;
+			StarteventFn=NULL;
+	LeaveCriticalSection(&keyb_crit);
+}
+
+void keybd_uni_event(_In_  BYTE bVk,_In_  BYTE bScan,_In_  DWORD dwFlags,_In_  ULONG_PTR dwExtraInfo)
+{
+	if (!WIN8) 
+	{
+		keybd_event(bVk,bScan,dwFlags,dwExtraInfo);
+		return;
+	}
+
+	bool ldown = HIBYTE(::GetKeyState(VK_LMENU)) != 0;
+	bool rdown = HIBYTE(::GetKeyState(VK_RMENU)) != 0;	
+	bool lcdown = HIBYTE(::GetKeyState(VK_LCONTROL)) != 0;	
+	bool rcdown = HIBYTE(::GetKeyState(VK_RCONTROL)) != 0;	
+	bool lwindown = HIBYTE(::GetKeyState(VK_LWIN)) != 0;
+	bool rwindown = HIBYTE(::GetKeyState(VK_RWIN)) != 0;
+	 if ((keyEventFn==NULL || !WIN8 || (!ldown && !rdown && !lcdown && !rcdown &&lwindown && !rwindown) ))
+	 {
+		 keybd_event(bVk,bScan,dwFlags,dwExtraInfo);
+	 }
+	 else 
+	 {
+		EnterCriticalSection(&keyb_crit);
+		keyEventdata ked;
+		ked.bVk=bVk;
+		ked.bScan=bScan;	
+		ked.dwflags=dwFlags;
+		keyEventFn->Call_Fnction((char*)&ked,NULL);
+		LeaveCriticalSection(&keyb_crit);
+	 }
+}
+
+void keybd_initialize_no_crit()
+{
+	if (!WIN8) return;
+
+	keyEventFn=new comm_serv;
+	StopeventFn=new comm_serv;
+	StarteventFn=new comm_serv;
+	if (!keyEventFn->Init("keyEvent",sizeof(keyEventdata),0,false,true)) goto error;
+	if (!StopeventFn->Init("stop_event",0,0,false,true)) goto error;
+	if (!StarteventFn->Init("start_event",1,1,false,true)) goto error;	
+	Shellexecuteforuiaccess();
+	Sleep(1000);
+	unsigned char Invalue=12;
+	unsigned char Outvalue=0;
+	StarteventFn->Call_Fnction_Long_Timeout((char*)&Invalue,(char*)&Outvalue,5);
+	if (Invalue!=Outvalue)
+	{
+		 goto error;
+	}
+	return;
 error:
 	if (keyEventFn)delete keyEventFn;
 			keyEventFn=NULL;
@@ -147,29 +131,61 @@ error:
 			StopeventFn=NULL;
 	if (StarteventFn)delete StarteventFn;
 			StarteventFn=NULL;
-	LeaveCriticalSection(&CriticalSection);
 	return;
 }
 
-void keybd_class::keybd_uni_event(_In_  BYTE bVk,_In_  BYTE bScan,_In_  DWORD dwFlags,_In_  ULONG_PTR dwExtraInfo)
+void keybd_initialize()
 {
-	 if (keyEventFn==NULL || !WIN8) 
-	 {
-		 keybd_event(bVk,bScan,dwFlags,dwExtraInfo);
-	 }
-	 else 
-	 {
-		EnterCriticalSection(&CriticalSection);
-		keyEventdata ked;
-		ked.bVk=bVk;
-		ked.bScan=bScan;	
-		ked.dwflags=dwFlags;
-		if (keyEventFn) keyEventFn->Call_Fnction((char*)&ked,NULL);
-		LeaveCriticalSection(&CriticalSection);
-	 }
+	if (!WIN8) return;
+
+
+	if (!crit_init)InitializeCriticalSection(&keyb_crit);
+	crit_init=true;
+
+	EnterCriticalSection(&keyb_crit);
+	keyEventFn=new comm_serv;
+	StopeventFn=new comm_serv;
+	StarteventFn=new comm_serv;
+	if (!keyEventFn->Init("keyEvent",sizeof(keyEventdata),0,false,true)) goto error;
+	if (!StopeventFn->Init("stop_event",0,0,false,true)) goto error;
+	if (!StarteventFn->Init("start_event",1,1,false,true)) goto error;	
+	Shellexecuteforuiaccess();
+	Sleep(1000);
+	unsigned char Invalue=12;
+	unsigned char Outvalue=0;
+	StarteventFn->Call_Fnction_Long_Timeout((char*)&Invalue,(char*)&Outvalue,5);
+	if (Invalue!=Outvalue)
+	{
+		 goto error;
+	}
+	LeaveCriticalSection(&keyb_crit);
+	return;
+error:
+	if (keyEventFn)delete keyEventFn;
+			keyEventFn=NULL;
+	if (StopeventFn)delete StopeventFn;
+			StopeventFn=NULL;
+	if (StarteventFn)delete StarteventFn;
+			StarteventFn=NULL;
+	LeaveCriticalSection(&keyb_crit);
+	return;
 }
 
-
+void keybd_delete()
+{
+	if (!WIN8) return;
+	EnterCriticalSection(&keyb_crit);
+	if (StopeventFn) StopeventFn->Call_Fnction_no_feedback();
+	if (keyEventFn)delete keyEventFn;
+	keyEventFn=NULL;
+	if (StopeventFn)delete StopeventFn;
+	StopeventFn=NULL;
+	if (StarteventFn)delete StarteventFn;
+	StarteventFn=NULL;
+	LeaveCriticalSection(&keyb_crit);
+	if (crit_init) DeleteCriticalSection(&keyb_crit);
+	crit_init=false;
+}
 
 comm_serv::comm_serv()
 {

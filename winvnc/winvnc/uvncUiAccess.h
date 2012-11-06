@@ -20,7 +20,16 @@
 //  USA.
 //
 //
-
+// Functions to hide the Windows Desktop
+//
+// This hides three variants:
+//	- Desktop Patterns  (WIN.INI [Desktop] Pattern=)
+//	- Desktop Wallpaper (.bmp [and JPEG on Windows XP])
+//	- Active Desktop
+//
+// Written by Ed Hardebeck - Glance Networks, Inc.
+// With some code from Paul DiLascia, MSDN Magazine - May 2001
+//
 
 #ifndef _G_UIACCESS_H_
 #define _G_UIACCESS_H_
@@ -52,6 +61,7 @@ public:
 	void Call_Fnction_no_feedback_data(char *databuffer_IN,char *databuffer_OUT);
 	void Call_Fnction_Long(char *databuffer_IN,char *databuffer_OUT);
 	void Call_Fnction_Long_Timeout(char *databuffer_IN,char *databuffer_OUT,int timeout);
+	HANDLE InitFileHandle(char *name,int IN_datasize_IN,int IN_datasize_OUT,bool app,bool master);
 	void Force_unblock();
 	void Release();
 
@@ -80,23 +90,9 @@ private:
 	bool GLOBAL_RUNNING;
 };
 
-
-class keybd_class
-{
-public:
-	keybd_class();
-	~keybd_class();
-	void keybd_uni_event(_In_  BYTE bVk,_In_  BYTE bScan,_In_  DWORD dwFlags,_In_  ULONG_PTR dwExtraInfo);
-	void keybd_initialize();
-	void keybd_delete();
-	void keepalive();
-	void Shellexecuteforuiaccess();
-private:
-	comm_serv *keyEventFn;
-	comm_serv *StopeventFn;
-	comm_serv *StarteventFn;
-	int keycounter;
-	CRITICAL_SECTION CriticalSection;
-};
-
+void keybd_uni_event(_In_  BYTE bVk,_In_  BYTE bScan,_In_  DWORD dwFlags,_In_  ULONG_PTR dwExtraInfo);
+void keybd_initialize();
+void keybd_initialize_no_crit();
+void keybd_delete();
+void keepalive();
 #endif

@@ -28,7 +28,7 @@
 #include "vncservice.h"
 #include <string.h>
 #include "uvncUiAccess.h"
-extern keybd_class *keybd_class_instance;
+
 #define MSGFLT_ADD		1
 typedef BOOL (WINAPI *CHANGEWINDOWMESSAGEFILTER)(UINT message, DWORD dwFlag);
 int OSversion();
@@ -146,12 +146,10 @@ vncDesktop::StartInitWindowthread()
 DWORD WINAPI
 InitWindowThread(LPVOID lpParam)
 {
-	if (keybd_class_instance) delete keybd_class_instance;
-	keybd_class_instance= new keybd_class;
+	keybd_initialize();
 	vncDesktop *mydesk=(vncDesktop*)lpParam;
 	mydesk->InitWindow();
-	delete keybd_class_instance;
-	keybd_class_instance=NULL;
+	keybd_delete();
 	return 0;
 }
 
@@ -739,7 +737,7 @@ vncDesktop::InitWindow()
 			vnclog.Print(LL_INTERR, VNCLOG("OOOOOOOOOOOO %i %i\n"),msg.message,msg.hwnd);
 			if (msg.message==WM_TIMER)
 			{
-				if(msg.wParam==1001) if (keybd_class_instance) keybd_class_instance->keepalive();
+				if(msg.wParam==1001) keepalive();
 			}			
 			else if (msg.message==WM_QUIT || fShutdownOrdered)
 				{
