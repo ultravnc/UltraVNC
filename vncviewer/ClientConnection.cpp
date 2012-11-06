@@ -2598,19 +2598,28 @@ void ClientConnection::AuthSecureVNCPlugin()
 					//adzm 2010-05-12 - passphrase
 				ad.m_bPassphraseMode = passphraseused;
 				bPassphraseRequired= passphraseused;
-
-				if (ad.DoDialog(false))
-					{
-						strncpy(passwd, ad.m_passwd,254);
-						if (!bPassphraseRequired && strlen(passwd) > 8) {
-							passwd[8] = '\0';
-						}
-						lengt=strlen(passwd);												
-					}
+				if (strlen(passwd)>0)
+				{
+					//password was passed via commandline
+					lengt=strlen(passwd);
+				}
 				else
-					{
-						bCancel = true; // cancel
-					}			
+				{
+					if (ad.DoDialog(false))
+						{
+							strncpy(passwd, ad.m_passwd,254);
+							if (!bPassphraseRequired && strlen(passwd) > 8) {
+								passwd[8] = '\0';
+							}
+							lengt=strlen(passwd);												
+						}
+					else
+						{
+							bCancel = true; // cancel
+						}	
+				}
+
+
 				WriteExact((char*)&lengt, sizeof(lengt));
 				WriteExact((char*)passwd, lengt);
 			}
