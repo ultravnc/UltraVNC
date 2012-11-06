@@ -88,9 +88,9 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,8,135,54,16
     CONTROL         139,IDC_VNCLOGO,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_SUNKEN,7,5,53,46,WS_EX_TRANSPARENT
 #ifdef _X64
-	LTEXT			"UltraVNC X64 Server 1.1.2",IDC_VERSION,73,5,195,11    
+	LTEXT			"UltraVNC X64 Server 1.1.3",IDC_VERSION,73,5,195,11
 #else
-	LTEXT           "UltraVNC Win32 Server 1.1.2",IDC_VERSION,73,5,195,11
+	LTEXT           "UltraVNC Win32 Server 1.1.3",IDC_VERSION,73,5,195,11
 #endif
     LTEXT           "Copyright © 2002-2012 UltraVNC Team\nCopyright © 2001-2002 Sam - eSVNC \nCopyright © 1999-2002 Rudi D. V. - VdaccVNC \nCopyright © 2001 Harakan Software - PalmVNC\nCopyright © 1999-2002 Const. Kaplinsky - TightVNC \n",IDC_NAME,74,27,202,41
     LTEXT           "For more Information and Links please visit: \nhttp://www.uvnc.com",IDC_WWW,74,135,141,19
@@ -256,7 +256,6 @@ BEGIN
     CONTROL         153,IDC_VNCLOGO,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_SUNKEN,7,5,269,199,WS_EX_TRANSPARENT
 END
 
-
 /////////////////////////////////////////////////////////////////////////////
 //
 // DESIGNINFO
@@ -370,15 +369,14 @@ BEGIN
 END
 #endif    // APSTUDIO_INVOKED
 
-
 /////////////////////////////////////////////////////////////////////////////
 //
 // Version
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,1,2,0
- PRODUCTVERSION 1,1,2,0
+ FILEVERSION 1,1,3,0
+ PRODUCTVERSION 1,1,3,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x2dL
@@ -400,14 +398,14 @@ BEGIN
 #else
             VALUE "FileDescription", "VNC server for win32"
 #endif
-            VALUE "FileVersion", "1.1.2"
+            VALUE "FileVersion", "1.1.3"
             VALUE "InternalName", "WinVNC"
             VALUE "LegalCopyright", "Copyright © 2010 UltraVNC"
             VALUE "LegalTrademarks", "VNC"
             VALUE "OriginalFilename", "WinVNC.exe"
-            VALUE "PrivateBuild", "1.1.2"
+            VALUE "PrivateBuild", "1.1.3"
             VALUE "ProductName", "UltraVNC"
-            VALUE "ProductVersion", "1.1.2"
+            VALUE "ProductVersion", "1.1.3"
         END
     END
     BLOCK "VarFileInfo"
@@ -415,7 +413,6 @@ BEGIN
         VALUE "Translation", 0x0, 1200
     END
 END
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -453,7 +450,6 @@ BEGIN
         MENUITEM "&Close VNC Connections",      ID_CLOSE
     END
 END
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -500,11 +496,11 @@ BEGIN
     ID_WINVNC_ERROR         "WinVNC Error"
     ID_WINVNC_WARNIN        "WinVNC Warning"
     ID_PLUGIN_LOADIN        "Plugin Loading"
-    ID_NO_PASSWD_NO_OVERRIDE_ERR 
+    ID_NO_PASSWD_NO_OVERRIDE_ERR
                             "No password has been set & this machine has been preconfigured to prevent users from setting their own.\nYou must contact a System Administrator to configure WinVNC properly."
-    ID_NO_PASSWD_NO_OVERRIDE_WARN 
+    ID_NO_PASSWD_NO_OVERRIDE_WARN
                             "WARNING : This machine has been preconfigured to allow un-authenticated\nconnections to be accepted and to prevent users from enabling authentication."
-    ID_NO_PASSWD_NO_LOGON_WARN 
+    ID_NO_PASSWD_NO_LOGON_WARN
                             "WARNING : This machine has no default password set.  WinVNC will present the Default Properties dialog now to allow one to be entered."
 END
 
@@ -512,7 +508,7 @@ STRINGTABLE
 BEGIN
     ID_NO_OVERRIDE_ERR      "This machine has been preconfigured with WinVNC settings, which cannot be overridden by individual users.  The preconfigured settings may be modified only by a System Administrator."
     ID_NO_CURRENT_USER_ERR  "The WinVNC settings for the current user are unavailable at present."
-    ID_CANNOT_EDIT_DEFAULT_PREFS 
+    ID_CANNOT_EDIT_DEFAULT_PREFS
                             "You do not have sufficient priviliges to edit the default local WinVNC settings."
     ID_NO_PASSWORD_WARN     "WARNING : Running WinVNC without setting a password is a dangerous security risk!\nUntil you set a password, WinVNC will not accept incoming connections."
     ID_PLUGIN_NOT_LOAD      "The Plugin cannot be loaded.\n\rPlease check its integrity."
@@ -552,7 +548,6 @@ END
 #endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 
-
 /////////////////////////////////////////////////////////////////////////////
 // English (United Kingdom) resources
 
@@ -566,18 +561,18 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE 
+1 TEXTINCLUDE
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE 
+2 TEXTINCLUDE
 BEGIN
     "#include ""afxres.h""\r\n"
     "\0"
 END
 
-3 TEXTINCLUDE 
+3 TEXTINCLUDE
 BEGIN
     "\r\n"
     "\0"
@@ -587,7 +582,6 @@ END
 
 #endif    // English (United Kingdom) resources
 /////////////////////////////////////////////////////////////////////////////
-
 
 /////////////////////////////////////////////////////////////////////////////
 // Dutch (Belgium) resources
@@ -648,7 +642,6 @@ BEGIN
     LTEXT           "3",IDC_STATIC,11,56,8,8
 END
 
-
 /////////////////////////////////////////////////////////////////////////////
 //
 // DESIGNINFO
@@ -676,7 +669,6 @@ BEGIN
 END
 #endif    // APSTUDIO_INVOKED
 
-
 /////////////////////////////////////////////////////////////////////////////
 //
 // JAVAARCHIVE
@@ -703,15 +695,11 @@ IDB_LOGO64              BITMAP                  "res\\vnc-1.bmp"
 #endif    // Dutch (Belgium) resources
 /////////////////////////////////////////////////////////////////////////////
 
-
-
 #ifndef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
 //
 // Generated from the TEXTINCLUDE 3 resource.
 //
 
-
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
-
