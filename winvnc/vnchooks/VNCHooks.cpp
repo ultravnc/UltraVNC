@@ -196,7 +196,7 @@ BOOL WINAPI DllMain (HANDLE hInst, ULONG ul_reason_for_call, LPVOID lpReserved)
 		// If the app failed to hook OK, ExitInstance will still operate OK (hopefully...)
 		ExitInstance();
 		UnmapViewOfFile(g_shdata);
-		CloseHandle(filemapping);
+		if (filemapping)CloseHandle(filemapping);
 
 		return TRUE;
 

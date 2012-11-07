@@ -2542,7 +2542,7 @@ void vncDesktop::SetBlockInputState(bool newstate)
 
 bool vncDesktop::block_input()
 {
-    int Blockinput_val;
+    bool Blockinput_val;
 	BOOL returnvalue;
 	if(m_bIsInputDisabledByClient || m_server->LocalInputsDisabled())
 	{

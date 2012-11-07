@@ -130,6 +130,13 @@ bool CZipUnZip32::ZipDirectory(char* szRootDir, char* szDirectoryToZip, char* sz
 	{
 	  szFileList = (char far *)GlobalLock(m_hFileList);
 	}
+	if (!szFileList)
+	{
+		if (m_hFileList) GlobalUnlock(m_hFileList);
+		if (m_hFileList)GlobalFree(m_hFileList);
+		FreeUpZipMemory();
+		return false;
+	}
 	index = (char **)szFileList; // WARNING: szFileList potentially a NULL ptr
 	cc = (sizeof(char *) * m_ZpZCL.argc);
 	sz = szFileList + cc;
@@ -155,8 +162,8 @@ bool CZipUnZip32::ZipDirectory(char* szRootDir, char* szDirectoryToZip, char* sz
 	retcode = ZpArchive(m_ZpZCL);//retcode = m_PZipArchive(m_ZpZCL);
 
 	// Free the temp resources
-	GlobalUnlock(m_hFileList);
-	GlobalFree(m_hFileList);
+	if (m_hFileList) GlobalUnlock(m_hFileList);
+	if (m_hFileList)GlobalFree(m_hFileList);
 	FreeUpZipMemory();
 
 	return (retcode == 0);

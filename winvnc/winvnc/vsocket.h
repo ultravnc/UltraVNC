@@ -236,7 +236,7 @@ protected:
   MIB_TCPROW					m_SocketInfo;
   bool							CanUseFlow;
   bool							GetOptimalSndBuf();
-  int							G_SENDBUFFER;
+  unsigned int							G_SENDBUFFER;
 };
 
 #endif // _ATT_VSOCKET_DEFINED

@@ -1097,13 +1097,8 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 								StartUPInfo.cb = sizeof(STARTUPINFO);
 						
 								CreateProcessAsUser(hPToken,NULL,dir,NULL,NULL,FALSE,DETACHED_PROCESS,NULL,NULL,&StartUPInfo,&ProcessInfo);
-								GetLastError();
                                 if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
                                 if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
-								//if (error==1314)
-								//	{
-								//		Open_homepage();
-								//	}
 
 							}
 						}
@@ -1137,13 +1132,8 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 								StartUPInfo.cb = sizeof(STARTUPINFO);
 						
 								CreateProcessAsUser(hPToken,NULL,dir,NULL,NULL,FALSE,DETACHED_PROCESS,NULL,NULL,&StartUPInfo,&ProcessInfo);
-								GetLastError();
                                 if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
                                 if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
-								//if (error==1314)
-								//	{
-								//		Open_forum();
-								//	}
 
 							}
 						}

@@ -421,7 +421,7 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 						{
 							m_desktop->Checkmonitors();
 							m_desktop->requested_multi_monitor=m_desktop->m_buffer.IsMultiMonitor();
-							int old_monitor=m_desktop->multi_monitor;	
+							bool old_monitor=m_desktop->multi_monitor;	
 							m_desktop->multi_monitor=true;
 							if (m_desktop->requested_multi_monitor && m_desktop->nr_monitors>1) m_desktop->multi_monitor=true;
 							else m_desktop->multi_monitor=false;							
@@ -791,7 +791,7 @@ void vncDesktopThread::do_polling(HANDLE& threadHandle, rfb::Region2D& rgncache,
 				m_desktop->m_DIBbits=NULL;
 			}
 
-			bool value=m_desktop->capturew8();
+			BOOL value=m_desktop->capturew8();
 			DWORD dwTId(0);
 			if (threadHandle==NULL && value!=0)
 				threadHandle = CreateThread(NULL, 0, hookwatch, this, 0, &dwTId);

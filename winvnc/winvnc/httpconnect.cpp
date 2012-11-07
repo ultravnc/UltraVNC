@@ -1330,7 +1330,7 @@ httpconnect::mainconnect( int meth,char *server,char *remoteserver, int remotepo
 	f_debug++;
 	local_type = LOCAL_SOCKET;
     local_port = 1111;
-	strcpy(dest_host,remoteserver);
+	strncpy(dest_host,remoteserver,256);
 	dest_port=remoteport;
 	set_relay( meth, server );
 

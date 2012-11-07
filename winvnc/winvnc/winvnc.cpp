@@ -203,9 +203,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 	// handle dpi on aero
 	HMODULE hUser32 = LoadLibrary(_T("user32.dll"));
 	typedef BOOL (*SetProcessDPIAwareFunc)();
-	SetProcessDPIAwareFunc setDPIAware = (SetProcessDPIAwareFunc)GetProcAddress(hUser32, "SetProcessDPIAware");
+	SetProcessDPIAwareFunc setDPIAware=NULL;
+	if (hUser32) setDPIAware = (SetProcessDPIAwareFunc)GetProcAddress(hUser32, "SetProcessDPIAware");
 	if (setDPIAware) setDPIAware();
-	FreeLibrary(hUser32);
+	if (hUser32) FreeLibrary(hUser32);
 
 #ifdef IPP
 	InitIpp();
@@ -407,13 +408,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 			{
 			    typedef void (*vncEditSecurityFn) (HWND hwnd, HINSTANCE hInstance);
 				vncEditSecurityFn vncEditSecurity = 0;
-				char szCurrentDir[MAX_PATH];
-					if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH)) {
-						char* p = strrchr(szCurrentDir, '\\');
+				char szCurrentDirl[MAX_PATH];
+					if (GetModuleFileName(NULL, szCurrentDirl, MAX_PATH)) {
+						char* p = strrchr(szCurrentDirl, '\\');
 						*p = '\0';
-						strcat (szCurrentDir,"\\authSSP.dll");
+						strcat (szCurrentDirl,"\\authSSP.dll");
 					}
-					HMODULE hModule = LoadLibrary(szCurrentDir);
+					HMODULE hModule = LoadLibrary(szCurrentDirl);
 					if (hModule) {
 						vncEditSecurity = (vncEditSecurityFn) GetProcAddress(hModule, "vncEditSecurity");
 						HRESULT hr = CoInitialize(NULL);
