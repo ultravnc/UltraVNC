@@ -8180,7 +8180,11 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 
 			case WM_SETFOCUS:
 				if (_this->InFullScreenMode())
+				{
+					//HWND handleW1 = FindWindow("Shell_traywnd", "");
+   					//SetWindowPos(handleW1, 0, 0, 0, 0, 0, 128);
 					SetWindowPos(hwnd, HWND_TOPMOST, 0,0,100,100, SWP_NOMOVE | SWP_NOSIZE);
+				}
 				_this->m_keymap->Reset();
 				return 0;
 
@@ -8189,9 +8193,13 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 				{
 					if (!_this->m_running) return 0;
 					if (_this->InFullScreenMode()) {
+
+						//HWND handleW1 = FindWindow("Shell_traywnd", "");
+   						//SetWindowPos(handleW1, 0, 0, 0, 0, 0, 64);
+						SetWindowPos(hwnd, HWND_TOP, 0,0,100,100, SWP_NOMOVE | SWP_NOSIZE| SWP_NOACTIVATE);
 						// We must top being topmost, but we want to choose our
 						// position carefully.
-						HWND foreground = GetForegroundWindow();
+						/*HWND foreground = GetForegroundWindow();
 						HWND hwndafter = NULL;
 						if ((foreground == NULL) ||
 							(GetWindowLong(foreground, GWL_EXSTYLE) & WS_EX_TOPMOST)) {
@@ -8200,7 +8208,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 							hwndafter = GetNextWindow(foreground, GW_HWNDNEXT);
 						}
 
-						SetWindowPos(hwnd, hwndafter, 0,0,100,100, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+						SetWindowPos(hwnd, hwndafter, 0,0,100,100, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);*/
 					}
 					if (_this->m_opts.m_ViewOnly) return 0;
 					_this->m_keymap->ReleaseAllKeys(_this);
