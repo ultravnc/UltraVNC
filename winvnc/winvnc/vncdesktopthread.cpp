@@ -31,6 +31,7 @@ DWORD WINAPI hookwatch(LPVOID lpParam);
 extern bool stop_hookwatch;
 void testBench();
 extern bool WIN8;
+char g_hookstring[16]="";
 
 inline bool
 ClipRect(int *x, int *y, int *w, int *h,
@@ -768,6 +769,7 @@ void vncDesktopThread::do_polling(HANDLE& threadHandle, rfb::Region2D& rgncache,
 	{
 		if (m_desktop->SetHook && g_obIPC.listall()!=NULL && m_desktop->can_be_hooked) 
 		{
+			strcpy_s(g_hookstring,"schook");
 			DWORD dwTId(0);
 			if (threadHandle==NULL) threadHandle = CreateThread(NULL, 0, hookwatch, this, 0, &dwTId);
 			if (Handle_Ringbuffer(g_obIPC.listall(),rgncache)) return;
@@ -790,7 +792,7 @@ void vncDesktopThread::do_polling(HANDLE& threadHandle, rfb::Region2D& rgncache,
 				m_desktop->m_bitmappointer=false;
 				m_desktop->m_DIBbits=NULL;
 			}
-
+			strcpy_s(g_hookstring,"w8hook");
 			BOOL value=m_desktop->capturew8();
 			DWORD dwTId(0);
 			if (threadHandle==NULL && value!=0)
@@ -999,6 +1001,7 @@ vncDesktopThread::run_undetached(void *arg)
 		waittime=33;
 		if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver) 
 		{
+			strcpy_s(g_hookstring,"driver");
 			int fastcounter=0;
 			POINT cursorpos;
 			while (m_desktop->m_videodriver->oldaantal==m_desktop->pchanges_buf->counter)

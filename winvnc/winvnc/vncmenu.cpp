@@ -71,6 +71,7 @@ bool RunningAsAdministrator ();
 extern HINSTANCE	hInstResDLL;
 
 extern bool			fShutdownOrdered;
+extern char g_hookstring[16];
 
 extern BOOL SPECIAL_SC_PROMPT;
 
@@ -730,12 +731,13 @@ vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 
 	if (vncService::RunningAsService())
 	{
-		strncat(m_nid.szTip, " - service", strlen(" - service"));
+		strncat(m_nid.szTip, " - service - ", strlen(" - service - "));
 	}
 	else
 	{
-		strncat(m_nid.szTip, " - application", strlen(" - application"));
+		strncat(m_nid.szTip, " - application - ", strlen(" - application - "));
 	}
+	strncat(m_nid.szTip, g_hookstring, strlen(g_hookstring));
 
 //	vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::SendTrayMsg - Shell_NotifyIcon call\n"));
 	// Send the message

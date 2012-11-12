@@ -87,12 +87,13 @@ bool CIPC::CreateIPCMMF(void)
 			return false;	// Already created
 
 		// Create an in-memory 4KB memory mapped file to share data
-		m_hFileMap = CreateFileMapping((HANDLE)0xFFFFFFFF,
+		m_hFileMap = CreateFileMapping(INVALID_HANDLE_VALUE,
 			NULL,
 			PAGE_READWRITE,
 			0,
 			sizeof(list),
 			g_szIPCSharedMMF);
+		DWORD error=GetLastError();
 		if(m_hFileMap != NULL)
 			bCreated = true;
 	}

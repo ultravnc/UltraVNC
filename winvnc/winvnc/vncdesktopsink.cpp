@@ -35,6 +35,7 @@ int OSversion();
 DWORD WINAPI Driverwatch(LPVOID lpParam);
 DWORD WINAPI InitWindowThread(LPVOID lpParam);
 extern bool WIN8;
+extern char g_hookstring[16];
 
 void
 vncDesktop::ShutdownInitWindowthread()
@@ -703,6 +704,7 @@ vncDesktop::InitWindow()
 	if (WIN8) hW8Module = LoadLibrary(szCurrentDirW8);
 	if (hModule)
 		{
+			strcpy_s(g_hookstring,"vnchook");
 			UnSetHooks = (UnSetHooksFn) GetProcAddress( hModule, "UnSetHooks" );
 			SetMouseFilterHook  = (SetMouseFilterHookFn) GetProcAddress( hModule, "SetMouseFilterHook" );
 			SetKeyboardFilterHook  = (SetKeyboardFilterHookFn) GetProcAddress( hModule, "SetKeyboardFilterHook" );
@@ -739,7 +741,7 @@ vncDesktop::InitWindow()
 			{
 				if(msg.wParam==1001) keepalive();
 			}			
-			else if (msg.message==WM_QUIT || fShutdownOrdered)
+			if (msg.message==WM_QUIT || fShutdownOrdered)
 				{
 					vnclog.Print(LL_INTERR, VNCLOG("OOOOOOOOOOOO called wm_quit\n"));
 					DestroyWindow(m_hwnd);
