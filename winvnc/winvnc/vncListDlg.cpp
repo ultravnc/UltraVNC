@@ -89,7 +89,7 @@ BOOL CALLBACK vncListDlg::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
             helper::SafeSetWindowUserData(hwnd, lParam);
 			_this = (vncListDlg *) lParam;
 
-			vncClientList::iterator i;
+			//vncClientList::iterator i;
 			HWND hList = GetDlgItem(hwnd, IDC_VIEWERS_LISTBOX);
 
 			_this->m_pServer->ListAuthClients(hList);

@@ -31,7 +31,7 @@ struct mystruct
 	RECT rect1[2000];
 	RECT rect2[2000];
 	short type[2000];
-//	ULONG cursor[2000];
+	short test;
 };
 
 // Class for Inter Process Communication using Memory Mapped Files
@@ -70,7 +70,7 @@ protected:
 
 	HANDLE m_hFileMapBitmap;
 	HANDLE m_hMutexBitmap;
-	DWORD m_FileViewBitmap;
+	LPVOID m_FileViewBitmap;
 
 	mystruct list;
 	mystruct *plist;

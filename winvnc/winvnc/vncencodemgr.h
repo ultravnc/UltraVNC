@@ -602,17 +602,19 @@ vncEncodeMgr::SetEncoding(CARD32 encoding,BOOL reinitialize)
 	}
 
 	// Initialise it and give it the pixel format
-	m_encoder->Init();
-	m_encoder->SetLocalFormat(
-			m_scrinfo.format,
-			m_scrinfo.framebufferWidth,
-			m_scrinfo.framebufferHeight);
-	if (m_clientfmtset)
-		if (!m_encoder->SetRemoteFormat(m_clientformat))
+	if (m_encoder != NULL)
 		{
-			vnclog.Print(LL_INTERR, VNCLOG("client pixel format is not supported\n"));
-
-			return FALSE;
+			m_encoder->Init();
+			m_encoder->SetLocalFormat(
+				m_scrinfo.format,
+				m_scrinfo.framebufferWidth,
+				m_scrinfo.framebufferHeight);
+			if (m_clientfmtset)
+			if (!m_encoder->SetRemoteFormat(m_clientformat))
+				{
+					vnclog.Print(LL_INTERR, VNCLOG("client pixel format is not supported\n"));
+					return FALSE;
+				}
 		}
 
 	if (reinitialize)

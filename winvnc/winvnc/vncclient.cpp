@@ -2056,6 +2056,7 @@ bool vncClientThread::InitSocket()
 
 bool vncClientThread::TryReconnect()
 {
+	if (m_client==NULL) return false;
 	if (fShutdownOrdered || m_client->m_Autoreconnect || !m_client->GetHost() || !m_client->GetRepeaterID()) {
 		return false;
 	}
@@ -5464,7 +5465,7 @@ bool vncClient::ReceiveFileChunk(int nLen, int nSize)
 	if (fAlreadyHere) 
 	{
 		DWORD dwPtr = SetFilePointer(m_hDestFile, nLen, NULL, FILE_CURRENT); 
-		if (dwPtr == 0xFFFFFFFF)
+		if (dwPtr == INVALID_SET_FILE_POINTER)
 			fRes = false;
 	}
 	else

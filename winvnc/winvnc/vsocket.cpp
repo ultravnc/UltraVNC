@@ -454,7 +454,7 @@ VSocket::Resolve(const VString address)
   addr = inet_addr(address);
 
   // Was it a valid IP address?
-  if (addr == 0xffffffff)
+  if (addr == INADDR_NONE)
     {
       // No, so get the actual IP address of the host name specified
       struct hostent *pHost;

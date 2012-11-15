@@ -2304,7 +2304,7 @@ BOOL vncDesktop::InitVideoDriver()
 		{
 			m_ScreenOffsetx=mymonitor[0].offsetx;
 			m_ScreenOffsety=mymonitor[0].offsety;
-			m_videodriver->VIDEODRIVER_start(mymonitor[0].offsetx,mymonitor[0].offsety,mymonitor[0].Width,mymonitor[0].Height);
+			if (m_videodriver!=NULL) m_videodriver->VIDEODRIVER_start(mymonitor[0].offsetx,mymonitor[0].offsety,mymonitor[0].Width,mymonitor[0].Height);
 		}
 	if (nr_monitors>1)
 		{
@@ -2315,12 +2315,13 @@ BOOL vncDesktop::InitVideoDriver()
 			*/
 			m_ScreenOffsetx=mymonitor[3].offsetx;
 			m_ScreenOffsety=mymonitor[3].offsety;
-			m_videodriver->VIDEODRIVER_start(mymonitor[3].offsetx,mymonitor[3].offsety,mymonitor[3].Width,mymonitor[3].Height);
+			if (m_videodriver!=NULL)m_videodriver->VIDEODRIVER_start(mymonitor[3].offsetx,mymonitor[3].offsety,mymonitor[3].Width,mymonitor[3].Height);
 		}		
 	vnclog.Print(LL_INTERR, VNCLOG("Start Mirror driver\n"));
 	m_hookdriver=true;
 	m_hookdll=false;
 	// check if driver has mapped the shared memory
+	if (m_videodriver!=NULL)
 	if (!m_videodriver->mypVideoMemory) 
 	{
 		vnclog.Print(LL_INTERR, VNCLOG("Start Mirror driver Failed\n"));
@@ -2341,6 +2342,7 @@ BOOL vncDesktop::InitVideoDriver()
 		return false;
 	}
 	
+	if (m_videodriver!=NULL)
 	if (m_videodriver->mypVideoMemory)
 	{
 		vnclog.Print(LL_INTERR, VNCLOG("Driver Used\n"));

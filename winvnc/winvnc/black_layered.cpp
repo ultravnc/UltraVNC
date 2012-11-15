@@ -260,14 +260,25 @@ create_window(void)
 	/*
 	* Make the windows a layered window
 	*/
+
+#ifndef _X64
 	LONG style = GetWindowLong(hwnd, GWL_STYLE);
 	style = GetWindowLong(hwnd, GWL_STYLE);
 	style &= ~(WS_DLGFRAME | WS_THICKFRAME);
 	SetWindowLong(hwnd, GWL_STYLE, style);
+#else
+	LONG_PTR style = GetWindowLongPtr(hwnd, GWL_STYLE);
+	style = GetWindowLongPtr(hwnd, GWL_STYLE);
+	style &= ~(WS_DLGFRAME | WS_THICKFRAME);
+	SetWindowLongPtr(hwnd, GWL_STYLE, style);
+#endif
 
 	if (pSetLayeredWindowAttributes != NULL) {
-		SetWindowLong (hwnd, GWL_EXSTYLE, GetWindowLong
-		(hwnd, GWL_EXSTYLE) |WS_EX_LAYERED|WS_EX_TRANSPARENT|WS_EX_TOPMOST);
+#ifndef _X64
+		SetWindowLong (hwnd, GWL_EXSTYLE, GetWindowLong(hwnd, GWL_EXSTYLE) |WS_EX_LAYERED|WS_EX_TRANSPARENT|WS_EX_TOPMOST);
+#else
+		SetWindowLongPtr (hwnd, GWL_EXSTYLE, GetWindowLongPtr(hwnd, GWL_EXSTYLE) |WS_EX_LAYERED|WS_EX_TRANSPARENT|WS_EX_TOPMOST);
+#endif
 	    ShowWindow (hwnd, SW_SHOWNORMAL);
 	}
 	if (pSetLayeredWindowAttributes != NULL) {

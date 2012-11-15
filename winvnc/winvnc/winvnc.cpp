@@ -948,7 +948,7 @@ DWORD WINAPI imp_desktop_thread(LPVOID lpParam)
 		if (fShutdownOrdered && !Runonce)
 		{
 			Runonce=true;
-			menu->Shutdown(true);
+			if (menu) menu->Shutdown(true);
 		}
 	}
 

@@ -41,8 +41,12 @@ int oldcounter=0;
 
 
 //***********************************************
-CIPC::CIPC() : m_hFileMap(NULL), m_hMutex(NULL),m_hFileMapBitmap(NULL), m_hMutexBitmap(NULL)
+CIPC::CIPC() 
 {
+	m_hFileMap=NULL;
+	m_hMutex=NULL;
+	m_hFileMapBitmap=NULL;
+	m_hMutexBitmap=NULL;
 	pBitmap=NULL;
 	plist=NULL;
 	m_FileView=0;
@@ -80,18 +84,18 @@ void CIPC::CloseBitmap()
 bool CIPC::CreateIPCMMF(void)
 {
 	bool bCreated = false;
-
+	int listsize=sizeof(mystruct);
 	try
 	{
 		if(m_hFileMap != NULL)
 			return false;	// Already created
-
+		
 		// Create an in-memory 4KB memory mapped file to share data
 		m_hFileMap = CreateFileMapping(INVALID_HANDLE_VALUE,
 			NULL,
 			PAGE_READWRITE,
 			0,
-			sizeof(list),
+			listsize,
 			g_szIPCSharedMMF);
 		DWORD error=GetLastError();
 		if(m_hFileMap != NULL)
@@ -174,7 +178,7 @@ bool CIPC::OpenIPCMMFBitmap(void)
 		if(m_hFileMapBitmap != NULL)
 		{
 			bOpenedBitmap = true;
-			m_FileViewBitmap = (DWORD)MapViewOfFile(m_hFileMapBitmap,
+			m_FileViewBitmap = MapViewOfFile(m_hFileMapBitmap,
 			FILE_MAP_READ | FILE_MAP_WRITE,
 			0, 0, 0);
 			if (m_FileViewBitmap==0) bOpenedBitmap = false;
