@@ -123,7 +123,7 @@ void ClientConnection::RealiseFullScreenMode()
         int y = mi.rcMonitor.top;
 		int cx = mi.rcMonitor.right - x; 
 		int cy = mi.rcMonitor.bottom - y;
-		SetWindowPos(m_hwndMain, HWND_TOP, x, y, cx+3, cy+3, SWP_FRAMECHANGED);
+		SetWindowPos(m_hwndMain, HWND_TOPMOST, x, y, cx+3, cy+3, SWP_FRAMECHANGED);
         TitleBar.MoveToMonitor(hMonitor);
 		// adzm - 2010-07 - Extended clipboard
 		CheckMenuItem(m_hPopupMenuDisplay, ID_FULLSCREEN, MF_BYCOMMAND|MF_CHECKED);

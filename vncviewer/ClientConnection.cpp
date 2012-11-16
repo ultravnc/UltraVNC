@@ -7293,12 +7293,19 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 					return true;
 
 				case WM_SETFOCUS:
+					if (_this->InFullScreenMode())
+					{
+						SetWindowPos(hwnd, HWND_TOPMOST, 0,0,100,100, SWP_NOMOVE | SWP_NOSIZE);
+					}
 					TheAccelKeys.SetWindowHandle(_this->m_opts.m_NoHotKeys ? 0 : hwnd);
-					_this->m_keymap->Reset();
+					_this->m_keymap->Reset();					
 					return 0;
 
 				case WM_KILLFOCUS:
 					if (!_this->m_running) return 0;
+					if (_this->InFullScreenMode()) {
+						SetWindowPos(hwnd, HWND_TOP, 0,0,100,100, SWP_NOMOVE | SWP_NOSIZE| SWP_NOACTIVATE);
+					}
 					if ( _this->m_opts.m_ViewOnly) return 0;
 					_this->m_keymap->ReleaseAllKeys(_this);
 					//adzm 2010-09
@@ -7311,6 +7318,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 					_this->SendKeyEvent(XK_Control_R, false);
 					_this->SendKeyEvent(XK_Shift_R,   false);
 					*/
+					return DefWindowProc(hwnd, iMsg, wParam, lParam);
 					return 0;
 
 				case WM_CLOSE:
@@ -8185,7 +8193,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
    					//SetWindowPos(handleW1, 0, 0, 0, 0, 0, 128);
 					SetWindowPos(hwnd, HWND_TOPMOST, 0,0,100,100, SWP_NOMOVE | SWP_NOSIZE);
 				}
-				_this->m_keymap->Reset();
+				_this->m_keymap->Reset();				
 				return 0;
 
 				// Cacnel modifiers when we lose focus
