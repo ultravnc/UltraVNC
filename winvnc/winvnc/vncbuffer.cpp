@@ -806,7 +806,7 @@ void vncBuffer::ScaleRect(rfb::Rect &rect)
 
 // Modif sf@2005 - Grey Scale transformation
 // Ok, it's a little wild to do it here... should be done in Translate.cpp,..
-void vncBuffer::GreyScaleRect(rfb::Rect &rect)
+bool vncBuffer::GreyScaleRect(rfb::Rect &rect)
 {
 	bool fCanReduceColors = true;
     fCanReduceColors = (((m_scrinfo.format.redMax ^ m_scrinfo.format.blueMax ^
@@ -827,9 +827,9 @@ void vncBuffer::GreyScaleRect(rfb::Rect &rect)
 		fCanReduceColors = false;
 	//End JK
 #endif
-	if (!fCanReduceColors) return;
+	if (!fCanReduceColors) return false;
 	if (!FastCheckMainbuffer())
-		return;
+		return false;
 	///////////
 	rect.tl.y = (rect.tl.y - (rect.tl.y % m_nScale));
 	rect.br.y = (rect.br.y - (rect.br.y % m_nScale)) + m_nScale - 1;
@@ -875,6 +875,7 @@ void vncBuffer::GreyScaleRect(rfb::Rect &rect)
 			pMain   += (m_bytesPerRow * m_nScale); // Skip m_nScale lines of the mainbuffer's Rect
 			pScaled += m_bytesPerRow;
 		}
+	return true;
 }
 
 void vncBuffer::WriteMessageOnScreen(char* tt)
@@ -893,14 +894,10 @@ vncBuffer::GrabRect(const rfb::Rect &rect,BOOL driver,BOOL capture)
 	// Modif sf@2002 - Scaling
 	// Only use scaledbuffer if necessary !
 	rfb::Rect TheRect = rect;
-	// if (m_nScale > 1) ScaleRect(rfb::Rect(rect.tl.x, rect.tl.y, rect.br.x, rect.br.y)); // sf@2002 - Waste of time !!!
-	// Problem, driver buffer is not writable
-	// so we always need a m_scalednuff
-	/*if (m_nScale > 1)
-		ScaleRect(TheRect);
-	else if (m_fGreyPalette)
-		GreyScaleRect(TheRect);*/
-	if (m_fGreyPalette)GreyScaleRect(TheRect);
+	if (m_fGreyPalette)
+		{
+			if (!GreyScaleRect(TheRect)) ScaleRect(TheRect);
+		}
 	else ScaleRect(TheRect);
 }
 

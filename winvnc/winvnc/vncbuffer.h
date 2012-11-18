@@ -93,7 +93,7 @@ public:
 
 	// Modif sf@2002 - Scaling
 	void ScaleRect(rfb::Rect &rect);
-	void GreyScaleRect(rfb::Rect &rect);
+	bool GreyScaleRect(rfb::Rect &rect);
 	rfb::Rect GetViewerSize();
 	UINT GetScale();
 	BOOL SetScale(int scale);
