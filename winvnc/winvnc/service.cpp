@@ -617,7 +617,7 @@ LaunchProcessWin(DWORD dwSessionId)
 								   {
 									   LockWorkStationF=(pLockWorkStation)GetProcAddress(hlibuser32, "LockWorkStation"); 
 								   }
-								if (WinStationConnectF!=NULL && WinStationConnectF!=NULL)
+								if (WinStationConnectF!=NULL && LockWorkStationF!=NULL)
 									{
 											DWORD ID=0;
 											if (lpfnWTSGetActiveConsoleSessionId.isValid()) ID=(*lpfnWTSGetActiveConsoleSessionId)();
@@ -693,7 +693,7 @@ LaunchProcessWin(DWORD dwSessionId)
 								   {
 									   LockWorkStationF=(pLockWorkStation)GetProcAddress(hlibuser32, "LockWorkStation"); 
 								   }
-								if (WinStationConnectF!=NULL && WinStationConnectF!=NULL)
+								if (WinStationConnectF!=NULL && LockWorkStationF!=NULL)
 									{
 											DWORD ID=0;
 											if (lpfnWTSGetActiveConsoleSessionId.isValid()) ID=(*lpfnWTSGetActiveConsoleSessionId)();

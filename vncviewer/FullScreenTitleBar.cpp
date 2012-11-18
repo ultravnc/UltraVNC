@@ -408,7 +408,7 @@ LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg,
 			for(int i=0;i<GetMenuItemCount(SubMenu);i++)
 			{
 				TCHAR Text[MAX_PATH];
-				ZeroMemory(Text,sizeof(LPTSTR));
+				ZeroMemory(Text,sizeof(Text));
 				int res=::GetMenuString(SubMenu, i, Text, MAX_PATH, MF_BYPOSITION);
 				
 				if(res!=0)
@@ -425,7 +425,7 @@ LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg,
 				for(int i=0;i<GetMenuItemCount(SubMenu);i++)
 				{
 					TCHAR Text[MAX_PATH];
-					ZeroMemory(Text,sizeof(LPTSTR));
+					ZeroMemory(Text,sizeof(Text));
 					int res=::GetMenuString(SubMenu, i, Text, MAX_PATH, MF_BYPOSITION);
 					
 					if(res!=0)

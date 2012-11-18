@@ -270,7 +270,7 @@ void ClientConnection::ReadSolMonoZip(rfbFramebufferUpdateRectHeader *pfburh,HRG
 	}
 
 	BYTE* pzipbuf = m_zipbuf;
-	for (UINT i = 0 ; i < nNbCacheRects; i++)
+	for (UINT ii = 0 ; ii < nNbCacheRects; ii++)
 	{
 		rfbFramebufferUpdateRectHeader surh;
 		memcpy((char *) &surh,pzipbuf, sz_rfbFramebufferUpdateRectHeader);

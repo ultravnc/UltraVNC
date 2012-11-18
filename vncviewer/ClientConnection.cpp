@@ -2518,7 +2518,7 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 
 void ClientConnection::AuthSecureVNCPlugin()
 {
-	if (!m_pIntegratedPluginInterface) {
+	if (m_pIntegratedPluginInterface==NULL) {
 		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,"SecureVNCPlugin authentication failed (SecureVNCPlugin interface available)");
 		SetEvent(KillEvent);
 		throw ErrorException("SecureVNCPlugin authentication failed (no plugin interface available)");
@@ -2596,8 +2596,8 @@ void ClientConnection::AuthSecureVNCPlugin()
 
 				AuthDialog ad;
 					//adzm 2010-05-12 - passphrase
-				ad.m_bPassphraseMode = passphraseused;
-				bPassphraseRequired= passphraseused;
+				ad.m_bPassphraseMode = (bool)passphraseused;
+				bPassphraseRequired= (bool)passphraseused;
 				if (strlen(passwd)>0)
 				{
 					//password was passed via commandline
@@ -3566,9 +3566,9 @@ void ClientConnection::Createdib()
 				if (directx_output.m_directxformat.bitsPerPixel ==m_myFormat.bitsPerPixel)
 					{
 						directx_used=true;
-						m_myFormat.redShift=directx_output.m_directxformat.redShift;
-						m_myFormat.greenShift=directx_output.m_directxformat.greenShift;
-						m_myFormat.blueShift=directx_output.m_directxformat.blueShift;
+						m_myFormat.redShift=(CARD8)directx_output.m_directxformat.redShift;
+						m_myFormat.greenShift=(CARD8)directx_output.m_directxformat.greenShift;
+						m_myFormat.blueShift=(CARD8)directx_output.m_directxformat.blueShift;
 
 						if (m_hmemdc != NULL) {DeleteDC(m_hmemdc);m_hmemdc = NULL;m_DIBbits=NULL;}
 						if (m_membitmap != NULL) {DeleteObject(m_membitmap);m_membitmap= NULL;}
@@ -5096,23 +5096,23 @@ inline void ClientConnection::ReadScreenUpdate()
 			// Try to empty buffer...
 			// so next update should be back in sync
 			BYTE * buffer;
-			int i=0;
+			int ii=0;
 			while (TRUE)
 			{
 				int aantal=fis->Check_if_buffer_has_data();
 				if (aantal>0) buffer = new BYTE [aantal];
 				if (aantal>0)
 				{
-					i=0;
+					ii=0;
 					ReadExact(((char *) buffer), aantal);
 					delete [] buffer;
 					Sleep(5);
 				}
 				else if (aantal==0)
 				{
-					if (i==5) break;
+					if (ii==5) break;
 					Sleep(200);
-					i++;
+					ii++;
 				}
 				else break;
 			}

@@ -580,7 +580,6 @@ omni_thread::common_constructor(void* arg, priority_t pri, int det)
 //
 // Destructor for omni_thread.
 //
-
 omni_thread::~omni_thread(void)
 {
     DB(cerr << "destructor called for thread " << id() << endl);
