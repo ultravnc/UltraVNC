@@ -1170,8 +1170,8 @@ vncDesktopThread::run_undetached(void *arg)
 //									sprintf(szText," m_desktop->m_server->UpdateWanted check\n");
 //										OutputDebugString(szText);		
 //#endif
-								omni_mutex_lock l(m_desktop->m_update_lock);
-								if (m_desktop->m_server->UpdateWanted())
+								omni_mutex_lock l(m_desktop->m_update_lock);								
+								if (m_desktop->m_server->UpdateWanted() || !initialupdate)
 								{
 									oldtick=newtick;
 									bool cursormoved = false;
