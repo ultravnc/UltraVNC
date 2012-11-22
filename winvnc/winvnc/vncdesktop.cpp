@@ -513,6 +513,7 @@ vncDesktop::vncDesktop()
 	hUser32=LoadLibrary("USER32");
 	if (hUser32) pbi = (pBlockInput)GetProcAddress( hUser32, "BlockInput");
 	m_OrigpollingSet=false;
+	no_default_desktop=false;
 	m_Origpolling=false;
 	DriverWantedSet=false;
 	can_be_hooked=false;
@@ -663,6 +664,7 @@ vncDesktop::Startup()
 			m_server->Hook(HookWanted);
 			DriverWantedSet=FALSE;
 			}
+	no_default_desktop=false;
 	if (m_server->Driver())
 				{
 					vnclog.Print(LL_INTINFO, VNCLOG("Driver option enabled \n"));
@@ -677,9 +679,13 @@ vncDesktop::Startup()
 									if (strcmp(new_name,"Default")==0)
 										{
 											InitVideoDriver();
+											no_default_desktop=false;
 										}
 									else 
-										vnclog.Print(LL_INTINFO, VNCLOG("no default desktop \n"));
+										{
+											vnclog.Print(LL_INTINFO, VNCLOG("no default desktop \n"));
+											no_default_desktop=true;
+										}
 								}
 						}
 				}

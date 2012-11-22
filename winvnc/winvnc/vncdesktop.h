@@ -526,6 +526,7 @@ protected:
 	pBlockInput pbi;
 	HMODULE hUser32;
 	BOOL m_OrigpollingSet;
+	BOOL no_default_desktop;
 	BOOL m_Origpolling;
 /*	BOOL Check24bit();*/
 	COLORREF CapturePixel(int x,int y);

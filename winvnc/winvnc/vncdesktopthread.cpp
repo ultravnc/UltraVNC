@@ -491,7 +491,7 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 								if (fHookDriverWanted && m_desktop->m_videodriver == NULL)
 									{
 										vnclog.Print(LL_INTERR, VNCLOG("m_videodriver == NULL \n"));
-										m_desktop->SethookMechanism(true, false); 	// InitHookSettings() would work as well;
+										m_desktop->SethookMechanism(false,false); 	// InitHookSettings() would work as well;
 									}
 								stop_hookwatch=true;
 								vnclog.Print(LL_INTERR, VNCLOG("threadHandle \n"));
@@ -813,7 +813,7 @@ void vncDesktopThread::do_polling(HANDLE& threadHandle, rfb::Region2D& rgncache,
 	//if (cursormoved)
 	//	m_lLastMouseMoveTime = lTime;
 	if (cursormoved) m_desktop->idle_counter=0;
-	if ((m_desktop->m_server->PollFullScreen() /*&& !cursormoved*/) || (!m_desktop->can_be_hooked && !cursormoved))
+	if ((m_desktop->m_server->PollFullScreen()) || (!m_desktop->can_be_hooked && !cursormoved))
 	{
 		int timeSinceLastMouseMove = lTime - m_lLastMouseMoveTime;
 		if (timeSinceLastMouseMove > 150) // 150 ms pause after a Mouse move 
@@ -1207,7 +1207,7 @@ vncDesktopThread::run_undetached(void *arg)
 									//****************************************************************************
 									//************* Polling ---- no driver
 									//****************************************************************************
-									if (!m_desktop->m_hookdriver || !m_desktop->can_be_hooked)
+									if (!m_desktop->m_hookdriver || !m_desktop->can_be_hooked || m_desktop->no_default_desktop)
 									{
 										if (!s_moved)
 										do_polling(threadHandle, rgncache, fullpollcounter, cursormoved);
