@@ -7293,17 +7293,18 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 					return true;
 
 				case WM_SETFOCUS:
-					if (_this->InFullScreenMode())
+					if (_this->InFullScreenMode() && !_this->m_pFileTransfer->m_fFileTransferRunning && !_this->m_pTextChat->m_fTextChatRunning && !_this->m_fOptionsOpen)
 					{
 						SetWindowPos(hwnd, HWND_TOPMOST, 0,0,100,100, SWP_NOMOVE | SWP_NOSIZE);
 					}
+
 					TheAccelKeys.SetWindowHandle(_this->m_opts.m_NoHotKeys ? 0 : hwnd);
 					_this->m_keymap->Reset();					
 					return 0;
 
 				case WM_KILLFOCUS:
 					if (!_this->m_running) return 0;
-					if (_this->InFullScreenMode()) {
+					if (_this->InFullScreenMode()  && !_this->m_pFileTransfer->m_fFileTransferRunning && !_this->m_pTextChat->m_fTextChatRunning && !_this->m_fOptionsOpen) {
 						SetWindowPos(hwnd, HWND_TOP, 0,0,100,100, SWP_NOMOVE | SWP_NOSIZE| SWP_NOACTIVATE);
 					}
 					if ( _this->m_opts.m_ViewOnly) return 0;
