@@ -125,7 +125,7 @@ protected:
 	BOOL m_pref_XDMCPConnect;
 	BOOL m_pref_AutoPortSelect;
 	LONG m_pref_PortNumber;
-	LONG m_pref_HttpPortNumber;  // TightVNC 1.1.7
+	LONG m_pref_HttpPortNumber;  // TightVNC 1.1.8
 	char m_pref_passwd[MAXPWLEN];
 	char m_pref_passwd2[MAXPWLEN]; //PGM
 	UINT m_pref_QuerySetting;
@@ -177,7 +177,7 @@ protected:
 	BOOL m_pref_Secondary;
 
 private:
-	void InitPortSettings(HWND hwnd); // TightVNC 1.1.7
+	void InitPortSettings(HWND hwnd); // TightVNC 1.1.8
 
 
 };
