@@ -1545,10 +1545,13 @@ BOOL vncClientThread::AuthenticateLegacyClient()
 	if (auth_success) {
 		auth_result = rfbVncAuthOK;
 	}
-
+	//proto 6.2.1 np securityresult for none 3.3 and 3.7
+	if (auth_type != rfbNoAuth)
+	{
 	CARD32 auth_result_msg = Swap32IfLE(auth_result);
 	if (!m_socket->SendExact((char *)&auth_result_msg, sizeof(auth_result_msg)))
 		return FALSE;
+	}
 	
 	//adzm 2010-09 - Set handshake complete if integrated plugin finished auth
 	if (auth_success && auth_type == rfbLegacy_SecureVNCPlugin && m_socket->GetIntegratedPlugin()) {			
