@@ -90,7 +90,7 @@ char passwd2[MAXPWLEN]; //PGM
 LONG TurboMode=1;
 LONG PollUnderCursor=0;
 LONG PollForeground=0;
-LONG PollFullScreen=0;
+LONG PollFullScreen=1;
 LONG PollConsoleOnly=0;
 LONG PollOnEventOnly=0;
 LONG Driver=0;
