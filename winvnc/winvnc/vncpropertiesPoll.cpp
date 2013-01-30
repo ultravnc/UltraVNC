@@ -743,10 +743,10 @@ LABELUSERSETTINGS:
 
 	// Set the default user prefs
 	vnclog.Print(LL_INTINFO, VNCLOG("clearing user settings\n"));
-	m_pref_TurboMode = ((vncService::VersionMajor() >= 6) ? TRUE : FALSE);
+	m_pref_TurboMode = TRUE;//((vncService::VersionMajor() >= 6) ? TRUE : FALSE);
 	m_pref_PollUnderCursor=FALSE;
 	m_pref_PollForeground= FALSE;
-	m_pref_PollFullScreen= ((vncService::VersionMajor() >= 6) ? TRUE : FALSE);
+	m_pref_PollFullScreen= TRUE;//((vncService::VersionMajor() >= 6) ? TRUE : FALSE);
 	m_pref_PollConsoleOnly=FALSE;
 	m_pref_PollOnEventOnly=FALSE;
 	m_pref_MaxCpu=40;
@@ -957,10 +957,10 @@ void vncPropertiesPoll::LoadFromIniFile()
 //		return;
 //	}
 	
-	m_pref_TurboMode = ((vncService::VersionMajor() >= 6) ? TRUE : FALSE);
+	m_pref_TurboMode = TRUE;//((vncService::VersionMajor() >= 6) ? TRUE : FALSE);
 	m_pref_PollUnderCursor=FALSE;
 	m_pref_PollForeground= FALSE;
-	m_pref_PollFullScreen= ((vncService::VersionMajor() >= 6) ? TRUE : FALSE);
+	m_pref_PollFullScreen= TRUE;//((vncService::VersionMajor() >= 6) ? TRUE : FALSE);
 	m_pref_PollConsoleOnly=FALSE;
 	m_pref_PollOnEventOnly=FALSE;
 	m_pref_MaxCpu=40;
