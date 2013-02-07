@@ -1616,7 +1616,7 @@ BOOL vncClientThread::AuthSecureVNCPlugin(std::string& auth_message)
 		}
 
 		char passphraseused=bPassphrase;
-		if (m_ms_logon) passphraseused=2;
+		if (m_ms_logon || strlen(plainPassword)==0) passphraseused=2;
 		if (!m_socket->SendExact((const char*)&passphraseused, 1)) {
 			m_socket->GetIntegratedPlugin()->FreeMemory(pChallenge);
 			return FALSE;
@@ -1650,7 +1650,7 @@ BOOL vncClientThread::AuthSecureVNCPlugin(std::string& auth_message)
 		m_socket->GetIntegratedPlugin()->SetHandshakeComplete();	
 
 
-		if (!m_ms_logon)
+		if (!m_ms_logon && strlen(plainPassword)!=0)
 		{
 			if (!m_socket->ReadExact((char*)&wResponseLength, sizeof(wResponseLength))) {
 				return FALSE;
