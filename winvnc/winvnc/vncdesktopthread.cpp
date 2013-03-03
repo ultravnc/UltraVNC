@@ -318,7 +318,7 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 	if (first_run)
 	{
 		first_run=false;
-		m_server->SetNewSWSizeFR(m_desktop->m_scrinfo.framebufferWidth,m_desktop->m_scrinfo.framebufferHeight,FALSE);//changed no lock ok
+		//m_server->SetNewSWSizeFR(m_desktop->m_scrinfo.framebufferWidth,m_desktop->m_scrinfo.framebufferHeight,FALSE);//changed no lock ok
 		//m_server->SetScreenOffset(m_desktop->m_ScreenOffsetx,m_desktop->m_ScreenOffsety,m_desktop->nr_monitors);// no lock ok
 		//m_desktop->m_displaychanged=true;
 		//screensize_changed=true;
