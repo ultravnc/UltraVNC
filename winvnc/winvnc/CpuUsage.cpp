@@ -157,6 +157,7 @@ short CProcessorUsage::GetUsage()
    }
 
     __int64 div = (time - sTime);
+	if (div==0) return 0;
 
    GetSysTimes(idleTime, kernelTime, userTime);
 
