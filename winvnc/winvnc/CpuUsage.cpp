@@ -157,7 +157,12 @@ short CProcessorUsage::GetUsage()
    }
 
     __int64 div = (time - sTime);
-	if (div==0) return 0;
+	if (div==0)
+		{
+			if (m_bLocked) ::LeaveCriticalSection( &m_cs );
+			m_bLocked = false;
+			return sLastCpu;
+		}
 
    GetSysTimes(idleTime, kernelTime, userTime);
 
