@@ -700,8 +700,10 @@ void CTitleBar::MoveToMonitor(HMONITOR hMonitor)
 
     // now calculate our new origin relative to the new monitor.
     GetMonitorInfo(hMonitor, &mi);
-    int x = mi.rcMonitor.left + dx;
-    int y = mi.rcMonitor.top + dy;
+    int x = mi.rcMonitor.left + (  mi.rcMonitor.right-mi.rcMonitor.left)/2-tbWidth/2;
+    int y = mi.rcMonitor.top -tbHeigth+1;
     // finally move the window.
+
+
     ::SetWindowPos(m_hWnd, 0, x, y, 0,0, SWP_NOSIZE|SWP_NOACTIVATE|SWP_NOZORDER);
 }
