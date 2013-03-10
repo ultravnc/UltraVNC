@@ -377,6 +377,13 @@ vncEncodeMgr::CheckBuffer()
 inline BOOL
 vncEncodeMgr::SetEncoding(CARD32 encoding,BOOL reinitialize)
 {
+	if (m_scrinfo.format.bitsPerPixel!=32 && encoding==rfbEncodingUltra2)
+	{
+		//This is not supported, jpeg require 32bit buffers
+		//to avoif a server crash we switch to zrle encoding
+		encoding=rfbEncodingZRLE;
+	}
+
 	if (reinitialize)
 	{
 		encoding=m_encoding;
@@ -495,7 +502,11 @@ vncEncodeMgr::SetEncoding(CARD32 encoding,BOOL reinitialize)
 	case rfbEncodingUltra2:
 
 		vnclog.Print(LL_INTINFO, VNCLOG("Ultra encoder requested\n"));
-
+		if (m_scrinfo.format.bitsPerPixel!=32)
+		{
+			vnclog.Print(LL_INTINFO, VNCLOG("jpeg encoder is only supported on 32bit color display\n"));
+			return false;
+		}
 		// Create a Zlib encoder, if needed.
 		// If a Zlib encoder was used previously, then reuse it here
 		// to maintain zlib dictionary synchronization with the viewer.

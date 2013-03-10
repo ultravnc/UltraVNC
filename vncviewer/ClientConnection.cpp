@@ -419,7 +419,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_pendingScaleChange = false;
 	m_pendingCacheInit = false;
 	m_nServerScale = 1;
-	m_reconnectcounter = 0;
+	m_reconnectcounter = 3;
 	m_Is_Listening=0;
 
 	//ms logon
