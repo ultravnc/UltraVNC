@@ -1003,17 +1003,22 @@ void vncPropertiesPoll::SaveToIniFile()
 	bool use_uac=false;
 	if (!myIniFile.IsWritable())
 			{
-				// We can't write to the ini file , Vista in service mode
-				if (!Copy_to_Temp(m_Tempfile)) return ;
-				myIniFile.IniFileSetTemp(m_Tempfile);
-				use_uac=true;
+				myIniFile.IniFileSetTemp( m_Tempfile);
+				if (!myIniFile.IsWritable())
+					{
+						vnclog.Print(LL_INTERR, VNCLOG("file %s not writable, error saving new settings\n"), m_Tempfile);
+						return;				
+					}
+				if (!Copy_to_Temp(m_Tempfile))
+					{
+						vnclog.Print(LL_INTERR, VNCLOG("file %s not writable, error saving new settings\n"), m_Tempfile);
+						return;				
+					}
+				SaveUserPrefsPollToIniFile();
+				myIniFile.copy_to_secure();
+				myIniFile.IniFileSetSecure();
 			}
 	SaveUserPrefsPollToIniFile();
-	if (use_uac==true)
-	{
-	myIniFile.copy_to_secure();
-	myIniFile.IniFileSetSecure();
-	}
 }
 
 

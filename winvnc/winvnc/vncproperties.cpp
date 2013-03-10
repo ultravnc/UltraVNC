@@ -2458,13 +2458,44 @@ void vncProperties::SaveToIniFile()
 		return;
 
 	// SAVE PER-USER PREFS IF ALLOWED
-	bool use_uac=false;
 	if (!myIniFile.IsWritable()  || vncService::RunningAsService())
 			{
-				// We can't write to the ini file , Vista in service mode
-				if (!Copy_to_Temp( m_Tempfile)) return;
+				//First check if temp file is writable
 				myIniFile.IniFileSetTemp( m_Tempfile);
-				use_uac=true;
+				if (!myIniFile.IsWritable())
+					{
+						vnclog.Print(LL_INTERR, VNCLOG("file %s not writable, error saving new settings\n"), m_Tempfile);
+						return;				
+					}
+				if (!Copy_to_Temp( m_Tempfile))
+					{
+						vnclog.Print(LL_INTERR, VNCLOG("file %s not writable, error saving new settings\n"), m_Tempfile);
+						return;				
+					}
+
+				SaveUserPrefsToIniFile();
+				myIniFile.WriteInt("admin", "DebugMode", vnclog.GetMode());
+				myIniFile.WriteInt("admin", "Avilog", vnclog.GetVideo());
+				myIniFile.WriteString("admin", "path", vnclog.GetPath());
+				myIniFile.WriteInt("admin", "DebugLevel", vnclog.GetLevel());
+				myIniFile.WriteInt("admin", "AllowLoopback", m_server->LoopbackOk());
+				myIniFile.WriteInt("admin", "LoopbackOnly", m_server->LoopbackOnly());
+				myIniFile.WriteInt("admin", "AllowShutdown", m_allowshutdown);
+				myIniFile.WriteInt("admin", "AllowProperties",  m_allowproperties);
+				myIniFile.WriteInt("admin", "AllowEditClients", m_alloweditclients);
+				myIniFile.WriteInt("admin", "FileTransferTimeout", m_ftTimeout);
+				myIniFile.WriteInt("admin", "KeepAliveInterval", m_keepAliveInterval);
+				// adzm 2010-08
+				myIniFile.WriteInt("admin", "SocketKeepAliveTimeout", m_socketKeepAliveTimeout);
+				myIniFile.WriteInt("admin", "DisableTrayIcon", m_server->GetDisableTrayIcon());
+				myIniFile.WriteInt("admin", "MSLogonRequired", m_server->MSLogonRequired());
+				// Marscha@2004 - authSSP: save "New MS-Logon" state
+				myIniFile.WriteInt("admin", "NewMSLogon", m_server->GetNewMSLogon());
+				// sf@2003 - DSM params here
+				myIniFile.WriteInt("admin", "ConnectPriority", m_server->ConnectPriority());
+				myIniFile.copy_to_secure();
+				myIniFile.IniFileSetSecure();
+				return;
 			}
 
 	SaveUserPrefsToIniFile();
@@ -2481,24 +2512,13 @@ void vncProperties::SaveToIniFile()
     myIniFile.WriteInt("admin", "KeepAliveInterval", m_keepAliveInterval);
 	// adzm 2010-08
     myIniFile.WriteInt("admin", "SocketKeepAliveTimeout", m_socketKeepAliveTimeout);
-
 	myIniFile.WriteInt("admin", "DisableTrayIcon", m_server->GetDisableTrayIcon());
 	myIniFile.WriteInt("admin", "MSLogonRequired", m_server->MSLogonRequired());
 	// Marscha@2004 - authSSP: save "New MS-Logon" state
 	myIniFile.WriteInt("admin", "NewMSLogon", m_server->GetNewMSLogon());
 	// sf@2003 - DSM params here
-	myIniFile.WriteInt("admin", "UseDSMPlugin", m_server->IsDSMPluginEnabled());
 	myIniFile.WriteInt("admin", "ConnectPriority", m_server->ConnectPriority());
-	myIniFile.WriteString("admin", "DSMPlugin",m_server->GetDSMPluginName());
-
-	//adzm 2010-05-12 - dsmplugin config
-	myIniFile.WriteString("admin", "DSMPluginConfig", m_server->GetDSMPluginConfig());
-
-	if (use_uac==true)
-	{
-	myIniFile.copy_to_secure();
-	myIniFile.IniFileSetSecure();
-	}
+	return;
 }
 
 
