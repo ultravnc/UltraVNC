@@ -4705,7 +4705,7 @@ void ClientConnection::Internal_SendAppropriateFramebufferUpdateRequest()
 
 		// Cache init/reinit - A SetFormatAndEncoding() implies a cache reinit on server side
 		// Cache enabled, so it's going to be reallocated/reinited on server side
-		omni_mutex_lock l(m_cursorMutex);
+		omni_mutex_lock l(m_bitmapdcMutex);//m_cursorMutex);
 		if (m_opts.m_fEnableCache)
 		{
 			// create viewer cache buffer if necessary
@@ -5193,10 +5193,19 @@ inline void ClientConnection::ReadScreenUpdate()
 		m_lLastChangeTimeTimeout=60000;  // set to 1 minutes
 		int nOldServerScale = m_nServerScale;
 
-		if (avg_kbitsPerSecond > 1000 && (m_nConfig != 1))
+		if (avg_kbitsPerSecond > 10000 && (m_nConfig != 1))
 		{
 			m_nConfig = 1;
 			m_opts.m_PreferredEncoding = rfbEncodingHextile;
+			//m_opts.m_Use8Bit = rfbPFFullColors; // Max colors
+			m_opts.m_fEnableCache = false;
+			m_pendingFormatChange = true;
+			m_lLastChangeTime = timeGetTime();
+		}
+		else if (avg_kbitsPerSecond < 10000 && avg_kbitsPerSecond > 256 && (m_nConfig != 2))
+		{
+			m_nConfig = 1;
+			m_opts.m_PreferredEncoding = rfbEncodingUltra2;
 			//m_opts.m_Use8Bit = rfbPFFullColors; // Max colors
 			m_opts.m_fEnableCache = false;
 			m_pendingFormatChange = true;

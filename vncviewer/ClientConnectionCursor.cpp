@@ -131,7 +131,7 @@ void ClientConnection::ReadCursorShape(rfbFramebufferUpdateRectHeader *pfburh) {
 
 	// Set remaining data associated with cursor.
 
-	omni_mutex_lock l(m_cursorMutex);
+	omni_mutex_lock l(m_bitmapdcMutex);//m_cursorMutex);
 
 	rcWidth = pfburh->r.w;
 	rcHeight = pfburh->r.h;
@@ -176,7 +176,7 @@ void ClientConnection::ReadCursorPos(rfbFramebufferUpdateRectHeader *pfburh)
 
 void ClientConnection::SoftCursorLockArea(int x, int y, int w, int h) {
 
-	omni_mutex_lock l(m_cursorMutex);
+	omni_mutex_lock l(m_bitmapdcMutex);//m_cursorMutex);
 
 	if (!prevCursorSet)
 		return;
@@ -211,7 +211,7 @@ void ClientConnection::SoftCursorLockArea(int x, int y, int w, int h) {
 
 void ClientConnection::SoftCursorUnlockScreen() {
 
-	omni_mutex_lock l(m_cursorMutex);
+	omni_mutex_lock l(m_bitmapdcMutex);//m_cursorMutex);
 
 	if (!prevCursorSet)
 		return;
@@ -233,7 +233,7 @@ void ClientConnection::SoftCursorUnlockScreen() {
 
 void ClientConnection::SoftCursorMove(int x, int y) {
 
-	omni_mutex_lock l(m_cursorMutex);
+	omni_mutex_lock l(m_bitmapdcMutex);//m_cursorMutex);
 
 	if (prevCursorSet && !rcCursorHidden) {
 		SoftCursorRestoreArea();
@@ -256,7 +256,7 @@ void ClientConnection::SoftCursorMove(int x, int y) {
 
 void ClientConnection::SoftCursorFree() {
 
-	omni_mutex_lock l(m_cursorMutex);
+	omni_mutex_lock l(m_bitmapdcMutex);//m_cursorMutex);
 
 	if (prevCursorSet) {
 		if (!rcCursorHidden)
