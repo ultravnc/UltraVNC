@@ -1203,11 +1203,11 @@ void VNCOptions::ShowUsage(LPTSTR info) {
 }
 
 // The dialog box allows you to change the session-specific parameters
-int VNCOptions::DoDialog(bool running)
+int VNCOptions::DoDialog(bool running,HWND hwnd)
 {
   m_running = running;
   return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_OPTIONDIALOG), 
-                        NULL, (DLGPROC) OptDlgProc, (LONG_PTR) this);
+                        hwnd, (DLGPROC) OptDlgProc, (LONG_PTR) this);
 }
 
 void VNCOptions::CancelDialog()

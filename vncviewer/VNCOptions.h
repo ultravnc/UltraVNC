@@ -174,7 +174,7 @@ public:
 	int m_slowgdi;
 #endif
 
-	int DoDialog(bool running = false);
+	int DoDialog(bool running = false,HWND hwnd=NULL);
 	void SetFromCommandLine(LPTSTR szCmdLine);
 
     void CancelDialog();

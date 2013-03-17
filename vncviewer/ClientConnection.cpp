@@ -6792,7 +6792,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							bool bOldViewOnly = _this->m_opts.m_ViewOnly;
 							bool bOldDisableClipboard = _this->m_opts.m_DisableClipboard;
 
-							if (_this->m_opts.DoDialog(true))
+							if (_this->m_opts.DoDialog(true,hwnd))
 							{
 								// Modif sf@2002 - Server Scaling
 								_this->m_nServerScale = _this->m_opts.m_nServerScale;
