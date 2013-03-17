@@ -6984,7 +6984,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						{
 							MessageBox(hwnd, sz_L77,
 								sz_L78,
-								MB_OK | MB_ICONINFORMATION | MB_SETFOREGROUND | MB_TOPMOST);
+								MB_OK | MB_ICONINFORMATION | MB_SETFOREGROUND | MB_TOPMOST|MB_SYSTEMMODAL);
 							return 0;
 						}
 						// Don't call FileTRansfer GUI is already open !
@@ -7005,7 +7005,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							MessageBox(	hwnd,
 										sz_L86,
 										sz_L88,
-										MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST);
+										MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST|MB_SYSTEMMODAL);
 							return 0;
 						}
 
@@ -7029,7 +7029,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						{
 							MessageBox(hwnd, sz_L81,
 								sz_L82,
-								MB_OK | MB_ICONINFORMATION | MB_SETFOREGROUND | MB_TOPMOST);
+								MB_OK | MB_ICONINFORMATION | MB_SETFOREGROUND | MB_TOPMOST|MB_SYSTEMMODAL);
 							return 0;
 						}
 						if (_this->m_pTextChat->m_fTextChatRunning)
@@ -7049,7 +7049,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							MessageBox(hwnd,
 										sz_L85,
 										sz_L88,
-										MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST);
+										MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST|MB_SYSTEMMODAL);
 							return 0;
 						}
 						_this->m_pTextChat->m_fTextChatRunning = true;
@@ -7342,7 +7342,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							if (_this->m_opts.m_fExitCheck) //PGM @ Advantig
 							{ //PGM @ Advantig
 								boxopen=true;
-							    if (MessageBox(hwnd, sz_L75,sz_L76,MB_YESNO | MB_ICONQUESTION | MB_SETFOREGROUND | MB_TOPMOST) == IDNO)
+							    if (MessageBox(hwnd, sz_L75,sz_L76,MB_YESNO | MB_ICONQUESTION | MB_SETFOREGROUND | MB_TOPMOST|MB_SYSTEMMODAL) == IDNO)
 									{
 										boxopen=false;
 										return 0;
@@ -7361,7 +7361,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							_this->m_pFileTransfer->ShowFileTransferWindow(true);
 							MessageBox(hwnd, sz_L85,
 								sz_L88,
-								MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST);
+								MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST|MB_SYSTEMMODAL);
 							return 0;
 						}
 
@@ -7377,7 +7377,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							_this->m_pTextChat->ShowChatWindow(true);
 							MessageBox(hwnd, sz_L86,
 								sz_L88,
-								MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST);
+								MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST|MB_SYSTEMMODAL);
 							return 0;
 						}
 
@@ -7385,7 +7385,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						{
                             MessageBox(hwnd, sz_L87,
 								sz_L88,
-								MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST);
+								MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST|MB_SYSTEMMODAL);
 							return 0;
 						}
 
@@ -8254,7 +8254,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 						if (_this->m_opts.m_fExitCheck) //PGM @ Advantig
 						{ //PGM @ Advantig
 						    boxopen=true;
-						    if (MessageBox(hwnd, sz_L75,sz_L76,MB_YESNO | MB_ICONQUESTION | MB_SETFOREGROUND | MB_TOPMOST) == IDNO)
+						    if (MessageBox(hwnd, sz_L75,sz_L76,MB_YESNO | MB_ICONQUESTION | MB_SETFOREGROUND | MB_TOPMOST|MB_SYSTEMMODAL) == IDNO)
 							{
 								boxopen=false;
 								return 0;
@@ -8269,7 +8269,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 						_this->m_pFileTransfer->ShowFileTransferWindow(true);
 						MessageBox(hwnd, sz_L85,
 							sz_L88,
-							MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST);
+							MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST|MB_SYSTEMMODAL);
 						return 0;
 					}
 
@@ -8279,7 +8279,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 						_this->m_pTextChat->ShowChatWindow(true);
 						MessageBox(hwnd, sz_L86,
 							sz_L88,
-							MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST);
+							MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST|MB_SYSTEMMODAL);
 						return 0;
 					}
 
@@ -8287,7 +8287,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 					{
 						MessageBox(hwnd, sz_L87,
 							sz_L88,
-							MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST);
+							MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST|MB_SYSTEMMODAL);
 						return 0;
 					}
 
