@@ -309,6 +309,7 @@ FileTransfer::FileTransfer(VNCviewerApp *l_pApp, ClientConnection *pCC)
 	{
 		MessageBox( NULL, sz_E1, sz_E2, MB_OK | MB_ICONEXCLAMATION );
     }
+	InitializeCriticalSection(&crit);
 }
 
 //
@@ -317,6 +318,8 @@ FileTransfer::FileTransfer(VNCviewerApp *l_pApp, ClientConnection *pCC)
 FileTransfer::~FileTransfer()
 {
 //	vnclog.Print(0, _T("nFileTransfer\n"));
+	KillFTTimer();
+	EnterCriticalSection(&crit);
 	m_fFileCommandPending = false;
 	m_fFileTransferRunning = false;
 	m_FilesList.clear();
@@ -328,6 +331,8 @@ FileTransfer::~FileTransfer()
 	}
     // 16 April 2008 jdp
 	if (m_hRichEdit != NULL) FreeLibrary(m_hRichEdit);
+	LeaveCriticalSection(&crit);
+	DeleteCriticalSection(&crit);
 }
 
 
@@ -354,7 +359,7 @@ void FileTransfer::InitFTTimer()
 void FileTransfer::KillFTTimer()
 {
 #ifdef FT_USE_MMTIMER
-	timeKillEvent(m_mmRes);
+	if (m_mmRes!=-1) timeKillEvent(m_mmRes);
 	m_mmRes = -1;
 #else
 	
@@ -384,7 +389,12 @@ void CALLBACK FileTransfer::fpTimer(UINT uID, UINT uMsg, DWORD_PTR dwUser, DWORD
 
 void FileTransfer::TimerCallback(FileTransfer* ft)
 {
-	if (!ft->m_fFileUploadRunning) return;
+	EnterCriticalSection(&ft->crit);
+	if (!ft->m_fFileUploadRunning) 
+		{
+			LeaveCriticalSection(&ft->crit);
+			return;
+		}
 
 	if (!ft->m_fSendFileChunk)
 	{
@@ -392,8 +402,8 @@ void FileTransfer::TimerCallback(FileTransfer* ft)
 
 		//ft->m_dwLastChunkTime = timeGetTime();
 		ft->m_dwLastChunkTime = GetTickCount();
-
-		SendMessage(ft->m_pCC->m_hwndMain, FileTransferSendPacketMessage, (WPARAM) 0, (LPARAM) 0);
+		DWORD Result = 0;
+		SendMessageTimeout(ft->m_pCC->m_hwndMain, FileTransferSendPacketMessage, (WPARAM) 0, (LPARAM) 0,SMTO_ABORTIFHUNG,500,&Result);
 
 		// sf@2005 - FileTransfer Temporization
 		// - Prevents the windows message stack to be blocked too much when transfering over slow connection
@@ -412,6 +422,7 @@ void FileTransfer::TimerCallback(FileTransfer* ft)
 
 		ft->m_fSendFileChunk = false;
 	}
+	LeaveCriticalSection(&ft->crit);
 }
 
 //

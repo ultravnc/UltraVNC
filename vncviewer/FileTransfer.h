@@ -45,6 +45,7 @@ class ClientConnection;
 class FileTransfer  
 {
 public:
+	CRITICAL_SECTION crit;
 	// Props
 	VNCviewerApp		*m_pApp; 
 	ClientConnection	*m_pCC;
