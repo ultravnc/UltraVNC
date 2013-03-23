@@ -5829,7 +5829,7 @@ void ClientConnection::Write(char *buf, int bytes, bool bQueue, bool bTimeout, i
 				LocalFree( lpMsgBuf );
 				m_running = false;
 
-				throw WarningException(sz_L69);
+				//throw WarningException(sz_L69);
 			}
 			i += j;
 			m_BytesSend += j;
@@ -5881,7 +5881,7 @@ void ClientConnection::FlushOutstandingWriteQueue(char*& buf2, int& bytes2, bool
 			LocalFree( lpMsgBuf );
 			m_running = false;
 
-			throw WarningException(sz_L69);
+			//throw WarningException(sz_L69);
 		}
 
 		// adjust our stats

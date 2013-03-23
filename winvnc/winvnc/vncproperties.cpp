@@ -148,12 +148,13 @@ vncProperties::Init(vncServer *server)
 								sz_ID_WINVNC_ERROR,
 								MB_OK | MB_ICONSTOP);
 					PostQuitMessage(0);
-				} else {
+				}
+				/*else {
 					if (!vncService::RunningAsService())
 						MessageBoxSecure(NULL, sz_ID_NO_PASSWD_NO_OVERRIDE_WARN,
 								sz_ID_WINVNC_ERROR,
 								MB_OK | MB_ICONEXCLAMATION);
-				}
+				}*/
 			} else {
 				// If null passwords are not allowed, ensure that one is entered!
 				if (m_server->AuthRequired()) {
