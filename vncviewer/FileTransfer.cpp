@@ -403,8 +403,11 @@ void FileTransfer::TimerCallback(FileTransfer* ft)
 		//ft->m_dwLastChunkTime = timeGetTime();
 		ft->m_dwLastChunkTime = GetTickCount();
 		DWORD Result = 0;
+		#if _MSC_VER >= 1400 && defined (_M_X64)
+		SendMessageTimeout(ft->m_pCC->m_hwndMain, FileTransferSendPacketMessage, (WPARAM) 0, (LPARAM) 0,SMTO_ABORTIFHUNG,500,(PDWORD_PTR)&Result);
+		#else
 		SendMessageTimeout(ft->m_pCC->m_hwndMain, FileTransferSendPacketMessage, (WPARAM) 0, (LPARAM) 0,SMTO_ABORTIFHUNG,500,&Result);
-
+		#endif
 		// sf@2005 - FileTransfer Temporization
 		// - Prevents the windows message stack to be blocked too much when transfering over slow connection
 		// - Gives more priority to screen updates during asynchronous filetransfer
