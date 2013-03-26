@@ -474,7 +474,7 @@ void*
 vncClientUpdateThread::run_undetached(void *arg)
 {
 	rfb::SimpleUpdateTracker update;
-	rfb::Region2D clipregion;
+	//rfb::Region2D clipregion;
 	// adzm - 2010-07 - Extended clipboard
 	//char *clipboard_text = 0;
 	update.enable_copyrect(true);
@@ -500,7 +500,7 @@ vncClientUpdateThread::run_undetached(void *arg)
 					OutputDebugString(szText);		
 			#endif*/
 
-			m_client->m_incr_rgn.assign_union(clipregion);
+			//m_client->m_incr_rgn.assign_union(clipregion);
 
 			// We block as long as updates are disabled, or the client
 			// isn't interested in them, unless this thread is killed.
@@ -549,10 +549,10 @@ vncClientUpdateThread::run_undetached(void *arg)
 								//do forcefull update after 4 seconds
 								omni_mutex_lock l(m_client->GetUpdateLock());
 								rfb::Region2D update_rgn=m_client->m_encodemgr.m_buffer->GetViewerSize();
-					     		// Add the requested area to the incremental update cliprect
 								m_client->m_incr_rgn.assign_union(update_rgn);
-							   // Kick the update thread (and create it if not there already)
+								m_client->m_update_tracker.add_changed(update_rgn);
 								m_client->m_encodemgr.m_buffer->m_desktop->TriggerUpdate();
+								m_client->TriggerUpdateThread();
 						}
 
 					}
@@ -622,18 +622,18 @@ vncClientUpdateThread::run_undetached(void *arg)
 			m_client->m_palettechanged = FALSE;
 
 			// Fetch the incremental region
-			clipregion = m_client->m_incr_rgn;
+			//clipregion = m_client->m_incr_rgn;
 			//m_client->m_incr_rgn.clear();
 
 			// Get the clipboard data, if any
 			// adzm - 2010-07 - Extended clipboard
-			if (!(m_client->m_clipboard.m_bNeedToProvide || m_client->m_clipboard.m_bNeedToNotify))
+			if ((m_client->m_clipboard.m_bNeedToProvide || m_client->m_clipboard.m_bNeedToNotify))
 			{
-				m_client->m_incr_rgn.clear();
+				//m_client->m_incr_rgn.clear();
 			}
 		
 			// Get the update details from the update tracker
-			m_client->m_update_tracker.flush_update(update, clipregion);
+			m_client->m_update_tracker.flush_update(update, m_client->m_incr_rgn);
 
 		//if (!m_client->m_encodemgr.m_buffer->m_desktop->IsVideoDriverEnabled())
 		//TEST if (!m_client->m_encodemgr.m_buffer->m_desktop->m_hookdriver)
@@ -793,12 +793,12 @@ vncClientUpdateThread::run_undetached(void *arg)
 			// the supplied update tracker
 			if (m_client->SendUpdate(update)) {
 				updates_sent++;
-				clipregion.clear();
+				m_client->m_incr_rgn.clear();
 			}
 		}
 		else
 		{
-			clipregion.clear();
+			m_client->m_incr_rgn.clear();
 		}
 
 			/*#ifdef _DEBUG
