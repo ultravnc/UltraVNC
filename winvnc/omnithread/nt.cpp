@@ -113,7 +113,7 @@ public:
     d = 0;
     t = omni_thread::self();
     if (!t) {
-      omni_mutex_lock sync(cachelock);
+      omni_mutex_lock sync(cachelock,1);
       if (cache) {
 	d = cache;
 	cache = cache->next;
@@ -126,7 +126,7 @@ public:
   }
   inline ~_internal_omni_thread_helper() { 
     if (d) {
-      omni_mutex_lock sync(cachelock);
+      omni_mutex_lock sync(cachelock,1);
       d->next = cache;
       cache = d;
     }
@@ -608,7 +608,7 @@ omni_thread::~omni_thread(void)
 void
 omni_thread::start(void)
 {
-    omni_mutex_lock l(mutex);
+    omni_mutex_lock l(mutex,1);
 
     if (_state != STATE_NEW)
 	throw omni_thread_invalid();
@@ -706,7 +706,7 @@ omni_thread::join(void** status)
 void
 omni_thread::set_priority(priority_t pri)
 {
-    omni_mutex_lock l(mutex);
+    omni_mutex_lock l(mutex,1);
 
     if (_state != STATE_RUNNING)
 	throw omni_thread_invalid();

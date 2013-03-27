@@ -1795,7 +1795,7 @@ BOOL
 vncDesktop::GetRichCursorData(BYTE *databuf, HCURSOR hcursor, int width, int height)
 {
 	// Protect the memory bitmap (is it really necessary here?)
-	omni_mutex_lock l(m_update_lock);
+	omni_mutex_lock l(m_update_lock,278);
 
 	// Create bitmap, select it into memory DC
 	HBITMAP membitmap = CreateCompatibleBitmap(m_hrootdc, width, height);
@@ -2136,7 +2136,7 @@ void
 vncDesktop::SetDisableInput()
 {
     CARD32 state;
-    state=!block_input();
+    state=!block_input(false);
     m_server->NotifyClients_StateChange(rfbServerRemoteInputsState, state);
 }
 
@@ -2282,7 +2282,7 @@ DWORD WINAPI Warningbox_non_locked(LPVOID lpParam)
 // Modif rdv@2002 - v1.1.x - videodriver
 BOOL vncDesktop::InitVideoDriver()
 {
-	omni_mutex_lock l(m_videodriver_lock);
+	omni_mutex_lock l(m_videodriver_lock,79);
 	
 	if(!(OSversion()==1  || OSversion()==2)) return true; //we need w2k or xp
 	vnclog.Print(LL_INTERR, VNCLOG("Driver option is enabled\n"));
@@ -2538,7 +2538,7 @@ void vncDesktop::SetBlockInputState(bool newstate)
 				}
 			}
 		m_bIsInputDisabledByClient=newstate;
-		state=!block_input();
+		state=!block_input(false);
 		
     }
 	else state=!newstate;
@@ -2548,8 +2548,16 @@ void vncDesktop::SetBlockInputState(bool newstate)
  m_server->NotifyClients_StateChange(rfbServerRemoteInputsState, state);
 }
 
-bool vncDesktop::block_input()
+bool vncDesktop::block_input(bool first)
 {
+	if (first)
+	{
+		old_Blockinput1=m_bIsInputDisabledByClient;
+		old_Blockinput2=m_server->LocalInputsDisabled();
+		return false;
+	}
+	else
+	{
     bool Blockinput_val;
 	BOOL returnvalue;
 	if(m_bIsInputDisabledByClient || m_server->LocalInputsDisabled())
@@ -2589,6 +2597,6 @@ bool vncDesktop::block_input()
 	old_Blockinput1=m_bIsInputDisabledByClient;
 	old_Blockinput2=m_server->LocalInputsDisabled();
 	old_Blockinput=Blockinput_val;
-
     return Blockinput_val;
+	}
 }

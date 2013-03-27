@@ -646,7 +646,7 @@ void
 vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 {
 	// adzm 2009-07-05
-	omni_mutex_lock sync(m_mutexTrayIcon);
+	omni_mutex_lock sync(m_mutexTrayIcon,69);
 
 	// Create the tray icon message
 	m_nid.hWnd = m_hwnd;
@@ -1931,7 +1931,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		// adzm 2009-07-05 - Tray icon balloon tips
 		if (iMsg == MENU_TRAYICON_BALLOON_MSG) {
 			try {
-				omni_mutex_lock sync(_this->m_mutexTrayIcon);
+				omni_mutex_lock sync(_this->m_mutexTrayIcon,70);
 
 				// adzm 2009-07-05 - Tray icon balloon tips
 				if (_this->m_BalloonInfo) {		

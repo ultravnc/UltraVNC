@@ -493,7 +493,7 @@ bool CDSMPlugin::SupportsIntegrated()
 BYTE* CDSMPlugin::TransformBuffer(BYTE* pDataBuffer, int nDataLen, int* pnTransformedDataLen)
 {
 	// FixME: possible pb with this mutex in WinVNC
-	omni_mutex_lock l(m_TransMutex);
+	omni_mutex_lock l(m_TransMutex,105);
 
 	m_pTransBuffer = (*m_PTransformBuffer)(pDataBuffer, nDataLen, pnTransformedDataLen);
 

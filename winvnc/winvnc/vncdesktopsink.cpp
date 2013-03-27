@@ -458,63 +458,9 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 				// adzm - 2010-07 - Extended clipboard
 				{
 					// only need a window when setting clipboard data
-					omni_mutex_lock l(_this->m_update_lock);
+					omni_mutex_lock l(_this->m_update_lock,277);
 					_this->m_server->UpdateClipTextEx(NULL);
 				}
-				/*
-				LPSTR cliptext = NULL;
-
-				// Open the clipboard
-				if (OpenClipboard(_this->Window()))
-				{
-					// Get the clipboard data
-					HGLOBAL cliphandle = GetClipboardData(CF_TEXT);
-					if (cliphandle != NULL)
-					{
-						LPSTR clipdata = (LPSTR) GlobalLock(cliphandle);
-
-						// Copy it into a new buffer
-						if (clipdata == NULL)
-							cliptext = NULL;
-						else
-							cliptext = _strdup(clipdata);
-
-						// Release the buffer and close the clipboard
-						GlobalUnlock(cliphandle);
-					}
-
-					CloseClipboard();
-				}
-
-				if (cliptext != NULL)
-				{
-					int cliplen = strlen(cliptext);
-					LPSTR unixtext = (char *)malloc(cliplen+1);
-
-					// Replace CR-LF with LF - never send CR-LF on the wire,
-					// since Unix won't like it
-					int unixpos=0;
-					for (int x=0; x<cliplen; x++)
-					{
-						if (cliptext[x] != '\x0d')
-						{
-							unixtext[unixpos] = cliptext[x];
-							unixpos++;
-						}
-					}
-					unixtext[unixpos] = 0;
-
-					// Free the clip text
-					free(cliptext);
-					cliptext = NULL;
-
-					// Now send the unix text to the server
-					omni_mutex_lock l(_this->m_update_lock);
-					_this->m_server->UpdateClipText(unixtext);
-
-					free(unixtext);
-				}
-				*/
 			}
 
 			//_this->m_initialClipBoardSeen = TRUE;

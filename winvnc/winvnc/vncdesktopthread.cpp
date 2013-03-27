@@ -142,7 +142,7 @@ BOOL
 vncDesktopThread::handle_driver_changes(rfb::Region2D &rgncache,rfb::UpdateTracker &tracker)
 { 
 
-	omni_mutex_lock l(m_desktop->m_videodriver_lock);
+	omni_mutex_lock l(m_desktop->m_videodriver_lock,70);
 
 	int oldaantal=m_desktop->m_videodriver->oldaantal;
 	int counter=m_desktop->pchanges_buf->counter;
@@ -246,7 +246,7 @@ vncDesktopThread::Init(vncDesktop *desktop, vncServer *server)
 	// Start the thread
 	start_undetached();
 	// Wait for the thread to let us know if it failed to init
-	{	omni_mutex_lock l(m_returnLock);
+	{	omni_mutex_lock l(m_returnLock,71);
 
 		while (!m_returnset)
 		{
@@ -263,7 +263,7 @@ vncDesktopThread::Init(vncDesktop *desktop, vncServer *server)
 void
 vncDesktopThread::ReturnVal(DWORD result)
 {
-	omni_mutex_lock l(m_returnLock);
+	omni_mutex_lock l(m_returnLock,72);
 	m_returnset = TRUE;
 	m_return = result;
 	m_returnsig->signal();
@@ -396,7 +396,7 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 				{
 					if (XRichCursorEnabled) m_server->UpdateCursorShape();
 					/// We lock all buffers,,and also back the client thread update mechanism
-					omni_mutex_lock l(m_desktop->m_update_lock);
+					omni_mutex_lock l(m_desktop->m_update_lock,273);
 					/*#ifdef _DEBUG
 					char			szText[256];
 					sprintf(szText," ++++++ Mutex lock display changes\n");
@@ -904,7 +904,18 @@ vncDesktopThread::run_undetached(void *arg)
 	ReturnVal(0);
 
 	//telling running viewers to wait until first update
-	m_server->InitialUpdate(false);
+#ifdef _DEBUG
+										char			szText[256];
+										sprintf(szText," nitialUpdate(false) \n");
+										OutputDebugString(szText);		
+#endif
+	//default=false
+	//m_server->InitialUpdate(false);
+#ifdef _DEBUG
+										//char			szText[256];
+										sprintf(szText," nitialUpdate(false) \n");
+										OutputDebugString(szText);		
+#endif
 	// sf@2003 - Done here to take into account if the driver is actually activated
 	m_desktop->InitHookSettings(); 
 	initialupdate=false;
@@ -1032,11 +1043,11 @@ vncDesktopThread::run_undetached(void *arg)
 
 		result=WaitForMultipleObjects(6,m_desktop->trigger_events,FALSE,waittime);
 		{
-			//#ifdef _DEBUG
-			//							char			szText[256];
-			//							sprintf(szText,"WaitForMultipleObjects %i\n",result );
-			//							OutputDebugString(szText);		
-			//#endif
+			#ifdef _DEBUG
+										char			szText[256];
+										sprintf(szText,"WaitForMultipleObjects %i\n",result );
+										OutputDebugString(szText);		
+			#endif
 
 			// We need to wait until restart is done
 			// else wait_timeout goes in to looping while sink window is not ready
@@ -1121,7 +1132,7 @@ vncDesktopThread::run_undetached(void *arg)
 								bool SWSizeChanged=false;
 								if (m_server->SingleWindow())
 								{
-									omni_mutex_lock l(m_desktop->m_update_lock);
+									omni_mutex_lock l(m_desktop->m_update_lock,274);
 									m_desktop->GetQuarterSize();
 									m_server->SetSWOffset(m_desktop->m_SWOffsetx,m_desktop->m_SWOffsety);
 									//SW size changed
@@ -1170,7 +1181,7 @@ vncDesktopThread::run_undetached(void *arg)
 //									sprintf(szText," m_desktop->m_server->UpdateWanted check\n");
 //										OutputDebugString(szText);		
 //#endif
-								omni_mutex_lock l(m_desktop->m_update_lock);								
+								omni_mutex_lock l(m_desktop->m_update_lock,275);								
 								if (m_desktop->m_server->UpdateWanted() || !initialupdate)
 								{
 									oldtick=newtick;
@@ -1272,7 +1283,7 @@ vncDesktopThread::run_undetached(void *arg)
 
 									{
 										// Prevent any clients from accessing the Buffer
-										omni_mutex_lock ll(m_desktop->m_update_lock);
+										omni_mutex_lock ll(m_desktop->m_update_lock,276);
 										
 										// CHECK FOR COPYRECTS
 										// This actually just checks where the Foreground window is
@@ -1447,7 +1458,17 @@ vncDesktopThread::run_undetached(void *arg)
 											m_desktop->m_buffer.CheckRegion(changedrgn,cachedrgn, checkrgn);
 										if (!initialupdate)
 											{
+												#ifdef _DEBUG
+										char			szText[256];
+										sprintf(szText," nitialUpdate(true) \n");
+										OutputDebugString(szText);		
+#endif
 												m_server->InitialUpdate(true);
+												#ifdef _DEBUG
+										//char			szText[256];
+										sprintf(szText," nitialUpdate(true) \n");
+										OutputDebugString(szText);		
+#endif
 												initialupdate=true;
 												// JnZn558
 												m_desktop->m_old_monitor = MULTI_MON_ALL;

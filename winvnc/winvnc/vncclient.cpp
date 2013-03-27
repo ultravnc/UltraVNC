@@ -383,7 +383,7 @@ vncClientUpdateThread::Init(vncClient *client)
 	vnclog.Print(LL_INTINFO, VNCLOG("init update thread\n"));
 
 	m_client = client;
-	omni_mutex_lock l(m_client->GetUpdateLock());
+	omni_mutex_lock l(m_client->GetUpdateLock(),80);
 	m_signal = new omni_condition(&m_client->GetUpdateLock());
 	m_sync_sig = new omni_condition(&m_client->GetUpdateLock());
 	m_active = TRUE;
@@ -418,7 +418,7 @@ vncClientUpdateThread::Kill()
 {
 	vnclog.Print(LL_INTINFO, VNCLOG("kill update thread\n"));
 
-	omni_mutex_lock l(m_client->GetUpdateLock());
+	omni_mutex_lock l(m_client->GetUpdateLock(),81);
 	m_active=FALSE;
 	m_signal->signal();
 }
@@ -485,25 +485,24 @@ vncClientUpdateThread::run_undetached(void *arg)
 	vnclog.Print(LL_INTINFO, VNCLOG("starting update thread\n"));
 
 	while (1)
-	{
-//#ifdef _DEBUG
-//										char			szText[256];
-//										sprintf(szText," run_undetached loop \n");
-//										OutputDebugString(szText);		
-//#endif
-		// Block waiting for an update to send
+	{		
+		while (!m_client->m_initial_update) 
+			{
+				Sleep(50);
+#ifdef _DEBUG
+			char			szText[256];
+			sprintf(szText,"!m_initial_update \n");
+			OutputDebugString(szText);		
+#endif
+			}
 		{
-			omni_mutex_lock l(m_client->GetUpdateLock());
-			/*#ifdef _DEBUG
-					char			szText[256];
-					sprintf(szText," ++++++ Mutex lock clientupdatethread\n");
-					OutputDebugString(szText);		
-			#endif*/
+			omni_mutex_lock l(m_client->GetUpdateLock(),82);
 
 			//m_client->m_incr_rgn.assign_union(clipregion);
 
 			// We block as long as updates are disabled, or the client
 			// isn't interested in them, unless this thread is killed.
+
 			if (updates_sent < 1) 
 			{
 			while (m_active && (
@@ -547,7 +546,6 @@ vncClientUpdateThread::run_undetached(void *arg)
 					{
 						{
 								//do forcefull update after 4 seconds
-								omni_mutex_lock l(m_client->GetUpdateLock());
 								rfb::Region2D update_rgn=m_client->m_encodemgr.m_buffer->GetViewerSize();
 								m_client->m_incr_rgn.assign_union(update_rgn);
 								m_client->m_update_tracker.add_changed(update_rgn);
@@ -561,11 +559,12 @@ vncClientUpdateThread::run_undetached(void *arg)
 							break;
 						}
 				}while(true);
-				//m_signal->wait();
+
 			}
 			}
 			// If the thread is being killed then quit
 			if (!m_active) break;
+			
 
 			// SEND AN UPDATE!
 			// The thread is active, updates are enabled, and the
@@ -791,13 +790,36 @@ vncClientUpdateThread::run_undetached(void *arg)
 
 			// Send updates to the client - this implicitly clears
 			// the supplied update tracker
+#ifdef _DEBUG
+			char			szText[256];
+			sprintf(szText,"SendUpdate start \n");
+			OutputDebugString(szText);		
+#endif
 			if (m_client->SendUpdate(update)) {
 				updates_sent++;
 				m_client->m_incr_rgn.clear();
+#ifdef _DEBUG
+			char			szText[256];
+			sprintf(szText,"SendUpdate returned true, m_incr_rgn cleared \n");
+			OutputDebugString(szText);		
+#endif
+			}
+			else
+			{
+#ifdef _DEBUG
+			char			szText[256];
+			sprintf(szText,"SendUpdate returned false \n");
+			OutputDebugString(szText);		
+#endif
 			}
 		}
 		else
 		{
+#ifdef _DEBUG
+			char			szText[256];
+			sprintf(szText,"m_incr_rgn cleared 2 \n");
+			OutputDebugString(szText);		
+#endif
 			m_client->m_incr_rgn.clear();
 		}
 
@@ -2198,7 +2220,7 @@ vncClientThread::run(void *arg)
 	// Modif sf@2002 - Scaling
 	if (m_server->AreThereMultipleViewers()==false)
 		{
-			omni_mutex_lock l(m_client->GetUpdateLock());
+			omni_mutex_lock l(m_client->GetUpdateLock(),84);
 			m_client->m_encodemgr.m_buffer->SetScale(m_server->GetDefaultScale()); // v1.1.2
 		}
 	m_client->m_ScaledScreen = m_client->m_encodemgr.m_buffer->GetViewerSize();
@@ -2283,7 +2305,7 @@ vncClientThread::run(void *arg)
 	// sf@2002 - Scaling
 	// m_client->m_update_tracker.add_changed(m_client->m_fullscreen);
 	{ // RealVNC 336
-		omni_mutex_lock l(m_client->GetUpdateLock());
+		omni_mutex_lock l(m_client->GetUpdateLock(),91);
 		m_client->m_update_tracker.add_changed(m_client->m_ScaledScreen);
 	}
 
@@ -2301,6 +2323,7 @@ vncClientThread::run(void *arg)
 	BOOL need_to_disable_input = m_server->LocalInputsDisabled();
     bool need_to_clear_keyboard = true;
     bool need_first_keepalive = false;
+	bool firstrun=true;
     bool need_ft_version_msg =  false;
 	// adzm - 2010-07 - Extended clipboard
 	bool need_notify_extended_clipboard = false;
@@ -2340,7 +2363,8 @@ vncClientThread::run(void *arg)
         }
 
         // reclaim input block after local C+A+D if user currently has it blocked 
-        m_client->m_encodemgr.m_buffer->m_desktop->block_input();
+        m_client->m_encodemgr.m_buffer->m_desktop->block_input(firstrun);
+		firstrun=false;
 
         if (need_first_keepalive)
         {
@@ -2660,7 +2684,7 @@ vncClientThread::run(void *arg)
 					if (!encoding_set)
 					{
 						// No, so try the buffer to see if this encoding will work...
-						omni_mutex_lock l(m_client->GetUpdateLock());
+						omni_mutex_lock l(m_client->GetUpdateLock(),85);
 						if (m_client->m_encodemgr.SetEncoding(Swap32IfLE(encoding),FALSE))
 							encoding_set = TRUE;
 					}
@@ -2670,7 +2694,7 @@ vncClientThread::run(void *arg)
 				if (!encoding_set)
 				{
 					vnclog.Print(LL_INTINFO, VNCLOG("defaulting to raw encoder\n"));
-					omni_mutex_lock l(m_client->GetUpdateLock());
+					omni_mutex_lock l(m_client->GetUpdateLock(),86);
 					if (!m_client->m_encodemgr.SetEncoding(Swap32IfLE(rfbEncodingRaw),FALSE))
 					{
 						vnclog.Print(LL_INTERR, VNCLOG("failed to select raw encoder!\n"));
@@ -3003,7 +3027,7 @@ vncClientThread::run(void *arg)
 			m_client->m_nScale_viewer = msg.ssc.scale;
 			m_client->m_nScale = msg.ssc.scale;
 			{
-				omni_mutex_lock l(m_client->GetUpdateLock());
+				omni_mutex_lock l(m_client->GetUpdateLock(),87);
 				if (!m_client->m_encodemgr.m_buffer->SetScale(msg.ssc.scale))
 					{
 						connected = FALSE;
@@ -3104,7 +3128,7 @@ vncClientThread::run(void *arg)
 
 		    if (!m_client->m_keyboardenabled || !m_client->m_pointerenabled) fUserOk = false; //PGM
 
-			omni_mutex_lock l(m_client->GetUpdateLock());
+			omni_mutex_lock l(m_client->GetUpdateLock(),88);
 
 			// Read the rest of the message:
 			m_client->m_fFileTransferRunning = TRUE; 
@@ -3122,7 +3146,7 @@ vncClientThread::run(void *arg)
                         break;
 					case rfbFileTransferOffer:
 						{
-						omni_mutex_lock ll(m_client->GetUpdateLock());
+						omni_mutex_lock ll(m_client->GetUpdateLock(),89);
 						if (!m_server->FileTransferEnabled() || !fUserOk) break;
 						// bool fError = false;
 						const UINT length = Swap32IfLE(msg.ft.length);
@@ -3306,7 +3330,7 @@ vncClientThread::run(void *arg)
 					// The client requests a File
 					case rfbFileTransferRequest:
 						{
-						omni_mutex_lock ll(m_client->GetUpdateLock());
+						omni_mutex_lock ll(m_client->GetUpdateLock(),90);
 						m_client->m_fCompressionEnabled = (Swap32IfLE(msg.ft.size) == 1);
 						const UINT length = Swap32IfLE(msg.ft.length);
 						memset(m_client->m_szSrcFileName, 0, sizeof(m_client->m_szSrcFileName));
@@ -4239,7 +4263,7 @@ vncClient::vncClient() : Sendinput("USER32", "SendInput"), m_clipboard(Clipboard
 	m_szHost = NULL;
 	m_hostPort = 0;
 	m_want_update_state=false;
-	m_initial_update=true;
+	m_initial_update=false;
 	m_nScale_viewer = 1;
 }
 
@@ -4435,11 +4459,15 @@ vncClient::NotifyUpdate(rfbFramebufferUpdateRequestMsg fur)
 		}
 
 		{
-			omni_mutex_lock l(GetUpdateLock());
+			omni_mutex_lock l(GetUpdateLock(),92);
 
 	     	// Add the requested area to the incremental update cliprect
 			m_incr_rgn.assign_union(update_rgn);
-
+#ifdef _DEBUG
+			char			szText[256];
+			sprintf(szText,"m_incr_rgn \n");
+			OutputDebugString(szText);		
+#endif
 			// Is this request for a full update?
 			if (!fur.incremental)
 			{
@@ -4483,7 +4511,7 @@ vncClient::UpdateMouse()
 {
 	if (!m_mousemoved && !m_cursor_update_sent)
 	{
-	omni_mutex_lock l(GetUpdateLock());
+	omni_mutex_lock l(GetUpdateLock(),93);
     m_mousemoved=TRUE;
 	}
 	// nyama/marscha - PointerPos
@@ -4499,7 +4527,7 @@ vncClient::UpdateMouse()
 		if (cursorPos.x != m_cursor_pos.x || cursorPos.y != m_cursor_pos.y) {
 			// This movement isn't by this client, but generated locally or by other client.
 			// Send it to this client.
-			omni_mutex_lock l(GetUpdateLock());
+			omni_mutex_lock l(GetUpdateLock(),94);
 			m_cursor_pos.x = cursorPos.x;
 			m_cursor_pos.y = cursorPos.y;
 			m_cursor_pos_changed = TRUE;
@@ -4531,7 +4559,7 @@ vncClient::UpdateClipTextEx(ClipboardData& clipboardData, CARD32 overrideFlags)
 	//This is already locked in the vncdesktopsynk
 	//But it's just a critical section, doesn't matter how often you lock it in the same thread
 	//as long as it is unlocked the same number of times.
-	omni_mutex_lock l(GetUpdateLock());
+	omni_mutex_lock l(GetUpdateLock(),95);
 	if (m_clipboard.UpdateClipTextEx(clipboardData, overrideFlags)) {
 		TriggerUpdateThread();
 	}
@@ -4540,14 +4568,14 @@ vncClient::UpdateClipTextEx(ClipboardData& clipboardData, CARD32 overrideFlags)
 void
 vncClient::UpdateCursorShape()
 {
-	omni_mutex_lock l(GetUpdateLock());
+	omni_mutex_lock l(GetUpdateLock(),96);
 	TriggerUpdateThread();
 }
 
 void
 vncClient::UpdatePalette(bool lock)
 {
-	if (lock) omni_mutex_lock l(GetUpdateLock());
+	if (lock) omni_mutex_lock l(GetUpdateLock(),97);
 	m_palettechanged = TRUE;
 }
 
@@ -4603,7 +4631,7 @@ vncClient::DisableProtocol()
 {
 	BOOL disable = FALSE;
 	{	 
-		omni_mutex_lock l(GetUpdateLock());
+		omni_mutex_lock l(GetUpdateLock(),98);
 		if (m_disable_protocol == 0)
 			disable = TRUE;
 		m_disable_protocol++;
@@ -4616,7 +4644,7 @@ void
 vncClient::EnableProtocol()
 {
 	{	 
-		omni_mutex_lock l(GetUpdateLock());
+		omni_mutex_lock l(GetUpdateLock(),99);
 		if (m_disable_protocol == 0) {
 			vnclog.Print(LL_INTERR, VNCLOG("protocol enabled too many times!\n"));
 			m_socket->Close();
@@ -4695,12 +4723,11 @@ vncClient::SendRFBMsgQueue(CARD8 type, BYTE *buffer, int buflen)
 
 BOOL
 vncClient::SendUpdate(rfb::SimpleUpdateTracker &update)
-{
-	if (!m_initial_update) return FALSE;
-
+{		
 	// If there is nothing to send then exit
 
-	if (update.is_empty() && !m_cursor_update_pending && !m_NewSWUpdateWaiting && !m_cursor_pos_changed) return FALSE;
+	if (update.is_empty() && !m_cursor_update_pending && !m_NewSWUpdateWaiting && !m_cursor_pos_changed) 
+		return FALSE;
 	
 	// Get the update info from the tracker
 	rfb::UpdateInfo update_info;
@@ -4805,7 +4832,7 @@ vncClient::SendUpdate(rfb::SimpleUpdateTracker &update)
 
 //	Sendtimer.start();
 
-	omni_mutex_lock l(GetUpdateLock());
+	omni_mutex_lock l(GetUpdateLock(),100);
 	// Otherwise, send <number of rectangles> header
 	rfbFramebufferUpdateMsg header;
 	header.nRects = Swap16IfLE(updates);
@@ -5633,7 +5660,7 @@ void vncClient::FinishFileReception()
 bool vncClient::SendFileChunk()
 {
     bool connected = true;
-	omni_mutex_lock l(GetUpdateLock());
+	omni_mutex_lock l(GetUpdateLock(),101);
 
 	if (!m_fFileUploadRunning) return connected;
 	if ( m_fEof || m_fFileUploadError)
@@ -5746,7 +5773,7 @@ bool vncClient::SendFileChunk()
 
 void vncClient::FinishFileSending()
 {
-	omni_mutex_lock l(GetUpdateLock());
+	omni_mutex_lock l(GetUpdateLock(),102);
 
 	if (!m_fFileUploadRunning)
 		return;
@@ -5982,7 +6009,7 @@ bool vncClient::MyGetFileSize(char* szFilePath, ULARGE_INTEGER *n2FileSize)
 bool vncClient::DoFTUserImpersonation()
 {
 	vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::DoFTUserImpersonation - Call\n"));
-	omni_mutex_lock l(GetUpdateLock());
+	omni_mutex_lock l(GetUpdateLock(),103);
 
 	if (m_fFileDownloadRunning) return true;
 	if (m_fFileUploadRunning) return true;
@@ -6096,7 +6123,7 @@ void vncClient::UndoFTUserImpersonation()
 	vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::UNDoFTUserImpersonation - 1\n"));
 	DWORD lTime = timeGetTime();
 	if (lTime - m_lLastFTUserImpersonationTime < 10000) return;
-	omni_mutex_lock l(GetUpdateLock());
+	omni_mutex_lock l(GetUpdateLock(),104);
 	vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::UNDoFTUserImpersonation - Impersonationtoken exists\n"));
 	RevertToSelf();
 	m_fFTUserImpersonatedOk = false;

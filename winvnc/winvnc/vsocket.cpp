@@ -1030,7 +1030,7 @@ BYTE* VSocket::RestoreBufferStep2(BYTE* pRestoredDataBuffer, int nDataLen, int* 
 //
 void VSocket::CheckNetRectBufferSize(int nBufSize)
 {
-    omni_mutex_lock l(m_CheckMutex); 
+    omni_mutex_lock l(m_CheckMutex,3); 
 
 	if (m_nNetRectBufSize > nBufSize) return;
 

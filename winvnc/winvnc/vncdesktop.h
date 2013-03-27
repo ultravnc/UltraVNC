@@ -341,7 +341,7 @@ public:
     // 28 Mar 2008 jdp
     void SetBlockInputState(bool newstate);
     bool GetBlockInputState() { return m_bIsInputDisabledByClient; }
-    bool block_input();
+    bool block_input(bool state);
 	BOOL InitWindow();
 	HANDLE trigger_events[6];
 	HANDLE restart_event;
