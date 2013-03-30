@@ -470,6 +470,8 @@ vncClientUpdateThread::EnableUpdates(BOOL enable)
 	vnclog.Print(LL_INTINFO, VNCLOG("enable/disable synced\n"));
 }
 
+extern bool g_DesktopThread_running;
+
 void*
 vncClientUpdateThread::run_undetached(void *arg)
 {
@@ -483,12 +485,16 @@ vncClientUpdateThread::run_undetached(void *arg)
 	updates_sent=0;
 
 	vnclog.Print(LL_INTINFO, VNCLOG("starting update thread\n"));
-
-	while (1)
+	//Make sure we never can get locked by the initail m_initial_update) wait loop
+	//After 5 sec cont.
+	int esc_counter=0;
+	while (g_DesktopThread_running)
 	{		
 		while (!m_client->m_initial_update) 
 			{
+				esc_counter++;
 				Sleep(50);
+				if (esc_counter>100) break;
 #ifdef _DEBUG
 			char			szText[256];
 			sprintf(szText,"!m_initial_update \n");
@@ -558,7 +564,7 @@ vncClientUpdateThread::run_undetached(void *arg)
 						{
 							break;
 						}
-				}while(true);
+				}while(g_DesktopThread_running);
 
 			}
 			}
@@ -2151,7 +2157,7 @@ vncClientThread::run(void *arg)
 	// adzm 2010-08
 	if (!InitSocket()) {
 		m_server->RemoveClient(m_client->GetClientId());
-		return;
+		return; 
 	}
 
 	// GET PROTOCOL VERSION

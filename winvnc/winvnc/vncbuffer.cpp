@@ -1003,6 +1003,7 @@ vncBuffer::ClearCacheRect(const rfb::Rect &dest)
 void
 vncBuffer::ClearBack()
 {
+	m_mainbuff = (BYTE *)m_desktop->OptimisedBlitBuffer();
 	if (m_mainbuff) memcpy(m_backbuff, m_mainbuff, m_desktop->ScreenBuffSize());
 }
 

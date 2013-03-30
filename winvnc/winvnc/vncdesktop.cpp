@@ -99,6 +99,7 @@ PixelCaptureEngine::PixelCaptureEngine()
 		if (OSversion()==2) m_bIsVista=true;
 		else 
 			m_bIsVista=false;
+
 		if (G_USE_PIXEL)
 			m_bIsVista=false;
 	}
@@ -794,8 +795,7 @@ vncDesktop::Shutdown()
 			delete AviGen;
 			AviGen=NULL;
 		}
-#endif
-
+#endif	
 	ShutdownInitWindowthread();
 
 	// Now free all the bitmap stuff

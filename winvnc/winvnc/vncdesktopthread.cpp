@@ -871,13 +871,18 @@ void vncDesktopThread::do_polling(HANDLE& threadHandle, rfb::Region2D& rgncache,
 		}
 	}
 }
+extern bool G_USE_PIXEL;
 void *
 vncDesktopThread::run_undetached(void *arg)
 {
 	//*******************************************************
 	// INIT
 	//*******************************************************
-	testBench();
+	if (OSversion()==2) 
+	{
+		G_USE_PIXEL=false;
+	}
+	else testBench();
 	capture=true;
 	vnclog.Print(LL_INTERR, VNCLOG("Hook changed 1\n"));
 	// Save the thread's "home" desktop, under NT (no effect under 9x)
@@ -1054,7 +1059,8 @@ vncDesktopThread::run_undetached(void *arg)
 			// if no window could be started in 10 seconds something went wrong, close
 			// desktop thread.
 			DWORD status=WaitForSingleObject(m_desktop->restart_event,10000);
-			if (status==WAIT_TIMEOUT) looping=false;
+			if (status==WAIT_TIMEOUT) 
+				looping=false;
 			switch(result)
 			{
 				case WAIT_TIMEOUT:
@@ -1538,6 +1544,8 @@ vncDesktopThread::run_undetached(void *arg)
 		}
 		
 	}//while
+
+	m_server->KillAuthClients();
 
 	stop_hookwatch=true;
 	if (threadHandle)
