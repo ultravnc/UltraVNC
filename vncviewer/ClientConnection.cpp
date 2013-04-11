@@ -651,7 +651,7 @@ DWORD WINAPI ReconnectThreadProc(LPVOID lpParameter)
 	}
 	catch (Exception &e)
 	{
-		if( !cc->m_autoReconnect )
+		if( cc->m_autoReconnect == 0)
 			e.Report();
 		cc->reconnectcounter--;
 		if (cc->reconnectcounter<0) cc->reconnectcounter=0;
@@ -677,7 +677,7 @@ void ClientConnection::Reconnect()
 	}
 	catch (Exception &e)
 	{
-		if( !m_autoReconnect )
+		if( m_autoReconnect == 0)
 			e.Report();
 		reconnectcounter--;
 		if (reconnectcounter<0) reconnectcounter=0;
@@ -3989,7 +3989,7 @@ inline void ClientConnection::SubProcessPointerEvent(int x, int y, DWORD keyflag
 			SendPointerEvent(x_scaled, y_scaled, mask);
 		}
 	} catch (Exception &e) {
-		if( !m_autoReconnect )
+		if( m_autoReconnect ==0)
 			e.Report();
 		PostMessage(m_hwndMain, WM_CLOSE, reconnectcounter, 1);
 	}
@@ -4108,7 +4108,7 @@ inline void ClientConnection::ProcessKeyEvent(int virtKey, DWORD keyData)
 		try {
 			m_keymap->PCtoX(virtKey, keyData, this);
 		} catch (Exception &e) {
-			if( !m_autoReconnect )
+			if( m_autoReconnect ==0)
 				e.Report();
 			PostMessage(m_hwndMain, WM_CLOSE, reconnectcounter, 1);
 		}
@@ -4158,7 +4158,7 @@ inline void ClientConnection::ProcessKeyEvent(int virtKey, DWORD keyData)
 				vnclog.Print(5, _T("fake L Ctrl pressed\n"));
 			}
 		} catch (Exception &e) {
-			if( !m_autoReconnect )
+			if( m_autoReconnect ==0)
 				e.Report();
 			PostMessage(m_hwndMain, WM_CLOSE, 4, 1);
 		}
@@ -4404,6 +4404,8 @@ void* ClientConnection::run_undetached(void* arg) {
     rdr::U8 msgType;
 
 	// sf@2007 - AutoReconnect
+	// Error, value can be set 0 by gui in that case you get a gray screen
+	if (m_autoReconnect==0) m_autoReconnect=1;
 	while (m_autoReconnect > 0)
 	{
 		try
