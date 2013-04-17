@@ -130,7 +130,7 @@ void testBench()
 
 	if (m_hrootdc != NULL)
 	{
-		if (!DeleteDC(m_hrootdc))
+		if (!ReleaseDC(NULL,m_hrootdc))
 		m_hrootdc = NULL;
 	}
 	if (m_hmemdc != NULL)

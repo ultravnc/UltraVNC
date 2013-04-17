@@ -222,7 +222,8 @@ bool vncDesktop::FastDetectChanges(rfb::Region2D &rgn, rfb::Rect &rect, int nZon
                 {
 					DWORD pid;
 					GetWindowThreadProcessId(hWnd, &pid);
-					HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, 0, pid);
+					HANDLE hProcess = NULL;
+					hProcess = OpenProcess(PROCESS_ALL_ACCESS, 0, pid);
 					RECT* ptritemrect;
 					RECT itemrect;
 					ptritemrect = (RECT*)VirtualAllocEx(hProcess, NULL, sizeof(RECT), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
@@ -240,6 +241,7 @@ bool vncDesktop::FastDetectChanges(rfb::Region2D &rgn, rfb::Rect &rect, int nZon
 					iconregion.assign_union(wrect);
 					VirtualFreeEx(hProcess, ptritemrect, 0, MEM_RELEASE);
 					}
+					if (hProcess) CloseHandle(hProcess);
 				}
 			}
 
@@ -801,7 +803,7 @@ vncDesktop::Shutdown()
 	// Now free all the bitmap stuff
 	if (m_hrootdc != NULL)
 	{
-		if (!DeleteDC(m_hrootdc))
+		if (!ReleaseDC(NULL,m_hrootdc))
 				vnclog.Print(LL_INTERR, VNCLOG("failed to DeleteDC hrootdc\n"));
 		m_hrootdc = NULL;
 	}
