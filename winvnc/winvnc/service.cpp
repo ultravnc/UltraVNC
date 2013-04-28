@@ -862,7 +862,7 @@ void monitor_sessions()
 				if (counter_ipcheck==30)
 				{
 					counter_ipcheck=0;
-					if (!CheckIPAddrString()) OlddwSessionId=99;  //force restart
+					//if (!CheckIPAddrString()) OlddwSessionId=99;  //force restart
 				}
 
 									if (lpfnWTSGetActiveConsoleSessionId.isValid())

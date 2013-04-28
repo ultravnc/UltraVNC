@@ -591,7 +591,7 @@ char old_buflen=0;
 int dns_counter=0; // elimate to many dns requests once every 250s is ok
 void 
 vncMenu::GetIPAddrString(char *buffer, int buflen) {
-	if (old_buflen!=0 && dns_counter<50)
+	if (old_buflen!=0 && dns_counter<12)
 	{
 		dns_counter++;
 		strcpy(buffer,old_buffer);
@@ -622,7 +622,9 @@ vncMenu::GetIPAddrString(char *buffer, int buflen) {
 		if (ph->h_addr_list[i+1] != 0)
 			strncat(buffer, ", ", (buflen-1)-strlen(buffer));
     }
-	if (strlen(buffer)<512) // just in case it would be bigger then our buffer
+
+
+	if (strlen(buffer)<512 && m_server->AuthClientCount()==0 ) // just in case it would be bigger then our buffer
 	{
 		if (old_buflen!=0)//first time old_buflen=0
 		{
@@ -638,6 +640,7 @@ vncMenu::GetIPAddrString(char *buffer, int buflen) {
 			}
 		}
 	old_buflen=strlen(buffer);
+	memset(old_buffer,0,512);
 	strncpy(old_buffer,buffer,strlen(buffer));
 	}
 }
