@@ -764,6 +764,7 @@ public:
 	HWND m_hwndMain;
 	HANDLE rcth;
 	void ReadExact(char *buf, int bytes);
+	bool new_ultra_server;
 };
 
 // Some handy classes for temporary GDI object selection

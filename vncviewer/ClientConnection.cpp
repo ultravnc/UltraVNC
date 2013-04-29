@@ -296,6 +296,7 @@ ClientConnection::ClientConnection(VNCviewerApp *pApp, LPTSTR host, int port)
 
 void ClientConnection::Init(VNCviewerApp *pApp)
 {
+	new_ultra_server=false;
 	Pressed_Cancel=false;
 	saved_set=false;
 	m_hwndcn = 0;
@@ -2375,6 +2376,7 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 	switch(authScheme)
 	{
 	case rfbUltraVNC:
+		new_ultra_server=true;
 		m_fServerKnowsFileTransfer = true;
 		break;
 	case rfbUltraVNC_SecureVNCPluginAuth_new:
@@ -3389,6 +3391,12 @@ void ClientConnection::SetFormatAndEncodings()
 
 	bool useCompressLevel = false;
 	int i = 0;
+	//no u2 supported, even when it was selected
+	//
+	if (!new_ultra_server)
+	{
+		if ( m_opts.m_PreferredEncoding == rfbEncodingUltra2) m_opts.m_PreferredEncoding=rfbEncodingZRLE;
+	}
 	// Put the preferred encoding first, and change it if the
 	// preferred encoding is not actually usable.
 	for (i = LASTENCODING; i >= rfbEncodingRaw; i--)
@@ -3651,7 +3659,7 @@ ClientConnection::CloseWindows()
 	if (m_hwndMain) SendMessage(m_hwndMain, WM_CLOSE, 0, 1);
 }
 ClientConnection::~ClientConnection()
-{
+{	
 	if (m_hwndStatus)
 		EndDialog(m_hwndStatus,0);
 	Sleep(500);
@@ -5207,7 +5215,8 @@ inline void ClientConnection::ReadScreenUpdate()
 		else if (avg_kbitsPerSecond < 10000 && avg_kbitsPerSecond > 256 && (m_nConfig != 2))
 		{
 			m_nConfig = 1;
-			m_opts.m_PreferredEncoding = rfbEncodingUltra2;
+			if (new_ultra_server) m_opts.m_PreferredEncoding = rfbEncodingUltra2;
+			else m_opts.m_PreferredEncoding = rfbEncodingZRLE; //rfbEncodingZlibHex;
 			//m_opts.m_Use8Bit = rfbPFFullColors; // Max colors
 			m_opts.m_fEnableCache = false;
 			m_pendingFormatChange = true;
