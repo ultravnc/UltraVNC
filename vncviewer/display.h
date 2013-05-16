@@ -41,7 +41,7 @@ public:
 	void Init();
 	void checkmonitors();
 	int nr_monitors;
-	mymonitor monarray[9];
+	mymonitor monarray[15];
 
 private:
 	HINSTANCE hUser32;
