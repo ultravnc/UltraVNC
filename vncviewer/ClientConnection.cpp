@@ -2010,7 +2010,7 @@ void ClientConnection::NegotiateProtocolVersion()
 			{
 				//adzm 2009-07-19 - Auto-accept the connection if it is unencrypted if that option is specified
 
-				int returnvalue=MessageBox(m_hwndMain, "You have specified an encryption plugin, however this connection in unencrypted! Do you want to continue?", "Accept insecure connection", MB_YESNO | MB_ICONEXCLAMATION | MB_TOPMOST);
+				int returnvalue=MessageBox(m_hwndMain, "You have specified an encryption plugin, however this connection is unencrypted! Do you want to continue?", "Accept insecure connection", MB_YESNO | MB_ICONEXCLAMATION | MB_TOPMOST);
 				if (returnvalue==IDNO)
 				{
 					throw WarningException("You refused the insecure connection.");
@@ -2364,7 +2364,7 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 
 			//adzm 2009-07-19 - Auto-accept the connection if it is unencrypted if that option is specified
 			if (!m_opts.m_fAutoAcceptNoDSM) {
-				int returnvalue=MessageBox(m_hwndMain, "You have specified an encryption plugin, however this connection in unencrypted! Do you want to continue?", "Accept insecure connection", MB_YESNO | MB_ICONEXCLAMATION | MB_TOPMOST);
+				int returnvalue=MessageBox(m_hwndMain, "You have specified an encryption plugin, however this connection is unencrypted! Do you want to continue?", "Accept insecure connection", MB_YESNO | MB_ICONEXCLAMATION | MB_TOPMOST);
 				if (returnvalue==IDNO)
 				{
 					throw WarningException("You refused the insecure connection.");
