@@ -757,6 +757,7 @@ vncProperties::DialogProc(HWND hwnd,
 
 				// Save the password
 				char passwd[MAXPWLEN+1];
+				char passwd2[MAXPWLEN+1];
 				// TightVNC method
 				int len = GetDlgItemText(hwnd, IDC_PASSWORD, (LPSTR) &passwd, MAXPWLEN+1);
 				if (strcmp(passwd, "~~~~~~~~") != 0) {
@@ -772,10 +773,10 @@ vncProperties::DialogProc(HWND hwnd,
 					}
 				}
 
-				memset(passwd, '\0', MAXPWLEN+1); //PGM
+				memset(passwd2, '\0', MAXPWLEN+1); //PGM
 				len = 0; //PGM
-				len = GetDlgItemText(hwnd, IDC_PASSWORD2, (LPSTR) &passwd, MAXPWLEN+1); //PGM
-				if (strcmp(passwd, "~~~~~~~~") != 0) { //PGM
+				len = GetDlgItemText(hwnd, IDC_PASSWORD2, (LPSTR) &passwd2, MAXPWLEN+1); //PGM
+				if (strcmp(passwd2, "~~~~~~~~") != 0) { //PGM
 					if (len == 0) //PGM
 					{ //PGM
 						vncPasswd::FromClear crypt2; //PGM
@@ -783,26 +784,19 @@ vncProperties::DialogProc(HWND hwnd,
 					} //PGM
 					else //PGM
 					{ //PGM
-						vncPasswd::FromText crypt2(passwd); //PGM
+						vncPasswd::FromText crypt2(passwd2); //PGM
 						_this->m_server->SetPassword2(crypt2); //PGM
 					} //PGM
 				} //PGM
 
-				memset(passwd, '\0', MAXPWLEN+1); //PGM
-				len = 0; //PGM
-				len = GetDlgItemText(hwnd, IDC_PASSWORD2, (LPSTR) &passwd, MAXPWLEN+1); //PGM
-				if (strcmp(passwd, "~~~~~~~~") != 0) { //PGM
-					if (len == 0) //PGM
-					{ //PGM
-						vncPasswd::FromClear crypt2; //PGM
-						_this->m_server->SetPassword2(crypt2); //PGM
-					} //PGM
-					else //PGM
-					{ //PGM
-						vncPasswd::FromText crypt2(passwd); //PGM
-						_this->m_server->SetPassword2(crypt2); //PGM
-					} //PGM
-				} //PGM
+
+				//avoid readonly and full passwd being set the same
+				if (strcmp(passwd, "~~~~~~~~") != 0 && strcmp(passwd2, "~~~~~~~~") != 0) { 
+					if (strcmp(passwd,passwd2)==0)
+					{
+						MessageBox(NULL,"View only and full password are the same\nRunning in view only mode","Warning",0);
+					}					
+				} 
 
 				// Save the new settings to the server
 				int state = SendDlgItemMessage(hwnd, IDC_PORTNO_AUTO, BM_GETCHECK, 0, 0);
