@@ -810,15 +810,15 @@ void vncDesktopThread::do_polling(HANDLE& threadHandle, rfb::Region2D& rgncache,
 
 	m_desktop->m_buffer.SetAccuracy(m_desktop->m_server->TurboMode() ? 8 : 4); 
 
-	//if (cursormoved)
-	//	m_lLastMouseMoveTime = lTime;
+	if (cursormoved)
+		m_lLastMouseMoveTime = lTime;
 	if (cursormoved) m_desktop->idle_counter=0;
 	if ((m_desktop->m_server->PollFullScreen()) || (!m_desktop->can_be_hooked && !cursormoved))
 	{
 		int timeSinceLastMouseMove = lTime - m_lLastMouseMoveTime;
 		if (timeSinceLastMouseMove > 150) // 150 ms pause after a Mouse move 
 		{
-			m_lLastMouseMoveTime = lTime;
+			//m_lLastMouseMoveTime = lTime;
 			++fullpollcounter;
 			rfb::Rect r = m_desktop->GetSize();
 			// THIS FUNCTION IS A PIG. It uses too much CPU on older machines (PIII, P4)
