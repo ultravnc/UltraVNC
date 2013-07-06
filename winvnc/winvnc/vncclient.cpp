@@ -81,6 +81,8 @@ bool isDirectoryTransfer(const char *szFileName);
 extern BOOL SPECIAL_SC_PROMPT;
 extern BOOL SPECIAL_SC_EXIT;
 int getinfo(char mytext[1024]);
+int calc_updates=0;
+int old_calc_updates=0;
 
 // take a full path & file name, split it, prepend prefix to filename, then merge it back
 static std::string make_temp_filename(const char *szFullPath)
@@ -797,18 +799,16 @@ vncClientUpdateThread::run_undetached(void *arg)
 			// Send updates to the client - this implicitly clears
 			// the supplied update tracker
 #ifdef _DEBUG
+			calc_updates=GetTickCount();
+			if (calc_updates==old_calc_updates) calc_updates++;
 			char			szText[256];
-			sprintf(szText,"SendUpdate start \n");
+			sprintf(szText,"SendUpdate %i \n", 1000 / (calc_updates-old_calc_updates));
+			old_calc_updates=calc_updates;
 			OutputDebugString(szText);		
 #endif
 			if (m_client->SendUpdate(update)) {
 				updates_sent++;
 				m_client->m_incr_rgn.clear();
-#ifdef _DEBUG
-			char			szText[256];
-			sprintf(szText,"SendUpdate returned true, m_incr_rgn cleared \n");
-			OutputDebugString(szText);		
-#endif
 			}
 			else
 			{

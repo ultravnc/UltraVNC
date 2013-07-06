@@ -426,10 +426,20 @@ bool vncDesktop::FastDetectChanges(rfb::Region2D &rgn, rfb::Rect &rect, int nZon
 	// after x time, force some timeout
 	if (change_found)
 	{
+		#ifdef _DEBUG
+			char			szText[256];
+			sprintf(szText,"Change found %d\n",GetTickCount());
+			OutputDebugString(szText);		
+		#endif
 		idle_counter=0;
 	}
 	else
 	{
+		#ifdef _DEBUG
+			char			szText[256];
+			sprintf(szText,"Change idle %d\n",GetTickCount());
+			OutputDebugString(szText);		
+		#endif
 		idle_counter=idle_counter+5;
 	}
 	if (idle_counter>20) 

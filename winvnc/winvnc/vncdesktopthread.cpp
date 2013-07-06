@@ -809,21 +809,39 @@ void vncDesktopThread::do_polling(HANDLE& threadHandle, rfb::Region2D& rgncache,
 	DWORD lTime = timeGetTime();
 
 	m_desktop->m_buffer.SetAccuracy(m_desktop->m_server->TurboMode() ? 8 : 4); 
+	#ifdef _DEBUG
+			char			szText[256];
+			sprintf(szText,"Do polling %d\n",GetTickCount());
+			OutputDebugString(szText);		
+	#endif
 
-	if (cursormoved)
-		m_lLastMouseMoveTime = lTime;
-	if (cursormoved) m_desktop->idle_counter=0;
+	if (cursormoved) 
+		{
+			m_desktop->idle_counter=0;
+			m_lLastMouseMoveTime = lTime;
+		}
 	if ((m_desktop->m_server->PollFullScreen()) || (!m_desktop->can_be_hooked && !cursormoved))
 	{
 		int timeSinceLastMouseMove = lTime - m_lLastMouseMoveTime;
-		if (timeSinceLastMouseMove > 150) // 150 ms pause after a Mouse move 
+			
+		if (timeSinceLastMouseMove > 50) // 150 ms pause after a Mouse move 
 		{
+			#ifdef _DEBUG
+				char			szText[256];
+				sprintf(szText,"Do polling2 %d\n",GetTickCount());
+				OutputDebugString(szText);		
+			#endif
 			//m_lLastMouseMoveTime = lTime;
 			++fullpollcounter;
 			rfb::Rect r = m_desktop->GetSize();
 			// THIS FUNCTION IS A PIG. It uses too much CPU on older machines (PIII, P4)
 			if (vncService::InputDesktopSelected()!=2)
 			{
+				#ifdef _DEBUG
+					char			szText[256];
+					sprintf(szText,"FastDetectChanges %d\n",GetTickCount());
+					OutputDebugString(szText);		
+				#endif
 				if (m_desktop->FastDetectChanges(rgncache, r, 0, true)) capture=false;
 			}
 			else
