@@ -260,7 +260,7 @@ public:
 		mutex.lock();
 #ifdef _DEBUG
 			char			szText[256];
-			sprintf(szText,"lock %i \n",nummer);
+			sprintf(szText,"lock %i %d\n",nummer,GetTickCount());
 			if (nummer>200) OutputDebugString(szText);		
 #endif
 	}
@@ -268,7 +268,7 @@ public:
 		mutex.unlock(); 
 		#ifdef _DEBUG
 			char			szText[256];
-			sprintf(szText,"unlock %i\n",nummer);
+			sprintf(szText,"unlock %i %d\n",nummer,GetTickCount());
 			if (nummer>200) OutputDebugString(szText);		
 #endif
 	}
