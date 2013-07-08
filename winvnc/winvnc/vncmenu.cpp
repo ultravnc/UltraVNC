@@ -473,7 +473,7 @@ vncMenu::~vncMenu()
 
 	if (hWTSDll)
 	{
-		WTSUNREGISTERSESSIONNOTIFICATION FunctionWTSUnRegisterSessionNotification;
+		WTSUNREGISTERSESSIONNOTIFICATION FunctionWTSUnRegisterSessionNotification=NULL;
 		FunctionWTSUnRegisterSessionNotification = (WTSUNREGISTERSESSIONNOTIFICATION)GetProcAddress((HINSTANCE)hWTSDll,"WTSUnRegisterSessionNotification" );
 		if (FunctionWTSUnRegisterSessionNotification)
 			FunctionWTSUnRegisterSessionNotification( m_hwnd );

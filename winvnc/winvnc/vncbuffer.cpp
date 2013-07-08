@@ -615,6 +615,7 @@ vncBuffer::GrabRegion(rfb::Region2D &src,BOOL driver,BOOL capture)
 void
 vncBuffer::CheckRegion(rfb::Region2D &dest,rfb::Region2D &cacheRgn ,const rfb::Region2D &src)
 {
+	if (!FastCheckMainbuffer()) return;
 	rfb::RectVector rects;
 	rfb::RectVector::iterator i;
 
@@ -1068,6 +1069,12 @@ vncBuffer::FastCheckMainbuffer() {
 			BOOL result=CheckBuffer();
 			return result;
 		}
+	else if (m_mainbuff != tmp)
+	{
+		//m_freemainbuff=true;
+		BOOL result=CheckBuffer();
+		return result;
+	}
 	return TRUE;
 }
 
