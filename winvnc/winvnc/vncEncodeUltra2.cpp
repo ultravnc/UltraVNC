@@ -122,7 +122,7 @@ vncEncodeUltra2::EncodeRect(BYTE *source, VSocket *outConn, BYTE *dest, const rf
 	rect.br.y=rect2.br.y;
 	rect.tl.x=rect2.tl.x;
 	rect.tl.y=rect2.tl.y;
-	while(((rect.br.x-rect.tl.x))/8*8!=(rect.br.x-rect.tl.x))
+	/*while(((rect.br.x-rect.tl.x))/8*8!=(rect.br.x-rect.tl.x))
 		{
 		
 			if (rect.br.x+1<=framebufferWidth) rect.br.x+=1;
@@ -135,7 +135,7 @@ vncEncodeUltra2::EncodeRect(BYTE *source, VSocket *outConn, BYTE *dest, const rf
 			if (rect.br.y+1<=framebufferHeight) rect.br.y+=1;
 			else if (rect.tl.y-1>=0) rect.tl.y-=1;
 			
-		}
+		}*/
 
 	const int rectW = rect.br.x - rect.tl.x;
 	const int rectH = rect.br.y - rect.tl.y;
