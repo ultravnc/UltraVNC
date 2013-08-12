@@ -66,8 +66,7 @@ vncDesktopThread::copy_bitmaps_to_buffer(ULONG i,rfb::Region2D &rgncache,rfb::Up
 		int h = m_desktop->pchanges_buf->pointrect[i].rect.bottom-m_desktop->pchanges_buf->pointrect[i].rect.top;
 		//vnclog.Print(LL_INTINFO, VNCLOG("Driver ************* %i %i %i %i \n"),x,y,w,h);
 
-		if (!ClipRect(&x, &y, &w, &h, m_desktop->m_bmrect.tl.x, m_desktop->m_bmrect.tl.y,
-			m_desktop->m_bmrect.br.x-m_desktop->m_bmrect.tl.x, m_desktop->m_bmrect.br.y-m_desktop->m_bmrect.tl.y)) return;
+		if (!ClipRect(&x, &y, &w, &h, 0,0,m_desktop->m_bmrect.br.x, m_desktop->m_bmrect.br.y)) return;
 		//vnclog.Print(LL_INTINFO, VNCLOG("Driver ************* %i %i %i %i \n"),x,y,w,h);
 		rect.tl.x = x;
 		rect.br.x = x+w;
@@ -87,8 +86,7 @@ vncDesktopThread::copy_bitmaps_to_buffer(ULONG i,rfb::Region2D &rgncache,rfb::Up
                                     int yy=y;
                                     int hh=h;
                                     int ww=w;
-                                    if (ClipRect(&xx,&yy,&ww,&hh,m_desktop->m_bmrect.tl.x, m_desktop->m_bmrect.tl.y,
-                                                m_desktop->m_bmrect.br.x-m_desktop->m_bmrect.tl.x, m_desktop->m_bmrect.br.y-m_desktop->m_bmrect.tl.y))
+                                    if (ClipRect(&xx,&yy,&ww,&hh,0,0, m_desktop->m_bmrect.br.x, m_desktop->m_bmrect.br.y))
 									{
                                     rect.tl.x=xx;
                                     rect.tl.y=yy;
@@ -101,8 +99,7 @@ vncDesktopThread::copy_bitmaps_to_buffer(ULONG i,rfb::Region2D &rgncache,rfb::Up
 // Fix Eckerd
 									x=x+dx;;
 									y=y+dy;;
-									if (!ClipRect(&x,&y,&w,&h,m_desktop->m_bmrect.tl.x, m_desktop->m_bmrect.tl.y,
-												m_desktop->m_bmrect.br.x-m_desktop->m_bmrect.tl.x, m_desktop->m_bmrect.br.y-m_desktop->m_bmrect.tl.y)) return;
+									if (!ClipRect(&x,&y,&w,&h,0,0,m_desktop->m_bmrect.br.x, m_desktop->m_bmrect.br.y)) return;
 //////////////////////
 // Fix Eckerd
 									rect.tl.x=x-dx;
@@ -154,27 +151,6 @@ vncDesktopThread::handle_driver_changes(rfb::Region2D &rgncache,rfb::UpdateTrack
 	if (!m_server->SingleWindow()) m_screen_moved=m_desktop->CalcCopyRects(tracker);
 	else m_screen_moved=true;
 
-/// HEITE01E
-// buffer was overloaded, so we use the bounding rect
-/*	if (nr_updates>2000)
-	{
-		rfb::Rect rect;
-		int x = m_desktop->pchanges_buf->pointrect[0].rect.left;
-		int w = m_desktop->pchanges_buf->pointrect[0].rect.right-m_desktop->pchanges_buf->pointrect[0].rect.left;
-		int y = m_desktop->pchanges_buf->pointrect[0].rect.top;
-		int h = m_desktop->pchanges_buf->pointrect[0].rect.bottom-m_desktop->pchanges_buf->pointrect[0].rect.top;
-		if (ClipRect(&x, &y, &w, &h, m_desktop->m_bmrect.tl.x, m_desktop->m_bmrect.tl.y,
-			m_desktop->m_bmrect.br.x-m_desktop->m_bmrect.tl.x, m_desktop->m_bmrect.br.y-m_desktop->m_bmrect.tl.y))
-		{
-		rect.tl.x = x;
-		rect.br.x = x+w;
-		rect.tl.y = y;
-		rect.br.y = y+h;
-		rgncache=rgncache.union_(rect);
-		m_desktop->m_videodriver->oldaantal=counter;
-		}
-	    return TRUE;
-	}*/
 	if (m_server->SingleWindow()) m_screen_moved=true;
 	if (oldaantal<counter)
 		{
@@ -388,7 +364,7 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 				
 				
 				//BOOL screensize_changed=false;
-				BOOL monitor_changed=false;
+				BOOL monitor_changed=true;
 				rfbServerInitMsg oldscrinfo;
 				//*******************************************************
 				// Lock Buffers from here
@@ -562,17 +538,6 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 						// Cliprect, buffer coordinates
 						if (m_desktop->multi_monitor)
 						{
-							/* JnZn558
-							m_desktop->m_SWOffsetx=0;
-							m_desktop->m_SWOffsety=0;
-							m_server->SetSWOffset(m_desktop->m_SWOffsetx,m_desktop->m_SWOffsety);
-
-							m_desktop->m_Cliprect.tl.x=0;
-							m_desktop->m_Cliprect.tl.y=0;
-							m_desktop->m_Cliprect.br.x=m_desktop->mymonitor[2].offsetx+m_desktop->mymonitor[2].Width-m_desktop->mymonitor[2].offsetx;
-							m_desktop->m_Cliprect.br.y=m_desktop->mymonitor[2].offsety+m_desktop->mymonitor[2].Height-m_desktop->mymonitor[2].offsety;
-							*/
-
 							vnclog.Print(LL_INTINFO, VNCLOG("Request Monitor %d\n"), m_desktop->m_current_monitor);
 							int mon[2] = {0};
 							switch (m_desktop->m_current_monitor) {
@@ -661,43 +626,34 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 
 								default:
 								{
-									m_desktop->m_SWOffsetx=m_desktop->mymonitor[3].offsetx;
-									m_desktop->m_SWOffsety=m_desktop->mymonitor[3].offsety;
+									m_desktop->m_SWOffsetx=0;
+									m_desktop->m_SWOffsety=0;
 									m_server->SetSWOffset(m_desktop->m_SWOffsetx,m_desktop->m_SWOffsety);
-									
-									m_desktop->m_Cliprect.tl.x=m_desktop->m_SWOffsetx;
-									m_desktop->m_Cliprect.tl.y=m_desktop->m_SWOffsety;
-									m_desktop->m_Cliprect.br.x=m_desktop->mymonitor[3].offsetx+m_desktop->mymonitor[3].Width;
-									m_desktop->m_Cliprect.br.y=m_desktop->mymonitor[3].offsety+m_desktop->mymonitor[3].Height;
+
+									m_desktop->m_Cliprect.tl.x=0;
+									m_desktop->m_Cliprect.tl.y=0;
+									m_desktop->m_Cliprect.br.x=m_desktop->mymonitor[3].Width;
+									m_desktop->m_Cliprect.br.y=m_desktop->mymonitor[3].Height;
+							
 									rc.right = m_desktop->mymonitor[3].Width;
 									rc.bottom = m_desktop->mymonitor[3].Height;
+									vnclog.Print(LL_INTINFO, VNCLOG("Monitor %d: width = %d height = %d\n"), m_desktop->m_current_monitor, rc.right, rc.bottom);
 
-									vnclog.Print(LL_INTINFO, VNCLOG("All Monitor: width = %d height = %d\n"), rc.right, rc.bottom);
 								}
 							}
 						}
 						else
 						{
-							/* JnZn558
-							m_desktop->m_SWOffsetx=m_desktop->mymonitor[0].offsetx-m_desktop->mymonitor[2].offsetx;
-							m_desktop->m_SWOffsety=m_desktop->mymonitor[0].offsety-m_desktop->mymonitor[2].offsety;
-							m_server->SetSWOffset(m_desktop->m_SWOffsetx,m_desktop->m_SWOffsety);
-
-							m_desktop->m_Cliprect.tl.x=m_desktop->mymonitor[0].offsetx-m_desktop->mymonitor[2].offsetx;
-							m_desktop->m_Cliprect.tl.y=m_desktop->mymonitor[0].offsety-m_desktop->mymonitor[2].offsety;
-							m_desktop->m_Cliprect.br.x=m_desktop->mymonitor[0].offsetx+m_desktop->mymonitor[0].Width-m_desktop->mymonitor[2].offsetx;
-							m_desktop->m_Cliprect.br.y=m_desktop->mymonitor[0].offsety+m_desktop->mymonitor[0].Height-m_desktop->mymonitor[2].offsety;
-							*/
 							int nCurrentMon = m_desktop->m_current_monitor - 1;
 								
-							m_desktop->m_SWOffsetx=m_desktop->mymonitor[nCurrentMon].offsetx;
-							m_desktop->m_SWOffsety=m_desktop->mymonitor[nCurrentMon].offsety;
+							m_desktop->m_SWOffsetx=m_desktop->mymonitor[nCurrentMon].offsetx-m_desktop->mymonitor[3].offsetx;
+							m_desktop->m_SWOffsety=m_desktop->mymonitor[nCurrentMon].offsety-m_desktop->mymonitor[3].offsety;
 							m_server->SetSWOffset(m_desktop->m_SWOffsetx,m_desktop->m_SWOffsety);
 
-							m_desktop->m_Cliprect.tl.x=m_desktop->mymonitor[nCurrentMon].offsetx;
-							m_desktop->m_Cliprect.tl.y=m_desktop->mymonitor[nCurrentMon].offsety;
-							m_desktop->m_Cliprect.br.x=m_desktop->mymonitor[nCurrentMon].offsetx+m_desktop->mymonitor[nCurrentMon].Width;
-							m_desktop->m_Cliprect.br.y=m_desktop->mymonitor[nCurrentMon].offsety+m_desktop->mymonitor[nCurrentMon].Height;
+							m_desktop->m_Cliprect.tl.x=m_desktop->mymonitor[nCurrentMon].offsetx-m_desktop->mymonitor[3].offsetx;
+							m_desktop->m_Cliprect.tl.y=m_desktop->mymonitor[nCurrentMon].offsety-m_desktop->mymonitor[3].offsety;
+							m_desktop->m_Cliprect.br.x=m_desktop->mymonitor[nCurrentMon].offsetx-m_desktop->mymonitor[3].offsetx+m_desktop->mymonitor[nCurrentMon].Width;
+							m_desktop->m_Cliprect.br.y=m_desktop->mymonitor[nCurrentMon].offsety-m_desktop->mymonitor[3].offsety+m_desktop->mymonitor[nCurrentMon].Height;
 							
 							rc.right = m_desktop->mymonitor[nCurrentMon].Width;
 							rc.bottom = m_desktop->mymonitor[nCurrentMon].Height;
@@ -1290,7 +1246,7 @@ vncDesktopThread::run_undetached(void *arg)
 												int y = m_desktop->m_cursorpos.tl.y;
 												int h = m_desktop->m_cursorpos.br.y-y;
 												if (ClipRect(&x, &y, &w, &h, m_desktop->m_bmrect.tl.x, m_desktop->m_bmrect.tl.y,
-													m_desktop->m_bmrect.br.x-m_desktop->m_bmrect.tl.x, m_desktop->m_bmrect.br.y-m_desktop->m_bmrect.tl.y))
+													m_desktop->m_bmrect.br.x+m_desktop->m_bmrect.tl.x, m_desktop->m_bmrect.br.y+m_desktop->m_bmrect.tl.y))
 													{
 														rect.tl.x = x;
 														rect.br.x = x+w;
@@ -1374,7 +1330,7 @@ vncDesktopThread::run_undetached(void *arg)
 																int y = m_desktop->m_cursorpos.tl.y;
 																int h = m_desktop->m_cursorpos.br.y-y;
 																if (ClipRect(&x, &y, &w, &h, m_desktop->m_bmrect.tl.x, m_desktop->m_bmrect.tl.y,
-																	m_desktop->m_bmrect.br.x-m_desktop->m_bmrect.tl.x, m_desktop->m_bmrect.br.y-m_desktop->m_bmrect.tl.y))
+																	m_desktop->m_bmrect.br.x+m_desktop->m_bmrect.tl.x, m_desktop->m_bmrect.br.y+m_desktop->m_bmrect.tl.y))
 																		{
 																			rect.tl.x = x;
 																			rect.br.x = x+w;
@@ -1406,7 +1362,7 @@ vncDesktopThread::run_undetached(void *arg)
 																int y = m_desktop->m_cursorpos.tl.y;
 																int h = m_desktop->m_cursorpos.br.y-y;
 																if (ClipRect(&x, &y, &w, &h, m_desktop->m_bmrect.tl.x, m_desktop->m_bmrect.tl.y,
-																	m_desktop->m_bmrect.br.x-m_desktop->m_bmrect.tl.x, m_desktop->m_bmrect.br.y-m_desktop->m_bmrect.tl.y))
+																	m_desktop->m_bmrect.br.x+m_desktop->m_bmrect.tl.x, m_desktop->m_bmrect.br.y+m_desktop->m_bmrect.tl.y))
 																		{
 																			rect.tl.x = x;
 																			rect.br.x = x+w;

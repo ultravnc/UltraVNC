@@ -271,15 +271,7 @@ if (m_server->SingleWindow())
 	}
 	}
 else
-	{
-	/* JnZn558
-	m_SWOffsetx=0;
-	m_SWOffsety=0;
-	m_Cliprect.tl.x=0;
-	m_Cliprect.tl.y=0;
-	m_Cliprect.br.x=m_bmrect.br.x;
-	m_Cliprect.br.y=m_bmrect.br.y;
-	*/
+	{	
 	m_SWOffsetx=m_bmrect.tl.x;
 	m_SWOffsety=m_bmrect.tl.y;
 	m_Cliprect.tl.x=m_bmrect.tl.x;
