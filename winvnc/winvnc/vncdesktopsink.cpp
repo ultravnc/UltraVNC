@@ -407,7 +407,7 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		else
 		{
 				_this->m_displaychanged = TRUE;
-				_this->m_hookdriver=true;
+				_this->m_hookdriver=false;
 				vnclog.Print(LL_INTERR, VNCLOG("Resolution switch detected, driver NOT active\n"));
 		}
 		return 0;
