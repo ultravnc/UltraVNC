@@ -525,9 +525,7 @@ vncDesktop::vncDesktop()
 	g_Desktop_running=true;
 	hUser32=LoadLibrary("USER32");
 	if (hUser32) pbi = (pBlockInput)GetProcAddress( hUser32, "BlockInput");
-	m_OrigpollingSet=false;
 	no_default_desktop=false;
-	m_Origpolling=false;
 	DriverWantedSet=false;
 	can_be_hooked=false;
 
@@ -702,10 +700,8 @@ vncDesktop::Startup()
 								}
 						}
 				}
-    else
-	vnclog.Print(LL_INTINFO, VNCLOG("Driver option disabled \n"));
-	if (m_Origpolling) m_server->PollFullScreen(m_Origpolling);
-	m_OrigpollingSet=false;
+    else vnclog.Print(LL_INTINFO, VNCLOG("Driver option disabled \n"));
+
 	
 	if (VideoBuffer())
 	{
@@ -2336,50 +2332,41 @@ BOOL vncDesktop::InitVideoDriver()
 			if (m_videodriver!=NULL)m_videodriver->VIDEODRIVER_start(mymonitor[3].offsetx,mymonitor[3].offsety,mymonitor[3].Width,mymonitor[3].Height);
 		}		
 	vnclog.Print(LL_INTERR, VNCLOG("Start Mirror driver\n"));
-	m_hookdriver=true;
-	m_hookdll=false;
+	
 	// check if driver has mapped the shared memory
 	if (m_videodriver!=NULL)
-	if (!m_videodriver->mypVideoMemory) 
-	{
-		vnclog.Print(LL_INTERR, VNCLOG("Start Mirror driver Failed\n"));
-		vnclog.Print(LL_INTERR, VNCLOG("Using non driver mode\n"));
-		if (m_videodriver!=NULL) delete m_videodriver;
-		m_videodriver=NULL;
-		// If driver selected and fialed to start default to hookdll
-		// 
-		m_hookdriver=false;
-		m_hookdll=true;
-		// sf@2002 - Necessary for the following InitHookSettings() call
-		// Remember old states
-		DriverWantedSet=true;
-		DriverWanted=m_server->Driver();
-		HookWanted=m_server->Hook();
-		m_server->Driver(false);
-		m_server->Hook(true);
-		return false;
-	}
+			if (!m_videodriver->mypVideoMemory) 
+			{
+				vnclog.Print(LL_INTERR, VNCLOG("Start Mirror driver Failed\n"));
+				vnclog.Print(LL_INTERR, VNCLOG("Using non driver mode\n"));
+				if (m_videodriver!=NULL) delete m_videodriver;
+				m_videodriver=NULL;
+				// If driver selected and fialed to start default to hookdll
+				// 
+				m_hookdriver=false;
+				m_hookdll=true;
+				// sf@2002 - Necessary for the following InitHookSettings() call
+				// Remember old states
+				DriverWantedSet=true;
+				DriverWanted=m_server->Driver();
+				HookWanted=m_server->Hook();
+				m_server->Driver(false);
+				m_server->Hook(true);
+				return false;
+			}
+
+	m_hookdriver=true;
+	m_hookdll=false;
 	
 	if (m_videodriver!=NULL)
-	if (m_videodriver->mypVideoMemory)
-	{
-		vnclog.Print(LL_INTERR, VNCLOG("Driver Used\n"));
-		if (!m_videodriver->mypVideoMemory)
+		if (m_videodriver->mypVideoMemory)
 		{
-			vnclog.Print(LL_INTERR, VNCLOG("Unable to map memory\n"));
-			delete m_videodriver;
-			m_videodriver=NULL;
-			// If driver selected and fialed to start default to hookdll
-			// 
-			m_hookdriver=false;
-			m_hookdll=true;
-			return false;
-		}
-		vnclog.Print(LL_INTERR, VNCLOG("Shared memory mapped\n"));
-		InvalidateRect(NULL,NULL,TRUE);
+			vnclog.Print(LL_INTERR, VNCLOG("Driver Used\n"));			
+			vnclog.Print(LL_INTERR, VNCLOG("Shared memory mapped\n"));
+			InvalidateRect(NULL,NULL,TRUE);
 
-		return true;
-	}
+			return true;
+		}
 	return true;
 }
 
