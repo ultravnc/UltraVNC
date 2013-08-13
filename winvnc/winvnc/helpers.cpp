@@ -155,12 +155,20 @@ char DSMPluginConfig[512];
 LONG Primary=1;
 LONG Secondary=0;
 
-BUseRegistry = myIniFile_In.ReadInt("admin", "UseRegistry", 0);
+BUseRegistry = myIniFile_In.ReadInt("admin", "UseRegistry", 99);
+if (BUseRegistry==99)
+{
+	//Failed to read, don't write anything to avoid a factoery reset
+	return;
+}
+
+
 if (!myIniFile_Out.WriteInt("admin", "UseRegistry", BUseRegistry))
 {
 		//error
 		DWORD error=GetLastError();
 		MessageBoxSecure(NULL,"Permission denied:Uncheck [_] Protect my computer... in run as dialog or use user with write permission." ,myIniFile_Out.myInifile,MB_ICONERROR);
+		return;
 }
 
 MSLogonRequired=myIniFile_In.ReadInt("admin", "MSLogonRequired", false);
