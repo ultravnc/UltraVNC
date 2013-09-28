@@ -3432,6 +3432,8 @@ void ClientConnection::SetFormatAndEncodings()
 	// desirable!
 	for (i = LASTENCODING; i >= rfbEncodingRaw; i--)
 	{
+		if ( i == rfbEncodingTight && m_opts.m_PreferredEncoding != rfbEncodingTight) m_opts.m_UseEnc[i]=false;
+
 		if ( (m_opts.m_PreferredEncoding != i) &&
 			 (m_opts.m_UseEnc[i]))
 		{
