@@ -181,8 +181,10 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="jaricom.c" />
     <ClCompile Include="jcapimin.c" />
     <ClCompile Include="jcapistd.c" />
+    <ClCompile Include="jcarith.c" />
     <ClCompile Include="jccoefct.c" />
     <ClCompile Include="jccolor.c" />
     <ClCompile Include="jcdctmgr.c" />
@@ -199,6 +201,7 @@
     <ClCompile Include="jctrans.c" />
     <ClCompile Include="jdapimin.c" />
     <ClCompile Include="jdapistd.c" />
+    <ClCompile Include="jdarith.c" />
     <ClCompile Include="jdatadst.c" />
     <ClCompile Include="jdatasrc.c" />
     <ClCompile Include="jdcoefct.c" />
@@ -212,7 +215,6 @@
     <ClCompile Include="jdmerge.c" />
     <ClCompile Include="jdphuff.c" />
     <ClCompile Include="jdpostct.c" />
-    <ClCompile Include="jdsample.c" />
     <ClCompile Include="jdtrans.c" />
     <ClCompile Include="jerror.c" />
     <ClCompile Include="jfdctflt.c" />
@@ -1071,6 +1073,27 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
     </CustomBuild>
     <None Include="ReadMe.txt" />
+    <CustomBuild Include="simd\jcgrammx.asm">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </CustomBuild>
+    <CustomBuild Include="simd\jcgrass2-64.asm">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuild>
+    <CustomBuild Include="simd\jcgrass2.asm">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </CustomBuild>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
