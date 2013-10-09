@@ -1252,10 +1252,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\jdsample.c"
-				>
-			</File>
-			<File
 				RelativePath=".\jdtrans.c"
 				>
 			</File>
@@ -1791,6 +1787,50 @@
 							Description="nasm $(InputFileName) -&gt; $(InputName).obj"
 							CommandLine="nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)/$(InputName).obj simd/$(InputFileName)&#x0D;&#x0A;"
 							Outputs="$(OutDir)/$(InputName).obj"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\simd\jcgrammx.asm"
+					>
+					<FileConfiguration
+						Name="ReleaseLib-Static|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o &quot;$(OutDir)/$(InputName).obj&quot; &quot;simd/$(InputFileName)&quot;"
+							CommandLine="nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o &quot;$(OutDir)/$(InputName).obj&quot; &quot;simd/$(InputFileName)&quot;"
+							Outputs="$(OutDir)/$(InputName).obj"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="ReleaseLib-Static|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\simd\jcgrass2.asm"
+					>
+					<FileConfiguration
+						Name="ReleaseLib-Static|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o &quot;$(OutDir)/$(InputName).obj&quot; &quot;simd/$(InputFileName)&quot;"
+							CommandLine="nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o &quot;$(OutDir)/$(InputName).obj&quot; &quot;simd/$(InputFileName)&quot;"
+							Outputs="$(OutDir)/$(InputName).obj"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="ReleaseLib-Static|x64"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
 						/>
 					</FileConfiguration>
 				</File>
@@ -6930,6 +6970,28 @@
 							Name="VCCustomBuildTool"
 							Description="nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o &quot;$(OutDir)/$(InputName).obj&quot; &quot;simd/$(InputFileName)&quot;"
 							CommandLine="nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o &quot;$(OutDir)/$(InputName).obj&quot; &quot;simd/$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)/$(InputName).obj"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\simd\jcgrass2-64.asm"
+					>
+					<FileConfiguration
+						Name="ReleaseLib-Static|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="ReleaseLib-Static|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o &quot;$(OutDir)/$(InputName).obj&quot; &quot;simd/$(InputFileName)&quot;"
+							CommandLine="nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o &quot;$(OutDir)/$(InputName).obj&quot; &quot;simd/$(InputFileName)&quot;"
 							Outputs="$(OutDir)/$(InputName).obj"
 						/>
 					</FileConfiguration>
