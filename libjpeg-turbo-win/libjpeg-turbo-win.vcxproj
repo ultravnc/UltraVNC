@@ -171,9 +171,12 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="jaricom.c" />
     <ClCompile Include="jcapimin.c" />
     <ClCompile Include="jcapistd.c" />
+    <ClCompile Include="jcarith.c" />
     <ClCompile Include="jccoefct.c" />
+    <ClCompile Include="jccolext.c" />
     <ClCompile Include="jccolor.c" />
     <ClCompile Include="jcdctmgr.c" />
     <ClCompile Include="jchuff.c" />
@@ -189,9 +192,13 @@
     <ClCompile Include="jctrans.c" />
     <ClCompile Include="jdapimin.c" />
     <ClCompile Include="jdapistd.c" />
+    <ClCompile Include="jdarith.c" />
+    <ClCompile Include="jdatadst-tj.c" />
     <ClCompile Include="jdatadst.c" />
+    <ClCompile Include="jdatasrc-tj.c" />
     <ClCompile Include="jdatasrc.c" />
     <ClCompile Include="jdcoefct.c" />
+    <ClCompile Include="jdcolext.c" />
     <ClCompile Include="jdcolor.c" />
     <ClCompile Include="jddctmgr.c" />
     <ClCompile Include="jdhuff.c" />
@@ -200,9 +207,9 @@
     <ClCompile Include="jdmarker.c" />
     <ClCompile Include="jdmaster.c" />
     <ClCompile Include="jdmerge.c" />
+    <ClCompile Include="jdmrgext.c" />
     <ClCompile Include="jdphuff.c" />
     <ClCompile Include="jdpostct.c" />
-    <ClCompile Include="jdsample.c" />
     <ClCompile Include="jdtrans.c" />
     <ClCompile Include="jerror.c" />
     <ClCompile Include="jfdctflt.c" />
@@ -1061,6 +1068,52 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
     </CustomBuild>
     <None Include="ReadMe.txt" />
+    <CustomBuild Include="simd\jcgrammx.asm">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </CustomBuild>
+    <CustomBuild Include="simd\jcgrass2-64.asm">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="simd\jcgrass2.asm">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="bmp.h" />
+    <ClInclude Include="cderror.h" />
+    <ClInclude Include="cdjpeg.h" />
+    <ClInclude Include="jchuff.h" />
+    <ClInclude Include="jdct.h" />
+    <ClInclude Include="jdhuff.h" />
+    <ClInclude Include="jerror.h" />
+    <ClInclude Include="jinclude.h" />
+    <ClInclude Include="jmemsys.h" />
+    <ClInclude Include="jmorecfg.h" />
+    <ClInclude Include="jpegint.h" />
+    <ClInclude Include="jpeglib.h" />
+    <ClInclude Include="jsimd.h" />
+    <ClInclude Include="jsimddct.h" />
+    <ClInclude Include="jversion.h" />
+    <ClInclude Include="rrtimer.h" />
+    <ClInclude Include="rrutil.h" />
+    <ClInclude Include="transupp.h" />
+    <ClInclude Include="turbojpeg.h" />
+    <ClInclude Include="win\config.h" />
+    <ClInclude Include="win\jconfig.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

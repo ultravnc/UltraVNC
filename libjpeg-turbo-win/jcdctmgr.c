@@ -1,10 +1,12 @@
 /*
  * jcdctmgr.c
  *
+ * This file was part of the Independent JPEG Group's software:
  * Copyright (C) 1994-1996, Thomas G. Lane.
+ * Modifications:
  * Copyright (C) 1999-2006, MIYASAKA Masaru.
  * Copyright 2009 Pierre Ossman <ossman@cendio.se> for Cendio AB
- * This file is part of the Independent JPEG Group's software.
+ * Copyright (C) 2011 D. R. Commander
  * For conditions of distribution and use, see the accompanying README file.
  *
  * This file contains the forward-DCT management logic.
@@ -38,6 +40,8 @@ typedef JMETHOD(void, quantize_method_ptr,
 typedef JMETHOD(void, float_quantize_method_ptr,
                 (JCOEFPTR coef_block, FAST_FLOAT * divisors,
                  FAST_FLOAT * workspace));
+
+METHODDEF(void) quantize (JCOEFPTR, DCTELEM *, DCTELEM *);
 
 typedef struct {
   struct jpeg_forward_dct pub;	/* public fields */
@@ -160,7 +164,7 @@ flss (UINT16 val)
  * of in a consecutive manner, yet again in order to allow SIMD
  * routines.
  */
-LOCAL(void)
+LOCAL(int)
 compute_reciprocal (UINT16 divisor, DCTELEM * dtbl)
 {
   UDCTELEM2 fq, fr;
@@ -179,7 +183,7 @@ compute_reciprocal (UINT16 divisor, DCTELEM * dtbl)
     /* fq will be one bit too large to fit in DCTELEM, so adjust */
     fq >>= 1;
     r--;
-  } else if (fr <= (divisor / 2)) { /* fractional part is < 0.5 */
+  } else if (fr <= (divisor / 2U)) { /* fractional part is < 0.5 */
     c++;
   } else { /* fractional part is > 0.5 */
     fq++;
@@ -189,6 +193,9 @@ compute_reciprocal (UINT16 divisor, DCTELEM * dtbl)
   dtbl[DCTSIZE2 * 1] = (DCTELEM) c;       /* correction + roundfactor */
   dtbl[DCTSIZE2 * 2] = (DCTELEM) (1 << (sizeof(DCTELEM)*8*2 - r));  /* scale */
   dtbl[DCTSIZE2 * 3] = (DCTELEM) r - sizeof(DCTELEM)*8; /* shift */
+
+  if(r <= 16) return 0;
+  else return 1;
 }
 
 /*
@@ -232,7 +239,9 @@ start_pass_fdctmgr (j_compress_ptr cinfo)
       }
       dtbl = fdct->divisors[qtblno];
       for (i = 0; i < DCTSIZE2; i++) {
-	compute_reciprocal(qtbl->quantval[i] << 3, &dtbl[i]);
+	if(!compute_reciprocal(qtbl->quantval[i] << 3, &dtbl[i])
+	  && fdct->quantize == jsimd_quantize)
+	  fdct->quantize = quantize;
       }
       break;
 #endif
@@ -266,10 +275,12 @@ start_pass_fdctmgr (j_compress_ptr cinfo)
 	}
 	dtbl = fdct->divisors[qtblno];
 	for (i = 0; i < DCTSIZE2; i++) {
-	  compute_reciprocal(
+	  if(!compute_reciprocal(
 	    DESCALE(MULTIPLY16V16((INT32) qtbl->quantval[i],
 				  (INT32) aanscales[i]),
-		    CONST_BITS-3), &dtbl[i]);
+		    CONST_BITS-3), &dtbl[i])
+	    && fdct->quantize == jsimd_quantize)
+	    fdct->quantize = quantize;
 	}
       }
       break;

@@ -50,51 +50,64 @@ CONFIG_HEADER = $(top_builddir)/config.h $(top_builddir)/jconfig.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libsimd_la_LIBADD =
-am__libsimd_la_SOURCES_DIST = jsimd_i386.c jsimd.h jsimdcfg.inc.h \
-	jsimdext.inc jcolsamp.inc jdct.inc jsimdcpu.asm jccolmmx.asm \
-	jdcolmmx.asm jcsammmx.asm jdsammmx.asm jdmermmx.asm \
-	jcqntmmx.asm jfmmxfst.asm jfmmxint.asm jimmxred.asm \
-	jimmxint.asm jimmxfst.asm jcqnt3dn.asm jf3dnflt.asm \
-	ji3dnflt.asm jcqntsse.asm jfsseflt.asm jisseflt.asm \
-	jccolss2.asm jdcolss2.asm jcsamss2.asm jdsamss2.asm \
+am__libsimd_la_SOURCES_DIST = jsimd_arm.c jsimd_arm_neon.S \
+	jsimd_i386.c jsimd.h jsimdcfg.inc.h jsimdext.inc jcolsamp.inc \
+	jdct.inc jsimdcpu.asm jccolmmx.asm jdcolmmx.asm jcgrammx.asm \
+	jcsammmx.asm jdsammmx.asm jdmermmx.asm jcqntmmx.asm \
+	jfmmxfst.asm jfmmxint.asm jimmxred.asm jimmxint.asm \
+	jimmxfst.asm jcqnt3dn.asm jf3dnflt.asm ji3dnflt.asm \
+	jcqntsse.asm jfsseflt.asm jisseflt.asm jccolss2.asm \
+	jdcolss2.asm jcgrass2.asm jcsamss2.asm jdsamss2.asm \
 	jdmerss2.asm jcqnts2i.asm jfss2fst.asm jfss2int.asm \
 	jiss2red.asm jiss2int.asm jiss2fst.asm jcqnts2f.asm \
-	jiss2flt.asm jsimd_x86_64.c jfsseflt-64.asm jccolss2-64.asm \
-	jdcolss2-64.asm jcsamss2-64.asm jdsamss2-64.asm \
-	jdmerss2-64.asm jcqnts2i-64.asm jfss2fst-64.asm \
-	jfss2int-64.asm jiss2red-64.asm jiss2int-64.asm \
-	jiss2fst-64.asm jcqnts2f-64.asm jiss2flt-64.asm
-@SIMD_I386_FALSE@@SIMD_X86_64_TRUE@am_libsimd_la_OBJECTS =  \
-@SIMD_I386_FALSE@@SIMD_X86_64_TRUE@	jsimd_x86_64.lo \
-@SIMD_I386_FALSE@@SIMD_X86_64_TRUE@	jfsseflt-64.lo \
-@SIMD_I386_FALSE@@SIMD_X86_64_TRUE@	jccolss2-64.lo \
-@SIMD_I386_FALSE@@SIMD_X86_64_TRUE@	jdcolss2-64.lo \
-@SIMD_I386_FALSE@@SIMD_X86_64_TRUE@	jcsamss2-64.lo \
-@SIMD_I386_FALSE@@SIMD_X86_64_TRUE@	jdsamss2-64.lo \
-@SIMD_I386_FALSE@@SIMD_X86_64_TRUE@	jdmerss2-64.lo \
-@SIMD_I386_FALSE@@SIMD_X86_64_TRUE@	jcqnts2i-64.lo \
-@SIMD_I386_FALSE@@SIMD_X86_64_TRUE@	jfss2fst-64.lo \
-@SIMD_I386_FALSE@@SIMD_X86_64_TRUE@	jfss2int-64.lo \
-@SIMD_I386_FALSE@@SIMD_X86_64_TRUE@	jiss2red-64.lo \
-@SIMD_I386_FALSE@@SIMD_X86_64_TRUE@	jiss2int-64.lo \
-@SIMD_I386_FALSE@@SIMD_X86_64_TRUE@	jiss2fst-64.lo \
-@SIMD_I386_FALSE@@SIMD_X86_64_TRUE@	jcqnts2f-64.lo \
-@SIMD_I386_FALSE@@SIMD_X86_64_TRUE@	jiss2flt-64.lo
-@SIMD_I386_TRUE@am_libsimd_la_OBJECTS = jsimd_i386.lo jsimdcpu.lo \
-@SIMD_I386_TRUE@	jccolmmx.lo jdcolmmx.lo jcsammmx.lo \
-@SIMD_I386_TRUE@	jdsammmx.lo jdmermmx.lo jcqntmmx.lo \
-@SIMD_I386_TRUE@	jfmmxfst.lo jfmmxint.lo jimmxred.lo \
-@SIMD_I386_TRUE@	jimmxint.lo jimmxfst.lo jcqnt3dn.lo \
-@SIMD_I386_TRUE@	jf3dnflt.lo ji3dnflt.lo jcqntsse.lo \
-@SIMD_I386_TRUE@	jfsseflt.lo jisseflt.lo jccolss2.lo \
-@SIMD_I386_TRUE@	jdcolss2.lo jcsamss2.lo jdsamss2.lo \
-@SIMD_I386_TRUE@	jdmerss2.lo jcqnts2i.lo jfss2fst.lo \
-@SIMD_I386_TRUE@	jfss2int.lo jiss2red.lo jiss2int.lo \
-@SIMD_I386_TRUE@	jiss2fst.lo jcqnts2f.lo jiss2flt.lo
+	jiss2flt.asm jsimd_x86_64.c jfsseflt-64.asm jcgrass2-64.asm \
+	jccolss2-64.asm jdcolss2-64.asm jcsamss2-64.asm \
+	jdsamss2-64.asm jdmerss2-64.asm jcqnts2i-64.asm \
+	jfss2fst-64.asm jfss2int-64.asm jiss2red-64.asm \
+	jiss2int-64.asm jiss2fst-64.asm jcqnts2f-64.asm \
+	jiss2flt-64.asm
+@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_X86_64_TRUE@am_libsimd_la_OBJECTS = jsimd_x86_64.lo \
+@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_X86_64_TRUE@	jfsseflt-64.lo \
+@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_X86_64_TRUE@	jcgrass2-64.lo \
+@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_X86_64_TRUE@	jccolss2-64.lo \
+@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_X86_64_TRUE@	jdcolss2-64.lo \
+@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_X86_64_TRUE@	jcsamss2-64.lo \
+@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_X86_64_TRUE@	jdsamss2-64.lo \
+@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_X86_64_TRUE@	jdmerss2-64.lo \
+@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_X86_64_TRUE@	jcqnts2i-64.lo \
+@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_X86_64_TRUE@	jfss2fst-64.lo \
+@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_X86_64_TRUE@	jfss2int-64.lo \
+@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_X86_64_TRUE@	jiss2red-64.lo \
+@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_X86_64_TRUE@	jiss2int-64.lo \
+@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_X86_64_TRUE@	jiss2fst-64.lo \
+@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_X86_64_TRUE@	jcqnts2f-64.lo \
+@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_X86_64_TRUE@	jiss2flt-64.lo
+@SIMD_ARM_FALSE@@SIMD_I386_TRUE@am_libsimd_la_OBJECTS = jsimd_i386.lo \
+@SIMD_ARM_FALSE@@SIMD_I386_TRUE@	jsimdcpu.lo jccolmmx.lo \
+@SIMD_ARM_FALSE@@SIMD_I386_TRUE@	jdcolmmx.lo jcgrammx.lo \
+@SIMD_ARM_FALSE@@SIMD_I386_TRUE@	jcsammmx.lo jdsammmx.lo \
+@SIMD_ARM_FALSE@@SIMD_I386_TRUE@	jdmermmx.lo jcqntmmx.lo \
+@SIMD_ARM_FALSE@@SIMD_I386_TRUE@	jfmmxfst.lo jfmmxint.lo \
+@SIMD_ARM_FALSE@@SIMD_I386_TRUE@	jimmxred.lo jimmxint.lo \
+@SIMD_ARM_FALSE@@SIMD_I386_TRUE@	jimmxfst.lo jcqnt3dn.lo \
+@SIMD_ARM_FALSE@@SIMD_I386_TRUE@	jf3dnflt.lo ji3dnflt.lo \
+@SIMD_ARM_FALSE@@SIMD_I386_TRUE@	jcqntsse.lo jfsseflt.lo \
+@SIMD_ARM_FALSE@@SIMD_I386_TRUE@	jisseflt.lo jccolss2.lo \
+@SIMD_ARM_FALSE@@SIMD_I386_TRUE@	jdcolss2.lo jcgrass2.lo \
+@SIMD_ARM_FALSE@@SIMD_I386_TRUE@	jcsamss2.lo jdsamss2.lo \
+@SIMD_ARM_FALSE@@SIMD_I386_TRUE@	jdmerss2.lo jcqnts2i.lo \
+@SIMD_ARM_FALSE@@SIMD_I386_TRUE@	jfss2fst.lo jfss2int.lo \
+@SIMD_ARM_FALSE@@SIMD_I386_TRUE@	jiss2red.lo jiss2int.lo \
+@SIMD_ARM_FALSE@@SIMD_I386_TRUE@	jiss2fst.lo jcqnts2f.lo \
+@SIMD_ARM_FALSE@@SIMD_I386_TRUE@	jiss2flt.lo
+@SIMD_ARM_TRUE@am_libsimd_la_OBJECTS = jsimd_arm.lo jsimd_arm_neon.lo
 libsimd_la_OBJECTS = $(am_libsimd_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir) -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
+CCASCOMPILE = $(CCAS) $(AM_CCASFLAGS) $(CCASFLAGS)
+LTCCASCOMPILE = $(LIBTOOL) --mode=compile $(CCAS) $(AM_CCASFLAGS) \
+	$(CCASFLAGS)
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) \
@@ -119,6 +132,8 @@ AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
 BUILD = @BUILD@
 CC = @CC@
+CCAS = @CCAS@
+CCASFLAGS = @CCASFLAGS@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
 CPP = @CPP@
@@ -143,15 +158,24 @@ INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
-IS_WIN32_FALSE = @IS_WIN32_FALSE@
-IS_WIN32_TRUE = @IS_WIN32_TRUE@
+JAR = @JAR@
+JAVA = @JAVA@
+JAVAC = @JAVAC@
+JAVACFLAGS = @JAVACFLAGS@
+JAVA_RPM_CONTENTS_1 = @JAVA_RPM_CONTENTS_1@
+JAVA_RPM_CONTENTS_2 = @JAVA_RPM_CONTENTS_2@
+JNI_CFLAGS = @JNI_CFLAGS@
+JPEG_LIB_VERSION = @JPEG_LIB_VERSION@
+JPEG_LIB_VERSION_DECIMAL = @JPEG_LIB_VERSION_DECIMAL@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
+LIBTOOL_CURRENT = @LIBTOOL_CURRENT@
 LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
+MEM_SRCDST_FUNCTIONS = @MEM_SRCDST_FUNCTIONS@
 NAFLAGS = @NAFLAGS@
 NASM = @NASM@
 OBJEXT = @OBJEXT@
@@ -162,22 +186,41 @@ PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PKGNAME = @PKGNAME@
 RANLIB = @RANLIB@
-RM = @RM@
 RPMARCH = @RPMARCH@
+RPM_CONFIG_ARGS = @RPM_CONFIG_ARGS@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
+SIMD_ARM_FALSE = @SIMD_ARM_FALSE@
+SIMD_ARM_TRUE = @SIMD_ARM_TRUE@
 SIMD_I386_FALSE = @SIMD_I386_FALSE@
 SIMD_I386_TRUE = @SIMD_I386_TRUE@
 SIMD_X86_64_FALSE = @SIMD_X86_64_FALSE@
 SIMD_X86_64_TRUE = @SIMD_X86_64_TRUE@
+SO_AGE = @SO_AGE@
+SO_MAJOR_VERSION = @SO_MAJOR_VERSION@
+SO_MINOR_VERSION = @SO_MINOR_VERSION@
 STRIP = @STRIP@
 VERSION = @VERSION@
 VERSION_SCRIPT_FALSE = @VERSION_SCRIPT_FALSE@
 VERSION_SCRIPT_FLAG = @VERSION_SCRIPT_FLAG@
 VERSION_SCRIPT_TRUE = @VERSION_SCRIPT_TRUE@
+WITH_ARITH_DEC_FALSE = @WITH_ARITH_DEC_FALSE@
+WITH_ARITH_DEC_TRUE = @WITH_ARITH_DEC_TRUE@
+WITH_ARITH_ENC_FALSE = @WITH_ARITH_ENC_FALSE@
+WITH_ARITH_ENC_TRUE = @WITH_ARITH_ENC_TRUE@
+WITH_ARITH_FALSE = @WITH_ARITH_FALSE@
+WITH_ARITH_TRUE = @WITH_ARITH_TRUE@
+WITH_JAVA = @WITH_JAVA@
+WITH_JAVA_FALSE = @WITH_JAVA_FALSE@
+WITH_JAVA_TRUE = @WITH_JAVA_TRUE@
 WITH_SIMD_FALSE = @WITH_SIMD_FALSE@
 WITH_SIMD_TRUE = @WITH_SIMD_TRUE@
+WITH_SSE_FLOAT_DCT_FALSE = @WITH_SSE_FLOAT_DCT_FALSE@
+WITH_SSE_FLOAT_DCT_TRUE = @WITH_SSE_FLOAT_DCT_TRUE@
+WITH_TURBOJPEG_FALSE = @WITH_TURBOJPEG_FALSE@
+WITH_TURBOJPEG_TRUE = @WITH_TURBOJPEG_TRUE@
 X86_64_FALSE = @X86_64_FALSE@
 X86_64_TRUE = @X86_64_TRUE@
 ac_ct_AR = @ac_ct_AR@
@@ -227,19 +270,20 @@ noinst_LTLIBRARIES = libsimd.la
 BUILT_SOURCES = jsimdcfg.inc
 EXTRA_DIST = nasm_lt.sh jcclrmmx.asm jcclrss2.asm jdclrmmx.asm jdclrss2.asm \
 	jdmrgmmx.asm jdmrgss2.asm jcclrss2-64.asm jdclrss2-64.asm \
-	jdmrgss2-64.asm
+	jdmrgss2-64.asm jcgryss2-64.asm jcgrymmx.asm jcgryss2.asm CMakeLists.txt
 
+@SIMD_ARM_TRUE@libsimd_la_SOURCES = jsimd_arm.c jsimd_arm_neon.S
 @SIMD_I386_TRUE@libsimd_la_SOURCES = jsimd_i386.c \
 @SIMD_I386_TRUE@	jsimd.h jsimdcfg.inc.h \
 @SIMD_I386_TRUE@	jsimdext.inc jcolsamp.inc jdct.inc \
 @SIMD_I386_TRUE@	jsimdcpu.asm \
-@SIMD_I386_TRUE@	jccolmmx.asm jdcolmmx.asm \
+@SIMD_I386_TRUE@	jccolmmx.asm jdcolmmx.asm jcgrammx.asm \
 @SIMD_I386_TRUE@	jcsammmx.asm jdsammmx.asm jdmermmx.asm \
 @SIMD_I386_TRUE@	jcqntmmx.asm jfmmxfst.asm jfmmxint.asm \
 @SIMD_I386_TRUE@	jimmxred.asm jimmxint.asm jimmxfst.asm \
 @SIMD_I386_TRUE@	jcqnt3dn.asm jf3dnflt.asm ji3dnflt.asm \
 @SIMD_I386_TRUE@	jcqntsse.asm jfsseflt.asm jisseflt.asm \
-@SIMD_I386_TRUE@	jccolss2.asm jdcolss2.asm \
+@SIMD_I386_TRUE@	jccolss2.asm jdcolss2.asm jcgrass2.asm \
 @SIMD_I386_TRUE@	jcsamss2.asm jdsamss2.asm jdmerss2.asm \
 @SIMD_I386_TRUE@	jcqnts2i.asm jfss2fst.asm jfss2int.asm \
 @SIMD_I386_TRUE@	jiss2red.asm jiss2int.asm jiss2fst.asm \
@@ -248,7 +292,7 @@ EXTRA_DIST = nasm_lt.sh jcclrmmx.asm jcclrss2.asm jdclrmmx.asm jdclrss2.asm \
 @SIMD_X86_64_TRUE@libsimd_la_SOURCES = jsimd_x86_64.c \
 @SIMD_X86_64_TRUE@	jsimd.h jsimdcfg.inc.h \
 @SIMD_X86_64_TRUE@	jsimdext.inc jcolsamp.inc jdct.inc \
-@SIMD_X86_64_TRUE@	jfsseflt-64.asm \
+@SIMD_X86_64_TRUE@	jfsseflt-64.asm jcgrass2-64.asm \
 @SIMD_X86_64_TRUE@	jccolss2-64.asm jdcolss2-64.asm \
 @SIMD_X86_64_TRUE@	jcsamss2-64.asm jdsamss2-64.asm jdmerss2-64.asm \
 @SIMD_X86_64_TRUE@	jcqnts2i-64.asm jfss2fst-64.asm jfss2int-64.asm \
@@ -260,7 +304,7 @@ all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
-.SUFFIXES: .asm .c .lo .o .obj
+.SUFFIXES: .S .asm .c .lo .o .obj
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -308,8 +352,18 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jsimd_arm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jsimd_i386.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jsimd_x86_64.Plo@am__quote@
+
+.S.o:
+	$(CCASCOMPILE) -c $<
+
+.S.obj:
+	$(CCASCOMPILE) -c `$(CYGPATH_W) '$<'`
+
+.S.lo:
+	$(LTCCASCOMPILE) -c -o $@ $<
 
 .c.o:
 @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
@@ -514,17 +568,20 @@ uninstall-am: uninstall-info-am
 
 @SIMD_X86_64_TRUE@jccolss2-64.lo: jcclrss2-64.asm
 @SIMD_X86_64_TRUE@jdcolss2-64.lo: jdclrss2-64.asm
+@SIMD_X86_64_TRUE@jcgrass2-64.lo: jcgryss2-64.asm
 @SIMD_X86_64_TRUE@jdmerss2-64.lo: jdmrgss2-64.asm
 
 @SIMD_I386_TRUE@jccolmmx.lo: jcclrmmx.asm
+@SIMD_I386_TRUE@jcgrammx.lo: jcgrymmx.asm
 @SIMD_I386_TRUE@jccolss2.lo: jcclrss2.asm
+@SIMD_I386_TRUE@jcgrass2.lo: jcgryss2.asm
 @SIMD_I386_TRUE@jdcolmmx.lo: jdclrmmx.asm
 @SIMD_I386_TRUE@jdcolss2.lo: jdclrss2.asm
 @SIMD_I386_TRUE@jdmermmx.lo: jdmrgmmx.asm
 @SIMD_I386_TRUE@jdmerss2.lo: jdmrgss2.asm
 
 .asm.lo:
-	$(LIBTOOL) --mode=compile --tag NASM $(srcdir)/nasm_lt.sh $(NASM) $(NAFLAGS) -I$(srcdir) $< -o $@
+	$(LIBTOOL) --mode=compile --tag NASM $(srcdir)/nasm_lt.sh $(NASM) $(NAFLAGS) -I$(srcdir) -I. $< -o $@
 
 jsimdcfg.inc: $(srcdir)/jsimdcfg.inc.h ../jpeglib.h ../jconfig.h ../jmorecfg.h
 	$(CPP) -I$(top_builddir) -I$(top_builddir)/simd $(srcdir)/jsimdcfg.inc.h | $(EGREP) "^[\;%]|^\ %" | sed 's%_cpp_protection_%%' | sed 's@% define@%define@g' > $@

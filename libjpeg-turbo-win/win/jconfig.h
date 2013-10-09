@@ -1,5 +1,11 @@
+#include "config.h"
 /* jconfig.vc --- jconfig.h for Microsoft Visual C++ on Windows 95 or NT. */
-/* see jconfig.doc for explanations */
+/* see jconfig.txt for explanations */
+#define JPEG_LIB_VERSION 62
+#define LIBJPEG_TURBO_VERSION 1.3.0
+#define C_ARITH_CODING_SUPPORTED
+#define D_ARITH_CODING_SUPPORTED
+#define MEM_SRCDST_SUPPORTED
 
 #define HAVE_PROTOTYPES
 #define HAVE_UNSIGNED_CHAR
@@ -21,7 +27,15 @@ typedef unsigned char boolean;
 #endif
 #define HAVE_BOOLEAN		/* prevent jmorecfg.h from redefining it */
 
-#define inline __inline
+/* Define "INT32" as int, not long, per Windows custom */
+#if !(defined(_BASETSD_H_) || defined(_BASETSD_H))   /* don't conflict if basetsd.h already read */
+typedef short INT16;
+typedef signed int INT32;
+#endif
+
+#ifndef XMD_H
+#define XMD_H                   /* prevent jmorecfg.h from redefining it */
+#endif
 
 #ifdef JPEG_INTERNALS
 

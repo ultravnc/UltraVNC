@@ -99,9 +99,18 @@ transdecode_master_selection (j_decompress_ptr cinfo)
   /* This is effectively a buffered-image operation. */
   cinfo->buffered_image = TRUE;
 
+#if JPEG_LIB_VERSION >= 80
+  /* Compute output image dimensions and related values. */
+  jpeg_core_output_dimensions(cinfo);
+#endif
+
   /* Entropy decoding: either Huffman or arithmetic coding. */
   if (cinfo->arith_code) {
+#ifdef D_ARITH_CODING_SUPPORTED
+    jinit_arith_decoder(cinfo);
+#else
     ERREXIT(cinfo, JERR_ARITH_NOTIMPL);
+#endif
   } else {
     if (cinfo->progressive_mode) {
 #ifdef D_PROGRESSIVE_SUPPORTED

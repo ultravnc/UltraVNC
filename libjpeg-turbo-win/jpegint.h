@@ -2,6 +2,7 @@
  * jpegint.h
  *
  * Copyright (C) 1991-1997, Thomas G. Lane.
+ * Modified 1997-2009 by Guido Vollbeding.
  * This file is part of the Independent JPEG Group's software.
  * For conditions of distribution and use, see the accompanying README file.
  *
@@ -86,6 +87,13 @@ struct jpeg_color_converter {
 				JSAMPARRAY input_buf, JSAMPIMAGE output_buf,
 				JDIMENSION output_row, int num_rows));
 };
+
+typedef struct {
+  struct jpeg_color_converter pub; 
+
+ 
+  INT32 * rgb_ycc_tab;		
+} my_color_converter;
 
 /* Downsampling */
 struct jpeg_downsampler {
@@ -241,6 +249,31 @@ struct jpeg_upsampler {
 
   boolean need_context_rows;	/* TRUE if need rows above & below */
 };
+typedef struct {
+  struct jpeg_upsampler pub;	/* public fields */
+
+  /* Pointer to routine to do actual upsampling/conversion of one row group */
+  JMETHOD(void, upmethod, (j_decompress_ptr cinfo,
+			   JSAMPIMAGE input_buf, JDIMENSION in_row_group_ctr,
+			   JSAMPARRAY output_buf));
+
+  /* Private state for YCC->RGB conversion */
+  int * Cr_r_tab;		/* => table for Cr to R conversion */
+  int * Cb_b_tab;		/* => table for Cb to B conversion */
+  INT32 * Cr_g_tab;		/* => table for Cr to G conversion */
+  INT32 * Cb_g_tab;		/* => table for Cb to G conversion */
+
+  /* For 2:1 vertical sampling, we produce two output rows at a time.
+   * We need a "spare" row buffer to hold the second output row if the
+   * application provides just a one-row buffer; we also use the spare
+   * to discard the dummy last row if the image height is odd.
+   */
+  JSAMPROW spare_row;
+  boolean spare_full;		/* T if spare buffer is occupied */
+
+  JDIMENSION out_row_width;	/* samples per output row */
+  JDIMENSION rows_to_go;	/* counts rows remaining in image */
+} my_upsampler;
 
 /* Colorspace conversion */
 struct jpeg_color_deconverter {
@@ -249,6 +282,18 @@ struct jpeg_color_deconverter {
 				JSAMPIMAGE input_buf, JDIMENSION input_row,
 				JSAMPARRAY output_buf, int num_rows));
 };
+typedef struct {
+  struct jpeg_color_deconverter pub; /* public fields */
+
+  /* Private state for YCC->RGB conversion */
+  int * Cr_r_tab;		/* => table for Cr to R conversion */
+  int * Cb_b_tab;		/* => table for Cb to B conversion */
+  INT32 * Cr_g_tab;		/* => table for Cr to G conversion */
+  INT32 * Cb_g_tab;		/* => table for Cb to G conversion */
+
+  /* Private state for RGB->Y conversion */
+  INT32 * rgb_y_tab;		/* => table for RGB to Y conversion */
+} my_color_deconverter;
 
 /* Color quantization or color precision reduction */
 struct jpeg_color_quantizer {
@@ -304,6 +349,7 @@ struct jpeg_color_quantizer {
 #define jinit_forward_dct	jIFDCT
 #define jinit_huff_encoder	jIHEncoder
 #define jinit_phuff_encoder	jIPHEncoder
+#define jinit_arith_encoder	jIAEncoder
 #define jinit_marker_writer	jIMWriter
 #define jinit_master_decompress	jIDMaster
 #define jinit_d_main_controller	jIDMainC
@@ -313,6 +359,7 @@ struct jpeg_color_quantizer {
 #define jinit_marker_reader	jIMReader
 #define jinit_huff_decoder	jIHDecoder
 #define jinit_phuff_decoder	jIPHDecoder
+#define jinit_arith_decoder	jIADecoder
 #define jinit_inverse_dct	jIIDCT
 #define jinit_upsampler		jIUpsampler
 #define jinit_color_deconverter	jIDColor
@@ -327,6 +374,7 @@ struct jpeg_color_quantizer {
 #define jzero_far		jZeroFar
 #define jpeg_zigzag_order	jZIGTable
 #define jpeg_natural_order	jZAGTable
+#define jpeg_aritab		jAriTab
 #endif /* NEED_SHORT_EXTERNAL_NAMES */
 
 
@@ -345,6 +393,7 @@ EXTERN(void) jinit_downsampler JPP((j_compress_ptr cinfo));
 EXTERN(void) jinit_forward_dct JPP((j_compress_ptr cinfo));
 EXTERN(void) jinit_huff_encoder JPP((j_compress_ptr cinfo));
 EXTERN(void) jinit_phuff_encoder JPP((j_compress_ptr cinfo));
+EXTERN(void) jinit_arith_encoder JPP((j_compress_ptr cinfo));
 EXTERN(void) jinit_marker_writer JPP((j_compress_ptr cinfo));
 /* Decompression module initialization routines */
 EXTERN(void) jinit_master_decompress JPP((j_decompress_ptr cinfo));
@@ -358,6 +407,7 @@ EXTERN(void) jinit_input_controller JPP((j_decompress_ptr cinfo));
 EXTERN(void) jinit_marker_reader JPP((j_decompress_ptr cinfo));
 EXTERN(void) jinit_huff_decoder JPP((j_decompress_ptr cinfo));
 EXTERN(void) jinit_phuff_decoder JPP((j_decompress_ptr cinfo));
+EXTERN(void) jinit_arith_decoder JPP((j_decompress_ptr cinfo));
 EXTERN(void) jinit_inverse_dct JPP((j_decompress_ptr cinfo));
 EXTERN(void) jinit_upsampler JPP((j_decompress_ptr cinfo));
 EXTERN(void) jinit_color_deconverter JPP((j_decompress_ptr cinfo));
@@ -369,7 +419,7 @@ EXTERN(void) jinit_memory_mgr JPP((j_common_ptr cinfo));
 
 /* Utility routines in jutils.c */
 EXTERN(long) jdiv_round_up JPP((long a, long b));
-EXTERN(size_t) jround_up JPP((size_t a, size_t b));
+EXTERN(long) jround_up JPP((long a, long b));
 EXTERN(void) jcopy_sample_rows JPP((JSAMPARRAY input_array, int source_row,
 				    JSAMPARRAY output_array, int dest_row,
 				    int num_rows, JDIMENSION num_cols));
@@ -381,6 +431,9 @@ EXTERN(void) jzero_far JPP((void FAR * target, size_t bytestozero));
 extern const int jpeg_zigzag_order[]; /* natural coef order to zigzag order */
 #endif
 extern const int jpeg_natural_order[]; /* zigzag coef order to natural order */
+
+/* Arithmetic coding probability estimation tables in jaricom.c */
+extern const INT32 jpeg_aritab[];
 
 /* Suppress undefined-structure complaints if necessary. */
 

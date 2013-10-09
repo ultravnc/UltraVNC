@@ -114,9 +114,6 @@
     <ClCompile Include="jdpostct.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="jdsample.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="jdtrans.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -163,6 +160,30 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="jutils.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="jccolext.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="jaricom.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="jcarith.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="jdarith.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="jdatadst-tj.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="jdatasrc-tj.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="jdcolext.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="jdmrgext.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -305,5 +326,79 @@
     <CustomBuild Include="simd\jiss2red-64.asm">
       <Filter>Source Files\simd64</Filter>
     </CustomBuild>
+    <CustomBuild Include="simd\jcgrammx.asm">
+      <Filter>Source Files\simd</Filter>
+    </CustomBuild>
+    <CustomBuild Include="simd\jcgrass2.asm">
+      <Filter>Source Files\simd</Filter>
+    </CustomBuild>
+    <CustomBuild Include="simd\jcgrass2-64.asm">
+      <Filter>Source Files\simd64</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="bmp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cderror.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cdjpeg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="jchuff.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="jdct.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="jdhuff.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="jerror.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="jinclude.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="jmemsys.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="jmorecfg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="jpegint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="jpeglib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="jsimd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="jsimddct.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="jversion.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="rrtimer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="rrutil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="transupp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="turbojpeg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="win\config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="win\jconfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

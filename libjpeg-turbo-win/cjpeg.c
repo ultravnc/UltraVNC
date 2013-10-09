@@ -1,8 +1,11 @@
 /*
  * cjpeg.c
  *
+ * This file was part of the Independent JPEG Group's software:
  * Copyright (C) 1991-1998, Thomas G. Lane.
- * This file is part of the Independent JPEG Group's software.
+ * Modified 2003-2011 by Guido Vollbeding.
+ * Modifications:
+ * Copyright (C) 2010, 2013, D. R. Commander.
  * For conditions of distribution and use, see the accompanying README file.
  *
  * This file contains a command-line user interface for the JPEG compressor.
@@ -25,6 +28,7 @@
 
 #include "cdjpeg.h"		/* Common decls for cjpeg/djpeg applications */
 #include "jversion.h"		/* for version message */
+#include "config.h"
 
 #ifdef USE_CCOMMAND		/* command-line reader for Macintosh */
 #ifdef __MWERKS__
@@ -135,6 +139,7 @@ select_file_type (j_compress_ptr cinfo, FILE * infile)
 
 static const char * progname;	/* program name for error messages */
 static char * outfilename;	/* for -outfile switch */
+boolean memdst;  /* for -memdst switch */
 
 
 LOCAL(void)
@@ -149,8 +154,9 @@ usage (void)
 #endif
 
   fprintf(stderr, "Switches (names may be abbreviated):\n");
-  fprintf(stderr, "  -quality N     Compression quality (0..100; 5-95 is useful range)\n");
+  fprintf(stderr, "  -quality N[,...]   Compression quality (0..100; 5-95 is useful range)\n");
   fprintf(stderr, "  -grayscale     Create monochrome JPEG file\n");
+  fprintf(stderr, "  -rgb           Create RGB JPEG file\n");
 #ifdef ENTROPY_OPT_SUPPORTED
   fprintf(stderr, "  -optimize      Optimize Huffman table (smaller file, but slow compression)\n");
 #endif
@@ -161,6 +167,9 @@ usage (void)
   fprintf(stderr, "  -targa         Input file is Targa format (usually not needed)\n");
 #endif
   fprintf(stderr, "Switches for advanced users:\n");
+#ifdef C_ARITH_CODING_SUPPORTED
+  fprintf(stderr, "  -arithmetic    Use arithmetic coding\n");
+#endif
 #ifdef DCT_ISLOW_SUPPORTED
   fprintf(stderr, "  -dct int       Use integer DCT method%s\n",
 	  (JDCT_DEFAULT == JDCT_ISLOW ? " (default)" : ""));
@@ -179,11 +188,11 @@ usage (void)
 #endif
   fprintf(stderr, "  -maxmemory N   Maximum memory to use (in kbytes)\n");
   fprintf(stderr, "  -outfile name  Specify name for output file\n");
+#if JPEG_LIB_VERSION >= 80 || defined(MEM_SRCDST_SUPPORTED)
+  fprintf(stderr, "  -memdst        Compress to memory instead of file (useful for benchmarking)\n");
+#endif
   fprintf(stderr, "  -verbose  or  -debug   Emit debug output\n");
   fprintf(stderr, "Switches for wizards:\n");
-#ifdef C_ARITH_CODING_SUPPORTED
-  fprintf(stderr, "  -arithmetic    Use arithmetic coding\n");
-#endif
   fprintf(stderr, "  -baseline      Force baseline quantization tables\n");
   fprintf(stderr, "  -qtables file  Use quantization tables given in file\n");
   fprintf(stderr, "  -qslots N[,...]    Set component quantization tables\n");
@@ -209,25 +218,21 @@ parse_switches (j_compress_ptr cinfo, int argc, char **argv,
 {
   int argn;
   char * arg;
-  int quality;			/* -quality parameter */
-  int q_scale_factor;		/* scaling percentage for -qtables */
   boolean force_baseline;
   boolean simple_progressive;
+  char * qualityarg = NULL;	/* saves -quality parm if any */
   char * qtablefile = NULL;	/* saves -qtables filename if any */
   char * qslotsarg = NULL;	/* saves -qslots parm if any */
   char * samplearg = NULL;	/* saves -sample parm if any */
   char * scansarg = NULL;	/* saves -scans parm if any */
 
   /* Set up default JPEG parameters. */
-  /* Note that default -quality level need not, and does not,
-   * match the default scaling for an explicit -qtables argument.
-   */
-  quality = 75;			/* default -quality value */
-  q_scale_factor = 100;		/* default to no scaling for -qtables */
+
   force_baseline = FALSE;	/* by default, allow 16-bit quantizers */
   simple_progressive = FALSE;
   is_targa = FALSE;
   outfilename = NULL;
+  memdst = FALSE;
   cinfo->err->trace_level = 0;
 
   /* Scan command line options, adjust parameters */
@@ -277,8 +282,11 @@ parse_switches (j_compress_ptr cinfo, int argc, char **argv,
       static boolean printed_version = FALSE;
 
       if (! printed_version) {
-	fprintf(stderr, "Independent JPEG Group's CJPEG, version %s\n%s\n",
-		JVERSION, JCOPYRIGHT);
+	fprintf(stderr, "%s version %s (build %s)\n",
+		PACKAGE_NAME, VERSION, BUILD);
+	fprintf(stderr, "%s\n\n", JCOPYRIGHT);
+	fprintf(stderr, "Emulating The Independent JPEG Group's software, version %s\n\n",
+		JVERSION);
 	printed_version = TRUE;
       }
       cinfo->err->trace_level++;
@@ -286,6 +294,10 @@ parse_switches (j_compress_ptr cinfo, int argc, char **argv,
     } else if (keymatch(arg, "grayscale", 2) || keymatch(arg, "greyscale",2)) {
       /* Force a monochrome JPEG file to be generated. */
       jpeg_set_colorspace(cinfo, JCS_GRAYSCALE);
+
+    } else if (keymatch(arg, "rgb", 3)) {
+      /* Force an RGB JPEG file to be generated. */
+      jpeg_set_colorspace(cinfo, JCS_RGB);
 
     } else if (keymatch(arg, "maxmemory", 3)) {
       /* Maximum memory in Kb (or Mb with 'm'). */
@@ -305,7 +317,7 @@ parse_switches (j_compress_ptr cinfo, int argc, char **argv,
 #ifdef ENTROPY_OPT_SUPPORTED
       cinfo->optimize_coding = TRUE;
 #else
-      fprintf(stderr, "%s: sorry, entropy optimization was not compiled\n",
+      fprintf(stderr, "%s: sorry, entropy optimization was not compiled in\n",
 	      progname);
       exit(EXIT_FAILURE);
 #endif
@@ -322,19 +334,26 @@ parse_switches (j_compress_ptr cinfo, int argc, char **argv,
       simple_progressive = TRUE;
       /* We must postpone execution until num_components is known. */
 #else
-      fprintf(stderr, "%s: sorry, progressive output was not compiled\n",
+      fprintf(stderr, "%s: sorry, progressive output was not compiled in\n",
 	      progname);
       exit(EXIT_FAILURE);
 #endif
 
+    } else if (keymatch(arg, "memdst", 2)) {
+      /* Use in-memory destination manager */
+#if JPEG_LIB_VERSION >= 80 || defined(MEM_SRCDST_SUPPORTED)
+      memdst = TRUE;
+#else
+      fprintf(stderr, "%s: sorry, in-memory destination manager was not compiled in\n",
+              progname);
+      exit(EXIT_FAILURE);
+#endif
+
     } else if (keymatch(arg, "quality", 1)) {
-      /* Quality factor (quantization table scaling factor). */
+      /* Quality ratings (quantization table scaling factors). */
       if (++argn >= argc)	/* advance to next argument */
 	usage();
-      if (sscanf(argv[argn], "%d", &quality) != 1)
-	usage();
-      /* Change scale factor in case -qtables is present. */
-      q_scale_factor = jpeg_quality_scaling(quality);
+      qualityarg = argv[argn];
 
     } else if (keymatch(arg, "qslots", 2)) {
       /* Quantization table slot numbers. */
@@ -382,7 +401,7 @@ parse_switches (j_compress_ptr cinfo, int argc, char **argv,
        * default sampling factors.
        */
 
-    } else if (keymatch(arg, "scans", 2)) {
+    } else if (keymatch(arg, "scans", 4)) {
       /* Set scan script. */
 #ifdef C_MULTISCAN_FILES_SUPPORTED
       if (++argn >= argc)	/* advance to next argument */
@@ -390,7 +409,7 @@ parse_switches (j_compress_ptr cinfo, int argc, char **argv,
       scansarg = argv[argn];
       /* We must postpone reading the file in case -progressive appears. */
 #else
-      fprintf(stderr, "%s: sorry, multi-scan output was not compiled\n",
+      fprintf(stderr, "%s: sorry, multi-scan output was not compiled in\n",
 	      progname);
       exit(EXIT_FAILURE);
 #endif
@@ -422,11 +441,12 @@ parse_switches (j_compress_ptr cinfo, int argc, char **argv,
 
     /* Set quantization tables for selected quality. */
     /* Some or all may be overridden if -qtables is present. */
-    jpeg_set_quality(cinfo, quality, force_baseline);
+    if (qualityarg != NULL)	/* process -quality if it was present */
+      if (! set_quality_ratings(cinfo, qualityarg, force_baseline))
+	usage();
 
     if (qtablefile != NULL)	/* process -qtables if it was present */
-      if (! read_quant_tables(cinfo, qtablefile,
-			      q_scale_factor, force_baseline))
+      if (! read_quant_tables(cinfo, qtablefile, force_baseline))
 	usage();
 
     if (qslotsarg != NULL)	/* process -qslots if it was present */
@@ -468,7 +488,9 @@ main (int argc, char **argv)
   int file_index;
   cjpeg_source_ptr src_mgr;
   FILE * input_file;
-  FILE * output_file;
+  FILE * output_file = NULL;
+  unsigned char *outbuffer = NULL;
+  unsigned long outsize = 0;
   JDIMENSION num_scanlines;
 
   /* On Mac, fetch a command line. */
@@ -511,19 +533,21 @@ main (int argc, char **argv)
   file_index = parse_switches(&cinfo, argc, argv, 0, FALSE);
 
 #ifdef TWO_FILE_COMMANDLINE
-  /* Must have either -outfile switch or explicit output file name */
-  if (outfilename == NULL) {
-    if (file_index != argc-2) {
-      fprintf(stderr, "%s: must name one input and one output file\n",
-	      progname);
-      usage();
-    }
-    outfilename = argv[file_index+1];
-  } else {
-    if (file_index != argc-1) {
-      fprintf(stderr, "%s: must name one input and one output file\n",
-	      progname);
-      usage();
+  if (!memdst) {
+    /* Must have either -outfile switch or explicit output file name */
+    if (outfilename == NULL) {
+      if (file_index != argc-2) {
+        fprintf(stderr, "%s: must name one input and one output file\n",
+                progname);
+        usage();
+      }
+      outfilename = argv[file_index+1];
+    } else {
+      if (file_index != argc-1) {
+        fprintf(stderr, "%s: must name one input and one output file\n",
+                progname);
+        usage();
+      }
     }
   }
 #else
@@ -551,7 +575,7 @@ main (int argc, char **argv)
       fprintf(stderr, "%s: can't open %s\n", progname, outfilename);
       exit(EXIT_FAILURE);
     }
-  } else {
+  } else if (!memdst) {
     /* default output file is stdout */
     output_file = write_stdout();
   }
@@ -574,7 +598,12 @@ main (int argc, char **argv)
   file_index = parse_switches(&cinfo, argc, argv, 0, TRUE);
 
   /* Specify data destination for compression */
-  jpeg_stdio_dest(&cinfo, output_file);
+#if JPEG_LIB_VERSION >= 80 || defined(MEM_SRCDST_SUPPORTED)
+  if (memdst)
+    jpeg_mem_dest(&cinfo, &outbuffer, &outsize);
+  else
+#endif
+    jpeg_stdio_dest(&cinfo, output_file);
 
   /* Start compressor */
   jpeg_start_compress(&cinfo, TRUE);
@@ -593,12 +622,18 @@ main (int argc, char **argv)
   /* Close files, if we opened them */
   if (input_file != stdin)
     fclose(input_file);
-  if (output_file != stdout)
+  if (output_file != stdout && output_file != NULL)
     fclose(output_file);
 
 #ifdef PROGRESS_REPORT
   end_progress_monitor((j_common_ptr) &cinfo);
 #endif
+
+  if (memdst) {
+    fprintf(stderr, "Compressed size:  %lu bytes\n", outsize);
+    if (outbuffer != NULL)
+      free(outbuffer);
+  }
 
   /* All done. */
   exit(jerr.num_warnings ? EXIT_WARNING : EXIT_SUCCESS);

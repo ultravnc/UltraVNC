@@ -16,7 +16,8 @@
 
 
 
-SOURCES = $(libjpeg_la_SOURCES) $(libturbojpeg_la_SOURCES) $(cjpeg_SOURCES) $(djpeg_SOURCES) $(jpegtran_SOURCES) $(jpegut_SOURCES) $(jpgtest_SOURCES) $(rdjpgcom_SOURCES) $(wrjpgcom_SOURCES)
+
+SOURCES = $(libjpeg_la_SOURCES) $(libturbojpeg_la_SOURCES) $(cjpeg_SOURCES) $(djpeg_SOURCES) $(jcstest_SOURCES) $(jpegtran_SOURCES) $(rdjpgcom_SOURCES) $(tjbench_SOURCES) $(tjunittest_SOURCES) $(wrjpgcom_SOURCES)
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -40,16 +41,36 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@VERSION_SCRIPT_TRUE@am__append_1 = $(VERSION_SCRIPT_FLAG)$(srcdir)/turbojpeg-mapfile
-@WITH_SIMD_FALSE@am__append_2 = jsimd_none.c
+@WITH_TURBOJPEG_TRUE@am__append_1 = libturbojpeg.la
+@WITH_TURBOJPEG_TRUE@am__append_2 = turbojpeg.h
+@WITH_ARITH_TRUE@am__append_3 = jaricom.c
+@WITH_ARITH_ENC_TRUE@am__append_4 = jcarith.c
+@WITH_ARITH_DEC_TRUE@am__append_5 = jdarith.c
+@WITH_JAVA_TRUE@@WITH_TURBOJPEG_TRUE@am__append_6 = turbojpeg-jni.c
+@VERSION_SCRIPT_TRUE@@WITH_TURBOJPEG_TRUE@am__append_7 = $(VERSION_SCRIPT_FLAG)$(srcdir)/$(TJMAPFILE)
+@VERSION_SCRIPT_TRUE@am__append_8 = $(VERSION_SCRIPT_FLAG)libjpeg.map
+@WITH_SIMD_TRUE@am__append_9 = simd
+@WITH_SIMD_FALSE@am__append_10 = jsimd_none.c
 bin_PROGRAMS = cjpeg$(EXEEXT) djpeg$(EXEEXT) jpegtran$(EXEEXT) \
-	rdjpgcom$(EXEEXT) wrjpgcom$(EXEEXT)
-noinst_PROGRAMS = jpgtest$(EXEEXT) jpegut$(EXEEXT)
-DIST_COMMON = README $(am__configure_deps) $(dist_man1_MANS) \
-	$(include_HEADERS) $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
+	rdjpgcom$(EXEEXT) wrjpgcom$(EXEEXT) $(am__EXEEXT_1)
+noinst_PROGRAMS = jcstest$(EXEEXT) $(am__EXEEXT_2)
+@WITH_TURBOJPEG_TRUE@am__append_11 = tjbench
+@WITH_TURBOJPEG_TRUE@am__append_12 = tjunittest
+DIST_COMMON = README $(am__configure_deps) $(am__include_HEADERS_DIST) \
+	$(dist_doc_DATA) $(dist_example_DATA) $(dist_man1_MANS) \
+	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/config.h.in $(srcdir)/jconfig.h.in \
-	$(top_srcdir)/configure compile config.guess config.sub \
-	depcomp install-sh ltmain.sh missing
+	$(srcdir)/libjpeg.map.in $(srcdir)/tjbenchtest.in \
+	$(srcdir)/tjbenchtest.java.in $(srcdir)/tjexampletest.in \
+	$(top_srcdir)/configure \
+	$(top_srcdir)/release/Description.plist.in \
+	$(top_srcdir)/release/Info.plist.in \
+	$(top_srcdir)/release/libjpeg-turbo.spec.in \
+	$(top_srcdir)/release/makecygwinpkg.in \
+	$(top_srcdir)/release/makedpkg.in \
+	$(top_srcdir)/release/makemacpkg.in \
+	$(top_srcdir)/release/uninstall.in compile config.guess \
+	config.sub depcomp install-sh ltmain.sh missing
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
@@ -60,7 +81,11 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno configure.status.lineno
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = config.h jconfig.h
-CONFIG_CLEAN_FILES =
+CONFIG_CLEAN_FILES = pkgscripts/libjpeg-turbo.spec.tmpl \
+	pkgscripts/makecygwinpkg.tmpl pkgscripts/makedpkg.tmpl \
+	pkgscripts/makemacpkg.tmpl pkgscripts/Description.plist \
+	pkgscripts/Info.plist pkgscripts/uninstall.tmpl tjbenchtest \
+	tjbenchtest.java tjexampletest libjpeg.map
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
     $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
@@ -68,24 +93,29 @@ am__vpath_adj = case $$p in \
   esac;
 am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
-	"$(DESTDIR)$(man1dir)" "$(DESTDIR)$(includedir)" \
+	"$(DESTDIR)$(man1dir)" "$(DESTDIR)$(docdir)" \
+	"$(DESTDIR)$(exampledir)" "$(DESTDIR)$(includedir)" \
 	"$(DESTDIR)$(includedir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 @WITH_SIMD_TRUE@libjpeg_la_DEPENDENCIES = simd/libsimd.la
 am__libjpeg_la_SOURCES_DIST = jchuff.h jdct.h jdhuff.h jerror.h \
 	jinclude.h jmemsys.h jmorecfg.h jpegint.h jpeglib.h jversion.h \
-	jsimd.h jsimddct.h jcapimin.c jcapistd.c jccoefct.c jccolor.c \
-	jcdctmgr.c jchuff.c jcinit.c jcmainct.c jcmarker.c jcmaster.c \
-	jcomapi.c jcparam.c jcphuff.c jcprepct.c jcsample.c jctrans.c \
-	jdapimin.c jdapistd.c jdatadst.c jdatasrc.c jdcoefct.c \
-	jdcolor.c jddctmgr.c jdhuff.c jdinput.c jdmainct.c jdmarker.c \
-	jdmaster.c jdmerge.c jdphuff.c jdpostct.c jdsample.c jdtrans.c \
-	jerror.c jfdctflt.c jfdctfst.c jfdctint.c jidctflt.c \
-	jidctfst.c jidctint.c jidctred.c jquant1.c jquant2.c jutils.c \
-	jmemmgr.c jmemnobs.c jsimd_none.c
+	jsimd.h jsimddct.h jpegcomp.h jcapimin.c jcapistd.c jccoefct.c \
+	jccolor.c jcdctmgr.c jchuff.c jcinit.c jcmainct.c jcmarker.c \
+	jcmaster.c jcomapi.c jcparam.c jcphuff.c jcprepct.c jcsample.c \
+	jctrans.c jdapimin.c jdapistd.c jdatadst.c jdatasrc.c \
+	jdcoefct.c jdcolor.c jddctmgr.c jdhuff.c jdinput.c jdmainct.c \
+	jdmarker.c jdmaster.c jdmerge.c jdphuff.c jdpostct.c \
+	jdsample.c jdtrans.c jerror.c jfdctflt.c jfdctfst.c jfdctint.c \
+	jidctflt.c jidctfst.c jidctint.c jidctred.c jquant1.c \
+	jquant2.c jutils.c jmemmgr.c jmemnobs.c jaricom.c jcarith.c \
+	jdarith.c jsimd_none.c
 am__objects_1 =
-@WITH_SIMD_FALSE@am__objects_2 = jsimd_none.lo
+@WITH_ARITH_TRUE@am__objects_2 = jaricom.lo
+@WITH_ARITH_ENC_TRUE@am__objects_3 = jcarith.lo
+@WITH_ARITH_DEC_TRUE@am__objects_4 = jdarith.lo
+@WITH_SIMD_FALSE@am__objects_5 = jsimd_none.lo
 am_libjpeg_la_OBJECTS = $(am__objects_1) jcapimin.lo jcapistd.lo \
 	jccoefct.lo jccolor.lo jcdctmgr.lo jchuff.lo jcinit.lo \
 	jcmainct.lo jcmarker.lo jcmaster.lo jcomapi.lo jcparam.lo \
@@ -95,34 +125,65 @@ am_libjpeg_la_OBJECTS = $(am__objects_1) jcapimin.lo jcapistd.lo \
 	jdmaster.lo jdmerge.lo jdphuff.lo jdpostct.lo jdsample.lo \
 	jdtrans.lo jerror.lo jfdctflt.lo jfdctfst.lo jfdctint.lo \
 	jidctflt.lo jidctfst.lo jidctint.lo jidctred.lo jquant1.lo \
-	jquant2.lo jutils.lo jmemmgr.lo jmemnobs.lo $(am__objects_2)
+	jquant2.lo jutils.lo jmemmgr.lo jmemnobs.lo $(am__objects_2) \
+	$(am__objects_3) $(am__objects_4) $(am__objects_5)
 libjpeg_la_OBJECTS = $(am_libjpeg_la_OBJECTS)
 @WITH_SIMD_TRUE@libturbojpeg_la_DEPENDENCIES = simd/libsimd.la
 am__libturbojpeg_la_SOURCES_DIST = jchuff.h jdct.h jdhuff.h jerror.h \
 	jinclude.h jmemsys.h jmorecfg.h jpegint.h jpeglib.h jversion.h \
-	jsimd.h jsimddct.h jcapimin.c jcapistd.c jccoefct.c jccolor.c \
-	jcdctmgr.c jchuff.c jcinit.c jcmainct.c jcmarker.c jcmaster.c \
-	jcomapi.c jcparam.c jcphuff.c jcprepct.c jcsample.c jctrans.c \
-	jdapimin.c jdapistd.c jdatadst.c jdatasrc.c jdcoefct.c \
-	jdcolor.c jddctmgr.c jdhuff.c jdinput.c jdmainct.c jdmarker.c \
-	jdmaster.c jdmerge.c jdphuff.c jdpostct.c jdsample.c jdtrans.c \
-	jerror.c jfdctflt.c jfdctfst.c jfdctint.c jidctflt.c \
-	jidctfst.c jidctint.c jidctred.c jquant1.c jquant2.c jutils.c \
-	jmemmgr.c jmemnobs.c jsimd_none.c turbojpegl.c turbojpeg.h \
-	turbojpeg-mapfile
-am__objects_3 = $(am__objects_1) jcapimin.lo jcapistd.lo jccoefct.lo \
-	jccolor.lo jcdctmgr.lo jchuff.lo jcinit.lo jcmainct.lo \
-	jcmarker.lo jcmaster.lo jcomapi.lo jcparam.lo jcphuff.lo \
-	jcprepct.lo jcsample.lo jctrans.lo jdapimin.lo jdapistd.lo \
-	jdatadst.lo jdatasrc.lo jdcoefct.lo jdcolor.lo jddctmgr.lo \
-	jdhuff.lo jdinput.lo jdmainct.lo jdmarker.lo jdmaster.lo \
-	jdmerge.lo jdphuff.lo jdpostct.lo jdsample.lo jdtrans.lo \
-	jerror.lo jfdctflt.lo jfdctfst.lo jfdctint.lo jidctflt.lo \
-	jidctfst.lo jidctint.lo jidctred.lo jquant1.lo jquant2.lo \
-	jutils.lo jmemmgr.lo jmemnobs.lo $(am__objects_2)
-am_libturbojpeg_la_OBJECTS = $(am__objects_3) turbojpegl.lo
+	jsimd.h jsimddct.h jpegcomp.h jcapimin.c jcapistd.c jccoefct.c \
+	jccolor.c jcdctmgr.c jchuff.c jcinit.c jcmainct.c jcmarker.c \
+	jcmaster.c jcomapi.c jcparam.c jcphuff.c jcprepct.c jcsample.c \
+	jctrans.c jdapimin.c jdapistd.c jdatadst.c jdatasrc.c \
+	jdcoefct.c jdcolor.c jddctmgr.c jdhuff.c jdinput.c jdmainct.c \
+	jdmarker.c jdmaster.c jdmerge.c jdphuff.c jdpostct.c \
+	jdsample.c jdtrans.c jerror.c jfdctflt.c jfdctfst.c jfdctint.c \
+	jidctflt.c jidctfst.c jidctint.c jidctred.c jquant1.c \
+	jquant2.c jutils.c jmemmgr.c jmemnobs.c jaricom.c jcarith.c \
+	jdarith.c jsimd_none.c turbojpeg.c turbojpeg.h transupp.c \
+	transupp.h jdatadst-tj.c jdatasrc-tj.c turbojpeg-jni.c \
+	turbojpeg-mapfile turbojpeg-mapfile.jni
+@WITH_ARITH_TRUE@am__objects_6 = libturbojpeg_la-jaricom.lo
+@WITH_ARITH_ENC_TRUE@am__objects_7 = libturbojpeg_la-jcarith.lo
+@WITH_ARITH_DEC_TRUE@am__objects_8 = libturbojpeg_la-jdarith.lo
+@WITH_SIMD_FALSE@am__objects_9 = libturbojpeg_la-jsimd_none.lo
+am__objects_10 = $(am__objects_1) libturbojpeg_la-jcapimin.lo \
+	libturbojpeg_la-jcapistd.lo libturbojpeg_la-jccoefct.lo \
+	libturbojpeg_la-jccolor.lo libturbojpeg_la-jcdctmgr.lo \
+	libturbojpeg_la-jchuff.lo libturbojpeg_la-jcinit.lo \
+	libturbojpeg_la-jcmainct.lo libturbojpeg_la-jcmarker.lo \
+	libturbojpeg_la-jcmaster.lo libturbojpeg_la-jcomapi.lo \
+	libturbojpeg_la-jcparam.lo libturbojpeg_la-jcphuff.lo \
+	libturbojpeg_la-jcprepct.lo libturbojpeg_la-jcsample.lo \
+	libturbojpeg_la-jctrans.lo libturbojpeg_la-jdapimin.lo \
+	libturbojpeg_la-jdapistd.lo libturbojpeg_la-jdatadst.lo \
+	libturbojpeg_la-jdatasrc.lo libturbojpeg_la-jdcoefct.lo \
+	libturbojpeg_la-jdcolor.lo libturbojpeg_la-jddctmgr.lo \
+	libturbojpeg_la-jdhuff.lo libturbojpeg_la-jdinput.lo \
+	libturbojpeg_la-jdmainct.lo libturbojpeg_la-jdmarker.lo \
+	libturbojpeg_la-jdmaster.lo libturbojpeg_la-jdmerge.lo \
+	libturbojpeg_la-jdphuff.lo libturbojpeg_la-jdpostct.lo \
+	libturbojpeg_la-jdsample.lo libturbojpeg_la-jdtrans.lo \
+	libturbojpeg_la-jerror.lo libturbojpeg_la-jfdctflt.lo \
+	libturbojpeg_la-jfdctfst.lo libturbojpeg_la-jfdctint.lo \
+	libturbojpeg_la-jidctflt.lo libturbojpeg_la-jidctfst.lo \
+	libturbojpeg_la-jidctint.lo libturbojpeg_la-jidctred.lo \
+	libturbojpeg_la-jquant1.lo libturbojpeg_la-jquant2.lo \
+	libturbojpeg_la-jutils.lo libturbojpeg_la-jmemmgr.lo \
+	libturbojpeg_la-jmemnobs.lo $(am__objects_6) $(am__objects_7) \
+	$(am__objects_8) $(am__objects_9)
+@WITH_JAVA_TRUE@@WITH_TURBOJPEG_TRUE@am__objects_11 = libturbojpeg_la-turbojpeg-jni.lo
+@WITH_TURBOJPEG_TRUE@am_libturbojpeg_la_OBJECTS = $(am__objects_10) \
+@WITH_TURBOJPEG_TRUE@	libturbojpeg_la-turbojpeg.lo \
+@WITH_TURBOJPEG_TRUE@	libturbojpeg_la-transupp.lo \
+@WITH_TURBOJPEG_TRUE@	libturbojpeg_la-jdatadst-tj.lo \
+@WITH_TURBOJPEG_TRUE@	libturbojpeg_la-jdatasrc-tj.lo \
+@WITH_TURBOJPEG_TRUE@	$(am__objects_11) $(am__objects_1)
 libturbojpeg_la_OBJECTS = $(am_libturbojpeg_la_OBJECTS)
+@WITH_TURBOJPEG_TRUE@am_libturbojpeg_la_rpath = -rpath $(libdir)
+@WITH_TURBOJPEG_TRUE@am__EXEEXT_1 = tjbench$(EXEEXT)
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
+@WITH_TURBOJPEG_TRUE@am__EXEEXT_2 = tjunittest$(EXEEXT)
 PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
 am_cjpeg_OBJECTS = cjpeg-cdjpeg.$(OBJEXT) cjpeg-cjpeg.$(OBJEXT) \
 	cjpeg-rdbmp.$(OBJEXT) cjpeg-rdgif.$(OBJEXT) \
@@ -136,19 +197,32 @@ am_djpeg_OBJECTS = djpeg-cdjpeg.$(OBJEXT) djpeg-djpeg.$(OBJEXT) \
 	djpeg-wrppm.$(OBJEXT) djpeg-wrtarga.$(OBJEXT)
 djpeg_OBJECTS = $(am_djpeg_OBJECTS)
 djpeg_DEPENDENCIES = libjpeg.la
+am_jcstest_OBJECTS = jcstest.$(OBJEXT)
+jcstest_OBJECTS = $(am_jcstest_OBJECTS)
+jcstest_DEPENDENCIES = libjpeg.la
 am_jpegtran_OBJECTS = jpegtran.$(OBJEXT) rdswitch.$(OBJEXT) \
 	cdjpeg.$(OBJEXT) transupp.$(OBJEXT)
 jpegtran_OBJECTS = $(am_jpegtran_OBJECTS)
 jpegtran_DEPENDENCIES = libjpeg.la
-am_jpegut_OBJECTS = $(am__objects_1) jpegut.$(OBJEXT) bmp.$(OBJEXT)
-jpegut_OBJECTS = $(am_jpegut_OBJECTS)
-jpegut_DEPENDENCIES = libturbojpeg.la
-am_jpgtest_OBJECTS = $(am__objects_1) jpgtest.$(OBJEXT) bmp.$(OBJEXT)
-jpgtest_OBJECTS = $(am_jpgtest_OBJECTS)
-jpgtest_DEPENDENCIES = libturbojpeg.la
 am_rdjpgcom_OBJECTS = rdjpgcom.$(OBJEXT)
 rdjpgcom_OBJECTS = $(am_rdjpgcom_OBJECTS)
 rdjpgcom_DEPENDENCIES = libjpeg.la
+am__tjbench_SOURCES_DIST = tjbench.c bmp.h bmp.c tjutil.h tjutil.c \
+	rdbmp.c rdppm.c wrbmp.c wrppm.c
+@WITH_TURBOJPEG_TRUE@am_tjbench_OBJECTS = tjbench-tjbench.$(OBJEXT) \
+@WITH_TURBOJPEG_TRUE@	tjbench-bmp.$(OBJEXT) \
+@WITH_TURBOJPEG_TRUE@	tjbench-tjutil.$(OBJEXT) \
+@WITH_TURBOJPEG_TRUE@	tjbench-rdbmp.$(OBJEXT) \
+@WITH_TURBOJPEG_TRUE@	tjbench-rdppm.$(OBJEXT) \
+@WITH_TURBOJPEG_TRUE@	tjbench-wrbmp.$(OBJEXT) \
+@WITH_TURBOJPEG_TRUE@	tjbench-wrppm.$(OBJEXT)
+tjbench_OBJECTS = $(am_tjbench_OBJECTS)
+@WITH_TURBOJPEG_TRUE@tjbench_DEPENDENCIES = libturbojpeg.la libjpeg.la
+am__tjunittest_SOURCES_DIST = tjunittest.c tjutil.h tjutil.c
+@WITH_TURBOJPEG_TRUE@am_tjunittest_OBJECTS = tjunittest.$(OBJEXT) \
+@WITH_TURBOJPEG_TRUE@	tjutil.$(OBJEXT)
+tjunittest_OBJECTS = $(am_tjunittest_OBJECTS)
+@WITH_TURBOJPEG_TRUE@tjunittest_DEPENDENCIES = libturbojpeg.la
 am_wrjpgcom_OBJECTS = wrjpgcom.$(OBJEXT)
 wrjpgcom_OBJECTS = $(am_wrjpgcom_OBJECTS)
 wrjpgcom_DEPENDENCIES = libjpeg.la
@@ -163,22 +237,15 @@ LTCOMPILE = $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --mode=link --tag=CC $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
-LTCXXCOMPILE = $(LIBTOOL) --mode=compile --tag=CXX $(CXX) $(DEFS) \
-	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
-	$(AM_CXXFLAGS) $(CXXFLAGS)
-CXXLD = $(CXX)
-CXXLINK = $(LIBTOOL) --mode=link --tag=CXX $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(libjpeg_la_SOURCES) $(libturbojpeg_la_SOURCES) \
-	$(cjpeg_SOURCES) $(djpeg_SOURCES) $(jpegtran_SOURCES) \
-	$(jpegut_SOURCES) $(jpgtest_SOURCES) $(rdjpgcom_SOURCES) \
-	$(wrjpgcom_SOURCES)
+	$(cjpeg_SOURCES) $(djpeg_SOURCES) $(jcstest_SOURCES) \
+	$(jpegtran_SOURCES) $(rdjpgcom_SOURCES) $(tjbench_SOURCES) \
+	$(tjunittest_SOURCES) $(wrjpgcom_SOURCES)
 DIST_SOURCES = $(am__libjpeg_la_SOURCES_DIST) \
 	$(am__libturbojpeg_la_SOURCES_DIST) $(cjpeg_SOURCES) \
-	$(djpeg_SOURCES) $(jpegtran_SOURCES) $(jpegut_SOURCES) \
-	$(jpgtest_SOURCES) $(rdjpgcom_SOURCES) $(wrjpgcom_SOURCES)
+	$(djpeg_SOURCES) $(jcstest_SOURCES) $(jpegtran_SOURCES) \
+	$(rdjpgcom_SOURCES) $(am__tjbench_SOURCES_DIST) \
+	$(am__tjunittest_SOURCES_DIST) $(wrjpgcom_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -188,12 +255,16 @@ RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 man1dir = $(mandir)/man1
 NROFF = nroff
 MANS = $(dist_man1_MANS)
+dist_docDATA_INSTALL = $(INSTALL_DATA)
+dist_exampleDATA_INSTALL = $(INSTALL_DATA)
+DATA = $(dist_doc_DATA) $(dist_example_DATA)
+am__include_HEADERS_DIST = jerror.h jmorecfg.h jpeglib.h turbojpeg.h
 includeHEADERS_INSTALL = $(INSTALL_HEADER)
 nodist_includeHEADERS_INSTALL = $(INSTALL_HEADER)
 HEADERS = $(include_HEADERS) $(nodist_include_HEADERS)
 ETAGS = etags
 CTAGS = ctags
-DIST_SUBDIRS = simd
+DIST_SUBDIRS = java simd md5
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -216,6 +287,8 @@ AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
 BUILD = @BUILD@
 CC = @CC@
+CCAS = @CCAS@
+CCASFLAGS = @CCASFLAGS@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
 CPP = @CPP@
@@ -240,15 +313,24 @@ INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
-IS_WIN32_FALSE = @IS_WIN32_FALSE@
-IS_WIN32_TRUE = @IS_WIN32_TRUE@
+JAR = @JAR@
+JAVA = @JAVA@
+JAVAC = @JAVAC@
+JAVACFLAGS = @JAVACFLAGS@
+JAVA_RPM_CONTENTS_1 = @JAVA_RPM_CONTENTS_1@
+JAVA_RPM_CONTENTS_2 = @JAVA_RPM_CONTENTS_2@
+JNI_CFLAGS = @JNI_CFLAGS@
+JPEG_LIB_VERSION = @JPEG_LIB_VERSION@
+JPEG_LIB_VERSION_DECIMAL = @JPEG_LIB_VERSION_DECIMAL@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
+LIBTOOL_CURRENT = @LIBTOOL_CURRENT@
 LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
+MEM_SRCDST_FUNCTIONS = @MEM_SRCDST_FUNCTIONS@
 NAFLAGS = @NAFLAGS@
 NASM = @NASM@
 OBJEXT = @OBJEXT@
@@ -259,22 +341,41 @@ PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PKGNAME = @PKGNAME@
 RANLIB = @RANLIB@
-RM = @RM@
 RPMARCH = @RPMARCH@
+RPM_CONFIG_ARGS = @RPM_CONFIG_ARGS@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
+SIMD_ARM_FALSE = @SIMD_ARM_FALSE@
+SIMD_ARM_TRUE = @SIMD_ARM_TRUE@
 SIMD_I386_FALSE = @SIMD_I386_FALSE@
 SIMD_I386_TRUE = @SIMD_I386_TRUE@
 SIMD_X86_64_FALSE = @SIMD_X86_64_FALSE@
 SIMD_X86_64_TRUE = @SIMD_X86_64_TRUE@
+SO_AGE = @SO_AGE@
+SO_MAJOR_VERSION = @SO_MAJOR_VERSION@
+SO_MINOR_VERSION = @SO_MINOR_VERSION@
 STRIP = @STRIP@
 VERSION = @VERSION@
 VERSION_SCRIPT_FALSE = @VERSION_SCRIPT_FALSE@
 VERSION_SCRIPT_FLAG = @VERSION_SCRIPT_FLAG@
 VERSION_SCRIPT_TRUE = @VERSION_SCRIPT_TRUE@
+WITH_ARITH_DEC_FALSE = @WITH_ARITH_DEC_FALSE@
+WITH_ARITH_DEC_TRUE = @WITH_ARITH_DEC_TRUE@
+WITH_ARITH_ENC_FALSE = @WITH_ARITH_ENC_FALSE@
+WITH_ARITH_ENC_TRUE = @WITH_ARITH_ENC_TRUE@
+WITH_ARITH_FALSE = @WITH_ARITH_FALSE@
+WITH_ARITH_TRUE = @WITH_ARITH_TRUE@
+WITH_JAVA = @WITH_JAVA@
+WITH_JAVA_FALSE = @WITH_JAVA_FALSE@
+WITH_JAVA_TRUE = @WITH_JAVA_TRUE@
 WITH_SIMD_FALSE = @WITH_SIMD_FALSE@
 WITH_SIMD_TRUE = @WITH_SIMD_TRUE@
+WITH_SSE_FLOAT_DCT_FALSE = @WITH_SSE_FLOAT_DCT_FALSE@
+WITH_SSE_FLOAT_DCT_TRUE = @WITH_SSE_FLOAT_DCT_TRUE@
+WITH_TURBOJPEG_FALSE = @WITH_TURBOJPEG_FALSE@
+WITH_TURBOJPEG_TRUE = @WITH_TURBOJPEG_TRUE@
 X86_64_FALSE = @X86_64_FALSE@
 X86_64_TRUE = @X86_64_TRUE@
 ac_ct_AR = @ac_ct_AR@
@@ -320,13 +421,16 @@ sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-lib_LTLIBRARIES = libjpeg.la libturbojpeg.la
-libjpeg_la_LDFLAGS = -version-number 62:0:0 -no-undefined
-libturbojpeg_la_LDFLAGS = -avoid-version -no-undefined $(am__append_1)
-include_HEADERS = jerror.h jmorecfg.h jpeglib.h turbojpeg.h
+lib_LTLIBRARIES = libjpeg.la $(am__append_1)
+libjpeg_la_LDFLAGS = -version-info \
+	${LIBTOOL_CURRENT}:${SO_MINOR_VERSION}:${SO_AGE} -no-undefined \
+	$(am__append_8)
+include_HEADERS = jerror.h jmorecfg.h jpeglib.h $(am__append_2)
+@WITH_TURBOJPEG_TRUE@libturbojpeg_la_LDFLAGS = -version-info 0:0 \
+@WITH_TURBOJPEG_TRUE@	-no-undefined $(am__append_7)
 nodist_include_HEADERS = jconfig.h
 HDRS = jchuff.h jdct.h jdhuff.h jerror.h jinclude.h jmemsys.h jmorecfg.h \
-	jpegint.h jpeglib.h jversion.h jsimd.h jsimddct.h
+	jpegint.h jpeglib.h jversion.h jsimd.h jsimddct.h jpegcomp.h
 
 libjpeg_la_SOURCES = $(HDRS) jcapimin.c jcapistd.c jccoefct.c \
 	jccolor.c jcdctmgr.c jchuff.c jcinit.c jcmainct.c jcmarker.c \
@@ -336,18 +440,25 @@ libjpeg_la_SOURCES = $(HDRS) jcapimin.c jcapistd.c jccoefct.c \
 	jdmarker.c jdmaster.c jdmerge.c jdphuff.c jdpostct.c \
 	jdsample.c jdtrans.c jerror.c jfdctflt.c jfdctfst.c jfdctint.c \
 	jidctflt.c jidctfst.c jidctint.c jidctred.c jquant1.c \
-	jquant2.c jutils.c jmemmgr.c jmemnobs.c $(am__append_2)
-libturbojpeg_la_SOURCES = $(libjpeg_la_SOURCES) turbojpegl.c turbojpeg.h \
-	turbojpeg-mapfile
-
-@WITH_SIMD_TRUE@SUBDIRS = simd
+	jquant2.c jutils.c jmemmgr.c jmemnobs.c $(am__append_3) \
+	$(am__append_4) $(am__append_5) $(am__append_10)
+SUBDIRS = java $(am__append_9) md5
+@WITH_TURBOJPEG_TRUE@libturbojpeg_la_SOURCES = $(libjpeg_la_SOURCES) \
+@WITH_TURBOJPEG_TRUE@	turbojpeg.c turbojpeg.h transupp.c \
+@WITH_TURBOJPEG_TRUE@	transupp.h jdatadst-tj.c jdatasrc-tj.c \
+@WITH_TURBOJPEG_TRUE@	$(am__append_6) $(TJMAPFILE)
+@WITH_JAVA_TRUE@@WITH_TURBOJPEG_TRUE@libturbojpeg_la_CFLAGS = ${JNI_CFLAGS}
+@WITH_JAVA_FALSE@@WITH_TURBOJPEG_TRUE@TJMAPFILE = turbojpeg-mapfile
+@WITH_JAVA_TRUE@@WITH_TURBOJPEG_TRUE@TJMAPFILE = turbojpeg-mapfile.jni
 @WITH_SIMD_TRUE@libjpeg_la_LIBADD = simd/libsimd.la
 @WITH_SIMD_TRUE@libturbojpeg_la_LIBADD = simd/libsimd.la
-TSTHDRS = rrutil.h rrtimer.h
-jpgtest_SOURCES = $(TSTHDRS) jpgtest.cxx bmp.h bmp.c
-jpgtest_LDADD = libturbojpeg.la
-jpegut_SOURCES = $(TSTHDRS) jpegut.c bmp.h bmp.c
-jpegut_LDADD = libturbojpeg.la
+@WITH_TURBOJPEG_TRUE@tjbench_SOURCES = tjbench.c bmp.h bmp.c tjutil.h tjutil.c rdbmp.c rdppm.c \
+@WITH_TURBOJPEG_TRUE@	wrbmp.c wrppm.c
+
+@WITH_TURBOJPEG_TRUE@tjbench_LDADD = libturbojpeg.la libjpeg.la -lm
+@WITH_TURBOJPEG_TRUE@tjbench_CFLAGS = -DBMP_SUPPORTED -DPPM_SUPPORTED
+@WITH_TURBOJPEG_TRUE@tjunittest_SOURCES = tjunittest.c tjutil.h tjutil.c
+@WITH_TURBOJPEG_TRUE@tjunittest_LDADD = libturbojpeg.la
 cjpeg_SOURCES = cdjpeg.h cderror.h cdjpeg.c cjpeg.c rdbmp.c rdgif.c \
 	rdppm.c rdswitch.c rdtarga.c 
 
@@ -368,24 +479,58 @@ rdjpgcom_SOURCES = rdjpgcom.c
 rdjpgcom_LDADD = libjpeg.la
 wrjpgcom_SOURCES = wrjpgcom.c
 wrjpgcom_LDADD = libjpeg.la
+jcstest_SOURCES = jcstest.c
+jcstest_LDADD = libjpeg.la
 dist_man1_MANS = cjpeg.1 djpeg.1 jpegtran.1 rdjpgcom.1 wrjpgcom.1
-DOCS = README install.doc usage.doc wizard.doc example.c libjpeg.doc \
-	structure.doc coderules.doc filelist.doc jconfig.doc change.log \
-	README-turbo.txt rdrle.c wrrle.c LICENSE.txt LGPL.txt BUILDING.txt \
+DOCS = coderules.txt jconfig.txt change.log rdrle.c wrrle.c BUILDING.txt \
 	ChangeLog.txt
 
-TESTFILES = testorig.jpg testorig.ppm testimg.bmp testimgflt.jpg \
-	testimgfst.jpg testimgint.jpg testimgp.jpg testimgfst.ppm testimgint.ppm \
-	testimg-nosimd.bmp testimgfst-nosimd.ppm testorig-nosimd.ppm \
-	testimgflt-nosimd.jpg testimgint-nosimd.jpg testimgfst-nosimd.jpg \
-	testimgp-nosimd.jpg
+docdir = $(datadir)/doc
+dist_doc_DATA = README README-turbo.txt libjpeg.txt structure.txt usage.txt \
+	wizard.txt 
 
-EXTRA_DIST = win release $(DOCS) $(TESTFILES)
+exampledir = $(datadir)/doc
+dist_example_DATA = example.c
+EXTRA_DIST = win release $(DOCS) testimages CMakeLists.txt \
+	sharedlib/CMakeLists.txt cmakescripts libjpeg.map.in doc doxygen.config \
+	jccolext.c jdcolext.c jdmrgext.c
+
+MD5_JPEG_INT = 9a68f56bc76e466aa7e52f415d0f4a5f
+MD5_JPEG_FAST = 0e1502e7fa421835e376a314fac2a39f
+MD5_JPEG_FAST_100 = 7bf72a8e741d64eecb960c97323af77c
+MD5_JPEG_FLOAT = d1623885ffafcd40c684af09e3d65cd5
+MD5_JPEG_FLOAT_NOSIMD = fb4884c35f8273f498cb32879de5c455
+MD5_JPEG_INT_GRAY = 72b51f894b8f4a10b3ee3066770aa38d
+MD5_PPM_INT = d1ed0d11f076b842525271647716aeb8
+MD5_PPM_FAST = 048298a2d2410261c0533cb97bcfef23
+MD5_PPM_FLOAT = 7f5b446ee36b2630e06785b8d42af15f
+MD5_PPM_FLOAT_NOSIMD = 64072f1dbdc5b3a187777788604971a5
+MD5_PPM_INT_2_1 = 9f9de8c0612f8d06869b960b05abf9c9
+MD5_PPM_INT_15_8 = b6875bc070720b899566cc06459b63b7
+MD5_PPM_INT_7_4 = 06a177eae05f164fac57f7a2c346ee87
+MD5_PPM_INT_13_8 = bc3452573c8152f6ae552939ee19f82f
+MD5_PPM_INT_3_2 = f5a8b88a8a7f96016f04d259cf82ed67
+MD5_PPM_INT_11_8 = d8cc73c0aaacd4556569b59437ba00a5
+MD5_PPM_INT_5_4 = 32775dd9ad2ab90f4c5b219b53e0c86c
+MD5_PPM_INT_9_8 = d25e61bc7eac0002f5b393aa223747b6
+MD5_PPM_INT_7_8 = ddb564b7c74a09494016d6cd7502a946
+MD5_PPM_INT_3_4 = 8ed8e68808c3fbc4ea764fc9d2968646
+MD5_PPM_INT_5_8 = a3363274999da2366a024efae6d16c9b
+MD5_PPM_INT_1_2 = e692a315cea26b988c8e8b29a5dbcd81
+MD5_PPM_INT_3_8 = 79eca9175652ced755155c90e785a996
+MD5_PPM_INT_1_4 = 79cd778f8bf1a117690052cacdd54eca
+MD5_PPM_INT_1_8 = 391b3d4aca640c8567d6f8745eb2142f
+MD5_PPM_FAST_1_2 = f30bcf6d32ccd44cbdd9aeaacbd9454f
+MD5_BMP_256 = 4980185e3776e89bd931736e1cddeee6
+MD5_JPEG_ARI = e986fb0a637a8d833d96e8a6d6d84ea1
+MD5_PPM_ARI = 72b59a99bcf1de24c5b27d151bde2437
+MD5_JPEG_PROG = 1c4afddc05c0a43489ee54438a482d92
+MD5_JPEG_CROP = b4197f377e621c4e9b1d20471432610d
 all: config.h jconfig.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
 .SUFFIXES:
-.SUFFIXES: .c .cxx .lo .o .obj
+.SUFFIXES: .c .lo .o .obj
 am--refresh:
 	@:
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
@@ -446,6 +591,28 @@ stamp-h2: $(srcdir)/jconfig.h.in $(top_builddir)/config.status
 
 distclean-hdr:
 	-rm -f config.h stamp-h1 jconfig.h stamp-h2
+pkgscripts/libjpeg-turbo.spec.tmpl: $(top_builddir)/config.status $(top_srcdir)/release/libjpeg-turbo.spec.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+pkgscripts/makecygwinpkg.tmpl: $(top_builddir)/config.status $(top_srcdir)/release/makecygwinpkg.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+pkgscripts/makedpkg.tmpl: $(top_builddir)/config.status $(top_srcdir)/release/makedpkg.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+pkgscripts/makemacpkg.tmpl: $(top_builddir)/config.status $(top_srcdir)/release/makemacpkg.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+pkgscripts/Description.plist: $(top_builddir)/config.status $(top_srcdir)/release/Description.plist.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+pkgscripts/Info.plist: $(top_builddir)/config.status $(top_srcdir)/release/Info.plist.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+pkgscripts/uninstall.tmpl: $(top_builddir)/config.status $(top_srcdir)/release/uninstall.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+tjbenchtest: $(top_builddir)/config.status $(srcdir)/tjbenchtest.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+tjbenchtest.java: $(top_builddir)/config.status $(srcdir)/tjbenchtest.java.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+tjexampletest: $(top_builddir)/config.status $(srcdir)/tjexampletest.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+libjpeg.map: $(top_builddir)/config.status $(srcdir)/libjpeg.map.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
 install-libLTLIBRARIES: $(lib_LTLIBRARIES)
 	@$(NORMAL_INSTALL)
 	test -z "$(libdir)" || $(mkdir_p) "$(DESTDIR)$(libdir)"
@@ -476,7 +643,7 @@ clean-libLTLIBRARIES:
 libjpeg.la: $(libjpeg_la_OBJECTS) $(libjpeg_la_DEPENDENCIES) 
 	$(LINK) -rpath $(libdir) $(libjpeg_la_LDFLAGS) $(libjpeg_la_OBJECTS) $(libjpeg_la_LIBADD) $(LIBS)
 libturbojpeg.la: $(libturbojpeg_la_OBJECTS) $(libturbojpeg_la_DEPENDENCIES) 
-	$(LINK) -rpath $(libdir) $(libturbojpeg_la_LDFLAGS) $(libturbojpeg_la_OBJECTS) $(libturbojpeg_la_LIBADD) $(LIBS)
+	$(LINK) $(am_libturbojpeg_la_rpath) $(libturbojpeg_la_LDFLAGS) $(libturbojpeg_la_OBJECTS) $(libturbojpeg_la_LIBADD) $(LIBS)
 install-binPROGRAMS: $(bin_PROGRAMS)
 	@$(NORMAL_INSTALL)
 	test -z "$(bindir)" || $(mkdir_p) "$(DESTDIR)$(bindir)"
@@ -518,18 +685,21 @@ cjpeg$(EXEEXT): $(cjpeg_OBJECTS) $(cjpeg_DEPENDENCIES)
 djpeg$(EXEEXT): $(djpeg_OBJECTS) $(djpeg_DEPENDENCIES) 
 	@rm -f djpeg$(EXEEXT)
 	$(LINK) $(djpeg_LDFLAGS) $(djpeg_OBJECTS) $(djpeg_LDADD) $(LIBS)
+jcstest$(EXEEXT): $(jcstest_OBJECTS) $(jcstest_DEPENDENCIES) 
+	@rm -f jcstest$(EXEEXT)
+	$(LINK) $(jcstest_LDFLAGS) $(jcstest_OBJECTS) $(jcstest_LDADD) $(LIBS)
 jpegtran$(EXEEXT): $(jpegtran_OBJECTS) $(jpegtran_DEPENDENCIES) 
 	@rm -f jpegtran$(EXEEXT)
 	$(LINK) $(jpegtran_LDFLAGS) $(jpegtran_OBJECTS) $(jpegtran_LDADD) $(LIBS)
-jpegut$(EXEEXT): $(jpegut_OBJECTS) $(jpegut_DEPENDENCIES) 
-	@rm -f jpegut$(EXEEXT)
-	$(LINK) $(jpegut_LDFLAGS) $(jpegut_OBJECTS) $(jpegut_LDADD) $(LIBS)
-jpgtest$(EXEEXT): $(jpgtest_OBJECTS) $(jpgtest_DEPENDENCIES) 
-	@rm -f jpgtest$(EXEEXT)
-	$(CXXLINK) $(jpgtest_LDFLAGS) $(jpgtest_OBJECTS) $(jpgtest_LDADD) $(LIBS)
 rdjpgcom$(EXEEXT): $(rdjpgcom_OBJECTS) $(rdjpgcom_DEPENDENCIES) 
 	@rm -f rdjpgcom$(EXEEXT)
 	$(LINK) $(rdjpgcom_LDFLAGS) $(rdjpgcom_OBJECTS) $(rdjpgcom_LDADD) $(LIBS)
+tjbench$(EXEEXT): $(tjbench_OBJECTS) $(tjbench_DEPENDENCIES) 
+	@rm -f tjbench$(EXEEXT)
+	$(LINK) $(tjbench_LDFLAGS) $(tjbench_OBJECTS) $(tjbench_LDADD) $(LIBS)
+tjunittest$(EXEEXT): $(tjunittest_OBJECTS) $(tjunittest_DEPENDENCIES) 
+	@rm -f tjunittest$(EXEEXT)
+	$(LINK) $(tjunittest_LDFLAGS) $(tjunittest_OBJECTS) $(tjunittest_LDADD) $(LIBS)
 wrjpgcom$(EXEEXT): $(wrjpgcom_OBJECTS) $(wrjpgcom_DEPENDENCIES) 
 	@rm -f wrjpgcom$(EXEEXT)
 	$(LINK) $(wrjpgcom_LDFLAGS) $(wrjpgcom_OBJECTS) $(wrjpgcom_LDADD) $(LIBS)
@@ -540,7 +710,6 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bmp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdjpeg.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cjpeg-cdjpeg.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cjpeg-cjpeg.Po@am__quote@
@@ -557,8 +726,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/djpeg-wrgif.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/djpeg-wrppm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/djpeg-wrtarga.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jaricom.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jcapimin.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jcapistd.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jcarith.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jccoefct.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jccolor.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jcdctmgr.Plo@am__quote@
@@ -572,9 +743,11 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jcphuff.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jcprepct.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jcsample.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jcstest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jctrans.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jdapimin.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jdapistd.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jdarith.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jdatadst.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jdatasrc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jdcoefct.Plo@am__quote@
@@ -601,16 +774,77 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jmemmgr.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jmemnobs.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jpegtran.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jpegut.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jpgtest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jquant1.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jquant2.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jsimd_none.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jutils.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jaricom.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jcapimin.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jcapistd.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jcarith.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jccoefct.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jccolor.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jcdctmgr.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jchuff.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jcinit.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jcmainct.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jcmarker.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jcmaster.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jcomapi.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jcparam.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jcphuff.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jcprepct.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jcsample.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jctrans.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jdapimin.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jdapistd.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jdarith.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jdatadst-tj.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jdatadst.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jdatasrc-tj.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jdatasrc.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jdcoefct.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jdcolor.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jddctmgr.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jdhuff.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jdinput.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jdmainct.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jdmarker.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jdmaster.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jdmerge.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jdphuff.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jdpostct.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jdsample.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jdtrans.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jerror.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jfdctflt.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jfdctfst.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jfdctint.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jidctflt.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jidctfst.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jidctint.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jidctred.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jmemmgr.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jmemnobs.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jquant1.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jquant2.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jsimd_none.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-jutils.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-transupp.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-turbojpeg-jni.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libturbojpeg_la-turbojpeg.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rdjpgcom.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rdswitch.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tjbench-bmp.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tjbench-rdbmp.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tjbench-rdppm.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tjbench-tjbench.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tjbench-tjutil.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tjbench-wrbmp.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tjbench-wrppm.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tjunittest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tjutil.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/transupp.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/turbojpegl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wrjpgcom.Po@am__quote@
 
 .c.o:
@@ -633,6 +867,391 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
+
+libturbojpeg_la-jcapimin.lo: jcapimin.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jcapimin.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jcapimin.Tpo" -c -o libturbojpeg_la-jcapimin.lo `test -f 'jcapimin.c' || echo '$(srcdir)/'`jcapimin.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jcapimin.Tpo" "$(DEPDIR)/libturbojpeg_la-jcapimin.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jcapimin.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jcapimin.c' object='libturbojpeg_la-jcapimin.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jcapimin.lo `test -f 'jcapimin.c' || echo '$(srcdir)/'`jcapimin.c
+
+libturbojpeg_la-jcapistd.lo: jcapistd.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jcapistd.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jcapistd.Tpo" -c -o libturbojpeg_la-jcapistd.lo `test -f 'jcapistd.c' || echo '$(srcdir)/'`jcapistd.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jcapistd.Tpo" "$(DEPDIR)/libturbojpeg_la-jcapistd.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jcapistd.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jcapistd.c' object='libturbojpeg_la-jcapistd.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jcapistd.lo `test -f 'jcapistd.c' || echo '$(srcdir)/'`jcapistd.c
+
+libturbojpeg_la-jccoefct.lo: jccoefct.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jccoefct.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jccoefct.Tpo" -c -o libturbojpeg_la-jccoefct.lo `test -f 'jccoefct.c' || echo '$(srcdir)/'`jccoefct.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jccoefct.Tpo" "$(DEPDIR)/libturbojpeg_la-jccoefct.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jccoefct.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jccoefct.c' object='libturbojpeg_la-jccoefct.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jccoefct.lo `test -f 'jccoefct.c' || echo '$(srcdir)/'`jccoefct.c
+
+libturbojpeg_la-jccolor.lo: jccolor.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jccolor.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jccolor.Tpo" -c -o libturbojpeg_la-jccolor.lo `test -f 'jccolor.c' || echo '$(srcdir)/'`jccolor.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jccolor.Tpo" "$(DEPDIR)/libturbojpeg_la-jccolor.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jccolor.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jccolor.c' object='libturbojpeg_la-jccolor.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jccolor.lo `test -f 'jccolor.c' || echo '$(srcdir)/'`jccolor.c
+
+libturbojpeg_la-jcdctmgr.lo: jcdctmgr.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jcdctmgr.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jcdctmgr.Tpo" -c -o libturbojpeg_la-jcdctmgr.lo `test -f 'jcdctmgr.c' || echo '$(srcdir)/'`jcdctmgr.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jcdctmgr.Tpo" "$(DEPDIR)/libturbojpeg_la-jcdctmgr.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jcdctmgr.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jcdctmgr.c' object='libturbojpeg_la-jcdctmgr.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jcdctmgr.lo `test -f 'jcdctmgr.c' || echo '$(srcdir)/'`jcdctmgr.c
+
+libturbojpeg_la-jchuff.lo: jchuff.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jchuff.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jchuff.Tpo" -c -o libturbojpeg_la-jchuff.lo `test -f 'jchuff.c' || echo '$(srcdir)/'`jchuff.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jchuff.Tpo" "$(DEPDIR)/libturbojpeg_la-jchuff.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jchuff.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jchuff.c' object='libturbojpeg_la-jchuff.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jchuff.lo `test -f 'jchuff.c' || echo '$(srcdir)/'`jchuff.c
+
+libturbojpeg_la-jcinit.lo: jcinit.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jcinit.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jcinit.Tpo" -c -o libturbojpeg_la-jcinit.lo `test -f 'jcinit.c' || echo '$(srcdir)/'`jcinit.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jcinit.Tpo" "$(DEPDIR)/libturbojpeg_la-jcinit.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jcinit.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jcinit.c' object='libturbojpeg_la-jcinit.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jcinit.lo `test -f 'jcinit.c' || echo '$(srcdir)/'`jcinit.c
+
+libturbojpeg_la-jcmainct.lo: jcmainct.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jcmainct.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jcmainct.Tpo" -c -o libturbojpeg_la-jcmainct.lo `test -f 'jcmainct.c' || echo '$(srcdir)/'`jcmainct.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jcmainct.Tpo" "$(DEPDIR)/libturbojpeg_la-jcmainct.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jcmainct.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jcmainct.c' object='libturbojpeg_la-jcmainct.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jcmainct.lo `test -f 'jcmainct.c' || echo '$(srcdir)/'`jcmainct.c
+
+libturbojpeg_la-jcmarker.lo: jcmarker.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jcmarker.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jcmarker.Tpo" -c -o libturbojpeg_la-jcmarker.lo `test -f 'jcmarker.c' || echo '$(srcdir)/'`jcmarker.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jcmarker.Tpo" "$(DEPDIR)/libturbojpeg_la-jcmarker.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jcmarker.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jcmarker.c' object='libturbojpeg_la-jcmarker.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jcmarker.lo `test -f 'jcmarker.c' || echo '$(srcdir)/'`jcmarker.c
+
+libturbojpeg_la-jcmaster.lo: jcmaster.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jcmaster.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jcmaster.Tpo" -c -o libturbojpeg_la-jcmaster.lo `test -f 'jcmaster.c' || echo '$(srcdir)/'`jcmaster.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jcmaster.Tpo" "$(DEPDIR)/libturbojpeg_la-jcmaster.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jcmaster.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jcmaster.c' object='libturbojpeg_la-jcmaster.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jcmaster.lo `test -f 'jcmaster.c' || echo '$(srcdir)/'`jcmaster.c
+
+libturbojpeg_la-jcomapi.lo: jcomapi.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jcomapi.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jcomapi.Tpo" -c -o libturbojpeg_la-jcomapi.lo `test -f 'jcomapi.c' || echo '$(srcdir)/'`jcomapi.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jcomapi.Tpo" "$(DEPDIR)/libturbojpeg_la-jcomapi.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jcomapi.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jcomapi.c' object='libturbojpeg_la-jcomapi.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jcomapi.lo `test -f 'jcomapi.c' || echo '$(srcdir)/'`jcomapi.c
+
+libturbojpeg_la-jcparam.lo: jcparam.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jcparam.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jcparam.Tpo" -c -o libturbojpeg_la-jcparam.lo `test -f 'jcparam.c' || echo '$(srcdir)/'`jcparam.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jcparam.Tpo" "$(DEPDIR)/libturbojpeg_la-jcparam.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jcparam.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jcparam.c' object='libturbojpeg_la-jcparam.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jcparam.lo `test -f 'jcparam.c' || echo '$(srcdir)/'`jcparam.c
+
+libturbojpeg_la-jcphuff.lo: jcphuff.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jcphuff.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jcphuff.Tpo" -c -o libturbojpeg_la-jcphuff.lo `test -f 'jcphuff.c' || echo '$(srcdir)/'`jcphuff.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jcphuff.Tpo" "$(DEPDIR)/libturbojpeg_la-jcphuff.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jcphuff.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jcphuff.c' object='libturbojpeg_la-jcphuff.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jcphuff.lo `test -f 'jcphuff.c' || echo '$(srcdir)/'`jcphuff.c
+
+libturbojpeg_la-jcprepct.lo: jcprepct.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jcprepct.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jcprepct.Tpo" -c -o libturbojpeg_la-jcprepct.lo `test -f 'jcprepct.c' || echo '$(srcdir)/'`jcprepct.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jcprepct.Tpo" "$(DEPDIR)/libturbojpeg_la-jcprepct.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jcprepct.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jcprepct.c' object='libturbojpeg_la-jcprepct.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jcprepct.lo `test -f 'jcprepct.c' || echo '$(srcdir)/'`jcprepct.c
+
+libturbojpeg_la-jcsample.lo: jcsample.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jcsample.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jcsample.Tpo" -c -o libturbojpeg_la-jcsample.lo `test -f 'jcsample.c' || echo '$(srcdir)/'`jcsample.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jcsample.Tpo" "$(DEPDIR)/libturbojpeg_la-jcsample.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jcsample.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jcsample.c' object='libturbojpeg_la-jcsample.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jcsample.lo `test -f 'jcsample.c' || echo '$(srcdir)/'`jcsample.c
+
+libturbojpeg_la-jctrans.lo: jctrans.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jctrans.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jctrans.Tpo" -c -o libturbojpeg_la-jctrans.lo `test -f 'jctrans.c' || echo '$(srcdir)/'`jctrans.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jctrans.Tpo" "$(DEPDIR)/libturbojpeg_la-jctrans.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jctrans.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jctrans.c' object='libturbojpeg_la-jctrans.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jctrans.lo `test -f 'jctrans.c' || echo '$(srcdir)/'`jctrans.c
+
+libturbojpeg_la-jdapimin.lo: jdapimin.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jdapimin.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jdapimin.Tpo" -c -o libturbojpeg_la-jdapimin.lo `test -f 'jdapimin.c' || echo '$(srcdir)/'`jdapimin.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jdapimin.Tpo" "$(DEPDIR)/libturbojpeg_la-jdapimin.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jdapimin.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jdapimin.c' object='libturbojpeg_la-jdapimin.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jdapimin.lo `test -f 'jdapimin.c' || echo '$(srcdir)/'`jdapimin.c
+
+libturbojpeg_la-jdapistd.lo: jdapistd.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jdapistd.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jdapistd.Tpo" -c -o libturbojpeg_la-jdapistd.lo `test -f 'jdapistd.c' || echo '$(srcdir)/'`jdapistd.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jdapistd.Tpo" "$(DEPDIR)/libturbojpeg_la-jdapistd.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jdapistd.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jdapistd.c' object='libturbojpeg_la-jdapistd.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jdapistd.lo `test -f 'jdapistd.c' || echo '$(srcdir)/'`jdapistd.c
+
+libturbojpeg_la-jdatadst.lo: jdatadst.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jdatadst.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jdatadst.Tpo" -c -o libturbojpeg_la-jdatadst.lo `test -f 'jdatadst.c' || echo '$(srcdir)/'`jdatadst.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jdatadst.Tpo" "$(DEPDIR)/libturbojpeg_la-jdatadst.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jdatadst.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jdatadst.c' object='libturbojpeg_la-jdatadst.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jdatadst.lo `test -f 'jdatadst.c' || echo '$(srcdir)/'`jdatadst.c
+
+libturbojpeg_la-jdatasrc.lo: jdatasrc.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jdatasrc.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jdatasrc.Tpo" -c -o libturbojpeg_la-jdatasrc.lo `test -f 'jdatasrc.c' || echo '$(srcdir)/'`jdatasrc.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jdatasrc.Tpo" "$(DEPDIR)/libturbojpeg_la-jdatasrc.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jdatasrc.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jdatasrc.c' object='libturbojpeg_la-jdatasrc.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jdatasrc.lo `test -f 'jdatasrc.c' || echo '$(srcdir)/'`jdatasrc.c
+
+libturbojpeg_la-jdcoefct.lo: jdcoefct.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jdcoefct.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jdcoefct.Tpo" -c -o libturbojpeg_la-jdcoefct.lo `test -f 'jdcoefct.c' || echo '$(srcdir)/'`jdcoefct.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jdcoefct.Tpo" "$(DEPDIR)/libturbojpeg_la-jdcoefct.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jdcoefct.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jdcoefct.c' object='libturbojpeg_la-jdcoefct.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jdcoefct.lo `test -f 'jdcoefct.c' || echo '$(srcdir)/'`jdcoefct.c
+
+libturbojpeg_la-jdcolor.lo: jdcolor.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jdcolor.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jdcolor.Tpo" -c -o libturbojpeg_la-jdcolor.lo `test -f 'jdcolor.c' || echo '$(srcdir)/'`jdcolor.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jdcolor.Tpo" "$(DEPDIR)/libturbojpeg_la-jdcolor.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jdcolor.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jdcolor.c' object='libturbojpeg_la-jdcolor.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jdcolor.lo `test -f 'jdcolor.c' || echo '$(srcdir)/'`jdcolor.c
+
+libturbojpeg_la-jddctmgr.lo: jddctmgr.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jddctmgr.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jddctmgr.Tpo" -c -o libturbojpeg_la-jddctmgr.lo `test -f 'jddctmgr.c' || echo '$(srcdir)/'`jddctmgr.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jddctmgr.Tpo" "$(DEPDIR)/libturbojpeg_la-jddctmgr.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jddctmgr.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jddctmgr.c' object='libturbojpeg_la-jddctmgr.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jddctmgr.lo `test -f 'jddctmgr.c' || echo '$(srcdir)/'`jddctmgr.c
+
+libturbojpeg_la-jdhuff.lo: jdhuff.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jdhuff.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jdhuff.Tpo" -c -o libturbojpeg_la-jdhuff.lo `test -f 'jdhuff.c' || echo '$(srcdir)/'`jdhuff.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jdhuff.Tpo" "$(DEPDIR)/libturbojpeg_la-jdhuff.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jdhuff.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jdhuff.c' object='libturbojpeg_la-jdhuff.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jdhuff.lo `test -f 'jdhuff.c' || echo '$(srcdir)/'`jdhuff.c
+
+libturbojpeg_la-jdinput.lo: jdinput.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jdinput.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jdinput.Tpo" -c -o libturbojpeg_la-jdinput.lo `test -f 'jdinput.c' || echo '$(srcdir)/'`jdinput.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jdinput.Tpo" "$(DEPDIR)/libturbojpeg_la-jdinput.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jdinput.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jdinput.c' object='libturbojpeg_la-jdinput.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jdinput.lo `test -f 'jdinput.c' || echo '$(srcdir)/'`jdinput.c
+
+libturbojpeg_la-jdmainct.lo: jdmainct.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jdmainct.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jdmainct.Tpo" -c -o libturbojpeg_la-jdmainct.lo `test -f 'jdmainct.c' || echo '$(srcdir)/'`jdmainct.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jdmainct.Tpo" "$(DEPDIR)/libturbojpeg_la-jdmainct.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jdmainct.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jdmainct.c' object='libturbojpeg_la-jdmainct.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jdmainct.lo `test -f 'jdmainct.c' || echo '$(srcdir)/'`jdmainct.c
+
+libturbojpeg_la-jdmarker.lo: jdmarker.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jdmarker.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jdmarker.Tpo" -c -o libturbojpeg_la-jdmarker.lo `test -f 'jdmarker.c' || echo '$(srcdir)/'`jdmarker.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jdmarker.Tpo" "$(DEPDIR)/libturbojpeg_la-jdmarker.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jdmarker.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jdmarker.c' object='libturbojpeg_la-jdmarker.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jdmarker.lo `test -f 'jdmarker.c' || echo '$(srcdir)/'`jdmarker.c
+
+libturbojpeg_la-jdmaster.lo: jdmaster.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jdmaster.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jdmaster.Tpo" -c -o libturbojpeg_la-jdmaster.lo `test -f 'jdmaster.c' || echo '$(srcdir)/'`jdmaster.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jdmaster.Tpo" "$(DEPDIR)/libturbojpeg_la-jdmaster.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jdmaster.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jdmaster.c' object='libturbojpeg_la-jdmaster.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jdmaster.lo `test -f 'jdmaster.c' || echo '$(srcdir)/'`jdmaster.c
+
+libturbojpeg_la-jdmerge.lo: jdmerge.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jdmerge.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jdmerge.Tpo" -c -o libturbojpeg_la-jdmerge.lo `test -f 'jdmerge.c' || echo '$(srcdir)/'`jdmerge.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jdmerge.Tpo" "$(DEPDIR)/libturbojpeg_la-jdmerge.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jdmerge.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jdmerge.c' object='libturbojpeg_la-jdmerge.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jdmerge.lo `test -f 'jdmerge.c' || echo '$(srcdir)/'`jdmerge.c
+
+libturbojpeg_la-jdphuff.lo: jdphuff.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jdphuff.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jdphuff.Tpo" -c -o libturbojpeg_la-jdphuff.lo `test -f 'jdphuff.c' || echo '$(srcdir)/'`jdphuff.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jdphuff.Tpo" "$(DEPDIR)/libturbojpeg_la-jdphuff.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jdphuff.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jdphuff.c' object='libturbojpeg_la-jdphuff.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jdphuff.lo `test -f 'jdphuff.c' || echo '$(srcdir)/'`jdphuff.c
+
+libturbojpeg_la-jdpostct.lo: jdpostct.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jdpostct.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jdpostct.Tpo" -c -o libturbojpeg_la-jdpostct.lo `test -f 'jdpostct.c' || echo '$(srcdir)/'`jdpostct.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jdpostct.Tpo" "$(DEPDIR)/libturbojpeg_la-jdpostct.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jdpostct.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jdpostct.c' object='libturbojpeg_la-jdpostct.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jdpostct.lo `test -f 'jdpostct.c' || echo '$(srcdir)/'`jdpostct.c
+
+libturbojpeg_la-jdsample.lo: jdsample.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jdsample.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jdsample.Tpo" -c -o libturbojpeg_la-jdsample.lo `test -f 'jdsample.c' || echo '$(srcdir)/'`jdsample.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jdsample.Tpo" "$(DEPDIR)/libturbojpeg_la-jdsample.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jdsample.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jdsample.c' object='libturbojpeg_la-jdsample.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jdsample.lo `test -f 'jdsample.c' || echo '$(srcdir)/'`jdsample.c
+
+libturbojpeg_la-jdtrans.lo: jdtrans.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jdtrans.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jdtrans.Tpo" -c -o libturbojpeg_la-jdtrans.lo `test -f 'jdtrans.c' || echo '$(srcdir)/'`jdtrans.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jdtrans.Tpo" "$(DEPDIR)/libturbojpeg_la-jdtrans.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jdtrans.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jdtrans.c' object='libturbojpeg_la-jdtrans.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jdtrans.lo `test -f 'jdtrans.c' || echo '$(srcdir)/'`jdtrans.c
+
+libturbojpeg_la-jerror.lo: jerror.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jerror.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jerror.Tpo" -c -o libturbojpeg_la-jerror.lo `test -f 'jerror.c' || echo '$(srcdir)/'`jerror.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jerror.Tpo" "$(DEPDIR)/libturbojpeg_la-jerror.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jerror.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jerror.c' object='libturbojpeg_la-jerror.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jerror.lo `test -f 'jerror.c' || echo '$(srcdir)/'`jerror.c
+
+libturbojpeg_la-jfdctflt.lo: jfdctflt.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jfdctflt.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jfdctflt.Tpo" -c -o libturbojpeg_la-jfdctflt.lo `test -f 'jfdctflt.c' || echo '$(srcdir)/'`jfdctflt.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jfdctflt.Tpo" "$(DEPDIR)/libturbojpeg_la-jfdctflt.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jfdctflt.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jfdctflt.c' object='libturbojpeg_la-jfdctflt.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jfdctflt.lo `test -f 'jfdctflt.c' || echo '$(srcdir)/'`jfdctflt.c
+
+libturbojpeg_la-jfdctfst.lo: jfdctfst.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jfdctfst.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jfdctfst.Tpo" -c -o libturbojpeg_la-jfdctfst.lo `test -f 'jfdctfst.c' || echo '$(srcdir)/'`jfdctfst.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jfdctfst.Tpo" "$(DEPDIR)/libturbojpeg_la-jfdctfst.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jfdctfst.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jfdctfst.c' object='libturbojpeg_la-jfdctfst.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jfdctfst.lo `test -f 'jfdctfst.c' || echo '$(srcdir)/'`jfdctfst.c
+
+libturbojpeg_la-jfdctint.lo: jfdctint.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jfdctint.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jfdctint.Tpo" -c -o libturbojpeg_la-jfdctint.lo `test -f 'jfdctint.c' || echo '$(srcdir)/'`jfdctint.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jfdctint.Tpo" "$(DEPDIR)/libturbojpeg_la-jfdctint.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jfdctint.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jfdctint.c' object='libturbojpeg_la-jfdctint.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jfdctint.lo `test -f 'jfdctint.c' || echo '$(srcdir)/'`jfdctint.c
+
+libturbojpeg_la-jidctflt.lo: jidctflt.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jidctflt.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jidctflt.Tpo" -c -o libturbojpeg_la-jidctflt.lo `test -f 'jidctflt.c' || echo '$(srcdir)/'`jidctflt.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jidctflt.Tpo" "$(DEPDIR)/libturbojpeg_la-jidctflt.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jidctflt.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jidctflt.c' object='libturbojpeg_la-jidctflt.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jidctflt.lo `test -f 'jidctflt.c' || echo '$(srcdir)/'`jidctflt.c
+
+libturbojpeg_la-jidctfst.lo: jidctfst.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jidctfst.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jidctfst.Tpo" -c -o libturbojpeg_la-jidctfst.lo `test -f 'jidctfst.c' || echo '$(srcdir)/'`jidctfst.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jidctfst.Tpo" "$(DEPDIR)/libturbojpeg_la-jidctfst.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jidctfst.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jidctfst.c' object='libturbojpeg_la-jidctfst.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jidctfst.lo `test -f 'jidctfst.c' || echo '$(srcdir)/'`jidctfst.c
+
+libturbojpeg_la-jidctint.lo: jidctint.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jidctint.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jidctint.Tpo" -c -o libturbojpeg_la-jidctint.lo `test -f 'jidctint.c' || echo '$(srcdir)/'`jidctint.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jidctint.Tpo" "$(DEPDIR)/libturbojpeg_la-jidctint.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jidctint.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jidctint.c' object='libturbojpeg_la-jidctint.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jidctint.lo `test -f 'jidctint.c' || echo '$(srcdir)/'`jidctint.c
+
+libturbojpeg_la-jidctred.lo: jidctred.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jidctred.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jidctred.Tpo" -c -o libturbojpeg_la-jidctred.lo `test -f 'jidctred.c' || echo '$(srcdir)/'`jidctred.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jidctred.Tpo" "$(DEPDIR)/libturbojpeg_la-jidctred.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jidctred.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jidctred.c' object='libturbojpeg_la-jidctred.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jidctred.lo `test -f 'jidctred.c' || echo '$(srcdir)/'`jidctred.c
+
+libturbojpeg_la-jquant1.lo: jquant1.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jquant1.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jquant1.Tpo" -c -o libturbojpeg_la-jquant1.lo `test -f 'jquant1.c' || echo '$(srcdir)/'`jquant1.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jquant1.Tpo" "$(DEPDIR)/libturbojpeg_la-jquant1.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jquant1.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jquant1.c' object='libturbojpeg_la-jquant1.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jquant1.lo `test -f 'jquant1.c' || echo '$(srcdir)/'`jquant1.c
+
+libturbojpeg_la-jquant2.lo: jquant2.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jquant2.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jquant2.Tpo" -c -o libturbojpeg_la-jquant2.lo `test -f 'jquant2.c' || echo '$(srcdir)/'`jquant2.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jquant2.Tpo" "$(DEPDIR)/libturbojpeg_la-jquant2.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jquant2.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jquant2.c' object='libturbojpeg_la-jquant2.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jquant2.lo `test -f 'jquant2.c' || echo '$(srcdir)/'`jquant2.c
+
+libturbojpeg_la-jutils.lo: jutils.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jutils.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jutils.Tpo" -c -o libturbojpeg_la-jutils.lo `test -f 'jutils.c' || echo '$(srcdir)/'`jutils.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jutils.Tpo" "$(DEPDIR)/libturbojpeg_la-jutils.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jutils.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jutils.c' object='libturbojpeg_la-jutils.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jutils.lo `test -f 'jutils.c' || echo '$(srcdir)/'`jutils.c
+
+libturbojpeg_la-jmemmgr.lo: jmemmgr.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jmemmgr.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jmemmgr.Tpo" -c -o libturbojpeg_la-jmemmgr.lo `test -f 'jmemmgr.c' || echo '$(srcdir)/'`jmemmgr.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jmemmgr.Tpo" "$(DEPDIR)/libturbojpeg_la-jmemmgr.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jmemmgr.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jmemmgr.c' object='libturbojpeg_la-jmemmgr.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jmemmgr.lo `test -f 'jmemmgr.c' || echo '$(srcdir)/'`jmemmgr.c
+
+libturbojpeg_la-jmemnobs.lo: jmemnobs.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jmemnobs.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jmemnobs.Tpo" -c -o libturbojpeg_la-jmemnobs.lo `test -f 'jmemnobs.c' || echo '$(srcdir)/'`jmemnobs.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jmemnobs.Tpo" "$(DEPDIR)/libturbojpeg_la-jmemnobs.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jmemnobs.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jmemnobs.c' object='libturbojpeg_la-jmemnobs.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jmemnobs.lo `test -f 'jmemnobs.c' || echo '$(srcdir)/'`jmemnobs.c
+
+libturbojpeg_la-jaricom.lo: jaricom.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jaricom.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jaricom.Tpo" -c -o libturbojpeg_la-jaricom.lo `test -f 'jaricom.c' || echo '$(srcdir)/'`jaricom.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jaricom.Tpo" "$(DEPDIR)/libturbojpeg_la-jaricom.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jaricom.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jaricom.c' object='libturbojpeg_la-jaricom.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jaricom.lo `test -f 'jaricom.c' || echo '$(srcdir)/'`jaricom.c
+
+libturbojpeg_la-jcarith.lo: jcarith.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jcarith.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jcarith.Tpo" -c -o libturbojpeg_la-jcarith.lo `test -f 'jcarith.c' || echo '$(srcdir)/'`jcarith.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jcarith.Tpo" "$(DEPDIR)/libturbojpeg_la-jcarith.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jcarith.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jcarith.c' object='libturbojpeg_la-jcarith.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jcarith.lo `test -f 'jcarith.c' || echo '$(srcdir)/'`jcarith.c
+
+libturbojpeg_la-jdarith.lo: jdarith.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jdarith.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jdarith.Tpo" -c -o libturbojpeg_la-jdarith.lo `test -f 'jdarith.c' || echo '$(srcdir)/'`jdarith.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jdarith.Tpo" "$(DEPDIR)/libturbojpeg_la-jdarith.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jdarith.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jdarith.c' object='libturbojpeg_la-jdarith.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jdarith.lo `test -f 'jdarith.c' || echo '$(srcdir)/'`jdarith.c
+
+libturbojpeg_la-jsimd_none.lo: jsimd_none.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jsimd_none.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jsimd_none.Tpo" -c -o libturbojpeg_la-jsimd_none.lo `test -f 'jsimd_none.c' || echo '$(srcdir)/'`jsimd_none.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jsimd_none.Tpo" "$(DEPDIR)/libturbojpeg_la-jsimd_none.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jsimd_none.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jsimd_none.c' object='libturbojpeg_la-jsimd_none.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jsimd_none.lo `test -f 'jsimd_none.c' || echo '$(srcdir)/'`jsimd_none.c
+
+libturbojpeg_la-turbojpeg.lo: turbojpeg.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-turbojpeg.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-turbojpeg.Tpo" -c -o libturbojpeg_la-turbojpeg.lo `test -f 'turbojpeg.c' || echo '$(srcdir)/'`turbojpeg.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-turbojpeg.Tpo" "$(DEPDIR)/libturbojpeg_la-turbojpeg.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-turbojpeg.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='turbojpeg.c' object='libturbojpeg_la-turbojpeg.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-turbojpeg.lo `test -f 'turbojpeg.c' || echo '$(srcdir)/'`turbojpeg.c
+
+libturbojpeg_la-transupp.lo: transupp.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-transupp.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-transupp.Tpo" -c -o libturbojpeg_la-transupp.lo `test -f 'transupp.c' || echo '$(srcdir)/'`transupp.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-transupp.Tpo" "$(DEPDIR)/libturbojpeg_la-transupp.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-transupp.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='transupp.c' object='libturbojpeg_la-transupp.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-transupp.lo `test -f 'transupp.c' || echo '$(srcdir)/'`transupp.c
+
+libturbojpeg_la-jdatadst-tj.lo: jdatadst-tj.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jdatadst-tj.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jdatadst-tj.Tpo" -c -o libturbojpeg_la-jdatadst-tj.lo `test -f 'jdatadst-tj.c' || echo '$(srcdir)/'`jdatadst-tj.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jdatadst-tj.Tpo" "$(DEPDIR)/libturbojpeg_la-jdatadst-tj.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jdatadst-tj.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jdatadst-tj.c' object='libturbojpeg_la-jdatadst-tj.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jdatadst-tj.lo `test -f 'jdatadst-tj.c' || echo '$(srcdir)/'`jdatadst-tj.c
+
+libturbojpeg_la-jdatasrc-tj.lo: jdatasrc-tj.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-jdatasrc-tj.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-jdatasrc-tj.Tpo" -c -o libturbojpeg_la-jdatasrc-tj.lo `test -f 'jdatasrc-tj.c' || echo '$(srcdir)/'`jdatasrc-tj.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-jdatasrc-tj.Tpo" "$(DEPDIR)/libturbojpeg_la-jdatasrc-tj.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-jdatasrc-tj.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jdatasrc-tj.c' object='libturbojpeg_la-jdatasrc-tj.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-jdatasrc-tj.lo `test -f 'jdatasrc-tj.c' || echo '$(srcdir)/'`jdatasrc-tj.c
+
+libturbojpeg_la-turbojpeg-jni.lo: turbojpeg-jni.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -MT libturbojpeg_la-turbojpeg-jni.lo -MD -MP -MF "$(DEPDIR)/libturbojpeg_la-turbojpeg-jni.Tpo" -c -o libturbojpeg_la-turbojpeg-jni.lo `test -f 'turbojpeg-jni.c' || echo '$(srcdir)/'`turbojpeg-jni.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libturbojpeg_la-turbojpeg-jni.Tpo" "$(DEPDIR)/libturbojpeg_la-turbojpeg-jni.Plo"; else rm -f "$(DEPDIR)/libturbojpeg_la-turbojpeg-jni.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='turbojpeg-jni.c' object='libturbojpeg_la-turbojpeg-jni.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libturbojpeg_la_CFLAGS) $(CFLAGS) -c -o libturbojpeg_la-turbojpeg-jni.lo `test -f 'turbojpeg-jni.c' || echo '$(srcdir)/'`turbojpeg-jni.c
 
 cjpeg-cdjpeg.o: cdjpeg.c
 @am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(cjpeg_CFLAGS) $(CFLAGS) -MT cjpeg-cdjpeg.o -MD -MP -MF "$(DEPDIR)/cjpeg-cdjpeg.Tpo" -c -o cjpeg-cdjpeg.o `test -f 'cdjpeg.c' || echo '$(srcdir)/'`cdjpeg.c; \
@@ -844,26 +1463,103 @@ djpeg-wrtarga.obj: wrtarga.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(djpeg_CFLAGS) $(CFLAGS) -c -o djpeg-wrtarga.obj `if test -f 'wrtarga.c'; then $(CYGPATH_W) 'wrtarga.c'; else $(CYGPATH_W) '$(srcdir)/wrtarga.c'; fi`
 
-.cxx.o:
-@am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Po"; else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXXCOMPILE) -c -o $@ $<
+tjbench-tjbench.o: tjbench.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(tjbench_CFLAGS) $(CFLAGS) -MT tjbench-tjbench.o -MD -MP -MF "$(DEPDIR)/tjbench-tjbench.Tpo" -c -o tjbench-tjbench.o `test -f 'tjbench.c' || echo '$(srcdir)/'`tjbench.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/tjbench-tjbench.Tpo" "$(DEPDIR)/tjbench-tjbench.Po"; else rm -f "$(DEPDIR)/tjbench-tjbench.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='tjbench.c' object='tjbench-tjbench.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(tjbench_CFLAGS) $(CFLAGS) -c -o tjbench-tjbench.o `test -f 'tjbench.c' || echo '$(srcdir)/'`tjbench.c
 
-.cxx.obj:
-@am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ `$(CYGPATH_W) '$<'`; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Po"; else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+tjbench-tjbench.obj: tjbench.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(tjbench_CFLAGS) $(CFLAGS) -MT tjbench-tjbench.obj -MD -MP -MF "$(DEPDIR)/tjbench-tjbench.Tpo" -c -o tjbench-tjbench.obj `if test -f 'tjbench.c'; then $(CYGPATH_W) 'tjbench.c'; else $(CYGPATH_W) '$(srcdir)/tjbench.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/tjbench-tjbench.Tpo" "$(DEPDIR)/tjbench-tjbench.Po"; else rm -f "$(DEPDIR)/tjbench-tjbench.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='tjbench.c' object='tjbench-tjbench.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(tjbench_CFLAGS) $(CFLAGS) -c -o tjbench-tjbench.obj `if test -f 'tjbench.c'; then $(CYGPATH_W) 'tjbench.c'; else $(CYGPATH_W) '$(srcdir)/tjbench.c'; fi`
 
-.cxx.lo:
-@am__fastdepCXX_TRUE@	if $(LTCXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Plo"; else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ $<
+tjbench-bmp.o: bmp.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(tjbench_CFLAGS) $(CFLAGS) -MT tjbench-bmp.o -MD -MP -MF "$(DEPDIR)/tjbench-bmp.Tpo" -c -o tjbench-bmp.o `test -f 'bmp.c' || echo '$(srcdir)/'`bmp.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/tjbench-bmp.Tpo" "$(DEPDIR)/tjbench-bmp.Po"; else rm -f "$(DEPDIR)/tjbench-bmp.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bmp.c' object='tjbench-bmp.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(tjbench_CFLAGS) $(CFLAGS) -c -o tjbench-bmp.o `test -f 'bmp.c' || echo '$(srcdir)/'`bmp.c
+
+tjbench-bmp.obj: bmp.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(tjbench_CFLAGS) $(CFLAGS) -MT tjbench-bmp.obj -MD -MP -MF "$(DEPDIR)/tjbench-bmp.Tpo" -c -o tjbench-bmp.obj `if test -f 'bmp.c'; then $(CYGPATH_W) 'bmp.c'; else $(CYGPATH_W) '$(srcdir)/bmp.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/tjbench-bmp.Tpo" "$(DEPDIR)/tjbench-bmp.Po"; else rm -f "$(DEPDIR)/tjbench-bmp.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bmp.c' object='tjbench-bmp.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(tjbench_CFLAGS) $(CFLAGS) -c -o tjbench-bmp.obj `if test -f 'bmp.c'; then $(CYGPATH_W) 'bmp.c'; else $(CYGPATH_W) '$(srcdir)/bmp.c'; fi`
+
+tjbench-tjutil.o: tjutil.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(tjbench_CFLAGS) $(CFLAGS) -MT tjbench-tjutil.o -MD -MP -MF "$(DEPDIR)/tjbench-tjutil.Tpo" -c -o tjbench-tjutil.o `test -f 'tjutil.c' || echo '$(srcdir)/'`tjutil.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/tjbench-tjutil.Tpo" "$(DEPDIR)/tjbench-tjutil.Po"; else rm -f "$(DEPDIR)/tjbench-tjutil.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='tjutil.c' object='tjbench-tjutil.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(tjbench_CFLAGS) $(CFLAGS) -c -o tjbench-tjutil.o `test -f 'tjutil.c' || echo '$(srcdir)/'`tjutil.c
+
+tjbench-tjutil.obj: tjutil.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(tjbench_CFLAGS) $(CFLAGS) -MT tjbench-tjutil.obj -MD -MP -MF "$(DEPDIR)/tjbench-tjutil.Tpo" -c -o tjbench-tjutil.obj `if test -f 'tjutil.c'; then $(CYGPATH_W) 'tjutil.c'; else $(CYGPATH_W) '$(srcdir)/tjutil.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/tjbench-tjutil.Tpo" "$(DEPDIR)/tjbench-tjutil.Po"; else rm -f "$(DEPDIR)/tjbench-tjutil.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='tjutil.c' object='tjbench-tjutil.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(tjbench_CFLAGS) $(CFLAGS) -c -o tjbench-tjutil.obj `if test -f 'tjutil.c'; then $(CYGPATH_W) 'tjutil.c'; else $(CYGPATH_W) '$(srcdir)/tjutil.c'; fi`
+
+tjbench-rdbmp.o: rdbmp.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(tjbench_CFLAGS) $(CFLAGS) -MT tjbench-rdbmp.o -MD -MP -MF "$(DEPDIR)/tjbench-rdbmp.Tpo" -c -o tjbench-rdbmp.o `test -f 'rdbmp.c' || echo '$(srcdir)/'`rdbmp.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/tjbench-rdbmp.Tpo" "$(DEPDIR)/tjbench-rdbmp.Po"; else rm -f "$(DEPDIR)/tjbench-rdbmp.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='rdbmp.c' object='tjbench-rdbmp.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(tjbench_CFLAGS) $(CFLAGS) -c -o tjbench-rdbmp.o `test -f 'rdbmp.c' || echo '$(srcdir)/'`rdbmp.c
+
+tjbench-rdbmp.obj: rdbmp.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(tjbench_CFLAGS) $(CFLAGS) -MT tjbench-rdbmp.obj -MD -MP -MF "$(DEPDIR)/tjbench-rdbmp.Tpo" -c -o tjbench-rdbmp.obj `if test -f 'rdbmp.c'; then $(CYGPATH_W) 'rdbmp.c'; else $(CYGPATH_W) '$(srcdir)/rdbmp.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/tjbench-rdbmp.Tpo" "$(DEPDIR)/tjbench-rdbmp.Po"; else rm -f "$(DEPDIR)/tjbench-rdbmp.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='rdbmp.c' object='tjbench-rdbmp.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(tjbench_CFLAGS) $(CFLAGS) -c -o tjbench-rdbmp.obj `if test -f 'rdbmp.c'; then $(CYGPATH_W) 'rdbmp.c'; else $(CYGPATH_W) '$(srcdir)/rdbmp.c'; fi`
+
+tjbench-rdppm.o: rdppm.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(tjbench_CFLAGS) $(CFLAGS) -MT tjbench-rdppm.o -MD -MP -MF "$(DEPDIR)/tjbench-rdppm.Tpo" -c -o tjbench-rdppm.o `test -f 'rdppm.c' || echo '$(srcdir)/'`rdppm.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/tjbench-rdppm.Tpo" "$(DEPDIR)/tjbench-rdppm.Po"; else rm -f "$(DEPDIR)/tjbench-rdppm.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='rdppm.c' object='tjbench-rdppm.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(tjbench_CFLAGS) $(CFLAGS) -c -o tjbench-rdppm.o `test -f 'rdppm.c' || echo '$(srcdir)/'`rdppm.c
+
+tjbench-rdppm.obj: rdppm.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(tjbench_CFLAGS) $(CFLAGS) -MT tjbench-rdppm.obj -MD -MP -MF "$(DEPDIR)/tjbench-rdppm.Tpo" -c -o tjbench-rdppm.obj `if test -f 'rdppm.c'; then $(CYGPATH_W) 'rdppm.c'; else $(CYGPATH_W) '$(srcdir)/rdppm.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/tjbench-rdppm.Tpo" "$(DEPDIR)/tjbench-rdppm.Po"; else rm -f "$(DEPDIR)/tjbench-rdppm.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='rdppm.c' object='tjbench-rdppm.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(tjbench_CFLAGS) $(CFLAGS) -c -o tjbench-rdppm.obj `if test -f 'rdppm.c'; then $(CYGPATH_W) 'rdppm.c'; else $(CYGPATH_W) '$(srcdir)/rdppm.c'; fi`
+
+tjbench-wrbmp.o: wrbmp.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(tjbench_CFLAGS) $(CFLAGS) -MT tjbench-wrbmp.o -MD -MP -MF "$(DEPDIR)/tjbench-wrbmp.Tpo" -c -o tjbench-wrbmp.o `test -f 'wrbmp.c' || echo '$(srcdir)/'`wrbmp.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/tjbench-wrbmp.Tpo" "$(DEPDIR)/tjbench-wrbmp.Po"; else rm -f "$(DEPDIR)/tjbench-wrbmp.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='wrbmp.c' object='tjbench-wrbmp.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(tjbench_CFLAGS) $(CFLAGS) -c -o tjbench-wrbmp.o `test -f 'wrbmp.c' || echo '$(srcdir)/'`wrbmp.c
+
+tjbench-wrbmp.obj: wrbmp.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(tjbench_CFLAGS) $(CFLAGS) -MT tjbench-wrbmp.obj -MD -MP -MF "$(DEPDIR)/tjbench-wrbmp.Tpo" -c -o tjbench-wrbmp.obj `if test -f 'wrbmp.c'; then $(CYGPATH_W) 'wrbmp.c'; else $(CYGPATH_W) '$(srcdir)/wrbmp.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/tjbench-wrbmp.Tpo" "$(DEPDIR)/tjbench-wrbmp.Po"; else rm -f "$(DEPDIR)/tjbench-wrbmp.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='wrbmp.c' object='tjbench-wrbmp.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(tjbench_CFLAGS) $(CFLAGS) -c -o tjbench-wrbmp.obj `if test -f 'wrbmp.c'; then $(CYGPATH_W) 'wrbmp.c'; else $(CYGPATH_W) '$(srcdir)/wrbmp.c'; fi`
+
+tjbench-wrppm.o: wrppm.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(tjbench_CFLAGS) $(CFLAGS) -MT tjbench-wrppm.o -MD -MP -MF "$(DEPDIR)/tjbench-wrppm.Tpo" -c -o tjbench-wrppm.o `test -f 'wrppm.c' || echo '$(srcdir)/'`wrppm.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/tjbench-wrppm.Tpo" "$(DEPDIR)/tjbench-wrppm.Po"; else rm -f "$(DEPDIR)/tjbench-wrppm.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='wrppm.c' object='tjbench-wrppm.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(tjbench_CFLAGS) $(CFLAGS) -c -o tjbench-wrppm.o `test -f 'wrppm.c' || echo '$(srcdir)/'`wrppm.c
+
+tjbench-wrppm.obj: wrppm.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(tjbench_CFLAGS) $(CFLAGS) -MT tjbench-wrppm.obj -MD -MP -MF "$(DEPDIR)/tjbench-wrppm.Tpo" -c -o tjbench-wrppm.obj `if test -f 'wrppm.c'; then $(CYGPATH_W) 'wrppm.c'; else $(CYGPATH_W) '$(srcdir)/wrppm.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/tjbench-wrppm.Tpo" "$(DEPDIR)/tjbench-wrppm.Po"; else rm -f "$(DEPDIR)/tjbench-wrppm.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='wrppm.c' object='tjbench-wrppm.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(tjbench_CFLAGS) $(CFLAGS) -c -o tjbench-wrppm.obj `if test -f 'wrppm.c'; then $(CYGPATH_W) 'wrppm.c'; else $(CYGPATH_W) '$(srcdir)/wrppm.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -918,6 +1614,40 @@ uninstall-man1:
 	  inst=`echo $$inst | sed '$(transform)'`.$$ext; \
 	  echo " rm -f '$(DESTDIR)$(man1dir)/$$inst'"; \
 	  rm -f "$(DESTDIR)$(man1dir)/$$inst"; \
+	done
+install-dist_docDATA: $(dist_doc_DATA)
+	@$(NORMAL_INSTALL)
+	test -z "$(docdir)" || $(mkdir_p) "$(DESTDIR)$(docdir)"
+	@list='$(dist_doc_DATA)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  f=$(am__strip_dir) \
+	  echo " $(dist_docDATA_INSTALL) '$$d$$p' '$(DESTDIR)$(docdir)/$$f'"; \
+	  $(dist_docDATA_INSTALL) "$$d$$p" "$(DESTDIR)$(docdir)/$$f"; \
+	done
+
+uninstall-dist_docDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(dist_doc_DATA)'; for p in $$list; do \
+	  f=$(am__strip_dir) \
+	  echo " rm -f '$(DESTDIR)$(docdir)/$$f'"; \
+	  rm -f "$(DESTDIR)$(docdir)/$$f"; \
+	done
+install-dist_exampleDATA: $(dist_example_DATA)
+	@$(NORMAL_INSTALL)
+	test -z "$(exampledir)" || $(mkdir_p) "$(DESTDIR)$(exampledir)"
+	@list='$(dist_example_DATA)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  f=$(am__strip_dir) \
+	  echo " $(dist_exampleDATA_INSTALL) '$$d$$p' '$(DESTDIR)$(exampledir)/$$f'"; \
+	  $(dist_exampleDATA_INSTALL) "$$d$$p" "$(DESTDIR)$(exampledir)/$$f"; \
+	done
+
+uninstall-dist_exampleDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(dist_example_DATA)'; for p in $$list; do \
+	  f=$(am__strip_dir) \
+	  echo " rm -f '$(DESTDIR)$(exampledir)/$$f'"; \
+	  rm -f "$(DESTDIR)$(exampledir)/$$f"; \
 	done
 install-includeHEADERS: $(include_HEADERS)
 	@$(NORMAL_INSTALL)
@@ -1077,6 +1807,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
+	$(mkdir_p) $(distdir)/. $(distdir)/release $(distdir)/sharedlib
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
@@ -1220,13 +1951,13 @@ distcleancheck: distclean
 	       exit 1; } >&2
 check-am: all-am
 check: check-recursive
-all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(MANS) $(HEADERS) \
+all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(MANS) $(DATA) $(HEADERS) \
 		config.h jconfig.h
 install-binPROGRAMS: install-libLTLIBRARIES
 
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man1dir)" "$(DESTDIR)$(includedir)" "$(DESTDIR)$(includedir)"; do \
+	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man1dir)" "$(DESTDIR)$(docdir)" "$(DESTDIR)$(exampledir)" "$(DESTDIR)$(includedir)" "$(DESTDIR)$(includedir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
 install: install-recursive
@@ -1275,7 +2006,8 @@ info: info-recursive
 
 info-am:
 
-install-data-am: install-includeHEADERS install-man \
+install-data-am: install-dist_docDATA install-dist_exampleDATA \
+	install-includeHEADERS install-man \
 	install-nodist_includeHEADERS
 
 install-exec-am: install-binPROGRAMS install-libLTLIBRARIES
@@ -1306,7 +2038,8 @@ ps: ps-recursive
 
 ps-am:
 
-uninstall-am: uninstall-binPROGRAMS uninstall-includeHEADERS \
+uninstall-am: uninstall-binPROGRAMS uninstall-dist_docDATA \
+	uninstall-dist_exampleDATA uninstall-includeHEADERS \
 	uninstall-info-am uninstall-libLTLIBRARIES uninstall-man \
 	uninstall-nodist_includeHEADERS
 
@@ -1323,7 +2056,8 @@ uninstall-man: uninstall-man1
 	distclean-libtool distclean-recursive distclean-tags \
 	distcleancheck distdir distuninstallcheck dvi dvi-am html \
 	html-am info info-am install install-am install-binPROGRAMS \
-	install-data install-data-am install-exec install-exec-am \
+	install-data install-data-am install-dist_docDATA \
+	install-dist_exampleDATA install-exec install-exec-am \
 	install-includeHEADERS install-info install-info-am \
 	install-libLTLIBRARIES install-man install-man1 \
 	install-nodist_includeHEADERS install-strip installcheck \
@@ -1332,7 +2066,8 @@ uninstall-man: uninstall-man1
 	mostlyclean mostlyclean-compile mostlyclean-generic \
 	mostlyclean-libtool mostlyclean-recursive pdf pdf-am ps ps-am \
 	tags tags-recursive uninstall uninstall-am \
-	uninstall-binPROGRAMS uninstall-includeHEADERS \
+	uninstall-binPROGRAMS uninstall-dist_docDATA \
+	uninstall-dist_exampleDATA uninstall-includeHEADERS \
 	uninstall-info-am uninstall-libLTLIBRARIES uninstall-man \
 	uninstall-man1 uninstall-nodist_includeHEADERS
 
@@ -1340,101 +2075,187 @@ uninstall-man: uninstall-man1
 dist-hook:
 	rm -rf `find $(distdir) -name .svn`
 
-@WITH_SIMD_TRUE@test: testclean cjpeg djpeg jpegtran jpegut
-@WITH_SIMD_TRUE@	./jpegut
-@WITH_SIMD_TRUE@	./cjpeg -dct int -outfile testoutint.jpg $(srcdir)/testorig.ppm
-@WITH_SIMD_TRUE@	./cjpeg -dct fast -opt -outfile testoutfst.jpg $(srcdir)/testorig.ppm
-@WITH_SIMD_TRUE@	./cjpeg -dct float -outfile testoutflt.jpg $(srcdir)/testorig.ppm
-@WITH_SIMD_TRUE@	cmp $(srcdir)/testimgint.jpg testoutint.jpg
-@WITH_SIMD_TRUE@	cmp $(srcdir)/testimgfst.jpg testoutfst.jpg
-@WITH_SIMD_TRUE@	cmp $(srcdir)/testimgflt.jpg testoutflt.jpg
-@WITH_SIMD_TRUE@	./djpeg -dct int -fast -ppm -outfile testoutint.ppm $(srcdir)/testorig.jpg
-@WITH_SIMD_TRUE@	./djpeg -dct fast -ppm -outfile testoutfst.ppm $(srcdir)/testorig.jpg
-@WITH_SIMD_TRUE@	./djpeg -dct float -ppm -outfile testoutflt.ppm $(srcdir)/testorig.jpg
-@WITH_SIMD_TRUE@	cmp $(srcdir)/testimgint.ppm testoutint.ppm
-@WITH_SIMD_TRUE@	cmp $(srcdir)/testimgfst.ppm testoutfst.ppm
-@WITH_SIMD_TRUE@	cmp $(srcdir)/testorig.ppm testoutflt.ppm
-@WITH_SIMD_TRUE@	./djpeg -dct int -bmp -colors 256 -outfile testout.bmp  $(srcdir)/testorig.jpg
-@WITH_SIMD_TRUE@	cmp $(srcdir)/testimg.bmp testout.bmp
-@WITH_SIMD_TRUE@	./cjpeg -dct int -progressive -outfile testoutp.jpg $(srcdir)/testorig.ppm
-@WITH_SIMD_TRUE@	cmp $(srcdir)/testimgp.jpg testoutp.jpg
-@WITH_SIMD_TRUE@	./jpegtran -outfile testoutt.jpg testoutp.jpg
-@WITH_SIMD_TRUE@	cmp $(srcdir)/testimgint.jpg testoutt.jpg
-
-@WITH_SIMD_FALSE@test: testclean cjpeg djpeg jpegtran jpegut
-@WITH_SIMD_FALSE@	./jpegut
-@WITH_SIMD_FALSE@	./cjpeg -dct int -outfile testoutint.jpg $(srcdir)/testorig-nosimd.ppm
-@WITH_SIMD_FALSE@	./cjpeg -dct fast -opt -outfile testoutfst.jpg $(srcdir)/testorig-nosimd.ppm
-@WITH_SIMD_FALSE@	./cjpeg -dct float -outfile testoutflt.jpg $(srcdir)/testorig-nosimd.ppm
-@WITH_SIMD_FALSE@	cmp $(srcdir)/testimgint-nosimd.jpg testoutint.jpg
-@WITH_SIMD_FALSE@	cmp $(srcdir)/testimgfst-nosimd.jpg testoutfst.jpg
-@WITH_SIMD_FALSE@	cmp $(srcdir)/testimgflt-nosimd.jpg testoutflt.jpg
-@WITH_SIMD_FALSE@	./djpeg -dct int -fast -ppm -outfile testoutint.ppm $(srcdir)/testorig.jpg
-@WITH_SIMD_FALSE@	./djpeg -dct fast -ppm -outfile testoutfst.ppm $(srcdir)/testorig.jpg
-@WITH_SIMD_FALSE@	./djpeg -dct float -ppm -outfile testoutflt.ppm $(srcdir)/testorig.jpg
-@WITH_SIMD_FALSE@	cmp $(srcdir)/testimgint.ppm testoutint.ppm
-@WITH_SIMD_FALSE@	cmp $(srcdir)/testimgfst-nosimd.ppm testoutfst.ppm
-@WITH_SIMD_FALSE@	cmp $(srcdir)/testorig-nosimd.ppm testoutflt.ppm
-@WITH_SIMD_FALSE@	./djpeg -dct int -bmp -colors 256 -outfile testout.bmp  $(srcdir)/testorig.jpg
-@WITH_SIMD_FALSE@	cmp $(srcdir)/testimg-nosimd.bmp testout.bmp
-@WITH_SIMD_FALSE@	./cjpeg -dct int -progressive -outfile testoutp.jpg $(srcdir)/testorig-nosimd.ppm
-@WITH_SIMD_FALSE@	cmp $(srcdir)/testimgp-nosimd.jpg testoutp.jpg
-@WITH_SIMD_FALSE@	./jpegtran -outfile testoutt.jpg testoutp.jpg
-@WITH_SIMD_FALSE@	cmp $(srcdir)/testimgint-nosimd.jpg testoutt.jpg
+test: testclean all
+@WITH_JAVA_TRUE@@WITH_TURBOJPEG_TRUE@	$(JAVA) -cp java/turbojpeg.jar -Djava.library.path=.libs TJUnitTest
+@WITH_JAVA_TRUE@@WITH_TURBOJPEG_TRUE@	$(JAVA) -cp java/turbojpeg.jar -Djava.library.path=.libs TJUnitTest -bi
+@WITH_JAVA_TRUE@@WITH_TURBOJPEG_TRUE@	$(JAVA) -cp java/turbojpeg.jar -Djava.library.path=.libs TJUnitTest -yuv
+@WITH_JAVA_TRUE@@WITH_TURBOJPEG_TRUE@	$(JAVA) -cp java/turbojpeg.jar -Djava.library.path=.libs TJUnitTest -yuv -bi
+@WITH_TURBOJPEG_TRUE@	./tjunittest
+@WITH_TURBOJPEG_TRUE@	./tjunittest -alloc
+@WITH_TURBOJPEG_TRUE@	./tjunittest -yuv
+	./cjpeg -dct int -outfile testoutint.jpg $(srcdir)/testimages/testorig.ppm
+	md5/md5cmp $(MD5_JPEG_INT) testoutint.jpg
+	./cjpeg -dct fast -opt -outfile testoutfst.jpg $(srcdir)/testimages/testorig.ppm
+	md5/md5cmp $(MD5_JPEG_FAST) testoutfst.jpg
+	./cjpeg -dct fast -quality 100 -opt -outfile testoutfst100.jpg $(srcdir)/testimages/testorig.ppm
+	md5/md5cmp $(MD5_JPEG_FAST_100) testoutfst100.jpg
+	./cjpeg -dct float -outfile testoutflt.jpg $(srcdir)/testimages/testorig.ppm
+@WITH_SSE_FLOAT_DCT_TRUE@	md5/md5cmp $(MD5_JPEG_FLOAT) testoutflt.jpg
+@WITH_SSE_FLOAT_DCT_FALSE@	md5/md5cmp $(MD5_JPEG_FLOAT_NOSIMD) testoutflt.jpg
+	./cjpeg -dct int -grayscale -outfile testoutgray.jpg $(srcdir)/testimages/testorig.ppm
+	md5/md5cmp $(MD5_JPEG_INT_GRAY) testoutgray.jpg
+	./djpeg -dct int -fast -ppm -outfile testoutint.ppm $(srcdir)/testimages/testorig.jpg
+	md5/md5cmp $(MD5_PPM_INT) testoutint.ppm
+	./djpeg -dct fast -ppm -outfile testoutfst.ppm $(srcdir)/testimages/testorig.jpg
+	md5/md5cmp $(MD5_PPM_FAST) testoutfst.ppm
+	./djpeg -dct float -ppm -outfile testoutflt.ppm $(srcdir)/testimages/testorig.jpg
+@WITH_SSE_FLOAT_DCT_TRUE@	md5/md5cmp $(MD5_PPM_FLOAT) testoutflt.ppm
+@WITH_SSE_FLOAT_DCT_FALSE@	md5/md5cmp $(MD5_PPM_FLOAT_NOSIMD) testoutflt.ppm
+	./djpeg -dct int -nosmooth -scale 2/1 -ppm -outfile testoutint2_1.ppm $(srcdir)/testimages/testorig.jpg;
+	md5/md5cmp $(MD5_PPM_INT_2_1) testoutint2_1.ppm;
+	./djpeg -dct int -nosmooth -scale 15/8 -ppm -outfile testoutint15_8.ppm $(srcdir)/testimages/testorig.jpg;
+	md5/md5cmp $(MD5_PPM_INT_15_8) testoutint15_8.ppm;
+	./djpeg -dct int -nosmooth -scale 7/4 -ppm -outfile testoutint7_4.ppm $(srcdir)/testimages/testorig.jpg;
+	md5/md5cmp $(MD5_PPM_INT_7_4) testoutint7_4.ppm;
+	./djpeg -dct int -nosmooth -scale 13/8 -ppm -outfile testoutint13_8.ppm $(srcdir)/testimages/testorig.jpg;
+	md5/md5cmp $(MD5_PPM_INT_13_8) testoutint13_8.ppm;
+	./djpeg -dct int -nosmooth -scale 3/2 -ppm -outfile testoutint3_2.ppm $(srcdir)/testimages/testorig.jpg;
+	md5/md5cmp $(MD5_PPM_INT_3_2) testoutint3_2.ppm;
+	./djpeg -dct int -nosmooth -scale 11/8 -ppm -outfile testoutint11_8.ppm $(srcdir)/testimages/testorig.jpg;
+	md5/md5cmp $(MD5_PPM_INT_11_8) testoutint11_8.ppm;
+	./djpeg -dct int -nosmooth -scale 5/4 -ppm -outfile testoutint5_4.ppm $(srcdir)/testimages/testorig.jpg;
+	md5/md5cmp $(MD5_PPM_INT_5_4) testoutint5_4.ppm;
+	./djpeg -dct int -nosmooth -scale 9/8 -ppm -outfile testoutint9_8.ppm $(srcdir)/testimages/testorig.jpg;
+	md5/md5cmp $(MD5_PPM_INT_9_8) testoutint9_8.ppm;
+	./djpeg -dct int -nosmooth -scale 7/8 -ppm -outfile testoutint7_8.ppm $(srcdir)/testimages/testorig.jpg;
+	md5/md5cmp $(MD5_PPM_INT_7_8) testoutint7_8.ppm;
+	./djpeg -dct int -nosmooth -scale 3/4 -ppm -outfile testoutint3_4.ppm $(srcdir)/testimages/testorig.jpg;
+	md5/md5cmp $(MD5_PPM_INT_3_4) testoutint3_4.ppm;
+	./djpeg -dct int -nosmooth -scale 5/8 -ppm -outfile testoutint5_8.ppm $(srcdir)/testimages/testorig.jpg;
+	md5/md5cmp $(MD5_PPM_INT_5_8) testoutint5_8.ppm;
+	./djpeg -dct int -nosmooth -scale 1/2 -ppm -outfile testoutint1_2.ppm $(srcdir)/testimages/testorig.jpg;
+	md5/md5cmp $(MD5_PPM_INT_1_2) testoutint1_2.ppm;
+	./djpeg -dct int -nosmooth -scale 3/8 -ppm -outfile testoutint3_8.ppm $(srcdir)/testimages/testorig.jpg;
+	md5/md5cmp $(MD5_PPM_INT_3_8) testoutint3_8.ppm;
+	./djpeg -dct int -nosmooth -scale 1/4 -ppm -outfile testoutint1_4.ppm $(srcdir)/testimages/testorig.jpg;
+	md5/md5cmp $(MD5_PPM_INT_1_4) testoutint1_4.ppm;
+	./djpeg -dct int -nosmooth -scale 1/8 -ppm -outfile testoutint1_8.ppm $(srcdir)/testimages/testorig.jpg;
+	md5/md5cmp $(MD5_PPM_INT_1_8) testoutint1_8.ppm;
+	./djpeg -dct fast -scale 1/2 -ppm -outfile testoutfst1_2.ppm $(srcdir)/testimages/testorig.jpg
+	md5/md5cmp $(MD5_PPM_FAST_1_2) testoutfst1_2.ppm
+	./djpeg -dct int -bmp -colors 256 -outfile testout.bmp $(srcdir)/testimages/testorig.jpg
+	md5/md5cmp $(MD5_BMP_256) testout.bmp
+@WITH_ARITH_ENC_TRUE@	./cjpeg -dct int -arithmetic -outfile testoutari.jpg $(srcdir)/testimages/testorig.ppm
+@WITH_ARITH_ENC_TRUE@	md5/md5cmp $(MD5_JPEG_ARI) testoutari.jpg
+@WITH_ARITH_ENC_TRUE@	./jpegtran -arithmetic -outfile testouta.jpg $(srcdir)/testimages/testimgint.jpg
+@WITH_ARITH_ENC_TRUE@	md5/md5cmp $(MD5_JPEG_ARI) testouta.jpg
+@WITH_ARITH_DEC_TRUE@	./djpeg -dct int -fast -ppm -outfile testoutari.ppm $(srcdir)/testimages/testimgari.jpg
+@WITH_ARITH_DEC_TRUE@	md5/md5cmp $(MD5_PPM_ARI) testoutari.ppm
+@WITH_ARITH_DEC_TRUE@	./jpegtran -outfile testouta.jpg $(srcdir)/testimages/testimgari.jpg
+@WITH_ARITH_DEC_TRUE@	md5/md5cmp $(MD5_JPEG_INT) testouta.jpg
+	./cjpeg -dct int -progressive -outfile testoutp.jpg $(srcdir)/testimages/testorig.ppm
+	md5/md5cmp $(MD5_JPEG_PROG) testoutp.jpg
+	./jpegtran -outfile testoutt.jpg testoutp.jpg
+	md5/md5cmp $(MD5_JPEG_INT) testoutt.jpg
+	./jpegtran -crop 120x90+20+50 -transpose -perfect -outfile testoutcrop.jpg $(srcdir)/testimages/testorig.jpg
+	md5/md5cmp $(MD5_JPEG_CROP) testoutcrop.jpg
 
 testclean:
 	rm -f testout*
-	rm -f *_GRAYQ[0-9]*.bmp
-	rm -f *_GRAYQ[0-9]*.ppm
-	rm -f *_GRAYQ[0-9]*.jpg
-	rm -f *_420Q[0-9]*.bmp
-	rm -f *_420Q[0-9]*.ppm
-	rm -f *_420Q[0-9]*.jpg
-	rm -f *_422Q[0-9]*.bmp
-	rm -f *_422Q[0-9]*.ppm
-	rm -f *_422Q[0-9]*.jpg
-	rm -f *_444Q[0-9]*.bmp
-	rm -f *_444Q[0-9]*.ppm
-	rm -f *_444Q[0-9]*.jpg
+	rm -f *_GRAY_*.bmp
+	rm -f *_GRAY_*.png
+	rm -f *_GRAY_*.ppm
+	rm -f *_GRAY_*.jpg
+	rm -f *_GRAY.yuv
+	rm -f *_420_*.bmp
+	rm -f *_420_*.png
+	rm -f *_420_*.ppm
+	rm -f *_420_*.jpg
+	rm -f *_420.yuv
+	rm -f *_422_*.bmp
+	rm -f *_422_*.png
+	rm -f *_422_*.ppm
+	rm -f *_422_*.jpg
+	rm -f *_422.yuv
+	rm -f *_444_*.bmp
+	rm -f *_444_*.png
+	rm -f *_444_*.ppm
+	rm -f *_444_*.jpg
+	rm -f *_444.yuv
+	rm -f *_440_*.bmp
+	rm -f *_440_*.png
+	rm -f *_440_*.ppm
+	rm -f *_440_*.jpg
+	rm -f *_440.yuv
 
-rpm: all
-	sh $(srcdir)/release/makerpm ${PACKAGE_NAME} ${VERSION} ${BUILD} \
-		${RPMARCH} ${srcdir}
+tjtest:
+	sh ./tjbenchtest
+@WITH_JAVA_TRUE@	sh ./tjbenchtest.java
 
-srpm: dist-gzip
-	sh $(srcdir)/release/makesrpm ${PACKAGE_NAME} ${VERSION} ${BUILD} ${srcdir}
+pkgscripts/libjpeg-turbo.spec: pkgscripts/libjpeg-turbo.spec.tmpl
+	cat pkgscripts/libjpeg-turbo.spec.tmpl | sed s@%{__prefix}@$(prefix)@g | \
+		sed s@%{__bindir}@$(bindir)@g | sed s@%{__datadir}@$(datadir)@g | \
+		sed s@%{__docdir}@$(docdir)@g | sed s@%{__includedir}@$(includedir)@g | \
+		sed s@%{__libdir}@$(libdir)@g | sed s@%{__mandir}@$(mandir)@g \
+		> pkgscripts/libjpeg-turbo.spec
 
-deb: all
-	sh $(srcdir)/release/makedpkg ${PACKAGE_NAME} ${VERSION} ${BUILD} \
-		${DEBARCH} ${srcdir}
+rpm: all pkgscripts/libjpeg-turbo.spec
+	TMPDIR=`mktemp -d /tmp/${PACKAGE_NAME}-build.XXXXXX`; \
+	mkdir -p $$TMPDIR/RPMS; \
+	ln -fs `pwd` $$TMPDIR/BUILD; \
+	rm -f ${PKGNAME}-${VERSION}.${RPMARCH}.rpm; \
+	rpmbuild -bb --define "_blddir $$TMPDIR/buildroot"  \
+		--define "_topdir $$TMPDIR" \
+		--target ${RPMARCH} pkgscripts/libjpeg-turbo.spec; \
+	cp $$TMPDIR/RPMS/${RPMARCH}/${PKGNAME}-${VERSION}-${BUILD}.${RPMARCH}.rpm \
+		${PKGNAME}-${VERSION}.${RPMARCH}.rpm; \
+	rm -rf $$TMPDIR
 
-@X86_64_TRUE@udmg: all
-@X86_64_TRUE@	sh $(srcdir)/release/makemacpkg ${PACKAGE_NAME} ${VERSION} ${BUILD} \
-@X86_64_TRUE@		${srcdir} universal
+srpm: dist-gzip pkgscripts/libjpeg-turbo.spec
+	TMPDIR=`mktemp -d /tmp/${PACKAGE_NAME}-build.XXXXXX`; \
+	mkdir -p $$TMPDIR/RPMS; \
+	mkdir -p $$TMPDIR/SRPMS; \
+	mkdir -p $$TMPDIR/BUILD; \
+	mkdir -p $$TMPDIR/SOURCES; \
+	mkdir -p $$TMPDIR/SPECS; \
+	rm -f ${PKGNAME}-${VERSION}.src.rpm; \
+	cp ${PACKAGE_NAME}-${VERSION}.tar.gz $$TMPDIR/SOURCES; \
+	cat pkgscripts/libjpeg-turbo.spec | sed s/%{_blddir}/%{_tmppath}/g \
+		| sed s/#--\>//g \
+		> $$TMPDIR/SPECS/libjpeg-turbo.spec; \
+	rpmbuild -bs --define "_topdir $$TMPDIR" $$TMPDIR/SPECS/libjpeg-turbo.spec; \
+	cp $$TMPDIR/SRPMS/${PKGNAME}-${VERSION}-${BUILD}.src.rpm \
+		${PKGNAME}-${VERSION}.src.rpm; \
+	rm -rf $$TMPDIR
 
-dmg: all
-	sh $(srcdir)/release/makemacpkg ${PACKAGE_NAME} ${VERSION} ${BUILD} ${srcdir}
+pkgscripts/makedpkg: pkgscripts/makedpkg.tmpl
+	cat pkgscripts/makedpkg.tmpl | sed s@%{__prefix}@$(prefix)@g | \
+		sed s@%{__docdir}@$(docdir)@g | sed s@%{__libdir}@$(libdir)@g \
+		> pkgscripts/makedpkg
 
-@X86_64_TRUE@sunpkg: all
-@X86_64_TRUE@	sh $(srcdir)/release/makesunpkg ${PACKAGE_NAME} ${VERSION} ${BUILD} \
-@X86_64_TRUE@		${DEBARCH} ${srcdir} $(CC) $(CXX) combined
+deb: all pkgscripts/makedpkg
+	sh pkgscripts/makedpkg
 
-@X86_64_TRUE@nsi: all
-@X86_64_TRUE@	makensis -nocd -DVERSION=$(VERSION) -DAPPNAME=libjpeg-turbo-gcc64 \
-@X86_64_TRUE@		-DWLIBDIR=.libs -DWSRCDIR=$(srcdir) -DWBLDDIR=. -DWHDRDIR=. -DWIN64 \
-@X86_64_TRUE@		-DPLATFORM="GCC 64-bit" -DGCC $(srcdir)/release/libjpeg-turbo.nsi
+pkgscripts/uninstall: pkgscripts/uninstall.tmpl
+	cat pkgscripts/uninstall.tmpl | sed s@%{__prefix}@$(prefix)@g | \
+		sed s@%{__bindir}@$(bindir)@g | sed s@%{__datadir}@$(datadir)@g | \
+		sed s@%{__includedir}@$(includedir)@g | sed s@%{__libdir}@$(libdir)@g | \
+		sed s@%{__mandir}@$(mandir)@g > pkgscripts/uninstall
 
-@X86_64_FALSE@sunpkg: all
-@X86_64_FALSE@	sh $(srcdir)/release/makesunpkg ${PACKAGE_NAME} ${VERSION} ${BUILD} \
-@X86_64_FALSE@		${DEBARCH} ${srcdir} $(CC) $(CXX)
+pkgscripts/makemacpkg: pkgscripts/makemacpkg.tmpl
+	cat pkgscripts/makemacpkg.tmpl | sed s@%{__prefix}@$(prefix)@g | \
+		sed s@%{__bindir}@$(bindir)@g | sed s@%{__docdir}@$(docdir)@g | \
+		sed s@%{__libdir}@$(libdir)@g > pkgscripts/makemacpkg
 
-@X86_64_FALSE@nsi: all
-@X86_64_FALSE@	makensis -nocd -DVERSION=$(VERSION) -DAPPNAME=libjpeg-turbo-gcc \
-@X86_64_FALSE@		-DWLIBDIR=.libs -DWSRCDIR=$(srcdir) -DWBLDDIR=. -DWHDRDIR=. \
-@X86_64_FALSE@		-DPLATFORM="GCC" -DGCC $(srcdir)/release/libjpeg-turbo.nsi
+@X86_64_TRUE@udmg: all pkgscripts/makemacpkg pkgscripts/uninstall
+@X86_64_TRUE@	sh pkgscripts/makemacpkg -build32 ${BUILDDIR32}
 
-cygwinpkg: all
-	sh $(srcdir)/release/makecygwinpkg ${PACKAGE_NAME} ${VERSION} ${srcdir}
+@X86_64_TRUE@iosdmg: all pkgscripts/makemacpkg pkgscripts/uninstall
+@X86_64_TRUE@	sh pkgscripts/makemacpkg -build32 ${BUILDDIR32} -buildarmv6 ${BUILDDIRARMV6} -buildarmv7 ${BUILDDIRARMV7} -buildarmv7s ${BUILDDIRARMV7S}
+
+@X86_64_FALSE@iosdmg: all pkgscripts/makemacpkg pkgscripts/uninstall
+@X86_64_FALSE@	sh pkgscripts/makemacpkg -buildarmv6 ${BUILDDIRARMV6} -buildarmv7 ${BUILDDIRARMV7} -buildarmv7s ${BUILDDIRARMV7S}
+
+dmg: all pkgscripts/makemacpkg pkgscripts/uninstall
+	sh pkgscripts/makemacpkg
+
+pkgscripts/makecygwinpkg: pkgscripts/makecygwinpkg.tmpl
+	cat pkgscripts/makecygwinpkg.tmpl | sed s@%{__prefix}@$(prefix)@g | \
+		sed s@%{__docdir}@$(docdir)@g | sed s@%{__libdir}@$(libdir)@g \
+		> pkgscripts/makecygwinpkg
+
+cygwinpkg: all pkgscripts/makecygwinpkg
+	sh pkgscripts/makecygwinpkg
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

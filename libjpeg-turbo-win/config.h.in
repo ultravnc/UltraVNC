@@ -1,10 +1,22 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
+/* Build number */
+#undef BUILD
+
+/* Support arithmetic encoding */
+#undef C_ARITH_CODING_SUPPORTED
+
+/* Support arithmetic decoding */
+#undef D_ARITH_CODING_SUPPORTED
+
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
+
+/* Define to 1 if you have the <jni.h> header file. */
+#undef HAVE_JNI_H
 
 /* Define to 1 if you have the `memcpy' function. */
 #undef HAVE_MEMCPY
@@ -48,8 +60,20 @@
 /* Define to 1 if the system has the type `unsigned short'. */
 #undef HAVE_UNSIGNED_SHORT
 
-/* Define if you want use complete types */
+/* Compiler does not support pointers to undefined structures. */
 #undef INCOMPLETE_TYPES_BROKEN
+
+/* How to obtain function inlining. */
+#undef INLINE
+
+/* libjpeg API version */
+#undef JPEG_LIB_VERSION
+
+/* libjpeg-turbo version */
+#undef LIBJPEG_TURBO_VERSION
+
+/* Support in-memory source/destination managers */
+#undef MEM_SRCDST_SUPPORTED
 
 /* Define if you have BSD-like bzero and bcopy */
 #undef NEED_BSD_STRINGS

@@ -1,8 +1,10 @@
 /*
  * jcmarker.c
  *
+ * This file was part of the Independent JPEG Group's software:
  * Copyright (C) 1991-1998, Thomas G. Lane.
- * This file is part of the Independent JPEG Group's software.
+ * Modifications:
+ * Copyright (C) 2010, D. R. Commander.
  * For conditions of distribution and use, see the accompanying README file.
  *
  * This file contains routines to write JPEG datastream markers.
@@ -11,6 +13,7 @@
 #define JPEG_INTERNALS
 #include "jinclude.h"
 #include "jpeglib.h"
+#include "jpegcomp.h"
 
 
 typedef enum {			/* JPEG marker codes */
@@ -285,13 +288,13 @@ emit_sof (j_compress_ptr cinfo, JPEG_MARKER code)
   emit_2bytes(cinfo, 3 * cinfo->num_components + 2 + 5 + 1); /* length */
 
   /* Make sure image isn't bigger than SOF field can handle */
-  if ((long) cinfo->image_height > 65535L ||
-      (long) cinfo->image_width > 65535L)
+  if ((long) cinfo->_jpeg_height > 65535L ||
+      (long) cinfo->_jpeg_width > 65535L)
     ERREXIT1(cinfo, JERR_IMAGE_TOO_BIG, (unsigned int) 65535);
 
   emit_byte(cinfo, cinfo->data_precision);
-  emit_2bytes(cinfo, (int) cinfo->image_height);
-  emit_2bytes(cinfo, (int) cinfo->image_width);
+  emit_2bytes(cinfo, (int) cinfo->_jpeg_height);
+  emit_2bytes(cinfo, (int) cinfo->_jpeg_width);
 
   emit_byte(cinfo, cinfo->num_components);
 
