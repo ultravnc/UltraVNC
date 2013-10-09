@@ -193,9 +193,7 @@
     <ClCompile Include="jdapimin.c" />
     <ClCompile Include="jdapistd.c" />
     <ClCompile Include="jdarith.c" />
-    <ClCompile Include="jdatadst-tj.c" />
     <ClCompile Include="jdatadst.c" />
-    <ClCompile Include="jdatasrc-tj.c" />
     <ClCompile Include="jdatasrc.c" />
     <ClCompile Include="jdcoefct.c" />
     <ClCompile Include="jdcolext.c" />
@@ -1077,12 +1075,21 @@
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </CustomBuild>
     <CustomBuild Include="simd\jcgrass2-64.asm">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </CustomBuild>
     <CustomBuild Include="simd\jcgrass2.asm">
       <FileType>Document</FileType>
@@ -1090,6 +1097,10 @@
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

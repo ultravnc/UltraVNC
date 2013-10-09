@@ -174,12 +174,6 @@
     <ClCompile Include="jdarith.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="jdatadst-tj.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="jdatasrc-tj.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="jdcolext.c">
       <Filter>Source Files</Filter>
     </ClCompile>
