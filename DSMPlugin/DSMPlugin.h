@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002 UltraVNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002-2013 UltraVNC Team Members. All Rights Reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 // If the source code for the program is not available from the place from
 // which you received this file, check 
 // http://www.uvnc.com/
+//
 ////////////////////////////////////////////////////////////////////////////
 //
 // DSMPlugin.h: interface for the CDSMPlugin class.

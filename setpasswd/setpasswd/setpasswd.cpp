@@ -406,19 +406,19 @@ int main(int argc, char* argv[])
 	if (argc==2)
 	{
 		strcpy_s(passwd,argv[1]);
+		if (strlen(passwd)==0) return 0;
 		vncEncryptPasswd(passwd,epasswd);
 		myIniFile.WritePassword(epasswd);
 	}
+
 	if (argc==3)
 	{
 		strcpy_s(passwd,argv[1]);
 		vncEncryptPasswd(passwd,epasswd);
 		myIniFile.WritePassword(epasswd);
-#ifdef VIEWONLY
 		strcpy(passwd2,argv[2]);
 		vncEncryptPasswd(passwd2,epasswd);
 		myIniFile.WritePassword2(epasswd);
-#endif
 	}
 
 	if (myIniFile.ReadPassword(passwd,MAXPWLEN))
@@ -432,9 +432,9 @@ int main(int argc, char* argv[])
 
 	//Generate Random passwd
 
-	if (!passwd_set) myIniFile.WritePassword(passwd);
-#ifdef VIEWONLY
-	if (!passwd2_set)myIniFile.WritePassword2(passwd2); //PGM
-#endif
+	if (!passwd_set)
+		myIniFile.WritePassword(passwd);
+	if (!passwd2_set)
+		myIniFile.WritePassword2(passwd2); //PGM
 	return 0;
 }
