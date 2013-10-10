@@ -180,6 +180,9 @@
     <ClCompile Include="jaricom.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="jdsample.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />

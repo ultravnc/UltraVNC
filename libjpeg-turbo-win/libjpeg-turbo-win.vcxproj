@@ -208,6 +208,7 @@
     <ClCompile Include="jdmrgext.c" />
     <ClCompile Include="jdphuff.c" />
     <ClCompile Include="jdpostct.c" />
+    <ClCompile Include="jdsample.c" />
     <ClCompile Include="jdtrans.c" />
     <ClCompile Include="jerror.c" />
     <ClCompile Include="jfdctflt.c" />
