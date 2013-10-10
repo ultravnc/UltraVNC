@@ -165,9 +165,6 @@
     <ClCompile Include="jccolext.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="jaricom.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="jcarith.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -178,6 +175,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="jdmrgext.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="jaricom.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
