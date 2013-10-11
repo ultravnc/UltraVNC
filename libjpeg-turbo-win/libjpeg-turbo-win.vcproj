@@ -1264,6 +1264,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\jdsample.c"
+				>
+			</File>
+			<File
 				RelativePath=".\jdtrans.c"
 				>
 			</File>
