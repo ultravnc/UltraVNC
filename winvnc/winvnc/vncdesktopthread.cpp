@@ -1013,12 +1013,8 @@ vncDesktopThread::run_undetached(void *arg)
 			}
 			waittime=0;
 		}
-		/*else
-		{
-			waittime=waittime-(waiting_update*10);
-		}
-		if (waittime<0) waittime=0;
-		if (waittime>100) waittime=100;*/
+		//no need to wait, the w8hook does it own waiting.
+		if (m_desktop->startw8) waittime=0;
 
 		result=WaitForMultipleObjects(6,m_desktop->trigger_events,FALSE,waittime);
 		{
