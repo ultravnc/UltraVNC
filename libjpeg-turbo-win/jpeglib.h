@@ -16,10 +16,6 @@
 #ifndef JPEGLIB_H
 #define JPEGLIB_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /*
  * First we include the configuration files that record how this
  * installation of the JPEG library is set up.  jconfig.h can be
@@ -28,9 +24,17 @@ extern "C" {
  */
 
 #ifndef JCONFIG_INCLUDED	/* in case jinclude.h already did */
-#include "./win/jconfig.h"		/* widely used configuration options */
+#include "jconfig.h"		/* widely used configuration options */
 #endif
 #include "jmorecfg.h"		/* seldom changed options */
+
+
+#ifdef __cplusplus
+#ifndef DONT_USE_EXTERN_C
+extern "C" {
+#endif
+#endif
+
 
 /* Various constants determining the sizes of things.
  * All of these are specified by the JPEG standard, so don't change them
@@ -1202,7 +1206,9 @@ struct jpeg_color_quantizer { long dummy; };
 #endif
 
 #ifdef __cplusplus
+#ifndef DONT_USE_EXTERN_C
 }
+#endif
 #endif
 
 #endif /* JPEGLIB_H */

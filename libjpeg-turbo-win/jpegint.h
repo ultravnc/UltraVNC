@@ -88,13 +88,6 @@ struct jpeg_color_converter {
 				JDIMENSION output_row, int num_rows));
 };
 
-typedef struct {
-  struct jpeg_color_converter pub; 
-
- 
-  INT32 * rgb_ycc_tab;		
-} my_color_converter;
-
 /* Downsampling */
 struct jpeg_downsampler {
   JMETHOD(void, start_pass, (j_compress_ptr cinfo));
@@ -249,31 +242,6 @@ struct jpeg_upsampler {
 
   boolean need_context_rows;	/* TRUE if need rows above & below */
 };
-typedef struct {
-  struct jpeg_upsampler pub;	/* public fields */
-
-  /* Pointer to routine to do actual upsampling/conversion of one row group */
-  JMETHOD(void, upmethod, (j_decompress_ptr cinfo,
-			   JSAMPIMAGE input_buf, JDIMENSION in_row_group_ctr,
-			   JSAMPARRAY output_buf));
-
-  /* Private state for YCC->RGB conversion */
-  int * Cr_r_tab;		/* => table for Cr to R conversion */
-  int * Cb_b_tab;		/* => table for Cb to B conversion */
-  INT32 * Cr_g_tab;		/* => table for Cr to G conversion */
-  INT32 * Cb_g_tab;		/* => table for Cb to G conversion */
-
-  /* For 2:1 vertical sampling, we produce two output rows at a time.
-   * We need a "spare" row buffer to hold the second output row if the
-   * application provides just a one-row buffer; we also use the spare
-   * to discard the dummy last row if the image height is odd.
-   */
-  JSAMPROW spare_row;
-  boolean spare_full;		/* T if spare buffer is occupied */
-
-  JDIMENSION out_row_width;	/* samples per output row */
-  JDIMENSION rows_to_go;	/* counts rows remaining in image */
-} my_upsampler;
 
 /* Colorspace conversion */
 struct jpeg_color_deconverter {
@@ -282,18 +250,6 @@ struct jpeg_color_deconverter {
 				JSAMPIMAGE input_buf, JDIMENSION input_row,
 				JSAMPARRAY output_buf, int num_rows));
 };
-typedef struct {
-  struct jpeg_color_deconverter pub; /* public fields */
-
-  /* Private state for YCC->RGB conversion */
-  int * Cr_r_tab;		/* => table for Cr to R conversion */
-  int * Cb_b_tab;		/* => table for Cb to B conversion */
-  INT32 * Cr_g_tab;		/* => table for Cr to G conversion */
-  INT32 * Cb_g_tab;		/* => table for Cb to G conversion */
-
-  /* Private state for RGB->Y conversion */
-  INT32 * rgb_y_tab;		/* => table for RGB to Y conversion */
-} my_color_deconverter;
 
 /* Color quantization or color precision reduction */
 struct jpeg_color_quantizer {

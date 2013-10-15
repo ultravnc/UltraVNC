@@ -21,6 +21,19 @@
 
 /* Private subobject */
 
+typedef struct {
+  struct jpeg_color_deconverter pub; /* public fields */
+
+  /* Private state for YCC->RGB conversion */
+  int * Cr_r_tab;		/* => table for Cr to R conversion */
+  int * Cb_b_tab;		/* => table for Cb to B conversion */
+  INT32 * Cr_g_tab;		/* => table for Cr to G conversion */
+  INT32 * Cb_g_tab;		/* => table for Cb to G conversion */
+
+  /* Private state for RGB->Y conversion */
+  INT32 * rgb_y_tab;		/* => table for RGB to Y conversion */
+} my_color_deconverter;
+
 typedef my_color_deconverter * my_cconvert_ptr;
 
 

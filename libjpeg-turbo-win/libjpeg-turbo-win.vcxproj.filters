@@ -6,10 +6,10 @@
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
     <Filter Include="Source Files\simd">
-      <UniqueIdentifier>{42e94af1-66d1-4071-bc14-afa91ae51f64}</UniqueIdentifier>
+      <UniqueIdentifier>{ae72dcdf-29f4-4db2-9078-6c15d6f3496d}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\simd64">
-      <UniqueIdentifier>{a1c60a5a-1d9a-4ecb-95a1-1a16507f5ee7}</UniqueIdentifier>
+      <UniqueIdentifier>{d3921e01-60af-498b-b28c-201d219b2a11}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
@@ -114,6 +114,9 @@
     <ClCompile Include="jdpostct.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="jdsample.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="jdtrans.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -162,26 +165,14 @@
     <ClCompile Include="jutils.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="jccolext.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="jcarith.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="jdarith.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="jdcolext.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="jdmrgext.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="jaricom.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="jdsample.c">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="jdarith.c">
+      <Filter>Source Files\simd64</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -323,79 +314,14 @@
     <CustomBuild Include="simd\jiss2red-64.asm">
       <Filter>Source Files\simd64</Filter>
     </CustomBuild>
-    <CustomBuild Include="simd\jcgrammx.asm">
-      <Filter>Source Files\simd</Filter>
-    </CustomBuild>
     <CustomBuild Include="simd\jcgrass2.asm">
       <Filter>Source Files\simd</Filter>
     </CustomBuild>
     <CustomBuild Include="simd\jcgrass2-64.asm">
       <Filter>Source Files\simd64</Filter>
     </CustomBuild>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="bmp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="cderror.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="cdjpeg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="jchuff.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="jdct.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="jdhuff.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="jerror.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="jinclude.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="jmemsys.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="jmorecfg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="jpegint.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="jpeglib.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="jsimd.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="jsimddct.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="jversion.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="rrtimer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="rrutil.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="transupp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="turbojpeg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="win\config.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="win\jconfig.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
+    <CustomBuild Include="simd\jcgrammx.asm">
+      <Filter>Source Files\simd</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>

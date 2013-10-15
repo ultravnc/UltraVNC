@@ -6,7 +6,7 @@
 	ProjectGUID="{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}"
 	RootNamespace="libjpegturbowin"
 	Keyword="Win32Proj"
-	TargetFrameworkVersion="131072"
+	TargetFrameworkVersion="196613"
 	>
 	<Platforms>
 		<Platform
@@ -65,7 +65,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)\libjpeg-turbo-win-d.lib"
+				OutputFile="$(OutDir)\$(ProjectName)-static.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -130,7 +130,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)\libjpeg-turbo-win-d.lib"
+				OutputFile="$(OutDir)\$(ProjectName)-static.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -195,7 +195,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)\libjpeg-turbo-win.lib"
+				OutputFile="$(OutDir)\$(ProjectName)-static.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -261,7 +261,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)\libjpeg-turbo-win.lib"
+				OutputFile="$(OutDir)\$(ProjectName)-static.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -325,6 +325,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
+				OutputFile="$(OutDir)\$(ProjectName)-static.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -389,7 +390,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)\libjpeg-turbo-win-static-d.lib"
+				OutputFile="$(OutDir)\$(ProjectName)-static.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -454,7 +455,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)\libjpeg-turbo-win-static.lib"
+				OutputFile="$(OutDir)\$(ProjectName)-static.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -520,7 +521,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)\libjpeg-turbo-win-static.lib"
+				OutputFile="$(OutDir)\$(ProjectName)-static.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -584,7 +585,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)\jpeg-turbo-win-d.dll"
 				ModuleDefinitionFile="win/jpeg.def"
 				EnableCOMDATFolding="0"
 			/>
@@ -657,7 +657,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)\jpeg-turbo-win-d.dll"
 				ModuleDefinitionFile="win/jpeg.def"
 			/>
 			<Tool
@@ -729,7 +728,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)\jpeg-turbo-win.dll"
 				ModuleDefinitionFile="win/jpeg.def"
 			/>
 			<Tool
@@ -802,7 +800,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)\jpeg-turbo-win.dll"
 				ModuleDefinitionFile="win/jpeg.def"
 			/>
 			<Tool
@@ -873,7 +870,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)\jpeg-turbo-win-static-d.dll"
 				ModuleDefinitionFile="win/jpeg.def"
 				EnableCOMDATFolding="0"
 			/>
@@ -946,7 +942,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)\jpeg-turbo-win-static-d.dll"
 				ModuleDefinitionFile="win/jpeg.def"
 				TargetMachine="17"
 			/>
@@ -1019,7 +1014,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)\jpeg-turbo-win-static.dll"
 				ModuleDefinitionFile="win/jpeg.def"
 			/>
 			<Tool
@@ -1092,7 +1086,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)\jpeg-turbo-win-static.dll"
 				ModuleDefinitionFile="win/jpeg.def"
 				TargetMachine="17"
 			/>
@@ -1810,17 +1803,17 @@
 					RelativePath=".\simd\jcgrammx.asm"
 					>
 					<FileConfiguration
-						Name="ReleaseLib-Static|Win32"
+						Name="DebugDll|Win32"
 						>
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o &quot;$(OutDir)/$(InputName).obj&quot; &quot;simd/$(InputFileName)&quot;"
-							CommandLine="nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o &quot;$(OutDir)/$(InputName).obj&quot; &quot;simd/$(InputFileName)&quot;&#x0D;&#x0A;"
+							CommandLine="nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o &quot;$(OutDir)/$(InputName).obj&quot; &quot;simd/$(InputFileName)&quot;"
 							Outputs="$(OutDir)/$(InputName).obj"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="ReleaseLib-Static|x64"
+						Name="DebugDll|x64"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1832,17 +1825,17 @@
 					RelativePath=".\simd\jcgrass2.asm"
 					>
 					<FileConfiguration
-						Name="ReleaseLib-Static|Win32"
+						Name="DebugDll|Win32"
 						>
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o &quot;$(OutDir)/$(InputName).obj&quot; &quot;simd/$(InputFileName)&quot;"
-							CommandLine="nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o &quot;$(OutDir)/$(InputName).obj&quot; &quot;simd/$(InputFileName)&quot;&#x0D;&#x0A;"
+							CommandLine="nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o &quot;$(OutDir)/$(InputName).obj&quot; &quot;simd/$(InputFileName)&quot;"
 							Outputs="$(OutDir)/$(InputName).obj"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="ReleaseLib-Static|x64"
+						Name="DebugDll|x64"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -6994,7 +6987,7 @@
 					RelativePath=".\simd\jcgrass2-64.asm"
 					>
 					<FileConfiguration
-						Name="ReleaseLib-Static|Win32"
+						Name="DebugDll|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -7002,12 +6995,12 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="ReleaseLib-Static|x64"
+						Name="DebugDll|x64"
 						>
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o &quot;$(OutDir)/$(InputName).obj&quot; &quot;simd/$(InputFileName)&quot;"
-							CommandLine="nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o &quot;$(OutDir)/$(InputName).obj&quot; &quot;simd/$(InputFileName)&quot;&#x0D;&#x0A;"
+							CommandLine="nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o &quot;$(OutDir)/$(InputName).obj&quot; &quot;simd/$(InputFileName)&quot;"
 							Outputs="$(OutDir)/$(InputName).obj"
 						/>
 					</FileConfiguration>

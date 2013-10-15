@@ -1,14 +1,3 @@
-#define JPEG_INTERNALS
-#include "jinclude.h"
-#include "jpeglib.h"
-#include "jsimd.h"
-
-typedef my_upsampler * my_upsample_ptr;
-
-#define SCALEBITS	16	/* speediest right-shift on some machines */
-#define ONE_HALF	((INT32) 1 << (SCALEBITS-1))
-#define FIX(x)		((INT32) ((x) * (1L<<SCALEBITS) + 0.5))
-
 /*
  * jdmrgext.c
  *
