@@ -1242,7 +1242,7 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 			  Rect.right - Rect.left,
 			  Rect.bottom - Rect.top,
 			  SWP_SHOWWINDOW);
-		  
+		  _this->m_UseEnc[rfbEncodingTight]=true;
 		  HWND had = GetDlgItem(hwnd, IDC_AUTODETECT);
 		  SendMessage(had, BM_SETCHECK, _this->autoDetect, 0);
 		  int i = 0;	  
