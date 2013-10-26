@@ -266,6 +266,7 @@ top:
 #ifndef FAVOUR_FILL_RECT
       //fprintf(stderr,"copying data to screen %dx%d at %d,%d\n",tw,th,tx,ty);
 draw:
+	  omni_mutex_lock l(m_bitmapdcMutex);
 #if BPP!=8
       if( zywrle_level & 0x80 ){
 	    zywrle_level &= 0x7F;
@@ -273,6 +274,7 @@ draw:
 	  }
 #endif
       IMAGE_RECT(tx,ty,tw,th,buf);
+	   if (initialupdate_counter < 4) if (!directx_used)InvalidateRect(m_hwndcn, NULL, FALSE);
 #endif
     }
   }
