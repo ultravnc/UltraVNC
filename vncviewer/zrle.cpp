@@ -84,7 +84,7 @@ void ClientConnection::zrleDecode(int x, int y, int w, int h)
 {
   try {
     CheckBufferSize(rfbZRLETileWidth * rfbZRLETileHeight * 4);
-    omni_mutex_lock l(m_bitmapdcMutex);
+    //omni_mutex_lock l(m_bitmapdcMutex);
 
 	if( zywrle ){
 	  if( !m_opts.m_enableJpegCompression ){
