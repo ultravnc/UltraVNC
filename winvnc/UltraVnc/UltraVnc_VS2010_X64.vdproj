@@ -45,6 +45,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_23025C34C65C4890A069E0CDE2AA516A"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_2499FE2BC2EC43FC827586F2B36F2483"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -99,13 +105,25 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_708256351F4C475AB626FAA03B08F954"
+        "MsmKey" = "8:_6D477F4C832740E193E68EE2B025C51A"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_71B1BE9A5AA141E99ACB3D048DC86336"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_7E9202FA9ECA4F4E821B4ABFAFEE00A5"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_86C4E68B092F4414B8AD0B53001A2EB8"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -142,13 +160,13 @@
         "Entry"
         {
         "MsmKey" = "8:_D9CCD7A410A61576D752DC9362953245"
-        "OwnerKey" = "8:_E7889E76F1B34653A90C53D3F997EBAF"
+        "OwnerKey" = "8:_0F3E5B898783469D8773791F4330AA21"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_D9CCD7A410A61576D752DC9362953245"
-        "OwnerKey" = "8:_0F3E5B898783469D8773791F4330AA21"
+        "OwnerKey" = "8:_E7889E76F1B34653A90C53D3F997EBAF"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -183,14 +201,92 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_F84C0DFF34AB4B4FBCA386D383F5AC14"
+        "MsmKey" = "8:_FE82FF2D562E4B80928D6FEB67F9F479"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_FE82FF2D562E4B80928D6FEB67F9F479"
-        "OwnerKey" = "8:_UNDEFINED"
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_057C03B3B6C348A59E8D997A9884CC96"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_0F3E5B898783469D8773791F4330AA21"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_1D605486DA064476BC03795B9D1F0A1D"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_2499FE2BC2EC43FC827586F2B36F2483"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_26A88B0595B5471B8B4F81FFBB8B5087"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_2C1853F772494048B3B26B78A53486F4"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_30A3C3ED62BD436097EAA36546BB4380"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_496FDBFD8E724200972D9572D0438D7C"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_7E9202FA9ECA4F4E821B4ABFAFEE00A5"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_87DB62653B71411E93DD76EF68D97A39"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_9FFC46783A7F4BCB9DDA60B790D35975"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_B0AE7F7B374D4940BFC810B4E4ED9394"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_E7889E76F1B34653A90C53D3F997EBAF"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_FE82FF2D562E4B80928D6FEB67F9F479"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -238,7 +334,7 @@
         "DisplayName" = "8:Release"
         "IsDebugOnly" = "11:FALSE"
         "IsReleaseOnly" = "11:TRUE"
-        "OutputFilename" = "8:Release\\UltraVnc_10962_X64.msi"
+        "OutputFilename" = "8:Release\\UltraVnc_1194_X64.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -337,6 +433,14 @@
         {
             "LaunchCondition"
             {
+                "{A06ECF26-33A3-4562-8140-9B0E340D4F24}:_65E6E9734DA74D85B4DE509B1EA8512B"
+                {
+                "Name" = "8:.NET Framework"
+                "Message" = "8:[VSDNETMSG]"
+                "FrameworkVersion" = "8:ANY"
+                "AllowLaterVersions" = "11:FALSE"
+                "InstallUrl" = "8:http://go.microsoft.com/fwlink/?LinkId=131000"
+                }
             }
         }
         "File"
@@ -368,6 +472,26 @@
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
             "Condition" = "8:SERVER=1"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_23025C34C65C4890A069E0CDE2AA516A"
+            {
+            "SourcePath" = "8:..\\..\\..\\..\\..\\Files\\vncviewer64.exe"
+            "TargetName" = "8:vncviewer.exe"
+            "Tag" = "8:"
+            "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
+            "Condition" = "8:VIEWER=1"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
             "ReadOnly" = "11:FALSE"
@@ -421,13 +545,53 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_708256351F4C475AB626FAA03B08F954"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_6D477F4C832740E193E68EE2B025C51A"
             {
             "SourcePath" = "8:..\\..\\..\\..\\..\\Files\\banner.jpg"
             "TargetName" = "8:banner.jpg"
             "Tag" = "8:"
-            "Folder" = "8:_C494A31A95A7426D87F6B68CC354DB1E"
-            "Condition" = "8:GG=1"
+            "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_71B1BE9A5AA141E99ACB3D048DC86336"
+            {
+            "SourcePath" = "8:..\\..\\..\\..\\..\\Files\\w8hook64.dll"
+            "TargetName" = "8:w8hook64.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
+            "Condition" = "8:VersionNT>=602 AND SERVER=1"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_86C4E68B092F4414B8AD0B53001A2EB8"
+            {
+            "SourcePath" = "8:..\\..\\..\\..\\..\\Files\\sas64.dll"
+            "TargetName" = "8:sas.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
+            "Condition" = "8:SERVER=1 AND VERSIONNT=500"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
             "ReadOnly" = "11:FALSE"
@@ -541,26 +705,6 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F84C0DFF34AB4B4FBCA386D383F5AC14"
-            {
-            "SourcePath" = "8:..\\..\\..\\..\\..\\Files\\sas.dll"
-            "TargetName" = "8:sas.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
-            "Condition" = "8:VersionNT=600"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
         }
         "FileType"
         {
@@ -629,14 +773,14 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:UltraVnc"
         "ProductCode" = "8:{4ABD1242-7176-49CC-A128-AB9506C72DC7}"
-        "PackageCode" = "8:{1F15689A-5CC5-4AAE-AB87-4CEF6E32197E}"
+        "PackageCode" = "8:{F21EF04E-8CCB-4AF4-B03E-13C6E7BA13B0}"
         "UpgradeCode" = "8:{25A3A242-EEA3-4731-A2D0-E990D2EA5A23}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.0.963"
+        "ProductVersion" = "8:1.1.93"
         "Manufacturer" = "8:uvnc bvba"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:http://support.uvnc.com"
@@ -777,6 +921,20 @@
             "Icon" = "8:_0F3E5B898783469D8773791F4330AA21"
             "Feature" = "8:"
             }
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_2D385C875FF548B2B1F6147FA07A64CC"
+            {
+            "Name" = "8:UltraVNC Viewer"
+            "Arguments" = "8:"
+            "Description" = "8:"
+            "ShowCmd" = "3:1"
+            "IconIndex" = "3:0"
+            "Transitive" = "11:FALSE"
+            "Target" = "8:_23025C34C65C4890A069E0CDE2AA516A"
+            "Folder" = "8:_24665A4E9C2843369A076809668F5E3C"
+            "WorkingFolder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
+            "Icon" = "8:"
+            "Feature" = "8:"
+            }
             "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_4053ECB4920340759C34252F8750BE5D"
             {
             "Name" = "8:UltraVNC Settings"
@@ -805,34 +963,6 @@
             "Icon" = "8:"
             "Feature" = "8:"
             }
-            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_97F4C62031BD43429340CBDC5914135E"
-            {
-            "Name" = "8:UltraVNC Viewer"
-            "Arguments" = "8:"
-            "Description" = "8:UltraVNC Viewer"
-            "ShowCmd" = "3:1"
-            "IconIndex" = "3:101"
-            "Transitive" = "11:FALSE"
-            "Target" = "8:"
-            "Folder" = "8:_24665A4E9C2843369A076809668F5E3C"
-            "WorkingFolder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
-            "Icon" = "8:"
-            "Feature" = "8:"
-            }
-            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_B1897D1FD5ED46C6A74FA623BEF02AFD"
-            {
-            "Name" = "8:UltraVNC Viewer"
-            "Arguments" = "8:"
-            "Description" = "8:"
-            "ShowCmd" = "3:1"
-            "IconIndex" = "3:101"
-            "Transitive" = "11:FALSE"
-            "Target" = "8:"
-            "Folder" = "8:_97AE57B765F34429BF8EAA1F4067FFD5"
-            "WorkingFolder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
-            "Icon" = "8:"
-            "Feature" = "8:"
-            }
             "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_D6A42525FBAD48DC8428C8AD86945D7A"
             {
             "Name" = "8:UltraVNC Server"
@@ -845,6 +975,20 @@
             "Folder" = "8:_24665A4E9C2843369A076809668F5E3C"
             "WorkingFolder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
             "Icon" = "8:_E7889E76F1B34653A90C53D3F997EBAF"
+            "Feature" = "8:"
+            }
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_F4BBC02B7FF24FEF8CDD8BDC1CF60CD0"
+            {
+            "Name" = "8:UltraVNC Viewer"
+            "Arguments" = "8:"
+            "Description" = "8:"
+            "ShowCmd" = "3:1"
+            "IconIndex" = "3:0"
+            "Transitive" = "11:FALSE"
+            "Target" = "8:_23025C34C65C4890A069E0CDE2AA516A"
+            "Folder" = "8:_97AE57B765F34429BF8EAA1F4067FFD5"
+            "WorkingFolder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
+            "Icon" = "8:"
             "Feature" = "8:"
             }
         }
@@ -1192,7 +1336,7 @@
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
                             "Setting" = "3:2"
-                            "Value" = "8:_708256351F4C475AB626FAA03B08F954"
+                            "Value" = "8:_6D477F4C832740E193E68EE2B025C51A"
                             "UsePlugInResources" = "11:TRUE"
                             }
                             "EulaText"
@@ -1239,7 +1383,8 @@
                             "Type" = "3:8"
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
-                            "Setting" = "3:1"
+                            "Setting" = "3:2"
+                            "Value" = "8:_6D477F4C832740E193E68EE2B025C51A"
                             "UsePlugInResources" = "11:TRUE"
                             }
                             "BannerText"
@@ -1264,7 +1409,7 @@
                             "ContextData" = "8:"
                             "Attributes" = "3:0"
                             "Setting" = "3:2"
-                            "Value" = "8:UltraVnc 1.0.9.6.3 X64"
+                            "Value" = "8:UltraVnc 1.1.9.4 X64"
                             "DefaultValue" = "8:#1215"
                             "UsePlugInResources" = "11:TRUE"
                             }
@@ -1496,7 +1641,7 @@
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
                             "Setting" = "3:2"
-                            "Value" = "8:_708256351F4C475AB626FAA03B08F954"
+                            "Value" = "8:_6D477F4C832740E193E68EE2B025C51A"
                             "UsePlugInResources" = "11:TRUE"
                             }
                             "ReadmeText"
@@ -1544,7 +1689,7 @@
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
                             "Setting" = "3:2"
-                            "Value" = "8:_708256351F4C475AB626FAA03B08F954"
+                            "Value" = "8:_6D477F4C832740E193E68EE2B025C51A"
                             "UsePlugInResources" = "11:TRUE"
                             }
                             "CopyrightWarning"
@@ -1593,7 +1738,7 @@
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
                             "Setting" = "3:2"
-                            "Value" = "8:_708256351F4C475AB626FAA03B08F954"
+                            "Value" = "8:_6D477F4C832740E193E68EE2B025C51A"
                             "UsePlugInResources" = "11:TRUE"
                             }
                             "InstallAllUsersVisible"
@@ -1629,7 +1774,7 @@
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
                             "Setting" = "3:2"
-                            "Value" = "8:_708256351F4C475AB626FAA03B08F954"
+                            "Value" = "8:_6D477F4C832740E193E68EE2B025C51A"
                             "UsePlugInResources" = "11:TRUE"
                             }
                         }
@@ -1652,7 +1797,7 @@
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
                             "Setting" = "3:2"
-                            "Value" = "8:_708256351F4C475AB626FAA03B08F954"
+                            "Value" = "8:_6D477F4C832740E193E68EE2B025C51A"
                             "UsePlugInResources" = "11:TRUE"
                             }
                             "BannerText"

@@ -3656,6 +3656,9 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='DebugLib-Static|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='DebugLib-Static|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='DebugLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
     </CustomBuild>
     <CustomBuild Include="simd\jcgrass2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugDll|x64'">true</ExcludedFromBuild>
@@ -3709,6 +3712,7 @@
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugLib-Static|x64'">true</ExcludedFromBuild>
     </CustomBuild>
     <CustomBuild Include="simd\jcgrammx.asm">
       <FileType>Document</FileType>
@@ -3737,6 +3741,7 @@
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugLib-Static|x64'">true</ExcludedFromBuild>
     </CustomBuild>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
