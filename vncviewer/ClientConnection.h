@@ -287,7 +287,7 @@ private:
 		};
 	};
 	PendingMouseMove m_PendingMouseMove;
-	
+	int initialupdate_counter;
 	void ReadScreenUpdate();
 	void Update(RECT *pRect);
 	void SizeWindow();

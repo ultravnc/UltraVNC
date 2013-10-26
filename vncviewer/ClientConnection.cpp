@@ -4416,6 +4416,7 @@ void* ClientConnection::run_undetached(void* arg) {
 	// sf@2007 - AutoReconnect
 	// Error, value can be set 0 by gui in that case you get a gray screen
 	if (m_autoReconnect==0) m_autoReconnect=1;
+	initialupdate_counter=0;
 	while (m_autoReconnect > 0)
 	{
 		try
@@ -4998,7 +4999,7 @@ inline void ClientConnection::ReadScreenUpdate()
 			}
 			fTimingAlreadyStopped = true;
 		}
-
+			initialupdate_counter++;
 			// vnclog.Print(0, _T("known encoding %d - not supported!\n"), surh.encoding);
 		switch (surh.encoding)
 		{
