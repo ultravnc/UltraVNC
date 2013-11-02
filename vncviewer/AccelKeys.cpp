@@ -86,6 +86,18 @@ AccelKeys::AccelKeys()
 	AccelTable[i].key = VK_F12;
 	AccelTable[i++].cmd = ID_FULLSCREEN;
 
+	AccelTable[i].fVirt = FVIRTKEY | FCONTROL | FALT | FNOINVERT |FSHIFT;
+	AccelTable[i].key = 0x49;
+	AccelTable[i++].cmd = ID_CONN_ABOUT;
+
+	AccelTable[i].fVirt = FVIRTKEY | FCONTROL | FALT | FNOINVERT |FSHIFT;
+	AccelTable[i].key = 0x52;
+	AccelTable[i++].cmd = ID_REQUEST_REFRESH;
+
+	AccelTable[i].fVirt = FVIRTKEY | FCONTROL | FALT | FNOINVERT|FSHIFT;
+	AccelTable[i].key =0x4E;
+	AccelTable[i++].cmd = ID_NEWCONN;
+
 	m_hAccelTable = CreateAcceleratorTable((LPACCEL)AccelTable, i);
 }
 

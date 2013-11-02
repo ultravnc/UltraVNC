@@ -247,12 +247,15 @@ vncMenu::vncMenu(vncServer *server)
 	if (hUser32)
 	{
 	pfnFilter =(CHANGEWINDOWMESSAGEFILTER)GetProcAddress(hUser32,"ChangeWindowMessageFilter");
-	if (pfnFilter) pfnFilter(MENU_ADD_CLIENT_MSG, MSGFLT_ADD);
-	if (pfnFilter) pfnFilter(MENU_ADD_CLIENT_MSG_INIT, MSGFLT_ADD);
-	if (pfnFilter) pfnFilter(MENU_AUTO_RECONNECT_MSG, MSGFLT_ADD);
-	if (pfnFilter) pfnFilter(MENU_STOP_RECONNECT_MSG, MSGFLT_ADD);
-	if (pfnFilter) pfnFilter(MENU_STOP_ALL_RECONNECT_MSG, MSGFLT_ADD);
-	if (pfnFilter) pfnFilter(MENU_REPEATER_ID_MSG, MSGFLT_ADD);
+	if (pfnFilter) 
+		{	
+			pfnFilter(MENU_ADD_CLIENT_MSG, MSGFLT_ADD);
+			pfnFilter(MENU_ADD_CLIENT_MSG_INIT, MSGFLT_ADD);
+			pfnFilter(MENU_AUTO_RECONNECT_MSG, MSGFLT_ADD);
+			pfnFilter(MENU_STOP_RECONNECT_MSG, MSGFLT_ADD);
+			pfnFilter(MENU_STOP_ALL_RECONNECT_MSG, MSGFLT_ADD);
+			pfnFilter(MENU_REPEATER_ID_MSG, MSGFLT_ADD);
+		}
 	// adzm 2009-07-05 - Tray icon balloon tips
 	if (pfnFilter) pfnFilter(MENU_TRAYICON_BALLOON_MSG, MSGFLT_ADD);
     FreeLibrary (hUser32);

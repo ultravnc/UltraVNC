@@ -698,27 +698,8 @@ vncProperties::DialogProc(HWND hwnd,
 			sprintf(timeout, "%d", (int)t);
 		    SetDlgItemText(hwnd, IDQUERYTIMEOUT, (const char *) timeout);
 
-			// 2006 - Patch from KP774 - disable some options depending on this OS version
-			// for Win9x, no user impersonation, no LockWorkstation
-			if(OSversion() == 4 || OSversion() == 5)
-			{
-				// Disable userimpersonation
-				_this->m_server->FTUserImpersonation(FALSE);
-				EnableWindow(hFileTransferUserImp, FALSE);
-				SendMessage(hFileTransferUserImp, BM_SETCHECK, FALSE, 0);
-
-				// Disable Lock Workstation
-				if(_this->m_server->LockSettings() == 1)
-				{
-					SendMessage(GetDlgItem(hwnd, IDC_LOCKSETTING_LOCK), BM_SETCHECK, FALSE, 0);
-					_this->m_server->SetLockSettings(0);
-					SendMessage(GetDlgItem(hwnd, IDC_LOCKSETTING_NOTHING), BM_SETCHECK, TRUE, 0);
-				}
-				EnableWindow(GetDlgItem(hwnd, IDC_LOCKSETTING_LOCK), FALSE);
-			}
-
-			// if not XP or above (if win9x or NT4 or NT3.51), disable Alpha blending
-			if(!(OSversion() == 1 || OSversion()==2))
+			// W2K and WIN8 doesn't need alpha blending disable Alpha blending
+			if(VNCOS.OS_WIN8 || VNCOS.OS_W2K)
 			{
 				// Disable Capture Alpha Blending
 				_this->m_server->CaptureAlphaBlending(FALSE);
@@ -1007,6 +988,7 @@ vncProperties::DialogProc(HWND hwnd,
 
 				// Query Window options - Taken from TightVNC advanced properties
 				char timeout[256];
+				strcpy(timeout,"5");
 				if (GetDlgItemText(hwnd, IDQUERYTIMEOUT, (LPSTR) &timeout, 256) == 0)
 				    _this->m_server->SetQueryTimeout(atoi(timeout));
 				else
@@ -2147,9 +2129,12 @@ vncProperties::Save()
 	SaveInt(hkLocal, "DebugLevel", vnclog.GetLevel());
 	SaveInt(hkLocal, "AllowLoopback", m_server->LoopbackOk());
 	SaveInt(hkLocal, "LoopbackOnly", m_server->LoopbackOnly());
-	if (hkDefault) SaveInt(hkDefault, "AllowShutdown", m_allowshutdown);
-	if (hkDefault) SaveInt(hkDefault, "AllowProperties",  m_allowproperties);
-	if (hkDefault) SaveInt(hkDefault, "AllowEditClients", m_alloweditclients);
+	if (hkDefault) 
+		{
+			SaveInt(hkDefault, "AllowShutdown", m_allowshutdown);
+			SaveInt(hkDefault, "AllowProperties",  m_allowproperties);
+			SaveInt(hkDefault, "AllowEditClients", m_alloweditclients);
+		}
 
 	SaveInt(hkLocal, "DisableTrayIcon", m_server->GetDisableTrayIcon());
 	SaveInt(hkLocal, "MSLogonRequired", m_server->MSLogonRequired());

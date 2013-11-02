@@ -24,7 +24,21 @@
 
 #if !defined(DISPL)
 #define DISPL
+class VNC_OSVersion
+{
+public:
+	VNC_OSVersion();
+	virtual ~VNC_OSVersion();
+	bool OS_WIN8;
+	bool OS_WIN7;
+	bool OS_VISTA;
+	bool OS_XP;
+	bool OS_W2K;
+	bool OS_NOTSUPPORTED;
+protected:	
+
+};
+
 #pragma once
-void SetOSVersion();
-int OSversion();
+extern VNC_OSVersion VNCOS;
 #endif

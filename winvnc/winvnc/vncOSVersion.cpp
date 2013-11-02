@@ -23,6 +23,44 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include <windows.h>
+
+#include <windows.h>
+#include "vncOSVersion.h"
+
+VNC_OSVersion::VNC_OSVersion()
+{
+	OS_WIN8=false;
+	OS_WIN7=false;
+	OS_VISTA=false;
+	OS_XP=false;
+	OS_W2K=false;
+	OS_NOTSUPPORTED=false;
+	OSVERSIONINFO OSversion;	
+	OSversion.dwOSVersionInfoSize=sizeof(OSVERSIONINFO);
+	GetVersionEx(&OSversion);
+	switch(OSversion.dwPlatformId)
+	{
+		case VER_PLATFORM_WIN32_NT:
+								  if (OSversion.dwMajorVersion==6 && OSversion.dwMinorVersion>=2) OS_WIN8=true;
+								  else if(OSversion.dwMajorVersion==6 && OSversion.dwMinorVersion==1) OS_WIN7=true;
+								  else if(OSversion.dwMajorVersion==6 && OSversion.dwMinorVersion==0) OS_VISTA=true;
+								  else if(OSversion.dwMajorVersion==5 && OSversion.dwMinorVersion==2) OS_XP=true;
+								  else if(OSversion.dwMajorVersion==5 && OSversion.dwMinorVersion==1) OS_XP=true;								  
+								  else if(OSversion.dwMajorVersion==5 && OSversion.dwMinorVersion==0) OS_W2K=true;
+								  else OS_NOTSUPPORTED=true;
+								  break;
+		case VER_PLATFORM_WIN32_WINDOWS:
+								OS_NOTSUPPORTED=true;
+								break;
+	}
+}
+
+VNC_OSVersion::~VNC_OSVersion()
+{
+}
+
+
+/*
 int OSTYPE=4;
 bool WIN8=false;
 void
@@ -64,3 +102,4 @@ int OSversion()
 {
 	return OSTYPE;
 }
+*/

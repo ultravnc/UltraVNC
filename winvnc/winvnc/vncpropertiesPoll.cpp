@@ -313,13 +313,6 @@ vncPropertiesPoll::DialogProcPoll(HWND hwnd,
 				BM_SETCHECK,
 				_this->m_server->Driver(),0);
 
-			if (OSversion()==3) // If NT4 or below, no driver
-			{
-				SendMessage(hDriver,BM_SETCHECK,false,0);
-				_this->m_server->Driver(false);
-				EnableWindow(hDriver, false);
-			}
-
 			HWND hHook = GetDlgItem(hwnd, IDC_HOOK);
 			SendMessage(hHook,
 				BM_SETCHECK,

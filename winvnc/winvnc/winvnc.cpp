@@ -123,13 +123,12 @@ void Shellexecuteforuiaccess();
 
 //HACK to use name in autoreconnect from service with dyn dns
 char dnsname[255];
-
+VNC_OSVersion VNCOS;
 // winvnc.exe will also be used for helper exe
 // This allow us to minimize the number of seperate exe
 bool
 Myinit(HINSTANCE hInstance)
 {
-	SetOSVersion();
 	setbuf(stderr, 0);
 
 	// [v1.0.2-jp1 fix] Load resouce from dll
@@ -198,6 +197,11 @@ Myinit(HINSTANCE hInstance)
 // routine or, under NT, the main service routine.
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow)
 {
+	if (VNCOS.OS_NOTSUPPORTED==true)
+	{
+		 MessageBoxSecure(NULL, "Error OS not supported","Unsupported OS", MB_ICONERROR);
+		return true;
+	}
 	// make vnc last service to stop
 	SetProcessShutdownParameters(0x100,false);
 	// handle dpi on aero
@@ -217,7 +221,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 	bool Injected_autoreconnect=false;
 	SPECIAL_SC_EXIT=false;
 	SPECIAL_SC_PROMPT=false;
-	SetOSVersion();
 	setbuf(stderr, 0);
 
 	// [v1.0.2-jp1 fix] Load resouce from dll
@@ -621,12 +624,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 				while (szCmdLine[end] > ' ') end++;
 
 				pszId = new char[ end - start + 1 ];
-				if (pszId != 0)
-				{
-					strncpy( pszId, &(szCmdLine[start]), end - start );
-					pszId[ end - start ] = 0;
-					pszId = _strupr( pszId );
-				}
+	
+				strncpy( pszId, &(szCmdLine[start]), end - start );
+				pszId[ end - start ] = 0;
+				pszId = _strupr( pszId );
 //multiple spaces between autoreconnect and id
 				i = end;
 			}// end of condition we found the ID: parameter
@@ -1002,7 +1003,6 @@ void KillSDTimer()
 
 int WinVNCAppMain()
 {
-	SetOSVersion();
 	vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - WinVNCAPPMain\n"));
 #ifdef CRASH_ENABLED
 	LPVOID lpvState = Install(NULL,  "rudi.de.vos@skynet.be", "UltraVNC");

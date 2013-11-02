@@ -30,7 +30,6 @@ bool g_update_triggered;
 DWORD WINAPI hookwatch(LPVOID lpParam);
 extern bool stop_hookwatch;
 void testBench();
-extern bool WIN8;
 char g_hookstring[16]="";
 
 inline bool
@@ -852,7 +851,7 @@ vncDesktopThread::run_undetached(void *arg)
 	//*******************************************************
 	// INIT
 	//*******************************************************
-	if (OSversion()==2) 
+	if (VNCOS.OS_VISTA||VNCOS.OS_WIN7||VNCOS.OS_WIN8) 
 	{
 		G_USE_PIXEL=false;
 	}
@@ -965,11 +964,11 @@ vncDesktopThread::run_undetached(void *arg)
 	Sleep(1000);
 	rgncache.assign_union(rfb::Region2D(m_desktop->m_Cliprect));
 
-	if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver && !WIN8)
+	if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver && !VNCOS.OS_WIN8)
 		{
 			m_desktop->m_buffer.GrabRegion(rgncache,true,true);
 		}
-	else if (!WIN8)
+	else if (!VNCOS.OS_WIN8)
 		{
 			m_desktop->m_buffer.GrabRegion(rgncache,false,true);
 		}
@@ -1463,12 +1462,8 @@ vncDesktopThread::run_undetached(void *arg)
 										{
 										if (!m_server->BlackAlphaBlending() || m_desktop->VideoBuffer())
 											{
-												if(OSversion()!=2)
-												{
 												SystemParametersInfo(SPI_SETPOWEROFFACTIVE, 1, NULL, 0);
-												SendMessage(m_desktop->m_hwnd,WM_SYSCOMMAND,SC_MONITORPOWER,(LPARAM)2);
-												}
-					// don't block input here, this is the wrong thread!
+												SendMessage(HWND_BROADCAST,WM_SYSCOMMAND,SC_MONITORPOWER,(LPARAM)2);
 											}
 										}
 					#ifdef AVILOG

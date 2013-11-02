@@ -291,7 +291,7 @@ vncEncodeZlib::EncodeOneRect(BYTE *source,BYTE *source2, BYTE *dest, const RECT 
 	}
 
 
-	UINT newsize;
+	UINT newsize=0;
 	SoMoMu=PURE_ZLIB;
 	if (m_buffer2 && source2 && dataSize>Firstrun)
 		{

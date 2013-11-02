@@ -53,10 +53,9 @@ vncDesktop::Checkmonitors()
 
   if (nr_monitors>0)
   {
-	if(OSversion()==1 || OSversion()==2 || OSversion()==4 )GetPrimaryDevice();
+	GetPrimaryDevice();
 	devMode.dmSize = sizeof(DEVMODE);
-	if(OSversion()==1 || OSversion()==2 || OSversion()==4 ) EnumDisplaySettings(mymonitor[0].device, ENUM_CURRENT_SETTINGS, &devMode);
-	else EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &devMode);
+	EnumDisplaySettings(mymonitor[0].device, ENUM_CURRENT_SETTINGS, &devMode);
 	mymonitor[0].offsetx=devMode.dmPosition.x;
 	mymonitor[0].offsety=devMode.dmPosition.y;
 	mymonitor[0].Width=devMode.dmPelsWidth;
@@ -108,7 +107,6 @@ vncDesktop::Checkmonitors()
 int
 vncDesktop::GetNrMonitors()
 {
-	if(OSversion()==3 || OSversion()==5) return 1;
 	int i;
     int j=0;
     

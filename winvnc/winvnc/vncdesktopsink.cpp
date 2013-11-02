@@ -28,13 +28,13 @@
 #include "vncservice.h"
 #include <string.h>
 #include "uvncUiAccess.h"
+#include "vncOSVersion.h"
 
 #define MSGFLT_ADD		1
 typedef BOOL (WINAPI *CHANGEWINDOWMESSAGEFILTER)(UINT message, DWORD dwFlag);
 int OSversion();
 DWORD WINAPI Driverwatch(LPVOID lpParam);
 DWORD WINAPI InitWindowThread(LPVOID lpParam);
-extern bool WIN8;
 extern char g_hookstring[16];
 
 void
@@ -525,11 +525,14 @@ vncDesktop::InitWindow()
 	HMODULE  hUser32 = LoadLibrary("user32.dll");
 	CHANGEWINDOWMESSAGEFILTER pfnFilter = NULL;
 	pfnFilter =(CHANGEWINDOWMESSAGEFILTER)GetProcAddress(hUser32,"ChangeWindowMessageFilter");
-	if (pfnFilter) pfnFilter(RFB_SCREEN_UPDATE, MSGFLT_ADD);
-	if (pfnFilter) pfnFilter(RFB_COPYRECT_UPDATE, MSGFLT_ADD);
-	if (pfnFilter) pfnFilter(RFB_MOUSE_UPDATE, MSGFLT_ADD);
-	if (pfnFilter) pfnFilter(WM_QUIT, MSGFLT_ADD);
-	if (pfnFilter) pfnFilter(WM_SHUTDOWN, MSGFLT_ADD);
+	if (pfnFilter) 
+		{	
+			pfnFilter(RFB_SCREEN_UPDATE, MSGFLT_ADD);
+			pfnFilter(RFB_COPYRECT_UPDATE, MSGFLT_ADD);
+			pfnFilter(RFB_MOUSE_UPDATE, MSGFLT_ADD);
+			pfnFilter(WM_QUIT, MSGFLT_ADD);
+			pfnFilter(WM_SHUTDOWN, MSGFLT_ADD);
+		}
 
 	if (m_wndClass == 0) {
 		// Create the window class
@@ -620,7 +623,7 @@ vncDesktop::InitWindow()
 		}
 	hW8Module=NULL;
 	char szCurrentDirW8[MAX_PATH];
-	if (WIN8)
+	if (VNCOS.OS_WIN8)
 	{
 		if (GetModuleFileName(NULL, szCurrentDirW8, MAX_PATH))
 		{
@@ -647,7 +650,7 @@ vncDesktop::InitWindow()
 
 	hModule = LoadLibrary(szCurrentDir);
 	hSCModule = LoadLibrary(szCurrentDirSC);//TOFIX resource leak
-	if (WIN8) hW8Module = LoadLibrary(szCurrentDirW8);
+	if (VNCOS.OS_WIN8) hW8Module = LoadLibrary(szCurrentDirW8);
 	if (hModule)
 		{
 			strcpy_s(g_hookstring,"vnchook");

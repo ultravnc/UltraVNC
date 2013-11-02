@@ -23,12 +23,12 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "uvncUiAccess.h"
+#include "vncOSVersion.h"
 
 comm_serv *keyEventFn=NULL;
 comm_serv *StopeventFn=NULL;
 comm_serv *StarteventFn=NULL;
 
-extern bool WIN8;
 CRITICAL_SECTION keyb_crit;
 bool crit_init=false;
 
@@ -64,7 +64,7 @@ void Shellexecuteforuiaccess()
  int keycounter =0;
 void keepalive()
 {
-	if (!WIN8) return;
+	if (!VNCOS.OS_WIN8) return;
 
 	EnterCriticalSection(&keyb_crit);
 	unsigned char Invalue=12;
@@ -100,7 +100,7 @@ void keepalive()
 
 void keybd_uni_event(_In_  BYTE bVk,_In_  BYTE bScan,_In_  DWORD dwFlags,_In_  ULONG_PTR dwExtraInfo)
 {
-	if (!WIN8) 
+	if (!VNCOS.OS_WIN8) 
 	{
 		keybd_event(bVk,bScan,dwFlags,dwExtraInfo);
 		return;
@@ -112,7 +112,7 @@ void keybd_uni_event(_In_  BYTE bVk,_In_  BYTE bScan,_In_  DWORD dwFlags,_In_  U
 	bool rcdown = HIBYTE(::GetKeyState(VK_RCONTROL)) != 0;	
 	bool lwindown = HIBYTE(::GetKeyState(VK_LWIN)) != 0;
 	bool rwindown = HIBYTE(::GetKeyState(VK_RWIN)) != 0;
-	 if (keyEventFn==NULL || !WIN8)// || (!ldown && !rdown && !lcdown && !rcdown && !lwindown && !rwindown) )
+	 if (keyEventFn==NULL || !VNCOS.OS_WIN8)// || (!ldown && !rdown && !lcdown && !rcdown && !lwindown && !rwindown) )
 	 {
 		 keybd_event(bVk,bScan,dwFlags,dwExtraInfo);
 	 }
@@ -130,7 +130,7 @@ void keybd_uni_event(_In_  BYTE bVk,_In_  BYTE bScan,_In_  DWORD dwFlags,_In_  U
 
 void keybd_initialize_no_crit()
 {
-	if (!WIN8) return;
+	if (!VNCOS.OS_WIN8) return;
 
 	keyEventFn=new comm_serv;
 	StopeventFn=new comm_serv;
@@ -160,7 +160,7 @@ error:
 
 void keybd_initialize()
 {
-	if (!WIN8) return;
+	if (!VNCOS.OS_WIN8) return;
 
 
 	if (!crit_init)InitializeCriticalSection(&keyb_crit);
@@ -197,7 +197,7 @@ error:
 
 void keybd_delete()
 {
-	if (!WIN8) return;
+	if (!VNCOS.OS_WIN8) return;
 	EnterCriticalSection(&keyb_crit);
 	if (StopeventFn) StopeventFn->Call_Fnction_no_feedback();
 	if (keyEventFn)delete keyEventFn;

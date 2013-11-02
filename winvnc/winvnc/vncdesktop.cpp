@@ -96,7 +96,7 @@ PixelCaptureEngine::~PixelCaptureEngine()
 
 PixelCaptureEngine::PixelCaptureEngine()
 	{
-		if (OSversion()==2) m_bIsVista=true;
+		if (VNCOS.OS_VISTA || VNCOS.OS_WIN7 || VNCOS.OS_WIN8) m_bIsVista=true;
 		else 
 			m_bIsVista=false;
 
@@ -679,24 +679,21 @@ vncDesktop::Startup()
 	if (m_server->Driver())
 				{
 					vnclog.Print(LL_INTINFO, VNCLOG("Driver option enabled \n"));
-					if(OSversion()==1 || OSversion()==2 )
+					//Enable only the video driver for the Default desktop
+					HDESK desktop = GetThreadDesktop(GetCurrentThreadId());
+					DWORD dummy;
+					char new_name[256];
+					if (GetUserObjectInformation(desktop, UOI_NAME, &new_name, 256, &dummy))
 						{
-							//Enable only the video driver for the Default desktop
-							HDESK desktop = GetThreadDesktop(GetCurrentThreadId());
-							DWORD dummy;
-							char new_name[256];
-							if (GetUserObjectInformation(desktop, UOI_NAME, &new_name, 256, &dummy))
+							if (strcmp(new_name,"Default")==0)
 								{
-									if (strcmp(new_name,"Default")==0)
-										{
-											InitVideoDriver();
-											no_default_desktop=false;
-										}
-									else 
-										{
-											vnclog.Print(LL_INTINFO, VNCLOG("no default desktop \n"));
-											no_default_desktop=true;
-										}
+									InitVideoDriver();
+									no_default_desktop=false;
+								}
+							else 
+								{
+									vnclog.Print(LL_INTINFO, VNCLOG("no default desktop \n"));
+									no_default_desktop=true;
 								}
 						}
 				}
@@ -985,59 +982,56 @@ DWORD
 vncDesktop::InitBitmap()
 {	
 	// Get the device context for the whole screen and find it's size
-	DriverType=NONE;
-	if (OSversion()==1 || OSversion()==2) //XP W2k
-		{	
-			if (VideoBuffer())
-				{
-					pEnumDisplayDevices pd=NULL;
-					LPSTR driverName = "mv video hook driver2";
-					BOOL DriverFound;
-					DEVMODE devmode;
-					FillMemory(&devmode, sizeof(DEVMODE), 0);
-					devmode.dmSize = sizeof(DEVMODE);
-					devmode.dmDriverExtra = 0;
-					BOOL change = EnumDisplaySettings(NULL,ENUM_CURRENT_SETTINGS,&devmode);
-					devmode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
-					HMODULE hUser32=LoadLibrary("USER32");
-					if (hUser32) pd = (pEnumDisplayDevices)GetProcAddress( hUser32, "EnumDisplayDevicesA");
-						if (pd)
+	DriverType=NONE;	
+	if (VideoBuffer())
+		{
+			pEnumDisplayDevices pd=NULL;
+			LPSTR driverName = "mv video hook driver2";
+			BOOL DriverFound;
+			DEVMODE devmode;
+			FillMemory(&devmode, sizeof(DEVMODE), 0);
+			devmode.dmSize = sizeof(DEVMODE);
+			devmode.dmDriverExtra = 0;
+			BOOL change = EnumDisplaySettings(NULL,ENUM_CURRENT_SETTINGS,&devmode);
+			devmode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
+			HMODULE hUser32=LoadLibrary("USER32");
+			if (hUser32) pd = (pEnumDisplayDevices)GetProcAddress( hUser32, "EnumDisplayDevicesA");
+				if (pd)
+					{
+						LPSTR deviceName=NULL;
+						DISPLAY_DEVICE dd;
+						ZeroMemory(&dd, sizeof(dd));
+						dd.cb = sizeof(dd);
+						devmode.dmDeviceName[0] = '\0';
+						INT devNum = 0;
+						BOOL result;
+						DriverFound=false;
+						while (result = (*pd)(NULL,devNum, &dd,0))
 							{
-								LPSTR deviceName=NULL;
-								DISPLAY_DEVICE dd;
-								ZeroMemory(&dd, sizeof(dd));
-								dd.cb = sizeof(dd);
-								devmode.dmDeviceName[0] = '\0';
-								INT devNum = 0;
-								BOOL result;
-								DriverFound=false;
-								while (result = (*pd)(NULL,devNum, &dd,0))
+								if (strcmp((const char *)&dd.DeviceString[0], driverName) == 0)
 									{
-										if (strcmp((const char *)&dd.DeviceString[0], driverName) == 0)
-											{
-												DriverFound=true;
-												break;
-											}
-										devNum++;
+										DriverFound=true;
+										break;
 									}
-								if (DriverFound)
-									{
-										deviceName = (LPSTR)&dd.DeviceName[0];
-										// JnZn558 m_hrootdc = CreateDC("DISPLAY",deviceName,NULL,NULL);
-										m_hrootdc = GetDC(NULL);
-										BOOL change = EnumDisplaySettings(deviceName,ENUM_CURRENT_SETTINGS,&devmode);
-										m_ScreenOffsetx=devmode.dmPosition.x;
-										m_ScreenOffsety=devmode.dmPosition.y;
-										if (m_hrootdc) DriverType=MIRROR;
-										Checkmonitors();
-										requested_multi_monitor=m_buffer.IsMultiMonitor();
-										multi_monitor=false;
-										if (requested_multi_monitor && nr_monitors>1) multi_monitor=true;
-									}
+								devNum++;
 							}
-					if (hUser32) FreeLibrary(hUser32);
-				}//VIDEOBUFFER
-			}//OS
+						if (DriverFound)
+							{
+								deviceName = (LPSTR)&dd.DeviceName[0];
+								// JnZn558 m_hrootdc = CreateDC("DISPLAY",deviceName,NULL,NULL);
+								m_hrootdc = GetDC(NULL);
+								BOOL temp_para = EnumDisplaySettings(deviceName,ENUM_CURRENT_SETTINGS,&devmode);
+								m_ScreenOffsetx=devmode.dmPosition.x;
+								m_ScreenOffsety=devmode.dmPosition.y;
+								if (m_hrootdc) DriverType=MIRROR;
+								Checkmonitors();
+								requested_multi_monitor=m_buffer.IsMultiMonitor();
+								multi_monitor=false;
+								if (requested_multi_monitor && nr_monitors>1) multi_monitor=true;
+							}
+					}
+			if (hUser32) FreeLibrary(hUser32);
+		}//VIDEOBUFFER
 
 	// RDV SINGLE WINDOW
 	if (m_server->SingleWindow() && m_Single_hWnd==NULL)
@@ -1457,35 +1451,32 @@ vncDesktop::SetPalette()
 DWORD WINAPI Driverwatch(LPVOID lpParam)
 {
 	//Mouse shape changed
-	if (OSversion()==1 || OSversion()==2)
+	HANDLE event;
+	//DrvWatch *mywatch=(DrvWatch*)lpParam;
+	HWND hwnd=(HWND)lpParam;
+	event=NULL;
+	while (event==NULL)
 	{
-		HANDLE event;
-		//DrvWatch *mywatch=(DrvWatch*)lpParam;
-		HWND hwnd=(HWND)lpParam;
-		event=NULL;
-		while (event==NULL)
-		{
-			event = OpenEvent (SYNCHRONIZE, FALSE, "VncEvent") ;
-			Sleep(900);
-			if (!IsWindow(hwnd)) 
-			{
-				if (event) CloseHandle(event);
-				return 0;
-			}
-		}
-		SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_NORMAL);
-		for (;;)
-		{
-		if (WaitForSingleObject(event, 2000) == WAIT_OBJECT_0)
-			{
-				PostMessage(hwnd, WM_MOUSESHAPE, 0, 0);
-			}
-		if (!IsWindow(hwnd) || !g_Desktop_running)
+		event = OpenEvent (SYNCHRONIZE, FALSE, "VncEvent") ;
+		Sleep(900);
+		if (!IsWindow(hwnd)) 
 		{
 			if (event) CloseHandle(event);
-			break;
+			return 0;
 		}
+	}
+	SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_NORMAL);
+	for (;;)
+	{
+	if (WaitForSingleObject(event, 2000) == WAIT_OBJECT_0)
+		{
+			PostMessage(hwnd, WM_MOUSESHAPE, 0, 0);
 		}
+	if (!IsWindow(hwnd) || !g_Desktop_running)
+	{
+		if (event) CloseHandle(event);
+		break;
+	}
 	}
 	return 0;
 }
@@ -1534,9 +1525,8 @@ vncDesktop::Init(vncServer *server)
 	m_server = server;
 
 	// sf@2005
-	if (OSversion()==1 || OSversion()==2)
-	m_fCaptureAlphaBlending = m_server->CaptureAlphaBlending();
-	else m_fCaptureAlphaBlending=false;
+	if (VNCOS.OS_WIN8 || VNCOS.OS_W2K)  m_fCaptureAlphaBlending=false;
+	else m_fCaptureAlphaBlending = m_server->CaptureAlphaBlending();
 
 	// Load in the arrow cursor
 	m_hdefcursor = LoadCursor(NULL, IDC_ARROW);
@@ -1615,7 +1605,7 @@ vncDesktop::CaptureScreen(const rfb::Rect &rect, BYTE *scrBuff, UINT scrBuffSize
 	assert(rect.enclosed_by(m_bmrect));
 	if (capture)
 	{
-		if (OSversion()==1 || OSversion()==2)
+		if (VNCOS.OS_XP || VNCOS.OS_VISTA || VNCOS.OS_WIN7)
 		m_fCaptureAlphaBlending = m_server->CaptureAlphaBlending();
 
 
@@ -2098,7 +2088,7 @@ void vncDesktop::SetBlankMonitor(bool enabled)
     {
 	    if (enabled)
 	    {
-		    if ((!m_server->BlackAlphaBlending() || VideoBuffer()) && (OSversion()!=2))
+		    if (!m_server->BlackAlphaBlending() || VideoBuffer())
 		    {
 			    SetProcessShutdownParameters(0x100, 0);
 			    SystemParametersInfo(SPI_GETPOWEROFFTIMEOUT, 0, &OldPowerOffTimeout, 0);
@@ -2117,7 +2107,7 @@ void vncDesktop::SetBlankMonitor(bool enabled)
 	    }
 	    else // Monitor On
 	    {
-		    if ((!m_server->BlackAlphaBlending() || VideoBuffer()) && (OSversion()!=2))
+		    if (!m_server->BlackAlphaBlending() || VideoBuffer())
 		    {
 			    if (OldPowerOffTimeout!=0)
 				    SystemParametersInfo(SPI_SETPOWEROFFTIMEOUT, OldPowerOffTimeout, NULL, 0);
@@ -2291,8 +2281,6 @@ DWORD WINAPI Warningbox_non_locked(LPVOID lpParam)
 BOOL vncDesktop::InitVideoDriver()
 {
 	omni_mutex_lock l(m_videodriver_lock,79);
-	
-	if(!(OSversion()==1  || OSversion()==2)) return true; //we need w2k or xp
 	vnclog.Print(LL_INTERR, VNCLOG("Driver option is enabled\n"));
 	// If m_videodriver exist, the driver was activated.
 	// This does not mean he is still active
@@ -2374,7 +2362,6 @@ BOOL vncDesktop::InitVideoDriver()
 // Modif rdv@2002 - v1.1.x - videodriver
 void vncDesktop::ShutdownVideoDriver()
 {
-	if(!(OSversion()!=1 || OSversion()!=2)) return;
 	if (m_videodriver==NULL) return;
 	if (m_videodriver!=NULL)
 	{
@@ -2401,60 +2388,26 @@ void vncDesktop::SethookMechanism(BOOL hookall,BOOL hookdriver)
 		m_server->PollFullScreen(TRUE);
 	}
 
-	// 9,x case 
-	vnclog.Print(LL_INTERR, VNCLOG("SethookMechanism called\r\n"));
-	if(OSversion()==4 || OSversion()==5)
-	{
-		m_hookdriver=false;//(user driver updates)
-		m_hookdll=false;//(use hookdll updates)
-		if (hookall || hookdriver) m_hookdll=true;
-		//always try to stop the ddihook before starting
-		StartStopddihook(false);ddihook=false;
-		if (hookdriver) StartStopddihook(true);
-		// same for the hookdll
-		BOOL old_On_Off_hookdll=On_Off_hookdll;
-		if (hookdriver || hookall) On_Off_hookdll=true;
-		else On_Off_hookdll=false;
-		if (old_On_Off_hookdll!=On_Off_hookdll) Hookdll_Changed=true;
-		else Hookdll_Changed=false;
-	}
-	// W2k-XP case
-	else if(OSversion()==1 || OSversion()==2)
-	{
-		// sf@2002 - We forbid hoodll and hookdriver at the same time (pointless and high CPU load)
-		if (!hookall && !hookdriver) {m_hookdll=false;m_hookdriver=false;}
-		if (hookall && hookdriver) {m_hookdll=false;m_hookdriver=true;}
-		if (hookall && !hookdriver) {m_hookdll=true;m_hookdriver=false;}
-		if (!hookall && hookdriver) {m_hookdll=false;m_hookdriver=true;}
+	// sf@2002 - We forbid hoodll and hookdriver at the same time (pointless and high CPU load)
+	if (!hookall && !hookdriver) {m_hookdll=false;m_hookdriver=false;}
+	if (hookall && hookdriver) {m_hookdll=false;m_hookdriver=true;}
+	if (hookall && !hookdriver) {m_hookdll=true;m_hookdriver=false;}
+	if (!hookall && hookdriver) {m_hookdll=false;m_hookdriver=true;}
 
-		BOOL old_On_Off_hookdll=On_Off_hookdll;
-		if (m_hookdll) On_Off_hookdll=true;
-		else On_Off_hookdll=false;
-		if (old_On_Off_hookdll!=On_Off_hookdll) Hookdll_Changed=true;
-		else Hookdll_Changed=false;
-		if (OSversion()==2) Hookdll_Changed=true;
-		
-		vnclog.Print(LL_INTERR, VNCLOG("Sethook_restart_wanted hook=%d driver=%d \r\n"),m_hookdll,m_hookdriver);
-		if (Hookdll_Changed)
-			vnclog.Print(LL_INTERR, VNCLOG("Hookdll status changed \r\n"));
-
+	BOOL old_On_Off_hookdll=On_Off_hookdll;
+	if (m_hookdll) On_Off_hookdll=true;
+	else On_Off_hookdll=false;
+	if (old_On_Off_hookdll!=On_Off_hookdll) Hookdll_Changed=true;
+	else Hookdll_Changed=false;
+	if (VNCOS.OS_VISTA|| VNCOS.OS_WIN7||VNCOS.OS_WIN8) Hookdll_Changed=true;
+	
+	vnclog.Print(LL_INTERR, VNCLOG("Sethook_restart_wanted hook=%d driver=%d \r\n"),m_hookdll,m_hookdriver);
+	if (Hookdll_Changed)
+		vnclog.Print(LL_INTERR, VNCLOG("Hookdll status changed \r\n"));
 		if ((m_hookdriver && !VideoBuffer()) || (!m_hookdriver && VideoBuffer()))
-		{
-			m_hookswitch=true;
-			vnclog.Print(LL_INTERR, VNCLOG("Driver Status changed\r\n"));
-		}
-	}
-	else //NT4
 	{
-		if (!hookall && !hookdriver) {m_hookdll=false;m_hookdriver=false;}
-		if (hookall && hookdriver) {m_hookdll=true;m_hookdriver=false;}
-		if (hookall && !hookdriver) {m_hookdll=true;m_hookdriver=false;}
-		if (!hookall && hookdriver) {m_hookdll=false;m_hookdriver=false;}
-		BOOL old_On_Off_hookdll=On_Off_hookdll;
-		if (m_hookdll) On_Off_hookdll=true;
-		else On_Off_hookdll=false;
-		if (old_On_Off_hookdll!=On_Off_hookdll) Hookdll_Changed=true;
-		else Hookdll_Changed=false;
+		m_hookswitch=true;
+		vnclog.Print(LL_INTERR, VNCLOG("Driver Status changed\r\n"));
 	}
 
 }

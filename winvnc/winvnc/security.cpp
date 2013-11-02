@@ -33,7 +33,6 @@ typedef BOOL (WINAPI *pWTSQueryUserToken_proto)(ULONG, PHANDLE);
 
 DWORD GetCurrentUserToken(HANDLE& process, HANDLE &Token)
 {
-	if(OSversion()==4 || OSversion()==5) return 1;
 	if (!vncService::RunningAsService())
 	{
 		if (!OpenProcessToken(GetCurrentProcess(), TOKEN_ALL_ACCESS, &Token))

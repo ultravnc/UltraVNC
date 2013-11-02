@@ -142,14 +142,7 @@ bool replaceFile(const char *src, const char *dst)
     if (dwFileAttribs != INVALID_FILE_ATTRIBUTES && dwFileAttribs & FILE_ATTRIBUTE_READONLY)
         SetFileAttributes(dst, dwFileAttribs & ~FILE_ATTRIBUTE_READONLY);
 
-    if (OSversion() == 3)
-    {
-        status = ::CopyFile(src, dst, false) ? true : false;
-        if (status)
-            ::DeleteFile(src);
-    }
-    else
-        status = ::MoveFileEx(src, dst, MOVEFILE_REPLACE_EXISTING) ? true : false;
+     status = ::MoveFileEx(src, dst, MOVEFILE_REPLACE_EXISTING) ? true : false;
 
     // restore orginal file attributes, if we have them. We won't have them if
     // the destination file didn't exist prior to the copy/move.

@@ -339,11 +339,7 @@ vncEncodeMgr::CheckBuffer()
 	    m_clientbuffsize = 0;
 
 	    m_clientbuff = new BYTE [clientbuffsize];
-	    if (m_clientbuff == NULL)
-	    {		
-			vnclog.Print(LL_INTERR, VNCLOG("unable to allocate client buffer[%u]\n"), clientbuffsize);
-			return FALSE;
-	    }
+
 		memset(m_clientbuff, 0, clientbuffsize);
 	    m_clientbuffsize = clientbuffsize;
 	}
@@ -438,8 +434,6 @@ vncEncodeMgr::SetEncoding(CARD32 encoding,BOOL reinitialize)
 
 		// Create a RAW encoder
 		m_encoder = new vncEncoder;
-		if (m_encoder == NULL)
-			return FALSE;
 		break;
 
 	case rfbEncodingRRE:
@@ -448,8 +442,6 @@ vncEncodeMgr::SetEncoding(CARD32 encoding,BOOL reinitialize)
 
 		// Create a RRE encoder
 		m_encoder = new vncEncodeRRE;
-		if (m_encoder == NULL)
-			return FALSE;
 		break;
 
 	case rfbEncodingCoRRE:
@@ -458,8 +450,6 @@ vncEncodeMgr::SetEncoding(CARD32 encoding,BOOL reinitialize)
 
 		// Create a CoRRE encoder
 		m_encoder = new vncEncodeCoRRE;
-		if (m_encoder == NULL)
-			return FALSE;
 		break;
 
 	case rfbEncodingHextile:
@@ -468,8 +458,6 @@ vncEncodeMgr::SetEncoding(CARD32 encoding,BOOL reinitialize)
 
 		// Create a CoRRE encoder
 		m_encoder = new vncEncodeHexT;
-		if (m_encoder == NULL)
-			return FALSE;
 		break;
 
 	case rfbEncodingUltra:
