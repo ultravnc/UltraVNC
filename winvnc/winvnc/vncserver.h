@@ -414,15 +414,6 @@ public:
 	virtual BOOL FTUserImpersonation(){return m_fFTUserImpersonation;};
 	virtual void FTUserImpersonation(BOOL fEnabled){m_fFTUserImpersonation = fEnabled;};
 
-	virtual BOOL CaptureAlphaBlending(){return m_fCaptureAlphaBlending;};
-	virtual void CaptureAlphaBlending(BOOL fEnabled){m_fCaptureAlphaBlending = fEnabled;};
-	virtual BOOL BlackAlphaBlending(){return m_fBlackAlphaBlending;};
-	virtual void BlackAlphaBlending(BOOL fEnabled){m_fBlackAlphaBlending = fEnabled;};
-
-	// [v1.0.2-jp1 fix]
-//	virtual BOOL GammaGray(){return m_fGammaGray;};
-//	virtual void GammaGray(BOOL fEnabled){m_fGammaGray = fEnabled;};
-
 	virtual void Clear_Update_Tracker();
 	virtual void UpdateCursorShape();
 
@@ -604,11 +595,6 @@ protected:
 
 	// sf@2005 - FTUserImpersonation
 	BOOL m_fFTUserImpersonation;
-
-	// sf@2005
-	BOOL m_fCaptureAlphaBlending;
-	BOOL m_fBlackAlphaBlending;
-	//BOOL m_fGammaGray;	// [v1.0.2-jp1 fix]
 
 	HINSTANCE   hWtsLib;
     bool m_fEnableStateUpdates;

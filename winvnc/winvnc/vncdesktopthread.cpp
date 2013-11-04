@@ -490,7 +490,7 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 
 					if ((m_desktop->m_scrinfo.framebufferWidth != oldscrinfo.framebufferWidth) ||
 						(m_desktop->m_scrinfo.framebufferHeight != oldscrinfo.framebufferHeight ||
-							m_desktop->m_SWtoDesktop==TRUE ))
+							m_desktop->m_SWtoDesktop!=FALSE ))
 							{
 								screensize_changed=true;	
 								vnclog.Print(LL_INTINFO, VNCLOG("SCR: new screen format %dx%dx%d\n"),
@@ -1458,12 +1458,15 @@ vncDesktopThread::run_undetached(void *arg)
 									// Clear the update tracker and region cache an solid
 									clipped_updates.clear();
 									// screen blanking
-									if (m_desktop->OldPowerOffTimeout!=0)
+									if (m_desktop->m_screen_in_powersave)
 										{
-										if (!m_server->BlackAlphaBlending() || m_desktop->VideoBuffer())
-											{
-												SystemParametersInfo(SPI_SETPOWEROFFACTIVE, 1, NULL, 0);
-												SendMessage(HWND_BROADCAST,WM_SYSCOMMAND,SC_MONITORPOWER,(LPARAM)2);
+										if (!VNCOS.CaptureAlphaBlending() || m_desktop->VideoBuffer())
+											{	DWORD new_timer=GetTickCount();
+												if ((new_timer-monitor_sleep_timer)>500)
+												{
+													SendMessage(m_desktop->m_hwnd,WM_SYSCOMMAND,SC_MONITORPOWER,(LPARAM)2);
+													monitor_sleep_timer=new_timer;
+												}
 											}
 										}
 					#ifdef AVILOG

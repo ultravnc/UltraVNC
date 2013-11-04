@@ -62,7 +62,6 @@ const char szDesktopSink[] = "WinVNC desktop sink";
 bool g_Desktop_running;
 extern bool g_DesktopThread_running;
 extern bool g_update_triggered;
-DWORD WINAPI BlackWindow(LPVOID lpParam);
 
 //
 // // Modif sf@2002 - v1.1.0 - Optimization
@@ -247,7 +246,7 @@ bool vncDesktop::FastDetectChanges(rfb::Region2D &rgn, rfb::Rect &rect, int nZon
 
 	}
 
-	PixelEngine.PixelCaptureEngineInit(m_hrootdc, m_hmemdc, m_membitmap, m_fCaptureAlphaBlending && !m_Black_window_active, 
+	PixelEngine.PixelCaptureEngineInit(m_hrootdc, m_hmemdc, m_membitmap, VNCOS.CaptureAlphaBlending() && !m_Black_window_active, 
 		                           m_DIBbits, m_scrinfo.format.bitsPerPixel / 8, m_bytesPerRow,m_ScreenOffsetx,m_ScreenOffsety);
 	// We test one zone at a time 
 	// vnclog.Print(LL_INTINFO, VNCLOG("### Polling Grid %d - SubGrid %d\n"), nZone, m_nGridCycle); 
@@ -519,7 +518,7 @@ vncDesktop::vncDesktop()
 	m_ScreenOffsety=0;
 	m_hookdriver=false;
 
-	OldPowerOffTimeout=0;
+	m_screen_in_powersave=0;
 
 	On_Off_hookdll=false;
 	g_Desktop_running=true;
@@ -1524,10 +1523,6 @@ vncDesktop::Init(vncServer *server)
 	// Save the server pointer
 	m_server = server;
 
-	// sf@2005
-	if (VNCOS.OS_WIN8 || VNCOS.OS_W2K)  m_fCaptureAlphaBlending=false;
-	else m_fCaptureAlphaBlending = m_server->CaptureAlphaBlending();
-
 	// Load in the arrow cursor
 	m_hdefcursor = LoadCursor(NULL, IDC_ARROW);
 	m_hcursor = m_hdefcursor;
@@ -1605,10 +1600,6 @@ vncDesktop::CaptureScreen(const rfb::Rect &rect, BYTE *scrBuff, UINT scrBuffSize
 	assert(rect.enclosed_by(m_bmrect));
 	if (capture)
 	{
-		if (VNCOS.OS_XP || VNCOS.OS_VISTA || VNCOS.OS_WIN7)
-		m_fCaptureAlphaBlending = m_server->CaptureAlphaBlending();
-
-
 		// Select the memory bitmap into the memory DC
 		HBITMAP oldbitmap;
 		if ((oldbitmap = (HBITMAP) SelectObject(m_hmemdc, m_membitmap)) == NULL)
@@ -1629,7 +1620,7 @@ vncDesktop::CaptureScreen(const rfb::Rect &rect, BYTE *scrBuff, UINT scrBuffSize
 			m_hrootdc,
 			rect.tl.x+m_ScreenOffsetx,
 			rect.tl.y+m_ScreenOffsety,
-			(m_fCaptureAlphaBlending && !m_Black_window_active) ? (CAPTUREBLT | SRCCOPY) : SRCCOPY
+			(VNCOS.CaptureAlphaBlending() && !m_Black_window_active) ? (CAPTUREBLT | SRCCOPY) : SRCCOPY
 			);
 		}
 		else
@@ -1639,7 +1630,7 @@ vncDesktop::CaptureScreen(const rfb::Rect &rect, BYTE *scrBuff, UINT scrBuffSize
 			 rect.tl.y,
 			(rect.br.x-rect.tl.x),
 			(rect.br.y-rect.tl.y),
-			m_hrootdc, rect.tl.x, rect.tl.y, (m_fCaptureAlphaBlending && !m_Black_window_active) ? (CAPTUREBLT | SRCCOPY) : SRCCOPY);
+			m_hrootdc, rect.tl.x, rect.tl.y, (VNCOS.CaptureAlphaBlending() && !m_Black_window_active) ? (CAPTUREBLT | SRCCOPY) : SRCCOPY);
 		}
 	/*#if defined(_DEBUG)
 		DWORD e = timeGetTime() - t;
@@ -2064,68 +2055,6 @@ vncDesktop::CalcCopyRects(rfb::UpdateTracker &tracker)
 		}
 	}
 	return false;
-}
-
-
-// added jef
-void vncDesktop::SetBlankMonitor(bool enabled)
-{
-
-	// Added Jef Fix
-	typedef DWORD (WINAPI *PSLWA)(HWND, DWORD, BYTE, DWORD);
-	PSLWA pSetLayeredWindowAttributes=NULL;
-	HMODULE hDLL = LoadLibrary ("user32");
-	if (hDLL) pSetLayeredWindowAttributes = (PSLWA) GetProcAddress(hDLL,"SetLayeredWindowAttributes");
-	if (!pSetLayeredWindowAttributes) m_server->BlackAlphaBlending(false);
-	//if (VideoBuffer()) m_server->BlackAlphaBlending(false);
-
-    vnclog.Print(LL_INTINFO, VNCLOG("SetBlankMonitor: monitor %s, using alpha %s\n"), 
-        enabled ? "off" : "on",
-        m_server->BlackAlphaBlending() ? "true" : "false");
-
-	// Also Turn Off the Monitor if allowed ("Blank Screen", "Blank Monitor")
-	if (m_server->BlankMonitorEnabled())
-    {
-	    if (enabled)
-	    {
-		    if (!m_server->BlackAlphaBlending() || VideoBuffer())
-		    {
-			    SetProcessShutdownParameters(0x100, 0);
-			    SystemParametersInfo(SPI_GETPOWEROFFTIMEOUT, 0, &OldPowerOffTimeout, 0);
-			    SystemParametersInfo(SPI_SETPOWEROFFTIMEOUT, 100, NULL, 0);
-			    SystemParametersInfo(SPI_SETPOWEROFFACTIVE, 1, NULL, 0);
-			    SendMessage(m_hwnd,WM_SYSCOMMAND,SC_MONITORPOWER,(LPARAM)2);
-		    }
-		    else
-		    {
-			    HANDLE ThreadHandle2=NULL;
-			    DWORD dwTId;
-			    ThreadHandle2 = CreateThread(NULL, 0, BlackWindow, NULL, 0, &dwTId);
-			   if (ThreadHandle2)  CloseHandle(ThreadHandle2);
-			    m_Black_window_active=true;
-		    }
-	    }
-	    else // Monitor On
-	    {
-		    if (!m_server->BlackAlphaBlending() || VideoBuffer())
-		    {
-			    if (OldPowerOffTimeout!=0)
-				    SystemParametersInfo(SPI_SETPOWEROFFTIMEOUT, OldPowerOffTimeout, NULL, 0);
-			    SystemParametersInfo(SPI_SETPOWEROFFACTIVE, 0, NULL, 0);
-			    if (m_hwnd!=NULL) SendMessage(m_hwnd,WM_SYSCOMMAND,SC_MONITORPOWER,(LPARAM)-1);
-			    OldPowerOffTimeout=0;
-				//JUst in case video driver state was changed
-				HWND Blackhnd = FindWindow(("blackscreen"), 0);
-			    if (Blackhnd) PostMessage(Blackhnd, WM_CLOSE, 0, 0);
-		    }
-		    else
-		    {
-			    HWND Blackhnd = FindWindow(("blackscreen"), 0);
-			    if (Blackhnd) PostMessage(Blackhnd, WM_CLOSE, 0, 0);
-			    m_Black_window_active=false;
-		    }
-	    }
-    }
 }
 
 

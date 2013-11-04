@@ -197,6 +197,7 @@ Myinit(HINSTANCE hInstance)
 // routine or, under NT, the main service routine.
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow)
 {
+
 	if (VNCOS.OS_NOTSUPPORTED==true)
 	{
 		 MessageBoxSecure(NULL, "Error OS not supported","Unsupported OS", MB_ICONERROR);

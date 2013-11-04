@@ -104,8 +104,6 @@ LONG FTUserImpersonation=1;
 LONG BlankMonitorEnabled=1;
 LONG BlankInputsOnly=0; //PGM
 LONG DefaultScale=1;
-LONG CaptureAlphaBlending=1;
-LONG BlackAlphaBlending=1;
 
 LONG SocketConnect=1;
 LONG HTTPConnect;
@@ -238,8 +236,6 @@ FTUserImpersonation=myIniFile_In.ReadInt("admin", "FTUserImpersonation", true);
 BlankMonitorEnabled = myIniFile_In.ReadInt("admin", "BlankMonitorEnabled", true);
 BlankInputsOnly = myIniFile_In.ReadInt("admin", "BlankInputsOnly", false); //PGM
 DefaultScale = myIniFile_In.ReadInt("admin", "DefaultScale", 1);
-CaptureAlphaBlending = myIniFile_In.ReadInt("admin", "CaptureAlphaBlending", true); // sf@2005
-BlackAlphaBlending = myIniFile_In.ReadInt("admin", "BlackAlphaBlending", false); // sf@2005
 
 Primary = myIniFile_In.ReadInt("admin", "primary", true);
 Secondary = myIniFile_In.ReadInt("admin", "secondary", false);
@@ -249,8 +245,6 @@ myIniFile_Out.WriteInt("admin", "FTUserImpersonation", FTUserImpersonation);
 myIniFile_Out.WriteInt("admin", "BlankMonitorEnabled", BlankMonitorEnabled);
 myIniFile_Out.WriteInt("admin", "BlankInputsOnly", BlankInputsOnly); //PGM
 myIniFile_Out.WriteInt("admin", "DefaultScale", DefaultScale);
-myIniFile_Out.WriteInt("admin", "CaptureAlphaBlending", CaptureAlphaBlending);
-myIniFile_Out.WriteInt("admin", "BlackAlphaBlending", BlackAlphaBlending);
 
 myIniFile_Out.WriteInt("admin", "primary", Primary);
 myIniFile_Out.WriteInt("admin", "secondary", Secondary);

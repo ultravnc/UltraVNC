@@ -13,13 +13,11 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (U.S.) resources
+// English (United States) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -89,11 +87,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,8,135,54,16
     CONTROL         139,IDC_VNCLOGO,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_SUNKEN,7,5,53,46,WS_EX_TRANSPARENT
-#ifdef _X64
-	LTEXT           "UltraVNC X64 Server 1.1.9.4",IDC_VERSION,73,5,195,11
-#else
     LTEXT           "UltraVNC Win32 Server 1.1.9.4",IDC_VERSION,73,5,195,11
-#endif
     LTEXT           "Copyright © 2002-2012 UltraVNC Team\nCopyright © 2001-2002 Sam - eSVNC \nCopyright © 1999-2002 Rudi D. V. - VdaccVNC \nCopyright © 2001 Harakan Software - PalmVNC\nCopyright © 1999-2002 Const. Kaplinsky - TightVNC \n",IDC_NAME,74,27,202,41
     LTEXT           "For more Information and Links please visit: \nhttp://www.uvnc.com",IDC_WWW,74,135,141,19
     LTEXT           "Build:",IDC_BUILDTEXT,74,16,20,10
@@ -219,9 +213,6 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,228,151,144,10
     CONTROL         "Disable Only Inputs on Blanking Request",IDC_BLANK2,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,239,161,142,10
-    CONTROL         "Enable Alpha-Blending Monitor Blanking",IDC_ALPHABLACK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,239,172,142,10
-    CONTROL         "Capture Alpha-Blending",IDC_ALPHA,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,228,183,99,10
     CONTROL         "DisableTrayIcon",IDC_DISABLETRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,228,194,67,10
     CONTROL         "Disable clients options in tray icon menu",IDC_ALLOWEDITCLIENTS,
                     "Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_DISABLED | WS_TABSTOP,228,205,141,10
@@ -258,6 +249,7 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,210,204,54,16
     CONTROL         153,IDC_VNCLOGO,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_SUNKEN,7,5,269,199,WS_EX_TRANSPARENT
 END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -372,6 +364,7 @@ BEGIN
 END
 #endif    // APSTUDIO_INVOKED
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Version
@@ -396,11 +389,7 @@ BEGIN
         BEGIN
             VALUE "Comments", "UltraVNC - Remote Control for all"
             VALUE "CompanyName", "UltraVNC"
-#ifdef _X64
-			VALUE "FileDescription", "VNC server for X64"
-#else
             VALUE "FileDescription", "VNC server for win32"
-#endif
             VALUE "FileVersion", "1.1.9.4"
             VALUE "InternalName", "WinVNC"
             VALUE "LegalCopyright", "Copyright © 2010 UltraVNC"
@@ -416,6 +405,7 @@ BEGIN
         VALUE "Translation", 0x0, 1200
     END
 END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -453,6 +443,7 @@ BEGIN
         MENUITEM "&Close VNC Connections",      ID_CLOSE
     END
 END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -499,11 +490,11 @@ BEGIN
     ID_WINVNC_ERROR         "WinVNC Error"
     ID_WINVNC_WARNIN        "WinVNC Warning"
     ID_PLUGIN_LOADIN        "Plugin Loading"
-    ID_NO_PASSWD_NO_OVERRIDE_ERR
+    ID_NO_PASSWD_NO_OVERRIDE_ERR 
                             "No password has been set & this machine has been preconfigured to prevent users from setting their own.\nYou must contact a System Administrator to configure WinVNC properly."
-    ID_NO_PASSWD_NO_OVERRIDE_WARN
+    ID_NO_PASSWD_NO_OVERRIDE_WARN 
                             "WARNING : This machine has been preconfigured to allow un-authenticated\nconnections to be accepted and to prevent users from enabling authentication."
-    ID_NO_PASSWD_NO_LOGON_WARN
+    ID_NO_PASSWD_NO_LOGON_WARN 
                             "WARNING : This machine has no default password set.  WinVNC will present the Default Properties dialog now to allow one to be entered."
 END
 
@@ -511,7 +502,7 @@ STRINGTABLE
 BEGIN
     ID_NO_OVERRIDE_ERR      "This machine has been preconfigured with WinVNC settings, which cannot be overridden by individual users.  The preconfigured settings may be modified only by a System Administrator."
     ID_NO_CURRENT_USER_ERR  "The WinVNC settings for the current user are unavailable at present."
-    ID_CANNOT_EDIT_DEFAULT_PREFS
+    ID_CANNOT_EDIT_DEFAULT_PREFS 
                             "You do not have sufficient priviliges to edit the default local WinVNC settings."
     ID_NO_PASSWORD_WARN     "WARNING : Running WinVNC without setting a password is a dangerous security risk!\nUntil you set a password, WinVNC will not accept incoming connections."
     ID_PLUGIN_NOT_LOAD      "The Plugin cannot be loaded.\n\rPlease check its integrity."
@@ -548,17 +539,16 @@ BEGIN
     ID_CADPERMISSION        "Permission denied on cad.exe, UltraVNC must be installed in ""program files"" else special cad permission is refused."
 END
 
-#endif    // English (U.S.) resources
+#endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 
+
 /////////////////////////////////////////////////////////////////////////////
-// English (U.K.) resources
+// English (United Kingdom) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENG)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
 #pragma code_page(1252)
-#endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -566,18 +556,18 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE
+1 TEXTINCLUDE 
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE
+2 TEXTINCLUDE 
 BEGIN
     "#include ""afxres.h""\r\n"
     "\0"
 END
 
-3 TEXTINCLUDE
+3 TEXTINCLUDE 
 BEGIN
     "\r\n"
     "\0"
@@ -585,17 +575,16 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-#endif    // English (U.K.) resources
+#endif    // English (United Kingdom) resources
 /////////////////////////////////////////////////////////////////////////////
+
 
 /////////////////////////////////////////////////////////////////////////////
 // Dutch (Belgium) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NLB)
-#ifdef _WIN32
 LANGUAGE LANG_DUTCH, SUBLANG_DUTCH_BELGIAN
 #pragma code_page(1252)
-#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -649,6 +638,7 @@ BEGIN
     LTEXT           "3",IDC_STATIC,11,56,8,8
 END
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // DESIGNINFO
@@ -676,6 +666,7 @@ BEGIN
 END
 #endif    // APSTUDIO_INVOKED
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // JAVAARCHIVE
@@ -702,11 +693,15 @@ IDB_LOGO64              BITMAP                  "res\\vnc-1.bmp"
 #endif    // Dutch (Belgium) resources
 /////////////////////////////////////////////////////////////////////////////
 
+
+
 #ifndef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
 //
 // Generated from the TEXTINCLUDE 3 resource.
 //
 
+
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
+

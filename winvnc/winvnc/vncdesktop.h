@@ -402,7 +402,6 @@ protected:
 	// bool m_fTextChatRunning;
 	// TextChat* m_pCurrentTextChat;
 
-	BOOL m_fCaptureAlphaBlending;
 	// DATA
 
 	// Generally useful stuff
@@ -487,7 +486,7 @@ protected:
 	// Modif input dis/enabke
 	DWORD m_thread_hooks;
 	BOOL ddihook;
-	UINT OldPowerOffTimeout;
+	bool m_screen_in_powersave;
 	bool m_Black_window_active;
 
 	//	[v1.0.2-jp1 fix] Monitor Blanking

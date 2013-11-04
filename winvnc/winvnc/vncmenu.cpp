@@ -41,6 +41,7 @@
 #include "vncmenu.h"
 #include "HideDesktop.h"
 #include "common/win32_helpers.h"
+#include "vncosversion.h"
 
 #ifndef __GNUC__
 // [v1.0.2-jp1 fix]
@@ -565,6 +566,7 @@ vncMenu::AddTrayIcon()
 			}
 			if (m_server->RemoveAeroEnabled()) //PGM @ Advantig
 				DisableAero(); //PGM @ Advantig
+			VNCOS.SetAeroState();
 		} //PGM @ Advantig
 	}
 }
@@ -996,6 +998,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			}
 			if (_this->m_server->RemoveAeroEnabled()) // Moved, redundant if //PGM @ Advantig
 				DisableAero(); // Moved, redundant if //PGM @ Advantig
+			VNCOS.SetAeroState();
 		} else {
 			if (_this->m_server->RemoveAeroEnabled()) // Moved, redundant if //PGM @ Advantig
 				ResetAero(); // Moved, redundant if //PGM @ Advantig
@@ -1011,13 +1014,6 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				RestoreFontSmoothing();
 			}
 		}
-//PGM @ Advantig		if (_this->m_server->AuthClientCount() != 0) {
-//PGM @ Advantig			if (_this->m_server->RemoveAeroEnabled())
-//PGM @ Advantig				DisableAero();
-//PGM @ Advantig		} else {
-//PGM @ Advantig			if (_this->m_server->RemoveAeroEnabled())
-//PGM @ Advantig				ResetAero();
-//PGM @ Advantig		}
 		return 0;
 
 		// STANDARD MESSAGE HANDLING

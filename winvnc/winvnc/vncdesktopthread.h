@@ -81,6 +81,7 @@ public:
 		MIN_UPDATE_INTERVAL_MIN=33;
 		// replaced by macpu ini setting
 		MAX_CPU_USAGE=20;
+		monitor_sleep_timer=0;
 	};
 protected:
 	~vncDesktopThread() {
@@ -130,6 +131,7 @@ protected:
 	bool capture;
 	bool first_run;
 	bool initialupdate;
+	DWORD monitor_sleep_timer;
 
 };
 #endif

@@ -189,9 +189,6 @@
 #define IDC_ALLOWEDITCLIENTS            1108
 #define IDC_NEW_MSLOGON                 1109
 #define IDC_HIDE_B                      1110
-#define IDC_ALPHA                       1112
-#define IDC_ALPHABLACK                  1114
-#define IDC_ALPHABLACK2                 1116
 #define IDC_FTUSERIMPERSONATION_CHECK   1117
 #define IDC_REMOVE_Aero                 1118
 #define IDE_CUSTOM1                     1119

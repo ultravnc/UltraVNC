@@ -23,12 +23,17 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include <windows.h>
-
 #include <windows.h>
 #include "vncOSVersion.h"
-
+#define SUCCEEDED(hr) (((HRESULT)(hr)) >= 0)
 VNC_OSVersion::VNC_OSVersion()
 {
+	AeroWasEnabled=false;
+	pfnDwmIsCompositionEnabled=NULL;
+	pfnDwmEnableComposition = NULL;
+	DMdll = NULL; 
+	OS_AERO_ON=false;
+	OS_LAYER_ON=false;
 	OS_WIN8=false;
 	OS_WIN7=false;
 	OS_VISTA=false;
@@ -53,53 +58,86 @@ VNC_OSVersion::VNC_OSVersion()
 								OS_NOTSUPPORTED=true;
 								break;
 	}
+	LoadDM();
 }
 
 VNC_OSVersion::~VNC_OSVersion()
 {
+	ResetAero();
+	UnloadDM();
 }
 
-
-/*
-int OSTYPE=4;
-bool WIN8=false;
 void
-SetOSVersion()
+VNC_OSVersion::SetAeroState()
 {
-	OSVERSIONINFO OSversion;
-	
-	OSversion.dwOSVersionInfoSize=sizeof(OSVERSIONINFO);
-
-	GetVersionEx(&OSversion);
-
-	switch(OSversion.dwPlatformId)
-	{
-		case VER_PLATFORM_WIN32_NT:
-								  if(OSversion.dwMajorVersion==6 && OSversion.dwMinorVersion>=2)
-									 WIN8=1;	
-								  if(OSversion.dwMajorVersion==5 && OSversion.dwMinorVersion==0)
-									 OSTYPE=1;	
-								  if(OSversion.dwMajorVersion==5 && OSversion.dwMinorVersion==1)
-									 OSTYPE=1;
-								  if(OSversion.dwMajorVersion==5)
-									 OSTYPE=1;
-								  if(OSversion.dwMajorVersion>=6) // handle anything >= 6
-									 OSTYPE=2;
-								  if(OSversion.dwMajorVersion<=4) 	  
-								     OSTYPE=3;
-								  break;
-		case VER_PLATFORM_WIN32_WINDOWS:
-								if(OSversion.dwMinorVersion==0) 
-								{
-									OSTYPE=5; //95
-									break;
-								}
-								OSTYPE=4;
-	}
+	//are layered windows supported
+	typedef DWORD (WINAPI *PSLWA)(HWND, DWORD, BYTE, DWORD);
+	PSLWA pSetLayeredWindowAttributes=NULL;
+	HMODULE hDLL = LoadLibrary ("user32");
+	if (hDLL) pSetLayeredWindowAttributes = (PSLWA) GetProcAddress(hDLL,"SetLayeredWindowAttributes");
+	if (pSetLayeredWindowAttributes) OS_LAYER_ON=true;
+	else OS_LAYER_ON=false;
+	//is aero on/off
+	BOOL pfnDwmEnableCompositiond = FALSE;
+	if (pfnDwmIsCompositionEnabled==NULL) OS_AERO_ON=false;
+	else if (SUCCEEDED(pfnDwmIsCompositionEnabled(&pfnDwmEnableCompositiond))) OS_AERO_ON=pfnDwmEnableCompositiond;
+	else OS_AERO_ON=false;	
 }
 
-int OSversion()
+bool
+VNC_OSVersion::CaptureAlphaBlending()
 {
-	return OSTYPE;
+	if (OS_LAYER_ON==false) return false;
+	if (OS_XP) return true;
+	if ((OS_WIN7 || OS_VISTA) && OS_AERO_ON==false) return true;
+	return false;
 }
-*/
+
+void
+VNC_OSVersion::UnloadDM(VOID) 
+ {  
+	pfnDwmEnableComposition = NULL; 
+	pfnDwmIsCompositionEnabled = NULL; 
+	if (DMdll) FreeLibrary(DMdll); 
+    DMdll = NULL; 
+ } 
+
+bool
+VNC_OSVersion::LoadDM(VOID) 
+ { 
+         if (DMdll) return TRUE;   
+         DMdll = LoadLibraryA("dwmapi.dll"); 
+         if (!DMdll) return FALSE;   
+         pfnDwmIsCompositionEnabled = (P_DwmIsCompositionEnabled)GetProcAddress(DMdll, "DwmIsCompositionEnabled");  
+		 pfnDwmEnableComposition = (P_DwmEnableComposition)GetProcAddress(DMdll, "DwmEnableComposition");
+         return TRUE; 
+ } 
+
+void
+VNC_OSVersion::DisableAero(VOID) 
+ { 
+
+	     BOOL pfnDwmEnableCompositiond = FALSE;   
+         if (!(pfnDwmIsCompositionEnabled && SUCCEEDED(pfnDwmIsCompositionEnabled(&pfnDwmEnableCompositiond))))  return; 
+         if (!pfnDwmEnableCompositiond) return;   
+		 if (pfnDwmEnableComposition && SUCCEEDED(pfnDwmEnableComposition(FALSE))) {			  
+			AeroWasEnabled = pfnDwmEnableCompositiond;
+		  }
+
+		pfnDwmEnableCompositiond = FALSE;
+		if (pfnDwmIsCompositionEnabled==NULL) OS_AERO_ON=false;
+		else if (SUCCEEDED(pfnDwmIsCompositionEnabled(&pfnDwmEnableCompositiond))) OS_AERO_ON=pfnDwmEnableCompositiond;
+		else OS_AERO_ON=false;	
+		 
+ } 
+  
+void
+VNC_OSVersion::ResetAero(VOID) 
+ { 
+         if (pfnDwmEnableComposition && AeroWasEnabled) pfnDwmEnableComposition(AeroWasEnabled);
+		 BOOL pfnDwmEnableCompositiond = FALSE;
+	     if (pfnDwmIsCompositionEnabled==NULL) OS_AERO_ON=false;
+		 else if (SUCCEEDED(pfnDwmIsCompositionEnabled(&pfnDwmEnableCompositiond))) OS_AERO_ON=pfnDwmEnableCompositiond;
+		 else OS_AERO_ON=false;	
+        
+ } 

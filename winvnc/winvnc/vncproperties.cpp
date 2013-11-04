@@ -506,15 +506,6 @@ vncProperties::DialogProc(HWND hwnd,
 
 		   HWND hBlank2 = GetDlgItem(hwnd, IDC_BLANK2); //PGM
            SendMessage(hBlank2, BM_SETCHECK, _this->m_server->BlankInputsOnly(), 0); //PGM
-
-		   HWND hAlpha = GetDlgItem(hwnd, IDC_ALPHA);
-           SendMessage(hAlpha, BM_SETCHECK, _this->m_server->CaptureAlphaBlending(), 0);
-		   HWND hAlphab = GetDlgItem(hwnd, IDC_ALPHABLACK);
-           SendMessage(hAlphab, BM_SETCHECK, _this->m_server->BlackAlphaBlending(), 0);
-
-		   // [v1.0.2-jp1 fix]
-//		   HWND hGammaGray = GetDlgItem(hwnd, IDC_GAMMAGRAY);
-//         SendMessage(hGammaGray, BM_SETCHECK, _this->m_server->GammaGray(), 0);
 		   
 		   HWND hLoopback = GetDlgItem(hwnd, IDC_ALLOWLOOPBACK);
 		   BOOL fLoopback = _this->m_server->LoopbackOk();
@@ -697,21 +688,6 @@ vncProperties::DialogProc(HWND hwnd,
 			UINT t = _this->m_server->QueryTimeout();
 			sprintf(timeout, "%d", (int)t);
 		    SetDlgItemText(hwnd, IDQUERYTIMEOUT, (const char *) timeout);
-
-			// W2K and WIN8 doesn't need alpha blending disable Alpha blending
-			if(VNCOS.OS_WIN8 || VNCOS.OS_W2K)
-			{
-				// Disable Capture Alpha Blending
-				_this->m_server->CaptureAlphaBlending(FALSE);
-				EnableWindow(hAlpha, FALSE);
-				SendMessage(hAlpha, BM_SETCHECK, FALSE, 0);
-
-				// Disable Alpha Blending Monitor Blanking
-				_this->m_server->BlackAlphaBlending(FALSE);
-				EnableWindow(hAlphab, FALSE);
-				SendMessage(hAlphab, BM_SETCHECK, FALSE, 0);
-			}
-
 			SetForegroundWindow(hwnd);
 
 			return FALSE; // Because we've set the focus
@@ -915,16 +891,8 @@ vncProperties::DialogProc(HWND hwnd,
 				HWND hBlank = GetDlgItem(hwnd, IDC_BLANK);
 				_this->m_server->BlankMonitorEnabled(SendMessage(hBlank, BM_GETCHECK, 0, 0) == BST_CHECKED);
 				HWND hBlank2 = GetDlgItem(hwnd, IDC_BLANK2); //PGM
-				_this->m_server->BlankInputsOnly(SendMessage(hBlank2, BM_GETCHECK, 0, 0) == BST_CHECKED); //PGM
-				HWND hAlpha = GetDlgItem(hwnd, IDC_ALPHA);
-				_this->m_server->CaptureAlphaBlending(SendMessage(hAlpha, BM_GETCHECK, 0, 0) == BST_CHECKED);
-				HWND hAlphab = GetDlgItem(hwnd, IDC_ALPHABLACK);
-				_this->m_server->BlackAlphaBlending(SendMessage(hAlphab, BM_GETCHECK, 0, 0) == BST_CHECKED);
-
-				// [v1.0.2-jp1 fix]
-//				HWND hGammaGray = GetDlgItem(hwnd, IDC_GAMMAGRAY);
-//				_this->m_server->GammaGray(SendMessage(hGammaGray, BM_GETCHECK, 0, 0) == BST_CHECKED);
-
+				_this->m_server->BlankInputsOnly(SendMessage(hBlank2, BM_GETCHECK, 0, 0) == BST_CHECKED); //PGM				
+				
 				_this->m_server->SetLoopbackOk(IsDlgButtonChecked(hwnd, IDC_ALLOWLOOPBACK));
 				_this->m_server->SetLoopbackOnly(IsDlgButtonChecked(hwnd, IDC_LOOPBACKONLY));
 
@@ -1053,9 +1021,7 @@ vncProperties::DialogProc(HWND hwnd,
         case IDC_BLANK:
             {
                 // only enable alpha blanking if blanking is enabled
-                HWND hBlank = ::GetDlgItem(hwnd, IDC_BLANK);
-                HWND hAlphab = ::GetDlgItem(hwnd, IDC_ALPHABLACK);
-                ::EnableWindow(hAlphab, ::SendMessage(hBlank, BM_GETCHECK, 0, 0) == BST_CHECKED);
+                HWND hBlank = ::GetDlgItem(hwnd, IDC_BLANK);               
                 HWND hBlank2 = ::GetDlgItem(hwnd, IDC_BLANK2); //PGM
                 ::EnableWindow(hBlank2, ::SendMessage(hBlank, BM_GETCHECK, 0, 0) == BST_CHECKED); //PGM
             }
@@ -1064,9 +1030,7 @@ vncProperties::DialogProc(HWND hwnd,
         case IDC_BLANK2: //PGM
             { //PGM
                 // only enable alpha blanking if Disable Only Inputs is disabled //PGM
-                HWND hBlank = ::GetDlgItem(hwnd, IDC_BLANK2); //PGM
-                HWND hAlphab = ::GetDlgItem(hwnd, IDC_ALPHABLACK); //PGM
-                ::EnableWindow(hAlphab, ::SendMessage(hBlank, BM_GETCHECK, 0, 0) == BST_UNCHECKED); //PGM
+                HWND hBlank = ::GetDlgItem(hwnd, IDC_BLANK2); //PGM              
             } //PGM
             break; //PGM
 
@@ -1782,10 +1746,6 @@ LABELUSERSETTINGS:
 	m_pref_BlankInputsOnly = FALSE;
 	m_pref_QueryIfNoLogon = FALSE;
 	m_pref_DefaultScale = 1;
-	m_pref_CaptureAlphaBlending = TRUE; 
-	m_pref_BlackAlphaBlending = FALSE; 
-//	m_pref_GammaGray = FALSE;			// [v1.0.2-jp1 fix]
-
 
 	// Load the local prefs for this user
 	if (hkDefault != NULL)
@@ -1867,8 +1827,6 @@ vncProperties::LoadUserPrefs(HKEY appkey)
 	m_pref_EnableBlankMonitor = LoadInt(appkey, "BlankMonitorEnabled", m_pref_EnableBlankMonitor);
 	m_pref_BlankInputsOnly = LoadInt(appkey, "BlankInputsOnly", m_pref_BlankInputsOnly); //PGM
 	m_pref_DefaultScale = LoadInt(appkey, "DefaultScale", m_pref_DefaultScale);
-	m_pref_CaptureAlphaBlending = LoadInt(appkey, "CaptureAlphaBlending", m_pref_CaptureAlphaBlending); // sf@2005
-	m_pref_BlackAlphaBlending = LoadInt(appkey, "BlackAlphaBlending", m_pref_BlackAlphaBlending); // sf@2005
 	
 	m_pref_Primary=LoadInt(appkey, "primary", m_pref_Primary);
 	m_pref_Secondary=LoadInt(appkey, "secondary", m_pref_Secondary);
@@ -1924,8 +1882,6 @@ vncProperties::ApplyUserPrefs()
 	// Modif sf@2002
 	m_server->EnableFileTransfer(m_pref_EnableFileTransfer);
 	m_server->FTUserImpersonation(m_pref_FTUserImpersonation); // sf@2005
-	m_server->CaptureAlphaBlending(m_pref_CaptureAlphaBlending); // sf@2005
-	m_server->BlackAlphaBlending(m_pref_BlackAlphaBlending); // sf@2005
 	m_server->Primary(m_pref_Primary);
 	m_server->Secondary(m_pref_Secondary);
 
@@ -2163,8 +2119,6 @@ vncProperties::SaveUserPrefs(HKEY appkey)
 	SaveInt(appkey, "FTUserImpersonation", m_server->FTUserImpersonation()); // sf@2005
 	SaveInt(appkey, "BlankMonitorEnabled", m_server->BlankMonitorEnabled());
 	SaveInt(appkey, "BlankInputsOnly", m_server->BlankInputsOnly()); //PGM
-	SaveInt(appkey, "CaptureAlphaBlending", m_server->CaptureAlphaBlending()); // sf@2005
-	SaveInt(appkey, "BlackAlphaBlending", m_server->BlackAlphaBlending()); // sf@2005
 	SaveInt(appkey, "primary", m_server->Primary());
 	SaveInt(appkey, "secondary", m_server->Secondary());
 
@@ -2341,8 +2295,6 @@ void vncProperties::LoadFromIniFile()
 	m_pref_BlankInputsOnly = FALSE;
 	m_pref_QueryIfNoLogon = FALSE;
 	m_pref_DefaultScale = 1;
-	m_pref_CaptureAlphaBlending = TRUE; 
-	m_pref_BlackAlphaBlending = FALSE; 
 
 	LoadUserPrefsFromIniFile();
 	m_allowshutdown = myIniFile.ReadInt("admin", "AllowShutdown", m_allowshutdown);
@@ -2378,8 +2330,6 @@ void vncProperties::LoadUserPrefsFromIniFile()
 	m_pref_EnableBlankMonitor = myIniFile.ReadInt("admin", "BlankMonitorEnabled", m_pref_EnableBlankMonitor);
 	m_pref_BlankInputsOnly = myIniFile.ReadInt("admin", "BlankInputsOnly", m_pref_BlankInputsOnly); //PGM
 	m_pref_DefaultScale = myIniFile.ReadInt("admin", "DefaultScale", m_pref_DefaultScale);
-	m_pref_CaptureAlphaBlending = myIniFile.ReadInt("admin", "CaptureAlphaBlending", m_pref_CaptureAlphaBlending); // sf@2005
-	m_pref_BlackAlphaBlending = myIniFile.ReadInt("admin", "BlackAlphaBlending", m_pref_BlackAlphaBlending); // sf@2005
 
 	m_pref_UseDSMPlugin = myIniFile.ReadInt("admin", "UseDSMPlugin", m_pref_UseDSMPlugin);
 	myIniFile.ReadString("admin", "DSMPlugin",m_pref_szDSMPlugin,128);
@@ -2512,8 +2462,6 @@ void vncProperties::SaveUserPrefsToIniFile()
 	myIniFile.WriteInt("admin", "FTUserImpersonation", m_server->FTUserImpersonation()); // sf@2005
 	myIniFile.WriteInt("admin", "BlankMonitorEnabled", m_server->BlankMonitorEnabled());
 	myIniFile.WriteInt("admin", "BlankInputsOnly", m_server->BlankInputsOnly()); //PGM
-	myIniFile.WriteInt("admin", "CaptureAlphaBlending", m_server->CaptureAlphaBlending()); // sf@2005
-	myIniFile.WriteInt("admin", "BlackAlphaBlending", m_server->BlackAlphaBlending()); // sf@2005
 
 	myIniFile.WriteInt("admin", "DefaultScale", m_server->GetDefaultScale());
 
