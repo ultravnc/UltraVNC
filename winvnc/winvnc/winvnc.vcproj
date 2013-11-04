@@ -705,6 +705,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\blankmonitor.cpp"
+				>
+			</File>
+			<File
 				RelativePath="buildtime.cpp"
 				>
 				<FileConfiguration
@@ -4336,15 +4340,11 @@
 			</File>
 		</Filter>
 		<File
-			RelativePath="res\AuthPanel.class"
-			>
-		</File>
-		<File
 			RelativePath=".\res\mslogon\AuthPanel.class"
 			>
 		</File>
 		<File
-			RelativePath="..\..\BUILDING.txt"
+			RelativePath="res\AuthPanel.class"
 			>
 		</File>
 		<File
@@ -4352,7 +4352,7 @@
 			>
 		</File>
 		<File
-			RelativePath="res\ButtonPanel.class"
+			RelativePath="..\..\BUILDING.txt"
 			>
 		</File>
 		<File
@@ -4360,11 +4360,15 @@
 			>
 		</File>
 		<File
-			RelativePath=".\res\mslogon\ClipboardFrame.class"
+			RelativePath="res\ButtonPanel.class"
 			>
 		</File>
 		<File
 			RelativePath=".\res\clipboardframe.class"
+			>
+		</File>
+		<File
+			RelativePath=".\res\mslogon\ClipboardFrame.class"
 			>
 		</File>
 		<File
@@ -4376,11 +4380,11 @@
 			>
 		</File>
 		<File
-			RelativePath="res\DH.class"
+			RelativePath=".\res\mslogon\DH.class"
 			>
 		</File>
 		<File
-			RelativePath=".\res\mslogon\DH.class"
+			RelativePath="res\DH.class"
 			>
 		</File>
 		<File
@@ -4388,19 +4392,19 @@
 			>
 		</File>
 		<File
-			RelativePath=".\res\mslogon\FTPFrame$StrComp.class"
-			>
-		</File>
-		<File
 			RelativePath=".\res\ftpframe$strcomp.class"
 			>
 		</File>
 		<File
-			RelativePath=".\res\mslogon\FTPFrame.class"
+			RelativePath=".\res\mslogon\FTPFrame$StrComp.class"
 			>
 		</File>
 		<File
 			RelativePath="res\FTPFrame.class"
+			>
+		</File>
+		<File
+			RelativePath=".\res\mslogon\FTPFrame.class"
 			>
 		</File>
 		<File
@@ -4412,11 +4416,11 @@
 			>
 		</File>
 		<File
-			RelativePath=".\res\mslogon\OptionsFrame.class"
+			RelativePath=".\res\optionsframe.class"
 			>
 		</File>
 		<File
-			RelativePath=".\res\optionsframe.class"
+			RelativePath=".\res\mslogon\OptionsFrame.class"
 			>
 		</File>
 		<File
@@ -4424,19 +4428,19 @@
 			>
 		</File>
 		<File
-			RelativePath="res\RecordingFrame.class"
-			>
-		</File>
-		<File
 			RelativePath=".\res\mslogon\RecordingFrame.class"
 			>
 		</File>
 		<File
-			RelativePath=".\res\rfbproto.class"
+			RelativePath="res\RecordingFrame.class"
 			>
 		</File>
 		<File
 			RelativePath=".\res\mslogon\RfbProto.class"
+			>
+		</File>
+		<File
+			RelativePath=".\res\rfbproto.class"
 			>
 		</File>
 		<File
@@ -4448,15 +4452,11 @@
 			>
 		</File>
 		<File
-			RelativePath=".\res\mslogon\VncCanvas.class"
-			>
-		</File>
-		<File
 			RelativePath=".\res\vnccanvas.class"
 			>
 		</File>
 		<File
-			RelativePath=".\res\vncviewer.class"
+			RelativePath=".\res\mslogon\VncCanvas.class"
 			>
 		</File>
 		<File
@@ -4464,11 +4464,15 @@
 			>
 		</File>
 		<File
-			RelativePath=".\res\mslogon\VncViewer.jar"
+			RelativePath=".\res\vncviewer.class"
 			>
 		</File>
 		<File
 			RelativePath=".\res\vncviewer.jar"
+			>
+		</File>
+		<File
+			RelativePath=".\res\mslogon\VncViewer.jar"
 			>
 		</File>
 		<File
