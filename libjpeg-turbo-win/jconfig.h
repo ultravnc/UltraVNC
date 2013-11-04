@@ -32,7 +32,10 @@ typedef unsigned char boolean;
 typedef short INT16;
 typedef signed int INT32;
 #endif
-#define XMD_H                   /* prevent jmorecfg.h from redefining it */
+
+#ifndef XMD_H 
+#define XMD_H
+#endif/* prevent jmorecfg.h from redefining it */
 
 #ifdef JPEG_INTERNALS
 
