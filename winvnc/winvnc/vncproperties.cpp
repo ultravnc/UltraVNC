@@ -617,7 +617,7 @@ vncProperties::DialogProc(HWND hwnd,
 				TRUE,
 				0);
 
-			HWND hmvSetting;
+			HWND hmvSetting=NULL;
 			switch (_this->m_server->ConnectPriority()) {
 			case 0:
 				hmvSetting = GetDlgItem(hwnd, IDC_MV1);
@@ -632,7 +632,7 @@ vncProperties::DialogProc(HWND hwnd,
 				hmvSetting = GetDlgItem(hwnd, IDC_MV4);
 				break;
 			};
-			SendMessage(hmvSetting,
+			if (hmvSetting != NULL) SendMessage(hmvSetting,
 				BM_SETCHECK,
 				TRUE,
 				0);

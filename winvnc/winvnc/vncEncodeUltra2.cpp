@@ -198,6 +198,7 @@ vncEncodeUltra2::SendJpegRect(BYTE *src,BYTE *dst, int dst_size, int w, int h, i
   cinfo.err = jpeg_std_error(&jerr);
   jpeg_create_compress(&cinfo);
   BYTE *srcBuf=NULL;
+  if (src = NULL) return 0;
 
   cinfo.image_width = w;
   cinfo.image_height = h;

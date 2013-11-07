@@ -568,13 +568,13 @@ void comm_serv::Call_Fnction_Long_Timeout(char *databuffer_IN,char *databuffer_O
 	r=WaitForSingleObject(event_E_OUT,timeout);
 	memcpy(databuffer_OUT,data_OUT,datasize_OUT);
 	SetEvent(event_E_OUT_DONE);
+	LeaveCriticalSection(&CriticalSection_OUT);
 	if (r==WAIT_TIMEOUT) 
 	{
 		unsigned char value=99;
 		memcpy(databuffer_OUT,&value,datasize_OUT);
 		return;
 	}
-	LeaveCriticalSection(&CriticalSection_OUT);
 }
 
 HANDLE comm_serv::GetEvent()
