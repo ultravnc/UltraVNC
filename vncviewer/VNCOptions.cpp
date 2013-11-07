@@ -233,8 +233,8 @@ void VNCOptions::GetDefaultOptionsFileName(TCHAR *optionfile)
     const char *APPDIR = "UltraVNC";
     if (SHGetFolderPath (0,CSIDL_APPDATA, NULL, SHGFP_TYPE_CURRENT, optionfile) == S_OK)
     {
-       strcat(optionfile, "\\");
-       strcat(optionfile, APPDIR);
+		strcat_s(optionfile, MAX_PATH, "\\");
+		strcat_s(optionfile, MAX_PATH,APPDIR);
 
        struct _stat st;
        if (_stat(optionfile, &st) == -1)
@@ -245,12 +245,12 @@ void VNCOptions::GetDefaultOptionsFileName(TCHAR *optionfile)
       char *tempvar=NULL;
       tempvar = getenv( "TEMP" );
       if (tempvar) 
-          strcpy(optionfile,tempvar);
+		  strcpy_s(optionfile,  MAX_PATH,tempvar);
       else 
-          strcpy(optionfile,"");
+		  strcpy_s(optionfile,  MAX_PATH,"");
     }
 
-    strcat(optionfile,"\\options.vnc");
+	strcat_s(optionfile, MAX_PATH, "\\options.vnc");
 }
 
 void VNCOptions::DeleteDefaultOptions()

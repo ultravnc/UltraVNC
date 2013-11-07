@@ -215,7 +215,7 @@ LRESULT CALLBACK Daemon::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lPa
 				}
 			case FD_READ:
 				{
-					unsigned long numbytes;
+					unsigned long numbytes=0;
 					ioctlsocket(_this->m_deamon_sock, FIONREAD, &numbytes);
 					recv(_this->m_deamon_sock, _this->netbuf, numbytes, 0);
 					break;

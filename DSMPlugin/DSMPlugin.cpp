@@ -380,8 +380,8 @@ bool CDSMPlugin::LoadPlugin(char* szPlugin, bool fAllowMulti)
 		//Try current PATH
 		if (m_hPDll==NULL)
 		{
-			char szCurrentDir[MAX_PATH];
-			char szCurrentDir_szPlugin[MAX_PATH];
+			char szCurrentDir[MAX_PATH]="";
+			char szCurrentDir_szPlugin[MAX_PATH]="";
 			if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
 				{
 					char* p = strrchr(szCurrentDir, '\\');

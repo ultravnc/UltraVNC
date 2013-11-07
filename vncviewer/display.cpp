@@ -3,8 +3,6 @@
 void
 tempdisplayclass::checkmonitors()
 {
-	ENUMDISPLAYSETTINGSEXA pEnumDisplaySettingsEx;
-	if (hUser32) pEnumDisplaySettingsEx = (ENUMDISPLAYSETTINGSEXA) GetProcAddress(hUser32, "EnumDisplaySettingsExA");
 
 	DISPLAY_DEVICE dd;
 	ZeroMemory(&dd, sizeof(dd));
@@ -49,16 +47,9 @@ tempdisplayclass::checkmonitors()
 			ZeroMemory(&dm, sizeof(dm));
 			dm.dmSize = sizeof(dm);
 			dm.dmDriverExtra=0;
-			if (pEnumDisplaySettingsEx)
-			{
-			if (pEnumDisplaySettingsEx((char *)dd.DeviceName, ENUM_CURRENT_SETTINGS, &dm, 0) == FALSE)
-				pEnumDisplaySettingsEx((char *)dd.DeviceName, ENUM_REGISTRY_SETTINGS, &dm, 0);
-			}
-			else
-			{
-				if (EnumDisplaySettings((char *)dd.DeviceName, ENUM_CURRENT_SETTINGS, &dm) == FALSE)
-				EnumDisplaySettings((char *)dd.DeviceName, ENUM_REGISTRY_SETTINGS, &dm);
-			}
+			if (EnumDisplaySettingsEx((char *)dd.DeviceName, ENUM_CURRENT_SETTINGS, &dm, 0) == FALSE)
+				EnumDisplaySettingsEx((char *)dd.DeviceName, ENUM_REGISTRY_SETTINGS, &dm, 0);
+			
 
 			// get the monitor handle and workspace
 			HMONITOR hm = 0;
@@ -106,7 +97,7 @@ tempdisplayclass::checkmonitors()
 					strcpy(monarray[0].devicename,"All displays");
 					sprintf(monarray[0].buttontext, "%d. %d x %d @ %d,%d - %d-bit ", 0,monarray[0].width, monarray[0].height,monarray[0].offsetx, monarray[0].offsety, monarray[0].depth);
 
-					RECT workrect;
+					RECT workrect = { 0, 0, 0, 0 };
  					SystemParametersInfo(SPI_GETWORKAREA, 0, &workrect, 0);
 
 					/* Update work rectangle to use the virtual screen size */

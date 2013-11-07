@@ -1708,7 +1708,7 @@ void FileTransfer::ListRemoteDrives(HWND hWnd, int nLen)
 void FileTransfer::ListDrives(HWND hWnd)
 {
 //	vnclog.Print(0, _T("ListDrives\n"));
-	TCHAR szDrivesList[256]; // Format when filled : "C:\<NULL>D:\<NULL>....Z:\<NULL><NULL>"
+	TCHAR szDrivesList[256]=""; // Format when filled : "C:\<NULL>D:\<NULL>....Z:\<NULL><NULL>"
 	TCHAR szDrive[4];
 	TCHAR szTheDrive[32];
 	TCHAR szType[32];
@@ -1896,13 +1896,13 @@ void FileTransfer::SetStatus(LPSTR szStatus)
 	_strdate(dbuffer);
 	_strtime(tbuffer);
 	sprintf(szHist, " > %s %s - %s", dbuffer, tbuffer/*ctime(&lTime)*/, szStatus);
-    {
-        COMBOBOXINFO cbi;
-        cbi.cbSize = sizeof cbi;
+	{
+		COMBOBOXINFO cbi;
+		cbi.cbSize = sizeof cbi;
 
-        GetComboBoxInfo(GetDlgItem(hWnd, IDC_HISTORY_CB), &cbi);
-        HDC hdc = GetDC(cbi.hwndList);
-        RECT rc;
+		GetComboBoxInfo(GetDlgItem(hWnd, IDC_HISTORY_CB), &cbi);
+		HDC hdc = GetDC(cbi.hwndList);
+		RECT rc = {0, 0, 0, 0};
         DrawText(hdc, szHist, -1, &rc, DT_CALCRECT|DT_SINGLELINE);
         ReleaseDC(cbi.hwndList, hdc);
         int dx = rc.right - rc.left;
@@ -2029,7 +2029,7 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, int nLen)
     sprintf(displayName, "%s%s", m_szDestFileName, strrchr(szRemoteFileName, '\\') + 1);
 	// Check the free space on local destination drive
 	bool fErr = false;
-	ULARGE_INTEGER lpFreeBytesAvailable;
+	ULARGE_INTEGER lpFreeBytesAvailable = { 0, 0 };
 	ULARGE_INTEGER lpTotalBytes;		
 	ULARGE_INTEGER lpTotalFreeBytes;
 	unsigned long dwFreeKBytes=0;

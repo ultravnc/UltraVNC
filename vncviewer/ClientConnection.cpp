@@ -4411,7 +4411,7 @@ void* ClientConnection::run_undetached(void* arg) {
 	// sf@2002 - Attempt to speed up the thing
 	// omni_thread::set_priority(omni_thread::PRIORITY_LOW);
 
-    rdr::U8 msgType;
+    rdr::U8 msgType=0;
 
 	// sf@2007 - AutoReconnect
 	// Error, value can be set 0 by gui in that case you get a gray screen
@@ -8642,7 +8642,7 @@ ClientConnection:: ConvertPixel_to_bpp_from_32(int xx, int yy,int bytes_per_pixe
 	{
 	case 1:
 		{
-		unsigned char color;
+		unsigned char color=0;
 		if (gs==1) // 8 color
 		{
 			color=((r >> 7)<<2) | ((g>>7) << 1) | (b >> 7);

@@ -344,7 +344,7 @@ void InitIpp();
 #ifdef UNDER_CE
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR szCmdLine, int iCmdShow)
 #else
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow)
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR szCmdLine, int iCmdShow)
 #endif
 {
 #ifdef IPP
@@ -413,16 +413,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
   }
 
   //limit the vnclang.dll searchpath to avoid
-  char szCurrentDir[MAX_PATH];
-  char szCurrentDir_vnclangdll[MAX_PATH];
+  char szCurrentDir[MAX_PATH]="";
+  char szCurrentDir_vnclangdll[MAX_PATH]="";
   if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
 	{
 		char* p = strrchr(szCurrentDir, '\\');
 		*p = '\0';
 	}
-  strcpy (szCurrentDir_vnclangdll,szCurrentDir);
-  strcat (szCurrentDir_vnclangdll,"\\");
-  strcat (szCurrentDir_vnclangdll,"vnclang.dll");
+  strcpy_s (szCurrentDir_vnclangdll,szCurrentDir);
+  strcat_s (szCurrentDir_vnclangdll,"\\");
+  strcat_s (szCurrentDir_vnclangdll,"vnclang.dll");
   m_hInstResDLL = LoadLibrary(szCurrentDir_vnclangdll);
 
   

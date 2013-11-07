@@ -236,9 +236,9 @@ void MRU::Tidy()
 
 	// Then check that all entries in registry have entry in index.
     TCHAR valname[256];
-    DWORD valtype;
-    DWORD valnamelen;
-    DWORD numValues;
+    DWORD valtype=0;
+    DWORD valnamelen=0;
+    DWORD numValues=0;
 
     RegQueryInfoKey ( m_hRegKey,  
         NULL, NULL, 

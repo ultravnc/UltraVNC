@@ -189,7 +189,7 @@ private:
 
 	SOCKET m_sock;
 	//adzm 2010-09
-	char m_QueueBuffer[G_SENDBUFFER];
+	char m_QueueBuffer[G_SENDBUFFER+1];
 	DWORD m_nQueueBufferLength;
 	//adzm 2010-08-01
 	DWORD m_LastSentTick;
