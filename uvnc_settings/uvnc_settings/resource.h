@@ -61,7 +61,6 @@
 #define IDC_TURBOMODE                   1044
 #define IDC_HOOK                        1045
 #define IDC_DRIVER                      1046
-#define IDC_ALPHA                       1047
 #define IDC_REMOVE_Aero                 1048
 #define IDC_REMOVE_WALLPAPER            1049
 #define IDC_CHECKDRIVER                 1050

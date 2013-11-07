@@ -141,39 +141,13 @@ typedef struct _FileToResourceMap {
 } FileMap;
 
 const FileMap filemapping []	={
-	{"/VncViewer.jar", "JavaArchive", IDR_VNCVIEWER_JAR},
-	{"/AuthPanel.class", "JavaClass", IDR_AUTHPANEL_CLASS},
-	{"/ClipboardFrame.class", "JavaClass", IDR_CLIPBOARDFRAME_CLASS},
-	{"/DesCipher.class", "JavaClass", IDR_DESCIPHER_CLASS},
-	{"/OptionsFrame.class", "JavaClass", IDR_OPTIONSFRAME_CLASS},
-	{"/RfbProto.class", "JavaClass", IDR_RFBPROTO_CLASS},
-	{"/VncCanvas.class", "JavaClass", IDR_VNCCANVAS_CLASS},
-	{"/VncViewer.class", "JavaClass", IDR_VNCVIEWER_CLASS},
-	{"/ButtonPanel.class", "JavaClass", IDR_BUTTONPANEL_CLASS},
-	{"/RecordingFrame.class", "JavaClass", IDR_RECFRAME_CLASS},
-	{"/SessionRecorder.class", "JavaClass", IDR_SESSIONREC_CLASS},
-	{"/FTPFrame.class", "JavaClass", IDR_FTPFRAME_CLASS},
-	{"/DH.class", "JavaClass", IDR_DH_CLASS},
-	{"/FTPFRame$StrComp.class", "JavaClass", IDR_FTPFRAMESTRCOMP_CLASS},
+	{"/VncViewer.jar", "JavaArchive", IDR_VNCVIEWER_JAR},	
 	};
 
 const FileMap filemapping2 []	={
-	{"/VncViewer.jar", "JavaArchive", IDR_JAVAARCHIVE1},
-	{"/AuthPanel.class", "JavaClass", IDR_JAVACLASS1},
-	{"/ClipboardFrame.class", "JavaClass", IDR_JAVACLASS3},
-	{"/DesCipher.class", "JavaClass", IDR_JAVACLASS4},
-	{"/OptionsFrame.class", "JavaClass", IDR_JAVACLASS8},
-	{"/RfbProto.class", "JavaClass", IDR_JAVACLASS10},
-	{"/VncCanvas.class", "JavaClass", IDR_JAVACLASS12},
-	{"/VncViewer.class", "JavaClass", IDR_JAVACLASS13},
-	{"/ButtonPanel.class", "JavaClass", IDR_JAVACLASS2},
-	{"/RecordingFrame.class", "JavaClass", IDR_JAVACLASS9},
-	{"/SessionRecorder.class", "JavaClass", IDR_JAVACLASS11},
-	{"/FTPFrame.class", "JavaClass", IDR_JAVACLASS7},
-	{"/DH.class", "JavaClass", IDR_JAVACLASS5},
-	{"/FTPFRame$StrComp.class", "JavaClass", IDR_JAVACLASS6},
+	{"/VncViewer.jar", "JavaArchive", IDR_JAVAARCHIVE1},	
 	};
-const int filemappingsize		= 14;
+const int filemappingsize		= 1;
 
 #ifdef HTTP_SAMEPORT
 // Added for HTTP-via-RFB. Allows us to handle an HTTP transaction

@@ -175,8 +175,6 @@ BEGIN
     CONTROL         "Japanese (v102 keyboard method)",IDC_JAP_INPUTS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,113,128,10
     CONTROL         "Enable Blank Monitor on Viewer Request",IDC_BLANK,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,125,144,10
-    CONTROL         "Use powersaving",IDC_POWER,"Button",BS_AUTORADIOBUTTON,47,135,71,10
-    CONTROL         "Use Alpha Blending",IDC_ALPHA,"Button",BS_AUTORADIOBUTTON,127,135,77,10
     CONTROL         "Disable Only Inputs on Blanking Request",IDC_BLANK2,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,145,145,10
 END
@@ -228,7 +226,6 @@ BEGIN
     CONTROL         "Use system hookdll",IDC_HOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,83,77,10
     CONTROL         "Use mirror driver",IDC_DRIVER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,94,69,10
     PUSHBUTTON      "Check the Mirror Driver",IDC_CHECKDRIVER,110,92,84,14
-    CONTROL         "Capture Alpha-Blending",IDC_ALPHA,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,129,91,10
     CONTROL         "Remove Aero while connected",IDC_REMOVE_Aero,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,140,125,10
     CONTROL         "Remove Wallpaper while connected",IDC_REMOVE_WALLPAPER,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,151,129,10

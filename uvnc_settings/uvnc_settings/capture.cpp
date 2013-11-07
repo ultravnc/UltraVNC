@@ -1,18 +1,5 @@
 #include "stdafx.h"
 #include "resource.h"
-/*IDC_POLL_FULLSCREEN
-IDC_POLL_FOREGROUND
-IDC_POLL_UNDER_CURSOR
-IDC_CONSOLE_ONLY
-IDC_POLL_UNDER_CURSOR
-IDC_ONEVENT_ONLY
-IDC_TURBOMODE
-IDC_HOOK
-IDC_DRIVER
-IDC_ALPHA
-IDC_REMOVE_Aero
-IDC_REMOVE_WALLPAPER
-IDC_CHECKDRIVER*/
 
 extern LONG Primary;
 extern LONG Secondary;
@@ -24,7 +11,6 @@ extern LONG PollConsoleOnly;
 extern LONG PollOnEventOnly;
 extern LONG Driver;
 extern LONG Hook;
-extern LONG CaptureAlphaBlending;
 extern LONG RemoveWallpaper;
 extern LONG RemoveAero;
 bool CheckVideoDriver(bool Box);
@@ -45,7 +31,6 @@ BOOL CALLBACK DlgProcCAP(HWND hwnd, UINT uMsg,
 			SendMessage(GetDlgItem(hwnd, IDC_POLL_FOREGROUND),BM_SETCHECK,PollForeground,0);
 			SendMessage(GetDlgItem(hwnd, IDC_POLL_UNDER_CURSOR),BM_SETCHECK,PollUnderCursor,0);
 			SendMessage(GetDlgItem(hwnd, IDC_CONSOLE_ONLY),BM_SETCHECK,PollConsoleOnly,0);
-			SendMessage(GetDlgItem(hwnd, IDC_ALPHA), BM_SETCHECK,CaptureAlphaBlending, 0);
 			SendMessage(GetDlgItem(hwnd, IDC_REMOVE_WALLPAPER),BM_SETCHECK,RemoveWallpaper,0);
 			SendMessage(GetDlgItem(hwnd, IDC_REMOVE_Aero),BM_SETCHECK,RemoveAero,0);
 			SendMessage(GetDlgItem(hwnd, IDC_ONEVENT_ONLY),BM_SETCHECK,PollOnEventOnly,0);
@@ -75,7 +60,6 @@ BOOL CALLBACK DlgProcCAP(HWND hwnd, UINT uMsg,
 				Primary=SendDlgItemMessage(hwnd, IDC_PRIM, BM_GETCHECK, 0, 0);
 				Secondary=SendDlgItemMessage(hwnd, IDC_SEC, BM_GETCHECK, 0, 0);
 				Hook=SendDlgItemMessage(hwnd, IDC_HOOK, BM_GETCHECK, 0, 0);
-				CaptureAlphaBlending=SendDlgItemMessage(hwnd, IDC_ALPHA, BM_GETCHECK, 0, 0);
 				RemoveWallpaper=SendDlgItemMessage(hwnd, IDC_REMOVE_WALLPAPER, BM_GETCHECK, 0, 0);
 				RemoveAero=SendDlgItemMessage(hwnd, IDC_REMOVE_Aero, BM_GETCHECK, 0, 0);
 			}

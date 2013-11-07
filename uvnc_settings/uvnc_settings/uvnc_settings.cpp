@@ -60,8 +60,6 @@ LONG FTUserImpersonation;
 LONG BlankMonitorEnabled=0;
 LONG BlankInputsOnly=0; //PGM
 LONG DefaultScale=1;
-LONG CaptureAlphaBlending=1;
-LONG BlackAlphaBlending=1;
 LONG FTTimeout = 30;
 
 LONG SocketConnect=0;
@@ -168,8 +166,6 @@ myIniFile_Out.WriteInt("admin", "FTUserImpersonation", FTUserImpersonation);
 myIniFile_Out.WriteInt("admin", "BlankMonitorEnabled", BlankMonitorEnabled);
 myIniFile_Out.WriteInt("admin", "BlankInputsOnly", BlankInputsOnly); //PGM
 myIniFile_Out.WriteInt("admin", "DefaultScale", DefaultScale);
-myIniFile_Out.WriteInt("admin", "CaptureAlphaBlending", CaptureAlphaBlending);
-myIniFile_Out.WriteInt("admin", "BlackAlphaBlending", BlackAlphaBlending);
 myIniFile_Out.WriteInt("admin", "SocketConnect", SocketConnect);
 myIniFile_Out.WriteInt("admin", "HTTPConnect", HTTPConnect);
 myIniFile_Out.WriteInt("admin", "XDMCPConnect", XDMCPConnect);
@@ -240,8 +236,6 @@ myIniFile_Out.WriteInt("admin", "FTUserImpersonation", FTUserImpersonation);
 myIniFile_Out.WriteInt("admin", "BlankMonitorEnabled", BlankMonitorEnabled);
 myIniFile_Out.WriteInt("admin", "BlankInputsOnly", BlankInputsOnly); //PGM
 myIniFile_Out.WriteInt("admin", "DefaultScale", DefaultScale);
-myIniFile_Out.WriteInt("admin", "CaptureAlphaBlending", CaptureAlphaBlending);
-myIniFile_Out.WriteInt("admin", "BlackAlphaBlending", BlackAlphaBlending);
 myIniFile_Out.WriteInt("admin", "SocketConnect", SocketConnect);
 myIniFile_Out.WriteInt("admin", "HTTPConnect", HTTPConnect);
 myIniFile_Out.WriteInt("admin", "XDMCPConnect", XDMCPConnect);
@@ -318,8 +312,6 @@ FTUserImpersonation=myIniFile_In.ReadInt("admin", "FTUserImpersonation", true);
 BlankMonitorEnabled = myIniFile_In.ReadInt("admin", "BlankMonitorEnabled", true);
 BlankInputsOnly = myIniFile_In.ReadInt("admin", "BlankInputsOnly", false); //PGM
 DefaultScale = myIniFile_In.ReadInt("admin", "DefaultScale", 1);
-CaptureAlphaBlending = myIniFile_In.ReadInt("admin", "CaptureAlphaBlending", false); // sf@2005
-BlackAlphaBlending = myIniFile_In.ReadInt("admin", "BlackAlphaBlending", false); // sf@2005
 FTTimeout = myIniFile_In.ReadInt("admin", "FileTransferTimeout", 30);
 SocketConnect=myIniFile_In.ReadInt("admin", "SocketConnect", true);
 HTTPConnect=myIniFile_In.ReadInt("admin", "HTTPConnect", true);

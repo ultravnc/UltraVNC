@@ -1124,7 +1124,11 @@ vncProperties::DialogProc(HWND hwnd,
 					display = 0;
 				SetDlgItemInt(hwnd, IDC_DISPLAYNO, display, FALSE);
 				SetDlgItemInt(hwnd, IDC_PORTRFB, _this->m_server->GetPort(), FALSE);
+#ifdef HTTP_SAMEPORT
+				SetDlgItemInt(hwnd, IDC_PORTHTTP,  _this->m_server->GetPort(), FALSE);
+#else
 				SetDlgItemInt(hwnd, IDC_PORTHTTP, _this->m_server->GetHttpPort(), FALSE);
+#endif
 
 				SetFocus(GetDlgItem(hwnd, IDC_DISPLAYNO));
 				SendDlgItemMessage(hwnd, IDC_DISPLAYNO, EM_SETSEL, 0, (LPARAM)-1);
@@ -1145,7 +1149,11 @@ vncProperties::DialogProc(HWND hwnd,
 					SetDlgItemText(hwnd, IDC_DISPLAYNO, "");
 				}
 				SetDlgItemInt(hwnd, IDC_PORTRFB, _this->m_server->GetPort(), FALSE);
+#ifdef HTTP_SAMEPORT
+				SetDlgItemInt(hwnd, IDC_PORTHTTP, _this->m_server->GetPort(), FALSE);
+#else
 				SetDlgItemInt(hwnd, IDC_PORTHTTP, _this->m_server->GetHttpPort(), FALSE);
+#endif
 
 				SetFocus(GetDlgItem(hwnd, IDC_PORTRFB));
 				SendDlgItemMessage(hwnd, IDC_PORTRFB, EM_SETSEL, 0, (LPARAM)-1);
@@ -1368,7 +1376,11 @@ vncProperties::InitPortSettings(HWND hwnd)
 		SetDlgItemText(hwnd, IDC_DISPLAYNO, "");
 	}
 	SetDlgItemInt(hwnd, IDC_PORTRFB, port_rfb, FALSE);
+#ifdef HTTP_SAMEPORT
+	SetDlgItemInt(hwnd, IDC_PORTHTTP, port_rfb, FALSE);
+#else
 	SetDlgItemInt(hwnd, IDC_PORTHTTP, port_http, FALSE);
+#endif
 
 	EnableWindow(GetDlgItem(hwnd, IDC_DISPLAYNO),
 		bConnectSock && !bAutoPort && bValidDisplay);

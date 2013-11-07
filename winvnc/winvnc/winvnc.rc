@@ -28,25 +28,6 @@ IDC_FINGER              CURSOR                  "res\\Finger.cur"
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// JAVACLASS
-//
-
-IDR_FTPFRAME_CLASS      JAVACLASS               "res\\FTPFrame.class"
-IDR_AUTHPANEL_CLASS     JAVACLASS               "res\\AuthPanel.class"
-IDR_CLIPBOARDFRAME_CLASS JAVACLASS               "res\\clipboardFrame.class"
-IDR_OPTIONSFRAME_CLASS  JAVACLASS               "res\\optionsFrame.class"
-IDR_RFBPROTO_CLASS      JAVACLASS               "res\\rfbProto.class"
-IDR_VNCCANVAS_CLASS     JAVACLASS               "res\\vncCanvas.class"
-IDR_VNCVIEWER_CLASS     JAVACLASS               "res\\vncviewer.class"
-IDR_BUTTONPANEL_CLASS   JAVACLASS               "res\\ButtonPanel.class"
-IDR_DESCIPHER_CLASS     JAVACLASS               "res\\DesCipher.class"
-IDR_RECFRAME_CLASS      JAVACLASS               "res\\RecordingFrame.class"
-IDR_SESSIONREC_CLASS    JAVACLASS               "res\\SessionRecorder.class"
-IDR_DH_CLASS            JAVACLASS               "res\\dh.class"
-IDR_FTPFRAMESTRCOMP_CLASS JAVACLASS               "res\\ftpframe$strcomp.class"
-
-/////////////////////////////////////////////////////////////////////////////
-//
 // Dialog
 //
 
@@ -585,25 +566,6 @@ END
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NLB)
 LANGUAGE LANG_DUTCH, SUBLANG_DUTCH_BELGIAN
 #pragma code_page(1252)
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// JAVACLASS
-//
-
-IDR_JAVACLASS1          JAVACLASS               "res\\mslogon\\AuthPanel.class"
-IDR_JAVACLASS2          JAVACLASS               "res\\mslogon\\ButtonPanel.class"
-IDR_JAVACLASS3          JAVACLASS               "res\\mslogon\\ClipboardFrame.class"
-IDR_JAVACLASS4          JAVACLASS               "res\\mslogon\\DesCipher.class"
-IDR_JAVACLASS5          JAVACLASS               "res\\mslogon\\DH.class"
-IDR_JAVACLASS6          JAVACLASS               "res\\mslogon\\FTPFrame$StrComp.class"
-IDR_JAVACLASS7          JAVACLASS               "res\\mslogon\\FTPFrame.class"
-IDR_JAVACLASS8          JAVACLASS               "res\\mslogon\\OptionsFrame.class"
-IDR_JAVACLASS9          JAVACLASS               "res\\mslogon\\RecordingFrame.class"
-IDR_JAVACLASS10         JAVACLASS               "res\\mslogon\\RfbProto.class"
-IDR_JAVACLASS11         JAVACLASS               "res\\mslogon\\SessionRecorder.class"
-IDR_JAVACLASS12         JAVACLASS               "res\\mslogon\\VncCanvas.class"
-IDR_JAVACLASS13         JAVACLASS               "res\\mslogon\\VncViewer.class"
 
 /////////////////////////////////////////////////////////////////////////////
 //
