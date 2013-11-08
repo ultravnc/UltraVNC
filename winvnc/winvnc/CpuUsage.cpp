@@ -122,7 +122,7 @@ short CProcessorUsage::GetUsage()
 
     if(((::GetTickCount() - s_TickMark) & 0x7FFFFFFF) <= 200)
 	{
-	  ::LeaveCriticalSection( &m_cs );
+	  if (m_bLocked) ::LeaveCriticalSection( &m_cs );
 	  m_bLocked = false;
       return sLastCpu;
 	}
@@ -151,7 +151,7 @@ short CProcessorUsage::GetUsage()
       s_userTimeProcess = userTimeProcess;
       s_lastCpu = 0;
       s_TickMark = ::GetTickCount();
-	  ::LeaveCriticalSection( &m_cs );
+	  if (m_bLocked) ::LeaveCriticalSection( &m_cs );
 	  m_bLocked = false;
       return 0;
    }
@@ -159,7 +159,7 @@ short CProcessorUsage::GetUsage()
     __int64 div = (time - sTime);
 	if (div==0)
 		{
-			::LeaveCriticalSection( &m_cs );
+			if (m_bLocked) ::LeaveCriticalSection( &m_cs );
 			m_bLocked = false;
 			return sLastCpu;
 		}
@@ -215,7 +215,7 @@ short CProcessorUsage::GetUsage()
    s_lastCpu = cpuProcess;
    sLastCpu = s_lastCpu;
    s_TickMark = ::GetTickCount();
-   ::LeaveCriticalSection( &m_cs );
+   if (m_bLocked) ::LeaveCriticalSection( &m_cs );
    m_bLocked = false;
    return sLastCpu;
 }
