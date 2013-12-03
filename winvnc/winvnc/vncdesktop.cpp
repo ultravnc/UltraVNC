@@ -281,7 +281,7 @@ bool vncDesktop::FastDetectChanges(rfb::Region2D &rgn, rfb::Rect &rect, int nZon
 	// Try to detect if screen is almost idle
 	// no need to poll static screens very fast, it only use cpu
 	change_found=0;
-	//Detect text faster
+	/*//Detect text faster
 	//If the caret change use a 64x64 for his last position
 	static	DWORD	dwCurrentThreadId = GetCurrentThreadId();
  	static	HWND	hWindow = GetForegroundWindow();
@@ -318,7 +318,7 @@ bool vncDesktop::FastDetectChanges(rfb::Region2D &rgn, rfb::Rect &rect, int nZon
 
 		old_caret_pt.x=pt.x;
 		old_caret_pt.y=pt.y;
-	}
+	}*/
 
 
 	// We walk our way through the Grids
@@ -555,8 +555,8 @@ vncDesktop::vncDesktop()
 	m_old_monitor = MULTI_MON_PRIMARY;
 	m_ScreenWidth = 0;
 	m_ScreenHeight = 0;
-	old_caret_pt.x=0;
-	old_caret_pt.y=0;
+	//old_caret_pt.x=0;
+	//old_caret_pt.y=0;
 //
 }
 

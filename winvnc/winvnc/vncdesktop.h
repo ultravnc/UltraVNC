@@ -562,7 +562,7 @@ private:
 	PixelCaptureEngine PixelEngine;
 	int idle_counter;
 	bool change_found;
-	POINT	old_caret_pt;
+	//POINT	old_caret_pt;
 };
 
 #endif // _WINVNC_VNCDESKTOP
