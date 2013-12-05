@@ -312,8 +312,8 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="signtool.exe sign /f c:\uvnccert.pfx /p changeme /v /t http://timestamp.globalsign.com/scripts/timstamp.dll $(OutDir)\$(TargetName)$(TargetExt)"
-				ExcludedFromBuild="true"
+				CommandLine="signtool.exe sign /a  /n &quot;uvnc bvba&quot; /v /t http://timestamp.verisign.com/scripts/timstamp.dll &quot;$(TargetPath)&quot;&#x0D;&#x0A;copy &quot;$(TargetPath)&quot; ..\..\..\..\installer"
+				ExcludedFromBuild="false"
 			/>
 		</Configuration>
 		<Configuration
