@@ -799,7 +799,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:UltraVnc"
         "ProductCode" = "8:{98FE7A01-F441-46A6-BCDF-097FC2DCDB98}"
-        "PackageCode" = "8:{97AA6584-EFE6-46F0-BE95-FD13CA56D6FF}"
+        "PackageCode" = "8:{5683C381-B17D-4F27-A79A-8060C3B76738}"
         "UpgradeCode" = "8:{25A3A242-EEA3-4731-A2D0-E990D2EA5A23}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -1435,7 +1435,7 @@
                             "ContextData" = "8:"
                             "Attributes" = "3:0"
                             "Setting" = "3:2"
-                            "Value" = "8:UltraVnc 1.1.9.4 X86"
+                            "Value" = "8:UltraVnc 1.1.9.6 X86"
                             "DefaultValue" = "8:#1215"
                             "UsePlugInResources" = "11:TRUE"
                             }
