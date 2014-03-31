@@ -2109,7 +2109,7 @@ vncServer::AddAuthHostsBlacklist(const char *machine) {
 				return;
 
 			// Set the RefTime & failureCount
-			current->_lastRefTime.QuadPart = now.QuadPart + 10;
+			current->_lastRefTime.QuadPart = now.QuadPart + 10*current->_failureCount;
 			current->_failureCount++;
 
 			if (current->_failureCount > 5)
