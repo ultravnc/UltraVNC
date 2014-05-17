@@ -1154,14 +1154,19 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			break;
 		case ID_SOFTWARECAD:
 			{
-			HANDLE hProcess,hPToken;
+			HANDLE hProcess=NULL,hPToken=NULL;
 			DWORD id=GetExplorerLogonPid();
 				if (id!=0) 
 				{
 					hProcess = OpenProcess(MAXIMUM_ALLOWED,FALSE,id);
+					if (!hProcess) goto error;
 					if(!OpenProcessToken(hProcess,TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY
 											|TOKEN_DUPLICATE|TOKEN_ASSIGN_PRIMARY|TOKEN_ADJUST_SESSIONID
-											|TOKEN_READ|TOKEN_WRITE,&hPToken)) break;
+											| TOKEN_READ | TOKEN_WRITE, &hPToken))
+					{
+						CloseHandle(hProcess);
+						goto error;
+					}
 
 					char dir[MAX_PATH];
 					char exe_file_name[MAX_PATH];
@@ -1186,26 +1191,30 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 					if (Token) CloseHandle(Token);
 					if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
 					if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
-					if (errorcode==1314)
-					{
-						Enable_softwareCAD_elevated();
+					if (errorcode == 1314) goto error;	
+					break;
 					}
-
-					}
+				error:
+					Enable_softwareCAD_elevated();
 				}
 			}
 			break;
 
 		case ID_DELSOFTWARECAD:
 			{
-			HANDLE hProcess,hPToken;
+			HANDLE hProcess=NULL,hPToken=NULL;
 			DWORD id=GetExplorerLogonPid();
 				if (id!=0) 
 				{
 					hProcess = OpenProcess(MAXIMUM_ALLOWED,FALSE,id);
+					if (!hProcess) goto error2;
 					if(!OpenProcessToken(hProcess,TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY
 											|TOKEN_DUPLICATE|TOKEN_ASSIGN_PRIMARY|TOKEN_ADJUST_SESSIONID
-											|TOKEN_READ|TOKEN_WRITE,&hPToken)) break;
+											| TOKEN_READ | TOKEN_WRITE, &hPToken))
+					{
+						CloseHandle(hProcess);
+						goto error2;
+					}
 
 					char dir[MAX_PATH];
 					char exe_file_name[MAX_PATH];
@@ -1230,10 +1239,10 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 					if (Token) CloseHandle(Token);
 					if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
 					if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
-					if (errorcode==1314)
-					{
+					if (errorcode == 1314) goto error2;
+					break;
+					error2:
 						delete_softwareCAD_elevated();
-					}
 
 					}
 				}
@@ -1242,14 +1251,19 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
 		case ID_REBOOTSAFEMODE:
 			{
-			HANDLE hProcess,hPToken;
+			HANDLE hProcess = NULL, hPToken = NULL;
 			DWORD id=GetExplorerLogonPid();
 				if (id!=0) 
 				{
 					hProcess = OpenProcess(MAXIMUM_ALLOWED,FALSE,id);
+					if (!hProcess) goto error3;
 					if(!OpenProcessToken(hProcess,TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY
 											|TOKEN_DUPLICATE|TOKEN_ASSIGN_PRIMARY|TOKEN_ADJUST_SESSIONID
-											|TOKEN_READ|TOKEN_WRITE,&hPToken)) break;
+											| TOKEN_READ | TOKEN_WRITE, &hPToken))
+					{
+						CloseHandle(hProcess);
+						goto error3;
+					}
 
 					char dir[MAX_PATH];
 					char exe_file_name[MAX_PATH];
@@ -1274,11 +1288,10 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 					if (Token) CloseHandle(Token);
 					if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
 					if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
-					if (errorcode==1314)
-					{
+					if (errorcode == 1314) goto error3;
+					break;
+					error3:
 						Reboot_in_safemode_elevated();
-					}
-
 					}
 				}
 			}
@@ -1291,9 +1304,14 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				if (id!=0) 
 				{
 					hProcess = OpenProcess(MAXIMUM_ALLOWED,FALSE,id);
+					if (!hProcess) goto error4;
 					if(!OpenProcessToken(hProcess,TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY
 											|TOKEN_DUPLICATE|TOKEN_ASSIGN_PRIMARY|TOKEN_ADJUST_SESSIONID
-											|TOKEN_READ|TOKEN_WRITE,&hPToken)) break;
+											| TOKEN_READ | TOKEN_WRITE, &hPToken))
+					{
+						CloseHandle(hProcess);
+						goto error4;
+					}
 
 					char dir[MAX_PATH];
 					char exe_file_name[MAX_PATH];
@@ -1318,11 +1336,10 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 					if (Token) CloseHandle(Token);
 					if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
 					if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
-					if (errorcode==1314)
-					{
+					if (errorcode == 1314) goto error4;
+					break;
+					error4:
 						 Reboot_with_force_reboot_elevated();
-					}
-
 					}
 				}
 			}
@@ -1335,10 +1352,14 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				if (id!=0) 
 				{
 					hProcess = OpenProcess(MAXIMUM_ALLOWED,FALSE,id);
+					if (!hProcess) goto error5;
 					if(!OpenProcessToken(hProcess,TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY
 											|TOKEN_DUPLICATE|TOKEN_ASSIGN_PRIMARY|TOKEN_ADJUST_SESSIONID
-											|TOKEN_READ|TOKEN_WRITE,&hPToken)) break;
-
+											| TOKEN_READ | TOKEN_WRITE, &hPToken))
+					{
+						CloseHandle(hProcess);
+						goto error5;
+					}
 					char dir[MAX_PATH];
 					char exe_file_name[MAX_PATH];
 					GetModuleFileName(0, exe_file_name, MAX_PATH);
@@ -1362,16 +1383,11 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 					if (Token) CloseHandle(Token);
 					if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
 					if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
-					if (errorcode==1314)
-					{
+					if (errorcode == 1314) goto error5;
+					break;
+					error5:
 						Set_uninstall_service_as_admin();
 					}
-
-					}
-					/*fShutdownOrdered=TRUE;
-					vnclog.Print(LL_INTINFO, VNCLOG("KillAuthClients() ID_CLOSE \n"));
-					_this->m_server->KillAuthClients();					
-					PostMessage(hwnd, WM_CLOSE, 0, 0);*/
 				}
 			}
 			break;
@@ -1382,9 +1398,14 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				if (id!=0) 
 				{
 					hProcess = OpenProcess(MAXIMUM_ALLOWED,FALSE,id);
+					if (!hProcess) goto error6;
 					if(!OpenProcessToken(hProcess,TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY
 											|TOKEN_DUPLICATE|TOKEN_ASSIGN_PRIMARY|TOKEN_ADJUST_SESSIONID
-											|TOKEN_READ|TOKEN_WRITE,&hPToken)) break;
+											| TOKEN_READ | TOKEN_WRITE, &hPToken))
+					{
+						CloseHandle(hProcess);
+						goto error6;
+					}
 
 					char dir[MAX_PATH];
 					char exe_file_name[MAX_PATH];
@@ -1404,15 +1425,15 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 					StartUPInfo.cb = sizeof(STARTUPINFO);
 			
 					CreateProcessAsUser(hPToken,NULL,dir,NULL,NULL,FALSE,DETACHED_PROCESS,NULL,NULL,&StartUPInfo,&ProcessInfo);
-					DWORD error=GetLastError();
+					DWORD errorcode=GetLastError();
 					if (process) CloseHandle(process);
 					if (Token) CloseHandle(Token);
 					if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
 					if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
-					if (error==1314)
-					{
+					if (errorcode == 1314) goto error6;
+					break;
+					error6:
 						Set_install_service_as_admin();
-					}
 				}
 			fShutdownOrdered=TRUE;
 			Sleep(1000);
@@ -1428,12 +1449,13 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				if (id!=0) 
 				{
 					hProcess = OpenProcess(MAXIMUM_ALLOWED,FALSE,id);
+					if (!hProcess) goto error7;
 					if(!OpenProcessToken(hProcess,TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY
 											|TOKEN_DUPLICATE|TOKEN_ASSIGN_PRIMARY|TOKEN_ADJUST_SESSIONID
 											|TOKEN_READ|TOKEN_WRITE,&hPToken))
 					{
 						CloseHandle(hProcess);
-						break;
+						goto error7;
 					}
 
 					char dir[MAX_PATH];
@@ -1454,16 +1476,16 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 					StartUPInfo.cb = sizeof(STARTUPINFO);
 			
 					CreateProcessAsUser(hPToken,NULL,dir,NULL,NULL,FALSE,DETACHED_PROCESS,NULL,NULL,&StartUPInfo,&ProcessInfo);
-					DWORD error=GetLastError();
+					DWORD errorcode=GetLastError();
 					if (process) CloseHandle(process);
 					if (Token) CloseHandle(Token);
 					if (hProcess) CloseHandle(hProcess);
 					if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
 					if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
-					if (error==1314)
-					{
+					if (errorcode == 1314) goto error7;
+					break;
+					error7:
 						Set_stop_service_as_admin();
-					}
 				}
 			}
 			break;
@@ -1474,12 +1496,13 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				if (id!=0) 
 				{
 					hProcess = OpenProcess(MAXIMUM_ALLOWED,FALSE,id);
+					if (!hProcess) goto error8;
 					if(!OpenProcessToken(hProcess,TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY
 											|TOKEN_DUPLICATE|TOKEN_ASSIGN_PRIMARY|TOKEN_ADJUST_SESSIONID
 											|TOKEN_READ|TOKEN_WRITE,&hPToken))
 					{
 						CloseHandle(hProcess);
-						break;
+						goto error8;
 					}
 
 					char dir[MAX_PATH];
@@ -1500,17 +1523,17 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 					StartUPInfo.cb = sizeof(STARTUPINFO);
 			
 					CreateProcessAsUser(hPToken,NULL,dir,NULL,NULL,FALSE,DETACHED_PROCESS,NULL,NULL,&StartUPInfo,&ProcessInfo);
-					DWORD error=GetLastError();
+					DWORD errorcode=GetLastError();
 					if (hPToken) CloseHandle(hPToken);
 					if (process) CloseHandle(process);
 					if (Token) CloseHandle(Token);
 					if (hProcess) CloseHandle(hProcess);
 					if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
 					if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
-					if (error==1314)
-					{
+					if (errorcode == 1314) goto error8;
+					break;
+					error8:
 						Set_start_service_as_admin();
-					}
 					fShutdownOrdered=TRUE;
 					Sleep(1000);
 					vnclog.Print(LL_INTINFO, VNCLOG("KillAuthClients() ID_CLOSE \n"));

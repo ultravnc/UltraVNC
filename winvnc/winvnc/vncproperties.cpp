@@ -1228,6 +1228,7 @@ vncProperties::DialogProc(HWND hwnd,
 						if (id!=0) 
 						{
 							hProcess = OpenProcess(MAXIMUM_ALLOWED,FALSE,id);
+							if (!hProcess) goto error;
 							if(!OpenProcessToken(hProcess,TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY
 													|TOKEN_DUPLICATE|TOKEN_ASSIGN_PRIMARY|TOKEN_ADJUST_SESSIONID
 													|TOKEN_READ|TOKEN_WRITE,&hPToken)) break;
@@ -1248,32 +1249,16 @@ vncProperties::DialogProc(HWND hwnd,
 								StartUPInfo.cb = sizeof(STARTUPINFO);
 						
 								CreateProcessAsUser(hPToken,NULL,dir,NULL,NULL,FALSE,DETACHED_PROCESS,NULL,NULL,&StartUPInfo,&ProcessInfo);
-								DWORD error=GetLastError();
+								DWORD errorcode=GetLastError();
                                 if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
                                 if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
-								if (error==1314)
-									{
+								if (errorcode == 1314) goto error;
+								break;
+								error:
 										winvncSecurityEditorHelper_as_admin();
-									}
 
 							}
 						}
-
-/*
-					char szCurrentDir[MAX_PATH];
-					if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH)) {
-						char* p = strrchr(szCurrentDir, '\\');
-						*p = '\0';
-						strcat (szCurrentDir,"\\authSSP.dll");
-					}
-					HMODULE hModule = LoadLibrary(szCurrentDir);
-					if (hModule) {
-						vncEditSecurity = (vncEditSecurityFn) GetProcAddress(hModule, "vncEditSecurity");
-						HRESULT hr = CoInitialize(NULL);
-						vncEditSecurity(hwnd, hAppInstance);
-						CoUninitialize();
-						FreeLibrary(hModule);
-					}*/
 				} else { 
 					// Marscha@2004 - authSSP: end of change
 					_this->m_vncauth.Init(_this->m_server);

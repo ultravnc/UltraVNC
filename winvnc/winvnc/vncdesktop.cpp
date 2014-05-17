@@ -1284,7 +1284,9 @@ vncDesktop::SetPixShifts()
 				blueMask =  *(DWORD *) &m_bminfo.bmi.bmiColors[2];
 			}
 		}
+		if (m_videodriver) redMask = 0x7c00; greenMask = 0x03e0; blueMask = 0x001f;
 		break;
+		
 
 	case 32:
 		// Standard 24/32 bit displays

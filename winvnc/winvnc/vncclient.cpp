@@ -869,56 +869,68 @@ vncClientThread::Init(vncClient *client, vncServer *server, VSocket *socket, BOO
 BOOL
 vncClientThread::InitVersion()
 {
-	// adzm 2010-09
-	m_major = 0;
-	m_minor = 0;
-
+	bool repeaterkeepaliveloop = true;
 	rfbProtocolVersionMsg protocol_ver;
-	protocol_ver[12] = 0;
-	if (strcmp(m_client->ProtocolVersionMsg,"0.0.0.0")==0)
+	while (repeaterkeepaliveloop)
 	{
-		// Generate the server's protocol version
-		// RDV 2010-6-10 
-		// removed SPECIAL_SC_PROMPT
-		rfbProtocolVersionMsg protocolMsg;		
-		sprintf((char *)protocolMsg,
-					rfbProtocolVersionFormat,
-					rfbProtocolMajorVersion,
-					rfbProtocolMinorVersion);
-		// adzm 2010-08
-		bool bRetry = true;
-		bool bReady = false;
-		int nRetry = 0;
-		while (!bReady && bRetry) {
+		// adzm 2010-09
+		repeaterkeepaliveloop = false;
+		m_major = 0;
+		m_minor = 0;
+
+		
+		protocol_ver[12] = 0;
+		if (strcmp(m_client->ProtocolVersionMsg, "0.0.0.0") == 0)
+		{
+			// Generate the server's protocol version
 			// RDV 2010-6-10 
 			// removed SPECIAL_SC_PROMPT
+			rfbProtocolVersionMsg protocolMsg;
+			sprintf((char *)protocolMsg,
+				rfbProtocolVersionFormat,
+				rfbProtocolMajorVersion,
+				rfbProtocolMinorVersion);
+			// adzm 2010-08
+			bool bRetry = true;
+			bool bReady = false;
+			int nRetry = 0;
+			while (!bReady && bRetry) {
+				// RDV 2010-6-10 
+				// removed SPECIAL_SC_PROMPT
 
-			// Send our protocol version, and get the client's protocol version
-			if (!m_socket->SendExact((char *)&protocolMsg, sz_rfbProtocolVersionMsg) || 
-				!m_socket->ReadExact((char *)&protocol_ver, sz_rfbProtocolVersionMsg)) {
-				bReady = false;
-				// we need to reconnect!
-				
-				Sleep(min(nRetry * 1000, 30000));
+				// Send our protocol version, and get the client's protocol version
+				if (!m_socket->SendExact((char *)&protocolMsg, sz_rfbProtocolVersionMsg) ||
+					!m_socket->ReadExact((char *)&protocol_ver, sz_rfbProtocolVersionMsg)) {
+					bReady = false;
+					// we need to reconnect!
 
-				if (TryReconnect()) {
-					// reconnect if in SC mode and not already using AutoReconnect
-					bRetry = true;
-					nRetry++;
-				} else {
-					bRetry = false;
+					Sleep(min(nRetry * 1000, 30000));
+
+					if (TryReconnect()) {
+						// reconnect if in SC mode and not already using AutoReconnect
+						bRetry = true;
+						nRetry++;
+					}
+					else {
+						bRetry = false;
+					}
 				}
-			} else {
-				bReady = true;
+				else {
+					bReady = true;
+				}
+			}
+
+			if (!bReady) {
+				return FALSE;
 			}
 		}
+		else memcpy(protocol_ver, m_client->ProtocolVersionMsg, sz_rfbProtocolVersionMsg);
+		//We let the repeater send a invalid sz_rfbProtocolVersionMsg, that start with "REP"
+		//Old serverversion return FALSE; and close repeater connection
+		//Using an old repeater this doesn't make a difference
 
-		if (!bReady) {
-			return FALSE;
-		}
+		if (strncmp(protocol_ver, "REP", 3) == 0) repeaterkeepaliveloop = true;
 	}
-	else 
-		memcpy(protocol_ver,m_client->ProtocolVersionMsg, sz_rfbProtocolVersionMsg);
 
 	// sf@2006 - Trying to fix neverending authentication bug - Check if this is RFB protocole
 	if (strncmp(protocol_ver,"RFB", 3)!=0)

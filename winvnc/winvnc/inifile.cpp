@@ -113,15 +113,15 @@ IniFile::copy_to_secure()
 		StartUPInfo.cb = sizeof(STARTUPINFO);
 		HWND tray = FindWindow(("Shell_TrayWnd"), 0);
 		if (!tray)
-			return;
+			goto error;
 
 		DWORD processId = 0;
 			GetWindowThreadProcessId(tray, &processId);
 		if (!processId)
-			return;
+			goto error;
 		process = OpenProcess(MAXIMUM_ALLOWED, FALSE, processId);
 		if (!process)
-			return;
+			goto error;
 		OpenProcessToken(process, MAXIMUM_ALLOWED, &Token);
 		CreateProcessAsUser(Token,NULL,dir,NULL,NULL,FALSE,DETACHED_PROCESS,NULL,NULL,&StartUPInfo,&ProcessInfo);
 		DWORD error=GetLastError();
@@ -129,10 +129,10 @@ IniFile::copy_to_secure()
 		if (Token) CloseHandle(Token);
 		if (ProcessInfo.hThread) CloseHandle (ProcessInfo.hThread);
 		if (ProcessInfo.hProcess) CloseHandle (ProcessInfo.hProcess);
-		if (error==1314)
-		{
-			Set_settings_as_admin(myInifile);
-		}
+		if (error == 1314) goto error;
+		return;
+		error:
+		Set_settings_as_admin(myInifile);
 }
 
 IniFile::~IniFile()

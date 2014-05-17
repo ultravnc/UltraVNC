@@ -264,122 +264,25 @@ DWORD WINAPI Cadthread(LPVOID lpParam)
 
 	//////
 	if(OSversion.dwMajorVersion>=6 && vncService::RunningAsService())
-			{
-				/*if (OSversion.dwMinorVersion==0) //Vista
-				{
-					if (ISUACENabled() && !IsSoftwareCadEnabled())//ok
-					{
-						
-					}
-					if (!ISUACENabled() && IsSoftwareCadEnabled())
-					{
-						
-					}
-					if (!ISUACENabled() && !IsSoftwareCadEnabled())
-					{
-						DWORD result=MessageBoxSecure(NULL,"UAC is Disable, make registry changes to allow cad","Warning",MB_YESNO);
-						if (result==IDYES)
-						{
-							HANDLE hProcess,hPToken;
-							DWORD id=GetExplorerLogonPid();
-							if (id!=0) 
-								{
-									hProcess = OpenProcess(MAXIMUM_ALLOWED,FALSE,id);
-									if(!OpenProcessToken(hProcess,TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY
-													|TOKEN_DUPLICATE|TOKEN_ASSIGN_PRIMARY|TOKEN_ADJUST_SESSIONID
-													|TOKEN_READ|TOKEN_WRITE,&hPToken)) return 0;
-
-									char dir[MAX_PATH];
-									char exe_file_name[MAX_PATH];
-									GetModuleFileName(0, exe_file_name, MAX_PATH);
-									strcpy(dir, exe_file_name);
-									strcat(dir, " -softwarecadhelper");
-		
-							
-									STARTUPINFO          StartUPInfo;
-									PROCESS_INFORMATION  ProcessInfo;
-									HANDLE Token=NULL;
-									HANDLE process=NULL;
-									ZeroMemory(&StartUPInfo,sizeof(STARTUPINFO));
-									ZeroMemory(&ProcessInfo,sizeof(PROCESS_INFORMATION));
-									StartUPInfo.wShowWindow = SW_SHOW;
-									StartUPInfo.lpDesktop = "Winsta0\\Default";
-									StartUPInfo.cb = sizeof(STARTUPINFO);
-				
-									CreateProcessAsUser(hPToken,NULL,dir,NULL,NULL,FALSE,DETACHED_PROCESS,NULL,NULL,&StartUPInfo,&ProcessInfo);
-									DWORD errorcode=GetLastError();
-									if (process) CloseHandle(process);
-									if (Token) CloseHandle(Token);
-									if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
-									if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
-									if (errorcode==1314)
-									{
-										Enable_softwareCAD_elevated();
-									}
-								}
-						}
-					}
-					if (ISUACENabled() && IsSoftwareCadEnabled())
-					{
-						DWORD result=MessageBoxSecure(NULL,"UAC is Enablde, make registry changes to allow cad","Warning",MB_YESNO);
-						if (result==IDYES)
-						{
-							HANDLE hProcess,hPToken;
-							DWORD id=GetExplorerLogonPid();
-							if (id!=0) 
-								{
-									hProcess = OpenProcess(MAXIMUM_ALLOWED,FALSE,id);
-									if(!OpenProcessToken(hProcess,TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY
-													|TOKEN_DUPLICATE|TOKEN_ASSIGN_PRIMARY|TOKEN_ADJUST_SESSIONID
-													|TOKEN_READ|TOKEN_WRITE,&hPToken)) return 0;
-
-									char dir[MAX_PATH];
-									char exe_file_name[MAX_PATH];
-									GetModuleFileName(0, exe_file_name, MAX_PATH);
-									strcpy(dir, exe_file_name);
-									strcat(dir, " -delsoftwarecadhelper");
-			
-							
-									STARTUPINFO          StartUPInfo;
-									PROCESS_INFORMATION  ProcessInfo;
-									HANDLE Token=NULL;
-									HANDLE process=NULL;
-									ZeroMemory(&StartUPInfo,sizeof(STARTUPINFO));
-									ZeroMemory(&ProcessInfo,sizeof(PROCESS_INFORMATION));
-									StartUPInfo.wShowWindow = SW_SHOW;
-									StartUPInfo.lpDesktop = "Winsta0\\Default";
-									StartUPInfo.cb = sizeof(STARTUPINFO);
-			
-									CreateProcessAsUser(hPToken,NULL,dir,NULL,NULL,FALSE,DETACHED_PROCESS,NULL,NULL,&StartUPInfo,&ProcessInfo);
-									DWORD errorcode=GetLastError();
-									if (process) CloseHandle(process);
-									if (Token) CloseHandle(Token);
-									if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
-									if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
-									if (errorcode==1314)
-										{
-											delete_softwareCAD_elevated();
-										}							
-								}
-						}
-					}
-
-				}
-				else*/
+			{				
 					if( vncService::RunningAsService() &&!IsSoftwareCadEnabled())
 					{
 						DWORD result=MessageBoxSecure(NULL,"UAC is Disable, make registry changes to allow cad","Warning",MB_YESNO);
 						if (result==IDYES)
 							{
-								HANDLE hProcess,hPToken;
+								HANDLE hProcess=NULL,hPToken=NULL;
 								DWORD id=GetExplorerLogonPid();
 								if (id!=0) 
 									{						
 									hProcess = OpenProcess(MAXIMUM_ALLOWED,FALSE,id);
+									if (!hProcess) goto error;
 									if(!OpenProcessToken(hProcess,TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY
 													|TOKEN_DUPLICATE|TOKEN_ASSIGN_PRIMARY|TOKEN_ADJUST_SESSIONID
-													|TOKEN_READ|TOKEN_WRITE,&hPToken)) return 0;
-
+													| TOKEN_READ | TOKEN_WRITE, &hPToken))
+									{
+										CloseHandle(hProcess);
+										goto error;
+									}
 									char dir[MAX_PATH];
 									char exe_file_name[MAX_PATH];
 									GetModuleFileName(0, exe_file_name, MAX_PATH);
@@ -403,15 +306,16 @@ DWORD WINAPI Cadthread(LPVOID lpParam)
 									if (Token) CloseHandle(Token);
 									if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
 									if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
-									if (errorcode==1314)
-										{
-											Enable_softwareCAD_elevated();
-										}							
+									if (errorcode == 1314) goto error;
+									goto gotome;
+									error:
+											Enable_softwareCAD_elevated();							
 									}
 							}
 					
 					}
 			}
+	gotome:
        /////////////////////
 	if(OSversion.dwMajorVersion==6)//&& OSversion.dwMinorVersion>=1) //win7  // test win7 +Vista
 	{
