@@ -733,19 +733,19 @@ vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 	char namebuf[256];
 
     if (gethostname(namebuf, 256) == 0) {
-		strncat(m_nid.szTip, " - ", strlen(" - "));
-		strncat(m_nid.szTip, namebuf, strlen(namebuf));
+		strncat(m_nid.szTip, " - ", (sizeof(m_nid.szTip) - 1) - strlen(m_nid.szTip));
+		strncat(m_nid.szTip, namebuf, (sizeof(m_nid.szTip) - 1) - strlen(m_nid.szTip));
     }
 
 	if (vncService::RunningAsService())
 	{
-		strncat(m_nid.szTip, " - service - ", strlen(" - service - "));
+		strncat(m_nid.szTip, " - service - ", (sizeof(m_nid.szTip) - 1) - strlen(m_nid.szTip));
 	}
 	else
 	{
-		strncat(m_nid.szTip, " - application - ", strlen(" - application - "));
+		strncat(m_nid.szTip, " - application - ", (sizeof(m_nid.szTip) - 1) - strlen(m_nid.szTip));
 	}
-	strncat(m_nid.szTip, g_hookstring, strlen(g_hookstring));
+	strncat(m_nid.szTip, g_hookstring, (sizeof(m_nid.szTip) - 1) - strlen(m_nid.szTip));
 
 //	vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::SendTrayMsg - Shell_NotifyIcon call\n"));
 	// Send the message
