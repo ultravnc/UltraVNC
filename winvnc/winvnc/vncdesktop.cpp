@@ -1017,8 +1017,9 @@ vncDesktop::InitBitmap()
 						if (DriverFound)
 							{
 								deviceName = (LPSTR)&dd.DeviceName[0];
-								// JnZn558 m_hrootdc = CreateDC("DISPLAY",deviceName,NULL,NULL);
-								m_hrootdc = GetDC(NULL);
+								//JnZn558 
+								m_hrootdc = CreateDC("DISPLAY",deviceName,NULL,NULL);
+								//m_hrootdc = GetDC(NULL);
 								BOOL temp_para = EnumDisplaySettings(deviceName,ENUM_CURRENT_SETTINGS,&devmode);
 								m_ScreenOffsetx=devmode.dmPosition.x;
 								m_ScreenOffsety=devmode.dmPosition.y;
@@ -1284,7 +1285,7 @@ vncDesktop::SetPixShifts()
 				blueMask =  *(DWORD *) &m_bminfo.bmi.bmiColors[2];
 			}
 		}
-		if (m_videodriver) redMask = 0x7c00; greenMask = 0x03e0; blueMask = 0x001f;
+		//if (m_videodriver) redMask = 0x7c00; greenMask = 0x03e0; blueMask = 0x001f;
 		break;
 		
 
