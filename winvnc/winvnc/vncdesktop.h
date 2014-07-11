@@ -221,7 +221,7 @@ public:
 	bool		m_bIsVista;
 
 private:
-	HDC			m_hrootdc;
+	HDC			m_hrootdc_PixelEngine;
 	HDC			m_hmemdc;
 	HBITMAP		m_membitmap;
 	HBITMAP		m_oldbitmap;
@@ -416,7 +416,7 @@ protected:
 
 	// device contexts for memory and the screen
 	HDC				m_hmemdc;
-	HDC				m_hrootdc;
+	HDC				m_hrootdc_Desktop;
 
 	// New and old bitmaps
 	HBITMAP			m_membitmap;

@@ -110,7 +110,7 @@ PixelCaptureEngine::PixelCaptureEngineInit(HDC rootdc, HDC memdc, HBITMAP membit
 		m_oldbitmap=0;
 		m_DIBbits=dibbits;
 		m_bCaptureAlpha=bCaptureAlpha;
-		m_hrootdc=rootdc;
+		m_hrootdc_PixelEngine=rootdc;
 		m_bytesPerPixel=bpp;
 		m_bytesPerRow=bpr;
 		m_ScreenOffsetx=offsetx;
@@ -127,7 +127,7 @@ PixelCaptureEngine::CaptureRect(const rfb::Rect& rect)
 					return false;
 
 				// Capture screen into bitmap
-				BOOL blitok = BitBlt(m_hmemdc, 0, 0, rect.width(), rect.height(), m_hrootdc, rect.tl.x+m_ScreenOffsetx, rect.tl.y+m_ScreenOffsety, 
+				BOOL blitok = BitBlt(m_hmemdc, 0, 0, rect.width(), rect.height(), m_hrootdc_PixelEngine, rect.tl.x + m_ScreenOffsetx, rect.tl.y + m_ScreenOffsety,
 									 m_bCaptureAlpha ? (CAPTUREBLT | SRCCOPY) : SRCCOPY);
 				return blitok ? true : false;
 		}
@@ -152,7 +152,7 @@ PixelCaptureEngine::CapturePixel(int x, int y)
 		{
 
 				COLORREF cr=0;		
-				cr=GetPixel(m_hrootdc, x, y);
+				cr = GetPixel(m_hrootdc_PixelEngine, x, y);
 				return cr;
 		}
 	}
@@ -246,7 +246,7 @@ bool vncDesktop::FastDetectChanges(rfb::Region2D &rgn, rfb::Rect &rect, int nZon
 
 	}
 
-	PixelEngine.PixelCaptureEngineInit(m_hrootdc, m_hmemdc, m_membitmap, VNCOS.CaptureAlphaBlending() && !m_Black_window_active, 
+	PixelEngine.PixelCaptureEngineInit(m_hrootdc_Desktop, m_hmemdc, m_membitmap, VNCOS.CaptureAlphaBlending() && !m_Black_window_active,
 		                           m_DIBbits, m_scrinfo.format.bitsPerPixel / 8, m_bytesPerRow,m_ScreenOffsetx,m_ScreenOffsety);
 	// We test one zone at a time 
 	// vnclog.Print(LL_INTINFO, VNCLOG("### Polling Grid %d - SubGrid %d\n"), nZone, m_nGridCycle); 
@@ -481,7 +481,7 @@ vncDesktop::vncDesktop()
 	m_update_triggered = FALSE;
 	g_update_triggered = FALSE;
 
-	m_hrootdc = NULL;
+	m_hrootdc_Desktop = NULL;
 	m_hmemdc = NULL;
 	m_membitmap = NULL;
 
@@ -627,6 +627,14 @@ vncDesktop::~vncDesktop()
 	{
       vnclog.Print(LL_INTERR, VNCLOG("~vncDesktop:: second request to close InitWindowthread\n"));
       StopInitWindowthread();
+	}
+
+	if (m_hrootdc_Desktop != NULL)
+	{
+		if (!ReleaseDC(NULL, m_hrootdc_Desktop))
+			vnclog.Print(LL_INTERR, VNCLOG("failed to DeleteDC hrootdc\n"));
+		DeleteDC(m_hrootdc_Desktop);
+		m_hrootdc_Desktop = NULL;
 	}
 }
 
@@ -803,11 +811,12 @@ vncDesktop::Shutdown()
 	ShutdownInitWindowthread();
 
 	// Now free all the bitmap stuff
-	if (m_hrootdc != NULL)
+	if (m_hrootdc_Desktop != NULL)
 	{
-		if (!ReleaseDC(NULL,m_hrootdc))
+		if (!ReleaseDC(NULL, m_hrootdc_Desktop))
 				vnclog.Print(LL_INTERR, VNCLOG("failed to DeleteDC hrootdc\n"));
-		m_hrootdc = NULL;
+		DeleteDC(m_hrootdc_Desktop);
+		m_hrootdc_Desktop = NULL;
 	}
 	if (m_hmemdc != NULL)
 	{
@@ -1018,12 +1027,19 @@ vncDesktop::InitBitmap()
 							{
 								deviceName = (LPSTR)&dd.DeviceName[0];
 								//JnZn558 
-								m_hrootdc = CreateDC("DISPLAY",deviceName,NULL,NULL);
+								if (m_hrootdc_Desktop != NULL)
+								{
+									if (!ReleaseDC(NULL, m_hrootdc_Desktop))
+										vnclog.Print(LL_INTERR, VNCLOG("failed to DeleteDC hrootdc\n"));
+									DeleteDC(m_hrootdc_Desktop);
+									m_hrootdc_Desktop = NULL;
+								}
+								m_hrootdc_Desktop = CreateDC("DISPLAY", deviceName, NULL, NULL);
 								//m_hrootdc = GetDC(NULL);
 								BOOL temp_para = EnumDisplaySettings(deviceName,ENUM_CURRENT_SETTINGS,&devmode);
 								m_ScreenOffsetx=devmode.dmPosition.x;
 								m_ScreenOffsety=devmode.dmPosition.y;
-								if (m_hrootdc) DriverType=MIRROR;
+								if (m_hrootdc_Desktop) DriverType = MIRROR;
 								Checkmonitors();
 								requested_multi_monitor=m_buffer.IsMultiMonitor();
 								multi_monitor=false;
@@ -1040,7 +1056,7 @@ vncDesktop::InitBitmap()
 	}
 
 
-	if (m_hrootdc == NULL) {
+	if (m_hrootdc_Desktop == NULL) {
 		vnclog.Print(LL_INTERR, VNCLOG("No driver used \n"));
 		//Multi-Monitor changes
 		Checkmonitors();
@@ -1065,8 +1081,8 @@ vncDesktop::InitBitmap()
 			
 		}
 		*/
-		m_hrootdc = GetDC(NULL);
-		if (m_hrootdc == NULL) {
+		m_hrootdc_Desktop = GetDC(NULL);
+		if (m_hrootdc_Desktop == NULL) {
 				vnclog.Print(LL_INTERR, VNCLOG("Failed m_rootdc \n"));
 				return ERROR_DESKTOP_NO_ROOTDC;
 		}
@@ -1091,14 +1107,14 @@ vncDesktop::InitBitmap()
 	vnclog.Print(LL_INTINFO, VNCLOG("bitmap dimensions are %d x %d\n"), m_bmrect.br.x, m_bmrect.br.y);
 
 	// Create a compatible memory DC
-	m_hmemdc = CreateCompatibleDC(m_hrootdc);
+	m_hmemdc = CreateCompatibleDC(m_hrootdc_Desktop);
 	if (m_hmemdc == NULL) {
 		vnclog.Print(LL_INTERR, VNCLOG("failed to create compatibleDC(%d)\n"), GetLastError());
 		return ERROR_DESKTOP_NO_ROOTDC;
 	}
 
 	// Check that the device capabilities are ok
-	if ((GetDeviceCaps(m_hrootdc, RASTERCAPS) & RC_BITBLT) == 0)
+	if ((GetDeviceCaps(m_hrootdc_Desktop, RASTERCAPS) & RC_BITBLT) == 0)
 	{
 		MessageBoxSecure(
 			NULL,
@@ -1122,7 +1138,7 @@ vncDesktop::InitBitmap()
 	}
 
 	// Create the bitmap to be compatible with the ROOT DC!!!
-	m_membitmap = CreateCompatibleBitmap(m_hrootdc,1,1); //m_bmrect.br.x, m_bmrect.br.y);
+	m_membitmap = CreateCompatibleBitmap(m_hrootdc_Desktop, 1, 1); //m_bmrect.br.x, m_bmrect.br.y);
 	if (m_membitmap == NULL) {
 		vnclog.Print(LL_INTERR, VNCLOG("failed to create memory bitmap(%d)\n"), GetLastError());
 		return ERROR_DESKTOP_NO_COMPATBITMAP;
@@ -1223,7 +1239,7 @@ vncDesktop::SetPixFormat()
   // The VNC code can only handle formats with a single plane (CHUNKY pixels)
   if (!m_DIBbits) {
 	  vnclog.Print(LL_INTINFO, VNCLOG("DBG:display context has %d planes!\n"),
-      GetDeviceCaps(m_hrootdc, PLANES));
+		  GetDeviceCaps(m_hrootdc_Desktop, PLANES));
 	  vnclog.Print(LL_INTINFO, VNCLOG("DBG:memory context has %d planes!\n"),
       GetDeviceCaps(m_hmemdc, PLANES));
 	  if (GetDeviceCaps(m_hmemdc, PLANES) != 1)
@@ -1351,7 +1367,7 @@ vncDesktop::SetPalette()
 			palette->palNumEntries = 256;
 			
 			// Get the system colours
-			if (GetSystemPaletteEntries(m_hrootdc,
+			if (GetSystemPaletteEntries(m_hrootdc_Desktop,
 				0, 256, palette->palPalEntry) == 0)
 			{
 				vnclog.Print(LL_INTERR, VNCLOG("unable to get system palette entries\n"));
@@ -1395,7 +1411,7 @@ vncDesktop::SetPalette()
 			
 			// - Fetch the system palette for the framebuffer
 			PALETTEENTRY syspalette[256];
-			UINT entries = ::GetSystemPaletteEntries(m_hrootdc, 0, 256, syspalette);
+			UINT entries = ::GetSystemPaletteEntries(m_hrootdc_Desktop, 0, 256, syspalette);
 			vnclog.Print(LL_INTERR, VNCLOG("framebuffer has %u palette entries"), entries);
 			
 			// - Store it and convert it to RGBQUAD format
@@ -1417,7 +1433,7 @@ vncDesktop::SetPalette()
 			}
 			
 			// - Update the DIB section to use the same palette
-			HDC bitmapDC=::CreateCompatibleDC(m_hrootdc);
+			HDC bitmapDC = ::CreateCompatibleDC(m_hrootdc_Desktop);
 			if (!bitmapDC) {
 				vnclog.Print(LL_INTERR, VNCLOG("unable to create temporary DC"), GetLastError());
 				return FALSE;
@@ -1496,7 +1512,7 @@ vncDesktop::EnableOptimisedBlits()
 	if (tempbitmap == NULL) {
 		vnclog.Print(LL_INTINFO, VNCLOG("failed to build DIB section - reverting to slow blits\n"));
 		m_DIBbits = NULL;
-        tempbitmap = CreateCompatibleBitmap(m_hrootdc, m_bmrect.br.x, m_bmrect.br.y);
+		tempbitmap = CreateCompatibleBitmap(m_hrootdc_Desktop, m_bmrect.br.x, m_bmrect.br.y);
 	    if (tempbitmap == NULL) {
 		    vnclog.Print(LL_INTERR, VNCLOG("failed to create memory bitmap(%d)\n"), GetLastError());
 		    return ERROR_DESKTOP_NO_DIBSECTION_OR_COMPATBITMAP;
@@ -1620,7 +1636,7 @@ vncDesktop::CaptureScreen(const rfb::Rect &rect, BYTE *scrBuff, UINT scrBuffSize
 			 rect.tl.y,
 			(rect.br.x-rect.tl.x),
 			(rect.br.y-rect.tl.y),
-			m_hrootdc,
+			m_hrootdc_Desktop,
 			rect.tl.x+m_ScreenOffsetx,
 			rect.tl.y+m_ScreenOffsety,
 			(VNCOS.CaptureAlphaBlending() && !m_Black_window_active) ? (CAPTUREBLT | SRCCOPY) : SRCCOPY
@@ -1633,7 +1649,7 @@ vncDesktop::CaptureScreen(const rfb::Rect &rect, BYTE *scrBuff, UINT scrBuffSize
 			 rect.tl.y,
 			(rect.br.x-rect.tl.x),
 			(rect.br.y-rect.tl.y),
-			m_hrootdc, rect.tl.x, rect.tl.y, (VNCOS.CaptureAlphaBlending() && !m_Black_window_active) ? (CAPTUREBLT | SRCCOPY) : SRCCOPY);
+			m_hrootdc_Desktop, rect.tl.x, rect.tl.y, (VNCOS.CaptureAlphaBlending() && !m_Black_window_active) ? (CAPTUREBLT | SRCCOPY) : SRCCOPY);
 		}
 	/*#if defined(_DEBUG)
 		DWORD e = timeGetTime() - t;
@@ -1790,7 +1806,7 @@ vncDesktop::GetRichCursorData(BYTE *databuf, HCURSOR hcursor, int width, int hei
 	omni_mutex_lock l(m_update_lock,278);
 
 	// Create bitmap, select it into memory DC
-	HBITMAP membitmap = CreateCompatibleBitmap(m_hrootdc, width, height);
+	HBITMAP membitmap = CreateCompatibleBitmap(m_hrootdc_Desktop, width, height);
 	if (membitmap == NULL) {
 		return FALSE;
 	}
