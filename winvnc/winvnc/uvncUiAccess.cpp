@@ -66,7 +66,8 @@ void keepalive()
 {
 	if (!VNCOS.OS_WIN8) return;
 
-	EnterCriticalSection(&keyb_crit);
+	//keepalive not needed when some keybaord stuff is already being done
+	if (!TryEnterCriticalSection(&keyb_crit)) return;
 	unsigned char Invalue=12;
 	unsigned char Outvalue=0;
 	if (StarteventFn) StarteventFn->Call_Fnction_Long_Timeout((char*)&Invalue,(char*)&Outvalue,5);
@@ -112,13 +113,20 @@ void keybd_uni_event(_In_  BYTE bVk,_In_  BYTE bScan,_In_  DWORD dwFlags,_In_  U
 	bool rcdown = HIBYTE(::GetKeyState(VK_RCONTROL)) != 0;	
 	bool lwindown = HIBYTE(::GetKeyState(VK_LWIN)) != 0;
 	bool rwindown = HIBYTE(::GetKeyState(VK_RWIN)) != 0;
-	 if (keyEventFn==NULL || !VNCOS.OS_WIN8)// || (!ldown && !rdown && !lcdown && !rcdown && !lwindown && !rwindown) )
+	// The shared memory trick to inject keys seems to generate an overhead when fast key presses are done.
+	// Actual we only need it for special keys, so we better ctivate the check
+	 if (keyEventFn==NULL || !VNCOS.OS_WIN8 || (!ldown && !rdown && !lcdown && !rcdown && !lwindown && !rwindown) )
 	 {
 		 keybd_event(bVk,bScan,dwFlags,dwExtraInfo);
 	 }
 	 else 
 	 {
-		EnterCriticalSection(&keyb_crit);
+		//if locked just do it local, special keys want work, but you always can do it again
+		if (!TryEnterCriticalSection(&keyb_crit))
+		 {
+			keybd_event(bVk, bScan, dwFlags, dwExtraInfo);
+			return;
+		 }
 		keyEventdata ked;
 		ked.bVk=bVk;
 		ked.bScan=bScan;	
