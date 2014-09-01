@@ -1,6 +1,7 @@
-//  TODO: add Copyright?
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2013 UltraVNC Team Members. All Rights Reserved.
 //
-//  The VNC system is free software; you can redistribute it and/or modify
+//  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
@@ -15,9 +16,12 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the VNC system is not available from the place 
-// whence you received this file, check http://www.uk.research.att.com/vnc or contact
-// the authors on vnc@uk.research.att.com for information on obtaining it.
+// If the source code for the program is not available from the place from
+// which you received this file, check 
+// http://www.uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
+ 
 
 // This is the source for the low-level keyboard hook, which allows intercepting and sending
 // special keys (such as ALT,CTRL, ALT+TAB, etc) to the VNCServer side.

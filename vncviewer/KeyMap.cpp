@@ -19,7 +19,7 @@
 //  USA.
 //
 //  If the source code for the VNC system is not available from the place
-//  whence you received this file, check http://www.uk.research.att.com/vnc or
+//  whence you received this file, check http://www.uvnc.com or
 //  contact the authors on vnc@uk.research.att.com for information on obtaining
 //  it.
 //

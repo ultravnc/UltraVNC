@@ -18,7 +18,7 @@
 //  USA.
 //
 // If the source code for the VNC system is not available from the place 
-// whence you received this file, check http://www.uk.research.att.com/vnc or 
+// whence you received this file, check http://www.uvnc.com or 
 // contact the authors on vnc@uk.research.att.com for information on obtaining it.
 //
 
@@ -123,7 +123,7 @@ void ClientConnection::SaveConnection()
 		buf[0] = '\0';
 	WritePrivateProfileString("connection", "password", buf, fname);
 	m_opts.Save(fname);
-	m_opts.Register();
+	//m_opts.Register();
 }
 
 
@@ -135,7 +135,6 @@ void ClientConnection::Save_Latest_Connection()
 	char fname[_MAX_PATH];
 //	char tname[_MAX_FNAME + _MAX_EXT];
 	ofnInit();
-	int disp = PORT_TO_DISPLAY(m_port);
 	char optionfile[MAX_PATH];
     VNCOptions::GetDefaultOptionsFileName(optionfile);
 
@@ -154,7 +153,7 @@ void ClientConnection::Save_Latest_Connection()
 
 	WritePrivateProfileString("connection", "password", buf, fname);
 	m_opts.Save(fname);
-	m_opts.Register();
+	//m_opts.Register();
 }
 
 // returns zero if successful
@@ -211,7 +210,7 @@ int ClientConnection::LoadConnection(char *fname, bool fFromDialog)
 	if (fFromDialog)
 	{
 		m_opts.Load(fname);
-		m_opts.Register();
+		//m_opts.Register();
 	}
 	//AaronP
 	else if (strcmp(m_host, "") == 0 || strcmp(fname,optionfile)==0 )//|| config_specified)
@@ -221,7 +220,7 @@ int ClientConnection::LoadConnection(char *fname, bool fFromDialog)
 		m_opts.m_proxyport=m_proxyport;
 		m_opts.m_fUseProxy=m_fUseProxy;
 		m_opts.Load(fname);
-		m_opts.Register();
+		//m_opts.Register();
 		// Then display the session dialog to get missing params again
 		SessionDialog sessdlg(&m_opts, this, m_pDSMPlugin); //sf@2002
 		if (!sessdlg.DoDialog())
@@ -242,7 +241,7 @@ int ClientConnection::LoadConnection(char *fname, bool fFromDialog)
 		m_opts.m_proxyport=m_proxyport;
 		m_opts.m_fUseProxy=m_fUseProxy;
 		m_opts.Load(fname);
-		m_opts.Register();
+		//m_opts.Register();
 	}
 	//EndAaronP
 	return 0;

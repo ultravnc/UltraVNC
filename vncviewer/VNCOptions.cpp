@@ -1,14 +1,7 @@
-//  Copyright (C) 2002 UltraVNC Team Members. All Rights Reserved.
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2013 UltraVNC Team Members. All Rights Reserved.
 //
-//  Copyright (C) 2000-2002 Const Kaplinsky. All Rights Reserved.
-//
-// Copyright (C) 2002 RealVNC Ltd. All Rights Reserved.
-//
-//  Copyright (C) 1999 AT&T Laboratories Cambridge. All Rights Reserved.
-//
-//  This file is part of the VNC system.
-//
-//  The VNC system is free software; you can redistribute it and/or modify
+//  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
@@ -23,9 +16,12 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the VNC system is not available from the place 
-// whence you received this file, check http://www.uk.research.att.com/vnc or contact
-// the authors on vnc@uk.research.att.com for information on obtaining it.
+// If the source code for the program is not available from the place from
+// which you received this file, check 
+// http://www.uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
+ 
 
 
 // VNCOptions.cpp: implementation of the VNCOptions class.
@@ -230,6 +226,30 @@ VNCOptions::VNCOptions()
 
 void VNCOptions::GetDefaultOptionsFileName(TCHAR *optionfile)
 {
+
+	char szFileName[MAX_PATH];
+	if (GetModuleFileName(NULL, szFileName, MAX_PATH))
+	{
+		char* p = strrchr(szFileName, '\\');
+		if (p == NULL) return;
+		*p = '\0';
+		strcat(szFileName, "\\options.vnc");
+	}
+
+	HANDLE m_hDestFile = CreateFile(szFileName, GENERIC_WRITE | GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, FILE_FLAG_SEQUENTIAL_SCAN, NULL);
+	bool fAlreadyExists = (GetLastError() == ERROR_ALREADY_EXISTS);
+	if (fAlreadyExists)
+		m_hDestFile = CreateFile(szFileName, GENERIC_WRITE | GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, NULL);
+
+	if (m_hDestFile != INVALID_HANDLE_VALUE)
+	{ 
+		strcpy_s(optionfile, MAX_PATH, szFileName); 
+		CloseHandle(m_hDestFile); 
+		return;
+	}
+		
+
+
     const char *APPDIR = "UltraVNC";
     if (SHGetFolderPath (0,CSIDL_APPDATA, NULL, SHGFP_TYPE_CURRENT, optionfile) == S_OK)
     {
@@ -659,7 +679,7 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
         m_configSpecified = true;
       }
     } else if ( SwitchMatch(args[j], _T("register") )) {
-      Register();
+//      Register();
       PostQuitMessage(0);
 	
 	}
@@ -1078,7 +1098,7 @@ void VNCOptions::Load(char *fname)
   GetPrivateProfileString("options", "DSMPlugin", "NoPlugin", m_szDSMPluginFilename, MAX_PATH, fname);
   if (!g_disable_sponsor) g_disable_sponsor=readInt("sponsor",			g_disable_sponsor, fname) != 0;
 
-  if (!g_disable_sponsor)
+  /*if (!g_disable_sponsor)
   {
   HKEY hRegKey;
 		DWORD sponsor = 0;
@@ -1093,7 +1113,7 @@ void VNCOptions::Load(char *fname)
 			}
 			RegCloseKey(hRegKey);
 		}
-  }
+  }*/
 
   m_autoReconnect =		readInt("AutoReconnect",	m_autoReconnect, fname);
   
@@ -1127,7 +1147,7 @@ void VNCOptions::Load(char *fname)
 
 // Record the path to the VNC viewer and the type
 // of the .vnc files in the registry
-void VNCOptions::Register()
+/*void VNCOptions::Register()
 {
   char keybuf[_MAX_PATH * 2 + 20];
   HKEY hKey, hKey2;
@@ -1168,7 +1188,7 @@ void VNCOptions::Register()
     RegSetValue(hKey, NULL, REG_SZ, filename, 0);
     RegCloseKey(hKey);
   }
-}
+}*/
 
 void VNCOptions::ShowUsage(LPTSTR info) {
   TCHAR msg[1024];
@@ -1618,7 +1638,8 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 			DWORD dw;
 			DWORD val=g_disable_sponsor;
 			HKEY huser;
-			if (RegCreateKeyEx(HKEY_CURRENT_USER,
+
+			/*if (RegCreateKeyEx(HKEY_CURRENT_USER,
 			SETTINGS_KEY_NAME,
 			0,REG_NONE, REG_OPTION_NON_VOLATILE,
 			KEY_WRITE | KEY_READ,
@@ -1626,7 +1647,7 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 			{
 				RegSetValueEx(huser, "sponsor", 0, REG_DWORD, (LPBYTE) &val, sizeof(val));
 				if (huser != NULL) RegCloseKey(huser);
-			}
+			}*/
 
 			//adzm 2010-07-04
 			 HWND hpreemptiveUpdates = GetDlgItem(hwnd, IDC_PREEMPTIVEUPDATES);

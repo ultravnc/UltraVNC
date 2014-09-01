@@ -1,8 +1,7 @@
-//  Copyright (C) 1999 AT&T Laboratories Cambridge. All Rights Reserved.
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2013 UltraVNC Team Members. All Rights Reserved.
 //
-//  This file is part of the VNC system.
-//
-//  The VNC system is free software; you can redistribute it and/or modify
+//  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
@@ -17,15 +16,22 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the VNC system is not available from the place 
-// whence you received this file, check http://www.uk.research.att.com/vnc or contact
-// the authors on vnc@uk.research.att.com for information on obtaining it.
+// If the source code for the program is not available from the place from
+// which you received this file, check 
+// http://www.uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
 
 //
 // MRU maintains a list of 'Most Recently Used' strings in the registry
 // 
 
 #include "MRU.h"
+#include "VNCOptions.h"
+#include <shlobj.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <direct.h>
 
 static const TCHAR * INDEX_VAL_NAME = _T("index");
 static const int MRU_MAX_ITEM_LENGTH = 256;
@@ -34,25 +40,27 @@ MRU::MRU(LPTSTR keyname, unsigned int maxnum)
 {
 	DWORD dispos;
     // Create the registry key.  If unsuccessful all other methods will be no-ops.
-    if ( RegCreateKeyEx(HKEY_CURRENT_USER, keyname, 0, NULL, 
+    /*if ( RegCreateKeyEx(HKEY_CURRENT_USER, keyname, 0, NULL, 
 		REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &m_hRegKey, &dispos)  != ERROR_SUCCESS ) {
         m_hRegKey = NULL;
-    }
+    }*/
     m_index[0] = _T('\0');
     m_maxnum = maxnum;
 
     // Read the index entry
     ReadIndex();
 
-    Tidy();
+    //Tidy();
 }
 
 // Add the item specified at the front of the list
 // Move it there if not already.  If this makes the
 // list longer than the maximum, older ones are deleted.
+
+void ofnInit();
 void MRU::AddItem(LPTSTR txt) 
 {
-    if (m_hRegKey == NULL) return;
+    //if (m_hRegKey == NULL) return;
 
 	// We don't add empty items.
 	if (_tcslen(txt) == 0) return;
@@ -90,8 +98,18 @@ void MRU::AddItem(LPTSTR txt)
     TCHAR valname[2];
     valname[0] = firstUnusedId;
     valname[1] = _T('\0');
-    RegSetValueEx(m_hRegKey, valname, NULL, REG_SZ, 
-        (CONST BYTE *) txt, (_tcslen(txt) + 1) * sizeof(TCHAR));
+
+
+	char fname[_MAX_PATH];
+	ofnInit();
+	char optionfile[MAX_PATH];
+	VNCOptions::GetDefaultOptionsFileName(optionfile);
+	sprintf(fname, optionfile);
+	WritePrivateProfileString("connection", valname, txt, fname);
+
+
+    /*RegSetValueEx(m_hRegKey, valname, NULL, REG_SZ, 
+        (CONST BYTE *) txt, (_tcslen(txt) + 1) * sizeof(TCHAR));*/
     
     // move all the current ids up one
     for (int j = _tcslen(m_index); j >= 0; j--)
@@ -103,13 +121,13 @@ void MRU::AddItem(LPTSTR txt)
     WriteIndex();
 
     // Tidy, to truncate index if too long.
-    Tidy();
+    //Tidy();
 }
 
 // How many items are on the list?
 int MRU::NumItems()
 {
-    if (m_hRegKey == NULL) return 0;
+//    if (m_hRegKey == NULL) return 0;
 
     // return the length of index
     return _tcslen(m_index);
@@ -120,7 +138,7 @@ int MRU::NumItems()
 // Returns length, or 0 if unsuccessful.
 int MRU::GetItem(int index, LPTSTR buf, int buflen)
 {
-    if (m_hRegKey == NULL)      return 0;
+//    if (m_hRegKey == NULL)      return 0;
     if (index > NumItems() - 1) return 0;
 
     TCHAR valname[2];
@@ -129,13 +147,22 @@ int MRU::GetItem(int index, LPTSTR buf, int buflen)
 
     DWORD valtype;
     DWORD dwbuflen = buflen;
-    if ( RegQueryValueEx( m_hRegKey,  valname, 
+
+	char fname[_MAX_PATH];
+	ofnInit();
+	char optionfile[MAX_PATH];
+	VNCOptions::GetDefaultOptionsFileName(optionfile);
+	sprintf(fname, optionfile);
+	GetPrivateProfileString("connection", valname, "",buf, buflen, fname);
+
+
+    /*if ( RegQueryValueEx( m_hRegKey,  valname, 
             NULL, &valtype, 
             (LPBYTE) buf, &dwbuflen) != ERROR_SUCCESS)
           return 0;
 
     if (valtype != REG_SZ)
-        return 0;  // should really be an assert
+        return 0;  // should really be an assert*/
 
     // May not be one byte per char, so we won't use dwbuflen
     return _tcslen(buf);
@@ -145,7 +172,7 @@ int MRU::GetItem(int index, LPTSTR buf, int buflen)
 // Only one copy will be removed, but nothing should occur more than once.
 void MRU::RemoveItem(LPTSTR txt)
 {
-    if (m_hRegKey == NULL) return;
+    //if (m_hRegKey == NULL) return;
 
     TCHAR itembuf[MRU_MAX_ITEM_LENGTH+1];
 
@@ -163,13 +190,21 @@ void MRU::RemoveItem(LPTSTR txt)
 // If this is greater than NumItems()-1 it will be ignored.
 void MRU::RemoveItem(int index)
 {
-    if (m_hRegKey == NULL) return;
+    //if (m_hRegKey == NULL) return;
     if (index > NumItems()-1) return;
 
     TCHAR valname[2];
     valname[0] = m_index[index];
     valname[1] = _T('\0');
-    RegDeleteValue(m_hRegKey, valname);
+
+	char fname[_MAX_PATH];
+	ofnInit();
+	char optionfile[MAX_PATH];
+	VNCOptions::GetDefaultOptionsFileName(optionfile);
+	sprintf(fname, optionfile);
+	WritePrivateProfileString("connection", valname, NULL, fname);
+
+    //RegDeleteValue(m_hRegKey, valname);
 
     for (unsigned int i = index; i <= _tcslen(m_index); i++)
         m_index[i] = m_index[i+1];
@@ -180,26 +215,42 @@ void MRU::RemoveItem(int index)
 // Load the index string from the registry
 void MRU::ReadIndex()
 {
-    if (m_hRegKey == NULL) return;
+    //if (m_hRegKey == NULL) return;
 
     // read the index
     DWORD valtype;
     DWORD dwindexlen = sizeof(m_index);
-    if (RegQueryValueEx( m_hRegKey, INDEX_VAL_NAME,
+
+	char fname[_MAX_PATH];
+	ofnInit();
+	char optionfile[MAX_PATH];
+	VNCOptions::GetDefaultOptionsFileName(optionfile);
+	sprintf(fname, optionfile);
+	if (GetPrivateProfileString("connection", INDEX_VAL_NAME, "", m_index, dwindexlen, fname) == 0) WriteIndex();
+
+
+    /*if (RegQueryValueEx( m_hRegKey, INDEX_VAL_NAME,
         NULL, &valtype, (LPBYTE) m_index, &dwindexlen) == ERROR_SUCCESS) {
     } else {
         // If index entry doesn't exist, create it
         WriteIndex();
-    }
+    }*/
 }
 
 // Save the index string to the registry
 void MRU::WriteIndex()
 {
-   if (m_hRegKey == NULL) return;
+   //if (m_hRegKey == NULL) return;
 
-   RegSetValueEx(m_hRegKey, INDEX_VAL_NAME, NULL, REG_SZ, 
-        (CONST BYTE *)m_index, (_tcslen(m_index) + 1) * sizeof(TCHAR));
+	char fname[_MAX_PATH];
+	ofnInit();
+	char optionfile[MAX_PATH];
+	VNCOptions::GetDefaultOptionsFileName(optionfile);
+	sprintf(fname, optionfile);
+	WritePrivateProfileString("connection", INDEX_VAL_NAME, m_index, fname);
+
+   /*RegSetValueEx(m_hRegKey, INDEX_VAL_NAME, NULL, REG_SZ, 
+        (CONST BYTE *)m_index, (_tcslen(m_index) + 1) * sizeof(TCHAR));*/
 }
 
 // Tidy is called from time to time to preserve the integrity of the MRU
@@ -210,9 +261,9 @@ void MRU::WriteIndex()
 //  * Check that all entries in the index have a corresponding
 //    value in the registry key and delete them from index if not.
 
-void MRU::Tidy()
+/*void MRU::Tidy()
 {
-    if (m_hRegKey == NULL) return;
+   // if (m_hRegKey == NULL) return;
     int i;    
 
 	// First some checks on the index itself.
@@ -301,14 +352,14 @@ void MRU::Tidy()
 
 	// Save any changes to the index.
     WriteIndex();
-}
+}*/
 
 
 MRU::~MRU()
 {
-    if (m_hRegKey != NULL) {
+    /*if (m_hRegKey != NULL) {
         Tidy();
         RegCloseKey(m_hRegKey);
         m_hRegKey = NULL;
-    }
+    }*/
 }

@@ -1,14 +1,7 @@
-//  Copyright (C) 2002 UltraVNC Team Members. All Rights Reserved.
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2013 UltraVNC Team Members. All Rights Reserved.
 //
-//  Copyright (C) 2000-2002 Const Kaplinsky. All Rights Reserved.
-//
-//  Copyright (C) 2002 RealVNC Ltd. All Rights Reserved.
-//
-//  Copyright (C) 1999 AT&T Laboratories Cambridge. All Rights Reserved.
-//
-//  This file is part of the VNC system.
-//
-//  The VNC system is free software; you can redistribute it and/or modify
+//  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
@@ -23,16 +16,11 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the VNC system is not available from the place
-// whence you received this file, check http://www.uk.research.att.com/vnc or contact
-// the authors on vnc@uk.research.att.com for information on obtaining it.
-
-// Many thanks to Randy Brown <rgb@inven.com> for providing the 3-button
-// emulation code.
-
-// This is the main source for a ClientConnection object.
-// It handles almost everything to do with a connection to a server.
-// The decoding of specific rectangle encodings is done in separate files.
+// If the source code for the program is not available from the place from
+// which you received this file, check 
+// http://www.uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
 
 #define _WIN32_WINDOWS 0x0410
 #define WINVER 0x0400
@@ -8773,22 +8761,7 @@ ClientConnection::PendingMouseMove::PendingMouseMove()
 	bValid(false),
 	dwMinimumMouseMoveInterval(0) // changed to 0 from 150; need to have an interface for this
 {
-	//adzm 2010-10 - This is in the standard options dialog now.
-	/*
-	HKEY hRegKey;
-	DWORD dwPreferredMinimumMouseMoveInterval = 0;
-	if ( RegCreateKey(HKEY_CURRENT_USER, SETTINGS_KEY_NAME, &hRegKey)  != ERROR_SUCCESS ) {
-        hRegKey = NULL;
-	} else {
-		DWORD valsize = sizeof(dwPreferredMinimumMouseMoveInterval);
-		DWORD valtype = REG_DWORD;
-		if ( RegQueryValueEx( hRegKey,  "MinMouseMove", NULL, &valtype,
-			(LPBYTE) &dwPreferredMinimumMouseMoveInterval, &valsize) == ERROR_SUCCESS) {
-            dwMinimumMouseMoveInterval = dwPreferredMinimumMouseMoveInterval;
-		}
-		RegCloseKey(hRegKey);
-	}
-	*/
+	
 }
 
 // adzm 2010-09 - Notify streaming DSM plugin support
