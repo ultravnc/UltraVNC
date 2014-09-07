@@ -159,6 +159,8 @@ public:
 
 	// Lock to protect the client list from concurrency - lock when reading/updating client list
 	omni_mutex			m_clientsLock;
+	omni_mutex			m_clientsLockBlackList;
+	omni_mutex			m_clientsLock_notifyList;
 
 	UINT				m_port;
 	UINT				m_port_http; // TightVNC 1.2.7

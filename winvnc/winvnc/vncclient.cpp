@@ -454,9 +454,9 @@ vncClientUpdateThread::EnableUpdates(BOOL enable)
 
 	m_enable = enable;
 	m_signal->signal();
-	unsigned long now_sec, now_nsec;
-    get_time_now(&now_sec, &now_nsec);
-	m_sync_sig->wait();
+	//unsigned long now_sec, now_nsec;
+    //get_time_now(&now_sec, &now_nsec);
+	if (enable) m_sync_sig->wait();
 	/*if  (m_sync_sig->timedwait(now_sec+1,0)==0)
 		{
 //			m_signal->signal();

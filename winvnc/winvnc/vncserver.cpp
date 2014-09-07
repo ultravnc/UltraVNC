@@ -904,17 +904,6 @@ void vncServer::ListUnauthClients(HWND hListBox)
 	}
 }
 
-/*
-//
-// sf@2003 - Returns the first client name (IP)
-//
-void vncServer::FirstClientName()
-{
-	omni_mutex_lock l(m_clientsLock);
-	return GetClient(*(m_authClients.begin()))->GetClientName();
-}
-*/
-
 
 //
 // sf@2002 - test if there's a slow client connected
@@ -1000,7 +989,7 @@ vncServer::KillUnauthClients()
 UINT
 vncServer::AuthClientCount()
 {
-	omni_mutex_lock l(m_clientsLock,28);
+	//omni_mutex_lock l(m_clientsLock,28);
 
 	return m_authClients.size();
 }
@@ -1008,7 +997,7 @@ vncServer::AuthClientCount()
 UINT
 vncServer::UnauthClientCount()
 {
-	omni_mutex_lock l(m_clientsLock,30);
+	//omni_mutex_lock l(m_clientsLock,30);
 
 	return m_unauthClients.size();
 }
@@ -1046,7 +1035,7 @@ vncServer::RemoteEventReceived()
 void
 vncServer::WaitUntilAuthEmpty()
 {
-	omni_mutex_lock l(m_clientsLock,32);
+	//omni_mutex_lock l(m_clientsLock,32);
 
 	// Wait for all the clients to exit
 	while (!m_authClients.empty())
@@ -1059,7 +1048,7 @@ vncServer::WaitUntilAuthEmpty()
 void
 vncServer::WaitUntilUnauthEmpty()
 {
-	omni_mutex_lock l(m_clientsLock,33);
+	//omni_mutex_lock l(m_clientsLock,33);
 
 	// Wait for all the clients to exit
 	while (!m_unauthClients.empty())
@@ -1083,7 +1072,7 @@ vncServer::ClientList()
 {
 	vncClientList clients;
 
-	omni_mutex_lock l(m_clientsLock,34);
+	//omni_mutex_lock l(m_clientsLock,34);
 
 	clients = m_authClients;
 
@@ -1093,7 +1082,7 @@ vncServer::ClientList()
 void
 vncServer::SetCapability(vncClientId clientid, int capability)
 {
-	omni_mutex_lock l(m_clientsLock,35);
+	//omni_mutex_lock l(m_clientsLock,35);
 
 	vncClient *client = GetClient(clientid);
 	if (client != NULL)
@@ -1103,7 +1092,7 @@ vncServer::SetCapability(vncClientId clientid, int capability)
 void
 vncServer::SetKeyboardEnabled(vncClientId clientid, BOOL enabled)
 {
-	omni_mutex_lock l(m_clientsLock,36);
+	//omni_mutex_lock l(m_clientsLock,36);
 
 	vncClient *client = GetClient(clientid);
 	if (client != NULL)
@@ -1113,7 +1102,7 @@ vncServer::SetKeyboardEnabled(vncClientId clientid, BOOL enabled)
 void
 vncServer::SetPointerEnabled(vncClientId clientid, BOOL enabled)
 {
-	omni_mutex_lock l(m_clientsLock,37);
+	//omni_mutex_lock l(m_clientsLock,37);
 
 	vncClient *client = GetClient(clientid);
 	if (client != NULL)
@@ -1123,7 +1112,7 @@ vncServer::SetPointerEnabled(vncClientId clientid, BOOL enabled)
 int
 vncServer::GetCapability(vncClientId clientid)
 {
-	omni_mutex_lock l(m_clientsLock,38);
+	//omni_mutex_lock l(m_clientsLock,38);
 
 	vncClient *client = GetClient(clientid);
 	if (client != NULL)
@@ -1134,7 +1123,7 @@ vncServer::GetCapability(vncClientId clientid)
 const char*
 vncServer::GetClientName(vncClientId clientid)
 {
-	omni_mutex_lock l(m_clientsLock,39);
+	//omni_mutex_lock l(m_clientsLock,39);
 
 	vncClient *client = GetClient(clientid);
 	if (client != NULL)
@@ -1238,7 +1227,7 @@ vncServer::RemoveClient(vncClientId clientid)
 BOOL
 vncServer::AddNotify(HWND hwnd)
 {
-	omni_mutex_lock l(m_clientsLock,44);
+	omni_mutex_lock l(m_clientsLock_notifyList, 44);
 
 	// Add the window handle to the list
 	m_notifyList.push_front(hwnd);
@@ -1249,7 +1238,7 @@ vncServer::AddNotify(HWND hwnd)
 BOOL
 vncServer::RemNotify(HWND hwnd)
 {
-	omni_mutex_lock l(m_clientsLock,45);
+	omni_mutex_lock l(m_clientsLock_notifyList, 45);
 
 	// Remove the window handle from the list
 	vncNotifyList::iterator i;
@@ -1270,7 +1259,7 @@ vncServer::RemNotify(HWND hwnd)
 void
 vncServer::DoNotify(UINT message, WPARAM wparam, LPARAM lparam)
 {
-	omni_mutex_lock l(m_clientsLock,46);
+	omni_mutex_lock l(m_clientsLock_notifyList, 46);
 
 	// Send the given message to all the notification windows
 	vncNotifyList::iterator i;
@@ -1294,24 +1283,6 @@ vncServer::UpdateMouse()
 		GetClient(*i)->UpdateMouse();
 	}
 }
-
-// adzm - 2010-07 - Extended clipboard
-/*
-void
-vncServer::UpdateClipText(const char* text)
-{
-	vncClientList::iterator i;
-	
-	omni_mutex_lock l(m_clientsLock);
-
-	// Post this update to all the connected clients
-	for (i = m_authClients.begin(); i != m_authClients.end(); i++)
-	{
-		// Post the update
-		GetClient(*i)->UpdateClipText(text);
-	}
-}
-*/
 
 
 // adzm - 2010-07 - Extended clipboard
@@ -1403,25 +1374,6 @@ vncServer::UpdateLocalClipTextEx(ExtendedClipboardDataMessage& extendedClipboard
 		if (m_desktop != NULL)
 			m_desktop->SetClipTextEx(extendedClipboardDataMessage);
 	}
-
-	// At this point we could notify other viewers and update their clipboards too, but in practice this is very confusing.
-	// Perhaps what should be done is to notify the viewers that the clipboard has changed?
-	// Worry about it later.
-	/*
-	{ 
-		omni_mutex_lock l(m_clientsLock);
-
-		// Post this update to all the connected clients
-		for (i = m_authClients.begin(); i != m_authClients.end(); i++)
-		{
-			// Post the update
-			vncClient* client = GetClient(*i);
-			if (client != excludeClient) {
-				client->UpdateClipTextEx(clipboardData, (CARD32)clipPeek);
-			}
-		}
-	}
-	*/
 }
 
 // Name and port number handling
@@ -1887,7 +1839,7 @@ vncServer::GetScreenInfo(int &width, int &height, int &depth)
 
 void
 vncServer::SetAuthHosts(const char*hostlist) {
-	omni_mutex_lock l(m_clientsLock,57);
+	//omni_mutex_lock l(m_clientsLock,57);
 
 	if (hostlist == 0) {
 		vnclog.Print(LL_INTINFO, VNCLOG("authhosts cleared\n"));
@@ -1904,7 +1856,7 @@ vncServer::SetAuthHosts(const char*hostlist) {
 
 char*
 vncServer::AuthHosts() {
-	omni_mutex_lock l(m_clientsLock,58);
+	//omni_mutex_lock l(m_clientsLock,58);
 
 	if (m_auth_hosts == 0)
 		return _strdup("");
@@ -1930,7 +1882,7 @@ MatchStringToTemplate(const char *addr, UINT addrlen,
 
 vncServer::AcceptQueryReject
 vncServer::VerifyHost(const char *hostname) {
-	omni_mutex_lock l(m_clientsLock,59);
+	omni_mutex_lock l(m_clientsLockBlackList, 59);
 
 	// -=- Is the specified host blacklisted?
 	vncServer::BlacklistEntry	*current = m_blacklist;
@@ -2085,7 +2037,7 @@ vncServer::VerifyHost(const char *hostname) {
 
 void
 vncServer::AddAuthHostsBlacklist(const char *machine) {
-	omni_mutex_lock l(m_clientsLock,60);
+	omni_mutex_lock l(m_clientsLockBlackList, 60);
 
 	// -=- Is the specified host blacklisted?
 	vncServer::BlacklistEntry	*current = m_blacklist;
@@ -2132,7 +2084,7 @@ vncServer::AddAuthHostsBlacklist(const char *machine) {
 
 void
 vncServer::RemAuthHostsBlacklist(const char *machine) {
-	omni_mutex_lock l(m_clientsLock,61);
+	omni_mutex_lock l(m_clientsLockBlackList,61);
 
 	// -=- Is the specified host blacklisted?
 	vncServer::BlacklistEntry	*current = m_blacklist;
