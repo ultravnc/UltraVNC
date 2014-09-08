@@ -4520,6 +4520,18 @@ vncClient::TriggerUpdateThread()
 void
 vncClient::UpdateMouse()
 {
+	RECT testrect;
+	testrect.top = m_encodemgr.m_buffer->m_desktop->m_Cliprect.tl.y;
+	testrect.bottom = m_encodemgr.m_buffer->m_desktop->m_Cliprect.br.y;
+	testrect.left = m_encodemgr.m_buffer->m_desktop->m_Cliprect.tl.x;
+	testrect.right = m_encodemgr.m_buffer->m_desktop->m_Cliprect.br.x;
+	{
+		POINT cursorPos;
+		GetCursorPos(&cursorPos);
+		if (!PtInRect(&testrect, cursorPos)) return;
+	}
+	
+
 	if (!m_mousemoved && !m_cursor_update_sent)
 	{
 	omni_mutex_lock l(GetUpdateLock(),93);
@@ -4975,6 +4987,11 @@ vncClient::SendRectangle(const rfb::Rect &rect)
 	ScaledRect.br.y = rect.br.y / m_nScale;
 	ScaledRect.tl.x = rect.tl.x / m_nScale;
 	ScaledRect.br.x = rect.br.x / m_nScale;
+	#ifdef _DEBUG
+	char			szText[256];
+	sprintf(szText,"++++++++++++++++++++++++++++++++++++++++++++++REct1 %i %i %i %i  \n",rect.tl.x,rect.br.x,rect.tl.y,rect.br.y);
+	OutputDebugString(szText);
+	#endif
 
 	//	Totalsend+=(ScaledRect.br.x-ScaledRect.tl.x)*(ScaledRect.br.y-ScaledRect.tl.y);
 

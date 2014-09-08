@@ -1700,9 +1700,14 @@ vncDesktop::CaptureMouse(BYTE *scrBuff, UINT scrBuffSize)
 	// Get the cursor position
 	if (!GetCursorPos(&CursorPos))
 		return;
-	//CursorPos.x -= m_ScreenOffsetx;
-	//CursorPos.y -= m_ScreenOffsety;
-	//vnclog.Print(LL_INTINFO, VNCLOG("CursorPos %i %i\n"),CursorPos.x, CursorPos.y);
+	RECT testrect;
+	testrect.top = m_Cliprect.tl.y;
+	testrect.bottom = m_Cliprect.br.y;
+	testrect.left = m_Cliprect.tl.x;
+	testrect.right = m_Cliprect.br.x;
+
+	if (!PtInRect(&testrect, CursorPos)) return;
+
 	// Translate position for hotspot
 	if (GetIconInfo(m_hcursor, &IconInfo))
 	{
