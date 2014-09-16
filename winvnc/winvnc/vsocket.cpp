@@ -1095,7 +1095,7 @@ VSocket::ReadExactHTTP(char *buff, const VCard bufflen)
 
 	return VTrue;
 }
-#ifdef HTTP_SAMEPORT
+
 VBool
 VSocket::ReadSelect(VCard to)
  {
@@ -1109,7 +1109,6 @@ VSocket::ReadSelect(VCard to)
  	if (rc>0) return true;
  	return false;
  }
-#endif
 
 extern bool			fShutdownOrdered;
 bool

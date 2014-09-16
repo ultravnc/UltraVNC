@@ -149,49 +149,30 @@ const FileMap filemapping2 []	={
 	};
 const int filemappingsize		= 1;
 
-#ifdef HTTP_SAMEPORT
-// Added for HTTP-via-RFB. Allows us to handle an HTTP transaction
-// without starting a separate thread.
-class vncHTTPConnectThreadHelper {
-public:
-	// Routines to handle HTTP requests
-	void Init(vncServer* svr) { m_server = svr; }
-	void DoHTTP(VSocket *socket);
-	char *ReadLine(VSocket *socket, char delimiter);
-protected:
-	vncServer	*m_server;
-};
-#endif
-
-#ifdef HTTP_SAMEPORT
-class vncHTTPConnectThread : public omni_thread, public vncHTTPConnectThreadHelper
-#else
 // The function for the spawned thread to run
 class vncHTTPConnectThread : public omni_thread
-#endif
 {
 public:
 	// Init routine
 	virtual BOOL Init(VSocket *socket, vncServer *server);
+	void Inithttp(vncServer* svr) { m_server = svr; }
 
 	// Code to be executed by the thread
 	virtual void *run_undetached(void * arg);
-#ifndef HTTP_SAMEPORT
 	// Routines to handle HTTP requests
 	virtual void DoHTTP(VSocket *socket);
 	virtual char *ReadLine(VSocket *socket, char delimiter);
-#endif
+
 
 	// Fields used internally
 	BOOL		m_shutdown;
 protected:
-#ifndef HTTP_SAMEPORT
+
 	vncServer	*m_server;
-#endif
 	VSocket		*m_socket;
 };
 
-#ifdef HTTP_SAMEPORT
+
 // Added for HTTP-via-RFB. This function is called when a connection is
 // accepted on the RFB port. If the client sends an HTTP request we
 // handle it here and return TRUE. Otherwise we return
@@ -202,15 +183,15 @@ VBool maybeHandleHTTPRequest(VSocket* sock,vncServer* svr)
 
 	// Client is sending data. Create a vncHTTPConnectThread to
 	// handle it.
-	vncHTTPConnectThreadHelper http;
-	http.Init(svr);
+	vncHTTPConnectThread http;
+	http.Inithttp(svr);
 	http.DoHTTP(sock);
 	sock->Shutdown();
 	sock->Close();
 	delete sock;
 	return true;
 }
-#endif
+
 
 // Method implementations
 BOOL vncHTTPConnectThread::Init(VSocket *socket, vncServer *server)
@@ -262,11 +243,8 @@ void *vncHTTPConnectThread::run_undetached(void * arg)
 	return NULL;
 }
 
-#ifdef HTTP_SAMEPORT
-void vncHTTPConnectThreadHelper::DoHTTP(VSocket *socket)
-#else
 void vncHTTPConnectThread::DoHTTP(VSocket *socket)
-#endif
+
 {
 	char filename[1024];
 	char *line;
@@ -491,11 +469,9 @@ void vncHTTPConnectThread::DoHTTP(VSocket *socket)
 	if (!socket->SendExactHTTP(HTTP_MSG_NOSUCHFILE, strlen(HTTP_MSG_NOSUCHFILE)))
 		return;
 }
-#ifdef HTTP_SAMEPORT
-char *vncHTTPConnectThreadHelper::ReadLine(VSocket *socket, char delimiter)
-#else
+
 char *vncHTTPConnectThread::ReadLine(VSocket *socket, char delimiter)
-#endif
+
 {
 	int max=1024;
 	// Allocate the maximum required buffer

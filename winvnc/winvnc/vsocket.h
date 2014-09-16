@@ -144,11 +144,9 @@ public:
   VBool Http_CreateConnect(const VString address);
   SOCKET GetChannel() const { return (SOCKET) sock; }
   // I/O routines
-#ifdef HTTP_SAMEPORT
   // Check to see if the socket becomes readable within <to> msec.
   // Added to support HTTP-via-RFB.
   VBool ReadSelect(VCard to);
-#endif
 
   // Send and Read return the number of bytes sent or recieved.
   VInt Send(const char *buff, const VCard bufflen);

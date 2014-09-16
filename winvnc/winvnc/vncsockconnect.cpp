@@ -32,10 +32,8 @@
 #include "vncserver.h"
 #include <omnithread.h>
 
-#ifdef HTTP_SAMEPORT
-// Added for HTTP-via-RFB
+
 VBool maybeHandleHTTPRequest(VSocket* sock,vncServer* svr);
-#endif
 
 // The function for the spawned thread to run
 class vncSockConnectThread : public omni_thread
@@ -83,14 +81,16 @@ void *vncSockConnectThread::run_undetached(void * arg)
 			break;
 		else
 		{
-#ifdef HTTP_SAMEPORT
-		if (maybeHandleHTTPRequest(new_socket,m_server)) {
- 			// HTTP request has been handled and new_socket closed. The client will
- 			// now reconnect to the RFB port and we will carry on.
- 			vnclog.Print(LL_CLIENTS,VNCLOG("Woo hoo! Served Java applet via RFB!"));
- 			continue;
- 		}
-#endif
+			if( m_server->GetHttpPort()== m_server->GetPort())
+			{
+				if (maybeHandleHTTPRequest(new_socket,m_server)) {
+ 					// HTTP request has been handled and new_socket closed. The client will
+ 					// now reconnect to the RFB port and we will carry on.
+ 					vnclog.Print(LL_CLIENTS,VNCLOG("Woo hoo! Served Java applet via RFB!"));
+ 					continue;
+ 				}
+			}
+
 			vnclog.Print(LL_CLIENTS, VNCLOG("accepted connection from %s\n"), new_socket->GetPeerName());
 			if (!m_shutdown && !fShutdownOrdered) m_server->AddClient(new_socket, FALSE, FALSE,NULL);
 		}
@@ -100,62 +100,7 @@ void *vncSockConnectThread::run_undetached(void * arg)
 			delete new_socket;
 			break;
 		}
-
-		// sf@2007 - The following had be done to avoid to spawn a new client object/thread
-		// when the connection was not from a vncviewer or had bad RFB protocole version
-		// but it might be the cause of the v1.0.2 WinVNC connection unavailability/crash problems
-		// due to thread conflict at socket level (between this thread and vncClient thread)
-		/*
-		if (m_server->GetDSMPluginPointer()->IsEnabled())
-		{
-		m_server->AddClient(new_socket, FALSE, FALSE,NULL);
-		}
-		else
-		{
-		///////////////Eliminate polling and non vncviewers ////////////////
-		///////////////Unfindable memeory leak ?////////////////////////////
-		////////////////////////////////////////////////////////////////////
-#ifdef HTTP_SAMEPORT
-		if (maybeHandleHTTPRequest(new_socket,m_server)) {
- 			// HTTP request has been handled and new_socket closed. The client will
- 			// now reconnect to the RFB port and we will carry on.
- 			vnclog.Print(LL_CLIENTS,VNCLOG("Woo hoo! Served Java applet via RFB!"));
- 			continue;
- 		}
-#endif
-		rfbProtocolVersionMsg protocolMsg;
-		sprintf((char *)protocolMsg,
-		rfbProtocolVersionFormat,
-		rfbProtocolMajorVersion,
-		rfbProtocolMinorVersion + (m_server->MSLogonRequired() ? 0 : 2)); // 4: mslogon+FT,
-																		 // 6: VNClogon+FT
-		// Send the protocol message
-		if (new_socket->SendExact((char *)&protocolMsg, sz_rfbProtocolVersionMsg))
-			{
-				// Now, get the client's protocol version
-				rfbProtocolVersionMsg protocol_ver;
-				protocol_ver[12] = 0;
-				if (new_socket->ReadExact((char *)&protocol_ver, sz_rfbProtocolVersionMsg))
-				{
-					///////////////////////////////////////////////////////////////////
-					///////////////////////////////////////////////////////////////////
-					//We need at least a RFB start in the message
-					if (strncmp(protocol_ver,"RFB",3)==NULL)
-					{
-						vnclog.Print(LL_CLIENTS, VNCLOG("accepted connection from %s\n"), new_socket->GetPeerName());
-						// Successful accept - start the client unauthenticated
-						m_server->AddClient(new_socket, FALSE, FALSE,&protocol_ver);
-					}
-					else
-					{
-						delete new_socket;
-					}
-				}
-				else delete new_socket;
-			}
-		else delete new_socket;
-		}
-		*/
+		
 	}
 	//if (new_socket != null)
 	//	delete new_socket;
