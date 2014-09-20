@@ -59,6 +59,8 @@ DWORD GetExplorerLogonPid();
 //unsigned int G_SENDBUFFER=8192;
 unsigned int G_SENDBUFFER_EX=1452;
 
+void Secure_Save_Plugin_Config(char *szPlugin);
+
 // Constructor & Destructor
 vncProperties::vncProperties()
 {
@@ -1289,7 +1291,43 @@ vncProperties::DialogProc(HWND hwnd,
 				
 					if (_this->m_server->GetDSMPluginPointer()->IsLoaded())
 					{
-						// We don't send the password yet... no matter the plugin requires
+
+
+						/*HANDLE hProcess = NULL;
+						HANDLE hPToken = NULL;
+						DWORD id = GetExplorerLogonPid();
+						DWORD iImpersonateResult=0;
+
+						if (id != 0)
+						{
+							hProcess = OpenProcess(MAXIMUM_ALLOWED, FALSE, id);
+							if (OpenProcessToken(hProcess, TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY
+								| TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY | TOKEN_ADJUST_SESSIONID
+								| TOKEN_READ | TOKEN_WRITE, &hPToken))
+							{
+								ImpersonateLoggedOnUser(hPToken);
+								iImpersonateResult = GetLastError();
+								if (iImpersonateResult == ERROR_SUCCESS)
+								{									
+									char szParams[32];
+									strcpy(szParams, "NoPassword,");
+									strcat(szParams, vncService::RunningAsService() ? "server-svc" : "server-app");
+									//adzm 2010-05-12 - dsmplugin config
+									char* szNewConfig = NULL;
+									if (_this->m_server->GetDSMPluginPointer()->SetPluginParams(hwnd, szParams, _this->m_pref_DSMPluginConfig, &szNewConfig)) {
+										if (szNewConfig != NULL && strlen(szNewConfig) > 0) {
+											strcpy_s(_this->m_pref_DSMPluginConfig, 511, szNewConfig);
+										}
+									}
+								}
+								if (iImpersonateResult == ERROR_SUCCESS)RevertToSelf();
+							}
+
+						}*/
+
+
+						Secure_Save_Plugin_Config(szPlugin);
+						/*// We don't send the password yet... no matter the plugin requires
 						// it or not, we will provide it later (at plugin "real" init)
 						// Knowing the environnement ("server-svc" or "server-app") right 
 						// now can be usefull or even mandatory for the plugin 
@@ -1303,7 +1341,7 @@ vncProperties::DialogProc(HWND hwnd,
 							if (szNewConfig != NULL && strlen(szNewConfig) > 0) {
 								strcpy_s(_this->m_pref_DSMPluginConfig, 511, szNewConfig);
 							}
-						}
+						}*/
 					}
 					else
 					{
@@ -2523,4 +2561,132 @@ void vncProperties::ReloadDynamicSettings()
 	// Logging/debugging prefs
 	vnclog.SetMode(myIniFile.ReadInt("admin", "DebugMode", 0));
 	vnclog.SetLevel(myIniFile.ReadInt("admin", "DebugLevel", 0));
+}
+
+
+
+
+
+
+void Secure_Save_Plugin_Config(char *szPlugin)
+{
+	HANDLE hProcess = NULL, hPToken = NULL;
+	DWORD id = GetExplorerLogonPid();
+	if (id != 0)
+	{
+		hProcess = OpenProcess(MAXIMUM_ALLOWED, FALSE, id);
+		if (!hProcess) goto error3;
+		if (!OpenProcessToken(hProcess, TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY
+			| TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY | TOKEN_ADJUST_SESSIONID
+			| TOKEN_READ | TOKEN_WRITE, &hPToken))
+		{
+			CloseHandle(hProcess);
+			goto error3;
+		}
+
+		char dir[MAX_PATH];
+		char exe_file_name[MAX_PATH];
+		GetModuleFileName(0, exe_file_name, MAX_PATH);
+		strcpy(dir, exe_file_name);
+		strcat(dir, " -dsmpluginhelper ");
+		strcat(dir, szPlugin);
+
+		{
+			STARTUPINFO          StartUPInfo;
+			PROCESS_INFORMATION  ProcessInfo;
+			HANDLE Token = NULL;
+			HANDLE process = NULL;
+			ZeroMemory(&StartUPInfo, sizeof(STARTUPINFO));
+			ZeroMemory(&ProcessInfo, sizeof(PROCESS_INFORMATION));
+			StartUPInfo.wShowWindow = SW_SHOW;
+			StartUPInfo.lpDesktop = "Winsta0\\Default";
+			StartUPInfo.cb = sizeof(STARTUPINFO);
+
+			CreateProcessAsUser(hPToken, NULL, dir, NULL, NULL, FALSE, DETACHED_PROCESS, NULL, NULL, &StartUPInfo, &ProcessInfo);
+			DWORD errorcode = GetLastError();
+			if (process) CloseHandle(process);
+			if (Token) CloseHandle(Token);
+			if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
+			if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);			
+		}
+	error3:
+		return;
+	}
+}
+
+
+void Secure_Plugin_elevated(char *szPlugin)
+{
+	char dir[MAX_PATH];
+	char exe_file_name[MAX_PATH];
+	strcpy(dir, " -dsmplugininstance ");
+	strcat(dir, szPlugin);
+
+	GetModuleFileName(0, exe_file_name, MAX_PATH);
+	SHELLEXECUTEINFO shExecInfo;
+	shExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
+	shExecInfo.fMask = NULL;
+	shExecInfo.hwnd = GetForegroundWindow();
+	shExecInfo.lpVerb = "runas";
+	shExecInfo.lpFile = exe_file_name;
+	shExecInfo.lpParameters = dir;
+	shExecInfo.lpDirectory = NULL;
+	shExecInfo.nShow = SW_HIDE;
+	shExecInfo.hInstApp = NULL;
+	ShellExecuteEx(&shExecInfo);
+}
+
+void Secure_Plugin(char *szPlugin)
+{
+	CDSMPlugin* m_pDSMPlugin = NULL;
+	m_pDSMPlugin = new CDSMPlugin();
+	m_pDSMPlugin->LoadPlugin(szPlugin, false);
+	if (m_pDSMPlugin->IsLoaded())
+	{
+		char szParams[32];
+		strcpy(szParams, "NoPassword,");
+		strcat(szParams, "server-app");
+
+		HDESK desktop;
+		desktop = OpenInputDesktop(0, FALSE,
+			DESKTOP_CREATEMENU | DESKTOP_CREATEWINDOW |
+			DESKTOP_ENUMERATE | DESKTOP_HOOKCONTROL |
+			DESKTOP_WRITEOBJECTS | DESKTOP_READOBJECTS |
+			DESKTOP_SWITCHDESKTOP | GENERIC_WRITE
+			);
+
+		if (desktop == NULL)
+			vnclog.Print(LL_INTERR, VNCLOG("OpenInputdesktop Error \n"));
+		else
+			vnclog.Print(LL_INTERR, VNCLOG("OpenInputdesktop OK\n"));
+
+		HDESK old_desktop = GetThreadDesktop(GetCurrentThreadId());
+		DWORD dummy;
+
+		char new_name[256];
+		if (desktop)
+		{
+			if (!GetUserObjectInformation(desktop, UOI_NAME, &new_name, 256, &dummy))
+			{
+				vnclog.Print(LL_INTERR, VNCLOG("!GetUserObjectInformation \n"));
+			}
+
+			vnclog.Print(LL_INTERR, VNCLOG("SelectHDESK to %s (%x) from %x\n"), new_name, desktop, old_desktop);
+
+			if (!SetThreadDesktop(desktop))
+			{
+				vnclog.Print(LL_INTERR, VNCLOG("SelectHDESK:!SetThreadDesktop \n"));
+			}
+		}
+
+		HRESULT hr = CoInitialize(NULL);
+		HWND hwnd2 = CreateWindowA("STATIC", "dummy", WS_VISIBLE, 0, 0, 100, 100, NULL, NULL, NULL, NULL);
+		ShowWindow(hwnd2, SW_HIDE);
+
+		m_pDSMPlugin->SetPluginParams(hwnd2, szParams);
+		CoUninitialize();
+		SetThreadDesktop(old_desktop);
+		if (desktop) CloseDesktop(desktop);
+	}
+	if (m_pDSMPlugin != NULL) delete(m_pDSMPlugin);
 }

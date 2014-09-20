@@ -1395,6 +1395,9 @@ copy "$(LocalDebuggerCommand)" ..\..\..\..\..\installer64</Command>
     <None Include="VTune\winvnc.vpj" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\avilog\avilog\avilog.vcxproj">
+      <Project>{cd0d6ec9-d652-4d1b-b23b-18e1ac3aa683}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\libjpeg-turbo-win\libjpeg-turbo-win.vcxproj">
       <Project>{04f91fa4-2d94-4803-ba3b-b61fbef0abe3}</Project>
     </ProjectReference>

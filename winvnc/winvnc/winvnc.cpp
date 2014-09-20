@@ -121,6 +121,9 @@ void Reboot_with_force_reboot_elevated();
 void Reboot_with_force_reboot();
 void Shellexecuteforuiaccess();
 
+void Secure_Plugin_elevated(char *szPlugin);
+void Secure_Plugin(char *szPlugin);
+
 //HACK to use name in autoreconnect from service with dyn dns
 char dnsname[255];
 VNC_OSVersion VNCOS;
@@ -437,6 +440,25 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 			Real_settings(mycommand);
 			return 0;
 		}
+		
+		if (strncmp(&szCmdLine[i], dsmpluginhelper, strlen(dsmpluginhelper)) == 0)
+		{
+			char mycommand[MAX_PATH];
+			i += strlen(dsmpluginhelper);
+			strcpy(mycommand, &(szCmdLine[i + 1]));
+			Secure_Plugin_elevated(mycommand);
+			return 0;
+		}
+
+		if (strncmp(&szCmdLine[i], dsmplugininstance, strlen(dsmplugininstance)) == 0)
+		{
+			char mycommand[MAX_PATH];
+			i += strlen(dsmplugininstance);
+			strcpy(mycommand, &(szCmdLine[i + 1]));
+			Secure_Plugin(mycommand);
+			return 0;
+		}
+
 
 		if (strncmp(&szCmdLine[i], winvncSoftwarecad, strlen(winvncSoftwarecad)) == 0)
 		{
