@@ -456,7 +456,8 @@ vncClientUpdateThread::EnableUpdates(BOOL enable)
 	m_signal->signal();
 	//unsigned long now_sec, now_nsec;
     //get_time_now(&now_sec, &now_nsec);
-	if (enable) m_sync_sig->wait();
+	//if (enable) 
+		m_sync_sig->wait();
 	/*if  (m_sync_sig->timedwait(now_sec+1,0)==0)
 		{
 //			m_signal->signal();
@@ -2470,6 +2471,7 @@ vncClientThread::run(void *arg)
 
 		case rfbSetPixelFormat:
 			// Read the rest of the message:
+			vnclog.Print(LL_CONNERR, VNCLOG("remote pixel format\n"));
 			if (!m_socket->ReadExact(((char *) &msg)+nTO, sz_rfbSetPixelFormatMsg-nTO))
 			{
 				connected = FALSE;
