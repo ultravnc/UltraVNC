@@ -60,6 +60,8 @@ DWORD GetExplorerLogonPid();
 unsigned int G_SENDBUFFER_EX=1452;
 
 void Secure_Save_Plugin_Config(char *szPlugin);
+void Secure_Plugin_elevated(char *szPlugin);
+void Secure_Plugin(char *szPlugin);
 
 // Constructor & Destructor
 vncProperties::vncProperties()
@@ -1325,7 +1327,7 @@ vncProperties::DialogProc(HWND hwnd,
 
 						}*/
 
-
+						//Secure_Plugin(szPlugin);
 						Secure_Save_Plugin_Config(szPlugin);
 						/*// We don't send the password yet... no matter the plugin requires
 						// it or not, we will provide it later (at plugin "real" init)
@@ -2494,7 +2496,7 @@ void vncProperties::SaveUserPrefsToIniFile()
 	myIniFile.WriteString("admin", "DSMPlugin",m_server->GetDSMPluginName());
 
 	//adzm 2010-05-12 - dsmplugin config
-	myIniFile.WriteString("admin", "DSMPluginConfig", m_server->GetDSMPluginConfig());
+	//myIniFile.WriteString("admin", "DSMPluginConfig", m_server->GetDSMPluginConfig());
 
 	myIniFile.WriteInt("admin", "primary", m_server->Primary());
 	myIniFile.WriteInt("admin", "secondary", m_server->Secondary());
@@ -2682,8 +2684,20 @@ void Secure_Plugin(char *szPlugin)
 		HRESULT hr = CoInitialize(NULL);
 		HWND hwnd2 = CreateWindowA("STATIC", "dummy", WS_VISIBLE, 0, 0, 100, 100, NULL, NULL, NULL, NULL);
 		ShowWindow(hwnd2, SW_HIDE);
+		char* szNewConfig = NULL;
+		char DSMPluginConfig[512];
+		DSMPluginConfig[0] = '\0';
+		IniFile myIniFile;
+		myIniFile.ReadString("admin", "DSMPluginConfig", DSMPluginConfig, 512);
+		m_pDSMPlugin->SetPluginParams(hwnd2, szParams, DSMPluginConfig, &szNewConfig);
 
-		m_pDSMPlugin->SetPluginParams(hwnd2, szParams);
+
+		if (szNewConfig != NULL && strlen(szNewConfig) > 0) {
+			strcpy_s(DSMPluginConfig, 511, szNewConfig);
+		}
+		myIniFile.WriteString("admin", "DSMPluginConfig", DSMPluginConfig);
+
+
 		CoUninitialize();
 		SetThreadDesktop(old_desktop);
 		if (desktop) CloseDesktop(desktop);
