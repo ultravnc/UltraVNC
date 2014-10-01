@@ -484,7 +484,18 @@ BOOL CALLBACK security(HWND hwnd, UINT uMsg,WPARAM wParam, LPARAM lParam)
 						char szParams[32];
 						strcpy(szParams, "NoPassword,");
 						strcat(szParams, "server-app");
-						GetDSMPluginPointer()->SetPluginParams(hwnd, szParams);
+						char* szNewConfig = NULL;
+						char DSMPluginConfig[512];
+						DSMPluginConfig[0] = '\0';
+						IniFile myIniFile;
+						myIniFile.ReadString("admin", "DSMPluginConfig", DSMPluginConfig, 512);
+
+						GetDSMPluginPointer()->SetPluginParams(hwnd, szParams,DSMPluginConfig, &szNewConfig);
+
+						if (szNewConfig != NULL && strlen(szNewConfig) > 0) {
+							strcpy_s(DSMPluginConfig, 511, szNewConfig);
+						}
+						myIniFile.WriteString("admin", "DSMPluginConfig", DSMPluginConfig);
 					}
 					/*else
 					{
