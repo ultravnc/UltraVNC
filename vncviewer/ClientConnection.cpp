@@ -4684,6 +4684,7 @@ void ClientConnection::Internal_SendFullFramebufferUpdateRequest()
 					m_si.framebufferHeight, false);
 }
 
+static int dormant_keepalive_counter = 0;
 void ClientConnection::Internal_SendAppropriateFramebufferUpdateRequest()
 {
 	if (m_pendingFormatChange)
@@ -4744,6 +4745,16 @@ void ClientConnection::Internal_SendAppropriateFramebufferUpdateRequest()
 	{
 		if (!m_dormant)
 			Internal_SendIncrementalFramebufferUpdateRequest();
+		else
+		{
+			dormant_keepalive_counter++;
+			if (dormant_keepalive_counter > 3)
+			{
+				dormant_keepalive_counter = 0;
+				Internal_SendIncrementalFramebufferUpdateRequest();
+			}
+
+		}
 	}
 }
 
