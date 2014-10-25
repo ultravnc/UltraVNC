@@ -115,7 +115,7 @@ void keybd_uni_event(_In_  BYTE bVk,_In_  BYTE bScan,_In_  DWORD dwFlags,_In_  U
 	bool rwindown = HIBYTE(::GetKeyState(VK_RWIN)) != 0;
 	// The shared memory trick to inject keys seems to generate an overhead when fast key presses are done.
 	// Actual we only need it for special keys, so we better ctivate the check
-	 if (keyEventFn==NULL || !VNCOS.OS_WIN8 || (!ldown && !rdown && !lcdown && !rcdown && !lwindown && !rwindown) )
+	 if (keyEventFn==NULL || !VNCOS.OS_WIN8 || (!ldown && !lcdown && !lwindown) )
 	 {
 		 keybd_event(bVk,bScan,dwFlags,dwExtraInfo);
 	 }

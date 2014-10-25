@@ -3395,7 +3395,7 @@ vncClientThread::run(void *arg)
 						m_client->m_hSrcFile = CreateFile(
 															m_client->m_szSrcFileName,		
 															GENERIC_READ,		
-															FILE_SHARE_READ,	
+															FILE_SHARE_READ | FILE_SHARE_WRITE,
 															NULL,				
 															OPEN_EXISTING,		
 															FILE_FLAG_SEQUENTIAL_SCAN,	
