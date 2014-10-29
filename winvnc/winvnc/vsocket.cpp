@@ -832,11 +832,24 @@ VInt
 VSocket::Read(char *buff, const VCard bufflen)
 {
 	if (sock==-1) return sock;
-    int s = recv(sock, buff, bufflen, 0);
+	int counter = 0;
+	int s = 0;
+	while (counter < 2)
+	{
+		s = recv(sock, buff, bufflen, 0);
+		//POssible the network is just sloow...retry a few times before closing connection
+		if (s == SOCKET_ERROR && WSAGetLastError() == WSAETIMEDOUT)
+		{
+			counter++;
+			Sleep(1000);
+		}
+		else counter = 4;
+	}
+
 #if defined(_DEBUG)
     if (s == SOCKET_ERROR)
     {
-        OutputDebugString("recv: SOCKET_ERROR");
+		OutputDebugString("recv: SOCKET_ERROR");
     }
 
     if (s == 0)

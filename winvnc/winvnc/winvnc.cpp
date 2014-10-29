@@ -974,6 +974,18 @@ DWORD WINAPI imp_desktop_thread(LPVOID lpParam)
 			Runonce=true;
 			if (menu) menu->Shutdown(true);
 		}
+
+		if (hShutdownEvent)
+		{
+			// vnclog.Print(LL_INTERR, VNCLOG("****************** SDTimer tic\n"));
+			DWORD result = WaitForSingleObject(hShutdownEvent, 1);
+			if (WAIT_OBJECT_0 == result)
+			{
+				ResetEvent(hShutdownEvent);
+				fShutdownOrdered = true;
+				vnclog.Print(LL_INTERR, VNCLOG("****************** WaitForSingleObject - Shutdown server\n"));
+			}
+		}
 	}
 
 	// sf@2007 - Close all (vncMenu,tray icon, connections...)
@@ -988,6 +1000,7 @@ DWORD WINAPI imp_desktop_thread(LPVOID lpParam)
 	return 0;
 }
 
+/*
 // sf@2007 - For now we use a mmtimer to test the shutdown event periodically
 // Maybe there's a less rude method...
 void CALLBACK fpTimer(UINT uID, UINT uMsg, DWORD dwUser, DWORD dw1, DWORD dw2)
@@ -1017,7 +1030,7 @@ void KillSDTimer()
 	vnclog.Print(LL_INTERR, VNCLOG("****************** Kill SDTimer\n"));
 	timeKillEvent(mmRes);
 	mmRes = -1;
-}
+}*/
 
 // This is the main routine for WinVNC when running as an application
 // (under Windows 95 or Windows NT)
@@ -1066,7 +1079,7 @@ int WinVNCAppMain()
 	vnclog.Print(LL_STATE, VNCLOG("***************** SDEvent created \n"));
 	// Create the timer that looks periodicaly for shutdown event
 	mmRes = -1;
-	InitSDTimer();
+	//InitSDTimer();
 
 	while ( !fShutdownOrdered)
 	{
@@ -1084,7 +1097,7 @@ int WinVNCAppMain()
 		vnclog.Print(LL_STATE, VNCLOG("################## Closing Imp Thread\n"));
 	}
 
-	KillSDTimer();
+	//KillSDTimer();
 	if (instancehan!=NULL)
 		delete instancehan;
 
