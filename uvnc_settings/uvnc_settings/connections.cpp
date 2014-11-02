@@ -9,6 +9,9 @@ extern LONG ConnectPriority;
 extern LONG QueryAccept;
 extern LONG LockSettings;
 extern LONG IdleTimeout;
+extern char accept_reject_mesg[512];
+extern LONG keepAliveInterval;
+extern LONG socketKeepAliveTimeout;
 
 bool initdone4=false;
 BOOL CALLBACK DlgProcCON(HWND hwnd, UINT uMsg,
@@ -27,11 +30,15 @@ BOOL CALLBACK DlgProcCON(HWND hwnd, UINT uMsg,
 			EnableWindow(GetDlgItem(hwnd, IDC_DACCEPT), queryEnabled);
 			EnableWindow(GetDlgItem(hwnd, IDC_QNOLOGON), queryEnabled);
 			EnableWindow(GetDlgItem(hwnd, IDC_AUTHHOST), queryEnabled);
+			EnableWindow(GetDlgItem(hwnd, IDC_QMESG), queryEnabled);
 
 			SendMessage(GetDlgItem(hwnd, IDC_QNOLOGON), BM_SETCHECK, QueryIfNoLogon, 0);
 			SetDlgItemInt(hwnd,IDQUERYTIMEOUT, QueryTimeout, FALSE);
 			SetDlgItemInt(hwnd,IDC_IDLETIME, IdleTimeout, FALSE);
+			SetDlgItemInt(hwnd,IDC_KINTERVAL, keepAliveInterval, FALSE);
+			SetDlgItemInt(hwnd,IDC_SOCKETTIMEOUT, socketKeepAliveTimeout, FALSE);
 			SetDlgItemText(hwnd,IDC_AUTHHOST,authhosts);
+			SetDlgItemText(hwnd,IDC_QMESG,accept_reject_mesg);
 
 			HWND hQuerySetting;
 			switch (QueryAccept) {
@@ -109,6 +116,7 @@ BOOL CALLBACK DlgProcCON(HWND hwnd, UINT uMsg,
 			EnableWindow(GetDlgItem(hwnd, IDC_DACCEPT), queryEnabled);
 			EnableWindow(GetDlgItem(hwnd, IDC_QNOLOGON), queryEnabled);
 			EnableWindow(GetDlgItem(hwnd, IDC_AUTHHOST), queryEnabled);
+			EnableWindow(GetDlgItem(hwnd, IDC_QMESG), queryEnabled);
 			}
 			break;
 		case IDOK:	
@@ -117,6 +125,7 @@ BOOL CALLBACK DlgProcCON(HWND hwnd, UINT uMsg,
 			QueryTimeout=GetDlgItemInt(hwnd, IDQUERYTIMEOUT, &ok1, TRUE);
 			QueryIfNoLogon=SendDlgItemMessage(hwnd, IDC_QNOLOGON, BM_GETCHECK, 0, 0);
 			GetDlgItemText(hwnd, IDC_AUTHHOST, authhosts, 150);
+			GetDlgItemText(hwnd, IDC_QMESG, accept_reject_mesg, 512);
 
 			if (SendMessage(GetDlgItem(hwnd, IDC_LOCKSETTING_LOCK), BM_GETCHECK, 0, 0)
 					== BST_CHECKED) {
@@ -155,6 +164,9 @@ BOOL CALLBACK DlgProcCON(HWND hwnd, UINT uMsg,
 					ConnectPriority=3;
 				} 
 			IdleTimeout=GetDlgItemInt(hwnd, IDC_IDLETIME, &ok1, TRUE);
+			keepAliveInterval=GetDlgItemInt(hwnd, IDC_KINTERVAL, &ok1, TRUE);
+			socketKeepAliveTimeout=GetDlgItemInt(hwnd, IDC_SOCKETTIMEOUT, &ok1, TRUE);
+
 			}
 			break;
 		case IDCANCEL:

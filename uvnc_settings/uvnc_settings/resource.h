@@ -85,6 +85,7 @@
 #define IDC_INFO                        1070
 #define IDC_WARN                        1071
 #define IDC_CHECK1                      1072
+#define IDC_MAXCPU                      1072
 #define IDC_DISINI                      1073
 #define IDC_CHECKUSEENCRYPTION          1074
 #define IDC_ALLOWEDIT                   1075
@@ -96,6 +97,7 @@
 #define IDC_KICKRDP                     1081
 #define IDC_EDIT1                       1082
 #define IDC_SFXPASSWD                   1082
+#define IDC_QMESG                       1082
 #define IDC_SCL                         1083
 #define IDC_EDITOUTSERV                 1084
 #define IDC_EDITNAME                    1085
@@ -121,6 +123,7 @@
 #define IDC_BACK                        1105
 #define IDC_MANUAL                      1106
 #define IDC_EDIT2                       1107
+#define IDC_SOCKETTIMEOUT               1107
 #define IDC_LOCALIP                     1108
 #define IDC_REMOTEIP                    1109
 #define IDC_EDITVPORT                   1110
@@ -128,6 +131,7 @@
 #define IDC_PRIM                        1111
 #define IDC_SEC                         1112
 #define IDC_RADIO1                      1113
+#define IDC_KINTERVAL                   1114
 #define IDD_PARENT                      1200
 #define IDC_CONNECT_SOCK                1201
 #define IDD_OPTION2                     1202
@@ -152,7 +156,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        134
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1114
+#define _APS_NEXT_CONTROL_VALUE         1115
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif

@@ -125,7 +125,7 @@ END
 IDD_PARENT DIALOGEX 0, 0, 277, 231
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION
 EXSTYLE WS_EX_CONTEXTHELP | WS_EX_CONTROLPARENT
-CAPTION "UltraVNC settings"
+CAPTION "UltraVNC settings 1204"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     PUSHBUTTON      "&OK",IDOK,140,210,75,14
@@ -190,24 +190,29 @@ BEGIN
     CONTROL         "Do Nothing",IDC_LOCKSETTING_NOTHING,"Button",BS_AUTORADIOBUTTON | WS_GROUP,22,152,51,10
     CONTROL         "Lock Workstation",IDC_LOCKSETTING_LOCK,"Button",BS_AUTORADIOBUTTON,81,152,71,10
     CONTROL         "Logoff Workstation",IDC_LOCKSETTING_LOGOFF,"Button",BS_AUTORADIOBUTTON,160,152,77,10
-    CONTROL         "Display Query Window",IDQUERY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,42,88,10
+    CONTROL         "Display Query Window",IDQUERY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,41,88,10
     CONTROL         "Disconnect all existing connections",IDC_MV1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,13,111,126,10
     CONTROL         "Keep existing connections",IDC_MV2,"Button",BS_AUTORADIOBUTTON,13,124,99,10
     CONTROL         "Refuse the new connection",IDC_MV3,"Button",BS_AUTORADIOBUTTON,141,111,103,10
     CONTROL         "Refuse all new connections",IDC_MV4,"Button",BS_AUTORADIOBUTTON,141,124,103,10
-    LTEXT           "Timeout: ",IDC_STATIC,132,43,31,8
-    EDITTEXT        IDQUERYTIMEOUT,167,40,22,14,ES_AUTOHSCROLL
-    LTEXT           "Seconds",IDC_STATIC,198,43,28,8
+    LTEXT           "Timeout: ",IDC_STATIC,181,41,31,8
+    EDITTEXT        IDQUERYTIMEOUT,215,41,14,14,ES_AUTOHSCROLL
+    LTEXT           "s",IDC_STATIC,237,41,8,8
     LTEXT           "Default action: ",IDC_STATIC,16,58,50,8
     CONTROL         "Refuse",IDC_DREFUSE,"Button",BS_AUTORADIOBUTTON,67,55,39,10
     CONTROL         "Accept",IDC_DACCEPT,"Button",BS_AUTORADIOBUTTON,117,55,38,10
     CONTROL         "Refuse (allow locked)",IDC_DRefuseOnly,"Button",BS_AUTORADIOBUTTON,166,55,84,10
     EDITTEXT        IDC_AUTHHOST,60,67,188,14,ES_AUTOHSCROLL
     LTEXT           "AuthHosts:",IDC_STATIC,15,70,37,8
-    CONTROL         "Query If No Logon",IDC_QNOLOGON,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,86,71,10
-    LTEXT           "Idle Timeout",IDC_STATIC,15,17,40,8
-    EDITTEXT        IDC_IDLETIME,59,14,40,14,ES_AUTOHSCROLL
-    LTEXT           "Seconds",IDC_STATIC,104,17,28,8
+    CONTROL         "Query If No Logon",IDC_QNOLOGON,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,103,41,71,10
+    LTEXT           "Idle Timeout:",IDC_STATIC,9,17,43,8
+    EDITTEXT        IDC_IDLETIME,53,15,24,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_QMESG,61,83,185,14,ES_AUTOHSCROLL
+    LTEXT           "Query Msg:",IDC_STATIC,15,84,38,8
+    EDITTEXT        IDC_SOCKETTIMEOUT,136,14,24,14,ES_AUTOHSCROLL
+    LTEXT           "Socket Timeout:",IDC_STATIC,81,17,52,8
+    EDITTEXT        IDC_KINTERVAL,226,15,24,14,ES_AUTOHSCROLL
+    LTEXT           "Keepalive Interval:",IDC_STATIC,163,17,62,8
 END
 
 IDD_OPTION5 DIALOGEX 0, 0, 260, 180
@@ -231,6 +236,8 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,151,129,10
     CONTROL         "Show Primary Display",IDC_PRIM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,45,111,84,10
     CONTROL         "Show Secondary Display",IDC_SEC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,139,111,94,10
+    EDITTEXT        IDC_MAXCPU,49,124,40,14,ES_AUTOHSCROLL
+    LTEXT           "Max Cpu:",IDC_STATIC,15,127,32,8
 END
 
 IDD_OPTION7 DIALOGEX 0, 0, 260, 180
@@ -373,6 +380,10 @@ BEGIN
         BOTTOMMARGIN, 171
     END
 
+    IDD_PARENT, DIALOG
+    BEGIN
+    END
+
     IDD_OPTION2, DIALOG
     BEGIN
         BOTTOMMARGIN, 171
@@ -448,8 +459,8 @@ IDI_ICON1               ICON                    "settings.ico"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,1
- PRODUCTVERSION 1,0,0,1
+ FILEVERSION 1,2,0,4
+ PRODUCTVERSION 1,2,0,4
  FILEFLAGSMASK 0x17L
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -467,12 +478,12 @@ BEGIN
             VALUE "Comments", "Standalone UltraVNC.ini editor"
             VALUE "CompanyName", "uvnc bvba"
             VALUE "FileDescription", "uvnc_set Application"
-            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "FileVersion", "1.2.0.4"
             VALUE "InternalName", "uvnc_set"
             VALUE "LegalCopyright", "Copyright (C) 2010"
             VALUE "OriginalFilename", "uvnc_set.exe"
             VALUE "ProductName", "uvnc_set Application"
-            VALUE "ProductVersion", "1, 0, 0, 1"
+            VALUE "ProductVersion", "1.2.0.4"
         END
     END
     BLOCK "VarFileInfo"

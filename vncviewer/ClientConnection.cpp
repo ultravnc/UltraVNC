@@ -4748,7 +4748,7 @@ void ClientConnection::Internal_SendAppropriateFramebufferUpdateRequest()
 		else
 		{
 			dormant_keepalive_counter++;
-			if (dormant_keepalive_counter > 10)
+			if (dormant_keepalive_counter > 20)
 			{
 				dormant_keepalive_counter = 0;
 				Internal_SendIncrementalFramebufferUpdateRequest();
