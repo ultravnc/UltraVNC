@@ -459,8 +459,8 @@ IDI_ICON1               ICON                    "settings.ico"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,2,0,4
- PRODUCTVERSION 1,2,0,4
+ FILEVERSION 1,2,0,5
+ PRODUCTVERSION 1,2,0,5
  FILEFLAGSMASK 0x17L
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -478,12 +478,12 @@ BEGIN
             VALUE "Comments", "Standalone UltraVNC.ini editor"
             VALUE "CompanyName", "uvnc bvba"
             VALUE "FileDescription", "uvnc_set Application"
-            VALUE "FileVersion", "1.2.0.4"
+            VALUE "FileVersion", "1.2.0.5"
             VALUE "InternalName", "uvnc_set"
             VALUE "LegalCopyright", "Copyright (C) 2010"
             VALUE "OriginalFilename", "uvnc_set.exe"
             VALUE "ProductName", "uvnc_set Application"
-            VALUE "ProductVersion", "1.2.0.4"
+            VALUE "ProductVersion", "1.2.0.5"
         END
     END
     BLOCK "VarFileInfo"

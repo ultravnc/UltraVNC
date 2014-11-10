@@ -2337,6 +2337,7 @@ vncClientThread::run(void *arg)
 	BOOL need_to_disable_input = m_server->LocalInputsDisabled();
     bool need_to_clear_keyboard = true;
     bool need_first_keepalive = false;
+	bool need_first_idletime = false;
 	bool firstrun=true;
     bool need_ft_version_msg =  false;
 	// adzm - 2010-07 - Extended clipboard
@@ -2387,6 +2388,14 @@ vncClientThread::run(void *arg)
             m_client->SendKeepAlive();
             need_first_keepalive = false;
         }
+
+		if (need_first_idletime)
+		{
+			// send first keepalive to let the client know we accepted the encoding request
+			m_client->SendServerStateUpdate(rfbIdleInterval, m_server->GetIdleInterval());
+			need_first_idletime = false;
+		}
+
 		if (m_client->m_want_update_state && m_client->m_Support_rfbSetServerInput)
 		{
 			m_client->m_want_update_state=false;
@@ -2659,6 +2668,12 @@ vncClientThread::run(void *arg)
 						vnclog.Print(LL_INTINFO, VNCLOG("KeepAlive protocol extension enabled\n"));
                         continue;
 					}
+					
+					if (Swap32IfLE(encoding) == rfbEncodingEnableIdleTime) {
+						need_first_idletime = true;
+						vnclog.Print(LL_INTINFO, VNCLOG("IdleTime protocol extension enabled\n"));
+						continue;
+						}
 
 					if (Swap32IfLE(encoding) == rfbEncodingFTProtocolVersion) {
                         need_ft_version_msg = true;

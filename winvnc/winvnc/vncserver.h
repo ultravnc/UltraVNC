@@ -426,6 +426,9 @@ public:
     void NotifyClients_StateChange(CARD32 state, CARD32 value);
     int  GetFTTimeout() { return m_ftTimeout; }
     int  GetKeepAliveInterval () { return m_keepAliveInterval; }
+	int  GetIdleInterval() { return m_IdleInterval; }
+	void SetIdleInterval(int secs) { m_IdleInterval = secs; }
+
     void SetFTTimeout(int msecs);
     void EnableKeepAlives(bool newstate) { m_fEnableKeepAlive = newstate; }
     bool DoKeepAlives() { return m_fEnableKeepAlive; }
@@ -434,6 +437,7 @@ public:
     if (m_keepAliveInterval >= (m_ftTimeout - KEEPALIVE_HEADROOM))
         m_keepAliveInterval = m_ftTimeout  - KEEPALIVE_HEADROOM;
     }
+	
 
 	// adzm 2010-08
 	void SetSocketKeepAliveTimeout(int timeout)	{ m_socketKeepAliveTimeout = timeout > 0 ? timeout : 0; VSocket::SetSocketKeepAliveTimeoutDefault(m_socketKeepAliveTimeout); }
@@ -603,6 +607,7 @@ protected:
     bool m_fEnableKeepAlive;
     int m_ftTimeout;
     int m_keepAliveInterval;
+	int m_IdleInterval;
 	// adzm 2010-08
 	int m_socketKeepAliveTimeout;
 	bool clearconsole;

@@ -146,6 +146,7 @@ public:
 	bool m_fExitCheck; //PGM @ Advantig
     int m_FTTimeout;
     int m_keepAliveInterval;
+	int m_IdleInterval;
 	int m_socketKeepAliveTimeout; // adzm 2010-08
 
 	//adzm - 2009-06-21

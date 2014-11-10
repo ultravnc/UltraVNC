@@ -199,6 +199,7 @@ VNCOptions::VNCOptions()
 
   m_FTTimeout = FT_RECV_TIMEOUT;
   m_keepAliveInterval = KEEPALIVE_INTERVAL;
+  m_IdleInterval = 0;
   m_socketKeepAliveTimeout = SOCKET_KEEPALIVE_TIMEOUT; // adzm 2010-08
 
   m_throttleMouse = 0; // adzm 2010-10
@@ -360,6 +361,7 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
   m_fExitCheck    = s.m_fExitCheck; //PGM @ Advantig
   m_FTTimeout =  s.m_FTTimeout;
   m_keepAliveInterval = s.m_keepAliveInterval;
+  m_IdleInterval = s.m_IdleInterval;
   m_socketKeepAliveTimeout = s.m_socketKeepAliveTimeout; // adzm 2010-08
 
   m_throttleMouse = s.m_throttleMouse; // adzm 2010-10

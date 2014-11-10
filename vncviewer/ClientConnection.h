@@ -164,7 +164,7 @@ public:
     bool SetSendTimeout(int msecs = -1);
     bool SetRecvTimeout(int msecs = -1);
 
-	bool IsDormant(){ return m_dormant;};
+	int IsDormant(){ return m_dormant;};
 
 	void SendKeyEvent(CARD32 key, bool down);
 
@@ -649,8 +649,8 @@ private:
 
 	// Dormant basically means minimized; updates will not be requested 
 	// while dormant.
-	void SetDormant(bool newstate);
-	bool m_dormant;
+	void SetDormant(int newstate);
+	int m_dormant;
 
 	// The number of bytes required to hold at least one pixel.
 	unsigned int m_minPixelBytes;
@@ -750,6 +750,8 @@ private:
 
     bool m_server_wants_keepalives;
 	UINT m_keepalive_timer;
+	UINT m_idle_timer;
+	UINT m_idle_time;
 	ViewerDirectxClass directx_output;
 	bool directx_used;
 public:

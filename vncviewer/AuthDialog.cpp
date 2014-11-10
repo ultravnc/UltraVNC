@@ -48,8 +48,12 @@ AuthDialog::~AuthDialog()
 {
 }
 
-int AuthDialog::DoDialog(bool ms_logon, bool isSecure, bool warning)
+int AuthDialog::DoDialog(bool ms_logon, TCHAR IN_host[MAX_HOST_NAME_LEN], int IN_port, bool isSecure, bool warning)
 {
+	TCHAR tempchar[10];
+	strcpy_s(_host, IN_host);
+	strcat_s(_host, ":");
+	strcat_s(_host, itoa(IN_port, tempchar, 10));
 	if (isSecure) return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG), NULL, (DLGPROC) DlgProc, (LONG_PTR) this);
 	else if (ms_logon) return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG2), NULL, (DLGPROC) DlgProc, (LONG_PTR) this);
 	else if (warning) return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG1), NULL, (DLGPROC) DlgProc1, (LONG_PTR) this);
@@ -75,6 +79,11 @@ BOOL CALLBACK AuthDialog::DlgProc(  HWND hwnd,  UINT uMsg,
 
             Edit_LimitText(GetDlgItem(hwnd, IDC_PASSWD_EDIT), 32);
 			//CentreWindow(hwnd);
+			TCHAR tempchar[MAX_HOST_NAME_LEN];
+			GetWindowText(hwnd, tempchar, MAX_HOST_NAME_LEN);
+			strcat_s(tempchar, "   ");
+			strcat_s(tempchar, _this->_host);
+			SetWindowText(hwnd, tempchar);
 			SetForegroundWindow(hwnd);
 			return TRUE;
 		}
@@ -122,6 +131,11 @@ BOOL CALLBACK AuthDialog::DlgProc1(  HWND hwnd,  UINT uMsg,
 			//adzm 2010-05-12 - passphrase
 			Edit_LimitText(GetDlgItem(hwnd, IDC_PASSWD_EDIT), _this->m_bPassphraseMode ? 128 : 8);
 			//CentreWindow(hwnd);
+			TCHAR tempchar[MAX_HOST_NAME_LEN];
+			GetWindowText(hwnd, tempchar, MAX_HOST_NAME_LEN);
+			strcat_s(tempchar, "   ");
+			strcat_s(tempchar, _this->_host);
+			SetWindowText(hwnd, tempchar);
 			return TRUE;
 		}
 	case WM_COMMAND:

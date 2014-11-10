@@ -302,7 +302,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	// adzm - 2010-07 - Fix clipboard hangs
 	m_hwndNextViewer = (HWND)INVALID_HANDLE_VALUE;
 	m_pApp = pApp;
-	m_dormant = false;
+	m_dormant = 0;
 	m_hBitmapDC = NULL;
 	//m_hBitmap = NULL;
 	m_hPalette = NULL;
@@ -485,6 +485,8 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_hPopupMenuClipboardFormats = NULL;
 
 	m_keepalive_timer = 0;
+	m_idle_timer = 0;
+	m_idle_time = 5000;
 	m_emulate3ButtonsTimer = 0;
 	// adzm 2010-09
 	m_flushMouseMoveTimer = 0;
@@ -1573,7 +1575,7 @@ void ClientConnection::SetDSMPluginStuff()
 			if (strlen(m_clearPasswd) == 0) // Possibly set using -password command line
 			{
 				AuthDialog ad;
-				if (ad.DoDialog(false))
+				if (ad.DoDialog(false,m_host,m_port))
 				{
 					strncpy(m_clearPasswd, ad.m_passwd,254);
 				}
@@ -2595,7 +2597,7 @@ void ClientConnection::AuthSecureVNCPlugin()
 				}
 				else
 				{
-					if (ad.DoDialog(false))
+					if (ad.DoDialog(false,m_host,m_port))
 						{
 							strncpy(passwd, ad.m_passwd,254);
 							if (!bPassphraseRequired && strlen(passwd) > 8) {
@@ -2800,7 +2802,7 @@ void ClientConnection::AuthMsLogonII()
 	{
 	AuthDialog ad;
 	// adzm 2010-10 - RFB3.8 - the 'mslogon' param woudl always be true here
-	if (ad.DoDialog(true, true)) {
+	if (ad.DoDialog(true, m_host, m_port, true)) {
 #ifndef UNDER_CE
 		strncpy(passwd, ad.m_passwd, 64);
 		strncpy(user, ad.m_user, 254);
@@ -2884,7 +2886,7 @@ void ClientConnection::AuthMsLogonI()
 	{
 		AuthDialog ad;
 		///////////////ppppppppppppppppppppppppppppppppppppppppp // adzm 2010-10 - what?
-		if (ad.DoDialog(true))
+		if (ad.DoDialog(true,m_host, m_port))
 		{
 //					flash = new BmpFlasher;
 			strncpy(passwd, ad.m_passwd,254);
@@ -2971,7 +2973,7 @@ void ClientConnection::AuthVnc()
 	else
 	{
 		AuthDialog ad;
-		if (ad.DoDialog(false))
+		if (ad.DoDialog(false, m_host, m_port))
 		{
 			strncpy(passwd, ad.m_passwd,254);
 			if (strlen(passwd) == 0)
@@ -3479,6 +3481,7 @@ void ClientConnection::SetFormatAndEncodings()
 
     encs[se->nEncodings++] = Swap32IfLE(rfbEncodingServerState);
     encs[se->nEncodings++] = Swap32IfLE(rfbEncodingEnableKeepAlive);
+	encs[se->nEncodings++] = Swap32IfLE(rfbEncodingEnableIdleTime);
     encs[se->nEncodings++] = Swap32IfLE(rfbEncodingFTProtocolVersion);
 	encs[se->nEncodings++] = Swap32IfLE(rfbEncodingpseudoSession);
 
@@ -4684,7 +4687,7 @@ void ClientConnection::Internal_SendFullFramebufferUpdateRequest()
 					m_si.framebufferHeight, false);
 }
 
-static int dormant_keepalive_counter = 0;
+
 void ClientConnection::Internal_SendAppropriateFramebufferUpdateRequest()
 {
 	if (m_pendingFormatChange)
@@ -4743,18 +4746,9 @@ void ClientConnection::Internal_SendAppropriateFramebufferUpdateRequest()
 	}
 	else
 	{
-		if (!m_dormant)
+		if (m_dormant!=1)
 			Internal_SendIncrementalFramebufferUpdateRequest();
-		else
-		{
-			dormant_keepalive_counter++;
-			if (dormant_keepalive_counter > 20)
-			{
-				dormant_keepalive_counter = 0;
-				Internal_SendIncrementalFramebufferUpdateRequest();
-			}
-
-		}
+		if (m_dormant == 2) m_dormant = 1;
 	}
 }
 
@@ -5270,11 +5264,11 @@ inline void ClientConnection::ReadScreenUpdate()
 	DeleteObject(UpdateRegion);
 }
 
-void ClientConnection::SetDormant(bool newstate)
+void ClientConnection::SetDormant(int newstate)
 {
 	vnclog.Print(5, _T("%s dormant mode\n"), newstate ? _T("Entering") : _T("Leaving"));
 	m_dormant = newstate;
-	if (!m_dormant && m_running) {
+	if (m_dormant!=1 && m_running) {
 		//adzm 2010-09
 		SendIncrementalFramebufferUpdateRequest(false);
 	}
@@ -5425,6 +5419,21 @@ void ClientConnection::ReadServerState()
 			m_keepalive_timer = 0;
 		}
         break;
+
+	case rfbIdleInterval:
+		m_opts.m_IdleInterval = value;		
+		vnclog.Print(1, _T("New IdleTiler interval %u"), m_opts.m_IdleInterval);
+		m_idle_timer = 1012;
+		m_idle_time = value * 1000;
+		KillTimer(m_hwndcn, m_idle_timer);
+		if (m_opts.m_IdleInterval > 0) {
+			SetTimer(m_hwndcn, m_idle_timer, m_idle_time, NULL);
+		}
+		else {
+			m_idle_timer = 0;
+		}
+		break;
+
     default:
         vnclog.Print(1, _T("Ignoring unsupported state %u"), state);
         break;
@@ -8074,13 +8083,13 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 	//	HWND parent;
     ClientConnection *_this = helper::SafeGetWindowUserData<ClientConnection>(hwnd);
 
-	if (_this == NULL) return DefWindowProc(hwnd, iMsg, wParam, lParam);
+	if (_this == NULL && iMsg != WM_CREATE)
+		return DefWindowProc(hwnd, iMsg, wParam, lParam);
 	switch (iMsg)
 			{
 			case WM_CREATE:
 				_this = (ClientConnection*)((CREATESTRUCT*)lParam)->lpCreateParams;
-				helper::SafeSetWindowUserData(hwnd, (LONG_PTR)_this);
-				SetTimer(_this->m_hwndcn,3335, 1000, NULL);
+				if (_this == NULL) return 0;
 				return 0;
 
 			case WM_REQUESTUPDATE:
@@ -8131,6 +8140,12 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 							_this->FlushWriteQueue();
 						}
 					}
+					else if (wParam == _this->m_idle_timer) {						
+						if (_this->m_idle_time<60000) 
+							_this->SetDormant(2);
+						else 
+							PostMessage(_this->m_hwndMain, WM_CLOSE, 0, 0);
+					}
 				}
 				return 0;
 
@@ -8141,6 +8156,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 					_this->m_SWpoint.x=LOWORD(lParam);
 					_this->m_SWpoint.y=HIWORD(lParam);
 					_this->SendSW(_this->m_SWpoint.x,_this->m_SWpoint.y);
+					if (_this->m_opts.m_IdleInterval > 0) { SetTimer(hwnd, _this->m_idle_timer, _this->m_idle_time, NULL); _this->SetDormant(false); }
 					return 0;
 				}
 			case WM_MBUTTONDOWN:
@@ -8149,6 +8165,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 			case WM_RBUTTONUP:
 			case WM_MOUSEMOVE:
 				{
+					if (_this->m_opts.m_IdleInterval > 0) { SetTimer(hwnd, _this->m_idle_timer, _this->m_idle_time, NULL); _this->SetDormant(false); }
 					if (_this->m_SWselect) {return 0;}
 					if (!_this->m_running) return 0;
 //					if (GetFocus() != hwnd) return 0;
@@ -8173,7 +8190,8 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 			case WM_KEYUP:
 			case WM_SYSKEYDOWN:
 			case WM_SYSKEYUP:
-				{
+				{					
+					if (_this->m_opts.m_IdleInterval > 0) {SetTimer(hwnd, _this->m_idle_timer, _this->m_idle_time, NULL); _this->SetDormant(false);}
 					if (!_this->m_running) return 0;
 					if ( _this->m_opts.m_ViewOnly) return 0;
 					_this->ProcessKeyEvent((int) wParam, (DWORD) lParam);
@@ -8323,10 +8341,10 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 					vnclog.Print(6, _T("WndProchwnd ChangeClipboardChain hwnd 0x%08x / m_hwndcn 0x%08x, 0x%08x (%li)\n"), hwnd, _this->m_hwndcn, _this->m_hwndNextViewer, res);
 				}
 				#endif
+				KillTimer(_this->m_hwndcn, _this->m_idle_timer);
 				if (_this->m_waitingOnEmulateTimer)
 				{
 				KillTimer(_this->m_hwndcn, _this->m_emulate3ButtonsTimer);
-				KillTimer(_this->m_hwndcn, 3335);
 				_this->m_waitingOnEmulateTimer = false;
 				}
 				/*

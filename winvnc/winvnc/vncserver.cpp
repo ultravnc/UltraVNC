@@ -233,6 +233,7 @@ vncServer::vncServer()
 	m_fAutoRestart = false;
     m_ftTimeout = FT_RECV_TIMEOUT;
     m_keepAliveInterval = KEEPALIVE_INTERVAL;
+	m_IdleInterval = 0;
 
 	// adzm 2010-08
 	m_socketKeepAliveTimeout = SOCKET_KEEPALIVE_TIMEOUT;

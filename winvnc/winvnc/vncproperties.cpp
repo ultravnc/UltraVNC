@@ -75,6 +75,7 @@ vncProperties::vncProperties()
 	m_fUseRegistry = FALSE;
     m_ftTimeout = FT_RECV_TIMEOUT;
     m_keepAliveInterval = KEEPALIVE_INTERVAL;
+	m_IdleInterval = 0;
 	m_socketKeepAliveTimeout = SOCKET_KEEPALIVE_TIMEOUT; // adzm 2010-08
 	m_pref_Primary=true;
 	m_pref_Secondary=false;
@@ -2333,6 +2334,8 @@ void vncProperties::LoadFromIniFile()
         m_ftTimeout = 60;
 
     m_keepAliveInterval = myIniFile.ReadInt("admin", "KeepAliveInterval", m_keepAliveInterval);
+	m_IdleInterval = myIniFile.ReadInt("admin", "IdleInterval", m_IdleInterval);
+
     if (m_keepAliveInterval >= (m_ftTimeout - KEEPALIVE_HEADROOM))
         m_keepAliveInterval = m_ftTimeout - KEEPALIVE_HEADROOM;
 
@@ -2342,6 +2345,7 @@ void vncProperties::LoadFromIniFile()
 
     m_server->SetFTTimeout(m_ftTimeout);
     m_server->SetKeepAliveInterval(m_keepAliveInterval);
+	m_server->SetIdleInterval(m_IdleInterval);
 	m_server->SetSocketKeepAliveTimeout(m_socketKeepAliveTimeout); // adzm 2010-08
     
 
@@ -2442,6 +2446,7 @@ void vncProperties::SaveToIniFile()
 				myIniFile.WriteInt("admin", "AllowEditClients", m_alloweditclients);
 				myIniFile.WriteInt("admin", "FileTransferTimeout", m_ftTimeout);
 				myIniFile.WriteInt("admin", "KeepAliveInterval", m_keepAliveInterval);
+				myIniFile.WriteInt("admin", "IdleInterval", m_IdleInterval);
 				// adzm 2010-08
 				myIniFile.WriteInt("admin", "SocketKeepAliveTimeout", m_socketKeepAliveTimeout);
 				myIniFile.WriteInt("admin", "DisableTrayIcon", m_server->GetDisableTrayIcon());
@@ -2467,6 +2472,7 @@ void vncProperties::SaveToIniFile()
 	myIniFile.WriteInt("admin", "AllowEditClients", m_alloweditclients);
     myIniFile.WriteInt("admin", "FileTransferTimeout", m_ftTimeout);
     myIniFile.WriteInt("admin", "KeepAliveInterval", m_keepAliveInterval);
+	myIniFile.WriteInt("admin", "IdleInterval", m_IdleInterval);
 	// adzm 2010-08
     myIniFile.WriteInt("admin", "SocketKeepAliveTimeout", m_socketKeepAliveTimeout);
 	myIniFile.WriteInt("admin", "DisableTrayIcon", m_server->GetDisableTrayIcon());

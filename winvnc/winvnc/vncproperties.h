@@ -92,6 +92,7 @@ protected:
 	BOOL				m_alloweditclients;
     int                 m_ftTimeout;
     int                 m_keepAliveInterval;
+	int					m_IdleInterval;
 	int                 m_socketKeepAliveTimeout; // adzm 2010-08
 
 
