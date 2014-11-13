@@ -1431,6 +1431,11 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 					if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
 					if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
 					if (errorcode == 1314) goto error6;
+					fShutdownOrdered = TRUE;
+					Sleep(1000);
+					vnclog.Print(LL_INTINFO, VNCLOG("KillAuthClients() ID_CLOSE \n"));
+					_this->m_server->KillAuthClients();
+					PostMessage(hwnd, WM_CLOSE, 0, 0);
 					break;
 					error6:
 						Set_install_service_as_admin();
@@ -1531,6 +1536,11 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 					if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
 					if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
 					if (errorcode == 1314) goto error8;
+					fShutdownOrdered = TRUE;
+					Sleep(1000);
+					vnclog.Print(LL_INTINFO, VNCLOG("KillAuthClients() ID_CLOSE \n"));
+					_this->m_server->KillAuthClients();
+					PostMessage(hwnd, WM_CLOSE, 0, 0);
 					break;
 					error8:
 						Set_start_service_as_admin();
