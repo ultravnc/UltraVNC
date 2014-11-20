@@ -4134,7 +4134,8 @@ vncClientThread::run(void *arg)
 
 	// Disable the protocol to ensure that the update thread
 	// is not accessing the desktop and buffer objects
-	m_client->DisableProtocol();
+	// DEADLOCK ON EXIT SLow systems... IS this realy needed
+	//m_client->DisableProtocol();
 
 	// Finally, it's safe to kill the update thread here
 	if (m_client->m_updatethread) {
