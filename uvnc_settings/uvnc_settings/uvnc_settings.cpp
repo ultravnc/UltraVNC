@@ -65,7 +65,6 @@ LONG FTTimeout = 30;
 
 LONG SocketConnect=1;
 LONG HTTPConnect=1;
-LONG XDMCPConnect=0;//not used
 LONG AutoPortSelect=1;
 LONG PortNumber=5900;
 LONG HttpPortNumber=5800;
@@ -178,7 +177,6 @@ myIniFile_Out.WriteInt("admin", "BlankInputsOnly", BlankInputsOnly); //PGM
 myIniFile_Out.WriteInt("admin", "DefaultScale", DefaultScale);
 myIniFile_Out.WriteInt("admin", "SocketConnect", SocketConnect);
 myIniFile_Out.WriteInt("admin", "HTTPConnect", HTTPConnect);
-myIniFile_Out.WriteInt("admin", "XDMCPConnect", XDMCPConnect);
 myIniFile_Out.WriteInt("admin", "AutoPortSelect", AutoPortSelect);
 myIniFile_Out.WriteInt("admin", "PortNumber", PortNumber);
 myIniFile_Out.WriteInt("admin", "HTTPPortNumber", HttpPortNumber);
@@ -253,7 +251,6 @@ myIniFile_Out.WriteInt("admin", "BlankInputsOnly", BlankInputsOnly); //PGM
 myIniFile_Out.WriteInt("admin", "DefaultScale", DefaultScale);
 myIniFile_Out.WriteInt("admin", "SocketConnect", SocketConnect);
 myIniFile_Out.WriteInt("admin", "HTTPConnect", HTTPConnect);
-myIniFile_Out.WriteInt("admin", "XDMCPConnect", XDMCPConnect);
 myIniFile_Out.WriteInt("admin", "AutoPortSelect", AutoPortSelect);
 myIniFile_Out.WriteInt("admin", "PortNumber", PortNumber);
 myIniFile_Out.WriteInt("admin", "HTTPPortNumber", HttpPortNumber);
@@ -332,7 +329,6 @@ DefaultScale = myIniFile_In.ReadInt("admin", "DefaultScale", DefaultScale);
 FTTimeout = myIniFile_In.ReadInt("admin", "FileTransferTimeout", DefaultScale);
 SocketConnect=myIniFile_In.ReadInt("admin", "SocketConnect", SocketConnect);
 HTTPConnect=myIniFile_In.ReadInt("admin", "HTTPConnect", HTTPConnect);
-XDMCPConnect=myIniFile_In.ReadInt("admin", "XDMCPConnect", XDMCPConnect);
 AutoPortSelect=myIniFile_In.ReadInt("admin", "AutoPortSelect", AutoPortSelect);
 PortNumber=myIniFile_In.ReadInt("admin", "PortNumber", PortNumber);
 HttpPortNumber=myIniFile_In.ReadInt("admin", "HTTPPortNumber",HttpPortNumber);

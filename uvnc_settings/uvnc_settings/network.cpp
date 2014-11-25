@@ -14,7 +14,6 @@
 
 extern LONG SocketConnect;
 extern LONG HTTPConnect;
-extern LONG XDMCPConnect;
 extern LONG AutoPortSelect;
 extern LONG PortNumber;
 extern LONG HttpPortNumber;
