@@ -131,7 +131,7 @@ vncServer::vncServer()
 	m_socketConn = NULL;
 	m_httpConn = NULL;
 	m_enableHttpConn = false;
-	m_enableXdmcpConn = false;
+
 	m_desktop = NULL;
 	m_name = NULL;
 	m_port = DISPLAY_TO_PORT(0);
@@ -224,8 +224,6 @@ vncServer::vncServer()
 	m_fFTUserImpersonation = true;
 
 	m_impersonationtoken=NULL; //byteboon
-
-	m_xdmcpConn=NULL;
 
 	m_impersonationtoken=NULL; // Modif Jeremy C. 
 
@@ -327,6 +325,7 @@ vncServer::~vncServer()
 	}
 
 	// Free the host blacklist
+	omni_mutex_lock l(m_clientsLockBlackList, 611);
 	while (m_blacklist) {
 		vncServer::BlacklistEntry *current = m_blacklist;
 		m_blacklist=m_blacklist->_next;
@@ -426,7 +425,8 @@ vncServer::ShutdownServer()
 	}
 
 	// Free the host blacklist
-	while (m_blacklist) {
+	omni_mutex_lock l(m_clientsLockBlackList, 611);
+	while (m_blacklist) {		
 		vncServer::BlacklistEntry *current = m_blacklist;
 		m_blacklist=m_blacklist->_next;
 
@@ -1036,7 +1036,7 @@ vncServer::RemoteEventReceived()
 void
 vncServer::WaitUntilAuthEmpty()
 {
-	//omni_mutex_lock l(m_clientsLock,32);
+	omni_mutex_lock l(m_clientsLock,32);
 
 	// Wait for all the clients to exit
 	while (!m_authClients.empty())
@@ -1049,7 +1049,7 @@ vncServer::WaitUntilAuthEmpty()
 void
 vncServer::WaitUntilUnauthEmpty()
 {
-	//omni_mutex_lock l(m_clientsLock,33);
+	omni_mutex_lock l(m_clientsLock,33);
 
 	// Wait for all the clients to exit
 	while (!m_unauthClients.empty())
@@ -1073,7 +1073,7 @@ vncServer::ClientList()
 {
 	vncClientList clients;
 
-	//omni_mutex_lock l(m_clientsLock,34);
+	omni_mutex_lock l(m_clientsLock,34);
 
 	clients = m_authClients;
 
@@ -1083,7 +1083,7 @@ vncServer::ClientList()
 void
 vncServer::SetCapability(vncClientId clientid, int capability)
 {
-	//omni_mutex_lock l(m_clientsLock,35);
+	omni_mutex_lock l(m_clientsLock,35);
 
 	vncClient *client = GetClient(clientid);
 	if (client != NULL)
@@ -1093,7 +1093,7 @@ vncServer::SetCapability(vncClientId clientid, int capability)
 void
 vncServer::SetKeyboardEnabled(vncClientId clientid, BOOL enabled)
 {
-	//omni_mutex_lock l(m_clientsLock,36);
+	omni_mutex_lock l(m_clientsLock,36);
 
 	vncClient *client = GetClient(clientid);
 	if (client != NULL)
@@ -1103,7 +1103,7 @@ vncServer::SetKeyboardEnabled(vncClientId clientid, BOOL enabled)
 void
 vncServer::SetPointerEnabled(vncClientId clientid, BOOL enabled)
 {
-	//omni_mutex_lock l(m_clientsLock,37);
+	omni_mutex_lock l(m_clientsLock,37);
 
 	vncClient *client = GetClient(clientid);
 	if (client != NULL)
@@ -1113,7 +1113,7 @@ vncServer::SetPointerEnabled(vncClientId clientid, BOOL enabled)
 int
 vncServer::GetCapability(vncClientId clientid)
 {
-	//omni_mutex_lock l(m_clientsLock,38);
+	omni_mutex_lock l(m_clientsLock,38);
 
 	vncClient *client = GetClient(clientid);
 	if (client != NULL)
@@ -1124,7 +1124,7 @@ vncServer::GetCapability(vncClientId clientid)
 const char*
 vncServer::GetClientName(vncClientId clientid)
 {
-	//omni_mutex_lock l(m_clientsLock,39);
+	omni_mutex_lock l(m_clientsLock,39);
 
 	vncClient *client = GetClient(clientid);
 	if (client != NULL)
@@ -1595,7 +1595,6 @@ vncServer::SockConnect(BOOL On)
 
 			// Now let's start the HTTP connection stuff
 			EnableHTTPConnect(m_enableHttpConn);
-			EnableXDMCPConnect(m_enableXdmcpConn);
 			vnclog.Print(20, VNCLOG("SockConnect  Done %d\n"), On);
 		}
 	}
@@ -1663,63 +1662,6 @@ vncServer::EnableHTTPConnect(BOOL enable)
 			// Close the socket
 			delete m_httpConn;
 			m_httpConn = NULL;
-		}
-	}
-
-	return TRUE;
-}
-
-BOOL
-vncServer::EnableXDMCPConnect(BOOL enable)
-{
-	m_enableXdmcpConn = enable;
-	if (enable && m_socketConn)
-	{
-		if (m_xdmcpConn==NULL)
-		{
-			char szCurrentDir[MAX_PATH];
-			if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
-				{
-					char* p = strrchr(szCurrentDir, '\\');
-					if (p == NULL) return 0;
-					*p = '\0';
-					strcat (szCurrentDir,"\\xdmcp\\xdmcp.exe");
-				}
-			STARTUPINFO ssi;
-			PROCESS_INFORMATION ppi;
-			ZeroMemory( &ssi, sizeof(ssi) );
-			ssi.cb = sizeof(ssi);
-			// Start the child process. 
-			if( !CreateProcess( NULL, // No module name (use command line). 
-				szCurrentDir, // Command line. 
-		       NULL,             // Process handle not inheritable. 
-		        NULL,             // Thread handle not inheritable. 
-		       FALSE,            // Set handle inheritance to FALSE. 
-		       0,                // No creation flags. 
-		       NULL,             // Use parent's environment block. 
-		       ".\\xdmcp",             // Use parent's starting directory. 
-		       &ssi,              // Pointer to STARTUPINFO structure.
-		       &ppi )             // Pointer to PROCESS_INFORMATION structure.
-		   ) 
-			{
-				m_xdmcpConn=NULL;
-				if (ppi.hThread) CloseHandle(ppi.hThread);
-			}
-			else
-			{
-				WaitForInputIdle(ppi.hProcess, 10000);
-				m_xdmcpConn=ppi.hProcess;
-			}
-			
-		}
-	}
-	else
-	{
-		if (m_xdmcpConn != NULL)
-		{
-				TerminateProcess(m_xdmcpConn,0);
-				m_xdmcpConn=NULL;
-
 		}
 	}
 
@@ -1840,7 +1782,7 @@ vncServer::GetScreenInfo(int &width, int &height, int &depth)
 
 void
 vncServer::SetAuthHosts(const char*hostlist) {
-	//omni_mutex_lock l(m_clientsLock,57);
+	omni_mutex_lock l(m_clientsLock,57);
 
 	if (hostlist == 0) {
 		vnclog.Print(LL_INTINFO, VNCLOG("authhosts cleared\n"));
@@ -1857,7 +1799,7 @@ vncServer::SetAuthHosts(const char*hostlist) {
 
 char*
 vncServer::AuthHosts() {
-	//omni_mutex_lock l(m_clientsLock,58);
+	omni_mutex_lock l(m_clientsLock,58);
 
 	if (m_auth_hosts == 0)
 		return _strdup("");
