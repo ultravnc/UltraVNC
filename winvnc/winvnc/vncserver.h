@@ -277,8 +277,8 @@ public:
 	// HTTP daemon handling
 	virtual BOOL EnableHTTPConnect(BOOL enable);
 	virtual BOOL HTTPConnectEnabled() {return m_enableHttpConn;};
-	virtual BOOL EnableXDMCPConnect(BOOL enable);
-	virtual BOOL XDMCPConnectEnabled() {return m_enableXdmcpConn;};
+
+
 
 	virtual void GetScreenInfo(int &width, int &height, int &depth);
 
@@ -477,9 +477,8 @@ protected:
 	// Connection servers
 	vncSockConnect		*m_socketConn;
 	vncHTTPConnect		*m_httpConn;
-	HANDLE				m_xdmcpConn;
 	BOOL				m_enableHttpConn;
-	BOOL				m_enableXdmcpConn;
+
 
 	// The desktop handler
 	vncDesktop			*m_desktop;
