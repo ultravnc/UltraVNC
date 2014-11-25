@@ -481,11 +481,6 @@ vncProperties::DialogProc(HWND hwnd,
 				BM_SETCHECK,
 				_this->m_server->HTTPConnectEnabled(),
 				0);
-//			HWND hConnectXDMCP = GetDlgItem(hwnd, IDC_CONNECT_XDMCP);
-//			SendMessage(hConnectXDMCP,
-//				BM_SETCHECK,
-//				_this->m_server->XDMCPConnectEnabled(),
-//				0);
 
 			// Modif sf@2002
 //		   HWND hSingleWindow = GetDlgItem(hwnd, IDC_SINGLE_WINDOW);
@@ -797,11 +792,6 @@ vncProperties::DialogProc(HWND hwnd,
 				HWND hConnectHTTP = GetDlgItem(hwnd, IDC_CONNECT_HTTP);
 				_this->m_server->EnableHTTPConnect(
 					SendMessage(hConnectHTTP, BM_GETCHECK, 0, 0) == BST_CHECKED
-					);
-
-				HWND hConnectXDMCP = GetDlgItem(hwnd, IDC_CONNECT_XDMCP);
-				_this->m_server->EnableXDMCPConnect(
-					SendMessage(hConnectXDMCP, BM_GETCHECK, 0, 0) == BST_CHECKED
 					);
 				
 				// Remote input stuff
@@ -1735,7 +1725,6 @@ LABELUSERSETTINGS:
 	vnclog.Print(LL_INTINFO, VNCLOG("clearing user settings\n"));
 	m_pref_AutoPortSelect=TRUE;
     m_pref_HTTPConnect = TRUE;
-	m_pref_XDMCPConnect = TRUE;
 	m_pref_PortNumber = RFB_PORT_OFFSET; 
 	m_pref_SockConnect=TRUE;
 	{
@@ -1865,7 +1854,6 @@ vncProperties::LoadUserPrefs(HKEY appkey)
 	// Connection prefs
 	m_pref_SockConnect=LoadInt(appkey, "SocketConnect", m_pref_SockConnect);
 	m_pref_HTTPConnect=LoadInt(appkey, "HTTPConnect", m_pref_HTTPConnect);
-	m_pref_XDMCPConnect=LoadInt(appkey, "XDMCPConnect", m_pref_XDMCPConnect);
 	m_pref_AutoPortSelect=LoadInt(appkey, "AutoPortSelect", m_pref_AutoPortSelect);
 	m_pref_PortNumber=LoadInt(appkey, "PortNumber", m_pref_PortNumber);
 	m_pref_HttpPortNumber=LoadInt(appkey, "HTTPPortNumber",
@@ -1934,7 +1922,6 @@ vncProperties::ApplyUserPrefs()
 		m_server->SockConnect(m_pref_SockConnect);
 
 	m_server->EnableHTTPConnect(m_pref_HTTPConnect);
-	m_server->EnableXDMCPConnect(m_pref_XDMCPConnect);
 
 	// Are inputs being disabled?
 	if (!m_pref_EnableRemoteInputs)
@@ -2160,7 +2147,6 @@ vncProperties::SaveUserPrefs(HKEY appkey)
 	// Connection prefs
 	SaveInt(appkey, "SocketConnect", m_server->SockConnected());
 	SaveInt(appkey, "HTTPConnect", m_server->HTTPConnectEnabled());
-	SaveInt(appkey, "XDMCPConnect", m_server->XDMCPConnectEnabled());
 	SaveInt(appkey, "AutoPortSelect", m_server->AutoPortSelect());
 	if (!m_server->AutoPortSelect()) {
 		SaveInt(appkey, "PortNumber", m_server->GetPort());
@@ -2285,7 +2271,6 @@ void vncProperties::LoadFromIniFile()
 	vnclog.Print(LL_INTINFO, VNCLOG("clearing user settings\n"));
 	m_pref_AutoPortSelect=TRUE;
     m_pref_HTTPConnect = TRUE;
-	m_pref_XDMCPConnect = TRUE;
 	m_pref_PortNumber = RFB_PORT_OFFSET; 
 	m_pref_SockConnect=TRUE;
 	{
@@ -2374,7 +2359,6 @@ void vncProperties::LoadUserPrefsFromIniFile()
 	// Connection prefs
 	m_pref_SockConnect=myIniFile.ReadInt("admin", "SocketConnect", m_pref_SockConnect);
 	m_pref_HTTPConnect=myIniFile.ReadInt("admin", "HTTPConnect", m_pref_HTTPConnect);
-	m_pref_XDMCPConnect=myIniFile.ReadInt("admin", "XDMCPConnect", m_pref_XDMCPConnect);
 	m_pref_AutoPortSelect=myIniFile.ReadInt("admin", "AutoPortSelect", m_pref_AutoPortSelect);
 	m_pref_PortNumber=myIniFile.ReadInt("admin", "PortNumber", m_pref_PortNumber);
 	m_pref_HttpPortNumber=myIniFile.ReadInt("admin", "HTTPPortNumber",
@@ -2510,7 +2494,6 @@ void vncProperties::SaveUserPrefsToIniFile()
 	// Connection prefs
 	myIniFile.WriteInt("admin", "SocketConnect", m_server->SockConnected());
 	myIniFile.WriteInt("admin", "HTTPConnect", m_server->HTTPConnectEnabled());
-	myIniFile.WriteInt("admin", "XDMCPConnect", m_server->XDMCPConnectEnabled());
 	myIniFile.WriteInt("admin", "AutoPortSelect", m_server->AutoPortSelect());
 	if (!m_server->AutoPortSelect()) {
 		myIniFile.WriteInt("admin", "PortNumber", m_server->GetPort());

@@ -61,7 +61,6 @@ LONG DefaultScale=1;
 
 LONG SocketConnect=1;
 LONG HTTPConnect;
-LONG XDMCPConnect;
 LONG AutoPortSelect=1;
 LONG PortNumber=5900;
 LONG HttpPortNumber=5800;
@@ -195,14 +194,12 @@ myIniFile_Out.WriteInt("admin", "secondary", Secondary);
 	// Connection prefs
 SocketConnect=myIniFile_In.ReadInt("admin", "SocketConnect", true);
 HTTPConnect=myIniFile_In.ReadInt("admin", "HTTPConnect", true);
-XDMCPConnect=myIniFile_In.ReadInt("admin", "XDMCPConnect", true);
 AutoPortSelect=myIniFile_In.ReadInt("admin", "AutoPortSelect", true);
 PortNumber=myIniFile_In.ReadInt("admin", "PortNumber", PortNumber);
 HttpPortNumber=myIniFile_In.ReadInt("admin", "HTTPPortNumber",HttpPortNumber);
 IdleTimeout=myIniFile_In.ReadInt("admin", "IdleTimeout", IdleTimeout);
 myIniFile_Out.WriteInt("admin", "SocketConnect", SocketConnect);
 myIniFile_Out.WriteInt("admin", "HTTPConnect", HTTPConnect);
-myIniFile_Out.WriteInt("admin", "XDMCPConnect", XDMCPConnect);
 myIniFile_Out.WriteInt("admin", "AutoPortSelect", AutoPortSelect);
 myIniFile_Out.WriteInt("admin", "PortNumber", PortNumber);
 myIniFile_Out.WriteInt("admin", "HTTPPortNumber", HttpPortNumber);
