@@ -268,6 +268,7 @@ public:
 	void NotifyExtendedClipboardSupport();
 	// adzm 2010-09 - Notify streaming DSM plugin support
 	void NotifyPluginStreamingSupport();
+	bool cl_connected;
 
 	// sf@2002 
 	// Update routines

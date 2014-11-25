@@ -486,7 +486,7 @@ vncClientUpdateThread::run_undetached(void *arg)
 	//Make sure we never can get locked by the initail m_initial_update) wait loop
 	//After 5 sec cont.
 	int esc_counter=0;
-	while (g_DesktopThread_running)
+	while (g_DesktopThread_running && m_client->cl_connected)
 	{		
 		while (!m_client->m_initial_update) 
 			{
@@ -550,9 +550,9 @@ vncClientUpdateThread::run_undetached(void *arg)
 					{
 						{
 								//do forcefull update after 4 seconds
-								rfb::Region2D update_rgn=m_client->m_encodemgr.m_buffer->GetViewerSize();
+								/*rfb::Region2D update_rgn=m_client->m_encodemgr.m_buffer->GetViewerSize();
 								m_client->m_incr_rgn.assign_union(update_rgn);
-								m_client->m_update_tracker.add_changed(update_rgn);
+								m_client->m_update_tracker.add_changed(update_rgn);*/
 								m_client->m_encodemgr.m_buffer->m_desktop->TriggerUpdate();
 								m_client->TriggerUpdateThread();
 						}
@@ -799,6 +799,8 @@ vncClientUpdateThread::run_undetached(void *arg)
 			if (calc_updates==old_calc_updates) calc_updates++;
 			char			szText[256];
 			sprintf(szText,"SendUpdate %i \n", 1000 / (calc_updates-old_calc_updates));
+			if ((calc_updates - old_calc_updates)==1)
+				OutputDebugString(szText);
 			old_calc_updates=calc_updates;
 			OutputDebugString(szText);		
 #endif
@@ -2185,8 +2187,6 @@ vncClientThread::run(void *arg)
 
 			vncMenu::NotifyBalloon(szInfo, NULL);
 		}
-		m_server->RemoveClient(m_client->GetClientId());
-		
 		// wa@2005 - AutoReconnection attempt if required
 		if (m_client->m_Autoreconnect)
 		{
@@ -2205,7 +2205,7 @@ vncClientThread::run(void *arg)
 
 			vncService::PostAddNewClient(1111, 1111);
 		}
-
+		m_server->RemoveClient(m_client->GetClientId());
 		return;
 	}
 	m_server->AutoReconnect_counter=0;
@@ -2332,7 +2332,7 @@ vncClientThread::run(void *arg)
 	// Set the input thread to a high priority
 	set_priority(omni_thread::PRIORITY_HIGH);
 
-	BOOL connected = TRUE;
+	m_client->cl_connected = TRUE;
 	// added jeff
 	BOOL need_to_disable_input = m_server->LocalInputsDisabled();
     bool need_to_clear_keyboard = true;
@@ -2345,7 +2345,7 @@ vncClientThread::run(void *arg)
 	// adzm 2010-09 - Notify streaming DSM plugin support
 	bool need_notify_streaming_DSM = false;
 
-	while (connected)
+	while (m_client->cl_connected)
 	{
 		rfbClientToServerMsg msg;
 
@@ -2432,7 +2432,7 @@ vncClientThread::run(void *arg)
 		{
 			if (!m_socket->ReadExact((char *)&msg.type, sizeof(msg.type)))
 			{
-				connected = FALSE;
+				m_client->cl_connected = FALSE;
 				break;
 			}
 		    nTO = 0;
@@ -2442,7 +2442,7 @@ vncClientThread::run(void *arg)
 			// Try to read a message ID
 			if (!m_socket->ReadExact((char *)&msg.type, sizeof(msg.type)))
 			{
-				connected = FALSE;
+				m_client->cl_connected = FALSE;
 				break;
 			}
 		}
@@ -2474,7 +2474,7 @@ vncClientThread::run(void *arg)
             {
 			    if (!m_socket->ReadExact(((char *) &msg)+nTO, sz_rfbKeepAliveMsg-nTO))
 			    {
-				    connected = FALSE;
+					m_client->cl_connected = FALSE;
 				    break;
 			    }
             }
@@ -2484,7 +2484,7 @@ vncClientThread::run(void *arg)
 			// Read the rest of the message:
 			if (!m_socket->ReadExact(((char *) &msg)+nTO, sz_rfbSetPixelFormatMsg-nTO))
 			{
-				connected = FALSE;
+				m_client->cl_connected = FALSE;
 				break;
 			}
 
@@ -2504,7 +2504,7 @@ vncClientThread::run(void *arg)
 			{
 				vnclog.Print(LL_CONNERR, VNCLOG("remote pixel format invalid\n"));
 
-				connected = FALSE;
+				m_client->cl_connected = FALSE;
 			}
 
 			// Set the palette-changed flag, just in case...
@@ -2519,7 +2519,7 @@ vncClientThread::run(void *arg)
 			// Read the rest of the message:
 			if (!m_socket->ReadExact(((char *) &msg)+nTO, sz_rfbSetEncodingsMsg-nTO))
 			{
-				connected = FALSE;
+				m_client->cl_connected = FALSE;
 				break;
 			}
 
@@ -2562,7 +2562,7 @@ vncClientThread::run(void *arg)
 					// Read an encoding in
 					if (!m_socket->ReadExact((char *)&encoding, sizeof(encoding)))
 					{
-						connected = FALSE;
+						m_client->cl_connected = FALSE;
 						break;
 					}
 
@@ -2728,7 +2728,7 @@ vncClientThread::run(void *arg)
 					{
 						vnclog.Print(LL_INTERR, VNCLOG("failed to select raw encoder!\n"));
 
-						connected = FALSE;
+						m_client->cl_connected = FALSE;
 					}
 				}
 
@@ -2755,11 +2755,11 @@ vncClientThread::run(void *arg)
 #endif*/
 			if (!m_socket->ReadExact(((char *) &msg)+nTO, sz_rfbFramebufferUpdateRequestMsg-nTO))
 			{
-				connected = FALSE;
+				m_client->cl_connected = FALSE;
 				break;
 			}
 
-			if(!m_client->NotifyUpdate(msg.fur)) connected = FALSE;
+			if (!m_client->NotifyUpdate(msg.fur)) m_client->cl_connected = FALSE;
 			break;
 
 		case rfbKeyEvent:
@@ -3038,7 +3038,7 @@ vncClientThread::run(void *arg)
 			{
 				if (!m_socket->ReadExact(((char *) &msg) + nTO, sz_rfbPalmVNCSetScaleFactorMsg - nTO))
 				{
-					connected = FALSE;
+					m_client->cl_connected = FALSE;
 					break;
 				}
 			}
@@ -3046,7 +3046,7 @@ vncClientThread::run(void *arg)
 			{
 				if (!m_socket->ReadExact(((char *) &msg) + nTO, sz_rfbSetScaleMsg - nTO))
 				{
-					connected = FALSE;
+					m_client->cl_connected = FALSE;
 					break;
 				}
 			}
@@ -3059,7 +3059,7 @@ vncClientThread::run(void *arg)
 				omni_mutex_lock l(m_client->GetUpdateLock(),87);
 				if (!m_client->m_encodemgr.m_buffer->SetScale(msg.ssc.scale))
 					{
-						connected = FALSE;
+					m_client->cl_connected = FALSE;
 						break;
 					}
 	
@@ -3080,7 +3080,7 @@ vncClientThread::run(void *arg)
 		case rfbSetServerInput:
 			if (!m_socket->ReadExact(((char *) &msg) + nTO, sz_rfbSetServerInputMsg - nTO))
 			{
-				connected = FALSE;
+				m_client->cl_connected = FALSE;
 				break;
 			}
 
@@ -3124,7 +3124,7 @@ vncClientThread::run(void *arg)
 		case rfbSetSW:
 			if (!m_socket->ReadExact(((char *) &msg) + nTO, sz_rfbSetSWMsg - nTO))
 			{
-				connected = FALSE;
+				m_client->cl_connected = FALSE;
 				break;
 			}
 			if (Swap16IfLE(msg.sw.x)<5 && Swap16IfLE(msg.sw.y)<5) 
@@ -3509,7 +3509,7 @@ vncClientThread::run(void *arg)
 					// Destination file already exists - the viewer sends the checksums
 					case rfbFileChecksums:
                         m_socket->SetSendTimeout(m_server->GetFTTimeout()*1000);
-						connected = m_client->ReceiveDestinationFileChecksums(Swap32IfLE(msg.ft.size), Swap32IfLE(msg.ft.length));
+						m_client->cl_connected = m_client->ReceiveDestinationFileChecksums(Swap32IfLE(msg.ft.size), Swap32IfLE(msg.ft.length));
 						break;
 
 					// Destination file (viewer side) is ready for reception (size > 0) or not (size = -1)
@@ -3560,14 +3560,14 @@ vncClientThread::run(void *arg)
 						m_client->m_fFileUploadRunning = true;
                         m_client->m_fUserAbortedFileTransfer = false;
 
-						connected = m_client->SendFileChunk();
+						m_client->cl_connected = m_client->SendFileChunk();
 						}
 						break;
 
 
 					case rfbFilePacket:
 						if (!m_server->FileTransferEnabled() || !fUserOk) break;
-						connected = m_client->ReceiveFileChunk(Swap32IfLE(msg.ft.length), Swap32IfLE(msg.ft.size));
+						m_client->cl_connected = m_client->ReceiveFileChunk(Swap32IfLE(msg.ft.length), Swap32IfLE(msg.ft.size));
                         m_client->SendKeepAlive();
 						break;
 
@@ -4045,7 +4045,7 @@ vncClientThread::run(void *arg)
             {
 			    if (!m_socket->ReadExact(((char *) &msg)+nTO, sz_rfbNotifyPluginStreamingMsg-nTO))
 			    {
-				    connected = FALSE;
+					m_client->cl_connected = FALSE;
 				    break;
 			    }
             }
@@ -4053,7 +4053,7 @@ vncClientThread::run(void *arg)
             break;
 		default:
 			// Unknown message, so fail!
-			connected = FALSE;
+			m_client->cl_connected = FALSE;
 		}
 
 		// sf@2005 - Cancel FT User impersonation if possible
@@ -4299,6 +4299,7 @@ vncClient::vncClient() : Sendinput("USER32", "SendInput"), m_clipboard(Clipboard
 
 vncClient::~vncClient()
 {
+
 	vnclog.Print(LL_INTINFO, VNCLOG("~vncClient() executing...\n"));
 
 	// Modif sf@2002 - Text Chat
