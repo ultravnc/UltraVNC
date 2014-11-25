@@ -646,11 +646,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 				end = start;
 				while (szCmdLine[end] > ' ') end++;
 
-				pszId = new char[ end - start + 1 ];
-	
-				strncpy( pszId, &(szCmdLine[start]), end - start );
-				pszId[ end - start ] = 0;
-				pszId = _strupr( pszId );
+				if (end - start > 0)
+				{
+
+					pszId = new char[end - start + 1];
+
+					strncpy(pszId, &(szCmdLine[start]), end - start);
+					pszId[end - start] = 0;
+					pszId = _strupr(pszId);
+				}
 //multiple spaces between autoreconnect and id
 				i = end;
 			}// end of condition we found the ID: parameter
@@ -671,9 +675,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 				{
 					strcpy(pszId_char,pszId);
 					//memory leak fix
-					delete [] pszId;
+					delete[] pszId; pszId = NULL;
 				}
 			}
+			if (pszId != NULL) delete[] pszId; pszId = NULL;
 			continue;
 		}
 
@@ -685,13 +690,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 				start = i;
 				end = start;
 				while (szCmdLine[end] > ' ') end++;
-
-				pszId = new char[ end - start + 1 ];
-				if (pszId != 0)
+				if (end - start > 0)
 				{
-					strncpy( pszId, &(szCmdLine[start]), end - start );
-					pszId[ end - start ] = 0;
-					pszId = _strupr( pszId );
+					pszId = new char[end - start + 1];
+					if (pszId != 0)
+					{
+						strncpy(pszId, &(szCmdLine[start]), end - start);
+						pszId[end - start] = 0;
+						pszId = _strupr(pszId);
+					}
 				}
 				i = end;
 			if (!vncService::PostAddConnectClient( pszId ))
@@ -706,9 +713,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 				{
 					strcpy(pszId_char,pszId);
 					//memory leak fix
-					delete [] pszId;
+					delete[] pszId; pszId = NULL;
 				}
 				}
+			if (pszId != NULL) delete[] pszId; pszId = NULL;
 			continue;
 		}
 
