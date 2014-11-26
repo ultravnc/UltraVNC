@@ -100,6 +100,9 @@ char path[512];
 char accept_reject_mesg[512];
 LONG MaxCpu=40;
 
+char DSMPluginConfig[512];
+*DSMPluginConfig = '\0';
+
 LONG Primary=1;
 LONG Secondary=0;
 //Beep(100,20000);
@@ -149,11 +152,13 @@ myIniFile_Out.WriteInt("admin", "DisableTrayIcon", DisableTrayIcon);
 myIniFile_Out.WriteInt("admin", "LoopbackOnly", LoopbackOnly);
 
 UseDSMPlugin=myIniFile_In.ReadInt("admin", "UseDSMPlugin", false);
+myIniFile_In.ReadString("admin", "DSMPluginConfig", DSMPluginConfig, 512);
 AllowLoopback=myIniFile_In.ReadInt("admin", "AllowLoopback", true);
 AuthRequired=myIniFile_In.ReadInt("admin", "AuthRequired", true);
 ConnectPriority=myIniFile_In.ReadInt("admin", "ConnectPriority", 0);
 
 myIniFile_Out.WriteInt("admin", "UseDSMPlugin", UseDSMPlugin);
+myIniFile_Out.WriteString("admin", "DSMPluginConfig", DSMPluginConfig);
 myIniFile_Out.WriteInt("admin", "AllowLoopback", AllowLoopback);
 myIniFile_Out.WriteInt("admin", "AuthRequired", AuthRequired);
 myIniFile_Out.WriteInt("admin", "ConnectPriority", ConnectPriority);

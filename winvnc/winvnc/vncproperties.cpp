@@ -2595,10 +2595,14 @@ void Secure_Save_Plugin_Config(char *szPlugin)
 
 			CreateProcessAsUser(hPToken, NULL, dir, NULL, NULL, FALSE, DETACHED_PROCESS, NULL, NULL, &StartUPInfo, &ProcessInfo);
 			DWORD errorcode = GetLastError();
+			if (errorcode == 1314) goto error1;
 			if (process) CloseHandle(process);
 			if (Token) CloseHandle(Token);
 			if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
-			if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);			
+			if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);	
+			return;
+		error1:
+			Secure_Plugin(szPlugin);
 		}
 	error3:
 		return;
