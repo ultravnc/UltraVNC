@@ -437,11 +437,6 @@ public:
     if (m_keepAliveInterval >= (m_ftTimeout - KEEPALIVE_HEADROOM))
         m_keepAliveInterval = m_ftTimeout  - KEEPALIVE_HEADROOM;
     }
-	
-
-	// adzm 2010-08
-	void SetSocketKeepAliveTimeout(int timeout)	{ m_socketKeepAliveTimeout = timeout > 0 ? timeout : 0; VSocket::SetSocketKeepAliveTimeoutDefault(m_socketKeepAliveTimeout); }
-	int GetSocketKeepAliveTimeout() { return m_socketKeepAliveTimeout; }
 
 	void TriggerUpdate();
 	UINT				m_retry_timeout;
@@ -607,8 +602,6 @@ protected:
     int m_ftTimeout;
     int m_keepAliveInterval;
 	int m_IdleInterval;
-	// adzm 2010-08
-	int m_socketKeepAliveTimeout;
 	bool clearconsole;
 };
 

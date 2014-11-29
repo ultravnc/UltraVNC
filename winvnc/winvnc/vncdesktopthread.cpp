@@ -855,7 +855,7 @@ vncDesktopThread::run_undetached(void *arg)
 	{
 		G_USE_PIXEL=false;
 	}
-	else testBench();
+	else G_USE_PIXEL=true;//testBench();
 	capture=true;
 	vnclog.Print(LL_INTERR, VNCLOG("Hook changed 1\n"));
 	// Save the thread's "home" desktop, under NT (no effect under 9x)
@@ -1039,7 +1039,7 @@ vncDesktopThread::run_undetached(void *arg)
 				ResetEvent(m_desktop->trigger_events[0]);
 							{
 								//measure current cpu usage of winvnc
-								if (fullpollcounter==10 || fullpollcounter==0 || fullpollcounter==5) cpuUsage = usage.GetUsage();
+								if ((fullpollcounter==10 || fullpollcounter==0 || fullpollcounter==5)&& (m_server->MaxCpu()!=100)) cpuUsage = usage.GetUsage();
 								if (cpuUsage > m_server->MaxCpu()) 
 									MIN_UPDATE_INTERVAL+=10;
 								else MIN_UPDATE_INTERVAL-=10;
