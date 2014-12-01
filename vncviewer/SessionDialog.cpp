@@ -250,7 +250,7 @@ BOOL CALLBACK SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam, LPARAM lParam
 //				_tcscpy(_this->m_remotehost, fulldisplay);
                 EndDialog(hwnd, TRUE);
             }
-
+			_tcscpy(_this->m_proxyhost, "");
 			GetDlgItemText(hwnd, IDC_PROXY_EDIT, display, 256);
             _tcscpy(fulldisplay, display);
 
