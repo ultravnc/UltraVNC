@@ -77,7 +77,6 @@ void ClientConnection::RealiseFullScreenMode()
 
 		// A bit crude here - we can skip the prompt on a registry setting.
 		// We'll do this properly later.
-		HKEY hRegKey;
 		DWORD skipprompt = 0;
 
 		{
