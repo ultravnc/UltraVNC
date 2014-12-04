@@ -151,7 +151,7 @@ void ClientConnection::Save_Latest_Connection()
 	WritePrivateProfileString("connection", "proxyport", buf, fname);
 	buf[0] = '\0';
 
-	WritePrivateProfileString("connection", "password", buf, fname);
+	//WritePrivateProfileString("connection", "password", buf, fname);
 	m_opts.Save(fname);
 	//m_opts.Register();
 }
