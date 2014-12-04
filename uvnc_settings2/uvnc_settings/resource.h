@@ -124,6 +124,7 @@
 #define IDC_MANUAL                      1106
 #define IDC_EDIT2                       1107
 #define IDC_SOCKETTIMEOUT               1107
+#define IDC_IDLETIMEINPUT               1107
 #define IDC_LOCALIP                     1108
 #define IDC_REMOTEIP                    1109
 #define IDC_EDITVPORT                   1110
@@ -132,6 +133,11 @@
 #define IDC_SEC                         1112
 #define IDC_RADIO1                      1113
 #define IDC_KINTERVAL                   1114
+#define IDC_INSTALSS                    1115
+#define IDC_UNINSTALLS                  1116
+#define IDC_STARTS                      1117
+#define IDC_STOPS                       1118
+#define IDC_HELP2                       1120
 #define IDD_PARENT                      1200
 #define IDC_CONNECT_SOCK                1201
 #define IDD_OPTION2                     1202
@@ -156,7 +162,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        134
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1115
+#define _APS_NEXT_CONTROL_VALUE         1121
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif

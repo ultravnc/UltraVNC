@@ -116,7 +116,18 @@ BOOL CALLBACK DlgProcMISC(HWND hwnd, UINT uMsg,
 	
 	case WM_COMMAND: 
 		switch (LOWORD(wParam)) 
-		{	
+		{
+		case IDC_HELP2:
+			if (lParam==5)
+			
+{
+			char link[256];
+			strcpy(link,"http://www.uvnc.com/webhelp/");
+			strcat(link,"misc");
+			strcat(link,".html");
+			ShellExecute(GetDesktopWindow(), "open", link, "", 0, SW_SHOWNORMAL);
+			}
+			break;
 		case IDOK:	
 			{
 				DisableTrayIcon=IsDlgButtonChecked(hwnd, IDC_DISABLETRAY);

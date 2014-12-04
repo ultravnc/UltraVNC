@@ -23,7 +23,7 @@ BOOL CALLBACK DlgProcOFT(HWND hwnd, UINT uMsg,WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DlgProcCON(HWND hwnd, UINT uMsg,WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DlgProcCAP(HWND hwnd, UINT uMsg,WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DlgProcMISC(HWND hwnd, UINT uMsg,WPARAM wParam, LPARAM lParam);
-BOOL CALLBACK DlgProcSFX(HWND hwnd, UINT uMsg,WPARAM wParam, LPARAM lParam);
+BOOL CALLBACK DlgProcService(HWND hwnd, UINT uMsg,WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DlgProcSFX2(HWND hwnd, UINT uMsg,WPARAM wParam, LPARAM lParam);
 HWND m_hParent;
 HWND m_hTab;
@@ -69,6 +69,7 @@ LONG AutoPortSelect=1;
 LONG PortNumber=5900;
 LONG HttpPortNumber=5800;
 LONG IdleTimeout=0;
+LONG IdleInputTimeout=0;
 
 LONG RemoveWallpaper=0;
 LONG RemoveAero=0;
@@ -109,7 +110,6 @@ LONG MaxCpu=40;
 LONG clearconsole=0;
 
 LONG keepAliveInterval=5;
-LONG socketKeepAliveTimeout=1000; // adzm 2010-08
 
 
 
@@ -181,6 +181,7 @@ myIniFile_Out.WriteInt("admin", "AutoPortSelect", AutoPortSelect);
 myIniFile_Out.WriteInt("admin", "PortNumber", PortNumber);
 myIniFile_Out.WriteInt("admin", "HTTPPortNumber", HttpPortNumber);
 myIniFile_Out.WriteInt("admin", "IdleTimeout", IdleTimeout);
+myIniFile_Out.WriteInt("admin", "IdleInputTimeout", IdleInputTimeout);
 myIniFile_Out.WriteInt("admin", "RemoveWallpaper", RemoveWallpaper);
 myIniFile_Out.WriteInt("admin", "RemoveAero", RemoveAero);
 myIniFile_Out.WriteInt("admin", "QuerySetting", QuerySetting);
@@ -215,7 +216,6 @@ myIniFile_Out.WriteInt("admin", "clearconsole", clearconsole);
 myIniFile_Out.WriteInt("poll", "MaxCpu", MaxCpu);
 myIniFile_Out.WriteString("admin", "accept_reject_mesg", accept_reject_mesg);
 myIniFile_Out.WriteInt("admin", "KeepAliveInterval", keepAliveInterval);
-myIniFile_Out.WriteInt("admin", "SocketKeepAliveTimeout", socketKeepAliveTimeout);
 }
 
 void Save_settings_sfx(char *myfile)
@@ -255,6 +255,7 @@ myIniFile_Out.WriteInt("admin", "AutoPortSelect", AutoPortSelect);
 myIniFile_Out.WriteInt("admin", "PortNumber", PortNumber);
 myIniFile_Out.WriteInt("admin", "HTTPPortNumber", HttpPortNumber);
 myIniFile_Out.WriteInt("admin", "IdleTimeout", IdleTimeout);
+myIniFile_Out.WriteInt("admin", "IdleInputTimeout", IdleInputTimeout);
 myIniFile_Out.WriteInt("admin", "RemoveWallpaper", RemoveWallpaper);
 myIniFile_Out.WriteInt("admin", "RemoveAero", RemoveAero);
 myIniFile_Out.WriteInt("admin", "QuerySetting", QuerySetting);
@@ -333,6 +334,7 @@ AutoPortSelect=myIniFile_In.ReadInt("admin", "AutoPortSelect", AutoPortSelect);
 PortNumber=myIniFile_In.ReadInt("admin", "PortNumber", PortNumber);
 HttpPortNumber=myIniFile_In.ReadInt("admin", "HTTPPortNumber",HttpPortNumber);
 IdleTimeout=myIniFile_In.ReadInt("admin", "IdleTimeout", IdleTimeout);	
+IdleInputTimeout=myIniFile_In.ReadInt("admin", "IdleInputTimeout", IdleInputTimeout);
 RemoveWallpaper=myIniFile_In.ReadInt("admin", "RemoveWallpaper", RemoveWallpaper);
 RemoveAero=myIniFile_In.ReadInt("admin", "RemoveAero", RemoveAero);
 QuerySetting=myIniFile_In.ReadInt("admin", "QuerySetting", QuerySetting);
@@ -365,8 +367,7 @@ clearconsole=myIniFile_In.ReadInt("admin", "clearconsole", clearconsole);
 MaxCpu=myIniFile_In.ReadInt("poll", "MaxCpu", MaxCpu);
 myIniFile_In.ReadString("admin", "accept_reject_mesg", accept_reject_mesg,512);
 
-keepAliveInterval = myIniFile_In.ReadInt("admin", "KeepAliveInterval", keepAliveInterval);
-socketKeepAliveTimeout = myIniFile_In.ReadInt("admin", "SocketKeepAliveTimeout", socketKeepAliveTimeout); 
+keepAliveInterval = myIniFile_In.ReadInt("admin", "KeepAliveInterval", keepAliveInterval); 
 }
 
 DWORD WINAPI upnpthread( LPVOID lpParam );
@@ -487,7 +488,7 @@ BOOL CALLBACK DlgProc(HWND hwndDlg, UINT uMsg,
 			hTab6dialog = CreateDialogParam(hInst, 
 				MAKEINTRESOURCE(IDD_OPTION8),
 				hwndDlg,
-				(DLGPROC)DlgProcSFX,
+				(DLGPROC)DlgProcService,
 				NULL);
 
 			/*hTab7dialog = CreateDialogParam(hInst, 
@@ -530,6 +531,19 @@ BOOL CALLBACK DlgProc(HWND hwndDlg, UINT uMsg,
 
 	case WM_COMMAND:
 		switch (LOWORD(wParam))	{
+
+		case IDC_HELP2:
+			{
+			int i = TabCtrl_GetCurFocus(m_hTab);
+			SendMessage(hTab0dialog, WM_COMMAND, IDC_HELP2, i);
+			SendMessage(hTab1dialog, WM_COMMAND, IDC_HELP2, i);
+			SendMessage(hTab2dialog, WM_COMMAND, IDC_HELP2, i);
+			SendMessage(hTab3dialog, WM_COMMAND, IDC_HELP2, i);
+			SendMessage(hTab4dialog, WM_COMMAND, IDC_HELP2, i);
+			SendMessage(hTab5dialog, WM_COMMAND, IDC_HELP2, i);
+			SendMessage(hTab6dialog, WM_COMMAND, IDC_HELP2, i);	
+			}
+			break;
 		case IDOK:
 			///SetFocus(GetDlgItem(hwndDlg, IDOK));
 			SendMessage(hTab0dialog, WM_COMMAND, IDOK, 0);

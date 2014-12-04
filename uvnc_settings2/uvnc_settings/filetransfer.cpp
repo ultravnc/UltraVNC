@@ -40,7 +40,18 @@ BOOL CALLBACK DlgProcOFT(HWND hwnd, UINT uMsg,
 	
 	case WM_COMMAND: 
 		switch (LOWORD(wParam)) 
-		{	
+		{
+		case IDC_HELP2:
+			if (lParam==2)
+			
+{
+			char link[256];
+			strcpy(link,"http://www.uvnc.com/webhelp/");
+			strcat(link,"input");
+			strcat(link,".html");
+			ShellExecute(GetDesktopWindow(), "open", link, "", 0, SW_SHOWNORMAL);
+			}
+			break;
 		case IDOK:
 
 			EnableRemoteInputs=!SendDlgItemMessage(hwnd, IDC_DISABLE_INPUTS, BM_GETCHECK, 0, 0);

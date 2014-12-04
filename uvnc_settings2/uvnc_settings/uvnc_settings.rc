@@ -18,17 +18,15 @@
 // Dutch (Netherlands) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NLD)
-#ifdef _WIN32
 LANGUAGE LANG_DUTCH, SUBLANG_DUTCH
 #pragma code_page(1252)
-#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Menu
 //
 
-IDC_UVNC_SETTINGS MENU 
+IDC_UVNC_SETTINGS MENU
 BEGIN
     POPUP "&File"
     BEGIN
@@ -46,7 +44,7 @@ END
 // Accelerator
 //
 
-IDC_UVNC_SETTINGS ACCELERATORS 
+IDC_UVNC_SETTINGS ACCELERATORS
 BEGIN
     "?",            IDM_ABOUT,              ASCII,  ALT
     "/",            IDM_ABOUT,              ASCII,  ALT
@@ -58,7 +56,7 @@ END
 // Dialog
 //
 
-IDD_MSLOGON DIALOG  0, 0, 186, 166
+IDD_MSLOGON DIALOG 0, 0, 186, 166
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "MS logon setup"
 FONT 8, "MS Shell Dlg"
@@ -127,12 +125,13 @@ END
 IDD_PARENT DIALOGEX 0, 0, 277, 231
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION
 EXSTYLE WS_EX_CONTEXTHELP | WS_EX_CONTROLPARENT
-CAPTION "UltraVNC settings 1204"
+CAPTION "UltraVNC settings "
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     PUSHBUTTON      "&OK",IDOK,140,210,75,14
     PUSHBUTTON      "&Cancel",IDCANCEL,220,210,50,14
     CONTROL         "Tab1",IDC_TAB,"SysTabControl32",TCS_MULTILINE | WS_TABSTOP,5,5,265,200
+    PUSHBUTTON      "Help",IDC_HELP2,15,210,104,14
 END
 
 IDD_OPTION2 DIALOGEX 0, 0, 260, 180
@@ -207,14 +206,14 @@ BEGIN
     EDITTEXT        IDC_AUTHHOST,60,67,188,14,ES_AUTOHSCROLL
     LTEXT           "AuthHosts:",IDC_STATIC,15,70,37,8
     CONTROL         "Query If No Logon",IDC_QNOLOGON,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,103,41,71,10
-    LTEXT           "Idle Timeout:",IDC_STATIC,9,17,43,8
-    EDITTEXT        IDC_IDLETIME,53,15,24,14,ES_AUTOHSCROLL
+    LTEXT           "Idle Timeout:\nsocket",IDC_STATIC,16,13,44,17
+    EDITTEXT        IDC_IDLETIME,55,16,24,14,ES_AUTOHSCROLL
     EDITTEXT        IDC_QMESG,61,83,185,14,ES_AUTOHSCROLL
     LTEXT           "Query Msg:",IDC_STATIC,15,84,38,8
-    EDITTEXT        IDC_SOCKETTIMEOUT,136,14,24,14,ES_AUTOHSCROLL
-    LTEXT           "Socket Timeout:",IDC_STATIC,81,17,52,8
-    EDITTEXT        IDC_KINTERVAL,226,15,24,14,ES_AUTOHSCROLL
-    LTEXT           "Keepalive Interval:",IDC_STATIC,163,17,62,8
+    EDITTEXT        IDC_KINTERVAL,124,16,24,14,ES_AUTOHSCROLL
+    LTEXT           "Keepalive: \n Interval",IDC_STATIC,86,13,37,17
+    LTEXT           "Idle Timeout:\ninput",IDC_STATIC,160,12,44,17
+    EDITTEXT        IDC_IDLETIMEINPUT,209,15,27,14,ES_AUTOHSCROLL
 END
 
 IDD_OPTION5 DIALOGEX 0, 0, 260, 180
@@ -273,6 +272,10 @@ STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     GROUPBOX        "Service",IDC_STATIC,3,4,253,167
+    PUSHBUTTON      "Install Service",IDC_INSTALSS,30,25,91,14
+    PUSHBUTTON      "Uninstall Service",IDC_UNINSTALLS,30,61,91,14
+    PUSHBUTTON      "Start Service",IDC_STARTS,30,97,91,14
+    PUSHBUTTON      "Stop Service",IDC_STOPS,30,133,91,14
 END
 
 IDD_OPTION9 DIALOGEX 0, 0, 260, 180
@@ -307,7 +310,7 @@ BEGIN
     LTEXT           "Viewer Port",IDC_STATIC,209,107,38,8
 END
 
-IDD_ABOUTBOX DIALOG  22, 17, 230, 75
+IDD_ABOUTBOX DIALOG 22, 17, 230, 75
 STYLE DS_SETFONT | DS_MODALFRAME | WS_CAPTION | WS_SYSMENU
 CAPTION "About"
 FONT 8, "MS Shell Dlg"
@@ -353,7 +356,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_PASSWD, DIALOG
     BEGIN
@@ -363,6 +366,10 @@ BEGIN
     IDD_OPTION1, DIALOG
     BEGIN
         BOTTOMMARGIN, 171
+    END
+
+    IDD_PARENT, DIALOG
+    BEGIN
     END
 
     IDD_OPTION2, DIALOG
@@ -408,7 +415,7 @@ END
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_APP_TITLE           "uvnc_settings"
     IDC_UVNC_SETTINGS       "UVNC_SETTINGS"
@@ -422,10 +429,8 @@ END
 // Dutch (Belgium) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NLB)
-#ifdef _WIN32
 LANGUAGE LANG_DUTCH, SUBLANG_DUTCH_BELGIAN
 #pragma code_page(1252)
-#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //

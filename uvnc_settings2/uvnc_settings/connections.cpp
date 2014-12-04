@@ -9,9 +9,9 @@ extern LONG ConnectPriority;
 extern LONG QueryAccept;
 extern LONG LockSettings;
 extern LONG IdleTimeout;
+extern LONG IdleInputTimeout;
 extern char accept_reject_mesg[512];
 extern LONG keepAliveInterval;
-extern LONG socketKeepAliveTimeout;
 
 bool initdone4=false;
 BOOL CALLBACK DlgProcCON(HWND hwnd, UINT uMsg,
@@ -35,8 +35,8 @@ BOOL CALLBACK DlgProcCON(HWND hwnd, UINT uMsg,
 			SendMessage(GetDlgItem(hwnd, IDC_QNOLOGON), BM_SETCHECK, QueryIfNoLogon, 0);
 			SetDlgItemInt(hwnd,IDQUERYTIMEOUT, QueryTimeout, FALSE);
 			SetDlgItemInt(hwnd,IDC_IDLETIME, IdleTimeout, FALSE);
+			SetDlgItemInt(hwnd,IDC_IDLETIMEINPUT, IdleInputTimeout, FALSE);
 			SetDlgItemInt(hwnd,IDC_KINTERVAL, keepAliveInterval, FALSE);
-			SetDlgItemInt(hwnd,IDC_SOCKETTIMEOUT, socketKeepAliveTimeout, FALSE);
 			SetDlgItemText(hwnd,IDC_AUTHHOST,authhosts);
 			SetDlgItemText(hwnd,IDC_QMESG,accept_reject_mesg);
 
@@ -119,6 +119,18 @@ BOOL CALLBACK DlgProcCON(HWND hwnd, UINT uMsg,
 			EnableWindow(GetDlgItem(hwnd, IDC_QMESG), queryEnabled);
 			}
 			break;
+
+		case IDC_HELP2:
+			if (lParam==3)
+			
+{
+			char link[256];
+			strcpy(link,"http://www.uvnc.com/webhelp/");
+			strcat(link,"connections");
+			strcat(link,".html");
+			ShellExecute(GetDesktopWindow(), "open", link, "", 0, SW_SHOWNORMAL);
+			}
+			break;
 		case IDOK:	
 			{
 			BOOL ok1;
@@ -164,8 +176,8 @@ BOOL CALLBACK DlgProcCON(HWND hwnd, UINT uMsg,
 					ConnectPriority=3;
 				} 
 			IdleTimeout=GetDlgItemInt(hwnd, IDC_IDLETIME, &ok1, TRUE);
+			IdleInputTimeout=GetDlgItemInt(hwnd, IDC_IDLETIMEINPUT, &ok1, TRUE);
 			keepAliveInterval=GetDlgItemInt(hwnd, IDC_KINTERVAL, &ok1, TRUE);
-			socketKeepAliveTimeout=GetDlgItemInt(hwnd, IDC_SOCKETTIMEOUT, &ok1, TRUE);
 
 			}
 			break;

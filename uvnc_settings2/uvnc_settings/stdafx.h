@@ -32,6 +32,7 @@
 #include <malloc.h>
 #include <memory.h>
 #include <tchar.h>
+#include <shellapi.h>
 #define _WIN32_DCOM	
 //#if MSC_VER > 12
 #ifndef _X64

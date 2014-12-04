@@ -558,7 +558,17 @@ BOOL CALLBACK security(HWND hwnd, UINT uMsg,WPARAM wParam, LPARAM lParam)
 				}
 			EndDialog(hwnd, IDCANCEL);
 			return TRUE;
-
+		case IDC_HELP2:
+			if (lParam==1)
+			
+{
+			char link[256];
+			strcpy(link,"http://www.uvnc.com/webhelp/");
+			strcat(link,"security");
+			strcat(link,".html");
+			ShellExecute(GetDesktopWindow(), "open", link, "", 0, SW_SHOWNORMAL);
+			}
+			break;
 		case IDOK:
 			MSLogonRequired=SendDlgItemMessage(hwnd, IDC_MSLOGON_CHECKD, BM_GETCHECK, 0, 0);
 			NewMSLogon=SendDlgItemMessage(hwnd, IDC_NEW_MSLOGON, BM_GETCHECK, 0, 0);

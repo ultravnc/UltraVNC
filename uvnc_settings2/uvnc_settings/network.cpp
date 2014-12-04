@@ -268,6 +268,17 @@ BOOL CALLBACK DlgProcOptions1(HWND hwnd, UINT uMsg,
 			HANDLE thread=CreateThread( NULL, 0,unmapthread, NULL, 0, &dw);
 			}
 			break;
+		case IDC_HELP2:
+			if (lParam==0)
+			
+{
+			char link[256];
+			strcpy(link,"http://www.uvnc.com/webhelp/");
+			strcat(link,"network");
+			strcat(link,".html");
+			ShellExecute(GetDesktopWindow(), "open", link, "", 0, SW_SHOWNORMAL);
+			}
+			break;
 		case IDOK:
 			SocketConnect=SendDlgItemMessage(hwnd, IDC_CONNECT_SOCK, BM_GETCHECK, 0, 0);
 			HTTPConnect=SendDlgItemMessage(hwnd, IDC_CONNECT_HTTP, BM_GETCHECK, 0, 0);

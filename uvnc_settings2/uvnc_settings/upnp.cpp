@@ -59,9 +59,10 @@ HRESULT UPnP::OpenPorts(bool log) {
 		int counter=0;
 		while(SUCCEEDED(hr) && !pSPMC && counter<20)
 		{
-			if(log)debug("StaticPortMappingCollection failed");
+			debug("Retry StaticPortMappingCollection");
 			hr = pUN->get_StaticPortMappingCollection (&pSPMC);
 			counter++;
+			Sleep(1500);
 		}
 		if(SUCCEEDED(hr) && pSPMC) {
 			// see comment in "else"

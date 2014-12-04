@@ -201,9 +201,6 @@
   <ItemGroup>
     <ClCompile Include="capture.cpp" />
     <ClCompile Include="connections.cpp" />
-    <ClCompile Include="createsfx.cpp" />
-    <ClCompile Include="createsfx2.cpp" />
-    <ClCompile Include="createsfx3.cpp" />
     <ClCompile Include="dsmplugin.cpp" />
     <ClCompile Include="filetransfer.cpp" />
     <ClCompile Include="firewall.cpp" />
@@ -212,6 +209,7 @@
     <ClCompile Include="misc.cpp" />
     <ClCompile Include="network.cpp" />
     <ClCompile Include="security.cpp" />
+    <ClCompile Include="service.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

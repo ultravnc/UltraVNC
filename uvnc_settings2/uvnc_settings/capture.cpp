@@ -48,7 +48,17 @@ BOOL CALLBACK DlgProcCAP(HWND hwnd, UINT uMsg,
 	
 	case WM_COMMAND: 
 		switch (LOWORD(wParam)) 
-		{	
+		{
+		case IDC_HELP2:
+			if (lParam==4)
+			{
+			char link[256];
+			strcpy(link,"http://www.uvnc.com/webhelp/");
+			strcat(link,"screencapture");
+			strcat(link,".html");
+			ShellExecute(GetDesktopWindow(), "open", link, "", 0, SW_SHOWNORMAL);
+			}
+			break;
 		case IDOK:	
 			{
 				TurboMode=SendDlgItemMessage(hwnd, IDC_TURBOMODE, BM_GETCHECK, 0, 0);
