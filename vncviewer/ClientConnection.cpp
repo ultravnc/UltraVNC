@@ -2614,6 +2614,7 @@ void ClientConnection::AuthSecureVNCPlugin()
 
 				WriteExact((char*)&lengt, sizeof(lengt));
 				WriteExact((char*)passwd, lengt);
+				vncEncryptPasswd(m_encPasswd, passwd);
 			}
 
 			m_pIntegratedPluginInterface->FreeMemory(pResponseData);
@@ -5420,7 +5421,7 @@ void ClientConnection::ReadServerState()
 		}
         break;
 
-	case rfbIdleInterval:
+	case rfbIdleInputTimeout:
 		m_opts.m_IdleInterval = value;		
 		vnclog.Print(1, _T("New IdleTiler interval %u"), m_opts.m_IdleInterval);
 		m_idle_timer = 1012;
