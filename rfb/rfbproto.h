@@ -1076,7 +1076,7 @@ typedef struct {
 
 #define rfbServerRemoteInputsState  1
 #define rfbKeepAliveInterval        2
-#define rfbIdleInterval				3
+#define rfbIdleInputTimeout				3
 
 typedef struct {
     CARD8   type;          /* always rfbServerState */

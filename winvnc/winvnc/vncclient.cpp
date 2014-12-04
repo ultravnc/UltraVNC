@@ -2392,7 +2392,7 @@ vncClientThread::run(void *arg)
 		if (need_first_idletime)
 		{
 			// send first keepalive to let the client know we accepted the encoding request
-			m_client->SendServerStateUpdate(rfbIdleInterval, m_server->GetIdleInterval());
+			m_client->SendServerStateUpdate(rfbIdleInputTimeout, m_server->GetIdleInputTimeout());
 			need_first_idletime = false;
 		}
 

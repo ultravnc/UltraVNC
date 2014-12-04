@@ -117,6 +117,19 @@ PixelCaptureEngine::PixelCaptureEngineInit(HDC rootdc, HDC memdc, HBITMAP membit
 		m_ScreenOffsety=offsety;
 	}
 
+//SImulate high load biblt
+void Highcpu(long counter)
+{
+	float number = 1.5;
+
+	while (counter>0)
+	{
+		number *= number;
+		counter--;
+	}
+
+}
+
 bool
 PixelCaptureEngine::CaptureRect(const rfb::Rect& rect)
 	{
@@ -125,7 +138,8 @@ PixelCaptureEngine::CaptureRect(const rfb::Rect& rect)
 				m_rect = rect;
 				if ((m_oldbitmap = (HBITMAP) SelectObject(m_hmemdc, m_membitmap)) == NULL)
 					return false;
-
+				//Highcpu(100000000);
+	//			Beep(1000, 100);
 				// Capture screen into bitmap
 				BOOL blitok = BitBlt(m_hmemdc, 0, 0, rect.width(), rect.height(), m_hrootdc_PixelEngine, rect.tl.x + m_ScreenOffsetx, rect.tl.y + m_ScreenOffsety,
 									 m_bCaptureAlpha ? (CAPTUREBLT | SRCCOPY) : SRCCOPY);
@@ -1617,6 +1631,9 @@ void
 vncDesktop::CaptureScreen(const rfb::Rect &rect, BYTE *scrBuff, UINT scrBuffSize,BOOL capture)
 {
 	assert(rect.enclosed_by(m_bmrect));
+
+	//Highcpu(100000000);
+	//Beep(100, 100);
 	if (capture)
 	{
 		// Select the memory bitmap into the memory DC

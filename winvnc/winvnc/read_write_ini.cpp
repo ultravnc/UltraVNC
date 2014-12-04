@@ -65,6 +65,7 @@ LONG AutoPortSelect=1;
 LONG PortNumber=5900;
 LONG HttpPortNumber=5800;
 LONG IdleTimeout=0;
+LONG IdleInputTimeout = 0;
 
 LONG RemoveWallpaper=0;
 LONG RemoveAero=0;
@@ -203,12 +204,14 @@ AutoPortSelect=myIniFile_In.ReadInt("admin", "AutoPortSelect", true);
 PortNumber=myIniFile_In.ReadInt("admin", "PortNumber", PortNumber);
 HttpPortNumber=myIniFile_In.ReadInt("admin", "HTTPPortNumber",HttpPortNumber);
 IdleTimeout=myIniFile_In.ReadInt("admin", "IdleTimeout", IdleTimeout);
+IdleInputTimeout = myIniFile_In.ReadInt("admin", "IdleInputTimeout", IdleInputTimeout);
 myIniFile_Out.WriteInt("admin", "SocketConnect", SocketConnect);
 myIniFile_Out.WriteInt("admin", "HTTPConnect", HTTPConnect);
 myIniFile_Out.WriteInt("admin", "AutoPortSelect", AutoPortSelect);
 myIniFile_Out.WriteInt("admin", "PortNumber", PortNumber);
 myIniFile_Out.WriteInt("admin", "HTTPPortNumber", HttpPortNumber);
 myIniFile_Out.WriteInt("admin", "IdleTimeout", IdleTimeout);
+myIniFile_Out.WriteInt("admin", "IdleInputTimeout", IdleInputTimeout);
 
 RemoveWallpaper=myIniFile_In.ReadInt("admin", "RemoveWallpaper", RemoveWallpaper);
 RemoveAero=myIniFile_In.ReadInt("admin", "RemoveAero", RemoveAero);

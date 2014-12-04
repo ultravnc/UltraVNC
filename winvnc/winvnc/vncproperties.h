@@ -92,7 +92,7 @@ protected:
 	BOOL				m_alloweditclients;
     int                 m_ftTimeout;
     int                 m_keepAliveInterval;
-	int					m_IdleInterval;
+	int					m_IdleInputTimeout;
 
 
 	// Password handling

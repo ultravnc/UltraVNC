@@ -75,7 +75,7 @@ vncProperties::vncProperties()
 	m_fUseRegistry = FALSE;
     m_ftTimeout = FT_RECV_TIMEOUT;
     m_keepAliveInterval = KEEPALIVE_INTERVAL;
-	m_IdleInterval = 0;
+	m_IdleInputTimeout = 0;
 	m_pref_Primary=true;
 	m_pref_Secondary=false;
 
@@ -2318,14 +2318,14 @@ void vncProperties::LoadFromIniFile()
         m_ftTimeout = 60;
 
     m_keepAliveInterval = myIniFile.ReadInt("admin", "KeepAliveInterval", m_keepAliveInterval);
-	m_IdleInterval = myIniFile.ReadInt("admin", "IdleInterval", m_IdleInterval);
+	m_IdleInputTimeout = myIniFile.ReadInt("admin", "IdleInputTimeout", m_IdleInputTimeout);
 
     if (m_keepAliveInterval >= (m_ftTimeout - KEEPALIVE_HEADROOM))
         m_keepAliveInterval = m_ftTimeout - KEEPALIVE_HEADROOM;
 
     m_server->SetFTTimeout(m_ftTimeout);
     m_server->SetKeepAliveInterval(m_keepAliveInterval);
-	m_server->SetIdleInterval(m_IdleInterval);
+	m_server->SetIdleInputTimeout(m_IdleInputTimeout);
     
 
 	ApplyUserPrefs();
@@ -2424,7 +2424,7 @@ void vncProperties::SaveToIniFile()
 				myIniFile.WriteInt("admin", "AllowEditClients", m_alloweditclients);
 				myIniFile.WriteInt("admin", "FileTransferTimeout", m_ftTimeout);
 				myIniFile.WriteInt("admin", "KeepAliveInterval", m_keepAliveInterval);
-				myIniFile.WriteInt("admin", "IdleInterval", m_IdleInterval);
+				myIniFile.WriteInt("admin", "IdleInputTimeout", m_IdleInputTimeout);
 				myIniFile.WriteInt("admin", "DisableTrayIcon", m_server->GetDisableTrayIcon());
 				myIniFile.WriteInt("admin", "MSLogonRequired", m_server->MSLogonRequired());
 				// Marscha@2004 - authSSP: save "New MS-Logon" state
@@ -2448,7 +2448,7 @@ void vncProperties::SaveToIniFile()
 	myIniFile.WriteInt("admin", "AllowEditClients", m_alloweditclients);
     myIniFile.WriteInt("admin", "FileTransferTimeout", m_ftTimeout);
     myIniFile.WriteInt("admin", "KeepAliveInterval", m_keepAliveInterval);
-	myIniFile.WriteInt("admin", "IdleInterval", m_IdleInterval);
+	myIniFile.WriteInt("admin", "IdleInputTimeout", m_IdleInputTimeout);
 	myIniFile.WriteInt("admin", "DisableTrayIcon", m_server->GetDisableTrayIcon());
 	myIniFile.WriteInt("admin", "MSLogonRequired", m_server->MSLogonRequired());
 	// Marscha@2004 - authSSP: save "New MS-Logon" state

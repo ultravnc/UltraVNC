@@ -231,7 +231,7 @@ vncServer::vncServer()
 	m_fAutoRestart = false;
     m_ftTimeout = FT_RECV_TIMEOUT;
     m_keepAliveInterval = KEEPALIVE_INTERVAL;
-	m_IdleInterval = 0;
+	m_IdleInputTimeout = 0;
 	
 	//adzm 2010-05-12 - dsmplugin config
 	m_szDSMPluginConfig[0] = '\0';

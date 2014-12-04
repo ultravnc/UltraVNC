@@ -426,8 +426,8 @@ public:
     void NotifyClients_StateChange(CARD32 state, CARD32 value);
     int  GetFTTimeout() { return m_ftTimeout; }
     int  GetKeepAliveInterval () { return m_keepAliveInterval; }
-	int  GetIdleInterval() { return m_IdleInterval; }
-	void SetIdleInterval(int secs) { m_IdleInterval = secs; }
+	int  GetIdleInputTimeout() { return m_IdleInputTimeout; }
+	void SetIdleInputTimeout(int secs) { m_IdleInputTimeout = secs; }
 
     void SetFTTimeout(int msecs);
     void EnableKeepAlives(bool newstate) { m_fEnableKeepAlive = newstate; }
@@ -601,7 +601,7 @@ protected:
     bool m_fEnableKeepAlive;
     int m_ftTimeout;
     int m_keepAliveInterval;
-	int m_IdleInterval;
+	int m_IdleInputTimeout;
 	bool clearconsole;
 };
 
