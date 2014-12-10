@@ -5427,8 +5427,9 @@ void ClientConnection::ReadServerState()
 		m_idle_timer = 1012;
 		m_idle_time = value * 1000;
 		KillTimer(m_hwndcn, m_idle_timer);
+		KillTimer(m_hwndcn, 1013);
 		if (m_opts.m_IdleInterval > 0) {
-			SetTimer(m_hwndcn, m_idle_timer, m_idle_time, NULL);
+			SetTimer(m_hwndcn, m_idle_timer, m_idle_time, NULL);			
 		}
 		else {
 			m_idle_timer = 0;
@@ -8141,11 +8142,14 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 							_this->FlushWriteQueue();
 						}
 					}
-					else if (wParam == _this->m_idle_timer) {						
+					else if (wParam == _this->m_idle_timer) {
 						if (_this->m_idle_time<60000) 
-							_this->SetDormant(2);
+							SetTimer(_this->m_hwndcn, 1013, 5000, NULL);
 						else 
 							PostMessage(_this->m_hwndMain, WM_CLOSE, 0, 0);
+					}
+					else if (wParam == 1013) {
+						_this->SetDormant(2);
 					}
 				}
 				return 0;
@@ -8157,7 +8161,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 					_this->m_SWpoint.x=LOWORD(lParam);
 					_this->m_SWpoint.y=HIWORD(lParam);
 					_this->SendSW(_this->m_SWpoint.x,_this->m_SWpoint.y);
-					if (_this->m_opts.m_IdleInterval > 0) { SetTimer(hwnd, _this->m_idle_timer, _this->m_idle_time, NULL); _this->SetDormant(false); }
+					if (_this->m_opts.m_IdleInterval > 0) { KillTimer(_this->m_hwndcn, 1013);SetTimer(hwnd, _this->m_idle_timer, _this->m_idle_time, NULL); _this->SetDormant(false); }
 					return 0;
 				}
 			case WM_MBUTTONDOWN:
@@ -8166,7 +8170,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 			case WM_RBUTTONUP:
 			case WM_MOUSEMOVE:
 				{
-					if (_this->m_opts.m_IdleInterval > 0) { SetTimer(hwnd, _this->m_idle_timer, _this->m_idle_time, NULL); _this->SetDormant(false); }
+					if (_this->m_opts.m_IdleInterval > 0) { KillTimer(_this->m_hwndcn, 1013);SetTimer(hwnd, _this->m_idle_timer, _this->m_idle_time, NULL); _this->SetDormant(false); }
 					if (_this->m_SWselect) {return 0;}
 					if (!_this->m_running) return 0;
 //					if (GetFocus() != hwnd) return 0;
@@ -8192,7 +8196,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 			case WM_SYSKEYDOWN:
 			case WM_SYSKEYUP:
 				{					
-					if (_this->m_opts.m_IdleInterval > 0) {SetTimer(hwnd, _this->m_idle_timer, _this->m_idle_time, NULL); _this->SetDormant(false);}
+					if (_this->m_opts.m_IdleInterval > 0) {KillTimer(_this->m_hwndcn, 1013);SetTimer(hwnd, _this->m_idle_timer, _this->m_idle_time, NULL); _this->SetDormant(false);}
 					if (!_this->m_running) return 0;
 					if ( _this->m_opts.m_ViewOnly) return 0;
 					_this->ProcessKeyEvent((int) wParam, (DWORD) lParam);
@@ -8343,6 +8347,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 				}
 				#endif
 				KillTimer(_this->m_hwndcn, _this->m_idle_timer);
+				KillTimer(_this->m_hwndcn, 1013);
 				if (_this->m_waitingOnEmulateTimer)
 				{
 				KillTimer(_this->m_hwndcn, _this->m_emulate3ButtonsTimer);
