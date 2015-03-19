@@ -488,17 +488,22 @@ vncClientUpdateThread::run_undetached(void *arg)
 	int esc_counter=0;
 	while (g_DesktopThread_running && m_client->cl_connected)
 	{		
-		while (!m_client->m_initial_update) 
+		if (m_client->m_server->AreThereMultipleViewers() == false)
+		{
+			while (!m_client->m_initial_update)
 			{
 				esc_counter++;
 				Sleep(50);
-				if (esc_counter>100) break;
+				if (esc_counter > 100) break;
 #ifdef _DEBUG
-			char			szText[256];
-			sprintf(szText,"!m_initial_update \n");
-			OutputDebugString(szText);		
+				char			szText[256];
+				sprintf(szText,"!m_initial_update \n");
+				OutputDebugString(szText);		
 #endif
 			}
+		}
+
+
 		{
 			omni_mutex_lock l(m_client->GetUpdateLock(),82);
 
