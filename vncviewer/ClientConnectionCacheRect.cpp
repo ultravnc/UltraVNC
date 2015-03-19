@@ -139,7 +139,7 @@ void ClientConnection::ReadCacheZip(rfbFramebufferUpdateRectHeader *pfburh,HRGN 
 
 		SoftCursorLockArea(cacherect.left, cacherect.top, cacherect.right - cacherect.left, cacherect.bottom - cacherect.top);
 		RestoreArea(cacherect);
-		InvalidateRegion(&cacherect,prgn);
+		if (!m_opts.m_Directx) InvalidateRegion(&cacherect,prgn);
 	}
 
 }

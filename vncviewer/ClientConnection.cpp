@@ -3580,6 +3580,9 @@ void ClientConnection::Createdib()
 						directx_output.DestroyD3D();
 						directx_used=false;
 					}
+				//TEST WITHOUT DIRECTX
+				//directx_output.DestroyD3D();
+				//directx_used = false;
 			}
 }
 // Closing down the connection.
@@ -3976,7 +3979,7 @@ inline void ClientConnection::SubProcessPointerEvent(int x, int y, DWORD keyflag
 		int y_scaled =
 			(y + m_vScrollPos) * m_opts.m_scale_den / m_opts.m_scale_num;
 
-		if (directx_used)
+		if (m_opts.m_Directx)
 		{
 			x_scaled = (x ) *  m_si.framebufferWidth /m_cliwidth ;
 			if(m_opts.m_ShowToolbar) y_scaled =(y) * m_si.framebufferHeight / (m_cliheight-m_TBr.bottom) ;
@@ -4266,29 +4269,69 @@ inline void ClientConnection::DoBlit()
 			::Sleep(m_pApp->m_options.m_delay);
 		}
 
-		if (m_opts.m_scaling)
+		if (m_opts.m_scaling || (directx_used == false && m_opts.m_Directx == true))
 		{
-			int n = m_opts.m_scale_num;
-			int d = m_opts.m_scale_den;
 
-			SetStretchBltMode(hdc, HALFTONE);
-			SetBrushOrgEx(hdc, 0,0, NULL);
+			if ((directx_used == false && m_opts.m_Directx == true))
 			{
-				if(m_hmemdc)
+
+				RECT myrect, myclrect;
+				GetClientRect(m_hwndMain, &myclrect);
+				int w = myclrect.right - myclrect.left;
+				int h = myclrect.bottom - myclrect.top;
+
+				if (m_opts.m_ShowToolbar) h = h - m_TBr.bottom;
+
+				float horizontalRatio = (float)w / (float)m_si.framebufferWidth;
+				float verticalRatio = (float)h / (float)m_si.framebufferHeight;
+
+
+				SetStretchBltMode(hdc, HALFTONE);
+				SetBrushOrgEx(hdc, 0, 0, NULL);
 				{
-					ObjectSelector bb(m_hmemdc, m_membitmap);
-					StretchBlt(
-					hdc,
-					ps.rcPaint.left,
-					ps.rcPaint.top,
-					ps.rcPaint.right-ps.rcPaint.left,
-					ps.rcPaint.bottom-ps.rcPaint.top,
-					m_hmemdc,
-					(ps.rcPaint.left+m_hScrollPos)     * d / n,
-					(ps.rcPaint.top+m_vScrollPos)      * d / n,
-					(ps.rcPaint.right-ps.rcPaint.left) * d / n,
-					(ps.rcPaint.bottom-ps.rcPaint.top) * d / n,
-					SRCCOPY);
+					if (m_hmemdc)
+					{
+						ObjectSelector bb(m_hmemdc, m_membitmap);
+						StretchBlt(
+							hdc,
+							ps.rcPaint.left,
+							ps.rcPaint.top,
+							ps.rcPaint.right - ps.rcPaint.left,
+							ps.rcPaint.bottom - ps.rcPaint.top,
+							m_hmemdc,
+							(ps.rcPaint.left + m_hScrollPos)     / horizontalRatio,
+							(ps.rcPaint.top + m_vScrollPos)      / verticalRatio,
+							(ps.rcPaint.right - ps.rcPaint.left) / horizontalRatio,
+							(ps.rcPaint.bottom - ps.rcPaint.top) / verticalRatio,
+							SRCCOPY);
+					}
+				}
+			}
+			else
+			{
+
+				int n = m_opts.m_scale_num;
+				int d = m_opts.m_scale_den;
+
+				SetStretchBltMode(hdc, HALFTONE);
+				SetBrushOrgEx(hdc, 0, 0, NULL);
+				{
+					if (m_hmemdc)
+					{
+						ObjectSelector bb(m_hmemdc, m_membitmap);
+						StretchBlt(
+							hdc,
+							ps.rcPaint.left,
+							ps.rcPaint.top,
+							ps.rcPaint.right - ps.rcPaint.left,
+							ps.rcPaint.bottom - ps.rcPaint.top,
+							m_hmemdc,
+							(ps.rcPaint.left + m_hScrollPos)     * d / n,
+							(ps.rcPaint.top + m_vScrollPos)      * d / n,
+							(ps.rcPaint.right - ps.rcPaint.left) * d / n,
+							(ps.rcPaint.bottom - ps.rcPaint.top) * d / n,
+							SRCCOPY);
+					}
 				}
 			}
 		}
@@ -5141,7 +5184,7 @@ inline void ClientConnection::ReadScreenUpdate()
 			rect.right  = surh.r.x + surh.r.w ;
 			rect.bottom = surh.r.y + surh.r.h;
 
-			if (!directx_used)InvalidateRegion(&rect,&UpdateRegion);
+			if (!m_opts.m_Directx)InvalidateRegion(&rect,&UpdateRegion);
 				//InvalidateScreenRect(&rect);
 		}
 		else if (surh.encoding !=rfbEncodingNewFBSize)
@@ -5167,7 +5210,7 @@ inline void ClientConnection::ReadScreenUpdate()
 		SoftCursorUnlockScreen();
 	}
 
-	if (directx_used)
+	if (m_opts.m_Directx)
 	{
 		InvalidateRect(m_hwndcn, NULL, TRUE);
 	}
@@ -6425,6 +6468,13 @@ void ClientConnection::GTGBS_CreateDisplay()
 			  (LPVOID)this);
 	helper::SafeSetWindowUserData(m_hwndMain, (LONG_PTR)this);
 
+	/*LONG lExStyle = GetWindowLong(m_hwndMain, GWL_EXSTYLE);
+	lExStyle &= ~(WS_EX_DLGMODALFRAME | WS_EX_CLIENTEDGE | WS_EX_STATICEDGE);
+	SetWindowLong(m_hwndMain, GWL_EXSTYLE, lExStyle);
+	LONG lStyle = GetWindowLong(m_hwndMain, GWL_STYLE);
+	lStyle &= ~(WS_CAPTION | WS_THICKFRAME | WS_MINIMIZE | WS_MAXIMIZE | WS_SYSMENU);
+	SetWindowLong(m_hwndMain, GWL_STYLE, lStyle);
+	SetWindowPos(m_hwndMain, NULL, 0,0,0,0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOOWNERZORDER);*/
 	// [v1.0.2-jp1 fix]
 	ImmAssociateContext(m_hwndMain, NULL);    
 }
@@ -7278,7 +7328,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 
 #ifndef UNDER_CE
 				case WM_SIZING:
-					if (_this->directx_used) return 0;
+					if (_this->m_opts.m_Directx) return 0;
 					{
 						int a=GetSystemMetrics(SM_CYHSCROLL);
 						int b=GetSystemMetrics(SM_CXVSCROLL);
@@ -7632,7 +7682,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						if (_this->SB_HORZ_BOOL) h=h_scrollbar;
 						if (_this->SB_VERT_BOOL) v=v_scrollbar;
 
-						if (_this->InFullScreenMode() || _this->directx_used)
+						if (_this->InFullScreenMode() || _this->m_opts.m_Directx)
 						{
 							_this->SB_HORZ_BOOL=false;
 							_this->SB_VERT_BOOL=false;
@@ -7699,7 +7749,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						// Update these for the record
 						// And consider that in full-screen mode the window
 						// is actually bigger than the remote screen.
-						if (_this->directx_used)
+						if (_this->m_opts.m_Directx)
 						{
 							GetClientRect(hwnd, &rect);
 

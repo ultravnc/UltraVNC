@@ -316,7 +316,7 @@ void ClientConnection::SoftCursorRestoreArea() {
 	omni_mutex_lock l(m_bitmapdcMutex);
 	if (m_DIBbits && m_SavedAreaBIB) Copyfrom0buffer(w, h, x, y,m_myFormat.bitsPerPixel/8,m_SavedAreaBIB,(BYTE*)m_DIBbits,m_si.framebufferWidth);
 
-	InvalidateScreenRect(&r);
+	if (!m_opts.m_Directx)InvalidateScreenRect(&r);
 }
 
 //
@@ -349,7 +349,7 @@ void ClientConnection::SoftCursorDraw() {
 
 	RECT r;
 	SoftCursorToScreen(&r, NULL);
-	InvalidateScreenRect(&r);
+	if (!m_opts.m_Directx) InvalidateScreenRect(&r);
 }
 
 //

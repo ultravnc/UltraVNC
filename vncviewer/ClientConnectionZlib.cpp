@@ -313,7 +313,7 @@ void ClientConnection::ReadSolMonoZip(rfbFramebufferUpdateRectHeader *pfburh,HRG
 					vnclog.Print(0, _T("Invalid number of bits per pixel: %d\n"), m_myFormat.bitsPerPixel);
 				}
 				pzipbuf +=m_myFormat.bitsPerPixel/8;
-				if (!directx_used)InvalidateRegion(&rect,prgn);
+				if (!m_opts.m_Directx)InvalidateRegion(&rect,prgn);
 			}
 		else if ( surh.encoding==rfbEncodingXORMonoColor_Zlib)
 			{
@@ -341,7 +341,7 @@ void ClientConnection::ReadSolMonoZip(rfbFramebufferUpdateRectHeader *pfburh,HRG
 					vnclog.Print(0, _T("Invalid number of bits per pixel: %d\n"), m_myFormat.bitsPerPixel);
 				}
 				pzipbuf += (((surh.r.w*surh.r.h)+7)/8)+m_myFormat.bitsPerPixel/8+m_myFormat.bitsPerPixel/8;
-				if (!directx_used)InvalidateRegion(&rect,prgn);
+				if (!m_opts.m_Directx)InvalidateRegion(&rect,prgn);
 			}
 		else if ( surh.encoding==rfbEncodingXOR_Zlib)
 			{
@@ -369,7 +369,7 @@ void ClientConnection::ReadSolMonoZip(rfbFramebufferUpdateRectHeader *pfburh,HRG
 				}
 			// we need to count the size off the databuffer
 				pzipbuf += (((surh.r.w*surh.r.h)+7)/8)+aantal*m_myFormat.bitsPerPixel/8;//mask
-				if (!directx_used)InvalidateRegion(&rect,prgn);
+				if (!m_opts.m_Directx)InvalidateRegion(&rect,prgn);
 			}
 		else if ( surh.encoding==rfbEncodingRaw)
 			{
@@ -393,7 +393,7 @@ void ClientConnection::ReadSolMonoZip(rfbFramebufferUpdateRectHeader *pfburh,HRG
 						vnclog.Print(0, _T("Invalid number of bits per pixel: %d\n"), m_myFormat.bitsPerPixel);
 				}
 				pzipbuf +=numpixels*m_myFormat.bitsPerPixel/8;
-				if (!directx_used)InvalidateRegion(&rect,prgn);
+				if (!m_opts.m_Directx)InvalidateRegion(&rect,prgn);
 			}
 	}
 
