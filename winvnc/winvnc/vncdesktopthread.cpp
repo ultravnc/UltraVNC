@@ -363,7 +363,9 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 				
 				
 				//BOOL screensize_changed=false;
-				BOOL monitor_changed=true;
+				BOOL monitor_changed=false;
+				BOOL initial_run = false;
+				if (m_desktop->m_old_monitor == 6) initial_run = true;
 				rfbServerInitMsg oldscrinfo;
 				//*******************************************************
 				// Lock Buffers from here
@@ -672,8 +674,12 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 
 
 					}
-					m_desktop->m_buffer.ClearCache();
-					m_desktop->m_buffer.BlackBack();
+					if (!initial_run)
+					{
+						initial_run = false;
+						m_desktop->m_buffer.ClearCache();
+						m_desktop->m_buffer.BlackBack();
+					}
 					InvalidateRect(NULL,NULL,TRUE);
 					rgncache.assign_union(rfb::Region2D(m_desktop->m_Cliprect));
 					
