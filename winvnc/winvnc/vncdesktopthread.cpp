@@ -987,13 +987,13 @@ vncDesktopThread::run_undetached(void *arg)
 		}
 	if (m_server->IsUltraVNCViewer()) first_run=true;
 	else first_run=false;
+	int waittime=0;
 
 	while (looping && !fShutdownOrdered)
 	{		
 		DWORD result;
 		newtick = timeGetTime();
-		int waittime;
-		waittime=33;
+		if (waittime != 1000) waittime = 33;
 		if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver) 
 		{
 			strcpy_s(g_hookstring,"driver");
@@ -1019,7 +1019,14 @@ vncDesktopThread::run_undetached(void *arg)
 			waittime=0;
 		}
 		//no need to wait, the w8hook does it own waiting.
-		if (m_desktop->startw8) waittime=0;
+		if (m_desktop->startw8 && waittime!=1000) waittime = 33;
+#ifdef _DEBUG
+		char			szText[256];
+		DWORD error = GetLastError();
+		sprintf(szText, "waittime %i  \n",waittime);
+		SetLastError(0);
+		OutputDebugString(szText);
+#endif
 
 		result=WaitForMultipleObjects(6,m_desktop->trigger_events,FALSE,waittime);
 		{
@@ -1028,7 +1035,7 @@ vncDesktopThread::run_undetached(void *arg)
 										sprintf(szText,"WaitForMultipleObjects %i\n",result );
 										OutputDebugString(szText);		
 			#endif
-
+			waittime = 0;
 			// We need to wait until restart is done
 			// else wait_timeout goes in to looping while sink window is not ready
 			// if no window could be started in 10 seconds something went wrong, close
@@ -1479,6 +1486,10 @@ vncDesktopThread::run_undetached(void *arg)
 					#ifdef AVILOG
 									if (m_desktop->AviGen) m_desktop->AviGen->AddFrame((BYTE*)m_desktop->m_DIBbits);
 					#endif
+								}
+								else
+								{
+									if (m_desktop->startw8) waittime = 1000;
 								}
 								//newtick = timeGetTime(); 
 							}
