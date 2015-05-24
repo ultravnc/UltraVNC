@@ -348,6 +348,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR szCmdLin
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR szCmdLine, int iCmdShow)
 #endif
 {
+
+HMODULE hUser32 = LoadLibrary(_T("user32.dll"));
+typedef BOOL(*SetProcessDPIAwareFunc)();
+SetProcessDPIAwareFunc setDPIAware=NULL;
+if (hUser32) setDPIAware = (SetProcessDPIAwareFunc)GetProcAddress(hUser32, "SetProcessDPIAware");
+if (setDPIAware) setDPIAware();
+if (hUser32) FreeLibrary(hUser32);
+
 #ifdef IPP
 	InitIpp();
 #endif
