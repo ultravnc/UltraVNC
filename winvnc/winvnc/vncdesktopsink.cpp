@@ -181,12 +181,31 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 			if (wParam==100)
 			{
 					KillTimer(hwnd, 100);
+					bool w8started = false;
 					if (_this->startw8)
 					{
-						_this->startw8(!_this->multi_monitor);
-						vnclog.Print(LL_INTERR, VNCLOG("set W8 hooks OK\n"));
-						_this->m_hookinited = TRUE;
+						if (_this->startw8(!_this->multi_monitor))
+						{
+							w8started = true;
+							_this->m_hookinited = TRUE;
+							vnclog.Print(LL_INTERR, VNCLOG("set W8 hooks OK\n"));
+						}
+						else
+						{
+							vnclog.Print(LL_INTERR, VNCLOG("set W8 hooks Failed, wddm >= 1.2 ?\n"));
+							//not wddm 1.2 or some other things prevent the desktophook to work proper
+							_this->stopw8();
+							if (_this->hW8Module)FreeLibrary(_this->hW8Module);
+							_this->hW8Module = NULL;
+							_this->startw8 = NULL;
+							_this->stopw8 = NULL;
+							_this->capturew8 = NULL;
+
+						}
+						
+						
 					}
+					if (w8started){}
 					else if (_this->SetHook)
 					{
 						_this->SetHook(hwnd);

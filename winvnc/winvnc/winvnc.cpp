@@ -335,15 +335,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 			CloseHandle(hShutdownEventTmp);
 
 			//adzm 2010-02-10 - Finds the appropriate VNC window for any process. Sends this message to all of them!
+			// do removed, loops forever with cpu 100
 			HWND hservwnd = NULL;
-			do {
+			hservwnd = FindWinVNCWindow(false);
 				if (hservwnd!=NULL)
 				{
 					PostMessage(hservwnd, WM_COMMAND, 40002, 0);
 					PostMessage(hservwnd, WM_CLOSE, 0, 0);
 				}
-				hservwnd = FindWinVNCWindow(false);
-			} while (hservwnd!=NULL);
 			return 0;
 		}
 
