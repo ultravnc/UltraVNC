@@ -366,6 +366,8 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..;../zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="xzInStream.cxx" />
+    <ClCompile Include="xzOutStream.cxx" />
     <ClCompile Include="ZlibInStream.cxx">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..;../zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -406,6 +408,8 @@
     <ClInclude Include="NullOutStream.h" />
     <ClInclude Include="OutStream.h" />
     <ClInclude Include="types.h" />
+    <ClInclude Include="xzInStream.h" />
+    <ClInclude Include="xzOutStream.h" />
     <ClInclude Include="ZlibInStream.h" />
     <ClInclude Include="ZlibOutStream.h" />
   </ItemGroup>
