@@ -1456,6 +1456,17 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 		  HWND hCache = GetDlgItem(hwnd, ID_SESSION_SET_CACHE);
 		  SendMessage(hCache, BM_SETCHECK, _this->m_fEnableCache, 0);
 		  EnableWindow(hCache, !_this->autoDetect);
+
+#ifndef _XZ
+		  HWND hxz = GetDlgItem(hwnd, IDC_XZRADIO);
+		  EnableWindow(hxz, false);
+		  ShowWindow(hxz, false);
+		  HWND hxzyw = GetDlgItem(hwnd, IDC_XZYWRADIO);
+		  EnableWindow(hxzyw, false);
+		  ShowWindow(hxzyw, false);
+
+
+#endif
 		  
 		  
 #ifndef UNDER_CE
