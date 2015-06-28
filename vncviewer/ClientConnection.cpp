@@ -49,6 +49,13 @@ extern "C" {
 
 #include <rdr/FdInStream.h>
 #include <rdr/ZlibInStream.h>
+#include <rdr/ZlibOutStream.h>
+#ifdef _XZ
+#include <rdr/xzInStream.h>
+#endif
+#include <rdr/MemInStream.h>
+#include <rdr/xzOutStream.h>
+#include <rdr/MemOutStream.h>
 #include <rdr/Exception.h>
 
 #include <rfb/dh.h>
@@ -350,6 +357,14 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_nZRLENetRectBufOffset = 0;
 	m_nZRLEReadSize = 0;
 	m_nZRLENetRectBufSize = 0;
+#ifdef _XZ
+	m_pXZNetRectBuf = NULL;
+	m_fReadFromXZNetRectBuf = false;  // 
+	m_nXZNetRectBufOffset = 0;
+	m_nXZReadSize = 0;
+	m_nXZNetRectBufSize = 0;
+#endif
+
 	//adzm - 2009-06-21
 	m_pPluginInterface = NULL;
 	//adzm 2010-05-10
@@ -388,6 +403,9 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_fScalingDone = false;
 
     zis = new rdr::ZlibInStream;
+#ifdef _XZ
+	xzis = new rdr::xzInStream;
+#endif
 
 	// tight cusorhandling
 	prevCursorSet = false;
@@ -465,6 +483,10 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	rcSource=NULL;
 	rcMask=NULL;
 	zywrle_level = 1;
+#ifdef _XZ
+	xzyw_level = 1;
+	xzyw = 0;
+#endif
 
 	m_autoReconnect = m_opts.m_autoReconnect;
 	ThreadSocketTimeout=NULL;
@@ -1628,14 +1650,16 @@ void ClientConnection::HandleQuickOption()
 	switch (m_opts.m_quickoption)
 	{
 	case 1:
-		m_opts.m_PreferredEncoding = rfbEncodingZRLE;
+		m_opts.m_PreferredEncodings.clear();
+		m_opts.m_PreferredEncodings.push_back(rfbEncodingZRLE);
 		m_opts.m_Use8Bit = rfbPFFullColors; //false;
 		m_opts.m_fEnableCache = true;
 		m_opts.autoDetect = true;
 		break;
 
 	case 2:
-		m_opts.m_PreferredEncoding = rfbEncodingHextile;
+		m_opts.m_PreferredEncodings.clear();
+		m_opts.m_PreferredEncodings.push_back(rfbEncodingHextile);
 		m_opts.m_Use8Bit = rfbPFFullColors; // false; // Max colors
 		m_opts.autoDetect = false;
 		m_opts.m_fEnableCache = false;
@@ -1645,7 +1669,8 @@ void ClientConnection::HandleQuickOption()
 		break;
 
 	case 3:
-		m_opts.m_PreferredEncoding = rfbEncodingZRLE; // rfbEncodingZlibHex;
+		m_opts.m_PreferredEncodings.clear();
+		m_opts.m_PreferredEncodings.push_back(rfbEncodingZRLE);
 		m_opts.m_Use8Bit = rfbPF256Colors; //false;
 		m_opts.autoDetect = false;
 		m_opts.m_fEnableCache = false;
@@ -1653,14 +1678,16 @@ void ClientConnection::HandleQuickOption()
 		break;
 
 	case 4:
-		m_opts.m_PreferredEncoding = rfbEncodingZRLE;
+		m_opts.m_PreferredEncodings.clear();
+		m_opts.m_PreferredEncodings.push_back(rfbEncodingZRLE);
 		m_opts.m_Use8Bit = rfbPF64Colors; //true;
 		m_opts.autoDetect = false;
 		m_opts.m_fEnableCache = true;
 		break;
 
 	case 5:
-		m_opts.m_PreferredEncoding = rfbEncodingZRLE;
+		m_opts.m_PreferredEncodings.clear();
+		m_opts.m_PreferredEncodings.push_back(rfbEncodingZRLE);
 		m_opts.m_Use8Bit = rfbPF8Colors; //true;
 		// m_opts.m_scaling = true;
 		// m_opts.m_scale_num = 200;
@@ -1672,7 +1699,8 @@ void ClientConnection::HandleQuickOption()
 		break;
 
 	case 7:
-		m_opts.m_PreferredEncoding = rfbEncodingUltra;
+		m_opts.m_PreferredEncodings.clear();
+		m_opts.m_PreferredEncodings.push_back(rfbEncodingUltra);
 		m_opts.m_Use8Bit = rfbPFFullColors; //false; // Max colors
 		m_opts.autoDetect = false;
 		// [v1.0.2-jp2 fix-->]
@@ -1896,9 +1924,14 @@ void ClientConnection::SetSocketOptions()
 	BOOL nodelayval = TRUE;
 	if (setsockopt(m_sock, IPPROTO_TCP, TCP_NODELAY, (const char *) &nodelayval, sizeof(BOOL)))
 		throw WarningException(sz_L50);
-
-        fis = new rdr::FdInStream(m_sock);
-		fis->SetDSMMode(m_pDSMPlugin->IsEnabled()); // sf@2003 - Special DSM mode for ZRLE encoding
+	
+	// adzm 2010-10
+	if (fis) {
+		delete fis;
+		fis = NULL;
+	}
+    fis = new rdr::FdInStream(m_sock);
+	fis->SetDSMMode(m_pDSMPlugin->IsEnabled()); // sf@2003 - Special DSM mode for ZRLE encoding
 }
 
 void ClientConnection::NegotiateProtocolVersion()
@@ -3386,57 +3419,54 @@ void ClientConnection::SetFormatAndEncodings()
 	//
 	if (!new_ultra_server)
 	{
-		if ( m_opts.m_PreferredEncoding == rfbEncodingUltra2) m_opts.m_PreferredEncoding=rfbEncodingZRLE;
-	}
-	// Put the preferred encoding first, and change it if the
-	// preferred encoding is not actually usable.
-	for (i = LASTENCODING; i >= rfbEncodingRaw; i--)
-	{
-		if (m_opts.m_PreferredEncoding == i) {
-			if (m_opts.m_UseEnc[i])
-			{
-				encs[se->nEncodings++] = Swap32IfLE(i);
-	  			if ( i == rfbEncodingZlib ||
-					 i == rfbEncodingTight ||
-					 i == rfbEncodingZlibHex
-			   )
-				{
-					useCompressLevel = true;
-				}
-	  			if ( i == rfbEncodingZYWRLE
-			   )
-				{
-					zywrle = 1;
-				}else{
-					zywrle = 0;
-				}
-			}
-			else
-			{
-				m_opts.m_PreferredEncoding--;
+		for (std::vector<int>::iterator it = m_opts.m_PreferredEncodings.begin(); it != m_opts.m_PreferredEncodings.end(); ++it) {
+			if (*it == rfbEncodingUltra2) {
+				*it = rfbEncodingZRLE;
 			}
 		}
 	}
+	// Put the preferred encoding first, and change it if the
+	// preferred encoding is not actually usable.
+	std::vector<int> preferred_encodings = m_opts.m_PreferredEncodings;
+
+	if (preferred_encodings.end() != std::find(preferred_encodings.begin(), preferred_encodings.end(), rfbEncodingZYWRLE)) {
+		zywrle = 1;
+	} else {
+		zywrle = 0;
+	}
+#ifdef _XZ
+	if (preferred_encodings.end() != std::find(preferred_encodings.begin(), preferred_encodings.end(), rfbEncodingXZYW)) {
+		xzyw = 1;
+	} else {
+		xzyw = 0;
+	}
+#endif
+
 
 	// Now we go through and put in all the other encodings in order.
 	// We do rather assume that the most recent encoding is the most
 	// desirable!
 	for (i = LASTENCODING; i >= rfbEncodingRaw; i--)
 	{
-		if ( i == rfbEncodingTight && m_opts.m_PreferredEncoding != rfbEncodingTight) m_opts.m_UseEnc[i]=false;
-
-		if ( (m_opts.m_PreferredEncoding != i) &&
-			 (m_opts.m_UseEnc[i]))
-		{
-			encs[se->nEncodings++] = Swap32IfLE(i);
-			if ( i == rfbEncodingZlib ||
-				 i == rfbEncodingTight ||
-				 i == rfbEncodingZlibHex
-				)
-			{
-				useCompressLevel = true;
-			}
+		if (m_opts.m_UseEnc[i] && preferred_encodings.end() == std::find(preferred_encodings.begin(), preferred_encodings.end(), i)) {
+			preferred_encodings.push_back(i);
 		}
+	}
+	
+	for (std::vector<int>::iterator it = preferred_encodings.begin(); it != preferred_encodings.end(); it++) {
+		if (*it == rfbEncodingZlib ||
+			*it == rfbEncodingTight ||
+			*it == rfbEncodingZlibHex 
+#ifdef _XZ
+			||*it == rfbEncodingXZ ||
+			*it == rfbEncodingXZYW
+#endif
+			)
+		{
+			useCompressLevel = true;
+		}
+
+		encs[se->nEncodings++] = Swap32IfLE(*it);
 	}
 
 	// Tight - Request desired compression level if applicable
@@ -3617,6 +3647,10 @@ void ClientConnection::SuspendThread()
 	delete(zis);
 	zis = new rdr::ZlibInStream;
 
+#ifdef _XZ
+	delete(xzis);
+	xzis = new rdr::xzInStream;
+#endif
 	for (int i = 0; i < 4; i++)
 		m_tightZlibStreamActive[i] = false;
 
@@ -3624,17 +3658,28 @@ void ClientConnection::SuspendThread()
 	m_nTO = 1;
 	LoadDSMPlugin(true);
 	// WHat is this doing here ???
-	// m_fUseProxy = false;  << repeater block after reconnect
+	// m_fUseProxy = false;  << repeater block after reconnect+	
+
+	delete[] m_pNetRectBuf;
 	m_pNetRectBuf = NULL;
 	m_fReadFromNetRectBuf = false;
 	m_nNetRectBufOffset = 0;
 	m_nReadSize = 0;
 	m_nNetRectBufSize = 0;
+	delete[] m_pZRLENetRectBuf;
 	m_pZRLENetRectBuf = NULL;
 	m_fReadFromZRLENetRectBuf = false;
 	m_nZRLENetRectBufOffset = 0;
 	m_nZRLEReadSize = 0;
 	m_nZRLENetRectBufSize = 0;
+#ifdef _XZ
+	delete[] m_pXZNetRectBuf;
+	m_pXZNetRectBuf = NULL;
+	m_fReadFromXZNetRectBuf = false;
+	m_nXZNetRectBufOffset = 0;
+	m_nXZReadSize = 0;
+	m_nXZNetRectBufSize = 0;
+#endif
 
 	if (m_sock != INVALID_SOCKET)
 	{
@@ -3686,12 +3731,20 @@ ClientConnection::~ClientConnection()
 
     if (zis)
       delete zis;
-
+#ifdef _XZ
+	if (xzis)
+		delete(xzis);
+#endif
     if (fis)
       delete fis;
 
 	if (m_pZRLENetRectBuf != NULL)
 		delete [] m_pZRLENetRectBuf;
+#ifdef _XZ
+	if (m_pXZNetRectBuf != NULL)
+		delete [] m_pXZNetRectBuf;
+#endif
+
 
 	if (m_sock != INVALID_SOCKET) {
 		shutdown(m_sock, SD_BOTH);
@@ -4883,7 +4936,7 @@ inline void ClientConnection::ReadScreenUpdate()
 
     //if (sut.nRects == 0) return;  XXX tjr removed this - is this OK?
 
-	for (UINT i=0; i < sut.nRects; i++)
+	for (UINT iCurrentRect=0; iCurrentRect < sut.nRects; iCurrentRect++)
 	{
 		rfbFramebufferUpdateRectHeader surh;
 		ReadExact((char *) &surh, sz_rfbFramebufferUpdateRectHeader);
@@ -5135,6 +5188,66 @@ inline void ClientConnection::ReadScreenUpdate()
 			zrleDecode(surh.r.x, surh.r.y, surh.r.w, surh.r.h);
 			EncodingStatusWindow=zywrle ? rfbEncodingZYWRLE : rfbEncodingZRLE;
 			break;
+#ifdef _XZ
+		case rfbEncodingXZ:
+			xzyw = 0;
+		case rfbEncodingXZYW:			
+			EncodingStatusWindow=xzyw ? rfbEncodingXZYW : rfbEncodingXZ;
+			{
+				CheckBufferSize(0x20000);
+				int nAllRects = (surh.r.x << 16) | surh.r.y;
+				int nDataLength = (surh.r.w << 16) | surh.r.h;
+
+				if (!fis->GetReadFromMemoryBuffer())
+				{
+					m_nXZReadSize = nDataLength;
+					assert(m_nXZReadSize > 0);
+					CheckXZNetRectBufferSize((int)m_nXZReadSize);
+					CheckBufferSize((int)m_nXZReadSize+4);
+					ReadExact((char*)(m_pXZNetRectBuf), (int)(m_nXZReadSize));
+					fis->SetReadFromMemoryBuffer(m_nXZReadSize, (char*)(m_pXZNetRectBuf));
+				}
+
+				xzis->setUnderlying(fis, nDataLength);
+
+				std::vector<rfbRectangle> rects;
+
+				for (int iRect = 0; iRect < nAllRects; iRect++) {
+					rfbRectangle rectangle;
+					xzis->readBytes(&rectangle, sz_rfbRectangle);
+
+					rectangle.x = Swap16IfLE(rectangle.x);
+					rectangle.y = Swap16IfLE(rectangle.y);
+					rectangle.w = Swap16IfLE(rectangle.w);
+					rectangle.h = Swap16IfLE(rectangle.h);	
+
+					rects.push_back(rectangle);
+				}
+
+				for (std::vector<rfbRectangle>::const_iterator it = rects.begin(); it != rects.end(); it++) {
+					const rfbRectangle& rect(*it);
+
+					RECT invalid_rect;
+					invalid_rect.left   = rect.x;
+					invalid_rect.top    = rect.y;
+					invalid_rect.right  = rect.x + rect.w ;
+					invalid_rect.bottom = rect.y + rect.h; 
+					
+					SoftCursorLockArea(rect.x, rect.y, rect.w, rect.h);
+
+					SaveArea(invalid_rect);
+					
+					xzDecode(rect.x, rect.y, rect.w, rect.h);
+
+					InvalidateScreenRect(&invalid_rect); 
+
+					SoftCursorUnlockScreen();
+				}
+
+				iCurrentRect += rects.size() - 1;
+			}
+			break;
+#endif
 		case rfbEncodingTight:
 			if (directx_used) m_DIBbits=directx_output.Preupdate((unsigned char *)m_DIBbits);
 			SaveArea(cacherect);
@@ -5176,6 +5289,7 @@ inline void ClientConnection::ReadScreenUpdate()
 			break;
 		}
 
+		//Todo: surh.encoding != rfbEncodingXZ && surh.encoding != rfbEncodingXZYW && 
 		if (surh.encoding !=rfbEncodingNewFBSize && surh.encoding != rfbEncodingCacheZip && surh.encoding != rfbEncodingSolMonoZip && surh.encoding != rfbEncodingUltraZip)
 		{
 			RECT rect;
@@ -5246,7 +5360,8 @@ inline void ClientConnection::ReadScreenUpdate()
 		if (avg_kbitsPerSecond > 10000 && (m_nConfig != 1))
 		{
 			m_nConfig = 1;
-			m_opts.m_PreferredEncoding = rfbEncodingHextile;
+			m_opts.m_PreferredEncodings.clear();
+			m_opts.m_PreferredEncodings.push_back(rfbEncodingHextile);
 			//m_opts.m_Use8Bit = rfbPFFullColors; // Max colors
 			m_opts.m_fEnableCache = false;
 			m_pendingFormatChange = true;
@@ -5254,9 +5369,9 @@ inline void ClientConnection::ReadScreenUpdate()
 		}
 		else if (avg_kbitsPerSecond < 10000 && avg_kbitsPerSecond > 256 && (m_nConfig != 2))
 		{
-			m_nConfig = 1;
-			if (new_ultra_server) m_opts.m_PreferredEncoding = rfbEncodingUltra2;
-			else m_opts.m_PreferredEncoding = rfbEncodingZRLE; //rfbEncodingZlibHex;
+			m_nConfig = 1;			
+			if (new_ultra_server) m_opts.m_PreferredEncodings.push_back(rfbEncodingUltra2);
+			else m_opts.m_PreferredEncodings.push_back(rfbEncodingZRLE); //rfbEncodingZlibHex;
 			//m_opts.m_Use8Bit = rfbPFFullColors; // Max colors
 			m_opts.m_fEnableCache = false;
 			m_pendingFormatChange = true;
@@ -5266,7 +5381,8 @@ inline void ClientConnection::ReadScreenUpdate()
 		else if (avg_kbitsPerSecond < 256 && avg_kbitsPerSecond > 128 && (m_nConfig != 2))
 		{
 			m_nConfig = 2;
-			m_opts.m_PreferredEncoding = rfbEncodingZRLE; //rfbEncodingZlibHex;
+			m_opts.m_PreferredEncodings.clear();
+			m_opts.m_PreferredEncodings.push_back(rfbEncodingZRLE); //rfbEncodingZlibHex;
 			//m_opts.m_Use8Bit = rfbPF256Colors;
 			m_opts.m_fEnableCache = false;
 			m_pendingFormatChange = true;
@@ -5276,7 +5392,8 @@ inline void ClientConnection::ReadScreenUpdate()
 		else if (avg_kbitsPerSecond < 128 && avg_kbitsPerSecond > 19 && (m_nConfig != 3))
 		{
 			m_nConfig = 3;
-			m_opts.m_PreferredEncoding = rfbEncodingTight; // rfbEncodingZRLE;
+			m_opts.m_PreferredEncodings.clear();
+			m_opts.m_PreferredEncodings.push_back(rfbEncodingTight); // rfbEncodingZRLE;
 			//m_opts.m_Use8Bit = rfbPF64Colors;
 			m_opts.m_fEnableCache = false;
 			m_pendingFormatChange = true;
@@ -5291,7 +5408,8 @@ inline void ClientConnection::ReadScreenUpdate()
 		else if (avg_kbitsPerSecond < 19 && avg_kbitsPerSecond > 5 && (m_nConfig != 4))
 		{
 			m_nConfig = 4;
-			m_opts.m_PreferredEncoding = rfbEncodingTight; //rfbEncodingZRLE;
+			m_opts.m_PreferredEncodings.clear();
+			m_opts.m_PreferredEncodings.push_back(rfbEncodingTight); //rfbEncodingZRLE;
 			//m_opts.m_Use8Bit = rfbPF8Colors;
 			m_opts.m_fEnableCache = false;
 			m_pendingFormatChange = true;
@@ -6301,6 +6419,26 @@ inline void ClientConnection::CheckZRLENetRectBufferSize(int nBufSize)
 	m_nZRLENetRectBufSize = nBufSize + 256;
 }
 
+#ifdef _XZ
+inline void ClientConnection::CheckXZNetRectBufferSize(int nBufSize)
+{
+	if (m_nXZNetRectBufSize > nBufSize) return;
+
+	omni_mutex_lock l(m_XZNetRectBufferMutex);
+
+	BYTE *newbuf = new BYTE[nBufSize + 256];
+	if (newbuf == NULL) 
+	{
+		// Error
+	}
+	if (m_pXZNetRectBuf != NULL)
+		delete [] m_pXZNetRectBuf;
+
+	m_pXZNetRectBuf = newbuf;
+	m_nXZNetRectBufSize = nBufSize + 256;
+}
+#endif
+
 //
 // Format file size so it is user friendly to read
 //
@@ -6386,6 +6524,14 @@ void ClientConnection::UpdateStatusFields()
   			case rfbEncodingZYWRLE:
 				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "ZYWRLE, Cache" :"ZYWRLE");
   				break;
+#ifdef _XZ
+  			case rfbEncodingXZ:		
+				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "XZ, Cache" :"XZ");
+  				break;
+  			case rfbEncodingXZYW:		
+				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "XZYW, Cache" :"XZYW");
+  				break;
+#endif
 			case rfbEncodingTight:
 				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "Tight, Cache" : "Tight");
 				break;

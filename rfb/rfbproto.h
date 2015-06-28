@@ -465,6 +465,10 @@ typedef struct {
 #define rfbEncodingZRLE 16
 // nyama/2006/08/02:new YUV-Wavlet lossy codec based on ZRLE
 #define rfbEncodingZYWRLE 17
+#ifdef _XZ
+#define rfbEncodingXZ 18
+#define rfbEncodingXZYW 19
+#endif
 
 // Cache & XOR-Zlib - rdv@2002
 #define rfbEncodingCache					0xFFFF0000
@@ -530,11 +534,17 @@ typedef struct {
 #define rfbEncodingQualityLevel8   0xFFFFFFE8
 #define rfbEncodingQualityLevel9   0xFFFFFFE9
 
+/*
+ *  XZ Special encoding numbers (future possibilities)
+ *  using the existing levels is an option, too, but they have a much more
+ *  significant impact on memory and CPU compared to Zlib
+ *   0x585A0000 .. 0x585AFFFF -- XZ encoding-specific parameters;
+*/
+
 // adzm - 2010-07 - Extended clipboard support
 #define rfbEncodingExtendedClipboard  0xC0A1E5CE
   // adzm 2010-09 - Notify streaming DSM plugin support
 #define rfbEncodingPluginStreaming       0xC0A1E5CF
-
 
 
 /*****************************************************************************
@@ -720,6 +730,22 @@ typedef struct {
 #define rfbZRLETileWidth 64
 #define rfbZRLETileHeight 64
 
+#ifdef _XZ
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ * XZ - encoding combining XZ compression, tiling, palettisation and
+ * run-length encoding.
+ */
+ 
+typedef struct {
+    CARD32 length;
+} rfbXZHeader;
+
+#define sz_rfbXZHeader 4
+
+#define rfbXZTileWidth 64
+#define rfbXZTileHeight 64
+
+#endif
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  * Tight Encoding.  FIXME: Add more documentation.
@@ -926,7 +952,6 @@ typedef struct {
 } rfbNotifyPluginStreamingMsg;
 
 #define sz_rfbNotifyPluginStreamingMsg	4
-
 
 /*-----------------------------------------------------------------------------
  * // Modif sf@2002

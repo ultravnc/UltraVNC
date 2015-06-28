@@ -2534,6 +2534,9 @@ vncClientThread::run(void *arg)
 	        // RDV XOR and client detection
 			m_client->m_encodemgr.AvailableXOR(FALSE);
 			m_client->m_encodemgr.AvailableZRLE(FALSE);
+#ifdef _XZ
+			m_client->m_encodemgr.AvailableXZ(FALSE);
+#endif
 			m_client->m_encodemgr.AvailableTight(FALSE);
 
 			// sf@2002 - Tight
@@ -2707,6 +2710,13 @@ vncClientThread::run(void *arg)
 						vnclog.Print(LL_INTINFO, VNCLOG("ZRLE found \n"));
 						// continue;
 					}
+#ifdef _XZ
+					if (Swap32IfLE(encoding) == rfbEncodingXZ) {
+						m_client->m_encodemgr.AvailableXZ(TRUE);
+						vnclog.Print(LL_INTINFO, VNCLOG("XZ found \n"));
+						// continue;
+					}
+#endif
 
 					if (Swap32IfLE(encoding) == rfbEncodingTight) {
 						m_client->m_encodemgr.AvailableTight(TRUE);
@@ -4954,6 +4964,12 @@ vncClient::SendRectangles(const rfb::RectVector &rects)
 	int x,y;
 	int Blocksize=254;
 	int BlocksizeX=254;
+
+#ifdef _XZ
+	if (m_encodemgr.IsBulkRectEncoding()) {
+		return m_encodemgr.EncodeBulkRects(rects, m_nScale, m_socket);
+	}
+#endif
 
 
 	// Work through the list of rectangles, sending each one

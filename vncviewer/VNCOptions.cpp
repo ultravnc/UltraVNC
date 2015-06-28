@@ -68,7 +68,40 @@ extern char sz_D28[64];
 extern bool g_disable_sponsor;
 bool config_specified=false;
 
-
+int EncodingFromString(const char* szEncoding)
+{
+	if (_tcsicmp(szEncoding, _T("raw")) == 0) {
+		return rfbEncodingRaw;
+	} else if (_tcsicmp(szEncoding, _T("rre")) == 0) {
+		return rfbEncodingRRE;
+	} else if (_tcsicmp(szEncoding, _T("corre")) == 0) {
+		return rfbEncodingCoRRE;
+	} else if (_tcsicmp(szEncoding, _T("hextile")) == 0) {
+		return rfbEncodingHextile;
+	} else if (_tcsicmp(szEncoding, _T("zlib")) == 0) {
+		return rfbEncodingZlib;
+	} else if (_tcsicmp(szEncoding, _T("zlibhex")) == 0) {
+		return rfbEncodingZlibHex;
+	} else if (_tcsicmp(szEncoding, _T("tight")) == 0) {
+		return rfbEncodingTight;
+	} else if (_tcsicmp(szEncoding, _T("ultra")) == 0) {
+		return rfbEncodingUltra;
+	} else if (_tcsicmp(szEncoding, _T("ultra2")) == 0) {
+		return rfbEncodingUltra2;
+	} else if (_tcsicmp(szEncoding, _T("zrle")) == 0) { 
+		return rfbEncodingZRLE; 
+	} else if (_tcsicmp(szEncoding, _T("zywrle")) == 0) { 
+		return rfbEncodingZYWRLE; 
+#ifdef _XZ
+	} else if (_tcsicmp(szEncoding, _T("xz")) == 0) { 
+		return rfbEncodingXZ; 
+	} else if (_tcsicmp(szEncoding, _T("xzyw")) == 0) { 
+		return rfbEncodingXZYW; 
+#endif
+	} else {
+		return -1;
+	}
+}
 
 
 VNCOptions::VNCOptions()
@@ -88,6 +121,10 @@ VNCOptions::VNCOptions()
   m_UseEnc[rfbEncodingZYWRLE] = true;
   m_UseEnc[rfbEncodingUltra] = true;
   m_UseEnc[rfbEncodingUltra2] = true;
+ #ifdef _XZ
+  m_UseEnc[rfbEncodingXZ] = true;
+  m_UseEnc[rfbEncodingXZYW] = true;
+#endif
 	
   m_ViewOnly = false;
   m_FullScreen = false;
@@ -101,11 +138,11 @@ VNCOptions::VNCOptions()
 
 #ifndef UNDER_CE
   //m_PreferredEncoding = rfbEncodingHextile;
-  m_PreferredEncoding = rfbEncodingZRLE;
+  m_PreferredEncodings.push_back(rfbEncodingZRLE);
 #else
   // With WinCE2.0, CoRRE seems more efficient since it
   // reads the whole update in one socket call.
-  m_PreferredEncoding = rfbEncodingCoRRE;
+  m_PreferredEncodings.push_back(rfbEncodingCoRRE);
 #endif
   m_JapKeyboard = false;
   m_SwapMouse = false;
@@ -283,6 +320,10 @@ void VNCOptions::DeleteDefaultOptions()
 
 VNCOptions& VNCOptions::operator=(VNCOptions& s)
 {
+  if (&s == this) {
+	return *this;
+  }
+
   for (int i = rfbEncodingRaw; i<= LASTENCODING; i++)
     m_UseEnc[i] = s.m_UseEnc[i];
 	
@@ -292,7 +333,7 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
   m_Directx		= s.m_Directx;
   autoDetect = s.autoDetect;
   m_Use8Bit			= s.m_Use8Bit;
-  m_PreferredEncoding = s.m_PreferredEncoding;
+  m_PreferredEncodings = s.m_PreferredEncodings;
   m_SwapMouse			= s.m_SwapMouse;
   m_Emul3Buttons		= s.m_Emul3Buttons;
   m_Emul3Timeout		= s.m_Emul3Timeout;
@@ -685,43 +726,55 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
       PostQuitMessage(0);
 	
 	}
-	else if ( SwitchMatch(args[j], _T("encoding") )) {
-			if (++j == i) {
-				ArgError(sz_D18);
-				continue;
-			}
-			int enc = -1;
-			if (_tcsicmp(args[j], _T("raw")) == 0) {
-				enc = rfbEncodingRaw;
-			} else if (_tcsicmp(args[j], _T("rre")) == 0) {
-				enc = rfbEncodingRRE;
-			} else if (_tcsicmp(args[j], _T("corre")) == 0) {
-				enc = rfbEncodingCoRRE;
-			} else if (_tcsicmp(args[j], _T("hextile")) == 0) {
-				enc = rfbEncodingHextile;
-			} else if (_tcsicmp(args[j], _T("zlib")) == 0) {
-				enc = rfbEncodingZlib;
-			} else if (_tcsicmp(args[j], _T("zlibhex")) == 0) {
-				enc = rfbEncodingZlibHex;
-			} else if (_tcsicmp(args[j], _T("tight")) == 0) {
-				enc = rfbEncodingTight;
-			} else if (_tcsicmp(args[j], _T("ultra")) == 0) {
-				enc = rfbEncodingUltra;
-			} else if (_tcsicmp(args[j], _T("ultra2")) == 0) {
-				enc = rfbEncodingUltra2;
-			}else if (_tcsicmp(args[j], _T("zrle")) == 0) { 
-				enc = rfbEncodingZRLE; 
-			} else if (_tcsicmp(args[j], _T("zywrle")) == 0) { 
-				enc = rfbEncodingZYWRLE; 
-			} else {
-				ArgError(sz_D19);
-				continue;
-			}
-			if (enc != -1) {
-				m_UseEnc[enc] = true;
-				m_PreferredEncoding = enc;
-			}
+	else if (SwitchMatch(args[j], _T("encoding"))) {
+		if (++j == i) {
+			ArgError(sz_D18);
+			continue;
+		}
+		int enc = EncodingFromString(args[j]);
+		if (enc == -1) {
+			ArgError(sz_D19);
+			continue;
+		}
+		else {
+			m_PreferredEncodings.clear();
+			m_PreferredEncodings.push_back(enc);
+			m_UseEnc[enc] = true;
+		}
 	}
+	else if ( SwitchMatch(args[j], _T("encodings") )) {
+		if (++j == i) {
+			ArgError(sz_D18);
+			continue;
+		}
+		int encodings_found = 0;
+		while (encodings_found >= 0) {
+			int enc = EncodingFromString(args[j]);
+			if (enc == -1) {
+				if (encodings_found == 0) {
+					ArgError(sz_D19);
+				} else {
+					j--;
+				}
+				encodings_found = -1;
+			} else {
+				if (encodings_found == 0) {
+					m_PreferredEncodings.clear();
+				}
+ 				m_UseEnc[enc] = true;
+				if (m_PreferredEncodings.end() == std::find(m_PreferredEncodings.begin(), m_PreferredEncodings.end(), enc)) {
+					m_PreferredEncodings.push_back(enc);
+				}
+				encodings_found++;
+
+				j++;
+
+				if (j == i) {
+					encodings_found = -1;
+				}
+ 			}
+		}
+ 	}
 	// Tight options
 	else if ( SwitchMatch(args[j], _T("compresslevel") )) {
 			if (++j == i) {
@@ -975,7 +1028,9 @@ void VNCOptions::Save(char *fname)
     sprintf(buf, "use_encoding_%d", i);
     saveInt(buf, m_UseEnc[i], fname);
   }
-  saveInt("preferred_encoding",	m_PreferredEncoding,fname);
+  if (!m_PreferredEncodings.empty()) {
+	  saveInt("preferred_encoding", m_PreferredEncodings[0], fname);
+  }
   saveInt("restricted",			m_restricted,		fname);
   saveInt("viewonly",				m_ViewOnly,			fname);
   saveInt("nostatus",				m_NoStatus,			fname);
@@ -1051,7 +1106,11 @@ void VNCOptions::Load(char *fname)
     sprintf(buf, "use_encoding_%d", i);
     m_UseEnc[i] =   readInt(buf, m_UseEnc[i], fname) != 0;
   }
-  m_PreferredEncoding =	readInt("preferred_encoding", m_PreferredEncoding,	fname);
+  int nExistingPreferred = m_PreferredEncodings.empty() ? rfbEncodingZRLE : m_PreferredEncodings[0];
+  int nPreferredEncoding =	readInt("preferred_encoding", nExistingPreferred,	fname);
+  m_PreferredEncodings.clear();
+  m_PreferredEncodings.push_back(nPreferredEncoding);
+
   m_restricted =			readInt("restricted",		m_restricted,	fname) != 0 ;
   m_ViewOnly =			readInt("viewonly",			m_ViewOnly,		fname) != 0;
   m_NoStatus =			readInt("nostatus",			m_NoStatus,		fname) != 0;
@@ -1215,7 +1274,8 @@ void VNCOptions::ShowUsage(LPTSTR info) {
 			   "      [/reconnectcounter number_reconnect_attempt]\r\n"
 			   "      [/nohotkeys] [/proxy proxyhost [portnum]] [/256colors] [/64colors]\r\n"
 			   "      [/8colors] [/8greycolors] [/4greycolors] [/2greycolors]\r\n"
-			   "      [/encoding [zrle | zywrle | tight | zlib | zlibhex | ultra]]\r\n"
+			   "      [/encoding [xz | xzyw | zrle | zywrle | tight | zlib | zlibhex | ultra | ultra2 | corre | rre | raw]\r\n"
+			   "      [/encodings xz zrle ...]  (in order of priority)\r\n"
 			   "      [/autoacceptincoming] [/autoacceptnodsm] [/disablesponsor]\r\n" //adzm 2009-06-21, adzm 2009-07-19
 			   "      [/requireencryption] [/enablecache] [/throttlemouse n] [/socketkeepalivetimeout n]\r\n" //adzm 2010-05-12 
                "For full details see documentation."), 
@@ -1268,10 +1328,11 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 		  HWND had = GetDlgItem(hwnd, IDC_AUTODETECT);
 		  SendMessage(had, BM_SETCHECK, _this->autoDetect, 0);
 		  int i = 0;	  
+		  int nPreferredEncoding = _this->m_PreferredEncodings.empty() ? rfbEncodingZRLE : _this->m_PreferredEncodings[0];
 		  for (i = rfbEncodingRaw; i <= LASTENCODING; i++) {
 			  HWND hPref = GetDlgItem(hwnd, IDC_RAWRADIO + (i-rfbEncodingRaw));
 			  SendMessage(hPref, BM_SETCHECK, 
-				  (i== _this->m_PreferredEncoding), 0);
+				  (i== nPreferredEncoding), 0);
 			  EnableWindow(hPref, _this->m_UseEnc[i] && !_this->autoDetect);
 		  }
 		  
@@ -1466,7 +1527,8 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 			  for (int i = rfbEncodingRaw; i <= LASTENCODING; i++) {
 				  HWND hPref = GetDlgItem(hwnd, IDC_RAWRADIO+i-rfbEncodingRaw);
 				  if (SendMessage(hPref, BM_GETCHECK, 0, 0) == BST_CHECKED)
-					  _this->m_PreferredEncoding = i;
+					  _this->m_PreferredEncodings.clear();
+					  _this->m_PreferredEncodings.push_back(i);
 			  }
 
 			/*// [v1.0.2-jp2 fix-->]
@@ -1637,9 +1699,7 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 
 			}
 
-			DWORD dw;
 			DWORD val=g_disable_sponsor;
-			HKEY huser;
 
 			/*if (RegCreateKeyEx(HKEY_CURRENT_USER,
 			SETTINGS_KEY_NAME,

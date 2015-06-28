@@ -120,7 +120,7 @@ struct BitmapInfo {
   };
 };
 
-namespace rdr { class InStream; class FdInStream; class ZlibInStream; }
+namespace rdr { class InStream; class FdInStream; class ZlibInStream; class xzInStream; }
 
 class ClientConnection  : public omni_thread
 {
@@ -463,6 +463,9 @@ private:
 	// sf@2002 - DSM Plugin
 	void CheckNetRectBufferSize(int nBufSize);
 	void CheckZRLENetRectBufferSize(int nBufSize);
+#ifdef _XZ
+	void CheckXZNetRectBufferSize(int nBufSize);
+#endif
 	//
 	int EncodingStatusWindow,OldEncodingStatusWindow;
 
@@ -595,8 +598,19 @@ private:
 	int m_nZRLENetRectBufOffset;
 	int m_nZRLEReadSize;
 	int m_nZRLENetRectBufSize;
+
+#ifdef _XZ
+	BYTE* m_pXZNetRectBuf;
+	bool m_fReadFromXZNetRectBuf;  // 
+	int m_nXZNetRectBufOffset;
+	int m_nXZReadSize;
+	int m_nXZNetRectBufSize;
+#endif
 	omni_mutex	m_NetRectBufferMutex;
 	omni_mutex	m_ZRLENetRectBufferMutex;
+#ifdef _XZ
+	omni_mutex	m_XZNetRectBufferMutex;
+#endif
 	omni_mutex	m_ZipBufferMutex;
 	omni_mutex	m_FileZipBufferMutex;
 	omni_mutex	m_FileChunkBufferMutex;
@@ -722,6 +736,27 @@ private:
 	long zywrle;
 	long zywrle_level;
 	int zywrleBuf[rfbZRLETileWidth*rfbZRLETileHeight];
+
+#ifdef _XZ
+	rdr::xzInStream* xzis;
+	void xzDecode(int x, int y, int w, int h);
+	void xzDecode8NE(int x, int y, int w, int h, rdr::InStream* is,
+		rdr::xzInStream* xzis, rdr::U8* buf);
+	void xzDecode15LE(int x, int y, int w, int h, rdr::InStream* is,
+		rdr::xzInStream* xzis, rdr::U16* buf);
+	void xzDecode16LE(int x, int y, int w, int h, rdr::InStream* is,
+		rdr::xzInStream* xzis, rdr::U16* buf);
+	void xzDecode24ALE(int x, int y, int w, int h, rdr::InStream* is,
+		rdr::xzInStream* xzis, rdr::U32* buf);
+	void xzDecode24BLE(int x, int y, int w, int h, rdr::InStream* is,
+		rdr::xzInStream* xzis, rdr::U32* buf);
+	void xzDecode32LE(int x, int y, int w, int h, rdr::InStream* is,
+		rdr::xzInStream* xzis, rdr::U32* buf);
+
+	long xzyw;
+	long xzyw_level;
+	int xzywBuf[rfbXZTileWidth*rfbXZTileHeight];
+#endif
 
 	void ConvertAll(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth);
 	void ConvertPixel(int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth);

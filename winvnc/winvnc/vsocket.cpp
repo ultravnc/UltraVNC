@@ -35,11 +35,8 @@ class VSocket;
 // System includes
 
 #include "stdhdrs.h"
-#ifdef _VC80
 #include <iostream>
-#else
-#include <iostream>
-#endif
+
 
 #include <stdio.h>
 #ifdef __WIN32__

@@ -976,6 +976,7 @@ copy "$(LocalDebuggerCommand)" ..\..\..\..\..\installer64</Command>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="vncEncodeUltra2.cpp" />
+    <ClCompile Include="vncEncodeXZ.cpp" />
     <ClCompile Include="vncEncodeZlib.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -1316,6 +1317,7 @@ copy "$(LocalDebuggerCommand)" ..\..\..\..\..\installer64</Command>
     <ClInclude Include="vncEncodeTight.h" />
     <ClInclude Include="vncEncodeUltra.h" />
     <ClInclude Include="vncEncodeUltra2.h" />
+    <ClInclude Include="vncEncodeXZ.h" />
     <ClInclude Include="vncEncodeZlib.h" />
     <ClInclude Include="vncEncodeZlibHex.h" />
     <ClInclude Include="vncencodezrle.h" />
@@ -1406,6 +1408,9 @@ copy "$(LocalDebuggerCommand)" ..\..\..\..\..\installer64</Command>
     </ProjectReference>
     <ProjectReference Include="..\..\rdr\rdrv12.vcxproj">
       <Project>{f5244002-0fff-4f19-a941-fcce1861f132}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\xz-5.2.1\windows\liblzma.vcxproj">
+      <Project>{12728250-16ec-4dc6-94d7-e21dd88947f8}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\zipunzip_src\unzip\windll\vc6\lib\unz32libv12.vcxproj">
       <Project>{f9321962-fbed-4581-bf7d-d0ebc303d891}</Project>

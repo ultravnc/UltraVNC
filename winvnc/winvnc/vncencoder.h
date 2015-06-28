@@ -73,6 +73,7 @@ public:
 	virtual UINT EncodeRect(BYTE *source, BYTE *source2,VSocket *outConn, BYTE *dest, const rfb::Rect &rect);
 	virtual UINT EncodeRect(BYTE *source,VSocket *outConn, BYTE *dest, const rfb::Rect &rect);
 	virtual UINT EncodeRect(BYTE *source, VSocket *outConn, BYTE *dest, const RECT &rect); // sf@2002 - For Tight...
+	virtual UINT EncodeBulkRects(const rfb::RectVector &rects, BYTE *source, BYTE *dest, VSocket *outConn) { return 0; };
 
 	// CURSOR HANDLING
 	void Translate(BYTE *source, BYTE *dest, int w, int h, int bytesPerRow);
