@@ -31,6 +31,8 @@
 // algorithm writes to the position one past the end of the pixel data.
 //
 
+#ifdef _XZ
+
 #include <rdr/OutStream.h>
 #include <assert.h>
 
@@ -353,3 +355,5 @@ void XZ_ENCODE_TILE (PIXEL_T* data, int w, int h, rdr::OutStream* os)
 #undef XZ_ENCODE
 #undef XZ_ENCODE_TILE
 #undef BPPOUT
+
+#endif

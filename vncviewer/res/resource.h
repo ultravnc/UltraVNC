@@ -242,13 +242,9 @@
 #define IDC_ULTRA2                      2010
 #define IDC_ZRLERADIO                   2016
 #define IDC_ZYWRLERADIO                 2017
-#ifdef _XZ
 #define IDC_XZRADIO                     2018
 #define IDC_XZYWRADIO                   2019
 #define IDC_LAST_ENCODING               2020
-#else
-#define IDC_LAST_ENCODING               2018
-#endif
 #define IDC_STATIC_SPLIT                9000
 #define IDC_HOSTNAME_DEL                9001
 #define ID_SESSION_SET_CRECT            32777

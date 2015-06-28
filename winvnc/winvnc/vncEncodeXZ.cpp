@@ -19,6 +19,8 @@
 // which you received this file, check http://www.realvnc.com/ or contact
 // the authors on info@realvnc.com for information on obtaining it.
 
+#ifdef _XZ
+
 #include "vncEncodeXZ.h"
 #include "rfb.h"
 #include "rfbMisc.h"
@@ -303,3 +305,6 @@ void vncEncodeXZ::EncodeRect_Internal(BYTE *source, int x, int y, int w, int h)
 	  break;
 	}
 }
+
+
+#endif
