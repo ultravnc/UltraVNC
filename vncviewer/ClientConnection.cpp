@@ -68,7 +68,11 @@ extern "C" {
 #pragma comment(lib, "imm32.lib")
 
 #define INITIALNETBUFSIZE 4096
+#ifdef _XZ
+#define MAX_ENCODINGS (LASTENCODING+15)
+#else
 #define MAX_ENCODINGS (LASTENCODING+10)
+#endif
 #define VWR_WND_CLASS_NAME _T("VNCviewer")
 #define VWR_WND_CLASS_NAME_VIEWER _T("VNCviewerwindow")
 #define SESSION_MRU_KEY_NAME _T("Software\\ORL\\VNCviewer\\MRU")
@@ -3406,6 +3410,7 @@ void ClientConnection::SetFormatAndEncodings()
 
 	// Set encodings
     char buf[sz_rfbSetEncodingsMsg + MAX_ENCODINGS * 4];
+	int aa = sz_rfbSetEncodingsMsg + MAX_ENCODINGS * 4;
     rfbSetEncodingsMsg *se = (rfbSetEncodingsMsg *)buf;
     CARD32 *encs = (CARD32 *)(&buf[sz_rfbSetEncodingsMsg]);
     int len = 0;
@@ -3527,6 +3532,7 @@ void ClientConnection::SetFormatAndEncodings()
 	int nEncodings = se->nEncodings;
 	se->nEncodings = Swap16IfLE(se->nEncodings);
 	// WriteExact((char *)buf, len);
+	int bb = sz_rfbSetEncodingsMsg + sizeof(CARD32) * nEncodings;
 	WriteExact((char *)buf, sz_rfbSetEncodingsMsg + sizeof(CARD32) * nEncodings, rfbSetEncodings);
 }
 void ClientConnection::Createdib()
