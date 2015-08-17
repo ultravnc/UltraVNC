@@ -53,7 +53,7 @@ int AuthDialog::DoDialog(bool ms_logon, TCHAR IN_host[MAX_HOST_NAME_LEN], int IN
 	TCHAR tempchar[10];
 	strcpy_s(_host, IN_host);
 	strcat_s(_host, ":");
-	strcat_s(_host, itoa(IN_port, tempchar, 10));
+	strcat_s(_host, _itoa(IN_port, tempchar, 10));
 	if (isSecure) return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG), NULL, (DLGPROC) DlgProc, (LONG_PTR) this);
 	else if (ms_logon) return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG2), NULL, (DLGPROC) DlgProc, (LONG_PTR) this);
 	else if (warning) return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG1), NULL, (DLGPROC) DlgProc1, (LONG_PTR) this);
