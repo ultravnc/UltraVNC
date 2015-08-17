@@ -26,8 +26,6 @@
 // special keys (such as ALT,CTRL, ALT+TAB, etc) to the VNCServer side.
 // written by Assaf Gordon (Assaf@mazleg.com), 10/9/2003
 
-#define WINVER 0x0400
-#define _WIN32_WINNT 0x0400
 #include "LowLevelHook.h"
 #include "res/resource.h"
 #include "common/win32_helpers.h"
