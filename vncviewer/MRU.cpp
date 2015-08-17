@@ -38,12 +38,6 @@ static const int MRU_MAX_ITEM_LENGTH = 256;
 
 MRU::MRU(LPTSTR keyname, unsigned int maxnum)
 {
-	DWORD dispos;
-    // Create the registry key.  If unsuccessful all other methods will be no-ops.
-    /*if ( RegCreateKeyEx(HKEY_CURRENT_USER, keyname, 0, NULL, 
-		REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &m_hRegKey, &dispos)  != ERROR_SUCCESS ) {
-        m_hRegKey = NULL;
-    }*/
     m_index[0] = _T('\0');
     m_maxnum = maxnum;
 
@@ -145,7 +139,6 @@ int MRU::GetItem(int index, LPTSTR buf, int buflen)
     valname[0] = m_index[index];
     valname[1] = _T('\0');
 
-    DWORD valtype;
     DWORD dwbuflen = buflen;
 
 	char fname[_MAX_PATH];
@@ -218,7 +211,6 @@ void MRU::ReadIndex()
     //if (m_hRegKey == NULL) return;
 
     // read the index
-    DWORD valtype;
     DWORD dwindexlen = sizeof(m_index);
 
 	char fname[_MAX_PATH];
