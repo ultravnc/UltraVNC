@@ -256,7 +256,6 @@ ClientConnection::ClientConnection(VNCviewerApp *pApp, SOCKET sock)
     if (m_opts.autoDetect)
 	{
       m_opts.m_Use8Bit = rfbPFFullColors; //true;
-	  m_opts.m_fEnableCache = true; // sf@2002
 	}
 	m_sock = sock;
 	m_serverInitiated = true;
@@ -284,7 +283,6 @@ ClientConnection::ClientConnection(VNCviewerApp *pApp, LPTSTR host, int port)
     if (m_opts.autoDetect)
 	{
 		m_opts.m_Use8Bit = rfbPFFullColors; //true;
-		m_opts.m_fEnableCache = true; // sf@2002
 	}
 	_tcsncpy(m_host, host, MAX_HOST_NAME_LEN);
 	m_port = port;
@@ -1655,9 +1653,10 @@ void ClientConnection::HandleQuickOption()
 	{
 	case 1:
 		m_opts.m_PreferredEncodings.clear();
-		m_opts.m_PreferredEncodings.push_back(rfbEncodingZRLE);
+		if (new_ultra_server) m_opts.m_PreferredEncodings.push_back(rfbEncodingUltra2);
+		else m_opts.m_PreferredEncodings.push_back(rfbEncodingHextile);
 		m_opts.m_Use8Bit = rfbPFFullColors; //false;
-		m_opts.m_fEnableCache = true;
+		m_opts.m_fEnableCache = false;
 		m_opts.autoDetect = true;
 		break;
 
@@ -1754,7 +1753,6 @@ void ClientConnection::GetConnectDetails()
 					if (m_opts.autoDetect)
 					{
 						m_opts.m_Use8Bit = rfbPFFullColors;
-						m_opts.m_fEnableCache = true; // sf@2002
 					}
 				}
 		}
@@ -1774,7 +1772,6 @@ void ClientConnection::GetConnectDetails()
 			if (m_opts.autoDetect)
 			{
 				m_opts.m_Use8Bit = rfbPFFullColors;
-				m_opts.m_fEnableCache = true; // sf@2002
 			}
 		}
 	}
@@ -2405,6 +2402,7 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 	case rfbUltraVNC:
 		new_ultra_server=true;
 		m_fServerKnowsFileTransfer = true;
+		HandleQuickOption();
 		break;
 	case rfbUltraVNC_SecureVNCPluginAuth_new:
 		if (bSecureVNCPluginActive) {
@@ -5363,14 +5361,29 @@ inline void ClientConnection::ReadScreenUpdate()
 		m_lLastChangeTimeTimeout=60000;  // set to 1 minutes
 		int nOldServerScale = m_nServerScale;
 
+		for (std::vector<int>::iterator it = m_opts.m_PreferredEncodings.begin(); it != m_opts.m_PreferredEncodings.end(); ++it) {
+
+			int encoding = *it;
+			break;
+		}
+
 		if (avg_kbitsPerSecond > 10000 && (m_nConfig != 1))
 		{
 			m_nConfig = 1;
+			int encoding = 0;
+			for (std::vector<int>::iterator it = m_opts.m_PreferredEncodings.begin(); it != m_opts.m_PreferredEncodings.end(); ++it) {
+				encoding = *it;
+				break;
+			}
 			m_opts.m_PreferredEncodings.clear();
-			m_opts.m_PreferredEncodings.push_back(rfbEncodingHextile);
-			//m_opts.m_Use8Bit = rfbPFFullColors; // Max colors
+			if (new_ultra_server) m_opts.m_PreferredEncodings.push_back(rfbEncodingUltra2);
+			else m_opts.m_PreferredEncodings.push_back(rfbEncodingHextile);
+			//m_opts.m_Use8Bit = rfbPFFullColors;			
+			if (new_ultra_server && encoding == rfbEncodingUltra2 && m_opts.m_fEnableCache == false){}
+			else if (encoding == rfbEncodingHextile && m_opts.m_fEnableCache == false){}
+			else m_pendingFormatChange = true;
+
 			m_opts.m_fEnableCache = false;
-			m_pendingFormatChange = true;
 			m_lLastChangeTime = timeGetTime();
 		}
 		else if (avg_kbitsPerSecond < 10000 && avg_kbitsPerSecond > 256 && (m_nConfig != 2))
