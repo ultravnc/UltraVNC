@@ -1,7 +1,7 @@
 //
 // Copyright (C) 2002 RealVNC Ltd.  All Rights Reserved.
 //
-
+#ifdef _XZ
 #include <rdr/xzInStream.h>
 #include <rdr/FdInStream.h>
 #include <rdr/Exception.h>
@@ -150,3 +150,4 @@ void ClientConnection::xzDecode(int x, int y, int w, int h)
     throw;
   }
 }
+#endif
