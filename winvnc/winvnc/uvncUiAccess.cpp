@@ -32,20 +32,20 @@ comm_serv *StarteventFn=NULL;
 CRITICAL_SECTION keyb_crit;
 bool crit_init=false;
 
-void Shellexecuteforuiaccess()
+bool Shellexecuteforuiaccess()
 {		
 		char WORKDIR[MAX_PATH];
 		if (GetModuleFileName(NULL, WORKDIR, MAX_PATH))
 				{
 				char* p = strrchr(WORKDIR, '\\');
-				if (p == NULL) return;
+				if (p == NULL) return false;
 				*p = '\0';
 				}
 		strcat(WORKDIR,"\\uvnckeyboardhelper.exe");
 	
 		FILE *fp = fopen(WORKDIR,"rb");
 		if(fp) fclose(fp);
-		else  return;
+		else  return false;
 				
 		SHELLEXECUTEINFO shExecInfo;
 		memset(&shExecInfo,0,sizeof(shExecInfo));
@@ -59,6 +59,7 @@ void Shellexecuteforuiaccess()
 		shExecInfo.nShow = SW_HIDE;
 		shExecInfo.hInstApp = NULL;
 		ShellExecuteEx(&shExecInfo);
+		return true;
 }
 
  int keycounter =0;
@@ -146,7 +147,7 @@ void keybd_initialize_no_crit()
 	if (!keyEventFn->Init("keyEvent",sizeof(keyEventdata),0,false,true)) goto error;
 	if (!StopeventFn->Init("stop_event",0,0,false,true)) goto error;
 	if (!StarteventFn->Init("start_event",1,1,false,true)) goto error;	
-	Shellexecuteforuiaccess();
+	if (!Shellexecuteforuiaccess()) goto error;
 	Sleep(1000);
 	unsigned char Invalue=12;
 	unsigned char Outvalue=0;
@@ -181,7 +182,7 @@ void keybd_initialize()
 	if (!keyEventFn->Init("keyEvent",sizeof(keyEventdata),0,false,true)) goto error;
 	if (!StopeventFn->Init("stop_event",0,0,false,true)) goto error;
 	if (!StarteventFn->Init("start_event",1,1,false,true)) goto error;	
-	Shellexecuteforuiaccess();
+	if (!Shellexecuteforuiaccess()) goto error;
 	Sleep(1000);
 	unsigned char Invalue=12;
 	unsigned char Outvalue=0;
