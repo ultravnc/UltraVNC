@@ -41,8 +41,9 @@ public:
 	CIPC();
 	virtual ~CIPC();
 
-	unsigned char * CreateBitmap();
-	void CloseBitmap();
+	/**unsigned char * CreateBitmap();
+	unsigned char * CreateBitmap(int size);
+	void CloseBitmap();*/
 	bool CreateIPCMMF(void);
 	bool OpenIPCMMF(void);
 	void CloseIPCMMF(void);

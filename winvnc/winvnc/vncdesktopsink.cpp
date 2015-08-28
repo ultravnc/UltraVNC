@@ -37,6 +37,12 @@ DWORD WINAPI Driverwatch(LPVOID lpParam);
 DWORD WINAPI InitWindowThread(LPVOID lpParam);
 extern char g_hookstring[16];
 
+unsigned char * StartW8(bool primonly);
+BOOL StopW8();
+BOOL CaptureW8();
+mystruct * get_plist();
+
+
 void
 vncDesktop::ShutdownInitWindowthread()
 {
@@ -45,7 +51,7 @@ vncDesktop::ShutdownInitWindowthread()
 	can_be_hooked=false;
 	vnclog.Print(LL_INTINFO, VNCLOG("ShutdownInitWindowthread \n"));
 
-	if (startw8)
+	if (startedw8)
 		{
 #ifdef _DEBUG
 					char			szText[256];
@@ -182,29 +188,29 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 			{
 					KillTimer(hwnd, 100);
 					bool w8started = false;
-					if (_this->startw8)
-					{
-						if (_this->startw8(!_this->multi_monitor))
+					_this->w8_data = StartW8(!_this->multi_monitor);
+					if (_this->w8_data)
 						{
+							_this->startedw8=true;
 							w8started = true;
 							_this->m_hookinited = TRUE;
 							vnclog.Print(LL_INTERR, VNCLOG("set W8 hooks OK\n"));
+							_this->plist = get_plist();
+							if (_this->plist == NULL)
+							{
+								_this->startedw8 = false;
+								w8started = false;
+								StopW8();
+							}
 						}
-						else
+					else
 						{
 							vnclog.Print(LL_INTERR, VNCLOG("set W8 hooks Failed, wddm >= 1.2 ?\n"));
 							//not wddm 1.2 or some other things prevent the desktophook to work proper
-							_this->stopw8();
-							if (_this->hW8Module)FreeLibrary(_this->hW8Module);
-							_this->hW8Module = NULL;
-							_this->startw8 = NULL;
-							_this->stopw8 = NULL;
-							_this->capturew8 = NULL;
-
+							StopW8();
 						}
 						
-						
-					}
+
 					if (w8started){}
 					else if (_this->SetHook)
 					{
@@ -272,10 +278,10 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		else if (_this->m_hookinited)
 			{
 				_this->m_hookinited=FALSE;
-				if (_this->stopw8)
+				if (_this->startedw8)
 				{
 					vnclog.Print(LL_INTERR, VNCLOG("unset W8 hooks OK\n"));
-					_this->stopw8();
+					StopW8();
 				}
 				if (_this->UnSetHook)
 				{
@@ -329,10 +335,12 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		_this->m_hnextviewer=NULL;
 		if (_this->m_hookinited)
 			{
-				if (_this->stopw8)
+				if (_this->startedw8)
 				{
 					vnclog.Print(LL_INTERR, VNCLOG("unset W8 hooks OK\n"));
-					_this->stopw8();
+					_this->m_DIBbits = NULL;
+					Sleep(1000); //FIX
+					StopW8();
 				}
 				if (_this->UnSetHook)
 				{
@@ -640,22 +648,6 @@ vncDesktop::InitWindow()
 			strcat (szCurrentDirSC,"\\schook.dll");
 #endif
 		}
-	hW8Module=NULL;
-	char szCurrentDirW8[MAX_PATH];
-	if (VNCOS.OS_WIN8)
-	{
-		if (GetModuleFileName(NULL, szCurrentDirW8, MAX_PATH))
-		{
-			char* p = strrchr(szCurrentDirW8, '\\');
-			if (p == NULL) return 0;
-			*p = '\0';
-#ifdef _X64
-			strcat (szCurrentDirW8,"\\w8hook64.dll");
-#else
-			strcat (szCurrentDirW8,"\\w8hook.dll");
-#endif
-		}
-	}
 
 	UnSetHooks=NULL;
 	SetMouseFilterHook=NULL;
@@ -669,7 +661,6 @@ vncDesktop::InitWindow()
 
 	hModule = LoadLibrary(szCurrentDir);
 	hSCModule = LoadLibrary(szCurrentDirSC);//TOFIX resource leak
-	if (VNCOS.OS_WIN8) hW8Module = LoadLibrary(szCurrentDirW8);
 	if (hModule)
 		{
 			strcpy_s(g_hookstring,"vnchook");
@@ -684,15 +675,6 @@ vncDesktop::InitWindow()
 			SetHook  = (SetHookFn) GetProcAddress( hSCModule, "SetHook" );
 			SetMouseFilterHooks  = (SetMouseFilterHookFn) GetProcAddress( hSCModule, "SetMouseFilterHook" );
 			SetKeyboardFilterHooks  = (SetKeyboardFilterHookFn) GetProcAddress( hSCModule, "SetKeyboardFilterHook" );
-		}
-	startw8=NULL;
-	stopw8=NULL;
-	capturew8=NULL;
-	if (hW8Module)
-		{
-			startw8=(StartW8)GetProcAddress(hW8Module,"StartW8");
-			stopw8=(StopW8)GetProcAddress(hW8Module,"StopW8");
-			capturew8=(CaptureW8)GetProcAddress(hW8Module,"CaptureW8");
 		}
 
 	///////////////////////////////////////////////
@@ -767,7 +749,6 @@ vncDesktop::InitWindow()
 	KillTimer(m_hwnd,1001);
 	if (hModule)FreeLibrary(hModule);
 	if (hSCModule)FreeLibrary(hSCModule);
-	if (hW8Module)FreeLibrary(hW8Module);
 	SetThreadDesktop(old_desktop);
     CloseDesktop(desktop);
 	///////////////////////

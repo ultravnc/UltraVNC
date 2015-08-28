@@ -60,6 +60,7 @@ class vncServer;
 #endif
 // adzm - 2010-07 - Extended clipboard
 #include "common/Clipboard.h"
+#include "ipc.h"
 //#define COMPILE_MULTIMON_STUBS
 //#include "Multimon.h"
 
@@ -191,10 +192,6 @@ typedef BOOL (*UnSetHookFn)(HWND hwnd);
 typedef BOOL (WINAPI*  pBlockInput) (BOOL);
 typedef BOOL (WINAPI* LPGETMONITORINFO)(HMONITOR, LPMONITORINFO);
 typedef HMONITOR (WINAPI* LPMONITOTFROMPOINT) (POINT,DWORD);
-
-typedef BOOL (*StartW8)(bool primonly);
-typedef BOOL (*StopW8)(void);
-typedef BOOL (*CaptureW8)(void);
 
 // Class definition
 // multi monitor
@@ -506,7 +503,6 @@ protected:
 	void InitHookSettings();
 	HMODULE hModule;
 	HMODULE hSCModule;
-	HMODULE hW8Module;
 	SetHooksFn SetHooks;
 	UnSetHooksFn  UnSetHooks;
 	SetHookFn SetHook;
@@ -516,10 +512,6 @@ protected:
 	//hooks in schook Hook(s)
 	SetKeyboardFilterHookFn SetKeyboardFilterHooks;
 	SetMouseFilterHookFn SetMouseFilterHooks;
-
-	StartW8 startw8;
-	StopW8 stopw8;
-	CaptureW8 capturew8;
 
 
 	pBlockInput pbi;
@@ -555,6 +547,10 @@ bool m_bIsInputDisabledByClient; // 28 March 2008 jdp
 #ifdef AVILOG
 CAVIGenerator *AviGen;
 #endif
+
+bool startedw8;
+unsigned char *w8_data;
+mystruct *plist;
 
 private:
 	HDESK m_input_desktop;

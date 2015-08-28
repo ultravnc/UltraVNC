@@ -64,6 +64,14 @@ CIPC::~CIPC()
 	UnlockBitmap();
 }
 
+/*unsigned char * CIPC::CreateBitmap(int size)
+{
+	CreateIPCMMFBitmap(size);
+	OpenIPCMMFBitmap();
+	plist->rect1[0].left = size;
+	return pBitmap;
+}
+
 //***********************************************
 unsigned char * CIPC::CreateBitmap()
 {
@@ -77,7 +85,7 @@ void CIPC::CloseBitmap()
 {
 	CloseIPCMMFBitmap();
 	pBitmap=NULL;
-}
+}*/
 
 
 //***********************************************

@@ -185,6 +185,7 @@ PixelCaptureEngine::ReleaseCapture()
 
 bool vncDesktop::FastDetectChanges(rfb::Region2D &rgn, rfb::Rect &rect, int nZone, bool fTurbo)
 {
+	if (m_DIBbits == NULL) return false;
 	bool returnvalue=false;
 	bool fInitGrid = false;
 	bool fIncCycle = false;
@@ -571,6 +572,9 @@ vncDesktop::vncDesktop()
 	m_ScreenHeight = 0;
 	//old_caret_pt.x=0;
 	//old_caret_pt.y=0;
+
+	startedw8 = false;
+	plist = NULL;
 //
 }
 
@@ -587,7 +591,8 @@ vncDesktop::~vncDesktop()
 		int counter=0;
 		while (g_DesktopThread_running!=false)
 		{
-			if (Window()==NULL)SetEvent(trigger_events[5]);;
+			if (Window()==NULL)
+				SetEvent(trigger_events[5]);;
 			Sleep(100);
 			counter++;
 			if (counter>50) 
@@ -642,7 +647,7 @@ vncDesktop::~vncDesktop()
       vnclog.Print(LL_INTERR, VNCLOG("~vncDesktop:: second request to close InitWindowthread\n"));
       StopInitWindowthread();
 	}
-
+	Sleep(1000);//FIX
 	if (m_hrootdc_Desktop != NULL)
 	{
 		if (!ReleaseDC(NULL, m_hrootdc_Desktop))

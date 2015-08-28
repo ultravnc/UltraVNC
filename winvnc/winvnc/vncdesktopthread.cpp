@@ -25,6 +25,11 @@
 #include "vncdesktopthread.h"
 #include "vncOSVersion.h"
 #include "uvncUiAccess.h"
+
+BOOL StartW8(bool primonly);
+BOOL StopW8();
+BOOL CaptureW8();
+
 bool g_DesktopThread_running;
 bool g_update_triggered;
 DWORD WINAPI hookwatch(LPVOID lpParam);
@@ -306,7 +311,7 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 		rect.tl = rfb::Point(0,0);
 		rect.br = rfb::Point(300,120);
 		rgncache.assign_union(rect);
-		if (m_desktop->startw8)
+		if (m_desktop->startedw8)
 		{
 #ifdef _DEBUG
 					char			szText[256];
@@ -736,33 +741,35 @@ void vncDesktopThread::do_polling(HANDLE& threadHandle, rfb::Region2D& rgncache,
 			if (Handle_Ringbuffer(g_obIPC.listall(),rgncache)) return;
 		}
 
-		if (m_desktop->startw8 && g_obIPC.listall()!=NULL && m_desktop->can_be_hooked) 
+		if (m_desktop->startedw8 && m_desktop->plist!= NULL && m_desktop->can_be_hooked)
 		{
 			if (m_desktop->m_hookinited && ! m_desktop->m_bitmappointer)
 			{
-				unsigned char *data=g_obIPC.CreateBitmap();
-				if (data)
+				//unsigned char *data=g_obIPC.CreateBitmap();
+				if (m_desktop->w8_data)
 					{
 						m_desktop->m_bitmappointer=true;
-						m_desktop->m_DIBbits=data;
+						m_desktop->m_DIBbits = m_desktop->w8_data;
 					}
 			}
-			if (!m_desktop->m_hookinited && m_desktop->m_bitmappointer)
+			else if (!m_desktop->m_hookinited && m_desktop->m_bitmappointer)
 			{
-				g_obIPC.CloseBitmap();
+				strcpy_s(g_hookstring, "");
+				m_desktop->w8_data = NULL;// g_obIPC.CloseBitmap();
 				m_desktop->m_bitmappointer=false;
 				m_desktop->m_DIBbits=NULL;
 			}
-			strcpy_s(g_hookstring,"w8hook");
-			BOOL value=m_desktop->capturew8();
-			DWORD dwTId(0);
-			if (threadHandle==NULL && value!=0)
-				threadHandle = CreateThread(NULL, 0, hookwatch, this, 0, &dwTId);
-
-			capture=false;
-			if (Handle_Ringbuffer(g_obIPC.listall(),rgncache)) 
-				return;
-			return;
+			else
+			{
+				strcpy_s(g_hookstring, "w8hook");
+				BOOL value = CaptureW8();
+				DWORD dwTId(0);
+				if (threadHandle == NULL && value != 0)
+					threadHandle = CreateThread(NULL, 0, hookwatch, this, 0, &dwTId);
+				capture = false;
+				if (m_desktop->m_bitmappointer && m_desktop->m_DIBbits)
+					if (Handle_Ringbuffer(m_desktop->plist, rgncache)) return;
+			}
 		}
 	}
 	
@@ -804,6 +811,11 @@ void vncDesktopThread::do_polling(HANDLE& threadHandle, rfb::Region2D& rgncache,
 					OutputDebugString(szText);		
 				#endif
 				if (m_desktop->FastDetectChanges(rgncache, r, 0, true)) capture=false;
+#ifdef _DEBUG
+				//char			szText[256];
+				sprintf(szText, "FastDetectChanges done %d\n", GetTickCount());
+				OutputDebugString(szText);
+#endif
 			}
 			else
 			{
@@ -1019,7 +1031,7 @@ vncDesktopThread::run_undetached(void *arg)
 			waittime=0;
 		}
 		//no need to wait, the w8hook does it own waiting.
-		if (m_desktop->startw8 && waittime!=1000) waittime = 33;
+		if (m_desktop->startedw8 && waittime!=1000) waittime = 33;
 #ifdef _DEBUG
 		char			szText[256];
 		DWORD error = GetLastError();
@@ -1325,7 +1337,7 @@ vncDesktopThread::run_undetached(void *arg)
 														}
 
 											}
-										if (m_desktop->m_server->IsXRichCursorEnabled() && !m_desktop->m_UltraEncoder_used)
+										if (m_desktop->m_server->IsXRichCursorEnabled() && (!m_desktop->m_UltraEncoder_used  || VNCOS.OS_WIN8) )
 											{
 												if (m_desktop->m_hcursor != m_desktop->m_hOldcursor || m_desktop->m_buffer.IsShapeCleared())
 														{
@@ -1489,7 +1501,7 @@ vncDesktopThread::run_undetached(void *arg)
 								}
 								else
 								{
-									if (m_desktop->startw8) waittime = 1000;
+									if (m_desktop->startedw8) waittime = 1000;
 								}
 								//newtick = timeGetTime(); 
 							}

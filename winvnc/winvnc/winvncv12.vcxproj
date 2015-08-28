@@ -133,7 +133,7 @@
     <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(LibraryPath)</LibraryPath>
     <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(LibraryPath)</LibraryPath>
     <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(LibraryPath)</LibraryPath>
-    <PostBuildEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</PostBuildEventUseInBuild>
+    <PostBuildEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</PostBuildEventUseInBuild>
     <PostBuildEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</PostBuildEventUseInBuild>
     <PostBuildEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</PostBuildEventUseInBuild>
     <PostBuildEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</PostBuildEventUseInBuild>
@@ -151,7 +151,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\omnithread;..;..\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_DEBUG;__x86__;__WIN32__;WIN32;_WINDOWS;_WIN32_WINNT=0x501;XMD_H;_WINSTATIC;_CRT_SECURE_NO_WARNINGS;_VC80;_WIN32_IE=0x0600;_XZ;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;__x86__;__WIN32__;WIN32;_WINDOWS;XMD_H;_WINSTATIC;_CRT_SECURE_NO_WARNINGS;_WIN32_IE=0x0600;_WIN32_WINNT=0x0602;WINVER=0x0602;_XZ;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -169,7 +169,7 @@
       <Command>cl /nologo /MTd /Fo..\Debug\ /Fd..\Debug\ /c buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
-      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\..\Debug/winvnc.pdb</ProgramDatabaseFile>
@@ -269,7 +269,7 @@
     </PreLinkEvent>
     <Link>
       <AdditionalOptions>/LTCG %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateManifest>true</GenerateManifest>
       <SubSystem>Windows</SubSystem>
@@ -524,6 +524,7 @@ copy "$(LocalDebuggerCommand)" ..\..\..\..\..\installer64</Command>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="DesktopManager.cpp" />
     <ClCompile Include="Dtwinver.cpp" />
     <ClCompile Include="getinfo.cpp" />
     <ClCompile Include="helpers.cpp" />
@@ -1276,6 +1277,7 @@ copy "$(LocalDebuggerCommand)" ..\..\..\..\..\installer64</Command>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CpuUsage.h" />
+    <ClInclude Include="DesktopManager.h" />
     <ClInclude Include="Dtwinver.h" />
     <ClInclude Include="..\..\common\win32_helpers.h" />
     <ClInclude Include="..\..\ZipUnZip32\ZipUnZip32.h" />
