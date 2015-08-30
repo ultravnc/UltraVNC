@@ -168,12 +168,9 @@ public:
 
 	//adzm 2010-02-15
 	void CheckProxyAndHost();
-
-#ifdef UNDER_CE
-	// WinCE screen format for dialogs (Palm vs HPC)
-	int	m_palmpc;
-	// Use slow GDI rendering, but more accurate colours.
-	int m_slowgdi;
+#ifdef _Gii
+	//gii extention
+	bool m_giienable;
 #endif
 
 	int DoDialog(bool running = false,HWND hwnd=NULL);

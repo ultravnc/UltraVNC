@@ -208,6 +208,10 @@ VNCOptions::VNCOptions()
   m_selected_screen=1;
   m_szDSMPluginFilename[0] = '\0';
 
+#ifdef _Gii
+  m_giienable = true;
+#endif
+
   //adzm - 2009-06-21
   m_fAutoAcceptIncoming = false;
 
@@ -407,6 +411,10 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
 
   m_throttleMouse = s.m_throttleMouse; // adzm 2010-10
 
+#ifdef _Gii
+  m_giienable = s.m_giienable;
+#endif
+  m_fAutoAcceptIncoming = true;
   //adzm 2009-06-21
   m_fAutoAcceptIncoming = s.m_fAutoAcceptIncoming;
   
@@ -901,6 +909,12 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 		//adzm - 2009-06-21
 		m_fAutoAcceptIncoming = true;
 	}
+#ifdef _Gii
+	else if (SwitchMatch(args[j], _T("giienable")))
+	{
+		m_giienable = true;
+	}
+#endif
 	else if (SwitchMatch(args[j], _T("autoacceptnodsm")))
 	{
 		//adzm 2009-07-19
@@ -1192,6 +1206,10 @@ void VNCOptions::Load(char *fname)
       m_socketKeepAliveTimeout = 0; 
 
   m_throttleMouse = readInt("ThrottleMouse", m_throttleMouse, fname); // adzm 2010-10
+
+#ifdef _Gii
+  m_giienable = readInt("GiiEnable", (int)m_giienable, fname) ? true : false;
+#endif
 
   //adzm 2009-06-21
   m_fAutoAcceptIncoming = readInt("AutoAcceptIncoming", (int)m_fAutoAcceptIncoming, fname) ? true : false;

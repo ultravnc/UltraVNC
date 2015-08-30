@@ -22,9 +22,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#define _WIN32_WINDOWS 0x0410
-#define WINVER 0x0400
-
 #include "stdhdrs.h"
 
 #include "vncviewer.h"
@@ -525,6 +522,11 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	//adzm 2010-10
 	m_PendingMouseMove.dwMinimumMouseMoveInterval = m_opts.m_throttleMouse;
 	directx_used=false;
+
+#ifdef _Gii
+	mytouch = new vnctouch;
+	mytouch->Set_ClientConnect(this);
+#endif
 }
 
 // helper functions for setting socket timeouts during file transfer
@@ -3526,6 +3528,12 @@ void ClientConnection::SetFormatAndEncodings()
 		encs[se->nEncodings++] = Swap32IfLE(rfbEncodingPluginStreaming);
 	}
 
+#ifdef _Gii
+	if (m_opts.m_giienable)
+		encs[se->nEncodings++] = Swap32IfLE(rfbEncodingGII);
+#endif
+
+
     // sf@2002 - DSM Plugin
 	int nEncodings = se->nEncodings;
 	se->nEncodings = Swap16IfLE(se->nEncodings);
@@ -3817,6 +3825,13 @@ ClientConnection::~ClientConnection()
         delete m_keymapJap;
         m_keymapJap = NULL;
     }
+#ifdef _Gii
+	if (mytouch)
+	{
+		delete mytouch;
+		mytouch = NULL;
+	}
+#endif
 }
 
 // You can specify a dx & dy outside the limits; the return value will
@@ -4540,6 +4555,11 @@ void* ClientConnection::run_undetached(void* arg) {
 
 				switch (msgType)
 				{
+#ifdef _Gii
+				case rfbGIIMessage:
+					mytouch->_handle_gii_message(m_hwndcn);
+					break;
+#endif
                 case rfbKeepAlive:
                     m_server_wants_keepalives = true;
 #if defined(_DEBUG)
@@ -8366,6 +8386,26 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 					else if (wParam == 1013) {
 						_this->SetDormant(2);
 					}
+#ifdef _Gii
+					else if (wParam == TOUCH_REGISTER_TIMER) {
+						bool ret = RegisterTouchWindow(hwnd, 0);
+						DWORD err = GetLastError();
+#ifdef _DEBUG
+						char			szText[256];
+						if (ret != 0)
+						{
+							sprintf(szText, "RegisterTouchWindow Success \n");
+						}
+						else
+						{
+							sprintf(szText, "RegisterTouchWindow Failed with error code = %i \n", err);
+						}
+						OutputDebugString(szText);
+#endif
+						Sleep(10);
+						KillTimer(hwnd, TOUCH_REGISTER_TIMER);
+					}
+#endif
 				}
 				return 0;
 
@@ -8399,13 +8439,20 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 							return 0;
 					}
 					if ( _this->m_opts.m_ViewOnly) return 0;
+#ifdef _Gii
+					if (!_this->mytouch->All_Points_Up()) return 0;
+#endif
 					//adzm 2010-09
 					if (_this->ProcessPointerEvent(x,y, wParam, iMsg)) {
 						_this->FlushWriteQueue(true, 5);
 					}
 					return 0;
 				}
-
+#ifdef _Gii
+			case WM_TOUCH:
+				_this->mytouch->OnTouch(hwnd, wParam, lParam);
+				return 0;
+#endif
 			case WM_KEYDOWN:
 			case WM_KEYUP:
 			case WM_SYSKEYDOWN:
@@ -8422,27 +8469,6 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 
 			case WM_CHAR:
 			case WM_SYSCHAR:
-#ifdef UNDER_CE
-				{
-					int key = wParam;
-					vnclog.Print(4,_T("CHAR msg : %02x\n"), key);
-					// Control keys which are in the Keymap table will already
-					// have been handled.
-					if (key == 0x0D  ||  // return
-						key == 0x20 ||   // space
-						key == 0x08)     // backspace
-						return 0;
-
-					if (key < 32) key += 64;  // map ctrl-keys onto alphabet
-					if (key > 32 && key < 127) {
-						_this->SendKeyEvent(wParam & 0xff, true);
-						_this->SendKeyEvent(wParam & 0xff, false);
-						//adzm 2010-09
-						_this->FlushWriteQueue(true, 5);
-					}
-					return 0;
-				}
-#endif
 			case WM_DEADCHAR:
 			case WM_SYSDEADCHAR:
 				return 0;
@@ -8561,6 +8587,9 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 					vnclog.Print(6, _T("WndProchwnd ChangeClipboardChain hwnd 0x%08x / m_hwndcn 0x%08x, 0x%08x (%li)\n"), hwnd, _this->m_hwndcn, _this->m_hwndNextViewer, res);
 				}
 				#endif
+#ifdef _Gii
+				UnregisterTouchWindow(hwnd);
+#endif
 				KillTimer(_this->m_hwndcn, _this->m_idle_timer);
 				KillTimer(_this->m_hwndcn, 1013);
 				if (_this->m_waitingOnEmulateTimer)

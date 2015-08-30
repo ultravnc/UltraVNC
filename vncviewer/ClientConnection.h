@@ -65,6 +65,11 @@ extern "C"
 #include <vector>
 #include <algorithm>
 #include "./directx/directxviewer.h"
+#ifdef _Gii
+#include "vnctouch.h"
+#define TOUCH_REGISTER_TIMER 1014
+class vnctouch;
+#endif
 extern const UINT FileTransferSendPacketMessage;
 
 #ifndef max
@@ -174,7 +179,18 @@ public:
 
 	bool m_Is_Listening;
 
+// _Gii need to be global 
+	RECT m_TBr;
+	int m_hScrollPos, m_vScrollPos;
+	rfbServerInitMsg m_si;
+	// The size of the current client area
+	int m_cliwidth, m_cliheight;
+	void WriteExact(char *buf, int bytes); //adzm 2010-09
+
 private:
+#ifdef _Gii
+	vnctouch *mytouch;
+#endif
 	static LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam);
 	static LRESULT CALLBACK WndProcTBwin(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam);
 	static LRESULT CALLBACK WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam);
@@ -195,8 +211,6 @@ private:
 	bool m_serverInitiated;
 	HWND m_hwndcn, m_hbands,m_hwndTB,m_hwndTBwin,m_hwndStatus,m_TrafficMonitor,m_logo_wnd,m_button_wnd;
 	HANDLE m_statusThread;
-	RECT m_TBr;
-	// bool m_ToolbarEnable;
 	bool m_remote_mouse_disable;
 	bool m_SWselect;
 	POINT m_SWpoint;
@@ -427,8 +441,7 @@ private:
 	void WriteTransformed(char *buf, int bytes, bool bQueue); //adzm 2010-09
 	void WriteTransformed(char *buf, int bytes, CARD8 msgType, bool bQueue); //sf@2002 - DSM Plugin
 
-	//adzm 2010-09
-	void WriteExact(char *buf, int bytes); //adzm 2010-09
+	//adzm 2010-09	
 	void WriteExactProxy(char *buf, int bytes); // same as Write
 	void WriteExact(char *buf, int bytes, CARD8 msgType); //sf@2002 - DSM Plugin
 
@@ -624,7 +637,6 @@ private:
 	char m_cmdlnUser[256]; // act: add user option on command line
 	char m_clearPasswd[256]; // Modif sf@2002
 
-	rfbServerInitMsg m_si;
 	rfbPixelFormat m_myFormat, m_pendingFormat;
 	// protocol version in use.
 	int m_majorVersion, m_minorVersion;
@@ -646,7 +658,7 @@ private:
 	HMENU m_hPopupMenuKeyboard;
 
 	// Window may be scrollable - these control the scroll position
-	int m_hScrollPos, m_hScrollMax, m_vScrollPos, m_vScrollMax;
+	int m_hScrollMax, m_vScrollMax;
 	// The current window size
 	int m_winwidth, m_winheight;
 	bool SB_HORZ_BOOL;
@@ -654,8 +666,6 @@ private:
 	__int64 m_BytesSend;
 	__int64 m_BytesRead;
 	HANDLE m_bitmapFRONT,m_bitmapBACK,m_bitmapNONE,m_logo_min;
-	// The size of the current client area
-	int m_cliwidth, m_cliheight;
 	// The size of a window needed to hold entire screen without scrollbars
 	int m_fullwinwidth, m_fullwinheight;
 	// The size of the CE CommandBar

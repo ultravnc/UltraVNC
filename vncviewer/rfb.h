@@ -48,6 +48,11 @@ typedef unsigned char  CARD8;
 #define PORT_TO_DISPLAY(p) ( (p) - RFB_PORT_OFFSET )
 #define DISPLAY_TO_PORT(d) ( (d) + RFB_PORT_OFFSET )
 
+#ifdef _Gii
+#include <stdint.h>
+#include <rfb/gii.h>
+#endif
+
 // include the protocol spec
 #include <rfb/rfbproto.h>
 
