@@ -318,6 +318,7 @@ int vnctouch::GetContactIndex(int dwID){
 
 bool vnctouch::All_Points_Up()
 {
+	if (point_down)
 	for (int i = 0; i < MAXPOINTS; i++){
 		if (point_down[i]) return false;
 	}
