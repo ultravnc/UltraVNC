@@ -1,3 +1,4 @@
+#ifdef _USE_DESKTOPDUPLICATION
 #ifndef __DESK
 #define __DESK
 #include <windows.h>
@@ -60,4 +61,5 @@ class DESKTOPMANAGER
 		CRITICAL_SECTION CriticalSection;		
 };
 
+#endif
 #endif

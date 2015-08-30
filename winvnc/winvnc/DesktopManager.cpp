@@ -1,5 +1,5 @@
-﻿#include "desktopmanager.h"
-//CIPC g_obIPC2;
+﻿#ifdef _USE_DESKTOPDUPLICATION
+#include "desktopmanager.h"
 DESKTOPMANAGER *DESKTOPMANAGER_f=NULL;
 
 
@@ -714,3 +714,4 @@ void ONEDESKTOP::Addrect(int type, int x1, int y1, int x2, int y2, int x11, int 
 	plist->locked = 0;
 	plist->counter = counter;
 }
+#endif

@@ -37,10 +37,12 @@ DWORD WINAPI Driverwatch(LPVOID lpParam);
 DWORD WINAPI InitWindowThread(LPVOID lpParam);
 extern char g_hookstring[16];
 
+#ifdef _USE_DESKTOPDUPLICATION
 unsigned char * StartW8(bool primonly);
 BOOL StopW8();
 BOOL CaptureW8();
 mystruct * get_plist();
+#endif
 
 
 void
@@ -188,6 +190,7 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 			{
 					KillTimer(hwnd, 100);
 					bool w8started = false;
+#ifdef _USE_DESKTOPDUPLICATION
 					_this->w8_data = StartW8(!_this->multi_monitor);
 					if (_this->w8_data)
 						{
@@ -209,6 +212,7 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 							//not wddm 1.2 or some other things prevent the desktophook to work proper
 							StopW8();
 						}
+#endif
 						
 
 					if (w8started){}
@@ -281,7 +285,9 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 				if (_this->startedw8)
 				{
 					vnclog.Print(LL_INTERR, VNCLOG("unset W8 hooks OK\n"));
+#ifdef _USE_DESKTOPDUPLICATION
 					StopW8();
+#endif
 				}
 				if (_this->UnSetHook)
 				{
@@ -340,7 +346,9 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 					vnclog.Print(LL_INTERR, VNCLOG("unset W8 hooks OK\n"));
 					_this->m_DIBbits = NULL;
 					Sleep(1000); //FIX
+#ifdef _USE_DESKTOPDUPLICATION
 					StopW8();
+#endif
 				}
 				if (_this->UnSetHook)
 				{

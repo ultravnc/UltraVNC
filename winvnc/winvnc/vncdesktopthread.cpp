@@ -26,9 +26,9 @@
 #include "vncOSVersion.h"
 #include "uvncUiAccess.h"
 
-BOOL StartW8(bool primonly);
-BOOL StopW8();
+#ifdef _USE_DESKTOPDUPLICATION
 BOOL CaptureW8();
+#endif
 
 bool g_DesktopThread_running;
 bool g_update_triggered;
@@ -762,13 +762,16 @@ void vncDesktopThread::do_polling(HANDLE& threadHandle, rfb::Region2D& rgncache,
 			else
 			{
 				strcpy_s(g_hookstring, "w8hook");
+#ifdef _USE_DESKTOPDUPLICATION
 				BOOL value = CaptureW8();
+
 				DWORD dwTId(0);
 				if (threadHandle == NULL && value != 0)
 					threadHandle = CreateThread(NULL, 0, hookwatch, this, 0, &dwTId);
 				capture = false;
 				if (m_desktop->m_bitmappointer && m_desktop->m_DIBbits)
 					if (Handle_Ringbuffer(m_desktop->plist, rgncache)) return;
+#endif
 			}
 		}
 	}
