@@ -72,6 +72,7 @@ vncBuffer::~vncBuffer()
 		{
 			delete [] m_mainbuff;
 			m_mainbuff = NULL;
+			m_freemainbuff = false;
 		}
 	}
 	if (m_backbuff != NULL)
@@ -171,6 +172,7 @@ vncBuffer::CheckBuffer()
 			{
 				delete [] m_mainbuff;
 				m_mainbuff = NULL;
+				m_freemainbuff = false;
 			}
 		}
 
@@ -1004,7 +1006,30 @@ vncBuffer::ClearCacheRect(const rfb::Rect &dest)
 void
 vncBuffer::ClearBack()
 {
+	if (m_freemainbuff) {
+		// Slow blits were enabled - free the slow blit buffer
+		// Modif rdv@2002 - v1.1.x - Videodriver
+		if (m_mainbuff != NULL)
+		{
+			delete [] m_mainbuff;
+			m_mainbuff = NULL;
+			m_freemainbuff = false;
+		}
+	}
 	m_mainbuff = (BYTE *)m_desktop->OptimisedBlitBuffer();
+
+	if (m_mainbuff) {
+		m_freemainbuff = FALSE;
+	}
+	else {
+		m_freemainbuff = TRUE;
+		if ((m_mainbuff = new BYTE[m_desktop->ScreenBuffSize()]) == NULL)
+		{
+			return;
+		}
+		memset(m_mainbuff, 0, m_desktop->ScreenBuffSize());
+	}
+
 	if (m_mainbuff) memcpy(m_backbuff, m_mainbuff, m_desktop->ScreenBuffSize());
 }
 

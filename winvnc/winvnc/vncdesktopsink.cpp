@@ -55,11 +55,6 @@ vncDesktop::ShutdownInitWindowthread()
 
 	if (startedw8)
 		{
-#ifdef _DEBUG
-					char			szText[256];
-					sprintf(szText,"StartStophookdll(0) \n");
-					OutputDebugString(szText);
-#endif
 			StartStophookdll(0);
 			Hookdll_Changed = true;
 		}
@@ -304,30 +299,6 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		return true;
 
 	case WM_QUERYENDSESSION:
-
-		/*if (OSversion()==2)
-		{
-		if (_this->m_hnextviewer!=NULL) ChangeClipboardChain(hwnd, _this->m_hnextviewer);
-		_this->m_hnextviewer=NULL;
-		if (_this->m_hookinited)
-			{
-				_this->m_hookinited=FALSE;
-				if (_this->UnSetHook)
-				{
-					vnclog.Print(LL_INTERR, VNCLOG("unset SC hooks OK\n"));
-					_this->UnSetHook(hwnd);
-				}
-				else if (_this->UnSetHooks)
-				{
-				if(!_this->UnSetHooks(GetCurrentThreadId()) )
-					vnclog.Print(LL_INTERR, VNCLOG("Unsethooks Failed\n"));
-				else vnclog.Print(LL_INTERR, VNCLOG("Unsethooks OK\n"));
-				}
-			}
-		vnclog.Print(LL_INTERR, VNCLOG("WM_QUERYENDSESSION\n"));
-		PostQuitMessage(0);
-		SetEvent(_this->trigger_events[5]);
-		}*/
 		return DefWindowProc(hwnd, iMsg, wParam, lParam);
 
 	case WM_CLOSE:

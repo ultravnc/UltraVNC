@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+VisualStudioVersion = 12.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "omnithread", "omnithread\omnithreadv12.vcxproj", "{E52B9956-FE67-47F7-BC4F-67CC5A64B708}"
 EndProject
@@ -253,6 +253,7 @@ Global
 		{E8BA959F-B652-4BAB-9EA7-8E9FC8D7F39C}.Debug|Win32.ActiveCfg = Debug|Win32
 		{E8BA959F-B652-4BAB-9EA7-8E9FC8D7F39C}.Debug|Win32.Build.0 = Debug|Win32
 		{E8BA959F-B652-4BAB-9EA7-8E9FC8D7F39C}.Debug|x64.ActiveCfg = Debug|x64
+		{E8BA959F-B652-4BAB-9EA7-8E9FC8D7F39C}.Debug|x64.Build.0 = Debug|x64
 		{E8BA959F-B652-4BAB-9EA7-8E9FC8D7F39C}.Http|Win32.ActiveCfg = Release|Win32
 		{E8BA959F-B652-4BAB-9EA7-8E9FC8D7F39C}.Http|Win32.Build.0 = Release|Win32
 		{E8BA959F-B652-4BAB-9EA7-8E9FC8D7F39C}.Http|x64.ActiveCfg = Release|Win32
