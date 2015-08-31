@@ -712,7 +712,7 @@ void vnctouch::OnTouch(HWND hWnd, WPARAM wParam, LPARAM lParam)
 					if (ti.dwFlags& TOUCHEVENTF_UP)
 					{
 						pMyTouchInfo[index].pointerflag |= POINTER_FLAG_UP;
-						point_down[index] = false;
+						//point_down[index] = false;
 					}
 #ifdef _DEBUG
 					char			szText[256];
@@ -722,6 +722,9 @@ void vnctouch::OnTouch(HWND hWnd, WPARAM wParam, LPARAM lParam)
 				}
 			}
 			rfb_send_gii_mt_event();
+			for (UINT i = 0; i < cInputs; i++){
+				if (pMyTouchInfo[index].pointerflag & POINTER_FLAG_UP) point_down[index] = false;
+			}
 			bHandled = TRUE;
 		}
 	}
