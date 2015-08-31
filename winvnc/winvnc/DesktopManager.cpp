@@ -1,5 +1,6 @@
 ﻿#ifdef _USE_DESKTOPDUPLICATION
 #include "desktopmanager.h"
+#include <stdio.h>
 DESKTOPMANAGER *DESKTOPMANAGER_f=NULL;
 
 
@@ -368,6 +369,7 @@ ONEDESKTOP::ONEDESKTOP()
 	m_DeskDupl=nullptr;
 	m_AcquiredDesktopImage=nullptr;
 	m_MetaDataBuffer=nullptr;
+	frameaquired = false;
 }
 
 void ONEDESKTOP::SETONEDESKTOP(int desknr_IN,ID3D11Device* m_Device_IN,ID3D11DeviceContext* m_DeviceContext_IN)
@@ -415,15 +417,31 @@ int ONEDESKTOP::UPDATEDESK(int offsetx,int offsety, int width,int height,int scr
     DXGI_OUTDUPL_FRAME_INFO FrameInfo;
 	BYTE* DirtyRects=nullptr;
 	BYTE* MoveRects=nullptr;
+	if (frameaquired)
+	{
+		hr = m_DeskDupl->ReleaseFrame();
+		if (FAILED(hr))
+		{
+			goto Exit1;
+		}
+	}
 
-
+	if (m_AcquiredDesktopImage)
+	{
+		m_AcquiredDesktopImage->Release();
+		m_AcquiredDesktopImage = nullptr;
+	}
 
     // Get new frame
-    hr = m_DeskDupl->AcquireNextFrame(25, &FrameInfo, &DesktopResource);
-    if (hr == DXGI_ERROR_WAIT_TIMEOUT)
-		goto Exit1;
+	frameaquired = false;
+    hr = m_DeskDupl->AcquireNextFrame(50, &FrameInfo, &DesktopResource);
     if (FAILED(hr))
 	{
+		if (hr == DXGI_ERROR_WAIT_TIMEOUT)
+		{		
+			goto Exit1;
+		}
+
 		if (hr == DXGI_ERROR_ACCESS_LOST)
 			{
 				//◦Desktop switch
@@ -443,6 +461,7 @@ int ONEDESKTOP::UPDATEDESK(int offsetx,int offsety, int width,int height,int scr
 			}
 		goto Exit;
 	}
+	frameaquired = true;
 
 	if (m_AcquiredDesktopImage)
     {
@@ -589,18 +608,7 @@ int ONEDESKTOP::UPDATEDESK(int offsetx,int offsety, int width,int height,int scr
 	BitmapSurface->Release();
     BitmapSurface = NULL;
 	if (FAILED(hr)) goto Exit;
-
-	hr = m_DeskDupl->ReleaseFrame();
-    if (FAILED(hr))
-    {
-        goto Exit;
-    }
-
-    if (m_AcquiredDesktopImage)
-    {
-        m_AcquiredDesktopImage->Release();
-        m_AcquiredDesktopImage = nullptr;
-    }
+   
 Exit1:
 	return 1;
 Exit:

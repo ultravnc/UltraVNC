@@ -30,6 +30,7 @@ class ONEDESKTOP
 		int Desknr;
 		void ONEDESKTOP::Addrect(int type, int x1, int y1, int x2, int y2, int x11, int y11, int x22, int y22);
 		mystruct *plist;
+		bool frameaquired;
 };
 
 class DESKTOPMANAGER
