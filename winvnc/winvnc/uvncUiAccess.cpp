@@ -222,7 +222,6 @@ void keybd_delete()
 
 comm_serv::comm_serv()
 {
-	Force_unblock();
 	event_E_IN=NULL;
 	event_E_IN_DONE=NULL;
 	event_E_OUT=NULL;
@@ -240,10 +239,10 @@ comm_serv::comm_serv()
 comm_serv::~comm_serv()
 {
 	GLOBAL_RUNNING=false;
-	CloseHandle(event_E_IN);
-	CloseHandle(event_E_IN_DONE);
-	CloseHandle(event_E_OUT);
-	CloseHandle(event_E_OUT_DONE);
+	if (event_E_IN) CloseHandle(event_E_IN);
+	if (event_E_IN_DONE) CloseHandle(event_E_IN_DONE);
+	if (event_E_OUT) CloseHandle(event_E_OUT);
+	if (event_E_OUT_DONE) CloseHandle(event_E_OUT_DONE);
 	if (data_IN)UnmapViewOfFile(data_IN);
 	if (data_OUT)UnmapViewOfFile(data_OUT);
 	if (hMapFile_IN)CloseHandle(hMapFile_IN);
@@ -493,9 +492,9 @@ void comm_serv::Call_Fnction(char *databuffer_IN,char *databuffer_OUT)
 	EnterCriticalSection(&CriticalSection_IN);
 	memcpy(data_IN,databuffer_IN,datasize_IN);
 	//ResetEvent(event_E_IN_DONE);
-	ResetEvent(event_E_OUT);
-	ResetEvent(event_E_OUT_DONE);
-	SetEvent(event_E_IN);
+	if (event_E_OUT) ResetEvent(event_E_OUT);
+	if (event_E_OUT_DONE) ResetEvent(event_E_OUT_DONE);
+	if (event_E_IN) SetEvent(event_E_IN);
 	DWORD r=WaitForSingleObject(event_E_IN_DONE,1000);
 
 	if (r==WAIT_TIMEOUT) 
@@ -516,7 +515,7 @@ void comm_serv::Call_Fnction(char *databuffer_IN,char *databuffer_OUT)
 	r=WaitForSingleObject(event_E_OUT,1000);
 	memcpy(databuffer_OUT,data_OUT,datasize_OUT);
 	error:
-	SetEvent(event_E_OUT_DONE);
+	if (event_E_OUT_DONE) SetEvent(event_E_OUT_DONE);
 	LeaveCriticalSection(&CriticalSection_IN);
 }
 
@@ -551,7 +550,7 @@ void comm_serv::Call_Fnction_Long(char *databuffer_IN,char *databuffer_OUT)
 		r=1;
 
 	memcpy(databuffer_OUT,data_OUT,datasize_OUT);
-	SetEvent(event_E_OUT_DONE);
+	if (event_E_OUT_DONE) SetEvent(event_E_OUT_DONE);
 	LeaveCriticalSection(&CriticalSection_OUT);
 }
 
@@ -576,7 +575,7 @@ void comm_serv::Call_Fnction_Long_Timeout(char *databuffer_IN,char *databuffer_O
 	EnterCriticalSection(&CriticalSection_OUT);
 	r=WaitForSingleObject(event_E_OUT,timeout);
 	memcpy(databuffer_OUT,data_OUT,datasize_OUT);
-	SetEvent(event_E_OUT_DONE);
+	if (event_E_OUT_DONE) SetEvent(event_E_OUT_DONE);
 	if (r==WAIT_TIMEOUT) 
 	{
 		unsigned char value=99;
@@ -599,25 +598,25 @@ char *comm_serv::Getsharedmem()
 void comm_serv::ReadData(char *databuffer)
 {
 	memcpy(databuffer,data_IN,datasize_IN);
-	SetEvent(event_E_IN_DONE);
+	if (event_E_IN_DONE) SetEvent(event_E_IN_DONE);
 }
 
 void comm_serv::SetData(char *databuffer)
 {
 	if (!GLOBAL_RUNNING) return;
 	memcpy(data_OUT,databuffer,datasize_OUT);
-	SetEvent(event_E_OUT);
+	if (event_E_OUT)SetEvent(event_E_OUT);
 	DWORD r=WaitForSingleObject(event_E_OUT_DONE,2000);	
 }
 
 void comm_serv::Force_unblock()
 {
-	SetEvent(event_E_OUT_DONE);
-	SetEvent(event_E_IN_DONE);
-	SetEvent(event_E_OUT);
+	if (event_E_OUT_DONE) SetEvent(event_E_OUT_DONE);
+	if (event_E_IN_DONE) SetEvent(event_E_IN_DONE);
+	if (event_E_OUT) SetEvent(event_E_OUT);
 }
 
 void comm_serv::Release()
 {
-	ResetEvent(event_E_IN);
+	if (event_E_IN) ResetEvent(event_E_IN);
 }
