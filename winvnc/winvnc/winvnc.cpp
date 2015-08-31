@@ -1062,6 +1062,7 @@ int WinVNCAppMain()
 			// We don't allow multiple instances!
 			if (!fRunningFromExternalService)
 				MessageBoxSecure(NULL, sz_ID_ANOTHER_INST, szAppName, MB_OK);
+			if (instancehan != NULL) delete instancehan;
 			return 0;
 		}
 	}

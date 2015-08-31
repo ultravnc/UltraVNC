@@ -1403,7 +1403,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 											|TOKEN_DUPLICATE|TOKEN_ASSIGN_PRIMARY|TOKEN_ADJUST_SESSIONID
 											| TOKEN_READ | TOKEN_WRITE, &hPToken))
 					{
-						CloseHandle(hProcess);
+						if (hProcess) CloseHandle(hProcess);
 						goto error6;
 					}
 
@@ -1416,8 +1416,6 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
 					STARTUPINFO          StartUPInfo;
 					PROCESS_INFORMATION  ProcessInfo;
-					HANDLE Token=NULL;
-					HANDLE process=NULL;
 					ZeroMemory(&StartUPInfo,sizeof(STARTUPINFO));
 					ZeroMemory(&ProcessInfo,sizeof(PROCESS_INFORMATION));
 					StartUPInfo.wShowWindow = SW_SHOW;
@@ -1426,10 +1424,11 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			
 					CreateProcessAsUser(hPToken,NULL,dir,NULL,NULL,FALSE,DETACHED_PROCESS,NULL,NULL,&StartUPInfo,&ProcessInfo);
 					DWORD errorcode=GetLastError();
-					if (process) CloseHandle(process);
-					if (Token) CloseHandle(Token);
+					if (hProcess) CloseHandle(hProcess);
+					if (hPToken) CloseHandle(hPToken);
 					if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
 					if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
+					
 					if (errorcode == 1314) goto error6;
 					fShutdownOrdered = TRUE;
 					Sleep(1000);
