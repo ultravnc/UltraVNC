@@ -39,14 +39,14 @@
 #ifndef _WIN32_IE                       // Specifies that the minimum required platform is Internet Explorer 7.0.
 #define _WIN32_IE 0x0600        // Change this to the appropriate value to target other versions of IE.
 #endif
-#else
-#define _WIN32_WINDOWS 0x0510
-#define WINVER 0x0500
 #endif
 
 #ifdef _USE_DESKTOPDUPLICATION
 #define _WIN32_WINNT 0x0602
 #define WINVER 0x0602
+#else
+#define _WIN32_WINDOWS 0x0510
+#define WINVER 0x0500
 #endif
 
 #define WIN32_LEAN_AND_MEAN
