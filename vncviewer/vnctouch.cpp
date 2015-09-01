@@ -1,5 +1,5 @@
-#ifdef _Gii
 #include "vnctouch.h"
+#ifdef _Gii
 
 
 #define PF_flag 0x80000000// 'P'ressed 'F'lag : es wird übertragen, ob der Touchpunkt gedrückt oder losgelassen wurde. 
@@ -314,15 +314,6 @@ int vnctouch::GetContactIndex(int dwID){
 	}
 
 	return -1;
-}
-
-bool vnctouch::All_Points_Up()
-{
-	if (point_down)
-	for (int i = 0; i < MAXPOINTS; i++){
-		if (point_down[i]) return false;
-	}
-	return true;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -712,7 +703,7 @@ void vnctouch::OnTouch(HWND hWnd, WPARAM wParam, LPARAM lParam)
 					if (ti.dwFlags& TOUCHEVENTF_UP)
 					{
 						pMyTouchInfo[index].pointerflag |= POINTER_FLAG_UP;
-						//point_down[index] = false;
+						point_down[index] = false;
 					}
 #ifdef _DEBUG
 					char			szText[256];
@@ -722,9 +713,6 @@ void vnctouch::OnTouch(HWND hWnd, WPARAM wParam, LPARAM lParam)
 				}
 			}
 			rfb_send_gii_mt_event();
-			for (UINT i = 0; i < cInputs; i++){
-				if (pMyTouchInfo[index].pointerflag & POINTER_FLAG_UP) point_down[index] = false;
-			}
 			bHandled = TRUE;
 		}
 	}

@@ -1,10 +1,16 @@
+#include "stdhdrs.h"
+
 #ifdef _Gii
 #ifndef VNCTOUCH_H__
 #define VNCTOUCH_H__
 
-#include "stdhdrs.h"
 #include "vncviewer.h"
 #include "ClientConnection.h"
+
+#define MI_WP_SIGNATURE 0xFF515700
+#define SIGNATURE_MASK 0xFFFFFF00
+#define IsPenEvent(dw) (((dw) & SIGNATURE_MASK) == MI_WP_SIGNATURE)
+#define IsTouchEvent(dw) (((dw) & 0x80) == 0x80)
 
 
 struct MyTouchINfo
@@ -26,7 +32,6 @@ public:
 	void OnTouch(HWND hWnd, WPARAM wParam, LPARAM lParam);
 	int _handle_gii_message(HWND hwnd);
 	void Set_ClientConnect(ClientConnection *IN_cc);
-	bool All_Points_Up();
 
 private:
 	void Activate_touch(HWND hWnd);

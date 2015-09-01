@@ -22,7 +22,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
  
-
+#define _Gii
 #ifdef _Gii
 #ifndef WINVER                  // Specifies that the minimum required platform is Windows 7.
 #define WINVER 0x0601           // Change this to the appropriate value to target other versions of Windows.

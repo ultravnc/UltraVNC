@@ -8440,7 +8440,12 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 					}
 					if ( _this->m_opts.m_ViewOnly) return 0;
 #ifdef _Gii
-					if (!_this->mytouch->All_Points_Up()) return 0;
+					//Filter touch/pen events
+					if(IsPenEvent(GetMessageExtraInfo()) || IsTouchEvent(GetMessageExtraInfo()))
+					{
+						//ignore mouse events.
+						return 0;
+					}
 #endif
 					//adzm 2010-09
 					if (_this->ProcessPointerEvent(x,y, wParam, iMsg)) {
@@ -8450,6 +8455,8 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 				}
 #ifdef _Gii
 			case WM_TOUCH:
+				//view_only is also for the touch
+				if (_this->m_opts.m_ViewOnly) return 0;
 				_this->mytouch->OnTouch(hwnd, wParam, lParam);
 				return 0;
 #endif
