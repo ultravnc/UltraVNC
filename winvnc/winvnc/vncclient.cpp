@@ -548,6 +548,7 @@ vncClientUpdateThread::run_undetached(void *arg)
 				// where we have got to
 				m_sync_sig->broadcast();
 				do{
+					if (!m_client->cl_connected) return 0;
 					if(m_signal->wait(UPDATE_INTERVAL*100)==false)
 					{
 						{
