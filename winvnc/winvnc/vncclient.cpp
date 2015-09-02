@@ -492,16 +492,13 @@ vncClientUpdateThread::run_undetached(void *arg)
 		{
 			while (!m_client->m_initial_update)
 			{
+				if (!m_client->cl_connected) return 0;
 				esc_counter++;
 				Sleep(50);
 				if (esc_counter > 100) break;
-#ifdef _DEBUG
-				char			szText[256];
-				sprintf(szText,"!m_initial_update \n");
-				OutputDebugString(szText);		
-#endif
 			}
 		}
+		if (!m_client->cl_connected) return 0;
 
 
 		{
@@ -4644,7 +4641,7 @@ vncClient::vncClient() : Sendinput("USER32", "SendInput"), m_clipboard(Clipboard
 	m_ptrevent.y=0;
 
 	// Other misc flags
-	m_thread = NULL;
+	m_thread_ClientThread = NULL;
 	m_palettechanged = FALSE;
 
 	// Initialise the two update stores
@@ -4763,7 +4760,7 @@ vncClient::vncClient() : Sendinput("USER32", "SendInput"), m_clipboard(Clipboard
 
 vncClient::~vncClient()
 {
-
+	cl_connected = false;
 	vnclog.Print(LL_INTINFO, VNCLOG("~vncClient() executing...\n"));
 
 	// Modif sf@2002 - Text Chat
@@ -4867,10 +4864,10 @@ vncClient::Init(vncServer *server,
 	m_id = newid;
 
 	// Spawn the child thread here
-	m_thread = new vncClientThread;
-	if (m_thread == NULL)
+	m_thread_ClientThread = new vncClientThread;
+	if (m_thread_ClientThread == NULL)
 		return FALSE;
-	return ((vncClientThread *)m_thread)->Init(this, m_server, m_socket, auth, shared);
+	return ((vncClientThread *) m_thread_ClientThread)->Init(this, m_server, m_socket, auth, shared);
 
 	return FALSE;
 }

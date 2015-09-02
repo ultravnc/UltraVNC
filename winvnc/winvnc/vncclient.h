@@ -429,7 +429,7 @@ protected:
 	char			*m_client_name;
 
 	// The client thread
-	omni_thread		*m_thread;
+	omni_thread		*m_thread_ClientThread;
 
 	// adzm 2009-07-05
 	char*			m_szRepeaterID;
