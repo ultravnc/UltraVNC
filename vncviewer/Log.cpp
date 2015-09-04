@@ -64,9 +64,6 @@ void Log::SetMode(int mode) {
         m_tofile = false;
     }
     
-#ifdef _WIN32_WCE
-	m_toconsole = false;
-#else
     if (mode & ToConsole) {
         if (!m_toconsole) {
             AllocConsole();
@@ -80,7 +77,7 @@ void Log::SetMode(int mode) {
             _fdopen(2, "wt");
             printf("fh is %d\n",fh);
             fflush(stdout);
-#endif
+
         }
 
         m_toconsole = true;

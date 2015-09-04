@@ -26,12 +26,8 @@
 
 #include "vncviewer.h"
 
-#ifdef UNDER_CE
-#include "omnithreadce.h"
-#define SD_BOTH 0x02
-#else
 #include "omnithread/omnithread.h"
-#endif
+
 
 #include "ClientConnection.h"
 #include "SessionDialog.h"
@@ -1245,13 +1241,8 @@ void ClientConnection::GTGBS_CreateToolbar()
 
 void ClientConnection::CreateDisplay()
 {
-#ifdef _WIN32_WCE
-	//const DWORD winstyle = WS_VSCROLL | WS_HSCROLL | WS_CAPTION | WS_SYSMENU;
-	const DWORD winstyle =  WS_CHILD;
-#else
-	//const DWORD winstyle = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_THICKFRAME | WS_VSCROLL | WS_HSCROLL;
 	const DWORD winstyle = WS_CHILD;
-#endif
+
 	RECT Rmain;
 	RECT Rtb;
 	GetClientRect(m_hwndMain,&Rmain);
@@ -1436,7 +1427,6 @@ void ClientConnection::CreateDisplay()
 void ClientConnection::WatchClipboard()
 {
 	// Set up clipboard watching
-#ifndef _WIN32_WCE
 	// We want to know when the clipboard changes, so
 	// insert ourselves in the viewer chain. But doing
 	// this will cause us to be notified immediately of
@@ -1447,7 +1437,7 @@ void ClientConnection::WatchClipboard()
 	m_hwndNextViewer = SetClipboardViewer(m_hwndcn);
 	vnclog.Print(6, "SetClipboardViewer to 0x%08x; next is 0x%08x. Last error 0x%08x", m_hwndcn, m_hwndNextViewer, GetLastError());
 	m_settingClipboardViewer = false;
-#endif
+
 }
 
 // adzm - 2010-07 - Extended clipboard
@@ -6629,16 +6619,9 @@ void ClientConnection::GTGBS_CreateDisplay()
 	wndclass.hbrBackground	= (HBRUSH) GetStockObject(BLACK_BRUSH);
     wndclass.lpszMenuName	= (const TCHAR *) NULL;
 	wndclass.lpszClassName	= _T("VNCMDI_Window");
-
 	RegisterClass(&wndclass);
-
-#ifdef _WIN32_WCE
-	const DWORD winstyle = WS_VSCROLL | WS_HSCROLL | WS_CAPTION | WS_SYSMENU;
-#else
 	const DWORD winstyle = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU |
 	  WS_MINIMIZEBOX |WS_MAXIMIZEBOX | WS_THICKFRAME | WS_VSCROLL | WS_HSCROLL;
-#endif
-
 	m_hwndMain = CreateWindow(_T("VNCMDI_Window"),
 			  _T("VNCviewer"),
 			  winstyle,
@@ -6652,15 +6635,6 @@ void ClientConnection::GTGBS_CreateDisplay()
 			  m_pApp->m_instance,
 			  (LPVOID)this);
 	helper::SafeSetWindowUserData(m_hwndMain, (LONG_PTR)this);
-
-	/*LONG lExStyle = GetWindowLong(m_hwndMain, GWL_EXSTYLE);
-	lExStyle &= ~(WS_EX_DLGMODALFRAME | WS_EX_CLIENTEDGE | WS_EX_STATICEDGE);
-	SetWindowLong(m_hwndMain, GWL_EXSTYLE, lExStyle);
-	LONG lStyle = GetWindowLong(m_hwndMain, GWL_STYLE);
-	lStyle &= ~(WS_CAPTION | WS_THICKFRAME | WS_MINIMIZE | WS_MAXIMIZE | WS_SYSMENU);
-	SetWindowLong(m_hwndMain, GWL_STYLE, lStyle);
-	SetWindowPos(m_hwndMain, NULL, 0,0,0,0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOOWNERZORDER);*/
-	// [v1.0.2-jp1 fix]
 	ImmAssociateContext(m_hwndMain, NULL);    
 }
 

@@ -705,11 +705,7 @@ if (hUser32) FreeLibrary(hUser32);
 	/////////////////////////////////////////////////////////////
 
 	// The state of the application as a whole is contained in the one app object
-	#ifdef _WIN32_WCE
-		VNCviewerApp app(hInstance, szCmdLine);
-	#else
 		VNCviewerApp32 app(hInstance, szCmdLine);
-	#endif
 
     console = app.m_options.m_logToConsole;
 
