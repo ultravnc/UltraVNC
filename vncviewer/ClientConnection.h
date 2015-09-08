@@ -68,6 +68,7 @@ extern "C"
 #ifdef _Gii
 #include "vnctouch.h"
 #define TOUCH_REGISTER_TIMER 1014
+#define TOUCH_SLEEP_TIMER 1015
 class vnctouch;
 #endif
 extern const UINT FileTransferSendPacketMessage;

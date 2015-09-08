@@ -8286,6 +8286,9 @@ LRESULT CALLBACK ClientConnection::WndProcTBwin(HWND hwnd, UINT iMsg, WPARAM wPa
 return DefWindowProc(hwnd, iMsg, wParam, lParam);
 }
 
+
+
+static bool mouse_enable = false;
 //
 //
 //
@@ -8379,6 +8382,10 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 						Sleep(10);
 						KillTimer(hwnd, TOUCH_REGISTER_TIMER);
 					}
+					else if (wParam == TOUCH_SLEEP_TIMER) {
+						KillTimer(hwnd, TOUCH_SLEEP_TIMER);
+						mouse_enable = true;
+					}
 #endif
 				}
 				return 0;
@@ -8420,6 +8427,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 						//ignore mouse events.
 						return 0;
 					}
+					if (mouse_enable != true) return 0;
 #endif
 					//adzm 2010-09
 					if (_this->ProcessPointerEvent(x,y, wParam, iMsg)) {
@@ -8430,6 +8438,8 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 #ifdef _Gii
 			case WM_TOUCH:
 				//view_only is also for the touch
+				SetTimer(hwnd, TOUCH_SLEEP_TIMER, 1000, NULL);
+				mouse_enable = false;
 				if (_this->m_opts.m_ViewOnly) return 0;
 				_this->mytouch->OnTouch(hwnd, wParam, lParam);
 				return 0;
