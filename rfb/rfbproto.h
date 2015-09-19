@@ -1,6 +1,8 @@
 /*
 //  Copyright (C) 2002 UltraVNC Team Members. All Rights Reserved.
 //  Copyright (C) 2000-2002 Const Kaplinsky. All Rights Reserved.
+ *  Copyright (C) 2009 D. R. Commander. All Rights Reserved.
+ *  Copyright (C) 2008 Sun Microsystems, Inc. All Rights Reserved.
  *  Copyright (C) 2002 RealVNC Ltd.  All Rights Reserved.
  *  Copyright (C) 1999 AT&T Laboratories Cambridge.  All Rights Reserved.
  *
@@ -498,6 +500,8 @@ typedef struct {
 
 /*
  *  Tight Special encoding numbers:
+ *   0xFFFFFD00 .. 0xFFFFFD05 -- subsampling level;
+ *   0xFFFFFE00 .. 0xFFFFFE64 -- fine-grained quality level (0-100 scale);
  *   0xFFFFFF00 .. 0xFFFFFF0F -- encoding-specific compression levels;
  *   0xFFFFFF10 .. 0xFFFFFF1F -- mouse cursor shape data;
  *   0xFFFFFF20 .. 0xFFFFFF2F -- various protocol extensions;
@@ -505,6 +509,15 @@ typedef struct {
  *   0xFFFFFFE0 .. 0xFFFFFFEF -- quality level for JPEG compressor;
  *   0xFFFFFFF0 .. 0xFFFFFFFF -- cross-encoding compression levels.
  */
+
+#define rfbEncodingFineQualityLevel0   0xFFFFFE00
+#define rfbEncodingFineQualityLevel100 0xFFFFFE64
+#define rfbEncodingSubsamp1X           0xFFFFFD00
+#define rfbEncodingSubsamp4X           0xFFFFFD01
+#define rfbEncodingSubsamp2X           0xFFFFFD02
+#define rfbEncodingSubsampGray         0xFFFFFD03
+#define rfbEncodingSubsamp8X           0xFFFFFD04
+#define rfbEncodingSubsamp16X          0xFFFFFD05
 
 #define rfbEncodingCompressLevel0  0xFFFFFF00
 #define rfbEncodingCompressLevel1  0xFFFFFF01
@@ -748,12 +761,141 @@ typedef struct {
 #endif
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- * Tight Encoding.  FIXME: Add more documentation.
+ * Tight Encoding.
+ *
+ *-- The first byte of each Tight-encoded rectangle is a "compression control
+ *   byte". Its format is as follows (bit 0 is the least significant one):
+ *
+ *   bit 0:    if 1, then compression stream 0 should be reset;
+ *   bit 1:    if 1, then compression stream 1 should be reset;
+ *   bit 2:    if 1, then compression stream 2 should be reset;
+ *   bit 3:    if 1, then compression stream 3 should be reset;
+ *   bits 7-4: if 1000 (0x08), then the compression type is "fill",
+ *             if 1001 (0x09), then the compression type is "jpeg",
+ *             if 1010 (0x0A), then the compression type is "basic" and no
+ *               Zlib compression was used,
+ *             if 1110 (0x0E), then the compression type is "basic", no Zlib
+ *               compression was used, and a "filter id" byte follows this
+ *               byte,
+ *             if 0xxx, then the compression type is "basic" and Zlib
+ *               compression was used,
+ *             values greater than 1010 are not valid.
+ *
+ * If the compression type is "basic" and Zlib compression was used, then bits
+ * 6..4 of the compression control byte (those xxx in 0xxx) specify the
+ * following:
+ *
+ *   bits 5-4:  decimal representation is the index of a particular zlib
+ *              stream which should be used for decompressing the data;
+ *   bit 6:     if 1, then a "filter id" byte is following this byte.
+ *
+ *-- The data that follows after the compression control byte described
+ * above depends on the compression type ("fill", "jpeg" or "basic").
+ *
+ *-- If the compression type is "fill", then the only pixel value follows, in
+ * client pixel format (see NOTE 1). This value applies to all pixels of the
+ * rectangle.
+ *
+ *-- If the compression type is "jpeg", the following data stream looks like
+ * this:
+ *
+ *   1..3 bytes:  data size (N) in compact representation;
+ *   N bytes:     JPEG image.
+ *
+ * Data size is compactly represented in one, two or three bytes, according
+ * to the following scheme:
+ *
+ *  0xxxxxxx                    (for values 0..127)
+ *  1xxxxxxx 0yyyyyyy           (for values 128..16383)
+ *  1xxxxxxx 1yyyyyyy zzzzzzzz  (for values 16384..4194303)
+ *
+ * Here each character denotes one bit, xxxxxxx are the least significant 7
+ * bits of the value (bits 0-6), yyyyyyy are bits 7-13, and zzzzzzzz are the
+ * most significant 8 bits (bits 14-21). For example, decimal value 10000
+ * should be represented as two bytes: binary 10010000 01001110, or
+ * hexadecimal 90 4E.
+ *
+ *-- If the compression type is "basic" and bit 6 of the compression control
+ * byte was set to 1, then the next (second) byte specifies "filter id" which
+ * tells the decoder what filter type was used by the encoder to pre-process
+ * pixel data before the compression. The "filter id" byte can be one of the
+ * following:
+ *
+ *   0:  no filter ("copy" filter);
+ *   1:  "palette" filter;
+ *   2:  "gradient" filter.
+ *
+ *-- If bit 6 of the compression control byte is set to 0 (no "filter id"
+ * byte), or if the filter id is 0, then raw pixel values in the client
+ * format (see NOTE 1) will be compressed. See below details on the
+ * compression.
+ *
+ *-- The "gradient" filter pre-processes pixel data with a simple algorithm
+ * which converts each color component to a difference between a "predicted"
+ * intensity and the actual intensity. Such a technique does not affect
+ * uncompressed data size, but helps to compress photo-like images better. 
+ * Pseudo-code for converting intensities to differences is the following:
+ *
+ *   P[i,j] := V[i-1,j] + V[i,j-1] - V[i-1,j-1];
+ *   if (P[i,j] < 0) then P[i,j] := 0;
+ *   if (P[i,j] > MAX) then P[i,j] := MAX;
+ *   D[i,j] := V[i,j] - P[i,j];
+ *
+ * Here V[i,j] is the intensity of a color component for a pixel at
+ * coordinates (i,j). MAX is the maximum value of intensity for a color
+ * component.
+ *
+ *-- The "palette" filter converts true-color pixel data to indexed colors
+ * and a palette which can consist of 2..256 colors. If the number of colors
+ * is 2, then each pixel is encoded in 1 bit, otherwise 8 bits is used to
+ * encode one pixel. 1-bit encoding is performed such way that the most
+ * significant bits correspond to the leftmost pixels, and each raw of pixels
+ * is aligned to the byte boundary. When "palette" filter is used, the
+ * palette is sent before the pixel data. The palette begins with an unsigned
+ * byte which value is the number of colors in the palette minus 1 (i.e. 1
+ * means 2 colors, 255 means 256 colors in the palette). Then follows the
+ * palette itself which consist of pixel values in client pixel format (see
+ * NOTE 1).
+ *
+ *-- The pixel data is compressed using the zlib library. But if the data
+ * size after applying the filter but before the compression is less then 12,
+ * then the data is sent as is, uncompressed. Four separate zlib streams
+ * (0..3) can be used and the decoder should read the actual stream id from
+ * the compression control byte (see NOTE 2).
+ *
+ * If the compression is not used, then the pixel data is sent as is,
+ * otherwise the data stream looks like this:
+ *
+ *   1..3 bytes:  data size (N) in compact representation;
+ *   N bytes:     zlib-compressed data.
+ *
+ * Data size is compactly represented in one, two or three bytes, just like
+ * in the "jpeg" compression method (see above).
+ *
+ *-- NOTE 1. If the color depth is 24, and all three color components are
+ * 8-bit wide, then one pixel in Tight encoding is always represented by
+ * three bytes, where the first byte is red component, the second byte is
+ * green component, and the third byte is blue component of the pixel color
+ * value. This applies to colors in palettes as well.
+ *
+ *-- NOTE 2. The decoder must reset compression streams' states before
+ * decoding the rectangle, if some of bits 0,1,2,3 in the compression control
+ * byte are set to 1. Note that the decoder must reset zlib streams even if
+ * the compression type is "fill" or "jpeg".
+ *
+ *-- NOTE 3. The "gradient" filter and "jpeg" compression may be used only
+ * when bits-per-pixel value is either 16 or 32, not 8.
+ *
+ *-- NOTE 4. The width of any Tight-encoded rectangle cannot exceed 2048
+ * pixels. If a rectangle is wider, it must be split into several rectangles
+ * and each one should be encoded separately.
+ *
  */
 
 #define rfbTightExplicitFilter         0x04
 #define rfbTightFill                   0x08
 #define rfbTightJpeg                   0x09
+#define rfbTightNoZlib                 0x0A
 #define rfbTightMaxSubencoding         0x09
 
 /* Filters to improve compression efficiency */

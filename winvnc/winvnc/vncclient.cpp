@@ -1,4 +1,5 @@
 //  Copyright (C) 2002 UltraVNC Team Members. All Rights Reserved.
+//  Copyright (C) 2015 D. R. Commander. All Rights Reserved.
 //  Copyright (C) 2000-2002 Const Kaplinsky. All Rights Reserved.
 //  Copyright (C) 2002 RealVNC Ltd. All Rights Reserved.
 //  Copyright (C) 1999 AT&T Laboratories Cambridge. All Rights Reserved.
@@ -2600,6 +2601,7 @@ vncClientThread::run(void *arg)
 
 			// sf@2002 - Tight
 			m_client->m_encodemgr.SetQualityLevel(-1);
+			m_client->m_encodemgr.SetFineQualityLevel(-1);
 			m_client->m_encodemgr.SetCompressLevel(6);
 			m_client->m_encodemgr.EnableLastRect(FALSE);
 
@@ -2684,6 +2686,28 @@ vncClientThread::run(void *arg)
 						int level = (int)(Swap32IfLE(encoding) - rfbEncodingQualityLevel0);
 						m_client->m_encodemgr.SetQualityLevel(level);
 						vnclog.Print(LL_INTINFO, VNCLOG("image quality level requested: %d\n"), level);
+						continue;
+					}
+
+					// Is this a FineQualityLevel encoding?
+					if ((Swap32IfLE(encoding) >= rfbEncodingFineQualityLevel0) &&
+						(Swap32IfLE(encoding) <= rfbEncodingFineQualityLevel100))
+					{
+						// Client specified fine-grained image quality level used for JPEG compression
+						int level = (int)(Swap32IfLE(encoding) - rfbEncodingFineQualityLevel0);
+						m_client->m_encodemgr.SetFineQualityLevel(level);
+						vnclog.Print(LL_INTINFO, VNCLOG("fine-grained image quality level requested: %d\n"), level);
+						continue;
+					}
+
+					// Is this a Subsamp encoding?
+					if ((Swap32IfLE(encoding) >= rfbEncodingSubsamp1X) &&
+						(Swap32IfLE(encoding) <= rfbEncodingSubsamp16X))
+					{
+						// Client specified subsampling used for JPEG compression
+						int subsamp = (int)(Swap32IfLE(encoding) - rfbEncodingSubsamp1X);
+						m_client->m_encodemgr.SetSubsampling((subsamp_type)subsamp);
+						vnclog.Print(LL_INTINFO, VNCLOG("subsampling requested: %d\n"), subsamp);
 						continue;
 					}
 

@@ -1,4 +1,5 @@
 //  Copyright (C) 2002 UltraVNC Team Members. All Rights Reserved.
+//  Copyright (C) 2015 D. R. Commander. All Rights Reserved.
 //  Copyright (C) 2000-2002 Const Kaplinsky. All Rights Reserved.
 //  Copyright (C) 2002 RealVNC Ltd. All Rights Reserved.
 //  Copyright (C) 1999 AT&T Laboratories Cambridge. All Rights Reserved.
@@ -53,6 +54,33 @@ class vncEncodeMgr;
 #include "vncEncodeUltra2.h"
 #include "vncbuffer.h"
 
+// Mapping of coarse-grained to fine-grained quality levels, inherited from
+// TigerVNC.  These map roughly to the compression ratios indicated, but only
+// for a fairly arbitrary test case.  Further study on this is warranted.
+// 9 = JPEG quality 100, no subsampling (ratio ~= 10:1)
+//     [this should be lossless, except for round-off error]
+// 8 = JPEG quality 92,  no subsampling (ratio ~= 20:1)
+//     [this should be perceptually lossless, based on current research]
+// 7 = JPEG quality 86,  no subsampling (ratio ~= 25:1)
+// 6 = JPEG quality 79,  no subsampling (ratio ~= 30:1)
+// 5 = JPEG quality 77,  4:2:2 subsampling (ratio ~= 40:1)
+// 4 = JPEG quality 62,  4:2:2 subsampling (ratio ~= 50:1)
+// 3 = JPEG quality 42,  4:2:2 subsampling (ratio ~= 60:1)
+// 2 = JPEG quality 41,  4:2:0 subsampling (ratio ~= 70:1)
+// 1 = JPEG quality 29,  4:2:0 subsampling (ratio ~= 80:1)
+// 0 = JPEG quality 15,  4:2:0 subsampling (ratio ~= 100:1)
+
+static const int coarsequal2finequal[10] =
+{
+	15, 29, 41, 42, 62, 77, 79, 86, 92, 100
+};
+
+static const subsamp_type coarsequal2subsamp[10] =
+{
+	SUBSAMP_4X, SUBSAMP_4X, SUBSAMP_4X, SUBSAMP_2X, SUBSAMP_2X, SUBSAMP_2X,
+	SUBSAMP_1X, SUBSAMP_1X, SUBSAMP_1X, SUBSAMP_1X
+};
+
 //
 // -=- Define the Encoding Manager interface
 // 
@@ -85,6 +113,8 @@ public:
 	// Tight - CONFIGURING ENCODER
 	inline void SetCompressLevel(int level);
 	inline void SetQualityLevel(int level);
+	inline void SetFineQualityLevel(int level);
+	inline void SetSubsampling(subsamp_type subsamp);
 	inline void EnableLastRect(BOOL enable);
 	inline BOOL IsLastRectEnabled() { return m_use_lastrect; }
 
@@ -169,6 +199,8 @@ protected:
 	// Tight 
 	int				m_compresslevel;
 	int				m_qualitylevel;
+	int				m_finequalitylevel;
+	subsamp_type	m_subsampling;
 	BOOL			m_use_lastrect;
 
 	// Tight - CURSOR HANDLING
@@ -228,6 +260,8 @@ inline vncEncodeMgr::vncEncodeMgr()
 	// Tight 
 	m_compresslevel = 6;
 	m_qualitylevel = -1;
+	m_finequalitylevel = -1;
+	m_subsampling = SUBSAMP_2X;
 	m_use_lastrect = FALSE;
 	// Tight CURSOR HANDLING
 	m_use_xcursor = FALSE;
@@ -685,6 +719,8 @@ vncEncodeMgr::SetEncoding(CARD32 encoding,BOOL reinitialize)
 			m_encoder->EnableRichCursor(m_use_richcursor);
 			m_encoder->SetCompressLevel(m_compresslevel);
 			m_encoder->SetQualityLevel(m_qualitylevel);
+			m_encoder->SetFineQualityLevel(m_finequalitylevel);
+			m_encoder->SetSubsampling(m_subsampling);
 			m_encoder->EnableLastRect(m_use_lastrect);
 		}
 
@@ -913,8 +949,29 @@ inline void
 vncEncodeMgr::SetQualityLevel(int level)
 {
 	m_qualitylevel = (level >= 0 && level <= 9) ? level : -1;
-	if (m_encoder != NULL)
+	m_finequalitylevel = coarsequal2finequal[level];
+	m_subsampling = coarsequal2subsamp[level];
+	if (m_encoder != NULL) {
 		m_encoder->SetQualityLevel(m_qualitylevel);
+		m_encoder->SetFineQualityLevel(m_finequalitylevel);
+		m_encoder->SetSubsampling(m_subsampling);
+	}
+}
+
+inline void
+vncEncodeMgr::SetFineQualityLevel(int level)
+{
+	m_finequalitylevel = (level >= 0 && level <= 100) ? level : -1;
+	if (m_encoder != NULL)
+		m_encoder->SetFineQualityLevel(m_finequalitylevel);
+}
+
+inline void
+vncEncodeMgr::SetSubsampling(subsamp_type subsamp)
+{
+	m_subsampling = subsamp;
+	if (m_encoder != NULL)
+		m_encoder->SetSubsampling(m_subsampling);
 }
 
 inline void
