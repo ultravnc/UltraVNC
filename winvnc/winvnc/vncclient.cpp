@@ -2261,7 +2261,7 @@ vncClientThread::run(void *arg)
 				if (m_autoreconnectcounter_quit) return;
 			}
 			m_server->AutoReconnect_counter+=10;
-			if (m_server->AutoReconnect_counter>180) m_server->AutoReconnect_counter=180;
+			if (m_server->AutoReconnect_counter>20) m_server->AutoReconnect_counter=20;
 			vnclog.Print(LL_INTERR, VNCLOG("PostAddNewClient I\n"));
 			m_server->AutoReconnect(m_client->m_Autoreconnect);
 			m_server->AutoReconnectPort(m_AutoReconnectPort);
