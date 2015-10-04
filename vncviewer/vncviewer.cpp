@@ -304,14 +304,8 @@ bool g_ConnectionLossAlreadyReported = false;
 // Accelerator Keys
 AccelKeys TheAccelKeys;
 HINSTANCE m_hInstResDLL;
-//#define CRASHRPT
-#ifdef _X64
-#undef CRASHRPT
-#endif
-#ifdef CRASHRPT
-#include "C:/DATA/crash/crashrpt/include/crashrpt.h"
-#pragma comment(lib, "C:/DATA/crash/crashrpt/lib/crashrpt")
-#endif
+
+
 typedef void (CALLBACK* LPFNSETDLLDIRECTORY)(LPCTSTR);
 static LPFNSETDLLDIRECTORY MySetDllDirectory = NULL;
 
@@ -341,6 +335,11 @@ static BOOL read_reg_string(HKEY key, char* sub_key, char* val_name, LPBYTE data
 void InitIpp();
 #endif
 
+#define CRASHRPT
+#ifdef CRASHRPT
+#include "C:/DATA/crash/crashrpt/include/crashrpt.h"
+#pragma comment(lib, "C:/DATA/crash/crashrpt/lib/CrashRpt1403")
+#endif
 
 #ifdef UNDER_CE
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR szCmdLine, int iCmdShow)
@@ -359,9 +358,35 @@ if (hUser32) FreeLibrary(hUser32);
 #ifdef IPP
 	InitIpp();
 #endif
-  #ifdef CRASHRPT
-	Install(NULL, _T("UltraVNC@skynet.be"), _T(""));
-  #endif
+#ifdef CRASHRPT
+	CR_INSTALL_INFO info;
+	memset(&info, 0, sizeof(CR_INSTALL_INFO));
+	info.cb = sizeof(CR_INSTALL_INFO);
+	info.pszAppName = _T("UVNC");
+	info.pszAppVersion = _T("1.2.0.8");
+	info.pszEmailSubject = _T("UVNC viewer 1.2.0.8 Error Report");
+	info.pszEmailTo = _T("uvnc@skynet.be");
+	info.uPriorities[CR_SMAPI] = 1; // Third try send report over Simple MAPI    
+	// Install all available exception handlers
+	info.dwFlags |= CR_INST_ALL_POSSIBLE_HANDLERS;
+	// Restart the app on crash 
+	info.dwFlags |= CR_INST_APP_RESTART;
+	info.dwFlags |= CR_INST_SEND_QUEUED_REPORTS;
+	info.dwFlags |= CR_INST_AUTO_THREAD_HANDLERS;
+	info.pszRestartCmdLine = _T("/restart");
+	// Define the Privacy Policy URL 
+
+	// Install crash reporting
+	int nResult = crInstall(&info);
+	if (nResult != 0)
+	{
+		// Something goes wrong. Get error message.
+		TCHAR szErrorMsg[512] = _T("");
+		crGetLastErrorMsg(szErrorMsg, 512);
+		_tprintf_s(_T("%s\n"), szErrorMsg);
+		return 1;
+	}
+#endif
 
   setbuf(stderr, 0);
   bool console = false;
@@ -440,7 +465,6 @@ if (hUser32) FreeLibrary(hUser32);
 	  m_hInstResDLL = hInstance;
   }
   if (strcmp(szCmdLine,"")==0) command_line=false;
-  
   LoadString(m_hInstResDLL, IDS_A1, sz_A1, 64 -1);
   LoadString(m_hInstResDLL, IDS_A2, sz_A2, 64 -1);
   LoadString(m_hInstResDLL, IDS_A3, sz_A3, 64 -1);
@@ -740,12 +764,12 @@ if (hUser32) FreeLibrary(hUser32);
 			}
 		}
 		// Clean up winsock
-		WSACleanup();
-	
-	    vnclog.Print(3, _T("Exiting\n"));
-
-    if (console) Sleep(2000);
-
+	WSACleanup();	
+	vnclog.Print(3, _T("Exiting\n"));
+#ifdef CRASHRPT
+	crUninstall();
+#endif
+    if (console) Sleep(2000);	
 	return msg.wParam;
 }
 
