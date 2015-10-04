@@ -8288,7 +8288,7 @@ return DefWindowProc(hwnd, iMsg, wParam, lParam);
 
 
 
-static bool mouse_enable = false;
+static bool mouse_enable = true;
 //
 //
 //
