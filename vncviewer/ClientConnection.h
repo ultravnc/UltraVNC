@@ -167,6 +167,7 @@ public:
 	class ProtocolExc {};
 	class Fatal {};
 	HANDLE KillEvent;
+	HANDLE KillUpdateThreadEvent;
     bool SetSendTimeout(int msecs = -1);
     bool SetRecvTimeout(int msecs = -1);
 
@@ -641,7 +642,6 @@ private:
 	rfbPixelFormat m_myFormat, m_pendingFormat;
 	// protocol version in use.
 	int m_majorVersion, m_minorVersion;
-	bool m_threadStarted;
 	// mid-connection format change requested
 
 	// sf@2002 - v1.1.0

@@ -333,7 +333,6 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	//adzm 2010-08-01
 	m_LastSentTick = 0;
 	m_bKillThread = false;
-	m_threadStarted = true;
 	m_running = false;
 	m_pendingFormatChange = false;
 
@@ -468,6 +467,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_BigToolbar=false;
 	strcpy(m_proxyhost,"");
 	KillEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+	KillUpdateThreadEvent = CreateEvent(NULL, FALSE, TRUE, NULL);
 	newtick=0;
 	oldtick=0;
 
@@ -3706,7 +3706,7 @@ ClientConnection::~ClientConnection()
 {	
 	if (m_hwndStatus)
 		EndDialog(m_hwndStatus,0);
-	Sleep(500);
+	WaitForSingleObject(KillUpdateThreadEvent, 6000);
 	if (m_pNetRectBuf != NULL)
 		delete [] m_pNetRectBuf;
 	LowLevelHook::Release();
@@ -3798,6 +3798,7 @@ ClientConnection::~ClientConnection()
 	if (rcMask!=NULL)
 		delete[] rcMask;
 	if (KillEvent) CloseHandle(KillEvent);
+	if (KillUpdateThreadEvent) CloseHandle(KillUpdateThreadEvent);
 	if (ThreadSocketTimeout)
 	{
 	havetobekilled=false; //force SocketTimeout thread to quit
@@ -4483,7 +4484,6 @@ void ClientConnection::ShowConnInfo()
 void* ClientConnection::run_undetached(void* arg) {
 	vnclog.Print(9,_T("Update-processing thread started\n"));
 
-	m_threadStarted = true;
 
 	// Modif sf@2002 - Server Scaling
 	m_nServerScale = m_opts.m_nServerScale;
@@ -4514,6 +4514,7 @@ void* ClientConnection::run_undetached(void* arg) {
 	// Error, value can be set 0 by gui in that case you get a gray screen
 	if (m_autoReconnect==0) m_autoReconnect=1;
 	initialupdate_counter=0;
+	ResetEvent(KillUpdateThreadEvent);
 	while (m_autoReconnect > 0)
 	{
 		try
@@ -4705,12 +4706,12 @@ void* ClientConnection::run_undetached(void* arg) {
 			PostMessage(m_hwndMain, WM_CLOSE, reconnectcounter, 1);
 		}
 
-		Sleep(0);
-		Sleep(2000);
+		if (m_autoReconnect>0 && !m_bKillThread) Sleep(2000);
 	}
 
 	vnclog.Print(4, _T("Update-processing thread finishing\n") );
 	SetEvent(KillEvent);
+	SetEvent(KillUpdateThreadEvent);
 		// sf@2002
 	m_pFileTransfer->m_fFileTransferRunning = false;
 	m_pTextChat->m_fTextChatRunning = false;
