@@ -192,8 +192,13 @@ Myinit(HINSTANCE hInstance)
 }
 #define CRASHRPT
 #ifdef CRASHRPT
+#ifndef _X64
 #include "C:/DATA/crash/crashrpt/include/crashrpt.h"
 #pragma comment(lib, "C:/DATA/crash/crashrpt/lib/CrashRpt1403")
+#else
+#include "C:/DATA/crash/crashrpt/include/crashrpt.h"
+#pragma comment(lib, "C:/DATA/crash/crashrpt/lib/x64/CrashRpt1403")
+#endif
 #endif
 
 // WinMain parses the command line and either calls the main App
