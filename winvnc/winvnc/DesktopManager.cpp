@@ -2,11 +2,18 @@
 #include "desktopmanager.h"
 #include <stdio.h>
 DESKTOPMANAGER *DESKTOPMANAGER_f=NULL;
+//Fix crash
+//If we call stopW8 almost simultanious with captureW8
+//enter crirical section keeps capture waiting, but as soon as delete is called, the critial section release
+//and this DESKTOPMANAGER_f =null
+// access error and application crash
 
+bool Stop_initiated = false;
 
 
 unsigned char * StartW8(bool primonly)
 {
+	Stop_initiated = false;
 	DESKTOPMANAGER_f = NULL;
 	DESKTOPMANAGER_f = new DESKTOPMANAGER;
 	if (DESKTOPMANAGER_f) return DESKTOPMANAGER_f->STARTDESKTOPMANAGER(primonly);
@@ -21,6 +28,7 @@ mystruct * get_plist()
 
 BOOL StopW8()
 {
+	Stop_initiated = true;
 	if (DESKTOPMANAGER_f) DESKTOPMANAGER_f->STOPDESKTOPMANAGER();
 	if (DESKTOPMANAGER_f) delete DESKTOPMANAGER_f;
 	DESKTOPMANAGER_f = NULL;
@@ -29,7 +37,7 @@ BOOL StopW8()
 
 BOOL CaptureW8()
 {
-
+	if (Stop_initiated) return false;
 	bool returnvalue=false;
 	if (DESKTOPMANAGER_f) returnvalue= DESKTOPMANAGER_f->CAPTUREDESKTOPMANAGER();
 	return returnvalue;
