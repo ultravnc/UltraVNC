@@ -149,10 +149,6 @@ public:
 
 	// QUEUE ZLIBXOR
 	inline void LastRect(VSocket *outConn);
-	// Modif cs@2005
-#ifdef DSHOW
-	inline BOOL ResetZRLEEncoding(void);
-#endif
 
 	inline bool IsSlowEncoding() {return (m_encoding == rfbEncodingZYWRLE || m_encoding == rfbEncodingZRLE || m_encoding == rfbEncodingTight ||m_encoding == rfbEncodingZlib 
 #ifdef _XZ
@@ -1016,58 +1012,6 @@ vncEncodeMgr::LastRect(VSocket *outConn)
 {
 	m_encoder->LastRect(outConn);
 }
-
-// Modif cs@2005
-#ifdef DSHOW
-inline BOOL
-vncEncodeMgr::ResetZRLEEncoding(void)
-{
-	if (NULL != zrleEncoder)
-	{
-		delete zrleEncoder;
-
-		zrleEncoder = NULL;
-
-		zrleEncoder = new vncEncodeZRLE;
-
-		m_encoder = zrleEncoder;
-
-		// Initialise it and give it the pixel format
-		m_encoder->Init();
-
-		m_encoder->SetLocalFormat(	m_scrinfo.format,
-									m_scrinfo.framebufferWidth,
-									m_scrinfo.framebufferHeight);
-
-		if (m_clientfmtset)
-		{
-			if (!m_encoder->SetRemoteFormat(m_clientformat))
-			{
-				vnclog.Print(LL_INTERR, VNCLOG("client pixel format is not supported\n"));
-
-				return FALSE;
-			}
-		}
-
-		if (m_encoder != NULL)
-		{
-			m_encoder->EnableXCursor(m_use_xcursor);
-			m_encoder->EnableRichCursor(m_use_richcursor);
-			m_encoder->SetCompressLevel(m_compresslevel);
-			m_encoder->SetQualityLevel(m_qualitylevel);
-			m_encoder->EnableLastRect(m_use_lastrect);
-		}
-
-		m_buffer->ClearCache();
-		m_buffer->ClearBack();
-
-		// Check that the client buffer is compatible
-		return CheckBuffer();
-	}
-
-	return FALSE;
-}			
-#endif
 
 #endif // _WINVNC_VNCENCODEMGR
 

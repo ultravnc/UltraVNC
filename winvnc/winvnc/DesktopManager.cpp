@@ -28,6 +28,7 @@ mystruct * get_plist()
 
 BOOL StopW8()
 {
+	if (Stop_initiated) return TRUE;
 	Stop_initiated = true;
 	if (DESKTOPMANAGER_f) DESKTOPMANAGER_f->STOPDESKTOPMANAGER();
 	if (DESKTOPMANAGER_f) delete DESKTOPMANAGER_f;

@@ -350,28 +350,6 @@ protected:
 	BOOL m_enable;
 };
 
-// Modif cs@2005
-#ifdef DSHOW
-class MutexAutoLock 
-{
-public:
-	MutexAutoLock(HANDLE* phMutex) 
-	{ 
-		m_phMutex = phMutex;
-
-		if(WAIT_OBJECT_0 != WaitForSingleObject(*phMutex, INFINITE))
-		{
-			vnclog.Print(LL_INTERR, VNCLOG("Could not get access to the mutex\n"));
-		}
-	}
-	~MutexAutoLock() 
-	{ 
-		ReleaseMutex(*m_phMutex);
-	}
-
-	HANDLE* m_phMutex;
-};
-#endif
 
 BOOL
 vncClientUpdateThread::Init(vncClient *client)
@@ -504,9 +482,6 @@ vncClientUpdateThread::run_undetached(void *arg)
 
 		{
 			omni_mutex_lock l(m_client->GetUpdateLock(),82);
-
-			//m_client->m_incr_rgn.assign_union(clipregion);
-
 			// We block as long as updates are disabled, or the client
 			// isn't interested in them, unless this thread is killed.
 
@@ -554,9 +529,6 @@ vncClientUpdateThread::run_undetached(void *arg)
 					{
 						{
 								//do forcefull update after 4 seconds
-								/*rfb::Region2D update_rgn=m_client->m_encodemgr.m_buffer->GetViewerSize();
-								m_client->m_incr_rgn.assign_union(update_rgn);
-								m_client->m_update_tracker.add_changed(update_rgn);*/
 								m_client->m_encodemgr.m_buffer->m_desktop->TriggerUpdate();
 								m_client->TriggerUpdateThread();
 						}
@@ -627,17 +599,6 @@ vncClientUpdateThread::run_undetached(void *arg)
 			// Has the palette changed?
 			send_palette = m_client->m_palettechanged;
 			m_client->m_palettechanged = FALSE;
-
-			// Fetch the incremental region
-			//clipregion = m_client->m_incr_rgn;
-			//m_client->m_incr_rgn.clear();
-
-			// Get the clipboard data, if any
-			// adzm - 2010-07 - Extended clipboard
-			if ((m_client->m_clipboard.m_bNeedToProvide || m_client->m_clipboard.m_bNeedToNotify))
-			{
-				//m_client->m_incr_rgn.clear();
-			}
 		
 			// Get the update details from the update tracker
 			m_client->m_update_tracker.flush_update(update, m_client->m_incr_rgn);
@@ -794,49 +755,18 @@ vncClientUpdateThread::run_undetached(void *arg)
 		if ((m_client->m_encodemgr.m_scrinfo.framebufferHeight == m_client->m_encodemgr.m_buffer->m_scrinfo.framebufferHeight) &&
 			(m_client->m_encodemgr.m_scrinfo.framebufferWidth == m_client->m_encodemgr.m_buffer->m_scrinfo.framebufferWidth) &&
 			(m_client->m_encodemgr.m_scrinfo.format.bitsPerPixel == m_client->m_encodemgr.m_buffer->m_scrinfo.format.bitsPerPixel))
-		{
-
-			// Send updates to the client - this implicitly clears
-			// the supplied update tracker
-#ifdef _DEBUG
-			calc_updates=GetTickCount();
-			if (calc_updates==old_calc_updates) calc_updates++;
-			char			szText[256];
-			sprintf(szText,"SendUpdate %i \n", 1000 / (calc_updates-old_calc_updates));
-			if ((calc_updates - old_calc_updates)==1)
-				OutputDebugString(szText);
-			old_calc_updates=calc_updates;
-			OutputDebugString(szText);		
-#endif
+			{
 			if (m_client->SendUpdate(update)) {
 				updates_sent++;
 				m_client->m_incr_rgn.clear();
 			}
-			else
-			{
-#ifdef _DEBUG
-			char			szText[256];
-			sprintf(szText,"SendUpdate returned false \n");
-			OutputDebugString(szText);		
-#endif
-			}
 		}
 		else
 		{
-#ifdef _DEBUG
-			char			szText[256];
-			sprintf(szText,"m_incr_rgn cleared 2 \n");
-			OutputDebugString(szText);		
-#endif
 			m_client->m_incr_rgn.clear();
 		}
 
-			/*#ifdef _DEBUG
-//					char			szText[256];
-					sprintf(szText," ++++++ Mutex unlock clientupdatethread\n");
-					OutputDebugString(szText);		
-			#endif*/
-		}
+	}//end omni_mutex_lock l(m_client->GetUpdateLock(),82);
 
 		yield();
 	}
@@ -4481,50 +4411,6 @@ vncClientThread::run(void *arg)
 			}
 			break;
 
-			// Modif cs@2005
-#ifdef DSHOW
-		case rfbKeyFrameRequest:
-			{
-				MutexAutoLock l_Lock(&m_client->m_hmtxEncodeAccess);
-
-				omni_mutex_lock l(m_client->GetUpdateLock());
-
-				if(m_client->m_encodemgr.ResetZRLEEncoding())
-				{
-					rfb::Rect update;
-
-					rfb::Rect ViewerSize = m_client->m_encodemgr.m_buffer->GetViewerSize();
-
-					update.tl.x = 0;
-					update.tl.y = 0;
-					update.br.x = ViewerSize.br.x;
-					update.br.y = ViewerSize.br.y;
-					rfb::Region2D update_rgn = update;
-
-					// Add the requested area to the incremental update cliprect
-					m_client->m_incr_rgn.assign_union(update_rgn);
-
-					// Yes, so add the region to the update tracker
-					m_client->m_update_tracker.add_changed(update_rgn);
-					
-					// Tell the desktop grabber to fetch the region's latest state
-					m_client->m_encodemgr.m_buffer->m_desktop->QueueRect(update);
-
-					// Kick the update thread (and create it if not there already)
-					m_client->TriggerUpdateThread();
-
-					// Send a message back to the client to confirm that we have reset the zrle encoding			
-					rfbKeyFrameUpdateMsg header;
-					header.type = rfbKeyFrameUpdate;
-					m_client->SendRFBMsg(rfbKeyFrameUpdate, (BYTE *)&header, sz_rfbKeyFrameUpdateMsg);
-				}				
-				else
-				{
-					vnclog.Print(LL_INTERR, VNCLOG("[rfbKeyFrameRequest] Unable to Reset ZRLE Encoding\n"));
-				}
-			}
-			break;
-#endif
 		// adzm 2010-09 - Notify streaming DSM plugin support
         case rfbNotifyPluginStreaming:
             if (sz_rfbNotifyPluginStreamingMsg > 1)
@@ -4750,17 +4636,6 @@ vncClient::vncClient() : Sendinput("USER32", "SendInput"), m_clipboard(Clipboard
 	m_IsLoopback=false;
 	m_NewSWUpdateWaiting=false;
 	client_settings_passed=false;
-/*	roundrobin_counter=0;
-	for (int i=0;i<rfbEncodingZRLE+1;i++)
-		for (int j=0;j<31;j++)
-		{
-		  timearray[i][j]=0;
-		  sizearray[i][j]=0;
-		}*/
-// Modif cs@2005
-#ifdef DSHOW
-	m_hmtxEncodeAccess = CreateMutex(NULL, FALSE, NULL);
-#endif
     m_wants_ServerStateUpdates =  false;
     m_bClientHasBlockedInput = false;
 	m_Support_rfbSetServerInput = false;
@@ -4823,14 +4698,6 @@ vncClient::~vncClient()
 			delete [] m_pCacheZipBuf;
 			m_pCacheZipBuf = NULL;
 		}
-	// adzm - 2010-07 - Extended clipboard
-	/*if (m_clipboard_text) {
-		free(m_clipboard_text);
-	}*/
-// Modif cs@2005
-#ifdef DSHOW
-	CloseHandle(m_hmtxEncodeAccess);
-#endif
 	if (m_lpCSBuffer)
 		delete [] m_lpCSBuffer;
 	if (m_pBuff)
@@ -4861,6 +4728,21 @@ vncClient::~vncClient()
 	// adzm 2009-08-02
 	if (m_szHost) {
 		free(m_szHost);
+	}
+	if (m_updatethread) {
+		m_updatethread->Kill();
+		m_updatethread->join(NULL);
+	}
+
+	int counter = 0;
+	while (m_updatethread != NULL)
+	{
+		char			szText[256];
+		sprintf(szText, " m_updatethread != NULL \n");
+		OutputDebugString(szText);
+		Sleep(100);
+		counter++;
+		if (counter == 30) break;
 	}
 }
 
@@ -4980,11 +4862,6 @@ vncClient::NotifyUpdate(rfbFramebufferUpdateRequestMsg fur)
 
 	     	// Add the requested area to the incremental update cliprect
 			m_incr_rgn.assign_union(update_rgn);
-#ifdef _DEBUG
-			char			szText[256];
-			sprintf(szText,"m_incr_rgn \n");
-			OutputDebugString(szText);		
-#endif
 			// Is this request for a full update?
 			if (!fur.incremental)
 			{
@@ -5426,10 +5303,6 @@ vncClient::SendUpdate(rfb::SimpleUpdateTracker &update)
 BOOL
 vncClient::SendRectangles(const rfb::RectVector &rects)
 {
-	// Modif cs@2005
-#ifdef DSHOW
-	MutexAutoLock l_Lock(&m_hmtxEncodeAccess);
-#endif
 	rfb::RectVector::const_iterator i;
 	rfb::Rect rect;
 	int x,y;

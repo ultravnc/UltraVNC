@@ -412,10 +412,6 @@ typedef struct {
 #define rfbBell 2
 #define rfbServerCutText 3
 #define rfbResizeFrameBuffer 4 // Modif sf@2002 
-//Modif cs@2005
-#ifdef DSHOW
-#define rfbKeyFrameUpdate 5
-#endif
 #define rfbPalmVNCReSizeFrameBuffer 0xF
 #define rfbServerState 0xAD // 26 March 2008 jdp
 
@@ -434,10 +430,6 @@ typedef struct {
 #define rfbSetServerInput	9 // Modif rdv@2002
 #define rfbSetSW	10// Modif rdv@2002
 #define rfbTextChat	11// Modif sf@2002 - TextChat - Bidirectionnal
-//Modif cs@2005
-#ifdef DSHOW
-#define rfbKeyFrameRequest 12
-#endif
 #define rfbKeepAlive 13 // 16 July 2008 jdp -- bidirectional
 #define rfbPalmVNCSetScaleFactor 0xF // PalmVNC 1.4 & 2.0 SetScale Factor message
 // adzm 2010-09 - Notify streaming DSM plugin support
@@ -584,19 +576,6 @@ typedef struct {
 } rfbFramebufferUpdateMsg;
 
 #define sz_rfbFramebufferUpdateMsg 4
-
-#ifdef DSHOW
-/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- * KeyFrameUpdate - Acknowledgment of a key frame request, it tells the client
- * that the next update received will be a key frame.
- */
-
-typedef struct {
-    CARD8 type;
-} rfbKeyFrameUpdateMsg;
-
-#define sz_rfbKeyFrameUpdateMsg 1
-#endif
 
 /*
  * Each rectangle of pixel data consists of a header describing the position

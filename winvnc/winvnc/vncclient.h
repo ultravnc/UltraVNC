@@ -546,10 +546,6 @@ protected:
 	int totalraw;
 
     helper::DynamicFn<pSendinput> Sendinput;
-	// Modif cs@2005
-#ifdef DSHOW
-	HANDLE m_hmtxEncodeAccess;
-#endif
 
     std::string m_OrigSourceDirectoryName;
     bool        m_wants_ServerStateUpdates;
