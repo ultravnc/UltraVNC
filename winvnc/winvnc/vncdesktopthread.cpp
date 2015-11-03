@@ -1035,6 +1035,14 @@ vncDesktopThread::run_undetached(void *arg)
 		}
 		//no need to wait, the w8hook does it own waiting.
 		if (m_desktop->startedw8 && waittime!=1000) waittime = 33;
+		if (waittime == 33)
+		{
+			int testvalue = 33 - (newtick - oldtick);
+			if (testvalue > 0 && testvalue < 33) waittime = testvalue;
+		}
+		oldtick2 = newtick;
+
+
 #ifdef _DEBUG
 		char			szText[256];
 		DWORD error = GetLastError();

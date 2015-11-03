@@ -453,7 +453,7 @@ void*
 vncClientUpdateThread::run_undetached(void *arg)
 {
 	rfb::SimpleUpdateTracker update;
-	//rfb::Region2D clipregion;
+	rfb::Region2D clipregion;
 	// adzm - 2010-07 - Extended clipboard
 	//char *clipboard_text = 0;
 	update.enable_copyrect(true);
@@ -481,6 +481,7 @@ vncClientUpdateThread::run_undetached(void *arg)
 
 
 		{
+			m_client->m_incr_rgn.assign_union(clipregion);
 			omni_mutex_lock l(m_client->GetUpdateLock(),82);
 			// We block as long as updates are disabled, or the client
 			// isn't interested in them, unless this thread is killed.
@@ -544,7 +545,8 @@ vncClientUpdateThread::run_undetached(void *arg)
 			}
 			// If the thread is being killed then quit
 			if (!m_active) break;
-			
+			clipregion = m_client->m_incr_rgn;
+			m_client->m_incr_rgn.clear();
 
 			// SEND AN UPDATE!
 			// The thread is active, updates are enabled, and the
@@ -601,7 +603,8 @@ vncClientUpdateThread::run_undetached(void *arg)
 			m_client->m_palettechanged = FALSE;
 		
 			// Get the update details from the update tracker
-			m_client->m_update_tracker.flush_update(update, m_client->m_incr_rgn);
+			//m_client->m_update_tracker.flush_update(update, m_client->m_incr_rgn);
+			m_client->m_update_tracker.flush_update(update, clipregion);
 
 		//if (!m_client->m_encodemgr.m_buffer->m_desktop->IsVideoDriverEnabled())
 		//TEST if (!m_client->m_encodemgr.m_buffer->m_desktop->m_hookdriver)
@@ -758,12 +761,14 @@ vncClientUpdateThread::run_undetached(void *arg)
 			{
 			if (m_client->SendUpdate(update)) {
 				updates_sent++;
-				m_client->m_incr_rgn.clear();
+				//m_client->m_incr_rgn.clear();
+				clipregion.clear();
 			}
 		}
 		else
 		{
-			m_client->m_incr_rgn.clear();
+			//m_client->m_incr_rgn.clear();
+			clipregion.clear();
 		}
 
 	}//end omni_mutex_lock l(m_client->GetUpdateLock(),82);
@@ -4858,7 +4863,8 @@ vncClient::NotifyUpdate(rfbFramebufferUpdateRequestMsg fur)
 		}
 
 		{
-			omni_mutex_lock l(GetUpdateLock(),92);
+			// lock removed, clipregion solve unwanted m_incr_rgn clear
+			//omni_mutex_lock l(GetUpdateLock(),92);
 
 	     	// Add the requested area to the incremental update cliprect
 			m_incr_rgn.assign_union(update_rgn);

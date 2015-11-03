@@ -335,7 +335,7 @@ static BOOL read_reg_string(HKEY key, char* sub_key, char* val_name, LPBYTE data
 void InitIpp();
 #endif
 
-#define CRASHRPT
+//#define CRASHRPT
 #ifdef CRASHRPT
 #ifndef _X64
 #include "C:/DATA/crash/crashrpt/include/crashrpt.h"
@@ -353,12 +353,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR szCmdLin
 #endif
 {
 
-HMODULE hUser32 = LoadLibrary(_T("user32.dll"));
+/*HMODULE hUser32 = LoadLibrary(_T("user32.dll"));
 typedef BOOL(*SetProcessDPIAwareFunc)();
 SetProcessDPIAwareFunc setDPIAware=NULL;
 if (hUser32) setDPIAware = (SetProcessDPIAwareFunc)GetProcAddress(hUser32, "SetProcessDPIAware");
 if (setDPIAware) setDPIAware();
-if (hUser32) FreeLibrary(hUser32);
+if (hUser32) FreeLibrary(hUser32);*/
 
 #ifdef IPP
 	InitIpp();
@@ -368,8 +368,8 @@ if (hUser32) FreeLibrary(hUser32);
 	memset(&info, 0, sizeof(CR_INSTALL_INFO));
 	info.cb = sizeof(CR_INSTALL_INFO);
 	info.pszAppName = _T("UVNC");
-	info.pszAppVersion = _T("1.2.0.8");
-	info.pszEmailSubject = _T("UVNC viewer 1.2.0.8 Error Report");
+	info.pszAppVersion = _T("1.2.0.9");
+	info.pszEmailSubject = _T("UVNC viewer 1.2.0.9 Error Report");
 	info.pszEmailTo = _T("uvnc@skynet.be");
 	info.uPriorities[CR_SMAPI] = 1; // Third try send report over Simple MAPI    
 	// Install all available exception handlers
