@@ -5399,7 +5399,8 @@ inline void ClientConnection::ReadScreenUpdate()
 		}
 		else if (avg_kbitsPerSecond < 10000 && avg_kbitsPerSecond > 256 && (m_nConfig != 2))
 		{
-			m_nConfig = 1;			
+			m_nConfig = 1;		
+			m_opts.m_PreferredEncodings.clear();
 			if (new_ultra_server) m_opts.m_PreferredEncodings.push_back(rfbEncodingUltra2);
 			else m_opts.m_PreferredEncodings.push_back(rfbEncodingZRLE); //rfbEncodingZlibHex;
 			//m_opts.m_Use8Bit = rfbPFFullColors; // Max colors
