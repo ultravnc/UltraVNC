@@ -1,0 +1,110 @@
+<html>
+
+<head>
+<title>UltraVnc Repeater  Settings</title>
+<style type="text/css">
+.style1 {
+	vertical-align: middle;
+}
+</style>
+</head>
+
+<body>
+
+<h1><img class="style1" src="images2.jpg"> UltraVNC Repeater Settings</h1>
+
+
+
+<table style="width: 250px">
+	<tr>
+		<td style="width: 151px">
+		<FORM METHOD="LINK" ACTION="index.html">
+		<INPUT TYPE="submit" VALUE="Stats" style="width: 100px">
+		</FORM>
+	</td>
+		<td style="width: 151px">
+		<FORM METHOD="LINK" ACTION="passwd.html">
+		<INPUT TYPE="submit" VALUE="Password" style="width: 100px">
+		</FORM>
+	</td>
+	<td style="width: 151px">
+		<FORM METHOD="LINK" ACTION="log.html">
+		<INPUT TYPE="submit" VALUE="log" style="width: 100px">
+		</FORM>
+	</td>
+
+	</tr> UltraVNC Repeater Settings
+
+</table>
+<br>
+
+
+<form action="testaction.cgi" method="GET" name="testform">
+
+	<table style="width: 640">
+	
+		<tr>
+			<td style="width: 275px; height: 25px;">Mode :</td>
+			<td style="width: 72px; height: 25px;"> I 
+			<input type="checkbox" name="mode1" value="mode1" <!--#include file="mode1.ssi" --> > </td>
+			<td style="width: 72px; height: 25px;"> II 
+			<input type="checkbox" name="mode2" value="mode2" <!--#include file="mode2.ssi" --> > </td>
+		</tr>
+
+		<tr>
+			<td style="width: 275px">Listen Port Viewer:</td>
+			<td style="width: 72px">
+			<input name="server_port" type="text" <!--#include file="sport.ssi" --> style="width: 50px"></td>
+			<td>&nbsp;</td>
+
+		</tr>
+		<tr>
+			<td style="width: 275px">ListenPort Server:</td>
+			<td style="width: 72px">
+			<input name="viewer_port" type="text" <!--#include file="vport.ssi" --> style="width: 50px"></td>
+			<td>&nbsp;</td>
+
+		</tr>
+		
+		<tr>
+			<td style="width: 275px">Only allow connections from:</td>
+			<td style="width: 72px"> <input type="checkbox" name="allow_on" value="allow_on" <!--#include file="acon.ssi" -->> </td>
+			<td style="width: 350px">
+			<input name="allow_con" type="text" <!--#include file="acons.ssi" --> style="width: 350px"></td>
+		</tr>
+
+
+		<tr>
+			<td style="width: 275px">Refuse connections from:</td>
+			<td style="width: 72px"> <input type="checkbox" name="refuse_on" value="refuse_on" <!--#include file="rcon.ssi" --> > </td>
+			<td style="width: 350px">
+			<input name="refuse_con" type="text" <!--#include file="rcons.ssi" --> style="width: 350px"></td>
+		</tr>
+		<tr>
+			<td style="width: 275px">Only allow ID:</td>
+			<td style="width: 72px"> <input type="checkbox" name="id_on" value="id_on" <!--#include file="aid.ssi" -->> </td>
+			<td style="width: 350px">
+			<input name="id_con" type="text" <!--#include file="aids.ssi" --> style="width: 350px"></td>
+		</tr>
+		
+		<tr>
+			<td style="width: 275px">Web Gui Port:</td>
+			<td style="width: 72px"> <input name="web_port" type="text"  <!--#include file="webport.ssi" --> > </td>
+			<td style="width: 350px">
+		</tr>
+
+		<tr>
+			<td style="width: 375px">Use comment to check viewer access:</td>
+			<td style="width: 72px"> <input type="checkbox" name="ucom_on" value="ucom_on" <!--#include file="ucom.ssi" -->> </td>
+			<td style="width: 350px">
+		</tr>
+
+		
+	</table>
+	<input name="hidden" type="hidden">
+	 <input type="submit" value="Save Settings">
+</form>
+
+</body>
+
+</html>

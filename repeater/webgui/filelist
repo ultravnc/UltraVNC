@@ -1,0 +1,55 @@
+
+index.html -a
+passwd.html -a    
+settings.html -a
+ok.html -a
+nok.html -a
+log.html -a
+comment.html -a
+images2.jpg       -o imgdata.c
+connections.txt -a
+viewer_access.txt -a
+server_access.txt -a
+
+# SSI code-generated files
+memory.ssi   -s memory_ssi
+mode1.ssi  -s mode1_ssi
+mode2.ssi  -s mode2_ssi
+sport.ssi  -s sport_ssi
+vport.ssi  -s vport_ssi
+acon.ssi  -s acon_ssi
+rcon.ssi  -s rcon_ssi
+aid.ssi  -s aid_ssi
+acons.ssi  -s acons_ssi
+rcons.ssi  -s rcons_ssi
+aids.ssi  -s aids_ssi
+webport.ssi  -s webport_ssi
+log.ssi  -s log_ssi
+ucom.ssi  -s ucom_ssi
+listcomment.ssi -s listcomment_ssi
+connections.ssi -s connections_ssi
+server_access.ssi -s server_access_ssi
+viewer_access.ssi -s viewer_access_ssi
+
+
+
+
+
+
+# C-code expressions mapped to files
+memhits.var -e u_long  wi_totalblocks
+
+# Server push files
+pushtest.htm -p pushtest_func
+
+# form handlers
+testaction.cgi -f testaction_cgi
+testaction2.cgi -f testaction2_cgi
+testaction3.cgi -f testaction3_cgi
+testaction4.cgi -f testaction4_cgi
+testaction5.cgi -f testaction5_cgi
+passwd.cgi -f passwd_cgi
+
+
+
+

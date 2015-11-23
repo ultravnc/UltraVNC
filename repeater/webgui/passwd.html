@@ -1,0 +1,62 @@
+<html>
+
+<head>
+<title>UltraVnc Repeater passwd</title>
+<style type="text/css">
+.style1 {
+	vertical-align: middle;
+}
+</style>
+</head>
+
+<body>
+
+<h1><img class="style1" src="images2.jpg"> UltraVNC Repeater Gui Password</h1>
+
+
+<table style="width: 250px">
+	<tr>
+		<td style="width: 151px">
+		<FORM METHOD="LINK" ACTION="index.html">
+		<INPUT TYPE="submit" VALUE="Stats" style="width: 100px">
+		</FORM>
+
+	</td>
+		<td style="width: 151px">
+		<FORM METHOD="LINK" ACTION="settings.html">
+		<INPUT TYPE="submit" VALUE="Settings" style="width: 100px">
+		</FORM>
+
+	</td>
+	<td style="width: 151px">
+		<FORM METHOD="LINK" ACTION="log.html">
+		<INPUT TYPE="submit" VALUE="log" style="width: 100px">
+		</FORM>
+	</td>
+
+	</tr>
+</table>
+
+<form action="passwd.cgi" method="GET" name="testform">
+
+	<table style="width: 640">
+		<tr>
+			<td style="width: 127px; height: 26px;">Old Password: </td>
+			<td style="width: 72px; height: 26px;">
+			<input name="oldpass" type="password" value="" style="width: 97px"></td>
+			<td style="width: 127px; height: 26px;">New Password: </td>
+			<td style="width: 72px; height: 26px;">
+			<input name="newpass" type="password" value="" style="width: 97px"></td>
+		</tr>		
+
+		
+	</table>
+	<br>
+	<br>
+	<input name="hidden" type="hidden">
+	 <input type="submit" value="Save Password">
+</form>
+
+</body>
+
+</html>

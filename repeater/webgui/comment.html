@@ -1,0 +1,103 @@
+<html>
+
+<head>
+<title>UltraVnc Repeater Stats</title>
+<style type="text/css">
+.style1 {
+	vertical-align: middle;
+}
+.style2 {
+	border-style: solid;
+	border-width: 1px;
+}
+.style3 {
+	text-align: center;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1><img class="style1" src="images2.jpg"> UltraVNC Repeater Comments</h1>
+
+
+<table style="width: 250px">
+	<tr>
+		<td style="width: 151px">
+		<FORM METHOD="LINK" ACTION="index.html">
+		<INPUT TYPE="submit" VALUE="Back" style="width: 100px">
+		</FORM>
+		</td>
+		<td>
+			<form action="testaction5.cgi" method="GET" name="testform5">
+			<input name="hidden" type="hidden">
+			<input type="submit" value="Reload comment file">
+			</form>		
+		</td>
+	<br>
+	
+
+	</tr>
+</table>
+
+<br>
+
+<form action="testaction2.cgi" method="GET" name="testform2">
+
+	<table style="width: 720">
+	
+
+		<tr>
+			<td style="width: 20px">ID: </td>
+			<td style="width: 72px">
+			<input name="id" type="text" value=""  style="width: 72px"></td>
+			<td style="width: 72px">Comment: </td>
+			<td style="width: 376px">
+			<input name="comment" type="text" value="" style="width: 450px"></td>
+
+
+		</tr>
+		
+	</table>
+	<br>
+	<input name="hidden" type="hidden">
+	 <input type="submit" value="Add comment">
+</form>
+<br>
+<form action="testaction4.cgi" method="GET" name="testform4">
+
+	<table style="width: 720">
+	
+
+		<tr>
+			<td style="width: 20px">ID: </td>
+			<td style="width: 72px">
+			<input name="id" type="text" value=""  style="width: 72px"></td>			
+		</tr>
+		
+	</table>
+	<br>
+	<input name="hidden" type="hidden">
+	 <input type="submit" value="Delete ID">
+</form>
+
+<br>
+<form action="testaction3.cgi" method="GET" name="testform3">
+
+	<table style="width: 720">
+	<!--#include file="listcomment.ssi" -->
+	</table>
+	<br>
+	<input name="hidden" type="hidden">
+	 <input type="submit" value="Save all">
+</form>
+
+
+
+
+
+</body>
+
+</html>
