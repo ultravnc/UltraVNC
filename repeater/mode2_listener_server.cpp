@@ -60,6 +60,10 @@ DWORD WINAPI server_listen(LPVOID lpParam)
 			const int one_local = 1;
 			setsockopt(connection, IPPROTO_TCP, TCP_NODELAY, (char *)&one_local, sizeof(one_local));
 			setsockopt(connection, SOL_SOCKET, SO_KEEPALIVE, (char *)&one_local, sizeof(one_local));
+			int ii = 5000;  // disable
+			setsockopt (connection, SOL_SOCKET, SO_RCVTIMEO, (char*) &ii, sizeof(ii));
+			setsockopt (connection, SOL_SOCKET, SO_SNDTIMEO, (char*) &ii, sizeof(ii));
+
 			if (ReadExact(connection, proxyadress, MAX_HOST_NAME_LEN)<0){
 				debug("Reading Proxy settings error");
 				closesocket(connection);

@@ -136,6 +136,10 @@ DWORD WINAPI mode12listener(LPVOID lpParam)
 				// NAGLE
 				const int one_local = 1;
 				setsockopt(connection, IPPROTO_TCP, TCP_NODELAY, (char *)&one_local, sizeof(one_local));
+				DWORD ii = 5000;  // disable
+				setsockopt (connection, SOL_SOCKET, SO_RCVTIMEO, (char*) &ii, sizeof(ii));
+				setsockopt (connection, SOL_SOCKET, SO_SNDTIMEO, (char*) &ii, sizeof(ii));
+
 				debug ("accept() connection \n");
 				sprintf(pv,rfbProtocolVersionFormat,rfbProtocolMajorVersion,rfbProtocolMinorVersion);
 				if (WriteExact(connection, pv, sz_rfbProtocolVersionMsg) < 0) {
@@ -148,6 +152,9 @@ DWORD WINAPI mode12listener(LPVOID lpParam)
 					closesocket(connection);
 					goto end;
 					}
+				DWORD i = 0;  // disable
+				setsockopt (connection, SOL_SOCKET, SO_RCVTIMEO, (char*) &i, sizeof(i));
+				setsockopt (connection, SOL_SOCKET, SO_SNDTIMEO, (char*) &i, sizeof(i));
 				if (!ParseDisplay(proxyadress, remotehost, 255, &remoteport))
 					{
 					debug("ParseDisplay failed");
