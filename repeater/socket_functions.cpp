@@ -158,7 +158,7 @@ DWORD WINAPI do_repeater_wait(LPVOID lpParam)
     f_remote = 1;				/* yes, read from remote */
     rbuf_len = 0;
 
-    while ( f_remote && notstopped ) {
+	while (f_remote && notstopped  && Servers[nummer].code!=999999999) {
 	FD_SET ifds;
 	struct timeval tmo;
 	FD_ZERO( &ifds );
@@ -189,7 +189,7 @@ DWORD WINAPI do_repeater_wait(LPVOID lpParam)
 		if (sendkepalive_counter==60 && sendkepalive && server)
 		{
 			sendkepalive_counter=0;
-			Beep(1000,1000);
+			//Beep(1000,1000);
 			rfbProtocolVersionMsg pv;
 			sprintf(pv,rfbProtocolKeepAlive,rfbProtocolMajorVersion,rfbProtocolMinorVersion);
 			if (WriteExact(remote, pv, sz_rfbProtocolVersionMsg) < 0) goto error;
@@ -278,12 +278,12 @@ error:
     if (server)
 	{
 		Servers[nummer].waitingThread=0;
-		Remove_server_list(code);
+		Remove_server_list(Servers[nummer].code);
 	}
 	else
 	{
 		Viewers[nummer].waitingThread=0;
-		Remove_viewer_list(code);
+		Remove_viewer_list(Viewers[nummer].code);
 	}
     return 0;
 }
@@ -540,7 +540,7 @@ error:
 	closesocket(remote);
 	local_in=0;
 	remote=0;
-    Remove_server_list(code);
-	Remove_viewer_list(code);
+	Remove_server_list(Servers[server_nummer].code);
+	Remove_viewer_list(Viewers[viewer_nummer].code);
     return 0;
 }

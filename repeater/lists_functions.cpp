@@ -21,45 +21,51 @@ Add_server_list(mystruct *Serverstruct)
 	int i;
 	for (i=0;i<MAX_LIST;i++)
 	{
-		if (Servers[i].code==Serverstruct->code) return;
-	}
-	for (i=0;i<MAX_LIST;i++)
-	{
-		if (Servers[i].code==0) 
+		if (Servers[i].code == Serverstruct->code)
 		{
-			debug("Server added to list %i\n",Serverstruct->code);
-			Servers[i].code=Serverstruct->code;
-			Servers[i].local_in=Serverstruct->local_in;
-			Servers[i].local_out=Serverstruct->local_out;
-			Servers[i].remote=Serverstruct->remote;
-			Servers[i].timestamp=GetTickCount();
-			Servers[i].used=false;
-			Servers[i].waitingThread=false;
-			Servers[i].nummer=i;
-			strcpy_s(Servers[i].hostname,Serverstruct->hostname);
+			if (strcmp(Servers[i].hostname, Serverstruct->hostname) == 0)  return;
+			Servers[i].code = 999999999;
+			goto mylabel;
+		}
+	}
+mylabel:
+	for (i = 0; i<MAX_LIST; i++)
+	{
+		if (Servers[i].code ==0)
+		{
+			debug("Server added to list %i\n", Serverstruct->code);
+			Servers[i].code = Serverstruct->code;
+			Servers[i].local_in = Serverstruct->local_in;
+			Servers[i].local_out = Serverstruct->local_out;
+			Servers[i].remote = Serverstruct->remote;
+			Servers[i].timestamp = GetTickCount();
+			Servers[i].used = false;
+			Servers[i].waitingThread = false;
+			Servers[i].nummer = i;
+			strcpy_s(Servers[i].hostname, Serverstruct->hostname);
 			GetLocalTime(&st);
-			_itoa(st.wYear,buf,10);
-			strcpy(msg,buf);
-			strcat(msg,"/");
-			_itoa(st.wMonth,buf,10);
-			strcat(msg,buf);
-			strcat(msg,"/");
-			_itoa(st.wDay,buf,10);
-			strcat(msg,buf);
-			strcat(msg," ");
-			_itoa(st.wHour,buf,10);
-			strcat(msg,buf);
-			strcat(msg,":");
-			_itoa(st.wMinute,buf,10);
-			strcat(msg,buf);
-			strcat(msg,":");
-			_itoa(st.wSecond,buf,10);
-			strcat(msg,buf);
-			strcpy_s(Servers[i].time,msg);
+			_itoa(st.wYear, buf, 10);
+			strcpy(msg, buf);
+			strcat(msg, "/");
+			_itoa(st.wMonth, buf, 10);
+			strcat(msg, buf);
+			strcat(msg, "/");
+			_itoa(st.wDay, buf, 10);
+			strcat(msg, buf);
+			strcat(msg, " ");
+			_itoa(st.wHour, buf, 10);
+			strcat(msg, buf);
+			strcat(msg, ":");
+			_itoa(st.wMinute, buf, 10);
+			strcat(msg, buf);
+			strcat(msg, ":");
+			_itoa(st.wSecond, buf, 10);
+			strcat(msg, buf);
+			strcpy_s(Servers[i].time, msg);
 			return;
 		}
 	}
-
+	return;
 }
 
 void 
