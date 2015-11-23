@@ -1223,7 +1223,7 @@ vncDesktopThread::run_undetached(void *arg)
 									bool s_moved=false;
 									//if ((cpuUsage >= m_server->MaxCpu()/2))
 									{
-									if (!m_desktop->m_hookdriver && !m_server->SingleWindow()) 
+									if (!m_desktop->m_hookdriver && !m_server->SingleWindow() && !m_desktop->startedw8) 
 											s_moved=m_desktop->CalcCopyRects(updates);
 									}
 								
