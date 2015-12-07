@@ -44,6 +44,10 @@ DWORD WINAPI server_listen(LPVOID lpParam)
     socklen = sizeof(client);
 	while(notstopped)
 	{	
+		memset(dest_host,0,256);
+		memset(proxyadress,0,256);
+		memset(remotehost,0,256);
+
 		connection = accept( sock_server_listen, (struct sockaddr*)&client, &socklen);
 		Sleep(1000);
 		ip_peer=inet_ntoa(client.sin_addr);

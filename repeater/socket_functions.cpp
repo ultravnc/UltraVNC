@@ -192,7 +192,7 @@ DWORD WINAPI do_repeater_wait(LPVOID lpParam)
 			//Beep(1000,1000);
 			rfbProtocolVersionMsg pv;
 			sprintf(pv,rfbProtocolKeepAlive,rfbProtocolMajorVersion,rfbProtocolMinorVersion);
-			if (WriteExact(remote, pv, sz_rfbProtocolVersionMsg) < 0) goto error;
+ 			if (WriteExact(remote, pv, sz_rfbProtocolVersionMsg) < 0) goto error;
 			recvbytes=recvbytes-12;
 			rbuf_len=rbuf_len-12;
 		}
@@ -458,8 +458,8 @@ DWORD WINAPI do_repeater(LPVOID lpParam)
 		debug("local input is EOF\n");
 		goto error;
 	    } else if ( len == -1 ) {
-		/* error on reading from stdin */
-			goto error;
+		/* error on reading from stdin */			goto error;
+
 	    } else {
 		/* repeat */
 		lbuf_len += len;

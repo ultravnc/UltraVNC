@@ -81,7 +81,7 @@ int sock=0;
 
 DWORD WINAPI mode12listener(LPVOID lpParam)
 	{
-		TCHAR dest_host[256];
+		TCHAR dest_host[256]="";
 		u_short dest_port;
 		struct sockaddr_in name;
 		struct sockaddr_in client;
@@ -89,8 +89,8 @@ DWORD WINAPI mode12listener(LPVOID lpParam)
 		const int one = 1;
 		int connection;
 		rfbProtocolVersionMsg pv;
-		TCHAR proxyadress[256];
-		TCHAR remotehost[256];
+		TCHAR proxyadress[256]="";
+		TCHAR remotehost[256]="";
 		int remoteport;
 		SOCKET  local_in;				/* Local input */
 		SOCKET  local_out;				/* Local output */
@@ -100,8 +100,7 @@ DWORD WINAPI mode12listener(LPVOID lpParam)
 		BOOL found2;
 		int i;
 		char *ip_peer;
-
-
+		
 		sock = socket (PF_INET, SOCK_STREAM, 0);
 		if (sock < 0) fatal("socket() failed, errno=%d\n", socket_errno());
 		else debug("socket() initialized\n");
@@ -121,6 +120,10 @@ DWORD WINAPI mode12listener(LPVOID lpParam)
 
 		while(notstopped)
 		{
+			memset(dest_host,0,256);
+			memset(proxyadress,0,256);
+			memset(remotehost,0,256);
+			memset(pv,0,sizeof(pv));
 	//		debug ("Waiting for Viewer connection ...\n");
 			connection = accept( sock, (struct sockaddr*)&client, &socklen);
 			Sleep(1000);
