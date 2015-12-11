@@ -225,8 +225,8 @@ BOOL CALLBACK SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam, LPARAM lParam
 		case IDOK:
 			{
             TCHAR tmphost[256];
-            TCHAR display[256];
-            TCHAR fulldisplay[256];
+            TCHAR hostname[256];
+            TCHAR fullhostname[256];
 
 			// sf@2005
 			HWND hSave = GetDlgItem(hwnd, IDC_SETDEFAULT_CHECK);
@@ -234,9 +234,9 @@ BOOL CALLBACK SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam, LPARAM lParam
 
 			_this->m_pOpt->m_selected_screen=SendMessage(GetDlgItem(  hwnd, IDC_SCREEN),CB_GETCURSEL,0,0);
 
-			GetDlgItemText(hwnd, IDC_HOSTNAME_EDIT, display, 256);
-            _tcscpy(fulldisplay, display);
-            if (!ParseDisplay(display, tmphost, 255, &_this->m_port)) {
+			GetDlgItemText(hwnd, IDC_HOSTNAME_EDIT, hostname, 256);
+			_tcscpy(fullhostname, hostname);
+			if (!ParseDisplay(hostname, tmphost, 255, &_this->m_port)) {
                 MessageBox(hwnd, 
                     sz_F8, 
                     sz_F10, MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TOPMOST);
@@ -246,26 +246,26 @@ BOOL CALLBACK SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam, LPARAM lParam
 							tmphost[i] = toupper(tmphost[i]);
 						} 
                 _tcscpy(_this->m_host_dialog, tmphost);
-				_this->m_pMRU->AddItem(fulldisplay);
+				_this->m_pMRU->AddItem(fullhostname);
 //				_tcscpy(_this->m_remotehost, fulldisplay);
                 EndDialog(hwnd, TRUE);
             }
 			_tcscpy(_this->m_proxyhost, "");
-			GetDlgItemText(hwnd, IDC_PROXY_EDIT, display, 256);
-            _tcscpy(fulldisplay, display);
+			GetDlgItemText(hwnd, IDC_PROXY_EDIT, hostname, 256);
+			_tcscpy(fullhostname, hostname);
 
 			//adzm 2010-02-15
-			if (strlen(display) > 0) {
+			if (strlen(hostname) > 0) {
 				TCHAR actualProxy[256];
-				strcpy(actualProxy, display);
+				strcpy(actualProxy, hostname);
 
 				if (strncmp(tmphost, "ID", 2) == 0) {
 
 					int numericId = _this->m_port;
 
 					int numberOfHosts = 1;
-					for (int i = 0; i < (int)strlen(display); i++) {
-						if (display[i] == ';') {
+					for (int i = 0; i < (int)strlen(hostname); i++) {
+						if (hostname[i] == ';') {
 							numberOfHosts++;
 						}
 					}
@@ -275,7 +275,7 @@ BOOL CALLBACK SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam, LPARAM lParam
 					} else {
 						int modulo = numericId % numberOfHosts;
 
-						char* szToken = strtok(display, ";");
+						char* szToken = strtok(hostname, ";");
 						while (szToken) {
 							if (modulo == 0) {
 								strcpy(actualProxy, szToken);

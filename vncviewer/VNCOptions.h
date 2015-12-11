@@ -66,6 +66,7 @@ public:
 	bool	m_NoStatus;
 	bool	m_NoHotKeys;
 	bool	m_FullScreen;
+	bool	m_SavePos;
 	bool	m_Directx;
 	bool    m_ShowToolbar;
 
@@ -105,6 +106,7 @@ public:
 	int		m_nServerScale; // Divider of the Target Server's screensize
 	// Reconnect
 	int m_reconnectcounter;
+	int m_x, m_y, m_w, m_h;
 	// Modif sf@2002 - Cache
 	bool    m_fEnableCache;
 	// Modif sz@2002 - DSM Plugin

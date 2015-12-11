@@ -3262,8 +3262,30 @@ void ClientConnection::SizeWindow()
 	else
 		m_winheight = min(m_fullwinheight, workheight);
 	int aa=GetSystemMetrics(SM_CXBORDER)+GetSystemMetrics(SM_CXHSCROLL);
-	int bb=tdc.monarray[1].wr-tdc.monarray[1].wl+aa;
-	if (m_opts.m_selected_screen==0 && (m_fullwinwidth <= bb )) //fit on primary
+	int bb = tdc.monarray[1].wr - tdc.monarray[1].wl + aa;
+	int temp_x = 0;
+	int temp_y = 0;
+	int temp_w = 0;
+	int temp_h = 0;
+	{
+		MRU *m_pMRU;
+		m_pMRU = new MRU(SESSION_MRU_KEY_NAME, 26);
+		temp_x = m_pMRU->Get_x(m_host);
+		temp_y = m_pMRU->Get_y(m_host);
+		temp_w = m_pMRU->Get_w(m_host);
+		temp_h = m_pMRU->Get_h(m_host);
+		if (m_pMRU) delete m_pMRU;
+	}
+
+	if (m_opts.m_w != 0 && m_opts.m_h != 0)
+	{
+		SetWindowPos(m_hwndMain, HWND_TOP, m_opts.m_x, m_opts.m_y,  m_opts.m_w, m_opts.m_h, SWP_SHOWWINDOW);
+	}
+	else if (m_opts.m_SavePos && temp_w != 0 && temp_h !=0)
+	{
+		SetWindowPos(m_hwndMain, HWND_TOP, temp_x, temp_y, temp_w, temp_h, SWP_SHOWWINDOW);
+	}
+	else if (m_opts.m_selected_screen==0 && (m_fullwinwidth <= bb )) //fit on primary
 		// -20 for border
 	{
 		SetWindowPos(m_hwndMain, HWND_TOP,
@@ -6629,9 +6651,9 @@ void ClientConnection::GTGBS_CreateDisplay()
 			  winstyle,
 			  CW_USEDEFAULT,
 			  CW_USEDEFAULT,
-			  //CW_USEDEFAULT,
-			  //CW_USEDEFAULT,
-			  320,200,
+			  CW_USEDEFAULT,
+			  CW_USEDEFAULT,
+			  //320,200,
 			  NULL,                // Parent handle
 			  NULL,                // Menu handle
 			  m_pApp->m_instance,
@@ -6886,31 +6908,12 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 		 {
 		 _this = (ClientConnection*)((CREATESTRUCT*)lParam)->lpCreateParams;
 		 helper::SafeSetWindowUserData(hwnd, (LONG_PTR)_this);
-		 //SetWindowLongPtr( hwnd, GWLP_USERDATA, (LONG_PTR)_this );
 		 }
 
+	if (_this == NULL) return DefWindowProc(hwnd, iMsg, wParam, lParam);
 
-
-	// This is a static method, so we don't know which instantiation we're
-	// dealing with.  But we've stored a 'pseudo-this' in the window data.
-//    ClientConnection *_this = helper::SafeGetWindowUserData<ClientConnection>(hwnd);
-
-	if (_this == NULL)
-		return DefWindowProc(hwnd, iMsg, wParam, lParam);
-
-	// HWND parent;
-
-	{
-		// Main Window
-		// if ( hwnd == _this->m_hwndMain)
-		{
 			switch (iMsg)
 			{
-//			case WM_TIMER:
-//				KillTimer(hwnd,_this->m_FTtimer);
-//				_this->m_FTtimer=0;
-//				_this->m_pFileTransfer->SendFileChunk();
-//				break;
 			case WM_SYSCHAR:
 				return true;
 			case WM_SYSCOMMAND:
@@ -7567,7 +7570,15 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 					return 0;
 
 				case WM_CLOSE:
+				{
 					{
+						MRU *m_pMRU;
+						m_pMRU = new MRU(SESSION_MRU_KEY_NAME, 26);
+						RECT rect;
+						GetWindowRect(hwnd, &rect);
+						m_pMRU->SetPos(_this->m_host,rect.left,rect.top,rect.right-rect.left,rect.bottom-rect.top);
+						if (m_pMRU) delete m_pMRU;
+					}
 						_this->m_keepalive_timer=0;
                         // April 8 2008 jdp
 						static bool boxopen=false;
@@ -8075,11 +8086,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 			        SendMessage(hwnd,WM_SIZE,(WPARAM)ID_DINPUT,(LPARAM)0);
 		        }
             }
-		} // End if Main Window
-	}
-
 	return DefWindowProc(hwnd, iMsg, wParam, lParam);
-
 	// We know about an unused variable here.
 #pragma warning(disable : 4101)
 }

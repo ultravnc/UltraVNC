@@ -128,6 +128,7 @@ VNCOptions::VNCOptions()
 	
   m_ViewOnly = false;
   m_FullScreen = false;
+  m_SavePos = false;
   m_Directx = true;
   autoDetect = true;
   m_Use8Bit = rfbPFFullColors; //false;
@@ -164,6 +165,11 @@ VNCOptions::VNCOptions()
   m_nServerScale = 1;
 
   m_reconnectcounter = 3;
+
+  m_x = 0;
+  m_y = 0;
+  m_w = 0;
+  m_h = 0;
 
   // Modif sf@2002 - Cache
   m_fEnableCache = false;
@@ -333,7 +339,8 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
 	
   m_ViewOnly			= s.m_ViewOnly;
   m_NoStatus			= s.m_NoStatus;
-  m_FullScreen		= s.m_FullScreen;
+  m_FullScreen		=	s.m_FullScreen;
+  m_SavePos			=	s.m_SavePos;
   m_Directx		= s.m_Directx;
   autoDetect = s.autoDetect;
   m_Use8Bit			= s.m_Use8Bit;
@@ -373,6 +380,11 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
   m_proxyport				= s.m_proxyport;
   m_fUseProxy	      = s.m_fUseProxy;
   m_selected_screen		=s.m_selected_screen;
+
+  m_x = s.m_x;
+  m_y = s.m_y;
+  m_w = s.m_w;
+  m_h = s.m_h;
   
   strcpy_s(m_kbdname, 9,s.m_kbdname);
   m_kbdSpecified		= s.m_kbdSpecified;
@@ -587,7 +599,9 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
       m_fAutoScaling = true;
     } else if ( SwitchMatch(args[j], _T("fullscreen"))) {
       m_FullScreen = true;
-	 } else if ( SwitchMatch(args[j], _T("directx"))) {
+	} else if (SwitchMatch(args[j], _T("savepos"))) {
+	  m_SavePos = true;
+	} else if ( SwitchMatch(args[j], _T("directx"))) {
       m_Directx = true;
     } else if ( SwitchMatch(args[j], _T("noauto"))) {
       autoDetect = false;
@@ -862,24 +876,11 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 		{
 			ArgError(sz_D27); // sf@ - Todo: put correct message here
 			continue;
-		}
-		
+		}		
 		m_fUseProxy = true;
 		_tcscpy(m_proxyhost, args[j]);
 		//adzm 2010-02-15
 		CheckProxyAndHost();
-
-		/*
-		if (!ParseDisplay(args[j], proxyhost, 255, &m_proxyport)) {
-			ShowUsage(sz_D28);
-			PostQuitMessage(1);
-		} else {
-			m_fUseProxy = true;
-			_tcscpy(m_proxyhost, proxyhost);
-			//adzm 2010-02-15
-			CheckProxyAndHost();
-		}
-		*/
 	}
 	else if (SwitchMatch(args[j], _T("reconnectcounter"))) 
 	{
@@ -890,6 +891,22 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
         }
 		_stscanf(args[j], _T("%d"), &m_reconnectcounter);
 	}
+
+	else if (SwitchMatch(args[j], _T("position")))
+	{
+		j=j + 4;
+		if (j == i) {
+			ArgError(_T("You must specify x y w y"));
+			PostQuitMessage(1);
+			continue;
+		}
+		_stscanf(args[j - 3], _T("%d"), &m_x);
+		_stscanf(args[j - 2], _T("%d"), &m_y);
+		_stscanf(args[j - 1], _T("%d"), &m_w);
+		_stscanf(args[j], _T("%d"), &m_h);
+		int a = 0;
+	}
+
 	else if (SwitchMatch(args[j], _T("autoreconnect"))) 
 	{
         if (++j == i) {
@@ -1052,6 +1069,7 @@ void VNCOptions::Save(char *fname)
   saveInt("showtoolbar",			m_ShowToolbar,		fname);
   saveInt("AutoScaling",            m_fAutoScaling,     fname);
   saveInt("fullscreen",			m_FullScreen,		fname);
+  saveInt("SavePos", m_SavePos, fname);
   saveInt("directx",			m_Directx,		fname);
   saveInt("autoDetect", autoDetect, fname);
   saveInt("8bit",					m_Use8Bit,			fname);
@@ -1132,6 +1150,7 @@ void VNCOptions::Load(char *fname)
   m_ShowToolbar =			readInt("showtoolbar",			m_ShowToolbar,		fname) != 0;
   m_fAutoScaling =      readInt("AutoScaling",			m_fAutoScaling,		fname) != 0;
   m_FullScreen =			readInt("fullscreen",		m_FullScreen,	fname) != 0;
+  m_SavePos = readInt("SavePos", m_SavePos, fname) != 0;
   m_Directx =			readInt("directx",		m_Directx,	fname) != 0;
   autoDetect = readInt("autoDetect", autoDetect, fname) != 0;
   m_Use8Bit =				readInt("8bit",				m_Use8Bit,		fname);
@@ -1491,6 +1510,10 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 		  HWND hFullScreen = GetDlgItem(hwnd, IDC_FULLSCREEN);
 		  SendMessage(hFullScreen, BM_SETCHECK, _this->m_FullScreen, 0);
 
+		  HWND hSavePos = GetDlgItem(hwnd, IDC_SAVEPOS);
+		  SendMessage(hSavePos, BM_SETCHECK, _this->m_SavePos, 0);
+		  
+
 		  HWND hDirectx = GetDlgItem(hwnd, IDC_DIRECTX);
 		  SendMessage(hDirectx, BM_SETCHECK, _this->m_Directx, 0);
 		  
@@ -1673,6 +1696,10 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 			  HWND hFullScreen = GetDlgItem(hwnd, IDC_FULLSCREEN);
 			  _this->m_FullScreen = 
 				  (SendMessage(hFullScreen, BM_GETCHECK, 0, 0) == BST_CHECKED);
+
+			  HWND hSavePos = GetDlgItem(hwnd, IDC_SAVEPOS);
+			  _this->m_SavePos =
+				  (SendMessage(hSavePos, BM_GETCHECK, 0, 0) == BST_CHECKED);
 
 			   HWND hDirectx = GetDlgItem(hwnd, IDC_DIRECTX);
 			  _this->m_Directx = 
