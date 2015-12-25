@@ -26,6 +26,7 @@
 #include <windows.h>
 #include <wtsapi32.h>
 #include "common/win32_helpers.h"
+#include "inifile.h"
 
 static void WINAPI service_main(DWORD, LPTSTR *);
 static void WINAPI control_handler(DWORD controlCode);
@@ -38,12 +39,15 @@ HANDLE stopServiceEvent=0;
 extern HANDLE hEvent;
 static char service_path[MAX_PATH];
 void monitor_sessions();
+void monitor_sessions_RDP();
 void Restore_after_reboot();
 char service_name[256]="uvnc_service";
 char *app_name = "UltraVNC";
 void disconnect_remote_sessions();
 char cmdtext[256];
 extern int clear_console;
+extern bool  RDPMODE;
+
 bool IsWin2000()
 {
 	OSVERSIONINFO OSversion;
@@ -96,8 +100,13 @@ static void WINAPI service_main(DWORD argc, LPTSTR* argv) {
         serviceStatus.dwCurrentState=SERVICE_RUNNING;
         SetServiceStatus(serviceStatusHandle, &serviceStatus);
 
-Restore_after_reboot();
-monitor_sessions();
+		Restore_after_reboot();
+		IniFile myIniFile;
+		LONG L_rdpmode=0;
+		L_rdpmode = myIniFile.ReadInt("admin", "rdpmode", L_rdpmode);
+		RDPMODE = L_rdpmode; // 0 of 1
+		if (RDPMODE)monitor_sessions_RDP();
+		else monitor_sessions();
 
         /* service was stopped */
         serviceStatus.dwCurrentState=SERVICE_STOP_PENDING;
@@ -330,7 +339,7 @@ static int pad()
 
     strcpy(service_path, "\"");
     strcat(service_path, exe_file_name);
-    strcat(service_path, "\" -service");
+	strcat(service_path, "\" -service");
 	return 0;
 }
 ////////////////////////////////////////////////////////////////////////////////
