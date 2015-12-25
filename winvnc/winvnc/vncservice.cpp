@@ -28,7 +28,7 @@
 // Implementation of service-oriented functionality of WinVNC
 
 #include "stdhdrs.h"
-
+extern HWND G_MENU_HWND;
 // Header
 
 #include "vncservice.h"
@@ -98,8 +98,32 @@ DWORD GetCurrentSessionID()
 	return dwSessionId;
 }
 
+DWORD GetCurrentConsoleSessionID()
+{
+	DWORD dwSessionId;
+	pWTSGetActiveConsoleSessionId WTSGetActiveConsoleSessionIdF = NULL;
+	WTSProcessIdToSessionIdF = NULL;
+
+	HMODULE  hlibkernel = LoadLibrary("kernel32.dll");
+	if (hlibkernel)
+	{
+		WTSGetActiveConsoleSessionIdF = (pWTSGetActiveConsoleSessionId)GetProcAddress(hlibkernel, "WTSGetActiveConsoleSessionId");
+		WTSProcessIdToSessionIdF = (pProcessIdToSessionId)GetProcAddress(hlibkernel, "ProcessIdToSessionId");
+	}
+	if (WTSGetActiveConsoleSessionIdF != NULL)
+		dwSessionId = WTSGetActiveConsoleSessionIdF();
+	else dwSessionId = 0;
+	if (hlibkernel) FreeLibrary(hlibkernel);
+	return dwSessionId;
+}
+
 DWORD GetExplorerLogonPid()
 {
+	char alternate_shell[129];
+	IniFile myIniFile;
+	strcpy(alternate_shell, "");
+	myIniFile.ReadString("admin", "alternate_shell", alternate_shell, 256);
+
 	DWORD dwSessionId;
 	DWORD dwExplorerLogonPid=0;
 	PROCESSENTRY32 procEntry;
@@ -147,7 +171,7 @@ DWORD GetExplorerLogonPid()
 
     do
     {
-        if (_stricmp(procEntry.szExeFile, "explorer.exe") == 0)
+		if ((_stricmp(procEntry.szExeFile, "explorer.exe") == 0) || ( strlen(alternate_shell) != 0 && (_stricmp(procEntry.szExeFile, alternate_shell) == 0)))
         {
           DWORD dwExplorerSessId = 0;
 		  if (WTSProcessIdToSessionIdF!=NULL)
@@ -431,7 +455,9 @@ FindWinVNCWindow(bool bThisProcess)
 
 	if (!bThisProcess) {
 		// Find any window with the MENU_CLASS_NAME window class
-		return FindWindow(MENU_CLASS_NAME, NULL);
+		HWND returnvalue= FindWindow(MENU_CLASS_NAME, NULL);
+		if (returnvalue == NULL) goto nullreturn;
+		return returnvalue;
 	} else {
 		// Find one that matches the class and is the same process		
 		HWND hwndZ = NULL;
@@ -450,12 +476,13 @@ FindWinVNCWindow(bool bThisProcess)
 					hwndServer = NULL;
 				}
 			} else {
-				return NULL;
+				goto nullreturn;
 			}
 		}
 	}
 
-	return NULL;
+nullreturn:
+	return G_MENU_HWND;
 }
 
 // Internal routine to find the WinVNC menu class window and
