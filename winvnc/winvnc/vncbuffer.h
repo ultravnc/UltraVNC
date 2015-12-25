@@ -87,6 +87,7 @@ public:
 	void MultiMonitors(int number);
 	bool  IsMultiMonitor();
 	void WriteMessageOnScreen(char*);
+	void WriteMessageOnScreenPreConnect();
 
 	// sf@2005 - Grey Palette
 	void EnableGreyPalette(BOOL enable);
