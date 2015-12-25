@@ -127,6 +127,7 @@ void Secure_Plugin(char *szPlugin);
 //HACK to use name in autoreconnect from service with dyn dns
 char dnsname[255];
 VNC_OSVersion VNCOS;
+extern bool PreConnect;
 // winvnc.exe will also be used for helper exe
 // This allow us to minimize the number of seperate exe
 bool
@@ -229,8 +230,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 	memset(&info, 0, sizeof(CR_INSTALL_INFO));
 	info.cb = sizeof(CR_INSTALL_INFO);
 	info.pszAppName = _T("UVNC");
-	info.pszAppVersion = _T("1.2.0.9");
-	info.pszEmailSubject = _T("UVNC server 1.2.0.9 Error Report");
+	info.pszAppVersion = _T("1.2.1.0");
+	info.pszEmailSubject = _T("UVNC server 1.2.1.0 Error Report");
 	info.pszEmailTo = _T("uvnc@skynet.be");
 	info.uPriorities[CR_SMAPI] = 1; // Third try send report over Simple MAPI    
 	// Install all available exception handlers
@@ -679,6 +680,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 				return 0;
 			}
 
+		if (strncmp(&szCmdLine[i], winvncPreConnect, strlen(winvncPreConnect)) == 0)
+		{			
+			i += strlen(winvncPreConnect);
+			PreConnect = true;
+			continue;
+		}
 		if (strncmp(&szCmdLine[i], winvncRunService, strlen(winvncRunService)) == 0)
 		{
 			//Run as service
