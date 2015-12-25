@@ -110,6 +110,7 @@ bool ISUACENabled();
 void Reboot_with_force_reboot_elevated();
 //HACK to use name in autoreconnect from service with dyn dns
 extern char dnsname[255];
+HWND G_MENU_HWND = NULL;
 
 
 static inline VOID UnloadDM(VOID) 
@@ -304,6 +305,7 @@ vncMenu::vncMenu(vncServer *server)
 				NULL,
 				hAppInstance,
 				NULL);
+	G_MENU_HWND = m_hwnd;
 	if (m_hwnd == NULL)
 	{
 		PostQuitMessage(0);
@@ -784,45 +786,9 @@ vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 			EnableMenuItem(m_hmenu, ID_REBOOT_FORCE,(vncService::RunningAsService()&&m_properties.AllowShutdown()) ? MF_ENABLED : MF_GRAYED);
 			OSVERSIONINFO OSversion;	
 			OSversion.dwOSVersionInfoSize=sizeof(OSVERSIONINFO);
-			GetVersionEx(&OSversion);
-			/*if(OSversion.dwMajorVersion>=6 && m_properties.AllowShutdown() && vncService::RunningAsService())
-			{
-				if (OSversion.dwMinorVersion==0) //Vista
-				{
-					if (ISUACENabled() && !IsSoftwareCadEnabled())//ok
-					{
-						RemoveMenu(m_hmenu, ID_DELSOFTWARECAD, MF_BYCOMMAND);
-						RemoveMenu(m_hmenu, ID_SOFTWARECAD, MF_BYCOMMAND);
-					}
-					if (!ISUACENabled() && IsSoftwareCadEnabled())
-					{
-						RemoveMenu(m_hmenu, ID_DELSOFTWARECAD, MF_BYCOMMAND);
-						RemoveMenu(m_hmenu, ID_SOFTWARECAD, MF_BYCOMMAND);
-					}
-					if (!ISUACENabled() && !IsSoftwareCadEnabled())
-					{
-						RemoveMenu(m_hmenu, ID_DELSOFTWARECAD, MF_BYCOMMAND);
-						GetSubMenu(m_hmenu,ID_SOFTWARECAD);
-					}
-					if (ISUACENabled() && IsSoftwareCadEnabled())
-					{
-						RemoveMenu(m_hmenu, ID_SOFTWARECAD, MF_BYCOMMAND);
-						GetSubMenu(m_hmenu,ID_DELSOFTWARECAD);
-					}
-
-				}
-				else  //WIN7
-				{
-					EnableMenuItem(m_hmenu, ID_SOFTWARECAD,(vncService::RunningAsService()&&m_properties.AllowShutdown()&&!IsSoftwareCadEnabled()) ? MF_ENABLED : MF_GRAYED);
-					if (IsSoftwareCadEnabled()) RemoveMenu(m_hmenu, ID_SOFTWARECAD, MF_BYCOMMAND);
-					RemoveMenu(m_hmenu, ID_DELSOFTWARECAD, MF_BYCOMMAND);
-				}
-			}
-			else */
-			{
-				RemoveMenu(m_hmenu, ID_DELSOFTWARECAD, MF_BYCOMMAND);
-				RemoveMenu(m_hmenu, ID_SOFTWARECAD, MF_BYCOMMAND);
-			}
+			GetVersionEx(&OSversion);			
+			RemoveMenu(m_hmenu, ID_DELSOFTWARECAD, MF_BYCOMMAND);
+			RemoveMenu(m_hmenu, ID_SOFTWARECAD, MF_BYCOMMAND);
 
 
 			// adzm 2009-07-05
@@ -883,12 +849,9 @@ vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 void vncMenu::Shutdown(bool kill_client)
 {
 	vnclog.Print(LL_INTERR, VNCLOG("vncMenu::Shutdown: Close menu - Disconnect all - Shutdown server\n"));
-//	m_server->AutoRestartFlag(TRUE);
-//	m_server->KillAuthClients();
-//	m_server->KillSockConnect();
-//	m_server->ShutdownServer();
 	SendMessage(m_hwnd, WM_CLOSE, 0, 0);
 	if (kill_client) m_server->KillAuthClients();
+	G_MENU_HWND = NULL;
 }
 
 extern BOOL G_HTTP;
