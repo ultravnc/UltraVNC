@@ -205,6 +205,14 @@ struct monitor
 	int offsety;
 };
 
+typedef struct _sessionmessage
+{
+	DWORD ID;
+	char type[32];
+	char name[32];
+	char username[32];
+}sessionmsg;
+
 
 class PixelCaptureEngine
 {
@@ -349,12 +357,17 @@ public:
 	// The current mouse position
 	rfb::Rect		m_cursorpos;
 	void WriteMessageOnScreen(char*,BYTE *scrBuff, UINT scrBuffSize);
+	void WriteMessageOnScreenPreConnect( BYTE *scrBuff, UINT scrBuffSize);
+
+	sessionmsg *sesmsg ;
+	int aantal_session;
 
 	// Implementation
 protected:
 
 	// Routines to hook and unhook us
 	DWORD Startup();
+	DWORD PreConnectStartup();
 	BOOL Shutdown();
 	
 	// Init routines called by the child thread
@@ -363,6 +376,7 @@ protected:
 //	void KillWallpaper();
 //	void RestoreWallpaper();
 	DWORD InitBitmap();
+	DWORD PreConnectInitBitmap();
 	BOOL ThunkBitmapInfo();
 	DWORD SetPixFormat();
 	BOOL SetPixShifts();

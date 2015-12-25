@@ -51,6 +51,9 @@
 #include <algorithm>
 #include <Commctrl.h>
 
+extern bool PreConnect;
+int getinfo(char mytext[1024]);
+
 
 
 // Constants
@@ -575,6 +578,7 @@ vncDesktop::vncDesktop()
 
 	startedw8 = false;
 	plist = NULL;
+	sesmsg = NULL;
 //
 }
 
@@ -655,6 +659,8 @@ vncDesktop::~vncDesktop()
 		DeleteDC(m_hrootdc_Desktop);
 		m_hrootdc_Desktop = NULL;
 	}
+	if (sesmsg) delete[] sesmsg;
+	sesmsg = NULL;
 }
 
 
@@ -680,11 +686,63 @@ vncDesktop::TriggerUpdate()
 	}
 }
 
+DWORD
+vncDesktop::PreConnectInitBitmap()
+{
 
+	multi_monitor = false;
+    m_hrootdc_Desktop = GetDC(NULL);
+	if (m_hrootdc_Desktop == NULL) return ERROR_DESKTOP_NO_ROOTDC;
+
+	m_ScreenOffsetx = 0;
+	m_ScreenOffsety = 0;
+	m_ScreenWidth = 0;
+	m_ScreenHeight = 0;
+	m_bmrect = rfb::Rect(0, 0, 640, 640);
+
+	m_hmemdc = CreateCompatibleDC(m_hrootdc_Desktop);
+	if (m_hmemdc == NULL) return ERROR_DESKTOP_NO_ROOTDC;
+
+	m_membitmap = CreateCompatibleBitmap(m_hrootdc_Desktop, 640, 640);
+	if (m_membitmap == NULL) return ERROR_DESKTOP_NO_COMPATBITMAP;
+	memset(&m_bminfo, 0, sizeof(m_bminfo));
+	m_bminfo.bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+	m_bminfo.bmi.bmiHeader.biBitCount = 32;
+	m_bminfo.bmi.bmiHeader.biPlanes = 1;
+	m_bminfo.bmi.bmiHeader.biWidth = m_bmrect.br.x;
+	m_bminfo.bmi.bmiHeader.biHeight = m_bmrect.br.y;
+	m_bminfo.bmi.bmiHeader.biSizeImage = abs((m_bminfo.bmi.bmiHeader.biWidth *m_bminfo.bmi.bmiHeader.biHeight *m_bminfo.bmi.bmiHeader.biBitCount) / 8);
+	m_bminfo.bmi.bmiHeader.biHeight = -abs(m_bminfo.bmi.bmiHeader.biHeight);
+	m_bminfo.bmi.bmiHeader.biCompression == BI_RGB;
+	m_bminfo.truecolour = true;
+	m_DIBbits = NULL;
+	return 0;
+}
+DWORD
+vncDesktop::PreConnectStartup()
+{
+	DWORD status;
+	if (!InitDesktop())
+	{
+		vnclog.Print(LL_INTINFO, VNCLOG("InitDesktop Failed\n"));
+		return ERROR_DESKTOP_INIT_FAILED;
+	}
+	m_server->Driver(false);
+	m_server->Hook(false);
+	m_buffer.VideDriverUsed(false);
+	if ((status = PreConnectInitBitmap()) != 0) return status;
+	SetPixFormat();
+	SetPixShifts();
+	StartInitWindowthread();
+	if (!m_buffer.SetDesktop(this))return ERROR_DESKTOP_OUT_OF_MEMORY;
+	GetQuarterSize();
+	return 0;
+}
 // Routine to startup and install all the hooks and stuff
 DWORD
 vncDesktop::Startup()
 {
+	if (PreConnect) return PreConnectStartup();
 	// Initialise the Desktop object
     DWORD status;
 	if (!InitDesktop())
@@ -1625,6 +1683,216 @@ vncDesktop::WriteMessageOnScreen(char * tt,BYTE *scrBuff, UINT scrBuffSize)
 
 	CopyToBuffer(rect, scrBuff, scrBuffSize);
 }
+
+#include "wtsApi32.h"
+char mytext22[1024] = "";
+DWORD GetCurrentConsoleSessionID();
+
+void
+vncDesktop::WriteMessageOnScreenPreConnect(BYTE *scrBuff, UINT scrBuffSize)
+{
+	////////////////////////////////////////////////		
+		aantal_session = 0;
+		WTS_SESSION_INFO *pSessions = 0;
+		DWORD   nSessions(0);
+
+		typedef BOOL(WINAPI *pfnWTSEnumerateSessions)(HANDLE, DWORD, DWORD, PWTS_SESSION_INFO*, DWORD*);
+		typedef VOID(WINAPI *pfnWTSFreeMemory)(PVOID);
+		typedef BOOL(WINAPI * _WTSQUERYSESSIONINFORMATION)(HANDLE hServer, DWORD SessionId, WTS_INFO_CLASS WTSInfoClass, LPTSTR *ppBuffer, DWORD *pBytesReturned);
+
+		helper::DynamicFn<pfnWTSEnumerateSessions> pWTSEnumerateSessions("wtsapi32", "WTSEnumerateSessionsA");
+		helper::DynamicFn<pfnWTSFreeMemory> pWTSFreeMemory("wtsapi32", "WTSFreeMemory");
+
+		if (pWTSEnumerateSessions.isValid() && pWTSFreeMemory.isValid())
+		{
+			if ((*pWTSEnumerateSessions)(WTS_CURRENT_SERVER_HANDLE, 0, 1, &pSessions, &nSessions)) 
+			{
+				aantal_session = nSessions;
+				(*pWTSFreeMemory)(pSessions);
+			}
+		}
+		//// If WTSEnumerateSessions fail or the result is 0 we just handle the active console sessionID
+		if (aantal_session==0)
+		{
+			if (sesmsg) delete[] sesmsg;
+			sesmsg = new sessionmsg[1];
+			DWORD SessionId = 0xFFFFFFFF;
+			int coutersessionid = 0;
+			while (SessionId == 0xFFFFFFFF)
+			{
+				SessionId = GetCurrentConsoleSessionID();
+				Sleep(1000);
+				coutersessionid++;
+				if (coutersessionid > 10) break;
+			}
+			sesmsg[0].ID = SessionId;
+			memset(sesmsg[0].type, 0, 32);
+			memset(sesmsg[0].name, 0, 32);
+			strcpy_s(sesmsg[0].type, 32, "Active");
+			strcpy_s(sesmsg[0].name, 32, "Console");
+			memset(sesmsg[aantal_session].username, 0, 32);
+			strcpy_s(sesmsg[aantal_session].username, 32, "ActiveConsole");
+			aantal_session = 1;
+		}
+		else
+		{
+			if (sesmsg) delete[] sesmsg;
+			sesmsg = new sessionmsg[aantal_session + 1];
+
+			DWORD SessionId = 0xFFFFFFFF;
+			int coutersessionid = 0;
+			while (SessionId == 0xFFFFFFFF)
+			{
+				SessionId = GetCurrentConsoleSessionID();
+				Sleep(1000);
+				coutersessionid++;
+				if (coutersessionid > 10) break;
+			}
+			sesmsg[0].ID = SessionId;
+			memset(sesmsg[0].type, 0, 32);
+			memset(sesmsg[0].name, 0, 32);
+			strcpy_s(sesmsg[0].type, 32, "Active");
+			strcpy_s(sesmsg[0].name, 32, "Console");
+			memset(sesmsg[0].username, 0, 32);
+			HMODULE handle = LoadLibrary("WTSAPI32.DLL");
+			_WTSQUERYSESSIONINFORMATION pFunc;
+			LPTSTR  ppBuffer = NULL;    DWORD   pBytesReturned = 0;
+			if (handle)
+			{
+				pFunc = (_WTSQUERYSESSIONINFORMATION)GetProcAddress(handle, "WTSQuerySessionInformationA");
+				if (pFunc(WTS_CURRENT_SERVER_HANDLE, sesmsg[0].ID, WTSUserName, &ppBuffer, &pBytesReturned))
+				{
+					strcpy_s(sesmsg[0].username, 32, ppBuffer);
+				}
+			}
+
+			aantal_session = 1;
+			if (pWTSEnumerateSessions.isValid() && pWTSFreeMemory.isValid())
+			{
+				if ((*pWTSEnumerateSessions)(WTS_CURRENT_SERVER_HANDLE, 0, 1, &pSessions, &nSessions))
+				{
+					for (DWORD i(0); i < nSessions; ++i)
+					{
+						sesmsg[aantal_session].ID = pSessions[i].SessionId;
+						/*if ((_stricmp(pSessions[i].pWinStationName, "Console") == 0))
+						{
+							memset(sesmsg[aantal_session].type, 0, 32);
+							memset(sesmsg[aantal_session].name, 0, 32);
+							if ((pSessions[i].State == WTSActive)) strcpy_s(sesmsg[aantal_session].type, 32, "Active");
+							else strcpy_s(sesmsg[aantal_session].type, 32, "Disconnected");
+							strcpy_s(sesmsg[aantal_session].name, 32, pSessions[i].pWinStationName);
+							HMODULE handle = LoadLibrary("WTSAPI32.DLL");
+							_WTSQUERYSESSIONINFORMATION pFunc;
+							LPTSTR  ppBuffer = NULL;    DWORD   pBytesReturned = 0;
+							if (handle)
+							{
+								pFunc = (_WTSQUERYSESSIONINFORMATION)GetProcAddress(handle, "WTSQuerySessionInformationA");
+								if (pFunc(WTS_CURRENT_SERVER_HANDLE, pSessions[i].SessionId, WTSUserName, &ppBuffer, &pBytesReturned))
+								{
+									memset(sesmsg[aantal_session].username, 0, 32);
+									strcpy_s(sesmsg[aantal_session].username, 32, ppBuffer);
+								}
+							}
+							aantal_session++;
+							if (handle) FreeLibrary(handle);
+							(*pWTSFreeMemory)(ppBuffer);
+						}
+						else*/
+						if (((pSessions[i].State == WTSActive || pSessions[i].State == WTSShadow || pSessions[i].State == WTSConnectQuery)) && (_stricmp(pSessions[i].pWinStationName, "Console") != 0))
+						{
+							memset(sesmsg[aantal_session].type, 0, 32);
+							memset(sesmsg[aantal_session].name, 0, 32);
+							strcpy_s(sesmsg[aantal_session].type, 32, "Active");
+							strcpy_s(sesmsg[aantal_session].name, 32, pSessions[i].pWinStationName);
+							HMODULE handle = LoadLibrary("WTSAPI32.DLL");
+							_WTSQUERYSESSIONINFORMATION pFunc;
+							LPTSTR  ppBuffer = NULL;    DWORD   pBytesReturned = 0;
+							if (handle)
+							{
+								pFunc = (_WTSQUERYSESSIONINFORMATION)GetProcAddress(handle, "WTSQuerySessionInformationA");
+								if (pFunc(WTS_CURRENT_SERVER_HANDLE, pSessions[i].SessionId, WTSUserName, &ppBuffer, &pBytesReturned))
+								{
+									memset(sesmsg[aantal_session].username, 0, 32);
+									strcpy_s(sesmsg[aantal_session].username, 32, ppBuffer);
+								}
+							}
+							aantal_session++;
+							if (handle) FreeLibrary(handle);
+							(*pWTSFreeMemory)(ppBuffer);
+						}
+					}
+					(*pWTSFreeMemory)(pSessions);
+				}
+			}
+		}
+////////////////////////////////////////////////
+		char bigstring[128];
+		char menustring[12800];
+		strcpy(menustring, "");
+
+		for (DWORD i(0); i < aantal_session; ++i)
+		{
+			if (sesmsg[i].ID>0 && sesmsg[i].ID<100)
+			{
+			sprintf(bigstring, "%c) session%i %s user=%s  status=%s", 97+i, sesmsg[i].ID, sesmsg[i].name, sesmsg[i].username, sesmsg[i].type);
+			strcat(menustring, bigstring);
+			strcat(menustring, "\n");
+			if (i == 0) strcat(menustring, "\n");
+			}
+		}
+		strcat(menustring, "\n");
+		strcat(menustring, "\n");
+		strcat(menustring, "Enter session to clone: \n");
+////////////////////////////////////////////////
+	// Select the memory bitmap into the memory DC
+	RECT rect;
+	SetRect(&rect, 0, 0, 640, 640);
+	COLORREF bgcol = RGB(0x00, 0x00, 0xff);
+	COLORREF oldtxtcol = SetTextColor(m_hmemdc, RGB(254, 254, 254));
+	COLORREF oldbgcol = SetBkColor(m_hmemdc, bgcol);
+	HBRUSH backgroundBrush = CreateSolidBrush(bgcol);
+
+	HBITMAP oldbitmap;
+	if ((oldbitmap = (HBITMAP)SelectObject(m_hmemdc, m_membitmap)) == NULL)
+		return;
+
+	FillRect(m_hmemdc, &rect, backgroundBrush);
+	
+	HFONT hFont, hOldFont;
+	SetRect(&rect, 0, 10, 640, 640);
+	DrawText(m_hmemdc, "UVNC experimental server 1.2.1.0 pre-connect window \n", strlen("UVNC experimental server 1.2.1.0 pre-connect window \n"), &rect, DT_CENTER);
+
+	
+	if (strlen(mytext22) == 0)getinfo(mytext22);
+
+	SetRect(&rect, 30, 50, 640, 640);
+	hFont = (HFONT)GetStockObject(ANSI_FIXED_FONT);
+	if (hOldFont = (HFONT)SelectObject(m_hmemdc, hFont))
+	{
+		DrawText(m_hmemdc, mytext22, strlen(mytext22), &rect, DT_LEFT | DT_WORDBREAK);
+		SelectObject(m_hmemdc, hOldFont);
+
+	}
+
+	SetRect(&rect, 30, 180, 640, 640);
+	hFont = (HFONT)GetStockObject(ANSI_FIXED_FONT);
+	if (hOldFont = (HFONT)SelectObject(m_hmemdc, hFont))
+	{
+		DrawText(m_hmemdc, menustring, strlen(menustring), &rect, DT_LEFT);
+		SelectObject(m_hmemdc, hOldFont);
+
+	}
+
+	SetBkColor(m_hmemdc, oldbgcol);
+	SetTextColor(m_hmemdc, oldtxtcol);
+	SelectObject(m_hmemdc, oldbitmap);
+	DeleteObject(backgroundBrush);
+	SetRect(&rect, 0, 0, 640, 640);
+	CopyToBuffer(rect, scrBuff, scrBuffSize);
+	Sleep(1000);
+}
+
+
 
 #ifndef CAPTUREBLT
 #define CAPTUREBLT  0x40000000
