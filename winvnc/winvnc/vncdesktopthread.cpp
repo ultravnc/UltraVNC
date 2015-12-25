@@ -37,6 +37,8 @@ extern bool stop_hookwatch;
 void testBench();
 char g_hookstring[16]="";
 
+bool PreConnect = false;
+
 inline bool
 ClipRect(int *x, int *y, int *w, int *h,
 	    int cx, int cy, int cw, int ch) {
@@ -982,18 +984,24 @@ vncDesktopThread::run_undetached(void *arg)
 	int waiting_update=0;
 	SetEvent(m_desktop->restart_event);
 	///
-	Sleep(1000);
+	//Sleep(1000);
 	rgncache.assign_union(rfb::Region2D(m_desktop->m_Cliprect));
 
-	if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver && !VNCOS.OS_WIN8)
+	if (PreConnect)
+	{
+		//m_desktop->m_buffer.WriteMessageOnScreenPreConnect();
+	}
+	else
+	{
+		if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver && !VNCOS.OS_WIN8)
 		{
 			m_desktop->m_buffer.GrabRegion(rgncache,true,true);
 		}
-	else if (!VNCOS.OS_WIN8)
+		else if (!VNCOS.OS_WIN8)
 		{
 			m_desktop->m_buffer.GrabRegion(rgncache,false,true);
 		}
-
+	}
 	//telling running viewers to wait until first update, done
 	if  (m_server->MaxCpu() <50)
 		{
@@ -1302,7 +1310,7 @@ vncDesktopThread::run_undetached(void *arg)
 										// Back added, no need to stop polling during move
 										if ((cpuUsage < m_server->MaxCpu()/2))
 										{
-										if (!m_desktop->m_hookdriver && !m_server->SingleWindow() && !s_moved) 
+										if (!m_desktop->m_hookdriver && !m_server->SingleWindow() && !s_moved && !m_desktop->startedw8)
 											s_moved=m_desktop->CalcCopyRects(updates);
 										}
 										
@@ -1319,15 +1327,22 @@ vncDesktopThread::run_undetached(void *arg)
 										/*char tempchar[10];
 										if ((newtick-oldtick2) != 0) itoa(1000/((newtick-oldtick2)),tempchar,10);
 										oldtick2=newtick;
-										m_desktop->m_buffer.WriteMessageOnScreen(tempchar);*/
-										if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver)
-											{
-												m_desktop->m_buffer.GrabRegion(rgncache,true,capture);
-											}
+										m_desktop->m_buffer.WriteMessageOnScreen(tempchar);*/			
+										if (PreConnect)
+										{
+											if (m_desktop->m_server->IsEncoderSet()) m_desktop->m_buffer.WriteMessageOnScreenPreConnect();
+										}
 										else
+										{
+											if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver)
+											{
+												m_desktop->m_buffer.GrabRegion(rgncache, true, capture);
+											}
+											else
 											{
 												m_desktop->m_buffer.GrabRegion(rgncache,false,capture);
 											}
+										}
 /*#ifdef _DEBUG
 										char			szText[256];
 										sprintf(szText," capture %i\n",capture);
