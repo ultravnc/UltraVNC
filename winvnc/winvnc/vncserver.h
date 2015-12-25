@@ -380,6 +380,7 @@ public:
 	virtual void DisableCacheForAllClients();
 	virtual bool IsThereASlowClient();
 	virtual bool IsThereAUltraEncodingClient();
+	virtual bool IsEncoderSet();
 	virtual bool IsThereFileTransBusy();
 
 	// sf@2002 - Turbo Mode

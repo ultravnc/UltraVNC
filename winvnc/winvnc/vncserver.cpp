@@ -939,6 +939,23 @@ bool vncServer::IsThereAUltraEncodingClient()
 	return false;
 }
 
+bool vncServer::IsEncoderSet()
+{
+	vncClientList::iterator i;
+	bool fFound = false;
+	omni_mutex_lock l(m_clientsLock, 25);
+
+	for (i = m_authClients.begin(); i != m_authClients.end(); i++)
+	{
+		if (GetClient(*i)->IsEncoderSet())
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
 bool vncServer::IsThereFileTransBusy()
 {
 	vncClientList::iterator i;
