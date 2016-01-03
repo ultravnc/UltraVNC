@@ -102,13 +102,11 @@ DWORD GetCurrentConsoleSessionID()
 {
 	DWORD dwSessionId;
 	pWTSGetActiveConsoleSessionId WTSGetActiveConsoleSessionIdF = NULL;
-	WTSProcessIdToSessionIdF = NULL;
 
 	HMODULE  hlibkernel = LoadLibrary("kernel32.dll");
 	if (hlibkernel)
 	{
 		WTSGetActiveConsoleSessionIdF = (pWTSGetActiveConsoleSessionId)GetProcAddress(hlibkernel, "WTSGetActiveConsoleSessionId");
-		WTSProcessIdToSessionIdF = (pProcessIdToSessionId)GetProcAddress(hlibkernel, "ProcessIdToSessionId");
 	}
 	if (WTSGetActiveConsoleSessionIdF != NULL)
 		dwSessionId = WTSGetActiveConsoleSessionIdF();
