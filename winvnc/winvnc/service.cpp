@@ -1112,10 +1112,29 @@ void monitor_sessions_RDP()
 					//First RUN	
 					if (ProcessInfo.hProcess == NULL)
 					{
-						LaunchProcessWin(0, true);
-						OlddwSessionId = 0;
-						preconnect_start = false;
-						goto whileloop;
+						if (IsAnyRDPSessionActive())
+						{
+							LaunchProcessWin(0, true);
+							OlddwSessionId = 0;
+							preconnect_start = false;
+							goto whileloop;
+						}
+						else
+						{
+							dwSessionId = 0xFFFFFFFF;
+							int sessidcounter = 0;
+							while (dwSessionId == 0xFFFFFFFF)
+							{
+								if (lpfnWTSGetActiveConsoleSessionId.isValid()) dwSessionId = (*lpfnWTSGetActiveConsoleSessionId)();
+								Sleep(1000);
+								sessidcounter++;
+								if (sessidcounter > 10) break;
+							}
+							LaunchProcessWin(dwSessionId, false);
+							OlddwSessionId = dwSessionId;
+							preconnect_start = false;
+							goto whileloop;
+						}
 					}
 
 					if (preconnect_start==true) if(!IsSessionStillActive(OlddwSessionId)) SetEvent(hEvent);
