@@ -103,6 +103,7 @@ static void WINAPI service_main(DWORD argc, LPTSTR* argv) {
 		Restore_after_reboot();
 		IniFile myIniFile;
 		LONG L_rdpmode=0;
+#ifdef _RDPMODE L_rdpmode=1;
 		L_rdpmode = myIniFile.ReadInt("admin", "rdpmode", L_rdpmode);
 		RDPMODE = L_rdpmode; // 0 of 1
 		if (RDPMODE)monitor_sessions_RDP();
