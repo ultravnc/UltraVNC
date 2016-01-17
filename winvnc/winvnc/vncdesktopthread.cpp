@@ -694,7 +694,11 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 						{
 							vnclog.Print(LL_INTERR, VNCLOG("Format changed\n"));
 							m_server->UpdatePalette(false); // changed no lock ok
-							m_server->UpdateLocalFormat(false); // changed no lock ok
+							//UpdateLocalFormat without updatelock can cause stuck in m_signal->wait(), because not returning from mutex->lock()
+							//the synchonisation of EnableUpdates(TRUE|FALSE) does not work without getting the UpdateLock.
+							//this is a weakness in the vnc server implementation
+							//we had the problem on XP, running in a virtual machine of win7 virtualbox.
+							m_server->UpdateLocalFormat(true); // must have the update lock
 						}
 
 					if (screensize_changed) 
