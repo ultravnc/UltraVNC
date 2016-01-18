@@ -610,6 +610,22 @@ void ClientConnection::Run()
 // sf@2007 - Autoreconnect
 void ClientConnection::DoConnection()
 {
+	if (m_pDSMPlugin->IsEnabled())
+	{
+		if (!m_opts.m_NoStatus && !m_hwndStatus)
+			GTGBS_ShowConnectWindow();
+		int somethingwrong_counter = 0;
+		while (!m_hwndStatus)
+		{
+			Sleep(100);
+			somethingwrong_counter++;
+			if (somethingwrong_counter > 50) break;
+		}
+		if (m_hwndStatus)
+			SetDlgItemText(m_hwndStatus, IDC_PLUGIN_STATUS, "Encryption**");
+		if (m_hwndStatus) 
+			UpdateWindow(m_hwndStatus);
+	}
 	havetobekilled=true;
 	// Connect if we're not already connected
 	if (m_sock == INVALID_SOCKET)
@@ -1802,7 +1818,7 @@ void ClientConnection::Connect()
 {
 	struct sockaddr_in thataddr;
 	int res;
-	if (!m_opts.m_NoStatus) GTGBS_ShowConnectWindow();
+	if (!m_opts.m_NoStatus && !m_hwndStatus) GTGBS_ShowConnectWindow();
 	if (m_sock!=NULL && m_sock!=INVALID_SOCKET) closesocket(m_sock);
 	m_sock = socket(PF_INET, SOCK_STREAM, 0);
 	if (m_hwndStatus) SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L43);
@@ -1864,7 +1880,7 @@ void ClientConnection::ConnectProxy()
 {
 	struct sockaddr_in thataddr;
 	int res;
-	if (!m_opts.m_NoStatus) GTGBS_ShowConnectWindow();
+	if (!m_opts.m_NoStatus && !m_hwndStatus) GTGBS_ShowConnectWindow();
 
 	m_sock = socket(PF_INET, SOCK_STREAM, 0);
 	if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L43);
