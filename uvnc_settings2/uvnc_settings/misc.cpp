@@ -3,6 +3,7 @@
 
 
 extern LONG DisableTrayIcon;
+extern LONG Rdpmode;
 extern LONG DefaultScale;
 extern LONG Avilog;
 extern char path[512];
@@ -23,6 +24,7 @@ BOOL CALLBACK DlgProcMISC(HWND hwnd, UINT uMsg,
 		{	
 			initdone6=false;
 			SendMessage( GetDlgItem(hwnd, IDC_DISABLETRAY), BM_SETCHECK, DisableTrayIcon, 0);
+			SendMessage(GetDlgItem(hwnd, IDC_RDPMODE), BM_SETCHECK, Rdpmode, 0);
 			SendMessage( GetDlgItem(hwnd, IDC_KICKRDP), BM_SETCHECK, kickrdp, 0);
 			SendMessage( GetDlgItem(hwnd, IDC_DISINI), BM_SETCHECK, BUseRegistry, 0);
 			SetDlgItemInt(hwnd, IDC_SCALE, DefaultScale, false);
@@ -131,6 +133,7 @@ BOOL CALLBACK DlgProcMISC(HWND hwnd, UINT uMsg,
 		case IDOK:	
 			{
 				DisableTrayIcon=IsDlgButtonChecked(hwnd, IDC_DISABLETRAY);
+				Rdpmode = IsDlgButtonChecked(hwnd, IDC_RDPMODE);
 				BUseRegistry=IsDlgButtonChecked(hwnd, IDC_DISINI);
 				kickrdp=IsDlgButtonChecked(hwnd, IDC_KICKRDP);
 				DefaultScale=GetDlgItemInt(hwnd, IDC_SCALE, NULL, FALSE);

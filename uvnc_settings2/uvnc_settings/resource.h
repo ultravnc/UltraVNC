@@ -86,6 +86,7 @@
 #define IDC_WARN                        1071
 #define IDC_CHECK1                      1072
 #define IDC_MAXCPU                      1072
+#define IDC_RDPMODE                     1072
 #define IDC_DISINI                      1073
 #define IDC_CHECKUSEENCRYPTION          1074
 #define IDC_ALLOWEDIT                   1075
