@@ -518,6 +518,10 @@ vncProperties::DialogProc(HWND hwnd,
 		   BOOL fTrayicon = _this->m_server->GetDisableTrayIcon();
 		   SendMessage(hTrayicon, BM_SETCHECK, fTrayicon, 0);
 
+		   HWND hrdpmode = GetDlgItem(hwnd, IDC_RDPMODE);
+		   BOOL frdpmode = _this->m_server->GetRdpmode();
+		   SendMessage(hrdpmode, BM_SETCHECK, frdpmode, 0);
+
 		   HWND hAllowshutdown = GetDlgItem(hwnd, IDC_ALLOWSHUTDOWN);
 		   SendMessage(hAllowshutdown, BM_SETCHECK, !_this->m_allowshutdown , 0);
 
@@ -891,6 +895,7 @@ vncProperties::DialogProc(HWND hwnd,
 				_this->m_server->SetLoopbackOnly(IsDlgButtonChecked(hwnd, IDC_LOOPBACKONLY));
 
 				_this->m_server->SetDisableTrayIcon(IsDlgButtonChecked(hwnd, IDC_DISABLETRAY));
+				_this->m_server->SetRdpmode(IsDlgButtonChecked(hwnd, IDC_RDPMODE));
 				_this->m_allowshutdown=!IsDlgButtonChecked(hwnd, IDC_ALLOWSHUTDOWN);
 				_this->m_alloweditclients=!IsDlgButtonChecked(hwnd, IDC_ALLOWEDITCLIENTS);
 				_this->m_server->SetAllowEditClients(_this->m_alloweditclients);
@@ -1667,6 +1672,11 @@ vncProperties::Load(BOOL usersettings)
 
 	// Disable Tray Icon
 	m_server->SetDisableTrayIcon(LoadInt(hkLocal, "DisableTrayIcon", false));
+	LONG L_rdpmode = 0;
+#ifdef _RDPMODE 
+	L_rdpmode = 1;
+#endif
+	m_server->SetDisableTrayIcon(LoadInt(hkLocal, "rdpmode", L_rdpmode));
 
 	// Authentication required, loopback allowed, loopbackOnly
 
@@ -2107,6 +2117,7 @@ vncProperties::Save()
 		}
 
 	SaveInt(hkLocal, "DisableTrayIcon", m_server->GetDisableTrayIcon());
+	SaveInt(hkLocal, "rdpmode", m_server->GetRdpmode());
 	SaveInt(hkLocal, "MSLogonRequired", m_server->MSLogonRequired());
 	// Marscha@2004 - authSSP: save "New MS-Logon" state
 	SaveInt(hkLocal, "NewMSLogon", m_server->GetNewMSLogon());
@@ -2223,6 +2234,11 @@ void vncProperties::LoadFromIniFile()
 
 	// Disable Tray Icon
 	m_server->SetDisableTrayIcon(myIniFile.ReadInt("admin", "DisableTrayIcon", false));
+	LONG L_rdpmode = 0;
+#ifdef _RDPMODE 
+	L_rdpmode = 1;
+#endif
+	m_server->SetRdpmode(myIniFile.ReadInt("admin", "rdpmode", L_rdpmode));
 
 	// Authentication required, loopback allowed, loopbackOnly
 
@@ -2426,6 +2442,7 @@ void vncProperties::SaveToIniFile()
 				myIniFile.WriteInt("admin", "KeepAliveInterval", m_keepAliveInterval);
 				myIniFile.WriteInt("admin", "IdleInputTimeout", m_IdleInputTimeout);
 				myIniFile.WriteInt("admin", "DisableTrayIcon", m_server->GetDisableTrayIcon());
+				myIniFile.WriteInt("admin", "rdpmode", m_server->GetRdpmode());
 				myIniFile.WriteInt("admin", "MSLogonRequired", m_server->MSLogonRequired());
 				// Marscha@2004 - authSSP: save "New MS-Logon" state
 				myIniFile.WriteInt("admin", "NewMSLogon", m_server->GetNewMSLogon());
@@ -2450,6 +2467,7 @@ void vncProperties::SaveToIniFile()
     myIniFile.WriteInt("admin", "KeepAliveInterval", m_keepAliveInterval);
 	myIniFile.WriteInt("admin", "IdleInputTimeout", m_IdleInputTimeout);
 	myIniFile.WriteInt("admin", "DisableTrayIcon", m_server->GetDisableTrayIcon());
+	myIniFile.WriteInt("admin", "rdpmode", m_server->GetRdpmode());
 	myIniFile.WriteInt("admin", "MSLogonRequired", m_server->MSLogonRequired());
 	// Marscha@2004 - authSSP: save "New MS-Logon" state
 	myIniFile.WriteInt("admin", "NewMSLogon", m_server->GetNewMSLogon());

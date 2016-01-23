@@ -172,6 +172,7 @@
 #define IDC_JAP_INPUTS                  1122
 #define IDC_CHECK3                      1123
 #define IDC_EURO                        1123
+#define IDC_RDPMODE                     1123
 #define IDC_VIDEO                       1125
 #define IDC_BUTTON1                     1126
 #define IDC_CLEAR                       1126

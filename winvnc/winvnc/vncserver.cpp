@@ -172,6 +172,7 @@ vncServer::vncServer()
 	m_lock_on_exit = 0;
 	m_connect_pri = 0;
 	m_disableTrayIcon = FALSE;
+	m_Rdpmode = FALSE;
 	m_AllowEditClients = FALSE;
 
 	// Set the input options
@@ -2397,6 +2398,23 @@ vncServer::GetDisableTrayIcon()
 {
 	return m_disableTrayIcon;
 }
+
+BOOL
+vncServer::SetRdpmode(BOOL Rdpmode)
+{
+	if (Rdpmode != m_Rdpmode)
+	{
+		m_Rdpmode = Rdpmode;
+	}
+	return TRUE;
+}
+
+BOOL
+vncServer::GetRdpmode()
+{
+	return m_Rdpmode;
+}
+
 BOOL
 vncServer::SetAllowEditClients(BOOL AllowEditClients)
 {
