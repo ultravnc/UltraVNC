@@ -7587,7 +7587,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 
 				case WM_CLOSE:
 				{
-					{
+					if (wParam==0 && lParam==0){
 						MRU *m_pMRU;
 						m_pMRU = new MRU(SESSION_MRU_KEY_NAME, 26);
 						RECT rect;
