@@ -100,11 +100,12 @@ static void WINAPI service_main(DWORD argc, LPTSTR* argv) {
         SetServiceStatus(serviceStatusHandle, &serviceStatus);
 
 		Restore_after_reboot();
-		IniFile myIniFile;
-		bool  RDPMODE = true;
-		RDPMODE = myIniFile.ReadInt("admin", "rdpmode", 0);
-		if (RDPMODE)monitor_sessions_RDP();
-		else monitor_sessions();
+		//IniFile myIniFile;
+		//bool  RDPMODE = true;
+		//RDPMODE = myIniFile.ReadInt("admin", "rdpmode", 0);
+		//if (RDPMODE)
+			monitor_sessions_RDP();
+		//else monitor_sessions();
 
         /* service was stopped */
         serviceStatus.dwCurrentState=SERVICE_STOP_PENDING;
