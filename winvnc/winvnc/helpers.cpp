@@ -195,11 +195,7 @@ myIniFile_In.ReadString("admin", "path", path,512);
 myIniFile_In.ReadString("admin", "accept_reject_mesg", accept_reject_mesg,512);
 DebugLevel=myIniFile_In.ReadInt("admin", "DebugLevel", 0);
 DisableTrayIcon=myIniFile_In.ReadInt("admin", "DisableTrayIcon", false);
-LONG L_rdpmode = 0;
-#ifdef _RDPMODE 
-L_rdpmode = 1;
-#endif
-Rdpmode = myIniFile_In.ReadInt("admin", "rdpmode", L_rdpmode);
+Rdpmode = myIniFile_In.ReadInt("admin", "rdpmode", 0);
 LoopbackOnly=myIniFile_In.ReadInt("admin", "LoopbackOnly", false);
 
 myIniFile_Out.WriteInt("admin", "DebugMode", DebugMode);

@@ -46,7 +46,6 @@ char *app_name = "UltraVNC";
 void disconnect_remote_sessions();
 char cmdtext[256];
 extern int clear_console;
-extern bool  RDPMODE;
 
 bool IsWin2000()
 {
@@ -102,12 +101,8 @@ static void WINAPI service_main(DWORD argc, LPTSTR* argv) {
 
 		Restore_after_reboot();
 		IniFile myIniFile;
-		LONG L_rdpmode=0;
-#ifdef _RDPMODE 
-		L_rdpmode=1;
-#endif
-		L_rdpmode = myIniFile.ReadInt("admin", "rdpmode", L_rdpmode);
-		RDPMODE = L_rdpmode; // 0 of 1
+		bool  RDPMODE = true;
+		RDPMODE = myIniFile.ReadInt("admin", "rdpmode", 0);
 		if (RDPMODE)monitor_sessions_RDP();
 		else monitor_sessions();
 

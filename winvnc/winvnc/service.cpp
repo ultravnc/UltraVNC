@@ -51,8 +51,6 @@ extern char cmdtext[256];
 int kickrdp=0;
 int clear_console=0;
 bool W2K=0;
-
-bool  RDPMODE = true;
 //////////////////////////////////////////////////////////////////////////////
 #define MAXSTRLENGTH    255
 BOOL Char2Wchar(WCHAR* pDest, char* pSrc, int nDestStrLen)

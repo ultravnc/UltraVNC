@@ -1672,11 +1672,7 @@ vncProperties::Load(BOOL usersettings)
 
 	// Disable Tray Icon
 	m_server->SetDisableTrayIcon(LoadInt(hkLocal, "DisableTrayIcon", false));
-	LONG L_rdpmode = 0;
-#ifdef _RDPMODE 
-	L_rdpmode = 1;
-#endif
-	m_server->SetDisableTrayIcon(LoadInt(hkLocal, "rdpmode", L_rdpmode));
+	m_server->SetRdpmode(LoadInt(hkLocal, "rdpmode", 0));
 
 	// Authentication required, loopback allowed, loopbackOnly
 
@@ -2234,11 +2230,7 @@ void vncProperties::LoadFromIniFile()
 
 	// Disable Tray Icon
 	m_server->SetDisableTrayIcon(myIniFile.ReadInt("admin", "DisableTrayIcon", false));
-	LONG L_rdpmode = 0;
-#ifdef _RDPMODE 
-	L_rdpmode = 1;
-#endif
-	m_server->SetRdpmode(myIniFile.ReadInt("admin", "rdpmode", L_rdpmode));
+	m_server->SetRdpmode(myIniFile.ReadInt("admin", "rdpmode", 0));
 
 	// Authentication required, loopback allowed, loopbackOnly
 
