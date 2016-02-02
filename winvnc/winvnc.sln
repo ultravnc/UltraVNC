@@ -1,4 +1,3 @@
-﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "omnithread", "omnithread\omnithread.vcxproj", "{E52B9956-FE67-47F7-BC4F-67CC5A64B708}"
@@ -41,7 +40,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testauth", "..\addon\ms-log
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "workgrpdomnt4", "..\addon\ms-logon\workgrpdomnt4\workgrpdomnt4.vcxproj", "{8D7757CB-5125-4633-AFB1-4B30ED24955F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "uvnc_settings", "..\uvnc_settings\uvnc_settings\uvnc_settings.vcxproj", "{3B4D8565-E321-48B6-BF15-4EB7ADEC6BFC}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "uvnc_settings", "..\uvnc_settings2\uvnc_settings\uvnc_settings.vcxproj", "{3B4D8565-E321-48B6-BF15-4EB7ADEC6BFC}"
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "UltraVnc", "UltraVnc\UltraVnc_VS2010.vdproj", "{54ACD93D-E248-4E78-B193-9494E8D71FA5}"
 EndProject
