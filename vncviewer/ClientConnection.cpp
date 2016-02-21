@@ -62,9 +62,9 @@ extern "C" {
 
 #define INITIALNETBUFSIZE 4096
 #ifdef _XZ
-#define MAX_ENCODINGS (LASTENCODING+25)
+#define MAX_ENCODINGS (LASTENCODING+65)
 #else
-#define MAX_ENCODINGS (LASTENCODING+10)
+#define MAX_ENCODINGS (LASTENCODING+50)
 #endif
 #define VWR_WND_CLASS_NAME _T("VNCviewer")
 #define VWR_WND_CLASS_NAME_VIEWER _T("VNCviewerwindow")
