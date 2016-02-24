@@ -287,7 +287,10 @@ void VNCOptions::GetDefaultOptionsFileName(TCHAR *optionfile)
 	HANDLE m_hDestFile = CreateFile(szFileName, GENERIC_WRITE | GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, FILE_FLAG_SEQUENTIAL_SCAN, NULL);
 	bool fAlreadyExists = (GetLastError() == ERROR_ALREADY_EXISTS);
 	if (fAlreadyExists)
+	{
+		CloseHandle(m_hDestFile);
 		m_hDestFile = CreateFile(szFileName, GENERIC_WRITE | GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, NULL);
+	}
 
 	if (m_hDestFile != INVALID_HANDLE_VALUE)
 	{ 
