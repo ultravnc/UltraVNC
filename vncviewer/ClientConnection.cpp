@@ -717,6 +717,8 @@ void ClientConnection::Reconnect()
 HWND ClientConnection::GTGBS_ShowConnectWindow()
 {
 	DWORD				  threadID;
+	if (m_statusThread) CloseHandle(m_statusThread);
+	m_statusThread = NULL;
 	m_statusThread = CreateThread(NULL,0,(LPTHREAD_START_ROUTINE )ClientConnection::GTGBS_ShowStatusWindow,(LPVOID)this,0,&threadID);
 	if (m_statusThread) ResumeThread(m_statusThread);
 	return (HWND)0;
@@ -1855,6 +1857,13 @@ void ClientConnection::Connect()
 	thataddr.sin_port = htons(m_port);
 	///Force break after timeout
 	DWORD				  threadID;
+	if (ThreadSocketTimeout)
+	{
+		havetobekilled = false; //force SocketTimeout thread to quit
+		WaitForSingleObject(ThreadSocketTimeout, 5000);
+		CloseHandle(ThreadSocketTimeout);
+		ThreadSocketTimeout = NULL;
+	}
 	ThreadSocketTimeout = CreateThread(NULL,0,SocketTimeout,(LPVOID)&m_sock,0,&threadID);
 	res = connect(m_sock, (LPSOCKADDR) &thataddr, sizeof(thataddr));
 
@@ -1916,6 +1925,13 @@ void ClientConnection::ConnectProxy()
 	thataddr.sin_port = htons(m_proxyport);
 
 	DWORD				  threadID;
+	if (ThreadSocketTimeout)
+	{
+		havetobekilled = false; //force SocketTimeout thread to quit
+		WaitForSingleObject(ThreadSocketTimeout, 5000);
+		CloseHandle(ThreadSocketTimeout);
+		ThreadSocketTimeout = NULL;
+	}
 	ThreadSocketTimeout = CreateThread(NULL,0,SocketTimeout,(LPVOID)&m_sock,0,&threadID);
 
 	res = connect(m_sock, (LPSOCKADDR) &thataddr, sizeof(thataddr));
@@ -3600,6 +3616,7 @@ void ClientConnection::Createdib()
 	m_membitmap = CreateDIBSection(m_hmemdc, (BITMAPINFO*)&bi.bmiHeader, iUsage, &m_DIBbits, NULL, 0);
 	memset((char*)m_DIBbits,128,bi.bmiHeader.biSizeImage);
 
+	{
 	ObjectSelector bb(m_hmemdc, m_membitmap);
 
 	if (m_myFormat.bitsPerPixel==8 && m_myFormat.trueColour)
@@ -3632,6 +3649,7 @@ void ClientConnection::Createdib()
 		m_DIBbitsCache= new BYTE[Pitch*m_si.framebufferHeight];
 		vnclog.Print(0, _T("Cache: Cache buffer bitmap creation\n"));
 	}
+	}
 	if (m_opts.m_Directx && (m_myFormat.bitsPerPixel==32 || m_myFormat.bitsPerPixel==16))
 	if (!FAILED(directx_output.InitD3D(m_hwndcn,m_hwndMain, m_si.framebufferWidth, m_si.framebufferHeight, false,m_myFormat.bitsPerPixel,m_myFormat.redShift)))
 			{
@@ -3642,8 +3660,9 @@ void ClientConnection::Createdib()
 						m_myFormat.greenShift=(CARD8)directx_output.m_directxformat.greenShift;
 						m_myFormat.blueShift=(CARD8)directx_output.m_directxformat.blueShift;
 
-						if (m_hmemdc != NULL) {DeleteDC(m_hmemdc);m_hmemdc = NULL;m_DIBbits=NULL;}
 						if (m_membitmap != NULL) {DeleteObject(m_membitmap);m_membitmap= NULL;}
+						if (m_hmemdc != NULL) {DeleteDC(m_hmemdc);m_hmemdc = NULL;m_DIBbits=NULL;}
+						
 					}
 				else
 					{
@@ -8147,6 +8166,8 @@ LRESULT CALLBACK ClientConnection::WndProcTBwin(HWND hwnd, UINT iMsg, WPARAM wPa
 					}else{
 						SECURITY_ATTRIBUTES   lpSec;
 						DWORD				  threadID;
+						if (_this->m_statusThread) CloseHandle(_this->m_statusThread);
+						_this->m_statusThread = NULL;
 						_this->m_statusThread = CreateThread(NULL,0,(LPTHREAD_START_ROUTINE )ClientConnection::GTGBS_ShowStatusWindow,(LPVOID)_this,0,&threadID);
 					}
 					return 0;
