@@ -808,6 +808,7 @@ vncEncodeMgr::EncodeRect(const rfb::Rect &rect,VSocket *outconn)
 	{
 		if (m_use_xor)
 		{
+		omni_mutex_lock l(m_buffer->m_cacheLock, 671);
 		return m_encoder->EncodeRect(m_buffer->m_backbuff, m_buffer->m_cachebuff, outconn ,m_clientbuff, rect);
 		}
 		else return m_encoder->EncodeRect(m_buffer->m_backbuff, NULL, outconn ,m_clientbuff, rect);
