@@ -5778,9 +5778,9 @@ BOOL vncClient::SendCacheZip(const rfb::RectVector &rects)
 			delete [] m_pCacheZipBuf;
 			m_pCacheZipBuf = NULL;
 		}
-		m_pCacheZipBuf = new BYTE [maxCompSize+1];
+		m_pCacheZipBuf = new BYTE [maxCompSize+1000];
 		if (m_pCacheZipBuf == NULL) return 0;
-		m_nCacheZipBufSize = maxCompSize;
+		m_nCacheZipBufSize = maxCompSize+999;
 	}
 
 	int nRet = compress((unsigned char*)(m_pCacheZipBuf),
