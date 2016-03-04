@@ -1,53 +1,79 @@
-                wxWindows Library Licence, Version 3.1
-                ======================================
+libjpeg-turbo Licenses
+----------------------
 
-  Copyright (C) 1998-2005 Julian Smart, Robert Roebling et al
+libjpeg-turbo is covered by three compatible BSD-style open source licenses:
 
-  Everyone is permitted to copy and distribute verbatim copies
-  of this licence document, but changing it is not allowed.
+-- The IJG (Independent JPEG Group) License, which is listed in README
 
-                       WXWINDOWS LIBRARY LICENCE
-     TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
-  
-  This library is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Library General Public Licence as published by
-  the Free Software Foundation; either version 2 of the Licence, or (at
-  your option) any later version.
-  
-  This library is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Library
-  General Public Licence for more details.
+   This license applies to the libjpeg API library and associated programs
+   (any code inherited from libjpeg, and any modifications to that code.)
 
-  You should have received a copy of the GNU Library General Public Licence
-  along with this software, usually in a file named COPYING.LIB.  If not,
-  write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
-  Boston, MA 02111-1307 USA.
+-- The Modified (3-clause) BSD License, which is listed in turbojpeg.c
 
-  EXCEPTION NOTICE
+   This license covers the TurboJPEG API library and associated programs.
 
-  1. As a special exception, the copyright holders of this library give
-  permission for additional uses of the text contained in this release of
-  the library as licenced under the wxWindows Library Licence, applying
-  either version 3.1 of the Licence, or (at your option) any later version of
-  the Licence as published by the copyright holders of version
-  3.1 of the Licence document.
+-- The zlib License, which is listed in simd/jsimdext.inc
 
-  2. The exception is that you may use, copy, link, modify and distribute
-  under your own terms, binary object code versions of works based
-  on the Library.
-
-  3. If you copy code from files distributed under the terms of the GNU
-  General Public Licence or the GNU Library General Public Licence into a
-  copy of this library, as this licence permits, the exception does not
-  apply to the code that you add in this way.  To avoid misleading anyone as
-  to the status of such modified files, you must delete this exception
-  notice from such code and/or adjust the licensing conditions notice
-  accordingly.
-
-  4. If you write modifications of your own for this library, it is your
-  choice whether to permit this exception to apply to your modifications. 
-  If you do not wish that, you must delete the exception notice from such
-  code and/or adjust the licensing conditions notice accordingly.
+   This license is a subset of the other two, and it covers the libjpeg-turbo
+   SIMD extensions.
 
 
+Complying with the libjpeg-turbo Licenses
+-----------------------------------------
+
+This section provides a roll-up of the libjpeg-turbo licensing terms, to the
+best of our understanding.
+
+1.  If you are distributing a modified version of the libjpeg-turbo source,
+    then:
+
+    a.  You cannot alter or remove any existing copyright or license notices
+        from the source.
+
+        Origin:  Clause 1 of the IJG License
+                 Clause 1 of the Modified BSD License
+                 Clauses 1 and 3 of the zlib License
+
+    b.  You must add your own copyright notice to the header of each source
+        file you modified, so others can tell that you modified that file (if
+        there is not an existing copyright header in that file, then you can
+        simply add a notice stating that you modified the file.)
+
+        Origin:  Clause 1 of the IJG License
+                 Clause 2 of the zlib License
+
+    c.  You must include the IJG README file, and you must not alter any of the
+        copyright or license text in that file.
+
+        Origin:  Clause 1 of the IJG License
+
+2.  If you are distributing only libjpeg-turbo binaries without the source, or
+    if you are distributing an application that statically links with
+    libjpeg-turbo, then:
+
+    a.  Your product documentation must include a message stating:
+
+        This software is based in part on the work of the Independent JPEG
+        Group.
+
+        Origin:  Clause 2 of the IJG license
+
+    b.  If your binary distribution includes or uses the TurboJPEG API, then
+        your product documentation must include the text of the Modified BSD
+        License.
+
+        Origin:  Clause 2 of the Modified BSD License
+
+3.  You cannot use the name of the IJG or The libjpeg-turbo Project or the
+    contributors thereof in advertising, publicity, etc.
+
+    Origin:  IJG License
+             Clause 3 of the Modified BSD License
+
+4.  The IJG and The libjpeg-turbo Project do not warrant libjpeg-turbo to be
+    free of defects, nor do we accept any liability for undesirable
+    consequences resulting from your use of the software.
+
+    Origin:  IJG License
+             Modified BSD License
+             zlib License

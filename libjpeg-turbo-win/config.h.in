@@ -1,6 +1,9 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
-/* Build number */
+/* use 8 or 12 */
+#undef BITS_IN_JSAMPLE
+
+/* libjpeg-turbo build number */
 #undef BUILD
 
 /* Support arithmetic encoding */
@@ -18,6 +21,9 @@
 /* Define to 1 if you have the <jni.h> header file. */
 #undef HAVE_JNI_H
 
+/* Define to 1 if you have the <locale.h> header file. */
+#undef HAVE_LOCALE_H
+
 /* Define to 1 if you have the `memcpy' function. */
 #undef HAVE_MEMCPY
 
@@ -26,9 +32,6 @@
 
 /* Define to 1 if you have the `memset' function. */
 #undef HAVE_MEMSET
-
-/* Define if your compiler supports prototypes */
-#undef HAVE_PROTOTYPES
 
 /* Define to 1 if you have the <stddef.h> header file. */
 #undef HAVE_STDDEF_H
@@ -72,16 +75,17 @@
 /* libjpeg-turbo version */
 #undef LIBJPEG_TURBO_VERSION
 
+/* Define to the sub-directory where libtool stores uninstalled libraries. */
+#undef LT_OBJDIR
+
 /* Support in-memory source/destination managers */
 #undef MEM_SRCDST_SUPPORTED
 
-/* Define if you have BSD-like bzero and bcopy */
+/* Define if you have BSD-like bzero and bcopy in <strings.h> rather than
+   memset/memcpy in <string.h>. */
 #undef NEED_BSD_STRINGS
 
-/* Define if you need short function names */
-#undef NEED_SHORT_EXTERNAL_NAMES
-
-/* Define if you have sys/types.h */
+/* Define if you need to include <sys/types.h> to get size_t. */
 #undef NEED_SYS_TYPES_H
 
 /* Name of package */
@@ -99,11 +103,18 @@
 /* Define to the one symbol short name of this package. */
 #undef PACKAGE_TARNAME
 
+/* Define to the home page for this package. */
+#undef PACKAGE_URL
+
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
-/* Define if shift is unsigned */
+/* Define if your (broken) compiler shifts signed values as if they were
+   unsigned. */
 #undef RIGHT_SHIFT_IS_UNSIGNED
+
+/* The size of `size_t', as computed by sizeof. */
+#undef SIZEOF_SIZE_T
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
@@ -128,5 +139,5 @@
 #undef inline
 #endif
 
-/* Define to `unsigned' if <sys/types.h> does not define. */
+/* Define to `unsigned int' if <sys/types.h> does not define. */
 #undef size_t

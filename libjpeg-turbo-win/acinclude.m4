@@ -40,7 +40,7 @@ case "$host_os" in
         ;;
     esac
   ;;
-  freebsd* | netbsd* | openbsd*)
+  kfreebsd* | freebsd* | netbsd* | openbsd*)
     if echo __ELF__ | $CC -E - | grep __ELF__ > /dev/null; then
       objfmt='BSD-a.out'
     else
@@ -144,26 +144,91 @@ AC_DEFUN([AC_CHECK_COMPATIBLE_ARM_ASSEMBLER_IFELSE],[
   ac_save_CFLAGS="$CFLAGS"
   CFLAGS="$CCASFLAGS -x assembler-with-cpp"
   CC="$CCAS"
-  AC_COMPILE_IFELSE([[
+  AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
     .text
     .fpu neon
     .arch armv7a
     .object_arch armv4
     .arm
     pld [r0]
-    vmovn.u16 d0, q0]], ac_good_gnu_arm_assembler=yes)
+    vmovn.u16 d0, q0]])], ac_good_gnu_arm_assembler=yes)
 
   ac_use_gas_preprocessor=no
   if test "x$ac_good_gnu_arm_assembler" = "xno" ; then
     CC="gas-preprocessor.pl $CCAS"
-    AC_COMPILE_IFELSE([[
+    AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
       .text
       .fpu neon
       .arch armv7a
       .object_arch armv4
       .arm
       pld [r0]
-      vmovn.u16 d0, q0]], ac_use_gas_preprocessor=yes)
+      vmovn.u16 d0, q0]])], ac_use_gas_preprocessor=yes)
+  fi
+  CFLAGS="$ac_save_CFLAGS"
+  CC="$ac_save_CC"
+
+  if test "x$ac_use_gas_preprocessor" = "xyes" ; then
+    CCAS="gas-preprocessor.pl $CCAS"
+    AC_SUBST([CCAS])
+    ac_good_gnu_arm_assembler=yes
+  fi
+
+  if test "x$ac_good_gnu_arm_assembler" = "xyes" ; then
+    $1
+  else
+    $2
+  fi
+])
+
+# AC_CHECK_COMPATIBLE_MIPSEL_ASSEMBLER_IFELSE
+# --------------------------
+# Test whether the assembler is suitable and supports MIPS instructions
+AC_DEFUN([AC_CHECK_COMPATIBLE_MIPS_ASSEMBLER_IFELSE],[
+  have_mips_dspr2=no
+  ac_save_CFLAGS="$CFLAGS"
+  CFLAGS="$CCASFLAGS -mdspr2"
+
+  AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
+
+  int main ()
+  {
+    int c = 0, a = 0, b = 0;
+    __asm__ __volatile__ (
+        "precr.qb.ph %[c], %[a], %[b]          \n\t"
+        : [c] "=r" (c)
+        : [a] "r" (a), [b] "r" (b)
+    );
+    return c;
+  }
+  ]])], have_mips_dspr2=yes)
+  CFLAGS=$ac_save_CFLAGS
+
+  if test "x$have_mips_dspr2" = "xyes" ; then
+    $1
+  else
+    $2
+  fi
+])
+
+AC_DEFUN([AC_CHECK_COMPATIBLE_ARM64_ASSEMBLER_IFELSE],[
+  ac_good_gnu_arm_assembler=no
+  ac_save_CC="$CC"
+  ac_save_CFLAGS="$CFLAGS"
+  CFLAGS="$CCASFLAGS -x assembler-with-cpp"
+  CC="$CCAS"
+  AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
+    .text
+    .arch armv8-a+fp+simd
+    movi v0.16b, #100]])], ac_good_gnu_arm_assembler=yes)
+
+  ac_use_gas_preprocessor=no
+  if test "x$ac_good_gnu_arm_assembler" = "xno" ; then
+    CC="gas-preprocessor.pl $CCAS"
+    AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
+      .text
+      .arch armv8-a+fp+simd
+      movi v0.16b, #100]])], ac_use_gas_preprocessor=yes)
   fi
   CFLAGS="$ac_save_CFLAGS"
   CC="$ac_save_CC"

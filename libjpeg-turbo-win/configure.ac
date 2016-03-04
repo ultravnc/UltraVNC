@@ -2,24 +2,28 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.56])
-AC_INIT([libjpeg-turbo], [1.3.0])
-BUILD=`date +%Y%m%d`
+AC_INIT([libjpeg-turbo], [1.4.2])
 
 AM_INIT_AUTOMAKE([-Wall foreign dist-bzip2])
 AC_PREFIX_DEFAULT(/opt/libjpeg-turbo)
 
-# Always build with prototypes
-AC_DEFINE([HAVE_PROTOTYPES], 1, [Define if your compiler supports prototypes])
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 # Checks for programs.
 SAVED_CFLAGS=${CFLAGS}
 SAVED_CPPFLAGS=${CPPFLAGS}
 AC_PROG_CPP
 AC_PROG_CC
+m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 AM_PROG_AS
+AM_PROG_CC_C_O
 AC_PROG_INSTALL
 AC_PROG_LIBTOOL
 AC_PROG_LN_S
+
+AC_ARG_WITH([build-date], [Use custom build string to enable reproducible builds (default: YYMMDD)],
+  [BUILD="$with_build_date"],
+  [BUILD=`date +%Y%m%d`])
 
 # When the prefix is /opt/libjpeg-turbo, we assume that an "official" binary is
 # being created, and thus we install things into specific locations.
@@ -38,11 +42,18 @@ DATADIR=`eval echo $DATADIR`
 if test "$DATADIR" = "/opt/libjpeg-turbo/share"; then
   datarootdir='${prefix}'
 fi
+DOCDIR=`eval echo ${docdir}`
+DOCDIR=`eval echo $DOCDIR`
+if test "$DOCDIR" = "/opt/libjpeg-turbo/doc/libjpeg-turbo"; then
+  docdir='${datadir}/doc'
+fi
 
 old_exec_prefix=${exec_prefix}
 if test "x$exec_prefix" = "xNONE"; then
   exec_prefix=${prefix}
 fi
+
+AC_CHECK_SIZEOF(size_t)
 
 if test "x${libdir}" = 'x${exec_prefix}/lib' -o "x${libdir}" = 'x${prefix}/lib'; then
   LIBDIR=`eval echo ${libdir}`
@@ -52,14 +63,11 @@ if test "x${libdir}" = 'x${exec_prefix}/lib' -o "x${libdir}" = 'x${prefix}/lib';
       darwin*)
         ;;
       *)
-        case "$host_cpu" in
-          x86_64 | amd64)
-            libdir='${exec_prefix}/lib64'
-            ;;
-          i*86 | x86 | ia32)
-            libdir='${exec_prefix}/lib32'
-            ;;
-        esac
+        if test "${ac_cv_sizeof_size_t}" = "8"; then
+          libdir='${exec_prefix}/lib64'
+        elif test "${ac_cv_sizeof_size_t}" = "4"; then
+          libdir='${exec_prefix}/lib32'
+        fi
         ;;
     esac
   fi
@@ -95,9 +103,9 @@ fi
 
 # Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS([stddef.h stdlib.h string.h])
+AC_CHECK_HEADERS([stddef.h stdlib.h locale.h string.h])
 AC_CHECK_HEADER([sys/types.h],
-  AC_DEFINE([NEED_SYS_TYPES_H], 1, [Define if you have sys/types.h]))
+  AC_DEFINE([NEED_SYS_TYPES_H], 1, [Define if you need to include <sys/types.h> to get size_t.]))
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -129,24 +137,15 @@ AC_TRY_RUN(
      exit(is_shifting_signed(-0x7F7E80B1L));
    }],
   [AC_MSG_RESULT(no)
-   AC_DEFINE([RIGHT_SHIFT_IS_UNSIGNED], 1, [Define if shift is unsigned])],
+   AC_DEFINE([RIGHT_SHIFT_IS_UNSIGNED], 1,
+     [Define if your (broken) compiler shifts signed values as if they were unsigned.])],
   [AC_MSG_RESULT(yes)],
   [AC_MSG_RESULT(Assuming that right shift is signed on target machine.)])
-
-# test whether global names are unique to at least 15 chars
-AC_MSG_CHECKING([for short external names])
-AC_TRY_LINK(
-  [int possibly_duplicate_function () { return 0; }
-   int possibly_dupli_function () { return 1; }], [ ],
-  [AC_MSG_RESULT(ok)],
-  [AC_MSG_RESULT(short)
-   AC_DEFINE([NEED_SHORT_EXTERNAL_NAMES], 1,
-     [Define if you need short function names])])
 
 # Checks for library functions.
 AC_CHECK_FUNCS([memset memcpy], [],
   [AC_DEFINE([NEED_BSD_STRINGS], 1,
-     [Define if you have BSD-like bzero and bcopy])])
+     [Define if you have BSD-like bzero and bcopy in <strings.h> rather than memset/memcpy in <string.h>.])])
 
 AC_MSG_CHECKING([libjpeg API version])
 AC_ARG_VAR(JPEG_LIB_VERSION, [libjpeg API version (62, 70, or 80)])
@@ -237,13 +236,13 @@ VERS_1 {
   global: *;
 };
 EOF
-AC_LINK_IFELSE(AC_LANG_PROGRAM([], []),
+AC_LINK_IFELSE([AC_LANG_PROGRAM([], [])],
   [VERSION_SCRIPT_FLAG=-Wl,--version-script,;
    AC_MSG_RESULT([yes (GNU style)])],
   [])
 if test "x$VERSION_SCRIPT_FLAG" = "x"; then
   LDFLAGS="$SAVED_LDFLAGS -Wl,-M,conftest.map"
-  AC_LINK_IFELSE(AC_LANG_PROGRAM([], []),
+  AC_LINK_IFELSE([AC_LANG_PROGRAM([], [])],
     [VERSION_SCRIPT_FLAG=-Wl,-M,;
      AC_MSG_RESULT([yes (Sun style)])],
     [])
@@ -263,8 +262,8 @@ AC_SUBST(VERSION_SCRIPT_FLAG)
 # Check for non-broken inline under various spellings
 AC_MSG_CHECKING(for inline)
 ljt_cv_inline=""
-AC_TRY_COMPILE(, [} __attribute__((always_inline)) int foo() { return 0; }
-int bar() { return foo();], ljt_cv_inline="__attribute__((always_inline))",
+AC_TRY_COMPILE(, [} inline __attribute__((always_inline)) int foo() { return 0; }
+int bar() { return foo();], ljt_cv_inline="inline __attribute__((always_inline))",
 AC_TRY_COMPILE(, [} __inline__ int foo() { return 0; }
 int bar() { return foo();], ljt_cv_inline="__inline__",
 AC_TRY_COMPILE(, [} __inline int foo() { return 0; }
@@ -279,6 +278,9 @@ AC_MSG_CHECKING([whether to include arithmetic encoding support])
 AC_ARG_WITH([arith-enc],
   AC_HELP_STRING([--without-arith-enc],
     [Do not include arithmetic encoding support]))
+if test "x$with_12bit" = "xyes"; then
+  with_arith_enc=no
+fi
 if test "x$with_arith_enc" = "xno"; then
   AC_MSG_RESULT(no)
   RPM_CONFIG_ARGS="$RPM_CONFIG_ARGS --without-arith-enc"
@@ -292,6 +294,9 @@ AC_MSG_CHECKING([whether to include arithmetic decoding support])
 AC_ARG_WITH([arith-dec],
   AC_HELP_STRING([--without-arith-dec],
     [Do not include arithmetic decoding support]))
+if test "x$with_12bit" = "xyes"; then
+  with_arith_dec=no
+fi
 if test "x$with_arith_dec" = "xno"; then
   AC_MSG_RESULT(no)
   RPM_CONFIG_ARGS="$RPM_CONFIG_ARGS --without-arith-dec"
@@ -304,11 +309,26 @@ AM_CONDITIONAL([WITH_ARITH_DEC], [test "x$with_arith_dec" != "xno"])
 AM_CONDITIONAL([WITH_ARITH],
   [test "x$with_arith_dec" != "xno" -o "x$with_arith_enc" != "xno"])
 
+# 12-bit component support
+AC_MSG_CHECKING([whether to use 12-bit samples])
+AC_ARG_WITH([12bit],
+  AC_HELP_STRING([--with-12bit], [Encode/decode JPEG images with 12-bit samples (implies --without-simd --without-turbojpeg --without-arith-dec --without-arith-enc)]))
+if test "x$with_12bit" = "xyes"; then
+  AC_DEFINE([BITS_IN_JSAMPLE], [12], [use 8 or 12])
+  AC_MSG_RESULT(yes)
+else
+  AC_MSG_RESULT(no)
+fi
+AM_CONDITIONAL([WITH_12BIT], [test "x$with_12bit" = "xyes"])
+
 # TurboJPEG support
 AC_MSG_CHECKING([whether to build TurboJPEG C wrapper])
 AC_ARG_WITH([turbojpeg],
   AC_HELP_STRING([--without-turbojpeg],
     [Do not include the TurboJPEG wrapper library and associated test programs]))
+if test "x$with_12bit" = "xyes"; then
+  with_turbojpeg=no
+fi
 if test "x$with_turbojpeg" = "xno"; then
   AC_MSG_RESULT(no)
   RPM_CONFIG_ARGS="$RPM_CONFIG_ARGS --without-turbojpeg"
@@ -340,7 +360,7 @@ AC_ARG_VAR(JNI_CFLAGS,
 AC_MSG_CHECKING([whether to build TurboJPEG Java wrapper])
 AC_ARG_WITH([java],
   AC_HELP_STRING([--with-java], [Build Java wrapper for the TurboJPEG library]))
-if test "x$with_turbojpeg" = "xno"; then
+if test "x$with_12bit" = "xyes" -o "x$with_turbojpeg" = "xno"; then
   with_java=no
 fi
 
@@ -401,7 +421,14 @@ fi
 # SIMD is optional
 AC_ARG_WITH([simd],
   AC_HELP_STRING([--without-simd], [Do not include SIMD extensions]))
+if test "x$with_12bit" = "xyes"; then
+  with_simd=no
+fi
 if test "x${with_simd}" != "xno"; then
+  require_simd=no
+  if test "x${with_simd}" = "xyes"; then
+    require_simd=yes
+  fi
   # Check if we're on a supported CPU
   AC_MSG_CHECKING([if we have SIMD optimisations for cpu type])
   case "$host_cpu" in
@@ -419,16 +446,66 @@ if test "x${with_simd}" != "xno"; then
       AC_MSG_RESULT([yes (arm)])
       AC_MSG_CHECKING([if the assembler is GNU-compatible and can be used])
       AC_CHECK_COMPATIBLE_ARM_ASSEMBLER_IFELSE(
-        [AC_MSG_RESULT([yes])
+        [if test "x$ac_use_gas_preprocessor" = "xyes"; then
+           AC_MSG_RESULT([yes (with gas-preprocessor)])
+         else
+           AC_MSG_RESULT([yes])
+         fi
          simd_arch=arm],
         [AC_MSG_RESULT([no])
-         with_simd=no
-         AC_MSG_WARN([SIMD support can't be enabled.  Performance will suffer.])])
+         with_simd=no])
+      if test "x${with_simd}" = "xno"; then
+        if test "x${require_simd}" = "xyes"; then
+          AC_MSG_ERROR([SIMD support can't be enabled.])
+        else
+          AC_MSG_WARN([SIMD support can't be enabled.  Performance will suffer.])
+        fi
+      fi
+      ;;
+    aarch64*)
+      AC_MSG_RESULT([yes (arm64)])
+      AC_MSG_CHECKING([if the assembler is GNU-compatible and can be used])
+      AC_CHECK_COMPATIBLE_ARM64_ASSEMBLER_IFELSE(
+        [if test "x$ac_use_gas_preprocessor" = "xyes"; then
+           AC_MSG_RESULT([yes (with gas-preprocessor)])
+         else
+           AC_MSG_RESULT([yes])
+         fi
+         simd_arch=aarch64],
+        [AC_MSG_RESULT([no])
+         with_simd=no])
+      if test "x${with_simd}" = "xno"; then
+        if test "x${require_simd}" = "xyes"; then
+          AC_MSG_ERROR([SIMD support can't be enabled.])
+        else
+          AC_MSG_WARN([SIMD support can't be enabled.  Performance will suffer.])
+        fi
+      fi
+      ;;
+    mips*)
+      AC_MSG_RESULT([yes (mips)])
+      AC_MSG_CHECKING([if the assembler is GNU-compatible and can be used])
+      AC_CHECK_COMPATIBLE_MIPS_ASSEMBLER_IFELSE(
+        [AC_MSG_RESULT([yes])
+         simd_arch=mips],
+        [AC_MSG_RESULT([no])
+         with_simd=no])
+      if test "x${with_simd}" = "xno"; then
+        if test "x${require_simd}" = "xyes"; then
+          AC_MSG_ERROR([SIMD support can't be enabled.])
+        else
+          AC_MSG_WARN([SIMD support can't be enabled.  Performance will suffer.])
+        fi
+      fi
       ;;
     *)
       AC_MSG_RESULT([no ("$host_cpu")])
-      AC_MSG_WARN([SIMD support not available for this CPU.  Performance will suffer.])
       with_simd=no;
+      if test "x${require_simd}" = "xyes"; then
+        AC_MSG_ERROR([SIMD support not available for this CPU.])
+      else
+        AC_MSG_WARN([SIMD support not available for this CPU.  Performance will suffer.])
+      fi
       ;;
   esac
 
@@ -444,6 +521,8 @@ AM_CONDITIONAL([WITH_SSE_FLOAT_DCT], [test "x$simd_arch" = "xx86_64" -o "x$simd_
 AM_CONDITIONAL([SIMD_I386], [test "x$simd_arch" = "xi386"])
 AM_CONDITIONAL([SIMD_X86_64], [test "x$simd_arch" = "xx86_64"])
 AM_CONDITIONAL([SIMD_ARM], [test "x$simd_arch" = "xarm"])
+AM_CONDITIONAL([SIMD_ARM_64], [test "x$simd_arch" = "xaarch64"])
+AM_CONDITIONAL([SIMD_MIPS], [test "x$simd_arch" = "xmips"])
 AM_CONDITIONAL([X86_64], [test "x$host_cpu" = "xx86_64" -o "x$host_cpu" = "xamd64"])
 AM_CONDITIONAL([WITH_TURBOJPEG], [test "x$with_turbojpeg" != "xno"])
 
@@ -462,26 +541,35 @@ case "$host_cpu" in
     RPMARCH=i386
     DEBARCH=i386
     ;;
+  *)
+    RPMARCH=`uname -m`
+    DEBARCH=$RPMARCH
+    ;;
 esac
+
+if test "${docdir}" = ""; then
+  docdir=${datadir}/doc
+  AC_SUBST(docdir)
+fi
 
 AC_SUBST(RPMARCH)
 AC_SUBST(RPM_CONFIG_ARGS)
 AC_SUBST(DEBARCH)
 AC_SUBST(BUILD)
-AC_DEFINE_UNQUOTED([BUILD], "$BUILD", [Build number])
+AC_DEFINE_UNQUOTED([BUILD], "$BUILD", [libjpeg-turbo build number])
 
-# jconfig.h is the file we use, but we have another before that to
-# fool autoheader. the reason is that we include this header in our
-# API headers, which can screw things up for users of the lib.
-# jconfig.h is a minimal version that allows this package to be built
+# NOTE: autoheader automatically modifies the input file of the first
+# invocation of AC_CONFIG_HEADERS, so we put config.h first to prevent
+# jconfig.h.in from being clobbered.  config.h is used only internally, whereas
+# jconfig.h contains macros that are relevant to external programs (macros that
+# specify which features were built into the library.)
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_HEADERS([jconfig.h])
+AC_CONFIG_HEADERS([jconfigint.h])
 AC_CONFIG_FILES([pkgscripts/libjpeg-turbo.spec.tmpl:release/libjpeg-turbo.spec.in])
 AC_CONFIG_FILES([pkgscripts/makecygwinpkg.tmpl:release/makecygwinpkg.in])
 AC_CONFIG_FILES([pkgscripts/makedpkg.tmpl:release/makedpkg.in])
 AC_CONFIG_FILES([pkgscripts/makemacpkg.tmpl:release/makemacpkg.in])
-AC_CONFIG_FILES([pkgscripts/Description.plist:release/Description.plist.in])
-AC_CONFIG_FILES([pkgscripts/Info.plist:release/Info.plist.in])
 AC_CONFIG_FILES([pkgscripts/uninstall.tmpl:release/uninstall.in])
 if test "x$with_turbojpeg" != "xno"; then
   AC_CONFIG_FILES([tjbenchtest])

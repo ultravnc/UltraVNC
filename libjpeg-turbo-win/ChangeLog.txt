@@ -1,3 +1,327 @@
+1.4.2
+=====
+
+[1] Fixed an issue whereby cjpeg would segfault if a Windows bitmap with a
+negative width or height was used as an input image (Windows bitmaps can have
+a negative height if they are stored in top-down order, but such files are
+rare and not supported by libjpeg-turbo.)
+
+[2] Fixed an issue whereby, under certain circumstances, libjpeg-turbo would
+incorrectly encode certain JPEG images when quality=100 and the fast integer
+forward DCT were used.  This was known to cause 'make test' to fail when the
+library was built with '-march=haswell' on x86 systems.
+
+[3] Fixed an issue whereby libjpeg-turbo would crash when built with the latest
+& greatest development version of the Clang/LLVM compiler.  This was caused by
+an x86-64 ABI conformance issue in some of libjpeg-turbo's 64-bit SSE2 SIMD
+routines.  Those routines were incorrectly using a 64-bit mov instruction to
+transfer a 32-bit JDIMENSION argument, whereas the x86-64 ABI allows the upper
+(unused) 32 bits of a 32-bit argument's register to be undefined.  The new
+Clang/LLVM optimizer uses load combining to transfer multiple adjacent 32-bit
+structure members into a single 64-bit register, and this exposed the ABI
+conformance issue.
+
+[4] Fixed a bug in the MIPS DSPr2 4:2:0 "plain" (non-fancy and non-merged)
+upsampling routine that caused a buffer overflow (and subsequent segfault) when
+decompressing a 4:2:0 JPEG image whose scaled output width was less than 16
+pixels.  The "plain" upsampling routines are normally only used when
+decompressing a non-YCbCr JPEG image, but they are also used when decompressing
+a JPEG image whose scaled output height is 1.
+
+[5] Fixed various negative left shifts and other issues reported by the GCC and
+Clang undefined behavior sanitizers.  None of these was known to pose a
+security threat, but removing the warnings makes it easier to detect actual
+security issues, should they arise in the future.
+
+
+1.4.1
+=====
+
+[1] tjbench now properly handles CMYK/YCCK JPEG files.  Passing an argument of
+-cmyk (instead of, for instance, -rgb) will cause tjbench to internally convert
+the source bitmap to CMYK prior to compression, to generate YCCK JPEG files,
+and to internally convert the decompressed CMYK pixels back to RGB after
+decompression (the latter is done automatically if a CMYK or YCCK JPEG is
+passed to tjbench as a source image.)  The CMYK<->RGB conversion operation is
+not benchmarked.  NOTE: The quick & dirty CMYK<->RGB conversions that tjbench
+uses are suitable for testing only.  Proper conversion between CMYK and RGB
+requires a color management system.
+
+[2] 'make test' now performs additional bitwise regression tests using tjbench,
+mainly for the purpose of testing compression from/decompression to a subregion
+of a larger image buffer.
+
+[3] 'make test' no longer tests the regression of the floating point DCT/IDCT
+by default, since the results of those tests can vary if the algorithms in
+question are not implemented using SIMD instructions on a particular platform.
+See the comments in Makefile.am for information on how to re-enable the tests
+and to specify an expected result for them based on the particulars of your
+platform.
+
+[4] The NULL color conversion routines have been significantly optimized,
+which speeds up the compression of RGB and CMYK JPEGs by 5-20% when using
+64-bit code and 0-3% when using 32-bit code, and the decompression of those
+images by 10-30% when using 64-bit code and 3-12% when using 32-bit code.
+
+[5] Fixed an "illegal instruction" error that occurred when djpeg from a
+SIMD-enabled libjpeg-turbo MIPS build was executed with the -nosmooth option on
+a MIPS machine that lacked DSPr2 support.  The MIPS SIMD routines for h2v1 and
+h2v2 merged upsampling were not properly checking for the existence of DSPr2.
+
+[6] Performance has been improved significantly on 64-bit non-Linux and
+non-Windows platforms (generally 10-20% faster compression and 5-10% faster
+decompression.)  Due to an oversight, the 64-bit version of the accelerated
+Huffman codec was not being compiled in when libjpeg-turbo was built on
+platforms other than Windows or Linux.  Oops.
+
+[7] Fixed an extremely rare bug in the Huffman encoder that caused 64-bit
+builds of libjpeg-turbo to incorrectly encode a few specific test images when
+quality=98, an optimized Huffman table, and the slow integer forward DCT were
+used.
+
+[8] The Windows (CMake) build system now supports building only static or only
+shared libraries.  This is accomplished by adding either -DENABLE_STATIC=0 or
+-DENABLE_SHARED=0 to the CMake command line.
+
+[9] TurboJPEG API functions will now return an error code if a warning is
+triggered in the underlying libjpeg API.  For instance, if a JPEG file is
+corrupt, the TurboJPEG decompression functions will attempt to decompress
+as much of the image as possible, but those functions will now return -1 to
+indicate that the decompression was not entirely successful.
+
+[10] Fixed a bug in the MIPS DSPr2 4:2:2 fancy upsampling routine that caused a
+buffer overflow (and subsequent segfault) when decompressing a 4:2:2 JPEG image
+in which the right-most MCU was 5 or 6 pixels wide.
+
+
+1.4.0
+=====
+
+[1] Fixed a build issue on OS X PowerPC platforms (md5cmp failed to build
+because OS X does not provide the le32toh() and htole32() functions.)
+
+[2] The non-SIMD RGB565 color conversion code did not work correctly on big
+endian machines.  This has been fixed.
+
+[3] Fixed an issue in tjPlaneSizeYUV() whereby it would erroneously return 1
+instead of -1 if componentID was > 0 and subsamp was TJSAMP_GRAY.
+
+[3] Fixed an issue in tjBufSizeYUV2() whereby it would erroneously return 0
+instead of -1 if width was < 1.
+
+[5] The Huffman encoder now uses clz and bsr instructions for bit counting on
+ARM64 platforms (see 1.4 beta1 [5].)
+
+[6] The close() method in the TJCompressor and TJDecompressor Java classes is
+now idempotent.  Previously, that method would call the native tjDestroy()
+function even if the TurboJPEG instance had already been destroyed.  This
+caused an exception to be thrown during finalization, if the close() method had
+already been called.  The exception was caught, but it was still an expensive
+operation.
+
+[7] The TurboJPEG API previously generated an error ("Could not determine
+subsampling type for JPEG image") when attempting to decompress grayscale JPEG
+images that were compressed with a sampling factor other than 1 (for instance,
+with 'cjpeg -grayscale -sample 2x2').  Subsampling technically has no meaning
+with grayscale JPEGs, and thus the horizontal and vertical sampling factors
+for such images are ignored by the decompressor.  However, the TurboJPEG API
+was being too rigid and was expecting the sampling factors to be equal to 1
+before it treated the image as a grayscale JPEG.
+
+[8] cjpeg, djpeg, and jpegtran now accept an argument of -version, which will
+print the library version and exit.
+
+[9] Referring to 1.4 beta1 [15], another extremely rare circumstance was
+discovered under which the Huffman encoder's local buffer can be overrun
+when a buffered destination manager is being used and an
+extremely-high-frequency block (basically junk image data) is being encoded.
+Even though the Huffman local buffer was increased from 128 bytes to 136 bytes
+to address the previous issue, the new issue caused even the larger buffer to
+be overrun.  Further analysis reveals that, in the absolute worst case (such as
+setting alternating AC coefficients to 32767 and -32768 in the JPEG scanning
+order), the Huffman encoder can produce encoded blocks that approach double the
+size of the unencoded blocks.  Thus, the Huffman local buffer was increased to
+256 bytes, which should prevent any such issue from re-occurring in the future.
+
+[10] The new tjPlaneSizeYUV(), tjPlaneWidth(), and tjPlaneHeight() functions
+were not actually usable on any platform except OS X and Windows, because
+those functions were not included in the libturbojpeg mapfile.  This has been
+fixed.
+
+[11] Restored the JPP(), JMETHOD(), and FAR macros in the libjpeg-turbo header
+files.  The JPP() and JMETHOD() macros were originally implemented in libjpeg
+as a way of supporting non-ANSI compilers that lacked support for prototype
+parameters.  libjpeg-turbo has never supported such compilers, but some
+software packages still use the macros to define their own prototypes.
+Similarly, libjpeg-turbo has never supported MS-DOS and other platforms that
+have far symbols, but some software packages still use the FAR macro.  A pretty
+good argument can be made that this is a bad practice on the part of the
+software in question, but since this affects more than one package, it's just
+easier to fix it here.
+
+[12] Fixed issues that were preventing the ARM 64-bit SIMD code from compiling
+for iOS, and included an ARMv8 architecture in all of the binaries installed by
+the "official" libjpeg-turbo SDK for OS X.
+
+
+1.3.90 (1.4 beta1)
+==================
+
+[1] New features in the TurboJPEG API:
+-- YUV planar images can now be generated with an arbitrary line padding
+(previously only 4-byte padding, which was compatible with X Video, was
+supported.)
+-- The decompress-to-YUV function has been extended to support image scaling.
+-- JPEG images can now be compressed from YUV planar source images.
+-- YUV planar images can now be decoded into RGB or grayscale images.
+-- 4:1:1 subsampling is now supported.  This is mainly included for
+compatibility, since 4:1:1 is not fully accelerated in libjpeg-turbo and has no
+significant advantages relative to 4:2:0.
+-- CMYK images are now supported.  This feature allows CMYK source images to be
+compressed to YCCK JPEGs and YCCK or CMYK JPEGs to be decompressed to CMYK
+destination images.  Conversion between CMYK/YCCK and RGB or YUV images is not
+supported.  Such conversion requires a color management system and is thus out
+of scope for a codec library.
+-- The handling of YUV images in the Java API has been significantly refactored
+and should now be much more intuitive.
+-- The Java API now supports encoding a YUV image from an arbitrary position in
+a large image buffer.
+-- All of the YUV functions now have a corresponding function that operates on
+separate image planes instead of a unified image buffer.  This allows for
+compressing/decoding from or decompressing/encoding to a subregion of a larger
+YUV image.  It also allows for handling YUV formats that swap the order of the
+U and V planes.
+
+[2] Added SIMD acceleration for DSPr2-capable MIPS platforms.  This speeds up
+the compression of full-color JPEGs by 70-80% on such platforms and
+decompression by 25-35%.
+
+[3] If an application attempts to decompress a Huffman-coded JPEG image whose
+header does not contain Huffman tables, libjpeg-turbo will now insert the
+default Huffman tables.  In order to save space, many motion JPEG video frames
+are encoded without the default Huffman tables, so these frames can now be
+successfully decompressed by libjpeg-turbo without additional work on the part
+of the application.  An application can still override the Huffman tables, for
+instance to re-use tables from a previous frame of the same video.
+
+[4] The Mac packaging system now uses pkgbuild and productbuild rather than
+PackageMaker (which is obsolete and no longer supported.)  This means that
+OS X 10.6 "Snow Leopard" or later must be used when packaging libjpeg-turbo,
+although the packages produced can be installed on OS X 10.5 "Leopard" or
+later.  OS X 10.4 "Tiger" is no longer supported.
+
+[5] The Huffman encoder now uses clz and bsr instructions for bit counting on
+ARM platforms rather than a lookup table.  This reduces the memory footprint
+by 64k, which may be important for some mobile applications.  Out of four
+Android devices that were tested, two demonstrated a small overall performance
+loss (~3-4% on average) with ARMv6 code and a small gain (also ~3-4%) with
+ARMv7 code when enabling this new feature, but the other two devices
+demonstrated a significant overall performance gain with both ARMv6 and ARMv7
+code (~10-20%) when enabling the feature.  Actual mileage may vary.
+
+[6] Worked around an issue with Visual C++ 2010 and later that caused incorrect
+pixels to be generated when decompressing a JPEG image to a 256-color bitmap,
+if compiler optimization was enabled when libjpeg-turbo was built.  This caused
+the regression tests to fail when doing a release build under Visual C++ 2010
+and later.
+
+[7] Improved the accuracy and performance of the non-SIMD implementation of the
+floating point inverse DCT (using code borrowed from libjpeg v8a and later.)
+The accuracy of this implementation now matches the accuracy of the SSE/SSE2
+implementation.  Note, however, that the floating point DCT/IDCT algorithms are
+mainly a legacy feature.  They generally do not produce significantly better
+accuracy than the slow integer DCT/IDCT algorithms, and they are quite a bit
+slower.
+
+[8] Added a new output colorspace (JCS_RGB565) to the libjpeg API that allows
+for decompressing JPEG images into RGB565 (16-bit) pixels.  If dithering is not
+used, then this code path is SIMD-accelerated on ARM platforms.
+
+[9] Numerous obsolete features, such as support for non-ANSI compilers and
+support for the MS-DOS memory model, were removed from the libjpeg code,
+greatly improving its readability and making it easier to maintain and extend.
+
+[10] Fixed a segfault that occurred when calling output_message() with msg_code
+set to JMSG_COPYRIGHT.
+
+[11] Fixed an issue whereby wrjpgcom was allowing comments longer than 65k
+characters to be passed on the command line, which was causing it to generate
+incorrect JPEG files.
+
+[12] Fixed a bug in the build system that was causing the Windows version of
+wrjpgcom to be built using the rdjpgcom source code.
+
+[13] Restored 12-bit-per-component JPEG support.  A 12-bit version of
+libjpeg-turbo can now be built by passing an argument of --with-12bit to
+configure (Unix) or -DWITH_12BIT=1 to cmake (Windows.)  12-bit JPEG support is
+included only for convenience.  Enabling this feature disables all of the
+performance features in libjpeg-turbo, as well as arithmetic coding and the
+TurboJPEG API.  The resulting library still contains the other libjpeg-turbo
+features (such as the colorspace extensions), but in general, it performs no
+faster than libjpeg v6b.
+
+[14] Added ARM 64-bit SIMD acceleration for the YCC-to-RGB color conversion
+and IDCT algorithms (both are used during JPEG decompression.)  For unknown
+reasons (probably related to clang), this code cannot currently be compiled for
+iOS.
+
+[15] Fixed an extremely rare bug that could cause the Huffman encoder's local
+buffer to overrun when a very high-frequency MCU is compressed using quality
+100 and no subsampling, and when the JPEG output buffer is being dynamically
+resized by the destination manager.  This issue was so rare that, even with a
+test program specifically designed to make the bug occur (by injecting random
+high-frequency YUV data into the compressor), it was reproducible only once in
+about every 25 million iterations.
+
+[16] Fixed an oversight in the TurboJPEG C wrapper:  if any of the JPEG
+compression functions was called repeatedly with the same
+automatically-allocated destination buffer, then TurboJPEG would erroneously
+assume that the jpegSize parameter was equal to the size of the buffer, when in
+fact that parameter was probably equal to the size of the most recently
+compressed JPEG image.  If the size of the previous JPEG image was not as large
+as the current JPEG image, then TurboJPEG would unnecessarily reallocate the
+destination buffer.
+
+
+1.3.1
+=====
+
+[1] On Un*x systems, 'make install' now installs the libjpeg-turbo libraries
+into /opt/libjpeg-turbo/lib32 by default on any 32-bit system, not just x86,
+and into /opt/libjpeg-turbo/lib64 by default on any 64-bit system, not just
+x86-64.  You can override this by overriding either the 'prefix' or 'libdir'
+configure variables.
+
+[2] The Windows installer now places a copy of the TurboJPEG DLLs in the same
+directory as the rest of the libjpeg-turbo binaries.  This was mainly done
+to support TurboVNC 1.3, which bundles the DLLs in its Windows installation.
+When using a 32-bit version of CMake on 64-bit Windows, it is impossible to
+access the c:\WINDOWS\system32 directory, which made it impossible for the
+TurboVNC build scripts to bundle the 64-bit TurboJPEG DLL.
+
+[3] Fixed a bug whereby attempting to encode a progressive JPEG with arithmetic
+entropy coding (by passing arguments of -progressive -arithmetic to cjpeg or
+jpegtran, for instance) would result in an error, "Requested feature was
+omitted at compile time".
+
+[4] Fixed a couple of issues whereby malformed JPEG images would cause
+libjpeg-turbo to use uninitialized memory during decompression.
+
+[5] Fixed an error ("Buffer passed to JPEG library is too small") that occurred
+when calling the TurboJPEG YUV encoding function with a very small (< 5x5)
+source image, and added a unit test to check for this error.
+
+[6] The Java classes should now build properly under Visual Studio 2010 and
+later.
+
+[7] Fixed an issue that prevented SRPMs generated using the in-tree packaging
+tools from being rebuilt on certain newer Linux distributions.
+
+[8] Numerous minor fixes to eliminate compilation and build/packaging system
+warnings, fix cosmetic issues, improve documentation clarity, and other general
+source cleanup.
+
+
 1.3.0
 =====
 
@@ -91,7 +415,7 @@ configure/CMake switch in order to retain strict API/ABI compatibility with the
 libjpeg v6b or v7 API/ABI (or with previous versions of libjpeg-turbo.)  See
 README-turbo.txt for more details.
 
-[13] Added ARM v7s architecture to libjpeg.a and libturbojpeg.a in the official
+[13] Added ARMv7s architecture to libjpeg.a and libturbojpeg.a in the official
 libjpeg-turbo binary package for OS X, so that those libraries can be used to
 build applications that leverage the faster CPUs in the iPhone 5 and iPad 4.
 
@@ -174,7 +498,7 @@ K component is assigned a component ID of 1 instead of 4.  Although these files
 are in violation of the spec, other JPEG implementations handle them
 correctly.
 
-[7] Added ARM v6 and ARM v7 architectures to libjpeg.a and libturbojpeg.a in
+[7] Added ARMv6 and ARMv7 architectures to libjpeg.a and libturbojpeg.a in
 the official libjpeg-turbo binary package for OS X, so that those libraries can
 be used to build both OS X and iOS applications.
 

@@ -3,7 +3,7 @@
  *
  * This file was part of the Independent JPEG Group's software:
  * Copyright (C) 1991-1997, Thomas G. Lane.
- * Modifications:
+ * libjpeg-turbo Modifications:
  * Copyright (C) 2009, 2011, D. R. Commander.
  * For conditions of distribution and use, see the accompanying README file.
  *
@@ -58,8 +58,8 @@ ycc_rgb_convert_internal (j_decompress_ptr cinfo,
       /* Range-limiting is essential due to noise introduced by DCT losses. */
       outptr[RGB_RED] =   range_limit[y + Crrtab[cr]];
       outptr[RGB_GREEN] = range_limit[y +
-			      ((int) RIGHT_SHIFT(Cbgtab[cb] + Crgtab[cr],
-						 SCALEBITS))];
+                              ((int) RIGHT_SHIFT(Cbgtab[cb] + Crgtab[cr],
+                                                 SCALEBITS))];
       outptr[RGB_BLUE] =  range_limit[y + Cbbtab[cb]];
       /* Set unused byte to 0xFF so it can be interpreted as an opaque */
       /* alpha channel value */

@@ -14,11 +14,14 @@ Build Requirements
      provided.  The easiest way to obtain them is from MacPorts
      (http://www.macports.org/).
 
--- NASM (if building x86 or x86-64 SIMD extensions)
-   * 0.98, or 2.01 or later is required for a 32-bit build
-   * NASM 2.00 or later is required for a 64-bit build
-   * NASM 2.07 or later is required for a 64-bit build on OS X.  This can be
-     obtained from MacPorts (http://www.macports.org/).
+-- NASM or YASM (if building x86 or x86-64 SIMD extensions)
+   * NASM 0.98, or 2.01 or later is required for an x86 build (0.99 and 2.00 do
+     not work properly with libjpeg-turbo's x86 SIMD code.)
+   * NASM 2.00 or later is required for an x86-64 build.
+   * NASM 2.07, or 2.11.09 or later is required for an x86-64 Mac build
+     (2.11.08 does not work properly with libjpeg-turbo's x86-64 SIMD code when
+     building macho64 objects.)  NASM or YASM can be obtained from MacPorts
+     (http://www.macports.org/).
 
    The binary RPMs released by the NASM project do not work on older Linux
    systems, such as Red Hat Enterprise Linux 4.  On such systems, you can
@@ -47,15 +50,15 @@ Build Requirements
      code, relative to building libjpeg-turbo with GCC v4.2.  If you are
      running Snow Leopard or earlier, it is suggested that you continue to use
      Xcode v3.2.6, which provides GCC v4.2.  If you are using Lion or later, it
-     is suggested that you install Apple GCC v4.2 through MacPorts.
+     is suggested that you install Apple GCC v4.2 or GCC v5 through MacPorts.
 
 -- If building the TurboJPEG Java wrapper, JDK or OpenJDK 1.5 or later is
-   required.  Some systems, such as OS X 10.4, Solaris 10 and later, and Red
-   Hat Enterprise Linux 5 and later, have this pre-installed.  On OS X 10.5 and
-   later, it will be necessary to install the Java Developer Package, which can
-   be downloaded from http://connect.apple.com.  For systems that do not have a
-   JDK installed, you can obtain the Oracle Java Development Kit from
-   http://www.java.com.
+   required.  Some systems, such as Solaris 10 and later and Red Hat Enterprise
+   Linux 5 and later, have this pre-installed.  On OS X 10.5 and later, it will
+   be necessary to install the Java Developer Package, which can be downloaded
+   from http://developer.apple.com/downloads (Apple ID required.)  For systems
+   that do not have a JDK installed, you can obtain the Oracle Java Development
+   Kit from http://www.java.com.
 
 
 ==================
@@ -113,8 +116,8 @@ This will generate the following files under .libs/
   libturbojpeg.a
       Static link library for the TurboJPEG API
 
-  libturbojpeg.so.0.0.0 (Linux, Unix)
-  libturbojpeg.0.0.0.dylib (OS X)
+  libturbojpeg.so.0.1.0 (Linux, Unix)
+  libturbojpeg.0.1.0.dylib (OS X)
   cygturbojpeg-0.dll (Cygwin)
       Shared library for the TurboJPEG API
 
@@ -243,12 +246,12 @@ to the configure command line.
 Add
 
   --host x86_64-apple-darwin NASM=/opt/local/bin/nasm \
-  CFLAGS='-isysroot /Developer/SDKs/MacOSX10.4u.sdk \
-    -mmacosx-version-min=10.4 -O3' \
-    LDFLAGS='-isysroot /Developer/SDKs/MacOSX10.4u.sdk \
-    -mmacosx-version-min=10.4'
+  CFLAGS='-isysroot /Developer/SDKs/MacOSX10.5.sdk \
+    -mmacosx-version-min=10.5 -O3' \
+    LDFLAGS='-isysroot /Developer/SDKs/MacOSX10.5.sdk \
+    -mmacosx-version-min=10.5'
 
-to the configure command line.  The OS X 10.4 SDK, and NASM 2.07 or later from
+to the configure command line.  The OS X 10.5 SDK, and NASM 2.07 or later from
 MacPorts, must be installed.
 
 
@@ -258,12 +261,12 @@ MacPorts, must be installed.
 Add
 
   --host i686-apple-darwin \
-    CFLAGS='-isysroot /Developer/SDKs/MacOSX10.4u.sdk \
-    -mmacosx-version-min=10.4 -O3 -m32' \
-    LDFLAGS='-isysroot /Developer/SDKs/MacOSX10.4u.sdk \
-    -mmacosx-version-min=10.4 -m32'
+    CFLAGS='-isysroot /Developer/SDKs/MacOSX10.5.sdk \
+    -mmacosx-version-min=10.5 -O3 -m32' \
+    LDFLAGS='-isysroot /Developer/SDKs/MacOSX10.5.sdk \
+    -mmacosx-version-min=10.5 -m32'
 
-to the configure command line.  The OS X 10.4 SDK must be installed.
+to the configure command line.  The OS X 10.5 SDK must be installed.
 
 
 64-bit Library Build on 64-bit Solaris
@@ -319,63 +322,153 @@ This release of libjpeg-turbo can use ARM NEON SIMD instructions to accelerate
 JPEG compression/decompression by approximately 2-4x on ARMv7 and later
 platforms.  If libjpeg-turbo is configured on an ARM Linux platform, then the
 build system will automatically include the NEON SIMD routines, if they are
-supported.
+supported.  Build instructions for other ARM-based platforms follow.
 
 
 Building libjpeg-turbo for iOS
 ------------------------------
 
-iOS platforms, such as the iPhone and iPad, also use ARM processors, some of
-which support NEON instructions.  Additional steps are required to build
-libjpeg-turbo for these platforms.  The steps below assume iOS SDK v4.3.  If
-you are using a different SDK version, then you will need to modify the
-examples accordingly.
+iOS platforms, such as the iPhone and iPad, use ARM processors, some of which
+support NEON instructions.  Additional steps are required in order to build
+libjpeg-turbo for these platforms.
 
 Additional build requirements:
 
-  gas-preprocessor.pl (https://github.com/yuvi/gas-preprocessor) should be
-  installed in your PATH.
+  gas-preprocessor.pl
+  (https://raw.githubusercontent.com/libjpeg-turbo/gas-preprocessor/master/gas-preprocessor.pl)
+  should be installed in your PATH.
+
+
+ARM 32-bit Build (Xcode 4.6.x and earlier, LLVM-GCC):
 
 Set the following shell variables for simplicity:
 
-  Xcode 3.2.x / iOS 4.3 SDK:
-  IOS_PLATFORMDIR="/Developer/Platforms/iPhoneOS.platform"
-  IOS_SYSROOT="$IOS_PLATFORMDIR/Developer/SDKs/iPhoneOS4.3.sdk"
-  IOS_GCC="$IOS_PLATFORMDIR/Developer/usr/bin/arm-apple-darwin10-llvm-gcc-4.2"
+  Xcode 4.2 and earlier:
+  IOS_PLATFORMDIR=/Developer/Platforms/iPhoneOS.platform
+  Xcode 4.3 and later:
+  IOS_PLATFORMDIR=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform
 
-  Xcode 4.5.x / iOS 6.0 SDK:
-  IOS_PLATFORMDIR="/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform"
-  IOS_SYSROOT="$IOS_PLATFORMDIR/Developer/SDKs/iPhoneOS6.0.sdk"
-  IOS_GCC="$IOS_PLATFORMDIR/Developer/usr/bin/arm-apple-darwin10-llvm-gcc-4.2"
+  IOS_SYSROOT=$IOS_PLATFORMDIR/Developer/SDKs/iPhoneOS*.sdk
+  IOS_GCC=$IOS_PLATFORMDIR/Developer/usr/bin/arm-apple-darwin10-llvm-gcc-4.2
 
-  ARM v6 only (up to and including iPhone 3G):
+  ARMv6 (code will run on all iOS devices, not SIMD-accelerated):
   [NOTE: Requires Xcode 4.4.x or earlier]
   IOS_CFLAGS="-march=armv6 -mcpu=arm1176jzf-s -mfpu=vfp"
 
-  ARM v7 only (iPhone 3GS-4S, iPad 1st-3rd Generation):
+  ARMv7 (code will run on iPhone 3GS-4S/iPad 1st-3rd Generation and newer):
   IOS_CFLAGS="-march=armv7 -mcpu=cortex-a8 -mtune=cortex-a8 -mfpu=neon"
 
-  ARM v7s only (iPhone 5, iPad 4th Generation):
+  ARMv7s (code will run on iPhone 5/iPad 4th Generation and newer):
   [NOTE: Requires Xcode 4.5 or later]
   IOS_CFLAGS="-march=armv7s -mcpu=swift -mtune=swift -mfpu=neon"
 
 Follow the procedure under "Building libjpeg-turbo" above, adding
 
-  --host arm-apple-darwin10 --enable-static --disable-shared \
+  --host arm-apple-darwin10 \
     CC="$IOS_GCC" LD="$IOS_GCC" \
     CFLAGS="-mfloat-abi=softfp -isysroot $IOS_SYSROOT -O3 $IOS_CFLAGS" \
     LDFLAGS="-mfloat-abi=softfp -isysroot $IOS_SYSROOT $IOS_CFLAGS"
 
 to the configure command line.
 
-Once built, lipo can be used to combine the ARM v6, v7, and/or v7s variants
+
+ARM 32-bit Build (Xcode 5.0.x and later, Clang):
+
+Set the following shell variables for simplicity:
+
+  IOS_PLATFORMDIR=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform
+  IOS_SYSROOT=$IOS_PLATFORMDIR/Developer/SDKs/iPhoneOS*.sdk
+  IOS_GCC=/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang
+
+  ARMv7 (code will run on iPhone 3GS-4S/iPad 1st-3rd Generation and newer):
+  IOS_CFLAGS="-arch armv7"
+
+  ARMv7s (code will run on iPhone 5/iPad 4th Generation and newer):
+  IOS_CFLAGS="-arch armv7s"
+
+Follow the procedure under "Building libjpeg-turbo" above, adding
+
+  --host arm-apple-darwin10 \
+    CC="$IOS_GCC" LD="$IOS_GCC" \
+    CFLAGS="-mfloat-abi=softfp -isysroot $IOS_SYSROOT -O3 $IOS_CFLAGS" \
+    LDFLAGS="-mfloat-abi=softfp -isysroot $IOS_SYSROOT $IOS_CFLAGS" \
+    CCASFLAGS="-no-integrated-as $IOS_CFLAGS"
+
+to the configure command line.
+
+
+ARMv8 64-bit Build (Xcode 5.0.x and later, Clang):
+
+Code will run on iPhone 5S/iPad Mini 2/iPad Air and newer.
+
+Set the following shell variables for simplicity:
+
+  IOS_PLATFORMDIR=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform
+  IOS_SYSROOT=$IOS_PLATFORMDIR/Developer/SDKs/iPhoneOS*.sdk
+  IOS_GCC=/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang
+  IOS_CFLAGS="-arch arm64"
+
+Follow the procedure under "Building libjpeg-turbo" above, adding
+
+  --host aarch64-apple-darwin \
+    CC="$IOS_GCC" LD="$IOS_GCC" \
+    CFLAGS="-isysroot $IOS_SYSROOT -O3 $IOS_CFLAGS" \
+    LDFLAGS="-isysroot $IOS_SYSROOT $IOS_CFLAGS"
+
+to the configure command line.
+
+
+NOTE:  You can also add -miphoneos-version-min={version} to $IOS_CFLAGS above
+in order to support older versions of iOS than the default version supported by
+the SDK.
+
+Once built, lipo can be used to combine the ARMv6, v7, v7s, and/or v8 variants
 into a universal library.
 
 NOTE: If you are building libjpeg-turbo from the "official" project tarball,
 then it is highly likely that you will need to run 'autoreconf -fiv' in the
-source tree prior to building ARM v7 or v7s iOS binaries using the techniques
-described above.  Otherwise, you may get a libtool error such as "unable to
-infer tagged configuration."
+source tree prior to building ARMv7, v7s, or v8 iOS binaries using the
+techniques described above.  Otherwise, you may get a libtool error such as
+"unable to infer tagged configuration."
+
+
+Building libjpeg-turbo for Android
+----------------------------------
+
+Building libjpeg-turbo for Android platforms requires the Android NDK
+(https://developer.android.com/tools/sdk/ndk) and autotools.  The following is
+a general recipe script that can be modified for your specific needs.
+
+  # Set these variables to suit your needs
+  NDK_PATH={full path to the "ndk" directory-- for example, /opt/android/ndk}
+  BUILD_PLATFORM={the platform name for the NDK package you installed--
+    for example, "windows-x86" or "linux-x86_64"}
+  TOOLCHAIN_VERSION={"4.6", "4.8", etc.  This corresponds to a toolchain
+    directory under ${NDK_PATH}/toolchains/.}
+  ANDROID_VERSION={The minimum version of Android to support-- for example,
+    "9", "19", etc.}
+
+  HOST=arm-linux-androideabi
+  TOOLCHAIN=${NDK_PATH}/toolchains/${HOST}-${TOOLCHAIN_VERSION}/prebuilt/${BUILD_PLATFORM}
+  SYSROOT=${NDK_PATH}/platforms/android-${ANDROID_VERSION}/arch-arm
+  ANDROID_INCLUDES="-I${SYSROOT}/usr/include -I${TOOLCHAIN}/include"
+  ANDROID_CFLAGS="-march=armv7-a -mfloat-abi=softfp -fprefetch-loop-arrays \
+    -fstrict-aliasing --sysroot=${SYSROOT}"
+  export CPP=${TOOLCHAIN}/bin/${HOST}-cpp
+  export AR=${TOOLCHAIN}/bin/${HOST}-ar
+  export AS=${TOOLCHAIN}/bin/${HOST}-as
+  export NM=${TOOLCHAIN}/bin/${HOST}-nm
+  export CC=${TOOLCHAIN}/bin/${HOST}-gcc
+  export LD=${TOOLCHAIN}/bin/${HOST}-ld
+  export RANLIB=${TOOLCHAIN}/bin/${HOST}-ranlib
+  export OBJDUMP=${TOOLCHAIN}/bin/${HOST}-objdump
+  export STRIP=${TOOLCHAIN}/bin/${HOST}-strip
+  cd {build_directory}
+  sh {source_directory}/configure --host=${HOST} \
+    CFLAGS="${ANDROID_INCLUDES} ${ANDROID_CFLAGS} -O3" \
+    CPPFLAGS="${ANDROID_INCLUDES} ${ANDROID_CFLAGS}" \
+    LDFLAGS="${ANDROID_CFLAGS}" --with-simd ${1+"$@"}
+  make
 
 
 *******************************************************************************
@@ -387,7 +480,7 @@ infer tagged configuration."
 Build Requirements
 ==================
 
--- CMake (http://www.cmake.org) v2.6 or later
+-- CMake (http://www.cmake.org) v2.8.8 or later
 
 -- Microsoft Visual C++ 2005 or later
 
@@ -399,8 +492,9 @@ Build Requirements
    The Windows SDK includes both 32-bit and 64-bit Visual C++ compilers and
    everything necessary to build libjpeg-turbo.
 
-   * For 32-bit builds, you can also use Microsoft Visual C++ Express
-     Edition.  Visual C++ Express Edition is a free download.
+   * You can also use Microsoft Visual Studio Express Edition, which is a free
+     download.  (NOTE: versions prior to 2012 can only be used to build 32-bit
+     code.)
    * If you intend to build libjpeg-turbo from the command line, then add the
      appropriate compiler and SDK directories to the INCLUDE, LIB, and PATH
      environment variables.  This is generally accomplished by executing
@@ -414,7 +508,11 @@ Build Requirements
 
 -- MinGW
 
-   GCC v4.1 or later recommended for best performance
+   MinGW-builds (http://sourceforge.net/projects/mingwbuilds/) or
+   tdm-gcc (http://tdm-gcc.tdragon.net/) recommended if building on a Windows
+   machine.  Both distributions install a Start Menu link that can be used to
+   launch a command prompt with the appropriate compiler paths automatically
+   set.
 
 -- NASM (http://www.nasm.us/) 0.98 or later (NASM 2.05 or later is required for
    a 64-bit build)
@@ -479,7 +577,12 @@ Choose the appropriate CMake generator option for your version of Visual Studio
 instance:
 
   cd {build_directory}
-  cmake -G "Visual Studio 9 2008" {source_directory}
+  cmake -G "Visual Studio 10" {source_directory}
+
+NOTE:  Add "Win64" to the generator name (for example, "Visual Studio 10
+Win64") to build a 64-bit version of libjpeg-turbo.  Recent versions of CMake
+no longer document that.  A separate build directory must be used for 32-bit
+and 64-bit builds.
 
 You can then open ALL_BUILD.vcproj in Visual Studio and build one of the
 configurations in that project ("Debug", "Release", etc.) to generate a full
@@ -508,9 +611,12 @@ depending on whether libjpeg v6b (default), v7, or v8 emulation is enabled.
 MinGW
 -----
 
+NOTE: This assumes that you are building on a Windows machine.  If you are
+cross-compiling on a Linux/Unix machine, then see "Build Recipes" below.
+
   cd {build_directory}
-  cmake -G "MSYS Makefiles" {source_directory}
-  make
+  cmake -G "MinGW Makefiles" {source_directory}
+  mingw32-make
 
 This will generate the following files under {build_directory}
 
@@ -619,8 +725,8 @@ Build Recipes
   cd {build_directory}
   CC=/usr/bin/x86_64-w64-mingw32-gcc \
     cmake -G "Unix Makefiles" -DCMAKE_SYSTEM_NAME=Windows \
-    -DCMAKE_AR=/usr/bin/x86_64-w64-mingw32-ar \
-    -DCMAKE_RANLIB=/usr/bin/x86_64-w64-mingw32-ranlib {source_directory}
+    -DCMAKE_RC_COMPILER=/usr/bin/x86_64-w64-mingw32-windres.exe \
+    {source_directory}
   make
 
 This produces a 64-bit build of libjpeg-turbo that does not depend on
@@ -634,28 +740,13 @@ mingw64-x86_64-gcc-g++ packages (and their dependencies) must be installed.
   cd {build_directory}
   CC=/usr/bin/i686-w64-mingw32-gcc \
     cmake -G "Unix Makefiles" -DCMAKE_SYSTEM_NAME=Windows \
-    -DDCMAKE_AR=/usr/bin/i686-w64-mingw32-ar \
-    -DCMAKE_RANLIB=/usr/bin/i686-w64-mingw32-ranlib {source_directory}
+    -DCMAKE_RC_COMPILER=/usr/bin/i686-w64-mingw32-windres.exe \
+    {source_directory}
   make
 
 This produces a 32-bit build of libjpeg-turbo that does not depend on
 cygwin1.dll or other Cygwin DLL's.  The mingw64-i686-gcc-core and
 mingw64-i686-gcc-g++ packages (and their dependencies) must be installed.
-
-
-MinGW-w64 Build on Windows
---------------------------
-
-This produces a 64-bit build of libjpeg-turbo using the "native" MinGW-w64
-toolchain (which is faster than the Cygwin version):
-
-  cd {build_directory}
-  CC={mingw-w64_binary_path}/x86_64-w64-mingw32-gcc \
-    cmake -G "MSYS Makefiles" \
-    -DCMAKE_AR={mingw-w64_binary_path}/x86_64-w64-mingw32-ar \
-    -DCMAKE_RANLIB={mingw-w64_binary_path}/x86_64-w64-mingw32-ranlib \
-    {source_directory}
-  make
 
 
 MinGW Build on Linux
@@ -695,11 +786,11 @@ make deb
 
 make dmg
 
-  Create Macintosh package/disk image.  This requires the PackageMaker
-  application, which must be installed in /Developer/Applications/Utilities.
-  Note that PackageMaker is not included in recent releases of Xcode, but it
-  can be obtained by downloading the "Auxiliary Tools for Xcode" package from
-  http://developer.apple.com/downloads.
+  Create Macintosh package/disk image.  This requires pkgbuild and
+  productbuild, which are installed by default on OS X 10.7 and later and which
+  can be obtained by installing Xcode 3.2.6 (with the "Unix Development"
+  option) on OS X 10.6.  Packages built in this manner can be installed on OS X
+  10.5 and later, but they must be built on OS X 10.6 or later.
 
 make udmg [BUILDDIR32={32-bit build directory}]
 
@@ -712,26 +803,32 @@ make udmg [BUILDDIR32={32-bit build directory}]
   make command line as shown above.
 
 make iosdmg [BUILDDIR32={32-bit build directory}] \
-  [BUILDDIRARMV6={ARM v6 build directory}] \
-  [BUILDDIRARMV7={ARM v7 build directory}] \
-  [BUILDDIRARMV7S={ARM v7s build directory}]
+  [BUILDDIRARMV6={ARMv6 build directory}] \
+  [BUILDDIRARMV7={ARMv7 build directory}] \
+  [BUILDDIRARMV7S={ARMv7s build directory}] \
+  [BUILDDIRARMV8={ARMv8 build directory}]
 
   On OS X systems, this creates a Macintosh package and disk image in which the
   libjpeg-turbo static libraries contain ARM architectures necessary to build
   iOS applications.  If building on an x86-64 system, the binaries will also
   contain the i386 architecture, as with 'make udmg' above.  You should first
-  configure ARM v6, ARM v7, and/or ARM v7s out-of-tree builds of libjpeg-turbo
-  (see "Building libjpeg-turbo for iOS" above.)  If you are building an x86-64
-  version of libjpeg-turbo, you should configure a 32-bit out-of-tree build as
-  well.  Next, build libjpeg-turbo as you would normally, using an out-of-tree
-  build.  When it is built, run 'make iosdmg' from the build directory.  The
-  build system will look for the ARM v6 build under {source_directory}/iosarmv6
-  by default, the ARM v7 build under {source_directory}/iosarmv7 by default,
-  the ARM v7s build under {source_directory}/iosarmv7s by default, and (if
-  applicable) the 32-bit build under {source_directory}/osxx86 by default, but
-  you can override this by setting the BUILDDIR32, BUILDDIRARMV6,
-  BUILDDIRARMV7, and/or BUILDDIRARMV7S variables on the make command line as
-  shown above.
+  configure ARMv6, ARMv7, ARMv7s, and/or ARMv8 out-of-tree builds of
+  libjpeg-turbo (see "Building libjpeg-turbo for iOS" above.)  If you are
+  building an x86-64 version of libjpeg-turbo, you should configure a 32-bit
+  out-of-tree build as well.  Next, build libjpeg-turbo as you would normally,
+  using an out-of-tree build.  When it is built, run 'make iosdmg' from the
+  build directory.  The build system will look for the ARMv6 build under
+  {source_directory}/iosarmv6 by default, the ARMv7 build under
+  {source_directory}/iosarmv7 by default, the ARMv7s build under
+  {source_directory}/iosarmv7s by default, the ARMv8 build under
+  {source_directory}/iosarmv8 by default, and (if applicable) the 32-bit build
+  under {source_directory}/osxx86 by default, but you can override this by
+  setting the BUILDDIR32, BUILDDIRARMV6, BUILDDIRARMV7, BUILDDIRARMV7S, and/or
+  BUILDDIRARMV8 variables on the make command line as shown above.
+
+  NOTE: If including an ARMv8 build in the package, then you may need to use
+  Xcode's version of lipo instead of the operating system's.  To do this, pass
+  an argument of LIPO="xcrun lipo" on the make command line.
 
 make cygwinpkg
 
