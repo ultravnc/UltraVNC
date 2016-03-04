@@ -149,10 +149,10 @@ vncEncodeUltra2::EncodeRect(BYTE *source, VSocket *outConn, BYTE *dest, const rf
 			delete [] m_buffer;
 			m_buffer = NULL;
 		}
-		m_buffer = new BYTE [rawDataSize+1];
+		m_buffer = new BYTE [rawDataSize+1000];
 		if (m_buffer == NULL)
 			return vncEncoder::EncodeRect(source, dest, rect);
-		m_bufflen = rawDataSize;
+		m_bufflen = rawDataSize+999;
 	}
 	// Translate the data into our new buffer
 	Translate(source, m_buffer, rect);
