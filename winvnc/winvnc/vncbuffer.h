@@ -28,6 +28,7 @@
 // The vncBuffer object provides a client-local copy of the screen
 // It can tell the client which bits have changed in a given region
 // It uses the specified vncDesktop to read screen data from
+#include <omnithread.h>
 class vncDesktop;
 
 class vncBuffer;
@@ -143,6 +144,7 @@ public:
 	BYTE		*m_backbuff;
 	UINT		m_backbuffsize;
 	// CACHE RDV
+	omni_mutex			m_cacheLock;
 	BYTE		*m_cachebuff;
 	BYTE		*m_mainbuff;
 	vncDesktop	*m_desktop;
