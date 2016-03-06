@@ -356,7 +356,7 @@ GetCurrentUser(char *buffer, UINT size) // RealVNC 336 change
 				}
 			}
 		}
-		vnclog.Print(LL_INTERR, VNCLOG("@@@@@@@@@@@@@ GetCurrentUser - UserNAme found: %s \n"), buffer);
+		//vnclog.Print(LL_INTERR, VNCLOG("@@@@@@@@@@@@@ GetCurrentUser - UserNAme found: %s \n"), buffer);
 		return TRUE;
 	};
 
