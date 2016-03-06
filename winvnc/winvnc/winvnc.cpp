@@ -1243,7 +1243,7 @@ int WinVNCAppMain()
 		}
 		vnclog.Print(LL_STATE, VNCLOG("################## Closing Imp Thread\n"));
 	}
-
+	fShutdownOrdered = true;
 	//KillSDTimer();
 	if (instancehan!=NULL)
 		delete instancehan;
