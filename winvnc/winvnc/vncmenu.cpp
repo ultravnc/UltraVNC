@@ -547,13 +547,13 @@ vncMenu::AddTrayIcon()
 		{
 			if ( ! m_server->GetDisableTrayIcon())
 				{
-					vnclog.Print(LL_INTERR, VNCLOG("########### Shell_TrayWnd found %i\n"),IsIconSet);
+					//vnclog.Print(LL_INTERR, VNCLOG("########### Set TrayIcon \n"));
 					SendTrayMsg(NIM_ADD, FALSE);
 				}
 		}
 		else
 		{
-			vnclog.Print(LL_INTERR, VNCLOG("########### Shell_TrayWnd found %i\n"),IsIconSet);
+			//vnclog.Print(LL_INTERR, VNCLOG("########### Set TrayIcon \n"));
 			SendTrayMsg(NIM_ADD, FALSE);
 		}
 		if (m_server->AuthClientCount() != 0) { //PGM @ Advantig
