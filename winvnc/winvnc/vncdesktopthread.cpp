@@ -1347,11 +1347,6 @@ vncDesktopThread::run_undetached(void *arg)
 												m_desktop->m_buffer.GrabRegion(rgncache,false,capture);
 											}
 										}
-/*#ifdef _DEBUG
-										char			szText[256];
-										sprintf(szText," capture %i\n",capture);
-										OutputDebugString(szText);		
-#endif*/
 										capture=true;
 											
 										// sf@2002 - v1.1.x - Mouse handling
@@ -1367,7 +1362,7 @@ vncDesktopThread::run_undetached(void *arg)
 														}
 
 											}
-										if (m_desktop->m_server->IsXRichCursorEnabled() && (!m_desktop->m_UltraEncoder_used  || VNCOS.OS_WIN8) )
+										if (m_desktop->m_server->IsXRichCursorEnabled())// && (!m_desktop->m_UltraEncoder_used  || VNCOS.OS_WIN8) )
 											{
 												if (m_desktop->m_hcursor != m_desktop->m_hOldcursor || m_desktop->m_buffer.IsShapeCleared())
 														{
