@@ -1134,7 +1134,7 @@ vncBuffer::EnableCache(BOOL enable)
 		{
 			vnclog.Print(LL_INTERR, VNCLOG("unable to allocate cache buffer[%d]\n"), m_desktop->ScreenBuffSize());
 			return;
-
+		}
 		ClearCache();
 		// BlackBack();
 	}
