@@ -4705,6 +4705,7 @@ vncClient::vncClient() : Sendinput("USER32", "SendInput"), m_clipboard(Clipboard
 	m_want_update_state=false;
 	m_initial_update=false;
 	m_nScale_viewer = 1;
+	nr_incr_rgn_empty = 0;
 }
 
 vncClient::~vncClient()
