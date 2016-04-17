@@ -629,6 +629,9 @@ vncServer::Authenticated(vncClientId clientid)
 			// Yes, so remove the client and add it to the auth list
 			m_unauthClients.erase(i);
 
+			// Add the client to the auth list
+			m_authClients.push_back(clientid);
+
 			// Create the screen handler if necessary
 			if (m_desktop == NULL)
 			{
@@ -638,6 +641,7 @@ vncServer::Authenticated(vncClientId clientid)
 				{
 					client->Kill();
 					authok = FALSE;
+					m_authClients.erase(i);
 					break;
 				}
 				// Preset toggle prim/sec/both
@@ -655,16 +659,13 @@ vncServer::Authenticated(vncClientId clientid)
 					authok = FALSE;
 					delete m_desktop;
 					m_desktop = NULL;
-
+					m_authClients.erase(i);
 					break;
 				}
 			}
 
 			// Tell the client about this new buffer
 			client->SetBuffer(&(m_desktop->m_buffer));
-
-			// Add the client to the auth list
-			m_authClients.push_back(clientid);
 
 			break;
 		}
@@ -2437,7 +2438,8 @@ vncServer::All_clients_initialalized() {
 	// Post this update to all the connected clients
 	for (i = m_authClients.begin(); i != m_authClients.end(); i++)
 	{
-		if (!GetClient(*i)->client_settings_passed) return false;
+		if (!GetClient(*i)->client_settings_passed) 
+			return false;
 
 	}
 	return true;
