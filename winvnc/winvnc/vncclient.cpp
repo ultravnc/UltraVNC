@@ -441,7 +441,8 @@ vncClientUpdateThread::EnableUpdates(BOOL enable)
 
 	// give bad results with java
 	//if (enable)
-		m_sync_sig->wait();
+		if (!m_sync_sig->wait(5000))
+			vnclog.Print(LL_INTINFO, VNCLOG("wait timeout\n"));
 	/*if  (m_sync_sig->timedwait(now_sec+1,0)==0)
 		{
 //			m_signal->signal();
@@ -470,7 +471,7 @@ vncClientUpdateThread::run_undetached(void *arg)
 	int esc_counter=0;
 	while (g_DesktopThread_running && m_client->cl_connected)
 	{		
-		if (m_client->m_server->AreThereMultipleViewers() == false)
+		/*if (m_client->m_server->AreThereMultipleViewers() == false)
 		{
 			while (!m_client->m_initial_update)
 			{
@@ -479,7 +480,7 @@ vncClientUpdateThread::run_undetached(void *arg)
 				Sleep(50);
 				if (esc_counter > 100) break;
 			}
-		}
+		}*/
 		if (!m_client->cl_connected) return 0;
 
 
@@ -5026,7 +5027,7 @@ vncClient::UpdateClipTextEx(ClipboardData& clipboardData, CARD32 overrideFlags)
 void
 vncClient::UpdateCursorShape()
 {
-	omni_mutex_lock l(GetUpdateLock(),96);
+	//omni_mutex_lock l(GetUpdateLock(),96);
 	TriggerUpdateThread();
 }
 
