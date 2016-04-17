@@ -874,7 +874,7 @@ void vncDesktopThread::do_polling(HANDLE& threadHandle, rfb::Region2D& rgncache,
 extern bool G_USE_PIXEL;
 void *
 vncDesktopThread::run_undetached(void *arg)
-{
+{		
 	//*******************************************************
 	// INIT
 	//*******************************************************
@@ -906,21 +906,8 @@ vncDesktopThread::run_undetached(void *arg)
 		return NULL;
 	}
 	// Succeeded to initialise ok
-	ReturnVal(0);
+	ReturnVal(0);	
 
-	//telling running viewers to wait until first update
-#ifdef _DEBUG
-										char			szText[256];
-										sprintf(szText," nitialUpdate(false) \n");
-										OutputDebugString(szText);		
-#endif
-	//default=false
-	//m_server->InitialUpdate(false);
-#ifdef _DEBUG
-										//char			szText[256];
-										sprintf(szText," nitialUpdate(false) \n");
-										OutputDebugString(szText);		
-#endif
 	// sf@2003 - Done here to take into account if the driver is actually activated
 	m_desktop->InitHookSettings(); 
 	initialupdate=false;
@@ -962,6 +949,15 @@ vncDesktopThread::run_undetached(void *arg)
 	m_desktop->m_hookswitch=false;
 	m_desktop->m_hookinited = FALSE;
 	m_desktop->m_bitmappointer = FALSE;
+
+	int esc_counter = 0;
+	while (!m_server->All_clients_initialalized())
+	{
+	Sleep(100);
+	esc_counter++;
+	if (esc_counter > 50) break;
+	vnclog.Print(LL_INTERR, VNCLOG("Wait for viewer init \n"));
+	}
 
 	// Set driver cursor state
 	XRichCursorEnabled= (FALSE != m_desktop->m_server->IsXRichCursorEnabled());
