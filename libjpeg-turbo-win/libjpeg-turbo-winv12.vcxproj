@@ -65,6 +65,14 @@
       <Configuration>ReleaseLib</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="releasevista|Win32">
+      <Configuration>releasevista</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="releasevista|x64">
+      <Configuration>releasevista</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}</ProjectGuid>
@@ -96,6 +104,12 @@
     <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -145,6 +159,12 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugLib-Static|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
@@ -179,6 +199,9 @@
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugLib-Static|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
@@ -201,6 +224,9 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugLib-Static|x64'" Label="PropertySheets">
@@ -228,9 +254,13 @@
     <OutDir Condition="'$(Configuration)|$(Platform)'=='DebugLib-Static|x64'">$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='DebugLib-Static|x64'">$(Platform)\$(Configuration)\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">$(Configuration)\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(Platform)\$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(Platform)\$(Configuration)\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='DebugDll|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='DebugDll|Win32'">$(Configuration)\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='DebugDll|x64'">$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
@@ -284,11 +314,17 @@
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'" />
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'" />
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'" />
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'" />
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'" />
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'" />
@@ -304,6 +340,7 @@
     <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='ReleaseDll-Static|Win32'">C:\Program Files %28x86%29\nasm;C:\Program Files\nasm;$(ExecutablePath)</ExecutablePath>
     <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|Win32'">C:\Program Files %28x86%29\nasm;C:\Program Files\nasm;$(ExecutablePath)</ExecutablePath>
     <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">C:\Program Files %28x86%29\nasm;C:\Program Files\nasm;$(ExecutablePath)</ExecutablePath>
+    <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">C:\Program Files %28x86%29\nasm;C:\Program Files\nasm;$(ExecutablePath)</ExecutablePath>
     <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">C:\Program Files %28x86%29\nasm;C:\Program Files\nasm;$(ExecutablePath)</ExecutablePath>
     <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='DebugDll-Static|x64'">C:\Program Files %28x86%29\nasm;C:\Program Files\nasm;$(ExecutablePath)</ExecutablePath>
     <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='DebugLib-Static|x64'">C:\Program Files %28x86%29\nasm;C:\Program Files\nasm;$(ExecutablePath)</ExecutablePath>
@@ -311,6 +348,7 @@
     <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='ReleaseDll-Static|x64'">C:\Program Files %28x86%29\nasm;C:\Program Files\nasm;$(ExecutablePath)</ExecutablePath>
     <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">C:\Program Files %28x86%29\nasm;C:\Program Files\nasm;$(ExecutablePath)</ExecutablePath>
     <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">C:\Program Files %28x86%29\nasm;C:\Program Files\nasm;$(ExecutablePath)</ExecutablePath>
+    <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">C:\Program Files %28x86%29\nasm;C:\Program Files\nasm;$(ExecutablePath)</ExecutablePath>
     <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|x64'">C:\Program Files %28x86%29\nasm;C:\Program Files\nasm;$(ExecutablePath)</ExecutablePath>
     <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='DebugLib-Static|Win32'">C:\Program Files %28x86%29\nasm;C:\Program Files\nasm;$(ExecutablePath)</ExecutablePath>
   </PropertyGroup>
@@ -457,7 +495,51 @@
       <OutputFile>$(OutDir)$(ProjectName)-static.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>./win;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;WITH_SIMD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
+    </ClCompile>
+    <Lib>
+      <OutputFile>$(OutDir)$(ProjectName)-static.lib</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>./win;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;WITH_SIMD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+    </ClCompile>
+    <Lib>
+      <OutputFile>$(OutDir)$(ProjectName)-static.lib</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">
     <Midl>
       <TargetEnvironment>X64</TargetEnvironment>
     </Midl>
@@ -710,6 +792,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseDll-Static|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="simd\jsimd_x86_64.c">
@@ -720,6 +803,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseDll-Static|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="jutils.c" />
@@ -782,14 +866,23 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
@@ -857,14 +950,23 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
@@ -932,14 +1034,23 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
@@ -1007,14 +1118,23 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
@@ -1082,14 +1202,23 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
@@ -1157,14 +1286,23 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
@@ -1232,14 +1370,23 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
@@ -1307,14 +1454,23 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
@@ -1382,14 +1538,23 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
@@ -1457,14 +1622,23 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
@@ -1532,14 +1706,23 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
@@ -1607,14 +1790,23 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
@@ -1682,14 +1874,23 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
@@ -1757,14 +1958,23 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
@@ -1832,14 +2042,23 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
@@ -1907,14 +2126,23 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
@@ -1982,14 +2210,23 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
@@ -2057,14 +2294,23 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
@@ -2132,14 +2378,23 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
@@ -2207,14 +2462,23 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
@@ -2282,14 +2546,23 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
@@ -2357,14 +2630,23 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
@@ -2432,14 +2714,23 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
@@ -2507,14 +2798,23 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
@@ -2582,14 +2882,23 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
@@ -2657,14 +2966,23 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
@@ -2732,14 +3050,23 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
@@ -2807,14 +3134,23 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
@@ -2882,14 +3218,23 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
@@ -2957,14 +3302,23 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
@@ -3032,14 +3386,23 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm %(Filename)%(Extension) -&gt; %(Filename).obj</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o $(OutDir)%(Filename).obj simd/%(Filename)%(Extension)
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
@@ -3083,10 +3446,15 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
@@ -3126,10 +3494,15 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
@@ -3169,10 +3542,15 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
@@ -3212,10 +3590,15 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
@@ -3255,10 +3638,15 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
@@ -3298,10 +3686,15 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
@@ -3341,10 +3734,15 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
@@ -3384,10 +3782,15 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
@@ -3427,10 +3830,15 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
@@ -3470,10 +3878,15 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
@@ -3513,10 +3926,15 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
@@ -3556,10 +3974,15 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
@@ -3599,10 +4022,15 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
@@ -3642,10 +4070,15 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"
@@ -3660,8 +4093,11 @@
       <Message Condition="'$(Configuration)|$(Platform)'=='DebugDll|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='DebugDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='DebugLib-Static|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='DebugLib-Static|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='DebugLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
@@ -3688,8 +4124,11 @@
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
@@ -3712,12 +4151,16 @@
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|x64'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugLib-Static|x64'">true</ExcludedFromBuild>
     </CustomBuild>
     <CustomBuild Include="simd\jcgrammx.asm">
@@ -3741,12 +4184,16 @@
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='releasevista|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/ -o "$(OutDir)%(Filename).obj" "simd/%(Filename)%(Extension)"</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseLib-Static|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='releasevista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugLib-Static|x64'">true</ExcludedFromBuild>
     </CustomBuild>
   </ItemGroup>
