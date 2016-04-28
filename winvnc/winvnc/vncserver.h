@@ -323,7 +323,11 @@ public:
 	// Whether or not to allow connections from the local machine
 	virtual void SetLoopbackOk(BOOL ok) {m_loopback_allowed = ok;};
 	virtual BOOL LoopbackOk() {return m_loopback_allowed;};
-
+#ifdef IPV6V4
+	// Whether or not to allow connections from the local machine
+	virtual void SetIPV6(BOOL ok) { G_ipv6_allowed = ok; };
+	virtual BOOL IPV6() { return G_ipv6_allowed; };
+#endif
 	// Whether or not to shutdown or logoff when the last client leaves
 	virtual void SetLockSettings(int ok) {m_lock_on_exit = ok;};
 	virtual int LockSettings() {return m_lock_on_exit;};
@@ -488,7 +492,7 @@ protected:
 	char				m_password[MAXPWLEN];
 	char				m_password2[MAXPWLEN]; //PGM
 	BOOL				m_passwd_required;
-	BOOL				m_loopback_allowed;
+	BOOL				m_loopback_allowed;	
 	BOOL				m_loopbackOnly;
 	char				*m_auth_hosts;
 	BOOL				m_enable_remote_inputs;

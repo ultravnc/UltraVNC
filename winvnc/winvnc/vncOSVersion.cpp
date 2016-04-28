@@ -22,7 +22,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#include <windows.h>
+#include <winsock2.h>
 #include <windows.h>
 #include "vncOSVersion.h"
 #define SUCCEEDED(hr) (((HRESULT)(hr)) >= 0)

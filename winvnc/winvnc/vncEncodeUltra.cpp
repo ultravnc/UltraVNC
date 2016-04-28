@@ -21,7 +21,7 @@
 // http://www.uvnc.com/
 //
 ////////////////////////////////////////////////////////////////////////////
-
+#include "stdhdrs.h"
 #include "vncEncodeUltra.h"
 
 #define IN_LEN		(128*1024)

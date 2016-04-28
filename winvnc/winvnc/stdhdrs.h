@@ -55,7 +55,7 @@
 #endif
 
 //compile special case, rfb port is used for java and rfb
-
+#include <ws2tcpip.h>
 #include <winsock2.h>
 #include <windows.h>
 #include <shellapi.h>

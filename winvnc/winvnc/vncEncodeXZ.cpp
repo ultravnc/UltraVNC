@@ -20,7 +20,7 @@
 // the authors on info@realvnc.com for information on obtaining it.
 
 #ifdef _XZ
-
+#include "stdhdrs.h"
 #include "vncEncodeXZ.h"
 #include "rfb.h"
 #include "rfbMisc.h"

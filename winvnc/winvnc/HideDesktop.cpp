@@ -21,8 +21,9 @@
 // http://www.uvnc.com/
 //
 ////////////////////////////////////////////////////////////////////////////
-
+#include "stdhdrs.h"
 #define WIN32_LEAN_AND_MEAN
+#include <WinSock2.h>
 #include <Windows.h>
 #include <WinInet.h> // Shell object uses INTERNET_MAX_URL_LENGTH (go figure)
 #if _MSC_VER < 1400

@@ -23,7 +23,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 //  Copyright (C) 2000 Const Kaplinsky. All Rights Reserved.
-
+#include "stdhdrs.h"
 #include "vncencoder.h"
 #include "vncbuffer.h"
 #include "vncdesktop.h"

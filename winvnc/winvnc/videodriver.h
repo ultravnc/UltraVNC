@@ -28,6 +28,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <winsock2.h>
 #include <windows.h>
 
 #include <tchar.h>

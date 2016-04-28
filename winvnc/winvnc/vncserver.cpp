@@ -51,10 +51,11 @@ bool g_Server_running;
 extern bool g_Desktop_running;
 extern bool g_DesktopThread_running;
 void*	vncServer::pThis;
+bool G_ipv6_allowed = false;
 
 // adzm 2009-07-05
 extern BOOL SPECIAL_SC_PROMPT;
-extern BOOL G_HTTP;
+//extern BOOL G_HTTP;
 // vncServer::UpdateTracker routines
 
 void
@@ -169,6 +170,7 @@ vncServer::vncServer()
 	// General options
 	m_loopbackOnly = FALSE;
 	m_loopback_allowed = TRUE;
+	G_ipv6_allowed = FALSE;
 	m_lock_on_exit = 0;
 	m_connect_pri = 0;
 	m_disableTrayIcon = FALSE;
@@ -2493,7 +2495,7 @@ void vncServer::_actualTimerRetryHandler()
 		if (tmpsock) {
 
 
-			if (G_HTTP)
+			/*if (G_HTTP)
 				{
 					if (tmpsock->Http_CreateConnect(m_szAutoReconnectAdr))
 					{
@@ -2542,7 +2544,7 @@ void vncServer::_actualTimerRetryHandler()
 					}
 
 				}
-				else
+				else*/
 				{
 					// Connect out to the specified host on the VNCviewer listen port
 					tmpsock->Create();

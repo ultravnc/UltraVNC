@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <tchar.h>
 #include <time.h>
+#include <winsock2.h>
 #include <windows.h>
 #include "CpuUsage.h"
 

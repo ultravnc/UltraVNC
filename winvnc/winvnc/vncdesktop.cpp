@@ -721,7 +721,7 @@ vncDesktop::PreConnectInitBitmap()
 	m_bminfo.bmi.bmiHeader.biHeight = m_bmrect.br.y;
 	m_bminfo.bmi.bmiHeader.biSizeImage = abs((m_bminfo.bmi.bmiHeader.biWidth *m_bminfo.bmi.bmiHeader.biHeight *m_bminfo.bmi.bmiHeader.biBitCount) / 8);
 	m_bminfo.bmi.bmiHeader.biHeight = -abs(m_bminfo.bmi.bmiHeader.biHeight);
-	m_bminfo.bmi.bmiHeader.biCompression == BI_RGB;
+	m_bminfo.bmi.bmiHeader.biCompression = BI_RGB;
 	m_bminfo.truecolour = true;
 	m_DIBbits = NULL;
 	return 0;

@@ -141,7 +141,6 @@ public:
 
   bool GetPeerAddress(char *address, int size);
 
-  VBool Http_CreateConnect(const VString address);
   SOCKET GetChannel() const { return (SOCKET) sock; }
   // I/O routines
   // Check to see if the socket becomes readable within <to> msec.

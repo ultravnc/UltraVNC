@@ -39,7 +39,7 @@
 // However, over slower (128kbps or less) connections, the reduction
 // in data transmitted usually outweighs the extra latency added
 // while the server CPU performs the compression algorithms.
-
+#include "stdhdrs.h"
 #include "vncEncodeTight.h"
 
 // Compression level stuff. The following array contains various

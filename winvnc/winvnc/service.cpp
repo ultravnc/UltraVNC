@@ -26,6 +26,7 @@
 // vncService
 
 // Implementation of service-oriented functionality of WinVNC
+#include <winsock2.h>
 #include <windows.h>
 #include <userenv.h>
 #include <wtsapi32.h>

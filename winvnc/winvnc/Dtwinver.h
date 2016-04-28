@@ -46,7 +46,7 @@ to maintain a single distribution point for the source code.
 
 
 ////////////////////////////////// Includes ///////////////////////////////////
-
+#include <winsock2.h>
 #include <windows.h> 
 #if defined(COSVERSION_WIN32) || defined(COSVERSION_WIN64)
 #include <tchar.h>

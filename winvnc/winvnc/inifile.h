@@ -21,7 +21,7 @@
 // http://www.uvnc.com/
 //
 ////////////////////////////////////////////////////////////////////////////
-
+#include <winsock2.h>
 #include <windows.h>
 #if (!defined(_WINVNC_INIFILE))
 #define _WINVNC_INIFILE

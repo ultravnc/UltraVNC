@@ -1,6 +1,7 @@
 #ifdef _USE_DESKTOPDUPLICATION
 #ifndef __DESK
 #define __DESK
+#include <winsock2.h>
 #include <windows.h>
 #include <new>
 #include <d3d11.h>

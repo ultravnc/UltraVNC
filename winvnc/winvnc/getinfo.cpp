@@ -21,7 +21,8 @@
 // http://www.uvnc.com/
 //
 ////////////////////////////////////////////////////////////////////////////
-
+#include <winsock2.h>
+#include <ws2tcpip.h>
 #include <windows.h> 
 #if defined(_WIN32) || defined(_WIN64)
 #include <tchar.h>
