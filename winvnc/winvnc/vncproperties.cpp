@@ -513,6 +513,9 @@ vncProperties::DialogProc(HWND hwnd,
 		   HWND hIPV6 = GetDlgItem(hwnd, IDC_IPV6);
 		   BOOL fIPV6 = _this->m_server->IPV6();
 		   SendMessage(hIPV6, BM_SETCHECK, fIPV6, 0);
+#else
+		   HWND hIPV6 = GetDlgItem(hwnd, IDC_IPV6);
+		   EnableWindow(hIPV6, false);
 #endif
 		   HWND hLoopbackonly = GetDlgItem(hwnd, IDC_LOOPBACKONLY);
 		   BOOL fLoopbackonly = _this->m_server->LoopbackOnly();
@@ -1710,7 +1713,7 @@ vncProperties::Load(BOOL usersettings)
 		}
 	}
 #ifdef IPV6V4
-	m_server->SetIPV6(LoadInt(hkLocal, "AllowIpv6", true));
+	m_server->SetIPV6(LoadInt(hkLocal, "UseIpv6", true));
 #endif
 	if (m_server->LoopbackOnly()) m_server->SetLoopbackOk(true);
 	else m_server->SetLoopbackOk(LoadInt(hkLocal, "AllowLoopback", true));
@@ -2114,7 +2117,7 @@ vncProperties::Save()
 	SaveInt(hkLocal, "DebugLevel", vnclog.GetLevel());
 	SaveInt(hkLocal, "AllowLoopback", m_server->LoopbackOk());
 #ifdef IPV6V4
-	SaveInt(hkLocal, "AllowIpv6", m_server->IPV6());
+	SaveInt(hkLocal, "UseIpv6", m_server->IPV6());
 #endif
 	SaveInt(hkLocal, "LoopbackOnly", m_server->LoopbackOnly());
 	if (hkDefault) 
@@ -2265,7 +2268,7 @@ void vncProperties::LoadFromIniFile()
 	//adzm 2010-05-12 - dsmplugin config
 	myIniFile.ReadString("admin", "DSMPluginConfig", m_pref_DSMPluginConfig, 512);
 #ifdef IPV6V4
-	m_server->SetIPV6(myIniFile.ReadInt("admin", "AllowIpv6", false));
+	m_server->SetIPV6(myIniFile.ReadInt("admin", "UseIpv6", false));
 #endif
 	if (m_server->LoopbackOnly()) m_server->SetLoopbackOk(true);
 	else m_server->SetLoopbackOk(myIniFile.ReadInt("admin", "AllowLoopback", true));
@@ -2441,7 +2444,7 @@ void vncProperties::SaveToIniFile()
 				myIniFile.WriteInt("admin", "DebugLevel", vnclog.GetLevel());
 				myIniFile.WriteInt("admin", "AllowLoopback", m_server->LoopbackOk());
 #ifdef IPV6V4
-				myIniFile.WriteInt("admin", "AllowIpv6", m_server->IPV6());
+				myIniFile.WriteInt("admin", "UseIpv6", m_server->IPV6());
 #endif
 				myIniFile.WriteInt("admin", "LoopbackOnly", m_server->LoopbackOnly());
 				myIniFile.WriteInt("admin", "AllowShutdown", m_allowshutdown);
@@ -2469,7 +2472,7 @@ void vncProperties::SaveToIniFile()
 	myIniFile.WriteInt("admin", "DebugLevel", vnclog.GetLevel());
 	myIniFile.WriteInt("admin", "AllowLoopback", m_server->LoopbackOk());
 #ifdef IPV6V4
-	myIniFile.WriteInt("admin", "AllowIPv6", m_server->IPV6());
+	myIniFile.WriteInt("admin", "UseIpv6", m_server->IPV6());
 #endif
 	myIniFile.WriteInt("admin", "LoopbackOnly", m_server->LoopbackOnly());
 	myIniFile.WriteInt("admin", "AllowShutdown", m_allowshutdown);

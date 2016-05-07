@@ -2009,7 +2009,97 @@ void GetIPString(char *buffer, int buflen)
 		strncpy(buffer, "Host name unavailable", buflen);
 		return;
     }
+#ifdef IPV6V4
+	*buffer = '\0';
 
+	LPSOCKADDR sockaddr_ip;
+	struct addrinfo hint;
+	struct addrinfo *serverinfo = 0;
+	memset(&hint, 0, sizeof(hint));
+	hint.ai_family = AF_UNSPEC;
+	hint.ai_socktype = SOCK_STREAM;
+	hint.ai_protocol = IPPROTO_TCP;
+	struct sockaddr_in6 *pIpv6Addr;
+	struct sockaddr_in *pIpv4Addr;
+	struct sockaddr_in6 Ipv6Addr;
+	struct sockaddr_in Ipv4Addr;
+	memset(&Ipv6Addr, 0, sizeof(Ipv6Addr));
+	memset(&Ipv4Addr, 0, sizeof(Ipv4Addr));
+
+	//make sure the buffer is not overwritten
+
+
+	if (getaddrinfo(namebuf, 0, &hint, &serverinfo) == 0)
+	{
+		struct addrinfo *p;
+		if (!G_ipv6_allowed)
+		{
+			p = serverinfo;
+			for (p = serverinfo; p != NULL; p = p->ai_next) {
+				switch (p->ai_family) {
+				case AF_INET:
+				{
+					pIpv4Addr = (struct sockaddr_in *) p->ai_addr;
+					memcpy(&Ipv4Addr, pIpv4Addr, sizeof(Ipv4Addr));
+					Ipv4Addr.sin_family = AF_INET;
+					char			szText[256];
+					sprintf(szText, "%s-", inet_ntoa(Ipv4Addr.sin_addr));
+					int len = strlen(buffer);
+					int len2 = strlen(szText);
+					if (len + len2 < buflen) strcat_s(buffer, buflen, szText);
+					break;
+				}
+				case AF_INET6:
+				{
+					break;
+				}
+				default:
+					break;
+				}
+			}
+		}
+
+
+		if (G_ipv6_allowed)
+		{
+			p = serverinfo;
+			for (p = serverinfo; p != NULL; p = p->ai_next) {
+				switch (p->ai_family) {
+				case AF_INET:
+				{
+					break;
+				}
+				case AF_INET6:
+				{
+					char ipstringbuffer[46];
+					DWORD ipbufferlength = 46;
+					ipbufferlength = 46;
+					memset(ipstringbuffer, 0, 46);
+
+					pIpv6Addr = (struct sockaddr_in6 *) p->ai_addr;
+					memcpy(&Ipv6Addr, pIpv6Addr, sizeof(Ipv6Addr));
+					Ipv6Addr.sin6_family = AF_INET6;
+
+					sockaddr_ip = (LPSOCKADDR)p->ai_addr;
+
+					WSAAddressToString(sockaddr_ip, (DWORD)p->ai_addrlen, NULL, ipstringbuffer, &ipbufferlength);
+					char			szText[256];
+					memset(szText, 0, 256);
+					strncpy(szText, ipstringbuffer, ipbufferlength - 4);
+					strcat(szText, "-");
+					int len = strlen(buffer);
+					int len2 = strlen(szText);
+					if (len + len2 < buflen)strcat_s(buffer, buflen, szText);
+					break;
+				}
+				default:
+					break;
+				}
+			}
+		}
+	}
+	freeaddrinfo(serverinfo);
+#else
     HOSTENT *ph = NULL;
 	ph=gethostbyname(namebuf);
     if (!ph)
@@ -2031,6 +2121,7 @@ void GetIPString(char *buffer, int buflen)
 		if (ph->h_addr_list[i+1] != 0)
 			strncat(buffer, ", ", (buflen-1)-strlen(buffer));
     }
+#endif
 }
 
 // adzm 2010-08
@@ -2218,8 +2309,11 @@ vncClientThread::run(void *arg)
 			m_server->AutoReconnectPort(m_AutoReconnectPort);
 			m_server->AutoReconnectAdr(m_szAutoReconnectAdr);
 			m_server->AutoReconnectId(m_szAutoReconnectId);
-
+#ifdef IPV6V4
+			vncService::PostAddNewClient4(1111, 1111);
+#else
 			vncService::PostAddNewClient(1111, 1111);
+#endif
 		}
 		m_server->RemoveClient(m_client->GetClientId());
 		return;
@@ -4580,7 +4674,11 @@ vncClientThread::run(void *arg)
 			m_server->AutoReconnectPort(m_AutoReconnectPort);
 			m_server->AutoReconnectAdr(m_szAutoReconnectAdr);
 			m_server->AutoReconnectId(m_szAutoReconnectId);
+#ifdef IPV6V4
+			vncService::PostAddNewClient4(1111, 1111);
+#else
 			vncService::PostAddNewClient(1111, 1111);
+#endif
 		}
 	}
 }

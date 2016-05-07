@@ -51,7 +51,7 @@ bool g_Server_running;
 extern bool g_Desktop_running;
 extern bool g_DesktopThread_running;
 void*	vncServer::pThis;
-bool G_ipv6_allowed = false;
+BOOL G_ipv6_allowed = false;
 
 // adzm 2009-07-05
 extern BOOL SPECIAL_SC_PROMPT;
@@ -643,7 +643,7 @@ vncServer::Authenticated(vncClientId clientid)
 				{
 					client->Kill();
 					authok = FALSE;
-					m_authClients.erase(i);
+					//m_authClients.erase(i);
 					break;
 				}
 				// Preset toggle prim/sec/both
@@ -661,7 +661,7 @@ vncServer::Authenticated(vncClientId clientid)
 					authok = FALSE;
 					delete m_desktop;
 					m_desktop = NULL;
-					m_authClients.erase(i);
+					//m_authClients.erase(i);
 					break;
 				}
 			}

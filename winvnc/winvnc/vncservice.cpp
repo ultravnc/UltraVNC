@@ -68,6 +68,7 @@ pProcessIdToSessionId WTSProcessIdToSessionIdF=NULL;
 
 extern BOOL SPECIAL_SC_EXIT;
 extern BOOL SPECIAL_SC_PROMPT;
+in6_addr G_LPARAM_IN6;
 
 void ClearKeyState(BYTE key);
 DWORD GetCurrentSessionID()
@@ -836,6 +837,74 @@ vncService::LockWorkstation()
 // Static routine to tell a locally-running instance of the server
 // to connect out to a new client
 
+#ifdef IPV6V4
+BOOL
+vncService::PostAddNewClient4(unsigned long ipaddress, unsigned short port)
+{
+	// Post to the WinVNC menu window
+	if (!PostToWinVNC(MENU_ADD_CLIENT_MSG, (WPARAM)port, (LPARAM)ipaddress))
+	{
+
+		//MessageBoxSecure(NULL, sz_ID_NO_EXIST_INST, szAppName, MB_ICONEXCLAMATION | MB_OK);
+
+		//Little hack, seems postmessage fail in some cases on some os.
+		//permission proble
+		//use G_var + WM_time to reconnect
+		vnclog.Print(LL_INTERR, VNCLOG("PostAddNewClient failed\n"));
+		if (port == 1111 && ipaddress == 1111) G_1111 = true;
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+BOOL
+vncService::PostAddNewClientInit4(unsigned long ipaddress, unsigned short port)
+{
+	// Post to the WinVNC menu window
+	if (!PostToWinVNC(MENU_ADD_CLIENT_MSG_INIT, (WPARAM)port, (LPARAM)ipaddress))
+	{
+
+		//MessageBoxSecure(NULL, sz_ID_NO_EXIST_INST, szAppName, MB_ICONEXCLAMATION | MB_OK);
+
+		//Little hack, seems postmessage fail in some cases on some os.
+		//permission proble
+		//use G_var + WM_time to reconnect
+		vnclog.Print(LL_INTERR, VNCLOG("PostAddNewClient failed\n"));
+		if (port == 1111 && ipaddress == 1111) G_1111 = true;
+		return FALSE;
+	}
+
+	return TRUE;
+}
+BOOL
+vncService::PostAddNewClient6(in6_addr *ipaddress, unsigned short port)
+{
+	// Post to the WinVNC menu window
+	// We can not sen a ipv6 address with a LPARAM, so we fake the message by copying in a gloobal var.
+	memcpy(&G_LPARAM_IN6, ipaddress, sizeof(in6_addr));
+	if (!PostToWinVNC(MENU_ADD_CLIENT6_MSG, (WPARAM)port, (LPARAM)ipaddress))
+	{
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+BOOL
+vncService::PostAddNewClientInit6(in6_addr *ipaddress, unsigned short port)
+{
+	// Post to the WinVNC menu window
+	// We can not sen a ipv6 address with a LPARAM, so we fake the message by copying in a gloobal var.
+	memcpy(&G_LPARAM_IN6, ipaddress, sizeof(in6_addr));
+	if (!PostToWinVNC(MENU_ADD_CLIENT6_MSG_INIT, (WPARAM)port, (LPARAM)ipaddress))
+	{
+		return FALSE;
+	}
+
+	return TRUE;
+}
+#else
 BOOL
 vncService::PostAddNewClient(unsigned long ipaddress, unsigned short port)
 {
@@ -875,7 +944,7 @@ vncService::PostAddNewClientInit(unsigned long ipaddress, unsigned short port)
 
 	return TRUE;
 }
-
+#endif
 //adzm 2009-06-20
 // Static routine to tell a locally-running instance of the server
 // to prompt for a new ID to connect out to the repeater
