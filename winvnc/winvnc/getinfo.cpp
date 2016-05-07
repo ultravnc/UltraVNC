@@ -39,6 +39,8 @@
   #define LPTSTR LPSTR
 #endif
 
+extern BOOL G_ipv6_allowed;
+
 
 int getinfo(char mytext[1024])
 
@@ -572,6 +574,79 @@ int getinfo(char mytext[1024])
 
     char name[255];
 	char *IP=NULL;
+#ifdef IPV6V4
+
+	LPSOCKADDR sockaddr_ip;
+	char ipstringbuffer[46];
+	DWORD ipbufferlength = 46;
+	bool IsIpv4 = false;
+	bool IsIpv6 = false;
+	struct addrinfo hint;
+	struct addrinfo *serverinfo = 0;
+	memset(&hint, 0, sizeof(hint));
+	hint.ai_family = AF_UNSPEC;
+	hint.ai_socktype = SOCK_STREAM;
+	hint.ai_protocol = IPPROTO_TCP;
+	struct sockaddr_in6 *pIpv6Addr;
+	struct sockaddr_in *pIpv4Addr;
+	struct sockaddr_in6 Ipv6Addr;
+	struct sockaddr_in Ipv4Addr;
+	memset(&Ipv6Addr, 0, sizeof(Ipv6Addr));
+	memset(&Ipv4Addr, 0, sizeof(Ipv4Addr));
+
+	if (getaddrinfo(name, 0, &hint, &serverinfo) == 0)
+	{
+		struct addrinfo *p;
+		for (p = serverinfo; p != NULL; p = p->ai_next) {
+			switch (p->ai_family) {
+			case AF_INET:
+				IsIpv4 = true;
+				pIpv4Addr = (struct sockaddr_in *) p->ai_addr;
+				memcpy(&Ipv4Addr, pIpv4Addr, sizeof(Ipv4Addr));
+				Ipv4Addr.sin_family = AF_INET;
+				break;
+			case AF_INET6:
+				if (G_ipv6_allowed)
+				{
+					IsIpv6 = true;
+					pIpv6Addr = (struct sockaddr_in6 *) p->ai_addr;
+					memcpy(&Ipv6Addr, pIpv6Addr, sizeof(Ipv6Addr));
+					Ipv6Addr.sin6_family = AF_INET6;
+					sockaddr_ip = (LPSOCKADDR)p->ai_addr;
+					ipbufferlength = 46;
+					memset(ipstringbuffer, 0, 46);
+					WSAAddressToString(sockaddr_ip, (DWORD)p->ai_addrlen, NULL, ipstringbuffer, &ipbufferlength);
+				}
+				break;
+			default:
+				break;
+				}
+
+
+			}
+
+		}
+	freeaddrinfo(serverinfo);
+
+	if (IsIpv6 && IsIpv4)
+	{
+		char			szText[256];
+		sprintf(szText, "Ipv4: %s\nIpv6: %s \n", inet_ntoa(Ipv4Addr.sin_addr), ipstringbuffer);
+		strcat(mytext, szText);
+	}
+	else if (IsIpv6)
+	{
+		char			szText[256];
+		sprintf(szText, "Ipv6: %s \n", ipstringbuffer);
+		strcat(mytext, szText);
+	}
+	else if (IsIpv4)
+	{
+		char			szText[256];
+		sprintf(szText, "Ipv4: %s \n", inet_ntoa(Ipv4Addr.sin_addr));
+		strcat(mytext, szText);
+	}
+#else
 	PHOSTENT hostinfo;
 		if(gethostname(name, sizeof(name))==0)
 		{
@@ -585,19 +660,8 @@ int getinfo(char mytext[1024])
 	strcat(mytext,"\nIP : ");
 	strcat(mytext,IP);
 	}
-
+#endif
 	//////////////////////////////////////
-/*	MEMORYSTATUS memoryStatus;
-	ZeroMemory(&memoryStatus,sizeof(MEMORYSTATUS));
-	memoryStatus.dwLength = sizeof (MEMORYSTATUS);
-	
-	::GlobalMemoryStatus (&memoryStatus);
-	
-	sprintf("Installed RAM: %ldMB",(DWORD) ceil(memoryStatus.dwTotalPhys/1024/1024));	
-	sprintf("\r\nMemory Available: %ldKB",(DWORD) (memoryStatus.dwAvailPhys/1024));	
-	sprintf("\r\nPrecent of used RAM: %%%ld\n",memoryStatus.dwMemoryLoad);
-	sprintf("\n");
-	sprintf(sText);*/
 	strcat(mytext,"\n");
 	strcat(mytext,sText);      
 
