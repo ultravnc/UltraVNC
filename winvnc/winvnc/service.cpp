@@ -827,7 +827,7 @@ bool IsSessionStillActive(int ID)
 //////////////////////////////////////////////////////////////////////////////
 void monitor_sessions_RDP()
 {
-	bool  RDPMODE = false;
+	BOOL  RDPMODE = false;
 	IniFile myIniFile;
 	RDPMODE = myIniFile.ReadInt("admin", "rdpmode", 0);
 	pad2(false);
