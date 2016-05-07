@@ -31,6 +31,7 @@
 
 #pragma once
 #include "stdhdrs.h"
+#include <winsock2.h>
 #include <windows.h>
 #include <tchar.h>
 

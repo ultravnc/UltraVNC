@@ -32,7 +32,7 @@
 
 #ifndef _ZIPUNZIP32_H
 #define _ZIPUNZIP32_H
-
+#include <winsock2.h>
 #include "windows.h"
 
 

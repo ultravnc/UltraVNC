@@ -34,6 +34,7 @@
 
 
 #define VC_EXTRALEAN
+#include <winsock2.h>
 #include <windows.h>
 
 #include <string>

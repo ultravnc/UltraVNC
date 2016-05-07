@@ -247,6 +247,8 @@
 #define IDC_LAST_ENCODING               2020
 #define IDC_CHECK3                      2021
 #define IDC_SAVEPOS                     2021
+#define IDC_CHECK4                      2022
+#define IDC_SAVESIZE                    2022
 #define IDC_STATIC_SPLIT                9000
 #define IDC_HOSTNAME_DEL                9001
 #define ID_SESSION_SET_CRECT            32777
@@ -543,7 +545,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        210
 #define _APS_NEXT_COMMAND_VALUE         50025
-#define _APS_NEXT_CONTROL_VALUE         2022
+#define _APS_NEXT_CONTROL_VALUE         2023
 #define _APS_NEXT_SYMED_VALUE           154
 #endif
 #endif

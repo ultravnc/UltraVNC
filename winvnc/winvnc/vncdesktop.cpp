@@ -482,6 +482,7 @@ bool vncDesktop::FastDetectChanges(rfb::Region2D &rgn, rfb::Rect &rect, int nZon
 
 vncDesktop::vncDesktop()
 {
+	m_server = NULL;
 	m_thread = NULL;
 #ifdef AVILOG
 	AviGen=NULL;
@@ -623,7 +624,7 @@ vncDesktop::~vncDesktop()
 
 
 	// added jeff
-    SetBlockInputState(false);
+	if (m_server) SetBlockInputState(false);
 	// Let's call Shutdown just in case something went wrong...
 	Shutdown();
 	vnclog.Print(LL_INTINFO, VNCLOG("~vncDesktop Shutdown()\n"));
@@ -1626,7 +1627,6 @@ vncDesktop::Init(vncServer *server)
 
 	// Save the server pointer
 	m_server = server;
-
 	// Load in the arrow cursor
 	m_hdefcursor = LoadCursor(NULL, IDC_ARROW);
 	m_hcursor = m_hdefcursor;

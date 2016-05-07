@@ -67,6 +67,7 @@ public:
 	bool	m_NoHotKeys;
 	bool	m_FullScreen;
 	bool	m_SavePos;
+	bool	m_SaveSize;
 	bool	m_Directx;
 	bool    m_ShowToolbar;
 

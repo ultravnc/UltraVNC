@@ -13,13 +13,11 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (U.K.) resources
+// English (United Kingdom) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENG)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
 #pragma code_page(1252)
-#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -27,8 +25,8 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,1,0,1
- PRODUCTVERSION 1,1,0,1
+ FILEVERSION 1,1,0,2
+ PRODUCTVERSION 1,1,0,2
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -45,12 +43,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "UltraVNC"
             VALUE "FileDescription", "VNC hooks DLL for Win32"
-            VALUE "FileVersion", "1, 1, 0, 1"
+            VALUE "FileVersion", "1.1.0.2"
             VALUE "InternalName", "VNCHooks"
             VALUE "LegalCopyright", "Copyright (C) 2016 UltraVNC, Copyright RealVNC Ltd.© 2002, AT&T Research Labs Cambridge© 1996-2001"
             VALUE "OriginalFilename", "VNCHooks.dll"
             VALUE "ProductName", "UltraVNC - VNCHooks"
-            VALUE "ProductVersion", "1, 1, 0, 1"
+            VALUE "ProductVersion", "1.1.0.2"
         END
     END
     BLOCK "VarFileInfo"
@@ -85,7 +83,7 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-#endif    // English (U.K.) resources
+#endif    // English (United Kingdom) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

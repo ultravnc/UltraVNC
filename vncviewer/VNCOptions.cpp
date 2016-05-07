@@ -128,8 +128,9 @@ VNCOptions::VNCOptions()
 	
   m_ViewOnly = false;
   m_FullScreen = false;
-  m_SavePos = true;
-  m_Directx = true;
+  m_SavePos = false;
+  m_SaveSize = false;
+  m_Directx = false;
   autoDetect = true;
   m_Use8Bit = rfbPFFullColors; //false;
   m_ShowToolbar = true;
@@ -269,7 +270,10 @@ VNCOptions::VNCOptions()
 #endif
   char optionfile[MAX_PATH];
   GetDefaultOptionsFileName(optionfile);
-  if (!config_specified) Load(optionfile);
+  //at this point commandlines are not yet processed
+  //no need to check
+  //if (!config_specified) Load(optionfile);
+  Load(optionfile);
 }
 
 void VNCOptions::GetDefaultOptionsFileName(TCHAR *optionfile)
@@ -344,6 +348,7 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
   m_NoStatus			= s.m_NoStatus;
   m_FullScreen		=	s.m_FullScreen;
   m_SavePos			=	s.m_SavePos;
+  m_SaveSize		 =	s.m_SaveSize;
   m_Directx		= s.m_Directx;
   autoDetect = s.autoDetect;
   m_Use8Bit			= s.m_Use8Bit;
@@ -604,6 +609,8 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
       m_FullScreen = true;
 	} else if (SwitchMatch(args[j], _T("savepos"))) {
 	  m_SavePos = true;
+	} else if (SwitchMatch(args[j], _T("savesize"))) {
+		m_SaveSize = true;
 	} else if ( SwitchMatch(args[j], _T("directx"))) {
       m_Directx = true;
     } else if ( SwitchMatch(args[j], _T("noauto"))) {
@@ -1073,6 +1080,7 @@ void VNCOptions::Save(char *fname)
   saveInt("AutoScaling",            m_fAutoScaling,     fname);
   saveInt("fullscreen",			m_FullScreen,		fname);
   saveInt("SavePos", m_SavePos, fname);
+  saveInt("SaveSize", m_SaveSize, fname);
   saveInt("directx",			m_Directx,		fname);
   saveInt("autoDetect", autoDetect, fname);
   saveInt("8bit",					m_Use8Bit,			fname);
@@ -1154,6 +1162,7 @@ void VNCOptions::Load(char *fname)
   m_fAutoScaling =      readInt("AutoScaling",			m_fAutoScaling,		fname) != 0;
   m_FullScreen =			readInt("fullscreen",		m_FullScreen,	fname) != 0;
   m_SavePos = readInt("SavePos", m_SavePos, fname) != 0;
+  m_SaveSize = readInt("SaveSize", m_SaveSize, fname) != 0;
   m_Directx =			readInt("directx",		m_Directx,	fname) != 0;
   autoDetect = readInt("autoDetect", autoDetect, fname) != 0;
   m_Use8Bit =				readInt("8bit",				m_Use8Bit,		fname);
@@ -1515,6 +1524,9 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 
 		  HWND hSavePos = GetDlgItem(hwnd, IDC_SAVEPOS);
 		  SendMessage(hSavePos, BM_SETCHECK, _this->m_SavePos, 0);
+
+		  HWND hSaveSize = GetDlgItem(hwnd, IDC_SAVESIZE);
+		  SendMessage(hSaveSize, BM_SETCHECK, _this->m_SaveSize, 0);
 		  
 
 		  HWND hDirectx = GetDlgItem(hwnd, IDC_DIRECTX);
@@ -1703,6 +1715,10 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 			  HWND hSavePos = GetDlgItem(hwnd, IDC_SAVEPOS);
 			  _this->m_SavePos =
 				  (SendMessage(hSavePos, BM_GETCHECK, 0, 0) == BST_CHECKED);
+
+			  HWND hSaveSize = GetDlgItem(hwnd, IDC_SAVESIZE);
+			  _this->m_SaveSize =
+				  (SendMessage(hSaveSize, BM_GETCHECK, 0, 0) == BST_CHECKED);
 
 			   HWND hDirectx = GetDlgItem(hwnd, IDC_DIRECTX);
 			  _this->m_Directx = 

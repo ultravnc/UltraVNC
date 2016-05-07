@@ -43,7 +43,13 @@ protected:
 	void CheckTrayIcon();
 	void RemoveTrayIcon();
 	bool SendTrayMsg(DWORD msg);
+#ifdef IPV6V4
+	SOCKET m_deamon_sock6;
+	SOCKET m_deamon_sock4;
+#else
 	SOCKET m_deamon_sock;
+#endif
+
 	HWND m_hwnd;
 	HMENU m_hmenu;
 	UINT m_timer;

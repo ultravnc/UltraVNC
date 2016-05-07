@@ -66,7 +66,7 @@
 // Consequently, WinVNc will impose all its clients to use the same plugin. Maybe we'll 
 // improve that soon. It depends on the demand/production of DSM plugins.
 
-
+#include <winsock2.h>
 #include <memory.h>
 #include <stdio.h>
 #include <string.h>

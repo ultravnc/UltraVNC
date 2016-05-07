@@ -29,7 +29,6 @@
   If, for some reason, all these files are missing, the Info-ZIP license
   also may be found at:  ftp://ftp.info-zip.org/pub/infozip/license.html
 */
-
 #include <memory.h>
 #include <stdio.h>
 #include <string.h>
