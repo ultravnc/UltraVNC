@@ -3780,35 +3780,56 @@ void ClientConnection::SizeWindow()
 		temp_h = m_pMRU->Get_h(m_host);
 		if (m_pMRU) delete m_pMRU;
 	}
-
-	if (m_opts.m_w != 0 && m_opts.m_h != 0 && (m_opts.m_SavePos || m_opts.m_SaveSize))
+	bool pos_set = false;
+	bool size_set = false;
+	//added position x y w y via commandline or x y 0 0
+	if (m_opts.m_w != 0 || m_opts.m_h != 0 || m_opts.m_x != 0 || m_opts.m_y!=0)
 	{
-		if (m_opts.m_SavePos && m_opts.m_SaveSize) SetWindowPos(m_hwndMain, HWND_TOP, m_opts.m_x, m_opts.m_y, m_opts.m_w, m_opts.m_h, SWP_SHOWWINDOW);
-		if (m_opts.m_SavePos && !m_opts.m_SaveSize) SetWindowPos(m_hwndMain, HWND_TOP, m_opts.m_x, m_opts.m_y, m_opts.m_w, m_opts.m_h, SWP_SHOWWINDOW | SWP_NOSIZE);
-		if (!m_opts.m_SavePos && m_opts.m_SaveSize) SetWindowPos(m_hwndMain, HWND_TOP, m_opts.m_x, m_opts.m_y, m_opts.m_w, m_opts.m_h, SWP_SHOWWINDOW | SWP_NOMOVE);
+		// x y w h
+		if (m_opts.m_w != 0 && m_opts.m_h != 0 && m_opts.m_x != 0 && m_opts.m_y != 0)
+		{
+			pos_set = true; size_set = true;
+			SetWindowPos(m_hwndMain, HWND_TOP, m_opts.m_x, m_opts.m_y, m_opts.m_w, m_opts.m_h, SWP_SHOWWINDOW);
+		}
+		else if (m_opts.m_x != 0 && m_opts.m_y != 0)
+		{
+			pos_set = true;
+			SetWindowPos(m_hwndMain, HWND_TOP, m_opts.m_x, m_opts.m_y, m_opts.m_w, m_opts.m_h, SWP_SHOWWINDOW | SWP_NOSIZE);
+		}
 	}
-	else if (temp_w != 0 && temp_h != 0 && (m_opts.m_SavePos || m_opts.m_SaveSize))
+	else if (m_opts.m_SavePos || m_opts.m_SaveSize)
 	{
-		if(m_opts.m_SavePos && m_opts.m_SaveSize) SetWindowPos(m_hwndMain, HWND_TOP, temp_x, temp_y, temp_w, temp_h, SWP_SHOWWINDOW);
-		if (m_opts.m_SavePos && !m_opts.m_SaveSize) SetWindowPos(m_hwndMain, HWND_TOP, temp_x, temp_y, temp_w, temp_h, SWP_SHOWWINDOW | SWP_NOSIZE);
-		if (!m_opts.m_SavePos && m_opts.m_SaveSize) SetWindowPos(m_hwndMain, HWND_TOP, temp_x, temp_y, temp_w, temp_h, SWP_SHOWWINDOW | SWP_NOMOVE);
+
+		if (m_opts.m_SavePos && m_opts.m_SaveSize && temp_w != 0 && temp_h != 0)
+		{
+			pos_set = true; size_set = true;
+			SetWindowPos(m_hwndMain, HWND_TOP, temp_x, temp_y, temp_w, temp_h, SWP_SHOWWINDOW);
+		}
+		if (m_opts.m_SavePos && !m_opts.m_SaveSize)
+		{
+			pos_set = true;
+			SetWindowPos(m_hwndMain, HWND_TOP, temp_x, temp_y, temp_w, temp_h, SWP_SHOWWINDOW | SWP_NOSIZE);
+		}
+		if (!m_opts.m_SavePos && m_opts.m_SaveSize && temp_w != 0 && temp_h != 0)
+		{
+			size_set = true;
+			SetWindowPos(m_hwndMain, HWND_TOP, temp_x, temp_y, temp_w, temp_h, SWP_SHOWWINDOW | SWP_NOMOVE);
+		}
 	}
 
 
-	else if (m_opts.m_selected_screen==0 && (m_fullwinwidth <= bb )) //fit on primary
+	if (m_opts.m_selected_screen==0 && (m_fullwinwidth <= bb )) //fit on primary
 		// -20 for border
 	{
-		SetWindowPos(m_hwndMain, HWND_TOP,
-				tdc.monarray[1].wl + ((tdc.monarray[1].wr-tdc.monarray[1].wl)-m_winwidth) / 2,
-				tdc.monarray[1].wt + ((tdc.monarray[1].wb-tdc.monarray[1].wt)-m_winheight) / 2,
-				m_winwidth, m_winheight, SWP_SHOWWINDOW);
+		if (pos_set==false) SetWindowPos(m_hwndMain, HWND_TOP,tdc.monarray[1].wl + ((tdc.monarray[1].wr-tdc.monarray[1].wl)-m_winwidth) / 2,tdc.monarray[1].wt +
+			((tdc.monarray[1].wb - tdc.monarray[1].wt) - m_winheight) / 2, m_winwidth, m_winheight, SWP_SHOWWINDOW | SWP_NOSIZE);
+		if (size_set == false) SetWindowPos(m_hwndMain, HWND_TOP, tdc.monarray[1].wl + ((tdc.monarray[1].wr - tdc.monarray[1].wl) - m_winwidth) / 2, tdc.monarray[1].wt +
+			((tdc.monarray[1].wb - tdc.monarray[1].wt) - m_winheight) / 2, m_winwidth, m_winheight, SWP_SHOWWINDOW | SWP_NOMOVE);
 	}
 	else
 	{
-	SetWindowPos(m_hwndMain, HWND_TOP,
-				workrect.left + (workwidth-m_winwidth) / 2,
-				workrect.top + (workheight-m_winheight) / 2,
-				m_winwidth, m_winheight, SWP_SHOWWINDOW);
+		if (pos_set == false) SetWindowPos(m_hwndMain, HWND_TOP, workrect.left + (workwidth - m_winwidth) / 2, workrect.top + (workheight - m_winheight) / 2, m_winwidth, m_winheight, SWP_SHOWWINDOW | SWP_NOSIZE);
+		if (size_set == false) SetWindowPos(m_hwndMain, HWND_TOP, workrect.left + (workwidth - m_winwidth) / 2, workrect.top + (workheight - m_winheight) / 2, m_winwidth, m_winheight, SWP_SHOWWINDOW | SWP_NOMOVE);
 	}
 
 	SetForegroundWindow(m_hwndMain);
