@@ -357,7 +357,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile=".\..\Release/vnchooks.dll"
+				OutputFile=".\..\Release/vnchooks64.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\VNCHooks.def"
