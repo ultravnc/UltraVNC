@@ -50,8 +50,16 @@ open_connection( const char *host, u_short port )
 	{
 		for (i=0;i<rule1;i++)
 		{
-		if (strstr(temp1[i],remote_host) != NULL)
-		found=TRUE;
+			TCHAR myhost[256]="";
+			int myport=0;
+			if (ParseDisplay(temp1[i], myhost, 255, &myport))
+			{
+				if (strstr(myhost,remote_host) != NULL && port==myport)
+				found=TRUE;
+			}
+
+			//if (strstr(temp1[i],remote_host) != NULL)
+			//found=TRUE;
 		}
 	}
 	if (saved_refuse)
@@ -173,38 +181,42 @@ DWORD WINAPI mode12listener(LPVOID lpParam)
 				char * pch;
 				char * comm;
 				pch = strtok (dest_host,"+");
+				comm = strtok (NULL, ":");
+
 				bool alsoID=false;
-				if (pch != NULL && saved_usecom)
-				{
-					if (strcmp(pch,"ID")==0) alsoID=true;
-					comm = strtok (NULL, ":");
+
+				if (pch == NULL)
+					{
+						closesocket(connection);
+						debug("ID refused %i \n",remoteport);
+						goto end;
+					}
+
+				if (saved_usecom && strcmp(pch,"ID")==0 && comm!=NULL)
+				{					
+					alsoID=true;					
 					if (comm)
+					{
+						if (lookup_comment(remoteport)==NULL)
 						{
-							if (lookup_comment(remoteport)==NULL)
-							{
-								closesocket(connection);
-								debug("ID-XXX refused %i , ID not in use.\n",remoteport,comm);
-								goto end;
-							}
-							if (strcmp(lookup_comment(remoteport),comm)!=0)
-							{
-								closesocket(connection);
-								debug("ID-XXX refused %i , incorrect %s\n",remoteport,comm);
-								goto end;
-							}
+							closesocket(connection);
+							debug("ID-XXX refused %i , ID not in use.\n",remoteport,comm);
+							goto end;
 						}
+						if (strcmp(lookup_comment(remoteport),comm)!=0)
+						{
+							closesocket(connection);
+							debug("ID-XXX refused %i , incorrect %s\n",remoteport,comm);
+							goto end;
+						}
+					}
 					else
 					{
 						closesocket(connection);
 						debug("ID- refused %i\n",remoteport);
 						goto end;
 					}
-				}
-				else if (pch == NULL && saved_usecom)
-				{
-					closesocket(connection);
-					debug("ID refused %i \n",remoteport);
-					goto end;
+					
 				}
 
 				//
@@ -266,6 +278,7 @@ DWORD WINAPI mode12listener(LPVOID lpParam)
 					if ( remote == SOCKET_ERROR )
 					{
 						debug( "Unable to connect to destination host, errno=%d\n",socket_errno());
+						closesocket(connection);
 						goto end;
 					}
 				debug("connected\n");

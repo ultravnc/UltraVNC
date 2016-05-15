@@ -12,6 +12,7 @@
 
 extern int saved_mode2;
 extern int saved_mode1;
+extern int saved_keepalive;
 
 extern int saved_portA;
 extern int saved_portB;
@@ -24,7 +25,7 @@ extern int saved_refuse2;
 extern char saved_sample1[1024];
 extern char saved_sample2[1024];
 extern char saved_sample3[1024];
-extern char temp1[50][16];
+extern char temp1[50][25];
 extern char temp2[50][16];
 extern char temp3[50][16];
 extern int rule1;
@@ -173,8 +174,9 @@ Read_settings()
 		saved_portA=5901;
 		saved_portB=5500;
 		saved_mode2=1;
-		saved_mode1=1;
-		saved_allow=0;
+		saved_mode1=0;
+		saved_keepalive=0;
+		saved_allow=1;
 		saved_refuse=0;
 		saved_refuse2=0;
 		strcpy(saved_sample1,"");
@@ -196,6 +198,7 @@ Read_settings()
 		ReadFile(hFile,&saved_portB,sizeof(int),&readbytes,NULL);
 		ReadFile(hFile,&saved_mode2,sizeof(int),&readbytes,NULL);
 		ReadFile(hFile,&saved_mode1,sizeof(int),&readbytes,NULL);
+		ReadFile(hFile,&saved_keepalive,sizeof(int),&readbytes,NULL);
 		ReadFile(hFile,&saved_allow,sizeof(int),&readbytes,NULL);
 		ReadFile(hFile,&saved_refuse,sizeof(int),&readbytes,NULL);
 		ReadFile(hFile,&saved_refuse2,sizeof(int),&readbytes,NULL);
@@ -280,6 +283,7 @@ Save_settings()
 		WriteFile(hFile,&saved_portB,sizeof(int),&readbytes,NULL);
 		WriteFile(hFile,&saved_mode2,sizeof(int),&readbytes,NULL);
 		WriteFile(hFile,&saved_mode1,sizeof(int),&readbytes,NULL);
+		WriteFile(hFile,&saved_keepalive,sizeof(int),&readbytes,NULL);
 		WriteFile(hFile,&saved_allow,sizeof(int),&readbytes,NULL);
 		WriteFile(hFile,&saved_refuse,sizeof(int),&readbytes,NULL);
 		WriteFile(hFile,&saved_refuse2,sizeof(int),&readbytes,NULL);

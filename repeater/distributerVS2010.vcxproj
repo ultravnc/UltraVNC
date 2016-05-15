@@ -155,6 +155,7 @@
   <ItemGroup>
     <ClInclude Include="list_functions.h" />
     <ClInclude Include="repeater.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="resources.h" />
     <ClInclude Include="webgui\webgui.h" />
   </ItemGroup>

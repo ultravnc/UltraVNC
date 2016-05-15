@@ -46,6 +46,7 @@ void win_log(char *line);
 
 extern int saved_mode2;
 extern int saved_mode1;
+extern int saved_keepalive;
 
 extern int saved_portA;
 extern int saved_portB;
@@ -57,7 +58,7 @@ extern char saved_sample1[1024];
 extern char saved_sample2[1024];
 extern char saved_sample3[1024];
 
-extern char temp1[50][16];
+extern char temp1[50][25];
 extern char temp2[50][16];
 extern char temp3[50][16];
 extern int rule1;

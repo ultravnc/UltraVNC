@@ -95,7 +95,8 @@ int portA=5901;
 int portS=5500;
 int portB=5500;
 BOOL mode2=1;
-BOOL mode1=1;
+BOOL mode1=0;
+BOOL keepalive=0;
 BOOL ssl_proxy=1;
 BOOL ip_service=1;
 BOOL allow=1;
@@ -111,7 +112,7 @@ int saved_portS=0;
 BOOL saved_ssl_proxy;
 BOOL saved_ip_service;
 
-char temp1[50][16];
+char temp1[50][25];
 int rule1=0;
 char temp2[50][16];
 int rule2=0;
@@ -360,7 +361,7 @@ static LRESULT CALLBACK wndProc(HWND hwnd_local, UINT message, WPARAM wParam, LP
             PostMessage(hwnd_local, WM_NULL, 0, 0); /* see above */
             break;
         case WM_LBUTTONDBLCLK: /* switch log window visibility */
-            set_visible(!visible);
+            //set_visible(!visible);
             break;
         }
         return TRUE;
@@ -379,6 +380,7 @@ static LRESULT CALLBACK settings_proc(HWND hDlg, UINT message,
 			portS=saved_portS;
 			mode2=saved_mode2;
 			mode1=saved_mode1;
+			keepalive=saved_keepalive;
 			ssl_proxy=saved_ssl_proxy;
 			ip_service=saved_ip_service;
 			allow=saved_allow;
@@ -392,6 +394,7 @@ static LRESULT CALLBACK settings_proc(HWND hDlg, UINT message,
 			SetDlgItemText(hDlg, IDC_LISTENPORT, _itoa(portB,tempchar,10));
 			SendDlgItemMessage(hDlg, IDC_ENABLE,BM_SETCHECK,mode2,0);
 			SendDlgItemMessage(hDlg, IDC_ENABLE2,BM_SETCHECK,mode1,0);
+			SendDlgItemMessage(hDlg, IDC_KEEPALIVE,BM_SETCHECK,keepalive,0);
 			SendDlgItemMessage(hDlg, IDC_ENABLE3,BM_SETCHECK,ssl_proxy,0);
 			SendDlgItemMessage(hDlg, IDC_ENABLE4,BM_SETCHECK,ip_service,0);
 			SendDlgItemMessage(hDlg, IDC_ALLOW,BM_SETCHECK,allow,0);
@@ -444,6 +447,11 @@ static LRESULT CALLBACK settings_proc(HWND hDlg, UINT message,
 						mode1=1;
 					else mode1=0;
 
+				case IDC_KEEPALIVE:
+					if (SendDlgItemMessage(hDlg, IDC_KEEPALIVE,BM_GETCHECK,0,0)== BST_CHECKED)
+						keepalive=1;
+					else keepalive=0;
+
 				case IDC_ENABLE3:
 					if (SendDlgItemMessage(hDlg, IDC_ENABLE3,BM_GETCHECK,0,0)== BST_CHECKED)
 						ssl_proxy=1;
@@ -489,6 +497,7 @@ static LRESULT CALLBACK settings_proc(HWND hDlg, UINT message,
 					saved_portS=portS;
 					saved_mode2=mode2;
 					saved_mode1=mode1;
+					saved_keepalive=keepalive;
 					saved_ssl_proxy=ssl_proxy;
 					saved_ip_service=ip_service;
 					saved_allow=allow;

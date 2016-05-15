@@ -42,6 +42,7 @@
     <ClInclude Include="webgui\webgui.h">
       <Filter>gui</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources.rc" />

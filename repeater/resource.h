@@ -1,5 +1,5 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Developer Studio generated include file.
+// Microsoft Visual C++ generated include file.
 // Used by resources.rc
 //
 #define ID_SETTINGS                     101
@@ -22,7 +22,10 @@
 #define IDC_REFUSE2                     1014
 #define IDC_ENABLE3                     1015
 #define IDC_ENABLE4                     1016
+#define IDC_CHECK1                      1017
+#define IDC_KEEPALIVE                   1017
 #define IDM_SETTINGS                    40001
+#define ID_OOOPS_SETTINGS               40002
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -31,8 +34,8 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        104
-#define _APS_NEXT_COMMAND_VALUE         40002
-#define _APS_NEXT_CONTROL_VALUE         1017
+#define _APS_NEXT_COMMAND_VALUE         40003
+#define _APS_NEXT_CONTROL_VALUE         1018
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

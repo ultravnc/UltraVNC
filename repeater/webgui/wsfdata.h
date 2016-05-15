@@ -4,11 +4,11 @@
  * It is not intended for manual editing
  */
 
-extern em_file efslist[37];
+extern em_file efslist[38];
 
 extern  unsigned char index_html1[1315];
 extern  unsigned char passwd_html2[1383];
-extern  unsigned char settings_html3[3269];
+extern  unsigned char settings_html3[3876];
 extern  unsigned char ok_html4[513];
 extern  unsigned char nok_html5[528];
 extern  unsigned char log_html6[867];
@@ -54,6 +54,8 @@ int     server_access_ssi(wi_sess * sess, EOFILE * eofile);
 
 int     viewer_access_ssi(wi_sess * sess, EOFILE * eofile);
 
+int     keepalive_ssi(wi_sess * sess, EOFILE * eofile);
+
 int     pushtest_func(wi_sess * sess, EOFILE * eofile);
 
 char *  testaction_cgi(wi_sess * sess, EOFILE * eofile);
@@ -69,6 +71,6 @@ char *  testaction5_cgi(wi_sess * sess, EOFILE * eofile);
 char *  passwd_cgi(wi_sess * sess, EOFILE * eofile);
 
 
-#define  MEMHITS_VAR30                    30
+#define  MEMHITS_VAR31                    31
 
 

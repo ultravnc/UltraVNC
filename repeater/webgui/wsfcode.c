@@ -263,6 +263,20 @@ viewer_access_ssi(wi_sess * sess, EOFILE * eofile)
 
 
 
+/* SSI
+ *
+ * keepalive_ssi routine stub
+ */
+
+int
+keepalive_ssi(wi_sess * sess, EOFILE * eofile)
+{
+   /* Add your code here */
+   return 0;
+}
+
+
+
 /* PUSH
  *
  * pushtest_func routine stub
@@ -299,6 +313,7 @@ testaction_cgi(wi_sess * sess)
    char *   server_port;
    char *   mode2;
    char *   mode1;
+   char *   keepalive;
 
    hidden = wi_formvalue(sess, "hidden");   /* default:  */
    ucom_on = wi_formvalue(sess, "ucom_on");   /* default: ucom_on */
@@ -313,6 +328,7 @@ testaction_cgi(wi_sess * sess)
    server_port = wi_formvalue(sess, "server_port");   /* default:  */
    mode2 = wi_formvalue(sess, "mode2");   /* default: mode2 */
    mode1 = wi_formvalue(sess, "mode1");   /* default: mode1 */
+   keepalive = wi_formvalue(sess, "keepalive");   /* default: keepalive */
 
 
    return NULL;
@@ -431,7 +447,7 @@ wi_cvariables(wi_sess * sess, int token)
 
    switch(token)
    {
-   case MEMHITS_VAR30:
+   case MEMHITS_VAR31:
       e = wi_putlong(sess, (u_long)(wi_totalblocks));
       break;
    }

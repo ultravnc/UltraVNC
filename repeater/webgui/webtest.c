@@ -37,6 +37,7 @@
 #include "webgui.h"
 int saved_mode2;
 int saved_mode1;
+int saved_keepalive;
 
 int saved_portA;
 int saved_portB;
@@ -182,6 +183,14 @@ mode1_ssi(wi_sess * sess, EOFILE * eofile)
    if (saved_mode1) wi_printf(sess, "checked=\"checked\"");
    return 0;
 }
+
+int
+keepalive_ssi(wi_sess * sess, EOFILE * eofile)
+{
+   if (saved_keepalive) wi_printf(sess, "checked=\"checked\"");
+   return 0;
+}
+
 
 
 
@@ -385,7 +394,7 @@ wi_cvariables(wi_sess * sess, int token)
 
    switch(token)
    {
-   case MEMHITS_VAR30:
+   case MEMHITS_VAR31:
       e = wi_putlong(sess, (u_long)(wi_totalblocks));
       break;
    }
@@ -582,6 +591,7 @@ testaction_cgi(wi_sess * sess,  EOFILE * eofile)
 {
    char *   mode1;
    char *   mode2;
+   char *   keepalive;
    char *   server_port;
    char *   viewer_port;
 
@@ -601,10 +611,13 @@ testaction_cgi(wi_sess * sess,  EOFILE * eofile)
    mode1 = wi_formvalue(sess, "mode1");  
    if (mode1) saved_mode1=true;
    else saved_mode1=false;
+   keepalive = wi_formvalue(sess, "keepalive");  
+   if (keepalive) saved_keepalive=true;
+   else saved_keepalive=false;
    mode2 = wi_formvalue(sess, "mode2");  
     if (mode2) saved_mode2=true;
    else saved_mode2=false;
-#ifndef _DEBUG
+//#ifndef _DEBUG
    server_port = wi_formvalue(sess, "server_port"); 
    if (server_port) saved_portA=atoi(server_port);
    viewer_port = wi_formvalue(sess, "viewer_port");  
@@ -630,7 +643,7 @@ testaction_cgi(wi_sess * sess,  EOFILE * eofile)
    id_con = wi_formvalue(sess, "id_con");  
     if (id_con) strcpy(saved_sample3,id_con);
    else strcpy(saved_sample3,"");
-#endif
+//#endif
    ucom_on = wi_formvalue(sess, "ucom_on");  
    if (ucom_on) saved_usecom=true;
    else saved_usecom=false;

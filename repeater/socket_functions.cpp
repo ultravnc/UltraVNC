@@ -185,8 +185,8 @@ DWORD WINAPI do_repeater_wait(LPVOID lpParam)
 	FD_SET( remote, &ifds );
 	a=select( 0, &ifds, NULL, NULL, &tmo );
 	if ( a == 0 ) {
-		if (server && sendkepalive) sendkepalive_counter++;
-		if (sendkepalive_counter==60 && sendkepalive && server)
+		if (server && sendkepalive && saved_keepalive) sendkepalive_counter++;
+		if (sendkepalive_counter==60 && sendkepalive && server && saved_keepalive)
 		{
 			sendkepalive_counter=0;
 			//Beep(1000,1000);

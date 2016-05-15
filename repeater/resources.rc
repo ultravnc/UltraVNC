@@ -94,6 +94,8 @@ BEGIN
     LTEXT           "More Info\nhttp://www.uvnc.com",IDC_STATIC,162,84,92,28
     LTEXT           "Mode I only",IDC_STATIC,162,63,56,13
     LTEXT           "Mode I only",IDC_STATIC,162,127,38,8
+    CONTROL         "Use keepalive ( require winvnc >= 1.2.0.1)",IDC_KEEPALIVE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,124,7,168,10
 END
 
 ID_ABOUT DIALOGEX 0, 0, 202, 36
@@ -103,8 +105,8 @@ FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,167,17,32,14,WS_GROUP
     ICON            IDI_MYICON,-1,8,6,20,20
-    LTEXT           "UltraVnc  Repeater 2011 v2.00",-1,39,4,153,8
-    LTEXT           "© Team UltraVnc 2011",-1,39,15,102,8
+    LTEXT           "UltraVnc  Repeater 2016 build 1105",-1,39,4,153,8
+    LTEXT           "© Team UltraVnc 2016",-1,39,15,102,8
     LTEXT           "All Rights Reserved",-1,39,25,102,8
 END
 
@@ -173,8 +175,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,1,0,4
- PRODUCTVERSION 1,1,0,4
+ FILEVERSION 1,1,0,5
+ PRODUCTVERSION 1,1,0,5
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -191,12 +193,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", " "
             VALUE "FileDescription", "distributer"
-            VALUE "FileVersion", "1, 1, 0, 4"
+            VALUE "FileVersion", "1.1.0.5"
             VALUE "InternalName", "distributer"
             VALUE "LegalCopyright", "Copyright © 2005"
             VALUE "OriginalFilename", "distributer.exe"
             VALUE "ProductName", "  distributer"
-            VALUE "ProductVersion", "1, 1, 0, 4"
+            VALUE "ProductVersion", "1.1.0.5"
         END
     END
     BLOCK "VarFileInfo"

@@ -68,7 +68,7 @@ extern int notstopped;
 
 //Settings
 
-extern char temp1[50][16];
+extern char temp1[50][25];
 extern char temp2[50][16];
 extern char temp3[50][16];
 extern int rule1;

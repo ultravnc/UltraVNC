@@ -30,6 +30,7 @@ listcomment.ssi -s listcomment_ssi
 connections.ssi -s connections_ssi
 server_access.ssi -s server_access_ssi
 viewer_access.ssi -s viewer_access_ssi
+keepalive.ssi  -s keepalive_ssi
 
 
 
