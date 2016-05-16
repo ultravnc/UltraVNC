@@ -20,8 +20,8 @@
 	<Configurations>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory=".\..\..\Release"
-			IntermediateDirectory=".\..\..\Release"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
@@ -57,9 +57,6 @@
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				PrecompiledHeaderFile=".\..\..\Release/ldapauthnt4.pch"
-				AssemblerListingLocation=".\..\..\Release/"
-				ObjectFile=".\..\..\Release/"
-				ProgramDataBaseFileName=".\..\..\Release/"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 			/>
@@ -77,16 +74,13 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="odbc32.lib odbccp32.lib activeds.lib adsiid.lib Netapi32.lib"
-				OutputFile=".\..\..\Release/ldapauthnt4.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\ldapauthnt4.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\..\Release/ldapauthnt4.pdb"
 				SubSystem="2"
 				RandomizedBaseAddress="2"
 				DataExecutionPrevention="2"
-				ImportLibrary=".\..\..\Release/ldapauthnt4.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -111,8 +105,8 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="signtool.exe sign /f c:\uvnccert.pfx /p changeme /v /t http://timestamp.globalsign.com/scripts/timstamp.dll $(OutDir)/$(TargetName)$(TargetExt)"
-				ExcludedFromBuild="true"
+				CommandLine="&quot;C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe&quot; sign /sha1 075BD1CAB5AE085E523AF7883FC0A8127BE08C71 /n &quot;uvnc bvba&quot; /v /fd sha1 /t http://timestamp.verisign.com/scripts/timstamp.dll &quot;$(OutDir)\\$(TargetName)$(TargetExt)&quot;&#x0D;&#x0A;&quot;C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe&quot; sign /sha1 0F96782496EA96F2BA96CF177E61F993CA5BC2E8 /n &quot;uvnc bvba&quot; /v /as /fd sha256 /tr http://timestamp.geotrust.com/tsa &quot;$(OutDir)\\$(TargetName)$(TargetExt)&quot;&#x0D;&#x0A;copy &quot;$(OutDir)\\$(TargetName)$(TargetExt)&quot; c:\uvnc\32\w2k"
+				ExcludedFromBuild="false"
 			/>
 		</Configuration>
 		<Configuration
