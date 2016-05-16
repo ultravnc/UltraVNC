@@ -257,10 +257,6 @@
 				RuntimeLibrary="0"
 				StructMemberAlignment="5"
 				EnableFunctionLevelLinking="true"
-				PrecompiledHeaderFile=".\..\Release/winvnc.pch"
-				AssemblerListingLocation=".\..\Release/"
-				ObjectFile=".\..\Release/"
-				ProgramDataBaseFileName=".\..\Release/"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
@@ -280,12 +276,10 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="ws2_32.lib winmm.lib version.lib comctl32.lib wtsapi32.lib userenv.lib"
-				OutputFile=".\..\Release/winvnc.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				GenerateManifest="true"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\Release/winvnc.pdb"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="0"
@@ -315,7 +309,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="signtool.exe sign /a /n &quot;uvnc bvba&quot; /v /t http://timestamp.verisign.com/scripts/timstamp.dll &quot;$(OutDir)\$(TargetName)$(TargetExt)&quot;&#x0D;&#x0A;copy &quot;$(TargetPath)&quot; ..\..\..\..\..\installer"
+				CommandLine="&quot;C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe&quot; sign /sha1 075BD1CAB5AE085E523AF7883FC0A8127BE08C71 /n &quot;uvnc bvba&quot; /v /fd sha1 /t http://timestamp.verisign.com/scripts/timstamp.dll &quot;$(OutDir)\$(ProjectName).exe&quot;&#x0D;&#x0A;&quot;C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe&quot; sign /sha1 0F96782496EA96F2BA96CF177E61F993CA5BC2E8 /n &quot;uvnc bvba&quot; /v /as /fd sha256 /tr http://timestamp.geotrust.com/tsa &quot;$(OutDir)\$(ProjectName).exe&quot;&#x0D;&#x0A;copy &quot;$(OutDir)\$(ProjectName).exe&quot; c:\uvnc\32\w2k&#x0D;&#x0A;"
 				ExcludedFromBuild="false"
 			/>
 		</Configuration>
@@ -1025,14 +1019,6 @@
 						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\httpconnect.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\httpconnect.h"
-				>
 			</File>
 			<File
 				RelativePath="inifile.cpp"
@@ -4340,15 +4326,11 @@
 			</File>
 		</Filter>
 		<File
-			RelativePath="res\AuthPanel.class"
-			>
-		</File>
-		<File
 			RelativePath=".\res\mslogon\AuthPanel.class"
 			>
 		</File>
 		<File
-			RelativePath="..\..\BUILDING.txt"
+			RelativePath="res\AuthPanel.class"
 			>
 		</File>
 		<File
@@ -4356,7 +4338,7 @@
 			>
 		</File>
 		<File
-			RelativePath="res\ButtonPanel.class"
+			RelativePath="..\..\BUILDING.txt"
 			>
 		</File>
 		<File
@@ -4364,11 +4346,15 @@
 			>
 		</File>
 		<File
-			RelativePath=".\res\mslogon\ClipboardFrame.class"
+			RelativePath="res\ButtonPanel.class"
 			>
 		</File>
 		<File
 			RelativePath=".\res\clipboardframe.class"
+			>
+		</File>
+		<File
+			RelativePath=".\res\mslogon\ClipboardFrame.class"
 			>
 		</File>
 		<File
@@ -4380,11 +4366,11 @@
 			>
 		</File>
 		<File
-			RelativePath="res\DH.class"
+			RelativePath=".\res\mslogon\DH.class"
 			>
 		</File>
 		<File
-			RelativePath=".\res\mslogon\DH.class"
+			RelativePath="res\DH.class"
 			>
 		</File>
 		<File
@@ -4392,19 +4378,19 @@
 			>
 		</File>
 		<File
-			RelativePath=".\res\mslogon\FTPFrame$StrComp.class"
-			>
-		</File>
-		<File
 			RelativePath=".\res\ftpframe$strcomp.class"
 			>
 		</File>
 		<File
-			RelativePath=".\res\mslogon\FTPFrame.class"
+			RelativePath=".\res\mslogon\FTPFrame$StrComp.class"
 			>
 		</File>
 		<File
 			RelativePath="res\FTPFrame.class"
+			>
+		</File>
+		<File
+			RelativePath=".\res\mslogon\FTPFrame.class"
 			>
 		</File>
 		<File
@@ -4416,11 +4402,11 @@
 			>
 		</File>
 		<File
-			RelativePath=".\res\mslogon\OptionsFrame.class"
+			RelativePath=".\res\optionsframe.class"
 			>
 		</File>
 		<File
-			RelativePath=".\res\optionsframe.class"
+			RelativePath=".\res\mslogon\OptionsFrame.class"
 			>
 		</File>
 		<File
@@ -4428,19 +4414,19 @@
 			>
 		</File>
 		<File
-			RelativePath="res\RecordingFrame.class"
-			>
-		</File>
-		<File
 			RelativePath=".\res\mslogon\RecordingFrame.class"
 			>
 		</File>
 		<File
-			RelativePath=".\res\rfbproto.class"
+			RelativePath="res\RecordingFrame.class"
 			>
 		</File>
 		<File
 			RelativePath=".\res\mslogon\RfbProto.class"
+			>
+		</File>
+		<File
+			RelativePath=".\res\rfbproto.class"
 			>
 		</File>
 		<File
@@ -4452,15 +4438,11 @@
 			>
 		</File>
 		<File
-			RelativePath=".\res\mslogon\VncCanvas.class"
-			>
-		</File>
-		<File
 			RelativePath=".\res\vnccanvas.class"
 			>
 		</File>
 		<File
-			RelativePath=".\res\vncviewer.class"
+			RelativePath=".\res\mslogon\VncCanvas.class"
 			>
 		</File>
 		<File
@@ -4468,11 +4450,15 @@
 			>
 		</File>
 		<File
-			RelativePath=".\res\mslogon\VncViewer.jar"
+			RelativePath=".\res\vncviewer.class"
 			>
 		</File>
 		<File
 			RelativePath=".\res\vncviewer.jar"
+			>
+		</File>
+		<File
+			RelativePath=".\res\mslogon\VncViewer.jar"
 			>
 		</File>
 		<File

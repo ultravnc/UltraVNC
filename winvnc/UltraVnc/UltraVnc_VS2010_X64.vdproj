@@ -82,13 +82,13 @@
         "Entry"
         {
         "MsmKey" = "8:_42FE7889F2707625AD708AD6969D5CE5"
-        "OwnerKey" = "8:_9FFC46783A7F4BCB9DDA60B790D35975"
+        "OwnerKey" = "8:_7E9202FA9ECA4F4E821B4ABFAFEE00A5"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_42FE7889F2707625AD708AD6969D5CE5"
-        "OwnerKey" = "8:_7E9202FA9ECA4F4E821B4ABFAFEE00A5"
+        "OwnerKey" = "8:_9FFC46783A7F4BCB9DDA60B790D35975"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -184,13 +184,13 @@
         "Entry"
         {
         "MsmKey" = "8:_F8102562A64423CDCAC1C20AD91D5EEB"
-        "OwnerKey" = "8:_7E9202FA9ECA4F4E821B4ABFAFEE00A5"
+        "OwnerKey" = "8:_30A3C3ED62BD436097EAA36546BB4380"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_F8102562A64423CDCAC1C20AD91D5EEB"
-        "OwnerKey" = "8:_30A3C3ED62BD436097EAA36546BB4380"
+        "OwnerKey" = "8:_7E9202FA9ECA4F4E821B4ABFAFEE00A5"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -208,67 +208,7 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_9FFC46783A7F4BCB9DDA60B790D35975"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_87DB62653B71411E93DD76EF68D97A39"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_7E9202FA9ECA4F4E821B4ABFAFEE00A5"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_30A3C3ED62BD436097EAA36546BB4380"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_2C1853F772494048B3B26B78A53486F4"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_26A88B0595B5471B8B4F81FFBB8B5087"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_2499FE2BC2EC43FC827586F2B36F2483"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_1D605486DA064476BC03795B9D1F0A1D"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_057C03B3B6C348A59E8D997A9884CC96"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_FE82FF2D562E4B80928D6FEB67F9F479"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_E7889E76F1B34653A90C53D3F997EBAF"
+        "OwnerKey" = "8:_496FDBFD8E724200972D9572D0438D7C"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -280,7 +220,67 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_496FDBFD8E724200972D9572D0438D7C"
+        "OwnerKey" = "8:_E7889E76F1B34653A90C53D3F997EBAF"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_FE82FF2D562E4B80928D6FEB67F9F479"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_057C03B3B6C348A59E8D997A9884CC96"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_1D605486DA064476BC03795B9D1F0A1D"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_2499FE2BC2EC43FC827586F2B36F2483"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_26A88B0595B5471B8B4F81FFBB8B5087"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_2C1853F772494048B3B26B78A53486F4"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_30A3C3ED62BD436097EAA36546BB4380"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_7E9202FA9ECA4F4E821B4ABFAFEE00A5"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_87DB62653B71411E93DD76EF68D97A39"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_9FFC46783A7F4BCB9DDA60B790D35975"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -746,18 +746,18 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:UltraVnc"
-        "ProductCode" = "8:{280E7D9C-A23E-401C-BD4D-F1C6AB783303}"
-        "PackageCode" = "8:{9CA0FC04-61B5-4019-A489-366827FD3A9D}"
+        "ProductCode" = "8:{B555F797-A783-4230-81B2-5922CD77C827}"
+        "PackageCode" = "8:{0AF6460A-1249-4ED1-B45D-4363073F65B9}"
         "UpgradeCode" = "8:{25A3A242-EEA3-4731-A2D0-E990D2EA5A23}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.2.10"
+        "ProductVersion" = "8:1.2.11"
         "Manufacturer" = "8:uvnc bvba"
         "ARPHELPTELEPHONE" = "8:"
-        "ARPHELPLINK" = "8:http://support.uvnc.com"
+        "ARPHELPLINK" = "8:http://forum.uvnc.com"
         "Title" = "8:UltraVnc"
         "Subject" = "8:"
         "ARPCONTACT" = "8:Rudi De Vos"
@@ -901,12 +901,12 @@
             "Arguments" = "8:"
             "Description" = "8:"
             "ShowCmd" = "3:1"
-            "IconIndex" = "3:0"
+            "IconIndex" = "3:101"
             "Transitive" = "11:FALSE"
             "Target" = "8:_23025C34C65C4890A069E0CDE2AA516A"
             "Folder" = "8:_24665A4E9C2843369A076809668F5E3C"
             "WorkingFolder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
-            "Icon" = "8:"
+            "Icon" = "8:_23025C34C65C4890A069E0CDE2AA516A"
             "Feature" = "8:"
             }
             "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_4053ECB4920340759C34252F8750BE5D"
@@ -957,12 +957,12 @@
             "Arguments" = "8:"
             "Description" = "8:"
             "ShowCmd" = "3:1"
-            "IconIndex" = "3:0"
+            "IconIndex" = "3:101"
             "Transitive" = "11:FALSE"
             "Target" = "8:_23025C34C65C4890A069E0CDE2AA516A"
             "Folder" = "8:_97AE57B765F34429BF8EAA1F4067FFD5"
             "WorkingFolder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
-            "Icon" = "8:"
+            "Icon" = "8:_23025C34C65C4890A069E0CDE2AA516A"
             "Feature" = "8:"
             }
         }
@@ -1383,7 +1383,7 @@
                             "ContextData" = "8:"
                             "Attributes" = "3:0"
                             "Setting" = "3:2"
-                            "Value" = "8:UltraVnc 1.2.1.0 X64"
+                            "Value" = "8:UltraVnc 1.2.11 X64"
                             "DefaultValue" = "8:#1215"
                             "UsePlugInResources" = "11:TRUE"
                             }
@@ -2026,7 +2026,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_057C03B3B6C348A59E8D997A9884CC96"
             {
-            "SourcePath" = "8:..\\..\\addon\\ms-logon\\logging\\x64\\Release\\logging.dll"
+            "SourcePath" = "8:..\\Release\\logging.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2054,7 +2054,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_0F3E5B898783469D8773791F4330AA21"
             {
-            "SourcePath" = "8:..\\x64\\Release\\uvnc_settings.exe"
+            "SourcePath" = "8:..\\Release\\uvnc_settings.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2082,7 +2082,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_1D605486DA064476BC03795B9D1F0A1D"
             {
-            "SourcePath" = "8:..\\..\\addon\\ms-logon\\authSSP\\x64\\Release\\authSSP.dll"
+            "SourcePath" = "8:..\\Release\\authSSP.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2110,7 +2110,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_2499FE2BC2EC43FC827586F2B36F2483"
             {
-            "SourcePath" = "8:..\\..\\addon\\ms-logon\\testauth\\x64\\Release\\testauth.exe"
+            "SourcePath" = "8:..\\..\\addon\\Release\\testauth.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2138,7 +2138,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_26A88B0595B5471B8B4F81FFBB8B5087"
             {
-            "SourcePath" = "8:..\\..\\addon\\ms-logon\\ldapauth\\x64\\Release\\ldapauth.dll"
+            "SourcePath" = "8:..\\Release\\ldapauth.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2166,7 +2166,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_2C1853F772494048B3B26B78A53486F4"
             {
-            "SourcePath" = "8:..\\..\\addon\\ms-logon\\MSLogonACL\\x64\\Release\\MSLogonACL.exe"
+            "SourcePath" = "8:..\\Release\\MSLogonACL.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2194,7 +2194,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_30A3C3ED62BD436097EAA36546BB4380"
             {
-            "SourcePath" = "8:..\\..\\addon\\ms-logon\\authadm\\x64\\Release\\authadmin.dll"
+            "SourcePath" = "8:..\\Release\\authadmin.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2250,7 +2250,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_7E9202FA9ECA4F4E821B4ABFAFEE00A5"
             {
-            "SourcePath" = "8:..\\..\\addon\\ms-logon\\ldapauthNT4\\x64\\Release\\ldapauthnt4.dll"
+            "SourcePath" = "8:..\\Release\\ldapauthnt4.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2278,7 +2278,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_87DB62653B71411E93DD76EF68D97A39"
             {
-            "SourcePath" = "8:..\\..\\addon\\ms-logon\\workgrpdomnt4\\x64\\Release\\workgrpdomnt4.dll"
+            "SourcePath" = "8:..\\Release\\workgrpdomnt4.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2306,7 +2306,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_9FFC46783A7F4BCB9DDA60B790D35975"
             {
-            "SourcePath" = "8:..\\..\\addon\\ms-logon\\ldapauth9x\\x64\\Release\\ldapauth9x.dll"
+            "SourcePath" = "8:..\\Release\\ldapauth9x.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2362,7 +2362,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_E7889E76F1B34653A90C53D3F997EBAF"
             {
-            "SourcePath" = "8:..\\winvnc\\x64\\Release\\winvnc.exe"
+            "SourcePath" = "8:..\\Release\\winvnc.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2390,7 +2390,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_FE82FF2D562E4B80928D6FEB67F9F479"
             {
-            "SourcePath" = "8:..\\x64\\Release\\vnchooks.dll"
+            "SourcePath" = "8:..\\Release\\vnchooks.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
