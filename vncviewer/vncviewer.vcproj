@@ -213,8 +213,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory=".\Release"
-			IntermediateDirectory=".\Release"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
@@ -253,10 +253,6 @@
 				StringPooling="true"
 				RuntimeLibrary="0"
 				StructMemberAlignment="5"
-				PrecompiledHeaderFile=".\Release/vncviewer.pch"
-				AssemblerListingLocation=".\Release/"
-				ObjectFile=".\Release/"
-				ProgramDataBaseFileName=".\Release/"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
@@ -278,12 +274,10 @@
 				Name="VCLinkerTool"
 				AdditionalOptions="/LTCG"
 				AdditionalDependencies="comctl32.lib winmm.lib ws2_32.lib"
-				OutputFile=".\Release/vncviewer.exe"
 				LinkIncremental="0"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="omnithread/Release"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\Release/vncviewer.pdb"
 				SubSystem="2"
 				OptimizeReferences="2"
 				RandomizedBaseAddress="2"
@@ -312,8 +306,8 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="signtool.exe sign /a  /n &quot;uvnc bvba&quot; /v /t http://timestamp.verisign.com/scripts/timstamp.dll &quot;$(TargetPath)&quot;&#x0D;&#x0A;&#x0D;&#x0A;"
-				ExcludedFromBuild="true"
+				CommandLine="&quot;C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe&quot; sign /sha1 075BD1CAB5AE085E523AF7883FC0A8127BE08C71 /n &quot;uvnc bvba&quot; /v /fd sha1 /t http://timestamp.verisign.com/scripts/timstamp.dll &quot;$(OutDir)\$(ProjectName).exe&quot;&#x0D;&#x0A;&quot;C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe&quot; sign /sha1 0F96782496EA96F2BA96CF177E61F993CA5BC2E8 /n &quot;uvnc bvba&quot; /v /as /fd sha256 /tr http://timestamp.geotrust.com/tsa &quot;$(OutDir)\$(ProjectName).exe&quot;&#x0D;&#x0A;copy &quot;$(OutDir)\$(ProjectName).exe&quot; c:\uvnc\32\w2k"
+				ExcludedFromBuild="false"
 			/>
 		</Configuration>
 		<Configuration
