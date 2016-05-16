@@ -164,7 +164,7 @@ Read_settings()
 					{
 						char* p = strrchr(szFileName, '\\');
 						*p = '\0';
-						strcat (szFileName,"\\settings.txt");
+						strcat (szFileName,"\\settings2.txt");
 					}
 	hFile=CreateFile((LPCSTR)szFileName, GENERIC_READ,
             0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL,
@@ -266,7 +266,7 @@ Save_settings()
 					{
 						char* p = strrchr(szFileName, '\\');
 						*p = '\0';
-						strcat (szFileName,"\\settings.txt");
+						strcat (szFileName,"\\settings2.txt");
 					}
 	hFile=CreateFile((LPCSTR)szFileName, GENERIC_WRITE,
             0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL,
