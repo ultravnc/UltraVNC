@@ -1705,8 +1705,9 @@ void ClientConnection::HandleQuickOption()
 	{
 	case 1:
 		m_opts.m_PreferredEncodings.clear();
-		if (new_ultra_server) m_opts.m_PreferredEncodings.push_back(rfbEncodingUltra2);
-		else m_opts.m_PreferredEncodings.push_back(rfbEncodingHextile);
+		//if (new_ultra_server) m_opts.m_PreferredEncodings.push_back(rfbEncodingUltra2);
+		//else 
+		m_opts.m_PreferredEncodings.push_back(rfbEncodingHextile);
 		m_opts.m_Use8Bit = rfbPFFullColors; //false;
 		m_opts.m_fEnableCache = false;
 		m_opts.autoDetect = true;
@@ -5943,11 +5944,13 @@ inline void ClientConnection::ReadScreenUpdate()
 				break;
 			}
 			m_opts.m_PreferredEncodings.clear();
-			if (new_ultra_server) m_opts.m_PreferredEncodings.push_back(rfbEncodingUltra2);
-			else m_opts.m_PreferredEncodings.push_back(rfbEncodingHextile);
+			//if (new_ultra_server) m_opts.m_PreferredEncodings.push_back(rfbEncodingUltra2);
+			//else 
+			m_opts.m_PreferredEncodings.push_back(rfbEncodingHextile);
 			//m_opts.m_Use8Bit = rfbPFFullColors;			
-			if (new_ultra_server && encoding == rfbEncodingUltra2 && m_opts.m_fEnableCache == false){}
-			else if (encoding == rfbEncodingHextile && m_opts.m_fEnableCache == false){}
+			//if (new_ultra_server && encoding == rfbEncodingUltra2 && m_opts.m_fEnableCache == false){}
+			//else 
+			if (encoding == rfbEncodingHextile && m_opts.m_fEnableCache == false){}
 			else m_pendingFormatChange = true;
 
 			m_opts.m_fEnableCache = false;
@@ -5957,8 +5960,9 @@ inline void ClientConnection::ReadScreenUpdate()
 		{
 			m_nConfig = 1;		
 			m_opts.m_PreferredEncodings.clear();
-			if (new_ultra_server) m_opts.m_PreferredEncodings.push_back(rfbEncodingUltra2);
-			else m_opts.m_PreferredEncodings.push_back(rfbEncodingZRLE); //rfbEncodingZlibHex;
+			//if (new_ultra_server) m_opts.m_PreferredEncodings.push_back(rfbEncodingUltra2);
+			//else 
+			m_opts.m_PreferredEncodings.push_back(rfbEncodingZRLE); //rfbEncodingZlibHex;
 			//m_opts.m_Use8Bit = rfbPFFullColors; // Max colors
 			m_opts.m_fEnableCache = false;
 			m_pendingFormatChange = true;
