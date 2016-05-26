@@ -333,6 +333,7 @@ private:
 	void SetFullScreenMode(bool enable);
 	bool InFullScreenMode();
 	void RealiseFullScreenMode();
+	void BorderlessMode();
 	bool BumpScroll(int x, int y);
 	CTitleBar TitleBar; //Added by: Lars Werner (http://lars.werner.no)
 

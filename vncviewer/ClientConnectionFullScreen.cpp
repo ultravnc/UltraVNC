@@ -72,6 +72,12 @@ void ClientConnection::SetFullScreenMode(bool enable)
 void ofnInit();
 void ClientConnection::RealiseFullScreenMode()
 {
+	if (m_opts.m_NoBorder)
+	{
+		BorderlessMode();
+		return;
+	}
+
 	LONG style = GetWindowLong(m_hwndMain, GWL_STYLE);
 	if (m_opts.m_FullScreen) {
 
@@ -118,7 +124,7 @@ void ClientConnection::RealiseFullScreenMode()
 		ShowWindow(m_hwndMain, SW_MAXIMIZE);
 
 		style = GetWindowLong(m_hwndMain, GWL_STYLE);
-		style &= ~(WS_DLGFRAME | WS_THICKFRAME);
+		style &= ~(WS_CAPTION | WS_DLGFRAME | WS_THICKFRAME);
 		SetWindowLong(m_hwndMain, GWL_STYLE, style);
 		/* Does not work yet
 		// Used by VNCon - Copyright (C) 2001-2003 - Alastair Burr
@@ -155,7 +161,7 @@ void ClientConnection::RealiseFullScreenMode()
 	} else {
 		ShowWindow(m_hwndMain, SW_NORMAL);
 		style = GetWindowLong(m_hwndMain, GWL_STYLE);
-		style |= WS_DLGFRAME | WS_THICKFRAME;
+		style |= WS_DLGFRAME | WS_THICKFRAME | WS_CAPTION;
 		SetWindowLong(m_hwndMain, GWL_STYLE, style);
 		SetWindowPos(m_hwndMain, HWND_NOTOPMOST, 0,0,100,100, SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED); //Modified by: Lars Werner (http://lars.werner.no) - Reason: Bugfix, The framework got invisible after moving, so a NCCALCSIZE needed to be called!
 		// adzm - 2010-07 - Extended clipboard
@@ -165,6 +171,24 @@ void ClientConnection::RealiseFullScreenMode()
 
 		if (m_hwndStatus)::RedrawWindow(m_hwndStatus, NULL,NULL,TRUE); //Added by: Lars Werner (http://lars.werner.no) - Reason: The status window is not getting redrawn after a resize.
 	}
+}
+
+void ClientConnection::BorderlessMode()
+{
+	ShowWindow(m_hwndMain, SW_NORMAL);
+	LONG style = GetWindowLong(m_hwndMain, GWL_STYLE);
+	style &= ~(WS_CAPTION |WS_DLGFRAME | WS_THICKFRAME);
+	SetWindowLong(m_hwndMain, GWL_STYLE, style);
+	m_opts.m_ShowToolbar = false;	
+	SetWindowPos(m_hwndMain, HWND_NOTOPMOST, 0, 0, 100, 100, SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED); 
+
+	SetWindowPos(m_hwndcn, m_hwndTBwin, 0, 0, 100, 100, SWP_SHOWWINDOW);
+	SetWindowPos(m_hwndTBwin, NULL, 0, 0, 0, 0, SWP_HIDEWINDOW);
+
+	// adzm - 2010-07 - Extended clipboard
+	CheckMenuItem(m_hPopupMenuDisplay, ID_FULLSCREEN, MF_BYCOMMAND | MF_UNCHECKED);
+	TitleBar.DisplayWindow(FALSE, TRUE);
+	if (m_hwndStatus)::RedrawWindow(m_hwndStatus, NULL, NULL, TRUE);
 }
 
 bool ClientConnection::BumpScroll(int x, int y)

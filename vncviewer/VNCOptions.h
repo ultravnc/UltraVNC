@@ -88,6 +88,7 @@ public:
  	int     m_Emul3Timeout;
  	int     m_Emul3Fuzz;
 	bool	m_Shared;
+	bool    m_NoBorder;
 	bool	m_DeiconifyOnBell;
 	bool	m_DisableClipboard;
 	int     m_localCursor;

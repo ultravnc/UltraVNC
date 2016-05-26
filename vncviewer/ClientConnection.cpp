@@ -3787,7 +3787,7 @@ void ClientConnection::SizeWindow()
 	if (m_opts.m_w != 0 || m_opts.m_h != 0 || m_opts.m_x != 0 || m_opts.m_y!=0)
 	{
 		// x y w h
-		if (m_opts.m_w != 0 && m_opts.m_h != 0 && m_opts.m_x != 0 && m_opts.m_y != 0)
+		if (m_opts.m_w != 0 && m_opts.m_h != 0)
 		{
 			pos_set = true; size_set = true;
 			SetWindowPos(m_hwndMain, HWND_TOP, m_opts.m_x, m_opts.m_y, m_opts.m_w, m_opts.m_h, SWP_SHOWWINDOW);
@@ -7197,7 +7197,7 @@ void ClientConnection::GTGBS_CreateDisplay()
 			  m_pApp->m_instance,
 			  (LPVOID)this);
 	helper::SafeSetWindowUserData(m_hwndMain, (LONG_PTR)this);
-	ImmAssociateContext(m_hwndMain, NULL);    
+	ImmAssociateContext(m_hwndMain, NULL);	
 }
 
 //
@@ -8113,9 +8113,11 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						MRU *m_pMRU;
 						m_pMRU = new MRU(SESSION_MRU_KEY_NAME, 26);
 						RECT rect;
-						GetWindowRect(hwnd, &rect);
-						if (_this->m_opts.m_SavePos && !_this->m_opts.m_SaveSize) m_pMRU->SetPos(_this->m_host, rect.left, rect.top, 0, 0);
-						if (_this->m_opts.m_SavePos && _this->m_opts.m_SaveSize) m_pMRU->SetPos(_this->m_host, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
+						if (GetWindowRect(hwnd, &rect) !=0)
+							{
+								if (_this->m_opts.m_SavePos && !_this->m_opts.m_SaveSize) m_pMRU->SetPos(_this->m_host, rect.left, rect.top, 0, 0);
+								if (_this->m_opts.m_SavePos && _this->m_opts.m_SaveSize) m_pMRU->SetPos(_this->m_host, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
+							}
 						if (m_pMRU) delete m_pMRU;
 					}
 						_this->m_keepalive_timer=0;

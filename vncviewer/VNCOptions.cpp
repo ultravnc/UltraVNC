@@ -152,6 +152,7 @@ VNCOptions::VNCOptions()
   m_Emul3Timeout = 100; // milliseconds
   m_Emul3Fuzz = 4;      // pixels away before emulation is cancelled
   m_Shared = true;
+  m_NoBorder = false;
   m_DeiconifyOnBell = false;
 
   m_DisableClipboard = false;
@@ -358,6 +359,7 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
   m_Emul3Timeout		= s.m_Emul3Timeout;
   m_Emul3Fuzz			= s.m_Emul3Fuzz;      // pixels away before emulation is cancelled
   m_Shared			= s.m_Shared;
+  m_NoBorder = s.m_NoBorder;
   m_DeiconifyOnBell	= s.m_DeiconifyOnBell;
   m_DisableClipboard  = s.m_DisableClipboard;
   m_scaling			= s.m_scaling;
@@ -915,6 +917,9 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 		_stscanf(args[j - 1], _T("%d"), &m_w);
 		_stscanf(args[j], _T("%d"), &m_h);
 		int a = 0;
+	}
+	else if (SwitchMatch(args[j], _T("noborder"))) {
+		m_NoBorder = true;
 	}
 
 	else if (SwitchMatch(args[j], _T("autoreconnect"))) 
