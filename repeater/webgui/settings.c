@@ -212,6 +212,7 @@ Read_settings()
 		
 		test=strchr(saved_sample1,ch);
 		pos=saved_sample1;
+		rule1=0;
 		while (test)
 		{
 		int len=test-pos;
@@ -298,6 +299,7 @@ Save_settings()
 
 
 	}
+	Read_settings();
 }
 
 #define LOG_LINES 20

@@ -54,7 +54,10 @@ open_connection( const char *host, u_short port )
 			int myport=0;
 			if (ParseDisplay(temp1[i], myhost, 255, &myport))
 			{
-				if (strstr(myhost,remote_host) != NULL && port==myport)
+				char *testchar=NULL;
+				testchar=strstr(remote_host,myhost);
+				int a=int(testchar-remote_host);
+				if (port==myport && testchar!=NULL && a==0)
 				found=TRUE;
 			}
 
