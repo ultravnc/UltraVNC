@@ -590,7 +590,7 @@ BOOL
 LaunchProcessWin(DWORD dwSessionId,bool preconnect)
 {
   BOOL                 bReturn = FALSE;
-  HANDLE               hToken;
+  HANDLE               hToken=NULL;
   STARTUPINFO          StartUPInfo;
   PVOID                lpEnvironment = NULL;
 
