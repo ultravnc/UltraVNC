@@ -8957,29 +8957,31 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 			case WM_RBUTTONDOWN:
 			case WM_RBUTTONUP:
 			case WM_MOUSEMOVE:
-				{
-					if (_this->m_opts.m_IdleInterval > 0) { KillTimer(_this->m_hwndcn, 1013);SetTimer(hwnd, _this->m_idle_timer, _this->m_idle_time, NULL); _this->SetDormant(false); }
-					if (_this->m_SWselect) {return 0;}
-					if (!_this->m_running) return 0;
-//					if (GetFocus() != hwnd) return 0;
-//					if (GetFocus() != _this->m_hwnd) return 0;
-					if (GetFocus() != _this->m_hwndMain) return 0;
-					int x = LOWORD(lParam);
-					int y = HIWORD(lParam);
-					wParam = MAKEWPARAM(LOWORD(wParam), 0);
-					if (_this->InFullScreenMode()) {
-						if (_this->BumpScroll(x,y))
-							return 0;
-					}
-					if ( _this->m_opts.m_ViewOnly) return 0;
+			{
+				if (_this->m_opts.m_IdleInterval > 0) { KillTimer(_this->m_hwndcn, 1013); SetTimer(hwnd, _this->m_idle_timer, _this->m_idle_time, NULL); _this->SetDormant(false); }
+				if (_this->m_SWselect) { return 0; }
+				if (!_this->m_running) return 0;
+				//					if (GetFocus() != hwnd) return 0;
+				//					if (GetFocus() != _this->m_hwnd) return 0;
+				if (GetFocus() != _this->m_hwndMain) return 0;
+				int x = LOWORD(lParam);
+				int y = HIWORD(lParam);
+				wParam = MAKEWPARAM(LOWORD(wParam), 0);
+				if (_this->InFullScreenMode()) {
+					if (_this->BumpScroll(x, y))
+						return 0;
+				}
+				if (_this->m_opts.m_ViewOnly) return 0;
 #ifdef _Gii
-					//Filter touch/pen events
+				//Filter touch/pen events
+				if(_this->mytouch->TouchActivated()==true) {
 					if(IsPenEvent(GetMessageExtraInfo()) || IsTouchEvent(GetMessageExtraInfo()))
 					{
 						//ignore mouse events.
 						return 0;
 					}
-					if (mouse_enable != true) return 0;
+				}
+				if (mouse_enable != true) return 0;
 #endif
 					//adzm 2010-09
 					if (_this->ProcessPointerEvent(x,y, wParam, iMsg)) {
