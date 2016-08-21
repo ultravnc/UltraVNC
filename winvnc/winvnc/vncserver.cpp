@@ -1571,9 +1571,13 @@ vncServer::SockConnect(BOOL On)
 
 					// Attempt to connect to the port
 					VSocket tempsock;
+#ifdef IPV6V4
+					if (!tempsock.CreateConnect("localhost", m_port))
+#else
 					if (tempsock.Create())
 					{
 						if (!tempsock.Connect("localhost", m_port))
+#endif
 						{
 							// Couldn't connect, so this port is probably usable!
 							if (m_socketConn->Init(this, m_port))
@@ -1582,7 +1586,11 @@ vncServer::SockConnect(BOOL On)
 								break;
 							}
 						}
+#ifdef IPV6V4
+#else
 					}
+#endif
+
 				}
 
 				if (!ok)
@@ -2547,8 +2555,13 @@ void vncServer::_actualTimerRetryHandler()
 				else*/
 				{
 					// Connect out to the specified host on the VNCviewer listen port
+#ifdef IPV6V4
+					if (tmpsock->CreateConnect(m_szAutoReconnectAdr, m_AutoReconnectPort))
+#else
 					tmpsock->Create();
-					if (tmpsock->Connect(m_szAutoReconnectAdr, m_AutoReconnectPort)) {
+					if (tmpsock->Connect(m_szAutoReconnectAdr, m_AutoReconnectPort))
+#endif
+					{
 						if ( strlen( m_szAutoReconnectId ) > 0 )
 						{
 							tmpsock->Send(m_szAutoReconnectId,250);

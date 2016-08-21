@@ -74,17 +74,17 @@ public:
   VSocket();
   virtual ~VSocket();
 
-  ////////////////////////////
-  // Socket implementation
-
   // Create
   //        Create a socket and attach it to this VSocket object
 #ifdef IPV6V4
-  VBool Create();
-  VBool Create4();
-  VBool Create6();
 #else
   VBool Create();
+#endif
+
+#ifdef IPV6V4
+  VBool CreateConnect(const VString address, const VCard port);
+  VBool CreateBindConnect(const VString address, const VCard port);
+  VBool	CreateBindListen(const VCard port, const VBool localOnly = VFalse);
 #endif
 
   // Shutdown
@@ -112,7 +112,6 @@ public:
   //		If localOnly is VTrue then the socket is bound only
   //        to the loopback adapter.
 #ifdef IPV6V4
-  VBool Bind(const VCard port, const VBool localOnly = VFalse);
   VBool Bind4(const VCard port, const VBool localOnly=VFalse);
   VBool Bind6(const VCard port, const VBool localOnly=VFalse);
 #else
@@ -123,9 +122,6 @@ public:
   //        Make a stream socket connection to the specified port
   //        on the named machine.
 #ifdef IPV6V4
-  VBool Connect(const VString address, const VCard port);
-  VBool Connect4(const VString address, const VCard port);
-  VBool Connect6(const VString address, const VCard port);
 #else
   VBool Connect(const VString address, const VCard port);
 #endif
@@ -133,7 +129,6 @@ public:
   // Listen
   //        Set the attached socket to listen for connections
 #ifdef IPV6V4
-  VBool Listen();
   VBool Listen4();
   VBool Listen6();
 #else

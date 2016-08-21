@@ -606,17 +606,14 @@ int getinfo(char mytext[1024])
 				Ipv4Addr.sin_family = AF_INET;
 				break;
 			case AF_INET6:
-				if (G_ipv6_allowed)
-				{
-					IsIpv6 = true;
-					pIpv6Addr = (struct sockaddr_in6 *) p->ai_addr;
-					memcpy(&Ipv6Addr, pIpv6Addr, sizeof(Ipv6Addr));
-					Ipv6Addr.sin6_family = AF_INET6;
-					sockaddr_ip = (LPSOCKADDR)p->ai_addr;
-					ipbufferlength = 46;
-					memset(ipstringbuffer, 0, 46);
-					WSAAddressToString(sockaddr_ip, (DWORD)p->ai_addrlen, NULL, ipstringbuffer, &ipbufferlength);
-				}
+				IsIpv6 = true;
+				pIpv6Addr = (struct sockaddr_in6 *) p->ai_addr;
+				memcpy(&Ipv6Addr, pIpv6Addr, sizeof(Ipv6Addr));
+				Ipv6Addr.sin6_family = AF_INET6;
+				sockaddr_ip = (LPSOCKADDR)p->ai_addr;
+				ipbufferlength = 46;
+				memset(ipstringbuffer, 0, 46);
+				WSAAddressToString(sockaddr_ip, (DWORD)p->ai_addrlen, NULL, ipstringbuffer, &ipbufferlength);
 				break;
 			default:
 				break;

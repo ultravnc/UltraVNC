@@ -2219,8 +2219,13 @@ bool vncClientThread::TryReconnect()
 	// Connect out to the specified host on the VNCviewer listen port
 	// To be really good, we should allow a display number here but
 	// for now we'll just assume we're connecting to display zero
+#ifdef IPV6V4
+	if (m_socket->CreateConnect(m_client->GetHost(), m_client->GetHostPort()))
+#else
 	m_socket->Create();
-	if (m_socket->Connect(m_client->GetHost(), m_client->GetHostPort()))	{
+	if (m_socket->Connect(m_client->GetHost(), m_client->GetHostPort()))	
+#endif
+	{
 		if (m_client->GetRepeaterID()) {
 			char finalidcode[_MAX_PATH];
 			//adzm 2010-08 - this was sending uninitialized data over the wire

@@ -1868,9 +1868,8 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			// sf@2003 - Values are already converted
 
 			if (_this->m_server->m_retry_timeout != 0 && !fShutdownOrdered) Sleep(5000);
-			if (G_ipv6_allowed)
-			{
-				if ((_this->m_server->AutoReconnect() || _this->m_server->IdReconnect()) && strlen(_this->m_server->AutoReconnectAdr()) > 0)
+
+			if ((_this->m_server->AutoReconnect() || _this->m_server->IdReconnect()) && strlen(_this->m_server->AutoReconnectAdr()) > 0)
 				{
 					struct in6_addr address;
 					memset(&address, 0, sizeof(address));
@@ -1907,7 +1906,6 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 					if (nport == 0) nport = INCOMING_PORT_OFFSET;
 
 				}
-			}
 			// wa@2005 -- added support for the AutoReconnectId
 			// (but it's not required)
 			bool bId = (strlen(_this->m_server->AutoReconnectId()) > 0);
@@ -1937,9 +1935,14 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				VSocket *tmpsock;
 				tmpsock = new VSocket;
 				if (tmpsock) {
-					// Connect out to the specified host on the VNCviewer listen port			
+					// Connect out to the specified host on the VNCviewer listen port
+#ifdef IPV6V4
+					if (tmpsock->CreateConnect(szAdrName, nport))
+#else
 					tmpsock->Create();
-					if (tmpsock->Connect(szAdrName, nport)) {
+					if (tmpsock->Connect(szAdrName, nport)) 
+#endif 
+					{
 						if (bId)
 						{
 							// wa@2005 -- added support for the AutoReconnectId
@@ -2077,9 +2080,14 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				VSocket *tmpsock;
 				tmpsock = new VSocket;
 				if (tmpsock) {
-					// Connect out to the specified host on the VNCviewer listen port			
+					// Connect out to the specified host on the VNCviewer listen port
+#ifdef IPV6V4
+					if (tmpsock->CreateConnect(szAdrName, nport))
+#else
 					tmpsock->Create();
-					if (tmpsock->Connect(szAdrName, nport)) {
+					if (tmpsock->Connect(szAdrName, nport))
+#endif 
+					{
 						if (bId)
 						{
 							// wa@2005 -- added support for the AutoReconnectId
