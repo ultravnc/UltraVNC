@@ -379,6 +379,7 @@ ONEDESKTOP::ONEDESKTOP()
 	m_AcquiredDesktopImage=nullptr;
 	m_MetaDataBuffer=nullptr;
 	frameaquired = false;
+	m_MetaDataSize = 0;
 }
 
 void ONEDESKTOP::SETONEDESKTOP(int desknr_IN,ID3D11Device* m_Device_IN,ID3D11DeviceContext* m_DeviceContext_IN)
@@ -421,7 +422,6 @@ int ONEDESKTOP::UPDATEDESK(int offsetx,int offsety, int width,int height,int scr
 	HRESULT hr=0;
 	UINT DirtyCount=0;
 	UINT MoveCount=0;	
-	UINT m_MetaDataSize=0;
 	IDXGIResource* DesktopResource = nullptr;
     DXGI_OUTDUPL_FRAME_INFO FrameInfo;
 	BYTE* DirtyRects=nullptr;
@@ -579,7 +579,8 @@ int ONEDESKTOP::UPDATEDESK(int offsetx,int offsety, int width,int height,int scr
 					RECT *myrect= (RECT*)DirtyRects;
 					DirtyRects+=sizeof(RECT);
 					//g_obIPC2.Addrect(0, myrect->left+offsetx, myrect->top+offsety,myrect->right+offsetx,myrect->bottom+offsety,0,0,0,0);
-					Addrect(0, myrect->left + offsetx, myrect->top + offsety, myrect->right + offsetx, myrect->bottom + offsety, 0, 0, 0, 0);
+
+					
 					int xsource=myrect->left;
 					int ysource=myrect->top;
 
@@ -592,35 +593,82 @@ int ONEDESKTOP::UPDATEDESK(int offsetx,int offsety, int width,int height,int scr
 					int sourceline=MappedSurface.Pitch;
 					int destline=screenwidth*4;
 
-
-					unsigned char *source=MappedSurface.pBits  +  myrect->top*sourceline  + myrect->left*4;
-					unsigned char *dest=buffer +  ydest*destline  + xdest*4; 
-					
-					unsigned int offset=0;
-					unsigned int outoffset=0;
-
-					int rectwidth=myrect->right-myrect->left;
-					int rectheight=myrect->bottom-myrect->top;
-
-					for (int i=0;i<rectheight;i++)
+					__try
 					{
-						memcpy(dest+outoffset,source+offset,rectwidth*4);
-						offset+=pitchsource;
-						outoffset+=pitchdest;
+
+
+						if (screenwidth > screenheight)
+						{
+							unsigned char *source = MappedSurface.pBits +
+								myrect->top*sourceline + myrect->left * 4;
+							unsigned char *dest = buffer + ydest*destline +
+								xdest * 4;
+
+							unsigned int offset = 0;
+							unsigned int outoffset = 0;
+
+							int rectwidth = myrect->right - myrect->left;
+							int rectheight = myrect->bottom - myrect->top;
+
+							//x' = y
+							//y' = - x
+
+							for (int i = 0; i < rectheight; i++)
+							{
+								memcpy(dest + outoffset, source + offset,
+									rectwidth * 4);
+								offset += pitchsource;
+								outoffset += pitchdest;
+							}
+							Addrect(0, myrect->left + offsetx, myrect->top + offsety, myrect->right + offsetx, myrect->bottom + offsety, 0, 0, 0, 0);
+						}
+						else
+						{
+							int rectwidth = myrect->right - myrect->left;
+							int rectheight = myrect->bottom - myrect->top;
+
+							for (int j = 0; j < rectheight; j++)
+							{
+								for (int k = 0; k < rectwidth; k++)
+								{
+
+									unsigned char *source =
+										MappedSurface.pBits + (myrect->top + j)*sourceline + (myrect->left + k) * 4;
+									unsigned char *dest = buffer +
+										((myrect->left + k) + offsety - screenoffsety)*destline + (screenwidth
+										- myrect->top - j + offsetx - screenoffsetx) * 4;
+									memcpy(dest, source, 4);
+								}
+							}
+							Addrect(0, screenwidth - myrect->bottom + offsetx, myrect->left + offsety, screenwidth - myrect->top + offsetx, myrect->right + offsety, 0, 0, 0, 0);
+						}
 					}
+					__except (EXCEPTION_EXECUTE_HANDLER)
+					{
+						BitmapSurface->Unmap();
+						BitmapSurface->Release();
+						BitmapSurface = NULL;
+						goto Exit;
+					}
+					
+
+
+
+					
 
 				}
         }
     }
-
 	BitmapSurface->Unmap();
 	BitmapSurface->Release();
     BitmapSurface = NULL;
 	if (FAILED(hr)) goto Exit;
    
 Exit1:
+	//ok or wait
 	return 1;
 Exit:
+	//error
 	return 0;
 }
 

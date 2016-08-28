@@ -282,6 +282,11 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 					vnclog.Print(LL_INTERR, VNCLOG("unset W8 hooks OK\n"));
 #ifdef _USE_DESKTOPDUPLICATION
 					StopW8();
+					strcpy_s(g_hookstring, "");
+					_this->w8_data = NULL;// g_obIPC.CloseBitmap();
+					_this->m_bitmappointer = false;
+					_this->m_DIBbits = NULL;
+					_this->m_displaychanged = true;
 #endif
 				}
 				if (_this->UnSetHook)

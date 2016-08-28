@@ -28,6 +28,7 @@
 
 #ifdef _USE_DESKTOPDUPLICATION
 BOOL CaptureW8();
+BOOL StopW8();
 #endif
 
 bool g_DesktopThread_running;
@@ -770,13 +771,25 @@ void vncDesktopThread::do_polling(HANDLE& threadHandle, rfb::Region2D& rgncache,
 				strcpy_s(g_hookstring, "w8hook");
 #ifdef _USE_DESKTOPDUPLICATION
 				BOOL value = CaptureW8();
-
-				DWORD dwTId(0);
-				if (threadHandle == NULL && value != 0)
-					threadHandle = CreateThread(NULL, 0, hookwatch, this, 0, &dwTId);
-				capture = false;
-				if (m_desktop->m_bitmappointer && m_desktop->m_DIBbits)
-					if (Handle_Ringbuffer(m_desktop->plist, rgncache)) return;
+				if (value == 1)
+				{
+					DWORD dwTId(0);
+					if (threadHandle == NULL && value != 0)
+						threadHandle = CreateThread(NULL, 0, hookwatch, this, 0, &dwTId);
+					capture = false;
+					if (m_desktop->m_bitmappointer && m_desktop->m_DIBbits)
+						if (Handle_Ringbuffer(m_desktop->plist, rgncache)) return;
+				}
+				else
+				{
+					StopW8();
+					strcpy_s(g_hookstring, "");
+					m_desktop->startedw8 = false;
+					m_desktop->w8_data = NULL;// g_obIPC.CloseBitmap();
+					m_desktop->m_bitmappointer = false;
+					m_desktop->m_DIBbits = NULL;
+					m_desktop->m_displaychanged = true;
+				}
 #endif
 			}
 		}

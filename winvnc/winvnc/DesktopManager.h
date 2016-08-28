@@ -27,6 +27,7 @@ class ONEDESKTOP
 		IDXGIResource* DesktopResource;
 		IDXGIOutputDuplication* m_DeskDupl;
 		ID3D11Texture2D* m_AcquiredDesktopImage;
+		UINT m_MetaDataSize;
 		_Field_size_bytes_(m_MetaDataSize) BYTE* m_MetaDataBuffer;
 		int Desknr;
 		void ONEDESKTOP::Addrect(int type, int x1, int y1, int x2, int y2, int x11, int y11, int x22, int y22);
@@ -57,6 +58,7 @@ class DESKTOPMANAGER
 		INT ScreenOffSetY;
 		RECT *screenrect;
 		INT *OffesetX;
+		bool portrait[10];
 		INT *OffesetY;	
 		ONEDESKTOP *ondesktop;
 		unsigned char *buffer;
