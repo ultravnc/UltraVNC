@@ -223,6 +223,7 @@ public:
 	virtual bool IsEncoderSet() { return m_encodemgr.IsEncoderSet(); };
 	virtual bool IsFileTransBusy(){return (m_fFileUploadRunning||m_fFileDownloadRunning || m_fFileSessionOpen);};
 	void SetProtocolVersion(rfbProtocolVersionMsg *protocolMsg);
+	void SetOutgoing(bool outgoing) {m_outgoing = outgoing;};
 	void Clear_Update_Tracker();
 	void TriggerUpdate();
 	void UpdateCursorShape();
@@ -571,6 +572,7 @@ protected:
     bool        m_wants_KeepAlive;
 	bool		m_session_supported;
 	bool		m_initial_update;
+	bool		m_outgoing;
 };
 
 

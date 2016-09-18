@@ -89,17 +89,15 @@ public:
 	~vncServer();
 
 	// Client handling functions
-	virtual vncClientId AddClient(VSocket *socket, BOOL auth, BOOL shared);
-	virtual vncClientId AddClient(VSocket *socket, BOOL auth, BOOL shared,rfbProtocolVersionMsg *protocolMsg);
+	virtual vncClientId AddClient(VSocket *socket, BOOL auth, BOOL shared, BOOL outgoing);
+	virtual vncClientId AddClient(VSocket *socket, BOOL auth, BOOL shared, rfbProtocolVersionMsg *protocolMsg, BOOL outgoing);
 	virtual vncClientId AddClient(VSocket *socket,
-		BOOL auth, BOOL shared, int capability,
-		/*BOOL keysenabled, BOOL ptrenabled,*/rfbProtocolVersionMsg *protocolMsg);
+		BOOL auth, BOOL shared, int capability,rfbProtocolVersionMsg *protocolMsg, BOOL outgoing);
 	
 	// adzm 2009-07-05
 	// adzm 2009-08-02
 	virtual vncClientId AddClient(VSocket *socket,
-		BOOL auth, BOOL shared, int capability,
-		/*BOOL keysenabled, BOOL ptrenabled,*/rfbProtocolVersionMsg *protocolMsg,VString szRepeaterID,VString szHost,VCard port);
+		BOOL auth, BOOL shared, int capability,rfbProtocolVersionMsg *protocolMsg, VString szRepeaterID, VString szHost, VCard port, BOOL outgoing);
 
 	virtual BOOL Authenticated(vncClientId client);
 	virtual void KillClient(vncClientId client);
