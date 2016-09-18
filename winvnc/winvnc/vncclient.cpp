@@ -2297,7 +2297,7 @@ vncClientThread::run(void *arg)
 
 			szInfo[255] = '\0';
 
-			vncMenu::NotifyBalloon(szInfo, NULL);
+			if (m_client->m_outgoing) vncMenu::NotifyBalloon(szInfo, NULL);
 		}
 		// wa@2005 - AutoReconnection attempt if required
 		if (m_client->m_Autoreconnect && !fShutdownOrdered)
@@ -2500,7 +2500,7 @@ vncClientThread::run(void *arg)
         {
             // send first keepalive to let the client know we accepted the encoding request
             m_client->SendServerStateUpdate(rfbKeepAliveInterval, m_server->GetKeepAliveInterval());
-            m_client->SendKeepAlive();
+            m_client->SendKeepAlive(true);
             need_first_keepalive = false;
         }
 
@@ -2585,14 +2585,6 @@ vncClientThread::run(void *arg)
 
                     }
 #endif
-            if (sz_rfbKeepAliveMsg > 1)
-            {
-			    if (!m_socket->ReadExact(((char *) &msg)+nTO, sz_rfbKeepAliveMsg-nTO))
-			    {
-					m_client->cl_connected = FALSE;
-				    break;
-			    }
-            }
             break;
 
 		case rfbSetPixelFormat:
