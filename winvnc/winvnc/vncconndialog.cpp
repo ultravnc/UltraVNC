@@ -360,11 +360,11 @@ BOOL CALLBACK vncConnDialog::vncConnDlgProc(HWND hwnd,
 						// adzm 2009-07-05 - repeater IDs
 						// Add the new client to this server
 						// adzm 2009-08-02
-						_this->m_server->AddClient(tmpsock, TRUE, TRUE, 0, NULL, finalidcode, actualhostname, port);
+						_this->m_server->AddClient(tmpsock, TRUE, TRUE, 0, NULL, finalidcode, actualhostname, port,true);
 					} else {
 						// Add the new client to this server
 						// adzm 2009-08-02
-						_this->m_server->AddClient(tmpsock, TRUE, TRUE, 0, NULL, NULL, actualhostname, port);				
+						_this->m_server->AddClient(tmpsock, TRUE, TRUE, 0, NULL, NULL, actualhostname, port,true);				
 					}
 				// And close the dialog
 				EndDialog(hwnd, TRUE);
