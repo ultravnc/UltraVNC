@@ -5038,6 +5038,8 @@ vncClient::TriggerUpdateThread()
 	
 	if (!m_updatethread)
 	{
+		if (m_server->AreThereMultipleViewers()) 
+			cl_connected = TRUE;
 		m_updatethread = new vncClientUpdateThread;
 		if (!m_updatethread || 
 			!m_updatethread->Init(this)) {
