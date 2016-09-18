@@ -1318,7 +1318,7 @@ VSocket::SetTimeout(VCard32 msecs)
 {
 	if (LOBYTE(winsockVersion) < 2)
 		return VFalse;
-	int timeout=msecs;
+	DWORD timeout=msecs;
 	if (setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (char*)&timeout, sizeof(timeout)) == SOCKET_ERROR)
 	{
 		return VFalse;
