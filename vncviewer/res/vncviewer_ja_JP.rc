@@ -1,0 +1,1176 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Japanese (Japan) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+#pragma code_page(932)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Cursor
+//
+
+IDC_FINGER              CURSOR                     "Finger.cur"
+#endif    // Japanese (Japan) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+#pragma code_page(932)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Cursor
+//
+
+IDC_CURSOR1             CURSOR                     "cursorsel.cur"
+IDC_DOTCURSOR           CURSOR                     "cursor1.cur"
+IDC_NOCURSOR            CURSOR                     "nocursor.cur"
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_TRAY                ICON                       "idr_tray.ico"
+IDI_NET                 ICON                       "B46.ico"
+IDI_FILE                ICON                       "file.ico"
+IDI_DIR                 ICON                       "dir.ico"
+IDI_DRIVE               ICON                       "drive.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_TRAYMENU MENU
+BEGIN
+    POPUP "t"
+    BEGIN
+        MENUITEM "新しい接続...",              ID_NEWCONN
+        MENUITEM "デフォルトの接続設定...", IDC_OPTIONBUTTON
+        MENUITEM SEPARATOR
+        MENUITEM "バージョン情報...",          IDD_APP_ABOUT
+        MENUITEM SEPARATOR
+        MENUITEM "待ち受けモードの切り替え（ON/OFF）", ID_LISTEN_MODE
+        MENUITEM "待ち受けモードの終了",              ID_CLOSEAPP
+    END
+END
+
+IDR_tbMENU MENU
+BEGIN
+    POPUP "Rightclick menu for FullScreenCaption"
+    BEGIN
+        MENUITEM "元にのサイズに戻す",                     IDC_NULL
+        MENUITEM "最小化",                    IDC_NULL
+        MENUITEM SEPARATOR
+        MENUITEM "閉じる",                       IDC_NULL
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_OPTIONDIALOG DIALOGEX 0, 0, 335, 233
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "接続オプション"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    GROUPBOX        "フォーマットとエンコード",IDC_STATIC,4,2,160,173
+    CONTROL         "最適な設定を自動で選択",IDC_AUTODETECT,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,10,12,136,12
+    GROUPBOX        "",IDC_STATIC,9,22,72,94
+    CONTROL         "ZRLE",IDC_ZRLERADIO,"Button",BS_AUTORADIOBUTTON,12,30,31,10
+    CONTROL         "Tight",IDC_TIGHTRADIO,"Button",BS_AUTORADIOBUTTON,48,30,29,10
+    CONTROL         "Zlib (+xor)",IDC_ZLIBRADIO,"Button",BS_AUTORADIOBUTTON,12,41,47,10
+    CONTROL         "ZlibHex",IDC_ZLIBHEXRADIO,"Button",BS_AUTORADIOBUTTON,12,52,55,10
+    CONTROL         "Hextile",IDC_HEXTILERADIO,"Button",BS_AUTORADIOBUTTON,12,62,37,10
+    CONTROL         "RRE",IDC_RRERADIO,"Button",BS_AUTORADIOBUTTON,12,73,29,10
+    CONTROL         "CoRRE",IDC_CORRERADIO,"Button",BS_AUTORADIOBUTTON,41,73,38,10
+    CONTROL         "Raw",IDC_RAWRADIO,"Button",BS_AUTORADIOBUTTON,12,83,29,10
+    CONTROL         "Ultra",IDC_ULTRA,"Button",BS_AUTORADIOBUTTON,41,83,29,10
+    CONTROL         "ZYWRLE",IDC_ZYWRLERADIO,"Button",BS_AUTORADIOBUTTON,12,94,38,10
+    CONTROL         "u2",IDC_ULTRA2,"Button",BS_AUTORADIOBUTTON,57,94,18,10
+    CONTROL         "XZ",IDC_XZRADIO,"Button",BS_AUTORADIOBUTTON,12,105,24,10
+    CONTROL         "XZYW",IDC_XZYWRADIO,"Button",BS_AUTORADIOBUTTON,41,105,35,10
+    CONTROL         "フルカラー",IDC_FULLCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,89,30,48,10
+    CONTROL         "256色",IDC_256COLORS_RADIO,"Button",BS_AUTORADIOBUTTON,89,41,49,10
+    CONTROL         "64色",IDC_64COLORS_RADIO,"Button",BS_AUTORADIOBUTTON,89,52,45,10
+    CONTROL         "8色",IDC_8COLORS_RADIO,"Button",BS_AUTORADIOBUTTON,89,63,41,10
+    CONTROL         "8暗色",IDC_8GREYCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON,89,74,54,10
+    CONTROL         "4階調グレー",IDC_4GREYCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON,89,84,58,10
+    CONTROL         "白黒",IDC_2GREYCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON,89,95,57,10
+    CONTROL         "CopyRectエンコードを使用",ID_SESSION_SET_CRECT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,118,96,10
+    CONTROL         "キャッシュエンコードを使用",ID_SESSION_SET_CACHE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,128,90,10
+    CONTROL         "Zip/Tightの圧縮",IDC_ALLOW_COMPRESSLEVEL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,138,87,10
+    EDITTEXT        IDC_COMPRESSLEVEL,113,135,14,12,ES_AUTOHSCROLL
+    CONTROL         "Jpeg (Tight) - 品質：",IDC_ALLOW_JPEG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,148,84,10
+    EDITTEXT        IDC_QUALITYLEVEL,113,148,14,12,ES_AUTOHSCROLL
+    CONTROL         "Preemptive Updates",IDC_PREEMPTIVEUPDATES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,158,81,10
+    GROUPBOX        "その他",IDC_STATIC,4,174,160,54
+    CONTROL         "サーバを共有",IDC_SHARED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,184,71,10
+    CONTROL         "アイコン化を解除したときベルを鳴らす",IDC_BELLDEICONIFY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,195,137,8
+    CONTROL         "クリップボード転送を行わない",IDC_DISABLECLIPBOARD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,204,138,10
+    CONTROL         "スポンサー広告を表示しない",IDC_CHECK1,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,214,145,10
+    GROUPBOX        "マウスボタン",IDC_STATIC,174,2,159,100
+    CONTROL         "左右同時押しで中クリックとして扱う",IDC_EMULATECHECK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,15,139,10
+    CONTROL         "右ボタンと中ボタンを入れ替える",ID_SESSION_SWAPMOUSE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,27,126,10
+    CONTROL         "Japanese keyboard",IDC_JAPKEYBOARD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,39,78,10
+    CONTROL         "ローカルのカーソルを表示する",IDC_CSHAPE_ENABLE_RADIO,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,179,52,144,10
+    CONTROL         "リモートのカーソルを表示する",IDC_CSHAPE_DISABLE_RADIO,
+                    "Button",BS_AUTORADIOBUTTON,179,63,147,10
+    CONTROL         "カーソルを表示しない",IDC_CSHAPE_IGNORE_RADIO,
+                    "Button",BS_AUTORADIOBUTTON,179,74,142,10
+    EDITTEXT        IDC_MOUSE_THROTTLE,179,86,22,12,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "Mouse event throttle (milliseconds)",IDC_STATIC,205,88,116,11
+    GROUPBOX        "マウスカーソル",IDC_STATIC,174,104,159,93
+    CONTROL         "ツールバーを表示する",IDC_SHOWTOOLBAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,116,109,10
+    EDITTEXT        IDC_SCALE_NUM,279,116,15,12,ES_AUTOHSCROLL | ES_NUMBER | NOT WS_VISIBLE
+    EDITTEXT        IDC_SCALE_DEN,308,116,14,12,ES_AUTOHSCROLL | ES_NUMBER | NOT WS_VISIBLE
+    CONTROL         "表示のみ（リモート操作を行わない）",IDC_VIEWONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,127,129,10
+    CONTROL         "全画面表示",IDC_FULLSCREEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,138,114,8
+    LTEXT           "Viewer size/pos:",IDC_STATIC,179,161,54,8
+    CONTROL         "自動",IDC_SCALING,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,239,159,28,10
+    LTEXT           "by",IDC_STATIC,269,161,10,8
+    COMBOBOX        IDC_SCALE_CB,283,159,30,117,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    CTEXT           "%",IDC_STATIC,317,161,8,8,0,WS_EX_TRANSPARENT
+    LTEXT           "サーバ画面表示倍率：",IDC_STATIC,180,172,80,8
+    LTEXT           "1  /",IDC_STATIC,265,175,12,8
+    EDITTEXT        IDC_SERVER_SCALE,282,173,14,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_SERVER_RECON,177,199,16,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "reconnection attempts",IDC_STATIC,197,199,75,11
+    DEFPUSHBUTTON   "OK",IDOK,225,215,50,14
+    PUSHBUTTON      "キャンセル",IDCANCEL,280,215,50,14
+    GROUPBOX        "",IDC_STATIC,84,22,65,86,WS_GROUP
+    CONTROL         "ウィンドウへのスケール",IDC_DIRECTX,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,184,67,10
+    EDITTEXT        IDC_SERVER_RECON_TIME,276,199,16,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "timeout",IDC_STATIC,296,199,25,8
+    CONTROL         "保存位置",IDC_SAVEPOS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,147,59,10
+    CONTROL         "保存サイズ",IDC_SAVESIZE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,254,147,47,10
+END
+
+IDD_FILETRANSFER_DLG DIALOGEX 0, 0, 555, 414
+STYLE DS_SYSMODAL | DS_SETFONT | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+EXSTYLE WS_EX_TOPMOST
+CAPTION "ファイル転送 - UltraVNC"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    LTEXT           "履歴：",IDC_HS_STATIC,4,374,26,8
+    COMBOBOX        IDC_HISTORY_CB,45,372,507,71,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "進行状況：",IDC_PR_STATIC,4,388,32,8
+    CONTROL         "Progress1",IDC_PROGRESS,"msctls_progress32",WS_BORDER,45,388,307,9
+    CONTROL         "",IDC_LOCAL_STATUS,"Static",SS_LEFTNOWORDWRAP | WS_GROUP,3,359,238,10,WS_EX_STATICEDGE
+    CONTROL         "",IDC_REMOTE_STATUS,"Static",SS_LEFTNOWORDWRAP | WS_GROUP,314,359,238,10,WS_EX_STATICEDGE
+    COMBOBOX        IDC_LOCAL_DRIVECB,3,3,98,171,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    CTEXT           "ローカルマシン",IDC_LM_STATIC,105,3,94,13,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
+    PUSHBUTTON      "\\",IDC_LOCAL_ROOTB,204,3,17,12
+    PUSHBUTTON      "..",IDC_LOCAL_UPB,224,3,17,12
+    CONTROL         "",IDC_CURR_LOCAL,"RICHEDIT",TCS_VERTICAL | TCS_RAGGEDRIGHT,3,17,238,12,WS_EX_STATICEDGE
+    CONTROL         "List2",IDC_LOCAL_FILELIST,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_AUTOARRANGE | WS_BORDER | WS_TABSTOP,3,31,238,324
+    PUSHBUTTON      "Local Drives List",IDC_LOCAL_ROOT_B,263,1,40,9,BS_FLAT | NOT WS_VISIBLE
+    PUSHBUTTON      "Remote Drives List",IDC_REMOTE_ROOT_B,263,10,36,9,BS_FLAT | NOT WS_VISIBLE
+    DEFPUSHBUTTON   "OK",IDOK,251,23,59,14,NOT WS_VISIBLE
+    PUSHBUTTON      "送信 >>",IDC_UPLOAD_B,248,103,60,14,BS_CENTER | BS_FLAT
+    PUSHBUTTON      "<< 受信",IDC_DOWNLOAD_B,248,121,60,14,BS_CENTER | BS_FLAT
+    PUSHBUTTON      "中止",IDC_ABORT_B,248,141,60,14,BS_FLAT | NOT WS_VISIBLE
+    PUSHBUTTON      "削除",IDC_DELETE_B,248,203,60,14,BS_FLAT
+    PUSHBUTTON      "新規フォルダ",IDC_NEWFOLDER_B,248,221,60,14,BS_FLAT
+    PUSHBUTTON      "名前変更",IDC_RENAME_B,248,239,60,14,BS_FLAT
+    PUSHBUTTON      "最小化",IDC_HIDE_B,248,321,60,14
+    PUSHBUTTON      "閉じる",IDCANCEL,248,339,60,14
+    COMBOBOX        IDC_REMOTE_DRIVECB,314,3,98,172,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    CTEXT           "リモートマシン",IDC_RM_STATIC,415,3,95,13,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
+    PUSHBUTTON      "\\",IDC_REMOTE_ROOTB,514,3,17,12
+    PUSHBUTTON      "..",IDC_REMOTE_UPB,534,3,17,12
+    CONTROL         "",IDC_CURR_REMOTE,"RICHEDIT",TCS_VERTICAL | TCS_RAGGEDRIGHT,314,17,238,12,WS_EX_STATICEDGE
+    CONTROL         "List3",IDC_REMOTE_FILELIST,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_AUTOARRANGE | WS_BORDER | WS_TABSTOP,314,31,238,324
+    LTEXT           "",IDC_GLOBAL_STATUS,484,388,65,8,0,WS_EX_RIGHT
+    LTEXT           "",IDC_PERCENT,356,388,120,8
+END
+
+IDD_SESSION_DLG DIALOGEX 0, 0, 245, 229
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "UltraVNC Viewer - 1.2.1.2"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    CONTROL         IDB_VNC32,IDC_STATIC,"Static",SS_BITMAP,3,2,24,24
+    LTEXT           "VNCサーバ：",IDC_STATIC,34,7,40,8
+    COMBOBOX        IDC_HOSTNAME_EDIT,76,4,120,66,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "...",IDC_LOADPROFILE_B,200,4,16,13
+    LTEXT           "（ﾎｽﾄ:ﾃﾞｨｽﾌﾟﾚｲ番号 または ﾎｽﾄ::ﾎﾟｰﾄ番号）",IDC_STATIC,83,19,103,8
+    GROUPBOX        "簡単設定",IDC_STATIC,4,29,191,108
+    CONTROL         "自動　　　　　（最適な設定を自動選択）",IDC_DYNAMIC,
+                    "Button",BS_AUTORADIOBUTTON,12,42,177,10
+    CONTROL         "ULTRA       （2Mbit/s以上推奨） - 実験的",IDC_ULTRA_LAN_RB,
+                    "Button",BS_AUTORADIOBUTTON,12,53,176,10
+    CONTROL         "LAN          （1Mbit/s以上推奨） - フルカラー",IDC_LAN_RB,
+                    "Button",BS_AUTORADIOBUTTON,12,64,176,10
+    CONTROL         "中速          （128～256Kbit/s向け） - 256色",IDC_MEDIUM_RB,
+                    "Button",BS_AUTORADIOBUTTON,12,75,153,10
+    CONTROL         "モデム       （19～128Kbit/s向け） - 64色",IDC_MODEM_RB,
+                    "Button",BS_AUTORADIOBUTTON,12,86,148,10
+    CONTROL         "低速          （19Kbit/s以下） - 8色",IDC_SLOW_RB,
+                    "Button",BS_AUTORADIOBUTTON,12,97,128,10
+    CONTROL         "MANUAL     ( Use options button )",IDC_MANUAL,"Button",BS_AUTORADIOBUTTON,12,108,123,10
+    CONTROL         "表示のみ",IDC_VIEWONLY_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,123,47,10
+    CONTROL         "表示倍率を自動設定",IDC_AUTOSCALING_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,63,123,59,10
+    CONTROL         "Confirm Exit",IDC_EXIT_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,124,123,53,10
+    CONTROL         "DSMﾌﾟﾗｸﾞｲﾝ使用",IDC_PLUGIN_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,147,66,10
+    COMBOBOX        IDC_PLUGINS_COMBO,78,145,118,55,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "ﾌﾟﾛｷｼ/ﾘﾋﾟｰﾀ",IDC_PROXY_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,161,66,10
+    EDITTEXT        IDC_PROXY_EDIT,78,160,117,12,ES_AUTOHSCROLL
+    GROUPBOX        "",IDC_STATIC,4,204,237,21
+    CONTROL         "この接続設定を保存する",IDC_SETDEFAULT_CHECK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,213,128,10
+    DEFPUSHBUTTON   "接続",IDOK,200,33,40,26
+    PUSHBUTTON      "キャンセル",IDCANCEL,200,64,40,14
+    PUSHBUTTON      "オプション...",IDC_OPTIONBUTTON,200,113,40,14
+    PUSHBUTTON      "設定",IDC_PLUGIN_BUTTON,200,145,40,12
+    PUSHBUTTON      "保存済みの設定を削除",IDC_DELETE,149,211,84,12,BS_MULTILINE
+    GROUPBOX        "",IDC_STATIC,4,135,237,42
+    COMBOBOX        IDC_SCREEN,10,185,222,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "",IDC_STATIC,4,175,237,31
+END
+
+IDD_SERVINFO_DLG DIALOGEX 0, 0, 224, 170
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "RFB Server information"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,167,149,50,14
+    EDITTEXT        IDC_SERVINFO_EDIT,7,7,210,134,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY
+END
+
+IDD_AUTH_DIALOG DIALOGEX 101, 66, 214, 63
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION
+EXSTYLE WS_EX_TOPMOST
+CAPTION "UltraVNC認証"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    EDITTEXT        IDD_USER_NAME,118,6,82,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PASSWD_EDIT,118,22,82,14,ES_PASSWORD | ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "接続",IDOK,89,42,54,15
+    PUSHBUTTON      "キャンセル",IDCANCEL,149,42,50,15
+    RTEXT           "ユーザ名：",IDC_STATIC,58,10,57,8
+    RTEXT           "パスワード：",IDC_STATIC,58,26,57,8
+    CONTROL         ID_BUTTON_SEP,IDC_STATIC,"Static",SS_BITMAP | SS_REALSIZEIMAGE | SS_SUNKEN,8,10,48,42
+END
+
+IDD_AUTH_DIALOG2 DIALOGEX 101, 66, 214, 113
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION
+EXSTYLE WS_EX_TOPMOST
+CAPTION " UltraVNC 認証 - セキュリティの注意"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    LTEXT           "接続している UltraVNC サーバーは、パスワード転送の安全性に問題があります。（DSMプラグインを使用している場合を除く）\r\nパスワード送信を安全に行うためには UltraVNC サーバをバージョン 1.0.5 以降のものに更新してください。",IDC_STATIC,8,6,196,44
+    EDITTEXT        IDD_USER_NAME,118,57,82,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PASSWD_EDIT,118,73,82,14,ES_PASSWORD | ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "接続",IDOK,89,92,54,15
+    PUSHBUTTON      "キャンセル",IDCANCEL,150,92,50,15
+    RTEXT           "ユーザ名：",IDC_STATIC,58,60,57,8
+    RTEXT           "パスワード：",IDC_STATIC,58,76,57,8
+    CONTROL         ID_BUTTON_SEP,IDC_STATIC,"Static",SS_BITMAP | SS_REALSIZEIMAGE | SS_SUNKEN,8,60,48,42
+END
+
+IDD_CUSTUM_KEY DIALOGEX 0, 0, 224, 53
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_TOPMOST
+CAPTION "カスタムキーの送信"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    LTEXT           "キーコード（10進数）：",IDC_STATIC,7,9,87,12
+    EDITTEXT        IDC_CUSTOM_KEY,100,7,51,14,ES_AUTOHSCROLL
+    CONTROL         "ALT GR",IDC_ALTGR,"Button",BS_AUTORADIOBUTTON,54,26,38,9
+    CONTROL         "CTRL",IDC_STRG,"Button",BS_AUTORADIOBUTTON,100,26,35,9
+    CONTROL         "ALT",IDC_ALT,"Button",BS_AUTORADIOBUTTON,54,37,26,9
+    CONTROL         "NORMAL",IDC_NORMAL,"Button",BS_AUTORADIOBUTTON,100,37,45,9
+    DEFPUSHBUTTON   "送信",IDOK,167,7,50,14
+    PUSHBUTTON      "キャンセル",IDCANCEL,167,32,50,14
+END
+
+IDD_STATUS DIALOGEX 0, 0, 198, 144
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "VNCビューア接続状態"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "閉じる",IDCLOSE,140,126,50,14
+    GROUPBOX        "接続",IDC_STATIC,4,0,186,78
+    GROUPBOX        "通信状態",IDC_STATIC,4,81,186,42
+    LTEXT           "ポート番号：",IDC_STATIC,13,23,52,9
+    LTEXT           "送信量",IDC_STATIC,7,94,63,9
+    RTEXT           "受信量",IDC_STATIC,117,94,68,9
+    RTEXT           "Sent",IDC_SEND,6,110,64,9
+    RTEXT           "Received",IDC_RECEIVED,113,110,72,9
+    RTEXT           "Port Number",IDC_PORT,96,23,89,9
+    ICON            IDI_NET,IDC_STATIC,89,90,20,20
+    CONTROL         IDB_BITMAP3,IDC_STATIC,"Static",SS_BITMAP | SS_REALSIZEIMAGE,71,98,13,1,WS_EX_TRANSPARENT
+    CONTROL         IDB_BITMAP3,IDC_STATIC,"Static",SS_BITMAP | SS_REALSIZEIMAGE,109,98,13,1,WS_EX_TRANSPARENT
+    CONTROL         IDB_BITMAP2,IDC_STATIC,"Static",SS_BITMAP | SS_REALSIZEIMAGE,105,110,1,10,WS_EX_TRANSPARENT
+    LTEXT           "VNCサーバ：",IDC_STATIC,13,12,64,9
+    RTEXT           "Server Name",IDC_VNCSERVER,94,12,91,9
+    LTEXT           "状態：",IDC_STATIC,13,30,52,9
+    RTEXT           "Connection closed",IDC_STATUS,44,30,141,24
+    RTEXT           "",IDC_PLUGIN_STATUS,7,45,178,9
+    PUSHBUTTON      "キャンセル",IDQUIT,5,126,50,14
+    LTEXT           "通信速度：",IDC_STATIC,13,66,64,8
+    RTEXT           "（検出中）",IDC_SPEED,81,66,62,8
+    RTEXT           "kbit/s",IDC_STATIC,147,66,38,8
+    RTEXT           "",IDC_ENCODER,65,55,120,8
+    LTEXT           "エンコード：",IDC_STATIC,13,55,63,8
+END
+
+IDD_AUTH_DIALOG1 DIALOGEX 101, 66, 234, 58
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION
+EXSTYLE WS_EX_TOPMOST
+CAPTION "警告：サーバをアップグレード..."
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    EDITTEXT        IDC_PASSWD_EDIT,136,13,82,14,ES_PASSWORD | ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "接続",IDOK,108,37,54,15
+    PUSHBUTTON      "キャンセル",IDCANCEL,168,37,50,15
+    RTEXT           "パスワード：",-1,65,16,61,8
+    CONTROL         ID_BUTTON_SEP,-1,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_SUNKEN,6,6,50,42
+END
+
+IDD_FTPARAM_DLG DIALOGEX 0, 0, 241, 60
+STYLE DS_SYSMODAL | DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION
+CAPTION "FT Param Dialog"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    EDITTEXT        IDC_FTPARAM_EDIT,10,21,224,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,128,42,50,14
+    PUSHBUTTON      "キャンセル",IDCANCEL,184,42,50,14
+    LTEXT           "FT Param comment. Please enter blah blah blah...",IDC_FTPARAMCOMMENT,9,7,225,8
+END
+
+IDD_TEXTCHAT_DLG DIALOGEX 0, 0, 307, 175
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION
+CAPTION "チャット - UltraVNC"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    EDITTEXT        IDC_INPUTAREA_EDIT,4,136,255,36,ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN | NOT WS_BORDER | WS_VSCROLL,WS_EX_STATICEDGE
+    PUSHBUTTON      "送信",IDC_SEND_B,264,135,39,14,BS_CENTER | BS_MULTILINE
+    PUSHBUTTON      "最小化",IDC_HIDE_B,264,151,39,11
+    PUSHBUTTON      "閉じる",IDCANCEL,264,162,39,11
+    CONTROL         "",IDC_CHATAREA_EDIT,"RICHEDIT",TCS_HOTTRACK | TCS_RAGGEDRIGHT | TCS_FOCUSONBUTTONDOWN | TCS_MULTISELECT | WS_VSCROLL | WS_TABSTOP,3,3,300,130,WS_EX_STATICEDGE
+    DEFPUSHBUTTON   "",IDOK,299,0,8,6,NOT WS_VISIBLE
+END
+
+IDD_APP_ABOUT DIALOGEX 0, 0, 289, 156
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "VNCビューアのバージョン情報"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,8,137,62,14
+    CONTROL         ID_BUTTON_SEP,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_SUNKEN,8,7,62,54
+    LTEXT           "UltraVNC Viewer 1.2.1.2",IDC_STATIC,86,6,197,11
+    LTEXT           "For more Information and Links please visit: \nhttp://www.uvnc.com",IDC_STATIC,86,133,197,19
+    LTEXT           "Copyright c 2002-2005 UltraVNC Team\nCopyright c 2001-2002 Sam - eSVNC \nCopyright c 1999-2002 Rudi D. V. - VdaccVNC \nCopyright c 1999-2002 Const. Kaplinsky - TightVNC \nCopyright c 2002 RealVNC Ltd. - RealVNC\n",IDC_STATIC,86,30,200,40
+    LTEXT           "作成日：",IDC_STATIC,87,17,15,10
+    LTEXT           "BuildTime",IDC_BUILDTIME,120,17,98,10
+    LTEXT           "Copyright c 2002 VNC QuickDesk\nCopyright c 1999-2002 Tridia Corporation - TridiaVNC \nCopyright c 1994-2001 AT&&T Laboratories Cambridge/Olivetti Research Ltd. - VNC",IDC_STATIC,86,70,203,33
+    LTEXT           "Copyright c 1990-2002 Info-ZIP\nCopyright c 1996-2002 Markus Franz Xaver Johannes Oberhumer - Mini LZO library",IDC_STATIC,85,102,198,24
+END
+
+IDD_FTCONFIRM_DLG DIALOGEX 0, 0, 178, 86
+STYLE DS_SYSMODAL | DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION
+EXSTYLE WS_EX_TOPMOST
+CAPTION "Dialog"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    LTEXT           "Confirm message here",IDC_FTPCONFIRMCOMMENT,4,8,163,53
+    DEFPUSHBUTTON   "はい",IDC_YES_B,4,65,39,14
+    PUSHBUTTON      "全て はい",IDC_YESALL_B,46,65,40,14
+    PUSHBUTTON      "いいえ",IDC_NO_B,92,65,40,14
+    PUSHBUTTON      "全て いいえ",IDC_NOALL_B,135,65,39,14
+END
+
+IDD_APP_MESSAGE1 DIALOGEX 0, 0, 278, 158
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "VncViewer Message Box"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "閉じる",IDOK,185,110,56,14
+    LTEXT           "BuildTime",IDC_BUILDTIME,9,11,265,88
+    GROUPBOX        "Info Message",IDC_STATIC,3,1,274,100,BS_CENTER
+    CTEXT           "UltraVNC 1.2.1.2",IDC_STATIC,178,145,66,12
+    PUSHBUTTON      "",IDC_BUTTON1,7,104,170,47,BS_BITMAP
+END
+
+IDD_APP_MESSAGE2 DIALOGEX 0, 0, 273, 217
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "VncViewer Message Box"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "閉じる",IDOK,185,163,56,14
+    LTEXT           "BuildTime",IDC_BUILDTIME,9,11,258,97
+    PUSHBUTTON      "",IDC_BUTTON2,7,114,170,47,BS_BITMAP
+    GROUPBOX        "Info Message",IDC_STATIC,3,1,264,110,BS_CENTER
+    CTEXT           "UltraVNC 1.2.1.2",IDC_STATIC,175,204,69,12
+    PUSHBUTTON      "",IDC_BUTTON1,7,163,170,47,BS_BITMAP
+    CTEXT           "スポンサー\n リンク",IDC_STATIC,179,127,36,21
+END
+
+IDD_AUTH_DIALOG3 DIALOGEX 101, 66, 234, 58
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION
+EXSTYLE WS_EX_TOPMOST
+CAPTION "VNC認証"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    EDITTEXT        IDC_PASSWD_EDIT,136,13,82,14,ES_PASSWORD | ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "接続",IDOK,108,37,54,15
+    PUSHBUTTON      "キャンセル",IDCANCEL,168,37,50,15
+    RTEXT           "パスワード：",-1,65,16,61,8
+    CONTROL         ID_BUTTON_SEP,-1,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_SUNKEN,6,6,50,42
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_OPTIONDIALOG, DIALOG
+    BEGIN
+        RIGHTMARGIN, 330
+        VERTGUIDE, 164
+        BOTTOMMARGIN, 217
+        HORZGUIDE, 171
+    END
+
+    IDD_FILETRANSFER_DLG, DIALOG
+    BEGIN
+        RIGHTMARGIN, 505
+        VERTGUIDE, 215
+        VERTGUIDE, 274
+        VERTGUIDE, 279
+        VERTGUIDE, 486
+        BOTTOMMARGIN, 260
+    END
+
+    IDD_SESSION_DLG, DIALOG
+    BEGIN
+        VERTGUIDE, 10
+        VERTGUIDE, 232
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 225
+        HORZGUIDE, 17
+    END
+
+    IDD_SERVINFO_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 217
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 163
+    END
+
+    IDD_AUTH_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 2
+        RIGHTMARGIN, 209
+        VERTGUIDE, 8
+        VERTGUIDE, 43
+        VERTGUIDE, 56
+        VERTGUIDE, 58
+        VERTGUIDE, 81
+        VERTGUIDE, 115
+        VERTGUIDE, 118
+        VERTGUIDE, 190
+        BOTTOMMARGIN, 58
+        HORZGUIDE, 20
+        HORZGUIDE, 36
+        HORZGUIDE, 52
+        HORZGUIDE, 57
+    END
+
+    IDD_AUTH_DIALOG2, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 92
+    END
+
+    IDD_CUSTUM_KEY, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 217
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 46
+    END
+
+    IDD_STATUS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 191
+        VERTGUIDE, 185
+        VERTGUIDE, 190
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 129
+    END
+
+    IDD_AUTH_DIALOG1, DIALOG
+    BEGIN
+        LEFTMARGIN, 2
+        RIGHTMARGIN, 229
+        VERTGUIDE, 6
+        VERTGUIDE, 43
+        VERTGUIDE, 49
+        VERTGUIDE, 65
+        VERTGUIDE, 81
+        VERTGUIDE, 108
+        VERTGUIDE, 118
+        VERTGUIDE, 218
+        BOTTOMMARGIN, 53
+        HORZGUIDE, 25
+        HORZGUIDE, 27
+        HORZGUIDE, 36
+        HORZGUIDE, 52
+        HORZGUIDE, 57
+    END
+
+    IDD_FTPARAM_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 234
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 53
+    END
+
+    IDD_TEXTCHAT_DLG, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 164
+    END
+
+    IDD_APP_ABOUT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        VERTGUIDE, 86
+        VERTGUIDE, 94
+        VERTGUIDE, 108
+        VERTGUIDE, 283
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 124
+        HORZGUIDE, 29
+    END
+
+    IDD_FTCONFIRM_DLG, DIALOG
+    BEGIN
+    END
+
+    IDD_APP_MESSAGE1, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 246
+        VERTGUIDE, 86
+        VERTGUIDE, 94
+        VERTGUIDE, 108
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 151
+        HORZGUIDE, 29
+    END
+
+    IDD_APP_MESSAGE2, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 246
+        VERTGUIDE, 86
+        VERTGUIDE, 94
+        VERTGUIDE, 108
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 210
+        HORZGUIDE, 29
+    END
+
+    IDD_AUTH_DIALOG3, DIALOG
+    BEGIN
+        LEFTMARGIN, 2
+        RIGHTMARGIN, 229
+        VERTGUIDE, 6
+        VERTGUIDE, 43
+        VERTGUIDE, 49
+        VERTGUIDE, 65
+        VERTGUIDE, 81
+        VERTGUIDE, 108
+        VERTGUIDE, 118
+        VERTGUIDE, 218
+        BOTTOMMARGIN, 53
+        HORZGUIDE, 25
+        HORZGUIDE, 27
+        HORZGUIDE, 36
+        HORZGUIDE, 52
+        HORZGUIDE, 57
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog Info
+//
+
+IDD_SESSION_DLG DLGINIT
+BEGIN
+    IDC_HOSTNAME_EDIT, 0x403, 1, 0
+"\000"
+ 
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_BITMAP2             BITMAP                     "hoch.bmp"
+IDB_BITMAP3             BITMAP                     "quer.bmp"
+IDB_STAT_BACK           BITMAP                     "stat\\back.bmp"
+IDB_STAT_BOTH           BITMAP                     "stat\\both.bmp"
+IDB_STAT_FRONT          BITMAP                     "stat\\front.bmp"
+IDB_STAT_NONE           BITMAP                     "stat\\none.bmp"
+IDB_VNC64               BITMAP                     "vnc64.BMP"
+IDB_CLOSE               BITMAP                     "stat\\closeup.bmp"
+IDB_MAXIMIZE            BITMAP                     "stat\\maximizeup.bmp"
+IDB_MINIMIZE            BITMAP                     "stat\\minimizeup.bmp"
+IDB_PINDOWN             BITMAP                     "stat\\pindown.bmp"
+IDB_PINUP               BITMAP                     "stat\\pinup.bmp"
+IDB_VNC32               BITMAP                     "vnc32.BMP"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,2,1,2
+ PRODUCTVERSION 1,2,1,2
+ FILEFLAGSMASK 0x37L
+#ifdef _DEBUG
+ FILEFLAGS 0x25L
+#else
+ FILEFLAGS 0x24L
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "041104B0"
+        BEGIN
+            VALUE "Comments", "UltraVNC Viewer"
+            VALUE "CompanyName", "UltraVNC"
+            VALUE "FileDescription", "VNCViewer"
+            VALUE "FileVersion", "1.2.1.2"
+            VALUE "InternalName", "VNCViewer"
+            VALUE "LegalCopyright", "Copyright c 2015 UltraVNC team members"
+            VALUE "OriginalFilename", "VNCViewer.exe"
+            VALUE "ProductName", "UltraVNC VNCViewer"
+            VALUE "ProductVersion", "1.2.1.2"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0411, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDR_TRAY                "UltraVNCビューア　待機中"
+END
+
+STRINGTABLE
+BEGIN
+    ID_CLOSEDAEMON          "接続を受け入れるための待機を中止します"
+    ID_SHOWWINDOW           "接続ウィンドウを表示します"
+    ID_NEWCONN              "手動で新規接続を行います"
+    ID_BUTTON_CAD           "Ctrl+Alt+Del を送信"
+    ID_BUTTON_FTRANS        "ファイル転送"
+END
+
+STRINGTABLE
+BEGIN
+    ID_BUTTON_DINPUT        "ボタンを無効にする"
+    ID_BUTTON_DBUTTON       "サーバのマウスとキーボード操作を無効にする"
+    ID_BUTTON_SW            "一つのウィンドウを選択"
+    ID_BUTTON_DESKTOP       "デスクトップ全体を選択"
+    IDS_WARNING             "警告：デフォルトではこのセッションは暗号化されません。安全な接続ではない場合は、重要なデータを送信しないでください。\n\n"
+    IDS_A1                  "ビューアのシステムトレイを中止する"
+    IDS_A2                  "UltraVNC 情報"
+    IDS_A3                  "リスニングデーモンの作成中にエラー：\n\r"
+    IDS_A4                  "おそらく他の VNC ビューアがすでに起動しています"
+    IDS_A5                  "VNC ビューア エラー"
+    IDS_B1                  "ソケットライブラリの初期化中にエラーが発生しました"
+    IDS_B2                  "クライアントリストがオーバーフローしました"
+    IDS_B3                  "VNC エラー"
+END
+
+STRINGTABLE
+BEGIN
+    IDC_OPTIONBUTTON        "新規接続のためのオプション設定"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_C1                  "クリップボードを開くのに失敗しました\n"
+    IDS_C2                  "クリップボードを空にするのに失敗しました\n"
+    IDS_C3                  "クリップボードを閉じるのに失敗しました\n"
+    IDS_D1                  "引数エラー"
+    IDS_D2                  "無効な倍率設定です - 通常の倍率に戻します"
+    IDS_D3                  "無効な待機ポートが指定されました"
+    IDS_D4                  "倍率が指定されていません"
+    IDS_D5                  "無効な倍率が指定されました"
+    IDS_D6                  "タイムアウトが指定されていません"
+    IDS_D7                  "無効なタイムアウトが指定されました"
+    IDS_D8                  "fuzz が指定されていません"
+    IDS_D9                  "無効な fuzz が指定されました"
+    IDS_D10                 "遅延が指定されていません"
+    IDS_D11                 "無効な遅延が指定されました"
+    IDS_D12                 "ログレベルが指定されていません"
+    IDS_D13                 "無効なログレベルが指定されました"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_D14                 "ログファイルが指定されていません"
+    IDS_D15                 "無効なログファイルが指定されました"
+    IDS_D16                 "設定ファイルが指定されていません"
+    IDS_D17                 "指定された設定ファイルを読み込めません"
+    IDS_D18                 "エンコーディングが指定されていません"
+    IDS_D19                 "無効なエンコーディングが指定されました"
+    IDS_D20                 "圧縮レベルが指定されていません"
+    IDS_D21                 "無効な圧縮レベルが指定されました"
+    IDS_D22                 "画像品質レベルが指定されていません"
+    IDS_D23                 "無効な画像品質レベルが指定されました"
+    IDS_D24                 "パスワードが指定されていません"
+    IDS_D25                 "サーバ表示倍率が指定されていません"
+    IDS_D26                 "クイックオプション番号が指定されていません"
+    IDS_D27                 "DSM プラグインが指定されていません('プラグイン名.dsm')"
+    IDS_D28                 "無効なInvalid VNC server specified."
+    IDS_E1                  "リッチエディットコントロール(RICHED32.DLL)が読み込めません"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_E2                  "リッチエディット DLL を読み込んでいます"
+    IDS_F1                  "プラグインを読み込めませんでした\n\rプラグインを確認してください"
+    IDS_F3                  "プラグインの認証"
+    IDS_F4                  "パスワードがありません,ビューア"
+    IDS_F5                  "プラグインを読み込めませんでした\n\rプラグインの名前を確認してください"
+    IDS_F6                  "プラグインの読み込み中"
+    IDS_F7                  "プラグインを初期化できませんでした\n\rプラグインの名前を確認してください"
+    IDS_F8                  "無効な VNC サーバが指定されました\n\rサーバは ホスト名:ディスプレイ番号 で指定します"
+    IDS_F10                 "接続設定"
+    IDS_F11                 "プラグインが見つかりません..."
+    IDS_G1                  "フラッシャーソケットの作成でエラー"
+    IDS_G2                  "フラッシャーソケットのバインドでエラー"
+    IDS_G3                  "フラッシャーの待機でエラー"
+    IDS_H1                  " > 警告：ファイル転送はリモートマシンで無効に設定されています"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_H2                  " > 警告：ファイル転送はリモートマシンで無効に設定されています"
+    IDS_H3                  "ファイル転送の権限がありません：この機能が無効にされているか、不明なユーザか、またはバージョンが合いません"
+    IDS_H4                  " 接続しました..."
+    IDS_H5                  "転送はユーザによって中止されました"
+    IDS_H6                  "転送が完了しました"
+    IDS_H7                  "転送はユーザによって中止されました"
+    IDS_H8                  " > ローカルディレクトリの表示中です。お待ちください..."
+    IDS_H9                  " > エラー：ローカルドライブ上でメディアの準備ができていません"
+    IDS_H10                 " > エラー：リモートドライブ上でメディアの準備ができていません"
+    IDS_H11                 " > リモートディレクトリの表示中です。お待ちください..."
+    IDS_H12                 " エラー：ファイル"
+    IDS_H13                 " にはアクセスできません（リモートマシン上）"
+    IDS_H14                 "エラー：ローカルドライブに十分な領域がありません - "
+    IDS_H15                 "ファイルの受信"
+    IDS_H16                 "ローカルマシン上に作成できません"
+    IDS_H17                 "ファイル"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_H18                 "受信に成功..."
+    IDS_H19                 "エラー：ファイルの転送"
+    IDS_H20                 "リモートマシン上で失敗したため中止しました。"
+    IDS_H21                 "エラー：ファイルのアクセスに問題があります"
+    IDS_H22                 "ファイル転送中"
+    IDS_H23                 "エラー：ファイルのアクセスに問題があります"
+    IDS_H24                 "リモートマシン上に作成できません"
+    IDS_H25                 "エラー：→このファイル"
+    IDS_H26                 "ロックされているか、リモートのディスク空き容量が不足しています。"
+    IDS_H27                 "送信に成功..."
+    IDS_H28                 "ローカルマシン上で失敗したため中止しました。"
+    IDS_H29                 "フォルダを作成できません"
+    IDS_H30                 "リモートマシン上で"
+    IDS_H31                 "フォルダ"
+    IDS_H32                 "リモートマシン上に作成されました"
+    IDS_H33                 "ファイルを削除できません"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_H34                 "リモートマシン上から削除されました"
+    IDS_H35                 "ファイル転送相手："
+    IDS_H36                 "接続しました"
+    IDS_H37                 "接続中です。しばらくお待ちください..."
+    IDS_H38                 "リモートマシン上にすでに存在します\n\n上書きしますか？　それとも転送を再開しますか？\n"
+    IDS_H39                 "ファイル転送の警告"
+    IDS_H40                 "ファイル/フォルダが選択されました"
+    IDS_H41                 "ファイル転送を開始、転送中"
+    IDS_H42                 "ファイル/フォルダをリモートマシンに転送"
+    IDS_H43                 "ローカル上にすでに存在します\n\n上書きしますか？　それとも転送を再開しますか？"
+    IDS_H44                 "転送を開始します。受信中..."
+    IDS_H45                 "ファイル/フォルダをリモートマシンから受信"
+    IDS_H46                 "削除するファイルを選択してください。\n一度に一つだけ選択できます。"
+    IDS_H47                 "ファイル削除の警告"
+    IDS_H48                 "ローカルファイルを削除してもよいですか"
+    IDS_H49                 "ローカルファイルを削除できません"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_H50                 "は削除されました"
+    IDS_H51                 "本当にこのリモートファイルを削除していいですか"
+    IDS_H52                 "新しいローカルフォルダの名前を入力してください"
+    IDS_H53                 "ローカルフォルダを作成できません"
+    IDS_H54                 "ローカルフォルダ"
+    IDS_H55                 "は作成されました"
+    IDS_H56                 "新しいリモートフォルダの名前を入力してください"
+    IDS_H57                 "ファイル転送"
+    IDS_I1                  "デーモンソケットの作成でエラー"
+    IDS_I2                  "デーモンソケットのバインドでエラー"
+    IDS_I3                  "デーモンの待ち受けでエラー"
+    IDS_J1                  "全画面モードから抜けるにはCtrl+ESC→ESCの順にキーを押して、VNCビューアのタスクバーアイコンを右クリックし、メニューを開いて全画面モードの解除を行ってください。"
+    IDS_J2                  "VNCビューア　全画面モード"
+    IDS_K2                  "ファイルの保存中にエラー"
+    IDS_K1                  "ファイル名が不正です"
+    IDS_K3                  "パスワードを保存ファイルに含めますか？もしはいと答えると、このファイルを利用して誰でもあなたのセッションにアクセスすることができ、（潜在的に）VNCパスワードを知られることになります。"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_K4                  "セキュリティの警告"
+    IDS_K5                  "ファイルからホスト名を読み込むときにエラー"
+    IDS_K6                  "設定ファイルエラー"
+    IDS_K7                  "ファイルからポート番号を読み込むときにエラー"
+    IDS_L1                  "不明"
+    IDS_L2                  "Ctrl+Alt+Del を送信"
+    IDS_L3                  "全画面モードの切り替え(On/Off)"
+    IDS_L4                  "接続オプションを開く..."
+    IDS_L5                  "画面更新"
+    IDS_L6                  "スタートキー(Ctrl+ESC)を送信"
+    IDS_L7                  "カスタムキーを送信"
+    IDS_L8                  "状態ウィンドウを表示"
+    IDS_L9                  "接続を切る"
+    IDS_L10                 "ツールバーを隠す"
+    IDS_L11                 "リモートの入力とブランクモニタの切り替え(On/Off)"
+    IDS_L12                 "ファイル転送ウィンドウを開く..."
+END
+
+STRINGTABLE
+BEGIN
+    IDS_L13                 "1つのウィンドウを選択して表示"
+    IDS_L14                 "デスクトップ全体を表示"
+    IDS_L15                 "チャットを開く..."
+    IDS_L16                 "ファイル転送... \tCtrl+Alt+F7"
+    IDS_L17                 "チャット... \tCtrl+Alt+F8"
+    IDS_L18                 "ツールバーを表示\tCtrl+Alt+F9"
+    IDS_L19                 "リモートの入力/モニタ表示を無効にする"
+    IDS_L20                 "リモートの入力/モニタ表示を有効にする"
+    IDS_L21                 "接続オプション(&O)... \tCtrl+Alt+F6"
+    IDS_L22                 "接続情報..\tCtrl+Alt+Shift+I"
+    IDS_L23                 "要求画面のリフレッシュ..\tCtrl+Alt+Shift+R"
+    IDS_L24                 "全画面表示(&F)\tCtrl+Alt+F12"
+    IDS_L25                 "表示倍率の自動設定(&A)\tCtrl+Alt+F10"
+    IDS_L26                 "1/2に縮小して表示(&H)\tCtrl+Alt+F11"
+    IDS_L27                 "低画質な表示(&F)"
+    IDS_L28                 "通常の表示(&N)\tCtrl+F11"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_L29                 "フルカラー"
+    IDS_L30                 "256色(&2)"
+    IDS_L31                 "Ctrl+Alt+Delを送信\tCtrl+Alt+F4"
+    IDS_L32                 "Ctrl+Esc（Windowsキー）を送信"
+    IDS_L33                 "Ctrlキーを押す"
+    IDS_L34                 "Ctrlキーを離す"
+    IDS_L35                 "Altキーを押す"
+    IDS_L36                 "Altキーを離す"
+    IDS_L37                 "新しい接続..\tCtrl+Alt+Shift+N"
+    IDS_L38                 "この接続設定をファイルに保存(&A)...\tCtrl+Alt+F5"
+    IDS_L39                 "バージョン情報(&A)..."
+    IDS_L40                 "Close listening &daemon"
+    IDS_L41                 "DSMプラグインが設定されていません"
+    IDS_L42                 "ユーザによるキャンセル"
+    IDS_L43                 "接続中..."
+    IDS_L44                 "ソケットの作成でエラー発生"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_L45                 "サーバアドレスの取得中..."
+    IDS_L46                 "サーバアドレスの取得に失敗！"
+    IDS_L47                 "サーバに接続中..."
+    IDS_L48                 "サーバに接続できません！"
+    IDS_L49                 "接続しました"
+    IDS_L50                 "エラー：Nagle'sアルゴリズムを無効にできない"
+    IDS_L51                 "このサーバはすでに使われなくなった古い認証方法を使っています"
+    IDS_L52                 "プロトコルバージョンエラー"
+    IDS_L53                 "パスワードが未設定"
+    IDS_L54                 "認証がキャンセルされました"
+    IDS_L55                 "パスワードが受け付けられました"
+    IDS_L56                 "パスワードが違います"
+    IDS_L57                 "VNC認証に失敗！"
+    IDS_L58                 "VNC認証に失敗 - 試行回数が多すぎます"
+    IDS_L59                 "未知のVNC認証結果が返ってきました"
+    IDS_L60                 "未知の認証方法です"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_L61                 "スクリーンのローカルイメージを作成中にエラー"
+    IDS_L62                 "お待ちください - 初回のスクリーンを読み込み中..."
+    IDS_L63                 "想定外の SetColormap メッセージを受信しました\n"
+    IDS_L64                 "想定外のメッセージタイプを受信しました\n"
+    IDS_L65                 "WriteExact: DSM プラグイン - リストアバッファの確保中にエラー"
+    IDS_L66                 "WriteExact: DSM プラグイン - リストアバッファエラー"
+    IDS_L67                 "接続を閉じました"
+    IDS_L68                 "WriteExact: DSMプラグイン - トランスフォームバッファエラー"
+    IDS_L69                 "WriteExact: 書き込み中にソケットエラーが発生しました"
+    IDS_L70                 "メモリ不足のためネットワークバッファを確保できません"
+    IDS_L71                 "メモリ不足のため ZLIB バッファを確保できません"
+    IDS_L72                 "VNC ビューアの状態 for"
+    IDS_L73                 "VNC ビューアの状態"
+    IDS_L74                 "接続していない"
+    IDS_L75                 "終了してもよいですか？"
+    IDS_L76                 "VNC ビューアの終了中"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_L77                 "接続中の VNC サーバは UltraVNC のファイル転送に対応していません！"
+    IDS_L78                 "利用できない機能です"
+    IDS_L79                 "ファイル転送ウィンドウはすでに開いています！"
+    IDS_L80                 "ファイル転送の警告"
+    IDS_L81                 "接続中の VNC サーバは UltraVNC のテキストチャットに対応していません！"
+    IDS_L82                 "利用できない機能です"
+    IDS_L83                 "テキストチャットウィンドウはすでに開いています！"
+    IDS_L84                 "テキストチャットの警告"
+    IDS_L85                 "先にファイル転送ウィンドウを閉じてください"
+    IDS_L86                 "先にチャットウィンドウを閉じてください"
+    IDS_L87                 "先に接続オプションウィンドウを閉じてください"
+    IDS_L88                 "警告"
+    IDS_L89                 "プロトコルバージョンのネゴシエート中..."
+    IDS_L90                 "パスワードを要求されました"
+    IDS_L91                 "接続に失敗しました"
+    IDS_L92                 "認証は不要です"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_H58                 "ファイル/フォルダ"
+    IDS_H59                 "フォルダの展開中"
+    IDS_H60                 "受信中です、しばらくお待ちください..."
+    IDS_H61                 "リモートフォルダ"
+    IDS_H62                 "エラー：フォルダの展開ができません（unzip32.dllが無い？）"
+    IDS_H63                 "中止しました"
+    IDS_H64                 "ローカルフォルダの圧縮中"
+    IDS_H65                 "転送中、しばらくお待ちください..."
+    IDS_H66                 "ローカルフォルダ"
+    IDS_H67                 "圧縮が完了しました"
+    IDS_H68                 "エラー：フォルダの圧縮ができません（unzip32.dllが無い？）"
+    IDS_H69                 "転送は中止されました"
+    IDS_H70                 "送信に成功しました"
+    IDS_H71                 "リモートフォルダ"
+    IDS_H72                 "すでに存在します\n\n全てのファイルとフォルダを上書きしてもいいですか？"
+    IDS_H73                 "ローカルフォルダ"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_M1                  "名前変更は一度に一つのファイルかディレクトリに行えます"
+    IDS_M2                  "ファイルとディレクトリの名前変更の警告"
+    IDS_M3                  "ファイルとディレクトリの名前変更"
+    IDS_M4                  "新しい名前を入力してください："
+    IDS_M5                  "エラー：名前変更に失敗しました"
+    IDS_M6                  "ローカルの名前変更完了"
+    IDS_M7                  "→"
+    IDS_M8                  "リモートの名前変更完了"
+    IDS_H94                 "Folder Deletion Warning"
+    IDS_H95                 "Are you sure you want to delete the LOCAL folder"
+    IDS_H96                 "Are you sure you want to delete the REMOTE folder"
+    IDS_H97                 "Unable to delete the local folder"
+    IDS_H98                 "Unable to delete the remote folder"
+    IDS_H99                 "Unable to delete the folder"
+    IDS_H100                "Create New Folder"
+    IDS_L93                 "View Only... \tAlt+Ctrl+F3"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_H101                "Folder Transfer Warning"
+    IDS_H102                "a file or folder of that name already exists."
+    IDS_L94                 "Server closed connection"
+END
+
+#endif    // English (United States) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Dutch (Netherlands) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NLD)
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+#pragma code_page(932)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_BITMAPsx            BITMAP                     "Tango_sx.bmp"
+IDB_BITMAPl             BITMAP                     "Tango_l.bmp"
+IDB_BITMAPlx            BITMAP                     "Tango_lx.bmp"
+IDB_BITMAPs             BITMAP                     "Tango_s.bmp"
+#endif    // Dutch (Netherlands) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Dutch (Belgium) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NLB)
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+#pragma code_page(932)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_TRAY_DISABLED       ICON                       "idr_tray_disabled.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_SESSIONSELECTOR DIALOGEX 0, 0, 316, 183
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Session Selector"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,205,162,50,14
+    PUSHBUTTON      "キャンセル",IDCANCEL,259,162,50,14
+    CONTROL         "",IDC_LIST1,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_NOLABELWRAP | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,7,302,149
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_SESSIONSELECTOR, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 309
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 176
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_BITMAP14            BITMAP                     "l2.bmp"
+IDB_BITMAP13            BITMAP                     "l1.bmp"
+#endif    // Dutch (Belgium) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

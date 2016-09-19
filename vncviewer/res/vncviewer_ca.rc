@@ -1,0 +1,1176 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Japanese (Japan) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+LANGUAGE LANG_CATALAN, SUBLANG_DEFAULT
+#pragma code_page(1252)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Cursor
+//
+
+IDC_FINGER              CURSOR                     "Finger.cur"
+#endif    // Japanese (Japan) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_CATALAN, SUBLANG_DEFAULT
+#pragma code_page(1252)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Cursor
+//
+
+IDC_CURSOR1             CURSOR                     "cursorsel.cur"
+IDC_DOTCURSOR           CURSOR                     "cursor1.cur"
+IDC_NOCURSOR            CURSOR                     "nocursor.cur"
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_TRAY                ICON                       "idr_tray.ico"
+IDI_NET                 ICON                       "B46.ico"
+IDI_FILE                ICON                       "file.ico"
+IDI_DIR                 ICON                       "dir.ico"
+IDI_DRIVE               ICON                       "drive.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_TRAYMENU MENU
+BEGIN
+    POPUP "t"
+    BEGIN
+        MENUITEM "Nova connexió",              ID_NEWCONN
+        MENUITEM "Opcions de conexió per defecte...", IDC_OPTIONBUTTON
+        MENUITEM SEPARATOR
+        MENUITEM "Quant al VNCViewer...",          IDD_APP_ABOUT
+        MENUITEM SEPARATOR
+        MENUITEM "Commutar mode Escolta (On/Off)", ID_LISTEN_MODE
+        MENUITEM "Tancar la icona de la safata",              ID_CLOSEAPP
+    END
+END
+
+IDR_tbMENU MENU
+BEGIN
+    POPUP "Rightclick menu for FullScreenCaption"
+    BEGIN
+        MENUITEM "Restaurar",                     IDC_NULL
+        MENUITEM "Minimitzar",                    IDC_NULL
+        MENUITEM SEPARATOR
+        MENUITEM "Tancar",                       IDC_NULL
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_OPTIONDIALOG DIALOGEX 0, 0, 335, 233
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION " Opcions de connexió..."
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    GROUPBOX        "Format i codificació",IDC_STATIC,4,2,160,173
+    CONTROL         "Seleccionar automàticament les millors opcions",IDC_AUTODETECT,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,10,12,136,12
+    GROUPBOX        "",IDC_STATIC,9,22,72,94
+    CONTROL         "ZRLE",IDC_ZRLERADIO,"Button",BS_AUTORADIOBUTTON,12,30,31,10
+    CONTROL         "Tight",IDC_TIGHTRADIO,"Button",BS_AUTORADIOBUTTON,48,30,29,10
+    CONTROL         "Zlib (+XOR)",IDC_ZLIBRADIO,"Button",BS_AUTORADIOBUTTON,12,41,47,10
+    CONTROL         "ZlibHex",IDC_ZLIBHEXRADIO,"Button",BS_AUTORADIOBUTTON,12,52,55,10
+    CONTROL         "Hextile",IDC_HEXTILERADIO,"Button",BS_AUTORADIOBUTTON,12,62,37,10
+    CONTROL         "RRE",IDC_RRERADIO,"Button",BS_AUTORADIOBUTTON,12,73,29,10
+    CONTROL         "CoRRE",IDC_CORRERADIO,"Button",BS_AUTORADIOBUTTON,41,73,38,10
+    CONTROL         "Raw",IDC_RAWRADIO,"Button",BS_AUTORADIOBUTTON,12,83,29,10
+    CONTROL         "Ultra",IDC_ULTRA,"Button",BS_AUTORADIOBUTTON,41,83,29,10
+    CONTROL         "ZYWRLE",IDC_ZYWRLERADIO,"Button",BS_AUTORADIOBUTTON,12,94,38,10
+    CONTROL         "u2",IDC_ULTRA2,"Button",BS_AUTORADIOBUTTON,57,94,18,10
+    CONTROL         "XZ",IDC_XZRADIO,"Button",BS_AUTORADIOBUTTON,12,105,24,10
+    CONTROL         "XZYW",IDC_XZYWRADIO,"Button",BS_AUTORADIOBUTTON,41,105,35,10
+    CONTROL         "Tots els colors",IDC_FULLCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,89,30,48,10
+    CONTROL         "256 Colors",IDC_256COLORS_RADIO,"Button",BS_AUTORADIOBUTTON,89,41,49,10
+    CONTROL         "64 Colors",IDC_64COLORS_RADIO,"Button",BS_AUTORADIOBUTTON,89,52,45,10
+    CONTROL         "8 Colors",IDC_8COLORS_RADIO,"Button",BS_AUTORADIOBUTTON,89,63,41,10
+    CONTROL         "8 Colors foscos",IDC_8GREYCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON,89,74,54,10
+    CONTROL         "Escala de grisos",IDC_4GREYCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON,89,84,58,10
+    CONTROL         "Blanc && Negre",IDC_2GREYCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON,89,95,57,10
+    CONTROL         "Utilitzar codificació CopyRect",ID_SESSION_SET_CRECT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,118,96,10
+    CONTROL         "Utilitzar codificació cau",ID_SESSION_SET_CACHE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,128,90,10
+    CONTROL         "Compressió Zip/Tight:",IDC_ALLOW_COMPRESSLEVEL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,138,87,10
+    EDITTEXT        IDC_COMPRESSLEVEL,113,135,14,12,ES_AUTOHSCROLL
+    CONTROL         "Qualitat Jpeg (Tight)",IDC_ALLOW_JPEG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,148,84,10
+    EDITTEXT        IDC_QUALITYLEVEL,113,148,14,12,ES_AUTOHSCROLL
+    CONTROL         "Actualitzacions preventives",IDC_PREEMPTIVEUPDATES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,158,81,10
+    GROUPBOX        "Miscel·lània",IDC_STATIC,4,174,160,54
+    CONTROL         "Compartir el servidor",IDC_SHARED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,184,71,10
+    CONTROL         "Deiconify on Bell",IDC_BELLDEICONIFY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,195,137,8
+    CONTROL         "Inhabilitar transferència del porta-retalls",IDC_DISABLECLIPBOARD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,204,138,10
+    CONTROL         "No mostrar publicitat del patrocinador",IDC_CHECK1,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,214,145,10
+    GROUPBOX        "Ratolí i teclat",IDC_STATIC,174,2,159,100
+    CONTROL         "Emular 3 Botons (clicar 2 botons simultàniament)",IDC_EMULATECHECK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,15,139,10
+    CONTROL         "Intercanviar els botons 2 i 3 del ratolí",ID_SESSION_SWAPMOUSE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,27,126,10
+    CONTROL         "Teclat japonès",IDC_JAPKEYBOARD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,39,78,10
+    CONTROL         "Encarregar-se del cursor remot localment",IDC_CSHAPE_ENABLE_RADIO,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,179,52,144,10
+    CONTROL         "Permetre al servidor remot encarregar-se del cursor",IDC_CSHAPE_DISABLE_RADIO,
+                    "Button",BS_AUTORADIOBUTTON,179,63,147,10
+    CONTROL         "No mostrar el cursor remot",IDC_CSHAPE_IGNORE_RADIO,
+                    "Button",BS_AUTORADIOBUTTON,179,74,142,10
+    EDITTEXT        IDC_MOUSE_THROTTLE,179,86,22,12,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "Regulador d'esdeveniments del ratolí (milisegons)",IDC_STATIC,205,88,116,11
+    GROUPBOX        "Mostrar",IDC_STATIC,174,104,159,93
+    CONTROL         "Mostrar Barra de Botons (""Toolbar"")",IDC_SHOWTOOLBAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,116,109,10
+    EDITTEXT        IDC_SCALE_NUM,279,116,15,12,ES_AUTOHSCROLL | ES_NUMBER | NOT WS_VISIBLE
+    EDITTEXT        IDC_SCALE_DEN,308,116,14,12,ES_AUTOHSCROLL | ES_NUMBER | NOT WS_VISIBLE
+    CONTROL         "Només visualització (ignorar entrades)",IDC_VIEWONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,127,129,10
+    CONTROL         "Mode pantalla completa",IDC_FULLSCREEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,138,114,8
+    LTEXT           "Visor mida/posició:",IDC_STATIC,179,161,54,8
+    CONTROL         "Auto",IDC_SCALING,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,239,159,28,10
+    LTEXT           "per",IDC_STATIC,269,161,10,8
+    COMBOBOX        IDC_SCALE_CB,283,159,30,117,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    CTEXT           "%",IDC_STATIC,317,161,8,8,0,WS_EX_TRANSPARENT
+    LTEXT           "Server Screen Scale by :",IDC_STATIC,180,172,80,8
+    LTEXT           "1  /",IDC_STATIC,265,175,12,8
+    EDITTEXT        IDC_SERVER_SCALE,282,173,14,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_SERVER_RECON,177,199,16,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "intents de reconnexió",IDC_STATIC,197,199,75,11
+    DEFPUSHBUTTON   "Acceptar",IDOK,225,215,50,14
+    PUSHBUTTON      "Cancel·lar",IDCANCEL,280,215,50,14
+    GROUPBOX        "",IDC_STATIC,84,22,65,86,WS_GROUP
+    CONTROL         "Escala de finestra:",IDC_DIRECTX,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,184,67,10
+    EDITTEXT        IDC_SERVER_RECON_TIME,276,199,16,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "timeout",IDC_STATIC,296,199,25,8
+    CONTROL         "Guardar la posició",IDC_SAVEPOS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,147,59,10
+    CONTROL         "Desar Mida",IDC_SAVESIZE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,254,147,47,10
+END
+
+IDD_FILETRANSFER_DLG DIALOGEX 0, 0, 555, 414
+STYLE DS_SYSMODAL | DS_SETFONT | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+EXSTYLE WS_EX_TOPMOST
+CAPTION " Transferència de fitxers - UltraVNC"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    LTEXT           "Historial : ",IDC_HS_STATIC,4,374,26,8
+    COMBOBOX        IDC_HISTORY_CB,45,372,507,71,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "En curs :",IDC_PR_STATIC,4,388,32,8
+    CONTROL         "Progress1",IDC_PROGRESS,"msctls_progress32",WS_BORDER,45,388,307,9
+    CONTROL         "",IDC_LOCAL_STATUS,"Static",SS_LEFTNOWORDWRAP | WS_GROUP,3,359,238,10,WS_EX_STATICEDGE
+    CONTROL         "",IDC_REMOTE_STATUS,"Static",SS_LEFTNOWORDWRAP | WS_GROUP,314,359,238,10,WS_EX_STATICEDGE
+    COMBOBOX        IDC_LOCAL_DRIVECB,3,3,98,171,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    CTEXT           "MÀQUINA LOCAL",IDC_LM_STATIC,105,3,94,13,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
+    PUSHBUTTON      "\\",IDC_LOCAL_ROOTB,204,3,17,12
+    PUSHBUTTON      "..",IDC_LOCAL_UPB,224,3,17,12
+    CONTROL         "",IDC_CURR_LOCAL,"RICHEDIT",TCS_VERTICAL | TCS_RAGGEDRIGHT,3,17,238,12,WS_EX_STATICEDGE
+    CONTROL         "List2",IDC_LOCAL_FILELIST,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_AUTOARRANGE | WS_BORDER | WS_TABSTOP,3,31,238,324
+    PUSHBUTTON      "Llista d'unitats de disc locals",IDC_LOCAL_ROOT_B,263,1,40,9,BS_FLAT | NOT WS_VISIBLE
+    PUSHBUTTON      "Llista d'unitats de disc remots",IDC_REMOTE_ROOT_B,263,10,36,9,BS_FLAT | NOT WS_VISIBLE
+    DEFPUSHBUTTON   "Acceptar",IDOK,251,23,59,14,NOT WS_VISIBLE
+    PUSHBUTTON      "Enviar >>",IDC_UPLOAD_B,248,103,60,14,BS_CENTER | BS_FLAT
+    PUSHBUTTON      "<< Rebre",IDC_DOWNLOAD_B,248,121,60,14,BS_CENTER | BS_FLAT
+    PUSHBUTTON      "Aturar",IDC_ABORT_B,248,141,60,14,BS_FLAT | NOT WS_VISIBLE
+    PUSHBUTTON      "Esborrar",IDC_DELETE_B,248,203,60,14,BS_FLAT
+    PUSHBUTTON      "Nova carpeta",IDC_NEWFOLDER_B,248,221,60,14,BS_FLAT
+    PUSHBUTTON      "Canviar el nom",IDC_RENAME_B,248,239,60,14,BS_FLAT
+    PUSHBUTTON      "Minimitzar",IDC_HIDE_B,248,321,60,14
+    PUSHBUTTON      "Tancar",IDCANCEL,248,339,60,14
+    COMBOBOX        IDC_REMOTE_DRIVECB,314,3,98,172,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    CTEXT           "Màquina remota",IDC_RM_STATIC,415,3,95,13,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
+    PUSHBUTTON      "\\",IDC_REMOTE_ROOTB,514,3,17,12
+    PUSHBUTTON      "..",IDC_REMOTE_UPB,534,3,17,12
+    CONTROL         "",IDC_CURR_REMOTE,"RICHEDIT",TCS_VERTICAL | TCS_RAGGEDRIGHT,314,17,238,12,WS_EX_STATICEDGE
+    CONTROL         "List3",IDC_REMOTE_FILELIST,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_AUTOARRANGE | WS_BORDER | WS_TABSTOP,314,31,238,324
+    LTEXT           "",IDC_GLOBAL_STATUS,484,388,65,8,0,WS_EX_RIGHT
+    LTEXT           "",IDC_PERCENT,356,388,120,8
+END
+
+IDD_SESSION_DLG DIALOGEX 0, 0, 245, 229
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "UltraVNC Viewer - 1.2.1.2"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    CONTROL         IDB_VNC32,IDC_STATIC,"Static",SS_BITMAP,3,2,24,24
+    LTEXT           "Servidor VNC:",IDC_STATIC,34,7,40,8
+    COMBOBOX        IDC_HOSTNAME_EDIT,76,4,120,66,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "...",IDC_LOADPROFILE_B,200,4,16,13
+    LTEXT           "( amfitrió:pantalla o amfitrió::port )",IDC_STATIC,83,19,103,8
+    GROUPBOX        "Opcions ràpides",IDC_STATIC,4,29,191,108
+    CONTROL         "AUTO          (Seleccionar automàticament la millor configuració)",IDC_DYNAMIC,
+                    "Button",BS_AUTORADIOBUTTON,12,42,177,10
+    CONTROL         "ULTRA        (>2Mbit/s) - Experimental",IDC_ULTRA_LAN_RB,
+                    "Button",BS_AUTORADIOBUTTON,12,53,176,10
+    CONTROL         "LAN             (> 1Mbit/s) - Màxim de Colors",IDC_LAN_RB,
+                    "Button",BS_AUTORADIOBUTTON,12,64,176,10
+    CONTROL         "MEDIUM     (128 - 256Kbit/s) - 256 Colors",IDC_MEDIUM_RB,
+                    "Button",BS_AUTORADIOBUTTON,12,75,153,10
+    CONTROL         "MODEM      (19 - 128Kbit/s) - 64 Colors",IDC_MODEM_RB,
+                    "Button",BS_AUTORADIOBUTTON,12,86,148,10
+    CONTROL         "SLOW         (< 19kKbit/s) - 8 Colors",IDC_SLOW_RB,
+                    "Button",BS_AUTORADIOBUTTON,12,97,128,10
+    CONTROL         "MANUAL     ( Utilitzar els botons d'opcions )",IDC_MANUAL,"Button",BS_AUTORADIOBUTTON,12,108,123,10
+    CONTROL         "Només visualització",IDC_VIEWONLY_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,123,47,10
+    CONTROL         "Auto Scaling",IDC_AUTOSCALING_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,63,123,59,10
+    CONTROL         "Confirmar sortida",IDC_EXIT_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,124,123,53,10
+    CONTROL         "Utilitzar DSMPlugin",IDC_PLUGIN_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,147,66,10
+    COMBOBOX        IDC_PLUGINS_COMBO,78,145,118,55,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Servidor intermediari/Repetidor",IDC_PROXY_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,161,66,10
+    EDITTEXT        IDC_PROXY_EDIT,78,160,117,12,ES_AUTOHSCROLL
+    GROUPBOX        "",IDC_STATIC,4,204,237,21
+    CONTROL         "Desar la configuració de la connexió com a predeterminada",IDC_SETDEFAULT_CHECK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,213,128,10
+    DEFPUSHBUTTON   "Connectar",IDOK,200,33,40,26
+    PUSHBUTTON      "Cancel·lar",IDCANCEL,200,64,40,14
+    PUSHBUTTON      "Opcions...",IDC_OPTIONBUTTON,200,113,40,14
+    PUSHBUTTON      "Configuració",IDC_PLUGIN_BUTTON,200,145,40,12
+    PUSHBUTTON      "Eliminar configuració desada",IDC_DELETE,149,211,84,12,BS_MULTILINE
+    GROUPBOX        "",IDC_STATIC,4,135,237,42
+    COMBOBOX        IDC_SCREEN,10,185,222,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "",IDC_STATIC,4,175,237,31
+END
+
+IDD_SERVINFO_DLG DIALOGEX 0, 0, 224, 170
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Informació RFB del servidor"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "Acceptar",IDOK,167,149,50,14
+    EDITTEXT        IDC_SERVINFO_EDIT,7,7,210,134,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY
+END
+
+IDD_AUTH_DIALOG DIALOGEX 101, 66, 214, 63
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION
+EXSTYLE WS_EX_TOPMOST
+CAPTION " Autenticació UltraVNC"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    EDITTEXT        IDD_USER_NAME,118,6,82,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PASSWD_EDIT,118,22,82,14,ES_PASSWORD | ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "Iniciar sessió",IDOK,89,42,54,15
+    PUSHBUTTON      "Cancel·lar",IDCANCEL,149,42,50,15
+    RTEXT           "Usuari:",IDC_STATIC,58,10,57,8
+    RTEXT           "Paraula clau:",IDC_STATIC,58,26,57,8
+    CONTROL         ID_BUTTON_SEP,IDC_STATIC,"Static",SS_BITMAP | SS_REALSIZEIMAGE | SS_SUNKEN,8,10,48,42
+END
+
+IDD_AUTH_DIALOG2 DIALOGEX 101, 66, 214, 113
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION
+EXSTYLE WS_EX_TOPMOST
+CAPTION " Autenticació UltraVNC - Transmissió segura"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    LTEXT           "With the current UltraVNC server version, the password you provide is not transferred securely, except if you are using the encryption DSMPlugin.\r\nPlease update the UltraVNC server on the remote computer to v1.0.2 or above for secure password transmission.",IDC_STATIC,8,6,196,44
+    EDITTEXT        IDD_USER_NAME,118,57,82,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PASSWD_EDIT,118,73,82,14,ES_PASSWORD | ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "Iniciar sessió",IDOK,89,92,54,15
+    PUSHBUTTON      "Cancel·lar",IDCANCEL,150,92,50,15
+    RTEXT           "Usuari:",IDC_STATIC,58,60,57,8
+    RTEXT           "Paraula clau:",IDC_STATIC,58,76,57,8
+    CONTROL         ID_BUTTON_SEP,IDC_STATIC,"Static",SS_BITMAP | SS_REALSIZEIMAGE | SS_SUNKEN,8,60,48,42
+END
+
+IDD_CUSTUM_KEY DIALOGEX 0, 0, 224, 53
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_TOPMOST
+CAPTION " Enviar tecla personalitzada (Experimental ...)"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    LTEXT           "Codi de tecla (decimal) :",IDC_STATIC,7,9,87,12
+    EDITTEXT        IDC_CUSTOM_KEY,100,7,51,14,ES_AUTOHSCROLL
+    CONTROL         "ALT GR",IDC_ALTGR,"Button",BS_AUTORADIOBUTTON,54,26,38,9
+    CONTROL         "CTRL",IDC_STRG,"Button",BS_AUTORADIOBUTTON,100,26,35,9
+    CONTROL         "ALT",IDC_ALT,"Button",BS_AUTORADIOBUTTON,54,37,26,9
+    CONTROL         "NORMAL",IDC_NORMAL,"Button",BS_AUTORADIOBUTTON,100,37,45,9
+    DEFPUSHBUTTON   "Enviar",IDOK,167,7,50,14
+    PUSHBUTTON      "Cancel·lar",IDCANCEL,167,32,50,14
+END
+
+IDD_STATUS DIALOGEX 0, 0, 198, 144
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION " Estat de la connexió del visualitzador de VNC"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "Tancar",IDCLOSE,140,126,50,14
+    GROUPBOX        "Connexió",IDC_STATIC,4,0,186,78
+    GROUPBOX        "Tràfic",IDC_STATIC,4,81,186,42
+    LTEXT           "Port:",IDC_STATIC,13,23,52,9
+    LTEXT           "Bytes enviats",IDC_STATIC,7,94,63,9
+    RTEXT           "Bytes rebuts",IDC_STATIC,117,94,68,9
+    RTEXT           "Enviats",IDC_SEND,6,110,64,9
+    RTEXT           "Rebuts",IDC_RECEIVED,113,110,72,9
+    RTEXT           "Número de port",IDC_PORT,96,23,89,9
+    ICON            IDI_NET,IDC_STATIC,89,90,20,20
+    CONTROL         IDB_BITMAP3,IDC_STATIC,"Static",SS_BITMAP | SS_REALSIZEIMAGE,71,98,13,1,WS_EX_TRANSPARENT
+    CONTROL         IDB_BITMAP3,IDC_STATIC,"Static",SS_BITMAP | SS_REALSIZEIMAGE,109,98,13,1,WS_EX_TRANSPARENT
+    CONTROL         IDB_BITMAP2,IDC_STATIC,"Static",SS_BITMAP | SS_REALSIZEIMAGE,105,110,1,10,WS_EX_TRANSPARENT
+    LTEXT           "Servidor VNC:",IDC_STATIC,13,12,64,9
+    RTEXT           "Nom del servidor",IDC_VNCSERVER,94,12,91,9
+    LTEXT           "Estat:",IDC_STATIC,13,30,52,9
+    RTEXT           "Conxexió tancada",IDC_STATUS,44,30,141,24
+    RTEXT           "",IDC_PLUGIN_STATUS,7,45,178,9
+    PUSHBUTTON      "Cancel·lar",IDQUIT,5,126,50,14
+    LTEXT           "Velocitat:",IDC_STATIC,13,66,64,8
+    RTEXT           "123",IDC_SPEED,81,66,62,8
+    RTEXT           "kbit/s",IDC_STATIC,147,66,38,8
+    RTEXT           "",IDC_ENCODER,65,55,120,8
+    LTEXT           "Codificador:",IDC_STATIC,13,55,63,8
+END
+
+IDD_AUTH_DIALOG1 DIALOGEX 101, 66, 234, 58
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION
+EXSTYLE WS_EX_TOPMOST
+CAPTION "ADVERTÈNCIA : actualitzar el servidor"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    EDITTEXT        IDC_PASSWD_EDIT,136,13,82,14,ES_PASSWORD | ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "Iniciar sessió",IDOK,108,37,54,15
+    PUSHBUTTON      "Cancel·lar",IDCANCEL,168,37,50,15
+    RTEXT           "Paraula clau:",-1,65,16,61,8
+    CONTROL         ID_BUTTON_SEP,-1,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_SUNKEN,6,6,50,42
+END
+
+IDD_FTPARAM_DLG DIALOGEX 0, 0, 241, 60
+STYLE DS_SYSMODAL | DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION
+CAPTION "Diàleg de paràmetres per transferència de fitxers"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    EDITTEXT        IDC_FTPARAM_EDIT,10,21,224,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "Acceptar",IDOK,128,42,50,14
+    PUSHBUTTON      "Cancel·lar",IDCANCEL,184,42,50,14
+    LTEXT           "Comentari de paràmetres per transferència de fitxers ... Su us plau, introdueixi bla bla bla...",IDC_FTPARAMCOMMENT,9,7,225,8
+END
+
+IDD_TEXTCHAT_DLG DIALOGEX 0, 0, 307, 175
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION
+CAPTION " Xat - UltraVNC"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    EDITTEXT        IDC_INPUTAREA_EDIT,4,136,255,36,ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN | NOT WS_BORDER | WS_VSCROLL,WS_EX_STATICEDGE
+    PUSHBUTTON      "Enviar",IDC_SEND_B,264,135,39,14,BS_CENTER | BS_MULTILINE
+    PUSHBUTTON      "Minimitzar",IDC_HIDE_B,264,151,39,11
+    PUSHBUTTON      "Tancar",IDCANCEL,264,162,39,11
+    CONTROL         "",IDC_CHATAREA_EDIT,"RICHEDIT",TCS_HOTTRACK | TCS_RAGGEDRIGHT | TCS_FOCUSONBUTTONDOWN | TCS_MULTISELECT | WS_VSCROLL | WS_TABSTOP,3,3,300,130,WS_EX_STATICEDGE
+    DEFPUSHBUTTON   "",IDOK,299,0,8,6,NOT WS_VISIBLE
+END
+
+IDD_APP_ABOUT DIALOGEX 0, 0, 289, 156
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION " Quant al VNCviewer"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "Acceptar",IDOK,8,137,62,14
+    CONTROL         ID_BUTTON_SEP,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_SUNKEN,8,7,62,54
+    LTEXT           "UltraVNC Viewer 1.2.1.2",IDC_STATIC,86,6,197,11
+    LTEXT           "Per a més informació i enllaços, si us plau, visiteu: \nhttp://ultravnc.sf.net",IDC_STATIC,86,133,197,19
+    LTEXT           "Copyright © 2002-2009 UltraVNC Team\nCopyright © 2001-2002 Sam - eSVNC \nCopyright © 1999-2002 Rudi D. V. - VdaccVNC \nCopyright © 1999-2002 Const. Kaplinsky - TightVNC \nCopyright © 2002 RealVNC Ltd. - RealVNC\n",IDC_STATIC,86,30,200,40
+    LTEXT           "Muntatge:",IDC_STATIC,87,17,15,10
+    LTEXT           "Temps de muntatge",IDC_BUILDTIME,120,17,98,10
+    LTEXT           "Copyright © 2002 VNC QuickDesk\nCopyright © 1999-2002 Tridia Corporation - TridiaVNC \nCopyright © 1994-2001 AT&&T Laboratories Cambridge/Olivetti Research Ltd. - VNC",IDC_STATIC,86,70,203,33
+    LTEXT           "Copyright © 1990-2002 Info-ZIP\nCopyright © 1996-2002 Markus Franz Xaver Johannes Oberhumer - Mini LZO library",IDC_STATIC,85,102,198,24
+END
+
+IDD_FTCONFIRM_DLG DIALOGEX 0, 0, 178, 86
+STYLE DS_SYSMODAL | DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION
+EXSTYLE WS_EX_TOPMOST
+CAPTION "Diàleg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    LTEXT           "Confirmar el missatge aquí",IDC_FTPCONFIRMCOMMENT,4,8,163,53
+    DEFPUSHBUTTON   "Si",IDC_YES_B,4,65,39,14
+    PUSHBUTTON      "Si a tot",IDC_YESALL_B,46,65,40,14
+    PUSHBUTTON      "No",IDC_NO_B,92,65,40,14
+    PUSHBUTTON      "No a tot",IDC_NOALL_B,135,65,39,14
+END
+
+IDD_APP_MESSAGE1 DIALOGEX 0, 0, 278, 158
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Quadre de Missatges de VncViewer"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "Tancar",IDOK,185,110,56,14
+    LTEXT           "Temps de muntatge",IDC_BUILDTIME,9,11,265,88
+    GROUPBOX        "Missatge d'informació",IDC_STATIC,3,1,274,100,BS_CENTER
+    CTEXT           "UltraVNC 1.2.1.2",IDC_STATIC,178,145,66,12
+    PUSHBUTTON      "",IDC_BUTTON1,7,104,170,47,BS_BITMAP
+END
+
+IDD_APP_MESSAGE2 DIALOGEX 0, 0, 273, 217
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Quadre de Missatges de VncViewer"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "Tancar",IDOK,185,163,56,14
+    LTEXT           "Temps de muntatge",IDC_BUILDTIME,9,11,258,97
+    PUSHBUTTON      "",IDC_BUTTON2,7,114,170,47,BS_BITMAP
+    GROUPBOX        "Missatge d'informació",IDC_STATIC,3,1,264,110,BS_CENTER
+    CTEXT           "UltraVNC 1.2.1.2",IDC_STATIC,175,204,69,12
+    PUSHBUTTON      "",IDC_BUTTON1,7,163,170,47,BS_BITMAP
+    CTEXT           "Enllaç patrocinat\n",IDC_STATIC,179,127,36,21
+END
+
+IDD_AUTH_DIALOG3 DIALOGEX 101, 66, 234, 58
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION
+EXSTYLE WS_EX_TOPMOST
+CAPTION "Autenticació VNC"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    EDITTEXT        IDC_PASSWD_EDIT,136,13,82,14,ES_PASSWORD | ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "Iniciar sessió",IDOK,108,37,54,15
+    PUSHBUTTON      "Cancel·lar",IDCANCEL,168,37,50,15
+    RTEXT           "Paraula clau:",-1,65,16,61,8
+    CONTROL         ID_BUTTON_SEP,-1,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_SUNKEN,6,6,50,42
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_OPTIONDIALOG, DIALOG
+    BEGIN
+        RIGHTMARGIN, 330
+        VERTGUIDE, 164
+        BOTTOMMARGIN, 217
+        HORZGUIDE, 171
+    END
+
+    IDD_FILETRANSFER_DLG, DIALOG
+    BEGIN
+        RIGHTMARGIN, 505
+        VERTGUIDE, 215
+        VERTGUIDE, 274
+        VERTGUIDE, 279
+        VERTGUIDE, 486
+        BOTTOMMARGIN, 260
+    END
+
+    IDD_SESSION_DLG, DIALOG
+    BEGIN
+        VERTGUIDE, 10
+        VERTGUIDE, 232
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 225
+        HORZGUIDE, 17
+    END
+
+    IDD_SERVINFO_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 217
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 163
+    END
+
+    IDD_AUTH_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 2
+        RIGHTMARGIN, 209
+        VERTGUIDE, 8
+        VERTGUIDE, 43
+        VERTGUIDE, 56
+        VERTGUIDE, 58
+        VERTGUIDE, 81
+        VERTGUIDE, 115
+        VERTGUIDE, 118
+        VERTGUIDE, 190
+        BOTTOMMARGIN, 58
+        HORZGUIDE, 20
+        HORZGUIDE, 36
+        HORZGUIDE, 52
+        HORZGUIDE, 57
+    END
+
+    IDD_AUTH_DIALOG2, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 92
+    END
+
+    IDD_CUSTUM_KEY, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 217
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 46
+    END
+
+    IDD_STATUS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 191
+        VERTGUIDE, 185
+        VERTGUIDE, 190
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 129
+    END
+
+    IDD_AUTH_DIALOG1, DIALOG
+    BEGIN
+        LEFTMARGIN, 2
+        RIGHTMARGIN, 229
+        VERTGUIDE, 6
+        VERTGUIDE, 43
+        VERTGUIDE, 49
+        VERTGUIDE, 65
+        VERTGUIDE, 81
+        VERTGUIDE, 108
+        VERTGUIDE, 118
+        VERTGUIDE, 218
+        BOTTOMMARGIN, 53
+        HORZGUIDE, 25
+        HORZGUIDE, 27
+        HORZGUIDE, 36
+        HORZGUIDE, 52
+        HORZGUIDE, 57
+    END
+
+    IDD_FTPARAM_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 234
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 53
+    END
+
+    IDD_TEXTCHAT_DLG, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 164
+    END
+
+    IDD_APP_ABOUT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        VERTGUIDE, 86
+        VERTGUIDE, 94
+        VERTGUIDE, 108
+        VERTGUIDE, 283
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 124
+        HORZGUIDE, 29
+    END
+
+    IDD_FTCONFIRM_DLG, DIALOG
+    BEGIN
+    END
+
+    IDD_APP_MESSAGE1, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 246
+        VERTGUIDE, 86
+        VERTGUIDE, 94
+        VERTGUIDE, 108
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 151
+        HORZGUIDE, 29
+    END
+
+    IDD_APP_MESSAGE2, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 246
+        VERTGUIDE, 86
+        VERTGUIDE, 94
+        VERTGUIDE, 108
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 210
+        HORZGUIDE, 29
+    END
+
+    IDD_AUTH_DIALOG3, DIALOG
+    BEGIN
+        LEFTMARGIN, 2
+        RIGHTMARGIN, 229
+        VERTGUIDE, 6
+        VERTGUIDE, 43
+        VERTGUIDE, 49
+        VERTGUIDE, 65
+        VERTGUIDE, 81
+        VERTGUIDE, 108
+        VERTGUIDE, 118
+        VERTGUIDE, 218
+        BOTTOMMARGIN, 53
+        HORZGUIDE, 25
+        HORZGUIDE, 27
+        HORZGUIDE, 36
+        HORZGUIDE, 52
+        HORZGUIDE, 57
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog Info
+//
+
+IDD_SESSION_DLG DLGINIT
+BEGIN
+    IDC_HOSTNAME_EDIT, 0x403, 1, 0
+"\000"
+ 
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_BITMAP2             BITMAP                     "hoch.bmp"
+IDB_BITMAP3             BITMAP                     "quer.bmp"
+IDB_STAT_BACK           BITMAP                     "stat\\back.bmp"
+IDB_STAT_BOTH           BITMAP                     "stat\\both.bmp"
+IDB_STAT_FRONT          BITMAP                     "stat\\front.bmp"
+IDB_STAT_NONE           BITMAP                     "stat\\none.bmp"
+IDB_VNC64               BITMAP                     "vnc64.BMP"
+IDB_CLOSE               BITMAP                     "stat\\closeup.bmp"
+IDB_MAXIMIZE            BITMAP                     "stat\\maximizeup.bmp"
+IDB_MINIMIZE            BITMAP                     "stat\\minimizeup.bmp"
+IDB_PINDOWN             BITMAP                     "stat\\pindown.bmp"
+IDB_PINUP               BITMAP                     "stat\\pinup.bmp"
+IDB_VNC32               BITMAP                     "vnc32.BMP"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,2,1,2
+ PRODUCTVERSION 1,2,1,2
+ FILEFLAGSMASK 0x37L
+#ifdef _DEBUG
+ FILEFLAGS 0x25L
+#else
+ FILEFLAGS 0x24L
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040304B0"
+        BEGIN
+            VALUE "Comments", "UltraVNC Viewer"
+            VALUE "CompanyName", "UltraVNC"
+            VALUE "FileDescription", "VNCViewer"
+            VALUE "FileVersion", "1.2.1.2"
+            VALUE "InternalName", "VNCViewer"
+            VALUE "LegalCopyright", "Copyright © 2016 UltraVNC team members"
+            VALUE "OriginalFilename", "VNCViewer.exe"
+            VALUE "ProductName", "UltraVNC VNCViewer"
+            VALUE "ProductVersion", "1.2.1.2"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0403, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDR_TRAY                "Visualitzador UltraVNC escoltant"
+END
+
+STRINGTABLE
+BEGIN
+    ID_CLOSEDAEMON          "Deixar d'escoltar per connexions d'entrada"
+    ID_SHOWWINDOW           "Mostrar finestra de connexió"
+    ID_NEWCONN              "Fer una connexió manual"
+    ID_BUTTON_CAD           "Enviar CTRL+ALT+SUPR a l'amfitrió"
+    ID_BUTTON_FTRANS        "Transferència de fitxers"
+END
+
+STRINGTABLE
+BEGIN
+    ID_BUTTON_DINPUT        "Inhabilitar botons"
+    ID_BUTTON_DBUTTON       "Inhabilitar ratolí i tecla del servidor"
+    ID_BUTTON_SW            "Seleccionar programari"
+    ID_BUTTON_DESKTOP       "Seleccionar escriptori"
+    IDS_WARNING             "ADVERTIMENT: Per defecte, aquesta sessió no utilitza encriptatge de cap mena. Si us plau, no la utilitzeu per a enviar informació sensible a no ser que esteu segur que la seva connexió és segura (per exemple, utilitzant un connector d'encriptatge).\n\n"
+    IDS_A1                  "Aturar el visualitzador de la safata de sistema"
+    IDS_A2                  "Informació de UltraVNC"
+    IDS_A3                  "Error al crear un dimoni per escoltar:\n"
+    IDS_A4                  "Potser que un altre visualitzador de VNC està funcionant?"
+    IDS_A5                  "Error del visualitzador de VNC"
+    IDS_B1                  "Error al inicialitzar la biblioteca de sòcols"
+    IDS_B2                  "Desbordament de la llista de clients!"
+    IDS_B3                  "Error de VNC"
+END
+
+STRINGTABLE
+BEGIN
+    IDC_OPTIONBUTTON        "Seleccionar les opcions a ser utilitzades per a noves connexions"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_C1                  "Impossible obrir el porta-retalls\n"
+    IDS_C2                  "Impossible buidar el porta-retalls\n"
+    IDS_C3                  "Impossible tancar el porta-retalls\n"
+    IDS_D1                  "Error d'Argument"
+    IDS_D2                  "Factor d'escala invàlid - reconfigurant a escala normal"
+    IDS_D3                  "Port d'escolta especificat no vàlid"
+    IDS_D4                  "Factor d'escala no especificat"
+    IDS_D5                  "Escala especificada no vàlida"
+    IDS_D6                  "Temps d'espera especificat no vàlid"
+    IDS_D7                  "Temps d'espera no especificat"
+    IDS_D8                  "No fuzz specified"
+    IDS_D9                  "Invalid fuzz specified"
+    IDS_D10                 "Retard no especificat"
+    IDS_D11                 "Retard especificat no vàlid"
+    IDS_D12                 "Nivell de registre no especificat"
+    IDS_D13                 "Nivell de registre especificat no vàlid"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_D14                 "Fitxer de registre no especificat"
+    IDS_D15                 "Fitxer de registre especificat no vàlid"
+    IDS_D16                 "Fitxer de configuració no especificat"
+    IDS_D17                 "No es pot obrir el fitxer de configuració per llegir."
+    IDS_D18                 "Codificació no especificada"
+    IDS_D19                 "Codificació especificada no vàlida"
+    IDS_D20                 "Nivell de compressió no especificat"
+    IDS_D21                 "Nivell de compressió especificat no vàlid"
+    IDS_D22                 "Nivell de qualitat d'imatge no especificat"
+    IDS_D23                 "Nivell de qualitat d'imatge especificat no vàlid"
+    IDS_D24                 "No s'ha especificat la cap contrasenya"
+    IDS_D25                 "No serverscale denominator specified"
+    IDS_D26                 "No quick option number specified"
+    IDS_D27                 "No DSM plugin specified ('PluginName.dsm')"
+    IDS_D28                 "Servidor VNC especificat no vàlid."
+    IDS_E1                  "Unable to load the Rich Edit (RICHED32.DLL) control!"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_E2                  "Rich Edit Dll Loading"
+    IDS_F1                  "El connector no pot ser carregat.\nSi us plau, verifiqueu-ne la integritat."
+    IDS_F3                  "Activació del connector"
+    IDS_F4                  "Sense contrasenya,visualitzador"
+    IDS_F5                  "El connector no pot ser carregat.\nSi us plau, verifiqueu-ne la integritat del nom."
+    IDS_F6                  "Connector carregat"
+    IDS_F7                  "El connector no pot ser iniciat.\nSi us plau, verifiqueu-ne la integritat del nom."
+    IDS_F8                  "Servidor VNC especificat no vàlid.\nEl servidor ha de tenir la forma amfitrió:pantalla."
+    IDS_F10                 "Configuració de la connexió"
+    IDS_F11                 "No s'ha detectat cap connector..."
+    IDS_G1                  "Error creating Flasher socket"
+    IDS_G2                  "Error binding Flasher socket"
+    IDS_G3                  "Error when Flasher tries to listen"
+    IDS_H1                  " > ADVERTIMENT: La transferència de fitxers no està habilitada al servidor remot"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_H2                  " > ADVERTIMENT: La transferència de fitxers no està habilitada al servidor remot"
+    IDS_H3                  "Permís de transferència de fitxers denegat: inhabilitat o usuari desconegut o versió no compatible"
+    IDS_H4                  " Conectat..."
+    IDS_H5                  "Transferència interrompuda per l'usuari"
+    IDS_H6                  "Transferència completa"
+    IDS_H7                  "Transferència interrompuda per l'usuari"
+    IDS_H8                  " > Explorant el directori local. Espereu si us plau..."
+    IDS_H9                  " > ERROR: Suport no disponible a la unitat local."
+    IDS_H10                 " > ERROR: Suport no disponible a la unitat remota."
+    IDS_H11                 " > Explorant el directori remot. Espereu si us plau..."
+    IDS_H12                 " ERROR: fitxer"
+    IDS_H13                 " no és accesible a la màquina remota"
+    IDS_H14                 "ERROR: Espai lliue insuficient a la unitat local per a"
+    IDS_H15                 "Rebent fitxer"
+    IDS_H16                 "no pot ser creat a la màquina local"
+    IDS_H17                 "Fitxer"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_H18                 "REBUT amb èxit..."
+    IDS_H19                 "ERROR: Transferència de fitxer"
+    IDS_H20                 "ha fallat a la màquina remota. Cancel·lat."
+    IDS_H21                 "ERROR: Problema d'accés amb el fitxer"
+    IDS_H22                 "Enviant fitxer"
+    IDS_H23                 "ERROR: Problema d'accés amb el fitxer"
+    IDS_H24                 "no pot ser creat a la màquina remota"
+    IDS_H25                 "ERROR: -> Aquest fitxer"
+    IDS_H26                 "pot estar bloquejat o l'espai lliure al disc remot és insuficient"
+    IDS_H27                 "ENVIAT amb èxit..."
+    IDS_H28                 "ha fallat a la màquina local. Cancel·lat."
+    IDS_H29                 "No s'ha pogut crear la carpeta"
+    IDS_H30                 "a la màquina remota"
+    IDS_H31                 "Carpeta"
+    IDS_H32                 "ha sigut creat a la màquina remota"
+    IDS_H33                 "No s'ha pogut eliminar el fitxer"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_H34                 "ha sigut eliminat a la màquina remota"
+    IDS_H35                 "Transferència de fitxer amb"
+    IDS_H36                 "Connectat"
+    IDS_H37                 "Connectat. Espereu si us plau..."
+    IDS_H38                 "ja existeix a la màquina REMOTA.\n Voleu sobreescriure-ho o reprendre la transferència?\n"
+    IDS_H39                 "Advertiment de transferència de fitxers"
+    IDS_H40                 "Fitxer(s)/Carpeta(s) seleccionats per a transferència"
+    IDS_H41                 "Iniciant transferència. Enviant"
+    IDS_H42                 "Fitxer(s)/Carpeta(s) a la màquina remota"
+    IDS_H43                 "ja existeix a la màquina LOCAL.\n Voleu sobreescriure-ho o reprendre la transferència?\n"
+    IDS_H44                 "Iniciant transferència. Rebent"
+    IDS_H45                 "Fitxer(s)/Carpeta(s) a la màquina remota"
+    IDS_H46                 "Si us plau, seleccioni un fitxer a eliminar. \nNomés es pot eliminar un fitxer a cada vegada."
+    IDS_H47                 "Advertiment d'eliminació de fitxers"
+    IDS_H48                 "Esteu segur de voler eliminar el fitxer LOCAL"
+    IDS_H49                 "No s'ha pogut eliminar el fitxer local"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_H50                 "ha sigut eliminat"
+    IDS_H51                 "Esteu segur de voler eliminar el fitxer REMOT"
+    IDS_H52                 "Si us plau, introduiu el nom de la nova carpeta local:"
+    IDS_H53                 "No es possible crear la carpeta local"
+    IDS_H54                 "La carpeta local"
+    IDS_H55                 "ha sigut creada"
+    IDS_H56                 "Si us plau, introduiu el nom de la nova carpeta remota:"
+    IDS_H57                 "Transferència de fitxers"
+    IDS_I1                  "Error creant el sòcol del dimoni"
+    IDS_I2                  "Error assignant el sòcol del dimoni"
+    IDS_I3                  "Error quan el dimoni escolta"
+    IDS_J1                  "Per a sortir del mode pantalla completa, utilitzeu Ctrl-Esc Esc i llavors\nclicar el botó dret a la icona de la barra de tasques per a veure el menú."
+    IDS_J2                  "Mode pantalla completa del visualitzador VNC"
+    IDS_K2                  "Error desant el fitxer"
+    IDS_K1                  "Nom de fitxer no vàlid"
+    IDS_K3                  "Voleu desar la contrasenya en aquest fitxer?\n\r ( Si) Desar una contrasenya en un fitxer no és segur. contraseña."
+END
+
+STRINGTABLE
+BEGIN
+    IDS_K4                  "Advertiment de seguretat"
+    IDS_K5                  "Error llegint el nom de l'amfitrió des d'un fitxer"
+    IDS_K6                  "Error del fitxer de configuració"
+    IDS_K7                  "Error llegint el número de port des d'un fitxer"
+    IDS_L1                  "desconegut"
+    IDS_L2                  "Enviar Ctrl+Alt+Supr al amfitrió"
+    IDS_L3                  "Modo pantalla completa (actiu/inactiu)"
+    IDS_L4                  "Mostrar opcions de connexió..."
+    IDS_L5                  "Refrescar Pantalla"
+    IDS_L6                  "Enviar 'Inicia' (Ctrl+Esc) al amfitrió"
+    IDS_L7                  "Enviar tecla personalitzada"
+    IDS_L8                  "Mostrar finestra d'estat"
+    IDS_L9                  "Tancar connexió"
+    IDS_L10                 "Amagar barra d'eines"
+    IDS_L11                 "Toggle Remote Input and Remote Blank Monitor (On/Off)"
+    IDS_L12                 "Obrir transferència de fitxers..."
+END
+
+STRINGTABLE
+BEGIN
+    IDS_L13                 "Select Single Window"
+    IDS_L14                 "Select Full Desktop / Switch monitor(driver only)"
+    IDS_L15                 "Obrir de xat..."
+    IDS_L16                 "Transferència de fitxers... \tCtrl+Alt+F7"
+    IDS_L17                 "Xat... \tCtrl+Alt+F8"
+    IDS_L18                 "Mostrar barra d'eines \tCtrl+Alt+F9"
+    IDS_L19                 "Inhabilitar entrada/monitor remot"
+    IDS_L20                 "Habilitar entrada/monitor remot"
+    IDS_L21                 "&Opcions de connexió... \tCtrl+Alt+F6"
+    IDS_L22                 "Connexió i &informació..\tCtrl+Alt+Shift+I"
+    IDS_L23                 "pantalla de sol·licitud i d'actualització..\tCtrl+Alt+Shift+R"
+    IDS_L24                 "&Pantalla completa \tCtrl+Alt+F12"
+    IDS_L25                 "&Auto Scale screen \tCtrl+Alt+F10"
+    IDS_L26                 "&Mitja pantalla \tCtrl+Alt+F11"
+    IDS_L27                 "Pantalla &difúsa"
+    IDS_L28                 "Pantalla &normal \tCtrl+F11"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_L29                 "Tots els colors"
+    IDS_L30                 "&256  colors"
+    IDS_L31                 "Enviar Ctrl+Alt+Supr \tCtrl+Alt+F4"
+    IDS_L32                 "Enviar Ctrl+Esc (menú d'inici)"
+    IDS_L33                 "Enviar Ctrl+Tecla d'avançar pàgina"
+    IDS_L34                 "Enviar Ctrl+Tecla de retrocedir pàgina"
+    IDS_L35                 "Enviar Alt+Tecla d'avançar pàgina"
+    IDS_L36                 "Enviar Alt+Tecla de retrocedir pàgina"
+    IDS_L37                 "no&va connexió...\tCtrl+Alt+Shift+N"
+    IDS_L38                 "Desar la informació de la connexió &com... \tCtrl+Alt+F5"
+    IDS_L39                 "&En quant al Visor VNC..."
+    IDS_L40                 "Tancar el &dimoni que escolta"
+    IDS_L41                 "El DSMPlugin no es pot configurar"
+    IDS_L42                 "Cancel·lat per l'usuari"
+    IDS_L43                 "Connectant ..."
+    IDS_L44                 "Error creant el sòcol !"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_L45                 "Cercant adreça del servidor ..."
+    IDS_L46                 "Errada al obtenir adreça del servidor !"
+    IDS_L47                 "Connectant al servidor ..."
+    IDS_L48                 "Error al connectar al servidor !"
+    IDS_L49                 "Connectat"
+    IDS_L50                 "Error inhabilitant algorisme de Nagle"
+    IDS_L51                 "Disculpi - aquest servidor utilitza un esquema d'autenticació obsolet\n\rque ja no està admesa."
+    IDS_L52                 "Error de la versió de protocol"
+    IDS_L53                 "Contrasenya buida"
+    IDS_L54                 "Autenticació cancel·lada"
+    IDS_L55                 "Contrasenya acceptada"
+    IDS_L56                 "Contrasenya errònia"
+    IDS_L57                 "Autenticació VNC errònia!"
+    IDS_L58                 "Autenticació VNC errònia - massa intents!"
+    IDS_L59                 "Resultat d'autenticació VNC desconegut!"
+    IDS_L60                 "Esquema d'autenticació desconegut!"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_L61                 "Error al crear imatge local de  la pantalla."
+    IDS_L62                 "Esperi si us plau - Carregant la pantalla inicial..."
+    IDS_L63                 "Unhandled SetColormap message type received!\n"
+    IDS_L64                 "Unhandled message type received!\n"
+    IDS_L65                 "WriteExact: DSMPlugin-RestoreBuffer Alloc Error."
+    IDS_L66                 "WriteExact: DSMPlugin-RestoreBuffer Error."
+    IDS_L67                 "Connexió finalitzada (1)"
+    IDS_L68                 "WriteExact: Error DSMPlugin-TransformBuffer."
+    IDS_L69                 "Connexió amb el servidor tancada \n\r –El servidor executant-se com a aplicació no té prous permisos per desbloquejar la pantalla. \n\r –Tancament manual\n\r -Xarxa desconnectada"
+    IDS_L70                 "Memòria insuficient per assignar memòria intermèdia de xarxa."
+    IDS_L71                 "Memòria insuficient per assignar memòria intermèdia de zlib."
+    IDS_L72                 "Estat del visualitzador VNC per a"
+    IDS_L73                 "Estat del visualitzador VNC"
+    IDS_L74                 "Sense connexió"
+    IDS_L75                 "Esteu segurs de voler sortir?"
+    IDS_L76                 "Tancant el visualitzador VNC"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_L77                 "El servidor VNC connectat no admet transferència de fitxers !"
+    IDS_L78                 "Funcionalitat no disponible"
+    IDS_L79                 "La finestra de transferència de fitxers ja està oberta !"
+    IDS_L80                 "Advertiment de transferència de fitxers"
+    IDS_L81                 "El servidor VNC connectat no admet xat !"
+    IDS_L82                 "Funcionalitat no disponible"
+    IDS_L83                 "La finestra de xat ja està oberta !"
+    IDS_L84                 "Advertiment de xat"
+    IDS_L85                 "Si us plau, tanqui primer la finestra de transferència de fitxers"
+    IDS_L86                 "Si us plau, tanqui primer la finestra de xat"
+    IDS_L87                 "Si us plau, tanqui primer la finestra d'opcions de connexió"
+    IDS_L88                 "Advertiment"
+    IDS_L89                 "Negociant la versió del protocol ..."
+    IDS_L90                 "Contrasenya necessària"
+    IDS_L91                 "Connexió  fallida"
+    IDS_L92                 "No es necessària autenticació"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_H58                 "Fitxer(s)/Carpeta(s)"
+    IDS_H59                 "Descomprimint la carpeta"
+    IDS_H60                 "després de la recepció. Esperi si us plau..."
+    IDS_H61                 "Carpeta remota"
+    IDS_H62                 "ERROR durant la descompressió de la carpeta remota rebuda"
+    IDS_H63                 "Interromput."
+    IDS_H64                 "Comprimint carpeta local"
+    IDS_H65                 "per a transferir. Esperi si us plau..."
+    IDS_H66                 "La carpeta local"
+    IDS_H67                 "s'ha descomprimit amb èxit."
+    IDS_H68                 "ERROR durant la descompressió de la carpeta local ( alguns fitxers estan protegits )"
+    IDS_H69                 "Transferència interrompuda."
+    IDS_H70                 "ENVIADA amb èxit."
+    IDS_H71                 "La carpeta REMOTA"
+    IDS_H72                 "ja existeix.\n Esteu segurs que voleu SOBREESCRIURE-LA amb TOTS els seus fitxers i subcarpetes ?"
+    IDS_H73                 "La carpeta LOCAL"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_M1                  "Només es pot canviar el nom d'un fitxer o directori cada vegada"
+    IDS_M2                  "Canvi de nom d'un fitxer o directori"
+    IDS_M3                  "Advertiment de canvi de nom d'un fitxer o directori"
+    IDS_M4                  "Si us plau, introduïu el nou nom:"
+    IDS_M5                  "ERROR: A fallat el canvi de nom per a "
+    IDS_M6                  "Renombrat LOCAL"
+    IDS_M7                  "per a"
+    IDS_M8                  "Renombrat REMOT"
+    IDS_H94                 "Advertiment d'eliminació de carpeta"
+    IDS_H95                 "Esteu segurs de voler suprimir el directori LOCAL"
+    IDS_H96                 "Esteu segurs de voler suprimir el directori REMOT"
+    IDS_H97                 "Impossible eliminar el directori LOCAL"
+    IDS_H98                 "Impossible eliminar el directori REMOT"
+    IDS_H99                 "Impossible eliminar el directori"
+    IDS_H100                "Crear nova carpeta"
+    IDS_L93                 "Només visualització... \tAlt+Ctrl+F3"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_H101                "Advertiment de transferència de carpeta"
+    IDS_H102                "ja existeix un fitxer o carpeta amb aquest nom"
+    IDS_L94                 "El servidor ha tancat la connexió"
+END
+
+#endif    // English (United States) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Dutch (Netherlands) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NLD)
+LANGUAGE LANG_CATALAN, SUBLANG_DEFAULT
+#pragma code_page(1252)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_BITMAPsx            BITMAP                     "Tango_sx.bmp"
+IDB_BITMAPl             BITMAP                     "Tango_l.bmp"
+IDB_BITMAPlx            BITMAP                     "Tango_lx.bmp"
+IDB_BITMAPs             BITMAP                     "Tango_s.bmp"
+#endif    // Dutch (Netherlands) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Dutch (Belgium) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NLB)
+LANGUAGE LANG_CATALAN, SUBLANG_DEFAULT
+#pragma code_page(1252)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_TRAY_DISABLED       ICON                       "idr_tray_disabled.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_SESSIONSELECTOR DIALOGEX 0, 0, 316, 183
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Selector de Sessió"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "Acceptar",IDOK,205,162,50,14
+    PUSHBUTTON      "Cancel·lar",IDCANCEL,259,162,50,14
+    CONTROL         "",IDC_LIST1,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_NOLABELWRAP | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,7,302,149
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_SESSIONSELECTOR, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 309
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 176
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_BITMAP14            BITMAP                     "l2.bmp"
+IDB_BITMAP13            BITMAP                     "l1.bmp"
+#endif    // Dutch (Belgium) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

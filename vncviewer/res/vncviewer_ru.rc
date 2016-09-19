@@ -1,0 +1,1176 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Japanese (Japan) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
+#pragma code_page(1251)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Cursor
+//
+
+IDC_FINGER              CURSOR                     "Finger.cur"
+#endif    // Japanese (Japan) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
+#pragma code_page(1251)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Cursor
+//
+
+IDC_CURSOR1             CURSOR                     "cursorsel.cur"
+IDC_DOTCURSOR           CURSOR                     "cursor1.cur"
+IDC_NOCURSOR            CURSOR                     "nocursor.cur"
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_TRAY                ICON                       "idr_tray.ico"
+IDI_NET                 ICON                       "B46.ico"
+IDI_FILE                ICON                       "file.ico"
+IDI_DIR                 ICON                       "dir.ico"
+IDI_DRIVE               ICON                       "drive.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_TRAYMENU MENU
+BEGIN
+    POPUP "t"
+    BEGIN
+        MENUITEM "Новое соединение",              ID_NEWCONN
+        MENUITEM "Настройки соединения по умолчанию...", IDC_OPTIONBUTTON
+        MENUITEM SEPARATOR
+        MENUITEM "О VNCviewer  ",          IDD_APP_ABOUT
+        MENUITEM SEPARATOR
+        MENUITEM "Слушающий режим (Вкл/Выкл)", ID_LISTEN_MODE
+        MENUITEM "Закрыть иконку в трее",              ID_CLOSEAPP
+    END
+END
+
+IDR_tbMENU MENU
+BEGIN
+    POPUP "Rightclick menu for FullScreenCaption"
+    BEGIN
+        MENUITEM "Восстановить",                     IDC_NULL
+        MENUITEM "Скрыть",                    IDC_NULL
+        MENUITEM SEPARATOR
+        MENUITEM "Закрыть",                       IDC_NULL
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_OPTIONDIALOG DIALOGEX 0, 0, 335, 233
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Настройки"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    GROUPBOX        "Формат и сжатие ",IDC_STATIC,4,2,160,173
+    CONTROL         "Автоматически выбирать лучшие настройки",IDC_AUTODETECT,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,10,12,136,12
+    GROUPBOX        "",IDC_STATIC,9,22,72,94
+    CONTROL         "ZRLE",IDC_ZRLERADIO,"Button",BS_AUTORADIOBUTTON,12,30,31,10
+    CONTROL         "Tight",IDC_TIGHTRADIO,"Button",BS_AUTORADIOBUTTON,48,30,29,10
+    CONTROL         "Zlib (+xor)",IDC_ZLIBRADIO,"Button",BS_AUTORADIOBUTTON,12,41,47,10
+    CONTROL         "ZlibHex",IDC_ZLIBHEXRADIO,"Button",BS_AUTORADIOBUTTON,12,52,55,10
+    CONTROL         "Hextile",IDC_HEXTILERADIO,"Button",BS_AUTORADIOBUTTON,12,62,37,10
+    CONTROL         "RRE",IDC_RRERADIO,"Button",BS_AUTORADIOBUTTON,12,73,29,10
+    CONTROL         "CoRRE",IDC_CORRERADIO,"Button",BS_AUTORADIOBUTTON,41,73,38,10
+    CONTROL         "Raw",IDC_RAWRADIO,"Button",BS_AUTORADIOBUTTON,12,83,29,10
+    CONTROL         "Ultra",IDC_ULTRA,"Button",BS_AUTORADIOBUTTON,41,83,29,10
+    CONTROL         "ZYWRLE",IDC_ZYWRLERADIO,"Button",BS_AUTORADIOBUTTON,12,94,38,10
+    CONTROL         "u2",IDC_ULTRA2,"Button",BS_AUTORADIOBUTTON,57,94,18,10
+    CONTROL         "XZ",IDC_XZRADIO,"Button",BS_AUTORADIOBUTTON,12,105,24,10
+    CONTROL         "XZYW",IDC_XZYWRADIO,"Button",BS_AUTORADIOBUTTON,41,105,35,10
+    CONTROL         "Макс.цвет",IDC_FULLCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,89,30,48,10
+    CONTROL         "256 цветов",IDC_256COLORS_RADIO,"Button",BS_AUTORADIOBUTTON,89,41,49,10
+    CONTROL         "64 цвета",IDC_64COLORS_RADIO,"Button",BS_AUTORADIOBUTTON,89,52,45,10
+    CONTROL         "8 цветов",IDC_8COLORS_RADIO,"Button",BS_AUTORADIOBUTTON,89,63,41,10
+    CONTROL         "8 цв.серого",IDC_8GREYCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON,89,74,54,10
+    CONTROL         "4 цв.серого",IDC_4GREYCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON,89,84,58,10
+    CONTROL         "Черно-белое",IDC_2GREYCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON,89,95,57,10
+    CONTROL         "Использовать CopyRect сжатие",ID_SESSION_SET_CRECT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,118,96,10
+    CONTROL         "Включить кеширование",ID_SESSION_SET_CACHE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,128,90,10
+    CONTROL         "Zip/Tight сжатие:  ",IDC_ALLOW_COMPRESSLEVEL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,138,87,10
+    EDITTEXT        IDC_COMPRESSLEVEL,113,135,14,12,ES_AUTOHSCROLL
+    CONTROL         "JPEG (Tight) - Качество: ",IDC_ALLOW_JPEG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,148,84,10
+    EDITTEXT        IDC_QUALITYLEVEL,113,148,14,12,ES_AUTOHSCROLL
+    CONTROL         "Preemptive Updates",IDC_PREEMPTIVEUPDATES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,158,81,10
+    GROUPBOX        "Другое",IDC_STATIC,4,174,160,54
+    CONTROL         "Использовать сервер совместно",IDC_SHARED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,184,71,10
+    CONTROL         "Развернуть по сигналу",IDC_BELLDEICONIFY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,195,137,8
+    CONTROL         "Выключить буфер обмена ",IDC_DISABLECLIPBOARD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,204,138,10
+    CONTROL         "Не отображать рекламу спонсора",IDC_CHECK1,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,214,145,10
+    GROUPBOX        "Мышь и клавиатура ",IDC_STATIC,174,2,159,100
+    CONTROL         "Эмулировать 3 кнопки",IDC_EMULATECHECK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,15,139,10
+    CONTROL         "Поменять местами кнопки мыши 2 и 3",ID_SESSION_SWAPMOUSE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,27,126,10
+    CONTROL         "Японская клавиатура",IDC_JAPKEYBOARD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,39,78,10
+    CONTROL         "Отслеживать удаленный курсор",IDC_CSHAPE_ENABLE_RADIO,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,179,52,144,10
+    CONTROL         "Разрешить серверу управлять курсором ",IDC_CSHAPE_DISABLE_RADIO,
+                    "Button",BS_AUTORADIOBUTTON,179,63,147,10
+    CONTROL         "Не показывать удаленный курсор",IDC_CSHAPE_IGNORE_RADIO,
+                    "Button",BS_AUTORADIOBUTTON,179,74,142,10
+    EDITTEXT        IDC_MOUSE_THROTTLE,179,86,22,12,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "Mouse event throttle (milliseconds)",IDC_STATIC,205,88,116,11
+    GROUPBOX        "Дисплей",IDC_STATIC,174,104,159,93
+    CONTROL         "Показывать кнопки",IDC_SHOWTOOLBAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,116,109,10
+    EDITTEXT        IDC_SCALE_NUM,279,116,15,12,ES_AUTOHSCROLL | ES_NUMBER | NOT WS_VISIBLE
+    EDITTEXT        IDC_SCALE_DEN,308,116,14,12,ES_AUTOHSCROLL | ES_NUMBER | NOT WS_VISIBLE
+    CONTROL         "Только просмотр (ввод игнорируется) ",IDC_VIEWONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,127,129,10
+    CONTROL         "Полноэкранный режим",IDC_FULLSCREEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,138,114,8
+    LTEXT           "Viewer size/pos:",IDC_STATIC,179,161,54,8
+    CONTROL         "Авто",IDC_SCALING,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,239,159,28,10
+    LTEXT           "на",IDC_STATIC,269,161,10,8
+    COMBOBOX        IDC_SCALE_CB,283,159,30,117,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    CTEXT           "%",IDC_STATIC,317,161,8,8,0,WS_EX_TRANSPARENT
+    LTEXT           "Масштабирование экрана:",IDC_STATIC,180,172,80,8
+    LTEXT           "1  /",IDC_STATIC,265,175,12,8
+    EDITTEXT        IDC_SERVER_SCALE,282,173,14,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_SERVER_RECON,177,199,16,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "reconnection attempts",IDC_STATIC,197,199,75,11
+    DEFPUSHBUTTON   "&Ok ",IDOK,225,215,50,14
+    PUSHBUTTON      "&Отмена",IDCANCEL,280,215,50,14
+    GROUPBOX        "",IDC_STATIC,84,22,65,86,WS_GROUP
+    CONTROL         "Масштаб в окне",IDC_DIRECTX,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,184,67,10
+    EDITTEXT        IDC_SERVER_RECON_TIME,276,199,16,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "timeout",IDC_STATIC,296,199,25,8
+    CONTROL         "Сохранить позицию",IDC_SAVEPOS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,147,59,10
+    CONTROL         "Сохранить размер",IDC_SAVESIZE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,254,147,47,10
+END
+
+IDD_FILETRANSFER_DLG DIALOGEX 0, 0, 555, 414
+STYLE DS_SYSMODAL | DS_SETFONT | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+EXSTYLE WS_EX_TOPMOST
+CAPTION "Передача файлов - UltraVNC"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    LTEXT           "История:",IDC_HS_STATIC,4,374,26,8
+    COMBOBOX        IDC_HISTORY_CB,45,372,507,71,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Прогресс:  ",IDC_PR_STATIC,4,388,32,8
+    CONTROL         "Progress1",IDC_PROGRESS,"msctls_progress32",WS_BORDER,45,388,307,9
+    CONTROL         "",IDC_LOCAL_STATUS,"Static",SS_LEFTNOWORDWRAP | WS_GROUP,3,359,238,10,WS_EX_STATICEDGE
+    CONTROL         "",IDC_REMOTE_STATUS,"Static",SS_LEFTNOWORDWRAP | WS_GROUP,314,359,238,10,WS_EX_STATICEDGE
+    COMBOBOX        IDC_LOCAL_DRIVECB,3,3,98,171,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    CTEXT           "Локальная машина",IDC_LM_STATIC,105,3,94,13,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
+    PUSHBUTTON      "\\",IDC_LOCAL_ROOTB,204,3,17,12
+    PUSHBUTTON      "..",IDC_LOCAL_UPB,224,3,17,12
+    CONTROL         "",IDC_CURR_LOCAL,"RICHEDIT",TCS_VERTICAL | TCS_RAGGEDRIGHT,3,17,238,12,WS_EX_STATICEDGE
+    CONTROL         "List2 ",IDC_LOCAL_FILELIST,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_AUTOARRANGE | WS_BORDER | WS_TABSTOP,3,31,238,324
+    PUSHBUTTON      "Список локальных дисков",IDC_LOCAL_ROOT_B,263,1,40,9,BS_FLAT | NOT WS_VISIBLE
+    PUSHBUTTON      "Список удаленных дисков",IDC_REMOTE_ROOT_B,263,10,36,9,BS_FLAT | NOT WS_VISIBLE
+    DEFPUSHBUTTON   "&Ok ",IDOK,251,23,59,14,NOT WS_VISIBLE
+    PUSHBUTTON      "Отправить>> ",IDC_UPLOAD_B,248,103,60,14,BS_CENTER | BS_FLAT
+    PUSHBUTTON      "<< Принять",IDC_DOWNLOAD_B,248,121,60,14,BS_CENTER | BS_FLAT
+    PUSHBUTTON      "Стоп",IDC_ABORT_B,248,141,60,14,BS_FLAT | NOT WS_VISIBLE
+    PUSHBUTTON      "Удалить",IDC_DELETE_B,248,203,60,14,BS_FLAT
+    PUSHBUTTON      "Новая папка",IDC_NEWFOLDER_B,248,221,60,14,BS_FLAT
+    PUSHBUTTON      "Переименовать",IDC_RENAME_B,248,239,60,14,BS_FLAT
+    PUSHBUTTON      "Скрыть",IDC_HIDE_B,248,321,60,14
+    PUSHBUTTON      "Закрыть",IDCANCEL,248,339,60,14
+    COMBOBOX        IDC_REMOTE_DRIVECB,314,3,98,172,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    CTEXT           "Удаленная машина",IDC_RM_STATIC,415,3,95,13,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
+    PUSHBUTTON      "\\",IDC_REMOTE_ROOTB,514,3,17,12
+    PUSHBUTTON      "..",IDC_REMOTE_UPB,534,3,17,12
+    CONTROL         "",IDC_CURR_REMOTE,"RICHEDIT",TCS_VERTICAL | TCS_RAGGEDRIGHT,314,17,238,12,WS_EX_STATICEDGE
+    CONTROL         "List3 ",IDC_REMOTE_FILELIST,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_AUTOARRANGE | WS_BORDER | WS_TABSTOP,314,31,238,324
+    LTEXT           "",IDC_GLOBAL_STATUS,484,388,65,8,0,WS_EX_RIGHT
+    LTEXT           "",IDC_PERCENT,356,388,120,8
+END
+
+IDD_SESSION_DLG DIALOGEX 0, 0, 245, 229
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "UltraVNC Viewer - 1.2.1.2"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    CONTROL         IDB_VNC32,IDC_STATIC,"Static",SS_BITMAP,3,2,24,24
+    LTEXT           "VNC Сервер: ",IDC_STATIC,34,7,40,8
+    COMBOBOX        IDC_HOSTNAME_EDIT,76,4,120,66,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "...",IDC_LOADPROFILE_B,200,4,16,13
+    LTEXT           "(хост:дисплей или хост::порт) ",IDC_STATIC,83,19,103,8
+    GROUPBOX        "Быстрые настройки",IDC_STATIC,4,29,191,108
+    CONTROL         "АВТО (Выбрать лучшие настройки автоматом)",IDC_DYNAMIC,
+                    "Button",BS_AUTORADIOBUTTON,12,42,177,10
+    CONTROL         "УЛЬТРА  (>2Mbit/s)- Экспериментально",IDC_ULTRA_LAN_RB,
+                    "Button",BS_AUTORADIOBUTTON,12,53,176,10
+    CONTROL         "LAN    (> 1Mbit/s) - Максимальное кол-во цветов  ",IDC_LAN_RB,
+                    "Button",BS_AUTORADIOBUTTON,12,64,176,10
+    CONTROL         "СРЕДНЕ (128 - 256bit/s) - 256 цветов",IDC_MEDIUM_RB,
+                    "Button",BS_AUTORADIOBUTTON,12,75,153,10
+    CONTROL         "МОДЕМ       (19 - 256Kbit/s) - 64 цвета",IDC_MODEM_RB,
+                    "Button",BS_AUTORADIOBUTTON,12,86,148,10
+    CONTROL         "МЕДЛЕННО (< 19kKbit/s) - 256 цветов",IDC_SLOW_RB,
+                    "Button",BS_AUTORADIOBUTTON,12,97,128,10
+    CONTROL         "ВРУЧНУЮ (Используйте кнопку ""Настройки"")",IDC_MANUAL,"Button",BS_AUTORADIOBUTTON,12,108,123,10
+    CONTROL         "Просмотр",IDC_VIEWONLY_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,123,47,10
+    CONTROL         "Авто масштаб",IDC_AUTOSCALING_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,63,123,59,10
+    CONTROL         "Подтв. выход",IDC_EXIT_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,124,123,53,10
+    CONTROL         "DSMплагин",IDC_PLUGIN_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,147,66,10
+    COMBOBOX        IDC_PLUGINS_COMBO,78,145,118,55,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Прокси/Репитер",IDC_PROXY_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,161,66,10
+    EDITTEXT        IDC_PROXY_EDIT,78,160,117,12,ES_AUTOHSCROLL
+    GROUPBOX        "",IDC_STATIC,4,204,237,21
+    CONTROL         "Сохранить как настройки по умолчанию",IDC_SETDEFAULT_CHECK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,213,128,10
+    DEFPUSHBUTTON   "Подключить",IDOK,200,33,40,26
+    PUSHBUTTON      "&Отмена",IDCANCEL,200,64,40,14
+    PUSHBUTTON      "Настройки",IDC_OPTIONBUTTON,200,113,40,14
+    PUSHBUTTON      "Инфо",IDC_PLUGIN_BUTTON,200,145,40,12
+    PUSHBUTTON      "Удалить настройки",IDC_DELETE,149,211,84,12,BS_MULTILINE
+    GROUPBOX        "",IDC_STATIC,4,135,237,42
+    COMBOBOX        IDC_SCREEN,10,185,222,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "",IDC_STATIC,4,175,237,31
+END
+
+IDD_SERVINFO_DLG DIALOGEX 0, 0, 224, 170
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "RFB Информация о сервере "
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "&Ok ",IDOK,167,149,50,14
+    EDITTEXT        IDC_SERVINFO_EDIT,7,7,210,134,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY
+END
+
+IDD_AUTH_DIALOG DIALOGEX 101, 66, 214, 63
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION
+EXSTYLE WS_EX_TOPMOST
+CAPTION " UltraVNC Авторизация"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    EDITTEXT        IDD_USER_NAME,118,6,82,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PASSWD_EDIT,118,22,82,14,ES_PASSWORD | ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "Войти ",IDOK,89,42,54,15
+    PUSHBUTTON      "&Отмена",IDCANCEL,149,42,50,15
+    RTEXT           "Имя:",IDC_STATIC,58,10,57,8
+    RTEXT           "Пароль:",IDC_STATIC,58,26,57,8
+    CONTROL         ID_BUTTON_SEP,IDC_STATIC,"Static",SS_BITMAP | SS_REALSIZEIMAGE | SS_SUNKEN,8,10,48,42
+END
+
+IDD_AUTH_DIALOG2 DIALOGEX 101, 66, 214, 113
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION
+EXSTYLE WS_EX_TOPMOST
+CAPTION " UltraVNC Авторизация - Небезопасная передача"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    LTEXT           "Версия УльтраVNC сервера не поддерживает безопасную передачу пароля, если вы не используете DSM плагин.\nПожалуйста обновите УльтраVNC сервер на удаленном компьютере до новейшей версии для того чтобы обезопасить ваш пароль.",IDC_STATIC,8,6,196,44
+    EDITTEXT        IDD_USER_NAME,118,57,82,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PASSWD_EDIT,118,73,82,14,ES_PASSWORD | ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "Войти ",IDOK,89,92,54,15
+    PUSHBUTTON      "&Отмена",IDCANCEL,150,92,50,15
+    RTEXT           "Имя:",IDC_STATIC,58,60,57,8
+    RTEXT           "Пароль:",IDC_STATIC,58,76,57,8
+    CONTROL         ID_BUTTON_SEP,IDC_STATIC,"Static",SS_BITMAP | SS_REALSIZEIMAGE | SS_SUNKEN,8,60,48,42
+END
+
+IDD_CUSTUM_KEY DIALOGEX 0, 0, 224, 53
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_TOPMOST
+CAPTION "Отправить сочетание клавиш (Экспериментально...)"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    LTEXT           "Сочетание (десятичное): ",IDC_STATIC,7,9,87,12
+    EDITTEXT        IDC_CUSTOM_KEY,100,7,51,14,ES_AUTOHSCROLL
+    CONTROL         "ALT GR ",IDC_ALTGR,"Button",BS_AUTORADIOBUTTON,54,26,38,9
+    CONTROL         "STRG",IDC_STRG,"Button",BS_AUTORADIOBUTTON,100,26,35,9
+    CONTROL         "ALT ",IDC_ALT,"Button",BS_AUTORADIOBUTTON,54,37,26,9
+    CONTROL         "NORMAL ",IDC_NORMAL,"Button",BS_AUTORADIOBUTTON,100,37,45,9
+    DEFPUSHBUTTON   "Отпр.",IDOK,167,7,50,14
+    PUSHBUTTON      "&Отмена",IDCANCEL,167,32,50,14
+END
+
+IDD_STATUS DIALOGEX 0, 0, 198, 144
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "Ultr@VNC Viewer - Статус соединения"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "Закрыть",IDCLOSE,140,126,50,14
+    GROUPBOX        "Подключение",IDC_STATIC,4,0,186,78
+    GROUPBOX        "Трафик",IDC_STATIC,4,81,186,42
+    LTEXT           "Порт:",IDC_STATIC,13,23,52,9
+    LTEXT           "Байт передано",IDC_STATIC,7,94,63,9
+    RTEXT           "Байт получено",IDC_STATIC,117,94,68,9
+    RTEXT           "передано ",IDC_SEND,6,110,64,9
+    RTEXT           "получено ",IDC_RECEIVED,113,110,72,9
+    RTEXT           "Port ",IDC_PORT,96,23,89,9
+    ICON            IDI_NET,IDC_STATIC,89,90,20,20
+    CONTROL         IDB_BITMAP3,IDC_STATIC,"Static",SS_BITMAP | SS_REALSIZEIMAGE,71,98,13,1,WS_EX_TRANSPARENT
+    CONTROL         IDB_BITMAP3,IDC_STATIC,"Static",SS_BITMAP | SS_REALSIZEIMAGE,109,98,13,1,WS_EX_TRANSPARENT
+    CONTROL         IDB_BITMAP2,IDC_STATIC,"Static",SS_BITMAP | SS_REALSIZEIMAGE,105,110,1,10,WS_EX_TRANSPARENT
+    LTEXT           "VNC Сервер: ",IDC_STATIC,13,12,64,9
+    RTEXT           "Server-Name ",IDC_VNCSERVER,94,12,91,9
+    LTEXT           "Статус: ",IDC_STATIC,13,30,52,9
+    RTEXT           "Подключение разорвано",IDC_STATUS,44,30,141,24
+    RTEXT           "",IDC_PLUGIN_STATUS,7,45,178,9
+    PUSHBUTTON      "&Отмена",IDQUIT,5,126,50,14
+    LTEXT           "Скорость: ",IDC_STATIC,13,66,64,8
+    RTEXT           "123",IDC_SPEED,81,66,62,8
+    RTEXT           "кбит/сек ",IDC_STATIC,147,66,38,8
+    RTEXT           "",IDC_ENCODER,65,55,120,8
+    LTEXT           "Сжатие: ",IDC_STATIC,13,55,63,8
+END
+
+IDD_AUTH_DIALOG1 DIALOGEX 101, 66, 234, 58
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION
+EXSTYLE WS_EX_TOPMOST
+CAPTION "ПРЕДУПРЕЖДЕНИЕ : Обновление сервера ..."
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    EDITTEXT        IDC_PASSWD_EDIT,136,13,82,14,ES_PASSWORD | ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "Войти ",IDOK,108,37,54,15
+    PUSHBUTTON      "&Отмена",IDCANCEL,168,37,50,15
+    RTEXT           "Пароль:",-1,65,16,61,8
+    CONTROL         ID_BUTTON_SEP,-1,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_SUNKEN,6,6,50,42
+END
+
+IDD_FTPARAM_DLG DIALOGEX 0, 0, 241, 60
+STYLE DS_SYSMODAL | DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION
+CAPTION "Ft комментарий "
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    EDITTEXT        IDC_FTPARAM_EDIT,10,21,224,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "&Ok ",IDOK,128,42,50,14
+    PUSHBUTTON      "&Отмена",IDCANCEL,184,42,50,14
+    LTEXT           "FT комментарий. Пожалуйста введите бла бла бла...",IDC_FTPARAMCOMMENT,9,7,225,8
+END
+
+IDD_TEXTCHAT_DLG DIALOGEX 0, 0, 307, 175
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION
+CAPTION " Чат - UltraVNC"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    EDITTEXT        IDC_INPUTAREA_EDIT,4,136,255,36,ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN | NOT WS_BORDER | WS_VSCROLL,WS_EX_STATICEDGE
+    PUSHBUTTON      "Отпр.",IDC_SEND_B,264,135,39,14,BS_CENTER | BS_MULTILINE
+    PUSHBUTTON      "Скрыть",IDC_HIDE_B,264,151,39,11
+    PUSHBUTTON      "Закрыть",IDCANCEL,264,162,39,11
+    CONTROL         "",IDC_CHATAREA_EDIT,"RICHEDIT",TCS_HOTTRACK | TCS_RAGGEDRIGHT | TCS_FOCUSONBUTTONDOWN | TCS_MULTISELECT | WS_VSCROLL | WS_TABSTOP,3,3,300,130,WS_EX_STATICEDGE
+    DEFPUSHBUTTON   "",IDOK,299,0,8,6,NOT WS_VISIBLE
+END
+
+IDD_APP_ABOUT DIALOGEX 0, 0, 289, 156
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "О VNCviewer  "
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "&Ok ",IDOK,8,137,62,14
+    CONTROL         ID_BUTTON_SEP,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_SUNKEN,8,7,62,54
+    LTEXT           "UltraVNC Viewer 1.2.1.2",IDC_STATIC,86,6,197,11
+    LTEXT           "Для получения информации и ссылок посетите: \nhttp://ultravnc.sf.net ",IDC_STATIC,86,133,197,19
+    LTEXT           "Copyright © 2002-2003 UltraVNC Team\nCopyright © 2001-2002 Sam - eSVNC \nCopyright © 1999-2002 Rudi D. V. - VdaccVNC \nCopyright © 1999-2002 Const. Kaplinsky - TightVNC \nCopyright © 2002 RealVNC Ltd. - RealVNC\n",IDC_STATIC,86,30,200,40
+    LTEXT           "Built:",IDC_STATIC,87,17,15,10
+    LTEXT           "Erstellungsuhrzeit",IDC_BUILDTIME,120,17,98,10
+    LTEXT           "Copyright © 2002 VNC QuickDesk\nCopyright © 1999-2002 Tridia Corporation - TridiaVNC \nCopyright © 1994-2001 AT&&T Laboratories Cambridge/Olivetti Research Ltd. - VNC",IDC_STATIC,86,70,203,33
+    LTEXT           "Copyright © 1990-2002 Info-ZIP\nCopyright © 1996-2002 Markus Franz Xaver Johannes Oberhumer - Mini LZO library",IDC_STATIC,85,102,198,24
+END
+
+IDD_FTCONFIRM_DLG DIALOGEX 0, 0, 178, 86
+STYLE DS_SYSMODAL | DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION
+EXSTYLE WS_EX_TOPMOST
+CAPTION "Сообщение"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    LTEXT           "Сообщение подверждение тут",IDC_FTPCONFIRMCOMMENT,4,8,163,53
+    DEFPUSHBUTTON   "Да",IDC_YES_B,4,65,39,14
+    PUSHBUTTON      "Да для всех",IDC_YESALL_B,46,65,40,14
+    PUSHBUTTON      "Нет",IDC_NO_B,92,65,40,14
+    PUSHBUTTON      "Нет для всех",IDC_NOALL_B,135,65,39,14
+END
+
+IDD_APP_MESSAGE1 DIALOGEX 0, 0, 278, 158
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Окно сообщений Ultr@VNC Viewer"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "Закрыть",IDOK,185,110,56,14
+    LTEXT           "Erstellungsuhrzeit",IDC_BUILDTIME,9,11,265,88
+    GROUPBOX        "Информация",IDC_STATIC,3,1,274,100,BS_CENTER
+    CTEXT           "UltraVNC 1.2.1.2",IDC_STATIC,178,145,66,12
+    PUSHBUTTON      "",IDC_BUTTON1,7,104,170,47,BS_BITMAP
+END
+
+IDD_APP_MESSAGE2 DIALOGEX 0, 0, 273, 217
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Окно сообщений Ultr@VNC Viewer"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "Закрыть",IDOK,185,163,56,14
+    LTEXT           "Erstellungsuhrzeit",IDC_BUILDTIME,9,11,258,97
+    PUSHBUTTON      "",IDC_BUTTON2,7,114,170,47,BS_BITMAP
+    GROUPBOX        "Информация",IDC_STATIC,3,1,264,110,BS_CENTER
+    CTEXT           "UltraVNC 1.2.1.2",IDC_STATIC,175,204,69,12
+    PUSHBUTTON      "",IDC_BUTTON1,7,163,170,47,BS_BITMAP
+    CTEXT           "Sponsored\n Link",IDC_STATIC,179,127,36,21
+END
+
+IDD_AUTH_DIALOG3 DIALOGEX 101, 66, 234, 58
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION
+EXSTYLE WS_EX_TOPMOST
+CAPTION "Ultr@VNC Авторизация "
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    EDITTEXT        IDC_PASSWD_EDIT,136,13,82,14,ES_PASSWORD | ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "Войти ",IDOK,108,37,54,15
+    PUSHBUTTON      "&Отмена",IDCANCEL,168,37,50,15
+    RTEXT           "Пароль:",-1,65,16,61,8
+    CONTROL         ID_BUTTON_SEP,-1,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_SUNKEN,6,6,50,42
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_OPTIONDIALOG, DIALOG
+    BEGIN
+        RIGHTMARGIN, 330
+        VERTGUIDE, 164
+        BOTTOMMARGIN, 217
+        HORZGUIDE, 171
+    END
+
+    IDD_FILETRANSFER_DLG, DIALOG
+    BEGIN
+        RIGHTMARGIN, 505
+        VERTGUIDE, 215
+        VERTGUIDE, 274
+        VERTGUIDE, 279
+        VERTGUIDE, 486
+        BOTTOMMARGIN, 260
+    END
+
+    IDD_SESSION_DLG, DIALOG
+    BEGIN
+        VERTGUIDE, 10
+        VERTGUIDE, 232
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 225
+        HORZGUIDE, 17
+    END
+
+    IDD_SERVINFO_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 217
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 163
+    END
+
+    IDD_AUTH_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 2
+        RIGHTMARGIN, 209
+        VERTGUIDE, 8
+        VERTGUIDE, 43
+        VERTGUIDE, 56
+        VERTGUIDE, 58
+        VERTGUIDE, 81
+        VERTGUIDE, 115
+        VERTGUIDE, 118
+        VERTGUIDE, 190
+        BOTTOMMARGIN, 58
+        HORZGUIDE, 20
+        HORZGUIDE, 36
+        HORZGUIDE, 52
+        HORZGUIDE, 57
+    END
+
+    IDD_AUTH_DIALOG2, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 92
+    END
+
+    IDD_CUSTUM_KEY, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 217
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 46
+    END
+
+    IDD_STATUS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 191
+        VERTGUIDE, 185
+        VERTGUIDE, 190
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 129
+    END
+
+    IDD_AUTH_DIALOG1, DIALOG
+    BEGIN
+        LEFTMARGIN, 2
+        RIGHTMARGIN, 229
+        VERTGUIDE, 6
+        VERTGUIDE, 43
+        VERTGUIDE, 49
+        VERTGUIDE, 65
+        VERTGUIDE, 81
+        VERTGUIDE, 108
+        VERTGUIDE, 118
+        VERTGUIDE, 218
+        BOTTOMMARGIN, 53
+        HORZGUIDE, 25
+        HORZGUIDE, 27
+        HORZGUIDE, 36
+        HORZGUIDE, 52
+        HORZGUIDE, 57
+    END
+
+    IDD_FTPARAM_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 234
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 53
+    END
+
+    IDD_TEXTCHAT_DLG, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 164
+    END
+
+    IDD_APP_ABOUT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        VERTGUIDE, 86
+        VERTGUIDE, 94
+        VERTGUIDE, 108
+        VERTGUIDE, 283
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 124
+        HORZGUIDE, 29
+    END
+
+    IDD_FTCONFIRM_DLG, DIALOG
+    BEGIN
+    END
+
+    IDD_APP_MESSAGE1, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 246
+        VERTGUIDE, 86
+        VERTGUIDE, 94
+        VERTGUIDE, 108
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 151
+        HORZGUIDE, 29
+    END
+
+    IDD_APP_MESSAGE2, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 246
+        VERTGUIDE, 86
+        VERTGUIDE, 94
+        VERTGUIDE, 108
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 210
+        HORZGUIDE, 29
+    END
+
+    IDD_AUTH_DIALOG3, DIALOG
+    BEGIN
+        LEFTMARGIN, 2
+        RIGHTMARGIN, 229
+        VERTGUIDE, 6
+        VERTGUIDE, 43
+        VERTGUIDE, 49
+        VERTGUIDE, 65
+        VERTGUIDE, 81
+        VERTGUIDE, 108
+        VERTGUIDE, 118
+        VERTGUIDE, 218
+        BOTTOMMARGIN, 53
+        HORZGUIDE, 25
+        HORZGUIDE, 27
+        HORZGUIDE, 36
+        HORZGUIDE, 52
+        HORZGUIDE, 57
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog Info
+//
+
+IDD_SESSION_DLG DLGINIT
+BEGIN
+    IDC_HOSTNAME_EDIT, 0x403, 1, 0
+"\000"
+ 
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_BITMAP2             BITMAP                     "hoch.bmp"
+IDB_BITMAP3             BITMAP                     "quer.bmp"
+IDB_STAT_BACK           BITMAP                     "stat\\back.bmp"
+IDB_STAT_BOTH           BITMAP                     "stat\\both.bmp"
+IDB_STAT_FRONT          BITMAP                     "stat\\front.bmp"
+IDB_STAT_NONE           BITMAP                     "stat\\none.bmp"
+IDB_VNC64               BITMAP                     "vnc64.BMP"
+IDB_CLOSE               BITMAP                     "stat\\closeup.bmp"
+IDB_MAXIMIZE            BITMAP                     "stat\\maximizeup.bmp"
+IDB_MINIMIZE            BITMAP                     "stat\\minimizeup.bmp"
+IDB_PINDOWN             BITMAP                     "stat\\pindown.bmp"
+IDB_PINUP               BITMAP                     "stat\\pinup.bmp"
+IDB_VNC32               BITMAP                     "vnc32.BMP"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,2,1,2
+ PRODUCTVERSION 1,2,1,2
+ FILEFLAGSMASK 0x37L
+#ifdef _DEBUG
+ FILEFLAGS 0x25L
+#else
+ FILEFLAGS 0x24L
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "041904E3"
+        BEGIN
+            VALUE "Comments", "UltraVNC Viewer"
+            VALUE "CompanyName", "UltraVNC"
+            VALUE "FileDescription", "VNCViewer"
+            VALUE "FileVersion", "1.2.1.2"
+            VALUE "InternalName", "VNCViewer"
+            VALUE "LegalCopyright", "Copyright © 2015 UltraVNC team members"
+            VALUE "OriginalFilename", "VNCViewer.exe"
+            VALUE "ProductName", "UltraVNC VNCViewer"
+            VALUE "ProductVersion", "1.2.1.2"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0419, 1251
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDR_TRAY                "UltraVNC Viewer принимает подключения"
+END
+
+STRINGTABLE
+BEGIN
+    ID_CLOSEDAEMON          "Не принимать входящие подключения"
+    ID_SHOWWINDOW           "Отобразить окно подключения"
+    ID_NEWCONN              "Создать подключение вручную"
+    ID_BUTTON_CAD           "Послать CTRL+ALT+DEL"
+    ID_BUTTON_FTRANS        "Передача файлов"
+END
+
+STRINGTABLE
+BEGIN
+    ID_BUTTON_DINPUT        "Выключить кнопки"
+    ID_BUTTON_DBUTTON       "Выключить клавиатуру и мышь на сервере"
+    ID_BUTTON_SW            "Выбрать SW"
+    ID_BUTTON_DESKTOP       "Выбрать раб.стол"
+    IDS_WARNING             "ВНИМАНИЕ: По умолчанию эта сессия не шифруется. Пожалуйста не используйте ее для передачи важной информации, если вы не используете плагин для шифрования\n\n"
+    IDS_A1                  "Остановить трей"
+    IDS_A2                  "UltraVNC инфо"
+    IDS_A3                  "Ошибка создания демона для подключений:\n"
+    IDS_A4                  "Возможно запущена другая копия VNCViewer?"
+    IDS_A5                  "Ошибка VNCViewer"
+    IDS_B1                  "Ошибка инициализации библиотеки сокетов"
+    IDS_B2                  "Переполнение клиентского листа!"
+    IDS_B3                  "Ошибка VNC"
+END
+
+STRINGTABLE
+BEGIN
+    IDC_OPTIONBUTTON        "Выбрать опции, которые будут использоваться для новых подключений"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_C1                  "Не могу открыть буфер обмена\n"
+    IDS_C2                  "Не могу очистить буфер обмена\n"
+    IDS_C3                  "Не могу закрыть буфер обмена\n"
+    IDS_D1                  "Ошибка аргумента"
+    IDS_D2                  "Неправильное значение масштаба - используется стандартный"
+    IDS_D3                  "Неправильно указан порт"
+    IDS_D4                  "Не указан масштаб "
+    IDS_D5                  "Неправильно указан масштаб"
+    IDS_D6                  "Не указан таймаут"
+    IDS_D7                  "Неправильно указан таймаут"
+    IDS_D8                  "Не указан fuzz"
+    IDS_D9                  "Неправильно указан fuzz"
+    IDS_D10                 "Не указана задержка"
+    IDS_D11                 "Неправильно указана задержка"
+    IDS_D12                 "Не указан уровень логгирования"
+    IDS_D13                 "Неправильно указан уровень логгирования"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_D14                 "Не указан лог файл"
+    IDS_D15                 "Неверно указан лог файл"
+    IDS_D16                 "Не указан файл конфигурации"
+    IDS_D17                 "Не могу открыть указаный файл конфигурации."
+    IDS_D18                 "Не указано сжатие"
+    IDS_D19                 "Неверно указано сжатие"
+    IDS_D20                 "Не указана степень сжатия"
+    IDS_D21                 "Неверно указана степень сжатия"
+    IDS_D22                 "Не указано качество изображения"
+    IDS_D23                 "Неверно указано качество изображения"
+    IDS_D24                 "Не указан пароль"
+    IDS_D25                 "Неверно указан пароль"
+    IDS_D26                 "Не указан номер быстрой опции"
+    IDS_D27                 "Не указан DSM плагин ('ИмяПлагина.dsm')"
+    IDS_D28                 "Неверно указан VNC сервер."
+    IDS_E1                  "Не могу загрузить Rich Edit (RICHED32.DLL)!"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_E2                  "Загрузка DLL Rich Edit"
+    IDS_F1                  "Плагин не может быть загружен.\nПожалуйста проверьте его целостность."
+    IDS_F3                  "Активация плагина"
+    IDS_F4                  "NoPassword,viewer"
+    IDS_F5                  "Плагин не может быть загружен.\nПожалуйста проверьте его целостность."
+    IDS_F6                  "Загрузка плагина"
+    IDS_F7                  "Плагин не может быть инициализацию.\nПожалуйста проверьте его целостность."
+    IDS_F8                  "Неверно указан VNC сервер.\nУкажите в форме хост:дисплей."
+    IDS_F10                 "Настройка соединения"
+    IDS_F11                 "Плагин не обнаружен."
+    IDS_G1                  "Ошибка создания Flasher сокета"
+    IDS_G2                  "Ошибка назначения Flasher сокета"
+    IDS_G3                  "Ошибка при попытке Flasher слушать сокет"
+    IDS_H1                  " > ВНИМАНИЕ: Передача файлов отключена на сервере"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_H2                  " > ВНИМАНИЕ: Передача файлов отключена на сервере"
+    IDS_H3                  "Передача файлов выключена, не прав или сервера не поддерживает передачу"
+    IDS_H4                  " подключен..."
+    IDS_H5                  "Передача прервана пользователем"
+    IDS_H6                  "Передача завершена"
+    IDS_H7                  "Передача прервана пользователем"
+    IDS_H8                  " > Просмотр локальной папки. Подождите..."
+    IDS_H9                  " > ОШИБКА: Нет носителя на локальном диске."
+    IDS_H10                 " > ОШИБКА: Нет носителя на удаленном диске."
+    IDS_H11                 " > Просмотр удаленной папки. Подождите..."
+    IDS_H12                 " ОШИБКА: Файл"
+    IDS_H13                 " не доступен на удаленной машине"
+    IDS_H14                 "ОШИБКА: Нет свободного места на локальном диске для"
+    IDS_H15                 "Принимаемый файл"
+    IDS_H16                 "не может быть создан на локальной машине"
+    IDS_H17                 "Файл"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_H18                 "ПРИНЯТ..."
+    IDS_H19                 "ОШИБКА: Передача файла"
+    IDS_H20                 "не удалась на удаленной машине. Отменено."
+    IDS_H21                 "ОШИБКА: Проблема доступа к файлу"
+    IDS_H22                 "Отправка файла"
+    IDS_H23                 "ОШИБКА: Проблема доступа к файлу"
+    IDS_H24                 "не может быть создан на удаленной машине"
+    IDS_H25                 "ОШИБКА: -> Этот файл"
+    IDS_H26                 "может быть заблокирован или на удаленной машине не хватает места"
+    IDS_H27                 "ОТПРАВЛЕН..."
+    IDS_H28                 "не удалась на локальной машине. Отменено"
+    IDS_H29                 "Не удалось создать папку"
+    IDS_H30                 "на удаленной машине"
+    IDS_H31                 "Папка"
+    IDS_H32                 "создана на удаленной машине"
+    IDS_H33                 "Не удалось удалить файл"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_H34                 "удален на удаленной машине"
+    IDS_H35                 "Передача файлов с"
+    IDS_H36                 "Подключен"
+    IDS_H37                 "Подключение. Подождите..."
+    IDS_H38                 "уже существует на УДАЛЕННОЙ машине.\n Хотите перезаписать или продолжить?\n"
+    IDS_H39                 "Предупреждение передачи файлов"
+    IDS_H40                 "Файл(ы)/Папка(и) выбраны для передачи"
+    IDS_H41                 "Начало обмена. Передача"
+    IDS_H42                 "Файл(ы)/Папка(и) на удаленную машину"
+    IDS_H43                 "уже существует на ЛОКАЛЬНОЙ машине.\n Хотите перезаписать или продолжить?\n"
+    IDS_H44                 "Начало обмена. Прием"
+    IDS_H45                 "Файл(ы)/Папка(и) с удаленной машины"
+    IDS_H46                 "Выберите файл для удаления. \nТолько один файл можеть быть удален за раз."
+    IDS_H47                 "Предупреждение об удалении"
+    IDS_H48                 "Вы хотите удалить файл на ЛОКАЛЬНОЙ машине"
+    IDS_H49                 "Не удалось удалить локальный файл"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_H50                 "удален"
+    IDS_H51                 "Вы хотите удалить файл на УДАЛЕННОЙ машине"
+    IDS_H52                 "Введите новое имя для локальной папки:"
+    IDS_H53                 "Не удалось создать локальную папку"
+    IDS_H54                 "Локальная папку"
+    IDS_H55                 "создана"
+    IDS_H56                 "Введите новое имя для удаленной папки:"
+    IDS_H57                 "Передача файлов"
+    IDS_I1                  "Ошибка создания сокета для службы"
+    IDS_I2                  "Ошибка назначения сокета службе"
+    IDS_I3                  "Ошибка при попытке службы слушать сокет"
+    IDS_J1                  "Для выхода из полноэкранного режима, используйте Ctrl-Esc Esc и\nнажмите правой кнопкой на значке VNC чтобы увидеть меню."
+    IDS_J2                  "VNCviewer полноэкранный режим"
+    IDS_K2                  "Ошибка сохранения"
+    IDS_K1                  "Неверное имя"
+    IDS_K3                  "Вы хотите сохранить пароль в файл?\n (Да) Сохранение пароля в файл НЕБЕЗОПАСНО! ."
+END
+
+STRINGTABLE
+BEGIN
+    IDS_K4                  "Сообщение безопасности"
+    IDS_K5                  "Ошибка чтения имени хоста из файла"
+    IDS_K6                  "Ошибка чтения конфига"
+    IDS_K7                  "Ошибка чтения номера порта из файла"
+    IDS_L1                  "неизвестно"
+    IDS_L2                  "Послать CTRL+ALT+DEL"
+    IDS_L3                  "Переключение полноэкранного режима(Вкл/Выкл)"
+    IDS_L4                  "Показать опции подключения..."
+    IDS_L5                  "Обновить экран"
+    IDS_L6                  "Послать ПУСК  (Ctrl+Esc,Winkey) на сервер"
+    IDS_L7                  "Послать сочетание клавиш"
+    IDS_L8                  "Показать окно статуса"
+    IDS_L9                  "Закрыть подключение"
+    IDS_L10                 "Скрыть тулбар"
+    IDS_L11                 "Вкл./Выкл удаленный монитор, клавиатуру и мышь"
+    IDS_L12                 "Открыть передачу файлов..."
+END
+
+STRINGTABLE
+BEGIN
+    IDS_L13                 "Выбрать отдельное окно"
+    IDS_L14                 "Выбрать раб. стол/перекл. монитор(только драйвер)"
+    IDS_L15                 "Открыть чат..."
+    IDS_L16                 "Передача файлов... \tCtrl+Alt+F7"
+    IDS_L17                 "Чат... \tCtrl+Alt+F8"
+    IDS_L18                 "Показать тулбар \tCtrl+Alt+F9"
+    IDS_L19                 "Отключить удаленный ввод/монитор"
+    IDS_L20                 "Включить удаленный ввод/монитор"
+    IDS_L21                 "Настройка подключения... \tCtrl+Alt+F6"
+    IDS_L22                 "Информация соединения..\tCtrl+Alt+Shift+I"
+    IDS_L23                 "Запрос обновления экрана..\tCtrl+Alt+Shift+R"
+    IDS_L24                 "&Полный экран \tCtrl+Alt+F12"
+    IDS_L25                 "&Автомасштабирование \tCtrl+Alt+F10"
+    IDS_L26                 "&Половинный размер \tCtrl+Alt+F11"
+    IDS_L27                 "&Нечеткий экран"
+    IDS_L28                 "&Нормальный экран \tCtrl+F11"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_L29                 "Макс.цвет"
+    IDS_L30                 "256 цветов"
+    IDS_L31                 "Отправить Ctrl+Alt+Del \tCtrl+Alt+F4"
+    IDS_L32                 "Отправить Ctrl+Esc (меню ПУСК)"
+    IDS_L33                 "Ctrl клавиша Down"
+    IDS_L34                 "Ctrl клавиша Up"
+    IDS_L35                 "Alt клавиша Down"
+    IDS_L36                 "Alt клавиша Up"
+    IDS_L37                 "Новое соединение...\tCtrl+Alt+Shift+N"
+    IDS_L38                 "Сохранить инфо подключения... \tCtrl+Alt+F5"
+    IDS_L39                 "&О VNC Viewer..."
+    IDS_L40                 "Закрыть слушающую службу"
+    IDS_L41                 "DSM плагин не можнт быть настроен"
+    IDS_L42                 "Отменено пользователем"
+    IDS_L43                 "Подключение..."
+    IDS_L44                 "Ошибка создания сокета!"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_L45                 "Определяем адрес сервера..."
+    IDS_L46                 "Не удалось обнаружить сервер !"
+    IDS_L47                 "Подключение к серверу "
+    IDS_L48                 "Не удалось подключиться к серверу !"
+    IDS_L49                 "Подключен"
+    IDS_L50                 "Ошибка выключения алгоритма Nagle"
+    IDS_L51                 "Извините. Этот сервер использует слишком старую схему авторизации,\nкоторая больше не поддерживается!"
+    IDS_L52                 "Ошибка версии протокола"
+    IDS_L53                 "Введите пароль"
+    IDS_L54                 "Авторизация отменена"
+    IDS_L55                 "Пароль принят"
+    IDS_L56                 "Неверный пароль"
+    IDS_L57                 "VNC авторизация не удалась!"
+    IDS_L58                 "VNC авторизация не удалась - слишко много попыток! "
+    IDS_L59                 "Неизвестный результат VNC авторизации!"
+    IDS_L60                 "Неизвестная схема авторизации!"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_L61                 "Ошибка создания локального изображения дисплея."
+    IDS_L62                 "Подождите - загрузка вида удаленного экрана..."
+    IDS_L63                 "Принято необработанное SetColormap сообщение!\n"
+    IDS_L64                 "Принято необработанное сообщение!\n"
+    IDS_L65                 "WriteExact: DSMPlugin-RestoreBuffer Alloc Error."
+    IDS_L66                 "WriteExact: DSMPlugin-Restore Buffer Error."
+    IDS_L67                 "Подключение разорвано"
+    IDS_L68                 "WriteExact: DSMPlugin-TransformBuffer Error."
+    IDS_L69                 "WriteExact: Socket error while writing."
+    IDS_L70                 "Insufficient memory to allocate network buffer."
+    IDS_L71                 "Insufficient memory to allocate zlib buffer."
+    IDS_L72                 "VNC Viewer Статус для"
+    IDS_L73                 "VNC Viewer Статус"
+    IDS_L74                 "Нет соединения"
+    IDS_L75                 "Вы хотите файти?"
+    IDS_L76                 "Закрывается VNCviewer"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_L77                 "Подключенный VNC сервер не поддерживает передачу файлов!"
+    IDS_L78                 "Недоступная функциональность"
+    IDS_L79                 "Окно передачи файлов уже открыто!"
+    IDS_L80                 "Предупреждение передачи файлов"
+    IDS_L81                 "Подключенный VNC сервер не поддерживает чат !"
+    IDS_L82                 "Недоступная функциональность"
+    IDS_L83                 "Окно чата уже открыто !"
+    IDS_L84                 "Предупреждение окна чата"
+    IDS_L85                 "Сначала закройте окно передачи файлов"
+    IDS_L86                 "Сначала закройте окно чата"
+    IDS_L87                 "Сначала закройте окно настройки подключения"
+    IDS_L88                 "Внимание"
+    IDS_L89                 "Определение версии протокола..."
+    IDS_L90                 "Запрашивается пароль"
+    IDS_L91                 "Подключение не удалось"
+    IDS_L92                 "Авторизация не требуется"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_H58                 "Файл(ы)/Папка(и)"
+    IDS_H59                 "Распаковка папки"
+    IDS_H60                 "после приема. Подождите..."
+    IDS_H61                 "Удаленная папка"
+    IDS_H62                 "ОШИБКА распаковки принятой удаленной папки (нет UnZip32.dll ?)"
+    IDS_H63                 "Прервано."
+    IDS_H64                 "Сжатие локальной папки"
+    IDS_H65                 "для передачи. Подождите..."
+    IDS_H66                 "Локальная папку"
+    IDS_H67                 "сжата."
+    IDS_H68                 "ОШИБКА сжатия локальной папки (нет Zip32.dll ?)"
+    IDS_H69                 "Передача прервана."
+    IDS_H70                 "ОТПРАВЛЕН."
+    IDS_H71                 "Удаленная папка"
+    IDS_H72                 "уже существует.\n\n Хотите ПЕРЕЗАПИСАТЬ папку?"
+    IDS_H73                 "Локальная папка"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_M1                  "Один файл или папка могут быть переименованы за раз"
+    IDS_M2                  "Предупреждение переименования"
+    IDS_M3                  "Переименование файлов и папок"
+    IDS_M4                  "Введите новое имя:"
+    IDS_M5                  "ОШИБКА: Не удается переименовать "
+    IDS_M6                  "Переименован локальный"
+    IDS_M7                  "на"
+    IDS_M8                  "удаленный"
+    IDS_H94                 "Предупреждение удаления"
+    IDS_H95                 "Вы хотите удалить папку на локальной машине?"
+    IDS_H96                 "Вы хотите удалить папку на удаленной машине?"
+    IDS_H97                 "Не удается удалить папку на локальной машине"
+    IDS_H98                 "Не удается удалить папку на удаленной машине"
+    IDS_H99                 "Не удается удалить папку"
+    IDS_H100                "Создать новую папку"
+    IDS_L93                 "Только просмотр... \tAlt+Ctrl+F3"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_H101                "Предупреждение передачи файлов"
+    IDS_H102                "файл или папка уже существует."
+    IDS_L94                 "Сервер закрыл соединение"
+END
+
+#endif    // English (United States) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Dutch (Netherlands) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NLD)
+LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
+#pragma code_page(1251)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_BITMAPsx            BITMAP                     "Tango_sx.bmp"
+IDB_BITMAPl             BITMAP                     "Tango_l.bmp"
+IDB_BITMAPlx            BITMAP                     "Tango_lx.bmp"
+IDB_BITMAPs             BITMAP                     "Tango_s.bmp"
+#endif    // Dutch (Netherlands) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Dutch (Belgium) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NLB)
+LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
+#pragma code_page(1251)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_TRAY_DISABLED       ICON                       "idr_tray_disabled.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_SESSIONSELECTOR DIALOGEX 0, 0, 316, 183
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Session Selector"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "&Ok ",IDOK,205,162,50,14
+    PUSHBUTTON      "&Отмена",IDCANCEL,259,162,50,14
+    CONTROL         "",IDC_LIST1,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_NOLABELWRAP | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,7,302,149
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_SESSIONSELECTOR, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 309
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 176
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_BITMAP14            BITMAP                     "l2.bmp"
+IDB_BITMAP13            BITMAP                     "l1.bmp"
+#endif    // Dutch (Belgium) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

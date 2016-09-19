@@ -1,0 +1,671 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_SPANISH, SUBLANG_SPANISH_MODERN
+#pragma code_page(1252)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Cursor
+//
+
+IDC_FINGER              CURSOR                     "res\\Finger.cur"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_TEXTCHAT_DLG DIALOGEX 0, 0, 308, 177
+STYLE DS_SETFONT | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_THICKFRAME
+CAPTION " Chat - UltraVNC"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    EDITTEXT        IDC_INPUTAREA_EDIT,4,135,255,39,ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN | NOT WS_BORDER | WS_VSCROLL,WS_EX_STATICEDGE
+    PUSHBUTTON      "Enviar",IDC_SEND_B,264,135,39,16,BS_MULTILINE
+    PUSHBUTTON      "Minimizar",IDC_HIDE_B,264,153,39,11
+    PUSHBUTTON      "Cerrar",IDCANCEL,264,164,39,11
+    CONTROL         "",IDC_CHATAREA_EDIT,"RICHEDIT",TCS_HOTTRACK | TCS_RAGGEDRIGHT | TCS_FOCUSONBUTTONDOWN | TCS_MULTISELECT | WS_VSCROLL | WS_TABSTOP,4,4,300,122,WS_EX_STATICEDGE
+    PUSHBUTTON      "",IDOK,303,0,6,6,NOT WS_VISIBLE
+    LTEXT           "",IDC_STATIC_SPLIT,5,127,298,8,SS_NOTIFY
+END
+
+IDD_LIST_DLG DIALOGEX 0, 0, 288, 123
+STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION " Lista de clientes - UltraVNC"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "Cerrar",IDOK,118,94,50,14
+    PUSHBUTTON      "&Cancelar",IDCANCEL,118,78,50,14,NOT WS_VISIBLE
+    LTEXT           " Clientes conectados actualmente:",IDC_STATIC,5,4,105,8
+    LISTBOX         IDC_VIEWERS_LISTBOX,7,16,103,93,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP,WS_EX_STATICEDGE
+    PUSHBUTTON      "Matar cliente",IDC_KILL_B,118,17,50,14
+    PUSHBUTTON      "Chat con cliente",IDC_TEXTCHAT_B,118,35,50,22,BS_MULTILINE
+    LTEXT           "Pending Clients:",IDC_STATIC,173,4,105,8
+    LISTBOX         IDC_PENDING_LISTBOX,175,16,103,93,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP,WS_EX_STATICEDGE
+END
+
+IDD_ABOUT DIALOGEX 0, 0, 282, 158
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION " Acerca de WinVNC"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "&Aceptar",IDOK,8,135,54,16
+    CONTROL         IDB_LOGO64,IDC_VNCLOGO,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_SUNKEN,7,5,53,46,WS_EX_TRANSPARENT
+    LTEXT           "UltraVNC Server  1.2.1.2",IDC_VERSION,73,5,145,11
+    LTEXT           "Copyright © 2002-2015 UltraVNC Team\nCopyright © 2001-2002 Sam - eSVNC \nCopyright © 1999-2002 Rudi D. V. - VdaccVNC \nCopyright © 2001 Harakan Software - PalmVNC\nCopyright © 1999-2002 Const. Kaplinsky - TightVNC \n",IDC_NAME,74,27,202,41
+    LTEXT           "Para más información y enlaces, por favor visite: \nhttp://www.uvnc.com",IDC_WWW,74,135,141,19
+    LTEXT           "Build:",IDC_BUILDTEXT,74,16,20,10
+    LTEXT           "BuildTime",IDC_BUILDTIME,97,16,92,10
+    LTEXT           "Copyright © 2002 RealVNC Ltd. - RealVNC\nCopyright © 1999-2002 Tridia Corporation - TridiaVNC \nCopyright © 1994-2001 AT&&T Laboratories Cambridge/Olivetti Research Ltd. - VNC",IDC_STATIC,74,67,203,32
+    LTEXT           "Copyright © 1990-2002 Info-ZIP\nCopyright © 1996-2002 Markus Franz Xaver Johannes Oberhumer - Mini LZO library",IDC_STATIC,74,99,200,27
+END
+
+IDD_OUTGOING_CONN DIALOGEX 0, 0, 223, 102
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "Iniciar conexión saliente (añadir nuevo cliente)"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    CTEXT           "",IDC_CAPTION_STATIC,7,6,209,20,NOT WS_VISIBLE
+    LTEXT           "Nombre Host:",IDC_HOSTNAME_STATIC,90,9,58,8,SS_CENTERIMAGE
+    EDITTEXT        IDC_HOSTNAME_EDIT,90,22,121,14,ES_AUTOHSCROLL
+    LTEXT           "Connection #",IDC_CONNECTION_NUMBER_STATIC,90,43,58,8
+    EDITTEXT        IDC_IDCODE,90,56,121,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "&Aceptar",IDOK,90,78,46,14
+    PUSHBUTTON      "&Cancelar",IDCANCEL,165,78,46,14
+END
+
+IDD_ACCEPT_CONN DIALOGEX 0, 0, 186, 95
+STYLE DS_SYSMODAL | DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION
+EXSTYLE WS_EX_TOPMOST
+CAPTION "¿Aceptar conexión WinVNC?"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    PUSHBUTTON      "Aceptar",IDACCEPT,7,74,53,14
+    DEFPUSHBUTTON   "&Rechazar",IDREJECT,130,74,49,14
+    LTEXT           "WinVNC ha recibido una conexión entrante desde",IDC_STATIC_TEXT1,7,7,107,36
+    CTEXT           "<host desconocido>",IDC_ACCEPT_IP,5,47,172,9,SS_CENTERIMAGE
+    CTEXT           "¿Desea usted Aceptar o Rechazar la conexión?",IDC_STATIC_TEXT,7,58,172,15,SS_CENTERIMAGE
+    CTEXT           "Autorechazar:",IDC_ACCEPT_TIMEOUT,60,74,70,14,SS_CENTERIMAGE
+    CONTROL         IDB_LOGO64,IDC_ACCEPTLOGO,"Static",SS_BITMAP,130,7,43,39
+END
+
+IDD_PROPERTIES DIALOGEX 0, 0, 224, 191
+STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "Servidor de UltraVNC página de propiedades"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    GROUPBOX        "Pantalla de administración y actualización del servidor",IDC_UPDATE_BORDER,6,2,214,118
+    CONTROL         "Capturar pantalla completa (Ultra rápido)",IDC_POLL_FULLSCREEN,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,13,112,13
+    CONTROL         "Capturar ventana en primer plano",IDC_POLL_FOREGROUND,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,28,95,9
+    CONTROL         "Capturar ventana bajo el cursor",IDC_POLL_UNDER_CURSOR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,37,95,16
+    CONTROL         "Capturar solo ventana de consola",IDC_CONSOLE_ONLY,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,117,26,99,15
+    CONTROL         "Capturar solo en eventos",IDC_ONEVENT_ONLY,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,117,39,78,12
+    CONTROL         "Sistema HookDll",IDC_HOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,56,66,10
+    CONTROL         "controlador de duplicación",IDC_DRIVER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,68,74,10
+    CONTROL         "Precisión baja (Turbo velocidad)",IDC_TURBOMODE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,96,112,10
+    PUSHBUTTON      "Compruebe el controlador Mirror",IDC_CHECKDRIVER,92,67,121,11
+    GROUPBOX        "Compartiendo en una única ventana",IDC_STATIC,5,124,214,47,BS_LEFT
+    CONTROL         "Solo compartir la ventana del servidor designado:",IDC_SINGLE_WINDOW,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,137,188,10
+    EDITTEXT        IDC_NAME_APPLI,14,151,195,13,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "&Aceptar",IDOK,82,174,44,14
+    PUSHBUTTON      "&Aplicar",IDC_APPLY,131,174,43,14
+    PUSHBUTTON      "&Cancelar",IDCANCEL,178,174,41,14
+    EDITTEXT        IDC_MAXCPU,54,106,40,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "Max Cpu :",IDC_STATIC,14,109,34,8
+    LTEXT           "Acceso elevada necesario : Servicio o ejecutar como administrador",IDC_STATIC,39,80,159,12
+END
+
+IDD_PROPERTIES1 DIALOGEX 0, 0, 390, 297
+STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "Servidor de UltraVNC página de propiedades"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    GROUPBOX        "Conexiones entrantes",IDC_CONNECT_BORDER,5,3,132,121,BS_LEFT
+    CONTROL         "Aceptar conexiones del socket",IDC_CONNECT_SOCK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,15,112,11
+    LTEXT           "Nº de monitores o puertos a usar:",IDC_DISPLAY_NO_LABEL,11,28,102,9,SS_CENTERIMAGE
+    CONTROL         "Monitor",IDC_SPECDISPLAY,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,11,41,35,10
+    EDITTEXT        IDC_DISPLAYNO,66,41,29,12,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "Auto",IDC_AUTO_DISPLAY_NO,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,102,39,35,13
+    CONTROL         "Puerto",IDC_SPECPORT,"Button",BS_AUTORADIOBUTTON,11,54,30,10
+    CONTROL         "Auto",IDC_PORTNO_AUTO,"Button",BS_AUTORADIOBUTTON,101,54,31,9
+    RTEXT           "Prim.:",IDC_STATIC,45,55,18,8
+    EDITTEXT        IDC_PORTRFB,66,53,29,12,ES_AUTOHSCROLL
+    RTEXT           "Http:",IDC_STATIC,36,67,27,8
+    EDITTEXT        IDC_PORTHTTP,66,65,29,12,ES_AUTOHSCROLL
+    CONTROL         "Activar visor Java (Conexión http)",IDC_CONNECT_HTTP,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,80,122,10
+    CONTROL         "Permitir conexiones Loopback",IDC_ALLOWLOOPBACK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,91,105,10
+    CONTROL         "Solo Loopback",IDC_LOOPBACKONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,102,59,10
+    GROUPBOX        "Si el último cliente desconecta",IDC_LOCKSETTINGS,142,3,104,52,BS_LEFT
+    CONTROL         "No hacer nada",IDC_LOCKSETTING_NOTHING,"Button",BS_AUTORADIOBUTTON | WS_GROUP,146,15,80,12
+    CONTROL         "Bloquear el PC (W2K)",IDC_LOCKSETTING_LOCK,"Button",BS_AUTORADIOBUTTON,146,26,96,13
+    CONTROL         "Desconectar el PC",IDC_LOCKSETTING_LOGOFF,"Button",BS_AUTORADIOBUTTON,146,39,80,11
+    GROUPBOX        "Teclado && Ratón",IDC_STATIC,142,59,103,60,BS_LEFT
+    CONTROL         "Desactivar entrada de visores",IDC_DISABLE_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,150,70,92,11
+    CONTROL         "Desactivar visores locales",IDC_DISABLE_LOCAL_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,150,82,83,12
+    CONTROL         "método de teclado alternativo",IDC_JAP_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,150,95,89,18
+    GROUPBOX        "Consultar en conexiones entrantes",IDC_STATIC,250,3,136,53,BS_LEFT
+    CONTROL         "Mostrar ventana de consulta",IDQUERY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,257,15,86,10
+    LTEXT           "Intervalo:",IDC_STATIC,275,29,28,8
+    EDITTEXT        IDQUERYTIMEOUT,308,27,19,12,ES_AUTOHSCROLL
+    LTEXT           "segundos",IDC_STATIC,330,29,29,8
+    LTEXT           "Por defecto:",IDC_STATIC,257,43,47,8
+    CONTROL         "Rechazar",IDC_DREFUSE,"Button",BS_AUTORADIOBUTTON | WS_GROUP,307,43,39,10
+    CONTROL         "Aceptar",IDC_DACCEPT,"Button",BS_AUTORADIOBUTTON,346,43,37,10
+    GROUPBOX        "Conexiones de múltiples visores",IDC_STATIC,250,59,136,60,BS_LEFT
+    CONTROL         "Desconectar todas las conexiones",IDC_MV1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,255,71,127,10
+    CONTROL         "Mantener conexiones existentes",IDC_MV2,"Button",BS_AUTORADIOBUTTON,255,81,104,10
+    CONTROL         "Rechazar la nueva conexión",IDC_MV3,"Button",BS_AUTORADIOBUTTON,255,92,103,9
+    CONTROL         "Rechazar toda nueva conexión",IDC_MV4,"Button",BS_AUTORADIOBUTTON,255,103,102,10
+    GROUPBOX        "Autenticación",IDC_STATIC,7,124,210,88,BS_LEFT
+    LTEXT           "Contraseña VNC:",IDC_PASSWORD_LABEL,33,136,50,11,SS_CENTERIMAGE
+    EDITTEXT        IDC_PASSWORD,85,135,74,13,ES_PASSWORD | ES_AUTOHSCROLL
+    LTEXT           "View-Only Password:",IDC_PASSWORD_LABEL2,14,150,69,11,SS_CENTERIMAGE
+    EDITTEXT        IDC_PASSWORD2,85,150,74,13,ES_PASSWORD | ES_AUTOHSCROLL
+    CONTROL         "Requiere MS Logon (Usuario/Contraseña/Dominio)",IDC_MSLOGON_CHECKD,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,164,146,10
+    CONTROL         "Nuevo MS Logon (soporta múltiples dominios)",IDC_NEW_MSLOGON,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,175,153,11
+    PUSHBUTTON      "Configurar Grupos MS Logon (Inicio de sesión)",IDC_MSLOGON,13,190,195,12
+    GROUPBOX        "Miscelánea",IDC_STATIC,221,122,165,116,BS_LEFT
+    CONTROL         "Quitar Aero (Vista)",IDC_REMOVE_Aero,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,228,130,81,10
+    CONTROL         "Quitar fondo escritorio para visores",IDC_REMOVE_WALLPAPER,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,228,140,134,10
+    CONTROL         "Activar monitor en blanco a petición del visor",IDC_BLANK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,228,151,144,10
+    CONTROL         "Disable Only Inputs on Blanking Request",IDC_BLANK2,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,239,161,142,10
+    CONTROL         "Desactivar icono de la Bandeja del sistema",IDC_DISABLETRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,228,194,67,10
+    CONTROL         "Desactivar opciones de clientes en la Bandeja",IDC_ALLOWEDITCLIENTS,
+                    "Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_DISABLED | WS_TABSTOP,228,205,141,10
+    CONTROL         "Prohibir al usuario que cierre WinVNC",IDC_ALLOWSHUTDOWN,
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,228,216,135,10
+    LTEXT           "Escala por defecto de la pantalla del servidor:",IDC_STATIC,237,225,92,8
+    LTEXT           "1 / ",IDC_STATIC,348,225,12,8
+    EDITTEXT        IDC_SCALE,363,222,12,12,ES_AUTOHSCROLL
+    GROUPBOX        "Transferencia de archivos",IDC_STATIC,6,213,210,25
+    CONTROL         "Activar",IDC_FILETRANSFER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,224,38,10
+    CONTROL         "Personificar usuario (solo como servicio)",IDC_FTUSERIMPERSONATION_CHECK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,71,224,133,10
+    GROUPBOX        "Plugin DSM",IDC_STATIC,5,241,211,32,BS_LEFT
+    CONTROL         "Usar:",IDC_PLUGIN_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,255,31,10
+    COMBOBOX        IDC_PLUGINS_COMBO,45,253,129,86,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Configurar",IDC_PLUGIN_BUTTON,179,253,29,12
+    GROUPBOX        "Registro",IDC_STATIC,221,241,165,51
+    CONTROL         "Registro de depuración de WinVNC",IDC_LOG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,228,251,139,10
+    CONTROL         "Registro de video",IDC_VIDEO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,228,262,58,10
+    PUSHBUTTON      "Limpiar codificador avi",IDC_CLEAR,297,262,75,9
+    LTEXT           "Ruta:",IDC_STATIC,229,276,18,8
+    EDITTEXT        IDC_EDIT_PATH,250,274,132,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "&Aceptar",IDOK,32,279,43,14
+    PUSHBUTTON      "&Aplicar",IDC_APPLY,81,279,43,14
+    PUSHBUTTON      "&Cancelar",IDCANCEL,129,279,44,14
+    RTEXT           "N°",IDC_STATIC,53,42,9,8
+    CONTROL         "RDPmode",IDC_RDPMODE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,227,182,47,10
+    CONTROL         "IPv6 mode",IDC_IPV6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,113,50,10
+END
+
+IDD_ABOUT1 DIALOGEX 0, 0, 286, 222
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION " Información"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "&Aceptar",IDOK,210,204,54,16
+    CONTROL         153,IDC_VNCLOGO,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_SUNKEN,7,5,269,199,WS_EX_TRANSPARENT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_TEXTCHAT_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 5
+        RIGHTMARGIN, 303
+        TOPMARGIN, 5
+        BOTTOMMARGIN, 172
+    END
+
+    IDD_LIST_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 281
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 116
+    END
+
+    IDD_ABOUT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 275
+        VERTGUIDE, 80
+        VERTGUIDE, 90
+        VERTGUIDE, 100
+        VERTGUIDE, 120
+        TOPMARGIN, 5
+        HORZGUIDE, 9
+        HORZGUIDE, 20
+        HORZGUIDE, 30
+        HORZGUIDE, 40
+        HORZGUIDE, 50
+        HORZGUIDE, 60
+        HORZGUIDE, 70
+        HORZGUIDE, 80
+        HORZGUIDE, 90
+        HORZGUIDE, 100
+    END
+
+    IDD_OUTGOING_CONN, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 216
+        VERTGUIDE, 50
+        VERTGUIDE, 55
+        VERTGUIDE, 185
+        VERTGUIDE, 190
+        TOPMARGIN, 6
+        BOTTOMMARGIN, 95
+        HORZGUIDE, 20
+        HORZGUIDE, 49
+    END
+
+    IDD_ACCEPT_CONN, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 179
+        VERTGUIDE, 60
+        VERTGUIDE, 130
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 88
+        HORZGUIDE, 24
+        HORZGUIDE, 30
+        HORZGUIDE, 46
+        HORZGUIDE, 50
+        HORZGUIDE, 65
+        HORZGUIDE, 74
+    END
+
+    IDD_PROPERTIES, DIALOG
+    BEGIN
+        VERTGUIDE, 14
+        BOTTOMMARGIN, 172
+    END
+
+    IDD_PROPERTIES1, DIALOG
+    BEGIN
+        VERTGUIDE, 150
+        VERTGUIDE, 257
+        BOTTOMMARGIN, 280
+        HORZGUIDE, 270
+    END
+
+    IDD_ABOUT1, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 282
+        VERTGUIDE, 80
+        VERTGUIDE, 90
+        VERTGUIDE, 100
+        VERTGUIDE, 120
+        TOPMARGIN, 5
+        BOTTOMMARGIN, 158
+        HORZGUIDE, 9
+        HORZGUIDE, 20
+        HORZGUIDE, 30
+        HORZGUIDE, 40
+        HORZGUIDE, 50
+        HORZGUIDE, 60
+        HORZGUIDE, 70
+        HORZGUIDE, 80
+        HORZGUIDE, 90
+        HORZGUIDE, 100
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,2,1,2
+ PRODUCTVERSION 1,2,1,2
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x2dL
+#else
+ FILEFLAGS 0x2cL
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "0c0a04B0"
+        BEGIN
+            VALUE "Comments", "UltraVNC - Remote Control for all"
+            VALUE "CompanyName", "UltraVNC"
+            VALUE "FileDescription", "servidor VNC"
+            VALUE "FileVersion", "1.2.1.2"
+            VALUE "InternalName", "WinVNC"
+            VALUE "LegalCopyright", "Copyright © 2015 UltraVNC"
+            VALUE "LegalTrademarks", "VNC"
+            VALUE "OriginalFilename", "WinVNC.exe"
+            VALUE "PrivateBuild", "1.2.1.2"
+            VALUE "ProductName", "UltraVNC"
+            VALUE "ProductVersion", "1.2.1.2"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0c0a, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_TRAYMENU MENU
+BEGIN
+    POPUP "tray"
+    BEGIN
+        MENUITEM "&Propiedades",                 ID_PROPERTIES
+        MENUITEM "&Administrar propiedades",           ID_ADMIN_PROPERTIES
+        MENUITEM SEPARATOR
+        MENUITEM "&Acerca de WinVNC",               ID_ABOUT
+        POPUP "Visit our site"
+        BEGIN
+            MENUITEM "Homepage",                    ID_VISITUSONLINE_HOMEPAGE
+            MENUITEM "Forum",                       ID_VISITUSONLINE_FORUM
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "Añadir &nuevo cliente",             ID_OUTGOING_CONN
+        MENUITEM "&Matar Todos los clientes",           ID_KILLCLIENTS
+        MENUITEM SEPARATOR
+        MENUITEM "&Listar Todos los clientes",           ID_LISTCLIENTS
+        MENUITEM SEPARATOR
+        MENUITEM "Instalar servicio",             ID_RUNASSERVICE
+        MENUITEM "Desinstalar servicio",           ID_UNINSTALL_SERVICE
+        MENUITEM "Detener servicio",                ID_CLOSE_SERVICE
+        MENUITEM "Iniciar servicio (necesita estar previamente instalado)", ID_START_SERVICE
+        MENUITEM "Fix1 SoftwareCad",            ID_SOFTWARECAD
+        MENUITEM "Fix2 SoftwareCad",            ID_DELSOFTWARECAD
+        MENUITEM "Reiniciar en modo seguro",          ID_REBOOTSAFEMODE
+        MENUITEM "Fuerza de reinicio ( inseguro )",       ID_REBOOT_FORCE
+        MENUITEM SEPARATOR
+        MENUITEM "&Cerrar conexiones VNC",      ID_CLOSE
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// JAVAARCHIVE
+//
+
+IDR_VNCVIEWER_JAR       JAVAARCHIVE             "res\\vncviewer.jar"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDI_WINVNC              "WinVNC"
+    IDS_WARNING             "AVISO: Por defecto, esta sesión no usa ninguna codificación. Por favor no la utilice para enviar datos sensibles a menos que esté completamente seguro que su conexión es segura.\n\n"
+END
+
+STRINGTABLE
+BEGIN
+    ID_FAILED_INIT          "Fallo al inicializar el socket del sistema"
+    ID_WINVNC_USAGE         "WinVNC en uso"
+    ID_ANOTHER_INST         "Ya está ejecutándose otra instancia de WinVNC"
+    ID_NO_EXIST_INST        "No se pudo conectar con ninguna instancia existente de WinVNC"
+    ID_UNABLE_INST          "Imposible instalar el servicio WinVNC"
+    ID_SCM_NOT_HERE         "El SCM no pudo ser contactado - el servicio WinVNC no fue instalado"
+    ID_SERV_NOT_REG         "El servicio WinVNC no pudo ser registrado"
+    ID_SERV_FAIL_ST         "Fallo al iniciar el servicio WinVNC"
+END
+
+STRINGTABLE
+BEGIN
+    ID_SERV_CT_MISS         "El Administrador de control de servicios no puede ser contactado - el servicio WinVNC no fue registrado"
+    ID_SERV_OLD_REG         "El servicio WinVNC está ya registrado"
+    ID_SERVHELP_UNAB        "AVISO: Imposible instalar el servicio Helper hook\nLas opciones de registro específicas de usuarios globales no serán cargadas"
+    ID_SERV_CT_UNREG        "TEl Administrador de control de servicios no puede ser contactado - el servicio WinVNC no fue desregistrado"
+    ID_SERV_NOT_UNRG        "El servicio WinVNC no pudo ser desregistrado"
+    ID_SERV_NCONTACT        "El servicio WinVNC no pudo ser contactado"
+    ID_SERVHELP_NREM        "AVISO: La entrada del servicio Helper hook no puede ser borrada del Registro"
+    ID_SERV_NOT_STOP        "El servicio WinVNC no pudo ser detenido"
+    ID_SERV_MK_UNREG        "El servicio WinVNC esta ya marcado para ser desregistrado"
+    ID_SERV_NT_FOUND        "El servicio WinVNC no puede ser encontrado"
+    ID_WINVNC_ERROR         "Error de WinVNC"
+    ID_WINVNC_WARNIN        "Aviso de WinVNC"
+    ID_PLUGIN_LOADIN        "Plugin cargado"
+    ID_NO_PASSWD_NO_OVERRIDE_ERR 
+                            "No fue configurada ninguna contraseña y esta máquina ha sido preconfigurada para impedirle a los usuarios ponerla ellos.\nUsted debe contactar con un Administrador de sistema para configurar WinVNC correctamente."
+    ID_NO_PASSWD_NO_OVERRIDE_WARN 
+                            "AVISO: Esta máquina ha sido preconfigurada para permitir aceptar conexiones\nsin verificar e impedirle a los usuarios activar la autenticación."
+    ID_NO_PASSWD_NO_LOGON_WARN 
+                            "AVISO: Esta máquina por defecto no tiene configurada contraseña. WinVNC presentará ahora el diálogo de Propiedades por defecto para que pueda introducir una."
+END
+
+STRINGTABLE
+BEGIN
+    ID_NO_OVERRIDE_ERR      "Esta máquina ha sido preconfigurada con opciones de WinVNC, las cuales no pueden ser modificadas por usuarios individuales. Las opciones preconfiguradas pueden ser modificados sólo por un Administrador de sistema."
+    ID_NO_CURRENT_USER_ERR  "Los opciones de WinVNC para el usuario actual no están disponibles ahora."
+    ID_CANNOT_EDIT_DEFAULT_PREFS 
+                            "Usted no tiene suficientes privilegios para revisar la configuración local por defecto de WinVNC."
+    ID_NO_PASSWORD_WARN     "AVISO: ¡Ejecutar WinVNC sin configurar una contraseña es un peligroso riesgo de seguridad!\nHasta que usted ponga una contraseña, WinVNC no aceptará conexiones entrantes."
+    ID_PLUGIN_NOT_LOAD      "El Plugin no puede ser cargado.\nPor favor compruebe su integridad."
+    ID_MB1                  "MB1"
+    ID_WVNC                 "WVNC"
+    ID_AUTHAD_NOT_FO        "Usted seleccionó ms-logon (Inicio de sesión),\npero el authad.dll no fue encontrado. Compruebe la instalación"
+    ID_WARNING              "AVISO"
+    ID_AUTH_NOT_FO          "Usted seleccionó ms-logon (Inicio de sesión),\npero el auth.dll no fue encontrado. Compruebe la instalación"
+    ID_DESKTOP_BITBLT_ROOT  "vncDesktop : El dispositivo raíz no soporta BitBlt\nWinVNC no puede ser usado con este driver del dispositivo gráfico"
+    ID_DESKTOP_BITBLT_MEM   "vncDesktop : El dispositivo de memoria no soporta GetDIBits\nWinVNC no puede ser usado con este driver del dispositivo gráfico"
+    ID_DESKTOP_PLANAR_NOTC  "vncDesktop : ¡El monitor actual es PLANO, no CRT!\nWinVNC no puede ser usado con este driver del dispositivo gráfico"
+    ID_FAILED_CONNECT_LISTING_VIEW "Fallo al conectarse al visor VNC a la escucha"
+    ID_OUTGOING_CONNECTION  "Conexión saliente"
+    ID_UNABLE_PROC_MSLOGON  "Imposible procesar el MS logon"
+END
+
+STRINGTABLE
+BEGIN
+    ID_RICHED32_UNLOAD      "¡Imposible de cargar el control Rich Edit (RICHED32.DLL)!"
+    ID_RICHED32_DLL_LD      "Rich Edit Dll cargado"
+    ID_SERV_SUCCESS_INST    "El servicio WinVNC fue instalado con éxito\nEl servicio empezará ahora y lo hará automáticamente\nla próxima vez que reinicie"
+    ID_SERV_SUCCESS_REG     "El servicio WinVNC fue registrado con éxito\nEl servicio puede iniciarse desde el panel de control, y podrá\nejecutarse automáticamente la próxima vez que reinicie"
+    ID_SERV_SUCCESS_UNREG   "El servicio WinVNC ha sido desregistrado"
+    ID_ULTRAVNC_TEXTCHAT    "El cliente seleccionado no es un visor de UltraVNC"
+    ID_ULTRAVNC_WARNING     "Advertencia UltraVNC"
+    ID_NO_PLUGIN_DETECT     "Ningún Plugin detectado..."
+    ID_CHAT_WITH_S_ULTRAVNC " Chat with <%s> - UltraVNC"
+    ID_CURRENT_USER_PROP    "WinVNC: Propiedades actuales del usuario"
+    ID_DEFAULT_SYST_PROP    "WinVNC: Propiedades locales del Sistema por defecto"
+    ID_AUTOREJECT_U         "Autorechazar:%u"
+    ID_AUTOACCEPT_U         "Autoaceptar:%u"
+    ID_CADERROR             "Ctrl-alt-del necesita de un servicio, no permitido"
+    ID_CADERRORFILE         "El archivo cad.exe no se encuentra en la misma carpeta de winvnc"
+    ID_CADPERMISSION        "Permiso denegado en cad.exe , UltraVNC debe instalarse en "" archivos de programa "" otro permiso especial cad se negó ."
+END
+
+#endif    // English (United States) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United Kingdom) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENG)
+LANGUAGE LANG_SPANISH, SUBLANG_SPANISH_MODERN
+#pragma code_page(1252)
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+#endif    // English (United Kingdom) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Dutch (Belgium) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NLB)
+LANGUAGE LANG_SPANISH, SUBLANG_SPANISH_MODERN
+#pragma code_page(1252)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_MSLOGON DIALOGEX 0, 0, 186, 166
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Configurar inicio de sesión MS"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    GROUPBOX        "",IDC_STATIC,5,0,178,74
+    LTEXT           "Grupo",IDC_STATIC,23,8,20,8
+    LTEXT           "Local",IDC_STATIC,127,8,18,8
+    LTEXT           "Dominio",IDC_STATIC,153,8,25,8
+    EDITTEXT        IDC_GROUP1,21,19,93,13,ES_AUTOHSCROLL
+    CONTROL         "",IDC_CHECKG1L,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,127,20,13,10
+    CONTROL         "",IDC_CHECKG1D,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,153,22,16,8
+    EDITTEXT        IDC_GROUP2,21,36,93,13,ES_AUTOHSCROLL
+    CONTROL         "",IDC_CHECKG2L,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,127,38,16,8
+    CONTROL         "",IDC_CHECKG2D,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,153,38,16,8
+    EDITTEXT        IDC_GROUP3,21,53,93,13,ES_AUTOHSCROLL
+    CONTROL         "",IDC_CHECKG3L,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,127,56,16,8
+    CONTROL         "",IDC_CHECKG3D,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,153,56,16,8
+    GROUPBOX        "Reglas",IDC_STATIC,5,77,178,68
+    LTEXT           "Grupo 1, 2 = Acceso total       Grupo 3 = Solo lectura",IDC_STATIC,16,88,162,8
+    LTEXT           "Debe ejecutarse como un servicio en NT4, W2K\nPuede ser como un servicio o aplicación en XP, W2003. Los Admin. locales tienen siempre acceso.\nPara ejecutarlo en modo aplicación en NT4 y W2K necesita añadirse al grupo local de Admin.",IDC_STATIC,8,100,174,41
+    DEFPUSHBUTTON   "&Aceptar",IDOK,77,148,50,14
+    PUSHBUTTON      "&Cancelar",IDCANCEL,132,148,50,14
+    LTEXT           "1",IDC_STATIC,11,22,8,8
+    LTEXT           "2",IDC_STATIC,11,38,8,8
+    LTEXT           "3",IDC_STATIC,11,56,8,8
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_MSLOGON, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 182
+        VERTGUIDE, 17
+        VERTGUIDE, 110
+        VERTGUIDE, 123
+        VERTGUIDE, 149
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 162
+        HORZGUIDE, 46
+        HORZGUIDE, 66
+        HORZGUIDE, 88
+        HORZGUIDE, 105
+        HORZGUIDE, 164
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// JAVAARCHIVE
+//
+
+IDR_JAVAARCHIVE1        JAVAARCHIVE             "res\\mslogon\\VncViewer.jar"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_WINVNC              ICON                       "res\\world3a.ico"
+IDI_FLASH               ICON                       "res\\icon2.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_LOGO64              BITMAP                     "res\\vnc-1.bmp"
+#endif    // Dutch (Belgium) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
