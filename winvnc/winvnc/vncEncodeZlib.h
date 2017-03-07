@@ -40,7 +40,7 @@ class vncEncodeZlib;
 #ifdef IPP
 #include "..\..\ipp_zlib\src\zlib\zlib.h"
 #else
-#include "zlib-1.2.5/zlib.h"
+#include "zlib-1.2.11/zlib.h"
 #endif
 
 // Minimum zlib rectangle size in bytes.  Anything smaller will

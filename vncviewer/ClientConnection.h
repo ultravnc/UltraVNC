@@ -40,9 +40,9 @@
 #include "KeyMapJap.h"
 #include <rdr/types.h>
 #ifdef IPP
-#include "../ipp_zlib/src/zlib-1.2.5/zlib.h"
+#include "../ipp_zlib/src/zlib-1.2.11/zlib.h"
 #else
-#include "zlib-1.2.5/zlib.h"
+#include "zlib-1.2.11/zlib.h"
 #endif
 extern "C"
 {
@@ -797,6 +797,7 @@ private:
 
     bool m_server_wants_keepalives;
 	UINT m_keepalive_timer;
+	UINT m_fullupdate_timer;
 	UINT m_idle_timer;
 	UINT m_idle_time;
 	ViewerDirectxClass directx_output;

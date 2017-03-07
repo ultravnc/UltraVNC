@@ -595,6 +595,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_keepalive_timer = 0;
 	m_idle_timer = 0;
 	m_idle_time = 5000;
+	m_fullupdate_timer = 2999;
 	m_emulate3ButtonsTimer = 0;
 	// adzm 2010-09
 	m_flushMouseMoveTimer = 0;
@@ -1400,7 +1401,7 @@ void ClientConnection::CreateDisplay()
 	//ShowWindow(m_hwnd, SW_HIDE);
 	//ShowWindow(m_hwndcn, SW_SHOW);
 	//adzm 2009-06-21 - let's not show until connected.
-
+	SetTimer(m_hwndcn, m_fullupdate_timer, 30000, NULL);
 	// record which client created this window
     helper::SafeSetWindowUserData(m_hwndcn, (LONG_PTR)this);
 
@@ -8963,6 +8964,9 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 					}
 					else if (wParam == 1013) {
 						_this->SetDormant(2);
+					}
+					else if (wParam ==  2999) {
+						_this->HandleFramebufferUpdateRequest(0x00000000, 0x00000000);
 					}
 #ifdef _Gii
 					else if (wParam == TOUCH_REGISTER_TIMER) {
