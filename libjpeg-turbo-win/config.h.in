@@ -75,6 +75,9 @@
 /* libjpeg-turbo version */
 #undef LIBJPEG_TURBO_VERSION
 
+/* libjpeg-turbo version in integer form */
+#undef LIBJPEG_TURBO_VERSION_NUMBER
+
 /* Define to the sub-directory where libtool stores uninstalled libraries. */
 #undef LT_OBJDIR
 
