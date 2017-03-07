@@ -309,7 +309,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="&quot;C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe&quot; sign /sha1 075BD1CAB5AE085E523AF7883FC0A8127BE08C71 /n &quot;uvnc bvba&quot; /v /fd sha1 /t http://timestamp.verisign.com/scripts/timstamp.dll &quot;$(OutDir)\$(ProjectName).exe&quot;&#x0D;&#x0A;&quot;C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe&quot; sign /sha1 0F96782496EA96F2BA96CF177E61F993CA5BC2E8 /n &quot;uvnc bvba&quot; /v /as /fd sha256 /tr http://timestamp.geotrust.com/tsa &quot;$(OutDir)\$(ProjectName).exe&quot;&#x0D;&#x0A;copy &quot;$(OutDir)\$(ProjectName).exe&quot; c:\uvnc\32\w2k&#x0D;&#x0A;"
+				CommandLine="&quot;C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe&quot; sign /sha1 6D4DE9F8F9626857AEA19A9D95405BBF1A800532 /n &quot;uvnc bvba&quot; /v /as /fd sha256 /tr http://sha256timestamp.ws.symantec.com/sha256/timestamp &quot;$(OutDir)\$(ProjectName).exe&quot;&#x0D;&#x0A;copy &quot;$(OutDir)\$(ProjectName).exe&quot; c:\uvnc\32\w2k&#x0D;&#x0A;"
 				ExcludedFromBuild="false"
 			/>
 		</Configuration>
@@ -628,7 +628,7 @@
 		/>
 		<ProjectReference
 			ReferencedProjectIdentifier="{745DEC58-EBB3-47A9-A9B8-4C6627C01BF8}"
-			RelativePathToProject="..\zlib-1.2.5\contrib\vstudio\vc9\zlibstat.vcproj"
+			RelativePathToProject="..\zlib-1.2.11\contrib\vstudio\vc9\zlibstat.vcproj"
 		/>
 	</References>
 	<Files>
@@ -4326,15 +4326,11 @@
 			</File>
 		</Filter>
 		<File
-			RelativePath=".\res\mslogon\AuthPanel.class"
-			>
-		</File>
-		<File
 			RelativePath="res\AuthPanel.class"
 			>
 		</File>
 		<File
-			RelativePath="..\building.txt"
+			RelativePath=".\res\mslogon\AuthPanel.class"
 			>
 		</File>
 		<File
@@ -4342,7 +4338,7 @@
 			>
 		</File>
 		<File
-			RelativePath=".\res\mslogon\ButtonPanel.class"
+			RelativePath="..\building.txt"
 			>
 		</File>
 		<File
@@ -4350,11 +4346,15 @@
 			>
 		</File>
 		<File
-			RelativePath=".\res\clipboardframe.class"
+			RelativePath=".\res\mslogon\ButtonPanel.class"
 			>
 		</File>
 		<File
 			RelativePath=".\res\mslogon\ClipboardFrame.class"
+			>
+		</File>
+		<File
+			RelativePath=".\res\clipboardframe.class"
 			>
 		</File>
 		<File
@@ -4366,11 +4366,11 @@
 			>
 		</File>
 		<File
-			RelativePath=".\res\mslogon\DH.class"
+			RelativePath="res\DH.class"
 			>
 		</File>
 		<File
-			RelativePath="res\DH.class"
+			RelativePath=".\res\mslogon\DH.class"
 			>
 		</File>
 		<File
@@ -4378,19 +4378,19 @@
 			>
 		</File>
 		<File
-			RelativePath=".\res\ftpframe$strcomp.class"
-			>
-		</File>
-		<File
 			RelativePath=".\res\mslogon\FTPFrame$StrComp.class"
 			>
 		</File>
 		<File
-			RelativePath="res\FTPFrame.class"
+			RelativePath=".\res\ftpframe$strcomp.class"
 			>
 		</File>
 		<File
 			RelativePath=".\res\mslogon\FTPFrame.class"
+			>
+		</File>
+		<File
+			RelativePath="res\FTPFrame.class"
 			>
 		</File>
 		<File
@@ -4402,11 +4402,11 @@
 			>
 		</File>
 		<File
-			RelativePath=".\res\optionsframe.class"
+			RelativePath=".\res\mslogon\OptionsFrame.class"
 			>
 		</File>
 		<File
-			RelativePath=".\res\mslogon\OptionsFrame.class"
+			RelativePath=".\res\optionsframe.class"
 			>
 		</File>
 		<File
@@ -4414,19 +4414,19 @@
 			>
 		</File>
 		<File
-			RelativePath=".\res\mslogon\RecordingFrame.class"
-			>
-		</File>
-		<File
 			RelativePath="res\RecordingFrame.class"
 			>
 		</File>
 		<File
-			RelativePath=".\res\mslogon\RfbProto.class"
+			RelativePath=".\res\mslogon\RecordingFrame.class"
 			>
 		</File>
 		<File
 			RelativePath=".\res\rfbproto.class"
+			>
+		</File>
+		<File
+			RelativePath=".\res\mslogon\RfbProto.class"
 			>
 		</File>
 		<File
@@ -4438,15 +4438,11 @@
 			>
 		</File>
 		<File
-			RelativePath=".\res\vnccanvas.class"
-			>
-		</File>
-		<File
 			RelativePath=".\res\mslogon\VncCanvas.class"
 			>
 		</File>
 		<File
-			RelativePath=".\res\mslogon\VncViewer.class"
+			RelativePath=".\res\vnccanvas.class"
 			>
 		</File>
 		<File
@@ -4454,11 +4450,15 @@
 			>
 		</File>
 		<File
-			RelativePath=".\res\vncviewer.jar"
+			RelativePath=".\res\mslogon\VncViewer.class"
 			>
 		</File>
 		<File
 			RelativePath=".\res\mslogon\VncViewer.jar"
+			>
+		</File>
+		<File
+			RelativePath=".\res\vncviewer.jar"
 			>
 		</File>
 		<File

@@ -188,7 +188,7 @@
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
-        "Compression" = "3:2"
+        "Compression" = "3:3"
         "SignOutput" = "11:FALSE"
         "CertificateFile" = "8:"
         "PrivateKeyFile" = "8:"
@@ -497,18 +497,18 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:UltraVnc"
-        "ProductCode" = "8:{77B0E545-699B-4DEC-A686-3636B9920FFC}"
-        "PackageCode" = "8:{9BD8AF48-D01F-4D2D-9438-7D9BB40F7953}"
+        "ProductCode" = "8:{6A610E34-8CAD-4BDD-9804-08170C3EE2F7}"
+        "PackageCode" = "8:{0D824209-51DD-410C-B970-63ABAD83E483}"
         "UpgradeCode" = "8:{25A3A242-EEA3-4731-A2D0-E990D2EA5A23}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.2.10"
+        "ProductVersion" = "8:1.2.12"
         "Manufacturer" = "8:uvnc bvba"
         "ARPHELPTELEPHONE" = "8:"
-        "ARPHELPLINK" = "8:http://support.uvnc.com"
+        "ARPHELPLINK" = "8:http://forum.uvnc.com"
         "Title" = "8:UltraVnc"
         "Subject" = "8:"
         "ARPCONTACT" = "8:Rudi De Vos"
@@ -521,7 +521,7 @@
         "UseSystemSearchPath" = "11:TRUE"
         "TargetPlatform" = "3:1"
         "PreBuildEvent" = "8:"
-        "PostBuildEvent" = "8:\"C:\\Program Files (x86)\\Windows Kits\\8.1\\bin\\x86\\signtool.exe\" sign /sha1 075BD1CAB5AE085E523AF7883FC0A8127BE08C71 /n \"uvnc bvba\" /v /fd sha1 /t http://timestamp.verisign.com/scripts/timstamp.dll $(BuiltOuputPath)\r\n\"C:\\Program Files (x86)\\Windows Kits\\8.1\\bin\\x86\\signtool.exe\" sign /sha1 0F96782496EA96F2BA96CF177E61F993CA5BC2E8 /n \"uvnc bvba\" /v /as /fd sha256 /tr http://timestamp.geotrust.com/tsa $(BuiltOuputPath)"
+        "PostBuildEvent" = "8:\"C:\\Program Files (x86)\\Windows Kits\\8.1\\bin\\x86\\signtool.exe\" sign /sha1 6D4DE9F8F9626857AEA19A9D95405BBF1A800532 /n \"uvnc bvba\" /v  /fd sha256 /tr http://sha256timestamp.ws.symantec.com/sha256/timestamp $(BuiltOuputPath)"
         "RunPostBuildEvent" = "3:0"
         }
         "Registry"
@@ -1134,7 +1134,7 @@
                             "ContextData" = "8:"
                             "Attributes" = "3:0"
                             "Setting" = "3:2"
-                            "Value" = "8:UltraVnc 1.2.1.0 X64"
+                            "Value" = "8:UltraVnc 1.2.12 X64"
                             "DefaultValue" = "8:#1215"
                             "UsePlugInResources" = "11:TRUE"
                             }
@@ -1777,7 +1777,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_057C03B3B6C348A59E8D997A9884CC96"
             {
-            "SourcePath" = "8:..\\Release\\logging.dll"
+            "SourcePath" = "8:..\\..\\addon\\ms-logon\\logging\\x64\\Release\\logging.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -1805,7 +1805,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_0F3E5B898783469D8773791F4330AA21"
             {
-            "SourcePath" = "8:..\\Release\\uvnc_settings.exe"
+            "SourcePath" = "8:..\\x64\\Release\\uvnc_settings.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -1833,7 +1833,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_1D605486DA064476BC03795B9D1F0A1D"
             {
-            "SourcePath" = "8:..\\Release\\authSSP.dll"
+            "SourcePath" = "8:..\\..\\addon\\ms-logon\\authSSP\\x64\\Release\\authSSP.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -1861,7 +1861,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_2499FE2BC2EC43FC827586F2B36F2483"
             {
-            "SourcePath" = "8:..\\..\\addon\\Release\\testauth.exe"
+            "SourcePath" = "8:..\\..\\addon\\ms-logon\\testauth\\x64\\Release\\testauth.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -1889,7 +1889,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_26A88B0595B5471B8B4F81FFBB8B5087"
             {
-            "SourcePath" = "8:..\\Release\\ldapauth.dll"
+            "SourcePath" = "8:..\\..\\addon\\ms-logon\\ldapauth\\x64\\Release\\ldapauth.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -1917,7 +1917,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_2C1853F772494048B3B26B78A53486F4"
             {
-            "SourcePath" = "8:..\\Release\\MSLogonACL.exe"
+            "SourcePath" = "8:..\\..\\addon\\ms-logon\\MSLogonACL\\x64\\Release\\MSLogonACL.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -1945,7 +1945,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_30A3C3ED62BD436097EAA36546BB4380"
             {
-            "SourcePath" = "8:..\\Release\\authadmin.dll"
+            "SourcePath" = "8:..\\..\\addon\\ms-logon\\authadm\\x64\\Release\\authadmin.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2001,7 +2001,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_7E9202FA9ECA4F4E821B4ABFAFEE00A5"
             {
-            "SourcePath" = "8:..\\Release\\ldapauthnt4.dll"
+            "SourcePath" = "8:..\\..\\addon\\ms-logon\\ldapauthNT4\\x64\\Release\\ldapauthnt4.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2029,7 +2029,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_87DB62653B71411E93DD76EF68D97A39"
             {
-            "SourcePath" = "8:..\\Release\\workgrpdomnt4.dll"
+            "SourcePath" = "8:..\\..\\addon\\ms-logon\\workgrpdomnt4\\x64\\Release\\workgrpdomnt4.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2057,7 +2057,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_9FFC46783A7F4BCB9DDA60B790D35975"
             {
-            "SourcePath" = "8:..\\Release\\ldapauth9x.dll"
+            "SourcePath" = "8:..\\..\\addon\\ms-logon\\ldapauth9x\\x64\\Release\\ldapauth9x.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2113,7 +2113,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_E7889E76F1B34653A90C53D3F997EBAF"
             {
-            "SourcePath" = "8:..\\Release\\winvnc.exe"
+            "SourcePath" = "8:..\\winvnc\\x64\\Release\\winvnc.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2141,7 +2141,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_FE82FF2D562E4B80928D6FEB67F9F479"
             {
-            "SourcePath" = "8:..\\Release\\vnchooks.dll"
+            "SourcePath" = "8:..\\x64\\Release\\vnchooks.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"

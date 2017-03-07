@@ -180,6 +180,10 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <OutputFile>.\..\Debug/winvnc.bsc</OutputFile>
     </Bscmake>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Midl>
@@ -227,6 +231,9 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <OutputFile>.\..\Debug/winvnc.bsc</OutputFile>
     </Bscmake>
+    <PostBuildEvent>
+      <Command>"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe" sign /sha1 6D4DE9F8F9626857AEA19A9D95405BBF1A800532 /n "uvnc bvba" /v /as /fd sha256 /tr http://sha256timestamp.ws.symantec.com/sha256/timestamp "$(OutDir)$(TargetName)$(TargetExt)"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Midl>
@@ -279,8 +286,7 @@
       <OutputFile>.\..\Release/winvnc.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      <Command>"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe" sign /sha1 075BD1CAB5AE085E523AF7883FC0A8127BE08C71 /n "uvnc bvba" /v /fd sha1 /t http://timestamp.verisign.com/scripts/timstamp.dll "$(OutDir)$(TargetName)$(TargetExt)"
-"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe" sign /sha1 0F96782496EA96F2BA96CF177E61F993CA5BC2E8 /n "uvnc bvba" /v /as /fd sha256 /tr http://timestamp.geotrust.com/tsa "$(OutDir)$(TargetName)$(TargetExt)"</Command>
+      <Command>"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe" sign /sha1 6D4DE9F8F9626857AEA19A9D95405BBF1A800532 /n "uvnc bvba" /v  /fd sha256 /tr http://sha256timestamp.ws.symantec.com/sha256/timestamp "$(OutDir)$(TargetName)$(TargetExt)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -334,8 +340,7 @@
       <OutputFile>.\..\Release/winvnc.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      <Command>"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe" sign /sha1 075BD1CAB5AE085E523AF7883FC0A8127BE08C71 /n "uvnc bvba" /v /fd sha1 /t http://timestamp.verisign.com/scripts/timstamp.dll "$(OutDir)$(TargetName)$(TargetExt)"
-"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe" sign /sha1 0F96782496EA96F2BA96CF177E61F993CA5BC2E8 /n "uvnc bvba" /v /as /fd sha256 /tr http://timestamp.geotrust.com/tsa "$(OutDir)$(TargetName)$(TargetExt)"</Command>
+      <Command>"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe" sign /sha1 6D4DE9F8F9626857AEA19A9D95405BBF1A800532 /n "uvnc bvba" /v /as /fd sha256 /tr http://sha256timestamp.ws.symantec.com/sha256/timestamp "$(OutDir)$(TargetName)$(TargetExt)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='IPP|Win32'">
@@ -1408,7 +1413,7 @@
     <ProjectReference Include="..\..\zipunzip_src\zip20\windll\visualc\lib\zip32.vcxproj">
       <Project>{e8ba959f-b652-4bab-9ea7-8e9fc8d7f39c}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\zlib-1.2.5\contrib\vstudio\vc10\zlibstat.vcxproj">
+    <ProjectReference Include="..\..\zlib-1.2.11\contrib\vstudio\vc10\zlibstat.vcxproj">
       <Project>{745dec58-ebb3-47a9-a9b8-4c6627c01bf8}</Project>
     </ProjectReference>
     <ProjectReference Include="..\omnithread\omnithread.vcxproj">

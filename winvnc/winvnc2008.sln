@@ -25,7 +25,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zip32", "..\zipunzip_src\zi
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libjpeg-turbo-win", "..\libjpeg-turbo-win\libjpeg-turbo-win.vcproj", "{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zlibstat", "..\zlib-1.2.5\contrib\vstudio\vc9\zlibstat.vcproj", "{745DEC58-EBB3-47A9-A9B8-4C6627C01BF8}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zlibstat", "..\zlib-1.2.11\contrib\vstudio\vc9\zlibstat.vcproj", "{745DEC58-EBB3-47A9-A9B8-4C6627C01BF8}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "authadmin", "..\addon\ms-logon\authadm\authadmin.vcproj", "{334467FD-E35E-4C3D-9410-69B2171C2BB2}"
 EndProject
