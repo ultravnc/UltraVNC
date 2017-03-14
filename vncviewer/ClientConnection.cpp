@@ -1281,7 +1281,7 @@ void ClientConnection::GTGBS_CreateToolbar()
 	RECT r;
 
 	GetClientRect(m_hwndTBwin,&r);
-	m_TrafficMonitor = CreateWindowEx(WS_EX_NOPARENTNOTIFY | WS_EX_CLIENTEDGE,
+	/*m_TrafficMonitor = CreateWindowEx(WS_EX_NOPARENTNOTIFY | WS_EX_CLIENTEDGE,
 											"Static",
 											NULL,
 											WS_CHILD | WS_VISIBLE ,
@@ -1292,19 +1292,22 @@ void ClientConnection::GTGBS_CreateToolbar()
 											m_hwndTBwin,
 											NULL,
 											m_pApp->m_instance,
-											NULL);
+											NULL);*/
 
 	m_bitmapNONE = LoadImage(m_pApp->m_instance,MAKEINTRESOURCE(IDB_STAT_NONE),IMAGE_BITMAP,22,20,LR_SHARED);
 	m_bitmapFRONT = LoadImage(m_pApp->m_instance,MAKEINTRESOURCE(IDB_STAT_FRONT),IMAGE_BITMAP,22,20,LR_SHARED);
 	m_bitmapBACK= LoadImage(m_pApp->m_instance,MAKEINTRESOURCE(IDB_STAT_BACK),IMAGE_BITMAP,22,20,LR_SHARED);
-	HDC hdc = GetDC(m_TrafficMonitor);
-	HDC hdcBits;
-	hdcBits = CreateCompatibleDC(hdc);
-	HGDIOBJ hbrOld = SelectObject(hdcBits,m_bitmapNONE);
-	BitBlt(hdc,0,0,22,22,hdcBits,0,0,SRCCOPY);
-	SelectObject(hdcBits,hbrOld);
-	DeleteDC(hdcBits);
-	ReleaseDC(m_TrafficMonitor,hdc);
+	if (m_TrafficMonitor)
+	{
+		HDC hdc = GetDC(m_TrafficMonitor);
+		HDC hdcBits;
+		hdcBits = CreateCompatibleDC(hdc);
+		HGDIOBJ hbrOld = SelectObject(hdcBits, m_bitmapNONE);
+		BitBlt(hdc, 0, 0, 22, 22, hdcBits, 0, 0, SRCCOPY);
+		SelectObject(hdcBits, hbrOld);
+		DeleteDC(hdcBits);
+		ReleaseDC(m_TrafficMonitor, hdc);
+	}
 
 	///////////////////////////////////////////////////
 	m_logo_wnd = CreateWindow(
