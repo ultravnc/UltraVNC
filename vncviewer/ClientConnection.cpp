@@ -6657,7 +6657,7 @@ void ClientConnection::Write(char *buf, int bytes, bool bQueue, bool bTimeout, i
 				vnclog.Print(1, _T("Socket error %d: %s\n"), err, lpMsgBuf);
 				LocalFree( lpMsgBuf );
 				m_running = false;
-
+				return;
 				//throw WarningException(sz_L69);
 			}
 			i += j;
