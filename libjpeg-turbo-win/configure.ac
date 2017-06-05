@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.56])
-AC_INIT([libjpeg-turbo], [1.4.2])
+AC_INIT([libjpeg-turbo], [1.5.1])
 
 AM_INIT_AUTOMAKE([-Wall foreign dist-bzip2])
 AC_PREFIX_DEFAULT(/opt/libjpeg-turbo)
@@ -24,6 +24,8 @@ AC_PROG_LN_S
 AC_ARG_WITH([build-date], [Use custom build string to enable reproducible builds (default: YYMMDD)],
   [BUILD="$with_build_date"],
   [BUILD=`date +%Y%m%d`])
+
+PKG_PROG_PKG_CONFIG
 
 # When the prefix is /opt/libjpeg-turbo, we assume that an "official" binary is
 # being created, and thus we install things into specific locations.
@@ -77,7 +79,7 @@ prefix=${old_prefix}
 
 # Check whether compiler supports pointers to undefined structures
 AC_MSG_CHECKING(whether compiler supports pointers to undefined structures)
-AC_TRY_COMPILE([ typedef struct undefined_structure * undef_struct_ptr; ], ,
+AC_TRY_COMPILE([ typedef struct undefined_structure *undef_struct_ptr; ], ,
   AC_MSG_RESULT(yes),
   [AC_MSG_RESULT(no)
    AC_DEFINE([INCOMPLETE_TYPES_BROKEN], [1],
@@ -192,7 +194,7 @@ fi
 RPM_CONFIG_ARGS=
 
 # Memory source/destination managers
-SO_AGE=0
+SO_AGE=1
 MEM_SRCDST_FUNCTIONS=
 if test "x${with_jpeg8}" != "xyes"; then
   AC_MSG_CHECKING([whether to include in-memory source/destination managers])
@@ -203,7 +205,7 @@ if test "x${with_jpeg8}" != "xyes"; then
     AC_MSG_RESULT(yes)
     AC_DEFINE([MEM_SRCDST_SUPPORTED], [1],
       [Support in-memory source/destination managers])
-    SO_AGE=1
+    SO_AGE=2
     MEM_SRCDST_FUNCTIONS="global:  jpeg_mem_dest;  jpeg_mem_src;";
   else
     AC_MSG_RESULT(no)
@@ -221,6 +223,16 @@ AC_SUBST(SO_AGE)
 AC_SUBST(MEM_SRCDST_FUNCTIONS)
 
 AC_DEFINE_UNQUOTED(LIBJPEG_TURBO_VERSION, [$VERSION], [libjpeg-turbo version])
+
+m4_define(version_triplet,m4_split(AC_PACKAGE_VERSION,[[.]]))
+m4_define(version_major,m4_argn(1,version_triplet))
+m4_define(version_minor,m4_argn(2,version_triplet))
+m4_define(version_revision,m4_argn(3,version_triplet))
+VERSION_MAJOR=version_major
+VERSION_MINOR=version_minor
+VERSION_REVISION=version_revision
+LIBJPEG_TURBO_VERSION_NUMBER=`printf "%d%03d%03d" $VERSION_MAJOR $VERSION_MINOR $VERSION_REVISION`
+AC_DEFINE_UNQUOTED(LIBJPEG_TURBO_VERSION_NUMBER, [$LIBJPEG_TURBO_VERSION_NUMBER], [libjpeg-turbo version in integer form])
 
 VERSION_SCRIPT=yes
 AC_ARG_ENABLE([ld-version-script],
@@ -277,9 +289,12 @@ AC_DEFINE_UNQUOTED([INLINE],[$ljt_cv_inline],[How to obtain function inlining.])
 AC_MSG_CHECKING([whether to include arithmetic encoding support])
 AC_ARG_WITH([arith-enc],
   AC_HELP_STRING([--without-arith-enc],
-    [Do not include arithmetic encoding support]))
+    [Do not include arithmetic encoding support when emulating the libjpeg v6b API/ABI]))
 if test "x$with_12bit" = "xyes"; then
   with_arith_enc=no
+fi
+if test "x${with_jpeg8}" = "xyes" -o "x${with_jpeg7}" = "xyes"; then
+  with_arith_enc=yes
 fi
 if test "x$with_arith_enc" = "xno"; then
   AC_MSG_RESULT(no)
@@ -293,9 +308,12 @@ AM_CONDITIONAL([WITH_ARITH_ENC], [test "x$with_arith_enc" != "xno"])
 AC_MSG_CHECKING([whether to include arithmetic decoding support])
 AC_ARG_WITH([arith-dec],
   AC_HELP_STRING([--without-arith-dec],
-    [Do not include arithmetic decoding support]))
+    [Do not include arithmetic decoding support when emulating the libjpeg v6b API/ABI]))
 if test "x$with_12bit" = "xyes"; then
   with_arith_dec=no
+fi
+if test "x${with_jpeg8}" = "xyes" -o "x${with_jpeg7}" = "xyes"; then
+  with_arith_dec=yes
 fi
 if test "x$with_arith_dec" = "xno"; then
   AC_MSG_RESULT(no)
@@ -498,6 +516,10 @@ if test "x${with_simd}" != "xno"; then
         fi
       fi
       ;;
+    powerpc*)
+      AC_MSG_RESULT([yes (powerpc)])
+      simd_arch=powerpc
+      ;;
     *)
       AC_MSG_RESULT([no ("$host_cpu")])
       with_simd=no;
@@ -523,8 +545,10 @@ AM_CONDITIONAL([SIMD_X86_64], [test "x$simd_arch" = "xx86_64"])
 AM_CONDITIONAL([SIMD_ARM], [test "x$simd_arch" = "xarm"])
 AM_CONDITIONAL([SIMD_ARM_64], [test "x$simd_arch" = "xaarch64"])
 AM_CONDITIONAL([SIMD_MIPS], [test "x$simd_arch" = "xmips"])
+AM_CONDITIONAL([SIMD_POWERPC], [test "x$simd_arch" = "xpowerpc"])
 AM_CONDITIONAL([X86_64], [test "x$host_cpu" = "xx86_64" -o "x$host_cpu" = "xamd64"])
 AM_CONDITIONAL([WITH_TURBOJPEG], [test "x$with_turbojpeg" != "xno"])
+AM_CONDITIONAL([CROSS_COMPILING], [test "x$cross_compiling" = "xyes"])
 
 AC_ARG_VAR(PKGNAME, [distribution package name (default: libjpeg-turbo)])
 if test "x$PKGNAME" = "x"; then
@@ -571,6 +595,8 @@ AC_CONFIG_FILES([pkgscripts/makecygwinpkg.tmpl:release/makecygwinpkg.in])
 AC_CONFIG_FILES([pkgscripts/makedpkg.tmpl:release/makedpkg.in])
 AC_CONFIG_FILES([pkgscripts/makemacpkg.tmpl:release/makemacpkg.in])
 AC_CONFIG_FILES([pkgscripts/uninstall.tmpl:release/uninstall.in])
+AC_CONFIG_FILES([pkgscripts/libjpeg.pc:release/libjpeg.pc.in])
+AC_CONFIG_FILES([pkgscripts/libturbojpeg.pc:release/libturbojpeg.pc.in])
 if test "x$with_turbojpeg" != "xno"; then
   AC_CONFIG_FILES([tjbenchtest])
 fi
