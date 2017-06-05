@@ -546,6 +546,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_keepalive_timer = 0;
 	m_idle_timer = 0;
 	m_idle_time = 5000;
+	m_fullupdate_timer = 2999;
 	m_emulate3ButtonsTimer = 0;
 	// adzm 2010-09
 	m_flushMouseMoveTimer = 0;
@@ -1231,7 +1232,7 @@ void ClientConnection::GTGBS_CreateToolbar()
 	RECT r;
 
 	GetClientRect(m_hwndTBwin,&r);
-	m_TrafficMonitor = CreateWindowEx(WS_EX_NOPARENTNOTIFY | WS_EX_CLIENTEDGE,
+	/*m_TrafficMonitor = CreateWindowEx(WS_EX_NOPARENTNOTIFY | WS_EX_CLIENTEDGE,
 											"Static",
 											NULL,
 											WS_CHILD | WS_VISIBLE ,
@@ -1242,19 +1243,21 @@ void ClientConnection::GTGBS_CreateToolbar()
 											m_hwndTBwin,
 											NULL,
 											m_pApp->m_instance,
-											NULL);
+											NULL);*/
 
 	m_bitmapNONE = LoadImage(m_pApp->m_instance,MAKEINTRESOURCE(IDB_STAT_NONE),IMAGE_BITMAP,22,20,LR_SHARED);
 	m_bitmapFRONT = LoadImage(m_pApp->m_instance,MAKEINTRESOURCE(IDB_STAT_FRONT),IMAGE_BITMAP,22,20,LR_SHARED);
 	m_bitmapBACK= LoadImage(m_pApp->m_instance,MAKEINTRESOURCE(IDB_STAT_BACK),IMAGE_BITMAP,22,20,LR_SHARED);
-	HDC hdc = GetDC(m_TrafficMonitor);
-	HDC hdcBits;
-	hdcBits = CreateCompatibleDC(hdc);
-	HGDIOBJ hbrOld = SelectObject(hdcBits,m_bitmapNONE);
-	BitBlt(hdc,0,0,22,22,hdcBits,0,0,SRCCOPY);
-	SelectObject(hdcBits,hbrOld);
-	DeleteDC(hdcBits);
-	ReleaseDC(m_TrafficMonitor,hdc);
+	if (m_TrafficMonitor) {
+		HDC hdc = GetDC(m_TrafficMonitor);
+		HDC hdcBits;
+		hdcBits = CreateCompatibleDC(hdc);
+		HGDIOBJ hbrOld = SelectObject(hdcBits,m_bitmapNONE);
+		BitBlt(hdc,0,0,22,22,hdcBits,0,0,SRCCOPY);
+		SelectObject(hdcBits,hbrOld);
+		DeleteDC(hdcBits);
+		ReleaseDC(m_TrafficMonitor,hdc);
+	}
 
 	///////////////////////////////////////////////////
 	m_logo_wnd = CreateWindow(
@@ -1351,7 +1354,7 @@ void ClientConnection::CreateDisplay()
 	//ShowWindow(m_hwnd, SW_HIDE);
 	//ShowWindow(m_hwndcn, SW_SHOW);
 	//adzm 2009-06-21 - let's not show until connected.
-
+	SetTimer(m_hwndcn, m_fullupdate_timer, 30000, NULL);
 	// record which client created this window
     helper::SafeSetWindowUserData(m_hwndcn, (LONG_PTR)this);
 
@@ -8113,7 +8116,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						MRU *m_pMRU;
 						m_pMRU = new MRU(SESSION_MRU_KEY_NAME, 26);
 						RECT rect;
-						if (GetWindowRect(hwnd, &rect) !=0)
+						if (GetWindowRect(hwnd, &rect) != 0 && !IsIconic(hwnd))
 							{
 								if (_this->m_opts.m_SavePos && !_this->m_opts.m_SaveSize) m_pMRU->SetPos(_this->m_host, rect.left, rect.top, 0, 0);
 								if (_this->m_opts.m_SavePos && _this->m_opts.m_SaveSize) m_pMRU->SetPos(_this->m_host, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
@@ -8612,7 +8615,12 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 				if (LOWORD(wParam) == 0)
 				{
 //					if (_this->m_FTtimer != 0)_this->m_FTtimer=SetTimer(hwnd,11, 100, 0);//
-					_this->m_pFileTransfer->SendFileChunk();
+					int gr = 0;
+					while (gr<100)
+					{
+						_this->m_pFileTransfer->SendFileChunk();
+						gr++;
+					}
 				}
 				else
 					_this->m_pFileTransfer->ProcessFileTransferMsg();
@@ -8914,6 +8922,9 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 					}
 					else if (wParam == 1013) {
 						_this->SetDormant(2);
+					}
+					else if (wParam ==  2999) {
+						_this->HandleFramebufferUpdateRequest(0x00000000, 0x00000000);
 					}
 #ifdef _Gii
 					else if (wParam == TOUCH_REGISTER_TIMER) {

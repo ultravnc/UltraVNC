@@ -797,6 +797,7 @@ private:
 
     bool m_server_wants_keepalives;
 	UINT m_keepalive_timer;
+	UINT m_fullupdate_timer;
 	UINT m_idle_timer;
 	UINT m_idle_time;
 	ViewerDirectxClass directx_output;

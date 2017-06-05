@@ -181,12 +181,14 @@ vncDesktop::GetSize()
 
 			if (multi_monitor) {
 				int nWidth = mymonitor[0].Width;
-				int nHeight = mymonitor[0].Height;
+				int nHeight = mymonitor[0].Height;				
 				switch (nr_monitors) {
 				case 2:
 					{
-					nWidth=mymonitor[0].Width+mymonitor[1].Width;
-					nHeight=max(mymonitor[0].Height, mymonitor[1].Height);
+					//nWidth=mymonitor[0].Width+mymonitor[1].Width;
+					//nHeight=max(mymonitor[0].Height, mymonitor[1].Height);
+					nWidth = m_Cliprect.br.x;
+					nHeight = m_Cliprect.br.y;
 					} break;
 				case 3:
 					{
@@ -262,8 +264,10 @@ if (m_server->SingleWindow())
 	}
 	else
 	{
-	m_SWOffsetx=0;
-	m_SWOffsety=0;
+	//m_SWOffsetx=0;
+	//m_SWOffsety=0;
+	m_SWOffsetx = m_bmrect.tl.x;
+	m_SWOffsety = m_bmrect.tl.y;
 	m_Cliprect.tl.x=0;
 	m_Cliprect.tl.y=0;
 	m_Cliprect.br.x=m_bmrect.br.x;
@@ -276,8 +280,10 @@ else
 	{	
 	m_SWOffsetx=m_bmrect.tl.x;
 	m_SWOffsety=m_bmrect.tl.y;
-	m_Cliprect.tl.x=m_bmrect.tl.x;
-	m_Cliprect.tl.y=m_bmrect.tl.y;
+	//m_Cliprect.tl.x=m_bmrect.tl.x;
+	//m_Cliprect.tl.y=m_bmrect.tl.y;
+	m_Cliprect.tl.x = 0;
+	m_Cliprect.tl.y = 0;
 	m_Cliprect.br.x=m_bmrect.br.x;
 	m_Cliprect.br.y=m_bmrect.br.y;
 
