@@ -6,8 +6,7 @@
  * Modified 2003-2011 by Guido Vollbeding.
  * libjpeg-turbo Modifications:
  * Copyright (C) 2010, 2013-2014, D. R. Commander.
- * For conditions of distribution and use, see the accompanying README.ijg
- * file.
+ * For conditions of distribution and use, see the accompanying README file.
  *
  * This file contains a command-line user interface for the JPEG compressor.
  * It should work on any system with Unix- or MS-DOS-style command lines.
@@ -82,7 +81,7 @@ static boolean is_targa;        /* records user -targa switch */
 
 
 LOCAL(cjpeg_source_ptr)
-select_file_type (j_compress_ptr cinfo, FILE *infile)
+select_file_type (j_compress_ptr cinfo, FILE * infile)
 {
   int c;
 
@@ -138,9 +137,9 @@ select_file_type (j_compress_ptr cinfo, FILE *infile)
  */
 
 
-static const char *progname;    /* program name for error messages */
-static char *outfilename;       /* for -outfile switch */
-boolean memdst;                 /* for -memdst switch */
+static const char * progname;   /* program name for error messages */
+static char * outfilename;      /* for -outfile switch */
+boolean memdst;  /* for -memdst switch */
 
 
 LOCAL(void)
@@ -155,8 +154,7 @@ usage (void)
 #endif
 
   fprintf(stderr, "Switches (names may be abbreviated):\n");
-  fprintf(stderr, "  -quality N[,...]   Compression quality (0..100; 5-95 is most useful range,\n");
-  fprintf(stderr, "                     default is 75)\n");
+  fprintf(stderr, "  -quality N[,...]   Compression quality (0..100; 5-95 is useful range)\n");
   fprintf(stderr, "  -grayscale     Create monochrome JPEG file\n");
   fprintf(stderr, "  -rgb           Create RGB JPEG file\n");
 #ifdef ENTROPY_OPT_SUPPORTED
@@ -220,14 +218,14 @@ parse_switches (j_compress_ptr cinfo, int argc, char **argv,
  */
 {
   int argn;
-  char *arg;
+  char * arg;
   boolean force_baseline;
   boolean simple_progressive;
-  char *qualityarg = NULL;      /* saves -quality parm if any */
-  char *qtablefile = NULL;      /* saves -qtables filename if any */
-  char *qslotsarg = NULL;       /* saves -qslots parm if any */
-  char *samplearg = NULL;       /* saves -sample parm if any */
-  char *scansarg = NULL;        /* saves -scans parm if any */
+  char * qualityarg = NULL;     /* saves -quality parm if any */
+  char * qtablefile = NULL;     /* saves -qtables filename if any */
+  char * qslotsarg = NULL;      /* saves -qslots parm if any */
+  char * samplearg = NULL;      /* saves -sample parm if any */
+  char * scansarg = NULL;       /* saves -scans parm if any */
 
   /* Set up default JPEG parameters. */
 
@@ -495,8 +493,8 @@ main (int argc, char **argv)
 #endif
   int file_index;
   cjpeg_source_ptr src_mgr;
-  FILE *input_file;
-  FILE *output_file = NULL;
+  FILE * input_file;
+  FILE * output_file = NULL;
   unsigned char *outbuffer = NULL;
   unsigned long outsize = 0;
   JDIMENSION num_scanlines;

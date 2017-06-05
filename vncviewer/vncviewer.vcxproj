@@ -829,7 +829,7 @@ copy "$(LocalDebuggerCommand)" ..\..\..\..\files\vncviewer64.exe</Command>
       <Project>{e8ba959f-b652-4bab-9ea7-8e9fc8d7f39c}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\zlib-1.2.11\contrib\vstudio\vc10\zlibstat.vcxproj">
+    <ProjectReference Include="..\zlib-1.2.5\contrib\vstudio\vc10\zlibstat.vcxproj">
       <Project>{745dec58-ebb3-47a9-a9b8-4c6627c01bf8}</Project>
     </ProjectReference>
     <ProjectReference Include="omnithread\omnithread.vcxproj">

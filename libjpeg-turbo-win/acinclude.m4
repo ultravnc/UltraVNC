@@ -3,11 +3,8 @@
 # Check that NASM exists and determine flags
 AC_DEFUN([AC_PROG_NASM],[
 
-AC_ARG_VAR(NASM, [NASM command (used to build the x86/x86-64 SIMD code)])
-if test "x$NASM" = "x"; then
-  AC_CHECK_PROGS(NASM, [nasm nasmw yasm])
-  test -z "$NASM" && AC_MSG_ERROR([no nasm (Netwide Assembler) found])
-fi
+AC_CHECK_PROGS(NASM, [nasm nasmw yasm])
+test -z "$NASM" && AC_MSG_ERROR([no nasm (Netwide Assembler) found])
 
 AC_MSG_CHECKING([for object file format of host system])
 case "$host_os" in
@@ -222,20 +219,16 @@ AC_DEFUN([AC_CHECK_COMPATIBLE_ARM64_ASSEMBLER_IFELSE],[
   CC="$CCAS"
   AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
     .text
-    MYVAR .req x0
-    movi v0.16b, #100
-    mov MYVAR, #100
-    .unreq MYVAR]])], ac_good_gnu_arm_assembler=yes)
+    .arch armv8-a+fp+simd
+    movi v0.16b, #100]])], ac_good_gnu_arm_assembler=yes)
 
   ac_use_gas_preprocessor=no
   if test "x$ac_good_gnu_arm_assembler" = "xno" ; then
     CC="gas-preprocessor.pl $CCAS"
     AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
       .text
-      MYVAR .req x0
-      movi v0.16b, #100
-      mov MYVAR, #100
-      .unreq MYVAR]])], ac_use_gas_preprocessor=yes)
+      .arch armv8-a+fp+simd
+      movi v0.16b, #100]])], ac_use_gas_preprocessor=yes)
   fi
   CFLAGS="$ac_save_CFLAGS"
   CC="$ac_save_CC"

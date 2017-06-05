@@ -5,8 +5,7 @@
  * Copyright (C) 1991-1994, Thomas G. Lane.
  * It was modified by The libjpeg-turbo Project to include only code relevant
  * to libjpeg-turbo.
- * For conditions of distribution and use, see the accompanying README.ijg
- * file.
+ * For conditions of distribution and use, see the accompanying README file.
  *
  * This file exists to provide a single place to fix any problems with
  * including the wrong system include files.  (Common problems are taken

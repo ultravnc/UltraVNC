@@ -93,24 +93,23 @@ build_triplet = @build@
 host_triplet = @host@
 @WITH_TURBOJPEG_TRUE@am__append_1 = libturbojpeg.la
 @WITH_TURBOJPEG_TRUE@am__append_2 = turbojpeg.h
-@WITH_TURBOJPEG_TRUE@am__append_3 = pkgscripts/libturbojpeg.pc
-@WITH_ARITH_TRUE@am__append_4 = jaricom.c
-@WITH_ARITH_ENC_TRUE@am__append_5 = jcarith.c
-@WITH_ARITH_DEC_TRUE@am__append_6 = jdarith.c
-@WITH_JAVA_TRUE@@WITH_TURBOJPEG_TRUE@am__append_7 = turbojpeg-jni.c
-@VERSION_SCRIPT_TRUE@@WITH_TURBOJPEG_TRUE@am__append_8 = $(VERSION_SCRIPT_FLAG)$(srcdir)/$(TJMAPFILE)
-@VERSION_SCRIPT_TRUE@am__append_9 = $(VERSION_SCRIPT_FLAG)libjpeg.map
-@WITH_SIMD_TRUE@am__append_10 = simd
-@WITH_SIMD_FALSE@am__append_11 = jsimd_none.c
+@WITH_ARITH_TRUE@am__append_3 = jaricom.c
+@WITH_ARITH_ENC_TRUE@am__append_4 = jcarith.c
+@WITH_ARITH_DEC_TRUE@am__append_5 = jdarith.c
+@WITH_JAVA_TRUE@@WITH_TURBOJPEG_TRUE@am__append_6 = turbojpeg-jni.c
+@VERSION_SCRIPT_TRUE@@WITH_TURBOJPEG_TRUE@am__append_7 = $(VERSION_SCRIPT_FLAG)$(srcdir)/$(TJMAPFILE)
+@VERSION_SCRIPT_TRUE@am__append_8 = $(VERSION_SCRIPT_FLAG)libjpeg.map
+@WITH_SIMD_TRUE@am__append_9 = simd
+@WITH_SIMD_FALSE@am__append_10 = jsimd_none.c
 bin_PROGRAMS = cjpeg$(EXEEXT) djpeg$(EXEEXT) jpegtran$(EXEEXT) \
 	rdjpgcom$(EXEEXT) wrjpgcom$(EXEEXT) $(am__EXEEXT_1)
 noinst_PROGRAMS = jcstest$(EXEEXT) $(am__EXEEXT_2)
-@WITH_TURBOJPEG_TRUE@am__append_12 = tjbench
-@WITH_TURBOJPEG_TRUE@am__append_13 = tjunittest
-@WITH_12BIT_FALSE@am__append_14 = rdbmp.c rdtarga.c
-@WITH_12BIT_FALSE@am__append_15 = -DBMP_SUPPORTED -DTARGA_SUPPORTED
-@WITH_12BIT_FALSE@am__append_16 = wrbmp.c wrtarga.c
-@WITH_12BIT_FALSE@am__append_17 = -DBMP_SUPPORTED -DTARGA_SUPPORTED
+@WITH_TURBOJPEG_TRUE@am__append_11 = tjbench
+@WITH_TURBOJPEG_TRUE@am__append_12 = tjunittest
+@WITH_12BIT_FALSE@am__append_13 = rdbmp.c rdtarga.c
+@WITH_12BIT_FALSE@am__append_14 = -DBMP_SUPPORTED -DTARGA_SUPPORTED
+@WITH_12BIT_FALSE@am__append_15 = wrbmp.c wrtarga.c
+@WITH_12BIT_FALSE@am__append_16 = -DBMP_SUPPORTED -DTARGA_SUPPORTED
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
@@ -127,8 +126,7 @@ CONFIG_HEADER = config.h jconfig.h jconfigint.h
 CONFIG_CLEAN_FILES = pkgscripts/libjpeg-turbo.spec.tmpl \
 	pkgscripts/makecygwinpkg.tmpl pkgscripts/makedpkg.tmpl \
 	pkgscripts/makemacpkg.tmpl pkgscripts/uninstall.tmpl \
-	pkgscripts/libjpeg.pc pkgscripts/libturbojpeg.pc tjbenchtest \
-	tjbenchtest.java tjexampletest libjpeg.map
+	tjbenchtest tjbenchtest.java tjexampletest libjpeg.map
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -159,8 +157,8 @@ am__uninstall_files_from_dir = { \
   }
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
 	"$(DESTDIR)$(man1dir)" "$(DESTDIR)$(docdir)" \
-	"$(DESTDIR)$(exampledir)" "$(DESTDIR)$(pkgconfigdir)" \
-	"$(DESTDIR)$(includedir)" "$(DESTDIR)$(includedir)"
+	"$(DESTDIR)$(exampledir)" "$(DESTDIR)$(includedir)" \
+	"$(DESTDIR)$(includedir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 @WITH_SIMD_TRUE@libjpeg_la_DEPENDENCIES = simd/libsimd.la
 am__libjpeg_la_SOURCES_DIST = jchuff.h jdct.h jdhuff.h jerror.h \
@@ -375,7 +373,7 @@ am__can_run_installinfo = \
 man1dir = $(mandir)/man1
 NROFF = nroff
 MANS = $(dist_man1_MANS)
-DATA = $(dist_doc_DATA) $(dist_example_DATA) $(pkgconfig_DATA)
+DATA = $(dist_doc_DATA) $(dist_example_DATA)
 am__include_HEADERS_DIST = jerror.h jmorecfg.h jpeglib.h turbojpeg.h
 HEADERS = $(include_HEADERS) $(nodist_include_HEADERS)
 RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
@@ -414,13 +412,11 @@ am__DIST_COMMON = $(dist_man1_MANS) $(srcdir)/Makefile.in \
 	$(srcdir)/tjbenchtest.in $(srcdir)/tjbenchtest.java.in \
 	$(srcdir)/tjexampletest.in \
 	$(top_srcdir)/release/libjpeg-turbo.spec.in \
-	$(top_srcdir)/release/libjpeg.pc.in \
-	$(top_srcdir)/release/libturbojpeg.pc.in \
 	$(top_srcdir)/release/makecygwinpkg.in \
 	$(top_srcdir)/release/makedpkg.in \
 	$(top_srcdir)/release/makemacpkg.in \
-	$(top_srcdir)/release/uninstall.in ar-lib compile config.guess \
-	config.sub depcomp install-sh ltmain.sh missing
+	$(top_srcdir)/release/uninstall.in README ar-lib compile \
+	config.guess config.sub depcomp install-sh ltmain.sh missing
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -539,7 +535,6 @@ PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 PKGNAME = @PKGNAME@
-PKG_CONFIG = @PKG_CONFIG@
 RANLIB = @RANLIB@
 RPMARCH = @RPMARCH@
 RPM_CONFIG_ARGS = @RPM_CONFIG_ARGS@
@@ -608,13 +603,11 @@ top_srcdir = @top_srcdir@
 lib_LTLIBRARIES = libjpeg.la $(am__append_1)
 libjpeg_la_LDFLAGS = -version-info \
 	${LIBTOOL_CURRENT}:${SO_MINOR_VERSION}:${SO_AGE} -no-undefined \
-	$(am__append_9)
+	$(am__append_8)
 include_HEADERS = jerror.h jmorecfg.h jpeglib.h $(am__append_2)
 @WITH_TURBOJPEG_TRUE@libturbojpeg_la_LDFLAGS = -version-info 1:0:1 \
-@WITH_TURBOJPEG_TRUE@	-no-undefined $(am__append_8)
+@WITH_TURBOJPEG_TRUE@	-no-undefined $(am__append_7)
 nodist_include_HEADERS = jconfig.h
-pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = pkgscripts/libjpeg.pc $(am__append_3)
 HDRS = jchuff.h jdct.h jdhuff.h jerror.h jinclude.h jmemsys.h jmorecfg.h \
 	jpegint.h jpeglib.h jversion.h jsimd.h jsimddct.h jpegcomp.h \
 	jpeg_nbits_table.h
@@ -627,13 +620,13 @@ libjpeg_la_SOURCES = $(HDRS) jcapimin.c jcapistd.c jccoefct.c \
 	jdmarker.c jdmaster.c jdmerge.c jdphuff.c jdpostct.c \
 	jdsample.c jdtrans.c jerror.c jfdctflt.c jfdctfst.c jfdctint.c \
 	jidctflt.c jidctfst.c jidctint.c jidctred.c jquant1.c \
-	jquant2.c jutils.c jmemmgr.c jmemnobs.c $(am__append_4) \
-	$(am__append_5) $(am__append_6) $(am__append_11)
-SUBDIRS = java $(am__append_10) md5
+	jquant2.c jutils.c jmemmgr.c jmemnobs.c $(am__append_3) \
+	$(am__append_4) $(am__append_5) $(am__append_10)
+SUBDIRS = java $(am__append_9) md5
 @WITH_TURBOJPEG_TRUE@libturbojpeg_la_SOURCES = $(libjpeg_la_SOURCES) \
 @WITH_TURBOJPEG_TRUE@	turbojpeg.c turbojpeg.h transupp.c \
 @WITH_TURBOJPEG_TRUE@	transupp.h jdatadst-tj.c jdatasrc-tj.c \
-@WITH_TURBOJPEG_TRUE@	$(am__append_7) $(TJMAPFILE)
+@WITH_TURBOJPEG_TRUE@	$(am__append_6) $(TJMAPFILE)
 @WITH_JAVA_TRUE@@WITH_TURBOJPEG_TRUE@libturbojpeg_la_CFLAGS = ${JNI_CFLAGS}
 @WITH_JAVA_FALSE@@WITH_TURBOJPEG_TRUE@TJMAPFILE = turbojpeg-mapfile
 @WITH_JAVA_TRUE@@WITH_TURBOJPEG_TRUE@TJMAPFILE = turbojpeg-mapfile.jni
@@ -647,13 +640,13 @@ SUBDIRS = java $(am__append_10) md5
 @WITH_TURBOJPEG_TRUE@tjunittest_SOURCES = tjunittest.c tjutil.h tjutil.c
 @WITH_TURBOJPEG_TRUE@tjunittest_LDADD = libturbojpeg.la
 cjpeg_SOURCES = cdjpeg.h cderror.h cdjpeg.c cjpeg.c rdgif.c rdppm.c \
-	rdswitch.c $(am__append_14)
+	rdswitch.c $(am__append_13)
 cjpeg_LDADD = libjpeg.la
-cjpeg_CFLAGS = -DGIF_SUPPORTED -DPPM_SUPPORTED $(am__append_15)
+cjpeg_CFLAGS = -DGIF_SUPPORTED -DPPM_SUPPORTED $(am__append_14)
 djpeg_SOURCES = cdjpeg.h cderror.h cdjpeg.c djpeg.c rdcolmap.c \
-	rdswitch.c wrgif.c wrppm.c $(am__append_16)
+	rdswitch.c wrgif.c wrppm.c $(am__append_15)
 djpeg_LDADD = libjpeg.la
-djpeg_CFLAGS = -DGIF_SUPPORTED -DPPM_SUPPORTED $(am__append_17)
+djpeg_CFLAGS = -DGIF_SUPPORTED -DPPM_SUPPORTED $(am__append_16)
 jpegtran_SOURCES = jpegtran.c rdswitch.c cdjpeg.c transupp.c transupp.h
 jpegtran_LDADD = libjpeg.la
 rdjpgcom_SOURCES = rdjpgcom.c
@@ -663,19 +656,18 @@ wrjpgcom_LDADD = libjpeg.la
 jcstest_SOURCES = jcstest.c
 jcstest_LDADD = libjpeg.la
 dist_man1_MANS = cjpeg.1 djpeg.1 jpegtran.1 rdjpgcom.1 wrjpgcom.1
-DOCS = coderules.txt jconfig.txt change.log rdrle.c wrrle.c BUILDING.md \
-	ChangeLog.md
+DOCS = coderules.txt jconfig.txt change.log rdrle.c wrrle.c BUILDING.txt \
+	ChangeLog.txt
 
-dist_doc_DATA = README.ijg README.md libjpeg.txt structure.txt usage.txt \
-	wizard.txt LICENSE.md
+dist_doc_DATA = README README-turbo.txt libjpeg.txt structure.txt usage.txt \
+	wizard.txt
 
 exampledir = $(docdir)
 dist_example_DATA = example.c
 EXTRA_DIST = win release $(DOCS) testimages CMakeLists.txt \
 	sharedlib/CMakeLists.txt cmakescripts libjpeg.map.in doc doxygen.config \
 	doxygen-extra.css jccolext.c jdcolext.c jdcol565.c jdmrgext.c jdmrg565.c \
-	jstdhuff.c jdcoefct.h jdmainct.h jdmaster.h jdsample.h wrppm.h \
-	md5/CMakeLists.txt
+	jstdhuff.c LICENSE.txt
 
 @WITH_12BIT_FALSE@TESTORIG = testorig.jpg
 @WITH_12BIT_TRUE@TESTORIG = testorig12.jpg
@@ -703,7 +695,7 @@ EXTRA_DIST = win release $(DOCS) testimages CMakeLists.txt \
 @WITH_12BIT_TRUE@MD5_PPM_GRAY_ISLOW_RGB = e96ee81c30a6ed422d466338bd3de65d
 @WITH_12BIT_FALSE@MD5_JPEG_420S_IFAST_OPT = 388708217ac46273ca33086b22827ed8
 @WITH_12BIT_TRUE@MD5_JPEG_420S_IFAST_OPT = 7af8e60be4d9c227ec63ac9b6630855e
-# See README.md for more details on why this next bit is necessary.
+# See README-turbo.txt for more details on why this next bit is necessary.
 @WITH_12BIT_FALSE@MD5_JPEG_3x2_FLOAT_PROG_SSE = 343e3f8caf8af5986ebaf0bdc13b5c71
 @WITH_12BIT_TRUE@MD5_JPEG_3x2_FLOAT_PROG_SSE = a8c17daf77b457725ec929e215b603f8
 @WITH_12BIT_FALSE@MD5_PPM_3x2_FLOAT_SSE = 1a75f36e5904d6fc3a85a43da9ad89bb
@@ -742,14 +734,6 @@ EXTRA_DIST = win release $(DOCS) testimages CMakeLists.txt \
 @WITH_12BIT_TRUE@MD5_PPM_420M_ISLOW_1_4 = 35fd59d866e44659edfa3c18db2a3edb
 @WITH_12BIT_FALSE@MD5_PPM_420M_ISLOW_1_8 = 391b3d4aca640c8567d6f8745eb2142f
 @WITH_12BIT_TRUE@MD5_PPM_420M_ISLOW_1_8 = ccaed48ac0aedefda5d4abe4013f4ad7
-@WITH_12BIT_FALSE@MD5_PPM_420_ISLOW_SKIP15_31 = c4c65c1e43d7275cd50328a61e6534f0
-@WITH_12BIT_TRUE@MD5_PPM_420_ISLOW_SKIP15_31 = 86664cd9dc956536409e44e244d20a97
-@WITH_12BIT_FALSE@MD5_PPM_420_ISLOW_PROG_CROP62x62_71_71 = 26eb36ccc7d1f0cb80cdabb0ac8b5d99
-@WITH_12BIT_TRUE@MD5_PPM_420_ISLOW_PROG_CROP62x62_71_71 = 452a21656115a163029cfba5c04fa76a
-@WITH_12BIT_FALSE@MD5_PPM_444_ISLOW_SKIP1_6 = 5606f86874cf26b8fcee1117a0a436a6
-@WITH_12BIT_TRUE@MD5_PPM_444_ISLOW_SKIP1_6 = ef63901f71ef7a75cd78253fc0914f84
-@WITH_12BIT_FALSE@MD5_PPM_444_ISLOW_PROG_CROP98x98_13_13 = db87dc7ce26bcdc7a6b56239ce2b9d6c
-@WITH_12BIT_TRUE@MD5_PPM_444_ISLOW_PROG_CROP98x98_13_13 = 15b173fb5872d9575572fbcc1b05956f
 @WITH_12BIT_FALSE@MD5_JPEG_CROP = b4197f377e621c4e9b1d20471432610d
 @WITH_12BIT_TRUE@MD5_JPEG_CROP = cdb35ff4b4519392690ea040c56ea99c
 @WITH_12BIT_FALSE@MD5_BMP_RGB_ISLOW_565 = f07d2e75073e4bb10f6c6f4d36e2e3be
@@ -767,9 +751,6 @@ EXTRA_DIST = win release $(DOCS) testimages CMakeLists.txt \
 @WITH_12BIT_FALSE@MD5_BMP_420_ISLOW_565D = 6bde71526acc44bcff76f696df8638d2
 @WITH_12BIT_FALSE@MD5_BMP_420M_ISLOW_565 = 8dc0185245353cfa32ad97027342216f
 @WITH_12BIT_FALSE@MD5_BMP_420M_ISLOW_565D = d1be3a3339166255e76fa50a0d70d73e
-@WITH_12BIT_FALSE@MD5_PPM_420_ISLOW_ARI_SKIP16_139 = 087c6b123db16ac00cb88c5b590bb74a
-@WITH_12BIT_FALSE@MD5_PPM_420_ISLOW_ARI_CROP53x53_4_4 = 886c6775af22370257122f8b16207e6d
-@WITH_12BIT_FALSE@MD5_PPM_444_ISLOW_ARI_CROP37x37_0_0 = cb57b32bd6d03e35432362f7bf184b6d
 @WITH_TURBOJPEG_TRUE@MD5_PPM_GRAY_TILE = 89d3ca21213d9d864b50b4e4e7de4ca6
 @WITH_TURBOJPEG_TRUE@MD5_PPM_420_8x8_TILE = 847fceab15c5b7b911cb986cf0f71de3
 @WITH_TURBOJPEG_TRUE@MD5_PPM_420_16x16_TILE = ca45552a93687e078f7137cc4126a7b0
@@ -864,10 +845,6 @@ pkgscripts/makedpkg.tmpl: $(top_builddir)/config.status $(top_srcdir)/release/ma
 pkgscripts/makemacpkg.tmpl: $(top_builddir)/config.status $(top_srcdir)/release/makemacpkg.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 pkgscripts/uninstall.tmpl: $(top_builddir)/config.status $(top_srcdir)/release/uninstall.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-pkgscripts/libjpeg.pc: $(top_builddir)/config.status $(top_srcdir)/release/libjpeg.pc.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-pkgscripts/libturbojpeg.pc: $(top_builddir)/config.status $(top_srcdir)/release/libturbojpeg.pc.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 tjbenchtest: $(top_builddir)/config.status $(srcdir)/tjbenchtest.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
@@ -1957,27 +1934,6 @@ uninstall-dist_exampleDATA:
 	@list='$(dist_example_DATA)'; test -n "$(exampledir)" || list=; \
 	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
 	dir='$(DESTDIR)$(exampledir)'; $(am__uninstall_files_from_dir)
-install-pkgconfigDATA: $(pkgconfig_DATA)
-	@$(NORMAL_INSTALL)
-	@list='$(pkgconfig_DATA)'; test -n "$(pkgconfigdir)" || list=; \
-	if test -n "$$list"; then \
-	  echo " $(MKDIR_P) '$(DESTDIR)$(pkgconfigdir)'"; \
-	  $(MKDIR_P) "$(DESTDIR)$(pkgconfigdir)" || exit 1; \
-	fi; \
-	for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  echo "$$d$$p"; \
-	done | $(am__base_list) | \
-	while read files; do \
-	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(pkgconfigdir)'"; \
-	  $(INSTALL_DATA) $$files "$(DESTDIR)$(pkgconfigdir)" || exit $$?; \
-	done
-
-uninstall-pkgconfigDATA:
-	@$(NORMAL_UNINSTALL)
-	@list='$(pkgconfig_DATA)'; test -n "$(pkgconfigdir)" || list=; \
-	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
-	dir='$(DESTDIR)$(pkgconfigdir)'; $(am__uninstall_files_from_dir)
 install-includeHEADERS: $(include_HEADERS)
 	@$(NORMAL_INSTALL)
 	@list='$(include_HEADERS)'; test -n "$(includedir)" || list=; \
@@ -2325,7 +2281,7 @@ install-binPROGRAMS: install-libLTLIBRARIES
 
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man1dir)" "$(DESTDIR)$(docdir)" "$(DESTDIR)$(exampledir)" "$(DESTDIR)$(pkgconfigdir)" "$(DESTDIR)$(includedir)" "$(DESTDIR)$(includedir)"; do \
+	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man1dir)" "$(DESTDIR)$(docdir)" "$(DESTDIR)$(exampledir)" "$(DESTDIR)$(includedir)" "$(DESTDIR)$(includedir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-recursive
@@ -2384,7 +2340,7 @@ info-am:
 
 install-data-am: install-dist_docDATA install-dist_exampleDATA \
 	install-includeHEADERS install-man \
-	install-nodist_includeHEADERS install-pkgconfigDATA
+	install-nodist_includeHEADERS
 
 install-dvi: install-dvi-recursive
 
@@ -2435,7 +2391,7 @@ ps-am:
 uninstall-am: uninstall-binPROGRAMS uninstall-dist_docDATA \
 	uninstall-dist_exampleDATA uninstall-includeHEADERS \
 	uninstall-libLTLIBRARIES uninstall-man \
-	uninstall-nodist_includeHEADERS uninstall-pkgconfigDATA
+	uninstall-nodist_includeHEADERS
 
 uninstall-man: uninstall-man1
 
@@ -2456,16 +2412,15 @@ uninstall-man: uninstall-man1
 	install-html install-html-am install-includeHEADERS \
 	install-info install-info-am install-libLTLIBRARIES \
 	install-man install-man1 install-nodist_includeHEADERS \
-	install-pdf install-pdf-am install-pkgconfigDATA install-ps \
-	install-ps-am install-strip installcheck installcheck-am \
-	installdirs installdirs-am maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags tags-am uninstall uninstall-am uninstall-binPROGRAMS \
-	uninstall-dist_docDATA uninstall-dist_exampleDATA \
-	uninstall-includeHEADERS uninstall-libLTLIBRARIES \
-	uninstall-man uninstall-man1 uninstall-nodist_includeHEADERS \
-	uninstall-pkgconfigDATA
+	install-pdf install-pdf-am install-ps install-ps-am \
+	install-strip installcheck installcheck-am installdirs \
+	installdirs-am maintainer-clean maintainer-clean-generic \
+	mostlyclean mostlyclean-compile mostlyclean-generic \
+	mostlyclean-libtool pdf pdf-am ps ps-am tags tags-am uninstall \
+	uninstall-am uninstall-binPROGRAMS uninstall-dist_docDATA \
+	uninstall-dist_exampleDATA uninstall-includeHEADERS \
+	uninstall-libLTLIBRARIES uninstall-man uninstall-man1 \
+	uninstall-nodist_includeHEADERS
 
 .PRECIOUS: Makefile
 
@@ -2476,8 +2431,7 @@ dist-hook:
 .PHONY: test
 test: tjquicktest tjbittest bittest
 
-@CROSS_COMPILING_TRUE@tjquicktest: testclean
-@CROSS_COMPILING_FALSE@tjquicktest: testclean all
+tjquicktest: testclean all
 
 @WITH_JAVA_TRUE@@WITH_TURBOJPEG_TRUE@	$(JAVA) -cp java/turbojpeg.jar -Djava.library.path=.libs TJUnitTest
 @WITH_JAVA_TRUE@@WITH_TURBOJPEG_TRUE@	$(JAVA) -cp java/turbojpeg.jar -Djava.library.path=.libs TJUnitTest -bi
@@ -2492,8 +2446,7 @@ test: tjquicktest tjbittest bittest
 @WITH_TURBOJPEG_TRUE@	./tjunittest -yuv -noyuvpad
 	echo GREAT SUCCESS!
 
-@CROSS_COMPILING_TRUE@tjbittest: testclean
-@CROSS_COMPILING_FALSE@tjbittest: testclean all
+tjbittest: testclean all
 
 # Test compressing from/decompressing to an arbitrary subregion of a larger
 # image buffer
@@ -2515,7 +2468,7 @@ test: tjquicktest tjbittest bittest
 @WITH_TURBOJPEG_TRUE@	for i in 8 16 32 64 128; do \
 @WITH_TURBOJPEG_TRUE@		md5/md5cmp $(MD5_PPM_444_TILE) testout_tile_444_Q95_$$i\x$$i.ppm; \
 @WITH_TURBOJPEG_TRUE@	done
-@WITH_TURBOJPEG_TRUE@	rm -f testout_tile_GRAY_* testout_tile_420_* testout_tile_422_* testout_tile_444_*
+@WITH_TURBOJPEG_TRUE@	rm testout_tile_GRAY_* testout_tile_420_* testout_tile_422_* testout_tile_444_*
 
 @WITH_TURBOJPEG_TRUE@	./tjbench testout_tile.ppm 95 -rgb -fastupsample -quiet -tile -benchtime 0.01 >/dev/null 2>&1
 @WITH_TURBOJPEG_TRUE@	md5/md5cmp $(MD5_PPM_420M_8x8_TILE) testout_tile_420_Q95_8x8.ppm
@@ -2526,11 +2479,10 @@ test: tjquicktest tjbittest bittest
 @WITH_TURBOJPEG_TRUE@	for i in 16 32 64 128; do \
 @WITH_TURBOJPEG_TRUE@		md5/md5cmp $(MD5_PPM_422M_TILE) testout_tile_422_Q95_$$i\x$$i.ppm; \
 @WITH_TURBOJPEG_TRUE@	done
-@WITH_TURBOJPEG_TRUE@	rm -f testout_tile_GRAY_* testout_tile_420_* testout_tile_422_* testout_tile_444_* testout_tile.ppm
+@WITH_TURBOJPEG_TRUE@	rm testout_tile_GRAY_* testout_tile_420_* testout_tile_422_* testout_tile_444_* testout_tile.ppm
 @WITH_TURBOJPEG_TRUE@	echo GREAT SUCCESS!
 
-@CROSS_COMPILING_TRUE@bittest: testclean
-@CROSS_COMPILING_FALSE@bittest: testclean all
+bittest: testclean all
 
 # These tests are carefully crafted to provide full coverage of as many of the
 # underlying algorithms as possible (including all of the SIMD-accelerated
@@ -2542,16 +2494,16 @@ test: tjquicktest tjbittest bittest
 # CC: null  SAMP: fullsize  IDCT: islow  ENT: huff
 	./djpeg -dct int -ppm -outfile testout_rgb_islow.ppm testout_rgb_islow.jpg
 	md5/md5cmp $(MD5_PPM_RGB_ISLOW) testout_rgb_islow.ppm
-	rm -f testout_rgb_islow.ppm
-@WITH_12BIT_TRUE@	rm -f testout_rgb_islow.jpg
+	rm testout_rgb_islow.ppm
+@WITH_12BIT_TRUE@	rm testout_rgb_islow.jpg
 # CC: RGB->RGB565  SAMP: fullsize  IDCT: islow  ENT: huff
 @WITH_12BIT_FALSE@	./djpeg -dct int -rgb565 -dither none -bmp -outfile testout_rgb_islow_565.bmp testout_rgb_islow.jpg
 @WITH_12BIT_FALSE@	md5/md5cmp $(MD5_BMP_RGB_ISLOW_565) testout_rgb_islow_565.bmp
-@WITH_12BIT_FALSE@	rm -f testout_rgb_islow_565.bmp
+@WITH_12BIT_FALSE@	rm testout_rgb_islow_565.bmp
 # CC: RGB->RGB565 (dithered)  SAMP: fullsize  IDCT: islow  ENT: huff
 @WITH_12BIT_FALSE@	./djpeg -dct int -rgb565 -bmp -outfile testout_rgb_islow_565D.bmp testout_rgb_islow.jpg
 @WITH_12BIT_FALSE@	md5/md5cmp $(MD5_BMP_RGB_ISLOW_565D) testout_rgb_islow_565D.bmp
-@WITH_12BIT_FALSE@	rm -f testout_rgb_islow_565D.bmp testout_rgb_islow.jpg
+@WITH_12BIT_FALSE@	rm testout_rgb_islow_565D.bmp testout_rgb_islow.jpg
 
 # CC: RGB->YCC  SAMP: fullsize/h2v1  FDCT: ifast  ENT: 2-pass huff
 	./cjpeg -sample 2x1 -dct fast -opt -outfile testout_422_ifast_opt.jpg $(srcdir)/testimages/testorig.ppm
@@ -2559,20 +2511,20 @@ test: tjquicktest tjbittest bittest
 # CC: YCC->RGB  SAMP: fullsize/h2v1 fancy  IDCT: ifast  ENT: huff
 	./djpeg -dct fast -outfile testout_422_ifast.ppm testout_422_ifast_opt.jpg
 	md5/md5cmp $(MD5_PPM_422_IFAST) testout_422_ifast.ppm
-	rm -f testout_422_ifast.ppm
+	rm testout_422_ifast.ppm
 # CC: YCC->RGB  SAMP: h2v1 merged  IDCT: ifast  ENT: huff
 	./djpeg -dct fast -nosmooth -outfile testout_422m_ifast.ppm testout_422_ifast_opt.jpg
 	md5/md5cmp $(MD5_PPM_422M_IFAST) testout_422m_ifast.ppm
-	rm -f testout_422m_ifast.ppm
-@WITH_12BIT_TRUE@	rm -f testout_422_ifast_opt.jpg
+	rm testout_422m_ifast.ppm
+@WITH_12BIT_TRUE@	rm testout_422_ifast_opt.jpg
 # CC: YCC->RGB565  SAMP: h2v1 merged  IDCT: ifast  ENT: huff
 @WITH_12BIT_FALSE@	./djpeg -dct int -nosmooth -rgb565 -dither none -bmp -outfile testout_422m_ifast_565.bmp testout_422_ifast_opt.jpg
 @WITH_12BIT_FALSE@	md5/md5cmp $(MD5_BMP_422M_IFAST_565) testout_422m_ifast_565.bmp
-@WITH_12BIT_FALSE@	rm -f testout_422m_ifast_565.bmp
+@WITH_12BIT_FALSE@	rm testout_422m_ifast_565.bmp
 # CC: YCC->RGB565 (dithered)  SAMP: h2v1 merged  IDCT: ifast  ENT: huff
 @WITH_12BIT_FALSE@	./djpeg -dct int -nosmooth -rgb565 -bmp -outfile testout_422m_ifast_565D.bmp testout_422_ifast_opt.jpg
 @WITH_12BIT_FALSE@	md5/md5cmp $(MD5_BMP_422M_IFAST_565D) testout_422m_ifast_565D.bmp
-@WITH_12BIT_FALSE@	rm -f testout_422m_ifast_565D.bmp testout_422_ifast_opt.jpg
+@WITH_12BIT_FALSE@	rm testout_422m_ifast_565D.bmp testout_422_ifast_opt.jpg
 
 # CC: RGB->YCC  SAMP: fullsize/h2v2  FDCT: ifast  ENT: prog huff
 	./cjpeg -sample 2x2 -quality 100 -dct fast -prog -outfile testout_420_q100_ifast_prog.jpg $(srcdir)/testimages/testorig.ppm
@@ -2580,11 +2532,11 @@ test: tjquicktest tjbittest bittest
 # CC: YCC->RGB  SAMP: fullsize/h2v2 fancy  IDCT: ifast  ENT: prog huff
 	./djpeg -dct fast -outfile testout_420_q100_ifast.ppm testout_420_q100_ifast_prog.jpg
 	md5/md5cmp $(MD5_PPM_420_Q100_IFAST) testout_420_q100_ifast.ppm
-	rm -f testout_420_q100_ifast.ppm
+	rm testout_420_q100_ifast.ppm
 # CC: YCC->RGB  SAMP: h2v2 merged  IDCT: ifast  ENT: prog huff
 	./djpeg -dct fast -nosmooth -outfile testout_420m_q100_ifast.ppm testout_420_q100_ifast_prog.jpg
 	md5/md5cmp $(MD5_PPM_420M_Q100_IFAST) testout_420m_q100_ifast.ppm
-	rm -f testout_420m_q100_ifast.ppm testout_420_q100_ifast_prog.jpg
+	rm testout_420m_q100_ifast.ppm testout_420_q100_ifast_prog.jpg
 
 # CC: RGB->Gray  SAMP: fullsize  FDCT: islow  ENT: huff
 	./cjpeg -gray -dct int -outfile testout_gray_islow.jpg $(srcdir)/testimages/testorig.ppm
@@ -2592,33 +2544,32 @@ test: tjquicktest tjbittest bittest
 # CC: Gray->Gray  SAMP: fullsize  IDCT: islow  ENT: huff
 	./djpeg -dct int -outfile testout_gray_islow.ppm testout_gray_islow.jpg
 	md5/md5cmp $(MD5_PPM_GRAY_ISLOW) testout_gray_islow.ppm
-	rm -f testout_gray_islow.ppm
+	rm testout_gray_islow.ppm
 # CC: Gray->RGB  SAMP: fullsize  IDCT: islow  ENT: huff
 	./djpeg -dct int -rgb -outfile testout_gray_islow_rgb.ppm testout_gray_islow.jpg
 	md5/md5cmp $(MD5_PPM_GRAY_ISLOW_RGB) testout_gray_islow_rgb.ppm
-	rm -f testout_gray_islow_rgb.ppm
-@WITH_12BIT_TRUE@	rm -f testout_gray_islow.jpg
+	rm testout_gray_islow_rgb.ppm
+@WITH_12BIT_TRUE@	rm testout_gray_islow.jpg
 # CC: Gray->RGB565  SAMP: fullsize  IDCT: islow  ENT: huff
 @WITH_12BIT_FALSE@	./djpeg -dct int -rgb565 -dither none -bmp -outfile testout_gray_islow_565.bmp testout_gray_islow.jpg
 @WITH_12BIT_FALSE@	md5/md5cmp $(MD5_BMP_GRAY_ISLOW_565) testout_gray_islow_565.bmp
-@WITH_12BIT_FALSE@	rm -f testout_gray_islow_565.bmp
+@WITH_12BIT_FALSE@	rm testout_gray_islow_565.bmp
 # CC: Gray->RGB565 (dithered)  SAMP: fullsize  IDCT: islow  ENT: huff
 @WITH_12BIT_FALSE@	./djpeg -dct int -rgb565 -bmp -outfile testout_gray_islow_565D.bmp testout_gray_islow.jpg
 @WITH_12BIT_FALSE@	md5/md5cmp $(MD5_BMP_GRAY_ISLOW_565D) testout_gray_islow_565D.bmp
-@WITH_12BIT_FALSE@	rm -f testout_gray_islow_565D.bmp testout_gray_islow.jpg
+@WITH_12BIT_FALSE@	rm testout_gray_islow_565D.bmp testout_gray_islow.jpg
 
 # CC: RGB->YCC  SAMP: fullsize smooth/h2v2 smooth  FDCT: islow
 # ENT: 2-pass huff
 	./cjpeg -sample 2x2 -smooth 1 -dct int -opt -outfile testout_420s_ifast_opt.jpg $(srcdir)/testimages/testorig.ppm
 	md5/md5cmp $(MD5_JPEG_420S_IFAST_OPT) testout_420s_ifast_opt.jpg
-	rm -f testout_420s_ifast_opt.jpg
+	rm testout_420s_ifast_opt.jpg
 
 # The output of the floating point tests is not validated by default, because
 # the output differs depending on the type of floating point math used, and
 # this is only deterministic if the DCT/IDCT are implemented using SIMD
 # instructions on a particular platform.  Pass one of the following on the make
-# command line to validate the floating point tests against one of the expected
-# results:
+# command line to validate the floating point tests against one of the expected # results:
 #
 # FLOATTEST=sse  validate against the expected results from the libjpeg-turbo
 #                SSE SIMD extensions
@@ -2645,7 +2596,7 @@ test: tjquicktest tjbittest bittest
 	elif [ "${FLOATTEST}" = "64bit" ]; then \
 		md5/md5cmp $(MD5_PPM_3x2_FLOAT_64BIT) testout_3x2_float.ppm; \
 	fi
-	rm -f testout_3x2_float.ppm testout_3x2_float_prog.jpg
+	rm testout_3x2_float.ppm testout_3x2_float_prog.jpg
 
 # CC: RGB->YCC  SAMP: fullsize/int  FDCT: ifast  ENT: prog huff
 	./cjpeg -sample 3x2 -dct fast -prog -outfile testout_3x2_ifast_prog.jpg $(srcdir)/testimages/testorig.ppm
@@ -2653,136 +2604,99 @@ test: tjquicktest tjbittest bittest
 # CC: YCC->RGB  SAMP: fullsize/int  IDCT: ifast  ENT: prog huff
 	./djpeg -dct fast -outfile testout_3x2_ifast.ppm testout_3x2_ifast_prog.jpg
 	md5/md5cmp $(MD5_PPM_3x2_IFAST) testout_3x2_ifast.ppm
-	rm -f testout_3x2_ifast.ppm testout_3x2_ifast_prog.jpg
+	rm testout_3x2_ifast.ppm testout_3x2_ifast_prog.jpg
 
 # CC: YCC->RGB  SAMP: fullsize/h2v2  FDCT: islow  ENT: arith
 @WITH_ARITH_ENC_TRUE@	./cjpeg -dct int -arithmetic -outfile testout_420_islow_ari.jpg $(srcdir)/testimages/testorig.ppm
 @WITH_ARITH_ENC_TRUE@	md5/md5cmp $(MD5_JPEG_420_ISLOW_ARI) testout_420_islow_ari.jpg
-@WITH_ARITH_ENC_TRUE@	rm -f testout_420_islow_ari.jpg
+@WITH_ARITH_ENC_TRUE@	rm testout_420_islow_ari.jpg
 @WITH_ARITH_ENC_TRUE@	./jpegtran -arithmetic -outfile testout_420_islow_ari.jpg $(srcdir)/testimages/testimgint.jpg
 @WITH_ARITH_ENC_TRUE@	md5/md5cmp $(MD5_JPEG_420_ISLOW_ARI) testout_420_islow_ari.jpg
-@WITH_ARITH_ENC_TRUE@	rm -f testout_420_islow_ari.jpg
+@WITH_ARITH_ENC_TRUE@	rm testout_420_islow_ari.jpg
 # CC: YCC->RGB  SAMP: fullsize  FDCT: islow  ENT: prog arith
-@WITH_ARITH_ENC_TRUE@	./cjpeg -sample 1x1 -dct int -prog -arithmetic -outfile testout_444_islow_progari.jpg $(srcdir)/testimages/testorig.ppm
+@WITH_ARITH_ENC_TRUE@	./cjpeg -sample 1x1 -dct int -progressive -arithmetic -outfile testout_444_islow_progari.jpg $(srcdir)/testimages/testorig.ppm
 @WITH_ARITH_ENC_TRUE@	md5/md5cmp $(MD5_JPEG_444_ISLOW_PROGARI) testout_444_islow_progari.jpg
-@WITH_ARITH_ENC_TRUE@	rm -f testout_444_islow_progari.jpg
+@WITH_ARITH_ENC_TRUE@	rm testout_444_islow_progari.jpg
 # CC: RGB->YCC  SAMP: h2v2 merged  IDCT: ifast  ENT: arith
 @WITH_ARITH_DEC_TRUE@	./djpeg -fast -ppm -outfile testout_420m_ifast_ari.ppm $(srcdir)/testimages/testimgari.jpg
 @WITH_ARITH_DEC_TRUE@	md5/md5cmp $(MD5_PPM_420M_IFAST_ARI) testout_420m_ifast_ari.ppm
-@WITH_ARITH_DEC_TRUE@	rm -f testout_420m_ifast_ari.ppm
+@WITH_ARITH_DEC_TRUE@	rm testout_420m_ifast_ari.ppm
 @WITH_ARITH_DEC_TRUE@	./jpegtran -outfile testout_420_islow.jpg $(srcdir)/testimages/testimgari.jpg
 @WITH_ARITH_DEC_TRUE@	md5/md5cmp $(MD5_JPEG_420_ISLOW) testout_420_islow.jpg
-@WITH_ARITH_DEC_TRUE@	rm -f testout_420_islow.jpg
+@WITH_ARITH_DEC_TRUE@	rm testout_420_islow.jpg
 
 # CC: YCC->RGB  SAMP: h2v2 merged  IDCT: 16x16 islow  ENT: huff
 	./djpeg -dct int -scale 2/1 -nosmooth -ppm -outfile testout_420m_islow_2_1.ppm $(srcdir)/testimages/$(TESTORIG)
 	md5/md5cmp $(MD5_PPM_420M_ISLOW_2_1) testout_420m_islow_2_1.ppm
-	rm -f testout_420m_islow_2_1.ppm
+	rm testout_420m_islow_2_1.ppm
 # CC: YCC->RGB  SAMP: h2v2 merged  IDCT: 15x15 islow  ENT: huff
 	./djpeg -dct int -scale 15/8 -nosmooth -ppm -outfile testout_420m_islow_15_8.ppm $(srcdir)/testimages/$(TESTORIG)
 	md5/md5cmp $(MD5_PPM_420M_ISLOW_15_8) testout_420m_islow_15_8.ppm
-	rm -f testout_420m_islow_15_8.ppm
+	rm testout_420m_islow_15_8.ppm
 # CC: YCC->RGB  SAMP: h2v2 merged  IDCT: 13x13 islow  ENT: huff
 	./djpeg -dct int -scale 13/8 -nosmooth -ppm -outfile testout_420m_islow_13_8.ppm $(srcdir)/testimages/$(TESTORIG)
 	md5/md5cmp $(MD5_PPM_420M_ISLOW_13_8) testout_420m_islow_13_8.ppm
-	rm -f testout_420m_islow_13_8.ppm
+	rm testout_420m_islow_13_8.ppm
 # CC: YCC->RGB  SAMP: h2v2 merged  IDCT: 11x11 islow  ENT: huff
 	./djpeg -dct int -scale 11/8 -nosmooth -ppm -outfile testout_420m_islow_11_8.ppm $(srcdir)/testimages/$(TESTORIG)
 	md5/md5cmp $(MD5_PPM_420M_ISLOW_11_8) testout_420m_islow_11_8.ppm
-	rm -f testout_420m_islow_11_8.ppm
+	rm testout_420m_islow_11_8.ppm
 # CC: YCC->RGB  SAMP: h2v2 merged  IDCT: 9x9 islow  ENT: huff
 	./djpeg -dct int -scale 9/8 -nosmooth -ppm -outfile testout_420m_islow_9_8.ppm $(srcdir)/testimages/$(TESTORIG)
 	md5/md5cmp $(MD5_PPM_420M_ISLOW_9_8) testout_420m_islow_9_8.ppm
-	rm -f testout_420m_islow_9_8.ppm
+	rm testout_420m_islow_9_8.ppm
 # CC: YCC->RGB  SAMP: h2v2 merged  IDCT: 7x7 islow/14x14 islow  ENT: huff
 	./djpeg -dct int -scale 7/8 -nosmooth -ppm -outfile testout_420m_islow_7_8.ppm $(srcdir)/testimages/$(TESTORIG)
 	md5/md5cmp $(MD5_PPM_420M_ISLOW_7_8) testout_420m_islow_7_8.ppm
-	rm -f testout_420m_islow_7_8.ppm
+	rm testout_420m_islow_7_8.ppm
 # CC: YCC->RGB  SAMP: h2v2 merged  IDCT: 6x6 islow/12x12 islow  ENT: huff
 	./djpeg -dct int -scale 3/4 -nosmooth -ppm -outfile testout_420m_islow_3_4.ppm $(srcdir)/testimages/$(TESTORIG)
 	md5/md5cmp $(MD5_PPM_420M_ISLOW_3_4) testout_420m_islow_3_4.ppm
-	rm -f testout_420m_islow_3_4.ppm
+	rm testout_420m_islow_3_4.ppm
 # CC: YCC->RGB  SAMP: h2v2 merged  IDCT: 5x5 islow/10x10 islow  ENT: huff
 	./djpeg -dct int -scale 5/8 -nosmooth -ppm -outfile testout_420m_islow_5_8.ppm $(srcdir)/testimages/$(TESTORIG)
 	md5/md5cmp $(MD5_PPM_420M_ISLOW_5_8) testout_420m_islow_5_8.ppm
-	rm -f testout_420m_islow_5_8.ppm
+	rm testout_420m_islow_5_8.ppm
 # CC: YCC->RGB  SAMP: h2v2 merged  IDCT: 4x4 islow/8x8 islow  ENT: huff
 	./djpeg -dct int -scale 1/2 -nosmooth -ppm -outfile testout_420m_islow_1_2.ppm $(srcdir)/testimages/$(TESTORIG)
 	md5/md5cmp $(MD5_PPM_420M_ISLOW_1_2) testout_420m_islow_1_2.ppm
-	rm -f testout_420m_islow_1_2.ppm
+	rm testout_420m_islow_1_2.ppm
 # CC: YCC->RGB  SAMP: h2v2 merged  IDCT: 3x3 islow/6x6 islow  ENT: huff
 	./djpeg -dct int -scale 3/8 -nosmooth -ppm -outfile testout_420m_islow_3_8.ppm $(srcdir)/testimages/$(TESTORIG)
 	md5/md5cmp $(MD5_PPM_420M_ISLOW_3_8) testout_420m_islow_3_8.ppm
-	rm -f testout_420m_islow_3_8.ppm
+	rm testout_420m_islow_3_8.ppm
 # CC: YCC->RGB  SAMP: h2v2 merged  IDCT: 2x2 islow/4x4 islow  ENT: huff
 	./djpeg -dct int -scale 1/4 -nosmooth -ppm -outfile testout_420m_islow_1_4.ppm $(srcdir)/testimages/$(TESTORIG)
 	md5/md5cmp $(MD5_PPM_420M_ISLOW_1_4) testout_420m_islow_1_4.ppm
-	rm -f testout_420m_islow_1_4.ppm
+	rm testout_420m_islow_1_4.ppm
 # CC: YCC->RGB  SAMP: h2v2 merged  IDCT: 1x1 islow/2x2 islow  ENT: huff
 	./djpeg -dct int -scale 1/8 -nosmooth -ppm -outfile testout_420m_islow_1_8.ppm $(srcdir)/testimages/$(TESTORIG)
 	md5/md5cmp $(MD5_PPM_420M_ISLOW_1_8) testout_420m_islow_1_8.ppm
-	rm -f testout_420m_islow_1_8.ppm
+	rm testout_420m_islow_1_8.ppm
 # CC: YCC->RGB (dithered)  SAMP: h2v2 fancy  IDCT: islow  ENT: huff
 @WITH_12BIT_FALSE@	./djpeg -dct int -colors 256 -bmp -outfile testout_420_islow_256.bmp $(srcdir)/testimages/$(TESTORIG)
 @WITH_12BIT_FALSE@	md5/md5cmp $(MD5_BMP_420_ISLOW_256) testout_420_islow_256.bmp
-@WITH_12BIT_FALSE@	rm -f testout_420_islow_256.bmp
+@WITH_12BIT_FALSE@	rm testout_420_islow_256.bmp
 # CC: YCC->RGB565  SAMP: h2v2 fancy  IDCT: islow  ENT: huff
 @WITH_12BIT_FALSE@	./djpeg -dct int -rgb565 -dither none -bmp -outfile testout_420_islow_565.bmp $(srcdir)/testimages/$(TESTORIG)
 @WITH_12BIT_FALSE@	md5/md5cmp $(MD5_BMP_420_ISLOW_565) testout_420_islow_565.bmp
-@WITH_12BIT_FALSE@	rm -f testout_420_islow_565.bmp
+@WITH_12BIT_FALSE@	rm testout_420_islow_565.bmp
 # CC: YCC->RGB565 (dithered)  SAMP: h2v2 fancy  IDCT: islow  ENT: huff
 @WITH_12BIT_FALSE@	./djpeg -dct int -rgb565 -bmp -outfile testout_420_islow_565D.bmp $(srcdir)/testimages/$(TESTORIG)
 @WITH_12BIT_FALSE@	md5/md5cmp $(MD5_BMP_420_ISLOW_565D) testout_420_islow_565D.bmp
-@WITH_12BIT_FALSE@	rm -f testout_420_islow_565D.bmp
+@WITH_12BIT_FALSE@	rm testout_420_islow_565D.bmp
 # CC: YCC->RGB565  SAMP: h2v2 merged  IDCT: islow  ENT: huff
 @WITH_12BIT_FALSE@	./djpeg -dct int -nosmooth -rgb565 -dither none -bmp -outfile testout_420m_islow_565.bmp $(srcdir)/testimages/$(TESTORIG)
 @WITH_12BIT_FALSE@	md5/md5cmp $(MD5_BMP_420M_ISLOW_565) testout_420m_islow_565.bmp
-@WITH_12BIT_FALSE@	rm -f testout_420m_islow_565.bmp
+@WITH_12BIT_FALSE@	rm testout_420m_islow_565.bmp
 # CC: YCC->RGB565 (dithered)  SAMP: h2v2 merged  IDCT: islow  ENT: huff
 @WITH_12BIT_FALSE@	./djpeg -dct int -nosmooth -rgb565 -bmp -outfile testout_420m_islow_565D.bmp $(srcdir)/testimages/$(TESTORIG)
 @WITH_12BIT_FALSE@	md5/md5cmp $(MD5_BMP_420M_ISLOW_565D) testout_420m_islow_565D.bmp
-@WITH_12BIT_FALSE@	rm -f testout_420m_islow_565D.bmp
-
-# Partial decode tests.  These tests are designed to cover all of the possible
-# code paths in jpeg_skip_scanlines().
-
-# Context rows: Yes  Intra-iMCU row: Yes  iMCU row prefetch: No   ENT: huff
-	./djpeg -dct int -skip 15,31 -ppm -outfile testout_420_islow_skip15,31.ppm $(srcdir)/testimages/$(TESTORIG)
-	md5/md5cmp $(MD5_PPM_420_ISLOW_SKIP15_31) testout_420_islow_skip15,31.ppm
-	rm -f testout_420_islow_skip15,31.ppm
-# Context rows: Yes  Intra-iMCU row: No   iMCU row prefetch: Yes  ENT: arith
-@WITH_ARITH_DEC_TRUE@	./djpeg -dct int -skip 16,139 -ppm -outfile testout_420_islow_ari_skip16,139.ppm $(srcdir)/testimages/testimgari.jpg
-@WITH_ARITH_DEC_TRUE@	md5/md5cmp $(MD5_PPM_420_ISLOW_ARI_SKIP16_139) testout_420_islow_ari_skip16,139.ppm
-@WITH_ARITH_DEC_TRUE@	rm -f testout_420_islow_ari_skip16,139.ppm
-# Context rows: Yes  Intra-iMCU row: No   iMCU row prefetch: No   ENT: prog huff
-	./cjpeg -dct int -prog -outfile testout_420_islow_prog.jpg $(srcdir)/testimages/testorig.ppm
-	./djpeg -dct int -crop 62x62+71+71 -ppm -outfile testout_420_islow_prog_crop62x62,71,71.ppm testout_420_islow_prog.jpg
-	md5/md5cmp $(MD5_PPM_420_ISLOW_PROG_CROP62x62_71_71) testout_420_islow_prog_crop62x62,71,71.ppm
-	rm -f testout_420_islow_prog_crop62x62,71,71.ppm testout_420_islow_prog.jpg
-# Context rows: Yes  Intra-iMCU row: No   iMCU row prefetch: No   ENT: arith
-@WITH_ARITH_DEC_TRUE@	./djpeg -dct int -crop 53x53+4+4 -ppm -outfile testout_420_islow_ari_crop53x53,4,4.ppm $(srcdir)/testimages/testimgari.jpg
-@WITH_ARITH_DEC_TRUE@	md5/md5cmp $(MD5_PPM_420_ISLOW_ARI_CROP53x53_4_4) testout_420_islow_ari_crop53x53,4,4.ppm
-@WITH_ARITH_DEC_TRUE@	rm -f testout_420_islow_ari_crop53x53,4,4.ppm
-# Context rows: No   Intra-iMCU row: Yes  ENT: huff
-	./cjpeg -dct int -sample 1x1 -outfile testout_444_islow.jpg $(srcdir)/testimages/testorig.ppm
-	./djpeg -dct int -skip 1,6 -ppm -outfile testout_444_islow_skip1,6.ppm testout_444_islow.jpg
-	md5/md5cmp $(MD5_PPM_444_ISLOW_SKIP1_6) testout_444_islow_skip1,6.ppm
-	rm -f testout_444_islow_skip1,6.ppm testout_444_islow.jpg
-# Context rows: No   Intra-iMCU row: No   ENT: prog huff
-	./cjpeg -dct int -prog -sample 1x1 -outfile testout_444_islow_prog.jpg $(srcdir)/testimages/testorig.ppm
-	./djpeg -dct int -crop 98x98+13+13 -ppm -outfile testout_444_islow_prog_crop98x98,13,13.ppm testout_444_islow_prog.jpg
-	md5/md5cmp $(MD5_PPM_444_ISLOW_PROG_CROP98x98_13_13) testout_444_islow_prog_crop98x98,13,13.ppm
-	rm -f testout_444_islow_prog_crop98x98,13,13.ppm testout_444_islow_prog.jpg
-# Context rows: No   Intra-iMCU row: No   ENT: arith
-@WITH_ARITH_ENC_TRUE@	./cjpeg -dct int -arithmetic -sample 1x1 -outfile testout_444_islow_ari.jpg $(srcdir)/testimages/testorig.ppm
-@WITH_ARITH_DEC_TRUE@@WITH_ARITH_ENC_TRUE@	./djpeg -dct int -crop 37x37+0+0 -ppm -outfile testout_444_islow_ari_crop37x37,0,0.ppm testout_444_islow_ari.jpg
-@WITH_ARITH_DEC_TRUE@@WITH_ARITH_ENC_TRUE@	md5/md5cmp $(MD5_PPM_444_ISLOW_ARI_CROP37x37_0_0) testout_444_islow_ari_crop37x37,0,0.ppm
-@WITH_ARITH_DEC_TRUE@@WITH_ARITH_ENC_TRUE@	rm -f testout_444_islow_ari_crop37x37,0,0.ppm
-@WITH_ARITH_ENC_TRUE@	rm -f testout_444_islow_ari.jpg
+@WITH_12BIT_FALSE@	rm testout_420m_islow_565D.bmp
 
 	./jpegtran -crop 120x90+20+50 -transpose -perfect -outfile testout_crop.jpg $(srcdir)/testimages/$(TESTORIG)
 	md5/md5cmp $(MD5_JPEG_CROP) testout_crop.jpg
-	rm -f testout_crop.jpg
+	rm testout_crop.jpg
 	echo GREAT SUCCESS!
 
 testclean:
@@ -2885,10 +2799,10 @@ pkgscripts/makemacpkg: pkgscripts/makemacpkg.tmpl
 @X86_64_TRUE@	sh pkgscripts/makemacpkg -build32 ${BUILDDIR32}
 
 @X86_64_TRUE@iosdmg: all pkgscripts/makemacpkg pkgscripts/uninstall
-@X86_64_TRUE@	sh pkgscripts/makemacpkg -build32 ${BUILDDIR32} -buildarmv7 ${BUILDDIRARMV7} -buildarmv7s ${BUILDDIRARMV7S} -buildarmv8 ${BUILDDIRARMV8} -lipo "${LIPO}"
+@X86_64_TRUE@	sh pkgscripts/makemacpkg -build32 ${BUILDDIR32} -buildarmv6 ${BUILDDIRARMV6} -buildarmv7 ${BUILDDIRARMV7} -buildarmv7s ${BUILDDIRARMV7S} -buildarmv8 ${BUILDDIRARMV8} -lipo "${LIPO}"
 
 @X86_64_FALSE@iosdmg: all pkgscripts/makemacpkg pkgscripts/uninstall
-@X86_64_FALSE@	sh pkgscripts/makemacpkg -buildarmv7 ${BUILDDIRARMV7} -buildarmv7s ${BUILDDIRARMV7S} -buildarmv8 ${BUILDDIRARMV8} -lipo "${LIPO}"
+@X86_64_FALSE@	sh pkgscripts/makemacpkg -buildarmv6 ${BUILDDIRARMV6} -buildarmv7 ${BUILDDIRARMV7} -buildarmv7s ${BUILDDIRARMV7S} -buildarmv8 ${BUILDDIRARMV8} -lipo "${LIPO}"
 
 dmg: all pkgscripts/makemacpkg pkgscripts/uninstall
 	sh pkgscripts/makemacpkg

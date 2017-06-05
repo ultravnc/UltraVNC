@@ -642,7 +642,6 @@ BOOL CALLBACK TextChat::TextChatDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM wParam,
 	case WM_DESTROY:
 		// _this->SendTextChatRequest(_this, CHAT_FINISHED);
 		EndDialog(hWnd, FALSE);
-		_this->m_fTextChatRunning = false;
 		return TRUE;
 	}
 	return 0;

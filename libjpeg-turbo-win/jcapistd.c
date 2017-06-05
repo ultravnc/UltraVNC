@@ -3,8 +3,7 @@
  *
  * Copyright (C) 1994-1996, Thomas G. Lane.
  * This file is part of the Independent JPEG Group's software.
- * For conditions of distribution and use, see the accompanying README.ijg
- * file.
+ * For conditions of distribution and use, see the accompanying README file.
  *
  * This file contains application interface code for the compression half
  * of the JPEG library.  These are the "standard" API routines that are

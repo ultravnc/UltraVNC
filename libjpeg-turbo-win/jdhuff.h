@@ -4,16 +4,13 @@
  * This file was part of the Independent JPEG Group's software:
  * Copyright (C) 1991-1997, Thomas G. Lane.
  * libjpeg-turbo Modifications:
- * Copyright (C) 2010-2011, 2015-2016, D. R. Commander.
- * For conditions of distribution and use, see the accompanying README.ijg
- * file.
+ * Copyright (C) 2010-2011, D. R. Commander.
+ * For conditions of distribution and use, see the accompanying README file.
  *
  * This file contains declarations for Huffman entropy decoding routines
  * that are shared between the sequential decoder (jdhuff.c) and the
  * progressive decoder (jdphuff.c).  No other modules need to see these.
  */
-
-#include "jconfigint.h"
 
 
 /* Derived data constructed for each Huffman table */
@@ -22,9 +19,9 @@
 
 typedef struct {
   /* Basic tables: (element [0] of each array is unused) */
-  JLONG maxcode[18];            /* largest code of length k (-1 if none) */
+  INT32 maxcode[18];            /* largest code of length k (-1 if none) */
   /* (maxcode[17] is a sentinel to ensure jpeg_huff_decode terminates) */
-  JLONG valoffset[18];          /* huffval[] offset for codes of length k */
+  INT32 valoffset[18];          /* huffval[] offset for codes of length k */
   /* valoffset[k] = huffval[] index of 1st symbol of code length k, less
    * the smallest code of length k; so given a code of length k, the
    * corresponding symbol is huffval[code + valoffset[k]]
@@ -76,12 +73,12 @@ EXTERN(void) jpeg_make_d_derived_tbl
 
 #if SIZEOF_SIZE_T==8 || defined(_WIN64)
 
-typedef size_t bit_buf_type;            /* type of bit-extraction buffer */
+typedef size_t bit_buf_type;    /* type of bit-extraction buffer */
 #define BIT_BUF_SIZE  64                /* size of buffer in bits */
 
 #else
 
-typedef unsigned long bit_buf_type;     /* type of bit-extraction buffer */
+typedef INT32 bit_buf_type;     /* type of bit-extraction buffer */
 #define BIT_BUF_SIZE  32                /* size of buffer in bits */
 
 #endif
@@ -101,7 +98,7 @@ typedef struct {                /* Bitreading state saved across MCUs */
 typedef struct {                /* Bitreading working state within an MCU */
   /* Current data source location */
   /* We need a copy, rather than munging the original, in case of suspension */
-  const JOCTET *next_input_byte; /* => next byte to read from source */
+  const JOCTET * next_input_byte; /* => next byte to read from source */
   size_t bytes_in_buffer;       /* # of bytes remaining in source buffer */
   /* Bit input buffer --- note these values are kept in register variables,
    * not in this struct, inside the inner loops.
@@ -166,7 +163,7 @@ typedef struct {                /* Bitreading working state within an MCU */
 
 /* Load up the bit buffer to a depth of at least nbits */
 EXTERN(boolean) jpeg_fill_bit_buffer
-        (bitread_working_state *state, register bit_buf_type get_buffer,
+        (bitread_working_state * state, register bit_buf_type get_buffer,
          register int bits_left, int nbits);
 
 
@@ -230,5 +227,5 @@ slowlabel: \
 
 /* Out-of-line case for Huffman code fetching */
 EXTERN(int) jpeg_huff_decode
-        (bitread_working_state *state, register bit_buf_type get_buffer,
-         register int bits_left, d_derived_tbl *htbl, int min_bits);
+        (bitread_working_state * state, register bit_buf_type get_buffer,
+         register int bits_left, d_derived_tbl * htbl, int min_bits);

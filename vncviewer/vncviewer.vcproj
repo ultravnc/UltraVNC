@@ -425,7 +425,7 @@
 		/>
 		<ProjectReference
 			ReferencedProjectIdentifier="{745DEC58-EBB3-47A9-A9B8-4C6627C01BF8}"
-			RelativePathToProject="..\zlib-1.2.11\contrib\vstudio\vc9\zlibstat.vcproj"
+			RelativePathToProject="..\zlib-1.2.5\contrib\vstudio\vc9\zlibstat.vcproj"
 		/>
 		<ProjectReference
 			ReferencedProjectIdentifier="{AB1CE62F-4A4D-4DAA-831D-5C93AD68F5F1}"

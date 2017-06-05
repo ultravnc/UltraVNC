@@ -4,9 +4,8 @@
  * This file was part of the Independent JPEG Group's software:
  * Copyright (C) 1991-1996, Thomas G. Lane.
  * libjpeg-turbo Modifications:
- * Copyright (C) 2009, 2015, D. R. Commander.
- * For conditions of distribution and use, see the accompanying README.ijg
- * file.
+ * Copyright (C) 2009, D. R. Commander
+ * For conditions of distribution and use, see the accompanying README file.
  *
  * This file contains 1-pass color quantization (color mapping) routines.
  * These routines provide mapping to a fixed color map using equally spaced
@@ -128,8 +127,8 @@ static const UINT8 base_dither_matrix[ODITHER_SIZE][ODITHER_SIZE] = {
 typedef INT16 FSERROR;          /* 16 bits should be enough */
 typedef int LOCFSERROR;         /* use 'int' for calculation temps */
 #else
-typedef JLONG FSERROR;          /* may need more than 16 bits */
-typedef JLONG LOCFSERROR;       /* be sure calculation temps are big enough */
+typedef INT32 FSERROR;          /* may need more than 16 bits */
+typedef INT32 LOCFSERROR;       /* be sure calculation temps are big enough */
 #endif
 
 typedef FSERROR *FSERRPTR;  /* pointer to error array */
@@ -164,7 +163,7 @@ typedef struct {
   boolean on_odd_row;           /* flag to remember which row we are on */
 } my_cquantizer;
 
-typedef my_cquantizer *my_cquantize_ptr;
+typedef my_cquantizer * my_cquantize_ptr;
 
 
 /*
@@ -254,7 +253,7 @@ output_value (j_decompress_ptr cinfo, int ci, int j, int maxj)
    * (Forcing the upper and lower values to the limits ensures that
    * dithering can't produce a color outside the selected gamut.)
    */
-  return (int) (((JLONG) j * MAXJSAMPLE + maxj/2) / maxj);
+  return (int) (((INT32) j * MAXJSAMPLE + maxj/2) / maxj);
 }
 
 
@@ -264,7 +263,7 @@ largest_input_value (j_decompress_ptr cinfo, int ci, int j, int maxj)
 /* Must have largest(j=0) >= 0, and largest(j=maxj) >= MAXJSAMPLE */
 {
   /* Breakpoints are halfway between values returned by output_value */
-  return (int) (((JLONG) (2*j + 1) * MAXJSAMPLE + maxj) / (2*maxj));
+  return (int) (((INT32) (2*j + 1) * MAXJSAMPLE + maxj) / (2*maxj));
 }
 
 
@@ -400,7 +399,7 @@ make_odither_array (j_decompress_ptr cinfo, int ncolors)
 {
   ODITHER_MATRIX_PTR odither;
   int j,k;
-  JLONG num,den;
+  INT32 num,den;
 
   odither = (ODITHER_MATRIX_PTR)
     (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
@@ -410,10 +409,10 @@ make_odither_array (j_decompress_ptr cinfo, int ncolors)
    * (f=0..N-1) should be (N-1-2*f)/(2*N) * MAXJSAMPLE/(ncolors-1).
    * On 16-bit-int machine, be careful to avoid overflow.
    */
-  den = 2 * ODITHER_CELLS * ((JLONG) (ncolors - 1));
+  den = 2 * ODITHER_CELLS * ((INT32) (ncolors - 1));
   for (j = 0; j < ODITHER_SIZE; j++) {
     for (k = 0; k < ODITHER_SIZE; k++) {
-      num = ((JLONG) (ODITHER_CELLS-1 - 2*((int)base_dither_matrix[j][k])))
+      num = ((INT32) (ODITHER_CELLS-1 - 2*((int)base_dither_matrix[j][k])))
             * MAXJSAMPLE;
       /* Ensure round towards zero despite C's lack of consistency
        * about rounding negative values in integer division...
@@ -523,7 +522,7 @@ quantize_ord_dither (j_decompress_ptr cinfo, JSAMPARRAY input_buf,
   register JSAMPROW input_ptr;
   register JSAMPROW output_ptr;
   JSAMPROW colorindex_ci;
-  int *dither;                  /* points to active row of dither matrix */
+  int * dither;                 /* points to active row of dither matrix */
   int row_index, col_index;     /* current indexes into dither matrix */
   int nc = cinfo->out_color_components;
   int ci;
@@ -575,9 +574,9 @@ quantize3_ord_dither (j_decompress_ptr cinfo, JSAMPARRAY input_buf,
   JSAMPROW colorindex0 = cquantize->colorindex[0];
   JSAMPROW colorindex1 = cquantize->colorindex[1];
   JSAMPROW colorindex2 = cquantize->colorindex[2];
-  int *dither0;                 /* points to active row of dither matrix */
-  int *dither1;
-  int *dither2;
+  int * dither0;                /* points to active row of dither matrix */
+  int * dither1;
+  int * dither2;
   int row_index, col_index;     /* current indexes into dither matrix */
   int row;
   JDIMENSION col;

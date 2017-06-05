@@ -68,7 +68,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "&OK",IDOK,8,135,54,16
     CONTROL         IDB_LOGO64,IDC_VNCLOGO,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_SUNKEN,7,5,53,46,WS_EX_TRANSPARENT
-    LTEXT           "UltraVNC Server  1.2.1.4",IDC_VERSION,73,5,145,11
+    LTEXT           "UltraVNC Server  1.2.1.2",IDC_VERSION,73,5,145,11
     LTEXT           "Copyright © 2002-2015 UltraVNC Team\nCopyright © 2001-2002 Sam - eSVNC \nCopyright © 1999-2002 Rudi D. V. - VdaccVNC \nCopyright © 2001 Harakan Software - PalmVNC\nCopyright © 1999-2002 Const. Kaplinsky - TightVNC \n",IDC_NAME,74,27,202,41
     LTEXT           "Pour plus d'informations, faites un tour sur: \nhttp://www.ultravnc.fr",IDC_WWW,74,135,141,19
     LTEXT           "Build:",IDC_BUILDTEXT,74,16,20,10
@@ -354,8 +354,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,2,1,4
- PRODUCTVERSION 1,2,1,4
+ FILEVERSION 1,2,1,2
+ PRODUCTVERSION 1,2,1,2
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x2dL
@@ -373,14 +373,14 @@ BEGIN
             VALUE "Comments", "UltraVNC - Tout contrôler à distance"
             VALUE "CompanyName", "www.ultravnc.fr"
             VALUE "FileDescription", "serveur vnc"
-            VALUE "FileVersion", "1.2.1.4"
+            VALUE "FileVersion", "1.2.1.2"
             VALUE "InternalName", "WinVNC"
             VALUE "LegalCopyright", "Copyright © 2015 UltraVNC"
             VALUE "LegalTrademarks", "VNC"
             VALUE "OriginalFilename", "WinVNC.exe"
-            VALUE "PrivateBuild", "1.2.1.4"
+            VALUE "PrivateBuild", "1.2.1.2"
             VALUE "ProductName", "www.ultravnc.fr"
-            VALUE "ProductVersion", "1.2.1.4"
+            VALUE "ProductVersion", "1.2.1.2"
         END
     END
     BLOCK "VarFileInfo"

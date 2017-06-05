@@ -6,8 +6,7 @@
  * Modified 2003-2010 by Guido Vollbeding.
  * It was modified by The libjpeg-turbo Project to include only code relevant
  * to libjpeg-turbo.
- * For conditions of distribution and use, see the accompanying README.ijg
- * file.
+ * For conditions of distribution and use, see the accompanying README file.
  *
  * This file contains application interface code for the compression half
  * of the JPEG library.  These are the "minimum" API routines that may be
@@ -50,8 +49,8 @@ jpeg_CreateCompress (j_compress_ptr cinfo, int version, size_t structsize)
    * complain here.
    */
   {
-    struct jpeg_error_mgr *err = cinfo->err;
-    void *client_data = cinfo->client_data; /* ignore Purify complaint here */
+    struct jpeg_error_mgr * err = cinfo->err;
+    void * client_data = cinfo->client_data; /* ignore Purify complaint here */
     MEMZERO(cinfo, sizeof(struct jpeg_compress_struct));
     cinfo->err = err;
     cinfo->client_data = client_data;
@@ -134,8 +133,8 @@ GLOBAL(void)
 jpeg_suppress_tables (j_compress_ptr cinfo, boolean suppress)
 {
   int i;
-  JQUANT_TBL *qtbl;
-  JHUFF_TBL *htbl;
+  JQUANT_TBL * qtbl;
+  JHUFF_TBL * htbl;
 
   for (i = 0; i < NUM_QUANT_TBLS; i++) {
     if ((qtbl = cinfo->quant_tbl_ptrs[i]) != NULL)

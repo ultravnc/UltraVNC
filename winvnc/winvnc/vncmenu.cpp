@@ -118,12 +118,6 @@ extern char dnsname[255];
 HWND G_MENU_HWND = NULL;
 extern in6_addr G_LPARAM_IN6;
 
-#ifdef IPV6V4
-const char *inet_ntop2(int af, const void *src, char *dst, socklen_t size);
-int inet_pton2(int af, const char *src, void *dst);
-#endif
-
-
 
 static inline VOID UnloadDM(VOID) 
  { 
@@ -1883,7 +1877,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 					VCard32 ipaddress = VSocket::Resolve6(_this->m_server->AutoReconnectAdr(), &address);
 					char straddr[INET6_ADDRSTRLEN];
 					memset(straddr, 0, INET6_ADDRSTRLEN);
-					PCSTR test = inet_ntop2(AF_INET6, &address, straddr, sizeof(straddr));
+					PCSTR test = inet_ntop(AF_INET6, &address, straddr, sizeof(straddr));
 					if (strlen(straddr) == 0) return 0;
 					nameDup = _strdup(straddr);
 					if (nameDup == 0)
@@ -1900,7 +1894,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 					char straddr[INET6_ADDRSTRLEN];
 					memset(straddr, 0, INET6_ADDRSTRLEN);
 					memcpy(&address, &G_LPARAM_IN6, sizeof(in6_addr));
-					PCSTR test = inet_ntop2(AF_INET6, &address, straddr, sizeof(straddr));
+					PCSTR test = inet_ntop(AF_INET6, &address, straddr, sizeof(straddr));
 					if (strlen(straddr)== 0) return 0;
 					nameDup = _strdup(straddr);
 					if (nameDup == 0) return 0;

@@ -1,12 +1,9 @@
 /*
  * jaricom.c
  *
- * This file was part of the Independent JPEG Group's software:
  * Developed 1997-2009 by Guido Vollbeding.
- * libjpeg-turbo Modifications:
- * Copyright (C) 2015, D. R. Commander.
- * For conditions of distribution and use, see the accompanying README.ijg
- * file.
+ * This file is part of the Independent JPEG Group's software.
+ * For conditions of distribution and use, see the accompanying README file.
  *
  * This file contains probability estimation tables for common use in
  * arithmetic entropy encoding and decoding routines.
@@ -21,7 +18,7 @@
 #include "jpeglib.h"
 
 /* The following #define specifies the packing of the four components
- * into the compact JLONG representation.
+ * into the compact INT32 representation.
  * Note that this formula must match the actual arithmetic encoder
  * and decoder implementation.  The implementation has to be changed
  * if this formula is changed.
@@ -29,9 +26,9 @@
  * implementation (jbig_tab.c).
  */
 
-#define V(i,a,b,c,d) (((JLONG)a << 16) | ((JLONG)c << 8) | ((JLONG)d << 7) | b)
+#define V(i,a,b,c,d) (((INT32)a << 16) | ((INT32)c << 8) | ((INT32)d << 7) | b)
 
-const JLONG jpeg_aritab[113+1] = {
+const INT32 jpeg_aritab[113+1] = {
 /*
  * Index, Qe_Value, Next_Index_LPS, Next_Index_MPS, Switch_MPS
  */

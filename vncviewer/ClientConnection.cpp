@@ -210,55 +210,6 @@ extern char sz_F5[128];
 extern char sz_F6[64];
 extern bool command_line;
 
-#ifdef IPV6V4
-int inet_pton2(int af, const char *src, void *dst)
-{
-	struct sockaddr_storage ss;
-	int size = sizeof(ss);
-	char src_copy[INET6_ADDRSTRLEN + 1];
-
-	ZeroMemory(&ss, sizeof(ss));
-	/* stupid non-const API */
-	strncpy(src_copy, src, INET6_ADDRSTRLEN + 1);
-	src_copy[INET6_ADDRSTRLEN] = 0;
-
-	if (WSAStringToAddress(src_copy, af, NULL, (struct sockaddr *)&ss, &size) == 0) {
-		switch (af) {
-		case AF_INET:
-			*(struct in_addr *)dst = ((struct sockaddr_in *)&ss)->sin_addr;
-			return 1;
-		case AF_INET6:
-			*(struct in6_addr *)dst = ((struct sockaddr_in6 *)&ss)->sin6_addr;
-			return 1;
-		}
-	}
-	return 0;
-}
-
-const char *inet_ntop2(int af, const void *src, char *dst, socklen_t size)
-{
-	struct sockaddr_storage ss;
-	unsigned long s = size;
-
-	ZeroMemory(&ss, sizeof(ss));
-	ss.ss_family = af;
-
-	switch (af) {
-	case AF_INET:
-		((struct sockaddr_in *)&ss)->sin_addr = *(struct in_addr *)src;
-		break;
-	case AF_INET6:
-		((struct sockaddr_in6 *)&ss)->sin6_addr = *(struct in6_addr *)src;
-		break;
-	default:
-		return NULL;
-	}
-	/* cannot direclty use &size because of strict aliasing rules */
-	return (WSAAddressToString((struct sockaddr *)&ss, sizeof(ss), NULL, dst, &s) == 0) ?
-	dst : NULL;
-}
-#endif
-
 // *************************************************************************
 //  A Client connection involves two threads - the main one which sets up
 //  connections and processes window messages and inputs, and a
@@ -595,7 +546,6 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_keepalive_timer = 0;
 	m_idle_timer = 0;
 	m_idle_time = 5000;
-	m_fullupdate_timer = 2999;
 	m_emulate3ButtonsTimer = 0;
 	// adzm 2010-09
 	m_flushMouseMoveTimer = 0;
@@ -1281,7 +1231,7 @@ void ClientConnection::GTGBS_CreateToolbar()
 	RECT r;
 
 	GetClientRect(m_hwndTBwin,&r);
-	/*m_TrafficMonitor = CreateWindowEx(WS_EX_NOPARENTNOTIFY | WS_EX_CLIENTEDGE,
+	m_TrafficMonitor = CreateWindowEx(WS_EX_NOPARENTNOTIFY | WS_EX_CLIENTEDGE,
 											"Static",
 											NULL,
 											WS_CHILD | WS_VISIBLE ,
@@ -1292,22 +1242,19 @@ void ClientConnection::GTGBS_CreateToolbar()
 											m_hwndTBwin,
 											NULL,
 											m_pApp->m_instance,
-											NULL);*/
+											NULL);
 
 	m_bitmapNONE = LoadImage(m_pApp->m_instance,MAKEINTRESOURCE(IDB_STAT_NONE),IMAGE_BITMAP,22,20,LR_SHARED);
 	m_bitmapFRONT = LoadImage(m_pApp->m_instance,MAKEINTRESOURCE(IDB_STAT_FRONT),IMAGE_BITMAP,22,20,LR_SHARED);
 	m_bitmapBACK= LoadImage(m_pApp->m_instance,MAKEINTRESOURCE(IDB_STAT_BACK),IMAGE_BITMAP,22,20,LR_SHARED);
-	if (m_TrafficMonitor)
-	{
-		HDC hdc = GetDC(m_TrafficMonitor);
-		HDC hdcBits;
-		hdcBits = CreateCompatibleDC(hdc);
-		HGDIOBJ hbrOld = SelectObject(hdcBits, m_bitmapNONE);
-		BitBlt(hdc, 0, 0, 22, 22, hdcBits, 0, 0, SRCCOPY);
-		SelectObject(hdcBits, hbrOld);
-		DeleteDC(hdcBits);
-		ReleaseDC(m_TrafficMonitor, hdc);
-	}
+	HDC hdc = GetDC(m_TrafficMonitor);
+	HDC hdcBits;
+	hdcBits = CreateCompatibleDC(hdc);
+	HGDIOBJ hbrOld = SelectObject(hdcBits,m_bitmapNONE);
+	BitBlt(hdc,0,0,22,22,hdcBits,0,0,SRCCOPY);
+	SelectObject(hdcBits,hbrOld);
+	DeleteDC(hdcBits);
+	ReleaseDC(m_TrafficMonitor,hdc);
 
 	///////////////////////////////////////////////////
 	m_logo_wnd = CreateWindow(
@@ -1404,7 +1351,7 @@ void ClientConnection::CreateDisplay()
 	//ShowWindow(m_hwnd, SW_HIDE);
 	//ShowWindow(m_hwndcn, SW_SHOW);
 	//adzm 2009-06-21 - let's not show until connected.
-	SetTimer(m_hwndcn, m_fullupdate_timer, 30000, NULL);
+
 	// record which client created this window
     helper::SafeSetWindowUserData(m_hwndcn, (LONG_PTR)this);
 
@@ -1937,14 +1884,14 @@ void ClientConnection::Connect()
 		if (info->ai_family == AF_INET6)
 		{
 			IsIpv6 = true;
-			inet_pton2(AF_INET6, m_host, &(Ipv6Addr.sin6_addr));
+			inet_pton(AF_INET6, m_host, &(Ipv6Addr.sin6_addr));
 			Ipv6Addr.sin6_family = AF_INET6;
 			Ipv6Addr.sin6_port = htons(m_port);
 		}
 		if (info->ai_family == AF_INET)
 		{
 			IsIpv4 = true;
-			inet_pton2(AF_INET, m_host, &(Ipv4Addr.sin_addr));
+			inet_pton(AF_INET, m_host, &(Ipv4Addr.sin_addr));
 			Ipv4Addr.sin_family = AF_INET;
 			Ipv4Addr.sin_port = htons(m_port);
 		}
@@ -2228,14 +2175,14 @@ void ClientConnection::ConnectProxy()
 		if (info->ai_family == AF_INET6)
 		{
 			IsIpv6 = true;
-			inet_pton2(AF_INET6, m_proxyhost, &(Ipv6Addr.sin6_addr));
+			inet_pton(AF_INET6, m_proxyhost, &(Ipv6Addr.sin6_addr));
 			Ipv6Addr.sin6_family = AF_INET6;
 			Ipv6Addr.sin6_port = htons(m_proxyport);
 		}
 		if (info->ai_family == AF_INET)
 		{
 			IsIpv4 = true;
-			inet_pton2(AF_INET, m_proxyhost, &(Ipv4Addr.sin_addr));
+			inet_pton(AF_INET, m_proxyhost, &(Ipv4Addr.sin_addr));
 			Ipv4Addr.sin_family = AF_INET;
 			Ipv4Addr.sin_port = htons(m_proxyport);
 		}
@@ -6657,7 +6604,7 @@ void ClientConnection::Write(char *buf, int bytes, bool bQueue, bool bTimeout, i
 				vnclog.Print(1, _T("Socket error %d: %s\n"), err, lpMsgBuf);
 				LocalFree( lpMsgBuf );
 				m_running = false;
-				return;
+
 				//throw WarningException(sz_L69);
 			}
 			i += j;
@@ -7257,7 +7204,7 @@ void ClientConnection::GTGBS_CreateDisplay()
 //
 //
 LRESULT CALLBACK ClientConnection::GTGBS_ShowStatusWindow(LPVOID lpParameter)
-{	
+{
 	ClientConnection *_this = (ClientConnection*)lpParameter;
 
 	 _this->m_fStatusOpen = true;
@@ -8166,7 +8113,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						MRU *m_pMRU;
 						m_pMRU = new MRU(SESSION_MRU_KEY_NAME, 26);
 						RECT rect;
-						if (GetWindowRect(hwnd, &rect) != 0 && !IsIconic(hwnd))
+						if (GetWindowRect(hwnd, &rect) !=0)
 							{
 								if (_this->m_opts.m_SavePos && !_this->m_opts.m_SaveSize) m_pMRU->SetPos(_this->m_host, rect.left, rect.top, 0, 0);
 								if (_this->m_opts.m_SavePos && _this->m_opts.m_SaveSize) m_pMRU->SetPos(_this->m_host, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
@@ -8967,9 +8914,6 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 					}
 					else if (wParam == 1013) {
 						_this->SetDormant(2);
-					}
-					else if (wParam ==  2999) {
-						_this->HandleFramebufferUpdateRequest(0x00000000, 0x00000000);
 					}
 #ifdef _Gii
 					else if (wParam == TOUCH_REGISTER_TIMER) {
