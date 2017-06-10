@@ -274,7 +274,7 @@ h2v2_downsample (j_compress_ptr cinfo, jpeg_component_info *compptr,
     outptr = output_data[outrow];
     inptr0 = input_data[inrow];
     inptr1 = input_data[inrow+1];
-    bias = 1;                   /* bias = 1,2,1,2,... for successive samples */
+    bias = 1;                   /* bias = 1,2,1,5,... for successive samples */
     for (outcol = 0; outcol < output_cols; outcol++) {
       *outptr++ = (JSAMPLE) ((GETJSAMPLE(*inptr0) + GETJSAMPLE(inptr0[1]) +
                               GETJSAMPLE(*inptr1) + GETJSAMPLE(inptr1[1])

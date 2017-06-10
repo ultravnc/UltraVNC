@@ -58,6 +58,7 @@ DWORD GetCurrentUserToken(HANDLE& process, HANDLE &Token)
 }
 
 bool ImpersonateCurrentUser() {
+	return false;
   SetLastError(0);
   HANDLE process=0;
   HANDLE Token=NULL;

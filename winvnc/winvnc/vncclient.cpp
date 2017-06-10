@@ -6222,114 +6222,119 @@ void vncClient::FinishFileReception()
 
 bool vncClient::SendFileChunk()
 {
-    bool connected = true;
-	omni_mutex_lock l(GetUpdateLock(),101);
+	bool connected = true;
+	do
+	{
+		connected = true;
+		omni_mutex_lock l(GetUpdateLock(), 101);
 
-	if (!m_fFileUploadRunning) return connected;
-	if ( m_fEof || m_fFileUploadError)
-	{
-		FinishFileSending();
-		return connected;
-	}
-
-	int nRes = ReadFile(m_hSrcFile, m_pBuff, sz_rfbBlockSize, &m_dwNbBytesRead, NULL);
-	if (!nRes && m_dwNbBytesRead != 0)
-	{
-		m_fFileUploadError = true;
-	}
-
-	if (nRes && m_dwNbBytesRead == 0)
-	{
-		m_fEof = true;
-	}
-	else
-	{
-		// sf@2004 - Delta Transfer
-		bool fAlreadyThere = false;
-		unsigned long nCS = 0;
-		// if Checksums are available for this file
-		if (m_lpCSBuffer != NULL)
+		if (!m_fFileUploadRunning) return connected;
+		if (m_fEof || m_fFileUploadError)
 		{
-			if (m_nCSOffset < m_nCSBufferSize)
-			{
-				memcpy(&nCS, &m_lpCSBuffer[m_nCSOffset], 4);
-				if (nCS != 0)
-				{
-					m_nCSOffset += 4;
-					unsigned long cs = adler32(0L, Z_NULL, 0);
-					cs = adler32(cs, (unsigned char*)m_pBuff, (int)m_dwNbBytesRead);
-					if (cs == nCS)
-						fAlreadyThere = true;
-				}
-			}
+			FinishFileSending();
+			return connected;
 		}
 
-		if (fAlreadyThere)
+		int nRes = ReadFile(m_hSrcFile, m_pBuff, sz_rfbBlockSize, &m_dwNbBytesRead, NULL);
+		if (!nRes && m_dwNbBytesRead != 0)
 		{
-			// Send the FileTransferMsg with empty rfbFilePacket
-			rfbFileTransferMsg ft;
-			ft.type = rfbFileTransfer;
-			ft.contentType = rfbFilePacket;
-			ft.size = Swap32IfLE(2); // Means "Empty packet"// Swap32IfLE(nCS); 
-			ft.length = Swap32IfLE(m_dwNbBytesRead);
-			m_socket->SendExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
+			m_fFileUploadError = true;
+		}
+
+		if (nRes && m_dwNbBytesRead == 0)
+		{
+			m_fEof = true;
 		}
 		else
 		{
-			// Compress the data
-			// (Compressed data can be longer if it was already compressed)
-			unsigned int nMaxCompSize = sz_rfbBlockSize + 1024; // TODO: Improve this...
-			bool fCompressed = false;
-			if (m_fCompressionEnabled)
+			// sf@2004 - Delta Transfer
+			bool fAlreadyThere = false;
+			unsigned long nCS = 0;
+			// if Checksums are available for this file
+			if (m_lpCSBuffer != NULL)
 			{
-				int nRetC = compress((unsigned char*)(m_pCompBuff),
-									(unsigned long *)&nMaxCompSize,	
-									(unsigned char*)m_pBuff,
-									m_dwNbBytesRead
-									);
-
-				if (nRetC != 0)
+				if (m_nCSOffset < m_nCSBufferSize)
 				{
-					vnclog.Print(LL_INTINFO, VNCLOG("Compress returned error in File Send :%d\n"), nRetC);
-					// Todo: send data uncompressed instead
-					m_fFileUploadError = true;
-					FinishFileSending();
-					return connected;
+					memcpy(&nCS, &m_lpCSBuffer[m_nCSOffset], 4);
+					if (nCS != 0)
+					{
+						m_nCSOffset += 4;
+						unsigned long cs = adler32(0L, Z_NULL, 0);
+						cs = adler32(cs, (unsigned char*)m_pBuff, (int)m_dwNbBytesRead);
+						if (cs == nCS)
+							fAlreadyThere = true;
+					}
 				}
-				fCompressed = true;
 			}
 
-			// Test if we have to deal with already compressed data
-			if (nMaxCompSize > m_dwNbBytesRead)
-				fCompressed = false;
+			if (fAlreadyThere)
+			{
+				// Send the FileTransferMsg with empty rfbFilePacket
+				rfbFileTransferMsg ft;
+				ft.type = rfbFileTransfer;
+				ft.contentType = rfbFilePacket;
+				ft.size = Swap32IfLE(2); // Means "Empty packet"// Swap32IfLE(nCS); 
+				ft.length = Swap32IfLE(m_dwNbBytesRead);
+				m_socket->SendExactQueue((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
+			}
+			else
+			{
+				// Compress the data
+				// (Compressed data can be longer if it was already compressed)
+				unsigned int nMaxCompSize = sz_rfbBlockSize + 1024; // TODO: Improve this...
+				bool fCompressed = false;
+				if (m_fCompressionEnabled)
+				{
+					int nRetC = compress((unsigned char*)(m_pCompBuff),
+						(unsigned long *)&nMaxCompSize,
+						(unsigned char*)m_pBuff,
+						m_dwNbBytesRead
+					);
+
+					if (nRetC != 0)
+					{
+						vnclog.Print(LL_INTINFO, VNCLOG("Compress returned error in File Send :%d\n"), nRetC);
+						// Todo: send data uncompressed instead
+						m_fFileUploadError = true;
+						FinishFileSending();
+						return connected;
+					}
+					fCompressed = true;
+				}
+
+				// Test if we have to deal with already compressed data
+				if (nMaxCompSize > m_dwNbBytesRead)
+					fCompressed = false;
 				// m_fCompressionEnabled = false;
 
-			rfbFileTransferMsg ft;
+				rfbFileTransferMsg ft;
 
-			ft.type = rfbFileTransfer;
-			ft.contentType = rfbFilePacket;
-			ft.size = fCompressed ? Swap32IfLE(1) : Swap32IfLE(0); 
-			ft.length = fCompressed ? Swap32IfLE(nMaxCompSize) : Swap32IfLE(m_dwNbBytesRead);
+				ft.type = rfbFileTransfer;
+				ft.contentType = rfbFilePacket;
+				ft.size = fCompressed ? Swap32IfLE(1) : Swap32IfLE(0);
+				ft.length = fCompressed ? Swap32IfLE(nMaxCompSize) : Swap32IfLE(m_dwNbBytesRead);
 
-			//adzm 2010-09 - minimize packets. SendExact flushes the queue.
-            connected = VFalse != m_socket->SendExactQueue((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
-            if (connected) {
-			if (fCompressed)
-				connected = VFalse != m_socket->SendExact((char *)m_pCompBuff , nMaxCompSize);
-			else
-				connected = VFalse != m_socket->SendExact((char *)m_pBuff , m_dwNbBytesRead);
+				//adzm 2010-09 - minimize packets. SendExact flushes the queue.
+				connected = VFalse != m_socket->SendExactQueue((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
+				if (connected) {
+					if (fCompressed)
+						connected = VFalse != m_socket->SendExact((char *)m_pCompBuff, nMaxCompSize);
+					else
+						connected = VFalse != m_socket->SendExact((char *)m_pBuff, m_dwNbBytesRead);
+				}
 			}
-            }
-		
-		m_dwTotalNbBytesRead += m_dwNbBytesRead;
-		// TODO : test on nb of bytes written
-	}
-					
-    if (connected)
-    {
-	// Order next asynchronous packet sending
- 	PostToWinVNC( FileTransferSendPacketMessage, (WPARAM)this, (LPARAM)0);
-    }
+
+			m_dwTotalNbBytesRead += m_dwNbBytesRead;
+			// TODO : test on nb of bytes written
+		}
+
+		/*if (connected)
+		{
+			// Order next asynchronous packet sending
+			PostToWinVNC( FileTransferSendPacketMessage, (WPARAM)this, (LPARAM)0);
+		}*/
+	} while (connected);
+
     return connected;
 }
 

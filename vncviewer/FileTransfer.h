@@ -150,7 +150,7 @@ public:
 	static int CALLBACK ListViewLocalCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort); /*TAW*/
 	static int CALLBACK ListViewRemoteCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort); /*TAW*/
 
-	void DisableButtons(HWND hWnd);
+	void DisableButtons(HWND hWnd, bool X = true);
 	void EnableButtons(HWND hWnd);
     void CheckButtonState(HWND hWnd);
 

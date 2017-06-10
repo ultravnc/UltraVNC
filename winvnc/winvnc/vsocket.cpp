@@ -2284,13 +2284,14 @@ int val =0;
 	  {
 		struct fd_set write_fds;
 		struct timeval tm;
+		tm.tv_sec = 1;
+		tm.tv_usec = 0;
+
 		int count;
 		int aa=0;
 		do {
 			FD_ZERO(&write_fds);
-			FD_SET(RemoteSocket, &write_fds);
-			tm.tv_sec = 1;
-			tm.tv_usec = 0;
+			FD_SET(RemoteSocket, &write_fds);			
 			count = select(RemoteSocket+ 1, NULL, &write_fds, NULL, &tm);
 			aa++;
 		} while (count == 0&& !fShutdownOrdered && aa<20);

@@ -5266,7 +5266,7 @@ void* ClientConnection::run_undetached(void* arg) {
 			PostMessage(m_hwndMain, WM_CLOSE, reconnectcounter, 1);
 		}
 
-		if (m_autoReconnect>0 && !m_bKillThread) Sleep(2000);
+		if (m_autoReconnect>0) Sleep(2000);
 	}
 
 	vnclog.Print(4, _T("Update-processing thread finishing\n") );

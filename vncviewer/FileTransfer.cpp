@@ -699,7 +699,7 @@ bool FileTransfer::TestPermission(long lSize, int nVersion)
 		SetDlgItemText(hWnd, IDC_CURR_REMOTE, sz_H1);
 		SetDlgItemText(hWnd, IDC_REMOTE_STATUS, sz_H2);
 		SetStatus(sz_H3);
-		DisableButtons(hWnd);
+		DisableButtons(hWnd, false);
 		ShowWindow(GetDlgItem(hWnd, IDCANCEL), SW_SHOW);
 	}
 	else
@@ -4546,7 +4546,7 @@ BOOL CALLBACK FileTransfer::FTConfirmDlgProc(  HWND hwnd,  UINT uMsg, WPARAM wPa
 //
 //
 //
-void FileTransfer::DisableButtons(HWND hWnd)
+void FileTransfer::DisableButtons(HWND hWnd, bool X)
 {
 	ShowWindow(GetDlgItem(hWnd, IDC_UPLOAD_B), SW_HIDE);
 	ShowWindow(GetDlgItem(hWnd, IDC_DOWNLOAD_B), SW_HIDE);
@@ -4565,10 +4565,12 @@ void FileTransfer::DisableButtons(HWND hWnd)
 	EnableWindow(GetDlgItem(hWnd, IDC_REMOTE_UPB), FALSE);
 
 	// Disable Close Window in in title bar
-	HMENU hMenu = GetSystemMenu(hWnd, 0);
-	int nCount = GetMenuItemCount(hMenu);
-	EnableMenuItem(hMenu, nCount-1, MF_DISABLED|MF_GRAYED | MF_BYPOSITION);
-	EnableMenuItem(hMenu, nCount-2, MF_DISABLED|MF_GRAYED | MF_BYPOSITION);
+	if (X == true) {
+		HMENU hMenu = GetSystemMenu(hWnd, 0);
+		int nCount = GetMenuItemCount(hMenu);
+		EnableMenuItem(hMenu, nCount - 1, MF_DISABLED | MF_GRAYED | MF_BYPOSITION);
+		EnableMenuItem(hMenu, nCount - 2, MF_DISABLED | MF_GRAYED | MF_BYPOSITION);
+	}
 	DrawMenuBar(hWnd);
 
 }
