@@ -470,50 +470,31 @@ vncClientUpdateThread::run_undetached(void *arg)
 	//After 5 sec cont.
 	int esc_counter=0;
 	while (g_DesktopThread_running && m_client->cl_connected)
-	{		
-		/*if (m_client->m_server->AreThereMultipleViewers() == false)
-		{
-			while (!m_client->m_initial_update)
-			{
-				if (!m_client->cl_connected) return 0;
-				esc_counter++;
-				Sleep(50);
-				if (esc_counter > 100) break;
-			}
-		}*/
-		if (!m_client->cl_connected) return 0;
-
-
+	{				
 		{
 			m_client->m_incr_rgn.assign_union(clipregion);
 			omni_mutex_lock l(m_client->GetUpdateLock(),82);
 			// We block as long as updates are disabled, or the client
 			// isn't interested in them, unless this thread is killed.
 
-			if (updates_sent < 1) 
-			{
-			while (m_active && (
-						!m_enable || (
-							m_client->m_update_tracker.get_changed_region().intersect(m_client->m_incr_rgn).is_empty() &&
-							m_client->m_update_tracker.get_copied_region().intersect(m_client->m_incr_rgn).is_empty() &&
-							m_client->m_update_tracker.get_cached_region().intersect(m_client->m_incr_rgn).is_empty() &&
-							// adzm - 2010-07 - Extended clipboard
-							!(m_client->m_clipboard.m_bNeedToProvide || m_client->m_clipboard.m_bNeedToNotify) &&
-							!m_client->m_cursor_pos_changed // nyama/marscha - PointerPos
-							)
-						)
-					) {
-				// Issue the synchronisation signal, to tell other threads
-				// where we have got to
-				m_sync_sig->broadcast();
-				// Wait to be kicked into action
-				m_signal->wait();
-			}
-			}
-			else
-			{
-				while (m_active && (
-						!m_enable || (
+			if (updates_sent < 1)  {
+				while (m_active && (!m_enable || (
+								m_client->m_update_tracker.get_changed_region().intersect(m_client->m_incr_rgn).is_empty() &&
+								m_client->m_update_tracker.get_copied_region().intersect(m_client->m_incr_rgn).is_empty() &&
+								m_client->m_update_tracker.get_cached_region().intersect(m_client->m_incr_rgn).is_empty() &&
+								// adzm - 2010-07 - Extended clipboard
+								!(m_client->m_clipboard.m_bNeedToProvide || m_client->m_clipboard.m_bNeedToNotify) &&
+								!m_client->m_cursor_pos_changed // nyama/marscha - PointerPos
+								))) {
+					// Issue the synchronisation signal, to tell other threads
+					// where we have got to
+					m_sync_sig->broadcast();
+					// Wait to be kicked into action
+					m_signal->wait();
+				}
+			} 
+			else {
+				while (m_active && ( !m_enable || (
 							m_client->m_update_tracker.get_changed_region().intersect(m_client->m_incr_rgn).is_empty() &&
 							m_client->m_update_tracker.get_copied_region().intersect(m_client->m_incr_rgn).is_empty() &&
 							m_client->m_update_tracker.get_cached_region().intersect(m_client->m_incr_rgn).is_empty() &&
@@ -522,44 +503,27 @@ vncClientUpdateThread::run_undetached(void *arg)
 							!(m_client->m_clipboard.m_bNeedToProvide || m_client->m_clipboard.m_bNeedToNotify) &&
 							!m_client->m_NewSWUpdateWaiting &&
 							!m_client->m_cursor_pos_changed // nyama/marscha - PointerPos
-							)
-						)
-					) {
-				// Issue the synchronisation signal, to tell other threads
-				// where we have got to
-				m_sync_sig->broadcast();
-				do{
-					if (!m_client->cl_connected) return 0;
-					if(m_signal->wait(UPDATE_INTERVAL*100)==false)
-					{
-						{
-								//do forcefull update after 4 seconds
-								m_client->m_encodemgr.m_buffer->m_desktop->TriggerUpdate();
-								m_client->TriggerUpdateThread();
+							))) {
+					// Issue the synchronisation signal, to tell other threads
+					// where we have got to
+					m_sync_sig->broadcast();
+					do{
+						if (!m_client->cl_connected) return 0;
+						if(m_signal->wait(UPDATE_INTERVAL*100)==false) {
+							//do forcefull update after 4 seconds
+							m_client->m_encodemgr.m_buffer->m_desktop->TriggerUpdate();
+							m_client->TriggerUpdateThread();						
 						}
-
-					}
-					else 
-						{
+						else 
 							break;
-						}
-				}while(g_DesktopThread_running);
-
-			}
+					}while(g_DesktopThread_running);
+				}
 			}
 			// If the thread is being killed then quit
-			if (!m_active) break;
+			if (!m_active) 
+				break;
 			clipregion = m_client->m_incr_rgn;
 			m_client->m_incr_rgn.clear();
-
-			// SEND AN UPDATE!
-			// The thread is active, updates are enabled, and the
-			// client is expecting an update - let's see if there
-			// is anything to send.
-
-			// Modif sf@2002 - FileTransfer - Don't send anything if a file transfer is running !
-			// if (m_client->m_fFileTransferRunning) return 0;
-			// if (m_client->m_pTextChat->m_fTextChatRunning) return 0;
 
 			// sf@2002
 			// New scale requested, we do it before sending the next Update
@@ -607,181 +571,155 @@ vncClientUpdateThread::run_undetached(void *arg)
 			m_client->m_palettechanged = FALSE;
 		
 			// Get the update details from the update tracker
-			//m_client->m_update_tracker.flush_update(update, m_client->m_incr_rgn);
 			m_client->m_update_tracker.flush_update(update, clipregion);
 
-		//if (!m_client->m_encodemgr.m_buffer->m_desktop->IsVideoDriverEnabled())
-		//TEST if (!m_client->m_encodemgr.m_buffer->m_desktop->m_hookdriver)
-		{
-			// Render the mouse if required
+	
+			if (updates_sent > 1 ) 
+				m_client->m_cursor_update_pending = m_client->m_encodemgr.WasCursorUpdatePending();
+			updates_sent++;
 
-		if (updates_sent > 1 ) m_client->m_cursor_update_pending = m_client->m_encodemgr.WasCursorUpdatePending();
-		updates_sent++;
-
-		if (!m_client->m_cursor_update_sent && !m_client->m_cursor_update_pending) 
-			{
-				if (m_client->m_mousemoved)
-				{
+			if (!m_client->m_cursor_update_sent && !m_client->m_cursor_update_pending) {
+				if (m_client->m_mousemoved) {
 					// Re-render its old location
-					m_client->m_oldmousepos =
-						m_client->m_oldmousepos.intersect(m_client->m_ScaledScreen); // sf@2002
+					m_client->m_oldmousepos = m_client->m_oldmousepos.intersect(m_client->m_ScaledScreen); // sf@2002
 					if (!m_client->m_oldmousepos.is_empty())
 						update.add_changed(m_client->m_oldmousepos);
 
 					// And render its new one
 					m_client->m_encodemgr.m_buffer->GetMousePos(m_client->m_oldmousepos);
-					m_client->m_oldmousepos =
-						m_client->m_oldmousepos.intersect(m_client->m_ScaledScreen);
+					m_client->m_oldmousepos = m_client->m_oldmousepos.intersect(m_client->m_ScaledScreen);
 					if (!m_client->m_oldmousepos.is_empty())
-						update.add_changed(m_client->m_oldmousepos);
-	
+						update.add_changed(m_client->m_oldmousepos);	
 					m_client->m_mousemoved = FALSE;
 				}
 			}
-		}
+		
 
-		// SEND THE CLIPBOARD
-		// If there is clipboard text to be sent then send it
-		// Also allow in loopbackmode
-		// Loopback mode with winvncviewer will cause a loping
-		// But ssh is back working		
-		if (!m_client->m_fFileSessionOpen) {
+			// SEND THE CLIPBOARD
+			// If there is clipboard text to be sent then send it
+			// Also allow in loopbackmode
+			// Loopback mode with winvncviewer will cause a loping
+			// But ssh is back working		
+			if (!m_client->m_fFileSessionOpen) {
+				bool bShouldFlush = false;
 
-			bool bShouldFlush = false;
-
-			// adzm - 2010-07 - Extended clipboard
-			// send any clipboard data that should be sent automatically
-			if (m_client->m_clipboard.m_bNeedToProvide) {
-				m_client->m_clipboard.m_bNeedToProvide = false;
-				if (m_client->m_clipboard.settings.m_bSupportsEx) {
+				// adzm - 2010-07 - Extended clipboard
+				// send any clipboard data that should be sent automatically
+				if (m_client->m_clipboard.m_bNeedToProvide) {
+					m_client->m_clipboard.m_bNeedToProvide = false;
+					if (m_client->m_clipboard.settings.m_bSupportsEx) {
 					
-					int actualLen = m_client->m_clipboard.extendedClipboardDataMessage.GetDataLength();
+						int actualLen = m_client->m_clipboard.extendedClipboardDataMessage.GetDataLength();
 
-					rfbServerCutTextMsg message;
-					memset(&message, 0, sizeof(rfbServerCutTextMsg));
-					message.type = rfbServerCutText;
+						rfbServerCutTextMsg message;
+						memset(&message, 0, sizeof(rfbServerCutTextMsg));
+						message.type = rfbServerCutText;
 
-					message.length = Swap32IfLE(-actualLen);
+						message.length = Swap32IfLE(-actualLen);
 
-					bShouldFlush = true;
+						bShouldFlush = true;
 
-					//adzm 2010-09 - minimize packets. SendExact flushes the queue.
-					if (!m_client->SendRFBMsgQueue(rfbServerCutText,
-						(BYTE *) &message, sizeof(message))) {
-						m_client->m_socket->Close();
-					}
-					if (!m_client->m_socket->SendExactQueue((char*)(m_client->m_clipboard.extendedClipboardDataMessage.GetData()), m_client->m_clipboard.extendedClipboardDataMessage.GetDataLength()))
-					{
-						m_client->m_socket->Close();
-					}
-				} else {
-					rfbServerCutTextMsg message;
-
-					const char* cliptext = m_client->m_clipboard.m_strLastCutText.c_str();
-					char* unixtext = new char[m_client->m_clipboard.m_strLastCutText.length() + 1];
-					
-					// Replace CR-LF with LF - never send CR-LF on the wire,
-					// since Unix won't like it
-					int unixpos=0;
-					int cliplen=strlen(cliptext);
-					for (int x=0; x<cliplen; x++)
-					{
-						if (cliptext[x] != '\x0d')
-						{
-							unixtext[unixpos] = cliptext[x];
-							unixpos++;
+						//adzm 2010-09 - minimize packets. SendExact flushes the queue.
+						if (!m_client->SendRFBMsgQueue(rfbServerCutText,
+							(BYTE *) &message, sizeof(message))) {
+							m_client->m_socket->Close();
 						}
-					}
-					unixtext[unixpos] = 0;
+						if (!m_client->m_socket->SendExactQueue((char*)(m_client->m_clipboard.extendedClipboardDataMessage.GetData()), m_client->m_clipboard.extendedClipboardDataMessage.GetDataLength()))
+							m_client->m_socket->Close();
+					} 
+					else {
+						rfbServerCutTextMsg message;
 
-					message.length = Swap32IfLE(strlen(unixtext));
-
-					bShouldFlush = true;
-
-					//adzm 2010-09 - minimize packets. SendExact flushes the queue.
-					if (!m_client->SendRFBMsgQueue(rfbServerCutText,
-						(BYTE *) &message, sizeof(message))) {
-						m_client->m_socket->Close();
-					}
-					if (!m_client->m_socket->SendExactQueue(unixtext, strlen(unixtext)))
-					{
-						m_client->m_socket->Close();
-					}
-
-					delete[] unixtext;
-				}
-				m_client->m_clipboard.extendedClipboardDataMessage.Reset();
-			}
-			
-			// adzm - 2010-07 - Extended clipboard
-			// notify of any other formats
-			if (m_client->m_clipboard.m_bNeedToNotify) {
-				m_client->m_clipboard.m_bNeedToNotify = false;
-				if (m_client->m_clipboard.settings.m_bSupportsEx) {
+						const char* cliptext = m_client->m_clipboard.m_strLastCutText.c_str();
+						char* unixtext = new char[m_client->m_clipboard.m_strLastCutText.length() + 1];
 					
-					int actualLen = m_client->m_clipboard.extendedClipboardDataNotifyMessage.GetDataLength();
+						// Replace CR-LF with LF - never send CR-LF on the wire,
+						// since Unix won't like it
+						int unixpos=0;
+						int cliplen=strlen(cliptext);
+						for (int x=0; x<cliplen; x++) {
+							if (cliptext[x] != '\x0d') {
+								unixtext[unixpos] = cliptext[x];
+								unixpos++;
+							}
+						}
+						unixtext[unixpos] = 0;
 
-					rfbServerCutTextMsg message;
-					memset(&message, 0, sizeof(rfbServerCutTextMsg));
-					message.type = rfbServerCutText;
+						message.length = Swap32IfLE(strlen(unixtext));
 
-					message.length = Swap32IfLE(-actualLen);
+						bShouldFlush = true;
 
-					//adzm 2010-09 - minimize packets. SendExact flushes the queue.Queue
-
-					bShouldFlush = true;
-
-					if (!m_client->SendRFBMsgQueue(rfbServerCutText,
-						(BYTE *) &message, sizeof(message))) {
-						m_client->m_socket->Close();
+						//adzm 2010-09 - minimize packets. SendExact flushes the queue.
+						if (!m_client->SendRFBMsgQueue(rfbServerCutText,
+							(BYTE *) &message, sizeof(message))) {
+							m_client->m_socket->Close();
+						}
+						if (!m_client->m_socket->SendExactQueue(unixtext, strlen(unixtext)))
+							m_client->m_socket->Close();
+						delete[] unixtext;
 					}
-					if (!m_client->m_socket->SendExact((char*)(m_client->m_clipboard.extendedClipboardDataNotifyMessage.GetData()), m_client->m_clipboard.extendedClipboardDataNotifyMessage.GetDataLength()))
-					{
-						m_client->m_socket->Close();
-					}
+					m_client->m_clipboard.extendedClipboardDataMessage.Reset();
 				}
-				m_client->m_clipboard.extendedClipboardDataNotifyMessage.Reset();
-			}
+			
+				// adzm - 2010-07 - Extended clipboard
+				// notify of any other formats
+				if (m_client->m_clipboard.m_bNeedToNotify) {
+					m_client->m_clipboard.m_bNeedToNotify = false;
+					if (m_client->m_clipboard.settings.m_bSupportsEx) {
+					
+						int actualLen = m_client->m_clipboard.extendedClipboardDataNotifyMessage.GetDataLength();
 
-			if (bShouldFlush) {
+						rfbServerCutTextMsg message;
+						memset(&message, 0, sizeof(rfbServerCutTextMsg));
+						message.type = rfbServerCutText;
+
+						message.length = Swap32IfLE(-actualLen);
+
+						//adzm 2010-09 - minimize packets. SendExact flushes the queue.Queue
+
+						bShouldFlush = true;
+
+						if (!m_client->SendRFBMsgQueue(rfbServerCutText,
+							(BYTE *) &message, sizeof(message))) {
+							m_client->m_socket->Close();
+						}
+						if (!m_client->m_socket->SendExact((char*)(m_client->m_clipboard.extendedClipboardDataNotifyMessage.GetData()), m_client->m_clipboard.extendedClipboardDataNotifyMessage.GetDataLength()))
+							m_client->m_socket->Close();
+					}
+					m_client->m_clipboard.extendedClipboardDataNotifyMessage.Reset();
+				}
+
+			if (bShouldFlush) 
 				m_client->m_socket->ClearQueue();
 			}
-		}
 
-		// SEND AN UPDATE
-		// We do this without holding locks, to avoid network problems
-		// stalling the server.
+			// SEND AN UPDATE
+			// We do this without holding locks, to avoid network problems
+			// stalling the server.
 
-		// Update the client palette if necessary
+			// Update the client palette if necessary
 
-		if (send_palette) {
-			m_client->SendPalette();
-		}
+			if (send_palette) 
+				m_client->SendPalette();
 
-		//add extra check to avoid buffer/encoder sync problems
-		if ((m_client->m_encodemgr.m_scrinfo.framebufferHeight == m_client->m_encodemgr.m_buffer->m_scrinfo.framebufferHeight) &&
-			(m_client->m_encodemgr.m_scrinfo.framebufferWidth == m_client->m_encodemgr.m_buffer->m_scrinfo.framebufferWidth) &&
-			(m_client->m_encodemgr.m_scrinfo.format.bitsPerPixel == m_client->m_encodemgr.m_buffer->m_scrinfo.format.bitsPerPixel))
-			{
-			if (m_client->SendUpdate(update)) {
-				updates_sent++;
-				//m_client->m_incr_rgn.clear();
-				clipregion.clear();
+			//add extra check to avoid buffer/encoder sync problems
+			if ((m_client->m_encodemgr.m_scrinfo.framebufferHeight == m_client->m_encodemgr.m_buffer->m_scrinfo.framebufferHeight) &&
+					(m_client->m_encodemgr.m_scrinfo.framebufferWidth == m_client->m_encodemgr.m_buffer->m_scrinfo.framebufferWidth) &&
+					(m_client->m_encodemgr.m_scrinfo.format.bitsPerPixel == m_client->m_encodemgr.m_buffer->m_scrinfo.format.bitsPerPixel)) {
+				if (m_client->SendUpdate(update)) {
+					updates_sent++;
+					//m_client->m_incr_rgn.clear();
+					clipregion.clear();
+				}
 			}
-		}
-		else
-		{
-			//m_client->m_incr_rgn.clear();
-			clipregion.clear();
-		}
+			else
+				clipregion.clear();
 
-	}//end omni_mutex_lock l(m_client->GetUpdateLock(),82);
-
+		}//end omni_mutex_lock l(m_client->GetUpdateLock(),82);
 		yield();
 	}
 
-	vnclog.Print(LL_INTINFO, VNCLOG("stopping update thread\n"));
-	
+	vnclog.Print(LL_INTINFO, VNCLOG("stopping update thread\n"));	
 	vnclog.Print(LL_INTERR, "client sent %lu updates\n", updates_sent);
 	return 0;
 }

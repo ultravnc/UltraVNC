@@ -83,7 +83,7 @@ extern const UINT FileTransferSendPacketMessage;
 
 //adzm 2010-09
 // ethernet packet 1500 - 40 tcp/ip header - 8 PPPoE info
-#define G_SENDBUFFER 1452
+#define G_SENDBUFFER 2904
 
 #define SETTINGS_KEY_NAME "Software\\ORL\\VNCviewer\\Settings"
 #define SETTINGS_KEY_NAME2 "Software\\ORL\\VNCviewer\\Settingss"
@@ -430,7 +430,7 @@ private:
 
 	int Send(const char *buff, const unsigned int bufflen,int timeout);
 	//adzm 2010-09
-	void Write_timeout(char *buf, int bytes,int timeout, bool bQueue);
+	bool Write_timeout(char *buf, int bytes,int timeout, bool bQueue);
 	
 	void WriteTransformed_timeout(char *buf, int bytes, int timeout, bool bQueue); //adzm 2010-09
 	void WriteTransformed_timeout(char *buf, int bytes, CARD8 msgType, int timeout, bool bQueue); //sf@2002 - DSM Plugin
@@ -439,24 +439,24 @@ private:
 	void WriteExact_timeout(char *buf, int bytes, CARD8 msgType, int timeout); //sf@2002 - DSM Plugin
 
 	//adzm 2010-09
-	void Write(char *buf, int bytes, bool bQueue, bool bTimeout = false, int timeout = 0); // no DSM transform etc
+	bool Write(char *buf, int bytes, bool bQueue, bool bTimeout = false, int timeout = 0); // no DSM transform etc
 
-	void WriteTransformed(char *buf, int bytes, bool bQueue); //adzm 2010-09
+	bool WriteTransformed(char *buf, int bytes, bool bQueue); //adzm 2010-09
 	void WriteTransformed(char *buf, int bytes, CARD8 msgType, bool bQueue); //sf@2002 - DSM Plugin
 
 	//adzm 2010-09	
-	void WriteExactProxy(char *buf, int bytes); // same as Write
+	bool WriteExactProxy(char *buf, int bytes); // same as Write
 	void WriteExact(char *buf, int bytes, CARD8 msgType); //sf@2002 - DSM Plugin
 
 	//adzm 2010-09
-	void WriteQueue(char *buf, int bytes); // no DSM transform etc
+	bool WriteQueue(char *buf, int bytes); // no DSM transform etc
 	void WriteExactQueue(char *buf, int bytes);
 	void WriteExactQueue(char *buf, int bytes, CARD8 msgType); //sf@2002 - DSM Plugin
 	void WriteExactQueue_timeout(char *buf, int bytes,int timeout);
 	void WriteExactQueue_timeout(char *buf, int bytes, CARD8 msgType,int timeout); //sf@2002 - DSM Plugin
 
-	void FlushOutstandingWriteQueue(char*& buf2, int& bytes2, bool bTimeout = false, int timeout = 0);
-	void FlushWriteQueue(bool bTimeout = false, int timeout = 0);
+	bool FlushOutstandingWriteQueue(char*& buf2, int& bytes2, bool bTimeout = false, int timeout = 0);
+	bool FlushWriteQueue(bool bTimeout = false, int timeout = 0);
 	
 	void ReadExactProtocolVersion(char *buf, int bytes, bool& fNotEncrypted); //adzm 2009-06-21
 

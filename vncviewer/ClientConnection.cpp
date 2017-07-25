@@ -77,6 +77,7 @@ bool forcedexit=false;
 const UINT RebuildToolbarMessage = RegisterWindowMessage("UltraVNC.Viewer.RebuildToolbar");
 extern bool g_ConnectionLossAlreadyReported;
 extern bool paintbuzy;
+extern HWND hFTWnd;
 #define FAILED(hr) (((HRESULT)(hr)) < 0)
 
 /*
@@ -1638,7 +1639,7 @@ void ClientConnection::SetDSMPluginStuff()
 		delete m_pPluginInterface;
 		m_pPluginInterface = NULL;
 		//adzm 2010-05-10
-		m_pIntegratedPluginInterface = NULL;
+		m_pIntegratedPluginInterface = NULL;		
 	}
 
 	if (m_pDSMPlugin->IsEnabled())
@@ -5124,11 +5125,6 @@ void* ClientConnection::run_undetached(void* arg) {
                         OutputDebugString(msg);
                     }
 #endif
-                    if (sz_rfbKeepAliveMsg > 1)
-                    {
-                  	rfbKeepAliveMsg kp;
-                	ReadExact(((char *) &kp)+m_nTO, sz_rfbKeepAliveMsg-m_nTO);
-                    }
                     break;
 				case rfbRequestSession:
 					break;
@@ -5236,7 +5232,24 @@ void* ClientConnection::run_undetached(void* arg) {
 				delete m_pPluginInterface;
 				m_pPluginInterface = NULL;
 				//adzm 2010-05-10
-				m_pIntegratedPluginInterface = NULL;
+				m_pIntegratedPluginInterface = NULL;				
+			}
+			if (m_pFileTransfer->m_fFileTransferRunning || m_pTextChat->m_fTextChatRunning)
+			{
+				m_pDSMPlugin->SetEnabled(false);
+				m_fUsePlugin = false;
+				SetEvent(KillEvent);
+				SetEvent(KillUpdateThreadEvent);
+				m_pFileTransfer->m_fAbort = true;
+				m_pFileTransfer->m_fUserAbortedFileTransfer = true;
+				m_pFileTransfer->EndFTSession();
+				EndDialog(hFTWnd, FALSE);
+				m_pTextChat->m_fTextChatRunning = false;
+				m_pFileTransfer->m_fFileTransferRunning = false;
+				m_bKillThread = true;
+				MessageBox(m_hwndMain, "Filetransfer interupted: reason connection with server broken", "Warning", MB_ICONEXCLAMATION | MB_TOPMOST);
+				PostMessage(m_hwndMain, WM_CLOSE, 0, 1);
+				return this;
 			}
 			m_bKillThread = true;
 			PostMessage(m_hwndMain, WM_CLOSE, reconnectcounter, 1);
@@ -5254,7 +5267,23 @@ void* ClientConnection::run_undetached(void* arg) {
 			}
 			else if ((strcmp(e.str(),"rdr::SystemException: read: Unknown error (10054)")==NULL) && !m_bClosedByUser)
 			{
-				WarningException w(sz_L94,200);
+				//ErrorException w(sz_L94,200);
+
+				if (m_pFileTransfer->m_fFileTransferRunning || m_pTextChat->m_fTextChatRunning)
+				{
+					SetEvent(KillEvent);
+					SetEvent(KillUpdateThreadEvent);					
+					m_pFileTransfer->m_fAbort = true;
+					m_pFileTransfer->m_fUserAbortedFileTransfer = true;
+					m_pFileTransfer->EndFTSession();
+					EndDialog(hFTWnd, FALSE);
+					m_pTextChat->m_fTextChatRunning = false;
+					m_pFileTransfer->m_fFileTransferRunning = false;
+					m_bKillThread = true;
+					MessageBox(m_hwndMain, "Filetransfer interupted: reason connection with server broken", "Warning",  MB_ICONEXCLAMATION | MB_TOPMOST);
+					PostMessage(m_hwndMain, WM_CLOSE, 0, 1);
+					return this;
+				}
 			}
             else if (!(/*m_pFileTransfer->m_fFileTransferRunning || m_pTextChat->m_fTextChatRunning ||*/ m_bClosedByUser))
             {
@@ -5266,7 +5295,7 @@ void* ClientConnection::run_undetached(void* arg) {
 			PostMessage(m_hwndMain, WM_CLOSE, reconnectcounter, 1);
 		}
 
-		if (m_autoReconnect>0) Sleep(2000);
+		if (m_autoReconnect > 0) Sleep(2000);		
 	}
 
 	vnclog.Print(4, _T("Update-processing thread finishing\n") );
@@ -5284,7 +5313,7 @@ void* ClientConnection::run_undetached(void* arg) {
 
 void ClientConnection::Internal_SendFramebufferUpdateRequest(int x, int y, int w, int h, bool incremental)
 {
-	if (m_pFileTransfer->m_fFileTransferRunning && ( m_pFileTransfer->m_fVisible || m_pFileTransfer->UsingOldProtocol())) return;
+	if (m_pFileTransfer && (m_pFileTransfer->m_fFileTransferRunning && ( m_pFileTransfer->m_fVisible || m_pFileTransfer->UsingOldProtocol()))) return;
 	if (m_pTextChat->m_fTextChatRunning && m_pTextChat->m_fVisible) return;
 
 	//omni_mutex_lock l(m_UpdateMutex);
@@ -6567,14 +6596,14 @@ void ClientConnection::WriteExact_timeout(char *buf, int bytes, CARD8 msgType,in
 
 //adzm 2010-09
 // Sends the number of bytes specified from the buffer
-void ClientConnection::Write(char *buf, int bytes, bool bQueue, bool bTimeout, int timeout)
+bool ClientConnection::Write(char *buf, int bytes, bool bQueue, bool bTimeout, int timeout)
 {
 	omni_mutex_lock l(m_writeMutex);
 
-	if (bytes == 0 && (bQueue || (!bQueue && m_nQueueBufferLength == 0))) return;
+	if (bytes == 0 && (bQueue || (!bQueue && m_nQueueBufferLength == 0))) return true;
 
 	// this will adjust buf and bytes to be < G_SENDBUFFER
-	FlushOutstandingWriteQueue(buf, bytes, bTimeout, timeout);
+	if (!FlushOutstandingWriteQueue(buf, bytes, bTimeout, timeout)) return false;
 
 	// append buf to any remaining data in the queue, since we know that m_nQueueBufferLength + bytes < G_SENDBUFFER
 	if (bytes > 0) {
@@ -6607,7 +6636,7 @@ void ClientConnection::Write(char *buf, int bytes, bool bQueue, bool bTimeout, i
 				vnclog.Print(1, _T("Socket error %d: %s\n"), err, lpMsgBuf);
 				LocalFree( lpMsgBuf );
 				m_running = false;
-
+				return false;
 				//throw WarningException(sz_L69);
 			}
 			i += j;
@@ -6616,10 +6645,11 @@ void ClientConnection::Write(char *buf, int bytes, bool bQueue, bool bTimeout, i
 
 		m_nQueueBufferLength = 0;
 	}
+	return true;
 }
 
 // Sends the number of bytes specified from the buffer
-void ClientConnection::FlushOutstandingWriteQueue(char*& buf2, int& bytes2, bool bTimeout, int timeout)
+bool ClientConnection::FlushOutstandingWriteQueue(char*& buf2, int& bytes2, bool bTimeout, int timeout)
 {
 	omni_mutex_lock l(m_writeMutex);
 
@@ -6659,7 +6689,7 @@ void ClientConnection::FlushOutstandingWriteQueue(char*& buf2, int& bytes2, bool
 			vnclog.Print(1, _T("Socket error %d: %s\n"), err, lpMsgBuf);
 			LocalFree( lpMsgBuf );
 			m_running = false;
-
+			return false;
 			//throw WarningException(sz_L69);
 		}
 
@@ -6674,17 +6704,18 @@ void ClientConnection::FlushOutstandingWriteQueue(char*& buf2, int& bytes2, bool
 			memcpy(m_QueueBuffer, m_QueueBuffer + sent, G_SENDBUFFER - sent);
 		}
 	}
+	return true;
 }
 
-void ClientConnection::FlushWriteQueue(bool bTimeout, int timeout)
+bool ClientConnection::FlushWriteQueue(bool bTimeout, int timeout)
 {
-	Write(NULL, 0, false, bTimeout, timeout);
+	return Write(NULL, 0, false, bTimeout, timeout);
 }
 
 // Sends the number of bytes specified from the buffer
-void ClientConnection::WriteTransformed(char *buf, int bytes, bool bQueue)
+bool ClientConnection::WriteTransformed(char *buf, int bytes, bool bQueue)
 {
-	if (bytes == 0) return;
+	if (bytes == 0) return true;
 
 	omni_mutex_lock l(m_writeMutex);
 	//vnclog.Print(10, _T("  writing %d bytes\n"), bytes);
@@ -6698,13 +6729,16 @@ void ClientConnection::WriteTransformed(char *buf, int bytes, bool bQueue)
 			int nTransDataLen = 0;
 			pBuffer = (char*)TransformBuffer((BYTE*)buf, bytes, &nTransDataLen);
 			if (pBuffer == NULL || (bytes > 0 && nTransDataLen == 0))
+			{
 				throw WarningException(sz_L68);
+				return false;
+			}
 			bytes = nTransDataLen;
 		}
 	}
 
 	//adzm 2010-09
-	Write(pBuffer, bytes, bQueue);
+	return Write(pBuffer, bytes, bQueue);
 }
 
 //adzm 2010-09
@@ -6714,9 +6748,9 @@ void ClientConnection::WriteExact(char *buf, int bytes)
 }
 
 //adzm 2010-09
-void ClientConnection::WriteQueue(char *buf, int bytes)
+bool ClientConnection::WriteQueue(char *buf, int bytes)
 {
-	Write(buf, bytes, true);
+	return Write(buf, bytes, true);
 }
 
 void ClientConnection::WriteExactQueue(char *buf, int bytes)
@@ -6772,16 +6806,16 @@ void ClientConnection::WriteExact_timeout(char *buf, int bytes, int timeout)
 }
 
 //adzm 2010-09
-void ClientConnection::Write_timeout(char *buf, int bytes,int timeout, bool bQueue)
+bool ClientConnection::Write_timeout(char *buf, int bytes,int timeout, bool bQueue)
 {
-	Write(buf, bytes, bQueue, true, timeout);
+	return Write(buf, bytes, bQueue, true, timeout);
 }
 
 // Sends the number of bytes specified from the buffer
-void ClientConnection::WriteExactProxy(char *buf, int bytes)
+bool ClientConnection::WriteExactProxy(char *buf, int bytes)
 {
 	//adzm 2010-09 - just call this function, it is named a bit more clearly than this one
-	Write(buf, bytes, false);
+	return Write(buf, bytes, false);
 }
 
 // Security fix for uvnc 1.0.5 and 1.0.2 (should be ok for all version...)
@@ -8614,13 +8648,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 			{
 				if (LOWORD(wParam) == 0)
 				{
-//					if (_this->m_FTtimer != 0)_this->m_FTtimer=SetTimer(hwnd,11, 100, 0);//
-					int gr = 0;
-					while (gr<100)
-					{
-						_this->m_pFileTransfer->SendFileChunk();
-						gr++;
-					}
+					_this->m_pFileTransfer->SendFileChunk();
 				}
 				else
 					_this->m_pFileTransfer->ProcessFileTransferMsg();

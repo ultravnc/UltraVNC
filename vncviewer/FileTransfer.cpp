@@ -173,7 +173,7 @@ typedef BOOL (WINAPI *PGETDISKFREESPACEEX)(LPCSTR,PULARGE_INTEGER, PULARGE_INTEG
 
 static FileTransfer* g_FileTransferSingleton = NULL;
 
-static HWND hFTWnd = 0;
+HWND hFTWnd = 0;
 static std::string make_temp_filename(const char *szRemoteFileName)
 {
     // don't add prefix for directory transfers.
@@ -342,7 +342,7 @@ void FileTransfer::InitFTTimer()
 	if (m_mmRes != -1) return;
 
 	m_fSendFileChunk = false;
-	m_mmRes = timeSetEvent( 1, 0, (LPTIMECALLBACK)fpTimer, (DWORD_PTR)this, TIME_PERIODIC );
+	m_mmRes = timeSetEvent( 10, 0, (LPTIMECALLBACK)fpTimer, (DWORD_PTR)this, TIME_PERIODIC );
 #else
 
 	if (m_timerID != 0xFFFFFFFF) {
@@ -399,31 +399,7 @@ void FileTransfer::TimerCallback(FileTransfer* ft)
 	if (!ft->m_fSendFileChunk)
 	{
 		ft->m_fSendFileChunk = true;
-
-		//ft->m_dwLastChunkTime = timeGetTime();
-		ft->m_dwLastChunkTime = GetTickCount();
-
-		DWORD Result = 0;
-		#if _MSC_VER >= 1400 && defined (_M_X64)
-		SendMessageTimeout(ft->m_pCC->m_hwndMain, FileTransferSendPacketMessage, (WPARAM) 0, (LPARAM) 0,SMTO_ABORTIFHUNG,500,(PDWORD_PTR)&Result);
-		#else
-		SendMessageTimeout(ft->m_pCC->m_hwndMain, FileTransferSendPacketMessage, (WPARAM) 0, (LPARAM) 0,SMTO_ABORTIFHUNG,500,&Result);
-		#endif
-		// sf@2005 - FileTransfer Temporization
-		// - Prevents the windows message stack to be blocked too much when transfering over slow connection
-		// - Gives more priority to screen updates during asynchronous filetransfer
-		//long lDelta = timeGetTime() - ft->m_dwLastChunkTime;
-		long lDelta = GetTickCount() - ft->m_dwLastChunkTime;
-		if (lDelta > 200)
-		{
-			//if (lDelta < 3000)
-			//	Sleep(lDelta);
-			//else
-				Sleep(150);
-		}
-		else if (!ft->m_fVisible && !ft->UsingOldProtocol() && !ft->m_pCC->IsDormant())
-			Sleep(50);
-
+		ft->SendFileChunk();
 		ft->m_fSendFileChunk = false;
 	}
 	LeaveCriticalSection(&ft->crit);
@@ -2810,143 +2786,135 @@ bool FileTransfer::SendFile(long lSize, int nLen)
 // 
 bool FileTransfer::SendFileChunk()
 {
-//	vnclog.Print(0, _T("SendFilechunk\n"));
-	if (! m_fFileUploadRunning) return false;
-
-	if ( m_fEof || m_fFileUploadError)
+	bool connected = true;
+	do
 	{
-		FinishFileSending();
-		return true;
-	}
+		m_dwLastChunkTime = GetTickCount();
+		connected = true;		
 
-	m_pCC->CheckFileChunkBufferSize(m_nBlockSize + 1024);
-
-	int nRes = ReadFile(m_hSrcFile, m_pCC->m_filechunkbuf, m_nBlockSize, &m_dwNbBytesRead, NULL);
-	if (!nRes && m_dwNbBytesRead != 0)
-	{
-		m_fFileUploadError = true;
-	}
-
-	if (nRes && m_dwNbBytesRead == 0)
-	{
-		m_fEof = true;
-	}
-	else
-	{
-		// sf@2004 - Delta Transfer
-		bool fAlreadyThere = false;
-		unsigned long nCS = 0;
-		// if Checksums are available for this file
-		if (m_lpCSBuffer != NULL)
+		if ( m_fEof || m_fFileUploadError)
 		{
-			if (m_nCSOffset < m_nCSBufferSize)
-			{
-				memcpy(&nCS, &m_lpCSBuffer[m_nCSOffset], 4);
-				if (nCS != 0)
-				{
-					m_nCSOffset += 4;
-					unsigned long cs = adler32(0L, Z_NULL, 0);
-					cs = adler32(cs, m_pCC->m_filechunkbuf, (int)m_dwNbBytesRead);
-					if (cs == nCS)
-						fAlreadyThere = true;
-				}
-			}
+			FinishFileSending();
+			return true;
 		}
 
-		if (fAlreadyThere)
+		m_pCC->CheckFileChunkBufferSize(m_nBlockSize + 1024);
+
+		int nRes = ReadFile(m_hSrcFile, m_pCC->m_filechunkbuf, m_nBlockSize, &m_dwNbBytesRead, NULL);
+		if (!nRes && m_dwNbBytesRead != 0)
 		{
-			// Send the FileTransferMsg with empty rfbFilePacket
-			rfbFileTransferMsg ft;
-			ft.type = rfbFileTransfer;
-			ft.contentType = rfbFilePacket;
-			ft.size = Swap32IfLE(2); // Means "Empty packet"// Swap32IfLE(nCS); 
-			ft.length = Swap32IfLE(m_dwNbBytesRead);
-			m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
-			// m_nNotSent += m_dwNbBytesRead;
+			m_fFileUploadError = true;
+		}
+
+		if (nRes && m_dwNbBytesRead == 0)
+		{
+			m_fEof = true;
 		}
 		else
 		{
-			// Compress the data
-			// (Compressed data can be longer if it was already compressed)
-			unsigned int nMaxCompSize = m_nBlockSize + 1024; // TODO: Improve this...
-			bool fCompressed = false;
-			if (m_fCompress && !UsingOldProtocol())
+			// sf@2004 - Delta Transfer
+			bool fAlreadyThere = false;
+			unsigned long nCS = 0;
+			// if Checksums are available for this file
+			if (m_lpCSBuffer != NULL)
 			{
-				m_pCC->CheckFileZipBufferSize(nMaxCompSize);
-				int nRetC = compress((unsigned char*)(m_pCC->m_filezipbuf),
-											(unsigned long*)&nMaxCompSize,	
-											(unsigned char*)m_pCC->m_filechunkbuf,
-											m_dwNbBytesRead
-											);
-				if (nRetC != 0)
+				if (m_nCSOffset < m_nCSBufferSize)
 				{
-					// Todo: send data uncompressed instead
-					m_fFileUploadError = true;
-					return false;
+					memcpy(&nCS, &m_lpCSBuffer[m_nCSOffset], 4);
+					if (nCS != 0)
+					{
+						m_nCSOffset += 4;
+						unsigned long cs = adler32(0L, Z_NULL, 0);
+						cs = adler32(cs, m_pCC->m_filechunkbuf, (int)m_dwNbBytesRead);
+						if (cs == nCS)
+							fAlreadyThere = true;
+					}
 				}
-				Sleep(5);
-				fCompressed = true;
 			}
 
-			// If data compressed is larger, we're presumably dealing with already compressed data.
-			if (nMaxCompSize > m_dwNbBytesRead)
-				fCompressed = false;
-				// m_fCompress = false;
-
-
-
-			// Send the FileTransferMsg with rfbFilePacket
-			rfbFileTransferMsg ft;
-			ft.type = rfbFileTransfer;
-			ft.contentType = rfbFilePacket;
-			ft.size = fCompressed ? Swap32IfLE(1) : Swap32IfLE(0); 
-			ft.length = fCompressed ? Swap32IfLE(nMaxCompSize) : Swap32IfLE(m_dwNbBytesRead);
-			//adzm 2010-09
-			if(UsingOldProtocol())
-				m_pCC->WriteExactQueue((char *)&ft, sz_rfbFileTransferMsg);
+			if (fAlreadyThere)
+			{
+				// Send the FileTransferMsg with empty rfbFilePacket
+				rfbFileTransferMsg ft;
+				ft.type = rfbFileTransfer;
+				ft.contentType = rfbFilePacket;
+				ft.size = Swap32IfLE(2); // Means "Empty packet"// Swap32IfLE(nCS); 
+				ft.length = Swap32IfLE(m_dwNbBytesRead);
+				m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
+				// m_nNotSent += m_dwNbBytesRead;
+			}
 			else
-				m_pCC->WriteExactQueue((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
+			{
+				// Compress the data
+				// (Compressed data can be longer if it was already compressed)
+				unsigned int nMaxCompSize = m_nBlockSize + 1024; // TODO: Improve this...
+				bool fCompressed = false;
+				if (m_fCompress && !UsingOldProtocol())
+				{
+					m_pCC->CheckFileZipBufferSize(nMaxCompSize);
+					int nRetC = compress((unsigned char*)(m_pCC->m_filezipbuf),
+												(unsigned long*)&nMaxCompSize,	
+												(unsigned char*)m_pCC->m_filechunkbuf,
+												m_dwNbBytesRead
+												);
+					if (nRetC != 0)
+					{
+						// Todo: send data uncompressed instead
+						m_fFileUploadError = true;
+						return false;
+					}					
+					fCompressed = true;
+				}
 
-			if (fCompressed)
-				m_pCC->WriteExact((char *)m_pCC->m_filezipbuf, nMaxCompSize);
-			else
-				m_pCC->WriteExact((char *)m_pCC->m_filechunkbuf, m_dwNbBytesRead);
+				// If data compressed is larger, we're presumably dealing with already compressed data.
+				if (nMaxCompSize > m_dwNbBytesRead)
+					fCompressed = false;
+					// m_fCompress = false;
+
+
+
+				// Send the FileTransferMsg with rfbFilePacket
+				rfbFileTransferMsg ft;
+				ft.type = rfbFileTransfer;
+				ft.contentType = rfbFilePacket;
+				ft.size = fCompressed ? Swap32IfLE(1) : Swap32IfLE(0); 
+				ft.length = fCompressed ? Swap32IfLE(nMaxCompSize) : Swap32IfLE(m_dwNbBytesRead);
+				//adzm 2010-09
+				if(UsingOldProtocol())
+					m_pCC->WriteExactQueue((char *)&ft, sz_rfbFileTransferMsg);
+				else
+					m_pCC->WriteExactQueue((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
+
+				if (fCompressed)
+					m_pCC->WriteExact((char *)m_pCC->m_filezipbuf, nMaxCompSize);
+				else
+					m_pCC->WriteExact((char *)m_pCC->m_filechunkbuf, m_dwNbBytesRead);
+			}
+
+			m_dwTotalNbBytesRead += m_dwNbBytesRead;
+
+			// Refresh progress bar
+			SetGauge(hWnd, m_dwTotalNbBytesRead);
+			PseudoYield(GetParent(hWnd));
+		
+			if (m_fAbort)
+			{
+				m_fFileUploadError = true;
+				FinishFileSending();
+				return false;
+			}
 		}
+		long lDelta = GetTickCount() - m_dwLastChunkTime;
 
-		m_dwTotalNbBytesRead += m_dwNbBytesRead;
-
-		// Refresh progress bar
-		SetGauge(hWnd, m_dwTotalNbBytesRead);
-		PseudoYield(GetParent(hWnd));
-	
-		if (m_fAbort)
+		if (lDelta > 1000)
 		{
-			m_fFileUploadError = true;
-			FinishFileSending();
-			return false;
+				Sleep(150);
 		}
-	}
+		else if (!m_fVisible && !UsingOldProtocol() && !m_pCC->IsDormant())
+			Sleep(50);
 
-	// Order next asynchronous packet sending
-	// If Gui is visible or old blocking FT protocole : no screen updates, more speed
-	/*
-	if (m_fVisible || m_fOldFTProtocole)
-	{
-		// SendFileChunk(); // Fixme: Beware call stack...
-		// if (m_pCC->kbitsPerSecond <= 2048) 
-		PostMessage(m_pCC->m_hwndMain, FileTransferSendPacketMessage, (WPARAM) 0, (LPARAM) 0);
-	}
-	else
-	{
-		//if (m_pCC->kbitsPerSecond <= 2048) 
-		//else
-		//	Sleep(50);
-
-		PostMessage(m_pCC->m_hwndMain, FileTransferSendPacketMessage, (WPARAM) 0, (LPARAM) 0);
-	}
-	// PostMessage(hWnd, FileTransferSendPacketMessage, (WPARAM) 0, (LPARAM) 0);
-	*/
-
+	} while (connected && m_fFileUploadRunning);
+	if (!m_fFileUploadRunning) return false;
 	return true;
 }
 

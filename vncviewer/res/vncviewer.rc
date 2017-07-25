@@ -999,7 +999,7 @@ BEGIN
     IDS_L66                 "WriteExact: DSMPlugin-RestoreBuffer Error."
     IDS_L67                 "Connection closed (1)"
     IDS_L68                 "WriteExact: DSMPlugin-TransformBuffer Error."
-    IDS_L69                 "Server closed connection \n\r -The server running as application don't have permission to unlock screen. \n\r -Manual closed \n\r -Network disconnect"
+    IDS_L69                 "Server closed connection \n\r -Manual closed \n\r -Network disconnect"
     IDS_L70                 "Insufficient memory to allocate network buffer."
     IDS_L71                 "Insufficient memory to allocate zlib buffer."
     IDS_L72                 "VNC Viewer Status for"

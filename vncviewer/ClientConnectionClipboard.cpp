@@ -57,7 +57,7 @@ void ClientConnection::ProcessLocalClipboardChange()
 		vnclog.Print(2, _T("Ignore Clipboard while setting viewer!\n"));
 		//m_initialClipboardSeen = true;
 	}
-	else if (m_pFileTransfer->m_fFileTransferRunning ||m_pFileTransfer->m_fFileUploadRunning || m_pFileTransfer->m_fFileDownloadRunning)
+	else if (m_pFileTransfer && (m_pFileTransfer->m_fFileTransferRunning ||m_pFileTransfer->m_fFileUploadRunning || m_pFileTransfer->m_fFileDownloadRunning))
 	{
 		vnclog.Print(2, _T("Ignore Clipboard while FT is buzy!\n"));
 		//m_initialClipboardSeen = true;
