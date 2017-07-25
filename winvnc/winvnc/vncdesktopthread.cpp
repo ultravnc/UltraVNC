@@ -923,11 +923,7 @@ vncDesktopThread::run_undetached(void *arg)
 
 	// sf@2003 - Done here to take into account if the driver is actually activated
 	m_desktop->InitHookSettings(); 
-	initialupdate=false;
-
-	// We set a flag inside the desktop handler here, to indicate it's now safe
-	// to handle clipboard messages
-	m_desktop->SetClipboardActive(TRUE);
+	initialupdate=false;	
 
 	// All changes in the state of the display are stored in a local
 	// UpdateTracker object, and are flushed to the vncServer whenever
@@ -1024,6 +1020,10 @@ vncDesktopThread::run_undetached(void *arg)
 	if (m_server->IsUltraVNCViewer()) first_run=true;
 	else first_run=false;
 	int waittime=0;
+
+	// We set a flag inside the desktop handler here, to indicate it's now safe
+	// to handle clipboard messages
+	m_desktop->SetClipboardActive(TRUE);
 
 	while (looping && !fShutdownOrdered)
 	{		
