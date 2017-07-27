@@ -8922,7 +8922,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 				return 0;
 
 			case WM_TIMER:
-				if (wParam !=0) {
+				if (wParam !=0 && _this->m_running &&  !_this->m_pFileTransfer->m_fFileTransferRunning) {
 					if (wParam == _this->m_emulate3ButtonsTimer)
 					{
 						_this->SubProcessPointerEvent(
@@ -8951,7 +8951,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 					else if (wParam == 1013) {
 						_this->SetDormant(2);
 					}
-					else if (wParam ==  2999) {
+					else if (wParam == _this->m_fullupdate_timer) {
 						_this->HandleFramebufferUpdateRequest(0x00000000, 0x00000000);
 					}
 #ifdef _Gii
