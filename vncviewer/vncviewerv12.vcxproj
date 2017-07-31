@@ -30,6 +30,7 @@
     <ProjectGuid>{357D07B6-0613-4B05-9D22-1764A49AC945}</ProjectGuid>
     <RootNamespace>vncviewer</RootNamespace>
     <ProjectName>vncviewer</ProjectName>
+    <WindowsTargetPlatformVersion>7.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">

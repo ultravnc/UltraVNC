@@ -177,6 +177,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
+    <None Include="simd\jchuff-sse2-64.asm">
+      <Filter>Source Files\simd64</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="simd\jccolmmx.asm">
@@ -321,6 +324,9 @@
       <Filter>Source Files\simd64</Filter>
     </CustomBuild>
     <CustomBuild Include="simd\jcgrammx.asm">
+      <Filter>Source Files\simd</Filter>
+    </CustomBuild>
+    <CustomBuild Include="simd\jchuffsse2.asm">
       <Filter>Source Files\simd</Filter>
     </CustomBuild>
   </ItemGroup>

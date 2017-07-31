@@ -46,6 +46,7 @@
     <ProjectGuid>{E8BA959F-B652-4BAB-9EA7-8E9FC8D7F39C}</ProjectGuid>
     <RootNamespace>zip32</RootNamespace>
     <ProjectName>zip32</ProjectName>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
