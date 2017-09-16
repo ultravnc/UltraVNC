@@ -551,7 +551,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:UltraVnc"
         "ProductCode" = "8:{B5820C71-0806-4BAB-828A-C678CBD56B0A}"
-        "PackageCode" = "8:{A2F1CA0E-56C2-49D5-9B89-E39699152C24}"
+        "PackageCode" = "8:{BE30AA57-B35D-41A5-AFF8-3AF3E4DD86D7}"
         "UpgradeCode" = "8:{25A3A242-EEA3-4731-A2D0-E990D2EA5A23}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -574,7 +574,7 @@
         "UseSystemSearchPath" = "11:TRUE"
         "TargetPlatform" = "3:0"
         "PreBuildEvent" = "8:"
-        "PostBuildEvent" = "8:\"C:\\Program Files (x86)\\Windows Kits\\8.1\\bin\\x86\\signtool.exe\" sign /sha1 075BD1CAB5AE085E523AF7883FC0A8127BE08C71 /n \"uvnc bvba\" /v /fd sha1 /t http://timestamp.verisign.com/scripts/timstamp.dll $(BuiltOuputPath)\r\n\"C:\\Program Files (x86)\\Windows Kits\\8.1\\bin\\x86\\signtool.exe\" sign /sha1 0F96782496EA96F2BA96CF177E61F993CA5BC2E8 /n \"uvnc bvba\" /v /as /fd sha256 /tr http://timestamp.geotrust.com/tsa $(BuiltOuputPath)"
+        "PostBuildEvent" = "8:\"C:\\Program Files (x86)\\Windows Kits\\8.1\\bin\\x86\\signtool.exe\" sign /sha1 6D4DE9F8F9626857AEA19A9D95405BBF1A800532 /n \"uvnc bvba\" /v  /fd sha256 /tr http://sha256timestamp.ws.symantec.com/sha256/timestamp $(BuiltOuputPath)"
         "RunPostBuildEvent" = "3:0"
         }
         "Registry"
@@ -1187,7 +1187,7 @@
                             "ContextData" = "8:"
                             "Attributes" = "3:0"
                             "Setting" = "3:2"
-                            "Value" = "8:UltraVnc 1.2.1.0 X86"
+                            "Value" = "8:UltraVnc 1.2.1.6 X86"
                             "DefaultValue" = "8:#1215"
                             "UsePlugInResources" = "11:TRUE"
                             }
