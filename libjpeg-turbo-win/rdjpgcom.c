@@ -6,8 +6,7 @@
  * Modified 2009 by Bill Allombert, Guido Vollbeding.
  * It was modified by The libjpeg-turbo Project to include only code relevant
  * to libjpeg-turbo.
- * For conditions of distribution and use, see the accompanying README.ijg
- * file.
+ * For conditions of distribution and use, see the accompanying README file.
  *
  * This file contains a very simple stand-alone application that displays
  * the text in COM (comment) markers in a JFIF file.
@@ -57,7 +56,7 @@
  * To reuse this code in another application, you might need to change these.
  */
 
-static FILE *infile;            /* input JPEG file */
+static FILE * infile;           /* input JPEG file */
 
 /* Return next input byte, or EOF if no more */
 #define NEXTBYTE()  getc(infile)
@@ -279,7 +278,7 @@ process_SOFn (int marker)
   unsigned int length;
   unsigned int image_height, image_width;
   int data_precision, num_components;
-  const char *process;
+  const char * process;
   int ci;
 
   length = read_2_bytes();      /* usual parameter length count */
@@ -397,7 +396,7 @@ scan_JPEG_header (int verbose, int raw)
 
 /* Command line parsing code */
 
-static const char *progname;    /* program name for error messages */
+static const char * progname;   /* program name for error messages */
 
 
 static void
@@ -417,7 +416,7 @@ usage (void)
 
 
 static int
-keymatch (char *arg, const char *keyword, int minchars)
+keymatch (char * arg, const char * keyword, int minchars)
 /* Case-insensitive matching of (possibly abbreviated) keyword switches. */
 /* keyword is the constant keyword (must be lower case already), */
 /* minchars is length of minimum legal abbreviation. */
@@ -449,7 +448,7 @@ int
 main (int argc, char **argv)
 {
   int argn;
-  char *arg;
+  char * arg;
   int verbose = 0, raw = 0;
 
   /* On Mac, fetch a command line. */

@@ -6,8 +6,7 @@
  * Modified 2009 by Guido Vollbeding.
  * It was modified by The libjpeg-turbo Project to include only code and
  * information relevant to libjpeg-turbo.
- * For conditions of distribution and use, see the accompanying README.ijg
- * file.
+ * For conditions of distribution and use, see the accompanying README file.
  *
  * This file contains routines to write output images in PPM/PGM format.
  * The extended 2-byte-per-sample raw PPM/PGM formats are supported.
@@ -20,7 +19,6 @@
  */
 
 #include "cdjpeg.h"             /* Common decls for cjpeg/djpeg applications */
-#include "wrppm.h"
 
 #ifdef PPM_SUPPORTED
 
@@ -63,6 +61,21 @@
  */
 
 
+/* Private version of data destination object */
+
+typedef struct {
+  struct djpeg_dest_struct pub; /* public fields */
+
+  /* Usually these two pointers point to the same place: */
+  char *iobuffer;               /* fwrite's I/O buffer */
+  JSAMPROW pixrow;              /* decompressor output buffer */
+  size_t buffer_width;          /* width of I/O buffer */
+  JDIMENSION samples_per_row;   /* JSAMPLEs per output row */
+} ppm_dest_struct;
+
+typedef ppm_dest_struct * ppm_dest_ptr;
+
+
 /*
  * Write some pixel data.
  * In this module rows_supplied will always be 1.
@@ -91,7 +104,7 @@ copy_pixel_rows (j_decompress_ptr cinfo, djpeg_dest_ptr dinfo,
                  JDIMENSION rows_supplied)
 {
   ppm_dest_ptr dest = (ppm_dest_ptr) dinfo;
-  register char *bufferptr;
+  register char * bufferptr;
   register JSAMPROW ptr;
   register JDIMENSION col;
 
@@ -114,7 +127,7 @@ put_demapped_rgb (j_decompress_ptr cinfo, djpeg_dest_ptr dinfo,
                   JDIMENSION rows_supplied)
 {
   ppm_dest_ptr dest = (ppm_dest_ptr) dinfo;
-  register char *bufferptr;
+  register char * bufferptr;
   register int pixval;
   register JSAMPROW ptr;
   register JSAMPROW color_map0 = cinfo->colormap[0];
@@ -139,7 +152,7 @@ put_demapped_gray (j_decompress_ptr cinfo, djpeg_dest_ptr dinfo,
                    JDIMENSION rows_supplied)
 {
   ppm_dest_ptr dest = (ppm_dest_ptr) dinfo;
-  register char *bufferptr;
+  register char * bufferptr;
   register JSAMPROW ptr;
   register JSAMPROW color_map = cinfo->colormap[0];
   register JDIMENSION col;

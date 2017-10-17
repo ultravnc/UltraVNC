@@ -5,8 +5,7 @@
  * Copyright (C) 1991-1997, Thomas G. Lane.
  * It was modified by The libjpeg-turbo Project to include only code relevant
  * to libjpeg-turbo.
- * For conditions of distribution and use, see the accompanying README.ijg
- * file.
+ * For conditions of distribution and use, see the accompanying README file.
  *
  * This file contains common support routines used by the IJG application
  * programs (cjpeg, djpeg, jpegtran).
@@ -82,7 +81,7 @@ end_progress_monitor (j_common_ptr cinfo)
  */
 
 GLOBAL(boolean)
-keymatch (char *arg, const char *keyword, int minchars)
+keymatch (char * arg, const char * keyword, int minchars)
 {
   register int ca, ck;
   register int nmatched = 0;

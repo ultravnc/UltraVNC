@@ -4,9 +4,8 @@
  * This file was part of the Independent JPEG Group's software:
  * Copyright (C) 1991-1996, Thomas G. Lane.
  * libjpeg-turbo Modifications:
- * Copyright (C) 2009-2012, 2015, D. R. Commander.
- * For conditions of distribution and use, see the accompanying README.ijg
- * file.
+ * Copyright (C) 2009-2012, D. R. Commander.
+ * For conditions of distribution and use, see the accompanying README file.
  *
  * This file contains input colorspace conversion routines.
  */
@@ -35,7 +34,7 @@ rgb_ycc_convert_internal (j_compress_ptr cinfo,
 {
   my_cconvert_ptr cconvert = (my_cconvert_ptr) cinfo->cconvert;
   register int r, g, b;
-  register JLONG * ctab = cconvert->rgb_ycc_tab;
+  register INT32 * ctab = cconvert->rgb_ycc_tab;
   register JSAMPROW inptr;
   register JSAMPROW outptr0, outptr1, outptr2;
   register JDIMENSION col;
@@ -92,7 +91,7 @@ rgb_gray_convert_internal (j_compress_ptr cinfo,
 {
   my_cconvert_ptr cconvert = (my_cconvert_ptr) cinfo->cconvert;
   register int r, g, b;
-  register JLONG * ctab = cconvert->rgb_ycc_tab;
+  register INT32 * ctab = cconvert->rgb_ycc_tab;
   register JSAMPROW inptr;
   register JSAMPROW outptr;
   register JDIMENSION col;

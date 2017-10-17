@@ -4,9 +4,8 @@
  * This file was part of the Independent JPEG Group's software:
  * Copyright (C) 1994-1996, Thomas G. Lane.
  * libjpeg-turbo Modifications:
- * Copyright (C) 2011, 2015, D. R. Commander.
- * For conditions of distribution and use, see the accompanying README.ijg
- * file.
+ * Copyright (C) 2011, D. R. Commander.
+ * For conditions of distribution and use, see the accompanying README file.
  *
  * This file contains code for merged upsampling/color conversion.
  */
@@ -36,8 +35,8 @@ h2v1_merged_upsample_internal (j_decompress_ptr cinfo,
   register JSAMPLE * range_limit = cinfo->sample_range_limit;
   int * Crrtab = upsample->Cr_r_tab;
   int * Cbbtab = upsample->Cb_b_tab;
-  JLONG * Crgtab = upsample->Cr_g_tab;
-  JLONG * Cbgtab = upsample->Cb_g_tab;
+  INT32 * Crgtab = upsample->Cr_g_tab;
+  INT32 * Cbgtab = upsample->Cb_g_tab;
   SHIFT_TEMPS
 
   inptr0 = input_buf[0][in_row_group_ctr];
@@ -109,8 +108,8 @@ h2v2_merged_upsample_internal (j_decompress_ptr cinfo,
   register JSAMPLE * range_limit = cinfo->sample_range_limit;
   int * Crrtab = upsample->Cr_r_tab;
   int * Cbbtab = upsample->Cb_b_tab;
-  JLONG * Crgtab = upsample->Cr_g_tab;
-  JLONG * Cbgtab = upsample->Cb_g_tab;
+  INT32 * Crgtab = upsample->Cr_g_tab;
+  INT32 * Cbgtab = upsample->Cb_g_tab;
   SHIFT_TEMPS
 
   inptr00 = input_buf[0][in_row_group_ctr*2];

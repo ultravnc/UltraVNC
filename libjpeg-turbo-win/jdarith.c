@@ -2,11 +2,10 @@
  * jdarith.c
  *
  * This file was part of the Independent JPEG Group's software:
- * Developed 1997-2015 by Guido Vollbeding.
- * libjpeg-turbo Modifications:
- * Copyright (C) 2015-2016, D. R. Commander.
- * For conditions of distribution and use, see the accompanying README.ijg
- * file.
+ * Developed 1997-2009 by Guido Vollbeding.
+ * It was modified by The libjpeg-turbo Project to include only code relevant
+ * to libjpeg-turbo.
+ * For conditions of distribution and use, see the accompanying README file.
  *
  * This file contains portable arithmetic entropy decoding routines for JPEG
  * (implementing the ISO/IEC IS 10918-1 and CCITT Recommendation ITU-T T.81).
@@ -26,8 +25,8 @@
 typedef struct {
   struct jpeg_entropy_decoder pub; /* public fields */
 
-  JLONG c;       /* C register, base of coding interval + input bit buffer */
-  JLONG a;               /* A register, normalized size of coding interval */
+  INT32 c;       /* C register, base of coding interval + input bit buffer */
+  INT32 a;               /* A register, normalized size of coding interval */
   int ct;     /* bit shift counter, # of bits left in bit buffer part of C */
                                                          /* init: ct = -16 */
                                                          /* run: ct = 0..7 */
@@ -38,14 +37,14 @@ typedef struct {
   unsigned int restarts_to_go;  /* MCUs left in this restart interval */
 
   /* Pointers to statistics areas (these workspaces have image lifespan) */
-  unsigned char *dc_stats[NUM_ARITH_TBLS];
-  unsigned char *ac_stats[NUM_ARITH_TBLS];
+  unsigned char * dc_stats[NUM_ARITH_TBLS];
+  unsigned char * ac_stats[NUM_ARITH_TBLS];
 
   /* Statistics bin for coding with fixed probability 0.5 */
   unsigned char fixed_bin[4];
 } arith_entropy_decoder;
 
-typedef arith_entropy_decoder *arith_entropy_ptr;
+typedef arith_entropy_decoder * arith_entropy_ptr;
 
 /* The following two definitions specify the allocation chunk size
  * for the statistics area.
@@ -68,7 +67,7 @@ LOCAL(int)
 get_byte (j_decompress_ptr cinfo)
 /* Read next input byte; we do not support suspension in this module. */
 {
-  struct jpeg_source_mgr *src = cinfo->src;
+  struct jpeg_source_mgr * src = cinfo->src;
 
   if (src->bytes_in_buffer == 0)
     if (! (*src->fill_input_buffer) (cinfo))
@@ -97,7 +96,7 @@ get_byte (j_decompress_ptr cinfo)
  * (instead of fixed) with the bit shift counter CT.
  * Thus, we also need only one (variable instead of
  * fixed size) shift for the LPS/MPS decision, and
- * we can do away with any renormalization update
+ * we can get away with any renormalization update
  * of C (except for new data insertion, of course).
  *
  * I've also introduced a new scheme for accessing
@@ -110,7 +109,7 @@ arith_decode (j_decompress_ptr cinfo, unsigned char *st)
 {
   register arith_entropy_ptr e = (arith_entropy_ptr) cinfo->entropy;
   register unsigned char nl, nm;
-  register JLONG qe, temp;
+  register INT32 qe, temp;
   register int sv, data;
 
   /* Renormalization & data input per section D.2.6 */
@@ -194,7 +193,7 @@ process_restart (j_decompress_ptr cinfo)
 {
   arith_entropy_ptr entropy = (arith_entropy_ptr) cinfo->entropy;
   int ci;
-  jpeg_component_info *compptr;
+  jpeg_component_info * compptr;
 
   /* Advance past the RSTn marker */
   if (! (*cinfo->marker->read_restart_marker) (cinfo))
@@ -203,13 +202,13 @@ process_restart (j_decompress_ptr cinfo)
   /* Re-initialize statistics areas */
   for (ci = 0; ci < cinfo->comps_in_scan; ci++) {
     compptr = cinfo->cur_comp_info[ci];
-    if (!cinfo->progressive_mode || (cinfo->Ss == 0 && cinfo->Ah == 0)) {
+    if (! cinfo->progressive_mode || (cinfo->Ss == 0 && cinfo->Ah == 0)) {
       MEMZERO(entropy->dc_stats[compptr->dc_tbl_no], DC_STAT_BINS);
       /* Reset DC predictions to 0 */
       entropy->last_dc_val[ci] = 0;
       entropy->dc_context[ci] = 0;
     }
-    if (!cinfo->progressive_mode || cinfo->Ss) {
+    if (! cinfo->progressive_mode || cinfo->Ss) {
       MEMZERO(entropy->ac_stats[compptr->ac_tbl_no], AC_STAT_BINS);
     }
   }
@@ -382,7 +381,7 @@ decode_mcu_AC_first (j_decompress_ptr cinfo, JBLOCKROW *MCU_data)
       if (arith_decode(cinfo, st)) v |= m;
     v += 1; if (sign) v = -v;
     /* Scale and output coefficient in natural (dezigzagged) order */
-    (*block)[jpeg_natural_order[k]] = (JCOEF) ((unsigned)v << cinfo->Al);
+    (*block)[jpeg_natural_order[k]] = (JCOEF) (v << cinfo->Al);
   }
 
   return TRUE;
@@ -499,7 +498,7 @@ METHODDEF(boolean)
 decode_mcu (j_decompress_ptr cinfo, JBLOCKROW *MCU_data)
 {
   arith_entropy_ptr entropy = (arith_entropy_ptr) cinfo->entropy;
-  jpeg_component_info *compptr;
+  jpeg_component_info * compptr;
   JBLOCKROW block;
   unsigned char *st;
   int blkn, ci, tbl, sign, k;
@@ -517,7 +516,7 @@ decode_mcu (j_decompress_ptr cinfo, JBLOCKROW *MCU_data)
   /* Outer loop handles each block in the MCU */
 
   for (blkn = 0; blkn < cinfo->blocks_in_MCU; blkn++) {
-    block = MCU_data ? MCU_data[blkn] : NULL;
+    block = MCU_data[blkn];
     ci = cinfo->MCU_membership[blkn];
     compptr = cinfo->cur_comp_info[ci];
 
@@ -564,8 +563,7 @@ decode_mcu (j_decompress_ptr cinfo, JBLOCKROW *MCU_data)
       entropy->last_dc_val[ci] += v;
     }
 
-    if (block)
-      (*block)[0] = (JCOEF) entropy->last_dc_val[ci];
+    (*block)[0] = (JCOEF) entropy->last_dc_val[ci];
 
     /* Sections F.2.4.2 & F.1.4.4.2: Decoding of AC coefficients */
 
@@ -609,8 +607,7 @@ decode_mcu (j_decompress_ptr cinfo, JBLOCKROW *MCU_data)
       while (m >>= 1)
         if (arith_decode(cinfo, st)) v |= m;
       v += 1; if (sign) v = -v;
-      if (block)
-        (*block)[jpeg_natural_order[k]] = (JCOEF) v;
+      (*block)[jpeg_natural_order[k]] = (JCOEF) v;
     }
   }
 
@@ -627,7 +624,7 @@ start_pass (j_decompress_ptr cinfo)
 {
   arith_entropy_ptr entropy = (arith_entropy_ptr) cinfo->entropy;
   int ci, tbl;
-  jpeg_component_info *compptr;
+  jpeg_component_info * compptr;
 
   if (cinfo->progressive_mode) {
     /* Validate progressive scan parameters */
@@ -694,7 +691,7 @@ start_pass (j_decompress_ptr cinfo)
   /* Allocate & initialize requested statistics areas */
   for (ci = 0; ci < cinfo->comps_in_scan; ci++) {
     compptr = cinfo->cur_comp_info[ci];
-    if (!cinfo->progressive_mode || (cinfo->Ss == 0 && cinfo->Ah == 0)) {
+    if (! cinfo->progressive_mode || (cinfo->Ss == 0 && cinfo->Ah == 0)) {
       tbl = compptr->dc_tbl_no;
       if (tbl < 0 || tbl >= NUM_ARITH_TBLS)
         ERREXIT1(cinfo, JERR_NO_ARITH_TABLE, tbl);
@@ -706,7 +703,7 @@ start_pass (j_decompress_ptr cinfo)
       entropy->last_dc_val[ci] = 0;
       entropy->dc_context[ci] = 0;
     }
-    if (!cinfo->progressive_mode || cinfo->Ss) {
+    if (! cinfo->progressive_mode || cinfo->Ss) {
       tbl = compptr->ac_tbl_no;
       if (tbl < 0 || tbl >= NUM_ARITH_TBLS)
         ERREXIT1(cinfo, JERR_NO_ARITH_TABLE, tbl);

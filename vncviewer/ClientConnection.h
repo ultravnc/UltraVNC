@@ -802,6 +802,11 @@ private:
 	UINT m_idle_time;
 	ViewerDirectxClass directx_output;
 	bool directx_used;
+
+
+	jpeg_source_mgr m_jpegSrcManager;
+
+
 public:
 	// RFB settings
 	VNCOptions m_opts;

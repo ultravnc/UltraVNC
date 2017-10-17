@@ -5,9 +5,8 @@
  * Copyright (C) 1994-1996, Thomas G. Lane.
  * libjpeg-turbo Modifications:
  * Copyright (C) 2013, Linaro Limited.
- * Copyright (C) 2014-2015, D. R. Commander.
- * For conditions of distribution and use, see the accompanying README.ijg
- * file.
+ * Copyright (C) 2014, D. R. Commander.
+ * For conditions of distribution and use, see the accompanying README file.
  *
  * This file contains code for merged upsampling/color conversion.
  */
@@ -30,10 +29,10 @@ h2v1_merged_upsample_565_internal (j_decompress_ptr cinfo,
   register JSAMPLE * range_limit = cinfo->sample_range_limit;
   int * Crrtab = upsample->Cr_r_tab;
   int * Cbbtab = upsample->Cb_b_tab;
-  JLONG * Crgtab = upsample->Cr_g_tab;
-  JLONG * Cbgtab = upsample->Cb_g_tab;
+  INT32 * Crgtab = upsample->Cr_g_tab;
+  INT32 * Cbgtab = upsample->Cb_g_tab;
   unsigned int r, g, b;
-  JLONG rgb;
+  INT32 rgb;
   SHIFT_TEMPS
 
   inptr0 = input_buf[0][in_row_group_ctr];
@@ -79,7 +78,7 @@ h2v1_merged_upsample_565_internal (j_decompress_ptr cinfo,
     g = range_limit[y + cgreen];
     b = range_limit[y + cblue];
     rgb = PACK_SHORT_565(r, g, b);
-    *(INT16*)outptr = (INT16)rgb;
+    *(INT16*)outptr = rgb;
    }
  }
 
@@ -101,11 +100,11 @@ h2v1_merged_upsample_565D_internal (j_decompress_ptr cinfo,
   register JSAMPLE * range_limit = cinfo->sample_range_limit;
   int * Crrtab = upsample->Cr_r_tab;
   int * Cbbtab = upsample->Cb_b_tab;
-  JLONG * Crgtab = upsample->Cr_g_tab;
-  JLONG * Cbgtab = upsample->Cb_g_tab;
-  JLONG d0 = dither_matrix[cinfo->output_scanline & DITHER_MASK];
+  INT32 * Crgtab = upsample->Cr_g_tab;
+  INT32 * Cbgtab = upsample->Cb_g_tab;
+  INT32 d0 = dither_matrix[cinfo->output_scanline & DITHER_MASK];
   unsigned int r, g, b;
-  JLONG rgb;
+  INT32 rgb;
   SHIFT_TEMPS
 
   inptr0 = input_buf[0][in_row_group_ctr];
@@ -153,7 +152,7 @@ h2v1_merged_upsample_565D_internal (j_decompress_ptr cinfo,
     g = range_limit[DITHER_565_G(y + cgreen, d0)];
     b = range_limit[DITHER_565_B(y + cblue, d0)];
     rgb = PACK_SHORT_565(r, g, b);
-    *(INT16*)outptr = (INT16)rgb;
+    *(INT16*)outptr = rgb;
   }
 }
 
@@ -175,10 +174,10 @@ h2v2_merged_upsample_565_internal (j_decompress_ptr cinfo,
   register JSAMPLE * range_limit = cinfo->sample_range_limit;
   int * Crrtab = upsample->Cr_r_tab;
   int * Cbbtab = upsample->Cb_b_tab;
-  JLONG * Crgtab = upsample->Cr_g_tab;
-  JLONG * Cbgtab = upsample->Cb_g_tab;
+  INT32 * Crgtab = upsample->Cr_g_tab;
+  INT32 * Cbgtab = upsample->Cb_g_tab;
   unsigned int r, g, b;
-  JLONG rgb;
+  INT32 rgb;
   SHIFT_TEMPS
 
   inptr00 = input_buf[0][in_row_group_ctr * 2];
@@ -242,14 +241,14 @@ h2v2_merged_upsample_565_internal (j_decompress_ptr cinfo,
     g = range_limit[y + cgreen];
     b = range_limit[y + cblue];
     rgb = PACK_SHORT_565(r, g, b);
-    *(INT16*)outptr0 = (INT16)rgb;
+    *(INT16*)outptr0 = rgb;
 
     y  = GETJSAMPLE(*inptr01);
     r = range_limit[y + cred];
     g = range_limit[y + cgreen];
     b = range_limit[y + cblue];
     rgb = PACK_SHORT_565(r, g, b);
-    *(INT16*)outptr1 = (INT16)rgb;
+    *(INT16*)outptr1 = rgb;
   }
 }
 
@@ -271,12 +270,12 @@ h2v2_merged_upsample_565D_internal (j_decompress_ptr cinfo,
   register JSAMPLE * range_limit = cinfo->sample_range_limit;
   int * Crrtab = upsample->Cr_r_tab;
   int * Cbbtab = upsample->Cb_b_tab;
-  JLONG * Crgtab = upsample->Cr_g_tab;
-  JLONG * Cbgtab = upsample->Cb_g_tab;
-  JLONG d0 = dither_matrix[cinfo->output_scanline & DITHER_MASK];
-  JLONG d1 = dither_matrix[(cinfo->output_scanline+1) & DITHER_MASK];
+  INT32 * Crgtab = upsample->Cr_g_tab;
+  INT32 * Cbgtab = upsample->Cb_g_tab;
+  INT32 d0 = dither_matrix[cinfo->output_scanline & DITHER_MASK];
+  INT32 d1 = dither_matrix[(cinfo->output_scanline+1) & DITHER_MASK];
   unsigned int r, g, b;
-  JLONG rgb;
+  INT32 rgb;
   SHIFT_TEMPS
 
   inptr00 = input_buf[0][in_row_group_ctr*2];
@@ -344,13 +343,13 @@ h2v2_merged_upsample_565D_internal (j_decompress_ptr cinfo,
     g = range_limit[DITHER_565_G(y + cgreen, d0)];
     b = range_limit[DITHER_565_B(y + cblue, d0)];
     rgb = PACK_SHORT_565(r, g, b);
-    *(INT16*)outptr0 = (INT16)rgb;
+    *(INT16*)outptr0 = rgb;
 
     y  = GETJSAMPLE(*inptr01);
     r = range_limit[DITHER_565_R(y + cred, d1)];
     g = range_limit[DITHER_565_G(y + cgreen, d1)];
     b = range_limit[DITHER_565_B(y + cblue, d1)];
     rgb = PACK_SHORT_565(r, g, b);
-    *(INT16*)outptr1 = (INT16)rgb;
+    *(INT16*)outptr1 = rgb;
   }
 }

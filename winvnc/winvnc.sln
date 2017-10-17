@@ -46,8 +46,6 @@ Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "UltraVnc", "UltraVnc\UltraV
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "UltraVnc", "UltraVnc\UltraVnc_VS2010_X64.vdproj", "{3290B9F4-62C0-4367-9044-4F787A888ACB}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SCHook", "schook\SCHook.vcxproj", "{615BBC95-8125-4FFD-B6D5-C7D851D72529}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		ASM Debug|Win32 = ASM Debug|Win32
@@ -650,31 +648,6 @@ Global
 		{3290B9F4-62C0-4367-9044-4F787A888ACB}.ReleaseWithoutAsm|Win32.Build.0 = Release
 		{3290B9F4-62C0-4367-9044-4F787A888ACB}.ReleaseWithoutAsm|x64.ActiveCfg = Release
 		{3290B9F4-62C0-4367-9044-4F787A888ACB}.ReleaseWithoutAsm|x64.Build.0 = Release
-		{615BBC95-8125-4FFD-B6D5-C7D851D72529}.ASM Debug|Win32.ActiveCfg = Debug|Win32
-		{615BBC95-8125-4FFD-B6D5-C7D851D72529}.ASM Debug|Win32.Build.0 = Debug|Win32
-		{615BBC95-8125-4FFD-B6D5-C7D851D72529}.ASM Debug|x64.ActiveCfg = Debug|x64
-		{615BBC95-8125-4FFD-B6D5-C7D851D72529}.ASM Debug|x64.Build.0 = Debug|x64
-		{615BBC95-8125-4FFD-B6D5-C7D851D72529}.ASM Release|Win32.ActiveCfg = Release|Win32
-		{615BBC95-8125-4FFD-B6D5-C7D851D72529}.ASM Release|Win32.Build.0 = Release|Win32
-		{615BBC95-8125-4FFD-B6D5-C7D851D72529}.ASM Release|x64.ActiveCfg = Release|x64
-		{615BBC95-8125-4FFD-B6D5-C7D851D72529}.ASM Release|x64.Build.0 = Release|x64
-		{615BBC95-8125-4FFD-B6D5-C7D851D72529}.Debug|Win32.ActiveCfg = Debug|Win32
-		{615BBC95-8125-4FFD-B6D5-C7D851D72529}.Debug|Win32.Build.0 = Debug|Win32
-		{615BBC95-8125-4FFD-B6D5-C7D851D72529}.Debug|x64.ActiveCfg = Debug|x64
-		{615BBC95-8125-4FFD-B6D5-C7D851D72529}.Debug|x64.Build.0 = Debug|x64
-		{615BBC95-8125-4FFD-B6D5-C7D851D72529}.Http|Win32.ActiveCfg = Release|x64
-		{615BBC95-8125-4FFD-B6D5-C7D851D72529}.Http|x64.ActiveCfg = Release|x64
-		{615BBC95-8125-4FFD-B6D5-C7D851D72529}.Http|x64.Build.0 = Release|x64
-		{615BBC95-8125-4FFD-B6D5-C7D851D72529}.IPP|Win32.ActiveCfg = Release|x64
-		{615BBC95-8125-4FFD-B6D5-C7D851D72529}.IPP|x64.ActiveCfg = Release|x64
-		{615BBC95-8125-4FFD-B6D5-C7D851D72529}.IPP|x64.Build.0 = Release|x64
-		{615BBC95-8125-4FFD-B6D5-C7D851D72529}.Release|Win32.ActiveCfg = Release|Win32
-		{615BBC95-8125-4FFD-B6D5-C7D851D72529}.Release|Win32.Build.0 = Release|Win32
-		{615BBC95-8125-4FFD-B6D5-C7D851D72529}.Release|x64.ActiveCfg = Release|x64
-		{615BBC95-8125-4FFD-B6D5-C7D851D72529}.Release|x64.Build.0 = Release|x64
-		{615BBC95-8125-4FFD-B6D5-C7D851D72529}.ReleaseWithoutAsm|Win32.ActiveCfg = Release|x64
-		{615BBC95-8125-4FFD-B6D5-C7D851D72529}.ReleaseWithoutAsm|x64.ActiveCfg = Release|x64
-		{615BBC95-8125-4FFD-B6D5-C7D851D72529}.ReleaseWithoutAsm|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

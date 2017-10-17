@@ -515,9 +515,75 @@ void ClientConnection::FilterPalette (int numRows)
 //
 
 static bool jpegError;
+//
+// A "Source manager" for the JPEG library.
+//
 
-static void JpegSetSrcManager(j_decompress_ptr cinfo, char *compressedData,
-							  int compressedLen);
+static struct jpeg_source_mgr jpegSrcManager;
+static JOCTET *jpegBufferPtr;
+static size_t jpegBufferLen;
+
+static void JpegInitSource(j_decompress_ptr cinfo);
+static boolean JpegFillInputBuffer(j_decompress_ptr cinfo);
+static void JpegSkipInputData(j_decompress_ptr cinfo, long num_bytes);
+static void JpegTermSource(j_decompress_ptr cinfo);
+
+static void
+JpegInitSource(j_decompress_ptr cinfo)
+{
+	jpegError = false;
+}
+
+static boolean
+JpegFillInputBuffer(j_decompress_ptr cinfo)
+{
+	jpegError = true;
+	jpegSrcManager.bytes_in_buffer = jpegBufferLen;
+	jpegSrcManager.next_input_byte = (JOCTET *)jpegBufferPtr;
+
+	return TRUE;
+}
+
+static void
+JpegSkipInputData(j_decompress_ptr cinfo, long num_bytes)
+{
+	if (num_bytes < 0 || (size_t)num_bytes > jpegSrcManager.bytes_in_buffer) {
+		jpegError = true;
+		jpegSrcManager.bytes_in_buffer = jpegBufferLen;
+		jpegSrcManager.next_input_byte = (JOCTET *)jpegBufferPtr;
+	}
+	else {
+		jpegSrcManager.next_input_byte += (size_t)num_bytes;
+		jpegSrcManager.bytes_in_buffer -= (size_t)num_bytes;
+	}
+}
+
+static void
+JpegTermSource(j_decompress_ptr cinfo)
+{
+	/* No work necessary here. */
+}
+
+/*static void
+JpegSetSrcManager(j_decompress_ptr cinfo, char *compressedData, int compressedLen)
+{
+jpegBufferPtr = (JOCTET *)compressedData;
+jpegBufferLen = (size_t)compressedLen;
+
+jpegSrcManager.init_source = JpegInitSource;
+jpegSrcManager.fill_input_buffer = JpegFillInputBuffer;
+jpegSrcManager.skip_input_data = JpegSkipInputData;
+jpegSrcManager.resync_to_restart = jpeg_resync_to_restart;
+jpegSrcManager.term_source = JpegTermSource;
+jpegSrcManager.next_input_byte = jpegBufferPtr;
+jpegSrcManager.bytes_in_buffer = jpegBufferLen;
+
+cinfo->src = &jpegSrcManager;
+}*/
+
+
+/*static void JpegSetSrcManager(j_decompress_ptr cinfo, char *compressedData,
+							  int compressedLen);*/
 
 void ClientConnection::DecompressJpegRect(int x, int y, int w, int h)
 {
@@ -536,7 +602,20 @@ void ClientConnection::DecompressJpegRect(int x, int y, int w, int h)
   cinfo.err = jpeg_std_error(&jerr);
   jpeg_create_decompress(&cinfo);
 
-  JpegSetSrcManager(&cinfo, m_netbuf, compressedLen);
+  //JpegSetSrcManager(&cinfo, m_netbuf, compressedLen);
+
+  jpegBufferPtr = (JOCTET *)m_netbuf;
+  jpegBufferLen = (size_t)compressedLen;
+
+  m_jpegSrcManager.init_source = JpegInitSource;
+  m_jpegSrcManager.fill_input_buffer = JpegFillInputBuffer;
+  m_jpegSrcManager.skip_input_data = JpegSkipInputData;
+  m_jpegSrcManager.resync_to_restart = jpeg_resync_to_restart;
+  m_jpegSrcManager.term_source = JpegTermSource;
+  m_jpegSrcManager.next_input_byte = jpegBufferPtr;
+  m_jpegSrcManager.bytes_in_buffer = jpegBufferLen;
+
+  cinfo.src = &m_jpegSrcManager;
 
   jpeg_read_header(&cinfo, TRUE);
   cinfo.out_color_space = JCS_RGB;
@@ -578,68 +657,4 @@ void ClientConnection::DecompressJpegRect(int x, int y, int w, int h)
   jpeg_destroy_decompress(&cinfo);
 }
 
-//
-// A "Source manager" for the JPEG library.
-//
-
-static struct jpeg_source_mgr jpegSrcManager;
-static JOCTET *jpegBufferPtr;
-static size_t jpegBufferLen;
-
-static void JpegInitSource(j_decompress_ptr cinfo);
-static boolean JpegFillInputBuffer(j_decompress_ptr cinfo);
-static void JpegSkipInputData(j_decompress_ptr cinfo, long num_bytes);
-static void JpegTermSource(j_decompress_ptr cinfo);
-
-static void
-JpegInitSource(j_decompress_ptr cinfo)
-{
-  jpegError = false;
-}
-
-static boolean
-JpegFillInputBuffer(j_decompress_ptr cinfo)
-{
-  jpegError = true;
-  jpegSrcManager.bytes_in_buffer = jpegBufferLen;
-  jpegSrcManager.next_input_byte = (JOCTET *)jpegBufferPtr;
-
-  return TRUE;
-}
-
-static void
-JpegSkipInputData(j_decompress_ptr cinfo, long num_bytes)
-{
-  if (num_bytes < 0 || (size_t)num_bytes > jpegSrcManager.bytes_in_buffer) {
-    jpegError = true;
-    jpegSrcManager.bytes_in_buffer = jpegBufferLen;
-    jpegSrcManager.next_input_byte = (JOCTET *)jpegBufferPtr;
-  } else {
-    jpegSrcManager.next_input_byte += (size_t) num_bytes;
-    jpegSrcManager.bytes_in_buffer -= (size_t) num_bytes;
-  }
-}
-
-static void
-JpegTermSource(j_decompress_ptr cinfo)
-{
-  /* No work necessary here. */
-}
-
-static void
-JpegSetSrcManager(j_decompress_ptr cinfo, char *compressedData, int compressedLen)
-{
-  jpegBufferPtr = (JOCTET *)compressedData;
-  jpegBufferLen = (size_t)compressedLen;
-
-  jpegSrcManager.init_source = JpegInitSource;
-  jpegSrcManager.fill_input_buffer = JpegFillInputBuffer;
-  jpegSrcManager.skip_input_data = JpegSkipInputData;
-  jpegSrcManager.resync_to_restart = jpeg_resync_to_restart;
-  jpegSrcManager.term_source = JpegTermSource;
-  jpegSrcManager.next_input_byte = jpegBufferPtr;
-  jpegSrcManager.bytes_in_buffer = jpegBufferLen;
-
-  cinfo->src = &jpegSrcManager;
-}
 

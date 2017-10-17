@@ -75,7 +75,7 @@ JpegTermSource(j_decompress_ptr cinfo)
   /* No work necessary here. */
 }
 
-static void
+/*static void
 JpegSetSrcManager(j_decompress_ptr cinfo, char *compressedData, int compressedLen)
 {
   jpegBufferPtr = (JOCTET *)compressedData;
@@ -90,7 +90,7 @@ JpegSetSrcManager(j_decompress_ptr cinfo, char *compressedData, int compressedLe
   jpegSrcManager.bytes_in_buffer = jpegBufferLen;
 
   cinfo->src = &jpegSrcManager;
-}
+}*/
 
 void 
 	ClientConnection::DecompressJpegRect(BYTE *src, int srclen, BYTE *dst, int dst_size,int w, int h,rfbPixelFormat m_remoteformat)
@@ -104,7 +104,21 @@ void
  // Set up JPEG decompression
   cinfo.err = jpeg_std_error(&jerr);
   jpeg_create_decompress(&cinfo);
-  JpegSetSrcManager(&cinfo, (char*)src, srclen);
+  //JpegSetSrcManager(&cinfo, (char*)src, srclen);
+
+  jpegBufferPtr = (JOCTET *)src;
+  jpegBufferLen = (size_t)srclen;
+
+  m_jpegSrcManager.init_source = JpegInitSource;
+  m_jpegSrcManager.fill_input_buffer = JpegFillInputBuffer;
+  m_jpegSrcManager.skip_input_data = JpegSkipInputData;
+  m_jpegSrcManager.resync_to_restart = jpeg_resync_to_restart;
+  m_jpegSrcManager.term_source = JpegTermSource;
+  m_jpegSrcManager.next_input_byte = jpegBufferPtr;
+  m_jpegSrcManager.bytes_in_buffer = jpegBufferLen;
+
+  cinfo.src = &m_jpegSrcManager;
+
   jpeg_read_header(&cinfo, TRUE);
   cinfo.out_color_space = JCS_RGB;
   pixelsize = 3;

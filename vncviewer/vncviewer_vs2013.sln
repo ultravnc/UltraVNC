@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.16
+VisualStudioVersion = 15.0.26730.15
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rdr", "..\rdr\rdrv12.vcxproj", "{F5244002-0FFF-4F19-A941-FCCE1861F132}"
 EndProject
@@ -122,12 +122,12 @@ Global
 		{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}.Debug|Win32.Build.0 = Debug|Win32
 		{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}.Debug|x64.ActiveCfg = Debug|x64
 		{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}.Debug|x64.Build.0 = Debug|x64
-		{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}.OldCPU|Win32.ActiveCfg = OldCPU|Win32
-		{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}.OldCPU|Win32.Build.0 = OldCPU|Win32
-		{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}.OldCPU|Win32.Deploy.0 = OldCPU|Win32
-		{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}.OldCPU|x64.ActiveCfg = OldCPU|x64
-		{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}.OldCPU|x64.Build.0 = OldCPU|x64
-		{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}.OldCPU|x64.Deploy.0 = OldCPU|x64
+		{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}.OldCPU|Win32.ActiveCfg = Vista|Win32
+		{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}.OldCPU|Win32.Build.0 = Vista|Win32
+		{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}.OldCPU|Win32.Deploy.0 = Vista|Win32
+		{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}.OldCPU|x64.ActiveCfg = Vista|x64
+		{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}.OldCPU|x64.Build.0 = Vista|x64
+		{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}.OldCPU|x64.Deploy.0 = Vista|x64
 		{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}.Release|Win32.ActiveCfg = Release|Win32
 		{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}.Release|Win32.Build.0 = Release|Win32
 		{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}.Release|x64.ActiveCfg = Release|x64
@@ -173,5 +173,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {176DDE3A-F92A-485A-BAC9-D3DB9ED10A03}
 	EndGlobalSection
 EndGlobal

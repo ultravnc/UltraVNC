@@ -7,8 +7,7 @@
  * libjpeg-turbo Modifications:
  * Modified 2011 by Siarhei Siamashka.
  * Copyright (C) 2015, D. R. Commander.
- * For conditions of distribution and use, see the accompanying README.ijg
- * file.
+ * For conditions of distribution and use, see the accompanying README file.
  *
  * This file contains routines to read input images in Microsoft "BMP"
  * format (MS Windows 3.x, OS/2 1.x, and OS/2 2.x flavors).
@@ -52,7 +51,7 @@ typedef char U_CHAR;
 
 /* Private version of data source object */
 
-typedef struct _bmp_source_struct *bmp_source_ptr;
+typedef struct _bmp_source_struct * bmp_source_ptr;
 
 typedef struct _bmp_source_struct {
   struct cjpeg_source_struct pub; /* public fields */

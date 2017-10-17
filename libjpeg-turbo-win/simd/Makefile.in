@@ -88,7 +88,6 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@SIMD_POWERPC_TRUE@am__append_1 = libsimd_altivec.la
 subdir = simd
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
@@ -102,47 +101,43 @@ CONFIG_HEADER = $(top_builddir)/config.h $(top_builddir)/jconfig.h \
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-@SIMD_POWERPC_TRUE@libsimd_la_DEPENDENCIES = libsimd_altivec.la
+libsimd_la_LIBADD =
 am__libsimd_la_SOURCES_DIST = jsimd_arm64.c jsimd_arm64_neon.S \
 	jsimd_arm.c jsimd_arm_neon.S jsimd_i386.c jsimd.h \
-	jsimdcfg.inc.h jsimdext.inc jcolsamp.inc jdct.inc \
-	jpeg_nbits_table.inc jsimdcpu.asm jfdctflt-3dn.asm \
-	jidctflt-3dn.asm jquant-3dn.asm jccolor-mmx.asm jcgray-mmx.asm \
-	jcsample-mmx.asm jdcolor-mmx.asm jdmerge-mmx.asm \
-	jdsample-mmx.asm jfdctfst-mmx.asm jfdctint-mmx.asm \
-	jidctfst-mmx.asm jidctint-mmx.asm jidctred-mmx.asm \
-	jquant-mmx.asm jfdctflt-sse.asm jidctflt-sse.asm \
-	jquant-sse.asm jccolor-sse2.asm jcgray-sse2.asm \
-	jchuff-sse2.asm jcsample-sse2.asm jdcolor-sse2.asm \
-	jdmerge-sse2.asm jdsample-sse2.asm jfdctfst-sse2.asm \
-	jfdctint-sse2.asm jidctflt-sse2.asm jidctfst-sse2.asm \
-	jidctint-sse2.asm jidctred-sse2.asm jquantf-sse2.asm \
-	jquanti-sse2.asm jsimd_mips.c jsimd_mips_dspr2_asm.h \
-	jsimd_mips_dspr2.S jsimd_powerpc.c jsimd_altivec.h jcsample.h \
-	jsimd_x86_64.c jfdctflt-sse-64.asm jccolor-sse2-64.asm \
-	jcgray-sse2-64.asm jchuff-sse2-64.asm jcsample-sse2-64.asm \
-	jdcolor-sse2-64.asm jdmerge-sse2-64.asm jdsample-sse2-64.asm \
-	jfdctfst-sse2-64.asm jfdctint-sse2-64.asm jidctflt-sse2-64.asm \
-	jidctfst-sse2-64.asm jidctint-sse2-64.asm jidctred-sse2-64.asm \
-	jquantf-sse2-64.asm jquanti-sse2-64.asm
-@SIMD_ARM_64_FALSE@@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_MIPS_FALSE@@SIMD_POWERPC_FALSE@@SIMD_X86_64_TRUE@am_libsimd_la_OBJECTS = jsimd_x86_64.lo \
-@SIMD_ARM_64_FALSE@@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_MIPS_FALSE@@SIMD_POWERPC_FALSE@@SIMD_X86_64_TRUE@	jfdctflt-sse-64.lo \
-@SIMD_ARM_64_FALSE@@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_MIPS_FALSE@@SIMD_POWERPC_FALSE@@SIMD_X86_64_TRUE@	jccolor-sse2-64.lo \
-@SIMD_ARM_64_FALSE@@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_MIPS_FALSE@@SIMD_POWERPC_FALSE@@SIMD_X86_64_TRUE@	jcgray-sse2-64.lo \
-@SIMD_ARM_64_FALSE@@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_MIPS_FALSE@@SIMD_POWERPC_FALSE@@SIMD_X86_64_TRUE@	jchuff-sse2-64.lo \
-@SIMD_ARM_64_FALSE@@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_MIPS_FALSE@@SIMD_POWERPC_FALSE@@SIMD_X86_64_TRUE@	jcsample-sse2-64.lo \
-@SIMD_ARM_64_FALSE@@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_MIPS_FALSE@@SIMD_POWERPC_FALSE@@SIMD_X86_64_TRUE@	jdcolor-sse2-64.lo \
-@SIMD_ARM_64_FALSE@@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_MIPS_FALSE@@SIMD_POWERPC_FALSE@@SIMD_X86_64_TRUE@	jdmerge-sse2-64.lo \
-@SIMD_ARM_64_FALSE@@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_MIPS_FALSE@@SIMD_POWERPC_FALSE@@SIMD_X86_64_TRUE@	jdsample-sse2-64.lo \
-@SIMD_ARM_64_FALSE@@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_MIPS_FALSE@@SIMD_POWERPC_FALSE@@SIMD_X86_64_TRUE@	jfdctfst-sse2-64.lo \
-@SIMD_ARM_64_FALSE@@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_MIPS_FALSE@@SIMD_POWERPC_FALSE@@SIMD_X86_64_TRUE@	jfdctint-sse2-64.lo \
-@SIMD_ARM_64_FALSE@@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_MIPS_FALSE@@SIMD_POWERPC_FALSE@@SIMD_X86_64_TRUE@	jidctflt-sse2-64.lo \
-@SIMD_ARM_64_FALSE@@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_MIPS_FALSE@@SIMD_POWERPC_FALSE@@SIMD_X86_64_TRUE@	jidctfst-sse2-64.lo \
-@SIMD_ARM_64_FALSE@@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_MIPS_FALSE@@SIMD_POWERPC_FALSE@@SIMD_X86_64_TRUE@	jidctint-sse2-64.lo \
-@SIMD_ARM_64_FALSE@@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_MIPS_FALSE@@SIMD_POWERPC_FALSE@@SIMD_X86_64_TRUE@	jidctred-sse2-64.lo \
-@SIMD_ARM_64_FALSE@@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_MIPS_FALSE@@SIMD_POWERPC_FALSE@@SIMD_X86_64_TRUE@	jquantf-sse2-64.lo \
-@SIMD_ARM_64_FALSE@@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_MIPS_FALSE@@SIMD_POWERPC_FALSE@@SIMD_X86_64_TRUE@	jquanti-sse2-64.lo
-@SIMD_ARM_64_FALSE@@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_MIPS_FALSE@@SIMD_POWERPC_TRUE@am_libsimd_la_OBJECTS = jsimd_powerpc.lo
+	jsimdcfg.inc.h jsimdext.inc jcolsamp.inc jdct.inc jsimdcpu.asm \
+	jfdctflt-3dn.asm jidctflt-3dn.asm jquant-3dn.asm \
+	jccolor-mmx.asm jcgray-mmx.asm jcsample-mmx.asm \
+	jdcolor-mmx.asm jdmerge-mmx.asm jdsample-mmx.asm \
+	jfdctfst-mmx.asm jfdctint-mmx.asm jidctfst-mmx.asm \
+	jidctint-mmx.asm jidctred-mmx.asm jquant-mmx.asm \
+	jfdctflt-sse.asm jidctflt-sse.asm jquant-sse.asm \
+	jccolor-sse2.asm jcgray-sse2.asm jcsample-sse2.asm \
+	jdcolor-sse2.asm jdmerge-sse2.asm jdsample-sse2.asm \
+	jfdctfst-sse2.asm jfdctint-sse2.asm jidctflt-sse2.asm \
+	jidctfst-sse2.asm jidctint-sse2.asm jidctred-sse2.asm \
+	jquantf-sse2.asm jquanti-sse2.asm jsimd_mips.c \
+	jsimd_mips_dspr2_asm.h jsimd_mips_dspr2.S jsimd_x86_64.c \
+	jfdctflt-sse-64.asm jccolor-sse2-64.asm jcgray-sse2-64.asm \
+	jcsample-sse2-64.asm jdcolor-sse2-64.asm jdmerge-sse2-64.asm \
+	jdsample-sse2-64.asm jfdctfst-sse2-64.asm jfdctint-sse2-64.asm \
+	jidctflt-sse2-64.asm jidctfst-sse2-64.asm jidctint-sse2-64.asm \
+	jidctred-sse2-64.asm jquantf-sse2-64.asm jquanti-sse2-64.asm
+@SIMD_ARM_64_FALSE@@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_MIPS_FALSE@@SIMD_X86_64_TRUE@am_libsimd_la_OBJECTS = jsimd_x86_64.lo \
+@SIMD_ARM_64_FALSE@@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_MIPS_FALSE@@SIMD_X86_64_TRUE@	jfdctflt-sse-64.lo \
+@SIMD_ARM_64_FALSE@@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_MIPS_FALSE@@SIMD_X86_64_TRUE@	jccolor-sse2-64.lo \
+@SIMD_ARM_64_FALSE@@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_MIPS_FALSE@@SIMD_X86_64_TRUE@	jcgray-sse2-64.lo \
+@SIMD_ARM_64_FALSE@@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_MIPS_FALSE@@SIMD_X86_64_TRUE@	jcsample-sse2-64.lo \
+@SIMD_ARM_64_FALSE@@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_MIPS_FALSE@@SIMD_X86_64_TRUE@	jdcolor-sse2-64.lo \
+@SIMD_ARM_64_FALSE@@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_MIPS_FALSE@@SIMD_X86_64_TRUE@	jdmerge-sse2-64.lo \
+@SIMD_ARM_64_FALSE@@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_MIPS_FALSE@@SIMD_X86_64_TRUE@	jdsample-sse2-64.lo \
+@SIMD_ARM_64_FALSE@@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_MIPS_FALSE@@SIMD_X86_64_TRUE@	jfdctfst-sse2-64.lo \
+@SIMD_ARM_64_FALSE@@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_MIPS_FALSE@@SIMD_X86_64_TRUE@	jfdctint-sse2-64.lo \
+@SIMD_ARM_64_FALSE@@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_MIPS_FALSE@@SIMD_X86_64_TRUE@	jidctflt-sse2-64.lo \
+@SIMD_ARM_64_FALSE@@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_MIPS_FALSE@@SIMD_X86_64_TRUE@	jidctfst-sse2-64.lo \
+@SIMD_ARM_64_FALSE@@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_MIPS_FALSE@@SIMD_X86_64_TRUE@	jidctint-sse2-64.lo \
+@SIMD_ARM_64_FALSE@@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_MIPS_FALSE@@SIMD_X86_64_TRUE@	jidctred-sse2-64.lo \
+@SIMD_ARM_64_FALSE@@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_MIPS_FALSE@@SIMD_X86_64_TRUE@	jquantf-sse2-64.lo \
+@SIMD_ARM_64_FALSE@@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_MIPS_FALSE@@SIMD_X86_64_TRUE@	jquanti-sse2-64.lo
 @SIMD_ARM_64_FALSE@@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_MIPS_TRUE@am_libsimd_la_OBJECTS = jsimd_mips.lo \
 @SIMD_ARM_64_FALSE@@SIMD_ARM_FALSE@@SIMD_I386_FALSE@@SIMD_MIPS_TRUE@	jsimd_mips_dspr2.lo
 @SIMD_ARM_64_FALSE@@SIMD_ARM_FALSE@@SIMD_I386_TRUE@am_libsimd_la_OBJECTS = jsimd_i386.lo \
@@ -167,7 +162,6 @@ am__libsimd_la_SOURCES_DIST = jsimd_arm64.c jsimd_arm64_neon.S \
 @SIMD_ARM_64_FALSE@@SIMD_ARM_FALSE@@SIMD_I386_TRUE@	jquant-sse.lo \
 @SIMD_ARM_64_FALSE@@SIMD_ARM_FALSE@@SIMD_I386_TRUE@	jccolor-sse2.lo \
 @SIMD_ARM_64_FALSE@@SIMD_ARM_FALSE@@SIMD_I386_TRUE@	jcgray-sse2.lo \
-@SIMD_ARM_64_FALSE@@SIMD_ARM_FALSE@@SIMD_I386_TRUE@	jchuff-sse2.lo \
 @SIMD_ARM_64_FALSE@@SIMD_ARM_FALSE@@SIMD_I386_TRUE@	jcsample-sse2.lo \
 @SIMD_ARM_64_FALSE@@SIMD_ARM_FALSE@@SIMD_I386_TRUE@	jdcolor-sse2.lo \
 @SIMD_ARM_64_FALSE@@SIMD_ARM_FALSE@@SIMD_I386_TRUE@	jdmerge-sse2.lo \
@@ -190,30 +184,6 @@ AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
-libsimd_altivec_la_LIBADD =
-am__libsimd_altivec_la_SOURCES_DIST = jccolor-altivec.c \
-	jcgray-altivec.c jcsample-altivec.c jdcolor-altivec.c \
-	jdmerge-altivec.c jdsample-altivec.c jfdctfst-altivec.c \
-	jfdctint-altivec.c jidctfst-altivec.c jidctint-altivec.c \
-	jquanti-altivec.c
-@SIMD_POWERPC_TRUE@am_libsimd_altivec_la_OBJECTS =  \
-@SIMD_POWERPC_TRUE@	libsimd_altivec_la-jccolor-altivec.lo \
-@SIMD_POWERPC_TRUE@	libsimd_altivec_la-jcgray-altivec.lo \
-@SIMD_POWERPC_TRUE@	libsimd_altivec_la-jcsample-altivec.lo \
-@SIMD_POWERPC_TRUE@	libsimd_altivec_la-jdcolor-altivec.lo \
-@SIMD_POWERPC_TRUE@	libsimd_altivec_la-jdmerge-altivec.lo \
-@SIMD_POWERPC_TRUE@	libsimd_altivec_la-jdsample-altivec.lo \
-@SIMD_POWERPC_TRUE@	libsimd_altivec_la-jfdctfst-altivec.lo \
-@SIMD_POWERPC_TRUE@	libsimd_altivec_la-jfdctint-altivec.lo \
-@SIMD_POWERPC_TRUE@	libsimd_altivec_la-jidctfst-altivec.lo \
-@SIMD_POWERPC_TRUE@	libsimd_altivec_la-jidctint-altivec.lo \
-@SIMD_POWERPC_TRUE@	libsimd_altivec_la-jquanti-altivec.lo
-libsimd_altivec_la_OBJECTS = $(am_libsimd_altivec_la_OBJECTS)
-libsimd_altivec_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(libsimd_altivec_la_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
-	$(LDFLAGS) -o $@
-@SIMD_POWERPC_TRUE@am_libsimd_altivec_la_rpath =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -258,9 +228,8 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(libsimd_la_SOURCES) $(libsimd_altivec_la_SOURCES)
-DIST_SOURCES = $(am__libsimd_la_SOURCES_DIST) \
-	$(am__libsimd_altivec_la_SOURCES_DIST)
+SOURCES = $(libsimd_la_SOURCES)
+DIST_SOURCES = $(am__libsimd_la_SOURCES_DIST)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -363,7 +332,6 @@ PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 PKGNAME = @PKGNAME@
-PKG_CONFIG = @PKG_CONFIG@
 RANLIB = @RANLIB@
 RPMARCH = @RPMARCH@
 RPM_CONFIG_ARGS = @RPM_CONFIG_ARGS@
@@ -429,50 +397,39 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-noinst_LTLIBRARIES = libsimd.la $(am__append_1)
+noinst_LTLIBRARIES = libsimd.la
 BUILT_SOURCES = jsimdcfg.inc
 EXTRA_DIST = nasm_lt.sh CMakeLists.txt \
 	jccolext-mmx.asm   jcgryext-mmx.asm   jdcolext-mmx.asm   jdmrgext-mmx.asm \
 	jccolext-sse2.asm  jcgryext-sse2.asm  jdcolext-sse2.asm  jdmrgext-sse2.asm \
 	jccolext-sse2-64.asm  jcgryext-sse2-64.asm  jdcolext-sse2-64.asm \
-	jdmrgext-sse2-64.asm  jccolext-altivec.c    jcgryext-altivec.c \
-	jdcolext-altivec.c    jdmrgext-altivec.c
+	jdmrgext-sse2-64.asm
 
 @SIMD_ARM_64_TRUE@libsimd_la_SOURCES = jsimd_arm64.c jsimd_arm64_neon.S
 @SIMD_ARM_TRUE@libsimd_la_SOURCES = jsimd_arm.c jsimd_arm_neon.S
 @SIMD_I386_TRUE@libsimd_la_SOURCES = jsimd_i386.c jsimd.h jsimdcfg.inc.h jsimdext.inc \
-@SIMD_I386_TRUE@	jcolsamp.inc jdct.inc jpeg_nbits_table.inc jsimdcpu.asm \
+@SIMD_I386_TRUE@	jcolsamp.inc jdct.inc jsimdcpu.asm \
 @SIMD_I386_TRUE@	jfdctflt-3dn.asm   jidctflt-3dn.asm   jquant-3dn.asm \
 @SIMD_I386_TRUE@	jccolor-mmx.asm    jcgray-mmx.asm     jcsample-mmx.asm \
 @SIMD_I386_TRUE@	jdcolor-mmx.asm    jdmerge-mmx.asm    jdsample-mmx.asm \
 @SIMD_I386_TRUE@	jfdctfst-mmx.asm   jfdctint-mmx.asm   jidctfst-mmx.asm \
 @SIMD_I386_TRUE@	jidctint-mmx.asm   jidctred-mmx.asm   jquant-mmx.asm \
 @SIMD_I386_TRUE@	jfdctflt-sse.asm   jidctflt-sse.asm   jquant-sse.asm \
-@SIMD_I386_TRUE@	jccolor-sse2.asm   jcgray-sse2.asm    jchuff-sse2.asm \
-@SIMD_I386_TRUE@	jcsample-sse2.asm  jdcolor-sse2.asm   jdmerge-sse2.asm \
-@SIMD_I386_TRUE@	jdsample-sse2.asm  jfdctfst-sse2.asm  jfdctint-sse2.asm \
-@SIMD_I386_TRUE@	jidctflt-sse2.asm  jidctfst-sse2.asm  jidctint-sse2.asm \
-@SIMD_I386_TRUE@	jidctred-sse2.asm  jquantf-sse2.asm   jquanti-sse2.asm
+@SIMD_I386_TRUE@	jccolor-sse2.asm   jcgray-sse2.asm    jcsample-sse2.asm \
+@SIMD_I386_TRUE@	jdcolor-sse2.asm   jdmerge-sse2.asm   jdsample-sse2.asm \
+@SIMD_I386_TRUE@	jfdctfst-sse2.asm  jfdctint-sse2.asm  jidctflt-sse2.asm \
+@SIMD_I386_TRUE@	jidctfst-sse2.asm  jidctint-sse2.asm  jidctred-sse2.asm  \
+@SIMD_I386_TRUE@	jquantf-sse2.asm   jquanti-sse2.asm
 
 @SIMD_MIPS_TRUE@libsimd_la_SOURCES = jsimd_mips.c jsimd_mips_dspr2_asm.h jsimd_mips_dspr2.S
-@SIMD_POWERPC_TRUE@libsimd_la_SOURCES = jsimd_powerpc.c jsimd_altivec.h jcsample.h
 @SIMD_X86_64_TRUE@libsimd_la_SOURCES = jsimd_x86_64.c jsimd.h jsimdcfg.inc.h jsimdext.inc \
-@SIMD_X86_64_TRUE@	jcolsamp.inc jdct.inc jpeg_nbits_table.inc jfdctflt-sse-64.asm \
-@SIMD_X86_64_TRUE@	jccolor-sse2-64.asm   jcgray-sse2-64.asm    jchuff-sse2-64.asm \
-@SIMD_X86_64_TRUE@	jcsample-sse2-64.asm  jdcolor-sse2-64.asm   jdmerge-sse2-64.asm \
-@SIMD_X86_64_TRUE@	jdsample-sse2-64.asm  jfdctfst-sse2-64.asm  jfdctint-sse2-64.asm \
-@SIMD_X86_64_TRUE@	jidctflt-sse2-64.asm  jidctfst-sse2-64.asm  jidctint-sse2-64.asm \
-@SIMD_X86_64_TRUE@	jidctred-sse2-64.asm  jquantf-sse2-64.asm   jquanti-sse2-64.asm
+@SIMD_X86_64_TRUE@	jcolsamp.inc jdct.inc jfdctflt-sse-64.asm \
+@SIMD_X86_64_TRUE@	jccolor-sse2-64.asm   jcgray-sse2-64.asm    jcsample-sse2-64.asm \
+@SIMD_X86_64_TRUE@	jdcolor-sse2-64.asm   jdmerge-sse2-64.asm   jdsample-sse2-64.asm \
+@SIMD_X86_64_TRUE@	jfdctfst-sse2-64.asm  jfdctint-sse2-64.asm  jidctflt-sse2-64.asm \
+@SIMD_X86_64_TRUE@	jidctfst-sse2-64.asm  jidctint-sse2-64.asm  jidctred-sse2-64.asm  \
+@SIMD_X86_64_TRUE@	jquantf-sse2-64.asm   jquanti-sse2-64.asm
 
-@SIMD_POWERPC_TRUE@libsimd_altivec_la_SOURCES = \
-@SIMD_POWERPC_TRUE@	jccolor-altivec.c     jcgray-altivec.c      jcsample-altivec.c \
-@SIMD_POWERPC_TRUE@	jdcolor-altivec.c     jdmerge-altivec.c     jdsample-altivec.c \
-@SIMD_POWERPC_TRUE@	jfdctfst-altivec.c    jfdctint-altivec.c \
-@SIMD_POWERPC_TRUE@	jidctfst-altivec.c    jidctint-altivec.c \
-@SIMD_POWERPC_TRUE@	jquanti-altivec.c
-
-@SIMD_POWERPC_TRUE@libsimd_altivec_la_CFLAGS = -maltivec
-@SIMD_POWERPC_TRUE@libsimd_la_LIBADD = libsimd_altivec.la
 AM_CPPFLAGS = -I$(top_srcdir)
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
@@ -523,9 +480,6 @@ clean-noinstLTLIBRARIES:
 libsimd.la: $(libsimd_la_OBJECTS) $(libsimd_la_DEPENDENCIES) $(EXTRA_libsimd_la_DEPENDENCIES) 
 	$(AM_V_CCLD)$(LINK)  $(libsimd_la_OBJECTS) $(libsimd_la_LIBADD) $(LIBS)
 
-libsimd_altivec.la: $(libsimd_altivec_la_OBJECTS) $(libsimd_altivec_la_DEPENDENCIES) $(EXTRA_libsimd_altivec_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libsimd_altivec_la_LINK) $(am_libsimd_altivec_la_rpath) $(libsimd_altivec_la_OBJECTS) $(libsimd_altivec_la_LIBADD) $(LIBS)
-
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 
@@ -539,19 +493,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jsimd_i386.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jsimd_mips.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jsimd_mips_dspr2.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jsimd_powerpc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jsimd_x86_64.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsimd_altivec_la-jccolor-altivec.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsimd_altivec_la-jcgray-altivec.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsimd_altivec_la-jcsample-altivec.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsimd_altivec_la-jdcolor-altivec.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsimd_altivec_la-jdmerge-altivec.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsimd_altivec_la-jdsample-altivec.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsimd_altivec_la-jfdctfst-altivec.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsimd_altivec_la-jfdctint-altivec.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsimd_altivec_la-jidctfst-altivec.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsimd_altivec_la-jidctint-altivec.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsimd_altivec_la-jquanti-altivec.Plo@am__quote@
 
 .S.o:
 @am__fastdepCCAS_TRUE@	$(AM_V_CPPAS)$(CPPASCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -594,83 +536,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
-
-libsimd_altivec_la-jccolor-altivec.lo: jccolor-altivec.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsimd_altivec_la_CFLAGS) $(CFLAGS) -MT libsimd_altivec_la-jccolor-altivec.lo -MD -MP -MF $(DEPDIR)/libsimd_altivec_la-jccolor-altivec.Tpo -c -o libsimd_altivec_la-jccolor-altivec.lo `test -f 'jccolor-altivec.c' || echo '$(srcdir)/'`jccolor-altivec.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libsimd_altivec_la-jccolor-altivec.Tpo $(DEPDIR)/libsimd_altivec_la-jccolor-altivec.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='jccolor-altivec.c' object='libsimd_altivec_la-jccolor-altivec.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsimd_altivec_la_CFLAGS) $(CFLAGS) -c -o libsimd_altivec_la-jccolor-altivec.lo `test -f 'jccolor-altivec.c' || echo '$(srcdir)/'`jccolor-altivec.c
-
-libsimd_altivec_la-jcgray-altivec.lo: jcgray-altivec.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsimd_altivec_la_CFLAGS) $(CFLAGS) -MT libsimd_altivec_la-jcgray-altivec.lo -MD -MP -MF $(DEPDIR)/libsimd_altivec_la-jcgray-altivec.Tpo -c -o libsimd_altivec_la-jcgray-altivec.lo `test -f 'jcgray-altivec.c' || echo '$(srcdir)/'`jcgray-altivec.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libsimd_altivec_la-jcgray-altivec.Tpo $(DEPDIR)/libsimd_altivec_la-jcgray-altivec.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='jcgray-altivec.c' object='libsimd_altivec_la-jcgray-altivec.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsimd_altivec_la_CFLAGS) $(CFLAGS) -c -o libsimd_altivec_la-jcgray-altivec.lo `test -f 'jcgray-altivec.c' || echo '$(srcdir)/'`jcgray-altivec.c
-
-libsimd_altivec_la-jcsample-altivec.lo: jcsample-altivec.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsimd_altivec_la_CFLAGS) $(CFLAGS) -MT libsimd_altivec_la-jcsample-altivec.lo -MD -MP -MF $(DEPDIR)/libsimd_altivec_la-jcsample-altivec.Tpo -c -o libsimd_altivec_la-jcsample-altivec.lo `test -f 'jcsample-altivec.c' || echo '$(srcdir)/'`jcsample-altivec.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libsimd_altivec_la-jcsample-altivec.Tpo $(DEPDIR)/libsimd_altivec_la-jcsample-altivec.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='jcsample-altivec.c' object='libsimd_altivec_la-jcsample-altivec.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsimd_altivec_la_CFLAGS) $(CFLAGS) -c -o libsimd_altivec_la-jcsample-altivec.lo `test -f 'jcsample-altivec.c' || echo '$(srcdir)/'`jcsample-altivec.c
-
-libsimd_altivec_la-jdcolor-altivec.lo: jdcolor-altivec.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsimd_altivec_la_CFLAGS) $(CFLAGS) -MT libsimd_altivec_la-jdcolor-altivec.lo -MD -MP -MF $(DEPDIR)/libsimd_altivec_la-jdcolor-altivec.Tpo -c -o libsimd_altivec_la-jdcolor-altivec.lo `test -f 'jdcolor-altivec.c' || echo '$(srcdir)/'`jdcolor-altivec.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libsimd_altivec_la-jdcolor-altivec.Tpo $(DEPDIR)/libsimd_altivec_la-jdcolor-altivec.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='jdcolor-altivec.c' object='libsimd_altivec_la-jdcolor-altivec.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsimd_altivec_la_CFLAGS) $(CFLAGS) -c -o libsimd_altivec_la-jdcolor-altivec.lo `test -f 'jdcolor-altivec.c' || echo '$(srcdir)/'`jdcolor-altivec.c
-
-libsimd_altivec_la-jdmerge-altivec.lo: jdmerge-altivec.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsimd_altivec_la_CFLAGS) $(CFLAGS) -MT libsimd_altivec_la-jdmerge-altivec.lo -MD -MP -MF $(DEPDIR)/libsimd_altivec_la-jdmerge-altivec.Tpo -c -o libsimd_altivec_la-jdmerge-altivec.lo `test -f 'jdmerge-altivec.c' || echo '$(srcdir)/'`jdmerge-altivec.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libsimd_altivec_la-jdmerge-altivec.Tpo $(DEPDIR)/libsimd_altivec_la-jdmerge-altivec.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='jdmerge-altivec.c' object='libsimd_altivec_la-jdmerge-altivec.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsimd_altivec_la_CFLAGS) $(CFLAGS) -c -o libsimd_altivec_la-jdmerge-altivec.lo `test -f 'jdmerge-altivec.c' || echo '$(srcdir)/'`jdmerge-altivec.c
-
-libsimd_altivec_la-jdsample-altivec.lo: jdsample-altivec.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsimd_altivec_la_CFLAGS) $(CFLAGS) -MT libsimd_altivec_la-jdsample-altivec.lo -MD -MP -MF $(DEPDIR)/libsimd_altivec_la-jdsample-altivec.Tpo -c -o libsimd_altivec_la-jdsample-altivec.lo `test -f 'jdsample-altivec.c' || echo '$(srcdir)/'`jdsample-altivec.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libsimd_altivec_la-jdsample-altivec.Tpo $(DEPDIR)/libsimd_altivec_la-jdsample-altivec.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='jdsample-altivec.c' object='libsimd_altivec_la-jdsample-altivec.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsimd_altivec_la_CFLAGS) $(CFLAGS) -c -o libsimd_altivec_la-jdsample-altivec.lo `test -f 'jdsample-altivec.c' || echo '$(srcdir)/'`jdsample-altivec.c
-
-libsimd_altivec_la-jfdctfst-altivec.lo: jfdctfst-altivec.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsimd_altivec_la_CFLAGS) $(CFLAGS) -MT libsimd_altivec_la-jfdctfst-altivec.lo -MD -MP -MF $(DEPDIR)/libsimd_altivec_la-jfdctfst-altivec.Tpo -c -o libsimd_altivec_la-jfdctfst-altivec.lo `test -f 'jfdctfst-altivec.c' || echo '$(srcdir)/'`jfdctfst-altivec.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libsimd_altivec_la-jfdctfst-altivec.Tpo $(DEPDIR)/libsimd_altivec_la-jfdctfst-altivec.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='jfdctfst-altivec.c' object='libsimd_altivec_la-jfdctfst-altivec.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsimd_altivec_la_CFLAGS) $(CFLAGS) -c -o libsimd_altivec_la-jfdctfst-altivec.lo `test -f 'jfdctfst-altivec.c' || echo '$(srcdir)/'`jfdctfst-altivec.c
-
-libsimd_altivec_la-jfdctint-altivec.lo: jfdctint-altivec.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsimd_altivec_la_CFLAGS) $(CFLAGS) -MT libsimd_altivec_la-jfdctint-altivec.lo -MD -MP -MF $(DEPDIR)/libsimd_altivec_la-jfdctint-altivec.Tpo -c -o libsimd_altivec_la-jfdctint-altivec.lo `test -f 'jfdctint-altivec.c' || echo '$(srcdir)/'`jfdctint-altivec.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libsimd_altivec_la-jfdctint-altivec.Tpo $(DEPDIR)/libsimd_altivec_la-jfdctint-altivec.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='jfdctint-altivec.c' object='libsimd_altivec_la-jfdctint-altivec.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsimd_altivec_la_CFLAGS) $(CFLAGS) -c -o libsimd_altivec_la-jfdctint-altivec.lo `test -f 'jfdctint-altivec.c' || echo '$(srcdir)/'`jfdctint-altivec.c
-
-libsimd_altivec_la-jidctfst-altivec.lo: jidctfst-altivec.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsimd_altivec_la_CFLAGS) $(CFLAGS) -MT libsimd_altivec_la-jidctfst-altivec.lo -MD -MP -MF $(DEPDIR)/libsimd_altivec_la-jidctfst-altivec.Tpo -c -o libsimd_altivec_la-jidctfst-altivec.lo `test -f 'jidctfst-altivec.c' || echo '$(srcdir)/'`jidctfst-altivec.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libsimd_altivec_la-jidctfst-altivec.Tpo $(DEPDIR)/libsimd_altivec_la-jidctfst-altivec.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='jidctfst-altivec.c' object='libsimd_altivec_la-jidctfst-altivec.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsimd_altivec_la_CFLAGS) $(CFLAGS) -c -o libsimd_altivec_la-jidctfst-altivec.lo `test -f 'jidctfst-altivec.c' || echo '$(srcdir)/'`jidctfst-altivec.c
-
-libsimd_altivec_la-jidctint-altivec.lo: jidctint-altivec.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsimd_altivec_la_CFLAGS) $(CFLAGS) -MT libsimd_altivec_la-jidctint-altivec.lo -MD -MP -MF $(DEPDIR)/libsimd_altivec_la-jidctint-altivec.Tpo -c -o libsimd_altivec_la-jidctint-altivec.lo `test -f 'jidctint-altivec.c' || echo '$(srcdir)/'`jidctint-altivec.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libsimd_altivec_la-jidctint-altivec.Tpo $(DEPDIR)/libsimd_altivec_la-jidctint-altivec.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='jidctint-altivec.c' object='libsimd_altivec_la-jidctint-altivec.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsimd_altivec_la_CFLAGS) $(CFLAGS) -c -o libsimd_altivec_la-jidctint-altivec.lo `test -f 'jidctint-altivec.c' || echo '$(srcdir)/'`jidctint-altivec.c
-
-libsimd_altivec_la-jquanti-altivec.lo: jquanti-altivec.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsimd_altivec_la_CFLAGS) $(CFLAGS) -MT libsimd_altivec_la-jquanti-altivec.lo -MD -MP -MF $(DEPDIR)/libsimd_altivec_la-jquanti-altivec.Tpo -c -o libsimd_altivec_la-jquanti-altivec.lo `test -f 'jquanti-altivec.c' || echo '$(srcdir)/'`jquanti-altivec.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libsimd_altivec_la-jquanti-altivec.Tpo $(DEPDIR)/libsimd_altivec_la-jquanti-altivec.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='jquanti-altivec.c' object='libsimd_altivec_la-jquanti-altivec.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsimd_altivec_la_CFLAGS) $(CFLAGS) -c -o libsimd_altivec_la-jquanti-altivec.lo `test -f 'jquanti-altivec.c' || echo '$(srcdir)/'`jquanti-altivec.c
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -900,11 +765,6 @@ uninstall-am:
 @SIMD_I386_TRUE@jcgray-sse2.lo:   jcgryext-sse2.asm
 @SIMD_I386_TRUE@jdcolor-sse2.lo:  jdcolext-sse2.asm
 @SIMD_I386_TRUE@jdmerge-sse2.lo:  jdmrgext-sse2.asm
-
-@SIMD_POWERPC_TRUE@jccolor-altivec.lo:  jccolext-altivec.c
-@SIMD_POWERPC_TRUE@jcgray-altivec.lo:   jcgryext-altivec.c
-@SIMD_POWERPC_TRUE@jdcolor-altivec.lo:  jdcolext-altivec.c
-@SIMD_POWERPC_TRUE@jdmerge-altivec.lo:  jdmrgext-altivec.c
 
 .asm.lo:
 	$(AM_V_GEN) $(LIBTOOL) $(AM_V_lt) --mode=compile --tag NASM $(srcdir)/nasm_lt.sh $(AM_V_lt) $(NASM) $(NAFLAGS) -I$(srcdir) -I. $< -o $@

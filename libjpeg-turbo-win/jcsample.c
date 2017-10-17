@@ -5,10 +5,8 @@
  * Copyright (C) 1991-1996, Thomas G. Lane.
  * libjpeg-turbo Modifications:
  * Copyright 2009 Pierre Ossman <ossman@cendio.se> for Cendio AB
- * Copyright (C) 2014, MIPS Technologies, Inc., California.
- * Copyright (C) 2015, D. R. Commander.
- * For conditions of distribution and use, see the accompanying README.ijg
- * file.
+ * Copyright (C) 2014, MIPS Technologies, Inc., California
+ * For conditions of distribution and use, see the accompanying README file.
  *
  * This file contains downsampling routines.
  *
@@ -58,7 +56,7 @@
 
 /* Pointer to routine to downsample a single component */
 typedef void (*downsample1_ptr) (j_compress_ptr cinfo,
-                                 jpeg_component_info *compptr,
+                                 jpeg_component_info * compptr,
                                  JSAMPARRAY input_data,
                                  JSAMPARRAY output_data);
 
@@ -71,7 +69,7 @@ typedef struct {
   downsample1_ptr methods[MAX_COMPONENTS];
 } my_downsampler;
 
-typedef my_downsampler *my_downsample_ptr;
+typedef my_downsampler * my_downsample_ptr;
 
 
 /*
@@ -124,7 +122,7 @@ sep_downsample (j_compress_ptr cinfo,
 {
   my_downsample_ptr downsample = (my_downsample_ptr) cinfo->downsample;
   int ci;
-  jpeg_component_info *compptr;
+  jpeg_component_info * compptr;
   JSAMPARRAY in_ptr, out_ptr;
 
   for (ci = 0, compptr = cinfo->comp_info; ci < cinfo->num_components;
@@ -144,14 +142,14 @@ sep_downsample (j_compress_ptr cinfo,
  */
 
 METHODDEF(void)
-int_downsample (j_compress_ptr cinfo, jpeg_component_info *compptr,
+int_downsample (j_compress_ptr cinfo, jpeg_component_info * compptr,
                 JSAMPARRAY input_data, JSAMPARRAY output_data)
 {
   int inrow, outrow, h_expand, v_expand, numpix, numpix2, h, v;
   JDIMENSION outcol, outcol_h;  /* outcol_h == outcol*h_expand */
   JDIMENSION output_cols = compptr->width_in_blocks * DCTSIZE;
   JSAMPROW inptr, outptr;
-  JLONG outvalue;
+  INT32 outvalue;
 
   h_expand = cinfo->max_h_samp_factor / compptr->h_samp_factor;
   v_expand = cinfo->max_v_samp_factor / compptr->v_samp_factor;
@@ -174,7 +172,7 @@ int_downsample (j_compress_ptr cinfo, jpeg_component_info *compptr,
       for (v = 0; v < v_expand; v++) {
         inptr = input_data[inrow+v] + outcol_h;
         for (h = 0; h < h_expand; h++) {
-          outvalue += (JLONG) GETJSAMPLE(*inptr++);
+          outvalue += (INT32) GETJSAMPLE(*inptr++);
         }
       }
       *outptr++ = (JSAMPLE) ((outvalue + numpix2) / numpix);
@@ -191,7 +189,7 @@ int_downsample (j_compress_ptr cinfo, jpeg_component_info *compptr,
  */
 
 METHODDEF(void)
-fullsize_downsample (j_compress_ptr cinfo, jpeg_component_info *compptr,
+fullsize_downsample (j_compress_ptr cinfo, jpeg_component_info * compptr,
                      JSAMPARRAY input_data, JSAMPARRAY output_data)
 {
   /* Copy the data */
@@ -216,7 +214,7 @@ fullsize_downsample (j_compress_ptr cinfo, jpeg_component_info *compptr,
  */
 
 METHODDEF(void)
-h2v1_downsample (j_compress_ptr cinfo, jpeg_component_info *compptr,
+h2v1_downsample (j_compress_ptr cinfo, jpeg_component_info * compptr,
                  JSAMPARRAY input_data, JSAMPARRAY output_data)
 {
   int outrow;
@@ -253,7 +251,7 @@ h2v1_downsample (j_compress_ptr cinfo, jpeg_component_info *compptr,
  */
 
 METHODDEF(void)
-h2v2_downsample (j_compress_ptr cinfo, jpeg_component_info *compptr,
+h2v2_downsample (j_compress_ptr cinfo, jpeg_component_info * compptr,
                  JSAMPARRAY input_data, JSAMPARRAY output_data)
 {
   int inrow, outrow;
@@ -274,7 +272,7 @@ h2v2_downsample (j_compress_ptr cinfo, jpeg_component_info *compptr,
     outptr = output_data[outrow];
     inptr0 = input_data[inrow];
     inptr1 = input_data[inrow+1];
-    bias = 1;                   /* bias = 1,2,1,5,... for successive samples */
+    bias = 1;                   /* bias = 1,2,1,2,... for successive samples */
     for (outcol = 0; outcol < output_cols; outcol++) {
       *outptr++ = (JSAMPLE) ((GETJSAMPLE(*inptr0) + GETJSAMPLE(inptr0[1]) +
                               GETJSAMPLE(*inptr1) + GETJSAMPLE(inptr1[1])
@@ -296,14 +294,14 @@ h2v2_downsample (j_compress_ptr cinfo, jpeg_component_info *compptr,
  */
 
 METHODDEF(void)
-h2v2_smooth_downsample (j_compress_ptr cinfo, jpeg_component_info *compptr,
+h2v2_smooth_downsample (j_compress_ptr cinfo, jpeg_component_info * compptr,
                         JSAMPARRAY input_data, JSAMPARRAY output_data)
 {
   int inrow, outrow;
   JDIMENSION colctr;
   JDIMENSION output_cols = compptr->width_in_blocks * DCTSIZE;
   register JSAMPROW inptr0, inptr1, above_ptr, below_ptr, outptr;
-  JLONG membersum, neighsum, memberscale, neighscale;
+  INT32 membersum, neighsum, memberscale, neighscale;
 
   /* Expand input data enough to let all the output samples be generated
    * by the standard loop.  Special-casing padded output would be more
@@ -403,7 +401,7 @@ fullsize_smooth_downsample (j_compress_ptr cinfo, jpeg_component_info *compptr,
   JDIMENSION colctr;
   JDIMENSION output_cols = compptr->width_in_blocks * DCTSIZE;
   register JSAMPROW inptr, above_ptr, below_ptr, outptr;
-  JLONG membersum, neighsum, memberscale, neighscale;
+  INT32 membersum, neighsum, memberscale, neighscale;
   int colsum, lastcolsum, nextcolsum;
 
   /* Expand input data enough to let all the output samples be generated
@@ -472,7 +470,7 @@ jinit_downsampler (j_compress_ptr cinfo)
 {
   my_downsample_ptr downsample;
   int ci;
-  jpeg_component_info *compptr;
+  jpeg_component_info * compptr;
   boolean smoothok = TRUE;
 
   downsample = (my_downsample_ptr)

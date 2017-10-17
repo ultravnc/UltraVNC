@@ -216,7 +216,7 @@ vncProperties::ShowAdmin(BOOL show, BOOL usersettings)
 			strcat(m_Tempfile,INIFILE_NAME);
 		}
 	}
-	if (id!=0) 
+	if (id!=0 && usersettings)
 			{
 				hProcess = OpenProcess(MAXIMUM_ALLOWED,FALSE,id);
 				if(OpenProcessToken(hProcess,TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY
@@ -761,7 +761,7 @@ vncProperties::DialogProc(HWND hwnd,
 				if (strcmp(passwd, "~~~~~~~~") != 0 && strcmp(passwd2, "~~~~~~~~") != 0) { 
 					if (strcmp(passwd,passwd2)==0)
 					{
-						MessageBox(NULL,"View only and full password are the same\nRunning in view only mode","Warning",0);
+						MessageBox(NULL,"View only and full password are the same\nView only ignored","Warning",0);
 					}					
 				} 
 
