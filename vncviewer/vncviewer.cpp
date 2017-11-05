@@ -28,6 +28,13 @@
 #include "vncviewer.h"
 #include "Exception.h"
 #include "display.h"
+#ifdef _INTERNALLIB
+#pragma comment(lib, "zlibstat.lib")
+#pragma comment(lib, "zip32.lib")
+#pragma comment(lib, "unz32lib.lib")
+#pragma comment(lib, "libjpeg-turbo-win-static.lib")
+#endif
+
 
 // [v1.0.2-jp1 fix] Support "LinkLabel"
 //#include "LinkLabel.h"
@@ -331,10 +338,6 @@ static BOOL read_reg_string(HKEY key, char* sub_key, char* val_name, LPBYTE data
         return ret;
 }
 
-#ifdef IPP
-void InitIpp();
-#endif
-
 //#define CRASHRPT
 #ifdef CRASHRPT
 #ifndef _X64
@@ -360,9 +363,6 @@ if (hUser32) setDPIAware = (SetProcessDPIAwareFunc)GetProcAddress(hUser32, "SetP
 if (setDPIAware) setDPIAware();
 if (hUser32) FreeLibrary(hUser32);
 
-#ifdef IPP
-	InitIpp();
-#endif
 #ifdef CRASHRPT
 	CR_INSTALL_INFO info;
 	memset(&info, 0, sizeof(CR_INSTALL_INFO));

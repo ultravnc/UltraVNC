@@ -42,11 +42,12 @@
 #include <rdr/MemInStream.h>
 #include <rdr/ZlibOutStream.h>
 #include <rdr/ZlibInStream.h>
-#ifdef IPP
-#include "..\..\ipp_zlib\src\zlib\zlib.h"
+#ifdef _INTERNALLIBS
+#include <zlib.h>
 #else
 #include <zlib-1.2.5/zlib.h>
 #endif
+
 
 
 ExtendedClipboardDataMessage::ExtendedClipboardDataMessage()

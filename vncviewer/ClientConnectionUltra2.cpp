@@ -29,7 +29,12 @@
 #include "stdhdrs.h"
 #include "vncviewer.h"
 #include "ClientConnection.h"
+#ifdef _INTERNALLIB
+#include <jpeglib.h>
+#else
 #include "libjpeg-turbo-win/jpeglib.h"
+#endif
+
 
 static struct jpeg_source_mgr jpegSrcManager;
 static JOCTET *jpegBufferPtr;

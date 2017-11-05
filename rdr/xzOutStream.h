@@ -31,7 +31,9 @@
 #ifndef _VS2008
 #include <stdint.h>
 #endif
+#ifdef _XZ
 #include "../xz-5.2.1/src/liblzma/api/lzma.h"
+#endif
 
 namespace rdr {
 
@@ -58,8 +60,10 @@ namespace rdr {
     OutStream* underlying;
     int bufSize;
     int offset;
+#ifdef _XZ
 	lzma_stream* ls;
 	lzma_options_lzma ls_options;
+#endif
     U8* start;
   };
 
