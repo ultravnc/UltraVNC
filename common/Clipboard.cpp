@@ -42,7 +42,7 @@
 #include <rdr/MemInStream.h>
 #include <rdr/ZlibOutStream.h>
 #include <rdr/ZlibInStream.h>
-#ifdef _INTERNALLIBS
+#ifdef _INTERNALLIB
 #include <zlib.h>
 #else
 #include <zlib-1.2.5/zlib.h>
