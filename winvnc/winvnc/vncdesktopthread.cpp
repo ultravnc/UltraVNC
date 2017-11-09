@@ -1064,21 +1064,21 @@ vncDesktopThread::run_undetached(void *arg)
 		oldtick2 = newtick;
 
 
-#ifdef _DEBUG
+/*#ifdef _DEBUG
 		char			szText[256];
 		DWORD error = GetLastError();
 		sprintf(szText, "waittime %i  \n",waittime);
 		SetLastError(0);
 		OutputDebugString(szText);
-#endif
+#endif*/
 
 		result=WaitForMultipleObjects(6,m_desktop->trigger_events,FALSE,waittime);
 		{
-			#ifdef _DEBUG
+			/*#ifdef _DEBUG
 										char			szText[256];
 										sprintf(szText,"WaitForMultipleObjects %i\n",result );
 										OutputDebugString(szText);		
-			#endif
+			#endif*/
 			waittime = 0;
 			// We need to wait until restart is done
 			// else wait_timeout goes in to looping while sink window is not ready

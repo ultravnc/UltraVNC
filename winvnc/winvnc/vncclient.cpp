@@ -2523,6 +2523,7 @@ vncClientThread::run(void *arg)
 
                     }
 #endif
+					m_client->SendKeepAlive(true);
             break;
 
 		case rfbSetPixelFormat:
