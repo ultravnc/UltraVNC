@@ -25,6 +25,7 @@ LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
 //
 
 IDC_FINGER              CURSOR                  "Finger.cur"
+
 #endif    // Japanese (Japan) resources
 /////////////////////////////////////////////////////////////////////////////
 
@@ -42,8 +43,11 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 //
 
 IDC_CURSOR1             CURSOR                  "cursorsel.cur"
+
 IDC_DOTCURSOR           CURSOR                  "cursor1.cur"
+
 IDC_NOCURSOR            CURSOR                  "nocursor.cur"
+
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -79,10 +83,15 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDR_TRAY                ICON                    "idr_tray.ico"
+
 IDI_NET                 ICON                    "B46.ico"
+
 IDI_FILE                ICON                    "file.ico"
+
 IDI_DIR                 ICON                    "dir.ico"
+
 IDI_DRIVE               ICON                    "drive.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -237,6 +246,8 @@ BEGIN
     CONTROL         "List3",IDC_REMOTE_FILELIST,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_AUTOARRANGE | WS_BORDER | WS_TABSTOP,314,31,238,324
     LTEXT           "",IDC_GLOBAL_STATUS,484,388,65,8,0,WS_EX_RIGHT
     LTEXT           "",IDC_PERCENT,356,388,120,8
+    PUSHBUTTON      "Forced Stop",IDC_ABORT_B2,249,160,60,14,BS_FLAT | NOT WS_VISIBLE
+    PUSHBUTTON      "Forced Close",IDCANCEL2,248,355,60,14
 END
 
 IDD_SESSION_DLG DIALOGEX 0, 0, 245, 229
@@ -500,7 +511,7 @@ BEGIN
         VERTGUIDE, 274
         VERTGUIDE, 279
         VERTGUIDE, 486
-        BOTTOMMARGIN, 260
+        BOTTOMMARGIN, 397
     END
 
     IDD_SESSION_DLG, DIALOG
@@ -677,18 +688,31 @@ END
 //
 
 IDB_BITMAP2             BITMAP                  "hoch.bmp"
+
 IDB_BITMAP3             BITMAP                  "quer.bmp"
+
 IDB_STAT_BACK           BITMAP                  "stat\\back.bmp"
+
 IDB_STAT_BOTH           BITMAP                  "stat\\both.bmp"
+
 IDB_STAT_FRONT          BITMAP                  "stat\\front.bmp"
+
 IDB_STAT_NONE           BITMAP                  "stat\\none.bmp"
+
 IDB_VNC64               BITMAP                  "vnc64.BMP"
+
 IDB_CLOSE               BITMAP                  "stat\\closeup.bmp"
+
 IDB_MAXIMIZE            BITMAP                  "stat\\maximizeup.bmp"
+
 IDB_MINIMIZE            BITMAP                  "stat\\minimizeup.bmp"
+
 IDB_PINDOWN             BITMAP                  "stat\\pindown.bmp"
+
 IDB_PINUP               BITMAP                  "stat\\pinup.bmp"
+
 IDB_VNC32               BITMAP                  "vnc32.BMP"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -727,6 +751,17 @@ BEGIN
     BEGIN
         VALUE "Translation", 0x0, 1200
     END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_FILETRANSFER_DLG AFX_DIALOG_LAYOUT
+BEGIN
+    0
 END
 
 
@@ -1093,9 +1128,13 @@ LANGUAGE LANG_DUTCH, SUBLANG_DUTCH
 //
 
 IDB_BITMAPsx            BITMAP                  "Tango_sx.bmp"
+
 IDB_BITMAPl             BITMAP                  "Tango_l.bmp"
+
 IDB_BITMAPlx            BITMAP                  "Tango_lx.bmp"
+
 IDB_BITMAPs             BITMAP                  "Tango_s.bmp"
+
 #endif    // Dutch (Netherlands) resources
 /////////////////////////////////////////////////////////////////////////////
 
@@ -1115,6 +1154,7 @@ LANGUAGE LANG_DUTCH, SUBLANG_DUTCH_BELGIAN
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDR_TRAY_DISABLED       ICON                    "idr_tray_disabled.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1157,7 +1197,9 @@ END
 //
 
 IDB_BITMAP14            BITMAP                  "l2.bmp"
+
 IDB_BITMAP13            BITMAP                  "l1.bmp"
+
 #endif    // Dutch (Belgium) resources
 /////////////////////////////////////////////////////////////////////////////
 

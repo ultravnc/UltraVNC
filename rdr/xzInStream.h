@@ -20,7 +20,7 @@
 // xzInStream streams from a compressed data stream ("underlying"),
 // decompressing with zlib on the fly.
 //
-
+#ifdef _XZ
 #ifndef __RDR_xzInStream_H__
 #define __RDR_xzInStream_H__
 
@@ -62,4 +62,5 @@ namespace rdr {
 
 } // end of namespace rdr
 
+#endif
 #endif

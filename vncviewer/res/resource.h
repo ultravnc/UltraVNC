@@ -2,6 +2,7 @@
 // Microsoft Visual C++ generated include file.
 // Used by vncviewer.rc
 //
+#define IDCANCEL2                       4
 #define IDQUIT                          9
 #define IDR_TRAY                        101
 #define IDR_TRAYMENU                    103
@@ -126,6 +127,7 @@
 #define IDC_CURR_LOCAL                  1048
 #define IDC_PLUGIN_STATUS               1048
 #define IDC_CURR_REMOTE                 1049
+#define IDC_ABORT_B2                    1050
 #define IDC_LOCAL_LIST                  1052
 #define IDC_REMOTE_LIST                 1053
 #define IDC_LOCAL_ROOT_B                1054
@@ -543,7 +545,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        210
+#define _APS_NEXT_RESOURCE_VALUE        211
 #define _APS_NEXT_COMMAND_VALUE         50025
 #define _APS_NEXT_CONTROL_VALUE         2023
 #define _APS_NEXT_SYMED_VALUE           154

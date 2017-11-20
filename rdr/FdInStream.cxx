@@ -248,8 +248,10 @@ int FdInStream::readWithTimeoutOrCallback(void* buf, int len)
 	  
 	  if (n == 0)
 	  {
-		  if (timeout) throw TimedOut();
-		  if (blockCallback) (*blockCallback)(blockCallbackArg);
+		  if (timeout) 
+			  throw TimedOut();
+		  if (blockCallback) 
+			  (*blockCallback)(blockCallbackArg);
 	  }
   }
 	if (fd==INVALID_SOCKET) 
@@ -280,6 +282,11 @@ int FdInStream::readWithTimeoutOrCallback(void* buf, int len)
 	}
 	else
 	{
+		while (n == 0) {
+			n = checkReadable(fd, 30000);
+			if ( n == 0 ) 
+				throw TimedOut();
+		}
 		n = ::read(fd, buf, len);
 	}
 
@@ -288,8 +295,10 @@ int FdInStream::readWithTimeoutOrCallback(void* buf, int len)
     fprintf(stderr,"read returned EINTR\n");
   }
 
-  if (n < 0) throw SystemException("read",errno);
-  if (n == 0) throw EndOfStream("read");
+  if (n < 0) 
+	  throw SystemException("read",errno);
+  if (n == 0) 
+	  throw EndOfStream("read");
 
   if (fAlreadyCounted)
 	  return n; 

@@ -47,7 +47,11 @@
 
 extern "C"
 {
-	#include <jpeglib.h> // For Tight encoding
+#ifdef _INTERNALLIB
+#include <jpeglib.h>
+#else
+#include "libjpeg-turbo-win/jpeglib.h"
+#endif
 }
 #include "FileTransfer.h" // sf@2002
 #include "TextChat.h" // sf@2002

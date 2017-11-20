@@ -15,7 +15,7 @@
 // along with this software; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 // USA.
-
+#ifdef _XZ
 #include "xzInStream.h"
 #include "Exception.h"
 #include "assert.h"
@@ -137,3 +137,4 @@ void xzInStream::decompress()
 	end = ls->next_out;
 	underlying->setptr(ls->next_in);
 }
+#endif

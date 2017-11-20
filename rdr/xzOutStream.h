@@ -21,7 +21,7 @@
 // xzOutStream streams to a compressed data stream (underlying), compressing
 // with zlib on the fly.
 //
-
+#ifdef _XZ
 #ifndef __RDR_xzOutStream_H__
 #define __RDR_xzOutStream_H__
 
@@ -69,4 +69,5 @@ namespace rdr {
 
 } // end of namespace rdr
 
+#endif
 #endif
