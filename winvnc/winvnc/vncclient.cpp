@@ -6377,6 +6377,8 @@ int vncClient::ZipPossibleDirectory(LPSTR szSrcFileName)
 		char szDirZipPath[MAX_PATH];
 		char szWorkingDir[MAX_PATH];
 		::GetTempPath(MAX_PATH,szWorkingDir); //PGM Use Windows Temp folder
+		if (m_fFTUserImpersonatedOk)
+			strcpy(szWorkingDir, m_szTempDir);
 		if (szWorkingDir == NULL) //PGM 
 		{ //PGM
 			if (GetModuleFileName(NULL, szWorkingDir, MAX_PATH))
@@ -6562,8 +6564,8 @@ bool vncClient::DoFTUserImpersonation()
 					vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::DoFTUserImpersonation - ImpersonateLoggedOnUser Failed\n"));
 					fUserOk = false;
 				}
-			}
-
+			}			
+			ExpandEnvironmentStringsForUser(hPToken, "%TEMP%", m_szTempDir, MAX_PATH);
 			CloseHandle(hProcess);
 			CloseHandle(hPToken);
 		}

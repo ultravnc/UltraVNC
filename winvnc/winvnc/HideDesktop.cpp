@@ -29,6 +29,10 @@
 #if _MSC_VER < 1400
 #define _WIN32_IE 0x0400
 #endif
+#define _WIN32_WINNT 0x0A00
+#define _ATL_APARTMENT_THREADED
+#define _USING_V110_SDK71_
+#define _ATL_XP_TARGETING
 #include <atlbase.h> // ATL smart pointers
 #include <shlguid.h> // shell GUIDs
 #include <shlobj.h>  // IActiveDesktop

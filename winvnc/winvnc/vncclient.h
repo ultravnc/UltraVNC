@@ -558,6 +558,7 @@ protected:
 
 	// sf@2005 - FTUserImpersonation
 	bool m_fFTUserImpersonatedOk;
+	char m_szTempDir[MAX_PATH];
 	DWORD m_lLastFTUserImpersonationTime;
 
 	//stats
