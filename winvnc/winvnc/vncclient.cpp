@@ -6566,6 +6566,7 @@ bool vncClient::DoFTUserImpersonation()
 				}
 			}			
 			ExpandEnvironmentStringsForUser(hPToken, "%TEMP%", m_szTempDir, MAX_PATH);
+			strcat_s(m_szTempDir, "\\");
 			CloseHandle(hProcess);
 			CloseHandle(hPToken);
 		}
