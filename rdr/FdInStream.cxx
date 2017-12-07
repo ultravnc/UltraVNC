@@ -59,6 +59,7 @@ FdInStream::FdInStream(int fd_, int timeout_, int bufSize_)
 	m_nReadSize = 0;
 
 	m_nBytesRead = 0; // For stats
+	FT = false;
 }
 
 FdInStream::FdInStream(int fd_, void (*blockCallback_)(void*),
@@ -75,7 +76,7 @@ FdInStream::FdInStream(int fd_, void (*blockCallback_)(void*),
 	m_fReadFromNetRectBuf = false;
 	m_nNetRectBufOffset = 0;
 	m_nReadSize = 0;
-	
+	FT = false;
 }
 
 FdInStream::~FdInStream()
@@ -227,6 +228,11 @@ Passedusecs()
 }
 #endif
 
+void FdInStream::setFT(bool value)
+{
+	FT = value;
+}
+
 int FdInStream::readWithTimeoutOrCallback(void* buf, int len)
 {
   /*struct timeval before = {0, 0}, after; // before will not get initialized if the condition is false
@@ -284,7 +290,7 @@ int FdInStream::readWithTimeoutOrCallback(void* buf, int len)
 	{
 		while (n == 0) {
 			n = checkReadable(fd, 30000);
-			if ( n == 0 ) 
+			if ( n == 0  && !FT)
 				throw TimedOut();
 		}
 		n = ::read(fd, buf, len);

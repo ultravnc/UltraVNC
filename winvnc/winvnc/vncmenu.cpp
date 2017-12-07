@@ -257,11 +257,11 @@ vncMenu::vncMenu(vncServer *server)
 	pfnFilter =(CHANGEWINDOWMESSAGEFILTER)GetProcAddress(hUser32,"ChangeWindowMessageFilter");
 	if (pfnFilter) 
 		{	
-			pfnFilter(MENU_ADD_CLIENT_MSG, MSGFLT_ADD);
-			pfnFilter(MENU_ADD_CLIENT_MSG_INIT, MSGFLT_ADD);
+			//pfnFilter(MENU_ADD_CLIENT_MSG, MSGFLT_ADD);
+			//pfnFilter(MENU_ADD_CLIENT_MSG_INIT, MSGFLT_ADD);
 #ifdef IPV6V4
-			pfnFilter(MENU_ADD_CLIENT6_MSG, MSGFLT_ADD);
-			pfnFilter(MENU_ADD_CLIENT6_MSG_INIT, MSGFLT_ADD);
+			//pfnFilter(MENU_ADD_CLIENT6_MSG, MSGFLT_ADD);
+			//pfnFilter(MENU_ADD_CLIENT6_MSG_INIT, MSGFLT_ADD);
 #endif
 			pfnFilter(MENU_AUTO_RECONNECT_MSG, MSGFLT_ADD);
 			pfnFilter(MENU_STOP_RECONNECT_MSG, MSGFLT_ADD);

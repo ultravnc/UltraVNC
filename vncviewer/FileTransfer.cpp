@@ -337,7 +337,7 @@ FileTransfer::~FileTransfer()
 
 
 void FileTransfer::InitFTTimer()
-{
+{	
 #ifdef FT_USE_MMTIMER
 	if (m_mmRes != -1) return;
 
@@ -677,6 +677,7 @@ bool FileTransfer::TestPermission(long lSize, int nVersion)
 		SetStatus(sz_H3);
 		DisableButtons(hWnd, false);
 		ShowWindow(GetDlgItem(hWnd, IDCANCEL), SW_SHOW);
+		ShowWindow(GetDlgItem(hWnd, IDCANCEL2), SW_SHOW);
 	}
 	else
 	{
@@ -3328,13 +3329,15 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 			// DWORD lTime = timeGetTime();
 			// DWORD lLastTime = _this->m_pCC->m_lLastRfbRead;
 			// DWORD lDelta = abs(timeGetTime() - _this->m_pCC->m_lLastRfbRead);
-			if (true/*meGetTime() - _this->m_pCC->m_lLastRfbRead) > 1000 */)
+			if (true && wParam != 100/*meGetTime() - _this->m_pCC->m_lLastRfbRead) > 1000 */)
 			{
 				_this->m_fFileCommandPending = true;
 				_this->RequestPermission();
 				if (KillTimer(hWnd, _this->m_timer))
 					_this->m_timer = 0;
 			}
+			else
+				_this->m_pCC->SendKeepAlive(false, true);
 		break;
 		}
 
@@ -3343,6 +3346,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
             helper::SafeSetWindowUserData(hWnd, lParam);
 
             FileTransfer *l_this = (FileTransfer *) lParam;
+			SetTimer(hWnd, 100, 5000, NULL);
             // CentreWindow(hWnd);
 			l_this->hWnd = hWnd;
 			hFTWnd = hWnd;
@@ -4352,6 +4356,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 
 	case WM_DESTROY:
 		if (_this->m_timer != 0) KillTimer(hWnd, _this->m_timer);
+		KillTimer(hWnd, 100);
 		EndDialog(hWnd, FALSE);
 		return TRUE;
 
@@ -4445,7 +4450,7 @@ BOOL CALLBACK FileTransfer::FTParamDlgProc(  HWND hwnd,  UINT uMsg, WPARAM wPara
 			return TRUE;
 		}
 		break;
-	case WM_DESTROY:
+	case WM_DESTROY:		
 		EndDialog(hwnd, FALSE);
 		return TRUE;
 	}
@@ -4517,7 +4522,7 @@ BOOL CALLBACK FileTransfer::FTConfirmDlgProc(  HWND hwnd,  UINT uMsg, WPARAM wPa
 		}
 		break;
 
-	case WM_DESTROY:
+	case WM_DESTROY:		
 		EndDialog(hwnd, FALSE);
 		return TRUE;
 	}
@@ -4535,6 +4540,7 @@ void FileTransfer::DisableButtons(HWND hWnd, bool X)
 	ShowWindow(GetDlgItem(hWnd, IDC_NEWFOLDER_B), SW_HIDE);
 	ShowWindow(GetDlgItem(hWnd, IDC_RENAME_B), SW_HIDE);
 	ShowWindow(GetDlgItem(hWnd, IDCANCEL), SW_HIDE);
+	ShowWindow(GetDlgItem(hWnd, IDCANCEL2), SW_HIDE);
 	ShowWindow(GetDlgItem(hWnd, IDC_HIDE_B), SW_SHOW);
 	EnableWindow(GetDlgItem(hWnd, IDC_LOCAL_FILELIST), FALSE);
 	EnableWindow(GetDlgItem(hWnd, IDC_LOCAL_DRIVECB), FALSE);
@@ -4586,6 +4592,7 @@ void FileTransfer::EnableButtons(HWND hWnd)
 	ShowWindow(GetDlgItem(hWnd, IDC_UPLOAD_B), SW_SHOW);
 	ShowWindow(GetDlgItem(hWnd, IDC_DOWNLOAD_B), SW_SHOW);
 	ShowWindow(GetDlgItem(hWnd, IDCANCEL), SW_SHOW);
+	ShowWindow(GetDlgItem(hWnd, IDCANCEL2), SW_SHOW);
 	ShowWindow(GetDlgItem(hWnd, IDC_DELETE_B), SW_SHOW);
 	ShowWindow(GetDlgItem(hWnd, IDC_NEWFOLDER_B), SW_SHOW);
 	if (!UsingOldProtocol())

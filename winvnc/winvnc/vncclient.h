@@ -303,7 +303,9 @@ public:
 	// adzm 2010-09 - Notify streaming DSM plugin support
 	void NotifyPluginStreamingSupport();
 	bool cl_connected;
-
+	int filetransferrequestPart2(int nDirZipRet);
+	char m_szSrcFileName[MAX_PATH + 64]; // Path + timestring
+	HANDLE ThreadHandleCompressFolder;
 	// sf@2002 
 	// Update routines
 protected:
@@ -336,7 +338,7 @@ protected:
 	bool m_want_update_state; 
 	int unlockcounter;
 
-
+	int filetransferrequestPart1(rfbClientToServerMsg msg, bool fUserOk);	
 	// Specialised client-side UpdateTracker
 protected:
 
@@ -424,6 +426,8 @@ public:
 	//int Totalsend;
 	BOOL client_settings_passed;
 	bool		m_Autoreconnect;
+	// The socket
+	VSocket			*m_socket;
 
 	// Internal stuffs
 protected:
@@ -441,9 +445,7 @@ protected:
 
 	// The server
 	vncServer		*m_server;
-
-	// The socket
-	VSocket			*m_socket;
+	
 	char			*m_client_name;
 
 	// The client thread
@@ -522,7 +524,7 @@ protected:
 
     // 8 April 2008 jdp
     bool m_fUserAbortedFileTransfer;
-	char m_szSrcFileName[MAX_PATH + 64]; // Path + timestring
+	
 	HANDLE m_hSrcFile;
 	bool m_fEof;
 	DWORD m_dwNbBytesRead;

@@ -3854,8 +3854,10 @@ vncClientThread::run(void *arg)
 
 					// The client requests a File
 					case rfbFileTransferRequest:
-						{
-						omni_mutex_lock ll(m_client->GetUpdateLock(),90);
+					{
+						m_client->filetransferrequestPart1(msg, fUserOk);
+
+						/*omni_mutex_lock ll(m_client->GetUpdateLock(), 90);
 						m_client->m_fCompressionEnabled = (Swap32IfLE(msg.ft.size) == 1);
 						const UINT length = Swap32IfLE(msg.ft.length);
 						memset(m_client->m_szSrcFileName, 0, sizeof(m_client->m_szSrcFileName));
@@ -3867,12 +3869,13 @@ vncClientThread::run(void *arg)
 							//vnclog.Print(LL_INTINFO, VNCLOG("*** FileTransfer: Cannot read requested filename. Abort !\n"));
 							break;
 						}
-						
-                        // moved jdp 8/5/08 -- have to read whole packet to keep protocol in sync
+
+						// moved jdp 8/5/08 -- have to read whole packet to keep protocol in sync
 						if (!m_server->FileTransferEnabled() || !fUserOk) break;
 						// sf@2003 - Directory Transfer trick
 						// If the file is an Ultra Directory Zip Request we zip the directory here
 						// and we give it the requested name for transfer
+
 						int nDirZipRet = m_client->ZipPossibleDirectory(m_client->m_szSrcFileName);
 						if (nDirZipRet == -1)
 						{
@@ -3888,20 +3891,18 @@ vncClientThread::run(void *arg)
 							//adzm 2010-09 - minimize packets. SendExact flushes the queue.
 							m_socket->SendExactQueue((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
 							m_socket->SendExactQueue((char *)m_client->m_szSrcFileName, strlen(m_client->m_szSrcFileName));
-                            // 2 May 2008 jdp send the highpart too, else the client will hang
-                            // sf@2004 - Improving huge file size handling
-                            // TODO: what if we're speaking the old protocol, how can we tell? 
-					        CARD32 sizeH = Swap32IfLE(0xffffffffu);
-					        m_socket->SendExact((char *)&sizeH, sizeof(CARD32));
+							// 2 May 2008 jdp send the highpart too, else the client will hang
+							// sf@2004 - Improving huge file size handling
+							// TODO: what if we're speaking the old protocol, how can we tell? 
+							CARD32 sizeH = Swap32IfLE(0xffffffffu);
+							m_socket->SendExact((char *)&sizeH, sizeof(CARD32));
 
 							m_client->m_fFileUploadError = true;
 							m_client->m_fFileUploadRunning = false;
-                            m_client->FTUploadFailureHook();
+							m_client->FTUploadFailureHook();
 
 							break;
-						}
-
-
+						}					
 						// Open source file
 						m_client->m_hSrcFile = CreateFile(
 															m_client->m_szSrcFileName,		
@@ -3946,12 +3947,12 @@ vncClientThread::run(void *arg)
 									// We've made the choice off displaying all the files 
 									// off client AND server sides converted in clients local
 									// time only. So we don't convert server's files times.
-									/*
-									FILETIME LocalFileTime;
-									FileTimeToLocalFileTime(&SrcFileModifTime, &LocalFileTime);
-									*/
+									
+									//FILETIME LocalFileTime;
+									//FileTimeToLocalFileTime(&SrcFileModifTime, &LocalFileTime);
+									
 									SYSTEMTIME FileTime;
-									FileTimeToSystemTime(&SrcFileModifTime/*&LocalFileTime*/, &FileTime);
+									FileTimeToSystemTime(&SrcFileModifTime,  &FileTime);
 									wsprintf(szSrcFileTime,"%2.2d/%2.2d/%4.4d %2.2d:%2.2d",
 											FileTime.wMonth,
 											FileTime.wDay,
@@ -3997,7 +3998,7 @@ vncClientThread::run(void *arg)
                             m_client->FTUploadFailureHook();
 							break; // If error, we don't send anything else
 						}
-                        m_client->FTUploadStartHook();
+                        m_client->FTUploadStartHook();*/
 						}
 						break;
 
@@ -4741,6 +4742,7 @@ vncClient::vncClient() : Sendinput("USER32", "SendInput"), m_clipboard(Clipboard
 	m_initial_update=false;
 	m_nScale_viewer = 1;
 	nr_incr_rgn_empty = 0;
+	ThreadHandleCompressFolder = NULL;
 }
 
 vncClient::~vncClient()
@@ -4829,6 +4831,10 @@ vncClient::~vncClient()
 		Sleep(100);
 		counter++;
 		if (counter == 30) break;
+	}
+	if (ThreadHandleCompressFolder) {
+		WaitForSingleObject(ThreadHandleCompressFolder, INFINITE);
+		CloseHandle(ThreadHandleCompressFolder);
 	}
 }
 
@@ -6725,4 +6731,166 @@ void vncClient::NotifyPluginStreamingSupport()
 	//adzm 2010-09 - minimize packets. SendExact flushes the queue.
 	m_socket->SendExact((char *)&msg, sz_rfbNotifyPluginStreamingMsg, rfbNotifyPluginStreaming);
 	m_socket->SetPluginStreamingOut();
+}
+
+DWORD WINAPI CompressFolder(LPVOID lpParam)
+{
+	vncClient *client = (vncClient *)lpParam;
+	int nDirZipRet = client->ZipPossibleDirectory(client->m_szSrcFileName);
+	if (client->m_socket)
+		return client->filetransferrequestPart2(nDirZipRet);
+	return 0;
+}
+
+int  vncClient::filetransferrequestPart1(rfbClientToServerMsg msg, bool fUserOk)
+{
+	if (ThreadHandleCompressFolder != NULL)
+		return 0;
+	{
+		omni_mutex_lock ll(GetUpdateLock(), 90);
+		m_fCompressionEnabled = (Swap32IfLE(msg.ft.size) == 1);
+		const UINT length = Swap32IfLE(msg.ft.length);
+		memset(m_szSrcFileName, 0, sizeof(m_szSrcFileName));
+		if (length > sizeof(m_szSrcFileName))
+			return 0;
+		// Read in the Name of the file to create
+		if (!m_socket->ReadExact(m_szSrcFileName, length))
+			return 0;
+		if (!m_server->FileTransferEnabled() || !fUserOk)
+			return 0;
+	}	
+	DWORD dwTId;
+	ThreadHandleCompressFolder = CreateThread(NULL, 0, CompressFolder, this, 0, &dwTId);	
+}
+
+
+int  vncClient::filetransferrequestPart2(int nDirZipRet)
+{
+	omni_mutex_lock ll(GetUpdateLock(), 90);
+	if (nDirZipRet == -1)
+	{
+		//MessageBoxSecure(NULL, "5. Abort !", "Ultra WinVNC", MB_OK);
+		//vnclog.Print(LL_INTINFO, VNCLOG("*** FileTransfer: Failed to zip requested dir. Abort !\n"));
+
+		//	[v1.0.2-jp1 fix] Empty directory receive problem
+		rfbFileTransferMsg ft;
+		ft.type = rfbFileTransfer;
+		ft.contentType = rfbFileHeader;
+		ft.size = Swap32IfLE(0xffffffffu); // File Size in bytes, 0xFFFFFFFF (-1) means error
+		ft.length = Swap32IfLE(strlen(m_szSrcFileName));
+		//adzm 2010-09 - minimize packets. SendExact flushes the queue.
+		m_socket->SendExactQueue((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
+		m_socket->SendExactQueue((char *)m_szSrcFileName, strlen(m_szSrcFileName));
+		// 2 May 2008 jdp send the highpart too, else the client will hang
+		// sf@2004 - Improving huge file size handling
+		// TODO: what if we're speaking the old protocol, how can we tell? 
+		CARD32 sizeH = Swap32IfLE(0xffffffffu);
+		m_socket->SendExact((char *)&sizeH, sizeof(CARD32));
+
+		m_fFileUploadError = true;
+		m_fFileUploadRunning = false;
+		FTUploadFailureHook();
+		goto end;
+	}
+	// Open source file
+	m_hSrcFile = CreateFile(
+		m_szSrcFileName,
+		GENERIC_READ,
+		FILE_SHARE_READ | FILE_SHARE_WRITE,
+		NULL,
+		OPEN_EXISTING,
+		FILE_FLAG_SEQUENTIAL_SCAN,
+		NULL
+	);
+
+	// DWORD dwSrcSize = (DWORD)0;
+	ULARGE_INTEGER n2SrcSize;
+	if (m_hSrcFile == INVALID_HANDLE_VALUE)
+	{
+		DWORD TheError = GetLastError();
+		// dwSrcSize = 0xFFFFFFFF;
+		n2SrcSize.LowPart = 0xFFFFFFFF;
+		n2SrcSize.HighPart = 0xFFFFFFFF;
+	}
+	else
+	{
+		// Source file size 
+		bool bSize = MyGetFileSize(m_szSrcFileName, &n2SrcSize);
+		// dwSrcSize = GetFileSize(m_hSrcFile, NULL); 
+		// if (dwSrcSize == 0xFFFFFFFF)
+		if (!bSize)
+		{
+			helper::close_handle(m_hSrcFile);
+			n2SrcSize.LowPart = 0xFFFFFFFF;
+			n2SrcSize.HighPart = 0xFFFFFFFF;
+		}
+		else
+		{
+			// Add the File Time Stamp to the filename
+			FILETIME SrcFileModifTime;
+			BOOL fRes = GetFileTime(m_hSrcFile, NULL, NULL, &SrcFileModifTime);
+			if (fRes)
+			{
+				char szSrcFileTime[18];
+				// sf@2003 - Convert file time to local time
+				// We've made the choice off displaying all the files 
+				// off client AND server sides converted in clients local
+				// time only. So we don't convert server's files times.
+				/*
+				FILETIME LocalFileTime;
+				FileTimeToLocalFileTime(&SrcFileModifTime, &LocalFileTime);
+				*/
+				SYSTEMTIME FileTime;
+				FileTimeToSystemTime(&SrcFileModifTime/*&LocalFileTime*/, &FileTime);
+				wsprintf(szSrcFileTime, "%2.2d/%2.2d/%4.4d %2.2d:%2.2d",
+					FileTime.wMonth,
+					FileTime.wDay,
+					FileTime.wYear,
+					FileTime.wHour,
+					FileTime.wMinute
+				);
+				strcat(m_szSrcFileName, ",");
+				strcat(m_szSrcFileName, szSrcFileTime);
+			}
+		}
+	}
+
+	// sf@2004 - Delta Transfer
+	if (m_lpCSBuffer != NULL)
+	{
+		delete[] m_lpCSBuffer;
+		m_lpCSBuffer = NULL;
+	}
+	m_nCSOffset = 0;
+	m_nCSBufferSize = 0;
+
+	// Send the FileTransferMsg with rfbFileHeader
+	rfbFileTransferMsg ft;
+
+	ft.type = rfbFileTransfer;
+	ft.contentType = rfbFileHeader;
+	ft.size = Swap32IfLE(n2SrcSize.LowPart); // File Size in bytes, 0xFFFFFFFF (-1) means error
+	ft.length = Swap32IfLE(strlen(m_szSrcFileName));
+	//adzm 2010-09 - minimize packets. SendExact flushes the queue.
+	m_socket->SendExactQueue((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
+	m_socket->SendExactQueue((char *)m_szSrcFileName, strlen(m_szSrcFileName));
+
+	// sf@2004 - Improving huge file size handling
+	CARD32 sizeH = Swap32IfLE(n2SrcSize.HighPart);
+	m_socket->SendExact((char *)&sizeH, sizeof(CARD32));
+
+	// delete [] szSrcFileName;
+	if (n2SrcSize.LowPart == 0xFFFFFFFF && n2SrcSize.HighPart == 0xFFFFFFFF)
+	{
+		//MessageBoxSecure(NULL, "6. Abort !", "Ultra WinVNC", MB_OK);
+		//vnclog.Print(LL_INTINFO, VNCLOG("*** FileTransfer: Wrong Src File size. Abort !\n"));
+		FTUploadFailureHook();
+		goto end;
+	}
+	FTUploadStartHook();
+	end:
+	if (ThreadHandleCompressFolder)  
+		CloseHandle(ThreadHandleCompressFolder);
+	ThreadHandleCompressFolder = NULL;
+	return 0;
 }

@@ -7824,9 +7824,11 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 
 						// Call FileTransfer Dialog
 						_this->m_pFileTransfer->m_fFileTransferRunning = true;
+						_this->fis->setFT(true);
 						_this->m_pFileTransfer->m_fFileCommandPending = false;
 						_this->m_pFileTransfer->DoDialog();
 						_this->m_pFileTransfer->m_fFileTransferRunning = false;
+						_this->fis->setFT(false);
 						// Refresh Screen
 						// _this->SendFullFramebufferUpdateRequest();
 						//adzm 2010-09
