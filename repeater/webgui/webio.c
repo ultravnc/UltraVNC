@@ -431,6 +431,12 @@ wi_parseheader( wi_sess * sess )
    char *   pairs;
    u_long   cmd;
    int      error;
+   int i;
+   	char *strs[38] = {"index.html","passwd.html","settings.html","ok.html","nok.html","log.html","comment.html","images2.jpg",
+	 "connections.txt","viewer_access.txt","server_access.txt","memory.ssi","mode1.ssi","mode2.ssi","sport.ssi",
+	 "vport.ssi","acon.ssi","rcon.ssi","aid.ssi","acons.ssi","rcons.ssi","aids.ssi","webport.ssi","log.ssi","ucom.ssi",
+	 "listcomment.ssi","connections.ssi","server_access.ssi","viewer_access.ssi","keepalive.ssi","memhits.var","pushtest.htm",
+	 "testaction.cgi","testaction2.cgi","testaction3.cgi","testaction4.cgi","testaction5.cgi","passwd.cgi"};
 
    /* First find end of HTTP header */
    rxend = strstr(sess->ws_rxbuf, "\r\n\r\n" );
@@ -530,9 +536,26 @@ wi_parseheader( wi_sess * sess )
       if (sess->ws_referer) wi_argterm(sess->ws_referer);
    if((sess->ws_uri > sess->ws_host) && (sess->ws_host < rxend))
       if (sess->ws_host) wi_argterm(sess->ws_host);
+   
+
+
+   for (i=0; i<38; i++)
+   {
+	   if (strcmp(strs[i],sess->ws_uri) == 0)
+		   break;
+   }
+
+   if (i ==38)
+   {
+	  wi_senderr(sess, 333);
+      return error;
+   }
+
 
    /* Find and open file to return, */
    error = wi_fopen(sess, sess->ws_uri, "rb");
+
+
    if(error)
    {
       wi_senderr(sess, 404);  /* File not found */

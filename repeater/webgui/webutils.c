@@ -61,7 +61,7 @@ wi_senderr(wi_sess * sess, int httpcode )
 {
    int      i;
    char *   cp;
-   char *   errortext = "Unknown HTTP Error";
+   char *   errortext = "Only buildin pages allowed";
 
    for(i = 0; i < (sizeof(httperrors)/sizeof(struct httperror)); i++)
    {
