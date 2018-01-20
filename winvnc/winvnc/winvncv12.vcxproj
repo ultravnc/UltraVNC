@@ -88,7 +88,7 @@
     <UseIntelTBB>false</UseIntelTBB>
     <UseIntelMKL>No</UseIntelMKL>
     <UseILP64Interfaces>false</UseILP64Interfaces>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v141_xp</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='OldCPU|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -349,7 +349,7 @@
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <AdditionalIncludeDirectories>..\omnithread;..;..\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;__x86__;__WIN32__;WIN32;_WINDOWS;XMD_H;_WINSTATIC;_CRT_SECURE_NO_WARNINGS;_XZ;_USE_DESKTOPDUPLICATION;_RDPMODE;WIN32_WINNT=0x601;rem_WIN32_IE=0x0600;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;__x86__;__WIN32__;WIN32;_WINDOWS;XMD_H;_WINSTATIC;_CRT_SECURE_NO_WARNINGS;_XZ;rem_USE_DESKTOPDUPLICATION;_RDPMODE;WIN32_WINNT=0x601;rem_WIN32_IE=0x0600;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -571,7 +571,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\32\win8</Command>
       <Optimization>Full</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>..\omnithread;..;..\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;__x86__;__WIN32__;WIN32;_WINDOWS;XMD_H;_WINSTATIC;_CRT_SECURE_NO_WARNINGS;_X64;_XZ;_USE_DESKTOPDUPLICATION;_RDPMODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;__x86__;__WIN32__;WIN32;_WINDOWS;XMD_H;_WINSTATIC;_CRT_SECURE_NO_WARNINGS;_X64;_XZ;rem_USE_DESKTOPDUPLICATION;_RDPMODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -627,7 +627,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
       <Optimization>Full</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>..\omnithread;..;..\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;__x86__;__WIN32__;WIN32;_WINDOWS;XMD_H;_WINSTATIC;_CRT_SECURE_NO_WARNINGS;_X64;_XZ;rem_USE_DESKTOPDUPLICATION;_RDPMODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;__x86__;__WIN32__;WIN32;_WINDOWS;XMD_H;_WINSTATIC;_CRT_SECURE_NO_WARNINGS;_X64;rem_XZ;rem_USE_DESKTOPDUPLICATION;_RDPMODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>

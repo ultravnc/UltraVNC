@@ -352,6 +352,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <AdditionalIncludeDirectories>./;../src/liblzma/common;../src/common;../src/liblzma/api;../src/liblzma/check;../src/liblzma/delta;../src/liblzma/lz;../src/liblzma/lzma;../src/liblzma/rangecoder;../src/liblzma/simple</AdditionalIncludeDirectories>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

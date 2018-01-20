@@ -90,7 +90,7 @@
     <UseIntelTBB>false</UseIntelTBB>
     <UseIntelMKL>No</UseIntelMKL>
     <UseILP64Interfaces>false</UseILP64Interfaces>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v141_xp</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='OldCPU|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>

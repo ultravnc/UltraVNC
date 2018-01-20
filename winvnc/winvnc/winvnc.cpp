@@ -218,7 +218,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 {
 #ifndef _INTERNALLIB
 	if (VNCOS.OS_XP==true)
-		 MessageBoxSecure(NULL, "WIndows XP require special build", MB_ICONERROR);
+		 MessageBoxSecure(NULL, "WIndows XP require special build", "Warning", MB_ICONERROR);
 #endif
 		
 	if (VNCOS.OS_NOTSUPPORTED==true)
