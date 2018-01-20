@@ -27,7 +27,12 @@
 // 24/11/97		WEZ
 
 // WinMain and main WndProc for the new version of WinVNC
-
+#ifdef _INTERNALLIB
+#pragma comment(lib, "zlibstat.lib")
+#pragma comment(lib, "zip32.lib")
+#pragma comment(lib, "unz32lib.lib")
+#pragma comment(lib, "libjpeg-turbo-win-static.lib")
+#endif
 ////////////////////////////
 // System headers
 #include "stdhdrs.h"
@@ -211,7 +216,11 @@ Myinit(HINSTANCE hInstance)
 // routine or, under NT, the main service routine.
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow)
 {
-
+#ifndef _INTERNALLIB
+	if (VNCOS.OS_XP==true)
+		 MessageBoxSecure(NULL, "WIndows XP require special build", MB_ICONERROR);
+#endif
+		
 	if (VNCOS.OS_NOTSUPPORTED==true)
 	{
 		 MessageBoxSecure(NULL, "Error OS not supported","Unsupported OS", MB_ICONERROR);
