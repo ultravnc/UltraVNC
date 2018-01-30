@@ -1,22 +1,30 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.15
+VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "omnithread", "omnithread\omnithreadv12.vcxproj", "{E52B9956-FE67-47F7-BC4F-67CC5A64B708}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "omnithread", "omnithread\omnithread_VC2017.vcxproj", "{E52B9956-FE67-47F7-BC4F-67CC5A64B708}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rdr", "..\rdr\rdrv12.vcxproj", "{F5244002-0FFF-4F19-A941-FCCE1861F132}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rdr", "..\rdr\rdr_VC2017.vcxproj", "{F5244002-0FFF-4F19-A941-FCCE1861F132}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vnchooks", "vnchooks\vnchooksv12.vcxproj", "{1D18E045-6B72-43F4-ACBD-3E679A3DE349}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vnchooks", "vnchooks\vnchooks_VC2017.vcxproj", "{1D18E045-6B72-43F4-ACBD-3E679A3DE349}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "winvnc", "winvnc\winvncv12.vcxproj", "{C05AE605-1250-4F58-911B-EC99AE2C25AF}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "winvnc", "winvnc\winvnc_VC2017.vcxproj", "{C05AE605-1250-4F58-911B-EC99AE2C25AF}"
 	ProjectSection(ProjectDependencies) = postProject
+		{F5244002-0FFF-4F19-A941-FCCE1861F132} = {F5244002-0FFF-4F19-A941-FCCE1861F132}
 		{CAA83204-EBF8-4369-B152-011EA957784C} = {CAA83204-EBF8-4369-B152-011EA957784C}
 		{D50AEB07-5F5E-4401-9B50-C1660E693833} = {D50AEB07-5F5E-4401-9B50-C1660E693833}
 		{C05BE60B-FBDF-430F-B041-5089262E8FB5} = {C05BE60B-FBDF-430F-B041-5089262E8FB5}
 		{7DDBFA32-44F6-44CA-BDBE-CF8B32EDC6B1} = {7DDBFA32-44F6-44CA-BDBE-CF8B32EDC6B1}
 		{2F5FBC3F-4CCD-4C26-9719-C9166D8B0C7D} = {2F5FBC3F-4CCD-4C26-9719-C9166D8B0C7D}
 		{1D18E045-6B72-43F4-ACBD-3E679A3DE349} = {1D18E045-6B72-43F4-ACBD-3E679A3DE349}
+		{12728250-16EC-4DC6-94D7-E21DD88947F8} = {12728250-16EC-4DC6-94D7-E21DD88947F8}
+		{E52B9956-FE67-47F7-BC4F-67CC5A64B708} = {E52B9956-FE67-47F7-BC4F-67CC5A64B708}
+		{745DEC58-EBB3-47A9-A9B8-4C6627C01BF8} = {745DEC58-EBB3-47A9-A9B8-4C6627C01BF8}
+		{F9321962-FBED-4581-BF7D-D0EBC303D891} = {F9321962-FBED-4581-BF7D-D0EBC303D891}
+		{3B4D8565-E321-48B6-BF15-4EB7ADEC6BFC} = {3B4D8565-E321-48B6-BF15-4EB7ADEC6BFC}
 		{31AC9E7D-64B7-4301-ADE2-5EFF15AA6BDE} = {31AC9E7D-64B7-4301-ADE2-5EFF15AA6BDE}
+		{E8BA959F-B652-4BAB-9EA7-8E9FC8D7F39C} = {E8BA959F-B652-4BAB-9EA7-8E9FC8D7F39C}
+		{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3} = {04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}
 		{BC78A3C8-2280-42AB-BB6F-14FB674E2A0C} = {BC78A3C8-2280-42AB-BB6F-14FB674E2A0C}
 		{CD0D6EC9-D652-4D1B-B23B-18E1AC3AA683} = {CD0D6EC9-D652-4D1B-B23B-18E1AC3AA683}
 		{8D7757CB-5125-4633-AFB1-4B30ED24955F} = {8D7757CB-5125-4633-AFB1-4B30ED24955F}
@@ -25,45 +33,45 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "winvnc", "winvnc\winvncv12.
 		{334467FD-E35E-4C3D-9410-69B2171C2BB2} = {334467FD-E35E-4C3D-9410-69B2171C2BB2}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "avilog", "..\avilog\avilog\avilogv12.vcxproj", "{CD0D6EC9-D652-4D1B-B23B-18E1AC3AA683}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "avilog", "..\avilog\avilog\avilog_VC2017.vcxproj", "{CD0D6EC9-D652-4D1B-B23B-18E1AC3AA683}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "unz32lib", "..\zipunzip_src\unzip\windll\vc6\lib\unz32libv12.vcxproj", "{F9321962-FBED-4581-BF7D-D0EBC303D891}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "unz32lib", "..\zipunzip_src\unzip\windll\vc6\lib\unz32lib_VC2017.vcxproj", "{F9321962-FBED-4581-BF7D-D0EBC303D891}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zip32", "..\zipunzip_src\zip20\windll\visualc\lib\zip32v12.vcxproj", "{E8BA959F-B652-4BAB-9EA7-8E9FC8D7F39C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zip32", "..\zipunzip_src\zip20\windll\visualc\lib\zip32_VC2017.vcxproj", "{E8BA959F-B652-4BAB-9EA7-8E9FC8D7F39C}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libjpeg-turbo-win", "..\libjpeg-turbo-win\libjpeg-turbo-winv12.vcxproj", "{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libjpeg-turbo-win", "..\libjpeg-turbo-win\libjpeg-turbo-win_VC2017.vcxproj", "{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zlibstat", "..\zlib-1.2.5\contrib\vstudio\vc10\zlibstatv12.vcxproj", "{745DEC58-EBB3-47A9-A9B8-4C6627C01BF8}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zlibstat", "..\zlib-1.2.5\contrib\vstudio\vc10\zlibstat_VC2017.vcxproj", "{745DEC58-EBB3-47A9-A9B8-4C6627C01BF8}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "setcad", "..\setcad\setcad\setcadv12.vcxproj", "{3F5AB9E4-C106-43E2-98D2-718292AD4A9A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "setcad", "..\setcad\setcad\setcad_VC2017.vcxproj", "{3F5AB9E4-C106-43E2-98D2-718292AD4A9A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "setpasswd", "..\setpasswd\setpasswd\setpasswdv12.vcxproj", "{7DDBFA32-44F6-44CA-BDBE-CF8B32EDC6B1}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "setpasswd", "..\setpasswd\setpasswd\setpasswd_VC2017.vcxproj", "{7DDBFA32-44F6-44CA-BDBE-CF8B32EDC6B1}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "authadmin", "..\addon\ms-logon\authadm\authadminv12.vcxproj", "{334467FD-E35E-4C3D-9410-69B2171C2BB2}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "authadmin", "..\addon\ms-logon\authadm\authadmin_VC2017.vcxproj", "{334467FD-E35E-4C3D-9410-69B2171C2BB2}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "authSSP", "..\addon\ms-logon\authSSP\authSSPv12.vcxproj", "{2F5FBC3F-4CCD-4C26-9719-C9166D8B0C7D}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "authSSP", "..\addon\ms-logon\authSSP\authSSP_VC2017.vcxproj", "{2F5FBC3F-4CCD-4C26-9719-C9166D8B0C7D}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ldapauth", "..\addon\ms-logon\ldapauth\ldapauthv12.vcxproj", "{BC78A3C8-2280-42AB-BB6F-14FB674E2A0C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ldapauth", "..\addon\ms-logon\ldapauth\ldapauth_VC2017.vcxproj", "{BC78A3C8-2280-42AB-BB6F-14FB674E2A0C}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ldapauth9x", "..\addon\ms-logon\ldapauth9x\ldapauth9xv12.vcxproj", "{CAA83204-EBF8-4369-B152-011EA957784C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ldapauth9x", "..\addon\ms-logon\ldapauth9x\ldapauth9x_VC2017.vcxproj", "{CAA83204-EBF8-4369-B152-011EA957784C}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ldapauthnt4", "..\addon\ms-logon\ldapauthNT4\ldapauthnt4v12.vcxproj", "{31AC9E7D-64B7-4301-ADE2-5EFF15AA6BDE}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ldapauthnt4", "..\addon\ms-logon\ldapauthNT4\ldapauthnt4_VC2017.vcxproj", "{31AC9E7D-64B7-4301-ADE2-5EFF15AA6BDE}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "logging", "..\addon\ms-logon\logging\loggingv12.vcxproj", "{D50AEB07-5F5E-4401-9B50-C1660E693833}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "logging", "..\addon\ms-logon\logging\logging_VC2017.vcxproj", "{D50AEB07-5F5E-4401-9B50-C1660E693833}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MSLogonACL", "..\addon\ms-logon\MSLogonACL\MSLogonACLv12.vcxproj", "{F4E39BD7-C841-4F21-B40C-293D7E017EA1}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MSLogonACL", "..\addon\ms-logon\MSLogonACL\MSLogonACL_VC2017.vcxproj", "{F4E39BD7-C841-4F21-B40C-293D7E017EA1}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testauth", "..\addon\ms-logon\testauth\testauthv12.vcxproj", "{C05BE60B-FBDF-430F-B041-5089262E8FB5}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testauth", "..\addon\ms-logon\testauth\testauth_VC2017.vcxproj", "{C05BE60B-FBDF-430F-B041-5089262E8FB5}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "workgrpdomnt4", "..\addon\ms-logon\workgrpdomnt4\workgrpdomnt4v12.vcxproj", "{8D7757CB-5125-4633-AFB1-4B30ED24955F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "workgrpdomnt4", "..\addon\ms-logon\workgrpdomnt4\workgrpdomnt4_VC2017.vcxproj", "{8D7757CB-5125-4633-AFB1-4B30ED24955F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "uvnc_settings", "..\uvnc_settings2\uvnc_settings\uvnc_settingsv12.vcxproj", "{3B4D8565-E321-48B6-BF15-4EB7ADEC6BFC}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "uvnc_settings", "..\uvnc_settings2\uvnc_settings\uvnc_settings_VC2017.vcxproj", "{3B4D8565-E321-48B6-BF15-4EB7ADEC6BFC}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "liblzma", "..\xz-5.2.1\windows\liblzma.vcxproj", "{12728250-16EC-4DC6-94D7-E21DD88947F8}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "liblzma", "..\xz-5.2.1\windows\liblzma_VC2017.vcxproj", "{12728250-16EC-4DC6-94D7-E21DD88947F8}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "UltraVncX86", "UltraVnc\UltraVnc_VS2013.vdproj", "{FECB3925-98FD-4A8D-9C47-7BED7CD432D9}"
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "UltraVncX86", "UltraVnc\UltraVnc_VS2017.vdproj", "{FECB3925-98FD-4A8D-9C47-7BED7CD432D9}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "UltraVncX64", "UltraVnc\UltraVnc_VS2013_X64.vdproj", "{806D86FC-A458-41BE-A727-BF4E62970D19}"
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "UltraVncX64", "UltraVnc\UltraVnc_VS2017_X64.vdproj", "{806D86FC-A458-41BE-A727-BF4E62970D19}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
