@@ -32,7 +32,6 @@ BOOL StopW8();
 #endif
 
 bool g_DesktopThread_running;
-bool g_update_triggered;
 DWORD WINAPI hookwatch(LPVOID lpParam);
 extern bool stop_hookwatch;
 void testBench();
@@ -1074,11 +1073,11 @@ vncDesktopThread::run_undetached(void *arg)
 
 		result=WaitForMultipleObjects(6,m_desktop->trigger_events,FALSE,waittime);
 		{
-			/*#ifdef _DEBUG
+			#ifdef _DEBUG
 										char			szText[256];
 										sprintf(szText,"WaitForMultipleObjects %i\n",result );
 										OutputDebugString(szText);		
-			#endif*/
+			#endif
 			waittime = 0;
 			// We need to wait until restart is done
 			// else wait_timeout goes in to looping while sink window is not ready
@@ -1124,7 +1123,6 @@ vncDesktopThread::run_undetached(void *arg)
 								//oldtick=newtick;
 								if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver) handle_driver_changes(rgncache,updates);
 								m_desktop->m_update_triggered = FALSE;
-								g_update_triggered = FALSE;
 								//if (m_desktop->m_timerid==NULL) m_desktop->m_timerid = SetTimer(m_desktop->m_hwnd, 1, 100, NULL);
 
 								//*******************************************************

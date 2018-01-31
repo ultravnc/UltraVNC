@@ -64,7 +64,6 @@ const char szDesktopSink[] = "WinVNC desktop sink";
 
 bool g_Desktop_running;
 extern bool g_DesktopThread_running;
-extern bool g_update_triggered;
 
 //
 // // Modif sf@2002 - v1.1.0 - Optimization
@@ -498,7 +497,6 @@ vncDesktop::vncDesktop()
 
 	m_displaychanged = FALSE;
 	m_update_triggered = FALSE;
-	g_update_triggered = FALSE;
 
 	m_hrootdc_Desktop = NULL;
 	m_hmemdc = NULL;
@@ -688,11 +686,10 @@ vncDesktop::TriggerUpdate()
 	// Note that we should really lock the update lock here,
 	// but there are periodic timer updates anyway, so
 	// we don't actually need to.  Something to think about.
-	if (!m_update_triggered) {
+	/*if (!m_update_triggered) {
 		m_update_triggered = TRUE;
-		g_update_triggered = TRUE;
 		SetEvent(trigger_events[0]);
-	}
+	}*/
 }
 
 DWORD
