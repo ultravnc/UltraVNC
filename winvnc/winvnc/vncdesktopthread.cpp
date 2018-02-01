@@ -1094,6 +1094,7 @@ vncDesktopThread::run_undetached(void *arg)
 				waiting_update=0;
 				ResetEvent(m_desktop->trigger_events[0]);
 							{
+								m_desktop->m_update_triggered = FALSE;
 								//measure current cpu usage of winvnc
 								if ((fullpollcounter==10 || fullpollcounter==0 || fullpollcounter==5)&& (m_server->MaxCpu()!=100)) cpuUsage = usage.GetUsage();
 								if (cpuUsage > m_server->MaxCpu()) 
@@ -1121,8 +1122,7 @@ vncDesktopThread::run_undetached(void *arg)
 										OutputDebugString(szText);		
 								#endif*/
 								//oldtick=newtick;
-								if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver) handle_driver_changes(rgncache,updates);
-								m_desktop->m_update_triggered = FALSE;
+								if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver) handle_driver_changes(rgncache,updates);								
 								//if (m_desktop->m_timerid==NULL) m_desktop->m_timerid = SetTimer(m_desktop->m_hwnd, 1, 100, NULL);
 
 								//*******************************************************
