@@ -129,7 +129,6 @@ protected:
 	DWORD MIN_UPDATE_INTERVAL_MIN;
 	DWORD MAX_CPU_USAGE;
 	bool capture;
-	bool first_run;
 	bool initialupdate;
 	DWORD monitor_sleep_timer;
 

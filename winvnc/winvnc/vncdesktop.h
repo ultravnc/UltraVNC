@@ -50,6 +50,7 @@ class vncServer;
 
 // Modif rdv@2002 - v1.1.x - videodriver
 #include "videodriver.h"
+#include "DeskDupEngine.h"
 
 // Modif sf@2002 - v1.1.0
 #include <list>
@@ -176,11 +177,6 @@ extern const char szDesktopSink[];
 #define ERROR_DESKTOP_OUT_OF_MEMORY                     11
 #define ERROR_DESKTOP_NO_DIBSECTION_OR_COMPATBITMAP     12
 #define ERROR_DESKTOP_NO_DESKTOPTHREAD                  13
-typedef struct DrvWatch
-{
-	HWND hwnd;
-	bool *stop;
-}DrvWatch;
 
 typedef BOOL (*SetHooksFn)(DWORD thread_id,UINT UpdateMsg,UINT CopyMsg,UINT MouseMsg,BOOL ddihook);
 typedef BOOL (*UnSetHooksFn)(DWORD thread_id);
@@ -331,7 +327,6 @@ public:
 	void SethookMechanism(BOOL hookall,BOOL hookdriver);
 	bool m_UltraEncoder_used;
 	rfb::Rect		m_Cliprect;//the region to check
-	bool StopDriverWatches;
 
 	PCHANGES_BUF pchanges_buf;
 	CHANGES_BUF changes_buf;
@@ -380,7 +375,6 @@ protected:
 	BOOL ThunkBitmapInfo();
 	DWORD SetPixFormat();
 	BOOL SetPixShifts();
-	BOOL InitHooks();
 	BOOL SetPalette();
 	int m_timer;
 
@@ -489,10 +483,10 @@ protected:
 	//DDIHOOK
 
 	// Modif rdv@2002 - v1.1.x - videodriver
-	VIDEODRIVER *m_videodriver;
+	ScreenCapture *m_screenCapture;
 	BOOL InitVideoDriver();
  	void ShutdownVideoDriver();
-	omni_mutex		m_videodriver_lock;
+	omni_mutex		m_screenCapture_lock;
 
 	// Modif input dis/enabke
 	DWORD m_thread_hooks;
@@ -531,7 +525,6 @@ protected:
 	pBlockInput pbi;
 	HMODULE hUser32;
 	BOOL no_default_desktop;
-	COLORREF CapturePixel(int x,int y);
 	HANDLE InitWindowThreadh;
 	void StopInitWindowthread();
 	void StartInitWindowthread();
@@ -561,10 +554,6 @@ bool m_bIsInputDisabledByClient; // 28 March 2008 jdp
 #ifdef AVILOG
 CAVIGenerator *AviGen;
 #endif
-
-bool startedw8;
-unsigned char *w8_data;
-mystruct *plist;
 
 private:
 	HDESK m_input_desktop;

@@ -164,7 +164,7 @@ vncDesktop::GetSize()
 		return rfb::Rect(rect.left, rect.top, rect.right, rect.bottom);
 		
 		}
-	else if (!m_videodriver)
+	else if (!m_screenCapture)
 		{
 		m_SWOffsetx=0;
 		m_SWOffsety=0;

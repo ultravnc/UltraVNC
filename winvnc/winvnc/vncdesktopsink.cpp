@@ -33,16 +33,8 @@
 #define MSGFLT_ADD		1
 typedef BOOL (WINAPI *CHANGEWINDOWMESSAGEFILTER)(UINT message, DWORD dwFlag);
 int OSversion();
-DWORD WINAPI Driverwatch(LPVOID lpParam);
 DWORD WINAPI InitWindowThread(LPVOID lpParam);
 extern char g_hookstring[16];
-
-#ifdef _USE_DESKTOPDUPLICATION
-unsigned char * StartW8(bool primonly);
-BOOL StopW8();
-BOOL CaptureW8();
-mystruct * get_plist();
-#endif
 
 
 void
@@ -52,12 +44,6 @@ vncDesktop::ShutdownInitWindowthread()
 	// but ignore info
 	can_be_hooked=false;
 	vnclog.Print(LL_INTINFO, VNCLOG("ShutdownInitWindowthread \n"));
-
-	if (startedw8)
-		{
-			StartStophookdll(0);
-			Hookdll_Changed = true;
-		}
 }
 
 void
@@ -184,34 +170,7 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 			if (wParam==100)
 			{
 					KillTimer(hwnd, 100);
-					bool w8started = false;
-#ifdef _USE_DESKTOPDUPLICATION
-					_this->w8_data = StartW8(!_this->multi_monitor);
-					if (_this->w8_data)
-						{
-							_this->startedw8=true;
-							w8started = true;
-							_this->m_hookinited = TRUE;
-							vnclog.Print(LL_INTERR, VNCLOG("set W8 hooks OK\n"));
-							_this->plist = get_plist();
-							if (_this->plist == NULL)
-							{
-								_this->startedw8 = false;
-								w8started = false;
-								StopW8();
-							}
-						}
-					else
-						{
-							vnclog.Print(LL_INTERR, VNCLOG("set W8 hooks Failed, wddm >= 1.2 ?\n"));
-							//not wddm 1.2 or some other things prevent the desktophook to work proper
-							StopW8();
-						}
-#endif
-						
-
-					if (w8started){}
-					else if (_this->SetHook)
+					if (_this->SetHook)
 					{
 						_this->SetHook(hwnd);
 						vnclog.Print(LL_INTERR, VNCLOG("set SC hooks OK\n"));
@@ -277,18 +236,6 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		else if (_this->m_hookinited)
 			{
 				_this->m_hookinited=FALSE;
-				if (_this->startedw8)
-				{
-					vnclog.Print(LL_INTERR, VNCLOG("unset W8 hooks OK\n"));
-#ifdef _USE_DESKTOPDUPLICATION
-					StopW8();
-					strcpy_s(g_hookstring, "");
-					_this->w8_data = NULL;// g_obIPC.CloseBitmap();
-					_this->m_bitmappointer = false;
-					_this->m_DIBbits = NULL;
-					_this->m_displaychanged = true;
-#endif
-				}
 				if (_this->UnSetHook)
 				{
 					vnclog.Print(LL_INTERR, VNCLOG("unset SC hooks OK\n"));
@@ -317,15 +264,6 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		_this->m_hnextviewer=NULL;
 		if (_this->m_hookinited)
 			{
-				if (_this->startedw8)
-				{
-					vnclog.Print(LL_INTERR, VNCLOG("unset W8 hooks OK\n"));
-					_this->m_DIBbits = NULL;
-					Sleep(1000); //FIX
-#ifdef _USE_DESKTOPDUPLICATION
-					StopW8();
-#endif
-				}
 				if (_this->UnSetHook)
 				{
 					vnclog.Print(LL_INTERR, VNCLOG("unset SC hooks OK\n"));
@@ -389,7 +327,19 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 			return 0;
 
 	// GENERAL
-
+	case WM_APP + 10:
+		//ddEngine disconnected
+		//we need to restart it again
+		_this->m_displaychanged = TRUE;
+		_this->m_hookdriver = true;
+		_this->m_screenCapture->setBlocked(true);
+		break;
+	case WM_APP + 11:
+		SetEvent(_this->trigger_events[3]);
+		break;
+	case WM_APP + 12:
+		SetEvent(_this->trigger_events[0]);
+		break;
 	case WM_DISPLAYCHANGE:
 		// The display resolution is changing
 		// We must kick off any clients since their screen size will be wrong
@@ -399,19 +349,19 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		// For a temp resolution we don't use the driver, to fix the mirror driver
 		// to the new change, a resolution switch is needed, preventing screensaver locking.
 
-		if (_this->m_videodriver != NULL) //Video driver active
+		if (_this->m_screenCapture != NULL) //Video driver active
 		{
-			if (!_this->m_videodriver->blocked)
+			if (!_this->m_screenCapture->getBlocked())
 			{
 				_this->m_displaychanged = TRUE;
 				_this->m_hookdriver=true;
-				_this->m_videodriver->blocked=true;
+				_this->m_screenCapture->setBlocked(true);
 				vnclog.Print(LL_INTERR, VNCLOG("Resolution switch detected, driver active\n"));
 			}
 			else
 			{
 				//Remove display change, cause by driver activation
-				_this->m_videodriver->blocked=false;
+				_this->m_screenCapture->setBlocked(false);
 				vnclog.Print(LL_INTERR, VNCLOG("Resolution switch by driver activation removed\n"));
 			}
 		}
@@ -596,18 +546,7 @@ vncDesktop::InitWindow()
 	// adzm - 2010-07 - Fix clipboard hangs
 	m_settingClipboardViewer = true;
 	m_hnextviewer = SetClipboardViewer(m_hwnd);
-	m_settingClipboardViewer = false;
-	StopDriverWatches=false;
-		DrvWatch mywatch;
-		mywatch.stop=&StopDriverWatches;
-		mywatch.hwnd=m_hwnd;
-	if (VideoBuffer())
-	{
-		DWORD myword;
-		HANDLE T1=NULL;
-		T1=CreateThread(NULL,0,Driverwatch,m_hwnd,0,&myword);
-		if (T1) CloseHandle(T1);
-	}
+	m_settingClipboardViewer = false;		
 	vnclog.Print(LL_INTERR, VNCLOG("OOOOOOOOOOOO load hookdll's\n"));
 	////////////////////////
 		hModule=NULL;
@@ -670,7 +609,7 @@ vncDesktop::InitWindow()
 		
 		if (PeekMessage(&msg,NULL,0,0,PM_REMOVE))
 		{
-			vnclog.Print(LL_INTERR, VNCLOG("OOOOOOOOOOOO %i %i\n"),msg.message,msg.hwnd);
+			//vnclog.Print(LL_INTERR, VNCLOG("OOOOOOOOOOOO %i %i\n"),msg.message,msg.hwnd);
 			if (msg.message==WM_TIMER)
 			{
 				if(msg.wParam==1001) keepalive();

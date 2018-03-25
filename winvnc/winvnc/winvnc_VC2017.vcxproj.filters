@@ -10,7 +10,6 @@
     <ClCompile Include="d3des.c" />
     <ClCompile Include="..\..\rfb\dh.cpp" />
     <ClCompile Include="..\..\DSMPlugin\DSMPlugin.cpp" />
-    <ClCompile Include="DesktopManager.cpp" />
     <ClCompile Include="Dtwinver.cpp" />
     <ClCompile Include="getinfo.cpp" />
     <ClCompile Include="helpers.cpp" />
@@ -80,6 +79,8 @@
       <Filter>headers</Filter>
     </ClCompile>
     <ClCompile Include="security.cpp" />
+    <ClCompile Include="DeskdupEngine.cpp" />
+    <ClCompile Include="ScreenCapture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\ZipUnZip32\ZipUnZip32.h">
@@ -259,9 +260,6 @@
     <ClInclude Include="..\..\rfb\dh.h">
       <Filter>headers</Filter>
     </ClInclude>
-    <ClInclude Include="DesktopManager.h">
-      <Filter>headers</Filter>
-    </ClInclude>
     <ClInclude Include="d3des.h">
       <Filter>headers</Filter>
     </ClInclude>
@@ -271,12 +269,14 @@
     <ClInclude Include="resource.h">
       <Filter>resources</Filter>
     </ClInclude>
+    <ClInclude Include="DeskdupEngine.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="ScreenCapture.h">
+      <Filter>headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\BUILDING.txt" />
-    <None Include="..\building.txt" />
-    <None Include="..\history.txt" />
-    <None Include="..\README_BINARY.txt" />
     <None Include="VTune\winvnc.vpj" />
     <None Include="res\AuthPanel.class">
       <Filter>resources</Filter>

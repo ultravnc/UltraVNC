@@ -184,6 +184,7 @@
 #define IDC_CHECK4                      1132
 #define IDC_IPV6                        1132
 #define IDC_Path2                       1133
+#define IDC_STATICELEVATED              1133
 #define IDC_Path3                       1134
 #define IDC_LOCALTEXT_EDIT              1140
 #define IDC_INPUTAREA_EDIT              1140
@@ -279,9 +280,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        170
+#define _APS_NEXT_RESOURCE_VALUE        172
 #define _APS_NEXT_COMMAND_VALUE         40030
-#define _APS_NEXT_CONTROL_VALUE         1133
+#define _APS_NEXT_CONTROL_VALUE         1134
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

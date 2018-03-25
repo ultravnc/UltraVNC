@@ -53,8 +53,11 @@ DWORD GetExplorerLogonPid();
 // Constructor & Destructor
 vncPropertiesPoll::vncPropertiesPoll()
 {
+	ddEngine = false;
 	m_dlgvisible = FALSE;
 	m_usersettings = TRUE;
+	if (IsWindows8OrGreater())
+		ddEngine = true;
 }
 
 vncPropertiesPoll::~vncPropertiesPoll()
@@ -283,7 +286,11 @@ vncPropertiesPoll::DialogProcPoll(HWND hwnd,
 
 			_this = (vncPropertiesPoll *) lParam;
 			_this->m_dlgvisible = TRUE;
-
+			if (_this->ddEngine) {
+				ShowWindow(GetDlgItem(hwnd, IDC_CHECKDRIVER), false);
+				ShowWindow(GetDlgItem(hwnd, IDC_STATICELEVATED), false);
+				SetWindowText(GetDlgItem(hwnd, IDC_DRIVER), "Desktop Duplication (restart on change required)");
+			}
 			if (_this->m_fUseRegistry)
 			{
 				_this->Load(_this->m_usersettings);

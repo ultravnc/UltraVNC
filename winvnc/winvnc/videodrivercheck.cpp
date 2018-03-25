@@ -25,10 +25,10 @@
 #include <windows.h>
 #include <stdlib.h>
 #include "vncOSVersion.h"
+#include "screencapture.h"
 
 DWORD MessageBoxSecure(HWND hWnd,LPCTSTR lpText,LPCTSTR lpCaption,UINT uType);
 typedef BOOL (WINAPI* pEnumDisplayDevices)(PVOID,DWORD,PVOID,DWORD);
-extern int g_video_info;
 
 /*bool CheckDriver2(void)
 {
@@ -113,6 +113,8 @@ TEXT("\\StringFileInfo\\040904b0\\ProductVersion"),
 bool
 CheckVideoDriver(bool Box)
 {
+	if (IsWindows8OrGreater)
+		return true;
 		typedef BOOL (WINAPI* pEnumDisplayDevices)(PVOID,DWORD,PVOID,DWORD);
 		HDC m_hrootdc=NULL;
 		pEnumDisplayDevices pd=NULL;
@@ -185,7 +187,7 @@ CheckVideoDriver(bool Box)
 						}
 						else
 							strcat(buf2,"Driver Not Activated, is the viewer current connected ?\n");
-						    if (g_video_info==0) strcat(buf2,"Is winvnc started with run as admin, no permission to start mirror driver? \n");
+						    strcat(buf2,"A mirrior driver can only be started if winvnc is a service or running as admin\n");
 						MessageBoxSecure(NULL,buf2,buf,0);
 					}
 					return true;

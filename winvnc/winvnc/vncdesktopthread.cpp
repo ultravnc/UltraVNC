@@ -26,11 +26,6 @@
 #include "vncOSVersion.h"
 #include "uvncUiAccess.h"
 
-#ifdef _USE_DESKTOPDUPLICATION
-BOOL CaptureW8();
-BOOL StopW8();
-#endif
-
 bool g_DesktopThread_running;
 DWORD WINAPI hookwatch(LPVOID lpParam);
 extern bool stop_hookwatch;
@@ -133,6 +128,8 @@ vncDesktopThread::copy_bitmaps_to_buffer(ULONG i,rfb::Region2D &rgncache,rfb::Up
 				case BLIT:;
 					rgncache.assign_union(rect);
 					break;
+				case POINTERCHANGE:
+					break;
 				default:
 					break;
 			}
@@ -145,9 +142,9 @@ BOOL
 vncDesktopThread::handle_driver_changes(rfb::Region2D &rgncache,rfb::UpdateTracker &tracker)
 { 
 
-	omni_mutex_lock l(m_desktop->m_videodriver_lock,70);
+	omni_mutex_lock l(m_desktop->m_screenCapture_lock,70);
 
-	int oldaantal=m_desktop->m_videodriver->oldaantal;
+	int oldaantal=m_desktop->m_screenCapture->getPreviousCounter();
 	int counter=m_desktop->pchanges_buf->counter;
 //	int nr_updates=m_desktop->pchanges_buf->pointrect[0].type;
 //	vnclog.Print(LL_INTERR, VNCLOG("updates, rects %i\n"),oldaantal-counter);
@@ -179,7 +176,7 @@ vncDesktopThread::handle_driver_changes(rfb::Region2D &rgncache,rfb::UpdateTrack
 				}
 		}	
 //	vnclog.Print(LL_INTINFO, VNCLOG("Nr rects %i \n"),rgncache.Numrects());
-	m_desktop->m_videodriver->oldaantal=counter;
+	m_desktop->m_screenCapture->setPreviousCounter(counter);
 // A lot updates left after combining 
 // This generates an overflow
 // We expand each single update to minimum 32x32
@@ -292,205 +289,155 @@ vncDesktopThread::PollWindow(rfb::Region2D &rgn, HWND hwnd)
 		}
 	}
 }
-
-
+static int old_inputDesktopSelected;
 bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D& rgncache, rfb::SimpleUpdateTracker& clipped_updates, rfb::ClippedUpdateTracker& updates)
 {
 	BOOL screensize_changed=false;
-	if (first_run)
-	{
-		first_run=false;
-		//m_server->SetNewSWSizeFR(m_desktop->m_scrinfo.framebufferWidth,m_desktop->m_scrinfo.framebufferHeight,FALSE);//changed no lock ok
-		//m_server->SetScreenOffset(m_desktop->m_ScreenOffsetx,m_desktop->m_ScreenOffsety,m_desktop->nr_monitors);// no lock ok
-		//m_desktop->m_displaychanged=true;
-		//screensize_changed=true;
-	}
-
-	if (vncService::InputDesktopSelected()==2)
-	{
+	int inputDesktopSelected = vncService::InputDesktopSelected();
+	if (inputDesktopSelected == 2) {
+		vnclog.Print(LL_INTERR, VNCLOG("WriteMessageOnScreenSOEMTHING CETECTED \n"));
 		m_desktop->m_buffer.WriteMessageOnScreen("UltraVVNC running as application doesn't \nhave permission to acces \nUAC protected windows.\n\nScreen is locked until the remote user \nunlock this window");
 		rfb::Rect rect;
 		rect.tl = rfb::Point(0,0);
 		rect.br = rfb::Point(300,120);
 		rgncache.assign_union(rect);
-		if (m_desktop->startedw8)
-		{
-#ifdef _DEBUG
-					char			szText[256];
-					sprintf(szText,"threadHandle stop \n");
-					OutputDebugString(szText);		
-#endif
-			stop_hookwatch=true;
-			vnclog.Print(LL_INTERR, VNCLOG("threadHandle stop\n"));
-			if (threadHandle)
-				{
-					WaitForSingleObject( threadHandle, INFINITE );
-					CloseHandle(threadHandle);
-					stop_hookwatch=false;
-					threadHandle=NULL;
-				}
-#ifdef _DEBUG
-					sprintf(szText,"m_desktop->StartStophookdll(0) \n");
-					OutputDebugString(szText);		
-#endif
-			m_desktop->StartStophookdll(0);
-			m_desktop->Hookdll_Changed = true;
-		}
 	}
+	else if (inputDesktopSelected == 1) {
+		if (old_inputDesktopSelected == 2)
+			m_desktop->m_displaychanged = true;
+	}
+	old_inputDesktopSelected = inputDesktopSelected;
 		
-	if ((m_desktop->m_displaychanged ||									//WM_DISPLAYCHANGE
+	if (m_desktop->m_displaychanged ||									
 			vncService::InputDesktopSelected()==0 ||							//handle logon and screensaver desktops
 			m_desktop->m_SWtoDesktop ||										//switch from SW to full desktop or visa versa
 			m_desktop->m_hookswitch||										//hook change request
 			m_desktop->requested_multi_monitor!=m_desktop->m_buffer.IsMultiMonitor() ||		//monitor change request
-			// JnZn558
 			m_desktop->m_old_monitor != m_desktop->m_current_monitor
-			//
-			) )
-			{
-				// We need to wait until viewer has send if he support Size changes
-				if (!m_server->All_clients_initialalized())
-				{
+			){
+		// We need to wait until viewer has send if he support Size changes
+		if (!m_server->All_clients_initialalized()) {
 					Sleep(30);
 					vnclog.Print(LL_INTERR, VNCLOG("Wait for viewer init \n"));
-				}
-
-				//logging
-				if (m_desktop->m_displaychanged)								
-					vnclog.Print(LL_INTERR, VNCLOG("++++Screensize changed \n"));
-				if (m_desktop->m_SWtoDesktop)									
-					vnclog.Print(LL_INTERR, VNCLOG("m_SWtoDesktop \n"));
-				if (m_desktop->m_hookswitch)									
-					vnclog.Print(LL_INTERR, VNCLOG("m_hookswitch \n"));
-				if (m_desktop->requested_multi_monitor!=m_desktop->m_buffer.IsMultiMonitor()) 
-					vnclog.Print(LL_INTERR, VNCLOG("desktop switch %i %i \n"),m_desktop->requested_multi_monitor,m_desktop->m_buffer.IsMultiMonitor());
-				if (!m_server->IsThereFileTransBusy())
-				if (vncService::InputDesktopSelected()==0)						
-					vnclog.Print(LL_INTERR, VNCLOG("++++InputDesktopSelected \n"));
+		}
+		vnclog.Print(LL_INTERR, VNCLOG("SOEMTHING CETECTED \n"));
+		//logging
+		if (m_desktop->m_displaychanged)								
+			vnclog.Print(LL_INTERR, VNCLOG("++++Screensize changed \n"));
+		if (m_desktop->m_SWtoDesktop)									
+			vnclog.Print(LL_INTERR, VNCLOG("m_SWtoDesktop \n"));
+		if (m_desktop->m_hookswitch)									
+			vnclog.Print(LL_INTERR, VNCLOG("m_hookswitch \n"));
+		if (m_desktop->requested_multi_monitor!=m_desktop->m_buffer.IsMultiMonitor()) 
+			vnclog.Print(LL_INTERR, VNCLOG("desktop switch %i %i \n"),m_desktop->requested_multi_monitor,m_desktop->m_buffer.IsMultiMonitor());
+		if (!m_server->IsThereFileTransBusy())
+			if (vncService::InputDesktopSelected()==0)						
+				vnclog.Print(LL_INTERR, VNCLOG("++++InputDesktopSelected \n"));
 				
-				
-				//BOOL screensize_changed=false;
-				BOOL monitor_changed=false;
-				BOOL initial_run = false;
-				if (m_desktop->m_old_monitor == 6) initial_run = true;
-				rfbServerInitMsg oldscrinfo;
-				//*******************************************************
-				// Lock Buffers from here
-				//*******************************************************
-				{
-					if (XRichCursorEnabled) m_server->UpdateCursorShape();
-					/// We lock all buffers,,and also back the client thread update mechanism
-					omni_mutex_lock l(m_desktop->m_update_lock,273);
-					/*#ifdef _DEBUG
-					char			szText[256];
-					sprintf(szText," ++++++ Mutex lock display changes\n");
-					OutputDebugString(szText);		
-			#endif*/
-					// We remove all queue updates from the tracker
-					m_server->Clear_Update_Tracker();
-					// Also clear the current updates
-					rgncache.clear();
-					// Also clear the copy_rect updates
-					clipped_updates.clear();
-					// TESTTESTTEST
-					// Are all updates cleared....old updates could generate bounding errors
-					// any other queues to clear ? Yep cursor positions
-					m_desktop->m_cursorpos.tl.x=0;
-					m_desktop->m_cursorpos.tl.y=0;
-					m_desktop->m_cursorpos.br.x=0;
-					m_desktop->m_cursorpos.br.y=0;
-					//keep a copy of the old screen size, so we can check for changes later on
-					oldscrinfo = m_desktop->m_scrinfo;
+		BOOL monitor_changed=false;
+		rfbServerInitMsg oldscrinfo;
+		//*******************************************************
+		// Lock Buffers from here
+		//*******************************************************
+		{
+			if (XRichCursorEnabled) m_server->UpdateCursorShape();
+			/// We lock all buffers,,and also back the client thread update mechanism
+			omni_mutex_lock l(m_desktop->m_update_lock,273);
+			// We remove all queue updates from the tracker
+			m_server->Clear_Update_Tracker();
+			// Also clear the current updates
+			rgncache.clear();
+			// Also clear the copy_rect updates
+			clipped_updates.clear();
+			// TESTTESTTEST
+			// Are all updates cleared....old updates could generate bounding errors
+			// any other queues to clear ? Yep cursor positions
+			m_desktop->m_cursorpos.tl.x=0;
+			m_desktop->m_cursorpos.tl.y=0;
+			m_desktop->m_cursorpos.br.x=0;
+			m_desktop->m_cursorpos.br.y=0;
+			//keep a copy of the old screen size, so we can check for changes later on
+			oldscrinfo = m_desktop->m_scrinfo;
 						
-					if (m_desktop->requested_multi_monitor!=m_desktop->m_buffer.IsMultiMonitor())
-						{
-							m_desktop->Checkmonitors();
-							m_desktop->requested_multi_monitor=m_desktop->m_buffer.IsMultiMonitor();
-							bool old_monitor=m_desktop->multi_monitor;	
-							m_desktop->multi_monitor=true;
-							if (m_desktop->requested_multi_monitor && m_desktop->nr_monitors>1) m_desktop->multi_monitor=true;
-							else m_desktop->multi_monitor=false;							
-							if ( old_monitor!=m_desktop->multi_monitor) {
-								monitor_changed=true;
-								m_desktop->m_old_monitor = m_desktop->m_current_monitor;
-							}
-						}
-					// JnZn558
-					else
-					{
-						if (m_desktop->m_old_monitor != m_desktop->m_current_monitor) {
-							if (m_desktop->m_old_monitor!=6) monitor_changed = true;
-							m_desktop->m_old_monitor = m_desktop->m_current_monitor;
-						}
+			if (m_desktop->requested_multi_monitor!=m_desktop->m_buffer.IsMultiMonitor()) {
+				m_desktop->Checkmonitors();
+				m_desktop->requested_multi_monitor=m_desktop->m_buffer.IsMultiMonitor();
+				bool old_monitor=m_desktop->multi_monitor;	
+				m_desktop->multi_monitor=true;
+				if (m_desktop->requested_multi_monitor && m_desktop->nr_monitors>1) m_desktop->multi_monitor=true;
+				else m_desktop->multi_monitor=false;							
+				if ( old_monitor!=m_desktop->multi_monitor) {
+						monitor_changed=true;
+						m_desktop->m_old_monitor = m_desktop->m_current_monitor;
+				}
+			}
+			// JnZn558
+			else {
+				if (m_desktop->m_old_monitor != m_desktop->m_current_monitor) {
+					if (m_desktop->m_old_monitor!=6) monitor_changed = true;
+					m_desktop->m_old_monitor = m_desktop->m_current_monitor;
+				}
 					}
 
-					//*******************************************************
-					// Reinitialize buffers,color, etc
-					// monitor change, for non driver, use another buffer
-					//*******************************************************
-					if (!m_server->IsThereFileTransBusy())
-					if (m_desktop->m_displaychanged || vncService::InputDesktopSelected()==0 || m_desktop->m_hookswitch || (monitor_changed && !m_desktop->m_videodriver))
-					{
-								// Attempt to close the old hooks
-								// shutdown(true) driver is reinstalled without shutdown,(shutdown need a 640x480x8 switch)
-								vnclog.Print(LL_INTERR, VNCLOG("m_desktop->Shutdown"));
-								monitor_changed=false;
-								if (!m_desktop->Shutdown())
-									{
-										vnclog.Print(LL_INTERR, VNCLOG("Shutdown KillAuthClients\n"));
-										m_server->KillAuthClients();
-										return false;
-									}					
-								bool fHookDriverWanted = (FALSE != m_desktop->m_hookdriver);
-                                Sleep(1000);
-								vnclog.Print(LL_INTERR, VNCLOG("m_desktop->Startup"));
-								if (m_desktop->Startup() != 0)
-									{
-										vnclog.Print(LL_INTERR, VNCLOG("Startup KillAuthClients\n"));
-										m_server->KillAuthClients();
-										SetEvent(m_desktop->restart_event);
-										return false;
-									}
+				//*******************************************************
+				// Reinitialize buffers,color, etc
+				// monitor change, for non driver, use another buffer
+				//*******************************************************
+				if (!m_server->IsThereFileTransBusy())
+					if (m_desktop->m_displaychanged || vncService::InputDesktopSelected()==0 || m_desktop->m_hookswitch || (monitor_changed && !m_desktop->m_screenCapture)) {
+						// Attempt to close the old hooks
+						// shutdown(true) driver is reinstalled without shutdown,(shutdown need a 640x480x8 switch)
+						vnclog.Print(LL_INTERR, VNCLOG("m_desktop->Shutdown"));
+						monitor_changed=false;
+						if (!m_desktop->Shutdown()) {
+							vnclog.Print(LL_INTERR, VNCLOG("Shutdown KillAuthClients\n"));
+							m_server->KillAuthClients();
+							return false;
+						}					
+						bool fHookDriverWanted = (FALSE != m_desktop->m_hookdriver);
+                        Sleep(1000);
+						vnclog.Print(LL_INTERR, VNCLOG("m_desktop->Startup"));
+						if (m_desktop->Startup() != 0) {
+							vnclog.Print(LL_INTERR, VNCLOG("Startup KillAuthClients\n"));
+							m_server->KillAuthClients();
+							SetEvent(m_desktop->restart_event);
+							return false;
+						}
 
-								if (m_desktop->m_videodriver)
-									{
-										if (!XRichCursorEnabled) m_desktop->m_videodriver->HardwareCursor();
-										else m_desktop->m_videodriver->NoHardwareCursor();
-									}
-								m_server->SetScreenOffset(m_desktop->m_ScreenOffsetx,m_desktop->m_ScreenOffsety,m_desktop->nr_monitors);
+						if (m_desktop->m_screenCapture)	{
+							if (!XRichCursorEnabled) 
+								m_desktop->m_screenCapture->hardwareCursor();
+							else 
+								m_desktop->m_screenCapture->noHardwareCursor();
+						}
+						m_server->SetScreenOffset(m_desktop->m_ScreenOffsetx,m_desktop->m_ScreenOffsety,m_desktop->nr_monitors);
 
-								// sf@2003 - After a new Startup(), we check if the required video driver
-								// is actually available. If not, we force hookdll
-								// No need for m_hookswitch again because the driver is NOT available anyway.
-								// All the following cases are now handled:
-								// 1. Desktop thread starts with "Video Driver" checked and no video driver available...
-								//    -> HookDll forced (handled by the first InitHookSettings() after initial Startup() call
-								// 2. Desktop Thread starts without "Video Driver" checked but available driver
-								//    then the user checks "Video Driver" -> Video Driver used
-								// 3. Desktop thread starts with "Video Driver" and available driver used
-								//    Then driver is switched off (-> hookDll) 
-								//    Then the driver is switched on again (-> hook driver used again)
-								// 4. Desktop thread starts without "Video Driver" checked and no driver available
-								//    then the users checks "Video Driver" 
-								if (fHookDriverWanted && m_desktop->m_videodriver == NULL)
-									{
-										vnclog.Print(LL_INTERR, VNCLOG("m_videodriver == NULL \n"));
-										m_desktop->SethookMechanism(false,false); 	// InitHookSettings() would work as well;
-									}
-								stop_hookwatch=true;
-								vnclog.Print(LL_INTERR, VNCLOG("threadHandle \n"));
-								if (threadHandle)
-								{
-									WaitForSingleObject( threadHandle, INFINITE );
-									CloseHandle(threadHandle);
-									stop_hookwatch=false;
-									threadHandle=NULL;
-								}
-/*								if (m_desktop->startw8)
-								{
-									m_desktop->StartStophookdll(0);
-								}*/
-								vnclog.Print(LL_INTERR, VNCLOG("threadHandle2 \n"));
+						// sf@2003 - After a new Startup(), we check if the required video driver
+						// is actually available. If not, we force hookdll
+						// No need for m_hookswitch again because the driver is NOT available anyway.
+						// All the following cases are now handled:
+						// 1. Desktop thread starts with "Video Driver" checked and no video driver available...
+						//    -> HookDll forced (handled by the first InitHookSettings() after initial Startup() call
+						// 2. Desktop Thread starts without "Video Driver" checked but available driver
+						//    then the user checks "Video Driver" -> Video Driver used
+						// 3. Desktop thread starts with "Video Driver" and available driver used
+						//    Then driver is switched off (-> hookDll) 
+						//    Then the driver is switched on again (-> hook driver used again)
+						// 4. Desktop thread starts without "Video Driver" checked and no driver available
+						//    then the users checks "Video Driver" 
+						if (fHookDriverWanted && m_desktop->m_screenCapture == NULL) {
+							vnclog.Print(LL_INTERR, VNCLOG("m_videodriver == NULL \n"));
+							m_desktop->SethookMechanism(false,false); 	// InitHookSettings() would work as well;
+						}
+						stop_hookwatch=true;
+						vnclog.Print(LL_INTERR, VNCLOG("threadHandle \n"));
+						if (threadHandle) {
+							WaitForSingleObject( threadHandle, INFINITE );
+							CloseHandle(threadHandle);
+							stop_hookwatch=false;
+							threadHandle=NULL;
+						}
+						vnclog.Print(LL_INTERR, VNCLOG("threadHandle2 \n"));
 
 					}
 					//*******************************************************
@@ -498,15 +445,14 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 					//*******************************************************
 
 					if ((m_desktop->m_scrinfo.framebufferWidth != oldscrinfo.framebufferWidth) ||
-						(m_desktop->m_scrinfo.framebufferHeight != oldscrinfo.framebufferHeight ||
-							m_desktop->m_SWtoDesktop!=FALSE ))
-							{
-								screensize_changed=true;	
-								vnclog.Print(LL_INTINFO, VNCLOG("SCR: new screen format %dx%dx%d\n"),
+							(m_desktop->m_scrinfo.framebufferHeight != oldscrinfo.framebufferHeight ||
+								m_desktop->m_SWtoDesktop != FALSE)) {
+						screensize_changed = true;
+						vnclog.Print(LL_INTINFO, VNCLOG("SCR: new screen format %dx%dx%d\n"),
 								m_desktop->m_scrinfo.framebufferWidth,
 								m_desktop->m_scrinfo.framebufferHeight,
 								m_desktop->m_scrinfo.format.bitsPerPixel);
-							}
+					}
 
 					m_desktop->m_displaychanged = FALSE;
 					m_desktop->m_hookswitch = FALSE;
@@ -516,8 +462,7 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 					//************* SCREEN SIZE CHANGED 
 					//****************************************************************************
 
-					if (screensize_changed)
-						{
+					if (screensize_changed) {
 							vnclog.Print(LL_INTERR, VNCLOG("Size changed\n"));
 							POINT CursorPos;
 							m_desktop->SWinit();
@@ -681,12 +626,6 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 
 
 					}
-					if (!initial_run)
-					{
-						initial_run = false;
-						m_desktop->m_buffer.ClearCache();
-						m_desktop->m_buffer.BlackBack();
-					}
 					InvalidateRect(NULL,NULL,TRUE);
 					rgncache.assign_union(rfb::Region2D(m_desktop->m_Cliprect));
 					
@@ -719,12 +658,6 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 							*/
 							m_server->SetNewSWSize(rc.right,rc.bottom,TRUE); //changed no lock ok	
 						}
-
-		/*#ifdef _DEBUG
-					//char			szText[256];
-					sprintf(szText," ++++++ Mutex unlock display changes\n");
-					OutputDebugString(szText);		
-			#endif*/
 			}// end lock
 	}
 
@@ -747,49 +680,13 @@ void vncDesktopThread::do_polling(HANDLE& threadHandle, rfb::Region2D& rgncache,
 			if (Handle_Ringbuffer(g_obIPC.listall(),rgncache)) return;
 		}
 
-		if (m_desktop->startedw8 && m_desktop->plist!= NULL && m_desktop->can_be_hooked)
+		if (m_desktop->can_be_hooked)
 		{
-			if (m_desktop->m_hookinited && ! m_desktop->m_bitmappointer)
-			{
-				//unsigned char *data=g_obIPC.CreateBitmap();
-				if (m_desktop->w8_data)
-					{
-						m_desktop->m_bitmappointer=true;
-						m_desktop->m_DIBbits = m_desktop->w8_data;
-					}
-			}
-			else if (!m_desktop->m_hookinited && m_desktop->m_bitmappointer)
+			if (!m_desktop->m_hookinited && m_desktop->m_bitmappointer)
 			{
 				strcpy_s(g_hookstring, "");
-				m_desktop->w8_data = NULL;// g_obIPC.CloseBitmap();
 				m_desktop->m_bitmappointer=false;
 				m_desktop->m_DIBbits=NULL;
-			}
-			else
-			{
-				strcpy_s(g_hookstring, "w8hook");
-#ifdef _USE_DESKTOPDUPLICATION
-				BOOL value = CaptureW8();
-				if (value == 1)
-				{
-					DWORD dwTId(0);
-					if (threadHandle == NULL && value != 0)
-						threadHandle = CreateThread(NULL, 0, hookwatch, this, 0, &dwTId);
-					capture = false;
-					if (m_desktop->m_bitmappointer && m_desktop->m_DIBbits)
-						if (Handle_Ringbuffer(m_desktop->plist, rgncache)) return;
-				}
-				else
-				{
-					StopW8();
-					strcpy_s(g_hookstring, "");
-					m_desktop->startedw8 = false;
-					m_desktop->w8_data = NULL;// g_obIPC.CloseBitmap();
-					m_desktop->m_bitmappointer = false;
-					m_desktop->m_DIBbits = NULL;
-					m_desktop->m_displaychanged = true;
-				}
-#endif
 			}
 		}
 	}
@@ -798,11 +695,11 @@ void vncDesktopThread::do_polling(HANDLE& threadHandle, rfb::Region2D& rgncache,
 	DWORD lTime = timeGetTime();
 
 	m_desktop->m_buffer.SetAccuracy(m_desktop->m_server->TurboMode() ? 8 : 4); 
-	#ifdef _DEBUG
+	/*#ifdef _DEBUG
 			char			szText[256];
 			sprintf(szText,"Do polling %d\n",GetTickCount());
 			OutputDebugString(szText);		
-	#endif
+	#endif*/
 
 	if (cursormoved) 
 		{
@@ -842,12 +739,6 @@ void vncDesktopThread::do_polling(HANDLE& threadHandle, rfb::Region2D& rgncache,
 			{
 				capture=false;
 			}
-
-			/*#ifdef _DEBUG
-										char			szText[256];
-										sprintf(szText," Capture %i\n",capture);
-										OutputDebugString(szText);		
-			#endif*/
 
 			// force full screen scan every three seconds after the mouse stops moving
 			if (fullpollcounter > 200) 
@@ -969,8 +860,8 @@ vncDesktopThread::run_undetached(void *arg)
 
 	// Set driver cursor state
 	XRichCursorEnabled= (FALSE != m_desktop->m_server->IsXRichCursorEnabled());
-	if (!XRichCursorEnabled && m_desktop->m_videodriver) m_desktop->m_videodriver->HardwareCursor();
-	if (XRichCursorEnabled && m_desktop->m_videodriver) m_desktop->m_videodriver->NoHardwareCursor();
+	if (!XRichCursorEnabled && m_desktop->m_screenCapture) m_desktop->m_screenCapture->hardwareCursor();
+	if (XRichCursorEnabled && m_desktop->m_screenCapture) m_desktop->m_screenCapture->noHardwareCursor();
 	if (XRichCursorEnabled) m_server->UpdateCursorShape();
 
 	InvalidateRect(NULL,NULL,TRUE);
@@ -995,12 +886,7 @@ vncDesktopThread::run_undetached(void *arg)
 	//Sleep(1000);
 	rgncache.assign_union(rfb::Region2D(m_desktop->m_Cliprect));
 
-	if (PreConnect)
-	{
-		//m_desktop->m_buffer.WriteMessageOnScreenPreConnect();
-	}
-	else
-	{
+	if (!PreConnect) {
 		if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver && !VNCOS.OS_WIN8)
 		{
 			m_desktop->m_buffer.GrabRegion(rgncache,true,true);
@@ -1016,8 +902,6 @@ vncDesktopThread::run_undetached(void *arg)
 			MIN_UPDATE_INTERVAL_MIN=50;
 			MIN_UPDATE_INTERVAL_MAX=1000;
 		}
-	if (m_server->IsUltraVNCViewer()) first_run=true;
-	else first_run=false;
 	int waittime=0;
 
 	// We set a flag inside the desktop handler here, to indicate it's now safe
@@ -1028,56 +912,42 @@ vncDesktopThread::run_undetached(void *arg)
 	{		
 		DWORD result;
 		newtick = timeGetTime();
-		if (waittime != 1000) waittime = 33;
-		if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver) 
+		if (waittime != 1000) 
+			waittime = 33;
+		//MIRROR DRIVER
+		if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver && !VNCOS.OS_WIN8)
 		{
 			strcpy_s(g_hookstring,"driver");
 			int fastcounter=0;
 			POINT cursorpos;
-			while (m_desktop->m_videodriver->oldaantal==m_desktop->pchanges_buf->counter)
+			while (m_desktop->m_screenCapture->getPreviousCounter() == m_desktop->pchanges_buf->counter)
 			{
 				Sleep(5);
 				fastcounter++;
 				if (fastcounter>20)
-				{
-					/*#ifdef _DEBUG
-										char			szText[256];
-										sprintf(szText,"fastcounter\n");
-										OutputDebugString(szText);		
-					#endif*/
 					break;
-				}
 				if (GetCursorPos(&cursorpos) && 
 										((cursorpos.x != oldcursorpos.x) ||
 										(cursorpos.y != oldcursorpos.y))) break;
 			}
 			waittime=0;
 		}
-		//no need to wait, the w8hook does it own waiting.
-		if (m_desktop->startedw8 && waittime!=1000) waittime = 33;
-		if (waittime == 33)
+		//DDENGINE
+		else if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver && VNCOS.OS_WIN8)
+		{
+			strcpy_s(g_hookstring,"ddengine");
+			waittime = 1000;
+		}
+		else if (waittime == 33)
 		{
 			int testvalue = 33 - (newtick - oldtick);
 			if (testvalue > 0 && testvalue < 33) waittime = testvalue;
+			oldtick2 = newtick;
 		}
-		oldtick2 = newtick;
-
-
-/*#ifdef _DEBUG
-		char			szText[256];
-		DWORD error = GetLastError();
-		sprintf(szText, "waittime %i  \n",waittime);
-		SetLastError(0);
-		OutputDebugString(szText);
-#endif*/
+		
 
 		result=WaitForMultipleObjects(6,m_desktop->trigger_events,FALSE,waittime);
 		{
-			#ifdef _DEBUG
-										char			szText[256];
-										sprintf(szText,"WaitForMultipleObjects %i\n",result );
-										OutputDebugString(szText);		
-			#endif
 			waittime = 0;
 			// We need to wait until restart is done
 			// else wait_timeout goes in to looping while sink window is not ready
@@ -1242,7 +1112,7 @@ vncDesktopThread::run_undetached(void *arg)
 									bool s_moved=false;
 									//if ((cpuUsage >= m_server->MaxCpu()/2))
 									{
-									if (!m_desktop->m_hookdriver && !m_server->SingleWindow() && !m_desktop->startedw8) 
+									if (!m_desktop->m_hookdriver && !m_server->SingleWindow()) 
 											s_moved=m_desktop->CalcCopyRects(updates);
 									}
 								
@@ -1321,7 +1191,7 @@ vncDesktopThread::run_undetached(void *arg)
 										// Back added, no need to stop polling during move
 										if ((cpuUsage < m_server->MaxCpu()/2))
 										{
-										if (!m_desktop->m_hookdriver && !m_server->SingleWindow() && !s_moved && !m_desktop->startedw8)
+										if (!m_desktop->m_hookdriver && !m_server->SingleWindow() && !s_moved)
 											s_moved=m_desktop->CalcCopyRects(updates);
 										}
 										
@@ -1362,10 +1232,10 @@ vncDesktopThread::run_undetached(void *arg)
 										if( !XRichCursorEnabled==m_desktop->m_server->IsXRichCursorEnabled())
 											{
 												XRichCursorEnabled= (FALSE != m_desktop->m_server->IsXRichCursorEnabled());
-												if (m_desktop->m_videodriver)
+												if (m_desktop->m_screenCapture)
 														{
-																if (!XRichCursorEnabled) m_desktop->m_videodriver->HardwareCursor();
-																else m_desktop->m_videodriver->NoHardwareCursor();
+																if (!XRichCursorEnabled) m_desktop->m_screenCapture->hardwareCursor();
+																else m_desktop->m_screenCapture->noHardwareCursor();
 														}
 
 											}
@@ -1531,11 +1401,6 @@ vncDesktopThread::run_undetached(void *arg)
 									if (m_desktop->AviGen) m_desktop->AviGen->AddFrame((BYTE*)m_desktop->m_DIBbits);
 					#endif
 								}
-								else
-								{
-									if (m_desktop->startedw8) waittime = 1000;
-								}
-								//newtick = timeGetTime(); 
 							}
 						}
 					break;

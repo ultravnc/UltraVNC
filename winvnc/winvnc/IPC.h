@@ -55,22 +55,11 @@ public:
 
 	bool IsOpen(void) const {return (m_hFileMap != NULL);}
 
-	bool Lock(void);
-	void Unlock(void);
-
-	bool LockBitmap(void);
-	void UnlockBitmap(void);
-
-	void Addrect(int type, int x1, int y1, int x2, int y2,int x11,int y11, int x22,int y22);
-	void Addcursor(ULONG cursor);
-
 protected:
 	HANDLE m_hFileMap;
-	HANDLE m_hMutex;
 	LPVOID m_FileView;
 
 	HANDLE m_hFileMapBitmap;
-	HANDLE m_hMutexBitmap;
 	LPVOID m_FileViewBitmap;
 
 	mystruct list;

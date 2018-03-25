@@ -113,6 +113,7 @@ protected:
 	BOOL m_pref_SingleWindow;
 	char m_pref_szSingleWindowName[32];
 	char m_Tempfile[MAX_PATH];
+	bool ddEngine;
 
 };
 

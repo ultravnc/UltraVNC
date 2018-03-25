@@ -26,6 +26,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 IDC_FINGER              CURSOR                  "res\\Finger.cur"
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Dialog
@@ -68,7 +69,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,8,135,54,16
     CONTROL         IDB_LOGO64,IDC_VNCLOGO,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_SUNKEN,7,5,53,46,WS_EX_TRANSPARENT
-    LTEXT           "UltraVNC Server  1.2.1.7",IDC_VERSION,73,5,145,11
+    LTEXT           "UltraVNC Server  1.2.2.0",IDC_VERSION,73,5,145,11
     LTEXT           "Copyright © 2002-2015 UltraVNC Team\nCopyright © 2001-2002 Sam - eSVNC \nCopyright © 1999-2002 Rudi D. V. - VdaccVNC \nCopyright © 2001 Harakan Software - PalmVNC\nCopyright © 1999-2002 Const. Kaplinsky - TightVNC \n",IDC_NAME,74,27,202,41
     LTEXT           "For more Information and Links please visit: \nhttp://www.uvnc.com",IDC_WWW,74,135,141,19
     LTEXT           "Build:",IDC_BUILDTEXT,74,16,20,10
@@ -119,7 +120,7 @@ BEGIN
     CONTROL         "Poll Console Windows Only",IDC_CONSOLE_ONLY,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,117,26,99,15
     CONTROL         "Poll On Event Only",IDC_ONEVENT_ONLY,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,117,39,78,12
     CONTROL         "System HookDll",IDC_HOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,56,66,10
-    CONTROL         "Mirror Driver",IDC_DRIVER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,68,74,10
+    CONTROL         "Mirror Driver",IDC_DRIVER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,68,201,10
     CONTROL         "Low Accuracy ( Turbo Speed )",IDC_TURBOMODE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,96,112,10
     PUSHBUTTON      "Check the Mirror Driver",IDC_CHECKDRIVER,92,67,121,11
     GROUPBOX        "Single Window Sharing",IDC_STATIC,5,124,214,47,BS_LEFT
@@ -131,7 +132,7 @@ BEGIN
     PUSHBUTTON      "&Cancel",IDCANCEL,178,174,41,14
     EDITTEXT        IDC_MAXCPU,54,106,40,14,ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "Max Cpu :",IDC_STATIC,14,109,34,8
-    LTEXT           "Elevated access needed: Service or run as admin",IDC_STATIC,39,80,159,12
+    LTEXT           "Elevated access needed: Service or run as admin",IDC_STATICELEVATED,39,80,159,12
 END
 
 IDD_PROPERTIES1 DIALOGEX 0, 0, 390, 297
@@ -354,8 +355,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,2,1,7
- PRODUCTVERSION 1,2,1,7
+ FILEVERSION 1,2,2,0
+ PRODUCTVERSION 1,2,2,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x2dL
@@ -373,14 +374,14 @@ BEGIN
             VALUE "Comments", "UltraVNC - Remote Control for all"
             VALUE "CompanyName", "UltraVNC"
             VALUE "FileDescription", "VNC server"
-            VALUE "FileVersion", "1.2.1.7"
+            VALUE "FileVersion", "1.2.2.0"
             VALUE "InternalName", "WinVNC"
             VALUE "LegalCopyright", "Copyright © 2015 UltraVNC"
             VALUE "LegalTrademarks", "VNC"
             VALUE "OriginalFilename", "WinVNC.exe"
-            VALUE "PrivateBuild", "1.2.1.7"
+            VALUE "PrivateBuild", "1.2.2.0"
             VALUE "ProductName", "UltraVNC"
-            VALUE "ProductVersion", "1.2.1.7"
+            VALUE "ProductVersion", "1.2.2.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -434,6 +435,18 @@ END
 //
 
 IDR_VNCVIEWER_JAR       JAVAARCHIVE             "res\\vncviewer.jar"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_PROPERTIES AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -638,6 +651,7 @@ END
 
 IDR_JAVAARCHIVE1        JAVAARCHIVE             "res\\mslogon\\VncViewer.jar"
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Icon
@@ -646,7 +660,9 @@ IDR_JAVAARCHIVE1        JAVAARCHIVE             "res\\mslogon\\VncViewer.jar"
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDI_WINVNC              ICON                    "res\\world3a.ico"
+
 IDI_FLASH               ICON                    "res\\icon2.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -654,6 +670,7 @@ IDI_FLASH               ICON                    "res\\icon2.ico"
 //
 
 IDB_LOGO64              BITMAP                  "res\\vnc-1.bmp"
+
 #endif    // Dutch (Belgium) resources
 /////////////////////////////////////////////////////////////////////////////
 

@@ -29,24 +29,13 @@
 #include "IPC.h"
 
 const static LPCTSTR g_szIPCSharedMMF = _T("{34F673E0-878F-11D5-B98A-00B0D07B8C7C}");
-const static LPCTSTR g_szIPCMutex = _T("{34F673E1-878F-11D5-B98A-00B0D07B8C7C}");
-
-//const static LPCTSTR g_szIPCSharedMMFW8 = _T("{34F673E0-878F-11D5-B98A-56B0D07B8C7C}");
-//const static LPCTSTR g_szIPCMutexW8 = _T("{34F673E1-878F-11D5-B98A-56B0D07B8C7C}");
 const static LPCTSTR g_szIPCSharedMMFBitmap = _T("{34F673E0-878F-11D5-B98A-57B0D07B8C7C}");
-const static LPCTSTR g_szIPCMutexBitmap = _T("{34F673E1-878F-11D5-B98A-57B0D07B8C7C}");
-
 int oldcounter=0;
-
-
-
 //***********************************************
 CIPC::CIPC() 
 {
 	m_hFileMap=NULL;
-	m_hMutex=NULL;
 	m_hFileMapBitmap=NULL;
-	m_hMutexBitmap=NULL;
 	pBitmap=NULL;
 	plist=NULL;
 	m_FileView=0;
@@ -60,34 +49,7 @@ CIPC::~CIPC()
 {
 	CloseIPCMMF();
 	CloseIPCMMFBitmap();
-	Unlock();
-	UnlockBitmap();
 }
-
-/*unsigned char * CIPC::CreateBitmap(int size)
-{
-	CreateIPCMMFBitmap(size);
-	OpenIPCMMFBitmap();
-	plist->rect1[0].left = size;
-	return pBitmap;
-}
-
-//***********************************************
-unsigned char * CIPC::CreateBitmap()
-{
-	int size=plist->rect1[0].left;
-	CreateIPCMMFBitmap(size);
-	OpenIPCMMFBitmap();	
-	return pBitmap;
-}
-
-void CIPC::CloseBitmap()
-{
-	CloseIPCMMFBitmap();
-	pBitmap=NULL;
-}*/
-
-
 //***********************************************
 bool CIPC::CreateIPCMMF(void)
 {
@@ -222,120 +184,8 @@ void CIPC::CloseIPCMMFBitmap(void)
 	}
 	catch(...) {}
 }
-
-//***********************************************
-void CIPC::Addrect(int type, int x1, int y1, int x2, int y2,int x11,int y11, int x22,int y22)
-{
-	if (plist==NULL) return;
-	if (plist->locked==1) 
-	{
-		return;
-	}
-	int counter=plist->counter;
-	plist->locked=1;
-	counter++;
-	if (counter>1999) counter=1;
-	plist->rect1[counter].left=x1;
-	plist->rect1[counter].right=x2;
-	plist->rect1[counter].top=y1;
-	plist->rect1[counter].bottom=y2;
-	plist->rect2[counter].left=x11;
-	plist->rect2[counter].right=x22;
-	plist->rect2[counter].top=y11;
-	plist->rect2[counter].bottom=y22;
-	plist->type[counter]=type;
-	plist->locked=0;
-	plist->counter=counter;
-}
-
-void CIPC::Addcursor(ULONG cursor)
-{
-	if (plist==NULL) return;
-	if (plist->locked==1) 
-	{
-		return;
-	}
-	int counter=plist->counter;
-	plist->locked=1;
-	counter++;
-	if (counter>1999) counter=1;
-	plist->type[counter]=1;
-	plist->locked=0;
-	plist->counter=counter;
-}
-
 mystruct* CIPC::listall()
 {
 	return plist;
 }
 //***********************************************
-bool CIPC::Lock(void)
-{
-	bool bLocked = false;
-
-	try
-	{
-		// First get the handle to the mutex
-		m_hMutex = CreateMutex(NULL, FALSE, g_szIPCMutex);
-		if(m_hMutex != NULL)
-		{
-			// Wait to get the lock on the mutex
-			if(WaitForSingleObject(m_hMutex, INFINITE) == WAIT_OBJECT_0)
-				bLocked = true;
-		}
-	}
-	catch(...) {}
-
-	return bLocked;
-}
-
-//***********************************************
-void CIPC::Unlock(void)
-{
-	try
-	{
-		if(m_hMutex != NULL)
-		{
-			ReleaseMutex(m_hMutex);
-			CloseHandle(m_hMutex);
-			m_hMutex = NULL;
-		}
-	}
-	catch(...) {}
-}
-
-//***********************************************
-bool CIPC::LockBitmap(void)
-{
-	bool bLockedBitmap = false;
-
-	try
-	{
-		// First get the handle to the mutex
-		m_hMutexBitmap = CreateMutex(NULL, FALSE, g_szIPCMutexBitmap);
-		if(m_hMutexBitmap != NULL)
-		{
-			// Wait to get the lock on the mutex
-			if(WaitForSingleObject(m_hMutexBitmap, INFINITE) == WAIT_OBJECT_0)
-				bLockedBitmap = true;
-		}
-	}
-	catch(...) {}
-
-	return bLockedBitmap;
-}
-
-//***********************************************
-void CIPC::UnlockBitmap(void)
-{
-	try
-	{
-		if(m_hMutexBitmap != NULL)
-		{
-			ReleaseMutex(m_hMutexBitmap);
-			CloseHandle(m_hMutexBitmap);
-			m_hMutexBitmap = NULL;
-		}
-	}
-	catch(...) {}
-}
