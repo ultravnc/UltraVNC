@@ -538,11 +538,6 @@ ViewerDirectxClass:: Preupdate(unsigned char * bits)
 	while (mybits==NULL) {
 		mybits=Preupdate2(bits);
 		counter++;
-#ifdef _DEBUG
-		char			szText[256];
-		sprintf(szText, "Preupdate 3 %i\n", counter);
-		OutputDebugString(szText);
-#endif
 		if (counter>20) {
 			Sleep(1500);
 			DestroyD3D();
