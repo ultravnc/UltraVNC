@@ -486,54 +486,47 @@ ViewerDirectxClass:: paintdevice()
 	}
 bool
 ViewerDirectxClass:: paint()
-	{
-		if (directxlocked==true)
-		{
-			Afterupdate();
-		}		
-		if (devicelost==true) return true;
-		
-		if (!pD3DDevice9)
-		{
-			HDC dc = GetDC(parent_hwnd);
-
-			if (dc)
-			{
-				HBRUSH brush = CreateSolidBrush(RGB(0,0,0));
-				SelectObject(dc, brush);
-				RECT rect;
-				GetClientRect(parent_hwnd, &rect);
-				Rectangle(dc, 0, 0, rect.right, rect.bottom);
-				DeleteObject(brush);
-				ReleaseDC(parent_hwnd, dc);
-			}
-
-			ValidateRect(parent_hwnd, NULL);
-			return true;
+{
+	if (directxlocked==true)
+		Afterupdate();	
+	if (devicelost==true) 
+		return true;		
+	if (!pD3DDevice9) {
+		HDC dc = GetDC(parent_hwnd);
+		if (dc) {
+			HBRUSH brush = CreateSolidBrush(RGB(0,0,0));
+			SelectObject(dc, brush);
+			RECT rect;
+			GetClientRect(parent_hwnd, &rect);
+			Rectangle(dc, 0, 0, rect.right, rect.bottom);
+			DeleteObject(brush);
+			ReleaseDC(parent_hwnd, dc);
 		}
-		else
-		{
-			bool result=paintdevice();
-			//directxlocked=false;
-			return result;
-		}
+
+		ValidateRect(parent_hwnd, NULL);
+		return true;
 	}
+	else {
+		bool result=paintdevice();
+		return result;
+	}
+}
 
 unsigned char *
 ViewerDirectxClass:: Preupdate(unsigned char * bits)
 {
 	int counter2=0;
-	while (paintbuzy) 
-		{
-			Sleep(2);
-			counter2++;
-			if (counter2>300)
-				break;
-		}
+	while (paintbuzy) {
+		Sleep(2);
+		counter2++;
+		if (counter2>300)
+			break;
+	}
 
 	if (!valid())
 			return NULL;
-	if (directxlocked==true) return bits;
+	if (directxlocked == true) 
+		return bits;
 #ifdef _DEBUG
 	char			szText[256];
 				sprintf(szText,"Preupdate 2\n");
@@ -542,16 +535,16 @@ ViewerDirectxClass:: Preupdate(unsigned char * bits)
 
 	int counter=0;
 	unsigned char *mybits=Preupdate2(bits);
-	while (mybits==NULL)
-	{
+	while (mybits==NULL) {
 		mybits=Preupdate2(bits);
 		counter++;
-		if (counter>20) 
-		{
+#ifdef _DEBUG
+		char			szText[256];
+		sprintf(szText, "Preupdate 3 %i\n", counter);
+		OutputDebugString(szText);
+#endif
+		if (counter>20) {
 			Sleep(1500);
-//			Beep(5000,500);
-//			directx_disabled=true;
-//			directx_disabled_changed=true;
 			DestroyD3D();
 			ReInitD3D();
 			break;

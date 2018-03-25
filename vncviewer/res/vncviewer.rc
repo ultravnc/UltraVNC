@@ -252,7 +252,7 @@ END
 
 IDD_SESSION_DLG DIALOGEX 0, 0, 245, 229
 STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "UltraVNC Viewer - 1.2.1.7"
+CAPTION "UltraVNC Viewer - 1.2.2.0"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     CONTROL         IDB_VNC32,IDC_STATIC,"Static",SS_BITMAP,3,2,24,24
@@ -426,7 +426,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,8,137,62,14
     CONTROL         ID_BUTTON_SEP,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_SUNKEN,8,7,62,54
-    LTEXT           "UltraVNC Viewer 1.2.1.7",IDC_STATIC,86,6,197,11
+    LTEXT           "UltraVNC Viewer 1.2.2.0",IDC_STATIC,86,6,197,11
     LTEXT           "For more Information and Links please visit: \nhttp://www.uvnc.com",IDC_STATIC,86,133,197,19
     LTEXT           "Copyright © 2002-2009 UltraVNC Team\nCopyright © 2001-2002 Sam - eSVNC \nCopyright © 1999-2002 Rudi D. V. - VdaccVNC \nCopyright © 1999-2002 Const. Kaplinsky - TightVNC \nCopyright © 2002 RealVNC Ltd. - RealVNC\n",IDC_STATIC,86,30,200,40
     LTEXT           "Built:",IDC_STATIC,87,17,15,10
@@ -456,7 +456,7 @@ BEGIN
     DEFPUSHBUTTON   "Close",IDOK,185,110,56,14
     LTEXT           "BuildTime",IDC_BUILDTIME,9,11,265,88
     GROUPBOX        "Info Message",IDC_STATIC,3,1,274,100,BS_CENTER
-    CTEXT           "UltraVNC 1.2.1.7",IDC_STATIC,178,145,66,12
+    CTEXT           "UltraVNC 1.2.2.0",IDC_STATIC,178,145,66,12
     PUSHBUTTON      "",IDC_BUTTON1,7,104,170,47,BS_BITMAP
 END
 
@@ -469,7 +469,7 @@ BEGIN
     LTEXT           "BuildTime",IDC_BUILDTIME,9,11,258,97
     PUSHBUTTON      "",IDC_BUTTON2,7,114,170,47,BS_BITMAP
     GROUPBOX        "Info Message",IDC_STATIC,3,1,264,110,BS_CENTER
-    CTEXT           "UltraVNC 1.2.1.7",IDC_STATIC,175,204,69,12
+    CTEXT           "UltraVNC 1.2.2.0",IDC_STATIC,175,204,69,12
     PUSHBUTTON      "",IDC_BUTTON1,7,163,170,47,BS_BITMAP
     CTEXT           "Sponsored\n Link",IDC_STATIC,179,127,36,21
 END
@@ -720,8 +720,8 @@ IDB_VNC32               BITMAP                  "vnc32.BMP"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,2,1,7
- PRODUCTVERSION 1,2,1,7
+ FILEVERSION 1,2,2,0
+ PRODUCTVERSION 1,2,2,0
  FILEFLAGSMASK 0x37L
 #ifdef _DEBUG
  FILEFLAGS 0x25L
@@ -739,12 +739,12 @@ BEGIN
             VALUE "Comments", "UltraVNC Viewer"
             VALUE "CompanyName", "UltraVNC"
             VALUE "FileDescription", "VNCViewer"
-            VALUE "FileVersion", "1.2.1.7"
+            VALUE "FileVersion", "1.2.2.0"
             VALUE "InternalName", "VNCViewer"
             VALUE "LegalCopyright", "Copyright © 2015 UltraVNC team members"
             VALUE "OriginalFilename", "VNCViewer.exe"
             VALUE "ProductName", "UltraVNC VNCViewer"
-            VALUE "ProductVersion", "1.2.1.7"
+            VALUE "ProductVersion", "1.2.2.0"
         END
     END
     BLOCK "VarFileInfo"

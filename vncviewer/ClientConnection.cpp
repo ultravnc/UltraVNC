@@ -562,7 +562,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	//adzm 2010-10
 	m_PendingMouseMove.dwMinimumMouseMoveInterval = m_opts.m_throttleMouse;
 	directx_used=false;
-
+	directx_output = new ViewerDirectxClass;
 #ifdef _Gii
 	mytouch = new vnctouch;
 	mytouch->Set_ClientConnect(this);
@@ -654,6 +654,7 @@ void ClientConnection::Run()
 // sf@2007 - Autoreconnect
 void ClientConnection::DoConnection()
 {
+	omni_mutex_lock l(m_bitmapdcMutex);
 	if (m_pDSMPlugin->IsEnabled())
 	{
 		if (!m_opts.m_NoStatus && !m_hwndStatus)
@@ -696,7 +697,7 @@ void ClientConnection::DoConnection()
 
 	ReadServerInit();
 
-	CreateLocalFramebuffer();
+	//CreateLocalFramebuffer();
 
 	SetupPixelFormat();
 
@@ -4111,7 +4112,7 @@ void ClientConnection::Createdib()
 
 	if (directx_used)
 		{
-			directx_output.DestroyD3D();
+			directx_output->DestroyD3D();
 			directx_used=false;
 		}
 	if (m_hmemdc != NULL) {DeleteDC(m_hmemdc);m_hmemdc = NULL;m_DIBbits=NULL;}
@@ -4155,14 +4156,14 @@ void ClientConnection::Createdib()
 	}
 	}
 	if (m_opts.m_Directx && (m_myFormat.bitsPerPixel==32 || m_myFormat.bitsPerPixel==16))
-	if (!FAILED(directx_output.InitD3D(m_hwndcn,m_hwndMain, m_si.framebufferWidth, m_si.framebufferHeight, false,m_myFormat.bitsPerPixel,m_myFormat.redShift)))
+	if (!FAILED(directx_output->InitD3D(m_hwndcn,m_hwndMain, m_si.framebufferWidth, m_si.framebufferHeight, false,m_myFormat.bitsPerPixel,m_myFormat.redShift)))
 			{
-				if (directx_output.m_directxformat.bitsPerPixel ==m_myFormat.bitsPerPixel)
+				if (directx_output->m_directxformat.bitsPerPixel ==m_myFormat.bitsPerPixel)
 					{
 						directx_used=true;
-						m_myFormat.redShift=(CARD8)directx_output.m_directxformat.redShift;
-						m_myFormat.greenShift=(CARD8)directx_output.m_directxformat.greenShift;
-						m_myFormat.blueShift=(CARD8)directx_output.m_directxformat.blueShift;
+						m_myFormat.redShift=(CARD8)directx_output->m_directxformat.redShift;
+						m_myFormat.greenShift=(CARD8)directx_output->m_directxformat.greenShift;
+						m_myFormat.blueShift=(CARD8)directx_output->m_directxformat.blueShift;
 
 						if (m_membitmap != NULL) {DeleteObject(m_membitmap);m_membitmap= NULL;}
 						if (m_hmemdc != NULL) {DeleteDC(m_hmemdc);m_hmemdc = NULL;m_DIBbits=NULL;}
@@ -4170,11 +4171,11 @@ void ClientConnection::Createdib()
 					}
 				else
 					{
-						directx_output.DestroyD3D();
+						directx_output->DestroyD3D();
 						directx_used=false;
 					}
 				//TEST WITHOUT DIRECTX
-				//directx_output.DestroyD3D();
+				//directx_output->DestroyD3D();
 				//directx_used = false;
 			}
 }
@@ -4264,7 +4265,8 @@ ClientConnection::CloseWindows()
 	if (m_hwndMain) SendMessage(m_hwndMain, WM_CLOSE, 0, 1);
 }
 ClientConnection::~ClientConnection()
-{	
+{
+	omni_mutex_lock l(m_bitmapdcMutex);
 	if (m_hwndStatus)
 		EndDialog(m_hwndStatus,0);
 	WaitForSingleObject(KillUpdateThreadEvent, 6000);
@@ -4337,7 +4339,7 @@ ClientConnection::~ClientConnection()
 	if (directx_used)
 		{
 			directx_used=false;
-			directx_output.DestroyD3D();
+			directx_output->DestroyD3D();
 		}
 
 	if (m_hmemdc != NULL) {DeleteDC(m_hmemdc);m_hmemdc = NULL;m_DIBbits=NULL;}
@@ -4384,6 +4386,7 @@ ClientConnection::~ClientConnection()
 		mytouch = NULL;
 	}
 #endif
+	delete directx_output;
 }
 
 // You can specify a dx & dy outside the limits; the return value will
@@ -4873,7 +4876,7 @@ inline void ClientConnection::DoBlit()
 
 	if (directx_used)
 	{
-		directx_output.paint();
+		directx_output->paint();
 	}
 	else
 	{
@@ -5167,23 +5170,20 @@ void* ClientConnection::run_undetached(void* arg) {
 				// the viewer window
 				case rfbResizeFrameBuffer:
 				{
-					ClearCache();
-					rfbResizeFrameBufferMsg rsmsg;
-					ReadExact(((char*)&rsmsg) + m_nTO, sz_rfbResizeFrameBufferMsg - m_nTO);
+					{
+						omni_mutex_lock l(m_bitmapdcMutex);
+						ClearCache();
+						rfbResizeFrameBufferMsg rsmsg;
+						ReadExact(((char*)&rsmsg) + m_nTO, sz_rfbResizeFrameBufferMsg - m_nTO);
 
-					m_si.framebufferWidth = Swap16IfLE(rsmsg.framebufferWidth);
-					m_si.framebufferHeight = Swap16IfLE(rsmsg.framebufferHeigth);
+						m_si.framebufferWidth = Swap16IfLE(rsmsg.framebufferWidth);
+						m_si.framebufferHeight = Swap16IfLE(rsmsg.framebufferHeigth);
 
-					CreateLocalFramebuffer();
-					// SendFullFramebufferUpdateRequest();
-					Createdib();
-					m_pendingScaleChange = true;
-					m_pendingFormatChange = true;
-					//adzm 2010-09 - this could send in the middle of other sends by the ui thread! We can still use SendMessage to ensure
-					//it blocks until processed.
-					//SendAppropriateFramebufferUpdateRequest();
-					//SendMessage(m_hwndcn, WM_REGIONUPDATED, NULL, NULL);
-					//adzm 2010-09 - This function delegates the processing to the UI thread now, basically doing the same as the sendmessage above.
+						//CreateLocalFramebuffer();
+						Createdib();
+						m_pendingScaleChange = true;
+						m_pendingFormatChange = true; 
+					}
 					SendAppropriateFramebufferUpdateRequest(false);
 
 					SizeWindow();
@@ -5518,6 +5518,11 @@ bool ClientConnection::SendSW(int x, int y)
 // A ScreenUpdate message has been received
 inline void ClientConnection::ReadScreenUpdate()
 {
+#ifdef _DEBUG
+	char			szText[256];
+	sprintf(szText, "ReadScreenUpdate\n");
+	OutputDebugString(szText);
+#endif
 	//adzm 2010-07-04
 	bool bSentUpdateRequest = false;
 	if (m_opts.m_preemptiveUpdates && !m_pendingFormatChange) {
@@ -5698,96 +5703,96 @@ inline void ClientConnection::ReadScreenUpdate()
 		switch (surh.encoding)
 		{
 		case rfbEncodingHextile:
-			if (directx_used) m_DIBbits=directx_output.Preupdate((unsigned char *)m_DIBbits);
+			if (directx_used) m_DIBbits=directx_output->Preupdate((unsigned char *)m_DIBbits);
 			SaveArea(cacherect);
 			ReadHextileRect(&surh);
 			EncodingStatusWindow=rfbEncodingHextile;
 			break;
 		case rfbEncodingUltra:
-			if (directx_used) m_DIBbits=directx_output.Preupdate((unsigned char *)m_DIBbits);
+			if (directx_used) m_DIBbits=directx_output->Preupdate((unsigned char *)m_DIBbits);
 			ReadUltraRect(&surh);
 			EncodingStatusWindow=rfbEncodingUltra;
 			break;
 		case rfbEncodingUltra2:
-			if (directx_used) m_DIBbits=directx_output.Preupdate((unsigned char *)m_DIBbits);
+			if (directx_used) m_DIBbits=directx_output->Preupdate((unsigned char *)m_DIBbits);
 			ReadUltra2Rect(&surh);
 			EncodingStatusWindow=rfbEncodingUltra2;
 			break;
 		case rfbEncodingUltraZip:
-			if (directx_used) m_DIBbits=directx_output.Preupdate((unsigned char *)m_DIBbits);
+			if (directx_used) m_DIBbits=directx_output->Preupdate((unsigned char *)m_DIBbits);
 			ReadUltraZip(&surh,&UpdateRegion);
 			break;
 		case rfbEncodingRaw:
-			if (directx_used) m_DIBbits=directx_output.Preupdate((unsigned char *)m_DIBbits);
+			if (directx_used) m_DIBbits=directx_output->Preupdate((unsigned char *)m_DIBbits);
 			SaveArea(cacherect);
 			ReadRawRect(&surh);
 			EncodingStatusWindow=rfbEncodingRaw;
 			break;
 		case rfbEncodingCopyRect:
-			if (directx_used) m_DIBbits=directx_output.Preupdate((unsigned char *)m_DIBbits);
+			if (directx_used) m_DIBbits=directx_output->Preupdate((unsigned char *)m_DIBbits);
 			ReadCopyRect(&surh);
 			break;
 		case rfbEncodingCache:
-			if (directx_used) m_DIBbits=directx_output.Preupdate((unsigned char *)m_DIBbits);
+			if (directx_used) m_DIBbits=directx_output->Preupdate((unsigned char *)m_DIBbits);
 			ReadCacheRect(&surh);
 			break;
 		case rfbEncodingCacheZip:
-			if (directx_used) m_DIBbits=directx_output.Preupdate((unsigned char *)m_DIBbits);
+			if (directx_used) m_DIBbits=directx_output->Preupdate((unsigned char *)m_DIBbits);
 			ReadCacheZip(&surh,&UpdateRegion);
 			break;
 		case rfbEncodingSolMonoZip:
-			if (directx_used) m_DIBbits=directx_output.Preupdate((unsigned char *)m_DIBbits);
+			if (directx_used) m_DIBbits=directx_output->Preupdate((unsigned char *)m_DIBbits);
 			ReadSolMonoZip(&surh,&UpdateRegion);
 			break;
 		case rfbEncodingRRE:
-			if (directx_used) m_DIBbits=directx_output.Preupdate((unsigned char *)m_DIBbits);
+			if (directx_used) m_DIBbits=directx_output->Preupdate((unsigned char *)m_DIBbits);
 			SaveArea(cacherect);
 			ReadRRERect(&surh);
 			EncodingStatusWindow=rfbEncodingRRE;
 			break;
 		case rfbEncodingCoRRE:
-			if (directx_used) m_DIBbits=directx_output.Preupdate((unsigned char *)m_DIBbits);
+			if (directx_used) m_DIBbits=directx_output->Preupdate((unsigned char *)m_DIBbits);
 			SaveArea(cacherect);
 			ReadCoRRERect(&surh);
 			EncodingStatusWindow=rfbEncodingCoRRE;
 			break;
 		case rfbEncodingZlib:
-			if (directx_used) m_DIBbits=directx_output.Preupdate((unsigned char *)m_DIBbits);
+			if (directx_used) m_DIBbits=directx_output->Preupdate((unsigned char *)m_DIBbits);
 			SaveArea(cacherect);
 			ReadZlibRect(&surh,0);
 			EncodingStatusWindow=rfbEncodingZlib;
 			break;
 		case rfbEncodingZlibHex:
-			if (directx_used) m_DIBbits=directx_output.Preupdate((unsigned char *)m_DIBbits);
+			if (directx_used) m_DIBbits=directx_output->Preupdate((unsigned char *)m_DIBbits);
 			SaveArea(cacherect);
 			ReadZlibHexRect(&surh);
 			EncodingStatusWindow=rfbEncodingZlibHex;
 			break;
 		case rfbEncodingXOR_Zlib:
-			if (directx_used) m_DIBbits=directx_output.Preupdate((unsigned char *)m_DIBbits);
+			if (directx_used) m_DIBbits=directx_output->Preupdate((unsigned char *)m_DIBbits);
 			SaveArea(cacherect);
 			ReadZlibRect(&surh,1);
 			break;
 		case rfbEncodingXORMultiColor_Zlib:
-			if (directx_used) m_DIBbits=directx_output.Preupdate((unsigned char *)m_DIBbits);
+			if (directx_used) m_DIBbits=directx_output->Preupdate((unsigned char *)m_DIBbits);
 			SaveArea(cacherect);
 			ReadZlibRect(&surh,2);
 			break;
 		case rfbEncodingXORMonoColor_Zlib:
-			if (directx_used) m_DIBbits=directx_output.Preupdate((unsigned char *)m_DIBbits);
+			if (directx_used) m_DIBbits=directx_output->Preupdate((unsigned char *)m_DIBbits);
 			SaveArea(cacherect);
 			ReadZlibRect(&surh,3);
 			break;
 		case rfbEncodingSolidColor:
-			if (directx_used) m_DIBbits=directx_output.Preupdate((unsigned char *)m_DIBbits);
+			if (directx_used) m_DIBbits=directx_output->Preupdate((unsigned char *)m_DIBbits);
 			SaveArea(cacherect);
 			ReadSolidRect(&surh);
 			break;
 		case rfbEncodingZRLE:
-			if (directx_used) m_DIBbits=directx_output.Preupdate((unsigned char *)m_DIBbits);
+			if (directx_used) m_DIBbits=directx_output->Preupdate((unsigned char *)m_DIBbits);
 			zywrle = 0;
 		case rfbEncodingZYWRLE:
-			if (directx_used) m_DIBbits=directx_output.Preupdate((unsigned char *)m_DIBbits);
+			if (directx_used) m_DIBbits=directx_output->Preupdate((unsigned char *)m_DIBbits);
 			SaveArea(cacherect);
 			zrleDecode(surh.r.x, surh.r.y, surh.r.w, surh.r.h);
 			EncodingStatusWindow=zywrle ? rfbEncodingZYWRLE : rfbEncodingZRLE;
@@ -5853,7 +5858,7 @@ inline void ClientConnection::ReadScreenUpdate()
 			break;
 #endif
 		case rfbEncodingTight:
-			if (directx_used) m_DIBbits=directx_output.Preupdate((unsigned char *)m_DIBbits);
+			if (directx_used) m_DIBbits=directx_output->Preupdate((unsigned char *)m_DIBbits);
 			SaveArea(cacherect);
 			ReadTightRect(&surh);
 			EncodingStatusWindow=rfbEncodingTight;
@@ -6045,6 +6050,11 @@ inline void ClientConnection::ReadScreenUpdate()
 	if (!bSentUpdateRequest) {
 		//adzm 2010-09 - We can simply call SendAppropriateFramebufferUpdateRequest now, with a true bAsync param so the request is posted rather than sent.
 		SendAppropriateFramebufferUpdateRequest(true);
+#ifdef _DEBUG
+		char			szText[256];
+		sprintf(szText, "SendAppropriateFramebufferUpdateRequestn\n");
+		OutputDebugString(szText);
+#endif	
 	}
 	DeleteObject(UpdateRegion);
 }
@@ -6234,28 +6244,6 @@ void ClientConnection::ReadExact(char *inbuf, int wanted)
 	if (wanted == 0) {
 		return;
 	}
-	//omni_mutex_lock l(m_readMutex);
-	// Status window and connection activity updates
-	// We comment this because it just takes too much time to the viewer thread
-	/*
-	HDC hdcX,hdcBits;
-	if (m_TrafficMonitor)
-	{
-		hdcX = GetDC(m_TrafficMonitor);
-		hdcBits = CreateCompatibleDC(hdcX);
-		SelectObject(hdcBits,m_bitmapBACK);
-		BitBlt(hdcX,1,1,22,20,hdcBits,0,0,SRCCOPY);
-		DeleteDC(hdcBits);
-		ReleaseDC(m_TrafficMonitor,hdcX);
-	}
-	*/
-
-	// m_BytesRead += wanted;
-	/*
-	m_BytesRead = fis->GetBytesRead();
-	SetDlgItemInt(m_hwndStatus, IDC_RECEIVED, m_BytesRead, false);
-	SetDlgItemInt(m_hwndStatus, IDC_SPEED, kbitsPerSecond, false);
-	*/
 	try
 	{
 		// sf@2002 - DSM Plugin
@@ -6326,19 +6314,6 @@ void ClientConnection::ReadExact(char *inbuf, int wanted)
 		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L67);
 		throw ErrorException(sz_L69);
 	}
-
-	// Too slow !
-	/*
-	if (m_TrafficMonitor)
-	{
-		hdcX = GetDC(m_TrafficMonitor);
-		hdcBits = CreateCompatibleDC(hdcX);
-		SelectObject(hdcBits,m_bitmapNONE);
-		BitBlt(hdcX,1,1,22,20,hdcBits,0,0,SRCCOPY);
-		DeleteDC(hdcBits);
-		ReleaseDC(m_TrafficMonitor,hdcX);
-	}
-	*/
 }
 
 //adzm 2009-06-21
@@ -6942,23 +6917,19 @@ void ClientConnection::CheckFileChunkBufferSize(int bufsize)
 //
 void ClientConnection::ReadNewFBSize(rfbFramebufferUpdateRectHeader *pfburh)
 {
-	//adzm 2010-09 - Clear the cache first, since it tries to clear based on m_si which is changing!
+	{omni_mutex_lock l(m_bitmapdcMutex);
 	ClearCache();
 
-	// [v1.0.2-jp1 fix]
-	//m_si.framebufferWidth = pfburh->r.w;
-	//m_si.framebufferHeight = pfburh->r.h;
 	m_si.framebufferWidth = pfburh->r.w / m_nServerScale;
 	m_si.framebufferHeight = pfburh->r.h / m_nServerScale;
 
-	CreateLocalFramebuffer();
-	//adzm 2010-09 - all socket writes must remain on a single thread, so do a synchronous update request
-    SendFullFramebufferUpdateRequest(false);
+	//CreateLocalFramebuffer();
 	Createdib();
 	m_pendingScaleChange = true;
 	m_pendingFormatChange = true;
-	//adzm 2010-09 - all socket writes must remain on a single thread, so do a synchronous update request
+	}
 	SendAppropriateFramebufferUpdateRequest(false);
+
 	SizeWindow();
 	InvalidateRect(m_hwndcn, NULL, TRUE);
 	RealiseFullScreenMode();
