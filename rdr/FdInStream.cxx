@@ -287,9 +287,7 @@ int FdInStream::readWithTimeoutOrCallback(void* buf, int len)
 		fAlreadyCounted = true;
 	}
 	else
-	{
 		n = ::read(fd, buf, len);
-	}
 
     if (n != -1 || errno != EINTR)
       break;
