@@ -71,11 +71,12 @@ void DeskDupEngine::videoDriver_start(int x, int y, int w, int h)
 		return;
 	int refw = GetSystemMetrics(SM_CXVIRTUALSCREEN);
 	int refh = GetSystemMetrics(SM_CYVIRTUALSCREEN);
-	if (refh == h && refw == w) // prim or all monitors requested
+	if (refh == h && refw == w) { // prim or all monitors requested
 		if (!StartW8(false)) {
 			vnclog.Print(LL_INTWARN, VNCLOG("DDengine failed, not supported by video driver\n"));
 			return;
 		}
+	}
 	else
 		if(!StartW8(true)) {
 			vnclog.Print(LL_INTWARN, VNCLOG("DDengine failed, not supported by video driver\n"));

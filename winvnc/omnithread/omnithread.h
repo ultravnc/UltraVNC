@@ -258,19 +258,19 @@ public:
     omni_mutex_lock(omni_mutex& m,int i) : mutex(m) {
 		nummer=i;
 		mutex.lock();
-#ifdef _DEBUG
+/*#ifdef _DEBUG
 			char			szText[256];
 			sprintf(szText,"lock %i %d\n",nummer,GetTickCount());
 			if (nummer>0) OutputDebugString(szText);		
-#endif
+#endif*/
 	}
     ~omni_mutex_lock(void) {
 		mutex.unlock(); 
-		#ifdef _DEBUG
+		/*#ifdef _DEBUG
 			char			szText[256];
 			sprintf(szText,"unlock %i %d\n",nummer,GetTickCount());
 			if (nummer>0) OutputDebugString(szText);		
-#endif
+#endif*/
 	}
 private:
     // dummy copy constructor and operator= to prevent copying
