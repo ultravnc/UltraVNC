@@ -936,7 +936,20 @@ vncDesktopThread::run_undetached(void *arg)
 		else if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver && VNCOS.OS_WIN8)
 		{
 			strcpy_s(g_hookstring,"ddengine");
-			waittime = 1000;
+			//waittime = 1000;
+			int fastcounter=0;
+			POINT cursorpos;
+			while (m_desktop->m_screenCapture->getPreviousCounter() == m_desktop->pchanges_buf->counter)
+			{
+				Sleep(5);
+				fastcounter++;
+				if (fastcounter>20)
+					break;
+				if (GetCursorPos(&cursorpos) && 
+										((cursorpos.x != oldcursorpos.x) ||
+										(cursorpos.y != oldcursorpos.y))) break;
+			}
+			waittime=0;
 		}
 		else if (waittime == 33)
 		{
