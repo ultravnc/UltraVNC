@@ -53,6 +53,8 @@ public:
 	virtual void videoDriver_Stop() = 0;
 	virtual BOOL hardwareCursor() = 0;
 	virtual BOOL noHardwareCursor() = 0;
+	virtual void Lock() = 0;
+	virtual void Unlock() = 0;
 
 protected:
 	int osVersion();

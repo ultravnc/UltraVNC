@@ -259,7 +259,7 @@ public:
 	DWORD Init(vncServer *pSrv);
 
 	// Tell the desktop hooks to grab & update a particular rectangle
-	void QueueRect(const rfb::Rect &rect);
+	void UpdateFullScreen();
 	
 	// Kick the desktop hooks to perform an update
 	void TriggerUpdate();

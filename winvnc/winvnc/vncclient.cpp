@@ -4964,7 +4964,7 @@ vncClient::NotifyUpdate(rfbFramebufferUpdateRequestMsg fur)
 		m_update_tracker.add_changed(update_rgn);// <<< Black updates
 			
 		// Tell the desktop grabber to fetch the region's latest state
-		m_encodemgr.m_buffer->m_desktop->QueueRect(update);
+		m_encodemgr.m_buffer->m_desktop->UpdateFullScreen();
 	}
 
     // Kick the update thread (and create it if not there already)

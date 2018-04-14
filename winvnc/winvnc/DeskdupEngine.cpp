@@ -27,10 +27,14 @@ DeskDupEngine::DeskDupEngine()
 		if (hModule) {
 			StartW8 = (StartW8Fn)GetProcAddress(hModule, "StartW8");
 			StopW8 = (StopW8Fn)GetProcAddress(hModule, "StopW8");
-			CaptureW8 = (CaptureW8Fn)GetProcAddress(hModule, "CaptureW8");
-			AutoCaptureW8 = (AutoCaptureW8Fn)GetProcAddress(hModule, "AutoCaptureW8");
-			StopAutoCaptureW8 = (StopAutoCaptureW8Fn)GetProcAddress(hModule, "StopAutoCaptureW8");
-			if (StartW8 == NULL || StopW8 == NULL || CaptureW8 == NULL || AutoCaptureW8 == NULL || StopAutoCaptureW8 == NULL)
+
+			LockW8 = (LockW8Fn)GetProcAddress(hModule, "LockW8");
+			UnlockW8 = (UnlockW8Fn)GetProcAddress(hModule, "UnlockW8");
+
+			ShowCursorW8 = (ShowCursorW8Fn)GetProcAddress(hModule, "ShowCursorW8");
+			HideCursorW8 = (HideCursorW8Fn)GetProcAddress(hModule, "HideCursorW8");
+
+			if (StartW8 == NULL || StopW8 == NULL || LockW8 == NULL || UnlockW8 == NULL || ShowCursorW8 == NULL || HideCursorW8 = NULL)
 				init = false;
 		}
 		else
@@ -110,7 +114,6 @@ void DeskDupEngine::videoDriver_start(int x, int y, int w, int h)
 	if (fileViewBitmap == NULL)
 		return;
 	pFramebuffer = (PCHAR)fileViewBitmap;
-	AutoCaptureW8(33);
 }
 //-----------------------------------------------------------
 void DeskDupEngine::videoDriver_Stop()
@@ -122,7 +125,6 @@ void DeskDupEngine::videoDriver_Stop()
 #endif
 	if (!init)
 		return;
-	StopAutoCaptureW8();
 	StopW8();
 	if (fileView)
 		UnmapViewOfFile(fileView);
@@ -134,5 +136,25 @@ void DeskDupEngine::videoDriver_Stop()
 	if (hFileMapBitmap != NULL)
 		CloseHandle(hFileMapBitmap);
 	hFileMapBitmap = NULL;
+}
+//-----------------------------------------------------------
+void DeskDupEngine::Lock()
+{
+		LockW8();
+}
+//-----------------------------------------------------------
+void DeskDupEngine::Unlock()
+{
+		UnlockW8();
+}
+//-----------------------------------------------------------
+BOOL DeskDupEngine::hardwareCursor()
+{
+	ShowCursorW8();
+}
+//-----------------------------------------------------------
+BOOL DeskDupEngine::noHardwareCursor()
+{
+	HideCursorW8();
 }
 //-----------------------------------------------------------

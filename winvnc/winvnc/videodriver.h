@@ -44,6 +44,8 @@ public:
 	virtual void videoDriver_Stop();
 	virtual BOOL hardwareCursor();
 	virtual BOOL noHardwareCursor();
+	virtual void Lock(){};
+	virtual void Unlock(){};
 
 private:
 	

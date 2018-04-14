@@ -438,31 +438,24 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\BUILDING.txt" />
     <None Include="..\..\LICENCE.txt" />
-    <None Include="..\building.txt" />
     <None Include="..\history.txt" />
     <None Include="..\README_BINARY.txt" />
-    <None Include="res\AuthPanel.class" />
     <None Include="res\background.bmp">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="res\background2.bmp">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="res\ButtonPanel.class" />
     <None Include="res\clipboardframe.class">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="res\descipher.class">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="res\DH.class" />
-    <None Include="res\ding_dong.wav" />
     <None Include="res\Finger.cur">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="res\FTPFrame.class" />
     <None Include="res\ico00001.ico">
       <Filter>Resource Files</Filter>
     </None>
@@ -475,14 +468,12 @@
     <None Include="res\optionsframe.class">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="res\RecordingFrame.class" />
     <None Include="res\rfbproto.class">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="res\runas.bmp">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="res\SessionRecorder.class" />
     <None Include="res\vdacc.bmp">
       <Filter>Resource Files</Filter>
     </None>
@@ -523,20 +514,77 @@
       <Filter>Header Files</Filter>
     </None>
     <None Include="VTune\winvnc.vpj" />
-    <None Include="res\ftpframe$strcomp.class" />
-    <None Include="res\mslogon\AuthPanel.class" />
-    <None Include="res\mslogon\ButtonPanel.class" />
-    <None Include="res\mslogon\ClipboardFrame.class" />
-    <None Include="res\mslogon\DesCipher.class" />
-    <None Include="res\mslogon\DH.class" />
-    <None Include="res\mslogon\FTPFrame$StrComp.class" />
-    <None Include="res\mslogon\FTPFrame.class" />
-    <None Include="res\mslogon\OptionsFrame.class" />
-    <None Include="res\mslogon\RecordingFrame.class" />
-    <None Include="res\mslogon\RfbProto.class" />
-    <None Include="res\mslogon\SessionRecorder.class" />
-    <None Include="res\mslogon\VncCanvas.class" />
-    <None Include="res\mslogon\VncViewer.jar" />
-    <None Include="res\mslogon\VncViewer.class" />
+    <None Include="res\AuthPanel.class">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\DH.class">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\mslogon\AuthPanel.class">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\BUILDING.txt">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\building.txt">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\mslogon\ButtonPanel.class">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\ButtonPanel.class">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\mslogon\ClipboardFrame.class">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\mslogon\DesCipher.class">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\mslogon\DH.class">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\ftpframe$strcomp.class">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\mslogon\FTPFrame.class">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\mslogon\FTPFrame$StrComp.class">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\FTPFrame.class">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\mslogon\OptionsFrame.class">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\RecordingFrame.class">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\mslogon\RecordingFrame.class">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\mslogon\RfbProto.class">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\SessionRecorder.class">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\mslogon\SessionRecorder.class">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\mslogon\VncCanvas.class">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\mslogon\VncViewer.class">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\mslogon\VncViewer.jar">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\ding_dong.wav">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

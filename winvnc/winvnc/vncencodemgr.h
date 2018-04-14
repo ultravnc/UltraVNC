@@ -723,7 +723,7 @@ vncEncodeMgr::SetEncoding(CARD32 encoding,BOOL reinitialize)
 
 	}
 		m_buffer->ClearCache();
-		m_buffer->ClearBack();
+		m_buffer->ClearBack();		
 		m_encoder->SetSWOffset(m_SWOffsetx,m_SWOffsety);
 	// Check that the client buffer is compatible
 	return CheckBuffer();

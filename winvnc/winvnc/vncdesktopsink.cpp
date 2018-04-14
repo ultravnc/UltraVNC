@@ -319,7 +319,7 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 								strncpy(split[i],myptr,4);
 								myptr=myptr+5;
 							}
-						_this->QueueRect(rfb::Rect(atoi(split[0]), atoi(split[1]), atoi(split[2]), atoi(split[3])));
+						_this->UpdateFullScreen();
 					}
 			}
 			//vnclog.Print(LL_INTINFO, VNCLOG("copydata\n"));

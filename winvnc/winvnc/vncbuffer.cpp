@@ -517,6 +517,7 @@ void vncBuffer::CheckRect(rfb::Region2D &dest, rfb::Region2D &cacheRgn, const rf
 						dest.assign_union(new_rect);
 
 					// Copy the changes to the back buffer
+					//  HOTSPOT
 					for (by = ((fSmallRect) ? ay : y); by < blockbottom; by++)
 					{
 						memcpy(y_o_ptr, y_n_ptr, bytesPerBlockRow);
@@ -1038,7 +1039,12 @@ vncBuffer::ClearBack()
 		memset(m_mainbuff, 0, m_desktop->ScreenBuffSize());
 	}
 
-	if (m_mainbuff) memcpy(m_backbuff, m_mainbuff, m_desktop->ScreenBuffSize());
+	//if (m_mainbuff) 
+	//	memcpy(m_backbuff, m_mainbuff, m_desktop->ScreenBuffSize());
+	BlackBack();
+	InvalidateRect(NULL, NULL, true);
+	Sleep(100);
+	m_desktop->UpdateFullScreen();
 }
 
 //***************************

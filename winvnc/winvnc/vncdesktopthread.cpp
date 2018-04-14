@@ -404,12 +404,12 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 							return false;
 						}
 
-						if (m_desktop->m_screenCapture)	{
-							if (!XRichCursorEnabled) 
+						if (m_desktop->m_screenCapture && !XRichCursorEnabled)
 								m_desktop->m_screenCapture->hardwareCursor();
-							else 
+
+						if (m_desktop->m_screenCapture && XRichCursorEnabled) 
 								m_desktop->m_screenCapture->noHardwareCursor();
-						}
+
 						m_server->SetScreenOffset(m_desktop->m_ScreenOffsetx,m_desktop->m_ScreenOffsety,m_desktop->nr_monitors);
 
 						// sf@2003 - After a new Startup(), we check if the required video driver
@@ -897,11 +897,11 @@ vncDesktopThread::run_undetached(void *arg)
 		}
 	}
 	//telling running viewers to wait until first update, done
-	if  (m_server->MaxCpu() <50)
+	/*if  (m_server->MaxCpu() <50)
 		{
 			MIN_UPDATE_INTERVAL_MIN=50;
 			MIN_UPDATE_INTERVAL_MAX=1000;
-		}
+		}*/
 	int waittime=0;
 
 	// We set a flag inside the desktop handler here, to indicate it's now safe
@@ -936,8 +936,8 @@ vncDesktopThread::run_undetached(void *arg)
 		else if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver && VNCOS.OS_WIN8)
 		{
 			strcpy_s(g_hookstring,"ddengine");
-			//waittime = 1000;
-			int fastcounter=0;
+			waittime = 1000;
+			/*int fastcounter=0;
 			POINT cursorpos;
 			while (m_desktop->m_screenCapture->getPreviousCounter() == m_desktop->pchanges_buf->counter)
 			{
@@ -949,7 +949,7 @@ vncDesktopThread::run_undetached(void *arg)
 										((cursorpos.x != oldcursorpos.x) ||
 										(cursorpos.y != oldcursorpos.y))) break;
 			}
-			waittime=0;
+			waittime=0;*/
 		}
 		else if (waittime == 33)
 		{
@@ -979,12 +979,12 @@ vncDesktopThread::run_undetached(void *arg)
 							{
 								m_desktop->m_update_triggered = FALSE;
 								//measure current cpu usage of winvnc
-								if ((fullpollcounter==10 || fullpollcounter==0 || fullpollcounter==5)&& (m_server->MaxCpu()!=100)) cpuUsage = usage.GetUsage();
+								/*if ((fullpollcounter==10 || fullpollcounter==0 || fullpollcounter==5)&& (m_server->MaxCpu()!=100)) cpuUsage = usage.GetUsage();
 								if (cpuUsage > m_server->MaxCpu()) 
 									MIN_UPDATE_INTERVAL+=10;
 								else MIN_UPDATE_INTERVAL-=10;
 								if (MIN_UPDATE_INTERVAL<MIN_UPDATE_INTERVAL_MIN) MIN_UPDATE_INTERVAL=MIN_UPDATE_INTERVAL_MIN;
-								if (MIN_UPDATE_INTERVAL>MIN_UPDATE_INTERVAL_MAX) MIN_UPDATE_INTERVAL=MIN_UPDATE_INTERVAL_MAX;
+								if (MIN_UPDATE_INTERVAL>MIN_UPDATE_INTERVAL_MAX) MIN_UPDATE_INTERVAL=MIN_UPDATE_INTERVAL_MAX;*/
 
 
 					//			vnclog.Print(LL_INTERR, VNCLOG("!PeekMessage \n"));
@@ -1001,7 +1001,7 @@ vncDesktopThread::run_undetached(void *arg)
 								
 								/*#ifdef _DEBUG
 										char			szText[256];
-										sprintf(szText," cpu2: %d %i %i\n",cpuUsage,MIN_UPDATE_INTERVAL,newtick-oldtick);
+										sprintf(szText," cpu2: %d %i %i\n",cpuUsage,MIN_UPDATE_INTERVAL,MIN_UPDATE_INTERVAL-(newtick-oldtick));
 										OutputDebugString(szText);		
 								#endif*/
 								//oldtick=newtick;
@@ -1370,8 +1370,13 @@ vncDesktopThread::run_undetached(void *arg)
 										
 										//Check all regions for changed and cached parts
 										//This is very cpu intensive, only check once for all viewers
-										if (!checkrgn.is_empty())
+										if (!checkrgn.is_empty()) {
+											if (m_desktop->m_screenCapture)
+												m_desktop->m_screenCapture->Lock();
 											m_desktop->m_buffer.CheckRegion(changedrgn,cachedrgn, checkrgn);
+											if(m_desktop->m_screenCapture)
+												m_desktop->m_screenCapture->Unlock();
+										}
 										if (!initialupdate)
 											{
 												#ifdef _DEBUG
