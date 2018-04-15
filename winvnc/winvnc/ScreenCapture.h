@@ -51,8 +51,8 @@ public:
 
 	virtual void videoDriver_start(int x, int y, int w, int h) = 0;
 	virtual void videoDriver_Stop() = 0;
-	virtual BOOL hardwareCursor() = 0;
-	virtual BOOL noHardwareCursor() = 0;
+	virtual bool hardwareCursor() = 0;
+	virtual bool noHardwareCursor() = 0;
 	virtual void Lock() = 0;
 	virtual void Unlock() = 0;
 
@@ -63,7 +63,7 @@ protected:
 	PCHAR pFramebuffer;
 	PCHANGES_BUF pChangebuf;
 	ULONG oldAantal;
-	BOOL blocked;
+	bool blocked;
 	bool init;	
 };
 

@@ -2,8 +2,8 @@
 #include "ScreenCapture.h"
 #include <tchar.h>
 
-typedef BOOL(*StartW8Fn)(bool);
-typedef BOOL(*StopW8Fn)();
+typedef bool(*StartW8Fn)(bool);
+typedef bool (*StopW8Fn)();
 
 typedef void (*LockW8Fn)();
 typedef void (*UnlockW8Fn)();
@@ -21,8 +21,8 @@ public:
 	~DeskDupEngine();
 	virtual void videoDriver_start(int x, int y, int w, int h);
 	virtual void videoDriver_Stop();
-	virtual BOOL hardwareCursor();
-	virtual BOOL noHardwareCursor();
+	virtual bool hardwareCursor();
+	virtual bool noHardwareCursor();
 	virtual void Lock();
 	virtual void Unlock();
 private:

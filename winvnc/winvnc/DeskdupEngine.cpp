@@ -34,7 +34,7 @@ DeskDupEngine::DeskDupEngine()
 			ShowCursorW8 = (ShowCursorW8Fn)GetProcAddress(hModule, "ShowCursorW8");
 			HideCursorW8 = (HideCursorW8Fn)GetProcAddress(hModule, "HideCursorW8");
 
-			if (StartW8 == NULL || StopW8 == NULL || LockW8 == NULL || UnlockW8 == NULL || ShowCursorW8 == NULL || HideCursorW8 = NULL)
+			if (StartW8 == NULL || StopW8 == NULL || LockW8 == NULL || UnlockW8 == NULL || ShowCursorW8 == NULL || HideCursorW8 == NULL)
 				init = false;
 		}
 		else
@@ -148,13 +148,15 @@ void DeskDupEngine::Unlock()
 		UnlockW8();
 }
 //-----------------------------------------------------------
-BOOL DeskDupEngine::hardwareCursor()
+bool DeskDupEngine::hardwareCursor()
 {
 	ShowCursorW8();
+	return true;
 }
 //-----------------------------------------------------------
-BOOL DeskDupEngine::noHardwareCursor()
+bool DeskDupEngine::noHardwareCursor()
 {
 	HideCursorW8();
+	return true;
 }
 //-----------------------------------------------------------

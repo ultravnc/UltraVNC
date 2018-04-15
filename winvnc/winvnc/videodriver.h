@@ -42,8 +42,8 @@ public:
 	virtual ~VideoDriver();
 	virtual void videoDriver_start(int x, int y, int w, int h);
 	virtual void videoDriver_Stop();
-	virtual BOOL hardwareCursor();
-	virtual BOOL noHardwareCursor();
+	virtual bool hardwareCursor();
+	virtual bool noHardwareCursor();
 	virtual void Lock(){};
 	virtual void Unlock(){};
 

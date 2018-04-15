@@ -6762,6 +6762,7 @@ int  vncClient::filetransferrequestPart1(rfbClientToServerMsg msg, bool fUserOk)
 	}	
 	DWORD dwTId;
 	ThreadHandleCompressFolder = CreateThread(NULL, 0, CompressFolder, this, 0, &dwTId);	
+	return 1;
 }
 
 

@@ -122,7 +122,7 @@ void VideoDriver::videoDriver_Stop()
 	pFramebuffer = NULL;
 }
 //----------------------------------------------------------
-BOOL VideoDriver::hardwareCursor()
+bool VideoDriver::hardwareCursor()
 {
 	HDC gdc;
 	int returnvalue;
@@ -133,7 +133,7 @@ BOOL VideoDriver::hardwareCursor()
 	return true;
 }
 //----------------------------------------------------------
-BOOL VideoDriver::noHardwareCursor()
+bool VideoDriver::noHardwareCursor()
 {
 	HDC gdc;
 	int returnvalue;

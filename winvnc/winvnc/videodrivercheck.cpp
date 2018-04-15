@@ -113,7 +113,7 @@ TEXT("\\StringFileInfo\\040904b0\\ProductVersion"),
 bool
 CheckVideoDriver(bool Box)
 {
-	if (IsWindows8OrGreater)
+	if (IsWindows8OrGreater())
 		return true;
 		typedef BOOL (WINAPI* pEnumDisplayDevices)(PVOID,DWORD,PVOID,DWORD);
 		HDC m_hrootdc=NULL;
