@@ -781,11 +781,21 @@ vncDesktopThread::run_undetached(void *arg)
 	//*******************************************************
 	// INIT
 	//*******************************************************
-	if (VNCOS.OS_VISTA||VNCOS.OS_WIN7||VNCOS.OS_WIN8) 
+	if (m_server->AutoCapt() == 1)
 	{
-		G_USE_PIXEL=false;
+		if (VNCOS.OS_VISTA||VNCOS.OS_WIN7||VNCOS.OS_WIN8) 
+		{
+			G_USE_PIXEL=false;
+		}
+		else G_USE_PIXEL=true;//testBench();
 	}
-	else G_USE_PIXEL=true;//testBench();
+	else if (m_server->AutoCapt() == 2)
+		G_USE_PIXEL=true;
+	else
+		G_USE_PIXEL=false;
+
+
+	
 	capture=true;
 	vnclog.Print(LL_INTERR, VNCLOG("Hook changed 1\n"));
 	// Save the thread's "home" desktop, under NT (no effect under 9x)
@@ -822,6 +832,7 @@ vncDesktopThread::run_undetached(void *arg)
 	rfb::ClippedUpdateTracker updates(clipped_updates, m_desktop->m_Cliprect);
 	clipped_updates.enable_copyrect(true);
 	rfb::Region2D rgncache;
+	rfb::Region2D rgnFixArtifacts;
 
 
 	// Incoming update messages are collated into a single region cache
@@ -1377,19 +1388,11 @@ vncDesktopThread::run_undetached(void *arg)
 											if(m_desktop->m_screenCapture)
 												m_desktop->m_screenCapture->Unlock();
 										}
+
+
 										if (!initialupdate)
 											{
-												#ifdef _DEBUG
-										char			szText[256];
-										sprintf(szText," nitialUpdate(true) \n");
-										OutputDebugString(szText);		
-#endif
 												m_server->InitialUpdate(true);
-												#ifdef _DEBUG
-										//char			szText[256];
-										sprintf(szText," nitialUpdate(true) \n");
-										OutputDebugString(szText);		
-#endif
 												initialupdate=true;
 												// JnZn558
 												m_desktop->m_old_monitor = MULTI_MON_ALL;

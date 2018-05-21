@@ -2450,7 +2450,7 @@ vncClientThread::run(void *arg)
 
 		if (need_first_idletime)
 		{
-			// send first keepalive to let the client know we accepted the encoding request
+			// send idletime to let the client know we accepted the encoding request
 			m_client->SendServerStateUpdate(rfbIdleInputTimeout, m_server->GetIdleInputTimeout());
 			need_first_idletime = false;
 		}
@@ -6690,7 +6690,7 @@ void vncClient::SendKeepAlive(bool bForce)
         rfbKeepAliveMsg kp;
         memset(&kp, 0, sizeof kp);
         kp.type = rfbKeepAlive;
-
+		omni_mutex_lock l(GetUpdateLock(),255);
 		m_socket->SendExact((char*)&kp, sz_rfbKeepAliveMsg, rfbKeepAlive);
     }
 }

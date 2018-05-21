@@ -1043,7 +1043,7 @@ vncBuffer::ClearBack()
 		memcpy(m_backbuff, m_mainbuff, m_desktop->ScreenBuffSize());
 	//BlackBack();
 	InvalidateRect(NULL, NULL, true);
-	//Sleep(100);
+	Sleep(100);
 	m_desktop->UpdateFullScreen();
 }
 

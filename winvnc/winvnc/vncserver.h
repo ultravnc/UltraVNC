@@ -152,6 +152,8 @@ public:
 	virtual void SetSWOffset(int x,int y);
 	virtual void SetScreenOffset(int x,int y,int type); //never locked
 	virtual void InitialUpdate(bool value);
+	virtual void AutoCapt(int autocapt);
+	virtual int AutoCapt() { return m_autocapt; }
 
 	virtual BOOL All_clients_initialalized();
 
@@ -162,6 +164,7 @@ public:
 
 	UINT				m_port;
 	UINT				m_port_http; // TightVNC 1.2.7
+	int					m_autocapt;
 
 	virtual void ShutdownServer();
 

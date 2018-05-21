@@ -239,6 +239,8 @@ vncServer::vncServer()
 	//adzm 2010-05-12 - dsmplugin config
 	m_szDSMPluginConfig[0] = '\0';
 	OS_Shutdown=false;
+
+	m_autocapt = 1;
 }
 
 vncServer::~vncServer()
@@ -2637,4 +2639,9 @@ void vncServer::StopReconnectAll()
 void vncServer::SetFTTimeout(int msecs)
 {
     m_ftTimeout = msecs;
+}
+
+void vncServer::AutoCapt(int autocapt)
+{
+	m_autocapt = autocapt; 
 }

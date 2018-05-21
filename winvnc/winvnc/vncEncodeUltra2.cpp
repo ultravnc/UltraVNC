@@ -157,8 +157,14 @@ vncEncodeUltra2::EncodeRect(BYTE *source, VSocket *outConn, BYTE *dest, const rf
 	// Translate the data into our new buffer
 	Translate(source, m_buffer, rect);
 	rfbZlibHeader *zlibh=(rfbZlibHeader *)(dest+sz_rfbFramebufferUpdateRectHeader);
+	Size=0;
+	if (rectW >= 4 && rectH >= 4)
+	{
+		Size=SendJpegRect(m_buffer,dest+sz_rfbFramebufferUpdateRectHeader+sz_rfbZlibHeader, rawDataSize, rectW , rectH , m_qualitylevel*10,m_remoteformat);		
+		zlibh->nBytes = Swap32IfLE(Size);
+	}
 
-	if ((rectW*rectH)<1024)
+	if (Size == 0)
 	{
 		
 		if (rawDataSize < 64)
@@ -178,11 +184,6 @@ vncEncodeUltra2::EncodeRect(BYTE *source, VSocket *outConn, BYTE *dest, const rf
 		surh->encoding = Swap32IfLE(rfbEncodingUltra);
 		zlibh->nBytes = Swap32IfLE(out_len);
 		Size=out_len;
-	}
-	else
-	{
-		Size=SendJpegRect(m_buffer,dest+sz_rfbFramebufferUpdateRectHeader+sz_rfbZlibHeader, rawDataSize, rectW , rectH , m_qualitylevel*10,m_remoteformat);		
-		zlibh->nBytes = Swap32IfLE(Size);
 	}
 	transmittedSize += sz_rfbFramebufferUpdateRectHeader + sz_rfbZlibHeader+ Size;
 	return sz_rfbFramebufferUpdateRectHeader + sz_rfbZlibHeader+ Size;
@@ -237,11 +238,18 @@ vncEncodeUltra2::SendJpegRect(BYTE *src,BYTE *dst, int dst_size, int w, int h, i
 
   jpeg_set_defaults(&cinfo);
   jpeg_set_quality(&cinfo, quality, TRUE);
-  if(quality >= 96) cinfo.dct_method = JDCT_ISLOW;
-  else cinfo.dct_method = JDCT_FASTEST;
-
-   cinfo.comp_info[0].h_samp_factor = 2;
-   cinfo.comp_info[0].v_samp_factor = 2;
+  if(quality >= 90) 
+	  cinfo.dct_method = JDCT_ISLOW;
+  else 
+	  cinfo.dct_method = JDCT_FASTEST;
+  if(quality >= 60) {
+	cinfo.comp_info[0].h_samp_factor = 2;
+	cinfo.comp_info[0].v_samp_factor = 2;
+  }
+  if(quality >= 70) {
+	cinfo.comp_info[0].h_samp_factor = 1;
+	cinfo.comp_info[0].v_samp_factor = 1;
+  }
 
   JpegSetDstManager(&cinfo, dst, dst_size);
 
