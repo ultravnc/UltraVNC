@@ -47,8 +47,8 @@ vncEncoder::vncEncoder()
 	m_localpalette = NULL;
 	m_bytesPerRow = 0;
 
-	m_SWOffsetx=0;
-	m_SWOffsety=0;
+	monitor_Offsetx=0;
+	monitor_Offsety=0;
 
 	// Tight - CURSOR HANDLING
 	m_compresslevel = 6;
@@ -135,8 +135,8 @@ vncEncoder::EncodeRect(BYTE *source, BYTE *dest, const rfb::Rect &rect)
 {
 	// Create the header for the update in the destination area
 	rfbFramebufferUpdateRectHeader *surh = (rfbFramebufferUpdateRectHeader *)dest;
-	surh->r.x = (CARD16) (rect.tl.x-m_SWOffsetx);
-	surh->r.y = (CARD16) (rect.tl.y-m_SWOffsety);
+	surh->r.x = (CARD16) (rect.tl.x-monitor_Offsetx);
+	surh->r.y = (CARD16) (rect.tl.y-monitor_Offsety);
 	surh->r.w = (CARD16) (rect.br.x-rect.tl.x);
 	surh->r.h = (CARD16) (rect.br.y-rect.tl.y);
 	surh->r.x = Swap16IfLE(surh->r.x);
@@ -422,10 +422,10 @@ vncEncoder::SetRemoteFormat(rfbPixelFormat &pixformat)
 }
 
 void
-vncEncoder::SetSWOffset(int x,int y)
+vncEncoder::SetBufferOffset(int x,int y)
 {
-	m_SWOffsetx=x;
-	m_SWOffsety=y;
+	monitor_Offsetx=x;
+	monitor_Offsety=y;
 }
 
 // Tight

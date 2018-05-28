@@ -124,7 +124,6 @@ protected:
 
 	// CACHE RDV
 	BOOL			m_use_cache;
-	BOOL			m_single_monitor;
 	BOOL			m_multi_monitor;
 
 	// Modif sf@2002 - Scaling

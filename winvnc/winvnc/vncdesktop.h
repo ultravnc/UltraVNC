@@ -300,20 +300,14 @@ public:
 	vncBuffer		m_buffer;
 		//SINGLE WINDOW
 	vncServer		*GetServerPointer() {return m_server;};
-	HWND			m_Single_hWnd;
-	HWND			m_Single_hWnd_backup;
-	BOOL			CalculateSWrect(RECT &rect);
 	rfb::Rect		GetSize();
-	rfb::Rect		GetQuarterSize();
+	void		SetBitmapRectOffsetAndClipRect(int offesetx, int offsety, int width = 0 , int height = 0);
 
 	// Modif rdv@2002 - v1.1.x - videodriver
 	//BOOL IsVideoDriverEnabled();
 	BOOL VideoBuffer();
 	int m_ScreenOffsetx;
 	int m_ScreenOffsety;
-	// JnZn558
-	int m_ScreenWidth;
-	int m_ScreenHeight;
 	//
 	int DriverType;
 	DWORD color[10];
@@ -471,12 +465,6 @@ protected:
 	rfb::Rect		m_foreground_window_rect;
 
 	//SINGLE WINDOW
-	void SWinit();
-	int m_SWHeight;
-	int m_SWWidth;
-	BOOL m_SWSizeChanged;
-	BOOL m_SWmoved;
-	BOOL m_SWtoDesktop;
 	int m_SWOffsetx;
 	int m_SWOffsety;
 
@@ -547,7 +535,7 @@ BOOL DriverWantedSet;
 //Multi monitor
 monitor mymonitor[4];
 int nr_monitors;
-bool multi_monitor;
+bool show_multi_monitors;
 bool requested_multi_monitor;
 
 bool m_bIsInputDisabledByClient; // 28 March 2008 jdp

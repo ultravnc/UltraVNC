@@ -55,8 +55,7 @@ vncBuffer::vncBuffer()
 
 	nRowIndex = 0;
 	m_cursorpending = false;
-	m_single_monitor=0;
-	m_multi_monitor=1;
+	m_multi_monitor = 1;
 
 	// sf@2005 - Grey Palette
 	m_fGreyPalette = false;
@@ -1171,15 +1170,16 @@ vncBuffer::IsShapeCleared()
 void
 vncBuffer::MultiMonitors(int number)
 {
-	if (number==1) {m_single_monitor=true;m_multi_monitor=false;}
-	if (number==2) {m_single_monitor=false;m_multi_monitor=true;}
+	if (number==1) 
+		m_multi_monitor = false;
+	if (number==2) 
+		m_multi_monitor = true;
 }
 
 bool
 vncBuffer::IsMultiMonitor()
 {
-	if (m_single_monitor) return false;//we need at least 1 display
-	else return true;
+	return m_multi_monitor;
 }
 
 bool

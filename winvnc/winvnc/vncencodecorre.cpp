@@ -285,8 +285,8 @@ vncEncodeCoRRE::EncodeSmallRect(BYTE *source, BYTE *dest, const rfb::Rect &rect)
 
 	// Create the rectangle header
 	rfbFramebufferUpdateRectHeader *surh=(rfbFramebufferUpdateRectHeader *)dest;
-	surh->r.x = (CARD16) (rect.tl.x-m_SWOffsetx);
-	surh->r.y = (CARD16) (rect.tl.y-m_SWOffsety);
+	surh->r.x = (CARD16) (rect.tl.x-monitor_Offsetx);
+	surh->r.y = (CARD16) (rect.tl.y-monitor_Offsety);
 	surh->r.w = (CARD16) (rectW);
 	surh->r.h = (CARD16) (rectH);
 	surh->r.x = Swap16IfLE(surh->r.x);

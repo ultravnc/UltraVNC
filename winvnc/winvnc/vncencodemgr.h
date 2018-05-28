@@ -124,7 +124,7 @@ public:
 	inline BOOL SetServerFormat();
 	inline BOOL SetClientFormat(rfbPixelFormat &format);
 	inline rfbPixelFormat GetClientFormat() {return m_clientformat;};
-	inline void SetSWOffset(int x,int y);
+	inline void SetBufferOffset(int x,int y);
 	// CURSOR HANDLING
 	inline BOOL IsCursorUpdatePending();
 	inline BOOL WasCursorUpdatePending();
@@ -213,9 +213,9 @@ protected:
 	BOOL			m_fEnableQueuing;
 
 	// cache handling
-	BOOL			m_cache_enabled;
-	int				m_SWOffsetx;
-	int				m_SWOffsety;
+	BOOL	m_cache_enabled;
+	int		monitor_Offsetx;
+	int		monitor_Offsety;
 
 public:
 	vncBuffer	*m_buffer;
@@ -264,8 +264,8 @@ inline vncEncodeMgr::vncEncodeMgr()
 	m_use_richcursor = FALSE;
 //	m_hcursor = NULL;
 
-	m_SWOffsetx=0;
-	m_SWOffsety=0;
+	monitor_Offsetx = 0;
+	monitor_Offsety = 0;
 
 }
 
@@ -724,7 +724,7 @@ vncEncodeMgr::SetEncoding(CARD32 encoding,BOOL reinitialize)
 	}
 		m_buffer->ClearCache();
 		m_buffer->ClearBack();		
-		m_encoder->SetSWOffset(m_SWOffsetx,m_SWOffsety);
+		m_encoder->SetBufferOffset(monitor_Offsetx, monitor_Offsety);
 	// Check that the client buffer is compatible
 	return CheckBuffer();
 }
@@ -874,11 +874,11 @@ vncEncodeMgr::GetSize()
 	return m_buffer->GetSize();
 }
 inline void
-vncEncodeMgr::SetSWOffset(int x,int y)
+vncEncodeMgr::SetBufferOffset(int x,int y)
 {
-	m_SWOffsetx=x;
-	m_SWOffsety=y;
-	m_encoder->SetSWOffset(x,y);
+	monitor_Offsetx = x;
+	monitor_Offsety = y;
+	m_encoder->SetBufferOffset(x,y);
 }
 
 inline void

@@ -508,7 +508,7 @@ vncDesktop::vncDesktop()
 	DriverWantedSet = false;
 	can_be_hooked = false;
 
-	multi_monitor = true;
+	show_multi_monitors = true;
 	m_bIsInputDisabledByClient = false;
 	m_input_desktop = 0;
 	m_home_desktop = 0;
@@ -533,8 +533,6 @@ vncDesktop::vncDesktop()
 	// JnZn558
 	m_current_monitor = MULTI_MON_PRIMARY;
 	m_old_monitor = MULTI_MON_PRIMARY;
-	m_ScreenWidth = 0;
-	m_ScreenHeight = 0;
 
 	sesmsg = NULL;
 	sesmsg = new sessionmsg[100];
@@ -545,7 +543,9 @@ vncDesktop::vncDesktop()
 		memset(sesmsg[i].username, 0, 32);
 		memset(sesmsg[i].type, 0, 32);
 	}
-	//
+	m_SWOffsetx = 0;
+	m_SWOffsety = 0;
+
 }
 
 vncDesktop::~vncDesktop()
@@ -649,22 +649,21 @@ vncDesktop::TriggerUpdate()
 		m_update_triggered = TRUE;
 		SetEvent(trigger_events[0]);
 	}*/
+	if (m_screenCapture)
+		m_screenCapture->Unlock();
 }
 
 DWORD
 vncDesktop::PreConnectInitBitmap()
 {
 
-	multi_monitor = false;
+	show_multi_monitors = false;
 	m_hrootdc_Desktop = GetDC(NULL);
 	if (m_hrootdc_Desktop == NULL) return ERROR_DESKTOP_NO_ROOTDC;
 
 	m_ScreenOffsetx = 0;
 	m_ScreenOffsety = 0;
-	m_ScreenWidth = 0;
-	m_ScreenHeight = 0;
-	m_bmrect = rfb::Rect(0, 0, 640, 640);
-
+	SetBitmapRectOffsetAndClipRect(0, 0, 640, 640);
 	m_hmemdc = CreateCompatibleDC(m_hrootdc_Desktop);
 	if (m_hmemdc == NULL) return ERROR_DESKTOP_NO_ROOTDC;
 
@@ -699,8 +698,7 @@ vncDesktop::PreConnectStartup()
 	SetPixFormat();
 	SetPixShifts();
 	StartInitWindowthread();
-	if (!m_buffer.SetDesktop(this))return ERROR_DESKTOP_OUT_OF_MEMORY;
-	GetQuarterSize();
+	if (!m_buffer.SetDesktop(this))return ERROR_DESKTOP_OUT_OF_MEMORY;	
 	return 0;
 }
 // Routine to startup and install all the hooks and stuff
@@ -801,7 +799,6 @@ vncDesktop::Startup()
 	// Initialise the buffer object
 	if (!m_buffer.SetDesktop(this))
 		return ERROR_DESKTOP_OUT_OF_MEMORY;
-	GetQuarterSize();
 #ifdef AVILOG
 	if (vnclog.GetVideo()) {
 		SYSTEMTIME lt;
@@ -988,37 +985,11 @@ vncDesktop::KillScreenSaver()
 	}
 }
 
-
-//
-// Modif sf@2002 - Single Window
-//
-BOOL CALLBACK EnumWindowsHnd(HWND hwnd, LPARAM arg)
-{
-	int  nRet;
-	char buffer[128];
-	char szNameAppli[16];
-
-	strncpy(szNameAppli, (LPSTR)(((vncDesktop*)arg)->GetServerPointer()->GetWindowName()), 15);
-	szNameAppli[15] = 0;
-	nRet = GetWindowText(hwnd, buffer, sizeof(buffer));
-	if (nRet > 0)
-	{
-		if (!_strnicmp(buffer, szNameAppli, lstrlen(szNameAppli)))
-		{
-			((vncDesktop*)arg)->m_Single_hWnd = hwnd;
-			return FALSE;
-		}
-		else
-			return TRUE;
-	}
-	return TRUE;
-}
-
-
 DWORD
 vncDesktop::InitBitmap()
 {
 	// Get the device context for the whole screen and find it's size
+	show_multi_monitors = false;
 	DriverType = NONE;
 	if (VideoBuffer()) {
 		LPSTR driverName = "mv video hook driver2";
@@ -1057,45 +1028,14 @@ vncDesktop::InitBitmap()
 			m_hrootdc_Desktop = CreateDC("DISPLAY", deviceName, NULL, NULL);
 			//m_hrootdc = GetDC(NULL);
 			BOOL temp_para = EnumDisplaySettings(deviceName, ENUM_CURRENT_SETTINGS, &devmode);
-			m_ScreenOffsetx = devmode.dmPosition.x;
-			m_ScreenOffsety = devmode.dmPosition.y;
-			if (m_hrootdc_Desktop) DriverType = MIRROR;
-			Checkmonitors();
-			requested_multi_monitor = m_buffer.IsMultiMonitor();
-			multi_monitor = false;
-			if (requested_multi_monitor && nr_monitors > 1)
-				multi_monitor = true;
+			if (m_hrootdc_Desktop) 
+				DriverType = MIRROR;
 		}
 	}//VIDEOBUFFER
-
-	if (m_server->SingleWindow() && m_Single_hWnd == NULL)
-		EnumWindows((WNDENUMPROC)EnumWindowsHnd, (LPARAM)this);
 
 	if (m_hrootdc_Desktop == NULL) {
 		vnclog.Print(LL_INTERR, VNCLOG("No driver used \n"));
 		//Multi-Monitor changes
-		Checkmonitors();
-		requested_multi_monitor = m_buffer.IsMultiMonitor();
-		multi_monitor = false;
-		if (requested_multi_monitor && nr_monitors > 1) multi_monitor = true;
-
-		/* JnZn558
-		if (!multi_monitor)
-		{
-			m_hrootdc = CreateDC(("DISPLAY"),mymonitor[0].device,NULL,NULL);
-			m_ScreenOffsetx=mymonitor[0].offsetx;
-			m_ScreenOffsety=mymonitor[0].offsety;
-		}
-		else
-		{
-			m_hrootdc = GetDC(NULL);
-
-			m_ScreenOffsetx=mymonitor[2].offsetx;
-			m_ScreenOffsety=mymonitor[2].offsety;
-
-
-		}
-		*/
 		m_hrootdc_Desktop = GetDC(NULL);
 		if (m_hrootdc_Desktop == NULL) {
 			vnclog.Print(LL_INTERR, VNCLOG("Failed m_rootdc \n"));
@@ -1104,21 +1044,19 @@ vncDesktop::InitBitmap()
 
 	}
 
-	m_ScreenOffsetx = mymonitor[3].offsetx;
-	m_ScreenOffsety = mymonitor[3].offsety;
-	m_ScreenWidth = mymonitor[3].Width;
-	m_ScreenHeight = mymonitor[3].Height;
+	Checkmonitors();
+	requested_multi_monitor = m_buffer.IsMultiMonitor();
+	if (requested_multi_monitor && nr_monitors > 1)
+		show_multi_monitors = true;
 
-	// JnZn558 if (multi_monitor && !VideoBuffer()) m_bmrect = rfb::Rect(0, 0,mymonitor[2].Width,mymonitor[2].Height);
-	if (multi_monitor && !VideoBuffer()) m_bmrect = rfb::Rect(0, 0, mymonitor[3].Width, mymonitor[3].Height);
-	else if (!VideoBuffer())
-	{
-		m_bmrect = rfb::Rect(0, 0, mymonitor[0].Width, mymonitor[0].Height);
-		m_ScreenOffsetx = mymonitor[0].offsetx;
-		m_ScreenOffsety = mymonitor[0].offsety;
-	}
-	// JnZn558 else m_bmrect = rfb::Rect(0, 0,GetDeviceCaps(m_hrootdc, HORZRES),GetDeviceCaps(m_hrootdc, VERTRES));
-	else m_bmrect = rfb::Rect(m_ScreenOffsetx, m_ScreenOffsety, m_ScreenWidth, m_ScreenHeight);
+	if (VideoBuffer())
+		SetBitmapRectOffsetAndClipRect(mymonitor[3].offsetx, mymonitor[3].offsety, mymonitor[3].Width, mymonitor[3].Height);
+	else if (show_multi_monitors) 
+		SetBitmapRectOffsetAndClipRect(0, 0, mymonitor[3].Width, mymonitor[3].Height);
+	else
+		SetBitmapRectOffsetAndClipRect(0, 0, mymonitor[0].Width, mymonitor[0].Height);
+		
+
 	vnclog.Print(LL_INTINFO, VNCLOG("bitmap dimensions are %d x %d\n"), m_bmrect.br.x, m_bmrect.br.y);
 
 	// Create a compatible memory DC
@@ -1153,7 +1091,7 @@ vncDesktop::InitBitmap()
 	}
 
 	// Create the bitmap to be compatible with the ROOT DC!!!
-	m_membitmap = CreateCompatibleBitmap(m_hrootdc_Desktop, 1, 1); //m_bmrect.br.x, m_bmrect.br.y);
+	m_membitmap = CreateCompatibleBitmap(m_hrootdc_Desktop, 1, 1);
 	if (m_membitmap == NULL) {
 		vnclog.Print(LL_INTERR, VNCLOG("failed to create memory bitmap(%d)\n"), GetLastError());
 		return ERROR_DESKTOP_NO_COMPATBITMAP;
@@ -1533,9 +1471,6 @@ vncDesktop::Init(vncServer *server)
 		return ERROR_DESKTOP_NO_DESKTOPTHREAD;
 	}
 	m_thread = thread;
-	//SINGEL WINDOW
-	SWinit();
-	// InitHookSettings();
 	return thread->Init(this, m_server);
 }
 
@@ -1793,7 +1728,7 @@ vncDesktop::CaptureScreen(const rfb::Rect &rect, BYTE *scrBuff, UINT scrBuffSize
 #endif
 		// Capture screen into bitmap
 		BOOL blitok = false;
-		if (multi_monitor)
+		if (show_multi_monitors)
 		{
 			blitok = BitBlt(m_hmemdc,
 				rect.tl.x,
@@ -2277,10 +2212,6 @@ void vncDesktop::SetSW(int x, int y)
 	{
 		// 2= multi monitor
 		// 1= single monitor
-		/* yz
-		if (requested_multi_monitor)m_buffer.MultiMonitors(1);
-		else m_buffer.MultiMonitors(2);
-		*/
 		switch (nr_monitors) {
 		case 2:
 		{
@@ -2326,47 +2257,9 @@ void vncDesktop::SetSW(int x, int y)
 		} break;
 		}
 
-		m_Single_hWnd = NULL;
 		return;
 	}
-	//SW is disabled seems to crash server
-	//until found and fixed we better disabled it to avoid
-	//this
 	return;
-
-	m_Single_hWnd = WindowFromPoint(point);
-
-	if (m_Single_hWnd == GetDesktopWindow())
-	{
-		if (GetMonitorInfo.isValid() && MonitorFromPoint.isValid())
-		{
-			HMONITOR hmonitor = (*MonitorFromPoint)(point, MONITOR_DEFAULTTONEAREST);
-			(*GetMonitorInfo)(hmonitor, &monitorinfo);
-			if (monitorinfo.dwFlags == MONITORINFOF_PRIMARY)
-			{
-				m_buffer.MultiMonitors(1);
-				m_Single_hWnd = NULL;
-			}
-			else
-			{
-				m_buffer.MultiMonitors(2);
-				m_Single_hWnd = NULL;
-			}
-		}
-		return;
-	}
-
-	if (m_Single_hWnd == NULL) m_server->SingleWindow(false);
-	else
-	{
-		HWND parent;
-		while ((parent = GetParent(m_Single_hWnd)) != NULL)
-		{
-			m_Single_hWnd = parent;
-		}
-		m_server->SingleWindow(true);
-	}
-
 }
 
 /***************************************************************************
@@ -2437,15 +2330,15 @@ BOOL vncDesktop::InitVideoDriver()
 	nr_monitors = GetNrMonitors();
 	if (nr_monitors == 1)
 	{
-		m_ScreenOffsetx = mymonitor[0].offsetx;
-		m_ScreenOffsety = mymonitor[0].offsety;
+		//m_ScreenOffsetx = mymonitor[0].offsetx;
+		//m_ScreenOffsety = mymonitor[0].offsety;
 		if (m_screenCapture != NULL) 
 			m_screenCapture->videoDriver_start(mymonitor[0].offsetx, mymonitor[0].offsety, mymonitor[0].Width, mymonitor[0].Height);
 	}
 	if (nr_monitors > 1)
 	{
-		m_ScreenOffsetx = mymonitor[3].offsetx;
-		m_ScreenOffsety = mymonitor[3].offsety;
+		//m_ScreenOffsetx = mymonitor[3].offsetx;
+		//m_ScreenOffsety = mymonitor[3].offsety;
 		if (m_screenCapture != NULL)
 			m_screenCapture->videoDriver_start(mymonitor[3].offsetx, mymonitor[3].offsety, mymonitor[3].Width, mymonitor[3].Height);
 	}

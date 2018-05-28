@@ -561,8 +561,8 @@ vncEncodeTight::SendTightHeader(int x, int y, int w, int h)
 {
 	rfbFramebufferUpdateRectHeader rect;
 
-	rect.r.x = Swap16IfLE(x-m_SWOffsetx);
-	rect.r.y = Swap16IfLE(y-m_SWOffsety);
+	rect.r.x = Swap16IfLE(x-monitor_Offsetx);
+	rect.r.y = Swap16IfLE(y-monitor_Offsety);
 	rect.r.w = Swap16IfLE(w);
 	rect.r.h = Swap16IfLE(h);
 	rect.encoding = Swap32IfLE(rfbEncodingTight);

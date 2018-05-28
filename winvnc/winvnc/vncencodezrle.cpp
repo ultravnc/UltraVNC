@@ -199,8 +199,8 @@ UINT vncEncodeZRLE::EncodeRect(BYTE *source, BYTE *dest, const rfb::Rect &rect)
   }
 
   rfbFramebufferUpdateRectHeader* surh = (rfbFramebufferUpdateRectHeader*)dest;
-  surh->r.x = Swap16IfLE(x-m_SWOffsetx);
-  surh->r.y = Swap16IfLE(y-m_SWOffsety);
+  surh->r.x = Swap16IfLE(x-monitor_Offsetx);
+  surh->r.y = Swap16IfLE(y-monitor_Offsety);
   surh->r.w = Swap16IfLE(w);
   surh->r.h = Swap16IfLE(h);
   if( m_use_zywrle ){

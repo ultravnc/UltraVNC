@@ -92,7 +92,7 @@ public:
 
 	// Colour map handling
 	BOOL GetRemotePalette(RGBQUAD *quadlist, UINT ncolours);
-	void SetSWOffset(int x,int y);
+	void SetBufferOffset(int x,int y);
 
 	// Tight
 	void SetCompressLevel(int level);
@@ -129,8 +129,8 @@ protected:
 	int					m_bytesPerRow;			// Number of bytes per row locally
 	int					framebufferWidth;
 	int					framebufferHeight;
-	int m_SWOffsetx;
-	int m_SWOffsety;
+	int					monitor_Offsetx;
+	int					monitor_Offsety;
 	int					dataSize;				// Total size of raw data encoded
 	int					rectangleOverhead;		// Total size of rectangle header data
 	int					encodedSize;			// Total size of encoded data

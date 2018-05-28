@@ -481,18 +481,6 @@ vncProperties::DialogProc(HWND hwnd,
 				_this->m_server->HTTPConnectEnabled(),
 				0);
 
-			// Modif sf@2002
-//		   HWND hSingleWindow = GetDlgItem(hwnd, IDC_SINGLE_WINDOW);
-//           SendMessage(hSingleWindow, BM_SETCHECK, _this->m_server->SingleWindow(), 0);
-
-		   // handler to get window name
-//           HWND hWindowName = GetDlgItem(hwnd, IDC_NAME_APPLI);
-//           if ( _this->m_server->GetWindowName() != NULL)
-//		   {
-  //             SetDlgItemText(hwnd, IDC_NAME_APPLI,_this->m_server->GetWindowName());
-    //       }
-    //     EnableWindow(hWindowName, _this->m_server->SingleWindow());
-
 		   // Modif sf@2002 - v1.1.0
 		   HWND hFileTransfer = GetDlgItem(hwnd, IDC_FILETRANSFER);
            SendMessage(hFileTransfer, BM_SETCHECK, _this->m_server->FileTransferEnabled(), 0);
@@ -867,24 +855,6 @@ vncProperties::DialogProc(HWND hwnd,
 					== BST_CHECKED) {
 					_this->m_server->SetConnectPriority(3);
 				} 
-
-				
-
-				// Modif sf@2002
-				// [v1.0.2-jp2 fix-->] Move to vncpropertiesPoll.cpp
-//				HWND hSingleWindow = GetDlgItem(hwnd, IDC_SINGLE_WINDOW);
-//				_this->m_server->SingleWindow(SendMessage(hSingleWindow, BM_GETCHECK, 0, 0) == BST_CHECKED);
-//
-//				char szName[32];
-//				if (GetDlgItemText(hwnd, IDC_NAME_APPLI, (LPSTR) szName, 32) == 0)
-//				{
-//					vnclog.Print(LL_INTINFO,VNCLOG("Error while reading Window Name %d \n"), GetLastError());
-//				}
-//				else
-//				{
-//					_this->m_server->SetSingleWindowName(szName);
-//				}
-				// [<--v1.0.2-jp2 fix] Move to vncpropertiesPoll.cpp
 				
 				// Modif sf@2002 - v1.1.0
 				HWND hFileTransfer = GetDlgItem(hwnd, IDC_FILETRANSFER);
@@ -1004,18 +974,6 @@ vncProperties::DialogProc(HWND hwnd,
 
 				return TRUE;
 			}
-
-		// Modif sf@2002
-		// [v1.0.2-jp2 fix-->] Move to vncpropertiesPoll.cpp
-//		 case IDC_SINGLE_WINDOW:
-//			 {
-//				 HWND hSingleWindow = GetDlgItem(hwnd, IDC_SINGLE_WINDOW);
-//				 BOOL fSingleWindow = (SendMessage(hSingleWindow, BM_GETCHECK,0, 0) == BST_CHECKED);
-//				 HWND hWindowName   = GetDlgItem(hwnd, IDC_NAME_APPLI);
-//				 EnableWindow(hWindowName, fSingleWindow);
-//			 }
-//			 return TRUE;
-		// [<--v1.0.2-jp2 fix] Move to vncpropertiesPoll.cpp
 
 		case IDCANCEL:
 			vnclog.Print(LL_INTINFO, VNCLOG("enddialog (CANCEL)\n"));

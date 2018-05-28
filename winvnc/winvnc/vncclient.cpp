@@ -3294,8 +3294,8 @@ vncClientThread::run(void *arg)
 					msg.pe.y = (Swap16IfLE(msg.pe.y));
 					//Error, msd.pe.x is defined as unsigned while with a negative secondary screen it's negative
 					//offset need to be used later in this function
-					msg.pe.x = (msg.pe.x)* m_client->m_nScale;// + (m_client->m_SWOffsetx+m_client->m_ScreenOffsetx);
-					msg.pe.y = (msg.pe.y)* m_client->m_nScale;// + (m_client->m_SWOffsety+m_client->m_ScreenOffsety);
+					msg.pe.x = (msg.pe.x)* m_client->m_nScale;
+					msg.pe.y = (msg.pe.y)* m_client->m_nScale;
 
 					// Work out the flags for this event
 					DWORD flags = MOUSEEVENTF_ABSOLUTE;
@@ -3370,8 +3370,8 @@ vncClientThread::run(void *arg)
 					//primary display always have (0,0) as corner
 					if (m_client->m_display_type==1)
 						{
-							unsigned long x = ((msg.pe.x + (m_client->m_SWOffsetx)) *  65535) / (screenX-1);
-							unsigned long y = ((msg.pe.y + (m_client->m_SWOffsety))* 65535) / (screenY-1);
+							unsigned long x = ((msg.pe.x + (m_client->monitor_Offsetx)) *  65535) / (screenX-1);
+							unsigned long y = ((msg.pe.y + (m_client->monitor_Offsety))* 65535) / (screenY-1);
 							// Do the pointer event
 							::mouse_event(flags, (DWORD) x, (DWORD) y, wheel_movement, 0);
 //							vnclog.Print(LL_INTINFO, VNCLOG("########mouse_event :%i %i \n"),x,y);
@@ -3382,8 +3382,8 @@ vncClientThread::run(void *arg)
 							{							
 								INPUT evt;
 								evt.type = INPUT_MOUSE;
-								int xx=msg.pe.x-GetSystemMetrics(SM_XVIRTUALSCREEN)+ (m_client->m_SWOffsetx+m_client->m_ScreenOffsetx);
-								int yy=msg.pe.y-GetSystemMetrics(SM_YVIRTUALSCREEN)+ (m_client->m_SWOffsety+m_client->m_ScreenOffsety);
+								int xx=msg.pe.x-GetSystemMetrics(SM_XVIRTUALSCREEN)+ (m_client->monitor_Offsetx+m_client->m_ScreenOffsetx);
+								int yy=msg.pe.y-GetSystemMetrics(SM_YVIRTUALSCREEN)+ (m_client->monitor_Offsety+m_client->m_ScreenOffsety);
 								evt.mi.dx = (xx * 65535) / (GetSystemMetrics(SM_CXVIRTUALSCREEN)-1);
 								evt.mi.dy = (yy* 65535) / (GetSystemMetrics(SM_CYVIRTUALSCREEN)-1);
 								evt.mi.dwFlags = flags | MOUSEEVENTF_VIRTUALDESK;
@@ -3635,8 +3635,8 @@ vncClientThread::run(void *arg)
 				break;
 			}
 			m_client->m_encodemgr.m_buffer->m_desktop->SetSW(
-				(Swap16IfLE(msg.sw.x) + m_client->m_SWOffsetx+m_client->m_ScreenOffsetx) * m_client->m_nScale,
-				(Swap16IfLE(msg.sw.y) + m_client->m_SWOffsety+m_client->m_ScreenOffsety) * m_client->m_nScale);
+				(Swap16IfLE(msg.sw.x) + m_client->monitor_Offsetx+m_client->m_ScreenOffsetx) * m_client->m_nScale,
+				(Swap16IfLE(msg.sw.y) + m_client->monitor_Offsety+m_client->m_ScreenOffsety) * m_client->m_nScale);
 			break;
 
 
@@ -4660,11 +4660,10 @@ vncClient::vncClient() : Sendinput("USER32", "SendInput"), m_clipboard(Clipboard
 
 	//SINGLE WINDOW
 	m_use_NewSWSize = FALSE;
-	m_SWOffsetx=0;
-	vnclog.Print(LL_INTINFO, VNCLOG("TEST 4\n"));
-	m_SWOffsety=0;
-	m_ScreenOffsetx=0;
-	m_ScreenOffsety=0;
+	monitor_Offsetx = 0;
+	monitor_Offsety = 0;
+	m_ScreenOffsetx = 0;
+	m_ScreenOffsety = 0;
 
 	// sf@2002 
 	fNewScale = false;
@@ -4910,13 +4909,13 @@ vncClient::NotifyUpdate(rfbFramebufferUpdateRequestMsg fur)
 		rfb::Rect update;
 		// Get the specified rectangle as the region to send updates for
 		// Modif sf@2002 - Scaling.
-		update.tl.x = (Swap16IfLE(fur.x) + m_SWOffsetx) * m_nScale;
-		update.tl.y = (Swap16IfLE(fur.y) + m_SWOffsety) * m_nScale;
+		update.tl.x = (Swap16IfLE(fur.x) + monitor_Offsetx) * m_nScale;
+		update.tl.y = (Swap16IfLE(fur.y) + monitor_Offsety) * m_nScale;
 		update.br.x = update.tl.x + Swap16IfLE(fur.w) * m_nScale;
 		update.br.y = update.tl.y + Swap16IfLE(fur.h) * m_nScale;
 		// Verify max size, scaled changed on server while not pushed to viewer
-		if (update.tl.x< ((m_ScaledScreen.tl.x + m_SWOffsetx) * m_nScale)) update.tl.x = (m_ScaledScreen.tl.x + m_SWOffsetx) * m_nScale;
-		if (update.tl.y < ((m_ScaledScreen.tl.y + m_SWOffsety) * m_nScale)) update.tl.y = (m_ScaledScreen.tl.y + m_SWOffsety) * m_nScale;
+		if (update.tl.x< ((m_ScaledScreen.tl.x + monitor_Offsetx) * m_nScale)) update.tl.x = (m_ScaledScreen.tl.x + monitor_Offsetx) * m_nScale;
+		if (update.tl.y < ((m_ScaledScreen.tl.y + monitor_Offsety) * m_nScale)) update.tl.y = (m_ScaledScreen.tl.y + monitor_Offsety) * m_nScale;
 		if (update.br.x > (update.tl.x + (m_ScaledScreen.br.x-m_ScaledScreen.tl.x) * m_nScale)) update.br.x = update.tl.x + (m_ScaledScreen.br.x-m_ScaledScreen.tl.x) * m_nScale;
 		if (update.br.y > (update.tl.y + (m_ScaledScreen.br.y-m_ScaledScreen.tl.y) * m_nScale)) update.br.y = update.tl.y + (m_ScaledScreen.br.y-m_ScaledScreen.tl.y) * m_nScale;
 		rfb::Region2D update_rgn = update;
@@ -4930,8 +4929,8 @@ vncClient::NotifyUpdate(rfbFramebufferUpdateRequestMsg fur)
 			OutputDebugString(szText);		
 #endif
 
-		update.tl.x = (m_ScaledScreen.tl.x + m_SWOffsetx) * m_nScale;
-		update.tl.y = (m_ScaledScreen.tl.y + m_SWOffsety) * m_nScale;
+		update.tl.x = (m_ScaledScreen.tl.x + monitor_Offsetx) * m_nScale;
+		update.tl.y = (m_ScaledScreen.tl.y + monitor_Offsety) * m_nScale;
 		update.br.x = update.tl.x + (m_ScaledScreen.br.x-m_ScaledScreen.tl.x) * m_nScale;
 		update.br.y = update.tl.y + (m_ScaledScreen.br.y-m_ScaledScreen.tl.y) * m_nScale;
 
@@ -5023,8 +5022,8 @@ vncClient::UpdateMouse()
 	if (m_use_PointerPos && !m_cursor_pos_changed) {
 		POINT cursorPos;
 		GetCursorPos(&cursorPos);
-		cursorPos.x=cursorPos.x-(m_ScreenOffsetx+m_SWOffsetx);
-		cursorPos.y=cursorPos.y-(m_ScreenOffsety+m_SWOffsety);
+		cursorPos.x=cursorPos.x-(m_ScreenOffsetx+monitor_Offsetx);
+		cursorPos.y=cursorPos.y-(m_ScreenOffsety+monitor_Offsety);
 		//vnclog.Print(LL_INTINFO, VNCLOG("UpdateMouse m_cursor_pos(%d, %d), new(%d, %d)\n"), 
 		//  m_cursor_pos.x, m_cursor_pos.y, cursorPos.x, cursorPos.y);
 		if (cursorPos.x != m_cursor_pos.x || cursorPos.y != m_cursor_pos.y) {
@@ -5422,6 +5421,15 @@ vncClient::SendRectangles(const rfb::RectVector &rects)
 			rect.br.x=(*i).br.x;
 			rect.tl.y=(*i).tl.y;
 			rect.br.y=(*i).br.y;
+#ifdef _DEBUG
+			char			szText[256];
+							
+				sprintf(szText,"RECT m_encodemgr  %i %i %i %i \n",rect.tl.x,
+				rect.tl.y,
+				rect.br.x,
+				rect.br.y);
+				OutputDebugString(szText);
+#endif
 
 			if ((rect.br.x-rect.tl.x) * (rect.br.y-rect.tl.y) > Blocksize*BlocksizeX )
 			{
@@ -5581,16 +5589,16 @@ vncClient::SendCopyRect(const rfb::Rect &dest, const rfb::Point &source)
 	// Create the message header
 	// Modif sf@2002 - Scaling
 	rfbFramebufferUpdateRectHeader copyrecthdr;
-	copyrecthdr.r.x = Swap16IfLE((dest.tl.x - m_SWOffsetx) / m_nScale );
-	copyrecthdr.r.y = Swap16IfLE((dest.tl.y - m_SWOffsety) / m_nScale);
+	copyrecthdr.r.x = Swap16IfLE((dest.tl.x - monitor_Offsetx) / m_nScale );
+	copyrecthdr.r.y = Swap16IfLE((dest.tl.y - monitor_Offsety) / m_nScale);
 	copyrecthdr.r.w = Swap16IfLE((dest.br.x - dest.tl.x) / m_nScale);
 	copyrecthdr.r.h = Swap16IfLE((dest.br.y - dest.tl.y) / m_nScale);
 	copyrecthdr.encoding = Swap32IfLE(rfbEncodingCopyRect);
 
 	// Create the CopyRect-specific section
 	rfbCopyRect copyrectbody;
-	copyrectbody.srcX = Swap16IfLE((source.x- m_SWOffsetx) / m_nScale);
-	copyrectbody.srcY = Swap16IfLE((source.y- m_SWOffsety) / m_nScale);
+	copyrectbody.srcX = Swap16IfLE((source.x- monitor_Offsetx) / m_nScale);
+	copyrectbody.srcY = Swap16IfLE((source.y- monitor_Offsety) / m_nScale);
 
 	// Now send the message;
 	if (!m_socket->SendExactQueue((char *)&copyrecthdr, sizeof(copyrecthdr)))
@@ -5664,19 +5672,18 @@ vncClient::SendPalette()
 }
 
 void
-vncClient::SetSWOffset(int x,int y)
+vncClient::SetBufferOffset(int x,int y)
 {
-	//if (m_SWOffsetx!=x || m_SWOffsety!=y) m_encodemgr.m_buffer->ClearCache();
-	m_SWOffsetx=x;
-	m_SWOffsety=y;
-	m_encodemgr.SetSWOffset(x,y);
+	monitor_Offsetx=x;
+	monitor_Offsety=y;
+	m_encodemgr.SetBufferOffset(x,y);
 }
 
 void
 vncClient::SetScreenOffset(int x,int y,int type)
 {
-	m_ScreenOffsetx=x;
-	m_ScreenOffsety=y;
+	m_ScreenOffsetx = x;
+	m_ScreenOffsety = y;
 	m_display_type=type;
 }
 
@@ -5715,8 +5722,8 @@ vncClient::SendCacheRect(const rfb::Rect &dest)
 	// Modif rdv@2002 - v1.1.x - Application Resize
 	// Modif sf@2002 - Scaling
 	rfbFramebufferUpdateRectHeader cacherecthdr;
-	cacherecthdr.r.x = Swap16IfLE((dest.tl.x - m_SWOffsetx) / m_nScale );
-	cacherecthdr.r.y = Swap16IfLE((dest.tl.y - m_SWOffsety) / m_nScale);
+	cacherecthdr.r.x = Swap16IfLE((dest.tl.x - monitor_Offsetx) / m_nScale );
+	cacherecthdr.r.y = Swap16IfLE((dest.tl.y - monitor_Offsety) / m_nScale);
 	cacherecthdr.r.w = Swap16IfLE((dest.br.x - dest.tl.x) / m_nScale);
 	cacherecthdr.r.h = Swap16IfLE((dest.br.y - dest.tl.y) / m_nScale);
 	cacherecthdr.encoding = Swap32IfLE(rfbEncodingCache);
@@ -5820,8 +5827,8 @@ BOOL vncClient::SendCacheZip(const rfb::RectVector &rects)
 	BYTE* p = m_pRawCacheZipBuf;
 	for (i = rects.begin();i != rects.end();i++)
 	{
-		theRect.x = Swap16IfLE(((*i).tl.x - m_SWOffsetx) / m_nScale );
-		theRect.y = Swap16IfLE(((*i).tl.y - m_SWOffsety) / m_nScale);
+		theRect.x = Swap16IfLE(((*i).tl.x - monitor_Offsetx) / m_nScale );
+		theRect.y = Swap16IfLE(((*i).tl.y - monitor_Offsety) / m_nScale);
 		theRect.w = Swap16IfLE(((*i).br.x - (*i).tl.x) / m_nScale);
 		theRect.h = Swap16IfLE(((*i).br.y - (*i).tl.y) / m_nScale);
 		memcpy(p, (BYTE*)&theRect, sz_rfbRectangle);

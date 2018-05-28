@@ -362,15 +362,6 @@ vncPropertiesPoll::DialogProcPoll(HWND hwnd,
 				_this->m_server->PollUnderCursor() || _this->m_server->PollForeground()
 				);
 
-			// [v1.0.2-jp2 fix-->]
-			HWND hSingleWindow = GetDlgItem(hwnd, IDC_SINGLE_WINDOW);
-			SendMessage(hSingleWindow, BM_SETCHECK, _this->m_server->SingleWindow(), 0);
-
-			HWND hWindowName = GetDlgItem(hwnd, IDC_NAME_APPLI);
-			if ( _this->m_server->GetWindowName() != NULL){
-			   SetDlgItemText(hwnd, IDC_NAME_APPLI,_this->m_server->GetWindowName());
-			}
-			EnableWindow(hWindowName, _this->m_server->SingleWindow());
 			// [<--v1.0.2-jp2 fix]
 
 			CheckDlgButton(hwnd, IDC_AUTOCAPT1,
@@ -449,17 +440,6 @@ vncPropertiesPoll::DialogProcPoll(HWND hwnd,
 					SendMessage(hPollOnEventOnly, BM_GETCHECK, 0, 0) == BST_CHECKED
 					);
 
-				// [v1.0.2-jp2 fix-->] Move to vncpropertiesPoll.cpp
-				HWND hSingleWindow = GetDlgItem(hwnd, IDC_SINGLE_WINDOW);
-				_this->m_server->SingleWindow(SendMessage(hSingleWindow, BM_GETCHECK, 0, 0) == BST_CHECKED);
-
-				char szName[32];
-				if (GetDlgItemText(hwnd, IDC_NAME_APPLI, (LPSTR) szName, 32) == 0){
-					vnclog.Print(LL_INTINFO,VNCLOG("Error while reading Window Name %d \n"), GetLastError());
-				}
-				else{
-					_this->m_server->SetSingleWindowName(szName);
-				}
 				// [<--v1.0.2-jp2 fix] Move to vncpropertiesPoll.cpp
 
 				// Save the settings
@@ -485,15 +465,6 @@ vncPropertiesPoll::DialogProcPoll(HWND hwnd,
 				return TRUE;
 			}
 
-		// [v1.0.2-jp2 fix-->] Move to vncpropertiesPoll.cpp
-		 case IDC_SINGLE_WINDOW:
-			 {
-				 HWND hSingleWindow = GetDlgItem(hwnd, IDC_SINGLE_WINDOW);
-				 BOOL fSingleWindow = (SendMessage(hSingleWindow, BM_GETCHECK,0, 0) == BST_CHECKED);
-				 HWND hWindowName   = GetDlgItem(hwnd, IDC_NAME_APPLI);
-				 EnableWindow(hWindowName, fSingleWindow);
-			 }
-			 return TRUE;
 		// [<--v1.0.2-jp2 fix] Move to vncpropertiesPoll.cpp
 
 		 case IDCANCEL:
@@ -867,9 +838,6 @@ vncPropertiesPoll::ApplyUserPrefs()
 	else m_server->Driver(false);
 	m_server->Hook(m_pref_Hook);
 	m_server->Virtual(m_pref_Virtual);
-	// [v1.0.2-jp2 fix]
-	m_server->SingleWindow(m_pref_SingleWindow);
-	m_server->SetSingleWindowName(m_pref_szSingleWindowName);
 	m_server->AutoCapt(m_pref_autocapt);
 
 }
@@ -958,9 +926,6 @@ vncPropertiesPoll::SaveUserPrefsPoll(HKEY appkey)
 	SaveInt(appkey, "EnableDriver", m_server->Driver());
 	SaveInt(appkey, "EnableHook", m_server->Hook());
 	SaveInt(appkey, "EnableVirtual", m_server->Virtual());
-	// [v1.0.2-jp2 fix]
-	SaveInt(appkey, "SingleWindow", m_server->SingleWindow());
-	SaveString(appkey, "SingleWindowName", m_server->GetWindowName());
 	SaveInt(appkey, "autocapt", m_server->AutoCapt());
 }
 
@@ -1061,9 +1026,5 @@ void vncPropertiesPoll::SaveUserPrefsPollToIniFile()
 	myIniFile.WriteInt("poll", "EnableHook", m_server->Hook());
 	myIniFile.WriteInt("poll", "EnableVirtual", m_server->Virtual());
 	int test = m_server->AutoCapt();
-	myIniFile.WriteInt("poll", "autocapt", m_server->AutoCapt());
-
-	myIniFile.WriteInt("poll", "SingleWindow", m_server->SingleWindow());
-	myIniFile.WriteString("poll", "SingleWindowName", m_server->GetWindowName());
-	
+	myIniFile.WriteInt("poll", "autocapt", m_server->AutoCapt());	
 }

@@ -241,8 +241,8 @@ vncEncodeZlib::EncodeOneRect(BYTE *source,BYTE *source2, BYTE *dest, const RECT 
 	// Create the rectangle header
 	rfbFramebufferUpdateRectHeader *surh=(rfbFramebufferUpdateRectHeader *)dest;
 	// Modif rdv@2002 - v1.1.x - Application Resize
-	surh->r.x = (CARD16) rect.left-m_SWOffsetx;
-	surh->r.y = (CARD16) rect.top-m_SWOffsety;
+	surh->r.x = (CARD16) rect.left-monitor_Offsetx;
+	surh->r.y = (CARD16) rect.top-monitor_Offsety;
 	surh->r.w = (CARD16) (rectW);
 	surh->r.h = (CARD16) (rectH);
 	surh->r.x = Swap16IfLE(surh->r.x);

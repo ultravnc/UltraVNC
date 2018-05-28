@@ -131,8 +131,8 @@ vncEncodeUltra2::EncodeRect(BYTE *source, VSocket *outConn, BYTE *dest, const rf
 
 	rfbFramebufferUpdateRectHeader *surh=(rfbFramebufferUpdateRectHeader *)dest;
 	// Modif rdv@2002 - v1.1.x - Application Resize
-	surh->r.x = (CARD16) rect.tl.x-m_SWOffsetx;
-	surh->r.y = (CARD16) rect.tl.y-m_SWOffsety;
+	surh->r.x = (CARD16) rect.tl.x-monitor_Offsetx;
+	surh->r.y = (CARD16) rect.tl.y-monitor_Offsety;
 	surh->r.w = (CARD16) (rectW);
 	surh->r.h = (CARD16) (rectH);
 	surh->r.x = Swap16IfLE(surh->r.x);

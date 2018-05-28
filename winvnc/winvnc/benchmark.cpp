@@ -71,14 +71,14 @@ void testBench()
 	if (result == 0) {
 		return;
 	}
-	RECT m_bmrect;
-	m_bmrect.left=0;
-	m_bmrect.top=0;
-	m_bmrect.right=GetDeviceCaps(m_hrootdc, HORZRES);
-	m_bmrect.bottom=GetDeviceCaps(m_hrootdc, VERTRES);
+	RECT testRect;
+	testRect.left=0;
+	testRect.top=0;
+	testRect.right=GetDeviceCaps(m_hrootdc, HORZRES);
+	testRect.bottom=GetDeviceCaps(m_hrootdc, VERTRES);
 	// Henceforth we want to use a top-down scanning representation
-    m_bminfo.bmi.bmiHeader.biWidth = m_bmrect.right;
-    m_bminfo.bmi.bmiHeader.biHeight = m_bmrect.bottom;
+    m_bminfo.bmi.bmiHeader.biWidth = testRect.right;
+    m_bminfo.bmi.bmiHeader.biHeight = testRect.bottom;
     m_bminfo.bmi.bmiHeader.biSizeImage = abs((m_bminfo.bmi.bmiHeader.biWidth *
 				m_bminfo.bmi.bmiHeader.biHeight *
 				m_bminfo.bmi.bmiHeader.biBitCount)/ 8);
@@ -93,7 +93,7 @@ void testBench()
 	HBITMAP tempbitmap = CreateDIBSection(m_hmemdc, &m_bminfo.bmi, DIB_RGB_COLORS, &m_DIBbits, NULL, 0);
 	if (tempbitmap == NULL) {
 		m_DIBbits = NULL;
-        tempbitmap = CreateCompatibleBitmap(m_hrootdc, m_bmrect.right, m_bmrect.bottom);
+        tempbitmap = CreateCompatibleBitmap(m_hrootdc, testRect.right, testRect.bottom);
 	    if (tempbitmap == NULL) {
 		    return;
 	    }
@@ -115,12 +115,12 @@ void testBench()
 	{
 	if ((m_oldbitmap = (HBITMAP) SelectObject(m_hmemdc, m_membitmap)) == NULL)
 					return;
-	BOOL blitok = BitBlt(m_hmemdc, 0, 0, m_bmrect.right, m_bmrect.bottom, m_hrootdc, 0, 0, CAPTUREBLT | SRCCOPY);
+	BOOL blitok = BitBlt(m_hmemdc, 0, 0, testRect.right, testRect.bottom, m_hrootdc, 0, 0, CAPTUREBLT | SRCCOPY);
 	SelectObject(m_hmemdc, m_oldbitmap);
 	}
 	COLORREF cr = 0;
-	for (int xx=0;xx<m_bmrect.right/32;xx++)
-		for (int yy=0;yy<m_bmrect.bottom/32;yy++)
+	for (int xx=0;xx<testRect.right/32;xx++)
+		for (int yy=0;yy<testRect.bottom/32;yy++)
 		{
 			unsigned int index = (m_bytesPerRow * yy) + (m_bytesPerPixel * xx);
 				memcpy(&cr, ((char*)m_DIBbits)+index, m_bytesPerPixel);
@@ -137,7 +137,7 @@ void testBench()
 	
 	{
 	COLORREF cr = 0;
-	for (int xx=0;xx<m_bmrect.right*m_bmrect.bottom/32/32/200;xx++)
+	for (int xx=0;xx<testRect.right*testRect.bottom/32/32/200;xx++)
 		{
 			cr=GetPixel(m_hrootdc, 1, 1);
 		}
