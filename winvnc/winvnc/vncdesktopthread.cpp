@@ -1347,7 +1347,7 @@ vncDesktopThread::run_undetached(void *arg)
 											if (m_desktop->m_screenCapture)
 												m_desktop->m_screenCapture->Lock();
 											m_desktop->m_buffer.CheckRegion(changedrgn,cachedrgn, checkrgn);
-											if(m_desktop->m_screenCapture && changedrgn.is_empty() && cachedrgn.is_empty())
+											//if(m_desktop->m_screenCapture && changedrgn.is_empty() && cachedrgn.is_empty())
 												m_desktop->m_screenCapture->Unlock();
 										}
 

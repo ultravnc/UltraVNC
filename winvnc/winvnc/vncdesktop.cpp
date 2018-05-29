@@ -649,8 +649,8 @@ vncDesktop::TriggerUpdate()
 		m_update_triggered = TRUE;
 		SetEvent(trigger_events[0]);
 	}*/
-	if (m_screenCapture)
-		m_screenCapture->Unlock();
+	//if (m_screenCapture)
+	//	m_screenCapture->Unlock();
 }
 
 DWORD

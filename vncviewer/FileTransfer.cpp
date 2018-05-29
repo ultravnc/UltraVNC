@@ -4249,12 +4249,13 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 		MoveWindow(GetDlgItem(hWnd, IDC_UPLOAD_B),     lf_an+10+2,  icy-15-20-6-20-5-20, 90, 20, TRUE);
 		MoveWindow(GetDlgItem(hWnd, IDC_DOWNLOAD_B),   lf_an+10+2,       icy-15-20-6-20, 90, 20, TRUE);
 		MoveWindow(GetDlgItem(hWnd, IDC_ABORT_B),      lf_an+10+2,            icy-15-20, 90, 20, TRUE);
-		MoveWindow(GetDlgItem(hWnd, IDC_ABORT_B2),	   lf_an + 10 + 2, icy - 10, 90, 20, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDC_ABORT_B2),	   lf_an+10+2,			   icy - 10, 90, 20, TRUE);
 		MoveWindow(GetDlgItem(hWnd, IDC_DELETE_B),     lf_an+10+2,               icy+15, 90, 20, TRUE);
 		MoveWindow(GetDlgItem(hWnd, IDC_NEWFOLDER_B),  lf_an+10+2,          icy+15+20+6, 90, 20, TRUE);
 		MoveWindow(GetDlgItem(hWnd, IDC_RENAME_B),     lf_an+10+2,     icy+15+20+6+20+6, 90, 20, TRUE);
 		MoveWindow(GetDlgItem(hWnd, IDC_HIDE_B),       lf_an+10+2,        cy-103-20-4-6, 90, 20, TRUE);
-		MoveWindow(GetDlgItem(hWnd, IDCANCEL),         lf_an+10+2,             cy-103-4, 90, 20, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDCANCEL),         lf_an+10+2,             cy-103-4-3, 90, 20, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDCANCEL2),        lf_an+10+2,             cy-83-4, 90, 20, TRUE);
 		InvalidateRect(hWnd, NULL, FALSE);
 
 		FTAdjustFileNameColumns(hWnd); // sf@2006
