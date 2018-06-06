@@ -668,79 +668,42 @@ void vncDesktopThread::do_polling(HANDLE& threadHandle, rfb::Region2D& rgncache,
 	// We add specific areas of the screen to the region cache,
 	// causing them to be fetched for processing.
 	// if can_be_hooked==false, hooking is temp disabled, use polling
-	if (m_desktop->On_Off_hookdll)
-	{
-		if (m_desktop->SetHook && g_obIPC.listall()!=NULL && m_desktop->can_be_hooked) 
-		{
+	if (m_desktop->On_Off_hookdll) {
+		if (m_desktop->SetHook && g_obIPC.listall()!=NULL && m_desktop->can_be_hooked) {
 			strcpy_s(g_hookstring,"schook");
 			DWORD dwTId(0);
 			if (threadHandle==NULL) threadHandle = CreateThread(NULL, 0, hookwatch, this, 0, &dwTId);
 			if (Handle_Ringbuffer(g_obIPC.listall(),rgncache)) return;
 		}
-
-		if (m_desktop->can_be_hooked)
-		{
-			if (!m_desktop->m_hookinited && m_desktop->m_bitmappointer)
-			{
-				strcpy_s(g_hookstring, "");
-				m_desktop->m_bitmappointer=false;
-				m_desktop->m_DIBbits=NULL;
-			}
+		if (m_desktop->can_be_hooked && !m_desktop->m_hookinited && m_desktop->m_bitmappointer) {
+			strcpy_s(g_hookstring, "");
+			m_desktop->m_bitmappointer=false;
+			m_desktop->m_DIBbits=NULL;
 		}
 	}
 	
 
 	DWORD lTime = timeGetTime();
-
 	m_desktop->m_buffer.SetAccuracy(m_desktop->m_server->TurboMode() ? 8 : 4); 
-	/*#ifdef _DEBUG
-			char			szText[256];
-			sprintf(szText,"Do polling %d\n",GetTickCount());
-			OutputDebugString(szText);		
-	#endif*/
+	if (cursormoved)  {
+		m_desktop->idle_counter=0;
+		m_lLastMouseMoveTime = lTime;
+	}
 
-	if (cursormoved) 
-		{
-			m_desktop->idle_counter=0;
-			m_lLastMouseMoveTime = lTime;
-		}
-	if ((m_desktop->m_server->PollFullScreen()) || (!m_desktop->can_be_hooked && !cursormoved))
-	{
-		int timeSinceLastMouseMove = lTime - m_lLastMouseMoveTime;
-			
-		if (timeSinceLastMouseMove > 50) // 150 ms pause after a Mouse move 
-		{
-			#ifdef _DEBUG
-				char			szText[256];
-				sprintf(szText,"Do polling2 %d\n",GetTickCount());
-				OutputDebugString(szText);		
-			#endif
-			//m_lLastMouseMoveTime = lTime;
+	if ((m_desktop->m_server->PollFullScreen()) || (!m_desktop->can_be_hooked && !cursormoved)) {
+		int timeSinceLastMouseMove = lTime - m_lLastMouseMoveTime;			
+		if (timeSinceLastMouseMove > 50) { // 50 ms pause after a Mouse move 
 			++fullpollcounter;
 			rfb::Rect r = m_desktop->GetSize();
 			// THIS FUNCTION IS A PIG. It uses too much CPU on older machines (PIII, P4)
-			if (vncService::InputDesktopSelected()!=2)
-			{
-				#ifdef _DEBUG
-					char			szText[256];
-					sprintf(szText,"FastDetectChanges %d\n",GetTickCount());
-					OutputDebugString(szText);		
-				#endif
-				if (m_desktop->FastDetectChanges(rgncache, r, 0, true)) capture=false;
-#ifdef _DEBUG
-				//char			szText[256];
-				sprintf(szText, "FastDetectChanges done %d\n", GetTickCount());
-				OutputDebugString(szText);
-#endif
+			if (vncService::InputDesktopSelected()!=2) {
+				if (m_desktop->FastDetectChanges(rgncache, r, 0, true)) 
+					capture=false;
 			}
 			else
-			{
 				capture=false;
-			}
-
 			// force full screen scan every three seconds after the mouse stops moving
-			if (fullpollcounter > 200) 
-			{
+			if (fullpollcounter > 20) {
 				rgncache.assign_union(m_desktop->m_Cliprect);
 				fullpollcounter = 0;
 			}
@@ -748,8 +711,7 @@ void vncDesktopThread::do_polling(HANDLE& threadHandle, rfb::Region2D& rgncache,
 	}
 		
     HWND hWndToPoll = 0;
-	if (m_desktop->m_server->PollForeground() || !m_desktop->can_be_hooked)
-	{
+	if (m_desktop->m_server->PollForeground() || !m_desktop->can_be_hooked) {
 		// Get the window rectangle for the currently selected window
 		hWndToPoll = GetForegroundWindow();
 		if (hWndToPoll != NULL)
@@ -757,12 +719,10 @@ void vncDesktopThread::do_polling(HANDLE& threadHandle, rfb::Region2D& rgncache,
 		
 	}
 	
-	if (m_desktop->m_server->PollUnderCursor() || !m_desktop->can_be_hooked)
-	{
+	if (m_desktop->m_server->PollUnderCursor() || !m_desktop->can_be_hooked) {
 		// Find the mouse position
 		POINT mousepos;
-		if (GetCursorPos(&mousepos))
-		{
+		if (GetCursorPos(&mousepos)) {
 			// Find the window under the mouse
 			HWND hwnd = WindowFromPoint(mousepos);
             // exclude the foreground window (done above) and desktop
@@ -779,13 +739,11 @@ vncDesktopThread::run_undetached(void *arg)
 	//*******************************************************
 	// INIT
 	//*******************************************************
-	if (m_server->AutoCapt() == 1)
-	{
+	if (m_server->AutoCapt() == 1) {
 		if (VNCOS.OS_VISTA||VNCOS.OS_WIN7||VNCOS.OS_WIN8) 
-		{
 			G_USE_PIXEL=false;
-		}
-		else G_USE_PIXEL=true;//testBench();
+		else 
+			G_USE_PIXEL=true;//testBench();
 	}
 	else if (m_server->AutoCapt() == 2)
 		G_USE_PIXEL=true;
@@ -801,15 +759,11 @@ vncDesktopThread::run_undetached(void *arg)
     vnclog.Print(LL_INTERR, VNCLOG("Hook changed 2\n"));
 	// Attempt to initialise and return success or failure
 	m_desktop->KillScreenSaver();
-	{
-		keybd_uni_event(VK_CONTROL, 0, 0, 0);
-        keybd_uni_event(VK_CONTROL, 0, KEYEVENTF_KEYUP, 0);
-		Sleep(500); //Give screen some time to kill screensaver
-	}
+	keybd_uni_event(VK_CONTROL, 0, 0, 0);
+    keybd_uni_event(VK_CONTROL, 0, KEYEVENTF_KEYUP, 0);
+	Sleep(500); //Give screen some time to kill screensaver
     DWORD startup_error;
-	if ((startup_error = m_desktop->Startup()) != 0)
-	{
-		//TAG14
+	if ((startup_error = m_desktop->Startup()) != 0) {
 		vncService::SelectHDESK(m_desktop->m_home_desktop);
 		if (m_desktop->m_input_desktop)
 			CloseDesktop(m_desktop->m_input_desktop);
@@ -943,19 +897,6 @@ vncDesktopThread::run_undetached(void *arg)
 		{
 			strcpy_s(g_hookstring,"ddengine");
 			waittime = 1000;
-			/*int fastcounter=0;
-			POINT cursorpos;
-			while (m_desktop->m_screenCapture->getPreviousCounter() == m_desktop->pchanges_buf->counter)
-			{
-				Sleep(5);
-				fastcounter++;
-				if (fastcounter>20)
-					break;
-				if (GetCursorPos(&cursorpos) && 
-										((cursorpos.x != oldcursorpos.x) ||
-										(cursorpos.y != oldcursorpos.y))) break;
-			}
-			waittime=0;*/
 		}
 		else if (waittime == 33)
 		{
@@ -978,47 +919,32 @@ vncDesktopThread::run_undetached(void *arg)
 			switch(result)
 			{
 				case WAIT_TIMEOUT:
-				case WAIT_OBJECT_0:
-				{
-				waiting_update=0;
-				ResetEvent(m_desktop->trigger_events[0]);
+				case WAIT_OBJECT_0: {
+					waiting_update=0;
+					ResetEvent(m_desktop->trigger_events[0]);
 							{
 								m_desktop->m_update_triggered = FALSE;
 								//measure current cpu usage of winvnc
-								/*if ((fullpollcounter==10 || fullpollcounter==0 || fullpollcounter==5)&& (m_server->MaxCpu()!=100)) cpuUsage = usage.GetUsage();
+								if ((fullpollcounter==10 || fullpollcounter==0 || fullpollcounter==5)&& (m_server->MaxCpu()!=100))
+									cpuUsage = usage.GetUsage();
 								if (cpuUsage > m_server->MaxCpu()) 
 									MIN_UPDATE_INTERVAL+=10;
 								else MIN_UPDATE_INTERVAL-=10;
 								if (MIN_UPDATE_INTERVAL<MIN_UPDATE_INTERVAL_MIN) MIN_UPDATE_INTERVAL=MIN_UPDATE_INTERVAL_MIN;
-								if (MIN_UPDATE_INTERVAL>MIN_UPDATE_INTERVAL_MAX) MIN_UPDATE_INTERVAL=MIN_UPDATE_INTERVAL_MAX;*/
+								if (MIN_UPDATE_INTERVAL>MIN_UPDATE_INTERVAL_MAX) MIN_UPDATE_INTERVAL=MIN_UPDATE_INTERVAL_MAX;
 
-
-					//			vnclog.Print(LL_INTERR, VNCLOG("!PeekMessage \n"));
 								// MAX 30fps
-								newtick = timeGetTime(); // Better resolution than GetTickCount ;)
+								newtick = timeGetTime(); 
 								if ((newtick-oldtick)<MIN_UPDATE_INTERVAL)
-								{
 									Sleep(MIN_UPDATE_INTERVAL-(newtick-oldtick));
-									//continue;  Verify, this can cause screen lockup
-									// We need another PeekMessage, but this is only done
-									// by hookdll and viewer asking for new update
-									// can cause a very long wait time
-								}	
 								
-								/*#ifdef _DEBUG
-										char			szText[256];
-										sprintf(szText," cpu2: %d %i %i\n",cpuUsage,MIN_UPDATE_INTERVAL,MIN_UPDATE_INTERVAL-(newtick-oldtick));
-										OutputDebugString(szText);		
-								#endif*/
-								//oldtick=newtick;
-								if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver) handle_driver_changes(rgncache,updates);								
-								//if (m_desktop->m_timerid==NULL) m_desktop->m_timerid = SetTimer(m_desktop->m_hwnd, 1, 100, NULL);
+								if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver) 
+									handle_driver_changes(rgncache,updates);								
 
 								//*******************************************************
 								// HOOKDLL START STOP need to be executed from the thread
 								//*******************************************************
-								if (m_desktop->Hookdll_Changed && !m_desktop->m_hookswitch)
-								{
+								if (m_desktop->Hookdll_Changed && !m_desktop->m_hookswitch) {
 									vnclog.Print(LL_INTERR, VNCLOG("Hook changed \n"));
 									m_desktop->StartStophookdll(m_desktop->On_Off_hookdll);
 									if (m_desktop->On_Off_hookdll)
@@ -1031,13 +957,11 @@ vncDesktopThread::run_undetached(void *arg)
 								//*******************************************************
 								// SCREEN DISPLAY HAS CHANGED, RESTART DRIVER (IF Used)
 								//*******************************************************
-								if (!m_server->IsThereFileTransBusy())
-									if (!handle_display_change(threadHandle, rgncache, clipped_updates, updates))
-									{
-										//failed we need to quit thread
-										looping=false;
-										break;
-									}
+								if (!m_server->IsThereFileTransBusy() && (!handle_display_change(threadHandle, rgncache, clipped_updates, updates))) {
+									//failed we need to quit thread
+									looping = false;
+									break;
+								}
 								//*******************************************************
 								// END SCREEN DISPLAY HAS CHANGED
 								//*******************************************************
@@ -1046,33 +970,20 @@ vncDesktopThread::run_undetached(void *arg)
 								// END DYNAMIC CHANGES
 								////////////////////////////////////////////////////////////////////////////////
 
-								//Beep(1000,10);
-								//
 								// CALCULATE CHANGES
-								m_desktop->m_UltraEncoder_used=m_desktop->m_server->IsThereAUltraEncodingClient();
-					//			vnclog.Print(LL_INTERR, VNCLOG("UpdateWanted B\n"));
-//#ifdef _DEBUG
-////										char			szText[256];
-//									sprintf(szText," m_desktop->m_server->UpdateWanted check\n");
-//										OutputDebugString(szText);		
-//#endif
+								m_desktop->m_UltraEncoder_used = m_desktop->m_server->IsThereAUltraEncodingClient();
+
 								omni_mutex_lock l(m_desktop->m_update_lock, 275);
-								if (m_desktop->m_server->UpdateWanted() || !initialupdate)
-								{
+								if (m_desktop->m_server->UpdateWanted() || !initialupdate) {
 									//omni_mutex_lock l(m_desktop->m_update_lock, 275);
 									oldtick=newtick;
 									bool cursormoved = false;
 									POINT cursorpos;
-									if (GetCursorPos(&cursorpos) && 
-										((cursorpos.x != oldcursorpos.x) ||
-										(cursorpos.y != oldcursorpos.y)))
-									{
+									if (GetCursorPos(&cursorpos) && ((cursorpos.x != oldcursorpos.x) ||(cursorpos.y != oldcursorpos.y))) {
 										cursormoved = TRUE;
 										oldcursorpos = rfb::Point(cursorpos);
-										// nyama/marscha - PointerPos. Inform clients about mouse move.
 										m_desktop->m_server->UpdateMouse();
-										if (MyGetCursorInfo)
-										{
+										if (MyGetCursorInfo) {
 											MyCURSORINFO cinfo;
 											cinfo.cbSize=sizeof(MyCURSORINFO);
 											MyGetCursorInfo(&cinfo);
@@ -1085,35 +996,24 @@ vncDesktopThread::run_undetached(void *arg)
 									//****************************************************************************
 									// Back removed, to many artifacts
 									bool s_moved=false;
-									//if ((cpuUsage >= m_server->MaxCpu()/2))
-									{
 									if (!m_desktop->m_hookdriver) 
 											s_moved=m_desktop->CalcCopyRects(updates);
-									}
+
 								
 									//****************************************************************************
 									//************* Polling ---- no driver
 									//****************************************************************************
-									if (!m_desktop->m_hookdriver || !m_desktop->can_be_hooked || m_desktop->no_default_desktop)
-									{
+									if (!m_desktop->m_hookdriver || !m_desktop->can_be_hooked || m_desktop->no_default_desktop) {
 										if (!s_moved)
-										do_polling(threadHandle, rgncache, fullpollcounter, cursormoved);
+											do_polling(threadHandle, rgncache, fullpollcounter, cursormoved);
 									}
 									//****************************************************************************
 									//************* driver  No polling
 									//****************************************************************************
-									else 
-									{
-										// long lTime = timeGetTime();
+									else  {
 										if (cursormoved)
-										{
-											// if (lTime - m_desktop->m_lLastMouseUpdateTime < 200)
-											// 	continue;
 											m_desktop->m_buffer.SetAccuracy(m_desktop->m_server->TurboMode() ? 2 : 1);
-											// m_desktop->m_lLastMouseUpdateTime = lTime;
-										}
 										else
-											// 4 is not that bad...but not perfect (especially with tree branchs display)
 											m_desktop->m_buffer.SetAccuracy(m_desktop->m_server->TurboMode() ? 4 : 2); 
 									}
 									
@@ -1129,32 +1029,24 @@ vncDesktopThread::run_undetached(void *arg)
 									// rendering parts of the screen the mouse moved through between
 									// client updates, since in practice they will probably not have changed.
 								
-									if (cursormoved && !m_desktop->m_hookdriver)
-										{
-											if (!m_desktop->m_cursorpos.is_empty())
-											{
-												// Cursor position seems to be outsite the bounding
-												// When you make the screen smaller
-												// add extra check
-												rfb::Rect rect;
-												int x = m_desktop->m_cursorpos.tl.x;
-												int w = m_desktop->m_cursorpos.br.x-x;
-												int y = m_desktop->m_cursorpos.tl.y;
-												int h = m_desktop->m_cursorpos.br.y-y;
-												if (ClipRect(&x, &y, &w, &h, m_desktop->m_bmrect.tl.x, m_desktop->m_bmrect.tl.y,
-													m_desktop->m_bmrect.br.x+m_desktop->m_bmrect.tl.x, m_desktop->m_bmrect.br.y+m_desktop->m_bmrect.tl.y))
-													{
-														rect.tl.x = x;
-														rect.br.x = x+w;
-														rect.tl.y = y;
-														rect.br.y = y+h;
-														rgncache.assign_union(rect);
-					//									vnclog.Print(LL_INTINFO, VNCLOG("6 %i %i %i %i \n"),m_desktop->m_cursorpos.br.x,m_desktop->m_cursorpos.br.y,m_desktop->m_cursorpos.tl.x,m_desktop->m_cursorpos.tl.y);
-					//									vnclog.Print(LL_INTINFO, VNCLOG("6 %i %i %i %i \n"),rect.br.x,rect.br.y,rect.tl.x,rect.tl.y);
-													}
-											}
-
+									if (cursormoved && !m_desktop->m_hookdriver && !m_desktop->m_cursorpos.is_empty()) {
+										// Cursor position seems to be outsite the bounding
+										// When you make the screen smaller
+										// add extra check
+										rfb::Rect rect;
+										int x = m_desktop->m_cursorpos.tl.x;
+										int w = m_desktop->m_cursorpos.br.x-x;
+										int y = m_desktop->m_cursorpos.tl.y;
+										int h = m_desktop->m_cursorpos.br.y-y;
+										if (ClipRect(&x, &y, &w, &h, m_desktop->m_bmrect.tl.x, m_desktop->m_bmrect.tl.y,
+												m_desktop->m_bmrect.br.x+m_desktop->m_bmrect.tl.x, m_desktop->m_bmrect.br.y+m_desktop->m_bmrect.tl.y)) {
+											rect.tl.x = x;
+											rect.br.x = x+w;
+											rect.tl.y = y;
+											rect.br.y = y+h;
+											rgncache.assign_union(rect);
 										}
+									}
 									
 
 									{
@@ -1164,11 +1056,8 @@ vncDesktopThread::run_undetached(void *arg)
 										// CHECK FOR COPYRECTS
 										// This actually just checks where the Foreground window is
 										// Back added, no need to stop polling during move
-										if ((cpuUsage < m_server->MaxCpu()/2))
-										{
-										if (!m_desktop->m_hookdriver && !s_moved)
+										if ((cpuUsage < m_server->MaxCpu()/2) && !m_desktop->m_hookdriver && !s_moved)
 											s_moved=m_desktop->CalcCopyRects(updates);
-										}
 										
 										// GRAB THE DISPLAY
 										// Fetch data from the display to our display cache.
@@ -1179,101 +1068,77 @@ vncDesktopThread::run_undetached(void *arg)
 										// Otherwise we're still getting driver updates (from shared memory buffer)
 										// after a m_hookdriver switching from on to off 
 										// (and m_hookdll from off to on) that causes mouse cursor garbage,
-										// or missing mouse cursor.
-										/*char tempchar[10];
-										if ((newtick-oldtick2) != 0) itoa(1000/((newtick-oldtick2)),tempchar,10);
-										oldtick2=newtick;
-										m_desktop->m_buffer.WriteMessageOnScreen(tempchar);*/			
-										if (PreConnect)
-										{
-											if (m_desktop->m_server->IsEncoderSet()) m_desktop->m_buffer.WriteMessageOnScreenPreConnect();
+										// or missing mouse cursor.		
+										if (PreConnect && m_desktop->m_server->IsEncoderSet())
+											m_desktop->m_buffer.WriteMessageOnScreenPreConnect();
+										else if (!PreConnect && m_desktop->VideoBuffer() && m_desktop->m_hookdriver) {
+											m_desktop->m_buffer.GrabRegion(rgncache, true, capture);
 										}
-										else
-										{
-											if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver)
-											{
-												m_desktop->m_buffer.GrabRegion(rgncache, true, capture);
-											}
-											else
-											{
-												m_desktop->m_buffer.GrabRegion(rgncache,false,capture);
-											}
-										}
+										else if (!PreConnect)
+											m_desktop->m_buffer.GrabRegion(rgncache,false,capture);
+
 										capture=true;
 											
 										// sf@2002 - v1.1.x - Mouse handling
 										// If one client, send cursor shapes only when the cursor changes.
 										// This is Disabled for now.
-										if( !XRichCursorEnabled==m_desktop->m_server->IsXRichCursorEnabled())
-											{
-												XRichCursorEnabled= (FALSE != m_desktop->m_server->IsXRichCursorEnabled());
-												if (m_desktop->m_screenCapture)
-														{
-																if (!XRichCursorEnabled) m_desktop->m_screenCapture->hardwareCursor();
-																else m_desktop->m_screenCapture->noHardwareCursor();
-														}
+										if( !XRichCursorEnabled==m_desktop->m_server->IsXRichCursorEnabled()) {
+											XRichCursorEnabled= (FALSE != m_desktop->m_server->IsXRichCursorEnabled());
+											if (m_desktop->m_screenCapture)
+												if (!XRichCursorEnabled) 
+													m_desktop->m_screenCapture->hardwareCursor();
+												else 
+													m_desktop->m_screenCapture->noHardwareCursor();
+										}
 
+										if (m_desktop->m_server->IsXRichCursorEnabled()) {
+											if (m_desktop->m_hcursor != m_desktop->m_hOldcursor || m_desktop->m_buffer.IsShapeCleared()) {
+												m_desktop->m_hOldcursor = m_desktop->m_hcursor;
+												m_desktop->m_buffer.SetCursorPending(TRUE);
+												if (!m_desktop->m_hookdriver  || !m_desktop->can_be_hooked) 
+													m_desktop->m_buffer.GrabMouse(); // Grab mouse cursor in all cases
+												m_desktop->m_server->UpdateMouse();
+												rfb::Rect rect;
+												int x = m_desktop->m_cursorpos.tl.x;
+												int w = m_desktop->m_cursorpos.br.x-x;
+												int y = m_desktop->m_cursorpos.tl.y;
+												int h = m_desktop->m_cursorpos.br.y-y;
+												if (ClipRect(&x, &y, &w, &h, m_desktop->m_bmrect.tl.x, m_desktop->m_bmrect.tl.y,
+												m_desktop->m_bmrect.br.x+m_desktop->m_bmrect.tl.x, m_desktop->m_bmrect.br.y+m_desktop->m_bmrect.tl.y)) {
+													rect.tl.x = x;
+													rect.br.x = x+w;
+													rect.tl.y = y;
+													rect.br.y = y+h;
+													rgncache.assign_union(rect);
+												}
+												m_server->UpdateCursorShape();
 											}
-										if (m_desktop->m_server->IsXRichCursorEnabled())// && (!m_desktop->m_UltraEncoder_used  || VNCOS.OS_WIN8) )
-											{
-												if (m_desktop->m_hcursor != m_desktop->m_hOldcursor || m_desktop->m_buffer.IsShapeCleared())
-														{
-																m_desktop->m_hOldcursor = m_desktop->m_hcursor;
-																m_desktop->m_buffer.SetCursorPending(TRUE);
-																if (!m_desktop->m_hookdriver  || !m_desktop->can_be_hooked) m_desktop->m_buffer.GrabMouse(); // Grab mouse cursor in all cases
-																m_desktop->m_server->UpdateMouse();
-																rfb::Rect rect;
-																int x = m_desktop->m_cursorpos.tl.x;
-																int w = m_desktop->m_cursorpos.br.x-x;
-																int y = m_desktop->m_cursorpos.tl.y;
-																int h = m_desktop->m_cursorpos.br.y-y;
-																if (ClipRect(&x, &y, &w, &h, m_desktop->m_bmrect.tl.x, m_desktop->m_bmrect.tl.y,
-																	m_desktop->m_bmrect.br.x+m_desktop->m_bmrect.tl.x, m_desktop->m_bmrect.br.y+m_desktop->m_bmrect.tl.y))
-																		{
-																			rect.tl.x = x;
-																			rect.br.x = x+w;
-																			rect.tl.y = y;
-																			rect.br.y = y+h;
-																			rgncache.assign_union(rect);
-					//														vnclog.Print(LL_INTINFO, VNCLOG("7 %i %i %i %i \n"),m_desktop->m_cursorpos.br.x,m_desktop->m_cursorpos.br.y,m_desktop->m_cursorpos.tl.x,m_desktop->m_cursorpos.tl.y);
-					//														vnclog.Print(LL_INTINFO, VNCLOG("6 %i %i %i %i \n"),rect.br.x,rect.br.y,rect.tl.x,rect.tl.y);
-																		}
-																m_server->UpdateCursorShape();
-																}
+										}
+										else if (!m_desktop->m_hookdriver  || !m_desktop->can_be_hooked) {												
+											// Render the mouse
+											//if (!m_desktop->VideoBuffer())
+											m_desktop->m_buffer.GrabMouse();											
+											if (cursormoved) {
+												// Inform clients that it has moved
+												m_desktop->m_server->UpdateMouse();
+												// Get the buffer to fetch the pointer bitmap
+												if (!m_desktop->m_cursorpos.is_empty())	{
+													rfb::Rect rect;
+													int x = m_desktop->m_cursorpos.tl.x;
+													int w = m_desktop->m_cursorpos.br.x-x;
+													int y = m_desktop->m_cursorpos.tl.y;
+													int h = m_desktop->m_cursorpos.br.y-y;
+													if (ClipRect(&x, &y, &w, &h, m_desktop->m_bmrect.tl.x, m_desktop->m_bmrect.tl.y,
+															m_desktop->m_bmrect.br.x+m_desktop->m_bmrect.tl.x, m_desktop->m_bmrect.br.y+m_desktop->m_bmrect.tl.y)) {
+														rect.tl.x = x;
+														rect.br.x = x+w;
+														rect.tl.y = y;
+														rect.br.y = y+h;
+														rgncache.assign_union(rect);
+													}
+												}
 											}
-										else if (!m_desktop->m_hookdriver  || !m_desktop->can_be_hooked)// If several clients, send them all the mouse updates
-											{												
-												// Render the mouse
-												//if (!m_desktop->VideoBuffer())
-												m_desktop->m_buffer.GrabMouse();
-												
-												if (cursormoved /*&& !m_desktop->m_buffer.IsCursorUpdatePending()*/) 
-															{
-																// Inform clients that it has moved
-																m_desktop->m_server->UpdateMouse();
-																// Get the buffer to fetch the pointer bitmap
-																if (!m_desktop->m_cursorpos.is_empty())
-																{
-																	rfb::Rect rect;
-																int x = m_desktop->m_cursorpos.tl.x;
-																int w = m_desktop->m_cursorpos.br.x-x;
-																int y = m_desktop->m_cursorpos.tl.y;
-																int h = m_desktop->m_cursorpos.br.y-y;
-																if (ClipRect(&x, &y, &w, &h, m_desktop->m_bmrect.tl.x, m_desktop->m_bmrect.tl.y,
-																	m_desktop->m_bmrect.br.x+m_desktop->m_bmrect.tl.x, m_desktop->m_bmrect.br.y+m_desktop->m_bmrect.tl.y))
-																		{
-																			rect.tl.x = x;
-																			rect.br.x = x+w;
-																			rect.tl.y = y;
-																			rect.br.y = y+h;
-																			rgncache.assign_union(rect);
-																			//vnclog.Print(LL_INTINFO, VNCLOG("8 %i %i %i %i \n"),m_desktop->m_cursorpos.br.x,m_desktop->m_cursorpos.br.y,m_desktop->m_cursorpos.tl.x,m_desktop->m_cursorpos.tl.y);
-																			//vnclog.Print(LL_INTINFO, VNCLOG("8 %i %i %i %i \n"),rect.br.x,rect.br.y,rect.tl.x,rect.tl.y);
-																		}
-																}
-
-															}
-												}	
+										}	
 										
 											
 										// SCAN THE CHANGED REGION FOR ACTUAL CHANGES
@@ -1288,71 +1153,56 @@ vncDesktopThread::run_undetached(void *arg)
 										rfb::Region2D cachedrgn;
 											
 										//Update the backbuffer for the copyrect region
-										if (!clipped_updates.get_copied_region().is_empty()) 
-											{
-												rfb::UpdateInfo update_info;
-												rfb::RectVector::const_iterator i;
-												clipped_updates.get_update(update_info);
-												if (!update_info.copied.empty()) 
-													{
-														for (i=update_info.copied.begin(); i!=update_info.copied.end(); i++) 						
-															m_desktop->m_buffer.CopyRect(*i, update_info.copy_delta);
-													}
-											}
-#ifdef _DEBUG
-			char			szText[256];
-			sprintf(szText,"checkrgn, change, cache  %i %i %i %i \n",!checkrgn.is_empty(),!changedrgn.is_empty() , !cachedrgn.is_empty(), !rgncache.is_empty());
-			OutputDebugString(szText);		
-#endif
+										if (!clipped_updates.get_copied_region().is_empty()) {
+											rfb::UpdateInfo update_info;
+											rfb::RectVector::const_iterator i;
+											clipped_updates.get_update(update_info);
+											if (!update_info.copied.empty()) 
+												for (i=update_info.copied.begin(); i!=update_info.copied.end(); i++) 						
+													m_desktop->m_buffer.CopyRect(*i, update_info.copy_delta);
+										}
 										//Remove the copyrect region from the other updates																
 										checkrgn = rgncache.subtract(clipped_updates.get_copied_region());	
 										//make sure the copyrect is checked next update
-										if (!clipped_updates.get_copied_region().is_empty() && (cpuUsage < m_server->MaxCpu()/2))
-										{
+										if (!clipped_updates.get_copied_region().is_empty() && (cpuUsage < m_server->MaxCpu()/2)) {
 
 											rfb::UpdateInfo update_info;
-												rfb::RectVector::const_iterator i;
-												clipped_updates.get_update(update_info);
-												if (!update_info.copied.empty()) 
-													{
-														for (i=update_info.copied.begin(); i!=update_info.copied.end(); i++) 						
-														{
-															rfb::Rect rect;
-															rect.br.x=i->br.x+4;
-															rect.br.y=i->br.y+4;
-															rect.tl.x=i->tl.x-4;
-															rect.tl.y=i->tl.y-4;
-															rect = rect.intersect(m_desktop->m_Cliprect);
-															rgncache=rgncache.union_(rect);
-															rfb::Rect src = rect.translate(update_info.copy_delta.negate());
-															src = src.intersect(m_desktop->m_Cliprect);
-															rgncache=rgncache.union_(src);
-														}
-													}
+											rfb::RectVector::const_iterator i;
+											clipped_updates.get_update(update_info);
+											if (!update_info.copied.empty())  {
+												for (i=update_info.copied.begin(); i!=update_info.copied.end(); i++) {
+													rfb::Rect rect;
+													rect.br.x=i->br.x+4;
+													rect.br.y=i->br.y+4;
+													rect.tl.x=i->tl.x-4;
+													rect.tl.y=i->tl.y-4;
+													if (m_desktop->m_screenCapture)
+														rect = rect.intersect(m_desktop->m_Cliprect);
+													rgncache=rgncache.union_(rect);
+													rfb::Rect src = rect.translate(update_info.copy_delta.negate());
+													src = src.intersect(m_desktop->m_Cliprect);
+													rgncache=rgncache.union_(src);
+												}
+											}
 										}
 										else
 											rgncache = clipped_updates.get_copied_region();
 
-#ifdef _DEBUG
-			//char			szText[256];
-			sprintf(szText,"checkrgn, change, cache  %i %i %i %i \n",!checkrgn.is_empty(),!changedrgn.is_empty() , !cachedrgn.is_empty(), !rgncache.is_empty());
-			OutputDebugString(szText);		
-#endif
 										
 										//Check all regions for changed and cached parts
 										//This is very cpu intensive, only check once for all viewers
-										checkrgn = checkrgn.intersect(m_desktop->m_Cliprect);
+										//checkrgn = checkrgn.intersect(m_desktop->m_Cliprect);
 
 										if (!checkrgn.is_empty()) {
 											if (m_desktop->m_screenCapture)
 												m_desktop->m_screenCapture->Lock();
 											m_desktop->m_buffer.CheckRegion(changedrgn,cachedrgn, checkrgn);
-											//if(m_desktop->m_screenCapture && changedrgn.is_empty() && cachedrgn.is_empty())
+											if(m_desktop->m_screenCapture)
 												m_desktop->m_screenCapture->Unlock();
 										}
 
 #ifdef _DEBUG
-			//char			szText[256];
+			char			szText[256];
 			sprintf(szText,"checkrgn, change, cache  %i %i %i \n",!checkrgn.is_empty(),!changedrgn.is_empty() , !cachedrgn.is_empty());
 			OutputDebugString(szText);
 			rfb::RectVector rects;
@@ -1369,14 +1219,12 @@ vncDesktopThread::run_undetached(void *arg)
 			}
 
 #endif
-										if (!initialupdate)
-											{
-												m_server->InitialUpdate(true);
-												initialupdate=true;
-												// JnZn558
-												m_desktop->m_old_monitor = MULTI_MON_ALL;
-												//
-											}
+
+										if (!initialupdate) {
+											m_server->InitialUpdate(true);
+											initialupdate=true;
+											m_desktop->m_old_monitor = MULTI_MON_ALL;
+										}
 										updates.add_changed(changedrgn);
 										updates.add_cached(cachedrgn);
 												
@@ -1386,17 +1234,14 @@ vncDesktopThread::run_undetached(void *arg)
 									// Clear the update tracker and region cache an solid
 									clipped_updates.clear();
 									// screen blanking
-									if (m_desktop->m_screen_in_powersave)
-										{
-										if (!VNCOS.CaptureAlphaBlending() || m_desktop->VideoBuffer())
-											{	DWORD new_timer=GetTickCount();
-												if ((new_timer-monitor_sleep_timer)>500)
-												{
-													SendMessage(m_desktop->m_hwnd,WM_SYSCOMMAND,SC_MONITORPOWER,(LPARAM)2);
-													monitor_sleep_timer=new_timer;
-												}
-											}
+									if (m_desktop->m_screen_in_powersave && (!VNCOS.CaptureAlphaBlending() || m_desktop->VideoBuffer())) {
+										DWORD new_timer=GetTickCount();
+										if ((new_timer-monitor_sleep_timer)>500) {
+											SendMessage(m_desktop->m_hwnd,WM_SYSCOMMAND,SC_MONITORPOWER,(LPARAM)2);
+											monitor_sleep_timer=new_timer;
 										}
+									}
+
 					#ifdef AVILOG
 									if (m_desktop->AviGen) m_desktop->AviGen->AddFrame((BYTE*)m_desktop->m_DIBbits);
 					#endif

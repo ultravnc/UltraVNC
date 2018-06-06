@@ -392,11 +392,6 @@ protected:
 	// HDC	         m_hDC;			 // Local Screen Device context to capture our Grid of pixels 
 	int          m_nGridCycle;   // Cycle index for grid shifting
 
-	// Modif sf@2002 - v1.1.0
-	long         m_lLastMouseUpdateTime;
-	long         m_lLastSlowClientTestTime;
-	// long			m_lLastTempo;
-
 	// sf@2002 - TextChat - No more used for now
 	// bool m_fTextChatRunning;
 	// TextChat* m_pCurrentTextChat;

@@ -483,11 +483,6 @@ vncDesktop::vncDesktop()
 	m_lGridsList.clear();
 	m_nGridCycle = 0;
 
-	// Modif sf@2002 - v1.1.0
-	// m_lLastTempo = 0L;
-	m_lLastMouseUpdateTime = 0L;
-	m_lLastSlowClientTestTime = timeGetTime();
-
 	// sf@2002 - TextChat - No more used for now
 	// m_fTextChatRunning = false;
 	// m_pCurrentTextChat = NULL;
@@ -1800,12 +1795,12 @@ vncDesktop::CaptureMouse(BYTE *scrBuff, UINT scrBuffSize)
 	if (!GetCursorPos(&CursorPos))
 		return;
 	RECT testrect;
-	testrect.top = m_Cliprect.tl.y;
-	testrect.bottom = m_Cliprect.br.y;
-	testrect.left = m_Cliprect.tl.x;
-	testrect.right = m_Cliprect.br.x;
-
-	if (!PtInRect(&testrect, CursorPos)) return;
+	testrect.top = m_Cliprect.tl.y + m_ScreenOffsety;
+	testrect.bottom = m_Cliprect.br.y + m_ScreenOffsety;
+	testrect.left = m_Cliprect.tl.x + m_ScreenOffsetx;
+	testrect.right = m_Cliprect.br.x + m_ScreenOffsetx;
+	if (!PtInRect(&testrect, CursorPos)) 
+		return;
 
 	// Translate position for hotspot
 	if (GetIconInfo(m_hcursor, &IconInfo))
@@ -2216,8 +2211,14 @@ void vncDesktop::SetSW(int x, int y)
 		case 2:
 		{
 			if (m_current_monitor == MULTI_MON_PRIMARY) {
-				m_current_monitor = MULTI_MON_SECOND;
-				m_buffer.MultiMonitors(1);
+				if (m_screenCapture) {
+					m_current_monitor = MULTI_MON_SECOND;
+					m_buffer.MultiMonitors(1);
+				}
+				else {
+					m_current_monitor = MULTI_MON_ALL;
+					m_buffer.MultiMonitors(2);
+				}
 			}
 			else if (m_current_monitor == MULTI_MON_SECOND) {
 				m_current_monitor = MULTI_MON_ALL;

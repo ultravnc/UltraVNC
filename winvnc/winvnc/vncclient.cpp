@@ -2341,8 +2341,6 @@ vncClientThread::run(void *arg)
 	// Modif sf@2002 - Scaling
 	server_ini.framebufferWidth = Swap16IfLE(m_client->m_ScaledScreen.br.x - m_client->m_ScaledScreen.tl.x);
 	server_ini.framebufferHeight = Swap16IfLE(m_client->m_ScaledScreen.br.y - m_client->m_ScaledScreen.tl.y);
-	// server_ini.framebufferWidth = Swap16IfLE(m_client->m_fullscreen.br.x-m_client->m_fullscreen.tl.x);
-	// server_ini.framebufferHeight = Swap16IfLE(m_client->m_fullscreen.br.y-m_client->m_fullscreen.tl.y);
 
 	server_ini.format.redMax = Swap16IfLE(server_ini.format.redMax);
 	server_ini.format.greenMax = Swap16IfLE(server_ini.format.greenMax);
@@ -5000,21 +4998,19 @@ void
 vncClient::UpdateMouse()
 {
 	RECT testrect;
-	testrect.top = m_encodemgr.m_buffer->m_desktop->m_Cliprect.tl.y;
-	testrect.bottom = m_encodemgr.m_buffer->m_desktop->m_Cliprect.br.y;
-	testrect.left = m_encodemgr.m_buffer->m_desktop->m_Cliprect.tl.x;
-	testrect.right = m_encodemgr.m_buffer->m_desktop->m_Cliprect.br.x;
-	{
-		POINT cursorPos;
-		GetCursorPos(&cursorPos);
-		if (!PtInRect(&testrect, cursorPos)) return;
-	}
-	
+	testrect.top = m_encodemgr.m_buffer->m_desktop->m_Cliprect.tl.y + m_ScreenOffsety + monitor_Offsety;
+	testrect.bottom = m_encodemgr.m_buffer->m_desktop->m_Cliprect.br.y + m_ScreenOffsety + monitor_Offsety;
+	testrect.left = m_encodemgr.m_buffer->m_desktop->m_Cliprect.tl.x + m_ScreenOffsetx + monitor_Offsetx;
+	testrect.right = m_encodemgr.m_buffer->m_desktop->m_Cliprect.br.x + m_ScreenOffsetx + monitor_Offsetx;
 
-	if (!m_mousemoved && !m_cursor_update_sent)
-	{
-	omni_mutex_lock l(GetUpdateLock(),93);
-    m_mousemoved=TRUE;
+	POINT cursorPos;
+	GetCursorPos(&cursorPos);
+	if (!PtInRect(&testrect, cursorPos)) 
+		return;
+
+	if (!m_mousemoved && !m_cursor_update_sent) {
+		omni_mutex_lock l(GetUpdateLock(),93);
+		m_mousemoved=TRUE;
 	}
 	// nyama/marscha - PointerPos
 	// PointerPos code doesn take in account prim/secundary display
