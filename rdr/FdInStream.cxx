@@ -59,7 +59,6 @@ FdInStream::FdInStream(int fd_, int timeout_, int bufSize_)
 	m_nReadSize = 0;
 
 	m_nBytesRead = 0; // For stats
-	FT = false;
 }
 
 FdInStream::FdInStream(int fd_, void (*blockCallback_)(void*),
@@ -76,19 +75,11 @@ FdInStream::FdInStream(int fd_, void (*blockCallback_)(void*),
 	m_fReadFromNetRectBuf = false;
 	m_nNetRectBufOffset = 0;
 	m_nReadSize = 0;
-	FT = false;
 }
 
 FdInStream::~FdInStream()
 {
   delete [] start;
-}
-
-void
-FdInStream::Update_socket()
-{
-  // test, not used
-  //fd=INVALID_SOCKET;
 }
 
 
@@ -227,11 +218,6 @@ Passedusecs()
   return usecs;
 }
 #endif
-
-void FdInStream::setFT(bool value)
-{
-	FT = value;
-}
 
 int FdInStream::readWithTimeoutOrCallback(void* buf, int len)
 {

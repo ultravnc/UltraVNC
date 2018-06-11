@@ -249,7 +249,6 @@ VNCOptions::VNCOptions()
   m_FTTimeout = FT_RECV_TIMEOUT;
   m_keepAliveInterval = KEEPALIVE_INTERVAL;
   m_IdleInterval = 0;
-  m_socketKeepAliveTimeout = SOCKET_KEEPALIVE_TIMEOUT; // adzm 2010-08
 
   m_throttleMouse = 0; // adzm 2010-10
 
@@ -429,7 +428,6 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
   m_FTTimeout =  s.m_FTTimeout;
   m_keepAliveInterval = s.m_keepAliveInterval;
   m_IdleInterval = s.m_IdleInterval;
-  m_socketKeepAliveTimeout = s.m_socketKeepAliveTimeout; // adzm 2010-08
 
   m_throttleMouse = s.m_throttleMouse; // adzm 2010-10
 
@@ -569,8 +567,8 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
           ArgError(sz_D3);
           continue;
         }
-        if (m_FTTimeout > 60)
-            m_FTTimeout = 60;
+        if (m_FTTimeout > 600)
+            m_FTTimeout = 600;
         j++;
       }
     }  else if (SwitchMatch(args[j], _T("keepalive"))) { //PGM @ Advantig
@@ -585,12 +583,11 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
       }
 	} else if ( SwitchMatch(args[j], _T("socketkeepalivetimeout"))) { // adzm 2010-08 
       if (j+1 < i && args[j+1][0] >= '0' && args[j+1][0] <= '9') {
+		int m_socketKeepAliveTimeout;
         if (_stscanf(args[j+1], _T("%d"), &m_socketKeepAliveTimeout) != 1) {
           ArgError(sz_D3);
           continue;
         }
-        if (m_socketKeepAliveTimeout < 0)
-            m_socketKeepAliveTimeout = 0;
         j++;
       }
     } else if ( SwitchMatch(args[j], _T("askexit"))) { //PGM @ Advantig
@@ -1130,8 +1127,6 @@ void VNCOptions::Save(char *fname)
   saveInt("FileTransferTimeout",    m_FTTimeout,    fname);
   saveInt("KeepAliveInterval",      m_keepAliveInterval,    fname);
 
-  saveInt("SocketKeepAliveTimeout", m_socketKeepAliveTimeout,    fname); // adzm 2010-08
-
   saveInt("ThrottleMouse", m_throttleMouse,    fname); // adzm 2010-10
 
   //adzm 2009-06-21
@@ -1230,16 +1225,12 @@ void VNCOptions::Load(char *fname)
   
   m_fExitCheck =		readInt("ExitCheck", m_fExitCheck,  fname) != 0; //PGM @ Advantig
   m_FTTimeout  = readInt("FileTransferTimeout", m_FTTimeout, fname);
-  if (m_FTTimeout > 60)
-      m_FTTimeout = 60; // cap at 1 minute
+  if (m_FTTimeout > 600)
+      m_FTTimeout = 600; // cap at 1 minute
 
   m_keepAliveInterval  = readInt("KeepAliveInterval", m_keepAliveInterval, fname);
   if (m_keepAliveInterval >= (m_FTTimeout - KEEPALIVE_HEADROOM))
       m_keepAliveInterval = (m_FTTimeout  - KEEPALIVE_HEADROOM); 
-
-  m_socketKeepAliveTimeout  = readInt("SocketKeepAliveTimeout", m_socketKeepAliveTimeout, fname); // adzm 2010-08
-  if (m_socketKeepAliveTimeout < 0)
-      m_socketKeepAliveTimeout = 0; 
 
   m_throttleMouse = readInt("ThrottleMouse", m_throttleMouse, fname); // adzm 2010-10
 

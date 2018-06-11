@@ -43,7 +43,6 @@ namespace rdr {
     void readBytes(void* data, int length);
     int bytesInBuf() { return end - ptr; }
 
-	void Update_socket();
     void startTiming();
     void stopTiming();
     unsigned int kbitsPerSecond();
@@ -54,13 +53,11 @@ namespace rdr {
 	bool GetReadFromMemoryBuffer(void) {return m_fReadFromNetRectBuf;}; // sf@2002 
 	__int64 GetBytesRead() {return m_nBytesRead;};
 	int Check_if_buffer_has_data();
-	void setFT(bool value);
 
   protected:
     int overrun(int itemSize, int nItems);
 
   private:
-	 bool FT;
     int checkReadable(int fd, int timeout);
     int readWithTimeoutOrCallback(void* buf, int len);
 

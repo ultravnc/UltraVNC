@@ -4187,7 +4187,6 @@ void ClientConnection::KillThread()
 	m_running = false;
 
 	if (m_sock != INVALID_SOCKET) {
-		fis->Update_socket();
 		shutdown(m_sock, SD_BOTH);
 		closesocket(m_sock);
 		m_sock = INVALID_SOCKET;
@@ -7795,11 +7794,9 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 
 						// Call FileTransfer Dialog
 						_this->m_pFileTransfer->m_fFileTransferRunning = true;
-						_this->fis->setFT(true);
 						_this->m_pFileTransfer->m_fFileCommandPending = false;
 						_this->m_pFileTransfer->DoDialog();
 						_this->m_pFileTransfer->m_fFileTransferRunning = false;
-						_this->fis->setFT(false);
 						// Refresh Screen
 						// _this->SendFullFramebufferUpdateRequest();
 						//adzm 2010-09
@@ -9539,10 +9536,13 @@ ClientConnection:: Check_Rectangle_borders(int x,int y,int w,int h)
 // adzm 2010-09
 void ClientConnection::SendKeepAlive(bool bForce, bool bAsync)
 {
-	if (bAsync) {
-		PostMessage(m_hwndcn, WM_SENDKEEPALIVE, (WPARAM)(bForce ? 1 : 0), (LPARAM)0);
-	} else {
-		SendMessage(m_hwndcn, WM_SENDKEEPALIVE, (WPARAM)(bForce ? 1 : 0), (LPARAM)0);
+	if (m_opts.m_keepAliveInterval > 0)
+	{
+		if (bAsync) {
+			PostMessage(m_hwndcn, WM_SENDKEEPALIVE, (WPARAM)(bForce ? 1 : 0), (LPARAM)0);
+		} else {
+			SendMessage(m_hwndcn, WM_SENDKEEPALIVE, (WPARAM)(bForce ? 1 : 0), (LPARAM)0);
+		}
 	}
 }
 
