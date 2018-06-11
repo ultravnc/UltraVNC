@@ -1496,6 +1496,8 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 		  if (_this->m_Shared)
 		  SetDlgItemInt( hwnd, IDC_SERVER_RECON_TIME, _this->m_autoReconnect, FALSE);
 		  else SetDlgItemInt( hwnd, IDC_SERVER_RECON_TIME, 0, FALSE);
+
+		  SetDlgItemInt( hwnd, IDC_FTTIMEOUT, _this->m_FTTimeout, FALSE);
 		  
 		  // Modif sf@2002 - Cache 
 		  HWND hCache = GetDlgItem(hwnd, ID_SESSION_SET_CACHE);
@@ -1700,6 +1702,8 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 			 if (_this->m_Shared)
 			  _this->m_autoReconnect = GetDlgItemInt( hwnd, IDC_SERVER_RECON_TIME, NULL, TRUE);
 			 else _this->m_autoReconnect=0;
+
+			 _this->m_FTTimeout = GetDlgItemInt( hwnd, IDC_FTTIMEOUT, NULL, TRUE);
 
 
 			  
