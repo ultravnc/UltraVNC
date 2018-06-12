@@ -1995,7 +1995,8 @@ VSocket::ReadExact(char *buff, const VCard bufflen,int allsock)
 VBool
 VSocket::ReadExact(char *buff, const VCard bufflen)
 {	
-	if (sock==-1) return VFalse;
+	if (sock==-1) 
+		return VFalse;
 	//adzm 2010-09
 	if (bufflen <=0) {
 		return VTrue;

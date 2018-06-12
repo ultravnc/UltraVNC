@@ -132,8 +132,8 @@ UINT vncEncodeXZ::EncodeBulkRects(const rfb::RectVector &allRects, BYTE *source,
 		const rfb::Rect& rect(*i);
 
 		rfbRectangle rectangle;
-		rectangle.x = Swap16IfLE(rect.tl.x-m_SWOffsetx);
-		rectangle.y = Swap16IfLE(rect.tl.y-m_SWOffsety);
+		rectangle.x = Swap16IfLE(rect.tl.x- monitor_Offsetx);
+		rectangle.y = Swap16IfLE(rect.tl.y- monitor_Offsety);
 		rectangle.w = Swap16IfLE(rect.br.x - rect.tl.x);
 		rectangle.h = Swap16IfLE(rect.br.y - rect.tl.y);
 
@@ -206,8 +206,8 @@ UINT vncEncodeXZ::EncodeRect(BYTE *source, BYTE *dest, const rfb::Rect &rect)
 	xzos->flush();
 
 	rfbFramebufferUpdateRectHeader* surh = (rfbFramebufferUpdateRectHeader*)dest;
-	surh->r.x = Swap16IfLE(x-m_SWOffsetx);
-	surh->r.y = Swap16IfLE(y-m_SWOffsety);
+	surh->r.x = Swap16IfLE(x- monitor_Offsetx);
+	surh->r.y = Swap16IfLE(y- monitor_Offsety);
 	surh->r.w = Swap16IfLE(w);
 	surh->r.h = Swap16IfLE(h);
 	if( m_use_xzyw ){

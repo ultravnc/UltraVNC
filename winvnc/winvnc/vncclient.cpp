@@ -2513,21 +2513,7 @@ vncClientThread::run(void *arg)
 		{
 
         case rfbKeepAlive:
-            // nothing else to read.
-            // NO-OP
-#if defined(_DEBUG)
-                    {
-                        static time_t lastrecv = 0;
-                        time_t now = time(&now);
-                        time_t delta = now - lastrecv;
-                        lastrecv = now;
-                        char msgg[255];
-                        sprintf(msgg, "keepalive received %u seconds since last one\n", delta);
-                        OutputDebugString(msgg);
-
-                    }
-#endif
-					need_keepalive = true;
+				need_keepalive = true;
             break;
 
 		case rfbSetPixelFormat:
@@ -3230,7 +3216,8 @@ vncClientThread::run(void *arg)
 				break;
 			}
 
-			if (!m_client->NotifyUpdate(msg.fur)) m_client->cl_connected = FALSE;
+			if (!m_client->NotifyUpdate(msg.fur)) 
+				m_client->cl_connected = FALSE;
 			break;
 
 		case rfbKeyEvent:
@@ -3858,152 +3845,7 @@ vncClientThread::run(void *arg)
 
 					// The client requests a File
 					case rfbFileTransferRequest:
-					{
-						m_client->filetransferrequestPart1(msg, fUserOk);
-
-						/*omni_mutex_lock ll(m_client->GetUpdateLock(), 90);
-						m_client->m_fCompressionEnabled = (Swap32IfLE(msg.ft.size) == 1);
-						const UINT length = Swap32IfLE(msg.ft.length);
-						memset(m_client->m_szSrcFileName, 0, sizeof(m_client->m_szSrcFileName));
-						if (length > sizeof(m_client->m_szSrcFileName)) break;
-						// Read in the Name of the file to create
-						if (!m_socket->ReadExact(m_client->m_szSrcFileName, length))
-						{
-							//MessageBoxSecure(NULL, "4. Abort !", "Ultra WinVNC", MB_OK);
-							//vnclog.Print(LL_INTINFO, VNCLOG("*** FileTransfer: Cannot read requested filename. Abort !\n"));
-							break;
-						}
-
-						// moved jdp 8/5/08 -- have to read whole packet to keep protocol in sync
-						if (!m_server->FileTransferEnabled() || !fUserOk) break;
-						// sf@2003 - Directory Transfer trick
-						// If the file is an Ultra Directory Zip Request we zip the directory here
-						// and we give it the requested name for transfer
-
-						int nDirZipRet = m_client->ZipPossibleDirectory(m_client->m_szSrcFileName);
-						if (nDirZipRet == -1)
-						{
-							//MessageBoxSecure(NULL, "5. Abort !", "Ultra WinVNC", MB_OK);
-							//vnclog.Print(LL_INTINFO, VNCLOG("*** FileTransfer: Failed to zip requested dir. Abort !\n"));
-
-							//	[v1.0.2-jp1 fix] Empty directory receive problem
-							rfbFileTransferMsg ft;
-							ft.type = rfbFileTransfer;
-							ft.contentType = rfbFileHeader;
-							ft.size = Swap32IfLE(0xffffffffu); // File Size in bytes, 0xFFFFFFFF (-1) means error
-							ft.length = Swap32IfLE(strlen(m_client->m_szSrcFileName));
-							//adzm 2010-09 - minimize packets. SendExact flushes the queue.
-							m_socket->SendExactQueue((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
-							m_socket->SendExactQueue((char *)m_client->m_szSrcFileName, strlen(m_client->m_szSrcFileName));
-							// 2 May 2008 jdp send the highpart too, else the client will hang
-							// sf@2004 - Improving huge file size handling
-							// TODO: what if we're speaking the old protocol, how can we tell? 
-							CARD32 sizeH = Swap32IfLE(0xffffffffu);
-							m_socket->SendExact((char *)&sizeH, sizeof(CARD32));
-
-							m_client->m_fFileUploadError = true;
-							m_client->m_fFileUploadRunning = false;
-							m_client->FTUploadFailureHook();
-
-							break;
-						}					
-						// Open source file
-						m_client->m_hSrcFile = CreateFile(
-															m_client->m_szSrcFileName,		
-															GENERIC_READ,		
-															FILE_SHARE_READ | FILE_SHARE_WRITE,
-															NULL,				
-															OPEN_EXISTING,		
-															FILE_FLAG_SEQUENTIAL_SCAN,	
-															NULL
-														);				
-						
-						// DWORD dwSrcSize = (DWORD)0;
-						ULARGE_INTEGER n2SrcSize;
-						if (m_client->m_hSrcFile == INVALID_HANDLE_VALUE)
-						{
-							DWORD TheError = GetLastError();
-							// dwSrcSize = 0xFFFFFFFF;
-							n2SrcSize.LowPart = 0xFFFFFFFF;
-                            n2SrcSize.HighPart = 0xFFFFFFFF;
-						}
-						else
-						{	
-							// Source file size 
-							bool bSize = m_client->MyGetFileSize(m_client->m_szSrcFileName, &n2SrcSize); 
-							// dwSrcSize = GetFileSize(m_client->m_hSrcFile, NULL); 
-							// if (dwSrcSize == 0xFFFFFFFF)
-							if (!bSize)
-							{
-								helper::close_handle(m_client->m_hSrcFile);
-								n2SrcSize.LowPart = 0xFFFFFFFF;
-                                n2SrcSize.HighPart = 0xFFFFFFFF;
-							}
-							else
-							{
-								// Add the File Time Stamp to the filename
-								FILETIME SrcFileModifTime; 
-								BOOL fRes = GetFileTime(m_client->m_hSrcFile, NULL, NULL, &SrcFileModifTime);
-								if (fRes)
-								{
-									char szSrcFileTime[18];
-									// sf@2003 - Convert file time to local time
-									// We've made the choice off displaying all the files 
-									// off client AND server sides converted in clients local
-									// time only. So we don't convert server's files times.
-									
-									//FILETIME LocalFileTime;
-									//FileTimeToLocalFileTime(&SrcFileModifTime, &LocalFileTime);
-									
-									SYSTEMTIME FileTime;
-									FileTimeToSystemTime(&SrcFileModifTime,  &FileTime);
-									wsprintf(szSrcFileTime,"%2.2d/%2.2d/%4.4d %2.2d:%2.2d",
-											FileTime.wMonth,
-											FileTime.wDay,
-											FileTime.wYear,
-											FileTime.wHour,
-											FileTime.wMinute
-											);
-									strcat(m_client->m_szSrcFileName, ",");
-									strcat(m_client->m_szSrcFileName, szSrcFileTime);
-								}
-							}
-						}
-
-						// sf@2004 - Delta Transfer
-						if (m_client->m_lpCSBuffer != NULL) 
-						{
-							delete [] m_client->m_lpCSBuffer;
-							m_client->m_lpCSBuffer = NULL;
-						}
-						m_client->m_nCSOffset = 0;
-						m_client->m_nCSBufferSize = 0;
-
-						// Send the FileTransferMsg with rfbFileHeader
-						rfbFileTransferMsg ft;
-						
-						ft.type = rfbFileTransfer;
-						ft.contentType = rfbFileHeader;
-						ft.size = Swap32IfLE(n2SrcSize.LowPart); // File Size in bytes, 0xFFFFFFFF (-1) means error
-						ft.length = Swap32IfLE(strlen(m_client->m_szSrcFileName));
-						//adzm 2010-09 - minimize packets. SendExact flushes the queue.
-						m_socket->SendExactQueue((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
-						m_socket->SendExactQueue((char *)m_client->m_szSrcFileName, strlen(m_client->m_szSrcFileName));
-						
-						// sf@2004 - Improving huge file size handling
-						CARD32 sizeH = Swap32IfLE(n2SrcSize.HighPart);
-						m_socket->SendExact((char *)&sizeH, sizeof(CARD32));
-
-						// delete [] szSrcFileName;
-						if (n2SrcSize.LowPart == 0xFFFFFFFF && n2SrcSize.HighPart == 0xFFFFFFFF)
-						{
-							//MessageBoxSecure(NULL, "6. Abort !", "Ultra WinVNC", MB_OK);
-							//vnclog.Print(LL_INTINFO, VNCLOG("*** FileTransfer: Wrong Src File size. Abort !\n"));
-                            m_client->FTUploadFailureHook();
-							break; // If error, we don't send anything else
-						}
-                        m_client->FTUploadStartHook();*/
-						}
+						m_client->filetransferrequestPart1(msg, fUserOk);						
 						break;
 
 					// sf@2004 - Delta Transfer
@@ -5417,7 +5259,7 @@ vncClient::SendRectangles(const rfb::RectVector &rects)
 			rect.br.x=(*i).br.x;
 			rect.tl.y=(*i).tl.y;
 			rect.br.y=(*i).br.y;
-#ifdef _DEBUG
+/*#ifdef _DEBUG
 			char			szText[256];
 							
 				sprintf(szText,"RECT m_encodemgr  %i %i %i %i \n",rect.tl.x,
@@ -5425,7 +5267,7 @@ vncClient::SendRectangles(const rfb::RectVector &rects)
 				rect.br.x,
 				rect.br.y);
 				OutputDebugString(szText);
-#endif
+#endif*/
 
 			if ((rect.br.x-rect.tl.x) * (rect.br.y-rect.tl.y) > Blocksize*BlocksizeX )
 			{
@@ -6687,7 +6529,7 @@ void vncClient::SendKeepAlive(bool bForce)
 		DWORD nInterval = (DWORD)m_server->GetKeepAliveInterval() * 1000;
 		DWORD nTicksSinceLastSent = GetTickCount() - m_socket->GetLastSentTick();
 
-        if (!bForce && nTicksSinceLastSent < nInterval)
+        if ((!bForce && nTicksSinceLastSent < nInterval) || nInterval == 0)
             return;
 
         rfbKeepAliveMsg kp;

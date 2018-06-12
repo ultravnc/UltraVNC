@@ -915,7 +915,7 @@ vncDesktopThread::run_undetached(void *arg)
 			// desktop thread.
 			DWORD status=WaitForSingleObject(m_desktop->restart_event,10000);
 			if (status==WAIT_TIMEOUT) 
-				looping=false;
+				looping = false;
 			switch(result)
 			{
 				case WAIT_TIMEOUT:
@@ -987,7 +987,7 @@ vncDesktopThread::run_undetached(void *arg)
 											MyCURSORINFO cinfo;
 											cinfo.cbSize=sizeof(MyCURSORINFO);
 											MyGetCursorInfo(&cinfo);
-											m_desktop->SetCursor(cinfo.hCursor);
+											m_desktop->m_hcursor = cinfo.hCursor;
 										}
 									}
 
@@ -1201,7 +1201,7 @@ vncDesktopThread::run_undetached(void *arg)
 												m_desktop->m_screenCapture->Unlock();
 										}
 
-#ifdef _DEBUG
+/*#ifdef _DEBUG
 			char			szText[256];
 			sprintf(szText,"checkrgn, change, cache  %i %i %i \n",!checkrgn.is_empty(),!changedrgn.is_empty() , !cachedrgn.is_empty());
 			OutputDebugString(szText);
@@ -1218,7 +1218,7 @@ vncDesktopThread::run_undetached(void *arg)
 				OutputDebugString(szText);
 			}
 
-#endif
+#endif*/
 
 										if (!initialupdate) {
 											m_server->InitialUpdate(true);
@@ -1267,7 +1267,7 @@ vncDesktopThread::run_undetached(void *arg)
 						MyCURSORINFO cinfo;
 						cinfo.cbSize=sizeof(MyCURSORINFO);
 						MyGetCursorInfo(&cinfo);
-						m_desktop->SetCursor(cinfo.hCursor);
+						m_desktop->m_hcursor = cinfo.hCursor;
 					}
 					ResetEvent(m_desktop->trigger_events[3]);
 					break;
@@ -1277,7 +1277,7 @@ vncDesktopThread::run_undetached(void *arg)
 					break;
 				case WAIT_OBJECT_0+5:
 					//break to close
-					looping=false;
+					looping = false;
 					ResetEvent(m_desktop->trigger_events[5]);
 					break;
 			}
