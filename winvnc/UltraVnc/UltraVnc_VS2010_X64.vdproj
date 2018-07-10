@@ -39,6 +39,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_1CFD603134B04A51B409092C334E7CB1"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_1D605486DA064476BC03795B9D1F0A1D"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -129,6 +135,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_96DD06F17CB049BBACB7FDE0AB9698D7"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_9FFC46783A7F4BCB9DDA60B790D35975"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -202,12 +214,6 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_06C97228522542D68A2A4B86662D3CD8"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_FE82FF2D562E4B80928D6FEB67F9F479"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -221,6 +227,12 @@
         {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_9FFC46783A7F4BCB9DDA60B790D35975"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_96DD06F17CB049BBACB7FDE0AB9698D7"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -269,6 +281,12 @@
         {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_0F3E5B898783469D8773791F4330AA21"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_06C97228522542D68A2A4B86662D3CD8"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -357,7 +375,7 @@
             "InstallAction" = "3:1"
             "Arguments" = "8:-install"
             "EntryPoint" = "8:"
-            "Sequence" = "3:1"
+            "Sequence" = "3:2"
             "Identifier" = "8:_CCC65A07_156B_499F_AAA3_89B8749B443F"
             "InstallerClass" = "11:FALSE"
             "CustomActionData" = "8:"
@@ -385,22 +403,22 @@
             "InstallAction" = "3:1"
             "Arguments" = "8:"
             "EntryPoint" = "8:"
-            "Sequence" = "3:2"
+            "Sequence" = "3:3"
             "Identifier" = "8:_5F2A093F_F4DD_46BC_8D19_3E7D23839C99"
             "InstallerClass" = "11:FALSE"
             "CustomActionData" = "8:"
             }
-            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_9305D0D692F94B46961BDA3AE05DB16F"
+            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_B304E00F1217486E8B83DAB4D2041814"
             {
-            "Name" = "8:Primary Output from setcad (Active)"
-            "Condition" = "8:"
-            "Object" = "8:_06C97228522542D68A2A4B86662D3CD8"
+            "Name" = "8:Primary Output from setpasswd (Active)"
+            "Condition" = "8:SERVER=1"
+            "Object" = "8:_96DD06F17CB049BBACB7FDE0AB9698D7"
             "FileType" = "3:2"
             "InstallAction" = "3:1"
-            "Arguments" = "8:/Install"
+            "Arguments" = "8:\"[PASSWORD]\""
             "EntryPoint" = "8:"
-            "Sequence" = "3:3"
-            "Identifier" = "8:_FD92EBC0_C73D_4C07_9EF8_680BE236E951"
+            "Sequence" = "3:1"
+            "Identifier" = "8:_5F2DECD9_027A_459F_B961_B5BF73829F49"
             "InstallerClass" = "11:FALSE"
             "CustomActionData" = "8:"
             }
@@ -427,13 +445,13 @@
         }
         "File"
         {
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_11276E5D18D1F8A028D0E38F745FFA00"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1CFD603134B04A51B409092C334E7CB1"
             {
-            "SourcePath" = "8:IPHLPAPI.DLL"
-            "TargetName" = "8:IPHLPAPI.DLL"
+            "SourcePath" = "8:..\\..\\..\\..\\..\\Files\\ddengine64.dll"
+            "TargetName" = "8:ddengine64.dll"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
-            "Condition" = "8:"
+            "Condition" = "8:SERVER=1"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
             "ReadOnly" = "11:FALSE"
@@ -444,7 +462,7 @@
             "PackageAs" = "3:1"
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
+            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_21D3AD3D5C2D41B8BD9742DEAED2D472"
@@ -485,26 +503,6 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_42FE7889F2707625AD708AD6969D5CE5"
-            {
-            "SourcePath" = "8:ACTIVEDS.dll"
-            "TargetName" = "8:ACTIVEDS.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4B3ED6558E87467BB79B5F245A6A7814"
@@ -607,66 +605,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D9CCD7A410A61576D752DC9362953245"
-            {
-            "SourcePath" = "8:VERSION.dll"
-            "TargetName" = "8:VERSION.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E8EBA67D0DF2389006367EE66F35B612"
-            {
-            "SourcePath" = "8:IMM32.dll"
-            "TargetName" = "8:IMM32.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F8102562A64423CDCAC1C20AD91D5EEB"
-            {
-            "SourcePath" = "8:NETAPI32.dll"
-            "TargetName" = "8:NETAPI32.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
         }
         "FileType"
         {
@@ -734,15 +672,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:UltraVnc"
-        "ProductCode" = "8:{9255773D-D4C2-4C8C-B0E9-BFF574221886}"
-        "PackageCode" = "8:{384B2493-A59A-4D85-9C80-47A2DFFAE35E}"
+        "ProductCode" = "8:{15614FFC-17C4-47FC-9530-FC976D1361E0}"
+        "PackageCode" = "8:{ACFD3DE4-9387-4960-9FA6-80CB08CECEBA}"
         "UpgradeCode" = "8:{25A3A242-EEA3-4731-A2D0-E990D2EA5A23}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.2.16"
+        "ProductVersion" = "8:1.2.21"
         "Manufacturer" = "8:uvnc bvba"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:http://forum.uvnc.com"
@@ -2287,6 +2225,34 @@
             "OutputConfiguration" = "8:"
             "OutputGroupCanonicalName" = "8:Built"
             "OutputProjectGuid" = "8:{8D7757CB-5125-4633-AFB1-4B30ED24955F}"
+            "ShowKeyOutput" = "11:TRUE"
+                "ExcludeFilters"
+                {
+                }
+            }
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_96DD06F17CB049BBACB7FDE0AB9698D7"
+            {
+            "SourcePath" = "8:..\\Release\\setpasswd.exe"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            "ProjectOutputGroupRegister" = "3:1"
+            "OutputConfiguration" = "8:"
+            "OutputGroupCanonicalName" = "8:Built"
+            "OutputProjectGuid" = "8:{7DDBFA32-44F6-44CA-BDBE-CF8B32EDC6B1}"
             "ShowKeyOutput" = "11:TRUE"
                 "ExcludeFilters"
                 {

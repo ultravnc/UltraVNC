@@ -13,7 +13,6 @@ IsWindows10OrGreater()
 //----------------------------------------------------------
 ScreenCapture::ScreenCapture()
 {
-	int a = 0;
 }
 //----------------------------------------------------------
 int ScreenCapture::osVersion()

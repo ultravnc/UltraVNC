@@ -2080,7 +2080,7 @@ VSocket::ReadExact(char *buff, const VCard bufflen)
 			} else {
 				if (WSAGetLastError() != WSAEWOULDBLOCK)
 				{
-					//int aa=WSAGetLastError();
+					int aa=WSAGetLastError();
 					//vnclog.Print(LL_SOCKERR, VNCLOG("socket error 2: %d\n"), aa);
 					return VFalse;
 				}
@@ -2295,8 +2295,8 @@ int val =0;
 			FD_SET(RemoteSocket, &write_fds);			
 			count = select(RemoteSocket+ 1, NULL, &write_fds, NULL, &tm);
 			aa++;
-		} while (count == 0&& !fShutdownOrdered && aa<20);
-		if (aa>=20) return 0;
+		} while (count == 0&& !fShutdownOrdered && aa<600);
+		if (aa>=600) return 0;
 		if (fShutdownOrdered) return 0;
 		if (count < 0 || count > 1) return 0;
 		if (FD_ISSET(RemoteSocket, &write_fds)) 

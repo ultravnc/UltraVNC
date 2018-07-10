@@ -784,7 +784,6 @@ vncDesktopThread::run_undetached(void *arg)
 	rfb::ClippedUpdateTracker updates(clipped_updates, m_desktop->m_Cliprect);
 	clipped_updates.enable_copyrect(true);
 	rfb::Region2D rgncache;
-	rfb::Region2D rgnFixArtifacts;
 
 
 	// Incoming update messages are collated into a single region cache

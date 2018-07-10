@@ -57,13 +57,19 @@ public:
 	virtual UINT EncodeRect(BYTE *source,VSocket *outConn, BYTE *dest, const rfb::Rect &rect);
 
 // Implementation
-public:
+private:
 	BYTE		      *m_buffer;
 	int			       m_bufflen;
 	int SendJpegRect(BYTE *src,BYTE *dst, int dst_size, int w, int h, int quality,rfbPixelFormat m_remoteformat);
 	bool				lzo;
 	lzo_uint out_len;
 	unsigned char *destbuffer;
+	JSAMPROW *m_rowPointer;
+	int m_rowPointerSize;
+	void checkRowPointer(int h);
+	int m_quality;
+	struct jpeg_compress_struct cinfo;
+	struct jpeg_error_mgr jerr;
 };
 
 #endif // _WINVNC_EncodeUltra

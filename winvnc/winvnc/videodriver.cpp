@@ -36,7 +36,7 @@ LPSTR driverName = "mv video hook driver2";
 //----------------------------------------------------------
 VideoDriver::VideoDriver()
 {
-	init = true;
+	init = false;
 	pSharedMemory = NULL;
 	pChangebuf = NULL;
 	pFramebuffer = NULL;

@@ -47,16 +47,22 @@ vncEncodeUltra2::vncEncodeUltra2()
 	m_buffer = NULL;
 	m_bufflen = 0;
 	destbuffer=NULL;
+	m_quality = 0;
+	m_rowPointer = NULL;
+	m_rowPointerSize = 0;
+	cinfo.err = jpeg_std_error(&jerr);
+	jpeg_create_compress(&cinfo);
 }
 
 vncEncodeUltra2::~vncEncodeUltra2()
 {
 	if (m_buffer != NULL)
-	{
 		delete [] m_buffer;
-		m_buffer = NULL;
-	}
-	if (destbuffer!=0) free (destbuffer);
+	if (destbuffer!=0) 
+		free (destbuffer);
+	if (m_rowPointer != NULL)
+		delete[] m_rowPointer;
+	jpeg_destroy_compress(&cinfo);
 }
 
 void
@@ -98,36 +104,16 @@ vncEncodeUltra2::NumCodedRects(const rfb::Rect &rect)
 // Encode the rectangle using Ultra compression
 // Encode the rectangle using Ultra compression
 inline UINT
-vncEncodeUltra2::EncodeRect(BYTE *source, VSocket *outConn, BYTE *dest, const rfb::Rect &rect2)
+vncEncodeUltra2::EncodeRect(BYTE *source, VSocket *outConn, BYTE *dest, const rfb::Rect &rect)
 {
 
-	int  Size = 0;
-	rfb::Rect rect;
-	rect.br.x=rect2.br.x;
-	rect.br.y=rect2.br.y;
-	rect.tl.x=rect2.tl.x;
-	rect.tl.y=rect2.tl.y;
-	/*while(((rect.br.x-rect.tl.x))/8*8!=(rect.br.x-rect.tl.x))
-		{
-		
-			if (rect.br.x+1<=framebufferWidth) rect.br.x+=1;
-			else if (rect.tl.x-1>=0) rect.tl.x-=1;
-			
-		}
-		while(((rect.br.y-rect.tl.y))/8*8!=(rect.br.y-rect.tl.y))
-		{
-		
-			if (rect.br.y+1<=framebufferHeight) rect.br.y+=1;
-			else if (rect.tl.y-1>=0) rect.tl.y-=1;
-			
-		}*/
-
+	int size = 0;
 	const int rectW = rect.br.x - rect.tl.x;
 	const int rectH = rect.br.y - rect.tl.y;
 	const int rawDataSize = (rectW*rectH*m_remoteformat.bitsPerPixel / 8);
 
-	if (rectW==0) return 0;
-	if (rectH==0) return 0;
+	if (rectW == 0 || rectH == 0) 
+		return 0;
 
 	rfbFramebufferUpdateRectHeader *surh=(rfbFramebufferUpdateRectHeader *)dest;
 	// Modif rdv@2002 - v1.1.x - Application Resize
@@ -141,11 +127,9 @@ vncEncodeUltra2::EncodeRect(BYTE *source, VSocket *outConn, BYTE *dest, const rf
 	surh->r.h = Swap16IfLE(surh->r.h);
 	surh->encoding = Swap32IfLE(rfbEncodingUltra2);
 
-	// create a space big enough for the Zlib encoded pixels
-	if (m_bufflen < rawDataSize)
-	{
-		if (m_buffer != NULL)
-		{
+	// create a space big enough for the Jpeg encoded pixels
+	if (m_bufflen < rawDataSize + 1000) {
+		if (m_buffer != NULL) {
 			delete [] m_buffer;
 			m_buffer = NULL;
 		}
@@ -157,47 +141,42 @@ vncEncodeUltra2::EncodeRect(BYTE *source, VSocket *outConn, BYTE *dest, const rf
 	// Translate the data into our new buffer
 	Translate(source, m_buffer, rect);
 	rfbZlibHeader *zlibh=(rfbZlibHeader *)(dest+sz_rfbFramebufferUpdateRectHeader);
-	Size=0;
-	if (rectW >= 4 && rectH >= 4)
-	{
-		Size=SendJpegRect(m_buffer,dest+sz_rfbFramebufferUpdateRectHeader+sz_rfbZlibHeader, rawDataSize, rectW , rectH , m_qualitylevel*10,m_remoteformat);		
-		zlibh->nBytes = Swap32IfLE(Size);
+	size=0;
+	if (rectW >= 8 && rectH >= 8) {
+		size=SendJpegRect(m_buffer,dest+sz_rfbFramebufferUpdateRectHeader+sz_rfbZlibHeader, rawDataSize + 1000, rectW , rectH , m_qualitylevel*10,m_remoteformat);		
+		zlibh->nBytes = Swap32IfLE(size);
 	}
-
-	if (Size == 0)
-	{
-		
+	// jpeg failed
+	if (size == 0) {		
 		if (rawDataSize < 64)
-		{
 			return vncEncoder::EncodeRect(source, dest, rect);
-		}
 				
-		if (lzo==false)
-		{
-			if (lzo_init() == LZO_E_OK) lzo=true;
-		}
+		if (lzo==false && lzo_init() == LZO_E_OK)
+			lzo=true;
 		lzo1x_1_compress(m_buffer,rawDataSize,dest+sz_rfbFramebufferUpdateRectHeader+sz_rfbZlibHeader,&out_len,wrkmem);
 		if (out_len > (lzo_uint)rawDataSize)
-				{
-					return vncEncoder::EncodeRect(source, dest, rect);
-				}
+			return vncEncoder::EncodeRect(source, dest, rect);
 		surh->encoding = Swap32IfLE(rfbEncodingUltra);
 		zlibh->nBytes = Swap32IfLE(out_len);
-		Size=out_len;
+		size=out_len;
 	}
-	transmittedSize += sz_rfbFramebufferUpdateRectHeader + sz_rfbZlibHeader+ Size;
-	return sz_rfbFramebufferUpdateRectHeader + sz_rfbZlibHeader+ Size;
+	transmittedSize += sz_rfbFramebufferUpdateRectHeader + sz_rfbZlibHeader + size;
+	return sz_rfbFramebufferUpdateRectHeader + sz_rfbZlibHeader + size;
+}
+
+void vncEncodeUltra2::checkRowPointer(int h)
+{
+	if (h > m_rowPointerSize) {
+		if (m_rowPointer != NULL)
+			delete[] m_rowPointer;
+		m_rowPointer = new JSAMPROW[h];
+		m_rowPointerSize = h;
+	}
 }
 
 int
 vncEncodeUltra2::SendJpegRect(BYTE *src,BYTE *dst, int dst_size, int w, int h, int quality,rfbPixelFormat m_remoteformat)
 {
-
-  struct jpeg_compress_struct cinfo;
-  struct jpeg_error_mgr jerr;
-
-  cinfo.err = jpeg_std_error(&jerr);
-  jpeg_create_compress(&cinfo);
   BYTE *srcBuf=NULL;
 
   cinfo.image_width = w;
@@ -205,8 +184,6 @@ vncEncodeUltra2::SendJpegRect(BYTE *src,BYTE *dst, int dst_size, int w, int h, i
   cinfo.in_color_space = JCS_RGB;
   cinfo.input_components = 3;
 
-#ifdef JCS_EXTENSIONS
-  // Try to have libjpeg read directly from our native format
   if(m_remoteformat.bitsPerPixel==32) {
     int redShift, greenShift, blueShift;
 
@@ -234,33 +211,36 @@ vncEncodeUltra2::SendJpegRect(BYTE *src,BYTE *dst, int dst_size, int w, int h, i
       cinfo.input_components = 4;
     }
   }
-#endif
 
-  jpeg_set_defaults(&cinfo);
-  jpeg_set_quality(&cinfo, quality, TRUE);
-  if(quality >= 90) 
-	  cinfo.dct_method = JDCT_ISLOW;
-  else 
-	  cinfo.dct_method = JDCT_FASTEST;
-  if(quality >= 60) {
-	cinfo.comp_info[0].h_samp_factor = 2;
-	cinfo.comp_info[0].v_samp_factor = 2;
-  }
-  if(quality >= 70) {
-	cinfo.comp_info[0].h_samp_factor = 1;
-	cinfo.comp_info[0].v_samp_factor = 1;
+  if (quality != m_quality)
+  {
+	jpeg_set_defaults(&cinfo);
+	jpeg_set_quality(&cinfo, quality, TRUE);
+	if(quality >= 90) 
+		cinfo.dct_method = JDCT_ISLOW;
+	else 
+		cinfo.dct_method = JDCT_FASTEST;
+	if(quality >= 60) {
+		cinfo.comp_info[0].h_samp_factor = 2;
+		cinfo.comp_info[0].v_samp_factor = 2;
+	}
+	if(quality >= 70) {
+		cinfo.comp_info[0].h_samp_factor = 1;
+		cinfo.comp_info[0].v_samp_factor = 1;
+	}
+	m_quality = quality;
   }
 
   JpegSetDstManager(&cinfo, dst, dst_size);
 
-  JSAMPROW *rowPointer = new JSAMPROW[h];
+  checkRowPointer(h);
   for (int dy = 0; dy < h; dy++)
-    rowPointer[dy] = (JSAMPROW)(&srcBuf[dy * w * 4]);
+    m_rowPointer[dy] = (JSAMPROW)(&srcBuf[dy * w * 4]);
 
   jpeg_start_compress(&cinfo, TRUE);
   while (cinfo.next_scanline < cinfo.image_height)
   {
-    jpeg_write_scanlines(&cinfo, &rowPointer[cinfo.next_scanline],
+    jpeg_write_scanlines(&cinfo, &m_rowPointer[cinfo.next_scanline],
       cinfo.image_height - cinfo.next_scanline);
 	if (jpegError)
 			break;
@@ -268,10 +248,14 @@ vncEncodeUltra2::SendJpegRect(BYTE *src,BYTE *dst, int dst_size, int w, int h, i
 
   if (!jpegError)
 		jpeg_finish_compress(&cinfo);
-  jpeg_destroy_compress(&cinfo);
 
-  delete[] rowPointer;
-  if (jpegError) return 0;
+  if (jpegError) {
+	jpeg_destroy_compress(&cinfo);
+	cinfo.err = jpeg_std_error(&jerr);
+	jpeg_create_compress(&cinfo);
+	m_quality = 0;
+	return 0;
+  }
   return jpegDstDataLen;
 }
 
