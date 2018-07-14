@@ -146,6 +146,15 @@ PixelCaptureEngine::CaptureRect(const rfb::Rect& rect)
 			// Capture screen into bitmap
 		BOOL blitok = BitBlt(m_hmemdc, 0, 0, rect.width(), rect.height(), m_hrootdc_PixelEngine, rect.tl.x + m_ScreenOffsetx, rect.tl.y + m_ScreenOffsety,
 			m_bCaptureAlpha ? (CAPTUREBLT | SRCCOPY) : SRCCOPY);
+
+#ifdef _DEBUG
+			char			szText[256];
+			sprintf(szText,"BitBlt  %i %i %i %i \n",rect.tl.x,
+			rect.tl.y,
+			rect.br.x,
+			rect.br.y);
+			OutputDebugString(szText);
+#endif
 		return blitok ? true : false;
 	}
 	return true;

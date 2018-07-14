@@ -705,15 +705,16 @@ vncClientUpdateThread::run_undetached(void *arg)
 			//add extra check to avoid buffer/encoder sync problems
 			if ((m_client->m_encodemgr.m_scrinfo.framebufferHeight == m_client->m_encodemgr.m_buffer->m_scrinfo.framebufferHeight) &&
 					(m_client->m_encodemgr.m_scrinfo.framebufferWidth == m_client->m_encodemgr.m_buffer->m_scrinfo.framebufferWidth) &&
-					(m_client->m_encodemgr.m_scrinfo.format.bitsPerPixel == m_client->m_encodemgr.m_buffer->m_scrinfo.format.bitsPerPixel)) {
+					(m_client->m_encodemgr.m_scrinfo.format.bitsPerPixel == m_client->m_encodemgr.m_buffer->m_scrinfo.format.bitsPerPixel &&
+					m_client->initialCapture_done)) {
 				if (m_client->SendUpdate(update)) {
 					updates_sent++;
 					//m_client->m_incr_rgn.clear();
 					clipregion.clear();
 				}
 			}
-			else
-				clipregion.clear();
+			//else
+				//clipregion.clear();
 			}//end omni_mutex_lock l(m_client->GetUpdateLock(),82);
 		yield();
 
@@ -4566,6 +4567,7 @@ vncClient::vncClient() : Sendinput("USER32", "SendInput"), m_clipboard(Clipboard
 	m_IsLoopback=false;
 	m_NewSWUpdateWaiting=false;
 	client_settings_passed=false;
+	initialCapture_done=false;
     m_wants_ServerStateUpdates =  false;
     m_bClientHasBlockedInput = false;
 	m_Support_rfbSetServerInput = false;
@@ -5251,24 +5253,23 @@ vncClient::SendRectangles(const rfb::RectVector &rects)
 
 
 	// Work through the list of rectangles, sending each one
-	for (i=rects.begin();i!=rects.end();i++) {
-		if (m_encodemgr.ultra2_encoder_in_use)
-		{
-			//We want smaller rect, so data can be send and decoded while handling next update
+	for (i=rects.begin();i!=rects.end();i++) {					
 			rect.tl.x=(*i).tl.x;
 			rect.br.x=(*i).br.x;
 			rect.tl.y=(*i).tl.y;
 			rect.br.y=(*i).br.y;
-/*#ifdef _DEBUG
+#ifdef _DEBUG
 			char			szText[256];
 							
-				sprintf(szText,"RECT m_encodemgr  %i %i %i %i \n",rect.tl.x,
+				sprintf(szText,"SendRectangles  %i %i %i %i \n",rect.tl.x,
 				rect.tl.y,
 				rect.br.x,
 				rect.br.y);
 				OutputDebugString(szText);
-#endif*/
+#endif
 
+		if (m_encodemgr.ultra2_encoder_in_use)
+		{
 			if ((rect.br.x-rect.tl.x) * (rect.br.y-rect.tl.y) > Blocksize*BlocksizeX )
 			{
  

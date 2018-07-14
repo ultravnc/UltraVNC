@@ -425,6 +425,7 @@ public:
 	//int sizearray[rfbEncodingZRLE+1][31];
 	//int Totalsend;
 	BOOL client_settings_passed;
+	bool initialCapture_done;
 	bool		m_Autoreconnect;
 	// The socket
 	VSocket			*m_socket;

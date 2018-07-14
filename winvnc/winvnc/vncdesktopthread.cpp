@@ -795,7 +795,9 @@ vncDesktopThread::run_undetached(void *arg)
 	// The previous cursor position is stored, to allow us to erase the
 	// old instance whenever it moves.
 	rfb::Point oldcursorpos;
-
+	POINT tempcursorpos;
+	GetCursorPos(&tempcursorpos);
+	oldcursorpos = rfb::Point(tempcursorpos);
 	// The driver gives smaller rectangles to check
 	// if Accuracy is 4 you eliminate pointer updates
 	if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver)
@@ -1200,24 +1202,37 @@ vncDesktopThread::run_undetached(void *arg)
 												m_desktop->m_screenCapture->Unlock();
 										}
 
-/*#ifdef _DEBUG
+										m_server->initialCapture_done();
+
+
+
+#ifdef _DEBUG
 			char			szText[256];
-			sprintf(szText,"checkrgn, change, cache  %i %i %i \n",!checkrgn.is_empty(),!changedrgn.is_empty() , !cachedrgn.is_empty());
-			OutputDebugString(szText);
 			rfb::RectVector rects;
 			rfb::RectVector::iterator i;
+		checkrgn.get_rects(rects, 1, 1);
+		for (i = rects.begin(); i != rects.end(); i++)
+			{
+				rfb::Rect rect = *i;				
+				sprintf(szText,"RECT checkrgn  %i %i %i %i \n",rect.tl.x,
+				rect.tl.y,
+				rect.br.x,
+				rect.br.y);
+				OutputDebugString(szText);
+			}
+
 			changedrgn.get_rects(rects, 1, 1);
 		for (i = rects.begin(); i != rects.end(); i++)
 			{
 				rfb::Rect rect = *i;				
-				sprintf(szText,"RECT m_desktop->m_Cliprect  %i %i %i %i \n",m_desktop->m_Cliprect.tl.x,
-				m_desktop->m_Cliprect.tl.y,
-				m_desktop->m_Cliprect.br.x,
-				m_desktop->m_Cliprect.br.y);
+				sprintf(szText,"RECT changedrgn  %i %i %i %i \n",rect.tl.x,
+				rect.tl.y,
+				rect.br.x,
+				rect.br.y);
 				OutputDebugString(szText);
 			}
 
-#endif*/
+#endif
 
 										if (!initialupdate) {
 											m_server->InitialUpdate(true);

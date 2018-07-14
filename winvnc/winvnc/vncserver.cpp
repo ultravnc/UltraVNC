@@ -2447,6 +2447,17 @@ vncServer::All_clients_initialalized() {
 }
 
 void
+vncServer::initialCapture_done() {
+	vncClientList::iterator i;
+	// Post this update to all the connected clients
+	for (i = m_authClients.begin(); i != m_authClients.end(); i++)
+	{
+		GetClient(*i)->initialCapture_done=true;
+
+	}
+}
+
+void
 vncServer::TriggerUpdate() {
 	vncClientList::iterator i;
 	// Post this update to all the connected clients

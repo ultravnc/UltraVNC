@@ -151,6 +151,7 @@ public:
 	virtual int AutoCapt() { return m_autocapt; }
 
 	virtual BOOL All_clients_initialalized();
+	void initialCapture_done();
 
 	// Lock to protect the client list from concurrency - lock when reading/updating client list
 	omni_mutex			m_clientsLock;

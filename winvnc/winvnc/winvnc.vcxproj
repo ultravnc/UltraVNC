@@ -1291,6 +1291,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
     <ClInclude Include="rfbRegion_win32.h" />
     <ClInclude Include="rfbRegion_X11.h" />
     <ClInclude Include="rfbUpdateTracker.h" />
+    <ClInclude Include="ScreenCapture.h" />
     <ClInclude Include="stdhdrs.h" />
     <ClInclude Include="TextChat.h" />
     <ClInclude Include="translate.h" />

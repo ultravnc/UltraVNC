@@ -431,6 +431,9 @@
     <ClInclude Include="uvncUiAccess.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="ScreenCapture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="winvnc.rc">

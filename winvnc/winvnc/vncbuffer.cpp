@@ -217,6 +217,7 @@ vncBuffer::CheckBuffer()
 			    return FALSE;
 		    }
     		m_backbuffsize = m_desktop->ScreenBuffSize();
+			memset(m_backbuff, 0, m_desktop->ScreenBuffSize());
         }
 
 		if (m_use_cache)
@@ -229,14 +230,7 @@ vncBuffer::CheckBuffer()
 			ClearCache();
 		}
 
-		memset(m_backbuff, 0, m_desktop->ScreenBuffSize());
-
-		// Problem, driver buffer is not writable
-		// so we always need a m_scalednuff
-		/// If scale==1 we don't need to allocate the memory
-		/*if (m_nScale > 1)
-		{*/
-            if (m_ScaledSize != m_desktop->ScreenBuffSize())
+        if (m_ScaledSize != m_desktop->ScreenBuffSize())
             {
 		        // Modif sf@2002 - Scaling
 		        if (m_ScaledBuff != NULL)
@@ -253,17 +247,8 @@ vncBuffer::CheckBuffer()
 				    return FALSE;
 			    }
 			    m_ScaledSize = m_desktop->ScreenBuffSize();
-            }
-		/*}
-		else
-		{
-			delete [] m_ScaledBuff;
-			m_ScaledBuff = NULL;
-    		m_ScaledSize = 0;
-		}
-
-		if (m_nScale > 1) */
-			memcpy(m_ScaledBuff, m_mainbuff, m_desktop->ScreenBuffSize());
+				memset(m_ScaledBuff, 0, m_desktop->ScreenBuffSize());
+            }			
 	}
 
 	vnclog.Print(LL_INTINFO, VNCLOG("local buffer=%d\n"), m_backbuffsize);
@@ -1038,9 +1023,12 @@ vncBuffer::ClearBack()
 		memset(m_mainbuff, 0, m_desktop->ScreenBuffSize());
 	}
 
+	if (m_videodriverused) {
 	if (m_mainbuff) 
 		memcpy(m_backbuff, m_mainbuff, m_desktop->ScreenBuffSize());
-	//BlackBack();
+	}
+	else 
+		BlackBack();
 	InvalidateRect(NULL, NULL, true);
 	Sleep(100);
 	m_desktop->UpdateFullScreen();
