@@ -68,6 +68,7 @@ pProcessIdToSessionId WTSProcessIdToSessionIdF=NULL;
 
 extern BOOL SPECIAL_SC_EXIT;
 extern BOOL SPECIAL_SC_PROMPT;
+extern BOOL multi ;
 in6_addr G_LPARAM_IN6;
 
 void ClearKeyState(BYTE key);
@@ -493,7 +494,7 @@ PostToWinVNC(UINT message, WPARAM wParam, LPARAM lParam)
 	// Locate the hidden WinVNC menu window
 	// adzm 2010-02-10 - If we are in SC mode, then we know we want to only post messages to our own instance. This prevents
 	// conflicts if the user already has another copy of a WinVNC-derived application running.
-	if (SPECIAL_SC_EXIT || SPECIAL_SC_PROMPT) {
+	if (multi  || SPECIAL_SC_EXIT || SPECIAL_SC_PROMPT) {
 		return PostToThisWinVNC(message, wParam, lParam);
 	}
 

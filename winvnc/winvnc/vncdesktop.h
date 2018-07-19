@@ -245,7 +245,8 @@ protected:
 
 // Fields
 public:
-
+	int first_update;
+	int first_update_counter;
 // Methods
 public:
 	// Make the desktop thread & window proc friends

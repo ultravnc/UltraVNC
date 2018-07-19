@@ -147,14 +147,14 @@ PixelCaptureEngine::CaptureRect(const rfb::Rect& rect)
 		BOOL blitok = BitBlt(m_hmemdc, 0, 0, rect.width(), rect.height(), m_hrootdc_PixelEngine, rect.tl.x + m_ScreenOffsetx, rect.tl.y + m_ScreenOffsety,
 			m_bCaptureAlpha ? (CAPTUREBLT | SRCCOPY) : SRCCOPY);
 
-#ifdef _DEBUG
+/*#ifdef _DEBUG
 			char			szText[256];
 			sprintf(szText,"BitBlt  %i %i %i %i \n",rect.tl.x,
 			rect.tl.y,
 			rect.br.x,
 			rect.br.y);
 			OutputDebugString(szText);
-#endif
+#endif*/
 		return blitok ? true : false;
 	}
 	return true;
@@ -423,11 +423,11 @@ bool vncDesktop::FastDetectChanges(rfb::Region2D &rgn, rfb::Rect &rect, int nZon
 	}
 	else
 	{
-#ifdef _DEBUG
+/*#ifdef _DEBUG
 		char			szText[256];
 		sprintf(szText, "Change idle %d\n", GetTickCount());
 		OutputDebugString(szText);
-#endif
+#endif*/
 		idle_counter = idle_counter + 5;
 	}
 	if (idle_counter > 20)
@@ -549,7 +549,8 @@ vncDesktop::vncDesktop()
 	}
 	m_SWOffsetx = 0;
 	m_SWOffsety = 0;
-
+	first_update = 0;
+	first_update_counter = 0;
 }
 
 vncDesktop::~vncDesktop()

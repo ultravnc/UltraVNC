@@ -999,6 +999,11 @@ vncBuffer::ClearCacheRect(const rfb::Rect &dest)
 void
 vncBuffer::ClearBack()
 {
+	#ifdef _DEBUG
+					char			szText[256];
+					sprintf(szText," ++++++ ClearBack \n");
+					OutputDebugString(szText);		
+			#endif
 	if (m_freemainbuff) {
 		// Slow blits were enabled - free the slow blit buffer
 		// Modif rdv@2002 - v1.1.x - Videodriver
@@ -1043,6 +1048,11 @@ vncBuffer::ClearBack()
 void
 vncBuffer::BlackBack()
 {
+	#ifdef _DEBUG
+					char			szText[256];
+					sprintf(szText," ++++++ BlackBack \n");
+					OutputDebugString(szText);		
+			#endif
 	RECT dest;
 	dest.left=0;
 	dest.top=0;

@@ -137,6 +137,27 @@ void keybd_uni_event(_In_  BYTE bVk,_In_  BYTE bScan,_In_  DWORD dwFlags,_In_  U
 	 }
 }
 
+DWORD WINAPI initkeyboardthread( LPVOID lpParam )
+{
+	Sleep(1000);
+	unsigned char Invalue=12;
+	unsigned char Outvalue=0;
+	StarteventFn->Call_Fnction_Long_Timeout((char*)&Invalue,(char*)&Outvalue,5);
+	if (Invalue!=Outvalue)
+	{
+		 goto error;
+	}	
+	return 0;
+	error:
+	if (keyEventFn)delete keyEventFn;
+			keyEventFn=NULL;
+	if (StopeventFn)delete StopeventFn;
+			StopeventFn=NULL;
+	if (StarteventFn)delete StarteventFn;
+			StarteventFn=NULL;
+	return 0;
+}
+
 void keybd_initialize_no_crit()
 {
 	if (!VNCOS.OS_WIN8) return;
@@ -148,15 +169,12 @@ void keybd_initialize_no_crit()
 	if (!StopeventFn->Init("stop_event",0,0,false,true)) goto error;
 	if (!StarteventFn->Init("start_event",1,1,false,true)) goto error;	
 	if (!Shellexecuteforuiaccess()) goto error;
-	Sleep(1000);
-	unsigned char Invalue=12;
-	unsigned char Outvalue=0;
-	StarteventFn->Call_Fnction_Long_Timeout((char*)&Invalue,(char*)&Outvalue,5);
-	if (Invalue!=Outvalue)
-	{
-		 goto error;
-	}
+
+	DWORD dw;
+	HANDLE thread=CreateThread( NULL, 0,initkeyboardthread, NULL, 0, &dw);
+	CloseHandle(thread);
 	return;
+
 error:
 	if (keyEventFn)delete keyEventFn;
 			keyEventFn=NULL;
@@ -170,30 +188,30 @@ error:
 void keybd_initialize()
 {
 	if (!VNCOS.OS_WIN8) return;
-
-
-	if (!crit_init)InitializeCriticalSection(&keyb_crit);
+	if (!crit_init)
+		InitializeCriticalSection(&keyb_crit);
 	crit_init=true;
 
 	EnterCriticalSection(&keyb_crit);
 	keyEventFn=new comm_serv;
 	StopeventFn=new comm_serv;
 	StarteventFn=new comm_serv;
-	if (!keyEventFn->Init("keyEvent",sizeof(keyEventdata),0,false,true)) goto error;
-	if (!StopeventFn->Init("stop_event",0,0,false,true)) goto error;
-	if (!StarteventFn->Init("start_event",1,1,false,true)) goto error;	
-	if (!Shellexecuteforuiaccess()) goto error;
-	Sleep(1000);
-	unsigned char Invalue=12;
-	unsigned char Outvalue=0;
-	StarteventFn->Call_Fnction_Long_Timeout((char*)&Invalue,(char*)&Outvalue,5);
-	if (Invalue!=Outvalue)
-	{
-		 goto error;
-	}
+	if (!keyEventFn->Init("keyEvent",sizeof(keyEventdata),0,false,true)) 
+		goto error;
+	if (!StopeventFn->Init("stop_event",0,0,false,true)) 
+		goto error;
+	if (!StarteventFn->Init("start_event",1,1,false,true)) 
+		goto error;	
+	if (!Shellexecuteforuiaccess()) 
+		goto error;
+
+	DWORD dw;
+	HANDLE thread=CreateThread( NULL, 0,initkeyboardthread, NULL, 0, &dw);
+	CloseHandle(thread);
 	LeaveCriticalSection(&keyb_crit);
 	return;
-error:
+
+	error:
 	if (keyEventFn)delete keyEventFn;
 			keyEventFn=NULL;
 	if (StopeventFn)delete StopeventFn;

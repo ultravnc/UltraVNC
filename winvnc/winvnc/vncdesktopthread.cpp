@@ -703,7 +703,7 @@ void vncDesktopThread::do_polling(HANDLE& threadHandle, rfb::Region2D& rgncache,
 			else
 				capture=false;
 			// force full screen scan every three seconds after the mouse stops moving
-			if (fullpollcounter > 20) {
+			if (fullpollcounter > 200) {
 				rgncache.assign_union(m_desktop->m_Cliprect);
 				fullpollcounter = 0;
 			}
@@ -1201,7 +1201,17 @@ vncDesktopThread::run_undetached(void *arg)
 											if(m_desktop->m_screenCapture)
 												m_desktop->m_screenCapture->Unlock();
 										}
-
+										//update preview
+										if (m_desktop->first_update == 1) {
+											 rfb::Rect rect;
+											 rect.tl.x = m_desktop->m_Cliprect.tl.x;
+											 rect.tl.y = m_desktop->m_Cliprect.tl.y  + ((m_desktop->m_Cliprect.br.y - m_desktop->m_Cliprect.tl.y) / 10 ) * m_desktop->first_update_counter++;
+											 rect.br.x = m_desktop->m_Cliprect.br.x;
+											 rect.br.y = m_desktop->m_Cliprect.tl.y  + ((m_desktop->m_Cliprect.br.y - m_desktop->m_Cliprect.tl.y) / 10 ) * m_desktop->first_update_counter;
+											 if ( m_desktop->first_update_counter == 10)
+												 m_desktop->first_update = 2;
+											 changedrgn.assign_union(rect);
+										}
 										m_server->initialCapture_done();
 
 

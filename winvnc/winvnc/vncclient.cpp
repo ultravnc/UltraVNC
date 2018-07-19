@@ -2570,7 +2570,7 @@ vncClientThread::run(void *arg)
 			m_client->m_encodemgr.AvailableXZ(FALSE);
 #endif
 			m_client->m_encodemgr.AvailableTight(FALSE);
-
+			m_client->m_encodemgr.PreviewSupported(FALSE);
 			// sf@2002 - Tight
 			m_client->m_encodemgr.SetQualityLevel(-1);
 			m_client->m_encodemgr.SetFineQualityLevel(-1);
@@ -2777,6 +2777,12 @@ vncClientThread::run(void *arg)
 
 					if (Swap32IfLE(encoding) == rfbEncodingTight) {
 						m_client->m_encodemgr.AvailableTight(TRUE);
+						vnclog.Print(LL_INTINFO, VNCLOG("Tight found\n"));
+						// continue;
+					}
+
+					if (Swap32IfLE(encoding) == rfbEncodingUltra2) {
+						m_client->m_encodemgr.PreviewSupported(TRUE);
 						vnclog.Print(LL_INTINFO, VNCLOG("Tight found\n"));
 						// continue;
 					}
@@ -5258,48 +5264,48 @@ vncClient::SendRectangles(const rfb::RectVector &rects)
 			rect.br.x=(*i).br.x;
 			rect.tl.y=(*i).tl.y;
 			rect.br.y=(*i).br.y;
-#ifdef _DEBUG
-			char			szText[256];
-							
-				sprintf(szText,"SendRectangles  %i %i %i %i \n",rect.tl.x,
-				rect.tl.y,
-				rect.br.x,
-				rect.br.y);
-				OutputDebugString(szText);
-#endif
+		if (m_encodemgr.m_buffer->m_desktop->first_update == 0)
+		{			
+			if (!SendRectangle(*i, true)) return FALSE;
+		}
+		else {
+			if (m_encodemgr.ultra2_encoder_in_use)
+			{
+				if ((rect.br.x-rect.tl.x) * (rect.br.y-rect.tl.y) > Blocksize*BlocksizeX )
+				{
+ 
+				for (y = rect.tl.y; y < rect.br.y; y += Blocksize)
+				{
+					int blockbottom = min(y + Blocksize, rect.br.y);
+					for (x = rect.tl.x; x < rect.br.x; x += BlocksizeX)
+						{
+ 
+						   int blockright = min(x+BlocksizeX, rect.br.x);
+						   rfb::Rect tilerect;
+						   tilerect.tl.x=x;
+						   tilerect.br.x=blockright;
+						   tilerect.tl.y=y;
+						   tilerect.br.y=blockbottom;
+						   if (!SendRectangle(tilerect)) return FALSE;
+						}
+				}
+				}
+				else
+				{
+					if (!SendRectangle(rect)) return FALSE;
+				}
 
-		if (m_encodemgr.ultra2_encoder_in_use)
-		{
-			if ((rect.br.x-rect.tl.x) * (rect.br.y-rect.tl.y) > Blocksize*BlocksizeX )
-			{
- 
-			for (y = rect.tl.y; y < rect.br.y; y += Blocksize)
-			{
-				int blockbottom = min(y + Blocksize, rect.br.y);
-				for (x = rect.tl.x; x < rect.br.x; x += BlocksizeX)
-					{
- 
-					   int blockright = min(x+BlocksizeX, rect.br.x);
-					   rfb::Rect tilerect;
-					   tilerect.tl.x=x;
-					   tilerect.br.x=blockright;
-					   tilerect.tl.y=y;
-					   tilerect.br.y=blockbottom;
-					   if (!SendRectangle(tilerect)) return FALSE;
-					}
-			}
 			}
 			else
 			{
-				if (!SendRectangle(rect)) return FALSE;
+			if (!SendRectangle(*i)) return FALSE;
 			}
-
-		}
-		else
-		{
-		if (!SendRectangle(*i)) return FALSE;
 		}
 	}
+	if ( rects.size() >0 && m_encodemgr.m_buffer->m_desktop->first_update == 0) {
+		m_encodemgr.m_buffer->m_desktop->first_update = 1;
+	}
+	
 	return TRUE;
 }
 
@@ -5307,7 +5313,7 @@ vncClient::SendRectangles(const rfb::RectVector &rects)
 
 // Tell the encoder to send a single rectangle
 BOOL
-vncClient::SendRectangle(const rfb::Rect &rect)
+vncClient::SendRectangle(const rfb::Rect &rect, bool preview)
 {
 	// Get the buffer to encode the rectangle
 	// Modif sf@2002 - Scaling
@@ -5345,7 +5351,11 @@ vncClient::SendRectangle(const rfb::Rect &rect)
 		// Then we take the worse case (screen buffer size * 1.5) for the net rect buffer size.
 		// m_socket->CheckNetRectBufferSize((int)(m_encodemgr.GetClientBuffSize() * 2));
 		m_socket->CheckNetRectBufferSize((int)(m_encodemgr.m_buffer->m_desktop->ScreenBuffSize() * 3 / 2));
-		UINT bytes = m_encodemgr.EncodeRect(ScaledRect, m_socket);
+		UINT bytes;
+		if (preview)
+			bytes = m_encodemgr.EncodePreviewRect(ScaledRect, m_socket);
+		else
+			bytes = m_encodemgr.EncodeRect(ScaledRect, m_socket);
 		if (bytes == 0)
 		{
 			return true;
@@ -5410,7 +5420,12 @@ vncClient::SendRectangle(const rfb::Rect &rect)
 	}
 	else // Normal case - No DSM - Symetry is not important
 	{
-		UINT bytes = m_encodemgr.EncodeRect(ScaledRect, m_socket);
+		UINT bytes;
+		if (preview) {
+			bytes = m_encodemgr.EncodePreviewRect(ScaledRect, m_socket);
+		}
+		else
+			bytes = m_encodemgr.EncodeRect(ScaledRect, m_socket);
 
 		// if (bytes == 0) return false; // From realvnc337. No! Causes viewer disconnections/
 

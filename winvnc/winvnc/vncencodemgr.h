@@ -104,9 +104,10 @@ public:
 
 	// ENCODING & TRANSLATION
 	inline UINT GetNumCodedRects(const rfb::Rect &rect);
-	inline BOOL SetEncoding(CARD32 encoding,BOOL reinitialize);
+	inline BOOL SetEncoding(CARD32 encoding, BOOL reinitialize, BOOL temp= false);
 	//inline UINT EncodeRect(const rfb::Rect &rect);
 	inline UINT EncodeRect(const rfb::Rect &rect,VSocket *outconn);
+	inline UINT EncodePreviewRect(const rfb::Rect &rect,VSocket *outconn);
 	inline UINT EncodeBulkRects(const rfb::RectVector &allRects, int nScale, VSocket *outconn);
 
 
@@ -160,7 +161,8 @@ public:
 #endif
 	inline bool IsUltraEncoding() {return (m_encoding == rfbEncodingUltra || m_encoding == rfbEncodingUltra2);};
 	inline bool IsEncoderSet() { return ((m_encoder != NULL) && (m_encoding != rfbEncodingRaw)); };
-
+	inline bool IsPreviewSupported() { return previewSupported;}
+	inline void PreviewSupported(bool enabled){previewSupported = enabled;}
 
 protected:
 
@@ -179,6 +181,7 @@ protected:
 	BOOL			m_clientfmtset;
 	rfbTranslateFnType	m_transfunc;
 	vncEncoder*		m_encoder;
+	vncEncoder*		m_old_encoder;
 	vncEncoder*		zrleEncoder;
 	bool			xz_encoder_in_use;
 	vncEncoder*		m_hold_xz_encoder;
@@ -191,6 +194,7 @@ protected:
 	vncEncoder*		m_hold_zlibhex_encoder;
 	bool			tight_encoder_in_use;
 	vncEncoder*		m_hold_tight_encoder;
+	bool			previewSupported;
 
 	// Tight 
 	int				m_compresslevel;
@@ -222,6 +226,7 @@ public:
 	rfbServerInitMsg	m_scrinfo;
 	CARD32		m_encoding;
 	bool			ultra2_encoder_in_use;
+	CARD32 lastencoding;
 };
 
 //
@@ -399,35 +404,23 @@ vncEncodeMgr::CheckBuffer()
 	    m_clientbuffsize = clientbuffsize;
 	}
 
-/*	// Check the client backing buffer matches the server back buffer
-	const UINT backbuffsize = m_buffer->m_backbuffsize;
-	if (m_clientbackbuffsize != backbuffsize)
-	{
-		vnclog.Print(LL_INTINFO, VNCLOG("request client back buffer[%u]\n"), backbuffsize);
-		if (m_clientbackbuff) {
-			delete [] m_clientbackbuff;
-			m_clientbackbuff = 0;
-		}
-		m_clientbackbuffsize = 0;
-
-		m_clientbackbuff = new BYTE[backbuffsize];
-		if (!m_clientbackbuff) {
-			vnclog.Print(LL_INTERR, VNCLOG("unable to allocate client back buffer[%u]\n"), backbuffsize);
-			return FALSE;
-		}
-		memset(m_clientbackbuff, 0, backbuffsize);
-		m_clientbackbuffsize = backbuffsize;
-	}
-
-	vnclog.Print(LL_INTINFO, VNCLOG("remote buffer=%u\n"), m_clientbuffsize);*/
-
 	return TRUE;
 }
 
 // Set the encoding to use
 inline BOOL
-vncEncodeMgr::SetEncoding(CARD32 encoding,BOOL reinitialize)
+vncEncodeMgr::SetEncoding(CARD32 encoding, BOOL reinitialize, BOOL temp)
 {
+	if (!temp) 
+		lastencoding = encoding;
+#ifdef _DEBUG
+					char			szText[256];
+					DWORD error=GetLastError();
+					sprintf(szText," ++++++ SetEncoding %i \n",encoding);
+					SetLastError(0);
+					OutputDebugString(szText);		
+#endif
+
 	if (m_scrinfo.format.bitsPerPixel!=32 && encoding==rfbEncodingUltra2)
 	{
 		//This is not supported, jpeg require 32bit buffers
@@ -436,6 +429,8 @@ vncEncodeMgr::SetEncoding(CARD32 encoding,BOOL reinitialize)
 		encoding = rfbEncodingHextile;
 	}
 
+	if (encoding == m_encoding)
+		return TRUE;
 	if (reinitialize)
 	{
 		encoding=m_encoding;
@@ -722,11 +717,14 @@ vncEncodeMgr::SetEncoding(CARD32 encoding,BOOL reinitialize)
 		}
 
 	}
+	if (!temp) {
 		m_buffer->ClearCache();
 		m_buffer->ClearBack();		
 		m_encoder->SetBufferOffset(monitor_Offsetx, monitor_Offsety);
-	// Check that the client buffer is compatible
-	return CheckBuffer();
+		// Check that the client buffer is compatible
+		return CheckBuffer();
+	}	
+	return true;
 }
 
 // Predict how many update rectangles a given rect will encode to
@@ -807,24 +805,21 @@ vncEncodeMgr::EncodeRect(const rfb::Rect &rect,VSocket *outconn)
 	}
 	if (zlib_encoder_in_use)
 	{
-		if (m_use_xor)
-		{
-		omni_mutex_lock l(m_buffer->m_cacheLock, 671);
-		return m_encoder->EncodeRect(m_buffer->m_backbuff, m_buffer->m_cachebuff, outconn ,m_clientbuff, rect);
+		if (m_use_xor) {
+			omni_mutex_lock l(m_buffer->m_cacheLock, 671);
+			return m_encoder->EncodeRect(m_buffer->m_backbuff, m_buffer->m_cachebuff, outconn ,m_clientbuff, rect);
 		}
-		else return m_encoder->EncodeRect(m_buffer->m_backbuff, NULL, outconn ,m_clientbuff, rect);
+		else 
+			return m_encoder->EncodeRect(m_buffer->m_backbuff, NULL, outconn ,m_clientbuff, rect);
 	}
-	if (ultra_encoder_in_use)
-	{
-		return m_encoder->EncodeRect(m_buffer->m_backbuff, outconn ,m_clientbuff, rect);
-	}
-	if (ultra2_encoder_in_use)
+
+	if (ultra_encoder_in_use || ultra2_encoder_in_use)
 	{
 		return m_encoder->EncodeRect(m_buffer->m_backbuff, outconn ,m_clientbuff, rect);
 	}
 
 	// sf@2002 - Tight encoding
-	if (tight_encoder_in_use || zlibhex_encoder_in_use  || ultra_encoder_in_use || ultra2_encoder_in_use)
+	if (tight_encoder_in_use || zlibhex_encoder_in_use)
 	{
 		RECT TRect;
 		TRect.right = rect.br.x;
@@ -835,6 +830,29 @@ vncEncodeMgr::EncodeRect(const rfb::Rect &rect,VSocket *outconn)
 	}
 
 	return m_encoder->EncodeRect(m_buffer->m_backbuff, m_clientbuff, rect);
+}
+
+inline UINT
+vncEncodeMgr::EncodePreviewRect(const rfb::Rect &rect,VSocket *outconn)
+{
+	if (!IsPreviewSupported() || m_clientformat.bitsPerPixel!=32)
+		return EncodeRect(rect, outconn);
+
+	if(rect.br.x>m_scrinfo.framebufferWidth) 
+		return 0;
+	if(rect.br.y>m_scrinfo.framebufferHeight) 
+		return 0;
+	if (!m_buffer->m_backbuff)
+		return 0;
+
+	int qualitylevel = m_qualitylevel;
+	SetEncoding(rfbEncodingUltra2, false, true);
+	m_encoder->SetQualityLevel(1);	
+	m_qualitylevel = 2;
+	UINT result = m_encoder->EncodeRect(m_buffer->m_backbuff, outconn ,m_clientbuff, rect);
+	SetEncoding(lastencoding, false, true);
+	m_encoder->SetQualityLevel(qualitylevel);	
+	return result;
 }
 
 inline UINT
