@@ -26,6 +26,30 @@
 #include <windows.h>
 #include "vncOSVersion.h"
 #define SUCCEEDED(hr) (((HRESULT)(hr)) >= 0)
+
+
+typedef LONG NTSTATUS, *PNTSTATUS;
+#define STATUS_SUCCESS (0x00000000)
+
+typedef NTSTATUS (WINAPI* RtlGetVersionPtr)(PRTL_OSVERSIONINFOW);
+
+RTL_OSVERSIONINFOW GetRealOSVersion() {
+    HMODULE hMod = ::GetModuleHandleW(L"ntdll.dll");
+    if (hMod) {
+        RtlGetVersionPtr fxPtr = (RtlGetVersionPtr)::GetProcAddress(hMod, "RtlGetVersion");
+        if (fxPtr != nullptr) {
+            RTL_OSVERSIONINFOW rovi = { 0 };
+            rovi.dwOSVersionInfoSize = sizeof(rovi);
+            if ( STATUS_SUCCESS == fxPtr(&rovi) ) {
+                return rovi;
+            }
+        }
+    }
+    RTL_OSVERSIONINFOW rovi = { 0 };
+    return rovi;
+}
+
+
 VNC_OSVersion::VNC_OSVersion()
 {
 	AeroWasEnabled=false;
@@ -39,6 +63,7 @@ VNC_OSVersion::VNC_OSVersion()
 	OS_VISTA=false;
 	OS_XP=false;
 	OS_W2K=false;
+	OS_WIN10=false;
 	OS_NOTSUPPORTED=false;
 	OSVERSIONINFO OSversion;	
 	OSversion.dwOSVersionInfoSize=sizeof(OSVERSIONINFO);
@@ -57,6 +82,16 @@ VNC_OSVersion::VNC_OSVersion()
 		case VER_PLATFORM_WIN32_WINDOWS:
 								OS_NOTSUPPORTED=true;
 								break;
+	}
+
+	if (OS_WIN8)
+	{
+		RTL_OSVERSIONINFOW rTL_OSVERSIONINFOW;
+		rTL_OSVERSIONINFOW = GetRealOSVersion();
+		if (rTL_OSVERSIONINFOW.dwMajorVersion == 10) {
+			OS_WIN8 = false;
+			OS_WIN10 = true;
+		}
 	}
 	LoadDM();
 }

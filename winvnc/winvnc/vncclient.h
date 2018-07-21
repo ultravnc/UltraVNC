@@ -145,14 +145,14 @@ public:
 	//     AND no changed or copied updates intersect it
 	virtual BOOL UpdateWanted() {
 		omni_mutex_lock l(GetUpdateLock(),324);
-/*#ifdef _DEBUG
+#ifdef _DEBUG
 										char			szText[256];
 										sprintf(szText," UpdateWanted %i %i %i %i \n",!m_incr_rgn.is_empty(),
 											m_incr_rgn.intersect(m_update_tracker.get_changed_region()).is_empty() ,
 											m_incr_rgn.intersect(m_update_tracker.get_cached_region()).is_empty() ,
 											m_incr_rgn.intersect(m_update_tracker.get_copied_region()).is_empty());
 										OutputDebugString(szText);		
-#endif*/
+#endif
 		BOOL value =!m_incr_rgn.is_empty() &&m_incr_rgn.intersect(m_update_tracker.get_changed_region()).is_empty() &&
 			m_incr_rgn.intersect(m_update_tracker.get_cached_region()).is_empty() &&
 			m_incr_rgn.intersect(m_update_tracker.get_copied_region()).is_empty();
@@ -314,7 +314,7 @@ protected:
 	//adzm 2010-09 - minimize packets. SendExact flushes the queue.
 	BOOL SendRFBMsgQueue(CARD8 type, BYTE *buffer, int buflen);
 	BOOL SendRectangles(const rfb::RectVector &rects);
-	BOOL SendRectangle(const rfb::Rect &rect, bool preview = false);
+	BOOL SendRectangle(const rfb::Rect &rect);
 	BOOL SendCopyRect(const rfb::Rect &dest, const rfb::Point &source);
 	BOOL SendPalette();
 	// CACHE
@@ -337,8 +337,8 @@ protected:
 	CARD32 m_value;
 	bool m_want_update_state; 
 	int unlockcounter;
-	int filetransferrequestPart1(rfbClientToServerMsg msg, bool fUserOk);	
 
+	int filetransferrequestPart1(rfbClientToServerMsg msg, bool fUserOk);	
 	// Specialised client-side UpdateTracker
 protected:
 

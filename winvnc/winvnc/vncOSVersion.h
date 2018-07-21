@@ -36,6 +36,7 @@ public:
 	bool CaptureAlphaBlending();
 	void DisableAero(VOID);
 	void ResetAero(VOID);
+	bool OS_WIN10;
 	bool OS_WIN8;
 	bool OS_WIN7;
 	bool OS_VISTA;

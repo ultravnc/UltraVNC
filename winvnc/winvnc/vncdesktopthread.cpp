@@ -703,7 +703,7 @@ void vncDesktopThread::do_polling(HANDLE& threadHandle, rfb::Region2D& rgncache,
 			else
 				capture=false;
 			// force full screen scan every three seconds after the mouse stops moving
-			if (fullpollcounter > 200) {
+			if (fullpollcounter > 20) {
 				rgncache.assign_union(m_desktop->m_Cliprect);
 				fullpollcounter = 0;
 			}
@@ -740,7 +740,7 @@ vncDesktopThread::run_undetached(void *arg)
 	// INIT
 	//*******************************************************
 	if (m_server->AutoCapt() == 1) {
-		if (VNCOS.OS_VISTA||VNCOS.OS_WIN7||VNCOS.OS_WIN8) 
+		if (VNCOS.OS_VISTA||VNCOS.OS_WIN7||VNCOS.OS_WIN8||VNCOS.OS_WIN10) 
 			G_USE_PIXEL=false;
 		else 
 			G_USE_PIXEL=true;//testBench();
@@ -848,11 +848,11 @@ vncDesktopThread::run_undetached(void *arg)
 	rgncache.assign_union(rfb::Region2D(m_desktop->m_Cliprect));
 
 	if (!PreConnect) {
-		if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver && !VNCOS.OS_WIN8)
+		if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver && !VNCOS.OS_WIN8 && !VNCOS.OS_WIN10)
 		{
 			m_desktop->m_buffer.GrabRegion(rgncache,true,true);
 		}
-		else if (!VNCOS.OS_WIN8)
+		else if (!VNCOS.OS_WIN8 && !VNCOS.OS_WIN10)
 		{
 			m_desktop->m_buffer.GrabRegion(rgncache,false,true);
 		}
@@ -876,7 +876,7 @@ vncDesktopThread::run_undetached(void *arg)
 		if (waittime != 1000) 
 			waittime = 33;
 		//MIRROR DRIVER
-		if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver && !VNCOS.OS_WIN8)
+		if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver && !VNCOS.OS_WIN8 && !VNCOS.OS_WIN10)
 		{
 			strcpy_s(g_hookstring,"driver");
 			int fastcounter=0;
@@ -894,7 +894,7 @@ vncDesktopThread::run_undetached(void *arg)
 			waittime=0;
 		}
 		//DDENGINE
-		else if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver && VNCOS.OS_WIN8)
+		else if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver && (VNCOS.OS_WIN8||VNCOS.OS_WIN10))
 		{
 			strcpy_s(g_hookstring,"ddengine");
 			waittime = 1000;
@@ -1201,17 +1201,7 @@ vncDesktopThread::run_undetached(void *arg)
 											if(m_desktop->m_screenCapture)
 												m_desktop->m_screenCapture->Unlock();
 										}
-										//update preview
-										if (m_desktop->first_update == 1) {
-											 rfb::Rect rect;
-											 rect.tl.x = m_desktop->m_Cliprect.tl.x;
-											 rect.tl.y = m_desktop->m_Cliprect.tl.y  + ((m_desktop->m_Cliprect.br.y - m_desktop->m_Cliprect.tl.y) / 10 ) * m_desktop->first_update_counter++;
-											 rect.br.x = m_desktop->m_Cliprect.br.x;
-											 rect.br.y = m_desktop->m_Cliprect.tl.y  + ((m_desktop->m_Cliprect.br.y - m_desktop->m_Cliprect.tl.y) / 10 ) * m_desktop->first_update_counter;
-											 if ( m_desktop->first_update_counter == 10)
-												 m_desktop->first_update = 2;
-											 changedrgn.assign_union(rect);
-										}
+
 										m_server->initialCapture_done();
 
 
