@@ -585,6 +585,12 @@ vncProperties::DialogProc(HWND hwnd,
 				_this->m_server->JapInputEnabled(),
 				0);
 
+			HWND hwinhelper = GetDlgItem(hwnd, IDC_WIN8_HELPER);
+			SendMessage(hwinhelper,
+				BM_SETCHECK,
+				_this->m_server->Win8HelperEnabled(),
+				0);
+
 			// Remove the wallpaper
 			HWND hRemoveWallpaper = GetDlgItem(hwnd, IDC_REMOVE_WALLPAPER);
 			SendMessage(hRemoveWallpaper,
@@ -808,6 +814,11 @@ vncProperties::DialogProc(HWND hwnd,
 				HWND hJapInputs = GetDlgItem(hwnd, IDC_JAP_INPUTS);
 				_this->m_server->EnableJapInput(
 					SendMessage(hJapInputs, BM_GETCHECK, 0, 0) == BST_CHECKED
+					);
+
+				HWND hwinhelper = GetDlgItem(hwnd, IDC_WIN8_HELPER);
+				_this->m_server->Win8HelperEnabled(
+					SendMessage(hwinhelper, BM_GETCHECK, 0, 0) == BST_CHECKED
 					);
 
 				// Wallpaper handling
@@ -1713,6 +1724,7 @@ LABELUSERSETTINGS:
 	m_pref_EnableRemoteInputs=TRUE;
 	m_pref_DisableLocalInputs=FALSE;
 	m_pref_EnableJapInput=FALSE;
+	m_pref_EnableWin8Helper=FALSE;
 	m_pref_clearconsole=FALSE;
 	m_pref_LockSettings=-1;
 
@@ -1862,6 +1874,7 @@ vncProperties::LoadUserPrefs(HKEY appkey)
 	m_pref_LockSettings=LoadInt(appkey, "LockSetting", m_pref_LockSettings);
 	m_pref_DisableLocalInputs=LoadInt(appkey, "LocalInputsDisabled", m_pref_DisableLocalInputs);
 	m_pref_EnableJapInput=LoadInt(appkey, "EnableJapInput", m_pref_EnableJapInput);
+	m_pref_EnableWin8Helper=LoadInt(appkey, "EnableWin8Helper", m_pref_EnableWin8Helper);
 	m_pref_clearconsole=LoadInt(appkey, "clearconsole", m_pref_clearconsole);
 }
 
@@ -1905,6 +1918,8 @@ vncProperties::ApplyUserPrefs()
 		m_server->DisableLocalInputs(m_pref_DisableLocalInputs);
 	if (m_pref_EnableJapInput)
 		m_server->EnableJapInput(m_pref_EnableJapInput);
+	if (m_pref_EnableWin8Helper)
+		m_server->Win8HelperEnabled(m_pref_EnableWin8Helper);
 	m_server->Clearconsole(m_pref_clearconsole);
 
 	// Update the password
@@ -1925,6 +1940,7 @@ vncProperties::ApplyUserPrefs()
 	m_server->SetLockSettings(m_pref_LockSettings);
 	m_server->DisableLocalInputs(m_pref_DisableLocalInputs);
 	m_server->EnableJapInput(m_pref_EnableJapInput);
+	m_server->Win8HelperEnabled(m_pref_EnableWin8Helper);
 	m_server->Clearconsole(m_pref_clearconsole);
 
 	// DSM Plugin prefs
@@ -2135,6 +2151,7 @@ vncProperties::SaveUserPrefs(HKEY appkey)
 	SaveInt(appkey, "LocalInputsDisabled", m_server->LocalInputsDisabled());
 	SaveInt(appkey, "IdleTimeout", m_server->AutoIdleDisconnectTimeout());
 	SaveInt(appkey, "EnableJapInput", m_server->JapInputEnabled());
+	SaveInt(appkey, "EnableWin8Helper", m_server->Win8HelperEnabled());
 
 	// Connection querying settings
 	SaveInt(appkey, "QuerySetting", m_server->QuerySetting());
@@ -2266,6 +2283,7 @@ void vncProperties::LoadFromIniFile()
 	m_pref_EnableRemoteInputs=TRUE;
 	m_pref_DisableLocalInputs=FALSE;
 	m_pref_EnableJapInput=FALSE;
+	m_pref_EnableWin8Helper=FALSE;
 	m_pref_clearconsole=FALSE;
 	m_pref_LockSettings=-1;
 
@@ -2369,6 +2387,7 @@ void vncProperties::LoadUserPrefsFromIniFile()
 	m_pref_LockSettings=myIniFile.ReadInt("admin", "LockSetting", m_pref_LockSettings);
 	m_pref_DisableLocalInputs=myIniFile.ReadInt("admin", "LocalInputsDisabled", m_pref_DisableLocalInputs);
 	m_pref_EnableJapInput=myIniFile.ReadInt("admin", "EnableJapInput", m_pref_EnableJapInput);
+	m_pref_EnableWin8Helper=myIniFile.ReadInt("admin", "EnableWin8Helper", m_pref_EnableWin8Helper);
 	m_pref_clearconsole=myIniFile.ReadInt("admin", "clearconsole", m_pref_clearconsole);
 	G_SENDBUFFER_EX=myIniFile.ReadInt("admin", "sendbuffer", G_SENDBUFFER_EX);
 }
@@ -2484,6 +2503,7 @@ void vncProperties::SaveUserPrefsToIniFile()
 	myIniFile.WriteInt("admin", "LocalInputsDisabled", m_server->LocalInputsDisabled());
 	myIniFile.WriteInt("admin", "IdleTimeout", m_server->AutoIdleDisconnectTimeout());
 	myIniFile.WriteInt("admin", "EnableJapInput", m_server->JapInputEnabled());
+	myIniFile.WriteInt("admin", "EnableWin8Helper", m_server->Win8HelperEnabled());
 
 	// Connection querying settings
 	myIniFile.WriteInt("admin", "QuerySetting", m_server->QuerySetting());

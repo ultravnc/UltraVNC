@@ -37,6 +37,13 @@ struct keyEventdata
 	DWORD dwflags;
 };
 
+class mini_lock
+{
+public:
+		mini_lock(int a);
+		~mini_lock();
+};
+
 class comm_serv
 {
 public:

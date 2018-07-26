@@ -350,7 +350,7 @@ public:
 
 	sessionmsg *sesmsg ;
 	int aantal_session;
-
+	vncServer 		*m_server;
 	// Implementation
 protected:
 
@@ -398,8 +398,7 @@ protected:
 
 	// DATA
 
-	// Generally useful stuff
-	vncServer 		*m_server;
+	// Generally useful stuff	
 	omni_thread 	*m_thread;
 	HWND			m_hwnd;
 	//UINT			m_timerid;

@@ -29,8 +29,23 @@ comm_serv *keyEventFn=NULL;
 comm_serv *StopeventFn=NULL;
 comm_serv *StarteventFn=NULL;
 
-CRITICAL_SECTION keyb_crit;
-bool crit_init=false;
+int g_lockcode = 0;
+int g_initialized = false;
+
+mini_lock::mini_lock(int lockcode)
+{
+	while (g_lockcode != 0) {
+
+		Sleep(100);
+	}
+	g_lockcode = lockcode;
+}
+
+mini_lock::~mini_lock()
+{
+	g_lockcode = 0;
+}
+
 
 bool Shellexecuteforuiaccess()
 {		
@@ -58,21 +73,29 @@ bool Shellexecuteforuiaccess()
 		shExecInfo.lpDirectory = NULL;
 		shExecInfo.nShow = SW_HIDE;
 		shExecInfo.hInstApp = NULL;
-		ShellExecuteEx(&shExecInfo);
+		if (!ShellExecuteEx(&shExecInfo))
+		{
+			DWORD error=GetLastError();
+			return false;
+		}
 		return true;
 }
 
  int keycounter =0;
 void keepalive()
 {
-	if (!VNCOS.OS_WIN8) return;
+	if (!VNCOS.OS_WIN8) 
+		return;
+	//must be initialized and not buzy
+	mini_lock ml(1);
 
-	//keepalive not needed when some keybaord stuff is already being done
-	if (!TryEnterCriticalSection(&keyb_crit)) return;
+
 	unsigned char Invalue=12;
 	unsigned char Outvalue=0;
-	if (StarteventFn) StarteventFn->Call_Fnction_Long_Timeout((char*)&Invalue,(char*)&Outvalue,5);
-	else goto error;
+	if (StarteventFn) 
+		StarteventFn->Call_Fnction_Long_Timeout((char*)&Invalue,(char*)&Outvalue,5);
+	else
+	goto error;
 	if (Invalue!=Outvalue)
 	{
 		if (keyEventFn)delete keyEventFn;
@@ -87,7 +110,6 @@ void keepalive()
 		if (keycounter>3) goto error;
 	}
 	else keycounter=0;
-	LeaveCriticalSection(&keyb_crit);
 	return;
 	// This disable the keyboard helper, better to have something
 	error:
@@ -97,17 +119,15 @@ void keepalive()
 			StopeventFn=NULL;
 	if (StarteventFn)delete StarteventFn;
 			StarteventFn=NULL;
-	LeaveCriticalSection(&keyb_crit);
 }
 
 void keybd_uni_event(_In_  BYTE bVk,_In_  BYTE bScan,_In_  DWORD dwFlags,_In_  ULONG_PTR dwExtraInfo)
 {
-	if (!VNCOS.OS_WIN8) 
-	{
+	if (!VNCOS.OS_WIN8 || g_lockcode != 0 || !g_initialized) {
 		keybd_event(bVk,bScan,dwFlags,dwExtraInfo);
 		return;
 	}
-
+	mini_lock ml(2);
 	bool ldown = HIBYTE(::GetKeyState(VK_LMENU)) != 0;
 	bool rdown = HIBYTE(::GetKeyState(VK_RMENU)) != 0;	
 	bool lcdown = HIBYTE(::GetKeyState(VK_LCONTROL)) != 0;	
@@ -116,51 +136,19 @@ void keybd_uni_event(_In_  BYTE bVk,_In_  BYTE bScan,_In_  DWORD dwFlags,_In_  U
 	bool rwindown = HIBYTE(::GetKeyState(VK_RWIN)) != 0;
 	// The shared memory trick to inject keys seems to generate an overhead when fast key presses are done.
 	// Actual we only need it for special keys, so we better ctivate the check
-	 if (keyEventFn==NULL || !VNCOS.OS_WIN8 || (!ldown && !lcdown && !lwindown) )
-	 {
+	 if (keyEventFn==NULL || (!ldown && !lcdown && !lwindown) )
 		 keybd_event(bVk,bScan,dwFlags,dwExtraInfo);
-	 }
-	 else 
-	 {
-		//if locked just do it local, special keys want work, but you always can do it again
-		if (!TryEnterCriticalSection(&keyb_crit))
-		 {
-			keybd_event(bVk, bScan, dwFlags, dwExtraInfo);
-			return;
-		 }
+	 else {
 		keyEventdata ked;
 		ked.bVk=bVk;
 		ked.bScan=bScan;	
 		ked.dwflags=dwFlags;
-		keyEventFn->Call_Fnction((char*)&ked,NULL);
-		LeaveCriticalSection(&keyb_crit);
+		keyEventFn->Call_Fnction((char*)&ked,NULL);		
 	 }
-}
-
-DWORD WINAPI initkeyboardthread( LPVOID lpParam )
-{
-	Sleep(1000);
-	unsigned char Invalue=12;
-	unsigned char Outvalue=0;
-	StarteventFn->Call_Fnction_Long_Timeout((char*)&Invalue,(char*)&Outvalue,5);
-	if (Invalue!=Outvalue)
-	{
-		 goto error;
-	}	
-	return 0;
-	error:
-	if (keyEventFn)delete keyEventFn;
-			keyEventFn=NULL;
-	if (StopeventFn)delete StopeventFn;
-			StopeventFn=NULL;
-	if (StarteventFn)delete StarteventFn;
-			StarteventFn=NULL;
-	return 0;
 }
 
 void keybd_initialize_no_crit()
 {
-	if (!VNCOS.OS_WIN8) return;
 
 	keyEventFn=new comm_serv;
 	StopeventFn=new comm_serv;
@@ -169,13 +157,20 @@ void keybd_initialize_no_crit()
 	if (!StopeventFn->Init("stop_event",0,0,false,true)) goto error;
 	if (!StarteventFn->Init("start_event",1,1,false,true)) goto error;	
 	if (!Shellexecuteforuiaccess()) goto error;
-
-	DWORD dw;
-	HANDLE thread=CreateThread( NULL, 0,initkeyboardthread, NULL, 0, &dw);
-	CloseHandle(thread);
+	Sleep(1000);
+	unsigned char Invalue=12;
+	unsigned char Outvalue=0;
+	if (StarteventFn == NULL)
+		goto error;
+	StarteventFn->Call_Fnction_Long_Timeout((char*)&Invalue,(char*)&Outvalue,5);
+	if (Invalue!=Outvalue)
+	{
+		 goto error;
+	}
+	g_initialized = true;
 	return;
-
 error:
+
 	if (keyEventFn)delete keyEventFn;
 			keyEventFn=NULL;
 	if (StopeventFn)delete StopeventFn;
@@ -185,14 +180,36 @@ error:
 	return;
 }
 
+DWORD WINAPI initkeyboardthread( LPVOID lpParam )
+{
+
+	//mini_lock ml(3);
+	unsigned char Invalue=12;
+	unsigned char Outvalue=0;
+	if (StarteventFn == NULL)
+		goto error;
+	StarteventFn->Call_Fnction_Long_Timeout((char*)&Invalue,(char*)&Outvalue,5);
+	if (Invalue!=Outvalue)
+		 goto error;
+
+	return 0;
+	error:
+	if (keyEventFn)delete keyEventFn;
+			keyEventFn=NULL;
+	if (StopeventFn)delete StopeventFn;
+			StopeventFn=NULL;
+	if (StarteventFn)delete StarteventFn;
+			StarteventFn=NULL;
+
+	return 0;
+
+}
+
 void keybd_initialize()
 {
 	if (!VNCOS.OS_WIN8) return;
-	if (!crit_init)
-		InitializeCriticalSection(&keyb_crit);
-	crit_init=true;
-
-	EnterCriticalSection(&keyb_crit);
+	g_initialized = true;
+	mini_lock ml(4);
 	keyEventFn=new comm_serv;
 	StopeventFn=new comm_serv;
 	StarteventFn=new comm_serv;
@@ -205,27 +222,30 @@ void keybd_initialize()
 	if (!Shellexecuteforuiaccess()) 
 		goto error;
 
-	DWORD dw;
-	HANDLE thread=CreateThread( NULL, 0,initkeyboardthread, NULL, 0, &dw);
-	CloseHandle(thread);
-	LeaveCriticalSection(&keyb_crit);
+	unsigned char Invalue=12;
+	unsigned char Outvalue=0;
+	if (StarteventFn == NULL)
+		goto error;
+	StarteventFn->Call_Fnction_Long_Timeout((char*)&Invalue,(char*)&Outvalue,5);
+	if (Invalue!=Outvalue)
+		 goto error;
+
 	return;
 
-	error:
+error:
 	if (keyEventFn)delete keyEventFn;
 			keyEventFn=NULL;
 	if (StopeventFn)delete StopeventFn;
 			StopeventFn=NULL;
 	if (StarteventFn)delete StarteventFn;
 			StarteventFn=NULL;
-	LeaveCriticalSection(&keyb_crit);
 	return;
 }
 
 void keybd_delete()
 {
-	if (!VNCOS.OS_WIN8) return;
-	EnterCriticalSection(&keyb_crit);
+	if (!VNCOS.OS_WIN8) 
+		return;
 	if (StopeventFn) StopeventFn->Call_Fnction_no_feedback();
 	if (keyEventFn)delete keyEventFn;
 	keyEventFn=NULL;
@@ -233,9 +253,8 @@ void keybd_delete()
 	StopeventFn=NULL;
 	if (StarteventFn)delete StarteventFn;
 	StarteventFn=NULL;
-	LeaveCriticalSection(&keyb_crit);
-	if (crit_init) DeleteCriticalSection(&keyb_crit);
-	crit_init=false;
+	g_initialized=false;
+
 }
 
 comm_serv::comm_serv()
@@ -304,8 +323,8 @@ void
 
 bool comm_serv::Init(char *name,int IN_datasize_IN,int IN_datasize_OUT,bool app,bool master)
 {
-	datasize_IN=IN_datasize_IN;
-	datasize_OUT=IN_datasize_OUT;
+	datasize_IN = IN_datasize_IN;
+	datasize_OUT = IN_datasize_OUT;
 
 	char secDesc[ SECURITY_DESCRIPTOR_MIN_LENGTH ];
 		secAttr.nLength = sizeof(secAttr);
@@ -598,6 +617,7 @@ void comm_serv::Call_Fnction_Long_Timeout(char *databuffer_IN,char *databuffer_O
 	{
 		unsigned char value=99;
 		memcpy(databuffer_OUT,&value,datasize_OUT);
+		LeaveCriticalSection(&CriticalSection_OUT);
 		return;
 	}
 	LeaveCriticalSection(&CriticalSection_OUT);

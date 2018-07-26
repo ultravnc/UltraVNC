@@ -35,6 +35,7 @@ typedef BOOL (WINAPI *CHANGEWINDOWMESSAGEFILTER)(UINT message, DWORD dwFlag);
 int OSversion();
 DWORD WINAPI InitWindowThread(LPVOID lpParam);
 extern char g_hookstring[16];
+extern int g_lockcode;
 
 
 void
@@ -43,6 +44,7 @@ vncDesktop::ShutdownInitWindowthread()
 	// we keep the sink window running
 	// but ignore info
 	can_be_hooked=false;
+	g_lockcode = 0;
 	vnclog.Print(LL_INTINFO, VNCLOG("ShutdownInitWindowthread \n"));
 }
 
@@ -51,6 +53,7 @@ vncDesktop::StopInitWindowthread()
 {
 	//vndesktopthread is closing, all threads need to be stopped
 	//else winvnc wil stay running in background on exit
+	g_lockcode = 0;
 		can_be_hooked=true;
 		if (InitWindowThreadh)
 		{
@@ -135,11 +138,13 @@ vncDesktop::StartInitWindowthread()
 
 DWORD WINAPI
 InitWindowThread(LPVOID lpParam)
-{
-	keybd_initialize();
+{	
 	vncDesktop *mydesk=(vncDesktop*)lpParam;
+	if (mydesk->m_server->Win8HelperEnabled()) 
+		keybd_initialize();
 	mydesk->InitWindow();
-	keybd_delete();
+	if (mydesk->m_server->Win8HelperEnabled())
+		keybd_delete();
 	return 0;
 }
 
@@ -153,12 +158,12 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 #else
 	vncDesktop *_this = (vncDesktop*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
 #endif
-	/*#ifdef _DEBUG
+	#ifdef _DEBUG
 										char			szText[256];
 										sprintf(szText,"Message %i\n",iMsg );
 										OutputDebugString(szText);
 										//vnclog.Print(LL_INTERR, VNCLOG("%i  \n"),iMsg);
-			#endif*/
+			#endif
 	switch (iMsg)
 	{
 	case WM_CREATE:
@@ -202,7 +207,10 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 						}
 					}
 			}
-			else SetEvent(_this->trigger_events[0]);
+			else if (wParam==1001){
+				if (_this->m_server->Win8HelperEnabled())
+					keepalive();
+			}
 		}
 		break;
 	case WM_MOUSESHAPE:
@@ -278,6 +286,7 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 				_this->m_hookinited=FALSE;
 			}
 		vnclog.Print(LL_INTERR, VNCLOG("WM_DESTROY\n"));
+		PostQuitMessage(0); 
 		break;
 	///ddihook
 	case WM_SYSCOMMAND:
@@ -332,7 +341,8 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		//we need to restart it again
 		_this->m_displaychanged = TRUE;
 		_this->m_hookdriver = true;
-		_this->m_screenCapture->setBlocked(true);
+		if(_this->m_screenCapture)
+			_this->m_screenCapture->setBlocked(true);
 		break;
 	case WM_APP + 11:
 		SetEvent(_this->trigger_events[3]);
@@ -609,11 +619,7 @@ vncDesktop::InitWindow()
 		
 		if (PeekMessage(&msg,NULL,0,0,PM_REMOVE))
 		{
-			//vnclog.Print(LL_INTERR, VNCLOG("OOOOOOOOOOOO %i %i\n"),msg.message,msg.hwnd);
-			if (msg.message==WM_TIMER)
-			{
-				if(msg.wParam==1001) keepalive();
-			}			
+
 			if (msg.message==WM_QUIT || fShutdownOrdered)
 				{
 					vnclog.Print(LL_INTERR, VNCLOG("OOOOOOOOOOOO called wm_quit\n"));
@@ -668,6 +674,15 @@ vncDesktop::InitWindow()
 				}
 		}
 		else WaitMessage();
+	}
+	while (g_lockcode != 0)
+	{
+			#ifdef _DEBUG
+					char			szText[256];
+					sprintf(szText," OOOOOOOOOOOOOOOOOOOOOOOOOOOOO++++++ WAITING %s \n", g_lockcode);
+					OutputDebugString(szText);
+#endif
+					Sleep(100);
 	}
 	KillTimer(m_hwnd,1001);
 	if (hModule)FreeLibrary(hModule);

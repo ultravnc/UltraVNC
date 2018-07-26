@@ -68,11 +68,11 @@ vncDesktopThread::copy_bitmaps_to_buffer(ULONG i,rfb::Region2D &rgncache,rfb::Up
 		//vnclog.Print(LL_INTINFO, VNCLOG("Driver ************* %i %i %i %i \n"),x,y,w,h);
 
 		if (!ClipRect(&x, &y, &w, &h, 0,0,m_desktop->m_bmrect.br.x, m_desktop->m_bmrect.br.y)) return;
-#ifdef _DEBUG
+/*#ifdef _DEBUG
 					char			szText[256];
 					sprintf(szText,"REct1 %i %i %i %i  \n",x,y,w,h);
 					OutputDebugString(szText);		
-#endif
+#endif*/
 		rect.tl.x = x;
 		rect.br.x = x+w;
 		rect.tl.y = y;
@@ -148,7 +148,9 @@ vncDesktopThread::handle_driver_changes(rfb::Region2D &rgncache,rfb::UpdateTrack
 
 	omni_mutex_lock l(m_desktop->m_screenCapture_lock,70);
 
-	int oldaantal=m_desktop->m_screenCapture->getPreviousCounter();
+	if (!m_desktop->m_screenCapture)
+		return FALSE;
+	int	oldaantal = m_desktop->m_screenCapture->getPreviousCounter();
 	int counter=m_desktop->pchanges_buf->counter;
 //	int nr_updates=m_desktop->pchanges_buf->pointrect[0].type;
 //	vnclog.Print(LL_INTERR, VNCLOG("updates, rects %i\n"),oldaantal-counter);
@@ -178,7 +180,8 @@ vncDesktopThread::handle_driver_changes(rfb::Region2D &rgncache,rfb::UpdateTrack
 				}
 		}	
 //	vnclog.Print(LL_INTINFO, VNCLOG("Nr rects %i \n"),rgncache.Numrects());
-	m_desktop->m_screenCapture->setPreviousCounter(counter);
+	if (m_desktop->m_screenCapture)
+		m_desktop->m_screenCapture->setPreviousCounter(counter);
 // A lot updates left after combining 
 // This generates an overflow
 // We expand each single update to minimum 32x32
@@ -881,7 +884,7 @@ vncDesktopThread::run_undetached(void *arg)
 			strcpy_s(g_hookstring,"driver");
 			int fastcounter=0;
 			POINT cursorpos;
-			while (m_desktop->m_screenCapture->getPreviousCounter() == m_desktop->pchanges_buf->counter)
+			while (m_desktop->m_screenCapture && m_desktop->m_screenCapture->getPreviousCounter() == m_desktop->pchanges_buf->counter)
 			{
 				Sleep(5);
 				fastcounter++;
@@ -1072,7 +1075,7 @@ vncDesktopThread::run_undetached(void *arg)
 										// or missing mouse cursor.		
 										if (PreConnect && m_desktop->m_server->IsEncoderSet())
 											m_desktop->m_buffer.WriteMessageOnScreenPreConnect();
-										else if (!PreConnect && m_desktop->VideoBuffer() && m_desktop->m_hookdriver) {
+										else if (!PreConnect && m_desktop->VideoBuffer() && m_desktop->m_hookdriver ) {
 											m_desktop->m_buffer.GrabRegion(rgncache, true, capture);
 										}
 										else if (!PreConnect)
@@ -1206,7 +1209,7 @@ vncDesktopThread::run_undetached(void *arg)
 
 
 
-#ifdef _DEBUG
+/*#ifdef _DEBUG
 			char			szText[256];
 			rfb::RectVector rects;
 			rfb::RectVector::iterator i;
@@ -1232,7 +1235,7 @@ vncDesktopThread::run_undetached(void *arg)
 				OutputDebugString(szText);
 			}
 
-#endif
+#endif*/
 
 										if (!initialupdate) {
 											m_server->InitialUpdate(true);

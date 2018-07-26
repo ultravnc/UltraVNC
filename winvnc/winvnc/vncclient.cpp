@@ -5258,7 +5258,7 @@ vncClient::SendRectangles(const rfb::RectVector &rects)
 			rect.br.x=(*i).br.x;
 			rect.tl.y=(*i).tl.y;
 			rect.br.y=(*i).br.y;
-#ifdef _DEBUG
+/*#ifdef _DEBUG
 			char			szText[256];
 							
 				sprintf(szText,"SendRectangles  %i %i %i %i \n",rect.tl.x,
@@ -5266,7 +5266,7 @@ vncClient::SendRectangles(const rfb::RectVector &rects)
 				rect.br.x,
 				rect.br.y);
 				OutputDebugString(szText);
-#endif
+#endif*/
 
 		if (m_encodemgr.ultra2_encoder_in_use)
 		{

@@ -251,6 +251,9 @@ public:
 	virtual bool LocalInputsDisabled();
 	virtual BOOL JapInputEnabled();
 	virtual void EnableJapInput(BOOL enable);
+	//virtual void Enable(BOOL enable);
+	virtual BOOL Win8HelperEnabled();
+	virtual void Win8HelperEnabled(BOOL enable);
 	virtual void Clearconsole(BOOL enable);
 
 	// General connection handling
@@ -495,6 +498,7 @@ protected:
 	BOOL				m_enable_remote_inputs;
 	BOOL				m_disable_local_inputs;
 	BOOL				m_enable_jap_input;
+	BOOL				m_enable_win8helper;
 	int					m_lock_on_exit;
 	int					m_connect_pri;
 	UINT				m_querysetting;

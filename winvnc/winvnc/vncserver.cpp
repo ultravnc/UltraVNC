@@ -181,6 +181,7 @@ vncServer::vncServer()
 	m_enable_remote_inputs = TRUE;
 	m_disable_local_inputs = FALSE;
 	m_enable_jap_input = FALSE;
+	m_enable_win8helper = FALSE;
 
 	// Clear the client mapping table
 	for (int x=0; x<MAX_CLIENTS; x++)
@@ -1506,6 +1507,16 @@ BOOL vncServer::JapInputEnabled()
 {
 	return m_enable_jap_input;
 }
+
+BOOL vncServer::Win8HelperEnabled()
+{
+	return m_enable_win8helper;
+}
+void vncServer:: Win8HelperEnabled(BOOL enable)
+{
+	m_enable_win8helper = enable;
+}
+
 
 void
 vncServer::EnableJapInput(BOOL enable)

@@ -436,8 +436,9 @@ vncEncodeMgr::SetEncoding(CARD32 encoding,BOOL reinitialize)
 		encoding = rfbEncodingHextile;
 	}
 
-	if (encoding == m_encoding)
+	if (encoding == m_encoding && m_encoder != NULL)
 		return TRUE;
+
 	if (reinitialize)
 	{
 		encoding=m_encoding;
