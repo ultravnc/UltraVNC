@@ -221,7 +221,7 @@ void keybd_initialize()
 		goto error;	
 	if (!Shellexecuteforuiaccess()) 
 		goto error;
-
+	Sleep(2000);
 	unsigned char Invalue=12;
 	unsigned char Outvalue=0;
 	if (StarteventFn == NULL)
