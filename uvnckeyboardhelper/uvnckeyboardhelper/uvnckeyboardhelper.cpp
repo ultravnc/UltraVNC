@@ -580,7 +580,7 @@ DWORD WINAPI Cadthread(LPVOID lpParam)
 		if (!StarteventFn.Init("start_event",1,1,false,false)) goto error;
 		HANDLE Events_ini[1];
 		Events_ini[0]=StarteventFn.GetEvent();
-		DWORD dwEvent = WaitForMultipleObjects(1,Events_ini,FALSE,1000);
+		DWORD dwEvent = WaitForMultipleObjects(1,Events_ini,FALSE,5000);
 		switch(dwEvent)
 				{
 					case WAIT_OBJECT_0 + 0:
@@ -623,7 +623,7 @@ DWORD WINAPI Cadthread(LPVOID lpParam)
 						counter++;
 						break;
 				}
-		if (counter>3) break;
+		if (counter>5) break;
 		}
 
 error:
