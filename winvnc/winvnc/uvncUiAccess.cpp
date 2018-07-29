@@ -31,6 +31,7 @@ comm_serv *StarteventFn=NULL;
 
 int g_lockcode = 0;
 int g_initialized = false;
+int errorcounter =0;
 
 mini_lock::mini_lock(int lockcode)
 {
@@ -79,37 +80,28 @@ bool Shellexecuteforuiaccess()
 			return false;
 		}
 		return true;
+		Sleep(2000);
 }
 
- int keycounter =0;
 void keepalive()
 {
-	if (!VNCOS.OS_WIN8) 
+	if (!VNCOS.OS_WIN8 || errorcounter > 3) 
 		return;
-	//must be initialized and not buzy
 	mini_lock ml(1);
-
-
 	unsigned char Invalue=12;
 	unsigned char Outvalue=0;
-	if (StarteventFn) 
-		StarteventFn->Call_Fnction_Long_Timeout((char*)&Invalue,(char*)&Outvalue,5);
-	else
-	goto error;
-	if (Invalue!=Outvalue)
-	{
-		if (keyEventFn)delete keyEventFn;
-			keyEventFn=NULL;
-		if (StopeventFn)delete StopeventFn;
-			StopeventFn=NULL;
-		if (StarteventFn)delete StarteventFn;
-			StarteventFn=NULL;
-		//Try to reinit the keyboard
-		keybd_initialize_no_crit();
-		keycounter++;
-		if (keycounter>3) goto error;
+	if (StarteventFn) {
+		StarteventFn->Call_Fnction_Long_Timeout((char*)&Invalue,(char*)&Outvalue,1);
+		if (Invalue == Outvalue) {
+			errorcounter=0;
+			return;
+		}
 	}
-	else keycounter=0;
+	//Try to reinit the keyboard
+	keybd_initialize_no_crit();
+	errorcounter++;
+	if (errorcounter>3) 
+		goto error;
 	return;
 	// This disable the keyboard helper, better to have something
 	error:
@@ -149,28 +141,36 @@ void keybd_uni_event(_In_  BYTE bVk,_In_  BYTE bScan,_In_  DWORD dwFlags,_In_  U
 
 void keybd_initialize_no_crit()
 {
-
+	if (keyEventFn)delete keyEventFn;
+		keyEventFn=NULL;
+	if (StopeventFn)delete StopeventFn;
+		StopeventFn=NULL;
+	if (StarteventFn)delete StarteventFn;
+		StarteventFn=NULL;
 	keyEventFn=new comm_serv;
 	StopeventFn=new comm_serv;
 	StarteventFn=new comm_serv;
-	if (!keyEventFn->Init("keyEvent",sizeof(keyEventdata),0,false,true)) goto error;
-	if (!StopeventFn->Init("stop_event",0,0,false,true)) goto error;
-	if (!StarteventFn->Init("start_event",1,1,false,true)) goto error;	
-	if (!Shellexecuteforuiaccess()) goto error;
-	Sleep(1000);
+	if (!keyEventFn->Init("keyEvent",sizeof(keyEventdata),0,false,true)) 
+		goto error;
+	if (!StopeventFn->Init("stop_event",0,0,false,true)) 
+		goto error;
+	if (!StarteventFn->Init("start_event",1,1,false,true))
+		goto error;	
+	if (!Shellexecuteforuiaccess())
+		goto error;
 	unsigned char Invalue=12;
 	unsigned char Outvalue=0;
 	if (StarteventFn == NULL)
 		goto error;
-	StarteventFn->Call_Fnction_Long_Timeout((char*)&Invalue,(char*)&Outvalue,5);
-	if (Invalue!=Outvalue)
-	{
-		 goto error;
+	int StartErrorCounter = 0;
+	while (Invalue!=Outvalue) {
+		StarteventFn->Call_Fnction_Long_Timeout((char*)&Invalue,(char*)&Outvalue,1);
+		StartErrorCounter++;
+		if (StartErrorCounter > 5)
+			goto error;	
 	}
-	g_initialized = true;
 	return;
 error:
-
 	if (keyEventFn)delete keyEventFn;
 			keyEventFn=NULL;
 	if (StopeventFn)delete StopeventFn;
@@ -178,37 +178,13 @@ error:
 	if (StarteventFn)delete StarteventFn;
 			StarteventFn=NULL;
 	return;
-}
-
-DWORD WINAPI initkeyboardthread( LPVOID lpParam )
-{
-
-	//mini_lock ml(3);
-	unsigned char Invalue=12;
-	unsigned char Outvalue=0;
-	if (StarteventFn == NULL)
-		goto error;
-	StarteventFn->Call_Fnction_Long_Timeout((char*)&Invalue,(char*)&Outvalue,5);
-	if (Invalue!=Outvalue)
-		 goto error;
-
-	return 0;
-	error:
-	if (keyEventFn)delete keyEventFn;
-			keyEventFn=NULL;
-	if (StopeventFn)delete StopeventFn;
-			StopeventFn=NULL;
-	if (StarteventFn)delete StarteventFn;
-			StarteventFn=NULL;
-
-	return 0;
-
 }
 
 void keybd_initialize()
 {
 	if (!VNCOS.OS_WIN8) return;
 	g_initialized = true;
+	errorcounter = 0;
 	mini_lock ml(4);
 	keyEventFn=new comm_serv;
 	StopeventFn=new comm_serv;
@@ -220,18 +196,19 @@ void keybd_initialize()
 	if (!StarteventFn->Init("start_event",1,1,false,true)) 
 		goto error;	
 	if (!Shellexecuteforuiaccess()) 
-		goto error;
-	Sleep(2000);
+		goto error;	
 	unsigned char Invalue=12;
 	unsigned char Outvalue=0;
 	if (StarteventFn == NULL)
 		goto error;
-	StarteventFn->Call_Fnction_Long_Timeout((char*)&Invalue,(char*)&Outvalue,5);
-	if (Invalue!=Outvalue)
-		 goto error;
-
+	int StartErrorCounter = 0;
+	while (Invalue!=Outvalue) {
+		StarteventFn->Call_Fnction_Long_Timeout((char*)&Invalue,(char*)&Outvalue, 1);
+		StartErrorCounter++;
+		if (StartErrorCounter > 5)
+			goto error;	
+	}
 	return;
-
 error:
 	if (keyEventFn)delete keyEventFn;
 			keyEventFn=NULL;
@@ -254,7 +231,6 @@ void keybd_delete()
 	if (StarteventFn)delete StarteventFn;
 	StarteventFn=NULL;
 	g_initialized=false;
-
 }
 
 comm_serv::comm_serv()
