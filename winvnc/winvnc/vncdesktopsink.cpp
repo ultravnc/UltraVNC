@@ -101,6 +101,8 @@ vncDesktop::StartInitWindowthread()
 			if (InitWindowThreadh==NULL)
 			{
 				ResetEvent(restart_event);
+				if (m_server->Win8HelperEnabled()) 
+					keybd_initialize();
 				InitWindowThreadh=CreateThread(NULL,0,InitWindowThread,this,0,&pumpID);
 				DWORD status=WaitForSingleObject(restart_event,10000);
 				if (status==WAIT_TIMEOUT)
@@ -140,8 +142,8 @@ DWORD WINAPI
 InitWindowThread(LPVOID lpParam)
 {	
 	vncDesktop *mydesk=(vncDesktop*)lpParam;
-	if (mydesk->m_server->Win8HelperEnabled()) 
-		keybd_initialize();
+	//if (mydesk->m_server->Win8HelperEnabled()) 
+		//keybd_initialize();
 	mydesk->InitWindow();
 	if (mydesk->m_server->Win8HelperEnabled())
 		keybd_delete();

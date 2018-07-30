@@ -32,12 +32,17 @@ comm_serv *StarteventFn=NULL;
 int g_lockcode = 0;
 int g_initialized = false;
 int errorcounter =0;
+int preventDeadlock = 0;
 
 mini_lock::mini_lock(int lockcode)
 {
+	preventDeadlock = 0;
 	while (g_lockcode != 0) {
 
 		Sleep(100);
+		preventDeadlock++;
+		if (preventDeadlock > 20)
+			g_lockcode = 0;
 	}
 	g_lockcode = lockcode;
 }
@@ -182,9 +187,11 @@ error:
 
 void keybd_initialize()
 {
-	if (!VNCOS.OS_WIN8) return;
+	if (!VNCOS.OS_WIN8) 
+		return;
 	g_initialized = true;
 	errorcounter = 0;
+	g_lockcode = 0;
 	mini_lock ml(4);
 	keyEventFn=new comm_serv;
 	StopeventFn=new comm_serv;
