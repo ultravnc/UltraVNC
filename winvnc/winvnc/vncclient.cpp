@@ -711,6 +711,12 @@ vncClientUpdateThread::run_undetached(void *arg)
 					updates_sent++;
 					//m_client->m_incr_rgn.clear();
 					clipregion.clear();
+#ifdef _DEBUG
+					static DWORD sNotifyLastCopy1 = GetTickCount();
+					DWORD now = GetTickCount();;
+					OutputDevMessage("==================== SendUpdate %4d =======================", now - sNotifyLastCopy1);
+					sNotifyLastCopy1 = now;
+#endif
 				}
 			}
 			//else
@@ -3370,6 +3376,11 @@ vncClientThread::run(void *arg)
 								evt.type = INPUT_MOUSE;
 								int xx=msg.pe.x-GetSystemMetrics(SM_XVIRTUALSCREEN)+ (m_client->monitor_Offsetx+m_client->m_ScreenOffsetx);
 								int yy=msg.pe.y-GetSystemMetrics(SM_YVIRTUALSCREEN)+ (m_client->monitor_Offsety+m_client->m_ScreenOffsety);
+								if (m_server->Driver()) //chris
+								{
+									xx = msg.pe.x + m_client->monitor_Offsetx;
+									yy = msg.pe.y + m_client->monitor_Offsety;
+								}
 								evt.mi.dx = (xx * 65535) / (GetSystemMetrics(SM_CXVIRTUALSCREEN)-1);
 								evt.mi.dy = (yy* 65535) / (GetSystemMetrics(SM_CYVIRTUALSCREEN)-1);
 								evt.mi.dwFlags = flags | MOUSEEVENTF_VIRTUALDESK;
@@ -4791,9 +4802,7 @@ vncClient::NotifyUpdate(rfbFramebufferUpdateRequestMsg fur)
 		}
 
 #ifdef _DEBUG
-		char			szText[256];
-		sprintf(szText, " ++++++ rfbFramebufferUpdateRequestMsg\n");
-		OutputDebugString(szText);
+		OutputDevMessage("++++++ rfbFramebufferUpdateRequestMsg");
 #endif
 	// Add the requested area to the incremental update cliprect
 	m_incr_rgn.assign_union(update_rgn);

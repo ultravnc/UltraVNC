@@ -161,9 +161,7 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 	vncDesktop *_this = (vncDesktop*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
 #endif
 	#ifdef _DEBUG
-										char			szText[256];
-										sprintf(szText,"Message %i\n",iMsg );
-										OutputDebugString(szText);
+										OutputDevMessage("Message %i",iMsg );
 										//vnclog.Print(LL_INTERR, VNCLOG("%i  \n"),iMsg);
 			#endif
 	switch (iMsg)

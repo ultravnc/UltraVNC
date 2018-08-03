@@ -146,12 +146,10 @@ public:
 	virtual BOOL UpdateWanted() {
 		omni_mutex_lock l(GetUpdateLock(),324);
 #ifdef _DEBUG
-										char			szText[256];
-										sprintf(szText," UpdateWanted %i %i %i %i \n",!m_incr_rgn.is_empty(),
+										OutputDevMessage("%i %i %i %i",!m_incr_rgn.is_empty(),
 											m_incr_rgn.intersect(m_update_tracker.get_changed_region()).is_empty() ,
 											m_incr_rgn.intersect(m_update_tracker.get_cached_region()).is_empty() ,
 											m_incr_rgn.intersect(m_update_tracker.get_copied_region()).is_empty());
-										OutputDebugString(szText);		
 #endif
 		BOOL value =!m_incr_rgn.is_empty() &&m_incr_rgn.intersect(m_update_tracker.get_changed_region()).is_empty() &&
 			m_incr_rgn.intersect(m_update_tracker.get_cached_region()).is_empty() &&

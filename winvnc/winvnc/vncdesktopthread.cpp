@@ -68,11 +68,18 @@ vncDesktopThread::copy_bitmaps_to_buffer(ULONG i,rfb::Region2D &rgncache,rfb::Up
 		//vnclog.Print(LL_INTINFO, VNCLOG("Driver ************* %i %i %i %i \n"),x,y,w,h);
 
 		if (!ClipRect(&x, &y, &w, &h, 0,0,m_desktop->m_bmrect.br.x, m_desktop->m_bmrect.br.y)) return;
-/*#ifdef _DEBUG
+#ifdef _DEBUG
+		static DWORD sLastCopy = GetTickCount();
+		DWORD now = GetTickCount();
+#if 1
+		OutputDevMessage("%4d REct1 %i %i %i %i", now - sLastCopy, x, y, w, h);
+#else
 					char			szText[256];
-					sprintf(szText,"REct1 %i %i %i %i  \n",x,y,w,h);
+		sprintf(szText, "%4d REct1 %i %i %i %i  \n", now - sLastCopy, x, y, w, h);
 					OutputDebugString(szText);		
-#endif*/
+#endif
+		sLastCopy = now;
+#endif
 		rect.tl.x = x;
 		rect.br.x = x+w;
 		rect.tl.y = y;
@@ -571,10 +578,15 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 							m_desktop->m_SWOffsety=m_desktop->mymonitor[nCurrentMon].offsety-m_desktop->mymonitor[3].offsety;
 							m_server->SetBufferOffset(m_desktop->m_SWOffsetx,m_desktop->m_SWOffsety);
 
-							m_desktop->m_Cliprect.tl.x = m_desktop->mymonitor[nCurrentMon].offsetx;//-m_desktop->mymonitor[3].offsetx;
-							m_desktop->m_Cliprect.tl.y = m_desktop->mymonitor[nCurrentMon].offsety;//-m_desktop->mymonitor[3].offsety;
-							m_desktop->m_Cliprect.br.x = m_desktop->mymonitor[nCurrentMon].offsetx+m_desktop->mymonitor[nCurrentMon].Width;//-m_desktop->mymonitor[3].offsetx;
-							m_desktop->m_Cliprect.br.y = m_desktop->mymonitor[nCurrentMon].offsety+m_desktop->mymonitor[nCurrentMon].Height;//-m_desktop->mymonitor[3].offsety;
+							m_desktop->m_ScreenOffsetx = m_desktop->mymonitor[nCurrentMon].offsetx;// -m_desktop->mymonitor[3].offsetx;
+							m_desktop->m_ScreenOffsety = m_desktop->mymonitor[nCurrentMon].offsety;// -m_desktop->mymonitor[3].offsety;
+							m_server->SetScreenOffset(m_desktop->m_ScreenOffsetx, m_desktop->m_ScreenOffsety, m_desktop->nr_monitors);// no lock ok
+
+							m_desktop->m_Cliprect.tl.x = m_desktop->mymonitor[nCurrentMon].offsetx - m_desktop->mymonitor[3].offsetx;
+							m_desktop->m_Cliprect.tl.y = m_desktop->mymonitor[nCurrentMon].offsety - m_desktop->mymonitor[3].offsety;
+							m_desktop->m_Cliprect.br.x = m_desktop->mymonitor[nCurrentMon].offsetx + m_desktop->mymonitor[nCurrentMon].Width - m_desktop->mymonitor[3].offsetx;
+							m_desktop->m_Cliprect.br.y = m_desktop->mymonitor[nCurrentMon].offsety + m_desktop->mymonitor[nCurrentMon].Height - m_desktop->mymonitor[3].offsety;
+
 							
 							rc.right = m_desktop->mymonitor[nCurrentMon].Width;
 							rc.bottom = m_desktop->mymonitor[nCurrentMon].Height;
@@ -794,6 +806,7 @@ vncDesktopThread::run_undetached(void *arg)
 	// is triggered, and the changed areas are passed to the UpdateTracker
 	rgncache = m_desktop->m_Cliprect;
 	m_server->SetScreenOffset(m_desktop->m_ScreenOffsetx,m_desktop->m_ScreenOffsety,m_desktop->nr_monitors);
+	m_server->SetBufferOffset(m_desktop->m_SWOffsetx, m_desktop->m_SWOffsety);
 
 	// The previous cursor position is stored, to allow us to erase the
 	// old instance whenever it moves.
@@ -1331,4 +1344,24 @@ vncDesktopThread::run_undetached(void *arg)
 	m_desktop->Shutdown();
 	vnclog.Print(LL_INTINFO, VNCLOG("quitting desktop server thread:m_desktop->Shutdown\n"));
 	return NULL;
+}
+
+void writeLog(char *sender, char *text)
+{
+	char mess[3000];
+	SYSTEMTIME st;
+	GetSystemTime(&st);       // get current time
+	int len = sprintf(mess, "%04d-%02d-%02d %02d:%02d:%02d.%03d %40s %s\r\n", st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds, sender, text);
+
+	OutputDebugString(mess);
+}
+
+void WriteLog(char* sender, char *format, ...)
+{
+	char temp[1000];
+	va_list args;
+	va_start(args, format);
+	vsprintf(temp, format, args);
+	va_end(args);
+	writeLog(sender, temp);
 }

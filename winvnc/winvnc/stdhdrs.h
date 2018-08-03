@@ -110,3 +110,10 @@ extern VNCLog vnclog;
 //#define memcpy memcpy_amd
 //remove comment to compiler for >=athlon  or >=PIII
 DWORD MessageBoxSecure(HWND hWnd,LPCTSTR lpText,LPCTSTR lpCaption,UINT uType);
+
+extern void WriteLog(char* sender, char *format, ...);
+#ifdef _DEBUG
+#define OutputDevMessage(...) WriteLog(__FUNCTION__, __VA_ARGS__);
+#else
+#define OutputDevMessage(...)
+#endif
