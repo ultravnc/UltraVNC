@@ -1348,12 +1348,14 @@ vncDesktopThread::run_undetached(void *arg)
 
 void writeLog(char *sender, char *text)
 {
+#ifdef _DEBUG
 	char mess[3000];
 	SYSTEMTIME st;
 	GetSystemTime(&st);       // get current time
 	int len = sprintf(mess, "%04d-%02d-%02d %02d:%02d:%02d.%03d %40s %s\r\n", st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds, sender, text);
 
 	OutputDebugString(mess);
+#endif
 }
 
 void WriteLog(char* sender, char *format, ...)
