@@ -442,10 +442,6 @@ protected:
 	// Boolean flag to indicate when the display resolution has changed
 	BOOL			m_displaychanged;
 
-	// Boolean flag to indicate whether or not an update trigger message
-	// is already in the desktop thread message queue
-	BOOL			m_update_triggered;
-
 	// Extra vars used for the DIBsection optimisation
 	VOID			*m_DIBbits;
 	BOOL			m_formatmunged;

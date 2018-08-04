@@ -463,7 +463,6 @@ vncDesktop::vncDesktop()
 	m_hOldcursor = NULL; // sf@2002
 
 	m_displaychanged = FALSE;
-	m_update_triggered = FALSE;
 
 	m_hrootdc_Desktop = NULL;
 	m_hmemdc = NULL;

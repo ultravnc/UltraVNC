@@ -969,7 +969,6 @@ vncDesktopThread::run_undetached(void *arg)
 						OutputDevMessage("WaitForMultipleObjects result . %d last call delta %4d ms", result, now - sLastCopy3);
 						sLastCopy3 = now;
 #endif
-								m_desktop->m_update_triggered = FALSE;
 								//measure current cpu usage of winvnc
 								if ((fullpollcounter==10 || fullpollcounter==0 || fullpollcounter==5)&& (m_server->MaxCpu()!=100))
 									cpuUsage = usage.GetUsage();
