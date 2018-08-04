@@ -149,12 +149,10 @@ PixelCaptureEngine::CaptureRect(const rfb::Rect& rect)
 			m_bCaptureAlpha ? (CAPTUREBLT | SRCCOPY) : SRCCOPY);
 
 #ifdef _DEBUG
-			char			szText[256];
-			sprintf(szText,"BitBlt  %i %i %i %i \n",rect.tl.x,
+			OutputDevMessage("BitBlt  %i %i %i %i",rect.tl.x,
 			rect.tl.y,
 			rect.br.x,
 			rect.br.y);
-			OutputDebugString(szText);
 #endif
 		return blitok ? true : false;
 	}
@@ -416,18 +414,14 @@ bool vncDesktop::FastDetectChanges(rfb::Region2D &rgn, rfb::Rect &rect, int nZon
 	if (change_found)
 	{
 #ifdef _DEBUG
-		char			szText[256];
-		sprintf(szText, "Change found %d\n", GetTickCount());
-		OutputDebugString(szText);
+		OutputDevMessage("Change found %d", GetTickCount());
 #endif
 		idle_counter = 0;
 	}
 	else
 	{
 #ifdef _DEBUG
-		char			szText[256];
-		sprintf(szText, "Change idle %d\n", GetTickCount());
-		OutputDebugString(szText);
+		OutputDevMessage("Change idle %d", GetTickCount());
 #endif
 		idle_counter = idle_counter + 5;
 	}
@@ -654,8 +648,8 @@ vncDesktop::TriggerUpdate()
 		m_update_triggered = TRUE;
 		SetEvent(trigger_events[0]);
 	}*/
-	//if (m_screenCapture)
-	//	m_screenCapture->Unlock();
+	/*if (m_screenCapture)
+		m_screenCapture->Unlock();*/
 }
 
 DWORD
@@ -1748,12 +1742,16 @@ vncDesktop::CaptureScreen(const rfb::Rect &rect, BYTE *scrBuff, UINT scrBuffSize
 		}
 		else
 		{
+
+			int xoffset = mymonitor[m_current_monitor - 1].offsetx;
+			int yoffset = mymonitor[m_current_monitor - 1].offsety;
+
 			blitok = BitBlt(m_hmemdc,
 				rect.tl.x,
 				rect.tl.y,
 				(rect.br.x - rect.tl.x),
 				(rect.br.y - rect.tl.y),
-				m_hrootdc_Desktop, rect.tl.x, rect.tl.y, (VNCOS.CaptureAlphaBlending() && !m_Black_window_active) ? (CAPTUREBLT | SRCCOPY) : SRCCOPY);
+				m_hrootdc_Desktop, rect.tl.x + xoffset, rect.tl.y + yoffset, (VNCOS.CaptureAlphaBlending() && !m_Black_window_active) ? (CAPTUREBLT | SRCCOPY) : SRCCOPY);
 		}
 		/*#if defined(_DEBUG)
 			DWORD e = timeGetTime() - t;

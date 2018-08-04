@@ -106,39 +106,6 @@ rfb::Rect vncDesktop::GetSize()
 void
 vncDesktop::SetBitmapRectOffsetAndClipRect(int offesetx, int offsety, int width, int height)
 {
-#if 1
-	if (width == 0)
-		width = mymonitor[3].Width;
-	if (height == 0)
-		height = mymonitor[3].Height;
-
-	m_ScreenOffsetx = mymonitor[3].offsetx;
-	m_ScreenOffsety = mymonitor[3].offsety;
-	if (!show_multi_monitors) {
-		m_ScreenOffsetx = mymonitor[0].offsetx;
-		m_ScreenOffsety = mymonitor[0].offsety;
-	}
-	m_bmrect = rfb::Rect(offesetx, offsety, width, height);
-	//m_bmrect = rfb::Rect(0, 0, width, height);
-	m_SWOffsetx = m_ScreenOffsetx - mymonitor[3].offsetx;// m_bmrect.tl.x;
-	m_SWOffsety = m_ScreenOffsety - mymonitor[3].offsety;//m_bmrect.tl.y;
-	m_Cliprect.tl.x = 0;
-	m_Cliprect.tl.y = 0;
-	m_Cliprect.br.x = m_bmrect.br.x;
-	m_Cliprect.br.y = m_bmrect.br.y;
-	if (m_screenCapture && (m_current_monitor == MULTI_MON_PRIMARY || m_current_monitor == MULTI_MON_SECOND || m_current_monitor == MULTI_MON_THIRD)) {
-		int mon = m_current_monitor - 1;
-		/*m_Cliprect.tl.x = mymonitor[mon].offsetx;
-		m_Cliprect.tl.y = mymonitor[mon].offsety;
-		m_Cliprect.br.x = mymonitor[mon].offsetx + mymonitor[mon].Width;
-		m_Cliprect.br.y = mymonitor[mon].offsety + mymonitor[mon].Height;*/
-
-		m_Cliprect.tl.x = mymonitor[mon].offsetx - mymonitor[3].offsetx;
-		m_Cliprect.tl.y = mymonitor[mon].offsety - mymonitor[3].offsety;
-		m_Cliprect.br.x = mymonitor[mon].offsetx + mymonitor[mon].Width - mymonitor[3].offsetx;
-		m_Cliprect.br.y = mymonitor[mon].offsety + mymonitor[mon].Height - mymonitor[3].offsety;
-	}
-#else
 	if (width == 0)
 		width = mymonitor[3].Width;
 	if (height == 0)
@@ -158,12 +125,16 @@ vncDesktop::SetBitmapRectOffsetAndClipRect(int offesetx, int offsety, int width,
 	m_Cliprect.br.x = m_bmrect.br.x;
 	m_Cliprect.br.y = m_bmrect.br.y;
 	if (m_screenCapture && (m_current_monitor == MULTI_MON_PRIMARY || m_current_monitor == MULTI_MON_SECOND || m_current_monitor == MULTI_MON_THIRD)) {
-		int mon = m_current_monitor -1;
-		m_Cliprect.tl.x = mymonitor[mon].offsetx;
-		m_Cliprect.tl.y = mymonitor[mon].offsety;
-		m_Cliprect.br.x = mymonitor[mon].offsetx + mymonitor[mon].Width;
-		m_Cliprect.br.y = mymonitor[mon].offsety + mymonitor[mon].Height;
+
+		m_SWOffsetx = m_ScreenOffsetx - mymonitor[3].offsetx;// m_bmrect.tl.x;
+		m_SWOffsety = m_ScreenOffsety - mymonitor[3].offsety;//m_bmrect.tl.y;
+
+		int mon = m_current_monitor - 1;
+
+		m_Cliprect.tl.x = mymonitor[mon].offsetx - mymonitor[3].offsetx;
+		m_Cliprect.tl.y = mymonitor[mon].offsety - mymonitor[3].offsety;
+		m_Cliprect.br.x = mymonitor[mon].offsetx + mymonitor[mon].Width - mymonitor[3].offsetx;
+		m_Cliprect.br.y = mymonitor[mon].offsety + mymonitor[mon].Height - mymonitor[3].offsety;
 	}
-#endif
 }
 

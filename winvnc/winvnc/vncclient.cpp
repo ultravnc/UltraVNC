@@ -4777,9 +4777,7 @@ vncClient::NotifyUpdate(rfbFramebufferUpdateRequestMsg fur)
 		if (!fur.incremental)
 		{
 #ifdef _DEBUG
-			char			szText[256];
-			sprintf(szText,"FULL update request \n");
-			OutputDebugString(szText);		
+			OutputDevMessage("FULL update request");	
 #endif
 
 		update.tl.x = (m_ScaledScreen.tl.x + monitor_Offsetx) * m_nScale;
