@@ -150,9 +150,9 @@ vncDesktop::GetThirdDevice()
     ZeroMemory(&dd, sizeof(dd));
     dd.cb = sizeof(dd);
     for (i=0; EnumDisplayDevicesA(NULL, i, &dd, 0); i++) {
-		if (dd.StateFlags & DISPLAY_DEVICE_ATTACHED_TO_DESKTOP && !(dd.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE)) {
+		if (dd.StateFlags & DISPLAY_DEVICE_ATTACHED_TO_DESKTOP ) {
 			j++;
-			if (!(dd.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER)) {
+			if (!(dd.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER) && !(dd.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE)) {
 				if (j == 3) {
 					strcpy(mymonitor[2].device,(char *)dd.DeviceName);
 					break;

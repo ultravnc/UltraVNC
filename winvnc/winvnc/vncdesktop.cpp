@@ -2250,14 +2250,14 @@ void vncDesktop::SetSW(int x, int y)
 				m_buffer.MultiMonitors(1);
 			}
 			else if (m_current_monitor == MULTI_MON_THIRD) {
-				m_current_monitor = MULTI_MON_FIRST_TWO;
+				/*m_current_monitor = MULTI_MON_FIRST_TWO;
 				m_buffer.MultiMonitors(2);
 			}
 			else if (m_current_monitor == MULTI_MON_FIRST_TWO) {
 				m_current_monitor = MULTI_MON_LAST_TWO;
 				m_buffer.MultiMonitors(2);
 			}
-			else if (m_current_monitor == MULTI_MON_LAST_TWO) {
+			else if (m_current_monitor == MULTI_MON_LAST_TWO) {*/
 				m_current_monitor = MULTI_MON_ALL;
 				m_buffer.MultiMonitors(2);
 			}
