@@ -55,6 +55,8 @@ public:
 	virtual bool noHardwareCursor() = 0;
 	virtual void Lock() = 0;
 	virtual void Unlock() = 0;
+	virtual HANDLE getHScreenEvent() = 0;
+	virtual HANDLE getHPointerEvent() = 0;
 
 protected:
 	int osVersion();

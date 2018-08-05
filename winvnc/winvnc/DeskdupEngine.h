@@ -13,6 +13,8 @@ typedef void (*HideCursorW8Fn)();
 
 const static LPCTSTR g_szIPCSharedMMF = _T("{3DA76AC7-62E7-44AF-A8D1-45022044BB3E}");
 const static LPCTSTR g_szIPCSharedMMFBitmap = _T("{0E3D996F-B070-4503-9090-198A9DA092D5}");
+const static LPCTSTR g_szIPCSharedEvent = _T("{3BFBA3A0-2133-48B5-B5BD-E58C72853FFB}");
+const static LPCTSTR g_szIPCSharedPointerEvent = _T("{3A77E11C-B0B4-40F9-BC8B-D249116A76FE}");
 
 class DeskDupEngine : public ScreenCapture
 {
@@ -25,6 +27,8 @@ public:
 	virtual bool noHardwareCursor();
 	virtual void Lock();
 	virtual void Unlock();
+	virtual HANDLE getHScreenEvent(){return hScreenEvent;}
+	virtual HANDLE getHPointerEvent(){return hPointerEvent;}
 private:
 	HMODULE hModule;
 	StartW8Fn StartW8;
@@ -41,5 +45,7 @@ private:
 
 	HANDLE hFileMapBitmap;
 	LPVOID fileViewBitmap;
+	HANDLE hScreenEvent;
+	HANDLE hPointerEvent;
 };
 

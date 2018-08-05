@@ -25,13 +25,13 @@
 #include "vncdesktopthread.h"
 #include "vncOSVersion.h"
 #include "uvncUiAccess.h"
+extern bool G_USE_PIXEL;
 
 bool g_DesktopThread_running;
 DWORD WINAPI hookwatch(LPVOID lpParam);
 extern bool stop_hookwatch;
 void testBench();
 char g_hookstring[16]="";
-
 bool PreConnect = false;
 
 inline bool
@@ -307,7 +307,6 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 	BOOL screensize_changed=false;
 	int inputDesktopSelected = vncService::InputDesktopSelected();
 	if (inputDesktopSelected == 2) {
-		vnclog.Print(LL_INTERR, VNCLOG("WriteMessageOnScreenSOEMTHING CETECTED \n"));
 		m_desktop->m_buffer.WriteMessageOnScreen("UltraVVNC running as application doesn't \nhave permission to acces \nUAC protected windows.\n\nScreen is locked until the remote user \nunlock this window");
 		rfb::Rect rect;
 		rect.tl = rfb::Point(0,0);
@@ -331,7 +330,6 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 					Sleep(30);
 					vnclog.Print(LL_INTERR, VNCLOG("Wait for viewer init \n"));
 		}
-		vnclog.Print(LL_INTERR, VNCLOG("SOEMTHING CETECTED \n"));
 		//logging
 		if (m_desktop->m_displaychanged)								
 			vnclog.Print(LL_INTERR, VNCLOG("++++Screensize changed \n"));
@@ -767,7 +765,37 @@ void vncDesktopThread::do_polling(HANDLE& threadHandle, rfb::Region2D& rgncache,
 		}
 	}
 }
-extern bool G_USE_PIXEL;
+
+
+DWORD WINAPI ThreadCheckMirrorDriverUpdates(LPVOID lpParam)
+{
+	vncDesktopThread *dt = (vncDesktopThread *)lpParam;
+	while (dt->looping)
+	{	
+			if  (dt->m_desktop->m_screenCapture && dt->m_desktop->m_screenCapture->getPreviousCounter() != dt->m_desktop->pchanges_buf->counter)
+			{
+				SetEvent(dt->m_desktop->trigger_events[0]);				
+			}
+		Sleep(5);
+	}
+	return 0;
+}
+
+DWORD WINAPI ThreadCheckCursorUpdates(LPVOID lpParam)
+{
+	vncDesktopThread *dt = (vncDesktopThread *)lpParam;
+	POINT cursorpos;
+	while (dt->looping)
+	{
+		if (GetCursorPos(&cursorpos) &&  ((cursorpos.x != dt->oldcursorpos.x) || (cursorpos.y != dt->oldcursorpos.y)))
+				SetEvent(dt->m_desktop->trigger_events[0]);		
+		Sleep(50);
+	}
+	return 0;
+}
+
+
+
 void *
 vncDesktopThread::run_undetached(void *arg)
 {		
@@ -829,8 +857,7 @@ vncDesktopThread::run_undetached(void *arg)
 	
 
 	// The previous cursor position is stored, to allow us to erase the
-	// old instance whenever it moves.
-	rfb::Point oldcursorpos;
+	// old instance whenever it moves.	
 	POINT tempcursorpos;
 	GetCursorPos(&tempcursorpos);
 	oldcursorpos = rfb::Point(tempcursorpos);
@@ -879,11 +906,10 @@ vncDesktopThread::run_undetached(void *arg)
 	// We use a dynmiac value based on cpu usage
     //DWORD MIN_UPDATE_INTERVAL=33;
 	/////////////////////
-	bool looping=true;
+	looping=true;
 	int waiting_update=0;
 	SetEvent(m_desktop->restart_event);
-	///
-	//Sleep(1000);
+	
 	rgncache.assign_union(rfb::Region2D(m_desktop->m_Cliprect));
 
 	if (!PreConnect) {
@@ -896,59 +922,51 @@ vncDesktopThread::run_undetached(void *arg)
 			m_desktop->m_buffer.GrabRegion(rgncache,false,true);
 		}
 	}
-	//telling running viewers to wait until first update, done
-	/*if  (m_server->MaxCpu() <50)
-		{
-			MIN_UPDATE_INTERVAL_MIN=50;
-			MIN_UPDATE_INTERVAL_MAX=1000;
-		}*/
+	
 	int waittime=0;
 
 	// We set a flag inside the desktop handler here, to indicate it's now safe
 	// to handle clipboard messages
 	m_desktop->SetClipboardActive(TRUE);
 
-	while (looping && !fShutdownOrdered)
-	{		
-		DWORD result;
-		newtick = timeGetTime();
-		if (waittime != 1000) 
-			waittime = 33;
-		//MIRROR DRIVER
-		if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver && !VNCOS.OS_WIN8 && !VNCOS.OS_WIN10)
+	HANDLE ThreadHandleCheckMirrorDriverUpdates = NULL;
+	HANDLE ThreadHandleCheckCursorUpdates = NULL;
+	
+	if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver && !VNCOS.OS_WIN8 && !VNCOS.OS_WIN10)
 		{
+			//MIRROR DRIVER....still to check if this works
 			strcpy_s(g_hookstring,"driver");
-			int fastcounter=0;
-			POINT cursorpos;
-			while (m_desktop->m_screenCapture && m_desktop->m_screenCapture->getPreviousCounter() == m_desktop->pchanges_buf->counter)
-			{
-				Sleep(5);
-				fastcounter++;
-				if (fastcounter>20)
-					break;
-				if (GetCursorPos(&cursorpos) && 
-										((cursorpos.x != oldcursorpos.x) ||
-										(cursorpos.y != oldcursorpos.y))) break;
-			}
-			waittime=0;
+			DWORD dw;
+			if (ThreadHandleCheckMirrorDriverUpdates == NULL)
+				ThreadHandleCheckMirrorDriverUpdates = CreateThread(NULL, 0, ThreadCheckMirrorDriverUpdates, this, 0, &dw);
+			DWORD dw2;
+			if (ThreadHandleCheckCursorUpdates == NULL)
+				ThreadHandleCheckCursorUpdates = CreateThread(NULL, 0, ThreadCheckCursorUpdates, this, 0, &dw2);
+			waittime = 1000;
 		}
-		//DDENGINE
-		else if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver && (VNCOS.OS_WIN8||VNCOS.OS_WIN10))
+	else if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver && (VNCOS.OS_WIN8||VNCOS.OS_WIN10))
 		{
+			//DDENGINE
+			m_desktop->trigger_events[6] = m_desktop->m_screenCapture->getHScreenEvent();
+			m_desktop->trigger_events[7] = m_desktop->m_screenCapture->getHPointerEvent();
 			strcpy_s(g_hookstring,"ddengine");
 			waittime = 1000;
 		}
-		else if (waittime == 33)
-		{
-			int testvalue = 33 - (newtick - oldtick);
-			if (testvalue > 0 && testvalue < 33) waittime = testvalue;
-			oldtick2 = newtick;
+	else {
+			// BLIT
+			DWORD dw;
+			if (ThreadHandleCheckCursorUpdates == NULL)
+				ThreadHandleCheckCursorUpdates = CreateThread(NULL, 0, ThreadCheckCursorUpdates, this, 0, &dw);
+			waittime = 33; // possible this need to be higher to lower cpu usage
 		}
-		
-
-		result=WaitForMultipleObjects(6,m_desktop->trigger_events,FALSE,waittime);
+			   
+	while (looping && !fShutdownOrdered)
+	{		
+		DWORD result;
+	
+		result=WaitForMultipleObjects(8, m_desktop->trigger_events, FALSE, waittime);
 		{
-			waittime = 0;
+			
 			// We need to wait until restart is done
 			// else wait_timeout goes in to looping while sink window is not ready
 			// if no window could be started in 10 seconds something went wrong, close
@@ -959,6 +977,8 @@ vncDesktopThread::run_undetached(void *arg)
 			switch(result)
 			{
 				case WAIT_TIMEOUT:
+				case WAIT_OBJECT_0+6:
+					ResetEvent(m_desktop->trigger_events[6]);
 				case WAIT_OBJECT_0: {
 					waiting_update=0;
 					ResetEvent(m_desktop->trigger_events[0]);
@@ -1249,37 +1269,6 @@ vncDesktopThread::run_undetached(void *arg)
 										}
 
 										m_server->initialCapture_done();
-
-
-
-/*#ifdef _DEBUG
-			char			szText[256];
-			rfb::RectVector rects;
-			rfb::RectVector::iterator i;
-		checkrgn.get_rects(rects, 1, 1);
-		for (i = rects.begin(); i != rects.end(); i++)
-			{
-				rfb::Rect rect = *i;				
-				sprintf(szText,"RECT checkrgn  %i %i %i %i \n",rect.tl.x,
-				rect.tl.y,
-				rect.br.x,
-				rect.br.y);
-				OutputDebugString(szText);
-			}
-
-			changedrgn.get_rects(rects, 1, 1);
-		for (i = rects.begin(); i != rects.end(); i++)
-			{
-				rfb::Rect rect = *i;				
-				sprintf(szText,"RECT changedrgn  %i %i %i %i \n",rect.tl.x,
-				rect.tl.y,
-				rect.br.x,
-				rect.br.y);
-				OutputDebugString(szText);
-			}
-
-#endif*/
-
 										if (!initialupdate) {
 											m_server->InitialUpdate(true);
 											initialupdate=true;
@@ -1321,6 +1310,8 @@ vncDesktopThread::run_undetached(void *arg)
 				case WAIT_OBJECT_0+2:
 					ResetEvent(m_desktop->trigger_events[2]);
 					break;
+				case WAIT_OBJECT_0+7:
+					ResetEvent(m_desktop->trigger_events[7]);
 				case WAIT_OBJECT_0+3:
 					if (MyGetCursorInfo)
 					{
@@ -1344,7 +1335,7 @@ vncDesktopThread::run_undetached(void *arg)
 		}
 		
 	}//while
-
+	looping = false;
 	m_server->KillAuthClients();
 
 	stop_hookwatch=true;
@@ -1352,6 +1343,19 @@ vncDesktopThread::run_undetached(void *arg)
 	{
 		WaitForSingleObject( threadHandle, 5000 );
 		CloseHandle(threadHandle);
+		threadHandle = NULL;
+	}
+	if (ThreadHandleCheckMirrorDriverUpdates)
+	{
+		WaitForSingleObject( ThreadHandleCheckMirrorDriverUpdates, 5000 );
+		CloseHandle(ThreadHandleCheckMirrorDriverUpdates);
+		ThreadHandleCheckMirrorDriverUpdates = NULL;
+	}
+	if (ThreadHandleCheckCursorUpdates)
+	{
+		WaitForSingleObject( ThreadHandleCheckCursorUpdates, 5000 );
+		CloseHandle(ThreadHandleCheckCursorUpdates);
+		ThreadHandleCheckCursorUpdates = NULL;
 	}
 	
 	m_desktop->SetClipboardActive(FALSE);

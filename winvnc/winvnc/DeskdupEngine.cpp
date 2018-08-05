@@ -46,6 +46,8 @@ DeskDupEngine::DeskDupEngine()
 	sprintf(szText, "DeskDupEngine\n");
 	OutputDebugString(szText);
 #endif
+	hScreenEvent = NULL;
+	hPointerEvent = NULL;
 }
 //-----------------------------------------------------------
 DeskDupEngine::~DeskDupEngine()
@@ -113,6 +115,23 @@ void DeskDupEngine::videoDriver_start(int x, int y, int w, int h)
 	fileViewBitmap = MapViewOfFile(hFileMapBitmap, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, 0);
 	if (fileViewBitmap == NULL)
 		return;
+
+	if (hScreenEvent != NULL)
+		return;
+	hScreenEvent = CreateEvent(NULL, false, false, g_szIPCSharedEvent);
+	if (hScreenEvent == NULL)
+		hScreenEvent = OpenEvent(EVENT_ALL_ACCESS, false, g_szIPCSharedEvent);
+	if (hScreenEvent == NULL)
+		return;
+
+	if (hPointerEvent != NULL)
+		return;
+	hPointerEvent = CreateEvent(NULL, false, false, g_szIPCSharedPointerEvent);
+	if (hPointerEvent == NULL)
+		hPointerEvent = OpenEvent(EVENT_ALL_ACCESS, false, g_szIPCSharedPointerEvent);
+	if (hPointerEvent == NULL)
+		return;
+
 	pFramebuffer = (PCHAR)fileViewBitmap;
 }
 //-----------------------------------------------------------

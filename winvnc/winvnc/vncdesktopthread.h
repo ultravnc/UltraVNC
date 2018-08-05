@@ -108,6 +108,8 @@ public:
 	bool Handle_Ringbuffer(mystruct *ringbuffer,rfb::Region2D &rgncache);
 	CIPC g_obIPC;
 	vncDesktop *m_desktop;
+	bool looping;
+	rfb::Point oldcursorpos;
 
 protected:
 	vncServer *m_server;

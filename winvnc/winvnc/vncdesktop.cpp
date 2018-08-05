@@ -517,6 +517,8 @@ vncDesktop::vncDesktop()
 	trigger_events[3] = CreateEvent(NULL, TRUE, FALSE, "user1");
 	trigger_events[4] = CreateEvent(NULL, TRUE, FALSE, "user2");
 	trigger_events[5] = CreateEvent(NULL, TRUE, FALSE, "quit");
+	trigger_events[6] = eventPlaceholder1 = CreateEvent(NULL, TRUE, FALSE, "placeholder1");
+	trigger_events[7] = eventPlaceholder2 = CreateEvent(NULL, TRUE, FALSE, "placeholder2");
 	restart_event = CreateEvent(NULL, TRUE, TRUE, "restart");
 	rgnpump.clear();
 	lock_region_add = false;
@@ -607,6 +609,8 @@ vncDesktop::~vncDesktop()
 	for (int i = 0; i < 6; i++)
 		CloseHandle(trigger_events[i]);
 	CloseHandle(restart_event);
+	CloseHandle(eventPlaceholder1);
+	CloseHandle(eventPlaceholder2);
 	//problems, sync could be restarted in the little time the desktop thread was still running
 	//then this doesn't exist on desktop close and sink window crash
 	// Fix E. SAG
@@ -643,12 +647,8 @@ vncDesktop::TriggerUpdate()
 	// Note that we should really lock the update lock here,
 	// but there are periodic timer updates anyway, so
 	// we don't actually need to.  Something to think about.
-	/*if (!m_update_triggered) {
-		m_update_triggered = TRUE;
+	if (m_screenCapture == NULL)
 		SetEvent(trigger_events[0]);
-	}*/
-	/*if (m_screenCapture)
-		m_screenCapture->Unlock();*/
 }
 
 DWORD

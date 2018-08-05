@@ -46,6 +46,8 @@ public:
 	virtual bool noHardwareCursor();
 	virtual void Lock(){};
 	virtual void Unlock(){};
+	virtual HANDLE getHScreenEvent(){return NULL;}
+	virtual HANDLE getHPointerEvent(){return NULL;}
 
 private:
 	

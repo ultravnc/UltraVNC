@@ -345,9 +345,15 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 			_this->m_screenCapture->setBlocked(true);
 		break;
 	case WM_APP + 11:
+#ifdef _DEBUG
+		OutputDevMessage("ddengine NotifyPointerChange()");
+#endif
 		SetEvent(_this->trigger_events[3]);
 		break;
 	case WM_APP + 12:
+#ifdef _DEBUG
+		OutputDevMessage("ddengine NotifyScreenChange()");
+#endif
 		SetEvent(_this->trigger_events[0]);
 		break;
 	case WM_DISPLAYCHANGE:

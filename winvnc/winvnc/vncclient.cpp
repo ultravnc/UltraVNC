@@ -511,7 +511,7 @@ vncClientUpdateThread::run_undetached(void *arg)
 						if (!m_client->cl_connected) return 0;
 						if(m_signal->wait(UPDATE_INTERVAL*100)==false) {
 							//do forcefull update after 4 seconds
-							m_client->m_encodemgr.m_buffer->m_desktop->TriggerUpdate();
+							m_client->TriggerUpdate();
 							m_client->TriggerUpdateThread();						
 						}
 						else 
@@ -3270,7 +3270,7 @@ vncClientThread::run(void *arg)
 					}
 				}
 			}
-			m_client->m_encodemgr.m_buffer->m_desktop->TriggerUpdate();
+			m_client->TriggerUpdate();
 			break;
 
 		case rfbPointerEvent:
@@ -3421,7 +3421,7 @@ vncClientThread::run(void *arg)
 					// removed, terrible performance
 					// Why do we grap the screen after any inch a mouse move
 					// Removing it doesn't seems to have any missing update 
-					 m_client->m_encodemgr.m_buffer->m_desktop->TriggerUpdate();
+					 m_client->TriggerUpdate();
 				}
 			}	
 			break;
@@ -4816,7 +4816,7 @@ vncClient::NotifyUpdate(rfbFramebufferUpdateRequestMsg fur)
 	}
 
     // Kick the update thread (and create it if not there already)
-	m_encodemgr.m_buffer->m_desktop->TriggerUpdate();
+	TriggerUpdate();
 	TriggerUpdateThread();
 
 	return TRUE;

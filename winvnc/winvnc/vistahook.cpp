@@ -72,7 +72,6 @@ bool
 vncDesktopThread::Handle_Ringbuffer(mystruct *ringbuffer,rfb::Region2D &rgncache)
 {
 	bool returnvalue=false;
-	//vnclog.Print(LL_INTERR, VNCLOG("counter,g_Oldcounter %i %i  \n"),ringbuffer->counter,g_Oldcounter);
 	if (ringbuffer->counter==g_Oldcounter) return 0;
 	int counter=ringbuffer->counter;
 	if (counter<1 || counter>1999) return 0;
@@ -90,45 +89,19 @@ vncDesktopThread::Handle_Ringbuffer(mystruct *ringbuffer,rfb::Region2D &rgncache
 				rect.tl.x-=m_desktop->m_ScreenOffsetx;
 				rect.br.x-=m_desktop->m_ScreenOffsetx;
 				rect.tl.y-=m_desktop->m_ScreenOffsety;
-				rect.br.y-=m_desktop->m_ScreenOffsety;
-				vnclog.Print(LL_INTERR, VNCLOG("REct %i %i %i %i  \n"),rect.tl.x,rect.br.x,rect.tl.y,rect.br.y);
-	/*#ifdef _DEBUG
-					char			szText[256];
-					DWORD error=GetLastError();
-					sprintf(szText,"REct1 %i %i %i %i  \n",rect.tl.x,rect.br.x,rect.tl.y,rect.br.y);
-					SetLastError(0);
-					OutputDebugString(szText);		
-	#endif*/			
+				rect.br.y-=m_desktop->m_ScreenOffsety;		
 				rect = rect.intersect(m_desktop->m_Cliprect);
 				if (!rect.is_empty())
 				{
-/*#ifdef _DEBUG
-					char			szText[256];
-					DWORD error=GetLastError();
-					sprintf(szText,"REctXXXXXXXXXXX %i %i %i %i  \n",rect.tl.x,rect.br.x,rect.tl.y,rect.br.y);
-					SetLastError(0);
-					OutputDebugString(szText);		
-	#endif*/
+#ifdef _DEBUG
+
+					OutputDevMessage("SCHook changeRct %i %i %i %i  \n",rect.tl.x,rect.br.x,rect.tl.y,rect.br.y);	
+#endif
 					returnvalue=true;
 					rgncache.assign_union(rect);
 				}
-			}
-			if (ringbuffer->type[i]==2 || ringbuffer->type[i]==4)
-			{
-				/*if (MyGetCursorInfo)
-					{
-						MyCURSORINFO cinfo;
-						cinfo.cbSize=sizeof(MyCURSORINFO);
-						MyGetCursorInfo(&cinfo);
-						m_desktop->SetCursor(cinfo.hCursor);
-						//vnclog.Print(LL_INTERR, VNCLOG("Cursor %i  \n"),cinfo.hCursor);
-					}*/
-	
-				
-			}
-			
+			}			
 		}
-
 	}
 	else
 	{
@@ -144,35 +117,18 @@ vncDesktopThread::Handle_Ringbuffer(mystruct *ringbuffer,rfb::Region2D &rgncache
 				rect.tl.x-=m_desktop->m_ScreenOffsetx;
 				rect.br.x-=m_desktop->m_ScreenOffsetx;
 				rect.tl.y-=m_desktop->m_ScreenOffsety;
-				rect.br.y-=m_desktop->m_ScreenOffsety;
-				//vnclog.Print(LL_INTERR, VNCLOG("REct %i %i %i %i  \n"),rect.tl.x,rect.br.x,rect.tl.y,rect.br.y);
-/*#ifdef _DEBUG
-					char			szText[256];
-					DWORD error=GetLastError();
-					sprintf(szText,"REct2 %i %i %i %i  \n",rect.tl.x,rect.br.x,rect.tl.y,rect.br.y);
-					SetLastError(0);
-					OutputDebugString(szText);		
-	#endif		*/		
+				rect.br.y-=m_desktop->m_ScreenOffsety;	
 				rect = rect.intersect(m_desktop->m_Cliprect);
 				if (!rect.is_empty())
 				{
+#ifdef _DEBUG
+
+					OutputDevMessage("SCHook changeRct %i %i %i %i  \n",rect.tl.x,rect.br.x,rect.tl.y,rect.br.y);	
+#endif
 					returnvalue=true;
 					rgncache.assign_union(rect);
 				}
-			}
-			if (ringbuffer->type[i]==2 || ringbuffer->type[i]==4)
-			{
-				/*if (MyGetCursorInfo)
-					{
-						MyCURSORINFO cinfo;
-						cinfo.cbSize=sizeof(MyCURSORINFO);
-						MyGetCursorInfo(&cinfo);
-						m_desktop->SetCursor(cinfo.hCursor);
-						//vnclog.Print(LL_INTERR, VNCLOG("Cursor %i  \n"),cinfo.hCursor);
-					}*/
-				
-			}
-			
+			}			
 		}
 		for (i=1;i<=counter;i++)
 		{
@@ -186,28 +142,18 @@ vncDesktopThread::Handle_Ringbuffer(mystruct *ringbuffer,rfb::Region2D &rgncache
 				rect.br.x-=m_desktop->m_ScreenOffsetx;
 				rect.tl.y-=m_desktop->m_ScreenOffsety;
 				rect.br.y-=m_desktop->m_ScreenOffsety;
-				//vnclog.Print(LL_INTERR, VNCLOG("REct %i %i %i %i  \n"),rect.tl.x,rect.br.x,rect.tl.y,rect.br.y);
 				
 				rect = rect.intersect(m_desktop->m_Cliprect);
 				if (!rect.is_empty())
 				{
+#ifdef _DEBUG
+
+					OutputDevMessage("SCHook changeRct %i %i %i %i  \n",rect.tl.x,rect.br.x,rect.tl.y,rect.br.y);	
+#endif
 					returnvalue=true;
 					rgncache.assign_union(rect);
 				}
-			}
-			if (ringbuffer->type[i]==2 || ringbuffer->type[i]==4)
-			{
-				/*if (MyGetCursorInfo)
-					{
-						MyCURSORINFO cinfo;
-						cinfo.cbSize=sizeof(MyCURSORINFO);
-						MyGetCursorInfo(&cinfo);
-						m_desktop->SetCursor(cinfo.hCursor);
-						//vnclog.Print(LL_INTERR, VNCLOG("Cursor %i  \n"),cinfo.hCursor);
-					}*/
-				
-			}
-			
+			}			
 		}
 	}
 	g_Oldcounter=counter;

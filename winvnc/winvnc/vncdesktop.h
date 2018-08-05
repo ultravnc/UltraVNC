@@ -337,7 +337,9 @@ public:
     bool GetBlockInputState() { return m_bIsInputDisabledByClient; }
     bool block_input(bool state);
 	BOOL InitWindow();
-	HANDLE trigger_events[6];
+	HANDLE trigger_events[8];
+	HANDLE eventPlaceholder1;
+	HANDLE eventPlaceholder2;
 	HANDLE restart_event;
 	DWORD pumpID;
 	rfb::Region2D rgnpump;
@@ -351,6 +353,7 @@ public:
 	sessionmsg *sesmsg ;
 	int aantal_session;
 	vncServer 		*m_server;
+	ScreenCapture *m_screenCapture;
 	// Implementation
 protected:
 
@@ -460,8 +463,7 @@ protected:
 
 	//DDIHOOK
 
-	// Modif rdv@2002 - v1.1.x - videodriver
-	ScreenCapture *m_screenCapture;
+	// Modif rdv@2002 - v1.1.x - videodriver	
 	BOOL InitVideoDriver();
  	void ShutdownVideoDriver();
 	omni_mutex		m_screenCapture_lock;
