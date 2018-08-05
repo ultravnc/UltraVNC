@@ -2238,29 +2238,43 @@ void vncDesktop::SetSW(int x, int y)
 		} break;
 		case 3:
 		{
-			if (m_current_monitor == MULTI_MON_PRIMARY) {
-				m_current_monitor = MULTI_MON_SECOND;
-				m_buffer.MultiMonitors(1);
+			if(m_screenCapture)
+			{
+				if (m_current_monitor == MULTI_MON_PRIMARY) {
+					m_current_monitor = MULTI_MON_SECOND;
+					m_buffer.MultiMonitors(1);
+				}
+				else if (m_current_monitor == MULTI_MON_SECOND) {
+					m_current_monitor = MULTI_MON_THIRD;
+					m_buffer.MultiMonitors(1);
+				}
+				else if (m_current_monitor == MULTI_MON_THIRD) {
+					/*m_current_monitor = MULTI_MON_FIRST_TWO; //TODO: first two , last two
+					m_buffer.MultiMonitors(2);
+				}
+				else if (m_current_monitor == MULTI_MON_FIRST_TWO) {
+					m_current_monitor = MULTI_MON_LAST_TWO;
+					m_buffer.MultiMonitors(2);
+				}
+				else if (m_current_monitor == MULTI_MON_LAST_TWO) {*/
+					m_current_monitor = MULTI_MON_ALL;
+					m_buffer.MultiMonitors(2);
+				}
+				else if (m_current_monitor == MULTI_MON_ALL) {
+					m_current_monitor = MULTI_MON_PRIMARY;
+					m_buffer.MultiMonitors(1);
+				} 
 			}
-			else if (m_current_monitor == MULTI_MON_SECOND) {
-				m_current_monitor = MULTI_MON_THIRD;
-				m_buffer.MultiMonitors(1);
-			}
-			else if (m_current_monitor == MULTI_MON_THIRD) {
-				/*m_current_monitor = MULTI_MON_FIRST_TWO;
-				m_buffer.MultiMonitors(2);
-			}
-			else if (m_current_monitor == MULTI_MON_FIRST_TWO) {
-				m_current_monitor = MULTI_MON_LAST_TWO;
-				m_buffer.MultiMonitors(2);
-			}
-			else if (m_current_monitor == MULTI_MON_LAST_TWO) {*/
-				m_current_monitor = MULTI_MON_ALL;
-				m_buffer.MultiMonitors(2);
-			}
-			else if (m_current_monitor == MULTI_MON_ALL) {
-				m_current_monitor = MULTI_MON_PRIMARY;
-				m_buffer.MultiMonitors(1);
+			else
+			{
+				if (m_current_monitor == MULTI_MON_PRIMARY) {
+					m_current_monitor = MULTI_MON_ALL;
+					m_buffer.MultiMonitors(2);
+				}
+				else if (m_current_monitor == MULTI_MON_ALL) {
+					m_current_monitor = MULTI_MON_PRIMARY;
+					m_buffer.MultiMonitors(1);
+				}
 			}
 		} break;
 		}
