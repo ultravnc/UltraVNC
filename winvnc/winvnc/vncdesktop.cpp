@@ -2385,6 +2385,8 @@ BOOL vncDesktop::InitVideoDriver()
 			HookWanted = m_server->Hook();
 			m_server->Driver(false);
 			m_server->Hook(true);
+			m_server->PollFullScreen(true);
+			m_server->TurboMode(true);
 			return false;
 		}
 
