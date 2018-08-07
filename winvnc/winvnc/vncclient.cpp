@@ -2298,6 +2298,11 @@ vncClientThread::run(void *arg)
 			omni_mutex_lock l(m_client->GetUpdateLock(),84);
 			m_client->m_encodemgr.m_buffer->SetScale(m_server->GetDefaultScale()); // v1.1.2
 		}
+	else
+	{
+		m_client->SetScreenOffset(m_server->m_desktop->m_ScreenOffsetx, m_server->m_desktop->m_ScreenOffsety, m_server->m_desktop->nr_monitors);
+		m_client->SetBufferOffset(m_server->m_desktop->m_SWOffsetx, m_server->m_desktop->m_SWOffsety);
+	}
 	m_client->m_ScaledScreen = m_client->m_encodemgr.m_buffer->GetViewerSize();
 	m_client->m_nScale = m_client->m_encodemgr.m_buffer->GetScale();
 
@@ -4818,6 +4823,13 @@ vncClient::NotifyUpdate(rfbFramebufferUpdateRequestMsg fur)
     // Kick the update thread (and create it if not there already)
 	TriggerUpdate();
 	TriggerUpdateThread();
+
+#ifdef _DEBUG
+	static DWORD sNotifyLastCopy = GetTickCount();
+	DWORD now = GetTickCount();;
+	OutputDevMessage("%4d", now - sNotifyLastCopy);
+	sNotifyLastCopy = now;
+#endif
 
 	return TRUE;
 }

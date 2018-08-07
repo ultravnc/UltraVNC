@@ -250,6 +250,8 @@ public:
 public:
 	// Make the desktop thread & window proc friends
 	friend class vncDesktopThread;
+	friend class vncServer;
+	friend class vncClientThread;
 	friend LRESULT CALLBACK DesktopWndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp);
 
 	// Create/Destroy methods

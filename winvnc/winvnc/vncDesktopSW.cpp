@@ -126,10 +126,13 @@ vncDesktop::SetBitmapRectOffsetAndClipRect(int offesetx, int offsety, int width,
 	m_Cliprect.br.y = m_bmrect.br.y;
 	if (m_screenCapture && (m_current_monitor == MULTI_MON_PRIMARY || m_current_monitor == MULTI_MON_SECOND || m_current_monitor == MULTI_MON_THIRD)) {
 
-		m_SWOffsetx = m_ScreenOffsetx - mymonitor[3].offsetx;// m_bmrect.tl.x;
-		m_SWOffsety = m_ScreenOffsety - mymonitor[3].offsety;//m_bmrect.tl.y;
-
 		int mon = m_current_monitor - 1;
+
+		m_SWOffsetx = mymonitor[mon].offsetx - mymonitor[3].offsetx;
+		m_SWOffsety = mymonitor[mon].offsety - mymonitor[3].offsety;
+
+		m_ScreenOffsetx = mymonitor[mon].offsetx;
+		m_ScreenOffsety = mymonitor[mon].offsety;
 
 		m_Cliprect.tl.x = mymonitor[mon].offsetx - mymonitor[3].offsetx;
 		m_Cliprect.tl.y = mymonitor[mon].offsety - mymonitor[3].offsety;

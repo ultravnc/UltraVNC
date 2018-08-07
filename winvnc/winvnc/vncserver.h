@@ -82,6 +82,7 @@ class vncServer
 {
 public:
 
+	friend class vncClientThread;
 	HANDLE m_impersonationtoken;
 
 	// Constructor/destructor
