@@ -359,10 +359,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 		if (szCmdLine[i] <= ' ')
 			continue;
 		argfound = TRUE;
-        if (strncmp(&szCmdLine[i], winvncg_szIniFile, strlen(winvncg_szIniFile)) == 0)
+        if (strncmp(&szCmdLine[i], winvncinipath, strlen(winvncinipath)) == 0)
         {
             char filepath[MAX_PATH];
-            i += strlen(winvncg_szIniFile);
+            i += strlen(winvncinipath);
             char Drv[_MAX_PATH];
             char Path[_MAX_PATH];
             char FileName[_MAX_PATH];
