@@ -30,6 +30,8 @@ bool Copy_to_Temp(char *tempfile);
 bool Copy_to_Secure_from_temp(char *tempfile);
 #define INIFILE_NAME "UltraVNC.ini"
 
+extern char *g_szIniFile;
+
 class IniFile
 {
 

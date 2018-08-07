@@ -104,5 +104,7 @@ const char winvncopenforum[]				= "-openforum";
 const char dsmpluginhelper[] = "-dsmpluginhelper";
 const char dsmplugininstance[] = "-dsmplugininstance";
 
+const char winvncg_szIniFile[] = "-inifile";
+
 // Usage string
-const char winvncUsageText[]		= "winvnc [-sc_prompt] [-sc_exit] [-id:????] [-stopreconnect][-autoreconnect[ ID:????]] [-connect host[:display]] [-connect host[::port]] [-repeater host[:port]] [-run]\n";
+const char winvncUsageText[]		= "winvnc [-sc_prompt] [-sc_exit] [-id:????] [-stopreconnect][-autoreconnect[ ID:????]] [-connect host[:display]] [-connect host[::port]] [-repeater host[:port]] [-inifile ????] [-run]\n";
