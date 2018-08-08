@@ -192,6 +192,8 @@
 #define IDC_Path3                       1134
 #define IDC_CHECK5                      1134
 #define IDC_WIN8_HELPER                 1134
+#define IDC_EDIT2                       1135
+#define IDC_QUERYDISABLETIME            1135
 #define IDC_LOCALTEXT_EDIT              1140
 #define IDC_INPUTAREA_EDIT              1140
 #define IDC_REMOTETEXT_EDIT             1141
@@ -288,7 +290,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        172
 #define _APS_NEXT_COMMAND_VALUE         40030
-#define _APS_NEXT_CONTROL_VALUE         1135
+#define _APS_NEXT_CONTROL_VALUE         1136
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

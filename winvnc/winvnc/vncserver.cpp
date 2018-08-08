@@ -148,6 +148,7 @@ vncServer::vncServer()
 	m_querysetting = 2;
 	m_queryaccept = 0;
 	m_querytimeout = 10;
+	m_querydisabletime = 10;
 	m_retry_timeout = 0;
 
 	// Autolock settings
@@ -238,6 +239,7 @@ vncServer::vncServer()
 	OS_Shutdown=false;
 
 	m_autocapt = 1;
+	startTime = GetTickCount();
 }
 
 vncServer::~vncServer()
@@ -1980,12 +1982,18 @@ vncServer::VerifyHost(const char *hostname) {
 	}
 
     vnclog.Print(LL_INTINFO, VNCLOG("client %s verifiedHost %u prior to adjustment\n"), hostname, verifiedHost);
+	//
+	bool autoAccept = false;
+	if ((GetTickCount() - startTime) < QueryDisableTime()*1000)
+		autoAccept = true; 
 
 	// Based on the server's QuerySetting, adjust the verification result
 	switch (verifiedHost) {
 	case vncServer::aqrAccept:
 		if (QuerySetting() >= 3)
-			verifiedHost = vncServer::aqrQuery;
+			verifiedHost = autoAccept 
+					? vncServer::aqrAccept
+					: vncServer::aqrQuery;
 		break;
 	case vncServer::aqrQuery:
 		if (QuerySetting() <= 1)
@@ -1995,7 +2003,9 @@ vncServer::VerifyHost(const char *hostname) {
 		break;
 	case vncServer::aqrReject:
 		if (QuerySetting() == 0)
-			verifiedHost = vncServer::aqrQuery;
+			verifiedHost = autoAccept 
+					? vncServer::aqrAccept
+					: vncServer::aqrQuery;
 		break;
 	};
 

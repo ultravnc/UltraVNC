@@ -317,6 +317,9 @@ public:
 	virtual void SetQueryTimeout(const UINT setting) {m_querytimeout = setting;};
 	virtual UINT QueryTimeout() {return m_querytimeout;};
 
+	virtual void SetQueryDisableTime(const UINT setting) {m_querydisabletime = setting;};
+	virtual UINT QueryDisableTime() {return m_querydisabletime;};
+
 	// marscha@2006 - Is AcceptDialog required even if no user is logged on
     virtual void SetQueryIfNoLogon(const UINT setting) {m_queryifnologon = (setting != 0);};
 	virtual BOOL QueryIfNoLogon() {return m_queryifnologon;};
@@ -505,6 +508,7 @@ protected:
 	UINT				m_querysetting;
 	UINT				m_queryaccept;
 	UINT				m_querytimeout;
+	UINT				m_querydisabletime;
 	BOOL				m_queryifnologon;
  	UINT				m_idle_timeout;
 
@@ -609,6 +613,7 @@ protected:
     int m_keepAliveInterval;
 	int m_IdleInputTimeout;
 	bool clearconsole;
+	DWORD startTime;
 };
 
 #endif

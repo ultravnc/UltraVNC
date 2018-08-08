@@ -119,6 +119,7 @@ LONG RemoveAero=0;
 
 LONG QuerySetting=1;
 LONG QueryTimeout=10;
+LONG QueryDisableTime=0;
 LONG QueryAccept;
 LONG QueryIfNoLogon;
 
@@ -277,10 +278,12 @@ myIniFile_Out.WriteInt("admin", "RemoveAero", RemoveAero);
 	// Connection querying settings
 QuerySetting=myIniFile_In.ReadInt("admin", "QuerySetting", 0);
 QueryTimeout=myIniFile_In.ReadInt("admin", "QueryTimeout", 0);
+QueryDisableTime=myIniFile_In.ReadInt("admin", "QueryDisableTime", 0);
 QueryAccept=myIniFile_In.ReadInt("admin", "QueryAccept", 0);
 QueryIfNoLogon=myIniFile_In.ReadInt("admin", "QueryIfNoLogon", 0);
 myIniFile_Out.WriteInt("admin", "QuerySetting", QuerySetting);
 myIniFile_Out.WriteInt("admin", "QueryTimeout", QueryTimeout);
+myIniFile_Out.WriteInt("admin", "QueryDisableTime", QueryDisableTime);
 myIniFile_Out.WriteInt("admin", "QueryAccept", QueryAccept);
 myIniFile_Out.WriteInt("admin", "QueryIfNoLogon", QueryIfNoLogon);
 

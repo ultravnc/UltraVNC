@@ -163,15 +163,15 @@ BEGIN
     CONTROL         "Disable Viewers inputs",IDC_DISABLE_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,150,70,92,11
     CONTROL         "Disable Local inputs",IDC_DISABLE_LOCAL_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,150,82,83,12
     CONTROL         "Alternate keyboard method",IDC_JAP_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,150,95,89,18
-    GROUPBOX        "Query on incoming connection",IDC_STATIC,250,3,136,53,BS_LEFT
+    GROUPBOX        "Query on incoming connection",IDC_STATIC,250,3,136,60,BS_LEFT
     CONTROL         "Display Query Window",IDQUERY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,257,15,86,10
-    LTEXT           "Timeout:",IDC_STATIC,275,29,28,8
-    EDITTEXT        IDQUERYTIMEOUT,308,27,19,12,ES_AUTOHSCROLL
-    LTEXT           "seconds",IDC_STATIC,330,29,29,8
-    LTEXT           "Default action:",IDC_STATIC,257,43,47,8
-    CONTROL         "Refuse",IDC_DREFUSE,"Button",BS_AUTORADIOBUTTON | WS_GROUP,307,43,39,10
-    CONTROL         "Accept",IDC_DACCEPT,"Button",BS_AUTORADIOBUTTON,346,43,37,10
-    GROUPBOX        "Multi viewer connections",IDC_STATIC,250,59,136,60,BS_LEFT
+    LTEXT           "Timeout:",IDC_STATIC,257,28,28,8
+    EDITTEXT        IDQUERYTIMEOUT,287,26,19,12,ES_AUTOHSCROLL
+    LTEXT           "seconds",IDC_STATIC,311,28,29,8
+    LTEXT           "Default action:",IDC_STATIC,257,52,47,8
+    CONTROL         "Refuse",IDC_DREFUSE,"Button",BS_AUTORADIOBUTTON | WS_GROUP,307,52,39,10
+    CONTROL         "Accept",IDC_DACCEPT,"Button",BS_AUTORADIOBUTTON,346,52,37,10
+    GROUPBOX        "Multi viewer connections",IDC_STATIC,250,64,136,60,BS_LEFT
     CONTROL         "Disconnect all existing connections",IDC_MV1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,255,71,127,10
     CONTROL         "Keep existing connections",IDC_MV2,"Button",BS_AUTORADIOBUTTON,255,81,104,10
     CONTROL         "Refuse the new connection",IDC_MV3,"Button",BS_AUTORADIOBUTTON,255,92,103,9
@@ -223,6 +223,9 @@ BEGIN
     CONTROL         "RDPmode",IDC_RDPMODE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,228,182,47,10
     CONTROL         "IPv6 mode",IDC_IPV6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,113,50,10
     CONTROL         "win8 keyboardhelper",IDC_WIN8_HELPER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,150,112,83,10
+    EDITTEXT        IDC_QUERYDISABLETIME,287,39,19,12,ES_AUTOHSCROLL
+    LTEXT           "Delay:",IDC_STATIC,263,41,22,8
+    LTEXT           "sec. after restart.",IDC_STATIC,311,41,59,8
 END
 
 IDD_ABOUT1 DIALOGEX 0, 0, 286, 222
