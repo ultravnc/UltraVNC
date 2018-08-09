@@ -4792,8 +4792,12 @@ vncClient::NotifyUpdate(rfbFramebufferUpdateRequestMsg fur)
 		update.br.x = update.tl.x + (m_ScaledScreen.br.x-m_ScaledScreen.tl.x) * m_nScale;
 		update.br.y = update.tl.y + (m_ScaledScreen.br.y-m_ScaledScreen.tl.y) * m_nScale;
 
+		
+
 		update_rgn=update;
 		}
+
+		OutputDevMessage("Update Rect %i %i %i %i", update.tl.x, update.tl.y, update.br.x - update.tl.x, update.br.y - update.tl.y);
 
 		// RealVNC 336
 		if (update_rgn.is_empty()) {

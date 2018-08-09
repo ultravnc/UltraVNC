@@ -10,6 +10,7 @@ extern LONG PollFullScreen;
 extern LONG PollConsoleOnly;
 extern LONG PollOnEventOnly;
 extern LONG Driver;
+extern bool ddEngine;
 extern LONG Hook;
 extern LONG RemoveWallpaper;
 extern LONG RemoveAero;
@@ -35,6 +36,19 @@ BOOL CALLBACK DlgProcCAP(HWND hwnd, UINT uMsg,
 			SendMessage(GetDlgItem(hwnd, IDC_REMOVE_WALLPAPER),BM_SETCHECK,RemoveWallpaper,0);
 			SendMessage(GetDlgItem(hwnd, IDC_REMOVE_Aero),BM_SETCHECK,RemoveAero,0);
 			SendMessage(GetDlgItem(hwnd, IDC_ONEVENT_ONLY),BM_SETCHECK,PollOnEventOnly,0);
+
+            if (ddEngine) {
+                ShowWindow(GetDlgItem(hwnd, IDC_CHECKDRIVER), false);
+                //ShowWindow(GetDlgItem(hwnd, IDC_STATICELEVATED), false);
+                SetWindowText(GetDlgItem(hwnd, IDC_DRIVER), "Desktop Duplication (restart on change required)");
+                RECT rect;
+                GetWindowRect(GetDlgItem(hwnd, IDC_DRIVER), &rect);
+                POINT pt;
+                pt.x = rect.left;
+                pt.y = rect.top;
+                ScreenToClient(hwnd, &pt);
+                MoveWindow(GetDlgItem(hwnd, IDC_DRIVER), pt.x, pt.y, 410, 20, FALSE);
+            }
 			
 			EnableWindow(GetDlgItem(hwnd, IDC_CONSOLE_ONLY),PollUnderCursor ||PollForeground);
 			EnableWindow(GetDlgItem(hwnd, IDC_ONEVENT_ONLY),PollUnderCursor ||PollForeground);

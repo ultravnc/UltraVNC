@@ -97,6 +97,7 @@ LONG PollFullScreen=1;
 LONG PollConsoleOnly=0;
 LONG PollOnEventOnly=0;
 LONG Driver=0;
+bool ddEngine = false;
 LONG Hook=1;
 LONG Virtual=0;
 LONG SingleWindow=0;
@@ -295,6 +296,25 @@ myIniFile_Out.WriteInt("poll", "MaxCpu", MaxCpu);
 myIniFile_Out.WriteString("admin", "accept_reject_mesg", accept_reject_mesg);
 }
 
+bool IsWindows8OrGreater()
+{
+    OSVERSIONINFO OSversion;
+
+    OSversion.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+
+    GetVersionEx(&OSversion);
+
+    switch (OSversion.dwPlatformId)
+    {
+    case VER_PLATFORM_WIN32_NT:
+        if (OSversion.dwMajorVersion >= 6 && OSversion.dwMinorVersion >= 2)
+            return true;
+        break;
+    }
+
+    return false;
+}
+
 void Read_Settings_from_ini()
 {
 IniFile myIniFile_In;
@@ -372,6 +392,12 @@ MaxCpu=myIniFile_In.ReadInt("poll", "MaxCpu", MaxCpu);
 myIniFile_In.ReadString("admin", "accept_reject_mesg", accept_reject_mesg,512);
 
 keepAliveInterval = myIniFile_In.ReadInt("admin", "KeepAliveInterval", keepAliveInterval); 
+
+ddEngine = false;
+
+if(IsWindows8OrGreater)
+  ddEngine = true;
+
 }
 
 DWORD WINAPI upnpthread( LPVOID lpParam );
