@@ -78,6 +78,8 @@
 #include "common/win32_helpers.h"
 #include "uvncUiAccess.h"
 
+#define DWEXTRA_VNC_REMOTE  0x564e4300
+
 bool isDirectoryTransfer(const char *szFileName);
 extern BOOL SPECIAL_SC_PROMPT;
 extern BOOL SPECIAL_SC_EXIT;
@@ -3370,7 +3372,7 @@ vncClientThread::run(void *arg)
 							unsigned long x = ((msg.pe.x + (m_client->monitor_Offsetx)) *  65535) / (screenX-1);
 							unsigned long y = ((msg.pe.y + (m_client->monitor_Offsety))* 65535) / (screenY-1);
 							// Do the pointer event
-							::mouse_event(flags, (DWORD) x, (DWORD) y, wheel_movement, 0);
+							::mouse_event(flags, (DWORD) x, (DWORD) y, wheel_movement, m_server->SendExtraMouse() ? DWEXTRA_VNC_REMOTE : 0);
 //							vnclog.Print(LL_INTINFO, VNCLOG("########mouse_event :%i %i \n"),x,y);
 						}
 					else
@@ -3389,7 +3391,7 @@ vncClientThread::run(void *arg)
 								evt.mi.dx = (xx * 65535) / (GetSystemMetrics(SM_CXVIRTUALSCREEN)-1);
 								evt.mi.dy = (yy* 65535) / (GetSystemMetrics(SM_CYVIRTUALSCREEN)-1);
 								evt.mi.dwFlags = flags | MOUSEEVENTF_VIRTUALDESK;
-								evt.mi.dwExtraInfo = 0;
+								evt.mi.dwExtraInfo = m_server->SendExtraMouse() ? DWEXTRA_VNC_REMOTE : 0;
 								evt.mi.mouseData = wheel_movement;
 								evt.mi.time = 0;
 								(*m_client->Sendinput)(1, &evt, sizeof(evt));
@@ -3408,7 +3410,7 @@ vncClientThread::run(void *arg)
 										SystemParametersInfo(SPI_SETMOUSESPEED, 0, &newSpeed, 0);
 										SystemParametersInfo(SPI_SETMOUSE, 0, &idealMouseInfo, 0);
 									}
-								::mouse_event(flags, msg.pe.x-cursorPos.x, msg.pe.y-cursorPos.y, wheel_movement, 0);
+								::mouse_event(flags, msg.pe.x-cursorPos.x, msg.pe.y-cursorPos.y, wheel_movement, m_server->SendExtraMouse() ? DWEXTRA_VNC_REMOTE : 0);
 								if (flags & MOUSEEVENTF_MOVE) 
 									{
 										SystemParametersInfo(SPI_SETMOUSE, 0, &mouseInfo, 0);

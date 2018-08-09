@@ -267,6 +267,8 @@ public:
 	virtual BOOL SetLoopbackOnly(BOOL loopbackOnly);
 	virtual BOOL LoopbackOnly();
 
+	void SetSendExtraMouse(BOOL i_fSendExtraMouse);
+	BOOL SendExtraMouse();
 
 	// Tray icon disposition
 	virtual BOOL SetDisableTrayIcon(BOOL disableTrayIcon);
@@ -614,6 +616,7 @@ protected:
 	int m_IdleInputTimeout;
 	bool clearconsole;
 	DWORD startTime;
+    BOOL m_fSendExtraMouse;
 };
 
 #endif

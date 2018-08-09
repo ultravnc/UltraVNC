@@ -239,7 +239,9 @@ vncServer::vncServer()
 	OS_Shutdown=false;
 
 	m_autocapt = 1;
-	startTime = GetTickCount();
+
+    startTime = GetTickCount();
+	m_fSendExtraMouse = TRUE;
 }
 
 vncServer::~vncServer()
@@ -1712,6 +1714,16 @@ BOOL
 vncServer::LoopbackOnly()
 {
 	return m_loopbackOnly;
+}
+
+void vncServer::SetSendExtraMouse(BOOL i_fSendExtraMouse)
+{
+	m_fSendExtraMouse = i_fSendExtraMouse;
+}
+
+BOOL vncServer::SendExtraMouse()
+{
+	return m_fSendExtraMouse;
 }
 
 void

@@ -120,6 +120,9 @@ if (!myIniFile_Out.WriteInt("admin", "UseRegistry", BUseRegistry))
 		return false;
 }
 
+BOOL setextramouse = myIniFile_In.ReadInt("admin", "SendExtraMouse", 1);
+myIniFile_Out.WriteInt("admin", "SendExtraMouse", setextramouse);
+
 MSLogonRequired=myIniFile_In.ReadInt("admin", "MSLogonRequired", false);
 myIniFile_Out.WriteInt("admin", "MSLogonRequired", MSLogonRequired);
 NewMSLogon=myIniFile_In.ReadInt("admin", "NewMSLogon", false);
