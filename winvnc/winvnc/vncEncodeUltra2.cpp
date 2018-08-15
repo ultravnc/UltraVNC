@@ -212,6 +212,9 @@ vncEncodeUltra2::SendJpegRect(BYTE *src,BYTE *dst, int dst_size, int w, int h, i
     }
   }
 
+  if (w *h < 2500)
+	quality = 90;
+
   if (quality != m_quality)
   {
 	jpeg_set_defaults(&cinfo);

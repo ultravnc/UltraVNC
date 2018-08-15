@@ -951,6 +951,10 @@ vncDesktopThread::run_undetached(void *arg)
 			m_desktop->trigger_events[7] = m_desktop->m_screenCapture->getHPointerEvent();
 			strcpy_s(g_hookstring,"ddengine");
 			waittime = 1000;
+			DWORD dw;
+			if (XRichCursorEnabled && m_desktop->m_screenCapture && ThreadHandleCheckCursorUpdates == NULL)
+				ThreadHandleCheckCursorUpdates = CreateThread(NULL, 0, ThreadCheckCursorUpdates, this, 0, &dw);
+
 		}
 	else {
 			// BLIT
