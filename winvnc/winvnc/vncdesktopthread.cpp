@@ -774,6 +774,7 @@ DWORD WINAPI ThreadCheckMirrorDriverUpdates(LPVOID lpParam)
 	{	
 			if  (dt->m_desktop->m_screenCapture && dt->m_desktop->m_screenCapture->getPreviousCounter() != dt->m_desktop->pchanges_buf->counter)
 			{
+				strcpy_s(g_hookstring,"driver");
 				SetEvent(dt->m_desktop->trigger_events[0]);				
 			}
 		Sleep(5);
@@ -934,8 +935,7 @@ vncDesktopThread::run_undetached(void *arg)
 	
 	if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver && !VNCOS.OS_WIN8 && !VNCOS.OS_WIN10)
 		{
-			//MIRROR DRIVER....still to check if this works
-			strcpy_s(g_hookstring,"driver");
+			//MIRROR DRIVER....still to check if this works			
 			DWORD dw;
 			if (ThreadHandleCheckMirrorDriverUpdates == NULL)
 				ThreadHandleCheckMirrorDriverUpdates = CreateThread(NULL, 0, ThreadCheckMirrorDriverUpdates, this, 0, &dw);
@@ -948,8 +948,7 @@ vncDesktopThread::run_undetached(void *arg)
 		{
 			//DDENGINE
 			m_desktop->trigger_events[6] = m_desktop->m_screenCapture->getHScreenEvent();
-			m_desktop->trigger_events[7] = m_desktop->m_screenCapture->getHPointerEvent();
-			strcpy_s(g_hookstring,"ddengine");
+			m_desktop->trigger_events[7] = m_desktop->m_screenCapture->getHPointerEvent();			
 			waittime = 1000;
 			DWORD dw;
 			if (XRichCursorEnabled && m_desktop->m_screenCapture && ThreadHandleCheckCursorUpdates == NULL)
@@ -983,6 +982,7 @@ vncDesktopThread::run_undetached(void *arg)
 				case WAIT_TIMEOUT:
 				case WAIT_OBJECT_0+6:
 					ResetEvent(m_desktop->trigger_events[6]);
+					strcpy_s(g_hookstring,"ddengine");
 				case WAIT_OBJECT_0: {
 					waiting_update=0;
 					ResetEvent(m_desktop->trigger_events[0]);

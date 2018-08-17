@@ -601,8 +601,7 @@ vncDesktop::InitWindow()
 	hModule = LoadLibrary(szCurrentDir);
 	hSCModule = LoadLibrary(szCurrentDirSC);//TOFIX resource leak
 	if (hModule)
-		{
-			strcpy_s(g_hookstring,"vnchook");
+		{			
 			UnSetHooks = (UnSetHooksFn) GetProcAddress( hModule, "UnSetHooks" );
 			SetMouseFilterHook  = (SetMouseFilterHookFn) GetProcAddress( hModule, "SetMouseFilterHook" );
 			SetKeyboardFilterHook  = (SetKeyboardFilterHookFn) GetProcAddress( hModule, "SetKeyboardFilterHook" );
@@ -641,6 +640,7 @@ vncDesktop::InitWindow()
 				}
 			else if (msg.message==RFB_SCREEN_UPDATE)
 				{
+					strcpy_s(g_hookstring,"vnchook");
 					if (can_be_hooked)
 					{
 					vnclog.Print(LL_INTERR, VNCLOG("RFB_SCREEN_UPDATE  \n"));
