@@ -311,6 +311,10 @@ public:
 		if (m_queryaccept==2) return 0;
 		else return m_queryaccept;
 	};
+	virtual UINT QueryAcceptForSave() 
+	{
+		return m_queryaccept;
+	};
 	virtual UINT QueryAcceptLocked() 
 	{
 		if (m_queryaccept==2) return 0;
