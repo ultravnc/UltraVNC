@@ -1724,7 +1724,7 @@ vncDesktop::CaptureScreen(const rfb::Rect &rect, BYTE *scrBuff, UINT scrBuffSize
 			return;
 
 #if defined(_DEBUG)
-		DWORD t = timeGetTime();
+		DWORD t = GetTimeFunction();
 #endif
 		// Capture screen into bitmap
 		BOOL blitok = false;
@@ -1755,7 +1755,7 @@ vncDesktop::CaptureScreen(const rfb::Rect &rect, BYTE *scrBuff, UINT scrBuffSize
 				m_hrootdc_Desktop, rect.tl.x + xoffset, rect.tl.y + yoffset, (VNCOS.CaptureAlphaBlending() && !m_Black_window_active) ? (CAPTUREBLT | SRCCOPY) : SRCCOPY);
 		}
 		/*#if defined(_DEBUG)
-			DWORD e = timeGetTime() - t;
+			DWORD e = GetTimeFunction() - t;
 			vnclog.Print(LL_INTWARN, VNCLOG("Blit (%u,%u - %u,%u) (%ux%u took %ums\n"),
 				rect.tl.x, rect.tl.y, rect.br.x, rect.br.y,
 				rect.width(), rect.height(), e);

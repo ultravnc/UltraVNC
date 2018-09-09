@@ -117,3 +117,10 @@ extern void WriteLog(char* sender, char *format, ...);
 #else
 #define OutputDevMessage(...)
 #endif
+
+#ifdef HIGH_PRECISION
+#define GetTimeFunction timeGetTime
+#pragma comment(lib, "winmm.lib")
+#else
+#define GetTimeFunction GetTickCount
+#endif

@@ -49,37 +49,10 @@ extern HINSTANCE	hAppInstance;
 //
 //
 //
+#ifdef HIGH_PRECISION
 #include <mmsystem.h>
 BOOL PlayResource(LPSTR lpName)
 {
-    /*BOOL bRtn;
-    LPSTR lpRes;
-    HANDLE hRes;
-    HRSRC hResInfo;
-
-    // Find the WAVE resource. 
-    hResInfo= FindResource(hAppInstance,MAKEINTRESOURCE(IDR_WAVE1),"WAVE");
-    if(hResInfo == NULL)
-       return FALSE;
-    // Load the WAVE resource. 
-
-    hRes = LoadResource(hAppInstance,hResInfo);
-    if (hRes == NULL)
-      return FALSE;
-
-    // Lock the WAVE resource and play it. 
-    lpRes=(LPSTR)LockResource(hRes);
-    if(lpRes==NULL)
-      return FALSE;
-
-    bRtn = sndPlaySound(lpRes, SND_MEMORY | SND_SYNC);
-    if(bRtn == NULL)
-      return FALSE;
-
-    // Free the WAVE resource and return success or failure. 
-    FreeResource(hRes);
-    return TRUE;*/
-
 	char szWavFile[MAX_PATH]; //PGM 
 
 	if (GetModuleFileName(NULL, szWavFile, MAX_PATH)) //PGM 
@@ -105,6 +78,12 @@ BOOL PlayResource(LPSTR lpName)
 		return TRUE; //PGM 
 
 }
+#else
+BOOL PlayResource(LPSTR lpName)
+{
+	return TRUE;
+}
+#endif
 
 ///////////////////////////////////////////////////////
 TextChat::TextChat(vncClient *pCC)
@@ -432,7 +411,7 @@ LRESULT CALLBACK TextChat::DoDialogThread(LPVOID lpParameter)
 
 		if (!SetThreadDesktop(desktop))
 		{
-			vnclog.Print(LL_INTERR, VNCLOG("SelectHDESK:!SetThreadDesktop \n"));
+			vnclog.Print(LL_INTERR, VNCLOG("SelectHDESK:!SetThreadDesktop 3\n"));
 		}
 	}
 

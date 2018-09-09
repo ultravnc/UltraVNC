@@ -2287,7 +2287,7 @@ vncClientThread::run(void *arg)
 	vnclog.Print(LL_INTINFO, VNCLOG("authenticated connection\n"));
 
 	// Set Client Connect time
-	m_client->SetConnectTime(timeGetTime());
+	m_client->SetConnectTime(GetTimeFunction());
 
 	// INIT PIXEL FORMAT
 
@@ -2419,12 +2419,12 @@ vncClientThread::run(void *arg)
 		// Ensure that we're running in the correct desktop
 		if (!m_client->IsFileTransBusy())
 		// This desktop switch is responsible for the keyboard input
-		if (vncService::InputDesktopSelected()==0)
+		/*if (vncService::InputDesktopSelected()==0)
 		{
 			vnclog.Print(LL_CONNERR, VNCLOG("vncClientThread \n"));
 			if (!vncService::SelectDesktop(NULL, &input_desktop)) 
 					break;
-		}
+		}*/
 		// added jeff
         // 2 May 2008 jdp paquette@atnetsend.net moved so that we're on the right desktop  when we're a service
 	    // Clear the CapsLock and NumLock keys
@@ -6487,7 +6487,7 @@ bool vncClient::DoFTUserImpersonation()
 	}
 
 	if (fUserOk)
-		m_lLastFTUserImpersonationTime = timeGetTime();
+		m_lLastFTUserImpersonationTime = GetTimeFunction();
 
 	m_fFTUserImpersonatedOk = fUserOk;
 
@@ -6509,7 +6509,7 @@ void vncClient::UndoFTUserImpersonation()
     if (m_fFileSessionOpen) return;
 
 	vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::UNDoFTUserImpersonation - 1\n"));
-	DWORD lTime = timeGetTime();
+	DWORD lTime = GetTimeFunction();
 	if (lTime - m_lLastFTUserImpersonationTime < 10000) return;
 	omni_mutex_lock l(GetUpdateLock(),104);
 	vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::UNDoFTUserImpersonation - Impersonationtoken exists\n"));

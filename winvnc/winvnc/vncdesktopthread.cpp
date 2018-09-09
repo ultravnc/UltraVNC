@@ -716,7 +716,7 @@ void vncDesktopThread::do_polling(HANDLE& threadHandle, rfb::Region2D& rgncache,
 	}
 	
 
-	DWORD lTime = timeGetTime();
+	DWORD lTime = GetTimeFunction();
 	m_desktop->m_buffer.SetAccuracy(m_desktop->m_server->TurboMode() ? 8 : 4); 
 	if (cursormoved)  {
 		m_desktop->idle_counter=0;
@@ -893,8 +893,8 @@ vncDesktopThread::run_undetached(void *arg)
 	if (XRichCursorEnabled) m_server->UpdateCursorShape();
 
 	InvalidateRect(NULL,NULL,TRUE);
-	oldtick=timeGetTime();
-	oldtick2=timeGetTime();
+	oldtick=GetTimeFunction();
+	oldtick2=GetTimeFunction();
 	int fullpollcounter=0;
 	//*******************************************************
 	// END INIT
@@ -1005,7 +1005,7 @@ vncDesktopThread::run_undetached(void *arg)
 								if (MIN_UPDATE_INTERVAL>MIN_UPDATE_INTERVAL_MAX) MIN_UPDATE_INTERVAL=MIN_UPDATE_INTERVAL_MAX;
 #endif
 								// MAX 30fps
-								newtick = timeGetTime(); 
+								newtick = GetTimeFunction(); 
 								if ((newtick-oldtick)<MIN_UPDATE_INTERVAL)
 									Sleep(MIN_UPDATE_INTERVAL-(newtick-oldtick));
 								

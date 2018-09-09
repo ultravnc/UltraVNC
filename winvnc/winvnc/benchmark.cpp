@@ -26,6 +26,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "vnclog.h"
+#include "stdhdrs.h"
 bool G_USE_PIXEL=false;
 extern VNCLog vnclog;
 #define VNCLOG(s)	(__FILE__ " : " s)
@@ -110,7 +111,7 @@ void testBench()
 	DWORD time1,time2;
 ///---------------------------------------
 	{
-	DWORD start= timeGetTime();
+	DWORD start= GetTimeFunction();
 	
 	{
 	if ((m_oldbitmap = (HBITMAP) SelectObject(m_hmemdc, m_membitmap)) == NULL)
@@ -127,13 +128,13 @@ void testBench()
 		}
 
 
-	DWORD stop= timeGetTime();
+	DWORD stop= GetTimeFunction();
 	time1=stop-start;
 	}
 	
 ///---------------------------------------
 	{
-	DWORD start= timeGetTime();
+	DWORD start= GetTimeFunction();
 	
 	{
 	COLORREF cr = 0;
@@ -142,7 +143,7 @@ void testBench()
 			cr=GetPixel(m_hrootdc, 1, 1);
 		}
 	}
-	DWORD stop= timeGetTime();
+	DWORD stop= GetTimeFunction();
 	time2=(stop-start)*200;
 	}
 ///---------------------------------------
