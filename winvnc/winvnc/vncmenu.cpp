@@ -729,7 +729,7 @@ vncMenu::GetIPAddrString(char *buffer, int buflen) {
     }
 
 #endif
-	if (strlen(buffer)<512 && m_server->AuthClientCount()==0 ) // just in case it would be bigger then our buffer
+	/*if (strlen(buffer)<512 && m_server->AuthClientCount()==0 ) // just in case it would be bigger then our buffer
 	{
 		if (old_buflen!=0)//first time old_buflen=0
 		{
@@ -747,7 +747,7 @@ vncMenu::GetIPAddrString(char *buffer, int buflen) {
 	old_buflen=strlen(buffer);
 	memset(old_buffer,0,512);
 	strncpy(old_buffer,buffer,strlen(buffer));
-	}
+	}*/
 }
 
 void
