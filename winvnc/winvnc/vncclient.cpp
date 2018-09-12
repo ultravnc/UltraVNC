@@ -962,7 +962,7 @@ vncClientThread::FilterClients_Ask_Permission()
 				}
 			else 
 				{
-						HDESK desktop;
+						/*HDESK desktop;
 						desktop = OpenInputDesktop(0, FALSE,
 													DESKTOP_CREATEMENU | DESKTOP_CREATEWINDOW |
 													DESKTOP_ENUMERATE | DESKTOP_HOOKCONTROL |
@@ -973,12 +973,12 @@ vncClientThread::FilterClients_Ask_Permission()
 						HDESK old_desktop = GetThreadDesktop(GetCurrentThreadId());
 						
 					
-						SetThreadDesktop(desktop);
+						SetThreadDesktop(desktop);*/
 
 						if ( !(acceptDlg->DoDialog()) ) verified = vncServer::aqrReject;
 
-						SetThreadDesktop(old_desktop);
-						CloseDesktop(desktop);
+						/*SetThreadDesktop(old_desktop);
+						CloseDesktop(desktop);*/
 				}
             }
 		}
@@ -2419,12 +2419,14 @@ vncClientThread::run(void *arg)
 		// Ensure that we're running in the correct desktop
 		if (!m_client->IsFileTransBusy())
 		// This desktop switch is responsible for the keyboard input
-		/*if (vncService::InputDesktopSelected()==0)
+		if (vncService::InputDesktopSelected()==0)
 		{
 			vnclog.Print(LL_CONNERR, VNCLOG("vncClientThread \n"));
 			if (!vncService::SelectDesktop(NULL, &input_desktop)) 
-					break;
-		}*/
+					Beep(100,100);//break;
+		}
+		if (!vncService::SelectDesktop(NULL, &input_desktop)) 
+					Beep(100,100);
 		// added jeff
         // 2 May 2008 jdp paquette@atnetsend.net moved so that we're on the right desktop  when we're a service
 	    // Clear the CapsLock and NumLock keys
