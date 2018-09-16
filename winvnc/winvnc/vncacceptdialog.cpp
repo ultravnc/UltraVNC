@@ -46,6 +46,7 @@ vncAcceptDialog::vncAcceptDialog(UINT timeoutSecs,BOOL acceptOnTimeout, const ch
 	m_ipAddress = _strdup(ipAddress);
 	m_foreground_hack=FALSE;
 	m_acceptOnTimeout = acceptOnTimeout;
+	ThreadHandle = NULL;
 }
 
 // Destructor
@@ -54,17 +55,30 @@ vncAcceptDialog::~vncAcceptDialog()
 {
 	if (m_ipAddress)
 		free(m_ipAddress);
+	if (ThreadHandle)
+		CloseHandle(ThreadHandle);
 }
 
 // Routine called to activate the dialog and, once it's done, delete it
-
-BOOL vncAcceptDialog::DoDialog()
+DWORD WINAPI DialogThread(LPVOID lpParam)
 {
+	vncAcceptDialog *dialog = (vncAcceptDialog*)lpParam;
+	HDESK desktop;
+	desktop = OpenInputDesktop(0, FALSE,
+			DESKTOP_CREATEMENU | DESKTOP_CREATEWINDOW |
+			DESKTOP_ENUMERATE | DESKTOP_HOOKCONTROL |
+			DESKTOP_WRITEOBJECTS | DESKTOP_READOBJECTS |
+			DESKTOP_SWITCHDESKTOP | GENERIC_WRITE);
+	HDESK old_desktop = GetThreadDesktop(GetCurrentThreadId());											
+	SetThreadDesktop(desktop);
+
 	//	[v1.0.2-jp1 fix]
 	//int retVal = DialogBoxParam(hAppInstance, MAKEINTRESOURCE(IDD_ACCEPT_CONN),
 	int retVal = DialogBoxParam(hInstResDLL, MAKEINTRESOURCE(IDD_ACCEPT_CONN),
-		NULL, (DLGPROC) vncAcceptDlgProc, (LONG_PTR) this);
-	delete this;
+		NULL, (DLGPROC) dialog->vncAcceptDlgProc, (LONG_PTR) dialog);
+
+	SetThreadDesktop(old_desktop);
+	CloseDesktop(desktop);
 	switch (retVal)
 	{
 		case IDREJECT:
@@ -72,7 +86,18 @@ BOOL vncAcceptDialog::DoDialog()
 		case IDACCEPT:
 			return 1;
 	}
-	return (m_acceptOnTimeout) ? 1 : 0;
+	return (dialog->m_acceptOnTimeout) ? 1 : 0;
+}
+
+BOOL vncAcceptDialog::DoDialog()
+{
+	DWORD dwTId; 
+	ThreadHandle = CreateThread(NULL, 0, DialogThread, this, 0, &dwTId);	
+	WaitForSingleObject(ThreadHandle, INFINITE);
+	DWORD lpExitCode;
+	GetExitCodeThread(ThreadHandle, &lpExitCode);
+	if (lpExitCode == 1) return 1;
+	return 0;
 }
 
 // Callback function - handles messages sent to the dialog box

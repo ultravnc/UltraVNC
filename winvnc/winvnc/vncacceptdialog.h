@@ -35,27 +35,12 @@ class vncAcceptDialog
 {
 public:
 
-	// Create an outgoing-connection dialog
 	vncAcceptDialog(UINT timeoutSecs,BOOL acceptOnTimeout, const char *ipAddress);
-
-	// Destructor
 	virtual ~vncAcceptDialog();
-
-	// Once a dialog object is created, either delete it again, or
-	// call DoDialog.  DoDialog will run the dialog and return
-	// TRUE (Accept) or FALSE (Reject).
-	// The function will also return false if the dialog times out.
 	BOOL DoDialog();
-
-	// Internal stuffs
+	BOOL m_acceptOnTimeout;
+	static BOOL CALLBACK vncAcceptDlgProc(HWND hwndDlg,UINT uMsg, WPARAM wParam,LPARAM lParam);
 private:
-
-	// Routine to call when a dialog event occurs
-	static BOOL CALLBACK vncAcceptDlgProc(HWND hwndDlg,
-										UINT uMsg, 
-										WPARAM wParam,
-										LPARAM lParam);
-
 	// Storage for the timeout value
 	UINT m_timeoutSecs;
 	UINT m_timeoutCount;
@@ -65,9 +50,8 @@ private:
 	BOOL m_flash_state;
 
 	// Address of the offending machine
-	char *m_ipAddress;
-
-	BOOL m_acceptOnTimeout;
+	char *m_ipAddress;	
+	HANDLE ThreadHandle;
 };
 
 #endif

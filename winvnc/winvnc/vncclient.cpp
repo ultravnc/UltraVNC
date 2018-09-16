@@ -937,49 +937,20 @@ vncClientThread::FilterClients_Ask_Permission()
             // 10 Dec 2008 jdp reject/accept all incoming connections if the workstation is locked
             if (vncService::IsWSLocked() && !m_server->QueryIfNoLogon()) {
 				if (m_server->QueryAcceptLocked())
-				{
-					verified = m_server->QueryAccept() == 1 ? vncServer::aqrAccept : vncServer::aqrReject;
-				}
+					verified = m_server->QueryAccept() == 1 ? vncServer::aqrAccept : vncServer::aqrReject;				
 				else
-				{
 					//m_queryaccept==2, new method to allow accept on locked user
 					verified = vncServer::aqrAccept;
-				}
             } else {
-
-			vncAcceptDialog *acceptDlg = new vncAcceptDialog(m_server->QueryTimeout(),m_server->QueryAccept(), m_socket->GetPeerName());
-	
-			if (acceptDlg == NULL) 
-				{
+				vncAcceptDialog *acceptDlg = new vncAcceptDialog(m_server->QueryTimeout(),m_server->QueryAccept(), m_socket->GetPeerName());
+				if (acceptDlg == NULL) {
 					if (m_server->QueryAccept()==1) 
-					{
 						verified = vncServer::aqrAccept;
-					}
 					else 
-					{
 						verified = vncServer::aqrReject;
-					}
 				}
-			else 
-				{
-						HDESK desktop;
-						desktop = OpenInputDesktop(0, FALSE,
-													DESKTOP_CREATEMENU | DESKTOP_CREATEWINDOW |
-													DESKTOP_ENUMERATE | DESKTOP_HOOKCONTROL |
-													DESKTOP_WRITEOBJECTS | DESKTOP_READOBJECTS |
-													DESKTOP_SWITCHDESKTOP | GENERIC_WRITE
-													);
-
-						HDESK old_desktop = GetThreadDesktop(GetCurrentThreadId());
-						
-					
-						SetThreadDesktop(desktop);
-
-						if ( !(acceptDlg->DoDialog()) ) verified = vncServer::aqrReject;
-
-						SetThreadDesktop(old_desktop);
-						CloseDesktop(desktop);
-				}
+				else if ( !(acceptDlg->DoDialog()) ) 
+						verified = vncServer::aqrReject;						
             }
 		}
     }
