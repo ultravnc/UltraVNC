@@ -818,7 +818,7 @@ vncClientThread::InitVersion()
 					bReady = false;
 					// we need to reconnect!
 
-					Sleep(min(nRetry * 1000, 30000));
+					Sleep(std::min(nRetry * 1000, 30000));
 
 					if (TryReconnect()) {
 						// reconnect if in SC mode and not already using AutoReconnect
@@ -1624,9 +1624,9 @@ BOOL vncClientThread::AuthSecureVNCPlugin(std::string& auth_message)
 			}		
 			if (bPassphrase==false)
 				{
-					if (memcmp(plain,pResponseData,strlen(plain))!=NULL) auth_ok=false;
+					if (memcmp(plain,pResponseData,strlen(plain))) auth_ok=false;
 				}
-			else if (memcmp(ConfigHelpervar.m_szPassphrase,pResponseData,strlen(ConfigHelpervar.m_szPassphrase))!=NULL) auth_ok=false;
+			else if (memcmp(ConfigHelpervar.m_szPassphrase,pResponseData,strlen(ConfigHelpervar.m_szPassphrase))) auth_ok=false;
 			delete[] pResponseData;
 		}		
 		nSequenceNumber++;
@@ -3216,7 +3216,7 @@ vncClientThread::run(void *arg)
 					{
 						int index = msg.ke.key - 97;
 						HANDLE		hprconnectevent=NULL;
-						if (-1<index<100)
+						if (index>-1 && index<100)
 						{
 							PreConnectID = m_client->m_encodemgr.m_buffer->m_desktop->sesmsg[index].ID;
 							hprconnectevent = OpenEvent(EVENT_MODIFY_STATE, FALSE, "Global\\SessionEventUltraPreConnect");
@@ -4459,7 +4459,7 @@ vncClientThread::run(void *arg)
 // The vncClient itself
 
 // adzm - 2010-07 - Extended clipboard
-vncClient::vncClient() : Sendinput("USER32", "SendInput"), m_clipboard(ClipboardSettings::defaultServerCaps)
+vncClient::vncClient() : m_clipboard(ClipboardSettings::defaultServerCaps), Sendinput("USER32", "SendInput")
 {
 	vnclog.Print(LL_INTINFO, VNCLOG("vncClient() executing...\n"));
 
@@ -5057,7 +5057,6 @@ vncClient::SendRFBMsgQueue(CARD8 type, BYTE *buffer, int buflen)
 	}
 	return TRUE;
 }
-#define min(a, b)  (((a) < (b)) ? (a) : (b))
 
 BOOL
 vncClient::SendUpdate(rfb::SimpleUpdateTracker &update)
@@ -5271,11 +5270,11 @@ vncClient::SendRectangles(const rfb::RectVector &rects)
  
 			for (y = rect.tl.y; y < rect.br.y; y += Blocksize)
 			{
-				int blockbottom = min(y + Blocksize, rect.br.y);
+				int blockbottom = std::min(y + Blocksize, rect.br.y);
 				for (x = rect.tl.x; x < rect.br.x; x += BlocksizeX)
 					{
  
-					   int blockright = min(x+BlocksizeX, rect.br.x);
+					   int blockright = std::min(x+BlocksizeX, rect.br.x);
 					   rfb::Rect tilerect;
 					   tilerect.tl.x=x;
 					   tilerect.br.x=blockright;

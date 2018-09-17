@@ -25,7 +25,9 @@
 #include <winsock2.h>
 #include <windows.h>
 #include "vncOSVersion.h"
+#ifndef SUCCEEDED
 #define SUCCEEDED(hr) (((HRESULT)(hr)) >= 0)
+#endif
 
 
 typedef LONG NTSTATUS, *PNTSTATUS;

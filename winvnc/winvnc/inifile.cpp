@@ -110,6 +110,7 @@ char WORKDIR[MAX_PATH];
 void
 IniFile::copy_to_secure()
 {
+	{
 		char dir[MAX_PATH];
 
 		char exe_file_name[MAX_PATH];
@@ -149,6 +150,7 @@ IniFile::copy_to_secure()
 		if (ProcessInfo.hProcess) CloseHandle (ProcessInfo.hProcess);
 		if (error == 1314) goto error;
 		return;
+	}
 		error:
 		Set_settings_as_admin(myInifile);
 }

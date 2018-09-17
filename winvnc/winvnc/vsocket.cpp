@@ -42,6 +42,7 @@ class VSocket;
 #ifdef __WIN32__
 #include <io.h>
 #include <winsock2.h>
+#include <in6addr.h>
 #include <mstcpip.h>
 #else
 #include <sys/types.h>
@@ -149,7 +150,8 @@ VSocket::VSocket()
 	m_fWriteToNetRectBuf = false;
 	m_nNetRectBufOffset = 0;
 	queuebuffersize=0;
-	
+	memset( queuebuffer, 0, sizeof( queuebuffer ) );
+
 	//adzm 2010-08-01
 	m_LastSentTick = 0;
 
@@ -586,7 +588,7 @@ VSocket::Connect(const VString address, const VCard port)
   addr.sin_addr.s_addr = inet_addr(address);
 
   // Was the string a valid IP address?
-  if (addr.sin_addr.s_addr == -1)
+  if ((int) addr.sin_addr.s_addr == -1)
     {
       // No, so get the actual IP address of the host name specified
       struct hostent *pHost=NULL;

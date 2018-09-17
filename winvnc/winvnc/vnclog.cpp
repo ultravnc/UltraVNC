@@ -46,10 +46,11 @@ VNCLog::VNCLog()
     , m_level(0)
     , hlogfile(NULL)
     , m_append(false)
-    , m_lastLogTime(0)
 	, m_video(false)
+    , m_lastLogTime(0)
 {
 	strcpy(m_filename,"");
+	m_path[0] = 0;
 }
 
 void VNCLog::SetMode(int mode)

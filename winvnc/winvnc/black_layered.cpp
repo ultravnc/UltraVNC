@@ -30,7 +30,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 #define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
-#include <WinSock2.h>
+#include <winsock2.h>
 #include <windows.h>
 #endif // !defined(AFX_STDAFX_H__A9DB83DB_A9FD_11D0_BFD1_444553540000__INCLUDED_)
 #include <time.h>

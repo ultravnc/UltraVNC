@@ -371,7 +371,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
             char *p = strchr(FileExt, ' ');
             if (p) *p = 0;
             _makepath(filepath, Drv, Path, FileName, FileExt);
-            g_szIniFile = strdup(filepath);
+            g_szIniFile = _strdup(filepath);
             i += strlen(filepath);
 #ifdef CRASHRPT
             crUninstall();

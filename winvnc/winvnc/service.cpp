@@ -1309,7 +1309,7 @@ void disconnect_remote_sessions()
 				if (!LockWorkStationF())
                 {
                     char msg[1024];
-                    sprintf(msg, "LockWorkstation failed with error 0x%0X", GetLastError());
+                    sprintf(msg, "LockWorkstation failed with error 0x%0lX", GetLastError());
                     ::OutputDebugString(msg);
                 }
 

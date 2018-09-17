@@ -202,11 +202,11 @@ BOOL GenClientContext(PAUTH_SEQ pAS, PSEC_WINNT_AUTH_IDENTITY pAuthIdentity,
    ULONG           fContextAttr;
 
    if (!pAS->fInitialized) {
-      ss = fn._AcquireCredentialsHandle(NULL, _T("NTLM"), 
+	  ss = fn._AcquireCredentialsHandle(NULL, (SEC_WCHAR *) L"NTLM",
             SECPKG_CRED_OUTBOUND, NULL, pAuthIdentity, NULL, NULL,
             &pAS->hcred, &tsExpiry);
       if (ss < 0) {
-         fprintf(stderr, "AcquireCredentialsHandle failed with %08X\n", ss);
+         fprintf(stderr, "AcquireCredentialsHandle failed with %08X\n", (int) ss);
          return FALSE;
       }
 
@@ -250,7 +250,7 @@ BOOL GenClientContext(PAUTH_SEQ pAS, PSEC_WINNT_AUTH_IDENTITY pAuthIdentity,
       if (fn._CompleteAuthToken) {
          ss = fn._CompleteAuthToken(&pAS->hctxt, &sbdOut);
          if (ss < 0)  {
-            fprintf(stderr, "CompleteAuthToken failed with %08X\n", ss);
+            fprintf(stderr, "CompleteAuthToken failed with %08X\n", (int) ss);
             return FALSE;
          }
       }
@@ -298,11 +298,11 @@ BOOL GenServerContext(PAUTH_SEQ pAS, PVOID pIn, DWORD cbIn, PVOID pOut,
 
    if (!pAS->fInitialized)  {
       
-      ss = fn._AcquireCredentialsHandle(NULL, _T("NTLM"), 
+	  ss = fn._AcquireCredentialsHandle(NULL, (SEC_WCHAR *) L"NTLM",
             SECPKG_CRED_INBOUND, NULL, NULL, NULL, NULL, &pAS->hcred, 
             &tsExpiry);
       if (ss < 0) {
-         fprintf(stderr, "AcquireCredentialsHandle failed with %08X\n", ss);
+         fprintf(stderr, "AcquireCredentialsHandle failed with %08X\n", (int) ss);
          return FALSE;
       }
 
@@ -332,7 +332,7 @@ BOOL GenServerContext(PAUTH_SEQ pAS, PVOID pIn, DWORD cbIn, PVOID pOut,
          SECURITY_NATIVE_DREP, &pAS->hctxt, &sbdOut, &fContextAttr, 
          &tsExpiry);
    if (ss < 0)  {
-      fprintf(stderr, "AcceptSecurityContext failed with %08X\n", ss);
+      fprintf(stderr, "AcceptSecurityContext failed with %08X\n", (int) ss);
       return FALSE;
    }
 
@@ -344,7 +344,7 @@ BOOL GenServerContext(PAUTH_SEQ pAS, PVOID pIn, DWORD cbIn, PVOID pOut,
       if (fn._CompleteAuthToken) {
          ss = fn._CompleteAuthToken(&pAS->hctxt, &sbdOut);
          if (ss < 0)  {
-            fprintf(stderr, "CompleteAuthToken failed with %08X\n", ss);
+            fprintf(stderr, "CompleteAuthToken failed with %08X\n", (int) ss);
             return FALSE;
          }
       }

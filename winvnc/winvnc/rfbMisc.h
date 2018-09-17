@@ -19,14 +19,10 @@
 // which you received this file, check http://www.realvnc.com/ or contact
 // the authors on info@realvnc.com for information on obtaining it.
 
-#ifndef max
-#define max(a,b)            (((a) > (b)) ? (a) : (b))
-#endif
+#include <algorithm>
 
-#ifndef min
-#define min(a,b)            (((a) < (b)) ? (a) : (b))
-#endif
-
+#undef min
+#undef max
 
 #ifndef __RFB_MISC_INCLUDED__
 #define __RFB_MISC_INCLUDED__

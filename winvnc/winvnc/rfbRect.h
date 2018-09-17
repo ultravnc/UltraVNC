@@ -74,20 +74,20 @@ namespace rfb {
 #endif
 		Rect intersect(const Rect &r) const {
 			Rect result;
-			result.tl.x = max(tl.x, r.tl.x);
-			result.tl.y = max(tl.y, r.tl.y);
-			result.br.x = min(br.x, r.br.x);
-			result.br.y = min(br.y, r.br.y);
+			result.tl.x = std::max(tl.x, r.tl.x);
+			result.tl.y = std::max(tl.y, r.tl.y);
+			result.br.x = std::min(br.x, r.br.x);
+			result.br.y = std::min(br.y, r.br.y);
 			return result;
 		}
 		Rect union_boundary(const Rect &r) const {
 			Rect result;
 			if (is_empty()) return r;
 			if (r.is_empty()) return *this;
-			result.tl.x = min(tl.x, r.tl.x);
-			result.tl.y = min(tl.y, r.tl.y);
-			result.br.x = max(br.x, r.br.x);
-			result.br.y = max(br.y, r.br.y);
+			result.tl.x = std::min(tl.x, r.tl.x);
+			result.tl.y = std::min(tl.y, r.tl.y);
+			result.br.x = std::max(br.x, r.br.x);
+			result.br.y = std::max(br.y, r.br.y);
 			return result;
 		}
 		Rect translate(const Point &p) const {

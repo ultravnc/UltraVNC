@@ -641,9 +641,9 @@ void ConfigHelper::SetConfigHelper(DWORD dwFlags, char* szPassphrase)
 }
 
 ConfigHelper::ConfigHelper(const char* szConfig)
-	: m_szConfig(NULL)
+	: m_dwFlags(0x01 | 0x4000 | 0x00100000)
+	, m_szConfig(NULL)
 	, m_szPassphrase(NULL)
-	, m_dwFlags(0x01 | 0x4000 | 0x00100000)
 {
 	m_szPassphrase = new char[256];
 	m_szPassphrase[0] = '\0';

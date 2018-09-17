@@ -362,7 +362,7 @@ void vncBuffer::CheckRect(rfb::Region2D &dest, rfb::Region2D &cacheRgn, const rf
 		unsigned char * n_row_ptr = n_topleft_ptr;
 		unsigned char * c_row_ptr = c_topleft_ptr;
 
-		const UINT blockbottom = min(y + nOptimizedBlockSize, ScaledRect.br.y);
+		const UINT blockbottom = std::min(y + nOptimizedBlockSize, ScaledRect.br.y);
 			for (x = ScaledRect.tl.x, last_x = ScaledRect.br.x; x < last_x; x += nOptimizedBlockSize)
 		{
 			// Work our way across the row
@@ -370,7 +370,7 @@ void vncBuffer::CheckRect(rfb::Region2D &dest, rfb::Region2D &cacheRgn, const rf
 			unsigned char *o_block_ptr = o_row_ptr;
 			unsigned char *c_block_ptr = c_row_ptr;
 
-			const UINT blockright = min(x + nOptimizedBlockSize, ScaledRect.br.x);
+			const UINT blockright = std::min(x + nOptimizedBlockSize, ScaledRect.br.x);
 			const UINT bytesPerBlockRow = (blockright-x) * bytesPerPixel;
 
 				bool fCache = true; // RDV@2002
@@ -461,14 +461,14 @@ void vncBuffer::CheckRect(rfb::Region2D &dest, rfb::Region2D &cacheRgn, const rf
 		unsigned char * o_row_ptr = o_topleft_ptr;
 		unsigned char * n_row_ptr = n_topleft_ptr;
 
-		const UINT blockbottom = min(y + nOptimizedBlockSize, ScaledRect.br.y);
+		const UINT blockbottom = std::min(y + nOptimizedBlockSize, ScaledRect.br.y);
 		for (x = ScaledRect.tl.x; x < ScaledRect.br.x; x += nOptimizedBlockSize)
 		{
 			// Work our way across the row
 			unsigned char *n_block_ptr = n_row_ptr;
 			unsigned char *o_block_ptr = o_row_ptr;
 
-			const UINT blockright = min(x+nOptimizedBlockSize, ScaledRect.br.x);
+			const UINT blockright = std::min(x+nOptimizedBlockSize, ScaledRect.br.x);
 			const UINT bytesPerBlockRow = (blockright-x) * bytesPerPixel;
 
 			// Modif sf@2002

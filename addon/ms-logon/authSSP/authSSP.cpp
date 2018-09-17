@@ -94,7 +94,7 @@ BOOL WINAPI SSPLogonUser(LPTSTR szDomain,
 			__leave;
 		
 		// Get max token size
-		fn._QuerySecurityPackageInfo(_T("NTLM"), &pSPI);
+		fn._QuerySecurityPackageInfo((SEC_WCHAR *) L"NTLM", &pSPI);
 		cbMaxToken = pSPI->cbMaxToken;
 		
 		// Allocate buffers for client and server messages

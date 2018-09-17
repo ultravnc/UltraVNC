@@ -50,7 +50,7 @@ class vncServer;
 
 // Modif rdv@2002 - v1.1.x - videodriver
 #include "videodriver.h"
-#include "DeskDupEngine.h"
+#include "DeskdupEngine.h"
 
 // Modif sf@2002 - v1.1.0
 #include <list>
@@ -61,7 +61,7 @@ class vncServer;
 #endif
 // adzm - 2010-07 - Extended clipboard
 #include "common/Clipboard.h"
-#include "ipc.h"
+#include "IPC.h"
 //#define COMPILE_MULTIMON_STUBS
 //#include "Multimon.h"
 

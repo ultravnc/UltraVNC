@@ -43,10 +43,14 @@
 
 #ifdef _USE_DESKTOPDUPLICATION
 #define _WIN32_WINNT 0x0602
+#ifndef WINVER
 #define WINVER 0x0602
+#endif
 #else
 #define _WIN32_WINDOWS 0x0510
+#ifndef WINVER
 #define WINVER 0x0500
+#endif
 #endif
 
 #define WIN32_LEAN_AND_MEAN

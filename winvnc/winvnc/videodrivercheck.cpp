@@ -25,7 +25,7 @@
 #include <windows.h>
 #include <stdlib.h>
 #include "vncOSVersion.h"
-#include "screencapture.h"
+#include "ScreenCapture.h"
 
 DWORD MessageBoxSecure(HWND hWnd,LPCTSTR lpText,LPCTSTR lpCaption,UINT uType);
 typedef BOOL (WINAPI* pEnumDisplayDevices)(PVOID,DWORD,PVOID,DWORD);

@@ -572,7 +572,7 @@ char *vncDeskThreadError(DWORD code)
 {
     // create default message
     static char msg[255];
-    _snprintf(msg, sizeof msg, "Unknown error %u", code);
+    _snprintf(msg, sizeof msg, "Unknown error %u", static_cast<unsigned int>(code));
     msg[sizeof msg - 1] = 0;
 
     switch (code)
@@ -1558,7 +1558,7 @@ BOOL
 vncServer::SockConnect(BOOL On)
 {
 	// Are we being asked to switch socket connects on or off?
-	vnclog.Print(20, VNCLOG("SockConnect %d\n"), On);
+	vnclog.Print(LL_SOCKINFO, VNCLOG("SockConnect %d\n"), On);
 	if (On)
 	{
 		// Is there a listening socket?
@@ -1624,7 +1624,7 @@ vncServer::SockConnect(BOOL On)
 
 			// Now let's start the HTTP connection stuff
 			EnableHTTPConnect(m_enableHttpConn);
-			vnclog.Print(20, VNCLOG("SockConnect  Done %d\n"), On);
+			vnclog.Print(LL_SOCKINFO, VNCLOG("SockConnect  Done %d\n"), On);
 		}
 	}
 	else

@@ -254,9 +254,9 @@ DWORD WINAPI Cadthread(LPVOID lpParam)
 									if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
 									if (errorcode == 1314) goto error;
 									goto gotome;
+									}
 									error:
 											Enable_softwareCAD_elevated();							
-									}
 							}
 					
 					}

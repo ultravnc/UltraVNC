@@ -106,10 +106,10 @@ vncEncodeCoRRE::NumCodedRects(const rfb::Rect &rect)
 		if (newscore <= oldscore)
 		{
 			// The change was a good one, so adjust the threshold accordingly!
-			m_threshold = max(5, min(95, m_threshold + m_maxadjust));
+			m_threshold = std::max<int>(5, std::min<int>(95, m_threshold + m_maxadjust));
 
-			m_maxwidth = max(8, min(255, m_maxwidth + m_maxadjust));
-			m_maxheight = max(8, min(255, m_maxheight + m_maxadjust));
+			m_maxwidth = std::max<int>(8, std::min<int>(255, m_maxwidth + m_maxadjust));
+			m_maxheight = std::max<int>(8, std::min<int>(255, m_maxheight + m_maxadjust));
 		}
 		else
 		{

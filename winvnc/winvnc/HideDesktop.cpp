@@ -23,10 +23,11 @@
 ////////////////////////////////////////////////////////////////////////////
 #include "stdhdrs.h"
 #define WIN32_LEAN_AND_MEAN
-#include <WinSock2.h>
-#include <Windows.h>
-#include <WinInet.h> // Shell object uses INTERNET_MAX_URL_LENGTH (go figure)
-#if _MSC_VER < 1400
+//#include <shlwapi.h>
+#include <tchar.h>
+#include <windows.h>
+#include <wininet.h> // Shell object uses INTERNET_MAX_URL_LENGTH (go figure)
+#if !__GNUC__ && _MSC_VER < 1400
 #define _WIN32_IE 0x0400
 #endif
 #define _WIN32_WINNT 0x0A00
@@ -211,7 +212,7 @@ void HideDesktop()
 	{
 		SaveWallpaperStyle(); // Added Jef Fix
 		SystemParametersInfo(SPI_GETDESKWALLPAPER,1024,SCREENNAME,NULL );
-		SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, "", SPIF_SENDCHANGE);
+		SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, (PVOID)"", SPIF_SENDCHANGE);
 		ADWasEnabled = HideActiveDesktop();
 		ISWallPaperHided=true;
 		vnclog.Print(LL_INTWARN, VNCLOG("Killwallpaper %i %i\n"),ISWallPaperHided,ADWasEnabled);
@@ -289,7 +290,7 @@ void DisableEffects()
 			}
 		}
 		for (iParam = 0; iParam < (sizeof(spiParams) / sizeof(spiParams[0])); iParam++) {
-			if (spiValues[iParam] != spiSuggested[iParam]) {
+			if (spiValues[iParam] != (BOOL) spiSuggested[iParam]) {
 				if (!SystemParametersInfo(spiParams[iParam]+1, 0, (PVOID)spiSuggested[iParam], SPIF_SENDCHANGE)) {				
 					vnclog.Print(LL_INTWARN, VNCLOG("Failed to set SPI value for 0x%04x to 0x%08x (0x%08x)\n"), spiParams[iParam]+1, spiSuggested[iParam], GetLastError());
 				} else {
@@ -306,7 +307,7 @@ void EnableEffects()
 	if (g_bEffectsDisabled) {
 		int iParam = 0;
 		for (iParam = 0; iParam < (sizeof(spiParams) / sizeof(spiParams[0])); iParam++) {
-			if (spiValues[iParam] != spiSuggested[iParam]) {
+			if (spiValues[iParam] != (BOOL) spiSuggested[iParam]) {
 				if (!SystemParametersInfo(spiParams[iParam]+1, 0, (PVOID)spiValues[iParam], SPIF_SENDCHANGE)) {
 					vnclog.Print(LL_INTWARN, VNCLOG("Failed to restore SPI value for 0x%04x (0x%08x)\n"), spiParams[iParam]+1, GetLastError());
 				} else {

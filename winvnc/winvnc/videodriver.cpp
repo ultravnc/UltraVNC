@@ -23,7 +23,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "stdhdrs.h"
-#include "VideoDriver.h"
+#include "videodriver.h"
 #include <strsafe.h>
 
 LPSTR driverName = "mv video hook driver2";

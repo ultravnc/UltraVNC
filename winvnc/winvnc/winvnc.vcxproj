@@ -1400,9 +1400,6 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
     <None Include="VTune\winvnc.vpj" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\avilog\avilog\avilog.vcxproj">
-      <Project>{cd0d6ec9-d652-4d1b-b23b-18e1ac3aa683}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\..\rdr\rdr.vcxproj">
       <Project>{f5244002-0fff-4f19-a941-fcce1861f132}</Project>
     </ProjectReference>

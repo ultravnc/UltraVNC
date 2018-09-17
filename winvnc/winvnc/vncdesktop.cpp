@@ -43,14 +43,14 @@
 #include "vncservice.h"
 // Modif rdv@2002 - v1.1.x - videodriver
 #include "vncOSVersion.h"
-#include "DeskDupEngine.h"
+#include "DeskdupEngine.h"
 
 #include "mmsystem.h" // sf@2002
 #include "TextChat.h" // sf@2002
 #include "vncdesktopthread.h"
 #include "common/win32_helpers.h"
 #include <algorithm>
-#include <Commctrl.h>
+#include <commctrl.h>
 
 extern bool PreConnect;
 int getinfo(char mytext[1024]);
@@ -1515,7 +1515,7 @@ vncDesktop::WriteMessageOnScreen(char * tt, BYTE *scrBuff, UINT scrBuffSize)
 	CopyToBuffer(rect, scrBuff, scrBuffSize);
 }
 
-#include "wtsApi32.h"
+#include "wtsapi32.h"
 char mytext22[1024] = "";
 DWORD GetCurrentConsoleSessionID();
 
@@ -1645,7 +1645,7 @@ vncDesktop::WriteMessageOnScreenPreConnect(BYTE *scrBuff, UINT scrBuffSize)
 	{
 		if (sesmsg[i].ID != 65536 && sesmsg[i].ID != 0)
 		{
-			sprintf(bigstring, "%c) session%i %s user=%s  status=%s", 97 + i, sesmsg[i].ID, sesmsg[i].name, sesmsg[i].username, sesmsg[i].type);
+			sprintf(bigstring, "%c) session%i %s user=%s  status=%s", static_cast<char>(97 + i), static_cast<int>(sesmsg[i].ID), sesmsg[i].name, sesmsg[i].username, sesmsg[i].type);
 			strcat(menustring, bigstring);
 			strcat(menustring, "\n");
 		}
@@ -1677,7 +1677,7 @@ vncDesktop::WriteMessageOnScreenPreConnect(BYTE *scrBuff, UINT scrBuffSize)
 
 	SetRect(&rect, 30, 50, 640, 640);
 	hFont = (HFONT)GetStockObject(ANSI_FIXED_FONT);
-	if (hOldFont = (HFONT)SelectObject(m_hmemdc, hFont))
+	if ((hOldFont = (HFONT)SelectObject(m_hmemdc, hFont)))
 	{
 		DrawText(m_hmemdc, mytext22, strlen(mytext22), &rect, DT_LEFT | DT_WORDBREAK);
 		SelectObject(m_hmemdc, hOldFont);
@@ -1686,7 +1686,7 @@ vncDesktop::WriteMessageOnScreenPreConnect(BYTE *scrBuff, UINT scrBuffSize)
 
 	SetRect(&rect, 30, 180, 640, 640);
 	hFont = (HFONT)GetStockObject(ANSI_FIXED_FONT);
-	if (hOldFont = (HFONT)SelectObject(m_hmemdc, hFont))
+	if ((hOldFont = (HFONT)SelectObject(m_hmemdc, hFont)))
 	{
 		DrawText(m_hmemdc, menustring, strlen(menustring), &rect, DT_LEFT);
 		SelectObject(m_hmemdc, hOldFont);
@@ -2526,7 +2526,7 @@ void vncDesktop::SetBlockInputState(bool newstate)
 	{
 		if (!m_server->BlankInputsOnly())
 		{
-			if (blankmonitorstate == newstate == 1)
+			if ((blankmonitorstate == newstate) && (newstate == 1))
 			{
 				SetBlankMonitor(0);
 				blankmonitorstate = 0;

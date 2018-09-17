@@ -23,7 +23,7 @@
 ////////////////////////////////////////////////////////////////////////////
 #include "stdhdrs.h"
 #include "vncEncodeUltra2.h"
-#include <Mmsystem.h>
+#include <mmsystem.h>
 
 struct jpeg_destination_mgr jpegDstManager;
 static JOCTET *jpegDstBuffer;
