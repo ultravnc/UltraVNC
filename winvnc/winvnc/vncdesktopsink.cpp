@@ -683,12 +683,7 @@ vncDesktop::InitWindow()
 	}
 	while (g_lockcode != 0)
 	{
-			#ifdef _DEBUG
-					char			szText[256];
-					sprintf(szText," OOOOOOOOOOOOOOOOOOOOOOOOOOOOO++++++ WAITING %s \n", g_lockcode);
-					OutputDebugString(szText);
-#endif
-					Sleep(100);
+		Sleep(100);
 	}
 	KillTimer(m_hwnd,1001);
 	if (hModule)FreeLibrary(hModule);

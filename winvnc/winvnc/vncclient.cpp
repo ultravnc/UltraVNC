@@ -985,7 +985,7 @@ BOOL vncClientThread::CheckEmptyPasswd()
 {
 	char password[MAXPWLEN];
 	m_server->GetPassword(password);
-	vncPasswd::ToText plain(password);
+	vncPasswd::ToText plain(password, m_server->Secure());
 	// By default we disallow passwordless workstations!
 	if ((strlen(plain) == 0) && m_server->AuthRequired())
 	{
@@ -1234,7 +1234,7 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth)
 		// Retrieve the local password
 		char password[MAXPWLEN];
 		m_server->GetPassword(password);
-		vncPasswd::ToText plain(password);
+		vncPasswd::ToText plain(password, m_server->Secure());
 
 		if (!m_auth && m_ms_logon)
 		{
@@ -1424,7 +1424,7 @@ BOOL vncClientThread::AuthenticateLegacyClient()
 	// Retrieve the local password
 	char password[MAXPWLEN];
 	m_server->GetPassword(password);
-	vncPasswd::ToText plain(password);
+	vncPasswd::ToText plain(password, m_server->Secure());
 
 	CARD32 auth_type = rfbInvalidAuth;
 
@@ -1531,7 +1531,7 @@ BOOL vncClientThread::AuthSecureVNCPlugin(std::string& auth_message)
 	bool bPassphrase=false;
 	char password[MAXPWLEN];
 	m_server->GetPassword(password);
-	vncPasswd::ToText plain(password);
+	vncPasswd::ToText plain(password, m_server->Secure());
 	ConfigHelper ConfigHelpervar(m_server->GetDSMPluginConfig());
 	if (strlen(ConfigHelpervar.m_szPassphrase)>0)
 	{
@@ -1644,7 +1644,7 @@ BOOL vncClientThread::AuthSecureVNCPlugin_old(std::string& auth_message)
 {
 	char password[MAXPWLEN];
 	m_server->GetPassword(password);
-	vncPasswd::ToText plain(password);
+	vncPasswd::ToText plain(password, m_server->Secure());
 	m_socket->SetDSMPluginConfig(m_server->GetDSMPluginConfig());
 	BOOL auth_ok = FALSE;
 
@@ -1757,7 +1757,7 @@ BOOL vncClientThread::AuthVnc(std::string& auth_message)
 {
 	char password[MAXPWLEN];
 	m_server->GetPassword(password);
-	vncPasswd::ToText plain(password);
+	vncPasswd::ToText plain(password, m_server->Secure());
 
 	BOOL auth_ok = FALSE;
 	{
@@ -1801,7 +1801,7 @@ BOOL vncClientThread::AuthVnc(std::string& auth_message)
 			{ //PGM
 				memset(password, '\0', MAXPWLEN); //PGM
 				m_server->GetPassword2(password); //PGM
-				vncPasswd::ToText plain2(password); //PGM
+				vncPasswd::ToText plain2(password, m_server->Secure()); //PGM
 				if ((strlen(plain2) > 0)) //PGM
 				{ //PGM
 					vnclog.Print(LL_INTINFO, "View-only password authentication"); //PGM

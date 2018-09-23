@@ -26,6 +26,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 IDC_FINGER              CURSOR                  "res\\Finger.cur"
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Dialog
@@ -67,7 +68,7 @@ CAPTION " About WinVNC"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,8,135,54,16
-    CONTROL         139,IDC_VNCLOGO,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_SUNKEN,7,5,53,46,WS_EX_TRANSPARENT
+    CONTROL         IDB_LOGO64,IDC_VNCLOGO,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_SUNKEN,7,5,53,46,WS_EX_TRANSPARENT
     LTEXT           "UltraVNC Server  1.2.2.3",IDC_VERSION,73,5,145,11
     LTEXT           "Copyright © 2002-2018 UltraVNC Team\nCopyright © 2001-2002 Sam - eSVNC \nCopyright © 1999-2002 Rudi D. V. - VdaccVNC \nCopyright © 2001 Harakan Software - PalmVNC\nCopyright © 1999-2002 Const. Kaplinsky - TightVNC \n",IDC_NAME,74,27,202,41
     LTEXT           "For more Information and Links please visit: \nhttp://www.uvnc.com",IDC_WWW,74,135,141,19
@@ -103,7 +104,7 @@ BEGIN
     CTEXT           "<unknown host>",IDC_ACCEPT_IP,5,47,172,9,SS_CENTERIMAGE
     CTEXT           "Do you wish to Accept or Reject the connection?",IDC_STATIC_TEXT,7,58,172,15,SS_CENTERIMAGE
     CTEXT           "AutoReject:",IDC_ACCEPT_TIMEOUT,60,74,70,14,SS_CENTERIMAGE
-    CONTROL         139,IDC_ACCEPTLOGO,"Static",SS_BITMAP,130,7,43,39
+    CONTROL         IDB_LOGO64,IDC_ACCEPTLOGO,"Static",SS_BITMAP,130,7,43,39
 END
 
 IDD_PROPERTIES DIALOGEX 0, 0, 224, 175
@@ -182,10 +183,10 @@ BEGIN
     LTEXT           "View-Only Password:",IDC_PASSWORD_LABEL2,14,150,69,11,SS_CENTERIMAGE
     EDITTEXT        IDC_PASSWORD2,85,150,74,13,ES_PASSWORD | ES_AUTOHSCROLL
     CONTROL         "Require MS Logon  (User/Pass./Domain)",IDC_MSLOGON_CHECKD,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,164,146,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,178,146,10
     CONTROL         "New MS Logon (supports multiple domains)",IDC_NEW_MSLOGON,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,175,153,11
-    PUSHBUTTON      "Configure MS Logon Groups",IDC_MSLOGON,13,190,195,12
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,189,153,11
+    PUSHBUTTON      "Configure MS Logon Groups",IDC_MSLOGON,13,201,195,12
     GROUPBOX        "Misc.",IDC_STATIC,222,126,164,112,BS_LEFT
     CONTROL         "Remove Aero (Vista)",IDC_REMOVE_Aero,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,228,137,81,10
     CONTROL         "Remove Wallpaper for Viewers",IDC_REMOVE_WALLPAPER,
@@ -226,6 +227,8 @@ BEGIN
     EDITTEXT        IDC_QUERYDISABLETIME,287,39,19,12,ES_AUTOHSCROLL
     LTEXT           "Delay:",IDC_STATIC,263,41,22,8
     LTEXT           "sec. after restart.",IDC_STATIC,311,41,59,8
+    CONTROL         "save password more secure (not portable)",IDC_SAVEPASSWORDSECURE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,32,165,174,10
 END
 
 IDD_ABOUT1 DIALOGEX 0, 0, 286, 222
@@ -439,14 +442,20 @@ END
 
 IDR_VNCVIEWER_JAR       JAVAARCHIVE             "res\\vncviewer.jar"
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
-// 32766
+// AFX_DIALOG_LAYOUT
 //
 
-IDD_PROPERTIES 32766
+IDD_PROPERTIES AFX_DIALOG_LAYOUT
 BEGIN
-    0x0000
+    0
+END
+
+IDD_PROPERTIES1 AFX_DIALOG_LAYOUT
+BEGIN
+    0
 END
 
 
@@ -653,6 +662,7 @@ END
 
 IDR_JAVAARCHIVE1        JAVAARCHIVE             "res\\mslogon\\VncViewer.jar"
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Icon
@@ -661,7 +671,9 @@ IDR_JAVAARCHIVE1        JAVAARCHIVE             "res\\mslogon\\VncViewer.jar"
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDI_WINVNC              ICON                    "res\\world3a.ico"
+
 IDI_FLASH               ICON                    "res\\icon2.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -669,6 +681,7 @@ IDI_FLASH               ICON                    "res\\icon2.ico"
 //
 
 IDB_LOGO64              BITMAP                  "res\\vnc-1.bmp"
+
 #endif    // Dutch (Belgium) resources
 /////////////////////////////////////////////////////////////////////////////
 

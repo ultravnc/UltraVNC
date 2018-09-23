@@ -31,6 +31,7 @@ TCHAR *group1=new char[150];
 TCHAR *group2=new char[150];
 TCHAR *group3=new char[150];
 BOOL BUseRegistry;
+LONG Secure;
 LONG MSLogonRequired;
 LONG NewMSLogon;
 LONG locdom1;
@@ -122,7 +123,8 @@ if (!myIniFile_Out.WriteInt("admin", "UseRegistry", BUseRegistry))
 
 BOOL setextramouse = myIniFile_In.ReadInt("admin", "SendExtraMouse", 1);
 myIniFile_Out.WriteInt("admin", "SendExtraMouse", setextramouse);
-
+Secure = myIniFile_In.ReadInt("admin", "Secure", false);
+myIniFile_Out.WriteInt("admin", "Secure", Secure);
 MSLogonRequired=myIniFile_In.ReadInt("admin", "MSLogonRequired", false);
 myIniFile_Out.WriteInt("admin", "MSLogonRequired", MSLogonRequired);
 NewMSLogon=myIniFile_In.ReadInt("admin", "NewMSLogon", false);

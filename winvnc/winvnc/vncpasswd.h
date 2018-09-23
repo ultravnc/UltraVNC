@@ -51,10 +51,10 @@ public:
     class ToText
     {
     public:
-	inline ToText(const char encrypted[MAXPWLEN])
+	inline ToText(const char encrypted[MAXPWLEN], bool secure)
 	{
 	    vnclog.Print(LL_INTINFO, VNCLOG("PASSWD : ToText called\n"));
-	    plaintext = vncDecryptPasswd((char *)encrypted);
+	    plaintext = vncDecryptPasswd((char *)encrypted, secure);
 	}
 	inline ~ToText()
 	{
@@ -72,10 +72,10 @@ public:
     class FromText
     {
     public:
-	inline FromText(char *unencrypted)
+	inline FromText(char *unencrypted, bool secure)
 	{
 	    vnclog.Print(LL_INTINFO, VNCLOG("PASSWD : FromText called\n"));
-	    vncEncryptPasswd(unencrypted, encrypted);
+	    vncEncryptPasswd(unencrypted, encrypted, secure);
 	    // ZeroMemory(unencrypted, strlen(unencrypted));
 	}
 	inline ~FromText()
@@ -89,10 +89,10 @@ public:
     class FromClear
     {
     public:
-	inline FromClear()
+	inline FromClear(bool secure)
 	{
 	    vnclog.Print(LL_INTINFO, VNCLOG("PASSWD : FromClear called\n"));
-	    vncEncryptPasswd((char*)"", encrypted);
+	    vncEncryptPasswd((char*)"", encrypted, secure);
 	}
 	inline ~FromClear()
 	{

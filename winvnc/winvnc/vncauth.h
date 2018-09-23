@@ -35,12 +35,12 @@
 extern "C"
 {
 #endif
-extern int vncEncryptPasswd(char *passwd, char *fname);
-extern char *vncDecryptPasswd(char *fname);
-extern char *vncDecryptPasswdMs(char *fname);
+extern int vncEncryptPasswd(char *passwd, char *fname, int secure);
+extern char *vncDecryptPasswd(char *fname, int secure);
 extern void vncRandomBytes(unsigned char *bytes);
 extern void vncRandomBytesMs(unsigned char *bytes);
 extern void vncEncryptBytes(unsigned char *bytes, const char *passwd);
+extern void vncSetDynKey(unsigned char key[8]);
 // marscha
 extern void vncDecryptBytes(unsigned char *bytes, const int length, const unsigned char *key);
 #ifdef __cplusplus

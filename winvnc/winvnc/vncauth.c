@@ -26,7 +26,6 @@
  *  Functions for VNC password management and authentication.
  *
  */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -37,19 +36,31 @@
 #include "vncauth.h"
 #include "d3des.h"
 
+unsigned char dynkey[8] = { 23,82,107,6,35,78,88,7 };
+void vncSetDynKey(unsigned char key[8])
+{
+	dynkey[0] = key[0]; 
+	dynkey[1] = key[1]; 
+	dynkey[2] = key[2]; 
+	dynkey[3] = key[3]; 
+	dynkey[4] = key[4]; 
+	dynkey[5] = key[5]; 
+	dynkey[6] = key[6]; 
+	dynkey[7] = key[7]; 
+}
 /*
- *   We use a fixed key to store passwords, since we assume that our local
- *   file system is secure but nonetheless don't want to store passwords
- *   as plaintext.
- */
+*   We use a fixed key to store passwords, since we assume that our local
+*   file system is secure but nonetheless don't want to store passwords
+*   as plaintext.
+*/
+unsigned char fixedkey[8] = { 23,82,107,6,35,78,88,7 };
 
-unsigned char fixedkey[8] = {23,82,107,6,35,78,88,7};
 
 /*
  *   Encrypt a password and store it in a file.
  */
 int
-vncEncryptPasswd(char *passwd, char *encryptedPasswd)
+vncEncryptPasswd(char *passwd, char *encryptedPasswd, int secure)
 {
     size_t i;
 
@@ -65,8 +76,10 @@ vncEncryptPasswd(char *passwd, char *encryptedPasswd)
 
     /* Do encryption in-place - this way we overwrite our copy of the plaintext
        password */
-
-    deskey(fixedkey, EN0);
+	if (secure)
+		 deskey(dynkey, EN0);
+	else
+		deskey(fixedkey, EN0);
     des((unsigned  char*) encryptedPasswd, (unsigned char*) encryptedPasswd);
 
     return 8;
@@ -78,39 +91,18 @@ vncEncryptPasswd(char *passwd, char *encryptedPasswd)
  *   not be retrieved for some reason.
  */
 char *
-vncDecryptPasswd(char *inouttext)
+vncDecryptPasswd(char *inouttext, int secure)
 {
     unsigned char *passwd = (unsigned char *)malloc(9);
-
-    deskey(fixedkey, DE1);
+	if (secure)
+		deskey(dynkey, DE1);
+	else
+		deskey(fixedkey, DE1);
     des((unsigned char*) inouttext, passwd);
 
     passwd[8] = 0;
 
     return (char *)passwd;
-}
-
-char *
-vncDecryptPasswdMs(char *inouttext) 
-{ 
-        // Marscha@2004: corrected bug which occured for some passwords. 
-        // See http://forum.UltraVNC.net/viewtopic.php?t=803 
-    unsigned char *passwd = (unsigned char *)malloc(33); 
-        int i; 
-        for (i = 0; i < MAXMSPWLEN; i++) 
-                passwd[i] = inouttext[i]; 
-
-        //des seems only to handle the first 8 chars.. 
-    deskey(fixedkey, DE1); 
-    des(passwd, passwd); 
-    passwd[32] = 0; 
-
-        // Marscha@2004: Seems to be not necessary, but I found no 
-        // documentation what des() guarantees beyond the 8th byte. 
-        for (i=8; i < MAXMSPWLEN; i++) 
-                passwd[i] = inouttext[i]; 
-
-    return (char *)passwd; 
 }
 
 /*

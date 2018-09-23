@@ -541,39 +541,7 @@ vncSetAuth::DialogProc(HWND hwnd,
 			{
 				HWND hG1l = GetDlgItem(hwnd, IDC_CHECKG3D);
 				SendMessage(hG1l,BM_SETCHECK,false,0);
-			}
-			//already handled by vncproperties
-			//if we get at thgis place
-			//IDC_MSLOGON_CHECKD was checked
-			/*HWND hMSLogon = GetDlgItem(hwnd, IDC_MSLOGON_CHECKD);
-            SendMessage(hMSLogon, BM_SETCHECK, _this->m_server->MSLogonRequired(), 0);
-			if (SendMessage(hMSLogon, BM_GETCHECK,0, 0) == BST_CHECKED)
-				{
-					EnableWindow(GetDlgItem(hwnd, IDC_CHECKG1D), true);
-					EnableWindow(GetDlgItem(hwnd, IDC_CHECKG2D), true);
-					EnableWindow(GetDlgItem(hwnd, IDC_CHECKG3D), true);
-					EnableWindow(GetDlgItem(hwnd, IDC_CHECKG1L), true);
-					EnableWindow(GetDlgItem(hwnd, IDC_CHECKG2L), true);
-					EnableWindow(GetDlgItem(hwnd, IDC_CHECKG3L), true);
-					EnableWindow(GetDlgItem(hwnd, IDC_GROUP1), true);
-					EnableWindow(GetDlgItem(hwnd, IDC_GROUP2), true);
-					EnableWindow(GetDlgItem(hwnd, IDC_GROUP3), true);
-				}
-			else
-				{
-					EnableWindow(GetDlgItem(hwnd, IDC_CHECKG1D), FALSE);
-					EnableWindow(GetDlgItem(hwnd, IDC_CHECKG2D), FALSE);
-					EnableWindow(GetDlgItem(hwnd, IDC_CHECKG3D), FALSE);
-					EnableWindow(GetDlgItem(hwnd, IDC_CHECKG1L), FALSE);
-					EnableWindow(GetDlgItem(hwnd, IDC_CHECKG2L), FALSE);
-					EnableWindow(GetDlgItem(hwnd, IDC_CHECKG3L), FALSE);
-					EnableWindow(GetDlgItem(hwnd, IDC_GROUP1), FALSE);
-					EnableWindow(GetDlgItem(hwnd, IDC_GROUP2), FALSE);
-					EnableWindow(GetDlgItem(hwnd, IDC_GROUP3), FALSE);
-				}*/
-
-
-
+			}			
 			// Show the dialog
 			SetForegroundWindow(hwnd);
 
@@ -640,38 +608,6 @@ vncSetAuth::DialogProc(HWND hwnd,
 				_this->m_dlgvisible = FALSE;
 				return TRUE;
 			}
-		// rdv not needed, already handled by vncproperties
-		// 
-		/*case IDC_MSLOGON_CHECKD:
-			{
-				HWND hMSLogon = GetDlgItem(hwnd, IDC_MSLOGON_CHECKD);
-				_this->m_server->RequireMSLogon(SendMessage(hMSLogon, BM_GETCHECK, 0, 0) == BST_CHECKED);
-				if (SendMessage(hMSLogon, BM_GETCHECK,0, 0) == BST_CHECKED)
-					{
-					EnableWindow(GetDlgItem(hwnd, IDC_CHECKG1D), true);
-					EnableWindow(GetDlgItem(hwnd, IDC_CHECKG2D), true);
-					EnableWindow(GetDlgItem(hwnd, IDC_CHECKG3D), true);
-					EnableWindow(GetDlgItem(hwnd, IDC_CHECKG1L), true);
-					EnableWindow(GetDlgItem(hwnd, IDC_CHECKG2L), true);
-					EnableWindow(GetDlgItem(hwnd, IDC_CHECKG3L), true);
-					EnableWindow(GetDlgItem(hwnd, IDC_GROUP1), true);
-					EnableWindow(GetDlgItem(hwnd, IDC_GROUP2), true);
-					EnableWindow(GetDlgItem(hwnd, IDC_GROUP3), true);
-						
-					}
-				else
-					{
-					EnableWindow(GetDlgItem(hwnd, IDC_CHECKG1D), FALSE);
-					EnableWindow(GetDlgItem(hwnd, IDC_CHECKG2D), FALSE);
-					EnableWindow(GetDlgItem(hwnd, IDC_CHECKG3D), FALSE);
-					EnableWindow(GetDlgItem(hwnd, IDC_CHECKG1L), FALSE);
-					EnableWindow(GetDlgItem(hwnd, IDC_CHECKG2L), FALSE);
-					EnableWindow(GetDlgItem(hwnd, IDC_CHECKG3L), FALSE);
-					EnableWindow(GetDlgItem(hwnd, IDC_GROUP1), FALSE);
-					EnableWindow(GetDlgItem(hwnd, IDC_GROUP2), FALSE);
-					EnableWindow(GetDlgItem(hwnd, IDC_GROUP3), FALSE);
-					}
-			}*/
 		}
 
 		break;
