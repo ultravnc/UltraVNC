@@ -4,15 +4,15 @@ VisualStudioVersion = 15.0.26730.15
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rdr", "..\rdr\rdrv12.vcxproj", "{F5244002-0FFF-4F19-A941-FCCE1861F132}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vncviewer", "vncviewerv12.vcxproj", "{357D07B6-0613-4B05-9D22-1764A49AC945}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vncviewer", "vncviewer_VC2017.vcxproj", "{357D07B6-0613-4B05-9D22-1764A49AC945}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "unz32lib", "..\zipunzip_src\unzip\windll\vc6\lib\unz32libv12.vcxproj", "{F9321962-FBED-4581-BF7D-D0EBC303D891}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zip32", "..\zipunzip_src\zip20\windll\visualc\lib\zip32v12.vcxproj", "{E8BA959F-B652-4BAB-9EA7-8E9FC8D7F39C}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zlibstat", "..\zlib-1.2.5\contrib\vstudio\vc10\zlibstatv12.vcxproj", "{745DEC58-EBB3-47A9-A9B8-4C6627C01BF8}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zlibstat", "..\zlib\contrib\vstudio\vc15\zlibstat_VC2017.vcxproj", "{745DEC58-EBB3-47A9-A9B8-4C6627C01BF8}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libjpeg-turbo-win", "..\libjpeg-turbo-win\libjpeg-turbo-winv12.vcxproj", "{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libjpeg-turbo-win", "..\libjpeg-turbo-win\libjpeg-turbo-win_VC2017.vcxproj", "{04F91FA4-2D94-4803-BA3B-B61FBEF0ABE3}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "omnithread", "omnithread\omnithreadv12.vcxproj", "{AB1CE62F-4A4D-4DAA-831D-5C93AD68F5F1}"
 EndProject
@@ -104,12 +104,10 @@ Global
 		{745DEC58-EBB3-47A9-A9B8-4C6627C01BF8}.Debug|Win32.Build.0 = Debug|Win32
 		{745DEC58-EBB3-47A9-A9B8-4C6627C01BF8}.Debug|x64.ActiveCfg = Debug|x64
 		{745DEC58-EBB3-47A9-A9B8-4C6627C01BF8}.Debug|x64.Build.0 = Debug|x64
-		{745DEC58-EBB3-47A9-A9B8-4C6627C01BF8}.OldCPU|Win32.ActiveCfg = OldCPU|Win32
-		{745DEC58-EBB3-47A9-A9B8-4C6627C01BF8}.OldCPU|Win32.Build.0 = OldCPU|Win32
-		{745DEC58-EBB3-47A9-A9B8-4C6627C01BF8}.OldCPU|Win32.Deploy.0 = OldCPU|Win32
-		{745DEC58-EBB3-47A9-A9B8-4C6627C01BF8}.OldCPU|x64.ActiveCfg = OldCPU|x64
-		{745DEC58-EBB3-47A9-A9B8-4C6627C01BF8}.OldCPU|x64.Build.0 = OldCPU|x64
-		{745DEC58-EBB3-47A9-A9B8-4C6627C01BF8}.OldCPU|x64.Deploy.0 = OldCPU|x64
+		{745DEC58-EBB3-47A9-A9B8-4C6627C01BF8}.OldCPU|Win32.ActiveCfg = Vista|Win32
+		{745DEC58-EBB3-47A9-A9B8-4C6627C01BF8}.OldCPU|Win32.Build.0 = Vista|Win32
+		{745DEC58-EBB3-47A9-A9B8-4C6627C01BF8}.OldCPU|x64.ActiveCfg = Vista|x64
+		{745DEC58-EBB3-47A9-A9B8-4C6627C01BF8}.OldCPU|x64.Build.0 = Vista|x64
 		{745DEC58-EBB3-47A9-A9B8-4C6627C01BF8}.Release|Win32.ActiveCfg = Release|Win32
 		{745DEC58-EBB3-47A9-A9B8-4C6627C01BF8}.Release|Win32.Build.0 = Release|Win32
 		{745DEC58-EBB3-47A9-A9B8-4C6627C01BF8}.Release|x64.ActiveCfg = Release|x64

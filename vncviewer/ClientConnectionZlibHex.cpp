@@ -33,7 +33,7 @@
 #ifdef _INTERNALLIB
 #include <zlib.h>
 #else
-#include "../zlib-1.2.5/zlib.h"
+#include "../zlib/zlib.h"
 #endif
 #include "lzo/minilzo.h"
 

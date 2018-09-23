@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -321,8 +321,8 @@
       <OutputFile>.\Release/vncviewer.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      <Command>"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe" sign /sha1 6D4DE9F8F9626857AEA19A9D95405BBF1A800532 /n "uvnc bvba" /v /as /fd sha256 /tr http://sha256timestamp.ws.symantec.com/sha256/timestamp "$(OutDir)$(TargetName)$(TargetExt)"
-copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\32\win8\</Command>
+      <Command>rem "C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe" sign /sha1 6D4DE9F8F9626857AEA19A9D95405BBF1A800532 /n "uvnc bvba" /v /as /fd sha256 /tr http://sha256timestamp.ws.symantec.com/sha256/timestamp "$(OutDir)$(TargetName)$(TargetExt)"
+rem copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\32\win8\</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='OldCPU|Win32'">
@@ -1466,7 +1466,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp_ipv6</Command>
     <ProjectReference Include="..\zipunzip_src\zip20\windll\visualc\lib\zip32_VC2017.vcxproj">
       <Project>{e8ba959f-b652-4bab-9ea7-8e9fc8d7f39c}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\zlib-1.2.5\contrib\vstudio\vc10\zlibstat_VC2017.vcxproj">
+    <ProjectReference Include="..\zlib\contrib\vstudio\vc15\zlibstat_VC2017.vcxproj">
       <Project>{745dec58-ebb3-47a9-a9b8-4c6627c01bf8}</Project>
     </ProjectReference>
     <ProjectReference Include="omnithread\omnithread_VC2017.vcxproj">

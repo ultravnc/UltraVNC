@@ -40,7 +40,7 @@ class vncEncodeZlib;
 #ifdef _INTERNALLIB
 #include <zlib.h>
 #else
-#include <zlib-1.2.5/zlib.h>
+#include <zlib/zlib.h>
 #endif
 
 // Minimum zlib rectangle size in bytes.  Anything smaller will
