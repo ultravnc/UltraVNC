@@ -2213,7 +2213,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\win8</Command>
     <ProjectReference Include="..\..\zipunzip_src\zip20\windll\visualc\lib\zip32_VC2017.vcxproj">
       <Project>{e8ba959f-b652-4bab-9ea7-8e9fc8d7f39c}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\zlib\contrib\vstudio\vc10\zlibstat_VC2017.vcxproj">
+    <ProjectReference Include="..\..\zlib\contrib\vstudio\vc15\zlibstat_VC2017.vcxproj">
       <Project>{745dec58-ebb3-47a9-a9b8-4c6627c01bf8}</Project>
     </ProjectReference>
     <ProjectReference Include="..\omnithread\omnithread_VC2017.vcxproj">

@@ -5,6 +5,13 @@
 #include "stdafx.h"
 #include "AVIGenerator.h"
 
+#ifdef HIGH_PRECISION
+#define GetTimeFunction timeGetTime
+#pragma comment(lib, "winmm.lib")
+#else
+#define GetTimeFunction GetTickCount
+#endif
+
 /*#ifdef _DEBUG
 #undef THIS_FILE
 static char THIS_FILE[]=__FILE__;
@@ -334,7 +341,7 @@ void CAVIGenerator::ReleaseEngine()
 DWORD oldtime=0;
 HRESULT CAVIGenerator::AddFrame(BYTE *bmBits)
 {
-	DWORD newtime=timeGetTime();
+	DWORD newtime = GetTimeFunction();
 	if ((newtime-oldtime)<(1000/m_dwRate)) return 0;
 	oldtime=newtime;
 	HRESULT hr;
