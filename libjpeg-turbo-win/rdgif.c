@@ -3,7 +3,8 @@
  *
  * Copyright (C) 1991-1997, Thomas G. Lane.
  * This file is part of the Independent JPEG Group's software.
- * For conditions of distribution and use, see the accompanying README file.
+ * For conditions of distribution and use, see the accompanying README.ijg
+ * file.
  *
  * This file contains routines to read input images in GIF format.
  *
@@ -28,7 +29,7 @@
  */
 
 GLOBAL(cjpeg_source_ptr)
-jinit_read_gif (j_compress_ptr cinfo)
+jinit_read_gif(j_compress_ptr cinfo)
 {
   fprintf(stderr, "GIF input is unsupported for legal reasons.  Sorry.\n");
   exit(EXIT_FAILURE);

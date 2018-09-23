@@ -3,9 +3,10 @@
  *
  * This file was part of the Independent JPEG Group's software:
  * Copyright (C) 1991-1996, Thomas G. Lane.
- * It was modified by The libjpeg-turbo Project to include only code and
- * information relevant to libjpeg-turbo.
- * For conditions of distribution and use, see the accompanying README file.
+ * libjpeg-turbo Modifications:
+ * Copyright (C) 2017, D. R. Commander.
+ * For conditions of distribution and use, see the accompanying README.ijg
+ * file.
  *
  * This file contains routines to write output images in RLE format.
  * The Utah Raster Toolkit library is required (version 3.1 or later).
@@ -50,7 +51,7 @@
  */
 
 #define CMAPBITS        8
-#define CMAPLENGTH      (1<<(CMAPBITS))
+#define CMAPLENGTH      (1 << (CMAPBITS))
 
 typedef struct {
   struct djpeg_dest_struct pub; /* public fields */
@@ -61,12 +62,12 @@ typedef struct {
 
 } rle_dest_struct;
 
-typedef rle_dest_struct * rle_dest_ptr;
+typedef rle_dest_struct *rle_dest_ptr;
 
 /* Forward declarations */
-METHODDEF(void) rle_put_pixel_rows
-        (j_decompress_ptr cinfo, djpeg_dest_ptr dinfo,
-         JDIMENSION rows_supplied);
+METHODDEF(void) rle_put_pixel_rows(j_decompress_ptr cinfo,
+                                   djpeg_dest_ptr dinfo,
+                                   JDIMENSION rows_supplied);
 
 
 /*
@@ -76,13 +77,13 @@ METHODDEF(void) rle_put_pixel_rows
  */
 
 METHODDEF(void)
-start_output_rle (j_decompress_ptr cinfo, djpeg_dest_ptr dinfo)
+start_output_rle(j_decompress_ptr cinfo, djpeg_dest_ptr dinfo)
 {
-  rle_dest_ptr dest = (rle_dest_ptr) dinfo;
+  rle_dest_ptr dest = (rle_dest_ptr)dinfo;
   size_t cmapsize;
   int i, ci;
 #ifdef PROGRESS_REPORT
-  cd_progress_ptr progress = (cd_progress_ptr) cinfo->progress;
+  cd_progress_ptr progress = (cd_progress_ptr)cinfo->progress;
 #endif
 
   /*
@@ -116,8 +117,8 @@ start_output_rle (j_decompress_ptr cinfo, djpeg_dest_ptr dinfo)
   if (cinfo->quantize_colors) {
     /* Allocate storage for RLE-style cmap, zero any extra entries */
     cmapsize = cinfo->out_color_components * CMAPLENGTH * sizeof(rle_map);
-    dest->colormap = (rle_map *) (*cinfo->mem->alloc_small)
-      ((j_common_ptr) cinfo, JPOOL_IMAGE, cmapsize);
+    dest->colormap = (rle_map *)(*cinfo->mem->alloc_small)
+      ((j_common_ptr)cinfo, JPOOL_IMAGE, cmapsize);
     MEMZERO(dest->colormap, cmapsize);
 
     /* Save away data in RLE format --- note 8-bit left shift! */
@@ -132,7 +133,7 @@ start_output_rle (j_decompress_ptr cinfo, djpeg_dest_ptr dinfo)
 
   /* Set the output buffer to the first row */
   dest->pub.buffer = (*cinfo->mem->access_virt_sarray)
-    ((j_common_ptr) cinfo, dest->image, (JDIMENSION) 0, (JDIMENSION) 1, TRUE);
+    ((j_common_ptr)cinfo, dest->image, (JDIMENSION)0, (JDIMENSION)1, TRUE);
   dest->pub.buffer_height = 1;
 
   dest->pub.put_pixel_rows = rle_put_pixel_rows;
@@ -152,15 +153,15 @@ start_output_rle (j_decompress_ptr cinfo, djpeg_dest_ptr dinfo)
  */
 
 METHODDEF(void)
-rle_put_pixel_rows (j_decompress_ptr cinfo, djpeg_dest_ptr dinfo,
-                    JDIMENSION rows_supplied)
+rle_put_pixel_rows(j_decompress_ptr cinfo, djpeg_dest_ptr dinfo,
+                   JDIMENSION rows_supplied)
 {
-  rle_dest_ptr dest = (rle_dest_ptr) dinfo;
+  rle_dest_ptr dest = (rle_dest_ptr)dinfo;
 
   if (cinfo->output_scanline < cinfo->output_height) {
     dest->pub.buffer = (*cinfo->mem->access_virt_sarray)
-      ((j_common_ptr) cinfo, dest->image,
-       cinfo->output_scanline, (JDIMENSION) 1, TRUE);
+      ((j_common_ptr)cinfo, dest->image,
+       cinfo->output_scanline, (JDIMENSION)1, TRUE);
   }
 }
 
@@ -171,9 +172,9 @@ rle_put_pixel_rows (j_decompress_ptr cinfo, djpeg_dest_ptr dinfo,
  */
 
 METHODDEF(void)
-finish_output_rle (j_decompress_ptr cinfo, djpeg_dest_ptr dinfo)
+finish_output_rle(j_decompress_ptr cinfo, djpeg_dest_ptr dinfo)
 {
-  rle_dest_ptr dest = (rle_dest_ptr) dinfo;
+  rle_dest_ptr dest = (rle_dest_ptr)dinfo;
   rle_hdr header;               /* Output file information */
   rle_pixel **rle_row, *red, *green, *blue;
   JSAMPROW output_row;
@@ -181,7 +182,7 @@ finish_output_rle (j_decompress_ptr cinfo, djpeg_dest_ptr dinfo)
   int row, col;
   int ci;
 #ifdef PROGRESS_REPORT
-  cd_progress_ptr progress = (cd_progress_ptr) cinfo->progress;
+  cd_progress_ptr progress = (cd_progress_ptr)cinfo->progress;
 #endif
 
   /* Initialize the header info */
@@ -201,7 +202,8 @@ finish_output_rle (j_decompress_ptr cinfo, djpeg_dest_ptr dinfo)
     header.cmaplen = CMAPBITS;
     header.cmap    = dest->colormap;
     /* Add a comment to the output image with the true colormap length. */
-    sprintf(cmapcomment, "color_map_length=%d", cinfo->actual_number_of_colors);
+    sprintf(cmapcomment, "color_map_length=%d",
+            cinfo->actual_number_of_colors);
     rle_putcom(cmapcomment, &header);
   }
 
@@ -216,29 +218,29 @@ finish_output_rle (j_decompress_ptr cinfo, djpeg_dest_ptr dinfo)
   if (progress != NULL) {
     progress->pub.pass_limit = cinfo->output_height;
     progress->pub.pass_counter = 0;
-    (*progress->pub.progress_monitor) ((j_common_ptr) cinfo);
+    (*progress->pub.progress_monitor) ((j_common_ptr)cinfo);
   }
 #endif
 
   if (cinfo->output_components == 1) {
-    for (row = cinfo->output_height-1; row >= 0; row--) {
-      rle_row = (rle_pixel **) (*cinfo->mem->access_virt_sarray)
-        ((j_common_ptr) cinfo, dest->image,
-         (JDIMENSION) row, (JDIMENSION) 1, FALSE);
-      rle_putrow(rle_row, (int) cinfo->output_width, &header);
+    for (row = cinfo->output_height - 1; row >= 0; row--) {
+      rle_row = (rle_pixel **)(*cinfo->mem->access_virt_sarray)
+        ((j_common_ptr)cinfo, dest->image,
+         (JDIMENSION)row, (JDIMENSION)1, FALSE);
+      rle_putrow(rle_row, (int)cinfo->output_width, &header);
 #ifdef PROGRESS_REPORT
       if (progress != NULL) {
         progress->pub.pass_counter++;
-        (*progress->pub.progress_monitor) ((j_common_ptr) cinfo);
+        (*progress->pub.progress_monitor) ((j_common_ptr)cinfo);
       }
 #endif
     }
   } else {
-    for (row = cinfo->output_height-1; row >= 0; row--) {
-      rle_row = (rle_pixel **) dest->rle_row;
-      output_row = * (*cinfo->mem->access_virt_sarray)
-        ((j_common_ptr) cinfo, dest->image,
-         (JDIMENSION) row, (JDIMENSION) 1, FALSE);
+    for (row = cinfo->output_height - 1; row >= 0; row--) {
+      rle_row = (rle_pixel **)dest->rle_row;
+      output_row = *(*cinfo->mem->access_virt_sarray)
+        ((j_common_ptr)cinfo, dest->image,
+         (JDIMENSION)row, (JDIMENSION)1, FALSE);
       red = rle_row[0];
       green = rle_row[1];
       blue = rle_row[2];
@@ -247,11 +249,11 @@ finish_output_rle (j_decompress_ptr cinfo, djpeg_dest_ptr dinfo)
         *green++ = GETJSAMPLE(*output_row++);
         *blue++ = GETJSAMPLE(*output_row++);
       }
-      rle_putrow(rle_row, (int) cinfo->output_width, &header);
+      rle_putrow(rle_row, (int)cinfo->output_width, &header);
 #ifdef PROGRESS_REPORT
       if (progress != NULL) {
         progress->pub.pass_counter++;
-        (*progress->pub.progress_monitor) ((j_common_ptr) cinfo);
+        (*progress->pub.progress_monitor) ((j_common_ptr)cinfo);
       }
 #endif
     }
@@ -275,32 +277,33 @@ finish_output_rle (j_decompress_ptr cinfo, djpeg_dest_ptr dinfo)
  */
 
 GLOBAL(djpeg_dest_ptr)
-jinit_write_rle (j_decompress_ptr cinfo)
+jinit_write_rle(j_decompress_ptr cinfo)
 {
   rle_dest_ptr dest;
 
   /* Create module interface object, fill in method pointers */
   dest = (rle_dest_ptr)
-      (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
-                                  sizeof(rle_dest_struct));
+    (*cinfo->mem->alloc_small) ((j_common_ptr)cinfo, JPOOL_IMAGE,
+                                sizeof(rle_dest_struct));
   dest->pub.start_output = start_output_rle;
   dest->pub.finish_output = finish_output_rle;
+  dest->pub.calc_buffer_dimensions = NULL;
 
   /* Calculate output image dimensions so we can allocate space */
   jpeg_calc_output_dimensions(cinfo);
 
   /* Allocate a work array for output to the RLE library. */
   dest->rle_row = (*cinfo->mem->alloc_sarray)
-    ((j_common_ptr) cinfo, JPOOL_IMAGE,
-     cinfo->output_width, (JDIMENSION) cinfo->output_components);
+    ((j_common_ptr)cinfo, JPOOL_IMAGE,
+     cinfo->output_width, (JDIMENSION)cinfo->output_components);
 
   /* Allocate a virtual array to hold the image. */
   dest->image = (*cinfo->mem->request_virt_sarray)
-    ((j_common_ptr) cinfo, JPOOL_IMAGE, FALSE,
-     (JDIMENSION) (cinfo->output_width * cinfo->output_components),
-     cinfo->output_height, (JDIMENSION) 1);
+    ((j_common_ptr)cinfo, JPOOL_IMAGE, FALSE,
+     (JDIMENSION)(cinfo->output_width * cinfo->output_components),
+     cinfo->output_height, (JDIMENSION)1);
 
-  return (djpeg_dest_ptr) dest;
+  return (djpeg_dest_ptr)dest;
 }
 
 #endif /* RLE_SUPPORTED */

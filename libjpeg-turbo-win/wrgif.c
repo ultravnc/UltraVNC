@@ -3,9 +3,10 @@
  *
  * This file was part of the Independent JPEG Group's software:
  * Copyright (C) 1991-1997, Thomas G. Lane.
- * It was modified by The libjpeg-turbo Project to include only code relevant
- * to libjpeg-turbo.
- * For conditions of distribution and use, see the accompanying README file.
+ * libjpeg-turbo Modifications:
+ * Copyright (C) 2015, 2017, D. R. Commander.
+ * For conditions of distribution and use, see the accompanying README.ijg
+ * file.
  *
  * This file contains routines to write output images in GIF format.
  *
@@ -54,7 +55,7 @@ typedef struct {
   /* State for packing variable-width codes into a bitstream */
   int n_bits;                   /* current number of bits/code */
   int maxcode;                  /* maximum code, given n_bits */
-  INT32 cur_accum;              /* holds bits not yet output */
+  long cur_accum;               /* holds bits not yet output */
   int cur_bits;                 /* # of bits in cur_accum */
 
   /* State for GIF code assignment */
@@ -68,10 +69,10 @@ typedef struct {
 
 } gif_dest_struct;
 
-typedef gif_dest_struct * gif_dest_ptr;
+typedef gif_dest_struct *gif_dest_ptr;
 
 /* Largest value that will fit in N bits */
-#define MAXCODE(n_bits) ((1 << (n_bits)) - 1)
+#define MAXCODE(n_bits)  ((1 << (n_bits)) - 1)
 
 
 /*
@@ -80,13 +81,13 @@ typedef gif_dest_struct * gif_dest_ptr;
  */
 
 LOCAL(void)
-flush_packet (gif_dest_ptr dinfo)
+flush_packet(gif_dest_ptr dinfo)
 /* flush any accumulated data */
 {
   if (dinfo->bytesinpkt > 0) {  /* never write zero-length packet */
-    dinfo->packetbuf[0] = (char) dinfo->bytesinpkt++;
-    if (JFWRITE(dinfo->pub.output_file, dinfo->packetbuf, dinfo->bytesinpkt)
-        != (size_t) dinfo->bytesinpkt)
+    dinfo->packetbuf[0] = (char)dinfo->bytesinpkt++;
+    if (JFWRITE(dinfo->pub.output_file, dinfo->packetbuf, dinfo->bytesinpkt) !=
+        (size_t)dinfo->bytesinpkt)
       ERREXIT(dinfo->cinfo, JERR_FILE_WRITE);
     dinfo->bytesinpkt = 0;
   }
@@ -94,21 +95,21 @@ flush_packet (gif_dest_ptr dinfo)
 
 
 /* Add a character to current packet; flush to disk if necessary */
-#define CHAR_OUT(dinfo,c)  \
-        { (dinfo)->packetbuf[++(dinfo)->bytesinpkt] = (char) (c);  \
-            if ((dinfo)->bytesinpkt >= 255)  \
-              flush_packet(dinfo);  \
-        }
+#define CHAR_OUT(dinfo, c) { \
+  (dinfo)->packetbuf[++(dinfo)->bytesinpkt] = (char)(c); \
+  if ((dinfo)->bytesinpkt >= 255) \
+    flush_packet(dinfo); \
+}
 
 
 /* Routine to convert variable-width codes into a byte stream */
 
 LOCAL(void)
-output (gif_dest_ptr dinfo, int code)
+output(gif_dest_ptr dinfo, int code)
 /* Emit a code of n_bits bits */
 /* Uses cur_accum and cur_bits to reblock into 8-bit bytes */
 {
-  dinfo->cur_accum |= ((INT32) code) << dinfo->cur_bits;
+  dinfo->cur_accum |= ((long)code) << dinfo->cur_bits;
   dinfo->cur_bits += dinfo->n_bits;
 
   while (dinfo->cur_bits >= 8) {
@@ -142,7 +143,7 @@ output (gif_dest_ptr dinfo, int code)
  */
 
 LOCAL(void)
-compress_init (gif_dest_ptr dinfo, int i_bits)
+compress_init(gif_dest_ptr dinfo, int i_bits)
 /* Initialize pseudo-compressor */
 {
   /* init all the state variables */
@@ -161,7 +162,7 @@ compress_init (gif_dest_ptr dinfo, int i_bits)
 
 
 LOCAL(void)
-compress_pixel (gif_dest_ptr dinfo, int c)
+compress_pixel(gif_dest_ptr dinfo, int c)
 /* Accept and "compress" one pixel value.
  * The given value must be less than n_bits wide.
  */
@@ -181,7 +182,7 @@ compress_pixel (gif_dest_ptr dinfo, int c)
 
 
 LOCAL(void)
-compress_term (gif_dest_ptr dinfo)
+compress_term(gif_dest_ptr dinfo)
 /* Clean up at end */
 {
   /* Send an EOF code */
@@ -199,7 +200,7 @@ compress_term (gif_dest_ptr dinfo)
 
 
 LOCAL(void)
-put_word (gif_dest_ptr dinfo, unsigned int w)
+put_word(gif_dest_ptr dinfo, unsigned int w)
 /* Emit a 16-bit word, LSB first */
 {
   putc(w & 0xFF, dinfo->pub.output_file);
@@ -208,7 +209,7 @@ put_word (gif_dest_ptr dinfo, unsigned int w)
 
 
 LOCAL(void)
-put_3bytes (gif_dest_ptr dinfo, int val)
+put_3bytes(gif_dest_ptr dinfo, int val)
 /* Emit 3 copies of same byte value --- handy subr for colormap construction */
 {
   putc(val, dinfo->pub.output_file);
@@ -218,7 +219,7 @@ put_3bytes (gif_dest_ptr dinfo, int val)
 
 
 LOCAL(void)
-emit_header (gif_dest_ptr dinfo, int num_colors, JSAMPARRAY colormap)
+emit_header(gif_dest_ptr dinfo, int num_colors, JSAMPARRAY colormap)
 /* Output the GIF file header, including color map */
 /* If colormap==NULL, synthesize a grayscale colormap */
 {
@@ -248,18 +249,18 @@ emit_header (gif_dest_ptr dinfo, int num_colors, JSAMPARRAY colormap)
   putc('7', dinfo->pub.output_file);
   putc('a', dinfo->pub.output_file);
   /* Write the Logical Screen Descriptor */
-  put_word(dinfo, (unsigned int) dinfo->cinfo->output_width);
-  put_word(dinfo, (unsigned int) dinfo->cinfo->output_height);
+  put_word(dinfo, (unsigned int)dinfo->cinfo->output_width);
+  put_word(dinfo, (unsigned int)dinfo->cinfo->output_height);
   FlagByte = 0x80;              /* Yes, there is a global color table */
-  FlagByte |= (BitsPerPixel-1) << 4; /* color resolution */
-  FlagByte |= (BitsPerPixel-1); /* size of global color table */
+  FlagByte |= (BitsPerPixel - 1) << 4; /* color resolution */
+  FlagByte |= (BitsPerPixel - 1); /* size of global color table */
   putc(FlagByte, dinfo->pub.output_file);
   putc(0, dinfo->pub.output_file); /* Background color index */
   putc(0, dinfo->pub.output_file); /* Reserved (aspect ratio in GIF89) */
   /* Write the Global Color Map */
   /* If the color map is more than 8 bits precision, */
   /* we reduce it to 8 bits by shifting */
-  for (i=0; i < ColorMapSize; i++) {
+  for (i = 0; i < ColorMapSize; i++) {
     if (i < num_colors) {
       if (colormap != NULL) {
         if (dinfo->cinfo->out_color_space == JCS_RGB) {
@@ -273,7 +274,7 @@ emit_header (gif_dest_ptr dinfo, int num_colors, JSAMPARRAY colormap)
         }
       } else {
         /* Create a grayscale map of num_colors values, range 0..255 */
-        put_3bytes(dinfo, (i * 255 + (num_colors-1)/2) / (num_colors-1));
+        put_3bytes(dinfo, (i * 255 + (num_colors - 1) / 2) / (num_colors - 1));
       }
     } else {
       /* fill out the map to a power of 2 */
@@ -284,15 +285,15 @@ emit_header (gif_dest_ptr dinfo, int num_colors, JSAMPARRAY colormap)
   putc(',', dinfo->pub.output_file); /* separator */
   put_word(dinfo, 0);           /* left/top offset */
   put_word(dinfo, 0);
-  put_word(dinfo, (unsigned int) dinfo->cinfo->output_width); /* image size */
-  put_word(dinfo, (unsigned int) dinfo->cinfo->output_height);
+  put_word(dinfo, (unsigned int)dinfo->cinfo->output_width); /* image size */
+  put_word(dinfo, (unsigned int)dinfo->cinfo->output_height);
   /* flag byte: not interlaced, no local color map */
   putc(0x00, dinfo->pub.output_file);
   /* Write Initial Code Size byte */
   putc(InitCodeSize, dinfo->pub.output_file);
 
   /* Initialize for "compression" of image data */
-  compress_init(dinfo, InitCodeSize+1);
+  compress_init(dinfo, InitCodeSize + 1);
 }
 
 
@@ -301,14 +302,14 @@ emit_header (gif_dest_ptr dinfo, int num_colors, JSAMPARRAY colormap)
  */
 
 METHODDEF(void)
-start_output_gif (j_decompress_ptr cinfo, djpeg_dest_ptr dinfo)
+start_output_gif(j_decompress_ptr cinfo, djpeg_dest_ptr dinfo)
 {
-  gif_dest_ptr dest = (gif_dest_ptr) dinfo;
+  gif_dest_ptr dest = (gif_dest_ptr)dinfo;
 
   if (cinfo->quantize_colors)
     emit_header(dest, cinfo->actual_number_of_colors, cinfo->colormap);
   else
-    emit_header(dest, 256, (JSAMPARRAY) NULL);
+    emit_header(dest, 256, (JSAMPARRAY)NULL);
 }
 
 
@@ -318,10 +319,10 @@ start_output_gif (j_decompress_ptr cinfo, djpeg_dest_ptr dinfo)
  */
 
 METHODDEF(void)
-put_pixel_rows (j_decompress_ptr cinfo, djpeg_dest_ptr dinfo,
-                JDIMENSION rows_supplied)
+put_pixel_rows(j_decompress_ptr cinfo, djpeg_dest_ptr dinfo,
+               JDIMENSION rows_supplied)
 {
-  gif_dest_ptr dest = (gif_dest_ptr) dinfo;
+  gif_dest_ptr dest = (gif_dest_ptr)dinfo;
   register JSAMPROW ptr;
   register JDIMENSION col;
 
@@ -337,9 +338,9 @@ put_pixel_rows (j_decompress_ptr cinfo, djpeg_dest_ptr dinfo,
  */
 
 METHODDEF(void)
-finish_output_gif (j_decompress_ptr cinfo, djpeg_dest_ptr dinfo)
+finish_output_gif(j_decompress_ptr cinfo, djpeg_dest_ptr dinfo)
 {
-  gif_dest_ptr dest = (gif_dest_ptr) dinfo;
+  gif_dest_ptr dest = (gif_dest_ptr)dinfo;
 
   /* Flush "compression" mechanism */
   compress_term(dest);
@@ -355,22 +356,33 @@ finish_output_gif (j_decompress_ptr cinfo, djpeg_dest_ptr dinfo)
 
 
 /*
+ * Re-calculate buffer dimensions based on output dimensions.
+ */
+
+METHODDEF(void)
+calc_buffer_dimensions_gif(j_decompress_ptr cinfo, djpeg_dest_ptr dinfo)
+{
+}
+
+
+/*
  * The module selection routine for GIF format output.
  */
 
 GLOBAL(djpeg_dest_ptr)
-jinit_write_gif (j_decompress_ptr cinfo)
+jinit_write_gif(j_decompress_ptr cinfo)
 {
   gif_dest_ptr dest;
 
   /* Create module interface object, fill in method pointers */
   dest = (gif_dest_ptr)
-      (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
-                                  sizeof(gif_dest_struct));
+    (*cinfo->mem->alloc_small) ((j_common_ptr)cinfo, JPOOL_IMAGE,
+                                sizeof(gif_dest_struct));
   dest->cinfo = cinfo;          /* make back link for subroutines */
   dest->pub.start_output = start_output_gif;
   dest->pub.put_pixel_rows = put_pixel_rows;
   dest->pub.finish_output = finish_output_gif;
+  dest->pub.calc_buffer_dimensions = calc_buffer_dimensions_gif;
 
   if (cinfo->out_color_space != JCS_GRAYSCALE &&
       cinfo->out_color_space != JCS_RGB)
@@ -392,10 +404,10 @@ jinit_write_gif (j_decompress_ptr cinfo)
 
   /* Create decompressor output buffer. */
   dest->pub.buffer = (*cinfo->mem->alloc_sarray)
-    ((j_common_ptr) cinfo, JPOOL_IMAGE, cinfo->output_width, (JDIMENSION) 1);
+    ((j_common_ptr)cinfo, JPOOL_IMAGE, cinfo->output_width, (JDIMENSION)1);
   dest->pub.buffer_height = 1;
 
-  return (djpeg_dest_ptr) dest;
+  return (djpeg_dest_ptr)dest;
 }
 
 #endif /* GIF_SUPPORTED */
