@@ -51,7 +51,7 @@
 ///unload driver
 #include "vncOSVersion.h"
 #include "videodriver.h"
-
+#include <intrin.h>
 #include "vncauth.h"
 
 #ifdef IPP
