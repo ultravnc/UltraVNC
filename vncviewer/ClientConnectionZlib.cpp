@@ -164,8 +164,7 @@ void ClientConnection::ReadZlibRect(rfbFramebufferUpdateRectHeader *pfburh,int X
 	}
 	else if (XOR==0)
 	{
-		mybool *maskbuffer=(mybool *)m_zlibbuf;
-		BYTE *databuffer=m_zlibbuf+(((pfburh->r.w*pfburh->r.h)+7)/8);
+
 		// No other threads can use bitmap DC
 		omni_mutex_lock l(m_bitmapdcMutex);	
 
@@ -217,7 +216,7 @@ void ClientConnection::CheckZlibBufferSize(int bufsize)
 
 void ClientConnection::ReadSolidRect(rfbFramebufferUpdateRectHeader *pfburh) {
 
-	UINT numpixels = pfburh->r.w * pfburh->r.h;
+
 	ReadExact(m_netbuf, m_myFormat.bitsPerPixel/8);
 	SETUP_COLOR_SHORTCUTS;
 	
@@ -292,7 +291,7 @@ void ClientConnection::ReadSolMonoZip(rfbFramebufferUpdateRectHeader *pfburh,HRG
 
 		if (surh.encoding==rfbEncodingSolidColor)
 			{
-				UINT numpixels = surh.r.w * surh.r.h;
+
 				SETUP_COLOR_SHORTCUTS;
 	
 				// No other threads can use bitmap DC

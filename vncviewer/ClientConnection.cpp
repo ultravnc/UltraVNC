@@ -1851,7 +1851,7 @@ DWORD WINAPI SocketTimeout(LPVOID lpParam)
 {
 	SOCKET *sock;
 	sock=(SOCKET*) lpParam;
-	int counter=0;
+
 	while (havetobekilled && !forcedexit)
 	{
 		Sleep(100);
@@ -2094,7 +2094,7 @@ void ClientConnection::Connect()
 	m_sock = socket(PF_INET, SOCK_STREAM, 0);
 	if (m_hwndStatus) SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L43);
 	if (m_sock == INVALID_SOCKET) { if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L44); throw WarningException(sz_L44); }
-	int one = 1;
+
 
 	if (m_hwndStatus) SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L45);
 	if (m_hwndStatus) UpdateWindow(m_hwndStatus);
@@ -2371,7 +2371,7 @@ void ClientConnection::ConnectProxy()
 	m_sock = socket(PF_INET, SOCK_STREAM, 0);
 	if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L43);
 	if (m_sock == INVALID_SOCKET) {if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L44);throw WarningException(sz_L44);}
-	int one = 1;
+
 
 	if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L45);
 	if (m_hwndStatus)UpdateWindow(m_hwndStatus);
@@ -2644,8 +2644,7 @@ void ClientConnection::NegotiateProtocolVersion()
 		if (size<0 || size >1024)
 		{
 			throw WarningException("Buffer too big, ");
-			if (size<0) size=0;
-			if (size>1024) size=1024;
+
 		}
 
 		ReadExact(mytext,size);
@@ -2715,7 +2714,7 @@ void ClientConnection::NegotiateProxy()
 									"- Bad connection\r\n"
 									);
 
-		throw QuietException(c.m_info);
+
 	}
 
     pv[sz_rfbProtocolVersionMsg] = 0;
@@ -3485,7 +3484,7 @@ void ClientConnection::AuthMsLogonI()
 void ClientConnection::AuthVnc()
 {
 	CARD8 challenge[CHALLENGESIZE];
-	CARD32 authResult=rfbVncAuthFailed;
+
 	if ((m_majorVersion == 3) && (m_minorVersion < 3))
 	{
 		/* if server is 3.2 we can't use the new authentication */
@@ -3555,8 +3554,7 @@ void ClientConnection::AuthSCPrompt()
 	if (size<0 || size >1024)
 	{
 		throw WarningException("Buffer too big, ");
-		if (size<0) size=0;
-		if (size>1024) size=1024;
+
 	}
 
 	ReadExact(mytext,size);
@@ -3698,8 +3696,7 @@ void ClientConnection::SizeWindow()
 		int dy=(myrect.bottom-myrect.top)-(myclrect.bottom-myclrect.top);
 
 		//case one, does the scaling fit the window include borders?
-		int clientwidth=m_si.framebufferWidth*m_opts.m_scale_den/m_opts.m_scale_num;
-		int clientheight=m_si.framebufferHeight*m_opts.m_scale_den/m_opts.m_scale_num;
+
 		{
 			// we change the scaling to fit the window
 			// max windows size including borders etc..
@@ -3959,10 +3956,10 @@ void ClientConnection::SetFormatAndEncodings()
 
 	// Set encodings
     char buf[sz_rfbSetEncodingsMsg + MAX_ENCODINGS * 4];
-	int aa = sz_rfbSetEncodingsMsg + MAX_ENCODINGS * 4;
+
     rfbSetEncodingsMsg *se = (rfbSetEncodingsMsg *)buf;
     CARD32 *encs = (CARD32 *)(&buf[sz_rfbSetEncodingsMsg]);
-    int len = 0;
+
 
     se->type = rfbSetEncodings;
     se->nEncodings = 0;
@@ -4087,7 +4084,7 @@ void ClientConnection::SetFormatAndEncodings()
 	int nEncodings = se->nEncodings;
 	se->nEncodings = Swap16IfLE(se->nEncodings);
 	// WriteExact((char *)buf, len);
-	int bb = sz_rfbSetEncodingsMsg + sizeof(CARD32) * nEncodings;
+
 	WriteExact((char *)buf, sz_rfbSetEncodingsMsg + sizeof(CARD32) * nEncodings, rfbSetEncodings);
 }
 void ClientConnection::Createdib()
@@ -4901,7 +4898,7 @@ inline void ClientConnection::DoBlit()
 			if ((directx_used == false && m_opts.m_Directx == true))
 			{
 
-				RECT myrect, myclrect;
+				RECT myclrect;
 				GetClientRect(m_hwndMain, &myclrect);
 				int w = myclrect.right - myclrect.left;
 				int h = myclrect.bottom - myclrect.top;
@@ -5458,7 +5455,7 @@ void ClientConnection::Internal_SendAppropriateFramebufferUpdateRequest()
 bool ClientConnection::SendServerScale(int nScale)
 {
     rfbSetScaleMsg ssc;
-    int len = 0;
+
 
     ssc.type = rfbSetScale;
     ssc.scale = /*(unsigned short)*/ nScale;
@@ -5474,7 +5471,7 @@ bool ClientConnection::SendServerScale(int nScale)
 bool ClientConnection::SendServerInput(BOOL enabled)
 {
     rfbSetServerInputMsg sim;
-    int len = 0;
+
 
     sim.type = rfbSetServerInput;
     sim.status = enabled;
@@ -5490,7 +5487,7 @@ bool ClientConnection::SendServerInput(BOOL enabled)
 bool ClientConnection::SendSW(int x, int y)
 {
     rfbSetSWMsg sw;
-    int len = 0;
+
 	if (x==9999 && y==9999)
 	{
 		sw.type = rfbSetSW;
@@ -5963,13 +5960,7 @@ inline void ClientConnection::ReadScreenUpdate()
 	{
 		//Beep(1000,1000);
 		m_lLastChangeTimeTimeout=60000;  // set to 1 minutes
-		int nOldServerScale = m_nServerScale;
 
-		for (std::vector<int>::iterator it = m_opts.m_PreferredEncodings.begin(); it != m_opts.m_PreferredEncodings.end(); ++it) {
-
-			int encoding = *it;
-			break;
-		}
 
 		if (avg_kbitsPerSecond > 10000 && (m_nConfig != 1))
 		{
@@ -8112,7 +8103,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 					_this->SendKeyEvent(XK_Shift_R,   false);
 					*/
 					return DefWindowProc(hwnd, iMsg, wParam, lParam);
-					return 0;
+
 
 				case WM_CLOSE:
 				{
@@ -8704,7 +8695,7 @@ LRESULT CALLBACK ClientConnection::WndProcTBwin(HWND hwnd, UINT iMsg, WPARAM wPa
 								}
 						}
 					break;
-					return TRUE;
+
 				}
 
 				if (LOWORD(wParam) == ID_BUTTON_SEP)
@@ -9201,37 +9192,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 #ifndef UNDER_CE
 			case WM_SIZING:
 				return 0;
-				{
-					// Don't allow sizing larger than framebuffer
-					RECT *lprc = (LPRECT) lParam;
-					switch (wParam) {
-					case WMSZ_RIGHT:
-					case WMSZ_TOPRIGHT:
-					case WMSZ_BOTTOMRIGHT:
-						lprc->right = min(lprc->right, lprc->left + _this->m_fullwinwidth+1);
-						break;
-					case WMSZ_LEFT:
-					case WMSZ_TOPLEFT:
-					case WMSZ_BOTTOMLEFT:
-						lprc->left = max(lprc->left, lprc->right - _this->m_fullwinwidth);
-						break;
-					}
 
-					switch (wParam) {
-					case WMSZ_TOP:
-					case WMSZ_TOPLEFT:
-					case WMSZ_TOPRIGHT:
-						lprc->top = max(lprc->top, lprc->bottom - _this->m_fullwinheight);
-						break;
-					case WMSZ_BOTTOM:
-					case WMSZ_BOTTOMLEFT:
-					case WMSZ_BOTTOMRIGHT:
-						lprc->bottom = min(lprc->bottom, lprc->top + _this->m_fullwinheight);
-						break;
-					}
-
-					return 0;
-				}
 
 			case WM_SETCURSOR:
 				{
@@ -9434,7 +9395,7 @@ ClientConnection:: Switchbuffer(int width, int height, int xx, int yy,int bytes_
 void
 ClientConnection:: ConvertPixel(int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth)
 {
-	int bytesPerInputRow = bytes_per_pixel;
+
 	int bytesPerOutputRow = framebufferWidth * bytes_per_pixel;
 	//8bit pitch need to be taken in account
 	if (bytesPerOutputRow % 4)
@@ -9448,7 +9409,7 @@ ClientConnection:: ConvertPixel(int xx, int yy,int bytes_per_pixel,BYTE* source,
 void
 ClientConnection:: ConvertPixel_to_bpp_from_32(int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth)
 {
-	int bytesPerInputRow = bytes_per_pixel;
+
 	int bytesPerOutputRow = framebufferWidth * bytes_per_pixel;
 	//8bit pitch need to be taken in account
 	if (bytesPerOutputRow % 4)
@@ -9638,10 +9599,9 @@ BOOL CALLBACK DialogProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
                 if(((LPNMHDR)lParam)->code == NM_DBLCLK)
 				{
 				  char Text[255]={0};
-				  char Temp[255]={0};
-				  char Temp1[255]={0};
+
 				  int iSlected=0;
-				  int j=0;
+
 
 				  iSlected=SendMessage(hList,LVM_GETNEXTITEM,-1,LVNI_FOCUSED);
 

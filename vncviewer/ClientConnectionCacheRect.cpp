@@ -66,8 +66,7 @@ void ClientConnection::RestoreArea(RECT &r)
 	int y = r.top;
 	int w = r.right - r.left;
 	int h = r.bottom - r.top;
-	HBITMAP m_hTempBitmap=NULL;
-	HDC		m_hTempBitmapDC=NULL;
+
 
 	omni_mutex_lock l(m_bitmapdcMutex);
 

@@ -2494,7 +2494,7 @@ bool FileTransfer::OfferLocalFile(LPSTR szSrcFileName)
 		sprintf(szStatus, " %s < %s >", sz_H21, m_szSrcFileName); 
 		SetStatus(szStatus);
         m_fFileUploadError = true;
-		DWORD TheError = GetLastError();
+
 		return false;
 	}
 
@@ -2757,7 +2757,7 @@ bool FileTransfer::SendFile(long lSize, int nLen)
 	{
 		sprintf(szStatus, " %s < %s >", sz_H21, m_szSrcFileName); 
 		SetStatus(szStatus);
-		DWORD TheError = GetLastError();
+
         m_fFileUploadError = true;
 		return false;
 	}
@@ -4268,7 +4268,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 		{
 			LPNMLISTVIEW lpNmlv = (LPNMLISTVIEW) lParam;
 			LV_DISPINFO *pLvdi = (LV_DISPINFO*) lParam;
-			LVITEM *lvi = (LVITEM*)(pLvdi->item.lParam);
+
 
 			switch(lpNmlv->hdr.code)
 			{
