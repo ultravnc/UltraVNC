@@ -318,6 +318,8 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 			m_desktop->m_displaychanged = true;
 	}
 	old_inputDesktopSelected = inputDesktopSelected;
+
+    //vnclog.Print(LL_INTINFO, VNCLOG("desktop MM %i IsMM %i CurMon %d\n"), m_desktop->requested_multi_monitor, m_desktop->m_buffer.IsMultiMonitor(), m_desktop->m_current_monitor);
 		
 	if (m_desktop->m_displaychanged ||									
 			vncService::InputDesktopSelected()==0 ||							//handle logon and screensaver desktops
@@ -484,6 +486,7 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 							// Adjust the UpdateTracker clip region
 							updates.set_clip_region(m_desktop->m_Cliprect);
 							m_desktop->m_buffer.ClearCache();
+                            monitor_changed = true;
 						}
 
 					// JnZn558
