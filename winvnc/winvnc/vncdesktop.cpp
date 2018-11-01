@@ -1046,8 +1046,11 @@ vncDesktop::InitBitmap()
 
 	Checkmonitors();
 	requested_multi_monitor = m_buffer.IsMultiMonitor();
-	if (requested_multi_monitor && nr_monitors > 1)
-		show_multi_monitors = true;
+    if (requested_multi_monitor && nr_monitors > 1)
+    {
+        show_multi_monitors = true;
+        m_current_monitor = MULTI_MON_ALL;
+    }
 
 	if (VideoBuffer())
 		SetBitmapRectOffsetAndClipRect(mymonitor[3].offsetx, mymonitor[3].offsety, mymonitor[3].Width, mymonitor[3].Height);
