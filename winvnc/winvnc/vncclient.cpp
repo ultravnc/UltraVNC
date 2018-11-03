@@ -78,6 +78,8 @@
 #include "common/win32_helpers.h"
 #include "uvncUiAccess.h"
 
+#pragma comment(lib, "mpr.lib") //for getting full mapped drive
+
 #define DWEXTRA_VNC_REMOTE  0x564e4300
 
 bool isDirectoryTransfer(const char *szFileName);
@@ -4463,6 +4465,8 @@ vncClient::vncClient() : m_clipboard(ClipboardSettings::defaultServerCaps), Send
 {
 	vnclog.Print(LL_INTINFO, VNCLOG("vncClient() executing...\n"));
 
+    m_hPToken = 0;
+
 	m_socket = NULL;
 	m_client_name = 0;
 
@@ -6362,7 +6366,6 @@ bool vncClient::MyGetFileSize(char* szFilePath, ULARGE_INTEGER *n2FileSize)
 	return true;
 }
 
-
 bool vncClient::DoFTUserImpersonation()
 {
 	vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::DoFTUserImpersonation - Call\n"));
@@ -6391,14 +6394,14 @@ bool vncClient::DoFTUserImpersonation()
 	if (strcmp(username, "") != 0)
 	{
 		// sf@2007 - New method to achieve FTUserImpersonation - Still needs to be further tested...
-		HANDLE hProcess, hPToken;
+		HANDLE hProcess;
 		DWORD pid = GetExplorerLogonPid();
 		if (pid != 0) 
 		{
 			hProcess = OpenProcess(MAXIMUM_ALLOWED, FALSE, pid);
 			if (!OpenProcessToken(hProcess, TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY
 									|TOKEN_DUPLICATE|TOKEN_ASSIGN_PRIMARY|TOKEN_ADJUST_SESSIONID
-									|TOKEN_READ|TOKEN_WRITE,&hPToken
+									|TOKEN_READ|TOKEN_WRITE,&m_hPToken
 								 )
 			) 
 			{
@@ -6407,16 +6410,19 @@ bool vncClient::DoFTUserImpersonation()
 			}
 			else
 			{
-				if (!ImpersonateLoggedOnUser(hPToken))
+                if (!ImpersonateLoggedOnUser(m_hPToken))
 				{
 					vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::DoFTUserImpersonation - ImpersonateLoggedOnUser Failed\n"));
 					fUserOk = false;
 				}
-			}			
-			ExpandEnvironmentStringsForUser(hPToken, "%TEMP%", m_szTempDir, MAX_PATH);
+			}
+
+            vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::DoFTUserImpersonation - thread = %d\n"), GetCurrentThreadId());
+
+			ExpandEnvironmentStringsForUser(m_hPToken, "%TEMP%", m_szTempDir, MAX_PATH);
 			strcat_s(m_szTempDir, "\\");
 			CloseHandle(hProcess);
-			CloseHandle(hPToken);
+			//CloseHandle(hPToken);
 		}
 		
 		/* Old method
@@ -6485,6 +6491,8 @@ void vncClient::UndoFTUserImpersonation()
 	vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::UNDoFTUserImpersonation - Impersonationtoken exists\n"));
 	RevertToSelf();
 	m_fFTUserImpersonatedOk = false;
+    if (m_hPToken) CloseHandle(m_hPToken);
+    m_hPToken = 0;
 }
 
 // 10 April 2008 jdp paquette@atnetsend.net
@@ -6635,7 +6643,12 @@ int  vncClient::filetransferrequestPart2(int nDirZipRet)
 		FTUploadFailureHook();
 		goto end;
 	}
-	// Open source file
+
+    vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::filetransferrequestPart2 - thread = %d\n"), GetCurrentThreadId());
+    if(m_hPToken)
+       ImpersonateLoggedOnUser(m_hPToken); //need to set this thread's impersonation or can find mapped network or share files
+
+    // Open source file
 	m_hSrcFile = CreateFile(
 		m_szSrcFileName,
 		GENERIC_READ,
@@ -6643,7 +6656,7 @@ int  vncClient::filetransferrequestPart2(int nDirZipRet)
 		NULL,
 		OPEN_EXISTING,
 		FILE_FLAG_SEQUENTIAL_SCAN,
-		NULL
+        NULL
 	);
 
 	// DWORD dwSrcSize = (DWORD)0;

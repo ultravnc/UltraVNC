@@ -275,6 +275,7 @@ public:
 	int  CheckAndZipDirectoryForChecksuming(LPSTR szSrcFileName);
 	bool  UnzipPossibleDirectory(LPSTR szFileName);
 	bool MyGetFileSize(char* szFilePath, ULARGE_INTEGER* n2FileSize);
+    HANDLE m_hPToken; //used to set FT thread to correct user token
 	bool DoFTUserImpersonation();
 	void UndoFTUserImpersonation();
 
