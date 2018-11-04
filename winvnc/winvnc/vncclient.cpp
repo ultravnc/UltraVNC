@@ -6589,6 +6589,8 @@ void vncClient::NotifyPluginStreamingSupport()
 DWORD WINAPI CompressFolder(LPVOID lpParam)
 {
 	vncClient *client = (vncClient *)lpParam;
+    if (client->m_hPToken)
+        ImpersonateLoggedOnUser(client->m_hPToken); //need to set this thread's impersonation or can find mapped network or share files
 	int nDirZipRet = client->ZipPossibleDirectory(client->m_szSrcFileName);
 	if (client->m_socket)
 		return client->filetransferrequestPart2(nDirZipRet);
@@ -6648,8 +6650,7 @@ int  vncClient::filetransferrequestPart2(int nDirZipRet)
 	}
 
     vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::filetransferrequestPart2 - thread = %d\n"), GetCurrentThreadId());
-    if(m_hPToken)
-       ImpersonateLoggedOnUser(m_hPToken); //need to set this thread's impersonation or can find mapped network or share files
+    
 
     // Open source file
 	m_hSrcFile = CreateFile(
