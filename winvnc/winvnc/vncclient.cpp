@@ -3750,6 +3750,9 @@ vncClientThread::run(void *arg)
 						    // and create the zip accordingly. This way we can generate the checksums for it.
 						    // m_client->CheckAndZipDirectoryForChecksuming(m_client->m_szFullDestName);
 
+                            if (m_client->m_hPToken)
+                                ImpersonateLoggedOnUser(m_client->m_hPToken); //need to set this thread's impersonation or can find mapped network or share files
+
 						    // Create Local Dest file
 						    m_client->m_hDestFile = CreateFile(m_client->m_szFullDestName,
 															    GENERIC_WRITE | GENERIC_READ,
