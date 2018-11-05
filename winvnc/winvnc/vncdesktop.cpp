@@ -1050,6 +1050,7 @@ vncDesktop::InitBitmap()
     {
         show_multi_monitors = true;
         m_current_monitor = MULTI_MON_ALL;
+        m_old_monitor = m_current_monitor;
     }
 
 	if (VideoBuffer())
@@ -1058,7 +1059,7 @@ vncDesktop::InitBitmap()
 		SetBitmapRectOffsetAndClipRect(0, 0, mymonitor[3].Width, mymonitor[3].Height);
 	else
 		SetBitmapRectOffsetAndClipRect(0, 0, mymonitor[0].Width, mymonitor[0].Height);
-		
+	
 
 	vnclog.Print(LL_INTINFO, VNCLOG("bitmap dimensions are %d x %d\n"), m_bmrect.br.x, m_bmrect.br.y);
 

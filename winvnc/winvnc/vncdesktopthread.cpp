@@ -386,7 +386,7 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 			// JnZn558
 			else {
 				if (m_desktop->m_old_monitor != m_desktop->m_current_monitor) {
-					if (m_desktop->m_old_monitor!=6) 
+					if (m_desktop->m_old_monitor != MULTI_MON_ALL)
 						monitor_changed = true;
 					m_desktop->m_old_monitor = m_desktop->m_current_monitor;
 				}
@@ -1279,7 +1279,7 @@ vncDesktopThread::run_undetached(void *arg)
 										if (!initialupdate) {
 											m_server->InitialUpdate(true);
 											initialupdate=true;
-											m_desktop->m_old_monitor = MULTI_MON_ALL;
+											m_desktop->m_old_monitor = m_desktop->m_old_monitor == MULTI_MON_ALL ? 1 : MULTI_MON_ALL;
 										}
 										updates.add_changed(changedrgn);
 										updates.add_cached(cachedrgn);
