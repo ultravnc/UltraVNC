@@ -52,19 +52,21 @@ void ClientConnection::SetFullScreenMode(bool enable)
 	// Modif sf@2002 - v1.1.0 - In case of server scaling
 	// Clear the Window (in black)
     if (m_opts.m_nServerScale > 1)
-	{
-		/*RECT winrect;
-		GetWindowRect(m_hwndMain, &winrect);
-		int winwidth = winrect.right - winrect.left;
-		int winheight = winrect.bottom - winrect.top;
-		RECT rect;
-		SetRect(&rect, 0,0, winwidth, winheight);
-		COLORREF bgcol = RGB(0x0, 0x0, 0x0);
-		FillSolidRect_ultra(0, 0, winwidth, winheight, m_myFormat.bitsPerPixel,(BYTE *) &bgcol);*/
-		// Update the whole screen 
-		//adzm 2010-09
-		SendFullFramebufferUpdateRequest(false);
-	}
+    {
+        /*RECT winrect;
+        GetWindowRect(m_hwndMain, &winrect);
+        int winwidth = winrect.right - winrect.left;
+        int winheight = winrect.bottom - winrect.top;
+        RECT rect;
+        SetRect(&rect, 0,0, winwidth, winheight);
+        COLORREF bgcol = RGB(0x0, 0x0, 0x0);
+        FillSolidRect_ultra(0, 0, winwidth, winheight, m_myFormat.bitsPerPixel,(BYTE *) &bgcol);*/
+        // Update the whole screen 
+        //adzm 2010-09
+        SendFullFramebufferUpdateRequest(false);
+    }
+    else
+        InvalidateRect(m_hwndMain, NULL, FALSE);
 }
 
 // If the options have been changed other than by calling 

@@ -3820,19 +3820,33 @@ void ClientConnection::SizeWindow()
 		}
 	}
 
-
+    //need to avoid message WM_WINDOWPOSCHANGED changing new height or width
+    //called by SetWindowPos
+    int act_width = m_winwidth;
+    int act_height = m_winheight;
 	if (m_opts.m_selected_screen==0 && (m_fullwinwidth <= bb )) //fit on primary
 		// -20 for border
 	{
 		if (pos_set==false) SetWindowPos(m_hwndMain, HWND_TOP,tdc.monarray[1].wl + ((tdc.monarray[1].wr-tdc.monarray[1].wl)-m_winwidth) / 2,tdc.monarray[1].wt +
 			((tdc.monarray[1].wb - tdc.monarray[1].wt) - m_winheight) / 2, m_winwidth, m_winheight, SWP_SHOWWINDOW | SWP_NOSIZE);
-		if (size_set == false) SetWindowPos(m_hwndMain, HWND_TOP, tdc.monarray[1].wl + ((tdc.monarray[1].wr - tdc.monarray[1].wl) - m_winwidth) / 2, tdc.monarray[1].wt +
-			((tdc.monarray[1].wb - tdc.monarray[1].wt) - m_winheight) / 2, m_winwidth, m_winheight, SWP_SHOWWINDOW | SWP_NOMOVE);
+        if (size_set == false)
+        {
+            m_winwidth = act_width;
+            m_winheight = act_height;
+            SetWindowPos(m_hwndMain, HWND_TOP, tdc.monarray[1].wl + ((tdc.monarray[1].wr - tdc.monarray[1].wl) - m_winwidth) / 2, tdc.monarray[1].wt +
+                ((tdc.monarray[1].wb - tdc.monarray[1].wt) - m_winheight) / 2, m_winwidth, m_winheight, SWP_SHOWWINDOW | SWP_NOMOVE);
+        }
 	}
 	else
 	{
+        
 		if (pos_set == false) SetWindowPos(m_hwndMain, HWND_TOP, workrect.left + (workwidth - m_winwidth) / 2, workrect.top + (workheight - m_winheight) / 2, m_winwidth, m_winheight, SWP_SHOWWINDOW | SWP_NOSIZE);
-		if (size_set == false) SetWindowPos(m_hwndMain, HWND_TOP, workrect.left + (workwidth - m_winwidth) / 2, workrect.top + (workheight - m_winheight) / 2, m_winwidth, m_winheight, SWP_SHOWWINDOW | SWP_NOMOVE);
+        if (size_set == false)
+        {
+            m_winwidth = act_width;
+            m_winheight = act_height;
+            SetWindowPos(m_hwndMain, HWND_TOP, workrect.left + (workwidth - m_winwidth) / 2, workrect.top + (workheight - m_winheight) / 2, m_winwidth, m_winheight, SWP_SHOWWINDOW | SWP_NOMOVE);
+        }
 	}
 
 	SetForegroundWindow(m_hwndMain);
@@ -8324,7 +8338,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 				case WM_WINDOWPOSCHANGED:
 				case WM_SIZE:
 					{
-						// Calculate window dimensions
+                        // Calculate window dimensions
 						RECT rect;
 						RECT Rtb;
 						GetWindowRect(hwnd, &rect);

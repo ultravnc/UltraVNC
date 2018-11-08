@@ -137,8 +137,7 @@ class ClientConnection  : public omni_thread
 {
 	friend DWORD WINAPI ReconnectThreadProc(LPVOID);
 public:
-
-	HWND m_hSessionDialog;
+    HWND m_hSessionDialog;
 	int m_port;
 	int m_proxyport;
 //	int m_proxy;
