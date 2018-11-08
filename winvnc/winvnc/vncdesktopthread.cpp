@@ -982,10 +982,10 @@ vncDesktopThread::run_undetached(void *arg)
 				looping = false;
 			switch(result)
 			{
-				case WAIT_TIMEOUT:
 				case WAIT_OBJECT_0+6:
 					ResetEvent(m_desktop->trigger_events[6]);
 					strcpy_s(g_hookstring,"ddengine");
+				case WAIT_TIMEOUT:				
 				case WAIT_OBJECT_0: {
 					waiting_update=0;
 					ResetEvent(m_desktop->trigger_events[0]);
