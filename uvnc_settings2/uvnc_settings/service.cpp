@@ -43,7 +43,7 @@ void set_service_description()
 					0,
 					REG_SZ,
 					(const BYTE *)desc,
-					strlen(desc)+1);
+					(DWORD)(strlen(desc)+1));
 
 
 	RegCloseKey(hKey);
@@ -65,11 +65,11 @@ static int pad()
 
     strcpy(service_path, "\"");
     strcat(service_path, dir);
-	strcat(service_path, "\winvnc.exe");
+	strcat(service_path, "\\winvnc.exe");
     strcat(service_path, "\" -service");
 
     strcpy(service_file, dir);
-	strcat(service_file, "\winvnc.exe");
+	strcat(service_file, "\\winvnc.exe");
 	return 0;
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -223,14 +223,6 @@ Real_stop_service()
     _snprintf(command, sizeof command, "net stop \"%s\"", service_name);
 	WinExec(command,SW_HIDE);
 }
-
-bool Is_Service_running()
-{
-	bool value;
-
-	return value;
-}
-
 
 bool IsInstalled()
 {

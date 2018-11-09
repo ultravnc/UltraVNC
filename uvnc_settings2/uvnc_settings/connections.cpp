@@ -135,7 +135,7 @@ BOOL CALLBACK DlgProcCON(HWND hwnd, UINT uMsg,
 			{
 			BOOL ok1;
 			QueryTimeout=GetDlgItemInt(hwnd, IDQUERYTIMEOUT, &ok1, TRUE);
-			QueryIfNoLogon=SendDlgItemMessage(hwnd, IDC_QNOLOGON, BM_GETCHECK, 0, 0);
+			QueryIfNoLogon= (LONG)SendDlgItemMessage(hwnd, IDC_QNOLOGON, BM_GETCHECK, 0, 0);
 			GetDlgItemText(hwnd, IDC_AUTHHOST, authhosts, 150);
 			GetDlgItemText(hwnd, IDC_QMESG, accept_reject_mesg, 512);
 

@@ -60,7 +60,7 @@ void win_log(char *line) { /* Also used in log.c */
     int len;
     static int log_len=0;
     char *txt;
-    len=strlen(line);
+    len=(int)strlen(line);
     curr=(LIST *)malloc(sizeof(struct LIST)+len);
     curr->len=len;
     strcpy(curr->txt, line);

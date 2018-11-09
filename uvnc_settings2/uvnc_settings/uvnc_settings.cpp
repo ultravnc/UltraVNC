@@ -395,7 +395,7 @@ keepAliveInterval = myIniFile_In.ReadInt("admin", "KeepAliveInterval", keepAlive
 
 ddEngine = false;
 
-if(IsWindows8OrGreater)
+if(IsWindows8OrGreater())
   ddEngine = true;
 
 }

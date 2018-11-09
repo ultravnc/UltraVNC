@@ -122,7 +122,7 @@ DWORD WINAPI mapthread( LPVOID lpParam )
 	if ((dwRetVal = GetAdaptersInfo( pAdapterInfo, &ulOutBufLen)) == NO_ERROR)
 	{
 		strcpy(strLocalIP,pAdapterInfo->IpAddressList.IpAddress.String);
-		UPnPvar.Set_UPnP(strLocalIP,"TCP","UVNC_TCP",PortNumber);
+		UPnPvar.Set_UPnP(strLocalIP,"TCP","UVNC_TCP",(const short)PortNumber);
 		UPnPvar.OpenPorts(true);
 		strcpy(strExternIP,UPnPvar.GetExternalIP());
 		SendMessage(networkproc,WM_COMMAND,2003,0);
@@ -164,7 +164,7 @@ DWORD WINAPI unmapthread( LPVOID lpParam )
 	if ((dwRetVal = GetAdaptersInfo( pAdapterInfo, &ulOutBufLen)) == NO_ERROR)
 	{
 		strcpy(strLocalIP,pAdapterInfo->IpAddressList.IpAddress.String);
-		UPnPvar.Set_UPnP(strLocalIP,"TCP","UVNC_TCP",PortNumber);
+		UPnPvar.Set_UPnP(strLocalIP,"TCP","UVNC_TCP",(const short)PortNumber);
 		//UPnPvar.OpenPorts(true);
 		strcpy(strExternIP,UPnPvar.GetExternalIP());
 		SendMessage(networkproc,WM_COMMAND,2003,0);
@@ -280,11 +280,11 @@ BOOL CALLBACK DlgProcOptions1(HWND hwnd, UINT uMsg,
 			}
 			break;
 		case IDOK:
-			SocketConnect=SendDlgItemMessage(hwnd, IDC_CONNECT_SOCK, BM_GETCHECK, 0, 0);
-			HTTPConnect=SendDlgItemMessage(hwnd, IDC_CONNECT_HTTP, BM_GETCHECK, 0, 0);
-			AllowLoopback=SendDlgItemMessage(hwnd, IDC_ALLOWLOOPBACK, BM_GETCHECK, 0, 0);
-			LoopbackOnly=SendDlgItemMessage(hwnd, IDC_LOOPBACKONLY, BM_GETCHECK, 0, 0);
-			AutoPortSelect=SendDlgItemMessage(hwnd, IDC_PORTNO_AUTO, BM_GETCHECK, 0, 0);
+			SocketConnect= (LONG)SendDlgItemMessage(hwnd, IDC_CONNECT_SOCK, BM_GETCHECK, 0, 0);
+			HTTPConnect= (LONG)SendDlgItemMessage(hwnd, IDC_CONNECT_HTTP, BM_GETCHECK, 0, 0);
+			AllowLoopback= (LONG)SendDlgItemMessage(hwnd, IDC_ALLOWLOOPBACK, BM_GETCHECK, 0, 0);
+			LoopbackOnly= (LONG)SendDlgItemMessage(hwnd, IDC_LOOPBACKONLY, BM_GETCHECK, 0, 0);
+			AutoPortSelect= (LONG)SendDlgItemMessage(hwnd, IDC_PORTNO_AUTO, BM_GETCHECK, 0, 0);
 			BOOL ok1, ok2;
 			PortNumber=GetDlgItemInt(hwnd, IDC_PORTRFB, &ok1, TRUE);
 			HttpPortNumber=GetDlgItemInt(hwnd, IDC_PORTHTTP, &ok2, TRUE);
@@ -294,11 +294,11 @@ BOOL CALLBACK DlgProcOptions1(HWND hwnd, UINT uMsg,
 			return TRUE;
 		default:
 			if (initdone){
-				SocketConnect=SendDlgItemMessage(hwnd, IDC_CONNECT_SOCK, BM_GETCHECK, 0, 0);
-				HTTPConnect=SendDlgItemMessage(hwnd, IDC_CONNECT_HTTP, BM_GETCHECK, 0, 0);
-				AllowLoopback=SendDlgItemMessage(hwnd, IDC_ALLOWLOOPBACK, BM_GETCHECK, 0, 0);
-				LoopbackOnly=SendDlgItemMessage(hwnd, IDC_LOOPBACKONLY, BM_GETCHECK, 0, 0);
-				AutoPortSelect=SendDlgItemMessage(hwnd, IDC_PORTNO_AUTO, BM_GETCHECK, 0, 0);
+				SocketConnect= (LONG)SendDlgItemMessage(hwnd, IDC_CONNECT_SOCK, BM_GETCHECK, 0, 0);
+				HTTPConnect= (LONG)SendDlgItemMessage(hwnd, IDC_CONNECT_HTTP, BM_GETCHECK, 0, 0);
+				AllowLoopback= (LONG)SendDlgItemMessage(hwnd, IDC_ALLOWLOOPBACK, BM_GETCHECK, 0, 0);
+				LoopbackOnly= (LONG)SendDlgItemMessage(hwnd, IDC_LOOPBACKONLY, BM_GETCHECK, 0, 0);
+				AutoPortSelect= (LONG)SendDlgItemMessage(hwnd, IDC_PORTNO_AUTO, BM_GETCHECK, 0, 0);
 
 
 				EnableWindow(GetDlgItem(hwnd, IDC_CONNECT_HTTP), SocketConnect);

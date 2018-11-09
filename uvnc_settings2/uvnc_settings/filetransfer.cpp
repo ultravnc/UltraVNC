@@ -54,13 +54,13 @@ BOOL CALLBACK DlgProcOFT(HWND hwnd, UINT uMsg,
 			break;
 		case IDOK:
 
-			EnableRemoteInputs=!SendDlgItemMessage(hwnd, IDC_DISABLE_INPUTS, BM_GETCHECK, 0, 0);
-			DisableLocalInputs=SendDlgItemMessage(hwnd, IDC_DISABLE_LOCAL_INPUTS, BM_GETCHECK, 0, 0);
-			EnableJapInput=SendDlgItemMessage(hwnd, IDC_JAP_INPUTS, BM_GETCHECK, 0, 0);
-			FileTransferEnabled=SendDlgItemMessage(hwnd, IDC_FILETRANSFER, BM_GETCHECK, 0, 0);
-			FTUserImpersonation=SendDlgItemMessage(hwnd, IDC_FTUSERIMPERSONATION_CHECK, BM_GETCHECK, 0, 0);
-			BlankMonitorEnabled=SendDlgItemMessage(hwnd, IDC_BLANK, BM_GETCHECK, 0, 0);
-			BlankInputsOnly=SendDlgItemMessage(hwnd, IDC_BLANK2, BM_GETCHECK, 0, 0); //PGM
+			EnableRemoteInputs= !SendDlgItemMessage(hwnd, IDC_DISABLE_INPUTS, BM_GETCHECK, 0, 0);
+			DisableLocalInputs= (LONG)SendDlgItemMessage(hwnd, IDC_DISABLE_LOCAL_INPUTS, BM_GETCHECK, 0, 0);
+			EnableJapInput= (LONG)SendDlgItemMessage(hwnd, IDC_JAP_INPUTS, BM_GETCHECK, 0, 0);
+			FileTransferEnabled= (LONG)SendDlgItemMessage(hwnd, IDC_FILETRANSFER, BM_GETCHECK, 0, 0);
+			FTUserImpersonation= (LONG)SendDlgItemMessage(hwnd, IDC_FTUSERIMPERSONATION_CHECK, BM_GETCHECK, 0, 0);
+			BlankMonitorEnabled= (LONG)SendDlgItemMessage(hwnd, IDC_BLANK, BM_GETCHECK, 0, 0);
+			BlankInputsOnly= (LONG)SendDlgItemMessage(hwnd, IDC_BLANK2, BM_GETCHECK, 0, 0); //PGM
 			BOOL ok1;
 			FTTimeout=GetDlgItemInt(hwnd, IDC_FTTIMEOUT, &ok1, TRUE);
 			break;
@@ -68,19 +68,19 @@ BOOL CALLBACK DlgProcOFT(HWND hwnd, UINT uMsg,
 			EndDialog(hwnd, IDCANCEL);
 			return TRUE;
 		case IDC_FILETRANSFER:
-			FileTransferEnabled=SendDlgItemMessage(hwnd, IDC_FILETRANSFER, BM_GETCHECK, 0, 0);
+			FileTransferEnabled= (LONG)SendDlgItemMessage(hwnd, IDC_FILETRANSFER, BM_GETCHECK, 0, 0);
 			EnableWindow(GetDlgItem(hwnd, IDC_FTUSERIMPERSONATION_CHECK), FileTransferEnabled);
 			EnableWindow(GetDlgItem(hwnd, IDC_FTTIMEOUT), FileTransferEnabled);
 			break;
 		case IDC_BLANK:
-			BlankMonitorEnabled=SendDlgItemMessage(hwnd, IDC_BLANK, BM_GETCHECK, 0, 0);			
+			BlankMonitorEnabled= (LONG)SendDlgItemMessage(hwnd, IDC_BLANK, BM_GETCHECK, 0, 0);
 			EnableWindow(GetDlgItem(hwnd, IDC_BLANK2), BlankMonitorEnabled); //PGM
 			if (!BlankMonitorEnabled) //PGM
 				SendMessage(GetDlgItem(hwnd, IDC_BLANK2), BM_SETCHECK, BlankMonitorEnabled, 0); //PGM
-			BlankInputsOnly=SendDlgItemMessage(hwnd, IDC_BLANK2, BM_GETCHECK, 0, 0); //PGM
+			BlankInputsOnly= (LONG)SendDlgItemMessage(hwnd, IDC_BLANK2, BM_GETCHECK, 0, 0); //PGM
 			break;
 		case IDC_BLANK2: //PGM
-			BlankInputsOnly=SendDlgItemMessage(hwnd, IDC_BLANK2, BM_GETCHECK, 0, 0); //PGM
+			BlankInputsOnly= (LONG)SendDlgItemMessage(hwnd, IDC_BLANK2, BM_GETCHECK, 0, 0); //PGM
 			break; //PGM
 		}
 		return 0;	

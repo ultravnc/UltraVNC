@@ -75,18 +75,18 @@ BOOL CALLBACK DlgProcCAP(HWND hwnd, UINT uMsg,
 			break;
 		case IDOK:	
 			{
-				TurboMode=SendDlgItemMessage(hwnd, IDC_TURBOMODE, BM_GETCHECK, 0, 0);
-				PollUnderCursor=SendDlgItemMessage(hwnd, IDC_POLL_UNDER_CURSOR, BM_GETCHECK, 0, 0);
-				PollForeground=SendDlgItemMessage(hwnd, IDC_POLL_FOREGROUND, BM_GETCHECK, 0, 0);
-				PollFullScreen=SendDlgItemMessage(hwnd, IDC_POLL_FULLSCREEN, BM_GETCHECK, 0, 0);
-				PollConsoleOnly=SendDlgItemMessage(hwnd, IDC_CONSOLE_ONLY, BM_GETCHECK, 0, 0);
-				PollOnEventOnly=SendDlgItemMessage(hwnd, IDC_ONEVENT_ONLY, BM_GETCHECK, 0, 0);
-				Driver=SendDlgItemMessage(hwnd, IDC_DRIVER, BM_GETCHECK, 0, 0);
-				Primary=SendDlgItemMessage(hwnd, IDC_PRIM, BM_GETCHECK, 0, 0);
-				Secondary=SendDlgItemMessage(hwnd, IDC_SEC, BM_GETCHECK, 0, 0);
-				Hook=SendDlgItemMessage(hwnd, IDC_HOOK, BM_GETCHECK, 0, 0);
-				RemoveWallpaper=SendDlgItemMessage(hwnd, IDC_REMOVE_WALLPAPER, BM_GETCHECK, 0, 0);
-				RemoveAero=SendDlgItemMessage(hwnd, IDC_REMOVE_Aero, BM_GETCHECK, 0, 0);
+				TurboMode= (LONG)SendDlgItemMessage(hwnd, IDC_TURBOMODE, BM_GETCHECK, 0, 0);
+				PollUnderCursor= (LONG)SendDlgItemMessage(hwnd, IDC_POLL_UNDER_CURSOR, BM_GETCHECK, 0, 0);
+				PollForeground= (LONG)SendDlgItemMessage(hwnd, IDC_POLL_FOREGROUND, BM_GETCHECK, 0, 0);
+				PollFullScreen= (LONG)SendDlgItemMessage(hwnd, IDC_POLL_FULLSCREEN, BM_GETCHECK, 0, 0);
+				PollConsoleOnly= (LONG)SendDlgItemMessage(hwnd, IDC_CONSOLE_ONLY, BM_GETCHECK, 0, 0);
+				PollOnEventOnly= (LONG)SendDlgItemMessage(hwnd, IDC_ONEVENT_ONLY, BM_GETCHECK, 0, 0);
+				Driver= (LONG)SendDlgItemMessage(hwnd, IDC_DRIVER, BM_GETCHECK, 0, 0);
+				Primary= (LONG)SendDlgItemMessage(hwnd, IDC_PRIM, BM_GETCHECK, 0, 0);
+				Secondary= (LONG)SendDlgItemMessage(hwnd, IDC_SEC, BM_GETCHECK, 0, 0);
+				Hook= (LONG)SendDlgItemMessage(hwnd, IDC_HOOK, BM_GETCHECK, 0, 0);
+				RemoveWallpaper= (LONG)SendDlgItemMessage(hwnd, IDC_REMOVE_WALLPAPER, BM_GETCHECK, 0, 0);
+				RemoveAero= (LONG)SendDlgItemMessage(hwnd, IDC_REMOVE_Aero, BM_GETCHECK, 0, 0);
 				MaxCpu = GetDlgItemInt(hwnd, IDC_MAXCPU, NULL, FALSE);
 			}
 			break;

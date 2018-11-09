@@ -246,7 +246,7 @@ vncSetAuth::Show(BOOL show)
 				MAKEINTRESOURCE(IDD_MSLOGON), 
 				NULL,
 				(DLGPROC) DialogProc,
-				(LONG) this);
+				(LPARAM) this);
 		}
 	}
 }

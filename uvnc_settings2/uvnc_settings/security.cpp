@@ -570,13 +570,13 @@ BOOL CALLBACK security(HWND hwnd, UINT uMsg,WPARAM wParam, LPARAM lParam)
 			}
 			break;
 		case IDOK:
-			MSLogonRequired=SendDlgItemMessage(hwnd, IDC_MSLOGON_CHECKD, BM_GETCHECK, 0, 0);
-			NewMSLogon=SendDlgItemMessage(hwnd, IDC_NEW_MSLOGON, BM_GETCHECK, 0, 0);
-			AuthRequired=SendDlgItemMessage(hwnd, IDC_PASSRECK, BM_GETCHECK, 0, 0);
-			AllowShutdown=SendDlgItemMessage(hwnd, IDC_ALLOWSHUTDOWN, BM_GETCHECK, 0, 0);
-			AllowEditClients=SendDlgItemMessage(hwnd, IDC_ALLOWEDIT, BM_GETCHECK, 0, 0);
-			AllowProperties=SendDlgItemMessage(hwnd, IDC_ALLOWPROP, BM_GETCHECK, 0, 0);
-			UseDSMPlugin=SendDlgItemMessage(hwnd, IDC_PLUGIN_CHECK, BM_GETCHECK, 0, 0);
+			MSLogonRequired=(LONG)SendDlgItemMessage(hwnd, IDC_MSLOGON_CHECKD, BM_GETCHECK, 0, 0);
+			NewMSLogon= (LONG)SendDlgItemMessage(hwnd, IDC_NEW_MSLOGON, BM_GETCHECK, 0, 0);
+			AuthRequired= (LONG)SendDlgItemMessage(hwnd, IDC_PASSRECK, BM_GETCHECK, 0, 0);
+			AllowShutdown= (LONG)SendDlgItemMessage(hwnd, IDC_ALLOWSHUTDOWN, BM_GETCHECK, 0, 0);
+			AllowEditClients= (LONG)SendDlgItemMessage(hwnd, IDC_ALLOWEDIT, BM_GETCHECK, 0, 0);
+			AllowProperties= (LONG)SendDlgItemMessage(hwnd, IDC_ALLOWPROP, BM_GETCHECK, 0, 0);
+			UseDSMPlugin= (LONG)SendDlgItemMessage(hwnd, IDC_PLUGIN_CHECK, BM_GETCHECK, 0, 0);
 			GetDlgItemText(hwnd, IDC_PLUGINS_COMBO, DSMPlugin, 128); //PGM
 			char plaintext1[MAXPWLEN+1]; //PGM
 			int len = GetDlgItemText(hwnd, IDC_PASSWORD, (LPSTR) &plaintext1, MAXPWLEN+1); //PGM
