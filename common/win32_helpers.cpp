@@ -60,6 +60,7 @@ LONG SafeGetWindowProc(HWND hWnd)
 #ifndef _X64
     LONG pWndProc = GetWindowLong(hWnd, GWL_WNDPROC);
 #else
+    //TODO: get rid of LONG_PTR return warning for x64
     LONG pWndProc = GetWindowLongPtr(hWnd, GWLP_WNDPROC);
 #endif
     return pWndProc;

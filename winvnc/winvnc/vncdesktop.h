@@ -512,9 +512,9 @@ protected:
 	void StartInitWindowthread();
 	void ShutdownInitWindowthread();
 	bool can_be_hooked;
-	int old_Blockinput;
-	int old_Blockinput1;
-	int old_Blockinput2;
+	bool old_Blockinput;
+	bool old_Blockinput1;
+	bool old_Blockinput2;
 	int nr_rects;
 	HWND hDeskWnd;
 	HWND hFolderView;

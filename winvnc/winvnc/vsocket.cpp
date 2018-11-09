@@ -34,9 +34,10 @@ class VSocket;
 ////////////////////////////////////////////////////////
 // System includes
 
+#define _WINSOCK_DEPRECATED_NO_WARNINGS 1
+
 #include "stdhdrs.h"
 #include <iostream>
-
 
 #include <stdio.h>
 #ifdef __WIN32__
@@ -136,6 +137,7 @@ VSocket::VSocket()
 	sock6 = -1;
 #else
 	sock = -1;
+
 #endif
 	vnclog.Print(LL_SOCKINFO, VNCLOG("VSocket() m_pDSMPlugin = NULL \n"));
 	m_pDSMPlugin = NULL;
@@ -774,7 +776,7 @@ VSocket::Accept6()
 VSocket *
 VSocket::Accept()
 {
-  int new_socket_id;
+  SOCKET new_socket_id;
   VSocket * new_socket;
 
   // Check this socket
@@ -1876,7 +1878,7 @@ VSocket::Read(char *buff, const VCard bufflen,int allsock)
 VInt
 VSocket::Read(char *buff, const VCard bufflen)
 {
-	if (sock==-1) return sock;
+	if (sock==-1) return -1;
 	int counter = 0;
 	int s = 0;
 	s = recv(sock, buff, bufflen, 0);
@@ -2272,7 +2274,7 @@ VSocket::ReadSelect(VCard to)
 	struct timeval tv;
  	tv.tv_sec = to/1000;
  	tv.tv_usec = (to % 1000)*1000;
- 	int rc = select(sock+1,&fds,0,0,&tv);
+    int rc = select((int)(sock+1),&fds,0,0,&tv);
  	if (rc>0) return true;
  	return false;
  }
@@ -2295,7 +2297,7 @@ int val =0;
 		do {
 			FD_ZERO(&write_fds);
 			FD_SET(RemoteSocket, &write_fds);			
-			count = select(RemoteSocket+ 1, NULL, &write_fds, NULL, &tm);
+			count = select((int)(RemoteSocket+ 1), NULL, &write_fds, NULL, &tm);
 			aa++;
 		} while (count == 0&& !fShutdownOrdered && aa<600);
 		if (aa>=600) return 0;

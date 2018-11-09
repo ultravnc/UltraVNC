@@ -65,7 +65,7 @@ BOOL Char2Wchar(WCHAR* pDest, char* pSrc, int nDestStrLen)
           return FALSE;
      }
 
-     nSrcStrLen = strlen(pSrc);
+     nSrcStrLen = (int)strlen(pSrc);
      if(nSrcStrLen == 0)
      {  
           return FALSE;
@@ -104,7 +104,7 @@ ppNextBuf, DWORD* pdwUsedBytes)
         DWORD   dwOffset = *pdwUsedBytes;
         if(!pszText)
                 return 0;
-        DWORD   dwLen = (wcslen(pszText)+1)*sizeof(WCHAR);
+        DWORD   dwLen = (DWORD) (wcslen(pszText)+1)*sizeof(WCHAR);
         if(*pdwUsedBytes + dwLen> dwMaxSize)
                 return 0;
         memmove(*ppNextBuf, pszText , dwLen);
@@ -280,8 +280,8 @@ BOOL CreateRemoteSessionProcess(
 				hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, cpauRetData.ProcInfo.dwProcessId);
 	#ifdef _DEBUG
 						char			szText[256];
-						sprintf(szText," ++++++cpau  %i  %i %i %i %i %i\n",cpauRetData.bRetValue,cpauRetData.ProcInfo.hProcess,cpauRetData.ProcInfo.dwProcessId,cpauRetData.ProcInfo.dwThreadId,cpauRetData.ProcInfo.hThread,hProcess);
-						OutputDebugString(szText);						
+						sprintf(szText," ++++++cpau  %i  %p %i %i %p %p\n",cpauRetData.bRetValue, cpauRetData.ProcInfo.hProcess,cpauRetData.ProcInfo.dwProcessId,cpauRetData.ProcInfo.dwThreadId, cpauRetData.ProcInfo.hThread, hProcess);
+						OutputDebugString(szText);				
 	#endif
 					bRet = cpauRetData.bRetValue;
 					if(bRet)
@@ -538,7 +538,7 @@ get_winlogon_handle(OUT LPHANDLE  lphUserToken, DWORD mysessionID)
 		#ifdef _DEBUG
 					char			szText[256];
 					DWORD error=GetLastError();
-					sprintf(szText," ++++++ OpenProcess %i \n",hProcess);
+					sprintf(szText," ++++++ OpenProcess %p \n", hProcess);
 					SetLastError(0);
 					OutputDebugString(szText);		
 		#endif
@@ -547,7 +547,7 @@ get_winlogon_handle(OUT LPHANDLE  lphUserToken, DWORD mysessionID)
 
 		#ifdef _DEBUG
 					error=GetLastError();
-					sprintf(szText," ++++++ OpenProcessToken %i %i\n",hTokenThis,error);
+					sprintf(szText," ++++++ OpenProcessToken %i %i\n", (int)hTokenThis,error);
 					SetLastError(0);
 					OutputDebugString(szText);		
 		#endif
@@ -555,14 +555,14 @@ get_winlogon_handle(OUT LPHANDLE  lphUserToken, DWORD mysessionID)
 		bResult = DuplicateTokenEx(hTokenThis, TOKEN_ASSIGN_PRIMARY|TOKEN_ALL_ACCESS,NULL, SecurityImpersonation, TokenPrimary, lphUserToken);
 		#ifdef _DEBUG
 					error=GetLastError();
-					sprintf(szText," ++++++ DuplicateTokenEx %i %i %i %i\n",hTokenThis,&lphUserToken,error,bResult);
+					sprintf(szText," ++++++ DuplicateTokenEx %i %i %i %i\n", (int)hTokenThis, (int)&lphUserToken,error,bResult ? 1 : 0);
 					SetLastError(0);
 					OutputDebugString(szText);		
 		#endif
 		SetTokenInformation(*lphUserToken, TokenSessionId, &ID_session, sizeof(DWORD));
 		#ifdef _DEBUG
 					error=GetLastError();
-					sprintf(szText," ++++++ SetTokenInformation( %i %i %i\n",hTokenThis,&lphUserToken,error);
+					sprintf(szText," ++++++ SetTokenInformation( %i %i %i\n", (int)hTokenThis, (int)&lphUserToken,error);
 					SetLastError(0);
 					OutputDebugString(szText);		
 		#endif
@@ -1059,7 +1059,7 @@ void monitor_sessions_RDP()
 	whileloop:
 #ifdef _DEBUG
 		char			szText[256];
-		sprintf(szText, " ++++++1 %i %i %i\n", OlddwSessionId, dwSessionId, ProcessInfo.hProcess);
+		sprintf(szText, " ++++++1 %i %i %i\n", OlddwSessionId, dwSessionId, (int)ProcessInfo.hProcess);
 		OutputDebugString(szText);
 #else
 		;

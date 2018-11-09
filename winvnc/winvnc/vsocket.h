@@ -295,10 +295,10 @@ public:
 protected:
   // The internal socket id
 #ifdef IPV6V4
-	int sock4; //TODO:  use SOCKET
-	int sock6; //TODO:  use SOCKET
+    SOCKET sock4;
+    SOCKET sock6;
 #else
-  int sock;	//TODO:  use SOCKET
+    SOCKET sock;
 #endif
 
   //adzm 2010-08-01

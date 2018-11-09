@@ -146,7 +146,7 @@ bool CZipUnZip32::ZipDirectory(char* szRootDir, char* szDirectoryToZip, char* sz
 	sz = szFileList + cc;
 	for (i = 0; i < m_ZpZCL.argc; i++)
 	{
-		cc = strlen(szDirectoryToZip);
+		cc = (int)strlen(szDirectoryToZip);
 		strcpy(sz, szDirectoryToZip);
 		index[i] = sz;
 		sz += (cc + 1);
