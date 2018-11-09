@@ -674,7 +674,7 @@ if ( isNT )
 				strcat(userdom,"\\");
 				strcat(userdom,userin);
 				mbstowcs( (wchar_t *) userdomain, userdom, MAXLEN );
-				printf( "%S\n", userdomain);
+				printf( "%S\n", (wchar_t *)userdomain);
 				rc = NetUserGetGroupsNT( NULL ,(wchar_t *) userdomain, 0, 1,&buf2, MAX_PREFERRED_LENGTH, &read, &total);
 				if ( rc == NERR_Success)
 					{
@@ -724,7 +724,7 @@ if ( isNT )
 				//strcat(userdom,"\\");
 				strcpy(userdom,userin);
 				mbstowcs( (wchar_t *) userdomain, userdom, MAXLEN );
-				printf( "%S\n", userdomain);
+				printf( "%S\n", (wchar_t *)userdomain);
 				rc = NetUserGetGroupsNT2( (wchar_t *)server,(wchar_t *) userdomain, 0,&buf2, MAX_PREFERRED_LENGTH, &read, &total);
 				if ( rc == NERR_Success)
 					{

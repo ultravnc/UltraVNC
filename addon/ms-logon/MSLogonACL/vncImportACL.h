@@ -80,7 +80,7 @@ struct vncScanInput{
 	void RemoveComment(TCHAR *line);
 	void RemoveNewline(TCHAR *line);
 	int GetQuoteLength(const TCHAR *line);
-	int GetWordLength(const TCHAR *line);
+    size_t GetWordLength(const TCHAR *line);
 	bool GetLine(TCHAR *line);
 	bool Tokenize(const TCHAR *line, TCHAR **tokens);
 	int AddToken(TCHAR **token, int tokenCount, const TCHAR **line, int len);

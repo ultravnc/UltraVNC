@@ -348,7 +348,7 @@ PSID vncImportACL::GetSID(const TCHAR *domainaccount){
 // If separator is not found, head = "" and tail = input.
 const TCHAR * vncImportACL::SplitString(const TCHAR *input, TCHAR separator, TCHAR *head){
 	const TCHAR * tail;
-	int l;
+    size_t l;
 
 	tail = _tcschr(input, separator);
 	if (tail){
@@ -390,7 +390,7 @@ TCHAR *vncImportACL::AddDomainname(const TCHAR *user){
 	if (nStatus == NERR_Success)
 		_tcsncpy(domain, wkstainfo->wki100_langroup, MAXLEN);
 	else
-		_ftprintf(stderr, _T("NetWkstaGetInfo() returned %lu \n"), wkstainfo);
+		_ftprintf(stderr, _T("NetWkstaGetInfo() returned %lu \n"), nStatus);
 	domain[MAXLEN - 1] = _T('\0');
 	_ftprintf(stderr, _T("Detected domain = %s\n"),domain);
 	NetApiBufferFree(wkstainfo);
@@ -455,10 +455,10 @@ bool vncScanInput::Tokenize(const TCHAR *line, TCHAR **token){
 	return (tokenCount == 3 && _tcslen(line) == 0) ? true : false;
 }
 
-int vncScanInput::GetWordLength(const TCHAR *line){
-	int length = 0;
-	int blength = 0;
-	int tlength = 0;
+size_t vncScanInput::GetWordLength(const TCHAR *line){
+    size_t length = 0;
+    size_t blength = 0;
+    size_t tlength = 0;
 	
 	const TCHAR *nextblank = _tcschr(line, _T(' '));
 	const TCHAR *nexttab   = _tcschr(line, _T('\t'));
@@ -479,7 +479,7 @@ int vncScanInput::GetWordLength(const TCHAR *line){
 
 int vncScanInput::GetQuoteLength(const TCHAR *line){
 	const TCHAR *eoq = _tcschr(line, _T('"'));
-	int len = 0;
+    size_t len = 0;
 	if (eoq)
 		len = eoq - line;
 	return len;

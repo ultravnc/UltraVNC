@@ -200,7 +200,7 @@ HRESULT CAVIGenerator::InitEngine()
 	bool delete_needed=false;
 	{
 	FILE *file;
-	int size;
+	size_t size;
 	/* Read options from file */
       file = fopen(mypath, "rb");
       if (file == NULL) {
@@ -282,7 +282,7 @@ HRESULT CAVIGenerator::InitEngine()
 	{
 		{
 			FILE *file;
-			int size;
+			size_t size;
 			/* Save options to file*/
 			file = fopen(mypath, "wb");
 			if (file != NULL) {

@@ -399,7 +399,7 @@ void gen_random(char *s, const int len) {
 int main(int argc, char* argv[])
 {
 	char epasswd[MAXPWLEN+1];
-	srand ( time(NULL) );
+	srand ( (UINT)time(NULL) );
 	IniFile myIniFile;
 	memset(passwd,0,8);
 	memset(passwd2,0,8);

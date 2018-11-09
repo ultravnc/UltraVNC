@@ -807,7 +807,7 @@ static int VFatFileTime2utime(const FILETIME *pft, time_t *ut)
 
     if (!FileTimeToLocalFileTime(pft, &lft)) {
         /* if pft cannot be converted to local time, return current time */
-        return time(NULL);
+        return (int)time(NULL);
     }
     FTTrace((stdout, "VFatFT2utime, feed for mktime()", 1, &lft));
 #ifndef HAVE_MKTIME

@@ -321,7 +321,7 @@ local int VFatFileTime2utime(const FILETIME *pft, time_t *ut)
 
     if (!FileTimeToLocalFileTime(pft, &lft)) {
         /* if pft cannot be converted to local time, return current time */
-        return time(NULL);
+        return (int)time(NULL);
     }
     FileTimeToSystemTime(&lft, &w32tm);
     /* underflow and overflow handling */

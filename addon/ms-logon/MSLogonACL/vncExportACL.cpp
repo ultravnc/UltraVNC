@@ -145,7 +145,7 @@ void vncExportACL::PrintSid(PSID psid)
 				_tcscpy(domain, _T(".."));
 		}
 		else
-			_tprintf(_T("NetWkstaGetInfo() returned %lu \n"), wkstainfo);
+			_tprintf(_T("NetWkstaGetInfo() returned %lu \n"), nStatus);
 
 		NetApiBufferFree(wkstainfo);
 		wkstainfo = NULL;
