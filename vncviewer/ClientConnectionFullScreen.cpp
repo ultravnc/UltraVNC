@@ -65,9 +65,8 @@ void ClientConnection::SetFullScreenMode(bool enable)
         //adzm 2010-09
         SendFullFramebufferUpdateRequest(false);
     }
-    else
-        //InvalidateRect(m_hwndMain, NULL, FALSE);
-        RedrawWindow(m_hwndMain, NULL, NULL, RDW_FRAME | RDW_INVALIDATE);
+    
+    RedrawWindow(m_hwndMain, NULL, NULL, RDW_FRAME | RDW_INVALIDATE);
 }
 
 // If the options have been changed other than by calling 
@@ -172,7 +171,7 @@ void ClientConnection::RealiseFullScreenMode()
 
 		TitleBar.DisplayWindow(FALSE, TRUE); //Added by: Lars Werner (http://lars.werner.no)
 
-		if (m_hwndStatus)::RedrawWindow(m_hwndStatus, NULL,NULL,TRUE); //Added by: Lars Werner (http://lars.werner.no) - Reason: The status window is not getting redrawn after a resize.
+		if (m_hwndStatus)::RedrawWindow(m_hwndStatus, NULL,NULL, RDW_INVALIDATE); //Added by: Lars Werner (http://lars.werner.no) - Reason: The status window is not getting redrawn after a resize.
 	}
 }
 
@@ -191,7 +190,7 @@ void ClientConnection::BorderlessMode()
 	// adzm - 2010-07 - Extended clipboard
 	CheckMenuItem(m_hPopupMenuDisplay, ID_FULLSCREEN, MF_BYCOMMAND | MF_UNCHECKED);
 	TitleBar.DisplayWindow(FALSE, TRUE);
-	if (m_hwndStatus)::RedrawWindow(m_hwndStatus, NULL, NULL, TRUE);
+	if (m_hwndStatus)::RedrawWindow(m_hwndStatus, NULL, NULL, RDW_INVALIDATE);
 }
 
 bool ClientConnection::BumpScroll(int x, int y)
