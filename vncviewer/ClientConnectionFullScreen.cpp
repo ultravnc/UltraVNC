@@ -66,7 +66,8 @@ void ClientConnection::SetFullScreenMode(bool enable)
         SendFullFramebufferUpdateRequest(false);
     }
     else
-        InvalidateRect(m_hwndMain, NULL, FALSE);
+        //InvalidateRect(m_hwndMain, NULL, FALSE);
+        RedrawWindow(m_hwndMain, NULL, NULL, RDW_FRAME | RDW_INVALIDATE);
 }
 
 // If the options have been changed other than by calling 

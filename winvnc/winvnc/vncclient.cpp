@@ -640,7 +640,7 @@ vncClientUpdateThread::run_undetached(void *arg)
 						// Replace CR-LF with LF - never send CR-LF on the wire,
 						// since Unix won't like it
 						int unixpos=0;
-						int cliplen=strlen(cliptext);
+                        size_t cliplen=strlen(cliptext);
 						for (int x=0; x<cliplen; x++) {
 							if (cliptext[x] != '\x0d') {
 								unixtext[unixpos] = cliptext[x];
