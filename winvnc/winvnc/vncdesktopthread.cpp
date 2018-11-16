@@ -578,6 +578,10 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 									rc.bottom = m_desktop->mymonitor[3].Height;
 									vnclog.Print(LL_INTINFO, VNCLOG("Monitor %d: width = %d height = %d\n"), m_desktop->m_current_monitor, rc.right, rc.bottom);
 
+
+                                    m_desktop->m_ScreenOffsetx = m_desktop->mymonitor[3].offsetx;
+                                    m_desktop->m_ScreenOffsety = m_desktop->mymonitor[3].offsety;
+                                    m_server->SetScreenOffset(m_desktop->m_ScreenOffsetx, m_desktop->m_ScreenOffsety, m_desktop->nr_monitors);
 								}
 							}
 						}

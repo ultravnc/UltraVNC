@@ -3360,6 +3360,8 @@ vncClientThread::run(void *arg)
 								{
 									xx = msg.pe.x + m_client->monitor_Offsetx;
 									yy = msg.pe.y + m_client->monitor_Offsety;
+                                    //vnclog.Print(LL_INTINFO, VNCLOG("MouseMove m_cursor_pos(%d, %d), new(%d, %d)\n"),
+                                    //    xx, yy, msg.pe.x, msg.pe.y);
 								}
 								evt.mi.dx = (xx * 65535) / (GetSystemMetrics(SM_CXVIRTUALSCREEN)-1);
 								evt.mi.dy = (yy* 65535) / (GetSystemMetrics(SM_CYVIRTUALSCREEN)-1);
@@ -4850,10 +4852,16 @@ vncClient::UpdateMouse()
 	testrect.left = m_encodemgr.m_buffer->m_desktop->m_Cliprect.tl.x + m_ScreenOffsetx + monitor_Offsetx;
 	testrect.right = m_encodemgr.m_buffer->m_desktop->m_Cliprect.br.x + m_ScreenOffsetx + monitor_Offsetx;
 
+    //vnclog.Print(LL_INTINFO, VNCLOG("UpdateMouse sx %d sy %d mx %d my %d\n"), m_ScreenOffsetx, m_ScreenOffsety, monitor_Offsetx, monitor_Offsety);
+    //vnclog.Print(LL_INTINFO, VNCLOG("UpdateMouse Rect %d %d %d %d\n"), testrect.left, testrect.top, testrect.right, testrect.bottom);
+
 	POINT cursorPos;
 	GetCursorPos(&cursorPos);
-	if (!PtInRect(&testrect, cursorPos)) 
-		return;
+    if (!PtInRect(&testrect, cursorPos))
+    {
+        //vnclog.Print(LL_INTINFO, VNCLOG("UpdateMouse !PtInRect %d %d\n"), cursorPos.x, cursorPos.y);
+        return;
+    }
 
 	if (!m_mousemoved && !m_cursor_update_sent) {
 		omni_mutex_lock l(GetUpdateLock(),93);
@@ -4868,7 +4876,7 @@ vncClient::UpdateMouse()
 		cursorPos.x=cursorPos.x-(m_ScreenOffsetx+monitor_Offsetx);
 		cursorPos.y=cursorPos.y-(m_ScreenOffsety+monitor_Offsety);
 		//vnclog.Print(LL_INTINFO, VNCLOG("UpdateMouse m_cursor_pos(%d, %d), new(%d, %d)\n"), 
-		//  m_cursor_pos.x, m_cursor_pos.y, cursorPos.x, cursorPos.y);
+		//    m_cursor_pos.x, m_cursor_pos.y, cursorPos.x, cursorPos.y);
 		if (cursorPos.x != m_cursor_pos.x || cursorPos.y != m_cursor_pos.y) {
 			// This movement isn't by this client, but generated locally or by other client.
 			// Send it to this client.
