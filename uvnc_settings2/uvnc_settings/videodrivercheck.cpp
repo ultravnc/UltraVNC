@@ -121,34 +121,44 @@ CheckVideoDriver(bool Box)
 					if(Box)
 					{
 						char buf[512];
+						char buf2[512];
+						strcpy(buf,"");
+						strcpy(buf2,"");
+						strcpy(buf2,"Driver found. \n");
 						GetDllProductVersion("mv2.dll",buf,512);
+						if (strcmp(buf,"1.00.22")==NULL)
+						{
+							strcat(buf2,"Driver version OK \n");
+						}
+						else
+						{
+							strcat(buf2,"Driver verion is not 1.00.22 \n");
+							strcat(buf2,buf);
+							strcat(buf2," \n");
+						}
+
 						if (dd.StateFlags & DISPLAY_DEVICE_ATTACHED_TO_DESKTOP)
 						{
-							strcat(buf," driver Active");
+							strcat(buf2," driver Active");
 							HDC testdc=NULL;
 							deviceName = (LPSTR)&dd.DeviceName[0];
 							testdc = CreateDC("DISPLAY",deviceName,NULL,NULL);	
 							if (testdc)
 							{
 								DeleteDC(testdc);
-								strcat(buf," access ok");
+								strcat(buf2," access ok");
 							}
 							else
 							{
-								strcat(buf," access denied, permission problem");
+								strcat(buf2," access denied, permission problem");
 							}
 						}
-						else
-							if (strcmp(buf,"1.00.22")==NULL)
-							{
-								strcat(buf," driver Current Not Active (viewer not connected ?)");
-								MessageBox(NULL,buf,"Driver found: version ok",0);
-							}
-							else
-							{
-								strcat(buf," driver Not Active");
-								MessageBox(NULL,buf,"Driver found: required version 1.00.22",0);
-							}
+                        else
+                        {
+                            strcat(buf2, "Driver Not Activated, is the viewer current connected ?\n");
+                            strcat(buf2, "A mirrior driver can only be started if winvnc is a service or running as admin\n");
+                        }
+                        MessageBox(NULL,buf2,buf,0);
 					}
 					return true;
 				}

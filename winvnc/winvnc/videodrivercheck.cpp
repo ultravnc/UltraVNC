@@ -185,9 +185,11 @@ CheckVideoDriver(bool Box)
 								strcat(buf2," access denied, permission problem");
 							}
 						}
-						else
-							strcat(buf2,"Driver Not Activated, is the viewer current connected ?\n");
-						    strcat(buf2,"A mirrior driver can only be started if winvnc is a service or running as admin\n");
+                        else
+                        {
+                            strcat(buf2, "Driver Not Activated, is the viewer current connected ?\n");
+                            strcat(buf2, "A mirrior driver can only be started if winvnc is a service or running as admin\n");
+                        }
 						MessageBoxSecure(NULL,buf2,buf,0);
 					}
 					return true;
