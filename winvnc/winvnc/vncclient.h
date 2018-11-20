@@ -124,7 +124,7 @@ public:
 	// Kill
 	// The server uses this to close the client socket, causing the
 	// client thread to fail, which in turn deletes the client object
-	virtual void Kill();
+	virtual void Kill(bool deleted = false);
 
 	// Client manipulation functions for use by the server
 	virtual void SetBuffer(vncBuffer *buffer);
@@ -626,6 +626,7 @@ public:
 	UINT m_AutoReconnectPort;
 	char m_szAutoReconnectAdr[255];
 	char m_szAutoReconnectId[MAX_PATH];
+	bool m_deleted;
 
 protected:
 	virtual ~vncClientThread();

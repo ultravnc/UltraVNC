@@ -738,7 +738,7 @@ vncClientUpdateThread::run_undetached(void *arg)
 
 vncClientThread::~vncClientThread()
 {
-	if (m_client != NULL)
+	if (m_client != NULL && ! m_deleted)
 		delete m_client;
 #ifdef _Gii
 #ifdef _USE_DLL
@@ -752,6 +752,7 @@ BOOL
 vncClientThread::Init(vncClient *client, vncServer *server, VSocket *socket, BOOL auth, BOOL shared)
 {
 	// Save the server pointer and window handle
+	m_deleted = false;
 	m_server = server;
 	m_socket = socket;
 	m_client = client;
@@ -4717,7 +4718,7 @@ vncClient::Init(vncServer *server,
 }
 
 void
-vncClient::Kill()
+vncClient::Kill(bool deleted)
 {
 	// Close the socket
 	vnclog.Print(LL_INTERR, VNCLOG("client Kill() called"));
@@ -4725,6 +4726,8 @@ vncClient::Kill()
         m_pTextChat->KillDialog();
 	if (m_socket != NULL)
 		m_socket->Close();
+	if(deleted)
+		((vncClientThread *) m_thread_ClientThread)->m_deleted = true;
 }
 
 // Client manipulation functions for use by the server

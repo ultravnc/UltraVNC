@@ -717,8 +717,8 @@ vncServer::KillClient(vncClientId clientid)
 
 			// Ask the client to die
 			vncClient *client = GetClient(clientid);
-			client->Kill();
-
+			client->Kill(true);
+			delete client; 
 			done = TRUE;
 			break;
 		}
@@ -992,7 +992,8 @@ vncServer::KillUnauthClients()
 		vnclog.Print(LL_INTINFO, VNCLOG("killing unauth client\n"));
 
 		// Kill the client
-		GetClient(*i)->Kill();
+		GetClient(*i)->Kill(true);
+		delete GetClient(*i);
 	}
 
 	vnclog.Print(LL_INTINFO, VNCLOG("KillUnauthClients() done\n"));
