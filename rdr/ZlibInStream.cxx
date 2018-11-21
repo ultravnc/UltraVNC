@@ -62,7 +62,7 @@ void ZlibInStream::setUnderlying(InStream* is, int bytesIn_)
 
 int ZlibInStream::pos()
 {
-  return offset + ptr - start;
+  return (int)(offset + ptr - start);
 }
 
 void ZlibInStream::reset()
@@ -87,7 +87,7 @@ int ZlibInStream::overrun(int itemSize, int nItems)
   if (end - ptr != 0)
     memmove(start, ptr, end - ptr);
 
-  offset += ptr - start;
+  offset += (int)(ptr - start);
   end -= ptr - start;
   ptr = start;
 
@@ -96,7 +96,7 @@ int ZlibInStream::overrun(int itemSize, int nItems)
   }
 
   if (itemSize * nItems > end - ptr)
-    nItems = (end - ptr) / itemSize;
+    nItems = (int)((end - ptr) / itemSize);
 
   return nItems;
 }
@@ -107,11 +107,11 @@ int ZlibInStream::overrun(int itemSize, int nItems)
 void ZlibInStream::decompress()
 {
   zs->next_out = (U8*)end;
-  zs->avail_out = start + bufSize - end;
+  zs->avail_out = (uInt)(start + bufSize - end);
 
   underlying->check(1);
   zs->next_in = (U8*)underlying->getptr();
-  zs->avail_in = underlying->getend() - underlying->getptr();
+  zs->avail_in = (uInt)(underlying->getend() - underlying->getptr());
   if ((int)zs->avail_in > bytesIn)
     zs->avail_in = bytesIn;
 
@@ -120,7 +120,7 @@ void ZlibInStream::decompress()
     throw Exception("ZlibInStream: inflate failed");
   }
 
-  bytesIn -= zs->next_in - underlying->getptr();
+  bytesIn -= (int)(zs->next_in - underlying->getptr());
   end = zs->next_out;
   underlying->setptr(zs->next_in);
 }

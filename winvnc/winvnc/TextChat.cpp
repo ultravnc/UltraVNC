@@ -285,7 +285,7 @@ void TextChat::PrintMessage(const char* szMessage,const char* szSender,DWORD dwC
 	lpG.flags = GTL_NUMBYTES;
 	lpG.codepage = CP_ACP; // ANSI
 
-	int nLen = SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT, EM_GETTEXTLENGTHEX, (WPARAM)&lpG, 0L);
+	int nLen = (int)SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT, EM_GETTEXTLENGTHEX, (WPARAM)&lpG, 0L);
 	if (nLen + 32 > TEXTMAXSIZE )
 	{
 		memset(m_szTextBoxBuffer, 0, TEXTMAXSIZE);
@@ -314,7 +314,7 @@ void TextChat::PrintMessage(const char* szMessage,const char* szSender,DWORD dwC
 		SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT,EM_REPLACESEL,FALSE,(LPARAM)m_szTextBoxBuffer); // Replace the selection with the message
 	}
 
-	nLen = SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT, EM_GETTEXTLENGTHEX, (WPARAM)&lpG, 0L);
+	nLen = (int)SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT, EM_GETTEXTLENGTHEX, (WPARAM)&lpG, 0L);
 	if (szMessage != NULL) //print the sender's message
 	{	
 		SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT,WM_GETTEXT, TEXTMAXSIZE-1,(LPARAM)m_szTextBoxBuffer);
@@ -368,7 +368,7 @@ void TextChat::SendLocalText(void)
 	tcm.length = Swap32IfLE(strlen(m_szLocalText));
 	//adzm 2010-09 - minimize packets. SendExact flushes the queue.
     m_pCC->m_socket->SendExactQueue((char *)&tcm, sz_rfbTextChatMsg, rfbTextChat);
-	m_pCC->m_socket->SendExact((char *)m_szLocalText, strlen(m_szLocalText));
+	m_pCC->m_socket->SendExact((char *)m_szLocalText, (const VCard)strlen(m_szLocalText));
 
 	//and we clear the input box
 	SetDlgItemText(m_hDlg, IDC_INPUTAREA_EDIT, "");

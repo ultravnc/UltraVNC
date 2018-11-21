@@ -942,7 +942,7 @@ LRESULT CALLBACK LowLevelMouseFilterProc(int nCode, WPARAM wParam, LPARAM lParam
 char * NameFromPath(const char *path)
 {
 	int x;
-	int l = strlen(path);
+	int l = (int)strlen(path);
 	char *temp = NULL;
 	
 	// Find the file part of a filename

@@ -92,7 +92,7 @@ int ExtendedClipboardDataMessage::GetMessageLength()
 
 int ExtendedClipboardDataMessage::GetDataLength()
 {
-	return m_pCurrentPos - m_pData;
+	return (int)(m_pCurrentPos - m_pData);
 }
 
 const BYTE* ExtendedClipboardDataMessage::GetData()

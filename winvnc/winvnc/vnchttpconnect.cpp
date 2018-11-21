@@ -288,7 +288,7 @@ void vncHTTPConnectThread::DoHTTP(VSocket *socket)
     if (filename[0] != '/')
 	{
 		vnclog.Print(LL_CONNERR, VNCLOG("filename didn't begin with '/'\n"));
-		socket->SendExactHTTP(HTTP_MSG_NOSUCHFILE, strlen(HTTP_MSG_NOSUCHFILE));
+		socket->SendExactHTTP(HTTP_MSG_NOSUCHFILE, (const VCard)strlen(HTTP_MSG_NOSUCHFILE));
 		return;
 	}
 
@@ -300,7 +300,7 @@ void vncHTTPConnectThread::DoHTTP(VSocket *socket)
 		vnclog.Print(LL_CLIENTS, VNCLOG("sending main page\n"));
 
 		// Send the OK notification message to the client
-		if (!socket->SendExactHTTP(HTTP_MSG_OK, strlen(HTTP_MSG_OK)))
+		if (!socket->SendExactHTTP(HTTP_MSG_OK, (const VCard)strlen(HTTP_MSG_OK)))
 			return;
 
 		// Compose the index page
@@ -341,7 +341,7 @@ void vncHTTPConnectThread::DoHTTP(VSocket *socket)
 		}
 
 		// Send the page
-		if (socket->SendExactHTTP(indexpage, strlen(indexpage)))
+		if (socket->SendExactHTTP(indexpage, (const VCard)strlen(indexpage)))
 			vnclog.Print(LL_INTINFO, VNCLOG("sent page\n"));
 
 		return;
@@ -394,7 +394,7 @@ void vncHTTPConnectThread::DoHTTP(VSocket *socket)
 			vnclog.Print(LL_INTINFO, VNCLOG("sending file...\n"));
 
 			// Send the OK message
-			if (!socket->SendExactHTTP(HTTP_MSG_OK, strlen(HTTP_MSG_OK)))
+			if (!socket->SendExactHTTP(HTTP_MSG_OK, (const VCard)strlen(HTTP_MSG_OK)))
 				return;
 
 			// Now send the entirety of the data to the client
@@ -451,7 +451,7 @@ void vncHTTPConnectThread::DoHTTP(VSocket *socket)
 			vnclog.Print(LL_INTINFO, VNCLOG("sending file...\n"));
 
 			// Send the OK message
-			if (!socket->SendExactHTTP(HTTP_MSG_OK, strlen(HTTP_MSG_OK)))
+			if (!socket->SendExactHTTP(HTTP_MSG_OK, (const VCard)strlen(HTTP_MSG_OK)))
 				return;
 
 			// Now send the entirety of the data to the client
@@ -466,7 +466,7 @@ void vncHTTPConnectThread::DoHTTP(VSocket *socket)
 	}
 
 	// Send the NoSuchFile notification message to the client
-	if (!socket->SendExactHTTP(HTTP_MSG_NOSUCHFILE, strlen(HTTP_MSG_NOSUCHFILE)))
+	if (!socket->SendExactHTTP(HTTP_MSG_NOSUCHFILE, (const VCard)strlen(HTTP_MSG_NOSUCHFILE)))
 		return;
 }
 

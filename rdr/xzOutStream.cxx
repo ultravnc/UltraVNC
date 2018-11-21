@@ -133,7 +133,7 @@ void xzOutStream::setUnderlying(OutStream* os)
 
 int xzOutStream::length()
 {
-  return offset + ptr - start;
+  return (int)(offset + ptr - start);
 }
 
 void xzOutStream::flush()
@@ -167,7 +167,7 @@ void xzOutStream::flush()
 		} while (ls->avail_out == 0);
 	}
 	
-	offset += ptr - start;
+	offset += (int)(ptr - start);
 	ptr = start;
 }
 
@@ -208,20 +208,20 @@ int xzOutStream::overrun(int itemSize, int nItems)
 		// output buffer not full
 
 		if (ls->avail_in == 0) {
-			offset += ptr - start;
+			offset += (int)(ptr - start);
 			ptr = start;
 		} else {
 			// but didn't consume all the data?  try shifting what's left to the
 			// start of the buffer.
 			fprintf(stderr,"lzma out buf not full, but in data not consumed\n");
 			memmove(start, ls->next_in, ptr - ls->next_in);
-			offset += ls->next_in - start;
+			offset += (int)(ls->next_in - start);
 			ptr -= ls->next_in - start;
 		}
 	}
 	
 	if (itemSize * nItems > end - ptr)
-		nItems = (end - ptr) / itemSize;
+		nItems = (int)((end - ptr) / itemSize);
 
 	return nItems;
 }

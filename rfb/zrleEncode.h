@@ -265,7 +265,7 @@ void ZRLE_ENCODE_TILE (PIXEL_T* data, int w, int h, rdr::OutStream* os)
       pix = *ptr++;
       while (*ptr == pix && ptr < end)
         ptr++;
-      int len = ptr - runStart;
+      int len = (int)(ptr - runStart);
       if (len <= 2 && usePalette) {
         int index = ph.lookup(pix);
         if (len == 2)

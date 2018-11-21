@@ -223,7 +223,7 @@ vncPropertiesPoll::Show(BOOL show, BOOL usersettings)
 				// Do the dialog box
 				// [v1.0.2-jp1 fix]
 				//int result = DialogBoxParam(hAppInstance,
-				int result = DialogBoxParam(hInstResDLL,
+				int result = (int)DialogBoxParam(hInstResDLL,
 				    MAKEINTRESOURCE(IDD_PROPERTIES), 
 				    NULL,
 				    (DLGPROC) DialogProcPoll,
@@ -852,7 +852,7 @@ vncPropertiesPoll::SaveInt(HKEY key, LPCSTR valname, LONG val)
 void
 vncPropertiesPoll::SaveString(HKEY key,LPCSTR valname, const char *buffer)
 {
-	RegSetValueEx(key, valname, 0, REG_BINARY, (LPBYTE) buffer, strlen(buffer)+1);
+	RegSetValueEx(key, valname, 0, REG_BINARY, (LPBYTE) buffer, (DWORD)(strlen(buffer)+1));
 }
 // [<--v1.0.2-jp2 fix]
 

@@ -66,7 +66,7 @@ void xzInStream::setUnderlying(InStream* is, int bytesIn_)
 
 int xzInStream::pos()
 {
-  return offset + ptr - start;
+  return (int)(offset + ptr - start);
 }
 
 void xzInStream::reset()
@@ -95,7 +95,7 @@ int xzInStream::overrun(int itemSize, int nItems)
   if (end - ptr != 0)
     memmove(start, ptr, end - ptr);
 
-  offset += ptr - start;
+  offset += (int)(ptr - start);
   end -= ptr - start;
   ptr = start;
 
@@ -104,7 +104,7 @@ int xzInStream::overrun(int itemSize, int nItems)
   }
 
   if (itemSize * nItems > end - ptr)
-    nItems = (end - ptr) / itemSize;
+    nItems = (int)((end - ptr) / itemSize);
 
   return nItems;
 }
@@ -133,7 +133,7 @@ void xzInStream::decompress()
 		throw Exception("lzmaOutStream: decompress failed");
 	}
 
-	bytesIn -= ls->next_in - underlying->getptr();
+	bytesIn -= (int)(ls->next_in - underlying->getptr());
 	end = ls->next_out;
 	underlying->setptr(ls->next_in);
 }

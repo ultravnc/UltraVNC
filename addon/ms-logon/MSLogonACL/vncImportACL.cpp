@@ -447,7 +447,7 @@ bool vncScanInput::Tokenize(const TCHAR *line, TCHAR **token){
 			line++; // Eat closing quote
 			break;
 		default:
-			len = GetWordLength(line);
+			len = (int)GetWordLength(line);
 			tokenCount = AddToken(token, tokenCount, &line, len);
 			break;
 		}
@@ -482,7 +482,7 @@ int vncScanInput::GetQuoteLength(const TCHAR *line){
     size_t len = 0;
 	if (eoq)
 		len = eoq - line;
-	return len;
+	return (int)len;
 }
 
 int vncScanInput::AddToken(TCHAR **token, int tokenCount, const TCHAR **line, int len){

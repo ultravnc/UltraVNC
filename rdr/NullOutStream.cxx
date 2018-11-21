@@ -37,7 +37,7 @@ NullOutStream::~NullOutStream()
 
 int NullOutStream::length()
 {
-  return offset + ptr - start;
+  return (int)(offset + ptr - start);
 }
 
 void NullOutStream::writeBytes(const void* data, int length)
@@ -50,11 +50,11 @@ int NullOutStream::overrun(int itemSize, int nItems)
   if (itemSize > bufferSize)
     throw Exception("NullOutStream overrun: max itemSize exceeded");
 
-  offset += ptr - start;
+  offset += (int)(ptr - start);
   ptr = start;
 
   if (itemSize * nItems > end - ptr)
-    nItems = (end - ptr) / itemSize;
+    nItems = (int)((end - ptr) / itemSize);
 
   return nItems;
 }

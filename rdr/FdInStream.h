@@ -41,7 +41,7 @@ namespace rdr {
     int getFd() { return fd; }
     int pos();
     void readBytes(void* data, int length);
-    int bytesInBuf() { return end - ptr; }
+    int bytesInBuf() { return (int)(end - ptr); }
 
     void startTiming();
     void stopTiming();

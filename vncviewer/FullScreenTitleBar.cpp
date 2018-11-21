@@ -308,7 +308,7 @@ LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg,
 				}
 
 				//Redraw window to show the new gfx...
-				::RedrawWindow(TitleBarThis->Pin, NULL, NULL, TRUE);
+				::RedrawWindow(TitleBarThis->Pin, NULL, NULL, RDW_INVALIDATE);
 			}
 
 			//If default = true we'll send usally showwindow and close messages

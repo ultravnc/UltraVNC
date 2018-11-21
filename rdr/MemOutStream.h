@@ -46,7 +46,7 @@ namespace rdr {
       ptr += length;
     }
 
-    int length() { return ptr - start; }
+    int length() { return (int)(ptr - start); }
     void clear() { ptr = start; };
     void reposition(int pos) { ptr = start + pos; }
 
@@ -60,9 +60,9 @@ namespace rdr {
     // size itemSize bytes.
 
     int overrun(int itemSize, int nItems) {
-      int len = ptr - start + itemSize * nItems;
+      int len = (int)(ptr - start + itemSize * nItems);
       if (len < (end - start) * 2)
-        len = (end - start) * 2;
+        len = (int)((end - start) * 2);
 
       U8* newStart = new U8[len];
       memcpy(newStart, start, ptr - start);

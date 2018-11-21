@@ -47,7 +47,7 @@ namespace rdr {
         if (ptr + itemSize > end)
           return overrun(itemSize, nItems);
 
-        nItems = (end - ptr) / itemSize;
+        nItems = (int)((end - ptr) / itemSize);
       }
       return nItems;
     }
@@ -90,7 +90,7 @@ namespace rdr {
       U8* dataPtr = (U8*)data;
       U8* dataEnd = dataPtr + length;
       while (dataPtr < dataEnd) {
-        int n = check(1, dataEnd - dataPtr);
+        int n = check(1, (int)(dataEnd - dataPtr));
         memcpy(dataPtr, ptr, n);
         ptr += n;
         dataPtr += n;

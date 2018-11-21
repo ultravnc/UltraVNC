@@ -458,7 +458,7 @@ public:
     }
 
 	void TriggerUpdate();
-	UINT				m_retry_timeout;
+    UINT_PTR 	m_retry_timeout;
 	bool OS_Shutdown;
 	void StopReconnectAll();
 

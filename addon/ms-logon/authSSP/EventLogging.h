@@ -21,6 +21,8 @@
 // which you received this file, check 
 // http://www.uvnc.com
 
+#define _CRT_NON_CONFORMING_SWPRINTFS 1
+
 #include <windows.h>
 #include <stdio.h>
 #include <lmcons.h>

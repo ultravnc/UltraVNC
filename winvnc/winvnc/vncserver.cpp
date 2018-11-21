@@ -1005,7 +1005,7 @@ vncServer::AuthClientCount()
 {
 	//omni_mutex_lock l(m_clientsLock,28);
 
-	return m_authClients.size();
+	return (UINT)m_authClients.size();
 }
 
 UINT
@@ -1013,7 +1013,7 @@ vncServer::UnauthClientCount()
 {
 	//omni_mutex_lock l(m_clientsLock,30);
 
-	return m_unauthClients.size();
+	return (UINT)m_unauthClients.size();
 }
 
 BOOL
@@ -1934,7 +1934,7 @@ vncServer::VerifyHost(const char *hostname) {
 	vncServer::AcceptQueryReject patternType = vncServer::aqrReject;
 	UINT authHostsPos = 0;
 	UINT patternStart = 0;
-	UINT hostNameLen = strlen(hostname);
+	UINT hostNameLen = (UINT)strlen(hostname);
 
 	// Run through the auth hosts string until we hit the end
 	if (m_auth_hosts) {

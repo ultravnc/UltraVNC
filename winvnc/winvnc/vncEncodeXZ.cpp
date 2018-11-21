@@ -124,7 +124,7 @@ UINT vncEncodeXZ::EncodeBulkRects(const rfb::RectVector &allRects, BYTE *source,
 	mos->clear();
 	xzos->setUnderlying(mos);
 	
-	int nAllRects = allRects.size();
+	int nAllRects = (int)allRects.size();
 
 	rfb::RectVector::const_iterator i;
 

@@ -24,6 +24,7 @@
 // the authors on vnc@uk.research.att.com for information on obtaining it.
 
 
+#define _WINSOCK_DEPRECATED_NO_WARNINGS 1
 // vncMenu
 
 // Implementation of a system tray icon & menu for WinVNC
@@ -791,7 +792,7 @@ vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 	if (m_nid.uFlags & NIF_TIP) {
 	    strncat(m_nid.szTip, " - ", (sizeof(m_nid.szTip)-1)-strlen(m_nid.szTip));
 	    if (m_server->SockConnected()) {
-			unsigned long tiplen = strlen(m_nid.szTip);
+			unsigned long tiplen = (ULONG)strlen(m_nid.szTip);
 			char *tipptr = ((char *)&m_nid.szTip) + tiplen;
 			GetIPAddrString(tipptr, sizeof(m_nid.szTip) - tiplen);
 	    }
@@ -2099,7 +2100,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			{
 				// Get the IP address stringified
 				struct in_addr address;
-				address.S_un.S_addr = lParam;
+				address.S_un.S_addr = (ULONG)lParam;
 				char *name = inet_ntoa(address);
 				if (name == 0)
 					return 0;

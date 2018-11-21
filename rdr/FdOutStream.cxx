@@ -81,14 +81,14 @@ void FdOutStream::writeBytes(const void* data, int length)
 
 int FdOutStream::length()
 {
-  return offset + ptr - start;
+  return (int)(offset + ptr - start);
 }
 
 void FdOutStream::flush()
 {
   U8* sentUpTo = start;
   while (sentUpTo < ptr) {
-    int n = write(fd, (const void*) sentUpTo, ptr - sentUpTo);
+    int n = write(fd, (const void*) sentUpTo, (int)(ptr - sentUpTo));
 
     if (n < 0) throw SystemException("write",errno);
 
@@ -108,7 +108,7 @@ int FdOutStream::overrun(int itemSize, int nItems)
   flush();
 
   if (itemSize * nItems > end - ptr)
-    nItems = (end - ptr) / itemSize;
+    nItems = (int)((end - ptr) / itemSize);
 
   return nItems;
 }

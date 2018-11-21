@@ -658,7 +658,7 @@ vncClientUpdateThread::run_undetached(void *arg)
 							(BYTE *) &message, sizeof(message))) {
 							m_client->m_socket->Close();
 						}
-						if (!m_client->m_socket->SendExactQueue(unixtext, strlen(unixtext)))
+						if (!m_client->m_socket->SendExactQueue(unixtext, (const VCard)strlen(unixtext)))
 							m_client->m_socket->Close();
 						delete[] unixtext;
 					}
@@ -1076,7 +1076,7 @@ void vncClientThread::SendConnFailed(const char* szMessage)
 	CARD32 errlen = Swap32IfLE(strlen(szMessage));
 	if (!m_socket->SendExactQueue((char *)&errlen, sizeof(errlen)))
 		return;
-	m_socket->SendExact(szMessage, strlen(szMessage));
+	m_socket->SendExact(szMessage, (const VCard)strlen(szMessage));
 }
 
 void vncClientThread::LogAuthResult(bool success)
@@ -1388,7 +1388,7 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth)
 		CARD32 auth_message_length = Swap32IfLE(auth_message.length());
 		if (!m_socket->SendExactQueue((char *)&auth_message_length, sizeof(auth_message_length)))
 			return FALSE;
-		if (!m_socket->SendExact(auth_message.c_str(), auth_message.length()))
+		if (!m_socket->SendExact(auth_message.c_str(), (const VCard)auth_message.length()))
 			return FALSE;
 		return FALSE;
 	}
@@ -1400,7 +1400,7 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth)
 		CARD32 auth_message_length = Swap32IfLE(auth_message.length());
 		if (!m_socket->SendExactQueue((char *)&auth_message_length, sizeof(auth_message_length)))
 			return FALSE;
-		if (!m_socket->SendExact(auth_message.c_str(), auth_message.length()))
+		if (!m_socket->SendExact(auth_message.c_str(), (const VCard)auth_message.length()))
 			return FALSE;
 		return FALSE;
 	}
@@ -1654,7 +1654,7 @@ BOOL vncClientThread::AuthSecureVNCPlugin_old(std::string& auth_message)
 	const char* plainPassword = plain;
 
 	if (!m_ms_logon && plainPassword && strlen(plainPassword) > 0) {
-		m_socket->GetIntegratedPlugin()->SetPasswordData((const BYTE*)plainPassword, strlen(plainPassword));
+		m_socket->GetIntegratedPlugin()->SetPasswordData((const BYTE*)plainPassword, (int)strlen(plainPassword));
 	}
 
 	int nSequenceNumber = 0;
@@ -1842,7 +1842,7 @@ BOOL vncClientThread::AuthSCPrompt(std::string& auth_message)
 	// Check if viewer accept connection
 	char mytext[1024];
 	getinfo(mytext);
-	int size=strlen(mytext);
+	int size=(int)strlen(mytext);
 	//adzm 2010-09 - minimize packets. SendExact flushes the queue.
 	if (!m_socket->SendExactQueue((char *)&size, sizeof(int)))
 		return FALSE;
@@ -2334,7 +2334,7 @@ vncClientThread::run(void *arg)
 	server_ini.format.greenMax = Swap16IfLE(server_ini.format.greenMax);
 	server_ini.format.blueMax = Swap16IfLE(server_ini.format.blueMax);
 
-	CARD32 nNameLength = strlen(desktopname);
+	CARD32 nNameLength = (CARD32)strlen(desktopname);
 
 	server_ini.nameLength = Swap32IfLE(nNameLength);
 
@@ -3475,7 +3475,7 @@ vncClientThread::run(void *arg)
 							break;
 						}
 						
-						int len = strlen(text);
+						int len = (int)strlen(text);
 						winStr = new char[len*2+1];
 
 						int j = 0;
@@ -3804,7 +3804,7 @@ vncClientThread::run(void *arg)
 						ft.length = Swap32IfLE(strlen(m_client->m_szFullDestName));
 						//adzm 2010-09 - minimize packets. SendExact flushes the queue.
 						m_socket->SendExactQueue((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
-						m_socket->SendExact((char *)m_client->m_szFullDestName, strlen(m_client->m_szFullDestName));
+						m_socket->SendExact((char *)m_client->m_szFullDestName, (const VCard)strlen(m_client->m_szFullDestName));
 
 						if (dwDstSize == 0xFFFFFFFF)
 						{
@@ -4110,7 +4110,7 @@ vncClientThread::run(void *arg)
 									//adzm 2010-09 - minimize packets. SendExact flushes the queue.
 									m_socket->SendExactQueue((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
 									// sf@2004 - Also send back the full directory path to the viewer (necessary for Shorcuts)
-									m_socket->SendExactQueue((char *)szDir, strlen(szDir)-1);
+									m_socket->SendExactQueue((char *)szDir, (const VCard)(strlen(szDir)-1));
 
 
 									while ( fRet )
@@ -4233,7 +4233,7 @@ vncClientThread::run(void *arg)
                                     if (isDir)
                                         newname = AddDirPrefixAndSuffix(szFile);
 
-                                    length = newname.length()+1;
+                                    length = (UINT)(newname.length()+1);
 									BOOL fRet = DeleteFileOrDirectory(szFile);
 
 									rfbFileTransferMsg ft;
@@ -4757,10 +4757,10 @@ vncClient::NotifyUpdate(rfbFramebufferUpdateRequestMsg fur)
 		update.br.x = update.tl.x + Swap16IfLE(fur.w) * m_nScale;
 		update.br.y = update.tl.y + Swap16IfLE(fur.h) * m_nScale;
 		// Verify max size, scaled changed on server while not pushed to viewer
-		if (update.tl.x< ((m_ScaledScreen.tl.x + monitor_Offsetx) * m_nScale)) update.tl.x = (m_ScaledScreen.tl.x + monitor_Offsetx) * m_nScale;
-		if (update.tl.y < ((m_ScaledScreen.tl.y + monitor_Offsety) * m_nScale)) update.tl.y = (m_ScaledScreen.tl.y + monitor_Offsety) * m_nScale;
-		if (update.br.x > (update.tl.x + (m_ScaledScreen.br.x-m_ScaledScreen.tl.x) * m_nScale)) update.br.x = update.tl.x + (m_ScaledScreen.br.x-m_ScaledScreen.tl.x) * m_nScale;
-		if (update.br.y > (update.tl.y + (m_ScaledScreen.br.y-m_ScaledScreen.tl.y) * m_nScale)) update.br.y = update.tl.y + (m_ScaledScreen.br.y-m_ScaledScreen.tl.y) * m_nScale;
+		if (update.tl.x < (int)((m_ScaledScreen.tl.x + monitor_Offsetx) * m_nScale)) update.tl.x = (m_ScaledScreen.tl.x + monitor_Offsetx) * m_nScale;
+		if (update.tl.y < (int)((m_ScaledScreen.tl.y + monitor_Offsety) * m_nScale)) update.tl.y = (m_ScaledScreen.tl.y + monitor_Offsety) * m_nScale;
+		if (update.br.x > (int)(update.tl.x + (m_ScaledScreen.br.x-m_ScaledScreen.tl.x) * m_nScale)) update.br.x = update.tl.x + (m_ScaledScreen.br.x-m_ScaledScreen.tl.x) * m_nScale;
+		if (update.br.y > (int)(update.tl.y + (m_ScaledScreen.br.y-m_ScaledScreen.tl.y) * m_nScale)) update.br.y = update.tl.y + (m_ScaledScreen.br.y-m_ScaledScreen.tl.y) * m_nScale;
 		rfb::Region2D update_rgn = update;
 
 		//fullscreeen request, make it independed of the incremental rectangle
@@ -5118,7 +5118,7 @@ vncClient::SendUpdate(rfb::SimpleUpdateTracker &update)
 	// up by codings such as CoRRE.
 	int updates = 0;
 	int numsubrects = 0;
-	updates += update_info.copied.size();
+	updates += (int)update_info.copied.size();
 	if (m_encodemgr.IsCacheEnabled())
 	{
 		if (update_info.cached.size() > 5)
@@ -5127,7 +5127,7 @@ vncClient::SendUpdate(rfb::SimpleUpdateTracker &update)
 		}
 		else 
 		{
-			updates += update_info.cached.size();
+			updates += (int)update_info.cached.size();
 			//vnclog.Print(LL_INTERR, "cached %d\n", updates);
 		}
 	}
@@ -5653,7 +5653,7 @@ BOOL vncClient::SendCacheZip(const rfb::RectVector &rects)
 {
 	//int totalCompDataLen = 0;
 
-	int nNbCacheRects = rects.size();
+	int nNbCacheRects = (int)rects.size();
 	if (!nNbCacheRects) return true;
 	unsigned long rawDataSize = nNbCacheRects * sz_rfbRectangle;
 	unsigned long maxCompSize = (rawDataSize + (rawDataSize/100) + 8);
@@ -6647,7 +6647,7 @@ int  vncClient::filetransferrequestPart2(int nDirZipRet)
 		ft.length = Swap32IfLE(strlen(m_szSrcFileName));
 		//adzm 2010-09 - minimize packets. SendExact flushes the queue.
 		m_socket->SendExactQueue((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
-		m_socket->SendExactQueue((char *)m_szSrcFileName, strlen(m_szSrcFileName));
+		m_socket->SendExactQueue((char *)m_szSrcFileName, (const VCard)strlen(m_szSrcFileName));
 		// 2 May 2008 jdp send the highpart too, else the client will hang
 		// sf@2004 - Improving huge file size handling
 		// TODO: what if we're speaking the old protocol, how can we tell? 
@@ -6744,7 +6744,7 @@ int  vncClient::filetransferrequestPart2(int nDirZipRet)
 	ft.length = Swap32IfLE(strlen(m_szSrcFileName));
 	//adzm 2010-09 - minimize packets. SendExact flushes the queue.
 	m_socket->SendExactQueue((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
-	m_socket->SendExactQueue((char *)m_szSrcFileName, strlen(m_szSrcFileName));
+	m_socket->SendExactQueue((char *)m_szSrcFileName, (const VCard)strlen(m_szSrcFileName));
 
 	// sf@2004 - Improving huge file size handling
 	CARD32 sizeH = Swap32IfLE(n2SrcSize.HighPart);

@@ -85,7 +85,7 @@ FdInStream::~FdInStream()
 
 int FdInStream::pos()
 {
-  return offset + ptr - start;
+  return (int)(offset + ptr - start);
 }
 
 void FdInStream::readBytes(void* data, int length)
@@ -102,7 +102,7 @@ void FdInStream::readBytes(void* data, int length)
 	
 	U8* dataPtr = (U8*)data;
 	
-	int	n = end - ptr;
+	int	n = (int)(end - ptr);
 	if (n > length) n = length;
 	
 	memcpy(dataPtr, ptr, n);
@@ -127,17 +127,17 @@ int FdInStream::overrun(int itemSize, int nItems)
   if (end - ptr != 0)
     memmove(start, ptr, end - ptr);
 
-  offset += ptr - start;
+  offset += (int)(ptr - start);
   end -= ptr - start;
   ptr = start;
 
   while (end < start + itemSize) {
-    int n = readWithTimeoutOrCallback((U8*)end, start + bufSize - end);
+    int n = readWithTimeoutOrCallback((U8*)end, (int)(start + bufSize - end));
     end += n;
   }
 
   if (itemSize * nItems > end - ptr)
-    nItems = (end - ptr) / itemSize;
+    nItems = (int)((end - ptr) / itemSize);
 
   return nItems;
 }

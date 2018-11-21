@@ -342,7 +342,7 @@ vncProperties::ShowAdmin(BOOL show, BOOL usersettings)
 				// Do the dialog box
 				// [v1.0.2-jp1 fix]
 				//int result = DialogBoxParam(hAppInstance,
-				int result = DialogBoxParam(hInstResDLL,
+				int result = (int)DialogBoxParam(hInstResDLL,
 				    MAKEINTRESOURCE(IDD_PROPERTIES1), 
 				    NULL,
 				    (DLGPROC) DialogProc,
@@ -742,8 +742,8 @@ vncProperties::DialogProc(HWND hwnd,
 				int lenPassword = GetDlgItemText(hwnd, IDC_PASSWORD, (LPSTR) &passwd, MAXPWLEN+1);				
 				int lenPassword2 = GetDlgItemText(hwnd, IDC_PASSWORD2, (LPSTR)&passwd2, MAXPWLEN + 1); //PGM
 
-
-				if (Secure_old != _this->m_server->Secure()) {
+                bool bSecure = _this->m_server->Secure() ? true : false;
+				if (Secure_old != bSecure) {
 					//We changed the method to save the password
 					//load passwords and encrypt the other method
 					char password[MAXPWLEN];
@@ -756,8 +756,8 @@ vncProperties::DialogProc(HWND hwnd,
 					memset(passwd2, '\0', MAXPWLEN + 1); //PGM
 					strcpy(passwd,plain);
 					strcpy(passwd2, plain2);
-					lenPassword = strlen(passwd);
-					lenPassword2 = strlen(passwd2);
+					lenPassword = (int)strlen(passwd);
+					lenPassword2 = (int)strlen(passwd2);
 				}
 				
 				if (strcmp(passwd, "~~~~~~~~") != 0) {
@@ -797,7 +797,7 @@ vncProperties::DialogProc(HWND hwnd,
 				} 
 
 				// Save the new settings to the server
-				int state = SendDlgItemMessage(hwnd, IDC_PORTNO_AUTO, BM_GETCHECK, 0, 0);
+				int state = (int)SendDlgItemMessage(hwnd, IDC_PORTNO_AUTO, BM_GETCHECK, 0, 0);
 				_this->m_server->SetAutoPortSelect(state == BST_CHECKED);
 
 				// Save port numbers if we're not auto selecting
@@ -2037,7 +2037,7 @@ vncProperties::SavePassword2(HKEY key, char *buffer) //PGM
 void
 vncProperties::SaveString(HKEY key,LPCSTR valname, const char *buffer)
 {
-	RegSetValueEx(key, valname, 0, REG_BINARY, (LPBYTE) buffer, strlen(buffer)+1);
+	RegSetValueEx(key, valname, 0, REG_BINARY, (LPBYTE) buffer, (DWORD)(strlen(buffer)+1));
 }
 
 void

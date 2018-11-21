@@ -33,7 +33,7 @@ namespace rdr {
       end = start + len;
     }
 
-    int pos() { return ptr - start; }
+    int pos() { return (int)(ptr - start); }
     void reposition(int pos) { ptr = start + pos; }
 
   private:
