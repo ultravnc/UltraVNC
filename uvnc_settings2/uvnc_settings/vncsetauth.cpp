@@ -259,7 +259,7 @@ vncSetAuth::DialogProc(HWND hwnd,
 {
 	// We use the dialog-box's USERDATA to store a _this pointer
 	// This is set only once WM_INITDIALOG has been recieved, though!
-#ifndef _WIN64
+#ifndef _X64
 	vncSetAuth *_this = (vncSetAuth *) GetWindowLong(hwnd, GWL_USERDATA);
 #else
 	vncSetAuth *_this = (vncSetAuth *) GetWindowLongPtr(hwnd, GWLP_USERDATA);
@@ -272,7 +272,7 @@ vncSetAuth::DialogProc(HWND hwnd,
 		{
 			// Retrieve the Dialog box parameter and use it as a pointer
 			// to the calling vncProperties object
-			#ifndef _WIN64
+			#ifndef _X64
 				SetWindowLong(hwnd, GWL_USERDATA, lParam);
 			#else
 				SetWindowLongPtr(hwnd, GWLP_USERDATA, lParam);
