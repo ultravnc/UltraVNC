@@ -73,7 +73,7 @@ void *vncSockConnectThread::run_undetached(void * arg)
 {
 	vnclog.Print(LL_STATE, VNCLOG("started socket connection thread\n"));
 	// Go into a loop, listening for connections on the given socket
-	while (!m_shutdown)
+	while (!m_shutdown && !fShutdownOrdered)
 	{
 		// Accept an incoming connection
 		VSocket *new_socket = m_socket->Accept();
@@ -92,10 +92,11 @@ void *vncSockConnectThread::run_undetached(void * arg)
 			}
 
 			vnclog.Print(LL_CLIENTS, VNCLOG("accepted connection from %s\n"), new_socket->GetPeerName());
-			if (!m_shutdown && !fShutdownOrdered) m_server->AddClient(new_socket, FALSE, FALSE,NULL,false);
+			if (!m_shutdown && !fShutdownOrdered) 
+				m_server->AddClient(new_socket, FALSE, FALSE,NULL,false);
 		}
 
-		if (m_shutdown) 
+		if (m_shutdown || fShutdownOrdered) 
 		{
 			delete new_socket;
 			break;

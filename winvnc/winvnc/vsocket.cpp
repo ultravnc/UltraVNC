@@ -136,7 +136,7 @@ VSocket::VSocket()
 	sock4 = -1;
 	sock6 = -1;
 #else
-	sock = -1;
+	sock = INVALID_SOCKET;
 
 #endif
 	vnclog.Print(LL_SOCKINFO, VNCLOG("VSocket() m_pDSMPlugin = NULL \n"));
@@ -367,7 +367,7 @@ VSocket::Create()
 {
   const int one = 1;
   // Check that the old socket was closed
-  if (sock >= 0)
+  if (sock != INVALID_SOCKET)
     Close();
 
   // Create the socket
@@ -489,6 +489,7 @@ VSocket::Shutdown()
 	  vnclog.Print(LL_SOCKINFO, VNCLOG("shutdown socket\n"));
 
 	  shutdown(sock, SD_BOTH);
+	  closesocket(sock);
 //	  sock = -1;
     }
   return VTrue;
@@ -1233,8 +1234,6 @@ VSocket::SetDefaultSocketOptions()
 			}
 		}
 	}
-
-	assert(result);
 	return result;
 } 
 #endif

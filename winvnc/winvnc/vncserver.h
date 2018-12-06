@@ -164,6 +164,7 @@ public:
 	int					m_autocapt;
 
 	virtual void ShutdownServer();
+	HANDLE retryThreadHandle;
 
 protected:
 	// Send a notification message
@@ -421,8 +422,8 @@ public:
 	virtual void AutoReconnectAdr(char* szAdr){strcpy_s(m_szAutoReconnectAdr,255, szAdr);}
 	virtual void AutoReconnectId(char* szId){strcpy_s(m_szAutoReconnectId,MAX_PATH, szId);}
 	virtual void AutoConnectRetry( );
-	static void CALLBACK _timerRetryHandler( HWND /*hWnd*/, UINT /*uMsg*/, UINT_PTR /*idEvent*/, DWORD /*dwTime*/ );
-	void _actualTimerRetryHandler();
+	void actualRetryThread();
+	VSocket *retrysock;
 
 	// sf@2007 - Vista / XP FUS special modes
 	virtual BOOL RunningFromExternalService(){return m_fRunningFromExternalService;};
@@ -458,7 +459,7 @@ public:
     }
 
 	void TriggerUpdate();
-    UINT_PTR 	m_retry_timeout;
+
 	bool OS_Shutdown;
 	void StopReconnectAll();
 
