@@ -106,8 +106,8 @@ void DeskDupEngine::videoDriver_start(int x, int y, int w, int h)
 
 	if (hFileMapBitmap != NULL)
 		return;
-	hFileMapBitmap = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, size, g_szIPCSharedMMFBitmap);
-	if (hFileMapBitmap != NULL)
+	//hFileMapBitmap = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, size, g_szIPCSharedMMFBitmap);
+	if (hFileMapBitmap == NULL)
 		hFileMapBitmap = OpenFileMapping(FILE_MAP_READ | FILE_MAP_WRITE, FALSE, g_szIPCSharedMMFBitmap);
 	if (hFileMapBitmap == NULL)
 		return;
@@ -143,18 +143,26 @@ void DeskDupEngine::videoDriver_Stop()
 	OutputDebugString(szText);
 #endif
 	if (!init)
-		return;
-	StopW8();
+		return;	
 	if (fileView)
 		UnmapViewOfFile(fileView);
+	fileView = NULL;
 	if (hFileMap != NULL)
 		CloseHandle(hFileMap);
 	hFileMap = NULL;
 	if (fileViewBitmap)
 		UnmapViewOfFile((LPVOID)fileViewBitmap);
+	fileViewBitmap = NULL;
 	if (hFileMapBitmap != NULL)
 		CloseHandle(hFileMapBitmap);
 	hFileMapBitmap = NULL;
+	if (hScreenEvent != NULL)
+		CloseHandle(hScreenEvent);
+	if (hPointerEvent != NULL)	
+		CloseHandle(hPointerEvent);
+	hScreenEvent = NULL;
+	hPointerEvent = NULL;
+	StopW8();
 }
 //-----------------------------------------------------------
 void DeskDupEngine::Lock()
