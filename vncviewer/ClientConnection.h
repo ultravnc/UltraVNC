@@ -431,7 +431,7 @@ private:
 	
 	
 	void ReadExactProxy(char *buf, int bytes);
-	void ReadString(char *buf, int length);
+	void ReadString(char *buf, unsigned int length);
 
 	int Send(const char *buff, const unsigned int bufflen,int timeout);
 	//adzm 2010-09

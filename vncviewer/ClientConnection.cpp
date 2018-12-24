@@ -3956,6 +3956,7 @@ void ClientConnection::SetFormatAndEncodings()
 	// Set pixel format to myFormat
 
 	rfbSetPixelFormatMsg spf;
+	memset(&spf, 0, sizeof(spf));
 
     spf.type = rfbSetPixelFormat;
     spf.format = m_myFormat;
@@ -4818,6 +4819,7 @@ ClientConnection::SendKeyEvent(CARD32 key, bool down)
 	if (m_pTextChat->m_fTextChatRunning && m_pTextChat->m_fVisible) return;
 
     rfbKeyEventMsg ke;
+	memset(&ke, 0, sizeof(ke));
 
     ke.type = rfbKeyEvent;
     ke.down = down ? 1 : 0;
@@ -4861,6 +4863,7 @@ void ClientConnection::SendClientCutText(char *str, int len)
 	m_clipboard.m_strLastCutText = strStr;
 
 	rfbClientCutTextMsg cct;
+	memset(&cct, 0, sizeof(cct));
 
 	cct.type = rfbClientCutText;
 	cct.length = Swap32IfLE(len);
@@ -5469,6 +5472,7 @@ void ClientConnection::Internal_SendAppropriateFramebufferUpdateRequest()
 bool ClientConnection::SendServerScale(int nScale)
 {
     rfbSetScaleMsg ssc;
+	memset(&ssc, 0, sizeof(ssc));
 
 
     ssc.type = rfbSetScale;
@@ -5485,6 +5489,7 @@ bool ClientConnection::SendServerScale(int nScale)
 bool ClientConnection::SendServerInput(BOOL enabled)
 {
     rfbSetServerInputMsg sim;
+	memset(&sim, 0, sizeof(sim));
 
 
     sim.type = rfbSetServerInput;
@@ -5501,6 +5506,7 @@ bool ClientConnection::SendServerInput(BOOL enabled)
 bool ClientConnection::SendSW(int x, int y)
 {
     rfbSetSWMsg sw;
+	memset(&sw, 0, sizeof(sw));
 
 	if (x==9999 && y==9999)
 	{
@@ -6488,7 +6494,7 @@ void ClientConnection::ReadExactProxy(char *inbuf, int wanted)
 }
 
 // Read the number of bytes and return them zero terminated in the buffer
-/*inline*/ void ClientConnection::ReadString(char *buf, int length)
+/*inline*/ void ClientConnection::ReadString(char *buf, unsigned int length)
 {
 	if (length > 0)
 		ReadExact(buf, length);
