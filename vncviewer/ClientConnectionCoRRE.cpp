@@ -31,7 +31,8 @@
 #include "stdhdrs.h"
 #include "vncviewer.h"
 #include "ClientConnection.h"
-
+#include "Exception.h"
+extern char sz_L70[64];
 
 void ClientConnection::ReadCoRRERect(rfbFramebufferUpdateRectHeader *pfburh)
 {
@@ -61,6 +62,8 @@ void ClientConnection::ReadCoRRERect(rfbFramebufferUpdateRectHeader *pfburh)
 	FillSolidRect_ultra(pfburh->r.x, pfburh->r.y, pfburh->r.w, pfburh->r.h, m_myFormat.bitsPerPixel,pcolor);
 
     if (prreh->nSubrects == 0) return;
+	if (prreh->nSubrects > 20000000) 
+		throw ErrorException(sz_L70);
 
 	// Draw the sub-rectangles
     rfbCoRRERectangle *pRect;
