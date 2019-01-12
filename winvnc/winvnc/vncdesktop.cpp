@@ -2406,7 +2406,8 @@ BOOL vncDesktop::InitVideoDriver()
 			vnclog.Print(LL_INTERR, VNCLOG("Driver Used\n"));
 			vnclog.Print(LL_INTERR, VNCLOG("Shared memory mapped\n"));
 			InvalidateRect(NULL, NULL, TRUE);
-
+			trigger_events[6] = m_screenCapture->getHScreenEvent();
+			trigger_events[7] = m_screenCapture->getHPointerEvent();	
 			return true;
 		}
 	return true;

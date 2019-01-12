@@ -88,12 +88,11 @@ void DeskDupEngine::videoDriver_start(int x, int y, int w, int h)
 			vnclog.Print(LL_INTWARN, VNCLOG("DDengine failed, not supported by video driver\n"));
 			return;
 		}
+	Sleep(1000);
 
 	if (hFileMap != NULL)
 		return;
-	hFileMap = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, sizeof(CHANGES_BUF), g_szIPCSharedMMF);
-	if (hFileMap == NULL)
-		hFileMap = OpenFileMapping(FILE_MAP_READ | FILE_MAP_WRITE, FALSE, g_szIPCSharedMMF);
+	hFileMap = OpenFileMapping(FILE_MAP_READ | FILE_MAP_WRITE, FALSE, g_szIPCSharedMMF);
 	if (hFileMap == NULL)
 		return;
 
@@ -106,9 +105,7 @@ void DeskDupEngine::videoDriver_start(int x, int y, int w, int h)
 
 	if (hFileMapBitmap != NULL)
 		return;
-	//hFileMapBitmap = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, size, g_szIPCSharedMMFBitmap);
-	if (hFileMapBitmap == NULL)
-		hFileMapBitmap = OpenFileMapping(FILE_MAP_READ | FILE_MAP_WRITE, FALSE, g_szIPCSharedMMFBitmap);
+	hFileMapBitmap = OpenFileMapping(FILE_MAP_READ | FILE_MAP_WRITE, FALSE, g_szIPCSharedMMFBitmap);
 	if (hFileMapBitmap == NULL)
 		return;
 
@@ -118,17 +115,13 @@ void DeskDupEngine::videoDriver_start(int x, int y, int w, int h)
 
 	if (hScreenEvent != NULL)
 		return;
-	hScreenEvent = CreateEvent(NULL, false, false, g_szIPCSharedEvent);
-	if (hScreenEvent == NULL)
-		hScreenEvent = OpenEvent(EVENT_ALL_ACCESS, false, g_szIPCSharedEvent);
+	hScreenEvent = OpenEvent(EVENT_ALL_ACCESS, false, g_szIPCSharedEvent);
 	if (hScreenEvent == NULL)
 		return;
 
 	if (hPointerEvent != NULL)
 		return;
-	hPointerEvent = CreateEvent(NULL, false, false, g_szIPCSharedPointerEvent);
-	if (hPointerEvent == NULL)
-		hPointerEvent = OpenEvent(EVENT_ALL_ACCESS, false, g_szIPCSharedPointerEvent);
+	hPointerEvent = OpenEvent(EVENT_ALL_ACCESS, false, g_szIPCSharedPointerEvent);
 	if (hPointerEvent == NULL)
 		return;
 
