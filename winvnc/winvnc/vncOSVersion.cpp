@@ -70,6 +70,7 @@ VNC_OSVersion::VNC_OSVersion()
 	OSVERSIONINFO OSversion;	
 	OSversion.dwOSVersionInfoSize=sizeof(OSVERSIONINFO);
 	GetVersionEx(&OSversion);
+
 	switch(OSversion.dwPlatformId)
 	{
 		case VER_PLATFORM_WIN32_NT:
@@ -124,9 +125,10 @@ VNC_OSVersion::SetAeroState()
 bool
 VNC_OSVersion::CaptureAlphaBlending()
 {
-	if (OS_LAYER_ON==false) return false;
+	if (OS_LAYER_ON == false) return false;
 	if (OS_XP) return true;
-	if ((OS_WIN7 || OS_VISTA) && OS_AERO_ON==false) return true;
+	if ((OS_WIN7 || OS_VISTA) && OS_AERO_ON == false) return true;
+	if (OS_LAYER_ON == true && OS_AERO_ON == false) return true; //WINPE
 	return false;
 }
 
