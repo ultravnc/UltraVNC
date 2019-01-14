@@ -88,7 +88,6 @@ void DeskDupEngine::videoDriver_start(int x, int y, int w, int h)
 			vnclog.Print(LL_INTWARN, VNCLOG("DDengine failed, not supported by video driver\n"));
 			return;
 		}
-	Sleep(1000);
 
 	if (hFileMap != NULL)
 		return;
