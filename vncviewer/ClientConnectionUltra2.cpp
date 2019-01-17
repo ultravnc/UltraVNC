@@ -218,6 +218,6 @@ void ClientConnection::ReadUltra2Rect(rfbFramebufferUpdateRectHeader *pfburh) {
 
 	SoftCursorLockArea(pfburh->r.x, pfburh->r.y,pfburh->r.w,pfburh->r.h);
 	if (!Check_Rectangle_borders(pfburh->r.x, pfburh->r.y,pfburh->r.w,pfburh->r.h)) return;
-	if (m_DIBbits) ConvertAll(pfburh->r.w,pfburh->r.h,pfburh->r.x, pfburh->r.y,m_myFormat.bitsPerPixel/8,(BYTE *)m_zlibbuf,(BYTE *)m_DIBbits,m_si.framebufferWidth);
+	if (m_DIBbits) ConvertAll_secure(pfburh->r.w,pfburh->r.h,pfburh->r.x, pfburh->r.y,m_myFormat.bitsPerPixel/8,(BYTE *)m_zlibbuf,(BYTE *)m_DIBbits,m_si.framebufferWidth, numRawBytes, m_si.framebufferHeight);
 
 }

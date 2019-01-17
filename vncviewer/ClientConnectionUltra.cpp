@@ -49,11 +49,12 @@ void ClientConnection::ReadUltraRect(rfbFramebufferUpdateRectHeader *pfburh) {
 	// Read in the compressed data
     CheckBufferSize(numCompBytes);
 	ReadExact(m_netbuf, numCompBytes);
-	CheckZlibBufferSize(numRawBytes);
+	CheckZlibBufferSize(numRawBytes+ 500);
+	new_len = numRawBytes + 500;
 	lzo1x_decompress((BYTE*)m_netbuf,numCompBytes,(BYTE*)m_zlibbuf,&new_len,NULL);
 	SoftCursorLockArea(pfburh->r.x, pfburh->r.y,pfburh->r.w,pfburh->r.h);
 	if (!Check_Rectangle_borders(pfburh->r.x, pfburh->r.y,pfburh->r.w,pfburh->r.h)) return;
-	if (m_DIBbits) ConvertAll(pfburh->r.w,pfburh->r.h,pfburh->r.x, pfburh->r.y,m_myFormat.bitsPerPixel/8,(BYTE *)m_zlibbuf,(BYTE *)m_DIBbits,m_si.framebufferWidth);
+	if (m_DIBbits) ConvertAll_secure(pfburh->r.w,pfburh->r.h,pfburh->r.x, pfburh->r.y,m_myFormat.bitsPerPixel/8,(BYTE *)m_zlibbuf,(BYTE *)m_DIBbits,m_si.framebufferWidth, new_len, m_si.framebufferHeight);
 
 }
 
@@ -61,6 +62,12 @@ void ClientConnection::ReadUltraZip(rfbFramebufferUpdateRectHeader *pfburh,HRGN 
 {
 	UINT nNbCacheRects = pfburh->r.x;
 	UINT numRawBytes = pfburh->r.y+pfburh->r.w*65535;
+	// Security Check
+	if (numRawBytes > 106000000)
+		return;
+	if (nNbCacheRects > 25000)
+		return;
+
 	UINT numCompBytes;
 	lzo_uint new_len;
 	rfbZlibHeader hdr;
@@ -68,19 +75,26 @@ void ClientConnection::ReadUltraZip(rfbFramebufferUpdateRectHeader *pfburh,HRGN 
 	omni_mutex_lock l(m_bitmapdcMutex);
 	ReadExact((char *)&hdr, sz_rfbZlibHeader);
 	numCompBytes = Swap32IfLE(hdr.nBytes);
-	// Check the net buffer
+	// Security Check
+	if (numCompBytes > numRawBytes)
+		return;
 	CheckBufferSize(numCompBytes);
 	// Read the compressed data
 	ReadExact((char *)m_netbuf, numCompBytes);
 
 	// Verify buffer space for cache rects list
 	CheckZlibBufferSize(numRawBytes+500);
-
+	new_len = numRawBytes+500;
 	lzo1x_decompress((BYTE*)m_netbuf,numCompBytes,(BYTE*)m_zlibbuf,&new_len,NULL);
 	BYTE* pzipbuf = m_zlibbuf;
+	int m_zlibbuf_size = 0;
 	for (UINT i = 0 ; i < nNbCacheRects; i++)
 	{
 		rfbFramebufferUpdateRectHeader surh;
+		m_zlibbuf_size += sz_rfbFramebufferUpdateRectHeader;
+		// Security Check
+		if (m_zlibbuf_size > numRawBytes+500)
+			return;
 		memcpy((char *) &surh,pzipbuf, sz_rfbFramebufferUpdateRectHeader);
 		surh.r.x = Swap16IfLE(surh.r.x);
 		surh.r.y = Swap16IfLE(surh.r.y);

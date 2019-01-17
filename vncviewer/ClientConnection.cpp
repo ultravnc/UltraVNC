@@ -9330,6 +9330,34 @@ ClientConnection:: ConvertAll(int width, int height, int xx, int yy,int bytes_pe
     }
 }
 
+void ClientConnection:: ConvertAll_secure(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth, int sourceSize, int framebufferHeight)
+{
+	int bytesPerInputRow = width * bytes_per_pixel;
+	int bytesPerOutputRow = framebufferWidth * bytes_per_pixel;
+	//security check input buffer
+	if ((bytes_per_pixel * height) > sourceSize)
+			return;
+	//8bit pitch need to be taken in account
+	if (bytesPerOutputRow % 4)
+		bytesPerOutputRow += 4 - bytesPerOutputRow % 4;
+	//security check dibits
+	if ( ((width + xx) * (height + yy)) > (framebufferWidth * framebufferHeight))
+			return;
+
+
+	BYTE *sourcepos,*destpos;
+	destpos = (BYTE *)dest + (bytesPerOutputRow * yy)+(xx * bytes_per_pixel);
+	sourcepos=(BYTE*)source;
+
+    int y;
+    width*=bytes_per_pixel;
+    for (y=0; y<height; y++) {
+        memcpy(destpos, sourcepos, width);
+        sourcepos = (BYTE*)sourcepos + bytesPerInputRow;
+        destpos = (BYTE*)destpos + bytesPerOutputRow;
+    }
+}
+
 void
 ClientConnection:: Copybuffer(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth)
 {
