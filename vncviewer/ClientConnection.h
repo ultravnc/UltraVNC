@@ -530,7 +530,7 @@ private:
     // Buffer for network operations
 	void CheckBufferSize(UINT bufsize);
 	char *m_netbuf;
-	int m_netbufsize;
+	UINT m_netbufsize;
 	omni_mutex	m_bufferMutex, m_zlibBufferMutex,
 				m_bitmapdcMutex,  m_clipMutex,
 				m_writeMutex, m_sockMutex,m_cursorMutex, m_readMutex  ;
@@ -555,9 +555,9 @@ private:
 	unsigned char *m_filezipbuf;
 	int m_filezipbufsize;
 
-	void CheckFileChunkBufferSize(int bufsize);
+	void CheckFileChunkBufferSize(UINT bufsize);
 	unsigned char *m_filechunkbuf;
-	int m_filechunkbufsize;
+	UINT m_filechunkbufsize;
 
 
 	// Variables used by tight encoding:

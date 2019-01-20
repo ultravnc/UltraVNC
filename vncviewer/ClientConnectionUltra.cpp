@@ -87,7 +87,7 @@ void ClientConnection::ReadUltraZip(rfbFramebufferUpdateRectHeader *pfburh,HRGN 
 	new_len = numRawBytes+500;
 	lzo1x_decompress((BYTE*)m_netbuf,numCompBytes,(BYTE*)m_zlibbuf,&new_len,NULL);
 	BYTE* pzipbuf = m_zlibbuf;
-	int m_zlibbuf_size = 0;
+	UINT m_zlibbuf_size = 0;
 	for (UINT i = 0 ; i < nNbCacheRects; i++)
 	{
 		rfbFramebufferUpdateRectHeader surh;

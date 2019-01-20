@@ -123,7 +123,7 @@ public:
 	char				m_szIncomingFileTime[18];
 
     int                 m_ServerFTProtocolVersion; // 8/6/2008 jdp 
-	int					m_nBlockSize;
+	UINT					m_nBlockSize;
 
 	int					m_nNotSent;
 
@@ -155,13 +155,13 @@ public:
 	void EnableButtons(HWND hWnd);
     void CheckButtonState(HWND hWnd);
 
-	bool SendFile(long lSize, int nLen);
+	bool SendFile(long lSize, UINT nLen);
 	bool SendFileChunk();
 	bool FinishFileReception();
 	bool UnzipPossibleDirectory(LPSTR szFileName);
-	bool SendFiles(long lSize, int nLen);
+	bool SendFiles(long lSize, UINT nLen);
 	bool OfferNextFile();
-	void ListRemoteDrives(HWND hWnd, int nLen);
+	void ListRemoteDrives(HWND hWnd, UINT nLen);
 	void ProcessFileTransferMsg(void);
 	void RequestPermission();
 	bool TestPermission(long lSize, int nVersion);
@@ -171,16 +171,16 @@ public:
 	void RequestRemoteFile(LPSTR szRemoteFileName);
 	bool OfferLocalFile(LPSTR szSrcFileName);
 	int  ZipPossibleDirectory(LPSTR szSrcFileName);
-	bool ReceiveFile(unsigned long lSize, int nLen);
-	bool ReceiveFileChunk(int nLen, int nSize);
+	bool ReceiveFile(unsigned long lSize, UINT nLen);
+	bool ReceiveFileChunk(UINT nLen, int nSize);
 	bool FinishFileSending();
 	bool AbortFileReception();
-	bool ReceiveFiles(unsigned long lSize, int nLen);
+	bool ReceiveFiles(unsigned long lSize, UINT nLen);
 	bool RequestNextFile();
-	bool ReceiveDestinationFileChecksums(int nSize, int nLen);
+	bool ReceiveDestinationFileChecksums(int nSize, UINT nLen);
 	void HighlightTransferedFiles(HWND hSrcList, HWND hDstList);
-	void PopulateRemoteListBox(HWND hWnd, int nLen);
-	void ReceiveDirectoryItem(HWND hWnd, int nLen);
+	void PopulateRemoteListBox(HWND hWnd, UINT nLen);
+	void ReceiveDirectoryItem(HWND hWnd, UINT nLen);
 	void FinishDirectoryReception();
 	bool IsShortcutFolder(LPSTR szPath);
 	bool ResolvePossibleShortcutFolder(HWND hWnd, LPSTR szFolder);
@@ -188,10 +188,10 @@ public:
 	void ListDrives(HWND hWnd);
 	void CreateRemoteDirectory(LPSTR szDir);
     void DeleteRemoteFile(std::string szFile);
-	bool CreateRemoteDirectoryFeedback(long lSize, int nLen);
-	bool DeleteRemoteFileFeedback(long lSize, int nLen);
+	bool CreateRemoteDirectoryFeedback(long lSize, UINT nLen);
+	bool DeleteRemoteFileFeedback(long lSize, UINT nLen);
 	void RenameRemoteFileOrDirectory(LPSTR szCurrentName, LPSTR szNewName);
-	bool RenameRemoteFileOrDirectoryFeedback(long lSize, int nLen);
+	bool RenameRemoteFileOrDirectoryFeedback(long lSize, UINT nLen);
 	int  GenerateFileChecksums(HANDLE hFile, char* lpCSBuffer, int nCSBufferSize);
 
 	void SetTotalSize(HWND hwnd,DWORD dwTotalSize);

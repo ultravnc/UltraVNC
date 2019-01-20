@@ -6161,7 +6161,7 @@ void ClientConnection::ReadServerCutText()
 			vnclog.Print(6, _T("Invalid clipboard data!\n"));
 			return;
 		}
-		CheckBufferSize(len);
+		CheckBufferSize(len + 1);
 		if (len == 0) {
 			m_netbuf[0] = '\0';
 		} else {
@@ -6598,7 +6598,7 @@ bool ClientConnection::Write(char *buf, int bytes, bool bQueue, bool bTimeout, i
 	}
 
 	if (!bQueue) {
-		int i = 0;
+		UINT i = 0;
 		int j = 0;
 		while (i < m_nQueueBufferLength)
 		{
@@ -6896,7 +6896,7 @@ void ClientConnection::CheckFileZipBufferSize(int bufsize)
 	vnclog.Print(4, _T("zipbufsize expanded to %d\n"), m_filezipbufsize);
 }
 
-void ClientConnection::CheckFileChunkBufferSize(int bufsize)
+void ClientConnection::CheckFileChunkBufferSize(UINT bufsize)
 {
 	// sf@2009 - Sanity check
 	if (bufsize < 0 || bufsize > 104857600) // 100 MBytes max
