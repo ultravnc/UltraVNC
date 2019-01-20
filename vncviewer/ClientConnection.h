@@ -528,7 +528,7 @@ private:
     unsigned int CountProcessOtherWindows();
 
     // Buffer for network operations
-	void CheckBufferSize(int bufsize);
+	void CheckBufferSize(UINT bufsize);
 	char *m_netbuf;
 	int m_netbufsize;
 	omni_mutex	m_bufferMutex, m_zlibBufferMutex,

@@ -860,23 +860,23 @@ void FileTransfer::GetFriendlyFileSizeString(__int64 Size, char* szText)
 	{
 		__int64 lRest = (Size % (1024*1024*1024));
 		Size /= (1024*1024*1024);
-		wsprintf(szText,"%u.%2.2lu Gb", (unsigned long)Size, (unsigned long)(lRest * 100 / 1024 / 1024 / 1024));
+		_snprintf(szText, 256, "%u.%2.2lu Gb", (unsigned long)Size, (unsigned long)(lRest * 100 / 1024 / 1024 / 1024));
 	}
 	else if( Size > (1024*1024) )
 	{
 		unsigned long lRest = (Size % (1024*1024));
 		Size /= (1024*1024);
-		wsprintf(szText,"%u.%2.2lu Mb", (unsigned long)Size, lRest * 100 / 1024 / 1024);
+		_snprintf(szText, 256, "%u.%2.2lu Mb", (unsigned long)Size, lRest * 100 / 1024 / 1024);
 	}
 	else if ( Size > 1024 )
 	{
 		unsigned long lRest = Size % (1024);
 		Size /= 1024;
-		wsprintf(szText,"%u.%2.2lu Kb", (unsigned long)Size, lRest * 100 / 1024);
+		_snprintf(szText, 256, "%u.%2.2lu Kb", (unsigned long)Size, lRest * 100 / 1024);
 	}
 	else
 	{
-		wsprintf(szText,"%u bytes", (unsigned long)Size);
+		_snprintf(szText, 256, "%u bytes", (unsigned long)Size);
 	}
 }
 
@@ -988,7 +988,7 @@ void FileTransfer::AddFileToFileList(HWND hWnd, int nListId, WIN32_FIND_DATA& fd
 		FileTimeToLocalFileTime(&fd.ftLastWriteTime, &LocalFileTime);
 		SYSTEMTIME FileTime;
 		FileTimeToSystemTime(fLocalSide ? &LocalFileTime : &LocalFileTime /*&fd.ftLastWriteTime*/, &FileTime);
-		wsprintf(szText,"%2.2d/%2.2d/%4.4d %2.2d:%2.2d",
+		_snprintf(szText, 256, "%2.2d/%2.2d/%4.4d %2.2d:%2.2d",
 				FileTime.wMonth,
 				FileTime.wDay,
 				FileTime.wYear,

@@ -265,7 +265,7 @@ ClientConnection::ClientConnection(VNCviewerApp *pApp, SOCKET sock)
 		if (svraddr.ss_family == AF_INET) {
 			struct sockaddr_in *s = (struct sockaddr_in *)&svraddr;
 			m_port = ntohs(s->sin_port);
-			_stprintf(m_host, _T("%d.%d.%d.%d"),
+			_snprintf(m_host, 250, _T("%d.%d.%d.%d"),
 				s->sin_addr.S_un.S_un_b.s_b1,
 				s->sin_addr.S_un.S_un_b.s_b2,
 				s->sin_addr.S_un.S_un_b.s_b3,
@@ -275,7 +275,7 @@ ClientConnection::ClientConnection(VNCviewerApp *pApp, SOCKET sock)
 		{
 			struct sockaddr_in6 *s = (struct sockaddr_in6 *)&svraddr;
 			m_port = ntohs(s->sin6_port);
-			_stprintf(m_host, _T("%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x"),
+			_snprintf(m_host, 250, _T("%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x"),
 				s->sin6_addr.u.Byte[0],
 				s->sin6_addr.u.Byte[1],
 				s->sin6_addr.u.Byte[2],
@@ -298,7 +298,7 @@ ClientConnection::ClientConnection(VNCviewerApp *pApp, SOCKET sock)
 	int sasize = sizeof(svraddr);
 	if (getpeername(sock, (struct sockaddr *) &svraddr,
 		&sasize) != SOCKET_ERROR) {
-		_stprintf(m_host, _T("%d.%d.%d.%d"),
+		_snprintf(m_host, 250, _T("%d.%d.%d.%d"),
 			svraddr.sin_addr.S_un.S_un_b.s_b1,
 			svraddr.sin_addr.S_un.S_un_b.s_b2,
 			svraddr.sin_addr.S_un.S_un_b.s_b3,
@@ -1970,19 +1970,19 @@ void ClientConnection::Connect()
 	if (IsIpv6 && IsIpv4)
 	{
 		char			szText[256];
-		sprintf(szText, "Ipv4: %s\nIpv6: %s \n", inet_ntoa(Ipv4Addr.sin_addr), ipstringbuffer);
+		_snprintf(szText, 256,  "Ipv4: %s\nIpv6: %s \n", inet_ntoa(Ipv4Addr.sin_addr), ipstringbuffer);
 		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500); }		
 	}
 	else if (IsIpv6)
 	{
 		char			szText[256];
-		sprintf(szText, "Ipv6: %s \n", ipstringbuffer);
+		_snprintf(szText, 256,  "Ipv6: %s \n", ipstringbuffer);
 		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500); }
 	}
 	else if (IsIpv4)
 	{
 		char			szText[256];
-		sprintf(szText, "Ipv4: %s \n", inet_ntoa(Ipv4Addr.sin_addr));
+		_snprintf(szText, 256,  "Ipv4: %s \n", inet_ntoa(Ipv4Addr.sin_addr));
 		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500); }
 	}
 
@@ -1998,7 +1998,7 @@ void ClientConnection::Connect()
 		{
 			int res;
 			char			szText[256];
-			sprintf(szText, "Ipv6: %s \n", sz_L47);
+			_snprintf(szText, 256,  "Ipv6: %s \n", sz_L47);
 			if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, szText);
 			if (m_hwndStatus)ShowWindow(m_hwndStatus, SW_SHOW);
 			if (m_hwndStatus)UpdateWindow(m_hwndStatus);
@@ -2034,7 +2034,7 @@ void ClientConnection::Connect()
 				if (m_hwndStatus)UpdateWindow(m_hwndStatus);
 				return;
 			}
-			sprintf(szText, "Ipv6: %s \n", sz_L48);
+			_snprintf(szText, 256,  "Ipv6: %s \n", sz_L48);
 			if (m_hwndStatus) {SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500);}
 
 		}
@@ -2049,7 +2049,7 @@ void ClientConnection::Connect()
 			throw WarningException(sz_L44); 
 		}
 		char			szText[256];
-		sprintf(szText, "Ipv4: %s \n", sz_L47);
+		_snprintf(szText, 256,  "Ipv4: %s \n", sz_L47);
 		if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, szText);
 		if (m_hwndStatus)ShowWindow(m_hwndStatus,SW_SHOW);
 		if (m_hwndStatus)UpdateWindow(m_hwndStatus);
@@ -2261,19 +2261,19 @@ void ClientConnection::ConnectProxy()
 	if (IsIpv6 && IsIpv4)
 	{
 		char			szText[256];
-		sprintf(szText, "Ipv4: %s\nIpv6: %s \n", inet_ntoa(Ipv4Addr.sin_addr), ipstringbuffer);
+		_snprintf(szText, 256,  "Ipv4: %s\nIpv6: %s \n", inet_ntoa(Ipv4Addr.sin_addr), ipstringbuffer);
 		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500); }
 	}
 	else if (IsIpv6)
 	{
 		char			szText[256];
-		sprintf(szText, "Ipv6: %s \n", ipstringbuffer);
+		_snprintf(szText, 256,  "Ipv6: %s \n", ipstringbuffer);
 		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500); }
 	}
 	else if (IsIpv4)
 	{
 		char			szText[256];
-		sprintf(szText, "Ipv4: %s \n", inet_ntoa(Ipv4Addr.sin_addr));
+		_snprintf(szText, 256,  "Ipv4: %s \n", inet_ntoa(Ipv4Addr.sin_addr));
 		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500); }
 	}
 
@@ -2289,7 +2289,7 @@ void ClientConnection::ConnectProxy()
 		{
 			int res;
 			char			szText[256];
-			sprintf(szText, "Ipv6: %s \n", sz_L47);
+			_snprintf(szText, 256,  "Ipv6: %s \n", sz_L47);
 			if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, szText);
 			if (m_hwndStatus)ShowWindow(m_hwndStatus, SW_SHOW);
 			if (m_hwndStatus)UpdateWindow(m_hwndStatus);
@@ -2319,7 +2319,7 @@ void ClientConnection::ConnectProxy()
 				if (m_hwndStatus)UpdateWindow(m_hwndStatus);
 				return;
 			}
-			sprintf(szText, "Ipv6: %s \n", sz_L48);
+			_snprintf(szText, 256,  "Ipv6: %s \n", sz_L48);
 			if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500); }
 
 		}
@@ -2334,7 +2334,7 @@ void ClientConnection::ConnectProxy()
 			throw WarningException(sz_L44);
 		}
 		char			szText[256];
-		sprintf(szText, "Ipv4: %s \n", sz_L47);
+		_snprintf(szText, 256,  "Ipv4: %s \n", sz_L47);
 		if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, szText);
 		if (m_hwndStatus)ShowWindow(m_hwndStatus, SW_SHOW);
 		if (m_hwndStatus)UpdateWindow(m_hwndStatus);
@@ -5028,8 +5028,9 @@ void ClientConnection::ShowConnInfo()
 	TCHAR *kbdname = _T("(n/a)");
 #endif
 	TCHAR num[16];
-	_stprintf(
+	_snprintf(
 		buf,
+		20148,
 		_T("Connected to: %s\n\r\n\r")
 		_T("Host: %s  Port: %d\n\r")
 		_T("%s %s  %s\n\r\n\r")
@@ -5536,7 +5537,7 @@ inline void ClientConnection::ReadScreenUpdate()
 {
 #ifdef _DEBUG
 	char			szText[256];
-	sprintf(szText, "ReadScreenUpdate\n");
+	_snprintf(szText, 256,  "ReadScreenUpdate\n");
 	OutputDebugString(szText);
 #endif
 	//adzm 2010-07-04
@@ -6062,7 +6063,7 @@ inline void ClientConnection::ReadScreenUpdate()
 		SendAppropriateFramebufferUpdateRequest(true);
 #ifdef _DEBUG
 		char			szText[256];
-		sprintf(szText, "SendAppropriateFramebufferUpdateRequestn\n");
+		_snprintf(szText, 256,  "SendAppropriateFramebufferUpdateRequestn\n");
 		OutputDebugString(szText);
 #endif	
 	}
@@ -6809,7 +6810,7 @@ bool ClientConnection::WriteExactProxy(char *buf, int bytes)
 // Makes sure netbuf is at least as big as the specified size.
 // Note that netbuf itself may change as a result of this call.
 // Throws an exception on failure.
-void ClientConnection::CheckBufferSize(int bufsize)
+void ClientConnection::CheckBufferSize(UINT bufsize)
 {
 	// sf@2009 - Sanity check
 	if (bufsize < 0 || bufsize > 104857600) // 100 MBytes max
@@ -7058,23 +7059,23 @@ void ClientConnection::GetFriendlySizeString(__int64 Size, char* szText)
 	{
 		__int64 lRest = (Size % (1024*1024*1024));
 		Size /= (1024*1024*1024);
-		wsprintf(szText,"%u.%4.4lu Gb", (unsigned long)Size, (unsigned long)((__int64)(lRest) * 10000 / 1024 / 1024 / 1024));
+		_snprintf(szText, 256, "%u.%4.4lu Gb", (unsigned long)Size, (unsigned long)((__int64)(lRest) * 10000 / 1024 / 1024 / 1024));
 	}
 	else if( Size > (1024*1024) )
 	{
 		unsigned long lRest = (Size % (1024*1024));
 		Size /= (1024*1024);
-		wsprintf(szText,"%u.%3.3lu Mb", (unsigned long)Size, (unsigned long)((__int64)(lRest) * 1000 / 1024 / 1024));
+		_snprintf(szText, 256, "%u.%3.3lu Mb", (unsigned long)Size, (unsigned long)((__int64)(lRest) * 1000 / 1024 / 1024));
 	}
 	else if ( Size > 1024 )
 	{
 		unsigned long lRest = Size % (1024);
 		Size /= 1024;
-		wsprintf(szText,"%u.%2.2lu Kb", (unsigned long)Size, lRest * 100 / 1024);
+		_snprintf(szText, 256, "%u.%2.2lu Kb", (unsigned long)Size, lRest * 100 / 1024);
 	}
 	else
 	{
-		wsprintf(szText,"%u bytes", (unsigned long)Size);
+		_snprintf(szText, 256, "%u bytes", (unsigned long)Size);
 	}
 }
 
@@ -8943,11 +8944,11 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 						char			szText[256];
 						if (ret != 0)
 						{
-							sprintf(szText, "RegisterTouchWindow Success \n");
+							_snprintf(szText, 256,  "RegisterTouchWindow Success \n");
 						}
 						else
 						{
-							sprintf(szText, "RegisterTouchWindow Failed with error code = %i \n", err);
+							_snprintf(szText, 256,  "RegisterTouchWindow Failed with error code = %i \n", err);
 						}
 						OutputDebugString(szText);
 #endif

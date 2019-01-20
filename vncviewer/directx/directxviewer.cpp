@@ -444,7 +444,7 @@ ViewerDirectxClass:: paintdevice()
 		{
 #ifdef _DEBUG
 		char			szText[256];
-		sprintf(szText," ++++++++++BeginScene \n");
+		_snprintf(szText, 256, " ++++++++++BeginScene \n");
 		OutputDebugString(szText);		
 #endif
 		pD3DDevice9->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &backBuffer);
@@ -457,7 +457,7 @@ ViewerDirectxClass:: paintdevice()
 		backBuffer->Release();
 		pD3DDevice9->EndScene();
 #ifdef _DEBUG
-		sprintf(szText," ++++++++++ENdScene \n");
+		_snprintf(szText, 256, " ++++++++++ENdScene \n");
 		OutputDebugString(szText);		
 #endif
 		}
@@ -469,13 +469,13 @@ ViewerDirectxClass:: paintdevice()
 		// present back buffer to display
 #ifdef _DEBUG
 		char			szText[256];
-		sprintf(szText," ++++++++++Present \n");
+		_snprintf(szText, 256, " ++++++++++Present \n");
 		OutputDebugString(szText);		
 #endif
 		if (pD3DDevice9->Present(NULL, NULL, NULL, NULL)!= D3D_OK)
 			return false;
 #ifdef _DEBUG
-		sprintf(szText," ++++++++++Present2 \n");
+		_snprintf(szText, 256, " ++++++++++Present2 \n");
 		OutputDebugString(szText);		
 #endif
 		// tell windows that we dont need to repaint anything
@@ -529,7 +529,7 @@ ViewerDirectxClass:: Preupdate(unsigned char * bits)
 		return bits;
 #ifdef _DEBUG
 	char			szText[256];
-				sprintf(szText,"Preupdate 2\n");
+				_snprintf(szText, 256, "Preupdate 2\n");
 				OutputDebugString(szText);
 #endif
 
@@ -604,7 +604,7 @@ ViewerDirectxClass:: Afterupdate()
 
 #ifdef _DEBUG
 	char			szText[256];
-				sprintf(szText,"After update1 2\n");
+				_snprintf(szText, 256, "After update1 2\n");
 				OutputDebugString(szText);
 #endif
 	if (devicelost==true) return true;
@@ -612,7 +612,7 @@ ViewerDirectxClass:: Afterupdate()
 	if (!surface) return false;
 #ifdef _DEBUG
 //	char			szText[256];
-				sprintf(szText,"After update2 2\n");
+				_snprintf(szText, 256, "After update2 2\n");
 				OutputDebugString(szText);
 #endif
 	    ///copy pixels

@@ -545,9 +545,9 @@ BOOL CALLBACK SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam, LPARAM lParam
 					if (_this->m_pCC->m_port == 5900)
 						_tcscpy(szHost, _this->m_pCC->m_host);
 					else if (_this->m_pCC->m_port > 5900 && _this->m_pCC->m_port <= 5999)
-						_stprintf(szHost, TEXT("%s:%d"), _this->m_pCC->m_host, _this->m_pCC->m_port - 5900);
+						_snprintf(szHost, 250, TEXT("%s:%d"), _this->m_pCC->m_host, _this->m_pCC->m_port - 5900);
 					else
-						_stprintf(szHost, TEXT("%s::%d"), _this->m_pCC->m_host, _this->m_pCC->m_port);
+						_snprintf(szHost, 250, TEXT("%s::%d"), _this->m_pCC->m_host, _this->m_pCC->m_port);
 
 					SetDlgItemText(hwnd, IDC_HOSTNAME_EDIT, szHost);
 					//AaronP
