@@ -903,6 +903,8 @@ vncDesktop::Shutdown()
 	}
 	m_lGridsList.clear();
 	m_foreground_window_rect.clear();
+	trigger_events[6] = eventPlaceholder1;
+	trigger_events[7] = eventPlaceholder2;
 	return TRUE;
 }
 

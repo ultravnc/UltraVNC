@@ -986,6 +986,9 @@ vncDesktopThread::run_undetached(void *arg)
 				looping = false;
 			switch(result)
 			{
+				case WAIT_FAILED:
+					looping = false;
+				break;
 				case WAIT_OBJECT_0+6:
 					ResetEvent(m_desktop->trigger_events[6]);
 					strcpy_s(g_hookstring,"ddengine");
