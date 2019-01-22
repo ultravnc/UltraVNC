@@ -6252,6 +6252,11 @@ void ClientConnection::ReadServerState()
 // Reads the number of bytes specified into the buffer given
 void ClientConnection::ReadExact(char *inbuf, int wanted)
 {
+	if (wanted < 0) {
+		assert(true);
+		return;
+	}
+
 	if (wanted == 0) {
 		return;
 	}
@@ -9310,13 +9315,16 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 			return DefWindowProc(hwnd, iMsg, wParam, lParam);
 }
 void
-ClientConnection:: ConvertAll(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth)
+ClientConnection:: ConvertAll(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth, int framebufferHeight)
 {
 	int bytesPerInputRow = width * bytes_per_pixel;
 	int bytesPerOutputRow = framebufferWidth * bytes_per_pixel;
 	//8bit pitch need to be taken in account
 	if (bytesPerOutputRow % 4)
 		bytesPerOutputRow += 4 - bytesPerOutputRow % 4;
+
+	if ( ((width + xx) * (height + yy)) > (framebufferWidth * framebufferHeight))
+			goto error;
 
 	BYTE *sourcepos,*destpos;
 	destpos = (BYTE *)dest + (bytesPerOutputRow * yy)+(xx * bytes_per_pixel);
@@ -9329,6 +9337,9 @@ ClientConnection:: ConvertAll(int width, int height, int xx, int yy,int bytes_pe
         sourcepos = (BYTE*)sourcepos + bytesPerInputRow;
         destpos = (BYTE*)destpos + bytesPerOutputRow;
     }
+	return;
+error:
+	assert(true);
 }
 
 void ClientConnection:: ConvertAll_secure(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth, int sourceSize, int framebufferHeight)
@@ -9337,13 +9348,13 @@ void ClientConnection:: ConvertAll_secure(int width, int height, int xx, int yy,
 	int bytesPerOutputRow = framebufferWidth * bytes_per_pixel;
 	//security check input buffer
 	if ((bytes_per_pixel * height) > sourceSize)
-			return;
+			goto error;
 	//8bit pitch need to be taken in account
 	if (bytesPerOutputRow % 4)
 		bytesPerOutputRow += 4 - bytesPerOutputRow % 4;
 	//security check dibits
 	if ( ((width + xx) * (height + yy)) > (framebufferWidth * framebufferHeight))
-			return;
+			goto error;
 
 
 	BYTE *sourcepos,*destpos;
@@ -9357,11 +9368,17 @@ void ClientConnection:: ConvertAll_secure(int width, int height, int xx, int yy,
         sourcepos = (BYTE*)sourcepos + bytesPerInputRow;
         destpos = (BYTE*)destpos + bytesPerOutputRow;
     }
+	return;
+error:
+	assert(true);
 }
 
 void
-ClientConnection:: Copybuffer(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth)
+ClientConnection:: Copybuffer(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth,int framebufferHeight)
 {
+	if ( ((width + xx) * (height + yy)) > (framebufferWidth * framebufferHeight))
+			goto error;
+
 	int bytesPerOutputRow = framebufferWidth * bytes_per_pixel;
 	//8bit pitch need to be taken in account
 	if (bytesPerOutputRow % 4)
@@ -9377,11 +9394,16 @@ ClientConnection:: Copybuffer(int width, int height, int xx, int yy,int bytes_pe
         sourcepos = (BYTE*)sourcepos + bytesPerOutputRow;
         destpos = (BYTE*)destpos + bytesPerOutputRow;
     }
+	return;
+error:
+	assert(true);
 }
 
 void
-ClientConnection:: Copyto0buffer(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth)
+ClientConnection:: Copyto0buffer(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth,int framebufferHeight)
 {
+	if ( ((width + xx) * (height + yy)) > (framebufferWidth * framebufferHeight))
+			goto error;
 	int bytesPerOutputRow = framebufferWidth * bytes_per_pixel;
 	//8bit pitch need to be taken in account
 	if (bytesPerOutputRow % 4)
@@ -9396,11 +9418,16 @@ ClientConnection:: Copyto0buffer(int width, int height, int xx, int yy,int bytes
 			sourcepos = (BYTE*)sourcepos + bytesPerOutputRow;
 			destpos = (BYTE*)destpos + width;
 		}
+	return;
+	error:
+	assert(true);
 }
 
 void
-ClientConnection:: Copyfrom0buffer(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth)
+ClientConnection:: Copyfrom0buffer(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth,int framebufferHeight)
 {
+	if ( ((width + xx) * (height + yy)) > (framebufferWidth * framebufferHeight))
+		goto error;
 	int bytesPerOutputRow = framebufferWidth * bytes_per_pixel;
 	//8bit pitch need to be taken in account
 	if (bytesPerOutputRow % 4)
@@ -9416,6 +9443,9 @@ ClientConnection:: Copyfrom0buffer(int width, int height, int xx, int yy,int byt
         sourcepos = (BYTE*)sourcepos + width;
         destpos = (BYTE*)destpos + bytesPerOutputRow;
     }
+	return;
+	error:
+		assert(true);
 }
 
 void

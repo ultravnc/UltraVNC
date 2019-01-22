@@ -154,7 +154,7 @@ void TextChat::ProcessTextChatMsg()
 {
 	rfbTextChatMsg tcm;
 	m_pCC->ReadExact(((char *) &tcm) + m_pCC->m_nTO, sz_rfbTextChatMsg - m_pCC->m_nTO);
-	int len = Swap32IfLE(tcm.length);
+	UINT len = Swap32IfLE(tcm.length);
 	
 	if (len == CHAT_OPEN)
 	{

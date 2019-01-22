@@ -47,7 +47,7 @@ vncEncodeZlib::vncEncodeZlib()
 	m_QueueCompressedbuffer = NULL;
 	m_bufflen = 0;
 	m_Queuelen = 0;
-	m_Maskbuffer =NULL;
+	m_Maskbuffer = NULL;
 	m_MaskbufferSize =0;
 	compStreamInited = false;
 	MaxQueuebufflen=128*1024;

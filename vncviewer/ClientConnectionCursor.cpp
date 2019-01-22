@@ -297,7 +297,7 @@ void ClientConnection::SoftCursorSaveArea() {
 	int h = r.bottom - r.top;
 
 	omni_mutex_lock l(m_bitmapdcMutex);
-	if (m_DIBbits && m_SavedAreaBIB) Copyto0buffer(w, h, x, y,m_myFormat.bitsPerPixel/8,(BYTE*)m_DIBbits,m_SavedAreaBIB,m_si.framebufferWidth);
+	if (m_DIBbits && m_SavedAreaBIB) Copyto0buffer(w, h, x, y,m_myFormat.bitsPerPixel/8,(BYTE*)m_DIBbits,m_SavedAreaBIB,m_si.framebufferWidth,m_si.framebufferHeight);
 }
 
 //
@@ -314,7 +314,7 @@ void ClientConnection::SoftCursorRestoreArea() {
 	int h = r.bottom - r.top;
 
 	omni_mutex_lock l(m_bitmapdcMutex);
-	if (m_DIBbits && m_SavedAreaBIB) Copyfrom0buffer(w, h, x, y,m_myFormat.bitsPerPixel/8,m_SavedAreaBIB,(BYTE*)m_DIBbits,m_si.framebufferWidth);
+	if (m_DIBbits && m_SavedAreaBIB) Copyfrom0buffer(w, h, x, y,m_myFormat.bitsPerPixel/8,m_SavedAreaBIB,(BYTE*)m_DIBbits,m_si.framebufferWidth,m_si.framebufferHeight);
 
 	if (!m_opts.m_Directx)InvalidateScreenRect(&r);
 }

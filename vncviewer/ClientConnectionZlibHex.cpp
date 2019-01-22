@@ -119,6 +119,10 @@ void ClientConnection::HandleZlibHexEncoding##bpp(int rx, int ry, int rw, int rh
             ReadExact((char *)&subencoding, 1);									\
 																				\
             if (subencoding & rfbHextileRaw) {									\
+				if (getBufferSize() < w * h * (bpp / 8) && w > 0 && h > 0) { 	\
+					assert(true);												\
+					return;														\
+				}																\
                 ReadExact(m_netbuf, w * h * (bpp / 8));							\
                 SETPIXELS(m_netbuf, bpp, x,y,w,h)								\
                 continue;														\

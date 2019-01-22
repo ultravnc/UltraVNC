@@ -529,6 +529,7 @@ private:
 
     // Buffer for network operations
 	void CheckBufferSize(UINT bufsize);
+	UINT getBufferSize(){return m_netbufsize;}
 	char *m_netbuf;
 	UINT m_netbufsize;
 	omni_mutex	m_bufferMutex, m_zlibBufferMutex,
@@ -778,12 +779,12 @@ private:
 	int xzywBuf[rfbXZTileWidth*rfbXZTileHeight];
 #endif
 
-	void ConvertAll(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth);
+	void ConvertAll(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth, int framebufferHeight);
 	void ConvertAll_secure(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth, int sourceSize, int framebufferHeight);
 	void ConvertPixel(int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth);
-	void Copybuffer(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth);
-	void Copyto0buffer(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth);
-	void Copyfrom0buffer(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth);
+	void Copybuffer(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth,int framebufferHeight);
+	void Copyto0buffer(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth,int framebufferHeight);
+	void Copyfrom0buffer(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth,int framebufferHeight);
 	void Switchbuffer(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth);
 	void ConvertPixel_to_bpp_from_32(int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth);
 	void SolidColor(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth);
@@ -924,13 +925,17 @@ public:
 
 #define SETPIXELS(buffer, bpp, x, y, w, h)										\
 	{																			\
-			if (m_DIBbits) ConvertAll(w,h,x,y,bpp/8,(BYTE*)buffer,(BYTE*)m_DIBbits,m_si.framebufferWidth);\
+			if (m_DIBbits) ConvertAll(w,h,x,y,bpp/8,(BYTE*)buffer,(BYTE*)m_DIBbits,m_si.framebufferWidth,m_si.framebufferHeight);\
 	}
 
 
 
 #define SETPIXELS_NOCONV(buffer, x, y, w, h)									\
 	{																			\
+		if ( ((w + x) * (h + y)) > (m_si.framebufferWidth * m_si.framebufferHeight)) { \
+			assert(true);														\
+			return;																\
+		}																		\
 		CARD32 *p = (CARD32 *) buffer;											\
 		for (int k = y; k < y+h; k++) {											\
 			for (int j = x; j < x+w; j++) {										\

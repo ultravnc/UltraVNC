@@ -69,8 +69,12 @@ void ClientConnection::HandleHextileEncoding##bpp(int rx, int ry, int rw, int rh
             ReadExact((char *)&subencoding, 1);                               \
                                                                               \
             if (subencoding & rfbHextileRaw) {                                \
+				if (getBufferSize() < w * h * (bpp / 8) && w > 0 && h > 0){  	\
+					assert(true);											\
+					return;													\
+				}															\
                 ReadExact(m_netbuf, w * h * (bpp / 8));                       \
-                SETPIXELS(m_netbuf,bpp, x,y,w,h)                                       \
+                SETPIXELS(m_netbuf, bpp, x,y,w,h)							 \
                 continue;                                                     \
             }                                                                 \
                                                                               \
@@ -95,6 +99,10 @@ void ClientConnection::HandleHextileEncoding##bpp(int rx, int ry, int rw, int rh
                                                                               \
             if (subencoding & rfbHextileSubrectsColoured) {                   \
 				                                                              \
+				if (getBufferSize() < nSubrects * (2 + (bpp / 8)) && nSubrects > 0) {  \
+					assert(true);											 \
+					return;													  \
+				}															\
                 ReadExact( m_netbuf, nSubrects * (2 + (bpp / 8)));            \
                                                                               \
                 for (i = 0; i < nSubrects; i++) {                             \
@@ -109,7 +117,11 @@ void ClientConnection::HandleHextileEncoding##bpp(int rx, int ry, int rw, int rh
                 }                                                             \
                                                                               \
             } else {                                                          \
-                ReadExact(m_netbuf, nSubrects * 2);                    \
+			    if (getBufferSize() < (nSubrects * 2) && nSubrects > 0) {      \
+					assert(true);											\
+					return;													  \
+				}															\
+                ReadExact(m_netbuf, nSubrects * 2);                           \
                                                                               \
                 for (i = 0; i < nSubrects; i++) {                             \
                     sx = *ptr >> 4;                                           \

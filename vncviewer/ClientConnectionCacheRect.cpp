@@ -57,7 +57,7 @@ void ClientConnection::SaveArea(RECT &r)
 
 	omni_mutex_lock l(m_bitmapdcMutex);
 	if (m_DIBbitsCache && m_DIBbits) 
-		Copybuffer(w, h, x, y,m_myFormat.bitsPerPixel/8,(BYTE*)m_DIBbits,(BYTE*)m_DIBbitsCache,m_si.framebufferWidth);
+		Copybuffer(w, h, x, y,m_myFormat.bitsPerPixel/8,(BYTE*)m_DIBbits,(BYTE*)m_DIBbitsCache,m_si.framebufferWidth,m_si.framebufferHeight);
 }
 
 void ClientConnection::RestoreArea(RECT &r)

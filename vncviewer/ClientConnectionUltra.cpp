@@ -63,10 +63,8 @@ void ClientConnection::ReadUltraZip(rfbFramebufferUpdateRectHeader *pfburh,HRGN 
 	UINT nNbCacheRects = pfburh->r.x;
 	UINT numRawBytes = pfburh->r.y+pfburh->r.w*65535;
 	// Security Check
-	if (numRawBytes > 106000000)
-		return;
-	if (nNbCacheRects > 25000)
-		return;
+	if (numRawBytes > 106000000 || nNbCacheRects > 25000)
+	{assert(true);return;}
 
 	UINT numCompBytes;
 	lzo_uint new_len;
@@ -77,7 +75,7 @@ void ClientConnection::ReadUltraZip(rfbFramebufferUpdateRectHeader *pfburh,HRGN 
 	numCompBytes = Swap32IfLE(hdr.nBytes);
 	// Security Check
 	if (numCompBytes > numRawBytes)
-		return;
+		{assert(true);return;}
 	CheckBufferSize(numCompBytes);
 	// Read the compressed data
 	ReadExact((char *)m_netbuf, numCompBytes);
@@ -94,7 +92,7 @@ void ClientConnection::ReadUltraZip(rfbFramebufferUpdateRectHeader *pfburh,HRGN 
 		m_zlibbuf_size += sz_rfbFramebufferUpdateRectHeader;
 		// Security Check
 		if (m_zlibbuf_size > numRawBytes+500)
-			return;
+			{assert(true);return;}
 		memcpy((char *) &surh,pzipbuf, sz_rfbFramebufferUpdateRectHeader);
 		surh.r.x = Swap16IfLE(surh.r.x);
 		surh.r.y = Swap16IfLE(surh.r.y);
@@ -116,10 +114,9 @@ void ClientConnection::ReadUltraZip(rfbFramebufferUpdateRectHeader *pfburh,HRGN 
 		 if ( surh.encoding==rfbEncodingRaw)
 			{
 				UINT numpixels = surh.r.w * surh.r.h;							  
-				if (m_DIBbits) ConvertAll(surh.r.w,surh.r.h,surh.r.x, surh.r.y,m_myFormat.bitsPerPixel/8,(BYTE *)pzipbuf,(BYTE *)m_DIBbits,m_si.framebufferWidth);
+				if (m_DIBbits) ConvertAll(surh.r.w,surh.r.h,surh.r.x, surh.r.y,m_myFormat.bitsPerPixel/8,(BYTE *)pzipbuf,(BYTE *)m_DIBbits,m_si.framebufferWidth,m_si.framebufferHeight);
 				pzipbuf +=numpixels*m_myFormat.bitsPerPixel/8;
 				if (!m_opts.m_Directx)InvalidateRegion(&rect,prgn);
 			}
 	}
-
 }
