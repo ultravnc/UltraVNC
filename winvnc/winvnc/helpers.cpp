@@ -49,8 +49,8 @@ Set_settings_as_admin(char *mycommand)
 	char commanline[MAX_PATH];
 	GetModuleFileName(0, exe_file_name, MAX_PATH);
 
-	strcpy(commanline, winvncSettings);
-	strcat(commanline, ":");
+	strcpy_s(commanline, winvncSettings);
+	strcat_s(commanline, ":");
 	strcat_s(commanline, 260, mycommand);
 
 	SHELLEXECUTEINFO shExecInfo;

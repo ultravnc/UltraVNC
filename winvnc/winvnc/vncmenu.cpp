@@ -285,7 +285,7 @@ vncMenu::vncMenu(vncServer *server)
 	vncService::CurrentUser((char *)&m_username, sizeof(m_username));
 
 	//if (strcmp(m_username, "") == 0)
-	//	strcpy((char *)&m_username, "SYSTEM");
+	//	strcpy_s((char *)&m_username, "SYSTEM");
 	//vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::vncMenu - UserName = %s\n"), m_username);
 
 	// Create a dummy window to handle tray icon messages
@@ -592,7 +592,7 @@ vncMenu::GetIPAddrString(char *buffer, int buflen) {
 	if (old_buflen!=0 && dns_counter<12)
 	{
 		dns_counter++;
-		strcpy(buffer,old_buffer);
+		strcpy_s(buffer, buflen, old_buffer);
 		return;
 	}
 	dns_counter=0;
@@ -637,7 +637,7 @@ vncMenu::GetIPAddrString(char *buffer, int buflen) {
 					memcpy(&Ipv4Addr, pIpv4Addr, sizeof(Ipv4Addr));
 					Ipv4Addr.sin_family = AF_INET;
 					char			szText[256];
-					sprintf(szText, "%s-", inet_ntoa(Ipv4Addr.sin_addr));
+					sprintf_s(szText, "%s-", inet_ntoa(Ipv4Addr.sin_addr));
 					int len = strlen(buffer);
 					int len2 = strlen(szText);
 					if (len + len2 < buflen) strcat_s(buffer, buflen, szText);
@@ -677,7 +677,7 @@ vncMenu::GetIPAddrString(char *buffer, int buflen) {
 					char			szText[256];
 					memset(szText, 0, 256);
 					strncpy(szText, ipstringbuffer, ipbufferlength - 4);
-					strcat(szText, "-");
+					strcat_s(szText, "-");
 					int len = strlen(buffer);
 					int len2 = strlen(szText);
 					if (len + len2 < buflen)strcat_s(buffer, buflen, szText);
@@ -701,7 +701,7 @@ vncMenu::GetIPAddrString(char *buffer, int buflen) {
     char digtxt[5];
     for (int i = 0; ph->h_addr_list[i]; i++) {
     	for (int j = 0; j < ph->h_length; j++) {
-			sprintf(digtxt, "%d.", (unsigned char) ph->h_addr_list[i][j]);
+			sprintf_s(digtxt, "%d.", (unsigned char) ph->h_addr_list[i][j]);
 			strncat(buffer, digtxt, (buflen-1)-strlen(buffer));
 		}	
 		buffer[strlen(buffer)-1] = '\0';
@@ -764,7 +764,7 @@ vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 			strncpy(m_nid.szInfoTitle, m_BalloonTitle, 63);
 			m_nid.szInfoTitle[63] = '\0';
 		} else {
-			strcpy(m_nid.szInfoTitle, "Remote Connection");
+			strcpy_s(m_nid.szInfoTitle, "Remote Connection");
 		}
 
 		m_nid.uTimeout=10000; // minimum
@@ -912,7 +912,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		Sleep(1000);
 		vnclog.Print(LL_INTINFO, VNCLOG("WM_TASKBARCREATED \n"));
 		// User has changed!
-		strcpy(_this->m_username, newuser);
+		strcpy_s(_this->m_username, newuser);
 		// Order impersonation thread killing
 		KillTimer(hwnd,1);
 		PostQuitMessage(0);
@@ -934,14 +934,14 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		}
 
 		if (_this->m_server->RunningFromExternalService()) {
-			strcpy(newuser,"");
+			strcpy_s(newuser,"");
 			if (vncService::CurrentUser((char *) &newuser, sizeof(newuser))) {
 				// Check whether the user name has changed!
 				if (_stricmp(newuser, _this->m_username) != 0 || _this->IconFaultCounter>2) {
 					Sleep(1000);
 					vnclog.Print(LL_INTINFO,VNCLOG("user name has changed\n"));
 					// User has changed!
-					strcpy(_this->m_username, newuser);
+					strcpy_s(_this->m_username, newuser);
 					// Order impersonation thread killing
 					PostQuitMessage(0);
 					break;
@@ -1068,8 +1068,8 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 							char dir[MAX_PATH];
 							char exe_file_name[MAX_PATH];
 							GetModuleFileName(0, exe_file_name, MAX_PATH);
-							strcpy(dir, exe_file_name);
-							strcat(dir, " -openhomepage");
+							strcpy_s(dir, exe_file_name);
+							strcat_s(dir, " -openhomepage");
 				
 							{
 								STARTUPINFO          StartUPInfo;
@@ -1103,8 +1103,8 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 							char dir[MAX_PATH];
 							char exe_file_name[MAX_PATH];
 							GetModuleFileName(0, exe_file_name, MAX_PATH);
-							strcpy(dir, exe_file_name);
-							strcat(dir, " -openforum");
+							strcpy_s(dir, exe_file_name);
+							strcat_s(dir, " -openforum");
 				
 							{
 								STARTUPINFO          StartUPInfo;
@@ -1151,8 +1151,8 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 					char dir[MAX_PATH];
 					char exe_file_name[MAX_PATH];
 					GetModuleFileName(0, exe_file_name, MAX_PATH);
-					strcpy(dir, exe_file_name);
-					strcat(dir, " -softwarecadhelper");
+					strcpy_s(dir, exe_file_name);
+					strcat_s(dir, " -softwarecadhelper");
 		
 					{
 					STARTUPINFO          StartUPInfo;
@@ -1199,8 +1199,8 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 					char dir[MAX_PATH];
 					char exe_file_name[MAX_PATH];
 					GetModuleFileName(0, exe_file_name, MAX_PATH);
-					strcpy(dir, exe_file_name);
-					strcat(dir, " -delsoftwarecadhelper");
+					strcpy_s(dir, exe_file_name);
+					strcat_s(dir, " -delsoftwarecadhelper");
 		
 					{
 					STARTUPINFO          StartUPInfo;
@@ -1248,8 +1248,8 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 					char dir[MAX_PATH];
 					char exe_file_name[MAX_PATH];
 					GetModuleFileName(0, exe_file_name, MAX_PATH);
-					strcpy(dir, exe_file_name);
-					strcat(dir, " -rebootsafemodehelper");
+					strcpy_s(dir, exe_file_name);
+					strcat_s(dir, " -rebootsafemodehelper");
 		
 					{
 					STARTUPINFO          StartUPInfo;
@@ -1296,8 +1296,8 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 					char dir[MAX_PATH];
 					char exe_file_name[MAX_PATH];
 					GetModuleFileName(0, exe_file_name, MAX_PATH);
-					strcpy(dir, exe_file_name);
-					strcat(dir, " -rebootforcedehelper");
+					strcpy_s(dir, exe_file_name);
+					strcat_s(dir, " -rebootforcedehelper");
 		
 					{
 					STARTUPINFO          StartUPInfo;
@@ -1343,8 +1343,8 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 					char dir[MAX_PATH];
 					char exe_file_name[MAX_PATH];
 					GetModuleFileName(0, exe_file_name, MAX_PATH);
-					strcpy(dir, exe_file_name);
-					strcat(dir, " -uninstallhelper");
+					strcpy_s(dir, exe_file_name);
+					strcat_s(dir, " -uninstallhelper");
 		
 					{
 					STARTUPINFO          StartUPInfo;
@@ -1390,8 +1390,8 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 					char dir[MAX_PATH];
 					char exe_file_name[MAX_PATH];
 					GetModuleFileName(0, exe_file_name, MAX_PATH);
-					strcpy(dir, exe_file_name);
-					strcat(dir, " -installhelper");
+					strcpy_s(dir, exe_file_name);
+					strcat_s(dir, " -installhelper");
 		
 
 					STARTUPINFO          StartUPInfo;
@@ -1445,8 +1445,8 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 					char dir[MAX_PATH];
 					char exe_file_name[MAX_PATH];
 					GetModuleFileName(0, exe_file_name, MAX_PATH);
-					strcpy(dir, exe_file_name);
-					strcat(dir, " -stopservicehelper");
+					strcpy_s(dir, exe_file_name);
+					strcat_s(dir, " -stopservicehelper");
 		
 
 					STARTUPINFO          StartUPInfo;
@@ -1492,8 +1492,8 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 					char dir[MAX_PATH];
 					char exe_file_name[MAX_PATH];
 					GetModuleFileName(0, exe_file_name, MAX_PATH);
-					strcpy(dir, exe_file_name);
-					strcat(dir, " -startservicehelper");
+					strcpy_s(dir, exe_file_name);
+					strcat_s(dir, " -startservicehelper");
 		
 
 					STARTUPINFO          StartUPInfo;
@@ -1654,7 +1654,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 	case WM_USERCHANGED:
 		// The current user may have changed.
 		{
-			strcpy(newuser,"");
+			strcpy_s(newuser,"");
 
 			if (vncService::CurrentUser((char *) &newuser, sizeof(newuser)))
 			{
@@ -1669,7 +1669,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 						VNCLOG("user name has changed\n"));
 
 					// User has changed!
-					strcpy(_this->m_username, newuser);
+					strcpy_s(_this->m_username, newuser);
 
 					// Redraw the tray icon and set it's state
 					_this->DelTrayIcon();
@@ -1801,7 +1801,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 					nameDup = _strdup(straddr);
 					if (nameDup == 0)
 						return 0;
-					strcpy(szAdrName, nameDup);
+					strcpy_s(szAdrName, nameDup);
 					// Free the duplicate name
 					if (nameDup != 0) free(nameDup);
 				}
@@ -1817,7 +1817,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 					if (strlen(straddr)== 0) return 0;
 					nameDup = _strdup(straddr);
 					if (nameDup == 0) return 0;
-					strcpy(szAdrName, nameDup);
+					strcpy_s(szAdrName, nameDup);
 					// Free the duplicate name
 					if (nameDup != 0) free(nameDup);
 					// Get the port number
@@ -1829,7 +1829,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			// (but it's not required)
 			bool bId = (strlen(_this->m_server->AutoReconnectId()) > 0);
 			if (bId)
-				strcpy(szId, _this->m_server->AutoReconnectId());
+				strcpy_s(szId, _this->m_server->AutoReconnectId());
 
 			// sf@2003
 			// Stores the client adr/ports the first time we try to connect
@@ -1839,7 +1839,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				if (strlen(dnsname)>0) _this->m_server->AutoReconnectAdr(dnsname);
 				else
 					_this->m_server->AutoReconnectAdr(szAdrName);
-				strcpy(dnsname, "");
+				strcpy_s(dnsname, "");
 
 				_this->m_server->AutoReconnectPort(nport);
 			}
@@ -1945,7 +1945,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 					nameDup = _strdup(name);
 					if (nameDup == 0)
 						return 0;
-					strcpy(szAdrName, nameDup);
+					strcpy_s(szAdrName, nameDup);
 					// Free the duplicate name
 					if (nameDup != 0) free(nameDup);
 				}
@@ -1960,7 +1960,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 					nameDup = _strdup(name);
 					if (nameDup == 0)
 						return 0;
-					strcpy(szAdrName, nameDup);
+					strcpy_s(szAdrName, nameDup);
 					// Free the duplicate name
 					if (nameDup != 0) free(nameDup);
 
@@ -1974,7 +1974,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			// (but it's not required)
 			bool bId = ( strlen(_this->m_server->AutoReconnectId() ) > 0);
 			if ( bId )
-				strcpy( szId, _this->m_server->AutoReconnectId() );
+				strcpy_s( szId, _this->m_server->AutoReconnectId() );
 
 			// sf@2003
 			// Stores the client adr/ports the first time we try to connect
@@ -1984,7 +1984,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				if (strlen(dnsname)>0) _this->m_server->AutoReconnectAdr(dnsname);
 				else 
 					_this->m_server->AutoReconnectAdr(szAdrName);
-				strcpy(dnsname,"");
+				strcpy_s(dnsname,"");
 
 				_this->m_server->AutoReconnectPort(nport);
 			}
@@ -2094,7 +2094,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				nameDup = _strdup(name);
 				if (nameDup == 0)
 					return 0;
-				strcpy(szAdrName, nameDup);
+				strcpy_s(szAdrName, nameDup);
 				// Free the duplicate name
 				if (nameDup != 0) free(nameDup);
 			}
@@ -2109,7 +2109,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				nameDup = _strdup(name);
 				if (nameDup == 0)
 					return 0;
-				strcpy(szAdrName, nameDup);
+				strcpy_s(szAdrName, nameDup);
 				// Free the duplicate name
 				if (nameDup != 0) free(nameDup);
 
@@ -2124,7 +2124,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			// (but it's not required)
 			bool bId = (strlen(_this->m_server->AutoReconnectId()) > 0);
 			if (bId)
-				strcpy(szId, _this->m_server->AutoReconnectId());
+				strcpy_s(szId, _this->m_server->AutoReconnectId());
 
 			// sf@2003
 			// Stores the client adr/ports the first time we try to connect
@@ -2134,7 +2134,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				if (strlen(dnsname)>0) _this->m_server->AutoReconnectAdr(dnsname);
 				else
 					_this->m_server->AutoReconnectAdr(szAdrName);
-				strcpy(dnsname, "");
+				strcpy_s(dnsname, "");
 
 				_this->m_server->AutoReconnectPort(nport);
 			}

@@ -401,12 +401,12 @@ vncSetAuth::vncSetAuth()
 	locdom1=Readlocdom1(locdom1);
 	locdom2=Readlocdom2(locdom2);
 	locdom3=Readlocdom3(locdom3);
-	if (group1){strcpy(pszgroup1,group1);delete [] group1;}
-	else strcpy(pszgroup1,"");
-	if (group2){strcpy(pszgroup2,group2);delete [] group2;}
-	else strcpy(pszgroup2,"");
-	if (group3){strcpy(pszgroup3,group3);delete [] group3;}
-	else strcpy(pszgroup3,"");
+	if (group1){strcpy_s(pszgroup1,group1);delete [] group1;}
+	else strcpy_s(pszgroup1,"");
+	if (group2){strcpy_s(pszgroup2,group2);delete [] group2;}
+	else strcpy_s(pszgroup2,"");
+	if (group3){strcpy_s(pszgroup3,group3);delete [] group3;}
+	else strcpy_s(pszgroup3,"");
 }
 
 vncSetAuth::~vncSetAuth()
@@ -431,12 +431,12 @@ vncSetAuth::Init(vncServer *server)
 	locdom1=Readlocdom1(locdom1);
 	locdom2=Readlocdom2(locdom2);
 	locdom3=Readlocdom3(locdom3);
-	if (group1){strcpy(pszgroup1,group1);delete group1;}
-	else strcpy(pszgroup1,"");
-	if (group2){strcpy(pszgroup2,group2);delete group2;}
-	else strcpy(pszgroup2,"");
-	if (group3){strcpy(pszgroup3,group3);delete group3;}
-	else strcpy(pszgroup3,"");
+	if (group1){strcpy_s(pszgroup1,group1);delete group1;}
+	else strcpy_s(pszgroup1,"");
+	if (group2){strcpy_s(pszgroup2,group2);delete group2;}
+	else strcpy_s(pszgroup2,"");
+	if (group3){strcpy_s(pszgroup3,group3);delete group3;}
+	else strcpy_s(pszgroup3,"");
 	return TRUE;
 }
 

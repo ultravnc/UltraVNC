@@ -43,7 +43,7 @@ DeskDupEngine::DeskDupEngine()
 	}
 #ifdef _DEBUG
 	char			szText[256];
-	sprintf(szText, "DeskDupEngine\n");
+	sprintf_s(szText, "DeskDupEngine\n");
 	OutputDebugString(szText);
 #endif
 	hScreenEvent = NULL;
@@ -54,7 +54,7 @@ DeskDupEngine::~DeskDupEngine()
 {
 #ifdef _DEBUG
 	char			szText[256];
-	sprintf(szText, "~DeskDupEngine\n");
+	sprintf_s(szText, "~DeskDupEngine\n");
 	OutputDebugString(szText);
 #endif
 	videoDriver_Stop();
@@ -68,7 +68,7 @@ void DeskDupEngine::videoDriver_start(int x, int y, int w, int h)
 {
 #ifdef _DEBUG
 	char			szText[256];
-	sprintf(szText, "DeskDupEngine Start\n");
+	sprintf_s(szText, "DeskDupEngine Start\n");
 	OutputDebugString(szText);
 #endif
 	oldAantal = 1;
@@ -131,7 +131,7 @@ void DeskDupEngine::videoDriver_Stop()
 {
 #ifdef _DEBUG
 	char			szText[256];
-	sprintf(szText, "DeskDupEngine Stop\n");
+	sprintf_s(szText, "DeskDupEngine Stop\n");
 	OutputDebugString(szText);
 #endif
 	if (!init)

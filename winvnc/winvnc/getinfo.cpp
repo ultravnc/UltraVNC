@@ -553,22 +553,13 @@ int getinfo(char mytext[1024])
   else
 	  _stprintf(sText, _T("Failed in call to GetOSVersion\n"));
            
-  
-
-	/*char UserName[256+1]="";
-	DWORD Size=256+1;
-	if (GetUserName(UserName,&Size)!=0)
-	{
-		strcpy(mytext,"Current user : ");
-		strcat(mytext,UserName);
-	}*/
 	DWORD Size = 256 + 1;
-	strcpy(mytext, "");
+	strcpy_s(mytext, 1024, "");
 	char ComputerName[256+1]="";
 	if (GetComputerName(ComputerName,&Size)!=0)
 	{
-		strcat(mytext,"\nComputerName : ");
-		strcat(mytext,ComputerName);
+		strcat_s(mytext, 1024,"\nComputerName : ");
+		strcat_s(mytext, 1024,ComputerName);
 	}
 	///////////////////////////////
 
@@ -628,20 +619,20 @@ int getinfo(char mytext[1024])
 	if (IsIpv6 && IsIpv4)
 	{
 		char			szText[256];
-		sprintf(szText, "Ipv4: %s\nIpv6: %s \n", inet_ntoa(Ipv4Addr.sin_addr), ipstringbuffer);
-		strcat(mytext, szText);
+		sprintf_s(szText, "Ipv4: %s\nIpv6: %s \n", inet_ntoa(Ipv4Addr.sin_addr), ipstringbuffer);
+		strcat_s(mytext, 1024, szText);
 	}
 	else if (IsIpv6)
 	{
 		char			szText[256];
-		sprintf(szText, "Ipv6: %s \n", ipstringbuffer);
-		strcat(mytext, szText);
+		sprintf_s(szText, "Ipv6: %s \n", ipstringbuffer);
+		strcat_s(mytext, 1024, szText);
 	}
 	else if (IsIpv4)
 	{
 		char			szText[256];
-		sprintf(szText, "Ipv4: %s \n", inet_ntoa(Ipv4Addr.sin_addr));
-		strcat(mytext, szText);
+		sprintf_s(szText, "Ipv4: %s \n", inet_ntoa(Ipv4Addr.sin_addr));
+		strcat_s(mytext, 1024, szText);
 	}
 #else
 	PHOSTENT hostinfo;
@@ -654,13 +645,13 @@ int getinfo(char mytext[1024])
 		}
 	if (IP)
 	{
-	strcat(mytext,"\nIP : ");
-	strcat(mytext,IP);
+	strcat_s(mytext, 1024, "\nIP : ");
+	strcat_s(mytext, 1024, IP);
 	}
 #endif
 	//////////////////////////////////////
-	strcat(mytext,"\n");
-	strcat(mytext,sText);      
+	strcat_s(mytext, 1024, "\n");
+	strcat_s(mytext, 1024, sText);      
 
   return 0;
 }

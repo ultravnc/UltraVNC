@@ -69,8 +69,8 @@ HBITMAP
 				if (p == NULL) return 0;
 				*p = '\0';
 			}
-			strcpy(mycommand,WORKDIR);
-			strcat(mycommand,"\\background.bmp");
+			strcpy_s(mycommand,WORKDIR);
+			strcat_s(mycommand,"\\background.bmp");
 
 			hbmBkGnd = (HBITMAP)LoadImage(NULL, mycommand, IMAGE_BITMAP, 0, 0,LR_LOADFROMFILE);
 			if (hbmBkGnd ==NULL)

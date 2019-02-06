@@ -318,13 +318,13 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 					char mytext[1024];
 					char *myptr;
 					char split[4][6];
-					strcpy(mytext,(LPCSTR)pMyCDS->lpData);
+					strcpy_s(mytext,(LPCSTR)pMyCDS->lpData);
 					myptr=mytext;
 					for (DWORD j =0; j<(mysize/20);j++)
 					{
 						for (int i=0;i<4;i++)
 							{
-								strcpy(split[i],"     ");
+								strcpy_s(split[i],"     ");
 								strncpy(split[i],myptr,4);
 								myptr=myptr+5;
 							}

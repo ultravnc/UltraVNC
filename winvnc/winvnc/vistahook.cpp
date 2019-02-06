@@ -232,8 +232,8 @@ DWORD WINAPI Cadthread(LPVOID lpParam)
 									char dir[MAX_PATH];
 									char exe_file_name[MAX_PATH];
 									GetModuleFileName(0, exe_file_name, MAX_PATH);
-									strcpy(dir, exe_file_name);
-									strcat(dir, " -softwarecadhelper");
+									strcpy_s(dir, exe_file_name);
+									strcat_s(dir, " -softwarecadhelper");
 		
 							
 									STARTUPINFO          StartUPInfo;
@@ -299,10 +299,10 @@ DWORD WINAPI Cadthread(LPVOID lpParam)
 		if (p == NULL) return 0;
 		*p = '\0';
 		}
-	strcpy(mycommand,"");
-	strcat(mycommand,WORKDIR);//set the directory
-	strcat(mycommand,"\\");
-	strcat(mycommand,"cad.exe");
+	strcpy_s(mycommand,"");
+	strcat_s(mycommand,WORKDIR);//set the directory
+	strcat_s(mycommand,"\\");
+	strcat_s(mycommand,"cad.exe");
 
 	int nr=(int)ShellExecute(GetDesktopWindow(), "open", mycommand, "", 0, SW_SHOWNORMAL);
 	if (nr<=32)

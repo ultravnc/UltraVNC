@@ -244,7 +244,7 @@ BOOL CALLBACK vncConnDialog::vncConnDlgProc(HWND hwnd,
 			if (strcmp(idcode,"")==0) id=false;
 			else id=true;
 
-			strcpy(actualhostname, hostname);
+			strcpy_s(actualhostname, hostname);
 			
 			//adzm 2010-02-15 - Multiple repeaters chosen by modulo of ID
 
@@ -263,7 +263,7 @@ BOOL CALLBACK vncConnDialog::vncConnDlgProc(HWND hwnd,
 				finalidcode[i] = 0;
 
 				if (0 != strncmp("ID:", idcode, 3)) {
-					strcpy(finalidcode, "ID:");
+					strcpy_s(finalidcode, "ID:");
 					
 					for (i = 0; i < strlen(idcode); i++)
 					{
@@ -291,7 +291,7 @@ BOOL CALLBACK vncConnDialog::vncConnDlgProc(HWND hwnd,
 					char* szToken = strtok(hostname, ";");
 					while (szToken) {
 						if (modulo == 0) {
-							strcpy(actualhostname, szToken);
+							strcpy_s(actualhostname, szToken);
 							break;
 						}
 

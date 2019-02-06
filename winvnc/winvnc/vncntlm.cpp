@@ -555,12 +555,12 @@ int CheckUserGroupPasswordUni2(char * userin,char *password,const char *machine)
 	locdom1=Readlocdom1(locdom1);
 	locdom2=Readlocdom2(locdom2);
 	locdom3=Readlocdom3(locdom3);
-	strcpy(pszgroup1,"VNCACCESS");
-	strcpy(pszgroup2,"Administrators");
-	strcpy(pszgroup3,"VNCVIEWONLY");
-	if (group1){strcpy(pszgroup1,group1);}
-	if (group2){strcpy(pszgroup2,group2);}
-	if (group3){strcpy(pszgroup3,group3);}
+	strcpy_s(pszgroup1,"VNCACCESS");
+	strcpy_s(pszgroup2,"Administrators");
+	strcpy_s(pszgroup3,"VNCVIEWONLY");
+	if (group1){strcpy_s(pszgroup1,group1);}
+	if (group2){strcpy_s(pszgroup2,group2);}
+	if (group3){strcpy_s(pszgroup3,group3);}
 
 	savegroup1(pszgroup1);
 	savegroup2(pszgroup2);
@@ -569,9 +569,9 @@ int CheckUserGroupPasswordUni2(char * userin,char *password,const char *machine)
 	savelocdom2(locdom2);
 	savelocdom3(locdom3);
 
-	if (group1){strcpy(pszgroup1,group1);delete group1;}
-	if (group2){strcpy(pszgroup2,group2);delete group2;}
-	if (group3){strcpy(pszgroup3,group3);delete group3;}
+	if (group1){strcpy_s(pszgroup1,group1);delete group1;}
+	if (group2){strcpy_s(pszgroup2,group2);delete group2;}
+	if (group3){strcpy_s(pszgroup3,group3);delete group3;}
 
 	//////////////////////////////////////////////////
 	// logon user only works on NT>

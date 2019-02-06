@@ -125,7 +125,7 @@ BOOL CALLBACK vncAcceptDialog::vncAcceptDlgProc(HWND hwnd,
 			char accept_reject_mesg[512];
 			IniFile myIniFile;
 			myIniFile.ReadString("admin", "accept_reject_mesg", accept_reject_mesg,512);
-			if (strlen(accept_reject_mesg)==0) strcpy(accept_reject_mesg,"WinVNC has received an incoming connection from");
+			if (strlen(accept_reject_mesg)==0) strcpy_s(accept_reject_mesg,"WinVNC has received an incoming connection from");
 			SetDlgItemText(hwnd, IDC_STATIC_TEXT1, accept_reject_mesg);
 			SetDlgItemText(hwnd, IDC_ACCEPT_IP, _this->m_ipAddress);
 
@@ -138,8 +138,8 @@ BOOL CALLBACK vncAcceptDialog::vncAcceptDlgProc(HWND hwnd,
 				if (p == NULL) return 0;
 				*p = '\0';
 			}
-			strcpy(mycommand,WORKDIR);
-			strcat(mycommand,"\\mylogo.bmp");
+			strcpy_s(mycommand,WORKDIR);
+			strcat_s(mycommand,"\\mylogo.bmp");
 			hbmBkGnd = (HBITMAP)LoadImage(NULL, mycommand, IMAGE_BITMAP, 0, 0,LR_LOADFROMFILE);
 			}
 			SendMessage(GetDlgItem(hwnd, IDC_ACCEPTLOGO),STM_SETIMAGE,IMAGE_BITMAP,(LPARAM)(HBITMAP)hbmBkGnd);
@@ -155,9 +155,9 @@ BOOL CALLBACK vncAcceptDialog::vncAcceptDlgProc(HWND hwnd,
 
 			char temp[256];
 			if (_this->m_acceptOnTimeout)
-				sprintf(temp, "AutoAccept:%u", (_this->m_timeoutCount));
+				sprintf_s(temp, "AutoAccept:%u", (_this->m_timeoutCount));
 			else
-				sprintf(temp, "AutoReject:%u", (_this->m_timeoutCount));
+				sprintf_s(temp, "AutoReject:%u", (_this->m_timeoutCount));
 			SetDlgItemText(hwnd, IDC_ACCEPT_TIMEOUT, temp);
 
 			// Attempt to mimic Win98/2000 dialog behaviour
@@ -214,9 +214,9 @@ BOOL CALLBACK vncAcceptDialog::vncAcceptDlgProc(HWND hwnd,
 		// Update the displayed count
 		char temp[256];
 		if ( _this->m_acceptOnTimeout )
-			sprintf(temp, "AutoAccept: %u", (_this->m_timeoutCount));
+			sprintf_s(temp, "AutoAccept: %u", (_this->m_timeoutCount));
 		else
-			sprintf(temp, "AutoReject: %u", (_this->m_timeoutCount));
+			sprintf_s(temp, "AutoReject: %u", (_this->m_timeoutCount));
 		SetDlgItemText(hwnd, IDC_ACCEPT_TIMEOUT, temp);
 		break;
 

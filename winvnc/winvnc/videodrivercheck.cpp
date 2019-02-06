@@ -68,7 +68,7 @@ BOOL GetDllProductVersion(char* dllName, char *vBuffer, int size)
    DWORD myerror=GetLastError();
    if (sVersion==0)
 	   {
-		   strcpy(vBuffer,"Fail: Using 32bit winvnc.exe with  a 64bit driver? \n");		   
+		   strcpy_s(vBuffer, 512, "Fail: Using 32bit winvnc.exe with  a 64bit driver? \n");		   
 		   return (FALSE);
 		}
 
@@ -154,41 +154,41 @@ CheckVideoDriver(bool Box)
 					{
 						char buf[512];
 						char buf2[512];
-						strcpy(buf,"");
-						strcpy(buf2,"");
-						strcpy(buf2,"Driver found. \n");
+						strcpy_s(buf,"");
+						strcpy_s(buf2,"");
+						strcpy_s(buf2,"Driver found. \n");
 						GetDllProductVersion("mv2.dll",buf,512);
 						if (strcmp(buf,"1.00.22")==NULL)
 						{
-							strcat(buf2,"Driver version OK \n");
+							strcat_s(buf2,"Driver version OK \n");
 						}
 						else
 						{
-							strcat(buf2,"Driver verion is not 1.00.22 \n");
-							strcat(buf2,buf);
-							strcat(buf2," \n");
+							strcat_s(buf2,"Driver verion is not 1.00.22 \n");
+							strcat_s(buf2,buf);
+							strcat_s(buf2," \n");
 						}
 
 						if (dd.StateFlags & DISPLAY_DEVICE_ATTACHED_TO_DESKTOP)
 						{
-							strcat(buf2," driver Active");
+							strcat_s(buf2," driver Active");
 							HDC testdc=NULL;
 							deviceName = (LPSTR)&dd.DeviceName[0];
 							testdc = CreateDC("DISPLAY",deviceName,NULL,NULL);	
 							if (testdc)
 							{
 								DeleteDC(testdc);
-								strcat(buf2," access ok");
+								strcat_s(buf2," access ok");
 							}
 							else
 							{
-								strcat(buf2," access denied, permission problem");
+								strcat_s(buf2," access denied, permission problem");
 							}
 						}
                         else
                         {
-                            strcat(buf2, "Driver Not Activated, is the viewer current connected ?\n");
-                            strcat(buf2, "A mirrior driver can only be started if winvnc is a service or running as admin\n");
+                            strcat_s(buf2, "Driver Not Activated, is the viewer current connected ?\n");
+                            strcat_s(buf2, "A mirrior driver can only be started if winvnc is a service or running as admin\n");
                         }
 						MessageBoxSecure(NULL,buf2,buf,0);
 					}

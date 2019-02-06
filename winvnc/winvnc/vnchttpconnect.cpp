@@ -324,11 +324,11 @@ void vncHTTPConnectThread::DoHTTP(VSocket *socket)
 			}
 			else
 			{
-				strcpy(desktopname, "WinVNC");
+				strcpy_s(desktopname, "WinVNC");
 			}
 
 			// Send the java applet page
-			sprintf(indexpage, HTTP_FMT_INDEX,
+			sprintf_s(indexpage, HTTP_FMT_INDEX,
 				desktopname, width, height+32,
 				m_server->GetPort(), width, height+32,
 				m_server->GetPort()
@@ -337,7 +337,7 @@ void vncHTTPConnectThread::DoHTTP(VSocket *socket)
 		else
 		{
 			// Send a "sorry, not allowed" page
-			sprintf(indexpage, HTTP_MSG_NOSOCKCONN);
+			sprintf_s(indexpage, HTTP_MSG_NOSOCKCONN);
 		}
 
 		// Send the page

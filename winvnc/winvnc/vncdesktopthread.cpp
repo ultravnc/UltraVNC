@@ -75,7 +75,7 @@ vncDesktopThread::copy_bitmaps_to_buffer(ULONG i,rfb::Region2D &rgncache,rfb::Up
 		OutputDevMessage("%4d REct1 %i %i %i %i", now - sLastCopy, x, y, w, h);
 #else
 					char			szText[256];
-		sprintf(szText, "%4d REct1 %i %i %i %i  \n", now - sLastCopy, x, y, w, h);
+		sprintf_s(szText, "%4d REct1 %i %i %i %i  \n", now - sLastCopy, x, y, w, h);
 					OutputDebugString(szText);		
 #endif
 		sLastCopy = now;
@@ -1400,7 +1400,7 @@ void writeLog(char *sender, char *text)
 	char mess[3000];
 	SYSTEMTIME st;
 	GetSystemTime(&st);       // get current time
-	int len = sprintf(mess, "%04d-%02d-%02d %02d:%02d:%02d.%03d %40s %s\r\n", st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds, sender, text);
+	int len = sprintf_s(mess, "%04d-%02d-%02d %02d:%02d:%02d.%03d %40s %s\r\n", st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds, sender, text);
 
 	OutputDebugString(mess);
 #endif
@@ -1411,7 +1411,7 @@ void WriteLog(char* sender, char *format, ...)
 	char temp[1000];
 	va_list args;
 	va_start(args, format);
-	vsprintf(temp, format, args);
+	vsprintf_s(temp, format, args);
 	va_end(args);
 	writeLog(sender, temp);
 }

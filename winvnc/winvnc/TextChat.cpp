@@ -63,11 +63,11 @@ BOOL PlayResource(LPSTR lpName)
 
 		*p = '\0'; //PGM 
 
-		strcat(szWavFile,"\\"); //PGM 
+		strcat_s(szWavFile,"\\"); //PGM 
 
 	} //PGM 
 
-	strcat(szWavFile,"ding_dong.wav"); //PGM 
+	strcat_s(szWavFile,"ding_dong.wav"); //PGM 
 
 	if(::PlaySound(szWavFile, NULL, SND_APPLICATION | SND_FILENAME | SND_ASYNC | SND_NOWAIT)!= ERROR_SUCCESS) //PGM
 
@@ -289,7 +289,7 @@ void TextChat::PrintMessage(const char* szMessage,const char* szSender,DWORD dwC
 	if (nLen + 32 > TEXTMAXSIZE )
 	{
 		memset(m_szTextBoxBuffer, 0, TEXTMAXSIZE);
-		strcpy(m_szTextBoxBuffer, "------------------------------------------------------------------------------------------------------------------------\n");
+		strcpy_s(m_szTextBoxBuffer, TEXTMAXSIZE,  "------------------------------------------------------------------------------------------------------------------------\n");
 		SetDlgItemText(m_hDlg, IDC_CHATAREA_EDIT, m_szTextBoxBuffer);
 	}
 
@@ -504,7 +504,7 @@ INT_PTR CALLBACK TextChat::TextChatDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM wPar
     TextChat *_this = helper::SafeGetWindowUserData<TextChat>(hWnd);
 #ifdef _DEBUG
 					char			szText[256];
-					sprintf(szText," ++++++ uMsg %i\n",uMsg);
+					sprintf_s(szText," ++++++ uMsg %i\n",uMsg);
 					OutputDebugString(szText);		
 #endif
 	switch (uMsg)
@@ -582,7 +582,7 @@ INT_PTR CALLBACK TextChat::TextChatDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM wPar
 	case WM_COMMAND:
 #ifdef _DEBUG
 					//char			szText[256];
-					sprintf(szText," ++++++ wm_command %i\n",LOWORD(wParam));
+					sprintf_s(szText," ++++++ wm_command %i\n",LOWORD(wParam));
 					OutputDebugString(szText);		
 	#endif
 		switch (LOWORD(wParam))
@@ -617,7 +617,7 @@ INT_PTR CALLBACK TextChat::TextChatDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM wPar
 			{
 			memset(_this->m_szLocalText,0,TEXTMAXSIZE);
 			UINT nRes = GetDlgItemText( hWnd, IDC_LOCALTEXT_EDIT, _this->m_szLocalText, TEXTMAXSIZE-1);
-			strcat(_this->m_szLocalText, "\n");
+			strcat_s(_this->m_szLocalText, TEXTMAXSIZE, "\n");
 			_this->SendLocalText();	
 			SetFocus(GetDlgItem(hWnd, IDC_INPUTAREA_EDIT));
 			}

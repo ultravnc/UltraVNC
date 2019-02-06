@@ -62,7 +62,7 @@ bool Shellexecuteforuiaccess()
 				if (p == NULL) return false;
 				*p = '\0';
 				}
-		strcat(WORKDIR,"\\uvnckeyboardhelper.exe");
+		strcat_s(WORKDIR,"\\uvnckeyboardhelper.exe");
 	
 		FILE *fp = fopen(WORKDIR,"rb");
 		if(fp) fclose(fp);

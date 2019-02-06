@@ -280,7 +280,7 @@ BOOL CreateRemoteSessionProcess(
 				hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, cpauRetData.ProcInfo.dwProcessId);
 	#ifdef _DEBUG
 						char			szText[256];
-						sprintf(szText," ++++++cpau  %i  %p %i %i %p %p\n",cpauRetData.bRetValue, cpauRetData.ProcInfo.hProcess,cpauRetData.ProcInfo.dwProcessId,cpauRetData.ProcInfo.dwThreadId, cpauRetData.ProcInfo.hThread, hProcess);
+						sprintf_s(szText," ++++++cpau  %i  %p %i %i %p %p\n",cpauRetData.bRetValue, cpauRetData.ProcInfo.hProcess,cpauRetData.ProcInfo.dwProcessId,cpauRetData.ProcInfo.dwThreadId, cpauRetData.ProcInfo.hThread, hProcess);
 						OutputDebugString(szText);				
 	#endif
 					bRet = cpauRetData.bRetValue;
@@ -359,30 +359,30 @@ static int pad2(bool preconnect)
 	char cmdline[MAX_PATH];
     GetModuleFileName(0, exe_file_name, MAX_PATH);
 
-    strcpy(app_path, exe_file_name);
+    strcpy_s(app_path, exe_file_name);
 	if (preconnect)
 	{
-		strcat(app_path, " ");
-		strcat(app_path, "-preconnect");
+		strcat_s(app_path, " ");
+		strcat_s(app_path, "-preconnect");
 	}
-	strcat(app_path, " ");
-	strcat(app_path,cmdtext);
-    strcat(app_path, "_run");
+	strcat_s(app_path, " ");
+	strcat_s(app_path,cmdtext);
+    strcat_s(app_path, "_run");
 	IniFile myIniFile;
 	kickrdp=myIniFile.ReadInt("admin", "kickrdp", kickrdp);
 	clear_console=myIniFile.ReadInt("admin", "clearconsole", clear_console);
 	myIniFile.ReadString("admin", "service_commandline",cmdline,256);
 	if (strlen(cmdline)!=0)
 	{
-		strcpy(app_path, exe_file_name);
+		strcpy_s(app_path, exe_file_name);
 		if (preconnect)
 		{
-			strcat(app_path, " ");
-			strcat(app_path, "-preconnect");
+			strcat_s(app_path, " ");
+			strcat_s(app_path, "-preconnect");
 		}
-		strcat(app_path, " ");
-		strcat(app_path,cmdline);
-		strcat(app_path, " -service_run");
+		strcat_s(app_path, " ");
+		strcat_s(app_path,cmdline);
+		strcat_s(app_path, " -service_run");
 	}
 	return 0;
 }
@@ -526,7 +526,7 @@ get_winlogon_handle(OUT LPHANDLE  lphUserToken, DWORD mysessionID)
 	#ifdef _DEBUG
 					char			szText[256];
 					DWORD error=GetLastError();
-					sprintf(szText," ++++++ Find_winlogon %i %i %d\n",ID_session,Id,error);
+					sprintf_s(szText," ++++++ Find_winlogon %i %i %d\n",ID_session,Id,error);
 					SetLastError(0);
 					OutputDebugString(szText);		
 	#endif
@@ -538,7 +538,7 @@ get_winlogon_handle(OUT LPHANDLE  lphUserToken, DWORD mysessionID)
 		#ifdef _DEBUG
 					char			szText[256];
 					DWORD error=GetLastError();
-					sprintf(szText," ++++++ OpenProcess %p \n", hProcess);
+					sprintf_s(szText," ++++++ OpenProcess %p \n", hProcess);
 					SetLastError(0);
 					OutputDebugString(szText);		
 		#endif
@@ -547,7 +547,7 @@ get_winlogon_handle(OUT LPHANDLE  lphUserToken, DWORD mysessionID)
 
 		#ifdef _DEBUG
 					error=GetLastError();
-					sprintf(szText," ++++++ OpenProcessToken %i %i\n", (int)hTokenThis,error);
+					sprintf_s(szText," ++++++ OpenProcessToken %i %i\n", (int)hTokenThis,error);
 					SetLastError(0);
 					OutputDebugString(szText);		
 		#endif
@@ -555,14 +555,14 @@ get_winlogon_handle(OUT LPHANDLE  lphUserToken, DWORD mysessionID)
 		bResult = DuplicateTokenEx(hTokenThis, TOKEN_ASSIGN_PRIMARY|TOKEN_ALL_ACCESS,NULL, SecurityImpersonation, TokenPrimary, lphUserToken);
 		#ifdef _DEBUG
 					error=GetLastError();
-					sprintf(szText," ++++++ DuplicateTokenEx %i %i %i %i\n", (int)hTokenThis, (int)&lphUserToken,error,bResult ? 1 : 0);
+					sprintf_s(szText," ++++++ DuplicateTokenEx %i %i %i %i\n", (int)hTokenThis, (int)&lphUserToken,error,bResult ? 1 : 0);
 					SetLastError(0);
 					OutputDebugString(szText);		
 		#endif
 		SetTokenInformation(*lphUserToken, TokenSessionId, &ID_session, sizeof(DWORD));
 		#ifdef _DEBUG
 					error=GetLastError();
-					sprintf(szText," ++++++ SetTokenInformation( %i %i %i\n", (int)hTokenThis, (int)&lphUserToken,error);
+					sprintf_s(szText," ++++++ SetTokenInformation( %i %i %i\n", (int)hTokenThis, (int)&lphUserToken,error);
 					SetLastError(0);
 					OutputDebugString(szText);		
 		#endif
@@ -616,7 +616,7 @@ LaunchProcessWin(DWORD dwSessionId,bool preconnect)
 				DWORD error=GetLastError();
 				#ifdef _DEBUG
 					char			szText[256];
-					sprintf(szText," ++++++ CreateProcessAsUser winlogon %d\n",error);
+					sprintf_s(szText," ++++++ CreateProcessAsUser winlogon %d\n",error);
 					OutputDebugString(szText);		
 				#endif
 			}
@@ -625,7 +625,7 @@ LaunchProcessWin(DWORD dwSessionId,bool preconnect)
 			 DWORD error=GetLastError();
 			 #ifdef _DEBUG
 					char			szText[256];
-					sprintf(szText," ++++++ CreateProcessAsUser failed %d %d %d\n",error,kickrdp,counter);
+					sprintf_s(szText," ++++++ CreateProcessAsUser failed %d %d %d\n",error,kickrdp,counter);
 					OutputDebugString(szText);		
 			#endif
 			if (error==233 && kickrdp==1)
@@ -635,7 +635,7 @@ LaunchProcessWin(DWORD dwSessionId,bool preconnect)
 							{
 								#ifdef _DEBUG
 								DWORD error=GetLastError();
-								sprintf(szText," ++++++ error==233 win\n");
+								sprintf_s(szText," ++++++ error==233 win\n");
 								SetLastError(0);
 								OutputDebugString(szText);		
 								#endif
@@ -688,7 +688,7 @@ LaunchProcessWin(DWORD dwSessionId,bool preconnect)
 				DWORD error=GetLastError();
 				#ifdef _DEBUG
 					char			szText[256];
-					sprintf(szText," ++++++ CreateProcessAsUser winlogon %d\n",error);
+					sprintf_s(szText," ++++++ CreateProcessAsUser winlogon %d\n",error);
 					OutputDebugString(szText);		
 				#endif
 			}
@@ -697,7 +697,7 @@ LaunchProcessWin(DWORD dwSessionId,bool preconnect)
 			 DWORD error=GetLastError();
 			 #ifdef _DEBUG
 					char			szText[256];
-					sprintf(szText," ++++++ CreateProcessAsUser no env failed %d\n",error);
+					sprintf_s(szText," ++++++ CreateProcessAsUser no env failed %d\n",error);
 					OutputDebugString(szText);		
 			#endif
 			//Little trick needed, FUS sometimes has an unreachable logon session.
@@ -711,7 +711,7 @@ LaunchProcessWin(DWORD dwSessionId,bool preconnect)
 							{
 								#ifdef _DEBUG
 								DWORD error=GetLastError();
-								sprintf(szText," ++++++ error==233 win\n");
+								sprintf_s(szText," ++++++ error==233 win\n");
 								SetLastError(0);
 								OutputDebugString(szText);		
 								#endif
@@ -756,7 +756,7 @@ LaunchProcessWin(DWORD dwSessionId,bool preconnect)
 	 #ifdef _DEBUG
 	char			szText[256];
 	DWORD error=GetLastError();
-	sprintf(szText," ++++++ Getsessionusertokenwin failed %d\n",error);
+	sprintf_s(szText," ++++++ Getsessionusertokenwin failed %d\n",error);
 	OutputDebugString(szText);		
 	#endif
 
@@ -923,10 +923,10 @@ void monitor_sessions_RDP()
 					if (p == NULL) return;
 					*p = '\0';
 				}
-				strcpy(mycommand, "");
-				strcat(mycommand, WORKDIR);//set the directory
-				strcat(mycommand, "\\");
-				strcat(mycommand, "cad.exe");
+				strcpy_s(mycommand, "");
+				strcat_s(mycommand, WORKDIR);//set the directory
+				strcat_s(mycommand, "\\");
+				strcat_s(mycommand, "cad.exe");
 				(void)ShellExecute(GetDesktopWindow(), "open", mycommand, "", 0, SW_SHOWNORMAL);
 			}
 			if (Inst) FreeLibrary(Inst);
@@ -1059,7 +1059,7 @@ void monitor_sessions_RDP()
 	whileloop:
 #ifdef _DEBUG
 		char			szText[256];
-		sprintf(szText, " ++++++1 %i %i %i\n", OlddwSessionId, dwSessionId, (int)ProcessInfo.hProcess);
+		sprintf_s(szText, " ++++++1 %i %i %i\n", OlddwSessionId, dwSessionId, (int)ProcessInfo.hProcess);
 		OutputDebugString(szText);
 #else
 		;
@@ -1067,7 +1067,7 @@ void monitor_sessions_RDP()
 	}//while
 #ifdef _DEBUG
 	char			szText[256];
-	sprintf(szText, " ++++++SetEvent Service stopping: signal tray icon to shut down\n");
+	sprintf_s(szText, " ++++++SetEvent Service stopping: signal tray icon to shut down\n");
 	OutputDebugString(szText);
 #endif
 
@@ -1140,10 +1140,10 @@ void monitor_sessions_RDP()
 					if (p == NULL) return;
 					*p = '\0';
 				}
-				strcpy(mycommand, "");
-				strcat(mycommand, WORKDIR);//set the directory
-				strcat(mycommand, "\\");
-				strcat(mycommand, "cad.exe");
+				strcpy_s(mycommand, "");
+				strcat_s(mycommand, WORKDIR);//set the directory
+				strcat_s(mycommand, "\\");
+				strcat_s(mycommand, "cad.exe");
 				(void)ShellExecute(GetDesktopWindow(), "open", mycommand, "", 0, SW_SHOWNORMAL);
 			}
 			if (Inst) FreeLibrary(Inst);
@@ -1156,7 +1156,7 @@ void monitor_sessions_RDP()
 			{
 #ifdef _DEBUG
 				char	szText[256];
-				sprintf(szText, " ++++++SetEvent Session change: signal tray icon to shut down\n");
+				sprintf_s(szText, " ++++++SetEvent Session change: signal tray icon to shut down\n");
 				OutputDebugString(szText);
 #endif
 				//Tell winvnc to stop
@@ -1199,7 +1199,7 @@ void monitor_sessions_RDP()
 							if (sessidcounter > 10) break;
 #ifdef _DEBUG
 							char	szText[256];
-							sprintf(szText, " WAITING session change %i %i\n", OlddwSessionId, dwSessionId);
+							sprintf_s(szText, " WAITING session change %i %i\n", OlddwSessionId, dwSessionId);
 							OutputDebugString(szText);
 #endif
 						}
@@ -1232,7 +1232,7 @@ void monitor_sessions_RDP()
 						if (sessidcounter > 10) break;
 #ifdef _DEBUG
 						char	szText[256];
-						sprintf(szText, " WAITING session change %i %i\n", OlddwSessionId, dwSessionId);
+						sprintf_s(szText, " WAITING session change %i %i\n", OlddwSessionId, dwSessionId);
 						OutputDebugString(szText);
 #endif
 					}
@@ -1244,7 +1244,7 @@ void monitor_sessions_RDP()
 				}
 #ifdef _DEBUG
 				char	szText[256];
-				sprintf(szText, " ++++++1 %i %i %i %i\n", OlddwSessionId, dwSessionId, dwCode, ProcessInfo.hProcess);
+				sprintf_s(szText, " ++++++1 %i %i %i %i\n", OlddwSessionId, dwSessionId, dwCode, ProcessInfo.hProcess);
 				OutputDebugString(szText);
 #endif
 			}
@@ -1253,7 +1253,7 @@ void monitor_sessions_RDP()
 	}//while
 #ifdef _DEBUG
 	char	szText[256];
-	sprintf(szText, " ++++++SetEvent Service stopping: signal tray icon to shut down\n");
+	sprintf_s(szText, " ++++++SetEvent Service stopping: signal tray icon to shut down\n");
 	OutputDebugString(szText);
 #endif
 	if (hEvent) SetEvent(hEvent);
@@ -1309,7 +1309,7 @@ void disconnect_remote_sessions()
 				if (!LockWorkStationF())
                 {
                     char msg[1024];
-                    sprintf(msg, "LockWorkstation failed with error 0x%0lX", GetLastError());
+                    sprintf_s(msg, "LockWorkstation failed with error 0x%0lX", GetLastError());
                     ::OutputDebugString(msg);
                 }
 

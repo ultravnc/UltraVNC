@@ -204,16 +204,16 @@ vncProperties::ShowAdmin(BOOL show, BOOL usersettings)
 					if (p == NULL) return;
 					*p = '\0';
 				}
-					strcpy(m_Tempfile,"");
-					strcat(m_Tempfile,WORKDIR);//set the directory
-					strcat(m_Tempfile,"\\");
-					strcat(m_Tempfile,INIFILE_NAME);
+					strcpy_s(m_Tempfile,"");
+					strcat_s(m_Tempfile,WORKDIR);//set the directory
+					strcat_s(m_Tempfile,"\\");
+					strcat_s(m_Tempfile,INIFILE_NAME);
 		}
 		else
 		{
-			strcpy(m_Tempfile,"");
-			strcat(m_Tempfile,WORKDIR);//set the directory
-			strcat(m_Tempfile,INIFILE_NAME);
+			strcpy_s(m_Tempfile,"");
+			strcat_s(m_Tempfile,WORKDIR);//set the directory
+			strcat_s(m_Tempfile,INIFILE_NAME);
 		}
 	}
 	if (id!=0 && usersettings)
@@ -228,8 +228,8 @@ vncProperties::ShowAdmin(BOOL show, BOOL usersettings)
 					if(iImpersonateResult == ERROR_SUCCESS)
 					{
 						ExpandEnvironmentStringsForUser(hPToken, "%TEMP%", m_Tempfile, MAX_PATH);
-						strcat(m_Tempfile,"\\");
-						strcat(m_Tempfile,INIFILE_NAME);
+						strcat_s(m_Tempfile,"\\");
+						strcat_s(m_Tempfile,INIFILE_NAME);
 					}
 				}
 	}
@@ -698,12 +698,12 @@ vncProperties::DialogProc(HWND hwnd,
 
 			char timeout[128];
 			UINT t = _this->m_server->QueryTimeout();
-			sprintf(timeout, "%d", (int)t);
+			sprintf_s(timeout, "%d", (int)t);
 		    SetDlgItemText(hwnd, IDQUERYTIMEOUT, (const char *) timeout);
 
 			char disableTime[128];
 			UINT tt = _this->m_server->QueryDisableTime();
-			sprintf(disableTime, "%d", (int)tt);
+			sprintf_s(disableTime, "%d", (int)tt);
 		    SetDlgItemText(hwnd, IDC_QUERYDISABLETIME, (const char *) disableTime);
 
 			SetForegroundWindow(hwnd);
@@ -726,7 +726,7 @@ vncProperties::DialogProc(HWND hwnd,
 				}
 				else
 				{
-					strcpy(path,"");
+					strcpy_s(path,"");
 					vnclog.SetPath(path);
 				}
 				bool Secure_old = _this->m_server->Secure();
@@ -754,8 +754,8 @@ vncProperties::DialogProc(HWND hwnd,
 					vncPasswd::ToText plain2(password2, Secure_old);
 					memset(passwd, '\0', MAXPWLEN + 1); //PGM
 					memset(passwd2, '\0', MAXPWLEN + 1); //PGM
-					strcpy(passwd,plain);
-					strcpy(passwd2, plain2);
+					strcpy_s(passwd,plain);
+					strcpy_s(passwd2, plain2);
 					lenPassword = (int)strlen(passwd);
 					lenPassword2 = (int)strlen(passwd2);
 				}
@@ -984,14 +984,14 @@ vncProperties::DialogProc(HWND hwnd,
 
 				// Query Window options - Taken from TightVNC advanced properties
 				char timeout[256];
-				strcpy(timeout,"5");
+				strcpy_s(timeout,"5");
 				if (GetDlgItemText(hwnd, IDQUERYTIMEOUT, (LPSTR) &timeout, 256) == 0)
 				    _this->m_server->SetQueryTimeout(atoi(timeout));
 				else
 				    _this->m_server->SetQueryTimeout(atoi(timeout));
 
 				char disabletime[256];
-				strcpy(disabletime,"5");
+				strcpy_s(disabletime,"5");
 				if (GetDlgItemText(hwnd, IDC_QUERYDISABLETIME, (LPSTR) &disabletime, 256) == 0)
 				    _this->m_server->SetQueryDisableTime(atoi(disabletime));
 				else
@@ -1256,8 +1256,8 @@ vncProperties::DialogProc(HWND hwnd,
 							char dir[MAX_PATH];
 							char exe_file_name[MAX_PATH];
 							GetModuleFileName(0, exe_file_name, MAX_PATH);
-							strcpy(dir, exe_file_name);
-							strcat(dir, " -securityeditorhelper");
+							strcpy_s(dir, exe_file_name);
+							strcat_s(dir, " -securityeditorhelper");
 				
 							{
 								STARTUPINFO          StartUPInfo;
@@ -1334,8 +1334,8 @@ vncProperties::DialogProc(HWND hwnd,
 								if (iImpersonateResult == ERROR_SUCCESS)
 								{									
 									char szParams[32];
-									strcpy(szParams, "NoPassword,");
-									strcat(szParams, vncService::RunningAsService() ? "server-svc" : "server-app");
+									strcpy_s(szParams, "NoPassword,");
+									strcat_s(szParams, vncService::RunningAsService() ? "server-svc" : "server-app");
 									//adzm 2010-05-12 - dsmplugin config
 									char* szNewConfig = NULL;
 									if (_this->m_server->GetDSMPluginPointer()->SetPluginParams(hwnd, szParams, _this->m_pref_DSMPluginConfig, &szNewConfig)) {
@@ -1357,8 +1357,8 @@ vncProperties::DialogProc(HWND hwnd,
 						// now can be usefull or even mandatory for the plugin 
 						// (specific params saving and so on...)
 						char szParams[32];
-						strcpy(szParams, "NoPassword,");
-						strcat(szParams, vncService::RunningAsService() ? "server-svc" : "server-app");
+						strcpy_s(szParams, "NoPassword,");
+						strcat_s(szParams, vncService::RunningAsService() ? "server-svc" : "server-app");
 						//adzm 2010-05-12 - dsmplugin config
 						char* szNewConfig = NULL;
 						if (_this->m_server->GetDSMPluginPointer()->SetPluginParams(hwnd, szParams, _this->m_pref_DSMPluginConfig, &szNewConfig)) {
@@ -1552,7 +1552,7 @@ vncProperties::ResetRegistry()
 
 	// If there is no user logged on them default to SYSTEM
 	if (strcmp(username, "") == 0)
-		strcpy((char *)&username, "SYSTEM");
+		strcpy_s((char *)&username, UNLEN+1, "SYSTEM");
 
 	// Try to get the machine registry key for WinVNC
 	if (RegCreateKeyEx(HKEY_LOCAL_MACHINE,
@@ -1654,7 +1654,7 @@ vncProperties::Load(BOOL usersettings)
 	if (strcmp(username, "") == 0)
 	{
 		vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - Force USER SYSTEM 1\n"));
-		strcpy((char *)&username, "SYSTEM");
+		strcpy_s((char *)&username, UNLEN+1, "SYSTEM");
 	}
 
 
@@ -2265,7 +2265,7 @@ void vncProperties::LoadFromIniFile()
 	if (strcmp(username, "") == 0)
 	{
 		vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - Force USER SYSTEM 2\n"));
-		strcpy((char *)&username, "SYSTEM");
+		strcpy_s((char *)&username, UNLEN+1, "SYSTEM");
 	}
 
 	// Logging/debugging prefs
@@ -2619,7 +2619,7 @@ void vncProperties::ReloadDynamicSettings()
 	if (strcmp(username, "") == 0)
 	{
 		vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - Force USER SYSTEM 2\n"));
-		strcpy((char *)&username, "SYSTEM");
+		strcpy_s((char *)&username, UNLEN+1, "SYSTEM");
 	}
 
 	// Logging/debugging prefs
@@ -2651,9 +2651,9 @@ void Secure_Save_Plugin_Config(char *szPlugin)
 		char dir[MAX_PATH];
 		char exe_file_name[MAX_PATH];
 		GetModuleFileName(0, exe_file_name, MAX_PATH);
-		strcpy(dir, exe_file_name);
-		strcat(dir, " -dsmpluginhelper ");
-		strcat(dir, szPlugin);
+		strcpy_s(dir, exe_file_name);
+		strcat_s(dir, " -dsmpluginhelper ");
+		strcat_s(dir, szPlugin);
 
 		{
 			STARTUPINFO          StartUPInfo;
@@ -2687,8 +2687,8 @@ void Secure_Plugin_elevated(char *szPlugin)
 {
 	char dir[MAX_PATH];
 	char exe_file_name[MAX_PATH];
-	strcpy(dir, " -dsmplugininstance ");
-	strcat(dir, szPlugin);
+	strcpy_s(dir, " -dsmplugininstance ");
+	strcat_s(dir, szPlugin);
 
 	GetModuleFileName(0, exe_file_name, MAX_PATH);
 	SHELLEXECUTEINFO shExecInfo;
@@ -2712,8 +2712,8 @@ void Secure_Plugin(char *szPlugin)
 	if (m_pDSMPlugin->IsLoaded())
 	{
 		char szParams[32];
-		strcpy(szParams, "NoPassword,");
-		strcat(szParams, "server-app");
+		strcpy_s(szParams, "NoPassword,");
+		strcat_s(szParams, "server-app");
 
 		HDESK desktop;
 		desktop = OpenInputDesktop(0, FALSE,

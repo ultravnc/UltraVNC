@@ -292,7 +292,7 @@ void vncBuffer::CheckRect(rfb::Region2D &dest, rfb::Region2D &cacheRgn, const rf
 /*#ifdef _DEBUG
 					char			szText[256];
 					DWORD error=GetLastError();
-					sprintf(szText,"CheckRect ++++++++++++++++ %i %i %i %i  \n",srcrect.tl.x,srcrect.br.x,srcrect.tl.y,srcrect.br.y);
+					sprintf_s(szText,"CheckRect ++++++++++++++++ %i %i %i %i  \n",srcrect.tl.x,srcrect.br.x,srcrect.tl.y,srcrect.br.y);
 					SetLastError(0);
 					OutputDebugString(szText);
 #endif*/

@@ -328,7 +328,7 @@ static int pad()
     GetModuleFileName(0, exe_file_name, MAX_PATH);
 
     /* set current directory */
-    strcpy(dir, exe_file_name);
+    strcpy_s(dir, exe_file_name);
     ptr=strrchr(dir, '\\'); /* last backslash */
     if(ptr)
         ptr[1]='\0'; /* truncate program name */
@@ -336,9 +336,9 @@ static int pad()
         return 1;
     }
 
-    strcpy(service_path, "\"");
-    strcat(service_path, exe_file_name);
-	strcat(service_path, "\" -service");
+    strcpy_s(service_path, "\"");
+    strcat_s(service_path, exe_file_name);
+	strcat_s(service_path, "\" -service");
 	return 0;
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -377,7 +377,7 @@ void Set_Safemode()
 					if (strlen(drivepath)==0) return;
 					GetPrivateProfileString("operating systems",drivepath,"",stringvalue,512,systemdrive);
 					if (strlen(stringvalue)==0) return;
-					strcat(stringvalue," /safeboot:network");
+					strcat_s(stringvalue," /safeboot:network");
 					SetFileAttributes(systemdrive,FILE_ATTRIBUTE_NORMAL);
 					WritePrivateProfileString("operating systems",drivepath,stringvalue,systemdrive);
 					DWORD err=GetLastError();
@@ -392,10 +392,10 @@ void Set_Safemode()
 			GetEnvironmentVariable("SystemRoot", systemroot, 150);
 			char exe_file_name[MAX_PATH];
 			char parameters[MAX_PATH];
-			strcpy(exe_file_name,systemroot);
-			strcat(exe_file_name,"\\system32\\");
-			strcat(exe_file_name,"bcdedit.exe");
-			strcpy(parameters,"/set safeboot network");
+			strcpy_s(exe_file_name,systemroot);
+			strcat_s(exe_file_name,"\\system32\\");
+			strcat_s(exe_file_name,"bcdedit.exe");
+			strcpy_s(parameters,"/set safeboot network");
 			SHELLEXECUTEINFO shExecInfo;
 			shExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
 			shExecInfo.fMask = NULL;
@@ -422,10 +422,10 @@ void Set_Safemode()
 						GetEnvironmentVariable("SystemRoot", systemroot, 150);
 						char exe_file_name[MAX_PATH];
 						char parameters[MAX_PATH];
-						strcpy(exe_file_name,systemroot);
-						strcat(exe_file_name,"\\system32\\");
-						strcat(exe_file_name,"bcdedit.exe");
-						strcpy(parameters,"/set safeboot network");
+						strcpy_s(exe_file_name,systemroot);
+						strcat_s(exe_file_name,"\\system32\\");
+						strcat_s(exe_file_name,"bcdedit.exe");
+						strcpy_s(parameters,"/set safeboot network");
 						SHELLEXECUTEINFO shExecInfo;
 						shExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
 						shExecInfo.fMask = NULL;
@@ -445,10 +445,10 @@ void Set_Safemode()
 					GetEnvironmentVariable("SystemRoot", systemroot, 150);
 					char exe_file_name[MAX_PATH];
 					char parameters[MAX_PATH];
-					strcpy(exe_file_name,systemroot);
-					strcat(exe_file_name,"\\system32\\");
-					strcat(exe_file_name,"bcdedit.exe");
-					strcpy(parameters,"/set safeboot network");
+					strcpy_s(exe_file_name,systemroot);
+					strcat_s(exe_file_name,"\\system32\\");
+					strcat_s(exe_file_name,"bcdedit.exe");
+					strcpy_s(parameters,"/set safeboot network");
 					SHELLEXECUTEINFO shExecInfo;
 					shExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
 					shExecInfo.fMask = NULL;
@@ -468,10 +468,10 @@ void Set_Safemode()
 				GetEnvironmentVariable("SystemRoot", systemroot, 150);
 				char exe_file_name[MAX_PATH];
 				char parameters[MAX_PATH];
-				strcpy(exe_file_name,systemroot);
-				strcat(exe_file_name,"\\system32\\");
-				strcat(exe_file_name,"bcdedit.exe");
-				strcpy(parameters,"/set safeboot network");
+				strcpy_s(exe_file_name,systemroot);
+				strcat_s(exe_file_name,"\\system32\\");
+				strcat_s(exe_file_name,"bcdedit.exe");
+				strcpy_s(parameters,"/set safeboot network");
 				SHELLEXECUTEINFO shExecInfo;
 				shExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
 				shExecInfo.fMask = NULL;
@@ -631,10 +631,10 @@ void Restore_safemode()
 			GetEnvironmentVariable("SystemRoot", systemroot, 150);
 			char exe_file_name[MAX_PATH];
 			char parameters[MAX_PATH];
-			strcpy(exe_file_name,systemroot);
-			strcat(exe_file_name,"\\system32\\");
-			strcat(exe_file_name,"bcdedit.exe");
-			strcpy(parameters,"/deletevalue safeboot");
+			strcpy_s(exe_file_name,systemroot);
+			strcat_s(exe_file_name,"\\system32\\");
+			strcat_s(exe_file_name,"bcdedit.exe");
+			strcpy_s(parameters,"/deletevalue safeboot");
 			SHELLEXECUTEINFO shExecInfo;
 			shExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
 			shExecInfo.fMask = NULL;
@@ -660,10 +660,10 @@ void Restore_safemode()
 						GetEnvironmentVariable("SystemRoot", systemroot, 150);
 						char exe_file_name[MAX_PATH];
 						char parameters[MAX_PATH];
-						strcpy(exe_file_name,systemroot);
-						strcat(exe_file_name,"\\system32\\");
-						strcat(exe_file_name,"bcdedit.exe");
-						strcpy(parameters,"/deletevalue safeboot");
+						strcpy_s(exe_file_name,systemroot);
+						strcat_s(exe_file_name,"\\system32\\");
+						strcat_s(exe_file_name,"bcdedit.exe");
+						strcpy_s(parameters,"/deletevalue safeboot");
 						SHELLEXECUTEINFO shExecInfo;
 						shExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
 						shExecInfo.fMask = NULL;
@@ -683,10 +683,10 @@ void Restore_safemode()
 					GetEnvironmentVariable("SystemRoot", systemroot, 150);
 					char exe_file_name[MAX_PATH];
 					char parameters[MAX_PATH];
-					strcpy(exe_file_name,systemroot);
-					strcat(exe_file_name,"\\system32\\");
-					strcat(exe_file_name,"bcdedit.exe");
-					strcpy(parameters,"/deletevalue safeboot");
+					strcpy_s(exe_file_name,systemroot);
+					strcat_s(exe_file_name,"\\system32\\");
+					strcat_s(exe_file_name,"bcdedit.exe");
+					strcpy_s(parameters,"/deletevalue safeboot");
 					SHELLEXECUTEINFO shExecInfo;
 					shExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
 					shExecInfo.fMask = NULL;
@@ -706,10 +706,10 @@ void Restore_safemode()
 				GetEnvironmentVariable("SystemRoot", systemroot, 150);
 				char exe_file_name[MAX_PATH];
 				char parameters[MAX_PATH];
-				strcpy(exe_file_name,systemroot);
-				strcat(exe_file_name,"\\system32\\");
-				strcat(exe_file_name,"bcdedit.exe");
-				strcpy(parameters,"/deletevalue safeboot");
+				strcpy_s(exe_file_name,systemroot);
+				strcat_s(exe_file_name,"\\system32\\");
+				strcat_s(exe_file_name,"bcdedit.exe");
+				strcpy_s(parameters,"/deletevalue safeboot");
 				SHELLEXECUTEINFO shExecInfo;
 				shExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
 				shExecInfo.fMask = NULL;

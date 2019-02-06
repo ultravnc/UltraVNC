@@ -1491,7 +1491,7 @@ BOOL COSVersion::GetVersion(LPOS_VERSION_INFO lpVersionInformation)
     lpVersionInformation->dwUnderlyingMajorVersion = osvi.dwMajorVersion; 
     lpVersionInformation->dwUnderlyingMinorVersion = osvi.dwMinorVersion; 
     lpVersionInformation->dwUnderlyingBuildNumber = LOWORD(osvi.dwBuildNumber); //ignore HIWORD
-    _fstrcpy(lpVersionInformation->szUnderlyingCSDVersion, osvi.szCSDVersion);
+    _fstrcpy_s(lpVersionInformation->szUnderlyingCSDVersion, osvi.szCSDVersion);
        
     //Explicitely map the win32 dwPlatformId to our own values
     if (osvi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS)
@@ -1559,7 +1559,7 @@ BOOL COSVersion::GetVersion(LPOS_VERSION_INFO lpVersionInformation)
       lpVersionInformation->dwUnderlyingMinorVersion = (DWORD)(HIBYTE(LOWORD(dwVersion)));
       lpVersionInformation->dwUnderlyingBuildNumber  = 0;
       lpVersionInformation->UnderlyingPlatform   = WindowsNT; 
-      _fstrcpy(lpVersionInformation->szUnderlyingCSDVersion, "");
+      _fstrcpy_s(lpVersionInformation->szUnderlyingCSDVersion, "");
    
       bFoundUnderlyingOS = TRUE;
     }
@@ -1575,7 +1575,7 @@ BOOL COSVersion::GetVersion(LPOS_VERSION_INFO lpVersionInformation)
     lpVersionInformation->dwUnderlyingMinorVersion = LOBYTE(HIWORD(dwVersion)); 
     lpVersionInformation->dwUnderlyingBuildNumber = 0; 
     lpVersionInformation->UnderlyingPlatform = Dos;
-    _fstrcpy(lpVersionInformation->szUnderlyingCSDVersion, "");
+    _fstrcpy_s(lpVersionInformation->szUnderlyingCSDVersion, "");
   }
 #else //Must be some version of real or emulated DOS
 
@@ -1601,7 +1601,7 @@ BOOL COSVersion::GetVersion(LPOS_VERSION_INFO lpVersionInformation)
     if ((lpVersionInformation->dwEmulatedMajorVersion == 5) &&
         (lpVersionInformation->dwEmulatedMinorVersion == 50))    //NT reports DOS v5.5
     {
-      _fstrcpy(lpVersionInformation->szUnderlyingCSDVersion, "");
+      _fstrcpy_s(lpVersionInformation->szUnderlyingCSDVersion, "");
       //could not find method of determing version of NT from DOS,
       //so assume 3.50
       lpVersionInformation->dwUnderlyingMajorVersion = 3; 
@@ -1623,7 +1623,7 @@ BOOL COSVersion::GetVersion(LPOS_VERSION_INFO lpVersionInformation)
           //so assume Win3.1                                     
           lpVersionInformation->UnderlyingPlatform = Windows3x;
         }  
-        _fstrcpy(lpVersionInformation->szUnderlyingCSDVersion, "");
+        _fstrcpy_s(lpVersionInformation->szUnderlyingCSDVersion, "");
         lpVersionInformation->dwUnderlyingMajorVersion = (WinVer & 0xFF00) >> 8; 
         lpVersionInformation->dwUnderlyingMinorVersion = WinVer & 0x00FF; 
   
@@ -1653,7 +1653,7 @@ BOOL COSVersion::GetVersion(LPOS_VERSION_INFO lpVersionInformation)
         lpVersionInformation->dwUnderlyingMinorVersion = (DWORD) DosMinor;
         lpVersionInformation->dwUnderlyingBuildNumber = 0; //no build number with DOS
         lpVersionInformation->UnderlyingPlatform = Dos;
-        _fstrcpy(lpVersionInformation->szUnderlyingCSDVersion, "");
+        _fstrcpy_s(lpVersionInformation->szUnderlyingCSDVersion, "");
       }
     }   
   }
@@ -1676,7 +1676,7 @@ BOOL COSVersion::GetInfoBySpawingWriteVer(COSVersion::LPOS_VERSION_INFO lpVersio
     return FALSE;
   char szCommandLine[256];
   szCommandLine[0] = '\0';
-  sprintf(szCommandLine, "WriteVer.exe %s", pszTempFilename);
+  sprintf_s(szCommandLine, "WriteVer.exe %s", pszTempFilename);
 
   //Try to spawn out writever utilty
   if (system(szCommandLine) != -1)
@@ -1745,7 +1745,7 @@ BOOL COSVersion::GetInfoBySpawingWriteVer(COSVersion::LPOS_VERSION_INFO lpVersio
 
                               pszToken = strtok(NULL, pszSeparators);
                               if (pszToken)
-                                strcpy(lpVersionInformation->szUnderlyingCSDVersion, pszToken);
+                                strcpy_s(lpVersionInformation->szUnderlyingCSDVersion, pszToken);
                             }
                           }
                         }

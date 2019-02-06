@@ -207,7 +207,7 @@ vncServer::vncServer()
 	m_pDSMPlugin = new CDSMPlugin();
 
 	m_fDSMPluginEnabled = false;
-	strcpy(m_szDSMPlugin, "");
+	strcpy_s(m_szDSMPlugin, "");
 
 	m_fMSLogonRequired = false;
 	m_Secure = false;
@@ -218,8 +218,8 @@ vncServer::vncServer()
 	m_fAutoReconnect = false;
 	m_fIdReconnect = false;
 	m_AutoReconnectPort = 0;
-	strcpy(m_szAutoReconnectAdr, "");
-	strcpy(m_szAutoReconnectId, "");
+	strcpy_s(m_szAutoReconnectAdr, "");
+	strcpy_s(m_szAutoReconnectId, "");
 
 	// sf@2005 - No FT User Impersonnation
 	m_fFTUserImpersonation = true;
@@ -549,7 +549,7 @@ vncClientId vncServer::AddClient(VSocket *socket,
 	if (SPECIAL_SC_PROMPT) {
 		vncClientList::iterator i;
 		char szInfo[256];
-		strcpy(szInfo, "Waiting for connection... ");
+		strcpy_s(szInfo, "Waiting for connection... ");
 
 		for (i = m_unauthClients.begin(); i != m_unauthClients.end(); i++)
 		{
@@ -2333,14 +2333,14 @@ BOOL vncServer::SetDSMPlugin(BOOL bForceReload)
 		GetPassword(password);
 		// Does the plugin need the VNC password to do its job ?
 		if (!_stricmp(m_pDSMPlugin->GetPluginParams(), "VNCPasswordNeeded"))
-			strcpy(szParams, vncDecryptPasswd((char *)password, m_Secure));
+			strcpy_s(szParams, vncDecryptPasswd((char *)password, m_Secure));
 		else
-			strcpy(szParams, "NoPassword");
+			strcpy_s(szParams, "NoPassword");
 
 		// The second parameter tells the plugin the kind of program is using it
 		// (in WinVNC : "server-app" or "server-svc"
-		strcat(szParams, ",");
-		strcat(szParams, vncService::RunningAsService() ? "server-svc" : "server-app");
+		strcat_s(szParams, ",");
+		strcat_s(szParams, vncService::RunningAsService() ? "server-svc" : "server-app");
 
 		//::MessageBoxSecure(NULL, szParams, "SetDSMPlugin info", MB_OK);
 

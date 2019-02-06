@@ -392,7 +392,7 @@ bool vncDesktop::FastDetectChanges(rfb::Region2D &rgn, rfb::Rect &rect, int nZon
 									/*#ifdef _DEBUG
 														char			szText[256];
 														DWORD error=GetLastError();
-														sprintf(szText,"CheckRect 222222 ++++++++++++++++ %i %i %i %i  \n",wrect.tl.x,wrect.br.x,wrect.tl.y,wrect.br.y);
+														sprintf_s(szText,"CheckRect 222222 ++++++++++++++++ %i %i %i %i  \n",wrect.tl.x,wrect.br.x,wrect.tl.y,wrect.br.y);
 														SetLastError(0);
 														OutputDebugString(szText);
 									#endif*/
@@ -805,7 +805,7 @@ vncDesktop::Startup()
 		GetLocalTime(&lt);
 		char str[MAX_PATH + 32]; // 29 January 2008 jdp 
 		_snprintf(str, sizeof str, "%02d_%02d_%02d_%02d_%02d", lt.wMonth, lt.wDay, lt.wHour, lt.wMinute, lt.wSecond);
-		strcat(str, "_vnc.avi");
+		strcat_s(str, "_vnc.avi");
 		AviGen = new CAVIGenerator(str, "c:\\temp", &m_bminfo.bmi.bmiHeader, 5);
 		HRESULT hr;
 		hr = AviGen->InitEngine();
@@ -1645,20 +1645,20 @@ vncDesktop::WriteMessageOnScreenPreConnect(BYTE *scrBuff, UINT scrBuffSize)
 	////////////////////////////////////////////////
 	char bigstring[128];
 	char menustring[12800];
-	strcpy(menustring, "");
+	strcpy_s(menustring, "");
 
 	for (DWORD i(0); i < (DWORD)aantal_session; ++i)
 	{
 		if (sesmsg[i].ID != 65536 && sesmsg[i].ID != 0)
 		{
-			sprintf(bigstring, "%c) session%i %s user=%s  status=%s", static_cast<char>(97 + i), static_cast<int>(sesmsg[i].ID), sesmsg[i].name, sesmsg[i].username, sesmsg[i].type);
-			strcat(menustring, bigstring);
-			strcat(menustring, "\n");
+			sprintf_s(bigstring, "%c) session%i %s user=%s  status=%s", static_cast<char>(97 + i), static_cast<int>(sesmsg[i].ID), sesmsg[i].name, sesmsg[i].username, sesmsg[i].type);
+			strcat_s(menustring, bigstring);
+			strcat_s(menustring, "\n");
 		}
 	}
-	strcat(menustring, "\n");
-	strcat(menustring, "\n");
-	strcat(menustring, "Enter session to clone: \n");
+	strcat_s(menustring, "\n");
+	strcat_s(menustring, "\n");
+	strcat_s(menustring, "Enter session to clone: \n");
 	////////////////////////////////////////////////
 		// Select the memory bitmap into the memory DC
 	RECT rect;
@@ -2483,7 +2483,7 @@ void vncDesktop::StartStopddihook(BOOL enabled)
 			char* p = strrchr(szCurrentDir, '\\');
 			if (p == NULL) return;
 			*p = '\0';
-			strcat(szCurrentDir, "\\16bithlp.exe");
+			strcat_s(szCurrentDir, "\\16bithlp.exe");
 		}
 		// Add ddi hook
 		ZeroMemory(&ssi, sizeof(ssi));
@@ -2581,7 +2581,7 @@ bool vncDesktop::block_input(bool first)
 
 		/*#ifdef _DEBUG
 						char			szText[256];
-						sprintf(szText," blockinput %i %i %i %i\n",m_bIsInputDisabledByClient,m_server->LocalInputsDisabled(),old_Blockinput1,old_Blockinput2);
+						sprintf_s(szText," blockinput %i %i %i %i\n",m_bIsInputDisabledByClient,m_server->LocalInputsDisabled(),old_Blockinput1,old_Blockinput2);
 						SetLastError(0);
 						OutputDebugString(szText);
 		#endif*/

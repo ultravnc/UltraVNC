@@ -118,7 +118,7 @@ vncDesktop::GetPrimaryDevice()
     for (i=0; EnumDisplayDevicesA(NULL, i, &dd, 0); i++) {
 		if (dd.StateFlags & DISPLAY_DEVICE_ATTACHED_TO_DESKTOP && dd.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE 
 				&& !(dd.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER)) {
-			strcpy(mymonitor[0].device,(char *)dd.DeviceName);
+			strcpy_s(mymonitor[0].device,(char *)dd.DeviceName);
 			break;
 		}
 	}
@@ -135,7 +135,7 @@ vncDesktop::GetSecondaryDevice()
     for (i=0; EnumDisplayDevicesA(NULL, i, &dd, 0); i++) {
 		if (dd.StateFlags & DISPLAY_DEVICE_ATTACHED_TO_DESKTOP && !(dd.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE)
 				&& !(dd.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER)) {
-			strcpy(mymonitor[1].device,(char *)dd.DeviceName);
+			strcpy_s(mymonitor[1].device,(char *)dd.DeviceName);
 			break;
 			}
 	}
@@ -154,7 +154,7 @@ vncDesktop::GetThirdDevice()
 			j++;
 			if (!(dd.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER) && !(dd.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE)) {
 				if (j == 3) {
-					strcpy(mymonitor[2].device,(char *)dd.DeviceName);
+					strcpy_s(mymonitor[2].device,(char *)dd.DeviceName);
 					break;
 				}
 			}

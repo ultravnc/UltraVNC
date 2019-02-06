@@ -540,7 +540,8 @@ vncClientUpdateThread::run_undetached(void *arg)
 				if (m_client->m_fPalmVNCScaling)
 				{
 					rfb::Rect ScreenSize = m_client->m_encodemgr.m_buffer->GetSize();
-					rfbPalmVNCReSizeFrameBufferMsg rsfb;
+					rfbPalmVNCReSizeFrameBufferMsg rsfb = {0};
+
 					rsfb.type = rfbPalmVNCReSizeFrameBuffer;
 					rsfb.desktop_w = Swap16IfLE(ScreenSize.br.x);
 					rsfb.desktop_h = Swap16IfLE(ScreenSize.br.y);
@@ -552,7 +553,7 @@ vncClientUpdateThread::run_undetached(void *arg)
 				}
 				else // eSVNC-UltraVNC Scaling
 				{
-					rfbResizeFrameBufferMsg rsmsg;
+					rfbResizeFrameBufferMsg rsmsg = {0};
 					rsmsg.type = rfbResizeFrameBuffer;
 					rsmsg.framebufferWidth  = Swap16IfLE(ViewerSize.br.x);
 					rsmsg.framebufferHeigth = Swap16IfLE(ViewerSize.br.y);
@@ -633,7 +634,7 @@ vncClientUpdateThread::run_undetached(void *arg)
 					} 
 					else {
 						rfbServerCutTextMsg message;
-
+						memset(&message, 0, sizeof(rfbServerCutTextMsg));
 						const char* cliptext = m_client->m_clipboard.m_strLastCutText.c_str();
 						char* unixtext = new char[m_client->m_clipboard.m_strLastCutText.length() + 1];
 					
@@ -763,8 +764,8 @@ vncClientThread::Init(vncClient *client, vncServer *server, VSocket *socket, BOO
 	m_server->AutoReconnect(false);
 
 	m_AutoReconnectPort=m_server->AutoReconnectPort();
-	strcpy(m_szAutoReconnectAdr,m_server->AutoReconnectAdr());
-	strcpy(m_szAutoReconnectId,m_server->AutoReconnectId());
+	strcpy_s(m_szAutoReconnectAdr,m_server->AutoReconnectAdr());
+	strcpy_s(m_szAutoReconnectId,m_server->AutoReconnectId());
 #ifdef _Gii
 	point_status = NULL;
 	nr_points = 0;
@@ -795,7 +796,7 @@ vncClientThread::InitVersion()
 			// RDV 2010-6-10 
 			// removed SPECIAL_SC_PROMPT
 			rfbProtocolVersionMsg protocolMsg;
-			sprintf((char *)protocolMsg,
+			sprintf_s((char *)protocolMsg, 13,
 				rfbProtocolVersionFormat,
 				rfbProtocolMajorVersion,
 				rfbProtocolMinorVersion);
@@ -1878,9 +1879,9 @@ BOOL vncClientThread::AuthSessionSelect(std::string& auth_message)
 		char line1[128];
 		char line2[128];
 		char line3[128];
-		strcpy(line1,"line1 ");
-		strcpy(line2,"line22 ");
-		strcpy(line3,"line312 123 ");
+		strcpy_s(line1,"line1 ");
+		strcpy_s(line2,"line22 ");
+		strcpy_s(line3,"line312 123 ");
 		if (!m_socket->SendExact((char *)line1, 128))
 			return FALSE;
 		if (!m_socket->SendExact((char *)line2, 128))
@@ -1965,7 +1966,7 @@ void GetIPString(char *buffer, int buflen)
 					memcpy(&Ipv4Addr, pIpv4Addr, sizeof(Ipv4Addr));
 					Ipv4Addr.sin_family = AF_INET;
 					char			szText[256];
-					sprintf(szText, "%s-", inet_ntoa(Ipv4Addr.sin_addr));
+					sprintf_s(szText, "%s-", inet_ntoa(Ipv4Addr.sin_addr));
 					int len = strlen(buffer);
 					int len2 = strlen(szText);
 					if (len + len2 < buflen) strcat_s(buffer, buflen, szText);
@@ -2008,7 +2009,7 @@ void GetIPString(char *buffer, int buflen)
 					char			szText[256];
 					memset(szText, 0, 256);
 					strncpy(szText, ipstringbuffer, ipbufferlength - 4);
-					strcat(szText, "-");
+					strcat_s(szText, "-");
 					int len = strlen(buffer);
 					int len2 = strlen(szText);
 					if (len + len2 < buflen)strcat_s(buffer, buflen, szText);
@@ -2036,7 +2037,7 @@ void GetIPString(char *buffer, int buflen)
 	{
     	for (int j = 0; j < ph->h_length; j++)
 		{
-	    sprintf(digtxt, "%d.", (unsigned char) ph->h_addr_list[i][j]);
+	    sprintf_s(digtxt, "%d.", (unsigned char) ph->h_addr_list[i][j]);
 	    strncat(buffer, digtxt, (buflen-1)-strlen(buffer));
 		}	
 		buffer[strlen(buffer)-1] = '\0';
@@ -2301,7 +2302,7 @@ vncClientThread::run(void *arg)
 	}
 	else
 	{
-		strcpy(desktopname, "WinVNC");
+		strcpy_s(desktopname, "WinVNC");
 	}
 
 	// We add the IP address(es) to the computer name, if possible and necessary
@@ -2311,15 +2312,15 @@ vncClientThread::run(void *arg)
 		GetIPString(szIP, sizeof(szIP));
 		if (strlen(szIP) > 3 && szIP[0] != 'I' && szIP[0] != 'H') 
 		{
-			strcat(desktopname, " ( ");
-			strcat(desktopname, szIP);
-			strcat(desktopname, " )");
+			strcat_s(desktopname, " ( ");
+			strcat_s(desktopname, szIP);
+			strcat_s(desktopname, " )");
 		}
 	}
 
-	strcat(desktopname, " - ");
-	if (vncService::RunningAsService()) strcat(desktopname, "service mode");
-	else strcat(desktopname, "application mode");
+	strcat_s(desktopname, " - ");
+	if (vncService::RunningAsService()) strcat_s(desktopname, "service mode");
+	else strcat_s(desktopname, "application mode");
 
 	// Send the server format message to the client
 	rfbServerInitMsg server_ini;
@@ -2366,7 +2367,7 @@ vncClientThread::run(void *arg)
 	// MAIN LOOP
 #ifdef _DEBUG
 										char			szText[256];
-										sprintf(szText," MAIN LOOP \n");
+										sprintf_s(szText," MAIN LOOP \n");
 										OutputDebugString(szText);		
 #endif
 	// Set the input thread to a high priority
@@ -2447,7 +2448,7 @@ vncClientThread::run(void *arg)
 			m_client->SendServerStateUpdate(m_client->m_state, m_client->m_value);
 #ifdef _DEBUG
 					char			szText[256];
-					sprintf(szText,"SendServerStateUpdate %i %i  \n",m_client->m_state,m_client->m_value);
+					sprintf_s(szText,"SendServerStateUpdate %i %i  \n",m_client->m_state,m_client->m_value);
 					OutputDebugString(szText);		
 #endif
 		}
@@ -2493,7 +2494,7 @@ vncClientThread::run(void *arg)
 		}
 /*#ifdef _DEBUG
 										char			szText[256];
-										sprintf(szText," msg.type %i \n",msg.type);
+										sprintf_s(szText," msg.type %i \n",msg.type);
 										OutputDebugString(szText);		
 #endif*/
 		// What to do is determined by the message id
@@ -3001,8 +3002,8 @@ vncClientThread::run(void *arg)
 #ifdef _USE_DLL
 						bRet = DLL_PInjectTouch(rfbGIIValutorEvent.first, TI);
 #ifdef _DEBUG					
-						if (bRet == 0) sprintf(szText, "FAIL index %d %i\n", GetLastError(), rfbGIIValutorEvent.first);
-						else sprintf(szText, "OK %i\n", rfbGIIValutorEvent.first);
+						if (bRet == 0) sprintf_s(szText, "FAIL index %d %i\n", GetLastError(), rfbGIIValutorEvent.first);
+						else sprintf_s(szText, "OK %i\n", rfbGIIValutorEvent.first);
 						OutputDebugString(szText);
 #endif
 #else
@@ -3038,8 +3039,8 @@ vncClientThread::run(void *arg)
 						}
 						BOOL value = InjectTouchInput(rfbGIIValutorEvent.first, contact);
 #ifdef _DEBUG					
-						if (value == 0) sprintf(szText, "FAIL index %d %i\n", GetLastError(), rfbGIIValutorEvent.first);
-						else sprintf(szText, "OK number points %i\n", rfbGIIValutorEvent.first);
+						if (value == 0) sprintf_s(szText, "FAIL index %d %i\n", GetLastError(), rfbGIIValutorEvent.first);
+						else sprintf_s(szText, "OK number points %i\n", rfbGIIValutorEvent.first);
 						OutputDebugString(szText);
 #endif
 						delete []contact;
@@ -3195,7 +3196,7 @@ vncClientThread::run(void *arg)
 			// Read the rest of the message:
 /*#ifdef _DEBUG
 										char			szText[256];
-										sprintf(szText," rfbFramebufferUpdateRequest \n");
+										sprintf_s(szText," rfbFramebufferUpdateRequest \n");
 										OutputDebugString(szText);		
 #endif*/
 			if (!m_socket->ReadExact(((char *) &msg)+nTO, sz_rfbFramebufferUpdateRequestMsg-nTO))
@@ -3573,7 +3574,7 @@ vncClientThread::run(void *arg)
                 vnclog.Print(LL_INTINFO, VNCLOG("rfbSetServerInput: inputs %s\n"), (msg.sim.status==1) ? "disabled" : "enabled");
 		#ifdef _DEBUG
 					char szText[256];
-					sprintf(szText,"rfbSetServerInput  %i %i %i\n",msg.sim.status,m_server->GetDesktopPointer()->GetBlockInputState() , m_client->m_bClientHasBlockedInput);
+					sprintf_s(szText,"rfbSetServerInput  %i %i %i\n",msg.sim.status,m_server->GetDesktopPointer()->GetBlockInputState() , m_client->m_bClientHasBlockedInput);
 					OutputDebugString(szText);		
 		#endif
                 // only allow change if this is the client that originally changed the input state
@@ -3662,7 +3663,7 @@ vncClientThread::run(void *arg)
 						// bool fError = false;
 						const UINT length = Swap32IfLE(msg.ft.length);
 						memset(m_client->m_szFullDestName, 0, sizeof(m_client->m_szFullDestName));
-						if (length > sizeof(m_client->m_szFullDestName)) break;
+						if (length > sizeof(m_client->m_szFullDestName) - 12) break; // needed for temp_prefix
 						// Read in the Name of the file to create
 						if (!m_socket->ReadExact(m_client->m_szFullDestName, length)) 
 						{
@@ -3689,13 +3690,13 @@ vncClientThread::run(void *arg)
 							m_client->m_szFileTime[0] = '\0';
 						else 
 						{
-							strcpy(m_client->m_szFileTime, p+1);
+							strcpy_s(m_client->m_szFileTime, p+1);
 							*p = '\0';
 						}
 
 
                         // make a temp file name
-                        strcpy(m_client->m_szFullDestName, make_temp_filename(m_client->m_szFullDestName).c_str());
+                        strcpy_s(m_client->m_szFullDestName, make_temp_filename(m_client->m_szFullDestName).c_str());
                         
 						DWORD dwDstSize = (DWORD)0; // Dummy size, actually a return value
 
@@ -3707,7 +3708,7 @@ vncClientThread::run(void *arg)
 						char *szDestPath = new char [length + 1 + 64];
 						if (szDestPath == NULL) break;
 						memset(szDestPath, 0, length + 1 + 64);
-						strcpy(szDestPath, m_client->m_szFullDestName);
+						strcpy_s(szDestPath, length + 1 + 64, m_client->m_szFullDestName);
 						*strrchr(szDestPath, '\\') = '\0'; // We don't handle UNCs for now
 
 						// loadlibrary
@@ -3741,7 +3742,7 @@ vncClientThread::run(void *arg)
 						if (m_client->m_pCompBuff == NULL)
 							dwDstSize = 0xFFFFFFFF;
 
-						rfbFileTransferMsg ft;
+						rfbFileTransferMsg ft = {0};
 						ft.type = rfbFileTransfer;
 
 						// sf@2004 - Delta Transfer
@@ -3948,7 +3949,7 @@ vncClientThread::run(void *arg)
 							// FileTransfer permission requested by the client
 							if (m_client->fFTRequest)
 							{
-								rfbFileTransferMsg ft;
+								rfbFileTransferMsg ft = {0};
 								ft.type = rfbFileTransfer;
 								ft.contentType = rfbAbortFileTransfer;
 
@@ -4011,7 +4012,7 @@ vncClientThread::run(void *arg)
 								// We add Drives types to this drive list...
 								while (nIndex < dwLen - 3)
 								{
-									strcpy(szDrive, szDrivesList + nIndex);
+									strcpy_s(szDrive, szDrivesList + nIndex);
 									// We replace the "\" char following the drive letter and ":"
 									// with a char corresponding to the type of drive
 									// We obtain something like "C:l<NULL>D:c<NULL>....Z:n\<NULL><NULL>"
@@ -4035,7 +4036,7 @@ vncClientThread::run(void *arg)
 									nIndex += 4;
 								}
 
-								rfbFileTransferMsg ft;
+								rfbFileTransferMsg ft = {0};
 								ft.type = rfbFileTransfer;
 								ft.contentType = rfbDirPacket;
 								ft.contentParam = rfbADrivesList;
@@ -4053,7 +4054,7 @@ vncClientThread::run(void *arg)
 
 									const UINT length = Swap32IfLE(msg.ft.length);
 									char szDir[MAX_PATH + 2];
-									if (length > sizeof(szDir)) break;
+									if (length > sizeof(szDir) -1) break;
 
 									// Read in the Name of Dir to explore
 									if (!m_socket->ReadExact(szDir, length)) break;
@@ -4077,13 +4078,13 @@ vncClientThread::run(void *arg)
 										// if (SHGetSpecialFolderPath(NULL, szP, nFolder, FALSE))
 										if (m_client->GetSpecialFolderPath(nFolder, szP))
 										{
-											if (szP[strlen(szP)-1] != '\\') strcat(szP,"\\");
-											strcpy(szDir, szP);
+											if (szP[strlen(szP)-1] != '\\') strcat_s(szP,"\\");
+											strcpy_s(szDir, szP);
 										}
 										else
 											fShortError = true;
 
-									strcat(szDir, "*");
+									strcat_s(szDir, "*");
 
 									WIN32_FIND_DATA fd;
 									HANDLE ff;
@@ -4176,8 +4177,8 @@ vncClientThread::run(void *arg)
 							case rfbCDirCreate:
 								{
 									const UINT length = Swap32IfLE(msg.ft.length);
-									char szDir[MAX_PATH];
-									if (length > sizeof(szDir)) break;
+									char szDir[MAX_PATH +1];
+									if (length > sizeof(szDir) -1 ) break;
 
 									// Read in the Name of Dir to explore
 									if (!m_socket->ReadExact(szDir, length))
@@ -4211,8 +4212,8 @@ vncClientThread::run(void *arg)
 							case rfbCFileDelete:
 								{
 									UINT length = Swap32IfLE(msg.ft.length);
-									char szFile[MAX_PATH];
-									if (length > sizeof(szFile)) break;
+									char szFile[MAX_PATH +1];
+									if (length > sizeof(szFile) -1) break;
 
 									// Read in the Name of the File 
 									if (!m_socket->ReadExact(szFile, length))
@@ -4256,7 +4257,7 @@ vncClientThread::run(void *arg)
 								{
 									const UINT length = Swap32IfLE(msg.ft.length);
 									char szNames[(2 * MAX_PATH) + 1];
-									if (length > sizeof(szNames)) break;
+									if (length > sizeof(szNames) -1) break;
 
 									// Read in the Names
 									if (!m_socket->ReadExact(szNames, length))
@@ -4273,9 +4274,9 @@ vncClientThread::run(void *arg)
 									char szCurrentName[ (2 * MAX_PATH) + 1];
 									char szNewName[ (2 * MAX_PATH) + 1];
 
-									strcpy(szNewName, p + 1); 
+									strcpy_s(szNewName, p + 1); 
 									*p = '\0';
-									strcpy(szCurrentName, szNames);
+									strcpy_s(szCurrentName, szNames);
 									*p = '*';
 
 									// Rename
@@ -4672,7 +4673,7 @@ vncClient::~vncClient()
 	while (m_updatethread != NULL)
 	{
 		char			szText[256];
-		sprintf(szText, " m_updatethread != NULL \n");
+		sprintf_s(szText, " m_updatethread != NULL \n");
 		OutputDebugString(szText);
 		Sleep(100);
 		counter++;
@@ -4786,7 +4787,7 @@ vncClient::NotifyUpdate(rfbFramebufferUpdateRequestMsg fur)
 		if (update_rgn.is_empty()) {
 #ifdef _DEBUG
 				char			szText[256];
-				sprintf(szText,"FATAL! client update region is empty!\n");
+				sprintf_s(szText,"FATAL! client update region is empty!\n");
 				OutputDebugString(szText);		
 #endif
 		     	vnclog.Print(LL_INTERR, VNCLOG("FATAL! client update region is empty!\n"));
@@ -5274,7 +5275,7 @@ vncClient::SendRectangles(const rfb::RectVector &rects)
 /*#ifdef _DEBUG
 			char			szText[256];
 							
-				sprintf(szText,"SendRectangles  %i %i %i %i \n",rect.tl.x,
+				sprintf_s(szText,"SendRectangles  %i %i %i %i \n",rect.tl.x,
 				rect.tl.y,
 				rect.br.x,
 				rect.br.y);
@@ -5331,7 +5332,7 @@ vncClient::SendRectangle(const rfb::Rect &rect)
 	ScaledRect.br.x = rect.br.x / m_nScale;
 	/*#ifdef _DEBUG
 	char			szText[256];
-	sprintf(szText,"++++++++++++++++++++++++++++++++++++++++++++++REct1 %i %i %i %i  \n",rect.tl.x,rect.br.x,rect.tl.y,rect.br.y);
+	sprintf_s(szText,"++++++++++++++++++++++++++++++++++++++++++++++REct1 %i %i %i %i  \n",rect.tl.x,rect.br.x,rect.tl.y,rect.br.y);
 	OutputDebugString(szText);
 	#endif*/
 
@@ -5375,7 +5376,7 @@ vncClient::SendRectangle(const rfb::Rect &rect)
 #ifdef _DEBUG
 					char			szText[256];
 					DWORD error=GetLastError();
-					sprintf(szText," ++++++ crashtest TheSize %i \n",TheSize);
+					sprintf_s(szText," ++++++ crashtest TheSize %i \n",TheSize);
 					SetLastError(0);
 					OutputDebugString(szText);		
 	#endif
@@ -5393,7 +5394,7 @@ vncClient::SendRectangle(const rfb::Rect &rect)
 #ifdef _DEBUG
 					char			szText[256];
 					DWORD error=GetLastError();
-					sprintf(szText," ++++++ crashtest TheSize2 %i \n",TheSize);
+					sprintf_s(szText," ++++++ crashtest TheSize2 %i \n",TheSize);
 					SetLastError(0);
 					OutputDebugString(szText);		
 	#endif
@@ -5409,7 +5410,7 @@ vncClient::SendRectangle(const rfb::Rect &rect)
 #ifdef _DEBUG
 					char			szText[256];
 					DWORD error=GetLastError();
-					sprintf(szText," ++++++ crashtest Size %i %i\n",Size,bytes);
+					sprintf_s(szText," ++++++ crashtest Size %i %i\n",Size,bytes);
 					SetLastError(0);
 					OutputDebugString(szText);		
 	#endif
@@ -5748,7 +5749,7 @@ void vncClient::EnableCache(BOOL enabled)
 void vncClient::SetProtocolVersion(rfbProtocolVersionMsg *protocolMsg)
 {
 	if (protocolMsg!=NULL) memcpy(ProtocolVersionMsg,protocolMsg,sz_rfbProtocolVersionMsg);
-	else strcpy(ProtocolVersionMsg,"0.0.0.0");
+	else strcpy_s(ProtocolVersionMsg,"0.0.0.0");
 }
 
 void vncClient::Clear_Update_Tracker()
@@ -5969,15 +5970,15 @@ void vncClient::FinishFileReception()
 	{
 		char szPath[MAX_PATH + MAX_PATH];
 		char szDirName[MAX_PATH]; // Todo: improve this (size) 
-		strcpy(szPath, m_szFullDestName);
+		strcpy_s(szPath, m_szFullDestName);
 		// Todo: improve all this (p, p2, p3 NULL test or use a standard substring extraction function)
 		char *p = strrchr(szPath, '\\') + 1; 
 		char *p2 = strchr(p, '-') + 1; // rfbZipDirectoryPrefix MUST have a "-" at the end...
-		strcpy(szDirName, p2);
+		strcpy_s(szDirName, p2);
 		char *p3 = strrchr(szDirName, '.');
 		*p3 = '\0';
 		if (p != NULL) *p = '\0';
-		strcat(szPath, szDirName);
+		strcat_s(szPath, szDirName);
 
 		// Create the Directory
 		// BOOL fRet = CreateDirectory(szPath, NULL);
@@ -6244,7 +6245,7 @@ int vncClient::ZipPossibleDirectory(LPSTR szSrcFileName)
 		char szWorkingDir[MAX_PATH];
 		::GetTempPath(MAX_PATH,szWorkingDir); //PGM Use Windows Temp folder
 		if (m_fFTUserImpersonatedOk)
-			strcpy(szWorkingDir, m_szTempDir);
+			strcpy_s(szWorkingDir, m_szTempDir);
 		if (szWorkingDir == NULL) //PGM 
 		{ //PGM
 			if (GetModuleFileName(NULL, szWorkingDir, MAX_PATH))
@@ -6262,21 +6263,21 @@ int vncClient::ZipPossibleDirectory(LPSTR szSrcFileName)
 
 		char szPath[MAX_PATH];
 		char szDirectoryName[MAX_PATH];
-		strcpy(szPath, szSrcFileName);
+		strcpy_s(szPath, szSrcFileName);
 		p1 = strrchr(szPath, '\\') + 1;
-		strcpy(szDirectoryName, p1 + 2); // Skip dir prefix (2 chars)
+		strcpy_s(szDirectoryName, p1 + 2); // Skip dir prefix (2 chars)
 		szDirectoryName[strlen(szDirectoryName) - 2] = '\0'; // Remove dir suffix (2 chars)
 		*p1 = '\0';
         m_OrigSourceDirectoryName = std::string(szPath) + szDirectoryName;
 		if ((strlen(szPath) + strlen(rfbZipDirectoryPrefix) + strlen(szDirectoryName) + 4) > (MAX_PATH - 1)) return -1;
-		sprintf(szDirZipPath, "%s%s%s%s", szWorkingDir, rfbZipDirectoryPrefix, szDirectoryName, ".zip"); 
-		strcat(szPath, szDirectoryName);
-		strcpy(szDirectoryName, szPath);
+		sprintf_s(szDirZipPath, "%s%s%s%s", szWorkingDir, rfbZipDirectoryPrefix, szDirectoryName, ".zip"); 
+		strcat_s(szPath, szDirectoryName);
+		strcpy_s(szDirectoryName, szPath);
 		if (strlen(szDirectoryName) > (MAX_PATH - 4)) return -1;
-		strcat(szDirectoryName, "\\*.*");
+		strcat_s(szDirectoryName, "\\*.*");
 		bool fZip = m_pZipUnZip->ZipDirectory(szPath, szDirectoryName, szDirZipPath, true);
 		if (!fZip) return -1;
-		strcpy(szSrcFileName, szDirZipPath);
+		strcpy_s(szSrcFileName, 324, szDirZipPath);
 		return 1;
 	}
 	else
@@ -6294,24 +6295,24 @@ int vncClient::CheckAndZipDirectoryForChecksuming(LPSTR szSrcFileName)
 		char szPath[MAX_PATH + MAX_PATH];
 		char szDirName[MAX_PATH];
 		char szDirectoryName[MAX_PATH * 2];
-		strcpy(szPath, szSrcFileName);
+		strcpy_s(szPath, szSrcFileName);
 		char *p = strrchr(szPath, '\\') + 1; 
 		char *p2 = strchr(p, '-') + 1;
-		strcpy(szDirName, p2);
+		strcpy_s(szDirName, p2);
 		char *p3 = strrchr(szDirName, '.');
 		*p3 = '\0';
 		if (p != NULL) *p = '\0';
-		strcat(szPath, szDirName);
+		strcat_s(szPath, szDirName);
 
 		int nRes = CreateDirectory(szPath, NULL);
 		DWORD err = GetLastError(); // debug
 		if (GetLastError() == ERROR_ALREADY_EXISTS)
 		{
-			strcpy(szDirectoryName, szPath);
+			strcpy_s(szDirectoryName, szPath);
 			// p = strrchr(szPath, '\\') + 1; 
 			// if (p != NULL) *p = '\0'; else return -1;
 			if (strlen(szDirectoryName) > (MAX_PATH - 4)) return -1;
-			strcat(szDirectoryName, "\\*.*");
+			strcat_s(szDirectoryName, "\\*.*");
 			bool fZip = m_pZipUnZip->ZipDirectory(szPath, szDirectoryName, szSrcFileName, true);
 			if (!fZip) return -1;
 		}
@@ -6334,15 +6335,15 @@ bool vncClient::UnzipPossibleDirectory(LPSTR szFileName)
 	{
 		char szPath[MAX_PATH + MAX_PATH];
 		char szDirName[MAX_PATH]; // Todo: improve this (size) 
-		strcpy(szPath, szFileName);
+		strcpy_s(szPath, szFileName);
 		// Todo: improve all this (p, p2, p3 NULL test or use a standard substring extraction function)
 		char *p = strrchr(szPath, '\\') + 1; 
 		char *p2 = strchr(p, '-') + 1; // rfbZipDirectoryPrefix MUST have a "-" at the end...
-		strcpy(szDirName, p2);
+		strcpy_s(szDirName, p2);
 		char *p3 = strrchr(szDirName, '.');
 		*p3 = '\0';
 		if (p != NULL) *p = '\0';
-		strcat(szPath, szDirName);
+		strcat_s(szPath, szDirName);
 		// Create the Directory
 		bool fUnzip = m_pZipUnZip->UnZipDirectory(szPath, szFileName);
 		DeleteFile(szFileName);
@@ -6519,7 +6520,7 @@ void vncClient::Record_SendServerStateUpdate(CARD32 state, CARD32 value)
 	m_want_update_state=true;
 #ifdef _DEBUG
 					char			szText[256];
-					sprintf(szText,"Record_SendServerStateUpdate %i %i  \n",m_state,m_value);
+					sprintf_s(szText,"Record_SendServerStateUpdate %i %i  \n",m_state,m_value);
 					OutputDebugString(szText);		
 #endif
 }
@@ -6617,7 +6618,7 @@ int  vncClient::filetransferrequestPart1(rfbClientToServerMsg msg, bool fUserOk)
 		m_fCompressionEnabled = (Swap32IfLE(msg.ft.size) == 1);
 		const UINT length = Swap32IfLE(msg.ft.length);
 		memset(m_szSrcFileName, 0, sizeof(m_szSrcFileName));
-		if (length > sizeof(m_szSrcFileName))
+		if (length > sizeof(m_szSrcFileName) -2)
 			return 0;
 		// Read in the Name of the file to create
 		if (!m_socket->ReadExact(m_szSrcFileName, length))
@@ -6657,7 +6658,10 @@ int  vncClient::filetransferrequestPart2(int nDirZipRet)
 		m_fFileUploadError = true;
 		m_fFileUploadRunning = false;
 		FTUploadFailureHook();
-		goto end;
+		if (ThreadHandleCompressFolder)  
+			CloseHandle(ThreadHandleCompressFolder);
+		ThreadHandleCompressFolder = NULL;
+		return 0;
 	}
 
     vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::filetransferrequestPart2 - thread = %d\n"), GetCurrentThreadId());
@@ -6720,8 +6724,8 @@ int  vncClient::filetransferrequestPart2(int nDirZipRet)
 					FileTime.wHour,
 					FileTime.wMinute
 				);
-				strcat(m_szSrcFileName, ",");
-				strcat(m_szSrcFileName, szSrcFileTime);
+				strcat_s(m_szSrcFileName, ",");
+				strcat_s(m_szSrcFileName, szSrcFileTime);
 			}
 		}
 	}
@@ -6736,7 +6740,7 @@ int  vncClient::filetransferrequestPart2(int nDirZipRet)
 	m_nCSBufferSize = 0;
 
 	// Send the FileTransferMsg with rfbFileHeader
-	rfbFileTransferMsg ft;
+	rfbFileTransferMsg ft = {0};
 
 	ft.type = rfbFileTransfer;
 	ft.contentType = rfbFileHeader;
@@ -6756,10 +6760,13 @@ int  vncClient::filetransferrequestPart2(int nDirZipRet)
 		//MessageBoxSecure(NULL, "6. Abort !", "Ultra WinVNC", MB_OK);
 		//vnclog.Print(LL_INTINFO, VNCLOG("*** FileTransfer: Wrong Src File size. Abort !\n"));
 		FTUploadFailureHook();
-		goto end;
+		if (ThreadHandleCompressFolder)  
+			CloseHandle(ThreadHandleCompressFolder);
+		ThreadHandleCompressFolder = NULL;
+		return 0;
 	}
+
 	FTUploadStartHook();
-	end:
 	if (ThreadHandleCompressFolder)  
 		CloseHandle(ThreadHandleCompressFolder);
 	ThreadHandleCompressFolder = NULL;
