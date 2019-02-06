@@ -29,6 +29,7 @@
 #include "stdhdrs.h"
 #include "vncviewer.h"
 #include "ClientConnection.h"
+#include "Exception.h"
 #ifdef _INTERNALLIB
 #include <zlib.h>
 #else
@@ -199,9 +200,11 @@ void ClientConnection::CheckZlibBufferSize(int bufsize)
 
 
 	newbuf = (unsigned char *)new char[bufsize+256];
-//	if (newbuf == NULL) {
-//		throw ErrorException("Insufficient memory to allocate zlib buffer.");
-//	}
+	ZeroMemory(newbuf, bufsize+256);
+	
+	if (newbuf == NULL) {
+		throw ErrorException("Insufficient memory to allocate zlib buffer.");
+	}
 
 	// Only if we're successful...
 

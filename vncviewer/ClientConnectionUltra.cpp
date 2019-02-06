@@ -91,7 +91,7 @@ void ClientConnection::ReadUltraZip(rfbFramebufferUpdateRectHeader *pfburh,HRGN 
 		rfbFramebufferUpdateRectHeader surh;
 		m_zlibbuf_size += sz_rfbFramebufferUpdateRectHeader;
 		// Security Check
-		if (m_zlibbuf_size > numRawBytes+500)
+		if (m_zlibbuf_size > new_len)
 			{assert(true);return;}
 		memcpy((char *) &surh,pzipbuf, sz_rfbFramebufferUpdateRectHeader);
 		surh.r.x = Swap16IfLE(surh.r.x);
