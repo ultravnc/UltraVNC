@@ -257,7 +257,7 @@ vncMenu::vncMenu(vncServer *server)
 	{
 	pfnFilter =(CHANGEWINDOWMESSAGEFILTER)GetProcAddress(hUser32,"ChangeWindowMessageFilter");
 	if (pfnFilter) 
-		{	
+		{			
 			//pfnFilter(MENU_ADD_CLIENT_MSG, MSGFLT_ADD);
 			//pfnFilter(MENU_ADD_CLIENT_MSG_INIT, MSGFLT_ADD);
 #ifdef IPV6V4
@@ -348,6 +348,18 @@ vncMenu::vncMenu(vncServer *server)
 	{
 		PostQuitMessage(0);
 		return;
+	}
+
+	if (m_properties.AllowInjection()) {
+		if (pfnFilter)  {			
+			pfnFilter(MENU_ADD_CLIENT_MSG, MSGFLT_ADD);
+			pfnFilter(MENU_ADD_CLIENT_MSG_INIT, MSGFLT_ADD);
+#ifdef IPV6V4
+			pfnFilter(MENU_ADD_CLIENT6_MSG, MSGFLT_ADD);
+			pfnFilter(MENU_ADD_CLIENT6_MSG_INIT, MSGFLT_ADD);		
+#endif
+		}
+
 	}
 	
 	/* Does not work when vncMenu is created from imp_thread
@@ -1327,6 +1339,8 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
 		case ID_UNINSTALL_SERVICE:
 			{
+			HWND hwnd=FindWinVNCWindow(true);
+			if (hwnd) SendMessage(hwnd,WM_COMMAND,ID_CLOSE,0);
 			HANDLE hProcess,hPToken;
 			DWORD id=GetExplorerLogonPid();
 				if (id!=0) 

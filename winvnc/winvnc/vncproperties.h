@@ -64,6 +64,7 @@ public:
 
 	// TRAY ICON MENU SETTINGS
 	BOOL AllowProperties() {return m_allowproperties;};
+	BOOL AllowInjection() {return m_allowInjection;};
 	BOOL AllowShutdown() {return m_allowshutdown;};
 	BOOL AllowEditClients() {return m_alloweditclients;};
 	bool Lock_service_helper;
@@ -88,6 +89,7 @@ protected:
 
 	// Tray icon menu settings
 	BOOL				m_allowproperties;
+	BOOL				m_allowInjection;
 	BOOL				m_allowshutdown;
 	BOOL				m_alloweditclients;
     int                 m_ftTimeout;

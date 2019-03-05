@@ -2633,6 +2633,21 @@ void ClientConnection::NegotiateProtocolVersion()
     }
 
     sprintf(pv,rfbProtocolVersionFormat, m_majorVersion, m_minorVersion);
+	if (m_Is_Listening)
+		{
+			char szFileName[MAX_PATH];
+			if (GetModuleFileName(NULL, szFileName, MAX_PATH))
+				{
+				char* p = strrchr(szFileName, '\\');
+				if (p != NULL) { 
+					*p = '\0';
+					strcat (szFileName,"\\sound.wav");
+					if (GetFileAttributes(szFileName) != INVALID_FILE_ATTRIBUTES) {
+						PlaySound(szFileName, NULL, SND_ASYNC);
+					}
+				}
+			}
+		}
 
     WriteExact(pv, sz_rfbProtocolVersionMsg);
 	if (m_minorVersion == 14 || m_minorVersion == 16 || m_minorVersion == 18) // adzm 2010-09
@@ -2645,7 +2660,7 @@ void ClientConnection::NegotiateProtocolVersion()
 		{
 			throw WarningException("Buffer too big, ");
 
-		}
+		}		
 
 		ReadExact(mytext,size);
 		mytext[size]=0;

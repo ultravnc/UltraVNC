@@ -691,8 +691,29 @@ public:
 
       // see if it's a recognised keyboard key, otherwise ignore it
 
-      if (vkMap.find(keysym) == vkMap.end()) {
-        vnclog.Print(LL_INTWARN, "ignoring unknown keysym %d\n",keysym);
+    if (vkMap.find(keysym) == vkMap.end()) {		
+		INPUT inputs[1];
+		char *key, text[32];
+		sprintf(text,"%d",keysym);
+		key = text;	
+		vnclog.Print(LL_INTINFO, "trying unicode input key \"%s\"\n",key);
+		if (down) {
+			inputs[0].type= INPUT_KEYBOARD;
+			inputs[0].ki.wVk = 0;
+			inputs[0].ki.wScan = atoi(key);
+			inputs[0].ki.time = 0;
+			inputs[0].ki.dwExtraInfo = NULL;
+			inputs[0].ki.dwFlags = KEYEVENTF_UNICODE;
+			SendInput(1, inputs, sizeof(INPUT));
+		} else {
+			inputs[0].type= INPUT_KEYBOARD;
+			inputs[0].ki.wVk = 0;
+			inputs[0].ki.wScan = atoi(key);
+			inputs[0].ki.time = 0;
+			inputs[0].ki.dwExtraInfo = NULL;
+			inputs[0].ki.dwFlags = KEYEVENTF_UNICODE | KEYEVENTF_KEYUP;
+			SendInput(1, inputs, sizeof(INPUT));
+		}
         return;
       }
       BYTE vkCode = vkMap[keysym];

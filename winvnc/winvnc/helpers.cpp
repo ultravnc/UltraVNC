@@ -99,6 +99,7 @@ char *authhosts=new char[150];
 
 LONG AllowShutdown=1;
 LONG AllowProperties=1;
+LONG AllowInjection=0;
 LONG AllowEditClients=1;
 
 LONG FileTransferEnabled=0;
@@ -237,9 +238,11 @@ myIniFile_Out.WriteString("admin", "DSMPluginConfig",DSMPluginConfig);
 
 AllowShutdown=myIniFile_In.ReadInt("admin", "AllowShutdown", true);
 AllowProperties=myIniFile_In.ReadInt("admin", "AllowProperties", true);
+AllowInjection=myIniFile_In.ReadInt("admin", "AllowInjection", false);
 AllowEditClients=myIniFile_In.ReadInt("admin", "AllowEditClients", true);
 myIniFile_Out.WriteInt("admin", "AllowShutdown" ,AllowShutdown);
 myIniFile_Out.WriteInt("admin", "AllowProperties" ,AllowProperties);
+myIniFile_Out.WriteInt("admin", "AllowInjection" ,AllowInjection);
 myIniFile_Out.WriteInt("admin", "AllowEditClients" ,AllowEditClients);
 
 FileTransferEnabled=myIniFile_In.ReadInt("admin", "FileTransferEnabled", true);
