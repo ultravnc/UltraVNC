@@ -151,7 +151,9 @@ public:
 											m_incr_rgn.intersect(m_update_tracker.get_cached_region()).is_empty() ,
 											m_incr_rgn.intersect(m_update_tracker.get_copied_region()).is_empty());
 #endif
-		BOOL value =!m_incr_rgn.is_empty() &&m_incr_rgn.intersect(m_update_tracker.get_changed_region()).is_empty() &&
+		if (sendingUpdate == true)		
+			return true;
+		BOOL value =!m_incr_rgn.is_empty() && m_incr_rgn.intersect(m_update_tracker.get_changed_region()).is_empty() &&
 			m_incr_rgn.intersect(m_update_tracker.get_cached_region()).is_empty() &&
 			m_incr_rgn.intersect(m_update_tracker.get_copied_region()).is_empty();
 		if (m_incr_rgn.is_empty())
@@ -425,6 +427,7 @@ public:
 	//int Totalsend;
 	BOOL client_settings_passed;
 	bool initialCapture_done;
+	bool sendingUpdate;
 	bool		m_Autoreconnect;
 	// The socket
 	VSocket			*m_socket;

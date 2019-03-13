@@ -1003,17 +1003,22 @@ vncDesktopThread::run_undetached(void *arg)
 						OutputDevMessage("WaitForMultipleObjects result . %d last call delta %4d ms", result, now - sLastCopy3);
 						sLastCopy3 = now;
 #endif
-						// The cpu overhead in debugmode, don't use throttle
-#ifndef _DEBUG
-								//measure current cpu usage of winvnc
-								if ((fullpollcounter==10 || fullpollcounter==0 || fullpollcounter==5)&& (m_server->MaxCpu()!=100))
-									cpuUsage = usage.GetUsage();
-								if (cpuUsage > m_server->MaxCpu()) 
-									MIN_UPDATE_INTERVAL+=10;
-								else MIN_UPDATE_INTERVAL-=10;
-								if (MIN_UPDATE_INTERVAL<MIN_UPDATE_INTERVAL_MIN) MIN_UPDATE_INTERVAL=MIN_UPDATE_INTERVAL_MIN;
-								if (MIN_UPDATE_INTERVAL>MIN_UPDATE_INTERVAL_MAX) MIN_UPDATE_INTERVAL=MIN_UPDATE_INTERVAL_MAX;
-#endif
+								// MaxCpu() == 100  PowerMode
+								if (m_server->MaxCpu() != 100) {
+									if ((fullpollcounter==10 || fullpollcounter==0 || fullpollcounter==5)) {
+										cpuUsage = usage.GetUsage();
+										if (cpuUsage > m_server->MaxCpu()) 
+											MIN_UPDATE_INTERVAL+=10;
+										else MIN_UPDATE_INTERVAL-=10;
+										if (MIN_UPDATE_INTERVAL<MIN_UPDATE_INTERVAL_MIN) 
+											MIN_UPDATE_INTERVAL=MIN_UPDATE_INTERVAL_MIN;
+										if (MIN_UPDATE_INTERVAL>MIN_UPDATE_INTERVAL_MAX) 
+											MIN_UPDATE_INTERVAL=MIN_UPDATE_INTERVAL_MAX;
+									}
+								}
+								else
+									MIN_UPDATE_INTERVAL = 25;
+
 								// MAX 30fps
 								newtick = GetTimeFunction(); 
 								if ((newtick-oldtick)<MIN_UPDATE_INTERVAL)

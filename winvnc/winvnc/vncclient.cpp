@@ -712,6 +712,8 @@ vncClientUpdateThread::run_undetached(void *arg)
 					(m_client->m_encodemgr.m_scrinfo.framebufferWidth == m_client->m_encodemgr.m_buffer->m_scrinfo.framebufferWidth) &&
 					(m_client->m_encodemgr.m_scrinfo.format.bitsPerPixel == m_client->m_encodemgr.m_buffer->m_scrinfo.format.bitsPerPixel &&
 					m_client->initialCapture_done)) {
+				if (m_client->m_server->MaxCpu() == 100)
+					m_client->sendingUpdate = true;
 				if (m_client->SendUpdate(update)) {
 					updates_sent++;
 					//m_client->m_incr_rgn.clear();
@@ -723,6 +725,7 @@ vncClientUpdateThread::run_undetached(void *arg)
 					sNotifyLastCopy1 = now;
 #endif
 				}
+				m_client->sendingUpdate = false;
 			}
 			//else
 				//clipregion.clear();
@@ -4590,6 +4593,7 @@ vncClient::vncClient() : m_clipboard(ClipboardSettings::defaultServerCaps), Send
 	m_nScale_viewer = 1;
 	nr_incr_rgn_empty = 0;
 	ThreadHandleCompressFolder = NULL;
+	sendingUpdate = false;
 }
 
 vncClient::~vncClient()
@@ -5255,9 +5259,9 @@ vncClient::SendRectangles(const rfb::RectVector &rects)
 {
 	rfb::RectVector::const_iterator i;
 	rfb::Rect rect;
-	int x,y;
-	int Blocksize=254;
-	int BlocksizeX=254;
+	//int x,y;
+	//int Blocksize=1920;
+	//int BlocksizeX=1200;
 
 #ifdef _XZ
 	if (m_encodemgr.IsBulkRectEncoding()) {
@@ -5282,7 +5286,7 @@ vncClient::SendRectangles(const rfb::RectVector &rects)
 				OutputDebugString(szText);
 #endif*/
 
-		if (m_encodemgr.ultra2_encoder_in_use)
+		/*if (m_encodemgr.ultra2_encoder_in_use)
 		{
 			if ((rect.br.x-rect.tl.x) * (rect.br.y-rect.tl.y) > Blocksize*BlocksizeX )
 			{
@@ -5309,7 +5313,7 @@ vncClient::SendRectangles(const rfb::RectVector &rects)
 			}
 
 		}
-		else
+		else*/
 		{
 		if (!SendRectangle(*i)) return FALSE;
 		}
