@@ -5344,21 +5344,14 @@ void ClientConnection::Internal_SendFramebufferUpdateRequest(int x, int y, int w
 {
 	if (m_pFileTransfer && (m_pFileTransfer->m_fFileTransferRunning && ( m_pFileTransfer->m_fVisible || m_pFileTransfer->UsingOldProtocol()))) return;
 	if (m_pTextChat->m_fTextChatRunning && m_pTextChat->m_fVisible) return;
-
-	//omni_mutex_lock l(m_UpdateMutex);
-
     rfbFramebufferUpdateRequestMsg fur;
-
-	// vnclog.Print(0, _T("Request %s update x=%d,y=%d,w=%d,h=%d\n"), incremental ? _T("incremental") : _T("full"),x,y,w,h);
-
     fur.type = rfbFramebufferUpdateRequest;
     fur.incremental = incremental ? 1 : 0;
     fur.x = Swap16IfLE(x);
     fur.y = Swap16IfLE(y);
     fur.w = Swap16IfLE(w);
     fur.h = Swap16IfLE(h);
-
-	//vnclog.Print(10, _T("Request %s update\n"), incremental ? _T("incremental") : _T("full"));
+	fps.update();
     WriteExact_timeout((char *)&fur, sz_rfbFramebufferUpdateRequestMsg, rfbFramebufferUpdateRequest,5);
 }
 
@@ -7110,14 +7103,16 @@ void ClientConnection::UpdateStatusFields()
 	m_BytesRead = fis->GetBytesRead();
 	GetFriendlySizeString(m_BytesRead, szText);
 	// SetDlgItemInt(m_hwndStatus, IDC_RECEIVED, m_BytesRead, false);
-	if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_RECEIVED, szText);
+	if (m_hwndStatus)
+		SetDlgItemText(m_hwndStatus, IDC_RECEIVED, szText);
 
 	// Bytes Sent
 	GetFriendlySizeString(m_BytesSend, szText);
-	if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_SEND, szText);
-
-	// Speed
-	if (m_hwndStatus)SetDlgItemInt(m_hwndStatus, IDC_SPEED, avg_kbitsPerSecond, false);
+	if (m_hwndStatus) {
+		SetDlgItemText(m_hwndStatus,IDC_SEND, szText);
+		SetDlgItemInt(m_hwndStatus, IDC_SPEED, avg_kbitsPerSecond, false);
+		SetDlgItemInt(m_hwndStatus, IDC_FPS, fps.get(), false);
+	}
 
 	// Encoder
 	if (m_fStatusOpen) // It's called by the status window timer... fixme

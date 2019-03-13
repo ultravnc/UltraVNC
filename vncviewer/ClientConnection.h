@@ -70,6 +70,8 @@ extern "C"
 #include <vector>
 #include <algorithm>
 #include "./directx/directxviewer.h"
+#include "FpsCounter.h"
+
 #ifdef _Gii
 #include "vnctouch.h"
 #define TOUCH_REGISTER_TIMER 1014
@@ -195,6 +197,7 @@ public:
 	void WriteExactFT(char *buf, int bytes);
 
 private:
+	Fps fps;
 #ifdef _Gii
 	vnctouch *mytouch;
 #endif

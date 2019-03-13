@@ -253,6 +253,7 @@
 #define IDC_SAVESIZE                    2022
 #define IDC_EDIT3                       2023
 #define IDC_FTTIMEOUT                   2023
+#define IDC_FPS                         2024
 #define IDC_STATIC_SPLIT                9000
 #define IDC_HOSTNAME_DEL                9001
 #define ID_SESSION_SET_CRECT            32777
@@ -549,7 +550,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        211
 #define _APS_NEXT_COMMAND_VALUE         50025
-#define _APS_NEXT_CONTROL_VALUE         2024
+#define _APS_NEXT_CONTROL_VALUE         2025
 #define _APS_NEXT_SYMED_VALUE           154
 #endif
 #endif
