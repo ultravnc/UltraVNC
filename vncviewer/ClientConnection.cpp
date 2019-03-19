@@ -5045,7 +5045,7 @@ void ClientConnection::ShowConnInfo()
 	TCHAR num[16];
 	_snprintf(
 		buf,
-		20148,
+		2048,
 		_T("Connected to: %s\n\r\n\r")
 		_T("Host: %s  Port: %d\n\r")
 		_T("%s %s  %s\n\r\n\r")
