@@ -65,7 +65,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v141_xp</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Vista|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -110,7 +110,7 @@
     <UseIntelTBB>false</UseIntelTBB>
     <UseIntelMKL>No</UseIntelMKL>
     <UseILP64Interfaces>false</UseILP64Interfaces>
-    <PlatformToolset>v141_xp</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Vista|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -496,9 +496,8 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\32\oldCPU</Command>
       <OutputFile>.\..\Release/winvnc.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      <Command>"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe" sign /sha1 075BD1CAB5AE085E523AF7883FC0A8127BE08C71 /n "uvnc bvba" /v /fd sha1 /t http://timestamp.verisign.com/scripts/timstamp.dll "$(OutDir)$(TargetName)$(TargetExt)"
-"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe" sign /sha1 0F96782496EA96F2BA96CF177E61F993CA5BC2E8 /n "uvnc bvba" /v /as /fd sha256 /tr http://timestamp.geotrust.com/tsa "$(OutDir)$(TargetName)$(TargetExt)"
-copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\32\xp_ipv6</Command>
+      <Command>"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe" sign /sha1 6D4DE9F8F9626857AEA19A9D95405BBF1A800532 /n "uvnc bvba" /v /as /fd sha256 /tr http://sha256timestamp.ws.symantec.com/sha256/timestamp "$(OutDir)$(TargetName)$(TargetExt)"
+copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\32\xp\ipv6</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Vista|Win32'">
@@ -721,9 +720,8 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
       <OutputFile>.\..\Release/winvnc.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      <Command>"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe" sign /sha1 075BD1CAB5AE085E523AF7883FC0A8127BE08C71 /n "uvnc bvba" /v /fd sha1 /t http://timestamp.verisign.com/scripts/timstamp.dll "$(OutDir)$(TargetName)$(TargetExt)"
-"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe" sign /sha1 0F96782496EA96F2BA96CF177E61F993CA5BC2E8 /n "uvnc bvba" /v /as /fd sha256 /tr http://timestamp.geotrust.com/tsa "$(OutDir)$(TargetName)$(TargetExt)"
-copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp_ipv6</Command>
+      <Command>"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe" sign /sha1 6D4DE9F8F9626857AEA19A9D95405BBF1A800532 /n "uvnc bvba" /v /as /fd sha256 /tr http://sha256timestamp.ws.symantec.com/sha256/timestamp "$(OutDir)$(TargetName)$(TargetExt)"
+copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\ipv6</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">

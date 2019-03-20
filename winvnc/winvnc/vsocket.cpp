@@ -188,7 +188,7 @@ VSocket::CreateConnect(const VString address, const VCard port)
 	Hints.ai_family = AF_UNSPEC;
 	Hints.ai_socktype = SOCK_STREAM;
 	char temp [10];
-	itoa(port, temp, 10);
+	_itoa(port, temp, 10);
 	RetVal = getaddrinfo(address, temp, &Hints, &AddrInfo);
 	if (RetVal != 0) return false;
 
@@ -243,7 +243,7 @@ VSocket::CreateBindConnect(const VString address, const VCard port)
 	Hints.ai_family = PF_UNSPEC;
 	Hints.ai_socktype = SOCK_STREAM;
 	char temp[10];
-	itoa(port, temp, 10);
+	_itoa(port, temp, 10);
 	RetVal = getaddrinfo(address, temp, &Hints, &AddrInfo);
 	if (RetVal != 0) return false;
 
@@ -296,7 +296,7 @@ VBool	VSocket::CreateBindListen(const VCard port, const VBool localOnly)
 	int RetVal,i;
 	ADDRINFO Hints, *AddrInfo, *AI;
 	char temp[10];
-	itoa(port, temp, 10);
+	_itoa(port, temp, 10);
 
 	memset(&Hints, 0, sizeof(Hints));
 	Hints.ai_family = PF_UNSPEC;
@@ -1349,12 +1349,12 @@ VInt
 VSocket::Send(const char *buff, const VCard bufflen)
 {
 
-	if (sock4 >= 0) return  Send(buff, bufflen, sock4);
-	if (sock6 >= 0) return Send(buff, bufflen, sock6);
+	if (sock4 >= 0) return  SendSock(buff, bufflen, sock4);
+	if (sock6 >= 0) return SendSock(buff, bufflen, sock6);
 	return false;
 }
 VInt
-VSocket::Send(const char *buff, const VCard bufflen, int allsock)
+VSocket::SendSock(const char *buff, const VCard bufflen, SOCKET allsock)
 {
 	//adzm 2010-08-01
 	m_LastSentTick = GetTickCount();
@@ -1438,13 +1438,13 @@ VSocket::Send(const char *buff, const VCard bufflen)
 VInt
 VSocket::SendQueued(const char *buff, const VCard bufflen)
 {
-	if (sock4 >= 0) return  SendQueued(buff, bufflen, sock4);
-	if (sock6 >= 0) return SendQueued(buff, bufflen, sock6);
+	if (sock4 >= 0) return  SendQueuedSock(buff, bufflen, sock4);
+	if (sock6 >= 0) return SendQueuedSock(buff, bufflen, sock6);
 	return false;
 }
 
 VInt
-VSocket::SendQueued(const char *buff, const VCard bufflen,int allsock)
+VSocket::SendQueuedSock(const char *buff, const VCard bufflen, SOCKET allsock)
 {
 	unsigned int newsize=queuebuffersize+bufflen;
 	char *buff2;
@@ -1524,12 +1524,12 @@ VSocket::SendQueued(const char *buff, const VCard bufflen)
 VBool
 VSocket::SendExact(const char *buff, const VCard bufflen, unsigned char msgType)
 {
-	if (sock4 >= 0) return SendExact(buff, bufflen, msgType, sock4);
-	if (sock6 >= 0) return SendExact(buff, bufflen, msgType, sock6);
+	if (sock4 >= 0) return SendExactSock(buff, bufflen, msgType, sock4);
+	if (sock6 >= 0) return SendExactSock(buff, bufflen, msgType, sock6);
 	return false;
 }
 VBool
-VSocket::SendExact(const char *buff, const VCard bufflen, unsigned char msgType,int allsock)
+VSocket::SendExactSock(const char *buff, const VCard bufflen, unsigned char msgType, SOCKET allsock)
 {
 	if (allsock == -1) return VFalse;
 	//vnclog.Print(LL_SOCKERR, VNCLOG("SendExactMsg %i\n") ,bufflen);
@@ -1573,12 +1573,12 @@ VSocket::SendExact(const char *buff, const VCard bufflen, unsigned char msgType)
 VBool 
 VSocket::SendExactQueue(const char *buff, const VCard bufflen, unsigned char msgType)
 {
-	if (sock4 >= 0) return SendExactQueue(buff, bufflen, msgType, sock4);
-	if (sock6 >= 0) return SendExactQueue(buff, bufflen, msgType, sock6);
+	if (sock4 >= 0) return SendExactQueueSock(buff, bufflen, msgType, sock4);
+	if (sock6 >= 0) return SendExactQueueSock(buff, bufflen, msgType, sock6);
 	return false;
 }
 VBool 
-VSocket::SendExactQueue(const char *buff, const VCard bufflen, unsigned char msgType,int allsock)
+VSocket::SendExactQueueSock(const char *buff, const VCard bufflen, unsigned char msgType, SOCKET allsock)
 {
 	if (allsock == -1) return VFalse;
 	//vnclog.Print(LL_SOCKERR, VNCLOG("SendExactMsg %i\n") ,bufflen);
@@ -1623,13 +1623,13 @@ VSocket::SendExactQueue(const char *buff, const VCard bufflen, unsigned char msg
 VBool
 VSocket::SendExact(const char *buff, const VCard bufflen)
 {
-	if (sock4 >= 0) return SendExact(buff, bufflen, sock4);
-	if (sock6 >= 0) return SendExact(buff, bufflen, sock6);
+	if (sock4 >= 0) return SendExactSock(buff, bufflen, sock4);
+	if (sock6 >= 0) return SendExactSock(buff, bufflen, sock6);
 	return false;
 }
 
 VBool
-VSocket::SendExact(const char *buff, const VCard bufflen,int allsock)
+VSocket::SendExactSock(const char *buff, const VCard bufflen, SOCKET allsock)
 {	
 	if (allsock==-1) return VFalse;
 	//adzm 2010-09
@@ -1719,12 +1719,12 @@ VSocket::SendExact(const char *buff, const VCard bufflen)
 VBool
 VSocket::SendExactQueue(const char *buff, const VCard bufflen)
 {
-	if (sock4 >= 0) return SendExactQueue(buff, bufflen, sock4);
-	if (sock6 >= 0) return SendExactQueue(buff, bufflen, sock6);
+	if (sock4 >= 0) return SendExactQueueSock(buff, bufflen, sock4);
+	if (sock6 >= 0) return SendExactQueueSock(buff, bufflen, sock6);
 	return false;
 }
 VBool
-VSocket::SendExactQueue(const char *buff, const VCard bufflen,int allsock)
+VSocket::SendExactQueueSock(const char *buff, const VCard bufflen, SOCKET allsock)
 {
 	if (allsock == -1) return VFalse;
 	//adzm 2010-09
@@ -1816,13 +1816,13 @@ VSocket::SendExactQueue(const char *buff, const VCard bufflen)
 VBool
 VSocket::ClearQueue()
 {
-	if (sock4 >= 0) return ClearQueue(sock4);
-	if (sock6 >= 0) return ClearQueue(sock6);
+	if (sock4 >= 0) return ClearQueueSock(sock4);
+	if (sock6 >= 0) return ClearQueueSock(sock6);
 	return false;
 }
 
 VBool
-VSocket::ClearQueue(int allsock)
+VSocket::ClearQueueSock(SOCKET allsock)
 {
 	if (allsock==-1) return VFalse;
 	if (queuebuffersize!=0)
@@ -1860,12 +1860,12 @@ VSocket::ClearQueue()
 VInt
 VSocket::Read(char *buff, const VCard bufflen)
 {
-	if (sock4 >= 0) return Read(buff, bufflen, sock4);
-	if (sock6 >= 0) return Read(buff, bufflen, sock6);
+	if (sock4 >= 0) return ReadSock(buff, bufflen, sock4);
+	if (sock6 >= 0) return ReadSock(buff, bufflen, sock6);
 	return false;
 }
 VInt
-VSocket::Read(char *buff, const VCard bufflen,int allsock)
+VSocket::ReadSock(char *buff, const VCard bufflen, SOCKET allsock)
 {
 	if (allsock == -1) return allsock;
 	int counter = 0;
@@ -1889,12 +1889,12 @@ VSocket::Read(char *buff, const VCard bufflen)
 VBool
 VSocket::ReadExact(char *buff, const VCard bufflen)
 {
-	if (sock4 >= 0) return ReadExact(buff, bufflen, sock4);
-	if (sock6 >= 0) return ReadExact(buff, bufflen, sock6);
+	if (sock4 >= 0) return ReadExactSock(buff, bufflen, sock4);
+	if (sock6 >= 0) return ReadExactSock(buff, bufflen, sock6);
 	return false;
 }
 VBool
-VSocket::ReadExact(char *buff, const VCard bufflen,int allsock)
+VSocket::ReadExactSock(char *buff, const VCard bufflen, SOCKET allsock)
 {
 	if (allsock == -1) return VFalse;
 	//adzm 2010-09
@@ -2246,12 +2246,12 @@ VSocket::ReadExactHTTP(char *buff, const VCard bufflen)
 VBool
 VSocket::ReadSelect(VCard to)
 {
-	if (sock4 >= 0) return ReadSelect(to, sock4);
-	if (sock6 >= 0) return ReadSelect(to, sock6);
+	if (sock4 >= 0) return ReadSelectSock(to, sock4);
+	if (sock6 >= 0) return ReadSelectSock(to, sock6);
 	return false;
 }
 VBool
-VSocket::ReadSelect(VCard to, int allsock)
+VSocket::ReadSelectSock(VCard to, SOCKET allsock)
 {
 	fd_set fds;
 	FD_ZERO(&fds);

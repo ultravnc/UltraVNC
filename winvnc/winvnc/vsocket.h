@@ -230,16 +230,16 @@ public:
   VBool ReadExact(char *buff, const VCard bufflen);
   VBool ClearQueue();
 
-  VBool ReadSelect(VCard to , int allsock);
-  VInt Send(const char *buff, const VCard bufflen, int allsock);
-  VInt SendQueued(const char *buff, const VCard bufflen, int allsock);
-  VInt Read(char *buff, const VCard bufflen, int allsock);
-  VBool SendExact(const char *buff, const VCard bufflen, int allsock);
-  VBool SendExact(const char *buff, const VCard bufflen, unsigned char msgType, int allsock);
-  VBool SendExactQueue(const char *buff, const VCard bufflen, int allsock);
-  VBool SendExactQueue(const char *buff, const VCard bufflen, unsigned char msgType, int allsock);
-  VBool ReadExact(char *buff, const VCard bufflen, int allsock);
-  VBool ClearQueue(int allsock);
+  VBool ReadSelectSock(VCard to , SOCKET allsock);
+  VInt SendSock(const char *buff, const VCard bufflen, SOCKET allsock);
+  VInt SendQueuedSock(const char *buff, const VCard bufflen, SOCKET allsock);
+  VInt ReadSock(char *buff, const VCard bufflen, SOCKET allsock);
+  VBool SendExactSock(const char *buff, const VCard bufflen, SOCKET allsock);
+  VBool SendExactSock(const char *buff, const VCard bufflen, unsigned char msgType, SOCKET allsock);
+  VBool SendExactQueueSock(const char *buff, const VCard bufflen, SOCKET allsock);
+  VBool SendExactQueueSock(const char *buff, const VCard bufflen, unsigned char msgType, SOCKET allsock);
+  VBool ReadExactSock(char *buff, const VCard bufflen, SOCKET allsock);
+  VBool ClearQueueSock(SOCKET allsock);
 #else
   //VBool Http_CreateConnect(const VString address);
   // I/O routines

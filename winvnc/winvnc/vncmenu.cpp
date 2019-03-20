@@ -1800,7 +1800,8 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			char szId[MAX_PATH] = { 0 };
 			// sf@2003 - Values are already converted
 
-			if (_this->m_server->m_retry_timeout != 0 && !fShutdownOrdered) Sleep(5000);
+			if (WaitForSingleObject(_this->m_server->retryThreadHandle, 0) == WAIT_OBJECT_0 && fShutdownOrdered)
+				Sleep(5000);
 
 			if ((_this->m_server->AutoReconnect() || _this->m_server->IdReconnect()) && strlen(_this->m_server->AutoReconnectAdr()) > 0)
 				{
@@ -1945,7 +1946,8 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			char szId[MAX_PATH] = {0};
 			// sf@2003 - Values are already converted
 
-			if (_this->m_server->m_retry_timeout!=0 && !fShutdownOrdered) Sleep(5000);
+			if (WaitForSingleObject(_this->m_server->retryThreadHandle, 0) == WAIT_OBJECT_0 && fShutdownOrdered)
+				Sleep(5000);
 			if ((_this->m_server->AutoReconnect() || _this->m_server->IdReconnect()) && strlen(_this->m_server->AutoReconnectAdr()) > 0)
 				{
 					struct in_addr address;

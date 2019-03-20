@@ -2569,7 +2569,7 @@ void vncServer::actualRetryThread()
 		if (retrysock) {
 			// Connect out to the specified host on the VNCviewer listen port
 #ifdef IPV6V4
-			if (tmpsock->CreateConnect(m_szAutoReconnectAdr, m_AutoReconnectPort)) {
+			if (retrysock->CreateConnect(m_szAutoReconnectAdr, m_AutoReconnectPort)) {
 #else
 			retrysock->Create();
 			if (retrysock->Connect(m_szAutoReconnectAdr, m_AutoReconnectPort)) {
