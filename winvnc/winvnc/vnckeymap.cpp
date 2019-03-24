@@ -691,7 +691,9 @@ public:
 
       // see if it's a recognised keyboard key, otherwise ignore it
 
-    if (vkMap.find(keysym) == vkMap.end()) {		
+    if (vkMap.find(keysym) == vkMap.end()) {
+		if (keysym == 65509)
+			return;
 		INPUT inputs[1];
 		char *key, text[32];
 		sprintf(text,"%d",keysym);
