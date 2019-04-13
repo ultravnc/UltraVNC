@@ -145,6 +145,7 @@ protected:
 	int m_pref_LockSettings;
 	BOOL m_pref_DisableLocalInputs;
 	BOOL m_pref_EnableJapInput;
+	BOOL m_pref_EnableUnicodeInput;
 	BOOL m_pref_EnableWin8Helper;
 	BOOL m_pref_clearconsole;
 

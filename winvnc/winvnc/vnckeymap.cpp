@@ -453,7 +453,7 @@ public:
 
 
 
-  void keyEvent(rdr::U32 keysym, bool down, bool jap)
+  void keyEvent(rdr::U32 keysym, bool down, bool jap, bool unicode)
   {
 	  vnclog.Print(LL_INTWARN, " keysym 0x%x",keysym);
 	if (keysym>=XK_dead_grave && keysym <=XK_dead_belowdot)// && down)
@@ -692,29 +692,31 @@ public:
       // see if it's a recognised keyboard key, otherwise ignore it
 
     if (vkMap.find(keysym) == vkMap.end()) {
-		if (keysym == 65509)
-			return;
-		INPUT inputs[1];
-		char *key, text[32];
-		sprintf(text,"%d",keysym);
-		key = text;	
-		vnclog.Print(LL_INTINFO, "trying unicode input key \"%s\"\n",key);
-		if (down) {
-			inputs[0].type= INPUT_KEYBOARD;
-			inputs[0].ki.wVk = 0;
-			inputs[0].ki.wScan = atoi(key);
-			inputs[0].ki.time = 0;
-			inputs[0].ki.dwExtraInfo = NULL;
-			inputs[0].ki.dwFlags = KEYEVENTF_UNICODE;
-			SendInput(1, inputs, sizeof(INPUT));
-		} else {
-			inputs[0].type= INPUT_KEYBOARD;
-			inputs[0].ki.wVk = 0;
-			inputs[0].ki.wScan = atoi(key);
-			inputs[0].ki.time = 0;
-			inputs[0].ki.dwExtraInfo = NULL;
-			inputs[0].ki.dwFlags = KEYEVENTF_UNICODE | KEYEVENTF_KEYUP;
-			SendInput(1, inputs, sizeof(INPUT));
+		if (unicode) {
+			if (keysym == 65509)
+				return;
+			INPUT inputs[1];
+			char *key, text[32];
+			sprintf(text,"%d",keysym);
+			key = text;	
+			vnclog.Print(LL_INTINFO, "trying unicode input key \"%s\"\n",key);
+			if (down) {
+				inputs[0].type= INPUT_KEYBOARD;
+				inputs[0].ki.wVk = 0;
+				inputs[0].ki.wScan = atoi(key);
+				inputs[0].ki.time = 0;
+				inputs[0].ki.dwExtraInfo = NULL;
+				inputs[0].ki.dwFlags = KEYEVENTF_UNICODE;
+				SendInput(1, inputs, sizeof(INPUT));
+			} else {
+				inputs[0].type= INPUT_KEYBOARD;
+				inputs[0].ki.wVk = 0;
+				inputs[0].ki.wScan = atoi(key);
+				inputs[0].ki.time = 0;
+				inputs[0].ki.dwExtraInfo = NULL;
+				inputs[0].ki.dwFlags = KEYEVENTF_UNICODE | KEYEVENTF_KEYUP;
+				SendInput(1, inputs, sizeof(INPUT));
+			}
 		}
         return;
       }
@@ -784,9 +786,9 @@ private:
   std::map<rdr::U32,bool> extendedMap;
 } key_mapper;
 
-void vncKeymap::keyEvent(CARD32 keysym, bool down,bool jap)
+void vncKeymap::keyEvent(CARD32 keysym, bool down,bool jap, bool unicode)
 {
-  key_mapper.keyEvent(keysym, down,jap);
+  key_mapper.keyEvent(keysym, down,jap, unicode);
 }
 
 

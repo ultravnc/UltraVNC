@@ -190,6 +190,7 @@ public:
 	virtual void EnableKeyboard(BOOL enable) {m_keyboardenabled = enable;};
 	virtual void EnablePointer(BOOL enable) {m_pointerenabled = enable;};
 	virtual void EnableJap(bool enable) {m_jap = enable;};
+	virtual void EnableUnicode(bool enable) {m_unicode = enable;};
 	virtual void SetCapability(int capability) {m_capability = capability;};
 
 	virtual int GetCapability() {return m_capability;};
@@ -439,6 +440,7 @@ protected:
 	BOOL			m_keyboardenabled;
 	BOOL			m_pointerenabled;
 	bool			m_jap;
+	bool			m_unicode;
 	int				m_capability;
 	vncClientId		m_id;
 	long			m_lConnectTime;

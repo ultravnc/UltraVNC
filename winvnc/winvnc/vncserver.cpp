@@ -181,6 +181,7 @@ vncServer::vncServer()
 	m_enable_remote_inputs = TRUE;
 	m_disable_local_inputs = FALSE;
 	m_enable_jap_input = FALSE;
+	m_enable_unicode_input = FALSE;
 	m_enable_win8helper = FALSE;
 
 	// Clear the client mapping table
@@ -515,6 +516,7 @@ vncClientId vncServer::AddClient(VSocket *socket,
 	client->EnableKeyboard(/*keysenabled &&*/ m_enable_remote_inputs);
 	client->EnablePointer(/*ptrenabled &&*/ m_enable_remote_inputs);
     client->EnableJap(/*ptrenabled &&*/ m_enable_jap_input ? true : false);
+	client->EnableUnicode(/*ptrenabled &&*/ m_enable_unicode_input ? true : false);
 
 	// adzm 2009-07-05 - repeater IDs
 	if (szRepeaterID) {
@@ -1520,6 +1522,11 @@ BOOL vncServer::JapInputEnabled()
 	return m_enable_jap_input;
 }
 
+BOOL vncServer::UnicodeInputEnabled()
+{
+	return m_enable_unicode_input;
+}
+
 BOOL vncServer::Win8HelperEnabled()
 {
 	return m_enable_win8helper;
@@ -1541,6 +1548,20 @@ vncServer::EnableJapInput(BOOL enable)
 	for (i = m_authClients.begin(); i != m_authClients.end(); i++)
 	{
         GetClient(*i)->EnableJap(m_enable_jap_input ? true : false);
+	}
+}
+
+void
+vncServer::EnableUnicodeInput(BOOL enable)
+{
+	m_enable_unicode_input = enable;
+	vncClientList::iterator i;
+		
+	omni_mutex_lock l(m_clientsLock,55);
+
+	for (i = m_authClients.begin(); i != m_authClients.end(); i++)
+	{
+        GetClient(*i)->EnableUnicode(m_enable_unicode_input ? true : false);
 	}
 }
 
