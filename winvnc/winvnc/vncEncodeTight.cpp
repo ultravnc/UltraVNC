@@ -65,6 +65,7 @@ vncEncodeTight::vncEncodeTight()
 
 	for (int i = 0; i < 4; i++)
 		m_zsActive[i] = false;
+	m_turboCompressLevel = 0;
 }
 
 vncEncodeTight::~vncEncodeTight()
