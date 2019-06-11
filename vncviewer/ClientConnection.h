@@ -314,6 +314,7 @@ private:
 	void ReadScreenUpdate();
 	void Update(RECT *pRect);
 	void SizeWindow();
+	bool sizing_set;
 	bool ScrollScreen(int dx, int dy);
 	void UpdateScrollbars();
     

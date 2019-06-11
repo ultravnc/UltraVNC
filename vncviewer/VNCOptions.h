@@ -186,8 +186,8 @@ public:
 	static BOOL CALLBACK OptDlgProc(  HWND hwndDlg,  UINT uMsg, 
 		WPARAM wParam, LPARAM lParam );
 
-	// Register() makes this viewer the app invoked for .vnc files
-	//static void Register();
+	TCHAR m_folder[MAX_PATH];
+	TCHAR m_prefix[56];
 
 private:
     void ShowUsage(LPTSTR info = NULL);

@@ -27,6 +27,7 @@
 #pragma once
 
 #include <list>
+#include <string>
 #include "ZipUnZip32/zipUnZip32.h"
 
 #define CONFIRM_YES 1

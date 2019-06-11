@@ -678,6 +678,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="Snapshot.cpp" />
     <ClCompile Include="stdhdrs.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -779,6 +780,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
     <ClInclude Include="display.h" />
     <ClInclude Include="Exception.h" />
     <ClInclude Include="FileTransfer.h" />
+    <ClInclude Include="FpsCounter.h" />
     <ClInclude Include="FullScreenTitleBar.h" />
     <ClInclude Include="FullScreenTitleBarConst.h" />
     <ClInclude Include="KeyMap.h" />
@@ -792,6 +794,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
     <ClInclude Include="res\resource.h" />
     <ClInclude Include="rfb.h" />
     <ClInclude Include="SessionDialog.h" />
+    <ClInclude Include="Snapshot.h" />
     <ClInclude Include="stdhdrs.h" />
     <ClInclude Include="TextChat.h" />
     <ClInclude Include="vncauth.h" />

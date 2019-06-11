@@ -53,7 +53,7 @@
 //there will be a thin white line (and a hung window) while it waits to connect! TODO - this should
 //only apply (i think) if we are starting up in full screen.
 #define tbHideAtStartup		TRUE //Hide window when created
-#define tbPinNotPushedIn	TRUE //Is the pin pushed in or out at startup (sorry for invertion!)
+#define tbPinNotPushedIn	FALSE //Is the pin pushed in or out at startup (sorry for invertion!)
 #define tbScrollWindow		TRUE //Animate window to scroll up/down
 #define tbScrollDelay		20	//Timer variable for scrolling the window (cycletime) [ms]
 #define tbAutoScrollTime	10	//* tbAutoScrollDelay milliseconds steps. Meaning if it is 10 then = 10 (steps) * 100ms (tbAutoScrollDelay) = 1000ms delay
@@ -70,6 +70,10 @@
 #define tbIDC_MINIMIZE		30
 #define tbIDC_PIN			40
 
+#define tbIDC_SCREEN		50
+#define tbIDC_PHOTO			60
+#define tbIDC_SWITCHMONITOR	70
+
 //=================================================
 // Windows Message part
 //=================================================
@@ -81,6 +85,12 @@
 #define tbWM_CLOSE			WM_USER+1000
 #define tbWM_MINIMIZE		WM_USER+1001
 #define tbWM_MAXIMIZE		WM_USER+1002
+
+#define tbWM_FITSCREEN		WM_USER+1003
+#define tbWM_NOSCALE		WM_USER+1004
+#define tbWM_PHOTO			WM_USER+1005
+#define tbWM_SWITCHMONITOR	WM_USER+1006
+#define tbWM_PHOTO_SETTINGS WM_USER+1007
 
 //=================================================
 // Menus with ID's and messages

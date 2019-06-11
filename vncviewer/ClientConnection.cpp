@@ -56,6 +56,7 @@ extern "C" {
 #include <DSMPlugin/DSMPlugin.h> // sf@2002
 #include "common/win32_helpers.h"
 #include "display.h"
+#include "Snapshot.h"
 
 // [v1.0.2-jp1 fix]
 #pragma comment(lib, "imm32.lib")
@@ -567,6 +568,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	mytouch = new vnctouch;
 	mytouch->Set_ClientConnect(this);
 #endif
+	sizing_set = false;
 }
 
 // helper functions for setting socket timeouts during file transfer
@@ -1485,7 +1487,7 @@ void ClientConnection::CreateDisplay()
 
 	//Added by: Lars Werner (http://lars.werner.no)
 	if(TitleBar.GetSafeHwnd()==NULL)
-		TitleBar.Create(m_pApp->m_instance, m_hwndMain);
+		TitleBar.Create(m_pApp->m_instance, m_hwndMain, !m_opts.m_Directx);
 }
 
 // adzm - 2010-07 - Fix clipboard hangs
@@ -3685,10 +3687,17 @@ void ClientConnection::SizeWindow()
 	RECT workrect;
 	tempdisplayclass tdc;
 	tdc.Init();
+	if (sizing_set) {
+		int mon = tdc.getSelectedScreen(m_hwndMain);
+		if (mon != 0)
+			m_opts.m_selected_screen = mon;
+	}
+
 	workrect.left=tdc.monarray[m_opts.m_selected_screen].wl;
 	workrect.right=tdc.monarray[m_opts.m_selected_screen].wr;
 	workrect.top=tdc.monarray[m_opts.m_selected_screen].wt;
 	workrect.bottom=tdc.monarray[m_opts.m_selected_screen].wb;
+	sizing_set = true;
 	//SystemParametersInfo(SPI_GETWORKAREA, 0, &workrect, 0);
 	int workwidth = workrect.right -  workrect.left;
 	int workheight = workrect.bottom - workrect.top;
@@ -4149,38 +4158,38 @@ void ClientConnection::Createdib()
 	memset((char*)m_DIBbits,128,bi.bmiHeader.biSizeImage);
 
 	{
-	ObjectSelector bb(m_hmemdc, m_membitmap);
+		ObjectSelector bb(m_hmemdc, m_membitmap);
 
-	if (m_myFormat.bitsPerPixel==8 && m_myFormat.trueColour)
-	{
-		struct Colour {
-		int r, g, b;
-		};
-		Colour rgbQ[256];
-		 for (int i=0; i < (1<<(m_myFormat.depth)); i++) {
-			rgbQ[i].b = ((((i >> m_myFormat.blueShift) & m_myFormat.blueMax) * 65535) + m_myFormat.blueMax/2) / m_myFormat.blueMax;
-			rgbQ[i].g = ((((i >> m_myFormat.greenShift) & m_myFormat.greenMax) * 65535) + m_myFormat.greenMax/2) / m_myFormat.greenMax;
-			rgbQ[i].r = ((((i >> m_myFormat.redShift) & m_myFormat.redMax) * 65535) + m_myFormat.redMax/2) / m_myFormat.redMax;
-		 }
+		if (m_myFormat.bitsPerPixel==8 && m_myFormat.trueColour)
+		{
+			struct Colour {
+			int r, g, b;
+			};
+			Colour rgbQ[256];
+			 for (int i=0; i < (1<<(m_myFormat.depth)); i++) {
+				rgbQ[i].b = ((((i >> m_myFormat.blueShift) & m_myFormat.blueMax) * 65535) + m_myFormat.blueMax/2) / m_myFormat.blueMax;
+				rgbQ[i].g = ((((i >> m_myFormat.greenShift) & m_myFormat.greenMax) * 65535) + m_myFormat.greenMax/2) / m_myFormat.greenMax;
+				rgbQ[i].r = ((((i >> m_myFormat.redShift) & m_myFormat.redMax) * 65535) + m_myFormat.redMax/2) / m_myFormat.redMax;
+			 }
 
-	for (int ii=0; ii<256; ii++)
-	{
-		bi.color[ii].rgbRed      = rgbQ[ii].r >> 8;
-		bi.color[ii].rgbGreen    = rgbQ[ii].g >> 8;
-		bi.color[ii].rgbBlue     = rgbQ[ii].b >> 8;
-		bi.color[ii].rgbReserved = 0;
-	}
-	SetDIBColorTable(m_hmemdc, 0, 256, bi.color);
-	}
-	if (m_opts.m_fEnableCache)
-	{
-		if (m_DIBbitsCache != NULL) delete [] m_DIBbitsCache;
-		int Pitch=m_si.framebufferWidth*m_myFormat.bitsPerPixel/8;
-		if (Pitch % 4)Pitch += 4 - Pitch % 4;
+		for (int ii=0; ii<256; ii++)
+		{
+			bi.color[ii].rgbRed      = rgbQ[ii].r >> 8;
+			bi.color[ii].rgbGreen    = rgbQ[ii].g >> 8;
+			bi.color[ii].rgbBlue     = rgbQ[ii].b >> 8;
+			bi.color[ii].rgbReserved = 0;
+		}
+		SetDIBColorTable(m_hmemdc, 0, 256, bi.color);
+		}
+		if (m_opts.m_fEnableCache)
+		{
+			if (m_DIBbitsCache != NULL) delete [] m_DIBbitsCache;
+			int Pitch=m_si.framebufferWidth*m_myFormat.bitsPerPixel/8;
+			if (Pitch % 4)Pitch += 4 - Pitch % 4;
 
-		m_DIBbitsCache= new BYTE[Pitch*m_si.framebufferHeight];
-		vnclog.Print(0, _T("Cache: Cache buffer bitmap creation\n"));
-	}
+			m_DIBbitsCache= new BYTE[Pitch*m_si.framebufferHeight];
+			vnclog.Print(0, _T("Cache: Cache buffer bitmap creation\n"));
+		}
 	}
 	if (m_opts.m_Directx && (m_myFormat.bitsPerPixel==32 || m_myFormat.bitsPerPixel==16))
 	if (!FAILED(directx_output->InitD3D(m_hwndcn,m_hwndMain, m_si.framebufferWidth, m_si.framebufferHeight, false,m_myFormat.bitsPerPixel,m_myFormat.redShift)))
@@ -8636,6 +8645,43 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 					//_this->SetFullScreenMode(!_this->InFullScreenMode());
 					_this->SetFullScreenMode(FALSE);
 					return 0;
+
+				case tbWM_FITSCREEN:
+					_this->m_opts.m_Directx = true;
+					_this->m_pendingFormatChange = true;
+					InvalidateRect(hwnd, NULL, TRUE);
+					_this->RealiseFullScreenMode();
+					return 0;
+
+				case tbWM_NOSCALE:
+					_this->m_opts.m_Directx = false;
+					_this->m_pendingFormatChange = true;
+					InvalidateRect(hwnd, NULL, TRUE);
+					_this->RealiseFullScreenMode();
+					return 0;
+
+				case tbWM_SWITCHMONITOR:
+					SendMessage(hwnd, WM_SYSCOMMAND,(WPARAM)ID_DESKTOP,(LPARAM)0);
+					return 0;
+
+				case tbWM_PHOTO:
+					{
+						Snapshot snapshot;
+						snapshot.SaveJpeg(_this->m_membitmap,_this->m_opts.m_folder, _this->m_opts.m_prefix);
+						_tcscpy_s(_this->m_opts.m_folder,snapshot.getFolder());
+						_tcscpy_s(_this->m_opts.m_prefix, snapshot.getPrefix());
+					}
+					return 0;
+				case tbWM_PHOTO_SETTINGS:
+					{
+						Snapshot snapshot;
+						snapshot.DoDialog(_this->m_opts.m_folder, _this->m_opts.m_prefix);
+						_tcscpy_s(_this->m_opts.m_folder,snapshot.getFolder());
+						_tcscpy_s(_this->m_opts.m_prefix, snapshot.getPrefix());
+					}
+					return 0;
+
+
 			} // end of iMsg switch
 
 			//return DefWindowProc(hwnd, iMsg, wParam, lParam);

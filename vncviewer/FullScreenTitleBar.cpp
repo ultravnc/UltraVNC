@@ -1,6 +1,7 @@
 //===========================================================================
 //	FullScreen Titlebar
 //	2004 - All rights reservered
+//  2019 - modified for uVNc
 //===========================================================================
 //
 //	Project/Product :	FullScreenTitlebar
@@ -27,29 +28,37 @@
 extern Log vnclog;
 #define COMPILE_MULTIMON_STUBS
 #include "multimon.h"
+#include <CommCtrl.h>
 
 //***************************************************************************************
 
-// CTitleBar *TitleBarThis=NULL; // Added Jef Fix
+// CTitleBar *TitleBarThis=nullptr; // Added Jef Fix
 
 //***************************************************************************************
 
 CTitleBar::CTitleBar()
 {
-	hInstance=NULL;
-	Parent=NULL;
+	hInstance = nullptr;
+	Parent = nullptr;
 	this->Init();
-	Pin=NULL;
-	Close=NULL;
-	Maximize=NULL;
-	Minimize=NULL;
+	Pin = nullptr;
+	Close = nullptr;
+	Maximize = nullptr;
+	Minimize = nullptr;
+	Screen = nullptr;
+	Photo = nullptr;
+	SwitchMonitor = nullptr;
+	ScreenTip = nullptr;
+	PhotoTip = nullptr;
+	SwitchMonitorTip = nullptr;
 }
 
-CTitleBar::CTitleBar(HINSTANCE hInst, HWND ParentWindow)
+CTitleBar::CTitleBar(HINSTANCE hInst, HWND ParentWindow, bool Fit)
 {
 	hInstance=hInst;
 	Parent=ParentWindow;
 	this->Init();
+	this->Fit = Fit;
 }
 
 //***************************************************************************************
@@ -62,6 +71,12 @@ CTitleBar::~CTitleBar()
 	if (Maximize) DestroyWindow(Maximize);
 	if (Minimize) DestroyWindow(Minimize);
 	if (m_hWnd) DestroyWindow(m_hWnd);
+	if (Screen) DestroyWindow(Screen);
+	if (Photo) DestroyWindow(Photo);
+	if (SwitchMonitor) DestroyWindow(SwitchMonitor);
+	if (ScreenTip) DestroyWindow(ScreenTip);
+	if (PhotoTip) DestroyWindow(PhotoTip);
+	if (SwitchMonitorTip) DestroyWindow(SwitchMonitorTip);
 }
 
 //***************************************************************************************
@@ -78,17 +93,17 @@ void CTitleBar::Init()
     HDC hdc;
     long lfHeight;
     
-    hdc = GetDC(NULL);
+    hdc = GetDC(nullptr);
     lfHeight = -MulDiv(10, GetDeviceCaps(hdc, LOGPIXELSY), 72);
-    ReleaseDC(NULL, hdc);
+    ReleaseDC(nullptr, hdc);
 
 	Font=CreateFont(lfHeight, 0, 0, 0, 0, FALSE, 0, 0, 0, 0, 0, 0, 0, "Arial");
 
 	Text=""; //No text at startup...
 
-	m_hWnd=NULL;
+	m_hWnd=nullptr;
 
-	if(Parent!=NULL&&hInstance!=NULL)
+	if(Parent!=nullptr&&hInstance!=nullptr)
 	{
 		// TitleBarThis=this; // Added Jef Fix
 		this->CreateDisplay();
@@ -97,11 +112,12 @@ void CTitleBar::Init()
 
 //***************************************************************************************
 
-void CTitleBar::Create(HINSTANCE hInst, HWND ParentWindow)
+void CTitleBar::Create(HINSTANCE hInst, HWND ParentWindow, bool Fit)
 {
 	hInstance=hInst;
 	Parent=ParentWindow;
 	this->Init();
+	this->Fit = Fit;
 }
 
 //***************************************************************************************
@@ -121,10 +137,10 @@ void CTitleBar::CreateDisplay()
 	wndclass.cbClsExtra		= 0;
 	wndclass.cbWndExtra		= sizeof (CTitleBar *); // Added Jef Fix
 	wndclass.hInstance		= hInstance;
-	wndclass.hIcon=NULL;
-	wndclass.hCursor		= LoadCursor(NULL, IDC_ARROW);
+	wndclass.hIcon=nullptr;
+	wndclass.hCursor		= LoadCursor(nullptr, IDC_ARROW);
 	wndclass.hbrBackground	= (HBRUSH) GetStockObject(WHITE_BRUSH);
-    wndclass.lpszMenuName	= (const TCHAR *) NULL;
+    wndclass.lpszMenuName	= (const TCHAR *) nullptr;
 	wndclass.lpszClassName	= _T("FSTITLEBAR");
 
 	RegisterClass(&wndclass);
@@ -139,16 +155,16 @@ void CTitleBar::CreateDisplay()
 		HeightPlacement=0;
 
 	m_hWnd = CreateWindow(_T("FSTITLEBAR"),
-			      /*_T("Titlebar")*/NULL,
+			      /*_T("Titlebar")*/nullptr,
 			      winstyle,
 			      CenterX,
 			      HeightPlacement,
 			      tbWidth,       // x-size
 			      tbHeigth,       // y-size
 			      Parent,                // Parent handle
-			      NULL,                // Menu handle
+			      nullptr,                // Menu handle
 			      hInstance,
-			      NULL);
+			      nullptr);
 
     helper::SafeSetWindowUserData(m_hWnd, (LONG_PTR)this);
 	//Set region to window so it is non rectangular
@@ -173,7 +189,7 @@ void CTitleBar::CreateDisplay()
                 tbWidth-tbRightSpace-tbcxPicture, tbTopSpace, tbcxPicture, tbcyPicture, m_hWnd,
 				(HMENU)tbIDC_CLOSE,
                 hInstance,
-				NULL);
+				nullptr);
 
 	//Maximize button
 	Maximize=CreateWindow("STATIC",
@@ -182,7 +198,7 @@ void CTitleBar::CreateDisplay()
                 tbWidth-tbRightSpace-(tbcxPicture*2)-(tbButtonSpace*1), tbTopSpace, tbcxPicture, tbcyPicture, m_hWnd,
 				(HMENU)tbIDC_MAXIMIZE,
                 hInstance,
-				NULL);
+				nullptr);
 	
 	//Minimize button
 	Minimize=CreateWindow("STATIC",
@@ -191,7 +207,34 @@ void CTitleBar::CreateDisplay()
                 tbWidth-tbRightSpace-(tbcxPicture*3)-(tbButtonSpace*2), tbTopSpace, tbcxPicture, tbcyPicture, m_hWnd,
 				(HMENU)tbIDC_MINIMIZE,
                 hInstance,
-				NULL);
+				nullptr);
+
+	Screen=CreateWindow("STATIC",
+				"Screen",
+				WS_CHILD | WS_VISIBLE | SS_NOTIFY | SS_OWNERDRAW,
+                tbLeftSpace + (tbcxPicture*1) +(tbButtonSpace*1), tbTopSpace, tbcxPicture, tbcyPicture, m_hWnd,
+				(HMENU)tbIDC_SCREEN,
+                hInstance,
+				nullptr);
+	CreateToolTipForRect(Screen, ScreenTip, "Scaling: Fit to screen, 1:1");
+
+	Photo=CreateWindow("BUTTON",
+				"Photo",
+				WS_CHILD | WS_VISIBLE | BS_NOTIFY | BS_OWNERDRAW,
+                tbLeftSpace + (tbcxPicture*2) +(tbButtonSpace*2), tbTopSpace, tbcxPicture, tbcyPicture, m_hWnd,
+				(HMENU)tbIDC_PHOTO,
+                hInstance,
+				nullptr);
+	CreateToolTipForRect(Photo, PhotoTip, "Screenshot, dubble click for settings");
+
+	SwitchMonitor=CreateWindow("STATIC",
+				"SwitchMonitor",
+				WS_CHILD | WS_VISIBLE | SS_NOTIFY | SS_OWNERDRAW,
+                tbLeftSpace + (tbcxPicture*3) +(tbButtonSpace*3), tbTopSpace, tbcxPicture, tbcyPicture, m_hWnd,
+				(HMENU)tbIDC_SWITCHMONITOR,
+                hInstance,
+				nullptr);
+	CreateToolTipForRect(SwitchMonitor, SwitchMonitorTip, "Swicth monitor");
 
 	//Pin button
 	Pin=CreateWindow("STATIC",
@@ -200,7 +243,8 @@ void CTitleBar::CreateDisplay()
                 tbLeftSpace, tbTopSpace, tbcxPicture, tbcyPicture, m_hWnd,
 				(HMENU)tbIDC_PIN,
                 hInstance,
-				NULL);
+				nullptr);
+
 
 	//Set the creation of the window
     helper::SafeSetWindowUserData(m_hWnd, (LONG_PTR)this);
@@ -212,9 +256,9 @@ void CTitleBar::CreateDisplay()
 	if(tbHideAtStartup==FALSE)
 		ShowWindow(m_hWnd, SW_SHOW);
 	if(tbScrollWindow==TRUE)
-		SetTimer(m_hWnd, tbScrollTimerID, tbScrollDelay, NULL);
+		SetTimer(m_hWnd, tbScrollTimerID, tbScrollDelay, nullptr);
 	if(AutoHide==TRUE)
-		SetTimer(m_hWnd, tbAutoScrollTimer, tbAutoScrollDelay, NULL);
+		SetTimer(m_hWnd, tbAutoScrollTimer, tbAutoScrollDelay, nullptr);
 }
 
 //***************************************************************************************
@@ -223,7 +267,7 @@ LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg,
 					   WPARAM wParam, LPARAM lParam)
 {
 	// Added Jef Fix
-    CTitleBar *TitleBarThis=NULL;
+    CTitleBar *TitleBarThis=nullptr;
     TitleBarThis = helper::SafeGetWindowUserData<CTitleBar>(hwnd);
 
 	switch (iMsg)
@@ -259,7 +303,7 @@ LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg,
 
             lpdis = (LPDRAWITEMSTRUCT) lParam; 
             hdcMem = CreateCompatibleDC(lpdis->hDC); 
-			HGDIOBJ hbrOld=NULL;
+			HGDIOBJ hbrOld=nullptr;
  
 			if(lpdis->CtlID==tbIDC_CLOSE)
 					hbrOld=SelectObject(hdcMem, TitleBarThis->hClose); 
@@ -276,6 +320,18 @@ LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg,
 					hbrOld=SelectObject(hdcMem, TitleBarThis->hPinDown); 
 			}
 
+			if(lpdis->CtlID==tbIDC_SCREEN)
+			{
+				if(TitleBarThis->Fit==TRUE)
+					hbrOld=SelectObject(hdcMem, TitleBarThis->hFitScreen); 
+				else
+					hbrOld=SelectObject(hdcMem, TitleBarThis->hNoScaleScreen); 
+			}
+			if(lpdis->CtlID==tbIDC_PHOTO)
+					hbrOld=SelectObject(hdcMem, TitleBarThis->hPhoto); 
+			if(lpdis->CtlID==tbIDC_SWITCHMONITOR)
+					hbrOld=SelectObject(hdcMem, TitleBarThis->hSwitchMonitor); 
+
 			BitBlt(lpdis->hDC,
 					lpdis->rcItem.left,
 					lpdis->rcItem.top,
@@ -290,8 +346,13 @@ LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg,
             return TRUE; 
 		}
 
-	case WM_COMMAND: 
-		if (HIWORD(wParam) == BN_CLICKED)
+	case WM_COMMAND:
+		if (HIWORD(wParam) == BN_DBLCLK)
+		{
+			if(LOWORD(wParam) == tbIDC_PHOTO)
+				::SendMessage(TitleBarThis->Parent, tbWM_PHOTO_SETTINGS, 0, 0);
+		}
+		else if (HIWORD(wParam) == BN_CLICKED)
 		{
 			//Handle the Pin for holding the window
 			if(LOWORD(wParam) == tbIDC_PIN)
@@ -308,14 +369,22 @@ LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg,
 				}
 
 				//Redraw window to show the new gfx...
-				::RedrawWindow(TitleBarThis->Pin, NULL, NULL, RDW_INVALIDATE);
+				::RedrawWindow(TitleBarThis->Pin, nullptr, nullptr, RDW_INVALIDATE);
+			}
+			if(LOWORD(wParam) == tbIDC_SCREEN)
+			{
+					if (TitleBarThis->Fit == TRUE)
+						TitleBarThis->Fit = FALSE;
+					else 
+						TitleBarThis->Fit = TRUE;
+					::RedrawWindow(TitleBarThis->Screen, nullptr, nullptr, RDW_INVALIDATE);
 			}
 
 			//If default = true we'll send usally showwindow and close messages
 			if(tbDefault==TRUE)
 			{
 				if(LOWORD(wParam) == tbIDC_CLOSE)
-					::SendMessage(TitleBarThis->Parent, WM_CLOSE, NULL, 0);
+					::SendMessage(TitleBarThis->Parent, WM_CLOSE, 0, 0);
 				if(LOWORD(wParam) == tbIDC_MAXIMIZE)
 				{
 					//if(::IsZoomed(TitleBarThis->Parent)==TRUE)
@@ -329,11 +398,25 @@ LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg,
 			else //default = false - send custom message on buttons
 			{
 				if(LOWORD(wParam) == tbIDC_CLOSE)
-					::SendMessage(TitleBarThis->Parent, tbWM_CLOSE, NULL, NULL);
+					::SendMessage(TitleBarThis->Parent, tbWM_CLOSE, 0, 0);
 				if(LOWORD(wParam) == tbIDC_MAXIMIZE)
-					::SendMessage(TitleBarThis->Parent, tbWM_MAXIMIZE, NULL, NULL);
+					::SendMessage(TitleBarThis->Parent, tbWM_MAXIMIZE, 0, 0);
 				if(LOWORD(wParam) == tbIDC_MINIMIZE)
-					::SendMessage(TitleBarThis->Parent, tbWM_MINIMIZE, NULL, NULL);
+					::SendMessage(TitleBarThis->Parent, tbWM_MINIMIZE, 0, 0);
+
+				if(LOWORD(wParam) == tbIDC_SCREEN) {
+					if (TitleBarThis->Fit == TRUE)
+						::SendMessage(TitleBarThis->Parent, tbWM_NOSCALE, 0, 0);
+					else
+						::SendMessage(TitleBarThis->Parent, tbWM_FITSCREEN, 0, 0);
+				}
+				if(LOWORD(wParam) == tbIDC_PHOTO)
+					if (TitleBarThis->Fit == TRUE)
+						::SendMessage(TitleBarThis->Parent, tbWM_PHOTO, 0, 0);
+					else
+						MessageBox(TitleBarThis->Parent, _T("Function only supported in 1:1 mode"), _T("uVNC snapshot"), MB_ICONINFORMATION | MB_OK | MB_SETFOREGROUND | MB_TOPMOST);
+				if(LOWORD(wParam) == tbIDC_SWITCHMONITOR)
+					::SendMessage(TitleBarThis->Parent, tbWM_SWITCHMONITOR, 0, 0);
 			}
         }
 
@@ -347,7 +430,7 @@ LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg,
 
 				//When the close,minimize, maximize is not present just send! :)
 				if(tbLastIsStandard==FALSE)
-					::SendMessage(TitleBarThis->Parent, WM_USER+tbWMUSERID+Num, NULL,NULL);
+					::SendMessage(TitleBarThis->Parent, WM_USER+tbWMUSERID+Num, 0, 0);
 				else //Handle close, minimize and maximize
 				{
 					HMENU Menu=LoadMenu(TitleBarThis->hInstance,MAKEINTRESOURCE (tbMENUID));
@@ -358,19 +441,19 @@ LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg,
 					//Get the real number of entries (exluding seperators)
 					for(int i=0;i<GetMenuItemCount(SubMenu);i++)
 					{
-						int res=::GetMenuString(SubMenu, i, NULL, 0, MF_BYPOSITION);
+						int res=::GetMenuString(SubMenu, i, nullptr, 0, MF_BYPOSITION);
 						if(res!=0)
 							Total++;
 					}
 
 					if(Num==Total-1) //Close button
-						::SendMessage(TitleBarThis->m_hWnd,WM_COMMAND,MAKEWPARAM(tbIDC_CLOSE,BN_CLICKED),NULL);
+						::SendMessage(TitleBarThis->m_hWnd,WM_COMMAND,MAKEWPARAM(tbIDC_CLOSE,BN_CLICKED),0);
 					else if(Num==Total-2) //Minimize button
-						::SendMessage(TitleBarThis->m_hWnd,WM_COMMAND,MAKEWPARAM(tbIDC_MINIMIZE,BN_CLICKED),NULL);
+						::SendMessage(TitleBarThis->m_hWnd,WM_COMMAND,MAKEWPARAM(tbIDC_MINIMIZE,BN_CLICKED), 0);
 					else if(Num==Total-3) //Maximize button
-						::SendMessage(TitleBarThis->m_hWnd,WM_COMMAND,MAKEWPARAM(tbIDC_MAXIMIZE,BN_CLICKED),NULL);
+						::SendMessage(TitleBarThis->m_hWnd,WM_COMMAND,MAKEWPARAM(tbIDC_MAXIMIZE,BN_CLICKED), 0);
 					else
-						::SendMessage(TitleBarThis->Parent, WM_USER+tbWMUSERID+Num, NULL,NULL);
+						::SendMessage(TitleBarThis->Parent, WM_USER+tbWMUSERID+Num, 0, 0);
 
 					DestroyMenu (SubMenu);
 					DestroyMenu (Menu);
@@ -384,14 +467,14 @@ LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg,
 			if(TitleBarThis->HideAfterSlide==FALSE)
 			{
 				TitleBarThis->SlideDown=TRUE;
-				::SetTimer(TitleBarThis->m_hWnd, tbScrollTimerID, 20, NULL);
+				::SetTimer(TitleBarThis->m_hWnd, tbScrollTimerID, 20, nullptr);
 			}
 		break;
 
 	case WM_LBUTTONDBLCLK:
 			//If the default entries on the context menu is activated then doubleclick is restore :)
 			if(tbLastIsStandard==TRUE)
-				::SendMessage(TitleBarThis->m_hWnd,WM_COMMAND,MAKEWPARAM(tbIDC_MAXIMIZE,BN_CLICKED),NULL);
+				::SendMessage(TitleBarThis->m_hWnd,WM_COMMAND,MAKEWPARAM(tbIDC_MAXIMIZE,BN_CLICKED), 0);
 		break;
 
 	case WM_RBUTTONDOWN:
@@ -438,7 +521,7 @@ LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg,
 				}
 			}
 
-			TrackPopupMenu(SubMenu,TPM_LEFTALIGN, lpPoint.x, lpPoint.y, 0, TitleBarThis->m_hWnd, NULL);
+			TrackPopupMenu(SubMenu,TPM_LEFTALIGN, lpPoint.x, lpPoint.y, 0, TitleBarThis->m_hWnd, nullptr);
 
 			SetForegroundWindow (TitleBarThis->m_hWnd);
 			DestroyMenu (SubMenu);
@@ -497,7 +580,7 @@ LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg,
 					if(TitleBarThis->IntAutoHideCounter==tbAutoScrollTime)
 					{
 						TitleBarThis->SlideDown=FALSE;
-						::SetTimer(TitleBarThis->m_hWnd, tbScrollTimerID, tbScrollDelay, NULL);
+						::SetTimer(TitleBarThis->m_hWnd, tbScrollTimerID, tbScrollDelay, nullptr);
 					}
 				}
 				else
@@ -522,6 +605,10 @@ void CTitleBar::LoadPictures()
 	hMinimize=LoadBitmap(hInstance, MAKEINTRESOURCE(IDB_MINIMIZE));
 	hPinUp=LoadBitmap(hInstance, MAKEINTRESOURCE(IDB_PINUP));
 	hPinDown=LoadBitmap(hInstance, MAKEINTRESOURCE(IDB_PINDOWN));
+	hFitScreen=LoadBitmap(hInstance, MAKEINTRESOURCE(IDB_FITSCREEN));
+	hNoScaleScreen=LoadBitmap(hInstance, MAKEINTRESOURCE(IDB_NOSCALE));
+	hPhoto=LoadBitmap(hInstance, MAKEINTRESOURCE(IDB_PHOTO));
+	hSwitchMonitor=LoadBitmap(hInstance, MAKEINTRESOURCE(IDB_SWITCHMONITOR));
 }
 
 
@@ -532,6 +619,10 @@ void CTitleBar::FreePictures()
 	DeleteObject(hMinimize);
 	DeleteObject(hPinUp);
 	DeleteObject(hPinDown);
+	DeleteObject(hFitScreen);
+	DeleteObject(hNoScaleScreen);
+	DeleteObject(hPhoto);
+	DeleteObject(hSwitchMonitor);
 }
 
 //***************************************************************************************
@@ -588,7 +679,7 @@ void CTitleBar::Draw()
 	HGDIOBJ hbmOld=SelectObject(hdc, Border);
 
 	//Draw border around window
-	::MoveToEx(hdc, 0,0, NULL);
+	::MoveToEx(hdc, 0,0, nullptr);
 	::LineTo(hdc, tbTriangularPoint, tbHeigth);
 	::LineTo(hdc, tbWidth-tbTriangularPoint, tbHeigth);
 	::LineTo(hdc, tbWidth, 0);
@@ -599,7 +690,7 @@ void CTitleBar::Draw()
 	DeleteObject(Border);
 	Border=::CreatePen(PS_SOLID, tbBorderWidth, tbBorderPenShadow);
 	hbmOld=SelectObject(hdc, Border);
-	::MoveToEx(hdc, tbTriangularPoint+1,tbHeigth-1, NULL);
+	::MoveToEx(hdc, tbTriangularPoint+1,tbHeigth-1, nullptr);
 	::LineTo(hdc, tbWidth-tbTriangularPoint-1, tbHeigth-1);
 	SelectObject(hdc,hbmOld);
 	DeleteObject(Border);
@@ -643,13 +734,13 @@ void CTitleBar::DisplayWindow(BOOL Show, BOOL SetHideFlag)
 				SlideDown=TRUE;
 			}
 			ShowWindow(m_hWnd, SW_SHOW);
-			SetTimer(m_hWnd, tbScrollTimerID, tbScrollDelay, NULL);
+			SetTimer(m_hWnd, tbScrollTimerID, tbScrollDelay, nullptr);
 		}
 		else
 			ShowWindow(m_hWnd, SW_SHOW);
 
 		if(AutoHide==TRUE)
-			SetTimer(m_hWnd, tbAutoScrollTimer, tbAutoScrollDelay, NULL);
+			SetTimer(m_hWnd, tbAutoScrollTimer, tbAutoScrollDelay, nullptr);
 		else
 			KillTimer(m_hWnd, tbAutoScrollTimer);
 	}
@@ -662,13 +753,13 @@ void CTitleBar::DisplayWindow(BOOL Show, BOOL SetHideFlag)
 				HideAfterSlide=TRUE;
 				SlideDown=FALSE;
 			}
-			SetTimer(m_hWnd, tbScrollTimerID, tbScrollDelay, NULL);
+			SetTimer(m_hWnd, tbScrollTimerID, tbScrollDelay, nullptr);
 		}
 		else
 			ShowWindow(m_hWnd, SW_HIDE);
 
 		if(AutoHide==TRUE)
-			SetTimer(m_hWnd, tbAutoScrollTimer, tbAutoScrollDelay, NULL);
+			SetTimer(m_hWnd, tbAutoScrollTimer, tbAutoScrollDelay, nullptr);
 		else
 			KillTimer(m_hWnd, tbAutoScrollTimer);
 	}
@@ -707,3 +798,22 @@ void CTitleBar::MoveToMonitor(HMONITOR hMonitor)
 
     ::SetWindowPos(m_hWnd, 0, x, y, 0,0, SWP_NOSIZE|SWP_NOACTIVATE|SWP_NOZORDER);
 }
+
+//***************************************************************************************
+void CTitleBar::CreateToolTipForRect(HWND hwndParent, HWND hwndTip, char * text)
+{
+    hwndTip = CreateWindowEx(WS_EX_TOPMOST, TOOLTIPS_CLASS, NULL, 
+                                 WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP, 
+                                 CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, 
+                                 hwndParent, NULL, hInstance, NULL);
+    SetWindowPos(hwndTip, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+    TOOLINFO ti = { 0 };
+    ti.cbSize   = sizeof(TOOLINFO);
+    ti.uFlags   = TTF_SUBCLASS;
+    ti.hwnd     = hwndParent;
+    ti.hinst    = hInstance;
+    ti.lpszText = text;    
+    GetClientRect (hwndParent, &ti.rect);
+    SendMessage(hwndTip, TTM_ADDTOOL, 0, (LPARAM) (LPTOOLINFO) &ti); 
+} 
+//***************************************************************************************

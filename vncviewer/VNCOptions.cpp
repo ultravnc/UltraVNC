@@ -35,6 +35,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <direct.h>
+#include "Snapshot.h"
 
 extern char sz_A2[64];
 extern char sz_D1[64];
@@ -127,13 +128,13 @@ VNCOptions::VNCOptions()
 #endif
 	
   m_ViewOnly = false;
-  m_FullScreen = false;
+  m_FullScreen = true;
   m_SavePos = false;
   m_SaveSize = false;
   m_Directx = false;
   autoDetect = true;
   m_Use8Bit = rfbPFFullColors; //false;
-  m_ShowToolbar = true;
+  m_ShowToolbar = false;
   m_fAutoScaling = false;
   m_NoStatus = false;
   m_NoHotKeys = false;
@@ -215,6 +216,10 @@ VNCOptions::VNCOptions()
   m_fUseProxy = false;
   m_selected_screen=1;
   m_szDSMPluginFilename[0] = '\0';
+  char tempfile[MAX_PATH];
+  GetDefaultOptionsFileName(tempfile);
+ _tcscpy_s(m_folder, tempfile);
+ _tcscpy_s(m_prefix, "vnc_");
 
 #ifdef _Gii
   m_giienable = true;
@@ -381,6 +386,8 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
   m_saved_scaling   = s.m_saved_scaling;
 
   strcpy_s(m_szDSMPluginFilename, 260,s.m_szDSMPluginFilename);
+  strcpy_s(m_folder, MAX_PATH,s.m_folder);
+  strcpy_s(m_prefix, 56,s.m_prefix);
   
   strcpy_s(m_host_options, 256,s.m_host_options);
   m_port				= s.m_port;
@@ -1121,6 +1128,8 @@ void VNCOptions::Save(char *fname)
 
 
   WritePrivateProfileString("options", "DSMPlugin", m_szDSMPluginFilename, fname);
+  WritePrivateProfileString("options", "folder", m_folder, fname);
+  WritePrivateProfileString("options", "prefix", m_prefix, fname);
   saveInt("AutoReconnect", m_autoReconnect,	fname);
  
   saveInt("ExitCheck",				m_fExitCheck,	fname); //PGM @ Advantig
@@ -1202,6 +1211,8 @@ void VNCOptions::Load(char *fname)
 
   m_selected_screen=			readInt("selectedscreen",			m_selected_screen, fname);
   GetPrivateProfileString("options", "DSMPlugin", "NoPlugin", m_szDSMPluginFilename, MAX_PATH, fname);
+  GetPrivateProfileString("options", "folder", m_folder, m_folder, MAX_PATH, fname);
+  GetPrivateProfileString("options", "prefix", m_prefix, m_prefix, 56, fname);
   if (!g_disable_sponsor) g_disable_sponsor=readInt("sponsor",			g_disable_sponsor, fname) != 0;
 
   /*if (!g_disable_sponsor)
@@ -1806,6 +1817,15 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 	  
     case IDCANCEL:
 		EndDialog(hwnd, FALSE);
+		return TRUE;
+
+	case IDC_SNAPSHOTFOLDER:
+		{
+		Snapshot snapshot;
+		snapshot.DoDialog(_this->m_folder, _this->m_prefix);
+		_tcscpy_s(_this->m_folder,snapshot.getFolder());
+		_tcscpy_s(_this->m_prefix, snapshot.getPrefix());
+		}
 		return TRUE;
 		
     case IDC_AUTODETECT:

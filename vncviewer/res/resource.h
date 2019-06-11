@@ -2,6 +2,7 @@
 // Microsoft Visual C++ generated include file.
 // Used by vncviewer.rc
 //
+#define IDOK2                           3
 #define IDCANCEL2                       4
 #define IDQUIT                          9
 #define IDR_TRAY                        101
@@ -77,6 +78,14 @@
 #define ID_CLIPBOARD_DIB                208
 #define IDD_DIALOG1                     209
 #define IDD_SESSIONSELECTOR             209
+#define IDB_FITSCREEN                   211
+#define IDD_DIALOG2                     211
+#define IDD_SAVEIMAGE                   211
+#define IDB_NOSCALE                     212
+#define IDB_PHOTO                       213
+#define IDB_SWITCHMONITOR               214
+#define IDB_EXPAND                      218
+#define IDB_COLLAPS                     219
 #define IDD_USER_NAME                   604
 #define ID_VK_LWINDOWN                  605
 #define ID_VK_RWINDOWN                  606
@@ -232,6 +241,8 @@
 #define IDC_EDIT2                       1167
 #define IDC_SERVER_RECON_TIME           1167
 #define IDC_RADIO3                      1168
+#define IDC_FOLDER                      1179
+#define IDC_PREFIX                      1184
 #define IDC_ENCODING_BASE               1999
 #define IDC_RAWRADIO                    2000
 #define IDC_RRERADIO                    2002
@@ -254,6 +265,8 @@
 #define IDC_EDIT3                       2023
 #define IDC_FTTIMEOUT                   2023
 #define IDC_FPS                         2024
+#define IDC_SNAPSHOTFOLDER              2028
+#define IDC_BROWSE                      2029
 #define IDC_STATIC_SPLIT                9000
 #define IDC_HOSTNAME_DEL                9001
 #define ID_SESSION_SET_CRECT            32777
@@ -548,7 +561,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        211
+#define _APS_NEXT_RESOURCE_VALUE        212
 #define _APS_NEXT_COMMAND_VALUE         50025
 #define _APS_NEXT_CONTROL_VALUE         2025
 #define _APS_NEXT_SYMED_VALUE           154

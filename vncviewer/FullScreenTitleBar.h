@@ -29,10 +29,10 @@ class CTitleBar
 {
 public:
 	CTitleBar();
-	CTitleBar(HINSTANCE hInst, HWND ParentWindow); //Creation
+	CTitleBar(HINSTANCE hInst, HWND ParentWindow, bool Fit); //Creation
 	virtual ~CTitleBar(); //Destruction
 
-	void Create(HINSTANCE hInst, HWND ParentWindow);
+	void Create(HINSTANCE hInst, HWND ParentWindow, bool Fit);
 
 	void SetText(LPTSTR TextOut); //Set the header text eg: hostname, windowtitle ect...
 
@@ -66,6 +66,7 @@ private:
 	//Variables for scrolling of the window
 	BOOL SlideDown;
 	BOOL AutoHide; //Is the pin pushed in or not...
+	BOOL Fit;
 	BOOL HideAfterSlide; //TRUE = Hide the dialog after slide
 	int IntAutoHideCounter;
 
@@ -79,13 +80,28 @@ private:
 	HBITMAP hMaximize;
 	HBITMAP hPinUp;
 	HBITMAP hPinDown;
+	HBITMAP hFitScreen;
+	HBITMAP hNoScaleScreen;
+	HBITMAP hPhoto;
+	HBITMAP hSwitchMonitor;
+
 	HWND Pin;
 	HWND Close;
 	HWND Maximize;
 	HWND Minimize;
 
+	HWND Screen;
+	HWND Photo;
+	HWND SwitchMonitor;
+
+	HWND ScreenTip;
+	HWND PhotoTip;
+	HWND SwitchMonitorTip;
+
 
 	//Text to show on titlebar and it corespondent font! :)
 	LPTSTR Text;
 	HFONT Font;
+
+	void CreateToolTipForRect(HWND hwndParent, HWND hwndTip,char * text);
 };

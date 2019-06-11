@@ -22,6 +22,7 @@ typedef struct _mymonitor
 	int wr;
 	int wt;
 	int wb;
+	HMONITOR hm;
 }mymonitor;
 
 struct MyBitmapInfo
@@ -43,6 +44,7 @@ public:
 	void checkmonitors();
 	int nr_monitors;
 	mymonitor monarray[15];
+	int getSelectedScreen(HWND hwnd);
 
 private:
 	HINSTANCE hUser32;

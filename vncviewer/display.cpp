@@ -71,6 +71,7 @@ tempdisplayclass::checkmonitors()
 					monarray[id].wt=mi.rcWork.top;
 					monarray[id].wr=mi.rcWork.right;
 					monarray[id].wb=mi.rcWork.bottom;
+					monarray[id].hm = hm;
 			}
 			sprintf(monarray[id].buttontext, "%d. %d x %d @ %d,%d - %d-bit - %d Hz", id,dm.dmPelsWidth, dm.dmPelsHeight,
 				dm.dmPosition.x, dm.dmPosition.y, dm.dmBitsPerPel, dm.dmDisplayFrequency);
@@ -137,4 +138,14 @@ tempdisplayclass::Init()
 {
 	hUser32= LoadLibrary("user32.dll");
 	checkmonitors();
+}
+
+int tempdisplayclass::getSelectedScreen(HWND hwnd)
+{
+	HMONITOR hm = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
+	for (int i = 0; i <= nr_monitors; i ++) {
+		if (monarray[i].hm == hm)
+			return i;
+	}
+	return 0;
 }

@@ -30,6 +30,23 @@ IDC_FINGER              CURSOR                  "Finger.cur"
 
 
 /////////////////////////////////////////////////////////////////////////////
+// English resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_NEUTRAL
+#pragma code_page(1252)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_COLLAPS             BITMAP                  "up.bmp"
+#endif    // English resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
 // English (United States) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
@@ -200,6 +217,7 @@ BEGIN
     CONTROL         "Save Size",IDC_SAVESIZE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,254,147,47,10
     EDITTEXT        IDC_FTTIMEOUT,216,216,20,14,ES_AUTOHSCROLL
     LTEXT           "FTtimeout:",IDC_STATIC,177,219,39,8
+	PUSHBUTTON      "Snapshot folder",IDC_SNAPSHOTFOLDER,253,216,69,14
 END
 
 IDD_FILETRANSFER_DLG DIALOGEX 0, 0, 555, 414
@@ -1148,6 +1166,20 @@ BEGIN
     CONTROL         "",IDC_LIST1,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_NOLABELWRAP | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,7,302,149
 END
 
+IDD_SAVEIMAGE DIALOGEX 0, 0, 316, 63
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Dialog"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK2,205,38,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL2,259,38,50,14
+    EDITTEXT        IDC_FOLDER,51,7,189,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "Browse",IDC_BROWSE,259,7,50,14
+    LTEXT           "Folder:",IDC_STATIC,13,9,24,9
+    LTEXT           "Prefix:",IDC_STATIC,13,28,22,8
+    EDITTEXT        IDC_PREFIX,51,26,40,14,ES_AUTOHSCROLL
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1164,6 +1196,14 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 176
     END
+
+    IDD_SAVEIMAGE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 309
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 56
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -1175,6 +1215,11 @@ END
 
 IDB_BITMAP14            BITMAP                  "l2.bmp"
 IDB_BITMAP13            BITMAP                  "l1.bmp"
+IDB_SWITCHMONITOR       BITMAP                  "stat\\switch.bmp"
+IDB_PHOTO               BITMAP                  "stat\\photo.bmp"
+IDB_NOSCALE             BITMAP                  "stat\\full.bmp"
+IDB_FITSCREEN           BITMAP                  "stat\\1op1.bmp"
+IDB_EXPAND              BITMAP                  "down.bmp"
 #endif    // Dutch (Belgium) resources
 /////////////////////////////////////////////////////////////////////////////
 
