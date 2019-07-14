@@ -954,6 +954,22 @@ bool vncServer::IsThereAUltraEncodingClient()
 	return false;
 }
 
+bool vncServer::IsThereAUltra2EncodingClient()
+{
+	vncClientList::iterator i;
+	bool fFound = false;
+	omni_mutex_lock l(m_clientsLock,25);
+
+	for (i = m_authClients.begin(); i != m_authClients.end(); i++)
+	{
+		if (GetClient(*i)->IsUltra2Encoding())
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 bool vncServer::IsEncoderSet()
 {
 	vncClientList::iterator i;

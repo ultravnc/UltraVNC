@@ -401,6 +401,7 @@ public:
 	virtual void DisableCacheForAllClients();
 	virtual bool IsThereASlowClient();
 	virtual bool IsThereAUltraEncodingClient();
+	virtual bool IsThereAUltra2EncodingClient();
 	virtual bool IsEncoderSet();
 	virtual bool IsThereFileTransBusy();
 

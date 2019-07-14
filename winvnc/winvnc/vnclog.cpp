@@ -99,8 +99,6 @@ void VNCLog::SetLevel(int level) {
 
 void VNCLog::SetFile() 
 {
-	//SetMode(2);
-	//SetLevel(10);
 	char temp[512];
 	IniFile myIniFile;
 	myIniFile.ReadString("admin", "path", temp,512);

@@ -96,6 +96,7 @@ private:
 	int mon[2];
 	void SetFirstMonitorNummers();
 	void SetLastMonitorNummers();
+	int framecounter;
 
 public:
 	virtual BOOL Init(vncDesktop *desktop, vncServer *server);

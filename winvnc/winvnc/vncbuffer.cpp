@@ -287,7 +287,7 @@ bool vncBuffer::VideDriverUsed()
 //#pragma function(memcpy,Save_memcmp)
 
 const int BLOCK_SIZE = 32;
-void vncBuffer::CheckRect(rfb::Region2D &dest, rfb::Region2D &cacheRgn, const rfb::Rect &srcrect)
+void vncBuffer::CheckRect(rfb::Region2D &dest, rfb::Region2D &cacheRgn, const rfb::Rect &srcrect, bool full)
 {
 /*#ifdef _DEBUG
 					char			szText[256];
@@ -482,7 +482,7 @@ void vncBuffer::CheckRect(rfb::Region2D &dest, rfb::Region2D &cacheRgn, const rf
 			for (ay = y; ay < blockbottom; ay++)
 			{
 					int nBlockOffset =  nRowIndex * nOffset;
-					if (memcmp(n_block_ptr + nBlockOffset, o_block_ptr + nBlockOffset, nOffset) != 0)
+					if (full || memcmp(n_block_ptr + nBlockOffset, o_block_ptr + nBlockOffset, nOffset) != 0)
 				{
 					// A pixel has changed, so this block needs updating
 					if (fSmallRect) // Ignore unchanged first rows (samll rect : less chance to miss changes when using nAccuracy div)
@@ -601,7 +601,7 @@ vncBuffer::GrabRegion(rfb::Region2D &src,BOOL driver,BOOL capture)
 }
 
 void
-vncBuffer::CheckRegion(rfb::Region2D &dest,rfb::Region2D &cacheRgn ,const rfb::Region2D &src)
+vncBuffer::CheckRegion(rfb::Region2D &dest,rfb::Region2D &cacheRgn ,const rfb::Region2D &src, bool full)
 {
 	if (!FastCheckMainbuffer()) return;
 	rfb::RectVector rects;
@@ -618,7 +618,7 @@ vncBuffer::CheckRegion(rfb::Region2D &dest,rfb::Region2D &cacheRgn ,const rfb::R
 	// No Lock Needed, only called from vncdesktopthread
 	for (i = rects.begin(); i != rects.end(); ++i)
 	{
-		CheckRect(dest,cacheRgn, *i);
+		CheckRect(dest,cacheRgn, *i, full);
 	}
 }
 

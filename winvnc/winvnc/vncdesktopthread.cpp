@@ -230,6 +230,7 @@ BOOL
 vncDesktopThread::Init(vncDesktop *desktop, vncServer *server)
 {
 	// Save the server pointer
+	framecounter = 0;
 	m_server = server;
 	m_desktop = desktop;
 	m_returnset = FALSE;
@@ -1058,6 +1059,7 @@ vncDesktopThread::run_undetached(void *arg)
 
 								// CALCULATE CHANGES
 								m_desktop->m_UltraEncoder_used = m_desktop->m_server->IsThereAUltraEncodingClient();
+								m_desktop->m_Ultra2Encoder_used = m_desktop->m_server->IsThereAUltra2EncodingClient();
 
 								omni_mutex_lock l(m_desktop->m_update_lock, 275);
 								if (m_desktop->m_server->UpdateWanted() || !initialupdate) {
@@ -1282,7 +1284,18 @@ vncDesktopThread::run_undetached(void *arg)
 										if (!checkrgn.is_empty()) {
 											if (m_desktop->m_screenCapture)
 												m_desktop->m_screenCapture->Lock();
-											m_desktop->m_buffer.CheckRegion(changedrgn,cachedrgn, checkrgn);
+											bool fullframe = false;
+											if (m_desktop->m_Ultra2Encoder_used) {
+												framecounter++;
+												if (framecounter > 10) {
+													framecounter = 0;
+													checkrgn.assign_union(m_desktop->m_Cliprect);
+													fullframe = true;
+												}
+											}
+
+											m_desktop->m_buffer.CheckRegion(changedrgn,cachedrgn, checkrgn, fullframe);
+
 											if(m_desktop->m_screenCapture)
 												m_desktop->m_screenCapture->Unlock();
 										}

@@ -352,12 +352,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     char progname[MAX_PATH];
     strncpy(progname, WORKDIR, sizeof progname);
     progname[MAX_PATH - 1] = 0;
-	//strcat_s(WORKDIR,"\\");
-	//strcat_s(WORKDIR,"WinVNC.log");
-
 	vnclog.SetFile();
-	//vnclog.SetMode(4);
-	//vnclog.SetLevel(10);
+
 
 #ifdef _DEBUG
 	{
@@ -1345,7 +1341,15 @@ void KillSDTimer()
 
 int WinVNCAppMain()
 {
-	vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - WinVNCAPPMain\n"));
+	IniFile myIniFile;
+	vnclog.SetMode(myIniFile.ReadInt("admin", "DebugMode", 0));
+	char temp[512];
+	myIniFile.ReadString("admin", "path", temp,512);
+	vnclog.SetPath(temp);
+	vnclog.SetLevel(myIniFile.ReadInt("admin", "DebugLevel", 0));
+	vnclog.SetVideo(myIniFile.ReadInt("admin", "Avilog", 0) ? true : false);
+
+	vnclog.Print(-1, VNCLOG("WinVNCAPPMain-----Application started\n"));
 #ifdef CRASH_ENABLED
 	LPVOID lpvState = Install(NULL,  "rudi.de.vos@skynet.be", "UltraVNC");
 #endif

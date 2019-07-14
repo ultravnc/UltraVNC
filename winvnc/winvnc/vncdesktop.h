@@ -322,6 +322,7 @@ public:
 	BOOL m_hookdriver;
 	void SethookMechanism(BOOL hookall,BOOL hookdriver);
 	bool m_UltraEncoder_used;
+	bool m_Ultra2Encoder_used;
 	rfb::Rect		m_Cliprect;//the region to check
 
 	PCHANGES_BUF pchanges_buf;

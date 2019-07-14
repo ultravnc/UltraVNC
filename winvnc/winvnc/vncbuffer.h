@@ -68,8 +68,8 @@ public:
 
 	// SCREEN SCANNING
 //	void Clear(const rfb::Rect &rect);
-	void CheckRegion(rfb::Region2D &dest,rfb::Region2D &cache, const rfb::Region2D &src);
-	void CheckRect(rfb::Region2D &dest,rfb::Region2D &cache, const rfb::Rect &src);
+	void CheckRegion(rfb::Region2D &dest,rfb::Region2D &cache, const rfb::Region2D &src, bool full);
+	void CheckRect(rfb::Region2D &dest,rfb::Region2D &cache, const rfb::Rect &src, bool full);
 
 	// SCREEN CAPTURE
 	void CopyRect(const rfb::Rect &dest, const rfb::Point &delta);
