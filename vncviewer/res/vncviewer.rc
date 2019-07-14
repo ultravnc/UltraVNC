@@ -41,7 +41,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_NEUTRAL
 // Bitmap
 //
 
-IDB_COLLAPS             BITMAP                  "up.bmp"
+//IDB_COLLAPS             BITMAP                  "up.bmp"
 #endif    // English resources
 /////////////////////////////////////////////////////////////////////////////
 
@@ -1219,7 +1219,7 @@ IDB_SWITCHMONITOR       BITMAP                  "stat\\switch.bmp"
 IDB_PHOTO               BITMAP                  "stat\\photo.bmp"
 IDB_NOSCALE             BITMAP                  "stat\\full.bmp"
 IDB_FITSCREEN           BITMAP                  "stat\\1op1.bmp"
-IDB_EXPAND              BITMAP                  "down.bmp"
+//IDB_EXPAND              BITMAP                  "down.bmp"
 #endif    // Dutch (Belgium) resources
 /////////////////////////////////////////////////////////////////////////////
 
