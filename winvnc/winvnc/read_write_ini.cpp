@@ -42,6 +42,7 @@ LONG Avilog;
 LONG DebugLevel;
 LONG DisableTrayIcon;
 LONG Rdpmode=0;
+LONG NoScreensaver=0;
 LONG LoopbackOnly;
 LONG UseDSMPlugin;
 LONG AllowLoopback=1;
@@ -153,6 +154,7 @@ myIniFile_In.ReadString("admin", "accept_reject_mesg", accept_reject_mesg,512);
 DebugLevel=myIniFile_In.ReadInt("admin", "DebugLevel", 0);
 DisableTrayIcon=myIniFile_In.ReadInt("admin", "DisableTrayIcon", false);
 Rdpmode = myIniFile_In.ReadInt("admin", "rdpmode", 0);
+NoScreensaver = myIniFile_In.ReadInt("admin", "noscreensaver", 0);
 LoopbackOnly=myIniFile_In.ReadInt("admin", "LoopbackOnly", false);
 
 myIniFile_Out.WriteInt("admin", "DebugMode", DebugMode);
@@ -162,6 +164,7 @@ myIniFile_Out.WriteString("admin", "accept_reject_mesg", accept_reject_mesg);
 myIniFile_Out.WriteInt("admin", "DebugLevel", DebugLevel);
 myIniFile_Out.WriteInt("admin", "DisableTrayIcon", DisableTrayIcon);
 myIniFile_Out.WriteInt("admin", "rdpmode", Rdpmode);
+myIniFile_Out.WriteInt("admin", "noscreensaver", NoScreensaver);
 myIniFile_Out.WriteInt("admin", "LoopbackOnly", LoopbackOnly);
 
 UseDSMPlugin=myIniFile_In.ReadInt("admin", "UseDSMPlugin", false);

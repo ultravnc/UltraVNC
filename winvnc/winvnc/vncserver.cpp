@@ -175,6 +175,7 @@ vncServer::vncServer()
 	m_connect_pri = 0;
 	m_disableTrayIcon = FALSE;
 	m_Rdpmode = FALSE;
+	m_NoScreensaver = FALSE;
 	m_AllowEditClients = FALSE;
 
 	// Set the input options
@@ -2476,10 +2477,7 @@ void vncServer::EnableXRichCursor(BOOL fEnable)
 BOOL
 vncServer::SetDisableTrayIcon(BOOL disableTrayIcon)
 {
-	if (disableTrayIcon != m_disableTrayIcon)
-	{
-		m_disableTrayIcon = disableTrayIcon;
-	}
+	m_disableTrayIcon = disableTrayIcon;
 	return TRUE;
 }
 
@@ -2492,10 +2490,7 @@ vncServer::GetDisableTrayIcon()
 BOOL
 vncServer::SetRdpmode(BOOL Rdpmode)
 {
-	if (Rdpmode != m_Rdpmode)
-	{
-		m_Rdpmode = Rdpmode;
-	}
+	m_Rdpmode = Rdpmode;
 	return TRUE;
 }
 
@@ -2506,12 +2501,24 @@ vncServer::GetRdpmode()
 }
 
 BOOL
+vncServer::SetNoScreensaver(BOOL NoScreensaver)
+{
+	m_NoScreensaver = NoScreensaver;
+	if (m_desktop)
+		m_desktop->PreventScreensaver(true);
+	return TRUE;
+}
+
+BOOL
+vncServer::GetNoScreensaver()
+{
+	return m_NoScreensaver;
+}
+
+BOOL
 vncServer::SetAllowEditClients(BOOL AllowEditClients)
 {
-	if (AllowEditClients != m_AllowEditClients)
-	{
-		m_AllowEditClients = AllowEditClients;
-	}
+	m_AllowEditClients = AllowEditClients;
 	return TRUE;
 }
 

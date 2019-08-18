@@ -518,6 +518,10 @@ vncProperties::DialogProc(HWND hwnd,
 		   BOOL frdpmode = _this->m_server->GetRdpmode();
 		   SendMessage(hrdpmode, BM_SETCHECK, frdpmode, 0);
 
+		   HWND hNoScreensaver= GetDlgItem(hwnd,IDC_NOSCREENSAVER);
+		   BOOL fNoScrensaver = _this->m_server->GetNoScreensaver();
+		   SendMessage(hNoScreensaver, BM_SETCHECK, fNoScrensaver, 0);
+
 		   HWND hAllowshutdown = GetDlgItem(hwnd, IDC_ALLOWSHUTDOWN);
 		   SendMessage(hAllowshutdown, BM_SETCHECK, !_this->m_allowshutdown , 0);
 
@@ -937,6 +941,7 @@ vncProperties::DialogProc(HWND hwnd,
 
 				_this->m_server->SetDisableTrayIcon(IsDlgButtonChecked(hwnd, IDC_DISABLETRAY));
 				_this->m_server->SetRdpmode(IsDlgButtonChecked(hwnd, IDC_RDPMODE));
+				_this->m_server->SetNoScreensaver(IsDlgButtonChecked(hwnd, IDC_NOSCREENSAVER));
 				_this->m_allowshutdown=!IsDlgButtonChecked(hwnd, IDC_ALLOWSHUTDOWN);
 				_this->m_alloweditclients=!IsDlgButtonChecked(hwnd, IDC_ALLOWEDITCLIENTS);
 				_this->m_server->SetAllowEditClients(_this->m_alloweditclients);
@@ -1713,6 +1718,7 @@ vncProperties::Load(BOOL usersettings)
 	// Disable Tray Icon
 	m_server->SetDisableTrayIcon(LoadInt(hkLocal, "DisableTrayIcon", false));
 	m_server->SetRdpmode(LoadInt(hkLocal, "rdpmode", 0));
+	m_server->SetNoScreensaver(LoadInt(hkLocal, "noscreensaver", 0));
 
 	// Authentication required, loopback allowed, loopbackOnly
 
@@ -2181,6 +2187,7 @@ vncProperties::Save()
 
 	SaveInt(hkLocal, "DisableTrayIcon", m_server->GetDisableTrayIcon());
 	SaveInt(hkLocal, "rdpmode", m_server->GetRdpmode());
+	SaveInt(hkLocal, "noscreensaver", m_server->GetNoScreensaver());
 	SaveInt(hkLocal, "Secure", m_server->Secure());
 	SaveInt(hkLocal, "MSLogonRequired", m_server->MSLogonRequired());
 	// Marscha@2004 - authSSP: save "New MS-Logon" state
@@ -2302,6 +2309,7 @@ void vncProperties::LoadFromIniFile()
 	// Disable Tray Icon
 	m_server->SetDisableTrayIcon(myIniFile.ReadInt("admin", "DisableTrayIcon", false));
 	m_server->SetRdpmode(myIniFile.ReadInt("admin", "rdpmode", 0));
+	m_server->SetNoScreensaver(myIniFile.ReadInt("admin", "noscreensaver", 0));
 
 	// Authentication required, loopback allowed, loopbackOnly
 
@@ -2529,6 +2537,7 @@ void vncProperties::SaveToIniFile()
 				myIniFile.WriteInt("admin", "IdleInputTimeout", m_IdleInputTimeout);
 				myIniFile.WriteInt("admin", "DisableTrayIcon", m_server->GetDisableTrayIcon());
 				myIniFile.WriteInt("admin", "rdpmode", m_server->GetRdpmode());
+				myIniFile.WriteInt("admin", "noscreensaver", m_server->GetNoScreensaver());
 				myIniFile.WriteInt("admin", "Secure", m_server->Secure());
 				myIniFile.WriteInt("admin", "MSLogonRequired", m_server->MSLogonRequired());
 				// Marscha@2004 - authSSP: save "New MS-Logon" state
@@ -2559,6 +2568,7 @@ void vncProperties::SaveToIniFile()
 	myIniFile.WriteInt("admin", "IdleInputTimeout", m_IdleInputTimeout);
 	myIniFile.WriteInt("admin", "DisableTrayIcon", m_server->GetDisableTrayIcon());
 	myIniFile.WriteInt("admin", "rdpmode", m_server->GetRdpmode());
+	myIniFile.WriteInt("admin", "noscreensaver", m_server->GetNoScreensaver());
 	myIniFile.WriteInt("admin", "Secure", m_server->Secure());
 	myIniFile.WriteInt("admin", "MSLogonRequired", m_server->MSLogonRequired());
 	// Marscha@2004 - authSSP: save "New MS-Logon" state

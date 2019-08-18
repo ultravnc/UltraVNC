@@ -546,7 +546,6 @@ vncDesktop::vncDesktop()
 	}
 	m_SWOffsetx = 0;
 	m_SWOffsety = 0;
-
 }
 
 vncDesktop::~vncDesktop()
@@ -583,7 +582,10 @@ vncDesktop::~vncDesktop()
 
 
 	// added jeff
-	if (m_server) SetBlockInputState(false);
+	if (m_server) {
+		SetBlockInputState(false);
+		PreventScreensaver(false);
+	}
 	// Let's call Shutdown just in case something went wrong...
 	Shutdown();
 	vnclog.Print(LL_INTINFO, VNCLOG("~vncDesktop Shutdown()\n"));
@@ -2528,6 +2530,14 @@ void vncDesktop::InitHookSettings()
 	SethookMechanism(m_server->Hook(), m_server->Driver());
 }
 
+void vncDesktop::PreventScreensaver(bool state)
+{
+	if (state && m_server->GetNoScreensaver()) {
+		SetThreadExecutionState(ES_CONTINUOUS | ES_DISPLAY_REQUIRED | ES_SYSTEM_REQUIRED | ES_AWAYMODE_REQUIRED);
+	}
+	else
+		SetThreadExecutionState(ES_CONTINUOUS);
+}
 
 void vncDesktop::SetBlockInputState(bool newstate)
 {

@@ -229,6 +229,7 @@ BEGIN
     CONTROL         "save password more secure (not portable)",IDC_SAVEPASSWORDSECURE,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,32,178,174,10
     CONTROL         "International keys",IDC_UNICODE_INPUTS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,150,109,74,10
+    CONTROL         "Prevent screensaver",IDC_NOSCREENSAVER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,285,195,84,10
 END
 
 IDD_ABOUT1 DIALOGEX 0, 0, 286, 222

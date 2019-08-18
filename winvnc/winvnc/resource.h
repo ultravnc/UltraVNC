@@ -197,6 +197,8 @@
 #define IDC_SAVEPASSWORDSECURE          1136
 #define IDC_CHECK7                      1138
 #define IDC_UNICODE_INPUTS              1138
+#define IDC_CHECK6                      1139
+#define IDC_NOSCREENSAVER               1139
 #define IDC_LOCALTEXT_EDIT              1140
 #define IDC_INPUTAREA_EDIT              1140
 #define IDC_REMOTETEXT_EDIT             1141
@@ -293,7 +295,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        173
 #define _APS_NEXT_COMMAND_VALUE         40030
-#define _APS_NEXT_CONTROL_VALUE         1139
+#define _APS_NEXT_CONTROL_VALUE         1140
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

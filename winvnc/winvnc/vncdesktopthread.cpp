@@ -940,6 +940,7 @@ vncDesktopThread::run_undetached(void *arg)
 
 	HANDLE ThreadHandleCheckMirrorDriverUpdates = NULL;
 	HANDLE ThreadHandleCheckCursorUpdates = NULL;
+	m_desktop->PreventScreensaver(true);
 	
 	if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver && !VNCOS.OS_WIN8 && !VNCOS.OS_WIN10)
 		{
@@ -1395,6 +1396,7 @@ vncDesktopThread::run_undetached(void *arg)
 	
 	// Clear all the hooks and close windows, etc.
     m_desktop->SetBlockInputState(false);
+	m_desktop->PreventScreensaver(false);
 	vnclog.Print(LL_INTINFO, VNCLOG("quitting desktop server thread:SetBlockInputState\n"));
 	
 	// Clear the shift modifier keys, now that there are no remote clients
