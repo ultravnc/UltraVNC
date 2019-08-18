@@ -52,13 +52,87 @@ extern char sz_F11[64];
 
 SessionDialog::SessionDialog(VNCOptions *pOpt, ClientConnection* pCC, CDSMPlugin* pDSMPlugin)
 {
+	m_bExpanded = true;
+	cy =0;
+	cx = 0;
 	m_pCC = pCC;
 	m_pOpt = pOpt;
-    //AaronP
-//	m_pMRU = new MRU(SESSION_MRU_KEY_NAME);
-	m_pMRU = new MRU(SESSION_MRU_KEY_NAME,26);
-	//EndAaronP
+	m_pMRU = new MRU(SESSION_MRU_KEY_NAME,98);
 	m_pDSMPlugin = pDSMPlugin;
+	/////////////////////////////////////////////////	
+	TCHAR tmphost2[256];
+	_tcscpy(m_proxyhost, m_pOpt->m_proxyhost);
+	if (strcmp(m_proxyhost,"")!=NULL) {
+		_tcscat(m_proxyhost,":");
+		_tcscat(m_proxyhost,_itoa(m_pOpt->m_proxyport,tmphost2,10));
+	}
+	
+	for (int i = rfbEncodingRaw; i <= LASTENCODING; i++) {
+		UseEnc[i] = m_pOpt->m_UseEnc[i];
+	}
+
+	PreferredEncodings.clear();
+	for (int i=0; i<m_pOpt->m_PreferredEncodings.size(); i++) 
+        PreferredEncodings.push_back(m_pOpt->m_PreferredEncodings[i]); 
+
+	ViewOnly = m_pOpt->m_ViewOnly;
+	fAutoScaling = m_pOpt->m_fAutoScaling;
+	fExitCheck = m_pOpt->m_fExitCheck;
+	m_fUseProxy = m_pOpt->m_fUseProxy;
+	selected= m_pOpt->m_selected_screen;
+	autoDetect = m_pOpt->autoDetect;
+	SwapMouse = m_pOpt->m_SwapMouse;
+	DisableClipboard = m_pOpt->m_DisableClipboard;
+	Use8Bit = m_pOpt->m_Use8Bit;
+	Shared = m_pOpt->m_Shared;
+	running = m_pOpt->m_running;
+	ShowToolbar = m_pOpt->m_ShowToolbar;
+	scale_num = m_pOpt->m_scale_num;
+	scale_den = m_pOpt->m_scale_den;				  
+	nServerScale = m_pOpt->m_nServerScale;
+	reconnectcounter = m_pOpt->m_reconnectcounter;
+	autoReconnect = m_pOpt->m_autoReconnect;
+	FTTimeout = m_pOpt->m_FTTimeout;
+	listenport = m_pOpt->m_listenPort;
+	fEnableCache = m_pOpt->m_fEnableCache;
+	useCompressLevel = m_pOpt->m_useCompressLevel;
+	enableJpegCompression = m_pOpt->m_enableJpegCompression;
+	compressLevel = m_pOpt->m_compressLevel;
+	jpegQualityLevel = m_pOpt->m_jpegQualityLevel;
+	throttleMouse = m_pOpt->m_throttleMouse;
+	requestShapeUpdates = m_pOpt->m_requestShapeUpdates;
+	ignoreShapeUpdates = m_pOpt->m_ignoreShapeUpdates;
+	Emul3Buttons = m_pOpt->m_Emul3Buttons;
+	JapKeyboard = m_pOpt->m_JapKeyboard;
+	quickoption = m_pOpt->m_quickoption;
+	preemptiveUpdates = m_pOpt->m_preemptiveUpdates;
+	FullScreen = m_pOpt->m_FullScreen;
+	Directx = m_pOpt->m_Directx;
+	SavePos = m_pOpt->m_SavePos;
+	SaveSize = m_pOpt->m_SaveSize;
+	fUseDSMPlugin = m_pOpt->m_fUseDSMPlugin;
+	strcpy( szDSMPluginFilename, m_pOpt->m_szDSMPluginFilename);
+	listening = m_pOpt->m_listening;
+	oldplugin = m_pOpt->m_oldplugin;
+
+
+	strcpy(folder, m_pOpt->m_document_folder);
+	strcpy(prefix, m_pOpt->m_prefix);
+
+	scaling = m_pOpt->m_scaling;
+
+
+	keepAliveInterval = m_pOpt->m_keepAliveInterval;
+	fAutoAcceptIncoming = m_pOpt->m_fAutoAcceptIncoming;
+	fAutoAcceptNoDSM = m_pOpt->m_fAutoAcceptNoDSM;
+	fRequireEncryption = m_pOpt->m_fRequireEncryption;
+	restricted = m_pOpt->m_restricted;
+	NoStatus = m_pOpt->m_NoStatus;
+	NoHotKeys = m_pOpt->m_NoHotKeys;
+	setdefaults = false;
+	/////////////////////////////////////////////////
+	hBmpExpand = (HBITMAP)::LoadImage(pApp->m_instance, MAKEINTRESOURCE(IDB_EXPAND), IMAGE_BITMAP, 0, 0, LR_LOADTRANSPARENT);
+	hBmpCollaps = (HBITMAP)::LoadImage(pApp->m_instance, MAKEINTRESOURCE(IDB_COLLAPS), IMAGE_BITMAP, 0, 0, LR_LOADTRANSPARENT);
 }
 
 SessionDialog::~SessionDialog()
@@ -76,21 +150,8 @@ int SessionDialog::DoDialog()
 		NULL, (DLGPROC) SessDlgProc, (LONG_PTR) this);
 }
 
-static bool notset=true;
-static int selected=1;
-
-BOOL CALLBACK SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam, LPARAM lParam ) {
-	// This is a static method, so we don't know which instantiation we're 
-	// dealing with. But we can get a pseudo-this from the parameter to 
-	// WM_INITDIALOG, which we therafter store with the window and retrieve
-	// as follows:
-    /*SessionDialog*_this = helper::SafeGetWindowUserData<SessionDialog>(hwnd);
-	if (_this!=NULL && notset) 
-		{
-			selected=_this->m_pOpt->m_selected_screen;
-			notset=false;
-		}*/
-
+BOOL CALLBACK SessDlgProc(  HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam ) 
+{	
 	SessionDialog* _this;
     if(uMsg == WM_INITDIALOG){
       _this = (SessionDialog*)lParam;
@@ -98,498 +159,134 @@ BOOL CALLBACK SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam, LPARAM lParam
     }
     else
       _this= (SessionDialog*)helper::SafeGetWindowUserData<SessionDialog>(hwnd);
-	if (_this!=NULL && notset) 
-		{
-			selected=_this->m_pOpt->m_selected_screen;
-			notset=false;
-		}
-
-
-
-
+	                       
 	switch (uMsg) {
-
 	case WM_INITDIALOG:
-		{
-
+		{			
             helper::SafeSetWindowUserData(hwnd, lParam);
             SessionDialog *l_this = (SessionDialog *) lParam;
-            //CentreWindow(hwnd);
 			SetForegroundWindow(hwnd);
-			l_this->m_pCC->m_hSessionDialog = hwnd;
-
-			//List monitors
-			tempdisplayclass tdc;
-			tdc.Init();
-			HWND hcomboscreen = GetDlgItem(  hwnd, IDC_SCREEN);		
-            for (int i = 0; i < tdc.nr_monitors+1; i++) {
-                int pos = SendMessage(hcomboscreen, CB_ADDSTRING, 0, (LPARAM) tdc.monarray[i].buttontext);
-
-            }
-            SendMessage(hcomboscreen, CB_SETCURSEL, selected, 0);
-
-            // Set up recently-used list
-            HWND hcombo = GetDlgItem(  hwnd, IDC_HOSTNAME_EDIT);
-            TCHAR valname[256];
-
-            for (int i = 0; i < l_this->m_pMRU->NumItems(); i++) {
-                l_this->m_pMRU->GetItem(i, valname, 255);
-                int pos = SendMessage(hcombo, CB_ADDSTRING, 0, (LPARAM) valname);
-
-            }
-            SendMessage(hcombo, CB_SETCURSEL, 0, 0);
-
-			// sf@2002 - List available DSM Plugins
-			HWND hPlugins = GetDlgItem(hwnd, IDC_PLUGINS_COMBO);
-			int nPlugins = l_this->m_pDSMPlugin->ListPlugins(hPlugins);
-			if (!nPlugins)
-			{
-				SendMessage(hPlugins, CB_ADDSTRING, 0, (LPARAM) sz_F11);
-			}
-			else
-			{
-				// Use the first detected plugin, so the user doesn't have to check the option
-				// HWND hUsePlugin = GetDlgItem(hwnd, IDC_PLUGIN_CHECK);
-				// SendMessage(hUsePlugin, BM_SETCHECK, TRUE, 0);
-			}
-			SendMessage(hPlugins, CB_SETCURSEL, 0, 0);
-
-			HWND hButton = GetDlgItem(hwnd, IDC_PLUGIN_BUTTON);
-			EnableWindow(hButton, FALSE); // sf@2009 - Disable plugin config button by default
-
-			//AaronP
-			if( strcmp( l_this->m_pOpt->m_szDSMPluginFilename, "" ) != 0 && l_this->m_pOpt->m_fUseDSMPlugin )
-			{ 
-				int pos = SendMessage(hPlugins, CB_FINDSTRINGEXACT, -1,
-					(LPARAM)&(l_this->m_pOpt->m_szDSMPluginFilename[0]));
-
-				if( pos != CB_ERR )
-				{
-					SendMessage(hPlugins, CB_SETCURSEL, pos, 0);
-					HWND hUsePlugin = GetDlgItem(hwnd, IDC_PLUGIN_CHECK);
-					SendMessage(hUsePlugin, BM_SETCHECK, TRUE, 0);
-					EnableWindow(hButton, TRUE); // sf@2009 - Enable plugin config button
-				}
-			}
-			//EndAaronP
-
-			TCHAR tmphost[256];
-			TCHAR tmphost2[256];
-			_tcscpy(tmphost, l_this->m_pOpt->m_proxyhost);
-			if (strcmp(tmphost,"")!=NULL)
-			{
-			_tcscat(tmphost,":");
-			_tcscat(tmphost,_itoa(l_this->m_pOpt->m_proxyport,tmphost2,10));
-			SetDlgItemText(hwnd, IDC_PROXY_EDIT, tmphost);
-			}
-
-			HWND hViewOnly = GetDlgItem(hwnd, IDC_VIEWONLY_CHECK);
-			SendMessage(hViewOnly, BM_SETCHECK, l_this->m_pOpt->m_ViewOnly, 0);
-
-			HWND hAutoScaling = GetDlgItem(hwnd, IDC_AUTOSCALING_CHECK);
-			SendMessage(hAutoScaling, BM_SETCHECK, l_this->m_pOpt->m_fAutoScaling, 0);
-
-			HWND hExitCheck = GetDlgItem(hwnd, IDC_EXIT_CHECK); //PGM @ Advantig
-			SendMessage(hExitCheck, BM_SETCHECK, l_this->m_pOpt->m_fExitCheck, 0); //PGM @ Advantig
-
-			HWND hProxy = GetDlgItem(hwnd, IDC_PROXY_CHECK);
-			SendMessage(hProxy, BM_SETCHECK, l_this->m_pOpt->m_fUseProxy, 0);
-
-
-			// sf@2005 - Make the save settings optional but always enabled by default (for now)
-			// (maybe disabled as default is better ?)
-			HWND hSave = GetDlgItem(hwnd, IDC_SETDEFAULT_CHECK);
-//ACT			SendMessage(hSave, BM_SETCHECK, true, 0);
-
-
-			// sf@2002 - Select Modem Option as default
-			l_this->SetQuickOption(l_this, hwnd);
-
 			l_this->m_fFromOptions = false;
 			l_this->m_fFromFile = false;
-
+			l_this->m_pCC->m_hSessionDialog = hwnd;
+			l_this->SessHwnd = hwnd;
+			_this->InitDlgProc();
+			HWND hExitCheck = GetDlgItem(hwnd, IDC_EXIT_CHECK); //PGM @ Advantig
+			SendMessage(hExitCheck, BM_SETCHECK, l_this->fExitCheck, 0); //PGM @ Advantig
+			
+			_this->ExpandBox(hwnd, !_this->m_bExpanded);
+			SendMessage(GetDlgItem(hwnd, IDC_EXPAND), STM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)_this->hBmpExpand);			
+			l_this->InitTab(hwnd);
             return TRUE;
 		}
+
+	case WM_NOTIFY:
+		return _this->HandleNotify(hwnd, wParam, lParam);
 
 	case WM_COMMAND:
 		switch (LOWORD(wParam))
 		{
-	    case IDC_DELETE:
-			{
-				char optionfile[MAX_PATH];
-				VNCOptions::GetDefaultOptionsFileName(optionfile);
-				DeleteFile(optionfile);
-			}
-			return TRUE;
-
-		case IDOK:
-			{
-            TCHAR tmphost[256];
-            TCHAR hostname[256];
-            TCHAR fullhostname[256];
-
-			// sf@2005
-			HWND hSave = GetDlgItem(hwnd, IDC_SETDEFAULT_CHECK);
-			_this->m_pCC->saved_set = SendMessage(hSave, BM_GETCHECK, 0, 0) == BST_CHECKED;
-
-			_this->m_pOpt->m_selected_screen=SendMessage(GetDlgItem(  hwnd, IDC_SCREEN),CB_GETCURSEL,0,0);
-
-			GetDlgItemText(hwnd, IDC_HOSTNAME_EDIT, hostname, 256);
-			_tcscpy(fullhostname, hostname);
-			if (!ParseDisplay(hostname, tmphost, 255, &_this->m_port)) {
-                MessageBox(hwnd, 
-                    sz_F8, 
-                    sz_F10, MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TOPMOST);
-            } else {
-				for (size_t i = 0, len = strlen(tmphost); i < len; i++)
-						{
-							tmphost[i] = toupper(tmphost[i]);
-						} 
-                _tcscpy(_this->m_host_dialog, tmphost);
-				_this->m_pMRU->AddItem(fullhostname);
-//				_tcscpy(_this->m_remotehost, fulldisplay);
-                EndDialog(hwnd, TRUE);
-            }
-			_tcscpy(_this->m_proxyhost, "");
-			GetDlgItemText(hwnd, IDC_PROXY_EDIT, hostname, 256);
-			_tcscpy(fullhostname, hostname);
-
-			//adzm 2010-02-15
-			if (strlen(hostname) > 0) {
-				TCHAR actualProxy[256];
-				strcpy(actualProxy, hostname);
-
-				if (strncmp(tmphost, "ID", 2) == 0) {
-
-					int numericId = _this->m_port;
-
-					int numberOfHosts = 1;
-					for (int i = 0; i < (int)strlen(hostname); i++) {
-						if (hostname[i] == ';') {
-							numberOfHosts++;
-						}
-					}
-
-					if (numberOfHosts <= 1) {
-						// then hostname == actualhostname
-					} else {
-						int modulo = numericId % numberOfHosts;
-
-						char* szToken = strtok(hostname, ";");
-						while (szToken) {
-							if (modulo == 0) {
-								strcpy(actualProxy, szToken);
-								break;
-							}
-
-							modulo--;
-							szToken = strtok(NULL, ";");
-						}
-					}
+			case IDC_HOSTNAME_EDIT: 
+				if (HIWORD(wParam) == CBN_SELCHANGE) {					
+					TCHAR hostname[256];
+					int ItemIndex = SendMessage((HWND) lParam, CB_GETCURSEL, 0, 0);
+					SendMessage((HWND) lParam, (UINT) CB_GETLBTEXT, (WPARAM) ItemIndex, (LPARAM) hostname);
+					_this->IfHostExistLoadSettings(hostname);
+					_this->SettingsToUI();
 				}
-
-				if (!ParseDisplay(actualProxy, tmphost, 255, &_this->m_proxyport)) {
-					MessageBox(hwnd, 
-						sz_F8, 
-						sz_F10, MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TOPMOST);
-				} else {
-					_tcscpy(_this->m_proxyhost, tmphost);
-					EndDialog(hwnd, TRUE);
-				}
-			}
-
-			HWND hProxy = GetDlgItem(hwnd, IDC_PROXY_CHECK);
-			if (SendMessage(hProxy, BM_GETCHECK, 0, 0) == BST_CHECKED)
-			{
-				_this->m_pOpt->m_fUseProxy = true;
-				_this->m_fUseProxy = true;
-			}
-			else 
-			{
-				_this->m_pOpt->m_fUseProxy = false;
-				_this->m_fUseProxy = false;
-			}
-
-			// sf@2002 - DSMPlugin loading
-			// If Use plugin is checked, load the plugin if necessary
-			HWND hPlugin = GetDlgItem(hwnd, IDC_PLUGIN_CHECK);
-			if (SendMessage(hPlugin, BM_GETCHECK, 0, 0) == BST_CHECKED)
-			{
-				TCHAR szPlugin[MAX_PATH];
-				GetDlgItemText(hwnd, IDC_PLUGINS_COMBO, szPlugin, MAX_PATH);
-				_this->m_pOpt->m_fUseDSMPlugin = true;
-				strcpy(_this->m_pOpt->m_szDSMPluginFilename, szPlugin);
-
-				if (!_this->m_pDSMPlugin->IsLoaded())
-				{
-					_this->m_pDSMPlugin->LoadPlugin(szPlugin, _this->m_pOpt->m_listening);
-					if (_this->m_pDSMPlugin->IsLoaded())
-					{
-						if (_this->m_pDSMPlugin->InitPlugin())
-						{
-							if (!_this->m_pDSMPlugin->SupportsMultithreaded())
-								_this->m_pOpt->m_oldplugin=true; //PGM
-							else //PGM
-								_this->m_pOpt->m_oldplugin=false;
-
-							_this->m_pDSMPlugin->SetEnabled(true);
-							_this->m_pDSMPlugin->DescribePlugin();
-						}
-						else
-						{
-							_this->m_pDSMPlugin->SetEnabled(false);
-							MessageBox(hwnd, 
-							sz_F7, 
-							sz_F6, MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TOPMOST);
-							return TRUE;
-						}
-					}
-					else
-					{
-						_this->m_pDSMPlugin->SetEnabled(false);
-						MessageBox(hwnd, 
-							sz_F5, 
-							sz_F6, MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TOPMOST);
-						return TRUE;
-					}
-				}
-				else
-				{
-					// sf@2003 - If the plugin is already loaded here it has been loaded
-					// by clicking on the config button: we need to init it !
-					// But we must first check that the loaded plugin is the same that 
-					// the one currently selected...
-					_this->m_pDSMPlugin->DescribePlugin();
-					if (_stricmp(_this->m_pDSMPlugin->GetPluginFileName(), szPlugin))
-					{
-						// Unload the previous plugin
-						_this->m_pDSMPlugin->UnloadPlugin();
-						// Load the new selected one
-						_this->m_pDSMPlugin->LoadPlugin(szPlugin, _this->m_pOpt->m_listening);
-					}
-
-					if (_this->m_pDSMPlugin->IsLoaded())
-					{
-						if (_this->m_pDSMPlugin->InitPlugin())
-						{
-							if (!_this->m_pDSMPlugin->SupportsMultithreaded())
-								_this->m_pOpt->m_oldplugin=true; //PGM
-							else //PGM
-								_this->m_pOpt->m_oldplugin=false;
-							_this->m_pDSMPlugin->SetEnabled(true);
-							_this->m_pDSMPlugin->DescribePlugin();
-						}
-						else
-						{
-							_this->m_pDSMPlugin->SetEnabled(false);
-							MessageBox(hwnd, 
-							sz_F7, 
-							sz_F6, MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TOPMOST);
-							return TRUE;
-						}
-					}
-					else
-					{
-						_this->m_pDSMPlugin->SetEnabled(false);
-						MessageBox(hwnd, 
-							sz_F5, 
-							sz_F6, MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TOPMOST);
-						return TRUE;
-					}
-				}
-			}
-			else // If Use plugin unchecked but the plugin is loaded, unload it
-			{
-				_this->m_pOpt->m_fUseDSMPlugin = false;
-				if (_this->m_pDSMPlugin->IsEnabled())
-				{
-					_this->m_pDSMPlugin->UnloadPlugin();
-					_this->m_pDSMPlugin->SetEnabled(false);
-				}
-			}
-
-			if (_this->m_fFromOptions || _this->m_fFromFile)
-			{
-				EndDialog(hwnd, TRUE);
+			break;
+			case IDC_DELETE: 
+					DeleteFile(_this->m_pOpt->getDefaultOptionsFileName());
+					_this->SetDefaults();
+					return TRUE;
+			case IDC_SAVE:
+				_this->SaveConnection(hwnd, false);
+				break;
+			case IDC_SAVEAS:
+				_this->SaveConnection(hwnd, true);
+				break;
+			case IDCONNECT:			
+				return _this->connect(hwnd);
+			case IDCANCEL:
+				EndDialog(hwnd, FALSE);
+				return TRUE;		
+			case IDC_SHOWOPTIONS:
+			case IDC_EXPAND:
+				_this->ExpandBox(hwnd, !_this->m_bExpanded);
 				return TRUE;
-			}
-
-			// sf@2002 - Quick options handling
-			_this->ManageQuickOptions(_this, hwnd);
-
-			HWND hViewOnly = GetDlgItem(hwnd, IDC_VIEWONLY_CHECK);
-			_this->m_pOpt->m_ViewOnly = (SendMessage(hViewOnly, BM_GETCHECK, 0, 0) == BST_CHECKED);
-
-			HWND hAutoScaling = GetDlgItem(hwnd, IDC_AUTOSCALING_CHECK);
-			_this->m_pOpt->m_fAutoScaling = (SendMessage(hAutoScaling, BM_GETCHECK, 0, 0) == BST_CHECKED);
-
-			HWND hExitCheck = GetDlgItem(hwnd, IDC_EXIT_CHECK); //PGM @ Advantig
-			_this->m_pOpt->m_fExitCheck = (SendMessage(hExitCheck, BM_GETCHECK, 0, 0) == BST_CHECKED); //PGM @ Advantig
-
-			EndDialog(hwnd, TRUE);
-			return TRUE;
-			}
-
-		case IDCANCEL:
-			EndDialog(hwnd, FALSE);
-			return TRUE;
-
-		case IDC_OPTIONBUTTON:
-			{
-				if (!_this->m_fFromFile)
-				{
-					_this->ManageQuickOptions(_this, hwnd);					
-
-					HWND hViewOnly = GetDlgItem(hwnd, IDC_VIEWONLY_CHECK);
-					_this->m_pOpt->m_ViewOnly = (SendMessage(hViewOnly, BM_GETCHECK, 0, 0) == BST_CHECKED);
-					
-					HWND hAutoScaling = GetDlgItem(hwnd, IDC_AUTOSCALING_CHECK);
-					_this->m_pOpt->m_fAutoScaling = (SendMessage(hAutoScaling, BM_GETCHECK, 0, 0) == BST_CHECKED);
-
-					HWND hExitCheck = GetDlgItem(hwnd, IDC_EXIT_CHECK); //PGM @ Advantig
-					_this->m_pOpt->m_fExitCheck = (SendMessage(hExitCheck, BM_GETCHECK, 0, 0) == BST_CHECKED); //PGM @ Advantig
-
-				}
+			case IDC_OPTIONBUTTON:
+				{				
+					if (!_this->m_fFromFile){								
+						HWND hExitCheck = GetDlgItem(hwnd, IDC_EXIT_CHECK); //PGM @ Advantig
+						_this->fExitCheck = (SendMessage(hExitCheck, BM_GETCHECK, 0, 0) == BST_CHECKED); //PGM @ Advantig
+					}
 				
-				if (_this->m_pOpt->DoDialog())
-				{
-				_this->m_fFromOptions = true;
-				 HWND hDyn = GetDlgItem(hwnd, IDC_DYNAMIC);
-				SendMessage(hDyn, BM_SETCHECK, false, 0);
-				HWND hLan = GetDlgItem(hwnd, IDC_LAN_RB);
-				SendMessage(hLan, BM_SETCHECK, false, 0);
-				HWND hUltraLan = GetDlgItem(hwnd, IDC_ULTRA_LAN_RB);
-				SendMessage(hUltraLan, BM_SETCHECK, false, 0);
-				HWND hMedium = GetDlgItem(hwnd, IDC_MEDIUM_RB);
-				SendMessage(hMedium, BM_SETCHECK, false, 0);
-				HWND hModem = GetDlgItem(hwnd, IDC_MODEM_RB);
-				SendMessage(hModem, BM_SETCHECK, false, 0);
-				HWND hSlow = GetDlgItem(hwnd, IDC_SLOW_RB);
-				SendMessage(hSlow, BM_SETCHECK, false, 0);
-				HWND hManual = GetDlgItem(hwnd, IDC_MANUAL);
-				SendMessage(hManual, BM_SETCHECK, true, 0);
-				_this->m_pOpt->m_quickoption = 8;
-				}
-				return TRUE;
-			}
-
-		// sf@2002 
-		case IDC_PLUGIN_CHECK:
-			{
-				HWND hUse = GetDlgItem(hwnd, IDC_PLUGIN_CHECK);
-				BOOL enable = SendMessage(hUse, BM_GETCHECK, 0, 0) == BST_CHECKED;
-				HWND hButton = GetDlgItem(hwnd, IDC_PLUGIN_BUTTON);
-				EnableWindow(hButton, enable);
-			}
-			return TRUE;
-
-
-		case IDC_PLUGIN_BUTTON:
-			{
-			HWND hPlugin = GetDlgItem(hwnd, IDC_PLUGIN_CHECK);
-			if (SendMessage(hPlugin, BM_GETCHECK, 0, 0) == BST_CHECKED)
-			{
-				TCHAR szPlugin[MAX_PATH];
-				GetDlgItemText(hwnd, IDC_PLUGINS_COMBO, szPlugin, MAX_PATH);
-				// sf@2003 - The config button can be clicked several times with 
-				// different selected plugins...
-				bool fLoadIt = true;
-				char szParams[64];
-				strcpy(szParams, sz_F4);
-				// If a plugin is already loaded, check if it is the same that the one 
-				// we want to load.
-				if (_this->m_pDSMPlugin->IsLoaded())
-				{
-					_this->m_pDSMPlugin->DescribePlugin();
-					if (!_stricmp(_this->m_pDSMPlugin->GetPluginFileName(), szPlugin))
+					//if (_this->m_pOpt->DoDialog())
 					{
-						fLoadIt = false;
-						_this->m_pDSMPlugin->SetPluginParams(hwnd, szParams);
+					_this->m_fFromOptions = true;
+					 HWND hDyn = GetDlgItem(hwnd, IDC_DYNAMIC);
+					SendMessage(hDyn, BM_SETCHECK, false, 0);
+					HWND hLan = GetDlgItem(hwnd, IDC_LAN_RB);
+					SendMessage(hLan, BM_SETCHECK, false, 0);
+					HWND hUltraLan = GetDlgItem(hwnd, IDC_ULTRA_LAN_RB);
+					SendMessage(hUltraLan, BM_SETCHECK, false, 0);
+					HWND hMedium = GetDlgItem(hwnd, IDC_MEDIUM_RB);
+					SendMessage(hMedium, BM_SETCHECK, false, 0);
+					HWND hModem = GetDlgItem(hwnd, IDC_MODEM_RB);
+					SendMessage(hModem, BM_SETCHECK, false, 0);
+					HWND hSlow = GetDlgItem(hwnd, IDC_SLOW_RB);
+					SendMessage(hSlow, BM_SETCHECK, false, 0);
+					HWND hManual = GetDlgItem(hwnd, IDC_MANUAL);
+					SendMessage(hManual, BM_SETCHECK, true, 0);
+					_this->quickoption = 8;
 					}
-					else
+					return TRUE;
+				}
+			case IDC_LOADPROFILE_B:
+				{
+					TCHAR szFileName[MAX_PATH];
+					memset(szFileName, '\0', MAX_PATH);
+					if (_this->m_pCC->LoadConnection(szFileName, true) != -1)
 					{
-						// Unload the previous plugin
-						_this->m_pDSMPlugin->UnloadPlugin();
-						fLoadIt = true;
-					}
-				}
+						TCHAR szHost[250];
+						if (_this->m_pCC->m_port == 5900)
+							_tcscpy(szHost, _this->m_pCC->m_host);
+						else if (_this->m_pCC->m_port > 5900 && _this->m_pCC->m_port <= 5999)
+							_snprintf(szHost, 250, TEXT("%s:%d"), _this->m_pCC->m_host, _this->m_pCC->m_port - 5900);
+						else
+							_snprintf(szHost, 250, TEXT("%s::%d"), _this->m_pCC->m_host, _this->m_pCC->m_port);
 
-				if (!fLoadIt) return TRUE;
+						SetDlgItemText(hwnd, IDC_HOSTNAME_EDIT, szHost);
+						//AaronP
+						HWND hPlugins = GetDlgItem(hwnd, IDC_PLUGINS_COMBO);
+						if( strcmp( _this->szDSMPluginFilename, "" ) != 0 && _this->fUseDSMPlugin ) { 
+							int pos = SendMessage(hPlugins, CB_FINDSTRINGEXACT, -1,
+								(LPARAM)&(_this->szDSMPluginFilename[0]));
 
-				if (_this->m_pDSMPlugin->LoadPlugin(szPlugin, _this->m_pOpt->m_listening))
-				{
-					// We don't know the password yet... no matter the plugin requires
-					// it or not, we will provide it later (at plugin "real" startup)
-					// Knowing the environnement ("viewer") right now can be usefull or
-					// even mandatory for the plugin (specific params saving and so on...)
-					// The plugin receives environnement info but isn't inited at this point
-					_this->m_pDSMPlugin->SetPluginParams(hwnd, szParams);
-				}
-				else
-				{
-					MessageBox(hwnd, 
-						sz_F1, 
-						sz_F3, MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TOPMOST);
-				}
-			}				
-			return TRUE;
-			}
-
-		case IDC_LOADPROFILE_B:
-			{
-				TCHAR szFileName[MAX_PATH];
-				memset(szFileName, '\0', MAX_PATH);
-				if (_this->m_pCC->LoadConnection(szFileName, true) != -1)
-				{
-					TCHAR szHost[250];
-					if (_this->m_pCC->m_port == 5900)
-						_tcscpy(szHost, _this->m_pCC->m_host);
-					else if (_this->m_pCC->m_port > 5900 && _this->m_pCC->m_port <= 5999)
-						_snprintf(szHost, 250, TEXT("%s:%d"), _this->m_pCC->m_host, _this->m_pCC->m_port - 5900);
-					else
-						_snprintf(szHost, 250, TEXT("%s::%d"), _this->m_pCC->m_host, _this->m_pCC->m_port);
-
-					SetDlgItemText(hwnd, IDC_HOSTNAME_EDIT, szHost);
-					//AaronP
-					HWND hPlugins = GetDlgItem(hwnd, IDC_PLUGINS_COMBO);
-					if( strcmp( _this->m_pOpt->m_szDSMPluginFilename, "" ) != 0 && _this->m_pOpt->m_fUseDSMPlugin ) { 
-						int pos = SendMessage(hPlugins, CB_FINDSTRINGEXACT, -1,
-							(LPARAM)&(_this->m_pOpt->m_szDSMPluginFilename[0]));
-
-						if( pos != CB_ERR ) {
-							SendMessage(hPlugins, CB_SETCURSEL, pos, 0);
-							HWND hUsePlugin = GetDlgItem(hwnd, IDC_PLUGIN_CHECK);
-							SendMessage(hUsePlugin, BM_SETCHECK, TRUE, 0);
+							if( pos != CB_ERR ) {
+								SendMessage(hPlugins, CB_SETCURSEL, pos, 0);
+								HWND hUsePlugin = GetDlgItem(hwnd, IDC_PLUGIN_CHECK);
+								SendMessage(hUsePlugin, BM_SETCHECK, TRUE, 0);
+							}
 						}
+						//EndAaronP
+						_this->LoadFromFile(szFileName);
+						_this->SettingsToUI();
 					}
-					//EndAaronP
+					_this->m_fFromOptions = true;
+					_this->m_fFromFile = true;
+					return TRUE;
 				}
-				SetFocus(GetDlgItem(hwnd, IDC_HOSTNAME_EDIT));
- 				_this->SetQuickOption(_this, hwnd);
 
-   		        HWND hViewOnly = GetDlgItem(hwnd, IDC_VIEWONLY_CHECK);
-		        SendMessage(hViewOnly, BM_SETCHECK, _this->m_pOpt->m_ViewOnly, 0);
-
-				HWND hAutoScaling = GetDlgItem(hwnd, IDC_AUTOSCALING_CHECK);
-				SendMessage(hAutoScaling, BM_SETCHECK, _this->m_pOpt->m_fAutoScaling, 0);
-
-				HWND hExitCheck = GetDlgItem(hwnd, IDC_EXIT_CHECK); //PGM @ Advantig
-				SendMessage(hExitCheck, BM_SETCHECK, _this->m_pOpt->m_fExitCheck, 0); //PGM @ Advantig
-
-				_this->m_fFromOptions = true;
-				_this->m_fFromFile = true;
+			// [v1.0.2-jp1 fix]
+			case IDC_HOSTNAME_DEL:
+				HWND hcombo = GetDlgItem(  hwnd, IDC_HOSTNAME_EDIT);
+				int sel = SendMessage(hcombo, CB_GETCURSEL, 0, 0);
+				if(sel != CB_ERR){
+					SendMessage(hcombo, CB_DELETESTRING, sel, 0);
+					_this->m_pMRU->RemoveItem(sel);
+				}
 				return TRUE;
-			}
-
-		// [v1.0.2-jp1 fix]
-		case IDC_HOSTNAME_DEL:
-            HWND hcombo = GetDlgItem(  hwnd, IDC_HOSTNAME_EDIT);
-			int sel = SendMessage(hcombo, CB_GETCURSEL, 0, 0);
-			if(sel != CB_ERR){
-				SendMessage(hcombo, CB_DELETESTRING, sel, 0);
-				_this->m_pMRU->RemoveItem(sel);
-			}
-			return TRUE;
 		}
 
 		break;
@@ -604,128 +301,330 @@ BOOL CALLBACK SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam, LPARAM lParam
 	return 0;
 }
 
-
-//
-//  Set the Quick Option Radio button, depending on the current QuickOption
-//
-int SessionDialog::SetQuickOption(SessionDialog* p_SD, HWND hwnd)
+void SessionDialog::ExpandBox(HWND hDlg, BOOL fExpand)
 {
-	HWND hDyn = GetDlgItem(hwnd, IDC_DYNAMIC);
-	SendMessage(hDyn, BM_SETCHECK, false, 0);
-	HWND hLan = GetDlgItem(hwnd, IDC_LAN_RB);
-	SendMessage(hLan, BM_SETCHECK, false, 0);
-	HWND hUltraLan = GetDlgItem(hwnd, IDC_ULTRA_LAN_RB);
-	SendMessage(hUltraLan, BM_SETCHECK, false, 0);
-	HWND hMedium = GetDlgItem(hwnd, IDC_MEDIUM_RB);
-	SendMessage(hMedium, BM_SETCHECK, false, 0);
-	HWND hModem = GetDlgItem(hwnd, IDC_MODEM_RB);
-	SendMessage(hModem, BM_SETCHECK, false, 0);
-	HWND hSlow = GetDlgItem(hwnd, IDC_SLOW_RB);
-	SendMessage(hSlow, BM_SETCHECK, false, 0);
-	HWND hManual = GetDlgItem(hwnd, IDC_MANUAL);
-	SendMessage(hManual, BM_SETCHECK, false, 0);
+	// if the dialog is already in the requested state, return
+	// immediately.
+	if (fExpand == m_bExpanded) return;
 
-	// sf@2002 - Select Modem Option as default
-	switch (p_SD->m_pOpt->m_quickoption)
+	RECT rcWnd, rcDefaultBox, rcChild, rcIntersection;
+	HWND wndChild=NULL;
+	HWND wndDefaultBox=NULL;
+	
+	// get the window of the button 
+	HWND  pCtrl = GetDlgItem(hDlg, IDC_SHOWOPTIONS);
+	if (pCtrl==NULL) return;
+
+	wndDefaultBox = GetDlgItem(hDlg, IDC_DEFAULTBOX);
+	if (wndDefaultBox==NULL) return;
+
+	if (!fExpand) SendMessage(GetDlgItem(hDlg, IDC_EXPAND), STM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)hBmpExpand);
+	else SendMessage(GetDlgItem(hDlg, IDC_EXPAND), STM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)hBmpCollaps);
+	// retrieve coordinates for the default child window
+	GetWindowRect(wndDefaultBox, &rcDefaultBox);
+
+	// enable/disable all of the child window outside of the default box.
+	wndChild = GetTopWindow(hDlg);
+
+	for ( ; wndChild != NULL; wndChild = GetWindow(wndChild, GW_HWNDNEXT))
 	{
-	case 1: // AUTO
-		{
-		HWND hDyn = GetDlgItem(hwnd, IDC_DYNAMIC);
-		SendMessage(hDyn, BM_SETCHECK, true, 0);
-		}
-		break;
+		// get rectangle occupied by child window in screen coordinates.
+		GetWindowRect(wndChild, &rcChild);
 
-	case 2: // LAN
+		if (!IntersectRect(&rcIntersection, &rcChild,&rcDefaultBox))
 		{
-		HWND hLan = GetDlgItem(hwnd, IDC_LAN_RB);
-		SendMessage(hLan, BM_SETCHECK, true, 0);
+			EnableWindow(wndChild, fExpand);
 		}
-		break;
-	case 3: // MEDIUM
-		{
-		HWND hMedium = GetDlgItem(hwnd, IDC_MEDIUM_RB);
-		SendMessage(hMedium, BM_SETCHECK, true, 0);
-		}
-		break;
-	case 4: // MODEM
-		{
-		HWND hModem = GetDlgItem(hwnd, IDC_MODEM_RB);
-		SendMessage(hModem, BM_SETCHECK, true, 0);
-		}
-		break;
-	case 5: // SLOW
-		{
-		HWND hSlow = GetDlgItem(hwnd, IDC_SLOW_RB);
-		SendMessage(hSlow, BM_SETCHECK, true, 0);
-		}
-		break;
-	case 7: // LAN
-		{
-		HWND hUltraLan = GetDlgItem(hwnd, IDC_ULTRA_LAN_RB);
-		SendMessage(hUltraLan, BM_SETCHECK, true, 0);
-		}
-		break;
-	default: // MANUAL
-		{
-		HWND hManual = GetDlgItem(hwnd, IDC_MANUAL);
-		SendMessage(hManual, BM_SETCHECK, true, 0);
-		}
-		break;
-	/*
-	case 6: // BUSY
-		{
-		HWND hBusy = GetDlgItem(hwnd, IDC_BUSY_RB);
-		SendMessage(hBusy, BM_SETCHECK, true, 0);
-		}
-		break;
-	*/
 	}
-	return 0;
+
+	if (!fExpand)  // we are contracting
+	{
+		_ASSERT(m_bExpanded);
+		GetWindowRect(hDlg, &rcWnd);
+		
+		// this is the first time we are being called to shrink the dialog
+		// box.  The dialog box is currently in its expanded size and we must
+		// save the expanded width and height so that it can be restored
+		// later when the dialog box is expanded.
+
+		if (cx ==0 && cy == 0)
+		{
+			cx = rcDefaultBox.right - rcWnd.left;
+			cy = rcWnd.bottom - rcWnd.top;
+
+			// we also hide the default box here so that it is not visible
+			ShowWindow(wndDefaultBox, SW_HIDE);
+		}
+		
+
+		// shrink the dialog box so that it encompasses everything from the top,
+		// left up to and including the default box.
+		SetWindowPos(hDlg, NULL,0,0,
+			rcDefaultBox.right - rcWnd.left, 
+			rcDefaultBox.bottom - rcWnd.top,
+			SWP_NOZORDER|SWP_NOMOVE);
+
+		SetWindowText(pCtrl, "Show Options");
+
+		// record that the dialog is contracted.
+		m_bExpanded = FALSE;
+	}
+	else // we are expanding
+	{
+		_ASSERT(!m_bExpanded);
+		SetWindowPos(hDlg, NULL,0,0,cx,cy,SWP_NOZORDER|SWP_NOMOVE);
+
+		// make sure that the entire dialog box is visible on the user's
+		// screen.
+		SendMessage(hDlg, DM_REPOSITION,0,0);
+		SetWindowText(pCtrl, "Hide Options");
+		m_bExpanded = TRUE;
+	}
 }
 
-
-//
-//  Get the selected Quick Option and set the parameters consequently
-// 
-int SessionDialog::ManageQuickOptions(SessionDialog* _this, HWND hwnd)
+void SessionDialog::InitPlugin(HWND hwnd)
 {
-	// Auto Mode
-	HWND hDynamic = GetDlgItem(hwnd, IDC_DYNAMIC);
-	if ((SendMessage(hDynamic, BM_GETCHECK, 0, 0) == BST_CHECKED))
-		_this->m_pOpt->m_quickoption = 1;
+				// sf@2002 - List available DSM Plugins
+			HWND hPlugins = GetDlgItem(hwnd, IDC_PLUGINS_COMBO);
+			int nPlugins = m_pDSMPlugin->ListPlugins(hPlugins);
+			if (!nPlugins)
+			{
+				SendMessage(hPlugins, CB_ADDSTRING, 0, (LPARAM) sz_F11);
+			}
 
-	// Options for LAN Mode
-	HWND hUltraLan = GetDlgItem(hwnd, IDC_ULTRA_LAN_RB);
-	if ((SendMessage(hUltraLan, BM_GETCHECK, 0, 0) == BST_CHECKED))
-		_this->m_pOpt->m_quickoption = 7;
+			SendMessage(hPlugins, CB_SETCURSEL, 0, 0);
 
-	// Options for LAN Mode
-	HWND hLan = GetDlgItem(hwnd, IDC_LAN_RB);
-	if ((SendMessage(hLan, BM_GETCHECK, 0, 0) == BST_CHECKED))
-		_this->m_pOpt->m_quickoption = 2;
+			HWND hButton = GetDlgItem(hwnd, IDC_PLUGIN_BUTTON);
+			EnableWindow(hButton, FALSE); // sf@2009 - Disable plugin config button by default
 
-	// Options for Medium Mode
-	HWND hMedium = GetDlgItem(hwnd, IDC_MEDIUM_RB);
-	if ((SendMessage(hMedium, BM_GETCHECK, 0, 0) == BST_CHECKED))
-		_this->m_pOpt->m_quickoption = 3;
+			//AaronP
+			if( strcmp( szDSMPluginFilename, "" ) != 0 && fUseDSMPlugin )
+			{ 
+				int pos = SendMessage(hPlugins, CB_FINDSTRINGEXACT, -1,
+					(LPARAM)&(szDSMPluginFilename[0]));
 
-	// Options for Modem Mode 
-	HWND hModem = GetDlgItem(hwnd, IDC_MODEM_RB);
-	if ((SendMessage(hModem, BM_GETCHECK, 0, 0) == BST_CHECKED))
-		_this->m_pOpt->m_quickoption = 4;
+				if( pos != CB_ERR )
+				{
+					SendMessage(hPlugins, CB_SETCURSEL, pos, 0);
+					HWND hUsePlugin = GetDlgItem(hwnd, IDC_PLUGIN_CHECK);
+					SendMessage(hUsePlugin, BM_SETCHECK, TRUE, 0);
+					EnableWindow(hButton, TRUE); // sf@2009 - Enable plugin config button
+				}
+			}
+			//EndAaron
+}
 
-	// Options for Slow Mode
-	HWND hLow = GetDlgItem(hwnd, IDC_SLOW_RB);
-	if ((SendMessage(hLow, BM_GETCHECK, 0, 0) == BST_CHECKED))
-		_this->m_pOpt->m_quickoption = 5;
+void SessionDialog::InitDlgProc(bool loadhost)
+{	
+	HWND hwnd = SessHwnd;	
+	if (strcmp(m_proxyhost,"")!=NULL)
+		SetDlgItemText(hwnd, IDC_PROXY_EDIT, m_proxyhost);
+	HWND hProxy = GetDlgItem(hwnd, IDC_PROXY_CHECK);
+			SendMessage(hProxy, BM_SETCHECK, m_fUseProxy, 0);
+	if (!setdefaults) {
+		if (loadhost && (m_pCC->m_port != 0 || strlen(m_pCC->m_host) != 0)) {		
+			TCHAR szHost[250];
+			if (m_pCC->m_port == 5900)
+				_tcscpy(szHost, m_pCC->m_host);
+			else if (m_pCC->m_port > 5900 && m_pCC->m_port <= 5999)
+				_snprintf(szHost, 250, TEXT("%s:%d"), m_pCC->m_host, m_pCC->m_port - 5900);
+			else
+				_snprintf(szHost, 250, TEXT("%s::%d"), m_pCC->m_host, m_pCC->m_port);
+			SetDlgItemText(hwnd, IDC_HOSTNAME_EDIT, szHost);
+		}
+		else 
+			InitMRU(hwnd);
+	}
 
-	// Options for Manual
-	HWND hManual = GetDlgItem(hwnd, IDC_MANUAL);
-	if ((SendMessage(hManual, BM_GETCHECK, 0, 0) == BST_CHECKED))
-		_this->m_pOpt->m_quickoption = 8;
+	HFONT font = CreateFont(
+      24,                        // nHeight
+      0,                         // nWidth
+      0,                         // nEscapement
+      0,                         // nOrientation
+      FW_BOLD,                 // nWeight
+      TRUE,                     // bItalic
+      FALSE,                     // bUnderline
+      0,                         // cStrikeOut
+      ANSI_CHARSET,              // nCharSet
+      OUT_DEFAULT_PRECIS,        // nOutPrecision
+      CLIP_DEFAULT_PRECIS,       // nClipPrecision
+      DEFAULT_QUALITY,           // nQuality
+      DEFAULT_PITCH | FF_SWISS,  // nPitchAndFamily
+      _T("Arial"));                 // lpszFacename
 
-	// Set the params depending on the selected QuickOption
-	_this->m_pCC->HandleQuickOption();
+	  SendMessage(GetDlgItem(hwnd, IDC_LOGO), WM_SETFONT, (WPARAM)font, TRUE);
+}
 
-	return 0;
+void SessionDialog::InitMRU(HWND hwnd)
+{
+	// Set up recently-used list
+    HWND hcombo = GetDlgItem(  hwnd, IDC_HOSTNAME_EDIT);
+    TCHAR valname[256];
+	SendMessage(hcombo, CB_RESETCONTENT, 0, 0);
+    for (int i = 0; i < m_pMRU->NumItems(); i++) {
+		m_pMRU->GetItem(i, valname, 255);
+		if (strlen(valname) != 0)
+			SendMessage(hcombo, CB_ADDSTRING, 0, (LPARAM) valname);
+	}
+    SendMessage(hcombo, CB_SETCURSEL, 0, 0);
+
+	m_pMRU->GetItem(0, valname, 255);					
+	IfHostExistLoadSettings(valname);
+}
+
+void SessionDialog::InitMonitors(HWND hwnd)
+{
+	//List monitors
+	tempdisplayclass tdc;
+	tdc.Init();
+	HWND hcomboscreen = GetDlgItem(  hwnd, IDC_SCREEN);
+	SendMessage(hcomboscreen, CB_RESETCONTENT, 0, 0);
+    for (int i = 0; i < tdc.nr_monitors+1; i++) 
+		SendMessage(hcomboscreen, CB_ADDSTRING, 0, (LPARAM) tdc.monarray[i].buttontext);
+	SendMessage(hcomboscreen, CB_SETCURSEL, selected, 0);
+}
+
+bool SessionDialog::connect(HWND hwnd)
+{
+	SettingsFromUI();
+	for (int i = rfbEncodingRaw; i <= LASTENCODING; i++) {
+		m_pOpt->m_UseEnc[i] = UseEnc[i];
+	}
+
+	m_pOpt->m_PreferredEncodings.clear();
+	for (int i=0; i<PreferredEncodings.size(); i++) 
+        m_pOpt->m_PreferredEncodings.push_back(PreferredEncodings[i]); 
+
+	m_pOpt->autoDetect = autoDetect;
+	m_pOpt->m_fExitCheck = fExitCheck;
+	m_pOpt->m_fUseProxy = m_fUseProxy;
+	m_pOpt->m_selected_screen = selected;
+	m_pOpt->m_SwapMouse = SwapMouse;
+	m_pOpt->m_DisableClipboard = DisableClipboard;
+	m_pOpt->m_Use8Bit = Use8Bit;
+	m_pOpt->m_Shared = Shared;
+	m_pOpt->m_running = running;
+	m_pOpt->m_ViewOnly = ViewOnly;
+	m_pOpt->m_ShowToolbar = ShowToolbar;
+	m_pOpt->m_fAutoScaling = fAutoScaling;
+	m_pOpt->m_scale_num = scale_num;
+	m_pOpt->m_scale_den = scale_den;
+	m_pOpt->m_nServerScale = nServerScale;
+	m_pOpt->m_reconnectcounter = reconnectcounter;
+	m_pOpt->m_autoReconnect = autoReconnect;
+	m_pOpt->m_FTTimeout = FTTimeout;
+	m_pOpt->m_listenPort = listenport;
+	m_pOpt->m_fEnableCache = fEnableCache;
+	m_pOpt->m_useCompressLevel = useCompressLevel;
+	m_pOpt->m_enableJpegCompression = enableJpegCompression;
+	m_pOpt->m_compressLevel = compressLevel;
+	m_pOpt->m_jpegQualityLevel = jpegQualityLevel;
+	m_pOpt->m_throttleMouse = throttleMouse;
+	m_pOpt->m_requestShapeUpdates = requestShapeUpdates;
+	m_pOpt->m_ignoreShapeUpdates = ignoreShapeUpdates;
+	m_pOpt->m_Emul3Buttons = Emul3Buttons;
+	m_pOpt->m_JapKeyboard = JapKeyboard;
+	m_pOpt->m_quickoption = quickoption;
+	m_pOpt->m_preemptiveUpdates = preemptiveUpdates;
+	m_pOpt->m_FullScreen = FullScreen;
+	m_pOpt->m_Directx = Directx;
+	m_pOpt->m_SavePos = SavePos;
+	m_pOpt->m_SaveSize = SaveSize;
+	m_pOpt->m_fUseDSMPlugin = fUseDSMPlugin;
+	strcpy( m_pOpt->m_szDSMPluginFilename, szDSMPluginFilename);
+	m_pOpt->m_listening = listening;
+	m_pOpt->m_oldplugin = oldplugin;
+	strcpy(m_pOpt->m_document_folder, folder);
+	strcpy(m_pOpt->m_prefix, prefix);
+	m_pOpt->m_scaling = scaling;
+	m_pOpt->m_keepAliveInterval = keepAliveInterval;
+	m_pOpt->m_fAutoAcceptIncoming = fAutoAcceptIncoming;
+	m_pOpt->m_fAutoAcceptNoDSM =fAutoAcceptNoDSM;
+	m_pOpt->m_fRequireEncryption = fRequireEncryption;
+	m_pOpt->m_restricted = restricted;
+	m_pOpt->m_NoStatus = NoStatus;
+	m_pOpt->m_NoHotKeys = NoHotKeys;
+
+
+	HWND hPlugin = GetDlgItem(hwnd, IDC_PLUGIN_CHECK);
+	if (SendMessage(hPlugin, BM_GETCHECK, 0, 0) == BST_CHECKED){
+		TCHAR szPlugin[MAX_PATH];
+		GetDlgItemText(hwnd, IDC_PLUGINS_COMBO, szPlugin, MAX_PATH);
+		fUseDSMPlugin = true;
+		strcpy(szDSMPluginFilename, szPlugin);
+		if (!m_pDSMPlugin->IsLoaded()){
+			m_pDSMPlugin->LoadPlugin(szPlugin, listening);
+			if (m_pDSMPlugin->IsLoaded()){
+				if (m_pDSMPlugin->InitPlugin()){
+					if (!m_pDSMPlugin->SupportsMultithreaded())
+						oldplugin=true; //PGM
+					else //PGM
+						oldplugin=false;
+					m_pDSMPlugin->SetEnabled(true);
+					m_pDSMPlugin->DescribePlugin();
+				}
+				else{
+					m_pDSMPlugin->SetEnabled(false);
+					MessageBox(hwnd, sz_F7, sz_F6, MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TOPMOST);
+					return TRUE;
+					}
+			}
+			else{
+				m_pDSMPlugin->SetEnabled(false);
+				MessageBox(hwnd, sz_F5, sz_F6, MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TOPMOST);
+				return TRUE;
+			}
+		}
+		else {
+			// sf@2003 - If the plugin is already loaded here it has been loaded
+			// by clicking on the config button: we need to init it !
+			// But we must first check that the loaded plugin is the same that 
+			// the one currently selected...
+			m_pDSMPlugin->DescribePlugin();
+			if (_stricmp(m_pDSMPlugin->GetPluginFileName(), szPlugin)){
+				// Unload the previous plugin
+				m_pDSMPlugin->UnloadPlugin();
+				// Load the new selected one
+				m_pDSMPlugin->LoadPlugin(szPlugin, listening);
+			}
+			if (m_pDSMPlugin->IsLoaded()){
+				if (m_pDSMPlugin->InitPlugin()){
+					if (!m_pDSMPlugin->SupportsMultithreaded())
+						oldplugin=true; //PGM
+					else //PGM
+						oldplugin=false;
+					m_pDSMPlugin->SetEnabled(true);
+					m_pDSMPlugin->DescribePlugin();
+				}
+				else{
+					m_pDSMPlugin->SetEnabled(false);
+					MessageBox(hwnd, sz_F7, sz_F6, MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TOPMOST);
+					return TRUE;
+				}
+			}
+			else{
+				m_pDSMPlugin->SetEnabled(false);
+				MessageBox(hwnd, sz_F5, sz_F6, MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TOPMOST);
+				return TRUE;
+			}
+		}
+	}
+	else { // If Use plugin unchecked but the plugin is loaded, unload it
+		fUseDSMPlugin = false;
+		if (m_pDSMPlugin->IsEnabled()) {
+			m_pDSMPlugin->UnloadPlugin();
+			m_pDSMPlugin->SetEnabled(false);
+		}
+	}
+
+	TCHAR hostname[256];
+	GetDlgItemText(hwnd, IDC_HOSTNAME_EDIT, hostname, 256);
+	m_pMRU->AddItem(hostname);
+
+	if (m_fFromOptions || m_fFromFile) {
+		EndDialog(hwnd, TRUE);
+		return TRUE;
+	}
+	EndDialog(hwnd, TRUE);
+	return TRUE;
 }

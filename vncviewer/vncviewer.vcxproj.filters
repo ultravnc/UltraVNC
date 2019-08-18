@@ -186,6 +186,51 @@
     <None Include="LICENCE.txt" />
     <None Include="ToDo.txt" />
     <None Include="VTune\vncviewer.vpj" />
+    <None Include="stat\1op1.bmp">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="stat\full.bmp">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="stat\photo.bmp">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="stat\switch.bmp">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="res\stat\1op1.bmp">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="res\stat\full.bmp">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="res\stat\photo.bmp">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="res\stat\switch.bmp">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="res\stat\bitmap1.bmp">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="down.bmp">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="up.bmp">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="res\down.bmp">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="res\up.bmp">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="stat\logo.bmp">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="res\stat\logo.bmp">
+      <Filter>Resources</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AboutBox.cpp">
@@ -332,6 +377,18 @@
     <ClCompile Include="ClientConnectionUltra2.cpp">
       <Filter>sources</Filter>
     </ClCompile>
+    <ClCompile Include="Snapshot.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Snapshot.cpp" />
+    <ClCompile Include="SessionDialogTabs.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Snapshot.cpp" />
+    <ClCompile Include="sessiondialogLoadSave.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Snapshot.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AboutBox.h">
@@ -439,6 +496,18 @@
     <ClInclude Include="display.h">
       <Filter>sources</Filter>
     </ClInclude>
+    <ClInclude Include="FpsCounter.h">
+      <Filter>sources</Filter>
+    </ClInclude>
+    <ClInclude Include="Snapshot.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Snapshot.h" />
+    <ClInclude Include="SessionDialogTabs.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Snapshot.h" />
+    <ClInclude Include="Snapshot.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="res\vncviewer.rc">

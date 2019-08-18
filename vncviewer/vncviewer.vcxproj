@@ -290,12 +290,16 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="down.bmp" />
     <None Include="res\B46.ico" />
+    <None Include="res\down.bmp" />
+    <None Include="res\stat\1op1.bmp" />
     <None Include="res\stat\back.bmp" />
     <None Include="res\background2.bmp" />
     <None Include="res\stat\background2.bmp" />
     <None Include="res\bitmap1.bmp" />
     <None Include="res\bitmap2.bmp" />
+    <None Include="res\stat\bitmap1.bmp" />
     <None Include="res\stat\bitmap4.bmp" />
     <None Include="res\stat\bitmap5.bmp" />
     <None Include="res\stat\bitmap8.bmp" />
@@ -315,14 +319,24 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
     <None Include="res\idr_tray_disabled.ico" />
     <None Include="res\l1.bmp" />
     <None Include="res\l2.bmp" />
+    <None Include="res\stat\full.bmp" />
+    <None Include="res\stat\logo.bmp" />
     <None Include="res\stat\mainicon.ico" />
     <None Include="res\stat\maximizeup.bmp" />
     <None Include="res\stat\minimizeup.bmp" />
     <None Include="res\nocursor.cur" />
     <None Include="res\stat\none.bmp" />
+    <None Include="res\stat\photo.bmp" />
     <None Include="res\stat\pindown.bmp" />
     <None Include="res\stat\pinup.bmp" />
     <None Include="res\quer.bmp" />
+    <None Include="res\stat\switch.bmp" />
+    <None Include="res\up.bmp" />
+    <None Include="stat\1op1.bmp" />
+    <None Include="stat\full.bmp" />
+    <None Include="stat\logo.bmp" />
+    <None Include="stat\photo.bmp" />
+    <None Include="stat\switch.bmp" />
     <None Include="Tango_l.bmp" />
     <None Include="res\Tango_l.bmp" />
     <None Include="res\Tango_lx.bmp" />
@@ -349,6 +363,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
     <None Include="History.txt" />
     <None Include="LICENCE.txt" />
     <None Include="ToDo.txt" />
+    <None Include="up.bmp" />
     <None Include="VTune\vncviewer.vpj" />
   </ItemGroup>
   <ItemGroup>
@@ -616,6 +631,9 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="sessiondialogLoadSave.cpp" />
+    <ClCompile Include="SessionDialogTabs.cpp" />
+    <ClCompile Include="Snapshot.cpp" />
     <ClCompile Include="KeyMap.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -783,6 +801,8 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
     <ClInclude Include="FpsCounter.h" />
     <ClInclude Include="FullScreenTitleBar.h" />
     <ClInclude Include="FullScreenTitleBarConst.h" />
+    <ClInclude Include="SessionDialogTabs.h" />
+    <ClInclude Include="Snapshot.h" />
     <ClInclude Include="KeyMap.h" />
     <ClInclude Include="KeyMapjap.h" />
     <ClInclude Include="keysymdef.h" />

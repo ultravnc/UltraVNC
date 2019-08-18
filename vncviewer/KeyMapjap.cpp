@@ -232,9 +232,6 @@ KeyActionSpec KeyMapJap::PCtoX(UINT virtkey, DWORD keyData) {
 		
 		// Under CE, we're not so concerned about this bit because we handle a WM_CHAR message later
 
-
-#ifndef UNDER_CE
-
         // we try a simple conversion to Ascii, using the current keyboard mapping
 		::GetKeyboardState(keystate);
 
@@ -334,7 +331,6 @@ KeyActionSpec KeyMapJap::PCtoX(UINT virtkey, DWORD keyData) {
                 }
             }
         }
-#endif
 
     }
 

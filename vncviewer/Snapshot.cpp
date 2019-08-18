@@ -8,6 +8,7 @@
 #include <sstream>
 #include "common/win32_helpers.h"
 #include <GdiPlus.h>
+
 #pragma comment( lib, "gdiplus" )
 
 static int CALLBACK BrowseCallbackProc(HWND hwnd,UINT uMsg, LPARAM lParam, LPARAM lpData)
@@ -23,11 +24,11 @@ static int CALLBACK BrowseCallbackProc(HWND hwnd,UINT uMsg, LPARAM lParam, LPARA
     return 0;
 }
 
-TCHAR * BrowseFolder(std::string saved_path, HWND hwnd)
+TCHAR * BrowseFolder(TCHAR * saved_path, HWND hwnd)
 {
     TCHAR path[MAX_PATH];
 
-    const char * path_param = saved_path.c_str();
+    const char * path_param = saved_path;
 
     BROWSEINFO bi = { 0 };
     bi.lpszTitle  = ("Browse for folder...");
@@ -52,9 +53,8 @@ TCHAR * BrowseFolder(std::string saved_path, HWND hwnd)
         }
         return path;
     }
-    return "";
+    return  saved_path;
 }
-
 std::string datetime()
 {
     time_t rawtime;
@@ -74,7 +74,7 @@ void Snapshot::SaveJpeg(HBITMAP membit,TCHAR folder[MAX_PATH], TCHAR prefix[56])
 	_tcscpy_s(m_folder,  folder);
 	_tcscpy_s(m_prefix,  prefix);
 	if (strlen(m_folder) == 0 || strlen(m_prefix) == 0)
-		DoDialog(m_folder, m_prefix);
+		DoDialogSnapshot(m_folder, m_prefix);
 
 	TCHAR filename[MAX_PATH];
 	_tcscpy_s(filename, m_folder);
@@ -142,7 +142,7 @@ Snapshot::~Snapshot()
 {
 }
 
-int Snapshot::DoDialog(TCHAR folder[MAX_PATH], TCHAR prefix[56])
+int Snapshot::DoDialogSnapshot(TCHAR folder[MAX_PATH], TCHAR prefix[56])
 {
 	_tcscpy_s(m_folder,  folder);
 	_tcscpy_s(m_prefix,  prefix);
@@ -172,10 +172,6 @@ BOOL CALLBACK Snapshot::DlgProc(  HWND hwnd,  UINT uMsg,
 					_this->m_folder, 256);
 				res= GetDlgItemText( hwnd,  IDC_PREFIX,
 					_this->m_prefix, 256);
-				char optionfile[MAX_PATH];
-				VNCOptions::GetDefaultOptionsFileName(optionfile);
-				WritePrivateProfileString("options", "folder", _this->m_folder, optionfile);
-				WritePrivateProfileString("options", "prefix", _this->m_prefix, optionfile);
 				EndDialog(hwnd, TRUE);
 				return TRUE;
 			}

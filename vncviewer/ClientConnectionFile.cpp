@@ -132,62 +132,38 @@ void ClientConnection::Save_Latest_Connection()
 	vnclog.Print(2, _T("Saving connection info\n"));
 	// don't save in case of .vnc file
 	if (config_specified) return;
-	char fname[_MAX_PATH];
-//	char tname[_MAX_FNAME + _MAX_EXT];
-	ofnInit();
-	char optionfile[MAX_PATH];
-    VNCOptions::GetDefaultOptionsFileName(optionfile);
-
-	sprintf(fname, optionfile);
-	vnclog.Print(1, "Saving to %s\n", fname);	
-
-	int ret = WritePrivateProfileString("connection", "host", m_host, fname);
+	//ofnInit();
+	vnclog.Print(1, "Saving to %s\n", m_opts.getDefaultOptionsFileName());	
+	int ret = WritePrivateProfileString("connection", "host", m_host, m_opts.getDefaultOptionsFileName());
 	char buf[32];
 	sprintf(buf, "%d", m_port);
-	WritePrivateProfileString("connection", "port", buf, fname);
-
-	ret = WritePrivateProfileString("connection", "proxyhost", m_proxyhost, fname);
+	WritePrivateProfileString("connection", "port", buf, m_opts.getDefaultOptionsFileName());
+	ret = WritePrivateProfileString("connection", "proxyhost", m_proxyhost, m_opts.getDefaultOptionsFileName());
 	sprintf(buf, "%d", m_proxyport);
-	WritePrivateProfileString("connection", "proxyport", buf, fname);
+	WritePrivateProfileString("connection", "proxyport", buf, m_opts.getDefaultOptionsFileName());
 	buf[0] = '\0';
+	m_opts.Save(m_opts.getDefaultOptionsFileName());
 
-	//WritePrivateProfileString("connection", "password", buf, fname);
-	m_opts.Save(fname);
-	//m_opts.Register();
 }
 
 // returns zero if successful
 int ClientConnection::LoadConnection(char *fname, bool fFromDialog)
 {
 	// The Connection Profile ".vnc" has been required from Connection Session Dialog Box
-	if (fFromDialog)
-	{
+	if (fFromDialog) {
 		char tname[_MAX_FNAME + _MAX_EXT];
 		ofnInit();
 		ofn.hwndOwner = m_hSessionDialog;
 		ofn.lpstrFile = fname;
 		ofn.lpstrFileTitle = tname;
 		ofn.Flags = OFN_HIDEREADONLY;
-
-		// Open the FileSelection Dialog boxq
 		if (GetOpenFileName(&ofn) == 0)
 			return -1;
 	}
 
-	if (GetPrivateProfileString("connection", "host", "", m_host, MAX_HOST_NAME_LEN, fname) == 0) {
-		//AaronP
-//		MessageBox(m_hwnd, sz_K5, sz_K6, MB_ICONERROR | MB_OK | MB_SETFOREGROUND | MB_TOPMOST);
-//		return -1;
-		//EndAaronP
-	}
+	GetPrivateProfileString("connection", "host", "", m_host, MAX_HOST_NAME_LEN, fname);
 	if ( (m_port = GetPrivateProfileInt("connection", "port", 0, fname)) == 0)
-	{
-		//
-		//MessageBox(m_hwnd, sz_K7, sz_K6, MB_ICONERROR | MB_OK | MB_SETFOREGROUND | MB_TOPMOST);
-		// in case options.vnc does not exist return to normal menu
 		return -1;
-	}
-
 	GetPrivateProfileString("connection", "proxyhost", "", m_proxyhost, MAX_HOST_NAME_LEN, fname);
 	m_proxyport = GetPrivateProfileInt("connection", "proxyport", 0, fname);
     m_fUseProxy = GetPrivateProfileInt("options", "UseProxy", 0, fname) ? true : false;
@@ -201,20 +177,10 @@ int ClientConnection::LoadConnection(char *fname, bool fFromDialog)
 			m_encPasswd[i] = (unsigned char) x;
 		}
 	}
-
-	// The Connection Profile ".vnc" has been required from Connection Session Dialog Box
-	// Load the rest of params
-	char optionfile[MAX_PATH];
-    VNCOptions::GetDefaultOptionsFileName(optionfile);
 	
 	if (fFromDialog)
-	{
 		m_opts.Load(fname);
-		//m_opts.Register();
-	}
-	//AaronP
-	else if (strcmp(m_host, "") == 0 || strcmp(fname,optionfile)==0 )//|| config_specified)
-	{
+	else if (strcmp(m_host, "") == 0 || strcmp(fname, m_opts.getDefaultOptionsFileName())==0 ) {
 		// Load the rest of params 
 		strcpy(m_opts.m_proxyhost,m_proxyhost);
 		m_opts.m_proxyport=m_proxyport;
@@ -224,25 +190,19 @@ int ClientConnection::LoadConnection(char *fname, bool fFromDialog)
 		// Then display the session dialog to get missing params again
 		SessionDialog sessdlg(&m_opts, this, m_pDSMPlugin); //sf@2002
 		if (!sessdlg.DoDialog())
-		{
 			throw QuietException("");
-		}
 		_tcsncpy(m_host, sessdlg.m_host_dialog, MAX_HOST_NAME_LEN);
-		m_port = sessdlg.m_port;
-	
+		m_port = sessdlg.m_port;	
 		_tcsncpy(m_proxyhost, sessdlg.m_proxyhost, MAX_HOST_NAME_LEN);
 		m_proxyport = sessdlg.m_proxyport;
 		m_fUseProxy = sessdlg.m_fUseProxy;
 
 	}
-	else if (config_specified)
-	{
+	else if (config_specified) {
 		strcpy(m_opts.m_proxyhost,m_proxyhost);
 		m_opts.m_proxyport=m_proxyport;
 		m_opts.m_fUseProxy=m_fUseProxy;
 		m_opts.Load(fname);
-		//m_opts.Register();
 	}
-	//EndAaronP
 	return 0;
 }

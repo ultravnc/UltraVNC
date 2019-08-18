@@ -71,45 +71,24 @@ void ClientConnection::SetFullScreenMode(bool enable)
 
 // If the options have been changed other than by calling 
 // SetFullScreenMode, you need to call this to make it happen.
-void ofnInit();
+//void ofnInit();
 void ClientConnection::RealiseFullScreenMode()
 {
-	if (m_opts.m_NoBorder)
-	{
+	if (m_opts.m_NoBorder) {
 		BorderlessMode();
 		return;
 	}
 
 	LONG style = GetWindowLong(m_hwndMain, GWL_STYLE);
 	if (m_opts.m_FullScreen) {
-
 		// A bit crude here - we can skip the prompt on a registry setting.
 		// We'll do this properly later.
 		DWORD skipprompt = 0;
 
-		{
-			char fname[_MAX_PATH];
-			ofnInit();
-			char optionfile[MAX_PATH];
-			VNCOptions::GetDefaultOptionsFileName(optionfile);
-			sprintf(fname, optionfile);
-			vnclog.Print(1, "Saving to %s\n", fname);
-			skipprompt = 0;
-			skipprompt = GetPrivateProfileInt("connection", "SkipFullScreenPrompt", skipprompt, fname);
-		}
-
-
-		/*if ( RegCreateKey(HKEY_CURRENT_USER, SETTINGS_KEY_NAME, &hRegKey)  != ERROR_SUCCESS ) {
-	        hRegKey = NULL;
-		} else {
-			DWORD skippromptsize = sizeof(skipprompt);
-			DWORD valtype;	
-			if ( RegQueryValueEx( hRegKey,  "SkipFullScreenPrompt", NULL, &valtype, 
-				(LPBYTE) &skipprompt, &skippromptsize) != ERROR_SUCCESS) {
-				skipprompt = 0;
-			}
-			RegCloseKey(hRegKey);
-		}*/
+		//ofnInit();
+		vnclog.Print(1, "Saving to %s\n", m_opts.getDefaultOptionsFileName());
+		skipprompt = 0;
+		skipprompt = GetPrivateProfileInt("connection", "SkipFullScreenPrompt", skipprompt, m_opts.getDefaultOptionsFileName());
 		
 		skipprompt = 1; //sf@2004 - This prompt isn't needed any more now that we have
 						// the fullscreen title bar :) Thanks Lars !
@@ -119,20 +98,11 @@ void ClientConnection::RealiseFullScreenMode()
 				sz_J2,
 				MB_OK | MB_ICONINFORMATION | MB_TOPMOST | MB_SETFOREGROUND);
 
-		/* Does not work yet
-		// Used by VNCon - Copyright (C) 2001-2003 - Alastair Burr
-		//ShowWindow(m_hwnd, SW_HIDE);
-		*/
 		ShowWindow(m_hwndMain, SW_MAXIMIZE);
 
 		style = GetWindowLong(m_hwndMain, GWL_STYLE);
 		style &= ~(WS_CAPTION | WS_DLGFRAME | WS_THICKFRAME);
 		SetWindowLong(m_hwndMain, GWL_STYLE, style);
-		/* Does not work yet
-		// Used by VNCon - Copyright (C) 2001-2003 - Alastair Burr
-		// int cx = this->m_hScrollMax;
-		// int cy = this->m_vScrollMax;
-		*/
 
         // 7 May 2008 jdp
         HMONITOR hMonitor = ::MonitorFromWindow(m_hwndMain, MONITOR_DEFAULTTOPRIMARY);
@@ -149,13 +119,11 @@ void ClientConnection::RealiseFullScreenMode()
 		// adzm - 2010-07 - Extended clipboard
 		CheckMenuItem(m_hPopupMenuDisplay, ID_FULLSCREEN, MF_BYCOMMAND|MF_CHECKED);
 		if (m_opts.m_ShowToolbar)
-		SetWindowPos(m_hwndcn, m_hwndTBwin,0,m_TBr.bottom,m_winwidth, m_winheight, SWP_SHOWWINDOW);
-		else 
-		{
+			SetWindowPos(m_hwndcn, m_hwndTBwin,0,m_TBr.bottom,m_winwidth, m_winheight, SWP_SHOWWINDOW);
+		else  {
 			SetWindowPos(m_hwndcn, m_hwndTBwin,0,0,cx+3, cy+3, SWP_SHOWWINDOW);
 			SetWindowPos(m_hwndTBwin, NULL ,0,0,0, 0, SWP_HIDEWINDOW);
 		}
-
 		TitleBar.DisplayWindow(TRUE, TRUE); //Added by: Lars Werner (http://lars.werner.no)
  		if (m_opts.m_ViewOnly)TitleBar.SetText(m_desktopName_viewonly);
 		else TitleBar.SetText(m_desktopName); //Added by: Lars Werner (http://lars.werner.no)
@@ -168,9 +136,7 @@ void ClientConnection::RealiseFullScreenMode()
 		SetWindowPos(m_hwndMain, HWND_NOTOPMOST, 0,0,100,100, SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED |SWP_NOREDRAW); //Modified by: Lars Werner (http://lars.werner.no) - Reason: Bugfix, The framework got invisible after moving, so a NCCALCSIZE needed to be called!
 		// adzm - 2010-07 - Extended clipboard
 		CheckMenuItem(m_hPopupMenuDisplay, ID_FULLSCREEN, MF_BYCOMMAND|MF_UNCHECKED);
-
 		TitleBar.DisplayWindow(FALSE, TRUE); //Added by: Lars Werner (http://lars.werner.no)
-
 		if (m_hwndStatus)::RedrawWindow(m_hwndStatus, NULL,NULL, RDW_INVALIDATE); //Added by: Lars Werner (http://lars.werner.no) - Reason: The status window is not getting redrawn after a resize.
 	}
 }

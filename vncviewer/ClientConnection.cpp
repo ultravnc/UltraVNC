@@ -613,7 +613,7 @@ void ClientConnection::Run()
 	{
 		LoadDSMPlugin(false);
 		// sf@2003 - Take command line quickoption into account
-		HandleQuickOption();
+		//HandleQuickOption();
 	}
 
 	// add user option on command line
@@ -1290,7 +1290,7 @@ void ClientConnection::GTGBS_CreateToolbar()
 									NULL);
 	TCHAR valname[256];
 	MRU *m_pMRU;
-	m_pMRU = new MRU(SESSION_MRU_KEY_NAME,26);
+	m_pMRU = new MRU(SESSION_MRU_KEY_NAME,98);
 	//adzm 2009-06-21 - show the proxy in the 'recent' box
 	if (m_fUseProxy && strlen(m_proxyhost) > 0) {
 		TCHAR proxyname[MAX_HOST_NAME_LEN];
@@ -1358,7 +1358,7 @@ void ClientConnection::CreateDisplay()
 	//ShowWindow(m_hwnd, SW_HIDE);
 	//ShowWindow(m_hwndcn, SW_SHOW);
 	//adzm 2009-06-21 - let's not show until connected.
-	SetTimer(m_hwndcn, m_fullupdate_timer, 30000, NULL);
+	SetTimer(m_hwndcn, m_fullupdate_timer, 30000, NULL);	
 	// record which client created this window
     helper::SafeSetWindowUserData(m_hwndcn, (LONG_PTR)this);
 
@@ -1763,7 +1763,7 @@ void ClientConnection::HandleQuickOption()
 
 	case 7:
 		m_opts.m_PreferredEncodings.clear();
-		m_opts.m_PreferredEncodings.push_back(rfbEncodingUltra);
+		m_opts.m_PreferredEncodings.push_back(rfbEncodingUltra2);
 		m_opts.m_Use8Bit = rfbPFFullColors; //false; // Max colors
 		m_opts.autoDetect = false;
 		// [v1.0.2-jp2 fix-->]
@@ -1791,38 +1791,23 @@ void ClientConnection::GetConnectDetails()
 	if (m_opts.m_configSpecified) {
 		LoadConnection(m_opts.m_configFilename, false);
 	}
-	else
-	{
-		if (!command_line)
-		{
-            char optionfile[MAX_PATH];
-            VNCOptions::GetDefaultOptionsFileName(optionfile);
-			if (LoadConnection(optionfile, false)==-1)
-				{
-					SessionDialog sessdlg(&m_opts, this, m_pDSMPlugin); //sf@2002
-					if (!sessdlg.DoDialog())
-					{
-						throw QuietException(sz_L42);
-					}
-					_tcsncpy(m_host, sessdlg.m_host_dialog, MAX_HOST_NAME_LEN);
-					m_port = sessdlg.m_port;
-					_tcsncpy(m_proxyhost, sessdlg.m_proxyhost, MAX_HOST_NAME_LEN);
-			//		_tcsncpy(m_remotehost, sessdlg.m_remotehost, MAX_HOST_NAME_LEN);
-					m_proxyport = sessdlg.m_proxyport;
-					m_fUseProxy = sessdlg.m_fUseProxy;
-					if (m_opts.autoDetect)
-					{
-						m_opts.m_Use8Bit = rfbPFFullColors;
-					}
-				}
-		}
-		else
-		{
+	else {
+		if (!command_line && LoadConnection(m_opts.getDefaultOptionsFileName(), false)==-1) {
 			SessionDialog sessdlg(&m_opts, this, m_pDSMPlugin); //sf@2002
 			if (!sessdlg.DoDialog())
-					{
-						throw QuietException(sz_L42);
-					}
+					throw QuietException(sz_L42);
+			_tcsncpy(m_host, sessdlg.m_host_dialog, MAX_HOST_NAME_LEN);
+			m_port = sessdlg.m_port;
+			_tcsncpy(m_proxyhost, sessdlg.m_proxyhost, MAX_HOST_NAME_LEN);
+			m_proxyport = sessdlg.m_proxyport;
+			m_fUseProxy = sessdlg.m_fUseProxy;
+			if (m_opts.autoDetect)
+					m_opts.m_Use8Bit = rfbPFFullColors;				
+		}
+		else {
+			SessionDialog sessdlg(&m_opts, this, m_pDSMPlugin); //sf@2002
+			if (!sessdlg.DoDialog())
+					throw QuietException(sz_L42);
 			_tcsncpy(m_host, sessdlg.m_host_dialog, MAX_HOST_NAME_LEN);
 			m_port = sessdlg.m_port;
 			_tcsncpy(m_proxyhost, sessdlg.m_proxyhost, MAX_HOST_NAME_LEN);
@@ -1830,9 +1815,7 @@ void ClientConnection::GetConnectDetails()
 			m_proxyport = sessdlg.m_proxyport;
 			m_fUseProxy = sessdlg.m_fUseProxy;
 			if (m_opts.autoDetect)
-			{
 				m_opts.m_Use8Bit = rfbPFFullColors;
-			}
 		}
 	}
 	// This is a bit of a hack:
@@ -2920,7 +2903,7 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 	case rfbUltraVNC:
 		new_ultra_server=true;
 		m_fServerKnowsFileTransfer = true;
-		HandleQuickOption();
+		//HandleQuickOption();
 		break;
 	case rfbUltraVNC_SecureVNCPluginAuth_new:
 		if (bSecureVNCPluginActive) {
@@ -3333,16 +3316,9 @@ void ClientConnection::AuthMsLogonII()
 	if ((strlen(m_cmdlnUser)>0)&& (strlen(	m_pApp->m_options.m_clearPassword) > 0) && !m_pApp->m_options.m_NoMoreCommandLineUserPassword)
     {
 		vnclog.Print(0, _T("Command line MS-Logon.\n"));
-#ifndef UNDER_CE
 		strcpy(m_clearPasswd, m_pApp->m_options.m_clearPassword);
 		strncpy(passwd, m_clearPasswd, 64);
 		strncpy(user, m_cmdlnUser, 254);
-		//strncpy(domain, ad.m_domain, 254);
-#else
-		vncWc2Mb(passwd, m_clearPasswd, 64);
-		vncWc2Mb(user, m_cmdlnUser, 256);
-		//vncWc2Mb(domain, ad.m_domain, 256);
-#endif
 		vncEncryptPasswdMs(m_encPasswdMs, passwd);
 		strcpy(m_ms_user, user);
 	}
@@ -3357,15 +3333,8 @@ void ClientConnection::AuthMsLogonII()
 	AuthDialog ad;
 	// adzm 2010-10 - RFB3.8 - the 'mslogon' param woudl always be true here
 	if (ad.DoDialog(true, m_host, m_port, true)) {
-#ifndef UNDER_CE
 		strncpy(passwd, ad.m_passwd, 64);
 		strncpy(user, ad.m_user, 254);
-		//strncpy(domain, ad.m_domain, 254);
-#else
-		vncWc2Mb(passwd, ad.m_passwd, 64);
-		vncWc2Mb(user, ad.m_user, 256);
-		//vncWc2Mb(domain, ad.m_domain, 256);
-#endif
 		vncEncryptPasswdMs(m_encPasswdMs, passwd);
 		strcpy(m_ms_user, user);
 	} else {
@@ -3632,22 +3601,7 @@ void ClientConnection::ReadServerInit()
 
     m_desktopName = new TCHAR[m_si.nameLength + 4 + 256];
 	m_desktopName_viewonly = new TCHAR[m_si.nameLength + 4 + 256+16];
-
-#ifdef UNDER_CE
-    char *deskNameBuf = new char[m_si.nameLength + 4];
-
-	ReadString(deskNameBuf, m_si.nameLength);
-
-	MultiByteToWideChar( CP_ACP,   MB_PRECOMPOSED,
-			     deskNameBuf, m_si.nameLength,
-			     m_desktopName, m_si.nameLength+1);
-    delete deskNameBuf;
-#else
     ReadString(m_desktopName, m_si.nameLength);
-#endif
-    // TCHAR tcDummy [MAX_PATH * 3];
-
-	// sprintf(tcDummy,"%s ",m_desktopName);
 	strcat(m_desktopName, " ");
 
 	strcpy(m_desktopName_viewonly,m_desktopName);
@@ -3799,13 +3753,13 @@ void ClientConnection::SizeWindow()
 	int temp_w = 0;
 	int temp_h = 0;
 	{
-		MRU *m_pMRU;
-		m_pMRU = new MRU(SESSION_MRU_KEY_NAME, 26);
-		temp_x = m_pMRU->Get_x(m_host);
-		temp_y = m_pMRU->Get_y(m_host);
-		temp_w = m_pMRU->Get_w(m_host);
-		temp_h = m_pMRU->Get_h(m_host);
-		if (m_pMRU) delete m_pMRU;
+		MRU *m_pMRUxy;
+		m_pMRUxy = new MRU(SESSION_MRU_KEY_NAME, 98);
+		temp_x = m_pMRUxy->Get_x(m_host);
+		temp_y = m_pMRUxy->Get_y(m_host);
+		temp_w = m_pMRUxy->Get_w(m_host);
+		temp_h = m_pMRUxy->Get_h(m_host);
+		if (m_pMRUxy) delete m_pMRUxy;
 	}
 	bool pos_set = false;
 	bool size_set = false;
@@ -4757,19 +4711,6 @@ inline void ClientConnection::ProcessKeyEvent(int virtKey, DWORD keyData)
     //      calculate what the ascii would be without mods
     //      send that
 
-#ifdef _DEBUG
-#ifdef UNDER_CE
-	char *keyname="";
-#else
-    char keyname[32];
-    if (GetKeyNameText(  keyData,keyname, 31)) {
-//        vnclog.Print(4, _T("Process key: %s (keyData %04x): virtkey %04x "), keyname, keyData,virtkey);
-//		if (virtkey==0x00dd)
-//			vnclog.Print(4, _T("Process key: %s (keyData %04x): virtkey %04x "), keyname, keyData,virtkey);
-    };
-#endif
-#endif
-
 	if (m_opts.m_JapKeyboard==0 && virtKey!=69)
 	{
 		try {
@@ -4854,7 +4795,6 @@ ClientConnection::SendKeyEvent(CARD32 key, bool down)
       //  down ? _T("down") : _T("up"),ke.key);
 }
 
-#ifndef UNDER_CE
 //
 // SendClientCutText
 //
@@ -4896,7 +4836,6 @@ void ClientConnection::SendClientCutText(char *str, int len)
 	WriteExact(str, len);
 	vnclog.Print(6, _T("Sent %d bytes of clipboard\n"), len);
 }
-#endif
 
 // Copy any updated areas from the bitmap onto the screen.
 
@@ -5045,12 +4984,8 @@ inline void ClientConnection::UpdateScrollbars()
 void ClientConnection::ShowConnInfo()
 {
 	TCHAR buf[2048];
-#ifndef UNDER_CE
 	char kbdname[9];
 	GetKeyboardLayoutName(kbdname);
-#else
-	TCHAR *kbdname = _T("(n/a)");
-#endif
 	TCHAR num[16];
 	_snprintf(
 		buf,
@@ -6192,16 +6127,10 @@ void ClientConnection::ReadBell()
 {
 	rfbBellMsg bm;
 	ReadExact(((char *) &bm)+m_nTO, sz_rfbBellMsg-m_nTO);
-
-	#ifdef UNDER_CE
-	MessageBeep( MB_OK );
-	#else
-
 	if (! ::PlaySound("VNCViewerBell", NULL,
 		SND_APPLICATION | SND_ALIAS | SND_NODEFAULT | SND_ASYNC) ) {
 		::Beep(440, 125);
 	}
-	#endif
 	if (m_opts.m_DeiconifyOnBell) {
 		if (IsIconic(m_hwndcn)) {
 			SetDormant(false);
@@ -8071,7 +8000,6 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 					break;
 				}//end case wm_syscommand
 
-#ifndef UNDER_CE
 				case WM_SIZING:
 					if (_this->m_opts.m_Directx) return 0;
 					{
@@ -8115,7 +8043,6 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 
 						return 0;
 					}
-#endif
 				case WM_QUERYOPEN:
 					_this->SetDormant(false);
 					return true;
@@ -8153,15 +8080,15 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 				case WM_CLOSE:
 				{
 					if (wParam==0 && lParam==0){
-						MRU *m_pMRU;
-						m_pMRU = new MRU(SESSION_MRU_KEY_NAME, 26);
+						MRU *m_pMRUxy;
+						m_pMRUxy = new MRU(SESSION_MRU_KEY_NAME, 98);
 						RECT rect;
 						if (GetWindowRect(hwnd, &rect) != 0 && !IsIconic(hwnd))
 							{
-								if (_this->m_opts.m_SavePos && !_this->m_opts.m_SaveSize) m_pMRU->SetPos(_this->m_host, rect.left, rect.top, 0, 0);
-								if (_this->m_opts.m_SavePos && _this->m_opts.m_SaveSize) m_pMRU->SetPos(_this->m_host, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
+								if (_this->m_opts.m_SavePos && !_this->m_opts.m_SaveSize) m_pMRUxy->SetPos(_this->m_host, rect.left, rect.top, 0, 0);
+								if (_this->m_opts.m_SavePos && _this->m_opts.m_SaveSize) m_pMRUxy->SetPos(_this->m_host, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
 							}
-						if (m_pMRU) delete m_pMRU;
+						if (m_pMRUxy) delete m_pMRUxy;
 					}
 						_this->m_keepalive_timer=0;
                         // April 8 2008 jdp
@@ -8291,14 +8218,12 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 
 				case WM_DESTROY:
 					{
-#ifndef UNDER_CE
 						// Remove us from the clipboard viewer chain
 						if (hwnd == _this->m_hwndcn && _this->m_hwndNextViewer != (HWND)INVALID_HANDLE_VALUE) {
 							BOOL res = ChangeClipboardChain( _this->m_hwndcn, _this->m_hwndNextViewer);
 							_this->m_hwndNextViewer = NULL;
 							vnclog.Print(6, _T("WndProc ChangeClipboardChain m_hwndcn 0x%08x / hwnd 0x%08x, 0x%08x (%li)\n"), _this->m_hwndcn, hwnd, _this->m_hwndNextViewer, res);
 						}
-#endif
 						if (_this->m_waitingOnEmulateTimer)
 						{
 							KillTimer(_this->m_hwndcn, _this->m_emulate3ButtonsTimer);
@@ -8430,7 +8355,6 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						// whole screen without scrollbars, or if we're full-screen,
 						// we turn them off.  Under CE, the scroll bars are unchangeable.
 
-#ifndef UNDER_CE
 						int h_scrollbar=GetSystemMetrics(SM_CYHSCROLL);
 						int v_scrollbar=GetSystemMetrics(SM_CXVSCROLL);
 						int h=0;
@@ -8499,8 +8423,6 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						ShowScrollBar(hwnd, SB_HORZ, _this->SB_HORZ_BOOL);
 						ShowScrollBar(hwnd, SB_VERT, _this->SB_VERT_BOOL);
 						}
-
-#endif
 
 						// Update these for the record
 						// And consider that in full-screen mode the window
@@ -8667,20 +8589,11 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 				case tbWM_PHOTO:
 					{
 						Snapshot snapshot;
-						snapshot.SaveJpeg(_this->m_membitmap,_this->m_opts.m_folder, _this->m_opts.m_prefix);
-						_tcscpy_s(_this->m_opts.m_folder,snapshot.getFolder());
+						snapshot.SaveJpeg(_this->m_membitmap,_this->m_opts.m_document_folder, _this->m_opts.m_prefix);
+						_tcscpy_s(_this->m_opts.m_document_folder,snapshot.getFolder());
 						_tcscpy_s(_this->m_opts.m_prefix, snapshot.getPrefix());
 					}
 					return 0;
-				case tbWM_PHOTO_SETTINGS:
-					{
-						Snapshot snapshot;
-						snapshot.DoDialog(_this->m_opts.m_folder, _this->m_opts.m_prefix);
-						_tcscpy_s(_this->m_opts.m_folder,snapshot.getFolder());
-						_tcscpy_s(_this->m_opts.m_prefix, snapshot.getPrefix());
-					}
-					return 0;
-
 
 			} // end of iMsg switch
 
@@ -9031,7 +8944,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 					_this->m_SWpoint.x=LOWORD(lParam);
 					_this->m_SWpoint.y=HIWORD(lParam);
 					_this->SendSW(_this->m_SWpoint.x,_this->m_SWpoint.y);
-					if (_this->m_opts.m_IdleInterval > 0) { KillTimer(_this->m_hwndcn, 1013);SetTimer(hwnd, _this->m_idle_timer, _this->m_idle_time, NULL); _this->SetDormant(false); }
+					_this->processIdleTimer(hwnd);
 					return 0;
 				}
 			case WM_MBUTTONDOWN:
@@ -9040,7 +8953,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 			case WM_RBUTTONUP:
 			case WM_MOUSEMOVE:
 			{
-				if (_this->m_opts.m_IdleInterval > 0) { KillTimer(_this->m_hwndcn, 1013); SetTimer(hwnd, _this->m_idle_timer, _this->m_idle_time, NULL); _this->SetDormant(false); }
+				_this->processIdleTimer(hwnd);
 				if (_this->m_SWselect) { return 0; }
 				if (!_this->m_running) return 0;
 				//					if (GetFocus() != hwnd) return 0;
@@ -9066,7 +8979,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 				if (mouse_enable != true) return 0;
 #endif
 					//adzm 2010-09
-					if (_this->ProcessPointerEvent(x,y, wParam, iMsg)) {
+						if (_this->ProcessPointerEvent(x,y, wParam, iMsg)) {
 						_this->FlushWriteQueue(true, 5);
 					}
 					return 0;
@@ -9085,7 +8998,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 			case WM_SYSKEYDOWN:
 			case WM_SYSKEYUP:
 				{					
-					if (_this->m_opts.m_IdleInterval > 0) {KillTimer(_this->m_hwndcn, 1013);SetTimer(hwnd, _this->m_idle_timer, _this->m_idle_time, NULL); _this->SetDormant(false);}
+					_this->processIdleTimer(hwnd);
 					if (!_this->m_running) return 0;
 					if ( _this->m_opts.m_ViewOnly) return 0;
 					_this->ProcessKeyEvent((int) wParam, (DWORD) lParam);
@@ -9206,14 +9119,12 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 
 			case WM_DESTROY:
 				{
-				#ifndef UNDER_CE
 				// Remove us from the clipboard viewer chain
 				if (hwnd == _this->m_hwndcn) {
 					BOOL res = ChangeClipboardChain( hwnd, _this->m_hwndNextViewer);
 					_this->m_hwndNextViewer = NULL;
 					vnclog.Print(6, _T("WndProchwnd ChangeClipboardChain hwnd 0x%08x / m_hwndcn 0x%08x, 0x%08x (%li)\n"), hwnd, _this->m_hwndcn, _this->m_hwndNextViewer, res);
 				}
-				#endif
 #ifdef _Gii
 				UnregisterTouchWindow(hwnd);
 #endif
@@ -9262,16 +9173,10 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 					// UpdateColors can be called because it is faster than
 					// redrawing the client area (even though the results are
 					// not as good)
-#ifndef UNDER_CE
 					UpdateColors(hDC);
-#else
-					InvalidateRect(hwnd, NULL, FALSE);
-					UpdateWindow(hwnd);
-#endif
 				}
 				break;
 
-#ifndef UNDER_CE
 			case WM_SIZING:
 				return 0;
 
@@ -9324,7 +9229,6 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 
 					return 0;
 				}
-#endif
 
 			// Modif VNCon MultiView support
 			// Messages used by VNCon - Copyright (C) 2001-2003 - Alastair Burr
@@ -9370,8 +9274,17 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 
 			return DefWindowProc(hwnd, iMsg, wParam, lParam);
 }
-void
-ClientConnection:: ConvertAll(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth, int framebufferHeight)
+
+void ClientConnection::processIdleTimer(HWND hwnd)
+{
+	if (m_opts.m_IdleInterval > 0) {
+		KillTimer(m_hwndcn, 1013);
+		SetTimer(hwnd, m_idle_timer, m_idle_time, NULL);		
+		SetDormant(false); 
+	}
+}
+
+void ClientConnection::ConvertAll(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth, int framebufferHeight)
 {
 	int bytesPerInputRow = width * bytes_per_pixel;
 	int bytesPerOutputRow = framebufferWidth * bytes_per_pixel;

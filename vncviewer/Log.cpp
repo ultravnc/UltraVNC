@@ -126,11 +126,6 @@ void Log::CloseFile() {
     }
 }
 
-
-#ifndef UNDER_CE
-
-// Non-CE version 
-
 void Log::ReallyPrint(LPTSTR format, va_list ap) 
 {
     TCHAR line[LINE_BUFFER_SIZE];
@@ -148,36 +143,6 @@ void Log::ReallyPrint(LPTSTR format, va_list ap)
 
     }	
 }
-
-#else
-
-// CE version 
-
-void Log::ReallyPrint(LPTSTR format, va_list ap) 
-{
-    TCHAR line[LINE_BUFFER_SIZE];
-	_vsnprintf(line, LINE_BUFFER_SIZE-1, format, ap); // sf@2006 - Prevents buffer overflow
-    if (m_todebug) OutputDebugString(line);
-
-    if (m_tofile && (hlogfile != NULL)) {
-        DWORD byteswritten;
-		
-		// Log file is more readable if non-unicode!
-		char ansiline[LINE_BUFFER_SIZE];
-		int origlen = _tcslen(line);
-		int newlen = WideCharToMultiByte(
-			CP_ACP,    // code page
-			0,         // performance and mapping flags
-			line,      // address of wide-character string
-			origlen,   // number of characters in string
-			ansiline,  // address of buffer for new string
-			255,       // size of buffer
-			NULL, NULL );
-		WriteFile(hlogfile, ansiline, newlen, &byteswritten, NULL); 
-    }	
-}
-
-#endif
 
 Log::~Log()
 {

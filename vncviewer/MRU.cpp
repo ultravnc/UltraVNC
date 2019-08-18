@@ -53,23 +53,19 @@ void ofnInit();
 void MRU::AddItem(LPTSTR txt) 
 {
 	// We don't add empty items.
-	if (_tcslen(txt) == 0) return;
-
+	if (_tcslen(txt) == 0) 
+		return;
     // Read each value in index,
     // noting which is the first unused id
     TCHAR id = _T('\0');
     TCHAR firstUnusedId = _T('A');
     TCHAR itembuf[MRU_MAX_ITEM_LENGTH+1];
-
 	// Find first unused letter.
 	while (_tcschr(m_index, firstUnusedId) != NULL)
 		firstUnusedId++;
-
-    for (int i = 0; i < (int) _tcslen(m_index); i++) {
-        
+    for (int i = 0; i < (int) _tcslen(m_index); i++) {       
         // Does this entry already contain the item we're adding
-        if (GetItem(i, itembuf, MRU_MAX_ITEM_LENGTH) != 0) {
-            
+        if (GetItem(i, itembuf, MRU_MAX_ITEM_LENGTH) != 0) {           
             // If a value matches the txt specified, move it to the front.
             if (_tcscmp(itembuf, txt) == 0) {
                 id = m_index[i];
@@ -88,22 +84,12 @@ void MRU::AddItem(LPTSTR txt)
     TCHAR valname[2];
     valname[0] = firstUnusedId;
     valname[1] = _T('\0');
-
-
-	char fname[_MAX_PATH];
-	ofnInit();
-	char optionfile[MAX_PATH];
-	VNCOptions::GetDefaultOptionsFileName(optionfile);
-	sprintf(fname, optionfile);
-	WritePrivateProfileString("connection", valname, txt, fname);
-    
+	WritePrivateProfileString("connection", valname, txt, m_opts.getDefaultOptionsFileName());    
     // move all the current ids up one
     for (int j = _tcslen(m_index); j >= 0; j--)
-        m_index[j] = m_index[j-1];
-    
+        m_index[j] = m_index[j-1];   
     // and insert this one at the front
     m_index[0] = firstUnusedId;
-
     WriteIndex();
 }
 
@@ -119,22 +105,13 @@ int MRU::NumItems()
 // Returns length, or 0 if unsuccessful.
 int MRU::GetItem(int index, LPTSTR buf, int buflen)
 {
-    if (index > NumItems() - 1) return 0;
-
+    if (index > NumItems() - 1) 
+		return 0;
     TCHAR valname[2];
     valname[0] = m_index[index];
     valname[1] = _T('\0');
-
     DWORD dwbuflen = buflen;
-
-	char fname[_MAX_PATH];
-	ofnInit();
-	char optionfile[MAX_PATH];
-	VNCOptions::GetDefaultOptionsFileName(optionfile);
-	sprintf(fname, optionfile);
-	GetPrivateProfileString("connection", valname, "",buf, buflen, fname);
-
-    // May not be one byte per char, so we won't use dwbuflen
+	GetPrivateProfileString("connection", valname, "",buf, buflen, m_opts.getDefaultOptionsFileName());
     return _tcslen(buf);
 }
 
@@ -157,63 +134,39 @@ void MRU::RemoveItem(LPTSTR txt)
 void MRU::SetPos(LPTSTR txt, int x, int y, int w, int h)
 {
 	char buf[32];
-	char fname[_MAX_PATH];
-	ofnInit();
-	char optionfile[MAX_PATH];
-	VNCOptions::GetDefaultOptionsFileName(optionfile);
-	sprintf(fname, optionfile);
 	sprintf(buf, "%d", x);
-	WritePrivateProfileString(txt, "x", buf, fname);
+	WritePrivateProfileString(txt, "x", buf, m_opts.getDefaultOptionsFileName());
 	sprintf(buf, "%d", y);
-	WritePrivateProfileString(txt, "y", buf, fname);
+	WritePrivateProfileString(txt, "y", buf, m_opts.getDefaultOptionsFileName());
 	sprintf(buf, "%d", w);
-	WritePrivateProfileString(txt, "w", buf, fname);
+	WritePrivateProfileString(txt, "w", buf, m_opts.getDefaultOptionsFileName());
 	sprintf(buf, "%d", h);
-	WritePrivateProfileString(txt, "h", buf, fname);
+	WritePrivateProfileString(txt, "h", buf, m_opts.getDefaultOptionsFileName());
 }
 
 int MRU::Get_x(LPTSTR txt)
 {
 	char buf[32];
-	char fname[_MAX_PATH];
-	ofnInit();
-	char optionfile[MAX_PATH];
-	VNCOptions::GetDefaultOptionsFileName(optionfile);
-	sprintf(fname, optionfile);
-	GetPrivateProfileString(txt, "x", "", buf, 32, fname);
+	GetPrivateProfileString(txt, "x", "", buf, 32, m_opts.getDefaultOptionsFileName());
 	return atoi(buf);
 }
+
 int MRU::Get_y(LPTSTR txt)
 {
 	char buf[32];
-	char fname[_MAX_PATH];
-	ofnInit();
-	char optionfile[MAX_PATH];
-	VNCOptions::GetDefaultOptionsFileName(optionfile);
-	sprintf(fname, optionfile);
-	GetPrivateProfileString(txt, "y", "", buf, 32, fname);
+	GetPrivateProfileString(txt, "y", "", buf, 32, m_opts.getDefaultOptionsFileName());
 	return atoi(buf);
 }
 int MRU::Get_w(LPTSTR txt)
 {
 	char buf[32];
-	char fname[_MAX_PATH];
-	ofnInit();
-	char optionfile[MAX_PATH];
-	VNCOptions::GetDefaultOptionsFileName(optionfile);
-	sprintf(fname, optionfile);
-	GetPrivateProfileString(txt, "w", "", buf, 32, fname);
+	GetPrivateProfileString(txt, "w", "", buf, 32, m_opts.getDefaultOptionsFileName());
 	return atoi(buf);
 }
 int MRU::Get_h(LPTSTR txt)
 {
 	char buf[32];
-	char fname[_MAX_PATH];
-	ofnInit();
-	char optionfile[MAX_PATH];
-	VNCOptions::GetDefaultOptionsFileName(optionfile);
-	sprintf(fname, optionfile);
-	GetPrivateProfileString(txt, "h", "", buf, 32, fname);
+	GetPrivateProfileString(txt, "h", "", buf, 32, m_opts.getDefaultOptionsFileName());
 	return atoi(buf);
 }
 // Remove the item with the given index.
@@ -221,21 +174,13 @@ int MRU::Get_h(LPTSTR txt)
 void MRU::RemoveItem(int index)
 {
     if (index > NumItems()-1) return;
-
     TCHAR valname[2];
     valname[0] = m_index[index];
     valname[1] = _T('\0');
-
-	char fname[_MAX_PATH];
-	ofnInit();
-	char optionfile[MAX_PATH];
-	VNCOptions::GetDefaultOptionsFileName(optionfile);
-	sprintf(fname, optionfile);
-	WritePrivateProfileString("connection", valname, NULL, fname);
+	WritePrivateProfileString("connection", valname, NULL, m_opts.getDefaultOptionsFileName());
 
     for (unsigned int i = index; i <= _tcslen(m_index); i++)
-        m_index[i] = m_index[i+1];
-    
+        m_index[i] = m_index[i+1];    
     WriteIndex();
 }
 
@@ -244,24 +189,15 @@ void MRU::ReadIndex()
 {
     // read the index
     DWORD dwindexlen = sizeof(m_index);
-
-	char fname[_MAX_PATH];
-	ofnInit();
-	char optionfile[MAX_PATH];
-	VNCOptions::GetDefaultOptionsFileName(optionfile);
-	sprintf(fname, optionfile);
-	if (GetPrivateProfileString("connection", INDEX_VAL_NAME, "", m_index, dwindexlen, fname) == 0) WriteIndex();
+	if (GetPrivateProfileString("connection", INDEX_VAL_NAME, "", m_index, dwindexlen, m_opts.getDefaultOptionsFileName()) == 0) 
+		WriteIndex();
+	int size = NumItems();
 }
 
 // Save the index string to the registry
 void MRU::WriteIndex()
 {
-	char fname[_MAX_PATH];
-	ofnInit();
-	char optionfile[MAX_PATH];
-	VNCOptions::GetDefaultOptionsFileName(optionfile);
-	sprintf(fname, optionfile);
-	WritePrivateProfileString("connection", INDEX_VAL_NAME, m_index, fname);
+	WritePrivateProfileString("connection", INDEX_VAL_NAME, m_index, m_opts.getDefaultOptionsFileName());
 }
 
 

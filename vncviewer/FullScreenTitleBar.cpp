@@ -347,12 +347,7 @@ LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg,
 		}
 
 	case WM_COMMAND:
-		if (HIWORD(wParam) == BN_DBLCLK)
-		{
-			if(LOWORD(wParam) == tbIDC_PHOTO)
-				::SendMessage(TitleBarThis->Parent, tbWM_PHOTO_SETTINGS, 0, 0);
-		}
-		else if (HIWORD(wParam) == BN_CLICKED)
+		if (HIWORD(wParam) == BN_CLICKED)
 		{
 			//Handle the Pin for holding the window
 			if(LOWORD(wParam) == tbIDC_PIN)

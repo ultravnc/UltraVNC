@@ -66,19 +66,5 @@ bool ParseDisplay(LPTSTR display, LPTSTR phost, int hostlen, int *port);
 
 // Macro DIALOG_MAKEINTRESOURCE is used to allow both normal windows dialogs
 // and the selectable aspect ratio dialogs under WinCE (PalmPC vs HPC).
-#ifndef UNDER_CE
 #define DIALOG_MAKEINTRESOURCE MAKEINTRESOURCE
-#else
-// Under CE we pick dialog resource according to the 
-// screen format selected or determined.
-#define DIALOG_MAKEINTRESOURCE(res) SELECT_MAKEINTRESOURCE(res ## _PALM, res)
-inline LPTSTR SELECT_MAKEINTRESOURCE(WORD res_palm, WORD res_hpc)
-{
-	if (pApp->m_options.m_palmpc)
-		return MAKEINTRESOURCE(res_palm);
-	else
-		return MAKEINTRESOURCE(res_hpc);
-}
-#endif
-
 #endif

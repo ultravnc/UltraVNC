@@ -29,11 +29,7 @@
 #pragma once
 
 #include "stdhdrs.h"
-#ifdef UNDER_CE
-#include "omnithreadce.h"
-#else
 #include "omnithread/omnithread.h"
-#endif
 #include "VNCOptions.h"
 #include "VNCviewerApp.h"
 #include "KeyMap.h"
@@ -261,7 +257,7 @@ private:
 	void SendClientInit();
 	void CreateLocalFramebuffer();
 	void SaveConnection();
-	void Save_Latest_Connection();
+	
 	
 	void SetupPixelFormat();
 	void SetFormatAndEncodings();
@@ -504,19 +500,12 @@ private:
 	// These draw a solid rectangle of colour on the bitmap
 	// They assume the bitmap is already selected into the DC, and the
 	// DC is locked if necessary.
-#ifndef UNDER_CE
 	// Normally this is an inline call to a GDI method.
 	inline void FillSolidRect(RECT *pRect, COLORREF color) {
 		COLORREF oldbgcol = SetBkColor(m_hBitmapDC, color);
 		// This is the call MFC uses for FillSolidRect. Who am I to argue?
 		::ExtTextOut(m_hBitmapDC, 0, 0, ETO_OPAQUE, pRect, NULL, 0, NULL);			
 	};
-#else
-	// Under WinCE this is a manual insert into a pixmap, 
-	// and is a little too complicated for an inline.
-	void FillSolidRect(RECT *pRect, COLORREF color);
-#endif // UNDER_CE
-
 	inline void FillSolidRect(int x, int y, int w, int h, COLORREF color) {
 		RECT r;
 		r.left = x;		r.right = x + w;
@@ -586,11 +575,6 @@ private:
 	HDC		m_hBitmapDC;
 	HPALETTE m_hPalette;
 
-#ifdef UNDER_CE
-	// Under WinCE this points to the DIB pixels.
-	BYTE* m_bits;
-#endif
- 
 	// Keyboard mapper
     KeyMap *m_keymap;
 	KeyMapJap *m_keymapJap;
@@ -690,6 +674,7 @@ private:
 	// while dormant.
 	void SetDormant(int newstate);
 	int m_dormant;
+	void processIdleTimer(HWND hwnd);
 
 	// The number of bytes required to hold at least one pixel.
 	unsigned int m_minPixelBytes;
@@ -814,6 +799,7 @@ private:
 	UINT m_fullupdate_timer;
 	UINT m_idle_timer;
 	UINT m_idle_time;
+
 	ViewerDirectxClass *directx_output;
 	bool directx_used;
 
@@ -833,6 +819,7 @@ public:
 	HANDLE rcth;
 	void ReadExact(char *buf, int bytes);
 	bool new_ultra_server;
+	void Save_Latest_Connection();	
 };
 
 // Some handy classes for temporary GDI object selection
@@ -920,12 +907,7 @@ public:
                 (int) (((p >> gs) & gm) * 255 / gm), \
                 (int) (((p >> bs) & bm) * 255 / bm) ))
 
-
-#ifdef UNDER_CE
-#define SETPIXEL(b,x,y,c) SetPixel((b),(x),(y),(c))
-#else
 #define SETPIXEL(b,x,y,c) SetPixelV((b),(x),(y),(c))
-#endif
 
 #define SETPIXELS(buffer, bpp, x, y, w, h)										\
 	{																			\

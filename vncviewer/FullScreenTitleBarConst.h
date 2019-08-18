@@ -90,7 +90,6 @@
 #define tbWM_NOSCALE		WM_USER+1004
 #define tbWM_PHOTO			WM_USER+1005
 #define tbWM_SWITCHMONITOR	WM_USER+1006
-#define tbWM_PHOTO_SETTINGS WM_USER+1007
 
 //=================================================
 // Menus with ID's and messages

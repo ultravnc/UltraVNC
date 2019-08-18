@@ -34,6 +34,7 @@
 #include <winsock2.h>
 #include <windows.h>
 #include <tchar.h>
+#include "VNCOptions.h"
 
 class MRU  
 {
@@ -73,11 +74,12 @@ public:
 private:
 	void ReadIndex();
 
-    TCHAR m_index[28];  // allow a bit of workspace beyond maximum of 26
+    TCHAR m_index[100];  // allow a bit of workspace beyond maximum of 26
     //HKEY m_hRegKey;
     unsigned int m_maxnum;
 
     void Tidy();
+	VNCOptions m_opts;
 protected:
 	void WriteIndex();
 };

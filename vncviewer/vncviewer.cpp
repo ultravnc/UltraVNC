@@ -35,16 +35,8 @@
 #pragma comment(lib, "libjpeg-turbo-win-static.lib")
 #endif
 
-
-// [v1.0.2-jp1 fix] Support "LinkLabel"
-//#include "LinkLabel.h"
-
-#ifdef UNDER_CE
-#include "omnithreadce.h"
-#else
 #include "omnithread/omnithread.h"
 #include "VNCviewerApp32.h"
-#endif
 
 // All logging is done via the log object
 Log vnclog;
@@ -349,11 +341,7 @@ static BOOL read_reg_string(HKEY key, char* sub_key, char* val_name, LPBYTE data
 #endif
 #endif
 
-#ifdef UNDER_CE
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR szCmdLine, int iCmdShow)
-#else
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR szCmdLine, int iCmdShow)
-#endif
 {
 
 HMODULE hUser32 = LoadLibrary(_T("user32.dll"));
@@ -368,8 +356,8 @@ if (hUser32) FreeLibrary(hUser32);
 	memset(&info, 0, sizeof(CR_INSTALL_INFO));
 	info.cb = sizeof(CR_INSTALL_INFO);
 	info.pszAppName = _T("UVNC");
-	info.pszAppVersion = _T("1.2.2.4");
-	info.pszEmailSubject = _T("UVNC viewer 1.2.2.4 Error Report");
+	info.pszAppVersion = _T("1.2.3.0");
+	info.pszEmailSubject = _T("UVNC viewer 1.2.3.0 Error Report");
 	info.pszEmailTo = _T("uvnc@skynet.be");
 	info.uPriorities[CR_SMAPI] = 1; // Third try send report over Simple MAPI    
 	// Install all available exception handlers

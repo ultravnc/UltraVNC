@@ -106,73 +106,40 @@ public:
 
 	// Modif sf@2002 - Server Scaling
 	int		m_nServerScale; // Divider of the Target Server's screensize
-	// Reconnect
 	int m_reconnectcounter;
 	int m_x, m_y, m_w, m_h;
-	// Modif sf@2002 - Cache
 	bool    m_fEnableCache;
-	// Modif sz@2002 - DSM Plugin
 	bool	m_fUseDSMPlugin;
 	TCHAR   m_szDSMPluginFilename[_MAX_PATH];
 	bool	m_oldplugin;
-
-	// sf@2003 - Autoscaling
 	int m_saved_scale_num; 
 	int m_saved_scale_den;
 	bool m_saved_scaling;
-
-	// Keyboard can be specified on command line as 8-digit hex
 	TCHAR	m_kbdname[9];
 	bool	m_kbdSpecified;
-
-	// Connection options we don't do through the dialog
-	// Which encodings do we allow?
 	bool	m_UseEnc[LASTENCODING+1];
-
 	TCHAR   m_host_options[256];
 	int     m_port;
-
 	TCHAR   m_proxyhost[256];
 	int     m_proxyport;
 	bool	m_fUseProxy;
-
 	int m_selected_screen;
-
-    // Logging
     int     m_logLevel;
     bool    m_logToFile, m_logToConsole;
     TCHAR   m_logFilename[_MAX_PATH];
-    
-	// for debugging purposes
 	int m_delay;
-
-	// sf@2007 - AutoReconnect
 	int	m_autoReconnect;
-
-	// Fix by Act : No User and/Or password if the first VNC connection is rejected
 	bool m_NoMoreCommandLineUserPassword;
-
 	bool m_fExitCheck; //PGM @ Advantig
     int m_FTTimeout;
     int m_keepAliveInterval;
 	int m_IdleInterval;
-
-	//adzm - 2009-06-21
 	bool m_fAutoAcceptIncoming;
-
-	//adzm 2009-07-19
 	bool m_fAutoAcceptNoDSM;
-
-	//adzm 2010-05-12
 	bool m_fRequireEncryption;
-	
-	//adzm 2010-07-04
 	bool m_preemptiveUpdates;
-
-	//adzm 2010-02-15
 	void CheckProxyAndHost();
 #ifdef _Gii
-	//gii extention
 	bool m_giienable;
 #endif
 
@@ -180,21 +147,22 @@ public:
 	void SetFromCommandLine(LPTSTR szCmdLine);
 
     void CancelDialog();
-
-    static void GetDefaultOptionsFileName(TCHAR *optionfile);
-    static void DeleteDefaultOptions();
+	void setDefaultDocumentPath();
 	static BOOL CALLBACK OptDlgProc(  HWND hwndDlg,  UINT uMsg, 
 		WPARAM wParam, LPARAM lParam );
 
-	TCHAR m_folder[MAX_PATH];
+	TCHAR m_document_folder[MAX_PATH];
 	TCHAR m_prefix[56];
+	bool m_running;
+
+	TCHAR m_optionfile[MAX_PATH];
+	void VNCOptions::setDefaultOptionsFileName();
+	TCHAR *VNCOptions::getDefaultOptionsFileName();
 
 private:
     void ShowUsage(LPTSTR info = NULL);
 	void FixScaling();
 
-	// Just for temporary use
-	bool m_running;
     HWND hwnd;
 };
 

@@ -283,7 +283,7 @@ void ClientConnection::UpdateLocalClipboard(char *buf, int len)
     }
 }
 
-void ofnInit();
+//void ofnInit();
 
 void ClientConnection::SaveClipboardPreferences()
 {
@@ -300,76 +300,23 @@ void ClientConnection::SaveClipboardPreferences()
 		if (m_clipboard.settings.m_nLimitHTML > 0) {
 			dwClipboardPrefs |= clipHTML;
 		}
-
-		char fname[_MAX_PATH];
-		ofnInit();
-		char optionfile[MAX_PATH];
-		VNCOptions::GetDefaultOptionsFileName(optionfile);
-		sprintf(fname, optionfile);
-		vnclog.Print(1, "Saving to %s\n", fname);
+		//ofnInit();
+		vnclog.Print(1, "Saving to %s\n", m_opts.getDefaultOptionsFileName());
 		char buf[32];
 		sprintf(buf, "%d", dwClipboardPrefs);
-		WritePrivateProfileString("connection", "ClipboardPrefs", buf, fname);
+		WritePrivateProfileString("connection", "ClipboardPrefs", buf, m_opts.getDefaultOptionsFileName());
 	}
-
-
-	/*HKEY hRegKey;
-	if ( RegCreateKey(HKEY_CURRENT_USER, SETTINGS_KEY_NAME, &hRegKey)  != ERROR_SUCCESS ) {
-        hRegKey = NULL;
-	} else {
-			
-		DWORD dwClipboardPrefs = 0;
-		if (m_clipboard.settings.m_nLimitText > 0) {
-			dwClipboardPrefs |= clipText;
-		}
-		if (m_clipboard.settings.m_nLimitRTF > 0) {
-			dwClipboardPrefs |= clipRTF;
-		}
-		if (m_clipboard.settings.m_nLimitHTML > 0) {
-			dwClipboardPrefs |= clipHTML;
-		}
-
-		DWORD valsize = sizeof(dwClipboardPrefs);
-		RegSetValueEx(hRegKey, "ClipboardPrefs", NULL, REG_DWORD, (LPBYTE)&dwClipboardPrefs, valsize);
-		RegCloseKey(hRegKey);
-	}*/
 }
 
 bool ClientConnection::LoadClipboardPreferences()
 {
 	omni_mutex_lock l(m_clipMutex);
-
 	DWORD dwClipboardPrefs = 0;
-
-	{
-		char fname[_MAX_PATH];
-		ofnInit();
-		char optionfile[MAX_PATH];
-		VNCOptions::GetDefaultOptionsFileName(optionfile);
-		sprintf(fname, optionfile);
-		vnclog.Print(1, "Saving to %s\n", fname);
-		dwClipboardPrefs = clipText | clipRTF | clipHTML;
-		dwClipboardPrefs = GetPrivateProfileInt("connection", "ClipboardPrefs", dwClipboardPrefs, fname);
-		dwClipboardPrefs |= clipText;
-	}
-
-	/*HKEY hRegKey;
-	if ( RegCreateKey(HKEY_CURRENT_USER, SETTINGS_KEY_NAME, &hRegKey)  != ERROR_SUCCESS ) {
-        hRegKey = NULL;
-		return false;
-	} else {
-		DWORD valsize = sizeof(dwClipboardPrefs);
-		DWORD valtype = REG_DWORD;	
-		if ( RegQueryValueEx( hRegKey,  "ClipboardPrefs", NULL, &valtype, 
-			(LPBYTE) &dwClipboardPrefs, &valsize) != ERROR_SUCCESS) {
-            dwClipboardPrefs = clipText | clipRTF | clipHTML;
-		} else {
-			dwClipboardPrefs |= clipText;
-		}
-		RegCloseKey(hRegKey);
-	}*/
-
-	
+//	ofnInit();
+	vnclog.Print(1, "Saving to %s\n", m_opts.getDefaultOptionsFileName());
+	dwClipboardPrefs = clipText | clipRTF | clipHTML;
+	dwClipboardPrefs = GetPrivateProfileInt("connection", "ClipboardPrefs", dwClipboardPrefs, m_opts.getDefaultOptionsFileName());
+	dwClipboardPrefs |= clipText;
 	if (!(dwClipboardPrefs & clipRTF)) {
 		m_clipboard.settings.m_nLimitRTF = 0;
 	}

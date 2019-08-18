@@ -125,28 +125,19 @@ VNCOptions::VNCOptions()
  #ifdef _XZ
   m_UseEnc[rfbEncodingXZ] = true;
   m_UseEnc[rfbEncodingXZYW] = true;
-#endif
-	
+#endif	
   m_ViewOnly = false;
-  m_FullScreen = true;
+  m_FullScreen = false;
   m_SavePos = false;
   m_SaveSize = false;
   m_Directx = false;
-  autoDetect = true;
+  autoDetect = false;
   m_Use8Bit = rfbPFFullColors; //false;
-  m_ShowToolbar = false;
+  m_ShowToolbar = true;
   m_fAutoScaling = false;
   m_NoStatus = false;
   m_NoHotKeys = false;
-
-#ifndef UNDER_CE
-  //m_PreferredEncoding = rfbEncodingHextile;
-  m_PreferredEncodings.push_back(rfbEncodingZRLE);
-#else
-  // With WinCE2.0, CoRRE seems more efficient since it
-  // reads the whole update in one socket call.
-  m_PreferredEncodings.push_back(rfbEncodingCoRRE);
-#endif
+  m_PreferredEncodings.push_back(rfbEncodingUltra2);
   m_JapKeyboard = false;
   m_SwapMouse = false;
   m_Emul3Buttons = true;
@@ -155,42 +146,32 @@ VNCOptions::VNCOptions()
   m_Shared = true;
   m_NoBorder = false;
   m_DeiconifyOnBell = false;
-
   m_DisableClipboard = false;
   m_localCursor = DOTCURSOR; // NOCURSOR;
   m_scaling = false;
   m_fAutoScaling = false;
   m_scale_num = 100;
-  m_scale_den = 100;
-
-  
+  m_scale_den = 100;  
   // Modif sf@2002 - Server Scaling
   m_nServerScale = 1;
-
   m_reconnectcounter = 3;
-
   m_x = 0;
   m_y = 0;
   m_w = 0;
   m_h = 0;
-
   // Modif sf@2002 - Cache
   m_fEnableCache = false;
   // m_fAutoAdjust = false;
-
   m_host_options[0] = '\0';
   m_proxyhost[0] = '\0';
   m_port = -1;
-  m_proxyport = -1;
-	
+  m_proxyport = -1;	
   m_kbdname[0] = '\0';
-  m_kbdSpecified = false;
-	
+  m_kbdSpecified = false;	
   m_logLevel = 0;
   m_logToConsole = false;
   m_logToFile = false;
-  m_logFilename[0] = '\0';
-	
+  m_logFilename[0] = '\0';	
   m_delay=0;
   m_connectionSpecified = false;
   m_configSpecified = false;
@@ -198,15 +179,13 @@ VNCOptions::VNCOptions()
   m_listening = false;
   m_listenPort = INCOMING_PORT_OFFSET;
   m_restricted = false;
-
   // Tight specific
   m_useCompressLevel = true;
   m_compressLevel = 6;		
   m_enableJpegCompression = true;
-  m_jpegQualityLevel = 6;
+  m_jpegQualityLevel = 8;
   m_requestShapeUpdates = true;
   m_ignoreShapeUpdates = false;
-
   m_cmdlnUser[0] = '\0';		// act : add user option on command line
   m_clearPassword[0] = '\0';		// sf@2002
   m_quickoption = 1;				// sf@2002 - Auto Mode as default
@@ -216,128 +195,97 @@ VNCOptions::VNCOptions()
   m_fUseProxy = false;
   m_selected_screen=1;
   m_szDSMPluginFilename[0] = '\0';
-  char tempfile[MAX_PATH];
-  GetDefaultOptionsFileName(tempfile);
- _tcscpy_s(m_folder, tempfile);
+  setDefaultDocumentPath();
  _tcscpy_s(m_prefix, "vnc_");
 
 #ifdef _Gii
   m_giienable = true;
 #endif
 
-  //adzm - 2009-06-21
   m_fAutoAcceptIncoming = false;
-
-  //adzm 2009-07-19
   m_fAutoAcceptNoDSM = false;
-
-  //adzm 2010-05-12
   m_fRequireEncryption = false;
-
-  //adzm 2010-07-04
   m_preemptiveUpdates = false;
-
-  // sf@2003 - Auto Scaling
   m_saved_scale_num = 100;
   m_saved_scale_den = 100;
-  m_saved_scaling = false;
-  
-  // sf@2007 - Autoreconnect
+  m_saved_scaling = false; 
+
   m_autoReconnect = 3; // Default: 10s before reconnecting
 
-  // Fix by Act : no user password command line after a rejected connection
   m_NoMoreCommandLineUserPassword = false;
-
   m_fExitCheck = false; //PGM @ Advantig
   hwnd = 0;
-
   m_FTTimeout = FT_RECV_TIMEOUT;
   m_keepAliveInterval = KEEPALIVE_INTERVAL;
   m_IdleInterval = 0;
-
-  m_throttleMouse = 0; // adzm 2010-10
-
-  
-  
-#ifdef UNDER_CE
-  m_palmpc = false;
-	
-  // Check for PalmPC aspect 
-  HDC temp_hdc = GetDC(NULL);
-  int screen_width = GetDeviceCaps(temp_hdc, HORZRES);
-  if (screen_width < 320)
-  {
-    m_palmpc = true;
-  }
-  ReleaseDC(NULL,temp_hdc);
-
-  m_slowgdi = false;
-#endif
-  char optionfile[MAX_PATH];
-  GetDefaultOptionsFileName(optionfile);
-  //at this point commandlines are not yet processed
-  //no need to check
-  //if (!config_specified) Load(optionfile);
-  Load(optionfile);
+  m_throttleMouse = 0; // adzm 2010-10 
+  setDefaultOptionsFileName();
+  Load(getDefaultOptionsFileName());
 }
 
-void VNCOptions::GetDefaultOptionsFileName(TCHAR *optionfile)
+void VNCOptions::setDefaultOptionsFileName()
 {
-
 	char szFileName[MAX_PATH];
-	if (GetModuleFileName(NULL, szFileName, MAX_PATH))
-	{
+	if (GetModuleFileName(NULL, szFileName, MAX_PATH)) {
 		char* p = strrchr(szFileName, '\\');
 		if (p == NULL) return;
 		*p = '\0';
 		strcat(szFileName, "\\options.vnc");
 	}
-
 	HANDLE m_hDestFile = CreateFile(szFileName, GENERIC_WRITE | GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, FILE_FLAG_SEQUENTIAL_SCAN, NULL);
 	bool fAlreadyExists = (GetLastError() == ERROR_ALREADY_EXISTS);
-	if (fAlreadyExists)
-	{
+	if (fAlreadyExists) {
 		CloseHandle(m_hDestFile);
 		m_hDestFile = CreateFile(szFileName, GENERIC_WRITE | GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, NULL);
 	}
-
-	if (m_hDestFile != INVALID_HANDLE_VALUE)
-	{ 
-		strcpy_s(optionfile, MAX_PATH, szFileName); 
+	if (m_hDestFile != INVALID_HANDLE_VALUE) { 
+		strcpy_s(m_optionfile, MAX_PATH, szFileName); 
 		CloseHandle(m_hDestFile); 
 		return;
 	}
-		
-
-
     const char *APPDIR = "UltraVNC";
-    if (SHGetFolderPath (0,CSIDL_APPDATA, NULL, SHGFP_TYPE_CURRENT, optionfile) == S_OK)
-    {
-		strcat_s(optionfile, MAX_PATH, "\\");
-		strcat_s(optionfile, MAX_PATH,APPDIR);
-
+    if (SHGetFolderPath (0,CSIDL_APPDATA, NULL, SHGFP_TYPE_CURRENT, m_optionfile) == S_OK) {
+		strcat_s(m_optionfile, MAX_PATH, "\\");
+		strcat_s(m_optionfile, MAX_PATH,APPDIR);
        struct _stat st;
-       if (_stat(optionfile, &st) == -1)
-           _mkdir(optionfile);
+       if (_stat(m_optionfile, &st) == -1)
+           _mkdir(m_optionfile);
     }
-    else
-    {
+    else {
       char *tempvar=NULL;
       tempvar = getenv( "TEMP" );
       if (tempvar) 
-		  strcpy_s(optionfile,  MAX_PATH,tempvar);
+		  strcpy_s(m_optionfile,  MAX_PATH,tempvar);
       else 
-		  strcpy_s(optionfile,  MAX_PATH,"");
+		  strcpy_s(m_optionfile,  MAX_PATH,"");
     }
-
-	strcat_s(optionfile, MAX_PATH, "\\options.vnc");
+	strcat_s(m_optionfile, MAX_PATH, "\\options.vnc");
 }
 
-void VNCOptions::DeleteDefaultOptions()
+TCHAR *VNCOptions::getDefaultOptionsFileName()
 {
-  char optionfile[MAX_PATH];
-  GetDefaultOptionsFileName(optionfile);
-  DeleteFile(optionfile);
+	return m_optionfile; 
+}
+
+void VNCOptions::setDefaultDocumentPath()
+{
+    const char *APPDIR = "UltraVNC";
+    if (SHGetFolderPath (0,CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, m_document_folder) == S_OK){
+		strcat_s(m_document_folder, MAX_PATH, "\\");
+		strcat_s(m_document_folder, MAX_PATH,APPDIR);
+
+       struct _stat st;
+       if (_stat(m_document_folder, &st) == -1)
+           _mkdir(m_document_folder);
+    }
+    else{
+      char *tempvar=NULL;
+      tempvar = getenv( "TEMP" );
+      if (tempvar) 
+		  strcpy_s(m_document_folder,  MAX_PATH,tempvar);
+      else 
+		  strcpy_s(m_document_folder,  MAX_PATH,"");
+    }
 }
 
 VNCOptions& VNCOptions::operator=(VNCOptions& s)
@@ -386,7 +334,7 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
   m_saved_scaling   = s.m_saved_scaling;
 
   strcpy_s(m_szDSMPluginFilename, 260,s.m_szDSMPluginFilename);
-  strcpy_s(m_folder, MAX_PATH,s.m_folder);
+  strcpy_s(m_document_folder, MAX_PATH,s.m_document_folder);
   strcpy_s(m_prefix, 56,s.m_prefix);
   
   strcpy_s(m_host_options, 256,s.m_host_options);
@@ -454,10 +402,6 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
   //adzm 2010-07-04
   m_preemptiveUpdates = s.m_preemptiveUpdates;
 
-#ifdef UNDER_CE
-  m_palmpc			= s.m_palmpc;
-  m_slowgdi			= s.m_slowgdi;
-#endif
   return *this;
 }
 
@@ -697,16 +641,6 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
     } else if ( SwitchMatch(args[j], _T("disableclipboard") )) {
       m_DisableClipboard = true;
     }
-#ifdef UNDER_CE
-    // Manual setting of palm vs hpc aspect ratio for dialog boxes.
-    else if ( SwitchMatch(args[j], _T("hpc") )) {
-      m_palmpc = false;
-    } else if ( SwitchMatch(args[j], _T("palm") )) {
-      m_palmpc = true;
-    } else if ( SwitchMatch(args[j], _T("slow") )) {
-      m_slowgdi = true;
-    } 
-#endif
     else if ( SwitchMatch(args[j], _T("delay") )) {
       if (++j == i) {
         ArgError(sz_D10);
@@ -1128,12 +1062,13 @@ void VNCOptions::Save(char *fname)
 
 
   WritePrivateProfileString("options", "DSMPlugin", m_szDSMPluginFilename, fname);
-  WritePrivateProfileString("options", "folder", m_folder, fname);
+  WritePrivateProfileString("options", "folder", m_document_folder, fname);
   WritePrivateProfileString("options", "prefix", m_prefix, fname);
   saveInt("AutoReconnect", m_autoReconnect,	fname);
  
   saveInt("ExitCheck",				m_fExitCheck,	fname); //PGM @ Advantig
   saveInt("FileTransferTimeout",    m_FTTimeout,    fname);
+  saveInt("ListenPort",    m_listenPort,    fname);
   saveInt("KeepAliveInterval",      m_keepAliveInterval,    fname);
 
   saveInt("ThrottleMouse", m_throttleMouse,    fname); // adzm 2010-10
@@ -1211,7 +1146,7 @@ void VNCOptions::Load(char *fname)
 
   m_selected_screen=			readInt("selectedscreen",			m_selected_screen, fname);
   GetPrivateProfileString("options", "DSMPlugin", "NoPlugin", m_szDSMPluginFilename, MAX_PATH, fname);
-  GetPrivateProfileString("options", "folder", m_folder, m_folder, MAX_PATH, fname);
+  GetPrivateProfileString("options", "folder", m_document_folder, m_document_folder, MAX_PATH, fname);
   GetPrivateProfileString("options", "prefix", m_prefix, m_prefix, 56, fname);
   if (!g_disable_sponsor) g_disable_sponsor=readInt("sponsor",			g_disable_sponsor, fname) != 0;
 
@@ -1236,6 +1171,7 @@ void VNCOptions::Load(char *fname)
   
   m_fExitCheck =		readInt("ExitCheck", m_fExitCheck,  fname) != 0; //PGM @ Advantig
   m_FTTimeout  = readInt("FileTransferTimeout", m_FTTimeout, fname);
+  m_listenPort  = readInt("ListenPort", m_listenPort, fname);
   if (m_FTTimeout > 600)
       m_FTTimeout = 600; // cap at 1 minute
 
@@ -1262,63 +1198,12 @@ void VNCOptions::Load(char *fname)
   m_preemptiveUpdates = readInt("PreemptiveUpdates", (int)m_preemptiveUpdates, fname) ? true : false;
 }
 
-// Record the path to the VNC viewer and the type
-// of the .vnc files in the registry
-/*void VNCOptions::Register()
-{
-  char keybuf[_MAX_PATH * 2 + 20];
-  HKEY hKey, hKey2;
-  if ( RegCreateKey(HKEY_CLASSES_ROOT, ".vnc", &hKey)  == ERROR_SUCCESS ) {
-    RegSetValue(hKey, NULL, REG_SZ, "VncViewer.Config", 0);
-    RegCloseKey(hKey);
-  } else {
-    vnclog.Print(0, "Failed to register .vnc extension\n");
-  }
-
-  char filename[_MAX_PATH];
-  if (GetModuleFileName(NULL, filename, _MAX_PATH) == 0) {
-    vnclog.Print(0, "Error getting vncviewer filename\n");
-    return;
-  }
-  vnclog.Print(2, "Viewer is %s\n", filename);
-
-  if ( RegCreateKey(HKEY_CLASSES_ROOT, "VncViewer.Config", &hKey)  == ERROR_SUCCESS ) {
-    RegSetValue(hKey, NULL, REG_SZ, "VNCviewer Config File", 0);
-		
-    if ( RegCreateKey(hKey, "DefaultIcon", &hKey2)  == ERROR_SUCCESS ) {
-      sprintf(keybuf, "%s,0", filename);
-      RegSetValue(hKey2, NULL, REG_SZ, keybuf, 0);
-      RegCloseKey(hKey2);
-    }
-    if ( RegCreateKey(hKey, "Shell\\open\\command", &hKey2)  == ERROR_SUCCESS ) {
-      sprintf(keybuf, "\"%s\" -config \"%%1\"", filename);
-      RegSetValue(hKey2, NULL, REG_SZ, keybuf, 0);
-      RegCloseKey(hKey2);
-    }
-
-    RegCloseKey(hKey);
-  }
-
-  if ( RegCreateKey(HKEY_LOCAL_MACHINE, 
-                    "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\vncviewer.exe", 
-                    &hKey)  == ERROR_SUCCESS ) {
-    RegSetValue(hKey, NULL, REG_SZ, filename, 0);
-    RegCloseKey(hKey);
-  }
-}*/
-
 void VNCOptions::ShowUsage(LPTSTR info) {
   TCHAR msg[1024];
   TCHAR *tmpinf = _T("");
   if (info != NULL) 
     tmpinf = info;
   _stprintf(msg, 
-#ifdef UNDER_CE
-            _T("%s\r\nUsage includes:\r\n")
-            _T("vncviewer [/8bit] [/swapmouse] [/shared] [/belldeiconify] \r\n")
-            _T(" [/hpc | /palm] [/slow] [server:display] \r\n")
-            _T("For full details see documentation."),
-#else
             _T("%s\r\nUsage includes:\r\n"
                "  vncviewer [/8bit] [/swapmouse] [/shared] [/belldeiconify]\r\n"
                "      [/listen [portnum]] [/fullscreen] [/viewonly] [/notoolbar]\r\n"
@@ -1335,7 +1220,6 @@ void VNCOptions::ShowUsage(LPTSTR info) {
 			   "      [/autoacceptincoming] [/autoacceptnodsm] [/disablesponsor]\r\n" //adzm 2009-06-21, adzm 2009-07-19
 			   "      [/requireencryption] [/enablecache] [/throttlemouse n] [/socketkeepalivetimeout n]\r\n" //adzm 2010-05-12 
                "For full details see documentation."), 
-#endif
             tmpinf);
   MessageBox(NULL,  msg, sz_A2, MB_OK | MB_ICONINFORMATION | MB_TOPMOST);
 }
@@ -1415,10 +1299,8 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 		  HWND hDeiconify = GetDlgItem(hwnd, IDC_BELLDEICONIFY);
 		  SendMessage(hDeiconify, BM_SETCHECK, _this->m_DeiconifyOnBell, 0);
 		  
-#ifndef UNDER_CE
 		  HWND hDisableClip = GetDlgItem(hwnd, IDC_DISABLECLIPBOARD);
-		  SendMessage(hDisableClip, BM_SETCHECK, _this->m_DisableClipboard, 0);
-#endif			
+		  SendMessage(hDisableClip, BM_SETCHECK, _this->m_DisableClipboard, 0);			
 		  
 
 		  // sf@2005 - New Color depth choice
@@ -1522,12 +1404,7 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 		  HWND hxzyw = GetDlgItem(hwnd, IDC_XZYWRADIO);
 		  EnableWindow(hxzyw, false);
 		  ShowWindow(hxzyw, false);
-
-
-#endif
-		  
-		  
-#ifndef UNDER_CE
+#endif		  
 		  HWND hFullScreen = GetDlgItem(hwnd, IDC_FULLSCREEN);
 		  SendMessage(hFullScreen, BM_SETCHECK, _this->m_FullScreen, 0);
 
@@ -1546,9 +1423,6 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 
 		  HWND hJapkeyboard = GetDlgItem(hwnd, IDC_JAPKEYBOARD);
 		  SendMessage(hJapkeyboard, BM_SETCHECK, _this->m_JapKeyboard, 0);
-#endif
-
-		  
 
 		  // Tight Specific
 		  HWND hAllowCompressLevel = GetDlgItem(hwnd, IDC_ALLOW_COMPRESSLEVEL);
@@ -1599,11 +1473,10 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 			  HWND had = GetDlgItem(hwnd, IDC_AUTODETECT);
 			  _this->autoDetect =
 				  (SendMessage(had, BM_GETCHECK, 0, 0) == BST_CHECKED);
-			  
+			  _this->m_PreferredEncodings.clear();
 			  for (int i = rfbEncodingRaw; i <= LASTENCODING; i++) {
 				  HWND hPref = GetDlgItem(hwnd, IDC_RAWRADIO+i-rfbEncodingRaw);
-				  if (SendMessage(hPref, BM_GETCHECK, 0, 0) == BST_CHECKED)
-					  _this->m_PreferredEncodings.clear();
+				  if (SendMessage(hPref, BM_GETCHECK, 0, 0) == BST_CHECKED)					  
 					  _this->m_PreferredEncodings.push_back(i);
 			  }
 
@@ -1632,13 +1505,10 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 			  HWND hDeiconify = GetDlgItem(hwnd, IDC_BELLDEICONIFY);
 			  _this->m_DeiconifyOnBell =
 				  (SendMessage(hDeiconify, BM_GETCHECK, 0, 0) == BST_CHECKED);
-
-#ifndef UNDER_CE				
+			
 			  HWND hDisableClip = GetDlgItem(hwnd, IDC_DISABLECLIPBOARD);
 			  _this->m_DisableClipboard =
-				  (SendMessage(hDisableClip, BM_GETCHECK, 0, 0) == BST_CHECKED);
-#endif
-			  
+				  (SendMessage(hDisableClip, BM_GETCHECK, 0, 0) == BST_CHECKED);			  
 			  // sd@2005 - New Color depth choice
 			  HWND hColorMode = GetDlgItem(hwnd, IDC_FULLCOLORS_RADIO);
 			  if (SendMessage(hColorMode, BM_GETCHECK, 0, 0) == BST_CHECKED)
@@ -1716,9 +1586,6 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 
 			 _this->m_FTTimeout = GetDlgItemInt( hwnd, IDC_FTTIMEOUT, NULL, TRUE);
 
-
-			  
-#ifndef UNDER_CE
 			  HWND hFullScreen = GetDlgItem(hwnd, IDC_FULLSCREEN);
 			  _this->m_FullScreen = 
 				  (SendMessage(hFullScreen, BM_GETCHECK, 0, 0) == BST_CHECKED);
@@ -1742,7 +1609,6 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 			  HWND hJapkeyboard = GetDlgItem(hwnd, IDC_JAPKEYBOARD);
 			  _this->m_JapKeyboard =
 				  (SendMessage(hJapkeyboard, BM_GETCHECK, 0, 0) == BST_CHECKED);
-#endif
 			  
 			  // Tight Specific
 			  HWND hAllowCompressLevel = GetDlgItem(hwnd, IDC_ALLOW_COMPRESSLEVEL);
@@ -1787,16 +1653,6 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 
 			DWORD val=g_disable_sponsor;
 
-			/*if (RegCreateKeyEx(HKEY_CURRENT_USER,
-			SETTINGS_KEY_NAME,
-			0,REG_NONE, REG_OPTION_NON_VOLATILE,
-			KEY_WRITE | KEY_READ,
-			NULL, &huser, &dw) == ERROR_SUCCESS)
-			{
-				RegSetValueEx(huser, "sponsor", 0, REG_DWORD, (LPBYTE) &val, sizeof(val));
-				if (huser != NULL) RegCloseKey(huser);
-			}*/
-
 			//adzm 2010-07-04
 			 HWND hpreemptiveUpdates = GetDlgItem(hwnd, IDC_PREEMPTIVEUPDATES);
 			 _this->m_preemptiveUpdates = (SendMessage(hpreemptiveUpdates, BM_GETCHECK, 0, 0) == BST_CHECKED) ? true : false;
@@ -1817,15 +1673,6 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 	  
     case IDCANCEL:
 		EndDialog(hwnd, FALSE);
-		return TRUE;
-
-	case IDC_SNAPSHOTFOLDER:
-		{
-		Snapshot snapshot;
-		snapshot.DoDialog(_this->m_folder, _this->m_prefix);
-		_tcscpy_s(_this->m_folder,snapshot.getFolder());
-		_tcscpy_s(_this->m_prefix, snapshot.getPrefix());
-		}
 		return TRUE;
 		
     case IDC_AUTODETECT:
@@ -1888,25 +1735,7 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 		return TRUE;
 		}
 	case IDC_ULTRA:
-		{
-		bool ultra=IsDlgButtonChecked(hwnd, IDC_ULTRA) ? true : false;
-		if (ultra)
-		{
-	 	   /* HWND hCache = GetDlgItem(hwnd, ID_SESSION_SET_CACHE);
-			SendMessage(hCache, BM_SETCHECK, false, 0);
-			// [v1.0.2-jp2 fix-->]
-			HWND hCopyRect = GetDlgItem(hwnd, ID_SESSION_SET_CRECT);
-			SendMessage(hCopyRect, BM_SETCHECK, false, 0);
-			// [<--v1.0.2-jp2 fix]
-			HWND hRemoteCursor = GetDlgItem(hwnd, IDC_CSHAPE_DISABLE_RADIO);
-			SendMessage(hRemoteCursor, BM_SETCHECK,	true, 0);
-			HWND hRemoteCursor2 = GetDlgItem(hwnd, IDC_CSHAPE_ENABLE_RADIO);
-			SendMessage(hRemoteCursor2, BM_SETCHECK,false, 0);
-			HWND hRemoteCursor3 = GetDlgItem(hwnd, IDC_CSHAPE_IGNORE_RADIO);
-			SendMessage(hRemoteCursor3, BM_SETCHECK,false, 0);*/
-		}
 		return TRUE;
-		}
 	case IDC_256COLORS_RADIO:
 	case IDC_64COLORS_RADIO:
 	case IDC_8COLORS_RADIO:
@@ -1943,19 +1772,6 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 			SendMessage(hColorMode, BM_SETCHECK, false, 0);
 			hColorMode = GetDlgItem(hwnd, IDC_2GREYCOLORS_RADIO);			  
 			SendMessage(hColorMode, BM_SETCHECK, false, 0);
-
-	 	    /*HWND hCache = GetDlgItem(hwnd, ID_SESSION_SET_CACHE);
-			SendMessage(hCache, BM_SETCHECK, false, 0);
-			// [v1.0.2-jp2 fix-->]
-			HWND hCopyRect = GetDlgItem(hwnd, ID_SESSION_SET_CRECT);
-			SendMessage(hCopyRect, BM_SETCHECK, false, 0);
-			// [<--v1.0.2-jp2 fix]
-			HWND hRemoteCursor = GetDlgItem(hwnd, IDC_CSHAPE_DISABLE_RADIO);
-			SendMessage(hRemoteCursor, BM_SETCHECK,	true, 0);
-			HWND hRemoteCursor2 = GetDlgItem(hwnd, IDC_CSHAPE_ENABLE_RADIO);
-			SendMessage(hRemoteCursor2, BM_SETCHECK,false, 0);
-			HWND hRemoteCursor3 = GetDlgItem(hwnd, IDC_CSHAPE_IGNORE_RADIO);
-			SendMessage(hRemoteCursor3, BM_SETCHECK,false, 0);*/
 		}
 		return TRUE;
 		}
