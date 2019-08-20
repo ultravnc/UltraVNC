@@ -25,7 +25,6 @@ LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
 //
 
 IDC_FINGER              CURSOR                  "Finger.cur"
-
 #endif    // Japanese (Japan) resources
 /////////////////////////////////////////////////////////////////////////////
 
@@ -43,7 +42,6 @@ LANGUAGE LANG_ENGLISH, SUBLANG_NEUTRAL
 //
 
 IDB_COLLAPS             BITMAP                  "up.bmp"
-
 #endif    // English resources
 /////////////////////////////////////////////////////////////////////////////
 
@@ -61,11 +59,8 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 //
 
 IDC_CURSOR1             CURSOR                  "cursorsel.cur"
-
 IDC_DOTCURSOR           CURSOR                  "cursor1.cur"
-
 IDC_NOCURSOR            CURSOR                  "nocursor.cur"
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -73,31 +68,18 @@ IDC_NOCURSOR            CURSOR                  "nocursor.cur"
 //
 
 IDB_BITMAP2             BITMAP                  "hoch.bmp"
-
 IDB_BITMAP3             BITMAP                  "quer.bmp"
-
 IDB_STAT_BACK           BITMAP                  "stat\\back.bmp"
-
 IDB_STAT_BOTH           BITMAP                  "stat\\both.bmp"
-
 IDB_STAT_FRONT          BITMAP                  "stat\\front.bmp"
-
 IDB_STAT_NONE           BITMAP                  "stat\\none.bmp"
-
 IDB_VNC64               BITMAP                  "vnc64.BMP"
-
 IDB_CLOSE               BITMAP                  "stat\\closeup.bmp"
-
 IDB_MAXIMIZE            BITMAP                  "stat\\maximizeup.bmp"
-
 IDB_MINIMIZE            BITMAP                  "stat\\minimizeup.bmp"
-
 IDB_PINDOWN             BITMAP                  "stat\\pindown.bmp"
-
 IDB_PINUP               BITMAP                  "stat\\pinup.bmp"
-
 IDB_VNC32               BITMAP                  "vnc32.BMP"
-
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -133,15 +115,10 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDR_TRAY                ICON                    "idr_tray.ico"
-
 IDI_NET                 ICON                    "B46.ico"
-
 IDI_FILE                ICON                    "file.ico"
-
 IDI_DIR                 ICON                    "dir.ico"
-
 IDI_DRIVE               ICON                    "drive.ico"
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -311,7 +288,7 @@ BEGIN
     EDITTEXT        IDC_PROXY_EDIT,76,45,138,12,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "Connect",IDCONNECT,200,60,40,14
     PUSHBUTTON      "Cancel",IDCANCEL,157,60,40,14
-    CONTROL         IDB_EXPAND,IDC_EXPAND,"Static",SS_BITMAP | SS_NOTIFY | SS_REALSIZEIMAGE,6,64,11,10,WS_EX_TRANSPARENT
+    CONTROL         218,IDC_EXPAND,"Static",SS_BITMAP | SS_NOTIFY | SS_REALSIZEIMAGE,6,64,11,10,WS_EX_TRANSPARENT
     LTEXT           "Computer:",IDC_STATIC,6,32,66,8
     PUSHBUTTON      "Load ",IDC_LOADPROFILE_B,67,83,50,13
     CONTROL         "Use Repeater:",IDC_PROXY_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,46,66,10
@@ -322,7 +299,7 @@ BEGIN
     CONTROL         "",IDC_DEFAULTBOX,"Static",SS_BLACKFRAME | SS_REALSIZEIMAGE,0,0,247,83
     PUSHBUTTON      "Delete",IDC_HOSTNAME_DEL,128,83,50,13
     PUSHBUTTON      "Save as",IDC_SAVEAS,6,83,50,13
-    CONTROL         IDB_VNC32,IDC_STATIC,"Static",SS_BITMAP,6,5,21,20
+    CONTROL         109,IDC_STATIC,"Static",SS_BITMAP,6,5,21,20
     CTEXT           "UltraVNC viewer",IDC_LOGO,53,7,143,16,SS_CENTERIMAGE
     CONTROL         "",IDC_HTML,"Static",SS_BLACKFRAME,250,3,220,288
 END
@@ -348,7 +325,7 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,149,42,50,15
     RTEXT           "Username:",IDC_STATIC,58,10,57,8
     RTEXT           "Password:",IDC_STATIC,58,26,57,8
-    CONTROL         IDB_VNC64,IDC_STATIC,"Static",SS_BITMAP | SS_REALSIZEIMAGE | SS_SUNKEN,8,10,44,41
+    CONTROL         145,IDC_STATIC,"Static",SS_BITMAP | SS_REALSIZEIMAGE | SS_SUNKEN,8,10,44,41
 END
 
 IDD_AUTH_DIALOG2 DIALOGEX 101, 66, 214, 113
@@ -364,7 +341,7 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,150,92,50,15
     RTEXT           "Username:",IDC_STATIC,58,60,57,8
     RTEXT           "Password:",IDC_STATIC,58,76,57,8
-    CONTROL         IDB_VNC64,IDC_STATIC,"Static",SS_BITMAP | SS_REALSIZEIMAGE | SS_SUNKEN,8,60,44,41
+    CONTROL         145,IDC_STATIC,"Static",SS_BITMAP | SS_REALSIZEIMAGE | SS_SUNKEN,8,60,44,41
 END
 
 IDD_CUSTUM_KEY DIALOGEX 0, 0, 224, 53
@@ -427,7 +404,7 @@ BEGIN
     DEFPUSHBUTTON   "Log On",IDOK,108,37,54,15
     PUSHBUTTON      "Cancel",IDCANCEL,168,37,50,15
     RTEXT           "Password:",-1,65,16,61,8
-    CONTROL         IDB_VNC64,-1,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_SUNKEN,6,6,50,42
+    CONTROL         145,-1,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_SUNKEN,6,6,50,42
 END
 
 IDD_FTPARAM_DLG DIALOGEX 0, 0, 241, 60
@@ -460,7 +437,7 @@ CAPTION " About VNCviewer"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,8,137,62,14
-    CONTROL         IDB_BITMAP3,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_SUNKEN,8,7,62,54
+    CONTROL         156,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_SUNKEN,8,7,62,54
     LTEXT           "UltraVNC Viewer 1.2.3.0",IDC_STATIC,86,6,197,11
     LTEXT           "For more Information and Links please visit: \nhttp://www.uvnc.com",IDC_STATIC,86,133,197,19
     LTEXT           "Copyright © 2002-2018 UltraVNC Team\nCopyright © 2001-2002 Sam - eSVNC \nCopyright © 1999-2002 Rudi D. V. - VdaccVNC \nCopyright © 1999-2002 Const. Kaplinsky - TightVNC \nCopyright © 2002 RealVNC Ltd. - RealVNC\n",IDC_STATIC,86,30,200,40
@@ -519,7 +496,7 @@ BEGIN
     DEFPUSHBUTTON   "Log On",IDOK,108,37,54,15
     PUSHBUTTON      "Cancel",IDCANCEL,168,37,50,15
     RTEXT           "Password:",-1,65,16,61,8
-    CONTROL         IDB_VNC64,-1,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_SUNKEN,6,6,50,42
+    CONTROL         145,-1,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_SUNKEN,6,6,50,42
 END
 
 
@@ -762,14 +739,14 @@ END
 // AFX_DIALOG_LAYOUT
 //
 
-IDD_FILETRANSFER_DLG AFX_DIALOG_LAYOUT
+IDD_FILETRANSFER_DLG AFX_DIALOG_LAYOUT 
 BEGIN
-    0
+    0x0000
 END
 
-IDD_SESSION_DLG AFX_DIALOG_LAYOUT
+IDD_SESSION_DLG AFX_DIALOG_LAYOUT 
 BEGIN
-    0
+    0x0000
 END
 
 
@@ -1136,13 +1113,9 @@ LANGUAGE LANG_DUTCH, SUBLANG_DUTCH
 //
 
 IDB_BITMAPsx            BITMAP                  "Tango_sx.bmp"
-
 IDB_BITMAPl             BITMAP                  "Tango_l.bmp"
-
 IDB_BITMAPlx            BITMAP                  "Tango_lx.bmp"
-
 IDB_BITMAPs             BITMAP                  "Tango_s.bmp"
-
 #endif    // Dutch (Netherlands) resources
 /////////////////////////////////////////////////////////////////////////////
 
@@ -1160,19 +1133,12 @@ LANGUAGE LANG_DUTCH, SUBLANG_DUTCH_BELGIAN
 //
 
 IDB_BITMAP14            BITMAP                  "l2.bmp"
-
 IDB_BITMAP13            BITMAP                  "l1.bmp"
-
 IDB_FITSCREEN           BITMAP                  "stat\\1op1.bmp"
-
 IDB_NOSCALE             BITMAP                  "stat\\full.bmp"
-
 IDB_PHOTO               BITMAP                  "stat\\photo.bmp"
-
 IDB_SWITCHMONITOR       BITMAP                  "stat\\switch.bmp"
-
 IDB_EXPAND              BITMAP                  "down.bmp"
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1182,7 +1148,6 @@ IDB_EXPAND              BITMAP                  "down.bmp"
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDR_TRAY_DISABLED       ICON                    "idr_tray_disabled.ico"
-
 
 /////////////////////////////////////////////////////////////////////////////
 //

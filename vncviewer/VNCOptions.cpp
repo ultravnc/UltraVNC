@@ -230,7 +230,7 @@ void VNCOptions::setDefaultOptionsFileName()
 		char* p = strrchr(szFileName, '\\');
 		if (p == NULL) return;
 		*p = '\0';
-		strcat(szFileName, "\\options.vnc");
+		strcat_s(szFileName, "\\options.vnc");
 	}
 	HANDLE m_hDestFile = CreateFile(szFileName, GENERIC_WRITE | GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, FILE_FLAG_SEQUENTIAL_SCAN, NULL);
 	bool fAlreadyExists = (GetLastError() == ERROR_ALREADY_EXISTS);
@@ -452,7 +452,7 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
   if (cmdlinelen == 0) return;
 	
   TCHAR *cmd = new TCHAR[cmdlinelen + 1];
-  _tcscpy(cmd, szCmdLine);
+  _tcscpy_s(cmd, cmdlinelen + 1, szCmdLine);
 	
 	// Count the number of spaces
 	// This may be more than the number of arguments, but that doesn't matter.
@@ -506,7 +506,7 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 	{
       m_listening = true;
       if (j+1 < i && args[j+1][0] >= '0' && args[j+1][0] <= '9') {
-        if (_stscanf(args[j+1], _T("%d"), &m_listenPort) != 1) {
+        if (_stscanf_s(args[j+1], _T("%d"), &m_listenPort) != 1) {
           ArgError(sz_D3);
           continue;
         }
@@ -514,7 +514,7 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
       }
     } else if (SwitchMatch(args[j], _T("fttimeout"))) { //PGM @ Advantig
       if (j+1 < i && args[j+1][0] >= '0' && args[j+1][0] <= '9') {
-        if (_stscanf(args[j+1], _T("%d"), &m_FTTimeout) != 1) {
+        if (_stscanf_s(args[j+1], _T("%d"), &m_FTTimeout) != 1) {
           ArgError(sz_D3);
           continue;
         }
@@ -524,7 +524,7 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
       }
     }  else if (SwitchMatch(args[j], _T("keepalive"))) { //PGM @ Advantig
       if (j+1 < i && args[j+1][0] >= '0' && args[j+1][0] <= '9') {
-        if (_stscanf(args[j+1], _T("%d"), &m_keepAliveInterval) != 1) {
+        if (_stscanf_s(args[j+1], _T("%d"), &m_keepAliveInterval) != 1) {
           ArgError(sz_D3);
           continue;
         }
@@ -535,7 +535,7 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 	} else if ( SwitchMatch(args[j], _T("socketkeepalivetimeout"))) { // adzm 2010-08 
       if (j+1 < i && args[j+1][0] >= '0' && args[j+1][0] <= '9') {
 		int m_socketKeepAliveTimeout;
-        if (_stscanf(args[j+1], _T("%d"), &m_socketKeepAliveTimeout) != 1) {
+        if (_stscanf_s(args[j+1], _T("%d"), &m_socketKeepAliveTimeout) != 1) {
           ArgError(sz_D3);
           continue;
         }
@@ -610,7 +610,7 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
         ArgError(sz_D4);
         continue;
       }
-      int numscales = _stscanf(args[j], _T("%d/%d"), &m_scale_num, &m_scale_den);
+      int numscales = _stscanf_s(args[j], _T("%d/%d"), &m_scale_num, &m_scale_den);
       if (numscales < 1) {
         ArgError(sz_D5);
         continue;
@@ -623,7 +623,7 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
         ArgError(sz_D6);
         continue;
       }
-      if (_stscanf(args[j], _T("%d"), &m_Emul3Timeout) != 1) {
+      if (_stscanf_s(args[j], _T("%d"), &m_Emul3Timeout) != 1) {
         ArgError(sz_D7);
         continue;
       }
@@ -633,7 +633,7 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
         ArgError(sz_D8);
         continue;
       }
-      if (_stscanf(args[j], _T("%d"), &m_Emul3Fuzz) != 1) {
+      if (_stscanf_s(args[j], _T("%d"), &m_Emul3Fuzz) != 1) {
         ArgError(sz_D9);
         continue;
       }
@@ -646,7 +646,7 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
         ArgError(sz_D10);
         continue;
       }
-      if (_stscanf(args[j], _T("%d"), &m_delay) != 1) {
+      if (_stscanf_s(args[j], _T("%d"), &m_delay) != 1) {
         ArgError(sz_D11);
         continue;
       }
@@ -656,7 +656,7 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
         ArgError(sz_D12);
         continue;
       }
-      if (_stscanf(args[j], _T("%d"), &m_logLevel) != 1) {
+      if (_stscanf_s(args[j], _T("%d"), &m_logLevel) != 1) {
         ArgError(sz_D13);
         continue;
       }
@@ -668,7 +668,7 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
         ArgError(sz_D14);
         continue;
       }
-      if (_stscanf(args[j], _T("%s"), m_logFilename) != 1) {
+      if (_stscanf_s(args[j], _T("%s"), m_logFilename) != 1) {
         ArgError(sz_D15);
         continue;
       } else {
@@ -754,7 +754,7 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 				continue;
 			}
 			m_useCompressLevel = true;
-			if (_stscanf(args[j], _T("%d"), &m_compressLevel) != 1) {
+			if (_stscanf_s(args[j], _T("%d"), &m_compressLevel) != 1) {
 				ArgError(sz_D21);
 				continue;
 			}
@@ -764,7 +764,7 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 				continue;
 			}
 			m_enableJpegCompression = true;
-			if (_stscanf(args[j], _T("%d"), &m_jpegQualityLevel) != 1) {
+			if (_stscanf_s(args[j], _T("%d"), &m_jpegQualityLevel) != 1) {
 				ArgError(sz_D23);
 				continue;
 			}
@@ -777,7 +777,7 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 				ArgError(sz_D24);
 				continue;
 			}
-			strcpy(m_cmdlnUser, args[j]);
+			strcpy_s(m_cmdlnUser, args[j]);
 	} // act : add user option on command line
 	// Modif sf@2002 : password in the command line
 	else if ( SwitchMatch(args[j], _T("password") ))
@@ -787,7 +787,7 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 				ArgError(sz_D24);
 				continue;
 			}
-			strcpy(m_clearPassword, args[j]);
+			strcpy_s(m_clearPassword, args[j]);
 	} // Modif sf@2002
 	else if ( SwitchMatch(args[j], _T("serverscale") ))
 	{
@@ -796,7 +796,7 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 			ArgError(sz_D25);
 			continue;
 		}
-		_stscanf(args[j], _T("%d"), &m_nServerScale);
+		_stscanf_s(args[j], _T("%d"), &m_nServerScale);
 		if (m_nServerScale < 1 || m_nServerScale > 9) m_nServerScale = 1;
 	}
 	// Modif sf@2002
@@ -807,7 +807,7 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 			ArgError(sz_D26);
 			continue;
 		}
-		_stscanf(args[j], _T("%d"), &m_quickoption);
+		_stscanf_s(args[j], _T("%d"), &m_quickoption);
 	}
 	// Modif sf@2002 - DSM Plugin 
 	else if ( SwitchMatch(args[j], _T("dsmplugin") ))
@@ -818,7 +818,7 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 			continue;
 		}
 		m_fUseDSMPlugin = true;
-		strcpy(m_szDSMPluginFilename, args[j]);
+		strcpy_s(m_szDSMPluginFilename, args[j]);
 	}
 	else if ( SwitchMatch(args[j], _T("proxy") ))
 	{
@@ -828,7 +828,7 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 			continue;
 		}		
 		m_fUseProxy = true;
-		_tcscpy(m_proxyhost, args[j]);
+		_tcscpy_s(m_proxyhost, args[j]);
 		//adzm 2010-02-15
 		CheckProxyAndHost();
 	}
@@ -839,7 +839,7 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
             PostQuitMessage(1);
             continue;
         }
-		_stscanf(args[j], _T("%d"), &m_reconnectcounter);
+		_stscanf_s(args[j], _T("%d"), &m_reconnectcounter);
 	}
 
 	else if (SwitchMatch(args[j], _T("position")))
@@ -850,10 +850,10 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 			PostQuitMessage(1);
 			continue;
 		}
-		_stscanf(args[j - 3], _T("%d"), &m_x);
-		_stscanf(args[j - 2], _T("%d"), &m_y);
-		_stscanf(args[j - 1], _T("%d"), &m_w);
-		_stscanf(args[j], _T("%d"), &m_h);
+		_stscanf_s(args[j - 3], _T("%d"), &m_x);
+		_stscanf_s(args[j - 2], _T("%d"), &m_y);
+		_stscanf_s(args[j - 1], _T("%d"), &m_w);
+		_stscanf_s(args[j], _T("%d"), &m_h);
 		int a = 0;
 	}
 	else if (SwitchMatch(args[j], _T("noborder"))) {
@@ -867,7 +867,7 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
             PostQuitMessage(1);
             continue;
         }
-		_stscanf(args[j], _T("%d"), &m_autoReconnect);
+		_stscanf_s(args[j], _T("%d"), &m_autoReconnect);
 	}
 	else if (SwitchMatch(args[j], _T("disablesponsor")))
 	{
@@ -912,7 +912,7 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 			ArgError(sz_D22);
 			continue;
 		}
-		if (_stscanf(args[j], _T("%d"), &m_throttleMouse) != 1) {
+		if (_stscanf_s(args[j], _T("%d"), &m_throttleMouse) != 1) {
 			ArgError(sz_D23);
 			continue;
 		}
@@ -928,7 +928,7 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 						{
 							phost[l_i] = toupper(phost[l_i]);
 						} 
-        _tcscpy(m_host_options, phost);
+        _tcscpy_s(m_host_options, phost);
 		//adzm 2010-02-15
 		CheckProxyAndHost();
         m_connectionSpecified = true;
@@ -953,7 +953,7 @@ void VNCOptions::CheckProxyAndHost()
 {
 	if (strlen(m_proxyhost) > 0) {
 		TCHAR actualProxy[256];
-		strcpy(actualProxy, m_proxyhost);
+		strcpy_s(actualProxy, m_proxyhost);
 
 		if (strlen(m_host_options) > 0) {
 			if (strncmp(m_host_options, "ID", 2) == 0) {
@@ -975,7 +975,7 @@ void VNCOptions::CheckProxyAndHost()
 					char* szToken = strtok(m_proxyhost, ";");
 					while (szToken) {
 						if (modulo == 0) {
-							strcpy(actualProxy, szToken);
+							strcpy_s(actualProxy, szToken);
 							break;
 						}
 
@@ -996,7 +996,7 @@ void VNCOptions::CheckProxyAndHost()
 void saveInt(char *name, int value, char *fname) 
 {
   char buf[10];
-  sprintf(buf, "%d", value); 
+  sprintf_s(buf, "%d", value); 
   WritePrivateProfileString("options", name, buf, fname);
 }
 
@@ -1009,7 +1009,7 @@ void VNCOptions::Save(char *fname)
 {
   for (int i = rfbEncodingRaw; i<= LASTENCODING; i++) {
     char buf[128];
-    sprintf(buf, "use_encoding_%d", i);
+    sprintf_s(buf, "use_encoding_%d", i);
     saveInt(buf, m_UseEnc[i], fname);
   }
   if (!m_PreferredEncodings.empty()) {
@@ -1090,7 +1090,7 @@ void VNCOptions::Load(char *fname)
 {
   for (int i = rfbEncodingRaw; i<= LASTENCODING; i++) {
     char buf[128];
-    sprintf(buf, "use_encoding_%d", i);
+    sprintf_s(buf, "use_encoding_%d", i);
     m_UseEnc[i] =   readInt(buf, m_UseEnc[i], fname) != 0;
   }
   int nExistingPreferred = m_PreferredEncodings.empty() ? rfbEncodingZRLE : m_PreferredEncodings[0];
@@ -1203,7 +1203,7 @@ void VNCOptions::ShowUsage(LPTSTR info) {
   TCHAR *tmpinf = _T("");
   if (info != NULL) 
     tmpinf = info;
-  _stprintf(msg, 
+  _stprintf_s(msg, 
             _T("%s\r\nUsage includes:\r\n"
                "  vncviewer [/8bit] [/swapmouse] [/shared] [/belldeiconify]\r\n"
                "      [/listen [portnum]] [/fullscreen] [/viewonly] [/notoolbar]\r\n"
@@ -1372,7 +1372,7 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 		  char szPer[4];
 		  for (i = 0; i <= 12; i++)
 		  {
-			  _itoa(Scales[i], szPer, 10);
+			  _itoa_s(Scales[i], szPer, 10);
 			  SendMessage(hViewerScale, CB_INSERTSTRING, (WPARAM)i, (LPARAM)(int FAR*)szPer);
 		  }
 		  SetDlgItemInt(hwnd,

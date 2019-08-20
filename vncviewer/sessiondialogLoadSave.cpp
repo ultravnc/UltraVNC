@@ -37,10 +37,10 @@ void SessionDialog::SaveConnection(HWND hwnd, bool saveAs)
 	SettingsFromUI();
 	char fname[_MAX_PATH];
 	int disp = PORT_TO_DISPLAY(m_port);
-	sprintf(fname, "%.10s-%d.vnc", m_host_dialog, (disp > 0 && disp < 100) ? disp : m_port);
+	sprintf_s(fname, "%.10s-%d.vnc", m_host_dialog, (disp > 0 && disp < 100) ? disp : m_port);
 	char buffer[_MAX_PATH];
 	getAppData(buffer);
-	strcat(buffer,"\\vnc");
+	strcat_s(buffer,"\\vnc");
 	_mkdir(buffer);
 
 	if ( saveAs) {
@@ -66,7 +66,7 @@ void SessionDialog::SaveConnection(HWND hwnd, bool saveAs)
 			case 0:	// user cancelled
 				break;
 			case FNERR_INVALIDFILENAME:
-				strcpy(msg, sz_K1);
+				strcpy_s(msg, sz_K1);
 				MessageBox(hwnd, msg, sz_K2, MB_ICONERROR | MB_OK | MB_SETFOREGROUND | MB_TOPMOST);
 				break;
 			default:
@@ -78,8 +78,8 @@ void SessionDialog::SaveConnection(HWND hwnd, bool saveAs)
 		SaveToFile(fname);
 	}
 	else {
-		strcat(buffer,"\\");
-		strcat(buffer,fname);
+		strcat_s(buffer,"\\");
+		strcat_s(buffer,fname);
 		SaveToFile(buffer);
 	}
 	
@@ -114,7 +114,7 @@ void SessionDialog::SettingsToUI()
 void SessionDialog::saveInt(char *name, int value, char *fname) 
 {
   char buf[10];
-  sprintf(buf, "%d", value); 
+  sprintf_s(buf, "%d", value); 
   WritePrivateProfileString("options", name, buf, fname);
 }
 
@@ -127,14 +127,14 @@ void SessionDialog::SaveToFile(char *fname)
 {
 	int ret = WritePrivateProfileString("connection", "host", m_host_dialog, fname);
 	char buf[32];
-	sprintf(buf, "%d", m_port);
+	sprintf_s(buf, "%d", m_port);
 	WritePrivateProfileString("connection", "port", buf, fname);
 	ret = WritePrivateProfileString("connection", "proxyhost", m_proxyhost, fname);
-	sprintf(buf, "%d", m_proxyport);
+	sprintf_s(buf, "%d", m_proxyport);
 	WritePrivateProfileString("connection", "proxyport", buf, fname);
 	for (int i = rfbEncodingRaw; i<= LASTENCODING; i++) {
 		char buf[128];
-		sprintf(buf, "use_encoding_%d", i);
+		sprintf_s(buf, "use_encoding_%d", i);
 		saveInt(buf, UseEnc[i], fname);
 	 }
 	if (!PreferredEncodings.empty()) {
@@ -195,7 +195,7 @@ void SessionDialog::LoadFromFile(char *fname)
 {
   for (int i = rfbEncodingRaw; i<= LASTENCODING; i++) {
     char buf[128];
-    sprintf(buf, "use_encoding_%d", i);
+    sprintf_s(buf, "use_encoding_%d", i);
     UseEnc[i] =   readInt(buf, UseEnc[i], fname) != 0;
   }
   int nExistingPreferred = PreferredEncodings.empty() ? rfbEncodingZRLE : PreferredEncodings[0];
@@ -279,11 +279,11 @@ void SessionDialog::IfHostExistLoadSettings(char *hostname)
 	ParseDisplay(hostname, tmphost, 255, &port);
 	char fname[_MAX_PATH];
 	int disp = PORT_TO_DISPLAY(port);
-	sprintf(fname, "%.10s-%d.vnc", tmphost, (disp > 0 && disp < 100) ? disp : port);
+	sprintf_s(fname, "%.10s-%d.vnc", tmphost, (disp > 0 && disp < 100) ? disp : port);
 	char buffer[_MAX_PATH];
 	getAppData(buffer);
-	strcat(buffer,"\\vnc\\");
-	strcat(buffer,fname);
+	strcat_s(buffer,"\\vnc\\");
+	strcat_s(buffer,fname);
 
 	if (FILE *file = fopen(buffer, "r")) {
 		fclose(file);

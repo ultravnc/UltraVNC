@@ -36,16 +36,12 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-
-#ifdef UNDER_CE
-#include "omnithreadce.h"
-#else
 #ifdef _VNCVIEWER
 #include "../vncviewer/omnithread/omnithread.h"
 #else
 #include "omnithread.h"
 #endif
-#endif
+
 
 #include <winsock2.h>
 #include <windows.h>

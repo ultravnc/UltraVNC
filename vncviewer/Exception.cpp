@@ -31,7 +31,7 @@ Exception::Exception(const char *info,int error_nr) : m_error_nr(-1)
 {
 	assert(info != NULL);
 	m_info = new char[strlen(info)+1];
-	strcpy(m_info, info);
+	strcpy_s(m_info, strlen(info)+1, info);
     if (error_nr)
 	m_error_nr=error_nr;
 }

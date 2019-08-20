@@ -73,7 +73,7 @@ tempdisplayclass::checkmonitors()
 					monarray[id].wb=mi.rcWork.bottom;
 					monarray[id].hm = hm;
 			}
-			sprintf(monarray[id].buttontext, "%d. %d x %d @ %d,%d - %d-bit - %d Hz", id,dm.dmPelsWidth, dm.dmPelsHeight,
+			sprintf_s(monarray[id].buttontext, "%d. %d x %d @ %d,%d - %d-bit - %d Hz", id,dm.dmPelsWidth, dm.dmPelsHeight,
 				dm.dmPosition.x, dm.dmPosition.y, dm.dmBitsPerPel, dm.dmDisplayFrequency);
 			monarray[id].width=dm.dmPelsWidth;
 			monarray[id].height=dm.dmPelsHeight;
@@ -81,7 +81,7 @@ tempdisplayclass::checkmonitors()
 			monarray[id].offsetx=dm.dmPosition.x;
 			monarray[id].offsety=dm.dmPosition.y;
 			monarray[id].freq=dm.dmDisplayFrequency;
-			strcpy(monarray[id].devicename,(char *)dd.DeviceName);
+			strcpy_s(monarray[id].devicename,(char *)dd.DeviceName);
 			nr_monitors=id;
 
 			id++;
@@ -95,8 +95,8 @@ tempdisplayclass::checkmonitors()
 					monarray[0].depth=monarray[1].depth;
 					monarray[0].offsetx=GetSystemMetrics (SM_XVIRTUALSCREEN);
 					monarray[0].offsety=GetSystemMetrics (SM_YVIRTUALSCREEN);
-					strcpy(monarray[0].devicename,"All displays");
-					sprintf(monarray[0].buttontext, "%d. %d x %d @ %d,%d - %d-bit ", 0,monarray[0].width, monarray[0].height,monarray[0].offsetx, monarray[0].offsety, monarray[0].depth);
+					strcpy_s(monarray[0].devicename,"All displays");
+					sprintf_s(monarray[0].buttontext, "%d. %d x %d @ %d,%d - %d-bit ", 0,monarray[0].width, monarray[0].height,monarray[0].offsetx, monarray[0].offsety, monarray[0].depth);
 
 					RECT workrect = { 0, 0, 0, 0 };
  					SystemParametersInfo(SPI_GETWORKAREA, 0, &workrect, 0);

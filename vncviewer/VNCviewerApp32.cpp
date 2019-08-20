@@ -60,7 +60,7 @@ VNCviewerApp32::VNCviewerApp32(HINSTANCE hInstance, PSTR szCmdLine) :
 			m_pdaemon = new Daemon(m_options.m_listenPort);
 		} catch (WarningException &e) {
 			char msg[1024];
-			sprintf(msg,"%s (%s)\n\r%s",sz_A3,
+			sprintf_s(msg,"%s (%s)\n\r%s",sz_A3,
 				e.m_info, sz_A4);
 			MessageBox(NULL, msg, sz_A5, MB_OK | MB_ICONSTOP);
 			exit(1);

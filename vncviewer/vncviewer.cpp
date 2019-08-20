@@ -822,21 +822,21 @@ bool ParseDisplay(LPTSTR display, LPTSTR phost, int hostlen, int *pport)
 	{
 		// No colon -- use default port number
         tmp_port = RFB_PORT_OFFSET;
-		_tcsncpy(phost, display, MAX_HOST_NAME_LEN);
+		_tcsncpy_s(phost, 256, display, MAX_HOST_NAME_LEN);
 	}
 	else
 	{
-		_tcsncpy(phost, display, colonpos - display);
+		_tcsncpy_s(phost, 256, display, colonpos - display);
 		phost[colonpos - display] = L'\0';
 		if (colonpos[1] == L':') {
 			// Two colons -- interpret as a port number
-			if (_stscanf(colonpos + 2, TEXT("%d"), &tmp_port) != 1) 
+			if (_stscanf_s(colonpos + 2, TEXT("%d"), &tmp_port) != 1) 
 				return false;
 		}
 		else
 		{
 			// One colon -- interpret as a display number or port number
-			if (_stscanf(colonpos + 1, TEXT("%d"), &tmp_port) != 1) 
+			if (_stscanf_s(colonpos + 1, TEXT("%d"), &tmp_port) != 1) 
 				return false;
 
 			// RealVNC method - If port < 100 interpret as display number else as Port number

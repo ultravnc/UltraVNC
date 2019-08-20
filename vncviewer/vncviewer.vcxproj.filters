@@ -389,6 +389,7 @@
       <Filter>sources</Filter>
     </ClCompile>
     <ClCompile Include="Snapshot.cpp" />
+    <ClCompile Include="Snapshot.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AboutBox.h">
@@ -506,6 +507,7 @@
     <ClInclude Include="SessionDialogTabs.h">
       <Filter>headers</Filter>
     </ClInclude>
+    <ClInclude Include="Snapshot.h" />
     <ClInclude Include="Snapshot.h" />
     <ClInclude Include="Snapshot.h" />
   </ItemGroup>

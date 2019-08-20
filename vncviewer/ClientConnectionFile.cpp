@@ -79,7 +79,7 @@ void ClientConnection::SaveConnection()
 	char tname[_MAX_FNAME + _MAX_EXT];
 	ofnInit();
 	int disp = PORT_TO_DISPLAY(m_port);
-	sprintf(fname, "%.10s-%d.vnc", m_host, (disp > 0 && disp < 100) ? disp : m_port);
+	sprintf_s(fname, "%.10s-%d.vnc", m_host, (disp > 0 && disp < 100) ? disp : m_port);
 	ofn.hwndOwner = m_hwndcn;
 	ofn.lpstrFile = fname;
 	ofn.lpstrFileTitle = tname;
@@ -91,7 +91,7 @@ void ClientConnection::SaveConnection()
 		case 0:	// user cancelled
 			break;
 		case FNERR_INVALIDFILENAME:
-			strcpy(msg, sz_K1);
+			strcpy_s(msg, sz_K1);
 			MessageBox(m_hwndcn, msg, sz_K2, MB_ICONERROR | MB_OK | MB_SETFOREGROUND | MB_TOPMOST);
 			break;
 		default:
@@ -104,11 +104,11 @@ void ClientConnection::SaveConnection()
 
 	int ret = WritePrivateProfileString("connection", "host", m_host, fname);
 	char buf[32];
-	sprintf(buf, "%d", m_port);
+	sprintf_s(buf, "%d", m_port);
 	WritePrivateProfileString("connection", "port", buf, fname);
 
 	ret = WritePrivateProfileString("connection", "proxyhost", m_proxyhost, fname);
-	sprintf(buf, "%d", m_proxyport);
+	sprintf_s(buf, "%d", m_proxyport);
 	WritePrivateProfileString("connection", "proxyport", buf, fname);
 
 	if (MessageBox(m_hwndcn,
@@ -117,7 +117,7 @@ void ClientConnection::SaveConnection()
 		MB_YESNO | MB_ICONWARNING) == IDYES) 
 	{
 		for (int i = 0; i < MAXPWLEN; i++) {
-			sprintf(buf+i*2, "%02x", (unsigned int) m_encPasswd[i]);
+			sprintf_s(buf+i*2, 32-i*2, "%02x", (unsigned int) m_encPasswd[i]);
 		}
 	} else
 		buf[0] = '\0';
@@ -136,10 +136,10 @@ void ClientConnection::Save_Latest_Connection()
 	vnclog.Print(1, "Saving to %s\n", m_opts.getDefaultOptionsFileName());	
 	int ret = WritePrivateProfileString("connection", "host", m_host, m_opts.getDefaultOptionsFileName());
 	char buf[32];
-	sprintf(buf, "%d", m_port);
+	sprintf_s(buf, "%d", m_port);
 	WritePrivateProfileString("connection", "port", buf, m_opts.getDefaultOptionsFileName());
 	ret = WritePrivateProfileString("connection", "proxyhost", m_proxyhost, m_opts.getDefaultOptionsFileName());
-	sprintf(buf, "%d", m_proxyport);
+	sprintf_s(buf, "%d", m_proxyport);
 	WritePrivateProfileString("connection", "proxyport", buf, m_opts.getDefaultOptionsFileName());
 	buf[0] = '\0';
 	m_opts.Save(m_opts.getDefaultOptionsFileName());
@@ -173,7 +173,7 @@ int ClientConnection::LoadConnection(char *fname, bool fFromDialog)
 	if (GetPrivateProfileString("connection", "password", "", buf, 32, fname) > 0) {
 		for (int i = 0; i < MAXPWLEN; i++)	{
 			int x = 0;
-			sscanf(buf+i*2, "%2x", &x);
+			sscanf_s(buf+i*2, "%2x", &x);
 			m_encPasswd[i] = (unsigned char) x;
 		}
 	}
@@ -182,7 +182,7 @@ int ClientConnection::LoadConnection(char *fname, bool fFromDialog)
 		m_opts.Load(fname);
 	else if (strcmp(m_host, "") == 0 || strcmp(fname, m_opts.getDefaultOptionsFileName())==0 ) {
 		// Load the rest of params 
-		strcpy(m_opts.m_proxyhost,m_proxyhost);
+		strcpy_s(m_opts.m_proxyhost,m_proxyhost);
 		m_opts.m_proxyport=m_proxyport;
 		m_opts.m_fUseProxy=m_fUseProxy;
 		m_opts.Load(fname);
@@ -191,15 +191,15 @@ int ClientConnection::LoadConnection(char *fname, bool fFromDialog)
 		SessionDialog sessdlg(&m_opts, this, m_pDSMPlugin); //sf@2002
 		if (!sessdlg.DoDialog())
 			throw QuietException("");
-		_tcsncpy(m_host, sessdlg.m_host_dialog, MAX_HOST_NAME_LEN);
+		_tcsncpy_s(m_host, sessdlg.m_host_dialog, MAX_HOST_NAME_LEN);
 		m_port = sessdlg.m_port;	
-		_tcsncpy(m_proxyhost, sessdlg.m_proxyhost, MAX_HOST_NAME_LEN);
+		_tcsncpy_s(m_proxyhost, sessdlg.m_proxyhost, MAX_HOST_NAME_LEN);
 		m_proxyport = sessdlg.m_proxyport;
 		m_fUseProxy = sessdlg.m_fUseProxy;
 
 	}
 	else if (config_specified) {
-		strcpy(m_opts.m_proxyhost,m_proxyhost);
+		strcpy_s(m_opts.m_proxyhost,m_proxyhost);
 		m_opts.m_proxyport=m_proxyport;
 		m_opts.m_fUseProxy=m_fUseProxy;
 		m_opts.Load(fname);

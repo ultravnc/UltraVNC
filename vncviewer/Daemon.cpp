@@ -234,8 +234,8 @@ if (GetListenMode()){
 
 	// sf@2003 - Add the port number to the tip
 	char szTmp[16];
-	sprintf(szTmp, " - Port:%ld", m_nPort);
-	strcat(m_nid.szTip, szTmp);
+	sprintf_s(szTmp, " - Port:%ld", m_nPort);
+	strcat_s(m_nid.szTip, szTmp);
 
 	return (bool) (Shell_NotifyIcon(msg, &m_nid) != 0);
 }

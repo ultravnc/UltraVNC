@@ -61,10 +61,10 @@ SessionDialog::SessionDialog(VNCOptions *pOpt, ClientConnection* pCC, CDSMPlugin
 	m_pDSMPlugin = pDSMPlugin;
 	/////////////////////////////////////////////////	
 	TCHAR tmphost2[256];
-	_tcscpy(m_proxyhost, m_pOpt->m_proxyhost);
+	_tcscpy_s(m_proxyhost, m_pOpt->m_proxyhost);
 	if (strcmp(m_proxyhost,"")!=NULL) {
-		_tcscat(m_proxyhost,":");
-		_tcscat(m_proxyhost,_itoa(m_pOpt->m_proxyport,tmphost2,10));
+		_tcscat_s(m_proxyhost,":");
+		_tcscat_s(m_proxyhost, 256, _itoa(m_pOpt->m_proxyport,tmphost2,10));
 	}
 	
 	for (int i = rfbEncodingRaw; i <= LASTENCODING; i++) {
@@ -111,13 +111,13 @@ SessionDialog::SessionDialog(VNCOptions *pOpt, ClientConnection* pCC, CDSMPlugin
 	SavePos = m_pOpt->m_SavePos;
 	SaveSize = m_pOpt->m_SaveSize;
 	fUseDSMPlugin = m_pOpt->m_fUseDSMPlugin;
-	strcpy( szDSMPluginFilename, m_pOpt->m_szDSMPluginFilename);
+	strcpy_s( szDSMPluginFilename, m_pOpt->m_szDSMPluginFilename);
 	listening = m_pOpt->m_listening;
 	oldplugin = m_pOpt->m_oldplugin;
 
 
-	strcpy(folder, m_pOpt->m_document_folder);
-	strcpy(prefix, m_pOpt->m_prefix);
+	strcpy_s(folder, m_pOpt->m_document_folder);
+	strcpy_s(prefix, m_pOpt->m_prefix);
 
 	scaling = m_pOpt->m_scaling;
 
@@ -250,11 +250,11 @@ BOOL CALLBACK SessDlgProc(  HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 					{
 						TCHAR szHost[250];
 						if (_this->m_pCC->m_port == 5900)
-							_tcscpy(szHost, _this->m_pCC->m_host);
+							_tcscpy_s(szHost, _this->m_pCC->m_host);
 						else if (_this->m_pCC->m_port > 5900 && _this->m_pCC->m_port <= 5999)
-							_snprintf(szHost, 250, TEXT("%s:%d"), _this->m_pCC->m_host, _this->m_pCC->m_port - 5900);
+							_snprintf_s(szHost, 250, TEXT("%s:%d"), _this->m_pCC->m_host, _this->m_pCC->m_port - 5900);
 						else
-							_snprintf(szHost, 250, TEXT("%s::%d"), _this->m_pCC->m_host, _this->m_pCC->m_port);
+							_snprintf_s(szHost, 250, TEXT("%s::%d"), _this->m_pCC->m_host, _this->m_pCC->m_port);
 
 						SetDlgItemText(hwnd, IDC_HOSTNAME_EDIT, szHost);
 						//AaronP
@@ -425,11 +425,11 @@ void SessionDialog::InitDlgProc(bool loadhost)
 		if (loadhost && (m_pCC->m_port != 0 || strlen(m_pCC->m_host) != 0)) {		
 			TCHAR szHost[250];
 			if (m_pCC->m_port == 5900)
-				_tcscpy(szHost, m_pCC->m_host);
+				_tcscpy_s(szHost, m_pCC->m_host);
 			else if (m_pCC->m_port > 5900 && m_pCC->m_port <= 5999)
-				_snprintf(szHost, 250, TEXT("%s:%d"), m_pCC->m_host, m_pCC->m_port - 5900);
+				_snprintf_s(szHost, 250, TEXT("%s:%d"), m_pCC->m_host, m_pCC->m_port - 5900);
 			else
-				_snprintf(szHost, 250, TEXT("%s::%d"), m_pCC->m_host, m_pCC->m_port);
+				_snprintf_s(szHost, 250, TEXT("%s::%d"), m_pCC->m_host, m_pCC->m_port);
 			SetDlgItemText(hwnd, IDC_HOSTNAME_EDIT, szHost);
 		}
 		else 
@@ -531,11 +531,11 @@ bool SessionDialog::connect(HWND hwnd)
 	m_pOpt->m_SavePos = SavePos;
 	m_pOpt->m_SaveSize = SaveSize;
 	m_pOpt->m_fUseDSMPlugin = fUseDSMPlugin;
-	strcpy( m_pOpt->m_szDSMPluginFilename, szDSMPluginFilename);
+	strcpy_s( m_pOpt->m_szDSMPluginFilename, szDSMPluginFilename);
 	m_pOpt->m_listening = listening;
 	m_pOpt->m_oldplugin = oldplugin;
-	strcpy(m_pOpt->m_document_folder, folder);
-	strcpy(m_pOpt->m_prefix, prefix);
+	strcpy_s(m_pOpt->m_document_folder, folder);
+	strcpy_s(m_pOpt->m_prefix, prefix);
 	m_pOpt->m_scaling = scaling;
 	m_pOpt->m_keepAliveInterval = keepAliveInterval;
 	m_pOpt->m_fAutoAcceptIncoming = fAutoAcceptIncoming;
@@ -551,7 +551,7 @@ bool SessionDialog::connect(HWND hwnd)
 		TCHAR szPlugin[MAX_PATH];
 		GetDlgItemText(hwnd, IDC_PLUGINS_COMBO, szPlugin, MAX_PATH);
 		fUseDSMPlugin = true;
-		strcpy(szDSMPluginFilename, szPlugin);
+		strcpy_s(szDSMPluginFilename, szPlugin);
 		if (!m_pDSMPlugin->IsLoaded()){
 			m_pDSMPlugin->LoadPlugin(szPlugin, listening);
 			if (m_pDSMPlugin->IsLoaded()){

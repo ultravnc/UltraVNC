@@ -100,7 +100,7 @@ void Snapshot::SaveJpeg(HBITMAP membit,TCHAR folder[MAX_PATH], TCHAR prefix[56])
 		CLSID clsid;
 		GetEncoderClsid(L"image/jpeg", &clsid);
 		WCHAR wc[MAX_PATH];
-		mbstowcs (wc, filename, MAX_PATH);
+		mbstowcs(wc, filename, MAX_PATH);
 		bitmap.Save(wc, &clsid);
 	}
 	GdiplusShutdown(gdiplusToken);

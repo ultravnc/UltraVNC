@@ -72,10 +72,10 @@ static LRESULT CALLBACK MessageDlgProc2(HWND hwnd, UINT iMsg,
 		if (LOWORD(wParam) == IDC_BUTTON1) {
 			char link[256];
 			char tempchar[10];
-			strcpy(link,"http://www.uvnc.com/onlinehelp/");
-			_itoa(g_error_nr2,tempchar,10);
-			strcat(link,tempchar);
-			strcat(link,".html");
+			strcpy_s(link,"http://www.uvnc.com/onlinehelp/");
+			_itoa_s(g_error_nr2,tempchar,10);
+			strcat_s(link,tempchar);
+			strcat_s(link,".html");
 			ShellExecute(GetDesktopWindow(), "open", link, "", 0, SW_SHOWNORMAL);
 		}
 		if (LOWORD(wParam) == IDC_BUTTON2) {

@@ -266,7 +266,7 @@ ClientConnection::ClientConnection(VNCviewerApp *pApp, SOCKET sock)
 		if (svraddr.ss_family == AF_INET) {
 			struct sockaddr_in *s = (struct sockaddr_in *)&svraddr;
 			m_port = ntohs(s->sin_port);
-			_snprintf(m_host, 250, _T("%d.%d.%d.%d"),
+			_snprintf_s(m_host, 250, _T("%d.%d.%d.%d"),
 				s->sin_addr.S_un.S_un_b.s_b1,
 				s->sin_addr.S_un.S_un_b.s_b2,
 				s->sin_addr.S_un.S_un_b.s_b3,
@@ -276,7 +276,7 @@ ClientConnection::ClientConnection(VNCviewerApp *pApp, SOCKET sock)
 		{
 			struct sockaddr_in6 *s = (struct sockaddr_in6 *)&svraddr;
 			m_port = ntohs(s->sin6_port);
-			_snprintf(m_host, 250, _T("%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x"),
+			_snprintf_s(m_host, 250, _T("%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x"),
 				s->sin6_addr.u.Byte[0],
 				s->sin6_addr.u.Byte[1],
 				s->sin6_addr.u.Byte[2],
@@ -299,7 +299,7 @@ ClientConnection::ClientConnection(VNCviewerApp *pApp, SOCKET sock)
 	int sasize = sizeof(svraddr);
 	if (getpeername(sock, (struct sockaddr *) &svraddr,
 		&sasize) != SOCKET_ERROR) {
-		_snprintf(m_host, 250, _T("%d.%d.%d.%d"),
+		_snprintf_s(m_host, 250, _T("%d.%d.%d.%d"),
 			svraddr.sin_addr.S_un.S_un_b.s_b1,
 			svraddr.sin_addr.S_un.S_un_b.s_b2,
 			svraddr.sin_addr.S_un.S_un_b.s_b3,
@@ -307,7 +307,7 @@ ClientConnection::ClientConnection(VNCviewerApp *pApp, SOCKET sock)
 		m_port = svraddr.sin_port;
 #endif
 	} else {
-		_tcscpy(m_host,sz_L1);
+		_tcscpy_s(m_host,sz_L1);
 		m_port = 0;
 	};
 }
@@ -321,9 +321,9 @@ ClientConnection::ClientConnection(VNCviewerApp *pApp, LPTSTR host, int port)
 	{
 		m_opts.m_Use8Bit = rfbPFFullColors; //true;
 	}
-	_tcsncpy(m_host, host, MAX_HOST_NAME_LEN);
+	_tcsncpy_s(m_host, host, MAX_HOST_NAME_LEN);
 	m_port = port;
-	_tcsncpy(m_proxyhost,m_opts.m_proxyhost, MAX_HOST_NAME_LEN);
+	_tcsncpy_s(m_proxyhost,m_opts.m_proxyhost, MAX_HOST_NAME_LEN);
 	m_proxyport=m_opts.m_proxyport;
 	m_fUseProxy = m_opts.m_fUseProxy;
 }
@@ -509,7 +509,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_DIBbitsCache=NULL;
 	m_membitmap=NULL;
 	m_BigToolbar=false;
-	strcpy(m_proxyhost,"");
+	strcpy_s(m_proxyhost,"");
 	KillEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 	KillUpdateThreadEvent = CreateEvent(NULL, FALSE, TRUE, NULL);
 	newtick=0;
@@ -618,11 +618,11 @@ void ClientConnection::Run()
 
 	// add user option on command line
 	if ( (strlen(	m_pApp->m_options.m_cmdlnUser) > 0) && !m_pApp->m_options.m_NoMoreCommandLineUserPassword) // Fix by Act
-		strcpy(m_cmdlnUser, m_pApp->m_options.m_cmdlnUser);
+		strcpy_s(m_cmdlnUser, m_pApp->m_options.m_cmdlnUser);
 
 	// Modif sf@2002 - bit of a hack...and unsafe
 	if ( (strlen(	m_pApp->m_options.m_clearPassword) > 0) && !m_pApp->m_options.m_NoMoreCommandLineUserPassword)
-		strcpy(m_clearPasswd, m_pApp->m_options.m_clearPassword);
+		strcpy_s(m_clearPasswd, m_pApp->m_options.m_clearPassword);
 
 	if (saved_set)
 	{
@@ -1294,7 +1294,7 @@ void ClientConnection::GTGBS_CreateToolbar()
 	//adzm 2009-06-21 - show the proxy in the 'recent' box
 	if (m_fUseProxy && strlen(m_proxyhost) > 0) {
 		TCHAR proxyname[MAX_HOST_NAME_LEN];
-		_snprintf(proxyname, MAX_HOST_NAME_LEN-1, "%s:%li (%s:%li)", m_host, m_port, m_proxyhost, m_proxyport);
+		_snprintf_s(proxyname, MAX_HOST_NAME_LEN-1, "%s:%li (%s:%li)", m_host, m_port, m_proxyhost, m_proxyport);
 		SendMessage(m_logo_wnd, CB_ADDSTRING, 0, (LPARAM)proxyname);
 	}
     for (int i = 0; i < m_pMRU->NumItems(); i++) {
@@ -1649,7 +1649,7 @@ void ClientConnection::SetDSMPluginStuff()
 	{
 		vnclog.Print(0, _T("DSMPlugin enabled\n"));
 		char szParams[256+16];
-		//strcpy(szParams,m_pDSMPlugin->GetPluginParams());
+		//strcpy_s(szParams,m_pDSMPlugin->GetPluginParams());
 		// Does the plugin need the VNC password to do its job ?
 		if (!_stricmp(m_pDSMPlugin->GetPluginParams(), "VNCPasswordNeeded"))
 		{
@@ -1660,18 +1660,18 @@ void ClientConnection::SetDSMPluginStuff()
 				AuthDialog ad;
 				if (ad.DoDialog(false,m_host,m_port))
 				{
-					strncpy(m_clearPasswd, ad.m_passwd,254);
+					strncpy_s(m_clearPasswd, ad.m_passwd,254);
 				}
 			}
-			strcpy(szParams, m_clearPasswd);
+			strcpy_s(szParams, m_clearPasswd);
 		}
 		else
-			strcpy(szParams, "NoPassword");
+			strcpy_s(szParams, "NoPassword");
 
 		// The second parameter tells the plugin the kind of program is using it
 		// (in vncviewer : "viewer")
-		strcat(szParams, ",");
-		strcat(szParams, "viewer");
+		strcat_s(szParams, ",");
+		strcat_s(szParams, "viewer");
 
 		// Initialize the DSM Plugin with params
 		if (!m_pDSMPlugin->SetPluginParams(NULL, szParams))
@@ -1796,9 +1796,9 @@ void ClientConnection::GetConnectDetails()
 			SessionDialog sessdlg(&m_opts, this, m_pDSMPlugin); //sf@2002
 			if (!sessdlg.DoDialog())
 					throw QuietException(sz_L42);
-			_tcsncpy(m_host, sessdlg.m_host_dialog, MAX_HOST_NAME_LEN);
+			_tcsncpy_s(m_host, sessdlg.m_host_dialog, MAX_HOST_NAME_LEN);
 			m_port = sessdlg.m_port;
-			_tcsncpy(m_proxyhost, sessdlg.m_proxyhost, MAX_HOST_NAME_LEN);
+			_tcsncpy_s(m_proxyhost, sessdlg.m_proxyhost, MAX_HOST_NAME_LEN);
 			m_proxyport = sessdlg.m_proxyport;
 			m_fUseProxy = sessdlg.m_fUseProxy;
 			if (m_opts.autoDetect)
@@ -1808,10 +1808,10 @@ void ClientConnection::GetConnectDetails()
 			SessionDialog sessdlg(&m_opts, this, m_pDSMPlugin); //sf@2002
 			if (!sessdlg.DoDialog())
 					throw QuietException(sz_L42);
-			_tcsncpy(m_host, sessdlg.m_host_dialog, MAX_HOST_NAME_LEN);
+			_tcsncpy_s(m_host, sessdlg.m_host_dialog, MAX_HOST_NAME_LEN);
 			m_port = sessdlg.m_port;
-			_tcsncpy(m_proxyhost, sessdlg.m_proxyhost, MAX_HOST_NAME_LEN);
-	//		_tcsncpy(m_remotehost, sessdlg.m_remotehost, MAX_HOST_NAME_LEN);
+			_tcsncpy_s(m_proxyhost, sessdlg.m_proxyhost, MAX_HOST_NAME_LEN);
+	//		_tcsncpy_s(m_remotehost, sessdlg.m_remotehost, MAX_HOST_NAME_LEN);
 			m_proxyport = sessdlg.m_proxyport;
 			m_fUseProxy = sessdlg.m_fUseProxy;
 			if (m_opts.autoDetect)
@@ -1955,19 +1955,19 @@ void ClientConnection::Connect()
 	if (IsIpv6 && IsIpv4)
 	{
 		char			szText[256];
-		_snprintf(szText, 256,  "Ipv4: %s\nIpv6: %s \n", inet_ntoa(Ipv4Addr.sin_addr), ipstringbuffer);
+		_snprintf_s(szText, 256,  "Ipv4: %s\nIpv6: %s \n", inet_ntoa(Ipv4Addr.sin_addr), ipstringbuffer);
 		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500); }		
 	}
 	else if (IsIpv6)
 	{
 		char			szText[256];
-		_snprintf(szText, 256,  "Ipv6: %s \n", ipstringbuffer);
+		_snprintf_s(szText, 256,  "Ipv6: %s \n", ipstringbuffer);
 		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500); }
 	}
 	else if (IsIpv4)
 	{
 		char			szText[256];
-		_snprintf(szText, 256,  "Ipv4: %s \n", inet_ntoa(Ipv4Addr.sin_addr));
+		_snprintf_s(szText, 256,  "Ipv4: %s \n", inet_ntoa(Ipv4Addr.sin_addr));
 		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500); }
 	}
 
@@ -1983,7 +1983,7 @@ void ClientConnection::Connect()
 		{
 			int res;
 			char			szText[256];
-			_snprintf(szText, 256,  "Ipv6: %s \n", sz_L47);
+			_snprintf_s(szText, 256,  "Ipv6: %s \n", sz_L47);
 			if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, szText);
 			if (m_hwndStatus)ShowWindow(m_hwndStatus, SW_SHOW);
 			if (m_hwndStatus)UpdateWindow(m_hwndStatus);
@@ -2019,7 +2019,7 @@ void ClientConnection::Connect()
 				if (m_hwndStatus)UpdateWindow(m_hwndStatus);
 				return;
 			}
-			_snprintf(szText, 256,  "Ipv6: %s \n", sz_L48);
+			_snprintf_s(szText, 256,  "Ipv6: %s \n", sz_L48);
 			if (m_hwndStatus) {SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500);}
 
 		}
@@ -2034,7 +2034,7 @@ void ClientConnection::Connect()
 			throw WarningException(sz_L44); 
 		}
 		char			szText[256];
-		_snprintf(szText, 256,  "Ipv4: %s \n", sz_L47);
+		_snprintf_s(szText, 256,  "Ipv4: %s \n", sz_L47);
 		if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, szText);
 		if (m_hwndStatus)ShowWindow(m_hwndStatus,SW_SHOW);
 		if (m_hwndStatus)UpdateWindow(m_hwndStatus);
@@ -2246,19 +2246,19 @@ void ClientConnection::ConnectProxy()
 	if (IsIpv6 && IsIpv4)
 	{
 		char			szText[256];
-		_snprintf(szText, 256,  "Ipv4: %s\nIpv6: %s \n", inet_ntoa(Ipv4Addr.sin_addr), ipstringbuffer);
+		_snprintf_s(szText, 256,  "Ipv4: %s\nIpv6: %s \n", inet_ntoa(Ipv4Addr.sin_addr), ipstringbuffer);
 		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500); }
 	}
 	else if (IsIpv6)
 	{
 		char			szText[256];
-		_snprintf(szText, 256,  "Ipv6: %s \n", ipstringbuffer);
+		_snprintf_s(szText, 256,  "Ipv6: %s \n", ipstringbuffer);
 		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500); }
 	}
 	else if (IsIpv4)
 	{
 		char			szText[256];
-		_snprintf(szText, 256,  "Ipv4: %s \n", inet_ntoa(Ipv4Addr.sin_addr));
+		_snprintf_s(szText, 256,  "Ipv4: %s \n", inet_ntoa(Ipv4Addr.sin_addr));
 		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500); }
 	}
 
@@ -2274,7 +2274,7 @@ void ClientConnection::ConnectProxy()
 		{
 			int res;
 			char			szText[256];
-			_snprintf(szText, 256,  "Ipv6: %s \n", sz_L47);
+			_snprintf_s(szText, 256,  "Ipv6: %s \n", sz_L47);
 			if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, szText);
 			if (m_hwndStatus)ShowWindow(m_hwndStatus, SW_SHOW);
 			if (m_hwndStatus)UpdateWindow(m_hwndStatus);
@@ -2304,7 +2304,7 @@ void ClientConnection::ConnectProxy()
 				if (m_hwndStatus)UpdateWindow(m_hwndStatus);
 				return;
 			}
-			_snprintf(szText, 256,  "Ipv6: %s \n", sz_L48);
+			_snprintf_s(szText, 256,  "Ipv6: %s \n", sz_L48);
 			if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500); }
 
 		}
@@ -2319,7 +2319,7 @@ void ClientConnection::ConnectProxy()
 			throw WarningException(sz_L44);
 		}
 		char			szText[256];
-		_snprintf(szText, 256,  "Ipv4: %s \n", sz_L47);
+		_snprintf_s(szText, 256,  "Ipv4: %s \n", sz_L47);
 		if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, szText);
 		if (m_hwndStatus)ShowWindow(m_hwndStatus, SW_SHOW);
 		if (m_hwndStatus)UpdateWindow(m_hwndStatus);
@@ -2541,7 +2541,7 @@ void ClientConnection::NegotiateProtocolVersion()
 	}
 	*/
 
-    if (sscanf(pv,rfbProtocolVersionFormat,&m_majorVersion,&m_minorVersion) != 2)
+    if (sscanf_s(pv,rfbProtocolVersionFormat,&m_majorVersion,&m_minorVersion) != 2)
 	{
 		SetEvent(KillEvent);
 		if (m_fUsePlugin && m_pIntegratedPluginInterface == NULL)
@@ -2617,7 +2617,7 @@ void ClientConnection::NegotiateProtocolVersion()
 		m_minorVersion = rfbProtocolMinorVersion; // always 4 for Ultra Viewer
     }
 
-    sprintf(pv,rfbProtocolVersionFormat, m_majorVersion, m_minorVersion);
+    sprintf_s(pv,rfbProtocolVersionFormat, m_majorVersion, m_minorVersion);
 	if (m_Is_Listening)
 		{
 			char szFileName[MAX_PATH];
@@ -2626,7 +2626,7 @@ void ClientConnection::NegotiateProtocolVersion()
 				char* p = strrchr(szFileName, '\\');
 				if (p != NULL) { 
 					*p = '\0';
-					strcat (szFileName,"\\sound.wav");
+					strcat_s(szFileName,"\\sound.wav");
 					if (GetFileAttributes(szFileName) != INVALID_FILE_ATTRIBUTES) {
 						PlaySound(szFileName, NULL, SND_ASYNC);
 					}
@@ -2730,7 +2730,7 @@ void ClientConnection::NegotiateProxy()
 	}
 	*/
 
-	if (sscanf(pv,rfbProtocolVersionFormat,&m_majorVersion,&m_minorVersion) != 2)
+	if (sscanf_s(pv,rfbProtocolVersionFormat,&m_majorVersion,&m_minorVersion) != 2)
 	{
 		if (m_fUsePlugin)
 			throw WarningException("Proxy Connection failed - Invalid protocol !\r\n\r\n"
@@ -2759,11 +2759,11 @@ void ClientConnection::NegotiateProxy()
 	//adzm 2010-09
 	::ZeroMemory(tmphost, sizeof(tmphost));
 	::ZeroMemory(tmphost2, sizeof(tmphost2));
-	_tcscpy(tmphost,m_host);
+	_tcscpy_s(tmphost,m_host);
 	if (strcmp(tmphost,"")!=NULL)
 	{
-	_tcscat(tmphost,":");
-	_tcscat(tmphost,_itoa(m_port,tmphost2,10));
+	_tcscat_s(tmphost,":");
+	_tcscat_s(tmphost, MAX_HOST_NAME_LEN, _itoa(m_port,tmphost2, 10));
 	}
     WriteExactProxy(tmphost,MAX_HOST_NAME_LEN);
 
@@ -3057,11 +3057,11 @@ void ClientConnection::AuthSecureVNCPlugin()
 
 	if (strlen(m_clearPasswd)>0)
 	{
-		strcpy(passwd, m_clearPasswd);
+		strcpy_s(passwd, m_clearPasswd);
 	}
 	else if (strlen((const char *) m_encPasswd)>0)
 	{  char * pw = vncDecryptPasswd(m_encPasswd);
-		strcpy(passwd, pw);
+		strcpy_s(passwd, pw);
 		free(pw);
 	}
 	m_pIntegratedPluginInterface->SetPasswordData(NULL, 0);
@@ -3135,7 +3135,7 @@ void ClientConnection::AuthSecureVNCPlugin()
 				{
 					if (ad.DoDialog(false,m_host,m_port))
 						{
-							strncpy(passwd, ad.m_passwd,254);
+							strncpy_s(passwd, ad.m_passwd,254);
 							if (!bPassphraseRequired && strlen(passwd) > 8) {
 								passwd[8] = '\0';
 							}
@@ -3186,11 +3186,11 @@ void ClientConnection::AuthSecureVNCPlugin_old()
 
 	if (strlen(m_clearPasswd)>0)
 	{
-		strcpy(passwd, m_clearPasswd);
+		strcpy_s(passwd, m_clearPasswd);
 	}
 	else if (strlen((const char *) m_encPasswd)>0)
 	{  char * pw = vncDecryptPasswd(m_encPasswd);
-		strcpy(passwd, pw);
+		strcpy_s(passwd, pw);
 		free(pw);
 	}
 	m_pIntegratedPluginInterface->SetPasswordData(NULL, 0);
@@ -3233,7 +3233,7 @@ void ClientConnection::AuthSecureVNCPlugin_old()
 
 					if (ad.DoDialog(false,false,true))
 					{
-						strncpy(passwd, ad.m_passwd,254);
+						strncpy_s(passwd, ad.m_passwd,254);
 						if (!bPassphraseRequired && strlen(passwd) > 8) {
 							passwd[8] = '\0';
 						}
@@ -3316,27 +3316,27 @@ void ClientConnection::AuthMsLogonII()
 	if ((strlen(m_cmdlnUser)>0)&& (strlen(	m_pApp->m_options.m_clearPassword) > 0) && !m_pApp->m_options.m_NoMoreCommandLineUserPassword)
     {
 		vnclog.Print(0, _T("Command line MS-Logon.\n"));
-		strcpy(m_clearPasswd, m_pApp->m_options.m_clearPassword);
-		strncpy(passwd, m_clearPasswd, 64);
-		strncpy(user, m_cmdlnUser, 254);
+		strcpy_s(m_clearPasswd, m_pApp->m_options.m_clearPassword);
+		strncpy_s(passwd, m_clearPasswd, 64);
+		strncpy_s(user, m_cmdlnUser, 254);
 		vncEncryptPasswdMs(m_encPasswdMs, passwd);
-		strcpy(m_ms_user, user);
+		strcpy_s(m_ms_user, user);
 	}
 	else if (strlen((const char *) m_encPasswdMs)>0)
 	{  char * pw = vncDecryptPasswdMs(m_encPasswdMs);
-	   strcpy(passwd, pw);
+	   strcpy_s(passwd, pw);
 	   free(pw);
-	   strcpy(user, m_ms_user);
+	   strcpy_s(user, m_ms_user);
 	}
 	else
 	{
 	AuthDialog ad;
 	// adzm 2010-10 - RFB3.8 - the 'mslogon' param woudl always be true here
 	if (ad.DoDialog(true, m_host, m_port, true)) {
-		strncpy(passwd, ad.m_passwd, 64);
-		strncpy(user, ad.m_user, 254);
+		strncpy_s(passwd, ad.m_passwd, 64);
+		strncpy_s(user, ad.m_user, 254);
 		vncEncryptPasswdMs(m_encPasswdMs, passwd);
-		strcpy(m_ms_user, user);
+		strcpy_s(m_ms_user, user);
 	} else {
 		throw QuietException(sz_L54);
 	}
@@ -3378,8 +3378,8 @@ void ClientConnection::AuthMsLogonI()
 		if (strlen(m_cmdlnUser)>0)
 		{	if (strlen(m_clearPasswd)>0)
 			{  //user and password are not empty
-			    strcpy(user, m_cmdlnUser);
-				strcpy(passwd, m_clearPasswd);
+			    strcpy_s(user, m_cmdlnUser);
+				strcpy_s(passwd, m_clearPasswd);
 			}
 			else memset(m_cmdlnUser, 0, sizeof(m_cmdlnUser)); // user without password
 		}
@@ -3391,19 +3391,19 @@ void ClientConnection::AuthMsLogonI()
 	// Modif sf@2002 - A clear password can be transmitted via the vncviewer command line
 	if (strlen(m_clearPasswd)>0)
 	{
-		strcpy(passwd, m_clearPasswd);
-	    if (m_ms_logon_I_legacy) strcpy(user, m_cmdlnUser);
+		strcpy_s(passwd, m_clearPasswd);
+	    if (m_ms_logon_I_legacy) strcpy_s(user, m_cmdlnUser);
 	}
 	else if (strlen((const char *) m_encPasswd)>0)
 	{  char * pw = vncDecryptPasswd(m_encPasswd);
-		strcpy(passwd, pw);
+		strcpy_s(passwd, pw);
 		free(pw);
 	}
 	else if (strlen((const char *) m_encPasswdMs)>0)
 	{  char * pw = vncDecryptPasswdMs(m_encPasswdMs);
-	   strcpy(passwd, pw);
+	   strcpy_s(passwd, pw);
 	   free(pw);
-	   strcpy(user, m_ms_user);
+	   strcpy_s(user, m_ms_user);
 	}
 	else
 	{
@@ -3412,9 +3412,9 @@ void ClientConnection::AuthMsLogonI()
 		if (ad.DoDialog(true,m_host, m_port))
 		{
 //					flash = new BmpFlasher;
-			strncpy(passwd, ad.m_passwd,254);
-			strncpy(user, ad.m_user,254);
-			strncpy(domain, ad.m_domain,254);
+			strncpy_s(passwd, ad.m_passwd,254);
+			strncpy_s(user, ad.m_user,254);
+			strncpy_s(domain, ad.m_domain,254);
 			if (strlen(user)==0 ||!m_ms_logon_I_legacy)//need longer passwd for ms
 				{
 					if (strlen(passwd) == 0) {
@@ -3429,7 +3429,7 @@ void ClientConnection::AuthMsLogonI()
 			if (m_ms_logon_I_legacy)
 			{
 				vncEncryptPasswdMs(m_encPasswdMs, passwd);
-				strcpy(m_ms_user, user);
+				strcpy_s(m_ms_user, user);
 			}
 		}
 		else
@@ -3485,12 +3485,12 @@ void ClientConnection::AuthVnc()
 	// Modif sf@2002 - A clear password can be transmitted via the vncviewer command line
 	if (strlen(m_clearPasswd)>0)
 	{
-		strcpy(passwd, m_clearPasswd);
+		strcpy_s(passwd, m_clearPasswd);
 	}
 	else if (strlen((const char *) m_encPasswd)>0)
 	{
 		char * pw = vncDecryptPasswd(m_encPasswd);
-		strcpy(passwd, pw);
+		strcpy_s(passwd, pw);
 		free(pw);
 	}
 	else
@@ -3498,7 +3498,7 @@ void ClientConnection::AuthVnc()
 		AuthDialog ad;
 		if (ad.DoDialog(false, m_host, m_port))
 		{
-			strncpy(passwd, ad.m_passwd,254);
+			strncpy_s(passwd, ad.m_passwd,254);
 			if (strlen(passwd) == 0)
 			{
 				vnclog.Print(0, _T("Password had zero length\n"));
@@ -3602,10 +3602,10 @@ void ClientConnection::ReadServerInit()
     m_desktopName = new TCHAR[m_si.nameLength + 4 + 256];
 	m_desktopName_viewonly = new TCHAR[m_si.nameLength + 4 + 256+16];
     ReadString(m_desktopName, m_si.nameLength);
-	strcat(m_desktopName, " ");
+	strcat_s(m_desktopName, m_si.nameLength + 4 + 256, " ");
 
-	strcpy(m_desktopName_viewonly,m_desktopName);
-	strcat(m_desktopName_viewonly,"viewonly");
+	strcpy_s(m_desktopName_viewonly, m_si.nameLength + 4 + 256+16, m_desktopName);
+	strcat_s(m_desktopName_viewonly, m_si.nameLength + 4 + 256+16, "viewonly");
 
 	if (m_opts.m_ViewOnly) SetWindowText(m_hwndMain, m_desktopName_viewonly);
 	else SetWindowText(m_hwndMain, m_desktopName);
@@ -3620,15 +3620,15 @@ void ClientConnection::ReadServerInit()
 	{
 			char szMess[255];
 			memset(szMess, 0, 255);
-			sprintf(szMess, "--- UltraVNC Viewer + %s-v%s by %s ",
+			sprintf_s(szMess, "--- UltraVNC Viewer + %s-v%s by %s ",
 					m_pDSMPlugin->GetPluginName(),
 					m_pDSMPlugin->GetPluginVersion(),
 					m_pDSMPlugin->GetPluginAuthor()
 					);
-			strcat(m_desktopName, szMess);
+			strcat_s(m_desktopName, m_si.nameLength + 4 + 256+16, szMess);
 	}
-	strcpy(m_desktopName_viewonly,m_desktopName);
-	strcat(m_desktopName_viewonly,"viewonly");
+	strcpy_s(m_desktopName_viewonly, m_si.nameLength + 4 + 256+16, m_desktopName);
+	strcat_s(m_desktopName_viewonly, m_si.nameLength + 4 + 256+16, "viewonly");
 
 	if (m_opts.m_ViewOnly) SetWindowText(m_hwndMain, m_desktopName_viewonly);
 	else SetWindowText(m_hwndMain, m_desktopName);
@@ -4987,7 +4987,7 @@ void ClientConnection::ShowConnInfo()
 	char kbdname[9];
 	GetKeyboardLayoutName(kbdname);
 	TCHAR num[16];
-	_snprintf(
+	_snprintf_s(
 		buf,
 		2048,
 		_T("Connected to: %s\n\r\n\r")
@@ -5097,7 +5097,7 @@ void* ClientConnection::run_undetached(void* arg) {
                         time_t delta = now - lastrecv;
                         lastrecv = now;
                         char msg[255];
-                        sprintf(msg, "keepalive received %I64i seconds since last one\n", delta);
+                        sprintf_s(msg, "keepalive received %I64i seconds since last one\n", delta);
                         OutputDebugString(msg);
                     }
 #endif
@@ -5489,7 +5489,7 @@ inline void ClientConnection::ReadScreenUpdate()
 {
 #ifdef _DEBUG
 	char			szText[256];
-	_snprintf(szText, 256,  "ReadScreenUpdate\n");
+	_snprintf_s(szText, 256,  "ReadScreenUpdate\n");
 	OutputDebugString(szText);
 #endif
 	//adzm 2010-07-04
@@ -6015,7 +6015,7 @@ inline void ClientConnection::ReadScreenUpdate()
 		SendAppropriateFramebufferUpdateRequest(true);
 #ifdef _DEBUG
 		char			szText[256];
-		_snprintf(szText, 256,  "SendAppropriateFramebufferUpdateRequestn\n");
+		_snprintf_s(szText, 256,  "SendAppropriateFramebufferUpdateRequestn\n");
 		OutputDebugString(szText);
 #endif	
 	}
@@ -7010,23 +7010,23 @@ void ClientConnection::GetFriendlySizeString(__int64 Size, char* szText)
 	{
 		__int64 lRest = (Size % (1024*1024*1024));
 		Size /= (1024*1024*1024);
-		_snprintf(szText, 256, "%u.%4.4lu Gb", (unsigned long)Size, (unsigned long)((__int64)(lRest) * 10000 / 1024 / 1024 / 1024));
+		_snprintf_s(szText, 256, 256, "%u.%4.4lu Gb", (unsigned long)Size, (unsigned long)((__int64)(lRest) * 10000 / 1024 / 1024 / 1024));
 	}
 	else if( Size > (1024*1024) )
 	{
 		unsigned long lRest = (Size % (1024*1024));
 		Size /= (1024*1024);
-		_snprintf(szText, 256, "%u.%3.3lu Mb", (unsigned long)Size, (unsigned long)((__int64)(lRest) * 1000 / 1024 / 1024));
+		_snprintf_s(szText, 256, 256, "%u.%3.3lu Mb", (unsigned long)Size, (unsigned long)((__int64)(lRest) * 1000 / 1024 / 1024));
 	}
 	else if ( Size > 1024 )
 	{
 		unsigned long lRest = Size % (1024);
 		Size /= 1024;
-		_snprintf(szText, 256, "%u.%2.2lu Kb", (unsigned long)Size, lRest * 100 / 1024);
+		_snprintf_s(szText, 256, 256, "%u.%2.2lu Kb", (unsigned long)Size, lRest * 100 / 1024);
 	}
 	else
 	{
-		_snprintf(szText, 256, "%u bytes", (unsigned long)Size);
+		_snprintf_s(szText, 256, 256, "%u bytes", (unsigned long)Size);
 	}
 }
 
@@ -7216,7 +7216,7 @@ LRESULT CALLBACK ClientConnection::GTGBS_StatusProc(HWND hwnd, UINT iMsg, WPARAM
 
 			if (_this->m_host != NULL) {
 				SetDlgItemText(hwnd,IDC_VNCSERVER,_this->m_host);
-				sprintf(wt,"%s %s",sz_L72,_this->m_host);
+				sprintf_s(wt,"%s %s",sz_L72,_this->m_host);
 				SetWindowText(hwnd,wt);
 			} else {
 				SetDlgItemText(hwnd,IDC_VNCSERVER,_T(""));
@@ -7234,7 +7234,7 @@ LRESULT CALLBACK ClientConnection::GTGBS_StatusProc(HWND hwnd, UINT iMsg, WPARAM
 				{
 					char szMess[255];
 					memset(szMess, 0, 255);
-					sprintf(szMess, "%s (%s-v%s)",
+					sprintf_s(szMess, "%s (%s-v%s)",
 							sz_L49,
 							_this->m_pDSMPlugin->GetPluginName(),
 							_this->m_pDSMPlugin->GetPluginVersion()
@@ -8178,9 +8178,9 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							char temp[10];
 							char wtext[150];
 							_itoa(wParam,temp,10);
-							strcpy(wtext,"UltraVNC Viewer - Connection dropped, trying to reconnect (");
-							strcat(wtext,temp);
-							strcat(wtext,")");
+							strcpy_s(wtext,"UltraVNC Viewer - Connection dropped, trying to reconnect (");
+							strcat_s(wtext,temp);
+							strcat_s(wtext,")");
 							SetWindowText(_this->m_hwndMain, wtext);
 							_this->m_opts.m_NoStatus = true;
 							_this->SuspendThread();
@@ -8680,7 +8680,7 @@ LRESULT CALLBACK ClientConnection::WndProcTBwin(HWND hwnd, UINT iMsg, WPARAM wPa
 								TCHAR fulldisplay[256];
 								TCHAR display[256];
 								GetDlgItemText(hwnd, 9999, display, 256);
-								_tcscpy(fulldisplay, display);
+								_tcscpy_s(fulldisplay, display);
 								vnclog.Print(0,_T("CLICKK %s\n"),fulldisplay);
 								ParseDisplay(fulldisplay, display, 256, &port);
 								if (strcmp(display, "ID") == 0) {
@@ -8918,11 +8918,11 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 						char			szText[256];
 						if (ret != 0)
 						{
-							_snprintf(szText, 256,  "RegisterTouchWindow Success \n");
+							_snprintf_s(szText, 256,  "RegisterTouchWindow Success \n");
 						}
 						else
 						{
-							_snprintf(szText, 256,  "RegisterTouchWindow Failed with error code = %i \n", err);
+							_snprintf_s(szText, 256,  "RegisterTouchWindow Failed with error code = %i \n", err);
 						}
 						OutputDebugString(szText);
 #endif
@@ -9582,7 +9582,7 @@ void ClientConnection::Internal_SendKeepAlive(bool bForce)
 
 #if defined(_DEBUG)
         char msg[255];
-        sprintf(msg, "keepalive requested %u ms since last one\n", nTicksSinceLastSent);
+        sprintf_s(msg, "keepalive requested %u ms since last one\n", nTicksSinceLastSent);
         OutputDebugString(msg);
 
 #endif

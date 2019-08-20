@@ -434,7 +434,7 @@ BOOL CALLBACK DlgProcSecurity(HWND hwnd, UINT uMsg,WPARAM wParam, LPARAM lParam)
 						// different selected plugins...
 						bool fLoadIt = true;
 						char szParams[64];
-						strcpy(szParams, sz_F4);
+						strcpy_s(szParams, sz_F4);
 						// If a plugin is already loaded, check if it is the same that the one 
 						// we want to load.
 						if (_this->m_pDSMPlugin->IsLoaded()) {
@@ -709,7 +709,7 @@ void SessionDialog::InitDlgProcDisplay()
 	HWND hViewerScale = GetDlgItem(hwnd, IDC_SCALE_CB);
 	char szPer[4];
 	for (int i = 0; i <= 12; i++) {
-		_itoa(Scales[i], szPer, 10);
+		_itoa_s(Scales[i], szPer, 10);
 		SendMessage(hViewerScale, CB_INSERTSTRING, (WPARAM)i, (LPARAM)(int FAR*)szPer);
 	}
 	SetDlgItemInt(hwnd, IDC_SCALE_CB, (( scale_num * 100) / scale_den), FALSE);				  
@@ -964,7 +964,7 @@ void SessionDialog::ReadDlgProcSecurity()
 				TCHAR szPlugin[MAX_PATH];
 				GetDlgItemText(hwnd, IDC_PLUGINS_COMBO, szPlugin, MAX_PATH);
 				fUseDSMPlugin = true;
-				strcpy(szDSMPluginFilename, szPlugin);
+				strcpy_s(szDSMPluginFilename, szPlugin);
 	}
 	else
 		fUseDSMPlugin = false;
@@ -986,20 +986,20 @@ void SessionDialog::ReadDlgProc()
 	TCHAR fullhostname[256];
 	HWND hwnd = SessHwnd;
 	GetDlgItemText(hwnd, IDC_HOSTNAME_EDIT, hostname, 256);
-	_tcscpy(fullhostname, hostname);
+	_tcscpy_s(fullhostname, hostname);
 	if (ParseDisplay(hostname, tmphost, 255, &m_port)) {
 		for (size_t i = 0, len = strlen(tmphost); i < len; i++)
 			tmphost[i] = toupper(tmphost[i]);
-		_tcscpy(m_host_dialog, tmphost);
+		_tcscpy_s(m_host_dialog, tmphost);
      }
-	_tcscpy(m_proxyhost, "");
+	_tcscpy_s(m_proxyhost, "");
 	GetDlgItemText(hwnd, IDC_PROXY_EDIT, hostname, 256);
-	_tcscpy(fullhostname, hostname);
+	_tcscpy_s(fullhostname, hostname);
 
 	//adzm 2010-02-15
 	if (strlen(hostname) > 0) {
 		TCHAR actualProxy[256];
-		strcpy(actualProxy, hostname);
+		strcpy_s(actualProxy, hostname);
 		if (strncmp(tmphost, "ID", 2) == 0) {
 			int numericId = m_port;
 			int numberOfHosts = 1;
@@ -1013,7 +1013,7 @@ void SessionDialog::ReadDlgProc()
 				char* szToken = strtok(hostname, ";");
 				while (szToken) {
 					if (modulo == 0) {
-						strcpy(actualProxy, szToken);
+						strcpy_s(actualProxy, szToken);
 						break;
 					}
 					modulo--;
@@ -1022,7 +1022,7 @@ void SessionDialog::ReadDlgProc()
 			}
 		}
 		if (ParseDisplay(actualProxy, tmphost, 255, &m_proxyport)) {					
-			_tcscpy(m_proxyhost, tmphost);
+			_tcscpy_s(m_proxyhost, tmphost);
 		}
 	}
 
@@ -1357,11 +1357,11 @@ void SessionDialog::StartListener()
 	m_pOpt->m_SavePos = SavePos;
 	m_pOpt->m_SaveSize = SaveSize;
 	m_pOpt->m_fUseDSMPlugin = fUseDSMPlugin;
-	strcpy( m_pOpt->m_szDSMPluginFilename, szDSMPluginFilename);
+	strcpy_s( m_pOpt->m_szDSMPluginFilename, szDSMPluginFilename);
 	m_pOpt->m_listening = listening;
 	m_pOpt->m_oldplugin = oldplugin;
-	strcpy(m_pOpt->m_document_folder, folder);
-	strcpy(m_pOpt->m_prefix, prefix);
+	strcpy_s(m_pOpt->m_document_folder, folder);
+	strcpy_s(m_pOpt->m_prefix, prefix);
 	m_pOpt->m_scaling = scaling;
 	m_pOpt->m_keepAliveInterval = keepAliveInterval;
 	m_pOpt->m_fAutoAcceptIncoming = fAutoAcceptIncoming;

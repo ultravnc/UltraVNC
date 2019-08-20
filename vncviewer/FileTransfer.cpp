@@ -205,7 +205,7 @@ bool FileTransfer::DeleteFileOrDirectory(TCHAR *srcpath)
     TCHAR path[MAX_PATH + 1]; // room for extra null; SHFileOperation requires double null terminator
     memset(path, 0, sizeof path);
     
-    _tcsncpy(path, srcpath, MAX_PATH);
+    _tcsncpy_s(path, srcpath, MAX_PATH);
 
     SHFILEOPSTRUCT op;
     memset(&op, 0, sizeof(SHFILEOPSTRUCT));
@@ -741,7 +741,7 @@ bool FileTransfer::RequestNextFile()
 
 		GetDlgItemText(hWnd, IDC_CURR_REMOTE, szDstFile, sizeof(szDstFile));
 		if (!strlen(szDstFile)) return false; // no destination dir selected - msgbox ?
-		strcat(szDstFile, szSelectedFile);
+		strcat_s(szDstFile, szSelectedFile);
 
 		RequestRemoteFile(szDstFile);
 	}
@@ -818,7 +818,7 @@ bool FileTransfer::OfferNextFile()
 
 		GetDlgItemText(hWnd, IDC_CURR_LOCAL, szSrcFile, sizeof(szSrcFile));
 		if (!strlen(szSrcFile)) return false; // no destination dir selected - msgbox ?
-		strcat(szSrcFile, szSelectedFile);
+		strcat_s(szSrcFile, szSelectedFile);
 
 		if (!OfferLocalFile(szSrcFile))
 		   SendFiles(-1, 0);
@@ -853,30 +853,30 @@ bool FileTransfer::OfferNextFile()
 //
 // Format file size so it is user friendly to read
 // 
-void FileTransfer::GetFriendlyFileSizeString(__int64 Size, char* szText)
+void FileTransfer::GetFriendlyFileSizeString(__int64 Size, char* szText, int size)
 {
 	szText[0] = '\0';
 	if( Size > (1024*1024*1024) )
 	{
 		__int64 lRest = (Size % (1024*1024*1024));
 		Size /= (1024*1024*1024);
-		_snprintf(szText, 256, "%u.%2.2lu Gb", (unsigned long)Size, (unsigned long)(lRest * 100 / 1024 / 1024 / 1024));
+		_snprintf_s(szText, size, 256, "%u.%2.2lu Gb", (unsigned long)Size, (unsigned long)(lRest * 100 / 1024 / 1024 / 1024));
 	}
 	else if( Size > (1024*1024) )
 	{
 		unsigned long lRest = (Size % (1024*1024));
 		Size /= (1024*1024);
-		_snprintf(szText, 256, "%u.%2.2lu Mb", (unsigned long)Size, lRest * 100 / 1024 / 1024);
+		_snprintf_s(szText, size, 256, "%u.%2.2lu Mb", (unsigned long)Size, lRest * 100 / 1024 / 1024);
 	}
 	else if ( Size > 1024 )
 	{
 		unsigned long lRest = Size % (1024);
 		Size /= 1024;
-		_snprintf(szText, 256, "%u.%2.2lu Kb", (unsigned long)Size, lRest * 100 / 1024);
+		_snprintf_s(szText, size, 256, "%u.%2.2lu Kb", (unsigned long)Size, lRest * 100 / 1024);
 	}
 	else
 	{
-		_snprintf(szText, 256, "%u bytes", (unsigned long)Size);
+		_snprintf_s(szText, size, 256, "%u bytes", (unsigned long)Size);
 	}
 }
 
@@ -971,7 +971,7 @@ void FileTransfer::AddFileToFileList(HWND hWnd, int nListId, WIN32_FIND_DATA& fd
 		// Size
 		__int64 Size = ( ((__int64)fd.nFileSizeHigh) << 32 ) + fd.nFileSizeLow;
 		char szText[256];
-		GetFriendlyFileSizeString(Size, szText);
+		GetFriendlyFileSizeString(Size, szText, 256);
 
 		Item.mask = LVIF_TEXT;
 		Item.iItem = nItem;
@@ -988,7 +988,7 @@ void FileTransfer::AddFileToFileList(HWND hWnd, int nListId, WIN32_FIND_DATA& fd
 		FileTimeToLocalFileTime(&fd.ftLastWriteTime, &LocalFileTime);
 		SYSTEMTIME FileTime;
 		FileTimeToSystemTime(fLocalSide ? &LocalFileTime : &LocalFileTime /*&fd.ftLastWriteTime*/, &FileTime);
-		_snprintf(szText, 256, "%2.2d/%2.2d/%4.4d %2.2d:%2.2d",
+		_snprintf_s(szText, 256, "%2.2d/%2.2d/%4.4d %2.2d:%2.2d",
 				FileTime.wMonth,
 				FileTime.wDay,
 				FileTime.wYear,
@@ -1106,7 +1106,7 @@ bool FileTransfer::ResolvePossibleShortcutFolder(HWND hWnd, LPSTR szFolder)
 		// if (SHGetSpecialFolderPath(NULL, szP, nFolder, FALSE))
 		if (GetSpecialFolderPath(nFolder, szP))
 		{
-			strcat(szP,"\\");
+			strcat_s(szP,"\\");
 			SetDlgItemText(hWnd, IDC_CURR_LOCAL, szP);
 		}
 		return true;
@@ -1241,7 +1241,7 @@ void FileTransfer::PopulateLocalListBox(HWND hWnd, LPSTR szPath)
 			} //PGM @ Advantig
 			else //PGM @ Advantig
 			{ //PGM @ Advantig
-				strncpy(ofDir, ofDirT + 2, strlen(ofDirT) - 3); 
+				strncpy_s(ofDir, ofDirT + 2, strlen(ofDirT) - 3); 
 				ofDir[strlen(ofDirT) - 4] = '\0';
 			} //PGM @ Advantig
 		}
@@ -1258,14 +1258,14 @@ void FileTransfer::PopulateLocalListBox(HWND hWnd, LPSTR szPath)
 			*p = '\0';
 		}
 		else
-			strcat(ofDirT, ofDir);
+			strcat_s(ofDirT, ofDir);
 		if (!bTmp) //PGM @ Advantig
-			strcat(ofDirT, "\\");
+			strcat_s(ofDirT, "\\");
 		SetDlgItemText(hWnd, IDC_CURR_LOCAL, ofDirT);
 	}
 
 	strcpy_s(ofDir, ofDirT);
-	strcat(ofDir, "*");
+	strcat_s(ofDir, "*");
 
 	// Select the good drive in the drives combo box (the first time only)
 	int nIndex = SendDlgItemMessage(hWnd, IDC_LOCAL_DRIVECB, CB_GETCURSEL, 0, 0L);
@@ -1273,7 +1273,7 @@ void FileTransfer::PopulateLocalListBox(HWND hWnd, LPSTR szPath)
 	{
 	    char szDrive[5];
 		strcpy_s(szDrive, rfbDirPrefix);
-	    strncat(szDrive, ofDir, 2);
+	    strncat_s(szDrive, ofDir, 2);
 	    nIndex = SendDlgItemMessage(hWnd, IDC_LOCAL_DRIVECB, CB_FINDSTRING, -1, (LPARAM)(LPSTR)szDrive); 
 	    SendDlgItemMessage(hWnd, IDC_LOCAL_DRIVECB, CB_SETCURSEL, nIndex, 0L);
 	}
@@ -1390,7 +1390,7 @@ void FileTransfer::RequestRemoteDirectoryContent(HWND hWnd, LPSTR szPath)
 	{
 		if (ofDirT[0] == rfbDirPrefix[0] && ofDirT[1] == rfbDirPrefix[1])
 		{
-			strncpy(ofDir, ofDirT + 2, strlen(ofDirT) - 3); 
+			strncpy_s(ofDir, ofDirT + 2, strlen(ofDirT) - 3); 
 			ofDir[strlen(ofDirT) - 4] = '\0';
 		}
 		else
@@ -1413,8 +1413,8 @@ void FileTransfer::RequestRemoteDirectoryContent(HWND hWnd, LPSTR szPath)
 			*p = '\0';
 		}
 		else
-			strcat(ofDirT, ofDir);
-		strcat(ofDirT, "\\");
+			strcat_s(ofDirT, ofDir);
+		strcat_s(ofDirT, "\\");
 		SetDlgItemText(hWnd, IDC_CURR_REMOTE, ofDirT);
 	}
 	strcpy_s(ofDir, ofDirT);
@@ -1427,7 +1427,7 @@ void FileTransfer::RequestRemoteDirectoryContent(HWND hWnd, LPSTR szPath)
 	{
 	    char szDrive[5];
 		strcpy_s(szDrive, rfbDirPrefix);
-	    strncat(szDrive, ofDir, 2);
+	    strncat_s(szDrive, ofDir, 2);
 	    nIndex = SendDlgItemMessage(hWnd, IDC_REMOTE_DRIVECB, CB_FINDSTRING, -1, (LPARAM)(LPSTR)szDrive); 
 	    SendDlgItemMessage(hWnd, IDC_REMOTE_DRIVECB, CB_SETCURSEL, nIndex, 0L);
 	}
@@ -1634,8 +1634,8 @@ void FileTransfer::ListRemoteDrives(HWND hWnd, UINT nLen)
 		ListView_SetItem(hWndRemoteList, &Item);
 
 		// Prepare it for Combo Box and add it
-		strcat(szTheDrive, " - ");
-		strcat(szTheDrive, szType);
+		strcat_s(szTheDrive, " - ");
+		strcat_s(szTheDrive, szType);
 
 		SendMessage(GetDlgItem(hWnd, IDC_REMOTE_DRIVECB), CB_ADDSTRING, 0, (LPARAM)szTheDrive); 
 
@@ -1711,7 +1711,7 @@ void FileTransfer::ListDrives(HWND hWnd)
 		// szName[0] = '\0';
 		szType[0] = '\0';
 
-		strcat(szDrive, "\\");
+		strcat_s(szDrive, "\\");
 
 		// GetVolumeInformation(szDrive, szName, sizeof(szName), NULL, NULL, NULL, NULL, NULL);
 
@@ -1752,8 +1752,8 @@ void FileTransfer::ListDrives(HWND hWnd)
 		ListView_SetItem(hWndLocalList, &Item);
 
 		// Prepare it for Combo Box and add it
-		strcat(szTheDrive, " - ");
-		strcat(szTheDrive, szType);
+		strcat_s(szTheDrive, " - ");
+		strcat_s(szTheDrive, szType);
 
 		SendMessage(GetDlgItem(hWnd, IDC_LOCAL_DRIVECB), CB_ADDSTRING, 0, (LPARAM)szTheDrive); 
 	}
@@ -1870,8 +1870,8 @@ void FileTransfer::SetStatus(LPSTR szStatus)
 	SetDlgItemText(hWnd, IDC_STATUS, szStatus);
 	_tzset();
 	// time(&lTime);
-	_strdate(dbuffer);
-	_strtime(tbuffer);
+	_strdate_s(dbuffer);
+	_strtime_s(tbuffer);
 	sprintf_s(szHist, " > %s %s - %s", dbuffer, tbuffer/*ctime(&lTime)*/, szStatus);
 	{
 		COMBOBOXINFO cbi;
@@ -1915,9 +1915,9 @@ void FileTransfer::RequestRemoteFile(LPSTR szRemoteFileName)
 			strcpy_s(szDirectoryName, p1 + 2); // Skip dir prefix (2 chars)
 			szDirectoryName[strlen(szDirectoryName) - 2] = '\0'; // Remove dir suffix (2 chars)
 			*p1 = '\0';
-			strcat(szRemoteFileName, "("),
-			strcat(szRemoteFileName, szDirectoryName);
-			strcat(szRemoteFileName, ")");
+			strcat_s(szRemoteFileName, MAX_PATH, "("),
+			strcat_s(szRemoteFileName, MAX_PATH, szDirectoryName);
+			strcat_s(szRemoteFileName, MAX_PATH, ")");
 		}
 	}
 
@@ -2067,11 +2067,11 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, UINT nLen)
 
 
     
-    strcat(m_szDestFileName, make_temp_filename(strrchr(szRemoteFileName, '\\') + 1).c_str());
+    strcat_s(m_szDestFileName, make_temp_filename(strrchr(szRemoteFileName, '\\') + 1).c_str());
 
 	m_nnFileSize = (((__int64)(sizeH)) << 32) + lSize;
 	char szFFS[96];
-	GetFriendlyFileSizeString(m_nnFileSize, szFFS);
+	GetFriendlyFileSizeString(m_nnFileSize, szFFS, 96);
 	sprintf_s(szStatus, " %s < %s > (%s) <<<",
 			sz_H15, displayName , szFFS/*, szRemoteFileName*/);
 	SetStatus(szStatus);
@@ -2419,7 +2419,7 @@ bool FileTransfer::UnzipPossibleDirectory(LPSTR szFileName)
 		char *p3 = strrchr(szDirName, '.');
 		*p3 = '\0';
 		if (p != NULL) *p = '\0';
-		strcat(szPath, szDirName);
+		strcat_s(szPath, szDirName);
 
 		// Create the Directory
 		sprintf_s(szStatus, " %s < %s > %s", sz_H59 , szDirName, sz_H60); 
@@ -2512,7 +2512,7 @@ bool FileTransfer::OfferLocalFile(LPSTR szSrcFileName)
 	}
 
 	char szFFS[96];
-	GetFriendlyFileSizeString(n2SrcSize.QuadPart, szFFS);
+	GetFriendlyFileSizeString(n2SrcSize.QuadPart, szFFS, 96);
 	sprintf_s(szStatus, " %s < %s > (%s) >>>", sz_H22, m_szSrcFileName , szFFS); 
 
 	SetStatus(szStatus);
@@ -2540,7 +2540,7 @@ bool FileTransfer::OfferLocalFile(LPSTR szSrcFileName)
 
 	GetDlgItemText(hWnd, IDC_CURR_REMOTE, szDstFileName, sizeof(szDstFileName));
 	if (!strlen(szDstFileName)) return false; // no destination dir selected - msgbox ?
-	strcat(szDstFileName, strrchr(m_szSrcFileName, '\\') + 1);
+	strcat_s(szDstFileName, strrchr(m_szSrcFileName, '\\') + 1);
 
 	char szSrcFileTime[18];
 	// sf@2003
@@ -2560,8 +2560,8 @@ bool FileTransfer::OfferLocalFile(LPSTR szSrcFileName)
 			FileTime.wHour,
 			FileTime.wMinute
 			);
-	strcat(szDstFileName, ",");
-	strcat(szDstFileName, szSrcFileTime);
+	strcat_s(szDstFileName, ",");
+	strcat_s(szDstFileName, szSrcFileTime);
 
 	// sf@2004 - Delta Transfer
 	if (m_lpCSBuffer != NULL) 
@@ -2646,10 +2646,10 @@ int FileTransfer::ZipPossibleDirectory(LPSTR szSrcFileName)
 		if ((strlen(szPath) + strlen(rfbZipDirectoryPrefix) + strlen(szDirectoryName) + 4) > (MAX_PATH - 1)) return false;
 		// sprintf_s(szSrcFileName, "%s%s%s%s", szPath, rfbZipDirectoryPrefix, szDirectoryName, ".zip"); 
 		sprintf_s(szDirZipPath, "%s%s%s%s", szWorkingDir, rfbZipDirectoryPrefix, szDirectoryName, ".zip"); 
-		strcat(szPath, szDirectoryName);
+		strcat_s(szPath, szDirectoryName);
 		strcpy_s(szDirectoryName, szPath);
 		if (strlen(szDirectoryName) > (MAX_PATH - 4)) return -1;
-		strcat(szDirectoryName, "\\*.*");
+		strcat_s(szDirectoryName, "\\*.*");
 		sprintf_s(szStatus, " %s < %s > %s", sz_H64, szPath, sz_H65);
 		SetStatus(szStatus);
 		bool fZip = m_pZipUnZip->ZipDirectory(szPath, szDirectoryName, szDirZipPath/*szSrcFileName*/, true);
@@ -2736,7 +2736,7 @@ bool FileTransfer::SendFile(long lSize, UINT nLen)
 	if (m_fOldFTProtocole)
 	{
 	GetDlgItemText(hWnd, IDC_CURR_LOCAL, m_szSrcFileName, sizeof(m_szSrcFileName));
-	strcat(m_szSrcFileName, strrchr(szRemoteFileName, '\\') + 1);
+	strcat_s(m_szSrcFileName, strrchr(szRemoteFileName, '\\') + 1);
 	}
 	*/
 
@@ -3105,7 +3105,7 @@ bool FileTransfer::DeleteRemoteFileFeedback(long lSize, UINT nLen)
 	
 	char szStatus[MAX_PATH + 256];
 
-    bool isDir = IsDirectoryGetIt(szRemoteName);
+    bool isDir = IsDirectoryGetIt(szRemoteName, nLen+1);
 	if (lSize == -1)
 	{
         sprintf_s(szStatus, "%s < %s > %s", isDir ? sz_H99: sz_H33, szRemoteName,sz_H30);
@@ -3221,13 +3221,13 @@ int FileTransfer::GenerateFileChecksums(HANDLE hFile, char* lpCSBuffer, int nCSB
 }
 
 
-bool FileTransfer::IsDirectoryGetIt(char* szName)
+bool FileTransfer::IsDirectoryGetIt(char* szName, int size)
 {
 	char szWork[MAX_PATH];
 	strcpy_s(szWork, szName);
 	if (szWork[0] == rfbDirPrefix[0] && szWork[1] == rfbDirPrefix[1])
 	{
-		strncpy(szName, szWork + 2, strlen(szWork) - 3); 
+		strncpy_s(szName, size, szWork + 2, strlen(szWork) - 3); 
 		szName[strlen(szWork) - 4] = '\0';
 		return true;
 	}	
@@ -3371,14 +3371,14 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 			const long lTitleBufSize=256;			
 			char szRemoteName[lTitleBufSize];
 			char szTitle[lTitleBufSize];
-			if (_snprintf(szRemoteName, 127 ,"%s", l_this->m_pCC->m_desktopName) < 0 )
+			if (_snprintf_s(szRemoteName, 127 ,"%s", l_this->m_pCC->m_desktopName) < 0 )
 			{
 				szRemoteName[128-4]='.';
 				szRemoteName[128-3]='.';
 				szRemoteName[128-2]='.';
 				szRemoteName[128-1]=0x00;
 			}	
-			_snprintf(szTitle, lTitleBufSize-1," %s < %s>  -  UltraVNC", sz_H35,szRemoteName);
+			_snprintf_s(szTitle, lTitleBufSize-1," %s < %s>  -  UltraVNC", sz_H35,szRemoteName);
 			SetWindowText(hWnd, szTitle);
 
 			// Create all the columns of the Files ListViews
@@ -3586,7 +3586,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 
 			GetDlgItemText(hWnd, IDC_CURR_LOCAL, szCurrLocal, sizeof(szCurrLocal));
 			if (!strlen(szCurrLocal)) break; // no src dir selected
-			strcat(szCurrLocal, szSelectedFile);
+			strcat_s(szCurrLocal, szSelectedFile);
 
 			// Request the first file of the list (-> triggers the transfer of the whole list)
 			_this->m_fFileCommandPending = true;
@@ -3689,7 +3689,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 
 			GetDlgItemText(hWnd, IDC_CURR_REMOTE, szDstFile, sizeof(szDstFile));
 			if (!strlen(szDstFile)) break; // no src dir selected
-			strcat(szDstFile, szSelectedFile);
+			strcat_s(szDstFile, szSelectedFile);
 
 			// Request the first file of the list (-> triggers the transfer of the whole list)
 			_this->m_fFileCommandPending = true;
@@ -3790,7 +3790,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 						Item.iItem = nSelected;
 						ListView_GetItem(hWndLocalList, &Item);
                         // 14 April 2008 jdp
-                        bool isDir = _this->IsDirectoryGetIt(szSelectedFile);
+                        bool isDir = _this->IsDirectoryGetIt(szSelectedFile, 128);
 						GetDlgItemText(hWnd, IDC_CURR_LOCAL, szCurrLocal, sizeof(szCurrLocal));
 						if (strlen(szCurrLocal) + strlen(szSelectedFile) > MAX_PATH)
 						{
@@ -3806,7 +3806,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 							if (_this->m_nConfirmAnswer == CONFIRM_NOALL)
 								break;
 						}
-						strcat(szCurrLocal, szSelectedFile);
+						strcat_s(szCurrLocal, szSelectedFile);
 						if (!_this->DeleteFileOrDirectory(szCurrLocal))
 						{
                             sprintf_s(szMes, "%s < %s >", isDir ? sz_H97 : sz_H49, szCurrLocal);
@@ -3853,7 +3853,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 						Item.iItem = nSelected;
 						ListView_GetItem(hWndRemoteList, &Item);
                         // 14 April 2008 jdp
-                        bool isDir = _this->IsDirectoryGetIt(szSelectedFile);
+                        bool isDir = _this->IsDirectoryGetIt(szSelectedFile, 128);
 						GetDlgItemText(hWnd, IDC_CURR_REMOTE, szCurrRemote, sizeof(szCurrRemote));
 						if (strlen(szCurrRemote) + strlen(szSelectedFile) > MAX_PATH) continue;
 						if (_this->m_nConfirmAnswer == CONFIRM_YES || _this->m_nConfirmAnswer == CONFIRM_NO)
@@ -3866,7 +3866,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 								break;
 						}
 						_this->m_fFileCommandPending = true;
-						strcat(szCurrRemote, szSelectedFile);
+						strcat_s(szCurrRemote, szSelectedFile);
 						_this->m_nDeleteCount++;
                         pathsToDelete.push_back(std::string(szCurrRemote));
 					}
@@ -3896,9 +3896,9 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 					// TODO: Error Message
 					break;
 				}
-				strcat(szCurrLocal, _this->m_szFTParam);
+				strcat_s(szCurrLocal, _this->m_szFTParam);
                 TCHAR szFolderName[MAX_PATH];
-                _snprintf(szFolderName, MAX_PATH, "%s%s%s", rfbDirPrefix, _this->m_szFTParam, rfbDirSuffix);
+                _snprintf_s(szFolderName, MAX_PATH, "%s%s%s", rfbDirPrefix, _this->m_szFTParam, rfbDirSuffix);
                 szFolderName[MAX_PATH - 1] = 0;
 				if (_this->FileOrFolderExists(GetDlgItem(hWnd, IDC_LOCAL_FILELIST), szFolderName))
 				{
@@ -3937,7 +3937,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 				}
 
                 TCHAR szFolderName[MAX_PATH];
-                _snprintf(szFolderName, MAX_PATH, "%s%s%s", rfbDirPrefix, _this->m_szFTParam, rfbDirSuffix);
+                _snprintf_s(szFolderName, MAX_PATH, "%s%s%s", rfbDirPrefix, _this->m_szFTParam, rfbDirSuffix);
                 szFolderName[MAX_PATH - 1] = 0;
 				if (_this->FileOrFolderExists(GetDlgItem(hWnd, IDC_REMOTE_FILELIST), szFolderName))
 				{
@@ -3949,7 +3949,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 				}
 
 				_this->m_fFileCommandPending = true;
-				strcat(szCurrRemote, _this->m_szFTParam);
+				strcat_s(szCurrRemote, _this->m_szFTParam);
 				_this->CreateRemoteDirectory(szCurrRemote);
 			}
 			break;
@@ -3994,7 +3994,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 					{
 						Item.iItem = nSelected;
 						ListView_GetItem(hWndLocalList, &Item);
-						_this->IsDirectoryGetIt(szSelectedFile);
+						_this->IsDirectoryGetIt(szSelectedFile, 128);
 						strcpy_s(_this->m_szFTParam, szSelectedFile);
 						_this->DoFTParamDialog(sz_M3, sz_M4);
 						if (strlen(_this->m_szFTParam) == 0 || (strlen(szCurrLocal) + strlen(_this->m_szFTParam)) > 248) 
@@ -4003,7 +4003,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 							break;
 						}
 		                TCHAR szFolderName[MAX_PATH];
-		                _snprintf(szFolderName, MAX_PATH, "%s%s%s", rfbDirPrefix, _this->m_szFTParam, rfbDirSuffix);
+		                _snprintf_s(szFolderName, MAX_PATH, "%s%s%s", rfbDirPrefix, _this->m_szFTParam, rfbDirSuffix);
 		                szFolderName[MAX_PATH - 1] = 0;
 						if ((_this->FileOrFolderExists(GetDlgItem(hWnd, IDC_LOCAL_FILELIST), szFolderName)) ||
 						   (_this->FileOrFolderExists(GetDlgItem(hWnd, IDC_LOCAL_FILELIST), _this->m_szFTParam)))
@@ -4013,8 +4013,8 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 							break;
 						}
 						strcpy_s(szNewLocal, szCurrLocal);
-						strcat(szCurrLocal, szSelectedFile); // Old full name
-						strcat(szNewLocal, _this->m_szFTParam); // New full name
+						strcat_s(szCurrLocal, szSelectedFile); // Old full name
+						strcat_s(szNewLocal, _this->m_szFTParam); // New full name
 						if (!MoveFile(szCurrLocal, szNewLocal))
 						{
 							sprintf_s(szMes, "%s < %s >", sz_M5, szCurrLocal);
@@ -4068,7 +4068,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 					{
 						Item.iItem = nSelected;
 						ListView_GetItem(hWndRemoteList, &Item);
-						_this->IsDirectoryGetIt(szSelectedFile);
+						_this->IsDirectoryGetIt(szSelectedFile, 128);
 						strcpy_s(_this->m_szFTParam, szSelectedFile);
 						_this->DoFTParamDialog(sz_M3, sz_M4);
 						if (strrchr(_this->m_szFTParam, '*') != NULL 
@@ -4080,7 +4080,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 							break;
 						}
 		                TCHAR szFolderName[MAX_PATH];
-		                _snprintf(szFolderName, MAX_PATH, "%s%s%s", rfbDirPrefix, _this->m_szFTParam, rfbDirSuffix);
+		                _snprintf_s(szFolderName, MAX_PATH, "%s%s%s", rfbDirPrefix, _this->m_szFTParam, rfbDirSuffix);
 		                szFolderName[MAX_PATH - 1] = 0;
 						if ((_this->FileOrFolderExists(GetDlgItem(hWnd, IDC_REMOTE_FILELIST), szFolderName)) ||
 						   (_this->FileOrFolderExists(GetDlgItem(hWnd, IDC_REMOTE_FILELIST), _this->m_szFTParam)))
@@ -4091,8 +4091,8 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 							break;
 						}
 						strcpy_s(szNewRemote, szCurrRemote);
-						strcat(szCurrRemote, szSelectedFile); // Old full name
-						strcat(szNewRemote, _this->m_szFTParam); // New full name
+						strcat_s(szCurrRemote, szSelectedFile); // Old full name
+						strcat_s(szNewRemote, _this->m_szFTParam); // New full name
 
 						_this->m_fFileCommandPending = true;
 						_this->RenameRemoteFileOrDirectory(szCurrRemote, szNewRemote);
@@ -4700,9 +4700,9 @@ __int64 FileTransfer::GetFileSizeFromString(char* szSize)
 	if (ts0 == 'r') return -1;
 	char ts1 = szSize[strlen(szSize)-2];
 	if (ts1 != 'e')
-		sscanf(szSize, "%d.%02d", &m, &r);
+		sscanf_s(szSize, "%d.%02d", &m, &r);
 	else
-		sscanf(szSize, "%d", &m);
+		sscanf_s(szSize, "%d", &m);
 
 	switch (ts1)
 	{
@@ -4738,7 +4738,7 @@ FILETIME FileTransfer::GetFileTimeFromString(char* szFileSystemTime)
 	}
 	else
 	{
-		sscanf(szFileSystemTime,"%2d/%2d/%4d %2d:%2d",
+		sscanf_s(szFileSystemTime,"%2d/%2d/%4d %2d:%2d",
 				&m,
 				&d,
 				&y,

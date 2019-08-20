@@ -135,7 +135,7 @@ void ClientConnection::UpdateRemoteClipboard(CARD32 overrideFlags)
 				
 				char *contents = new char[strlen(lpstr) + 1];
 				char *unixcontents = new char[strlen(lpstr) + 1];
-				strcpy(contents,lpstr);
+				strcpy_s(contents, strlen(lpstr) + 1, lpstr);
 				GlobalUnlock(hglb); 
 				CloseClipboard();       		
 				
@@ -303,7 +303,7 @@ void ClientConnection::SaveClipboardPreferences()
 		//ofnInit();
 		vnclog.Print(1, "Saving to %s\n", m_opts.getDefaultOptionsFileName());
 		char buf[32];
-		sprintf(buf, "%d", dwClipboardPrefs);
+		sprintf_s(buf, "%d", dwClipboardPrefs);
 		WritePrivateProfileString("connection", "ClipboardPrefs", buf, m_opts.getDefaultOptionsFileName());
 	}
 }

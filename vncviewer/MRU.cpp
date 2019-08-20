@@ -134,13 +134,13 @@ void MRU::RemoveItem(LPTSTR txt)
 void MRU::SetPos(LPTSTR txt, int x, int y, int w, int h)
 {
 	char buf[32];
-	sprintf(buf, "%d", x);
+	sprintf_s(buf, "%d", x);
 	WritePrivateProfileString(txt, "x", buf, m_opts.getDefaultOptionsFileName());
-	sprintf(buf, "%d", y);
+	sprintf_s(buf, "%d", y);
 	WritePrivateProfileString(txt, "y", buf, m_opts.getDefaultOptionsFileName());
-	sprintf(buf, "%d", w);
+	sprintf_s(buf, "%d", w);
 	WritePrivateProfileString(txt, "w", buf, m_opts.getDefaultOptionsFileName());
-	sprintf(buf, "%d", h);
+	sprintf_s(buf, "%d", h);
 	WritePrivateProfileString(txt, "h", buf, m_opts.getDefaultOptionsFileName());
 }
 

@@ -200,9 +200,9 @@ public:
 	void SetGlobalCount();
 	void SetStatus(LPSTR szStatus);
 	void ShowFileTransferWindow(bool fVisible);
-	bool IsDirectoryGetIt(char* szName);
+	bool IsDirectoryGetIt(char* szName, int size);
 	bool GetSpecialFolderPath(int nId, char* szPath);
-	void GetFriendlyFileSizeString(__int64 Size, char* szText);
+	void GetFriendlyFileSizeString(__int64 Size, char* szText, int size);
 	bool MyGetFileSize(char* szFilePath, ULARGE_INTEGER* n2FileSize);
 	void InitListViewImagesList(HWND hListView);
     bool DeleteFileOrDirectory(TCHAR *srcpath); // 14 April 2008 jdp
