@@ -95,11 +95,11 @@ HMODULE LoadSecurityDll() {
       VerInfo.dwMajorVersion == 4 &&
       VerInfo.dwMinorVersion == 0)
    {
-      lstrcpy (lpszDLL, _T("security.dll"));
+      lstrcpy_s(lpszDLL, _T("security.dll"));
    }
    else
    {
-      lstrcpy (lpszDLL, _T("secur32.dll"));
+      lstrcpy_s(lpszDLL, _T("secur32.dll"));
    }
 
 
@@ -773,7 +773,7 @@ if ( isNT )
 				byte *buf2 = 0;
 				rc = NetWkstaGetInfo95( 0 , 100 , &buf2 ) ;
 				if( rc ) printf( "NetWkstaGetInfoA() returned %lu \n", rc);
-				else  strncpy( domain, ((WKSTA_INFO_100_95 *) buf2)->wki100_langroup, MAXLEN );
+				else  strncpy_s( domain, ((WKSTA_INFO_100_95 *) buf2)->wki100_langroup, MAXLEN );
 				NetApiBufferFree( buf2 );
 				domain[MAXLEN - 1] = '\0';
 				NetApiBufferFree( buf );
@@ -785,7 +785,7 @@ if ( isNT )
 					{
 						for ( i = 0; i < read; ++ i )
 							{ 
-								strncpy( groupname, ((LPLOCALGROUP_USERS_INFO_0_95 *) buf2)[i].grui0_name, MAXLEN );
+								strncpy_s( groupname, ((LPLOCALGROUP_USERS_INFO_0_95 *) buf2)[i].grui0_name, MAXLEN );
 								groupname[MAXLEN - 1] = '\0'; // because strncpy won't do this if overflow
 #ifdef _MSC_VER
 							_strupr(groupname);

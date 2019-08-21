@@ -242,7 +242,7 @@ const char *SplitString(const char *input, char separator, char *head){
 		l = (int)(tail - input);
 		// get rid of separator
 		tail = tail + 1; 
-		strncpy(head, input, l);
+		strncpy_s(head, input, l);
 		head[l] = '\0';
 	} else {
 		tail   = input;

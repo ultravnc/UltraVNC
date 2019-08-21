@@ -91,7 +91,7 @@ void EventLogging::AddEventSourceToRegistry(LPCTSTR lpszSourceName)
 			char* p = strrchr(szServicePath, '\\');
 			if (p == NULL) return;
 			*p = '\0';
-			strcat (szServicePath,"\\logmessages.dll");
+			strcat_s(szServicePath,"\\logmessages.dll");
 		}
 	//printf(szServicePath);
     lstrcpy(szBuf, szServicePath);
@@ -151,7 +151,7 @@ void LOGEXIT(char *machine)
 			if (p != NULL)
 			{
 				*p = '\0';
-				strcat (szMslogonLog,"\\mslogon.log");
+				strcat_s(szMslogonLog,"\\mslogon.log");
 			}
 		}
 		file = fopen(szMslogonLog, "a");
@@ -187,7 +187,7 @@ void LOGLOGON(char *machine)
 			if (p != NULL)
 			{
 				*p = '\0';
-				strcat (szMslogonLog,"\\mslogon.log");
+				strcat_s(szMslogonLog,"\\mslogon.log");
 			}
 		}
 		file = fopen(szMslogonLog, "a");
@@ -223,7 +223,7 @@ void LOGFAILED(char *machine)
 			if (p != NULL)
 			{
 				*p = '\0';
-				strcat (szMslogonLog,"\\mslogon.log");
+				strcat_s(szMslogonLog,"\\mslogon.log");
 			}
 		}
 		file = fopen(szMslogonLog, "a");
@@ -262,7 +262,7 @@ void LOGLOGONUSER(char *machine,char *user)
 			if (p != NULL)
 			{
 				*p = '\0';
-				strcat (szMslogonLog,"\\mslogon.log");
+				strcat_s(szMslogonLog,"\\mslogon.log");
 			}
 		}
 		file = fopen(szMslogonLog, "a");
@@ -301,7 +301,7 @@ void LOGFAILEDUSER(char *machine, char *user)
 			if (p != NULL)
 			{
 				*p = '\0';
-				strcat (szMslogonLog,"\\mslogon.log");
+				strcat_s(szMslogonLog,"\\mslogon.log");
 			}
 		}
 		file = fopen(szMslogonLog, "a");

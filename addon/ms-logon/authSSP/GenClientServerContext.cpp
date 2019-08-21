@@ -89,9 +89,9 @@ HMODULE LoadSecurityDll() {
 	if (VerInfo.dwPlatformId == VER_PLATFORM_WIN32_NT &&
 		VerInfo.dwMajorVersion == 4 &&
 		VerInfo.dwMinorVersion == 0){
-			lstrcpy (lpszDLL, _T("security.dll"));
+			lstrcpy_s(lpszDLL, _T("security.dll"));
 		} else {
-			lstrcpy (lpszDLL, _T("secur32.dll"));
+			lstrcpy_s(lpszDLL, _T("secur32.dll"));
 		}
 
 	hModule = LoadLibrary(lpszDLL);
