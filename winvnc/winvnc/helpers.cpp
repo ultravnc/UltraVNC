@@ -387,7 +387,7 @@ void
 Real_stop_service()
 {
     char command[MAX_PATH + 32]; // 29 January 2008 jdp
-    _snprintf(command, sizeof command, "net stop \"%s\"", service_name);
+    _snprintf_s(command, sizeof command, "net stop \"%s\"", service_name);
 	WinExec(command,SW_HIDE);
 }
 
@@ -425,7 +425,7 @@ void
 Real_start_service()
 {
     char command[MAX_PATH + 32]; // 29 January 2008 jdp
-    _snprintf(command, sizeof command, "net start \"%s\"", service_name);
+    _snprintf_s(command, sizeof command, "net start \"%s\"", service_name);
 	WinExec(command,SW_HIDE);
 }
 
@@ -577,7 +577,7 @@ bool GetServiceName(TCHAR *pszAppPath, TCHAR *pszServiceName)
                                 if (servicePath.find(appPath.c_str()) != -1)
                                 {
                                     bResult = true;
-                                    strncpy(pszServiceName, pServices[i].lpServiceName, 256);
+                                    strncpy_s(pszServiceName, 256, pServices[i].lpServiceName, 256);
                                     pszServiceName[255] = 0;
                                 }
                             }

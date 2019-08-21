@@ -806,7 +806,7 @@ vncDesktop::Startup()
 		SYSTEMTIME lt;
 		GetLocalTime(&lt);
 		char str[MAX_PATH + 32]; // 29 January 2008 jdp 
-		_snprintf(str, sizeof str, "%02d_%02d_%02d_%02d_%02d", lt.wMonth, lt.wDay, lt.wHour, lt.wMinute, lt.wSecond);
+		_snprintf_s(str, sizeof str, "%02d_%02d_%02d_%02d_%02d", lt.wMonth, lt.wDay, lt.wHour, lt.wMinute, lt.wSecond);
 		strcat_s(str, "_vnc.avi");
 		AviGen = new CAVIGenerator(str, "c:\\temp", &m_bminfo.bmi.bmiHeader, 5);
 		HRESULT hr;
@@ -1996,7 +1996,7 @@ void vncDesktop::SetClipText(LPSTR rfbStr)
 				// Get the data
 				if (pMem)
 				{
-					strcpy(pMem, rfbStr);
+					strcpy_s(pMem, strlen(rfbStr) + 1, rfbStr);
 					// Tell the clipboard
 					GlobalUnlock(hMem);
 					SetClipboardData(CF_TEXT, hMem);

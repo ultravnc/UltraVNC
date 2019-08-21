@@ -125,7 +125,7 @@ bool DeleteFileOrDirectory(TCHAR *srcpath)
     TCHAR path[MAX_PATH + 1]; // room for extra null; SHFileOperation requires double null terminator
     memset(path, 0, sizeof path);
     
-    _tcsncpy(path, srcpath, MAX_PATH);
+    _tcsncpy_s(path, srcpath, MAX_PATH);
 
     SHFILEOPSTRUCT op;
     memset(&op, 0, sizeof(SHFILEOPSTRUCT));
@@ -242,7 +242,7 @@ void SplitTransferredFileNameAndDate(char *szFileAndDate, char *filetime)
     else
     {
         if (filetime)
-            strcpy(filetime, p+1);
+            strcpy_s(filetime, 324, p+1);
         *p = '\0';
     }
 }
@@ -862,7 +862,7 @@ vncClientThread::InitVersion()
 		return FALSE;
 
 	// Check viewer's the protocol version
-	sscanf((char *)&protocol_ver, rfbProtocolVersionFormat, &m_major, &m_minor);
+	sscanf_s((char *)&protocol_ver, rfbProtocolVersionFormat, &m_major, &m_minor);
 	if (m_major != rfbProtocolMajorVersion)
 		return FALSE;
 
@@ -1095,7 +1095,7 @@ void vncClientThread::LogAuthResult(bool success)
 			{
 				char* p = strrchr(szCurrentDir, '\\');
 				*p = '\0';
-				strcat (szCurrentDir,"\\logging.dll");
+				strcat_s(szCurrentDir,"\\logging.dll");
 			}
 		HMODULE hModule = LoadLibrary(szCurrentDir);
 		if (hModule)
@@ -1115,7 +1115,7 @@ void vncClientThread::LogAuthResult(bool success)
 			{
 				char* p = strrchr(szCurrentDir, '\\');
 				*p = '\0';
-				strcat (szCurrentDir,"\\logging.dll");
+				strcat_s(szCurrentDir,"\\logging.dll");
 			}
 		HMODULE hModule = LoadLibrary(szCurrentDir);
 		if (hModule)
@@ -1932,7 +1932,7 @@ void GetIPString(char *buffer, int buflen)
 
     if (gethostname(namebuf, 256) != 0)
 	{
-		strncpy(buffer, "Host name unavailable", buflen);
+		strncpy_s(buffer, buflen, "Host name unavailable", buflen);
 		return;
     }
 #ifdef IPV6V4
@@ -2011,7 +2011,7 @@ void GetIPString(char *buffer, int buflen)
 					WSAAddressToString(sockaddr_ip, (DWORD)p->ai_addrlen, NULL, ipstringbuffer, &ipbufferlength);
 					char			szText[256];
 					memset(szText, 0, 256);
-					strncpy(szText, ipstringbuffer, ipbufferlength - 4);
+					strncpy_s(szText, ipstringbuffer, ipbufferlength - 4);
 					strcat_s(szText, "-");
 					int len = strlen(buffer);
 					int len2 = strlen(szText);
@@ -2030,7 +2030,7 @@ void GetIPString(char *buffer, int buflen)
 	ph=gethostbyname(namebuf);
     if (!ph)
 	{
-		strncpy(buffer, "IP address unavailable", buflen);
+		strncpy_s(buffer, buflen, "IP address unavailable", buflen);
 		return;
     }
 
@@ -2041,11 +2041,11 @@ void GetIPString(char *buffer, int buflen)
     	for (int j = 0; j < ph->h_length; j++)
 		{
 	    sprintf_s(digtxt, "%d.", (unsigned char) ph->h_addr_list[i][j]);
-	    strncat(buffer, digtxt, (buflen-1)-strlen(buffer));
+	    strncat_s(buffer, buflen, digtxt, (buflen-1)-strlen(buffer));
 		}	
 		buffer[strlen(buffer)-1] = '\0';
 		if (ph->h_addr_list[i+1] != 0)
-			strncat(buffer, ", ", (buflen-1)-strlen(buffer));
+			strncat_s(buffer, buflen, ", ", (buflen-1)-strlen(buffer));
     }
 #endif
 }
@@ -2156,7 +2156,7 @@ bool vncClientThread::TryReconnect()
 			char finalidcode[_MAX_PATH];
 			//adzm 2010-08 - this was sending uninitialized data over the wire
 			ZeroMemory(finalidcode, sizeof(finalidcode));
-			strncpy(finalidcode, m_client->GetRepeaterID(), sizeof(finalidcode) - 1);
+			strncpy_s(finalidcode, m_client->GetRepeaterID(), sizeof(finalidcode) - 1);
 
 			m_socket->Send(finalidcode,250);
 
@@ -2216,9 +2216,9 @@ vncClientThread::run(void *arg)
 			char szInfo[256];
 
 			if (m_client->GetRepeaterID() && (strlen(m_client->GetRepeaterID()) > 0) ) {
-				_snprintf(szInfo, 255, "Could not connect using %s!", m_client->GetRepeaterID());
+				_snprintf_s(szInfo, 255, "Could not connect using %s!", m_client->GetRepeaterID());
 			} else {
-				_snprintf(szInfo, 255, "Could not connect to %s!", m_client->GetClientName());
+				_snprintf_s(szInfo, 255, "Could not connect to %s!", m_client->GetClientName());
 			}
 
 			szInfo[255] = '\0';
@@ -4420,7 +4420,7 @@ vncClientThread::run(void *arg)
 		{
 			char* p = strrchr(szCurrentDir, '\\');
 			*p = '\0';
-			strcat (szCurrentDir,"\\logging.dll");
+			strcat_s(szCurrentDir,"\\logging.dll");
 		}
 		HMODULE hModule = LoadLibrary(szCurrentDir);
 		if (hModule)

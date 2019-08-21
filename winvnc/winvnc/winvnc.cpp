@@ -184,9 +184,9 @@ Myinit(HINSTANCE hInstance)
 		char* p = strrchr(szCurrentDir, '\\');
 		*p = '\0';
 	}
-	strcpy (szCurrentDir_vnclangdll,szCurrentDir);
-	strcat (szCurrentDir_vnclangdll,"\\");
-	strcat (szCurrentDir_vnclangdll,"vnclang_server.dll");
+	strcpy_s(szCurrentDir_vnclangdll,szCurrentDir);
+	strcat_s(szCurrentDir_vnclangdll,"\\");
+	strcat_s(szCurrentDir_vnclangdll,"vnclang_server.dll");
 
 	hInstResDLL = LoadLibrary(szCurrentDir_vnclangdll);
 
@@ -327,9 +327,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 		char* p = strrchr(szCurrentDir, '\\');
 		*p = '\0';
 	}
-	strcpy (szCurrentDir_vnclangdll,szCurrentDir);
-	strcat (szCurrentDir_vnclangdll,"\\");
-	strcat (szCurrentDir_vnclangdll,"vnclang_server.dll");
+	strcpy_s(szCurrentDir_vnclangdll,szCurrentDir);
+	strcat_s(szCurrentDir_vnclangdll,"\\");
+	strcat_s(szCurrentDir_vnclangdll,"vnclang_server.dll");
 
 	hInstResDLL = LoadLibrary(szCurrentDir_vnclangdll);
 
@@ -350,7 +350,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 		*p = '\0';
 		}
     char progname[MAX_PATH];
-    strncpy(progname, WORKDIR, sizeof progname);
+    strncpy_s(progname, WORKDIR, sizeof progname);
     progname[MAX_PATH - 1] = 0;
 	vnclog.SetFile();
 
@@ -405,10 +405,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
             char Path[_MAX_PATH];
             char FileName[_MAX_PATH];
             char FileExt[_MAX_PATH];
-            _splitpath(&(szCmdLine[i + 1]), Drv, Path, FileName, FileExt);
+            _splitpath_s(&(szCmdLine[i + 1]), Drv, Path, FileName, FileExt);
             char *p = strchr(FileExt, ' ');
             if (p) *p = 0;
-            _makepath(filepath, Drv, Path, FileName, FileExt);
+            _makepath_s(filepath, Drv, Path, FileName, FileExt);
             g_szIniFile = _strdup(filepath);
             i += strlen(filepath);
 #ifdef CRASHRPT
@@ -564,7 +564,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 					if (GetModuleFileName(NULL, szCurrentDirl, MAX_PATH)) {
 						char* p = strrchr(szCurrentDirl, '\\');
 						*p = '\0';
-						strcat (szCurrentDirl,"\\authSSP.dll");
+						strcat_s(szCurrentDirl,"\\authSSP.dll");
 					}
 					HMODULE hModule = LoadLibrary(szCurrentDirl);
 					if (hModule) {
@@ -699,13 +699,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
                 // the default, use the supplied service name instead
                 if (*pServiceName && (_strcmpi(pServiceName, service_name) != 0))
                 {
-                    strncpy(service_name, pServiceName, 256);
+                    strncpy_s(service_name, 256, pServiceName, 256);
                     service_name[255] = 0;
                 }
 				install_service();
 				Sleep(2000);
 				char command[MAX_PATH + 32]; // 29 January 2008 jdp
-                _snprintf(command, sizeof command, "net start \"%s\"", service_name);
+                _snprintf_s(command, sizeof command, "net start \"%s\"", service_name);
 				WinExec(command,SW_HIDE);
 #ifdef CRASHRPT
 				crUninstall();
@@ -740,10 +740,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 
                 if (*pServiceName && (_strcmpi(pServiceName, service_name) != 0))
                 {
-                    strncpy(service_name, pServiceName, 256);
+                    strncpy_s(service_name, 256, pServiceName, 256);
                     service_name[255] = 0;
                 }
-                _snprintf(command, sizeof command, "net stop \"%s\"", service_name);
+                _snprintf_s(command, sizeof command, "net stop \"%s\"", service_name);
 				WinExec(command,SW_HIDE);
 				uninstall_service();
 #ifdef CRASHRPT
@@ -849,7 +849,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 
 					pszId = new char[end - start + 1];
 
-					strncpy(pszId, &(szCmdLine[start]), end - start);
+					strncpy_s(pszId, end - start + 1, &(szCmdLine[start]), end - start);
 					pszId[end - start] = 0;
 					pszId = _strupr(pszId);
 				}
@@ -893,7 +893,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 					pszId = new char[end - start + 1];
 					if (pszId != 0)
 					{
-						strncpy(pszId, &(szCmdLine[start]), end - start);
+						strncpy_s(pszId, end - start + 1, &(szCmdLine[start]), end - start);
 						pszId[end - start] = 0;
 						pszId = _strupr(pszId);
 					}
@@ -939,7 +939,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 			{
 				char *name = new char[end-start+1];
 				if (name != 0) {
-					strncpy(name, &(szCmdLine[start]), end-start);
+					strncpy_s(name, end-start+1, &(szCmdLine[start]), end-start);
 					name[end-start] = 0;
 
 					int port = INCOMING_PORT_OFFSET;
@@ -1088,7 +1088,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 				}
 				g_szRepeaterHost = new char[end-start+1];
 				if (g_szRepeaterHost != 0) {
-					strncpy(g_szRepeaterHost, &(szCmdLine[start]), end-start);
+					strncpy_s(g_szRepeaterHost, end-start+1, &(szCmdLine[start]), end-start);
 					g_szRepeaterHost[end-start] = 0;
 
 					// We can not contact a runnning service, permissions, so we must store the settings

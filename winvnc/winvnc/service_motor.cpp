@@ -186,7 +186,7 @@ void set_service_description()
 	HKEY hKey;
 	char tempName[256];
     char desc[] = "Provides secure remote desktop sharing";
-	_snprintf(tempName,  sizeof tempName, "SYSTEM\\CurrentControlSet\\Services\\%s", service_name);
+	_snprintf_s(tempName,  sizeof tempName, "SYSTEM\\CurrentControlSet\\Services\\%s", service_name);
 	RegCreateKeyEx(HKEY_LOCAL_MACHINE,
 						tempName,
 						0,
@@ -349,7 +349,7 @@ BOOL CreateServiceSafeBootKey()
 	DWORD dwDisp = 0;
 	LONG lSuccess;
 	char szKey[1024];
-	_snprintf(szKey, 1024, "SYSTEM\\CurrentControlSet\\Control\\SafeBoot\\%s\\%s", "Network", service_name);
+	_snprintf_s(szKey, 1024, "SYSTEM\\CurrentControlSet\\Control\\SafeBoot\\%s\\%s", "Network", service_name);
 	lSuccess = RegCreateKeyEx(HKEY_LOCAL_MACHINE, szKey, 0L, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &hKey, &dwDisp);
 	if (lSuccess == ERROR_SUCCESS)
 	{
@@ -372,7 +372,7 @@ void Set_Safemode()
 					char systemdrive[150];
 					char stringvalue[512];
 					GetEnvironmentVariable("SYSTEMDRIVE", systemdrive, 150);
-					strcat (systemdrive,"/boot.ini");
+					strcat_s(systemdrive,"/boot.ini");
 					GetPrivateProfileString("boot loader","default","",drivepath,150,systemdrive);
 					if (strlen(drivepath)==0) return;
 					GetPrivateProfileString("operating systems",drivepath,"",stringvalue,512,systemdrive);
@@ -596,7 +596,7 @@ BOOL DeleteServiceSafeBootKey()
 {
 	LONG lSuccess;
 	char szKey[1024];
-	_snprintf(szKey, 1024, "SYSTEM\\CurrentControlSet\\Control\\SafeBoot\\%s\\%s", "Network", service_name);
+	_snprintf_s(szKey, 1024, "SYSTEM\\CurrentControlSet\\Control\\SafeBoot\\%s\\%s", "Network", service_name);
 	lSuccess = RegDeleteKey(HKEY_LOCAL_MACHINE, szKey);
 	return lSuccess == ERROR_SUCCESS;
 
@@ -613,7 +613,7 @@ void Restore_safemode()
 			char systemdrive[150];
 			char stringvalue[512];
 			GetEnvironmentVariable("SYSTEMDRIVE", systemdrive, 150);
-			strcat (systemdrive,"/boot.ini");
+			strcat_s(systemdrive,"/boot.ini");
 			GetPrivateProfileString("boot loader","default","",drivepath,150,systemdrive);
 			if (strlen(drivepath)==0) return;
 			GetPrivateProfileString("operating systems",drivepath,"",stringvalue,512,systemdrive);

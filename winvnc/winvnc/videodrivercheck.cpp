@@ -96,7 +96,7 @@ TEXT("\\StringFileInfo\\040904b0\\ProductVersion"),
 
    if( resultValue )
    {
-      strncpy(vBuffer, (char *) lpBuffer, size);
+      strncpy_s(vBuffer, 512, (char *) lpBuffer, size);
       delete []versionInfo;
       return(TRUE);
    }

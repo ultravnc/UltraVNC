@@ -47,7 +47,7 @@ HBITMAP
 				char* p = strrchr(szFileName, '\\');
 					if (p == NULL) return false;
 					*p = '\0';
-				strcat (szFileName,"\\background2.bmp");
+				strcat_s(szFileName,"\\background2.bmp");
 			}
 			hbmBkGnd = (HBITMAP)LoadImage( NULL, szFileName, IMAGE_BITMAP, 0, 0,
                LR_CREATEDIBSECTION | LR_DEFAULTSIZE | LR_LOADFROMFILE );*/

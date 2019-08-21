@@ -611,7 +611,7 @@ vncMenu::GetIPAddrString(char *buffer, int buflen) {
     char namebuf[256];
 
     if (gethostname(namebuf, 256) != 0) {
-		strncpy(buffer, "Host name unavailable", buflen);
+		strncpy_s(buffer, buflen, "Host name unavailable", buflen);
 		return;
     };
 
@@ -688,7 +688,7 @@ vncMenu::GetIPAddrString(char *buffer, int buflen) {
 					WSAAddressToString(sockaddr_ip, (DWORD)p->ai_addrlen, NULL, ipstringbuffer, &ipbufferlength);
 					char			szText[256];
 					memset(szText, 0, 256);
-					strncpy(szText, ipstringbuffer, ipbufferlength - 4);
+					strncpy_s(szText, ipstringbuffer, ipbufferlength - 4);
 					strcat_s(szText, "-");
 					int len = strlen(buffer);
 					int len2 = strlen(szText);
@@ -705,7 +705,7 @@ vncMenu::GetIPAddrString(char *buffer, int buflen) {
 #else
     HOSTENT *ph = gethostbyname(namebuf);
     if (!ph) {
-		strncpy(buffer, "IP address unavailable", buflen);
+		strncpy_s(buffer, buflen, "IP address unavailable", buflen);
 		return;
     };
 
@@ -714,11 +714,11 @@ vncMenu::GetIPAddrString(char *buffer, int buflen) {
     for (int i = 0; ph->h_addr_list[i]; i++) {
     	for (int j = 0; j < ph->h_length; j++) {
 			sprintf_s(digtxt, "%d.", (unsigned char) ph->h_addr_list[i][j]);
-			strncat(buffer, digtxt, (buflen-1)-strlen(buffer));
+			strncat_s(buffer, buflen, digtxt, (buflen-1)-strlen(buffer));
 		}	
 		buffer[strlen(buffer)-1] = '\0';
 		if (ph->h_addr_list[i+1] != 0)
-			strncat(buffer, ", ", (buflen-1)-strlen(buffer));
+			strncat_s(buffer, buflen, ", ", (buflen-1)-strlen(buffer));
     }
 
 #endif
@@ -739,7 +739,7 @@ vncMenu::GetIPAddrString(char *buffer, int buflen) {
 		}
 	old_buflen=strlen(buffer);
 	memset(old_buffer,0,512);
-	strncpy(old_buffer,buffer,strlen(buffer));
+	strncpy_s(old_buffer,buffer,strlen(buffer));
 	}*/
 }
 
@@ -769,11 +769,11 @@ vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 
 	if (m_BalloonInfo && (strlen(m_BalloonInfo) > 0)) {
 		m_nid.uFlags |= NIF_INFO;
-		strncpy(m_nid.szInfo, m_BalloonInfo, 255);
+		strncpy_s(m_nid.szInfo, m_BalloonInfo, 255);
 		m_nid.szInfo[255] = '\0';
 
 		if (m_BalloonTitle && (strlen(m_BalloonTitle) > 0)) {
-			strncpy(m_nid.szInfoTitle, m_BalloonTitle, 63);
+			strncpy_s(m_nid.szInfoTitle, m_BalloonTitle, 63);
 			m_nid.szInfoTitle[63] = '\0';
 		} else {
 			strcpy_s(m_nid.szInfoTitle, "Remote Connection");
@@ -802,28 +802,28 @@ vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 	
 	// Try to add the server's IP addresses to the tip string, if possible
 	if (m_nid.uFlags & NIF_TIP) {
-	    strncat(m_nid.szTip, " - ", (sizeof(m_nid.szTip)-1)-strlen(m_nid.szTip));
+	    strncat_s(m_nid.szTip, " - ", (sizeof(m_nid.szTip)-1)-strlen(m_nid.szTip));
 	    if (m_server->SockConnected()) {
 			unsigned long tiplen = (ULONG)strlen(m_nid.szTip);
 			char *tipptr = ((char *)&m_nid.szTip) + tiplen;
 			GetIPAddrString(tipptr, sizeof(m_nid.szTip) - tiplen);
 	    }
 	    else
-			strncat(m_nid.szTip, "Not listening", (sizeof(m_nid.szTip)-1)-strlen(m_nid.szTip));
+			strncat_s(m_nid.szTip, "Not listening", (sizeof(m_nid.szTip)-1)-strlen(m_nid.szTip));
 	}
 
 	char namebuf[256];
 
     if (gethostname(namebuf, 256) == 0) {
-		strncat(m_nid.szTip, " - ", (sizeof(m_nid.szTip) - 1) - strlen(m_nid.szTip));
-		strncat(m_nid.szTip, namebuf, (sizeof(m_nid.szTip) - 1) - strlen(m_nid.szTip));
+		strncat_s(m_nid.szTip, " - ", (sizeof(m_nid.szTip) - 1) - strlen(m_nid.szTip));
+		strncat_s(m_nid.szTip, namebuf, (sizeof(m_nid.szTip) - 1) - strlen(m_nid.szTip));
     }
 
 	if (vncService::RunningAsService())
-		strncat(m_nid.szTip, " - service - ", (sizeof(m_nid.szTip) - 1) - strlen(m_nid.szTip));
+		strncat_s(m_nid.szTip, " - service - ", (sizeof(m_nid.szTip) - 1) - strlen(m_nid.szTip));
 	else
-		strncat(m_nid.szTip, " - application - ", (sizeof(m_nid.szTip) - 1) - strlen(m_nid.szTip));
-	strncat(m_nid.szTip, g_hookstring, (sizeof(m_nid.szTip) - 1) - strlen(m_nid.szTip));
+		strncat_s(m_nid.szTip, " - application - ", (sizeof(m_nid.szTip) - 1) - strlen(m_nid.szTip));
+	strncat_s(m_nid.szTip, g_hookstring, (sizeof(m_nid.szTip) - 1) - strlen(m_nid.szTip));
 
 	//	vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::SendTrayMsg - Shell_NotifyIcon call\n"));
 	// Send the message

@@ -697,7 +697,7 @@ public:
 				return;
 			INPUT inputs[1];
 			char *key, text[32];
-			sprintf(text,"%d",keysym);
+			sprintf_s(text,"%d",keysym);
 			key = text;	
 			vnclog.Print(LL_INTINFO, "trying unicode input key \"%s\"\n",key);
 			if (down) {

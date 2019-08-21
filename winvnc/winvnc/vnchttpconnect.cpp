@@ -254,7 +254,7 @@ void vncHTTPConnectThread::DoHTTP(VSocket *socket)
 		return;
 
 	// Scan the header for the filename and free the storage
-	int result = sscanf(line, "GET %s ", (char*)&filename);
+	int result = sscanf_s(line, "GET %s ", (char*)&filename);
 	delete [] line;
 	if ((result == 0) || (result == EOF))
 		return;

@@ -53,289 +53,289 @@ int getinfo(char mytext[1024])
 	COSVersion os;
 	if (os.GetVersion(&osvi))
 	{
-	_stprintf(sText, _T(""));
+	_stprintf_s(sText, _T(""));
 	//CE does not really have a concept of an emulated OS so
 	//lets not bother displaying any info on this on CE
 	if (osvi.UnderlyingPlatform == COSVersion::WindowsCE)
-		_tcscpy(sText, _T("OS: "));
+		_tcscpy_s(sText, _T("OS: "));
 	else
-		_tcscat(sText, _T("OS: "));
+		_tcscat_s(sText, _T("OS: "));
 
 	switch (osvi.UnderlyingPlatform)
 	{
 	case COSVersion::Dos:
 	{
-		_tcscat(sText, _T("DOS"));
+		_tcscat_s(sText, _T("DOS"));
 		break;
 	}
 	case COSVersion::Windows3x:
 	{
-		_tcscat(sText, _T("Windows"));
+		_tcscat_s(sText, _T("Windows"));
 		break;
 	}
 	case COSVersion::WindowsCE:
 	{
 		if (os.IsWindowsEmbeddedCompact(&osvi, TRUE))
-			_tcscat(sText, _T("Windows Embedded Compact"));
+			_tcscat_s(sText, _T("Windows Embedded Compact"));
 		else if (os.IsWindowsCENET(&osvi, TRUE))
-			_tcscat(sText, _T("Windows CE .NET"));
+			_tcscat_s(sText, _T("Windows CE .NET"));
 		else
-			_tcscat(sText, _T("Windows CE"));
+			_tcscat_s(sText, _T("Windows CE"));
 		break;
 	}
 	case COSVersion::Windows9x:
 	{
 		if (os.IsWindows95(&osvi, TRUE))
-			_stprintf(sBuf, _T("Windows 95"));
+			_stprintf_s(sBuf, _T("Windows 95"));
 		else if (os.IsWindows95SP1(&osvi, TRUE))
-			_stprintf(sBuf, _T("Windows 95 SP1"));
+			_stprintf_s(sBuf, _T("Windows 95 SP1"));
 		else if (os.IsWindows95B(&osvi, TRUE))
-			_stprintf(sBuf, _T("Windows 95 B [aka OSR2]"));
+			_stprintf_s(sBuf, _T("Windows 95 B [aka OSR2]"));
 		else if (os.IsWindows95C(&osvi, TRUE))
-			_stprintf(sBuf, _T("Windows 95 C [aka OSR2.5]"));
+			_stprintf_s(sBuf, _T("Windows 95 C [aka OSR2.5]"));
 		else if (os.IsWindows98(&osvi, TRUE))
-			_stprintf(sBuf, _T("Windows 98"));
+			_stprintf_s(sBuf, _T("Windows 98"));
 		else if (os.IsWindows98SP1(&osvi, TRUE))
-			_stprintf(sBuf, _T("Windows 98 SP1"));
+			_stprintf_s(sBuf, _T("Windows 98 SP1"));
 		else if (os.IsWindows98SE(&osvi, TRUE))
-			_stprintf(sBuf, _T("Windows 98 Second Edition"));
+			_stprintf_s(sBuf, _T("Windows 98 Second Edition"));
 		else if (os.IsWindowsME(&osvi, TRUE))
-			_stprintf(sBuf, _T("Windows Millenium Edition"));
+			_stprintf_s(sBuf, _T("Windows Millenium Edition"));
 		else
-			_stprintf(sBuf, _T("Windows \?\?"));
-		_tcscat(sText, sBuf);
+			_stprintf_s(sBuf, _T("Windows \?\?"));
+		_tcscat_s(sText, sBuf);
 		break;
 	}
 	case COSVersion::WindowsNT:
 	{
 		if (os.IsNTPreWin2k(&osvi, TRUE))
 		{
-			_tcscat(sText, _T("Windows NT"));
+			_tcscat_s(sText, _T("Windows NT"));
 
 			if (os.IsNTWorkstation(&osvi, TRUE))
-				_tcscat(sText, _T(" (Workstation)"));
+				_tcscat_s(sText, _T(" (Workstation)"));
 			else if (os.IsNTStandAloneServer(&osvi, TRUE))
-				_tcscat(sText, _T(" (Server)"));
+				_tcscat_s(sText, _T(" (Server)"));
 			else if (os.IsNTPDC(&osvi, TRUE))
-				_tcscat(sText, _T(" (Primary Domain Controller)"));
+				_tcscat_s(sText, _T(" (Primary Domain Controller)"));
 			else if (os.IsNTBDC(&osvi, TRUE))
-				_tcscat(sText, _T(" (Backup Domain Controller)"));
+				_tcscat_s(sText, _T(" (Backup Domain Controller)"));
 
 			if (os.IsNTDatacenterServer(&osvi, TRUE))
-				_tcscat(sText, _T(", (Datacenter)"));
+				_tcscat_s(sText, _T(", (Datacenter)"));
 			else if (os.IsNTEnterpriseServer(&osvi, TRUE))
-				_tcscat(sText, _T(", (Enterprise)"));
+				_tcscat_s(sText, _T(", (Enterprise)"));
 		}
 		else if (os.IsWindows2000(&osvi, TRUE))
 		{
 			if (os.IsProfessional(&osvi))
-				_tcscat(sText, _T("Windows 2000 (Professional)"));
+				_tcscat_s(sText, _T("Windows 2000 (Professional)"));
 			else if (os.IsWindows2000Server(&osvi, TRUE))
-				_tcscat(sText, _T("Windows 2000 Server"));
+				_tcscat_s(sText, _T("Windows 2000 Server"));
 			else if (os.IsWindows2000DomainController(&osvi, TRUE))
-				_tcscat(sText, _T("Windows 2000 (Domain Controller)"));
+				_tcscat_s(sText, _T("Windows 2000 (Domain Controller)"));
 			else
-				_tcscat(sText, _T("Windows 2000"));
+				_tcscat_s(sText, _T("Windows 2000"));
 
 			if (os.IsWindows2000DatacenterServer(&osvi, TRUE))
-				_tcscat(sText, _T(", (Datacenter)"));
+				_tcscat_s(sText, _T(", (Datacenter)"));
 			else if (os.IsWindows2000AdvancedServer(&osvi, TRUE))
-				_tcscat(sText, _T(", (Advanced Server)"));
+				_tcscat_s(sText, _T(", (Advanced Server)"));
 		}
 		else if (os.IsWindowsXPOrWindowsServer2003(&osvi, TRUE))
 		{
 			if (os.IsStarterEdition(&osvi))
-				_tcscat(sText, _T("Windows XP (Starter Edition)"));
+				_tcscat_s(sText, _T("Windows XP (Starter Edition)"));
 			else if (os.IsPersonal(&osvi))
-				_tcscat(sText, _T("Windows XP (Personal)"));
+				_tcscat_s(sText, _T("Windows XP (Personal)"));
 			else if (os.IsProfessional(&osvi))
-				_tcscat(sText, _T("Windows XP (Professional)"));
+				_tcscat_s(sText, _T("Windows XP (Professional)"));
 			else if (os.IsWindowsServer2003(&osvi, TRUE))
-				_tcscat(sText, _T("Windows Server 2003"));
+				_tcscat_s(sText, _T("Windows Server 2003"));
 			else if (os.IsDomainControllerWindowsServer2003(&osvi, TRUE))
-				_tcscat(sText, _T("Windows Server 2003 (Domain Controller)"));
+				_tcscat_s(sText, _T("Windows Server 2003 (Domain Controller)"));
 			else if (os.IsWindowsServer2003R2(&osvi, TRUE))
-				_tcscat(sText, _T("Windows Server 2003 R2"));
+				_tcscat_s(sText, _T("Windows Server 2003 R2"));
 			else if (os.IsDomainControllerWindowsServer2003R2(&osvi, TRUE))
-				_tcscat(sText, _T("Windows Server 2003 R2 (Domain Controller)"));
+				_tcscat_s(sText, _T("Windows Server 2003 R2 (Domain Controller)"));
 			else
-				_tcscat(sText, _T("Windows XP"));
+				_tcscat_s(sText, _T("Windows XP"));
 
 			if (os.IsDatacenterWindowsServer2003(&osvi, TRUE) || os.IsDatacenterWindowsServer2003R2(&osvi, TRUE))
-				_tcscat(sText, _T(", (Datacenter Edition)"));
+				_tcscat_s(sText, _T(", (Datacenter Edition)"));
 			else if (os.IsEnterpriseWindowsServer2003(&osvi, TRUE) || os.IsEnterpriseWindowsServer2003(&osvi, TRUE))
-				_tcscat(sText, _T(", (Enterprise Edition)"));
+				_tcscat_s(sText, _T(", (Enterprise Edition)"));
 			else if (os.IsWebWindowsServer2003(&osvi, TRUE) || os.IsWebWindowsServer2003R2(&osvi, TRUE))
-				_tcscat(sText, _T(", (Web Edition)"));
+				_tcscat_s(sText, _T(", (Web Edition)"));
 			else if (os.IsStandardWindowsServer2003(&osvi, TRUE) || os.IsStandardWindowsServer2003R2(&osvi, TRUE))
-				_tcscat(sText, _T(", (Standard Edition)"));
+				_tcscat_s(sText, _T(", (Standard Edition)"));
 		}
 		else if (os.IsWindowsVistaOrWindowsServer2008(&osvi, TRUE))
 		{
 			if (os.IsStarterEdition(&osvi))
-				_tcscat(sText, _T("Windows Vista (Starter Edition)"));
+				_tcscat_s(sText, _T("Windows Vista (Starter Edition)"));
 			else if (os.IsHomeBasic(&osvi))
-				_tcscat(sText, _T("Windows Vista (Home Basic)"));
+				_tcscat_s(sText, _T("Windows Vista (Home Basic)"));
 			else if (os.IsHomeBasicPremium(&osvi))
-				_tcscat(sText, _T("Windows Vista (Home Premium)"));
+				_tcscat_s(sText, _T("Windows Vista (Home Premium)"));
 			else if (os.IsBusiness(&osvi))
-				_tcscat(sText, _T("Windows Vista (Business)"));
+				_tcscat_s(sText, _T("Windows Vista (Business)"));
 			else if (os.IsEnterprise(&osvi))
-				_tcscat(sText, _T("Windows Vista (Enterprise)"));
+				_tcscat_s(sText, _T("Windows Vista (Enterprise)"));
 			else if (os.IsUltimate(&osvi))
-				_tcscat(sText, _T("Windows Vista (Ultimate)"));
+				_tcscat_s(sText, _T("Windows Vista (Ultimate)"));
 			else if (os.IsWindowsServer2008(&osvi, TRUE))
-				_tcscat(sText, _T("Windows Server 2008"));
+				_tcscat_s(sText, _T("Windows Server 2008"));
 			else if (os.IsDomainControllerWindowsServer2008(&osvi, TRUE))
-				_tcscat(sText, _T("Windows Server 2008 (Domain Controller)"));
+				_tcscat_s(sText, _T("Windows Server 2008 (Domain Controller)"));
 			else
-				_tcscat(sText, _T("Windows Vista"));
+				_tcscat_s(sText, _T("Windows Vista"));
 
 			if (os.IsDatacenterWindowsServer2008(&osvi, TRUE))
-				_tcscat(sText, _T(", (Datacenter Edition)"));
+				_tcscat_s(sText, _T(", (Datacenter Edition)"));
 			else if (os.IsEnterpriseWindowsServer2008(&osvi, TRUE))
-				_tcscat(sText, _T(", (Enterprise Edition)"));
+				_tcscat_s(sText, _T(", (Enterprise Edition)"));
 			else if (os.IsWebWindowsServer2008(&osvi, TRUE))
-				_tcscat(sText, _T(", (Web Edition)"));
+				_tcscat_s(sText, _T(", (Web Edition)"));
 			else if (os.IsStandardWindowsServer2008(&osvi, TRUE))
-				_tcscat(sText, _T(", (Standard Edition)"));
+				_tcscat_s(sText, _T(", (Standard Edition)"));
 		}
 		else if (os.IsWindows7OrWindowsServer2008R2(&osvi, TRUE))
 		{
 			if (os.IsThinPC(&osvi))
-				_tcscat(sText, _T("Windows 7 Thin PC"));
+				_tcscat_s(sText, _T("Windows 7 Thin PC"));
 			else if (os.IsStarterEdition(&osvi))
-				_tcscat(sText, _T("Windows 7 (Starter Edition)"));
+				_tcscat_s(sText, _T("Windows 7 (Starter Edition)"));
 			else if (os.IsHomeBasic(&osvi))
-				_tcscat(sText, _T("Windows 7 (Home Basic)"));
+				_tcscat_s(sText, _T("Windows 7 (Home Basic)"));
 			else if (os.IsHomeBasicPremium(&osvi))
-				_tcscat(sText, _T("Windows 7 (Home Premium)"));
+				_tcscat_s(sText, _T("Windows 7 (Home Premium)"));
 			else if (os.IsProfessional(&osvi))
-				_tcscat(sText, _T("Windows 7 (Professional)"));
+				_tcscat_s(sText, _T("Windows 7 (Professional)"));
 			else if (os.IsEnterprise(&osvi))
-				_tcscat(sText, _T("Windows 7 (Enterprise)"));
+				_tcscat_s(sText, _T("Windows 7 (Enterprise)"));
 			else if (os.IsUltimate(&osvi))
-				_tcscat(sText, _T("Windows 7 (Ultimate)"));
+				_tcscat_s(sText, _T("Windows 7 (Ultimate)"));
 			else if (os.IsWindowsServer2008R2(&osvi, TRUE))
-				_tcscat(sText, _T("Windows Server 2008 R2"));
+				_tcscat_s(sText, _T("Windows Server 2008 R2"));
 			else if (os.IsDomainControllerWindowsServer2008R2(&osvi, TRUE))
-				_tcscat(sText, _T("Windows Server 2008 R2 (Domain Controller)"));
+				_tcscat_s(sText, _T("Windows Server 2008 R2 (Domain Controller)"));
 			else
-				_tcscat(sText, _T("Windows 7"));
+				_tcscat_s(sText, _T("Windows 7"));
 
 			if (os.IsDatacenterWindowsServer2008R2(&osvi, TRUE))
-				_tcscat(sText, _T(", (Datacenter Edition)"));
+				_tcscat_s(sText, _T(", (Datacenter Edition)"));
 			else if (os.IsEnterpriseWindowsServer2008R2(&osvi, TRUE))
-				_tcscat(sText, _T(", (Enterprise Edition)"));
+				_tcscat_s(sText, _T(", (Enterprise Edition)"));
 			else if (os.IsWebWindowsServer2008R2(&osvi, TRUE))
-				_tcscat(sText, _T(", (Web Edition)"));
+				_tcscat_s(sText, _T(", (Web Edition)"));
 			else if (os.IsStandardWindowsServer2008R2(&osvi, TRUE))
-				_tcscat(sText, _T(", (Standard Edition)"));
+				_tcscat_s(sText, _T(", (Standard Edition)"));
 		}
 		else if (os.IsWindows8OrWindowsServer2012(&osvi, TRUE))
 		{
 			if (os.IsThinPC(&osvi))
-				_tcscat(sText, _T("Windows 8 Thin PC"));
+				_tcscat_s(sText, _T("Windows 8 Thin PC"));
 			else if (os.IsWindowsRT(&osvi, TRUE))
-				_tcscat(sText, _T("Windows 8 RT"));
+				_tcscat_s(sText, _T("Windows 8 RT"));
 			else if (os.IsStarterEdition(&osvi))
-				_tcscat(sText, _T("Windows 8 (Starter Edition)"));
+				_tcscat_s(sText, _T("Windows 8 (Starter Edition)"));
 			else if (os.IsProfessional(&osvi))
-				_tcscat(sText, _T("Windows 8 (Pro)"));
+				_tcscat_s(sText, _T("Windows 8 (Pro)"));
 			else if (os.IsEnterprise(&osvi))
-				_tcscat(sText, _T("Windows 8 (Enterprise)"));
+				_tcscat_s(sText, _T("Windows 8 (Enterprise)"));
 			else if (os.IsWindowsServer2012(&osvi, TRUE))
-				_tcscat(sText, _T("Windows Server 2012"));
+				_tcscat_s(sText, _T("Windows Server 2012"));
 			else if (os.IsDomainControllerWindowsServer2012(&osvi, TRUE))
-				_tcscat(sText, _T("Windows Server 2012 (Domain Controller)"));
+				_tcscat_s(sText, _T("Windows Server 2012 (Domain Controller)"));
 			else
-				_tcscat(sText, _T("Windows 8"));
+				_tcscat_s(sText, _T("Windows 8"));
 
 			if (os.IsDatacenterWindowsServer2012(&osvi, TRUE))
-				_tcscat(sText, _T(", (Datacenter Edition)"));
+				_tcscat_s(sText, _T(", (Datacenter Edition)"));
 			else if (os.IsEnterpriseWindowsServer2012(&osvi, TRUE))
-				_tcscat(sText, _T(", (Enterprise Edition)"));
+				_tcscat_s(sText, _T(", (Enterprise Edition)"));
 			else if (os.IsWebWindowsServer2012(&osvi, TRUE))
-				_tcscat(sText, _T(", (Web Edition)"));
+				_tcscat_s(sText, _T(", (Web Edition)"));
 			else if (os.IsStandardWindowsServer2012(&osvi, TRUE))
-				_tcscat(sText, _T(", (Standard Edition)"));
+				_tcscat_s(sText, _T(", (Standard Edition)"));
 		}
 		else if (os.IsWindows8Point1OrWindowsServer2012R2(&osvi, TRUE))
 		{
 			if (os.IsThinPC(&osvi))
-				_tcscat(sText, _T("Windows 8.1 Thin PC"));
+				_tcscat_s(sText, _T("Windows 8.1 Thin PC"));
 			else if (os.IsWindowsRT(&osvi, TRUE))
-				_tcscat(sText, _T("Windows 8.1 RT"));
+				_tcscat_s(sText, _T("Windows 8.1 RT"));
 			else if (os.IsStarterEdition(&osvi))
-				_tcscat(sText, _T("Windows 8.1 (Starter Edition)"));
+				_tcscat_s(sText, _T("Windows 8.1 (Starter Edition)"));
 			else if (os.IsProfessional(&osvi))
-				_tcscat(sText, _T("Windows 8.1 (Pro)"));
+				_tcscat_s(sText, _T("Windows 8.1 (Pro)"));
 			else if (os.IsEnterprise(&osvi))
-				_tcscat(sText, _T("Windows 8.1 (Enterprise)"));
+				_tcscat_s(sText, _T("Windows 8.1 (Enterprise)"));
 			else if (os.IsWindowsServer2012R2(&osvi, TRUE))
-				_tcscat(sText, _T("Windows Server 2012 R2"));
+				_tcscat_s(sText, _T("Windows Server 2012 R2"));
 			else if (os.IsDomainControllerWindowsServer2012R2(&osvi, TRUE))
-				_tcscat(sText, _T("Windows Server 2012 R2 (Domain Controller)"));
+				_tcscat_s(sText, _T("Windows Server 2012 R2 (Domain Controller)"));
 			else
-				_tcscat(sText, _T("Windows 8.1"));
+				_tcscat_s(sText, _T("Windows 8.1"));
 
 			if (os.IsCoreConnected(&osvi))
-				_tcscat(sText, _T(", (with Bing / CoreConnected)"));
+				_tcscat_s(sText, _T(", (with Bing / CoreConnected)"));
 			if (os.IsWindows8Point1Or2012R2Update(&osvi))
-				_tcscat(sText, _T(", (Update)"));
+				_tcscat_s(sText, _T(", (Update)"));
 
 			if (os.IsDatacenterWindowsServer2012R2(&osvi, TRUE))
-				_tcscat(sText, _T(", (Datacenter Edition)"));
+				_tcscat_s(sText, _T(", (Datacenter Edition)"));
 			else if (os.IsEnterpriseWindowsServer2012R2(&osvi, TRUE))
-				_tcscat(sText, _T(", (Enterprise Edition)"));
+				_tcscat_s(sText, _T(", (Enterprise Edition)"));
 			else if (os.IsWebWindowsServer2012R2(&osvi, TRUE))
-				_tcscat(sText, _T(", (Web Edition)"));
+				_tcscat_s(sText, _T(", (Web Edition)"));
 			else if (os.IsStandardWindowsServer2012R2(&osvi, TRUE))
-				_tcscat(sText, _T(", (Standard Edition)"));
+				_tcscat_s(sText, _T(", (Standard Edition)"));
 		}
 		else if (os.IsWindows10OrWindowsServer2016(&osvi, TRUE))
 		{
 			if (os.IsThinPC(&osvi))
-				_tcscat(sText, _T("Windows 10 Thin PC"));
+				_tcscat_s(sText, _T("Windows 10 Thin PC"));
 			else if (os.IsWindowsRT(&osvi, TRUE))
-				_tcscat(sText, _T("Windows 10 RT"));
+				_tcscat_s(sText, _T("Windows 10 RT"));
 			else if (os.IsStarterEdition(&osvi))
-				_tcscat(sText, _T("Windows 10 (Starter Edition)"));
+				_tcscat_s(sText, _T("Windows 10 (Starter Edition)"));
 			else if (os.IsCore(&osvi))
-				_tcscat(sText, _T("Windows 10 (Home)"));
+				_tcscat_s(sText, _T("Windows 10 (Home)"));
 			else if (os.IsProfessional(&osvi))
-				_tcscat(sText, _T("Windows 10 (Pro)"));
+				_tcscat_s(sText, _T("Windows 10 (Pro)"));
 			else if (os.IsEnterprise(&osvi))
-				_tcscat(sText, _T("Windows 10 (Enterprise)"));
+				_tcscat_s(sText, _T("Windows 10 (Enterprise)"));
 			else if (os.IsNanoServer(&osvi))
-				_tcscat(sText, _T("Windows 10 Nano Server"));
+				_tcscat_s(sText, _T("Windows 10 Nano Server"));
 			else if (os.IsARM64Server(&osvi))
-				_tcscat(sText, _T("Windows 10 ARM64 Server"));
+				_tcscat_s(sText, _T("Windows 10 ARM64 Server"));
 			else if (os.IsWindowsServer2016(&osvi, TRUE))
-				_tcscat(sText, _T("Windows Server 2016"));
+				_tcscat_s(sText, _T("Windows Server 2016"));
 			else if (os.IsDomainControllerWindowsServer2016(&osvi, TRUE))
-				_tcscat(sText, _T("Windows Server 2016 (Domain Controller)"));
+				_tcscat_s(sText, _T("Windows Server 2016 (Domain Controller)"));
 			else
-				_tcscat(sText, _T("Windows 10"));
+				_tcscat_s(sText, _T("Windows 10"));
 
 			if (os.IsCoreConnected(&osvi))
-				_tcscat(sText, _T(", (with Bing / CoreConnected)"));
+				_tcscat_s(sText, _T(", (with Bing / CoreConnected)"));
 
 			if (os.IsDatacenterWindowsServer2016(&osvi, TRUE))
-				_tcscat(sText, _T(", (Datacenter Edition)"));
+				_tcscat_s(sText, _T(", (Datacenter Edition)"));
 			else if (os.IsEnterpriseWindowsServer2016(&osvi, TRUE))
-				_tcscat(sText, _T(", (Enterprise Edition)"));
+				_tcscat_s(sText, _T(", (Enterprise Edition)"));
 			else if (os.IsWebWindowsServer2016(&osvi, TRUE))
-				_tcscat(sText, _T(", (Web Edition)"));
+				_tcscat_s(sText, _T(", (Web Edition)"));
 			else if (os.IsStandardWindowsServer2016(&osvi, TRUE))
-				_tcscat(sText, _T(", (Standard Edition)"));
+				_tcscat_s(sText, _T(", (Standard Edition)"));
 		}
 		break;
 	}
 	default:
 	{
-		_stprintf(sBuf, _T("Unknown OS"));
-		_tcscat(sText, sBuf);
+		_stprintf_s(sBuf, _T("Unknown OS"));
+		_tcscat_s(sText, sBuf);
 		break;
 	}
 	}
@@ -345,213 +345,213 @@ int getinfo(char mytext[1024])
 	{
 	case COSVersion::IA32_PROCESSOR:
 	{
-		_tcscat(sText, _T(", (x86-32 Processor)"));
+		_tcscat_s(sText, _T(", (x86-32 Processor)"));
 		break;
 	}
 	case COSVersion::MIPS_PROCESSOR:
 	{
-		_tcscat(sText, _T(", (MIPS Processor)"));
+		_tcscat_s(sText, _T(", (MIPS Processor)"));
 		break;
 	}
 	case COSVersion::ALPHA_PROCESSOR:
 	{
-		_tcscat(sText, _T(", (Alpha Processor)"));
+		_tcscat_s(sText, _T(", (Alpha Processor)"));
 		break;
 	}
 	case COSVersion::PPC_PROCESSOR:
 	{
-		_tcscat(sText, _T(", (PPC Processor)"));
+		_tcscat_s(sText, _T(", (PPC Processor)"));
 		break;
 	}
 	case COSVersion::IA64_PROCESSOR:
 	{
-		_tcscat(sText, _T(", (IA64 Itanium[2] Processor)"));
+		_tcscat_s(sText, _T(", (IA64 Itanium[2] Processor)"));
 		break;
 	}
 	case COSVersion::AMD64_PROCESSOR:
 	{
-		_tcscat(sText, _T(", (x86-64 Processor)"));
+		_tcscat_s(sText, _T(", (x86-64 Processor)"));
 		break;
 	}
 	case COSVersion::ALPHA64_PROCESSOR:
 	{
-		_tcscat(sText, _T(", (Alpha64 Processor)"));
+		_tcscat_s(sText, _T(", (Alpha64 Processor)"));
 		break;
 	}
 	case COSVersion::MSIL_PROCESSOR:
 	{
-		_tcscat(sText, _T(", (MSIL Processor)"));
+		_tcscat_s(sText, _T(", (MSIL Processor)"));
 		break;
 	}
 	case COSVersion::ARM_PROCESSOR:
 	{
-		_tcscat(sText, _T(", (ARM Processor)"));
+		_tcscat_s(sText, _T(", (ARM Processor)"));
 		break;
 	}
 	case COSVersion::SHX_PROCESSOR:
 	{
-		_tcscat(sText, _T(", (SHX Processor)"));
+		_tcscat_s(sText, _T(", (SHX Processor)"));
 		break;
 	}
 	case COSVersion::UNKNOWN_PROCESSOR: //deliberate fallthrough
 	default:
 	{
-		_tcscat(sText, _T(", (Unknown Processor)"));
+		_tcscat_s(sText, _T(", (Unknown Processor)"));
 		break;
 	}
 	}
 #endif
-	_stprintf(sBuf, _T(" v%d."), (int)(osvi.dwUnderlyingMajorVersion));
-	_tcscat(sText, sBuf);
+	_stprintf_s(sBuf, _T(" v%d."), (int)(osvi.dwUnderlyingMajorVersion));
+	_tcscat_s(sText, sBuf);
 	if (osvi.dwUnderlyingMinorVersion % 10)
 	{
 		if (osvi.dwUnderlyingMinorVersion > 9)
-			_stprintf(sBuf, _T("%02d"), (int)(osvi.dwUnderlyingMinorVersion));
+			_stprintf_s(sBuf, _T("%02d"), (int)(osvi.dwUnderlyingMinorVersion));
 		else
-			_stprintf(sBuf, _T("%01d"), (int)(osvi.dwUnderlyingMinorVersion));
+			_stprintf_s(sBuf, _T("%01d"), (int)(osvi.dwUnderlyingMinorVersion));
 	}
 	else
-		_stprintf(sBuf, _T("%01d"), (int)(osvi.dwUnderlyingMinorVersion / 10));
-	_tcscat(sText, sBuf);
+		_stprintf_s(sBuf, _T("%01d"), (int)(osvi.dwUnderlyingMinorVersion / 10));
+	_tcscat_s(sText, sBuf);
 	if (osvi.dwUnderlyingBuildNumber)
 	{
-		_stprintf(sBuf, _T(" Build:%d"), (int)(osvi.dwUnderlyingBuildNumber));
-		_tcscat(sText, sBuf);
+		_stprintf_s(sBuf, _T(" Build:%d"), (int)(osvi.dwUnderlyingBuildNumber));
+		_tcscat_s(sText, sBuf);
 	}
-	_tcscat(sText, _T("\n"));
+	_tcscat_s(sText, _T("\n"));
 	if (osvi.wUnderlyingServicePackMajor)
 	{
 		if (osvi.wUnderlyingServicePackMinor)
 		{
 			//Handle the special case of NT 4 SP 6a which Dtwinver treats as SP 6.1
 			if (os.IsNTPreWin2k(&osvi, TRUE) && (osvi.wUnderlyingServicePackMajor == 6) && (osvi.wUnderlyingServicePackMinor == 1))
-				_stprintf(sBuf, _T("Service Pack: 6a"));
+				_stprintf_s(sBuf, _T("Service Pack: 6a"));
 			//Handle the special case of XP SP 1a which Dtwinver treats as SP 1.1
 			else if (os.IsWindowsXP(&osvi, TRUE) && (osvi.wUnderlyingServicePackMajor == 1) && (osvi.wUnderlyingServicePackMinor == 1))
-				_stprintf(sBuf, _T("Service Pack: 1a"));
+				_stprintf_s(sBuf, _T("Service Pack: 1a"));
 			else
-				_stprintf(sBuf, _T("Service Pack:%d.%d"), (int)(osvi.wUnderlyingServicePackMajor), (int)(osvi.wUnderlyingServicePackMinor));
+				_stprintf_s(sBuf, _T("Service Pack:%d.%d"), (int)(osvi.wUnderlyingServicePackMajor), (int)(osvi.wUnderlyingServicePackMinor));
 		}
 		else
-			_stprintf(sBuf, _T("Service Pack:%d"), (int)(osvi.wUnderlyingServicePackMajor));
-		_tcscat(sText, sBuf);
+			_stprintf_s(sBuf, _T("Service Pack:%d"), (int)(osvi.wUnderlyingServicePackMajor));
+		_tcscat_s(sText, sBuf);
 	}
 	else
 	{
 		if (osvi.wUnderlyingServicePackMinor)
-			_stprintf(sBuf, _T("Service Pack:0.%d"), (int)(osvi.wUnderlyingServicePackMinor));
+			_stprintf_s(sBuf, _T("Service Pack:0.%d"), (int)(osvi.wUnderlyingServicePackMinor));
 	}
 	if (os.IsEnterpriseStorageServer(&osvi))
-		_tcscat(sText, _T(", (Storage Server Enterprise)"));
+		_tcscat_s(sText, _T(", (Storage Server Enterprise)"));
 	else if (os.IsExpressStorageServer(&osvi))
-		_tcscat(sText, _T(", (Storage Server Express)"));
+		_tcscat_s(sText, _T(", (Storage Server Express)"));
 	else if (os.IsStandardStorageServer(&osvi))
-		_tcscat(sText, _T(", (Storage Server Standard)"));
+		_tcscat_s(sText, _T(", (Storage Server Standard)"));
 	else if (os.IsWorkgroupStorageServer(&osvi))
-		_tcscat(sText, _T(", (Storage Server Workgroup)"));
+		_tcscat_s(sText, _T(", (Storage Server Workgroup)"));
 	else if (os.IsEssentialsStorageServer(&osvi))
-		_tcscat(sText, _T(", (Storage Server Essentials)"));
+		_tcscat_s(sText, _T(", (Storage Server Essentials)"));
 	else if (os.IsStorageServer(&osvi))
-		_tcscat(sText, _T(", (Storage Server)"));
+		_tcscat_s(sText, _T(", (Storage Server)"));
 
 	if (os.IsHomeServerPremiumEdition(&osvi))
-		_tcscat(sText, _T(", (Home Server Premium Edition)"));
+		_tcscat_s(sText, _T(", (Home Server Premium Edition)"));
 	else if (os.IsHomeServerEdition(&osvi))
-		_tcscat(sText, _T(", (Home Server Edition)"));
+		_tcscat_s(sText, _T(", (Home Server Edition)"));
 
 	if (os.IsTerminalServices(&osvi))
-		_tcscat(sText, _T(", (Terminal Services)"));
+		_tcscat_s(sText, _T(", (Terminal Services)"));
 	if (os.IsEmbedded(&osvi))
-		_tcscat(sText, _T(", (Embedded)"));
+		_tcscat_s(sText, _T(", (Embedded)"));
 	if (os.IsTerminalServicesInRemoteAdminMode(&osvi))
-		_tcscat(sText, _T(", (Terminal Services in Remote Admin Mode)"));
+		_tcscat_s(sText, _T(", (Terminal Services in Remote Admin Mode)"));
 	if (os.Is64Bit(&osvi, TRUE))
-		_tcscat(sText, _T(", (64 Bit Edition)"));
+		_tcscat_s(sText, _T(", (64 Bit Edition)"));
 	if (os.IsMediaCenter(&osvi))
-		_tcscat(sText, _T(", (Media Center Edition)"));
+		_tcscat_s(sText, _T(", (Media Center Edition)"));
 	if (os.IsTabletPC(&osvi))
-		_tcscat(sText, _T(", (Tablet PC Edition)"));
+		_tcscat_s(sText, _T(", (Tablet PC Edition)"));
 	if (os.IsComputeClusterServerEdition(&osvi))
-		_tcscat(sText, _T(", (Compute Cluster Edition)"));
+		_tcscat_s(sText, _T(", (Compute Cluster Edition)"));
 	if (os.IsServerFoundation(&osvi))
-		_tcscat(sText, _T(", (Foundation Edition)"));
+		_tcscat_s(sText, _T(", (Foundation Edition)"));
 	if (os.IsMultipointServerPremiumEdition(&osvi))
-		_tcscat(sText, _T(", (MultiPoint Premium Edition)"));
+		_tcscat_s(sText, _T(", (MultiPoint Premium Edition)"));
 	else if (os.IsMultiPointServer(&osvi))
-		_tcscat(sText, _T(", (MultiPoint Edition)"));
+		_tcscat_s(sText, _T(", (MultiPoint Edition)"));
 	if (os.IsSecurityAppliance(&osvi))
-		_tcscat(sText, _T(", (Security Appliance)"));
+		_tcscat_s(sText, _T(", (Security Appliance)"));
 	if (os.IsBackOffice(&osvi))
-		_tcscat(sText, _T(", (BackOffice)"));
+		_tcscat_s(sText, _T(", (BackOffice)"));
 	if (os.IsNEdition(&osvi))
-		_tcscat(sText, _T(", (N Edition)"));
+		_tcscat_s(sText, _T(", (N Edition)"));
 	if (os.IsEEdition(&osvi))
-		_tcscat(sText, _T(", (E Edition)"));
+		_tcscat_s(sText, _T(", (E Edition)"));
 	if (os.IsHyperVTools(&osvi))
-		_tcscat(sText, _T(", (Hyper-V Tools)"));
+		_tcscat_s(sText, _T(", (Hyper-V Tools)"));
 	if (os.IsHyperVServer(&osvi))
-		_tcscat(sText, _T(", (Hyper-V Server)"));
+		_tcscat_s(sText, _T(", (Hyper-V Server)"));
 	if (os.IsServerCore(&osvi))
-		_tcscat(sText, _T(", (Server Core)"));
+		_tcscat_s(sText, _T(", (Server Core)"));
 	if (os.IsUniprocessorFree(&osvi))
-		_tcscat(sText, _T(", (Uniprocessor Free)"));
+		_tcscat_s(sText, _T(", (Uniprocessor Free)"));
 	if (os.IsUniprocessorChecked(&osvi))
-		_tcscat(sText, _T(", (Uniprocessor Checked)"));
+		_tcscat_s(sText, _T(", (Uniprocessor Checked)"));
 	if (os.IsMultiprocessorFree(&osvi))
-		_tcscat(sText, _T(", (Multiprocessor Free)"));
+		_tcscat_s(sText, _T(", (Multiprocessor Free)"));
 	if (os.IsMultiprocessorChecked(&osvi))
-		_tcscat(sText, _T(", (Multiprocessor Checked)"));
+		_tcscat_s(sText, _T(", (Multiprocessor Checked)"));
 	if (os.IsEssentialBusinessServerManagement(&osvi))
-		_tcscat(sText, _T(", (Windows Essential Business Server Manangement Server)"));
+		_tcscat_s(sText, _T(", (Windows Essential Business Server Manangement Server)"));
 	if (os.IsEssentialBusinessServerMessaging(&osvi))
-		_tcscat(sText, _T(", (Windows Essential Business Server Messaging Server)"));
+		_tcscat_s(sText, _T(", (Windows Essential Business Server Messaging Server)"));
 	if (os.IsEssentialBusinessServerSecurity(&osvi))
-		_tcscat(sText, _T(", (Windows Essential Business Server Security Server)"));
+		_tcscat_s(sText, _T(", (Windows Essential Business Server Security Server)"));
 	if (os.IsClusterServer(&osvi))
-		_tcscat(sText, _T(", (Cluster Server)"));
+		_tcscat_s(sText, _T(", (Cluster Server)"));
 	if (os.IsSmallBusinessServer(&osvi))
-		_tcscat(sText, _T(", (Small Business Server)"));
+		_tcscat_s(sText, _T(", (Small Business Server)"));
 	if (os.IsSmallBusinessServerPremium(&osvi))
-		_tcscat(sText, _T(", (Small Business Server Premium)"));
+		_tcscat_s(sText, _T(", (Small Business Server Premium)"));
 	if (os.IsPreRelease(&osvi))
-		_tcscat(sText, _T(", (Prerelease)"));
+		_tcscat_s(sText, _T(", (Prerelease)"));
 	if (os.IsEvaluation(&osvi))
-		_tcscat(sText, _T(", (Evaluation)"));
+		_tcscat_s(sText, _T(", (Evaluation)"));
 	if (os.IsAutomotive(&osvi))
-		_tcscat(sText, _T(", (Automotive)"));
+		_tcscat_s(sText, _T(", (Automotive)"));
 	if (os.IsChina(&osvi))
-		_tcscat(sText, _T(", (China)"));
+		_tcscat_s(sText, _T(", (China)"));
 	if (os.IsSingleLanguage(&osvi))
-		_tcscat(sText, _T(", (Single Language)"));
+		_tcscat_s(sText, _T(", (Single Language)"));
 	if (os.IsWin32sInstalled(&osvi))
-		_tcscat(sText, _T(", (Win32s)"));
+		_tcscat_s(sText, _T(", (Win32s)"));
 	if (os.IsEducation(&osvi))
-		_tcscat(sText, _T(", (Education)"));
+		_tcscat_s(sText, _T(", (Education)"));
 	if (os.IsIndustry(&osvi))
-		_tcscat(sText, _T(", (Industry)"));
+		_tcscat_s(sText, _T(", (Industry)"));
 	if (os.IsStudent(&osvi))
-		_tcscat(sText, _T(", (Student)"));
+		_tcscat_s(sText, _T(", (Student)"));
 	if (os.IsMobile(&osvi))
-		_tcscat(sText, _T(", (Mobile)"));
+		_tcscat_s(sText, _T(", (Mobile)"));
 	if (os.IsIoT(&osvi))
-		_tcscat(sText, _T(", (IoT Core)"));
+		_tcscat_s(sText, _T(", (IoT Core)"));
 	if (os.IsCloudHostInfrastructureServer(&osvi))
-		_tcscat(sText, _T(", (Cloud Host Infrastructure Server)"));
+		_tcscat_s(sText, _T(", (Cloud Host Infrastructure Server)"));
 	if (os.IsSEdition(&osvi))
-		_tcscat(sText, _T(", (S Edition)"));
+		_tcscat_s(sText, _T(", (S Edition)"));
 	if (os.IsCloudStorageServer(&osvi))
-		_tcscat(sText, _T(", (Cloud Storage Server)"));
+		_tcscat_s(sText, _T(", (Cloud Storage Server)"));
 	if (os.IsPPIPro(&osvi))
-		_tcscat(sText, _T(", (PPI Pro)"));
+		_tcscat_s(sText, _T(", (PPI Pro)"));
 	if (os.IsConnectedCar(&osvi))
-		_tcscat(sText, _T(", (Connected Car)"));
+		_tcscat_s(sText, _T(", (Connected Car)"));
 	if (os.IsHandheld(&osvi))
-		_tcscat(sText, _T(", (Handheld)"));
+		_tcscat_s(sText, _T(", (Handheld)"));
 
-	_tcscat(sText, _T("\n"));
+	_tcscat_s(sText, _T("\n"));
 	 }
   else
-	  _stprintf(sText, _T("Failed in call to GetOSVersion\n"));
+	  _stprintf_s(sText, _T("Failed in call to GetOSVersion\n"));
            
 	DWORD Size = 256 + 1;
 	strcpy_s(mytext, 1024, "");

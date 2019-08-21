@@ -961,7 +961,7 @@ bool VSocket::GetPeerAddress4(char *address, int size)
 	if (getpeername(sock4, (struct sockaddr *) &addr, &addrsize) != 0)
 		return false;
 
-	_snprintf(address, size, "%s:%d",inet_ntoa(addr.sin_addr),ntohs(addr.sin_port));
+	_snprintf_s(address, size, "%s:%d",inet_ntoa(addr.sin_addr),ntohs(addr.sin_port));
 
 	return true;
 }
@@ -977,7 +977,7 @@ bool VSocket::GetPeerAddress6(char *address, int size)
 	if (getpeername(sock6, (struct sockaddr *) &addr, &addrsize) != 0)
 		return false;
 	inet_ntop(AF_INET6, &addr.sin6_addr, straddr, sizeof(straddr));
-	_snprintf(address, size, "%s:%d", straddr, ntohs(addr.sin6_port));
+	_snprintf_s(address, size, "%s:%d", straddr, ntohs(addr.sin6_port));
 
 	return true;
 }
@@ -993,7 +993,7 @@ bool VSocket::GetPeerAddress(char *address, int size)
     if (getpeername(sock, (struct sockaddr *) &addr, &addrsize) != 0)
         return false;
 
-    _snprintf(address, size, "%s:%d",
+    _snprintf_s(address, size, size, "%s:%d",
               inet_ntoa(addr.sin_addr),
               ntohs(addr.sin_port));
 

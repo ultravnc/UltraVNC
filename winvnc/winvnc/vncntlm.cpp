@@ -490,7 +490,7 @@ int CheckUserGroupPasswordUni(char * userin,char *password,const char *machine)
 		if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH)) {
 			char* p = strrchr(szCurrentDir, '\\');
 			*p = '\0';
-			strcat (szCurrentDir,"\\authSSP.dll");
+			strcat_s(szCurrentDir,"\\authSSP.dll");
 		}
 		HMODULE hModule = LoadLibrary(szCurrentDir);
 		if (hModule) {
@@ -589,7 +589,7 @@ if (strcmp(pszgroup1,"")==0 && strcmp(pszgroup2,"")==0 && strcmp(pszgroup3,"")==
 			char* p = strrchr(szCurrentDir, '\\');
 			if (p == NULL) return false;
 			*p = '\0';
-			strcat (szCurrentDir,"\\authadmin.dll");
+			strcat_s(szCurrentDir,"\\authadmin.dll");
 		}
 		HMODULE hModule = LoadLibrary(szCurrentDir);
 		if (hModule)
@@ -623,7 +623,7 @@ if (strcmp(pszgroup1,"")!=0)
 			char* p = strrchr(szCurrentDir, '\\');
 			if (p == NULL) return false;
 			*p = '\0';
-			strcat (szCurrentDir,"\\workgrpdomnt4.dll");
+			strcat_s(szCurrentDir,"\\workgrpdomnt4.dll");
 		}
 		HMODULE hModule = LoadLibrary(szCurrentDir);
 		if (hModule)
@@ -651,7 +651,7 @@ if (strcmp(pszgroup1,"")!=0)
 			char* p = strrchr(szCurrentDir, '\\');
 			if (p == NULL) return false;
 			*p = '\0';
-			strcat (szCurrentDir,"\\ldapauth.dll");
+			strcat_s(szCurrentDir,"\\ldapauth.dll");
 		}
 		HMODULE hModule = LoadLibrary(szCurrentDir);
 		if (hModule)
@@ -678,7 +678,7 @@ if (strcmp(pszgroup1,"")!=0)
 			char* p = strrchr(szCurrentDir, '\\');
 			if (p == NULL) return false;
 			*p = '\0';
-			strcat (szCurrentDir,"\\ldapauthnt4.dll");
+			strcat_s(szCurrentDir,"\\ldapauthnt4.dll");
 		}
 		HMODULE hModule = LoadLibrary(szCurrentDir);
 		if (hModule)
@@ -705,7 +705,7 @@ if (strcmp(pszgroup1,"")!=0)
 			char* p = strrchr(szCurrentDir, '\\');
 			if (p == NULL) return false;
 			*p = '\0';
-			strcat (szCurrentDir,"\\ldapauth9x.dll");
+			strcat_s(szCurrentDir,"\\ldapauth9x.dll");
 		}
 		HMODULE hModule = LoadLibrary(szCurrentDir);
 		if (hModule)
@@ -738,7 +738,7 @@ if (strcmp(pszgroup2,"")!=0)
 			char* p = strrchr(szCurrentDir, '\\');
 			if (p == NULL) return false;
 			*p = '\0';
-			strcat (szCurrentDir,"\\workgrpdomnt4.dll");
+			strcat_s(szCurrentDir,"\\workgrpdomnt4.dll");
 		}
 		HMODULE hModule = LoadLibrary(szCurrentDir);
 		if (hModule)
@@ -765,7 +765,7 @@ if (strcmp(pszgroup2,"")!=0)
 			char* p = strrchr(szCurrentDir, '\\');
 			if (p == NULL) return false;
 			*p = '\0';
-			strcat (szCurrentDir,"\\authadmin.dll");
+			strcat_s(szCurrentDir,"\\authadmin.dll");
 		}
 		HMODULE hModule = LoadLibrary(szCurrentDir);
 		if (hModule)
@@ -793,7 +793,7 @@ if (strcmp(pszgroup2,"")!=0)
 			char* p = strrchr(szCurrentDir, '\\');
 			if (p == NULL) return false;
 			*p = '\0';
-			strcat (szCurrentDir,"\\ldapauth.dll");
+			strcat_s(szCurrentDir,"\\ldapauth.dll");
 		}
 		HMODULE hModule = LoadLibrary(szCurrentDir);
 		if (hModule)
@@ -820,7 +820,7 @@ if (strcmp(pszgroup2,"")!=0)
 			char* p = strrchr(szCurrentDir, '\\');
 			if (p == NULL) return false;
 			*p = '\0';
-			strcat (szCurrentDir,"\\ldapauthnt4.dll");
+			strcat_s(szCurrentDir,"\\ldapauthnt4.dll");
 		}
 		HMODULE hModule = LoadLibrary(szCurrentDir);
 		if (hModule)
@@ -847,7 +847,7 @@ if (strcmp(pszgroup2,"")!=0)
 			char* p = strrchr(szCurrentDir, '\\');
 			if (p == NULL) return false;
 			*p = '\0';
-			strcat (szCurrentDir,"\\ldapauth9x.dll");
+			strcat_s(szCurrentDir,"\\ldapauth9x.dll");
 		}
 		HMODULE hModule = LoadLibrary(szCurrentDir);
 		if (hModule)
@@ -880,7 +880,7 @@ if (strcmp(pszgroup3,"")!=0)
 			char* p = strrchr(szCurrentDir, '\\');
 			if (p == NULL) return false;
 			*p = '\0';
-			strcat (szCurrentDir,"\\workgrpdomnt4.dll");
+			strcat_s(szCurrentDir,"\\workgrpdomnt4.dll");
 		}
 		HMODULE hModule = LoadLibrary(szCurrentDir);
 		if (hModule)
@@ -907,7 +907,7 @@ if (strcmp(pszgroup3,"")!=0)
 			char* p = strrchr(szCurrentDir, '\\');
 			if (p == NULL) return false;
 			*p = '\0';
-			strcat (szCurrentDir,"\\authadmin.dll");
+			strcat_s(szCurrentDir,"\\authadmin.dll");
 		}
 		HMODULE hModule = LoadLibrary(szCurrentDir);
 		if (hModule)
@@ -935,7 +935,7 @@ if (strcmp(pszgroup3,"")!=0)
 			char* p = strrchr(szCurrentDir, '\\');
 			if (p == NULL) return false;
 			*p = '\0';
-			strcat (szCurrentDir,"\\ldapauth.dll");
+			strcat_s(szCurrentDir,"\\ldapauth.dll");
 		}
 		HMODULE hModule = LoadLibrary(szCurrentDir);
 		if (hModule)
@@ -962,7 +962,7 @@ if (strcmp(pszgroup3,"")!=0)
 			char* p = strrchr(szCurrentDir, '\\');
 			if (p == NULL) return false;
 			*p = '\0';
-			strcat (szCurrentDir,"\\ldapauthnt4.dll");
+			strcat_s(szCurrentDir,"\\ldapauthnt4.dll");
 		}
 		HMODULE hModule = LoadLibrary(szCurrentDir);
 		if (hModule)
@@ -989,7 +989,7 @@ if (strcmp(pszgroup3,"")!=0)
 			char* p = strrchr(szCurrentDir, '\\');
 			if (p == NULL) return false;
 			*p = '\0';
-			strcat (szCurrentDir,"\\ldapauth9x.dll");
+			strcat_s(szCurrentDir,"\\ldapauth9x.dll");
 		}
 		HMODULE hModule = LoadLibrary(szCurrentDir);
 		if (hModule)
@@ -1020,7 +1020,7 @@ if (strcmp(pszgroup3,"")!=0)
 					{
 						char* p = strrchr(szCurrentDir, '\\');
 						*p = '\0';
-						strcat (szCurrentDir,"\\logging.dll");
+						strcat_s(szCurrentDir,"\\logging.dll");
 					}
 				HMODULE hModule = LoadLibrary(szCurrentDir);
 				if (hModule)
@@ -1041,7 +1041,7 @@ if (strcmp(pszgroup3,"")!=0)
 					{
 						char* p = strrchr(szCurrentDir, '\\');
 						*p = '\0';
-						strcat (szCurrentDir,"\\logging.dll");
+						strcat_s(szCurrentDir,"\\logging.dll");
 					}
 				HMODULE hModule = LoadLibrary(szCurrentDir);
 				if (hModule)
@@ -1062,7 +1062,7 @@ if (strcmp(pszgroup3,"")!=0)
 					{
 						char* p = strrchr(szCurrentDir, '\\');
 						*p = '\0';
-						strcat (szCurrentDir,"\\logging.dll");
+						strcat_s(szCurrentDir,"\\logging.dll");
 					}
 				HMODULE hModule = LoadLibrary(szCurrentDir);
 				if (hModule)

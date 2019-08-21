@@ -582,7 +582,7 @@ char *vncDeskThreadError(DWORD code)
 {
     // create default message
     static char msg[255];
-    _snprintf(msg, sizeof msg, "Unknown error %u", static_cast<unsigned int>(code));
+    _snprintf_s(msg, sizeof msg, "Unknown error %u", static_cast<unsigned int>(code));
     msg[sizeof msg - 1] = 0;
 
     switch (code)
@@ -693,9 +693,9 @@ vncServer::Authenticated(vncClientId clientid)
 		char szInfo[256];
 
 		if (client->GetRepeaterID() && (strlen(client->GetRepeaterID()) > 0) ) {
-			_snprintf(szInfo, 255, "Remote user successfully connected (%s) and is currently sharing your desktop.", client->GetRepeaterID());
+			_snprintf_s(szInfo, 255, "Remote user successfully connected (%s) and is currently sharing your desktop.", client->GetRepeaterID());
 		} else {
-			_snprintf(szInfo, 255, "Remote user successfully connected (%s) and is currently sharing your desktop.", client->GetClientName());
+			_snprintf_s(szInfo, 255, "Remote user successfully connected (%s) and is currently sharing your desktop.", client->GetClientName());
 		}
 
 		szInfo[255] = '\0';
@@ -861,7 +861,7 @@ void vncServer::ListAuthClients(HWND hListBox)
 		vncClient* client = GetClient(*i);
 		if (client->GetRepeaterID() && (strlen(client->GetRepeaterID()) > 0) ) {
 			char szDescription[256];
-			_snprintf(szDescription, 255, "%s - %s", client->GetRepeaterID(), client->GetClientName());
+			_snprintf_s(szDescription, 255, "%s - %s", client->GetRepeaterID(), client->GetClientName());
 			szDescription[255] = '\0';
 
 			SendMessage(hListBox, 
@@ -891,7 +891,7 @@ void vncServer::ListUnauthClients(HWND hListBox)
 		vncClient* client = GetClient(*i);
 		if (client->GetRepeaterID() && (strlen(client->GetRepeaterID()) > 0) ) {
 			char szDescription[256];
-			_snprintf(szDescription, 255, "%s - %s", client->GetRepeaterID(), client->GetClientName());
+			_snprintf_s(szDescription, 255, "%s - %s", client->GetRepeaterID(), client->GetClientName());
 			szDescription[255] = '\0';
 
 			SendMessage(hListBox, 
