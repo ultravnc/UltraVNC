@@ -121,7 +121,7 @@ public:
 	void InitDlgProcDisplay();
 	void InitDlgProcMisc();
 	void InitDlgProcSecurity();	
-	void InitDlgProc(bool loadhost = false);
+	void InitDlgProc(bool loadhost = false, bool initMruNeeded = true);
 	void InitDlgProcListen();
 
 	void ReadDlgProcEncoders();
@@ -136,7 +136,7 @@ public:
 	void FixScaling();
 	void SaveConnection(HWND hwnd, bool saveAs);
 	void SettingsFromUI();
-	void SettingsToUI();
+	void SettingsToUI(bool initMruNeeded = true);
 	void SaveToFile(char *fname);
 	void saveInt(char *name, int value, char *fname); 
 	void LoadFromFile(char *fname);

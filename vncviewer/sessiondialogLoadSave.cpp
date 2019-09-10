@@ -100,7 +100,7 @@ void SessionDialog::SettingsFromUI()
 	ReadDlgProc();
 }
 
-void SessionDialog::SettingsToUI()
+void SessionDialog::SettingsToUI(bool initMruNeeded)
 {
 	InitDlgProcEncoders();
 	InitDlgProcKeyboardMouse();
@@ -108,7 +108,7 @@ void SessionDialog::SettingsToUI()
 	InitDlgProcMisc();
 	InitDlgProcSecurity();	
 	InitDlgProcListen();
-	InitDlgProc(true);		
+	InitDlgProc(true, initMruNeeded);		
 }
 
 void SessionDialog::saveInt(char *name, int value, char *fname) 
@@ -264,6 +264,11 @@ void SessionDialog::LoadFromFile(char *fname)
   fAutoAcceptNoDSM = readInt("AutoAcceptNoDSM", (int)fAutoAcceptNoDSM, fname) ? true : false;
   fRequireEncryption = readInt("RequireEncryption", (int)fRequireEncryption, fname) ? true : false;
   preemptiveUpdates = readInt("PreemptiveUpdates", (int)preemptiveUpdates, fname) ? true : false;
+
+  GetPrivateProfileString("connection", "proxyhost", "", m_proxyhost, MAX_HOST_NAME_LEN, fname);
+  m_proxyport = GetPrivateProfileInt("connection", "proxyport", 0, fname);
+
+
 }
 
 void SessionDialog::getAppData(char * buffer)

@@ -192,7 +192,7 @@ BOOL CALLBACK SessDlgProc(  HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 					int ItemIndex = SendMessage((HWND) lParam, CB_GETCURSEL, 0, 0);
 					SendMessage((HWND) lParam, (UINT) CB_GETLBTEXT, (WPARAM) ItemIndex, (LPARAM) hostname);
 					_this->IfHostExistLoadSettings(hostname);
-					_this->SettingsToUI();
+					_this->SettingsToUI(false);
 				}
 			break;
 			case IDC_DELETE: 
@@ -414,13 +414,9 @@ void SessionDialog::InitPlugin(HWND hwnd)
 			//EndAaron
 }
 
-void SessionDialog::InitDlgProc(bool loadhost)
+void SessionDialog::InitDlgProc(bool loadhost, bool initMruNeeded)
 {	
-	HWND hwnd = SessHwnd;	
-	if (strcmp(m_proxyhost,"")!=NULL)
-		SetDlgItemText(hwnd, IDC_PROXY_EDIT, m_proxyhost);
-	HWND hProxy = GetDlgItem(hwnd, IDC_PROXY_CHECK);
-			SendMessage(hProxy, BM_SETCHECK, m_fUseProxy, 0);
+	HWND hwnd = SessHwnd;		
 	if (!setdefaults) {
 		if (loadhost && (m_pCC->m_port != 0 || strlen(m_pCC->m_host) != 0)) {		
 			TCHAR szHost[250];
@@ -432,9 +428,22 @@ void SessionDialog::InitDlgProc(bool loadhost)
 				_snprintf_s(szHost, 250, TEXT("%s::%d"), m_pCC->m_host, m_pCC->m_port);
 			SetDlgItemText(hwnd, IDC_HOSTNAME_EDIT, szHost);
 		}
-		else 
+		else if (initMruNeeded)
 			InitMRU(hwnd);
 	}
+	TCHAR tmphost[256];
+	TCHAR tmphost2[256];
+	if (strcmp(m_proxyhost,"")!=NULL) {
+		_tcscpy_s(tmphost, m_proxyhost);
+		_tcscat_s(tmphost,":");
+		_tcscat_s(tmphost, 256, _itoa(m_proxyport,tmphost2,10));
+		SetDlgItemText(hwnd, IDC_PROXY_EDIT, tmphost);
+	}
+	else
+		SetDlgItemText(hwnd, IDC_PROXY_EDIT, "");
+
+	HWND hProxy = GetDlgItem(hwnd, IDC_PROXY_CHECK);
+			SendMessage(hProxy, BM_SETCHECK, m_fUseProxy, 0);
 
 	HFONT font = CreateFont(
       24,                        // nHeight
