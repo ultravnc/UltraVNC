@@ -79,7 +79,7 @@ void ClientConnection::SaveConnection()
 	char tname[_MAX_FNAME + _MAX_EXT];
 	ofnInit();
 	int disp = PORT_TO_DISPLAY(m_port);
-	sprintf_s(fname, "%.10s-%d.vnc", m_host, (disp > 0 && disp < 100) ? disp : m_port);
+	sprintf_s(fname, "%.15s-%d.vnc", m_host, (disp > 0 && disp < 100) ? disp : m_port);
 	ofn.hwndOwner = m_hwndcn;
 	ofn.lpstrFile = fname;
 	ofn.lpstrFileTitle = tname;

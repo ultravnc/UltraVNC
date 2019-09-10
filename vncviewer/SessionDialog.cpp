@@ -191,10 +191,17 @@ BOOL CALLBACK SessDlgProc(  HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 					TCHAR hostname[256];
 					int ItemIndex = SendMessage((HWND) lParam, CB_GETCURSEL, 0, 0);
 					SendMessage((HWND) lParam, (UINT) CB_GETLBTEXT, (WPARAM) ItemIndex, (LPARAM) hostname);
+					_this->m_pMRU->RemoveItem(hostname);
+					_this->m_pMRU->AddItem(hostname);
 					_this->IfHostExistLoadSettings(hostname);
 					_this->SettingsToUI(false);
 				}
-			break;
+				if (HIWORD(wParam) == CBN_SELENDOK) {
+				TCHAR hostname[256];
+				int ItemIndex = SendMessage((HWND)lParam, CB_GETCURSEL, 0, 0);
+				SendMessage((HWND)lParam, (UINT)CB_SETCURSEL, (WPARAM)ItemIndex, (LPARAM)hostname);
+				}
+				break;
 			case IDC_DELETE: 
 					DeleteFile(_this->m_pOpt->getDefaultOptionsFileName());
 					_this->SetDefaults();

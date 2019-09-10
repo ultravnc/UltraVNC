@@ -37,7 +37,7 @@ void SessionDialog::SaveConnection(HWND hwnd, bool saveAs)
 	SettingsFromUI();
 	char fname[_MAX_PATH];
 	int disp = PORT_TO_DISPLAY(m_port);
-	sprintf_s(fname, "%.10s-%d.vnc", m_host_dialog, (disp > 0 && disp < 100) ? disp : m_port);
+	sprintf_s(fname, "%.15s-%d.vnc", m_host_dialog, (disp > 0 && disp < 100) ? disp : m_port);
 	char buffer[_MAX_PATH];
 	getAppData(buffer);
 	strcat_s(buffer,"\\vnc");
@@ -284,7 +284,7 @@ void SessionDialog::IfHostExistLoadSettings(char *hostname)
 	ParseDisplay(hostname, tmphost, 255, &port);
 	char fname[_MAX_PATH];
 	int disp = PORT_TO_DISPLAY(port);
-	sprintf_s(fname, "%.10s-%d.vnc", tmphost, (disp > 0 && disp < 100) ? disp : port);
+	sprintf_s(fname, "%.15s-%d.vnc", tmphost, (disp > 0 && disp < 100) ? disp : port);
 	char buffer[_MAX_PATH];
 	getAppData(buffer);
 	strcat_s(buffer,"\\vnc\\");

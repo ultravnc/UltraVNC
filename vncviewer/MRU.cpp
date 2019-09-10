@@ -86,8 +86,9 @@ void MRU::AddItem(LPTSTR txt)
     valname[1] = _T('\0');
 	WritePrivateProfileString("connection", valname, txt, m_opts.getDefaultOptionsFileName());    
     // move all the current ids up one
-    for (int j = _tcslen(m_index); j >= 0; j--)
-        m_index[j] = m_index[j-1];   
+    for (int j = _tcslen(m_index)+1; j >= 0; j--)
+        m_index[j] = m_index[j-1];
+	m_index[MRU_MAX_ITEM_LENGTH] = _T('\0');
     // and insert this one at the front
     m_index[0] = firstUnusedId;
     WriteIndex();
