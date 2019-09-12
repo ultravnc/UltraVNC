@@ -3599,13 +3599,16 @@ void ClientConnection::ReadServerInit()
     m_si.format.blueMax = Swap16IfLE(m_si.format.blueMax);
     m_si.nameLength = Swap32IfLE(m_si.nameLength);
 
-    m_desktopName = new TCHAR[m_si.nameLength + 4 + 256];
-	m_desktopName_viewonly = new TCHAR[m_si.nameLength + 4 + 256+16];
+    m_desktopName = new TCHAR[1024];
+	m_desktopName_viewonly = new TCHAR[1024];
+	if (m_si.nameLength > 256) {
+		  MessageBox(NULL,"Server tried to overload buffer, name to long","Error",MB_OK|MB_ICONINFORMATION);
+	}
     ReadString(m_desktopName, m_si.nameLength);
-	strcat_s(m_desktopName, m_si.nameLength + 4 + 256, " ");
+	strcat_s(m_desktopName, 1024, " ");
 
-	strcpy_s(m_desktopName_viewonly, m_si.nameLength + 4 + 256+16, m_desktopName);
-	strcat_s(m_desktopName_viewonly, m_si.nameLength + 4 + 256+16, "viewonly");
+	strcpy_s(m_desktopName_viewonly, 1024, m_desktopName);
+	strcat_s(m_desktopName_viewonly, 1024, "viewonly");
 
 	if (m_opts.m_ViewOnly) SetWindowText(m_hwndMain, m_desktopName_viewonly);
 	else SetWindowText(m_hwndMain, m_desktopName);
@@ -3625,10 +3628,10 @@ void ClientConnection::ReadServerInit()
 					m_pDSMPlugin->GetPluginVersion(),
 					m_pDSMPlugin->GetPluginAuthor()
 					);
-			strcat_s(m_desktopName, m_si.nameLength + 4 + 256+16, szMess);
+			strcat_s(m_desktopName, 1024, szMess);
 	}
-	strcpy_s(m_desktopName_viewonly, m_si.nameLength + 4 + 256+16, m_desktopName);
-	strcat_s(m_desktopName_viewonly, m_si.nameLength + 4 + 256+16, "viewonly");
+	strcpy_s(m_desktopName_viewonly, 1024, m_desktopName);
+	strcat_s(m_desktopName_viewonly, 1024, "viewonly");
 
 	if (m_opts.m_ViewOnly) SetWindowText(m_hwndMain, m_desktopName_viewonly);
 	else SetWindowText(m_hwndMain, m_desktopName);

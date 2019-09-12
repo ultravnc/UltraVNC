@@ -764,6 +764,8 @@ void SessionDialog::InitDlgProcSecurity()
 	SendMessage(hfAutoAcceptNoDSM, BM_SETCHECK, fAutoAcceptNoDSM, 0);	
 	HWND hrestricted = GetDlgItem(hwnd,	IDC_HIDEMENU);
 	SendMessage(hrestricted, BM_SETCHECK, restricted, 0);
+	HWND hfUseEncryption = GetDlgItem(hwnd, IDC_PLUGIN_CHECK);
+	SendMessage(hfUseEncryption, BM_SETCHECK, fUseDSMPlugin, 0);
 }
 ////////////////////////////////////////////////////////////////////////////////
 void SessionDialog::InitDlgProcListen()
