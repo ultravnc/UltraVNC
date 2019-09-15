@@ -123,12 +123,17 @@ int SessionDialog::readInt(char *name, int defval, char *fname)
   return GetPrivateProfileInt("options", name, defval, fname);
 }
 
-void SessionDialog::SaveToFile(char *fname)
+void SessionDialog::SaveToFile(char *fname, bool asDefault)
 {
-	int ret = WritePrivateProfileString("connection", "host", m_host_dialog, fname);
+	int ret;
 	char buf[32];
-	sprintf_s(buf, "%d", m_port);
-	WritePrivateProfileString("connection", "port", buf, fname);
+	if (!asDefault) {
+		ret = WritePrivateProfileString("connection", "host", m_host_dialog, fname);		
+		sprintf_s(buf, "%d", m_port);
+		WritePrivateProfileString("connection", "port", buf, fname);
+	}
+	else
+		SettingsFromUI();
 	ret = WritePrivateProfileString("connection", "proxyhost", m_proxyhost, fname);
 	sprintf_s(buf, "%d", m_proxyport);
 	WritePrivateProfileString("connection", "proxyport", buf, fname);
@@ -294,6 +299,8 @@ void SessionDialog::IfHostExistLoadSettings(char *hostname)
 		fclose(file);
 		LoadFromFile(buffer);		
 	}
+	else
+		LoadFromFile(m_pOpt->getDefaultOptionsFileName());
 }
 
 void SessionDialog::SetDefaults()

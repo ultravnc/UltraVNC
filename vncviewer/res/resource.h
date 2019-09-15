@@ -302,6 +302,7 @@
 #define IDC_STARTLISTEN                 2045
 #define IDC_SAVELISTING                 2046
 #define IDC_SAVELISTEN                  2046
+#define IDC_SAVEASDEFAULT               2047
 #define IDC_STATIC_SPLIT                9000
 #define IDC_HOSTNAME_DEL                9001
 #define ID_SESSION_SET_CRECT            32777
@@ -598,7 +599,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        222
 #define _APS_NEXT_COMMAND_VALUE         50025
-#define _APS_NEXT_CONTROL_VALUE         2047
+#define _APS_NEXT_CONTROL_VALUE         2048
 #define _APS_NEXT_SYMED_VALUE           154
 #endif
 #endif

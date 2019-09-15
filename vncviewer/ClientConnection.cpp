@@ -3623,10 +3623,9 @@ void ClientConnection::ReadServerInit()
 	{
 			char szMess[255];
 			memset(szMess, 0, 255);
-			sprintf_s(szMess, "--- UltraVNC Viewer + %s-v%s by %s ",
+			sprintf_s(szMess, "--- %s-v%s ",
 					m_pDSMPlugin->GetPluginName(),
-					m_pDSMPlugin->GetPluginVersion(),
-					m_pDSMPlugin->GetPluginAuthor()
+					m_pDSMPlugin->GetPluginVersion()
 					);
 			strcat_s(m_desktopName, 1024, szMess);
 	}

@@ -202,6 +202,9 @@ BOOL CALLBACK SessDlgProc(  HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 				SendMessage((HWND)lParam, (UINT)CB_SETCURSEL, (WPARAM)ItemIndex, (LPARAM)hostname);
 				}
 				break;
+			case IDC_SAVEASDEFAULT:
+				_this->SaveToFile(_this->m_pOpt->getDefaultOptionsFileName(), true);
+				return true;
 			case IDC_DELETE: 
 					DeleteFile(_this->m_pOpt->getDefaultOptionsFileName());
 					_this->SetDefaults();
