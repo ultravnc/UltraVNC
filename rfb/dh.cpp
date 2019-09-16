@@ -34,7 +34,7 @@ public:
 Except::Except(const char *info_) {
 	if (info_ != NULL) {
 		info = new char[strlen(info_)+1];
-		strcpy(info, info_);
+		strcpy_s(info, strlen(info_) + 1, info_);
 	}
 }
 
