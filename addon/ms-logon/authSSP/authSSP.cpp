@@ -45,12 +45,13 @@ BOOL CUPSD2(const char * domainuser,
 	TCHAR password2[MAXLEN];
 	TCHAR *prefix = NULL;
 
-	user = SplitString(domainuser,'\\',domain);
+	user = SplitString(domainuser,'\\',domain, MAXLEN);
 
 #if defined (_UNICODE) || defined (UNICODE)
-	mbstowcs(user2, user, MAXLEN);
-	mbstowcs(domain2, domain, MAXLEN);
-	mbstowcs(password2, password, MAXLEN);
+	size_t pnconv;
+	mbstowcs_s(&pnconv, user2, MAXLEN, user, MAXLEN);
+	mbstowcs_s(&pnconv, domain2, MAXLEN, domain, MAXLEN);
+	mbstowcs_s(&pnconv, password2, MAXLEN, password, MAXLEN);
 #else
 	strcpy(user2, user);
 	strcpy(domain2, domain);
@@ -60,7 +61,7 @@ BOOL CUPSD2(const char * domainuser,
 	// On NT4, prepend computer- or domainname if username is unqualified.
 	if (isNT4() && _tcscmp(domain2, _T("")) == 0) {
 		if (!QualifyName(user2, domain2)) {
-			_tcscpy(domain2, _T("\0"));
+			_tcscpy_s(domain2, _T("\0"));
 		}
 	}
 	return SSPLogonUser(domain2, user2, password2, psdSD, isAuthenticated, pdwAccessGranted);
@@ -233,7 +234,7 @@ BOOL ImpersonateAndCheckAccess(PCtxtHandle phContext,
 // SplitString splits a string 'input' on the first occurence of char 'separator'
 // into string 'head' and 'tail' (removing the separator).
 // If separator is not found, head = "" and tail = input.
-const char *SplitString(const char *input, char separator, char *head){
+const char *SplitString(const char *input, char separator, char *head, int sizeHead){
 	const char *tail;
 	int l;
 
@@ -242,7 +243,7 @@ const char *SplitString(const char *input, char separator, char *head){
 		l = (int)(tail - input);
 		// get rid of separator
 		tail = tail + 1; 
-		strncpy_s(head, input, l);
+		strncpy_s(head, sizeHead, input, l);
 		head[l] = '\0';
 	} else {
 		tail   = input;

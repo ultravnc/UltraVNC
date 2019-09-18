@@ -70,7 +70,7 @@ void EventLogging::AddEventSourceToRegistry(LPCTSTR lpszSourceName)
 			TCHAR* p = _tcsrchr(szServicePath, '\\');
 			if (p == NULL) return;
 			*p = '\0';
-			_tcscat (szServicePath,_T("\\logmessages.dll"));
+			_tcscat_s(szServicePath,_T("\\logmessages.dll"));
 		}
     lstrcpy(szBuf, szServicePath);
 
@@ -110,7 +110,7 @@ void LOG(long EventID, const TCHAR *format, ...) {
 
 	va_list ap;
 	va_start(ap, format);
-	_vstprintf(szText, format, ap);
+	_vstprintf_s(szText, format, ap);
 	va_end(ap);
 	ps[0] = szText;
     EventLogging log;
@@ -122,7 +122,7 @@ void LOG(long EventID, const TCHAR *format, ...) {
 		if (p != NULL)
 		{
 			*p = '\0';
-			_tcscat (szMslogonLog,_T("\\mslogon.log"));
+			_tcscat_s(szMslogonLog,_T("\\mslogon.log"));
 		}
 	}
 	file = _tfopen(szMslogonLog, _T("a"));
@@ -130,14 +130,15 @@ void LOG(long EventID, const TCHAR *format, ...) {
 	{
 		// Prepend timestamp to message
 		GetLocalTime(& time);
-		_stprintf(szTimestamp,_T("%.2d/%.2d/%d %.2d:%.2d:%.2d  "), 
+		_stprintf_s(szTimestamp,_T("%.2d/%.2d/%d %.2d:%.2d:%.2d  "), 
 			time.wDay, time.wMonth, time.wYear, time.wHour, time.wMinute, time.wSecond);
-		_tcscpy(textbuf,szTimestamp);
-		_tcscat(textbuf,szText);
+		_tcscpy_s(textbuf,szTimestamp);
+		_tcscat_s(textbuf,szText);
 
 		// Write ANSI
 #if defined UNICODE || defined _UNICODE
-		wcstombs(texttowrite, textbuf, 2 * MAXLEN);
+		size_t pnconv;
+		wcstombs_s(&pnconv, texttowrite, 512, textbuf, 2 * MAXLEN);
 #else
 		strcpy(texttowrite, texttowrite);
 #endif

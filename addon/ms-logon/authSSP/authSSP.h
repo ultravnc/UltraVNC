@@ -78,7 +78,7 @@ void UnloadSecurityDll(HMODULE hModule);
 
 HMODULE LoadSecurityDll();
 
-const char * SplitString(const char *input, char separator, char *head);
+const char * SplitString(const char *input, char separator, char *head, int sizeHead);
 bool IsImpersonationAllowed();
  
 #define ViewOnly 0x0001

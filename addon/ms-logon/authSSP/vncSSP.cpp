@@ -48,8 +48,9 @@ int CUPSD(const char * userin, const char *password, const char *machine)
 	TCHAR machine2[MAXSTRING];
 	TCHAR user2[MAXSTRING];
 #if defined(UNICODE) || defined(_UNICODE)
-	mbstowcs(machine2, machine, MAXSTRING);
-	mbstowcs(user2, userin, MAXSTRING);
+	size_t pnconv;
+	mbstowcs_s(&pnconv, machine2, MAXSTRING, machine, MAXSTRING);
+	mbstowcs_s(&pnconv, user2, MAXSTRING, userin, MAXSTRING);
 #else
 	strcpy(machine2, machine);
 	strcpy(user2, userin);
@@ -69,7 +70,8 @@ int CUPSD(const char * userin, const char *password, const char *machine)
 		if (file) {
             time_t current;
 			time(&current);
-			char* timestr = ctime(&current);
+			char timestr[25];
+			ctime_s(timestr, 25, &current);
 			timestr[24] = '\0'; // remove newline
 			fprintf(file, "%s - CUPSD2: Access is %u, user %s is %sauthenticated, access granted is 0x%x\n",
 				timestr, isAccessOK, userin, isAuthenticated ? "" : "not ", dwAccessGranted);
@@ -106,8 +108,8 @@ TCHAR *AddToModuleDir(TCHAR *filename, int length){
 	{
 		TCHAR *p = _tcsrchr(szCurrentDir, '\\');
 		*p = '\0';
-		_tcscat(szCurrentDir,_T("\\"));
-		_tcscat(szCurrentDir, filename);
+		_tcscat_s(szCurrentDir, length, _T("\\"));
+		_tcscat_s(szCurrentDir, length, filename);
 	}
 	filename = szCurrentDir;
 	return filename;
