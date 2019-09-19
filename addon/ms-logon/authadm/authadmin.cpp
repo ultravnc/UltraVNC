@@ -92,7 +92,8 @@ BOOL CUGP(char * userin,char *password,char *machine,char *groupin,int locdom)
 			DWORD result=NetWkstaGetInfo( 0 , 100 , &buf2 ) ;
 				if (!result)
 				{
-					wcstombs( domain, ((WKSTA_INFO_100_NT *) buf2)->wki100_langroup, MAXLEN );
+					size_t pnconv;
+					wcstombs_s(&pnconv,  domain, MAXLEN, ((WKSTA_INFO_100_NT *) buf2)->wki100_langroup, MAXLEN );
 					NetApiBufferFree( buf2 );
 					printf("Logonuser: % s %s \n", userin, domain);
 					if (LogonUser(userin, domain, password, dwLogonType, dwLogonProvider, &hToken))

@@ -60,10 +60,11 @@ BOOL CUGP(char * userin,char *password,char *machine, char * groupin,int locdom)
         LPOLESTR pszBuffer2 = new OLECHAR[MAX_PATH*2];
         LPOLESTR pszBuffer3 = new OLECHAR[MAX_PATH*2];
         LPOLESTR pszBuffer4 = new OLECHAR[MAX_PATH*2];
-        mbstowcs( (wchar_t *) pszBuffer, userin, MAX_PATH );
-        mbstowcs( (wchar_t *) pszBuffer2, password, MAX_PATH );
-        mbstowcs( (wchar_t *) pszBuffer3, machine, MAX_PATH );
-        mbstowcs( (wchar_t *) pszBuffer4, groupin, MAX_PATH );
+		size_t pnconv;
+        mbstowcs_s( &pnconv, (wchar_t *) pszBuffer, MAX_PATH*2, userin, MAX_PATH );
+        mbstowcs_s( &pnconv, (wchar_t *) pszBuffer2, MAX_PATH*2, password, MAX_PATH );
+        mbstowcs_s( &pnconv, (wchar_t *) pszBuffer3, MAX_PATH*2, machine, MAX_PATH );
+        mbstowcs_s( &pnconv, (wchar_t *) pszBuffer4, MAX_PATH*2, groupin, MAX_PATH );
         HRESULT hr = S_OK;
         //Get rootDSE and the domain container's DN.
         IADs *pObject = NULL;
@@ -73,7 +74,7 @@ BOOL CUGP(char * userin,char *password,char *machine, char * groupin,int locdom)
         LPOLESTR szPath = new OLECHAR[MAX_PATH];
         LPOLESTR myPath = new OLECHAR[MAX_PATH];
         
-        wcscpy(szPath,L"LDAP://dc1.ad.local/dc=ad,dc=local"); //set to root of domain or search path
+        wcscpy_s(szPath, MAX_PATH, L"LDAP://dc1.ad.local/dc=ad,dc=local"); //set to root of domain or search path
         wprintf(szPath);
         wprintf(L"\n");
         //VariantClear(&var);
@@ -190,9 +191,9 @@ HRESULT FindUserByName(IDirectorySearch *pSearchBase, //Container to search
         //Create search filter
         LPOLESTR pszSearchFilter = new OLECHAR[MAX_PATH];
         LPOLESTR szADsPath = new OLECHAR[MAX_PATH];
-        wcscpy(pszSearchFilter, L"(&(objectClass=user)(samAccountName=");
-        wcscat(pszSearchFilter, szFindUser);
-        wcscat(pszSearchFilter, L"))");
+        wcscpy_s(pszSearchFilter, MAX_PATH, L"(&(objectClass=user)(samAccountName=");
+        wcscat_s(pszSearchFilter, MAX_PATH, szFindUser);
+        wcscat_s(pszSearchFilter, MAX_PATH, L"))");
     //Search entire subtree from root.
         ADS_SEARCHPREF_INFO SearchPrefs;
         SearchPrefs.dwSearchPref = ADS_SEARCHPREF_SEARCH_SCOPE;
@@ -236,7 +237,7 @@ HRESULT FindUserByName(IDirectorySearch *pSearchBase, //Container to search
                             {
                                     // Print the data for the column and free the column
                                         // Note the attribute we asked for is type CaseIgnoreString.
-                    wcscpy(szADsPath, col.pADsValues->CaseIgnoreString); 
+                    wcscpy_s(szADsPath, MAX_PATH, col.pADsValues->CaseIgnoreString); 
                                         hr = ADsOpenObject(szADsPath,
                                                                          pwszUser,
                                                                          pwszPassword,
@@ -274,9 +275,9 @@ HRESULT FindGroup(IDirectorySearch *pSearchBase, //Container to search
         //Create search filter
         LPOLESTR pszSearchFilter = new OLECHAR[MAX_PATH];
         LPOLESTR szADsPath = new OLECHAR[MAX_PATH];
-        wcscpy(pszSearchFilter, L"(&(objectClass=group)(cn=");
-        wcscat(pszSearchFilter,szGroup);
-        wcscat(pszSearchFilter, L"))");
+        wcscpy_s(pszSearchFilter, MAX_PATH, L"(&(objectClass=group)(cn=");
+        wcscat_s(pszSearchFilter, MAX_PATH, szGroup);
+        wcscat_s(pszSearchFilter, MAX_PATH, L"))");
     //Search entire subtree from root.
         ADS_SEARCHPREF_INFO SearchPrefs;
         SearchPrefs.dwSearchPref = ADS_SEARCHPREF_SEARCH_SCOPE;
@@ -318,7 +319,7 @@ HRESULT FindGroup(IDirectorySearch *pSearchBase, //Container to search
                             {
                                     // Print the data for the column and free the column
                                         // Note the attribute we asked for is type CaseIgnoreString.
-                    wcscpy(szADsPath, col.pADsValues->CaseIgnoreString); 
+                    wcscpy_s(szADsPath, MAX_PATH, col.pADsValues->CaseIgnoreString); 
                                         hr = ADsOpenObject(szADsPath,
                                                                          pwszUser,
                                                                          pwszPassword,

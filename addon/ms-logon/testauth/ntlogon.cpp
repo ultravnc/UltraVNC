@@ -89,10 +89,10 @@ int main(int argc, char* argv[])
 	}
 	else
 	{
-		strcpy(pszBuffer,argv[1]);
-		strcpy(pszBuffer2,argv[2]);
-		strcpy(pszBuffer3,argv[3]);
-		strcpy(pszBuffer4,argv[4]);
+		strcpy_s(pszBuffer,argv[1]);
+		strcpy_s(pszBuffer2,argv[2]);
+		strcpy_s(pszBuffer3,argv[3]);
+		strcpy_s(pszBuffer4,argv[4]);
 	}
 	locdom=atoi(pszBuffer4);
 	if (!CheckNetapi95() && !CheckNetApiNT())

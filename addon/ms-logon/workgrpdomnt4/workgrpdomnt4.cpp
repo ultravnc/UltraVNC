@@ -95,11 +95,11 @@ HMODULE LoadSecurityDll() {
       VerInfo.dwMajorVersion == 4 &&
       VerInfo.dwMinorVersion == 0)
    {
-      lstrcpy_s(lpszDLL, _T("security.dll"));
+      lstrcpy(lpszDLL, _T("security.dll"));
    }
    else
    {
-      lstrcpy_s(lpszDLL, _T("secur32.dll"));
+      lstrcpy(lpszDLL, _T("secur32.dll"));
    }
 
 
@@ -579,12 +579,12 @@ BOOL CUGP(char * userin,char *password,char *machine, char *groupin, int locdom)
 	char groupname[MAXLEN];
 	char domain[MAXLEN * sizeof(wchar_t)];
 
-	
-	if ( isNT )	mbstowcs( (wchar_t *) user, userin, MAXLEN );
-	else strcpy( user, userin );
+	size_t pnconv;
+	if ( isNT )	mbstowcs_s( &pnconv, (wchar_t *) user, MAXLEN, userin, MAXLEN );
+	else strcpy_s( user, userin );
 
-	if ( isNT )	mbstowcs( (wchar_t *) group, groupin, MAXLEN );
-	else strcpy( group, groupin );
+	if ( isNT )	mbstowcs_s( &pnconv, (wchar_t *) group, MAXLEN, groupin, MAXLEN );
+	else strcpy_s( group, groupin );
 	////////////////////////////////////////////////////////////////////////////////////////////
 	////NT
 	////////////////////////////////////////////////////////////////////////////////////////////
@@ -598,7 +598,7 @@ if ( isNT )
 			if (!rcdomain)
 			{
 			printf("Domain controler found");
-			wcscpy( (wchar_t *) server, (wchar_t *) buf );
+			wcscpy_s( (wchar_t *) server, MAXLEN,  (wchar_t *) buf );
 			wprintf((wchar_t *)server);
 			printf("\n------------------------------\n");
 			}
@@ -621,7 +621,8 @@ if ( isNT )
 				netlocalgroupgetmembers = (netlocalgroupgetmembers_t) GetProcAddress (h, "NetLocalGroupGetMembers");
 
 				////////////////////// GROUPS///////////////////////////////////////
-				mbstowcs( seperator,  "\\", 5 );
+				size_t pnconv;
+				mbstowcs_s( &pnconv, seperator,  256, "\\", 5 );
 				///////////////////////GROUP1/////////////////////////////////////
 				resumeh = 0;
 				do
@@ -636,7 +637,7 @@ if ( isNT )
 									// Note: the capital S in the format string will expect Unicode
 									// strings, as this is a program written/compiled for ANSI.
 									_wcsupr(cur->lgrmi2_domainandname);
-									wcscpy(tempbuf,cur->lgrmi2_domainandname);
+									wcscpy_s(tempbuf,cur->lgrmi2_domainandname);
 									wchar_t *t=wcsstr(tempbuf,seperator);
 									t++;
 									printf( "%S\n", t );
@@ -659,28 +660,30 @@ if ( isNT )
 			if ( !rcdomain){
 				DWORD rc;
 				printf( "New added ----  just for testing \n");
-				wcscpy( (wchar_t *) server, (wchar_t *) buf );
+				wcscpy_s( (wchar_t *) server, MAXLEN,  (wchar_t *) buf );
 				byte *buf2 = 0;
 				rc2 = NetWkstaGetInfoNT( 0 , 100 , &buf2 ) ;
+				size_t pnconv;
 				if( rc2 ) printf( "NetWkstaGetInfoA() returned %lu \n", rc2);
-				else wcstombs( domain, ((WKSTA_INFO_100_NT *) buf2)->wki100_langroup, MAXLEN );
+				else wcstombs_s( &pnconv, domain, MAXLEN, ((WKSTA_INFO_100_NT *) buf2)->wki100_langroup, MAXLEN );
 				NetApiBufferFree( buf2 );
 				domain[MAXLEN - 1] = '\0';
 				printf("Detected domain = %s\n",domain);
 				buf2 = 0;
 				char userdomain[MAXLEN * sizeof(wchar_t)];
 				char userdom[MAXLEN];
-				strcpy(userdom,domain);
-				strcat(userdom,"\\");
-				strcat(userdom,userin);
-				mbstowcs( (wchar_t *) userdomain, userdom, MAXLEN );
+				strcpy_s(userdom,domain);
+				strcat_s(userdom,"\\");
+				strcat_s(userdom,userin);
+				mbstowcs_s( &pnconv, (wchar_t *) userdomain, MAXLEN, userdom, MAXLEN );
 				printf( "%S\n", (wchar_t *)userdomain);
 				rc = NetUserGetGroupsNT( NULL ,(wchar_t *) userdomain, 0, 1,&buf2, MAX_PREFERRED_LENGTH, &read, &total);
 				if ( rc == NERR_Success)
 					{
 						for ( i = 0; i < read; ++ i )
 							{
-								wcstombs( groupname, ((LPLOCALGROUP_USERS_INFO_0_NT *) buf2)[i].grui0_name, MAXLEN );	
+								size_t pnconv;
+								wcstombs_s( &pnconv, groupname, MAXLEN, ((LPLOCALGROUP_USERS_INFO_0_NT *) buf2)[i].grui0_name, MAXLEN );	
 								groupname[MAXLEN - 1] = '\0'; // because strncpy won't do this if overflow
 #ifdef _MSC_VER
 								_strupr(groupname);
@@ -709,28 +712,30 @@ if ( isNT )
 			 if (locdom==2 || locdom==3) if ( !rcdomain){
 				DWORD rc;
 				printf( "New added ----  just for testing \n");
-				wcscpy( (wchar_t *) server, (wchar_t *) buf );
+				wcscpy_s( (wchar_t *) server, MAXLEN, (wchar_t *) buf );
 				byte *buf2 = 0;
 				rc2 = NetWkstaGetInfoNT( 0 , 100 , &buf2 ) ;
+				size_t pnconv;
 				if( rc2 ) printf( "NetWkstaGetInfoA() returned %lu \n", rc2);
-				else wcstombs( domain, ((WKSTA_INFO_100_NT *) buf2)->wki100_langroup, MAXLEN );
+				else wcstombs_s(&pnconv,  domain, MAXLEN, ((WKSTA_INFO_100_NT *) buf2)->wki100_langroup, MAXLEN );
 				NetApiBufferFree( buf2 );
 				domain[MAXLEN - 1] = '\0';
 				printf("Detected domain = %s\n",domain);
 				buf2 = 0;
 				char userdomain[MAXLEN * sizeof(wchar_t)];
 				char userdom[MAXLEN];
-				//strcpy(userdom,domain);
-				//strcat(userdom,"\\");
-				strcpy(userdom,userin);
-				mbstowcs( (wchar_t *) userdomain, userdom, MAXLEN );
+				//strcpy(_s(userdom,domain);
+				//strcat_s(userdom,"\\");
+				strcpy_s(userdom,userin);
+				mbstowcs_s( &pnconv, (wchar_t *) userdomain, MAXLEN, userdom, MAXLEN );
 				printf( "%S\n", (wchar_t *)userdomain);
 				rc = NetUserGetGroupsNT2( (wchar_t *)server,(wchar_t *) userdomain, 0,&buf2, MAX_PREFERRED_LENGTH, &read, &total);
 				if ( rc == NERR_Success)
 					{
 						for ( i = 0; i < read; ++ i )
 							{
-								wcstombs( groupname, ((LPLOCALGROUP_USERS_INFO_0_NT *) buf2)[i].grui0_name, MAXLEN );	
+								size_t pnconv;
+								wcstombs_s( &pnconv, groupname, MAXLEN, ((LPLOCALGROUP_USERS_INFO_0_NT *) buf2)[i].grui0_name, MAXLEN );	
 								groupname[MAXLEN - 1] = '\0'; // because strncpy won't do this if overflow
 #ifdef _MSC_VER
 								_strupr(groupname);
@@ -769,7 +774,7 @@ if ( isNT )
 			}
 			if ( !rc )
 			{
-				strcpy( server, (char *) buf );
+				strcpy_s( server, (char *) buf );
 				byte *buf2 = 0;
 				rc = NetWkstaGetInfo95( 0 , 100 , &buf2 ) ;
 				if( rc ) printf( "NetWkstaGetInfoA() returned %lu \n", rc);
@@ -812,11 +817,11 @@ if ( isNT )
 	//check user
 	if (isNT)
 	{
-
+	size_t pnconv;
 #if _MSC_VER < 1400
-		wcstombs( user, (unsigned short *)user, MAXLEN);	
+		wcstombs_s( &pnconv, user, MAXLEN, (unsigned short *)user, MAXLEN);	
 #else
-		wcstombs( user, (const wchar_t *)user, MAXLEN);	
+		wcstombs_s(&pnconv,  user, MAXLEN, (const wchar_t *)user, MAXLEN);	
 #endif
 	}
 

@@ -171,7 +171,7 @@ int vncImportACL::ScanInput(){
 		if (scanInput.isEmptyLine(line))
 			continue;
 		if (scanInput.Tokenize(line, token)
-			&& _stscanf(accessmaskstring, _T("%x"), &accessmask) == 1) {
+			&& _stscanf_s(accessmaskstring, _T("%x"), &accessmask) == 1) {
 			FillAceData(accesstype, accessmask, domainaccount);
 		} else {
 			_tprintf(_T("Error tokenizing line\n"));
@@ -287,7 +287,7 @@ bool vncImportACL::FillAceData(const TCHAR *type,
 		domainaccount = AddDomainname(user);
 	else {
 		domainaccount = new TCHAR[_tcslen(user)+1];
-		_tcscpy(domainaccount,user);
+		_tcscpy_s(domainaccount, _tcslen(user)+1, user);
 	}
 	pSID = GetSID(domainaccount);
 	if (!pSID)
@@ -346,7 +346,7 @@ PSID vncImportACL::GetSID(const TCHAR *domainaccount){
 // SplitString splits a string 'input' on the first occurence of char 'separator'
 // into string 'head' and 'tail' (removing the separator).
 // If separator is not found, head = "" and tail = input.
-const TCHAR * vncImportACL::SplitString(const TCHAR *input, TCHAR separator, TCHAR *head){
+const TCHAR * vncImportACL::SplitString(const TCHAR *input, TCHAR separator, TCHAR *head , int sizeHead){
 	const TCHAR * tail;
     size_t l;
 
@@ -355,7 +355,7 @@ const TCHAR * vncImportACL::SplitString(const TCHAR *input, TCHAR separator, TCH
 		l = tail - input;
 		// get rid of separator
 		tail = tail + 1; 
-		_tcsncpy(head, input, l);
+		_tcsncpy_s(head, sizeHead, input, l);
 		head[l] = _T('\0');
 	} else {
 		tail   = input;
@@ -374,8 +374,8 @@ TCHAR *vncImportACL::AddComputername(const TCHAR *user){
 	_ftprintf(stderr, _T("Detected computername = %s\n"), computername);
 	// Length of computername and user minus beginning dot plus terminating '\0'.
 	TCHAR *domainaccount = new TCHAR[_tcslen(computername) + _tcslen(user)];
-	_tcscpy(domainaccount, computername);
-	_tcscat(domainaccount, user + 1);
+	_tcscpy_s(domainaccount, _tcslen(computername) + _tcslen(user), computername);
+	_tcscat_s(domainaccount, _tcslen(computername) + _tcslen(user), user + 1);
 
 	return domainaccount;
 }
@@ -388,7 +388,7 @@ TCHAR *vncImportACL::AddDomainname(const TCHAR *user){
 
 	nStatus = NetWkstaGetInfo( 0 , 100 , (LPBYTE *) &wkstainfo);
 	if (nStatus == NERR_Success)
-		_tcsncpy(domain, wkstainfo->wki100_langroup, MAXLEN);
+		_tcsncpy_s(domain, MAXLEN, wkstainfo->wki100_langroup, MAXLEN);
 	else
 		_ftprintf(stderr, _T("NetWkstaGetInfo() returned %lu \n"), nStatus);
 	domain[MAXLEN - 1] = _T('\0');
@@ -398,8 +398,8 @@ TCHAR *vncImportACL::AddDomainname(const TCHAR *user){
 
 	// Length of domainname and user minus beginning dots plus terminating '\0'.
 	TCHAR *domainaccount = new TCHAR[_tcslen(domain) + _tcslen(user) - 1];
-	_tcscpy(domainaccount, domain);
-	_tcscat(domainaccount, user + 2);
+	_tcscpy_s(domainaccount, _tcslen(domain) + _tcslen(user) - 1, domain);
+	_tcscat_s(domainaccount, _tcslen(domain) + _tcslen(user) - 1, user + 2);
 
 	return domainaccount;
 }
@@ -488,7 +488,7 @@ int vncScanInput::GetQuoteLength(const TCHAR *line){
 int vncScanInput::AddToken(TCHAR **token, int tokenCount, const TCHAR **line, int len){
 	if (len) {
 		if (tokenCount < 3) {
-			_tcsncpy(token[tokenCount], *line, len);
+			_tcsncpy_s(token[tokenCount], len, *line, len);
 			token[tokenCount][len] = _T('\0');
 		}
 		*line += len; // Eat token

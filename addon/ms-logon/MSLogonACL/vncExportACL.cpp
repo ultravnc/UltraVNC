@@ -134,15 +134,15 @@ void vncExportACL::PrintSid(PSID psid)
 
 		nStatus = NetWkstaGetInfo( 0 , 100 , (LPBYTE *) &wkstainfo);
 		if (nStatus == NERR_Success){
-			_tcsncpy(langroup, wkstainfo->wki100_langroup, MAXLEN);
-			_tcsncpy(computername, wkstainfo->wki100_computername, MAXLEN);
+			_tcsncpy_s(langroup, wkstainfo->wki100_langroup, MAXLEN);
+			_tcsncpy_s(computername, wkstainfo->wki100_computername, MAXLEN);
 			langroup[MAXLEN - 1] = _T('\0');
 			computername[MAXLEN - 1] = _T('\0');
 			// replace computername with a dot
 			if (_tcsicmp(computername, domain) == 0)
-				_tcscpy(domain,_T("."));
+				_tcscpy_s(domain,_T("."));
 			else if (_tcsicmp(langroup, domain) == 0)
-				_tcscpy(domain, _T(".."));
+				_tcscpy_s(domain, _T(".."));
 		}
 		else
 			_tprintf(_T("NetWkstaGetInfo() returned %lu \n"), nStatus);
