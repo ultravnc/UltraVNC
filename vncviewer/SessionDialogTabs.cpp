@@ -925,6 +925,8 @@ void SessionDialog::ReadDlgProcDisplay()
 	HWND hDirectx = GetDlgItem(hwnd, IDC_DIRECTX);
 	Directx = 
 			(SendMessage(hDirectx, BM_GETCHECK, 0, 0) == BST_CHECKED);
+
+	selected=SendMessage(GetDlgItem(  hwnd, IDC_SCREEN),CB_GETCURSEL,0,0);
 }
 ////////////////////////////////////////////////////////////////////////////////
 void SessionDialog::ReadDlgProcMisc()

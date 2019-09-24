@@ -952,7 +952,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_L13                 "Select Single Window"
+    IDS_L13                 "Screenshot"
     IDS_L14                 "Select Full Desktop / Switch monitor(driver only)"
     IDS_L15                 "Open Chat..."
     IDS_L16                 "File Transfer... \tCtrl+Alt+F7"

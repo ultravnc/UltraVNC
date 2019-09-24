@@ -7433,10 +7433,16 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 					switch (LOWORD(wParam))
 					{
 					case ID_SW:
-						if (!_this->m_SWselect)
 						{
-							_this->m_SWselect=true;
+						Snapshot snapshot;
+						snapshot.SaveJpeg(_this->m_membitmap,_this->m_opts.m_document_folder, _this->m_opts.m_prefix);
+						_tcscpy_s(_this->m_opts.m_document_folder,snapshot.getFolder());
+						_tcscpy_s(_this->m_opts.m_prefix, snapshot.getPrefix());
 						}
+						//if (!_this->m_SWselect)
+						//{
+						//	_this->m_SWselect=true;
+						//}
 						break;
 
 					case ID_DESKTOP:
