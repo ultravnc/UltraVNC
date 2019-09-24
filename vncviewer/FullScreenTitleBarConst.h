@@ -53,7 +53,7 @@
 //there will be a thin white line (and a hung window) while it waits to connect! TODO - this should
 //only apply (i think) if we are starting up in full screen.
 #define tbHideAtStartup		TRUE //Hide window when created
-#define tbPinNotPushedIn	FALSE //Is the pin pushed in or out at startup (sorry for invertion!)
+#define tbPinNotPushedIn	TRUE //Is the pin pushed in or out at startup (sorry for invertion!)
 #define tbScrollWindow		TRUE //Animate window to scroll up/down
 #define tbScrollDelay		20	//Timer variable for scrolling the window (cycletime) [ms]
 #define tbAutoScrollTime	10	//* tbAutoScrollDelay milliseconds steps. Meaning if it is 10 then = 10 (steps) * 100ms (tbAutoScrollDelay) = 1000ms delay

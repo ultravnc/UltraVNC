@@ -2319,10 +2319,6 @@ void vncProperties::LoadFromIniFile()
 	m_pref_Secure = myIniFile.ReadInt("admin", "Secure", m_pref_Secure);
 	m_server->Secure(m_pref_Secure);
 
-	m_pref_Secure = false;
-	m_pref_Secure = myIniFile.ReadInt("admin", "Secure", m_pref_Secure);
-	m_server->Secure(m_pref_Secure);
-
 	m_pref_RequireMSLogon=false;
 	m_pref_RequireMSLogon = myIniFile.ReadInt("admin", "MSLogonRequired", m_pref_RequireMSLogon);
 	m_server->RequireMSLogon(m_pref_RequireMSLogon);
