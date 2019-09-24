@@ -193,7 +193,7 @@ void VNCLog::ReallyPrint(const char* format, va_list ap)
 	TCHAR line[(LINE_BUFFER_SIZE * 2) + 1]; // sf@2006 - Prevents buffer overflow
 	TCHAR szErrorMsg[LINE_BUFFER_SIZE];
 	DWORD  dwErrorCode = GetLastError();
-    _vsnprintf_s(line, LINE_BUFFER_SIZE, format, ap);
+    _vsnprintf(line, LINE_BUFFER_SIZE, format, ap);
 	SetLastError(0);
     if (dwErrorCode != 0) {
 	    if (FormatMessage( 
