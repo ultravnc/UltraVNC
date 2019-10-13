@@ -117,73 +117,60 @@ DWORD GetCurrentConsoleSessionID()
 	return dwSessionId;
 }
 
-DWORD GetExplorerLogonPid()
+DWORD vncService::GetExplorerLogonPid()
 {
 	char alternate_shell[129];
 	IniFile myIniFile;
 	strcpy_s(alternate_shell, "");
 	myIniFile.ReadString("admin", "alternate_shell", alternate_shell, 256);
-
 	DWORD dwSessionId;
 	DWORD dwExplorerLogonPid=0;
 	PROCESSENTRY32 procEntry;
-//	HANDLE hProcess,hPToken;
-
 	pWTSGetActiveConsoleSessionId WTSGetActiveConsoleSessionIdF=NULL;
 	WTSProcessIdToSessionIdF=NULL;
 
 	HMODULE  hlibkernel = LoadLibrary("kernel32.dll"); 
-	if (hlibkernel)
-	{
-	WTSGetActiveConsoleSessionIdF=(pWTSGetActiveConsoleSessionId)GetProcAddress(hlibkernel, "WTSGetActiveConsoleSessionId");
-	WTSProcessIdToSessionIdF=(pProcessIdToSessionId)GetProcAddress(hlibkernel, "ProcessIdToSessionId");
+	if (hlibkernel) {
+		WTSGetActiveConsoleSessionIdF=(pWTSGetActiveConsoleSessionId)GetProcAddress(hlibkernel, "WTSGetActiveConsoleSessionId");
+		WTSProcessIdToSessionIdF=(pProcessIdToSessionId)GetProcAddress(hlibkernel, "ProcessIdToSessionId");
 	}
-	if (WTSGetActiveConsoleSessionIdF!=NULL)
-	   dwSessionId =WTSGetActiveConsoleSessionIdF();
-	else dwSessionId=0;
+	if (WTSGetActiveConsoleSessionIdF != NULL)
+		dwSessionId = WTSGetActiveConsoleSessionIdF();
+	else 
+		dwSessionId=0;
 
 	if( GetSystemMetrics( SM_REMOTESESSION))
-		if (WTSProcessIdToSessionIdF!=NULL)
-		{
+		if (WTSProcessIdToSessionIdF!=NULL) {
 			DWORD dw		 = GetCurrentProcessId();
 			DWORD pSessionId = 0xFFFFFFFF;
 			WTSProcessIdToSessionIdF( dw, &pSessionId );
 			dwSessionId=pSessionId;
 		}
 
-	
-
     HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-    if (hSnap == INVALID_HANDLE_VALUE)
-    {
+    if (hSnap == INVALID_HANDLE_VALUE) {
 		if (hlibkernel) FreeLibrary(hlibkernel);
         return 0 ;
     }
-
     procEntry.dwSize = sizeof(PROCESSENTRY32);
-
-    if (!Process32First(hSnap, &procEntry))
-    {
+    if (!Process32First(hSnap, &procEntry)) {
 		CloseHandle(hSnap);
 		if (hlibkernel) FreeLibrary(hlibkernel);
         return 0 ;
     }
 
-    do
-    {
-		if ((_stricmp(procEntry.szExeFile, "explorer.exe") == 0) || ( strlen(alternate_shell) != 0 && (_stricmp(procEntry.szExeFile, alternate_shell) == 0)))
-        {
-          DWORD dwExplorerSessId = 0;
-		  if (WTSProcessIdToSessionIdF!=NULL)
-		  {
-			  if (WTSProcessIdToSessionIdF(procEntry.th32ProcessID, &dwExplorerSessId) 
-						&& dwExplorerSessId == dwSessionId)
-				{
+    do {
+		if ((_stricmp(procEntry.szExeFile, "explorer.exe") == 0) || ( strlen(alternate_shell) != 0 && (_stricmp(procEntry.szExeFile, alternate_shell) == 0))) {
+			DWORD dwExplorerSessId = 0;
+			if (WTSProcessIdToSessionIdF!=NULL) {
+				if (WTSProcessIdToSessionIdF(procEntry.th32ProcessID, &dwExplorerSessId) 
+						&& dwExplorerSessId == dwSessionId) {
 					dwExplorerLogonPid = procEntry.th32ProcessID;
 					break;
 				}
-		  }
-		  else dwExplorerLogonPid = procEntry.th32ProcessID;
+			}
+			else
+				dwExplorerLogonPid = procEntry.th32ProcessID;
         }
 
     } while (Process32Next(hSnap, &procEntry));
@@ -199,7 +186,7 @@ GetConsoleUser(char *buffer, UINT size)
 {
 
 	HANDLE hProcess,hPToken;
-	DWORD dwExplorerLogonPid=GetExplorerLogonPid();
+	DWORD dwExplorerLogonPid = vncService::GetExplorerLogonPid();
 	if (dwExplorerLogonPid==0) 
 	{
 		strcpy_s(buffer, 257, "");

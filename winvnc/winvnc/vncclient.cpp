@@ -162,7 +162,6 @@ bool replaceFile(const char *src, const char *dst)
 #include "Localization.h" // Act : add localization on messages
 typedef BOOL (WINAPI *PGETDISKFREESPACEEX)(LPCSTR,PULARGE_INTEGER, PULARGE_INTEGER, PULARGE_INTEGER);
 
-DWORD GetExplorerLogonPid();
 unsigned long updates_sent;
 
 // vncClient update thread class
@@ -6414,7 +6413,7 @@ bool vncClient::DoFTUserImpersonation()
 	{
 		// sf@2007 - New method to achieve FTUserImpersonation - Still needs to be further tested...
 		HANDLE hProcess;
-		DWORD pid = GetExplorerLogonPid();
+		DWORD pid = vncService::GetExplorerLogonPid();
 		if (pid != 0) 
 		{
 			hProcess = OpenProcess(MAXIMUM_ALLOWED, FALSE, pid);

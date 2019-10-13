@@ -426,8 +426,6 @@ BEGIN
         MENUITEM "Uninstall Service",           ID_UNINSTALL_SERVICE
         MENUITEM "Stop Service",                ID_CLOSE_SERVICE
         MENUITEM "Start Service (must be installed first)", ID_START_SERVICE
-        MENUITEM "Fix1 SoftwareCad",            ID_SOFTWARECAD
-        MENUITEM "Fix2 SoftwareCad",            ID_DELSOFTWARECAD
         MENUITEM "Reboot in safemode",          ID_REBOOTSAFEMODE
         MENUITEM "Force Reboot (unsafe)",       ID_REBOOT_FORCE
         MENUITEM SEPARATOR

@@ -124,6 +124,8 @@ public:
 	static void RunningFromExternalService(BOOL fEnabled);
 	static bool IsInstalled();
 
+	static DWORD GetExplorerLogonPid();
+
 };
 
 #endif

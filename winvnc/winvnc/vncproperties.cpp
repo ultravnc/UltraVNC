@@ -54,7 +54,6 @@ extern HINSTANCE	hInstResDLL;
 // Marscha@2004 - authSSP: Function pointer for dyn. linking
 typedef void (*vncEditSecurityFn) (HWND hwnd, HINSTANCE hInstance);
 vncEditSecurityFn vncEditSecurity = 0;
-DWORD GetExplorerLogonPid();
 // ethernet packet 1500 - 40 tcp/ip header - 8 PPPoE info
 //unsigned int G_SENDBUFFER=8192;
 unsigned int G_SENDBUFFER_EX=1452;
@@ -192,7 +191,7 @@ vncProperties::ShowAdmin(BOOL show, BOOL usersettings)
 //	if (Lock_service_helper) return;
 	HANDLE hProcess=NULL;
 	HANDLE hPToken=NULL;
-	DWORD id=GetExplorerLogonPid();
+	DWORD id = vncService::GetExplorerLogonPid();
 	int iImpersonateResult=0;
 	{
 		char WORKDIR[MAX_PATH];
@@ -1262,7 +1261,7 @@ vncProperties::DialogProc(HWND hwnd,
 				if (bNewMSLogonChecked) {
 					void winvncSecurityEditorHelper_as_admin();
 						HANDLE hProcess,hPToken;
-						DWORD id=GetExplorerLogonPid();
+						DWORD id = vncService::GetExplorerLogonPid();
 						if (id!=0) 
 						{
 							hProcess = OpenProcess(MAXIMUM_ALLOWED,FALSE,id);
@@ -1333,57 +1332,7 @@ vncProperties::DialogProc(HWND hwnd,
 				
 					if (_this->m_server->GetDSMPluginPointer()->IsLoaded())
 					{
-
-
-						/*HANDLE hProcess = NULL;
-						HANDLE hPToken = NULL;
-						DWORD id = GetExplorerLogonPid();
-						DWORD iImpersonateResult=0;
-
-						if (id != 0)
-						{
-							hProcess = OpenProcess(MAXIMUM_ALLOWED, FALSE, id);
-							if (OpenProcessToken(hProcess, TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY
-								| TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY | TOKEN_ADJUST_SESSIONID
-								| TOKEN_READ | TOKEN_WRITE, &hPToken))
-							{
-								ImpersonateLoggedOnUser(hPToken);
-								iImpersonateResult = GetLastError();
-								if (iImpersonateResult == ERROR_SUCCESS)
-								{									
-									char szParams[32];
-									strcpy_s(szParams, "NoPassword,");
-									strcat_s(szParams, vncService::RunningAsService() ? "server-svc" : "server-app");
-									//adzm 2010-05-12 - dsmplugin config
-									char* szNewConfig = NULL;
-									if (_this->m_server->GetDSMPluginPointer()->SetPluginParams(hwnd, szParams, _this->m_pref_DSMPluginConfig, &szNewConfig)) {
-										if (szNewConfig != NULL && strlen(szNewConfig) > 0) {
-											strcpy_s(_this->m_pref_DSMPluginConfig, 511, szNewConfig);
-										}
-									}
-								}
-								if (iImpersonateResult == ERROR_SUCCESS)RevertToSelf();
-							}
-
-						}*/
-
-						//Secure_Plugin(szPlugin);
 						Secure_Save_Plugin_Config(szPlugin);
-						/*// We don't send the password yet... no matter the plugin requires
-						// it or not, we will provide it later (at plugin "real" init)
-						// Knowing the environnement ("server-svc" or "server-app") right 
-						// now can be usefull or even mandatory for the plugin 
-						// (specific params saving and so on...)
-						char szParams[32];
-						strcpy_s(szParams, "NoPassword,");
-						strcat_s(szParams, vncService::RunningAsService() ? "server-svc" : "server-app");
-						//adzm 2010-05-12 - dsmplugin config
-						char* szNewConfig = NULL;
-						if (_this->m_server->GetDSMPluginPointer()->SetPluginParams(hwnd, szParams, _this->m_pref_DSMPluginConfig, &szNewConfig)) {
-							if (szNewConfig != NULL && strlen(szNewConfig) > 0) {
-								strcpy_s(_this->m_pref_DSMPluginConfig, 511, szNewConfig);
-							}
-						}*/
 					}
 					else
 					{
@@ -2671,7 +2620,7 @@ void vncProperties::ReloadDynamicSettings()
 void Secure_Save_Plugin_Config(char *szPlugin)
 {
 	HANDLE hProcess = NULL, hPToken = NULL;
-	DWORD id = GetExplorerLogonPid();
+	DWORD id = vncService::GetExplorerLogonPid();
 	if (id != 0)
 	{
 		hProcess = OpenProcess(MAXIMUM_ALLOWED, FALSE, id);

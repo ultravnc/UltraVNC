@@ -53,6 +53,7 @@
 #include "videodriver.h"
 #include <intrin.h>
 #include "vncauth.h"
+#include "cadthread.h"
 
 #ifdef IPP
 void InitIpp();
@@ -123,12 +124,8 @@ BOOL SPECIAL_SC_PROMPT=false;
 //BOOL G_HTTP;
 BOOL multi=false;
 
-void Enable_softwareCAD_elevated();
-void Enable_softwareCAD();
 void Reboot_in_safemode_elevated();
 void Reboot_in_safemode();
-void delete_softwareCAD_elevated();
-void delete_softwareCAD();
 void Reboot_with_force_reboot_elevated();
 void Reboot_with_force_reboot();
 void Shellexecuteforuiaccess();
@@ -512,7 +509,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 		if (strncmp(&szCmdLine[i], winvncSoftwarecadHelper, strlen(winvncSoftwarecadHelper)) == 0)
 			{
 				Sleep(3000);
-				Enable_softwareCAD_elevated();
+				vncCad::Enable_softwareCAD_elevated();
 #ifdef CRASHRPT
 				crUninstall();
 #endif
@@ -521,7 +518,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 		if (strncmp(&szCmdLine[i], winvncdelSoftwarecadHelper, strlen(winvncdelSoftwarecadHelper)) == 0)
 			{
 				Sleep(3000);
-				delete_softwareCAD_elevated();
+				vncCad::delete_softwareCAD_elevated();
 #ifdef CRASHRPT
 				crUninstall();
 #endif
@@ -619,7 +616,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 
 		if (strncmp(&szCmdLine[i], winvncSoftwarecad, strlen(winvncSoftwarecad)) == 0)
 		{
-			Enable_softwareCAD();
+			vncCad::Enable_softwareCAD();
 #ifdef CRASHRPT
 			crUninstall();
 #endif
@@ -628,7 +625,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 
 		if (strncmp(&szCmdLine[i], winvncdelSoftwarecad, strlen(winvncdelSoftwarecad)) == 0)
 		{
-			delete_softwareCAD();
+			vncCad::delete_softwareCAD();
 #ifdef CRASHRPT
 			crUninstall();
 #endif
@@ -1385,7 +1382,6 @@ int WinVNCAppMain()
 	// sf@2007 - New impersonation thread stuff for tray icon & menu
 	// Subscribe to shutdown event
 	hShutdownEvent = OpenEvent(EVENT_ALL_ACCESS, FALSE, "Global\\SessionEventUltra");
-	hShutdownEventcad = OpenEvent(EVENT_MODIFY_STATE, FALSE, "Global\\SessionEventUltraCad");
 	if (hShutdownEvent) ResetEvent(hShutdownEvent);
 	vnclog.Print(LL_STATE, VNCLOG("***************** SDEvent created \n"));
 	// Create the timer that looks periodicaly for shutdown event
@@ -1412,8 +1408,7 @@ int WinVNCAppMain()
 	if (instancehan!=NULL)
 		delete instancehan;
 
-	if (hShutdownEvent)CloseHandle(hShutdownEvent);
-	if (hShutdownEventcad)CloseHandle(hShutdownEventcad);
+	if (hShutdownEvent)CloseHandle(hShutdownEvent);	
 	vnclog.Print(LL_STATE, VNCLOG("################## SHUTING DOWN SERVER ####################\n"));
 
 	//adzm 2009-06-20

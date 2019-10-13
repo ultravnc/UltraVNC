@@ -93,7 +93,6 @@ static P_DwmIsCompositionEnabled pfnDwmIsCompositionEnabled = NULL;
 typedef HRESULT (CALLBACK *P_DwmEnableComposition) (BOOL   fEnable); 
 static P_DwmEnableComposition pfnDwmEnableComposition = NULL; 
 static BOOL AeroWasEnabled = FALSE;
-DWORD GetExplorerLogonPid();
 
 void Set_uninstall_service_as_admin();
 void Set_install_service_as_admin();
@@ -108,11 +107,7 @@ void Open_forum();
 #define MSGFLT_ADD		1
 typedef BOOL (WINAPI *CHANGEWINDOWMESSAGEFILTER)(UINT message, DWORD dwFlag);
 
-void Enable_softwareCAD_elevated();
-void delete_softwareCAD_elevated();
 void Reboot_in_safemode_elevated();
-bool IsSoftwareCadEnabled();
-bool ISUACENabled();
 void Reboot_with_force_reboot_elevated();
 //HACK to use name in autoreconnect from service with dyn dns
 extern char dnsname[255];
@@ -858,8 +853,6 @@ vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 		OSVERSIONINFO OSversion;	
 		OSversion.dwOSVersionInfoSize=sizeof(OSVERSIONINFO);
 		GetVersionEx(&OSversion);			
-		RemoveMenu(m_hmenu, ID_DELSOFTWARECAD, MF_BYCOMMAND);
-		RemoveMenu(m_hmenu, ID_SOFTWARECAD, MF_BYCOMMAND);
 		// adzm 2009-07-05
 		if (SPECIAL_SC_PROMPT) {
 			RemoveMenu(m_hmenu, ID_ADMIN_PROPERTIES, MF_BYCOMMAND);
@@ -869,8 +862,6 @@ vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 			RemoveMenu(m_hmenu, ID_UNINSTALL_SERVICE, MF_BYCOMMAND);
 			RemoveMenu(m_hmenu, ID_REBOOTSAFEMODE, MF_BYCOMMAND);
 			RemoveMenu(m_hmenu, ID_REBOOT_FORCE, MF_BYCOMMAND);
-			RemoveMenu(m_hmenu, ID_SOFTWARECAD, MF_BYCOMMAND);
-			RemoveMenu(m_hmenu, ID_DELSOFTWARECAD, MF_BYCOMMAND);
 		}
 		if (msg == NIM_ADD) {
 				IsIconSet=true;
@@ -1069,7 +1060,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		case ID_VISITUSONLINE_HOMEPAGE:
 			{
 						HANDLE hProcess,hPToken;
-						DWORD id=GetExplorerLogonPid();
+						DWORD id = vncService::GetExplorerLogonPid();
 						if (id!=0) 
 						{
 							hProcess = OpenProcess(MAXIMUM_ALLOWED,FALSE,id);
@@ -1104,7 +1095,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		case ID_VISITUSONLINE_FORUM:
 			{
 						HANDLE hProcess,hPToken;
-						DWORD id=GetExplorerLogonPid();
+						DWORD id = vncService::GetExplorerLogonPid();
 						if (id!=0) 
 						{
 							hProcess = OpenProcess(MAXIMUM_ALLOWED,FALSE,id);
@@ -1144,107 +1135,11 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			_this->m_server->KillAuthClients();
 			PostMessage(hwnd, WM_CLOSE, 0, 0);
 			break;
-		case ID_SOFTWARECAD:
-			{
-			HANDLE hProcess=NULL,hPToken=NULL;
-			DWORD id=GetExplorerLogonPid();
-				if (id!=0) 
-				{
-					hProcess = OpenProcess(MAXIMUM_ALLOWED,FALSE,id);
-					if (!hProcess) goto error;
-					if(!OpenProcessToken(hProcess,TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY
-											|TOKEN_DUPLICATE|TOKEN_ASSIGN_PRIMARY|TOKEN_ADJUST_SESSIONID
-											| TOKEN_READ | TOKEN_WRITE, &hPToken))
-					{
-						CloseHandle(hProcess);
-						goto error;
-					}
-
-					char dir[MAX_PATH];
-					char exe_file_name[MAX_PATH];
-					GetModuleFileName(0, exe_file_name, MAX_PATH);
-					strcpy_s(dir, exe_file_name);
-					strcat_s(dir, " -softwarecadhelper");
-		
-					{
-					STARTUPINFO          StartUPInfo;
-					PROCESS_INFORMATION  ProcessInfo;
-					HANDLE Token=NULL;
-					HANDLE process=NULL;
-					ZeroMemory(&StartUPInfo,sizeof(STARTUPINFO));
-					ZeroMemory(&ProcessInfo,sizeof(PROCESS_INFORMATION));
-					StartUPInfo.wShowWindow = SW_SHOW;
-					StartUPInfo.lpDesktop = "Winsta0\\Default";
-					StartUPInfo.cb = sizeof(STARTUPINFO);
-			
-					CreateProcessAsUser(hPToken,NULL,dir,NULL,NULL,FALSE,DETACHED_PROCESS,NULL,NULL,&StartUPInfo,&ProcessInfo);
-					DWORD errorcode=GetLastError();
-					if (process) CloseHandle(process);
-					if (Token) CloseHandle(Token);
-					if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
-					if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
-					if (errorcode == 1314) goto error;	
-					break;
-					}
-				error:
-					Enable_softwareCAD_elevated();
-				}
-			}
-			break;
-
-		case ID_DELSOFTWARECAD:
-			{
-			HANDLE hProcess=NULL,hPToken=NULL;
-			DWORD id=GetExplorerLogonPid();
-				if (id!=0) 
-				{
-					hProcess = OpenProcess(MAXIMUM_ALLOWED,FALSE,id);
-					if (!hProcess) goto error2;
-					if(!OpenProcessToken(hProcess,TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY
-											|TOKEN_DUPLICATE|TOKEN_ASSIGN_PRIMARY|TOKEN_ADJUST_SESSIONID
-											| TOKEN_READ | TOKEN_WRITE, &hPToken))
-					{
-						CloseHandle(hProcess);
-						goto error2;
-					}
-
-					char dir[MAX_PATH];
-					char exe_file_name[MAX_PATH];
-					GetModuleFileName(0, exe_file_name, MAX_PATH);
-					strcpy_s(dir, exe_file_name);
-					strcat_s(dir, " -delsoftwarecadhelper");
-		
-					{
-					STARTUPINFO          StartUPInfo;
-					PROCESS_INFORMATION  ProcessInfo;
-					HANDLE Token=NULL;
-					HANDLE process=NULL;
-					ZeroMemory(&StartUPInfo,sizeof(STARTUPINFO));
-					ZeroMemory(&ProcessInfo,sizeof(PROCESS_INFORMATION));
-					StartUPInfo.wShowWindow = SW_SHOW;
-					StartUPInfo.lpDesktop = "Winsta0\\Default";
-					StartUPInfo.cb = sizeof(STARTUPINFO);
-			
-					CreateProcessAsUser(hPToken,NULL,dir,NULL,NULL,FALSE,DETACHED_PROCESS,NULL,NULL,&StartUPInfo,&ProcessInfo);
-					DWORD errorcode=GetLastError();
-					if (process) CloseHandle(process);
-					if (Token) CloseHandle(Token);
-					if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
-					if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
-					if (errorcode == 1314) goto error2;
-					break;
-					error2:
-						delete_softwareCAD_elevated();
-
-					}
-				}
-			}
-			break;
 
 		case ID_REBOOTSAFEMODE:
 			{
 			HANDLE hProcess = NULL, hPToken = NULL;
-			DWORD id=GetExplorerLogonPid();
+			DWORD id = vncService::GetExplorerLogonPid();
 				if (id!=0) 
 				{
 					hProcess = OpenProcess(MAXIMUM_ALLOWED,FALSE,id);
@@ -1292,7 +1187,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		case ID_REBOOT_FORCE:
 			{
 			HANDLE hProcess,hPToken;
-			DWORD id=GetExplorerLogonPid();
+			DWORD id = vncService::GetExplorerLogonPid();
 				if (id!=0) 
 				{
 					hProcess = OpenProcess(MAXIMUM_ALLOWED,FALSE,id);
@@ -1342,7 +1237,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			HWND hwnd=FindWinVNCWindow(true);
 			if (hwnd) SendMessage(hwnd,WM_COMMAND,ID_CLOSE,0);
 			HANDLE hProcess,hPToken;
-			DWORD id=GetExplorerLogonPid();
+			DWORD id = vncService::GetExplorerLogonPid();
 				if (id!=0) 
 				{
 					hProcess = OpenProcess(MAXIMUM_ALLOWED,FALSE,id);
@@ -1388,7 +1283,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		case ID_RUNASSERVICE:
 			{
 			HANDLE hProcess,hPToken;
-			DWORD id=GetExplorerLogonPid();
+			DWORD id = vncService::GetExplorerLogonPid();
 				if (id!=0) 
 				{
 					hProcess = OpenProcess(MAXIMUM_ALLOWED,FALSE,id);
@@ -1443,7 +1338,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		case ID_CLOSE_SERVICE:
 			{
 			HANDLE hProcess,hPToken;
-			DWORD id=GetExplorerLogonPid();
+			DWORD id = vncService::GetExplorerLogonPid();
 				if (id!=0) 
 				{
 					hProcess = OpenProcess(MAXIMUM_ALLOWED,FALSE,id);
@@ -1490,7 +1385,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		case ID_START_SERVICE:
 			{
 			HANDLE hProcess,hPToken;
-			DWORD id=GetExplorerLogonPid();
+			DWORD id = vncService::GetExplorerLogonPid();
 				if (id!=0) 
 				{
 					hProcess = OpenProcess(MAXIMUM_ALLOWED,FALSE,id);

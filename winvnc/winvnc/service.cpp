@@ -829,7 +829,7 @@ void monitor_sessions_RDP()
 {
 	BOOL  RDPMODE = false;
 	IniFile myIniFile;
-	RDPMODE = myIniFile.ReadInt("admin", "rdpmode", 0);
+	RDPMODE = myIniFile.ReadInt("admin", "rdpmode", 0) && IsAnyRDPSessionActive();
 	pad2(false);
 	DWORD requestedSessionID = 0;
 	DWORD dwSessionId = 0;
@@ -934,92 +934,81 @@ void monitor_sessions_RDP()
 		break;
 
 		case WAIT_TIMEOUT:
-			if (RDPMODE)
-				{
-					//First RUN	
-					if (ProcessInfo.hProcess == NULL)
-					{
-						if (IsAnyRDPSessionActive())
-						{
-							LaunchProcessWin(0, true);
-							OlddwSessionId = 0;
-							preconnect_start = false;
-							goto whileloop;
-						}
-						else
-						{
-							dwSessionId = 0xFFFFFFFF;
-							int sessidcounter = 0;
-							while (dwSessionId == 0xFFFFFFFF)
-							{
-								if (lpfnWTSGetActiveConsoleSessionId.isValid()) dwSessionId = (*lpfnWTSGetActiveConsoleSessionId)();
-								Sleep(1000);
-								sessidcounter++;
-								if (sessidcounter > 10) break;
-							}
-							LaunchProcessWin(dwSessionId, false);
-							OlddwSessionId = dwSessionId;
-							preconnect_start = false;
-							goto whileloop;
-						}
-					}
-
-					if (preconnect_start == true) if (!IsSessionStillActive(OlddwSessionId)) SetEvent(hEvent);
-
-					// Monitor process
-					DWORD dwCode = 0;
-					bool returnvalue = GetExitCodeProcess(ProcessInfo.hProcess, &dwCode);
-					if (!returnvalue)
-					{
-						//bad handle, thread already terminated
-						if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
-						if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
-						ProcessInfo.hProcess = NULL;
-						ProcessInfo.hThread = NULL;
-						RDPMODE = myIniFile.ReadInt("admin", "rdpmode", 0);
-						Sleep(1000);
+			if (RDPMODE) {
+				//First RUN	
+				if (ProcessInfo.hProcess == NULL){
+					if (IsAnyRDPSessionActive()){
+						LaunchProcessWin(0, true);
+						OlddwSessionId = 0;
+						preconnect_start = false;
 						goto whileloop;
 					}
+					else
+					{
+						dwSessionId = 0xFFFFFFFF;
+						int sessidcounter = 0;
+						while (dwSessionId == 0xFFFFFFFF){
+							if (lpfnWTSGetActiveConsoleSessionId.isValid()) dwSessionId = (*lpfnWTSGetActiveConsoleSessionId)();
+							Sleep(1000);
+							sessidcounter++;
+							if (sessidcounter > 10) break;
+						}
+						LaunchProcessWin(dwSessionId, false);
+						OlddwSessionId = dwSessionId;
+						preconnect_start = false;
+						goto whileloop;
+					}
+				}
 
-					if (dwCode == STILL_ACTIVE) goto whileloop;
-					if (ProcessInfo.hProcess) WaitForSingleObject(ProcessInfo.hProcess, 15000);
+				if (preconnect_start == true)
+					if (!IsSessionStillActive(OlddwSessionId)) SetEvent(hEvent);
+
+				// Monitor process
+				DWORD dwCode = 0;
+				bool returnvalue = GetExitCodeProcess(ProcessInfo.hProcess, &dwCode);
+				if (!returnvalue){
+					//bad handle, thread already terminated
 					if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
 					if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
 					ProcessInfo.hProcess = NULL;
 					ProcessInfo.hThread = NULL;
-					RDPMODE = myIniFile.ReadInt("admin", "rdpmode", 0);
+					RDPMODE = myIniFile.ReadInt("admin", "rdpmode", 0) && IsAnyRDPSessionActive();;
 					Sleep(1000);
 					goto whileloop;
+				}
+
+				if (dwCode == STILL_ACTIVE) goto whileloop;
+				if (ProcessInfo.hProcess) WaitForSingleObject(ProcessInfo.hProcess, 15000);
+				if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
+				if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
+				ProcessInfo.hProcess = NULL;
+				ProcessInfo.hThread = NULL;
+				RDPMODE = myIniFile.ReadInt("admin", "rdpmode", 0) && IsAnyRDPSessionActive();;
+				Sleep(1000);
+				goto whileloop;
 				}//timeout
 			else
 			{
-				if (lpfnWTSGetActiveConsoleSessionId.isValid()) dwSessionId = (*lpfnWTSGetActiveConsoleSessionId)();
+				if (lpfnWTSGetActiveConsoleSessionId.isValid()) 
+					dwSessionId = (*lpfnWTSGetActiveConsoleSessionId)();
 				if (OlddwSessionId != dwSessionId)
-				{
-					//Tell winvnc to stop
 					SetEvent(hEvent);
-				}
-				if (dwSessionId != 0xFFFFFFFF)
-				{
+				if (dwSessionId != 0xFFFFFFFF){
 					DWORD dwCode = 0;
-					if (ProcessInfo.hProcess == NULL)
-					{
+					if (ProcessInfo.hProcess == NULL){
 						//First RUNf
 						LaunchProcessWin(dwSessionId, false);
 						OlddwSessionId = dwSessionId;
 					}
-					else if (GetExitCodeProcess(ProcessInfo.hProcess, &dwCode))
-					{
-						if (dwCode != STILL_ACTIVE)
-						{
+					else if (GetExitCodeProcess(ProcessInfo.hProcess, &dwCode)){
+						if (dwCode != STILL_ACTIVE){
 							WaitForSingleObject(ProcessInfo.hProcess, 15000);
 							if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
 							if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
 							ProcessInfo.hProcess = NULL;
 							ProcessInfo.hThread = NULL;							
 							int sessidcounter = 0;
-							while ((OlddwSessionId == dwSessionId) || dwSessionId == 0xFFFFFFFF)
-							{
+							while ((OlddwSessionId == dwSessionId) || dwSessionId == 0xFFFFFFFF){
 								Sleep(1000);
 								if (lpfnWTSGetActiveConsoleSessionId.isValid()) dwSessionId = (*lpfnWTSGetActiveConsoleSessionId)();
 								sessidcounter++;
@@ -1027,19 +1016,15 @@ void monitor_sessions_RDP()
 							}
 							RDPMODE = myIniFile.ReadInt("admin", "rdpmode", 0);
 							goto whileloop;
-							//LaunchProcessWin(dwSessionId, false);
-							//OlddwSessionId = dwSessionId;
 						}
 					}
-					else
-					{
+					else{
 						if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
 						if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
 						ProcessInfo.hProcess = NULL;
 						ProcessInfo.hThread = NULL;
 						int sessidcounter = 0;
-						while (OlddwSessionId == dwSessionId)
-						{
+						while (OlddwSessionId == dwSessionId){
 							Sleep(1000);
 							if (lpfnWTSGetActiveConsoleSessionId.isValid()) dwSessionId = (*lpfnWTSGetActiveConsoleSessionId)();
 							sessidcounter++;
@@ -1047,8 +1032,6 @@ void monitor_sessions_RDP()
 						}
 						RDPMODE = myIniFile.ReadInt("admin", "rdpmode", 0);
 						goto whileloop;
-						//LaunchProcessWin(dwSessionId, false);
-						//OlddwSessionId = dwSessionId;
 					}
 				}
 			}
@@ -1093,184 +1076,6 @@ void monitor_sessions_RDP()
 	if (data) UnmapViewOfFile(data);
 	if (hMapFile != NULL) CloseHandle(hMapFile);
 }
-//////////////////////////////////////////////////////////////////////////////
-
-/*void monitor_sessions()
-{
-	pad2(false);
-	DWORD dwSessionId = 0;
-	DWORD OlddwSessionId = 99;
-	ProcessInfo.hProcess = 0;
-	HANDLE testevent[2];
-	bool ToCont = true;
-
-	//We use this event to notify the program that the session has changed
-	//The program need to end so the service can restart the program in the correct session
-	wait_for_existing_process();
-	hEvent = CreateEvent(NULL, FALSE, FALSE, "Global\\SessionEventUltra");
-	hEventcad = CreateEvent(NULL, FALSE, FALSE, "Global\\SessionEventUltraCad");
-	Sleep(3000);	
-	testevent[0] = stopServiceEvent;
-	testevent[1] = hEventcad;
-	
-	while (ToCont && serviceStatus.dwCurrentState == SERVICE_RUNNING)
-	{
-		DWORD dwEvent;
-		dwEvent = WaitForMultipleObjects(2, testevent, FALSE, 1000);
-		switch (dwEvent)
-		{
-			//stopServiceEvent, exit while loop
-		case WAIT_OBJECT_0 + 0:
-			ToCont = false;
-			break;
-			//cad request
-		case WAIT_OBJECT_0 + 1:
-		{
-			typedef VOID(WINAPI *SendSas)(BOOL asUser);
-			HINSTANCE Inst = LoadLibrary("sas.dll");
-			SendSas sendSas = (SendSas)GetProcAddress(Inst, "SendSAS");
-			if (sendSas) sendSas(FALSE);
-			else
-			{
-				char WORKDIR[MAX_PATH];
-				char mycommand[MAX_PATH];
-				if (GetModuleFileName(NULL, WORKDIR, MAX_PATH))
-				{
-					char* p = strrchr(WORKDIR, '\\');
-					if (p == NULL) return;
-					*p = '\0';
-				}
-				strcpy_s(mycommand, "");
-				strcat_s(mycommand, WORKDIR);//set the directory
-				strcat_s(mycommand, "\\");
-				strcat_s(mycommand, "cad.exe");
-				(void)ShellExecute(GetDesktopWindow(), "open", mycommand, "", 0, SW_SHOWNORMAL);
-			}
-			if (Inst) FreeLibrary(Inst);
-		}
-		break;
-		case WAIT_TIMEOUT:
-		{
-			if (lpfnWTSGetActiveConsoleSessionId.isValid()) dwSessionId = (*lpfnWTSGetActiveConsoleSessionId)();
-			if (OlddwSessionId != dwSessionId)
-			{
-#ifdef _DEBUG
-				char	szText[256];
-				sprintf_s(szText, " ++++++SetEvent Session change: signal tray icon to shut down\n");
-				OutputDebugString(szText);
-#endif
-				//Tell winvnc to stop
-				SetEvent(hEvent);
-			}
-#ifdef _DEBUG
-			if (dwSessionId == 0xFFFFFFFF) OutputDebugString("Session state changing\n");
-#endif
-			if (dwSessionId != 0xFFFFFFFF)
-			{
-				DWORD dwCode = 0;
-				if (ProcessInfo.hProcess == NULL)
-				{
-					//First RUN
-#ifdef _DEBUG
-					OutputDebugString("First Run Start winvnc in session\n");
-#endif
-#ifdef _DEBUG
-					OutputDebugString("Start winvnc.exe\n");
-#endif
-					LaunchProcessWin(dwSessionId,false);
-					OlddwSessionId = dwSessionId;
-				}
-				else if (GetExitCodeProcess(ProcessInfo.hProcess, &dwCode))
-				{
-					if (dwCode != STILL_ACTIVE)
-					{
-#ifdef _DEBUG
-						OutputDebugString("dwCode=not active, waitsingleobject hprocess \n");
-#endif
-						WaitForSingleObject(ProcessInfo.hProcess, 15000);
-						CloseHandle(ProcessInfo.hProcess);
-						CloseHandle(ProcessInfo.hThread);
-						int sessidcounter = 0;
-						while ((OlddwSessionId == dwSessionId) || dwSessionId == 0xFFFFFFFF)
-						{
-							Sleep(1000);
-							if (lpfnWTSGetActiveConsoleSessionId.isValid()) dwSessionId = (*lpfnWTSGetActiveConsoleSessionId)();
-							sessidcounter++;
-							if (sessidcounter > 10) break;
-#ifdef _DEBUG
-							char	szText[256];
-							sprintf_s(szText, " WAITING session change %i %i\n", OlddwSessionId, dwSessionId);
-							OutputDebugString(szText);
-#endif
-						}
-#ifdef _DEBUG
-						OutputDebugString("Start winvnc.exe\n");
-#endif
-						LaunchProcessWin(dwSessionId,false);
-						OlddwSessionId = dwSessionId;
-					}
-					else
-					{
-#ifdef _DEBUG
-						OutputDebugString("dwCode=active\n");
-#endif
-					}
-				}
-				else
-				{
-#ifdef _DEBUG
-					OutputDebugString("GetExitCodeProcess failed\n");
-#endif
-					if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
-					if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
-					int sessidcounter = 0;
-					while (OlddwSessionId == dwSessionId)
-					{
-						Sleep(1000);
-						if (lpfnWTSGetActiveConsoleSessionId.isValid()) dwSessionId = (*lpfnWTSGetActiveConsoleSessionId)();
-						sessidcounter++;
-						if (sessidcounter > 10) break;
-#ifdef _DEBUG
-						char	szText[256];
-						sprintf_s(szText, " WAITING session change %i %i\n", OlddwSessionId, dwSessionId);
-						OutputDebugString(szText);
-#endif
-					}
-#ifdef _DEBUG
-					OutputDebugString("Start winvnc.exe\n");
-#endif
-					LaunchProcessWin(dwSessionId,false);
-					OlddwSessionId = dwSessionId;
-				}
-#ifdef _DEBUG
-				char	szText[256];
-				sprintf_s(szText, " ++++++1 %i %i %i %i\n", OlddwSessionId, dwSessionId, dwCode, ProcessInfo.hProcess);
-				OutputDebugString(szText);
-#endif
-			}
-		}//timeout
-		}//switch
-	}//while
-#ifdef _DEBUG
-	char	szText[256];
-	sprintf_s(szText, " ++++++SetEvent Service stopping: signal tray icon to shut down\n");
-	OutputDebugString(szText);
-#endif
-	if (hEvent) SetEvent(hEvent);
-	if (ProcessInfo.hProcess)
-	{
-#ifdef _DEBUG
-		OutputDebugString("Waiting up to 15 seconds for tray icon process to exit\n");
-#endif
-		WaitForSingleObject(ProcessInfo.hProcess, 15000);
-		if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
-		if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
-	}
-	// EndProcess();
-	if (hEvent) CloseHandle(hEvent);
-	if (hEventcad) CloseHandle(hEventcad);
-}*/
-
 
 // 20 April 2008 jdp paquette@atnetsend.net
 void disconnect_remote_sessions()

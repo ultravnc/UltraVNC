@@ -225,11 +225,9 @@
 #define ID_VISITUSONLINE_HOMEPAGE       40020
 #define ID_VISITUSONLINE_FORUM          40021
 #define ID_TRAY_ENABLESOFTWARECAD       40022
-#define ID_SOFTWARECAD                  40023
 #define ID_TRAY_REBOOTINSAFEMODE        40024
 #define ID_REBOOTSAFEMODE               40025
 #define ID_TRAY_DELETESOFTWARECAD       40026
-#define ID_DELSOFTWARECAD               40027
 #define ID_TRAY_FORCEREBOOT             40028
 #define ID_REBOOT_FORCE                 40029
 #define ID_FAILED_INIT                  41000

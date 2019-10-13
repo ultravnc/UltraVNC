@@ -43,12 +43,11 @@
 
 #include "keysymdef.h"
 #include "uvncUiAccess.h"
+#include "cadthread.h"
 //	[v1.0.2-jp1 fix] IOport's patch (Include "ime.h" for IME control)
 #include <ime.h>
- 
 #include <map>
 #include <vector>
-DWORD WINAPI Cadthread(LPVOID lpParam);
 
 // Mapping of X keysyms to windows VK codes.  Ordering here is the same as
 // keysymdef.h to make checking easier
@@ -745,7 +744,7 @@ public:
 				// Try to run the special Vista cad.exe file...
 				HANDLE ThreadHandle2;
 				DWORD dwTId;
-				ThreadHandle2 = CreateThread(NULL, 0, Cadthread, NULL, 0, &dwTId);
+				ThreadHandle2 = CreateThread(NULL, 0, vncCad::Cadthread, NULL, 0, &dwTId);
 				CloseHandle(ThreadHandle2);
 		}
 		else if (vncService::VersionMajor()>=6)
