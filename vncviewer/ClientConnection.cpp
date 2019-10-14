@@ -6043,7 +6043,8 @@ void ClientConnection::ReadServerCutText()
 	vnclog.Print(6, _T("Read remote clipboard change\n"));
 	ReadExact(((char *) &sctm)+m_nTO, sz_rfbServerCutTextMsg-m_nTO);
 	int len = Swap32IfLE(sctm.length);
-
+	if (len > 104857600)
+		return;
 	// adzm - 2010-07 - Extended clipboard
 	if (!m_clipboard.settings.m_bSupportsEx && len < 0) {
 		m_clipboard.settings.m_bSupportsEx = true;
@@ -6052,7 +6053,8 @@ void ClientConnection::ReadServerCutText()
 	if (len < 0 && m_clipboard.settings.m_bSupportsEx) {
 		vnclog.Print(6, _T("Read remote extended clipboard change\n"));
 		len = abs(len);
-
+		if (len > 104857600 || len < 0)
+			return;
 		ExtendedClipboardDataMessage extendedClipboardDataMessage;
 
 		extendedClipboardDataMessage.EnsureBufferLength(len, false);

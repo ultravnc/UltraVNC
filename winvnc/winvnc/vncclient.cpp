@@ -3424,7 +3424,8 @@ vncClientThread::run(void *arg)
 				if (length < 0 && m_client->m_clipboard.settings.m_bSupportsEx) {
 
 					length = abs(length);
-
+					if (length > 104857600 || length < 0)
+						break;
 					ExtendedClipboardDataMessage extendedClipboardDataMessage;
 
 					extendedClipboardDataMessage.EnsureBufferLength(length, false);
