@@ -45,7 +45,9 @@ namespace rdr {
       strncat_s(str_, "rdr::SystemException: ", len-1);
       strncat_s(str_, s, len-1-strlen(str_));
       strncat_s(str_, ": ", len-1-strlen(str_));
-      strncat_s(str_, strerror(err), len-1-strlen(str_));
+	  char errorbuffer[1024];
+	  strerror_s(errorbuffer, 1024, err);
+      strncat_s(str_, errorbuffer, len-1-strlen(str_));
       strncat_s(str_, " (", len-1-strlen(str_));
       char buf[20];
       sprintf_s(buf,"%d",err);
