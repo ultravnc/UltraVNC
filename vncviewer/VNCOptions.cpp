@@ -197,6 +197,7 @@ VNCOptions::VNCOptions()
   m_szDSMPluginFilename[0] = '\0';
   setDefaultDocumentPath();
  _tcscpy_s(m_prefix, "vnc_");
+  _tcscpy_s(m_imageFormat, ".jpeg");
 
 #ifdef _Gii
   m_giienable = true;
@@ -336,6 +337,7 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
   strcpy_s(m_szDSMPluginFilename, 260,s.m_szDSMPluginFilename);
   strcpy_s(m_document_folder, MAX_PATH,s.m_document_folder);
   strcpy_s(m_prefix, 56,s.m_prefix);
+  strcpy_s(m_imageFormat, 56, s.m_imageFormat);
   
   strcpy_s(m_host_options, 256,s.m_host_options);
   m_port				= s.m_port;
@@ -1064,6 +1066,7 @@ void VNCOptions::Save(char *fname)
   WritePrivateProfileString("options", "DSMPlugin", m_szDSMPluginFilename, fname);
   WritePrivateProfileString("options", "folder", m_document_folder, fname);
   WritePrivateProfileString("options", "prefix", m_prefix, fname);
+  WritePrivateProfileString("options", "imageFormat", m_imageFormat, fname);
   saveInt("AutoReconnect", m_autoReconnect,	fname);
  
   saveInt("ExitCheck",				m_fExitCheck,	fname); //PGM @ Advantig
@@ -1148,6 +1151,7 @@ void VNCOptions::Load(char *fname)
   GetPrivateProfileString("options", "DSMPlugin", "NoPlugin", m_szDSMPluginFilename, MAX_PATH, fname);
   GetPrivateProfileString("options", "folder", m_document_folder, m_document_folder, MAX_PATH, fname);
   GetPrivateProfileString("options", "prefix", m_prefix, m_prefix, 56, fname);
+  GetPrivateProfileString("options", "imageFormat", m_imageFormat, m_imageFormat, 56, fname);
   if (!g_disable_sponsor) g_disable_sponsor=readInt("sponsor",			g_disable_sponsor, fname) != 0;
 
   /*if (!g_disable_sponsor)

@@ -104,6 +104,7 @@ public:
 	bool listening;
 	TCHAR folder[MAX_PATH];
 	TCHAR prefix[56];
+	TCHAR imageFormat[56];
 	bool scaling;
 	int keepAliveInterval;
 	bool fAutoAcceptIncoming;

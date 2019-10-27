@@ -153,6 +153,7 @@ public:
 
 	TCHAR m_document_folder[MAX_PATH];
 	TCHAR m_prefix[56];
+	TCHAR m_imageFormat[56];
 	bool m_running;
 
 	TCHAR m_optionfile[MAX_PATH];

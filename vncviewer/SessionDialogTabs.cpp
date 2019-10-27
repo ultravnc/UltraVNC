@@ -366,7 +366,7 @@ BOOL CALLBACK DlgProcMisc(HWND hwnd, UINT uMsg,WPARAM wParam, LPARAM lParam)
 					g_disable_sponsor = true;
 				else 
 					g_disable_sponsor = false;
-
+				GetDlgItemText( hwnd,  IDC_IMAGEFORMAT, _this->imageFormat, 56);
 				return TRUE;}
 			case IDC_BROWSE:
 				_tcscpy_s(_this->folder,MAX_PATH ,BrowseFolder(_this->folder, hwnd));
@@ -744,6 +744,20 @@ void SessionDialog::InitDlgProcMisc()
 	SetDlgItemText(hwnd, IDC_PREFIX, prefix);
 	HWND hNoStatus = GetDlgItem(hwnd, IDC_HIDESTATUS);
 	SendMessage(hNoStatus, BM_SETCHECK, NoStatus, 0);
+	HWND hcomboscreen = GetDlgItem(hwnd, IDC_IMAGEFORMAT);
+	SendMessage(hcomboscreen, CB_RESETCONTENT, 0, 0);
+    SendMessage(hcomboscreen, CB_ADDSTRING, 0, (LPARAM) ".jpeg");
+	SendMessage(hcomboscreen, CB_ADDSTRING, 0, (LPARAM) ".png");
+	SendMessage(hcomboscreen, CB_ADDSTRING, 0, (LPARAM) ".gif");
+	SendMessage(hcomboscreen, CB_ADDSTRING, 0, (LPARAM) ".bmp");
+	if (strcmp(imageFormat, ".jpeg") == NULL)
+		SendMessage(hcomboscreen, CB_SETCURSEL, 0, 0);
+	if (strcmp(imageFormat, ".png") == NULL)
+		SendMessage(hcomboscreen, CB_SETCURSEL, 1, 0);
+	if (strcmp(imageFormat, ".gif") == NULL)
+		SendMessage(hcomboscreen, CB_SETCURSEL, 2, 0);
+	if (strcmp(imageFormat, ".bmp") == NULL)
+		SendMessage(hcomboscreen, CB_SETCURSEL, 3, 0);
 }
 ////////////////////////////////////////////////////////////////////////////////
 void SessionDialog::InitDlgProcSecurity()
@@ -952,8 +966,8 @@ void SessionDialog::ReadDlgProcMisc()
 		g_disable_sponsor = false;
 
 	HWND hNoStatus = GetDlgItem(hwnd, IDC_HIDESTATUS);
-	NoStatus = 
-			(SendMessage(hNoStatus, BM_GETCHECK, 0, 0) == BST_CHECKED);
+	NoStatus =  (SendMessage(hNoStatus, BM_GETCHECK, 0, 0) == BST_CHECKED);
+	GetDlgItemText( hwnd,  IDC_IMAGEFORMAT, imageFormat, 56);
 }
 ////////////////////////////////////////////////////////////////////////////////
 void SessionDialog::ReadDlgProcSecurity()
@@ -1366,6 +1380,7 @@ void SessionDialog::StartListener()
 	m_pOpt->m_oldplugin = oldplugin;
 	strcpy_s(m_pOpt->m_document_folder, folder);
 	strcpy_s(m_pOpt->m_prefix, prefix);
+	strcpy_s(m_pOpt->m_imageFormat, imageFormat);
 	m_pOpt->m_scaling = scaling;
 	m_pOpt->m_keepAliveInterval = keepAliveInterval;
 	m_pOpt->m_fAutoAcceptIncoming = fAutoAcceptIncoming;

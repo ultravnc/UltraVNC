@@ -69,7 +69,7 @@ std::string datetime()
     return std::string(buffer);
 }
 
-void Snapshot::SaveJpeg(HBITMAP membit,TCHAR folder[MAX_PATH], TCHAR prefix[56])
+void Snapshot::SaveJpeg(HBITMAP membit,TCHAR folder[MAX_PATH], TCHAR prefix[56], TCHAR imageFormat[56])
 {
 	_tcscpy_s(m_folder,  folder);
 	_tcscpy_s(m_prefix,  prefix);
@@ -77,6 +77,7 @@ void Snapshot::SaveJpeg(HBITMAP membit,TCHAR folder[MAX_PATH], TCHAR prefix[56])
 		DoDialogSnapshot(m_folder, m_prefix);
 
 	TCHAR filename[MAX_PATH];
+	TCHAR expanded_filename[MAX_PATH];
 	_tcscpy_s(filename, m_folder);
 	_tcscat_s(filename, "\\");
 	_tcscat_s(filename, m_prefix); 
@@ -89,7 +90,8 @@ void Snapshot::SaveJpeg(HBITMAP membit,TCHAR folder[MAX_PATH], TCHAR prefix[56])
     _tcsftime(buffer,80,"%d-%m-%Y %H-%M-%S",timeinfo);
 	_tcscat_s(filename, "_");
 	_tcscat_s(filename, buffer);
-	_tcscat_s(filename, ".jpeg");
+	_tcscat_s(filename, imageFormat);
+	ExpandEnvironmentStrings(filename, expanded_filename, MAX_PATH);
 	using namespace Gdiplus;
 	GdiplusStartupInput gdiplusStartupInput;
 	ULONG_PTR gdiplusToken;
@@ -98,9 +100,17 @@ void Snapshot::SaveJpeg(HBITMAP membit,TCHAR folder[MAX_PATH], TCHAR prefix[56])
 	{		
 		Gdiplus::Bitmap bitmap(membit, NULL);
 		CLSID clsid;
-		GetEncoderClsid(L"image/jpeg", &clsid);
+		if (strcmp(imageFormat, ".jpeg") == NULL)
+			GetEncoderClsid(L"image/jpeg", &clsid);
+		else if (strcmp(imageFormat, ".png") == NULL)
+			GetEncoderClsid(L"image/png", &clsid);
+		else if (strcmp(imageFormat, ".gif") == NULL)
+			GetEncoderClsid(L"image/gif", &clsid);
+		else if (strcmp(imageFormat, ".bmp") == NULL)
+			GetEncoderClsid(L"image/bmp", &clsid);
+
 		WCHAR wc[MAX_PATH];
-		mbstowcs(wc, filename, MAX_PATH);
+		mbstowcs(wc, expanded_filename, MAX_PATH);
 		bitmap.Save(wc, &clsid);
 	}
 	GdiplusShutdown(gdiplusToken);

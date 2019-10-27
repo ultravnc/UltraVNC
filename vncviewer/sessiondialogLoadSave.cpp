@@ -183,6 +183,7 @@ void SessionDialog::SaveToFile(char *fname, bool asDefault)
 	WritePrivateProfileString("options", "DSMPlugin",	szDSMPluginFilename, fname);
 	WritePrivateProfileString("options", "folder",		folder, fname);
 	WritePrivateProfileString("options", "prefix",		prefix, fname);
+	WritePrivateProfileString("options", "imageFormat",		imageFormat, fname);
 	saveInt("AutoReconnect",		autoReconnect,	fname);
 	saveInt("FileTransferTimeout",  FTTimeout,    fname);
 	saveInt("ThrottleMouse",		throttleMouse,    fname); 
@@ -253,6 +254,7 @@ void SessionDialog::LoadFromFile(char *fname)
   GetPrivateProfileString("options", "DSMPlugin", "NoPlugin", szDSMPluginFilename, MAX_PATH, fname);
   GetPrivateProfileString("options", "folder", folder, folder, MAX_PATH, fname);
   GetPrivateProfileString("options", "prefix", prefix, prefix, 56, fname);
+  GetPrivateProfileString("options", "imageFormat", imageFormat, imageFormat, 56, fname);  
   if (!g_disable_sponsor) g_disable_sponsor=readInt("sponsor",			g_disable_sponsor, fname) != 0;
   autoReconnect =		readInt("AutoReconnect",	autoReconnect, fname);
   FTTimeout  =			readInt("FileTransferTimeout", FTTimeout, fname);
@@ -347,6 +349,7 @@ void SessionDialog::SetDefaults()
 	oldplugin=false;
 	selected=1;
 	_tcscpy_s(prefix, "vnc_");
+	_tcscpy_s(imageFormat, ".jpeg");
 	fAutoAcceptIncoming = false;
 	fAutoAcceptNoDSM = false;
 	fRequireEncryption = false;

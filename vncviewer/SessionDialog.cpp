@@ -118,6 +118,7 @@ SessionDialog::SessionDialog(VNCOptions *pOpt, ClientConnection* pCC, CDSMPlugin
 
 	strcpy_s(folder, m_pOpt->m_document_folder);
 	strcpy_s(prefix, m_pOpt->m_prefix);
+	strcpy_s(imageFormat, m_pOpt->m_imageFormat);
 
 	scaling = m_pOpt->m_scaling;
 
@@ -555,6 +556,7 @@ bool SessionDialog::connect(HWND hwnd)
 	m_pOpt->m_oldplugin = oldplugin;
 	strcpy_s(m_pOpt->m_document_folder, folder);
 	strcpy_s(m_pOpt->m_prefix, prefix);
+	strcpy_s(m_pOpt->m_imageFormat, imageFormat);
 	m_pOpt->m_scaling = scaling;
 	m_pOpt->m_keepAliveInterval = keepAliveInterval;
 	m_pOpt->m_fAutoAcceptIncoming = fAutoAcceptIncoming;

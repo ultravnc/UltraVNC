@@ -16,5 +16,5 @@ public:
 	int DoDialogSnapshot(TCHAR folder[MAX_PATH], TCHAR prefix[56]);
 	TCHAR *getFolder(){return m_folder;}
 	TCHAR *getPrefix(){return m_prefix;}
-	void SaveJpeg(HBITMAP membit,TCHAR folder[MAX_PATH], TCHAR prefix[56]);
+	void SaveJpeg(HBITMAP membit,TCHAR folder[MAX_PATH], TCHAR prefix[56], TCHAR format[56]);
 };

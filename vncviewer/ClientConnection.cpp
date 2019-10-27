@@ -7437,7 +7437,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 					case ID_SW:
 						{
 						Snapshot snapshot;
-						snapshot.SaveJpeg(_this->m_membitmap,_this->m_opts.m_document_folder, _this->m_opts.m_prefix);
+						snapshot.SaveJpeg(_this->m_membitmap,_this->m_opts.m_document_folder, _this->m_opts.m_prefix,  _this->m_opts.m_imageFormat);
 						_tcscpy_s(_this->m_opts.m_document_folder,snapshot.getFolder());
 						_tcscpy_s(_this->m_opts.m_prefix, snapshot.getPrefix());
 						}
@@ -8599,7 +8599,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 				case tbWM_PHOTO:
 					{
 						Snapshot snapshot;
-						snapshot.SaveJpeg(_this->m_membitmap,_this->m_opts.m_document_folder, _this->m_opts.m_prefix);
+						snapshot.SaveJpeg(_this->m_membitmap,_this->m_opts.m_document_folder, _this->m_opts.m_prefix,  _this->m_opts.m_imageFormat);
 						_tcscpy_s(_this->m_opts.m_document_folder,snapshot.getFolder());
 						_tcscpy_s(_this->m_opts.m_prefix, snapshot.getPrefix());
 					}
