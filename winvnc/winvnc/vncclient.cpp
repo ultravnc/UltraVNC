@@ -4646,7 +4646,7 @@ vncClient::~vncClient()
 	//thos give sometimes errors, hlogfile is already removed at this point
 	//vnclog.Print(LL_INTINFO, VNCLOG("cached %d \n"),totalraw);
 
-	if ((SPECIAL_SC_EXIT || (m_server->GetRdpmode() && m_fRunningFromExternalService)) && !fShutdownOrdered) // if fShutdownOrdered, hwnd may not be valid
+	if ((SPECIAL_SC_EXIT || (m_server->RunningFromExternalServiceRdp())) && !fShutdownOrdered) // if fShutdownOrdered, hwnd may not be valid
 	{
 		//adzm 2009-06-20 - if we are SC, only exit if no other viewers are connected!
 		// (since multiple viewers is now allowed with the new DSM plugin)

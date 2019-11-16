@@ -654,7 +654,7 @@ void ClientConnection::Run()
 }
 
 // sf@2007 - Autoreconnect
-void ClientConnection::DoConnection()
+void ClientConnection::DoConnection(bool reconnect)
 {
 	omni_mutex_lock l(m_bitmapdcMutex);
 	if (m_pDSMPlugin->IsEnabled())
@@ -697,7 +697,7 @@ void ClientConnection::DoConnection()
 //	if (flash) {flash->Killflash();}
 	SendClientInit();
 
-	ReadServerInit();
+	ReadServerInit(reconnect);
 
 	//CreateLocalFramebuffer();
 
@@ -716,7 +716,7 @@ DWORD WINAPI ReconnectThreadProc(LPVOID lpParameter)
 	Sleep( cc->m_autoReconnect * 1000 );
 	try
 	{
-		cc->DoConnection();
+		cc->DoConnection(true);
 		cc->m_bKillThread = false;
 		cc->m_running = true;
 		cc->m_pendingFormatChange=true;
@@ -3588,7 +3588,7 @@ void ClientConnection::SendClientInit()
     WriteExact((char *)&ci, sz_rfbClientInitMsg); // sf@2002 - RSM Plugin
 }
 
-void ClientConnection::ReadServerInit()
+void ClientConnection::ReadServerInit(bool reconnect)
 {
     ReadExact((char *)&m_si, sz_rfbServerInitMsg);
 
@@ -3634,11 +3634,13 @@ void ClientConnection::ReadServerInit()
 
 	if (m_opts.m_ViewOnly) SetWindowText(m_hwndMain, m_desktopName_viewonly);
 	else SetWindowText(m_hwndMain, m_desktopName);
-	SizeWindow();
+	SizeWindow(reconnect);
 }
 
-void ClientConnection::SizeWindow()
+void ClientConnection::SizeWindow(bool reconnect)
 {
+	bool pos_set = reconnect;
+	bool size_set = reconnect;
 	// Find how large the desktop work area is
 	RECT workrect;
 	tempdisplayclass tdc;
@@ -3763,10 +3765,9 @@ void ClientConnection::SizeWindow()
 		temp_h = m_pMRUxy->Get_h(m_host);
 		if (m_pMRUxy) delete m_pMRUxy;
 	}
-	bool pos_set = false;
-	bool size_set = false;
+
 	//added position x y w y via commandline or x y 0 0
-	if (m_opts.m_w != 0 || m_opts.m_h != 0 || m_opts.m_x != 0 || m_opts.m_y!=0)
+	if ((m_opts.m_w != 0 || m_opts.m_h != 0 || m_opts.m_x != 0 || m_opts.m_y!=0) && !pos_set)
 	{
 		// x y w h
 		if (m_opts.m_w != 0 && m_opts.m_h != 0)
@@ -3780,7 +3781,7 @@ void ClientConnection::SizeWindow()
 			SetWindowPos(m_hwndMain, HWND_TOP, m_opts.m_x, m_opts.m_y, m_opts.m_w, m_opts.m_h, SWP_SHOWWINDOW | SWP_NOSIZE);
 		}
 	}
-	else if (m_opts.m_SavePos || m_opts.m_SaveSize)
+	else if ((m_opts.m_SavePos || m_opts.m_SaveSize) && !pos_set)
 	{
 
 		if (m_opts.m_SavePos && m_opts.m_SaveSize && temp_w != 0 && temp_h != 0)
@@ -3807,7 +3808,7 @@ void ClientConnection::SizeWindow()
 	if (m_opts.m_selected_screen==0 && (m_fullwinwidth <= bb )) //fit on primary
 		// -20 for border
 	{
-		if (pos_set==false) SetWindowPos(m_hwndMain, HWND_TOP,tdc.monarray[1].wl + ((tdc.monarray[1].wr-tdc.monarray[1].wl)-m_winwidth) / 2,tdc.monarray[1].wt +
+		if (pos_set == false) SetWindowPos(m_hwndMain, HWND_TOP,tdc.monarray[1].wl + ((tdc.monarray[1].wr-tdc.monarray[1].wl)-m_winwidth) / 2,tdc.monarray[1].wt +
 			((tdc.monarray[1].wb - tdc.monarray[1].wt) - m_winheight) / 2, m_winwidth, m_winheight, SWP_SHOWWINDOW | SWP_NOSIZE);
         if (size_set == false)
         {

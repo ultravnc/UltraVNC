@@ -317,29 +317,21 @@ bool IsAnyRDPSessionActive()
 	helper::DynamicFn<pfnWTSFreeMemory> pWTSFreeMemory("wtsapi32", "WTSFreeMemory");
 
 	if (pWTSEnumerateSessions.isValid() && pWTSFreeMemory.isValid())
-
-
-		if ((*pWTSEnumerateSessions)(WTS_CURRENT_SERVER_HANDLE, 0, 1, &pSessions, &nSessions))
-		{
-			for (DWORD i(0); i < nSessions && !rdpSessionExists; ++i)
-			{
+		if ((*pWTSEnumerateSessions)(WTS_CURRENT_SERVER_HANDLE, 0, 1, &pSessions, &nSessions)) {
+			for (DWORD i(0); i < nSessions && !rdpSessionExists; ++i) {
 				if ((_stricmp(pSessions[i].pWinStationName, "Console") != 0) &&
 					(pSessions[i].State == WTSActive ||
 						pSessions[i].State == WTSShadow ||
 						pSessions[i].State == WTSConnectQuery
 						))
-				{
 					rdpSessionExists = true;
-				}
 			}
-
 			(*pWTSFreeMemory)(pSessions);
 		}
-
 	return rdpSessionExists ? true : false;
 }
 //////////////////////////////////////////////////////////////////////////////
-static int pad2(bool preconnect)
+static int createWinvncExeCall(bool preconnect, bool rdpselect)
 {
 
 	OSVERSIONINFO OSversion;
@@ -361,13 +353,14 @@ static int pad2(bool preconnect)
 
     strcpy_s(app_path, exe_file_name);
 	if (preconnect)
-	{
-		strcat_s(app_path, " ");
-		strcat_s(app_path, "-preconnect");
-	}
-	strcat_s(app_path, " ");
-	strcat_s(app_path,cmdtext);
-    strcat_s(app_path, "_run");
+		strcat_s(app_path, " -preconnect");
+	if (rdpselect)
+			strcat_s(app_path, " -service_rdp_run");
+		else
+			strcat_s(app_path, " -service_run");
+	//strcat_s(app_path, " ");
+	//strcat_s(app_path,cmdtext);
+    //strcat_s(app_path, "_run");
 	IniFile myIniFile;
 	kickrdp=myIniFile.ReadInt("admin", "kickrdp", kickrdp);
 	clear_console=myIniFile.ReadInt("admin", "clearconsole", clear_console);
@@ -376,13 +369,13 @@ static int pad2(bool preconnect)
 	{
 		strcpy_s(app_path, exe_file_name);
 		if (preconnect)
-		{
-			strcat_s(app_path, " ");
-			strcat_s(app_path, "-preconnect");
-		}
+			strcat_s(app_path, " -preconnect");
 		strcat_s(app_path, " ");
 		strcat_s(app_path,cmdline);
-		strcat_s(app_path, " -service_run");
+		if (rdpselect)
+			strcat_s(app_path, " -service_rdp_run");
+		else
+			strcat_s(app_path, " -service_run");
 	}
 	return 0;
 }
@@ -587,7 +580,7 @@ GetSessionUserTokenWin(OUT LPHANDLE  lphUserToken,DWORD mysessionID)
 //////////////////////////////////////////////////////////////////////////////
 // START the app as system 
 BOOL
-LaunchProcessWin(DWORD dwSessionId,bool preconnect)
+LaunchProcessWin(DWORD dwSessionId,bool preconnect, bool rdpselect)
 {
   BOOL                 bReturn = FALSE;
   HANDLE               hToken=NULL;
@@ -601,7 +594,7 @@ LaunchProcessWin(DWORD dwSessionId,bool preconnect)
   StartUPInfo.lpDesktop = "Winsta0\\Default";
   StartUPInfo.cb = sizeof(STARTUPINFO);
   SetTBCPrivileges();
-  pad2(preconnect);
+  createWinvncExeCall(preconnect, rdpselect);
 
   if ( GetSessionUserTokenWin(&hToken,dwSessionId) )
   {
@@ -829,8 +822,8 @@ void monitor_sessions_RDP()
 {
 	BOOL  RDPMODE = false;
 	IniFile myIniFile;
-	RDPMODE = myIniFile.ReadInt("admin", "rdpmode", 0) && IsAnyRDPSessionActive();
-	pad2(false);
+	RDPMODE = myIniFile.ReadInt("admin", "rdpmode", 0);
+	createWinvncExeCall(false , false);
 	DWORD requestedSessionID = 0;
 	DWORD dwSessionId = 0;
 	DWORD OlddwSessionId = 99;
@@ -856,7 +849,7 @@ void monitor_sessions_RDP()
 	testevent2[0] = stopServiceEvent;
 	testevent2[1] = hEventcad;
 
-
+	//IsAnyRDPSessionActive()
 	while (ToCont && serviceStatus.dwCurrentState == SERVICE_RUNNING)
 	{
 		DWORD dwEvent;		
@@ -895,7 +888,7 @@ void monitor_sessions_RDP()
 				sessidcounter++;
 				if (sessidcounter > 10) break;
 			}
-			LaunchProcessWin(requestedSessionID, false);
+			LaunchProcessWin(requestedSessionID, false, true);
 			OlddwSessionId = requestedSessionID;
 			preconnect_start = true;
 		}
@@ -934,11 +927,13 @@ void monitor_sessions_RDP()
 		break;
 
 		case WAIT_TIMEOUT:
-			if (RDPMODE) {
+			if (RDPMODE && IsAnyRDPSessionActive()) {
+
 				//First RUN	
 				if (ProcessInfo.hProcess == NULL){
 					if (IsAnyRDPSessionActive()){
-						LaunchProcessWin(0, true);
+
+						LaunchProcessWin(0, true, false);
 						OlddwSessionId = 0;
 						preconnect_start = false;
 						goto whileloop;
@@ -953,7 +948,8 @@ void monitor_sessions_RDP()
 							sessidcounter++;
 							if (sessidcounter > 10) break;
 						}
-						LaunchProcessWin(dwSessionId, false);
+
+						LaunchProcessWin(dwSessionId, false, false);
 						OlddwSessionId = dwSessionId;
 						preconnect_start = false;
 						goto whileloop;
@@ -972,18 +968,21 @@ void monitor_sessions_RDP()
 					if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
 					ProcessInfo.hProcess = NULL;
 					ProcessInfo.hThread = NULL;
-					RDPMODE = myIniFile.ReadInt("admin", "rdpmode", 0) && IsAnyRDPSessionActive();;
+					RDPMODE = myIniFile.ReadInt("admin", "rdpmode", 0);
 					Sleep(1000);
 					goto whileloop;
 				}
 
 				if (dwCode == STILL_ACTIVE) goto whileloop;
-				if (ProcessInfo.hProcess) WaitForSingleObject(ProcessInfo.hProcess, 15000);
-				if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
-				if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
+				if (ProcessInfo.hProcess) 
+					WaitForSingleObject(ProcessInfo.hProcess, 15000);
+				if (ProcessInfo.hProcess) 
+					CloseHandle(ProcessInfo.hProcess);
+				if (ProcessInfo.hThread) 
+					CloseHandle(ProcessInfo.hThread);
 				ProcessInfo.hProcess = NULL;
 				ProcessInfo.hThread = NULL;
-				RDPMODE = myIniFile.ReadInt("admin", "rdpmode", 0) && IsAnyRDPSessionActive();;
+				RDPMODE = myIniFile.ReadInt("admin", "rdpmode", 0);
 				Sleep(1000);
 				goto whileloop;
 				}//timeout
@@ -997,23 +996,27 @@ void monitor_sessions_RDP()
 					DWORD dwCode = 0;
 					if (ProcessInfo.hProcess == NULL){
 						//First RUNf
-						LaunchProcessWin(dwSessionId, false);
+
+						LaunchProcessWin(dwSessionId, false, false);
 						OlddwSessionId = dwSessionId;
 					}
 					else if (GetExitCodeProcess(ProcessInfo.hProcess, &dwCode)){
 						if (dwCode != STILL_ACTIVE){
+
 							WaitForSingleObject(ProcessInfo.hProcess, 15000);
 							if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
 							if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
 							ProcessInfo.hProcess = NULL;
 							ProcessInfo.hThread = NULL;							
 							int sessidcounter = 0;
+
 							while ((OlddwSessionId == dwSessionId) || dwSessionId == 0xFFFFFFFF){
 								Sleep(1000);
 								if (lpfnWTSGetActiveConsoleSessionId.isValid()) dwSessionId = (*lpfnWTSGetActiveConsoleSessionId)();
 								sessidcounter++;
 								if (sessidcounter > 10) break;
 							}
+
 							RDPMODE = myIniFile.ReadInt("admin", "rdpmode", 0);
 							goto whileloop;
 						}
@@ -1024,12 +1027,14 @@ void monitor_sessions_RDP()
 						ProcessInfo.hProcess = NULL;
 						ProcessInfo.hThread = NULL;
 						int sessidcounter = 0;
+
 						while (OlddwSessionId == dwSessionId){
 							Sleep(1000);
 							if (lpfnWTSGetActiveConsoleSessionId.isValid()) dwSessionId = (*lpfnWTSGetActiveConsoleSessionId)();
 							sessidcounter++;
 							if (sessidcounter > 10) break;
 						}
+
 						RDPMODE = myIniFile.ReadInt("admin", "rdpmode", 0);
 						goto whileloop;
 					}
@@ -1039,42 +1044,29 @@ void monitor_sessions_RDP()
 
 		}//switch
 
-	whileloop:
-#ifdef _DEBUG
-		char			szText[256];
-		sprintf_s(szText, " ++++++1 %i %i %i\n", OlddwSessionId, dwSessionId, (int)ProcessInfo.hProcess);
-		OutputDebugString(szText);
-#else
+whileloop:
 		;
-#endif
 	}//while
-#ifdef _DEBUG
-	char			szText[256];
-	sprintf_s(szText, " ++++++SetEvent Service stopping: signal tray icon to shut down\n");
-	OutputDebugString(szText);
-#endif
 
-	if (hEvent) SetEvent(hEvent);
-
-	if (ProcessInfo.hProcess)
-	{
-#ifdef _DEBUG
-		OutputDebugString("Waiting up to 15 seconds for tray icon process to exit\n");
-#endif
+	if (hEvent) 
+		SetEvent(hEvent);
+	if (ProcessInfo.hProcess) {
 		WaitForSingleObject(ProcessInfo.hProcess, 15000);
 		if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
 		if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
 		ProcessInfo.hProcess = NULL;
 		ProcessInfo.hThread = NULL;
 	}
-
-	//	EndProcess();
-
-	if (hEvent) CloseHandle(hEvent);
-	if (hEventcad) CloseHandle(hEventcad);
-	if (hEventPreConnect) CloseHandle(hEventPreConnect);
-	if (data) UnmapViewOfFile(data);
-	if (hMapFile != NULL) CloseHandle(hMapFile);
+	if (hEvent) 
+		CloseHandle(hEvent);
+	if (hEventcad) 
+		CloseHandle(hEventcad);
+	if (hEventPreConnect) 
+		CloseHandle(hEventPreConnect);
+	if (data) 
+		UnmapViewOfFile(data);
+	if (hMapFile != NULL) 
+		CloseHandle(hMapFile);
 }
 
 // 20 April 2008 jdp paquette@atnetsend.net

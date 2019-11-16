@@ -66,7 +66,8 @@ void InitIpp();
 HINSTANCE	hAppInstance;
 const char	*szAppName = "WinVNC";
 DWORD		mainthreadId;
-BOOL		fRunningFromExternalService=false;
+BOOL		fRunningFromExternalService = false;
+BOOL		fRunningFromExternalServiceRdp = false;
 
 //adzm 2009-06-20
 char* g_szRepeaterHost = NULL;
@@ -768,6 +769,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 			return returnvalue;
 		}
 
+		if (strncmp(&szCmdLine[i], winvncRunServiceRdp, strlen(winvncRunServiceRdp)) == 0)
+		{
+			//Run as service
+			if (!Myinit(hInstance)) return 0;
+			fRunningFromExternalService = true;
+			fRunningFromExternalServiceRdp = true;
+			vncService::RunningFromExternalService(true);
+			int returnvalue = WinVNCAppMain();
+#ifdef CRASHRPT
+			crUninstall();
+#endif
+			return returnvalue;
+		}
+
 		if (strncmp(&szCmdLine[i], winvncStartService, strlen(winvncStartService)) == 0)
 		{
 		start_service(szCmdLine);
@@ -1378,6 +1393,7 @@ int WinVNCAppMain()
 
 	// sf@2007 - Set Application0 special mode
 	server.RunningFromExternalService(fRunningFromExternalService);
+	server.RunningFromExternalServiceRdp(fRunningFromExternalServiceRdp);
 
 	// sf@2007 - New impersonation thread stuff for tray icon & menu
 	// Subscribe to shutdown event

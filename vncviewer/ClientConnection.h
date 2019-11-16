@@ -253,7 +253,7 @@ private:
 	void AuthSecureVNCPlugin_old();
 	////////////////////////////////////////////////
 	void NegotiateProxy();
-	void ReadServerInit();
+	void ReadServerInit(bool reconnect);
 	void SendClientInit();
 	void CreateLocalFramebuffer();
 	void SaveConnection();
@@ -309,7 +309,7 @@ private:
 	int initialupdate_counter;
 	void ReadScreenUpdate();
 	void Update(RECT *pRect);
-	void SizeWindow();
+	void SizeWindow(bool reconnect = false);
 	bool sizing_set;
 	bool ScrollScreen(int dx, int dy);
 	void UpdateScrollbars();
@@ -812,7 +812,7 @@ public:
 	VNCOptions m_opts;
 	int m_autoReconnect;
 	int reconnectcounter;
-	void DoConnection();
+	void DoConnection(bool reconnect = false);
 	bool m_bKillThread;
 	bool m_running;
 	HWND m_hwndMain;
