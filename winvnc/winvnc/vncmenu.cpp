@@ -1130,7 +1130,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		case ID_CLOSE:
 			// User selected Close from the tray menu
 			fShutdownOrdered=TRUE;
-			Sleep(1000);
+			//Sleep(1000);
 			vnclog.Print(LL_INTINFO, VNCLOG("KillAuthClients() ID_CLOSE \n"));
 			_this->m_server->KillAuthClients();
 			PostMessage(hwnd, WM_CLOSE, 0, 0);
@@ -1515,7 +1515,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			ResetAero();
 
 		vnclog.Print(LL_INTERR, VNCLOG("vncMenu WM_CLOSE call - All cleanup done\n"));
-		Sleep(2000);
+		//Sleep(2000);
 		DestroyWindow(hwnd);
 		break;
 		

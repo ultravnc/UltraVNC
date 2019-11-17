@@ -1010,7 +1010,7 @@ void monitor_sessions_RDP()
 							ProcessInfo.hThread = NULL;							
 							int sessidcounter = 0;
 
-							while ((OlddwSessionId == dwSessionId) || dwSessionId == 0xFFFFFFFF){
+							while (dwSessionId == 0xFFFFFFFF){
 								Sleep(1000);
 								if (lpfnWTSGetActiveConsoleSessionId.isValid()) dwSessionId = (*lpfnWTSGetActiveConsoleSessionId)();
 								sessidcounter++;
@@ -1028,7 +1028,7 @@ void monitor_sessions_RDP()
 						ProcessInfo.hThread = NULL;
 						int sessidcounter = 0;
 
-						while (OlddwSessionId == dwSessionId){
+						while (dwSessionId == 0xFFFFFFFF){
 							Sleep(1000);
 							if (lpfnWTSGetActiveConsoleSessionId.isValid()) dwSessionId = (*lpfnWTSGetActiveConsoleSessionId)();
 							sessidcounter++;
