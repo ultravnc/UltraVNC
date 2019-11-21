@@ -53,9 +53,9 @@ VNCviewerApp::VNCviewerApp(HINSTANCE hInstance, LPTSTR szCmdLine) {
 	if (m_options.m_logToFile) {
 		vnclog.SetFile(m_options.m_logFilename);
 	}
-vnclog.SetLevel(20);
-vnclog.SetMode(1);
-vnclog.SetFile("vncviewer.log");
+//vnclog.SetLevel(20);
+//vnclog.SetMode(1);
+//vnclog.SetFile(_T(".\vncviewer.log"));
 #ifdef PALM_LOG
 	// Hack override for WinCE Palm developers who can't give
 	// options to commands, not even via shortcuts.

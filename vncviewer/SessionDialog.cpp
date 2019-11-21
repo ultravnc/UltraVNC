@@ -134,35 +134,10 @@ SessionDialog::SessionDialog(VNCOptions *pOpt, ClientConnection* pCC, CDSMPlugin
 	/////////////////////////////////////////////////
 	hBmpExpand = (HBITMAP)::LoadImage(pApp->m_instance, MAKEINTRESOURCE(IDB_EXPAND), IMAGE_BITMAP, 0, 0, LR_LOADTRANSPARENT);
 	hBmpCollaps = (HBITMAP)::LoadImage(pApp->m_instance, MAKEINTRESOURCE(IDB_COLLAPS), IMAGE_BITMAP, 0, 0, LR_LOADTRANSPARENT);
-	hTabEncoders = NULL;
-	hTabKeyboardMouse = NULL;
-	hTabDisplay = NULL;
-	hTabMisc = NULL;
-	hTabSecurity = NULL;
-	hTabQuickOptions = NULL;
-	hTabListen = NULL;
-	m_hTab = NULL;
-	browser_hwnd = NULL;
 }
 
 SessionDialog::~SessionDialog()
 {
-	if (m_hTab != NULL)
-		return;
-	if (hTabEncoders)
-		DestroyWindow(hTabEncoders);
-	if (hTabKeyboardMouse)
-		DestroyWindow(hTabKeyboardMouse);
-	if (hTabDisplay)
-		DestroyWindow(hTabDisplay);
-	if (hTabMisc)
-		DestroyWindow(hTabMisc);
-	if (hTabSecurity)
-		DestroyWindow(hTabSecurity);
-	if (hTabQuickOptions)
-		DestroyWindow(hTabQuickOptions);
-	if (hTabListen)
-		DestroyWindow(hTabListen);
     delete m_pMRU;
 }
 
@@ -201,7 +176,8 @@ BOOL CALLBACK SessDlgProc(  HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 			SendMessage(hExitCheck, BM_SETCHECK, l_this->fExitCheck, 0); //PGM @ Advantig
 			
 			_this->ExpandBox(hwnd, !_this->m_bExpanded);
-			SendMessage(GetDlgItem(hwnd, IDC_EXPAND), STM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)_this->hBmpExpand);						
+			SendMessage(GetDlgItem(hwnd, IDC_EXPAND), STM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)_this->hBmpExpand);			
+			l_this->InitTab(hwnd);
             return TRUE;
 		}
 
@@ -211,9 +187,6 @@ BOOL CALLBACK SessDlgProc(  HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 	case WM_COMMAND:
 		switch (LOWORD(wParam))
 		{
-			case IDC_PROXY_CHECK:
-				EnableWindow(GetDlgItem(hwnd, IDC_PROXY_EDIT), (SendMessage(GetDlgItem(hwnd, IDC_PROXY_CHECK), BM_GETCHECK, 0, 0) == BST_CHECKED) );
-				break;
 			case IDC_HOSTNAME_EDIT: 
 				if (HIWORD(wParam) == CBN_SELCHANGE) {					
 					TCHAR hostname[256];
@@ -243,17 +216,14 @@ BOOL CALLBACK SessDlgProc(  HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 			case IDC_SAVEAS:
 				_this->SaveConnection(hwnd, true);
 				break;
-			case IDCONNECT:
-				_this->InitTab(hwnd);
+			case IDCONNECT:			
 				return _this->connect(hwnd);
 			case IDCANCEL:
 				EndDialog(hwnd, FALSE);
 				return TRUE;		
 			case IDC_SHOWOPTIONS:
 			case IDC_EXPAND:
-					_this->ExpandBox(hwnd, !_this->m_bExpanded);
-				if (_this->m_bExpanded)
-					_this->InitTab(hwnd);
+				_this->ExpandBox(hwnd, !_this->m_bExpanded);
 				return TRUE;
 			case IDC_OPTIONBUTTON:
 				{				
@@ -435,8 +405,8 @@ void SessionDialog::InitPlugin(HWND hwnd)
 
 			SendMessage(hPlugins, CB_SETCURSEL, 0, 0);
 
-			EnableWindow(GetDlgItem(hwnd, IDC_PLUGIN_BUTTON), FALSE); // sf@2009 - Disable plugin config button by default			
-			EnableWindow(GetDlgItem(hwnd, IDC_PLUGINS_COMBO), fUseDSMPlugin);
+			HWND hButton = GetDlgItem(hwnd, IDC_PLUGIN_BUTTON);
+			EnableWindow(hButton, FALSE); // sf@2009 - Disable plugin config button by default
 
 			//AaronP
 			if( strcmp( szDSMPluginFilename, "" ) != 0 && fUseDSMPlugin )
@@ -449,7 +419,7 @@ void SessionDialog::InitPlugin(HWND hwnd)
 					SendMessage(hPlugins, CB_SETCURSEL, pos, 0);
 					HWND hUsePlugin = GetDlgItem(hwnd, IDC_PLUGIN_CHECK);
 					SendMessage(hUsePlugin, BM_SETCHECK, TRUE, 0);
-					EnableWindow(GetDlgItem(hwnd, IDC_PLUGIN_BUTTON), TRUE); // sf@2009 - Enable plugin config button
+					EnableWindow(hButton, TRUE); // sf@2009 - Enable plugin config button
 				}
 			}
 			//EndAaron
@@ -485,8 +455,6 @@ void SessionDialog::InitDlgProc(bool loadhost, bool initMruNeeded)
 
 	HWND hProxy = GetDlgItem(hwnd, IDC_PROXY_CHECK);
 			SendMessage(hProxy, BM_SETCHECK, m_fUseProxy, 0);
-
-	EnableWindow(GetDlgItem(hwnd, IDC_PROXY_EDIT), m_fUseProxy);
 
 	HFONT font = CreateFont(
       24,                        // nHeight

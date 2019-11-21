@@ -86,7 +86,6 @@ void VNCviewerApp32::NewConnection(bool Is_Listening) {
 //		DestroyWindow(pcc->m_hwndMain);
 		pcc->CloseWindows();
 		e.Report();	
-		vnclog.Print(0, _T("Exception 1 %s %i\n"), e.m_info, e.m_error_nr);
 		delete pcc;
 	} 
 }
@@ -101,8 +100,7 @@ void VNCviewerApp32::NewConnection(bool Is_Listening,TCHAR *host, int port) {
 	} catch (Exception &e) {
 //		DestroyWindow(pcc->m_hwndMain); 
 		pcc->CloseWindows();
-		e.Report();
-		vnclog.Print(0, _T("Exception 2 %s %i\n"), e.m_info, e.m_error_nr);
+		e.Report();	
 		delete pcc;
 	} 
 }

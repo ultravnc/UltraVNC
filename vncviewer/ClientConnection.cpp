@@ -337,7 +337,6 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_desktopName = NULL;
 	m_desktopName_viewonly = NULL;
 	m_port = -1;
-	m_host[0] = '\0';
 	m_proxyport = -1;
 //	m_proxy = 0;
 	m_serverInitiated = false;
@@ -601,19 +600,14 @@ bool ClientConnection::SetRecvTimeout(int msecs)
 
 void ClientConnection::Run()
 {
-	vnclog.Print(0, _T("run 0"));
 	havetobekilled=false;
 	forcedexit=false;
 	// Get the host name and port if we haven't got it
 	if (m_port == -1)
 	{
-		vnclog.Print(0, _T("GetConnectDetails 1"));
 		GetConnectDetails();
-		vnclog.Print(0, _T("GetConnectDetails 2"));
 		// sf@2002 - DSM Plugin loading if required
-		vnclog.Print(0, _T("LoadDSMPlugin 0"));
 		LoadDSMPlugin(false);
-		vnclog.Print(0, _T("LoadDSMPlugin 1"));
 	}
 	else
 	{
@@ -621,25 +615,25 @@ void ClientConnection::Run()
 		// sf@2003 - Take command line quickoption into account
 		//HandleQuickOption();
 	}
-	vnclog.Print(0, _T("run 1"));
+
 	// add user option on command line
 	if ( (strlen(	m_pApp->m_options.m_cmdlnUser) > 0) && !m_pApp->m_options.m_NoMoreCommandLineUserPassword) // Fix by Act
 		strcpy_s(m_cmdlnUser, m_pApp->m_options.m_cmdlnUser);
-	vnclog.Print(0, _T("run 2"));
+
 	// Modif sf@2002 - bit of a hack...and unsafe
 	if ( (strlen(	m_pApp->m_options.m_clearPassword) > 0) && !m_pApp->m_options.m_NoMoreCommandLineUserPassword)
 		strcpy_s(m_clearPasswd, m_pApp->m_options.m_clearPassword);
-	vnclog.Print(0, _T("run 3"));
+
 	if (saved_set)
 	{
 		saved_set=FALSE;
 		Save_Latest_Connection();
 	}
-	vnclog.Print(0, _T("run 4"));
+
 	GTGBS_CreateDisplay();
 	GTGBS_CreateToolbar();
 	CreateDisplay();
-	vnclog.Print(0, _T("run 5"));
+
 	DoConnection(); // sf@2007 - Autoreconnect - Must be done after windows creation, otherwise ReadServerInit does not initialise the title bar...
 
 	//adzm 2009-06-21 - if we are connected now, show the window
@@ -1796,15 +1790,12 @@ void ClientConnection::GetConnectDetails()
 {
 	if (m_opts.m_configSpecified) {
 		LoadConnection(m_opts.m_configFilename, false);
-		vnclog.Print(0, _T("GetConnectDetails 1\n"));
 	}
 	else {
-		/*if (!command_line && LoadConnection(m_opts.getDefaultOptionsFileName(), false)==-1) {
-			vnclog.Print(0, _T("GetConnectDetails 2\n"));
+		if (!command_line && LoadConnection(m_opts.getDefaultOptionsFileName(), false)==-1) {
 			SessionDialog sessdlg(&m_opts, this, m_pDSMPlugin); //sf@2002
 			if (!sessdlg.DoDialog())
 					throw QuietException(sz_L42);
-			vnclog.Print(0, _T("GetConnectDetails 3\n"));
 			_tcsncpy_s(m_host, sessdlg.m_host_dialog, MAX_HOST_NAME_LEN);
 			m_port = sessdlg.m_port;
 			_tcsncpy_s(m_proxyhost, sessdlg.m_proxyhost, MAX_HOST_NAME_LEN);
@@ -1813,15 +1804,10 @@ void ClientConnection::GetConnectDetails()
 			if (m_opts.autoDetect)
 					m_opts.m_Use8Bit = rfbPFFullColors;				
 		}
-		else*/ {
-			vnclog.Print(0, _T("GetConnectDetails 4\n"));
+		else {
 			SessionDialog sessdlg(&m_opts, this, m_pDSMPlugin); //sf@2002
-			vnclog.Print(0, _T("GetConnectDetails 5\n"));
-			if (!sessdlg.DoDialog()) {
-					vnclog.Print(0, _T("DoDialog 6\n"));
+			if (!sessdlg.DoDialog())
 					throw QuietException(sz_L42);
-			}
-			vnclog.Print(0, _T("GetConnectDetails 6\n"));
 			_tcsncpy_s(m_host, sessdlg.m_host_dialog, MAX_HOST_NAME_LEN);
 			m_port = sessdlg.m_port;
 			_tcsncpy_s(m_proxyhost, sessdlg.m_proxyhost, MAX_HOST_NAME_LEN);
@@ -1832,7 +1818,6 @@ void ClientConnection::GetConnectDetails()
 				m_opts.m_Use8Bit = rfbPFFullColors;
 		}
 	}
-	vnclog.Print(0, _T("GetConnectDetails 9\n"));
 	// This is a bit of a hack:
 	// The config file may set various things in the app-level defaults which
 	// we don't want to be used except for the first connection. So we clear them
