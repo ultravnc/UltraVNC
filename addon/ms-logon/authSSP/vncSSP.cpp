@@ -70,9 +70,9 @@ int CUPSD(const char * userin, const char *password, const char *machine)
 		if (file) {
             time_t current;
 			time(&current);
-			char timestr[25];
-			ctime_s(timestr, 25, &current);
-			timestr[24] = '\0'; // remove newline
+			char timestr[50];
+			ctime_s(timestr, 50, &current);
+			timestr[49] = '\0'; // remove newline
 			fprintf(file, "%s - CUPSD2: Access is %u, user %s is %sauthenticated, access granted is 0x%x\n",
 				timestr, isAccessOK, userin, isAuthenticated ? "" : "not ", dwAccessGranted);
 			fclose(file);
