@@ -46,7 +46,7 @@ Exception::~Exception()
 
 QuietException::QuietException(const char *info,int error_nr) : Exception(info,error_nr)
 {
-
+	ShowMessageBox2(m_info,m_error_nr);
 }
 
 QuietException::~QuietException()

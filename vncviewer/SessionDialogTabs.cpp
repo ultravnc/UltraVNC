@@ -349,7 +349,7 @@ BOOL CALLBACK DlgProcMisc(HWND hwnd, UINT uMsg,WPARAM wParam, LPARAM lParam)
 				return TRUE;
 			case IDOK:{
 				UINT res= GetDlgItemText( hwnd,  IDC_FOLDER, _this->folder, 256);
-				res= GetDlgItemText( hwnd,  IDC_PREFIX, _this->prefix, 256);
+				res= GetDlgItemText( hwnd,  IDC_PREFIX, _this->prefix, 56);
 				if (_this->Shared)
 					_this->reconnectcounter = GetDlgItemInt( hwnd, IDC_SERVER_RECON, NULL, TRUE);
 				else 
@@ -418,8 +418,29 @@ BOOL CALLBACK DlgProcSecurity(HWND hwnd, UINT uMsg,WPARAM wParam, LPARAM lParam)
 				{
 					HWND hUse = GetDlgItem(hwnd, IDC_PLUGIN_CHECK);
 					BOOL enable = SendMessage(hUse, BM_GETCHECK, 0, 0) == BST_CHECKED;
-					HWND hButton = GetDlgItem(hwnd, IDC_PLUGIN_BUTTON);
-					EnableWindow(hButton, enable);
+					//HWND hButton = GetDlgItem(hwnd, IDC_PLUGIN_BUTTON);
+					//EnableWindow(hButton, enable);*/
+					HWND hplugin = GetDlgItem(hwnd, IDC_PLUGINS_COMBO);
+					//EnableWindow(hplugin, enable);*/
+					if( strcmp( _this->szDSMPluginFilename, "" ) != 0 && enable )
+						{ 
+							int pos = SendMessage(hplugin, CB_FINDSTRINGEXACT, -1,
+								(LPARAM)&(_this->szDSMPluginFilename[0]));
+
+							if( pos != CB_ERR )
+							{
+								SendMessage(hplugin, CB_SETCURSEL, pos, 0);
+								HWND hUsePlugin = GetDlgItem(hwnd, IDC_PLUGIN_CHECK);
+								SendMessage(hUsePlugin, BM_SETCHECK, TRUE, 0);
+								EnableWindow(GetDlgItem(hwnd, IDC_PLUGIN_BUTTON), TRUE); // sf@2009 - Enable plugin config button
+								EnableWindow(GetDlgItem(hwnd, IDC_PLUGINS_COMBO), TRUE);
+							}
+						}
+					else {
+						EnableWindow(GetDlgItem(hwnd, IDC_PLUGIN_BUTTON), false); // sf@2009 - Enable plugin config button
+						EnableWindow(GetDlgItem(hwnd, IDC_PLUGINS_COMBO), false);
+					}
+
 				}
 				return TRUE;
 
@@ -947,7 +968,7 @@ void SessionDialog::ReadDlgProcMisc()
 {
 	HWND hwnd = MiscHwnd;
 	UINT res= GetDlgItemText( hwnd,  IDC_FOLDER, folder, 256);
-	res= GetDlgItemText( hwnd,  IDC_PREFIX, prefix, 256);
+	res= GetDlgItemText( hwnd,  IDC_PREFIX, prefix, 56);
 	if (Shared)
 		reconnectcounter = GetDlgItemInt( hwnd, IDC_SERVER_RECON, NULL, TRUE);
 	else 
