@@ -330,6 +330,7 @@ ClientConnection::ClientConnection(VNCviewerApp *pApp, LPTSTR host, int port)
 
 void ClientConnection::Init(VNCviewerApp *pApp)
 {
+	m_hSessionDialog = NULL;
 	new_ultra_server=false;
 	Pressed_Cancel=false;
 	saved_set=false;
@@ -338,6 +339,8 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_desktopName_viewonly = NULL;
 	m_port = -1;
 	m_proxyport = -1;
+	m_host[0] = '\0';
+	m_proxyhost[0] = '\0';
 //	m_proxy = 0;
 	m_serverInitiated = false;
 	m_netbuf = NULL;
@@ -1792,7 +1795,7 @@ void ClientConnection::GetConnectDetails()
 		LoadConnection(m_opts.m_configFilename, false);
 	}
 	else {
-		if (!command_line && LoadConnection(m_opts.getDefaultOptionsFileName(), false)==-1) {
+		if (!command_line && LoadConnection(m_opts.getDefaultOptionsFileName(), true, true)==-1) {
 			SessionDialog sessdlg(&m_opts, this, m_pDSMPlugin); //sf@2002
 			if (!sessdlg.DoDialog())
 					throw QuietException(sz_L42);
@@ -1811,7 +1814,6 @@ void ClientConnection::GetConnectDetails()
 			_tcsncpy_s(m_host, sessdlg.m_host_dialog, MAX_HOST_NAME_LEN);
 			m_port = sessdlg.m_port;
 			_tcsncpy_s(m_proxyhost, sessdlg.m_proxyhost, MAX_HOST_NAME_LEN);
-	//		_tcsncpy_s(m_remotehost, sessdlg.m_remotehost, MAX_HOST_NAME_LEN);
 			m_proxyport = sessdlg.m_proxyport;
 			m_fUseProxy = sessdlg.m_fUseProxy;
 			if (m_opts.autoDetect)

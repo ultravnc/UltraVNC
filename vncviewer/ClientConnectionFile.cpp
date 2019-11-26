@@ -133,7 +133,7 @@ void ClientConnection::Save_Latest_Connection()
 	// don't save in case of .vnc file
 	if (config_specified) return;
 	//ofnInit();
-	vnclog.Print(1, "Saving to %s\n", m_opts.getDefaultOptionsFileName());	
+	/*vnclog.Print(1, "Saving to %s\n", m_opts.getDefaultOptionsFileName());	
 	int ret = WritePrivateProfileString("connection", "host", m_host, m_opts.getDefaultOptionsFileName());
 	char buf[32];
 	sprintf_s(buf, "%d", m_port);
@@ -141,16 +141,16 @@ void ClientConnection::Save_Latest_Connection()
 	ret = WritePrivateProfileString("connection", "proxyhost", m_proxyhost, m_opts.getDefaultOptionsFileName());
 	sprintf_s(buf, "%d", m_proxyport);
 	WritePrivateProfileString("connection", "proxyport", buf, m_opts.getDefaultOptionsFileName());
-	buf[0] = '\0';
+	buf[0] = '\0';*/
 	m_opts.Save(m_opts.getDefaultOptionsFileName());
 
 }
 
 // returns zero if successful
-int ClientConnection::LoadConnection(char *fname, bool fFromDialog)
+int ClientConnection::LoadConnection(char *fname, bool fFromDialog, bool defaultOption)
 {
 	// The Connection Profile ".vnc" has been required from Connection Session Dialog Box
-	if (fFromDialog) {
+	if (fFromDialog && ! defaultOption) {
 		char tname[_MAX_FNAME + _MAX_EXT];
 		ofnInit();
 		ofn.hwndOwner = m_hSessionDialog;
@@ -161,9 +161,15 @@ int ClientConnection::LoadConnection(char *fname, bool fFromDialog)
 			return -1;
 	}
 
-	GetPrivateProfileString("connection", "host", "", m_host, MAX_HOST_NAME_LEN, fname);
-	if ( (m_port = GetPrivateProfileInt("connection", "port", 0, fname)) == 0)
-		return -1;
+	if (!defaultOption) {
+		GetPrivateProfileString("connection", "host", "", m_host, MAX_HOST_NAME_LEN, fname);
+		if ( (m_port = GetPrivateProfileInt("connection", "port", 0, fname)) == 0)
+			return -1;
+	}
+	else {
+		strcpy_s(m_host,"");
+		m_port = -1;
+	}
 	GetPrivateProfileString("connection", "proxyhost", "", m_proxyhost, MAX_HOST_NAME_LEN, fname);
 	m_proxyport = GetPrivateProfileInt("connection", "proxyport", 0, fname);
     m_fUseProxy = GetPrivateProfileInt("options", "UseProxy", 0, fname) ? true : false;
