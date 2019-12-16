@@ -1297,7 +1297,7 @@ DWORD WINAPI imp_desktop_thread(LPVOID lpParam)
 			{
 				ResetEvent(hShutdownEvent);
 				fShutdownOrdered = true;
-				vnclog.Print(LL_INTERR, VNCLOG("****************** WaitForSingleObject - Shutdown server\n"));
+				//vnclog.Print(LL_INTERR, VNCLOG("****************** WaitForSingleObject - Shutdown server\n"));
 			}
 		}
 	}
@@ -1327,7 +1327,7 @@ void CALLBACK fpTimer(UINT uID, UINT uMsg, DWORD dwUser, DWORD dw1, DWORD dw2)
 		{
 			ResetEvent(hShutdownEvent);
 			fShutdownOrdered = true;
-			vnclog.Print(LL_INTERR, VNCLOG("****************** WaitForSingleObject - Shutdown server\n"));
+			//vnclog.Print(LL_INTERR, VNCLOG("****************** WaitForSingleObject - Shutdown server\n"));
 		}
 	}
 }
@@ -1335,13 +1335,13 @@ void CALLBACK fpTimer(UINT uID, UINT uMsg, DWORD dwUser, DWORD dw1, DWORD dw2)
 void InitSDTimer()
 {
 	if (mmRes != -1) return;
-	vnclog.Print(LL_INTERR, VNCLOG("****************** Init SDTimer\n"));
+	//vnclog.Print(LL_INTERR, VNCLOG("****************** Init SDTimer\n"));
 	mmRes = timeSetEvent( 2000, 0, (LPTIMECALLBACK)fpTimer, 0, TIME_PERIODIC );
 }
 
 void KillSDTimer()
 {
-	vnclog.Print(LL_INTERR, VNCLOG("****************** Kill SDTimer\n"));
+	//vnclog.Print(LL_INTERR, VNCLOG("****************** Kill SDTimer\n"));
 	timeKillEvent(mmRes);
 	mmRes = -1;
 }*/
@@ -1399,7 +1399,7 @@ int WinVNCAppMain()
 	// Subscribe to shutdown event
 	hShutdownEvent = OpenEvent(EVENT_ALL_ACCESS, FALSE, "Global\\SessionEventUltra");
 	if (hShutdownEvent) ResetEvent(hShutdownEvent);
-	vnclog.Print(LL_STATE, VNCLOG("***************** SDEvent created \n"));
+	//vnclog.Print(LL_STATE, VNCLOG("***************** SDEvent created \n"));
 	// Create the timer that looks periodicaly for shutdown event
 	mmRes = -1;
 	//InitSDTimer();

@@ -558,7 +558,7 @@ vncEncodeMgr::SetEncoding(CARD32 encoding,BOOL reinitialize)
 	case rfbEncodingUltra2:
 
 		vnclog.Print(LL_INTINFO, VNCLOG("Ultra encoder requested\n"));
-		if (m_scrinfo.format.bitsPerPixel!=32)
+		if (m_scrinfo.format.bitsPerPixel!=32 || m_clientformat.bitsPerPixel != 32)
 		{
 			vnclog.Print(LL_INTINFO, VNCLOG("jpeg encoder is only supported on 32bit color display\n"));
 			return false;

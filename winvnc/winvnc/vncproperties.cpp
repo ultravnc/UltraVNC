@@ -1725,7 +1725,7 @@ vncProperties::Load(BOOL usersettings)
 	// If Socket connections are allowed, should the HTTP server be enabled?
 LABELUSERSETTINGS:
 	// LOAD THE USER PREFERENCES
-	vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - Load User Preferences\n"));
+	//vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - Load User Preferences\n"));
 
 	// Set the default user prefs
 	vnclog.Print(LL_INTINFO, VNCLOG("clearing user settings\n"));
@@ -1985,12 +1985,12 @@ vncProperties::ApplyUserPrefs()
 
 	if (m_server->IsDSMPluginEnabled()) 
 	{
-		vnclog.Print(LL_INTINFO, VNCLOG("$$$$$$$$$$ ApplyUserPrefs - Plugin Enabled - Call SetDSMPlugin() \n"));
+		//vnclog.Print(LL_INTINFO, VNCLOG("$$$$$$$$$$ ApplyUserPrefs - Plugin Enabled - Call SetDSMPlugin() \n"));
 		m_server->SetDSMPlugin(false);
 	}
 	else
 	{
-		vnclog.Print(LL_INTINFO, VNCLOG("$$$$$$$$$$ ApplyUserPrefs - Plugin NOT enabled \n"));
+		//vnclog.Print(LL_INTINFO, VNCLOG("$$$$$$$$$$ ApplyUserPrefs - Plugin NOT enabled \n"));
 	}
 
 }
@@ -2243,7 +2243,7 @@ void vncProperties::LoadFromIniFile()
 	// If there is no user logged on them default to SYSTEM
 	if (strcmp(username, "") == 0)
 	{
-		vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - Force USER SYSTEM 2\n"));
+		//vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - Force USER SYSTEM 2\n"));
 		strcpy_s((char *)&username, UNLEN+1, "SYSTEM");
 	}
 
@@ -2306,7 +2306,7 @@ void vncProperties::LoadFromIniFile()
 		m_server->SetAuthHosts(0);
 	}
 
-	vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - Load User Preferences\n"));
+	//vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - Load User Preferences\n"));
 
 	// Set the default user prefs
 	vnclog.Print(LL_INTINFO, VNCLOG("clearing user settings\n"));
@@ -2603,7 +2603,7 @@ void vncProperties::ReloadDynamicSettings()
 	// If there is no user logged on them default to SYSTEM
 	if (strcmp(username, "") == 0)
 	{
-		vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - Force USER SYSTEM 2\n"));
+		//vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - Force USER SYSTEM 2\n"));
 		strcpy_s((char *)&username, UNLEN+1, "SYSTEM");
 	}
 

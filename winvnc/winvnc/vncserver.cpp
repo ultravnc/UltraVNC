@@ -1875,7 +1875,7 @@ vncServer::SetAuthHosts(const char*hostlist) {
 		return;
 	}
 
-	vnclog.Print(LL_INTINFO, VNCLOG("authhosts set to \"%s\"\n"), hostlist);
+	//vnclog.Print(LL_INTINFO, VNCLOG("authhosts set to \"%s\"\n"), hostlist);
 	if (m_auth_hosts != 0)
 		free(m_auth_hosts);
 
@@ -2323,28 +2323,28 @@ void vncServer::SetDSMPluginName(char* szDSMPlugin)
 //
 BOOL vncServer::SetDSMPlugin(BOOL bForceReload)
 {
-	vnclog.Print(LL_INTINFO, VNCLOG("$$$$$$$$$$ SetDSMPlugin - Entry \n"));
+	//vnclog.Print(LL_INTINFO, VNCLOG("$$$$$$$$$$ SetDSMPlugin - Entry \n"));
 	if (AuthClientCount() > 0) return FALSE;
 
 	if (!IsDSMPluginEnabled()) return FALSE;
 
-	vnclog.Print(LL_INTINFO, VNCLOG("$$$$$$$$$$ SetDSMPlugin - Enabled \n"));
+	//vnclog.Print(LL_INTINFO, VNCLOG("$$$$$$$$$$ SetDSMPlugin - Enabled \n"));
 
 	// If the plugin is loaded, unload it first
 	// sf@2003 - it has been possibly pre-configured by
 	// clicking on the plugin config button
 	if (m_pDSMPlugin->IsLoaded())
 	{
-		vnclog.Print(LL_INTINFO, VNCLOG("$$$$$$$$$$ SetDSMPlugin - Is Loaded \n"));
+		//vnclog.Print(LL_INTINFO, VNCLOG("$$$$$$$$$$ SetDSMPlugin - Is Loaded \n"));
 
 		// sf@2003 - We check if the loaded plugin is the same than
 		// the currently selected one or not
 		m_pDSMPlugin->DescribePlugin();
 		if (_stricmp(m_pDSMPlugin->GetPluginFileName(), GetDSMPluginName()) || bForceReload)
 		{
-			if (bForceReload)
-				vnclog.Print(LL_INTINFO, VNCLOG("$$$$$$$$$$ SetDSMPlugin - FORCE RELOADING OF THE PLUGIN \n"));
-			vnclog.Print(LL_INTINFO, VNCLOG("$$$$$$$$$$ SetDSMPlugin - New one - Unload the current \n"));
+			//if (bForceReload)
+			//	vnclog.Print(LL_INTINFO, VNCLOG("$$$$$$$$$$ SetDSMPlugin - FORCE RELOADING OF THE PLUGIN \n"));
+			//vnclog.Print(LL_INTINFO, VNCLOG("$$$$$$$$$$ SetDSMPlugin - New one - Unload the current \n"));
 			m_pDSMPlugin->SetEnabled(false);
 			m_pDSMPlugin->UnloadPlugin();
 		}
@@ -2352,7 +2352,7 @@ BOOL vncServer::SetDSMPlugin(BOOL bForceReload)
 
 	if (!m_pDSMPlugin->IsLoaded())
 	{
-		vnclog.Print(LL_INTINFO, VNCLOG("$$$$$$$$$$ SetDSMPlugin - Plugin NOT loaded - Try to load it \n"));
+		//vnclog.Print(LL_INTINFO, VNCLOG("$$$$$$$$$$ SetDSMPlugin - Plugin NOT loaded - Try to load it \n"));
 		if (!m_pDSMPlugin->LoadPlugin(GetDSMPluginName(), false))
 		{
 			vnclog.Print(LL_INTINFO, VNCLOG("$$$$$$$$$$ DSMPlugin cannot be loaded\n"));
@@ -2365,7 +2365,7 @@ BOOL vncServer::SetDSMPlugin(BOOL bForceReload)
 	// Now that it is loaded, init it
 	if (m_pDSMPlugin->InitPlugin())
 	{
-		vnclog.Print(LL_INTINFO, VNCLOG("$$$$$$$$$$ SetDSMPlugin - Init plugin call \n"));
+		//vnclog.Print(LL_INTINFO, VNCLOG("$$$$$$$$$$ SetDSMPlugin - Init plugin call \n"));
 		char szParams[MAXPWLEN + 64];
 		char password[MAXPWLEN];
 		GetPassword(password);
@@ -2382,7 +2382,7 @@ BOOL vncServer::SetDSMPlugin(BOOL bForceReload)
 
 		//::MessageBoxSecure(NULL, szParams, "SetDSMPlugin info", MB_OK);
 
-		vnclog.Print(LL_INTINFO, VNCLOG("$$$$$$$$$$ SetDSMPlugin - SetPluginParams call \n"));
+		//vnclog.Print(LL_INTINFO, VNCLOG("$$$$$$$$$$ SetDSMPlugin - SetPluginParams call \n"));
 
 
 		//adzm 2010-05-12 - dsmplugin config

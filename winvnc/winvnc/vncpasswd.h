@@ -53,7 +53,7 @@ public:
     public:
 	inline ToText(const char encrypted[MAXPWLEN], bool secure)
 	{
-	    vnclog.Print(LL_INTINFO, VNCLOG("PASSWD : ToText called\n"));
+	    //vnclog.Print(LL_INTINFO, VNCLOG("PASSWD : ToText called\n"));
 	    plaintext = vncDecryptPasswd((char *)encrypted, secure);
 	}
 	inline ~ToText()
@@ -91,7 +91,7 @@ public:
     public:
 	inline FromClear(bool secure)
 	{
-	    vnclog.Print(LL_INTINFO, VNCLOG("PASSWD : FromClear called\n"));
+	    //vnclog.Print(LL_INTINFO, VNCLOG("PASSWD : FromClear called\n"));
 	    vncEncryptPasswd((char*)"", encrypted, secure);
 	}
 	inline ~FromClear()
