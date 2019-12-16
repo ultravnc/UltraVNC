@@ -940,7 +940,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			strcpy_s(newuser,"");
 			if (vncService::CurrentUser((char *) &newuser, sizeof(newuser))) {
 				// Check whether the user name has changed!
-				if (_stricmp(newuser, _this->m_username) != 0 || _this->IconFaultCounter>2) {
+				if (_stricmp(newuser, _this->m_username) != 0 || ( _this->IconFaultCounter>2 && !_this->m_server->GetDisableTrayIcon())) {
 					Sleep(1000);
 					vnclog.Print(LL_INTINFO,VNCLOG("user name has changed\n"));
 					// User has changed!
