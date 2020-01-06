@@ -61,20 +61,22 @@ char *
 wi_getdate(wi_sess * sess)
 {
    time_t      timeval;
-   struct tm * gmt;
+   struct tm gmt;
+   errno_t err;
 
    USE_ARG(sess);
    timeval = time(NULL);
-   gmt = gmtime(&timeval);
-
-   sprintf(datebuf, "%s, %u %s %u %u:%u:%u GMT",
-      day[gmt->tm_wday],
-      gmt->tm_mday,
-      month[gmt->tm_mon],
-      gmt->tm_year + 1900, /* Windows year is based on 1900 */
-      gmt->tm_hour,
-      gmt->tm_min,
-      gmt->tm_wday);
+   err = gmtime_s(&gmt, &timeval);
+   if (err)
+		return datebuf;
+   sprintf_s(datebuf, 36, "%s, %u %s %u %u:%u:%u GMT",
+      day[gmt.tm_wday],
+      gmt.tm_mday,
+      month[gmt.tm_mon],
+      gmt.tm_year + 1900, /* Windows year is based on 1900 */
+      gmt.tm_hour,
+      gmt.tm_min,
+      gmt.tm_wday);
 
    return datebuf;
 }

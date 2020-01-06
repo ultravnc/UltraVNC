@@ -846,8 +846,8 @@ wi_decode_auth(wi_sess * sess, char * name, int name_len, char * pass, int pass_
          return;
       }
       *divide++ = 0;    /* terminte name, point to password */
-      strncpy(name, decode, name_len);
-      strncpy(pass, divide, pass_len);
+      strncpy_s(name, 32, decode, name_len);
+      strncpy_s(pass, 32, divide, pass_len);
    }
    else  /* Add MD5 here later.... */
    {

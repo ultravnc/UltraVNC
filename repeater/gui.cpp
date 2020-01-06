@@ -143,7 +143,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     GetModuleFileName(0, exe_file_name, MAX_PATH);
 
     /* set current directory */
-    strcpy(dir, exe_file_name);
+    strcpy_s(dir, exe_file_name);
     ptr=strrchr(dir, '\\'); /* last backslash */
     if(ptr)
         ptr[1]='\0'; /* truncate program name */
@@ -154,10 +154,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     }
 
     /* setup service_path for CreateService() */
-    strcpy(service_path, "\"");
-    strcat(service_path, exe_file_name);
-    strcat(service_path, "\" -service");
-    /* strcat(service_path, lpszCmdLine); */
+    strcpy_s(service_path, "\"");
+    strcat_s(service_path, exe_file_name);
+    strcat_s(service_path, "\" -service");
+    /* strcat_s(service_path, lpszCmdLine); */
 
     if(!_strcmpi(lpszCmdLine, "-service")) {
         if(!setjmp(jump_buf))
@@ -259,9 +259,9 @@ static void update_taskbar(void) { /* create the taskbar icon */
     nid.hWnd=hwnd; /* window to receive notifications */
     nid.uID=1;     /* application-defined ID for icon */
     if(error_mode)
-        strcpy(nid.szTip, "Server is down");
+        strcpy_s(nid.szTip, "Server is down");
     else
-        strcpy(nid.szTip, "UltraVnc Repeater");
+        strcpy_s(nid.szTip, "UltraVnc Repeater");
     nid.uFlags=NIF_TIP;
     /* only nid.szTip and nid.uID are valid, change tip */
     if(Shell_NotifyIcon(NIM_MODIFY, &nid)) /* modify tooltip */
@@ -386,12 +386,13 @@ static LRESULT CALLBACK settings_proc(HWND hDlg, UINT message,
 			allow=saved_allow;
 			refuse=saved_refuse;
 			refuse2=saved_refuse2;
-			strcpy(sample1,saved_sample1);
-			strcpy(sample2,saved_sample2);
-			strcpy(sample3,saved_sample3);
-
-			SetDlgItemText(hDlg, IDC_ACCEPTPORT, _itoa(portA,tempchar,10));
-			SetDlgItemText(hDlg, IDC_LISTENPORT, _itoa(portB,tempchar,10));
+			strcpy_s(sample1,saved_sample1);
+			strcpy_s(sample2,saved_sample2);
+			strcpy_s(sample3,saved_sample3);
+			_itoa_s(portA, tempchar, 10);
+			SetDlgItemText(hDlg, IDC_ACCEPTPORT, tempchar);
+			_itoa_s(portB,tempchar,10);
+			SetDlgItemText(hDlg, IDC_LISTENPORT, tempchar);
 			SendDlgItemMessage(hDlg, IDC_ENABLE,BM_SETCHECK,mode2,0);
 			SendDlgItemMessage(hDlg, IDC_ENABLE2,BM_SETCHECK,mode1,0);
 			SendDlgItemMessage(hDlg, IDC_KEEPALIVE,BM_SETCHECK,keepalive,0);
@@ -403,7 +404,8 @@ static LRESULT CALLBACK settings_proc(HWND hDlg, UINT message,
 			SetDlgItemText(hDlg, IDC_EDITALLOW, sample1);
 			SetDlgItemText(hDlg, IDC_EDITREFUSE, sample2);
 			SetDlgItemText(hDlg, IDC_EDITREFUSE2, sample3);
-			SetDlgItemText(hDlg, IDC_PORTSERVER, _itoa(portS,tempchar,10));
+			_itoa_s(portS,tempchar,10);
+			SetDlgItemText(hDlg, IDC_PORTSERVER, tempchar);
 
 			if (mode2)
 				{
@@ -503,9 +505,9 @@ static LRESULT CALLBACK settings_proc(HWND hDlg, UINT message,
 					saved_allow=allow;
 					saved_refuse=refuse;
 					saved_refuse2=refuse2;
-					strcpy(saved_sample1,sample1);
-					strcpy(saved_sample2,sample2);
-					strcpy(saved_sample3,sample3);
+					strcpy_s(saved_sample1,sample1);
+					strcpy_s(saved_sample2,sample2);
+					strcpy_s(saved_sample3,sample3);
 					Save_settings();
 					win_log("Settings Saved: WARNING, new settings become active after restart !");
                 case IDCANCEL:

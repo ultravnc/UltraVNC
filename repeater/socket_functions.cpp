@@ -1,7 +1,7 @@
 #include "repeater.h"
 int f_debug=1;
 
-BOOL ParseDisplay(LPTSTR display, LPTSTR phost, int hostlen, int *pport) 
+BOOL ParseDisplay(LPTSTR display, int size, LPTSTR phost, int hostlen, int *pport) 
 {
 	int tmp_port;
 	TCHAR *colonpos = _tcschr(display, L':');
@@ -11,20 +11,20 @@ BOOL ParseDisplay(LPTSTR display, LPTSTR phost, int hostlen, int *pport)
 	{
 		// No colon -- use default port number
         tmp_port = RFB_PORT_OFFSET;
-		_tcsncpy(phost, display, MAX_HOST_NAME_LEN);
+		_tcsncpy_s(phost, size, display, MAX_HOST_NAME_LEN);
 	}	else
 	{
-		_tcsncpy(phost, display, colonpos - display);
+		_tcsncpy_s(phost, size, display, colonpos - display);
 		phost[colonpos - display] = L'\0';
 		if (colonpos[1] == L':') {
 			// Two colons -- interpret as a port number
-			if (_stscanf(colonpos + 2, TEXT("%d"), &tmp_port) != 1) 
+			if (_stscanf_s(colonpos + 2, TEXT("%d"), &tmp_port) != 1) 
 				return FALSE;
 		}
 		else
 		{
 			// One colon -- interpret as a display number or port number
-			if (_stscanf(colonpos + 1, TEXT("%d"), &tmp_port) != 1) 
+			if (_stscanf_s(colonpos + 1, TEXT("%d"), &tmp_port) != 1) 
 				return FALSE;
 
 			// RealVNC method - If port < 100 interpret as display number else as Port number
@@ -37,7 +37,7 @@ BOOL ParseDisplay(LPTSTR display, LPTSTR phost, int hostlen, int *pport)
     return TRUE;
 }
 
-BOOL ParseDisplay2(LPTSTR display, LPTSTR phost, int hostlen, char pport[32]) 
+/*BOOL ParseDisplay2(LPTSTR display, LPTSTR phost, int hostlen, char pport[32]) 
 {
 	//char tmp_port[512];
 	int tmp_port;
@@ -49,11 +49,11 @@ BOOL ParseDisplay2(LPTSTR display, LPTSTR phost, int hostlen, char pport[32])
 	{
 		// No colon -- use default port number
         tmp_port = RFB_PORT_OFFSET;
-		_tcsncpy(phost, display, MAX_HOST_NAME_LEN);
+		_tcsncpy_s(phost, display, MAX_HOST_NAME_LEN);
 	}
 	else
 	{
-		_tcsncpy(phost, display, colonpos - display);
+		_tcsncpy_s(phost, display, colonpos - display);
 		phost[colonpos - display] = L'\0';
 		if (colonpos[1] == L':') {
 			// Two colons -- interpret as a port number
@@ -71,9 +71,9 @@ BOOL ParseDisplay2(LPTSTR display, LPTSTR phost, int hostlen, char pport[32])
 				tmp_port += RFB_PORT_OFFSET;
 		}
 	}
-    strncpy(pport,_itoa(tmp_port,pport,10),32);
+    strncpy(pport,_itoa_s(tmp_port,pport,10),32);
     return TRUE;
-}
+}*/
 
 int
 WriteExact(int sock, char *buf, int len)
@@ -191,7 +191,7 @@ DWORD WINAPI do_repeater_wait(LPVOID lpParam)
 			sendkepalive_counter=0;
 			//Beep(1000,1000);
 			rfbProtocolVersionMsg pv;
-			sprintf(pv,rfbProtocolKeepAlive,rfbProtocolMajorVersion,rfbProtocolMinorVersion);
+			sprintf_s(pv,rfbProtocolKeepAlive,rfbProtocolMajorVersion,rfbProtocolMinorVersion);
  			if (WriteExact(remote, pv, sz_rfbProtocolVersionMsg) < 0) goto error;
 			recvbytes=recvbytes-12;
 			rbuf_len=rbuf_len-12;
@@ -238,23 +238,23 @@ DWORD WINAPI do_repeater_wait(LPVOID lpParam)
 					char	buf[5];
 					SYSTEMTIME	st; 
 					GetLocalTime(&st);
-					_itoa(st.wYear,buf,10);
-					strcpy(msg,buf);
-					strcat(msg,"/");
-					_itoa(st.wMonth,buf,10);
-					strcat(msg,buf);
-					strcat(msg,"/");
-					_itoa(st.wDay,buf,10);
-					strcat(msg,buf);
-					strcat(msg," ");
-					_itoa(st.wHour,buf,10);
-					strcat(msg,buf);
-					strcat(msg,":");
-					_itoa(st.wMinute,buf,10);
-					strcat(msg,buf);
-					strcat(msg,":");
-					_itoa(st.wSecond,buf,10);
-					strcat(msg,buf);
+					_itoa_s(st.wYear,buf,10);
+					strcpy_s(msg,buf);
+					strcat_s(msg,"/");
+					_itoa_s(st.wMonth,buf,10);
+					strcat_s(msg,buf);
+					strcat_s(msg,"/");
+					_itoa_s(st.wDay,buf,10);
+					strcat_s(msg,buf);
+					strcat_s(msg," ");
+					_itoa_s(st.wHour,buf,10);
+					strcat_s(msg,buf);
+					strcat_s(msg,":");
+					_itoa_s(st.wMinute,buf,10);
+					strcat_s(msg,buf);
+					strcat_s(msg,":");
+					_itoa_s(st.wSecond,buf,10);
+					strcat_s(msg,buf);
 					strcpy_s(Servers[nummer].time,msg);
 
 				}
@@ -328,24 +328,24 @@ DWORD WINAPI do_repeater(LPVOID lpParam)
 	server_nummer=inout->server_nummer;
 	SYSTEMTIME	st; 
 	GetLocalTime(&st);
-	_itoa(st.wYear,buf,10);
-	strcpy(start_msg,buf);
-	strcat(start_msg,"/");
-	_itoa(st.wMonth,buf,10);
-	strcat(start_msg,buf);
-	strcat(start_msg,"/");
-	_itoa(st.wDay,buf,10);
-	strcat(start_msg,buf);
-	strcat(start_msg," ");
-	_itoa(st.wHour,buf,10);
-	strcat(start_msg,buf);
-	strcat(start_msg,":");
-	_itoa(st.wMinute,buf,10);
-	strcat(start_msg,buf);
-	strcat(start_msg,":");
-	_itoa(st.wSecond,buf,10);
-	strcat(start_msg,buf);
-	strcat(start_msg," ");
+	_itoa_s(st.wYear,buf,10);
+	strcpy_s(start_msg,buf);
+	strcat_s(start_msg,"/");
+	_itoa_s(st.wMonth,buf,10);
+	strcat_s(start_msg,buf);
+	strcat_s(start_msg,"/");
+	_itoa_s(st.wDay,buf,10);
+	strcat_s(start_msg,buf);
+	strcat_s(start_msg," ");
+	_itoa_s(st.wHour,buf,10);
+	strcat_s(start_msg,buf);
+	strcat_s(start_msg,":");
+	_itoa_s(st.wMinute,buf,10);
+	strcat_s(start_msg,buf);
+	strcat_s(start_msg,":");
+	_itoa_s(st.wSecond,buf,10);
+	strcat_s(start_msg,buf);
+	strcat_s(start_msg," ");
 
 	lbuf_len = 0;
     rbuf_len = 0;
@@ -512,24 +512,24 @@ DWORD WINAPI do_repeater(LPVOID lpParam)
     }
 error:
 	GetLocalTime(&st);
-	_itoa(st.wYear,buf,10);
-	strcpy(stop_msg,buf);
-	strcat(stop_msg,"/");
-	_itoa(st.wMonth,buf,10);
-	strcat(stop_msg,buf);
-	strcat(stop_msg,"/");
-	_itoa(st.wDay,buf,10);
-	strcat(stop_msg,buf);
-	strcat(stop_msg," ");
-	_itoa(st.wHour,buf,10);
-	strcat(stop_msg,buf);
-	strcat(stop_msg,":");
-	_itoa(st.wMinute,buf,10);
-	strcat(stop_msg,buf);
-	strcat(stop_msg,":");
-	_itoa(st.wSecond,buf,10);
-	strcat(stop_msg,buf);
-	strcat(stop_msg," ");
+	_itoa_s(st.wYear,buf,10);
+	strcpy_s(stop_msg,buf);
+	strcat_s(stop_msg,"/");
+	_itoa_s(st.wMonth,buf,10);
+	strcat_s(stop_msg,buf);
+	strcat_s(stop_msg,"/");
+	_itoa_s(st.wDay,buf,10);
+	strcat_s(stop_msg,buf);
+	strcat_s(stop_msg," ");
+	_itoa_s(st.wHour,buf,10);
+	strcat_s(stop_msg,buf);
+	strcat_s(stop_msg,":");
+	_itoa_s(st.wMinute,buf,10);
+	strcat_s(stop_msg,buf);
+	strcat_s(stop_msg,":");
+	_itoa_s(st.wSecond,buf,10);
+	strcat_s(stop_msg,buf);
+	strcat_s(stop_msg," ");
 	LogStats_access(start_msg,stop_msg,code,viewer_nummer,server_nummer,Viewers[viewer_nummer].sendbytes+Viewers[viewer_nummer].recvbytes);
 	//LogStats(code,recvbytes,sendbytes);
 	f_remote = 0;			/* no more read from socket */

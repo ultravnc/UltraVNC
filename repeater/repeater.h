@@ -51,7 +51,7 @@ typedef char rfbProtocolVersionMsg[13];
 
 void debug( const char *fmt, ... );
 void fatal( const char *fmt, ... );
-BOOL ParseDisplay(LPTSTR display, LPTSTR phost, int hostlen, int *pport) ;
+BOOL ParseDisplay(LPTSTR display, int size, LPTSTR phost, int hostlen, int *pport) ;
 int WriteExact(int sock, char *buf, int len);
 int ReadExact(int sock, char *buf, int len);
 

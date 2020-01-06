@@ -43,7 +43,7 @@ open_connection( const char *host, u_short port )
     saddr.sin_port = htons(port);
 
     debug("connecting to %s:%u\n", inet_ntoa(saddr.sin_addr), port);
-	strcpy(remote_host,inet_ntoa(saddr.sin_addr));
+	strcpy_s(remote_host,inet_ntoa(saddr.sin_addr));
 	found=FALSE;
 	if (!saved_allow) found=TRUE;
 	else
@@ -52,7 +52,7 @@ open_connection( const char *host, u_short port )
 		{
 			TCHAR myhost[256]="";
 			int myport=0;
-			if (ParseDisplay(temp1[i], myhost, 255, &myport))
+			if (ParseDisplay(temp1[i], sizeof(temp1[i]), myhost, 255, &myport))
 			{
 				char *testchar=NULL;
 				testchar=strstr(remote_host,myhost);
@@ -106,10 +106,9 @@ DWORD WINAPI mode12listener(LPVOID lpParam)
 		SOCKET  local_in;				/* Local input */
 		SOCKET  local_out;				/* Local output */
 		SOCKET  remote;
-		mystruct teststruct;
+		mystruct teststruct = {};
 		DWORD dwThreadId;
 		BOOL found2;
-		int i;
 		char *ip_peer;
 		
 		sock = socket (PF_INET, SOCK_STREAM, 0);
@@ -155,7 +154,7 @@ DWORD WINAPI mode12listener(LPVOID lpParam)
 				setsockopt (connection, SOL_SOCKET, SO_SNDTIMEO, (char*) &ii, sizeof(ii));
 
 				debug ("accept() connection \n");
-				sprintf(pv,rfbProtocolVersionFormat,rfbProtocolMajorVersion,rfbProtocolMinorVersion);
+				sprintf_s(pv,rfbProtocolVersionFormat,rfbProtocolMajorVersion,rfbProtocolMinorVersion);
 				if (WriteExact(connection, pv, sz_rfbProtocolVersionMsg) < 0) {
 					debug("Writing protocol version error");
 					closesocket(connection);
@@ -169,22 +168,23 @@ DWORD WINAPI mode12listener(LPVOID lpParam)
 				DWORD i = 0;  // disable
 				setsockopt (connection, SOL_SOCKET, SO_RCVTIMEO, (char*) &i, sizeof(i));
 				setsockopt (connection, SOL_SOCKET, SO_SNDTIMEO, (char*) &i, sizeof(i));
-				if (!ParseDisplay(proxyadress, remotehost, 255, &remoteport))
+				if (!ParseDisplay(proxyadress, 255,  remotehost, 255, &remoteport))
 					{
 					debug("ParseDisplay failed");
 					shutdown(sock, 2);
 					closesocket(connection);
 					continue;
 					}
-				strcpy(dest_host,remotehost);
+				strcpy_s(dest_host,remotehost);
 				dest_port=remoteport;
 				//debug ("Server %s port %d \n", dest_host,remoteport);
 				shutdown(sock, 2);
 				local_in = local_out=connection;
 				char * pch;
 				char * comm;
-				pch = strtok (dest_host,"+");
-				comm = strtok (NULL, ":");
+				char *posn;
+				pch = strtok_s(dest_host, "+", &posn);				
+				comm = strtok_s(NULL, ":", &posn);
 
 				bool alsoID=false;
 

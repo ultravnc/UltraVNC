@@ -39,7 +39,8 @@ FILE *f;
 						char* p = strrchr(szFileName, '\\');
 						*p = '\0';
 						strcat_s (szFileName,MAX_PATH,"\\");
-						strcat_s (szFileName,MAX_PATH,_itoa(code,tempchar,10));
+						_itoa_s(code,tempchar,10);
+						strcat_s (szFileName,MAX_PATH, tempchar);
 						strcat_s (szFileName,MAX_PATH,".txt");
 					}
 
@@ -49,27 +50,28 @@ FILE *f;
 			char	buf[5];
 			SYSTEMTIME	st; 
 			GetLocalTime(&st);
-			_itoa(st.wYear,buf,10);
-			strcpy(msg,buf);
-			strcat(msg,"/");
-			_itoa(st.wMonth,buf,10);
-			strcat(msg,buf);
-			strcat(msg,"/");
-			_itoa(st.wDay,buf,10);
-			strcat(msg,buf);
-			strcat(msg," ");
-			_itoa(st.wHour,buf,10);
-			strcat(msg,buf);
-			strcat(msg,":");
-			_itoa(st.wMinute,buf,10);
-			strcat(msg,buf);
-			strcat(msg,":");
-			_itoa(st.wSecond,buf,10);
-			strcat(msg,buf);
-			strcat(msg," ");
-			strcat(msg,"Transmitted: ");
-			strcat(msg,_ltoa((send+recv)/512,tempchar,10));
-			strcat(msg,"k \n");
+			_itoa_s(st.wYear,buf,10);
+			strcpy_s(msg,buf);
+			strcat_s(msg,"/");
+			_itoa_s(st.wMonth,buf,10);
+			strcat_s(msg,buf);
+			strcat_s(msg,"/");
+			_itoa_s(st.wDay,buf,10);
+			strcat_s(msg,buf);
+			strcat_s(msg," ");
+			_itoa_s(st.wHour,buf,10);
+			strcat_s(msg,buf);
+			strcat_s(msg,":");
+			_itoa_s(st.wMinute,buf,10);
+			strcat_s(msg,buf);
+			strcat_s(msg,":");
+			_itoa_s(st.wSecond,buf,10);
+			strcat_s(msg,buf);
+			strcat_s(msg," ");
+			strcat_s(msg,"Transmitted: ");
+			_ltoa_s((send+recv)/512,tempchar,10);
+			strcat_s(msg, tempchar);
+			strcat_s(msg,"k \n");
 	
 			fprintf(f,msg);
 			fclose(f);
@@ -86,8 +88,8 @@ char szFileName[MAX_PATH];
 					{
 						char* p = strrchr(szFileName, '\\');
 						*p = '\0';
-						strcat (szFileName,"\\");
-						strcat (szFileName,"server_access.txt");
+						strcat_s(szFileName,"\\");
+						strcat_s(szFileName,"server_access.txt");
 					}
 
 	if ((f = fopen((LPCSTR)szFileName, "a")) != NULL)
@@ -96,24 +98,24 @@ char szFileName[MAX_PATH];
 			char	buf[5];
 			SYSTEMTIME	st; 
 			GetLocalTime(&st);
-			_itoa(st.wYear,buf,10);
-			strcpy(msg,buf);
-			strcat(msg,"/");
-			_itoa(st.wMonth,buf,10);
-			strcat(msg,buf);
-			strcat(msg,"/");
-			_itoa(st.wDay,buf,10);
-			strcat(msg,buf);
-			strcat(msg," ");
-			_itoa(st.wHour,buf,10);
-			strcat(msg,buf);
-			strcat(msg,":");
-			_itoa(st.wMinute,buf,10);
-			strcat(msg,buf);
-			strcat(msg,":");
-			_itoa(st.wSecond,buf,10);
-			strcat(msg,buf);
-			strcat(msg," ");
+			_itoa_s(st.wYear,buf,10);
+			strcpy_s(msg,buf);
+			strcat_s(msg,"/");
+			_itoa_s(st.wMonth,buf,10);
+			strcat_s(msg,buf);
+			strcat_s(msg,"/");
+			_itoa_s(st.wDay,buf,10);
+			strcat_s(msg,buf);
+			strcat_s(msg," ");
+			_itoa_s(st.wHour,buf,10);
+			strcat_s(msg,buf);
+			strcat_s(msg,":");
+			_itoa_s(st.wMinute,buf,10);
+			strcat_s(msg,buf);
+			strcat_s(msg,":");
+			_itoa_s(st.wSecond,buf,10);
+			strcat_s(msg,buf);
+			strcat_s(msg," ");
 	
 			fprintf(f,"%s;%i;%s\n",msg,code,Servers[nummer].hostname);
 			fclose(f);
@@ -131,8 +133,8 @@ char szFileName[MAX_PATH];
 					{
 						char* p = strrchr(szFileName, '\\');
 						*p = '\0';
-						strcat (szFileName,"\\");
-						strcat (szFileName,"viewer_access.txt");
+						strcat_s(szFileName,"\\");
+						strcat_s(szFileName,"viewer_access.txt");
 					}
 
 	if ((f = fopen((LPCSTR)szFileName, "a")) != NULL)
@@ -141,24 +143,24 @@ char szFileName[MAX_PATH];
 			char	buf[5];
 			SYSTEMTIME	st; 
 			GetLocalTime(&st);
-			_itoa(st.wYear,buf,10);
-			strcpy(msg,buf);
-			strcat(msg,"/");
-			_itoa(st.wMonth,buf,10);
-			strcat(msg,buf);
-			strcat(msg,"/");
-			_itoa(st.wDay,buf,10);
-			strcat(msg,buf);
-			strcat(msg," ");
-			_itoa(st.wHour,buf,10);
-			strcat(msg,buf);
-			strcat(msg,":");
-			_itoa(st.wMinute,buf,10);
-			strcat(msg,buf);
-			strcat(msg,":");
-			_itoa(st.wSecond,buf,10);
-			strcat(msg,buf);
-			strcat(msg," ");
+			_itoa_s(st.wYear,buf,10);
+			strcpy_s(msg,buf);
+			strcat_s(msg,"/");
+			_itoa_s(st.wMonth,buf,10);
+			strcat_s(msg,buf);
+			strcat_s(msg,"/");
+			_itoa_s(st.wDay,buf,10);
+			strcat_s(msg,buf);
+			strcat_s(msg," ");
+			_itoa_s(st.wHour,buf,10);
+			strcat_s(msg,buf);
+			strcat_s(msg,":");
+			_itoa_s(st.wMinute,buf,10);
+			strcat_s(msg,buf);
+			strcat_s(msg,":");
+			_itoa_s(st.wSecond,buf,10);
+			strcat_s(msg,buf);
+			strcat_s(msg," ");
 	
 			fprintf(f,"%s;%i;%s\n",msg,code,Viewers[nummer].hostname);
 			fclose(f);
@@ -175,8 +177,8 @@ void LogStats_access(char *start,char *stop,int code,int viewer,int server ,long
 					{
 						char* p = strrchr(szFileName, '\\');
 						*p = '\0';
-						strcat (szFileName,"\\");
-						strcat (szFileName,"connections.txt");
+						strcat_s(szFileName,"\\");
+						strcat_s(szFileName,"connections.txt");
 					}
 
 	if ((f = fopen((LPCSTR)szFileName, "a")) != NULL)
@@ -194,10 +196,10 @@ debug( const char *fmt, ... )
     va_list args;
 	memset(myoutput2,0,256);
 	va_start( args, fmt );
-	sprintf(myoutput, "UltraVnc> ");
-	vsprintf( myoutput, fmt, args );
+	sprintf_s(myoutput, "UltraVnc> ");
+	vsprintf_s( myoutput, fmt, args );
 	va_end( args );
-	strncpy(myoutput2,myoutput,strlen(myoutput)-1);
+	strncpy_s(myoutput2,myoutput,strlen(myoutput)-1);
 	win_log(myoutput2);
 }
 

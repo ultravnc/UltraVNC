@@ -51,7 +51,7 @@ wi_printf(wi_sess * sess, char * fmt, ...)
    }
 
    va_start(a, fmt);
-   vsprintf(output, fmt, a);
+   vsprintf(output,  fmt, a);
    va_end(a);
 
    /* See if we overflowed the print buffer */

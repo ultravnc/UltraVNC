@@ -115,7 +115,7 @@ DWORD WINAPI ThreadStartWeb(LPVOID lpParam)
 		if (old_port!=saved_portHTTP)
 		{
 			char text[200];
-			sprintf(text,"The defined web port is already in use. \nChanged to http://localhost:%i \nVerify settings!\n Default user and password is admin.",saved_portHTTP);
+			sprintf_s(text, 200, "The defined web port is already in use. \nChanged to http://localhost:%i \nVerify settings!\n Default user and password is admin.",saved_portHTTP);
 			MessageBox(NULL,text,"UltraVnc Repeater: Warning",MB_ICONEXCLAMATION);
 		}
 		/* Install our port-local authentication routine */
@@ -428,8 +428,8 @@ testaction3_cgi(wi_sess * sess,  EOFILE * eofile)
 	{
 	   char idnr[50];
 	   char commentnr[50];
-	   sprintf (idnr,"%s%i","id",i);
-	   sprintf (commentnr,"%s%i","comment",i);
+	   sprintf_s(idnr,50,"%s%i","id",i);
+	   sprintf_s(commentnr,50, "%s%i","comment",i);
 	   id = wi_formvalue(sess, idnr);  
 	   comment = wi_formvalue(sess, commentnr); 
 	   if (id && comment) 
@@ -488,8 +488,8 @@ listcomment_ssi(wi_sess * sess, EOFILE * eofile)
 			char pg[]="\" type=\"text\" value=\"";
 			char gg[]="\" style=\"width: 450px\"></td>";
  			char h[]="</tr>";
-			if (comment[i].comment) sprintf(txt,"%s%s%s%s%i%s%i%s%s%s%s%i%s%s%s%s",a,b,c,d,i,pd,comment[i].code,dd,e,f,g,i,pg,comment[i].comment,gg,h);
-			else sprintf(txt,"%s%s%s%s%i%s%i%s%s%s%s%i%s%s%s%s",a,b,c,d,i,pd,comment[i].code,dd,e,f,g,i,pg,"",gg,h);
+			if (comment[i].comment) sprintf_s(txt, 1000, "%s%s%s%s%i%s%i%s%s%s%s%i%s%s%s%s",a,b,c,d,i,pd,comment[i].code,dd,e,f,g,i,pg,comment[i].comment,gg,h);
+			else sprintf_s(txt,1000, "%s%s%s%s%i%s%i%s%s%s%s%i%s%s%s%s",a,b,c,d,i,pd,comment[i].code,dd,e,f,g,i,pg,"",gg,h);
 			wi_printf(sess, "%s", txt);
 		}
 	}
@@ -508,8 +508,8 @@ connections_ssi(wi_sess * sess, EOFILE * eofile)
 					{
 						char* p = strrchr(szFileName, '\\');
 						*p = '\0';
-						strcat (szFileName,"\\");
-						strcat (szFileName,"connections.txt");
+						strcat_s(szFileName, 260, "\\");
+						strcat_s(szFileName, 260, "connections.txt");
 					}
 
 	if ((f = fopen((LPCSTR)szFileName, "r")) != NULL)
@@ -535,8 +535,8 @@ server_access_ssi(wi_sess * sess, EOFILE * eofile)
 					{
 						char* p = strrchr(szFileName, '\\');
 						*p = '\0';
-						strcat (szFileName,"\\");
-						strcat (szFileName,"server_access.txt");
+						strcat_s(szFileName,260,"\\");
+						strcat_s(szFileName,260,"server_access.txt");
 					}
 
 	if ((f = fopen((LPCSTR)szFileName, "r")) != NULL)
@@ -562,8 +562,8 @@ viewer_access_ssi(wi_sess * sess, EOFILE * eofile)
 					{
 						char* p = strrchr(szFileName, '\\');
 						*p = '\0';
-						strcat (szFileName,"\\");
-						strcat (szFileName,"viewer_access.txt");
+						strcat_s(szFileName,260,"\\");
+						strcat_s(szFileName,260,"viewer_access.txt");
 					}
 
 	if ((f = fopen((LPCSTR)szFileName, "r")) != NULL)
@@ -627,22 +627,22 @@ testaction_cgi(wi_sess * sess,  EOFILE * eofile)
    if (allow_on) saved_allow=true;
    else saved_allow=false;
    allow_con = wi_formvalue(sess, "allow_con");
-   if (allow_con) strcpy(saved_sample1,allow_con);
-   else strcpy(saved_sample1,"");
+   if (allow_con) strcpy_s(saved_sample1, 1024, allow_con);
+   else strcpy_s(saved_sample1, 1024, "");
 
    refuse_on = wi_formvalue(sess, "refuse_on");  
    if (refuse_on) saved_refuse=true;
    else saved_refuse=false;
    refuse_con = wi_formvalue(sess, "refuse_con"); 
-   if (refuse_con) strcpy(saved_sample2,refuse_con);
-   else strcpy(saved_sample2,"");
+   if (refuse_con) strcpy_s(saved_sample2, 1024, refuse_con);
+   else strcpy_s(saved_sample2, 1024, "");
 
    id_on = wi_formvalue(sess, "id_on");  
    if (id_on) saved_refuse2=true;
    else saved_refuse2=false;
    id_con = wi_formvalue(sess, "id_con");  
-    if (id_con) strcpy(saved_sample3,id_con);
-   else strcpy(saved_sample3,"");
+    if (id_con) strcpy_s(saved_sample3, 1024, id_con);
+   else strcpy_s(saved_sample3, 1024, "");
 //#endif
    ucom_on = wi_formvalue(sess, "ucom_on");  
    if (ucom_on) saved_usecom=true;

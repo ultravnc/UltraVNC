@@ -55,7 +55,7 @@ void Read_comment()
 					{
 						char* p = strrchr(myInifile, '\\');
 						*p = '\0';
-						strcat (myInifile,"\\comment.txt");
+						strcat_s(myInifile, 260, "\\comment.txt");
 					}
 	for (i=0;i<MAX_LIST*2;i++)
 	{
@@ -64,20 +64,21 @@ void Read_comment()
 		char temp2[256];
 		char seps[]   = ":";
 		char *token;
+		char *next_token = NULL;
 
 		comment[i].code=0;
 		memset(comment[i].comment,0,256);
 
 		memset(temp2,0,256);
-		sprintf(temp,"%i",i);
+		sprintf_s(temp, 10, "%i",i);
 		ReadString("comment", temp,temp2,256);
-		token = strtok( temp2, seps );
+		token = strtok_s( temp2, seps , &next_token);
 		if ( token != NULL )
 		{
 			int a=0;
 			comment[i].code=atol(token);
 		}
-		token = strtok( NULL, seps );
+		token = strtok_s( NULL, seps,  &next_token);
 		if ( token != NULL )
 		{
 			strcpy_s(comment[i].comment,256,token);
@@ -92,15 +93,15 @@ void Save_comment()
 					{
 						char* p = strrchr(myInifile, '\\');
 						*p = '\0';
-						strcat (myInifile,"\\comment.txt");
+						strcat_s(myInifile, 260, "\\comment.txt");
 					}
 	for (i=0;i<MAX_LIST*2;i++)
 	{
 		char temp[10];
 		char temp3[10];
 		char temp2[256];
-		sprintf(temp,"%i",i);
-		sprintf(temp3,"%u",comment[i].code);
+		sprintf_s(temp,10, "%i",i);
+		sprintf_s(temp3, 10, "%u",comment[i].code);
 		strcpy_s(temp2,256,temp3);
 		strcat_s(temp2,256,":");
 		strcat_s(temp2,256,comment[i].comment);
@@ -164,7 +165,7 @@ Read_settings()
 					{
 						char* p = strrchr(szFileName, '\\');
 						*p = '\0';
-						strcat (szFileName,"\\settings2.txt");
+						strcat_s(szFileName, 260, "\\settings2.txt");
 					}
 	hFile=CreateFile((LPCSTR)szFileName, GENERIC_READ,
             0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL,
@@ -179,10 +180,10 @@ Read_settings()
 		saved_allow=1;
 		saved_refuse=0;
 		saved_refuse2=0;
-		strcpy(saved_sample1,"");
-		strcpy(saved_sample2,"");
-		strcpy(saved_sample3,"");
-		strcpy(saved_password,"adminadmi2");
+		strcpy_s(saved_sample1, 1024, "");
+		strcpy_s(saved_sample2, 1024,"");
+		strcpy_s(saved_sample3, 1024,"");
+		strcpy_s(saved_password, 64, "adminadmi2");
 		saved_portHTTP=80;
 		saved_usecom=0;
 		Save_settings();
@@ -216,27 +217,31 @@ Read_settings()
 		while (test)
 		{
 		int len=test-pos;
-		strncpy(temp1[rule1],pos,len);
+		strncpy_s(temp1[rule1], 25, pos,len);
 		temp1[rule1][len]=0;
 		rule1++;
+		if (rule1 > 48)
+			break;
 		pos+=len+1;
 		test=strchr(pos,ch);
 		}
-		strcpy(temp1[rule1],pos);
+		strcpy_s(temp1[rule1], 25, pos);
 		rule1++;
 
-		test=strchr(saved_sample2,ch);
+		test=strchr(saved_sample2, ch);
 		pos=saved_sample2;
 		while (test)
 		{
 		int len=test-pos;
-		strncpy(temp2[rule2],pos,len);
+		strncpy_s(temp2[rule2], 16, pos,len);
 		temp2[rule2][len]=0;
 		rule2++;
+		if (rule2 > 48)
+			break;
 		pos+=len+1;
 		test=strchr(pos,ch);
 		}
-		strcpy(temp2[rule2],pos);
+		strcpy_s(temp2[rule2], 16,pos);
 		rule2++;
 
 		test=strchr(saved_sample3,ch);
@@ -244,13 +249,15 @@ Read_settings()
 		while (test)
 		{
 		int len=test-pos;
-		strncpy(temp3[rule3],pos,len);
+		strncpy_s(temp3[rule3], 16,pos,len);
 		temp3[rule3][len]=0;
 		rule3++;
+		if (rule3 > 48)
+			break;
 		pos+=len+1;
 		test=strchr(pos,ch);
 		}
-		strcpy(temp3[rule3],pos);
+		strcpy_s(temp3[rule3], 16,pos);
 		rule3++;
 
 		CloseHandle(hFile);
@@ -267,7 +274,7 @@ Save_settings()
 					{
 						char* p = strrchr(szFileName, '\\');
 						*p = '\0';
-						strcat (szFileName,"\\settings2.txt");
+						strcat_s(szFileName,260, "\\settings2.txt");
 					}
 	hFile=CreateFile((LPCSTR)szFileName, GENERIC_WRITE,
             0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL,
@@ -366,7 +373,7 @@ list_servers(wi_sess * sess,char *txt)
 {
 	char temp[10];
 	int i;
-	strcpy(txt,"<table class=\"style2\" style=\"width: 800px\">");
+	strcpy_s(txt, 4000, "<table class=\"style2\" style=\"width: 800px\">");
 	strcat_s(txt,4000,"<tr>");
 		strcat_s(txt,4000,"<td style=\"width: 40px; height: 23px\" class=\"style3\">Slot</td>");
 		strcat_s(txt,4000,"<td style=\"width: 160px; height: 23px\" class=\"style3\">Time</td>");
@@ -381,7 +388,7 @@ list_servers(wi_sess * sess,char *txt)
 		if (Servers[i].code!=0 && Servers[i].used==0) 
 		{
 			strcpy_s(txt,4000,"<tr>");
-			_itoa(i,temp,10);
+			_itoa_s(i,temp,10, 10);
 			strcat_s(txt,4000,"<td style=\"width: 40px; height: 23px\"class=\"style3\">");
 			strcat_s(txt,4000,temp);	
 			strcat_s(txt,4000,"</td>");
@@ -390,7 +397,7 @@ list_servers(wi_sess * sess,char *txt)
 			strcat_s(txt,4000,Servers[i].time);	
 			strcat_s(txt,4000,"</td>");
 
-			_itoa(Servers[i].code,temp,10);
+			_itoa_s(Servers[i].code,temp,10, 10);
 			strcat_s(txt,4000,"<td style=\"width: 90px; height: 23px\"class=\"style3\">");
 			strcat_s(txt,4000,temp);	
 			strcat_s(txt,4000,"</td>");
@@ -406,7 +413,7 @@ list_servers(wi_sess * sess,char *txt)
 			wi_printf(sess, "%s", txt );
 		}
 	}
-	strcpy(txt,"</table>");
+	strcpy_s(txt, 4000, "</table>");
 	wi_printf(sess, "%s", txt );
 
 }
@@ -416,7 +423,7 @@ list_viewers(wi_sess * sess,char *txt)
 {
 	char temp[10];
 	int i;
-	strcpy(txt,"<table class=\"style2\" style=\"width: 800px\">");
+	strcpy_s(txt, 4000, "<table class=\"style2\" style=\"width: 800px\">");
 	strcat_s(txt,4000,"<tr>");
 		strcat_s(txt,4000,"<td style=\"width: 40px; height: 23px\" class=\"style3\">Slot</td>");
 		strcat_s(txt,4000,"<td style=\"width: 160px; height: 23px\" class=\"style3\">Time</td>");
@@ -431,7 +438,7 @@ list_viewers(wi_sess * sess,char *txt)
 		if (Viewers[i].code!=0 && Viewers[i].used==0) 
 		{
 			strcpy_s(txt,4000,"<tr>");
-			_itoa(i,temp,10);
+			_itoa_s(i,temp,10, 10);
 			strcat_s(txt,4000,"<td style=\"width: 40px; height: 23px\" class=\"style3\" >");
 			strcat_s(txt,4000,temp);	
 			strcat_s(txt,4000,"</td>");
@@ -440,7 +447,7 @@ list_viewers(wi_sess * sess,char *txt)
 			strcat_s(txt,4000,Viewers[i].time);	
 			strcat_s(txt,4000,"</td>");
 
-			_itoa(Viewers[i].code,temp,10);
+			_itoa_s(Viewers[i].code,temp,10, 10);
 			strcat_s(txt,4000,"<td style=\"width: 90px; height: 23px\" class=\"style3\" >");
 			strcat_s(txt,4000,temp);	
 			strcat_s(txt,4000,"</td>");
@@ -456,7 +463,7 @@ list_viewers(wi_sess * sess,char *txt)
 			wi_printf(sess, "%s", txt );
 		}
 	}
-	strcpy(txt,"</table>");
+	strcpy_s(txt, 4000, "</table>");
 	wi_printf(sess, "%s", txt );
 
 }
@@ -467,7 +474,7 @@ list_connections(wi_sess * sess,char *txt)
 	char temp[10];
 	int i;
 	int j;
-	strcpy(txt,"<table class=\"style2\" style=\"width: 800px\">");
+	strcpy_s(txt, 4000, "<table class=\"style2\" style=\"width: 800px\">");
 	strcat_s(txt,4000,"<tr>");
 		strcat_s(txt,4000,"<td style=\"width: 40px; height: 23px\" class=\"style3\">Slot</td>");
 		strcat_s(txt,4000,"<td style=\"width: 160px; height: 23px\" class=\"style3\">Time</td>");
@@ -479,13 +486,13 @@ list_connections(wi_sess * sess,char *txt)
 		strcat_s(txt,4000,"<td style=\"width: 250px; height: 23px\" class=\"style3\">comment</td>");
 	strcat_s(txt,4000,"</tr>");
 	wi_printf(sess, "%s", txt );
-	strcpy(txt,"");
+	strcpy_s(txt, 4000, "");
 	for (i=0;i<MAX_LIST;i++)
 	{
 		if (Viewers[i].code!=0 && Viewers[i].used!=0) 
 		{
 			strcpy_s(txt,4000,"<tr>");
-			_itoa(i,temp,10);
+			_itoa_s(i,temp,10, 10);
 			strcat_s(txt,4000,"<td style=\"width: 40px; height: 23px\"class=\"style3\">");
 			strcat_s(txt,4000,temp);	
 			strcat_s(txt,4000,"</td>");
@@ -494,7 +501,7 @@ list_connections(wi_sess * sess,char *txt)
 			strcat_s(txt,4000,Viewers[i].time);	
 			strcat_s(txt,4000,"</td>");
 
-			_itoa(Viewers[i].code,temp,10);
+			_itoa_s(Viewers[i].code,temp,10, 10);
 			strcat_s(txt,4000,"<td style=\"width: 90px; height: 23px\"class=\"style3\">");
 			strcat_s(txt,4000,temp);	
 			strcat_s(txt,4000,"</td>");
@@ -513,12 +520,12 @@ list_connections(wi_sess * sess,char *txt)
 				}
 			}
 
-			_itoa(Viewers[i].recvbytes/1000,temp,10);
+			_itoa_s(Viewers[i].recvbytes/1000,temp,10, 10);
 			strcat_s(txt,4000,"<td style=\"width: 75px; height: 23px\"class=\"style3\">");
 			strcat_s(txt,4000,temp);	
 			strcat_s(txt,4000,"</td>");
 
-			_itoa(Viewers[i].average,temp,10);
+			_itoa_s(Viewers[i].average,temp, 10, 10);
 			strcat_s(txt,4000,"<td style=\"width: 75px; height: 23px\"class=\"style3\">");
 			strcat_s(txt,4000,temp);	
 			strcat_s(txt,4000,"</td>");
@@ -529,10 +536,10 @@ list_connections(wi_sess * sess,char *txt)
 
 			strcat_s(txt,4000,"</tr>");
 			wi_printf(sess, "%s", txt );
-			strcpy(txt,"");
+			strcpy_s(txt, 4000, "");
 		}
 	}
-	strcpy(txt,"</table>");
+	strcpy_s(txt, 4000, "</table>");
 	wi_printf(sess, "%s", txt );
-	strcpy(txt,"");
+	strcpy_s(txt, 4000, "");
 }
