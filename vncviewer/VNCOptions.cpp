@@ -670,7 +670,7 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
         ArgError(sz_D14);
         continue;
       }
-      if (_stscanf_s(args[j], _T("%s"), m_logFilename) != 1) {
+      if (_stscanf(args[j], _T("%s"), m_logFilename) != 1) {
         ArgError(sz_D15);
         continue;
       } else {
