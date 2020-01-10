@@ -262,7 +262,7 @@
       <DataExecutionPrevention>
       </DataExecutionPrevention>
       <TargetMachine>MachineX64</TargetMachine>
-      <AdditionalLibraryDirectories>..\vncviewer\x64\Debug;..\vncviewer\Debug\x64\liblzma;..\rdr\x64\Debug;..\zlib\contrib\vstudio\vc15\x64\ZlibStatDebug;..\zipunzip_src\zip20\windll\visualc\lib\x64\Debug;..\zipunzip_src\unzip\windll\vc6\lib\x64\Debug;..\vncviewer\omnithread\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\vncviewer\x64\Debug;..\winvnc\Debug\x64\liblzma;..\rdr\x64\Debug;..\zlib\contrib\vstudio\vc15\x64\ZlibStatDebug;..\zipunzip_src\zip20\windll\visualc\lib\x64\Debug;..\zipunzip_src\unzip\windll\vc6\lib\x64\Debug;..\winvnc\omnithread\x64\Debug;..\winvnc\x64\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -475,7 +475,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\32\ipv6</Command>
     <Link>
       <AdditionalDependencies>comctl32.lib;winmm.lib;ws2_32.lib;rdr.lib;libjpeg-turbo-win.lib;zlibstat.lib;liblzma.lib;omnithread.lib;zip32.lib;unz32lib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>..\vncviewer\x64\Release;..\vncviewer\Release\x64\liblzma;..\rdr\x64\Release;..\zlib\contrib\vstudio\vc15\x64\ZlibStatRelease;..\zipunzip_src\zip20\windll\visualc\lib\x64\Release;..\zipunzip_src\unzip\windll\vc6\lib\x64\Release;..\vncviewer\omnithread\x64\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\vncviewer\x64\Release;..\winvnc\Release\x64\liblzma;..\winvnc\x64\Release;..\zlib\contrib\vstudio\vc15\x64\ZlibStatRelease;..\zipunzip_src\zip20\windll\visualc\lib\x64\Release;..\zipunzip_src\unzip\windll\vc6\lib\x64\Release;..\vncviewer\omnithread\x64\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>true</RandomizedBaseAddress>
