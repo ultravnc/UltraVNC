@@ -30,6 +30,8 @@
 #include "uvncUiAccess.h"
 #include "vncOSVersion.h"
 
+#define WM_DPICHANGED       0x02E0
+
 #define MSGFLT_ADD		1
 typedef BOOL (WINAPI *CHANGEWINDOWMESSAGEFILTER)(UINT message, DWORD dwFlag);
 int OSversion();
@@ -356,7 +358,9 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 #endif
 		SetEvent(_this->trigger_events[0]);
 		break;
-	case WM_DISPLAYCHANGE:
+	case WM_DPICHANGED:
+		_this->m_screensize_changed = true;
+	case WM_DISPLAYCHANGE:			
 		// The display resolution is changing
 		// We must kick off any clients since their screen size will be wrong
 		// WE change the clients screensize, if they support it.

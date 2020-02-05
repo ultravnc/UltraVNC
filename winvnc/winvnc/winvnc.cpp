@@ -271,11 +271,23 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 	SetProcessShutdownParameters(0x100,false);
 	// handle dpi on aero
 	HMODULE hUser32 = LoadLibrary(_T("user32.dll"));
+	HMODULE hSHCore = LoadLibrary(_T("SHCore.dll"));
 	typedef BOOL (*SetProcessDPIAwareFunc)();
-	SetProcessDPIAwareFunc setDPIAware=NULL;
-	if (hUser32) setDPIAware = (SetProcessDPIAwareFunc)GetProcAddress(hUser32, "SetProcessDPIAware");
-	if (setDPIAware) setDPIAware();
-	if (hUser32) FreeLibrary(hUser32);
+	HRESULT(WINAPI *_SetProcessDpiAwareness)(DWORD value);
+	_SetProcessDpiAwareness	= 
+					(HRESULT(WINAPI*)(DWORD))GetProcAddress(hSHCore, "SetProcessDpiAwareness");
+	if (_SetProcessDpiAwareness)
+		_SetProcessDpiAwareness(2);
+	else  {
+		BOOL(WINAPI *_SetProcessDPIAware)();
+		_SetProcessDPIAware = (BOOL(WINAPI*)())GetProcAddress(hUser32, "SetProcessDPIAware");
+		if (_SetProcessDPIAware) 
+			_SetProcessDPIAware();
+	}
+	if (hUser32) 
+		FreeLibrary(hUser32);
+	if (hSHCore) 
+		FreeLibrary(hSHCore);
 
 #ifdef IPP
 	InitIpp();

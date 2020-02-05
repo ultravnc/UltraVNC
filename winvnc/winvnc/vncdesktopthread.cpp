@@ -305,7 +305,6 @@ vncDesktopThread::PollWindow(rfb::Region2D &rgn, HWND hwnd)
 static int old_inputDesktopSelected;
 bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D& rgncache, rfb::SimpleUpdateTracker& clipped_updates, rfb::ClippedUpdateTracker& updates)
 {
-	BOOL screensize_changed=false;
 	int inputDesktopSelected = vncService::InputDesktopSelected();
 	if (inputDesktopSelected == 2) {
 		m_desktop->m_buffer.WriteMessageOnScreen("UltraVVNC running as application doesn't \nhave permission to acces \nUAC protected windows.\n\nScreen is locked until the remote user \nunlock this window");
@@ -460,7 +459,7 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 
 					if ((m_desktop->m_scrinfo.framebufferWidth != oldscrinfo.framebufferWidth) ||
 							(m_desktop->m_scrinfo.framebufferHeight != oldscrinfo.framebufferHeight)) {
-						screensize_changed = true;
+						m_desktop->m_screensize_changed = true;
 						vnclog.Print(LL_INTINFO, VNCLOG("SCR: new screen format %dx%dx%d\n"),
 								m_desktop->m_scrinfo.framebufferWidth,
 								m_desktop->m_scrinfo.framebufferHeight,
@@ -474,7 +473,7 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 					//************* SCREEN SIZE CHANGED 
 					//****************************************************************************
 
-					if (screensize_changed) {
+					if (m_desktop->m_screensize_changed) {
 							vnclog.Print(LL_INTERR, VNCLOG("Size changed\n"));
 							POINT CursorPos;
 							GetCursorPos(&CursorPos);
@@ -646,9 +645,9 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 							m_server->UpdateLocalFormat(true); // must have the update lock
 						}
 
-					if (screensize_changed) 
+					if (m_desktop->m_screensize_changed) 
 						{
-							screensize_changed=false;
+							m_desktop->m_screensize_changed = false;
 							m_server->SetNewSWSize(m_desktop->m_scrinfo.framebufferWidth,m_desktop->m_scrinfo.framebufferHeight,FALSE);//changed no lock ok
 							m_server->SetScreenOffset(m_desktop->m_ScreenOffsetx,m_desktop->m_ScreenOffsety,m_desktop->nr_monitors);// no lock ok
 						}

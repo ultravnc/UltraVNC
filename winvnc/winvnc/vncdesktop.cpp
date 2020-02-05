@@ -464,6 +464,7 @@ vncDesktop::vncDesktop()
 	m_hOldcursor = NULL; // sf@2002
 
 	m_displaychanged = FALSE;
+	m_screensize_changed = FALSE;
 
 	m_hrootdc_Desktop = NULL;
 	m_hmemdc = NULL;
