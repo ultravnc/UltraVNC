@@ -70,7 +70,7 @@ public:
 	PSID GetSID(const TCHAR *domainaccount);
 	PACL BuildACL(void);
 	bool SetACL(PACL pACL);
-	const TCHAR * SplitString(const TCHAR *input, TCHAR separator, TCHAR *head, int sizeHead);
+	const TCHAR * SplitString(const TCHAR *input, TCHAR separator, TCHAR *head);
 	TCHAR *AddComputername(const TCHAR *user);
 	TCHAR *AddDomainname(const TCHAR *user);
 };
