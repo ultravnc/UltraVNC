@@ -36,12 +36,8 @@ class vncEncodeTight;
 #pragma once
 
 #include "vncencoder.h"
+#include "../../common/UltraVncZ.h"
 
-#ifdef _INTERNALLIB
-#include <zlib.h>
-#else
-#include <zlib/zlib.h>
-#endif
 extern "C"
 {
 #ifdef _INTERNALLIB
@@ -102,38 +98,27 @@ public:
 	// Create/Destroy methods
 	vncEncodeTight();
 	~vncEncodeTight();
-
 	virtual void Init();
 	virtual const char* GetEncodingName() { return "Tight"; }
-
 	virtual UINT RequiredBuffSize(UINT width, UINT height);
 	virtual UINT NumCodedRects(RECT &rect);
-
 	virtual UINT EncodeRect(BYTE *source, VSocket *outConn, BYTE *dest, const RECT &rect);
-
+	virtual void set_use_zstd(bool enabled);
 // Implementation
 protected:
 	int m_paletteNumColors, m_paletteMaxColors;
 	CARD32 m_monoBackground, m_monoForeground;
 	PALETTE m_palette;
-
-	z_stream m_zsStruct[4];
-	bool m_zsActive[4];
+	UltraVncZ   ultraVncZTight[4]; 
 	int m_zsLevel[4];
-
 	BYTE *m_hdrBuffer;
 	int m_hdrBufferBytes;
 	BYTE *m_buffer;
 	int m_bufflen;
-
 	bool m_usePixelFormat24;
-
 	static const TIGHT_CONF m_conf[4];
-
     int m_turboCompressLevel;
-
 	// Protected member functions.
-
 	void FindBestSolidArea(BYTE *source, int x, int y, int w, int h,
 						   CARD32 colorValue, int *w_ptr, int *h_ptr);
 	void ExtendSolidArea  (BYTE *source, int x, int y, int w, int h,
@@ -147,13 +132,11 @@ protected:
 						   CARD32 *colorPtr, bool needSameColor);
 	bool CheckSolidTile32 (BYTE *source, int x, int y, int w, int h,
 						   CARD32 *colorPtr, bool needSameColor);
-
 	UINT EncodeRectSimple (BYTE *source, VSocket *outConn, BYTE *dest,
 						   const RECT &rect);
 	UINT EncodeSubrect    (BYTE *source, VSocket *outConn, BYTE *dest,
 						   int x, int y, int w, int h);
 	void SendTightHeader  (int x, int y, int w, int h);
-
 	int SendSolidRect     (BYTE *dest);
 	int SendMonoRect      (BYTE *dest, int w, int h);
 	int SendIndexedRect   (BYTE *dest, int w, int h);
@@ -161,26 +144,19 @@ protected:
 	int CompressData      (BYTE *dest, int streamId, int dataLen,
 						   int zlibLevel, int zlibStrategy);
 	int SendCompressedData(int compressedLen);
-
 	void FillPalette8 (int count);
 	void FillPalette16(int count);
 	void FillPalette32(int count);
-
 	void FastFillPalette16(CARD16 *data, int w, int pitch, int h);
 	void FastFillPalette32(CARD32 *data, int w, int pitch, int h);
-
 	void PaletteReset(void);
 	int PaletteInsert(CARD32 rgb, int numPixels, int bpp);
-
 	void Pack24(BYTE *buf, int count);
-
 	void EncodeIndexedRect16(BYTE *buf, int count);
 	void EncodeIndexedRect32(BYTE *buf, int count);
-
 	void EncodeMonoRect8 (BYTE *buf, int w, int h);
 	void EncodeMonoRect16(BYTE *buf, int w, int h);
 	void EncodeMonoRect32(BYTE *buf, int w, int h);
-
 	int SendJpegRect(BYTE *source, BYTE *dst, int x, int y, int w, int h);
 	void PrepareRowForJpeg(BYTE *dst, int y, int w);
 	void PrepareRowForJpeg24(BYTE *dst, CARD32 *src, int count);

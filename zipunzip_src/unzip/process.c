@@ -629,7 +629,7 @@ static int do_seekable(__G__ lastchance)        /* return PK-type error code */
 
     /* initialize the CRC table pointer (once) */
     if (CRC_32_TAB == NULL) {
-        if ((CRC_32_TAB = get_crc_table()) == NULL) {
+        if ((CRC_32_TAB = get_crc_table_unzip()) == NULL) {
             CLOSE_INFILE();
             return PK_MEM;
         }
@@ -1217,7 +1217,7 @@ int get_cdir_ent(__G)   /* return PK-type error code */
       makeword(&byterec[C_COMPRESSION_METHOD]);
     G.crec.last_mod_dos_datetime =
       makelong(&byterec[C_LAST_MOD_DOS_DATETIME]);
-    G.crec.crc32 =
+    G.crec.crc32_unzip =
       makelong(&byterec[C_CRC32]);
     G.crec.csize =
       makelong(&byterec[C_COMPRESSED_SIZE]);
@@ -1275,7 +1275,7 @@ int process_local_file_hdr(__G)    /* return PK-type error code */
       makeword(&byterec[L_GENERAL_PURPOSE_BIT_FLAG]);
     G.lrec.compression_method = makeword(&byterec[L_COMPRESSION_METHOD]);
     G.lrec.last_mod_dos_datetime = makelong(&byterec[L_LAST_MOD_DOS_DATETIME]);
-    G.lrec.crc32 = makelong(&byterec[L_CRC32]);
+    G.lrec.crc32_unzip = makelong(&byterec[L_CRC32]);
     G.lrec.csize = makelong(&byterec[L_COMPRESSED_SIZE]);
     G.lrec.ucsize = makelong(&byterec[L_UNCOMPRESSED_SIZE]);
     G.lrec.filename_length = makeword(&byterec[L_FILENAME_LENGTH]);
@@ -1283,7 +1283,7 @@ int process_local_file_hdr(__G)    /* return PK-type error code */
 
     if ((G.lrec.general_purpose_bit_flag & 8) != 0) {
         /* can't trust local header, use central directory: */
-        G.lrec.crc32 = G.pInfo->crc;
+        G.lrec.crc32_unzip = G.pInfo->crc;
         G.lrec.csize = G.pInfo->compr_size;
         G.lrec.ucsize = G.pInfo->uncompr_size;
     }

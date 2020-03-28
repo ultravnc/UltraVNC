@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002-2013 UltraVNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002-2020 UltraVNC Team Members. All Rights Reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -35,10 +35,13 @@
 #include "KeyMap.h"
 #include "KeyMapJap.h"
 #include <rdr/types.h>
+#include "../common/UltraVncZ.h"
 #ifdef _INTERNALLIB
 #include <zlib.h>
+#include <zstd.h>
 #else
 #include "../zlib/zlib.h"
+#include "../zstd-1.4.4/lib/zstd.h"
 #endif
 
 extern "C"
@@ -129,7 +132,7 @@ struct BitmapInfo {
   };
 };
 
-namespace rdr { class InStream; class FdInStream; class ZlibInStream; class xzInStream; }
+namespace rdr { class InStream; class FdInStream; class ZlibInStream; class xzInStream; class ZstdInStream; }
 
 class ClientConnection  : public omni_thread
 {
@@ -193,6 +196,8 @@ public:
 	void WriteExactFT(char *buf, int bytes);
 
 private:
+	UltraVncZ *ultraVncZlib;
+	UltraVncZ ultraVncZTight[4];
 	Fps fps;
 #ifdef _Gii
 	vnctouch *mytouch;
@@ -323,8 +328,7 @@ private:
     void ReadRRERect(rfbFramebufferUpdateRectHeader *pfburh);
 	void ReadCoRRERect(rfbFramebufferUpdateRectHeader *pfburh);
 	void ReadHextileRect(rfbFramebufferUpdateRectHeader *pfburh);
-	void ReadZlibRect(rfbFramebufferUpdateRectHeader *pfburh,int XOR);
-	void ReadSolidRect(rfbFramebufferUpdateRectHeader *pfburh);
+	void ReadZlibRect(rfbFramebufferUpdateRectHeader *pfburh, bool zstd);
 	void HandleHextileEncoding8(int x, int y, int w, int h);
 	void HandleHextileEncoding16(int x, int y, int w, int h);
 	void HandleHextileEncoding32(int x, int y, int w, int h);
@@ -352,10 +356,10 @@ private:
 	void ReadCacheRect(rfbFramebufferUpdateRectHeader *pfburh);
 	void ClearCache();
 	void ReadCacheZip(rfbFramebufferUpdateRectHeader *pfburh,HRGN *prgn);
-	void ReadSolMonoZip(rfbFramebufferUpdateRectHeader *pfburh,HRGN *prgn);
+	void ReadQueueZip(rfbFramebufferUpdateRectHeader *pfburh,HRGN *prgn, bool zstd);
 
 	// ClientConnectionTight.cpp
-	void ReadTightRect(rfbFramebufferUpdateRectHeader *pfburh);
+	void ReadTightRect(rfbFramebufferUpdateRectHeader *pfburh, bool zstd);
 	int ReadCompactLen();
 	int InitFilterCopy (int rw, int rh);
 	int InitFilterGradient (int rw, int rh);
@@ -396,18 +400,18 @@ private:
 	void InvalidateRegion(const RECT *pRect,HRGN *prgn);
 
 	// ClientConnectionZlibHex.cpp
-	void HandleZlibHexEncoding8(int x, int y, int w, int h);
-	void HandleZlibHexEncoding16(int x, int y, int w, int h);
-	void HandleZlibHexEncoding32(int x, int y, int w, int h);
+	void HandleZlibHexEncoding8(int x, int y, int w, int h, bool zstd);
+	void HandleZlibHexEncoding16(int x, int y, int w, int h, bool zstd);
+	void HandleZlibHexEncoding32(int x, int y, int w, int h, bool zstd);
 	void HandleZlibHexSubencodingStream8(int x, int y, int w, int h, int subencoding);
 	void HandleZlibHexSubencodingStream16(int x, int y, int w, int h, int subencoding);
 	void HandleZlibHexSubencodingStream32(int x, int y, int w, int h, int subencoding);
 	void HandleZlibHexSubencodingBuf8(int x, int y, int w, int h, int subencoding, unsigned char * buffer);
 	void HandleZlibHexSubencodingBuf16(int x, int y, int w, int h, int subencoding, unsigned char * buffer);
 	void HandleZlibHexSubencodingBuf32(int x, int y, int w, int h, int subencoding, unsigned char * buffer);
-	void ReadZlibHexRect(rfbFramebufferUpdateRectHeader *pfburh);
+	void ReadZlibHexRect(rfbFramebufferUpdateRectHeader *pfburh, bool zstd);
 
-	bool zlibDecompress(unsigned char *from_buf, unsigned char *to_buf, unsigned int count, unsigned int size, z_stream *decompressor);
+	bool zlibDecompress(unsigned char *from_buf, unsigned char *to_buf, unsigned int count, unsigned int size, UltraVncZ * ultravncZ, bool zstd);
 
 	// ClientConnectionClipboard.cpp
 	void ProcessLocalClipboardChange();
@@ -535,10 +539,10 @@ private:
 	int m_zlibbufsize;
 
 	// zlib decompression state
-	bool m_decompStreamInited;
-	z_stream m_decompStream;
-	z_stream m_decompStreamRaw;
-	z_stream m_decompStreamEncoded;
+	//bool m_decompStreamInited;
+	//z_stream m_decompStream;
+	UltraVncZ *ultraVncZRaw;
+	UltraVncZ *ultraVncZEncoded;
 
 	void CheckZipBufferSize(int bufsize);
 	unsigned char *m_zipbuf;
@@ -557,10 +561,6 @@ private:
 	// Variables used by tight encoding:
 	// Separate buffer for tight-compressed data.
 	char m_tightbuf[TIGHT_ZLIB_BUFFER_SIZE];
-
-	// Four independent compression streams for zlib library.
-	z_stream m_tightZlibStream[4];
-	bool m_tightZlibStreamActive[4];
 
 	// Tight filter stuff. Should be initialized by filter initialization code.
 	tightFilterFunc m_tightCurrentFilter;
@@ -730,19 +730,26 @@ private:
 
 	rdr::FdInStream* fis;
 	rdr::ZlibInStream* zis;
-	void zrleDecode(int x, int y, int w, int h);
+	rdr::ZstdInStream* zstdis;
+	void zrleDecode(int x, int y, int w, int h, bool use_zstd);
+	template <class myInStream>
 	void zrleDecode8NE(int x, int y, int w, int h, rdr::InStream* is,
-		rdr::ZlibInStream* zis, rdr::U8* buf);
+		myInStream* zis, rdr::U8* buf);
+	template <class myInStream>
 	void zrleDecode15LE(int x, int y, int w, int h, rdr::InStream* is,
-		rdr::ZlibInStream* zis, rdr::U16* buf);
+		myInStream* zis, rdr::U16* buf);
+	template <class myInStream>
 	void zrleDecode16LE(int x, int y, int w, int h, rdr::InStream* is,
-		rdr::ZlibInStream* zis, rdr::U16* buf);
+		myInStream* zis, rdr::U16* buf);
+	template <class myInStream>
 	void zrleDecode24ALE(int x, int y, int w, int h, rdr::InStream* is,
-		rdr::ZlibInStream* zis, rdr::U32* buf);
+		myInStream* zis, rdr::U32* buf);
+	template <class myInStream>
 	void zrleDecode24BLE(int x, int y, int w, int h, rdr::InStream* is,
-		rdr::ZlibInStream* zis, rdr::U32* buf);
+		myInStream* zis, rdr::U32* buf);
+	template <class myInStream>
 	void zrleDecode32LE(int x, int y, int w, int h, rdr::InStream* is,
-		rdr::ZlibInStream* zis, rdr::U32* buf);
+		myInStream* zis, rdr::U32* buf);
 	long zywrle;
 	long zywrle_level;
 	int zywrleBuf[rfbZRLETileWidth*rfbZRLETileHeight];
@@ -952,7 +959,7 @@ public:
 		}																		\
 	}
 
-#define SETXORSOLPIXELS(mask,buffer, color, bpp, x, y, w, h)					\
+/*#define SETXORSOLPIXELS(mask,buffer, color, bpp, x, y, w, h)					\
 	{																			\
 		CARD##bpp *p = (CARD##bpp *) buffer;									\
 		CARD##bpp *pc = (CARD##bpp *) color;									\
@@ -1015,9 +1022,9 @@ public:
 					i++;														\
 			}																	\
 		}																		\
-	}
+	}*/
 
-#define MYMASK(mask,i,result)						\
+/*#define MYMASK(mask,i,result)						\
 	{												\
 		int byte_nr,bit_nr;							\
 		byte_nr=i/8;								\
@@ -1030,5 +1037,5 @@ public:
 		if (bit_nr==5) result=mask[byte_nr].b5;		\
 		if (bit_nr==6) result=mask[byte_nr].b6;		\
 		if (bit_nr==7) result=mask[byte_nr].b7;		\
-	}
+	}*/
 #endif

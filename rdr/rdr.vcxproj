@@ -393,6 +393,8 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..;../zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="ZstdInStream.cxx" />
+    <ClCompile Include="ZstdOutStream.cxx" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Exception.h" />
@@ -407,6 +409,8 @@
     <ClInclude Include="types.h" />
     <ClInclude Include="ZlibInStream.h" />
     <ClInclude Include="ZlibOutStream.h" />
+    <ClInclude Include="ZstdInStream.h" />
+    <ClInclude Include="ZstdOutStream.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

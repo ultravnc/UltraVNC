@@ -1,4 +1,4 @@
-//  Copyright (C) 2002 UltraVNC Team Members. All Rights Reserved.
+//  Copyright (C) 2020 UltraVNC Team Members. All Rights Reserved.
 //  Copyright (C) 2015 D. R. Commander. All Rights Reserved.
 //  Copyright (C) 2000-2002 Const Kaplinsky. All Rights Reserved.
 //  Copyright (C) 2002 RealVNC Ltd. All Rights Reserved.
@@ -132,7 +132,7 @@ public:
 	inline BOOL SendEmptyCursorShape(VSocket *outConn);
 	inline BOOL IsXCursorSupported();
 	// CLIENT OPTIONS
-	inline void AvailableXOR(BOOL enable){m_use_xor = enable;};
+	inline void AvailableQueueEnabled(BOOL enable){m_use_queue = enable;};
 	inline void AvailableZRLE(BOOL enable){m_use_zrle = enable;};
 #ifdef _XZ
 	inline void AvailableXZ(BOOL enable){m_use_xz = enable;};
@@ -207,7 +207,7 @@ protected:
 
 	// Client detection
 	// if tight->tight zrle->zrle both=ultra
-	BOOL			m_use_xor;
+	BOOL			m_use_queue;
 	BOOL			m_use_zrle;
 	BOOL			m_use_xz;
 	BOOL			m_use_tight;
@@ -585,117 +585,136 @@ vncEncodeMgr::SetEncoding(CARD32 encoding,BOOL reinitialize)
 		EnableCache(false);
 		break;
 
-	case rfbEncodingZRLE:
-		vnclog.Print(LL_INTINFO, VNCLOG("ZRLE encoder requested\n"));
+	case rfbEncodingZSTDRLE:
+		vnclog.Print(LL_INTINFO, VNCLOG("ZSTDRLE encoder requested\n"));			
 		if (!zrleEncoder)
 			zrleEncoder = new vncEncodeZRLE;
 		m_encoder = zrleEncoder;
 		((vncEncodeZRLE*)zrleEncoder)->m_use_zywrle = FALSE;
+		((vncEncodeZRLE*)zrleEncoder)->set_use_zstd(true);
+		break;
+	case rfbEncodingZRLE:
+		vnclog.Print(LL_INTINFO, VNCLOG("ZRLE encoder requested\n"));			
+		if (!zrleEncoder)
+			zrleEncoder = new vncEncodeZRLE;
+		m_encoder = zrleEncoder;
+		((vncEncodeZRLE*)zrleEncoder)->m_use_zywrle = FALSE;
+		((vncEncodeZRLE*)zrleEncoder)->set_use_zstd(false);
 		break;
 
-	case rfbEncodingZYWRLE:
-		vnclog.Print(LL_INTINFO, VNCLOG("ZYWRLE encoder requested\n"));
+	case rfbEncodingZSTDYWRLE:
+		vnclog.Print(LL_INTINFO, VNCLOG("ZSTDYWRLE encoder requested\n"));		
 		if (!zrleEncoder)
 			zrleEncoder = new vncEncodeZRLE;
 		m_encoder = zrleEncoder;
 		((vncEncodeZRLE*)zrleEncoder)->m_use_zywrle = TRUE;
+		((vncEncodeZRLE*)zrleEncoder)->set_use_zstd(true);
+		break;
+	case rfbEncodingZYWRLE:
+		vnclog.Print(LL_INTINFO, VNCLOG("ZYWRLE encoder requested\n"));			
+		if (!zrleEncoder)
+			zrleEncoder = new vncEncodeZRLE;
+		m_encoder = zrleEncoder;
+		((vncEncodeZRLE*)zrleEncoder)->m_use_zywrle = TRUE;
+		((vncEncodeZRLE*)zrleEncoder)->set_use_zstd(false);
 		break;
 #ifdef _XZ
 	case rfbEncodingXZ:
 		vnclog.Print(LL_INTINFO, VNCLOG("XZ encoder requested\n"));
-
 		if ( m_hold_xz_encoder == NULL )
-		{
 			m_encoder = new vncEncodeXZ;
-		}
 		else
-		{
 			m_encoder = m_hold_xz_encoder;
-		}
 		((vncEncodeXZ*)m_encoder)->m_use_xzyw = FALSE;
 		xz_encoder_in_use = true;
 		break;
 
 	case rfbEncodingXZYW:
 		vnclog.Print(LL_INTINFO, VNCLOG("XZYW encoder requested\n"));
-
 		if ( m_hold_xz_encoder == NULL )
-		{
 			m_encoder = new vncEncodeXZ;
-		}
 		else
-		{
 			m_encoder = m_hold_xz_encoder;
-		}
 		((vncEncodeXZ*)m_encoder)->m_use_xzyw = TRUE;
 		xz_encoder_in_use = true;
 		break;
 #endif
 
 	case rfbEncodingZlib:
-
-		vnclog.Print(LL_INTINFO, VNCLOG("Zlib encoder requested\n"));
-
-		// Create a Zlib encoder, if needed.
-		// If a Zlib encoder was used previously, then reuse it here
-		// to maintain zlib dictionary synchronization with the viewer.
-		if ( m_hold_zlib_encoder == NULL )
-		{
+		vnclog.Print(LL_INTINFO, VNCLOG("Zlib encoder requested\n"));		
+		if (m_hold_zlib_encoder == NULL)
 			m_encoder = new vncEncodeZlib;
-		}
 		else
-		{
 			m_encoder = m_hold_zlib_encoder;
-		}
+		if (m_encoder == NULL)
+			return FALSE;
+		zlib_encoder_in_use = true;
+		((vncEncodeZlib*)m_encoder)->set_use_zstd(false);
+		break;
+
+	case rfbEncodingZstd:
+		vnclog.Print(LL_INTINFO, VNCLOG("Zstd encoder requested\n"));
+		if ( m_hold_zlib_encoder == NULL )
+			m_encoder = new vncEncodeZlib;
+		else
+			m_encoder = m_hold_zlib_encoder;
 		if (m_encoder == NULL)
 			return FALSE;
 		zlib_encoder_in_use = true;//
+		((vncEncodeZlib*)m_encoder)->set_use_zstd(true);
 		break;
-
 
 	case rfbEncodingZlibHex:
 		vnclog.Print(LL_INTINFO, VNCLOG("ZlibHex encoder requested\n"));
-
-		// Create a ZlibHex encoder, if needed.
-		// If a Zlibhex encoder was used previously, then reuse it here
-		// to maintain zlib dictionary synchronization with the viewer.
-		if ( m_hold_zlibhex_encoder == NULL )
-		{
+		if (m_hold_zlibhex_encoder == NULL)
 			m_encoder = new vncEncodeZlibHex;
-		}
 		else
-		{
 			m_encoder = m_hold_zlibhex_encoder;
-		}
 		if (m_encoder == NULL)
 			return FALSE;
 		zlibhex_encoder_in_use = true;//
+		((vncEncodeZlibHex*)m_encoder)->set_use_zstd(false);
 		break;
 
+	case rfbEncodingZstdHex:
+		vnclog.Print(LL_INTINFO, VNCLOG("ZstdbHex encoder requested\n"));
+		if ( m_hold_zlibhex_encoder == NULL )
+			m_encoder = new vncEncodeZlibHex;
+		else
+			m_encoder = m_hold_zlibhex_encoder;
+		if (m_encoder == NULL)
+			return FALSE;
+		zlibhex_encoder_in_use = true;//
+		((vncEncodeZlibHex*)m_encoder)->set_use_zstd(true);
+		break;
 
 	case rfbEncodingTight:
 		vnclog.Print(LL_INTINFO, VNCLOG("Tight encoder requested\n"));
-
-		// Create a Tight encoder, if needed.
-		// If a Tight encoder was used previously, then reuse it here
-		// to maintain zlib dictionaries synchronization with the viewer.
 		if ( m_hold_tight_encoder == NULL )
-		{
 			m_encoder = new vncEncodeTight;
-		}
 		else
-		{
 			m_encoder = m_hold_tight_encoder;
-		}
 		if (m_encoder == NULL)
 			return FALSE;
 		tight_encoder_in_use = true;
+		((vncEncodeTight*)m_encoder)->set_use_zstd(false);
+		break;
+
+	case rfbEncodingTightZstd:
+		vnclog.Print(LL_INTINFO, VNCLOG("TightZstd encoder requested\n"));
+		if (m_hold_tight_encoder == NULL)
+			m_encoder = new vncEncodeTight;
+		else
+			m_encoder = m_hold_tight_encoder;
+		if (m_encoder == NULL)
+			return FALSE;
+		tight_encoder_in_use = true;
+		((vncEncodeTight*)m_encoder)->set_use_zstd(true);
 		break;
 
 	default:
 		// An unknown encoding was specified
 		vnclog.Print(LL_INTERR, VNCLOG("unknown encoder requested: %i\n"), encoding);
-
 		return FALSE;
 	}
 
@@ -814,12 +833,10 @@ vncEncodeMgr::EncodeRect(const rfb::Rect &rect,VSocket *outconn)
 	}
 	if (zlib_encoder_in_use)
 	{
-		if (m_use_xor)
-		{
-		omni_mutex_lock l(m_buffer->m_cacheLock, 671);
-		return m_encoder->EncodeRect(m_buffer->m_backbuff, m_buffer->m_cachebuff, outconn ,m_clientbuff, rect);
-		}
-		else return m_encoder->EncodeRect(m_buffer->m_backbuff, NULL, outconn ,m_clientbuff, rect);
+		if (m_use_queue)
+			return m_encoder->EncodeRect(m_buffer->m_backbuff, outconn ,m_clientbuff, rect, 1);
+		else 
+			return m_encoder->EncodeRect(m_buffer->m_backbuff, outconn ,m_clientbuff, rect, 0);
 	}
 	if (ultra_encoder_in_use)
 	{
@@ -991,7 +1008,7 @@ vncEncodeMgr::EnableLastRect(BOOL enable)
 inline BOOL
 vncEncodeMgr::IsMouseWheelTight()
 {
-	if (m_use_tight && !m_use_xor) //tight client
+	if (m_use_tight && !m_use_queue) //tight client
 		return true;
 	return false;
 }

@@ -1120,6 +1120,17 @@
   <ItemGroup>
     <None Include="..\..\ziplib.def" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\api.h" />
+    <ClInclude Include="..\..\..\crypt.h" />
+    <ClInclude Include="..\..\..\ebcdic.h" />
+    <ClInclude Include="..\..\..\revision.h" />
+    <ClInclude Include="..\..\..\tailor.h" />
+    <ClInclude Include="..\..\..\timezone.h" />
+    <ClInclude Include="..\..\..\ttyio.h" />
+    <ClInclude Include="..\..\..\zip.h" />
+    <ClInclude Include="..\..\..\ziperr.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

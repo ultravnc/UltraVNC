@@ -546,7 +546,7 @@ typedef struct central_directory_file_header { /* CENTRAL */
     ush general_purpose_bit_flag;
     ush compression_method;
     ulg last_mod_dos_datetime;
-    ulg crc32;
+    ulg crc32_unzip;
     ulg csize;
     ulg ucsize;
     ush filename_length;

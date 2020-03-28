@@ -389,7 +389,7 @@ void ziperr   OF((int, ZCONST char *));
 #  else
      void flush_outbuf OF((char *, unsigned *));
      int seekable OF((void));
-     extern unsigned (*read_buf) OF((char *, unsigned int));
+     extern unsigned (*read_buf_zip) OF((char *, unsigned int));
 #  endif /* !USE_ZLIB */
 #  ifdef ZP_NEED_MEMCOMPR
      ulg memcompress OF((char *, ulg, char *, ulg));

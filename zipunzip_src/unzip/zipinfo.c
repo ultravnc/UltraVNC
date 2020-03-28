@@ -1115,7 +1115,7 @@ static int zi_long(__G__ pEndprev)   /* return PK-type error code */
     }
 #endif /* USE_EF_UT_TIME */
 
-    Info(slide, 0, ((char *)slide, LoadFarString(CRC32Value), G.crec.crc32));
+    Info(slide, 0, ((char *)slide, LoadFarString(CRC32Value), G.crec.crc32_unzip));
     Info(slide, 0, ((char *)slide, LoadFarString(CompressedFileSize),
       G.crec.csize));
     Info(slide, 0, ((char *)slide, LoadFarString(UncompressedFileSize),

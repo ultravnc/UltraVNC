@@ -1875,7 +1875,7 @@ nextarg: ;
 #if CRYPT
   /* Initialize the crc_32_tab pointer, when encryption was requested. */
   if (key != NULL) {
-    crc_32_tab = get_crc_table();
+    crc_32_tab = get_crc_table_unzip();
 #ifdef EBCDIC
     /* convert encryption key to ASCII (ISO variant for 8-bit ASCII chars) */
     strtoasc(key, key);

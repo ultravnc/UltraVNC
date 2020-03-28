@@ -136,7 +136,7 @@
 #define __globals_h
 
 #ifdef USE_ZLIB
-#  include "zlib.h"
+#  include "zstd_zlibwrapper.h"
 #  ifdef zlib_version           /* This name is used internally in unzip */
 #    undef zlib_version         /*  and must not be defined as a macro. */
 #  endif
@@ -226,7 +226,7 @@ typedef struct Globals {
     ZCONST ulg Far *crc_32_tab;
 #  endif
 #endif
-    ulg       crc32val;             /* CRC shift reg. (was static in funzip) */
+    ulg       crc32_unzipval;             /* CRC shift reg. (was static in funzip) */
 
 #ifdef FUNZIP
     FILE     *in;                   /* file descriptor of compressed stream */

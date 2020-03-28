@@ -343,7 +343,7 @@ int list_files(__G)    /* return PK-type error code */
             (*G.lpUserFunctions->SendApplicationMessage)(G.crec.ucsize, csiz,
               (unsigned)cfactor, mo, dy, yr, hh, mm,
               (char)(G.pInfo->lcflag ? '^' : ' '),
-              (LPSTR)fnfilter(G.filename, slide), (LPSTR)methbuf, G.crec.crc32,
+              (LPSTR)fnfilter(G.filename, slide), (LPSTR)methbuf, G.crec.crc32_unzip,
               (char)((G.crec.general_purpose_bit_flag & 1) ? 'E' : ' '));
 #else /* !WINDLL */
             if (cfactor == 100)
@@ -354,7 +354,7 @@ int list_files(__G)    /* return PK-type error code */
                 Info(slide, 0, ((char *)slide, LoadFarString(LongHdrStats),
                   G.crec.ucsize, methbuf, csiz, cfactorstr,
                   mo, dt_sepchar, dy, dt_sepchar, yr, hh, mm,
-                  G.crec.crc32, (G.pInfo->lcflag? '^':' ')));
+                  G.crec.crc32_unzip, (G.pInfo->lcflag? '^':' ')));
             else
 #ifdef OS2_EAS
                 Info(slide, 0, ((char *)slide, LoadFarString(ShortHdrStats),

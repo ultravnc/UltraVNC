@@ -33,6 +33,7 @@
 #pragma comment(lib, "zip32.lib")
 #pragma comment(lib, "unz32lib.lib")
 #pragma comment(lib, "libjpeg-turbo-win-static.lib")
+#pragma comment(lib, "libzstd_static.lib")
 #endif
 
 #include "omnithread/omnithread.h"
@@ -356,8 +357,8 @@ if (hUser32) FreeLibrary(hUser32);
 	memset(&info, 0, sizeof(CR_INSTALL_INFO));
 	info.cb = sizeof(CR_INSTALL_INFO);
 	info.pszAppName = _T("UVNC");
-	info.pszAppVersion = _T("1.2.4.0");
-	info.pszEmailSubject = _T("UVNC viewer 1.2.4.0 Error Report");
+	info.pszAppVersion = _T("1.2.5.0");
+	info.pszEmailSubject = _T("UVNC viewer 1.2.5.0 Error Report");
 	info.pszEmailTo = _T("uvnc@skynet.be");
 	info.uPriorities[CR_SMAPI] = 1; // Third try send report over Simple MAPI    
 	// Install all available exception handlers

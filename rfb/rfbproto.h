@@ -1,5 +1,5 @@
 /*
-//  Copyright (C) 2002 UltraVNC Team Members. All Rights Reserved.
+//  Copyright (C) 2020 UltraVNC Team Members. All Rights Reserved.
 //  Copyright (C) 2000-2002 Const Kaplinsky. All Rights Reserved.
  *  Copyright (C) 2009 D. R. Commander. All Rights Reserved.
  *  Copyright (C) 2008 Sun Microsystems, Inc. All Rights Reserved.
@@ -463,18 +463,26 @@ typedef struct {
 #define rfbEncodingXZ 18
 #define rfbEncodingXZYW 19
 #endif
+#define rfbEncodingZstd    25
+#define rfbEncodingTightZstd   26
+#define rfbEncodingZstdHex 27
+#define rfbEncodingZSTDRLE 28
+#define rfbEncodingZSTDYWRLE 29
+
 
 // Cache & XOR-Zlib - rdv@2002
 #define rfbEncodingCache					0xFFFF0000
 #define rfbEncodingCacheEnable				0xFFFF0001
-#define rfbEncodingXOR_Zlib					0xFFFF0002
-#define rfbEncodingXORMonoColor_Zlib		0xFFFF0003
-#define rfbEncodingXORMultiColor_Zlib		0xFFFF0004
-#define rfbEncodingSolidColor				0xFFFF0005
-#define rfbEncodingXOREnable				0xFFFF0006
+//#define rfbEncodingXOR_Zlib					0xFFFF0002
+//#define rfbEncodingXORMonoColor_Zlib		0xFFFF0003
+//#define rfbEncodingXORMultiColor_Zlib		0xFFFF0004
+//#define rfbEncodingSolidColor				0xFFFF0005
+//#define rfbEncodingXOREnable				0xFFFF0006
 #define rfbEncodingCacheZip					0xFFFF0007
-#define rfbEncodingSolMonoZip				0xFFFF0008
-#define rfbEncodingUltraZip				0xFFFF0009
+#define rfbEncodingQueueZip					0xFFFF0008
+#define rfbEncodingUltraZip					0xFFFF0009
+#define rfbEncodingQueueZstd				0xFFFF000A
+#define rfbEncodingQueueEnable				0xFFFF000B
 
 // viewer requests server state updates
 #define rfbEncodingServerState              0xFFFF8000

@@ -1,3 +1,4 @@
+//  Copyright (C) 2020 UltraVnc
 //  Copyright (C) 2000 Tridia Corporation. All Rights Reserved.
 //  Copyright (C) 1999 AT&T Laboratories Cambridge. All Rights Reserved.
 //
@@ -41,12 +42,6 @@ class vncEncodeZlibHex;
 #pragma once
 
 #include "vncencoder.h"
-
-#ifdef _INTERNALLIB
-#include <zlib.h>
-#else
-#include <zlib/zlib.h>
-#endif
 #include "lzo/minilzo.h"
 
 // Minimum zlib rectangle size in bytes.  Anything smaller will
@@ -63,6 +58,7 @@ class vncEncodeZlibHex;
 #define VNC_ENCODE_ZLIBHEX_MIN_DATAXFER (1400)
 
 // Class definition
+class UltraVncZ;
 
 class vncEncodeZlibHex : public vncEncoder
 {
@@ -74,23 +70,19 @@ public:
 	// Create/Destroy methods
 	vncEncodeZlibHex();
 	~vncEncodeZlibHex();
-
 	void Init();
 	virtual const char* GetEncodingName() { return "ZlibHex"; }
-
 	virtual UINT RequiredBuffSize(UINT width, UINT height);
 	virtual UINT NumCodedRects(RECT &rect);
-
 	// virtual UINT EncodeRect(BYTE *source, BYTE *dest, const RECT &rect);
 	virtual UINT EncodeRect(BYTE *source, VSocket *outConn, BYTE *dest, const RECT &rect);
-
 	virtual void LastRect(VSocket *outConn);
 	virtual void AddToQueu(BYTE *source,int size,VSocket *outConn);
 	virtual void SendZlibHexrects(VSocket *outConn);
+	virtual void set_use_zstd(bool enabled);
 
 protected:
-	virtual UINT zlibCompress(BYTE *from_buf, BYTE *to_buf, UINT length, struct z_stream_s *compressor);
-
+	virtual UINT zlibCompress(BYTE *from_buf, BYTE *to_buf, UINT length, UltraVncZ *compressor);
 	virtual UINT EncodeHextiles8(BYTE *source, BYTE *dest,
 		VSocket *outConn, int x, int y, int w, int h);
 	virtual UINT EncodeHextiles16(BYTE *source, BYTE *dest,
@@ -101,13 +93,13 @@ protected:
 // Implementation
 protected:
 	BYTE		      *m_buffer;
-	int			       m_bufflen;
-	struct z_stream_s  compStreamRaw;
-	struct z_stream_s  compStreamEncoded;
+	int			       m_bufflen;	
 	//bool lzo;
 	BYTE			  *m_Queuebuffer;
 	int					m_Queuelen;
 	int					MaxQueuebufflen;
+	UltraVncZ   *ultraVncZRaw;
+	UltraVncZ   *ultraVncZEncoded;
 };
 
 #endif // _WINVNC_ENCODEHEXTILE

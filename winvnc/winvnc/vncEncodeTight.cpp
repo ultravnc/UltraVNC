@@ -1,3 +1,4 @@
+//  Copyright (C) 2020, UltraVnc
 //  Copyright (C) 2010, 2015 D. R. Commander. All Rights Reserved.
 //  Copyright (C) 2004 Landmark Graphics Corporation. All Rights Reserved.
 //  Copyright (C) 2005-2008 Sun Microsystems, Inc. All Rights Reserved.
@@ -60,11 +61,7 @@ vncEncodeTight::vncEncodeTight()
 {
 	m_buffer = NULL;
 	m_bufflen = 0;
-
 	m_hdrBuffer = new BYTE [sz_rfbFramebufferUpdateRectHeader + 8 + 256*4];
-
-	for (int i = 0; i < 4; i++)
-		m_zsActive[i] = false;
 	m_turboCompressLevel = 0;
 }
 
@@ -74,14 +71,7 @@ vncEncodeTight::~vncEncodeTight()
 		delete[] m_buffer;
 		m_buffer = NULL;
 	}
-
 	delete[] m_hdrBuffer;
-
-	for (int i = 0; i < 4; i++) {
-		if (m_zsActive[i])
-			deflateEnd(&m_zsStruct[i]);
-		m_zsActive[i] = false;
-	}
 }
 
 void
@@ -101,7 +91,6 @@ vncEncodeTight::RequiredBuffSize(UINT width, UINT height)
 {
 	int result = m_conf[ 0 ].maxRectSize * (m_remoteformat.bitsPerPixel / 8);
 	result += result / 100 + 16;
-
 	return result;
 }
 
@@ -136,7 +125,6 @@ vncEncodeTight::EncodeRect(BYTE *source, VSocket *outConn, BYTE *dest,
 {
 	int x = rect.left, y = rect.top;
 	int w = rect.right - x, h = rect.bottom - y;
-
 	m_turboCompressLevel = m_compresslevel;
 
 	// We only allow compression levels that have a demonstrable performance
@@ -291,18 +279,12 @@ vncEncodeTight::EncodeRect(BYTE *source, VSocket *outConn, BYTE *dest,
 					int size = EncodeRect(source, outConn, dest, rects[i]);
 					outConn->SendExactQueue((char *)dest, size);
 				}
-
 				// Return after all recursive calls done (0 == data sent).
-
 				return 0;
 			}
-
 		}
-
 	}
-
 	// No suitable solid-color rectangles found.
-
 	return EncodeRectSimple(source, outConn, dest, rect);
 }
 
@@ -313,9 +295,7 @@ vncEncodeTight::FindBestSolidArea(BYTE *source, int x, int y, int w, int h,
 	int dx, dy, dw, dh;
 	int w_prev;
 	int w_best = 0, h_best = 0;
-
 	w_prev = w;
-
 	for (dy = y; dy < y + h; dy += MAX_SPLIT_TILE_SIZE) {
 
 		dh = (dy + MAX_SPLIT_TILE_SIZE <= y + h) ?
@@ -340,7 +320,6 @@ vncEncodeTight::FindBestSolidArea(BYTE *source, int x, int y, int w, int h,
 			h_best = dy + dh - y;
 		}
 	}
-
 	*w_ptr = w_best;
 	*h_ptr = h_best;
 }
@@ -566,7 +545,7 @@ vncEncodeTight::SendTightHeader(int x, int y, int w, int h)
 	rect.r.y = Swap16IfLE(y-monitor_Offsety);
 	rect.r.w = Swap16IfLE(w);
 	rect.r.h = Swap16IfLE(h);
-	rect.encoding = Swap32IfLE(rfbEncodingTight);
+	rect.encoding = Swap32IfLE(m_use_zstd ? rfbEncodingTightZstd : rfbEncodingTight);
 
 	dataSize += w * h * (m_remoteformat.bitsPerPixel / 8);
 	rectangleOverhead += sz_rfbFramebufferUpdateRectHeader;
@@ -747,61 +726,12 @@ vncEncodeTight::CompressData(BYTE *dest, int streamId, int dataLen,
 		return SendCompressedData(dataLen);
 	}
 
-	z_streamp pz = &m_zsStruct[streamId];
+	UltraVncZ *uz = &ultraVncZTight[streamId];
 
-	// Initialize compression stream if needed.
-	if (!m_zsActive[streamId]) {
-		pz->zalloc = Z_NULL;
-		pz->zfree = Z_NULL;
-		pz->opaque = Z_NULL;
-
-		vnclog.Print(LL_INTINFO,
-					 VNCLOG("calling deflateInit2 with zlib level:%d\n"),
-					 zlibLevel);
-		int err = deflateInit2 (pz, zlibLevel, Z_DEFLATED, MAX_WBITS,
-								MAX_MEM_LEVEL, zlibStrategy);
-		if (err != Z_OK) {
-			vnclog.Print(LL_INTINFO,
-						 VNCLOG("deflateInit2 returned error:%d:%s\n"),
-						 err, pz->msg);
-			return -1;
-		}
-
-		m_zsActive[streamId] = true;
-		m_zsLevel[streamId] = zlibLevel;
-	}
-
-	int outBufferSize = dataLen + dataLen / 100 + 16;
-
-	// Prepare buffer pointers.
-	pz->next_in = (Bytef *)m_buffer;
-	pz->avail_in = dataLen;
-	pz->next_out = (Bytef *)dest;
-	pz->avail_out = outBufferSize;
-
-	// Change compression parameters if needed.
-	if (zlibLevel != m_zsLevel[streamId]) {
-		vnclog.Print(LL_INTINFO,
-					 VNCLOG("calling deflateParams with zlib level:%d\n"),
-					 zlibLevel);
-		int err = deflateParams (pz, zlibLevel, zlibStrategy);
-		if (err != Z_OK) {
-			vnclog.Print(LL_INTINFO,
-						 VNCLOG("deflateParams returned error:%d:%s\n"),
-						 err, pz->msg);
-			return -1;
-		}
-		m_zsLevel[streamId] = zlibLevel;
-	}
-
-	// Actual compression.
-	if ( deflate (pz, Z_SYNC_FLUSH) != Z_OK ||
-		 pz->avail_in != 0 || pz->avail_out == 0 ) {
-		vnclog.Print(LL_INTINFO, VNCLOG("deflate() call failed.\n"));
+	int result = uz->compress(zlibLevel, dataLen, dataLen + dataLen / 100 + 16, (Bytef *)m_buffer, (Bytef *)dest);
+	if (result == 0)
 		return -1;
-	}
-
-	return SendCompressedData(outBufferSize - pz->avail_out);
+	return SendCompressedData(result);
 }
 
 int
@@ -861,6 +791,15 @@ vncEncodeTight::FillPalette8(int count)
 		m_paletteNumColors = 2;   // Two colors
 	}
 }
+
+void vncEncodeTight::set_use_zstd(bool enabled)
+{
+	for (int i = 0; i < 4; i++) {
+		ultraVncZTight[i].set_use_zstd(enabled);
+	}
+	vncEncoder::set_use_zstd(enabled);
+}
+
 
 #define DEFINE_FILL_PALETTE_FUNCTION(bpp)									  \
 																			  \

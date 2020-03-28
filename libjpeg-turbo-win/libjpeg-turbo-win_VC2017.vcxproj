@@ -17,6 +17,14 @@
       <Configuration>IPV6</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="release_viewer|Win32">
+      <Configuration>release_viewer</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="release_viewer|x64">
+      <Configuration>release_viewer</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="XP|Win32">
       <Configuration>XP</Configuration>
       <Platform>Win32</Platform>
@@ -55,10 +63,16 @@
     <RootNamespace>libjpegturbowin</RootNamespace>
     <Keyword>Win32Proj</Keyword>
     <ProjectName>libjpeg-turbo-win</ProjectName>
-    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -99,6 +113,12 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='XP|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
@@ -134,6 +154,9 @@
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='XP|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
@@ -150,6 +173,9 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='XP|x64'" Label="PropertySheets">
@@ -175,21 +201,25 @@
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='XP|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Vista|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(Configuration)\</IntDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='XP|Win32'">$(Configuration)\</IntDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">$(Configuration)\</IntDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Vista|Win32'">$(Configuration)\</IntDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">$(Configuration)\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='XP|x64'">$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='IPV6|x64'">$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">$(Platform)\$(Configuration)\</IntDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='XP|x64'">$(Platform)\$(Configuration)\</IntDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='IPV6|x64'">$(Platform)\$(Configuration)\</IntDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">$(Platform)\$(Configuration)\</IntDir>
@@ -201,42 +231,50 @@
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='XP|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Vista|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'" />
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='XP|Win32'" />
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'" />
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Vista|Win32'" />
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='XP|Win32'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Vista|Win32'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'" />
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='XP|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='IPV6|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'" />
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='XP|x64'" />
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='IPV6|x64'" />
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Vista|x64'" />
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='XP|x64'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='IPV6|x64'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Vista|x64'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'" />
     <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\Program Files %28x86%29\nasm;C:\Program Files\nasm;$(ExecutablePath)</ExecutablePath>
+    <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">C:\Program Files %28x86%29\nasm;C:\Program Files\nasm;$(ExecutablePath)</ExecutablePath>
     <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='XP|Win32'">C:\Program Files %28x86%29\nasm;C:\Program Files\nasm;$(ExecutablePath)</ExecutablePath>
     <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">C:\Program Files %28x86%29\nasm;C:\Program Files\nasm;$(ExecutablePath)</ExecutablePath>
     <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='Vista|Win32'">C:\Program Files %28x86%29\nasm;C:\Program Files\nasm;$(ExecutablePath)</ExecutablePath>
     <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">C:\Program Files %28x86%29\nasm;C:\Program Files\nasm;$(ExecutablePath)</ExecutablePath>
     <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Program Files %28x86%29\nasm;C:\Program Files\nasm;$(ExecutablePath)</ExecutablePath>
     <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Program Files %28x86%29\nasm;C:\Program Files\nasm;$(ExecutablePath)</ExecutablePath>
+    <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">C:\Program Files %28x86%29\nasm;C:\Program Files\nasm;$(ExecutablePath)</ExecutablePath>
     <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='XP|x64'">C:\Program Files %28x86%29\nasm;C:\Program Files\nasm;$(ExecutablePath)</ExecutablePath>
     <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='IPV6|x64'">C:\Program Files %28x86%29\nasm;C:\Program Files\nasm;$(ExecutablePath)</ExecutablePath>
     <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">C:\Program Files %28x86%29\nasm;C:\Program Files\nasm;$(ExecutablePath)</ExecutablePath>
@@ -284,6 +322,24 @@
     <Lib />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>./win;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;WITH_SIMD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
+    </ClCompile>
+    <Lib />
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -374,6 +430,28 @@
     <Lib />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>./win;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;WITH_SIMD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+    </ClCompile>
+    <Lib />
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">
     <Midl>
       <TargetEnvironment>X64</TargetEnvironment>
     </Midl>
@@ -540,6 +618,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="simd\x86_64\jsimd.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -548,15 +627,19 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">true</ExcludedFromBuild>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
     <CustomBuild Include="simd\i386\jccolor-avx2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
@@ -573,6 +656,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">false</ExcludedFromBuild>
@@ -581,9 +665,12 @@
     </CustomBuild>
     <CustomBuild Include="simd\i386\jccolor-mmx.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
@@ -600,6 +687,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">false</ExcludedFromBuild>
@@ -608,9 +696,12 @@
     </CustomBuild>
     <CustomBuild Include="simd\i386\jccolor-sse2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
@@ -627,6 +718,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">false</ExcludedFromBuild>
@@ -635,9 +727,12 @@
     </CustomBuild>
     <CustomBuild Include="simd\i386\jcgray-avx2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
@@ -654,6 +749,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">false</ExcludedFromBuild>
@@ -662,9 +758,12 @@
     </CustomBuild>
     <CustomBuild Include="simd\i386\jcgray-mmx.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
@@ -681,6 +780,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">false</ExcludedFromBuild>
@@ -689,9 +789,12 @@
     </CustomBuild>
     <CustomBuild Include="simd\i386\jcgray-sse2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
@@ -708,6 +811,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">false</ExcludedFromBuild>
@@ -716,9 +820,12 @@
     </CustomBuild>
     <CustomBuild Include="simd\i386\jchuff-sse2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
@@ -735,6 +842,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">false</ExcludedFromBuild>
@@ -743,9 +851,12 @@
     </CustomBuild>
     <CustomBuild Include="simd\i386\jcphuff-sse2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
@@ -762,6 +873,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">false</ExcludedFromBuild>
@@ -770,9 +882,12 @@
     </CustomBuild>
     <CustomBuild Include="simd\i386\jcsample-avx2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
@@ -789,6 +904,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">false</ExcludedFromBuild>
@@ -797,9 +913,12 @@
     </CustomBuild>
     <CustomBuild Include="simd\i386\jcsample-mmx.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
@@ -816,6 +935,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">false</ExcludedFromBuild>
@@ -824,9 +944,12 @@
     </CustomBuild>
     <CustomBuild Include="simd\i386\jcsample-sse2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
@@ -843,6 +966,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">false</ExcludedFromBuild>
@@ -851,9 +975,12 @@
     </CustomBuild>
     <CustomBuild Include="simd\i386\jdcolor-avx2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
@@ -870,6 +997,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">false</ExcludedFromBuild>
@@ -878,9 +1006,12 @@
     </CustomBuild>
     <CustomBuild Include="simd\i386\jdcolor-mmx.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
@@ -897,6 +1028,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">false</ExcludedFromBuild>
@@ -905,9 +1037,12 @@
     </CustomBuild>
     <CustomBuild Include="simd\i386\jdcolor-sse2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
@@ -924,6 +1059,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">false</ExcludedFromBuild>
@@ -932,9 +1068,12 @@
     </CustomBuild>
     <CustomBuild Include="simd\i386\jdmerge-avx2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
@@ -951,6 +1090,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">false</ExcludedFromBuild>
@@ -959,9 +1099,12 @@
     </CustomBuild>
     <CustomBuild Include="simd\i386\jdmerge-mmx.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
@@ -978,6 +1121,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">false</ExcludedFromBuild>
@@ -986,9 +1130,12 @@
     </CustomBuild>
     <CustomBuild Include="simd\i386\jdmerge-sse2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
@@ -1005,6 +1152,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">false</ExcludedFromBuild>
@@ -1013,9 +1161,12 @@
     </CustomBuild>
     <CustomBuild Include="simd\i386\jdsample-avx2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
@@ -1032,6 +1183,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">false</ExcludedFromBuild>
@@ -1040,9 +1192,12 @@
     </CustomBuild>
     <CustomBuild Include="simd\i386\jdsample-mmx.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
@@ -1059,6 +1214,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">false</ExcludedFromBuild>
@@ -1067,9 +1223,12 @@
     </CustomBuild>
     <CustomBuild Include="simd\i386\jdsample-sse2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
@@ -1086,6 +1245,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">false</ExcludedFromBuild>
@@ -1094,9 +1254,12 @@
     </CustomBuild>
     <CustomBuild Include="simd\i386\jfdctflt-3dn.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
@@ -1113,6 +1276,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">false</ExcludedFromBuild>
@@ -1121,9 +1285,12 @@
     </CustomBuild>
     <CustomBuild Include="simd\i386\jfdctflt-sse.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
@@ -1140,6 +1307,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">false</ExcludedFromBuild>
@@ -1148,9 +1316,12 @@
     </CustomBuild>
     <CustomBuild Include="simd\i386\jfdctfst-mmx.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
@@ -1167,6 +1338,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">false</ExcludedFromBuild>
@@ -1175,9 +1347,12 @@
     </CustomBuild>
     <CustomBuild Include="simd\i386\jfdctfst-sse2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
@@ -1194,6 +1369,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">false</ExcludedFromBuild>
@@ -1202,9 +1378,12 @@
     </CustomBuild>
     <CustomBuild Include="simd\i386\jfdctint-avx2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
@@ -1221,6 +1400,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">false</ExcludedFromBuild>
@@ -1229,9 +1409,12 @@
     </CustomBuild>
     <CustomBuild Include="simd\i386\jfdctint-mmx.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
@@ -1248,6 +1431,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">false</ExcludedFromBuild>
@@ -1256,9 +1440,12 @@
     </CustomBuild>
     <CustomBuild Include="simd\i386\jfdctint-sse2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
@@ -1275,6 +1462,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">false</ExcludedFromBuild>
@@ -1283,9 +1471,12 @@
     </CustomBuild>
     <CustomBuild Include="simd\i386\jidctflt-3dn.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
@@ -1302,6 +1493,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">false</ExcludedFromBuild>
@@ -1310,9 +1502,12 @@
     </CustomBuild>
     <CustomBuild Include="simd\i386\jidctflt-sse.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
@@ -1329,6 +1524,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">false</ExcludedFromBuild>
@@ -1337,9 +1533,12 @@
     </CustomBuild>
     <CustomBuild Include="simd\i386\jidctflt-sse2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
@@ -1356,6 +1555,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">false</ExcludedFromBuild>
@@ -1364,9 +1564,12 @@
     </CustomBuild>
     <CustomBuild Include="simd\i386\jidctfst-mmx.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
@@ -1383,6 +1586,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">false</ExcludedFromBuild>
@@ -1391,9 +1595,12 @@
     </CustomBuild>
     <CustomBuild Include="simd\i386\jidctfst-sse2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
@@ -1410,6 +1617,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">false</ExcludedFromBuild>
@@ -1418,9 +1626,12 @@
     </CustomBuild>
     <CustomBuild Include="simd\i386\jidctint-avx2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
@@ -1437,6 +1648,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">false</ExcludedFromBuild>
@@ -1445,9 +1657,12 @@
     </CustomBuild>
     <CustomBuild Include="simd\i386\jidctint-mmx.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
@@ -1464,6 +1679,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">false</ExcludedFromBuild>
@@ -1472,9 +1688,12 @@
     </CustomBuild>
     <CustomBuild Include="simd\i386\jidctint-sse2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
@@ -1491,6 +1710,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">false</ExcludedFromBuild>
@@ -1499,9 +1719,12 @@
     </CustomBuild>
     <CustomBuild Include="simd\i386\jidctred-mmx.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
@@ -1518,6 +1741,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">false</ExcludedFromBuild>
@@ -1526,9 +1750,12 @@
     </CustomBuild>
     <CustomBuild Include="simd\i386\jidctred-sse2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
@@ -1545,6 +1772,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">false</ExcludedFromBuild>
@@ -1553,9 +1781,12 @@
     </CustomBuild>
     <CustomBuild Include="simd\i386\jquant-3dn.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
@@ -1572,6 +1803,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">false</ExcludedFromBuild>
@@ -1580,9 +1812,12 @@
     </CustomBuild>
     <CustomBuild Include="simd\i386\jquant-mmx.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
@@ -1599,6 +1834,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">false</ExcludedFromBuild>
@@ -1607,9 +1843,12 @@
     </CustomBuild>
     <CustomBuild Include="simd\i386\jquant-sse.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
@@ -1626,6 +1865,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">false</ExcludedFromBuild>
@@ -1634,9 +1874,12 @@
     </CustomBuild>
     <CustomBuild Include="simd\i386\jquantf-sse2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
@@ -1653,6 +1896,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">false</ExcludedFromBuild>
@@ -1661,9 +1905,12 @@
     </CustomBuild>
     <CustomBuild Include="simd\i386\jquanti-avx2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
@@ -1680,6 +1927,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">false</ExcludedFromBuild>
@@ -1688,9 +1936,12 @@
     </CustomBuild>
     <CustomBuild Include="simd\i386\jquanti-sse2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
@@ -1707,6 +1958,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">false</ExcludedFromBuild>
@@ -1715,9 +1967,12 @@
     </CustomBuild>
     <CustomBuild Include="simd\i386\jsimdcpu.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">nasm -fwin32 -DWIN32 -DMSVC -Iwin/ -Isimd/nasm/ -Isimd/i386/ -o "$(OutDir)%(Filename).obj" "simd/i386/%(Filename)%(Extension)"</Command>
@@ -1734,6 +1989,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">false</ExcludedFromBuild>
@@ -1747,6 +2003,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">true</ExcludedFromBuild>
       <FileType>Document</FileType>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">false</ExcludedFromBuild>
@@ -1754,6 +2011,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">false</ExcludedFromBuild>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
@@ -1765,7 +2023,9 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
     </CustomBuild>
     <CustomBuild Include="simd\x86_64\jccolor-sse2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -1774,6 +2034,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">true</ExcludedFromBuild>
       <FileType>Document</FileType>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">false</ExcludedFromBuild>
@@ -1781,6 +2042,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">false</ExcludedFromBuild>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
@@ -1792,7 +2054,9 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
     </CustomBuild>
     <CustomBuild Include="simd\x86_64\jcgray-avx2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -1801,6 +2065,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">true</ExcludedFromBuild>
       <FileType>Document</FileType>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">false</ExcludedFromBuild>
@@ -1808,6 +2073,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">false</ExcludedFromBuild>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
@@ -1819,7 +2085,9 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
     </CustomBuild>
     <CustomBuild Include="simd\x86_64\jcgray-sse2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -1828,6 +2096,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">true</ExcludedFromBuild>
       <FileType>Document</FileType>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">false</ExcludedFromBuild>
@@ -1835,6 +2104,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">false</ExcludedFromBuild>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
@@ -1846,7 +2116,9 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
     </CustomBuild>
     <CustomBuild Include="simd\x86_64\jchuff-sse2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -1855,12 +2127,14 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
@@ -1873,7 +2147,9 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
     </CustomBuild>
     <CustomBuild Include="simd\x86_64\jcphuff-sse2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -1882,12 +2158,14 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
@@ -1900,7 +2178,9 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
     </CustomBuild>
     <CustomBuild Include="simd\x86_64\jcsample-avx2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -1909,12 +2189,14 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
@@ -1927,7 +2209,9 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
     </CustomBuild>
     <CustomBuild Include="simd\x86_64\jcsample-sse2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -1936,12 +2220,14 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
@@ -1954,7 +2240,9 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
     </CustomBuild>
     <CustomBuild Include="simd\x86_64\jdcolor-avx2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -1963,12 +2251,14 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
@@ -1981,7 +2271,9 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
     </CustomBuild>
     <CustomBuild Include="simd\x86_64\jdcolor-sse2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -1990,12 +2282,14 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
@@ -2008,7 +2302,9 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
     </CustomBuild>
     <CustomBuild Include="simd\x86_64\jdmerge-avx2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -2017,12 +2313,14 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
@@ -2035,7 +2333,9 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
     </CustomBuild>
     <CustomBuild Include="simd\x86_64\jdmerge-sse2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -2044,12 +2344,14 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
@@ -2062,7 +2364,9 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
     </CustomBuild>
     <CustomBuild Include="simd\x86_64\jdsample-avx2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -2071,12 +2375,14 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
@@ -2089,7 +2395,9 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
     </CustomBuild>
     <CustomBuild Include="simd\x86_64\jdsample-sse2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -2098,12 +2406,14 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
@@ -2116,7 +2426,9 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
     </CustomBuild>
     <CustomBuild Include="simd\x86_64\jfdctflt-sse.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -2125,12 +2437,14 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
@@ -2143,7 +2457,9 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
     </CustomBuild>
     <CustomBuild Include="simd\x86_64\jfdctfst-sse2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -2152,12 +2468,14 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
@@ -2170,7 +2488,9 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
     </CustomBuild>
     <CustomBuild Include="simd\x86_64\jfdctint-avx2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -2179,12 +2499,14 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
@@ -2197,7 +2519,9 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
     </CustomBuild>
     <CustomBuild Include="simd\x86_64\jfdctint-sse2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -2206,12 +2530,14 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
@@ -2224,7 +2550,9 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
     </CustomBuild>
     <CustomBuild Include="simd\x86_64\jidctflt-sse2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -2233,12 +2561,14 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
@@ -2251,7 +2581,9 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
     </CustomBuild>
     <CustomBuild Include="simd\x86_64\jidctfst-sse2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -2260,12 +2592,14 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
@@ -2278,7 +2612,9 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
     </CustomBuild>
     <CustomBuild Include="simd\x86_64\jidctint-avx2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -2287,12 +2623,14 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
@@ -2305,7 +2643,9 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
     </CustomBuild>
     <CustomBuild Include="simd\x86_64\jidctint-sse2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -2314,12 +2654,14 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
@@ -2332,7 +2674,9 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
     </CustomBuild>
     <CustomBuild Include="simd\x86_64\jidctred-sse2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -2341,12 +2685,14 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
@@ -2359,7 +2705,9 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
     </CustomBuild>
     <CustomBuild Include="simd\x86_64\jquantf-sse2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -2368,12 +2716,14 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
@@ -2386,7 +2736,9 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
     </CustomBuild>
     <CustomBuild Include="simd\x86_64\jquanti-avx2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -2395,12 +2747,14 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
@@ -2413,7 +2767,9 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
     </CustomBuild>
     <CustomBuild Include="simd\x86_64\jquanti-sse2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -2422,12 +2778,14 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
@@ -2440,7 +2798,9 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
     </CustomBuild>
     <CustomBuild Include="simd\x86_64\jsimdcpu.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -2449,12 +2809,14 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='IPV6|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
@@ -2467,7 +2829,9 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">nasm -fwin64 -DWIN64 -DMSVC -D__x86_64__ -I"./simd/nasm/" -I"./simd/x86_64/" -o "$(OutDir)%(Filename).obj" "simd/x86_64/%(Filename)%(Extension)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -2478,6 +2842,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">true</ExcludedFromBuild>
     </ClInclude>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

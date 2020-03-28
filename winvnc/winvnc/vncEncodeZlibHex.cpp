@@ -1,3 +1,4 @@
+//  Copyright (C) 2020 UltraVnc
 //  Copyright (C) 2000 Tridia Corporation. All Rights Reserved.
 //  Copyright (C) 1999 AT&T Laboratories Cambridge. All Rights Reserved.
 //
@@ -34,61 +35,45 @@
 // optimized Hextile sub-encodings, including zlib.
 #include "stdhdrs.h"
 #include "vncEncodeZlibHex.h"
+#include "../../common/UltraVncZ.h"
 #include "rfb.h"
-// #include "MinMax.h"
 #include <stdlib.h>
 #include <time.h>
 
-//#define IN_LEN		(128*1024)
-//#define OUT_LEN		(IN_LEN + IN_LEN / 64 + 16 + 3)
-//#define HEAP_ALLOC(var,size) \
-//	lzo_align_t __LZO_MMODEL var [ ((size) + (sizeof(lzo_align_t) - 1)) / sizeof(lzo_align_t) ]
-//static HEAP_ALLOC(wrkmem,LZO1X_1_MEM_COMPRESS);
 
 
 vncEncodeZlibHex::vncEncodeZlibHex()
 {
-
+	//ultraVncZ = new UltraVncZ();
 	m_buffer = NULL;
 	m_bufflen = 0;
 	m_Queuebuffer = NULL;
 	m_Queuelen = 0;
 	MaxQueuebufflen=128*1024;
-	compStreamRaw.total_in = ZLIBHEX_COMP_UNINITED;
-	compStreamEncoded.total_in = ZLIBHEX_COMP_UNINITED;
-	//lzo=false;
 	m_Queuebuffer = new BYTE [MaxQueuebufflen+1];
-		if (m_Queuebuffer == NULL)
-		{
-			vnclog.Print(LL_INTINFO, VNCLOG("Memory error"));
-		}
-
+	if (m_Queuebuffer == NULL)
+		vnclog.Print(LL_INTINFO, VNCLOG("Memory error"));
+	ultraVncZRaw = new UltraVncZ();
+	ultraVncZEncoded = new UltraVncZ();
 }
 
 vncEncodeZlibHex::~vncEncodeZlibHex()
 {
-	if (m_buffer != NULL)
-	{
+	if (m_buffer != NULL){
 		delete [] m_buffer;
 		m_buffer = NULL;
 		m_bufflen = 0;
 	}
-	if ( compStreamRaw.total_in != ZLIBHEX_COMP_UNINITED )
-	{
-		deflateEnd( &compStreamRaw );
-		compStreamRaw.total_in = ZLIBHEX_COMP_UNINITED;
-	}
-	if ( compStreamEncoded.total_in != ZLIBHEX_COMP_UNINITED )
-	{
-		deflateEnd( &compStreamEncoded );
-		compStreamEncoded.total_in = ZLIBHEX_COMP_UNINITED;
-	}
-	if (m_Queuebuffer != NULL)
-	{
+	if (m_Queuebuffer != NULL){
 		delete [] m_Queuebuffer;
 		m_Queuebuffer = NULL;
 	}
 
+	if (ultraVncZRaw)
+		delete ultraVncZRaw;
+
+	if (ultraVncZEncoded)
+		delete ultraVncZEncoded;
 }
 
 void
@@ -101,7 +86,6 @@ UINT
 vncEncodeZlibHex::RequiredBuffSize(UINT width, UINT height)
 {
 	int accumSize;
-
 	// Start with the raw encoding size, which includes the
 	// rectangle header size.
 	accumSize = vncEncoder::RequiredBuffSize(width, height);
@@ -109,7 +93,6 @@ vncEncodeZlibHex::RequiredBuffSize(UINT width, UINT height)
 	accumSize += ((accumSize / 100) + 8);
 	// Add zlib/other subencoding overhead, worst case.
 	accumSize += (((width/16)+1) * ((height/16)+1) * ((3 * m_remoteformat.bitsPerPixel / 8) + 2));
-
 	return accumSize;
 }
 
@@ -149,7 +132,7 @@ vncEncodeZlibHex::EncodeRect(BYTE *source, VSocket *outConn, BYTE *dest, const R
 	surh->r.y = Swap16IfLE(surh->r.y);
 	surh->r.w = Swap16IfLE(surh->r.w);
 	surh->r.h = Swap16IfLE(surh->r.h);
-	surh->encoding = Swap32IfLE(rfbEncodingZlibHex);
+	surh->encoding = Swap32IfLE(m_use_zstd ? rfbEncodingZstdHex : rfbEncodingZlibHex);
 
 	rectangleOverhead += sz_rfbFramebufferUpdateRectHeader;
 	dataSize += ( rectW * rectH * m_remoteformat.bitsPerPixel) / 8;
@@ -178,78 +161,16 @@ vncEncodeZlibHex::EncodeRect(BYTE *source, VSocket *outConn, BYTE *dest, const R
 		SendZlibHexrects(outConn);
 		return retval;
     }
-
 	return vncEncoder::EncodeRect(source, dest, rect);
 }
 
 UINT
-vncEncodeZlibHex::zlibCompress(BYTE *from_buf, BYTE *to_buf, UINT length, struct z_stream_s *compressor)
+vncEncodeZlibHex::zlibCompress(BYTE *from_buf, BYTE *to_buf, UINT length, UltraVncZ *compressor)
 {
-	int totalCompDataLen = 0;
-	int previousTotalOut;
-	int deflateResult;
-//	unsigned int out_len;
-
-	// Initialize input/output buffer assignment for compressor state.
-	compressor->avail_in = length;
-	compressor->next_in = from_buf;
-	compressor->avail_out = (2 * length);
-	compressor->next_out = to_buf;
-	compressor->data_type = Z_BINARY;
-	/*if (lzo==false)
-		{
-			if (lzo_init() == LZO_E_OK) lzo=true;
-		}
-	if (lzo1x_1_compress(from_buf,length,to_buf,&out_len,wrkmem)!=LZO_E_OK)
-		vnclog.Print(LL_INTINFO, VNCLOG("Error compressing  \n"));
-	return out_len;*/
-
-	//vnclog.Print(LL_INTINFO, VNCLOG("ZlibHex length %d %d \n"), length,out_len);
-
-
-	// If necessary, the first time, initialize the compressor state.
-	if ( compressor->total_in == ZLIBHEX_COMP_UNINITED )
-	{
-
-		compressor->total_in = 0;
-		compressor->total_out = 0;
-		compressor->zalloc = Z_NULL;
-		compressor->zfree = Z_NULL;
-		compressor->opaque = Z_NULL;
-
-		vnclog.Print(LL_INTINFO, VNCLOG("calling deflateInit2 with zlib level:%d\n"), m_compresslevel);
-
-		deflateResult = deflateInit2( compressor,
-			                          m_compresslevel,
-					                  Z_DEFLATED,
-					                  MAX_WBITS,
-					                  MAX_MEM_LEVEL,
-					                  Z_DEFAULT_STRATEGY );
-		if ( deflateResult != Z_OK )
-		{
-			vnclog.Print(LL_INTINFO, VNCLOG("deflateInit2 returned error:%d:%s\n"), deflateResult, compressor->msg);
-			return -1;
-		}
-
-	}
-
-	// Record previous total output size.
-	previousTotalOut = compressor->total_out;
-
-	// Compress the raw data into the result buffer.
-	deflateResult = deflate( compressor, Z_SYNC_FLUSH );
-
-	if ( deflateResult != Z_OK )
-	{
-		vnclog.Print(LL_INTINFO, VNCLOG("deflate returned error:%d:%s\n"), deflateResult, compressor->msg);
+	int totalCompDataLen = compressor->compress(m_compresslevel, length, (2 * length), from_buf, to_buf);
+	if (totalCompDataLen == 0)
 		return -1;
-	}
-//	vnclog.Print(LL_INTINFO, VNCLOG("ZlibHex length %d %d %d \n"), length,compressor->total_out - previousTotalOut,out_len);
-//	if (length/2>out_len) vnclog.Print(LL_INTINFO, VNCLOG("ZlibHex length %d #####50######### \n"), length);
-//	if (length/3*2>out_len) vnclog.Print(LL_INTINFO, VNCLOG("ZlibHex length %d #####33######### \n"), length);
-//	if (length/4*3>out_len) vnclog.Print(LL_INTINFO, VNCLOG("ZlibHex length %d #####25######### \n"), length);
-
-	return compressor->total_out - previousTotalOut;
+	return totalCompDataLen;
 }
 
 
@@ -369,7 +290,7 @@ vncEncodeZlibHex::EncodeHextiles##bpp(BYTE *source, BYTE *dest,				\
 					compressedSize = zlibCompress((BYTE *) clientPixelData,	\
 													dest + destoffset + 2,	\
 													(w*h*(bpp/8)),			\
-													&compStreamRaw);		\
+													ultraVncZRaw);		\
 																			\
 																			\
 					card16ptr = (CARD16*) (dest + destoffset);				\
@@ -406,7 +327,7 @@ vncEncodeZlibHex::EncodeHextiles##bpp(BYTE *source, BYTE *dest,				\
 					compressedSize = zlibCompress((BYTE *) clientPixelData,	\
 													dest + destoffset + 2,	\
 													subEncodedLen,			\
-													&compStreamEncoded);	\
+													ultraVncZEncoded);	\
 																			\
 																			\
 					card16ptr = (CARD16*) (dest + destoffset);				\
@@ -645,4 +566,11 @@ void
 vncEncodeZlibHex::LastRect(VSocket *outConn)
 {
 	SendZlibHexrects(outConn);
+}
+
+void vncEncodeZlibHex::set_use_zstd(bool enabled)
+{
+	ultraVncZRaw->set_use_zstd(enabled);
+	ultraVncZEncoded->set_use_zstd(enabled);
+	vncEncoder::set_use_zstd(enabled);
 }

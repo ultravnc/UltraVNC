@@ -392,6 +392,10 @@
     <ClCompile Include="Snapshot.cpp" />
     <ClCompile Include="Snapshot.cpp" />
     <ClCompile Include="Snapshot.cpp" />
+    <ClCompile Include="Snapshot.cpp" />
+    <ClCompile Include="..\common\UltraVncZ.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AboutBox.h">
@@ -514,6 +518,10 @@
     <ClInclude Include="Snapshot.h" />
     <ClInclude Include="Snapshot.h" />
     <ClInclude Include="Snapshot.h" />
+    <ClInclude Include="Snapshot.h" />
+    <ClInclude Include="..\common\UltraVncZ.h">
+      <Filter>sources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="res\vncviewer.rc">

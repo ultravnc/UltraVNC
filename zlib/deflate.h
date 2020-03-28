@@ -110,6 +110,8 @@ typedef struct internal_state {
     Byte  method;        /* can only be DEFLATED */
     int   last_flush;    /* value of flush param for previous deflate call */
 
+    unsigned zalign(16) crc0[4 * 5];
+
                 /* used by deflate.c: */
 
     uInt  w_size;        /* LZ77 window size (32K by default) */
@@ -280,6 +282,30 @@ typedef struct internal_state {
  */
 #define put_byte(s, c) {s->pending_buf[s->pending++] = (Bytef)(c);}
 
+/* ===========================================================================
+ * Output a short LSB first on the stream.
+ * IN assertion: there is enough room in pendingBuf.
+ */
+#ifdef UNALIGNED_OK
+/* Compared to the else-clause's implementation, there are few advantages:
+ *  - s->pending is loaded only once (else-clause's implementation needs to
+ *    load s->pending twice due to the alias between s->pending and
+ *    s->pending_buf[].
+ *  - no instructions for extracting bytes from short.
+ *  - needs less registers
+ *  - stores to adjacent bytes are merged into a single store, albeit at the
+ *    cost of penalty of potentially unaligned access. 
+ */
+#define put_short(s, w) { \
+    *(ushf*)(&s->pending_buf[s->pending]) = (w) ; \
+    s->pending += 2; \
+}
+#else
+#define put_short(s, w) { \
+    put_byte(s, (uch)((w) & 0xff)); \
+    put_byte(s, (uch)((ush)(w) >> 8)); \
+}
+#endif
 
 #define MIN_LOOKAHEAD (MAX_MATCH+MIN_MATCH+1)
 /* Minimum amount of lookahead, except at the end of the input file.
@@ -345,5 +371,13 @@ void ZLIB_INTERNAL _tr_stored_block OF((deflate_state *s, charf *buf,
 # define _tr_tally_dist(s, distance, length, flush) \
               flush = _tr_tally(s, distance, length)
 #endif
+
+/* ===========================================================================
+ * Update a hash value with the given input byte
+ * IN  assertion: all calls to UPDATE_HASH are made with consecutive input
+ *    characters, so that a running hash key can be computed from the previous
+ *    key instead of complete recalculation each time.
+ */
+#define UPDATE_HASH_C(s,h,c) (h = (((h)<<s->hash_shift) ^ (c)) & s->hash_mask)
 
 #endif /* DEFLATE_H */

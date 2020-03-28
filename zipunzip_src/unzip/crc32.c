@@ -6,12 +6,12 @@
   If, for some reason, all these files are missing, the Info-ZIP license
   also may be found at:  ftp://ftp.info-zip.org/pub/infozip/license.html
 */
-/* crc32.c -- compute the CRC-32 of a data stream
+/* crc32_unzip.c -- compute the CRC-32 of a data stream
  * Copyright (C) 1995 Mark Adler
  * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
-/* $Id: crc32.c,v 1.5 1996/01/13 14:55:12 spc Exp $ */
+/* $Id: crc32_unzip.c,v 1.5 1996/01/13 14:55:12 spc Exp $ */
 
 #define __CRC32_C       /* identifies this source module */
 
@@ -34,7 +34,7 @@
 #define DO8(buf)  DO4(buf); DO4(buf)
 
 /* ========================================================================= */
-ulg crc32(crc, buf, len)
+ulg crc32_unzip(crc, buf, len)
     register ulg crc;           /* crc shift register */
     register ZCONST uch *buf;   /* pointer to bytes to pump through */
     extent len;                 /* number of bytes in buf[] */
@@ -46,7 +46,7 @@ ulg crc32(crc, buf, len)
 
   if (buf == NULL) return 0L;
 
-  crc_table = get_crc_table();
+  crc_table = get_crc_table_unzip();
 
   crc = crc ^ 0xffffffffL;
 #ifndef NO_UNROLLED_LOOPS

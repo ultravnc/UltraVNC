@@ -7,7 +7,7 @@
   also may be found at:  ftp://ftp.info-zip.org/pub/infozip/license.html
 */
 /* This is a dummy zip.h to allow the source files shared with Zip (crypt.c,
-   crc32.c, crctab.c, ttyio.c) to compile for UnZip.  (In case you are looking
+   crc32_unzip.c, crctab.c, ttyio.c) to compile for UnZip.  (In case you are looking
    for the Info-ZIP license, please follow the pointers above.)  */
 
 #ifndef __zip_h   /* don't include more than once */

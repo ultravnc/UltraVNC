@@ -792,7 +792,7 @@ static int store_info(__G)   /* return 0 if skipping, 1 if OK */
     G.pInfo->encrypted = G.crec.general_purpose_bit_flag & 1;   /* bit field */
     G.pInfo->ExtLocHdr = (G.crec.general_purpose_bit_flag & 8) == 8;  /* bit */
     G.pInfo->textfile = G.crec.internal_file_attributes & 1;    /* bit field */
-    G.pInfo->crc = G.crec.crc32;
+    G.pInfo->crc = G.crec.crc32_unzip;
     G.pInfo->compr_size = G.crec.csize;
     G.pInfo->uncompr_size = G.crec.ucsize;
 
@@ -1440,7 +1440,7 @@ static int extract_or_test_member(__G)    /* return PK-type error code */
     G.bitbuf = 0L;       /* unreduce and unshrink only */
     G.zipeof = 0;
     G.newfile = TRUE;
-    G.crc32val = CRCVAL_INITIAL;
+    G.crc32_unzipval = CRCVAL_INITIAL;
 
 #ifdef SYMLINKS
     /* if file came from Unix and is a symbolic link and we are extracting
@@ -1715,13 +1715,13 @@ static int extract_or_test_member(__G)    /* return PK-type error code */
         undefer_input(__G);
         return error;
     }
-    if (G.crc32val != G.lrec.crc32) {
+    if (G.crc32_unzipval != G.lrec.crc32_unzip) {
         /* if quiet enough, we haven't output the filename yet:  do it */
         if ((uO.tflag && uO.qflag) || (!uO.tflag && !QCOND2))
             Info(slide, 0x401, ((char *)slide, "%-22s ",
               FnFilter1(G.filename)));
-        Info(slide, 0x401, ((char *)slide, LoadFarString(BadCRC), G.crc32val,
-          G.lrec.crc32));
+        Info(slide, 0x401, ((char *)slide, LoadFarString(BadCRC), G.crc32_unzipval,
+          G.lrec.crc32_unzip));
 #if CRYPT
         if (G.pInfo->encrypted)
             Info(slide, 0x401, ((char *)slide, LoadFarString(MaybeBadPasswd)));
@@ -1910,7 +1910,7 @@ static int TestExtraField(__G__ ef, ef_len)
                 break;
             case EF_PKVMS:
                 if (makelong(ef+EB_HEADSIZE) !=
-                    crc32(CRCVAL_INITIAL, ef+(EB_HEADSIZE+4),
+                    crc32_unzip(CRCVAL_INITIAL, ef+(EB_HEADSIZE+4),
                           (extent)(ebLen-4)))
                     Info(slide, 1, ((char *)slide,
                       LoadFarString(BadCRC_EAs)));
@@ -2070,7 +2070,7 @@ int memextract(__G__ tgt, tgtsize, src, srcsize)  /* extract compressed */
     G.mem_mode = FALSE;
 
     if (!error) {
-        register ulg crcval = crc32(CRCVAL_INITIAL, tgt, (extent)G.outcnt);
+        register ulg crcval = crc32_unzip(CRCVAL_INITIAL, tgt, (extent)G.outcnt);
 
         if (crcval != extra_field_crc) {
             if (uO.tflag)

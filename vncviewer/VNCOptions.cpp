@@ -125,7 +125,13 @@ VNCOptions::VNCOptions()
  #ifdef _XZ
   m_UseEnc[rfbEncodingXZ] = true;
   m_UseEnc[rfbEncodingXZYW] = true;
-#endif	
+#endif
+  m_UseEnc[rfbEncodingZstd] = true;
+  m_UseEnc[rfbEncodingTightZstd] = true;
+  m_UseEnc[rfbEncodingZstdHex] = true;
+  m_UseEnc[rfbEncodingZSTDRLE] = true;
+  m_UseEnc[rfbEncodingZSTDYWRLE] = true;
+
   m_ViewOnly = false;
   m_FullScreen = false;
   m_SavePos = false;
@@ -161,6 +167,7 @@ VNCOptions::VNCOptions()
   m_h = 0;
   // Modif sf@2002 - Cache
   m_fEnableCache = false;
+  m_fEnableZstd = true;
   // m_fAutoAdjust = false;
   m_host_options[0] = '\0';
   m_proxyhost[0] = '\0';
@@ -323,6 +330,7 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
   // Modif sf@2002
   m_nServerScale  	  = s.m_nServerScale;
   m_fEnableCache      = s.m_fEnableCache;
+  m_fEnableZstd			= s.m_fEnableZstd;
   m_quickoption       = s.m_quickoption;
   m_ShowToolbar       = s.m_ShowToolbar;
   m_fAutoScaling      = s.m_fAutoScaling;
@@ -1056,6 +1064,7 @@ void VNCOptions::Save(char *fname)
   saveInt("ServerScale",			m_nServerScale,		fname);
   saveInt("Reconnect",				m_reconnectcounter,		fname);
   saveInt("EnableCache",			m_fEnableCache,		fname);
+  saveInt("EnableZstd",			m_fEnableZstd, fname);
   saveInt("QuickOption",			m_quickoption,	fname);
   saveInt("UseDSMPlugin",			m_fUseDSMPlugin,	fname);
   saveInt("UseProxy",				m_fUseProxy,	fname);
@@ -1143,6 +1152,7 @@ void VNCOptions::Load(char *fname)
   m_nServerScale =		readInt("ServerScale",		m_nServerScale,	fname);
   m_reconnectcounter =  readInt("Reconnect",		m_reconnectcounter,	fname);
   m_fEnableCache =		readInt("EnableCache",		m_fEnableCache,	fname) != 0;
+  m_fEnableZstd =		readInt("EnableZstd",		m_fEnableZstd, fname);
   m_quickoption  =		readInt("QuickOption",		m_quickoption, fname);
   m_fUseDSMPlugin =		readInt("UseDSMPlugin",		m_fUseDSMPlugin, fname) != 0;
   m_fUseProxy =			readInt("UseProxy",			m_fUseProxy, fname) != 0;
@@ -1401,6 +1411,10 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 		  SendMessage(hCache, BM_SETCHECK, _this->m_fEnableCache, 0);
 		  EnableWindow(hCache, !_this->autoDetect);
 
+		  HWND hZstd = GetDlgItem(hwnd, IDC_ZSTD);
+		  SendMessage(hZstd, BM_SETCHECK, _this->m_fEnableZstd, 0);
+		  
+
 #ifndef _XZ
 		  HWND hxz = GetDlgItem(hwnd, IDC_XZRADIO);
 		  EnableWindow(hxz, false);
@@ -1501,6 +1515,10 @@ BOOL CALLBACK VNCOptions::OptDlgProc(  HWND hwnd,  UINT uMsg,
 			  HWND hCache = GetDlgItem(hwnd, ID_SESSION_SET_CACHE);
 			  _this->m_fEnableCache =
 				  (SendMessage(hCache, BM_GETCHECK, 0, 0) == BST_CHECKED);
+
+			  HWND hZstd = GetDlgItem(hwnd, IDC_ZSTD);
+			  _this->m_fEnableZstd =
+				  (SendMessage(hZstd, BM_GETCHECK, 0, 0) == BST_CHECKED);
 			  
 			  HWND hSwap = GetDlgItem(hwnd, ID_SESSION_SWAPMOUSE);
 			  _this->m_SwapMouse =

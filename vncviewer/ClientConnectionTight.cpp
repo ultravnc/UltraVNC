@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002-2013 UltraVNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002-2020 UltraVNC Team Members. All Rights Reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@
 #define TIGHT_MIN_TO_COMPRESS 12
 #define TIGHT_BUFFER_SIZE (2048 * 200)
 
-void ClientConnection::ReadTightRect(rfbFramebufferUpdateRectHeader *pfburh)
+void ClientConnection::ReadTightRect(rfbFramebufferUpdateRectHeader *pfburh, bool zstd)
 {
   if (m_myFormat.bitsPerPixel != 8 &&
       m_myFormat.bitsPerPixel != 16 &&
@@ -44,19 +44,10 @@ void ClientConnection::ReadTightRect(rfbFramebufferUpdateRectHeader *pfburh)
 
   /* Flush zlib streams if we are told by the server to do so. */
   for (int i = 0; i < 4; i++) {
-    if ((comp_ctl & 1) && m_tightZlibStreamActive[i]) {
-      int err = inflateEnd (&m_tightZlibStream[i]);
-      if (err != Z_OK) {
-        if (m_tightZlibStream[i].msg != NULL) {
-          vnclog.Print(0, _T("zlib inflateEnd() error: %s\n"),
-                       m_tightZlibStream[i].msg);
-        } else {
-          vnclog.Print(0, _T("zlib inflateEnd() error: %d\n"), err);
-        }
-        return;
-      }
-      m_tightZlibStreamActive[i] = FALSE;
-    }
+    if (comp_ctl & 1){
+		UltraVncZ *uz = &ultraVncZTight[i];
+		uz->endInflateStream(zstd);
+		}
     comp_ctl >>= 1;
   }
 
@@ -165,25 +156,9 @@ void ClientConnection::ReadTightRect(rfbFramebufferUpdateRectHeader *pfburh)
 
   /* Now let's initialize compression stream if needed. */
   int stream_id = comp_ctl & 0x03;
-  z_streamp zs = &m_tightZlibStream[stream_id];
-  if (!m_tightZlibStreamActive[stream_id]) {
-    zs->zalloc = Z_NULL;
-    zs->zfree = Z_NULL;
-    zs->opaque = Z_NULL;
-    int err = inflateInit(zs);
-    if (err != Z_OK) {
-      if (zs->msg != NULL) {
-        vnclog.Print(0, _T("zlib inflateInit() error: %s.\n"), zs->msg);
-      } else {
-        vnclog.Print(0, _T("zlib inflateInit() error: %d.\n"), err);
-      }
-      return;
-    }
-    m_tightZlibStreamActive[stream_id] = TRUE;
-  }
+  UltraVncZ *uz = &ultraVncZTight[stream_id];
 
   /* Read, decode and draw actual pixel data in a loop. */
-
   int beforeBufferSize =
     TIGHT_BUFFER_SIZE * bitsPixel / (bitsPixel + sizeof(COLORREF) * 8)
       & 0xFFFFFFFC;
@@ -205,41 +180,36 @@ void ClientConnection::ReadTightRect(rfbFramebufferUpdateRectHeader *pfburh)
 
     compressedLen -= portionLen;
 
-    zs->next_in = (Bytef *)m_tightbuf;
-    zs->avail_in = portionLen;
+	BYTE * next_in = (Bytef *)m_tightbuf;
+    UINT avail_in = portionLen;
+	BYTE * next_out;
+	UINT avail_out;
 
     do {
-      zs->next_out = (Bytef *)&m_netbuf[extraBytes];
-      zs->avail_out = beforeBufferSize - extraBytes;
+		next_out = (Bytef *)&m_netbuf[extraBytes];
+		avail_out = beforeBufferSize - extraBytes;
 
-      err = inflate(zs, Z_SYNC_FLUSH);
-      if (err == Z_BUF_ERROR)   // Input exhausted -- no problem
-        break;
-      if (err != Z_OK && err != Z_STREAM_END) {
-        if (zs->msg != NULL) {
-          vnclog.Print(0, _T("zlib inflate() error: %s.\n"), zs->msg);
-        } else {
-          vnclog.Print(0, _T("zlib inflate() error: %d.\n"), err);
-        }
-        return;
-      }
+		err = uz->decompress(avail_in, avail_out, next_in, next_out, zstd);
 
-      numRows = (beforeBufferSize - zs->avail_out) / rowSize;
+		if (err != Z_OK)   // Input exhausted -- no problem
+	        return;
 
-      (this->*m_tightCurrentFilter)(numRows);
+		numRows = (beforeBufferSize - avail_out) / rowSize;
 
-      extraBytes = beforeBufferSize - zs->avail_out - numRows * rowSize;
-      if (extraBytes > 0)
-        memcpy(m_netbuf, &m_netbuf[numRows * rowSize], extraBytes);
+		(this->*m_tightCurrentFilter)(numRows);
 
-      omni_mutex_lock l(m_bitmapdcMutex);
+		extraBytes = beforeBufferSize - avail_out - numRows * rowSize;
+		if (extraBytes > 0)
+			memcpy(m_netbuf, &m_netbuf[numRows * rowSize], extraBytes);
 
-      SETPIXELS_NOCONV(m_zlibbuf, pfburh->r.x, pfburh->r.y + rowsProcessed,
-                       pfburh->r.w, numRows);
+		omni_mutex_lock l(m_bitmapdcMutex);
 
-      rowsProcessed += numRows;
+		SETPIXELS_NOCONV(m_zlibbuf, pfburh->r.x, pfburh->r.y + rowsProcessed,
+						   pfburh->r.w, numRows);
+
+		  rowsProcessed += numRows;
     }
-    while (zs->avail_out == 0);
+    while (avail_out == 0);
   }
 
   if (rowsProcessed != pfburh->r.h) {

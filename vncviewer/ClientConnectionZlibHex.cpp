@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002-2013 UltraVNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002-2020 UltraVNC Team Members. All Rights Reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -30,44 +30,13 @@
 #include "stdhdrs.h"
 #include "vncviewer.h"
 #include "ClientConnection.h"
-#ifdef _INTERNALLIB
-#include <zlib.h>
-#else
-#include "../zlib/zlib.h"
-#endif
+
 #include "lzo/minilzo.h"
 
-bool ClientConnection::zlibDecompress(unsigned char *from_buf, unsigned char *to_buf, unsigned int count, unsigned int size, z_stream *decompressor)
+bool ClientConnection::zlibDecompress(unsigned char *from_buf, unsigned char *to_buf, unsigned int count, unsigned int size, UltraVncZ * ultravncZ, bool zstd)
 {
 	int inflateResult;
-
-	decompressor->next_in = from_buf;
-	decompressor->avail_in = count;
-	decompressor->next_out = to_buf;
-	decompressor->avail_out = size;
-	decompressor->data_type = Z_BINARY;
-	//if (lzo1x_decompress(from_buf,count,to_buf,&size,NULL)!=LZO_E_OK)
-	//		vnclog.Print(0, _T("Error zlo\n"));
-	//return true;
-		
-	// Insure the inflator is initialized
-	if ( decompressor->total_in == ZLIBHEX_DECOMP_UNINITED ) {
-		decompressor->total_in = 0;
-		decompressor->total_out = 0;
-		decompressor->zalloc = Z_NULL;
-		decompressor->zfree = Z_NULL;
-		decompressor->opaque = Z_NULL;
-
-		inflateResult = inflateInit( decompressor );
-		if ( inflateResult != Z_OK ) {
-			vnclog.Print(0, _T("zlib inflateInit error: %d\n"), inflateResult);
-			return false;
-		}
-
-	}
-
-	// Decompress screen data
-	inflateResult = inflate( decompressor, Z_SYNC_FLUSH );
+	inflateResult = ultravncZ->decompress(count, size, from_buf, to_buf, zstd);
 	if ( inflateResult < 0 ) {
 		vnclog.Print(0, _T("zlib inflate error: %d\n"), inflateResult);
 		return false;
@@ -76,17 +45,17 @@ bool ClientConnection::zlibDecompress(unsigned char *from_buf, unsigned char *to
 	return true;
 }
 
-void ClientConnection::ReadZlibHexRect(rfbFramebufferUpdateRectHeader *pfburh)
+void ClientConnection::ReadZlibHexRect(rfbFramebufferUpdateRectHeader *pfburh, bool zstd)
 {
 	switch (m_myFormat.bitsPerPixel) {
 	case 8:
-		HandleZlibHexEncoding8(pfburh->r.x, pfburh->r.y, pfburh->r.w, pfburh->r.h);
+		HandleZlibHexEncoding8(pfburh->r.x, pfburh->r.y, pfburh->r.w, pfburh->r.h, zstd);
 		break;
 	case 16:
-		HandleZlibHexEncoding16(pfburh->r.x, pfburh->r.y, pfburh->r.w, pfburh->r.h);
+		HandleZlibHexEncoding16(pfburh->r.x, pfburh->r.y, pfburh->r.w, pfburh->r.h, zstd);
 		break;
 	case 32:
-		HandleZlibHexEncoding32(pfburh->r.x, pfburh->r.y, pfburh->r.w, pfburh->r.h);
+		HandleZlibHexEncoding32(pfburh->r.x, pfburh->r.y, pfburh->r.w, pfburh->r.h, zstd);
 		break;
 	}
 }
@@ -97,7 +66,7 @@ BYTE pfgcolor[4];
 BYTE pbgcolor[4];
 
 #define DEFINE_HEXTILE(bpp)														\
-void ClientConnection::HandleZlibHexEncoding##bpp(int rx, int ry, int rw, int rh)		\
+void ClientConnection::HandleZlibHexEncoding##bpp(int rx, int ry, int rw, int rh, bool zstd)		\
 {																				\
     int x, y, w, h;																\
     CARD8 subencoding;															\
@@ -133,7 +102,7 @@ void ClientConnection::HandleZlibHexEncoding##bpp(int rx, int ry, int rw, int rh
                 nCompData = Swap16IfLE(nCompData);								\
 				CheckBufferSize(nCompData);										\
                 ReadExact(m_netbuf, nCompData);									\
-		        if (zlibDecompress((unsigned char *)m_netbuf, m_zlibbuf, nCompData, ((w*h+2)*(bpp/8)), &m_decompStreamRaw)) {  \
+		        if (zlibDecompress((unsigned char *)m_netbuf, m_zlibbuf, nCompData, ((w*h+2)*(bpp/8)), ultraVncZRaw, zstd)) {  \
                     SETPIXELS(m_zlibbuf, bpp, x,y,w,h);							\
 				}																\
                 continue;														\
@@ -142,8 +111,9 @@ void ClientConnection::HandleZlibHexEncoding##bpp(int rx, int ry, int rw, int rh
             if (subencoding & rfbHextileZlibHex) {								\
                 ReadExact((char *)&nCompData, 2);								\
                 nCompData = Swap16IfLE(nCompData);								\
+				CheckBufferSize(nCompData);										\
                 ReadExact(m_netbuf, nCompData);									\
-		        if (zlibDecompress((unsigned char *)m_netbuf, m_zlibbuf, nCompData, ((w*h+2)*(bpp/8)+20), &m_decompStreamEncoded)) {  \
+		        if (zlibDecompress((unsigned char *)m_netbuf, m_zlibbuf, nCompData, ((w*h+2)*(bpp/8)+20), ultraVncZEncoded, zstd)) {  \
                     HandleZlibHexSubencodingBuf##bpp(x, y, w, h, subencoding, m_zlibbuf);							\
 				}																\
                 continue;														\

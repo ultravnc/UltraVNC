@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002-2013 UltraVNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002-2020 UltraVNC Team Members. All Rights Reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -32,18 +32,19 @@
 #include "Exception.h"
 #ifdef _INTERNALLIB
 #include <zlib.h>
+#include <zstd.h>
 #else
-#include "../zlib/zlib.h"
+//#include "../zlib/zlib.h"
+#include "../zstd-1.4.4/lib/zstd.h"
 #endif
 
 
-void ClientConnection::ReadZlibRect(rfbFramebufferUpdateRectHeader *pfburh,int XOR) {
+void ClientConnection::ReadZlibRect(rfbFramebufferUpdateRectHeader *pfburh, bool zstd) {
 
 	UINT numpixels = pfburh->r.w * pfburh->r.h;
     // this assumes at least one byte per pixel. Naughty.
 	UINT numRawBytes = numpixels * m_minPixelBytes;
 	UINT numCompBytes;
-	int inflateResult;
 
 	rfbZlibHeader hdr;
 
@@ -58,119 +59,16 @@ void ClientConnection::ReadZlibRect(rfbFramebufferUpdateRectHeader *pfburh,int X
 
 	// Verify enough buffer space for screen update.
 	CheckZlibBufferSize(numRawBytes);
-
-	m_decompStream.next_in = (unsigned char *)m_netbuf;
-	m_decompStream.avail_in = numCompBytes;
-	m_decompStream.next_out = m_zlibbuf;
-	m_decompStream.avail_out = numRawBytes;
-	m_decompStream.data_type = Z_BINARY;
-		
-	// Insure the inflator is initialized
-	if ( m_decompStreamInited == false ) {
-		m_decompStream.total_in = 0;
-		m_decompStream.total_out = 0;
-		m_decompStream.zalloc = Z_NULL;
-		m_decompStream.zfree = Z_NULL;
-		m_decompStream.opaque = Z_NULL;
-
-		inflateResult = inflateInit( &m_decompStream );
-		if ( inflateResult != Z_OK ) {
-			vnclog.Print(0, _T("zlib inflateInit error: %d\n"), inflateResult);
-			return;
-		}
-		m_decompStreamInited = true;
-	}
-
-	// Decompress screen data
-	inflateResult = inflate( &m_decompStream, Z_SYNC_FLUSH );
-	if ( inflateResult < 0 ) {
-		vnclog.Print(0, _T("zlib inflate error: %d\n"), inflateResult);
+	if (ultraVncZlib->decompress(numCompBytes, numRawBytes, (unsigned char *)m_netbuf, m_zlibbuf, zstd) != Z_OK)
 		return;
-	}
+
 	SETUP_COLOR_SHORTCUTS;
-	if (XOR==3)
-	{
-		mybool *maskbuffer=(mybool *)m_zlibbuf;
-		BYTE *color=m_zlibbuf+(((pfburh->r.w*pfburh->r.h)+7)/8);
-		BYTE *color2=m_zlibbuf+(((pfburh->r.w*pfburh->r.h)+7)/8)+m_myFormat.bitsPerPixel/8;
-		// No other threads can use bitmap DC
-		omni_mutex_lock l(m_bitmapdcMutex);						  
 
-		// This big switch is untidy but fast
-		switch (m_myFormat.bitsPerPixel) {
-		case 8:
-			SETXORMONOPIXELS(maskbuffer,color2, color,8, pfburh->r.x, pfburh->r.y, pfburh->r.w, pfburh->r.h)
-				break;
-		case 16:
-			SETXORMONOPIXELS(maskbuffer,color2, color,16, pfburh->r.x, pfburh->r.y, pfburh->r.w, pfburh->r.h)
-				break;
-		case 24:
-		case 32:
-			SETXORMONOPIXELS(maskbuffer,color2, color,32, pfburh->r.x, pfburh->r.y, pfburh->r.w, pfburh->r.h)            
-				break;
-		default:
-			vnclog.Print(0, _T("Invalid number of bits per pixel: %d\n"), m_myFormat.bitsPerPixel);
-			return;
-		}
-	}
+	// No other threads can use bitmap DC
+	omni_mutex_lock l(m_bitmapdcMutex);	
 
-	else if (XOR==2)
-	{
-		mybool *maskbuffer=(mybool *)m_zlibbuf;
-		BYTE *color=m_zlibbuf+(((pfburh->r.w*pfburh->r.h)+7)/8);
-		BYTE *databuffer=m_zlibbuf+(((pfburh->r.w*pfburh->r.h)+7)/8)+m_myFormat.bitsPerPixel/8;
-		// No other threads can use bitmap DC
-		omni_mutex_lock l(m_bitmapdcMutex);						  
-
-		// This big switch is untidy but fast
-		switch (m_myFormat.bitsPerPixel) {
-		case 8:
-			SETXORSOLPIXELS(maskbuffer,databuffer, color,8, pfburh->r.x, pfburh->r.y, pfburh->r.w, pfburh->r.h)
-				break;
-		case 16:
-			SETXORSOLPIXELS(maskbuffer,databuffer, color,16, pfburh->r.x, pfburh->r.y, pfburh->r.w, pfburh->r.h)
-				break;
-		case 24:
-		case 32:
-			SETXORSOLPIXELS(maskbuffer,databuffer, color,32, pfburh->r.x, pfburh->r.y, pfburh->r.w, pfburh->r.h)            
-				break;
-		default:
-			vnclog.Print(0, _T("Invalid number of bits per pixel: %d\n"), m_myFormat.bitsPerPixel);
-			return;
-		}
-	}
-	else if (XOR==1)
-	{
-		mybool *maskbuffer=(mybool *)m_zlibbuf;
-		BYTE *databuffer=m_zlibbuf+(((pfburh->r.w*pfburh->r.h)+7)/8);
-		// No other threads can use bitmap DC
-		omni_mutex_lock l(m_bitmapdcMutex);						  
-		int aantal=0;
-		// This big switch is untidy but fast
-		switch (m_myFormat.bitsPerPixel) {
-		case 8:
-			SETXORPIXELS(maskbuffer,databuffer, 8, pfburh->r.x, pfburh->r.y, pfburh->r.w, pfburh->r.h,aantal)
-				break;
-		case 16:
-			SETXORPIXELS(maskbuffer,databuffer, 16, pfburh->r.x, pfburh->r.y, pfburh->r.w, pfburh->r.h,aantal)
-				break;
-		case 24:
-		case 32:
-			SETXORPIXELS(maskbuffer,databuffer, 32, pfburh->r.x, pfburh->r.y, pfburh->r.w, pfburh->r.h,aantal)            
-				break;
-		default:
-			vnclog.Print(0, _T("Invalid number of bits per pixel: %d\n"), m_myFormat.bitsPerPixel);
-			return;
-		}
-	}
-	else if (XOR==0)
-	{
-
-		// No other threads can use bitmap DC
-		omni_mutex_lock l(m_bitmapdcMutex);	
-
-		// This big switch is untidy but fast
-		switch (m_myFormat.bitsPerPixel) {
+	// This big switch is untidy but fast
+	switch (m_myFormat.bitsPerPixel) {
 		case 8:
 			SETPIXELS(m_zlibbuf, 8, pfburh->r.x, pfburh->r.y, pfburh->r.w, pfburh->r.h)
 				break;
@@ -184,7 +82,6 @@ void ClientConnection::ReadZlibRect(rfbFramebufferUpdateRectHeader *pfburh,int X
 		default:
 			vnclog.Print(0, _T("Invalid number of bits per pixel: %d\n"), m_myFormat.bitsPerPixel);
 			return;
-		}
 	}
 }
 // Makes sure zlibbuf is at least as big as the specified size.
@@ -194,7 +91,7 @@ void ClientConnection::CheckZlibBufferSize(int bufsize)
 {
 	unsigned char *newbuf;
 
-	if (m_zlibbufsize > bufsize) return;
+	if (m_zlibbufsize > bufsize + 256) return;
 
 	omni_mutex_lock l(m_zlibBufferMutex);
 
@@ -217,34 +114,7 @@ void ClientConnection::CheckZlibBufferSize(int bufsize)
 
 }
 
-void ClientConnection::ReadSolidRect(rfbFramebufferUpdateRectHeader *pfburh) {
-
-
-	ReadExact(m_netbuf, m_myFormat.bitsPerPixel/8);
-	SETUP_COLOR_SHORTCUTS;
-	
-		// No other threads can use bitmap DC
-		omni_mutex_lock l(m_bitmapdcMutex);						  
-
-		// This big switch is untidy but fast
-		switch (m_myFormat.bitsPerPixel) {
-		case 8:
-			SETSOLPIXELS(m_netbuf,8, pfburh->r.x, pfburh->r.y, pfburh->r.w, pfburh->r.h)
-				break;
-		case 16:
-			SETSOLPIXELS(m_netbuf,16, pfburh->r.x, pfburh->r.y, pfburh->r.w, pfburh->r.h)
-				break;
-		case 24:
-		case 32:
-			SETSOLPIXELS(m_netbuf,32, pfburh->r.x, pfburh->r.y, pfburh->r.w, pfburh->r.h)            
-				break;
-		default:
-			vnclog.Print(0, _T("Invalid number of bits per pixel: %d\n"), m_myFormat.bitsPerPixel);
-			return;
-		}
-}
-
-void ClientConnection::ReadSolMonoZip(rfbFramebufferUpdateRectHeader *pfburh,HRGN *prgn)
+void ClientConnection::ReadQueueZip(rfbFramebufferUpdateRectHeader *pfburh,HRGN *prgn, bool zstd)
 {
 	UINT nNbCacheRects = pfburh->r.x;
 	UINT numRawBytes = pfburh->r.y+pfburh->r.w*65535;
@@ -261,15 +131,8 @@ void ClientConnection::ReadSolMonoZip(rfbFramebufferUpdateRectHeader *pfburh,HRG
 	// Verify buffer space for cache rects list
 	CheckZipBufferSize(numRawBytes+500);
 
-	int nRet = uncompress((unsigned char*)m_zipbuf,// Dest  
-						  (unsigned long*)&numRawBytes,// Dest len
-						  (unsigned char*)m_netbuf,	// Src
-						  numCompBytes	// Src len
-						 );							    
-	if (nRet != 0)
-	{
-		return;		
-	}
+	if (ultraVncZlib->decompress(numCompBytes, numRawBytes, (unsigned char *)m_netbuf, m_zlibbuf, zstd) != Z_OK)
+		return;
 
 	BYTE* pzipbuf = m_zipbuf;
 	for (UINT ii = 0 ; ii < nNbCacheRects; ii++)
@@ -291,113 +154,28 @@ void ClientConnection::ReadSolMonoZip(rfbFramebufferUpdateRectHeader *pfburh,HRG
 
 		SoftCursorLockArea(rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
 		SaveArea(rect);
+		if ( surh.encoding==rfbEncodingRaw) {
+			UINT numpixels = surh.r.w * surh.r.h;
+			SETUP_COLOR_SHORTCUTS;
+			omni_mutex_lock l(m_bitmapdcMutex);						  
 
-		if (surh.encoding==rfbEncodingSolidColor)
-			{
-
-				SETUP_COLOR_SHORTCUTS;
-	
-				// No other threads can use bitmap DC
-				omni_mutex_lock l(m_bitmapdcMutex);						  
-
-				// This big switch is untidy but fast
-				switch (m_myFormat.bitsPerPixel) {
+			// This big switch is untidy but fast
+			switch (m_myFormat.bitsPerPixel) {
 				case 8:
-					SETSOLPIXELS(pzipbuf,8, surh.r.x, surh.r.y, surh.r.w, surh.r.h)
-					break;
-				case 16:
-					SETSOLPIXELS(pzipbuf,16, surh.r.x, surh.r.y, surh.r.w, surh.r.h)
-					break;
-				case 24:
-				case 32:
-					SETSOLPIXELS(pzipbuf,32, surh.r.x, surh.r.y, surh.r.w, surh.r.h)            
-					break;
-				default:
-					vnclog.Print(0, _T("Invalid number of bits per pixel: %d\n"), m_myFormat.bitsPerPixel);
-				}
-				pzipbuf +=m_myFormat.bitsPerPixel/8;
-				if (!m_opts.m_Directx)InvalidateRegion(&rect,prgn);
-			}
-		else if ( surh.encoding==rfbEncodingXORMonoColor_Zlib)
-			{
-				SETUP_COLOR_SHORTCUTS;
-				mybool *maskbuffer=(mybool *)pzipbuf;
-				BYTE *color=pzipbuf+(((surh.r.w*surh.r.h)+7)/8);
-				BYTE *color2=pzipbuf+(((surh.r.w*surh.r.h)+7)/8)+m_myFormat.bitsPerPixel/8;
-
-				// No other threads can use bitmap DC
-				omni_mutex_lock l(m_bitmapdcMutex);						  
-
-				// This big switch is untidy but fast
-				switch (m_myFormat.bitsPerPixel) {
-				case 8:
-					SETXORMONOPIXELS(maskbuffer,color2, color,8, surh.r.x, surh.r.y, surh.r.w, surh.r.h)
+					SETPIXELS(pzipbuf, 8, surh.r.x, surh.r.y, surh.r.w, surh.r.h)
 						break;
 				case 16:
-					SETXORMONOPIXELS(maskbuffer,color2, color,16, surh.r.x, surh.r.y, surh.r.w, surh.r.h)
+					SETPIXELS(pzipbuf, 16, surh.r.x, surh.r.y, surh.r.w, surh.r.h)
 						break;
 				case 24:
 				case 32:
-					SETXORMONOPIXELS(maskbuffer,color2, color,32, surh.r.x, surh.r.y, surh.r.w, surh.r.h)            
+					SETPIXELS(pzipbuf, 32, surh.r.x, surh.r.y, surh.r.w, surh.r.h)            
 						break;
 				default:
 					vnclog.Print(0, _T("Invalid number of bits per pixel: %d\n"), m_myFormat.bitsPerPixel);
-				}
-				pzipbuf += (((surh.r.w*surh.r.h)+7)/8)+m_myFormat.bitsPerPixel/8+m_myFormat.bitsPerPixel/8;
-				if (!m_opts.m_Directx)InvalidateRegion(&rect,prgn);
 			}
-		else if ( surh.encoding==rfbEncodingXOR_Zlib)
-			{
-				SETUP_COLOR_SHORTCUTS;
-				mybool *maskbuffer=(mybool *)pzipbuf;
-				BYTE *databuffer=pzipbuf+(((surh.r.w*surh.r.h)+7)/8);
-		
-				omni_mutex_lock l(m_bitmapdcMutex);
-				int aantal=0;
-
-				// This big switch is untidy but fast
-				switch (m_myFormat.bitsPerPixel) {
-				case 8:
-					SETXORPIXELS(maskbuffer,databuffer, 8, surh.r.x, surh.r.y, surh.r.w, surh.r.h,aantal)
-						break;
-				case 16:
-					SETXORPIXELS(maskbuffer,databuffer, 16,  surh.r.x, surh.r.y, surh.r.w, surh.r.h,aantal)
-						break;
-				case 24:
-				case 32:
-					SETXORPIXELS(maskbuffer,databuffer, 32,  surh.r.x, surh.r.y, surh.r.w, surh.r.h,aantal)            
-						break;
-				default:
-					vnclog.Print(0, _T("Invalid number of bits per pixel: %d\n"), m_myFormat.bitsPerPixel);
-				}
-			// we need to count the size off the databuffer
-				pzipbuf += (((surh.r.w*surh.r.h)+7)/8)+aantal*m_myFormat.bitsPerPixel/8;//mask
-				if (!m_opts.m_Directx)InvalidateRegion(&rect,prgn);
-			}
-		else if ( surh.encoding==rfbEncodingRaw)
-			{
-				UINT numpixels = surh.r.w * surh.r.h;
-				SETUP_COLOR_SHORTCUTS;
-				omni_mutex_lock l(m_bitmapdcMutex);						  
-
-				// This big switch is untidy but fast
-				switch (m_myFormat.bitsPerPixel) {
-					case 8:
-						SETPIXELS(pzipbuf, 8, surh.r.x, surh.r.y, surh.r.w, surh.r.h)
-							break;
-					case 16:
-						SETPIXELS(pzipbuf, 16, surh.r.x, surh.r.y, surh.r.w, surh.r.h)
-							break;
-					case 24:
-					case 32:
-						SETPIXELS(pzipbuf, 32, surh.r.x, surh.r.y, surh.r.w, surh.r.h)            
-							break;
-					default:
-						vnclog.Print(0, _T("Invalid number of bits per pixel: %d\n"), m_myFormat.bitsPerPixel);
-				}
-				pzipbuf +=numpixels*m_myFormat.bitsPerPixel/8;
-				if (!m_opts.m_Directx)InvalidateRegion(&rect,prgn);
-			}
+			pzipbuf +=numpixels*m_myFormat.bitsPerPixel/8;
+			if (!m_opts.m_Directx)InvalidateRegion(&rect,prgn);
+		}
 	}
-
 }

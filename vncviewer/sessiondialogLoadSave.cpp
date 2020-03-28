@@ -176,6 +176,7 @@ void SessionDialog::SaveToFile(char *fname, bool asDefault)
 	saveInt("ServerScale",			nServerScale,		fname);
 	saveInt("Reconnect",			reconnectcounter,		fname);
 	saveInt("EnableCache",			fEnableCache,		fname);
+	saveInt("EnableZstd",			fEnableZstd, fname);
 	saveInt("QuickOption",			quickoption,	fname);
 	saveInt("UseDSMPlugin",			fUseDSMPlugin,	fname);
 	saveInt("UseProxy",				m_fUseProxy,	fname);
@@ -247,6 +248,7 @@ void SessionDialog::LoadFromFile(char *fname)
   nServerScale =		readInt("ServerScale",		nServerScale,	fname);
   reconnectcounter =	readInt("Reconnect",		reconnectcounter,	fname);
   fEnableCache =		readInt("EnableCache",		fEnableCache,	fname) != 0;
+  fEnableZstd =			readInt("EnableZstd",		fEnableZstd, fname);
   quickoption  =		readInt("QuickOption",		quickoption, fname);
   fUseDSMPlugin =		readInt("UseDSMPlugin",		fUseDSMPlugin, fname) != 0;
   m_fUseProxy =			readInt("UseProxy",			m_fUseProxy, fname) != 0;
@@ -334,6 +336,7 @@ void SessionDialog::SetDefaults()
 	nServerScale = 1;
 	reconnectcounter = 3;
 	fEnableCache = false;
+	fEnableZstd = true;
 	listening = false;
 	listenport = INCOMING_PORT_OFFSET;
 	restricted = false;

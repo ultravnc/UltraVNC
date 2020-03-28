@@ -18,6 +18,7 @@
 
 #include "ZlibInStream.h"
 #include "Exception.h"
+
 #ifdef _INTERNALLIB
 #include <zlib.h>
 #else

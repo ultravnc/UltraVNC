@@ -770,7 +770,7 @@
         "UseSystemSearchPath" = "11:TRUE"
         "TargetPlatform" = "3:1"
         "PreBuildEvent" = "8:"
-        "PostBuildEvent" = "8:\"C:\\Program Files (x86)\\Windows Kits\\8.1\\bin\\x86\\signtool.exe\" sign /sha1 7686bed45b491e41586b7d2a3c63cbd7e2f3d0ca /n \"uvnc bvba\" /v /fd sha256 /tr http://sha256timestamp.ws.symantec.com/sha256/timestamp $(BuiltOuputPath)\r\ncopy $(BuiltOuputPath) c:\\uvnc\\64\\xp "
+        "PostBuildEvent" = "8:\""C:\Program Files (x86)\Windows Kits\8.1\bin\x86\DigiCertUtil .exe" sign /sha1 7686bed45b491e41586b7d2a3c63cbd7e2f3d0ca /noInput $(BuiltOuputPath)\r\ncopy $(BuiltOuputPath) c:\\uvnc\\64\\xp "
         "RunPostBuildEvent" = "3:0"
         }
         "Registry"

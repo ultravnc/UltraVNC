@@ -141,7 +141,7 @@ local ulg filecompress OF((struct zlist far *z_entry, FILE *zipfile,
 #ifndef USE_ZLIB
   extern ulg window_size;       /* size of said window */
 
-  unsigned (*read_buf) OF((char *buf, unsigned size)) = file_read;
+  unsigned (*read_buf_zip) OF((char *buf, unsigned size)) = file_read;
   /* Current input function. Set to mem_read for in-memory compression */
 #endif /* !USE_ZLIB */
 
@@ -574,7 +574,7 @@ FILE *y;                /* output file */
 /*
  * compute crc first because zfwrite will alter the buffer b points to !!
  */
-      crc = crc32(crc, (uch *) b, k);
+      crc = crc32_unzip(crc, (uch *) b, k);
       if (zfwrite(b, 1, k, y) != k)
       {
         free((zvoid *)b);
@@ -823,7 +823,7 @@ local unsigned file_read(buf, size)
        if (buf[len-1] == CTRLZ) len--; /* suppress final ^Z */
     }
   }
-  crc = crc32(crc, (uch *) buf, len);
+  crc = crc32_unzip(crc, (uch *) buf, len);
   isize += (ulg)len;
   /* added check for file size - 2/20/05 */
   if ((isize & (ulg)0xffffffffL) < (ulg)len) {
@@ -1104,7 +1104,7 @@ local ulg filecompress(z_entry, zipfile, cmpr_method)
 
     /* Set the defaults for file compression. */
     zfile = zipfile;
-    read_buf = file_read;
+    read_buf_zip = file_read;
 
     /* Initialize deflate's internals and execute file compression. */
     bi_init(file_outbuf, sizeof(file_outbuf), TRUE);
@@ -1165,7 +1165,7 @@ ulg memcompress(tgt, tgtsize, src, srcsize)
         error("zlib deflateReset failed");
 #else /* !USE_ZLIB */
     zfile     = NULL;
-    read_buf  = mem_read;
+    read_buf_zip  = mem_read;
     in_buf    = src;
     in_size   = (unsigned)srcsize;
     in_offset = 0;
@@ -1179,7 +1179,7 @@ ulg memcompress(tgt, tgtsize, src, srcsize)
 #endif /* ?USE_ZLIB */
 
     crc = CRCVAL_INITIAL;
-    crc = crc32(crc, (uch *)src, (extent)srcsize);
+    crc = crc32_unzip(crc, (uch *)src, (extent)srcsize);
 
     /* For portability, force little-endian order on all machines: */
     tgt[0] = (char)(method & 0xff);

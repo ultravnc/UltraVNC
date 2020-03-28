@@ -32,6 +32,7 @@ static HEAP_ALLOC(wrkmem,LZO1X_1_MEM_COMPRESS);
 
 vncEncodeUltra::vncEncodeUltra()
 {
+	must_be_zipped = false;
 	m_buffer = NULL;
 	m_Queuebuffer = NULL;
 	m_QueueCompressedbuffer = NULL;

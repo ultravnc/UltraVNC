@@ -1499,7 +1499,7 @@
 #define EB_NTSD_VERSION   4    /* offset of NTSD version byte */
 #define EB_NTSD_MAX_VER   (0)  /* maximum version # we know how to handle */
 
-#define EB_ASI_CRC32      0    /* offset of ASI Unix field's crc32 checksum */
+#define EB_ASI_CRC32      0    /* offset of ASI Unix field's crc32_unzip checksum */
 #define EB_ASI_MODE       4    /* offset of ASI Unix permission mode field */
 
 #define EB_IZVMS_HLEN     12   /* length of IZVMS attribute block header */
@@ -1747,7 +1747,7 @@ typedef struct VMStimbuf {
        ulg csize;
        ulg ucsize;
        ulg last_mod_dos_datetime;
-       ulg crc32;
+       ulg crc32_unzip;
        uch version_needed_to_extract[2];
        ush general_purpose_bit_flag;
        ush compression_method;
@@ -1762,7 +1762,7 @@ typedef struct VMStimbuf {
        ush general_purpose_bit_flag;
        ush compression_method;
        ulg last_mod_dos_datetime;
-       ulg crc32;
+       ulg crc32_unzip;
        ulg csize;
        ulg ucsize;
        ush filename_length;
@@ -2158,9 +2158,9 @@ int      iswild          OF((ZCONST char *p));                    /* match.c */
    void     free_crc_table  OF((void));                          /* crctab.c */
 #endif
 #ifndef USE_ZLIB
-   ZCONST ulg near *get_crc_table  OF((void));         /* funzip.c, crctab.c */
-   ulg      crc32           OF((ulg crc, ZCONST uch *buf, extent len));
-#endif /* !USE_ZLIB */                        /* assembler source or crc32.c */
+   ZCONST ulg near *get_crc_table_unzip  OF((void));         /* funzip.c, crctab.c */
+   ulg      crc32_unzip           OF((ulg crc, ZCONST uch *buf, extent len));
+#endif /* !USE_ZLIB */                        /* assembler source or crc32_unzip.c */
 
 int      dateformat      OF((void));                                /* local */
 char     dateseparator   OF((void));                                /* local */
@@ -2299,8 +2299,8 @@ char    *GetLoadPath     OF((__GPRO));                              /* local */
 #  define MESSAGE(str,len,flag)  (*G.message)((zvoid *)&G,(str),(len),(flag))
 #endif
 
-#if 0            /* Optimization: use the (const) result of crc32(0L,NULL,0) */
-#  define CRCVAL_INITIAL  crc32(0L, NULL, 0)
+#if 0            /* Optimization: use the (const) result of crc32_unzip(0L,NULL,0) */
+#  define CRCVAL_INITIAL  crc32_unzip(0L, NULL, 0)
 #else
 #  define CRCVAL_INITIAL  0L
 #endif

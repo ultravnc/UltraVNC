@@ -13,7 +13,7 @@
 
 #define GLOBALS         /* include definition of errors[] in zip.h */
 #ifndef UTIL
-#define UTIL            /* do not declare the read_buf variable */
+#define UTIL            /* do not declare the read_buf_zip variable */
 #endif
 
 #include "zip.h"

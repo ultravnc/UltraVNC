@@ -131,7 +131,7 @@
 #endif /* !NO_32_BIT_LOADS */
 
 /* ========================================================================= */
-ulg crc32(crc, buf, len)
+ulg crc32_unzip(crc, buf, len)
     ulg crc;                    /* crc shift register */
     ZCONST uch *buf;            /* pointer to bytes to pump through */
     extent len;                 /* number of bytes in buf[] */
@@ -148,7 +148,7 @@ ulg crc32(crc, buf, len)
                 test    esi,esi         ;/*>   return 0;                   */
                 jz      fine            ;/*> else {                        */
 
-                call    get_crc_table
+                call    get_crc_table_unzip
                 mov     edi,eax
                 mov     eax,crc         ;/* 1st arg: ulg crc               */
 #ifndef __686

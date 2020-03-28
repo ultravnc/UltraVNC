@@ -29,7 +29,6 @@
 #include "stdhdrs.h"
 #include "vncviewer.h"
 #include "ClientConnection.h"
-// #include "zlib\zlib.h"
 
 
 void ClientConnection::ReadCacheRect(rfbFramebufferUpdateRectHeader *pfburh)

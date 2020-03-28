@@ -667,6 +667,9 @@ void SessionDialog::InitDlgProcEncoders()
 	HWND hCache = GetDlgItem(hwnd, ID_SESSION_SET_CACHE);
 	SendMessage(hCache, BM_SETCHECK, fEnableCache, 0);
 	EnableWindow(hCache, !autoDetect);
+	HWND hZstd = GetDlgItem(hwnd, IDC_ZSTD);
+	SendMessage(hZstd, BM_SETCHECK, fEnableZstd, 0);
+	
 #ifndef _XZ
 	HWND hxz = GetDlgItem(hwnd, IDC_XZRADIO);
 	EnableWindow(hxz, false);
@@ -873,6 +876,9 @@ void SessionDialog::ReadDlgProcEncoders()
 	HWND hCache = GetDlgItem(hwnd, ID_SESSION_SET_CACHE);
 	fEnableCache =
 			(SendMessage(hCache, BM_GETCHECK, 0, 0) == BST_CHECKED);
+	HWND hZstd = GetDlgItem(hwnd, IDC_ZSTD);
+	fEnableZstd =
+		(SendMessage(hZstd, BM_GETCHECK, 0, 0) == BST_CHECKED);
 }
 ////////////////////////////////////////////////////////////////////////////////
 void SessionDialog::ReadDlgProcKeyboardMouse()
@@ -1379,6 +1385,7 @@ void SessionDialog::StartListener()
 	m_pOpt->m_FTTimeout = FTTimeout;
 	m_pOpt->m_listenPort = listenport;
 	m_pOpt->m_fEnableCache = fEnableCache;
+	m_pOpt->m_fEnableZstd = fEnableZstd;
 	m_pOpt->m_useCompressLevel = useCompressLevel;
 	m_pOpt->m_enableJpegCompression = enableJpegCompression;
 	m_pOpt->m_compressLevel = compressLevel;

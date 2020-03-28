@@ -654,6 +654,8 @@ vncDesktop::TriggerUpdate()
 	// we don't actually need to.  Something to think about.
 	if (m_screenCapture == NULL)
 		SetEvent(trigger_events[0]);
+	//else
+	//	m_screenCapture->Unlock();
 }
 
 DWORD
@@ -1679,7 +1681,7 @@ vncDesktop::WriteMessageOnScreenPreConnect(BYTE *scrBuff, UINT scrBuffSize)
 
 	HFONT hFont, hOldFont;
 	SetRect(&rect, 0, 10, 640, 640);
-    char *tout = "UVNC experimental server 1.2.4.0 pre-connect window \n";
+    char *tout = "UVNC experimental server 1.2.5.0 pre-connect window \n";
 	DrawText(m_hmemdc, tout, (int)strlen(tout), &rect, DT_CENTER);
 
 

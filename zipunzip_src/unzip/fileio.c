@@ -770,7 +770,7 @@ static int partflush(__G__ rawbuf, size, unshrink)
     Compute the CRC first; if testing or if disk is full, that's it.
   ---------------------------------------------------------------------------*/
 
-    G.crc32val = crc32(G.crc32val, rawbuf, (extent)size);
+    G.crc32_unzipval = crc32_unzip(G.crc32_unzipval, rawbuf, (extent)size);
 
 #ifdef DLL
     if ((G.statreportcb != NULL) &&
@@ -1084,7 +1084,7 @@ static int is_vms_varlen_txt(__G__ ef_buf, ef_len)
 
             /* test the CRC checksum */
             if (makelong(ef_buf+EB_HEADSIZE) !=
-                crc32(CRCVAL_INITIAL, eb_data, (extent)eb_datlen))
+                crc32_unzip(CRCVAL_INITIAL, eb_data, (extent)eb_datlen))
             {
                 Info(slide, 1, ((char *)slide,
                   "[Warning: CRC error, discarding PKWARE extra field]\n"));

@@ -26,6 +26,8 @@
 #include <time.h>
 #include <rdr/MemOutStream.h>
 #include <rdr/ZlibOutStream.h>
+#include <rdr/ZstdOutStream.h>
+
 
 #define GET_IMAGE_INTO_BUF(tx,ty,tw,th,buf)     \
   rfb::Rect rect;                                    \
@@ -89,14 +91,17 @@ vncEncodeZRLE::vncEncodeZRLE()
 {
   mos = new rdr::MemOutStream;
   zos = new rdr::ZlibOutStream;
+  zstdos = new rdr::ZstdOutStream;
   beforeBuf = new rdr::U32[rfbZRLETileWidth * rfbZRLETileHeight + 1];
   m_use_zywrle = FALSE;
+  m_use_zstd = true;
 }
 
 vncEncodeZRLE::~vncEncodeZRLE()
 {
   delete mos;
   delete zos;
+  delete zstdos;
   delete [] (rdr::U32 *) beforeBuf;
 }
 
@@ -121,101 +126,182 @@ UINT vncEncodeZRLE::EncodeRect(BYTE *source, BYTE *dest, const rfb::Rect &rect)
   int w = rect.br.x - x;
   int h = rect.br.y - y;
 
-  mos->clear();
+mos->clear();
 
-  if( m_use_zywrle ){
-	  if( m_qualitylevel < 0 ){
-		  zywrle_level = 1;
-	  }else if( m_qualitylevel < 3 ){
-		  zywrle_level = 3;
-	  }else if( m_qualitylevel < 6 ){
-		  zywrle_level = 2;
-	  }else{
-		  zywrle_level = 1;
-	  }
-  }else{
-	  zywrle_level = 0;
-  }
-
-  switch (m_remoteformat.bitsPerPixel) {
-
-  case 8:
-    zrleEncode8NE( x, y, w, h, mos, zos, beforeBuf, source, this);
-    break;
-
-  case 16:
-    if( m_remoteformat.greenMax > 0x1F ){
-      if( m_remoteformat.bigEndian ){
-        zrleEncode16BE(x, y, w, h, mos, zos, beforeBuf, source, this);
-	  }else{
-        zrleEncode16LE(x, y, w, h, mos, zos, beforeBuf, source, this);
-	  }
-	}else{
-      if( m_remoteformat.bigEndian ){
-        zrleEncode15BE(x, y, w, h, mos, zos, beforeBuf, source, this);
-	  }else{
-        zrleEncode15LE(x, y, w, h, mos, zos, beforeBuf, source, this);
-	  }
+if (m_use_zywrle) {
+	if (m_qualitylevel < 0) {
+		zywrle_level = 1;
 	}
-    break;
-
-  case 32:
-    bool fitsInLS3Bytes
-      = ((m_remoteformat.redMax   << m_remoteformat.redShift)   < (1<<24) &&
-         (m_remoteformat.greenMax << m_remoteformat.greenShift) < (1<<24) &&
-         (m_remoteformat.blueMax  << m_remoteformat.blueShift)  < (1<<24));
-
-    bool fitsInMS3Bytes = (m_remoteformat.redShift   > 7  &&
-                           m_remoteformat.greenShift > 7  &&
-                           m_remoteformat.blueShift  > 7);
-
-    if ((fitsInLS3Bytes && !m_remoteformat.bigEndian) ||
-        (fitsInMS3Bytes && m_remoteformat.bigEndian))
-    {
-      if( m_remoteformat.bigEndian ){
-        zrleEncode24ABE(x, y, w, h, mos, zos, beforeBuf, source, this);
-	  }else{
-        zrleEncode24ALE(x, y, w, h, mos, zos, beforeBuf, source, this);
-	  }
-    }
-    else if ((fitsInLS3Bytes && m_remoteformat.bigEndian) ||
-             (fitsInMS3Bytes && !m_remoteformat.bigEndian))
-    {
-      if( m_remoteformat.bigEndian ){
-        zrleEncode24BBE(x, y, w, h, mos, zos, beforeBuf, source, this);
-	  }else{
-        zrleEncode24BLE(x, y, w, h, mos, zos, beforeBuf, source, this);
-	  }
-    }
-    else
-    {
-      if( m_remoteformat.bigEndian ){
-        zrleEncode32BE(x, y, w, h, mos, zos, beforeBuf, source, this);
-	  }else{
-        zrleEncode32LE(x, y, w, h, mos, zos, beforeBuf, source, this);
-	  }
-    }
-    break;
-  }
-
-  rfbFramebufferUpdateRectHeader* surh = (rfbFramebufferUpdateRectHeader*)dest;
-  surh->r.x = Swap16IfLE(x-monitor_Offsetx);
-  surh->r.y = Swap16IfLE(y-monitor_Offsety);
-  surh->r.w = Swap16IfLE(w);
-  surh->r.h = Swap16IfLE(h);
-  if( m_use_zywrle ){
-    surh->encoding = Swap32IfLE(rfbEncodingZYWRLE);
-  }else{
-    surh->encoding = Swap32IfLE(rfbEncodingZRLE);
-  }
-
-  rfbZRLEHeader* hdr = (rfbZRLEHeader*)(dest +
-                                        sz_rfbFramebufferUpdateRectHeader);
-
-  hdr->length = Swap32IfLE(mos->length());
-
-  memcpy(dest + sz_rfbFramebufferUpdateRectHeader + sz_rfbZRLEHeader,
-         (rdr::U8*)mos->data(), mos->length());
-
-  return sz_rfbFramebufferUpdateRectHeader + sz_rfbZRLEHeader + mos->length();
+	else if (m_qualitylevel < 3) {
+		zywrle_level = 3;
+	}
+	else if (m_qualitylevel < 6) {
+		zywrle_level = 2;
+	}
+	else {
+		zywrle_level = 1;
+	}
 }
+else {
+	zywrle_level = 0;
+}
+
+if (m_use_zstd) {
+	switch (m_remoteformat.bitsPerPixel) {
+
+	case 8:
+		zrleEncode8NE(x, y, w, h, mos, zstdos, beforeBuf, source, this);
+		break;
+
+	case 16:
+		if (m_remoteformat.greenMax > 0x1F) {
+			if (m_remoteformat.bigEndian) {
+				zrleEncode16BE(x, y, w, h, mos, zstdos, beforeBuf, source, this);
+			}
+			else {
+				zrleEncode16LE(x, y, w, h, mos, zstdos, beforeBuf, source, this);
+			}
+		}
+		else {
+			if (m_remoteformat.bigEndian) {
+				zrleEncode15BE(x, y, w, h, mos, zstdos, beforeBuf, source, this);
+			}
+			else {
+				zrleEncode15LE(x, y, w, h, mos, zstdos, beforeBuf, source, this);
+			}
+		}
+		break;
+
+	case 32:
+		bool fitsInLS3Bytes
+			= ((m_remoteformat.redMax << m_remoteformat.redShift) < (1 << 24) &&
+			(m_remoteformat.greenMax << m_remoteformat.greenShift) < (1 << 24) &&
+				(m_remoteformat.blueMax << m_remoteformat.blueShift) < (1 << 24));
+
+		bool fitsInMS3Bytes = (m_remoteformat.redShift > 7 &&
+			m_remoteformat.greenShift > 7 &&
+			m_remoteformat.blueShift > 7);
+
+		if ((fitsInLS3Bytes && !m_remoteformat.bigEndian) ||
+			(fitsInMS3Bytes && m_remoteformat.bigEndian))
+		{
+			if (m_remoteformat.bigEndian) {
+				zrleEncode24ABE(x, y, w, h, mos, zstdos, beforeBuf, source, this);
+			}
+			else {
+				zrleEncode24ALE(x, y, w, h, mos, zstdos, beforeBuf, source, this);
+			}
+		}
+		else if ((fitsInLS3Bytes && m_remoteformat.bigEndian) ||
+			(fitsInMS3Bytes && !m_remoteformat.bigEndian))
+		{
+			if (m_remoteformat.bigEndian) {
+				zrleEncode24BBE(x, y, w, h, mos, zstdos, beforeBuf, source, this);
+			}
+			else {
+				zrleEncode24BLE(x, y, w, h, mos, zstdos, beforeBuf, source, this);
+			}
+		}
+		else
+		{
+			if (m_remoteformat.bigEndian) {
+				zrleEncode32BE(x, y, w, h, mos, zstdos, beforeBuf, source, this);
+			}
+			else {
+				zrleEncode32LE(x, y, w, h, mos, zstdos, beforeBuf, source, this);
+			}
+		}
+		break;
+	}
+}
+else {
+	switch (m_remoteformat.bitsPerPixel) {
+
+	case 8:
+		zrleEncode8NE(x, y, w, h, mos, zos, beforeBuf, source, this);
+		break;
+
+	case 16:
+		if (m_remoteformat.greenMax > 0x1F) {
+			if (m_remoteformat.bigEndian) {
+				zrleEncode16BE(x, y, w, h, mos, zos, beforeBuf, source, this);
+			}
+			else {
+				zrleEncode16LE(x, y, w, h, mos, zos, beforeBuf, source, this);
+			}
+		}
+		else {
+			if (m_remoteformat.bigEndian) {
+				zrleEncode15BE(x, y, w, h, mos, zos, beforeBuf, source, this);
+			}
+			else {
+				zrleEncode15LE(x, y, w, h, mos, zos, beforeBuf, source, this);
+			}
+		}
+		break;
+
+	case 32:
+		bool fitsInLS3Bytes
+			= ((m_remoteformat.redMax << m_remoteformat.redShift) < (1 << 24) &&
+			(m_remoteformat.greenMax << m_remoteformat.greenShift) < (1 << 24) &&
+				(m_remoteformat.blueMax << m_remoteformat.blueShift) < (1 << 24));
+
+		bool fitsInMS3Bytes = (m_remoteformat.redShift > 7 &&
+			m_remoteformat.greenShift > 7 &&
+			m_remoteformat.blueShift > 7);
+
+		if ((fitsInLS3Bytes && !m_remoteformat.bigEndian) ||
+			(fitsInMS3Bytes && m_remoteformat.bigEndian))
+		{
+			if (m_remoteformat.bigEndian) {
+				zrleEncode24ABE(x, y, w, h, mos, zos, beforeBuf, source, this);
+			}
+			else {
+				zrleEncode24ALE(x, y, w, h, mos, zos, beforeBuf, source, this);
+			}
+		}
+		else if ((fitsInLS3Bytes && m_remoteformat.bigEndian) ||
+			(fitsInMS3Bytes && !m_remoteformat.bigEndian))
+		{
+			if (m_remoteformat.bigEndian) {
+				zrleEncode24BBE(x, y, w, h, mos, zos, beforeBuf, source, this);
+			}
+			else {
+				zrleEncode24BLE(x, y, w, h, mos, zos, beforeBuf, source, this);
+			}
+		}
+		else
+		{
+			if (m_remoteformat.bigEndian) {
+				zrleEncode32BE(x, y, w, h, mos, zos, beforeBuf, source, this);
+			}
+			else {
+				zrleEncode32LE(x, y, w, h, mos, zos, beforeBuf, source, this);
+			}
+		}
+		break;
+	}
+
+}
+
+rfbFramebufferUpdateRectHeader* surh = (rfbFramebufferUpdateRectHeader*)dest;
+surh->r.x = Swap16IfLE(x - monitor_Offsetx);
+surh->r.y = Swap16IfLE(y - monitor_Offsety);
+surh->r.w = Swap16IfLE(w);
+surh->r.h = Swap16IfLE(h);
+if (m_use_zywrle) 
+	surh->encoding = Swap32IfLE(m_use_zstd ? rfbEncodingZSTDYWRLE : rfbEncodingZYWRLE);
+else 
+	surh->encoding = Swap32IfLE(m_use_zstd ? rfbEncodingZSTDRLE : rfbEncodingZRLE);
+
+rfbZRLEHeader* hdr = (rfbZRLEHeader*)(dest +
+	sz_rfbFramebufferUpdateRectHeader);
+
+hdr->length = Swap32IfLE(mos->length());
+
+memcpy(dest + sz_rfbFramebufferUpdateRectHeader + sz_rfbZRLEHeader,
+(rdr::U8*)mos->data(), mos->length());
+
+return sz_rfbFramebufferUpdateRectHeader + sz_rfbZRLEHeader + mos->length();
+}
+

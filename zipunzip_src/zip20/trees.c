@@ -48,10 +48,10 @@
  *      into the requested output buffer. The buffer is limited to 64K on
  *      16 bit machines; flushing of the output buffer during compression
  *      process is not supported.
- *      The input data is read in blocks by the (*read_buf)() function.
+ *      The input data is read in blocks by the (*read_buf_zip)() function.
  *
  *      For more details about input to and output from the deflation routines,
- *      see the actual input functions for (*read_buf)(), flush_outbuf(), and
+ *      see the actual input functions for (*read_buf_zip)(), flush_outbuf(), and
  *      the filecompress() resp. memcompress() wrapper functions which handle
  *      the I/O setup.
  *

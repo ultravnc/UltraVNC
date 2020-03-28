@@ -83,6 +83,7 @@ public:
 	int	scale_num, scale_den;
 	int reconnectcounter, autoReconnect, FTTimeout, listenport;
 	bool fEnableCache;
+	bool fEnableZstd;
 	bool useCompressLevel;
 	int	compressLevel;
 	bool enableJpegCompression;

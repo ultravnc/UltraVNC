@@ -245,6 +245,8 @@ vncMenu::vncMenu(vncServer *server)
     CoInitialize(0);
 	IsIconSet=false;
 	IconFaultCounter=0;
+	FunctionWTSRegisterSessionNotification = NULL;
+	FunctionWTSUnRegisterSessionNotification = NULL;
 
 	HMODULE hUser32 = LoadLibrary("user32.dll");
 	CHANGEWINDOWMESSAGEFILTER pfnFilter = NULL;
@@ -278,6 +280,12 @@ vncMenu::vncMenu(vncServer *server)
 
 	// Set the initial user name to something sensible...
 	vncService::CurrentUser((char *)&m_username, sizeof(m_username));
+
+	if (!hWTSDll) hWTSDll = LoadLibrary(("wtsapi32.dll"));
+	if (hWTSDll) {
+		FunctionWTSRegisterSessionNotification = (WTSREGISTERSESSIONNOTIFICATION)GetProcAddress((HINSTANCE)hWTSDll, "WTSRegisterSessionNotification");
+		FunctionWTSUnRegisterSessionNotification = (WTSUNREGISTERSESSIONNOTIFICATION)GetProcAddress((HINSTANCE)hWTSDll, "WTSUnRegisterSessionNotification");
+	}
 
 	//if (strcmp(m_username, "") == 0)
 	//	strcpy_s((char *)&m_username, "SYSTEM");
@@ -316,15 +324,6 @@ vncMenu::vncMenu(vncServer *server)
 	{
 		PostQuitMessage(0);
 		return;
-	}
-
-	if (!hWTSDll) hWTSDll = LoadLibrary( ("wtsapi32.dll") );
-	if (hWTSDll)
-	{
-		WTSREGISTERSESSIONNOTIFICATION FunctionWTSRegisterSessionNotification;    
-		FunctionWTSRegisterSessionNotification = (WTSREGISTERSESSIONNOTIFICATION)GetProcAddress((HINSTANCE)hWTSDll, "WTSRegisterSessionNotification" );
-		if (FunctionWTSRegisterSessionNotification)
-			FunctionWTSRegisterSessionNotification( m_hwnd, NOTIFY_FOR_THIS_SESSION );
 	}
 
 	// record which client created this window
@@ -378,37 +377,6 @@ vncMenu::vncMenu(vncServer *server)
 	{
 	osvi.dwOSVersionInfoSize = sizeof(osvi);
 	GetVersionEx(&osvi);
-/*if (osvi.dwPlatformId==VER_PLATFORM_WIN32_NT)
-		{
-		  if(osvi.dwMajorVersion==5 && osvi.dwMinorVersion>=1)
-		  {
-			m_winvnc_icon=(HICON)LoadImage(hAppInstance, MAKEINTRESOURCE(IDI_WINVNC), IMAGE_ICON,
-                        GetSystemMetrics(SM_CXSMICON),
-                        GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR);
-			m_flash_icon=(HICON)LoadImage(hAppInstance, MAKEINTRESOURCE(IDI_FLASH), IMAGE_ICON,
-                        GetSystemMetrics(SM_CXSMICON),
-                        GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR);
-		  }
-		  else
-		 {
-			  m_winvnc_icon=(HICON)LoadImage(hAppInstance, MAKEINTRESOURCE(IDI_WINVNC), IMAGE_ICON,
-                        GetSystemMetrics(SM_CXSMICON),
-                        GetSystemMetrics(SM_CYSMICON), LR_VGACOLOR);
-			m_flash_icon=(HICON)LoadImage(hAppInstance, MAKEINTRESOURCE(IDI_FLASH), IMAGE_ICON,
-                        GetSystemMetrics(SM_CXSMICON),
-                        GetSystemMetrics(SM_CYSMICON), LR_VGACOLOR);
-		  }
-		 }
-	else
-		 {
-			  m_winvnc_icon=(HICON)LoadImage(hAppInstance, MAKEINTRESOURCE(IDI_WINVNC), IMAGE_ICON,
-                        GetSystemMetrics(SM_CXSMICON),
-                        GetSystemMetrics(SM_CYSMICON), LR_VGACOLOR);
-			m_flash_icon=(HICON)LoadImage(hAppInstance, MAKEINTRESOURCE(IDI_FLASH), IMAGE_ICON,
-                        GetSystemMetrics(SM_CXSMICON),
-                        GetSystemMetrics(SM_CYSMICON), LR_VGACOLOR);
-		  }
-	}*/
 
 	if (osvi.dwPlatformId==VER_PLATFORM_WIN32_NT)
 		{
@@ -495,12 +463,7 @@ vncMenu::~vncMenu()
 		m_BalloonTitle = NULL;
 	}
 
-	if (hWTSDll)
-	{
-		WTSUNREGISTERSESSIONNOTIFICATION FunctionWTSUnRegisterSessionNotification=NULL;
-		FunctionWTSUnRegisterSessionNotification = (WTSUNREGISTERSESSIONNOTIFICATION)GetProcAddress((HINSTANCE)hWTSDll,"WTSUnRegisterSessionNotification" );
-		if (FunctionWTSUnRegisterSessionNotification)
-			FunctionWTSUnRegisterSessionNotification( m_hwnd );
+	if (hWTSDll) {
 		FreeLibrary( hWTSDll );
 		hWTSDll = NULL;
 	}
@@ -1133,6 +1096,8 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			//Sleep(1000);
 			vnclog.Print(LL_INTINFO, VNCLOG("KillAuthClients() ID_CLOSE \n"));
 			_this->m_server->KillAuthClients();
+			if (_this->FunctionWTSUnRegisterSessionNotification)
+				_this->FunctionWTSUnRegisterSessionNotification(hwnd);
 			PostMessage(hwnd, WM_CLOSE, 0, 0);
 			break;
 

@@ -1,5 +1,5 @@
 /* zlib.h -- interface of the 'zlib' general purpose compression library
-  version 1.2.11, January 15th, 2017
+  version 1.2.11.1, January xxth, 2017
 
   Copyright (C) 1995-2017 Jean-loup Gailly and Mark Adler
 
@@ -712,11 +712,12 @@ ZEXTERN int ZEXPORT deflateParams OF((z_streamp strm,
    used to switch between compression and straight copy of the input data, or
    to switch to a different kind of input data requiring a different strategy.
    If the compression approach (which is a function of the level) or the
-   strategy is changed, and if any input has been consumed in a previous
-   deflate() call, then the input available so far is compressed with the old
-   level and strategy using deflate(strm, Z_BLOCK).  There are three approaches
-   for the compression levels 0, 1..3, and 4..9 respectively.  The new level
-   and strategy will take effect at the next call of deflate().
+   strategy is changed, and if there have been any deflate() calls since the
+   state was initialized or reset, then the input available so far is
+   compressed with the old level and strategy using deflate(strm, Z_BLOCK).
+   There are three approaches for the compression levels 0, 1..3, and 4..9
+   respectively.  The new level and strategy will take effect at the next call
+   of deflate().
 
      If a deflate(strm, Z_BLOCK) is performed by deflateParams(), and it does
    not have enough output space to complete, then the parameter change will not
@@ -1744,6 +1745,32 @@ ZEXTERN uLong ZEXPORT crc32_z OF((uLong adler, const Bytef *buf,
 /*
      Same as crc32(), but with a size_t length.
 */
+
+/* The struct should preferably be aligned to a 16 byte boundary for aligned access (128-bit SIMD register) */
+/* requires C++11 */
+#ifdef __cplusplus
+typedef struct alignas(16) z_crc32_state_s {
+    unsigned crc0[4 * 5];
+} FAR z_crc32_state;
+#else
+/* ISO C11 supports_Alignof in stdalign.h */
+#ifdef _MSC_VER
+#define zalign(x) __declspec(align(x))
+#else
+#define zalign(x) __attribute__((aligned((x))))
+#endif
+
+typedef struct z_crc32_state_s {
+    unsigned zalign(16) crc0[4 * 5];
+} FAR z_crc32_state;
+#endif
+
+ZEXTERN void ZEXPORT crc32_init OF((z_crc32_state *z_const state));
+
+ZEXTERN void ZEXPORT crc32_update OF((z_crc32_state *z_const state, const Bytef *buf,
+    z_size_t len));
+
+ZEXTERN uLong ZEXPORT crc32_final OF((z_crc32_state *z_const state));
 
 /*
 ZEXTERN uLong ZEXPORT crc32_combine OF((uLong crc1, uLong crc2, z_off_t len2));

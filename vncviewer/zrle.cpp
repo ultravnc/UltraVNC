@@ -80,7 +80,7 @@
 
 #undef zrleDecode
 
-void ClientConnection::zrleDecode(int x, int y, int w, int h)
+void ClientConnection::zrleDecode(int x, int y, int w, int h, bool use_zstd)
 {
   try {
     CheckBufferSize(rfbZRLETileWidth * rfbZRLETileHeight * 4);
@@ -99,47 +99,92 @@ void ClientConnection::zrleDecode(int x, int y, int w, int h)
 	}else{
 	  zywrle_level = 0;
 	}
+	if (!use_zstd) {
+		switch (m_myFormat.bitsPerPixel) {
 
-    switch (m_myFormat.bitsPerPixel) {
+		case 8:
+			zrleDecode8NE(x, y, w, h, fis, zis, (rdr::U8*)m_netbuf);
+			break;
 
-    case 8:
-      zrleDecode8NE(x,y,w,h,fis,zis,(rdr::U8*)m_netbuf);
-      break;
+		case 16:
+			if (m_myFormat.greenMax > 0x1F) {
+				zrleDecode16LE(x, y, w, h, fis, zis, (rdr::U16*)m_netbuf);
+			}
+			else {
+				zrleDecode15LE(x, y, w, h, fis, zis, (rdr::U16*)m_netbuf);
+			}
+			break;
 
-    case 16:
-      if( m_myFormat.greenMax > 0x1F ){
-        zrleDecode16LE(x,y,w,h,fis,zis,(rdr::U16*)m_netbuf);
-	  }else{
-        zrleDecode15LE(x,y,w,h,fis,zis,(rdr::U16*)m_netbuf);
-	  }
-      break;
+		case 32:
+			bool fitsInLS3Bytes
+				= ((m_myFormat.redMax << m_myFormat.redShift) < (1 << 24) &&
+				(m_myFormat.greenMax << m_myFormat.greenShift) < (1 << 24) &&
+					(m_myFormat.blueMax << m_myFormat.blueShift) < (1 << 24));
 
-    case 32:
-      bool fitsInLS3Bytes
-        = ((m_myFormat.redMax   << m_myFormat.redShift)   < (1<<24) &&
-           (m_myFormat.greenMax << m_myFormat.greenShift) < (1<<24) &&
-           (m_myFormat.blueMax  << m_myFormat.blueShift)  < (1<<24));
+			bool fitsInMS3Bytes = (m_myFormat.redShift > 7 &&
+				m_myFormat.greenShift > 7 &&
+				m_myFormat.blueShift > 7);
 
-      bool fitsInMS3Bytes = (m_myFormat.redShift   > 7  &&
-                             m_myFormat.greenShift > 7  &&
-                             m_myFormat.blueShift  > 7);
+			if ((fitsInLS3Bytes && !m_myFormat.bigEndian) ||
+				(fitsInMS3Bytes && m_myFormat.bigEndian))
+			{
+				zrleDecode24ALE(x, y, w, h, fis, zis, (rdr::U32*)m_netbuf);
+			}
+			else if ((fitsInLS3Bytes && m_myFormat.bigEndian) ||
+				(fitsInMS3Bytes && !m_myFormat.bigEndian))
+			{
+				zrleDecode24BLE(x, y, w, h, fis, zis, (rdr::U32*)m_netbuf);
+			}
+			else
+			{
+				zrleDecode32LE(x, y, w, h, fis, zis, (rdr::U32*)m_netbuf);
+			}
+			break;
+		}
+	}
+	else {
+		switch (m_myFormat.bitsPerPixel) {
 
-      if ((fitsInLS3Bytes && !m_myFormat.bigEndian) ||
-          (fitsInMS3Bytes && m_myFormat.bigEndian))
-      {
-        zrleDecode24ALE(x,y,w,h,fis,zis,(rdr::U32*)m_netbuf);
-      }
-      else if ((fitsInLS3Bytes && m_myFormat.bigEndian) ||
-               (fitsInMS3Bytes && !m_myFormat.bigEndian))
-      {
-        zrleDecode24BLE(x,y,w,h,fis,zis,(rdr::U32*)m_netbuf);
-      }
-      else
-      {
-        zrleDecode32LE(x,y,w,h,fis,zis,(rdr::U32*)m_netbuf);
-      }
-      break;
-    }
+		case 8:
+			zrleDecode8NE(x, y, w, h, fis, zstdis, (rdr::U8*)m_netbuf);
+			break;
+
+		case 16:
+			if (m_myFormat.greenMax > 0x1F) {
+				zrleDecode16LE(x, y, w, h, fis, zstdis, (rdr::U16*)m_netbuf);
+			}
+			else {
+				zrleDecode15LE(x, y, w, h, fis, zstdis, (rdr::U16*)m_netbuf);
+			}
+			break;
+
+		case 32:
+			bool fitsInLS3Bytes
+				= ((m_myFormat.redMax << m_myFormat.redShift) < (1 << 24) &&
+				(m_myFormat.greenMax << m_myFormat.greenShift) < (1 << 24) &&
+					(m_myFormat.blueMax << m_myFormat.blueShift) < (1 << 24));
+
+			bool fitsInMS3Bytes = (m_myFormat.redShift > 7 &&
+				m_myFormat.greenShift > 7 &&
+				m_myFormat.blueShift > 7);
+
+			if ((fitsInLS3Bytes && !m_myFormat.bigEndian) ||
+				(fitsInMS3Bytes && m_myFormat.bigEndian))
+			{
+				zrleDecode24ALE(x, y, w, h, fis, zstdis, (rdr::U32*)m_netbuf);
+			}
+			else if ((fitsInLS3Bytes && m_myFormat.bigEndian) ||
+				(fitsInMS3Bytes && !m_myFormat.bigEndian))
+			{
+				zrleDecode24BLE(x, y, w, h, fis, zstdis, (rdr::U32*)m_netbuf);
+			}
+			else
+			{
+				zrleDecode32LE(x, y, w, h, fis, zstdis, (rdr::U32*)m_netbuf);
+			}
+			break;
+		}
+	}
 
   } catch (rdr::Exception& e) {
     fprintf(stderr,"ZRLE decoder exception: %s\n",e.str());

@@ -31,9 +31,9 @@
 #include <vector>
 
 #ifdef _XZ
-#define LASTENCODING rfbEncodingXZYW
+#define LASTENCODING rfbEncodingZSTDYWRLE
 #else
-#define LASTENCODING rfbEncodingZYWRLE
+#define LASTENCODING rfbEncodingZSTDYWRLE
 #endif
 #define NOCURSOR 0
 #define DOTCURSOR 1
@@ -72,14 +72,7 @@ public:
 	bool    m_ShowToolbar;
 
     bool	autoDetect;
-	int		m_Use8Bit;	// sf@2005 - Now has 7 possible values (defines in rfbproto.h file)
-						// 0 : Full colors
-						// 1 : 256 colors
-						// 2 : 64 colors
-						// 3 : 8 colors
-						// 4 : 8 Grey colors
-						// 5 : 4 colors
-						// 6 : 2 Grey colors
+	int		m_Use8Bit;	
 	std::vector<int> m_PreferredEncodings;
 
 	bool	m_SwapMouse;
@@ -109,6 +102,7 @@ public:
 	int m_reconnectcounter;
 	int m_x, m_y, m_w, m_h;
 	bool    m_fEnableCache;
+	bool    m_fEnableZstd;
 	bool	m_fUseDSMPlugin;
 	TCHAR   m_szDSMPluginFilename[_MAX_PATH];
 	bool	m_oldplugin;

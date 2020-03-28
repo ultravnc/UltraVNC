@@ -360,7 +360,7 @@ void lm_init (pack_level, flags)
 #ifndef MAXSEG_64K
     if (sizeof(int) > 2) j <<= 1; /* Can read 64K in one step */
 #endif
-    lookahead = (*read_buf)((char*)window, j);
+    lookahead = (*read_buf_zip)((char*)window, j);
 
     if (lookahead == 0 || lookahead == (unsigned)EOF) {
        eofile = 1, lookahead = 0;
@@ -603,7 +603,7 @@ local void fill_window()
             more--;
 
         /* For MMAP or BIG_MEM, the whole input file is already in memory so
-         * we must not perform sliding. We must however call (*read_buf)() in
+         * we must not perform sliding. We must however call (*read_buf_zip)() in
          * order to compute the crc, update lookahead and possibly set eofile.
          */
         } else if (strstart >= WSIZE+MAX_DIST && sliding) {
@@ -656,7 +656,7 @@ local void fill_window()
          */
         Assert(more >= 2, "more < 2");
 
-        n = (*read_buf)((char*)window+strstart+lookahead, more);
+        n = (*read_buf_zip)((char*)window+strstart+lookahead, more);
         if (n == 0 || n == (unsigned)EOF) {
             eofile = 1;
         } else {

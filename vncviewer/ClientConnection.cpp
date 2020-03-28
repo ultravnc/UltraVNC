@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002-2013 UltraVNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002-2020 UltraVNC Team Members. All Rights Reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -42,6 +42,7 @@ extern "C" {
 
 #include <rdr/FdInStream.h>
 #include <rdr/ZlibInStream.h>
+#include <rdr/ZstdInStream.h>
 #include <rdr/ZlibOutStream.h>
 #ifdef _XZ
 #include <rdr/xzInStream.h>
@@ -63,9 +64,9 @@ extern "C" {
 
 #define INITIALNETBUFSIZE 4096
 #ifdef _XZ
-#define MAX_ENCODINGS (LASTENCODING+65)
+#define MAX_ENCODINGS (LASTENCODING+66)
 #else
-#define MAX_ENCODINGS (LASTENCODING+50)
+#define MAX_ENCODINGS (LASTENCODING+51)
 #endif
 #define VWR_WND_CLASS_NAME _T("VNCviewer")
 #define VWR_WND_CLASS_NAME_VIEWER _T("VNCviewerwindow")
@@ -222,7 +223,7 @@ extern bool command_line;
 // *************************************************************************
 // adzm - 2010-07 - Extended clipboard
 //ClientConnection::ClientConnection()
-//	: fis(0), zis(0), m_clipboard(ClipboardSettings::defaultViewerCaps)
+//	: fis(0), zis(0), zstdis(0), m_clipboard(ClipboardSettings::defaultViewerCaps)
 //{
 //	m_keymap = NULL;
 //	m_keymapJap = NULL;
@@ -238,14 +239,14 @@ BOOL CALLBACK DialogProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam);
 
 // adzm - 2010-07 - Extended clipboard
 ClientConnection::ClientConnection(VNCviewerApp *pApp)
-	: fis(0), zis(0), m_clipboard(ClipboardSettings::defaultViewerCaps)
+	: fis(0), zis(0), zstdis(0), m_clipboard(ClipboardSettings::defaultViewerCaps)
 {
 	Init(pApp);
 }
 
 // adzm - 2010-07 - Extended clipboard
 ClientConnection::ClientConnection(VNCviewerApp *pApp, SOCKET sock)
-  : fis(0), zis(0), m_clipboard(ClipboardSettings::defaultViewerCaps)
+  : fis(0), zis(0), zstdis(0), m_clipboard(ClipboardSettings::defaultViewerCaps)
 {
 	Init(pApp);
     if (m_opts.autoDetect)
@@ -274,6 +275,7 @@ ClientConnection::ClientConnection(VNCviewerApp *pApp, SOCKET sock)
 		}
 		else
 		{
+#undef Byte
 			struct sockaddr_in6 *s = (struct sockaddr_in6 *)&svraddr;
 			m_port = ntohs(s->sin6_port);
 			_snprintf_s(m_host, 250, _T("%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x"),
@@ -314,7 +316,7 @@ ClientConnection::ClientConnection(VNCviewerApp *pApp, SOCKET sock)
 
 // adzm - 2010-07 - Extended clipboard
 ClientConnection::ClientConnection(VNCviewerApp *pApp, LPTSTR host, int port)
-  : fis(0), zis(0), m_clipboard(ClipboardSettings::defaultViewerCaps)
+  : fis(0), zis(0), zstdis(0), m_clipboard(ClipboardSettings::defaultViewerCaps)
 {
 	Init(pApp);
     if (m_opts.autoDetect)
@@ -347,7 +349,6 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_netbufsize = 0;
 	m_zlibbuf = NULL;
 	m_zlibbufsize = 0;
-	m_decompStreamInited = false;
 	// adzm - 2010-07 - Fix clipboard hangs
 	m_hwndNextViewer = (HWND)INVALID_HANDLE_VALUE;
 	m_pApp = pApp;
@@ -412,9 +413,8 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_pIntegratedPluginInterface = NULL;
 
 	// ZlibHex
-	m_decompStreamInited = false;
-	m_decompStreamRaw.total_in = ZLIBHEX_DECOMP_UNINITED;
-	m_decompStreamEncoded.total_in = ZLIBHEX_DECOMP_UNINITED;
+	ultraVncZRaw = new UltraVncZ();
+	ultraVncZEncoded = new UltraVncZ();
 
 	// Initialise a few fields that will be properly set when the
 	// connection has been negotiated
@@ -444,6 +444,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_fScalingDone = false;
 
     zis = new rdr::ZlibInStream;
+	zstdis = new rdr::ZstdInStream;
 #ifdef _XZ
 	xzis = new rdr::xzInStream;
 #endif
@@ -481,10 +482,6 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 
 	// sf@2002 - Options window flag
 	m_fOptionsOpen = false;
-
-	// Tight encoding
-	for (int i = 0; i < 4; i++)
-		m_tightZlibStreamActive[i] = false;
 
 	m_hwndcn=NULL;
 	m_hbands=NULL;
@@ -572,6 +569,8 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	mytouch->Set_ClientConnect(this);
 #endif
 	sizing_set = false;
+
+	ultraVncZlib = new UltraVncZ();
 }
 
 // helper functions for setting socket timeouts during file transfer
@@ -3956,9 +3955,7 @@ void ClientConnection::SetFormatAndEncodings()
     char buf[sz_rfbSetEncodingsMsg + MAX_ENCODINGS * 4];
 
     rfbSetEncodingsMsg *se = (rfbSetEncodingsMsg *)buf;
-    CARD32 *encs = (CARD32 *)(&buf[sz_rfbSetEncodingsMsg]);
-
-
+    CARD32 *encs = (CARD32 *)(&buf[sz_rfbSetEncodingsMsg]);	
     se->type = rfbSetEncodings;
     se->nEncodings = 0;
 
@@ -3977,6 +3974,20 @@ void ClientConnection::SetFormatAndEncodings()
 	// Put the preferred encoding first, and change it if the
 	// preferred encoding is not actually usable.
 	std::vector<int> preferred_encodings = m_opts.m_PreferredEncodings;
+
+	for (std::vector<int>::iterator it = preferred_encodings.begin(); it != preferred_encodings.end(); it++) {
+		if (*it == rfbEncodingZlib && m_opts.m_fEnableZstd)
+			preferred_encodings.insert(preferred_encodings.begin(), 1, rfbEncodingZstd);
+		else if (*it == rfbEncodingTight && m_opts.m_fEnableZstd)
+			preferred_encodings.insert(preferred_encodings.begin(), 1, rfbEncodingTightZstd);
+		else if (*it == rfbEncodingZlibHex && m_opts.m_fEnableZstd)
+			preferred_encodings.insert(preferred_encodings.begin(), 1, rfbEncodingZstdHex);
+		else if (*it == rfbEncodingZRLE && m_opts.m_fEnableZstd)
+			preferred_encodings.insert(preferred_encodings.begin(), 1, rfbEncodingZSTDRLE);
+		else if (*it == rfbEncodingZYWRLE && m_opts.m_fEnableZstd)
+			preferred_encodings.insert(preferred_encodings.begin(), 1, rfbEncodingZSTDYWRLE);
+		break;
+	}
 
 	if (preferred_encodings.end() != std::find(preferred_encodings.begin(), preferred_encodings.end(), rfbEncodingZYWRLE)) {
 		zywrle = 1;
@@ -4044,7 +4055,8 @@ void ClientConnection::SetFormatAndEncodings()
 
     // Modif rdv@2002
 	//Tell the server that we support the special Zlibencoding
-	encs[se->nEncodings++] = Swap32IfLE(rfbEncodingXOREnable);
+	//removed old Xor, rfbEncodingQueueEnable just combine small updates
+	encs[se->nEncodings++] = Swap32IfLE(rfbEncodingQueueEnable);
 
 	// Tight - LastRect - SINGLE WINDOW
 	encs[se->nEncodings++] = Swap32IfLE(rfbEncodingLastRect);
@@ -4057,8 +4069,7 @@ void ClientConnection::SetFormatAndEncodings()
 		// vnclog.Print(0, _T("Cache: Enable Cache sent to Server\n"));
 	}
 
-    // len = sz_rfbSetEncodingsMsg + se->nEncodings * 4;
-
+    // len = sz_rfbSetEncodingsMsg + se->nEncodings * 4;	
     encs[se->nEncodings++] = Swap32IfLE(rfbEncodingServerState);
     encs[se->nEncodings++] = Swap32IfLE(rfbEncodingEnableKeepAlive);
 	encs[se->nEncodings++] = Swap32IfLE(rfbEncodingEnableIdleTime);
@@ -4203,14 +4214,14 @@ void ClientConnection::SuspendThread()
 
 	// Reinit encoders stuff
 	delete(zis);
+	delete(zstdis);
 	zis = new rdr::ZlibInStream;
+	zstdis = new rdr::ZstdInStream;
 
 #ifdef _XZ
 	delete(xzis);
 	xzis = new rdr::xzInStream;
 #endif
-	for (int i = 0; i < 4; i++)
-		m_tightZlibStreamActive[i] = false;
 
 	// Reinit DSM stuff
 	m_nTO = 1;
@@ -4290,12 +4301,19 @@ ClientConnection::~ClientConnection()
 
     if (zis)
       delete zis;
+	if (zstdis)
+		delete(zstdis);
 #ifdef _XZ
 	if (xzis)
 		delete(xzis);
 #endif
     if (fis)
       delete fis;
+
+	if (ultraVncZRaw)
+		delete ultraVncZRaw;
+	if (ultraVncZEncoded)
+		delete ultraVncZEncoded;
 
 	if (m_pZRLENetRectBuf != NULL)
 		delete [] m_pZRLENetRectBuf;
@@ -4381,6 +4399,7 @@ ClientConnection::~ClientConnection()
 	}
 #endif
 	delete directx_output;
+	delete ultraVncZlib;
 }
 
 // You can specify a dx & dy outside the limits; the return value will
@@ -5556,7 +5575,7 @@ inline void ClientConnection::ReadScreenUpdate()
 			continue;
 		}
 
-		if (surh.encoding !=rfbEncodingNewFBSize && surh.encoding != rfbEncodingCacheZip && surh.encoding != rfbEncodingSolMonoZip && surh.encoding !=rfbEncodingUltraZip)
+		if (surh.encoding !=rfbEncodingNewFBSize && surh.encoding != rfbEncodingCacheZip && surh.encoding != rfbEncodingQueueZip && surh.encoding !=rfbEncodingUltraZip)
 			SoftCursorLockArea(surh.r.x, surh.r.y, surh.r.w, surh.r.h);
 
 		// Modif sf@2002 - DSM Plugin
@@ -5576,10 +5595,6 @@ inline void ClientConnection::ReadScreenUpdate()
 				case rfbEncodingUltra:
 				case rfbEncodingUltra2:
 				case rfbEncodingZlib:
-				case rfbEncodingXOR_Zlib:
-				case rfbEncodingXORMultiColor_Zlib:
-				case rfbEncodingXORMonoColor_Zlib:
-				case rfbEncodingSolidColor:
 				case rfbEncodingTight:
 				case rfbEncodingZlibHex:
 					{
@@ -5680,17 +5695,17 @@ inline void ClientConnection::ReadScreenUpdate()
 			if (directx_used) m_DIBbits=directx_output->Preupdate((unsigned char *)m_DIBbits);
 			SaveArea(cacherect);
 			ReadHextileRect(&surh);
-			EncodingStatusWindow=rfbEncodingHextile;
+			EncodingStatusWindow = surh.encoding;
 			break;
 		case rfbEncodingUltra:
 			if (directx_used) m_DIBbits=directx_output->Preupdate((unsigned char *)m_DIBbits);
 			ReadUltraRect(&surh);
-			EncodingStatusWindow=rfbEncodingUltra;
+			EncodingStatusWindow = surh.encoding;
 			break;
 		case rfbEncodingUltra2:
 			if (directx_used) m_DIBbits=directx_output->Preupdate((unsigned char *)m_DIBbits);
 			ReadUltra2Rect(&surh);
-			EncodingStatusWindow=rfbEncodingUltra2;
+			EncodingStatusWindow = surh.encoding;
 			break;
 		case rfbEncodingUltraZip:
 			if (directx_used) m_DIBbits=directx_output->Preupdate((unsigned char *)m_DIBbits);
@@ -5700,7 +5715,7 @@ inline void ClientConnection::ReadScreenUpdate()
 			if (directx_used) m_DIBbits=directx_output->Preupdate((unsigned char *)m_DIBbits);
 			SaveArea(cacherect);
 			ReadRawRect(&surh);
-			EncodingStatusWindow=rfbEncodingRaw;
+			EncodingStatusWindow = surh.encoding;
 			break;
 		case rfbEncodingCopyRect:
 			if (directx_used) m_DIBbits=directx_output->Preupdate((unsigned char *)m_DIBbits);
@@ -5714,68 +5729,71 @@ inline void ClientConnection::ReadScreenUpdate()
 			if (directx_used) m_DIBbits=directx_output->Preupdate((unsigned char *)m_DIBbits);
 			ReadCacheZip(&surh,&UpdateRegion);
 			break;
-		case rfbEncodingSolMonoZip:
+		case rfbEncodingQueueZstd:
+			if (directx_used) m_DIBbits = directx_output->Preupdate((unsigned char *)m_DIBbits);
+			ReadQueueZip(&surh, &UpdateRegion, true);
+			break;
+		case rfbEncodingQueueZip:
 			if (directx_used) m_DIBbits=directx_output->Preupdate((unsigned char *)m_DIBbits);
-			ReadSolMonoZip(&surh,&UpdateRegion);
+			ReadQueueZip(&surh,&UpdateRegion, false);
 			break;
 		case rfbEncodingRRE:
 			if (directx_used) m_DIBbits=directx_output->Preupdate((unsigned char *)m_DIBbits);
 			SaveArea(cacherect);
 			ReadRRERect(&surh);
-			EncodingStatusWindow=rfbEncodingRRE;
+			EncodingStatusWindow = surh.encoding;
 			break;
 		case rfbEncodingCoRRE:
 			if (directx_used) m_DIBbits=directx_output->Preupdate((unsigned char *)m_DIBbits);
 			SaveArea(cacherect);
 			ReadCoRRERect(&surh);
-			EncodingStatusWindow=rfbEncodingCoRRE;
+			EncodingStatusWindow = surh.encoding;
+			break;
+		case rfbEncodingZstd:
+			if (directx_used) m_DIBbits = directx_output->Preupdate((unsigned char *)m_DIBbits);
+			SaveArea(cacherect);
+			ReadZlibRect(&surh, true);
+			EncodingStatusWindow = surh.encoding;
 			break;
 		case rfbEncodingZlib:
 			if (directx_used) m_DIBbits=directx_output->Preupdate((unsigned char *)m_DIBbits);
 			SaveArea(cacherect);
-			ReadZlibRect(&surh,0);
-			EncodingStatusWindow=rfbEncodingZlib;
+			ReadZlibRect(&surh, false);
+			EncodingStatusWindow = surh.encoding;
+			break;
+		case rfbEncodingZstdHex:
+			if (directx_used) m_DIBbits = directx_output->Preupdate((unsigned char *)m_DIBbits);
+			SaveArea(cacherect);
+			ReadZlibHexRect(&surh, true);
+			EncodingStatusWindow = surh.encoding;
 			break;
 		case rfbEncodingZlibHex:
 			if (directx_used) m_DIBbits=directx_output->Preupdate((unsigned char *)m_DIBbits);
 			SaveArea(cacherect);
-			ReadZlibHexRect(&surh);
-			EncodingStatusWindow=rfbEncodingZlibHex;
+			ReadZlibHexRect(&surh, false);
+			EncodingStatusWindow = surh.encoding;
 			break;
-		case rfbEncodingXOR_Zlib:
-			if (directx_used) m_DIBbits=directx_output->Preupdate((unsigned char *)m_DIBbits);
-			SaveArea(cacherect);
-			ReadZlibRect(&surh,1);
-			break;
-		case rfbEncodingXORMultiColor_Zlib:
-			if (directx_used) m_DIBbits=directx_output->Preupdate((unsigned char *)m_DIBbits);
-			SaveArea(cacherect);
-			ReadZlibRect(&surh,2);
-			break;
-		case rfbEncodingXORMonoColor_Zlib:
-			if (directx_used) m_DIBbits=directx_output->Preupdate((unsigned char *)m_DIBbits);
-			SaveArea(cacherect);
-			ReadZlibRect(&surh,3);
-			break;
-		case rfbEncodingSolidColor:
-			if (directx_used) m_DIBbits=directx_output->Preupdate((unsigned char *)m_DIBbits);
-			SaveArea(cacherect);
-			ReadSolidRect(&surh);
-			break;
-		case rfbEncodingZRLE:
-			if (directx_used) m_DIBbits=directx_output->Preupdate((unsigned char *)m_DIBbits);
+		case rfbEncodingZRLE:			
 			zywrle = 0;
 		case rfbEncodingZYWRLE:
 			if (directx_used) m_DIBbits=directx_output->Preupdate((unsigned char *)m_DIBbits);
 			SaveArea(cacherect);
-			zrleDecode(surh.r.x, surh.r.y, surh.r.w, surh.r.h);
-			EncodingStatusWindow=zywrle ? rfbEncodingZYWRLE : rfbEncodingZRLE;
+			zrleDecode(surh.r.x, surh.r.y, surh.r.w, surh.r.h, false);
+			EncodingStatusWindow = surh.encoding;
+			break;
+		case rfbEncodingZSTDRLE:
+			zywrle = 0;
+		case rfbEncodingZSTDYWRLE:
+			if (directx_used) m_DIBbits = directx_output->Preupdate((unsigned char *)m_DIBbits);
+			SaveArea(cacherect);
+			zrleDecode(surh.r.x, surh.r.y, surh.r.w, surh.r.h, true);
+			EncodingStatusWindow = surh.encoding;
 			break;
 #ifdef _XZ
 		case rfbEncodingXZ:
 			xzyw = 0;
 		case rfbEncodingXZYW:			
-			EncodingStatusWindow=xzyw ? rfbEncodingXZYW : rfbEncodingXZ;
+			EncodingStatusWindow = surh.encoding;
 			{
 				CheckBufferSize(0x20000);
 				int nAllRects = (surh.r.x << 16) | surh.r.y;
@@ -5831,11 +5849,17 @@ inline void ClientConnection::ReadScreenUpdate()
 			}
 			break;
 #endif
+		case rfbEncodingTightZstd:
+			if (directx_used) m_DIBbits = directx_output->Preupdate((unsigned char *)m_DIBbits);
+			SaveArea(cacherect);
+			ReadTightRect(&surh, true);
+			EncodingStatusWindow = surh.encoding;
+			break;
 		case rfbEncodingTight:
 			if (directx_used) m_DIBbits=directx_output->Preupdate((unsigned char *)m_DIBbits);
 			SaveArea(cacherect);
-			ReadTightRect(&surh);
-			EncodingStatusWindow=rfbEncodingTight;
+			ReadTightRect(&surh, false);
+			EncodingStatusWindow = surh.encoding;
 			break;
 		default:
 			// vnclog.Print(0, _T("Unknown encoding %d - not supported!\n"), surh.encoding);
@@ -5873,7 +5897,7 @@ inline void ClientConnection::ReadScreenUpdate()
 		}
 
 		//Todo: surh.encoding != rfbEncodingXZ && surh.encoding != rfbEncodingXZYW && 
-		if (surh.encoding !=rfbEncodingNewFBSize && surh.encoding != rfbEncodingCacheZip && surh.encoding != rfbEncodingSolMonoZip && surh.encoding != rfbEncodingUltraZip)
+		if (surh.encoding !=rfbEncodingNewFBSize && surh.encoding != rfbEncodingCacheZip && surh.encoding != rfbEncodingQueueZip && surh.encoding != rfbEncodingUltraZip)
 		{
 			RECT rect;
 			rect.left   = surh.r.x;
@@ -7086,7 +7110,10 @@ void ClientConnection::UpdateStatusFields()
 				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "Ultra2, Cache" : "Ultra2");
 				break;
 			case rfbEncodingZlib:
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "XORZlib, Cache" : "XORZlib");
+				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "Zlib, Cache" : "Zlib");
+				break;
+			case rfbEncodingZstd:
+				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "ZSTD, Cache" : "ZSTD");
 				break;
   			case rfbEncodingZRLE:
 				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "ZRLE, Cache" :"ZRLE");
@@ -7094,6 +7121,12 @@ void ClientConnection::UpdateStatusFields()
   			case rfbEncodingZYWRLE:
 				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "ZYWRLE, Cache" :"ZYWRLE");
   				break;
+			case rfbEncodingZSTDRLE:
+				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "ZSTDRLE, Cache" : "ZSTDRLE");
+				break;
+			case rfbEncodingZSTDYWRLE:
+				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "ZSTDYWRLE, Cache" : "ZSTDYWRLE");
+				break;
 #ifdef _XZ
   			case rfbEncodingXZ:		
 				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "XZ, Cache" :"XZ");
@@ -7107,6 +7140,12 @@ void ClientConnection::UpdateStatusFields()
 				break;
 			case rfbEncodingZlibHex:
 				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "ZlibHex, Cache" : "ZlibHex");
+				break;
+			case rfbEncodingTightZstd:
+				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "TightZstd, Cache" : "TightZstd");
+				break;
+			case rfbEncodingZstdHex:
+				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "ZstdHex, Cache" : "ZstdHex");
 				break;
 			}
 		}

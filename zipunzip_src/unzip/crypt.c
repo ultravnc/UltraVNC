@@ -536,7 +536,7 @@ local int testkey(__G__ h, key)
 
     Trace((stdout,
       "\n  lrec.crc= %08lx  crec.crc= %08lx  pInfo->ExtLocHdr= %s\n",
-      GLOBAL(lrec.crc32), GLOBAL(pInfo->crc),
+      GLOBAL(lrec.crc32_unzip), GLOBAL(pInfo->crc),
       GLOBAL(pInfo->ExtLocHdr) ? "true":"false"));
     Trace((stdout, "  incnt = %d  unzip offset into zipfile = %ld\n",
       GLOBAL(incnt),
@@ -548,20 +548,20 @@ local int testkey(__G__ h, key)
     c = hh[RAND_HEAD_LEN-2], b = hh[RAND_HEAD_LEN-1];
     Trace((stdout,
       "  (c | (b<<8)) = %04x  (crc >> 16) = %04x  lrec.time = %04x\n",
-      (ush)(c | (b<<8)), (ush)(GLOBAL(lrec.crc32) >> 16),
+      (ush)(c | (b<<8)), (ush)(GLOBAL(lrec.crc32_unzip) >> 16),
       ((ush)GLOBAL(lrec.last_mod_dos_datetime) & 0xffff))));
     if ((ush)(c | (b<<8)) != (GLOBAL(pInfo->ExtLocHdr) ?
                            ((ush)GLOBAL(lrec.last_mod_dos_datetime) & 0xffff) :
-                           (ush)(GLOBAL(lrec.crc32) >> 16)))
+                           (ush)(GLOBAL(lrec.crc32_unzip) >> 16)))
         return -1;  /* bad */
 #else
     b = hh[RAND_HEAD_LEN-1];
     Trace((stdout, "  b = %02x  (crc >> 24) = %02x  (lrec.time >> 8) = %02x\n",
-      b, (ush)(GLOBAL(lrec.crc32) >> 24),
+      b, (ush)(GLOBAL(lrec.crc32_unzip) >> 24),
       ((ush)GLOBAL(lrec.last_mod_dos_datetime) >> 8) & 0xff));
     if (b != (GLOBAL(pInfo->ExtLocHdr) ?
         ((ush)GLOBAL(lrec.last_mod_dos_datetime) >> 8) & 0xff :
-        (ush)(GLOBAL(lrec.crc32) >> 24)))
+        (ush)(GLOBAL(lrec.crc32_unzip) >> 24)))
         return -1;  /* bad */
 #endif
     /* password OK:  decrypt current buffer contents before leaving */

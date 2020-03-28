@@ -1,3 +1,4 @@
+//  Copyright (C) 2020, UltraVnc
 //  Copyright (C) 2002 UltraVNC Team Members. All Rights Reserved.
 //  Copyright (C) 2015 D. R. Commander. All Rights Reserved.
 //  Copyright (C) 2000-2002 Const Kaplinsky. All Rights Reserved.
@@ -78,7 +79,7 @@ public:
 	//    into a contiguous region of the buffer.
 	virtual void Translate(BYTE *source, BYTE *dest, const rfb::Rect &rect);
 	virtual UINT EncodeRect(BYTE *source, BYTE *dest, const rfb::Rect &rect);
-	virtual UINT EncodeRect(BYTE *source, BYTE *source2,VSocket *outConn, BYTE *dest, const rfb::Rect &rect);
+	virtual UINT EncodeRect(BYTE *source, VSocket *outConn, BYTE *dest, const rfb::Rect &rect, bool queue_enabled);
 	virtual UINT EncodeRect(BYTE *source,VSocket *outConn, BYTE *dest, const rfb::Rect &rect);
 	virtual UINT EncodeRect(BYTE *source, VSocket *outConn, BYTE *dest, const RECT &rect); // sf@2002 - For Tight...
 	virtual UINT EncodeBulkRects(const rfb::RectVector &rects, BYTE *source, BYTE *dest, VSocket *outConn) { return 0; };
@@ -109,6 +110,7 @@ public:
 	BOOL IsXCursorSupported();
 
 	virtual void LastRect(VSocket *outConn); //xorzlib
+	void set_use_zstd(bool use_zstd);
 
 protected:
 	BOOL SetTranslateFunction();
@@ -145,7 +147,7 @@ protected:
 	// Tight - CURSOR HANDLING
 	BOOL				m_use_xcursor;			// XCursor cursor shape updates allowed.
 	BOOL				m_use_richcursor;		// RichCursor cursor shape updates allowed.
-
+	bool				m_use_zstd;
 //	UltraVNCmemcpy mem;
 };
 
