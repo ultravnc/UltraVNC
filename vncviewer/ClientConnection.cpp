@@ -5620,7 +5620,7 @@ inline void ClientConnection::ReadScreenUpdate()
 			// ZRLE special case
 			if (!fis->GetReadFromMemoryBuffer())
 			{
-				if ((surh.encoding == rfbEncodingZYWRLE)||(surh.encoding == rfbEncodingZRLE))
+				if ((surh.encoding == rfbEncodingZYWRLE)||(surh.encoding == rfbEncodingZRLE) || (surh.encoding == rfbEncodingZSTDYWRLE) || (surh.encoding == rfbEncodingZSTDRLE))
 				{
 					if (m_minorVersion==6 || m_minorVersion==4 || m_minorVersion==16 || m_minorVersion==14 || m_opts.m_oldplugin)
 					{
