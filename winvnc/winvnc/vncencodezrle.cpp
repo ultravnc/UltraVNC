@@ -94,7 +94,6 @@ vncEncodeZRLE::vncEncodeZRLE()
   zstdos = new rdr::ZstdOutStream;
   beforeBuf = new rdr::U32[rfbZRLETileWidth * rfbZRLETileHeight + 1];
   m_use_zywrle = FALSE;
-  m_use_zstd = true;
 }
 
 vncEncodeZRLE::~vncEncodeZRLE()

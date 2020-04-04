@@ -219,6 +219,8 @@ public:
 
 	static __int64 GetFileSizeFromString(char* szSize);
 	static FILETIME GetFileTimeFromString(char* szFileSystemTime);
+private:
+	int nDirZipRet;
 
 };
 
