@@ -32,7 +32,7 @@
 #include <memory.h>
 #include <stdio.h>
 #include <string.h>
-#include "zipunzip32.h"
+#include "ZipUnZip32.h"
 
 extern "C" {
 #ifdef _INTERNALLIB

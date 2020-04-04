@@ -24,7 +24,7 @@
 #include "stdhdrs.h"
 #include "vncviewer.h"
 #include "SessionDialog.h"
-#include <shlobj.h>
+#include <ShlObj.h>
 #include "common/win32_helpers.h"
 
 BOOL CALLBACK DlgProcEncoders(HWND hwnd, UINT uMsg,WPARAM wParam, LPARAM lParam);

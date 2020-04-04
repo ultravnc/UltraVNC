@@ -26,8 +26,8 @@
 #include "vncviewer.h"
 #include "TextChat.h"
 #include "Exception.h"
-#include "commctrl.h"
-#include "richedit.h"
+#include "CommCtrl.h"
+#include "Richedit.h"
 #include "common/win32_helpers.h"
 #include <rdr/Exception.h>
 

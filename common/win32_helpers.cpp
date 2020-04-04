@@ -21,8 +21,8 @@
 // http://www.uvnc.com/
 //
 ////////////////////////////////////////////////////////////////////////////
-#include <winsock2.h>
-#include <windows.h>
+#include <WinSock2.h>
+#include <Windows.h>
 #include "win32_helpers.h"
 
 namespace helper {

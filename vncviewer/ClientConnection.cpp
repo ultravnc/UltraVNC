@@ -774,11 +774,11 @@ HWND ClientConnection::GTGBS_ShowConnectWindow()
 }
 
 ////////////////////////////////////////////////////////
-#include <commctrl.h>
+#include <CommCtrl.h>
 #include <shellapi.h>
-#include <lmaccess.h>
-#include <lmat.h>
-#include <lmalert.h>
+#include <LMaccess.h>
+#include <LMat.h>
+#include <LMalert.h>
 
 void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 {

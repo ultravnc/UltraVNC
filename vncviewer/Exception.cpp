@@ -25,7 +25,7 @@
 
 #include "stdhdrs.h"
 #include "Exception.h"
-#include "messbox.h"
+#include "MEssBox.h"
 
 Exception::Exception(const char *info,int error_nr) : m_error_nr(-1)
 {

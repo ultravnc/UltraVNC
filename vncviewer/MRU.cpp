@@ -28,7 +28,7 @@
 
 #include "MRU.h"
 #include "VNCOptions.h"
-#include <shlobj.h>
+#include <ShlObj.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <direct.h>

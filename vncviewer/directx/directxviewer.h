@@ -1,6 +1,6 @@
 #pragma once
-#include <winsock2.h>
-#include <windows.h>
+#include <WinSock2.h>
+#include <Windows.h>
 #include <d3d9.h>
 //#include <d3dx9.h>
 

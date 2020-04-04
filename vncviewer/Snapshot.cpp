@@ -1,13 +1,13 @@
 #include "stdhdrs.h"
 #include "Snapshot.h"
 #include "vncviewer.h"
-#include <windows.h>
+#include <Windows.h>
 #include <string>
-#include <shlobj.h>
+#include <ShlObj.h>
 #include <iostream>
 #include <sstream>
 #include "common/win32_helpers.h"
-#include <GdiPlus.h>
+#include <gdiplus.h>
 
 #pragma comment( lib, "gdiplus" )
 

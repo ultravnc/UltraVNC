@@ -43,8 +43,8 @@
 #endif
 
 
-#include <winsock2.h>
-#include <windows.h>
+#include <WinSock2.h>
+#include <Windows.h>
 
 //adzm - 2009-06-21
 class IPlugin

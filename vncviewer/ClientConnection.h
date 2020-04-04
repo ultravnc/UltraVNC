@@ -33,7 +33,7 @@
 #include "VNCOptions.h"
 #include "VNCviewerApp.h"
 #include "KeyMap.h"
-#include "KeyMapJap.h"
+#include "KeyMapjap.h"
 #include <rdr/types.h>
 #include "../common/UltraVncZ.h"
 #ifdef _INTERNALLIB
@@ -64,7 +64,7 @@ extern "C"
 #include "FullScreenTitleBar.h" //Added by: Lars Werner (http://lars.werner.no)
 
 // adzm - 2010-07 - Extended clipboard
-#include "common/clipboard.h"
+#include "common/Clipboard.h"
 
 #include <vector>
 #include <algorithm>

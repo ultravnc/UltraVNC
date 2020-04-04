@@ -24,7 +24,7 @@
 #include "stdhdrs.h"
 #include "vncviewer.h"
 #include "SessionDialog.h"
-#include <Shlobj.h>
+#include <ShlObj.h>
 #include <direct.h>
 #include <fstream>
 extern char sz_K1[64];
