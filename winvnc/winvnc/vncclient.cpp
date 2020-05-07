@@ -129,6 +129,7 @@ bool DeleteFileOrDirectory(TCHAR *srcpath)
     memset(path, 0, sizeof path);
     
     _tcsncpy_s(path, srcpath, MAX_PATH);
+	path[_tcslen(srcpath) + 1] = 0;
 
     SHFILEOPSTRUCT op;
     memset(&op, 0, sizeof(SHFILEOPSTRUCT));
