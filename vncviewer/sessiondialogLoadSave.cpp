@@ -298,8 +298,8 @@ void SessionDialog::IfHostExistLoadSettings(char *hostname)
 	getAppData(buffer);
 	strcat_s(buffer,"\\vnc\\");
 	strcat_s(buffer,fname);
-
-	if (FILE *file = fopen(buffer, "r")) {
+	FILE *file = fopen(buffer, "r");
+	if (strlen(hostname) != 0 && file ) {
 		fclose(file);
 		LoadFromFile(buffer);		
 	}
