@@ -962,12 +962,27 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 			if (end-start > 0)
 			{
 				char *name = new char[end-start+1];
+				char *name2 = new char[end - start + 1];
 				if (name != 0) {
 					strncpy_s(name, end-start+1, &(szCmdLine[start]), end-start);
 					name[end-start] = 0;
-
+					strcpy(name2, name);
+					//detect braceletes in ipv6 address or remove port number from name
+					char *bs = strchr(name, '[');
+					char *be = strchr(name, ']');
+					if (bs && be) {
+						strncpy(name2, be + 1, strlen(be));
+						*be = '\0';
+						strcpy(name, bs + 1);
+					}
+					else {
+						char *portp = strchr(name, ':');
+						if (portp) {
+							*portp++ = '\0';
+						}
+					}
 					int port = INCOMING_PORT_OFFSET;
-					char *portp = strchr(name, ':');
+					char *portp = strchr(name2, ':');
 					if (portp) {
 						*portp++ = '\0';
 						if (*portp == ':') {
@@ -976,6 +991,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 							port = atoi(portp);	// Display number after ":"
 						}
 					}
+					delete[] name2;
 					vnclog.Print(LL_STATE, VNCLOG("test... %s %d\n"),name,port);
 					strcpy_s(dnsname,name);
 #ifdef IPV6V4
@@ -1006,7 +1022,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 							return 0;
 						}						
 					}
-					//else
+					if (port_int == 0)
 					{
 						VCard32 address = VSocket::Resolve4(name);
 						if (address != 0) {

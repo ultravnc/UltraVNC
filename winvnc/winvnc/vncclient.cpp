@@ -4734,8 +4734,6 @@ vncClient::Kill(bool deleted)
         m_pTextChat->KillDialog();
 	if (m_socket != NULL)
 		m_socket->Close();
-	delete m_socket;
-	m_socket = NULL;
 	if(deleted)
 		((vncClientThread *) m_thread_ClientThread)->m_deleted = true;
 }
