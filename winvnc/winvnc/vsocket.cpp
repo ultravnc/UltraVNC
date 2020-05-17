@@ -777,22 +777,24 @@ VSocket::Accept6()
 VSocket *
 VSocket::Accept()
 {
-  SOCKET new_socket_id;
-  VSocket * new_socket;
+	SOCKET new_socket_id;
+	VSocket * new_socket;
 
-  // Check this socket
-  if (sock == INVALID_SOCKET)
-    return NULL;
+	// Check this socket
+	if (sock == INVALID_SOCKET)
+		return NULL;
 
-  int optVal;
-  int optLen = sizeof(int);
-  getsockopt(sock, SOL_SOCKET, SO_SNDBUF, (char *)&optVal, &optLen); 
-  optVal=32*1024;
-  setsockopt(sock, SOL_SOCKET, SO_SNDBUF, (char *)&optVal, optLen); 
+	int optVal;
+	int optLen = sizeof(int);
+	getsockopt(sock, SOL_SOCKET, SO_SNDBUF, (char *)&optVal, &optLen);
+	DWORD bb = GetLastError();
+	optVal = 32 * 1024;
+	setsockopt(sock, SOL_SOCKET, SO_SNDBUF, (char *)&optVal, optLen);
+	DWORD vv = GetLastError();
 
-  // Accept an incoming connection
-  if ((new_socket_id = accept(sock, NULL, 0)) == INVALID_SOCKET)
-    return NULL;
+	// Accept an incoming connection
+	if ((new_socket_id = accept(sock, NULL, 0)) == INVALID_SOCKET)
+		return NULL;
 
   // Create a new VSocket and return it
   new_socket = new VSocket;

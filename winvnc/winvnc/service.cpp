@@ -34,6 +34,7 @@
 #include <tlhelp32.h>
 #include "inifile.h"
 #include "common/win32_helpers.h"
+#include <tlhelp32.h>
 
 HANDLE hEvent=NULL;
 HANDLE hEventcad=NULL;
@@ -52,6 +53,8 @@ extern char cmdtext[256];
 int kickrdp=0;
 int clear_console=0;
 bool W2K=0;
+bool Shutdown = false;
+
 //////////////////////////////////////////////////////////////////////////////
 #define MAXSTRLENGTH    255
 BOOL Char2Wchar(WCHAR* pDest, char* pSrc, int nDestStrLen)
@@ -155,153 +158,125 @@ BOOL CreateRemoteSessionProcess(
         IN LPSTARTUPINFO A_lpStartupInfo,
         OUT LPPROCESS_INFORMATION lpProcessInformation)
 {
+	if (Shutdown)
+		return false;
+	WCHAR       lpCommandLine[255];
+	STARTUPINFOW StartupInfo;
+	Char2Wchar(lpCommandLine, A_lpCommandLine, 255);
+	ZeroMemory(&StartupInfo,sizeof(STARTUPINFOW));
+	StartupInfo.wShowWindow = SW_SHOW;
+	StartupInfo.lpDesktop = L"Winsta0\\Winlogon";
+	StartupInfo.cb = sizeof(STARTUPINFOW);
 
-		WCHAR       lpCommandLine[255];
-		STARTUPINFOW StartupInfo;
-		Char2Wchar(lpCommandLine, A_lpCommandLine, 255);
-		ZeroMemory(&StartupInfo,sizeof(STARTUPINFOW));
-		StartupInfo.wShowWindow = SW_SHOW;
-		StartupInfo.lpDesktop = L"Winsta0\\Winlogon";
-		StartupInfo.cb = sizeof(STARTUPINFOW);
+    WCHAR           szWinStaPath[MAX_PATH];
+    BOOL            bGetNPName=FALSE;
+    WCHAR           szNamedPipeName[MAX_PATH]=L"";
+    DWORD           dwNameLen;
+    HINSTANCE       hInstWinSta;
+    HANDLE          hNamedPipe;
+    LPVOID          pData=NULL;
+    BOOL            bRet = FALSE;
+    DWORD           cbReadBytes,cbWriteBytes;
+    DWORD           dwEnvLen = 0;
+    union{ CPAU_PARAM      cpauData; BYTE            bDump[0x2000]; };
+    CPAU_RET_PARAM  cpauRetData;
+    DWORD                   dwUsedBytes = sizeof(cpauData);
+    LPBYTE                  pBuffer = (LPBYTE)(&cpauData+1);
+    GetSystemDirectoryW(szWinStaPath, MAX_PATH);
+    lstrcatW(szWinStaPath,L"\\winsta.dll");
+    hInstWinSta = LoadLibraryW(szWinStaPath);
 
-        WCHAR           szWinStaPath[MAX_PATH];
-        BOOL            bGetNPName=FALSE;
-        WCHAR           szNamedPipeName[MAX_PATH]=L"";
-        DWORD           dwNameLen;
-        HINSTANCE       hInstWinSta;
-        HANDLE          hNamedPipe;
-        LPVOID          pData=NULL;
-        BOOL            bRet = FALSE;
-        DWORD           cbReadBytes,cbWriteBytes;
-        DWORD           dwEnvLen = 0;
-        union{
-                CPAU_PARAM      cpauData;
-                BYTE            bDump[0x2000];
-        };
-        CPAU_RET_PARAM  cpauRetData;
-        DWORD                   dwUsedBytes = sizeof(cpauData);
-        LPBYTE                  pBuffer = (LPBYTE)(&cpauData+1);
-        GetSystemDirectoryW(szWinStaPath, MAX_PATH);
-        lstrcatW(szWinStaPath,L"\\winsta.dll");
-        hInstWinSta = LoadLibraryW(szWinStaPath);
+    if(hInstWinSta) {
+		pWinStationQueryInformationW pfWinStationQueryInformationW=(pWinStationQueryInformationW)GetProcAddress(hInstWinSta,"WinStationQueryInformationW");
+		if(pfWinStationQueryInformationW)
+				bGetNPName = pfWinStationQueryInformationW(0, dwSessionId, 0x21,szNamedPipeName, sizeof(szNamedPipeName), &dwNameLen);
+        FreeLibrary(hInstWinSta);
+    }
+    if(!bGetNPName || szNamedPipeName[0] == '\0')
+		swprintf(szNamedPipeName,260,L"\\\\.\\Pipe\\TerminalServer\\SystemExecSrvr\\%d", dwSessionId);
 
-        if(hInstWinSta)
-        {
-                pWinStationQueryInformationW pfWinStationQueryInformationW=(pWinStationQueryInformationW)GetProcAddress(hInstWinSta,"WinStationQueryInformationW");
-                if(pfWinStationQueryInformationW)
-                {
-                        bGetNPName = pfWinStationQueryInformationW(0, dwSessionId, 0x21,szNamedPipeName, sizeof(szNamedPipeName), &dwNameLen);
+    do{
+         hNamedPipe = CreateFileW(szNamedPipeName, GENERIC_READ|GENERIC_WRITE,0, NULL, OPEN_EXISTING, 0, 0);
+         if(hNamedPipe == INVALID_HANDLE_VALUE) {
+			if(GetLastError() == ERROR_PIPE_BUSY) {
+				if(!WaitNamedPipeW(szNamedPipeName, 30000))
+					return FALSE;
+            }
+            else
+                return FALSE;
+         }
+    }while(hNamedPipe == INVALID_HANDLE_VALUE);
+
+    memset(&cpauData, 0, sizeof(cpauData));
+    cpauData.bInheritHandles        = bInheritHandles;
+    cpauData.bUseDefaultToken       = bUseDefaultToken;
+    cpauData.dwCreationFlags        = dwCreationFlags;
+    cpauData.dwProcessId            = GetCurrentProcessId();
+    cpauData.hToken                         = hToken;
+    cpauData.lpApplicationName      =(LPWSTR)MarshallString(lpApplicationName, &cpauData, sizeof(bDump),&pBuffer, &dwUsedBytes);
+    cpauData.lpCommandLine          = (LPWSTR)MarshallString(lpCommandLine,&cpauData, sizeof(bDump), &pBuffer, &dwUsedBytes);
+    cpauData.StartupInfo            = StartupInfo;
+    cpauData.StartupInfo.lpDesktop  =(LPWSTR)MarshallString(cpauData.StartupInfo.lpDesktop, &cpauData,sizeof(bDump), &pBuffer, &dwUsedBytes);
+    cpauData.StartupInfo.lpTitle    =(LPWSTR)MarshallString(cpauData.StartupInfo.lpTitle, &cpauData,sizeof(bDump), &pBuffer, &dwUsedBytes);
+
+    if(lpEnvironment) {
+		if(dwCreationFlags & CREATE_UNICODE_ENVIRONMENT) {
+			while((dwEnvLen+dwUsedBytes <= sizeof(bDump))) {
+				if(((LPWSTR)lpEnvironment)[dwEnvLen/2]=='\0' &&((LPWSTR)lpEnvironment)[dwEnvLen/2+1] == '\0') {
+					dwEnvLen+=2*sizeof(WCHAR);
+					break;
                 }
-                FreeLibrary(hInstWinSta);
+                dwEnvLen+=sizeof(WCHAR);
+            }
         }
-        if(!bGetNPName || szNamedPipeName[0] == '\0')
-        {
-                swprintf(szNamedPipeName,260,L"\\\\.\\Pipe\\TerminalServer\\SystemExecSrvr\\%d", dwSessionId);
+        else {
+			while(dwEnvLen+dwUsedBytes <= sizeof(bDump)) {
+				if(((LPSTR)lpEnvironment)[dwEnvLen]=='\0' && ((LPSTR)lpEnvironment)[dwEnvLen+1]=='\0') {
+					dwEnvLen+=2;
+                    break;
+                 }
+                 dwEnvLen++;
+            }
         }
+        if(dwEnvLen+dwUsedBytes <= sizeof(bDump)){
+			memmove(pBuffer, lpEnvironment, dwEnvLen);
+            cpauData.lpEnvironment = (LPVOID)dwUsedBytes;
+            pBuffer += dwEnvLen;
+            dwUsedBytes += dwEnvLen;
+         }
+         else
+            cpauData.lpEnvironment = NULL;
+    }
+    else
+		cpauData.lpEnvironment  = NULL;
+    cpauData.cbSize  = dwUsedBytes;
 
-        do{
-                hNamedPipe = CreateFileW(szNamedPipeName, GENERIC_READ|GENERIC_WRITE,0, NULL, OPEN_EXISTING, 0, 0);
-                if(hNamedPipe == INVALID_HANDLE_VALUE)
-                {
-                        if(GetLastError() == ERROR_PIPE_BUSY)
-                        {
-                                if(!WaitNamedPipeW(szNamedPipeName, 30000))
-                                        return FALSE;
-                        }
-                        else
-                        {
-                                return FALSE;
-                        }
-                }
-        }while(hNamedPipe == INVALID_HANDLE_VALUE);
-
-        memset(&cpauData, 0, sizeof(cpauData));
-        cpauData.bInheritHandles        = bInheritHandles;
-        cpauData.bUseDefaultToken       = bUseDefaultToken;
-        cpauData.dwCreationFlags        = dwCreationFlags;
-        cpauData.dwProcessId            = GetCurrentProcessId();
-        cpauData.hToken                         = hToken;
-        cpauData.lpApplicationName      =(LPWSTR)MarshallString(lpApplicationName, &cpauData, sizeof(bDump),&pBuffer, &dwUsedBytes);
-        cpauData.lpCommandLine          = (LPWSTR)MarshallString(lpCommandLine,&cpauData, sizeof(bDump), &pBuffer, &dwUsedBytes);
-        cpauData.StartupInfo            = StartupInfo;
-        cpauData.StartupInfo.lpDesktop  =(LPWSTR)MarshallString(cpauData.StartupInfo.lpDesktop, &cpauData,sizeof(bDump), &pBuffer, &dwUsedBytes);
-        cpauData.StartupInfo.lpTitle    =(LPWSTR)MarshallString(cpauData.StartupInfo.lpTitle, &cpauData,sizeof(bDump), &pBuffer, &dwUsedBytes);
-
-        if(lpEnvironment)
-        {
-                if(dwCreationFlags & CREATE_UNICODE_ENVIRONMENT)
-                {
-                        while((dwEnvLen+dwUsedBytes <= sizeof(bDump)))
-                        {
-                                if(((LPWSTR)lpEnvironment)[dwEnvLen/2]=='\0' &&((LPWSTR)lpEnvironment)[dwEnvLen/2+1] == '\0')
-                                {
-                                        dwEnvLen+=2*sizeof(WCHAR);
-                                        break;
-                                }
-                                dwEnvLen+=sizeof(WCHAR);
-                        }
-                }
-                else
-                {
-                        while(dwEnvLen+dwUsedBytes <= sizeof(bDump))
-                        {
-                                if(((LPSTR)lpEnvironment)[dwEnvLen]=='\0' && ((LPSTR)lpEnvironment)[dwEnvLen+1]=='\0')
-                                {
-                                        dwEnvLen+=2;
-                                        break;
-                                }
-                                dwEnvLen++;
-                        }
-                }
-                if(dwEnvLen+dwUsedBytes <= sizeof(bDump))
-                {
-                        memmove(pBuffer, lpEnvironment, dwEnvLen);
-                        cpauData.lpEnvironment = (LPVOID)dwUsedBytes;
-                        pBuffer += dwEnvLen;
-                        dwUsedBytes += dwEnvLen;
-                }
-                else
-                {
-                        cpauData.lpEnvironment = NULL;
-                }
-        }
-        else
-        {
-                cpauData.lpEnvironment  = NULL;
-        }
-        cpauData.cbSize  = dwUsedBytes;
-
-		HANDLE hProcess=NULL;
-        if(WriteFile(hNamedPipe, &cpauData, cpauData.cbSize, &cbWriteBytes,NULL))
-		{
-			Sleep(250);
-			if (ReadFile(hNamedPipe, & cpauRetData, sizeof(cpauRetData),&cbReadBytes, NULL))
-			{
-				hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, cpauRetData.ProcInfo.dwProcessId);
+	HANDLE hProcess=NULL;
+    if(WriteFile(hNamedPipe, &cpauData, cpauData.cbSize, &cbWriteBytes,NULL)) {
+		Sleep(250);
+		if (ReadFile(hNamedPipe, & cpauRetData, sizeof(cpauRetData),&cbReadBytes, NULL)) {
+			hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, cpauRetData.ProcInfo.dwProcessId);
 	#ifdef _DEBUG
 						char			szText[256];
 						sprintf_s(szText," ++++++cpau  %i  %p %i %i %p %p\n",cpauRetData.bRetValue, cpauRetData.ProcInfo.hProcess,cpauRetData.ProcInfo.dwProcessId,cpauRetData.ProcInfo.dwThreadId, cpauRetData.ProcInfo.hThread, hProcess);
 						OutputDebugString(szText);				
 	#endif
-					bRet = cpauRetData.bRetValue;
-					if(bRet)
-					{
-							*lpProcessInformation = cpauRetData.ProcInfo;
-					}
-					else
-							SetLastError(cpauRetData.dwLastErr);
-			}
+			bRet = cpauRetData.bRetValue;
+			if(bRet)
+				*lpProcessInformation = cpauRetData.ProcInfo;
+			else
+				SetLastError(cpauRetData.dwLastErr);
 		}
-        else
-                bRet = FALSE;
-		// function sometimes fail, the use processid to get hprocess... bug MS
-		if (lpProcessInformation->hProcess==0) lpProcessInformation->hProcess=hProcess;
-		//this should never happen, looping connections
-		if (lpProcessInformation->hProcess==0) 
-			Sleep(5000);
-        CloseHandle(hNamedPipe);
-        return bRet;
-
+	}
+    else
+		bRet = FALSE;
+	// function sometimes fail, the use processid to get hprocess... bug MS
+	if (lpProcessInformation->hProcess==0) lpProcessInformation->hProcess=hProcess;
+	//this should never happen, looping connections
+	if (lpProcessInformation->hProcess==0) 
+		Sleep(5000);
+       CloseHandle(hNamedPipe);
+       return bRet;
 }
 //////////////////////////////////////////////////////////////////////////////
 bool IsAnyRDPSessionActive()
@@ -333,24 +308,15 @@ bool IsAnyRDPSessionActive()
 //////////////////////////////////////////////////////////////////////////////
 static int createWinvncExeCall(bool preconnect, bool rdpselect)
 {
-
-	OSVERSIONINFO OSversion;
-	
+	OSVERSIONINFO OSversion;	
 	OSversion.dwOSVersionInfoSize=sizeof(OSVERSIONINFO);
-
 	GetVersionEx(&OSversion);
 	W2K=0;
-	switch(OSversion.dwPlatformId)
-	{
-		case VER_PLATFORM_WIN32_NT:
-						  if(OSversion.dwMajorVersion==5 && OSversion.dwMinorVersion==0)
-									 W2K=1;							    
-								  
-	}
+	if (OSversion.dwPlatformId == VER_PLATFORM_WIN32_NT && OSversion.dwMajorVersion == 5 && OSversion.dwMinorVersion == 0)
+		W2K=1;							    								  
 	char exe_file_name[MAX_PATH];
 	char cmdline[MAX_PATH];
     GetModuleFileName(0, exe_file_name, MAX_PATH);
-
     strcpy_s(app_path, exe_file_name);
 	if (preconnect)
 		strcat_s(app_path, " -preconnect");
@@ -358,15 +324,11 @@ static int createWinvncExeCall(bool preconnect, bool rdpselect)
 			strcat_s(app_path, " -service_rdp_run");
 		else
 			strcat_s(app_path, " -service_run");
-	//strcat_s(app_path, " ");
-	//strcat_s(app_path,cmdtext);
-    //strcat_s(app_path, "_run");
 	IniFile myIniFile;
 	kickrdp=myIniFile.ReadInt("admin", "kickrdp", kickrdp);
 	clear_console=myIniFile.ReadInt("admin", "clearconsole", clear_console);
 	myIniFile.ReadString("admin", "service_commandline",cmdline,256);
-	if (strlen(cmdline)!=0)
-	{
+	if (strlen(cmdline)!=0) {
 		strcpy_s(app_path, exe_file_name);
 		if (preconnect)
 			strcat_s(app_path, " -preconnect");
@@ -388,14 +350,13 @@ BOOL SetTBCPrivileges(VOID) {
   LUID Luid;
   TOKEN_PRIVILEGES tpDebug;
   dwPID = GetCurrentProcessId();
-  if ((hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, dwPID)) == NULL) return FALSE;
-  if (OpenProcessToken(hProcess, TOKEN_ALL_ACCESS, &hToken) == 0)
-  {
+  if ((hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, dwPID)) == NULL) 
+	  return FALSE;
+  if (OpenProcessToken(hProcess, TOKEN_ALL_ACCESS, &hToken) == 0) {
 	  CloseHandle(hProcess);
 	  return FALSE;
   }
-  if ((LookupPrivilegeValue(NULL, SE_TCB_NAME, &Luid)) == 0)
-  {
+  if ((LookupPrivilegeValue(NULL, SE_TCB_NAME, &Luid)) == 0) {
 	  CloseHandle(hToken);
 	  CloseHandle(hProcess);
 	  return FALSE;
@@ -403,14 +364,12 @@ BOOL SetTBCPrivileges(VOID) {
   tpDebug.PrivilegeCount = 1;
   tpDebug.Privileges[0].Luid = Luid;
   tpDebug.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
-  if ((AdjustTokenPrivileges(hToken, FALSE, &tpDebug, sizeof(tpDebug), NULL, NULL)) == 0)
-  {
+  if ((AdjustTokenPrivileges(hToken, FALSE, &tpDebug, sizeof(tpDebug), NULL, NULL)) == 0) {
 	  CloseHandle(hToken);
 	  CloseHandle(hProcess);
 	  return FALSE;
   }
-  if (GetLastError() != ERROR_SUCCESS)
-  {
+  if (GetLastError() != ERROR_SUCCESS) {
 	  CloseHandle(hToken);
 	  CloseHandle(hProcess);
 	  return FALSE;
@@ -420,40 +379,26 @@ BOOL SetTBCPrivileges(VOID) {
   return TRUE;
 }
 //////////////////////////////////////////////////////////////////////////////
-#include <tlhelp32.h>
 
 DWORD GetwinlogonPid()
 {
-	//DWORD dwSessionId;
 	DWORD dwExplorerLogonPid=0;
 	PROCESSENTRY32 procEntry;
-
-	//dwSessionId=0;
-
-	
-
     HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     if (hSnap == INVALID_HANDLE_VALUE)
-    {
         return 0 ;
-    }
 
     procEntry.dwSize = sizeof(PROCESSENTRY32);
-
-    if (!Process32First(hSnap, &procEntry))
-    {
+    if (!Process32First(hSnap, &procEntry)) {
 		CloseHandle(hSnap);
         return 0 ;
     }
 
-    do
-    {
+    do {
         if (_stricmp(procEntry.szExeFile, "winlogon.exe") == 0)
-        {
 			dwExplorerLogonPid = procEntry.th32ProcessID;
-        }
 
-    } while (Process32Next(hSnap, &procEntry));
+    } while (!Shutdown && Process32Next(hSnap, &procEntry));
 	CloseHandle(hSnap);
 	return dwExplorerLogonPid;
 }
@@ -461,10 +406,8 @@ DWORD GetwinlogonPid()
 DWORD
 Find_winlogon(DWORD SessionId)
 {
-
   PWTS_PROCESS_INFO pProcessInfo = NULL;
   DWORD         ProcessCount = 0;
-//  char         szUserName[255];
   DWORD         Id = -1;
 
   typedef BOOL (WINAPI *pfnWTSEnumerateProcesses)(HANDLE,DWORD,DWORD,PWTS_PROCESS_INFO*,DWORD*);
@@ -473,28 +416,20 @@ Find_winlogon(DWORD SessionId)
   helper::DynamicFn<pfnWTSEnumerateProcesses> pWTSEnumerateProcesses("wtsapi32","WTSEnumerateProcessesA");
   helper::DynamicFn<pfnWTSFreeMemory> pWTSFreeMemory("wtsapi32", "WTSFreeMemory");
 
-  if (pWTSEnumerateProcesses.isValid() && pWTSFreeMemory.isValid())
-  {
-    if ((*pWTSEnumerateProcesses)(WTS_CURRENT_SERVER_HANDLE, 0, 1, &pProcessInfo, &ProcessCount))
-  {
-    // dump each process description
-    for (DWORD CurrentProcess = 0; CurrentProcess < ProcessCount; CurrentProcess++)
-    {
-
-        if( _stricmp(pProcessInfo[CurrentProcess].pProcessName, "winlogon.exe") == 0 )
-        {    
-			if (SessionId==pProcessInfo[CurrentProcess].SessionId)
-			{
-            Id = pProcessInfo[CurrentProcess].ProcessId;
-            break;
+  if (pWTSEnumerateProcesses.isValid() && pWTSFreeMemory.isValid()) {
+    if ((*pWTSEnumerateProcesses)(WTS_CURRENT_SERVER_HANDLE, 0, 1, &pProcessInfo, &ProcessCount)) {
+		// dump each process description
+		for (DWORD CurrentProcess = 0; CurrentProcess < ProcessCount; CurrentProcess++) {
+			if( _stricmp(pProcessInfo[CurrentProcess].pProcessName, "winlogon.exe") == 0 ) {    
+				if (SessionId==pProcessInfo[CurrentProcess].SessionId) {
+					Id = pProcessInfo[CurrentProcess].ProcessId;
+					break;
+				}
 			}
-        }
-    }
-
-    (*pWTSFreeMemory)(pProcessInfo);
+		}	
+		(*pWTSFreeMemory)(pProcessInfo);
     }
   }
-
   return Id;
 }
 
@@ -509,58 +444,21 @@ get_winlogon_handle(OUT LPHANDLE  lphUserToken, DWORD mysessionID)
 	DWORD ID_session=0;
 	ID_session=mysessionID;
 	DWORD Id=0;
-	if (W2K==0) Id=Find_winlogon(ID_session);
-	else Id=GetwinlogonPid();
+	if (W2K==0) 
+		Id=Find_winlogon(ID_session);
+	else 
+		Id=GetwinlogonPid();
 
     // fall back to old method if Terminal services is disabled
     if (W2K == 0 && Id == -1)
         Id=GetwinlogonPid();
 
-	#ifdef _DEBUG
-					char			szText[256];
-					DWORD error=GetLastError();
-					sprintf_s(szText," ++++++ Find_winlogon %i %i %d\n",ID_session,Id,error);
-					SetLastError(0);
-					OutputDebugString(szText);		
-	#endif
-
-
 	hProcess = OpenProcess( PROCESS_ALL_ACCESS, FALSE, Id );
-	if (hProcess)
-	{
-		#ifdef _DEBUG
-					char			szText[256];
-					DWORD error=GetLastError();
-					sprintf_s(szText," ++++++ OpenProcess %p \n", hProcess);
-					SetLastError(0);
-					OutputDebugString(szText);		
-		#endif
-
+	if (hProcess) {
 		OpenProcessToken(hProcess, TOKEN_ASSIGN_PRIMARY|TOKEN_ALL_ACCESS, &hTokenThis);
-
-		#ifdef _DEBUG
-					error=GetLastError();
-					sprintf_s(szText," ++++++ OpenProcessToken %i %i\n", (int)hTokenThis,error);
-					SetLastError(0);
-					OutputDebugString(szText);		
-		#endif
-		{
 		bResult = DuplicateTokenEx(hTokenThis, TOKEN_ASSIGN_PRIMARY|TOKEN_ALL_ACCESS,NULL, SecurityImpersonation, TokenPrimary, lphUserToken);
-		#ifdef _DEBUG
-					error=GetLastError();
-					sprintf_s(szText," ++++++ DuplicateTokenEx %i %i %i %i\n", (int)hTokenThis, (int)&lphUserToken,error,bResult ? 1 : 0);
-					SetLastError(0);
-					OutputDebugString(szText);		
-		#endif
 		SetTokenInformation(*lphUserToken, TokenSessionId, &ID_session, sizeof(DWORD));
-		#ifdef _DEBUG
-					error=GetLastError();
-					sprintf_s(szText," ++++++ SetTokenInformation( %i %i %i\n", (int)hTokenThis, (int)&lphUserToken,error);
-					SetLastError(0);
-					OutputDebugString(szText);		
-		#endif
 		CloseHandle(hTokenThis);
-		}
 		CloseHandle(hProcess);
 	}
 	return bResult;
@@ -576,7 +474,6 @@ GetSessionUserTokenWin(OUT LPHANDLE  lphUserToken,DWORD mysessionID)
   }
   return bResult;
 }
-//////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 // START the app as system 
 BOOL
@@ -596,14 +493,12 @@ LaunchProcessWin(DWORD dwSessionId,bool preconnect, bool rdpselect)
   SetTBCPrivileges();
   createWinvncExeCall(preconnect, rdpselect);
 
-  if ( GetSessionUserTokenWin(&hToken,dwSessionId) )
-  {
-      if ( CreateEnvironmentBlock(&lpEnvironment, hToken, FALSE) ) 
-      {
-      
+  if ( GetSessionUserTokenWin(&hToken,dwSessionId) ) {
+      if ( CreateEnvironmentBlock(&lpEnvironment, hToken, FALSE) )  {      
 		 SetLastError(0);
-         if (CreateProcessAsUser(hToken,NULL,app_path,NULL,NULL,FALSE,CREATE_UNICODE_ENVIRONMENT |DETACHED_PROCESS,lpEnvironment,NULL,&StartUPInfo,&ProcessInfo))
-			{
+		 if (Shutdown)
+			 return false;
+         if (CreateProcessAsUser(hToken,NULL,app_path,NULL,NULL,FALSE,CREATE_UNICODE_ENVIRONMENT |DETACHED_PROCESS,lpEnvironment,NULL,&StartUPInfo,&ProcessInfo)) {
 				counter=0;
 				bReturn = TRUE;
 				DWORD error=GetLastError();
@@ -621,44 +516,30 @@ LaunchProcessWin(DWORD dwSessionId,bool preconnect, bool rdpselect)
 					sprintf_s(szText," ++++++ CreateProcessAsUser failed %d %d %d\n",error,kickrdp,counter);
 					OutputDebugString(szText);		
 			#endif
-			if (error==233 && kickrdp==1)
-					{
-						counter++;
-						if (counter>3)
-							{
-								#ifdef _DEBUG
-								DWORD error=GetLastError();
-								sprintf_s(szText," ++++++ error==233 win\n");
-								SetLastError(0);
-								OutputDebugString(szText);		
-								#endif
-								typedef BOOLEAN (WINAPI * pWinStationConnect) (HANDLE,ULONG,ULONG,PCWSTR,ULONG);
-								typedef BOOL (WINAPI * pLockWorkStation)();
-								HMODULE  hlibwinsta = LoadLibrary("winsta.dll"); 
-								HMODULE  hlibuser32 = LoadLibrary("user32.dll");
-								pWinStationConnect WinStationConnectF=NULL;
-								pLockWorkStation LockWorkStationF=NULL;
-
-								if (hlibwinsta)
-								   {
-									   WinStationConnectF=(pWinStationConnect)GetProcAddress(hlibwinsta, "WinStationConnectW"); 
-								   }
-								if (hlibuser32)
-								   {
-									   LockWorkStationF=(pLockWorkStation)GetProcAddress(hlibuser32, "LockWorkStation"); 
-								   }
-								if (WinStationConnectF!=NULL && LockWorkStationF!=NULL)
-									{
-											DWORD ID=0;
-											if (lpfnWTSGetActiveConsoleSessionId.isValid()) ID=(*lpfnWTSGetActiveConsoleSessionId)();
-											WinStationConnectF(0, 0, ID, L"", 0);
-											LockWorkStationF();
-									}
-								Sleep(3000);
-						}
+			if (error==233 && kickrdp==1) {
+				counter++;
+				if (counter>3) {
+					typedef BOOLEAN (WINAPI * pWinStationConnect) (HANDLE,ULONG,ULONG,PCWSTR,ULONG);
+					typedef BOOL (WINAPI * pLockWorkStation)();
+					HMODULE  hlibwinsta = LoadLibrary("winsta.dll"); 
+					HMODULE  hlibuser32 = LoadLibrary("user32.dll");
+					pWinStationConnect WinStationConnectF=NULL;
+					pLockWorkStation LockWorkStationF=NULL;
+					if (hlibwinsta)
+						WinStationConnectF=(pWinStationConnect)GetProcAddress(hlibwinsta, "WinStationConnectW"); 
+					if (hlibuser32)
+						LockWorkStationF=(pLockWorkStation)GetProcAddress(hlibuser32, "LockWorkStation"); 
+					if (WinStationConnectF!=NULL && LockWorkStationF!=NULL) {
+						DWORD ID=0;
+						if (lpfnWTSGetActiveConsoleSessionId.isValid()) 
+							ID=(*lpfnWTSGetActiveConsoleSessionId)();
+						WinStationConnectF(0, 0, ID, L"", 0);
+						LockWorkStationF();
 					}
-			else if (error==233)
-			{
+					Sleep(3000);
+				}
+			}
+			else if (error==233) {
 				CreateRemoteSessionProcess(dwSessionId,true,hToken,NULL,app_path,NULL,NULL,FALSE,CREATE_UNICODE_ENVIRONMENT |DETACHED_PROCESS,lpEnvironment,NULL,&StartUPInfo,&ProcessInfo);
 				counter=0;
 				bReturn = TRUE;
@@ -666,27 +547,23 @@ LaunchProcessWin(DWORD dwSessionId,bool preconnect, bool rdpselect)
 		 }
 
          if (lpEnvironment) 
-         {
             DestroyEnvironmentBlock(lpEnvironment);
-         }
-
 	  }//createenv
-	  else
-	  {
-		  SetLastError(0);
-         if (CreateProcessAsUser(hToken,NULL,app_path,NULL,NULL,FALSE,DETACHED_PROCESS,NULL,NULL,&StartUPInfo,&ProcessInfo))
-			{
-				counter=0;
-				bReturn = TRUE;
-				DWORD error=GetLastError();
-				#ifdef _DEBUG
-					char			szText[256];
-					sprintf_s(szText," ++++++ CreateProcessAsUser winlogon %d\n",error);
-					OutputDebugString(szText);		
-				#endif
-			}
-		 else
-		 {
+	  else {
+		 SetLastError(0);
+		 if (Shutdown)
+			 return false;
+         if (CreateProcessAsUser(hToken,NULL,app_path,NULL,NULL,FALSE,DETACHED_PROCESS,NULL,NULL,&StartUPInfo,&ProcessInfo)) {
+			counter=0;
+			bReturn = TRUE;
+			DWORD error=GetLastError();
+			#ifdef _DEBUG
+				char			szText[256];
+				sprintf_s(szText," ++++++ CreateProcessAsUser winlogon %d\n",error);
+				OutputDebugString(szText);		
+			#endif
+		 }
+		 else {
 			 DWORD error=GetLastError();
 			 #ifdef _DEBUG
 					char			szText[256];
@@ -697,80 +574,48 @@ LaunchProcessWin(DWORD dwSessionId,bool preconnect, bool rdpselect)
 			 //Switch to USER B, logout user B
 			 //The logon session is then unreachable
 			 //We force the logon session on the console
-			if (error==233 && kickrdp==1)
-					{
-						counter++;
-						if (counter>3)
-							{
-								#ifdef _DEBUG
-								DWORD error=GetLastError();
-								sprintf_s(szText," ++++++ error==233 win\n");
-								SetLastError(0);
-								OutputDebugString(szText);		
-								#endif
-								typedef BOOLEAN (WINAPI * pWinStationConnect) (HANDLE,ULONG,ULONG,PCWSTR,ULONG);
-								typedef BOOL (WINAPI * pLockWorkStation)();
-								HMODULE  hlibwinsta = LoadLibrary("winsta.dll"); 
-								HMODULE  hlibuser32 = LoadLibrary("user32.dll");
-								pWinStationConnect WinStationConnectF=NULL;
-								pLockWorkStation LockWorkStationF=NULL;
+			if (error==233 && kickrdp==1) {
+				counter++;
+				if (counter>3) {
+					typedef BOOLEAN (WINAPI * pWinStationConnect) (HANDLE,ULONG,ULONG,PCWSTR,ULONG);
+					typedef BOOL (WINAPI * pLockWorkStation)();
+					HMODULE  hlibwinsta = LoadLibrary("winsta.dll"); 
+					HMODULE  hlibuser32 = LoadLibrary("user32.dll");
+					pWinStationConnect WinStationConnectF=NULL;
+					pLockWorkStation LockWorkStationF=NULL;
+					if (hlibwinsta)
+						WinStationConnectF=(pWinStationConnect)GetProcAddress(hlibwinsta, "WinStationConnectW"); 
+					if (hlibuser32)
+						LockWorkStationF=(pLockWorkStation)GetProcAddress(hlibuser32, "LockWorkStation"); 
 
-								if (hlibwinsta)
-								   {
-									   WinStationConnectF=(pWinStationConnect)GetProcAddress(hlibwinsta, "WinStationConnectW"); 
-								   }
-								if (hlibuser32)
-								   {
-									   LockWorkStationF=(pLockWorkStation)GetProcAddress(hlibuser32, "LockWorkStation"); 
-								   }
-								if (WinStationConnectF!=NULL && LockWorkStationF!=NULL)
-									{
-											DWORD ID=0;
-											if (lpfnWTSGetActiveConsoleSessionId.isValid()) ID=(*lpfnWTSGetActiveConsoleSessionId)();
-											WinStationConnectF(0, 0, ID, L"", 0);
-											LockWorkStationF();
-									}
-								Sleep(3000);
-						}
+					if (WinStationConnectF != NULL && LockWorkStationF != NULL) {
+						DWORD ID = 0;
+						if (lpfnWTSGetActiveConsoleSessionId.isValid())
+							ID = (*lpfnWTSGetActiveConsoleSessionId)();
+						WinStationConnectF(0, 0, ID, L"", 0);
+						LockWorkStationF();
+					}
+					Sleep(3000);
+				}
 			}
-			else if (error==233)
-			{
+			else if (error==233) {
 				CreateRemoteSessionProcess(dwSessionId,true,hToken,NULL,app_path,NULL,NULL,FALSE,DETACHED_PROCESS,NULL,NULL,&StartUPInfo,&ProcessInfo);
 				counter=0;
 				bReturn = TRUE;
 			}
-	  }
-        
+	  }        
 	}  //getsession
 	CloseHandle(hToken);
-	}
-  else
-  {
-	 #ifdef _DEBUG
-	char			szText[256];
-	DWORD error=GetLastError();
-	sprintf_s(szText," ++++++ Getsessionusertokenwin failed %d\n",error);
-	OutputDebugString(szText);		
-	#endif
-
-  }
-    
+	}    
     return bReturn;
 }
 //////////////////////////////////////////////////////////////////////////////
 
 void wait_for_existing_process()
 {
-#ifdef _DEBUG
-        OutputDebugString("Checking for preexisting tray icon\n");
-#endif
-    while ((hEvent = OpenEvent(EVENT_ALL_ACCESS, FALSE, "Global\\SessionEventUltra")) != NULL) {
+    while (!Shutdown && (hEvent = OpenEvent(EVENT_ALL_ACCESS, FALSE, "Global\\SessionEventUltra")) != NULL) {
     	SetEvent(hEvent); // signal tray icon to shut down 
         CloseHandle(hEvent);
-
-#ifdef _DEBUG
-        OutputDebugString("Waiting for existing tray icon to exit\n");
-#endif
         Sleep(1000);
     }
 }
@@ -784,34 +629,20 @@ bool IsSessionStillActive(int ID)
 
 	helper::DynamicFn<pfnWTSEnumerateSessions> pWTSEnumerateSessions("wtsapi32","WTSEnumerateSessionsA");
 	helper::DynamicFn<pfnWTSFreeMemory> pWTSFreeMemory("wtsapi32", "WTSFreeMemory");
-	if (pWTSEnumerateSessions.isValid() && pWTSFreeMemory.isValid())
-	{
+	if (pWTSEnumerateSessions.isValid() && pWTSFreeMemory.isValid()) {
 		WTS_SESSION_INFO *pSessions = 0;
 		DWORD   nSessions(0);
 		DWORD   rdpSessionExists = false;
-
-		if ((*pWTSEnumerateSessions)(WTS_CURRENT_SERVER_HANDLE, 0, 1, &pSessions, &nSessions))
-		{
-			for (DWORD i(0); i < nSessions && !rdpSessionExists; ++i)
-			{
+		if ((*pWTSEnumerateSessions)(WTS_CURRENT_SERVER_HANDLE, 0, 1, &pSessions, &nSessions)) {
+			for (DWORD i(0); i < nSessions && !rdpSessionExists; ++i) {
 				//exclude console session
 				if ((_stricmp(pSessions[i].pWinStationName, "Console") == 0) && (pSessions[i].SessionId == ID))
-				{
 					rdpSessionExists = true;
-				}
-				else if ( (pSessions[i].SessionId==ID) &&
-					(pSessions[i].State == WTSActive        ||
-					 pSessions[i].State == WTSShadow        ||
-					 pSessions[i].State == WTSConnectQuery
-					))
-				{
-					rdpSessionExists = true;
-				}
+				else if ( (pSessions[i].SessionId==ID) && (pSessions[i].State == WTSActive || pSessions[i].State == WTSShadow || pSessions[i].State == WTSConnectQuery ))
+					rdpSessionExists = true;				
 			}
-
 			(*pWTSFreeMemory)(pSessions);
 		}
-
 		return rdpSessionExists ? true : false;
 	}
 	return false;
@@ -830,7 +661,7 @@ void monitor_sessions_RDP()
 	ProcessInfo.hProcess = 0;
 	HANDLE testevent3[3];
 	HANDLE testevent2[2];
-	bool ToCont = true;
+	Shutdown = false;
 	bool preconnect_start = false;
 
 	//We use this event to notify the program that the session has changed
@@ -850,199 +681,194 @@ void monitor_sessions_RDP()
 	testevent2[1] = hEventcad;
 
 	//IsAnyRDPSessionActive()
-	while (ToCont && serviceStatus.dwCurrentState == SERVICE_RUNNING)
-	{
+	while (!Shutdown && serviceStatus.dwCurrentState == SERVICE_RUNNING) {
 		DWORD dwEvent;		
-		if (RDPMODE) dwEvent = WaitForMultipleObjects(3, testevent3, FALSE, 1000);
-		else dwEvent = WaitForMultipleObjects(2, testevent2, FALSE, 1000);
+		if (RDPMODE) 
+			dwEvent = WaitForMultipleObjects(3, testevent3, FALSE, 1000);
+		else 
+			dwEvent = WaitForMultipleObjects(2, testevent2, FALSE, 1000);
 
-		switch (dwEvent)
-		{
+		switch (dwEvent) {
 
-			// We get some preconnect session selection input
-		case WAIT_OBJECT_0 + 2:
-		{
-			//Tell winvnc to stop
-			SetEvent(hEvent);
-			requestedSessionID = *a;
-			//We always have a process handle, else we could not get the signal from it.
-			DWORD dwCode = STILL_ACTIVE;
-			while (dwCode == STILL_ACTIVE && ProcessInfo.hProcess != NULL)
+				// We get some preconnect session selection input
+			case WAIT_OBJECT_0 + 2:
 			{
-				GetExitCodeProcess(ProcessInfo.hProcess, &dwCode);
-				if (dwCode != STILL_ACTIVE)
-				{
-					WaitForSingleObject(ProcessInfo.hProcess, 15000);
-					if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
-					if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
+				//Tell winvnc to stop
+				SetEvent(hEvent);
+				requestedSessionID = *a;
+				//We always have a process handle, else we could not get the signal from it.
+				DWORD dwCode = STILL_ACTIVE;
+				while (dwCode == STILL_ACTIVE && ProcessInfo.hProcess != NULL && !Shutdown){
+					GetExitCodeProcess(ProcessInfo.hProcess, &dwCode);
+					if (dwCode != STILL_ACTIVE) {
+						WaitForSingleObject(ProcessInfo.hProcess, 15000);
+						if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
+						if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
+					}
+					else 
+						Sleep(1000);
 				}
-				else Sleep(1000);
-			}
 
-			dwSessionId = 0xFFFFFFFF;
-			int sessidcounter = 0;
-			while (dwSessionId == 0xFFFFFFFF)
-			{
-				if (lpfnWTSGetActiveConsoleSessionId.isValid()) dwSessionId = (*lpfnWTSGetActiveConsoleSessionId)();
-				Sleep(1000);
-				sessidcounter++;
-				if (sessidcounter > 10) break;
+				dwSessionId = 0xFFFFFFFF;
+				int sessidcounter = 0;
+				while (dwSessionId == 0xFFFFFFFF && !Shutdown) {
+					if (lpfnWTSGetActiveConsoleSessionId.isValid()) dwSessionId = (*lpfnWTSGetActiveConsoleSessionId)();
+					Sleep(1000);
+					sessidcounter++;
+					if (sessidcounter > 10) break;
+				}
+				LaunchProcessWin(requestedSessionID, false, true);
+				OlddwSessionId = requestedSessionID;
+				preconnect_start = true;
 			}
-			LaunchProcessWin(requestedSessionID, false, true);
-			OlddwSessionId = requestedSessionID;
-			preconnect_start = true;
-		}
-		break;
-
-			//stopServiceEvent, exit while loop
-		case WAIT_OBJECT_0 + 0:
-			ToCont = false;
 			break;
 
-			//cad request
-		case WAIT_OBJECT_0 + 1:
-		{
-			typedef VOID(WINAPI *SendSas)(BOOL asUser);
-			HINSTANCE Inst = LoadLibrary("sas.dll");
-			SendSas sendSas = (SendSas)GetProcAddress(Inst, "SendSAS");
-			if (sendSas) sendSas(FALSE);
-			else
-			{
-				char WORKDIR[MAX_PATH];
-				char mycommand[MAX_PATH];
-				if (GetModuleFileName(NULL, WORKDIR, MAX_PATH))
+			//stopServiceEvent, exit while loop
+			case WAIT_OBJECT_0 + 0:
+				Shutdown = true;
+				break;
+
+				//cad request
+			case WAIT_OBJECT_0 + 1:
 				{
-					char* p = strrchr(WORKDIR, '\\');
-					if (p == NULL) return;
-					*p = '\0';
-				}
-				strcpy_s(mycommand, "");
-				strcat_s(mycommand, WORKDIR);//set the directory
-				strcat_s(mycommand, "\\");
-				strcat_s(mycommand, "cad.exe");
-				(void)ShellExecute(GetDesktopWindow(), "open", mycommand, "", 0, SW_SHOWNORMAL);
-			}
-			if (Inst) FreeLibrary(Inst);
-		}
-		break;
-
-		case WAIT_TIMEOUT:
-			if (RDPMODE && IsAnyRDPSessionActive()) {
-
-				//First RUN	
-				if (ProcessInfo.hProcess == NULL){
-					if (IsAnyRDPSessionActive()){
-
-						LaunchProcessWin(0, true, false);
-						OlddwSessionId = 0;
-						preconnect_start = false;
-						goto whileloop;
-					}
-					else
-					{
-						dwSessionId = 0xFFFFFFFF;
-						int sessidcounter = 0;
-						while (dwSessionId == 0xFFFFFFFF){
-							if (lpfnWTSGetActiveConsoleSessionId.isValid()) dwSessionId = (*lpfnWTSGetActiveConsoleSessionId)();
-							Sleep(1000);
-							sessidcounter++;
-							if (sessidcounter > 10) break;
+					typedef VOID(WINAPI *SendSas)(BOOL asUser);
+					HINSTANCE Inst = LoadLibrary("sas.dll");
+					SendSas sendSas = (SendSas)GetProcAddress(Inst, "SendSAS");
+					if (sendSas) 
+						sendSas(FALSE);
+					else{
+						char WORKDIR[MAX_PATH];
+						char mycommand[MAX_PATH];
+						if (GetModuleFileName(NULL, WORKDIR, MAX_PATH)) {
+							char* p = strrchr(WORKDIR, '\\');
+							if (p == NULL) return;
+							*p = '\0';
 						}
+						strcpy_s(mycommand, "");
+						strcat_s(mycommand, WORKDIR);//set the directory
+						strcat_s(mycommand, "\\");
+						strcat_s(mycommand, "cad.exe");
+						(void)ShellExecute(GetDesktopWindow(), "open", mycommand, "", 0, SW_SHOWNORMAL);
+					}
+					if (Inst) 
+						FreeLibrary(Inst);
+				}
+			break;
 
-						LaunchProcessWin(dwSessionId, false, false);
-						OlddwSessionId = dwSessionId;
-						preconnect_start = false;
+			case WAIT_TIMEOUT:
+				if (RDPMODE && IsAnyRDPSessionActive()) {
+					//First RUN	
+					if (ProcessInfo.hProcess == NULL) {
+						if (IsAnyRDPSessionActive()) {
+							LaunchProcessWin(0, true, false);
+							OlddwSessionId = 0;
+							preconnect_start = false;
+							goto whileloop;
+						}
+						else {
+							dwSessionId = 0xFFFFFFFF;
+							int sessidcounter = 0;
+							while (dwSessionId == 0xFFFFFFFF && !Shutdown){
+								if (lpfnWTSGetActiveConsoleSessionId.isValid()) dwSessionId = (*lpfnWTSGetActiveConsoleSessionId)();
+								Sleep(1000);
+								sessidcounter++;
+								if (sessidcounter > 10) break;
+							}
+							LaunchProcessWin(dwSessionId, false, false);
+							OlddwSessionId = dwSessionId;
+							preconnect_start = false;
+							goto whileloop;
+						}
+					}
+
+					if (preconnect_start == true)
+						if (!IsSessionStillActive(OlddwSessionId)) SetEvent(hEvent);
+
+					// Monitor process
+					DWORD dwCode = 0;
+					bool returnvalue = GetExitCodeProcess(ProcessInfo.hProcess, &dwCode);
+					if (!returnvalue) {
+						//bad handle, thread already terminated
+						if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
+						if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
+						ProcessInfo.hProcess = NULL;
+						ProcessInfo.hThread = NULL;
+						RDPMODE = myIniFile.ReadInt("admin", "rdpmode", 0);
+						Sleep(1000);
 						goto whileloop;
 					}
-				}
 
-				if (preconnect_start == true)
-					if (!IsSessionStillActive(OlddwSessionId)) SetEvent(hEvent);
-
-				// Monitor process
-				DWORD dwCode = 0;
-				bool returnvalue = GetExitCodeProcess(ProcessInfo.hProcess, &dwCode);
-				if (!returnvalue){
-					//bad handle, thread already terminated
-					if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
-					if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
+					if (dwCode == STILL_ACTIVE) 
+						goto whileloop;
+					if (ProcessInfo.hProcess) 
+						WaitForSingleObject(ProcessInfo.hProcess, 15000);
+					if (ProcessInfo.hProcess) 
+						CloseHandle(ProcessInfo.hProcess);
+					if (ProcessInfo.hThread) 
+						CloseHandle(ProcessInfo.hThread);
 					ProcessInfo.hProcess = NULL;
 					ProcessInfo.hThread = NULL;
 					RDPMODE = myIniFile.ReadInt("admin", "rdpmode", 0);
 					Sleep(1000);
 					goto whileloop;
-				}
-
-				if (dwCode == STILL_ACTIVE) goto whileloop;
-				if (ProcessInfo.hProcess) 
-					WaitForSingleObject(ProcessInfo.hProcess, 15000);
-				if (ProcessInfo.hProcess) 
-					CloseHandle(ProcessInfo.hProcess);
-				if (ProcessInfo.hThread) 
-					CloseHandle(ProcessInfo.hThread);
-				ProcessInfo.hProcess = NULL;
-				ProcessInfo.hThread = NULL;
-				RDPMODE = myIniFile.ReadInt("admin", "rdpmode", 0);
-				Sleep(1000);
-				goto whileloop;
-				}//timeout
-			else
-			{
-				if (lpfnWTSGetActiveConsoleSessionId.isValid()) 
-					dwSessionId = (*lpfnWTSGetActiveConsoleSessionId)();
-				if (OlddwSessionId != dwSessionId)
-					SetEvent(hEvent);
-				if (dwSessionId != 0xFFFFFFFF){
-					DWORD dwCode = 0;
-					if (ProcessInfo.hProcess == NULL){
-						//First RUNf
-
-						LaunchProcessWin(dwSessionId, false, false);
-						OlddwSessionId = dwSessionId;
-					}
-					else if (GetExitCodeProcess(ProcessInfo.hProcess, &dwCode)){
-						if (dwCode != STILL_ACTIVE){
-
-							WaitForSingleObject(ProcessInfo.hProcess, 15000);
-							if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
-							if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
+					}//timeout
+				else
+				{
+					if (lpfnWTSGetActiveConsoleSessionId.isValid()) 
+						dwSessionId = (*lpfnWTSGetActiveConsoleSessionId)();
+					if (OlddwSessionId != dwSessionId)
+						SetEvent(hEvent);
+					if (dwSessionId != 0xFFFFFFFF) {
+						DWORD dwCode = 0;
+						if (ProcessInfo.hProcess == NULL) {
+							//First RUNf
+							LaunchProcessWin(dwSessionId, false, false);
+							OlddwSessionId = dwSessionId;
+						}
+						else if (GetExitCodeProcess(ProcessInfo.hProcess, &dwCode)) {
+							if (dwCode != STILL_ACTIVE) {
+								WaitForSingleObject(ProcessInfo.hProcess, 15000);
+								if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
+								if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
+								ProcessInfo.hProcess = NULL;
+								ProcessInfo.hThread = NULL;							
+								int sessidcounter = 0;
+								while (dwSessionId == 0xFFFFFFFF && !Shutdown) {
+									Sleep(1000);
+									if (lpfnWTSGetActiveConsoleSessionId.isValid()) dwSessionId = (*lpfnWTSGetActiveConsoleSessionId)();
+									sessidcounter++;
+									if (sessidcounter > 10) break;
+								}
+								RDPMODE = myIniFile.ReadInt("admin", "rdpmode", 0);
+								goto whileloop;
+							}
+						}
+						else {
+							if (ProcessInfo.hProcess) 
+								CloseHandle(ProcessInfo.hProcess);
+							if (ProcessInfo.hThread) 
+								CloseHandle(ProcessInfo.hThread);
 							ProcessInfo.hProcess = NULL;
-							ProcessInfo.hThread = NULL;							
+							ProcessInfo.hThread = NULL;
 							int sessidcounter = 0;
 
-							while (dwSessionId == 0xFFFFFFFF){
+							while (dwSessionId == 0xFFFFFFFF && !Shutdown) {
 								Sleep(1000);
-								if (lpfnWTSGetActiveConsoleSessionId.isValid()) dwSessionId = (*lpfnWTSGetActiveConsoleSessionId)();
+								if (lpfnWTSGetActiveConsoleSessionId.isValid()) 
+									dwSessionId = (*lpfnWTSGetActiveConsoleSessionId)();
 								sessidcounter++;
-								if (sessidcounter > 10) break;
+								if (sessidcounter > 10) 
+									break;
 							}
 
 							RDPMODE = myIniFile.ReadInt("admin", "rdpmode", 0);
 							goto whileloop;
 						}
 					}
-					else{
-						if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
-						if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
-						ProcessInfo.hProcess = NULL;
-						ProcessInfo.hThread = NULL;
-						int sessidcounter = 0;
-
-						while (dwSessionId == 0xFFFFFFFF){
-							Sleep(1000);
-							if (lpfnWTSGetActiveConsoleSessionId.isValid()) dwSessionId = (*lpfnWTSGetActiveConsoleSessionId)();
-							sessidcounter++;
-							if (sessidcounter > 10) break;
-						}
-
-						RDPMODE = myIniFile.ReadInt("admin", "rdpmode", 0);
-						goto whileloop;
-					}
 				}
-			}
 
 
-		}//switch
+			}//switch
 
 whileloop:
 		;
@@ -1052,8 +878,10 @@ whileloop:
 		SetEvent(hEvent);
 	if (ProcessInfo.hProcess) {
 		WaitForSingleObject(ProcessInfo.hProcess, 15000);
-		if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
-		if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
+		if (ProcessInfo.hProcess) 
+			CloseHandle(ProcessInfo.hProcess);
+		if (ProcessInfo.hThread) 
+			CloseHandle(ProcessInfo.hThread);
 		ProcessInfo.hProcess = NULL;
 		ProcessInfo.hThread = NULL;
 	}
@@ -1073,46 +901,34 @@ whileloop:
 void disconnect_remote_sessions()
 {
 	typedef BOOLEAN (WINAPI * pWinStationConnect) (HANDLE,ULONG,ULONG,PCWSTR,ULONG);
-	
 	typedef BOOL (WINAPI * pLockWorkStation)();
-
 	HMODULE  hlibwinsta = LoadLibrary("winsta.dll"); 
 	HMODULE  hlibuser32 = LoadLibrary("user32.dll");
 	pWinStationConnect WinStationConnectF=NULL;
 	pLockWorkStation LockWorkStationF=NULL;
 
-
     // don't kick rdp off if there's still an active session
     if (IsAnyRDPSessionActive())
         return;
-
 	if (hlibwinsta)
-	   {
 		   WinStationConnectF=(pWinStationConnect)GetProcAddress(hlibwinsta, "WinStationConnectW"); 
-	   }
-	
 	if (hlibuser32)
-	   {
 		   LockWorkStationF=(pLockWorkStation)GetProcAddress(hlibuser32, "LockWorkStation"); 
-	   }
-	if (WinStationConnectF!=NULL && LockWorkStationF!=NULL)
-		{
-				DWORD ID=0;
-				if (lpfnWTSGetActiveConsoleSessionId.isValid()) ID=(*lpfnWTSGetActiveConsoleSessionId)();
-				WinStationConnectF(0, 0, ID, L"", 0);
-				// sleep to allow the system to finish the connect/disconnect process. If we don't
-				// then the workstation won't get locked every time.
-            	Sleep(3000);
-				if (!LockWorkStationF())
-                {
-                    char msg[1024];
-                    sprintf_s(msg, "LockWorkstation failed with error 0x%0lX", GetLastError());
-                    ::OutputDebugString(msg);
-                }
-
-		}
+	if (WinStationConnectF!=NULL && LockWorkStationF!=NULL){
+		DWORD ID=0;
+		if (lpfnWTSGetActiveConsoleSessionId.isValid())  
+			ID = (*lpfnWTSGetActiveConsoleSessionId)();
+		WinStationConnectF(0, 0, ID, L"", 0);
+		// sleep to allow the system to finish the connect/disconnect process. If we don't
+		// then the workstation won't get locked every time.
+        Sleep(3000);
+		if (!LockWorkStationF()) {
+			char msg[1024];
+            sprintf_s(msg, "LockWorkstation failed with error 0x%0lX", GetLastError());
+            ::OutputDebugString(msg);
+        }
+	}
 	Sleep(3000);
-
 	if (hlibwinsta)
         FreeLibrary(hlibwinsta);
 	if (hlibuser32)
