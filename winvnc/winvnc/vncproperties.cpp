@@ -383,6 +383,7 @@ vncProperties::ShowAdmin(BOOL show, BOOL usersettings)
 				    if(iImpersonateResult == ERROR_SUCCESS)RevertToSelf();
 					CloseHandle(hProcess);
 					CloseHandle(hPToken);
+					fShutdownOrdered = true;
 					return;
 				}
 
