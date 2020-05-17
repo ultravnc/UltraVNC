@@ -1493,8 +1493,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 	case WM_QUERYENDSESSION:
 		{
 			//shutdown or reboot
-			if((lParam & ENDSESSION_LOGOFF) != ENDSESSION_LOGOFF)
-			{
+			if((lParam & ENDSESSION_LOGOFF) != ENDSESSION_LOGOFF) {
 				fShutdownOrdered=TRUE;
 				Sleep(1000);
 				vnclog.Print(LL_INTERR, VNCLOG("SHUTDOWN OS detected\n"));
@@ -1504,9 +1503,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				PostMessage(hwnd, WM_CLOSE, 0, 0);
 				break;
 			}
-
-
-			DWORD SessionID;
+			/*DWORD SessionID;
 			SessionID=GetCurrentSessionID();
 			vnclog.Print(LL_INTERR, VNCLOG("Session ID %i\n"),SessionID);
 			if (SessionID!=0)
@@ -1517,11 +1514,12 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				vnclog.Print(LL_INTINFO, VNCLOG("KillAuthClients() ID_CLOSE \n"));
 				_this->m_server->KillAuthClients();				
 				PostMessage(hwnd, WM_CLOSE, 0, 0);
-			}
+			}*/
 		}	
 		break;
 		
 	case WM_ENDSESSION:
+		fShutdownOrdered = TRUE;
 		vnclog.Print(LL_INTERR, VNCLOG("WM_ENDSESSION\n"));
 		break;
 
@@ -1529,7 +1527,6 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		// The current user may have changed.
 		{
 			strcpy_s(newuser,"");
-
 			if (vncService::CurrentUser((char *) &newuser, sizeof(newuser)))
 			{
 				//vnclog.Print(LL_INTINFO,
@@ -2015,11 +2012,11 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				_this->m_server->AutoReconnectPort(nport);
 			}
 
-			if (_this->m_server->AutoReconnect())
+			if (!fShutdownOrdered && _this->m_server->AutoReconnect())
 			{
 				_this->m_server->AutoConnectRetry();
 			}
-			else
+			else if (!fShutdownOrdered)
 			{
 				// Attempt to create a new socket
 				VSocket *tmpsock;

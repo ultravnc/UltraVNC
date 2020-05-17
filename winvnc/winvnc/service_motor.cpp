@@ -94,7 +94,7 @@ static void WINAPI service_main(DWORD argc, LPTSTR* argv) {
         /* running */
         serviceStatus.dwControlsAccepted |= (SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_SHUTDOWN);
         if (!IsWin2000())
-            serviceStatus.dwControlsAccepted |= SERVICE_ACCEPT_SESSIONCHANGE;
+            serviceStatus.dwControlsAccepted |= SERVICE_ACCEPT_SESSIONCHANGE | SERVICE_CONTROL_PRESHUTDOWN;
 
         serviceStatus.dwCurrentState=SERVICE_RUNNING;
         SetServiceStatus(serviceStatusHandle, &serviceStatus);
@@ -128,6 +128,7 @@ static DWORD WINAPI control_handler_ex(DWORD controlCode, DWORD dwEventType, LPV
     case SERVICE_CONTROL_INTERROGATE:
         break;
 
+	case SERVICE_CONTROL_PRESHUTDOWN:
     case SERVICE_CONTROL_SHUTDOWN:
     case SERVICE_CONTROL_STOP:
         serviceStatus.dwCurrentState=SERVICE_STOP_PENDING;
