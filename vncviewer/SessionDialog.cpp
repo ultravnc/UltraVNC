@@ -79,7 +79,13 @@ SessionDialog::SessionDialog(VNCOptions *pOpt, ClientConnection* pCC, CDSMPlugin
 	fAutoScaling = m_pOpt->m_fAutoScaling;
 	fExitCheck = m_pOpt->m_fExitCheck;
 	m_fUseProxy = m_pOpt->m_fUseProxy;
-	selected= m_pOpt->m_selected_screen;
+	allowMonitorSpanning = m_pOpt->m_allowMonitorSpanning;
+	changeServerRes = m_pOpt->m_ChangeServerRes;
+	extendDisplay = m_pOpt->m_extendDisplay;
+	use_virt = m_pOpt->m_use_virt;
+	use_allmonitors = m_pOpt->m_use_allmonitors;
+	requestedWidth = m_pOpt->m_requestedWidth;
+	requestedHeight = m_pOpt->m_requestedHeight;
 	autoDetect = m_pOpt->autoDetect;
 	SwapMouse = m_pOpt->m_SwapMouse;
 	DisableClipboard = m_pOpt->m_DisableClipboard;
@@ -529,18 +535,6 @@ void SessionDialog::InitMRU(HWND hwnd)
 	IfHostExistLoadSettings(valname);
 }
 
-void SessionDialog::InitMonitors(HWND hwnd)
-{
-	//List monitors
-	tempdisplayclass tdc;
-	tdc.Init();
-	HWND hcomboscreen = GetDlgItem(  hwnd, IDC_SCREEN);
-	SendMessage(hcomboscreen, CB_RESETCONTENT, 0, 0);
-    for (int i = 0; i < tdc.nr_monitors+1; i++) 
-		SendMessage(hcomboscreen, CB_ADDSTRING, 0, (LPARAM) tdc.monarray[i].buttontext);
-	SendMessage(hcomboscreen, CB_SETCURSEL, selected, 0);
-}
-
 bool SessionDialog::connect(HWND hwnd)
 {
 	SettingsFromUI();
@@ -555,7 +549,13 @@ bool SessionDialog::connect(HWND hwnd)
 	m_pOpt->autoDetect = autoDetect;
 	m_pOpt->m_fExitCheck = fExitCheck;
 	m_pOpt->m_fUseProxy = m_fUseProxy;
-	m_pOpt->m_selected_screen = selected;
+	m_pOpt->m_allowMonitorSpanning = allowMonitorSpanning;
+	m_pOpt->m_ChangeServerRes = changeServerRes;
+	m_pOpt->m_extendDisplay = extendDisplay;
+	m_pOpt->m_use_virt = use_virt;
+	m_pOpt->m_use_allmonitors = use_allmonitors;
+	m_pOpt->m_requestedWidth = requestedWidth;
+	m_pOpt->m_requestedHeight = requestedHeight;
 	m_pOpt->m_SwapMouse = SwapMouse;
 	m_pOpt->m_DisableClipboard = DisableClipboard;
 	m_pOpt->m_Use8Bit = Use8Bit;

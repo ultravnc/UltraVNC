@@ -44,11 +44,9 @@ public:
 	void checkmonitors();
 	int nr_monitors;
 	mymonitor monarray[15];
-	int getSelectedScreen(HWND hwnd);
+	int getSelectedScreen(HWND hwnd , bool allowMonitorSpanning);
 
 private:
 	HINSTANCE hUser32;
-	int selected_monitor;
-
 };
 #endif

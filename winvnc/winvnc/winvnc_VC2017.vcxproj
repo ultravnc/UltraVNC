@@ -1277,6 +1277,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\win8</Command>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='IPV6|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="VirtualDisplay.cpp" />
     <ClCompile Include="vistahook.cpp" />
     <ClCompile Include="vncabout.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -2129,6 +2130,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\win8</Command>
     <ClInclude Include="translate.h" />
     <ClInclude Include="uvncUiAccess.h" />
     <ClInclude Include="videodriver.h" />
+    <ClInclude Include="VirtualDisplay.h" />
     <ClInclude Include="vncabout.h" />
     <ClInclude Include="vncacceptdialog.h" />
     <ClInclude Include="vncauth.h" />

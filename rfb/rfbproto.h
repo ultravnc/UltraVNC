@@ -437,6 +437,7 @@ typedef struct {
 
 #define rfbRequestSession 20
 #define rfbSetSession 21
+#define rfbSetDesktopSize 251
 
 
 
@@ -535,6 +536,7 @@ typedef struct {
 #define rfbEncodingPointerPos      0xFFFFFF18
 #define rfbEncodingLastRect        0xFFFFFF20
 #define rfbEncodingNewFBSize       0xFFFFFF21
+#define rfbEncodingExtDesktopSize  0xFFFFFECC
  
 #define rfbEncodingQualityLevel0   0xFFFFFFE0
 #define rfbEncodingQualityLevel1   0xFFFFFFE1
@@ -1182,7 +1184,72 @@ typedef struct _rfbTextChatMsg {
 #define rfbTextMaxSize		4096
 #define rfbTextChatOpen		0xFFFFFFFF 
 #define rfbTextChatClose	0xFFFFFFFE  
-#define rfbTextChatFinished 0xFFFFFFFD  
+#define rfbTextChatFinished 0xFFFFFFFD 
+
+
+/*-----------------------------------------------------------------------------
+ * ExtendedDesktopSize server -> client message
+ *
+ * Informs the client of (re)size of framebuffer, provides information about
+ * physical screens attached, and lets the client knows it can request
+ * resolution changes using SetDesktopSize.
+ */
+
+typedef struct rfbExtDesktopSizeMsg {
+    CARD8 numberOfScreens;
+    CARD8 pad[3];
+
+    /* Followed by rfbExtDesktopScreen[numberOfScreens] */
+} rfbExtDesktopSizeMsg;
+
+typedef struct rfbExtDesktopScreen {
+    CARD32 id;
+    CARD16 x;
+    CARD16 y;
+    CARD16 width;
+    CARD16 height;
+    CARD32 flags;
+} rfbExtDesktopScreen;
+
+/*ultravnc flags
+0 = normal
+1 = virtual
+2 = extend virtual*/
+
+#define sz_rfbExtDesktopSizeMsg (4)
+#define sz_rfbExtDesktopScreen (16)
+
+/* x - reason for the change */
+#define rfbExtDesktopSize_GenericChange 0
+#define rfbExtDesktopSize_ClientRequestedChange 1
+#define rfbExtDesktopSize_OtherClientRequestedChange 2
+
+/* y - status code for change */
+#define rfbExtDesktopSize_Success 0
+#define rfbExtDesktopSize_ResizeProhibited 1
+#define rfbExtDesktopSize_OutOfResources 2
+#define rfbExtDesktopSize_InvalidScreenLayout 3
+
+/*-----------------------------------------------------------------------------
+ * SetDesktopSize client -> server message
+ *
+ * Allows the client to request that the framebuffer and physical screen
+ * resolutions are changed.
+ */
+
+typedef struct rfbSetDesktopSizeMsg {
+    CARD8 type;                       /* always rfbSetDesktopSize */
+    CARD8 pad1;
+    CARD16 width;
+    CARD16 height;
+    CARD8 numberOfScreens;
+    CARD8 pad2;
+
+    /* Followed by rfbExtDesktopScreen[numberOfScreens] */
+} rfbSetDesktopSizeMsg;
+
+#define sz_rfbSetDesktopSizeMsg (8)
+
 
 
 
@@ -1287,6 +1354,7 @@ typedef union {
     rfbKeepAliveMsg kp;
 	rfbNotifyPluginStreamingMsg nsd;
 	rfbRequestSessionMsg rs;
+    rfbExtDesktopSizeMsg eds;
 } rfbServerToClientMsg;
 
 
@@ -1549,4 +1617,5 @@ typedef union {
     rfbKeepAliveMsg kp;
 	rfbRequestSessionMsg rs;
 	rfbSetSessionMsg ss;
+    rfbSetDesktopSizeMsg sdm;
 } rfbClientToServerMsg;

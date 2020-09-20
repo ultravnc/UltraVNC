@@ -29,6 +29,8 @@
 #include "VNCOptions.h"
 #include "MRU.h"
 #include <DSMPlugin/DSMPlugin.h>
+#include<map>
+using namespace std;
 
 class SessionDialog  
 {
@@ -60,16 +62,20 @@ public:
 	HBITMAP hBmpCollaps;
 	void InitPlugin(HWND hwnd);
 	void InitMRU(HWND hwnd);
-	void InitMonitors(HWND hwnd);
 	void InitTab(HWND hwnd);
 	int HandleNotify(HWND hwndDlg, WPARAM wParam, LPARAM lParam);
-	void InitAll(HWND hwnd, LPARAM lParam);
 	int HandeleEncodersMessages(HWND hwnd, WPARAM wParam);
 
 	bool ViewOnly;
 	bool fAutoScaling;
 	bool fExitCheck;
-	int selected;
+	bool allowMonitorSpanning;
+	bool changeServerRes;
+	bool extendDisplay;
+	bool use_virt;
+	bool use_allmonitors;
+	int requestedWidth;
+	int requestedHeight;
 	bool UseEnc[LASTENCODING+1];
 	std::vector<int> PreferredEncodings;
 	bool autoDetect;
@@ -116,11 +122,13 @@ public:
 	bool NoHotKeys;
 	bool setdefaults;
 	bool connect(HWND hwnd);
+	map<pair<int, int>, int >resolutionMap;;
 
 	void HandleQuickOption(int quickoption);
 	void InitDlgProcEncoders();
 	void InitDlgProcKeyboardMouse();
 	void InitDlgProcDisplay();
+	void setDisplays();
 	void InitDlgProcMisc();
 	void InitDlgProcSecurity();	
 	void InitDlgProc(bool loadhost = false, bool initMruNeeded = true);

@@ -58,15 +58,20 @@ extern "C" {
 #include "common/win32_helpers.h"
 #include "display.h"
 #include "Snapshot.h"
+#include <CommCtrl.h>
+#include <shellapi.h>
+#include <LMaccess.h>
+#include <LMat.h>
+#include <LMalert.h>
 
 // [v1.0.2-jp1 fix]
 #pragma comment(lib, "imm32.lib")
 
 #define INITIALNETBUFSIZE 4096
 #ifdef _XZ
-#define MAX_ENCODINGS (LASTENCODING+66)
+#define MAX_ENCODINGS (LASTENCODING+67)
 #else
-#define MAX_ENCODINGS (LASTENCODING+51)
+#define MAX_ENCODINGS (LASTENCODING+52)
 #endif
 #define VWR_WND_CLASS_NAME _T("VNCviewer")
 #define VWR_WND_CLASS_NAME_VIEWER _T("VNCviewerwindow")
@@ -442,6 +447,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	                     // (in Auto mode, ZRLE is used: pointless over a LAN)
 
 	m_fScalingDone = false;
+	m_FullScreen = false;
 
     zis = new rdr::ZlibInStream;
 	zstdis = new rdr::ZstdInStream;
@@ -501,7 +507,6 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 
 	m_nStatusTimer = 0;
 //	m_FTtimer = 0;
-	skipprompt2=true;
 //	flash=NULL;
 
 	m_hmemdc=NULL;
@@ -568,9 +573,10 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	mytouch = new vnctouch;
 	mytouch->Set_ClientConnect(this);
 #endif
-	sizing_set = false;
 
 	ultraVncZlib = new UltraVncZ();
+	desktopsize_requested = true;
+	ShowToolbar = -1;
 }
 
 // helper functions for setting socket timeouts during file transfer
@@ -658,11 +664,11 @@ void ClientConnection::Run()
 // sf@2007 - Autoreconnect
 void ClientConnection::DoConnection(bool reconnect)
 {
-	if (!m_opts.m_NoStatus && !m_hwndStatus)
-		GTGBS_ShowConnectWindow();
 	omni_mutex_lock l(m_bitmapdcMutex);
 	if (m_pDSMPlugin->IsEnabled())
 	{
+		if (!m_opts.m_NoStatus && !m_hwndStatus)
+			GTGBS_ShowConnectWindow();
 		int somethingwrong_counter = 0;
 		while (!m_hwndStatus)
 		{
@@ -774,11 +780,6 @@ HWND ClientConnection::GTGBS_ShowConnectWindow()
 }
 
 ////////////////////////////////////////////////////////
-#include <CommCtrl.h>
-#include <shellapi.h>
-#include <LMaccess.h>
-#include <LMat.h>
-#include <LMalert.h>
 
 void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 {
@@ -3647,17 +3648,11 @@ void ClientConnection::SizeWindow(bool reconnect)
 	RECT workrect;
 	tempdisplayclass tdc;
 	tdc.Init();
-	if (sizing_set) {
-		int mon = tdc.getSelectedScreen(m_hwndMain);
-		if (mon != 0 && m_opts.m_selected_screen != 0) // Thomas Levering
-			m_opts.m_selected_screen = mon;
-	}
-
-	workrect.left=tdc.monarray[m_opts.m_selected_screen].wl;
-	workrect.right=tdc.monarray[m_opts.m_selected_screen].wr;
-	workrect.top=tdc.monarray[m_opts.m_selected_screen].wt;
-	workrect.bottom=tdc.monarray[m_opts.m_selected_screen].wb;
-	sizing_set = true;
+	int mon = tdc.getSelectedScreen(m_hwndMain, m_opts.m_allowMonitorSpanning);	
+	workrect.left=tdc.monarray[mon].wl;
+	workrect.right=tdc.monarray[mon].wr;
+	workrect.top=tdc.monarray[mon].wt;
+	workrect.bottom=tdc.monarray[mon].wb;
 	//SystemParametersInfo(SPI_GETWORKAREA, 0, &workrect, 0);
 	int workwidth = workrect.right -  workrect.left;
 	int workheight = workrect.bottom - workrect.top;
@@ -3807,7 +3802,7 @@ void ClientConnection::SizeWindow(bool reconnect)
     //called by SetWindowPos
     int act_width = m_winwidth;
     int act_height = m_winheight;
-	if (m_opts.m_selected_screen==0 && (m_fullwinwidth <= bb )) //fit on primary
+	if (m_opts.m_allowMonitorSpanning == true && (m_fullwinwidth <= bb )) //fit on primary
 		// -20 for border
 	{
 		if (pos_set == false) SetWindowPos(m_hwndMain, HWND_TOP,tdc.monarray[1].wl + ((tdc.monarray[1].wr-tdc.monarray[1].wl)-m_winwidth) / 2,tdc.monarray[1].wt +
@@ -4062,6 +4057,7 @@ void ClientConnection::SetFormatAndEncodings()
 	// Tight - LastRect - SINGLE WINDOW
 	encs[se->nEncodings++] = Swap32IfLE(rfbEncodingLastRect);
 	encs[se->nEncodings++] = Swap32IfLE(rfbEncodingNewFBSize);
+	encs[se->nEncodings++] = Swap32IfLE(rfbEncodingExtDesktopSize);
 
 	// Modif sf@2002
 	if (m_opts.m_fEnableCache)
@@ -5564,7 +5560,20 @@ inline void ClientConnection::ReadScreenUpdate()
 
 		if (surh.encoding == rfbEncodingNewFBSize)
 		{
+			m_pendingFormatChange = true;
 			ReadNewFBSize(&surh);
+			break;
+		}
+
+		if (surh.encoding == rfbEncodingExtDesktopSize)
+		{
+			rfbExtDesktopSizeMsg edsHdr;
+			ReadExact((char*)&edsHdr, sz_rfbExtDesktopSizeMsg);
+			rfbExtDesktopScreen eds;
+			for (int i = 0; i < edsHdr.numberOfScreens; i++) {
+				ReadExact((char*)&eds, sz_rfbExtDesktopScreen);
+			}
+			SendMonitorSizes();
 			break;
 		}
 
@@ -5913,16 +5922,8 @@ inline void ClientConnection::ReadScreenUpdate()
 			rect.right  = surh.r.x + surh.r.w ;
 			rect.bottom = surh.r.y + surh.r.h;
 
-			if (!m_opts.m_Directx)InvalidateRegion(&rect,&UpdateRegion);
-				//InvalidateScreenRect(&rect);
-		}
-		else if (surh.encoding !=rfbEncodingNewFBSize)
-		{
-			/*if (!directx_used)
-				InvalidateRgn(m_hwndcn, UpdateRegion, FALSE);
-			HRGN tempregion=CreateRectRgn(0,0,0,0);
-			CombineRgn(UpdateRegion,UpdateRegion,tempregion,RGN_AND);
-			DeleteObject(tempregion);*/
+			if (!m_opts.m_Directx)
+				InvalidateRegion(&rect,&UpdateRegion);
 		}
 
 		if (m_TrafficMonitor)
@@ -6920,7 +6921,7 @@ void ClientConnection::ReadNewFBSize(rfbFramebufferUpdateRectHeader *pfburh)
 {
 	{omni_mutex_lock l(m_bitmapdcMutex);
 	ClearCache();
-
+	m_fScalingDone = false;
 	m_si.framebufferWidth = pfburh->r.w / m_nServerScale;
 	m_si.framebufferHeight = pfburh->r.h / m_nServerScale;
 
@@ -6934,6 +6935,62 @@ void ClientConnection::ReadNewFBSize(rfbFramebufferUpdateRectHeader *pfburh)
 	SizeWindow();
 	InvalidateRect(m_hwndcn, NULL, TRUE);
 	RealiseFullScreenMode();
+	SendFullFramebufferUpdateRequest(false);
+}
+
+void ClientConnection::SendMonitorSizes()
+{	
+	if (!m_opts.m_ChangeServerRes) {
+		SendFullFramebufferUpdateRequest(false);
+		return;
+	}
+
+	int flag = 0;
+	if (m_opts.m_use_virt)
+		flag = 1;
+	if (m_opts.m_extendDisplay)
+		flag = 2;
+	
+	rfbSetDesktopSizeMsg sdmz;
+	tempdisplayclass tdc;
+	if (desktopsize_requested) {	
+		desktopsize_requested = false;
+		tdc.Init();
+		if (m_opts.m_use_allmonitors) {
+			sdmz.numberOfScreens = tdc.nr_monitors;
+			sdmz.height = tdc.monarray[0].height;
+			sdmz.width = tdc.monarray[0].width;
+			sdmz.type = rfbSetDesktopSize;
+			WriteExact((char*)&sdmz, sz_rfbSetDesktopSizeMsg);
+			for (int i = 1; i < tdc.nr_monitors + 1; i++) {
+				rfbExtDesktopScreen eds;
+				eds.id = Swap32IfLE(1);
+				eds.x = Swap16IfLE(tdc.monarray[i].offsetx);
+				eds.y = Swap16IfLE(tdc.monarray[i].offsety);
+				eds.width = Swap16IfLE(tdc.monarray[i].width);
+				eds.height = Swap16IfLE(tdc.monarray[i].height);
+				eds.flags = Swap32IfLE(flag);
+				WriteExact((char*)&eds, sz_rfbExtDesktopScreen);
+			}
+		}
+		else {
+			sdmz.numberOfScreens = 1;
+			sdmz.height = tdc.monarray[0].height;
+			sdmz.width = tdc.monarray[0].width;
+			sdmz.type = rfbSetDesktopSize;
+			WriteExact((char*)&sdmz, sz_rfbSetDesktopSizeMsg);
+			rfbExtDesktopScreen eds;
+			eds.id = Swap32IfLE(1);
+			eds.x = Swap16IfLE(0);
+			eds.y = Swap16IfLE(0); 
+			eds.width = Swap16IfLE(m_opts.m_requestedWidth == 0 ? tdc.monarray[1].width : m_opts.m_requestedWidth);
+			eds.height = Swap16IfLE(m_opts.m_requestedHeight == 0 ? tdc.monarray[1].height : m_opts.m_requestedHeight);
+			eds.flags = Swap32IfLE(flag);
+			WriteExact((char*)&eds, sz_rfbExtDesktopScreen);
+
+		}		
+	}
+	
 }
 
 //
@@ -9088,24 +9145,8 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 			case WM_KILLFOCUS:
 				{
 					if (!_this->m_running) return 0;
-					if (_this->InFullScreenMode()) {
-
-						//HWND handleW1 = FindWindow("Shell_traywnd", "");
-   						//SetWindowPos(handleW1, 0, 0, 0, 0, 0, 64);
+					if (_this->InFullScreenMode())
 						SetWindowPos(hwnd, HWND_TOP, 0,0,100,100, SWP_NOMOVE | SWP_NOSIZE| SWP_NOACTIVATE);
-						// We must top being topmost, but we want to choose our
-						// position carefully.
-						/*HWND foreground = GetForegroundWindow();
-						HWND hwndafter = NULL;
-						if ((foreground == NULL) ||
-							(GetWindowLong(foreground, GWL_EXSTYLE) & WS_EX_TOPMOST)) {
-							hwndafter = HWND_NOTOPMOST;
-						} else {
-							hwndafter = GetNextWindow(foreground, GW_HWNDNEXT);
-						}
-
-						SetWindowPos(hwnd, hwndafter, 0,0,100,100, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);*/
-					}
 					if (_this->m_opts.m_ViewOnly) return 0;
 					_this->m_keymap->ReleaseAllKeys(_this);
 					//adzm 2010-09

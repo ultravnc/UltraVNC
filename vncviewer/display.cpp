@@ -8,7 +8,8 @@ tempdisplayclass::checkmonitors()
 	ZeroMemory(&dd, sizeof(dd));
 	dd.cb = sizeof(dd);
 	DWORD dev = 0; // device index
-	int id = 1; // monitor number, as used by Display Properties > Settings
+	int id = 2; // monitor number, as used by Display Properties > Settings
+	nr_monitors = 1;
 
 	while (EnumDisplayDevices(0, dev, &dd, 0))
 	{
@@ -64,27 +65,45 @@ tempdisplayclass::checkmonitors()
 				if (hm)
 					GetMonitorInfo(hm, &mi);
 			}
-
 			if (hm)
 			{
-					monarray[id].wl=mi.rcWork.left;
-					monarray[id].wt=mi.rcWork.top;
-					monarray[id].wr=mi.rcWork.right;
-					monarray[id].wb=mi.rcWork.bottom;
-					monarray[id].hm = hm;
-			}
-			sprintf_s(monarray[id].buttontext, "%d. %d x %d @ %d,%d - %d-bit - %d Hz", id,dm.dmPelsWidth, dm.dmPelsHeight,
-				dm.dmPosition.x, dm.dmPosition.y, dm.dmBitsPerPel, dm.dmDisplayFrequency);
-			monarray[id].width=dm.dmPelsWidth;
-			monarray[id].height=dm.dmPelsHeight;
-			monarray[id].depth=dm.dmBitsPerPel;
-			monarray[id].offsetx=dm.dmPosition.x;
-			monarray[id].offsety=dm.dmPosition.y;
-			monarray[id].freq=dm.dmDisplayFrequency;
-			strcpy_s(monarray[id].devicename,(char *)dd.DeviceName);
-			nr_monitors=id;
+				if (dd.StateFlags & DISPLAY_DEVICE_ATTACHED_TO_DESKTOP && dd.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE) {
+					monarray[1].wl = mi.rcWork.left;
+					monarray[1].wt = mi.rcWork.top;
+					monarray[1].wr = mi.rcWork.right;
+					monarray[1].wb = mi.rcWork.bottom;
+					monarray[1].hm = hm;
+					sprintf_s(monarray[1].buttontext, "%d. %d x %d @ %d,%d - %d-bit - %d Hz", 1, dm.dmPelsWidth, dm.dmPelsHeight,
+						dm.dmPosition.x, dm.dmPosition.y, dm.dmBitsPerPel, dm.dmDisplayFrequency);
+					monarray[1].width = dm.dmPelsWidth;
+					monarray[1].height = dm.dmPelsHeight;
+					monarray[1].depth = dm.dmBitsPerPel;
+					monarray[1].offsetx = dm.dmPosition.x;
+					monarray[1].offsety = dm.dmPosition.y;
+					monarray[1].freq = dm.dmDisplayFrequency;
+					strcpy_s(monarray[1].devicename, (char*)dd.DeviceName);
 
-			id++;
+				}
+				else
+				{
+					monarray[id].wl = mi.rcWork.left;
+					monarray[id].wt = mi.rcWork.top;
+					monarray[id].wr = mi.rcWork.right;
+					monarray[id].wb = mi.rcWork.bottom;
+					monarray[id].hm = hm;
+					sprintf_s(monarray[id].buttontext, "%d. %d x %d @ %d,%d - %d-bit - %d Hz", id, dm.dmPelsWidth, dm.dmPelsHeight,
+						dm.dmPosition.x, dm.dmPosition.y, dm.dmBitsPerPel, dm.dmDisplayFrequency);
+					monarray[id].width = dm.dmPelsWidth;
+					monarray[id].height = dm.dmPelsHeight;
+					monarray[id].depth = dm.dmBitsPerPel;
+					monarray[id].offsetx = dm.dmPosition.x;
+					monarray[id].offsety = dm.dmPosition.y;
+					monarray[id].freq = dm.dmDisplayFrequency;
+					strcpy_s(monarray[id].devicename, (char*)dd.DeviceName);
+					nr_monitors = id;
+					id++;
+				}
+			}
 		}
 		dev++;
 	}
@@ -124,7 +143,6 @@ tempdisplayclass::checkmonitors()
 tempdisplayclass::tempdisplayclass()
 {
   nr_monitors=0;
-  selected_monitor=1;
   Init();
 }
 
@@ -140,8 +158,10 @@ tempdisplayclass::Init()
 	checkmonitors();
 }
 
-int tempdisplayclass::getSelectedScreen(HWND hwnd)
+int tempdisplayclass::getSelectedScreen(HWND hwnd, bool  allowMonitorSpanning)
 {
+	if (allowMonitorSpanning)
+		return 0;
 	HMONITOR hm = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
 	for (int i = 0; i <= nr_monitors; i ++) {
 		if (monarray[i].hm == hm)

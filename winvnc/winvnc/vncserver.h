@@ -470,6 +470,7 @@ public:
 
 	bool OS_Shutdown;
 	void StopReconnectAll();
+	int m_virtualDisplaySupported;
 
 protected:
 	// The vncServer UpdateTracker class
@@ -599,7 +600,6 @@ protected:
 
 	// sf@2002 - DSMPlugin
 	BOOL m_fDSMPluginEnabled;
-	BOOL m_NatPluginEnabled;
 	char m_szDSMPlugin[128];
 	CDSMPlugin *m_pDSMPlugin;
 	//adzm 2010-05-12 - dsmplugin config
@@ -632,7 +632,7 @@ protected:
 	bool clearconsole;
 	DWORD startTime;
     BOOL m_fSendExtraMouse;
-	bool KillAuthClientsBuzy;
+	bool KillAuthClientsBuzy;	
 };
 
 #endif

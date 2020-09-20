@@ -248,6 +248,7 @@
 #define IDC_CHECK2                      1174
 #define IDC_AUTOACCEPTNOWARN            1174
 #define IDC_HIDESTATUS                  1174
+#define IDC_USERVIRT                    1174
 #define IDC_DIRECTX                     1175
 #define IDC_LIST1                       1176
 #define IDC_EDIT1                       1177
@@ -277,6 +278,7 @@
 #define IDC_LAST_ENCODING               2020
 #define IDC_CHECK3                      2021
 #define IDC_ONLYENCRYPTED               2021
+#define IDC_CHANGESERVER                2021
 #define IDC_SAVEPOS                     2022
 #define IDC_CHECK4                      2023
 #define IDC_HIDEMENU                    2023
@@ -310,6 +312,11 @@
 #define IDC_ZSTD                        2049
 #define IDC_LINE1                       2053
 #define IDC_LINE2                       2054
+#define IDC_SLIDERRES                   2054
+#define IDC_RES                         2055
+#define IDC_ALLMONS                     2056
+#define IDC_ALLOWSPAN                   2057
+#define IDC_EXTENDDISPLAY               2058
 #define IDC_STATIC_SPLIT                9000
 #define IDC_HOSTNAME_DEL                9001
 #define ID_SESSION_SET_CRECT            32777
@@ -604,9 +611,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        222
+#define _APS_NEXT_RESOURCE_VALUE        227
 #define _APS_NEXT_COMMAND_VALUE         50025
-#define _APS_NEXT_CONTROL_VALUE         2054
+#define _APS_NEXT_CONTROL_VALUE         2059
 #define _APS_NEXT_SYMED_VALUE           154
 #endif
 #endif

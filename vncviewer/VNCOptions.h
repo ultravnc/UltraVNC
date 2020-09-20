@@ -17,14 +17,13 @@
 //  USA.
 //
 // If the source code for the program is not available from the place from
-// which you received this file, check 
+// which you received this file, check
 // http://www.uvnc.com/
 //
 ////////////////////////////////////////////////////////////////////////////
- 
 
 #ifndef VNCOPTIONS_H__
-#define VNCOPTIONS_H__ 
+#define VNCOPTIONS_H__
 
 #pragma once
 
@@ -39,16 +38,16 @@
 #define DOTCURSOR 1
 #define NORMALCURSOR 2
 
-class VNCOptions  
+class VNCOptions
 {
 public:
 	VNCOptions();
 	VNCOptions& operator=(VNCOptions& s);
 	virtual ~VNCOptions();
-	
+
 	// Save and load a set of options from a config file
-	void Save(char *fname);
-	void Load(char *fname);
+	void Save(char* fname);
+	void Load(char* fname);
 
 	// process options
 	bool	m_listening;
@@ -71,15 +70,15 @@ public:
 	bool	m_Directx;
 	bool    m_ShowToolbar;
 
-    bool	autoDetect;
-	int		m_Use8Bit;	
+	bool	autoDetect;
+	int		m_Use8Bit;
 	std::vector<int> m_PreferredEncodings;
 
 	bool	m_SwapMouse;
-	bool    m_Emul3Buttons; 
+	bool    m_Emul3Buttons;
 	bool    m_JapKeyboard;
- 	int     m_Emul3Timeout;
- 	int     m_Emul3Fuzz;
+	int     m_Emul3Timeout;
+	int     m_Emul3Fuzz;
 	bool	m_Shared;
 	bool    m_NoBorder;
 	bool	m_DeiconifyOnBell;
@@ -106,27 +105,34 @@ public:
 	bool	m_fUseDSMPlugin;
 	TCHAR   m_szDSMPluginFilename[_MAX_PATH];
 	bool	m_oldplugin;
-	int m_saved_scale_num; 
+	int m_saved_scale_num;
 	int m_saved_scale_den;
 	bool m_saved_scaling;
 	TCHAR	m_kbdname[9];
 	bool	m_kbdSpecified;
-	bool	m_UseEnc[LASTENCODING+1];
+	bool	m_UseEnc[LASTENCODING + 1];
 	TCHAR   m_host_options[256];
 	int     m_port;
 	TCHAR   m_proxyhost[256];
 	int     m_proxyport;
 	bool	m_fUseProxy;
-	int m_selected_screen;
-    int     m_logLevel;
-    bool    m_logToFile, m_logToConsole;
-    TCHAR   m_logFilename[_MAX_PATH];
+	bool	m_allowMonitorSpanning;
+	bool	m_ChangeServerRes;
+	bool	m_extendDisplay;
+	bool	m_use_virt;
+	bool	m_use_allmonitors;
+	int		m_requestedWidth;
+	int		m_requestedHeight;
+
+	int     m_logLevel;
+	bool    m_logToFile, m_logToConsole;
+	TCHAR   m_logFilename[_MAX_PATH];
 	int m_delay;
 	int	m_autoReconnect;
 	bool m_NoMoreCommandLineUserPassword;
 	bool m_fExitCheck; //PGM @ Advantig
-    int m_FTTimeout;
-    int m_keepAliveInterval;
+	int m_FTTimeout;
+	int m_keepAliveInterval;
 	int m_IdleInterval;
 	bool m_fAutoAcceptIncoming;
 	bool m_fAutoAcceptNoDSM;
@@ -137,13 +143,13 @@ public:
 	bool m_giienable;
 #endif
 
-	int DoDialog(bool running = false,HWND hwnd=NULL);
+	int DoDialog(bool running = false, HWND hwnd = NULL);
 	void SetFromCommandLine(LPTSTR szCmdLine);
 
-    void CancelDialog();
+	void CancelDialog();
 	void setDefaultDocumentPath();
-	static BOOL CALLBACK OptDlgProc(  HWND hwndDlg,  UINT uMsg, 
-		WPARAM wParam, LPARAM lParam );
+	static BOOL CALLBACK OptDlgProc(HWND hwndDlg, UINT uMsg,
+		WPARAM wParam, LPARAM lParam);
 
 	TCHAR m_document_folder[MAX_PATH];
 	TCHAR m_prefix[56];
@@ -152,13 +158,13 @@ public:
 
 	TCHAR m_optionfile[MAX_PATH];
 	void VNCOptions::setDefaultOptionsFileName();
-	TCHAR *VNCOptions::getDefaultOptionsFileName();
+	TCHAR* VNCOptions::getDefaultOptionsFileName();
 
 private:
-    void ShowUsage(LPTSTR info = NULL);
+	void ShowUsage(LPTSTR info = NULL);
 	void FixScaling();
 
-    HWND hwnd;
+	HWND hwnd;
 };
 
 #endif VNCOPTIONS_H__

@@ -83,6 +83,7 @@
     <ClCompile Include="ScreenCapture.cpp" />
     <ClCompile Include="cadthread.cpp" />
     <ClCompile Include="..\..\common\UltraVncZ.cpp" />
+    <ClCompile Include="VirtualDisplay.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\ZipUnZip32\ZipUnZip32.h">
@@ -280,6 +281,7 @@
     <ClInclude Include="cadthread.h" />
     <ClInclude Include="Header.h" />
     <ClInclude Include="..\..\common\UltraVncZ.h" />
+    <ClInclude Include="VirtualDisplay.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="VTune\winvnc.vpj" />
@@ -443,5 +445,7 @@
     <Image Include="down.bmp" />
     <Image Include="res\LedGreen.bmp" />
     <Image Include="res\LedRed.bmp" />
+    <Image Include="res\down.bmp" />
+    <Image Include="res\up.bmp" />
   </ItemGroup>
 </Project>

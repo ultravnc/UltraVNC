@@ -180,7 +180,15 @@ void SessionDialog::SaveToFile(char *fname, bool asDefault)
 	saveInt("QuickOption",			quickoption,	fname);
 	saveInt("UseDSMPlugin",			fUseDSMPlugin,	fname);
 	saveInt("UseProxy",				m_fUseProxy,	fname);
-	saveInt("selectedscreen",		selected,	fname);
+	saveInt("allowMonitorSpanning", allowMonitorSpanning, fname);
+	saveInt("ChangeServerRes", changeServerRes, fname);
+	saveInt("extendDisplay", extendDisplay, fname);
+	saveInt("useVirt", use_virt, fname);	
+	saveInt("useAllMonitors", use_allmonitors, fname);
+	saveInt("requestedWidth", requestedWidth, fname);
+	saveInt("requestedHeight", requestedHeight, fname);
+
+
 	WritePrivateProfileString("options", "DSMPlugin",	szDSMPluginFilename, fname);
 	WritePrivateProfileString("options", "folder",		folder, fname);
 	WritePrivateProfileString("options", "prefix",		prefix, fname);
@@ -252,7 +260,15 @@ void SessionDialog::LoadFromFile(char *fname)
   quickoption  =		readInt("QuickOption",		quickoption, fname);
   fUseDSMPlugin =		readInt("UseDSMPlugin",		fUseDSMPlugin, fname) != 0;
   m_fUseProxy =			readInt("UseProxy",			m_fUseProxy, fname) != 0;
-  selected=				readInt("selectedscreen",			selected, fname);
+  allowMonitorSpanning = readInt("allowMonitorSpanning", allowMonitorSpanning, fname);
+  changeServerRes = readInt("ChangeServerRes", changeServerRes, fname);
+  extendDisplay = readInt("extendDisplay", extendDisplay, fname);
+  use_virt = readInt("useVirt", use_virt, fname);
+  use_allmonitors = readInt("useAllMonitors", use_allmonitors, fname);
+
+  requestedWidth = readInt("requestedWidth", requestedWidth, fname);
+  requestedHeight = readInt("requestedHeight", requestedHeight, fname);
+
   GetPrivateProfileString("options", "DSMPlugin", "NoPlugin", szDSMPluginFilename, MAX_PATH, fname);
   GetPrivateProfileString("options", "folder", folder, folder, MAX_PATH, fname);
   GetPrivateProfileString("options", "prefix", prefix, prefix, 56, fname);
@@ -350,7 +366,13 @@ void SessionDialog::SetDefaults()
 	quickoption = 1;				// sf@2002 - Auto Mode as default
 	fUseDSMPlugin = false;
 	oldplugin=false;
-	selected=1;
+	allowMonitorSpanning = 0;
+	changeServerRes = 0;
+	extendDisplay = 0;
+	use_virt = 0;
+	use_allmonitors =0;
+	requestedWidth = 0;
+	requestedHeight = 0;
 	_tcscpy_s(prefix, "vnc_");
 	_tcscpy_s(imageFormat, ".jpeg");
 	fAutoAcceptIncoming = false;

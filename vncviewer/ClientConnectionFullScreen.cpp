@@ -28,6 +28,7 @@
 #include "vncviewer.h"
 #include "ClientConnection.h"
 #include "FullScreenTitleBar.h" //Added by: Lars Werner (http://lars.werner.no)
+#include "display.h"
 
 // Parameters for scrolling in full screen mode
 #define BUMPSCROLLBORDER 8
@@ -44,28 +45,19 @@ bool ClientConnection::InFullScreenMode()
 // You can explicitly change mode by calling this
 void ClientConnection::SetFullScreenMode(bool enable)
 {
-	if (m_opts.m_FullScreen==true) skipprompt2=true;
-	else skipprompt2=false;
+	if (enable) {
+		ShowToolbar = m_opts.m_ShowToolbar;
+		m_opts.m_ShowToolbar = 0;		
+	}
+	else if (ShowToolbar != -1) {		
+		m_opts.m_ShowToolbar = ShowToolbar;
+		ShowToolbar = -1;		
+	}
+	SizeWindow();
+
 	m_opts.m_FullScreen = enable;
 	RealiseFullScreenMode();
-
-	// Modif sf@2002 - v1.1.0 - In case of server scaling
-	// Clear the Window (in black)
-    if (m_opts.m_nServerScale > 1)
-    {
-        /*RECT winrect;
-        GetWindowRect(m_hwndMain, &winrect);
-        int winwidth = winrect.right - winrect.left;
-        int winheight = winrect.bottom - winrect.top;
-        RECT rect;
-        SetRect(&rect, 0,0, winwidth, winheight);
-        COLORREF bgcol = RGB(0x0, 0x0, 0x0);
-        FillSolidRect_ultra(0, 0, winwidth, winheight, m_myFormat.bitsPerPixel,(BYTE *) &bgcol);*/
-        // Update the whole screen 
-        //adzm 2010-09
-        SendFullFramebufferUpdateRequest(false);
-    }
-    
+	SendFullFramebufferUpdateRequest(false);
     RedrawWindow(m_hwndMain, NULL, NULL, RDW_FRAME | RDW_INVALIDATE);
 }
 
@@ -78,30 +70,16 @@ void ClientConnection::RealiseFullScreenMode()
 		BorderlessMode();
 		return;
 	}
+	if (m_FullScreen != m_opts.m_FullScreen) {
+		m_FullScreen = m_opts.m_FullScreen;
+		m_fScalingDone = false;
+	}
 
 	LONG style = GetWindowLong(m_hwndMain, GWL_STYLE);
-	if (m_opts.m_FullScreen) {
-		// A bit crude here - we can skip the prompt on a registry setting.
-		// We'll do this properly later.
-		DWORD skipprompt = 0;
-
-		//ofnInit();
-		vnclog.Print(1, "Saving to %s\n", m_opts.getDefaultOptionsFileName());
-		skipprompt = 0;
-		skipprompt = GetPrivateProfileInt("connection", "SkipFullScreenPrompt", skipprompt, m_opts.getDefaultOptionsFileName());
-		
-		skipprompt = 1; //sf@2004 - This prompt isn't needed any more now that we have
-						// the fullscreen title bar :) Thanks Lars !
-		if (!skipprompt && !skipprompt2)
-			MessageBox(m_hwndMain, 
-				sz_J1,
-				sz_J2,
-				MB_OK | MB_ICONINFORMATION | MB_TOPMOST | MB_SETFOREGROUND);
-
-		ShowWindow(m_hwndMain, SW_MAXIMIZE);
-
+	if (m_opts.m_FullScreen) {		
 		style = GetWindowLong(m_hwndMain, GWL_STYLE);
 		style &= ~(WS_CAPTION | WS_DLGFRAME | WS_THICKFRAME);
+		style |= WS_MAXIMIZE |WS_POPUP;
 		SetWindowLong(m_hwndMain, GWL_STYLE, style);
 
         // 7 May 2008 jdp
@@ -114,14 +92,26 @@ void ClientConnection::RealiseFullScreenMode()
         int y = mi.rcMonitor.top;
 		int cx = mi.rcMonitor.right - x; 
 		int cy = mi.rcMonitor.bottom - y;
-		SetWindowPos(m_hwndMain, HWND_TOPMOST, x, y, cx+3, cy+3, SWP_FRAMECHANGED);
+
+		// when the remote size is bigger then 1,5 time the localscreen we use all monitors in
+		// fullscreen mode
+		if (m_si.framebufferWidth > cx * 1.5 || m_si.framebufferHeight > cy * 1.5) {
+			tempdisplayclass tdc;
+			tdc.Init();
+			x = 0;
+			y = 0;
+			cy = tdc.monarray[0].height;
+			cx = tdc.monarray[0].width;
+		}
+
+		SetWindowPos(m_hwndMain, HWND_TOPMOST, x, y, cx, cy, SWP_FRAMECHANGED);
         TitleBar.MoveToMonitor(hMonitor);
 		// adzm - 2010-07 - Extended clipboard
 		CheckMenuItem(m_hPopupMenuDisplay, ID_FULLSCREEN, MF_BYCOMMAND|MF_CHECKED);
 		if (m_opts.m_ShowToolbar)
 			SetWindowPos(m_hwndcn, m_hwndTBwin,0,m_TBr.bottom,m_winwidth, m_winheight, SWP_SHOWWINDOW);
 		else  {
-			SetWindowPos(m_hwndcn, m_hwndTBwin,0,0,cx+3, cy+3, SWP_SHOWWINDOW);
+			SetWindowPos(m_hwndcn, m_hwndTBwin,0,0,cx, cy, SWP_SHOWWINDOW);
 			SetWindowPos(m_hwndTBwin, NULL ,0,0,0, 0, SWP_HIDEWINDOW);
 		}
 		TitleBar.DisplayWindow(TRUE, TRUE); //Added by: Lars Werner (http://lars.werner.no)
@@ -129,6 +119,12 @@ void ClientConnection::RealiseFullScreenMode()
 		else TitleBar.SetText(m_desktopName); //Added by: Lars Werner (http://lars.werner.no)
 
 	} else {
+		if (m_opts.m_ShowToolbar)
+			SetWindowPos(m_hwndcn, m_hwndTBwin, 0, m_TBr.bottom, m_winwidth, m_winheight, SWP_SHOWWINDOW);
+		else {
+			SetWindowPos(m_hwndcn, m_hwndTBwin, 0, 0, m_winwidth, m_winheight, SWP_SHOWWINDOW);
+			SetWindowPos(m_hwndTBwin, NULL, 0, 0, 0, 0, SWP_HIDEWINDOW);
+		}
 		ShowWindow(m_hwndMain, SW_NORMAL);
 		style = GetWindowLong(m_hwndMain, GWL_STYLE);
 		style |= WS_DLGFRAME | WS_THICKFRAME | WS_CAPTION;

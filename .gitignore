@@ -1,7 +1,6 @@
 zipunzip_src/unzip/windll/vc6/lib/Debug/
 zipunzip_src/zip20/windll/visualc/lib/Debug/
 *.user
-winvnc/winvnc/Debug/
 winvnc/Debug/
 winvnc/bin/
 vncviewer/omnithread/Debug/
@@ -20,7 +19,6 @@ rdr/Release/
 *.obj
 *.log
 *.tlog
-*.dll
 *.lib
 *.pdb
 *.exe
