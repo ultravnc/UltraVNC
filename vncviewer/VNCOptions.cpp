@@ -351,9 +351,9 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
   m_port				= s.m_port;
 
   strcpy_s(m_proxyhost, 256,s.m_proxyhost);
-  m_proxyport				= s.m_proxyport;
-  m_fUseProxy	      = s.m_fUseProxy;
-  m_selected_screen		=s.m_selected_screen;
+  m_proxyport		= s.m_proxyport;
+  m_fUseProxy	    = s.m_fUseProxy;
+  m_selected_screen	=s.m_selected_screen;
 
   m_x = s.m_x;
   m_y = s.m_y;

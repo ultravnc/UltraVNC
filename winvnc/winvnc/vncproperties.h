@@ -78,6 +78,11 @@ public:
 	void SaveUserPrefsToIniFile();
     void ReloadDynamicSettings();
 
+	void ExpandBox(HWND hDlg, BOOL fExpand);
+	BOOL m_bExpanded;
+	HBITMAP hBmpExpand;
+	HBITMAP hBmpCollaps;
+
 	// Implementation
 protected:
 	// The server object to which this properties object is attached.
@@ -102,6 +107,7 @@ protected:
 	void SavePassword(HKEY k, char *buffer);
 	void LoadPassword2(HKEY k, char *buffer); //PGM
 	void SavePassword2(HKEY k, char *buffer); //PGM
+	char service_commandline[1024];
 
 	// String handling
 	char * LoadString(HKEY k, LPCSTR valname);
@@ -178,6 +184,7 @@ protected:
 
 private:
 	void InitPortSettings(HWND hwnd); // TightVNC 1.1.8
+	int cx, cy;
 
 
 };

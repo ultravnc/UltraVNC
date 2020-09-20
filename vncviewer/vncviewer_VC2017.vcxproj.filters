@@ -1,60 +1,171 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="AboutBox.cpp" />
-    <ClCompile Include="AccelKeys.cpp" />
-    <ClCompile Include="AuthDialog.cpp" />
-    <ClCompile Include="buildtime.cpp" />
-    <ClCompile Include="ClientConnection.cpp" />
-    <ClCompile Include="ClientConnectionCacheRect.cpp" />
-    <ClCompile Include="ClientConnectionClipboard.cpp" />
-    <ClCompile Include="ClientConnectionCopyRect.cpp" />
-    <ClCompile Include="ClientConnectionCoRRE.cpp" />
-    <ClCompile Include="ClientConnectionCursor.cpp" />
-    <ClCompile Include="ClientConnectionFile.cpp" />
-    <ClCompile Include="ClientConnectionFullScreen.cpp" />
-    <ClCompile Include="ClientConnectionHextile.cpp" />
-    <ClCompile Include="ClientConnectionRaw.cpp" />
-    <ClCompile Include="ClientConnectionRRE.cpp" />
-    <ClCompile Include="ClientConnectionTight.cpp" />
-    <ClCompile Include="ClientConnectionUltra.cpp" />
-    <ClCompile Include="ClientConnectionUltra2.cpp" />
-    <ClCompile Include="ClientConnectionZlib.cpp" />
-    <ClCompile Include="ClientConnectionZlibHex.cpp" />
-    <ClCompile Include="..\common\Clipboard.cpp" />
-    <ClCompile Include="d3des.c" />
-    <ClCompile Include="Daemon.cpp" />
-    <ClCompile Include="..\rfb\dh.cpp" />
-    <ClCompile Include="..\DSMPlugin\DSMPlugin.cpp" />
-    <ClCompile Include="directx\directxviewer.cpp" />
-    <ClCompile Include="display.cpp" />
-    <ClCompile Include="Exception.cpp" />
-    <ClCompile Include="FileTransfer.cpp" />
-    <ClCompile Include="FullScreenTitleBar.cpp" />
-    <ClCompile Include="KeyMap.cpp" />
-    <ClCompile Include="KeyMapjap.cpp" />
-    <ClCompile Include="Log.cpp" />
-    <ClCompile Include="LowLevelHook.cpp" />
-    <ClCompile Include="MessBox2.cpp" />
-    <ClCompile Include="..\lzo\minilzo.c" />
-    <ClCompile Include="MRU.cpp" />
-    <ClCompile Include="SessionDialog.cpp" />
-    <ClCompile Include="sessiondialogLoadSave.cpp" />
-    <ClCompile Include="SessionDialogTabs.cpp" />
-    <ClCompile Include="Snapshot.cpp" />
-    <ClCompile Include="stdhdrs.cpp" />
-    <ClCompile Include="TextChat.cpp" />
-    <ClCompile Include="vncauth.c" />
-    <ClCompile Include="VNCOptions.cpp" />
-    <ClCompile Include="vnctouch.cpp" />
-    <ClCompile Include="vncviewer.cpp" />
-    <ClCompile Include="VNCviewerApp.cpp" />
-    <ClCompile Include="VNCviewerApp32.cpp" />
-    <ClCompile Include="..\common\win32_helpers.cpp" />
-    <ClCompile Include="..\ZipUnZip32\ZipUnzip32.cpp" />
-    <ClCompile Include="xz.cpp" />
-    <ClCompile Include="zrle.cpp" />
-    <ClCompile Include="..\common\UltraVncZ.cpp" />
+    <ClCompile Include="AboutBox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AccelKeys.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AuthDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="buildtime.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientConnection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientConnectionCacheRect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientConnectionClipboard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientConnectionCopyRect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientConnectionCoRRE.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientConnectionCursor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientConnectionFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientConnectionFullScreen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientConnectionHextile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientConnectionRaw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientConnectionRRE.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientConnectionTight.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientConnectionUltra.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientConnectionUltra2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientConnectionZlib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientConnectionZlibHex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\Clipboard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="d3des.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Daemon.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rfb\dh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="directx\directxviewer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="display.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DSMPlugin\DSMPlugin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Exception.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FileTransfer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VNCviewerApp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VNCviewerApp32.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\win32_helpers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="xz.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ZipUnZip32\ZipUnzip32.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zrle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vncviewer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vnctouch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VNCOptions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vncauth.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\UltraVncZ.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TextChat.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stdhdrs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Snapshot.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SessionDialogTabs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sessiondialogLoadSave.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SessionDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MRU.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lzo\minilzo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MessBox2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MessBox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LowLevelHook.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Log.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="KeyMapjap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="KeyMap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FullScreenTitleBar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AboutBox.h">
@@ -162,42 +273,29 @@
     <ClInclude Include="SessionDialog.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="res\resource.h">
-      <Filter>Resources</Filter>
-    </ClInclude>
     <ClInclude Include="..\rfb\zrleDecode.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\UltraVncZ.h" />
+    <ClInclude Include="FpsCounter.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="keysym.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="MEssBox.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="Natplugin.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\UltraVncZ.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="res\resource.h">
+      <Filter>header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="res\stat\1op1.bmp">
-      <Filter>Resources</Filter>
-    </Image>
-    <Image Include="res\down.bmp">
-      <Filter>Resources</Filter>
-    </Image>
-    <Image Include="res\stat\full.bmp">
-      <Filter>Resources</Filter>
-    </Image>
-    <Image Include="res\stat\photo.bmp">
-      <Filter>Resources</Filter>
-    </Image>
-    <Image Include="res\stat\switch.bmp">
-      <Filter>Resources</Filter>
-    </Image>
-    <Image Include="res\up.bmp">
-      <Filter>Resources</Filter>
-    </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="VTune\vncviewer.vpj" />
-    <None Include="res\B46.ico">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="res\stat\back.bmp">
-      <Filter>Resources</Filter>
-    </None>
     <None Include="res\background2.bmp">
       <Filter>Resources</Filter>
     </None>
@@ -213,9 +311,6 @@
     <None Include="res\bitmap2.bmp">
       <Filter>Resources</Filter>
     </None>
-    <None Include="res\stat\both.bmp">
-      <Filter>Resources</Filter>
-    </None>
     <None Include="res\stat\bitmap9.bmp">
       <Filter>Resources</Filter>
     </None>
@@ -225,109 +320,25 @@
     <None Include="res\stat\bitmap5.bmp">
       <Filter>Resources</Filter>
     </None>
-    <None Include="res\stat\closeup.bmp">
-      <Filter>Resources</Filter>
-    </None>
     <None Include="COPYING.txt">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="cpp.hint">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="res\cursor1.cur">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="res\cursorsel.cur">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="res\dir.ico">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="res\drive.ico">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="res\file.ico">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="res\Finger.cur">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="res\stat\flash.bmp">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="res\stat\front.bmp">
       <Filter>Resources</Filter>
     </None>
     <None Include="History.txt">
       <Filter>Resources</Filter>
     </None>
-    <None Include="res\hoch.bmp">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="res\idr_tray.ico">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="res\idr_tray_disabled.ico">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="res\l1.bmp">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="res\l2.bmp">
-      <Filter>Resources</Filter>
-    </None>
     <None Include="LICENCE.txt">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="res\stat\mainicon.ico">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="res\stat\maximizeup.bmp">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="res\stat\minimizeup.bmp">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="res\quer.bmp">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="res\stat\pinup.bmp">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="res\stat\pindown.bmp">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="res\stat\none.bmp">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="res\nocursor.cur">
       <Filter>Resources</Filter>
     </None>
     <None Include="Tango_sx.bmp">
       <Filter>Resources</Filter>
     </None>
-    <None Include="res\Tango_sx.bmp">
-      <Filter>Resources</Filter>
-    </None>
     <None Include="Tango_s.bmp">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="res\Tango_s.bmp">
       <Filter>Resources</Filter>
     </None>
     <None Include="Tango_lx.bmp">
       <Filter>Resources</Filter>
     </None>
-    <None Include="res\Tango_lx.bmp">
-      <Filter>Resources</Filter>
-    </None>
     <None Include="Tango_l.bmp">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="res\Tango_l.bmp">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="res\vnc64.BMP">
       <Filter>Resources</Filter>
     </None>
     <None Include="ToDo.txt">
@@ -366,24 +377,131 @@
     <None Include="res\vnc.bmp">
       <Filter>Resources</Filter>
     </None>
-    <None Include="res\vnc32.BMP">
+    <None Include="res\Finger.cur">
       <Filter>Resources</Filter>
     </None>
-    <None Include="res\vncviewer.ico">
+    <None Include="res\cursorsel.cur">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="res\cursor1.cur">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="res\nocursor.cur">
       <Filter>Resources</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Resources">
       <UniqueIdentifier>{361f573b-0b0b-4d25-b607-7a26ad499560}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="header">
       <UniqueIdentifier>{bb10bdae-6f4e-4386-84a7-27bbcec55005}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{50d2e024-87a5-437c-9b8a-faecf4803df9}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="res\vncviewer.rc">
       <Filter>Resources</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\up.bmp">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="res\hoch.bmp">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="res\quer.bmp">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="res\stat\back.bmp">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="res\stat\both.bmp">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="res\stat\front.bmp">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="res\stat\none.bmp">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="res\vnc64.BMP">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="res\stat\closeup.bmp">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="res\stat\maximizeup.bmp">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="res\stat\minimizeup.bmp">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="res\stat\pindown.bmp">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="res\stat\pinup.bmp">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="res\vnc32.BMP">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="res\idr_tray.ico">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="res\B46.ico">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="res\file.ico">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="res\dir.ico">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="res\drive.ico">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="res\Tango_sx.bmp">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="res\Tango_l.bmp">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="res\Tango_lx.bmp">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="res\Tango_s.bmp">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="res\l2.bmp">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="res\l1.bmp">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="res\stat\1op1.bmp">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="res\stat\full.bmp">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="res\stat\photo.bmp">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="res\stat\switch.bmp">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="res\down.bmp">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="res\idr_tray_disabled.ico">
+      <Filter>Resources</Filter>
+    </Image>
   </ItemGroup>
 </Project>

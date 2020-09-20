@@ -58,8 +58,9 @@ vncConnDialog::~vncConnDialog()
 
 // Routine called to activate the dialog and, once it's done, delete it
 
-INT_PTR vncConnDialog::DoDialog()
+INT_PTR vncConnDialog::DoDialog(bool rep)
 {
+	m_repeater = rep;
 	//	[v1.0.2-jp1 fix]
 	//DialogBoxParam(hAppInstance, MAKEINTRESOURCE(IDD_OUTGOING_CONN), 	
 	//adzm 2009-06-20 - Return the result
@@ -82,61 +83,6 @@ BOOL CALLBACK vncConnDialog::vncConnDlgProc(HWND hwnd,
      vncConnDialog *_this = helper::SafeGetWindowUserData<vncConnDialog>(hwnd);
 
 	switch (uMsg) {
-	case WM_PAINT:
-		{
-			//adzm 2009-06-20
-			if (GetUpdateRect(hwnd, NULL, TRUE)) {
-				PAINTSTRUCT ps;
-				HDC hdc = BeginPaint(hwnd, &ps);
-
-				{
-					RECT rcIcon;
-					rcIcon.top = 0;
-					rcIcon.left = 0;
-					rcIcon.bottom = 48;
-					rcIcon.right = 48;
-					
-					RECT rcClient;
-					if (GetClientRect(hwnd, &rcClient)) {
-						int nDifference = (rcClient.bottom - rcIcon.bottom) / 2;
-						if (nDifference > 0) {
-							rcIcon.top += nDifference;
-							rcIcon.bottom += nDifference;
-						}
-					}
-
-					RECT rcLabel;
-					HWND hwndLabel = GetDlgItem(hwnd, IDC_CONNECTION_NUMBER_STATIC);
-					if (GetWindowRect(hwndLabel, &rcLabel)) {
-						LPRECT lprcLabel = &rcLabel;
-						ScreenToClient(hwnd, (LPPOINT)lprcLabel);
-						ScreenToClient(hwnd, ((LPPOINT)lprcLabel)+1);
-
-						int nAdjustment = (rcLabel.left - rcIcon.right) / 2;
-
-						rcIcon.left += nAdjustment;
-						rcIcon.right += nAdjustment;
-					}
-
-					RECT rcIntersect;
-
-					if (IntersectRect(&rcIntersect, &rcIcon, &(ps.rcPaint))) {
-						if (_this->m_hicon == NULL) {
-							_this->m_hicon = (HICON)LoadImage(hInstResDLL, MAKEINTRESOURCE(IDI_WINVNC), IMAGE_ICON,
-							   48, 48, 0);
-						}
-						if (_this->m_hicon) {
-							HBRUSH hbr = (HBRUSH)SendMessage(hwnd, WM_CTLCOLORDLG, (WPARAM)hdc, (WPARAM)hwnd);
-							DrawIconEx(hdc, rcIcon.left, rcIcon.top, _this->m_hicon, 48, 48, 0, hbr, DI_NORMAL);
-						}
-					}
-				}
-
-				EndPaint(hwnd, &ps);
-			}
-
-			return 0;
-		}
 
 		// Dialog has just been created
 	case WM_INITDIALOG:
@@ -214,6 +160,8 @@ BOOL CALLBACK vncConnDialog::vncConnDlgProc(HWND hwnd,
 			} else {            
 				// Make the text entry box active
 				SetFocus(GetDlgItem(hwnd, IDC_HOSTNAME_EDIT));
+				if (_this->m_repeater)
+					SetDlgItemText(hwnd, IDC_HOSTNAME_STATIC, "Repeater:");
 			}
 			
 			SetForegroundWindow(hwnd);

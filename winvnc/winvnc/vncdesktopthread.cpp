@@ -586,17 +586,7 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 							}
 						}
 						else
-						{
-							switch (m_desktop->m_current_monitor) {
-							case MULTI_MON_PRIMARY:
-
-								break;
-							case MULTI_MON_SECOND:
-								break;
-							case MULTI_MON_THIRD:
-								break;
-							}
-
+						{							
 							int nCurrentMon = m_desktop->m_current_monitor - 1;
 								
 							m_desktop->m_SWOffsetx=m_desktop->mymonitor[nCurrentMon].offsetx-m_desktop->mymonitor[3].offsetx;

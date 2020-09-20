@@ -105,6 +105,7 @@ LONG SingleWindow=0;
 char SingleWindowName[32];
 LONG FTTimeout = 30;
 char path[512];
+char service_commandline[1024];
 char accept_reject_mesg[512];
 LONG MaxCpu=40;
 
@@ -150,6 +151,8 @@ myIniFile_Out.WriteInt("admin_auth", "locdom3", locdom3);
 DebugMode=myIniFile_In.ReadInt("admin", "DebugMode", 0);
 Avilog=myIniFile_In.ReadInt("admin", "Avilog", 0);
 myIniFile_In.ReadString("admin", "path", path,512);
+myIniFile_In.ReadString("admin", "service_commandline", service_commandline, 1024);
+
 myIniFile_In.ReadString("admin", "accept_reject_mesg", accept_reject_mesg,512);
 DebugLevel=myIniFile_In.ReadInt("admin", "DebugLevel", 0);
 DisableTrayIcon=myIniFile_In.ReadInt("admin", "DisableTrayIcon", false);
@@ -160,6 +163,7 @@ LoopbackOnly=myIniFile_In.ReadInt("admin", "LoopbackOnly", false);
 myIniFile_Out.WriteInt("admin", "DebugMode", DebugMode);
 myIniFile_Out.WriteInt("admin", "Avilog", Avilog);
 myIniFile_Out.WriteString("admin", "path", path);
+myIniFile_Out.WriteString("admin", "service_commandline", service_commandline);
 myIniFile_Out.WriteString("admin", "accept_reject_mesg", accept_reject_mesg);
 myIniFile_Out.WriteInt("admin", "DebugLevel", DebugLevel);
 myIniFile_Out.WriteInt("admin", "DisableTrayIcon", DisableTrayIcon);

@@ -40,6 +40,7 @@
 #include "vncpasswd.h"
 #include "vncOSVersion.h"
 #include "common/win32_helpers.h"
+#include "vncConnDialog.h"
 
 #include "Localization.h" // ACT : Add localization on messages
 
@@ -80,48 +81,17 @@ vncProperties::vncProperties()
 	m_pref_Secondary=false;
 
 	m_pref_DSMPluginConfig[0] = '\0';
+	hBmpExpand = (HBITMAP)::LoadImage(hInstResDLL, MAKEINTRESOURCE(IDB_EXPAND), IMAGE_BITMAP, 0, 0, LR_LOADTRANSPARENT);
+	hBmpCollaps = (HBITMAP)::LoadImage(hInstResDLL, MAKEINTRESOURCE(IDB_COLLAPS), IMAGE_BITMAP, 0, 0, LR_LOADTRANSPARENT);
+	m_bExpanded = true;	
+	cy = 0;
+	cx = 0;
+	service_commandline[0] = '\0';
+
 }
 
 vncProperties::~vncProperties()
 {
-}
-
-
-BOOL CALLBACK
-DialogProc1(HWND hwnd,
-					 UINT uMsg,
-					 WPARAM wParam,
-					 LPARAM lParam )
-{
-	switch (uMsg)
-	{
-
-	case WM_INITDIALOG:
-		{
-
-			// Show the dialog
-			SetForegroundWindow(hwnd);
-
-			return TRUE;
-		}
-
-	case WM_COMMAND:
-		switch (LOWORD(wParam))
-		{
-
-		case IDCANCEL:
-		case IDOK:
-			EndDialog(hwnd, TRUE);
-			return TRUE;
-		}
-
-		break;
-
-	case WM_DESTROY:
-		EndDialog(hwnd, FALSE);
-		return TRUE;
-	}
-	return 0;
 }
 
 // Initialisation
@@ -342,6 +312,9 @@ vncProperties::ShowAdmin(BOOL show, BOOL usersettings)
 				// Do the dialog box
 				// [v1.0.2-jp1 fix]
 				//int result = DialogBoxParam(hAppInstance,
+				m_bExpanded = true;
+				cy = 0;
+				cx = 0;
 				int result = (int)DialogBoxParam(hInstResDLL,
 				    MAKEINTRESOURCE(IDD_PROPERTIES1), 
 				    NULL,
@@ -374,6 +347,10 @@ vncProperties::ShowAdmin(BOOL show, BOOL usersettings)
 
 				vnclog.Print(LL_INTERR, VNCLOG("warning - empty password\n"));
 
+				// If we reached here then OK was used & there is no password!
+				int result2 = MessageBoxSecure(NULL, sz_ID_NO_PASSWORD_WARN,
+					sz_ID_WINVNC_WARNIN, MB_OK | MB_ICONEXCLAMATION);
+
 				// The password is empty, so if OK was used then redisplay the box,
 				// otherwise, if CANCEL was used, close down WinVNC
 				if (result == IDCANCEL)
@@ -385,11 +362,7 @@ vncProperties::ShowAdmin(BOOL show, BOOL usersettings)
 					CloseHandle(hPToken);
 					fShutdownOrdered = true;
 					return;
-				}
-
-				// If we reached here then OK was used & there is no password!
-				int result2 = MessageBoxSecure(NULL, sz_ID_NO_PASSWORD_WARN,
-				    sz_ID_WINVNC_WARNIN, MB_OK | MB_ICONEXCLAMATION);
+				}				
 
 				omni_thread::sleep(4);
 			}
@@ -542,13 +515,13 @@ vncProperties::DialogProc(HWND hwnd,
 		   if (vnclog.GetVideo())
 		   {
 			   SetDlgItemText(hwnd, IDC_EDIT_PATH, vnclog.GetPath());
-			   EnableWindow(GetDlgItem(hwnd, IDC_EDIT_PATH), true);
+			   //EnableWindow(GetDlgItem(hwnd, IDC_EDIT_PATH), true);
 			   CheckDlgButton(hwnd, IDC_VIDEO, BST_CHECKED);
 		   }
 		   else
 		   {
 			   SetDlgItemText(hwnd, IDC_EDIT_PATH, vnclog.GetPath());
-			   EnableWindow(GetDlgItem(hwnd, IDC_EDIT_PATH), false);
+			   //EnableWindow(GetDlgItem(hwnd, IDC_EDIT_PATH), false);
 			   CheckDlgButton(hwnd, IDC_VIDEO, BST_UNCHECKED);
 		   }
 		   
@@ -684,27 +657,18 @@ vncProperties::DialogProc(HWND hwnd,
 				SendMessage(hPlugins, CB_SELECTSTRING, 0, (LPARAM)_this->m_server->GetDSMPluginName());
 
 			// Modif sf@2002
-			HWND hUsePlugin = GetDlgItem(hwnd, IDC_PLUGIN_CHECK);
-			SendMessage(hUsePlugin,
-				BM_SETCHECK,
-				_this->m_server->IsDSMPluginEnabled(),
-				0);
-			HWND hButton = GetDlgItem(hwnd, IDC_PLUGIN_BUTTON);
-			EnableWindow(hButton, _this->m_server->IsDSMPluginEnabled());
+			SendMessage(GetDlgItem(hwnd, IDC_PLUGIN_CHECK), BM_SETCHECK, _this->m_server->IsDSMPluginEnabled(), 0);
+			EnableWindow(GetDlgItem(hwnd, IDC_PLUGIN_BUTTON), _this->m_server->IsDSMPluginEnabled());
 
 			// Query window option - Taken from TightVNC advanced properties 
-			HWND hQuery = GetDlgItem(hwnd, IDQUERY);
 			BOOL queryEnabled = (_this->m_server->QuerySetting() == 4);
-			SendMessage(hQuery, BM_SETCHECK, queryEnabled, 0);
-
-			HWND hQueryTimeout = GetDlgItem(hwnd, IDQUERYTIMEOUT);
-			EnableWindow(hQueryTimeout, queryEnabled);
-
-			HWND hQueryDisableTime = GetDlgItem(hwnd, IDC_QUERYDISABLETIME);
-			EnableWindow(hQueryDisableTime, queryEnabled);
-
+			SendMessage(GetDlgItem(hwnd, IDQUERY), BM_SETCHECK, queryEnabled, 0);
+			EnableWindow(GetDlgItem(hwnd, IDQUERYTIMEOUT), queryEnabled);
+			EnableWindow(GetDlgItem(hwnd, IDC_QUERYDISABLETIME), queryEnabled);
 			EnableWindow(GetDlgItem(hwnd, IDC_DREFUSE), queryEnabled);
 			EnableWindow(GetDlgItem(hwnd, IDC_DACCEPT), queryEnabled);
+
+			SetDlgItemText(hwnd, IDC_SERVICE_COMMANDLINE, _this->service_commandline);
 
 
 			char timeout[128];
@@ -717,6 +681,9 @@ vncProperties::DialogProc(HWND hwnd,
 			sprintf_s(disableTime, "%d", (int)tt);
 		    SetDlgItemText(hwnd, IDC_QUERYDISABLETIME, (const char *) disableTime);
 
+			_this->ExpandBox(hwnd, !_this->m_bExpanded);
+			SendMessage(GetDlgItem(hwnd, IDC_BUTTON_EXPAND), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)_this->hBmpExpand);
+
 			SetForegroundWindow(hwnd);
 
 			return FALSE; // Because we've set the focus
@@ -725,7 +692,12 @@ vncProperties::DialogProc(HWND hwnd,
 	case WM_COMMAND:
 		switch (LOWORD(wParam))
 		{
-
+		case IDC_SHOWOPTIONS:
+		case IDC_BUTTON_EXPAND:
+			_this->ExpandBox(hwnd, !_this->m_bExpanded);
+//			if (_this->m_bExpanded)
+//				_this->InitTab(hwnd);
+			return TRUE;
 		case IDOK:
 		case IDC_APPLY:
 			{
@@ -979,8 +951,7 @@ vncProperties::DialogProc(HWND hwnd,
 				
 				// sf@2002 - DSM Plugin loading
 				// If Use plugin is checked, load the plugin if necessary
-				HWND hPlugin = GetDlgItem(hwnd, IDC_PLUGIN_CHECK);
-				if (SendMessage(hPlugin, BM_GETCHECK, 0, 0) == BST_CHECKED)
+				if (SendMessage(GetDlgItem(hwnd, IDC_PLUGIN_CHECK), BM_GETCHECK, 0, 0) == BST_CHECKED)
 				{
 					TCHAR szPlugin[MAX_PATH];
 					GetDlgItemText(hwnd, IDC_PLUGINS_COMBO, szPlugin, MAX_PATH);
@@ -1014,6 +985,8 @@ vncProperties::DialogProc(HWND hwnd,
 				    _this->m_server->SetQueryDisableTime(atoi(disabletime));
 				else
 				    _this->m_server->SetQueryDisableTime(atoi(disabletime));
+
+				GetDlgItemText(hwnd, IDC_SERVICE_COMMANDLINE, _this->service_commandline, 1024);
 
 
 				HWND hQuery = GetDlgItem(hwnd, IDQUERY);
@@ -1122,25 +1095,6 @@ vncProperties::DialogProc(HWND hwnd,
 				EnableWindow(GetDlgItem(hwnd, IDC_PORTHTTP), bConnectSock &&
 					(SendMessage(hSpecPort, BM_GETCHECK, 0, 0) == BST_CHECKED));
 			}
-			// RealVNC method
-			/*
-			// The user has clicked on the socket connect tickbox
-			{
-				HWND hConnectSock = GetDlgItem(hwnd, IDC_CONNECT_SOCK);
-				BOOL connectsockon =
-					(SendMessage(hConnectSock, BM_GETCHECK, 0, 0) == BST_CHECKED);
-
-				HWND hAutoDisplayNo = GetDlgItem(hwnd, IDC_AUTO_DISPLAY_NO);
-				EnableWindow(hAutoDisplayNo, connectsockon);
-			
-				HWND hPortNo = GetDlgItem(hwnd, IDC_PORTNO);
-				EnableWindow(hPortNo, connectsockon
-					&& (SendMessage(hAutoDisplayNo, BM_GETCHECK, 0, 0) != BST_CHECKED));
-			
-				HWND hPassword = GetDlgItem(hwnd, IDC_PASSWORD);
-				EnableWindow(hPassword, connectsockon);
-			}
-			*/
 			return TRUE;
 
 		// TightVNC 1.2.7 method
@@ -1197,26 +1151,6 @@ vncProperties::DialogProc(HWND hwnd,
 			}
 			return TRUE;
 
-		// RealVNC method
-		/*
-		case IDC_AUTO_DISPLAY_NO:
-			// User has toggled the Auto Port Select feature.
-			// If this is in use, then we don't allow the Display number field
-			// to be modified!
-			{
-				// Get the auto select button
-				HWND hPortNoAuto = GetDlgItem(hwnd, IDC_AUTO_DISPLAY_NO);
-
-				// Should the portno field be modifiable?
-				BOOL enable = SendMessage(hPortNoAuto, BM_GETCHECK, 0, 0) != BST_CHECKED;
-
-				// Set the state
-				HWND hPortNo = GetDlgItem(hwnd, IDC_PORTNO);
-				EnableWindow(hPortNo, enable);
-			}
-			return TRUE;
-		*/
-
 		// Query window option - Taken from TightVNC advanced properties code
 		case IDQUERY:
 			{
@@ -1229,13 +1163,21 @@ vncProperties::DialogProc(HWND hwnd,
 			}
 			return TRUE;
 
+		case IDC_STARTREP:
+			{
+				vncConnDialog *newconn = new vncConnDialog(_this->m_server);
+				if (newconn)
+				{
+					newconn->DoDialog(true);
+					// delete newconn; // NO ! Already done in vncConnDialog.
+				}
+			}
+
 		// sf@2002 - DSM Plugin
 		case IDC_PLUGIN_CHECK:
 			{
-				HWND hUse = GetDlgItem(hwnd, IDC_PLUGIN_CHECK);
-				BOOL enable = SendMessage(hUse, BM_GETCHECK, 0, 0) == BST_CHECKED;
-				HWND hButton = GetDlgItem(hwnd, IDC_PLUGIN_BUTTON);
-				EnableWindow(hButton, enable);
+				EnableWindow(GetDlgItem(hwnd, IDC_PLUGIN_BUTTON),
+					SendMessage(GetDlgItem(hwnd, IDC_PLUGIN_CHECK), BM_GETCHECK, 0, 0) == BST_CHECKED);
 			}
 			return TRUE;
 			// Marscha@2004 - authSSP: moved MSLogon checkbox back to admin props page
@@ -1967,7 +1909,6 @@ vncProperties::ApplyUserPrefs()
 
 	m_server->SockConnect(m_pref_SockConnect);
 
-
 	// Remote access prefs
 	m_server->EnableRemoteInputs(m_pref_EnableRemoteInputs);
 	m_server->SetLockSettings(m_pref_LockSettings);
@@ -1976,7 +1917,6 @@ vncProperties::ApplyUserPrefs()
 	m_server->EnableUnicodeInput(m_pref_EnableUnicodeInput);
 	m_server->Win8HelperEnabled(m_pref_EnableWin8Helper);
 	m_server->Clearconsole(m_pref_clearconsole);
-
 	// DSM Plugin prefs
 	m_server->EnableDSMPlugin(m_pref_UseDSMPlugin);
 	m_server->SetDSMPluginName(m_pref_szDSMPlugin);
@@ -1985,15 +1925,7 @@ vncProperties::ApplyUserPrefs()
 	m_server->SetDSMPluginConfig(m_pref_DSMPluginConfig);
 
 	if (m_server->IsDSMPluginEnabled()) 
-	{
-		//vnclog.Print(LL_INTINFO, VNCLOG("$$$$$$$$$$ ApplyUserPrefs - Plugin Enabled - Call SetDSMPlugin() \n"));
 		m_server->SetDSMPlugin(false);
-	}
-	else
-	{
-		//vnclog.Print(LL_INTINFO, VNCLOG("$$$$$$$$$$ ApplyUserPrefs - Plugin NOT enabled \n"));
-	}
-
 }
 
 void
@@ -2251,7 +2183,7 @@ void vncProperties::LoadFromIniFile()
 	// Logging/debugging prefs
 	vnclog.SetMode(myIniFile.ReadInt("admin", "DebugMode", 0));
 	char temp[512];
-	myIniFile.ReadString("admin", "path", temp,512);
+	myIniFile.ReadString("admin", "path", temp,512);	
 	vnclog.SetPath(temp);
 	vnclog.SetLevel(myIniFile.ReadInt("admin", "DebugLevel", 0));
 	vnclog.SetVideo(myIniFile.ReadInt("admin", "Avilog", 0) ? true : false);
@@ -2375,6 +2307,7 @@ void vncProperties::LoadFromIniFile()
     m_server->SetKeepAliveInterval(m_keepAliveInterval);
 	m_server->SetIdleInputTimeout(m_IdleInputTimeout);
     
+	myIniFile.ReadString("admin", "service_commandline", service_commandline, 1024);
 
 	ApplyUserPrefs();
 }
@@ -2442,7 +2375,6 @@ void vncProperties::LoadUserPrefsFromIniFile()
 	G_SENDBUFFER_EX=myIniFile.ReadInt("admin", "sendbuffer", G_SENDBUFFER_EX);
 }
 
-
 void vncProperties::SaveToIniFile()
 {
 	if (!m_allowproperties)
@@ -2490,6 +2422,7 @@ void vncProperties::SaveToIniFile()
 				myIniFile.WriteInt("admin", "NewMSLogon", m_server->GetNewMSLogon());
 				// sf@2003 - DSM params here
 				myIniFile.WriteInt("admin", "ConnectPriority", m_server->ConnectPriority());
+				myIniFile.WriteString("admin", "service_commandline", service_commandline);
 				myIniFile.copy_to_secure();
 				myIniFile.IniFileSetSecure();
 				return;
@@ -2521,6 +2454,8 @@ void vncProperties::SaveToIniFile()
 	myIniFile.WriteInt("admin", "NewMSLogon", m_server->GetNewMSLogon());
 	// sf@2003 - DSM params here
 	myIniFile.WriteInt("admin", "ConnectPriority", m_server->ConnectPriority());
+
+	myIniFile.WriteString("admin", "service_commandline", service_commandline);
 	return;
 }
 
@@ -2539,6 +2474,7 @@ void vncProperties::SaveUserPrefsToIniFile()
 	myIniFile.WriteInt("admin", "DefaultScale", m_server->GetDefaultScale());
 
 	myIniFile.WriteInt("admin", "UseDSMPlugin", m_server->IsDSMPluginEnabled());
+
 	myIniFile.WriteString("admin", "DSMPlugin",m_server->GetDSMPluginName());
 
 	//adzm 2010-05-12 - dsmplugin config
@@ -2755,4 +2691,85 @@ void Secure_Plugin(char *szPlugin)
 		if (desktop) CloseDesktop(desktop);
 	}
 	if (m_pDSMPlugin != NULL) delete(m_pDSMPlugin);
+}
+
+void vncProperties::ExpandBox(HWND hDlg, BOOL fExpand)
+{
+	// if the dialog is already in the requested state, return
+	// immediately.
+	if (fExpand == m_bExpanded) return;
+
+	RECT rcWnd, rcDefaultBox, rcChild, rcIntersection;
+	HWND wndChild = NULL;
+	HWND wndDefaultBox = NULL;
+
+	// get the window of the button 
+	HWND  pCtrl = GetDlgItem(hDlg, IDC_SHOWOPTIONS);
+	if (pCtrl == NULL) return;
+
+	wndDefaultBox = GetDlgItem(hDlg, IDC_DEFAULTBOX);
+	if (wndDefaultBox == NULL) return;
+
+	if (!fExpand) SendMessage(GetDlgItem(hDlg, IDC_BUTTON_EXPAND), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)hBmpExpand);
+	else SendMessage(GetDlgItem(hDlg, IDC_BUTTON_EXPAND), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)hBmpCollaps);
+	// retrieve coordinates for the default child window
+	GetWindowRect(wndDefaultBox, &rcDefaultBox);
+
+	// enable/disable all of the child window outside of the default box.
+	wndChild = GetTopWindow(hDlg);
+
+	for (; wndChild != NULL; wndChild = GetWindow(wndChild, GW_HWNDNEXT))
+	{
+		// get rectangle occupied by child window in screen coordinates.
+		GetWindowRect(wndChild, &rcChild);
+
+		if (!IntersectRect(&rcIntersection, &rcChild, &rcDefaultBox))
+		{
+			EnableWindow(wndChild, fExpand);
+		}
+	}
+
+	if (!fExpand)  // we are contracting
+	{
+		_ASSERT(m_bExpanded);
+		GetWindowRect(hDlg, &rcWnd);
+
+		// this is the first time we are being called to shrink the dialog
+		// box.  The dialog box is currently in its expanded size and we must
+		// save the expanded width and height so that it can be restored
+		// later when the dialog box is expanded.
+
+		if (cx == 0 && cy == 0)
+		{
+			cx = rcDefaultBox.right - rcWnd.left;
+			cy = rcWnd.bottom - rcWnd.top;
+
+			// we also hide the default box here so that it is not visible
+			ShowWindow(wndDefaultBox, SW_HIDE);
+		}
+
+
+		// shrink the dialog box so that it encompasses everything from the top,
+		// left up to and including the default box.
+		SetWindowPos(hDlg, NULL, 0, 0,
+			rcDefaultBox.right - rcWnd.left,
+			rcDefaultBox.bottom - rcWnd.top,
+			SWP_NOZORDER | SWP_NOMOVE);
+
+		SetWindowText(pCtrl, "Advanced options");
+
+		// record that the dialog is contracted.
+		m_bExpanded = FALSE;
+	}
+	else // we are expanding
+	{
+		_ASSERT(!m_bExpanded);
+		SetWindowPos(hDlg, NULL, 0, 0, cx, cy, SWP_NOZORDER | SWP_NOMOVE);
+
+		// make sure that the entire dialog box is visible on the user's
+		// screen.
+		SendMessage(hDlg, DM_REPOSITION, 0, 0);
+		SetWindowText(pCtrl, "Hide");
+		m_bExpanded = TRUE;
+	}
 }

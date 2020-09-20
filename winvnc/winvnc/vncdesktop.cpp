@@ -1119,6 +1119,7 @@ vncDesktop::InitBitmap()
 		vnclog.Print(LL_INTERR, VNCLOG("unable to get display format\n"));
 		return ERROR_DESKTOP_NO_DISPLAYFORMAT;
 	}
+	//needed, no dubble, need to be executed 2 times
 	result = ::GetDIBits(m_hmemdc, m_membitmap, 0, 1, NULL, &m_bminfo.bmi, DIB_RGB_COLORS);
 	if (result == 0) {
 		vnclog.Print(LL_INTERR, VNCLOG("unable to get display colour info\n"));
@@ -1681,7 +1682,7 @@ vncDesktop::WriteMessageOnScreenPreConnect(BYTE *scrBuff, UINT scrBuffSize)
 
 	HFONT hFont, hOldFont;
 	SetRect(&rect, 0, 10, 640, 640);
-    char *tout = "UVNC experimental server 1.2.5.0 pre-connect window \n";
+    char *tout = "UVNC experimental server 1.3.0 pre-connect window \n";
 	DrawText(m_hmemdc, tout, (int)strlen(tout), &rect, DT_CENTER);
 
 

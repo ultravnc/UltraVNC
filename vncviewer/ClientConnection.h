@@ -196,6 +196,7 @@ public:
 	void WriteExactFT(char *buf, int bytes);
 
 private:
+	int MouseOldX, MouseOldY;
 	UltraVncZ *ultraVncZlib;
 	UltraVncZ ultraVncZTight[4];
 	Fps fps;

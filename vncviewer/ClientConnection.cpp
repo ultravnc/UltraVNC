@@ -658,11 +658,11 @@ void ClientConnection::Run()
 // sf@2007 - Autoreconnect
 void ClientConnection::DoConnection(bool reconnect)
 {
+	if (!m_opts.m_NoStatus && !m_hwndStatus)
+		GTGBS_ShowConnectWindow();
 	omni_mutex_lock l(m_bitmapdcMutex);
 	if (m_pDSMPlugin->IsEnabled())
 	{
-		if (!m_opts.m_NoStatus && !m_hwndStatus)
-			GTGBS_ShowConnectWindow();
 		int somethingwrong_counter = 0;
 		while (!m_hwndStatus)
 		{
@@ -2432,6 +2432,7 @@ void ClientConnection::NegotiateProtocolVersion()
 
 	bool fNotEncrypted = false;
 	if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L89);
+	if (m_hwndStatus)UpdateWindow(m_hwndStatus);
     try
 	{
 		//ReadExact(pv, sz_rfbProtocolVersionMsg);
@@ -3648,7 +3649,7 @@ void ClientConnection::SizeWindow(bool reconnect)
 	tdc.Init();
 	if (sizing_set) {
 		int mon = tdc.getSelectedScreen(m_hwndMain);
-		if (mon != 0)
+		if (mon != 0 && m_opts.m_selected_screen != 0) // Thomas Levering
 			m_opts.m_selected_screen = mon;
 	}
 
@@ -4441,6 +4442,13 @@ inline bool ClientConnection::ProcessPointerEvent(int x, int y, DWORD keyflags, 
 {
 	//adzm 2010-09 - Throttle mousemove events
 	if (msg == WM_MOUSEMOVE) {
+		if ((MouseOldX == x) && (MouseOldY = y) && (keyflags == 0))
+		{
+			return false;
+		}
+		MouseOldX = x;
+		MouseOldY = y;
+
 		bool bMouseKeyDown = (keyflags & (MK_LBUTTON|MK_MBUTTON|MK_RBUTTON|MK_XBUTTON1|MK_XBUTTON2)) != 0;
 		if (m_PendingMouseMove.ShouldThrottle(bMouseKeyDown)) {
 			m_PendingMouseMove.x = x;
@@ -8617,6 +8625,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 
 				case tbWM_MAXIMIZE:
 					//_this->SetFullScreenMode(!_this->InFullScreenMode());
+					_this->SizeWindow();   // Thomas Levering
 					_this->SetFullScreenMode(FALSE);
 					return 0;
 

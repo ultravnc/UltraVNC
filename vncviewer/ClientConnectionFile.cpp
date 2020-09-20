@@ -202,7 +202,6 @@ int ClientConnection::LoadConnection(char *fname, bool fFromDialog, bool default
 		_tcsncpy_s(m_proxyhost, sessdlg.m_proxyhost, MAX_HOST_NAME_LEN);
 		m_proxyport = sessdlg.m_proxyport;
 		m_fUseProxy = sessdlg.m_fUseProxy;
-
 	}
 	else if (config_specified) {
 		strcpy_s(m_opts.m_proxyhost,m_proxyhost);

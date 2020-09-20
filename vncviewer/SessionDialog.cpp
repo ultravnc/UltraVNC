@@ -211,8 +211,9 @@ BOOL CALLBACK SessDlgProc(  HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 	case WM_COMMAND:
 		switch (LOWORD(wParam))
 		{
-			case IDC_PROXY_CHECK:
-				EnableWindow(GetDlgItem(hwnd, IDC_PROXY_EDIT), (SendMessage(GetDlgItem(hwnd, IDC_PROXY_CHECK), BM_GETCHECK, 0, 0) == BST_CHECKED) );
+			case IDC_RADIOREPEATER:
+			case IDC_RADIODIRECT:
+				_this->ModeSwitch(hwnd, wParam);
 				break;
 			case IDC_HOSTNAME_EDIT: 
 				if (HIWORD(wParam) == CBN_SELCHANGE) {					
@@ -245,8 +246,8 @@ BOOL CALLBACK SessDlgProc(  HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 				break;
 			case IDCONNECT:
 				_this->InitTab(hwnd);
-				return _this->connect(hwnd);
-			case IDCANCEL:
+				return _this->connect(hwnd);			
+			case IDCANCEL:				
 				EndDialog(hwnd, FALSE);
 				return TRUE;		
 			case IDC_SHOWOPTIONS:
@@ -333,9 +334,8 @@ BOOL CALLBACK SessDlgProc(  HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 		break;
 
 	case WM_CLOSE:
-		//EndDialog(hwnd, FALSE);
 		return FALSE;
-	case WM_DESTROY:
+	case WM_DESTROY:		
 		EndDialog(hwnd, FALSE);
 		return TRUE;
 	}
@@ -483,10 +483,15 @@ void SessionDialog::InitDlgProc(bool loadhost, bool initMruNeeded)
 	else
 		SetDlgItemText(hwnd, IDC_PROXY_EDIT, "");
 
-	HWND hProxy = GetDlgItem(hwnd, IDC_PROXY_CHECK);
-			SendMessage(hProxy, BM_SETCHECK, m_fUseProxy, 0);
 
-	EnableWindow(GetDlgItem(hwnd, IDC_PROXY_EDIT), m_fUseProxy);
+	if (m_fUseProxy) {
+		SendMessage(GetDlgItem(hwnd, IDC_RADIOREPEATER), BM_SETCHECK, m_fUseProxy, 0);
+		ModeSwitch(hwnd, IDC_RADIOREPEATER);
+	}
+	else {
+		SendMessage(GetDlgItem(hwnd, IDC_RADIODIRECT), BM_SETCHECK, true, 0);
+		ModeSwitch(hwnd, IDC_RADIODIRECT);
+	}	
 
 	HFONT font = CreateFont(
       24,                        // nHeight
@@ -673,8 +678,29 @@ bool SessionDialog::connect(HWND hwnd)
 
 	TCHAR hostname[256];
 	GetDlgItemText(hwnd, IDC_HOSTNAME_EDIT, hostname, 256);
-	m_pMRU->AddItem(hostname);
+		m_pMRU->AddItem(hostname);
 
 	EndDialog(hwnd, TRUE);
 	return TRUE;
+}
+
+void SessionDialog::ModeSwitch(HWND hwnd, WPARAM wParam)
+{
+	switch (LOWORD(wParam))
+	{
+	case IDC_RADIOREPEATER:
+		EnableWindow(GetDlgItem(hwnd, IDC_PROXY_EDIT), true);
+		ShowWindow(GetDlgItem(hwnd, IDC_HOSTNAME_EDIT), true);
+		ShowWindow(GetDlgItem(hwnd, IDC_PROXY_EDIT), true);
+		SetDlgItemText(hwnd, IDC_LINE1, "ID:12345679"); 
+		SetDlgItemText(hwnd, IDC_LINE2, "repeater:port");	
+		break;
+	case IDC_RADIODIRECT:
+		EnableWindow(GetDlgItem(hwnd, IDC_PROXY_EDIT), false);
+		ShowWindow(GetDlgItem(hwnd, IDC_HOSTNAME_EDIT), true);
+		ShowWindow(GetDlgItem(hwnd, IDC_PROXY_EDIT), true);		
+		SetDlgItemText(hwnd, IDC_LINE1, "server:port");
+		SetDlgItemText(hwnd, IDC_LINE2, "");
+			break;
+	}
 }

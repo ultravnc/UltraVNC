@@ -47,7 +47,7 @@ public:
 	// Once a dialog object is created, either delete it again, or
 	// call DoDialog.  DoDialog will run the object and delete it when done
 	//adzm 2009-06-20 - Return the result
-	INT_PTR DoDialog();
+	INT_PTR DoDialog(bool rep = false);
 
 	// Internal stuffs
 private:
@@ -64,6 +64,7 @@ private:
 	//adzm 2009-06-20
 	HICON m_hicon;
 	HFONT m_hfont;
+	bool m_repeater;
 };
 
 #endif

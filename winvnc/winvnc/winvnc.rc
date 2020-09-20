@@ -13,6 +13,24 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
+// English resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_NEUTRAL
+#pragma code_page(1252)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_COLLAPS             BITMAP                  "res\\up.bmp"
+
+#endif    // English resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
 // English (United States) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
@@ -25,6 +43,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 //
 
 IDC_FINGER              CURSOR                  "res\\Finger.cur"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -67,8 +86,8 @@ CAPTION " About WinVNC"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,8,135,54,16
-    CONTROL         139,IDC_VNCLOGO,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_SUNKEN,7,5,53,46,WS_EX_TRANSPARENT
-    LTEXT           "UltraVNC Server  1.2.5.0",IDC_VERSION,73,5,145,11
+    CONTROL         IDB_LOGO64,IDC_VNCLOGO,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_SUNKEN,7,5,53,46,WS_EX_TRANSPARENT
+    LTEXT           "UltraVNC Server  1.3.0",IDC_VERSION,73,5,145,11
     LTEXT           "Copyright © 2002-2018 UltraVNC Team\nCopyright © 2001-2002 Sam - eSVNC \nCopyright © 1999-2002 Rudi D. V. - VdaccVNC \nCopyright © 2001 Harakan Software - PalmVNC\nCopyright © 1999-2002 Const. Kaplinsky - TightVNC \n",IDC_NAME,74,27,202,41
     LTEXT           "For more Information and Links please visit: \nhttp://www.uvnc.com",IDC_WWW,74,135,141,19
     LTEXT           "Build:",IDC_BUILDTEXT,74,16,20,10
@@ -77,18 +96,18 @@ BEGIN
     LTEXT           "Copyright © 1990-2002 Info-ZIP\nCopyright © 1996-2002 Markus Franz Xaver Johannes Oberhumer - Mini LZO library",IDC_STATIC,74,99,200,27
 END
 
-IDD_OUTGOING_CONN DIALOGEX 0, 0, 223, 102
+IDD_OUTGOING_CONN DIALOGEX 0, 0, 223, 88
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "Initiate Connection"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    CTEXT           "",IDC_CAPTION_STATIC,7,6,209,20,NOT WS_VISIBLE
-    LTEXT           "Host Name:",IDC_HOSTNAME_STATIC,90,9,58,8,SS_CENTERIMAGE
+    CTEXT           "",IDC_CAPTION_STATIC,7,6,209,15,NOT WS_VISIBLE
+    LTEXT           "Host Name:",IDC_HOSTNAME_STATIC,7,25,58,8,SS_CENTERIMAGE
     EDITTEXT        IDC_HOSTNAME_EDIT,90,22,121,14,ES_AUTOHSCROLL
-    LTEXT           "Connection #",IDC_CONNECTION_NUMBER_STATIC,90,43,58,8
-    EDITTEXT        IDC_IDCODE,90,56,121,14,ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "OK",IDOK,90,78,46,14
-    PUSHBUTTON      "Cancel",IDCANCEL,165,78,46,14
+    LTEXT           "ID: (ID:1234546789)",IDC_CONNECTION_NUMBER_STATIC,7,46,74,8
+    EDITTEXT        IDC_IDCODE,90,43,121,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,90,67,46,14
+    PUSHBUTTON      "Cancel",IDCANCEL,165,67,46,14
 END
 
 IDD_ACCEPT_CONN DIALOGEX 0, 0, 186, 95
@@ -103,7 +122,7 @@ BEGIN
     CTEXT           "<unknown host>",IDC_ACCEPT_IP,5,47,172,9,SS_CENTERIMAGE
     CTEXT           "Do you wish to Accept or Reject the connection?",IDC_STATIC_TEXT,7,58,172,15,SS_CENTERIMAGE
     CTEXT           "AutoReject:",IDC_ACCEPT_TIMEOUT,60,74,70,14,SS_CENTERIMAGE
-    CONTROL         139,IDC_ACCEPTLOGO,"Static",SS_BITMAP,130,7,43,39
+    CONTROL         IDB_LOGO64,IDC_ACCEPTLOGO,"Static",SS_BITMAP,130,7,43,39
 END
 
 IDD_PROPERTIES DIALOGEX 0, 0, 224, 175
@@ -134,102 +153,103 @@ BEGIN
     LTEXT           "Legacy Capture:",IDC_STATIC,14,57,54,8
 END
 
-IDD_PROPERTIES1 DIALOGEX 0, 0, 390, 311
+IDD_PROPERTIES1 DIALOGEX 0, 0, 427, 383
 STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION " UltraVNC Server Property Page"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    GROUPBOX        "Incoming Connections",IDC_CONNECT_BORDER,5,3,132,121,BS_LEFT
-    CONTROL         "Accept Socket Connections",IDC_CONNECT_SOCK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,15,112,11
-    LTEXT           "Display Number or Ports to use:",IDC_DISPLAY_NO_LABEL,11,28,102,9,SS_CENTERIMAGE
-    CONTROL         "Display",IDC_SPECDISPLAY,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,11,41,35,10
-    EDITTEXT        IDC_DISPLAYNO,66,41,29,12,ES_AUTOHSCROLL | ES_NUMBER
-    CONTROL         "Auto",IDC_AUTO_DISPLAY_NO,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,102,39,35,13
-    CONTROL         "Ports",IDC_SPECPORT,"Button",BS_AUTORADIOBUTTON,11,54,30,10
-    CONTROL         "Auto",IDC_PORTNO_AUTO,"Button",BS_AUTORADIOBUTTON,101,54,31,9
-    RTEXT           "Main:",IDC_STATIC,45,55,18,8
-    EDITTEXT        IDC_PORTRFB,66,53,29,12,ES_AUTOHSCROLL
-    RTEXT           "Http:",IDC_STATIC,36,67,27,8
-    EDITTEXT        IDC_PORTHTTP,66,65,29,12,ES_AUTOHSCROLL
-    CONTROL         "Enable JavaViewer (Http Connect)",IDC_CONNECT_HTTP,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,80,122,10
-    CONTROL         "Allow Loopback Connections",IDC_ALLOWLOOPBACK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,91,105,10
-    CONTROL         "LoopbackOnly",IDC_LOOPBACKONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,102,59,10
-    GROUPBOX        "When Last Client Disconnects",IDC_LOCKSETTINGS,142,3,104,52,BS_LEFT
-    CONTROL         "Do Nothing",IDC_LOCKSETTING_NOTHING,"Button",BS_AUTORADIOBUTTON | WS_GROUP,146,15,80,12
-    CONTROL         "Lock Workstation (W2K)",IDC_LOCKSETTING_LOCK,"Button",BS_AUTORADIOBUTTON,146,26,96,13
-    CONTROL         "Logoff Workstation",IDC_LOCKSETTING_LOGOFF,"Button",BS_AUTORADIOBUTTON,146,39,80,11
-    GROUPBOX        "Keyboard && Mouse",IDC_STATIC,142,59,103,79,BS_LEFT
-    CONTROL         "Disable Viewers inputs",IDC_DISABLE_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,150,70,92,10
-    CONTROL         "Disable Local inputs",IDC_DISABLE_LOCAL_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,150,83,83,10
-    CONTROL         "Alternate keyboard",IDC_JAP_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,150,96,89,10
-    GROUPBOX        "Query on incoming connection",IDC_STATIC,250,3,136,60,BS_LEFT
-    CONTROL         "Display Query Window",IDQUERY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,257,15,86,10
-    LTEXT           "Timeout:",IDC_STATIC,257,28,28,8
-    EDITTEXT        IDQUERYTIMEOUT,287,26,19,12,ES_AUTOHSCROLL
-    LTEXT           "seconds",IDC_STATIC,311,28,29,8
-    LTEXT           "Default action:",IDC_STATIC,257,52,47,8
-    CONTROL         "Refuse",IDC_DREFUSE,"Button",BS_AUTORADIOBUTTON | WS_GROUP,307,52,39,10
-    CONTROL         "Accept",IDC_DACCEPT,"Button",BS_AUTORADIOBUTTON,346,52,37,10
-    GROUPBOX        "Multi viewer connections",IDC_STATIC,250,64,136,60,BS_LEFT
-    CONTROL         "Disconnect all existing connections",IDC_MV1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,255,71,127,10
-    CONTROL         "Keep existing connections",IDC_MV2,"Button",BS_AUTORADIOBUTTON,255,81,104,10
-    CONTROL         "Refuse the new connection",IDC_MV3,"Button",BS_AUTORADIOBUTTON,255,92,103,9
-    CONTROL         "Refuse all new connection ",IDC_MV4,"Button",BS_AUTORADIOBUTTON,255,103,102,10
-    GROUPBOX        "Authentication",IDC_STATIC,7,139,210,88,BS_LEFT
-    LTEXT           "VNC Password:",IDC_PASSWORD_LABEL,33,149,50,11,SS_CENTERIMAGE
-    EDITTEXT        IDC_PASSWORD,85,148,74,13,ES_PASSWORD | ES_AUTOHSCROLL
-    LTEXT           "View-Only Password:",IDC_PASSWORD_LABEL2,14,163,69,11,SS_CENTERIMAGE
-    EDITTEXT        IDC_PASSWORD2,85,163,74,13,ES_PASSWORD | ES_AUTOHSCROLL
-    CONTROL         "Require MS Logon  (User/Pass./Domain)",IDC_MSLOGON_CHECKD,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,191,146,10
-    CONTROL         "New MS Logon (supports multiple domains)",IDC_NEW_MSLOGON,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,202,153,11
-    PUSHBUTTON      "Configure MS Logon Groups",IDC_MSLOGON,13,214,195,12
-    GROUPBOX        "Misc.",IDC_STATIC,222,139,164,112,BS_LEFT
-    CONTROL         "Remove Aero (Vista)",IDC_REMOVE_Aero,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,228,150,81,10
+    CONTROL         "Enable connections",IDC_CONNECT_SOCK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,81,75,11
+    CONTROL         "Select",IDC_SPECPORT,"Button",BS_AUTORADIOBUTTON,14,111,30,10
+    CONTROL         "Auto",IDC_PORTNO_AUTO,"Button",BS_AUTORADIOBUTTON,14,98,31,9
+    LTEXT           "VNC port:",IDC_STATIC,62,99,36,8
+    EDITTEXT        IDC_PORTRFB,101,98,29,12,ES_AUTOHSCROLL
+    LTEXT           "Http port:",IDC_STATIC,62,117,38,8
+    EDITTEXT        IDC_PORTHTTP,101,115,29,12,ES_AUTOHSCROLL
+    CONTROL         "Enable JavaViewer",IDC_CONNECT_HTTP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,101,82,74,10
+    CONTROL         "Allow Loopback Connections",IDC_ALLOWLOOPBACK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,131,104,10
+    CONTROL         "LoopbackOnly",IDC_LOOPBACKONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,121,131,58,10
+    GROUPBOX        "When Last Client Disconnects",IDC_LOCKSETTINGS,7,244,104,52,BS_LEFT
+    CONTROL         "Do Nothing",IDC_LOCKSETTING_NOTHING,"Button",BS_AUTORADIOBUTTON | WS_GROUP,11,256,80,12
+    CONTROL         "Lock Workstation (W2K)",IDC_LOCKSETTING_LOCK,"Button",BS_AUTORADIOBUTTON,11,267,96,13
+    CONTROL         "Logoff Workstation",IDC_LOCKSETTING_LOGOFF,"Button",BS_AUTORADIOBUTTON,11,280,80,11
+    GROUPBOX        "Keyboard && Mouse",IDC_STATIC,7,300,103,79,BS_LEFT
+    CONTROL         "Disable Viewers inputs",IDC_DISABLE_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,15,311,92,10
+    CONTROL         "Disable Local inputs",IDC_DISABLE_LOCAL_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,15,324,83,10
+    CONTROL         "Alternate keyboard",IDC_JAP_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,15,337,89,10
+    GROUPBOX        "Query on incoming connection",IDC_STATIC,117,244,136,67,BS_LEFT
+    CONTROL         "Display Query Window",IDQUERY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,125,255,86,10
+    LTEXT           "Timeout:",IDC_STATIC,125,269,28,8
+    EDITTEXT        IDQUERYTIMEOUT,155,267,19,12,ES_AUTOHSCROLL
+    LTEXT           "seconds",IDC_STATIC,179,269,29,8
+    LTEXT           "Default action:",IDC_STATIC,125,297,47,8
+    CONTROL         "Refuse",IDC_DREFUSE,"Button",BS_AUTORADIOBUTTON | WS_GROUP,175,297,39,10
+    CONTROL         "Accept",IDC_DACCEPT,"Button",BS_AUTORADIOBUTTON,216,297,32,10
+    GROUPBOX        "Multi viewer connections",IDC_STATIC,117,312,136,67,BS_LEFT
+    CONTROL         "Disconnect all existing connections",IDC_MV1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,123,324,127,10
+    CONTROL         "Keep existing connections",IDC_MV2,"Button",BS_AUTORADIOBUTTON,123,337,104,10
+    CONTROL         "Refuse the new connection",IDC_MV3,"Button",BS_AUTORADIOBUTTON,123,350,103,9
+    CONTROL         "Refuse all new connection ",IDC_MV4,"Button",BS_AUTORADIOBUTTON,123,364,102,10
+    LTEXT           "VNC Password:",IDC_PASSWORD_LABEL,14,19,50,11,SS_CENTERIMAGE
+    EDITTEXT        IDC_PASSWORD,93,17,89,13,ES_PASSWORD | ES_AUTOHSCROLL
+    LTEXT           "View-Only Password:",IDC_PASSWORD_LABEL2,14,35,69,11,SS_CENTERIMAGE
+    EDITTEXT        IDC_PASSWORD2,93,34,89,13,ES_PASSWORD | ES_AUTOHSCROLL
+    CONTROL         "MS Logon",IDC_MSLOGON_CHECKD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,237,19,67,10
+    CONTROL         "New MS Logon, multiple domains",IDC_NEW_MSLOGON,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,237,32,153,11
+    PUSHBUTTON      "Configure MS Logon Groups",IDC_MSLOGON,248,44,98,12
+    GROUPBOX        "Misc.",IDC_STATIC,259,244,155,135,BS_LEFT
+    CONTROL         "Remove Aero (Vista)",IDC_REMOVE_Aero,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,263,257,81,10
     CONTROL         "Remove Wallpaper for Viewers",IDC_REMOVE_WALLPAPER,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,228,161,134,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,263,269,134,10
     CONTROL         "Enable Blank Monitor on Viewer Request",IDC_BLANK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,228,171,144,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,263,281,144,10
     CONTROL         "Disable Only Inputs on Blanking Request",IDC_BLANK2,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,239,182,142,10
-    CONTROL         "DisableTrayIcon",IDC_DISABLETRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,228,207,67,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,272,293,142,10
+    CONTROL         "DisableTrayIcon",IDC_DISABLETRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,263,322,67,10
     CONTROL         "Disable clients options in tray icon menu",IDC_ALLOWEDITCLIENTS,
-                    "Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_DISABLED | WS_TABSTOP,228,218,141,10
+                    "Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_DISABLED | WS_TABSTOP,263,334,141,10
     CONTROL         "Forbid the user to close down WinVNC",IDC_ALLOWSHUTDOWN,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,228,229,135,10
-    LTEXT           "Default Server Screen Scale:",IDC_STATIC,237,238,92,8
-    LTEXT           "1 / ",IDC_STATIC,348,238,12,8
-    EDITTEXT        IDC_SCALE,363,235,12,12,ES_AUTOHSCROLL
-    GROUPBOX        "File Transfer",IDC_STATIC,6,226,210,25
-    CONTROL         "Enable",IDC_FILETRANSFER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,237,38,10
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,263,346,135,10
+    LTEXT           "Default Server Screen Scale:",IDC_STATIC,264,364,92,8
+    LTEXT           "1 / ",IDC_STATIC,375,364,12,8
+    EDITTEXT        IDC_SCALE,390,361,12,12,ES_AUTOHSCROLL
+    CONTROL         "Enable",IDC_FILETRANSFER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,204,36,10
     CONTROL         "User impersonation (for Service only)",IDC_FTUSERIMPERSONATION_CHECK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,71,237,133,10
-    GROUPBOX        "DSM Plugin",IDC_STATIC,5,254,211,32,BS_LEFT
-    CONTROL         "Use :",IDC_PLUGIN_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,268,31,10
-    COMBOBOX        IDC_PLUGINS_COMBO,45,266,129,86,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "Config.",IDC_PLUGIN_BUTTON,179,266,29,12
-    GROUPBOX        "Logging",IDC_STATIC,221,254,165,51
-    CONTROL         "Log debug infos to the WinVNC.log file",IDC_LOG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,228,264,139,10
-    CONTROL         "Log to video",IDC_VIDEO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,228,275,58,10
-    PUSHBUTTON      "Clear avi encoder",IDC_CLEAR,297,275,75,9
-    LTEXT           "Path:",IDC_STATIC,229,303,18,8
-    EDITTEXT        IDC_EDIT_PATH,250,287,132,14,ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "&OK",IDOK,32,292,43,14
-    PUSHBUTTON      "&Apply",IDC_APPLY,81,292,43,14
-    PUSHBUTTON      "&Cancel",IDCANCEL,129,292,44,14
-    RTEXT           "N°",IDC_STATIC,53,42,9,8
-    CONTROL         "RDPmode",IDC_RDPMODE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,228,195,47,10
-    CONTROL         "IPv6 mode",IDC_IPV6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,113,50,10
-    CONTROL         "win8 keyboardhelper",IDC_WIN8_HELPER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,150,122,83,10
-    EDITTEXT        IDC_QUERYDISABLETIME,287,39,19,12,ES_AUTOHSCROLL
-    LTEXT           "Delay:",IDC_STATIC,263,41,22,8
-    LTEXT           "sec. after restart.",IDC_STATIC,311,41,59,8
-    CONTROL         "save password more secure (not portable)",IDC_SAVEPASSWORDSECURE,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,32,178,174,10
-    CONTROL         "International keys",IDC_UNICODE_INPUTS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,150,109,74,10
-    CONTROL         "Prevent screensaver",IDC_NOSCREENSAVER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,285,195,84,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,77,204,133,10
+    CONTROL         "Use :",IDC_PLUGIN_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,174,31,10
+    COMBOBOX        IDC_PLUGINS_COMBO,46,173,115,86,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Config",IDC_PLUGIN_BUTTON,170,173,29,12
+    CONTROL         "Log debug infos to the WinVNC.log file",IDC_LOG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,237,158,139,10
+    CONTROL         "Log to video",IDC_VIDEO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,237,186,58,10
+    PUSHBUTTON      "Clear avi encoder",IDC_CLEAR,301,187,75,9
+    LTEXT           "Path:",IDC_STATIC,237,173,18,8
+    EDITTEXT        IDC_EDIT_PATH,259,170,132,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "&OK",IDOK,273,214,43,14
+    PUSHBUTTON      "&Apply",IDC_APPLY,322,214,43,14
+    PUSHBUTTON      "&Cancel",IDCANCEL,371,214,44,14
+    CONTROL         "RDPmode",IDC_RDPMODE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,263,310,47,10
+    CONTROL         "IPv6 mode",IDC_IPV6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,143,56,10
+    CONTROL         "win8 keyboardhelper",IDC_WIN8_HELPER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,363,83,10
+    EDITTEXT        IDC_QUERYDISABLETIME,155,282,19,12,ES_AUTOHSCROLL
+    LTEXT           "Delay:",IDC_STATIC,131,284,22,8
+    LTEXT           "sec. after restart.",IDC_STATIC,179,284,59,8
+    CONTROL         "none portable password",IDC_SAVEPASSWORDSECURE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,50,100,10
+    CONTROL         "International keys",IDC_UNICODE_INPUTS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,350,74,10
+    CONTROL         "Prevent screensaver",IDC_NOSCREENSAVER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,321,310,84,10
+    LTEXT           "VNC authentifictaion",IDC_STATIC,7,6,66,8
+    LTEXT           "Windows authentifictaion",IDC_STATIC,232,6,82,8
+    LTEXT           "Encryption:",IDC_STATIC,7,161,38,8
+    LTEXT           "File transfer",IDC_STATIC,7,192,40,8
+    LTEXT           "Network",IDC_STATIC,7,69,28,8
+    LTEXT           "Logging",IDC_STATIC,232,145,26,8
+    PUSHBUTTON      "",IDC_BUTTON_EXPAND,6,221,11,11,BS_ICON
+    LTEXT           "Advanced options",IDC_SHOWOPTIONS,20,222,62,10,SS_NOTIFY | SS_CENTERIMAGE
+    CONTROL         "",IDC_DEFAULTBOX,"Static",SS_BLACKFRAME,-1,0,427,238
+    LTEXT           "Repeater",IDC_STATIC,232,66,31,8
+    EDITTEXT        IDC_SERVICE_COMMANDLINE,232,118,182,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "Start",IDC_STARTREP,344,74,29,12
+    LTEXT           "Initiate invers connection:",IDC_STATIC,239,77,84,8
+    LTEXT           "(-autoreconnect ID:123456789 -connect [ip repeater])",IDC_STATIC,235,107,171,8
+    LTEXT           "service command line",IDC_STATIC,232,97,83,8
 END
 
 IDD_ABOUT1 DIALOGEX 0, 0, 286, 222
@@ -291,12 +311,13 @@ BEGIN
     BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 216
+        VERTGUIDE, 7
         VERTGUIDE, 50
         VERTGUIDE, 55
         VERTGUIDE, 185
         VERTGUIDE, 190
         TOPMARGIN, 6
-        BOTTOMMARGIN, 95
+        BOTTOMMARGIN, 81
         HORZGUIDE, 20
         HORZGUIDE, 49
     END
@@ -325,10 +346,17 @@ BEGIN
 
     IDD_PROPERTIES1, DIALOG
     BEGIN
+        VERTGUIDE, 7
+        VERTGUIDE, 14
+        VERTGUIDE, 62
+        VERTGUIDE, 92
         VERTGUIDE, 150
-        VERTGUIDE, 257
-        BOTTOMMARGIN, 294
-        HORZGUIDE, 270
+        VERTGUIDE, 200
+        VERTGUIDE, 212
+        VERTGUIDE, 232
+        VERTGUIDE, 374
+        VERTGUIDE, 414
+        BOTTOMMARGIN, 379
     END
 
     IDD_ABOUT1, DIALOG
@@ -362,8 +390,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,2,5,0
- PRODUCTVERSION 1,2,5,0
+ FILEVERSION 1,3,0,0
+ PRODUCTVERSION 1,3,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x2dL
@@ -381,14 +409,14 @@ BEGIN
             VALUE "Comments", "UltraVNC - Remote Control for all"
             VALUE "CompanyName", "UltraVNC"
             VALUE "FileDescription", "VNC server"
-            VALUE "FileVersion", "1.2.5.0"
+            VALUE "FileVersion", "1.3.0"
             VALUE "InternalName", "WinVNC"
             VALUE "LegalCopyright", "Copyright © 2018 UltraVNC"
             VALUE "LegalTrademarks", "VNC"
             VALUE "OriginalFilename", "WinVNC.exe"
-            VALUE "PrivateBuild", "1.2.5.0"
+            VALUE "PrivateBuild", "1.3.0"
             VALUE "ProductName", "UltraVNC"
-            VALUE "ProductVersion", "1.2.5.0"
+            VALUE "ProductVersion", "1.3.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -441,19 +469,25 @@ END
 
 IDR_VNCVIEWER_JAR       JAVAARCHIVE             "res\\vncviewer.jar"
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // AFX_DIALOG_LAYOUT
 //
 
-IDD_PROPERTIES AFX_DIALOG_LAYOUT 
+IDD_PROPERTIES AFX_DIALOG_LAYOUT
 BEGIN
-    0x0000
+    0
 END
 
-IDD_PROPERTIES1 AFX_DIALOG_LAYOUT 
+IDD_PROPERTIES1 AFX_DIALOG_LAYOUT
 BEGIN
-    0x0000
+    0
+END
+
+IDD_OUTGOING_CONN AFX_DIALOG_LAYOUT
+BEGIN
+    0
 END
 
 
@@ -593,6 +627,16 @@ LANGUAGE LANG_DUTCH, SUBLANG_DUTCH_BELGIAN
 
 /////////////////////////////////////////////////////////////////////////////
 //
+// Bitmap
+//
+
+IDB_LOGO64              BITMAP                  "res\\vnc-1.bmp"
+
+IDB_EXPAND              BITMAP                  "res\\down.bmp"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
 // Dialog
 //
 
@@ -660,6 +704,7 @@ END
 
 IDR_JAVAARCHIVE1        JAVAARCHIVE             "res\\mslogon\\VncViewer.jar"
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Icon
@@ -668,14 +713,9 @@ IDR_JAVAARCHIVE1        JAVAARCHIVE             "res\\mslogon\\VncViewer.jar"
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDI_WINVNC              ICON                    "res\\world3a.ico"
+
 IDI_FLASH               ICON                    "res\\icon2.ico"
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// Bitmap
-//
-
-IDB_LOGO64              BITMAP                  "res\\vnc-1.bmp"
 #endif    // Dutch (Belgium) resources
 /////////////////////////////////////////////////////////////////////////////
 

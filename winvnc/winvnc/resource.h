@@ -27,6 +27,8 @@
 #define IDD_PROPERTIES1                 146
 #define IDD_ABOUT1                      147
 #define IDR_JAVAARCHIVE1                155
+#define IDB_EXPAND                      218
+#define IDB_COLLAPS                     219
 #define IDD_USER_NAME                   604
 #define IDD_PASSWORD                    608
 #define IDR_MESSAGES_PROPERTIES         900
@@ -204,6 +206,14 @@
 #define IDC_REMOTETEXT_EDIT             1141
 #define IDC_CHATAREA_EDIT               1141
 #define IDC_CLEAR_B                     1142
+#define IDC_DEFAULTBOX                  1145
+#define IDC_RED                         1146
+#define IDC_GREEN                       1147
+#define IDC_EDIT3                       1148
+#define IDC_SERVICE_COMMANDLINE         1148
+#define IDC_STARTREP                    1149
+#define IDC_SHOWOPTIONS                 2032
+#define IDC_BUTTON_EXPAND               2048
 #define IDC_FINGER                      9000
 #define IDC_GAMMAGRAY                   9001
 #define IDC_STATIC_SPLIT                9002
@@ -291,9 +301,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        173
+#define _APS_NEXT_RESOURCE_VALUE        176
 #define _APS_NEXT_COMMAND_VALUE         40030
-#define _APS_NEXT_CONTROL_VALUE         1140
+#define _APS_NEXT_CONTROL_VALUE         1150
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

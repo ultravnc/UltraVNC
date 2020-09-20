@@ -574,14 +574,9 @@ protected:
 	vncClient			*m_clientmap[MAX_CLIENTS];
 	vncClientId			m_nextid;
 
-	// Lock to protect the client list from concurrency - lock when reading/updating client list
-//	omni_mutex			m_clientsLock;
-	// Lock to protect the desktop object from concurrency - lock when updating client list
 	omni_mutex			m_desktopLock;
-
 	// Signal set when a client removes itself
 	omni_condition		*m_clientquitsig;
-
 	// Set of windows to send notifications to
 	vncNotifyList		m_notifyList;
 
@@ -604,6 +599,7 @@ protected:
 
 	// sf@2002 - DSMPlugin
 	BOOL m_fDSMPluginEnabled;
+	BOOL m_NatPluginEnabled;
 	char m_szDSMPlugin[128];
 	CDSMPlugin *m_pDSMPlugin;
 	//adzm 2010-05-12 - dsmplugin config

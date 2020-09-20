@@ -209,6 +209,7 @@ vncServer::vncServer()
 	m_pDSMPlugin = new CDSMPlugin();
 
 	m_fDSMPluginEnabled = false;
+	m_NatPluginEnabled = false;
 	strcpy_s(m_szDSMPlugin, "");
 
 	m_fMSLogonRequired = false;
@@ -245,7 +246,7 @@ vncServer::vncServer()
     startTime = GetTickCount();
 	m_fSendExtraMouse = TRUE;
 	retryThreadHandle = NULL;
-	retrysock = NULL;
+	retrysock = NULL;	
 }
 
 vncServer::~vncServer()

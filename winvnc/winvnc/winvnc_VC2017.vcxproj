@@ -2256,6 +2256,14 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\win8</Command>
       <Project>{e52b9956-fe67-47f7-bc4f-67cc5a64b708}</Project>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="down.bmp" />
+    <Image Include="res\down.bmp" />
+    <Image Include="res\LedGreen.bmp" />
+    <Image Include="res\LedRed.bmp" />
+    <Image Include="res\up.bmp" />
+    <Image Include="up.bmp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

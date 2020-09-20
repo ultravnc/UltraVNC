@@ -164,6 +164,7 @@
 #define IDC_SLOW_RB                     1099
 #define IDC_VIEWONLY_CHECK              1100
 #define IDC_RADIO1                      1101
+#define IDC_RADIODIRECT                 1101
 #define IDC_ULTRALAN_RB                 1102
 #define IDC_ULTRA_LAN_RB                1103
 #define IDC_FULLCOLORS_RADIO            1104
@@ -242,6 +243,7 @@
 #define IDD_LISTEN                      1170
 #define IDC_EXIT_CHECK                  1171
 #define IDC_RADIO2                      1172
+#define IDC_RADIOREPEATER               1172
 #define IDC_MANUAL                      1173
 #define IDC_CHECK2                      1174
 #define IDC_AUTOACCEPTNOWARN            1174
@@ -306,6 +308,8 @@
 #define IDC_SAVEASDEFAULT               2047
 #define IDC_BUTTON_EXPAND               2048
 #define IDC_ZSTD                        2049
+#define IDC_LINE1                       2053
+#define IDC_LINE2                       2054
 #define IDC_STATIC_SPLIT                9000
 #define IDC_HOSTNAME_DEL                9001
 #define ID_SESSION_SET_CRECT            32777
@@ -602,7 +606,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        222
 #define _APS_NEXT_COMMAND_VALUE         50025
-#define _APS_NEXT_CONTROL_VALUE         2050
+#define _APS_NEXT_CONTROL_VALUE         2054
 #define _APS_NEXT_SYMED_VALUE           154
 #endif
 #endif

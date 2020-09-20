@@ -148,6 +148,7 @@ public:
 	void SetDefaults();
 	VNCOptions *m_pOpt;
 	void StartListener();
+	void ModeSwitch(HWND hwnd, WPARAM wParam);
 private:
 
 	int cx, cy;

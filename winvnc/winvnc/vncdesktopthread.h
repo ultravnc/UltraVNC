@@ -56,14 +56,13 @@ class vncDesktopThread : public omni_thread
 public:
 	vncDesktopThread() {
 		m_returnsig = NULL;
-		user32 = LoadLibrary("user32.dll");
+		hUser32 = LoadLibrary("user32.dll");
 		MyGetCursorInfo=NULL;
-		if (user32) MyGetCursorInfo=(_GetCursorInfo )GetProcAddress(user32, "GetCursorInfo");
+		if (hUser32) MyGetCursorInfo=(_GetCursorInfo )GetProcAddress(hUser32, "GetCursorInfo");
 		g_DesktopThread_running=true;
 
 		m_lLastMouseMoveTime = 0L;
 		
-		hUser32 = LoadLibrary("user32.dll");
 		CHANGEWINDOWMESSAGEFILTER pfnFilter = NULL;
 		if (hUser32)
 		{
@@ -86,7 +85,7 @@ public:
 protected:
 	~vncDesktopThread() {
 		if (m_returnsig != NULL) delete m_returnsig;
-		if (user32) FreeLibrary(user32);
+		if (hUser32) FreeLibrary(hUser32);
 		g_DesktopThread_running=false;
 		if (hUser32) FreeLibrary(hUser32);
 	};
@@ -121,13 +120,12 @@ protected:
 	BOOL m_returnset;
 	bool m_screen_moved;
 	bool lastsend;
-	HMODULE user32;
+	HMODULE hUser32;
 	_GetCursorInfo MyGetCursorInfo;
 	bool XRichCursorEnabled;
 	DWORD newtick,oldtick,oldtick2;
 
 	DWORD m_lLastMouseMoveTime;
-	HMODULE  hUser32;
 	CProcessorUsage usage;
 	short cpuUsage;
 	DWORD MIN_UPDATE_INTERVAL;

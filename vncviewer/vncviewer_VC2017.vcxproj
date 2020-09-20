@@ -743,10 +743,11 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\ipv6</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="cpp.hint" />
-    <None Include="res\B46.ico" />
-    <None Include="res\stat\back.bmp" />
     <None Include="res\background2.bmp" />
+    <None Include="res\cursor1.cur" />
+    <None Include="res\cursorsel.cur" />
+    <None Include="res\Finger.cur" />
+    <None Include="res\nocursor.cur" />
     <None Include="res\stat\background2.bmp" />
     <None Include="res\bitmap1.bmp" />
     <None Include="res\bitmap2.bmp" />
@@ -754,37 +755,10 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\ipv6</Command>
     <None Include="res\stat\bitmap5.bmp" />
     <None Include="res\stat\bitmap8.bmp" />
     <None Include="res\stat\bitmap9.bmp" />
-    <None Include="res\stat\both.bmp" />
-    <None Include="res\stat\closeup.bmp" />
-    <None Include="res\cursor1.cur" />
-    <None Include="res\cursorsel.cur" />
-    <None Include="res\dir.ico" />
-    <None Include="res\drive.ico" />
-    <None Include="res\file.ico" />
-    <None Include="res\Finger.cur" />
-    <None Include="res\stat\flash.bmp" />
-    <None Include="res\stat\front.bmp" />
-    <None Include="res\hoch.bmp" />
-    <None Include="res\idr_tray.ico" />
-    <None Include="res\idr_tray_disabled.ico" />
-    <None Include="res\l1.bmp" />
-    <None Include="res\l2.bmp" />
-    <None Include="res\stat\mainicon.ico" />
-    <None Include="res\stat\maximizeup.bmp" />
-    <None Include="res\stat\minimizeup.bmp" />
-    <None Include="res\nocursor.cur" />
-    <None Include="res\stat\none.bmp" />
-    <None Include="res\stat\pindown.bmp" />
-    <None Include="res\stat\pinup.bmp" />
-    <None Include="res\quer.bmp" />
     <None Include="Tango_l.bmp" />
-    <None Include="res\Tango_l.bmp" />
-    <None Include="res\Tango_lx.bmp" />
     <None Include="Tango_lx.bmp" />
     <None Include="Tango_s.bmp" />
-    <None Include="res\Tango_s.bmp" />
     <None Include="Tango_sx.bmp" />
-    <None Include="res\Tango_sx.bmp" />
     <None Include="res\toolbar1.bmp" />
     <None Include="res\toollb_large.bmp" />
     <None Include="res\toollb_largecolor.bmp" />
@@ -796,14 +770,10 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\ipv6</Command>
     <None Include="res\toollb_smallmouseX.bmp" />
     <None Include="res\ultra-logo.bmp" />
     <None Include="res\vnc.bmp" />
-    <None Include="res\vnc32.BMP" />
-    <None Include="res\vnc64.BMP" />
-    <None Include="res\vncviewer.ico" />
     <None Include="COPYING.txt" />
     <None Include="History.txt" />
     <None Include="LICENCE.txt" />
     <None Include="ToDo.txt" />
-    <None Include="VTune\vncviewer.vpj" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\common\UltraVncZ.cpp" />
@@ -1450,6 +1420,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\ipv6</Command>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='OldCPU|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="MessBox.cpp" />
     <ClCompile Include="MessBox2.cpp" />
     <ClCompile Include="..\lzo\minilzo.c">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -1721,16 +1692,20 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\ipv6</Command>
     <ClInclude Include="display.h" />
     <ClInclude Include="Exception.h" />
     <ClInclude Include="FileTransfer.h" />
+    <ClInclude Include="FpsCounter.h" />
     <ClInclude Include="FullScreenTitleBar.h" />
     <ClInclude Include="FullScreenTitleBarConst.h" />
     <ClInclude Include="KeyMap.h" />
     <ClInclude Include="KeyMapjap.h" />
+    <ClInclude Include="keysym.h" />
     <ClInclude Include="keysymdef.h" />
     <ClInclude Include="keysymdefjap.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="LowLevelHook.h" />
+    <ClInclude Include="MEssBox.h" />
     <ClInclude Include="MRU.h" />
     <ClInclude Include="multimon.h" />
+    <ClInclude Include="Natplugin.h" />
     <ClInclude Include="res\resource.h" />
     <ClInclude Include="rfb.h" />
     <ClInclude Include="SessionDialog.h" />
@@ -1744,38 +1719,6 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\ipv6</Command>
     <ClInclude Include="VNCviewerApp32.h" />
     <ClInclude Include="..\common\win32_helpers.h" />
     <ClInclude Include="..\ZipUnZip32\ZipUnZip32.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="res\vncviewer.rc">
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">res;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">res;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='OldCPU|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">res;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">res;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='OldCPU|Win32'">res;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">res;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='OldCPU|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">res;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">res;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='OldCPU|x64'">res;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">res;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="res\down.bmp" />
-    <Image Include="res\stat\1op1.bmp" />
-    <Image Include="res\stat\full.bmp" />
-    <Image Include="res\stat\photo.bmp" />
-    <Image Include="res\stat\switch.bmp" />
-    <Image Include="res\up.bmp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\libjpeg-turbo-win\libjpeg-turbo-win_VC2017.vcxproj">
@@ -1802,6 +1745,42 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\ipv6</Command>
     <ProjectReference Include="omnithread\omnithreadv12.vcxproj">
       <Project>{ab1ce62f-4a4d-4daa-831d-5c93ad68f5f1}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="res\vncviewer.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\B46.ico" />
+    <Image Include="res\dir.ico" />
+    <Image Include="res\down.bmp" />
+    <Image Include="res\drive.ico" />
+    <Image Include="res\file.ico" />
+    <Image Include="res\hoch.bmp" />
+    <Image Include="res\idr_tray.ico" />
+    <Image Include="res\idr_tray_disabled.ico" />
+    <Image Include="res\l1.bmp" />
+    <Image Include="res\l2.bmp" />
+    <Image Include="res\quer.bmp" />
+    <Image Include="res\stat\1op1.bmp" />
+    <Image Include="res\stat\back.bmp" />
+    <Image Include="res\stat\both.bmp" />
+    <Image Include="res\stat\closeup.bmp" />
+    <Image Include="res\stat\front.bmp" />
+    <Image Include="res\stat\full.bmp" />
+    <Image Include="res\stat\maximizeup.bmp" />
+    <Image Include="res\stat\minimizeup.bmp" />
+    <Image Include="res\stat\none.bmp" />
+    <Image Include="res\stat\photo.bmp" />
+    <Image Include="res\stat\pindown.bmp" />
+    <Image Include="res\stat\pinup.bmp" />
+    <Image Include="res\stat\switch.bmp" />
+    <Image Include="res\Tango_l.bmp" />
+    <Image Include="res\Tango_lx.bmp" />
+    <Image Include="res\Tango_s.bmp" />
+    <Image Include="res\Tango_sx.bmp" />
+    <Image Include="res\up.bmp" />
+    <Image Include="res\vnc32.BMP" />
+    <Image Include="res\vnc64.BMP" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

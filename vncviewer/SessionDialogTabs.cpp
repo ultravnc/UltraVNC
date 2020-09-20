@@ -999,12 +999,9 @@ void SessionDialog::ReadDlgProcMisc()
 void SessionDialog::ReadDlgProcSecurity()
 {
 	HWND hwnd = SecurityHwnd;
-	HWND hShared = GetDlgItem(hwnd, IDC_SHARED);
-	Shared = (SendMessage(hShared, BM_GETCHECK, 0, 0) == BST_CHECKED);				
-	HWND hDisableClip = GetDlgItem(hwnd, IDC_DISABLECLIPBOARD);
-	DisableClipboard = (SendMessage(hDisableClip, BM_GETCHECK, 0, 0) == BST_CHECKED);
-	HWND hPlugin = GetDlgItem(hwnd, IDC_PLUGIN_CHECK);
-	if (SendMessage(hPlugin, BM_GETCHECK, 0, 0) == BST_CHECKED){
+	Shared = (SendMessage(GetDlgItem(hwnd, IDC_SHARED), BM_GETCHECK, 0, 0) == BST_CHECKED);
+	DisableClipboard = (SendMessage(GetDlgItem(hwnd, IDC_DISABLECLIPBOARD), BM_GETCHECK, 0, 0) == BST_CHECKED);
+	if (SendMessage(GetDlgItem(hwnd, IDC_PLUGIN_CHECK), BM_GETCHECK, 0, 0) == BST_CHECKED){
 				TCHAR szPlugin[MAX_PATH];
 				GetDlgItemText(hwnd, IDC_PLUGINS_COMBO, szPlugin, MAX_PATH);
 				fUseDSMPlugin = true;
@@ -1012,25 +1009,18 @@ void SessionDialog::ReadDlgProcSecurity()
 	}
 	else
 		fUseDSMPlugin = false;
-	HWND hfRequireEncryption = GetDlgItem(hwnd, IDC_ONLYENCRYPTED);
-	fRequireEncryption =(SendMessage(hfRequireEncryption, BM_GETCHECK, 0, 0) == BST_CHECKED);
-	HWND hfAutoAcceptIncoming = GetDlgItem(hwnd,	IDC_AUTOACCEPT);
-	fAutoAcceptIncoming =(SendMessage(hfAutoAcceptIncoming, BM_GETCHECK, 0, 0) == BST_CHECKED);
-	HWND hfAutoAcceptNoDSM = GetDlgItem(hwnd,	IDC_AUTOACCEPTNOWARN);
-	fAutoAcceptNoDSM =(SendMessage(hfAutoAcceptNoDSM, BM_GETCHECK, 0, 0) == BST_CHECKED);
-	HWND hrestricted = GetDlgItem(hwnd,	IDC_HIDEMENU);
-	restricted =(SendMessage(hrestricted, BM_GETCHECK, 0, 0) == BST_CHECKED);
-	HWND hJiggle = GetDlgItem(hwnd,	IDC_JIGGLEMOUSE);
-
+	fRequireEncryption =(SendMessage(GetDlgItem(hwnd, IDC_ONLYENCRYPTED), BM_GETCHECK, 0, 0) == BST_CHECKED);
+	fAutoAcceptIncoming =(SendMessage(GetDlgItem(hwnd, IDC_AUTOACCEPT), BM_GETCHECK, 0, 0) == BST_CHECKED);
+	fAutoAcceptNoDSM =(SendMessage(GetDlgItem(hwnd, IDC_AUTOACCEPTNOWARN), BM_GETCHECK, 0, 0) == BST_CHECKED);
+	restricted =(SendMessage(GetDlgItem(hwnd, IDC_HIDEMENU), BM_GETCHECK, 0, 0) == BST_CHECKED);
 }
+////////////////////////////////////////////////////////////////////////////////
 void SessionDialog::ReadDlgProc()
 {
 	TCHAR tmphost[256];
 	TCHAR hostname[256];
-	TCHAR fullhostname[256];
 	HWND hwnd = SessHwnd;
 	GetDlgItemText(hwnd, IDC_HOSTNAME_EDIT, hostname, 256);
-	_tcscpy_s(fullhostname, hostname);
 	if (ParseDisplay(hostname, tmphost, 255, &m_port)) {
 		for (size_t i = 0, len = strlen(tmphost); i < len; i++)
 			tmphost[i] = toupper(tmphost[i]);
@@ -1038,7 +1028,6 @@ void SessionDialog::ReadDlgProc()
      }
 	_tcscpy_s(m_proxyhost, "");
 	GetDlgItemText(hwnd, IDC_PROXY_EDIT, hostname, 256);
-	_tcscpy_s(fullhostname, hostname);
 
 	//adzm 2010-02-15
 	if (strlen(hostname) > 0) {
@@ -1070,13 +1059,7 @@ void SessionDialog::ReadDlgProc()
 		}
 	}
 
-	HWND hProxy = GetDlgItem(hwnd, IDC_PROXY_CHECK);
-	if (SendMessage(hProxy, BM_GETCHECK, 0, 0) == BST_CHECKED) {
-		m_fUseProxy = true;
-	}
-	else {
-		m_fUseProxy = false;
-	}
+	m_fUseProxy = SendMessage(GetDlgItem(hwnd, IDC_RADIOREPEATER), BM_GETCHECK, 0, 0) == BST_CHECKED;
 }
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -1088,37 +1071,22 @@ int SessionDialog::HandeleEncodersMessages(HWND hwnd, WPARAM wParam)
 				bool ad = IsDlgButtonChecked(hwnd, IDC_AUTODETECT) ? true : false;
 				for (int i = rfbEncodingRaw; i <= LASTENCODING; i++) {
 				int aa = IDC_RAWRADIO + (i-rfbEncodingRaw);
-				HWND hPref = GetDlgItem(hwnd, IDC_RAWRADIO + (i-rfbEncodingRaw));
-				EnableWindow(hPref, UseEnc[i] && !ad);
+				EnableWindow(GetDlgItem(hwnd, IDC_RAWRADIO + (i - rfbEncodingRaw)), UseEnc[i] && !ad);
 			}		
-			HWND hCopyRect = GetDlgItem(hwnd, ID_SESSION_SET_CRECT);
-			EnableWindow(hCopyRect, !ad);
-			HWND hColorMode = GetDlgItem(hwnd, IDC_FULLCOLORS_RADIO);
-			EnableWindow(hColorMode, !ad);
-			hColorMode = GetDlgItem(hwnd, IDC_256COLORS_RADIO);
-			EnableWindow(hColorMode, !ad);
-			hColorMode = GetDlgItem(hwnd, IDC_64COLORS_RADIO);
-			EnableWindow(hColorMode, !ad);
-			hColorMode = GetDlgItem(hwnd, IDC_8COLORS_RADIO);
-			EnableWindow(hColorMode, !ad);
-			hColorMode = GetDlgItem(hwnd, IDC_8GREYCOLORS_RADIO);
-			EnableWindow(hColorMode, !ad);
-			hColorMode = GetDlgItem(hwnd, IDC_4GREYCOLORS_RADIO);
-			EnableWindow(hColorMode, !ad);
-			hColorMode = GetDlgItem(hwnd, IDC_2GREYCOLORS_RADIO);
-			EnableWindow(hColorMode, !ad);
-			HWND hCache = GetDlgItem(hwnd, ID_SESSION_SET_CACHE);
-			EnableWindow(hCache, !ad);		
-			HWND hAcl = GetDlgItem(hwnd, IDC_ALLOW_COMPRESSLEVEL);
-			EnableWindow(hAcl, !ad);	
-			HWND hCl = GetDlgItem(hwnd, IDC_COMPRESSLEVEL);
-			EnableWindow(hCl, !ad);		
-			HWND hAj = GetDlgItem(hwnd, IDC_ALLOW_JPEG);
-			EnableWindow(hAj, !ad);		
-			HWND hQl = GetDlgItem(hwnd, IDC_QUALITYLEVEL);
-			EnableWindow(hQl, !ad);
-			HWND hPu = GetDlgItem(hwnd, IDC_PREEMPTIVEUPDATES);
-			EnableWindow(hPu, !ad);	
+			EnableWindow(GetDlgItem(hwnd, ID_SESSION_SET_CRECT), !ad);
+			EnableWindow(GetDlgItem(hwnd, IDC_FULLCOLORS_RADIO), !ad);
+			EnableWindow(GetDlgItem(hwnd, IDC_256COLORS_RADIO), !ad);
+			EnableWindow(GetDlgItem(hwnd, IDC_64COLORS_RADIO), !ad);
+			EnableWindow(GetDlgItem(hwnd, IDC_8COLORS_RADIO), !ad);
+			EnableWindow(GetDlgItem(hwnd, IDC_8GREYCOLORS_RADIO), !ad);
+			EnableWindow(GetDlgItem(hwnd, IDC_4GREYCOLORS_RADIO), !ad);
+			EnableWindow(GetDlgItem(hwnd, IDC_2GREYCOLORS_RADIO), !ad);
+			EnableWindow(GetDlgItem(hwnd, ID_SESSION_SET_CACHE), !ad);
+			EnableWindow(GetDlgItem(hwnd, IDC_ALLOW_COMPRESSLEVEL), !ad);
+			EnableWindow(GetDlgItem(hwnd, IDC_COMPRESSLEVEL), !ad);
+			EnableWindow(GetDlgItem(hwnd, IDC_ALLOW_JPEG), !ad);
+			EnableWindow(GetDlgItem(hwnd, IDC_QUALITYLEVEL), !ad);
+			EnableWindow(GetDlgItem(hwnd, IDC_PREEMPTIVEUPDATES), !ad);
 			autoDetect = ad;
 			SetQuickOption(ad == false ? 8 : 1);
 		}
@@ -1128,8 +1096,7 @@ int SessionDialog::HandeleEncodersMessages(HWND hwnd, WPARAM wParam)
 		case IDC_ZLIBRADIO:{
 				bool xor = IsDlgButtonChecked(hwnd, IDC_ZLIBRADIO) ? true : false;
 				if (xor) {
-	 				HWND hCache = GetDlgItem(hwnd, ID_SESSION_SET_CACHE);
-					SendMessage(hCache, BM_SETCHECK, true, 0);
+					SendMessage(GetDlgItem(hwnd, ID_SESSION_SET_CACHE), BM_SETCHECK, true, 0);
 				}
 				return TRUE;
 			}
@@ -1145,30 +1112,21 @@ int SessionDialog::HandeleEncodersMessages(HWND hwnd, WPARAM wParam)
 		case IDC_2GREYCOLORS_RADIO:{
 				bool ultra2=IsDlgButtonChecked(hwnd, IDC_ULTRA2) ? true : false;
 				if (ultra2) {
-					HWND hultra = GetDlgItem(hwnd, IDC_ULTRA2);
-					SendMessage(hultra, BM_SETCHECK, false, 0);
-					hultra = GetDlgItem(hwnd, IDC_ULTRA);	
-					SendMessage(hultra, BM_SETCHECK, true, 0);
+					SendMessage(GetDlgItem(hwnd, IDC_ULTRA2), BM_SETCHECK, false, 0);
+					SendMessage(GetDlgItem(hwnd, IDC_ULTRA), BM_SETCHECK, true, 0);
 				}
 			}
 			break;
 		case IDC_ULTRA2:{
 				bool ultra2=IsDlgButtonChecked(hwnd, IDC_ULTRA2) ? true : false;
 				if (ultra2) {
-					HWND hColorMode = GetDlgItem(hwnd, IDC_FULLCOLORS_RADIO);
-					SendMessage(hColorMode, BM_SETCHECK, true, 0);
-					hColorMode = GetDlgItem(hwnd, IDC_256COLORS_RADIO);	
-					SendMessage(hColorMode, BM_SETCHECK, false, 0);
-					hColorMode = GetDlgItem(hwnd, IDC_64COLORS_RADIO);			  
-					SendMessage(hColorMode, BM_SETCHECK, false, 0);
-					hColorMode = GetDlgItem(hwnd, IDC_8COLORS_RADIO);			  
-					SendMessage(hColorMode, BM_SETCHECK, false, 0);
-					hColorMode = GetDlgItem(hwnd, IDC_8GREYCOLORS_RADIO);			  
-					SendMessage(hColorMode, BM_SETCHECK, false, 0);
-					hColorMode = GetDlgItem(hwnd, IDC_4GREYCOLORS_RADIO);			  
-					SendMessage(hColorMode, BM_SETCHECK, false, 0);
-					hColorMode = GetDlgItem(hwnd, IDC_2GREYCOLORS_RADIO);			  
-					SendMessage(hColorMode, BM_SETCHECK, false, 0);	 			
+					SendMessage(GetDlgItem(hwnd, IDC_FULLCOLORS_RADIO), BM_SETCHECK, true, 0);
+					SendMessage(GetDlgItem(hwnd, IDC_256COLORS_RADIO), BM_SETCHECK, false, 0);		  
+					SendMessage(GetDlgItem(hwnd, IDC_64COLORS_RADIO), BM_SETCHECK, false, 0);		  
+					SendMessage(GetDlgItem(hwnd, IDC_8COLORS_RADIO), BM_SETCHECK, false, 0);			  
+					SendMessage(GetDlgItem(hwnd, IDC_8GREYCOLORS_RADIO), BM_SETCHECK, false, 0);	  
+					SendMessage(GetDlgItem(hwnd, IDC_4GREYCOLORS_RADIO), BM_SETCHECK, false, 0);			  
+					SendMessage(GetDlgItem(hwnd, IDC_2GREYCOLORS_RADIO), BM_SETCHECK, false, 0);
 				}
 				return TRUE;
 			}
@@ -1238,65 +1196,36 @@ void SessionDialog::HandleQuickOption(int quickoption)
 int SessionDialog::SetQuickOption(int quickoption)
 {
 	HWND hwnd = QuickOptionsHwnd;
-	HWND hDyn = GetDlgItem(hwnd, IDC_DYNAMIC);
-	SendMessage(hDyn, BM_SETCHECK, false, 0);
-	HWND hLan = GetDlgItem(hwnd, IDC_LAN_RB);
-	SendMessage(hLan, BM_SETCHECK, false, 0);
-	HWND hUltraLan = GetDlgItem(hwnd, IDC_ULTRA_LAN_RB);
-	SendMessage(hUltraLan, BM_SETCHECK, false, 0);
-	HWND hMedium = GetDlgItem(hwnd, IDC_MEDIUM_RB);
-	SendMessage(hMedium, BM_SETCHECK, false, 0);
-	HWND hModem = GetDlgItem(hwnd, IDC_MODEM_RB);
-	SendMessage(hModem, BM_SETCHECK, false, 0);
-	HWND hSlow = GetDlgItem(hwnd, IDC_SLOW_RB);
-	SendMessage(hSlow, BM_SETCHECK, false, 0);
-	HWND hManual = GetDlgItem(hwnd, IDC_MANUAL);
-	SendMessage(hManual, BM_SETCHECK, false, 0);
+	SendMessage(GetDlgItem(hwnd, IDC_DYNAMIC), BM_SETCHECK, false, 0);
+	SendMessage(GetDlgItem(hwnd, IDC_LAN_RB), BM_SETCHECK, false, 0);
+	SendMessage(GetDlgItem(hwnd, IDC_ULTRA_LAN_RB), BM_SETCHECK, false, 0);
+	SendMessage(GetDlgItem(hwnd, IDC_MEDIUM_RB), BM_SETCHECK, false, 0);
+	SendMessage(GetDlgItem(hwnd, IDC_MODEM_RB), BM_SETCHECK, false, 0);
+	SendMessage(GetDlgItem(hwnd, IDC_SLOW_RB), BM_SETCHECK, false, 0);
+	SendMessage(GetDlgItem(hwnd, IDC_MANUAL), BM_SETCHECK, false, 0);
 
 	// sf@2002 - Select Modem Option as default
 	switch (quickoption) {
 		case 1: // AUTO
-			{
-			HWND hDyn = GetDlgItem(hwnd, IDC_DYNAMIC);
-			SendMessage(hDyn, BM_SETCHECK, true, 0);
-			}
+			SendMessage(GetDlgItem(hwnd, IDC_DYNAMIC), BM_SETCHECK, true, 0);
 			break;
-
 		case 2: // LAN
-			{
-			HWND hLan = GetDlgItem(hwnd, IDC_LAN_RB);
-			SendMessage(hLan, BM_SETCHECK, true, 0);
-			}
+			SendMessage(GetDlgItem(hwnd, IDC_LAN_RB), BM_SETCHECK, true, 0);
 			break;
 		case 3: // MEDIUM
-			{
-			HWND hMedium = GetDlgItem(hwnd, IDC_MEDIUM_RB);
-			SendMessage(hMedium, BM_SETCHECK, true, 0);
-			}
+			SendMessage(GetDlgItem(hwnd, IDC_MEDIUM_RB), BM_SETCHECK, true, 0);
 			break;
 		case 4: // MODEM
-			{
-			HWND hModem = GetDlgItem(hwnd, IDC_MODEM_RB);
-			SendMessage(hModem, BM_SETCHECK, true, 0);
-			}
+			SendMessage(GetDlgItem(hwnd, IDC_MODEM_RB), BM_SETCHECK, true, 0);
 			break;
 		case 5: // SLOW
-			{
-			HWND hSlow = GetDlgItem(hwnd, IDC_SLOW_RB);
-			SendMessage(hSlow, BM_SETCHECK, true, 0);
-			}
+			SendMessage(GetDlgItem(hwnd, IDC_SLOW_RB), BM_SETCHECK, true, 0);
 			break;
 		case 7: // LAN
-			{
-			HWND hUltraLan = GetDlgItem(hwnd, IDC_ULTRA_LAN_RB);
-			SendMessage(hUltraLan, BM_SETCHECK, true, 0);
-			}
+			SendMessage(GetDlgItem(hwnd, IDC_ULTRA_LAN_RB), BM_SETCHECK, true, 0);
 			break;
 		default: // MANUAL
-			{
-			HWND hManual = GetDlgItem(hwnd, IDC_MANUAL);
-			SendMessage(hManual, BM_SETCHECK, true, 0);
-			}
+			SendMessage(GetDlgItem(hwnd, IDC_MANUAL), BM_SETCHECK, true, 0);
 			break;
 	}
 	return 0;
@@ -1305,32 +1234,25 @@ int SessionDialog::SetQuickOption(int quickoption)
 int SessionDialog::ReadQuickOptionsFromUI(SessionDialog* _this, HWND hwnd)
 {
 	// Auto Mode
-	HWND hDynamic = GetDlgItem(hwnd, IDC_DYNAMIC);
-	if ((SendMessage(hDynamic, BM_GETCHECK, 0, 0) == BST_CHECKED))
+	if ((SendMessage(GetDlgItem(hwnd, IDC_DYNAMIC), BM_GETCHECK, 0, 0) == BST_CHECKED))
 		_this->quickoption = 1;
 	// Options for LAN Mode
-	HWND hUltraLan = GetDlgItem(hwnd, IDC_ULTRA_LAN_RB);
-	if ((SendMessage(hUltraLan, BM_GETCHECK, 0, 0) == BST_CHECKED))
+	if ((SendMessage(GetDlgItem(hwnd, IDC_ULTRA_LAN_RB), BM_GETCHECK, 0, 0) == BST_CHECKED))
 		_this->quickoption = 7;
 	// Options for LAN Mode
-	HWND hLan = GetDlgItem(hwnd, IDC_LAN_RB);
-	if ((SendMessage(hLan, BM_GETCHECK, 0, 0) == BST_CHECKED))
+	if ((SendMessage(GetDlgItem(hwnd, IDC_LAN_RB), BM_GETCHECK, 0, 0) == BST_CHECKED))
 		_this->quickoption = 2;
 	// Options for Medium Mode
-	HWND hMedium = GetDlgItem(hwnd, IDC_MEDIUM_RB);
-	if ((SendMessage(hMedium, BM_GETCHECK, 0, 0) == BST_CHECKED))
+	if ((SendMessage(GetDlgItem(hwnd, IDC_MEDIUM_RB), BM_GETCHECK, 0, 0) == BST_CHECKED))
 		_this->quickoption = 3;
 	// Options for Modem Mode 
-	HWND hModem = GetDlgItem(hwnd, IDC_MODEM_RB);
-	if ((SendMessage(hModem, BM_GETCHECK, 0, 0) == BST_CHECKED))
+	if ((SendMessage(GetDlgItem(hwnd, IDC_MODEM_RB), BM_GETCHECK, 0, 0) == BST_CHECKED))
 		_this->quickoption = 4;
 	// Options for Slow Mode
-	HWND hLow = GetDlgItem(hwnd, IDC_SLOW_RB);
-	if ((SendMessage(hLow, BM_GETCHECK, 0, 0) == BST_CHECKED))
+	if ((SendMessage(GetDlgItem(hwnd, IDC_SLOW_RB), BM_GETCHECK, 0, 0) == BST_CHECKED))
 		_this->quickoption = 5;
 	// Options for Manual
-	HWND hManual = GetDlgItem(hwnd, IDC_MANUAL);
-	if ((SendMessage(hManual, BM_GETCHECK, 0, 0) == BST_CHECKED))
+	if ((SendMessage(GetDlgItem(hwnd, IDC_MANUAL), BM_GETCHECK, 0, 0) == BST_CHECKED))
 		_this->quickoption = 8;
 	// Set the params depending on the selected QuickOption
 	_this->m_pCC->HandleQuickOption();

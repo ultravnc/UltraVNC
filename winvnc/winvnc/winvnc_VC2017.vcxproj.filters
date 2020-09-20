@@ -438,4 +438,10 @@
       <Filter>resources</Filter>
     </ResourceCompile>
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="up.bmp" />
+    <Image Include="down.bmp" />
+    <Image Include="res\LedGreen.bmp" />
+    <Image Include="res\LedRed.bmp" />
+  </ItemGroup>
 </Project>
