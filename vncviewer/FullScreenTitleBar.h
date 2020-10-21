@@ -88,7 +88,7 @@ private:
 	HWND Pin;
 	HWND Close;
 	HWND Maximize;
-	HWND Minimize;
+	//HWND Minimize;
 
 	HWND Screen;
 	HWND Photo;
@@ -102,6 +102,7 @@ private:
 	//Text to show on titlebar and it corespondent font! :)
 	LPTSTR Text;
 	HFONT Font;
+	int MonitorTop;
 
 	void CreateToolTipForRect(HWND hwndParent, HWND hwndTip,char * text);
 };

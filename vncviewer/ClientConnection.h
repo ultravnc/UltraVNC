@@ -340,6 +340,9 @@ private:
 	// ClientConnectionFullScreen.cpp
 	void SetFullScreenMode(bool enable);
 	bool InFullScreenMode();
+	void saveScreenPosition();
+	void restoreScreenPosition();
+	RECT mainRect;
 	void RealiseFullScreenMode();
 	void BorderlessMode();
 	bool BumpScroll(int x, int y);

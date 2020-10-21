@@ -44,13 +44,14 @@ CTitleBar::CTitleBar()
 	Pin = nullptr;
 	Close = nullptr;
 	Maximize = nullptr;
-	Minimize = nullptr;
+//	Minimize = nullptr;
 	Screen = nullptr;
 	Photo = nullptr;
 	SwitchMonitor = nullptr;
 	ScreenTip = nullptr;
 	PhotoTip = nullptr;
 	SwitchMonitorTip = nullptr;
+	MonitorTop = 0;
 }
 
 CTitleBar::CTitleBar(HINSTANCE hInst, HWND ParentWindow, bool Fit)
@@ -69,7 +70,7 @@ CTitleBar::~CTitleBar()
 	if (Pin) DestroyWindow(Pin);
 	if (Close) DestroyWindow(Close);
 	if (Maximize) DestroyWindow(Maximize);
-	if (Minimize) DestroyWindow(Minimize);
+//	if (Minimize) DestroyWindow(Minimize);
 	if (m_hWnd) DestroyWindow(m_hWnd);
 	if (Screen) DestroyWindow(Screen);
 	if (Photo) DestroyWindow(Photo);
@@ -108,6 +109,7 @@ void CTitleBar::Init()
 		// TitleBarThis=this; // Added Jef Fix
 		this->CreateDisplay();
 	}
+	
 }
 
 //***************************************************************************************
@@ -201,13 +203,13 @@ void CTitleBar::CreateDisplay()
 				nullptr);
 	
 	//Minimize button
-	Minimize=CreateWindow("STATIC",
+/*	Minimize=CreateWindow("STATIC",
 				"Minimize",
 				WS_CHILD | WS_VISIBLE | SS_NOTIFY | SS_OWNERDRAW,
                 tbWidth-tbRightSpace-(tbcxPicture*3)-(tbButtonSpace*2), tbTopSpace, tbcxPicture, tbcyPicture, m_hWnd,
 				(HMENU)tbIDC_MINIMIZE,
                 hInstance,
-				nullptr);
+				nullptr);*/
 
 	Screen=CreateWindow("STATIC",
 				"Screen",
@@ -534,9 +536,9 @@ LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg,
 				RECT lpRect;
 				::GetWindowRect(TitleBarThis->m_hWnd, &lpRect);
 
-				if( ((lpRect.top==0)&&(TitleBarThis->SlideDown==TRUE))
+				if( ((lpRect.top== TitleBarThis->MonitorTop)&&(TitleBarThis->SlideDown==TRUE))
 					||
-					((lpRect.top==-tbHeigth+1)&&(TitleBarThis->SlideDown==FALSE)))
+					((lpRect.top== TitleBarThis->MonitorTop -tbHeigth+1)&&(TitleBarThis->SlideDown==FALSE)))
 				{
 					KillTimer(TitleBarThis->m_hWnd, tbScrollTimerID);
 
@@ -787,7 +789,8 @@ void CTitleBar::MoveToMonitor(HMONITOR hMonitor)
     // now calculate our new origin relative to the new monitor.
     GetMonitorInfo(hMonitor, &mi);
     int x = mi.rcMonitor.left + (  mi.rcMonitor.right-mi.rcMonitor.left)/2-tbWidth/2;
-    int y = mi.rcMonitor.top -tbHeigth+1;
+    int y = mi.rcMonitor.top -tbHeigth;
+	MonitorTop = mi.rcMonitor.top;
     // finally move the window.
 
 

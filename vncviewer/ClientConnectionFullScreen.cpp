@@ -37,6 +37,16 @@
 extern char sz_J1[128];
 extern char sz_J2[64];
 
+void ClientConnection::saveScreenPosition()
+{
+	GetWindowRect(m_hwndMain, &mainRect);
+}
+
+void ClientConnection::restoreScreenPosition()
+{
+	SetWindowPos(m_hwndMain, HWND_TOPMOST, mainRect.left, mainRect.top, mainRect.right- mainRect.left, mainRect.bottom- mainRect.top, SWP_FRAMECHANGED);
+}
+
 bool ClientConnection::InFullScreenMode() 
 {
 	return m_opts.m_FullScreen; 
@@ -48,15 +58,20 @@ void ClientConnection::SetFullScreenMode(bool enable)
 	if (enable) {
 		ShowToolbar = m_opts.m_ShowToolbar;
 		m_opts.m_ShowToolbar = 0;		
+		saveScreenPosition();
+		SizeWindow();
+		m_opts.m_FullScreen = enable;
+		RealiseFullScreenMode();
 	}
 	else if (ShowToolbar != -1) {		
 		m_opts.m_ShowToolbar = ShowToolbar;
 		ShowToolbar = -1;		
+		m_opts.m_FullScreen = enable;
+		SizeWindow();		
+		RealiseFullScreenMode();
+		restoreScreenPosition();
 	}
-	SizeWindow();
 
-	m_opts.m_FullScreen = enable;
-	RealiseFullScreenMode();
 	SendFullFramebufferUpdateRequest(false);
     RedrawWindow(m_hwndMain, NULL, NULL, RDW_FRAME | RDW_INVALIDATE);
 }
@@ -95,7 +110,7 @@ void ClientConnection::RealiseFullScreenMode()
 
 		// when the remote size is bigger then 1,5 time the localscreen we use all monitors in
 		// fullscreen mode
-		if (m_si.framebufferWidth > cx * 1.5 || m_si.framebufferHeight > cy * 1.5) {
+		if ((m_si.framebufferWidth > cx * 1.5 || m_si.framebufferHeight > cy * 1.5) && m_opts.m_allowMonitorSpanning){
 			tempdisplayclass tdc;
 			tdc.Init();
 			x = 0;

@@ -3843,7 +3843,7 @@ void ClientConnection::SizeWindow(bool reconnect)
 	if (m_opts.m_ShowToolbar)
 		ShowWindow(m_hwndTBwin, SW_SHOW);
 	else
-		ShowWindow(m_hwndTB, SW_HIDE);
+		ShowWindow(m_hwndTBwin, SW_HIDE);
 }
 
 // We keep a local copy of the whole screen.  This is not strictly necessary
@@ -7571,14 +7571,6 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						// adzm - 2010-07 - Extended clipboard
 						//_this->UpdateMenuItems(); // Handled in WM_INITMENUPOPUP
 						break;
-
-					/*
-					case ID_BUTTON:
-						_this->m_opts.m_ShowToolbar=true;
-						_this->SizeWindow();
-						_this->SetFullScreenMode(_this->InFullScreenMode());
-						break;
-					*/
 
 					case ID_AUTOSCALING:
 						_this->m_opts.m_fAutoScaling = !_this->m_opts.m_fAutoScaling;
