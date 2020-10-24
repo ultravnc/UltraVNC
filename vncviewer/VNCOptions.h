@@ -140,7 +140,7 @@ public:
 	bool m_preemptiveUpdates;
 	void CheckProxyAndHost();
 #ifdef _Gii
-	bool m_giienable;
+	bool m_giiEnable;
 #endif
 
 	int DoDialog(bool running = false, HWND hwnd = NULL);

@@ -756,6 +756,9 @@ void SessionDialog::InitDlgProcKeyboardMouse()
 	SendMessage(hJapkeyboard, BM_SETCHECK, JapKeyboard, 0);
 	HWND hNoHotKeys = GetDlgItem(hwnd, IDC_NOHOTKEYS);
 	SendMessage(hNoHotKeys, BM_SETCHECK, NoHotKeys, 0);
+
+	HWND hGii = GetDlgItem(hwnd, IDC_GII);
+	SendMessage(hGii, BM_SETCHECK, giiEnable, 0);
 }
 ////////////////////////////////////////////////////////////////////////////////
 void SessionDialog::setDisplays()
@@ -1034,6 +1037,9 @@ void SessionDialog::ReadDlgProcKeyboardMouse()
 	HWND hJapkeyboard = GetDlgItem(hwnd, IDC_JAPKEYBOARD);
 	JapKeyboard =
 		(SendMessage(hJapkeyboard, BM_GETCHECK, 0, 0) == BST_CHECKED);
+
+	HWND hGii = GetDlgItem(hwnd, IDC_GII);
+	giiEnable = (SendMessage(hGii, BM_GETCHECK, 0, 0) == BST_CHECKED);
 
 	requestShapeUpdates = false;
 	ignoreShapeUpdates = false;

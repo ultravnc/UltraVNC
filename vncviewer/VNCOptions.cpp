@@ -224,7 +224,7 @@ VNCOptions::VNCOptions()
 	_tcscpy_s(m_imageFormat, ".jpeg");
 
 #ifdef _Gii
-	m_giienable = true;
+	m_giiEnable = false;
 #endif
 
 	m_fAutoAcceptIncoming = false;
@@ -420,7 +420,7 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
 	m_throttleMouse = s.m_throttleMouse; // adzm 2010-10
 
 #ifdef _Gii
-	m_giienable = s.m_giienable;
+	m_giiEnable = s.m_giiEnable;
 #endif
 	m_fAutoAcceptIncoming = true;
 	//adzm 2009-06-21
@@ -957,7 +957,7 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 #ifdef _Gii
 		else if (SwitchMatch(args[j], _T("giienable")))
 		{
-			m_giienable = true;
+			m_giiEnable = true;
 		}
 #endif
 		else if (SwitchMatch(args[j], _T("autoacceptnodsm")))
@@ -1266,7 +1266,7 @@ void VNCOptions::Load(char* fname)
 	m_throttleMouse = readInt("ThrottleMouse", m_throttleMouse, fname); // adzm 2010-10
 
 #ifdef _Gii
-	m_giienable = readInt("GiiEnable", (int)m_giienable, fname) ? true : false;
+	m_giiEnable = readInt("GiiEnable", (int)m_giiEnable, fname) ? true : false;
 #endif
 
 	//adzm 2009-06-21

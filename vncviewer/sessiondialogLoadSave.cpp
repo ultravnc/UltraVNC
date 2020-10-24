@@ -198,7 +198,10 @@ void SessionDialog::SaveToFile(char *fname, bool asDefault)
 	saveInt("ThrottleMouse",		throttleMouse,    fname); 
 	saveInt("KeepAliveInterval",    keepAliveInterval,    fname);	
 	saveInt("AutoAcceptIncoming",	fAutoAcceptIncoming, fname);  
-	saveInt("AutoAcceptNoDSM",		fAutoAcceptNoDSM, fname);	    
+	saveInt("AutoAcceptNoDSM",		fAutoAcceptNoDSM, fname);
+#ifdef _Gii
+	saveInt("GiiEnable", giiEnable, fname);
+#endif
 	saveInt("RequireEncryption",	fRequireEncryption, fname);
 	saveInt("restricted",			restricted,		fname);  //hide menu
 	saveInt("nostatus",				NoStatus,			fname); //hide status window
@@ -283,7 +286,7 @@ void SessionDialog::LoadFromFile(char *fname)
       keepAliveInterval = (FTTimeout  - KEEPALIVE_HEADROOM); 
   throttleMouse = readInt("ThrottleMouse", throttleMouse, fname); // adzm 2010-10
 #ifdef _Gii
-  giienable = readInt("GiiEnable", (int)giienable, fname) ? true : false;
+  giiEnable = readInt("GiiEnable", (int)giiEnable, fname) ? true : false;
 #endif
   fAutoAcceptIncoming = readInt("AutoAcceptIncoming", (int)fAutoAcceptIncoming, fname) ? true : false;
   fAutoAcceptNoDSM = readInt("AutoAcceptNoDSM", (int)fAutoAcceptNoDSM, fname) ? true : false;
@@ -390,4 +393,5 @@ void SessionDialog::SetDefaults()
 	setdefaults = true;
 	SettingsToUI();
 	setdefaults = false;
+	giiEnable = false;
 }

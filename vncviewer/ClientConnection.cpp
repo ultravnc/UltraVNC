@@ -4081,7 +4081,7 @@ void ClientConnection::SetFormatAndEncodings()
 	}
 
 #ifdef _Gii
-	if (m_opts.m_giienable)
+	if (m_opts.m_giiEnable)
 		encs[se->nEncodings++] = Swap32IfLE(rfbEncodingGII);
 #endif
 

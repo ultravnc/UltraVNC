@@ -95,6 +95,7 @@ public:
 	bool enableJpegCompression;
 	int	jpegQualityLevel;
 	int  throttleMouse;
+	bool giiEnable;
 	bool requestShapeUpdates;
 	int  quickoption;
 	bool ignoreShapeUpdates;

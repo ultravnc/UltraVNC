@@ -504,13 +504,13 @@ int vnctouch::_handle_gii_version_message(rfbGIIMsg *msg, int gii_bigendian)
 		max < rfbGIIMinVersion)
 		return 0;
 	if ((cmsg.version = _find_gii_version(min, max)) == -1) {
-		cc->m_opts.m_giienable = 0;
+		cc->m_opts.m_giiEnable = 0;
 		return 0;
 	}
 	serverVersion = cmsg.version;
 	cmsg.version = Swap16IfLE(cmsg.version);
 	cc->WriteExact((char*)&cmsg, sz_rfbGIIClientVersionMsg);
-	cc->m_opts.m_giienable = 1;
+	cc->m_opts.m_giiEnable = 1;
 	return 1;
 }
 
