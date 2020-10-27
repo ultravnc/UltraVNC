@@ -131,6 +131,7 @@ SessionDialog::SessionDialog(VNCOptions *pOpt, ClientConnection* pCC, CDSMPlugin
 
 
 	keepAliveInterval = m_pOpt->m_keepAliveInterval;
+	giiEnable = m_pOpt->m_giiEnable;
 	fAutoAcceptIncoming = m_pOpt->m_fAutoAcceptIncoming;
 	fAutoAcceptNoDSM = m_pOpt->m_fAutoAcceptNoDSM;
 	fRequireEncryption = m_pOpt->m_fRequireEncryption;
@@ -597,6 +598,7 @@ bool SessionDialog::connect(HWND hwnd)
 	strcpy_s(m_pOpt->m_imageFormat, imageFormat);
 	m_pOpt->m_scaling = scaling;
 	m_pOpt->m_keepAliveInterval = keepAliveInterval;
+	m_pOpt->m_giiEnable = giiEnable;
 	m_pOpt->m_fAutoAcceptIncoming = fAutoAcceptIncoming;
 	m_pOpt->m_fAutoAcceptNoDSM =fAutoAcceptNoDSM;
 	m_pOpt->m_fRequireEncryption = fRequireEncryption;

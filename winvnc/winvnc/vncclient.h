@@ -97,6 +97,8 @@ struct MyTouchINfo
 typedef BOOL(__cdecl*PInitializeTouchInjection)(int);
 typedef BOOL(__cdecl*PInjectTouch)(int points, MyTouchINfo *ti_array);
 #endif
+typedef BOOL(WINAPI* PtrInjectTouchInput)(UINT32, POINTER_TOUCH_INFO*);
+typedef BOOL(WINAPI* PtrInitializeTouchInjection)(UINT32, DWORD);
 #endif
 
 extern int CheckUserGroupPasswordUni(char * userin,char *password,const char *machine);
@@ -689,6 +691,8 @@ protected:
 	PInjectTouch DLL_PInjectTouch;
 	HMODULE win8dllHandle;
 #endif
+	PtrInjectTouchInput InjectTouchInputUVNC;
+	PtrInitializeTouchInjection InitializeTouchInjectionUVNC;
 	bool *point_status;
 	DWORD nr_points;
 #endif

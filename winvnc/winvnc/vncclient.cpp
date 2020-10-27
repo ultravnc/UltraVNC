@@ -2154,6 +2154,14 @@ vncClientThread::run(void *arg)
 		DLL_PInjectTouch = (PInjectTouch) GetProcAddress(win8dllHandle, "DLL_PInjectTouch");;
 	}
 #endif
+	InjectTouchInputUVNC = NULL;
+	InitializeTouchInjectionUVNC = NULL;
+	HINSTANCE user32 = LoadLibraryA("user32.dll");
+	if (user32) {
+		InjectTouchInputUVNC = (PtrInjectTouchInput)(GetProcAddress(user32, "InjectTouchInput"));
+		InitializeTouchInjectionUVNC = (PtrInitializeTouchInjection)(GetProcAddress(user32, "InitializeTouchInjection"));		
+	}
+
 #endif
 	// All this thread does is go into a socket-receive loop,
 	// waiting for stuff on the given socket
@@ -2805,7 +2813,7 @@ vncClientThread::run(void *arg)
 					m_server->DisableCacheForAllClients();
 #ifdef _Gii
 				// Gii encoding requested (MC Multitouch Extensions)
-				if (gii_set)
+				if (gii_set && InjectTouchInputUVNC != NULL && InitializeTouchInjectionUVNC !=NULL)
 				{
 					InitGiiVersion();
 				}
@@ -3038,7 +3046,7 @@ vncClientThread::run(void *arg)
 							contact[i].pointerInfo.pointerId = ti_array[i].TouchId;          //contact 0
 							contact[i].pointerInfo.pointerFlags = ti_array[i].pointerflag;
 						}
-						BOOL value = InjectTouchInput(rfbGIIValutorEvent.first, contact);
+						BOOL value = InjectTouchInputUVNC(rfbGIIValutorEvent.first, contact);
 #ifdef _DEBUG					
 						if (value == 0) sprintf_s(szText, "FAIL index %d %i\n", GetLastError(), rfbGIIValutorEvent.first);
 						else sprintf_s(szText, "OK number points %i\n", rfbGIIValutorEvent.first);
@@ -3168,7 +3176,7 @@ vncClientThread::run(void *arg)
 #ifdef _USE_DLL					   
 								if (DLL_InitializeTouchInjection) DLL_InitializeTouchInjection(rfbGIIClientDeviceCreation.numButtons);
 #else
-								InitializeTouchInjection(rfbGIIClientDeviceCreation.numButtons, TOUCH_FEEDBACK_DEFAULT);
+								InitializeTouchInjectionUVNC(rfbGIIClientDeviceCreation.numButtons, TOUCH_FEEDBACK_DEFAULT);
 #endif
 								nr_points = rfbGIIClientDeviceCreation.numButtons;
 								if (nr_points>0 && nr_points<254) point_status = new bool[nr_points];
