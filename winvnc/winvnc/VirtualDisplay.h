@@ -31,6 +31,19 @@ typedef struct _VIRTUALDISPLAY
 	HANDLE hEvent;
 }VIRTUALDISPLAY;
 
+typedef HRESULT(__cdecl* PSwDeviceCreate)(
+	PCWSTR                      pszEnumeratorName,
+	PCWSTR                      pszParentDeviceInstance,
+	const SW_DEVICE_CREATE_INFO* pCreateInfo,
+	ULONG                       cPropertyCount,
+	const DEVPROPERTY* pProperties,
+	SW_DEVICE_CREATE_CALLBACK   pCallback,
+	PVOID                       pContext,
+	PHSWDEVICE                  phSwDevice
+	);
+
+typedef void(__cdecl* PSwDeviceClose)(HSWDEVICE hSwDevice);
+
 class VirtualDisplay
 {
 private:
@@ -41,6 +54,9 @@ private:
 	std::list <VIRTUALDISPLAY> virtualDisplayList;
 	bool initialized;
 	bool restoreNeeded;
+	HMODULE hdll;
+	PSwDeviceCreate SwDeviceCreateUVNC;
+	PSwDeviceClose SwDeviceCloseUVNC;
 public:
 	VirtualDisplay();
 	~VirtualDisplay();
@@ -49,7 +65,6 @@ public:
 	bool AddVirtualDisplay(HSWDEVICE& hSwDevice, HANDLE& hEvent, WCHAR* name);
 	static bool InstallDriver();
 	void changeMonitors(int flag, map< pair<int, int>, pair<int, int> >resolutionMap);
-	void VirtualDisplay::DisablePrimary();
-	void VirtualDisplay::getMapElement(int nummer, int& x, int& y, int& w, int& h, map< pair<int, int>, pair<int, int> >resolutionMap);
+	void VirtualDisplay::getMapElement(int nummer, int& x, int& y, int& w, int& h, map< pair<int, int>, pair<int, int> >resolutionMap);	
 };
 

@@ -25,6 +25,14 @@ CreationCallback(
 
 VirtualDisplay::VirtualDisplay()
 {
+	hdll = LoadLibrary("cfgmgr32.dll");
+	SwDeviceCreateUVNC = NULL;
+	SwDeviceCloseUVNC = NULL;
+	if (hdll) {
+		SwDeviceCreateUVNC = (PSwDeviceCreate)GetProcAddress(hdll, "SwDeviceCreate");
+		SwDeviceCloseUVNC = (PSwDeviceClose)GetProcAddress(hdll, "SwDeviceClose");
+	}
+
 	FileView = NULL;
 	hFileMap = NULL;
 	pbuff = NULL;
@@ -104,7 +112,8 @@ VirtualDisplay::~VirtualDisplay()
 	while (virtualDisplayIter != virtualDisplayList.end())
 	{
 		if ((*virtualDisplayIter).hDevice)
-			SwDeviceClose((*virtualDisplayIter).hDevice);
+			if (SwDeviceCloseUVNC)
+				SwDeviceCloseUVNC((*virtualDisplayIter).hDevice);
 		if ((*virtualDisplayIter).hEvent)
 			CloseHandle((*virtualDisplayIter).hEvent);
 		virtualDisplayIter++;
@@ -164,6 +173,8 @@ void VirtualDisplay::changeMonitors(int flag , map< pair<int, int>, pair<int, in
 			int w = (it->second).first;
 			int h = (it->second).second;
 			SetVirtualMonitorsSize(h, w);
+		}
+		for (it = resolutionMap.begin(); it != resolutionMap.end(); it++) {
 			AddVirtualMonitors();
 		}
 		Sleep(1000);
@@ -203,8 +214,8 @@ void VirtualDisplay::changeMonitors(int flag , map< pair<int, int>, pair<int, in
 					getMapElement(element, x, y, w, h, resolutionMap);
 					dm.dmPosition.x = x;
 					dm.dmPosition.y = y;
-					dm.dmPelsHeight = w;
-					dm.dmPelsWidth = h;
+					dm.dmPelsHeight = h;
+					dm.dmPelsWidth = w;
 					if ( x==0  && y == 0)
 						ChangeDisplaySettingsEx(dd.DeviceName, &dm, NULL, (CDS_UPDATEREGISTRY | CDS_NORESET | CDS_SET_PRIMARY), NULL);
 					else
@@ -240,6 +251,8 @@ void VirtualDisplay::changeMonitors(int flag , map< pair<int, int>, pair<int, in
 			int w = (it->second).first;
 			int h = (it->second).second;
 			SetVirtualMonitorsSize(h, w);
+		}
+		for (it = resolutionMap.begin(); it != resolutionMap.end(); it++) {
 			AddVirtualMonitors();
 		}
 		
@@ -267,9 +280,14 @@ void VirtualDisplay::SetVirtualMonitorsSize(int height, int width)
 {
 	if (!initialized)
 		return;
-	pbuff->w[0] = width;
-	pbuff->h[0] = height;
-	pbuff->counter = 1;
+	//we don't want dubbels
+	for (int i = 0; i < pbuff->counter; i++)
+		if (pbuff->w[i] == width && pbuff->h[i] == height)
+			return;
+
+	pbuff->w[pbuff->counter] = width;
+	pbuff->h[pbuff->counter] = height;
+	pbuff->counter += 1;
 }
 
 void VirtualDisplay::AddVirtualMonitors()
@@ -311,8 +329,14 @@ bool VirtualDisplay::AddVirtualDisplay(HSWDEVICE& hSwDevice, HANDLE& hEvent, WCH
 	createInfo.CapabilityFlags = SWDeviceCapabilitiesRemovable |
 		SWDeviceCapabilitiesSilentInstall |
 		SWDeviceCapabilitiesDriverRequired;
-	HRESULT hr = SwDeviceCreate(name, L"HTREE\\ROOT\\0", &createInfo, 0,
-		nullptr, CreationCallback, &hEvent, &hSwDevice);
+
+	HRESULT hr = S_FALSE;
+	if (SwDeviceCreateUVNC != NULL) {
+			hr = SwDeviceCreateUVNC(name, L"HTREE\\ROOT\\0", &createInfo, 0,
+				nullptr, CreationCallback, &hEvent, &hSwDevice);
+	}
+	else
+		return false;
 
 	if (FAILED(hr))
 		return false;
