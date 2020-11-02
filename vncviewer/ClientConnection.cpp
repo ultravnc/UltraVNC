@@ -7606,19 +7606,15 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						break;
 
 					case SC_MINIMIZE:
+						if (_this->InFullScreenMode())
+							return TRUE;
 						_this->SetDormant(true);
-						if (_this->m_hwndStatus)ShowWindow(_this->m_hwndStatus,SW_MINIMIZE);
+						if (_this->m_hwndStatus)
+							ShowWindow(_this->m_hwndStatus,SW_MINIMIZE);
 						break;
 
 					case SC_MAXIMIZE:
-						// Toggle full screen mode
-						if (!_this->InFullScreenMode())
-						{
-							SendMessage(hwnd,WM_SYSCOMMAND,(WPARAM)ID_NORMALSCREEN,(LPARAM)0);
-							Sleep(100);
-						}
 						_this->SetFullScreenMode(!_this->InFullScreenMode());
-						return 0;
 						break;
 
 					case SC_RESTORE:
@@ -7704,15 +7700,6 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						return 0;
 
 					case ID_FULLSCREEN:
-						// Toggle full screen mode
-						if (!_this->InFullScreenMode()) //PGM
-
-						{ //PGM
-							SendMessage(hwnd,WM_SYSCOMMAND,(WPARAM)ID_NORMALSCREEN,(LPARAM)0); //PGM
-
-							Sleep(100); //PGM
-						} //PGM
-
 						_this->SetFullScreenMode(!_this->InFullScreenMode());
 						return 0;
 
@@ -7997,34 +7984,6 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 								_this->m_pendingFormatChange = true;
 							}
 
-							return 0;
-						}
-
-						// Modif sf@2002
-					case ID_NORMALSCREEN:
-						{
-							// Toggle normal screen
-							/*int nOldServerScale = _this->m_nServerScale;
-
-							_this->m_opts.m_fAutoScaling = false;
-							_this->m_nServerScale = 1;
-							_this->m_opts.m_nServerScale = 1;
-							_this->m_opts.m_scaling = false;
-							_this->m_opts.m_scale_num = 100;
-							_this->m_opts.m_scale_den = 100;
-
-							if (_this->m_nServerScale != nOldServerScale)
-							{
-								_this->SendServerScale(_this->m_nServerScale);
-								// _this->m_pendingFormatChange = true;
-							}
-							else
-							{
-								_this->SizeWindow();
-								InvalidateRect(hwnd, NULL, TRUE);
-								_this->SetFullScreenMode(false);
-								_this->m_pendingFormatChange = true;
-							}*/
 							return 0;
 						}
 
@@ -8591,19 +8550,6 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						_this->m_vScrollPos = newvpos;
 						_this->UpdateScrollbars();
 						}
-
-					//Added by: Lars Werner (http://lars.werner.no)
-					if(wParam==SIZE_MAXIMIZED&&_this->InFullScreenMode()==FALSE)
-					{
-						_this->SetFullScreenMode(!_this->InFullScreenMode());
-						//MessageBox(NULL,"Fullscreeen from maximizehora...","KAKE",MB_OK);
-						//return 0;
-					}
-
-					//Modified by: Lars Werner (http://lars.werner.no)
-					if(_this->InFullScreenMode()==TRUE)
-						return 0;
-					else
 						break;
 					}
 

@@ -70,16 +70,17 @@ static LRESULT CALLBACK MessageDlgProc2(HWND hwnd, UINT iMsg,
 			EndDialog(hwnd, TRUE);
 		}
 		if (LOWORD(wParam) == IDC_BUTTON1) {
-			char link[256];
+			ShellExecute(GetDesktopWindow(), "open", "https://www.uvnc.com", "", 0, SW_SHOWNORMAL);
+			/*char link[256];
 			char tempchar[10];
-			strcpy_s(link,"http://www.uvnc.com/onlinehelp/");
+			strcpy_s(link,"https://www.uvnc.com");
 			_itoa_s(g_error_nr2,tempchar,10);
 			strcat_s(link,tempchar);
 			strcat_s(link,".html");
-			ShellExecute(GetDesktopWindow(), "open", link, "", 0, SW_SHOWNORMAL);
+			ShellExecute(GetDesktopWindow(), "open", link, "", 0, SW_SHOWNORMAL);*/
 		}
 		if (LOWORD(wParam) == IDC_BUTTON2) {
-			ShellExecute(GetDesktopWindow(), "open", "http://sponsor.uvnc.com/index.html", "", 0, SW_SHOWNORMAL);
+			ShellExecute(GetDesktopWindow(), "open", "https://www.uvnc2me.com", "", 0, SW_SHOWNORMAL);
 		}
 	}
 	return FALSE;

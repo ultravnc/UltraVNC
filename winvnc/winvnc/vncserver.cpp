@@ -247,7 +247,10 @@ vncServer::vncServer()
 	m_fSendExtraMouse = TRUE;
 	retryThreadHandle = NULL;
 	retrysock = NULL;
+	virtualDisplay = NULL;
 	m_virtualDisplaySupported = VirtualDisplay::InstallDriver();
+	if (m_virtualDisplaySupported)
+		virtualDisplay = new VirtualDisplay();
 }
 
 vncServer::~vncServer()
@@ -349,6 +352,9 @@ vncServer::~vncServer()
 	//sometimes crash, vnclog seems already removed
 	//	vnclog.Print(LL_STATE, VNCLOG("shutting down server object(4)\n"));
 	g_Server_running=false;
+
+	if (virtualDisplay)
+		delete virtualDisplay;
 }
 
 void

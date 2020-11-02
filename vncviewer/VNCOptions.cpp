@@ -1228,6 +1228,14 @@ void VNCOptions::Load(char* fname)
 	m_fUseDSMPlugin = readInt("UseDSMPlugin", m_fUseDSMPlugin, fname) != 0;
 	m_fUseProxy = readInt("UseProxy", m_fUseProxy, fname) != 0;
 
+	m_allowMonitorSpanning = readInt("allowMonitorSpanning", m_allowMonitorSpanning, fname);
+	m_ChangeServerRes = readInt("ChangeServerRes", m_ChangeServerRes, fname);
+	m_extendDisplay = readInt("extendDisplay", m_extendDisplay, fname);
+	m_use_virt = readInt("use_virt", m_use_virt, fname);
+	m_use_allmonitors = readInt("use_allmonitors", m_use_allmonitors, fname);
+	m_requestedWidth = readInt("requestedWidth", m_requestedWidth, fname);
+	m_requestedHeight = readInt("requestedHeight", m_requestedHeight, fname);
+
 	GetPrivateProfileString("options", "DSMPlugin", "NoPlugin", m_szDSMPluginFilename, MAX_PATH, fname);
 	GetPrivateProfileString("options", "folder", m_document_folder, m_document_folder, MAX_PATH, fname);
 	GetPrivateProfileString("options", "prefix", m_prefix, m_prefix, 56, fname);

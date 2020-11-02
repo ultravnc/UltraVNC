@@ -88,8 +88,8 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,8,135,54,16
     CONTROL         IDB_LOGO64,IDC_VNCLOGO,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_SUNKEN,7,5,53,46,WS_EX_TRANSPARENT
     LTEXT           "UltraVNC Server  1.3.0",IDC_VERSION,73,5,145,11
-    LTEXT           "Copyright © 2002-2018 UltraVNC Team\nCopyright © 2001-2002 Sam - eSVNC \nCopyright © 1999-2002 Rudi D. V. - VdaccVNC \nCopyright © 2001 Harakan Software - PalmVNC\nCopyright © 1999-2002 Const. Kaplinsky - TightVNC \n",IDC_NAME,74,27,202,41
-    LTEXT           "For more Information and Links please visit: \nhttp://www.uvnc.com",IDC_WWW,74,135,141,19
+    LTEXT           "Copyright © 2002-2020 UltraVNC Team\nCopyright © 2001-2002 Sam - eSVNC \nCopyright © 1999-2002 Rudi D. V. - VdaccVNC \nCopyright © 2001 Harakan Software - PalmVNC\nCopyright © 1999-2002 Const. Kaplinsky - TightVNC \n",IDC_NAME,74,27,202,41
+    LTEXT           "For more Information and Links please visit: \nhttps://www.uvnc.com",IDC_WWW,74,135,201,19
     LTEXT           "Build:",IDC_BUILDTEXT,74,16,20,10
     LTEXT           "BuildTime",IDC_BUILDTIME,97,16,92,10
     LTEXT           "Copyright © 2002 RealVNC Ltd. - RealVNC\nCopyright © 1999-2002 Tridia Corporation - TridiaVNC \nCopyright © 1994-2001 AT&&T Laboratories Cambridge/Olivetti Research Ltd. - VNC",IDC_STATIC,74,67,203,32
@@ -208,7 +208,7 @@ BEGIN
     CONTROL         "Disable clients options in tray icon menu",IDC_ALLOWEDITCLIENTS,
                     "Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_DISABLED | WS_TABSTOP,263,334,141,10
     CONTROL         "Forbid the user to close down WinVNC",IDC_ALLOWSHUTDOWN,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,263,346,135,10
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,263,346,151,10
     LTEXT           "Default Server Screen Scale:",IDC_STATIC,264,364,92,8
     LTEXT           "1 / ",IDC_STATIC,375,364,12,8
     EDITTEXT        IDC_SCALE,390,361,12,12,ES_AUTOHSCROLL
@@ -486,6 +486,11 @@ BEGIN
 END
 
 IDD_OUTGOING_CONN AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_ABOUT AFX_DIALOG_LAYOUT
 BEGIN
     0
 END

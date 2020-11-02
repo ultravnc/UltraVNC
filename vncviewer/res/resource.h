@@ -165,6 +165,7 @@
 #define IDC_VIEWONLY_CHECK              1100
 #define IDC_RADIO1                      1101
 #define IDC_RADIODIRECT                 1101
+#define IDC_RADIO_ONLY_VIRTUAL          1101
 #define IDC_ULTRALAN_RB                 1102
 #define IDC_ULTRA_LAN_RB                1103
 #define IDC_FULLCOLORS_RADIO            1104
@@ -244,11 +245,11 @@
 #define IDC_EXIT_CHECK                  1171
 #define IDC_RADIO2                      1172
 #define IDC_RADIOREPEATER               1172
+#define IDC_RADIO_EXTEND                1172
 #define IDC_MANUAL                      1173
 #define IDC_CHECK2                      1174
 #define IDC_AUTOACCEPTNOWARN            1174
 #define IDC_HIDESTATUS                  1174
-#define IDC_USERVIRT                    1174
 #define IDC_DIRECTX                     1175
 #define IDC_LIST1                       1176
 #define IDC_EDIT1                       1177
@@ -316,7 +317,6 @@
 #define IDC_RES                         2055
 #define IDC_ALLMONS                     2056
 #define IDC_ALLOWSPAN                   2057
-#define IDC_EXTENDDISPLAY               2058
 #define IDC_GII                         2059
 #define IDC_STATIC_SPLIT                9000
 #define IDC_HOSTNAME_DEL                9001

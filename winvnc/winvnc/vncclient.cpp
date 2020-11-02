@@ -2317,8 +2317,6 @@ vncClientThread::run(void *arg)
 	strcat_s(desktopname, " - ");
 	if (vncService::RunningAsService()) strcat_s(desktopname, "service mode");
 	else strcat_s(desktopname, "application mode");
-	if (m_server->m_virtualDisplaySupported)
-		strcat_s(desktopname, " - Virtual monitor(s) installed");
 
 	// Send the server format message to the client
 	rfbServerInitMsg server_ini;
@@ -2384,8 +2382,6 @@ vncClientThread::run(void *arg)
 	bool need_notify_extended_clipboard = false;
 	// adzm 2010-09 - Notify streaming DSM plugin support
 	bool need_notify_streaming_DSM = false;
-
-	VirtualDisplay virtalDisplay;
 
 	while (m_client->cl_connected)
 	{
@@ -2612,10 +2608,7 @@ vncClientThread::run(void *arg)
 
 					if (Swap32IfLE(encoding) == rfbEncodingExtDesktopSize) {
 						// only allow desktop resize when to the first client
-						if (m_server->AreThereMultipleViewers() == false)
-							m_client->m_use_ExtDesktopSize = true;
-						else
-							m_client->m_use_ExtDesktopSize = false;
+						m_client->m_use_ExtDesktopSize = true;
 						continue;
 					}
 
@@ -2886,12 +2879,7 @@ vncClientThread::run(void *arg)
 					{
 						MyTouchINfo *TI = NULL;
 						TI = new MyTouchINfo[rfbGIIValutorEvent.first];
-						//POINTER_TOUCH_INFO contact[10];
-						//memset(&contact, 0, sizeof(POINTER_TOUCH_INFO) * 10);
 						BOOL bRet = TRUE;
-						char			szText[256];
-
-
 						for (unsigned int j = 0; j < rfbGIIValutorEvent.first; j++)
 						{
 							DWORD ValuatorFlag = 0;
@@ -3619,7 +3607,7 @@ vncClientThread::run(void *arg)
 			}
 			{
 				map< pair<int, int>, pair<int, int> > resolutionMap;
-				int flag = 0;
+				DisplayMode flag = dmDisplay;
 				for (int i = 0; i < msg.sdm.numberOfScreens; i++) {
 					rfbExtDesktopScreen eds;
 					if (!m_socket->ReadExact(((char*)&eds), sz_rfbExtDesktopScreen)) {
@@ -3631,7 +3619,7 @@ vncClientThread::run(void *arg)
 					int y = Swap16IfLE(eds.y);
 					int w = Swap16IfLE(eds.width);
 					int h = Swap16IfLE(eds.height);
-					flag = Swap32IfLE(eds.flags);
+					flag = DisplayMode(Swap32IfLE(eds.flags));
 #ifdef _DEBUG
 					char			szText[256];
 					sprintf_s(szText, "++++++++++++++++++++++++++++++ DesktopScreen %i %i %i %i \n", x, y, w, h);
@@ -3640,8 +3628,14 @@ vncClientThread::run(void *arg)
 					resolutionMap.insert(make_pair(make_pair(x, y), make_pair(w, h)));
 				}
 				if (!m_server->m_virtualDisplaySupported)
-					flag = 0;
-				virtalDisplay.changeMonitors(flag, resolutionMap);
+					flag = dmDisplay;
+				// Only the first Viewer can set the resolution
+				// unless it's extended mode with a single monitor
+				// This way each viewer can add his own extended display
+				if (m_server->virtualDisplay && !m_server->AreThereMultipleViewers())
+					m_server->virtualDisplay->setMonitorResolutions(flag, resolutionMap, false, m_client->m_id);
+				if (m_server->virtualDisplay && m_server->AreThereMultipleViewers() && flag == dmExtend && resolutionMap.size() == 1)
+					m_server->virtualDisplay->setMonitorResolutions(flag, resolutionMap, true, m_client->m_id);
 			}
 			break;
 		// Set Single Window
@@ -4725,6 +4719,8 @@ vncClient::~vncClient()
 		WaitForSingleObject(ThreadHandleCompressFolder, INFINITE);
 		CloseHandle(ThreadHandleCompressFolder);
 	}
+	if (m_server->virtualDisplay)
+		m_server->virtualDisplay->disconnectDisplay(m_id, !m_server->AreThereMultipleViewers());
 }
 
 // Init
@@ -5145,44 +5141,51 @@ vncClient::SendUpdate(rfb::SimpleUpdateTracker &update)
 		rfbExtDesktopSizeMsg edsHdr;
 		rfbExtDesktopScreen eds;
 
-		if (m_use_ExtDesktopSize) {			
-			hdr.encoding = Swap32IfLE(rfbEncodingExtDesktopSize);
-			hdr.r.w = Swap16IfLE(NewsizeW * m_nScale_viewer / m_nScale);
-			hdr.r.h = Swap16IfLE(NewsizeH * m_nScale_viewer / m_nScale);
-			hdr.r.x = Swap16IfLE(m_server->m_virtualDisplaySupported);
-			hdr.r.y = Swap16IfLE(m_lastDesktopSizeChangeError);
-			edsHdr.numberOfScreens = 1;
-			edsHdr.pad[0] = edsHdr.pad[1] = edsHdr.pad[2] = 0;
-			for (int i = 0; i < 1; i++) {
-				eds.id = Swap32IfLE(1);
-				eds.x = Swap16IfLE(0);
-				eds.y = Swap16IfLE(0);
-				eds.width = Swap16IfLE(NewsizeW * m_nScale_viewer / m_nScale);
-				eds.height = Swap16IfLE(NewsizeH * m_nScale_viewer / m_nScale);
-				eds.flags = Swap32IfLE(0);
+		if (m_use_ExtDesktopSize) {	
+			HDESK desktop = GetThreadDesktop(GetCurrentThreadId());
+			DWORD dummy;
+			char new_name[256];
+			if (GetUserObjectInformation(desktop, UOI_NAME, &new_name, 256, &dummy) &&
+					strcmp(new_name, "Default") == 0 && vncService::InputDesktopSelected() != 2) {
+				hdr.encoding = Swap32IfLE(rfbEncodingExtDesktopSize);
+				hdr.r.w = Swap16IfLE(NewsizeW * m_nScale_viewer / m_nScale);
+				hdr.r.h = Swap16IfLE(NewsizeH * m_nScale_viewer / m_nScale);
+				hdr.r.x = Swap16IfLE(m_server->m_virtualDisplaySupported);
+				hdr.r.y = Swap16IfLE(m_lastDesktopSizeChangeError);
+				edsHdr.numberOfScreens = 1;
+				edsHdr.pad[0] = edsHdr.pad[1] = edsHdr.pad[2] = 0;
+				for (int i = 0; i < 1; i++) {
+					eds.id = Swap32IfLE(1);
+					eds.x = Swap16IfLE(0);
+					eds.y = Swap16IfLE(0);
+					eds.width = Swap16IfLE(NewsizeW * m_nScale_viewer / m_nScale);
+					eds.height = Swap16IfLE(NewsizeH * m_nScale_viewer / m_nScale);
+					eds.flags = Swap32IfLE(0);
+				}
+				rfbFramebufferUpdateMsg header;
+				header.nRects = Swap16IfLE(1);
+				//adzm 2010-09 - minimize packets. SendExact flushes the queue.
+				SendRFBMsgQueue(rfbFramebufferUpdate, (BYTE*)&header, sz_rfbFramebufferUpdateMsg);
+				m_socket->SendExact((char*)&hdr, sizeof(hdr));
+				m_socket->SendExact((char*)&edsHdr, sizeof(edsHdr));
+				m_socket->SendExact((char*)&eds, sizeof(eds));
+				m_use_ExtDesktopSize = false;
 			}
-
 		}
 		else if (m_use_NewSWSize) {			
 			hdr.r.x = 0;
 			hdr.r.y = 0;
 			hdr.r.w = Swap16IfLE(NewsizeW*m_nScale_viewer/m_nScale);
 			hdr.r.h = Swap16IfLE(NewsizeH*m_nScale_viewer/m_nScale);
-			hdr.encoding = Swap32IfLE(rfbEncodingNewFBSize);						
-		}
-		rfbFramebufferUpdateMsg header;
-		header.nRects = Swap16IfLE(1);
-		//adzm 2010-09 - minimize packets. SendExact flushes the queue.
-		SendRFBMsgQueue(rfbFramebufferUpdate, (BYTE*)&header, sz_rfbFramebufferUpdateMsg);
-		m_socket->SendExact((char*)&hdr, sizeof(hdr));
-		if (m_use_ExtDesktopSize) {
-			m_socket->SendExact((char*)&edsHdr, sizeof(edsHdr));
-			m_socket->SendExact((char*)&eds, sizeof(eds));
-		}
+			hdr.encoding = Swap32IfLE(rfbEncodingNewFBSize);
+			rfbFramebufferUpdateMsg header;
+			header.nRects = Swap16IfLE(1);
+			//adzm 2010-09 - minimize packets. SendExact flushes the queue.
+			SendRFBMsgQueue(rfbFramebufferUpdate, (BYTE*)&header, sz_rfbFramebufferUpdateMsg);
+			m_socket->SendExact((char*)&hdr, sizeof(hdr));
+		}				
 		m_NewSWUpdateWaiting = false;
-		m_use_ExtDesktopSize = false;
 		return TRUE;
-
 	}
 
 	// Find out how many rectangles in total will be updated

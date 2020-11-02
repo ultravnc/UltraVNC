@@ -315,10 +315,14 @@ BOOL CALLBACK DlgProcDisplay(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			return TRUE; }
 		case IDC_CHANGESERVER:
 			_this->changeServerRes = (SendMessage(GetDlgItem(hwnd, IDC_CHANGESERVER), BM_GETCHECK, 0, 0) == BST_CHECKED);
-			EnableWindow(GetDlgItem(hwnd, IDC_EXTENDDISPLAY), _this->changeServerRes);
-			EnableWindow(GetDlgItem(hwnd, IDC_USERVIRT), _this->changeServerRes);
+			EnableWindow(GetDlgItem(hwnd, IDC_RADIO_EXTEND), _this->changeServerRes);
+			EnableWindow(GetDlgItem(hwnd, IDC_RADIO_ONLY_VIRTUAL), _this->changeServerRes);
 			EnableWindow(GetDlgItem(hwnd, IDC_ALLMONS), _this->changeServerRes);
-			EnableWindow(GetDlgItem(hwnd, IDC_SLIDERRES), _this->changeServerRes);
+			EnableWindow(GetDlgItem(hwnd, IDC_SLIDERRES), _this->changeServerRes && !_this->use_allmonitors);
+			break;
+		case IDC_ALLMONS:
+			_this->use_allmonitors = (SendMessage(GetDlgItem(hwnd, IDC_ALLMONS), BM_GETCHECK, 0, 0) == BST_CHECKED);
+			EnableWindow(GetDlgItem(hwnd, IDC_SLIDERRES), _this->changeServerRes && !_this->use_allmonitors);
 			break;
 		default:
 
@@ -850,10 +854,10 @@ void SessionDialog::InitDlgProcDisplay()
 	HWND hallowMonitorSpanning = GetDlgItem(hwnd, IDC_ALLOWSPAN);
 	SendMessage(hallowMonitorSpanning, BM_SETCHECK, allowMonitorSpanning, 0);
 
-	HWND hExtendDisplay = GetDlgItem(hwnd, IDC_EXTENDDISPLAY);
+	HWND hExtendDisplay = GetDlgItem(hwnd, IDC_RADIO_EXTEND);
 	SendMessage(hExtendDisplay, BM_SETCHECK, extendDisplay, 0);
 
-	HWND hUseVirt = GetDlgItem(hwnd, IDC_USERVIRT);
+	HWND hUseVirt = GetDlgItem(hwnd, IDC_RADIO_ONLY_VIRTUAL);
 	SendMessage(hUseVirt, BM_SETCHECK, use_virt, 0);
 
 	HWND hAllMons = GetDlgItem(hwnd, IDC_ALLMONS);
@@ -862,7 +866,7 @@ void SessionDialog::InitDlgProcDisplay()
 	EnableWindow(hExtendDisplay, changeServerRes);
 	EnableWindow(hUseVirt, changeServerRes);
 	EnableWindow(hAllMons, changeServerRes);
-	EnableWindow(GetDlgItem(hwnd, IDC_SLIDERRES) , changeServerRes);
+	EnableWindow(GetDlgItem(hwnd, IDC_SLIDERRES) , changeServerRes && !use_allmonitors);
 
 	HWND hShowToolbar = GetDlgItem(hwnd, IDC_SHOWTOOLBAR);
 	SendMessage(hShowToolbar, BM_SETCHECK, ShowToolbar, 0);
@@ -1121,11 +1125,11 @@ void SessionDialog::ReadDlgProcDisplay()
 	changeServerRes =
 		(SendMessage(hChangeServerRes, BM_GETCHECK, 0, 0) == BST_CHECKED);
 
-	HWND hExtendDisplay = GetDlgItem(hwnd, IDC_EXTENDDISPLAY);
+	HWND hExtendDisplay = GetDlgItem(hwnd, IDC_RADIO_EXTEND);
 	extendDisplay =
 		(SendMessage(hExtendDisplay, BM_GETCHECK, 0, 0) == BST_CHECKED);
 
-	HWND hUseVirt = GetDlgItem(hwnd, IDC_USERVIRT);
+	HWND hUseVirt = GetDlgItem(hwnd, IDC_RADIO_ONLY_VIRTUAL);
 	use_virt =
 		(SendMessage(hUseVirt, BM_GETCHECK, 0, 0) == BST_CHECKED);
 

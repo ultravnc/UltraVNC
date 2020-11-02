@@ -38,6 +38,7 @@
 // and via the ORB interface
 extern bool			fShutdownOrdered;
 class vncServer;
+class VirtualDisplay;
 
 #if (!defined(_WINVNC_VNCSERVER))
 #define _WINVNC_VNCSERVER
@@ -471,6 +472,7 @@ public:
 	bool OS_Shutdown;
 	void StopReconnectAll();
 	int m_virtualDisplaySupported;
+	VirtualDisplay *virtualDisplay;
 
 protected:
 	// The vncServer UpdateTracker class

@@ -1,17 +1,13 @@
 ﻿#include "stdhdrs.h"
 #include "VirtualDisplay.h"
 #include "versionhelpers.h"
+#include "vncservice.h"
 #include <newdev.h>
 #pragma comment(lib, "Newdev.lib")
 #pragma comment(lib, "swdevice.lib")
 
-VOID WINAPI
-CreationCallback(
-	_In_ HSWDEVICE hSwDevice,
-	_In_ HRESULT hrCreateResult,
-	_In_opt_ PVOID pContext,
-	_In_opt_ PCWSTR pszDeviceInstanceId
-)
+VOID WINAPI CreationCallback(_In_ HSWDEVICE hSwDevice, _In_ HRESULT hrCreateResult, _In_opt_ PVOID pContext, _In_opt_ PCWSTR pszDeviceInstanceId)
+
 {
 	HANDLE hEvent = *(HANDLE*)pContext;
 
@@ -21,332 +17,6 @@ CreationCallback(
 	UNREFERENCED_PARAMETER(pszDeviceInstanceId);
 }
 
-
-
-VirtualDisplay::VirtualDisplay()
-{
-	hdll = LoadLibrary("cfgmgr32.dll");
-	SwDeviceCreateUVNC = NULL;
-	SwDeviceCloseUVNC = NULL;
-	if (hdll) {
-		SwDeviceCreateUVNC = (PSwDeviceCreate)GetProcAddress(hdll, "SwDeviceCreate");
-		SwDeviceCloseUVNC = (PSwDeviceClose)GetProcAddress(hdll, "SwDeviceClose");
-	}
-
-	FileView = NULL;
-	hFileMap = NULL;
-	pbuff = NULL;
-	initialized = false;
-	restoreNeeded = false;
-
-	hFileMap = CreateFileMappingA(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, sizeof(SUPPORTEDMONITORS), g_szIPC);
-	if (hFileMap) {
-		SetSecurityInfo(hFileMap, SE_KERNEL_OBJECT, DACL_SECURITY_INFORMATION, 0, 0, (PACL)NULL, NULL);
-		FileView = MapViewOfFile(hFileMap, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, 0);
-		pbuff = (SUPPORTEDMONITORS*)FileView;
-	}
-	if (!pbuff)
-		return;
-	initialized = true;
-	pbuff->counter = 0;
-
-	DISPLAY_DEVICE dd;
-	ZeroMemory(&dd, sizeof(dd));
-	dd.cb = sizeof(dd);
-	DWORD dev = 0;
-
-	while (EnumDisplayDevices(0, dev, &dd, 0))
-	{
-		if (!(dd.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER) && (dd.StateFlags & DISPLAY_DEVICE_ATTACHED_TO_DESKTOP)) {
-			DISPLAY_DEVICE ddMon;
-			ZeroMemory(&ddMon, sizeof(ddMon));
-			ddMon.cb = sizeof(ddMon);
-			DWORD devMon = 0;
-
-			while (EnumDisplayDevices(dd.DeviceName, devMon, &ddMon, 0)) {
-				if (ddMon.StateFlags & DISPLAY_DEVICE_ACTIVE)
-					break;
-				devMon++;
-			}
-
-			DEVMODE dm;
-			ZeroMemory(&dm, sizeof(dm));
-			dm.dmSize = sizeof(dm);
-			dm.dmDriverExtra = 0;
-			if (EnumDisplaySettingsEx(dd.DeviceName, ENUM_CURRENT_SETTINGS, &dm, 0) == FALSE)
-				EnumDisplaySettingsEx(dd.DeviceName, ENUM_REGISTRY_SETTINGS, &dm, 0);
-			DISPLAYINFO di;
-			di.dm = dm;
-			strcpy_s(di.naam, 256, dd.DeviceName);
-			di.primary = dd.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE;
-			diplayInfoList.push_back(di);
-		}
-		ZeroMemory(&dd, sizeof(dd));
-		dd.cb = sizeof(dd);
-		dev++;
-	}
-}
-
-VirtualDisplay::~VirtualDisplay()
-{
-	if (FileView)
-		UnmapViewOfFile((LPVOID)FileView);
-	if (hFileMap)
-		CloseHandle(hFileMap);
-
-	if (!initialized)
-		return;
-	if (restoreNeeded) {
-		std::list<DISPLAYINFO>::iterator resIter;
-		resIter = diplayInfoList.begin();
-		while (resIter != diplayInfoList.end())
-		{
-			ChangeDisplaySettingsEx((*resIter).naam, &(*resIter).dm, NULL, (CDS_UPDATEREGISTRY | CDS_NORESET), NULL);
-			resIter++;
-		}
-		ChangeDisplaySettingsEx(NULL, NULL, NULL, 0, NULL);
-	}
-
-	std::list<VIRTUALDISPLAY>::iterator virtualDisplayIter;
-	virtualDisplayIter = virtualDisplayList.begin();
-	while (virtualDisplayIter != virtualDisplayList.end())
-	{
-		if ((*virtualDisplayIter).hDevice)
-			if (SwDeviceCloseUVNC)
-				SwDeviceCloseUVNC((*virtualDisplayIter).hDevice);
-		if ((*virtualDisplayIter).hEvent)
-			CloseHandle((*virtualDisplayIter).hEvent);
-		virtualDisplayIter++;
-	}
-}
-
-void VirtualDisplay::changeMonitors(int flag , map< pair<int, int>, pair<int, int> >resolutionMap)
-{
-	if (flag == 0 && resolutionMap.size() > 0) {
-		map< pair<int, int>, pair<int, int> >::iterator it;
-		bool used[254]{};
-		for (it = resolutionMap.begin(); it != resolutionMap.end(); it++) {
-			int x = (it->first).first;
-			int y = (it->first).second;
-			int w = (it->second).first;
-			int h = (it->second).second;
-			std::list<DISPLAYINFO>::iterator resIter;
-			resIter = diplayInfoList.begin();
-			int counter = 0;
-			while (resIter != diplayInfoList.end())
-			{
-				DEVMODE dm = (*resIter).dm;
-				if (used[counter] == true) {
-					resIter++;
-					counter++;
-					continue;
-				}
-				if (dm.dmPosition.x == 0 && dm.dmPosition.y == 0 && x == 0 && y == 0) {
-					dm.dmPelsHeight = h;
-					dm.dmPelsWidth = w;
-					ChangeDisplaySettingsEx((*resIter).naam, &dm, NULL, (CDS_UPDATEREGISTRY | CDS_NORESET), NULL);
-					used[counter] = true;
-					restoreNeeded = true;
-					break;;
-				}
-				else {
-					dm.dmPosition.x = x;
-					dm.dmPosition.y = y;
-					dm.dmPelsHeight = h;
-					dm.dmPelsWidth = w;
-					ChangeDisplaySettingsEx((*resIter).naam, &dm, NULL, (CDS_UPDATEREGISTRY | CDS_NORESET), NULL);
-					used[counter] = true;
-					restoreNeeded = true;
-					break;
-
-				}
-				resIter++;
-				counter++;
-			}
-		}
-		ChangeDisplaySettingsEx(NULL, NULL, NULL, 0, NULL);
-	}
-	if (flag == 1 && resolutionMap.size() > 0) {
-
-		map< pair<int, int>, pair<int, int> >::iterator it;
-		for (it = resolutionMap.begin(); it != resolutionMap.end(); it++) {
-			int w = (it->second).first;
-			int h = (it->second).second;
-			SetVirtualMonitorsSize(h, w);
-		}
-		for (it = resolutionMap.begin(); it != resolutionMap.end(); it++) {
-			AddVirtualMonitors();
-		}
-		Sleep(1000);
-
-		DISPLAY_DEVICE dd;
-		ZeroMemory(&dd, sizeof(dd));
-		dd.cb = sizeof(dd);
-		DWORD dev = 0;
-		int element = 0;
-
-		while (EnumDisplayDevices(0, dev, &dd, 0))
-		{
-			if (!(dd.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER) && (dd.StateFlags & DISPLAY_DEVICE_ATTACHED_TO_DESKTOP)) {
-				DISPLAY_DEVICE ddMon;
-				ZeroMemory(&ddMon, sizeof(ddMon));
-				ddMon.cb = sizeof(ddMon);
-				DWORD devMon = 0;
-
-				while (EnumDisplayDevices(dd.DeviceName, devMon, &ddMon, 0)) {
-					if (ddMon.StateFlags & DISPLAY_DEVICE_ACTIVE)
-						break;
-					devMon++;
-				}
-
-				DEVMODE dm;
-				ZeroMemory(&dm, sizeof(dm));
-				dm.dmSize = sizeof(dm);
-				dm.dmDriverExtra = 0;
-				if (EnumDisplaySettingsEx(dd.DeviceName, ENUM_CURRENT_SETTINGS, &dm, 0) == FALSE)
-					EnumDisplaySettingsEx(dd.DeviceName, ENUM_REGISTRY_SETTINGS, &dm, 0);
-				DISPLAYINFO di;
-				di.dm = dm;
-				strcpy_s(di.naam, 256, dd.DeviceName);
-				di.primary = dd.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE;
-				if (strcmp(dd.DeviceString, "UVncVirtualDisplay Device") == NULL) {
-					int x, y, w, h;
-					getMapElement(element, x, y, w, h, resolutionMap);
-					dm.dmPosition.x = x;
-					dm.dmPosition.y = y;
-					dm.dmPelsHeight = h;
-					dm.dmPelsWidth = w;
-					if ( x==0  && y == 0)
-						ChangeDisplaySettingsEx(dd.DeviceName, &dm, NULL, (CDS_UPDATEREGISTRY | CDS_NORESET | CDS_SET_PRIMARY), NULL);
-					else
-						ChangeDisplaySettingsEx(dd.DeviceName, &dm, NULL, (CDS_UPDATEREGISTRY | CDS_NORESET), NULL);
-					element++;
-				}
-			}
-			ZeroMemory(&dd, sizeof(dd));
-			dd.cb = sizeof(dd);
-			dev++;
-		}
-
-		std::list<DISPLAYINFO>::iterator resIter;
-		resIter = diplayInfoList.begin();
-		while (resIter != diplayInfoList.end())
-		{
-			DEVMODE dm = (*resIter).dm;
-			dm.dmPosition.x = 10000;
-			dm.dmPosition.y = 10000;
-			dm.dmPelsHeight = 0;
-			dm.dmPelsWidth = 0;
-			ChangeDisplaySettingsEx((*resIter).naam, &dm, NULL, (CDS_UPDATEREGISTRY | CDS_NORESET), NULL);
-			restoreNeeded = true;
-			resIter++;
-		}
-
-		ChangeDisplaySettingsEx(NULL, NULL, NULL, 0, NULL);
-
-	}
-	if (flag == 2 && resolutionMap.size() > 0) {
-		map< pair<int, int>, pair<int, int> >::iterator it;
-		for (it = resolutionMap.begin(); it != resolutionMap.end(); it++) {
-			int w = (it->second).first;
-			int h = (it->second).second;
-			SetVirtualMonitorsSize(h, w);
-		}
-		for (it = resolutionMap.begin(); it != resolutionMap.end(); it++) {
-			AddVirtualMonitors();
-		}
-		
-	}
-}
-
-void VirtualDisplay::getMapElement(int nummer, int &x, int &y, int &w, int &h , map< pair<int, int>, pair<int, int> >resolutionMap)
-{
-	map< pair<int, int>, pair<int, int> >::iterator it;
-	int counter = 0;
-	for (it = resolutionMap.begin(); it != resolutionMap.end(); it++) {
-		x = (it->first).first;
-		y = (it->first).second;
-		w = (it->second).first;
-		h = (it->second).second;
-		if (counter == nummer)
-			return;
-		counter++;
-	}
-}
-
-
-
-void VirtualDisplay::SetVirtualMonitorsSize(int height, int width)
-{
-	if (!initialized)
-		return;
-	//we don't want dubbels
-	for (int i = 0; i < pbuff->counter; i++)
-		if (pbuff->w[i] == width && pbuff->h[i] == height)
-			return;
-
-	pbuff->w[pbuff->counter] = width;
-	pbuff->h[pbuff->counter] = height;
-	pbuff->counter += 1;
-}
-
-void VirtualDisplay::AddVirtualMonitors()
-{
-	if (!initialized)
-		return;
-	HSWDEVICE hSwDevice = NULL;
-	HANDLE hEvent = NULL;
-	WCHAR name[256];
-	wcscpy_s(name, L"UVncVirtualDisplay");
-	WCHAR nummer[256];
-	swprintf_s(nummer, L"%zd", virtualDisplayList.size());
-	wcscat_s(name, nummer);
-
-	if (AddVirtualDisplay(hSwDevice, hEvent, name))
-	{
-		VIRTUALDISPLAY virtualDisplay;
-		virtualDisplay.hDevice = hSwDevice;
-		virtualDisplay.hEvent = hEvent;
-		virtualDisplayList.push_back(virtualDisplay);
-	}
-}
-
-bool VirtualDisplay::AddVirtualDisplay(HSWDEVICE& hSwDevice, HANDLE& hEvent, WCHAR* name)
-{
-	if (!initialized)
-		return false;
-	PCWSTR description = name;
-	PCWSTR instanceId = name;
-	PCWSTR hardwareIds = L"UVncVirtualDisplay\0\0";
-	PCWSTR compatibleIds = L"UVncVirtualDisplay\0\0";
-	SW_DEVICE_CREATE_INFO createInfo = { 0 };
-	hEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-	createInfo.cbSize = sizeof(createInfo);
-	createInfo.pszzCompatibleIds = compatibleIds;
-	createInfo.pszInstanceId = instanceId;
-	createInfo.pszzHardwareIds = hardwareIds;
-	createInfo.pszDeviceDescription = description;
-	createInfo.CapabilityFlags = SWDeviceCapabilitiesRemovable |
-		SWDeviceCapabilitiesSilentInstall |
-		SWDeviceCapabilitiesDriverRequired;
-
-	HRESULT hr = S_FALSE;
-	if (SwDeviceCreateUVNC != NULL) {
-			hr = SwDeviceCreateUVNC(name, L"HTREE\\ROOT\\0", &createInfo, 0,
-				nullptr, CreationCallback, &hEvent, &hSwDevice);
-	}
-	else
-		return false;
-
-	if (FAILED(hr))
-		return false;
-	DWORD waitResult = WaitForSingleObject(hEvent, 10 * 1000);
-	if (waitResult != WAIT_OBJECT_0)
-		return false;
-	return true;
-}
-
-typedef void (WINAPI* RtlGetVersion_FUNC)(OSVERSIONINFOEXW*);
 BOOL GetVersion2(OSVERSIONINFOEX* os) {
 	HMODULE hMod;
 	RtlGetVersion_FUNC func;
@@ -387,7 +57,328 @@ BOOL GetVersion2(OSVERSIONINFOEX* os) {
 	return TRUE;
 }
 
-typedef BOOL (WINAPI *DiInstallDriverAFn) (HWND hwndParent OPTIONAL,LPCSTR InfPath,DWORD Flags,PBOOL NeedReboot OPTIONAL);
+VirtualDisplay::VirtualDisplay()
+{
+	FileView = NULL;
+	hFileMap = NULL;
+	pbuff = NULL;
+	initialized = false;
+	restoreNeeded = false;
+	hdll = LoadLibrary("cfgmgr32.dll");
+	SwDeviceCreateUVNC = NULL;
+	SwDeviceCloseUVNC = NULL;
+	if (hdll) {
+		SwDeviceCreateUVNC = (PSwDeviceCreate)GetProcAddress(hdll, "SwDeviceCreate");
+		SwDeviceCloseUVNC = (PSwDeviceClose)GetProcAddress(hdll, "SwDeviceClose");
+	}
+
+	hFileMap = CreateFileMappingA(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, sizeof(SUPPORTEDMONITORS), g_szIPC);
+	if (hFileMap) {
+		SetSecurityInfo(hFileMap, SE_KERNEL_OBJECT, DACL_SECURITY_INFORMATION, 0, 0, (PACL)NULL, NULL);
+		FileView = MapViewOfFile(hFileMap, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, 0);
+		pbuff = (SUPPORTEDMONITORS*)FileView;
+	}
+	if (!pbuff) {
+		if (FileView)
+			UnmapViewOfFile((LPVOID)FileView);
+		FileView = NULL;
+		return;
+	}
+
+	initialized = true;
+	pbuff->counter = 0;
+
+	DISPLAY_DEVICE dd;
+	ZeroMemory(&dd, sizeof(dd));
+	dd.cb = sizeof(dd);
+	DWORD dev = 0;
+
+	while (EnumDisplayDevices(0, dev, &dd, 0))
+	{
+		if (!(dd.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER) && (dd.StateFlags & DISPLAY_DEVICE_ATTACHED_TO_DESKTOP)) {
+			DISPLAY_DEVICE ddMon;
+			ZeroMemory(&ddMon, sizeof(ddMon));
+			ddMon.cb = sizeof(ddMon);
+			DWORD devMon = 0;
+
+			while (EnumDisplayDevices(dd.DeviceName, devMon, &ddMon, 0)) {
+				if (ddMon.StateFlags & DISPLAY_DEVICE_ACTIVE)
+					break;
+				devMon++;
+			}
+
+			DEVMODE dm;
+			ZeroMemory(&dm, sizeof(dm));
+			dm.dmSize = sizeof(dm);
+			dm.dmDriverExtra = 0;
+			if (EnumDisplaySettingsEx(dd.DeviceName, ENUM_CURRENT_SETTINGS, &dm, 0) == FALSE)
+				EnumDisplaySettingsEx(dd.DeviceName, ENUM_REGISTRY_SETTINGS, &dm, 0);
+			DISPLAYINFO di;
+			di.dm = dm;
+			strcpy_s(di.naam, 256, dd.DeviceName);
+			di.primary = dd.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE;
+			diplayInfoList.push_back(di);
+		}
+		ZeroMemory(&dd, sizeof(dd));
+		dd.cb = sizeof(dd);
+		dev++;
+	}
+}
+
+void VirtualDisplay::disconnectDisplay(int clientId, bool lastViewer)
+{
+	std::list<VIRTUALDISPLAY>::iterator virtualDisplayIter;
+	virtualDisplayIter = virtualDisplayList.begin();
+	while (virtualDisplayIter != virtualDisplayList.end())
+	{
+		if ((*virtualDisplayIter).hDevice && SwDeviceCloseUVNC && (*virtualDisplayIter).clientId == clientId && (*virtualDisplayIter).singleExtend) {
+			SwDeviceCloseUVNC((*virtualDisplayIter).hDevice);
+			CloseHandle((*virtualDisplayIter).hEvent);
+			virtualDisplayList.erase(virtualDisplayIter);
+			return;
+		}
+		virtualDisplayIter++;
+	}
+	if (lastViewer)
+		disconnectAllDisplays();
+}
+
+void VirtualDisplay::disconnectAllDisplays()
+{
+	if (!initialized)
+		return;
+
+	pbuff->counter = 0;
+
+	if (restoreNeeded) {
+		std::list<DISPLAYINFO>::iterator resIter;
+		resIter = diplayInfoList.begin();
+		while (resIter != diplayInfoList.end())
+		{
+			if ((*resIter).dm.dmPosition.x == 0 && (*resIter).dm.dmPosition.y == 0)
+				ChangeDisplaySettingsEx((*resIter).naam, &(*resIter).dm, NULL, (CDS_UPDATEREGISTRY | CDS_NORESET | CDS_SET_PRIMARY), NULL);
+			else
+				ChangeDisplaySettingsEx((*resIter).naam, &(*resIter).dm, NULL, (CDS_UPDATEREGISTRY | CDS_NORESET), NULL);
+			resIter++;
+		}
+		ChangeDisplaySettingsEx(NULL, NULL, NULL, 0, NULL);
+		restoreNeeded = false;
+	}
+	// Disable virtual displays
+	std::list<VIRTUALDISPLAY>::iterator virtualDisplayIter;
+	virtualDisplayIter = virtualDisplayList.begin();
+	while (virtualDisplayIter != virtualDisplayList.end())
+	{
+		if ((*virtualDisplayIter).hDevice)
+			if (SwDeviceCloseUVNC)
+				SwDeviceCloseUVNC((*virtualDisplayIter).hDevice);
+		if ((*virtualDisplayIter).hEvent)
+			CloseHandle((*virtualDisplayIter).hEvent);
+		virtualDisplayIter++;
+	}
+	virtualDisplayList.clear();
+	initialized = false;
+}
+
+VirtualDisplay::~VirtualDisplay()
+{
+	disconnectAllDisplays();
+	if (FileView)
+		UnmapViewOfFile((LPVOID)FileView);
+	if (hFileMap)
+		CloseHandle(hFileMap);
+}
+
+void VirtualDisplay::extendMonitors(map< pair<int, int>, pair<int, int> >resolutionMap, int clientId, bool multi)
+{
+	map< pair<int, int>, pair<int, int> >::iterator it;
+	for (it = resolutionMap.begin(); it != resolutionMap.end(); it++) {
+		int w = (it->second).first;
+		int h = (it->second).second;
+		SetVirtualMonitorsSize(h, w);
+	}
+
+	for (it = resolutionMap.begin(); it != resolutionMap.end(); it++) {
+		getSetDisplayName(NULL);
+		AddVirtualMonitors(clientId, resolutionMap.size() == 1);
+		char displayName[256];
+		getSetDisplayName(displayName);
+		changeDisplaySize((it->second).first, (it->second).second, displayName);
+	}
+	ChangeDisplaySettingsEx(NULL, NULL, NULL, 0, NULL);
+}
+
+void VirtualDisplay::realMonitors(map< pair<int, int>, pair<int, int> >resolutionMap)
+{
+	map< pair<int, int>, pair<int, int> >::iterator it;
+	bool used[254]{};
+	for (it = resolutionMap.begin(); it != resolutionMap.end(); it++) {
+		int x = (it->first).first;
+		int y = (it->first).second;
+		int w = (it->second).first;
+		int h = (it->second).second;
+		std::list<DISPLAYINFO>::iterator resIter;
+		resIter = diplayInfoList.begin();
+		int counter = 0;
+		while (resIter != diplayInfoList.end())
+		{
+			DEVMODE dm = (*resIter).dm;
+			if (used[counter] == true) {
+				resIter++;
+				counter++;
+				continue;
+			}
+			if (dm.dmPosition.x == 0 && dm.dmPosition.y == 0 && x == 0 && y == 0) {
+				dm.dmPelsHeight = h;
+				dm.dmPelsWidth = w;
+				ChangeDisplaySettingsEx((*resIter).naam, &dm, NULL, (CDS_UPDATEREGISTRY | CDS_NORESET), NULL);
+				used[counter] = true;
+				restoreNeeded = true;
+				break;;
+			}
+			else {
+				dm.dmPosition.x = x;
+				dm.dmPosition.y = y;
+				dm.dmPelsHeight = h;
+				dm.dmPelsWidth = w;
+				ChangeDisplaySettingsEx((*resIter).naam, &dm, NULL, (CDS_UPDATEREGISTRY | CDS_NORESET), NULL);
+				used[counter] = true;
+				restoreNeeded = true;
+				break;
+
+			}
+			resIter++;
+			counter++;
+		}
+	}
+	ChangeDisplaySettingsEx(NULL, NULL, NULL, 0, NULL);
+}
+
+void VirtualDisplay::virtualMonitors(map< pair<int, int>, pair<int, int> >resolutionMap, int clientId)
+{
+	map< pair<int, int>, pair<int, int> >::iterator it;
+	for (it = resolutionMap.begin(); it != resolutionMap.end(); it++) {
+		int w = (it->second).first;
+		int h = (it->second).second;
+		SetVirtualMonitorsSize(h, w);
+	}
+	char newPrimaryDisplayName[256];
+	for (it = resolutionMap.begin(); it != resolutionMap.end(); it++) {
+		getSetDisplayName(NULL);
+		AddVirtualMonitors(clientId, false);
+		char displayName[256];
+		getSetDisplayName(displayName);
+		changeDisplaySize((it->second).first, (it->second).second, displayName);
+		if (it == resolutionMap.begin())
+			strcpy_s(newPrimaryDisplayName, displayName);
+	}
+	ChangePrimaryMonitor(newPrimaryDisplayName);
+	
+
+	std::list<DISPLAYINFO>::iterator resIter;
+	resIter = diplayInfoList.begin();
+	while (resIter != diplayInfoList.end())
+	{
+		DEVMODE dm = (*resIter).dm;
+		dm.dmPosition.x = 10000;
+		dm.dmPosition.y = 10000;
+		dm.dmPelsHeight = 0;
+		dm.dmPelsWidth = 0;
+		ChangeDisplaySettingsEx((*resIter).naam, &dm, NULL, (CDS_UPDATEREGISTRY | CDS_NORESET), NULL);
+		restoreNeeded = true;
+		resIter++;
+	}
+
+	ChangeDisplaySettingsEx(NULL, NULL, NULL, 0, NULL);
+
+}
+
+void VirtualDisplay::setMonitorResolutions(DisplayMode flag , map< pair<int, int>, pair<int, int> >resolutionMap, bool multi, int clientId)
+{
+	if (restoreNeeded) //allready set
+		return;
+	if (flag == dmDisplay && resolutionMap.size() > 0)
+		realMonitors(resolutionMap);
+	
+	if (flag == dmVirtual && resolutionMap.size() > 0) 
+		virtualMonitors(resolutionMap, clientId);
+
+	if (flag == dmExtend && resolutionMap.size() > 0) 
+		extendMonitors(resolutionMap, clientId, multi);
+}
+
+
+void VirtualDisplay::SetVirtualMonitorsSize(int height, int width)
+{
+	if (!initialized)
+		return;
+	//we don't want dubbels
+	for (int i = 0; i < pbuff->counter; i++)
+		if (pbuff->w[i] == width && pbuff->h[i] == height)
+			return;
+
+	pbuff->w[pbuff->counter] = width;
+	pbuff->h[pbuff->counter] = height;
+	pbuff->counter += 1;
+}
+
+void VirtualDisplay::AddVirtualMonitors(int clientId, bool singleExtend)
+{
+	if (!initialized)
+		return;
+	HSWDEVICE hSwDevice = NULL;
+	HANDLE hEvent = NULL;
+	WCHAR name[256];
+	wcscpy_s(name, L"UVncVirtualDisplay");
+	WCHAR nummer[256];
+	swprintf_s(nummer, L"%zd", virtualDisplayList.size());
+	wcscat_s(name, nummer);
+
+	if (AddVirtualDisplay(hSwDevice, hEvent, name))
+	{
+		VIRTUALDISPLAY virtualDisplay;
+		virtualDisplay.hDevice = hSwDevice;
+		virtualDisplay.hEvent = hEvent;
+		virtualDisplay.clientId = clientId;
+		virtualDisplay.singleExtend = singleExtend;
+		virtualDisplayList.push_back(virtualDisplay);
+	}
+}
+
+bool VirtualDisplay::AddVirtualDisplay(HSWDEVICE& hSwDevice, HANDLE& hEvent, WCHAR* name)
+{
+	if (!initialized)
+		return false;
+	PCWSTR description = name;
+	PCWSTR instanceId = name;
+	PCWSTR hardwareIds = L"UVncVirtualDisplay\0\0";
+	PCWSTR compatibleIds = L"UVncVirtualDisplay\0\0";
+	SW_DEVICE_CREATE_INFO createInfo = { 0 };
+	hEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+	createInfo.cbSize = sizeof(createInfo);
+	createInfo.pszzCompatibleIds = compatibleIds;
+	createInfo.pszInstanceId = instanceId;
+	createInfo.pszzHardwareIds = hardwareIds;
+	createInfo.pszDeviceDescription = description;
+	createInfo.CapabilityFlags = SWDeviceCapabilitiesRemovable |
+		SWDeviceCapabilitiesSilentInstall |
+		SWDeviceCapabilitiesDriverRequired;
+
+	HRESULT hr = S_FALSE;
+	if (SwDeviceCreateUVNC != NULL) {
+			hr = SwDeviceCreateUVNC(name, L"HTREE\\ROOT\\0", &createInfo, 0,
+				nullptr, CreationCallback, &hEvent, &hSwDevice);
+	}
+	else
+		return false;
+
+	if (FAILED(hr))
+		return false;
+	DWORD waitResult = WaitForSingleObject(hEvent, 10 * 1000);
+	if (waitResult != WAIT_OBJECT_0)
+		return false;
+	return true;
+}
 
 bool VirtualDisplay::InstallDriver()
 {
@@ -426,4 +417,133 @@ bool VirtualDisplay::InstallDriver()
 		}
 	}
 	return 0;
+}
+
+bool VirtualDisplay::ContainDisplayName(char naam[256])
+{
+	std::list<NAMES>::iterator displayInfoIter;
+	displayInfoIter = displayList.begin();
+	while (displayInfoIter != displayList.end()) {
+		if (strcmp((*displayInfoIter).naam, naam) == NULL)
+			return true;
+		displayInfoIter++;
+	}
+	return false;
+}
+
+void VirtualDisplay::getSetDisplayName(char* gdiDeviceName)
+{
+	DISPLAY_DEVICE dd;
+	ZeroMemory(&dd, sizeof(dd));
+	dd.cb = sizeof(dd);
+	if (gdiDeviceName == NULL)
+		displayList.clear();
+	int times = 0;
+	while (gdiDeviceName != NULL && times < 10) {
+		DWORD dev = 0;
+		while (EnumDisplayDevices(0, dev, &dd, 0))
+		{
+			if (!(dd.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER) && (dd.StateFlags & DISPLAY_DEVICE_ATTACHED_TO_DESKTOP)) {
+				DISPLAY_DEVICE ddMon;
+				ZeroMemory(&ddMon, sizeof(ddMon));
+				ddMon.cb = sizeof(ddMon);
+				DWORD devMon = 0;
+				while (EnumDisplayDevices(dd.DeviceName, devMon, &ddMon, 0)) {
+					if (ddMon.StateFlags & DISPLAY_DEVICE_ACTIVE)
+						break;
+					devMon++;
+				}
+				DEVMODE dm;
+				ZeroMemory(&dm, sizeof(dm));
+				dm.dmSize = sizeof(dm);
+				dm.dmDriverExtra = 0;
+				if (!EnumDisplaySettingsEx(dd.DeviceName, ENUM_CURRENT_SETTINGS, &dm, 0))
+					return;
+				NAMES naam;
+				strcpy_s(naam.naam, 256, dd.DeviceName);
+				if (strcmp(dd.DeviceString, "UVncVirtualDisplay Device") == NULL) {
+					if (gdiDeviceName == NULL)
+						displayList.push_back(naam);
+					else if (!ContainDisplayName(naam.naam)) {
+						strcpy_s(gdiDeviceName, 256, naam.naam);
+						return;
+					}
+				}
+			}
+			ZeroMemory(&dd, sizeof(dd));
+			dd.cb = sizeof(dd);
+			dev++;
+		}
+		times++;
+		Sleep(100);
+	}
+	return;
+}
+
+void VirtualDisplay::changeDisplaySize(int w, int h, char gdiDeviceName[256])
+{
+	DEVMODE dm;
+	ZeroMemory(&dm, sizeof(dm));
+	dm.dmSize = sizeof(dm);
+	dm.dmDriverExtra = 0;
+	if (!EnumDisplaySettingsEx(gdiDeviceName, ENUM_CURRENT_SETTINGS, &dm, 0))
+		return;
+	dm.dmPelsHeight = h;
+	dm.dmPelsWidth = w;
+	ChangeDisplaySettingsEx(gdiDeviceName, &dm, NULL, (CDS_UPDATEREGISTRY | CDS_NORESET), NULL);
+}
+
+HRESULT VirtualDisplay::ChangePrimaryMonitor(char gdiDeviceName[256])
+{
+	HRESULT hr;
+	char lastPrimaryDisplay[256] = "";
+	bool shouldRefresh = false;
+
+	DEVMODE newPrimaryDeviceMode;
+	newPrimaryDeviceMode.dmSize = sizeof(newPrimaryDeviceMode);
+	if (!EnumDisplaySettings(gdiDeviceName, ENUM_CURRENT_SETTINGS, &newPrimaryDeviceMode))
+	{
+		hr = E_FAIL;
+		return hr;
+	}
+
+	for (int i = 0;; ++i)
+	{
+		ULONG flags = CDS_UPDATEREGISTRY | CDS_NORESET;
+		DISPLAY_DEVICE device;
+		device.cb = sizeof(device);
+		if (!EnumDisplayDevices(NULL, i, &device, EDD_GET_DEVICE_INTERFACE_NAME))
+			break;
+
+		if ((device.StateFlags & DISPLAY_DEVICE_ATTACHED_TO_DESKTOP) == 0)
+			continue;
+
+		if (!strcmp(device.DeviceName, gdiDeviceName))
+			flags |= CDS_SET_PRIMARY;
+
+		DEVMODE deviceMode;
+		newPrimaryDeviceMode.dmSize = sizeof(deviceMode);
+		if (!EnumDisplaySettings(device.DeviceName, ENUM_CURRENT_SETTINGS, &deviceMode))
+		{
+			hr = E_FAIL;
+			return hr;
+		}
+
+		deviceMode.dmPosition.x -= newPrimaryDeviceMode.dmPosition.x;
+		deviceMode.dmPosition.y -= newPrimaryDeviceMode.dmPosition.y;
+		deviceMode.dmFields |= DM_POSITION;
+
+		LONG rc = ChangeDisplaySettingsEx(device.DeviceName, &deviceMode, NULL,
+			flags, NULL);
+
+		if (rc != DISP_CHANGE_SUCCESSFUL) {
+			hr = E_FAIL;
+			return hr;
+		}
+
+		shouldRefresh = true;
+	}
+
+	hr = S_OK;
+	return hr;
 }
