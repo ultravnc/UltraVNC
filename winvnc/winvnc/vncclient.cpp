@@ -2273,7 +2273,7 @@ vncClientThread::run(void *arg)
 	}
 	else
 	{
-		m_client->SetScreenOffset(m_server->m_desktop->m_ScreenOffsetx, m_server->m_desktop->m_ScreenOffsety, m_server->m_desktop->nr_monitors);
+		m_client->SetScreenOffset(m_server->m_desktop->m_ScreenOffsetx, m_server->m_desktop->m_ScreenOffsety, m_server->m_desktop->nr_monitors == 1);
 		m_client->SetBufferOffset(m_server->m_desktop->m_SWOffsetx, m_server->m_desktop->m_SWOffsety);
 	}
 	m_client->m_ScaledScreen = m_client->m_encodemgr.m_buffer->GetViewerSize();
@@ -3339,7 +3339,7 @@ vncClientThread::run(void *arg)
 					m_server->GetScreenInfo(screenX, screenY, screenDepth);
 					// 1 , only one display, so always positive
 					//primary display always have (0,0) as corner
-					if (m_client->m_display_type==1)
+					if (m_client->m_single_display)
 						{
 							unsigned long x = ((msg.pe.x + (m_client->monitor_Offsetx)) *  65535) / (screenX-1);
 							unsigned long y = ((msg.pe.y + (m_client->monitor_Offsety))* 65535) / (screenY-1);
@@ -5607,11 +5607,11 @@ vncClient::SetBufferOffset(int x,int y)
 }
 
 void
-vncClient::SetScreenOffset(int x,int y,int type)
+vncClient::SetScreenOffset(int x,int y, bool single_display)
 {
 	m_ScreenOffsetx = x;
 	m_ScreenOffsety = y;
-	m_display_type=type;
+	m_single_display = single_display;
 }
 
 void

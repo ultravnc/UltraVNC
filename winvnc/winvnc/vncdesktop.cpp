@@ -1061,11 +1061,11 @@ vncDesktop::InitBitmap()
     }
 
 	if (VideoBuffer())
-		SetBitmapRectOffsetAndClipRect(mymonitor[3].offsetx, mymonitor[3].offsety, mymonitor[3].Width, mymonitor[3].Height);
+		SetBitmapRectOffsetAndClipRect(mymonitor[MULTI_MON_ALL].offsetx, mymonitor[MULTI_MON_ALL].offsety, mymonitor[MULTI_MON_ALL].Width, mymonitor[MULTI_MON_ALL].Height);
 	else if (show_multi_monitors) 
-		SetBitmapRectOffsetAndClipRect(0, 0, mymonitor[3].Width, mymonitor[3].Height);
+		SetBitmapRectOffsetAndClipRect(0, 0, mymonitor[MULTI_MON_ALL].Width, mymonitor[MULTI_MON_ALL].Height);
 	else
-		SetBitmapRectOffsetAndClipRect(0, 0, mymonitor[0].Width, mymonitor[0].Height);
+		SetBitmapRectOffsetAndClipRect(0, 0, mymonitor[MULTI_MON_PRIMARY].Width, mymonitor[MULTI_MON_PRIMARY].Height);
 	
 
 	vnclog.Print(LL_INTINFO, VNCLOG("bitmap dimensions are %d x %d\n"), m_bmrect.br.x, m_bmrect.br.y);
@@ -1757,8 +1757,8 @@ vncDesktop::CaptureScreen(const rfb::Rect &rect, BYTE *scrBuff, UINT scrBuffSize
 		else
 		{
 
-			int xoffset = mymonitor[m_current_monitor - 1].offsetx;
-			int yoffset = mymonitor[m_current_monitor - 1].offsety;
+			int xoffset = mymonitor[m_current_monitor].offsetx;
+			int yoffset = mymonitor[m_current_monitor].offsety;
 
 			blitok = BitBlt(m_hmemdc,
 				rect.tl.x,
@@ -2227,74 +2227,27 @@ void vncDesktop::SetSW(int x, int y)
 
 	if (x <= 5 && y <= 5 && x > -5 && y > -5)
 	{
-		// 2= multi monitor
-		// 1= single monitor
-		switch (nr_monitors) {
-		case 2:
-		{
-			if (m_current_monitor == MULTI_MON_PRIMARY) {
-				if (m_screenCapture) {
-					m_current_monitor = MULTI_MON_SECOND;
-					m_buffer.MultiMonitors(1);
-				}
-				else {
-					m_current_monitor = MULTI_MON_ALL;
-					m_buffer.MultiMonitors(2);
-				}
-			}
-			else if (m_current_monitor == MULTI_MON_SECOND) {
+		if (m_screenCapture) {
+			m_current_monitor++;
+			if (m_current_monitor == nr_monitors) {
 				m_current_monitor = MULTI_MON_ALL;
 				m_buffer.MultiMonitors(2);
 			}
-			else if (m_current_monitor == MULTI_MON_ALL) {
-				m_buffer.MultiMonitors(1);
+			else if (m_current_monitor == MULTI_MON_ALL + 1) {
 				m_current_monitor = MULTI_MON_PRIMARY;
+				m_buffer.MultiMonitors(1);
 			}
-		} break;
-		case 3:
-		{
-			if(m_screenCapture)
-			{
-				if (m_current_monitor == MULTI_MON_PRIMARY) {
-					m_current_monitor = MULTI_MON_SECOND;
-					m_buffer.MultiMonitors(1);
-				}
-				else if (m_current_monitor == MULTI_MON_SECOND) {
-					m_current_monitor = MULTI_MON_THIRD;
-					m_buffer.MultiMonitors(1);
-				}
-				else if (m_current_monitor == MULTI_MON_THIRD) {
-					/*m_current_monitor = MULTI_MON_FIRST_TWO; //TODO: first two , last two
-					m_buffer.MultiMonitors(2);
-				}
-				else if (m_current_monitor == MULTI_MON_FIRST_TWO) {
-					m_current_monitor = MULTI_MON_LAST_TWO;
-					m_buffer.MultiMonitors(2);
-				}
-				else if (m_current_monitor == MULTI_MON_LAST_TWO) {*/
-					m_current_monitor = MULTI_MON_ALL;
-					m_buffer.MultiMonitors(2);
-				}
-				else if (m_current_monitor == MULTI_MON_ALL) {
-					m_current_monitor = MULTI_MON_PRIMARY;
-					m_buffer.MultiMonitors(1);
-				} 
-			}
-			else
-			{
-				if (m_current_monitor == MULTI_MON_PRIMARY) {
-					m_current_monitor = MULTI_MON_ALL;
-					m_buffer.MultiMonitors(2);
-				}
-				else if (m_current_monitor == MULTI_MON_ALL) {
-					m_current_monitor = MULTI_MON_PRIMARY;
-					m_buffer.MultiMonitors(1);
-				}
-			}
-		} break;
 		}
-
-		return;
+		else {
+			if (m_current_monitor == MULTI_MON_ALL) {
+				m_current_monitor = MULTI_MON_PRIMARY;
+				m_buffer.MultiMonitors(1);
+			}
+			else {
+				m_current_monitor = MULTI_MON_ALL;
+				m_buffer.MultiMonitors(2);
+			}
+		}
 	}
 	return;
 }
@@ -2364,20 +2317,15 @@ BOOL vncDesktop::InitVideoDriver()
 
 	//try to use the mirror driver if he is still active
 	Checkmonitors();
-	nr_monitors = GetNrMonitors();
 	if (nr_monitors == 1)
 	{
-		//m_ScreenOffsetx = mymonitor[0].offsetx;
-		//m_ScreenOffsety = mymonitor[0].offsety;
 		if (m_screenCapture != NULL) 
-			m_screenCapture->videoDriver_start(mymonitor[0].offsetx, mymonitor[0].offsety, mymonitor[0].Width, mymonitor[0].Height);
+			m_screenCapture->videoDriver_start(mymonitor[MULTI_MON_PRIMARY].offsetx, mymonitor[MULTI_MON_PRIMARY].offsety, mymonitor[MULTI_MON_PRIMARY].Width, mymonitor[MULTI_MON_PRIMARY].Height);
 	}
 	if (nr_monitors > 1)
 	{
-		//m_ScreenOffsetx = mymonitor[3].offsetx;
-		//m_ScreenOffsety = mymonitor[3].offsety;
 		if (m_screenCapture != NULL)
-			m_screenCapture->videoDriver_start(mymonitor[3].offsetx, mymonitor[3].offsety, mymonitor[3].Width, mymonitor[3].Height);
+			m_screenCapture->videoDriver_start(mymonitor[MULTI_MON_ALL].offsetx, mymonitor[MULTI_MON_ALL].offsety, mymonitor[MULTI_MON_ALL].Width, mymonitor[MULTI_MON_ALL].Height);
 	}
 	vnclog.Print(LL_INTERR, VNCLOG("Start Mirror driver\n"));
 

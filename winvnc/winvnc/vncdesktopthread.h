@@ -92,9 +92,6 @@ protected:
 private:
 	bool handle_display_change(HANDLE& threadhandle, rfb::Region2D& rgncache, rfb::SimpleUpdateTracker& clipped_updates, rfb::ClippedUpdateTracker& updates);
 	void do_polling(HANDLE& threadHandle, rfb::Region2D& rgncache, int& fullpollcounter, bool cursormoved);
-	int mon[2];
-	void SetFirstMonitorNummers();
-	void SetLastMonitorNummers();
 	int framecounter;
 
 public:

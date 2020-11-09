@@ -2224,7 +2224,7 @@ vncServer::InitialUpdate(bool value)
 }
 
 void
-vncServer::SetScreenOffset(int x,int y,int type)
+vncServer::SetScreenOffset(int x,int y, bool single_display)
 {
 	vncClientList::iterator i;
 		
@@ -2234,7 +2234,7 @@ vncServer::SetScreenOffset(int x,int y,int type)
 	for (i = m_authClients.begin(); i != m_authClients.end(); i++)
 	{
 		// Post the update
-		GetClient(*i)->SetScreenOffset(x,y,type);
+		GetClient(*i)->SetScreenOffset(x, y, single_display);
 	}
 
 }

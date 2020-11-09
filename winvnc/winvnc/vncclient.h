@@ -241,7 +241,7 @@ public:
 	virtual BOOL SetNewSWSize(long w,long h,BOOL desktop);
 	virtual BOOL SetNewSWSizeFR(long w,long h,BOOL desktop);
 	virtual void SetBufferOffset(int x,int y);
-	virtual void SetScreenOffset(int x,int y,int type);
+	virtual void SetScreenOffset(int x,int y, bool single_display);
 	virtual void InitialUpdate(bool value);
 
 	virtual TextChat* GetTextChatPointer() { return m_pTextChat; }; // sf@2002
@@ -454,7 +454,7 @@ public:
 	int				monitor_Offsety;
 	int				m_ScreenOffsetx;
 	int				m_ScreenOffsety;
-	int				m_display_type;
+	int				m_single_display;
 	BOOL			m_NewSWUpdateWaiting;
 	rfbProtocolVersionMsg ProtocolVersionMsg;
 	//Timer Sendtimer;

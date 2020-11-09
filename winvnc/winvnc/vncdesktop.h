@@ -66,12 +66,8 @@ class vncServer;
 //#include "Multimon.h"
 
 // JnZn558
-#define MULTI_MON_PRIMARY		1
-#define MULTI_MON_SECOND		2
-#define MULTI_MON_THIRD			3
-#define MULTI_MON_FIRST_TWO		4
-#define MULTI_MON_LAST_TWO		5
-#define MULTI_MON_ALL			6
+#define MULTI_MON_PRIMARY		0
+#define MULTI_MON_ALL			99
 //
 
 #ifndef SM_CMONITORS
@@ -196,7 +192,6 @@ struct monitor
 	int Width;
 	int Height;
 	int Depth;
-	char device[32];
 	int offsetx;
 	int offsety;
 };
@@ -328,12 +323,6 @@ public:
 	PCHANGES_BUF pchanges_buf;
 	CHANGES_BUF changes_buf;
 
-	int GetNrMonitors();
-	void GetPrimaryDevice();
-	void GetSecondaryDevice();
-	// JnZn558
-	void GetThirdDevice();
-	//
 	void Checkmonitors();
     // 28 Mar 2008 jdp
     void SetBlockInputState(bool newstate);
@@ -530,7 +519,7 @@ BOOL HookWanted;
 BOOL DriverWantedSet;
 
 //Multi monitor
-monitor mymonitor[4];
+monitor mymonitor[100];
 int nr_monitors;
 bool show_multi_monitors;
 bool requested_multi_monitor;

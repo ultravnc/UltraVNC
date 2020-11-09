@@ -39,15 +39,14 @@
 
 rfb::Rect vncDesktop::GetSize()
 {
-	//vnclog.Print(LL_INTINFO, VNCLOG("GetSize \n"));
 	if (!m_screenCapture) {
 		m_SWOffsetx=0;
 		m_SWOffsety=0;
 		return rfb::Rect(0, 0, m_scrinfo.framebufferWidth, m_scrinfo.framebufferHeight);
 	} else {
 		if (show_multi_monitors) {
-			int nWidth = mymonitor[0].Width;
-			int nHeight = mymonitor[0].Height;				
+			int nWidth = mymonitor[MULTI_MON_PRIMARY].Width;
+			int nHeight = mymonitor[MULTI_MON_PRIMARY].Height;				
 			switch (nr_monitors) {
 				case 2:
 					nWidth = m_Cliprect.br.x;
@@ -55,52 +54,14 @@ rfb::Rect vncDesktop::GetSize()
 					break;
 				case 3:
 					{
-						switch (m_current_monitor) {
-							case 4:
-							{
-								if (nr_monitors > 2) {
-									if ((mymonitor[0].offsetx < mymonitor[1].offsetx && mymonitor[1].offsetx < mymonitor[2].offsetx) ||
-										(mymonitor[1].offsetx < mymonitor[0].offsetx && mymonitor[0].offsetx < mymonitor[2].offsetx))
-										nWidth = mymonitor[0].Width+mymonitor[1].Width;
-									if ((mymonitor[0].offsetx < mymonitor[2].offsetx && mymonitor[2].offsetx < mymonitor[1].offsetx) ||
-										(mymonitor[2].offsetx < mymonitor[0].offsetx && mymonitor[0].offsetx < mymonitor[2].offsetx))
-										nWidth = mymonitor[0].Width+mymonitor[2].Width;
-									if ((mymonitor[1].offsetx < mymonitor[2].offsetx && mymonitor[2].offsetx < mymonitor[0].offsetx) ||
-										(mymonitor[2].offsetx < mymonitor[1].offsetx && mymonitor[1].offsetx < mymonitor[0].offsetx))
-										nWidth = mymonitor[1].Width+mymonitor[2].Width;
-									} else
-										nWidth = mymonitor[3].Width;
-									nHeight = std::max(mymonitor[0].Height, mymonitor[1].Height);
-							} break;
-							case 5:
-							{
-								if (nr_monitors > 2) {
-									if ((mymonitor[0].offsetx < mymonitor[1].offsetx && mymonitor[1].offsetx < mymonitor[2].offsetx) ||
-										(mymonitor[0].offsetx < mymonitor[2].offsetx && mymonitor[2].offsetx < mymonitor[1].offsetx))
-										nWidth = mymonitor[1].Width+mymonitor[2].Width;
-									if ((mymonitor[1].offsetx < mymonitor[0].offsetx && mymonitor[0].offsetx < mymonitor[2].offsetx) ||
-										(mymonitor[1].offsetx < mymonitor[2].offsetx && mymonitor[2].offsetx < mymonitor[0].offsetx))
-										nWidth = mymonitor[0].Width+mymonitor[2].Width;
-									if ((mymonitor[2].offsetx < mymonitor[1].offsetx && mymonitor[1].offsetx < mymonitor[0].offsetx) ||
-										(mymonitor[2].offsetx < mymonitor[0].offsetx && mymonitor[0].offsetx < mymonitor[1].offsetx))
-										nWidth = mymonitor[0].Width+mymonitor[1].Width;
-								} else {
-									nWidth = mymonitor[3].Width;
-									nHeight = std::max(mymonitor[1].Height, mymonitor[2].Height);
-							    }
-							} break;
-							default:
-							{
-								nWidth = mymonitor[3].Width;
-								nHeight = mymonitor[3].Height;
-							}
-						}
+						nWidth = mymonitor[MULTI_MON_ALL].Width;
+						nHeight = mymonitor[MULTI_MON_ALL].Height;
 					}
 					default: break;
 				}
 				return rfb::Rect(0,0,nWidth,nHeight);
 			} else
-				return rfb::Rect(0,0,mymonitor[m_current_monitor-1].Width,mymonitor[m_current_monitor-1].Height);
+				return rfb::Rect(0,0,mymonitor[m_current_monitor].Width,mymonitor[m_current_monitor].Height);
 		}
 }
 
@@ -108,15 +69,15 @@ void
 vncDesktop::SetBitmapRectOffsetAndClipRect(int offesetx, int offsety, int width, int height)
 {
 	if (width == 0)
-		width = mymonitor[3].Width;
+		width = mymonitor[MULTI_MON_ALL].Width;
 	if (height == 0)
-		height = mymonitor[3].Height;
+		height = mymonitor[MULTI_MON_ALL].Height;
 
-	m_ScreenOffsetx = mymonitor[3].offsetx;
-	m_ScreenOffsety = mymonitor[3].offsety;
+	m_ScreenOffsetx = mymonitor[MULTI_MON_ALL].offsetx;
+	m_ScreenOffsety = mymonitor[MULTI_MON_ALL].offsety;
 	if (!show_multi_monitors) {
-		m_ScreenOffsetx = mymonitor[0].offsetx;
-		m_ScreenOffsety = mymonitor[0].offsety;
+		m_ScreenOffsetx = mymonitor[MULTI_MON_PRIMARY].offsetx;
+		m_ScreenOffsety = mymonitor[MULTI_MON_PRIMARY].offsety;
 	}
 	m_bmrect = rfb::Rect(offesetx, offsety, width, height);
 	m_SWOffsetx = m_bmrect.tl.x;
@@ -125,20 +86,17 @@ vncDesktop::SetBitmapRectOffsetAndClipRect(int offesetx, int offsety, int width,
 	m_Cliprect.tl.y = 0;
 	m_Cliprect.br.x = m_bmrect.br.x;
 	m_Cliprect.br.y = m_bmrect.br.y;
-	if (m_screenCapture && (m_current_monitor == MULTI_MON_PRIMARY || m_current_monitor == MULTI_MON_SECOND || m_current_monitor == MULTI_MON_THIRD)) {
+	if (m_screenCapture && m_current_monitor != MULTI_MON_ALL) {
+		m_SWOffsetx = mymonitor[m_current_monitor].offsetx - mymonitor[MULTI_MON_ALL].offsetx;
+		m_SWOffsety = mymonitor[m_current_monitor].offsety - mymonitor[MULTI_MON_ALL].offsety;
 
-		int mon = m_current_monitor - 1;
+		m_ScreenOffsetx = mymonitor[m_current_monitor].offsetx;
+		m_ScreenOffsety = mymonitor[m_current_monitor].offsety;
 
-		m_SWOffsetx = mymonitor[mon].offsetx - mymonitor[3].offsetx;
-		m_SWOffsety = mymonitor[mon].offsety - mymonitor[3].offsety;
-
-		m_ScreenOffsetx = mymonitor[mon].offsetx;
-		m_ScreenOffsety = mymonitor[mon].offsety;
-
-		m_Cliprect.tl.x = mymonitor[mon].offsetx - mymonitor[3].offsetx;
-		m_Cliprect.tl.y = mymonitor[mon].offsety - mymonitor[3].offsety;
-		m_Cliprect.br.x = mymonitor[mon].offsetx + mymonitor[mon].Width - mymonitor[3].offsetx;
-		m_Cliprect.br.y = mymonitor[mon].offsety + mymonitor[mon].Height - mymonitor[3].offsety;
+		m_Cliprect.tl.x = mymonitor[m_current_monitor].offsetx - mymonitor[MULTI_MON_ALL].offsetx;
+		m_Cliprect.tl.y = mymonitor[m_current_monitor].offsety - mymonitor[MULTI_MON_ALL].offsety;
+		m_Cliprect.br.x = mymonitor[m_current_monitor].offsetx + mymonitor[m_current_monitor].Width - mymonitor[MULTI_MON_ALL].offsetx;
+		m_Cliprect.br.y = mymonitor[m_current_monitor].offsety + mymonitor[m_current_monitor].Height - mymonitor[MULTI_MON_ALL].offsety;
 	}
 }
 

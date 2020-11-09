@@ -48,116 +48,37 @@
 void 
 vncDesktop::Checkmonitors()
 {
-	nr_monitors=GetNrMonitors();
-	DEVMODE devMode;
-
-	if (nr_monitors>0) {
-		GetPrimaryDevice();
-		devMode.dmSize = sizeof(DEVMODE);
-		EnumDisplaySettings(mymonitor[0].device, ENUM_CURRENT_SETTINGS, &devMode);
-		mymonitor[0].offsetx=devMode.dmPosition.x;
-		mymonitor[0].offsety=devMode.dmPosition.y;
-		mymonitor[0].Width=devMode.dmPelsWidth;
-		mymonitor[0].Height=devMode.dmPelsHeight;
-		mymonitor[0].Depth=devMode.dmBitsPerPel;
-	}
-	if (nr_monitors>1) {
-		GetSecondaryDevice();
-		devMode.dmSize = sizeof(DEVMODE);
-		EnumDisplaySettings(mymonitor[1].device, ENUM_CURRENT_SETTINGS, &devMode);
-		mymonitor[1].offsetx=devMode.dmPosition.x;
-		mymonitor[1].offsety=devMode.dmPosition.y;
-		mymonitor[1].Width=devMode.dmPelsWidth;
-		mymonitor[1].Height=devMode.dmPelsHeight;
-		mymonitor[1].Depth=devMode.dmBitsPerPel;
-	}
-	if (nr_monitors>2) {
-		GetThirdDevice();
-		devMode.dmSize = sizeof(DEVMODE);
-		EnumDisplaySettings(mymonitor[2].device, ENUM_CURRENT_SETTINGS, &devMode);
-		mymonitor[2].offsetx=devMode.dmPosition.x;
-		mymonitor[2].offsety=devMode.dmPosition.y;
-		mymonitor[2].Width=devMode.dmPelsWidth;
-		mymonitor[2].Height=devMode.dmPelsHeight;
-		mymonitor[2].Depth=devMode.dmBitsPerPel;
-	}
-
-	mymonitor[3].offsetx=GetSystemMetrics(SM_XVIRTUALSCREEN);
-    mymonitor[3].offsety=GetSystemMetrics(SM_YVIRTUALSCREEN);
-    mymonitor[3].Width=GetSystemMetrics(SM_CXVIRTUALSCREEN);
-    mymonitor[3].Height=GetSystemMetrics(SM_CYVIRTUALSCREEN);
-	mymonitor[3].Depth=mymonitor[0].Depth;//depth primary monitor is used
-}
-
-
-
-int
-vncDesktop::GetNrMonitors()
-{
-	int i;
-    int j=0;
-    DISPLAY_DEVICE dd;
-    ZeroMemory(&dd, sizeof(dd));
-    dd.cb = sizeof(dd);
-    for (i=0; EnumDisplayDevicesA(NULL, i, &dd, 0); i++) {
-		if (dd.StateFlags & DISPLAY_DEVICE_ATTACHED_TO_DESKTOP)
-		if (!(dd.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER))
-			j++;
-	}
-	return j;
-}
-
-void
-vncDesktop::GetPrimaryDevice()
-{
-	int i;
-    int j=0;
-    DISPLAY_DEVICE dd;
-    ZeroMemory(&dd, sizeof(dd));
-    dd.cb = sizeof(dd);
-    for (i=0; EnumDisplayDevicesA(NULL, i, &dd, 0); i++) {
-		if (dd.StateFlags & DISPLAY_DEVICE_ATTACHED_TO_DESKTOP && dd.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE 
-				&& !(dd.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER)) {
-			strcpy_s(mymonitor[0].device,(char *)dd.DeviceName);
-			break;
-		}
-	}
-}
-
-void
-vncDesktop::GetSecondaryDevice()
-{
-	int i;
-    int j=0;
-    DISPLAY_DEVICE dd;
-    ZeroMemory(&dd, sizeof(dd));
-    dd.cb = sizeof(dd);
-    for (i=0; EnumDisplayDevicesA(NULL, i, &dd, 0); i++) {
-		if (dd.StateFlags & DISPLAY_DEVICE_ATTACHED_TO_DESKTOP && !(dd.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE)
-				&& !(dd.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER)) {
-			strcpy_s(mymonitor[1].device,(char *)dd.DeviceName);
-			break;
+	nr_monitors = 0;
+	int nr = 1;
+	DISPLAY_DEVICE dd;
+	ZeroMemory(&dd, sizeof(dd));
+	dd.cb = sizeof(dd);
+	for (int i = 0; EnumDisplayDevicesA(NULL, i, &dd, 0); i++) {
+		if ((dd.StateFlags & DISPLAY_DEVICE_ATTACHED_TO_DESKTOP) && !(dd.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER)) {
+			DEVMODE devMode;
+			devMode.dmSize = sizeof(DEVMODE);
+			EnumDisplaySettings(dd.DeviceName, ENUM_CURRENT_SETTINGS, &devMode);
+			nr_monitors++;
+			if (dd.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE) {
+				mymonitor[MULTI_MON_PRIMARY].offsetx = devMode.dmPosition.x;
+				mymonitor[MULTI_MON_PRIMARY].offsety = devMode.dmPosition.y;
+				mymonitor[MULTI_MON_PRIMARY].Width = devMode.dmPelsWidth;
+				mymonitor[MULTI_MON_PRIMARY].Height = devMode.dmPelsHeight;
+				mymonitor[MULTI_MON_PRIMARY].Depth = devMode.dmBitsPerPel;
 			}
-	}
-}
-
-void
-vncDesktop::GetThirdDevice()
-{
-	int i;
-    int j=0;
-    DISPLAY_DEVICE dd;
-    ZeroMemory(&dd, sizeof(dd));
-    dd.cb = sizeof(dd);
-    for (i=0; EnumDisplayDevicesA(NULL, i, &dd, 0); i++) {
-		if (dd.StateFlags & DISPLAY_DEVICE_ATTACHED_TO_DESKTOP ) {
-			j++;
-			if (!(dd.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER) && !(dd.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE)) {
-				if (j == 3) {
-					strcpy_s(mymonitor[2].device,(char *)dd.DeviceName);
-					break;
-				}
+			else {
+				mymonitor[nr].offsetx = devMode.dmPosition.x;
+				mymonitor[nr].offsety = devMode.dmPosition.y;
+				mymonitor[nr].Width = devMode.dmPelsWidth;
+				mymonitor[nr].Height = devMode.dmPelsHeight;
+				mymonitor[nr].Depth = devMode.dmBitsPerPel;
+				nr++;
 			}
 		}
 	}
+	mymonitor[MULTI_MON_ALL].offsetx = GetSystemMetrics(SM_XVIRTUALSCREEN);
+	mymonitor[MULTI_MON_ALL].offsety = GetSystemMetrics(SM_YVIRTUALSCREEN);
+	mymonitor[MULTI_MON_ALL].Width = GetSystemMetrics(SM_CXVIRTUALSCREEN);
+	mymonitor[MULTI_MON_ALL].Height = GetSystemMetrics(SM_CYVIRTUALSCREEN);
+	mymonitor[MULTI_MON_ALL].Depth = mymonitor[MULTI_MON_PRIMARY].Depth;//depth primary monitor is used
 }
