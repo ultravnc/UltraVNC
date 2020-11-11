@@ -319,12 +319,12 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 	}
 	old_inputDesktopSelected = inputDesktopSelected;
 
-    //vnclog.Print(LL_INTINFO, VNCLOG("desktop MM %i IsMM %i CurMon %d\n"), m_desktop->requested_multi_monitor, m_desktop->m_buffer.IsMultiMonitor(), m_desktop->m_current_monitor);
+    //vnclog.Print(LL_INTINFO, VNCLOG("desktop MM %i IsMM %i CurMon %d\n"), m_desktop->requested_all_monitor, m_desktop->m_buffer.IsAllMonitors(), m_desktop->m_current_monitor);
 		
 	if (m_desktop->m_displaychanged ||									
 			vncService::InputDesktopSelected()==0 ||							//handle logon and screensaver desktops
 			m_desktop->m_hookswitch||										//hook change request
-			m_desktop->requested_multi_monitor!=m_desktop->m_buffer.IsMultiMonitor() ||		//monitor change request
+			m_desktop->requested_all_monitor!=m_desktop->m_buffer.IsAllMonitors() ||		//monitor change request
 			m_desktop->m_old_monitor != m_desktop->m_current_monitor
 			){
 		// We need to wait until viewer has send if he support Size changes
@@ -337,8 +337,8 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 			vnclog.Print(LL_INTERR, VNCLOG("++++Screensize changed \n"));
 		if (m_desktop->m_hookswitch)									
 			vnclog.Print(LL_INTERR, VNCLOG("m_hookswitch \n"));
-		if (m_desktop->requested_multi_monitor!=m_desktop->m_buffer.IsMultiMonitor()) 
-			vnclog.Print(LL_INTERR, VNCLOG("desktop switch %i %i \n"),m_desktop->requested_multi_monitor,m_desktop->m_buffer.IsMultiMonitor());
+		if (m_desktop->requested_all_monitor!=m_desktop->m_buffer.IsAllMonitors()) 
+			vnclog.Print(LL_INTERR, VNCLOG("desktop switch %i %i \n"),m_desktop->requested_all_monitor,m_desktop->m_buffer.IsAllMonitors());
 		if (!m_server->IsThereFileTransBusy())
 			if (vncService::InputDesktopSelected()==0)						
 				vnclog.Print(LL_INTERR, VNCLOG("++++InputDesktopSelected \n"));
@@ -368,17 +368,17 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 			//keep a copy of the old screen size, so we can check for changes later on
 			oldscrinfo = m_desktop->m_scrinfo;
 						
-			if (m_desktop->requested_multi_monitor!=m_desktop->m_buffer.IsMultiMonitor()) {
+			if (m_desktop->requested_all_monitor!=m_desktop->m_buffer.IsAllMonitors()) {
 				m_desktop->Checkmonitors();
-				m_desktop->requested_multi_monitor=m_desktop->m_buffer.IsMultiMonitor();
+				m_desktop->requested_all_monitor=m_desktop->m_buffer.IsAllMonitors();
 
-				bool orig_monitor=m_desktop->show_multi_monitors;	
-				m_desktop->show_multi_monitors = true;
-				if (m_desktop->requested_multi_monitor && m_desktop->nr_monitors>1) 
-					m_desktop->show_multi_monitors = true;
+				bool orig_monitor=m_desktop->show_all_monitors;	
+				m_desktop->show_all_monitors = true;
+				if (m_desktop->requested_all_monitor && m_desktop->nr_monitors>1) 
+					m_desktop->show_all_monitors = true;
 				else 
-					m_desktop->show_multi_monitors = false;							
-				if ( orig_monitor!=m_desktop->show_multi_monitors) {
+					m_desktop->show_all_monitors = false;							
+				if ( orig_monitor!=m_desktop->show_all_monitors) {
 						monitor_changed = true;
 						m_desktop->m_old_monitor = m_desktop->m_current_monitor;
 				}
@@ -497,7 +497,7 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 						// m_desktop->current_monitor is the new monitor we want to see
 						// m_SWOffset is used by the encoders to send the correct coordinates to the viewer
 						// Cliprect, buffer coordinates
-						if (m_desktop->show_multi_monitors) {
+						if (m_desktop->show_all_monitors) {
 							vnclog.Print(LL_INTINFO, VNCLOG("Request Monitor %d\n"), m_desktop->m_current_monitor);
 							//int mon[2] = {0};
 							switch (m_desktop->m_current_monitor) {							
@@ -575,8 +575,9 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 					if (m_desktop->m_screensize_changed) 
 						{
 							m_desktop->m_screensize_changed = false;
-							m_server->SetNewSWSize(m_desktop->m_scrinfo.framebufferWidth,m_desktop->m_scrinfo.framebufferHeight,FALSE);//changed no lock ok
-							m_server->SetScreenOffset(m_desktop->m_ScreenOffsetx,m_desktop->m_ScreenOffsety,m_desktop->nr_monitors);// no lock ok
+							monitor_changed = false;
+							m_server->SetNewSWSize(m_desktop->m_scrinfo.framebufferWidth,m_desktop->m_scrinfo.framebufferHeight, monitor_changed);//changed no lock ok
+							m_server->SetScreenOffset(m_desktop->m_ScreenOffsetx,m_desktop->m_ScreenOffsety,m_desktop->nr_monitors);// no lock ok							
 						}
 					
 					if (monitor_changed && m_desktop->m_screenCapture)

@@ -152,7 +152,6 @@ public:
 
     void RebuildToolbar(HWND hwnd); // 24 March 2008 jdp
 	void GTGBS_CreateDisplay(void);
-	void GTGBS_ScrollToolbar(int dx, int dy);
 	void CreateButtons(BOOL mini,BOOL ultra);
 	//ClientConnection();
 	ClientConnection(VNCviewerApp *pApp);
@@ -315,7 +314,7 @@ private:
 	void ReadScreenUpdate();
 	void Update(RECT *pRect);
 	void SizeWindow(bool reconnect = false);
-	bool ScrollScreen(int dx, int dy);
+	bool ScrollScreen(int dx, int dy, bool absolute = false);
 	void UpdateScrollbars();
     
 	void ReadRawRect(rfbFramebufferUpdateRectHeader *pfburh);
@@ -731,6 +730,12 @@ private:
 	int m_lLastChangeTimeTimeout;  //dynamic timeout
 	bool m_fScalingDone; // sf@2003 - Auto Scaling flag
 	bool m_FullScreen;
+
+	int offsetXExtSDisplay;
+	int offsetYExtSDisplay;
+	int widthExtSDisplay;
+	int heightExtSDisplay;
+	bool extSDisplay;
 
 	rdr::FdInStream* fis;
 	rdr::ZlibInStream* zis;

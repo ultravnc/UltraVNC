@@ -49,6 +49,7 @@ void
 vncDesktop::Checkmonitors()
 {
 	nr_monitors = 0;
+	devicenaamToPosMap.clear();
 	int nr = 1;
 	DISPLAY_DEVICE dd;
 	ZeroMemory(&dd, sizeof(dd));
@@ -65,6 +66,7 @@ vncDesktop::Checkmonitors()
 				mymonitor[MULTI_MON_PRIMARY].Width = devMode.dmPelsWidth;
 				mymonitor[MULTI_MON_PRIMARY].Height = devMode.dmPelsHeight;
 				mymonitor[MULTI_MON_PRIMARY].Depth = devMode.dmBitsPerPel;
+				devicenaamToPosMap.insert(std::pair< std::string, monitor >(dd.DeviceName, mymonitor[MULTI_MON_PRIMARY]));
 			}
 			else {
 				mymonitor[nr].offsetx = devMode.dmPosition.x;
@@ -72,6 +74,7 @@ vncDesktop::Checkmonitors()
 				mymonitor[nr].Width = devMode.dmPelsWidth;
 				mymonitor[nr].Height = devMode.dmPelsHeight;
 				mymonitor[nr].Depth = devMode.dmBitsPerPel;
+				devicenaamToPosMap.insert(std::pair< std::string, monitor >(dd.DeviceName, mymonitor[nr]));
 				nr++;
 			}
 		}
@@ -81,4 +84,5 @@ vncDesktop::Checkmonitors()
 	mymonitor[MULTI_MON_ALL].Width = GetSystemMetrics(SM_CXVIRTUALSCREEN);
 	mymonitor[MULTI_MON_ALL].Height = GetSystemMetrics(SM_CYVIRTUALSCREEN);
 	mymonitor[MULTI_MON_ALL].Depth = mymonitor[MULTI_MON_PRIMARY].Depth;//depth primary monitor is used
+	devicenaamToPosMap.insert(std::pair< std::string, monitor >("MULTI_MON_ALL", mymonitor[MULTI_MON_ALL]));
 }

@@ -185,7 +185,6 @@ int SessionDialog::HandleNotify(HWND hwndDlg, WPARAM wParam, LPARAM lParam)
 				break;
 			case 2:
 				ShowWindow(hTabDisplay, SW_HIDE);
-				//allowMonitorSpanning = SendMessage(GetDlgItem(hTabDisplay, IDC_ALLOWSPAN), BM_GETCHECK, 0, 0) == BST_CHECKED;
 				break;
 			case 3:
 				ShowWindow(hTabMisc, SW_HIDE);
@@ -319,10 +318,21 @@ BOOL CALLBACK DlgProcDisplay(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			EnableWindow(GetDlgItem(hwnd, IDC_RADIO_ONLY_VIRTUAL), _this->changeServerRes);
 			EnableWindow(GetDlgItem(hwnd, IDC_ALLMONS), _this->changeServerRes);
 			EnableWindow(GetDlgItem(hwnd, IDC_SLIDERRES), _this->changeServerRes && !_this->use_allmonitors);
+			EnableWindow(GetDlgItem(hwnd, IDC_SHOW_EXTEND), _this->changeServerRes && _this->extendDisplay);
+			break;
+		case IDC_RADIO_ONLY_VIRTUAL:
+		case IDC_RADIO_EXTEND:
+			_this->extendDisplay = (SendMessage(GetDlgItem(hwnd, IDC_RADIO_EXTEND), BM_GETCHECK, 0, 0) == BST_CHECKED);
+			EnableWindow(GetDlgItem(hwnd, IDC_SHOW_EXTEND), _this->changeServerRes && _this->extendDisplay);
 			break;
 		case IDC_ALLMONS:
 			_this->use_allmonitors = (SendMessage(GetDlgItem(hwnd, IDC_ALLMONS), BM_GETCHECK, 0, 0) == BST_CHECKED);
 			EnableWindow(GetDlgItem(hwnd, IDC_SLIDERRES), _this->changeServerRes && !_this->use_allmonitors);
+			break;
+		case IDC_SHOW_EXTEND:
+			_this->showExtend =(SendMessage(GetDlgItem(hwnd, IDC_SHOW_EXTEND), BM_GETCHECK, 0, 0) == BST_CHECKED);
+			EnableWindow(GetDlgItem(hwnd, IDC_ALLOWSPAN), !_this->showExtend);
+			EnableWindow(GetDlgItem(hwnd, IDC_DIRECTX), !_this->showExtend);
 			break;
 		default:
 
@@ -857,6 +867,9 @@ void SessionDialog::InitDlgProcDisplay()
 	HWND hExtendDisplay = GetDlgItem(hwnd, IDC_RADIO_EXTEND);
 	SendMessage(hExtendDisplay, BM_SETCHECK, extendDisplay, 0);
 
+	HWND hShowExtend = GetDlgItem(hwnd, IDC_SHOW_EXTEND);
+	SendMessage(hShowExtend, BM_SETCHECK, showExtend, 0);
+
 	HWND hUseVirt = GetDlgItem(hwnd, IDC_RADIO_ONLY_VIRTUAL);
 	SendMessage(hUseVirt, BM_SETCHECK, use_virt, 0);
 
@@ -867,6 +880,9 @@ void SessionDialog::InitDlgProcDisplay()
 	EnableWindow(hUseVirt, changeServerRes);
 	EnableWindow(hAllMons, changeServerRes);
 	EnableWindow(GetDlgItem(hwnd, IDC_SLIDERRES) , changeServerRes && !use_allmonitors);
+	EnableWindow(GetDlgItem(hwnd, IDC_SHOW_EXTEND), changeServerRes && extendDisplay);
+	EnableWindow(GetDlgItem(hwnd, IDC_ALLOWSPAN), !showExtend);
+	EnableWindow(GetDlgItem(hwnd, IDC_DIRECTX), !showExtend);
 
 	HWND hShowToolbar = GetDlgItem(hwnd, IDC_SHOWTOOLBAR);
 	SendMessage(hShowToolbar, BM_SETCHECK, ShowToolbar, 0);
@@ -1128,6 +1144,11 @@ void SessionDialog::ReadDlgProcDisplay()
 	HWND hExtendDisplay = GetDlgItem(hwnd, IDC_RADIO_EXTEND);
 	extendDisplay =
 		(SendMessage(hExtendDisplay, BM_GETCHECK, 0, 0) == BST_CHECKED);
+
+	HWND hShowExtend = GetDlgItem(hwnd, IDC_SHOW_EXTEND);
+	showExtend =
+		(SendMessage(hShowExtend, BM_GETCHECK, 0, 0) == BST_CHECKED);
+
 
 	HWND hUseVirt = GetDlgItem(hwnd, IDC_RADIO_ONLY_VIRTUAL);
 	use_virt =
@@ -1461,6 +1482,7 @@ void SessionDialog::StartListener()
 	m_pOpt->m_allowMonitorSpanning = allowMonitorSpanning;
 	m_pOpt->m_ChangeServerRes = changeServerRes;
 	m_pOpt->m_extendDisplay = extendDisplay;
+	m_pOpt->m_showExtend = showExtend;
 	m_pOpt->m_use_virt = use_virt;
 	m_pOpt->m_use_allmonitors = use_allmonitors;
 	m_pOpt->m_requestedWidth = requestedWidth;

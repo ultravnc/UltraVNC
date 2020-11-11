@@ -448,6 +448,11 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 
 	m_fScalingDone = false;
 	m_FullScreen = false;
+	offsetXExtSDisplay = 0;
+	offsetYExtSDisplay = 0;
+	widthExtSDisplay = 0;
+	heightExtSDisplay = 0;
+	extSDisplay = false;
 
     zis = new rdr::ZlibInStream;
 	zstdis = new rdr::ZstdInStream;
@@ -3642,13 +3647,16 @@ void ClientConnection::ReadServerInit(bool reconnect)
 
 void ClientConnection::SizeWindow(bool reconnect)
 {
+	int uni_screenWidth = extSDisplay ? widthExtSDisplay : m_si.framebufferWidth;
+	int uni_screenHeight = extSDisplay ? heightExtSDisplay : m_si.framebufferHeight;
+
 	bool pos_set = reconnect;
 	bool size_set = reconnect;
 	// Find how large the desktop work area is
 	RECT workrect;
 	tempdisplayclass tdc;
 	tdc.Init();
-	int mon = tdc.getSelectedScreen(m_hwndMain, m_opts.m_allowMonitorSpanning);	
+	int mon = tdc.getSelectedScreen(m_hwndMain, m_opts.m_allowMonitorSpanning && !m_opts.m_showExtend);	
 	workrect.left=tdc.monarray[mon].wl;
 	workrect.right=tdc.monarray[mon].wr;
 	workrect.top=tdc.monarray[mon].wt;
@@ -3679,11 +3687,11 @@ void ClientConnection::SizeWindow(bool reconnect)
 		{
 			// we change the scaling to fit the window
 			// max windows size including borders etc..
-			int horizontalRatio= (int) (((workwidth-dx)*100)/m_si.framebufferWidth);
-			int verticalRatio = (int) (((workheight-dy*2)*100)/m_si.framebufferHeight);
+			int horizontalRatio= (int) (((workwidth-dx)*100)/uni_screenWidth);
+			int verticalRatio = (int) (((workheight-dy*2)*100)/uni_screenHeight);
 			int Ratio= min(verticalRatio, horizontalRatio);
-			widthwindow=m_si.framebufferWidth*Ratio/100;
-			heightwindow=m_si.framebufferHeight*Ratio/100;
+			widthwindow=uni_screenWidth*Ratio/100;
+			heightwindow=uni_screenHeight*Ratio/100;
 			m_opts.m_scale_num =Ratio;
 			m_opts.m_scale_den = 100;
 			m_opts.m_scaling = true;
@@ -3708,10 +3716,10 @@ void ClientConnection::SizeWindow(bool reconnect)
 
 	if (m_opts.m_scaling)
 		SetRect(&fullwinrect, 0, 0,
-				m_si.framebufferWidth * m_opts.m_scale_num / m_opts.m_scale_den,
-				m_si.framebufferHeight * m_opts.m_scale_num / m_opts.m_scale_den);
+				uni_screenWidth * m_opts.m_scale_num / m_opts.m_scale_den,
+				uni_screenHeight * m_opts.m_scale_num / m_opts.m_scale_den);
 	else
-		SetRect(&fullwinrect, 0, 0, m_si.framebufferWidth, m_si.framebufferHeight);
+		SetRect(&fullwinrect, 0, 0, uni_screenWidth, uni_screenHeight);
 
 	AdjustWindowRectEx(&fullwinrect,
 			   GetWindowLong(m_hwndcn, GWL_STYLE) & ~WS_VSCROLL & ~WS_HSCROLL,
@@ -3802,7 +3810,7 @@ void ClientConnection::SizeWindow(bool reconnect)
     //called by SetWindowPos
     int act_width = m_winwidth;
     int act_height = m_winheight;
-	if (m_opts.m_allowMonitorSpanning == true && (m_fullwinwidth <= bb )) //fit on primary
+	if (m_opts.m_allowMonitorSpanning && !m_opts.m_showExtend && (m_fullwinwidth <= bb )) //fit on primary
 		// -20 for border
 	{
 		if (pos_set == false) SetWindowPos(m_hwndMain, HWND_TOP,tdc.monarray[1].wl + ((tdc.monarray[1].wr-tdc.monarray[1].wl)-m_winwidth) / 2,tdc.monarray[1].wt +
@@ -4158,7 +4166,7 @@ void ClientConnection::Createdib()
 			vnclog.Print(0, _T("Cache: Cache buffer bitmap creation\n"));
 		}
 	}
-	if (m_opts.m_Directx && (m_myFormat.bitsPerPixel==32 || m_myFormat.bitsPerPixel==16))
+	if (m_opts.m_Directx && !m_opts.m_showExtend && (m_myFormat.bitsPerPixel==32 || m_myFormat.bitsPerPixel==16))
 	if (!FAILED(directx_output->InitD3D(m_hwndcn,m_hwndMain, m_si.framebufferWidth, m_si.framebufferHeight, false,m_myFormat.bitsPerPixel,m_myFormat.redShift)))
 			{
 				if (directx_output->m_directxformat.bitsPerPixel ==m_myFormat.bitsPerPixel)
@@ -4177,9 +4185,6 @@ void ClientConnection::Createdib()
 						directx_output->DestroyD3D();
 						directx_used=false;
 					}
-				//TEST WITHOUT DIRECTX
-				//directx_output->DestroyD3D();
-				//directx_used = false;
 			}
 }
 // Closing down the connection.
@@ -4401,12 +4406,19 @@ ClientConnection::~ClientConnection()
 
 // You can specify a dx & dy outside the limits; the return value will
 // tell you whether it actually scrolled.
-bool ClientConnection::ScrollScreen(int dx, int dy)
+bool ClientConnection::ScrollScreen(int dx, int dy, bool absolute)
 {
-	dx = max(dx, -m_hScrollPos);
-	dx = min(dx, m_hScrollMax-(m_cliwidth)-m_hScrollPos);
-	dy = max(dy, -m_vScrollPos);
-	dy = min(dy, m_vScrollMax-(m_cliheight)-m_vScrollPos);
+	if (absolute)
+	{
+		dx = dx - m_hScrollPos;
+		dy = dy - m_vScrollPos;
+	}
+	else{
+		dx = max(dx, -m_hScrollPos);
+		dx = min(dx, m_hScrollMax - (m_cliwidth)-m_hScrollPos);
+		dy = max(dy, -m_vScrollPos);
+		dy = min(dy, m_vScrollMax - (m_cliheight)-m_vScrollPos);
+	}
 	if (dx || dy) {
 		m_hScrollPos += dx;
 		m_vScrollPos += dy;
@@ -4900,10 +4912,10 @@ inline void ClientConnection::DoBlit()
 			::Sleep(m_pApp->m_options.m_delay);
 		}
 
-		if (m_opts.m_scaling || (directx_used == false && m_opts.m_Directx == true))
+		if (m_opts.m_scaling || (m_opts.m_Directx && !m_opts.m_showExtend))
 		{
 
-			if ((directx_used == false && m_opts.m_Directx == true))
+			if (m_opts.m_Directx && !m_opts.m_showExtend)
 			{
 
 				RECT myclrect;
@@ -5372,14 +5384,14 @@ void ClientConnection::SendFramebufferUpdateRequest(WPARAM requestType, bool bAs
 
 void ClientConnection::Internal_SendIncrementalFramebufferUpdateRequest()
 {
-    Internal_SendFramebufferUpdateRequest(0, 0, m_si.framebufferWidth,
-					m_si.framebufferHeight, true);
+	Internal_SendFramebufferUpdateRequest(0, 0, m_si.framebufferWidth,
+			m_si.framebufferHeight, true);
 }
 
 void ClientConnection::Internal_SendFullFramebufferUpdateRequest()
 {
     Internal_SendFramebufferUpdateRequest(0, 0, m_si.framebufferWidth,
-					m_si.framebufferHeight, false);
+			m_si.framebufferHeight, false);
 }
 
 
@@ -5551,8 +5563,6 @@ inline void ClientConnection::ReadScreenUpdate()
 		surh.r.w = Swap16IfLE(surh.r.w);
 		surh.r.h = Swap16IfLE(surh.r.h);
 		surh.encoding = Swap32IfLE(surh.encoding);
-		// vnclog.Print(0, _T("%d %d\n"), i,sut.nRects);
-		//vnclog.Print(0, _T("encoding %d\n"), surh.encoding);
 
 		// Tight - If lastrect we must quit this loop (nRects = 0xFFFF)
 		if (surh.encoding == rfbEncodingLastRect)
@@ -5562,6 +5572,19 @@ inline void ClientConnection::ReadScreenUpdate()
 		{
 			m_pendingFormatChange = true;
 			ReadNewFBSize(&surh);
+			break;
+		}
+
+		if (surh.encoding == rfbEncodingExtViewSize)
+		{
+			offsetXExtSDisplay = surh.r.x / m_nServerScale;
+			offsetYExtSDisplay = surh.r.y / m_nServerScale;
+			widthExtSDisplay = surh.r.w / m_nServerScale;
+			heightExtSDisplay = surh.r.h / m_nServerScale;
+			
+			extSDisplay = true;
+			SizeWindow();
+			ScrollScreen(offsetXExtSDisplay, offsetYExtSDisplay, true);
 			break;
 		}
 
@@ -5592,7 +5615,7 @@ inline void ClientConnection::ReadScreenUpdate()
 			continue;
 		}
 
-		if (surh.encoding !=rfbEncodingNewFBSize && surh.encoding != rfbEncodingCacheZip && surh.encoding != rfbEncodingQueueZip && surh.encoding !=rfbEncodingUltraZip)
+		if (surh.encoding != rfbEncodingExtViewSize && surh.encoding !=rfbEncodingNewFBSize && surh.encoding != rfbEncodingCacheZip && surh.encoding != rfbEncodingQueueZip && surh.encoding !=rfbEncodingUltraZip)
 			SoftCursorLockArea(surh.r.x, surh.r.y, surh.r.w, surh.r.h);
 
 		// Modif sf@2002 - DSM Plugin
@@ -5914,7 +5937,7 @@ inline void ClientConnection::ReadScreenUpdate()
 		}
 
 		//Todo: surh.encoding != rfbEncodingXZ && surh.encoding != rfbEncodingXZYW && 
-		if (surh.encoding !=rfbEncodingNewFBSize && surh.encoding != rfbEncodingCacheZip && surh.encoding != rfbEncodingQueueZip && surh.encoding != rfbEncodingUltraZip)
+		if (surh.encoding != rfbEncodingExtViewSize && surh.encoding !=rfbEncodingNewFBSize && surh.encoding != rfbEncodingCacheZip && surh.encoding != rfbEncodingQueueZip && surh.encoding != rfbEncodingUltraZip)
 		{
 			RECT rect;
 			rect.left   = surh.r.x;
@@ -6925,12 +6948,10 @@ void ClientConnection::ReadNewFBSize(rfbFramebufferUpdateRectHeader *pfburh)
 	m_si.framebufferWidth = pfburh->r.w / m_nServerScale;
 	m_si.framebufferHeight = pfburh->r.h / m_nServerScale;
 
-	//CreateLocalFramebuffer();
 	Createdib();
 	m_pendingScaleChange = true;
 	m_pendingFormatChange = true;
 	}
-	SendAppropriateFramebufferUpdateRequest(false);
 
 	SizeWindow();
 	InvalidateRect(m_hwndcn, NULL, TRUE);
@@ -6950,6 +6971,8 @@ void ClientConnection::SendMonitorSizes()
 		flag = 1;
 	if (m_opts.m_extendDisplay)
 		flag = 2;
+	if (m_opts.m_extendDisplay && m_opts.m_showExtend && !m_opts.m_use_allmonitors)
+		flag = 3;
 	
 	rfbSetDesktopSizeMsg sdmz;
 	tempdisplayclass tdc;
@@ -7222,21 +7245,6 @@ void ClientConnection::UpdateStatusFields()
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
-
-void ClientConnection::GTGBS_ScrollToolbar(int dx, int dy)
-{
-/*	dx = max(dx, -m_hScrollPos);
-	dx = min(dx, m_hScrollMax-(m_cliwidth)-m_hScrollPos);
-	dy = max(dy, -m_vScrollPos);
-	dy = min(dy, m_vScrollMax-(m_cliheight)-m_vScrollPos);
-	if (dx || dy) {
-		RECT clirect;
-		GetClientRect(m_hwndTBwin, &clirect);
-		ScrollWindowEx(m_hwndTBwin, dx, dy, NULL, &clirect, NULL, NULL, SW_ERASE );
-		DoBlit();
-	}
-*/
-}
 
 void ClientConnection::GTGBS_CreateDisplay()
 {
@@ -8511,14 +8519,17 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						{
 						GetClientRect(hwnd, &rect);
 
+						int uni_screenWidth = /*_this->extSDisplay ? _this->widthExtSDisplay :*/ _this->m_si.framebufferWidth;
+						int uni_screenHeight = /*_this->extSDisplay ? _this->heightExtSDisplay :*/ _this->m_si.framebufferHeight;
+
 						_this->m_cliwidth = min( (int)(rect.right - rect.left),
-							                     (int)(_this->m_si.framebufferWidth * _this->m_opts.m_scale_num / _this->m_opts.m_scale_den));
+							                     (int)(uni_screenWidth * _this->m_opts.m_scale_num / _this->m_opts.m_scale_den));
 						if (_this->m_opts.m_ShowToolbar)
 							_this->m_cliheight = min( (int)rect.bottom - rect.top ,
-							                          (int)_this->m_si.framebufferHeight * _this->m_opts.m_scale_num / _this->m_opts.m_scale_den + _this->m_TBr.bottom);
+							                          (int)uni_screenHeight * _this->m_opts.m_scale_num / _this->m_opts.m_scale_den + _this->m_TBr.bottom);
 						else
 							_this->m_cliheight = min( (int)(rect.bottom - rect.top) ,
-							                          (int)(_this->m_si.framebufferHeight * _this->m_opts.m_scale_num / _this->m_opts.m_scale_den));
+							                          (int)(uni_screenHeight * _this->m_opts.m_scale_num / _this->m_opts.m_scale_den));
 
 						_this->m_hScrollMax = (int)_this->m_si.framebufferWidth * _this->m_opts.m_scale_num / _this->m_opts.m_scale_den;
 						if (_this->m_opts.m_ShowToolbar)
@@ -8625,7 +8636,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 					return 0;
 
 				case tbWM_FITSCREEN:
-					_this->m_opts.m_Directx = true;
+					_this->m_opts.m_Directx = !_this->m_opts.m_showExtend;
 					_this->m_pendingFormatChange = true;
 					InvalidateRect(hwnd, NULL, TRUE);
 					_this->RealiseFullScreenMode();

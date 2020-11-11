@@ -537,6 +537,7 @@ typedef struct {
 #define rfbEncodingLastRect        0xFFFFFF20
 #define rfbEncodingNewFBSize       0xFFFFFF21
 #define rfbEncodingExtDesktopSize  0xFFFFFECC
+#define rfbEncodingExtViewSize     0xFFFFFECD
  
 #define rfbEncodingQualityLevel0   0xFFFFFFE0
 #define rfbEncodingQualityLevel1   0xFFFFFFE1

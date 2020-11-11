@@ -301,7 +301,10 @@ omni_condition::broadcast(void)
 
     while (waiting_head != NULL) {
 	omni_thread* t = waiting_head;
-	waiting_head = t->cond_next;
+    if (waiting_head == t->cond_next)
+        waiting_head = NULL;
+    else
+	    waiting_head = t->cond_next;
 	if (waiting_head == NULL)
 	    waiting_tail = NULL;
 	else

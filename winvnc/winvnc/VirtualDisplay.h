@@ -11,8 +11,7 @@ using namespace std;
 
 const static LPCSTR g_szIPC = ("Global\\{4A77E11C-B0B4-40F9-AA8B-D249116A76FE}");
 
-enum DisplayMode {dmDisplay, dmVirtual, dmExtend
-};
+enum DisplayMode {dmDisplay, dmVirtual, dmExtend, dmExtendOnly};
 
 typedef struct _SUPPORTEDMONITORS
 {
@@ -24,16 +23,17 @@ typedef struct _SUPPORTEDMONITORS
 typedef struct _DISPLAYINFO
 {
 	DEVMODE dm;
-	CHAR naam[256];
+	CHAR devicenaam[256];
 	bool primary;
 }DISPLAYINFO;
 
 typedef struct _VIRTUALDISPLAY
 {
 	int clientId;
+	CHAR devicenaam[256];
 	HSWDEVICE hDevice;
 	HANDLE hEvent;
-	bool singleExtend;
+	bool singleExtendMode;
 }VIRTUALDISPLAY;
 
 typedef struct _NAMES
@@ -72,23 +72,24 @@ private:
 	PSwDeviceClose SwDeviceCloseUVNC;
 
 	void realMonitors(map< pair<int, int>, pair<int, int> >resolutionMap);
-	void extendMonitors(map< pair<int, int>, pair<int, int> >resolutionMap, int clientId, bool multi);
+	void extendMonitors(map< pair<int, int>, pair<int, int> >resolutionMap, int clientId, bool singleExtendMode, char *displayName);
 	void virtualMonitors(map< pair<int, int>, pair<int, int> >resolutionMap, int clientId);
 
 	bool ContainDisplayName(char naam[256]);
 	void getSetDisplayName(char* displayName);
+	void recordDisplayNames();
 	void changeDisplaySize(int w, int h, char naam[256]);
+	void disconnectAllDisplays();
+	void SetVirtualMonitorsSize(int height, int width);
+	void AddVirtualMonitors(int clientId, bool singleExtendMode);
+	bool AddVirtualDisplay(HSWDEVICE& hSwDevice, HANDLE& hEvent, WCHAR* name);
+	HRESULT ChangePrimaryMonitor(char gdiDeviceName[256]);
 
 public:
-	VirtualDisplay();
-	void disconnectDisplay(int clientId, bool lastViewer);
-	void disconnectAllDisplays();
+	VirtualDisplay();	
 	~VirtualDisplay();
-	void SetVirtualMonitorsSize(int height, int width);
-	void AddVirtualMonitors(int clientId, bool singleExtend);
-	bool AddVirtualDisplay(HSWDEVICE& hSwDevice, HANDLE& hEvent, WCHAR* name);
 	static bool InstallDriver();
-	void setMonitorResolutions(DisplayMode flag, map< pair<int, int>, pair<int, int> >resolutionMap, bool multi, int clientId);
-	HRESULT ChangePrimaryMonitor(char gdiDeviceName[256]);
+	void attachDisplay(DisplayMode flag, map< pair<int, int>, pair<int, int> >resolutionMap, bool singleExtendMode, int clientId, char* displayName);
+	void disconnectDisplay(int clientId, bool lastViewer);
 };
 

@@ -183,6 +183,7 @@ void SessionDialog::SaveToFile(char *fname, bool asDefault)
 	saveInt("allowMonitorSpanning", allowMonitorSpanning, fname);
 	saveInt("ChangeServerRes", changeServerRes, fname);
 	saveInt("extendDisplay", extendDisplay, fname);
+	saveInt("showExtend", showExtend, fname);
 	saveInt("use_virt", use_virt, fname);	
 	saveInt("useAllMonitors", use_allmonitors, fname);
 	saveInt("requestedWidth", requestedWidth, fname);
@@ -266,6 +267,7 @@ void SessionDialog::LoadFromFile(char *fname)
   allowMonitorSpanning = readInt("allowMonitorSpanning", allowMonitorSpanning, fname);
   changeServerRes = readInt("ChangeServerRes", changeServerRes, fname);
   extendDisplay = readInt("extendDisplay", extendDisplay, fname);
+  showExtend = readInt("showExtend", showExtend, fname);
   use_virt = readInt("use_virt", use_virt, fname);
   use_allmonitors = readInt("useAllMonitors", use_allmonitors, fname);
 
@@ -372,6 +374,7 @@ void SessionDialog::SetDefaults()
 	allowMonitorSpanning = 0;
 	changeServerRes = 0;
 	extendDisplay = 0;
+	showExtend = 0;
 	use_virt = 0;
 	use_allmonitors =0;
 	requestedWidth = 0;

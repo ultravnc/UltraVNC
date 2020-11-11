@@ -318,6 +318,7 @@
 #define IDC_ALLMONS                     2056
 #define IDC_ALLOWSPAN                   2057
 #define IDC_GII                         2059
+#define IDC_SHOW_EXTEND                 2060
 #define IDC_STATIC_SPLIT                9000
 #define IDC_HOSTNAME_DEL                9001
 #define ID_SESSION_SET_CRECT            32777
@@ -614,7 +615,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        227
 #define _APS_NEXT_COMMAND_VALUE         50025
-#define _APS_NEXT_CONTROL_VALUE         2060
+#define _APS_NEXT_CONTROL_VALUE         2061
 #define _APS_NEXT_SYMED_VALUE           154
 #endif
 #endif

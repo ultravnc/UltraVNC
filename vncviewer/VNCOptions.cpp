@@ -213,6 +213,7 @@ VNCOptions::VNCOptions()
 	m_allowMonitorSpanning = 0;
 	m_ChangeServerRes = 0;
 	m_extendDisplay = 0;
+	m_showExtend = 0;
 	m_use_virt = 0;
 	m_use_allmonitors = 0;
 	m_requestedWidth = 0;
@@ -373,6 +374,7 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
 	m_allowMonitorSpanning = s.m_allowMonitorSpanning;
 	m_ChangeServerRes = s.m_ChangeServerRes;
 	m_extendDisplay = s.m_extendDisplay;
+	m_showExtend = s.m_showExtend;
 	m_use_virt = s.m_use_virt;
 	m_use_allmonitors = s.m_use_allmonitors;
 	m_requestedWidth = s.m_requestedWidth;
@@ -1138,6 +1140,7 @@ void VNCOptions::Save(char* fname)
 	saveInt("allowMonitorSpanning", m_allowMonitorSpanning, fname);
 	saveInt("ChangeServerRes", m_ChangeServerRes, fname);
 	saveInt("extendDisplay", m_extendDisplay, fname);
+	saveInt("showExtend", m_showExtend, fname);
 	saveInt("use_virt", m_use_virt, fname);
 	saveInt("use_allmonitors", m_use_allmonitors, fname);
 	saveInt("requestedWidth", m_requestedWidth, fname);
@@ -1231,6 +1234,7 @@ void VNCOptions::Load(char* fname)
 	m_allowMonitorSpanning = readInt("allowMonitorSpanning", m_allowMonitorSpanning, fname);
 	m_ChangeServerRes = readInt("ChangeServerRes", m_ChangeServerRes, fname);
 	m_extendDisplay = readInt("extendDisplay", m_extendDisplay, fname);
+	m_showExtend = readInt("showExtend", m_showExtend, fname);
 	m_use_virt = readInt("use_virt", m_use_virt, fname);
 	m_use_allmonitors = readInt("use_allmonitors", m_use_allmonitors, fname);
 	m_requestedWidth = readInt("requestedWidth", m_requestedWidth, fname);

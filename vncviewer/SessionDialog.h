@@ -72,6 +72,7 @@ public:
 	bool allowMonitorSpanning;
 	bool changeServerRes;
 	bool extendDisplay;
+	bool showExtend;
 	bool use_virt;
 	bool use_allmonitors;
 	int requestedWidth;

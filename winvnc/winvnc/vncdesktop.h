@@ -47,104 +47,23 @@ class vncServer;
 #include "vncbuffer.h"
 #include "translate.h"
 #include <omnithread.h>
-
-// Modif rdv@2002 - v1.1.x - videodriver
 #include "videodriver.h"
 #include "DeskdupEngine.h"
-
-// Modif sf@2002 - v1.1.0
 #include <list>
 #include <set>
 #include "TextChat.h"
 #ifdef AVILOG
 #include "avilog/avilog/AVIGenerator.h"
 #endif
-// adzm - 2010-07 - Extended clipboard
 #include "common/Clipboard.h"
 #include "IPC.h"
-//#define COMPILE_MULTIMON_STUBS
-//#include "Multimon.h"
+#include <map>
+#include <string>
 
-// JnZn558
 #define MULTI_MON_PRIMARY		0
 #define MULTI_MON_ALL			99
-//
-
-#ifndef SM_CMONITORS
-
-#define SM_XVIRTUALSCREEN       76
-#define SM_YVIRTUALSCREEN       77
-#define SM_CXVIRTUALSCREEN      78
-#define SM_CYVIRTUALSCREEN      79
-#define SM_CMONITORS            80
-#define SM_SAMEDISPLAYFORMAT    81
-
-// HMONITOR is already declared if WINVER >= 0x0500 in windef.h
-// This is for components built with an older version number.
-//
-#if !defined(HMONITOR_DECLARED) && (WINVER < 0x0500)
-DECLARE_HANDLE(HMONITOR);
-#define HMONITOR_DECLARED
-#endif
-
-#define MONITOR_DEFAULTTONULL       0x00000000
-#define MONITOR_DEFAULTTOPRIMARY    0x00000001
-#define MONITOR_DEFAULTTONEAREST    0x00000002
-
-#define MONITORINFOF_PRIMARY        0x00000001
-
-typedef struct tagMONITORINFO
-{
-    DWORD   cbSize;
-    RECT    rcMonitor;
-    RECT    rcWork;
-    DWORD   dwFlags;
-} MONITORINFO, *LPMONITORINFO;
-
-#ifndef CCHDEVICENAME
-#define CCHDEVICENAME 32
-#endif
-
-#ifdef __cplusplus
-typedef struct tagMONITORINFOEXA : public tagMONITORINFO
-{
-    CHAR        szDevice[CCHDEVICENAME];
-} MONITORINFOEXA, *LPMONITORINFOEXA;
-typedef struct tagMONITORINFOEXW : public tagMONITORINFO
-{
-    WCHAR       szDevice[CCHDEVICENAME];
-} MONITORINFOEXW, *LPMONITORINFOEXW;
-#ifdef UNICODE
-typedef MONITORINFOEXW MONITORINFOEX;
-typedef LPMONITORINFOEXW LPMONITORINFOEX;
-#else
-typedef MONITORINFOEXA MONITORINFOEX;
-typedef LPMONITORINFOEXA LPMONITORINFOEX;
-#endif // UNICODE
-#else // ndef __cplusplus
-typedef struct tagMONITORINFOEXA
-{
-    MONITORINFO;
-    CHAR        szDevice[CCHDEVICENAME];
-} MONITORINFOEXA, *LPMONITORINFOEXA;
-typedef struct tagMONITORINFOEXW
-{
-    MONITORINFO;
-    WCHAR       szDevice[CCHDEVICENAME];
-} MONITORINFOEXW, *LPMONITORINFOEXW;
-#ifdef UNICODE
-typedef MONITORINFOEXW MONITORINFOEX;
-typedef LPMONITORINFOEXW LPMONITORINFOEX;
-#else
-typedef MONITORINFOEXA MONITORINFOEX;
-typedef LPMONITORINFOEXA LPMONITORINFOEX;
-#endif // UNICODE
-#endif
-#endif
 
 typedef std::vector<COLORREF> RGBPixelList;   // List of RGB values (pixels)
-// sf@2002 - Generates ClassName lenght warning in debug mode compile.
-// typedef std::list<RGBPixelList*> GridsList; // List of Grids of pixels
 typedef std::vector<RGBPixelList*> GridsList; // List of Grids of pixels
 typedef std::set<HWND> WindowsList;       // List of windows handles
 
@@ -234,12 +153,12 @@ class vncDesktop
 {
 // JnZn558
 protected:
-	int m_current_monitor;
 	int m_old_monitor;
 //
 
 // Fields
 public:
+	int m_current_monitor;
 
 // Methods
 public:
@@ -252,6 +171,9 @@ public:
 	// Create/Destroy methods
 	vncDesktop();
 	~vncDesktop();
+
+	monitor mymonitor[100];
+	std::map<std::string, monitor> devicenaamToPosMap;
 
 	DWORD Init(vncServer *pSrv);
 
@@ -514,20 +436,19 @@ protected:
 	bool blankmonitorstate;
 
 	
-BOOL DriverWanted;
-BOOL HookWanted;
-BOOL DriverWantedSet;
+	BOOL DriverWanted;
+	BOOL HookWanted;
+	BOOL DriverWantedSet;
 
-//Multi monitor
-monitor mymonitor[100];
-int nr_monitors;
-bool show_multi_monitors;
-bool requested_multi_monitor;
+	//Multi monitor
+	int nr_monitors;
+	bool show_all_monitors;
+	bool requested_all_monitor;
 
-bool m_bIsInputDisabledByClient; // 28 March 2008 jdp
-#ifdef AVILOG
-CAVIGenerator *AviGen;
-#endif
+	bool m_bIsInputDisabledByClient; // 28 March 2008 jdp
+	#ifdef AVILOG
+	CAVIGenerator *AviGen;
+	#endif
 
 private:
 	HDESK m_input_desktop;

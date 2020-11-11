@@ -44,7 +44,7 @@ rfb::Rect vncDesktop::GetSize()
 		m_SWOffsety=0;
 		return rfb::Rect(0, 0, m_scrinfo.framebufferWidth, m_scrinfo.framebufferHeight);
 	} else {
-		if (show_multi_monitors) {
+		if (show_all_monitors) {
 			int nWidth = mymonitor[MULTI_MON_PRIMARY].Width;
 			int nHeight = mymonitor[MULTI_MON_PRIMARY].Height;				
 			switch (nr_monitors) {
@@ -60,9 +60,10 @@ rfb::Rect vncDesktop::GetSize()
 					default: break;
 				}
 				return rfb::Rect(0,0,nWidth,nHeight);
-			} else
-				return rfb::Rect(0,0,mymonitor[m_current_monitor].Width,mymonitor[m_current_monitor].Height);
-		}
+		} 
+		else
+			return rfb::Rect(0,0,mymonitor[m_current_monitor].Width,mymonitor[m_current_monitor].Height);
+	}
 }
 
 void
@@ -73,9 +74,11 @@ vncDesktop::SetBitmapRectOffsetAndClipRect(int offesetx, int offsety, int width,
 	if (height == 0)
 		height = mymonitor[MULTI_MON_ALL].Height;
 
-	m_ScreenOffsetx = mymonitor[MULTI_MON_ALL].offsetx;
-	m_ScreenOffsety = mymonitor[MULTI_MON_ALL].offsety;
-	if (!show_multi_monitors) {
+	if (show_all_monitors) {
+		m_ScreenOffsetx = mymonitor[MULTI_MON_ALL].offsetx;
+		m_ScreenOffsety = mymonitor[MULTI_MON_ALL].offsety;
+	}
+	else {
 		m_ScreenOffsetx = mymonitor[MULTI_MON_PRIMARY].offsetx;
 		m_ScreenOffsety = mymonitor[MULTI_MON_PRIMARY].offsety;
 	}

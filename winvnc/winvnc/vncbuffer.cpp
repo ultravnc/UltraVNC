@@ -55,7 +55,7 @@ vncBuffer::vncBuffer()
 
 	nRowIndex = 0;
 	m_cursorpending = false;
-	m_multi_monitor = 1;
+	m_all_monitor = true;
 
 	// sf@2005 - Grey Palette
 	m_fGreyPalette = false;
@@ -1156,18 +1156,15 @@ vncBuffer::IsShapeCleared()
 }
 
 void
-vncBuffer::MultiMonitors(int number)
+vncBuffer::SetAllMonitors(bool all)
 {
-	if (number==1) 
-		m_multi_monitor = false;
-	if (number==2) 
-		m_multi_monitor = true;
+	m_all_monitor = all;
 }
 
 bool
-vncBuffer::IsMultiMonitor()
+vncBuffer::IsAllMonitors()
 {
-	return m_multi_monitor;
+	return m_all_monitor;
 }
 
 bool

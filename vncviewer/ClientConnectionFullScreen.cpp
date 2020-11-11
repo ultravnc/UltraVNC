@@ -70,6 +70,9 @@ void ClientConnection::SetFullScreenMode(bool enable)
 		SizeWindow();		
 		RealiseFullScreenMode();
 		restoreScreenPosition();
+		if (extSDisplay)
+			ScrollScreen(offsetXExtSDisplay, offsetYExtSDisplay, true);
+
 	}
 
 	SendFullFramebufferUpdateRequest(false);
@@ -110,7 +113,7 @@ void ClientConnection::RealiseFullScreenMode()
 
 		// when the remote size is bigger then 1,5 time the localscreen we use all monitors in
 		// fullscreen mode
-		if ((m_si.framebufferWidth > cx * 1.5 || m_si.framebufferHeight > cy * 1.5) && m_opts.m_allowMonitorSpanning){
+		if ((m_si.framebufferWidth > cx * 1.5 || m_si.framebufferHeight > cy * 1.5) && m_opts.m_allowMonitorSpanning && !m_opts.m_showExtend){
 			tempdisplayclass tdc;
 			tdc.Init();
 			x = 0;

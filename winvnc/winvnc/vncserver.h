@@ -145,7 +145,6 @@ public:
 
 	virtual vncDesktop* GetDesktopPointer() {return m_desktop;}
 	virtual void SetNewSWSize(long w,long h,BOOL desktop);
-	virtual void SetNewSWSizeFR(long w,long h,BOOL desktop);
 	virtual void SetBufferOffset(int x,int y);
 	virtual void SetScreenOffset(int x,int y, bool single_display); //never locked
 	virtual void InitialUpdate(bool value);

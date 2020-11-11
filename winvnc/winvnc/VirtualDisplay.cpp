@@ -115,7 +115,7 @@ VirtualDisplay::VirtualDisplay()
 				EnumDisplaySettingsEx(dd.DeviceName, ENUM_REGISTRY_SETTINGS, &dm, 0);
 			DISPLAYINFO di;
 			di.dm = dm;
-			strcpy_s(di.naam, 256, dd.DeviceName);
+			strcpy_s(di.devicenaam, 256, dd.DeviceName);
 			di.primary = dd.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE;
 			diplayInfoList.push_back(di);
 		}
@@ -131,7 +131,7 @@ void VirtualDisplay::disconnectDisplay(int clientId, bool lastViewer)
 	virtualDisplayIter = virtualDisplayList.begin();
 	while (virtualDisplayIter != virtualDisplayList.end())
 	{
-		if ((*virtualDisplayIter).hDevice && SwDeviceCloseUVNC && (*virtualDisplayIter).clientId == clientId && (*virtualDisplayIter).singleExtend) {
+		if ((*virtualDisplayIter).hDevice && SwDeviceCloseUVNC && (*virtualDisplayIter).clientId == clientId && (*virtualDisplayIter).singleExtendMode) {
 			SwDeviceCloseUVNC((*virtualDisplayIter).hDevice);
 			CloseHandle((*virtualDisplayIter).hEvent);
 			virtualDisplayList.erase(virtualDisplayIter);
@@ -156,9 +156,9 @@ void VirtualDisplay::disconnectAllDisplays()
 		while (resIter != diplayInfoList.end())
 		{
 			if ((*resIter).dm.dmPosition.x == 0 && (*resIter).dm.dmPosition.y == 0)
-				ChangeDisplaySettingsEx((*resIter).naam, &(*resIter).dm, NULL, (CDS_UPDATEREGISTRY | CDS_NORESET | CDS_SET_PRIMARY), NULL);
+				ChangeDisplaySettingsEx((*resIter).devicenaam, &(*resIter).dm, NULL, (CDS_UPDATEREGISTRY | CDS_NORESET | CDS_SET_PRIMARY), NULL);
 			else
-				ChangeDisplaySettingsEx((*resIter).naam, &(*resIter).dm, NULL, (CDS_UPDATEREGISTRY | CDS_NORESET), NULL);
+				ChangeDisplaySettingsEx((*resIter).devicenaam, &(*resIter).dm, NULL, (CDS_UPDATEREGISTRY | CDS_NORESET), NULL);
 			resIter++;
 		}
 		ChangeDisplaySettingsEx(NULL, NULL, NULL, 0, NULL);
@@ -176,8 +176,7 @@ void VirtualDisplay::disconnectAllDisplays()
 			CloseHandle((*virtualDisplayIter).hEvent);
 		virtualDisplayIter++;
 	}
-	virtualDisplayList.clear();
-	initialized = false;
+	virtualDisplayList.clear();	
 }
 
 VirtualDisplay::~VirtualDisplay()
@@ -187,9 +186,10 @@ VirtualDisplay::~VirtualDisplay()
 		UnmapViewOfFile((LPVOID)FileView);
 	if (hFileMap)
 		CloseHandle(hFileMap);
+	initialized = false;
 }
 
-void VirtualDisplay::extendMonitors(map< pair<int, int>, pair<int, int> >resolutionMap, int clientId, bool multi)
+void VirtualDisplay::extendMonitors(map< pair<int, int>, pair<int, int> >resolutionMap, int clientId, bool singleExtendMode, char * displayName)
 {
 	map< pair<int, int>, pair<int, int> >::iterator it;
 	for (it = resolutionMap.begin(); it != resolutionMap.end(); it++) {
@@ -201,9 +201,11 @@ void VirtualDisplay::extendMonitors(map< pair<int, int>, pair<int, int> >resolut
 	for (it = resolutionMap.begin(); it != resolutionMap.end(); it++) {
 		getSetDisplayName(NULL);
 		AddVirtualMonitors(clientId, resolutionMap.size() == 1);
-		char displayName[256];
-		getSetDisplayName(displayName);
-		changeDisplaySize((it->second).first, (it->second).second, displayName);
+		char display[256] = {};
+		getSetDisplayName(display);
+		changeDisplaySize((it->second).first, (it->second).second, display);
+		if (singleExtendMode)
+			strcpy_s(displayName, 256, display);
 	}
 	ChangeDisplaySettingsEx(NULL, NULL, NULL, 0, NULL);
 }
@@ -231,7 +233,7 @@ void VirtualDisplay::realMonitors(map< pair<int, int>, pair<int, int> >resolutio
 			if (dm.dmPosition.x == 0 && dm.dmPosition.y == 0 && x == 0 && y == 0) {
 				dm.dmPelsHeight = h;
 				dm.dmPelsWidth = w;
-				ChangeDisplaySettingsEx((*resIter).naam, &dm, NULL, (CDS_UPDATEREGISTRY | CDS_NORESET), NULL);
+				ChangeDisplaySettingsEx((*resIter).devicenaam, &dm, NULL, (CDS_UPDATEREGISTRY | CDS_NORESET), NULL);
 				used[counter] = true;
 				restoreNeeded = true;
 				break;;
@@ -241,7 +243,7 @@ void VirtualDisplay::realMonitors(map< pair<int, int>, pair<int, int> >resolutio
 				dm.dmPosition.y = y;
 				dm.dmPelsHeight = h;
 				dm.dmPelsWidth = w;
-				ChangeDisplaySettingsEx((*resIter).naam, &dm, NULL, (CDS_UPDATEREGISTRY | CDS_NORESET), NULL);
+				ChangeDisplaySettingsEx((*resIter).devicenaam, &dm, NULL, (CDS_UPDATEREGISTRY | CDS_NORESET), NULL);
 				used[counter] = true;
 				restoreNeeded = true;
 				break;
@@ -262,11 +264,11 @@ void VirtualDisplay::virtualMonitors(map< pair<int, int>, pair<int, int> >resolu
 		int h = (it->second).second;
 		SetVirtualMonitorsSize(h, w);
 	}
-	char newPrimaryDisplayName[256];
+	char newPrimaryDisplayName[256] = {};
 	for (it = resolutionMap.begin(); it != resolutionMap.end(); it++) {
 		getSetDisplayName(NULL);
 		AddVirtualMonitors(clientId, false);
-		char displayName[256];
+		char displayName[256] = {};
 		getSetDisplayName(displayName);
 		changeDisplaySize((it->second).first, (it->second).second, displayName);
 		if (it == resolutionMap.begin())
@@ -284,7 +286,7 @@ void VirtualDisplay::virtualMonitors(map< pair<int, int>, pair<int, int> >resolu
 		dm.dmPosition.y = 10000;
 		dm.dmPelsHeight = 0;
 		dm.dmPelsWidth = 0;
-		ChangeDisplaySettingsEx((*resIter).naam, &dm, NULL, (CDS_UPDATEREGISTRY | CDS_NORESET), NULL);
+		ChangeDisplaySettingsEx((*resIter).devicenaam, &dm, NULL, (CDS_UPDATEREGISTRY | CDS_NORESET), NULL);
 		restoreNeeded = true;
 		resIter++;
 	}
@@ -293,9 +295,9 @@ void VirtualDisplay::virtualMonitors(map< pair<int, int>, pair<int, int> >resolu
 
 }
 
-void VirtualDisplay::setMonitorResolutions(DisplayMode flag , map< pair<int, int>, pair<int, int> >resolutionMap, bool multi, int clientId)
+void VirtualDisplay::attachDisplay(DisplayMode flag , map< pair<int, int>, pair<int, int> >resolutionMap, bool singleExtendMode, int clientId, char *displayName)
 {
-	if (restoreNeeded) //allready set
+	if (!initialized || restoreNeeded) //restoreNeeded, only set once for real and virtual
 		return;
 	if (flag == dmDisplay && resolutionMap.size() > 0)
 		realMonitors(resolutionMap);
@@ -303,8 +305,8 @@ void VirtualDisplay::setMonitorResolutions(DisplayMode flag , map< pair<int, int
 	if (flag == dmVirtual && resolutionMap.size() > 0) 
 		virtualMonitors(resolutionMap, clientId);
 
-	if (flag == dmExtend && resolutionMap.size() > 0) 
-		extendMonitors(resolutionMap, clientId, multi);
+	if ((flag == dmExtend  || flag == dmExtendOnly) && resolutionMap.size() > 0)
+		extendMonitors(resolutionMap, clientId, singleExtendMode, displayName);
 }
 
 
@@ -322,7 +324,7 @@ void VirtualDisplay::SetVirtualMonitorsSize(int height, int width)
 	pbuff->counter += 1;
 }
 
-void VirtualDisplay::AddVirtualMonitors(int clientId, bool singleExtend)
+void VirtualDisplay::AddVirtualMonitors(int clientId, bool singleExtendMode)
 {
 	if (!initialized)
 		return;
@@ -340,7 +342,7 @@ void VirtualDisplay::AddVirtualMonitors(int clientId, bool singleExtend)
 		virtualDisplay.hDevice = hSwDevice;
 		virtualDisplay.hEvent = hEvent;
 		virtualDisplay.clientId = clientId;
-		virtualDisplay.singleExtend = singleExtend;
+		virtualDisplay.singleExtendMode = singleExtendMode;
 		virtualDisplayList.push_back(virtualDisplay);
 	}
 }
@@ -431,15 +433,59 @@ bool VirtualDisplay::ContainDisplayName(char naam[256])
 	return false;
 }
 
-void VirtualDisplay::getSetDisplayName(char* gdiDeviceName)
+void VirtualDisplay::recordDisplayNames()
 {
 	DISPLAY_DEVICE dd;
 	ZeroMemory(&dd, sizeof(dd));
 	dd.cb = sizeof(dd);
-	if (gdiDeviceName == NULL)
-		displayList.clear();
+	displayList.clear();
 	int times = 0;
-	while (gdiDeviceName != NULL && times < 10) {
+	bool found = false;
+
+	DWORD dev = 0;
+	while (EnumDisplayDevices(0, dev, &dd, 0))
+	{
+		if (!(dd.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER) && (dd.StateFlags & DISPLAY_DEVICE_ATTACHED_TO_DESKTOP)) {
+			DISPLAY_DEVICE ddMon;
+			ZeroMemory(&ddMon, sizeof(ddMon));
+			ddMon.cb = sizeof(ddMon);
+			DWORD devMon = 0;
+			while (EnumDisplayDevices(dd.DeviceName, devMon, &ddMon, 0)) {
+				if (ddMon.StateFlags & DISPLAY_DEVICE_ACTIVE)
+					break;
+				devMon++;
+			}
+			DEVMODE dm;
+			ZeroMemory(&dm, sizeof(dm));
+			dm.dmSize = sizeof(dm);
+			dm.dmDriverExtra = 0;
+			if (!EnumDisplaySettingsEx(dd.DeviceName, ENUM_CURRENT_SETTINGS, &dm, 0))
+				return;
+
+			NAMES naam;
+			strcpy_s(naam.naam, 256, dd.DeviceName);
+			if (strcmp(dd.DeviceString, "UVncVirtualDisplay Device") == NULL)
+				displayList.push_back(naam);
+		}
+		ZeroMemory(&dd, sizeof(dd));
+		dd.cb = sizeof(dd);
+		dev++;
+	}
+
+	return;
+}
+
+void VirtualDisplay::getSetDisplayName(char* gdiDeviceName)
+{
+	if (gdiDeviceName == NULL)
+		recordDisplayNames();
+
+	DISPLAY_DEVICE dd;
+	ZeroMemory(&dd, sizeof(dd));
+	dd.cb = sizeof(dd);
+	int times = 0;
+	bool found = false;
+	while (!found && times < 10) {
 		DWORD dev = 0;
 		while (EnumDisplayDevices(0, dev, &dd, 0))
 		{
@@ -459,13 +505,13 @@ void VirtualDisplay::getSetDisplayName(char* gdiDeviceName)
 				dm.dmDriverExtra = 0;
 				if (!EnumDisplaySettingsEx(dd.DeviceName, ENUM_CURRENT_SETTINGS, &dm, 0))
 					return;
+
 				NAMES naam;
 				strcpy_s(naam.naam, 256, dd.DeviceName);
 				if (strcmp(dd.DeviceString, "UVncVirtualDisplay Device") == NULL) {
-					if (gdiDeviceName == NULL)
-						displayList.push_back(naam);
-					else if (!ContainDisplayName(naam.naam)) {
+					if (!ContainDisplayName(naam.naam)) {
 						strcpy_s(gdiDeviceName, 256, naam.naam);
+						found = true;
 						return;
 					}
 				}

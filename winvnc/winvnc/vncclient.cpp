@@ -2376,7 +2376,7 @@ vncClientThread::run(void *arg)
     bool need_first_keepalive = false;
 	bool need_keepalive = false;
 	bool need_first_idletime = false;
-	bool firstrun=true;
+	bool firstrun=true;	
     bool need_ft_version_msg =  false;
 	// adzm - 2010-07 - Extended clipboard
 	bool need_notify_extended_clipboard = false;
@@ -3190,12 +3190,6 @@ vncClientThread::run(void *arg)
 #endif
 			
 		case rfbFramebufferUpdateRequest:
-			// Read the rest of the message:
-/*#ifdef _DEBUG
-										char			szText[256];
-										sprintf_s(szText," rfbFramebufferUpdateRequest \n");
-										OutputDebugString(szText);		
-#endif*/
 			if (!m_socket->ReadExact(((char *) &msg)+nTO, sz_rfbFramebufferUpdateRequestMsg-nTO))
 			{
 				m_client->cl_connected = FALSE;
@@ -3632,10 +3626,13 @@ vncClientThread::run(void *arg)
 				// Only the first Viewer can set the resolution
 				// unless it's extended mode with a single monitor
 				// This way each viewer can add his own extended display
+				m_client->m_singleExtendMode = (flag == dmExtendOnly);
 				if (m_server->virtualDisplay && !m_server->AreThereMultipleViewers())
-					m_server->virtualDisplay->setMonitorResolutions(flag, resolutionMap, false, m_client->m_id);
-				if (m_server->virtualDisplay && m_server->AreThereMultipleViewers() && flag == dmExtend && resolutionMap.size() == 1)
-					m_server->virtualDisplay->setMonitorResolutions(flag, resolutionMap, true, m_client->m_id);
+					m_server->virtualDisplay->attachDisplay(flag, resolutionMap, m_client->m_singleExtendMode, m_client->m_id, m_client->displayname);
+				if (m_server->virtualDisplay && m_server->AreThereMultipleViewers() && m_client->m_singleExtendMode)
+					m_server->virtualDisplay->attachDisplay(flag, resolutionMap, m_client->m_singleExtendMode, m_client->m_id, m_client->displayname);
+				if (strlen(m_client->displayname) == 0)
+					m_client->m_singleExtendMode = false;
 			}
 			break;
 		// Set Single Window
@@ -4626,6 +4623,8 @@ vncClient::vncClient() : m_clipboard(ClipboardSettings::defaultServerCaps), Send
 	nr_incr_rgn_empty = 0;
 	ThreadHandleCompressFolder = NULL;
 	sendingUpdate = false;
+	m_singleExtendMode = false;
+	m_firstExtDesktop = true;
 }
 
 vncClient::~vncClient()
@@ -4720,7 +4719,7 @@ vncClient::~vncClient()
 		CloseHandle(ThreadHandleCompressFolder);
 	}
 	if (m_server->virtualDisplay)
-		m_server->virtualDisplay->disconnectDisplay(m_id, !m_server->AreThereMultipleViewers());
+		m_server->virtualDisplay->disconnectDisplay(m_id, !m_server->AreThereMultipleViewers() && initialCapture_done);
 }
 
 // Init
@@ -4784,84 +4783,68 @@ vncClient::SetBuffer(vncBuffer *buffer)
 bool
 vncClient::NotifyUpdate(rfbFramebufferUpdateRequestMsg fur) 
 {
-		if (!fur.incremental && m_use_ExtDesktopSize) {
-			m_NewSWUpdateWaiting = true;
-		}
-		//Fix server viewer crash, when server site scaling is used
-    	//
-	    m_ScaledScreen =m_encodemgr.m_buffer->GetViewerSize();
-
 		rfb::Rect update;
-		// Get the specified rectangle as the region to send updates for
-		// Modif sf@2002 - Scaling.
-		update.tl.x = (Swap16IfLE(fur.x) + monitor_Offsetx) * m_nScale;
-		update.tl.y = (Swap16IfLE(fur.y) + monitor_Offsety) * m_nScale;
-		update.br.x = update.tl.x + Swap16IfLE(fur.w) * m_nScale;
-		update.br.y = update.tl.y + Swap16IfLE(fur.h) * m_nScale;
-		// Verify max size, scaled changed on server while not pushed to viewer
-		if (update.tl.x < (int)((m_ScaledScreen.tl.x + monitor_Offsetx) * m_nScale)) update.tl.x = (m_ScaledScreen.tl.x + monitor_Offsetx) * m_nScale;
-		if (update.tl.y < (int)((m_ScaledScreen.tl.y + monitor_Offsety) * m_nScale)) update.tl.y = (m_ScaledScreen.tl.y + monitor_Offsety) * m_nScale;
-		if (update.br.x > (int)(update.tl.x + (m_ScaledScreen.br.x-m_ScaledScreen.tl.x) * m_nScale)) update.br.x = update.tl.x + (m_ScaledScreen.br.x-m_ScaledScreen.tl.x) * m_nScale;
-		if (update.br.y > (int)(update.tl.y + (m_ScaledScreen.br.y-m_ScaledScreen.tl.y) * m_nScale)) update.br.y = update.tl.y + (m_ScaledScreen.br.y-m_ScaledScreen.tl.y) * m_nScale;
-		rfb::Region2D update_rgn = update;
+		m_ScaledScreen = m_encodemgr.m_buffer->GetViewerSize();
+		rfb::Region2D update_rgn;
 
-		//fullscreeen request, make it independed of the incremental rectangle
-		if (!fur.incremental)
-		{
-#ifdef _DEBUG
-			OutputDevMessage("FULL update request");	
-#endif
-
-		update.tl.x = (m_ScaledScreen.tl.x + monitor_Offsetx) * m_nScale;
-		update.tl.y = (m_ScaledScreen.tl.y + monitor_Offsety) * m_nScale;
-		update.br.x = update.tl.x + (m_ScaledScreen.br.x-m_ScaledScreen.tl.x) * m_nScale;
-		update.br.y = update.tl.y + (m_ScaledScreen.br.y-m_ScaledScreen.tl.y) * m_nScale;
-
-		
-
-		update_rgn=update;
+		// Extended display with a single screen, block all updates on the other screens when all monitors
+		// is selected. This minimize compression and network traffic
+		monitor mon = m_encodemgr.m_buffer->m_desktop->devicenaamToPosMap[displayname];
+		if (mon.Height && mon.Width && m_encodemgr.m_buffer->m_desktop->m_current_monitor == MULTI_MON_ALL) {
+				m_ScaledScreen.tl.x = mon.offsetx / m_nScale;
+				m_ScaledScreen.tl.y = mon.offsety / m_nScale;
+				m_ScaledScreen.br.x = (mon.Width + mon.offsetx) / m_nScale;
+				m_ScaledScreen.br.y = (mon.Height + mon.offsety) / m_nScale;
 		}
 
+		if (!fur.incremental) {
+			if (m_use_ExtDesktopSize && m_firstExtDesktop) {
+				m_NewSWUpdateWaiting = true;
+				m_firstExtDesktop = false;
+			}
+			update.tl.x = (m_ScaledScreen.tl.x + monitor_Offsetx) * m_nScale;
+			update.tl.y = (m_ScaledScreen.tl.y + monitor_Offsety) * m_nScale;
+			update.br.x = update.tl.x + (m_ScaledScreen.br.x - m_ScaledScreen.tl.x) * m_nScale;
+			update.br.y = update.tl.y + (m_ScaledScreen.br.y - m_ScaledScreen.tl.y) * m_nScale;
+			update_rgn = update;
+			if (update_rgn.is_empty())
+				return false;
+			m_update_tracker.add_changed(update_rgn);
+			m_encodemgr.m_buffer->m_desktop->UpdateFullScreen();
+		}
+		else {
+			update.tl.x = (Swap16IfLE(fur.x) + monitor_Offsetx) * m_nScale;
+			update.tl.y = (Swap16IfLE(fur.y) + monitor_Offsety) * m_nScale;
+			update.br.x = update.tl.x + Swap16IfLE(fur.w) * m_nScale;
+			update.br.y = update.tl.y + Swap16IfLE(fur.h) * m_nScale;
+			// Verify max size, scaled changed on server while not pushed to viewer
+			if (update.tl.x < (int)((m_ScaledScreen.tl.x + monitor_Offsetx) * m_nScale))
+				update.tl.x = (m_ScaledScreen.tl.x + monitor_Offsetx) * m_nScale;
+			if (update.tl.y < (int)((m_ScaledScreen.tl.y + monitor_Offsety) * m_nScale))
+				update.tl.y = (m_ScaledScreen.tl.y + monitor_Offsety) * m_nScale;
+			if (update.br.x > (int)(update.tl.x + (m_ScaledScreen.br.x - m_ScaledScreen.tl.x) * m_nScale))
+				update.br.x = update.tl.x + (m_ScaledScreen.br.x - m_ScaledScreen.tl.x) * m_nScale;
+			if (update.br.y > (int)(update.tl.y + (m_ScaledScreen.br.y - m_ScaledScreen.tl.y) * m_nScale))
+				update.br.y = update.tl.y + (m_ScaledScreen.br.y - m_ScaledScreen.tl.y) * m_nScale;
+			update_rgn = update;
+			if (update_rgn.is_empty())
+				return false;
+		}
+#ifdef _DEBUG		
 		OutputDevMessage("Update Rect %i %i %i %i", update.tl.x, update.tl.y, update.br.x - update.tl.x, update.br.y - update.tl.y);
-
-		// RealVNC 336
-		if (update_rgn.is_empty()) {
-#ifdef _DEBUG
-				char			szText[256];
-				sprintf_s(szText,"FATAL! client update region is empty!\n");
-				OutputDebugString(szText);		
-#endif
-		     	vnclog.Print(LL_INTERR, VNCLOG("FATAL! client update region is empty!\n"));
-				return FALSE;
-		}
-
-#ifdef _DEBUG
 		OutputDevMessage("++++++ rfbFramebufferUpdateRequestMsg");
 #endif
-	// Add the requested area to the incremental update cliprect
 	m_incr_rgn.assign_union(update_rgn);
-	// Is this request for a full update?
-	//Generate Black updates
-	if (!fur.incremental)
-	{
-		// Yes, so add the region to the update tracker
-		m_update_tracker.add_changed(update_rgn);// <<< Black updates
-			
-		// Tell the desktop grabber to fetch the region's latest state
-		m_encodemgr.m_buffer->m_desktop->UpdateFullScreen();
-	}
 
     // Kick the update thread (and create it if not there already)
 	TriggerUpdate();
 	TriggerUpdateThread();
-
 #ifdef _DEBUG
 	static DWORD sNotifyLastCopy = GetTickCount();
 	DWORD now = GetTickCount();;
 	OutputDevMessage("%4d", now - sNotifyLastCopy);
 	sNotifyLastCopy = now;
 #endif
-
 	return TRUE;
 }
 
@@ -5006,16 +4989,6 @@ vncClient::SetNewSWSize(long w,long h,BOOL Desktop)
 	return TRUE;
 }
 
-BOOL
-vncClient::SetNewSWSizeFR(long w,long h,BOOL Desktop)
-{
-	if (!m_use_NewSWSize) return FALSE;
-	m_NewSWUpdateWaiting=true;
-	NewsizeW=w;
-	NewsizeH=h;
-	return TRUE;
-}
-
 // Functions used to set and retrieve the client settings
 const char*
 vncClient::GetClientName()
@@ -5133,7 +5106,7 @@ vncClient::SendUpdate(rfb::SimpleUpdateTracker &update)
 	//Old update could be outsite the new bounding
 	//We first make sure the new size is send to the client
 	//The client ask a full update after screen_size change
-	if (m_NewSWUpdateWaiting)  {
+	if (m_NewSWUpdateWaiting) {
 		m_socket->ClearQueue();
 		rfbFramebufferUpdateRectHeader hdr;
 		m_ScaledScreen = m_encodemgr.m_buffer->GetViewerSize();
@@ -5141,12 +5114,12 @@ vncClient::SendUpdate(rfb::SimpleUpdateTracker &update)
 		rfbExtDesktopSizeMsg edsHdr;
 		rfbExtDesktopScreen eds;
 
-		if (m_use_ExtDesktopSize) {	
+		if (m_use_ExtDesktopSize) {
 			HDESK desktop = GetThreadDesktop(GetCurrentThreadId());
 			DWORD dummy;
 			char new_name[256];
 			if (GetUserObjectInformation(desktop, UOI_NAME, &new_name, 256, &dummy) &&
-					strcmp(new_name, "Default") == 0 && vncService::InputDesktopSelected() != 2) {
+				strcmp(new_name, "Default") == 0 && vncService::InputDesktopSelected() != 2) {
 				hdr.encoding = Swap32IfLE(rfbEncodingExtDesktopSize);
 				hdr.r.w = Swap16IfLE(NewsizeW * m_nScale_viewer / m_nScale);
 				hdr.r.h = Swap16IfLE(NewsizeH * m_nScale_viewer / m_nScale);
@@ -5172,18 +5145,34 @@ vncClient::SendUpdate(rfb::SimpleUpdateTracker &update)
 				m_use_ExtDesktopSize = false;
 			}
 		}
-		else if (m_use_NewSWSize) {			
+		else if (m_use_NewSWSize) {						
 			hdr.r.x = 0;
 			hdr.r.y = 0;
-			hdr.r.w = Swap16IfLE(NewsizeW*m_nScale_viewer/m_nScale);
-			hdr.r.h = Swap16IfLE(NewsizeH*m_nScale_viewer/m_nScale);
+			hdr.r.w = Swap16IfLE(NewsizeW * m_nScale_viewer / m_nScale);
+			hdr.r.h = Swap16IfLE(NewsizeH * m_nScale_viewer / m_nScale);
 			hdr.encoding = Swap32IfLE(rfbEncodingNewFBSize);
 			rfbFramebufferUpdateMsg header;
 			header.nRects = Swap16IfLE(1);
 			//adzm 2010-09 - minimize packets. SendExact flushes the queue.
 			SendRFBMsgQueue(rfbFramebufferUpdate, (BYTE*)&header, sz_rfbFramebufferUpdateMsg);
-			m_socket->SendExact((char*)&hdr, sizeof(hdr));
-		}				
+			m_socket->SendExact((char*)&hdr, sizeof(hdr));			
+			if (m_singleExtendMode) {
+				//send position of the virtual screen
+				m_encodemgr.m_buffer->m_desktop->Checkmonitors();
+				m_encodemgr.m_buffer->m_desktop->m_current_monitor = MULTI_MON_ALL;
+				m_encodemgr.m_buffer->SetAllMonitors(true);
+				monitor mon = m_encodemgr.m_buffer->m_desktop->devicenaamToPosMap[displayname];
+				hdr.r.x = Swap16IfLE(mon.offsetx * m_nScale_viewer / m_nScale);
+				hdr.r.y = Swap16IfLE(mon.offsety * m_nScale_viewer / m_nScale);
+				hdr.r.w = Swap16IfLE(mon.Width * m_nScale_viewer / m_nScale);
+				hdr.r.h = Swap16IfLE(mon.Height * m_nScale_viewer / m_nScale);
+				hdr.encoding = Swap32IfLE(rfbEncodingExtViewSize);
+				rfbFramebufferUpdateMsg header;
+				header.nRects = Swap16IfLE(1);
+				SendRFBMsgQueue(rfbFramebufferUpdate, (BYTE*)&header, sz_rfbFramebufferUpdateMsg);
+				m_socket->SendExact((char*)&hdr, sizeof(hdr));
+			}
+		}
 		m_NewSWUpdateWaiting = false;
 		return TRUE;
 	}

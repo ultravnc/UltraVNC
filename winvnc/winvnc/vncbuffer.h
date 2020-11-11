@@ -85,8 +85,8 @@ public:
 	void EnableCache(BOOL enable);
 	BOOL IsCacheEnabled();
 	BOOL IsShapeCleared();
-	void MultiMonitors(int number);
-	bool  IsMultiMonitor();
+	void SetAllMonitors(bool all);
+	bool  IsAllMonitors();
 	void WriteMessageOnScreen(char*);
 	void WriteMessageOnScreenPreConnect();
 
@@ -124,7 +124,7 @@ protected:
 
 	// CACHE RDV
 	BOOL			m_use_cache;
-	BOOL			m_multi_monitor;
+	BOOL			m_all_monitor;
 
 	// Modif sf@2002 - Scaling
 	UINT		m_ScaledSize;

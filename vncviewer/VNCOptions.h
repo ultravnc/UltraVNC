@@ -119,6 +119,7 @@ public:
 	bool	m_allowMonitorSpanning;
 	bool	m_ChangeServerRes;
 	bool	m_extendDisplay;
+	bool	m_showExtend;
 	bool	m_use_virt;
 	bool	m_use_allmonitors;
 	int		m_requestedWidth;
