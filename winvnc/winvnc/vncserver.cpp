@@ -160,7 +160,7 @@ vncServer::vncServer()
 	m_poll_undercursor = TRUE;
 
 	m_poll_oneventonly = FALSE;
-	m_MaxCpu=20;
+	m_MaxCpu=100;
 	m_poll_consoleonly = TRUE;
 
 	m_driver = FALSE;
@@ -834,6 +834,18 @@ bool vncServer::AreThereMultipleViewers()
 {
 	if (m_authClients.size()<=1) return false;
 	else return true;
+}
+
+bool vncServer::singleExtendRequested()
+{
+	vncClientList::iterator i;
+	vncClient* pClient = NULL;
+
+	for (i = m_authClients.begin(); i != m_authClients.end(); i++)
+	{
+		if (GetClient(*i)->singleExtendRequested())return true;
+	}
+	return false;
 }
 
 

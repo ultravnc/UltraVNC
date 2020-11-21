@@ -49,7 +49,7 @@ public:
 	void setBlocked(bool blocked) { this->blocked = blocked; }
 	bool getBlocked() { return blocked; }
 
-	virtual void videoDriver_start(int x, int y, int w, int h) = 0;
+	virtual void videoDriver_start(int x, int y, int w, int h, bool onlyVirtual) = 0;
 	virtual void videoDriver_Stop() = 0;
 	virtual bool hardwareCursor() = 0;
 	virtual bool noHardwareCursor() = 0;

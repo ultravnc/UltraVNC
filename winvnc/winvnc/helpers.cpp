@@ -151,7 +151,7 @@ LONG SingleWindow=0;
 char SingleWindowName[32];
 char path[512];
 char accept_reject_mesg[512];
-LONG MaxCpu=40;
+LONG MaxCpu=100;
 
 //adzm 2010-05-30 - dsmplugin config
 char DSMPluginConfig[512];
@@ -330,7 +330,7 @@ PollForeground=myIniFile_In.ReadInt("poll", "PollForeground", 0);
 PollFullScreen=myIniFile_In.ReadInt("poll", "PollFullScreen", 0);
 PollConsoleOnly=myIniFile_In.ReadInt("poll", "OnlyPollConsole", 0);
 PollOnEventOnly=myIniFile_In.ReadInt("poll", "OnlyPollOnEvent", 0);
-MaxCpu=myIniFile_In.ReadInt("poll", "MaxCpu", 0);
+MaxCpu=myIniFile_In.ReadInt("poll", "MaxCpu2", 0);
 Driver=myIniFile_In.ReadInt("poll", "EnableDriver", 0);
 Hook=myIniFile_In.ReadInt("poll", "EnableHook", 0);
 Virtual=myIniFile_In.ReadInt("poll", "EnableVirtual", 0);
@@ -344,7 +344,7 @@ myIniFile_Out.WriteInt("poll", "PollForeground", PollForeground);
 myIniFile_Out.WriteInt("poll", "PollFullScreen", PollFullScreen);
 myIniFile_Out.WriteInt("poll", "OnlyPollConsole",PollConsoleOnly);
 myIniFile_Out.WriteInt("poll", "OnlyPollOnEvent", PollOnEventOnly);
-myIniFile_Out.WriteInt("poll", "MaxCpu", MaxCpu);
+myIniFile_Out.WriteInt("poll", "MaxCpu2", MaxCpu);
 myIniFile_Out.WriteInt("poll", "EnableDriver", Driver);
 myIniFile_Out.WriteInt("poll", "EnableHook", Hook);
 myIniFile_Out.WriteInt("poll", "EnableVirtual", Virtual);
@@ -352,8 +352,8 @@ myIniFile_Out.WriteInt("poll", "EnableVirtual", Virtual);
 myIniFile_Out.WriteInt("poll", "SingleWindow", SingleWindow);
 myIniFile_Out.WriteString("poll", "SingleWindowName", SingleWindowName);
 
-MaxCpu=myIniFile_In.ReadInt("poll", "MaxCpu",MaxCpu);
-myIniFile_Out.WriteInt("poll", "MaxCpu", MaxCpu);
+MaxCpu=myIniFile_In.ReadInt("poll", "MaxCpu2",MaxCpu);
+myIniFile_Out.WriteInt("poll", "MaxCpu2", MaxCpu);
 
 DeleteFile(lpCmdLine);
 }

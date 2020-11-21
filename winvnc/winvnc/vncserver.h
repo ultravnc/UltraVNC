@@ -107,6 +107,7 @@ public:
 	virtual void TextChatClient(LPSTR szClientName); // sf@2002
 	bool IsUltraVNCViewer();
 	bool AreThereMultipleViewers();
+	bool singleExtendRequested();
 
 	virtual UINT AuthClientCount();
 	virtual UINT UnauthClientCount();

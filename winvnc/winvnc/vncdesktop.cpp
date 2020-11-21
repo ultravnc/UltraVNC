@@ -2316,16 +2316,16 @@ BOOL vncDesktop::InitVideoDriver()
 	}
 
 	//try to use the mirror driver if he is still active
-	Checkmonitors();
+	Checkmonitors();	
 	if (nr_monitors == 1)
 	{
 		if (m_screenCapture != NULL) 
-			m_screenCapture->videoDriver_start(mymonitor[MULTI_MON_PRIMARY].offsetx, mymonitor[MULTI_MON_PRIMARY].offsety, mymonitor[MULTI_MON_PRIMARY].Width, mymonitor[MULTI_MON_PRIMARY].Height);
+			m_screenCapture->videoDriver_start(mymonitor[MULTI_MON_PRIMARY].offsetx, mymonitor[MULTI_MON_PRIMARY].offsety, mymonitor[MULTI_MON_PRIMARY].Width, mymonitor[MULTI_MON_PRIMARY].Height, m_server->singleExtendRequested());
 	}
 	if (nr_monitors > 1)
 	{
 		if (m_screenCapture != NULL)
-			m_screenCapture->videoDriver_start(mymonitor[MULTI_MON_ALL].offsetx, mymonitor[MULTI_MON_ALL].offsety, mymonitor[MULTI_MON_ALL].Width, mymonitor[MULTI_MON_ALL].Height);
+			m_screenCapture->videoDriver_start(mymonitor[MULTI_MON_ALL].offsetx, mymonitor[MULTI_MON_ALL].offsety, mymonitor[MULTI_MON_ALL].Width, mymonitor[MULTI_MON_ALL].Height, m_server->singleExtendRequested());
 	}
 	vnclog.Print(LL_INTERR, VNCLOG("Start Mirror driver\n"));
 

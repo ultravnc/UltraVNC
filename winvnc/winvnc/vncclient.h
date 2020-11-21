@@ -247,6 +247,7 @@ public:
 	virtual TextChat* GetTextChatPointer() { return m_pTextChat; }; // sf@2002
 	virtual void SetUltraViewer(bool fTrue) { m_fUltraViewer = fTrue;};
 	virtual bool IsUltraViewer() { return m_fUltraViewer;};
+	bool singleExtendRequested() { return m_singleExtendMode; }
 
 	virtual void EnableCache(BOOL enabled);
 

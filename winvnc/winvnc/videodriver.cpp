@@ -56,7 +56,7 @@ VideoDriver::~VideoDriver()
 	}	
 }
 //----------------------------------------------------------
-void VideoDriver::videoDriver_start(int x, int y, int w, int h)
+void VideoDriver::videoDriver_start(int x, int y, int w, int h, bool onlyVirtual)
 {
 	if (init)
 		return;

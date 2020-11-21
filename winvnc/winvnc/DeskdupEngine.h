@@ -21,7 +21,7 @@ class DeskDupEngine : public ScreenCapture
 public:
 	DeskDupEngine();
 	~DeskDupEngine();
-	virtual void videoDriver_start(int x, int y, int w, int h);
+	virtual void videoDriver_start(int x, int y, int w, int h, bool onlyVirtual);
 	virtual void videoDriver_Stop();
 	virtual bool hardwareCursor();
 	virtual bool noHardwareCursor();
@@ -32,6 +32,7 @@ public:
 private:
 	HMODULE hModule;
 	StartW8Fn StartW8;
+	StartW8Fn StartW8Virt;
 	StopW8Fn StopW8;
 
 	LockW8Fn LockW8;

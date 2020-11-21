@@ -26,6 +26,7 @@ DeskDupEngine::DeskDupEngine()
 		
 		if (hModule) {
 			StartW8 = (StartW8Fn)GetProcAddress(hModule, "StartW8");
+			StartW8Virt = (StartW8Fn)GetProcAddress(hModule, "StartW8Virt");
 			StopW8 = (StopW8Fn)GetProcAddress(hModule, "StopW8");
 
 			LockW8 = (LockW8Fn)GetProcAddress(hModule, "LockW8");
@@ -64,7 +65,7 @@ DeskDupEngine::~DeskDupEngine()
 	}
 }
 //-----------------------------------------------------------
-void DeskDupEngine::videoDriver_start(int x, int y, int w, int h)
+void DeskDupEngine::videoDriver_start(int x, int y, int w, int h, bool onlyVirtual)
 {
 #ifdef _DEBUG
 	char			szText[256];
@@ -77,7 +78,13 @@ void DeskDupEngine::videoDriver_start(int x, int y, int w, int h)
 		return;
 	int refw = GetSystemMetrics(SM_CXVIRTUALSCREEN);
 	int refh = GetSystemMetrics(SM_CYVIRTUALSCREEN);
-	if (refh == h && refw == w) { // prim or all monitors requested
+	if (onlyVirtual && StartW8Virt) {
+		if (!StartW8Virt(false)) {
+			vnclog.Print(LL_INTWARN, VNCLOG("DDengine failed, not supported by video driver\n"));
+			return;
+		}
+	}
+	else if (refh == h && refw == w) { // prim or all monitors requested
 		if (!StartW8(false)) {
 			vnclog.Print(LL_INTWARN, VNCLOG("DDengine failed, not supported by video driver\n"));
 			return;

@@ -40,7 +40,7 @@ class VideoDriver : public ScreenCapture
 public:
 	VideoDriver();
 	virtual ~VideoDriver();
-	virtual void videoDriver_start(int x, int y, int w, int h);
+	virtual void videoDriver_start(int x, int y, int w, int h, bool onlyVirtual);
 	virtual void videoDriver_Stop();
 	virtual bool hardwareCursor();
 	virtual bool noHardwareCursor();
