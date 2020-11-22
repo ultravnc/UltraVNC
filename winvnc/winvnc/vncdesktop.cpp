@@ -1682,7 +1682,7 @@ vncDesktop::WriteMessageOnScreenPreConnect(BYTE *scrBuff, UINT scrBuffSize)
 
 	HFONT hFont, hOldFont;
 	SetRect(&rect, 0, 10, 640, 640);
-    char *tout = "UVNC experimental server 1.3.0 pre-connect window \n";
+    char *tout = "UVNC experimental server 1.3.1 pre-connect window \n";
 	DrawText(m_hmemdc, tout, (int)strlen(tout), &rect, DT_CENTER);
 
 
@@ -2320,12 +2320,12 @@ BOOL vncDesktop::InitVideoDriver()
 	if (nr_monitors == 1)
 	{
 		if (m_screenCapture != NULL) 
-			m_screenCapture->videoDriver_start(mymonitor[MULTI_MON_PRIMARY].offsetx, mymonitor[MULTI_MON_PRIMARY].offsety, mymonitor[MULTI_MON_PRIMARY].Width, mymonitor[MULTI_MON_PRIMARY].Height, m_server->singleExtendRequested());
+			m_screenCapture->videoDriver_start(mymonitor[MULTI_MON_PRIMARY].offsetx, mymonitor[MULTI_MON_PRIMARY].offsety, mymonitor[MULTI_MON_PRIMARY].Width, mymonitor[MULTI_MON_PRIMARY].Height, m_server->singleExtendRequested(), m_server->MaxFPS());
 	}
 	if (nr_monitors > 1)
 	{
 		if (m_screenCapture != NULL)
-			m_screenCapture->videoDriver_start(mymonitor[MULTI_MON_ALL].offsetx, mymonitor[MULTI_MON_ALL].offsety, mymonitor[MULTI_MON_ALL].Width, mymonitor[MULTI_MON_ALL].Height, m_server->singleExtendRequested());
+			m_screenCapture->videoDriver_start(mymonitor[MULTI_MON_ALL].offsetx, mymonitor[MULTI_MON_ALL].offsety, mymonitor[MULTI_MON_ALL].Width, mymonitor[MULTI_MON_ALL].Height, m_server->singleExtendRequested(), m_server->MaxFPS());
 	}
 	vnclog.Print(LL_INTERR, VNCLOG("Start Mirror driver\n"));
 

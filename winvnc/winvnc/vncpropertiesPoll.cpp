@@ -38,6 +38,7 @@
 #include "vncpropertiesPoll.h"
 #include "vncserver.h"
 #include "vncOSVersion.h"
+#include <ShlObj.h>
 #include "common/win32_helpers.h"
 
 
@@ -277,18 +278,63 @@ vncPropertiesPoll::DialogProcPoll(HWND hwnd,
 	switch (uMsg)
 	{
 
+	case WM_HSCROLL:
+		{
+			if ((lParam != 0) &&
+				(reinterpret_cast<HWND>(lParam) == GetDlgItem(hwnd, IDC_SLIDERFPS)))
+			{
+				switch (LOWORD(wParam))
+				{
+				case SB_ENDSCROLL:
+				case SB_LEFT:
+				case SB_RIGHT:
+				case SB_LINELEFT:
+				case SB_LINERIGHT:
+				case SB_PAGELEFT:
+				case SB_PAGERIGHT:
+				case SB_THUMBPOSITION:
+				case SB_THUMBTRACK:
+					int pos = SendMessage(GetDlgItem(hwnd, IDC_SLIDERFPS), TBM_GETPOS, 0, 0L);
+					CHAR temp[250];
+					sprintf_s(temp, "%d", pos);
+					SetDlgItemText(hwnd, IDC_STATICFPS, temp);
+					_this->m_server->MaxFPS(pos);
+					break;
+				}
+			}
+			break;
+		}
+		return (INT_PTR)FALSE;
+
 	case WM_INITDIALOG:
 		{
 			// Retrieve the Dialog box parameter and use it as a pointer
 			// to the calling vncPropertiesPoll object
             helper::SafeSetWindowUserData(hwnd, lParam);
-
 			_this = (vncPropertiesPoll *) lParam;
 			_this->m_dlgvisible = TRUE;
+
+
+			HWND slider = GetDlgItem(hwnd, IDC_SLIDERFPS);
+			SendMessage(slider, TBM_SETRANGE, (WPARAM)1, (LPARAM)MAKELONG(5, 60));
+			SendMessage(slider, TBM_SETTICFREQ, 1, 10);		
+			SendMessage(slider, TBM_SETPOS, true, _this->m_server->MaxFPS());
+			CHAR temp[250];
+			sprintf_s(temp, "%d", _this->m_server->MaxFPS());
+			SetDlgItemText(hwnd, IDC_STATICFPS, temp);
+
 			if (_this->ddEngine) {
 				ShowWindow(GetDlgItem(hwnd, IDC_CHECKDRIVER), false);
 				ShowWindow(GetDlgItem(hwnd, IDC_STATICELEVATED), false);
+				EnableWindow(GetDlgItem(hwnd, IDC_SLIDERFPS), _this->m_server->Driver());
+				EnableWindow(GetDlgItem(hwnd, IDC_STATICFPS60), _this->m_server->Driver());
+				EnableWindow(GetDlgItem(hwnd, IDC_STATICFPS5), _this->m_server->Driver());
 				SetWindowText(GetDlgItem(hwnd, IDC_DRIVER), "Desktop Duplication (restart on change required)");
+			}
+			else {
+				EnableWindow(GetDlgItem(hwnd, IDC_SLIDERFPS), false);
+				EnableWindow(GetDlgItem(hwnd, IDC_STATICFPS60), false);
+				EnableWindow(GetDlgItem(hwnd, IDC_STATICFPS5), false);
 			}
 			if (_this->m_fUseRegistry)
 			{
@@ -378,7 +424,19 @@ vncPropertiesPoll::DialogProcPoll(HWND hwnd,
 	case WM_COMMAND:
 		switch (LOWORD(wParam))
 		{
-
+		case IDC_DRIVER:
+			if (SendMessage(GetDlgItem(hwnd, IDC_DRIVER), BM_GETCHECK, 0, 0) == BST_CHECKED)
+			{
+				_this->m_server->Driver(CheckVideoDriver(0));
+			}
+			else _this->m_server->Driver(false);
+			if (_this->ddEngine) {
+				EnableWindow(GetDlgItem(hwnd, IDC_SLIDERFPS), _this->m_server->Driver());
+				EnableWindow(GetDlgItem(hwnd, IDC_STATICFPS60), _this->m_server->Driver());
+				EnableWindow(GetDlgItem(hwnd, IDC_STATICFPS5), _this->m_server->Driver());
+			}
+			
+			break;
 		case IDOK:
 		case IDC_APPLY:
 			{
@@ -386,6 +444,9 @@ vncPropertiesPoll::DialogProcPoll(HWND hwnd,
 
 				int maxcpu = GetDlgItemInt(hwnd, IDC_MAXCPU, NULL, FALSE);
 				_this->m_server->MaxCpu(maxcpu);
+
+				int pos = SendMessage(GetDlgItem(hwnd, IDC_SLIDERFPS), TBM_GETPOS, 0, 0L);
+				_this->m_server->MaxFPS(pos);
 
 				HWND hcapt = GetDlgItem(hwnd, IDC_AUTOCAPT1);
 				if (SendMessage(hcapt, BM_GETCHECK, 0, 0) == BST_CHECKED)
@@ -738,6 +799,7 @@ LABELUSERSETTINGS:
 	m_pref_PollConsoleOnly=FALSE;
 	m_pref_PollOnEventOnly=FALSE;
 	m_pref_MaxCpu=100;
+	m_pref_MaxFPS = 25;
 	m_pref_Driver=CheckVideoDriver(0);
 	m_pref_Hook=TRUE;
 	m_pref_Virtual=FALSE;
@@ -808,6 +870,7 @@ vncPropertiesPoll::LoadUserPrefsPoll(HKEY appkey)
 	m_pref_PollOnEventOnly=LoadInt(appkey, "OnlyPollOnEvent", m_pref_PollOnEventOnly);
 	m_pref_MaxCpu=LoadInt(appkey, "MaxCpu2", m_pref_MaxCpu);
 	if (m_pref_MaxCpu==0) m_pref_MaxCpu=100;
+	m_pref_MaxFPS = LoadInt(appkey, "MaxFPS", m_pref_MaxFPS);
 	m_pref_Driver=LoadInt(appkey, "EnableDriver", m_pref_Driver);
 	if (m_pref_Driver)m_pref_Driver=CheckVideoDriver(0);
 	m_pref_Hook=LoadInt(appkey, "EnableHook", m_pref_Hook);
@@ -833,6 +896,7 @@ vncPropertiesPoll::ApplyUserPrefs()
 	m_server->PollConsoleOnly(m_pref_PollConsoleOnly);
 	m_server->PollOnEventOnly(m_pref_PollOnEventOnly);
 	m_server->MaxCpu(m_pref_MaxCpu);	
+	m_server->MaxFPS(m_pref_MaxFPS);
 	if (CheckVideoDriver(0) && m_pref_Driver) m_server->Driver(m_pref_Driver);
 	else m_server->Driver(false);
 	m_server->Hook(m_pref_Hook);
@@ -922,6 +986,7 @@ vncPropertiesPoll::SaveUserPrefsPoll(HKEY appkey)
 	SaveInt(appkey, "OnlyPollConsole", m_server->PollConsoleOnly());
 	SaveInt(appkey, "OnlyPollOnEvent", m_server->PollOnEventOnly());
 	SaveInt(appkey, "MaxCpu2", m_server->MaxCpu());
+	SaveInt(appkey, "MaxFPS", m_server->MaxFPS());
 	SaveInt(appkey, "EnableDriver", m_server->Driver());
 	SaveInt(appkey, "EnableHook", m_server->Hook());
 	SaveInt(appkey, "EnableVirtual", m_server->Virtual());
@@ -950,6 +1015,7 @@ void vncPropertiesPoll::LoadFromIniFile()
 	m_pref_PollConsoleOnly=FALSE;
 	m_pref_PollOnEventOnly=FALSE;
 	m_pref_MaxCpu=100;
+	m_pref_MaxFPS = 25;
 	m_pref_Driver=CheckVideoDriver(0);
 	m_pref_Hook=TRUE;
 	m_pref_Virtual=FALSE;
@@ -973,6 +1039,7 @@ void vncPropertiesPoll::LoadUserPrefsPollFromIniFile()
 	m_pref_PollOnEventOnly=myIniFile.ReadInt("poll", "OnlyPollOnEvent", m_pref_PollOnEventOnly);
 	m_pref_MaxCpu=myIniFile.ReadInt("poll", "MaxCpu2", m_pref_MaxCpu);
 	if (m_pref_MaxCpu==0) m_pref_MaxCpu=100;
+	m_pref_MaxFPS = myIniFile.ReadInt("poll", "MaxFPS", m_pref_MaxFPS);
 	m_pref_Driver=myIniFile.ReadInt("poll", "EnableDriver", m_pref_Driver);
 	if (m_pref_Driver)m_pref_Driver=CheckVideoDriver(0);
 	m_pref_Hook=myIniFile.ReadInt("poll", "EnableHook", m_pref_Hook);
@@ -1020,6 +1087,7 @@ void vncPropertiesPoll::SaveUserPrefsPollToIniFile()
 	myIniFile.WriteInt("poll", "OnlyPollConsole", m_server->PollConsoleOnly());
 	myIniFile.WriteInt("poll", "OnlyPollOnEvent", m_server->PollOnEventOnly());
 	myIniFile.WriteInt("poll", "MaxCpu2", m_server->MaxCpu());
+	myIniFile.WriteInt("poll", "MaxFPS", m_server->MaxFPS());
 
 	myIniFile.WriteInt("poll", "EnableDriver", m_server->Driver());
 	myIniFile.WriteInt("poll", "EnableHook", m_server->Hook());

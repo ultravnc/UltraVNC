@@ -161,6 +161,7 @@ vncServer::vncServer()
 
 	m_poll_oneventonly = FALSE;
 	m_MaxCpu=100;
+	m_MaxFPS = 25;
 	m_poll_consoleonly = TRUE;
 
 	m_driver = FALSE;

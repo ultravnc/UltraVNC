@@ -4504,7 +4504,7 @@ vncClient::vncClient() : m_clipboard(ClipboardSettings::defaultServerCaps), Send
     m_hPToken = 0;
 
 	m_socket = NULL;
-	m_client_name = 0;
+	m_client_name = NULL;
 
 	// Initialise mouse fields
 	m_mousemoved = FALSE;
@@ -4644,9 +4644,9 @@ vncClient::~vncClient()
 	if (m_pZipUnZip) delete m_pZipUnZip;
 
 	// We now know the thread is dead, so we can clean up
-	if (m_client_name != 0) {
+	if (m_client_name != NULL) {
 		free(m_client_name);
-		m_client_name = 0;
+		m_client_name = NULL;
 	}
 
 	// If we have a socket then kill it
@@ -4738,7 +4738,7 @@ vncClient::Init(vncServer *server,
 
 	// Save the name of the connecting client
 	char *name = m_socket->GetPeerName();
-	if (name != 0)
+	if (name != NULL)
 		m_client_name = _strdup(name);
 	else
 		m_client_name = _strdup("<unknown>");

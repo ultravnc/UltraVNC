@@ -104,6 +104,7 @@ protected:
 	BOOL m_pref_PollConsoleOnly;
 	BOOL m_pref_PollOnEventOnly;
 	LONG m_pref_MaxCpu;
+	LONG m_pref_MaxFPS;
 
 	BOOL m_pref_Driver;
 	BOOL m_pref_Hook;

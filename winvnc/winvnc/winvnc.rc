@@ -87,7 +87,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,8,135,54,16
     CONTROL         IDB_LOGO64,IDC_VNCLOGO,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_SUNKEN,7,5,53,46,WS_EX_TRANSPARENT
-    LTEXT           "UltraVNC Server  1.3.0",IDC_VERSION,73,5,145,11
+    LTEXT           "UltraVNC Server  1.3.1",IDC_VERSION,73,5,145,11
     LTEXT           "Copyright © 2002-2020 UltraVNC Team\nCopyright © 2001-2002 Sam - eSVNC \nCopyright © 1999-2002 Rudi D. V. - VdaccVNC \nCopyright © 2001 Harakan Software - PalmVNC\nCopyright © 1999-2002 Const. Kaplinsky - TightVNC \n",IDC_NAME,74,27,202,41
     LTEXT           "For more Information and Links please visit: \nhttps://www.uvnc.com",IDC_WWW,74,135,201,19
     LTEXT           "Build:",IDC_BUILDTEXT,74,16,20,10
@@ -125,32 +125,34 @@ BEGIN
     CONTROL         IDB_LOGO64,IDC_ACCEPTLOGO,"Static",SS_BITMAP,130,7,43,39
 END
 
-IDD_PROPERTIES DIALOGEX 0, 0, 224, 175
+IDD_PROPERTIES DIALOGEX 0, 0, 241, 196
 STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION " UltraVNC Server Property Page"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    GROUPBOX        "Server Screen Updates Handling",IDC_UPDATE_BORDER,6,2,214,153
     CONTROL         "Poll Full Screen ( Ultra Fast )",IDC_POLL_FULLSCREEN,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,13,112,13
-    CONTROL         "Poll Foreground Window",IDC_POLL_FOREGROUND,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,26,89,15
-    CONTROL         "Poll Window Under Cursor",IDC_POLL_UNDER_CURSOR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,39,95,12
-    CONTROL         "Poll Console Windows Only",IDC_CONSOLE_ONLY,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,119,25,97,15
-    CONTROL         "Poll On Event Only",IDC_ONEVENT_ONLY,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,119,38,78,12
-    CONTROL         "System HookDll",IDC_HOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,78,66,10
-    CONTROL         "Mirror Driver",IDC_DRIVER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,90,205,10
-    CONTROL         "Low Accuracy ( Turbo Speed )",IDC_TURBOMODE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,121,112,10
-    PUSHBUTTON      "Check the Mirror Driver",IDC_CHECKDRIVER,14,103,86,11
-    DEFPUSHBUTTON   "&OK",IDOK,84,159,44,14
-    PUSHBUTTON      "&Apply",IDC_APPLY,131,159,43,14
-    PUSHBUTTON      "&Cancel",IDCANCEL,177,159,41,14
-    EDITTEXT        IDC_MAXCPU,54,133,40,14,ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           "Max Cpu :",IDC_STATIC,14,134,34,8
-    LTEXT           "Elevated access needed: Service or run as admin",IDC_STATICELEVATED,108,102,107,19
-    CONTROL         "Auto",IDC_AUTOCAPT1,"Button",BS_AUTORADIOBUTTON,105,57,31,10
-    CONTROL         "Pixel",IDC_AUTOCAPT2,"Button",BS_AUTORADIOBUTTON,144,57,31,10
-    CONTROL         "Blit",IDC_AUTOCAPT3,"Button",BS_AUTORADIOBUTTON,183,57,25,10
-    LTEXT           "Legacy Capture:",IDC_STATIC,14,57,54,8
+    CONTROL         "Poll Foreground Window",IDC_POLL_FOREGROUND,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,27,89,15
+    CONTROL         "Poll Window Under Cursor",IDC_POLL_UNDER_CURSOR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,40,104,12
+    CONTROL         "Poll Console Windows Only",IDC_CONSOLE_ONLY,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,130,27,99,15
+    CONTROL         "Poll On Event Only",IDC_ONEVENT_ONLY,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,130,40,78,12
+    CONTROL         "System HookDll (vnchook.dll)",IDC_HOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,71,110,10
+    CONTROL         "Mirror Driver ( <=win7)",IDC_DRIVER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,84,205,10
+    CONTROL         "Low Accuracy ( Turbo Speed )",IDC_TURBOMODE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,138,112,10
+    PUSHBUTTON      "Check the Mirror Driver",IDC_CHECKDRIVER,14,120,86,11
+    DEFPUSHBUTTON   "&OK",IDOK,84,174,44,14
+    PUSHBUTTON      "&Apply",IDC_APPLY,137,174,43,14
+    PUSHBUTTON      "&Cancel",IDCANCEL,189,174,41,14
+    EDITTEXT        IDC_MAXCPU,54,150,40,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "Max Cpu :",IDC_STATIC,14,151,34,8
+    LTEXT           "Elevated access needed: Service or run as admin",IDC_STATICELEVATED,108,119,107,19
+    CONTROL         "Auto",IDC_AUTOCAPT1,"Button",BS_AUTORADIOBUTTON,73,56,31,10
+    CONTROL         "Pixel",IDC_AUTOCAPT2,"Button",BS_AUTORADIOBUTTON,112,56,31,10
+    CONTROL         "Blit",IDC_AUTOCAPT3,"Button",BS_AUTORADIOBUTTON,151,56,25,10
+    LTEXT           "Legacy Capture:",IDC_STATIC,14,56,54,8
+    CONTROL         "",IDC_SLIDERFPS,"msctls_trackbar32",TBS_AUTOTICKS | TBS_TOP | WS_TABSTOP,71,95,133,12
+    LTEXT           "Max FPS",IDC_STATICFPS5,28,98,29,8
+    LTEXT           "60",IDC_STATICFPS,214,98,9,8
 END
 
 IDD_PROPERTIES1 DIALOGEX 0, 0, 427, 383
@@ -340,8 +342,9 @@ BEGIN
 
     IDD_PROPERTIES, DIALOG
     BEGIN
+        RIGHTMARGIN, 237
         VERTGUIDE, 14
-        BOTTOMMARGIN, 173
+        BOTTOMMARGIN, 194
     END
 
     IDD_PROPERTIES1, DIALOG
@@ -390,8 +393,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,3,0,0
- PRODUCTVERSION 1,3,0,0
+ FILEVERSION 1,3,1,0
+ PRODUCTVERSION 1,3,1,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x2dL
@@ -409,14 +412,14 @@ BEGIN
             VALUE "Comments", "UltraVNC - Remote Control for all"
             VALUE "CompanyName", "UltraVNC"
             VALUE "FileDescription", "VNC server"
-            VALUE "FileVersion", "1.3.0"
+            VALUE "FileVersion", "1.3.1"
             VALUE "InternalName", "WinVNC"
-            VALUE "LegalCopyright", "Copyright © 2018 UltraVNC"
+            VALUE "LegalCopyright", "Copyright © 2020 UltraVNC"
             VALUE "LegalTrademarks", "VNC"
             VALUE "OriginalFilename", "WinVNC.exe"
-            VALUE "PrivateBuild", "1.3.0"
+            VALUE "PrivateBuild", "1.3.1"
             VALUE "ProductName", "UltraVNC"
-            VALUE "ProductVersion", "1.3.0"
+            VALUE "ProductVersion", "1.3.1"
         END
     END
     BLOCK "VarFileInfo"

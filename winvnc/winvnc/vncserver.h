@@ -205,6 +205,8 @@ public:
 	virtual BOOL PollOnEventOnly() {return m_poll_oneventonly;};
 	virtual void MaxCpu(LONG maxcpu) {m_MaxCpu = maxcpu;};
 	virtual LONG MaxCpu() {return m_MaxCpu;};
+	virtual void MaxFPS(LONG maxFPS) { m_MaxFPS = maxFPS; };
+	virtual LONG MaxFPS() { return m_MaxFPS; };
 
 	// Client manipulation of the clipboard
 	virtual void UpdateLocalClipText(LPSTR text);
@@ -550,6 +552,7 @@ protected:
 
 	BOOL				m_poll_oneventonly;
 	LONG				m_MaxCpu;
+	LONG				m_MaxFPS;
 	BOOL				m_poll_consoleonly;
 
 	BOOL				m_driver;

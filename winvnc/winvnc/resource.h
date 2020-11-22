@@ -212,6 +212,10 @@
 #define IDC_EDIT3                       1148
 #define IDC_SERVICE_COMMANDLINE         1148
 #define IDC_STARTREP                    1149
+#define IDC_SLIDERFPS                   1150
+#define IDC_STATICFPS5                  1151
+#define IDC_STATICFPS60                 1152
+#define IDC_STATICFPS                   1152
 #define IDC_SHOWOPTIONS                 2032
 #define IDC_BUTTON_EXPAND               2048
 #define IDC_FINGER                      9000
@@ -303,7 +307,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        176
 #define _APS_NEXT_COMMAND_VALUE         40030
-#define _APS_NEXT_CONTROL_VALUE         1150
+#define _APS_NEXT_CONTROL_VALUE         1153
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
