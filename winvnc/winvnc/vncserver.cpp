@@ -249,7 +249,7 @@ vncServer::vncServer()
 	retryThreadHandle = NULL;
 	retrysock = NULL;
 	virtualDisplay = NULL;
-	m_virtualDisplaySupported = VirtualDisplay::InstallDriver();
+	m_virtualDisplaySupported = VirtualDisplay::InstallDriver(false);
 	if (m_virtualDisplaySupported)
 		virtualDisplay = new VirtualDisplay();
 }

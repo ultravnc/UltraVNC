@@ -88,7 +88,7 @@ private:
 public:
 	VirtualDisplay();	
 	~VirtualDisplay();
-	static bool InstallDriver();
+	static bool InstallDriver(bool fromCommandline);
 	void attachDisplay(DisplayMode flag, map< pair<int, int>, pair<int, int> >resolutionMap, bool singleExtendMode, int clientId, char* displayName);
 	void disconnectDisplay(int clientId, bool lastViewer);
 };

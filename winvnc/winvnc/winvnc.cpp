@@ -58,6 +58,7 @@
 #ifdef IPP
 void InitIpp();
 #endif
+#include "VirtualDisplay.h"
 
 #define LOCALIZATION_MESSAGES   // ACT: full declaration instead on extern ones
 #include "Localization.h" // Act : add localization on messages
@@ -678,6 +679,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 #ifdef CRASHRPT
 			crUninstall();
 #endif
+			return 0;
+		}
+
+		if (strncmp(&szCmdLine[i], winvncInstallDriver, strlen(winvncInstallDriver)) == 0) {
+			VirtualDisplay::InstallDriver(true);
 			return 0;
 		}
 

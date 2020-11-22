@@ -80,6 +80,7 @@ const char winvncStartserviceHelper[]	= "-startservicehelper";
 const char winvncStartservice[]			= "-startservice";
 
 const char winvncInstallService[]		= "-install";
+const char winvncInstallDriver[]		= "-installdriver";
 const char winvncUnInstallService[]		= "-uninstall";
 const char winvncInstallServiceHelper[]		= "-installhelper";
 const char winvncUnInstallServiceHelper[]	= "-uninstallhelper";

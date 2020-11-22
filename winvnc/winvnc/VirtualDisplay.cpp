@@ -382,10 +382,14 @@ bool VirtualDisplay::AddVirtualDisplay(HSWDEVICE& hSwDevice, HANDLE& hEvent, WCH
 	return true;
 }
 
-bool VirtualDisplay::InstallDriver()
+bool VirtualDisplay::InstallDriver(bool fromCommandline)
 {
+	if (fromCommandline)
+		AllocConsole();
 	OSVERSIONINFOEX os;
 	if (GetVersion2(&os) == TRUE && os.dwMajorVersion == 10 && os.dwBuildNumber >= 18362) {
+		if (!fromCommandline)
+			return 1;
 		CHAR szdriverPath[MAX_PATH];
 		if (GetModuleFileName(NULL, szdriverPath, MAX_PATH)) {
 			char* p = strrchr(szdriverPath, '\\');
@@ -412,12 +416,25 @@ bool VirtualDisplay::InstallDriver()
 					size_t size = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 						NULL, errorMessageID, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&messageBuffer, 0, NULL);
 					vnclog.Print(LL_INTERR, VNCLOG("InstallDriver failed %s \n"), messageBuffer);
+					if (fromCommandline) {
+						DWORD byteswritten;
+						WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE), messageBuffer, strlen(messageBuffer), &byteswritten, NULL);
+						Sleep(3000);
+					}
 				}
 				return status;
 			}
 			FreeLibrary(hModule);
 		}
 	}
+	else if (fromCommandline) {
+		DWORD byteswritten;
+		WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE), "OS not supported", strlen("OS not supported"), &byteswritten, NULL);
+		Sleep(3000);
+	}
+
+	if (fromCommandline)
+		FreeConsole();
 	return 0;
 }
 
