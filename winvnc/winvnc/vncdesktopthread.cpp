@@ -423,7 +423,7 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 						if (m_desktop->m_screenCapture && XRichCursorEnabled) 
 								m_desktop->m_screenCapture->noHardwareCursor();
 
-						m_server->SetScreenOffset(m_desktop->m_ScreenOffsetx,m_desktop->m_ScreenOffsety,m_desktop->nr_monitors);
+						m_server->SetScreenOffset(m_desktop->m_ScreenOffsetx, m_desktop->m_ScreenOffsety, m_desktop->nr_monitors == 1);
 
 						// sf@2003 - After a new Startup(), we check if the required video driver
 						// is actually available. If not, we force hookdll
@@ -518,7 +518,7 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 
                                     m_desktop->m_ScreenOffsetx = m_desktop->mymonitor[MULTI_MON_ALL].offsetx;
                                     m_desktop->m_ScreenOffsety = m_desktop->mymonitor[MULTI_MON_ALL].offsety;
-                                    m_server->SetScreenOffset(m_desktop->m_ScreenOffsetx, m_desktop->m_ScreenOffsety, m_desktop->nr_monitors);
+                                    m_server->SetScreenOffset(m_desktop->m_ScreenOffsetx, m_desktop->m_ScreenOffsety, m_desktop->nr_monitors == 1);
 								}
 							}
 						}
@@ -532,7 +532,7 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 
 							m_desktop->m_ScreenOffsetx = m_desktop->mymonitor[nCurrentMon].offsetx;
 							m_desktop->m_ScreenOffsety = m_desktop->mymonitor[nCurrentMon].offsety;
-							m_server->SetScreenOffset(m_desktop->m_ScreenOffsetx, m_desktop->m_ScreenOffsety, m_desktop->nr_monitors);
+							m_server->SetScreenOffset(m_desktop->m_ScreenOffsetx, m_desktop->m_ScreenOffsety, m_desktop->nr_monitors == 1);
 
 							m_desktop->m_Cliprect.tl.x = m_desktop->mymonitor[nCurrentMon].offsetx - m_desktop->mymonitor[MULTI_MON_ALL].offsetx;
 							m_desktop->m_Cliprect.tl.y = m_desktop->mymonitor[nCurrentMon].offsety - m_desktop->mymonitor[MULTI_MON_ALL].offsety;
@@ -577,7 +577,7 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 							m_desktop->m_screensize_changed = false;
 							monitor_changed = false;
 							m_server->SetNewSWSize(m_desktop->m_scrinfo.framebufferWidth,m_desktop->m_scrinfo.framebufferHeight, monitor_changed);//changed no lock ok
-							m_server->SetScreenOffset(m_desktop->m_ScreenOffsetx,m_desktop->m_ScreenOffsety,m_desktop->nr_monitors);// no lock ok							
+							m_server->SetScreenOffset(m_desktop->m_ScreenOffsetx, m_desktop->m_ScreenOffsety, m_desktop->nr_monitors == 1);// no lock ok							
 						}
 					
 					if (monitor_changed && m_desktop->m_screenCapture)
@@ -750,7 +750,7 @@ vncDesktopThread::run_undetached(void *arg)
 	// The region cache areas are checked for changes before an update
 	// is triggered, and the changed areas are passed to the UpdateTracker
 	rgncache = m_desktop->m_Cliprect;
-	m_server->SetScreenOffset(m_desktop->m_ScreenOffsetx,m_desktop->m_ScreenOffsety,m_desktop->nr_monitors);
+	m_server->SetScreenOffset(m_desktop->m_ScreenOffsetx,m_desktop->m_ScreenOffsety,m_desktop->nr_monitors == 1);
 	
 
 	// The previous cursor position is stored, to allow us to erase the
