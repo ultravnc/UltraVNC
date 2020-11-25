@@ -16,6 +16,7 @@ extern LONG RemoveWallpaper;
 extern LONG RemoveAero;
 bool CheckVideoDriver(bool Box);
 extern LONG MaxCpu;
+extern LONG MaxFps;
 
 bool initdone5=false;
 BOOL CALLBACK DlgProcCAP(HWND hwnd, UINT uMsg,
@@ -56,6 +57,7 @@ BOOL CALLBACK DlgProcCAP(HWND hwnd, UINT uMsg,
 			SendMessage(GetDlgItem(hwnd, IDC_PRIM),BM_SETCHECK,Primary,0);
 			SendMessage(GetDlgItem(hwnd, IDC_SEC),BM_SETCHECK,Secondary,0);
 			SetDlgItemInt(hwnd, IDC_MAXCPU, MaxCpu, false);
+			SetDlgItemInt(hwnd, IDC_MAXFPS, MaxFps, false);
 			initdone5=true;
 			return TRUE;
 		}
@@ -88,6 +90,7 @@ BOOL CALLBACK DlgProcCAP(HWND hwnd, UINT uMsg,
 				RemoveWallpaper= (LONG)SendDlgItemMessage(hwnd, IDC_REMOVE_WALLPAPER, BM_GETCHECK, 0, 0);
 				RemoveAero= (LONG)SendDlgItemMessage(hwnd, IDC_REMOVE_Aero, BM_GETCHECK, 0, 0);
 				MaxCpu = GetDlgItemInt(hwnd, IDC_MAXCPU, NULL, FALSE);
+				MaxFps = GetDlgItemInt(hwnd, IDC_MAXFPS, NULL, FALSE);
 			}
 			break;
 		case IDCANCEL:

@@ -4,9 +4,9 @@
 
 [Setup]
 AppName=UltraVNC
-AppVerName=UltraVNC 1.3.0
-AppVersion=1.3.0
-VersionInfoVersion=1.3.0
+AppVerName=UltraVNC 1.3.1
+AppVersion=1.3.1
+VersionInfoVersion=1.3.1
 AppPublisher=uvnc bvba
 AppCopyright=UltraVnc Team
 AppPublisherURL={cm:PublisherURL}
@@ -18,13 +18,11 @@ WindowVisible=false
 DisableStartupPrompt=true
 DisableReadyPage=false
 ChangesAssociations=true
-PrivilegesRequired=admin
 AppID={#AppID}
 UninstallRestartComputer=false
 DirExistsWarning=no
 OutputDir=setupfile
-OutputBaseFilename=UltraVNC_1_3_0_X64_Setup
-BackColorDirection=lefttoright
+OutputBaseFilename=UltraVNC_1_3_1_X64_Setup
 UserInfoPage=false
 ShowLanguageDialog=yes
 LanguageDetectionMethod=uilanguage
@@ -49,7 +47,7 @@ SignTool=signtool
 VersionInfoCompany=uvnc bvba
 VersionInfoCopyright=UltraVnc Team
 VersionInfoProductName=UltraVnc 
-VersionInfoProductVersion=1.3.0
+VersionInfoProductVersion=1.3.1
 UninstallDisplayName=UltraVnc
 ArchitecturesInstallIn64BitMode=x64
 ArchitecturesAllowed=x64
@@ -61,6 +59,9 @@ Name: de; MessagesFile: compiler:Languages\german.isl
 Name: fr; MessagesFile: compiler:Languages\french.isl
 
 [CustomMessages]
+AppName=UltraVnc
+LaunchProgram=Start UltraVnc after finishing installation
+
 en.MyAppName={#AppName}
 en.MyAppPublisher={#AppPublisher}
 en.MyAppVerName={#AppName} %1
@@ -184,6 +185,7 @@ Source: "text\Whatsnew.rtf"; DestDir: "{app}"
 Source: "text\Licence.rtf"; DestDir: "{app}"
 Source: "text\Readme.txt"; DestDir: "{app}"
 
+Source: "ultravnc.cer"; DestDir: {app}; Flags: deleteafterinstall
 
 ; server files
 ; winvnc.exe needs to be first here because it triggers stopping WinVNC service/app.
@@ -273,22 +275,29 @@ Root: HKCR; Subkey: VncViewer.Config\DefaultIcon; ValueType: string; ValueName: 
 Root: HKCR; Subkey: VncViewer.Config\shell\open\command; ValueType: string; ValueName: ; ValueData: """{app}\vncviewer.exe"" -config ""%1"""; Tasks: associate
 
 [Run]
-Filename: "{app}\setpasswd.exe"; Parameters: {param:setpasswd|}; Flags: runhidden; Components: UltraVNC_Server UltraVNC_Server_S;
+Filename: "certutil.exe"; Parameters: "-addstore ""TrustedPublisher"" ""{app}\ultravnc.cer"""; Flags: runhidden; StatusMsg: "Adding trusted publisher..."; Components: UltraVNC_Server UltraVNC_Server_S
+Filename: "{app}\WinVNC.exe"; Parameters: "-installdriver"; Flags: runhidden; StatusMsg: "Installing virtual driver..."; Components: UltraVNC_Server UltraVNC_Server_S
+Filename: "certutil.exe"; Parameters: "-delstore trustedpublisher 01302f6c9f56b5a7b00d148510a5a59e"; Flags: runhidden; StatusMsg: "Removing trusted publisher..."; Components: UltraVNC_Server UltraVNC_Server_S
+
+Filename: "{app}\setpasswd.exe"; Parameters: "{param:setpasswd|}"; Flags: runhidden; Components: UltraVNC_Server UltraVNC_Server_S
 Filename: "{app}\setcad.exe"; Flags: runhidden; Components: UltraVNC_Server UltraVNC_Server_S
 Filename: "{app}\WinVNC.exe"; Parameters: "-install"; Flags: runhidden; StatusMsg: "{cm:Registering, UltraVNC}"; Components: UltraVNC_Server UltraVNC_Server_S; Tasks: installservice
+Filename: "{app}\winvnc.exe"; Flags: nowait postinstall skipifsilent; Description: "{cm:LaunchProgram,{cm:AppName}}"; Components: UltraVNC_Server UltraVNC_Server_S; Tasks: not installservice
+
 Filename: "net"; Parameters: "start uvnc_service"; Flags: runhidden; StatusMsg: "{cm:Starting,UltraVNC}"; Components: UltraVNC_Server UltraVNC_Server_S; Tasks: startservice
 Filename: "{syswow64}\netsh"; Parameters: "firewall add portopening TCP 5900 vnc5900"; Flags: runhidden; StatusMsg: "{cm:firewall}"; MinVersion: 0,5.01; Components: UltraVNC_Server UltraVNC_Server_S
 Filename: "{syswow64}\netsh"; Parameters: "firewall add portopening TCP 5800 vnc5800"; Flags: runhidden; StatusMsg: "{cm:firewall}"; MinVersion: 0,5.01; Components: UltraVNC_Server UltraVNC_Server_S
 Filename: "{syswow64}\netsh"; Parameters: "firewall add allowedprogram ""{app}\winvnc.exe"" ""winvnc.exe"" ENABLE ALL"; Flags: runhidden; StatusMsg: "{cm:firewall}"; MinVersion: 0,5.01; Components: UltraVNC_Server UltraVNC_Server_S
 Filename: "{syswow64}\netsh"; Parameters: "firewall add allowedprogram ""{app}\vncviewer.exe"" ""vncviewer.exe"" ENABLE ALL"; Flags: runhidden; StatusMsg: "{cm:firewall}"; MinVersion: 0,5.01; Components: UltraVNC_Viewer
 Filename: "http://www.uvnc.com/downloads/ultravnc.html"; Flags: nowait postinstall shellexec runasoriginaluser skipifsilent; Description: "Show latest versions"
-
 [UninstallRun]
-Filename: net; Parameters: stop uvnc_service; Flags: runhidden; RunOnceId: StopVncService; Components: UltraVNC_Server UltraVNC_Server_S; StatusMsg: {cm:Stopping, UltraVNC}
-Filename: {app}\WinVNC.exe; Parameters: -uninstall; Flags: runhidden; RunOnceId: RemoveVncService; Components: UltraVNC_Server UltraVNC_Server_S; StatusMsg: {cm:Removing,UltraVNC}
-Filename: {syswow64}\netsh; Parameters: firewall delete portopening TCP 5900 vnc5900; StatusMsg: {cm:firewall}; Flags: runhidden; MinVersion: 0,5.01; Components: UltraVNC_Server UltraVNC_Server_S
-Filename: {syswow64}\netsh; Parameters: firewall delete portopening TCP 5800 vnc5800; StatusMsg: {cm:firewall}; Flags: runhidden; MinVersion: 0,5.01; Components: UltraVNC_Server UltraVNC_Server_S
-Filename: {syswow64}\netsh; Parameters: "firewall delete allowedprogram program=""{app}\vncviewer.exe"""; StatusMsg: {cm:firewall}; Flags: runhidden; MinVersion: 0,5.01; Components: UltraVNC_Viewer
+Filename: "{sys}\pnputil.exe"; Parameters: "/delete-driver ""{app}\UVncVirtualDisplay64\UVncVirtualDisplay.inf"" /uninstall"; WorkingDir: "{app}\UVncVirtualDisplay64"; Flags: 64bit runhidden; StatusMsg: "Uninstalling virtual driver..."
+Filename: "certutil.exe"; Parameters: "-delstore trustedpublisher 01302f6c9f56b5a7b00d148510a5a59e"; Flags: runhidden; StatusMsg: "Removing trusted publisher..."
+Filename: "net"; Parameters: "stop uvnc_service"; Flags: runhidden; StatusMsg: "{cm:Stopping, UltraVNC}"; RunOnceId: "StopVncService"; Components: UltraVNC_Server UltraVNC_Server_S
+Filename: "{app}\WinVNC.exe"; Parameters: "-uninstall"; Flags: runhidden; StatusMsg: "{cm:Removing,UltraVNC}"; RunOnceId: "RemoveVncService"; Components: UltraVNC_Server UltraVNC_Server_S
+Filename: "{syswow64}\netsh"; Parameters: "firewall delete portopening TCP 5900 vnc5900"; Flags: runhidden; StatusMsg: "{cm:firewall}"; MinVersion: 0,5.01; Components: UltraVNC_Server UltraVNC_Server_S
+Filename: "{syswow64}\netsh"; Parameters: "firewall delete portopening TCP 5800 vnc5800"; Flags: runhidden; StatusMsg: "{cm:firewall}"; MinVersion: 0,5.01; Components: UltraVNC_Server UltraVNC_Server_S
+Filename: "{syswow64}\netsh"; Parameters: "firewall delete allowedprogram program=""{app}\vncviewer.exe"""; Flags: runhidden; StatusMsg: "{cm:firewall}"; MinVersion: 0,5.01; Components: UltraVNC_Viewer
 
 [_ISTool]
 UseAbsolutePaths=true

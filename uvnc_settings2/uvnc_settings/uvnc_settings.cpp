@@ -108,7 +108,8 @@ LONG Secondary=0;
 char servicecmdline[256]=("\0");
 
 char accept_reject_mesg[512];
-LONG MaxCpu=40;
+LONG MaxCpu=100;
+LONG MaxFps = 25;
 LONG clearconsole=0;
 
 LONG keepAliveInterval=5;
@@ -216,7 +217,8 @@ myIniFile_Out.WriteString("poll", "SingleWindowName", SingleWindowName);
 myIniFile_Out.WriteInt("admin", "FileTransferTimeout", FTTimeout);
 
 myIniFile_Out.WriteInt("admin", "clearconsole", clearconsole);
-myIniFile_Out.WriteInt("poll", "MaxCpu", MaxCpu);
+myIniFile_Out.WriteInt("poll", "MaxCpu2", MaxCpu);
+myIniFile_Out.WriteInt("poll", "MaxFPS", MaxFps);
 myIniFile_Out.WriteString("admin", "accept_reject_mesg", accept_reject_mesg);
 myIniFile_Out.WriteInt("admin", "KeepAliveInterval", keepAliveInterval);
 }
@@ -292,7 +294,8 @@ myIniFile_Out.WriteInt("poll", "SingleWindow", SingleWindow);
 myIniFile_Out.WriteString("poll", "SingleWindowName", SingleWindowName);
 myIniFile_Out.WriteInt("admin", "FileTransferTimeout", FTTimeout);
 myIniFile_Out.WriteInt("admin", "clearconsole", clearconsole);
-myIniFile_Out.WriteInt("poll", "MaxCpu", MaxCpu);
+myIniFile_Out.WriteInt("poll", "MaxCpu2", MaxCpu);
+myIniFile_Out.WriteInt("poll", "MaxFPS", MaxFps);
 myIniFile_Out.WriteString("admin", "accept_reject_mesg", accept_reject_mesg);
 }
 
@@ -388,7 +391,8 @@ SingleWindow=myIniFile_In.ReadInt("poll","SingleWindow",SingleWindow);
 myIniFile_In.ReadString("poll", "SingleWindowName", SingleWindowName,32);
 
 clearconsole=myIniFile_In.ReadInt("admin", "clearconsole", clearconsole);
-MaxCpu=myIniFile_In.ReadInt("poll", "MaxCpu", MaxCpu);
+MaxCpu=myIniFile_In.ReadInt("poll", "MaxCpu2", MaxCpu);
+MaxFps = myIniFile_In.ReadInt("poll", "MaxFPS", MaxFps);
 myIniFile_In.ReadString("admin", "accept_reject_mesg", accept_reject_mesg,512);
 
 keepAliveInterval = myIniFile_In.ReadInt("admin", "KeepAliveInterval", keepAliveInterval); 
@@ -481,42 +485,42 @@ BOOL CALLBACK DlgProc(HWND hwndDlg, UINT uMsg,
 			TabCtrl_InsertItem(m_hTab, 6, &item);
 
 			hTab0dialog = CreateDialogParam(hInst,
-				MAKEINTRESOURCE(IDD_OPTION1),
+				MAKEINTRESOURCE(IDD_INCOMING),
 				hwndDlg,
 				(DLGPROC)DlgProcOptions1,
 				NULL);
 
 			hTab1dialog = CreateDialogParam(hInst, 
-				MAKEINTRESOURCE(IDD_OPTION2),
+				MAKEINTRESOURCE(IDD_SECURITY),
 				hwndDlg,
 				(DLGPROC)security,
 				NULL);
 
 			hTab2dialog = CreateDialogParam(hInst, 
-				MAKEINTRESOURCE(IDD_OPTION3),
+				MAKEINTRESOURCE(IDD_FILETRANSFER),
 				hwndDlg,
 				(DLGPROC)DlgProcOFT,
 				NULL);
 			hTab3dialog = CreateDialogParam(hInst, 
-				MAKEINTRESOURCE(IDD_OPTION4),
+				MAKEINTRESOURCE(IDD_CONNECTION),
 				hwndDlg,
 				(DLGPROC)DlgProcCON,
 				NULL);
 
 			hTab4dialog = CreateDialogParam(hInst, 
-				MAKEINTRESOURCE(IDD_OPTION5),
+				MAKEINTRESOURCE(IDD_CAPTURE),
 				hwndDlg,
 				(DLGPROC)DlgProcCAP,
 				NULL);
 
 			hTab5dialog = CreateDialogParam(hInst, 
-				MAKEINTRESOURCE(IDD_OPTION7),
+				MAKEINTRESOURCE(IDD_MISC),
 				hwndDlg,
 				(DLGPROC)DlgProcMISC,
 				NULL);
 
 			hTab6dialog = CreateDialogParam(hInst, 
-				MAKEINTRESOURCE(IDD_OPTION8),
+				MAKEINTRESOURCE(IDD_SERVICE),
 				hwndDlg,
 				(DLGPROC)DlgProcService,
 				NULL);
