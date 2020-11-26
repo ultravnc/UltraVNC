@@ -1272,26 +1272,28 @@ BEGIN
     CONTROL         "",IDC_SLIDERRES,"msctls_trackbar32",TBS_AUTOTICKS | TBS_ENABLESELRANGE | WS_TABSTOP,43,12,133,11
     CONTROL         "Use all my monitors for the remote session",IDC_ALLMONS,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,22,24,157,10
-    CONTROL         "Fit to screen, no scrollbars.",IDC_DIRECTX,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,82,103,10
+    CONTROL         "Fit to screen, no scrollbars.",IDC_DIRECTX,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,85,103,10
     CONTROL         "Auto scale by",IDC_SCALING,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,107,59,10
     COMBOBOX        IDC_SCALE_CB,69,105,30,117,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     EDITTEXT        IDC_SERVER_SCALE,107,117,14,12,ES_AUTOHSCROLL
-    CONTROL         "Start in fullscreen mode.",IDC_FULLSCREEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,125,95,101,10
+    CONTROL         "Start in fullscreen mode.",IDC_FULLSCREEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,125,96,101,10
     CONTROL         "Save size on exit.",IDC_SAVESIZE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,137,129,73,10
-    CONTROL         "Show toolbar.",IDC_SHOWTOOLBAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,95,87,10
+    CONTROL         "Show toolbar.",IDC_SHOWTOOLBAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,96,60,10
     CONTROL         "Save position on exit.",IDC_SAVEPOS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,129,97,10
     LTEXT           "Server Screen Scale by :",IDC_STATIC,4,119,80,8
     CTEXT           "%",IDC_STATIC,102,107,8,8,0,WS_EX_TRANSPARENT
     LTEXT           "1  /",IDC_STATIC,91,119,12,8
     CTEXT           "",IDC_RES,181,12,47,8
-    CONTROL         "Allow multi monitor spanning",IDC_ALLOWSPAN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,70,111,10
+    CONTROL         "Allow multi monitor spanning",IDC_ALLOWSPAN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,74,111,10
     LTEXT           "Small",IDC_STATIC,19,12,19,8
     CONTROL         "Change server resolution.",IDC_CHANGESERVER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,1,100,10
     CONTROL         "Use only virtual displays  (win 10 1903 >=)",IDC_RADIO_ONLY_VIRTUAL,
-                    "Button",BS_AUTORADIOBUTTON,22,36,157,10
-    CONTROL         "Extend remote display  (win 10 1903 >=)",IDC_RADIO_EXTEND,
-                    "Button",BS_AUTORADIOBUTTON,22,46,151,10
-    CONTROL         "Show only extend",IDC_SHOW_EXTEND,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,33,58,74,10
+                    "Button",BS_AUTORADIOBUTTON,22,45,157,10
+    CONTROL         "Extend main display  (win 10 1903 >=)",IDC_RADIO_EXTEND,
+                    "Button",BS_AUTORADIOBUTTON,22,55,143,10
+    CONTROL         "Show only extend ( portable as extra display)",IDC_SHOW_EXTEND,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,33,65,164,10
+    CONTROL         "Main screen resolution",IDC_RADIO_NOVIRT,"Button",BS_AUTORADIOBUTTON,22,35,90,10
 END
 
 IDD_MISC DIALOGEX 0, 0, 240, 145

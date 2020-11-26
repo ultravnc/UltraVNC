@@ -252,9 +252,9 @@ BOOL CALLBACK SessDlgProc(  HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 			case IDC_SAVEAS:
 				_this->SaveConnection(hwnd, true);
 				break;
-			case IDCONNECT:
-				_this->SaveConnection(hwnd, false);
+			case IDCONNECT:				
 				_this->InitTab(hwnd);
+				_this->SaveConnection(hwnd, false);
 				return _this->connect(hwnd);			
 			case IDCANCEL:				
 				EndDialog(hwnd, FALSE);

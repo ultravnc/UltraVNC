@@ -262,6 +262,7 @@
 #define IDC_SERVER_RECON_TIME           1183
 #define IDC_PREFIX                      1184
 #define IDC_RADIO3                      1185
+#define IDC_RADIO_NOVIRT                1185
 #define IDC_ENCODING_BASE               1199
 #define IDC_RAWRADIO                    2000
 #define IDC_RRERADIO                    2002

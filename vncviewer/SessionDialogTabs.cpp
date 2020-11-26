@@ -316,10 +316,12 @@ BOOL CALLBACK DlgProcDisplay(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			_this->changeServerRes = (SendMessage(GetDlgItem(hwnd, IDC_CHANGESERVER), BM_GETCHECK, 0, 0) == BST_CHECKED);
 			EnableWindow(GetDlgItem(hwnd, IDC_RADIO_EXTEND), _this->changeServerRes);
 			EnableWindow(GetDlgItem(hwnd, IDC_RADIO_ONLY_VIRTUAL), _this->changeServerRes);
+			EnableWindow(GetDlgItem(hwnd, IDC_RADIO_NOVIRT), _this->changeServerRes);
 			EnableWindow(GetDlgItem(hwnd, IDC_ALLMONS), _this->changeServerRes);
 			EnableWindow(GetDlgItem(hwnd, IDC_SLIDERRES), _this->changeServerRes && !_this->use_allmonitors);
 			EnableWindow(GetDlgItem(hwnd, IDC_SHOW_EXTEND), _this->changeServerRes && _this->extendDisplay);
 			break;
+		case IDC_RADIO_NOVIRT:
 		case IDC_RADIO_ONLY_VIRTUAL:
 		case IDC_RADIO_EXTEND:
 			_this->extendDisplay = (SendMessage(GetDlgItem(hwnd, IDC_RADIO_EXTEND), BM_GETCHECK, 0, 0) == BST_CHECKED);
@@ -872,6 +874,9 @@ void SessionDialog::InitDlgProcDisplay()
 
 	HWND hUseVirt = GetDlgItem(hwnd, IDC_RADIO_ONLY_VIRTUAL);
 	SendMessage(hUseVirt, BM_SETCHECK, use_virt, 0);
+
+	HWND hNoVirt = GetDlgItem(hwnd, IDC_RADIO_NOVIRT);
+	SendMessage(hNoVirt, BM_SETCHECK, !use_virt && !extendDisplay, 0);
 
 	HWND hAllMons = GetDlgItem(hwnd, IDC_ALLMONS);
 	SendMessage(hAllMons, BM_SETCHECK, use_allmonitors, 0);
