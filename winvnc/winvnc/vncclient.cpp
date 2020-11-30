@@ -3629,7 +3629,7 @@ vncClientThread::run(void *arg)
 				m_client->m_singleExtendMode = (flag == dmExtendOnly);
 				if (m_server->virtualDisplay && !m_server->AreThereMultipleViewers())
 					m_server->virtualDisplay->attachDisplay(flag, resolutionMap, m_client->m_singleExtendMode, m_client->m_id, m_client->displayname);
-				if (m_server->virtualDisplay && m_server->AreThereMultipleViewers() && m_client->m_singleExtendMode)
+				else if (m_server->virtualDisplay && m_server->AreThereMultipleViewers() && m_client->m_singleExtendMode)
 					m_server->virtualDisplay->attachDisplay(flag, resolutionMap, m_client->m_singleExtendMode, m_client->m_id, m_client->displayname);
 				if (strlen(m_client->displayname) == 0)
 					m_client->m_singleExtendMode = false;
@@ -4800,7 +4800,6 @@ vncClient::NotifyUpdate(rfbFramebufferUpdateRequestMsg fur)
 		if (!fur.incremental) {
 			if (m_use_ExtDesktopSize && m_firstExtDesktop) {
 				m_NewSWUpdateWaiting = true;
-				m_firstExtDesktop = false;
 			}
 			update.tl.x = (m_ScaledScreen.tl.x + monitor_Offsetx) * m_nScale;
 			update.tl.y = (m_ScaledScreen.tl.y + monitor_Offsety) * m_nScale;
@@ -5114,7 +5113,7 @@ vncClient::SendUpdate(rfb::SimpleUpdateTracker &update)
 		rfbExtDesktopSizeMsg edsHdr;
 		rfbExtDesktopScreen eds;
 
-		if (m_use_ExtDesktopSize) {
+		if (m_use_ExtDesktopSize && m_firstExtDesktop) {
 			HDESK desktop = GetThreadDesktop(GetCurrentThreadId());
 			DWORD dummy;
 			char new_name[256];
@@ -5143,6 +5142,7 @@ vncClient::SendUpdate(rfb::SimpleUpdateTracker &update)
 				m_socket->SendExact((char*)&edsHdr, sizeof(edsHdr));
 				m_socket->SendExact((char*)&eds, sizeof(eds));
 				m_use_ExtDesktopSize = false;
+				m_firstExtDesktop = false;
 			}
 		}
 		else if (m_use_NewSWSize) {						

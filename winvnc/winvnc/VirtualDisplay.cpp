@@ -64,30 +64,7 @@ VirtualDisplay::VirtualDisplay()
 	pbuff = NULL;
 	initialized = false;
 	restoreNeeded = false;
-	hdll = LoadLibrary("cfgmgr32.dll");
-	SwDeviceCreateUVNC = NULL;
-	SwDeviceCloseUVNC = NULL;
-	if (hdll) {
-		SwDeviceCreateUVNC = (PSwDeviceCreate)GetProcAddress(hdll, "SwDeviceCreate");
-		SwDeviceCloseUVNC = (PSwDeviceClose)GetProcAddress(hdll, "SwDeviceClose");
-	}
-
-	hFileMap = CreateFileMappingA(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, sizeof(SUPPORTEDMONITORS), g_szIPC);
-	if (hFileMap) {
-		SetSecurityInfo(hFileMap, SE_KERNEL_OBJECT, DACL_SECURITY_INFORMATION, 0, 0, (PACL)NULL, NULL);
-		FileView = MapViewOfFile(hFileMap, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, 0);
-		pbuff = (SUPPORTEDMONITORS*)FileView;
-	}
-	if (!pbuff) {
-		if (FileView)
-			UnmapViewOfFile((LPVOID)FileView);
-		FileView = NULL;
-		return;
-	}
-
-	initialized = true;
-	pbuff->counter = 0;
-
+	
 	DISPLAY_DEVICE dd;
 	ZeroMemory(&dd, sizeof(dd));
 	dd.cb = sizeof(dd);
@@ -123,6 +100,30 @@ VirtualDisplay::VirtualDisplay()
 		dd.cb = sizeof(dd);
 		dev++;
 	}
+
+	hdll = LoadLibrary("cfgmgr32.dll");
+	SwDeviceCreateUVNC = NULL;
+	SwDeviceCloseUVNC = NULL;
+	if (hdll) {
+		SwDeviceCreateUVNC = (PSwDeviceCreate)GetProcAddress(hdll, "SwDeviceCreate");
+		SwDeviceCloseUVNC = (PSwDeviceClose)GetProcAddress(hdll, "SwDeviceClose");
+	}
+
+	hFileMap = CreateFileMappingA(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, sizeof(SUPPORTEDMONITORS), g_szIPC);
+	if (hFileMap) {
+		SetSecurityInfo(hFileMap, SE_KERNEL_OBJECT, DACL_SECURITY_INFORMATION, 0, 0, (PACL)NULL, NULL);
+		FileView = MapViewOfFile(hFileMap, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, 0);
+		pbuff = (SUPPORTEDMONITORS*)FileView;
+	}
+	if (!pbuff) {
+		if (FileView)
+			UnmapViewOfFile((LPVOID)FileView);
+		FileView = NULL;
+		return;
+	}
+
+	initialized = true;
+	pbuff->counter = 0;
 }
 
 void VirtualDisplay::disconnectDisplay(int clientId, bool lastViewer)
@@ -145,11 +146,6 @@ void VirtualDisplay::disconnectDisplay(int clientId, bool lastViewer)
 
 void VirtualDisplay::disconnectAllDisplays()
 {
-	if (!initialized)
-		return;
-
-	pbuff->counter = 0;
-
 	if (restoreNeeded) {
 		std::list<DISPLAYINFO>::iterator resIter;
 		resIter = diplayInfoList.begin();
@@ -164,6 +160,10 @@ void VirtualDisplay::disconnectAllDisplays()
 		ChangeDisplaySettingsEx(NULL, NULL, NULL, 0, NULL);
 		restoreNeeded = false;
 	}
+
+	if (!initialized)
+		return;
+	pbuff->counter = 0;
 	// Disable virtual displays
 	std::list<VIRTUALDISPLAY>::iterator virtualDisplayIter;
 	virtualDisplayIter = virtualDisplayList.begin();
@@ -297,11 +297,12 @@ void VirtualDisplay::virtualMonitors(map< pair<int, int>, pair<int, int> >resolu
 
 void VirtualDisplay::attachDisplay(DisplayMode flag , map< pair<int, int>, pair<int, int> >resolutionMap, bool singleExtendMode, int clientId, char *displayName)
 {
-	if (!initialized || restoreNeeded) //restoreNeeded, only set once for real and virtual
-		return;
 	if (flag == dmDisplay && resolutionMap.size() > 0)
 		realMonitors(resolutionMap);
-	
+
+	if (!initialized || restoreNeeded) //restoreNeeded, only set once for real and virtual
+		return;
+		
 	if (flag == dmVirtual && resolutionMap.size() > 0) 
 		virtualMonitors(resolutionMap, clientId);
 
