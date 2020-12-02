@@ -139,7 +139,7 @@ VNCOptions::VNCOptions()
 	m_UseEnc[rfbEncodingZstd] = true;
 	m_UseEnc[rfbEncodingTightZstd] = true;
 	m_UseEnc[rfbEncodingZstdHex] = true;
-	m_UseEnc[rfbEncodingZSTDRLE] = true;
+	m_UseEnc[rfbEncodingZSTDRLE] = false;
 	m_UseEnc[rfbEncodingZSTDYWRLE] = true;
 
 	m_ViewOnly = false;

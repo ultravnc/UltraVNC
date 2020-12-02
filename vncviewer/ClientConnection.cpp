@@ -3986,8 +3986,8 @@ void ClientConnection::SetFormatAndEncodings()
 			preferred_encodings.insert(preferred_encodings.begin(), 1, rfbEncodingTightZstd);
 		else if (*it == rfbEncodingZlibHex && m_opts.m_fEnableZstd)
 			preferred_encodings.insert(preferred_encodings.begin(), 1, rfbEncodingZstdHex);
-		else if (*it == rfbEncodingZRLE && m_opts.m_fEnableZstd)
-			preferred_encodings.insert(preferred_encodings.begin(), 1, rfbEncodingZSTDRLE);
+		//else if (*it == rfbEncodingZRLE && m_opts.m_fEnableZstd)
+		//	preferred_encodings.insert(preferred_encodings.begin(), 1, rfbEncodingZSTDRLE);
 		else if (*it == rfbEncodingZYWRLE && m_opts.m_fEnableZstd)
 			preferred_encodings.insert(preferred_encodings.begin(), 1, rfbEncodingZSTDYWRLE);
 		break;
@@ -5527,11 +5527,6 @@ bool ClientConnection::SendSW(int x, int y)
 // A ScreenUpdate message has been received
 inline void ClientConnection::ReadScreenUpdate()
 {
-#ifdef _DEBUG
-	char			szText[256];
-	_snprintf_s(szText, 256,  "ReadScreenUpdate\n");
-	OutputDebugString(szText);
-#endif
 	//adzm 2010-07-04
 	bool bSentUpdateRequest = false;
 	if (m_opts.m_preemptiveUpdates && !m_pendingFormatChange) {
@@ -6073,12 +6068,7 @@ inline void ClientConnection::ReadScreenUpdate()
 	//adzm 2010-07-04
 	if (!bSentUpdateRequest) {
 		//adzm 2010-09 - We can simply call SendAppropriateFramebufferUpdateRequest now, with a true bAsync param so the request is posted rather than sent.
-		SendAppropriateFramebufferUpdateRequest(true);
-#ifdef _DEBUG
-		char			szText[256];
-		_snprintf_s(szText, 256,  "SendAppropriateFramebufferUpdateRequestn\n");
-		OutputDebugString(szText);
-#endif	
+		SendAppropriateFramebufferUpdateRequest(true);	
 	}
 	DeleteObject(UpdateRegion);
 }

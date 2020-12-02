@@ -254,7 +254,6 @@ BOOL CALLBACK SessDlgProc(  HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 				break;
 			case IDCONNECT:				
 				_this->InitTab(hwnd);
-				_this->SaveConnection(hwnd, false);
 				return _this->connect(hwnd);			
 			case IDCANCEL:				
 				EndDialog(hwnd, FALSE);
@@ -609,15 +608,9 @@ bool SessionDialog::connect(HWND hwnd)
 	m_pOpt->m_NoStatus = NoStatus;
 	m_pOpt->m_NoHotKeys = NoHotKeys;
 
-
-	HWND hPlugin = GetDlgItem(hwnd, IDC_PLUGIN_CHECK);
-	if (SendMessage(hPlugin, BM_GETCHECK, 0, 0) == BST_CHECKED){
-		TCHAR szPlugin[MAX_PATH];
-		GetDlgItemText(hwnd, IDC_PLUGINS_COMBO, szPlugin, MAX_PATH);
-		fUseDSMPlugin = true;
-		strcpy_s(szDSMPluginFilename, szPlugin);
+	if (fUseDSMPlugin){
 		if (!m_pDSMPlugin->IsLoaded()){
-			m_pDSMPlugin->LoadPlugin(szPlugin, listening);
+			m_pDSMPlugin->LoadPlugin(szDSMPluginFilename, listening);
 			if (m_pDSMPlugin->IsLoaded()){
 				if (m_pDSMPlugin->InitPlugin()){
 					if (!m_pDSMPlugin->SupportsMultithreaded())
@@ -645,11 +638,11 @@ bool SessionDialog::connect(HWND hwnd)
 			// But we must first check that the loaded plugin is the same that 
 			// the one currently selected...
 			m_pDSMPlugin->DescribePlugin();
-			if (_stricmp(m_pDSMPlugin->GetPluginFileName(), szPlugin)){
+			if (_stricmp(m_pDSMPlugin->GetPluginFileName(), szDSMPluginFilename)){
 				// Unload the previous plugin
 				m_pDSMPlugin->UnloadPlugin();
 				// Load the new selected one
-				m_pDSMPlugin->LoadPlugin(szPlugin, listening);
+				m_pDSMPlugin->LoadPlugin(szDSMPluginFilename, listening);
 			}
 			if (m_pDSMPlugin->IsLoaded()){
 				if (m_pDSMPlugin->InitPlugin()){
@@ -673,18 +666,27 @@ bool SessionDialog::connect(HWND hwnd)
 			}
 		}
 	}
-	else { // If Use plugin unchecked but the plugin is loaded, unload it
-		fUseDSMPlugin = false;
+	else {
 		if (m_pDSMPlugin->IsEnabled()) {
 			m_pDSMPlugin->UnloadPlugin();
 			m_pDSMPlugin->SetEnabled(false);
 		}
 	}
 
+	char fname[_MAX_PATH];
+	int disp = PORT_TO_DISPLAY(m_port);
+	char buffer[_MAX_PATH];
+
+	sprintf_s(fname, "%.15s-%d.vnc", m_host_dialog, (disp > 0 && disp < 100) ? disp : m_port);
+	getAppData(buffer);
+	strcat_s(buffer, "\\vnc");
+	_mkdir(buffer);
+	strcat_s(buffer, "\\");
+	strcat_s(buffer, fname);
+	SaveToFile(buffer);
 	TCHAR hostname[256];
 	GetDlgItemText(hwnd, IDC_HOSTNAME_EDIT, hostname, 256);
-		m_pMRU->AddItem(hostname);
-
+	m_pMRU->AddItem(hostname);
 	EndDialog(hwnd, TRUE);
 	return TRUE;
 }

@@ -303,7 +303,7 @@ void SessionDialog::LoadFromFile(char *fname)
 
 void SessionDialog::getAppData(char * buffer)
 {
-	BOOL result = SHGetSpecialFolderPathA( NULL, buffer, CSIDL_LOCAL_APPDATA, false );
+	BOOL result = SHGetSpecialFolderPathA( NULL, buffer, CSIDL_APPDATA, false );
 }
 
 void SessionDialog::IfHostExistLoadSettings(char *hostname)

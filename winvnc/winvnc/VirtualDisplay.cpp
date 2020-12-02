@@ -157,7 +157,19 @@ void VirtualDisplay::disconnectAllDisplays()
 				ChangeDisplaySettingsEx((*resIter).devicenaam, &(*resIter).dm, NULL, (CDS_UPDATEREGISTRY | CDS_NORESET), NULL);
 			resIter++;
 		}
+		HDESK   hdeskInput = NULL;
+		HDESK   hdeskCurrent = NULL;
+		hdeskCurrent = GetThreadDesktop(GetCurrentThreadId());
+		if (hdeskCurrent != NULL) {
+			hdeskInput = OpenInputDesktop(0, FALSE, MAXIMUM_ALLOWED);
+			if (hdeskInput != NULL)
+				SetThreadDesktop(hdeskInput);
+		}
 		ChangeDisplaySettingsEx(NULL, NULL, NULL, 0, NULL);
+		if (hdeskCurrent)
+			SetThreadDesktop(hdeskCurrent);
+		if (hdeskInput)
+			CloseDesktop(hdeskInput);
 		restoreNeeded = false;
 	}
 
@@ -207,7 +219,19 @@ void VirtualDisplay::extendMonitors(map< pair<int, int>, pair<int, int> >resolut
 		if (singleExtendMode)
 			strcpy_s(displayName, 256, display);
 	}
+	HDESK   hdeskInput = NULL;
+	HDESK   hdeskCurrent = NULL;
+	hdeskCurrent = GetThreadDesktop(GetCurrentThreadId());
+	if (hdeskCurrent != NULL) {
+		hdeskInput = OpenInputDesktop(0, FALSE, MAXIMUM_ALLOWED);
+		if (hdeskInput != NULL)
+			SetThreadDesktop(hdeskInput);
+	}
 	ChangeDisplaySettingsEx(NULL, NULL, NULL, 0, NULL);
+	if (hdeskCurrent)
+		SetThreadDesktop(hdeskCurrent);
+	if (hdeskInput)
+		CloseDesktop(hdeskInput);
 }
 
 void VirtualDisplay::realMonitors(map< pair<int, int>, pair<int, int> >resolutionMap)
@@ -233,6 +257,7 @@ void VirtualDisplay::realMonitors(map< pair<int, int>, pair<int, int> >resolutio
 			if (dm.dmPosition.x == 0 && dm.dmPosition.y == 0 && x == 0 && y == 0) {
 				dm.dmPelsHeight = h;
 				dm.dmPelsWidth = w;
+				dm.dmFields = DM_PELSWIDTH |DM_PELSHEIGHT;
 				ChangeDisplaySettingsEx((*resIter).devicenaam, &dm, NULL, (CDS_UPDATEREGISTRY | CDS_NORESET), NULL);
 				used[counter] = true;
 				restoreNeeded = true;
@@ -253,7 +278,19 @@ void VirtualDisplay::realMonitors(map< pair<int, int>, pair<int, int> >resolutio
 			counter++;
 		}
 	}
+	HDESK   hdeskInput = NULL;
+	HDESK   hdeskCurrent = NULL;
+	hdeskCurrent = GetThreadDesktop(GetCurrentThreadId());
+	if (hdeskCurrent != NULL) {
+		hdeskInput = OpenInputDesktop(0, FALSE, MAXIMUM_ALLOWED);
+		if (hdeskInput != NULL)
+			SetThreadDesktop(hdeskInput);
+	}
 	ChangeDisplaySettingsEx(NULL, NULL, NULL, 0, NULL);
+	if (hdeskCurrent)
+		SetThreadDesktop(hdeskCurrent);
+	if (hdeskInput)
+		CloseDesktop(hdeskInput);
 }
 
 void VirtualDisplay::virtualMonitors(map< pair<int, int>, pair<int, int> >resolutionMap, int clientId)
@@ -291,7 +328,19 @@ void VirtualDisplay::virtualMonitors(map< pair<int, int>, pair<int, int> >resolu
 		resIter++;
 	}
 
+	HDESK   hdeskInput = NULL;
+	HDESK   hdeskCurrent = NULL;
+	hdeskCurrent = GetThreadDesktop(GetCurrentThreadId());
+	if (hdeskCurrent != NULL) {
+		hdeskInput = OpenInputDesktop(0, FALSE, MAXIMUM_ALLOWED);
+		if (hdeskInput != NULL)
+			SetThreadDesktop(hdeskInput);
+	}
 	ChangeDisplaySettingsEx(NULL, NULL, NULL, 0, NULL);
+	if (hdeskCurrent)
+		SetThreadDesktop(hdeskCurrent);
+	if (hdeskInput)
+		CloseDesktop(hdeskInput);
 
 }
 
