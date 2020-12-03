@@ -66,8 +66,8 @@ void ClientConnection::SetFullScreenMode(bool enable)
 	else if (ShowToolbar != -1) {		
 		m_opts.m_ShowToolbar = ShowToolbar;
 		ShowToolbar = -1;		
+		SizeWindow();	
 		m_opts.m_FullScreen = enable;
-		SizeWindow();		
 		RealiseFullScreenMode();
 		restoreScreenPosition();
 		if (extSDisplay)

@@ -317,7 +317,7 @@ void SessionDialog::IfHostExistLoadSettings(char *hostname)
 	sprintf_s(fname, "%.15s-%d.vnc", tmphost, (disp > 0 && disp < 100) ? disp : port);
 	char buffer[_MAX_PATH];
 	getAppData(buffer);
-	strcat_s(buffer,"\\vnc\\");
+	strcat_s(buffer,"\\UltraVNC\\");
 	strcat_s(buffer,fname);
 	FILE *file = fopen(buffer, "r");
 	if (strlen(hostname) != 0 && file ) {

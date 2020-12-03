@@ -8551,6 +8551,8 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						_this->m_vScrollPos = newvpos;
 						_this->UpdateScrollbars();
 						}
+						if (wParam == SIZE_MAXIMIZED && _this->InFullScreenMode() == FALSE)
+							SendMessage(hwnd, WM_SYSCOMMAND, SC_MAXIMIZE, 0);
 						break;
 					}
 
