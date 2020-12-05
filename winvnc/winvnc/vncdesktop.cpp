@@ -1682,7 +1682,7 @@ vncDesktop::WriteMessageOnScreenPreConnect(BYTE *scrBuff, UINT scrBuffSize)
 
 	HFONT hFont, hOldFont;
 	SetRect(&rect, 0, 10, 640, 640);
-    char *tout = "UVNC experimental server 1.3.1 pre-connect window \n";
+    char *tout = "UVNC experimental server 1.3.2 pre-connect window \n";
 	DrawText(m_hmemdc, tout, (int)strlen(tout), &rect, DT_CENTER);
 
 
