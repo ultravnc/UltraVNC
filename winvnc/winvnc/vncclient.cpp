@@ -4808,7 +4808,6 @@ vncClient::NotifyUpdate(rfbFramebufferUpdateRequestMsg fur)
 			update_rgn = update;
 			if (update_rgn.is_empty())
 				return false;
-			m_update_tracker.add_changed(update_rgn);
 			m_encodemgr.m_buffer->m_desktop->UpdateFullScreen();
 		}
 		else {

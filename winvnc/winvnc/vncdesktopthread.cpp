@@ -804,7 +804,6 @@ vncDesktopThread::run_undetached(void *arg)
     //DWORD MIN_UPDATE_INTERVAL=33;
 	/////////////////////
 	looping=true;
-	int waiting_update=0;
 	SetEvent(m_desktop->restart_event);
 	
 	rgncache.assign_union(rfb::Region2D(m_desktop->m_Cliprect));
@@ -884,7 +883,6 @@ vncDesktopThread::run_undetached(void *arg)
 					strcpy_s(g_hookstring,"ddengine");
 				case WAIT_TIMEOUT:				
 				case WAIT_OBJECT_0: {
-					waiting_update=0;
 					ResetEvent(m_desktop->trigger_events[0]);
 							{
 #ifdef _DEBUG
@@ -1226,7 +1224,6 @@ vncDesktopThread::run_undetached(void *arg)
 					rgncache.assign_union(m_desktop->rgnpump);
 					m_desktop->rgnpump.clear();
 					m_desktop->lock_region_add=false;
-					waiting_update++;
 					break;
 				case WAIT_OBJECT_0+2:
 					ResetEvent(m_desktop->trigger_events[2]);
@@ -1244,8 +1241,10 @@ vncDesktopThread::run_undetached(void *arg)
 					ResetEvent(m_desktop->trigger_events[3]);
 					break;
 				case WAIT_OBJECT_0+4:
+					m_desktop->lock_region_add = true;
 					rgncache.assign_union(m_desktop->m_Cliprect);
 					ResetEvent(m_desktop->trigger_events[4]);
+					m_desktop->lock_region_add = false;
 					break;
 				case WAIT_OBJECT_0+5:
 					//break to close

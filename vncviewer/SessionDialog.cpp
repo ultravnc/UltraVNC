@@ -679,7 +679,7 @@ bool SessionDialog::connect(HWND hwnd)
 
 	sprintf_s(fname, "%.15s-%d.vnc", m_host_dialog, (disp > 0 && disp < 100) ? disp : m_port);
 	getAppData(buffer);
-	strcat_s(buffer, "\\vnc");
+	strcat_s(buffer, "\\UltraVNC");
 	_mkdir(buffer);
 	strcat_s(buffer, "\\");
 	strcat_s(buffer, fname);

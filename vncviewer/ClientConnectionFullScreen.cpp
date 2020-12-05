@@ -58,7 +58,8 @@ void ClientConnection::SetFullScreenMode(bool enable)
 	if (enable) {
 		ShowToolbar = m_opts.m_ShowToolbar;
 		m_opts.m_ShowToolbar = 0;		
-		saveScreenPosition();
+		if (!m_opts.m_SavePos)
+			saveScreenPosition();
 		SizeWindow();
 		m_opts.m_FullScreen = enable;
 		RealiseFullScreenMode();
@@ -69,7 +70,8 @@ void ClientConnection::SetFullScreenMode(bool enable)
 		SizeWindow();	
 		m_opts.m_FullScreen = enable;
 		RealiseFullScreenMode();
-		restoreScreenPosition();
+		if (!m_opts.m_SavePos)
+			restoreScreenPosition();
 		if (extSDisplay)
 			ScrollScreen(offsetXExtSDisplay, offsetYExtSDisplay, true);
 

@@ -40,7 +40,7 @@ void SessionDialog::SaveConnection(HWND hwnd, bool saveAs)
 	sprintf_s(fname, "%.15s-%d.vnc", m_host_dialog, (disp > 0 && disp < 100) ? disp : m_port);
 	char buffer[_MAX_PATH];
 	getAppData(buffer);
-	strcat_s(buffer,"\\vnc");
+	strcat_s(buffer,"\\UltraVNC");
 	_mkdir(buffer);
 
 	if ( saveAs) {
