@@ -369,8 +369,6 @@ protected:
 
 	void TriggerUpdateThread();
 
-	void PollWindow(HWND hwnd);
-
 
 	CARD32 m_state;
 	CARD32 m_value;

@@ -171,9 +171,6 @@ protected:
 	// Pixel buffers and access to display buffer
 	BYTE		*m_clientbuff;
 	UINT		m_clientbuffsize;
-/*	BYTE		*m_clientbackbuff;
-	UINT		m_clientbackbuffsize;*/
-	//RESIZE
 
 	// Pixel formats, translation and encoding
 	rfbPixelFormat	m_clientformat;

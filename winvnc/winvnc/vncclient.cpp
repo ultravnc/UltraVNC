@@ -2751,24 +2751,29 @@ vncClientThread::run(void *arg)
 						continue;
 					}
 
+#ifdef _Gii
+					if (Swap32IfLE(encoding) == rfbEncodingGII) {
+						vnclog.Print(LL_INTINFO, VNCLOG("Gii Encoding found\n"));
+						gii_set = TRUE;
+						continue;
+					}
+#endif
+
 					// RDV - We try to detect which type of viewer tries to connect
 					if (Swap32IfLE(encoding) == rfbEncodingZRLE) {
 						m_client->m_encodemgr.AvailableZRLE(TRUE);
 						vnclog.Print(LL_INTINFO, VNCLOG("ZRLE found \n"));
-						// continue;
 					}
 #ifdef _XZ
 					if (Swap32IfLE(encoding) == rfbEncodingXZ) {
 						m_client->m_encodemgr.AvailableXZ(TRUE);
 						vnclog.Print(LL_INTINFO, VNCLOG("XZ found \n"));
-						// continue;
 					}
 #endif
 
 					if (Swap32IfLE(encoding) == rfbEncodingTight) {
 						m_client->m_encodemgr.AvailableTight(TRUE);
 						vnclog.Print(LL_INTINFO, VNCLOG("Tight found\n"));
-						// continue;
 					}
 
 					// Have we already found a suitable encoding?
@@ -2779,13 +2784,6 @@ vncClientThread::run(void *arg)
 						if (m_client->m_encodemgr.SetEncoding(Swap32IfLE(encoding),FALSE))
 							encoding_set = TRUE;
 					}
-#ifdef _Gii
-					if (Swap32IfLE(encoding) == rfbEncodingGII) {
-						vnclog.Print(LL_INTINFO, VNCLOG("Gii Encoding found\n"));
-						gii_set = TRUE;
-						// continue;
-					}
-#endif
 				}
 				// If no encoding worked then default to RAW!
 				if (!encoding_set)
