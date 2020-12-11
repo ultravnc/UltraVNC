@@ -1539,7 +1539,9 @@ void SessionDialog::StartListener()
 	m_pOpt->m_restricted = restricted;
 	m_pOpt->m_NoStatus = NoStatus;
 	m_pOpt->m_NoHotKeys = NoHotKeys;
+#ifdef _Gii
 	m_pOpt->m_giiEnable = giiEnable;
+#endif
 	m_pCC->Save_Latest_Connection();
 	char exePath[255];
 	GetModuleFileName(NULL, exePath, 255);
