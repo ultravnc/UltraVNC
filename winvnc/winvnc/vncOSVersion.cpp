@@ -80,6 +80,7 @@ VNC_OSVersion::VNC_OSVersion()
 								  else if(OSversion.dwMajorVersion==5 && OSversion.dwMinorVersion==2) OS_XP=true;
 								  else if(OSversion.dwMajorVersion==5 && OSversion.dwMinorVersion==1) OS_XP=true;								  
 								  else if(OSversion.dwMajorVersion==5 && OSversion.dwMinorVersion==0) OS_W2K=true;
+								  else if (OSversion.dwMajorVersion==10) OS_WIN10=true;
 								  else OS_NOTSUPPORTED=true;
 								  break;
 		case VER_PLATFORM_WIN32_WINDOWS:
@@ -87,15 +88,6 @@ VNC_OSVersion::VNC_OSVersion()
 								break;
 	}
 
-	if (OS_WIN8)
-	{
-		RTL_OSVERSIONINFOW rTL_OSVERSIONINFOW;
-		rTL_OSVERSIONINFOW = GetRealOSVersion();
-		if (rTL_OSVERSIONINFOW.dwMajorVersion == 10) {
-			OS_WIN8 = false;
-			OS_WIN10 = true;
-		}
-	}
 	LoadDM();
 }
 
