@@ -44,7 +44,7 @@ void ClientConnection::saveScreenPosition()
 
 void ClientConnection::restoreScreenPosition()
 {
-	SetWindowPos(m_hwndMain, HWND_TOPMOST, mainRect.left, mainRect.top, mainRect.right- mainRect.left, mainRect.bottom- mainRect.top, SWP_FRAMECHANGED);
+	SetWindowPos(m_hwndMain, HWND_NOTOPMOST, mainRect.left, mainRect.top, mainRect.right- mainRect.left, mainRect.bottom- mainRect.top, SWP_FRAMECHANGED);
 }
 
 bool ClientConnection::InFullScreenMode() 
