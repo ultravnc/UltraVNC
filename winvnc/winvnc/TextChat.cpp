@@ -264,6 +264,7 @@ void TextChat::SendTextChatRequest(int nMsg)
     rfbTextChatMsg tcm;
     tcm.type = rfbTextChat;
 	tcm.length = Swap32IfLE(nMsg);
+	omni_mutex_lock l(m_pCC->GetUpdateLock(), 82);
     m_pCC->m_socket->SendExact((char *)&tcm, sz_rfbTextChatMsg, rfbTextChat);
 	return;
 }
@@ -367,6 +368,7 @@ void TextChat::SendLocalText(void)
     tcm.type = rfbTextChat;
 	tcm.length = Swap32IfLE(strlen(m_szLocalText));
 	//adzm 2010-09 - minimize packets. SendExact flushes the queue.
+	omni_mutex_lock l(m_pCC->GetUpdateLock(), 82);
     m_pCC->m_socket->SendExactQueue((char *)&tcm, sz_rfbTextChatMsg, rfbTextChat);
 	m_pCC->m_socket->SendExact((char *)m_szLocalText, (const VCard)strlen(m_szLocalText));
 

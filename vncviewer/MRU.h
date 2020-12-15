@@ -74,7 +74,7 @@ public:
 private:
 	void ReadIndex();
 
-    TCHAR m_index[257];  // allow a bit of workspace beyond maximum of 26
+    TCHAR m_index[257] = {};  // allow a bit of workspace beyond maximum of 26
     //HKEY m_hRegKey;
     unsigned int m_maxnum;
 

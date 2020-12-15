@@ -267,7 +267,7 @@ void TextChat::PrintMessage(const char* szMessage,const char* szSender,DWORD dwC
 		}
 		// [<--v1.0.2-jp1 fix]
 
-		_snprintf_s(m_szTextBoxBuffer, TEXTMAXSIZE, MAXNAMESIZE-1 + 4, "<%s>: ", szSender);		
+		_snprintf_s(m_szTextBoxBuffer, TEXTMAXSIZE -1, _TRUNCATE, "<%s>: ", szSender);
 		SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT,EM_REPLACESEL,FALSE,(LPARAM)m_szTextBoxBuffer); // Replace the selection with the message
 	}
 
@@ -289,7 +289,7 @@ void TextChat::PrintMessage(const char* szMessage,const char* szSender,DWORD dwC
 		}
 		// [<--v1.0.2-jp1 fix]
 
-		_snprintf_s(m_szTextBoxBuffer, TEXTMAXSIZE, TEXTMAXSIZE-1, "%s", szMessage);		
+		_snprintf_s(m_szTextBoxBuffer, TEXTMAXSIZE-1, _TRUNCATE, "%s", szMessage);
 		SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT, EM_REPLACESEL, FALSE, (LPARAM)m_szTextBoxBuffer); 
 	}
 
@@ -451,7 +451,7 @@ BOOL CALLBACK TextChat::TextChatDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM wParam,
 			_this->m_hWnd = hWnd;
 			_this->m_hDlg = hWnd;
 			
-			if (_snprintf_s(_this->m_szRemoteName, TEXTMAXSIZE, MAXNAMESIZE-1,"%s", _this->m_pCC->m_desktopName) < 0 )
+			if (_snprintf_s(_this->m_szRemoteName, MAXNAMESIZE-1, _TRUNCATE, "%s", _this->m_pCC->m_desktopName) < 0 )
 			{
 				_this->m_szRemoteName[MAXNAMESIZE-4]='.';
 				_this->m_szRemoteName[MAXNAMESIZE-3]='.';
@@ -461,9 +461,9 @@ BOOL CALLBACK TextChat::TextChatDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM wParam,
 			
 
 			const long lTitleBufSize=256;			
-			char szTitle[lTitleBufSize];
-			
-			_snprintf_s(szTitle,lTitleBufSize-1," Chat with <%s> - UltraVNC",_this->m_szRemoteName);
+			char szTitle[lTitleBufSize] = {};
+
+			_snprintf_s(szTitle, lTitleBufSize-1, _TRUNCATE, " Chat with <%s> - UltraVNC",_this->m_szRemoteName);
 			SetWindowText(hWnd, szTitle);			
 
 			// Trunc the remote name for display in Chat Area before the first parenthesis, if any.

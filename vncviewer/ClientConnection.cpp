@@ -337,6 +337,7 @@ ClientConnection::ClientConnection(VNCviewerApp *pApp, LPTSTR host, int port)
 
 void ClientConnection::Init(VNCviewerApp *pApp)
 {
+	InitializeCriticalSection(&crit);
 	m_hSessionDialog = NULL;
 	new_ultra_server=false;
 	Pressed_Cancel=false;
@@ -4402,6 +4403,7 @@ ClientConnection::~ClientConnection()
 #endif
 	delete directx_output;
 	delete ultraVncZlib;
+	DeleteCriticalSection(&crit);
 }
 
 // You can specify a dx & dy outside the limits; the return value will
@@ -6558,7 +6560,13 @@ void ClientConnection::WriteTransformed(char *buf, int bytes, CARD8 msgType, boo
 //adzm 2010-09
 void ClientConnection::WriteExact(char *buf, int bytes, CARD8 msgType)
 {
-	WriteTransformed(buf, bytes, msgType, false);
+	__try {
+		EnterCriticalSection(&crit);
+		WriteTransformed(buf, bytes, msgType, false);
+	}
+	__finally {
+		LeaveCriticalSection(&crit);
+	}
 }
 
 //adzm 2010-09

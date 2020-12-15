@@ -195,6 +195,7 @@ public:
 	void WriteExactFT(char *buf, int bytes);
 
 private:
+	CRITICAL_SECTION crit;
 	int MouseOldX, MouseOldY;
 	UltraVncZ *ultraVncZlib;
 	UltraVncZ ultraVncZTight[4];

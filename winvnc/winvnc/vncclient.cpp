@@ -517,6 +517,7 @@ vncClientUpdateThread::run_undetached(void *arg)
 					rsfb.desktop_h = Swap16IfLE(ScreenSize.br.y);
 					rsfb.buffer_w = Swap16IfLE(ViewerSize.br.x);
 					rsfb.buffer_h = Swap16IfLE(ViewerSize.br.y);
+					omni_mutex_lock l(m_client->GetUpdateLock(), 82);
 					m_client->m_socket->SendExact((char*)&rsfb,
 													sz_rfbPalmVNCReSizeFrameBufferMsg,
 													rfbPalmVNCReSizeFrameBuffer);
@@ -527,6 +528,7 @@ vncClientUpdateThread::run_undetached(void *arg)
 					rsmsg.type = rfbResizeFrameBuffer;
 					rsmsg.framebufferWidth  = Swap16IfLE(ViewerSize.br.x);
 					rsmsg.framebufferHeigth = Swap16IfLE(ViewerSize.br.y);
+					omni_mutex_lock l(m_client->GetUpdateLock(), 82);
 					m_client->m_socket->SendExact((char*)&rsmsg,
 													sz_rfbResizeFrameBufferMsg,
 													rfbResizeFrameBuffer);
@@ -577,7 +579,7 @@ vncClientUpdateThread::run_undetached(void *arg)
 			// But ssh is back working		
 			if (!m_client->m_fFileSessionOpen) {
 				bool bShouldFlush = false;
-
+				omni_mutex_lock l(m_client->GetUpdateLock(), 82);
 				// adzm - 2010-07 - Extended clipboard
 				// send any clipboard data that should be sent automatically
 				if (m_client->m_clipboard.m_bNeedToProvide) {
