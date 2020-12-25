@@ -583,6 +583,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	ultraVncZlib = new UltraVncZ();
 	desktopsize_requested = true;
 	ShowToolbar = -1;
+	ExtDesktop = false;
 }
 
 // helper functions for setting socket timeouts during file transfer
@@ -5332,7 +5333,10 @@ void ClientConnection::Internal_SendFramebufferUpdateRequest(int x, int y, int w
 	if (m_pTextChat->m_fTextChatRunning && m_pTextChat->m_fVisible) return;
     rfbFramebufferUpdateRequestMsg fur;
     fur.type = rfbFramebufferUpdateRequest;
-    fur.incremental = incremental ? 1 : 0;
+	if (new_ultra_server)
+		fur.incremental = incremental ? 1 : 0;
+	else
+		fur.incremental = (incremental || ExtDesktop) ? 1 : 0;
     fur.x = Swap16IfLE(x);
     fur.y = Swap16IfLE(y);
     fur.w = Swap16IfLE(w);
@@ -5587,6 +5591,7 @@ inline void ClientConnection::ReadScreenUpdate()
 
 		if (surh.encoding == rfbEncodingExtDesktopSize)
 		{
+			ExtDesktop = true;
 			rfbExtDesktopSizeMsg edsHdr;
 			ReadExact((char*)&edsHdr, sz_rfbExtDesktopSizeMsg);
 			rfbExtDesktopScreen eds;

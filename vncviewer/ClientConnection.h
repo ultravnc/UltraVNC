@@ -824,7 +824,7 @@ private:
 	jpeg_source_mgr m_jpegSrcManager;
 	bool desktopsize_requested;
 	int ShowToolbar;
-
+	bool ExtDesktop;
 
 public:
 	// RFB settings
