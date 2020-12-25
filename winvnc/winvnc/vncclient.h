@@ -484,6 +484,7 @@ protected:
 	vncEncodeMgr	m_encodemgr;
 	bool			m_singleExtendMode;
 	bool			m_firstExtDesktop;
+	bool			m_firstExtDesktopIncremental;
 
 	// The server
 	vncServer		*m_server;

@@ -118,6 +118,25 @@ void ClientConnection::UpdateRemoteClipboard(CARD32 overrideFlags)
 
 			m_clipboard.extendedClipboardDataMessage.Reset();
 
+			if (m_clipboard.m_bNeedToNotify) {
+				m_clipboard.m_bNeedToNotify = false;
+				if (m_clipboard.settings.m_bSupportsEx) {
+
+					int actualLen =m_clipboard.extendedClipboardDataNotifyMessage.GetDataLength();
+
+					rfbClientCutTextMsg message;
+					memset(&message, 0, sizeof(rfbClientCutTextMsg));
+					message.type = rfbClientCutText;
+
+					message.length = Swap32IfLE(-actualLen);
+
+					WriteExactQueue((char*)&message, sz_rfbClientCutTextMsg, rfbClientCutText);
+					WriteExact((char*)(m_clipboard.extendedClipboardDataNotifyMessage.GetData()), m_clipboard.extendedClipboardDataNotifyMessage.GetDataLength());
+
+				}
+				m_clipboard.extendedClipboardDataNotifyMessage.Reset();
+			}
+
 		} else {
 			vnclog.Print(6, _T("Failed to load local clipboard!\n"));
 		}
@@ -175,6 +194,7 @@ void ClientConnection::UpdateRemoteClipboardCaps(bool bSavePreferences)
 		extendedClipboardDataMessage.m_pExtendedData->flags = Swap32IfLE(clipCaps | clipText | clipRTF | clipHTML | clipDIB);
 
 		// now include our limits in order of enum value
+		extendedClipboardDataMessage.AppendInt(0);
 		extendedClipboardDataMessage.AppendInt(0);
 		extendedClipboardDataMessage.AppendInt(0);
 		extendedClipboardDataMessage.AppendInt(0);

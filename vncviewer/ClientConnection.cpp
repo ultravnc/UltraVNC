@@ -583,6 +583,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	ultraVncZlib = new UltraVncZ();
 	desktopsize_requested = true;
 	ShowToolbar = -1;
+	ExtDesktop = false;
 }
 
 // helper functions for setting socket timeouts during file transfer
@@ -5332,7 +5333,10 @@ void ClientConnection::Internal_SendFramebufferUpdateRequest(int x, int y, int w
 	if (m_pTextChat->m_fTextChatRunning && m_pTextChat->m_fVisible) return;
     rfbFramebufferUpdateRequestMsg fur;
     fur.type = rfbFramebufferUpdateRequest;
-    fur.incremental = incremental ? 1 : 0;
+	if (new_ultra_server)
+		fur.incremental = incremental ? 1 : 0;
+	else
+		fur.incremental = (incremental || ExtDesktop) ? 1 : 0;
     fur.x = Swap16IfLE(x);
     fur.y = Swap16IfLE(y);
     fur.w = Swap16IfLE(w);
@@ -5587,6 +5591,7 @@ inline void ClientConnection::ReadScreenUpdate()
 
 		if (surh.encoding == rfbEncodingExtDesktopSize)
 		{
+			ExtDesktop = true;
 			rfbExtDesktopSizeMsg edsHdr;
 			ReadExact((char*)&edsHdr, sz_rfbExtDesktopSizeMsg);
 			rfbExtDesktopScreen eds;
@@ -6123,7 +6128,7 @@ void ClientConnection::ReadServerCutText()
 			case clipCaps:
 				{
 					omni_mutex_lock l(m_clipMutex);
-					m_clipboard.settings.HandleCapsPacket(extendedClipboardDataMessage, false);
+					m_clipboard.settings.HandleCapsPacket(extendedClipboardDataMessage, true);
 
 					//adzm 2010-09
 					//UpdateRemoteClipboardCaps();
@@ -6156,7 +6161,16 @@ void ClientConnection::ReadServerCutText()
 				}
 				break;
 			case clipRequest:
-				// no need for server to request anything at the moment.
+				{
+					ClipboardData clipboardData;
+
+					// only need an owner window when setting clipboard data -- by using NULL we can rely on fewer locks
+					if (clipboardData.Load(NULL)) {
+						omni_mutex_lock l(m_clipMutex);
+						m_clipboard.UpdateClipTextEx(clipboardData, extendedClipboardDataMessage.GetFlags());
+						PostMessage(m_hwndcn, WM_UPDATEREMOTECLIPBOARD, extendedClipboardDataMessage.GetFlags(), NULL);						
+					}
+				}
 				break;
 			case clipPeek:		// irrelevant coming from server
 			default:
@@ -8926,6 +8940,9 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 			case WM_UPDATEREMOTECLIPBOARDCAPS:
 				//adzm 2010-09
 				_this->UpdateRemoteClipboardCaps();
+				return 0;
+			case WM_UPDATEREMOTECLIPBOARD:
+				_this->UpdateRemoteClipboard(wParam);
 				return 0;
 
 			case WM_NOTIFYPLUGINSTREAMING:
