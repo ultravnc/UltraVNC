@@ -8,4 +8,4 @@ Visual Studio 2017 or 2019
 nasm assembler compiler (https://www.nasm.us/)
 
 
-Build vncviewer_vs2017.sln and winvncVS2017.sln project files.
+Load the project files vncviewer_vs2017.sln and winvncVS2017.sln to build server or viewer.
