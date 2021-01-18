@@ -687,7 +687,7 @@ bool Clipboard::UpdateClipTextEx(ClipboardData& clipboardData, CARD32 overrideFl
 					compressedStream.writeBytes(clipboardData.m_pDataText, clipboardData.m_lengthText);
 					extendedClipboardDataMessage.AddFlag(clipText);
 					m_bNeedToProvide = true;
-				} else {
+				} else if (!(overrideFlags & clipRequest)){
 					m_bNeedToNotify = true;
 				}
 			}
@@ -699,7 +699,7 @@ bool Clipboard::UpdateClipTextEx(ClipboardData& clipboardData, CARD32 overrideFl
 					compressedStream.writeBytes(clipboardData.m_pDataRTF, clipboardData.m_lengthRTF);
 					extendedClipboardDataMessage.AddFlag(clipRTF);
 					m_bNeedToProvide = true;
-				} else {
+				} else if (!(overrideFlags & clipRequest)) {
 					m_bNeedToNotify = true;
 				}
 			}
@@ -711,7 +711,7 @@ bool Clipboard::UpdateClipTextEx(ClipboardData& clipboardData, CARD32 overrideFl
 					compressedStream.writeBytes(clipboardData.m_pDataHTML, clipboardData.m_lengthHTML);
 					extendedClipboardDataMessage.AddFlag(clipHTML);
 					m_bNeedToProvide = true;
-				} else {
+				} else if (!(overrideFlags & clipRequest)) {
 					m_bNeedToNotify = true;
 				}
 			}
@@ -723,7 +723,7 @@ bool Clipboard::UpdateClipTextEx(ClipboardData& clipboardData, CARD32 overrideFl
 					compressedStream.writeBytes(clipboardData.m_pDataDIB, clipboardData.m_lengthDIB);
 					extendedClipboardDataMessage.AddFlag(clipDIB);
 					m_bNeedToProvide = true;
-				} else {
+				} else if (!(overrideFlags & clipRequest)) {
 					m_bNeedToNotify = true;
 				}
 			}

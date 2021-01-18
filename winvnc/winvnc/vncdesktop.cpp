@@ -1235,6 +1235,8 @@ vncDesktop::SetPixFormat()
 	m_scrinfo.framebufferHeight = (CARD16)(m_bmrect.br.y - ((m_bmrect.tl.y < 0) ? 0 : m_bmrect.tl.y));	// Swap endian before actually sending
 	m_scrinfo.format.bitsPerPixel = (CARD8)m_bminfo.bmi.bmiHeader.biBitCount;
 	m_scrinfo.format.depth = (CARD8)m_bminfo.bmi.bmiHeader.biBitCount;
+	if (m_scrinfo.format.depth == 32)
+		m_scrinfo.format.depth = 24;
 
 	// Calculate the number of bytes per row
 	m_bytesPerRow = m_scrinfo.framebufferWidth * m_scrinfo.format.bitsPerPixel / 8;
@@ -1682,7 +1684,7 @@ vncDesktop::WriteMessageOnScreenPreConnect(BYTE *scrBuff, UINT scrBuffSize)
 
 	HFONT hFont, hOldFont;
 	SetRect(&rect, 0, 10, 640, 640);
-    char *tout = "UVNC experimental server 1.3.2 pre-connect window \n";
+    char *tout = "UVNC experimental server pre-connect window \n";
 	DrawText(m_hmemdc, tout, (int)strlen(tout), &rect, DT_CENTER);
 
 
