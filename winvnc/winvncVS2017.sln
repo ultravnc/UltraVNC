@@ -60,6 +60,8 @@ Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "UltraVnc_x86", "UltraVnc\Ul
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "UltraVnc_x64", "UltraVnc\UltraVnc_VS2015_X64.vdproj", "{9AA91151-DD71-4031-82CA-0F94A966AC17}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "createpassword", "createpassword\createpassword.vcxproj", "{FA83DC58-34F9-4E04-8B45-A75538946914}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM64 = Debug|ARM64

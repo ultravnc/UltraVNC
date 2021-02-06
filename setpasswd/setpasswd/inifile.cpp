@@ -104,7 +104,7 @@ IniFile::WritePassword2(char *value) //PGM
 
 bool IniFile::IsWritable()
 {
-    bool writable = WriteInt("Permissions", "isWritable",1);
+    bool writable = WriteInt((char*)"Permissions", (char*)"isWritable",1);
     if (writable)
         WritePrivateProfileSection("Permissions", "", myInifile);
 

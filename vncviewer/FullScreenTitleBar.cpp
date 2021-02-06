@@ -29,6 +29,7 @@ extern Log vnclog;
 #define COMPILE_MULTIMON_STUBS
 #include "multimon.h"
 #include <CommCtrl.h>
+#include "VNCOptions.h"
 
 //***************************************************************************************
 
@@ -44,14 +45,14 @@ CTitleBar::CTitleBar()
 	Pin = nullptr;
 	Close = nullptr;
 	Maximize = nullptr;
-//	Minimize = nullptr;
+	Minimize = nullptr;
 	Screen = nullptr;
 	Photo = nullptr;
 	SwitchMonitor = nullptr;
 	ScreenTip = nullptr;
 	PhotoTip = nullptr;
 	SwitchMonitorTip = nullptr;
-	MonitorTop = 0;
+	MonitorTop = 0;	
 }
 
 CTitleBar::CTitleBar(HINSTANCE hInst, HWND ParentWindow, bool Fit)
@@ -70,7 +71,7 @@ CTitleBar::~CTitleBar()
 	if (Pin) DestroyWindow(Pin);
 	if (Close) DestroyWindow(Close);
 	if (Maximize) DestroyWindow(Maximize);
-//	if (Minimize) DestroyWindow(Minimize);
+	if (Minimize) DestroyWindow(Minimize);
 	if (m_hWnd) DestroyWindow(m_hWnd);
 	if (Screen) DestroyWindow(Screen);
 	if (Photo) DestroyWindow(Photo);
@@ -114,8 +115,9 @@ void CTitleBar::Init()
 
 //***************************************************************************************
 
-void CTitleBar::Create(HINSTANCE hInst, HWND ParentWindow, bool Fit)
+void CTitleBar::Create(HINSTANCE hInst, HWND ParentWindow, bool Fit, VNCOptions* opts)
 {
+	m_opts = opts;
 	hInstance=hInst;
 	Parent=ParentWindow;
 	this->Init();
@@ -203,13 +205,14 @@ void CTitleBar::CreateDisplay()
 				nullptr);
 	
 	//Minimize button
-/*	Minimize=CreateWindow("STATIC",
+	if (!m_opts->m_allowMonitorSpanning)
+	Minimize=CreateWindow("STATIC",
 				"Minimize",
 				WS_CHILD | WS_VISIBLE | SS_NOTIFY | SS_OWNERDRAW,
                 tbWidth-tbRightSpace-(tbcxPicture*3)-(tbButtonSpace*2), tbTopSpace, tbcxPicture, tbcyPicture, m_hWnd,
 				(HMENU)tbIDC_MINIMIZE,
                 hInstance,
-				nullptr);*/
+				nullptr);
 
 	Screen=CreateWindow("STATIC",
 				"Screen",
