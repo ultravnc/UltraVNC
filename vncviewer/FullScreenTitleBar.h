@@ -25,6 +25,8 @@
 #include "FullScreenTitleBarConst.h"
 #include "multimon.h"
 
+class VNCOptions;
+
 class CTitleBar
 {
 public:
@@ -32,7 +34,7 @@ public:
 	CTitleBar(HINSTANCE hInst, HWND ParentWindow, bool Fit); //Creation
 	virtual ~CTitleBar(); //Destruction
 
-	void Create(HINSTANCE hInst, HWND ParentWindow, bool Fit);
+	void Create(HINSTANCE hInst, HWND ParentWindow, bool Fit, VNCOptions* opts);
 
 	void SetText(LPTSTR TextOut); //Set the header text eg: hostname, windowtitle ect...
 
@@ -88,7 +90,7 @@ private:
 	HWND Pin;
 	HWND Close;
 	HWND Maximize;
-	//HWND Minimize;
+	HWND Minimize;
 
 	HWND Screen;
 	HWND Photo;
@@ -105,4 +107,5 @@ private:
 	int MonitorTop;
 
 	void CreateToolTipForRect(HWND hwndParent, HWND hwndTip,char * text);
+	VNCOptions* m_opts;
 };

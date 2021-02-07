@@ -1497,7 +1497,7 @@ void ClientConnection::CreateDisplay()
 
 	//Added by: Lars Werner (http://lars.werner.no)
 	if(TitleBar.GetSafeHwnd()==NULL)
-		TitleBar.Create(m_pApp->m_instance, m_hwndMain, !m_opts.m_Directx);
+		TitleBar.Create(m_pApp->m_instance, m_hwndMain, !m_opts.m_Directx, &m_opts);
 }
 
 // adzm - 2010-07 - Fix clipboard hangs
