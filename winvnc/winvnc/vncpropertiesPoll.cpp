@@ -329,7 +329,7 @@ vncPropertiesPoll::DialogProcPoll(HWND hwnd,
 				EnableWindow(GetDlgItem(hwnd, IDC_SLIDERFPS), _this->m_server->Driver());
 				EnableWindow(GetDlgItem(hwnd, IDC_STATICFPS60), _this->m_server->Driver());
 				EnableWindow(GetDlgItem(hwnd, IDC_STATICFPS5), _this->m_server->Driver());
-				SetWindowText(GetDlgItem(hwnd, IDC_DRIVER), "Desktop Duplication (restart on change required)");
+				SetWindowText(GetDlgItem(hwnd, IDC_DRIVER), "DDEngine (restart on change required)");
 			}
 			else {
 				EnableWindow(GetDlgItem(hwnd, IDC_SLIDERFPS), false);

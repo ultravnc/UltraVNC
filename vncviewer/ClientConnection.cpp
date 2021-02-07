@@ -3757,8 +3757,6 @@ void ClientConnection::SizeWindow(bool reconnect)
 		m_winheight = min(m_fullwinheight + m_TBr.bottom + m_TBr.top , workheight);
 	else
 		m_winheight = min(m_fullwinheight, workheight);
-	int aa=GetSystemMetrics(SM_CXBORDER)+GetSystemMetrics(SM_CXHSCROLL);
-	int bb = tdc.monarray[1].wr - tdc.monarray[1].wl + aa;
 	int temp_x = 0;
 	int temp_y = 0;
 	int temp_w = 0;
@@ -3812,11 +3810,12 @@ void ClientConnection::SizeWindow(bool reconnect)
     //called by SetWindowPos
     int act_width = m_winwidth;
     int act_height = m_winheight;
-	if (m_opts.m_allowMonitorSpanning && !m_opts.m_showExtend && (m_fullwinwidth <= bb )) //fit on primary
-		// -20 for border
+
+	if (m_opts.m_allowMonitorSpanning && !m_opts.m_showExtend && (m_fullwinwidth <= tdc.monarray[1].wr - tdc.monarray[1].wl + GetSystemMetrics(SM_CXBORDER) + GetSystemMetrics(SM_CXHSCROLL))) //fit on primary -20 for border
 	{
-		if (pos_set == false) SetWindowPos(m_hwndMain, HWND_TOP,tdc.monarray[1].wl + ((tdc.monarray[1].wr-tdc.monarray[1].wl)-m_winwidth) / 2,tdc.monarray[1].wt +
-			((tdc.monarray[1].wb - tdc.monarray[1].wt) - m_winheight) / 2, m_winwidth, m_winheight, SWP_SHOWWINDOW | SWP_NOSIZE);
+		if (pos_set == false) 
+			SetWindowPos(m_hwndMain, HWND_TOP,tdc.monarray[1].wl + ((tdc.monarray[1].wr-tdc.monarray[1].wl)-m_winwidth) / 2,tdc.monarray[1].wt +
+					((tdc.monarray[1].wb - tdc.monarray[1].wt) - m_winheight) / 2, m_winwidth, m_winheight, SWP_SHOWWINDOW | SWP_NOSIZE);
         if (size_set == false)
         {
             m_winwidth = act_width;
@@ -3828,7 +3827,8 @@ void ClientConnection::SizeWindow(bool reconnect)
 	else
 	{
         
-		if (pos_set == false) SetWindowPos(m_hwndMain, HWND_TOP, workrect.left + (workwidth - m_winwidth) / 2, workrect.top + (workheight - m_winheight) / 2, m_winwidth, m_winheight, SWP_SHOWWINDOW | SWP_NOSIZE);
+		if (pos_set == false) 
+			SetWindowPos(m_hwndMain, HWND_TOP, workrect.left + (workwidth - m_winwidth) / 2, workrect.top + (workheight - m_winheight) / 2, m_winwidth, m_winheight, SWP_SHOWWINDOW | SWP_NOSIZE);
         if (size_set == false)
         {
             m_winwidth = act_width;
