@@ -205,7 +205,6 @@ void CTitleBar::CreateDisplay()
 				nullptr);
 	
 	//Minimize button
-	if (!m_opts->m_allowMonitorSpanning)
 	Minimize=CreateWindow("STATIC",
 				"Minimize",
 				WS_CHILD | WS_VISIBLE | SS_NOTIFY | SS_OWNERDRAW,
