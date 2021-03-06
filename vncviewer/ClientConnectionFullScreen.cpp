@@ -39,12 +39,14 @@ extern char sz_J2[64];
 
 void ClientConnection::saveScreenPosition()
 {
-	GetWindowRect(m_hwndMain, &mainRect);
+	if (!m_opts.m_SavePos)
+		GetWindowRect(m_hwndMain, &mainRect);
 }
 
 void ClientConnection::restoreScreenPosition()
 {
-	SetWindowPos(m_hwndMain, HWND_NOTOPMOST, mainRect.left, mainRect.top, mainRect.right- mainRect.left, mainRect.bottom- mainRect.top, SWP_FRAMECHANGED);
+	if (!m_opts.m_SavePos)
+		SetWindowPos(m_hwndMain, HWND_NOTOPMOST, mainRect.left, mainRect.top, mainRect.right- mainRect.left, mainRect.bottom- mainRect.top, SWP_FRAMECHANGED);
 }
 
 bool ClientConnection::InFullScreenMode() 
@@ -58,8 +60,7 @@ void ClientConnection::SetFullScreenMode(bool enable)
 	if (enable) {
 		ShowToolbar = m_opts.m_ShowToolbar;
 		m_opts.m_ShowToolbar = 0;		
-		if (!m_opts.m_SavePos)
-			saveScreenPosition();
+		saveScreenPosition();
 		SizeWindow(enable);
 		m_opts.m_FullScreen = enable;
 		RealiseFullScreenMode();
@@ -70,8 +71,6 @@ void ClientConnection::SetFullScreenMode(bool enable)
 		SizeWindow();	
 		m_opts.m_FullScreen = enable;
 		RealiseFullScreenMode();
-		if (!m_opts.m_SavePos)
-			restoreScreenPosition();
 		if (extSDisplay)
 			ScrollScreen(offsetXExtSDisplay, offsetYExtSDisplay, true);
 
