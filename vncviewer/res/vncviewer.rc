@@ -305,7 +305,7 @@ END
 
 IDD_SESSION_DLG DIALOGEX 0, 0, 259, 313
 STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "UltraVNC Viewer - 1.3.3 dev-2"
+CAPTION "UltraVNC Viewer - 1.3.3 dev-3"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     COMBOBOX        IDC_HOSTNAME_EDIT,76,27,162,66,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
@@ -748,7 +748,7 @@ BEGIN
             VALUE "LegalCopyright", "Copyright © 2020 UltraVNC team members"
             VALUE "OriginalFilename", "VNCViewer.exe"
             VALUE "ProductName", "UltraVNC VNCViewer"
-            VALUE "ProductVersion", "1.3.3 dev-1"
+            VALUE "ProductVersion", "1.3.3 dev-3"
         END
     END
     BLOCK "VarFileInfo"

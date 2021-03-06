@@ -7587,7 +7587,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 					// Toggle toolbar & toolbar menu option
 					case ID_DBUTTON:
 						_this->m_opts.m_ShowToolbar = !_this->m_opts.m_ShowToolbar;
-						_this->SizeWindow();
+						_this->SizeWindow(false, false);
 						_this->SetFullScreenMode(_this->InFullScreenMode());
 						// adzm - 2010-07 - Extended clipboard
 						//_this->UpdateMenuItems(); // Handled in WM_INITMENUPOPUP
@@ -8652,9 +8652,9 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 					return 0;
 
 				case tbWM_MAXIMIZE:
-					//_this->SetFullScreenMode(!_this->InFullScreenMode());
-					_this->SizeWindow();   // Thomas Levering
 					_this->SetFullScreenMode(FALSE);
+					_this->SizeWindow(false, false); // Thomas Levering
+					_this->restoreScreenPosition();
 					return 0;
 
 				case tbWM_FITSCREEN:

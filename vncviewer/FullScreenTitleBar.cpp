@@ -238,7 +238,7 @@ void CTitleBar::CreateDisplay()
 				(HMENU)tbIDC_SWITCHMONITOR,
                 hInstance,
 				nullptr);
-	CreateToolTipForRect(SwitchMonitor, SwitchMonitorTip, "Swicth monitor");
+	CreateToolTipForRect(SwitchMonitor, SwitchMonitorTip, "Switch monitor");
 
 	//Pin button
 	Pin=CreateWindow("STATIC",
