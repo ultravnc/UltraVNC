@@ -4454,13 +4454,6 @@ inline bool ClientConnection::ProcessPointerEvent(int x, int y, DWORD keyflags, 
 {
 	//adzm 2010-09 - Throttle mousemove events
 	if (msg == WM_MOUSEMOVE) {
-		if ((MouseOldX == x) && (MouseOldY = y) && (keyflags == 0))
-		{
-			return false;
-		}
-		MouseOldX = x;
-		MouseOldY = y;
-
 		bool bMouseKeyDown = (keyflags & (MK_LBUTTON|MK_MBUTTON|MK_RBUTTON|MK_XBUTTON1|MK_XBUTTON2)) != 0;
 		if (m_PendingMouseMove.ShouldThrottle(bMouseKeyDown)) {
 			m_PendingMouseMove.x = x;

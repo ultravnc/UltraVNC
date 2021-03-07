@@ -196,7 +196,6 @@ public:
 
 private:
 	CRITICAL_SECTION crit;
-	int MouseOldX, MouseOldY;
 	UltraVncZ *ultraVncZlib;
 	UltraVncZ ultraVncZTight[4];
 	Fps fps;

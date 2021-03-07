@@ -74,3 +74,14 @@ winvnc/UltraVnc/.vs/
 uvnc_settings2/uvnc_settings/
 winvnc/x64/
 *FileListAbsolute.txt
+addon/ms-logon/authadm/x64/
+addon/ms-logon/authSSP/x64/
+addon/ms-logon/ldapauth/x64/Release/ldapauth.dll
+addon/ms-logon/ldapauth/x64/
+addon/ms-logon/ldapauth9x/x64/
+addon/ms-logon/ldapauthNT4/x64/
+addon/ms-logon/workgrpdomnt4/x64/
+winvnc/createpassword/x64/
+setpasswd/setpasswd/Debug/
+winvnc/createpassword/Debug/
+libjpeg-turbo-win/DebugLib-Static/
