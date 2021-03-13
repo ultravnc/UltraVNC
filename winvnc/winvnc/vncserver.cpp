@@ -252,6 +252,9 @@ vncServer::vncServer()
 	m_virtualDisplaySupported = VirtualDisplay::InstallDriver(false);
 	if (m_virtualDisplaySupported)
 		virtualDisplay = new VirtualDisplay();
+	DriverWanted = FALSE;
+	HookWanted = FALSE;
+	DriverWantedSet = FALSE;
 }
 
 vncServer::~vncServer()

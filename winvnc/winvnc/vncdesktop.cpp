@@ -504,8 +504,7 @@ vncDesktop::vncDesktop()
 	g_Desktop_running = true;
 	hUser32 = LoadLibrary("USER32");
 	if (hUser32) pbi = (pBlockInput)GetProcAddress(hUser32, "BlockInput");
-	no_default_desktop = false;
-	DriverWantedSet = false;
+	no_default_desktop = false;	
 	can_be_hooked = false;
 
 	show_all_monitors = true;
@@ -721,10 +720,10 @@ vncDesktop::Startup()
 
 	// Modif rdv@2002 - v1.1.x - videodriver
 	vnclog.Print(LL_INTINFO, VNCLOG("InitVideo driver Called\n"));
-	if (FALSE != DriverWantedSet) {
-		m_server->Driver(DriverWanted);
-		m_server->Hook(HookWanted);
-		DriverWantedSet = FALSE;
+	if (FALSE != m_server->DriverWantedSet) {
+		m_server->Driver(m_server->DriverWanted);
+		m_server->Hook(m_server->HookWanted);
+		m_server->DriverWantedSet = FALSE;
 	}
 	no_default_desktop = false;
 	if (m_server->Driver()) {
@@ -869,16 +868,13 @@ vncDesktop::Shutdown()
 	}
 
 	m_DIBbits = NULL;
+	m_hcursor = NULL;
+	m_hOldcursor = NULL;
 
-	if (m_hcursor)
+	if (m_hdefcursor)
 	{
-		DeleteObject(m_hcursor);
-		m_hcursor = NULL;
-	}
-	if (m_hOldcursor)
-	{
-		DeleteObject(m_hOldcursor);
-		m_hOldcursor = NULL;
+		DeleteObject(m_hdefcursor);
+		m_hdefcursor = NULL;
 	}
 	// Modif rdv@2002 - v1.1.x - videodriver
 	ShutdownVideoDriver();
@@ -1476,7 +1472,7 @@ vncDesktop::Init(vncServer *server)
 	// Load in the arrow cursor
 	m_hdefcursor = LoadCursor(NULL, IDC_ARROW);
 	m_hcursor = m_hdefcursor;
-	m_hOldcursor = m_hdefcursor; //sf@2002
+	m_hOldcursor = NULL; //sf@2002
 
 	// Spawn a thread to handle that window's message queue
 	vncDesktopThread *thread = new vncDesktopThread;
@@ -2345,9 +2341,9 @@ BOOL vncDesktop::InitVideoDriver()
 			m_hookdll = true;
 			// sf@2002 - Necessary for the following InitHookSettings() call
 			// Remember old states
-			DriverWantedSet = true;
-			DriverWanted = m_server->Driver();
-			HookWanted = m_server->Hook();
+			m_server->DriverWantedSet = true;
+			m_server->DriverWanted = m_server->Driver();
+			m_server->HookWanted = m_server->Hook();
 			m_server->Driver(false);
 			m_server->Hook(true);
 			m_server->PollFullScreen(true);

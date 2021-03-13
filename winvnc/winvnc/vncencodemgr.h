@@ -200,7 +200,6 @@ protected:
 	// Tight - CURSOR HANDLING
 	BOOL			m_use_xcursor;
 	BOOL			m_use_richcursor;
-	HCURSOR			m_hcursor;		// Used to track cursor shape changes
 
 	// Client detection
 	// if tight->tight zrle->zrle both=ultra
@@ -577,9 +576,9 @@ vncEncodeMgr::SetEncoding(CARD32 encoding,BOOL reinitialize)
 
 		// sf@2003 - UltraEncoder Queing does not work with DSM - Disable it in this case until
 		// some work is done to improve Queuing/DSM compatibility
-		EnableXCursor(false);
-		EnableRichCursor(false);
-		EnableCache(false);
+		//EnableXCursor(false);
+		//EnableRichCursor(false);
+		//EnableCache(false);
 		break;
 
 	case rfbEncodingZSTDRLE:
@@ -716,39 +715,27 @@ vncEncodeMgr::SetEncoding(CARD32 encoding,BOOL reinitialize)
 	}
 
 	// Initialise it and give it the pixel format
-	if (m_encoder != NULL)
-		{
-			m_encoder->Init();
-			m_encoder->SetLocalFormat(
-				m_scrinfo.format,
-				m_scrinfo.framebufferWidth,
-				m_scrinfo.framebufferHeight);
-			if (m_clientfmtset)
-			if (!m_encoder->SetRemoteFormat(m_clientformat))
-				{
-					vnclog.Print(LL_INTERR, VNCLOG("client pixel format is not supported\n"));
-					return FALSE;
-				}
+	if (m_encoder != NULL) {
+		m_encoder->Init();
+		m_encoder->SetLocalFormat(m_scrinfo.format, m_scrinfo.framebufferWidth, m_scrinfo.framebufferHeight);
+		if (m_clientfmtset && !m_encoder->SetRemoteFormat(m_clientformat)) {
+			vnclog.Print(LL_INTERR, VNCLOG("client pixel format is not supported\n"));
+			return FALSE;
 		}
-
-	if (reinitialize)
-	{
-		if (m_encoder != NULL)
-		{
-			m_encoder->EnableXCursor(m_use_xcursor);
-			m_encoder->EnableRichCursor(m_use_richcursor);
-			m_encoder->SetCompressLevel(m_compresslevel);
-			m_encoder->SetQualityLevel(m_qualitylevel);
-			m_encoder->SetFineQualityLevel(m_finequalitylevel);
-			m_encoder->SetSubsampling(m_subsampling);
-			m_encoder->EnableLastRect(m_use_lastrect);
-		}
-
 	}
-		m_buffer->ClearCache();
-		m_buffer->ClearBack();		
-		m_encoder->SetBufferOffset(monitor_Offsetx, monitor_Offsety);
-	// Check that the client buffer is compatible
+	if (reinitialize && m_encoder != NULL) {
+		m_encoder->EnableXCursor(m_use_xcursor);
+		m_encoder->EnableRichCursor(m_use_richcursor);
+		m_encoder->SetCompressLevel(m_compresslevel);
+		m_encoder->SetQualityLevel(m_qualitylevel);
+		m_encoder->SetFineQualityLevel(m_finequalitylevel);
+		m_encoder->SetSubsampling(m_subsampling);
+		m_encoder->EnableLastRect(m_use_lastrect);
+	}
+
+	m_buffer->ClearCache();
+	m_buffer->ClearBack();		
+	m_encoder->SetBufferOffset(monitor_Offsetx, monitor_Offsety);
 	return CheckBuffer();
 }
 
@@ -909,7 +896,7 @@ vncEncodeMgr::EnableXCursor(BOOL enable)
 	if (m_encoder != NULL) {
 		m_encoder->EnableXCursor(enable);
 	}
-	m_hcursor = NULL;
+	m_buffer->m_cursor_shape_cleared = TRUE;
 }
 
 inline void
@@ -919,7 +906,7 @@ vncEncodeMgr::EnableRichCursor(BOOL enable)
 	if (m_encoder != NULL) {
 		m_encoder->EnableRichCursor(enable);
 	}
-	m_hcursor = NULL;
+	m_buffer->m_cursor_shape_cleared = TRUE;
 }
 
 // Check if cursor shape update should be sent

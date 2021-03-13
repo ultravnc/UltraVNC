@@ -950,7 +950,7 @@ vncBuffer::CopyRect(const rfb::Rect &dest, const rfb::Point &delta)
 void
 vncBuffer::ClearCache()
 {
-	m_cursor_shape_cleared=TRUE;
+	m_cursor_shape_cleared = TRUE;
 	if (m_use_cache && m_cachebuff)
 	{
 	omni_mutex_lock l(m_cacheLock, 668);
@@ -1151,7 +1151,7 @@ BOOL
 vncBuffer::IsShapeCleared()
 {
 	BOOL value=m_cursor_shape_cleared;
-	m_cursor_shape_cleared=FALSE;
+	m_cursor_shape_cleared = FALSE;
 	return value;
 }
 
