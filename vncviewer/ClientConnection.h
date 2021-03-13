@@ -316,6 +316,7 @@ private:
 	void SizeWindow(bool reconnect = false, bool SizeMultimon = true);
 	bool ScrollScreen(int dx, int dy, bool absolute = false);
 	void UpdateScrollbars();
+	void CalculateScrollbars(HWND hwnd, RECT Rtb);
     
 	void ReadRawRect(rfbFramebufferUpdateRectHeader *pfburh);
 	void ReadUltraRect(rfbFramebufferUpdateRectHeader *pfburh);
