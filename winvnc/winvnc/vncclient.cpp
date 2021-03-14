@@ -169,8 +169,6 @@ bool replaceFile(const char *src, const char *dst)
 #include "Localization.h" // Act : add localization on messages
 typedef BOOL (WINAPI *PGETDISKFREESPACEEX)(LPCSTR,PULARGE_INTEGER, PULARGE_INTEGER, PULARGE_INTEGER);
 
-unsigned long updates_sent;
-
 // vncClient update thread class
 
 //	[v1.0.2-jp1 fix]
@@ -437,7 +435,7 @@ vncClientUpdateThread::run_undetached(void *arg)
 	update.enable_copyrect(true);
 	BOOL send_palette = FALSE;
 	const int UPDATE_INTERVAL=40;
-	updates_sent=0;
+	first_run = true;
 
 	vnclog.Print(LL_INTINFO, VNCLOG("starting update thread\n"));
 	//Make sure we never can get locked by the initail m_initial_update) wait loop
@@ -451,7 +449,7 @@ vncClientUpdateThread::run_undetached(void *arg)
 			// We block as long as updates are disabled, or the client
 			// isn't interested in them, unless this thread is killed.
 
-			if (updates_sent < 1)  {
+			if (first_run)  {
 				while (m_active && (!m_enable || (
 								m_client->m_update_tracker.get_changed_region().intersect(m_client->m_incr_rgn).is_empty() &&
 								m_client->m_update_tracker.get_copied_region().intersect(m_client->m_incr_rgn).is_empty() &&
@@ -465,6 +463,7 @@ vncClientUpdateThread::run_undetached(void *arg)
 					m_sync_sig->broadcast();
 					// Wait to be kicked into action
 					m_signal->wait();
+					first_run = false;
 				}
 			} 
 			else {
@@ -550,10 +549,7 @@ vncClientUpdateThread::run_undetached(void *arg)
 			// Get the update details from the update tracker
 			m_client->m_update_tracker.flush_update(update, clipregion);
 
-	
-			if (updates_sent > 1 ) 
-				m_client->m_cursor_update_pending = m_client->m_encodemgr.WasCursorUpdatePending();
-			updates_sent++;
+			m_client->m_cursor_update_pending = m_client->m_encodemgr.WasCursorUpdatePending();
 
 			if (!m_client->m_cursor_update_sent && !m_client->m_cursor_update_pending) {
 				if (m_client->m_mousemoved) {
@@ -687,8 +683,6 @@ vncClientUpdateThread::run_undetached(void *arg)
 				if (m_client->m_server->MaxCpu() == 100)
 					m_client->sendingUpdate = true;
 				if (m_client->SendUpdate(update)) {
-					updates_sent++;
-					//m_client->m_incr_rgn.clear();
 					clipregion.clear();
 #ifdef _DEBUG
 					static DWORD sNotifyLastCopy1 = GetTickCount();
@@ -708,7 +702,6 @@ vncClientUpdateThread::run_undetached(void *arg)
 	}
 
 	vnclog.Print(LL_INTINFO, VNCLOG("stopping update thread\n"));	
-	vnclog.Print(LL_INTERR, "client sent %lu updates\n", updates_sent);
 	return 0;
 }
 
@@ -2686,6 +2679,7 @@ vncClientThread::run(void *arg)
 					if (Swap32IfLE(encoding) == rfbEncodingXCursor) {
 						m_client->m_encodemgr.EnableXCursor(TRUE);
 						m_server->EnableXRichCursor(TRUE);
+						m_client->m_encodemgr.m_buffer->m_cursor_shape_cleared = TRUE;
 						vnclog.Print(LL_INTINFO, VNCLOG("X-style cursor shape updates enabled\n"));
 						continue;
 					}
@@ -2693,6 +2687,7 @@ vncClientThread::run(void *arg)
 					// Is this a RichCursor encoding request?
 					if (Swap32IfLE(encoding) == rfbEncodingRichCursor) {
 						m_client->m_encodemgr.EnableRichCursor(TRUE);
+						m_client->m_encodemgr.m_buffer->m_cursor_shape_cleared = TRUE;
 						m_server->EnableXRichCursor(TRUE);
 						vnclog.Print(LL_INTINFO, VNCLOG("Full-color cursor shape updates enabled\n"));
 						continue;

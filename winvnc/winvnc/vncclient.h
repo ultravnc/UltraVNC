@@ -136,6 +136,7 @@ protected:
 	omni_condition* m_sync_sig;
 	BOOL m_active;
 	BOOL m_enable;
+	bool first_run;
 };
 
 class vncClient

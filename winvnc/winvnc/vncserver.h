@@ -193,6 +193,11 @@ public:
 
 	virtual void Driver(BOOL enable);
 	virtual BOOL Driver() {return m_driver;};
+
+	BOOL DriverWanted;
+	BOOL HookWanted;
+	BOOL DriverWantedSet;
+
 	virtual void Hook(BOOL enable);
 	virtual BOOL Hook() {return m_hook;};
 	virtual void Virtual(BOOL enable) {m_virtual = enable;};

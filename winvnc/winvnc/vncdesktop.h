@@ -433,11 +433,6 @@ protected:
 	rfb::Region2D iconregion;
 	bool blankmonitorstate;
 
-	
-	BOOL DriverWanted;
-	BOOL HookWanted;
-	BOOL DriverWantedSet;
-
 	//Multi monitor
 	int nr_monitors;
 	bool show_all_monitors;
