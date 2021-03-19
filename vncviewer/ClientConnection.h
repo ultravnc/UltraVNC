@@ -193,6 +193,7 @@ public:
 	int m_cliwidth, m_cliheight;
 	void WriteExact(char *buf, int bytes); //adzm 2010-09
 	void WriteExactFT(char *buf, int bytes);
+	void ResizeToolbar(RECT& rect);
 
 private:
 	CRITICAL_SECTION crit;
@@ -316,7 +317,10 @@ private:
 	void SizeWindow(bool reconnect = false, bool SizeMultimon = true);
 	bool ScrollScreen(int dx, int dy, bool absolute = false);
 	void UpdateScrollbars();
-	void CalculateScrollbars(HWND hwnd, RECT Rtb);
+	void AddRemoveScrollbars(HWND hwnd, RECT Rtb);
+	void Scollbar_wm_sizing(WPARAM wParam, LPARAM lParam);
+	void Scollbar_wm_siz(HWND hwnd);
+	void Scrollbar_RecalculateSize(HWND hwnd);
     
 	void ReadRawRect(rfbFramebufferUpdateRectHeader *pfburh);
 	void ReadUltraRect(rfbFramebufferUpdateRectHeader *pfburh);

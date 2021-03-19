@@ -4989,51 +4989,6 @@ inline void ClientConnection::DoBlit()
 	EndPaint(m_hwndcn, &ps);
 }
 
-inline void ClientConnection::CalculateScrollbars(HWND hwnd, RECT Rtb)
-{
-	SB_HORZ_BOOL = false;
-	SB_VERT_BOOL = false;
-
-	if (!InFullScreenMode() && !m_opts.m_Directx)
-	{
-		if ((m_winwidth < m_fullwinwidth))
-			SB_VERT_BOOL = true;
-		if ((m_winheight < (m_fullwinheight + (Rtb.bottom - Rtb.top))))
-			SB_HORZ_BOOL = true;
-	}
-	ShowScrollBar(hwnd, SB_HORZ, SB_HORZ_BOOL);
-	ShowScrollBar(hwnd, SB_VERT, SB_VERT_BOOL);
-}
-
-inline void ClientConnection::UpdateScrollbars()
-{
-	// We don't update the actual scrollbar info in full-screen mode
-	// because it causes them to flicker.
-	bool setInfo = !InFullScreenMode();
-
-	SCROLLINFO scri;
-	scri.cbSize = sizeof(scri);
-	scri.fMask = SIF_ALL;
-	scri.nMin = 0;
-	scri.nMax = m_hScrollMax;
-	scri.nPage= m_cliwidth;
-	scri.nPos = m_hScrollPos;
-
-	if (setInfo)
-		SetScrollInfo(m_hwndMain, SB_HORZ, &scri, TRUE);
-
-	scri.cbSize = sizeof(scri);
-	scri.fMask = SIF_ALL;
-	scri.nMin = 0;
-
-	scri.nMax = m_vScrollMax ;
-	scri.nPage= m_cliheight;
-	scri.nPos = m_vScrollPos;
-
-	if (setInfo)
-		SetScrollInfo(m_hwndMain, SB_VERT, &scri, TRUE);
-}
-
 void ClientConnection::ShowConnInfo()
 {
 	TCHAR buf[2048];
@@ -8104,44 +8059,11 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 				}//end case wm_syscommand
 
 				case WM_SIZING:
-					if (_this->m_opts.m_Directx) return 0;
-					{						
-						// Don't allow sizing larger than framebuffer
-						RECT *lprc = (LPRECT) lParam;
-						switch (wParam) {
-						case WMSZ_RIGHT:
-						case WMSZ_TOPRIGHT:
-						case WMSZ_BOTTOMRIGHT:
-							lprc->right = min(lprc->right, lprc->left + (_this->m_fullwinwidth)+1 );
-							break;
-						case WMSZ_LEFT:
-						case WMSZ_TOPLEFT:
-						case WMSZ_BOTTOMLEFT:
-							lprc->left = max(lprc->left, lprc->right - (_this->m_fullwinwidth));
-							break;
-						}
-
-						switch (wParam) {
-						case WMSZ_TOP:
-						case WMSZ_TOPLEFT:
-						case WMSZ_TOPRIGHT:
-							if (_this->m_opts.m_ShowToolbar)
-								lprc->top = max(lprc->top, lprc->bottom - (_this->m_fullwinheight) -_this->m_TBr.bottom);
-							else
-								lprc->top = max(lprc->top, lprc->bottom - (_this->m_fullwinheight));
-							break;
-						case WMSZ_BOTTOM:
-						case WMSZ_BOTTOMLEFT:
-						case WMSZ_BOTTOMRIGHT:
-							if (_this->m_opts.m_ShowToolbar)
-								lprc->bottom = min(lprc->bottom, lprc->top + (_this->m_fullwinheight) + _this->m_TBr.bottom);
-							else
-								lprc->bottom = min(lprc->bottom, lprc->top + (_this->m_fullwinheight));
-							break;
-						}
-
+					if (_this->m_opts.m_Directx) 
 						return 0;
-					}
+					_this->Scollbar_wm_sizing(wParam, lParam);
+					return 0;
+
 				case WM_QUERYOPEN:
 					_this->SetDormant(false);
 					return true;
@@ -8400,68 +8322,11 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						_this->m_winwidth = rect.right - rect.left;
 						_this->m_winheight = rect.bottom - rect.top ;
 
-						if (_this->m_opts.m_ShowToolbar)
-						{
-							GetWindowRect(_this->m_hwndTBwin, &Rtb);
-							//MoveWindow(_this->m_hwndTB,
-							//	0,0,_this->m_winwidth - 106, 32,TRUE);
-							//SetWindowPos(_this->m_hwndTBwin, HWND_TOP, 0, 0, _this->m_winwidth, 32,SWP_FRAMECHANGED);
-							if ((_this->m_winwidth) > 140+85+14*24)
-							{
-								if (_this->m_BigToolbar==false)
-								{
-								DestroyWindow(_this->m_hwndTB);
-								_this->m_BigToolbar=true;
-								_this->CreateButtons(false,_this->m_fServerKnowsFileTransfer);
-								}
-							}
-							else
-							{
-								if (_this->m_BigToolbar)
-								{
-								_this->m_BigToolbar=false;
-								DestroyWindow(_this->m_hwndTB);
-								_this->CreateButtons(true,_this->m_fServerKnowsFileTransfer);
-								}
-							}
-							SetWindowPos(_this->m_hwndTB,HWND_TOP,0,0,_this->m_winwidth - 200, 32,SWP_FRAMECHANGED);
-							if (_this->m_TrafficMonitor)
-							{
-								MoveWindow(_this->m_TrafficMonitor,
-									_this->m_winwidth - 55,2,35,30,TRUE);
-								MoveWindow(_this->m_logo_wnd,
-									_this->m_winwidth - 185,2,130,28,TRUE);
-								MoveWindow(_this->m_button_wnd,
-									_this->m_winwidth - 200,10,10,10,TRUE);
-							}
-							if (_this->m_logo_wnd)
-							{
-								MoveWindow(_this->m_logo_wnd,
-									_this->m_winwidth - 185,2,130,28,TRUE);
-								MoveWindow(_this->m_button_wnd,
-									_this->m_winwidth - 200,10,10,10,TRUE);
-							}
-							UpdateWindow(_this->m_hwndTB);
-							UpdateWindow(_this->m_logo_wnd);
-							UpdateWindow(_this->m_button_wnd);
-						}
-						else
-						{
-							Rtb.top=0;Rtb.bottom=0;
-						}
+						_this->ResizeToolbar(Rtb);
+						
+						_this->AddRemoveScrollbars(hwnd, Rtb);						
 
-						// If the current window size would be large enough to hold the
-						// whole screen without scrollbars, or if we're full-screen,
-						// we turn them off.  Under CE, the scroll bars are unchangeable.
-
-						_this->CalculateScrollbars(hwnd, Rtb);
-
-						// Update these for the record
-						// And consider that in full-screen mode the window
-						// is actually bigger than the remote screen.
-						if (_this->m_opts.m_Directx) {
-							GetClientRect(hwnd, &rect);
-
+						if (_this->m_opts.m_Directx) { // full-screen mode
 							_this->m_cliwidth = rect.right - rect.left;
 							_this->m_cliheight = (int)(rect.bottom - rect.top);
 
@@ -8472,7 +8337,6 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						}
 						else {
 							GetClientRect(hwnd, &rect);
-
 							int uni_screenWidth =  _this->m_si.framebufferWidth;
 							int uni_screenHeight =  _this->m_si.framebufferHeight;
 
@@ -8494,6 +8358,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 								_this->m_vScrollMax = (int)(_this->m_si.framebufferHeight*
 														   _this->m_opts.m_scale_num / _this->m_opts.m_scale_den);
 
+
 							int newhpos, newvpos;
 							newhpos = max(0,
 										  min(_this->m_hScrollPos,
@@ -8514,6 +8379,8 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							_this->m_hScrollPos = newhpos;
 							_this->m_vScrollPos = newvpos;
 							_this->UpdateScrollbars();
+							_this->Scrollbar_RecalculateSize(hwnd);
+
 						}
 						if (wParam == SIZE_MAXIMIZED && _this->InFullScreenMode() == FALSE)
 							SendMessage(hwnd, WM_SYSCOMMAND, SC_MAXIMIZE, 0);
@@ -9797,4 +9664,175 @@ BOOL CALLBACK DialogProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
     }
 
 	return TRUE;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////// SCROLLBAR
+///////////////////////////////////////////////////////////////////////////////
+
+inline void ClientConnection::AddRemoveScrollbars(HWND hwnd, RECT Rtb)
+{
+	if (!InFullScreenMode() && !m_opts.m_Directx)
+	{
+		if ((m_winwidth == m_fullwinwidth) && (m_winheight == (m_fullwinheight +(Rtb.bottom - Rtb.top)))) {
+			SB_HORZ_BOOL = false;
+			SB_VERT_BOOL = false;
+		}
+		else if (m_winwidth < (m_fullwinwidth + (SB_VERT_BOOL ? GetSystemMetrics(SM_CXHSCROLL) : 0)))
+			SB_HORZ_BOOL = true;
+		else
+			SB_HORZ_BOOL = false;
+		if (m_winheight < (m_fullwinheight + (Rtb.bottom - Rtb.top) + (SB_HORZ_BOOL ? GetSystemMetrics(SM_CXVSCROLL) : 0)))
+			SB_VERT_BOOL = true;
+		else
+			SB_VERT_BOOL = false;
+	}
+	else {
+		SB_HORZ_BOOL = false;
+		SB_VERT_BOOL = false;
+	}
+	ShowScrollBar(hwnd, SB_HORZ, SB_HORZ_BOOL);
+	ShowScrollBar(hwnd, SB_VERT, SB_VERT_BOOL);
+}
+
+inline void ClientConnection::UpdateScrollbars()
+{
+	// We don't update the actual scrollbar info in full-screen mode
+	// because it causes them to flicker.
+	bool setInfo = !InFullScreenMode();
+
+	SCROLLINFO scri;
+	scri.cbSize = sizeof(scri);
+	scri.fMask = SIF_ALL;
+	scri.nMin = 0;
+	scri.nMax = m_hScrollMax;
+	scri.nPage = m_cliwidth;
+	scri.nPos = m_hScrollPos;
+
+	if (setInfo)
+		SetScrollInfo(m_hwndMain, SB_HORZ, &scri, TRUE);
+
+	scri.cbSize = sizeof(scri);
+	scri.fMask = SIF_ALL;
+	scri.nMin = 0;
+
+	scri.nMax = m_vScrollMax;
+	scri.nPage = m_cliheight;
+	scri.nPos = m_vScrollPos;
+
+	if (setInfo)
+		SetScrollInfo(m_hwndMain, SB_VERT, &scri, TRUE);
+}
+
+void ClientConnection::ResizeToolbar(RECT& Rtb)
+{
+	if (!m_opts.m_ShowToolbar) {
+		Rtb.top = 0; Rtb.bottom = 0;
+		return;
+	}
+	GetWindowRect(m_hwndTBwin, &Rtb);
+	//MoveWindow(_this->m_hwndTB,
+	//	0,0,_this->m_winwidth - 106, 32,TRUE);
+	//SetWindowPos(m_hwndTBwin, HWND_TOP, 0, 0, m_winwidth, 32,SWP_FRAMECHANGED);
+	if ((m_winwidth) > 140 + 85 + 14 * 24)
+	{
+		if (m_BigToolbar == false)
+		{
+			DestroyWindow(m_hwndTB);
+			m_BigToolbar = true;
+			CreateButtons(false, m_fServerKnowsFileTransfer);
+		}
+	}
+	else
+	{
+		if (m_BigToolbar)
+		{
+			m_BigToolbar = false;
+			DestroyWindow(m_hwndTB);
+			CreateButtons(true, m_fServerKnowsFileTransfer);
+		}
+	}
+	SetWindowPos(m_hwndTB, HWND_TOP, 0, 0, m_winwidth - 200, 32, SWP_FRAMECHANGED);
+	if (m_TrafficMonitor)
+	{
+		MoveWindow(m_TrafficMonitor,
+			m_winwidth - 55, 2, 35, 30, TRUE);
+		MoveWindow(m_logo_wnd,
+			m_winwidth - 185, 2, 130, 28, TRUE);
+		MoveWindow(m_button_wnd,
+			m_winwidth - 200, 10, 10, 10, TRUE);
+	}
+	if (m_logo_wnd)
+	{
+		MoveWindow(m_logo_wnd,
+			m_winwidth - 185, 2, 130, 28, TRUE);
+		MoveWindow(m_button_wnd,
+			m_winwidth - 200, 10, 10, 10, TRUE);
+	}
+	UpdateWindow(m_hwndTB);
+	UpdateWindow(m_logo_wnd);
+	UpdateWindow(m_button_wnd);
+}
+
+void ClientConnection::Scollbar_wm_sizing(WPARAM wParam, LPARAM lParam)
+{
+	int hScrollSize = SB_HORZ_BOOL ? GetSystemMetrics(SM_CYHSCROLL) : 0;
+	int vSchrollSize = SB_VERT_BOOL ? GetSystemMetrics(SM_CXVSCROLL) : 0;
+	// Don't allow sizing larger than framebuffer
+	RECT* lprc = (LPRECT)lParam;
+	switch (wParam) {
+	case WMSZ_RIGHT:
+	case WMSZ_TOPRIGHT:
+	case WMSZ_BOTTOMRIGHT:
+		lprc->right = min(lprc->right, lprc->left + (m_fullwinwidth + vSchrollSize) + 1);
+		break;
+	case WMSZ_LEFT:
+	case WMSZ_TOPLEFT:
+	case WMSZ_BOTTOMLEFT:
+		lprc->left = max(lprc->left, lprc->right - (m_fullwinwidth + vSchrollSize));
+		break;
+	}
+
+	switch (wParam) {
+	case WMSZ_TOP:
+	case WMSZ_TOPLEFT:
+	case WMSZ_TOPRIGHT:
+		if (m_opts.m_ShowToolbar)
+			lprc->top = max(lprc->top, lprc->bottom - (m_fullwinheight + hScrollSize) - m_TBr.bottom);
+		else
+			lprc->top = max(lprc->top, lprc->bottom - (m_fullwinheight + hScrollSize));
+		break;
+	case WMSZ_BOTTOM:
+	case WMSZ_BOTTOMLEFT:
+	case WMSZ_BOTTOMRIGHT:
+		if (m_opts.m_ShowToolbar)
+			lprc->bottom = min(lprc->bottom, lprc->top + (m_fullwinheight + hScrollSize) + m_TBr.bottom);
+		else
+			lprc->bottom = min(lprc->bottom, lprc->top + (m_fullwinheight + hScrollSize));
+		break;
+	}
+}
+
+void ClientConnection::Scrollbar_RecalculateSize(HWND hwnd)
+{
+	if (!InFullScreenMode() && !m_opts.m_Directx) {
+		RECT rect;
+		GetWindowRect(hwnd, &rect);
+		int hScrollSize = SB_HORZ_BOOL ? GetSystemMetrics(SM_CYHSCROLL) : 0;
+		int vSchrollSize = SB_VERT_BOOL ? GetSystemMetrics(SM_CXVSCROLL) : 0;
+		rect.right = min(rect.right, rect.left + (m_fullwinwidth + vSchrollSize) + 1);
+		rect.left = max(rect.left, rect.right - (m_fullwinwidth + vSchrollSize));
+
+		if (m_opts.m_ShowToolbar)
+			rect.top = max(rect.top, rect.bottom - (m_fullwinheight + hScrollSize) - m_TBr.bottom);
+		else
+			rect.top = max(rect.top, rect.bottom - (m_fullwinheight + hScrollSize));
+
+		if (m_opts.m_ShowToolbar)
+			rect.bottom = min(rect.bottom, rect.top + (m_fullwinheight + hScrollSize) + m_TBr.bottom);
+		else
+			rect.bottom = min(rect.bottom, rect.top + (m_fullwinheight + hScrollSize));
+
+		SetWindowPos(hwnd, NULL, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, SWP_NOZORDER | SWP_NOMOVE);
+	}
 }
