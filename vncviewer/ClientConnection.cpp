@@ -659,7 +659,7 @@ void ClientConnection::Run()
 	WatchClipboard();
 
 	Createdib();
-	SizeWindow(false, false);
+	SizeWindow(false, false, true);
 
 	// This starts the worker thread.
 	// The rest of the processing continues in run_undetached.
@@ -3645,10 +3645,10 @@ void ClientConnection::ReadServerInit(bool reconnect)
 
 	if (m_opts.m_ViewOnly) SetWindowText(m_hwndMain, m_desktopName_viewonly);
 	else SetWindowText(m_hwndMain, m_desktopName);
-	SizeWindow(reconnect, false);
+	SizeWindow(reconnect, false, true);
 }
 
-void ClientConnection::SizeWindow(bool reconnect, bool SizeMultimon)
+void ClientConnection::SizeWindow(bool reconnect, bool sizeMultimon, bool setPosition)
 {
 	int uni_screenWidth = extSDisplay ? widthExtSDisplay : m_si.framebufferWidth;
 	int uni_screenHeight = extSDisplay ? heightExtSDisplay : m_si.framebufferHeight;
@@ -3659,7 +3659,7 @@ void ClientConnection::SizeWindow(bool reconnect, bool SizeMultimon)
 	RECT workrect;
 	tempdisplayclass tdc;
 	tdc.Init();
-	int mon = tdc.getSelectedScreen(m_hwndMain, (m_opts.m_allowMonitorSpanning || SizeMultimon) && !m_opts.m_showExtend);
+	int mon = tdc.getSelectedScreen(m_hwndMain, (m_opts.m_allowMonitorSpanning || sizeMultimon) && !m_opts.m_showExtend);
 	workrect.left=tdc.monarray[mon].wl;
 	workrect.right=tdc.monarray[mon].wr;
 	workrect.top=tdc.monarray[mon].wt;
@@ -3828,7 +3828,7 @@ void ClientConnection::SizeWindow(bool reconnect, bool SizeMultimon)
 	else
 	{
         
-		if (pos_set == false) 
+		if (pos_set == false && setPosition)
 			SetWindowPos(m_hwndMain, HWND_TOP, workrect.left + (workwidth - m_winwidth) / 2, workrect.top + (workheight - m_winheight) / 2, m_winwidth, m_winheight, SWP_SHOWWINDOW | SWP_NOSIZE);
         if (size_set == false)
         {
@@ -5043,9 +5043,9 @@ void* ClientConnection::run_undetached(void* arg) {
 	//adzm 2010-09 - all socket writes must remain on a single thread
 	SendFullFramebufferUpdateRequest(false);
 
-	SizeWindow(false, false);
+	SizeWindow(false, false, true);
 	RealiseFullScreenMode();
-	if (!InFullScreenMode()) SizeWindow(false, false);
+	if (!InFullScreenMode()) SizeWindow(false, false, true);
 
 	m_running = true;
 	UpdateWindow(m_hwndcn);
