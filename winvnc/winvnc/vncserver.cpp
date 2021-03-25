@@ -658,6 +658,14 @@ vncServer::Authenticated(vncClientId clientid)
 			// Add the client to the auth list
 			m_authClients.push_back(clientid);
 
+			//If we are the only client, we give it mouse access.
+			//Other client can take access when the click a mouse button
+			if (m_authClients.size() == 1)
+				client->has_mouse = true;
+			else
+				client->has_mouse = false;
+
+
 			// Create the screen handler if necessary
 			if (m_desktop == NULL)
 			{
@@ -2566,6 +2574,23 @@ vncServer::TriggerUpdate() {
 	for (i = m_authClients.begin(); i != m_authClients.end(); i++)
 	{
 		GetClient(*i)->TriggerUpdate();
+
+	}
+}
+
+void
+vncServer::set_has_mouse() 
+{
+vncClientList::iterator i;
+	for (i = m_authClients.begin(); i != m_authClients.end(); i++)
+	{
+		if (GetClient(*i)->ask_mouse == true) {
+			GetClient(*i)->has_mouse = true;
+			GetClient(*i)->ask_mouse = false;
+		}
+		else
+			GetClient(*i)->has_mouse = false;
+
 
 	}
 }

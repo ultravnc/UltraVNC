@@ -30,6 +30,17 @@ typedef HRESULT (CALLBACK *P_DwmEnableComposition) (BOOL   fEnable);
 class VNC_OSVersion
 {
 public:
+	static VNC_OSVersion* getInstance() {
+
+		return (!vnc_OSVersion) ?
+			vnc_OSVersion = new VNC_OSVersion :
+			vnc_OSVersion;
+	}
+	static void releaseInstance() {
+		if (vnc_OSVersion)
+			delete vnc_OSVersion;
+	}
+
 	VNC_OSVersion();
 	virtual ~VNC_OSVersion();
 	void SetAeroState();
@@ -45,15 +56,17 @@ public:
 	bool OS_AERO_ON;
 	bool OS_LAYER_ON;
 	bool OS_NOTSUPPORTED;
+	bool OS_BEFOREVISTA;
+	bool OS_MINIMUMVISTA;
 	bool AeroWasEnabled;
+	bool isWINPE(VOID);
+	bool OS_WINPE;
 protected:	
 	HMODULE DMdll; 
 	void UnloadDM(VOID);
 	bool LoadDM(VOID);
 	P_DwmIsCompositionEnabled pfnDwmIsCompositionEnabled;
 	P_DwmEnableComposition pfnDwmEnableComposition; 
+	static VNC_OSVersion* vnc_OSVersion;
 };
-
-#pragma once
-extern VNC_OSVersion VNCOS;
 #endif

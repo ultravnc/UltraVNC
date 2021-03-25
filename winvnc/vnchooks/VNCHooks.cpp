@@ -915,6 +915,7 @@ LRESULT CALLBACK LowLevelKeyboardFilterProc(int nCode, WPARAM wParam, LPARAM lPa
 #endif
 
 // Hook procedure for LowLevel Mouse filtering
+#define MOUSEEVENTF_FROMTOUCH 0xFF515700
 
 #ifdef WH_MOUSE_LL
 LRESULT CALLBACK LowLevelMouseFilterProc(int nCode, WPARAM wParam, LPARAM lParam)
@@ -927,7 +928,12 @@ LRESULT CALLBACK LowLevelMouseFilterProc(int nCode, WPARAM wParam, LPARAM lParam
 		   // Is this mouse event "real" or "injected"
 		   // i.e. hardware or software-produced?
 		   MSLLHOOKSTRUCT *hookStruct = (MSLLHOOKSTRUCT*)lParam;
-		   if (!(hookStruct->flags & LLMHF_INJECTED)) {
+		   if ((hookStruct->dwExtraInfo & MOUSEEVENTF_FROMTOUCH) == MOUSEEVENTF_FROMTOUCH)
+		   {
+			   return TRUE;
+		   }
+
+		   if (!(hookStruct->flags & LLMHF_INJECTED)) {			   
 			   // Message was not injected - reject it!
 			   return TRUE;
 		   }

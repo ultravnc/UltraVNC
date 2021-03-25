@@ -9,6 +9,14 @@
       <Configuration>Debug</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="NOacceleration|Win32">
+      <Configuration>NOacceleration</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="NOacceleration|x64">
+      <Configuration>NOacceleration</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="release_viewer|Win32">
       <Configuration>release_viewer</Configuration>
       <Platform>Win32</Platform>
@@ -131,6 +139,11 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NOacceleration|Win32'" Label="Configuration">
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='XP|Win32'" Label="Configuration">
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -142,6 +155,11 @@
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NOacceleration|x64'" Label="Configuration">
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <PlatformToolset>v141</PlatformToolset>
@@ -168,6 +186,9 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='NOacceleration|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='XP|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
@@ -175,6 +196,9 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='NOacceleration|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='XP|x64'" Label="PropertySheets">
@@ -199,6 +223,11 @@
     <IncludePath>$(IncludePath);$(SolutionDir)..\..\zlib;$(SolutionDir)..\..\lib;$(SolutionDir)..\..\programs\legacy;$(SolutionDir)..\..\lib\legacy;$(SolutionDir)..\..\lib\common;$(SolutionDir)..\..\lib\dictBuilder;$(SolutionDir)..\zstd-1.4.4\lib;$(SolutionDir)..\zstd-1.4.4\programs\legacy;$(SolutionDir)..\zstd-1.4.4\lib\legacy;$(SolutionDir)..\zstd-1.4.4\lib\common;$(SolutionDir)..\zstd-1.4.4\lib\dictBuilder;$(UniversalCRT_IncludePath);$(SolutionDir)..\zlib</IncludePath>
     <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NOacceleration|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(IncludePath);$(SolutionDir)..\..\zlib;$(SolutionDir)..\..\lib;$(SolutionDir)..\..\programs\legacy;$(SolutionDir)..\..\lib\legacy;$(SolutionDir)..\..\lib\common;$(SolutionDir)..\..\lib\dictBuilder;$(SolutionDir)..\zstd-1.4.4\lib;$(SolutionDir)..\zstd-1.4.4\programs\legacy;$(SolutionDir)..\zstd-1.4.4\lib\legacy;$(SolutionDir)..\zstd-1.4.4\lib\common;$(SolutionDir)..\zstd-1.4.4\lib\dictBuilder;$(UniversalCRT_IncludePath);$(SolutionDir)..\zlib</IncludePath>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='XP|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(IncludePath);$(SolutionDir)..\..\zlib;$(SolutionDir)..\..\lib;$(SolutionDir)..\..\programs\legacy;$(SolutionDir)..\..\lib\legacy;$(SolutionDir)..\..\lib\common;$(SolutionDir)..\..\lib\dictBuilder;$(SolutionDir)..\zstd-1.4.4\lib;$(SolutionDir)..\zstd-1.4.4\programs\legacy;$(SolutionDir)..\zstd-1.4.4\lib\legacy;$(SolutionDir)..\zstd-1.4.4\lib\common;$(SolutionDir)..\zstd-1.4.4\lib\dictBuilder;$(UniversalCRT_IncludePath);$(SolutionDir)..\zlib</IncludePath>
@@ -210,6 +239,11 @@
     <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(IncludePath);$(SolutionDir)..\..\zlib;$(SolutionDir)..\..\lib;$(SolutionDir)..\..\programs\legacy;$(SolutionDir)..\..\lib\legacy;$(SolutionDir)..\..\lib\common;$(SolutionDir)..\..\lib\dictBuilder;$(SolutionDir)..\zstd-1.4.4\lib;$(SolutionDir)..\zstd-1.4.4\programs\legacy;$(SolutionDir)..\zstd-1.4.4\lib\legacy;$(SolutionDir)..\zstd-1.4.4\lib\common;$(SolutionDir)..\zstd-1.4.4\lib\dictBuilder;$(UniversalCRT_IncludePath);$(SolutionDir)..\zlib</IncludePath>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NOacceleration|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(IncludePath);$(SolutionDir)..\..\zlib;$(SolutionDir)..\..\lib;$(SolutionDir)..\..\programs\legacy;$(SolutionDir)..\..\lib\legacy;$(SolutionDir)..\..\lib\common;$(SolutionDir)..\..\lib\dictBuilder;$(SolutionDir)..\zstd-1.4.4\lib;$(SolutionDir)..\zstd-1.4.4\programs\legacy;$(SolutionDir)..\zstd-1.4.4\lib\legacy;$(SolutionDir)..\zstd-1.4.4\lib\common;$(SolutionDir)..\zstd-1.4.4\lib\dictBuilder;$(UniversalCRT_IncludePath);$(SolutionDir)..\zlib</IncludePath>
     <RunCodeAnalysis>false</RunCodeAnalysis>
@@ -279,6 +313,29 @@
       <EnablePREfast>false</EnablePREfast>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <EnableEnhancedInstructionSet>NoExtensions</EnableEnhancedInstructionSet>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='NOacceleration|Win32'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>ZSTD_MULTITHREAD=1;ZSTD_LEGACY_SUPPORT=5;WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <EnablePREfast>false</EnablePREfast>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <EnableEnhancedInstructionSet>NoExtensions</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -331,6 +388,29 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>ZSTD_MULTITHREAD=1;ZSTD_LEGACY_SUPPORT=5;WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <EnablePREfast>false</EnablePREfast>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <OmitFramePointers>true</OmitFramePointers>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='NOacceleration|x64'">
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <PrecompiledHeader>

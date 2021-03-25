@@ -137,7 +137,6 @@ void Secure_Plugin(char *szPlugin);
 
 //HACK to use name in autoreconnect from service with dyn dns
 char dnsname[255];
-VNC_OSVersion VNCOS;
 extern bool PreConnect;
 // winvnc.exe will also be used for helper exe
 // This allow us to minimize the number of seperate exe
@@ -259,11 +258,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 	
 
 #ifndef _INTERNALLIB
-	if (VNCOS.OS_XP==true)
+	if (VNC_OSVersion::getInstance()->OS_XP==true)
 		 MessageBoxSecure(NULL, "WIndows XP require special build", "Warning", MB_ICONERROR);
 #endif
 		
-	if (VNCOS.OS_NOTSUPPORTED==true)
+	if (VNC_OSVersion::getInstance()->OS_NOTSUPPORTED==true)
 	{
 		 MessageBoxSecure(NULL, "Error OS not supported","Unsupported OS", MB_ICONERROR);
 		return true;
@@ -1199,6 +1198,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 #ifdef CRASHRPT
 	crUninstall();
 #endif
+	VNC_OSVersion::releaseInstance();
 	return 0;
 }
 

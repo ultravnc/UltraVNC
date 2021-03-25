@@ -2142,7 +2142,7 @@ vncClientThread::run(void *arg)
 	DLL_InitializeTouchInjection = NULL;
 	DLL_PInjectTouch = NULL;
 	win8dllHandle = NULL;
-	if (VNCOS.OS_WIN8 || VNCOS.OS_WIN10)
+	if (VNC_OSVersion::getInstance()->OS_WIN8 || VNC_OSVersion::getInstance()->OS_WIN10)
 	{
 		win8dllHandle = LoadLibrary("InjectTouch.dll");
 		DLL_InitializeTouchInjection = (PInitializeTouchInjection) GetProcAddress(win8dllHandle, "DLL_InitializeTouchInjection");
@@ -3271,7 +3271,7 @@ vncClientThread::run(void *arg)
 						    ? MOUSEEVENTF_RIGHTDOWN : MOUSEEVENTF_RIGHTUP;
 					    else
 						flags |= (msg.pe.buttonMask & rfbButton1Mask) 
-						    ? MOUSEEVENTF_LEFTDOWN : MOUSEEVENTF_LEFTUP;
+						    ? MOUSEEVENTF_LEFTDOWN : MOUSEEVENTF_LEFTUP;						
 					}
 					if ( (msg.pe.buttonMask & rfbButton2Mask) != 
 						(m_client->m_ptrevent.buttonMask & rfbButton2Mask) )
@@ -3289,6 +3289,34 @@ vncClientThread::run(void *arg)
 						flags |= (msg.pe.buttonMask & rfbButton3Mask) 
 						    ? MOUSEEVENTF_RIGHTDOWN : MOUSEEVENTF_RIGHTUP;
 					}
+
+					if ((msg.pe.buttonMask & rfbButton1Mask) != (m_client->m_ptrevent.buttonMask & rfbButton1Mask) ||
+						(msg.pe.buttonMask & rfbButton2Mask) != (m_client->m_ptrevent.buttonMask & rfbButton2Mask) ||
+						(msg.pe.buttonMask & rfbButton1Mask) != (m_client->m_ptrevent.buttonMask & rfbButton1Mask)) {
+						if (!m_client->has_mouse) {
+							m_client->ask_mouse = true;
+							m_server->set_has_mouse();
+							return;
+						}
+					}
+
+					if (!m_client->has_mouse) {
+						int xx = msg.pe.x - GetSystemMetrics(SM_XVIRTUALSCREEN) + (m_client->monitor_Offsetx + m_client->m_ScreenOffsetx);
+						int yy = msg.pe.y - GetSystemMetrics(SM_YVIRTUALSCREEN) + (m_client->monitor_Offsety + m_client->m_ScreenOffsety);
+						if (m_server->Driver()) //chris
+						{
+							xx = msg.pe.x + m_client->monitor_Offsetx;
+							yy = msg.pe.y + m_client->monitor_Offsety;
+							//vnclog.Print(LL_INTINFO, VNCLOG("MouseMove m_cursor_pos(%d, %d), new(%d, %d)\n"),
+							//    xx, yy, msg.pe.x, msg.pe.y);
+						}
+						char			szText[256];
+						sprintf_s(szText, "%i %i \n", xx, yy);
+						OutputDebugString(szText);
+						break;
+					}
+
+
 
 
 					// Treat buttons 4 and 5 presses as mouse wheel events
@@ -4623,6 +4651,8 @@ vncClient::vncClient() : m_clipboard(ClipboardSettings::defaultServerCaps), Send
 	m_singleExtendMode = false;
 	m_firstExtDesktop = true;
 	m_firstExtDesktopIncremental = true;
+	has_mouse = false;
+	ask_mouse = false;
 }
 
 vncClient::~vncClient()

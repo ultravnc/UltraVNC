@@ -138,9 +138,6 @@ protected:
 
 	bool IsIconSet;
 	int IconFaultCounter;
-	//HANDLE hEvent;
-	OSVERSIONINFO	osvi;
-
 };
 
 

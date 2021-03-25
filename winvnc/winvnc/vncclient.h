@@ -464,6 +464,8 @@ public:
 	//int Totalsend;
 	BOOL client_settings_passed;
 	bool initialCapture_done;
+	bool has_mouse;
+	bool ask_mouse;
 	bool sendingUpdate;
 	bool		m_Autoreconnect;
 	// The socket

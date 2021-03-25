@@ -90,7 +90,7 @@ bool Shellexecuteforuiaccess()
 
 void keepalive()
 {
-	if (!VNCOS.OS_WIN8 || errorcounter > 3) 
+	if (!VNC_OSVersion::getInstance()->OS_WIN8 || errorcounter > 3) 
 		return;
 	mini_lock ml(1);
 	unsigned char Invalue=12;
@@ -120,7 +120,7 @@ void keepalive()
 
 void keybd_uni_event(_In_  BYTE bVk,_In_  BYTE bScan,_In_  DWORD dwFlags,_In_  ULONG_PTR dwExtraInfo)
 {
-	if (!VNCOS.OS_WIN8 || g_lockcode != 0 || !g_initialized) {
+	if (!VNC_OSVersion::getInstance()->OS_WIN8 || g_lockcode != 0 || !g_initialized) {
 		keybd_event(bVk,bScan,dwFlags,dwExtraInfo);
 		return;
 	}
@@ -191,7 +191,7 @@ error:
 void keybd_initialize()
 {
 {
-	if (!VNCOS.OS_WIN8) 
+	if (!VNC_OSVersion::getInstance()->OS_WIN8) 
 		return;
 	g_initialized = true;
 	errorcounter = 0;
@@ -234,7 +234,7 @@ error:
 
 void keybd_delete()
 {
-	if (!VNCOS.OS_WIN8) 
+	if (!VNC_OSVersion::getInstance()->OS_WIN8) 
 		return;
 	if (StopeventFn) StopeventFn->Call_Fnction_no_feedback();
 	if (keyEventFn)delete keyEventFn;

@@ -700,7 +700,7 @@ vncDesktopThread::run_undetached(void *arg)
 	// INIT
 	//*******************************************************
 	if (m_server->AutoCapt() == 1) {
-		if (VNCOS.OS_VISTA||VNCOS.OS_WIN7||VNCOS.OS_WIN8||VNCOS.OS_WIN10) 
+		if (VNC_OSVersion::getInstance()->OS_VISTA||VNC_OSVersion::getInstance()->OS_WIN7||VNC_OSVersion::getInstance()->OS_WIN8||VNC_OSVersion::getInstance()->OS_WIN10) 
 			G_USE_PIXEL=false;
 		else 
 			G_USE_PIXEL=true;//testBench();
@@ -809,11 +809,11 @@ vncDesktopThread::run_undetached(void *arg)
 	rgncache.assign_union(rfb::Region2D(m_desktop->m_Cliprect));
 
 	if (!PreConnect) {
-		if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver && !VNCOS.OS_WIN8 && !VNCOS.OS_WIN10)
+		if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver && !VNC_OSVersion::getInstance()->OS_WIN8 && !VNC_OSVersion::getInstance()->OS_WIN10)
 		{
 			m_desktop->m_buffer.GrabRegion(rgncache,true,true);
 		}
-		else if (!VNCOS.OS_WIN8 && !VNCOS.OS_WIN10)
+		else if (!VNC_OSVersion::getInstance()->OS_WIN8 && !VNC_OSVersion::getInstance()->OS_WIN10)
 		{
 			m_desktop->m_buffer.GrabRegion(rgncache,false,true);
 		}
@@ -829,7 +829,7 @@ vncDesktopThread::run_undetached(void *arg)
 	HANDLE ThreadHandleCheckCursorUpdates = NULL;
 	m_desktop->PreventScreensaver(true);
 	
-	if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver && !VNCOS.OS_WIN8 && !VNCOS.OS_WIN10)
+	if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver && !VNC_OSVersion::getInstance()->OS_WIN8 && !VNC_OSVersion::getInstance()->OS_WIN10)
 		{
 			//MIRROR DRIVER....still to check if this works			
 			DWORD dw;
@@ -840,7 +840,7 @@ vncDesktopThread::run_undetached(void *arg)
 				ThreadHandleCheckCursorUpdates = CreateThread(NULL, 0, ThreadCheckCursorUpdates, this, 0, &dw2);
 			waittime = 1000;
 		}
-	else if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver && (VNCOS.OS_WIN8||VNCOS.OS_WIN10))
+	else if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver && (VNC_OSVersion::getInstance()->OS_WIN8||VNC_OSVersion::getInstance()->OS_WIN10))
 		{
 			//DDENGINE
 			m_desktop->trigger_events[6] = m_desktop->m_screenCapture->getHScreenEvent();
@@ -1202,7 +1202,7 @@ vncDesktopThread::run_undetached(void *arg)
 									// Clear the update tracker and region cache an solid
 									clipped_updates.clear();
 									// screen blanking
-									if (m_desktop->m_screen_in_powersave && (!VNCOS.CaptureAlphaBlending() || m_desktop->VideoBuffer())) {
+									if (m_desktop->m_screen_in_powersave && (!VNC_OSVersion::getInstance()->CaptureAlphaBlending() || m_desktop->VideoBuffer())) {
 										DWORD new_timer=GetTickCount();
 										if ((new_timer-monitor_sleep_timer)>500) {
 											SendMessage(m_desktop->m_hwnd,WM_SYSCOMMAND,SC_MONITORPOWER,(LPARAM)2);

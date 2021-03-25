@@ -99,7 +99,7 @@ PixelCaptureEngine::~PixelCaptureEngine()
 
 PixelCaptureEngine::PixelCaptureEngine()
 {
-	if (VNCOS.OS_VISTA || VNCOS.OS_WIN7 || VNCOS.OS_WIN8 || VNCOS.OS_WIN10) 
+	if (VNC_OSVersion::getInstance()->OS_VISTA || VNC_OSVersion::getInstance()->OS_WIN7 || VNC_OSVersion::getInstance()->OS_WIN8 || VNC_OSVersion::getInstance()->OS_WIN10) 
 		m_bIsVista = true;
 	else
 		m_bIsVista = false;
@@ -274,7 +274,7 @@ bool vncDesktop::FastDetectChanges(rfb::Region2D &rgn, rfb::Rect &rect, int nZon
 
 	}
 
-	PixelEngine.PixelCaptureEngineInit(m_hrootdc_Desktop, m_hmemdc, m_membitmap, VNCOS.CaptureAlphaBlending() && !m_Black_window_active,
+	PixelEngine.PixelCaptureEngineInit(m_hrootdc_Desktop, m_hmemdc, m_membitmap, VNC_OSVersion::getInstance()->CaptureAlphaBlending() && !m_Black_window_active,
 		m_DIBbits, m_scrinfo.format.bitsPerPixel / 8, m_bytesPerRow, m_ScreenOffsetx, m_ScreenOffsety);
 	// We test one zone at a time 
 	// vnclog.Print(LL_INTINFO, VNCLOG("### Polling Grid %d - SubGrid %d\n"), nZone, m_nGridCycle); 
@@ -1749,7 +1749,7 @@ vncDesktop::CaptureScreen(const rfb::Rect &rect, BYTE *scrBuff, UINT scrBuffSize
 				m_hrootdc_Desktop,
 				rect.tl.x + m_ScreenOffsetx,
 				rect.tl.y + m_ScreenOffsety,
-				((VNCOS.CaptureAlphaBlending() || m_server->AutoCapt() == 2) && !m_Black_window_active) ? (CAPTUREBLT | SRCCOPY) : SRCCOPY
+				((VNC_OSVersion::getInstance()->CaptureAlphaBlending() || m_server->AutoCapt() == 2) && !m_Black_window_active) ? (CAPTUREBLT | SRCCOPY) : SRCCOPY
 			);
 		}
 		else
@@ -1763,7 +1763,7 @@ vncDesktop::CaptureScreen(const rfb::Rect &rect, BYTE *scrBuff, UINT scrBuffSize
 				rect.tl.y,
 				(rect.br.x - rect.tl.x),
 				(rect.br.y - rect.tl.y),
-				m_hrootdc_Desktop, rect.tl.x + xoffset, rect.tl.y + yoffset, ((VNCOS.CaptureAlphaBlending() || m_server->AutoCapt() == 2) && !m_Black_window_active) ? (CAPTUREBLT | SRCCOPY) : SRCCOPY);
+				m_hrootdc_Desktop, rect.tl.x + xoffset, rect.tl.y + yoffset, ((VNC_OSVersion::getInstance()->CaptureAlphaBlending() || m_server->AutoCapt() == 2) && !m_Black_window_active) ? (CAPTUREBLT | SRCCOPY) : SRCCOPY);
 		}
 		/*#if defined(_DEBUG)
 			DWORD e = GetTimeFunction() - t;
@@ -2303,13 +2303,15 @@ BOOL vncDesktop::InitVideoDriver()
 		if (m_screenCapture != NULL) delete m_screenCapture;
 
 	}
-	if (IsWindows8OrGreater())
+	if (IsWindows8OrGreater() && !VNC_OSVersion::getInstance()->OS_WINPE)
 	{
 		int a = 0;
+		vnclog.Print(LL_INTERR, VNCLOG("Try ddengine\n"));
 		m_screenCapture = new DeskDupEngine;
 	}
 	else
 	{
+		vnclog.Print(LL_INTERR, VNCLOG("Try mirrordriver\n"));
 		m_screenCapture = new VideoDriver;
 	}
 
@@ -2410,7 +2412,7 @@ void vncDesktop::SethookMechanism(BOOL hookall, BOOL hookdriver)
 	else On_Off_hookdll = false;
 	if (old_On_Off_hookdll != On_Off_hookdll) Hookdll_Changed = true;
 	else Hookdll_Changed = false;
-	if (VNCOS.OS_VISTA || VNCOS.OS_WIN7 || VNCOS.OS_WIN8 || VNCOS.OS_WIN10) Hookdll_Changed = true;
+	if (VNC_OSVersion::getInstance()->OS_VISTA || VNC_OSVersion::getInstance()->OS_WIN7 || VNC_OSVersion::getInstance()->OS_WIN8 || VNC_OSVersion::getInstance()->OS_WIN10) Hookdll_Changed = true;
 
 	vnclog.Print(LL_INTERR, VNCLOG("Sethook_restart_wanted hook=%d driver=%d \r\n"), m_hookdll, m_hookdriver);
 	if (Hookdll_Changed)
