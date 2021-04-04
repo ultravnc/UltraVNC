@@ -2142,7 +2142,7 @@ vncClientThread::run(void *arg)
 	DLL_InitializeTouchInjection = NULL;
 	DLL_PInjectTouch = NULL;
 	win8dllHandle = NULL;
-	if (VNCOS.OS_WIN8 || VNCOS.OS_WIN10)
+	if (VNC_OSVersion::getInstance()->OS_WIN8 || VNC_OSVersion::getInstance()->OS_WIN10)
 	{
 		win8dllHandle = LoadLibrary("InjectTouch.dll");
 		DLL_InitializeTouchInjection = (PInitializeTouchInjection) GetProcAddress(win8dllHandle, "DLL_InitializeTouchInjection");

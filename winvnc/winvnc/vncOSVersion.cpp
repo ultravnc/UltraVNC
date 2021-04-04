@@ -25,9 +25,11 @@
 #include <winsock2.h>
 #include <windows.h>
 #include "vncOSVersion.h"
+#include "stdhdrs.h"
 #ifndef SUCCEEDED
 #define SUCCEEDED(hr) (((HRESULT)(hr)) >= 0)
 #endif
+VNC_OSVersion* VNC_OSVersion::vnc_OSVersion = nullptr;
 
 
 typedef LONG NTSTATUS, *PNTSTATUS;
@@ -67,9 +69,11 @@ VNC_OSVersion::VNC_OSVersion()
 	OS_W2K=false;
 	OS_WIN10=false;
 	OS_NOTSUPPORTED=false;
+	OS_BEFOREVISTA = false;
 	OSVERSIONINFO OSversion;	
 	OSversion.dwOSVersionInfoSize=sizeof(OSVERSIONINFO);
 	GetVersionEx(&OSversion);
+	OS_WINPE = isWINPE();
 
 	switch(OSversion.dwPlatformId)
 	{
@@ -77,15 +81,17 @@ VNC_OSVersion::VNC_OSVersion()
 								  if (OSversion.dwMajorVersion==6 && OSversion.dwMinorVersion>=2) OS_WIN8=true;
 								  else if(OSversion.dwMajorVersion==6 && OSversion.dwMinorVersion==1) OS_WIN7=true;
 								  else if(OSversion.dwMajorVersion==6 && OSversion.dwMinorVersion==0) OS_VISTA=true;
-								  else if(OSversion.dwMajorVersion==5 && OSversion.dwMinorVersion==2) OS_XP=true;
-								  else if(OSversion.dwMajorVersion==5 && OSversion.dwMinorVersion==1) OS_XP=true;								  
-								  else if(OSversion.dwMajorVersion==5 && OSversion.dwMinorVersion==0) OS_W2K=true;
+								  else if (OSversion.dwMajorVersion == 5 && OSversion.dwMinorVersion == 2) { OS_XP = true; OS_BEFOREVISTA = true; }
+								  else if (OSversion.dwMajorVersion == 5 && OSversion.dwMinorVersion == 1) { OS_XP = true; OS_BEFOREVISTA = true; }
+								  else if (OSversion.dwMajorVersion == 5 && OSversion.dwMinorVersion == 0) { OS_W2K = true; OS_BEFOREVISTA = true; }
 								  else OS_NOTSUPPORTED=true;
 								  break;
 		case VER_PLATFORM_WIN32_WINDOWS:
 								OS_NOTSUPPORTED=true;
 								break;
 	}
+
+	OS_MINIMUMVISTA = !OS_BEFOREVISTA;
 
 	if (OS_WIN8)
 	{
@@ -125,10 +131,13 @@ VNC_OSVersion::SetAeroState()
 bool
 VNC_OSVersion::CaptureAlphaBlending()
 {
+	if (OS_WINPE) {
+		return true; //WINPE
+	}
 	if (OS_LAYER_ON == false) return false;
 	if (OS_XP) return true;
 	if ((OS_WIN7 || OS_VISTA) && OS_AERO_ON == false) return true;
-	if (OS_LAYER_ON == true && OS_AERO_ON == false) return true; //WINPE
+	if (OS_LAYER_ON == true && OS_AERO_ON == false) return true; 
 	return false;
 }
 
@@ -180,3 +189,22 @@ VNC_OSVersion::ResetAero(VOID)
 		 else OS_AERO_ON=false;	
         
  } 
+
+HWND GetConsoleHwnd(void)
+{
+	return FindWindow("ConsoleWindowClass", NULL);
+}
+
+bool
+VNC_OSVersion::isWINPE(VOID)
+{
+	HKEY hCurrentVersion = NULL;
+	bool winpe = (RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\WinPE", 0, KEY_QUERY_VALUE | KEY_WOW64_64KEY, &hCurrentVersion) == ERROR_SUCCESS);
+	if (winpe) {		
+		HWND hWnd = GetConsoleHwnd();
+		SetWindowLong(hWnd, GWL_EXSTYLE, GetWindowLong(hWnd, GWL_EXSTYLE) & ~WS_EX_LAYERED);
+		RedrawWindow(hWnd, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
+		RegCloseKey(hCurrentVersion);
+	}	
+	return winpe;
+}

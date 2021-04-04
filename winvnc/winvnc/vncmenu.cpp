@@ -375,68 +375,20 @@ vncMenu::vncMenu(vncServer *server)
 //	m_winvnc_icon = LoadIcon(hAppInstance, MAKEINTRESOURCE(IDI_WINVNC));
 //	m_flash_icon = LoadIcon(hAppInstance, MAKEINTRESOURCE(IDI_FLASH));
 	{
-	osvi.dwOSVersionInfoSize = sizeof(osvi);
-	GetVersionEx(&osvi);
-
-	if (osvi.dwPlatformId==VER_PLATFORM_WIN32_NT)
-		{
-		  if(osvi.dwMajorVersion==5 && osvi.dwMinorVersion>=1)
-		  {
-			m_winvnc_icon=(HICON)LoadImage(NULL, "icon1.ico", IMAGE_ICON, GetSystemMetrics(SM_CXSMICON),
-                        GetSystemMetrics(SM_CYSMICON), LR_LOADFROMFILE|LR_DEFAULTCOLOR);
-			m_flash_icon=(HICON)LoadImage(NULL, "icon2.ico", IMAGE_ICON, GetSystemMetrics(SM_CXSMICON),
-                        GetSystemMetrics(SM_CYSMICON), LR_LOADFROMFILE|LR_DEFAULTCOLOR);
-			// [v1.0.2-jp1 fix]
-			//if (!m_winvnc_icon) m_winvnc_icon=(HICON)LoadImage(hAppInstance, MAKEINTRESOURCE(IDI_WINVNC), IMAGE_ICON,
-			if (!m_winvnc_icon) m_winvnc_icon=(HICON)LoadImage(hInstResDLL, MAKEINTRESOURCE(IDI_WINVNC), IMAGE_ICON,
-                        GetSystemMetrics(SM_CXSMICON),
-                        GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR);
-			// [v1.0.2-jp1 fix]
-			//if (!m_flash_icon) m_flash_icon=(HICON)LoadImage(hAppInstance, MAKEINTRESOURCE(IDI_FLASH), IMAGE_ICON,
- 			if (!m_flash_icon) m_flash_icon=(HICON)LoadImage(hInstResDLL, MAKEINTRESOURCE(IDI_FLASH), IMAGE_ICON,
-                       GetSystemMetrics(SM_CXSMICON),
-                        GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR);
-			
-		  }
-		  else
-		 {
-			  m_winvnc_icon=(HICON)LoadImage(NULL, "icon1.ico", IMAGE_ICON, GetSystemMetrics(SM_CXSMICON),
-                        GetSystemMetrics(SM_CYSMICON), LR_LOADFROMFILE|LR_VGACOLOR);
-				m_flash_icon=(HICON)LoadImage(NULL, "icon2.ico", IMAGE_ICON, GetSystemMetrics(SM_CXSMICON),
-                        GetSystemMetrics(SM_CYSMICON), LR_LOADFROMFILE|LR_VGACOLOR);
-				
-			  // [v1.0.2-jp1 fix]
-			  //if (!m_winvnc_icon)m_winvnc_icon=(HICON)LoadImage(hAppInstance, MAKEINTRESOURCE(IDI_WINVNC), IMAGE_ICON,
- 			  if (!m_winvnc_icon)m_winvnc_icon=(HICON)LoadImage(hInstResDLL, MAKEINTRESOURCE(IDI_WINVNC), IMAGE_ICON,
-                       GetSystemMetrics(SM_CXSMICON),
-                        GetSystemMetrics(SM_CYSMICON), LR_VGACOLOR);
-			 // [v1.0.2-jp1 fix]
-			 //if (!m_flash_icon)m_flash_icon=(HICON)LoadImage(hAppInstance, MAKEINTRESOURCE(IDI_FLASH), IMAGE_ICON,
- 			 if (!m_flash_icon)m_flash_icon=(HICON)LoadImage(hInstResDLL, MAKEINTRESOURCE(IDI_FLASH), IMAGE_ICON,
-                       GetSystemMetrics(SM_CXSMICON),
-                        GetSystemMetrics(SM_CYSMICON), LR_VGACOLOR);
-			 
-		  }
-		 }
-	else
-		 {
-				m_winvnc_icon=(HICON)LoadImage(NULL, "icon1.ico", IMAGE_ICON, GetSystemMetrics(SM_CXSMICON),
-                        GetSystemMetrics(SM_CYSMICON), LR_LOADFROMFILE|LR_VGACOLOR);
-				m_flash_icon=(HICON)LoadImage(NULL, "icon2.ico", IMAGE_ICON, GetSystemMetrics(SM_CXSMICON),
-                        GetSystemMetrics(SM_CYSMICON), LR_LOADFROMFILE|LR_VGACOLOR);
-				
-				// [v1.0.2-jp1 fix]
-				//if (!m_winvnc_icon)m_winvnc_icon=(HICON)LoadImage(hAppInstance, MAKEINTRESOURCE(IDI_WINVNC), IMAGE_ICON,
-				if (!m_winvnc_icon)m_winvnc_icon=(HICON)LoadImage(hInstResDLL, MAKEINTRESOURCE(IDI_WINVNC), IMAGE_ICON,
-                       GetSystemMetrics(SM_CXSMICON),
-                        GetSystemMetrics(SM_CYSMICON), LR_VGACOLOR);
-				// [v1.0.2-jp1 fix]
-				//if (!m_flash_icon)m_flash_icon=(HICON)LoadImage(hAppInstance, MAKEINTRESOURCE(IDI_FLASH), IMAGE_ICON,
-				if (!m_flash_icon)m_flash_icon=(HICON)LoadImage(hInstResDLL, MAKEINTRESOURCE(IDI_FLASH), IMAGE_ICON,
-                        GetSystemMetrics(SM_CXSMICON),
-                        GetSystemMetrics(SM_CYSMICON), LR_VGACOLOR);
-				
-		  }
+		m_winvnc_icon=(HICON)LoadImage(NULL, "icon1.ico", IMAGE_ICON, GetSystemMetrics(SM_CXSMICON),
+					GetSystemMetrics(SM_CYSMICON), LR_LOADFROMFILE|LR_DEFAULTCOLOR);
+		m_flash_icon=(HICON)LoadImage(NULL, "icon2.ico", IMAGE_ICON, GetSystemMetrics(SM_CXSMICON),
+					GetSystemMetrics(SM_CYSMICON), LR_LOADFROMFILE|LR_DEFAULTCOLOR);
+		// [v1.0.2-jp1 fix]
+		//if (!m_winvnc_icon) m_winvnc_icon=(HICON)LoadImage(hAppInstance, MAKEINTRESOURCE(IDI_WINVNC), IMAGE_ICON,
+		if (!m_winvnc_icon) m_winvnc_icon=(HICON)LoadImage(hInstResDLL, MAKEINTRESOURCE(IDI_WINVNC), IMAGE_ICON,
+					GetSystemMetrics(SM_CXSMICON),
+					GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR);
+		// [v1.0.2-jp1 fix]
+		//if (!m_flash_icon) m_flash_icon=(HICON)LoadImage(hAppInstance, MAKEINTRESOURCE(IDI_FLASH), IMAGE_ICON,
+ 		if (!m_flash_icon) m_flash_icon=(HICON)LoadImage(hInstResDLL, MAKEINTRESOURCE(IDI_FLASH), IMAGE_ICON,
+					GetSystemMetrics(SM_CXSMICON),
+					GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR);					 
 	}
 
 	// Load the popup menu
@@ -451,6 +403,7 @@ vncMenu::vncMenu(vncServer *server)
 
 vncMenu::~vncMenu()
 {
+	KillTimer(m_hwnd, 1);
 	vnclog.Print(LL_INTERR, VNCLOG("vncmenu killed\n"));
 
 	// adzm 2009-07-05 - Tray icon balloon tips
@@ -529,7 +482,7 @@ vncMenu::AddTrayIcon()
 			}
 			if (m_server->RemoveAeroEnabled()) //PGM @ Advantig
 				DisableAero(); //PGM @ Advantig
-			VNCOS.SetAeroState();
+			VNC_OSVersion::getInstance()->SetAeroState();
 		} //PGM @ Advantig
 	}
 }
@@ -944,7 +897,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			}
 			if (_this->m_server->RemoveAeroEnabled()) // Moved, redundant if //PGM @ Advantig
 				DisableAero(); // Moved, redundant if //PGM @ Advantig
-			VNCOS.SetAeroState();
+			VNC_OSVersion::getInstance()->SetAeroState();
 		} else {
 			if (_this->m_server->RemoveAeroEnabled()) // Moved, redundant if //PGM @ Advantig
 				ResetAero(); // Moved, redundant if //PGM @ Advantig

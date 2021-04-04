@@ -37,9 +37,9 @@ void vncDesktop::SetBlankMonitor(bool enabled)
     {
 	    if (enabled)
 	    {
-			if (VNCOS.OS_AERO_ON) VNCOS.DisableAero();
+			if (VNC_OSVersion::getInstance()->OS_AERO_ON) VNC_OSVersion::getInstance()->DisableAero();
 			Sleep(1000);
-		    if (!VNCOS.CaptureAlphaBlending() || VideoBuffer())
+		    if (!VNC_OSVersion::getInstance()->CaptureAlphaBlending() || VideoBuffer())
 		    {			   
 			    SendMessage(m_hwnd,WM_SYSCOMMAND,SC_MONITORPOWER,(LPARAM)2);
 				m_screen_in_powersave=true;
@@ -55,7 +55,7 @@ void vncDesktop::SetBlankMonitor(bool enabled)
 	    }
 	    else // Monitor On
 	    {			
-		    if (!VNCOS.CaptureAlphaBlending() || VideoBuffer())
+		    if (!VNC_OSVersion::getInstance()->CaptureAlphaBlending() || VideoBuffer())
 		    {			   
 			    SendMessage(m_hwnd,WM_SYSCOMMAND,SC_MONITORPOWER,(LPARAM)-1);
 				//win8 require mouse move
@@ -73,7 +73,7 @@ void vncDesktop::SetBlankMonitor(bool enabled)
 			    if (Blackhnd) PostMessage(Blackhnd, WM_CLOSE, 0, 0);
 			    m_Black_window_active=false;
 		    }
-			VNCOS.ResetAero();
+			VNC_OSVersion::getInstance()->ResetAero();
 	    }
     }
 }
