@@ -2306,10 +2306,12 @@ BOOL vncDesktop::InitVideoDriver()
 	if (IsWindows8OrGreater() && !VNC_OSVersion::getInstance()->OS_WINPE)
 	{
 		int a = 0;
+		vnclog.Print(LL_INTERR, VNCLOG("Try ddengine\n"));
 		m_screenCapture = new DeskDupEngine;
 	}
 	else
 	{
+		vnclog.Print(LL_INTERR, VNCLOG("Try mirrordriver\n"));
 		m_screenCapture = new VideoDriver;
 	}
 
