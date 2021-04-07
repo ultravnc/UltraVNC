@@ -8327,6 +8327,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						_this->AddRemoveScrollbars(hwnd, Rtb);						
 
 						if (_this->m_opts.m_Directx) { // full-screen mode
+							GetClientRect(hwnd, &rect);
 							_this->m_cliwidth = rect.right - rect.left;
 							_this->m_cliheight = (int)(rect.bottom - rect.top);
 
