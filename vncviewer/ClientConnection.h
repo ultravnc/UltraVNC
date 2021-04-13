@@ -829,6 +829,10 @@ private:
 	bool desktopsize_requested;
 	int ShowToolbar;
 	bool ExtDesktop;
+	int prevMouseX;
+	int prevMousey;
+	DWORD prevMousekeyflags;
+	UINT prevMousemsg;
 
 public:
 	// RFB settings

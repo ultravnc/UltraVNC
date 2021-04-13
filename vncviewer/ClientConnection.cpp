@@ -4454,20 +4454,26 @@ inline bool ClientConnection::ProcessPointerEvent(int x, int y, DWORD keyflags, 
 {
 	//adzm 2010-09 - Throttle mousemove events
 	if (msg == WM_MOUSEMOVE) {
-		bool bMouseKeyDown = (keyflags & (MK_LBUTTON|MK_MBUTTON|MK_RBUTTON|MK_XBUTTON1|MK_XBUTTON2)) != 0;
-		if (m_PendingMouseMove.ShouldThrottle(bMouseKeyDown)) {
-			m_PendingMouseMove.x = x;
-			m_PendingMouseMove.y = y;
-			m_PendingMouseMove.keyflags = keyflags;
-			m_PendingMouseMove.bValid = true;
+		if (prevMouseX != x || prevMousey != y || prevMousekeyflags != keyflags) {
+			prevMouseX = x;
+			prevMousey = y;
+			prevMousekeyflags = keyflags;
+			bool bMouseKeyDown = (keyflags & (MK_LBUTTON | MK_MBUTTON | MK_RBUTTON | MK_XBUTTON1 | MK_XBUTTON2)) != 0;
+			if (m_PendingMouseMove.ShouldThrottle(bMouseKeyDown)) {
+				m_PendingMouseMove.x = x;
+				m_PendingMouseMove.y = y;
+				m_PendingMouseMove.keyflags = keyflags;
+				m_PendingMouseMove.bValid = true;
 
-			m_flushMouseMoveTimer = SetTimer(m_hwndcn, IDT_FLUSHMOUSEMOVETIMER, m_PendingMouseMove.dwMinimumMouseMoveInterval, NULL);
+				m_flushMouseMoveTimer = SetTimer(m_hwndcn, IDT_FLUSHMOUSEMOVETIMER, m_PendingMouseMove.dwMinimumMouseMoveInterval, NULL);
 
-			// this is the only time we will return false!
-			return false;
-		} else {
-			m_PendingMouseMove.bValid = false;
-			m_PendingMouseMove.dwLastSentMouseMove = GetTickCount();
+				// this is the only time we will return false!
+				return false;
+			}
+			else {
+				m_PendingMouseMove.bValid = false;
+				m_PendingMouseMove.dwLastSentMouseMove = GetTickCount();
+			}
 		}
 	} else {
 		//adzm 2010-09 - If we are sending an input, ensure the mouse is moved to the last known spot before sending
