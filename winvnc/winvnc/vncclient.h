@@ -69,6 +69,8 @@ typedef std::list<vncClientId> vncClientList;
 // adzm - 2010-07 - Extended clipboard
 #include "common/Clipboard.h"
 
+#include "MouseSimulator.h"
+
 // The vncClient class itself
 typedef UINT (WINAPI *pSendinput)(UINT,LPINPUT,INT);
 #define SPI_GETMOUSESPEED         0x0070
@@ -464,7 +466,7 @@ public:
 	//int Totalsend;
 	BOOL client_settings_passed;
 	bool initialCapture_done;
-	bool has_mouse;
+	void SetHasMouse(bool has_mouse);
 	bool ask_mouse;
 	bool sendingUpdate;
 	bool		m_Autoreconnect;
@@ -473,6 +475,8 @@ public:
 
 	// Internal stuffs
 protected:
+	bool has_mouse;
+	SimulateCursor* simulateCursor;
 	// Per-client settings
 	BOOL			m_IsLoopback;
 	BOOL			m_keyboardenabled;

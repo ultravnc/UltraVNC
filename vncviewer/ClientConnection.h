@@ -314,7 +314,7 @@ private:
 	int initialupdate_counter;
 	void ReadScreenUpdate();
 	void Update(RECT *pRect);
-	void SizeWindow(bool reconnect = false, bool SizeMultimon = true, bool setPosition = false);
+	void SizeWindow(bool reconnect = false, bool SizeMultimon = true);
 	bool ScrollScreen(int dx, int dy, bool absolute = false);
 	void UpdateScrollbars();
 	void AddRemoveScrollbars(HWND hwnd, RECT Rtb);
@@ -829,6 +829,10 @@ private:
 	bool desktopsize_requested;
 	int ShowToolbar;
 	bool ExtDesktop;
+	int prevMouseX;
+	int prevMousey;
+	DWORD prevMousekeyflags;
+	UINT prevMousemsg;
 
 public:
 	// RFB settings

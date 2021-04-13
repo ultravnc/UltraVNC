@@ -659,7 +659,7 @@ void ClientConnection::Run()
 	WatchClipboard();
 
 	Createdib();
-	SizeWindow(false, false, true);
+	SizeWindow(false, false);
 
 	// This starts the worker thread.
 	// The rest of the processing continues in run_undetached.
@@ -3645,10 +3645,10 @@ void ClientConnection::ReadServerInit(bool reconnect)
 
 	if (m_opts.m_ViewOnly) SetWindowText(m_hwndMain, m_desktopName_viewonly);
 	else SetWindowText(m_hwndMain, m_desktopName);
-	SizeWindow(reconnect, false, true);
+	SizeWindow(reconnect, false);
 }
 
-void ClientConnection::SizeWindow(bool reconnect, bool sizeMultimon, bool setPosition)
+void ClientConnection::SizeWindow(bool reconnect, bool sizeMultimon)
 {
 	int uni_screenWidth = extSDisplay ? widthExtSDisplay : m_si.framebufferWidth;
 	int uni_screenHeight = extSDisplay ? heightExtSDisplay : m_si.framebufferHeight;
@@ -3828,7 +3828,7 @@ void ClientConnection::SizeWindow(bool reconnect, bool sizeMultimon, bool setPos
 	else
 	{
         
-		if (pos_set == false && setPosition)
+		if (pos_set == false) 
 			SetWindowPos(m_hwndMain, HWND_TOP, workrect.left + (workwidth - m_winwidth) / 2, workrect.top + (workheight - m_winheight) / 2, m_winwidth, m_winheight, SWP_SHOWWINDOW | SWP_NOSIZE);
         if (size_set == false)
         {
@@ -4454,20 +4454,26 @@ inline bool ClientConnection::ProcessPointerEvent(int x, int y, DWORD keyflags, 
 {
 	//adzm 2010-09 - Throttle mousemove events
 	if (msg == WM_MOUSEMOVE) {
-		bool bMouseKeyDown = (keyflags & (MK_LBUTTON|MK_MBUTTON|MK_RBUTTON|MK_XBUTTON1|MK_XBUTTON2)) != 0;
-		if (m_PendingMouseMove.ShouldThrottle(bMouseKeyDown)) {
-			m_PendingMouseMove.x = x;
-			m_PendingMouseMove.y = y;
-			m_PendingMouseMove.keyflags = keyflags;
-			m_PendingMouseMove.bValid = true;
+		if (prevMouseX != x || prevMousey != y || prevMousekeyflags != keyflags) {
+			prevMouseX = x;
+			prevMousey = y;
+			prevMousekeyflags = keyflags;
+			bool bMouseKeyDown = (keyflags & (MK_LBUTTON | MK_MBUTTON | MK_RBUTTON | MK_XBUTTON1 | MK_XBUTTON2)) != 0;
+			if (m_PendingMouseMove.ShouldThrottle(bMouseKeyDown)) {
+				m_PendingMouseMove.x = x;
+				m_PendingMouseMove.y = y;
+				m_PendingMouseMove.keyflags = keyflags;
+				m_PendingMouseMove.bValid = true;
 
-			m_flushMouseMoveTimer = SetTimer(m_hwndcn, IDT_FLUSHMOUSEMOVETIMER, m_PendingMouseMove.dwMinimumMouseMoveInterval, NULL);
+				m_flushMouseMoveTimer = SetTimer(m_hwndcn, IDT_FLUSHMOUSEMOVETIMER, m_PendingMouseMove.dwMinimumMouseMoveInterval, NULL);
 
-			// this is the only time we will return false!
-			return false;
-		} else {
-			m_PendingMouseMove.bValid = false;
-			m_PendingMouseMove.dwLastSentMouseMove = GetTickCount();
+				// this is the only time we will return false!
+				return false;
+			}
+			else {
+				m_PendingMouseMove.bValid = false;
+				m_PendingMouseMove.dwLastSentMouseMove = GetTickCount();
+			}
 		}
 	} else {
 		//adzm 2010-09 - If we are sending an input, ensure the mouse is moved to the last known spot before sending
@@ -5043,9 +5049,9 @@ void* ClientConnection::run_undetached(void* arg) {
 	//adzm 2010-09 - all socket writes must remain on a single thread
 	SendFullFramebufferUpdateRequest(false);
 
-	SizeWindow(false, false, true);
+	SizeWindow(false, false);
 	RealiseFullScreenMode();
-	if (!InFullScreenMode()) SizeWindow(false, false, true);
+	if (!InFullScreenMode()) SizeWindow(false, false);
 
 	m_running = true;
 	UpdateWindow(m_hwndcn);

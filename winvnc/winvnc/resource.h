@@ -11,11 +11,19 @@
 #define IDR_CIPHER_CLASS                121
 #define IDR_CRYPTOUTILS_CLASS           123
 #define IDR_IDEACIPHER_CLASS            124
+#define IDC_CURSOR1                     129
+#define IDC_CURSOR2                     130
 #define IDD_ABOUT                       131
 #define IDB_VNCLOGO                     132
+#define IDC_CURSOR4                     132
+#define IDC_CURSORBLANK                 133
 #define IDI_FLASH                       134
+#define IDC_CURSOR6                     134
 #define IDD_OUTGOING_CONN               135
+#define IDC_CURSOR7                     135
 #define IDD_ACCEPT_CONN                 136
+#define IDC_CURSOR8                     136
+#define IDC_CURSOR9                     137
 #define IDD_PATHS                       138
 #define IDB_LOGO64                      139
 #define IDD_TEXTCHAT_DLG                140
@@ -124,6 +132,7 @@
 #define IDC_VIRTUAL                     1068
 #define IDC_CONNECT_XDMCP               1069
 #define IDC_BLANK                       1070
+#define IDC_CURSOR3                     1070
 #define IDC_BLANK2                      1071
 #define IDC_TURBOMODE                   1075
 #define IDC_SEND_B                      1078
