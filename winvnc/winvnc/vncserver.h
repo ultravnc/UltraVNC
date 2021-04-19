@@ -475,7 +475,7 @@ public:
     }
 
 	void TriggerUpdate();
-	void set_has_mouse();
+	void SetHasMouse();
 
 	bool OS_Shutdown;
 	void StopReconnectAll();

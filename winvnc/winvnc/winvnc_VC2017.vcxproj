@@ -1195,6 +1195,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\win8</Command>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='IPV6|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="MouseSimulator.cpp" />
     <ClCompile Include="read_write_ini.cpp" />
     <ClCompile Include="rfbRegion_win32.cpp" />
     <ClCompile Include="rfbRegion_X11.cxx">
@@ -2509,6 +2510,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\win8</Command>
     <ClInclude Include="inifile.h" />
     <ClInclude Include="IPC.h" />
     <ClInclude Include="keysymdef.h" />
+    <ClInclude Include="MouseSimulator.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="rfb.h" />
     <ClInclude Include="rfbMisc.h" />
@@ -2580,6 +2582,24 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\win8</Command>
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="cursor1.cur" />
+    <None Include="cursor2.cur" />
+    <None Include="cursor3.cur" />
+    <None Include="cursor4.cur" />
+    <None Include="cursor5.cur" />
+    <None Include="cursor6.cur" />
+    <None Include="cursor7.cur" />
+    <None Include="cursor8.cur" />
+    <None Include="cursor9.cur" />
+    <None Include="res\cursor1.cur" />
+    <None Include="res\cursor2.cur" />
+    <None Include="res\cursor3.cur" />
+    <None Include="res\cursor4.cur" />
+    <None Include="res\cursor5.cur" />
+    <None Include="res\cursor6.cur" />
+    <None Include="res\cursor7.cur" />
+    <None Include="res\cursor8.cur" />
+    <None Include="res\cursor9.cur" />
     <None Include="res\mslogon\AuthPanel.class" />
     <None Include="res\mslogon\ButtonPanel.class" />
     <None Include="res\mslogon\ClipboardFrame.class" />

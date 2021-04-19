@@ -3295,24 +3295,19 @@ vncClientThread::run(void *arg)
 						(msg.pe.buttonMask & rfbButton1Mask) != (m_client->m_ptrevent.buttonMask & rfbButton1Mask)) {
 						if (!m_client->has_mouse) {
 							m_client->ask_mouse = true;
-							m_server->set_has_mouse();
-							return;
+							m_server->SetHasMouse();
 						}
 					}
 
 					if (!m_client->has_mouse) {
 						int xx = msg.pe.x - GetSystemMetrics(SM_XVIRTUALSCREEN) + (m_client->monitor_Offsetx + m_client->m_ScreenOffsetx);
 						int yy = msg.pe.y - GetSystemMetrics(SM_YVIRTUALSCREEN) + (m_client->monitor_Offsety + m_client->m_ScreenOffsety);
-						if (m_server->Driver()) //chris
-						{
+						if (m_server->Driver()){
 							xx = msg.pe.x + m_client->monitor_Offsetx;
 							yy = msg.pe.y + m_client->monitor_Offsety;
-							//vnclog.Print(LL_INTINFO, VNCLOG("MouseMove m_cursor_pos(%d, %d), new(%d, %d)\n"),
-							//    xx, yy, msg.pe.x, msg.pe.y);
 						}
-						char			szText[256];
-						sprintf_s(szText, "%i %i \n", xx, yy);
-						OutputDebugString(szText);
+						if(m_client->simulateCursor)
+							m_client->simulateCursor->moveCursor(xx, yy);
 						break;
 					}
 
@@ -4653,6 +4648,7 @@ vncClient::vncClient() : m_clipboard(ClipboardSettings::defaultServerCaps), Send
 	m_firstExtDesktopIncremental = true;
 	has_mouse = false;
 	ask_mouse = false;
+	simulateCursor = NULL;
 }
 
 vncClient::~vncClient()
@@ -4748,6 +4744,9 @@ vncClient::~vncClient()
 	}
 	if (m_server->virtualDisplay)
 		m_server->virtualDisplay->disconnectDisplay(m_id, !m_server->AreThereMultipleViewers() && initialCapture_done);
+	if (simulateCursor)
+		delete simulateCursor;
+
 }
 
 // Init
@@ -6878,4 +6877,19 @@ int  vncClient::filetransferrequestPart2(int nDirZipRet)
 		CloseHandle(ThreadHandleCompressFolder);
 	ThreadHandleCompressFolder = NULL;
 	return 0;
+}
+
+extern HINSTANCE	hAppInstance;
+void vncClient::SetHasMouse(bool has_mouse)
+{
+	this->has_mouse = has_mouse;
+	if (has_mouse) {
+		if (simulateCursor)
+			delete simulateCursor;
+		simulateCursor = NULL;
+	}
+	else {
+		simulateCursor = new SimulateCursor(hAppInstance);
+	}
+
 }
