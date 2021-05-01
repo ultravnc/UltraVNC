@@ -1125,6 +1125,27 @@ vncClientThread::InitAuthenticate()
 		}
 	}
 
+	if (m_server->getNumberViewers() > m_server->getMaxViewers() -1)
+	{
+		if (m_server->getMaxViewerSetting() == 0) {
+			SendConnFailed("Max viewers reached");
+			return FALSE;
+		}
+		else {
+
+			m_server->AddAuthHostsBlacklist(m_client->GetClientName());
+			m_server->AddAuthHostsBlacklist(m_client->GetClientName());
+			m_server->AddAuthHostsBlacklist(m_client->GetClientName());
+			m_server->AddAuthHostsBlacklist(m_client->GetClientName());
+			m_server->AddAuthHostsBlacklist(m_client->GetClientName());
+			m_server->AddAuthHostsBlacklist(m_client->GetClientName());
+			
+			m_server->GetClient(m_server->getOldestViewer())->Kill();
+			m_client->forceBlacklist = true;
+		}
+
+	}
+
 
 	// Read the client's initialisation message
 	rfbClientInitMsg client_ini;
@@ -2248,7 +2269,9 @@ vncClientThread::run(void *arg)
 	}
 
 	// Authenticated OK - remove from blacklist and remove timeout
-	m_server->RemAuthHostsBlacklist(m_client->GetClientName());
+	if (!m_client->forceBlacklist)
+		m_server->RemAuthHostsBlacklist(m_client->GetClientName());
+	m_client->forceBlacklist = false;
 	m_socket->SetTimeout(m_server->AutoIdleDisconnectTimeout()*1000);
 	vnclog.Print(LL_INTINFO, VNCLOG("authenticated connection\n"));
 
@@ -4649,6 +4672,7 @@ vncClient::vncClient() : m_clipboard(ClipboardSettings::defaultServerCaps), Send
 	has_mouse = false;
 	ask_mouse = false;
 	simulateCursor = NULL;
+	forceBlacklist = false;
 }
 
 vncClient::~vncClient()

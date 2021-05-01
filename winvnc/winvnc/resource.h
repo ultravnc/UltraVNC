@@ -225,6 +225,10 @@
 #define IDC_STATICFPS5                  1151
 #define IDC_STATICFPS60                 1152
 #define IDC_STATICFPS                   1152
+#define IDC_MAXVIEWERS                  1153
+#define IDC_MAXREFUSE                   1154
+#define IDC_RADIO6                      1155
+#define IDC_MAXDISCONNECT               1155
 #define IDC_SHOWOPTIONS                 2032
 #define IDC_BUTTON_EXPAND               2048
 #define IDC_FINGER                      9000
@@ -316,7 +320,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        176
 #define _APS_NEXT_COMMAND_VALUE         40030
-#define _APS_NEXT_CONTROL_VALUE         1153
+#define _APS_NEXT_CONTROL_VALUE         1156
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

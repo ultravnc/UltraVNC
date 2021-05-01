@@ -645,6 +645,27 @@ vncProperties::DialogProc(HWND hwnd,
 				TRUE,
 				0);
 
+			HWND hMaxViewerSetting;
+			switch (_this->m_server->getMaxViewerSetting()) {
+			case 0:
+				hMaxViewerSetting = GetDlgItem(hwnd, IDC_MAXREFUSE);
+				break;
+			case 1:
+				hMaxViewerSetting = GetDlgItem(hwnd, IDC_MAXDISCONNECT);
+				break;
+			default:
+				hMaxViewerSetting = GetDlgItem(hwnd, IDC_MAXREFUSE);
+			};
+			SendMessage(hMaxViewerSetting,
+				BM_SETCHECK,
+				TRUE,
+				0);
+
+			char maxviewersChar[128];
+			UINT maxviewers = _this->m_server->getMaxViewers();
+			sprintf_s(maxviewersChar, "%d", (int)maxviewers);
+			SetDlgItemText(hwnd, IDC_MAXVIEWERS, (const char*)maxviewersChar);
+
 			// sf@2002 - List available DSM Plugins
 			HWND hPlugins = GetDlgItem(hwnd, IDC_PLUGINS_COMBO);
 			int nPlugins = _this->m_server->GetDSMPluginPointer()->ListPlugins(hPlugins);
@@ -877,6 +898,26 @@ vncProperties::DialogProc(HWND hwnd,
 					== BST_CHECKED) {
 					_this->m_server->SetQueryAccept(1);
 				} 
+
+				if (SendMessage(GetDlgItem(hwnd, IDC_MAXREFUSE), BM_GETCHECK, 0, 0)
+					== BST_CHECKED) {
+					_this->m_server->setMaxViewerSetting(0);
+				}
+				else if (SendMessage(GetDlgItem(hwnd, IDC_MAXDISCONNECT), BM_GETCHECK, 0, 0)
+					== BST_CHECKED) {
+					_this->m_server->setMaxViewerSetting(1);
+				}
+
+				char maxViewerChar[256];
+				strcpy_s(maxViewerChar, "128");				
+				if (GetDlgItemText(hwnd, IDC_MAXVIEWERS, (LPSTR)&maxViewerChar, 256) == 0) {
+					int value = atoi(maxViewerChar);
+					if (value > 128) 
+						value = 128;
+					_this->m_server->setMaxViewers(value);
+				}
+				else
+					_this->m_server->setMaxViewers(atoi(maxViewerChar));
 
 				if (SendMessage(GetDlgItem(hwnd, IDC_MV1), BM_GETCHECK, 0, 0)
 					== BST_CHECKED) {
@@ -1685,6 +1726,8 @@ LABELUSERSETTINGS:
 	m_pref_QueryDisableTime=0;
 	m_pref_QueryAccept=0;
 	m_pref_IdleTimeout=0;
+	m_pref_MaxViewerSetting = 0;
+	m_pref_MaxViewers = 128;
 	m_pref_EnableRemoteInputs=TRUE;
 	m_pref_DisableLocalInputs=FALSE;
 	m_pref_EnableJapInput=FALSE;
@@ -1832,6 +1875,11 @@ vncProperties::LoadUserPrefs(HKEY appkey)
 	m_pref_QueryAccept=LoadInt(appkey, "QueryAccept", m_pref_QueryAccept);
 	m_server->SetQueryAccept(m_pref_QueryAccept);
 
+	m_pref_MaxViewerSetting = LoadInt(appkey, "MaxViewerSetting", m_pref_MaxViewerSetting);
+	m_server->setMaxViewerSetting(m_pref_MaxViewerSetting);
+	m_pref_MaxViewers = LoadInt(appkey, "MaxViewers", m_pref_MaxViewers);
+	m_server->setMaxViewers(m_pref_MaxViewers);	
+
 	// marscha@2006 - Is AcceptDialog required even if no user is logged on
 	m_pref_QueryIfNoLogon=LoadInt(appkey, "QueryIfNoLogon", m_pref_QueryIfNoLogon);
 	m_server->SetQueryIfNoLogon(m_pref_QueryIfNoLogon);
@@ -1870,6 +1918,8 @@ vncProperties::ApplyUserPrefs()
 	m_server->SetQueryTimeout(m_pref_QueryTimeout);
 	m_server->SetQueryDisableTime(m_pref_QueryDisableTime);
 	m_server->SetQueryAccept(m_pref_QueryAccept);
+	m_server->setMaxViewerSetting(m_pref_MaxViewerSetting);
+	m_server->setMaxViewers(m_pref_MaxViewers);
 	m_server->SetAutoIdleDisconnectTimeout(m_pref_IdleTimeout);
 	m_server->EnableRemoveWallpaper(m_pref_RemoveWallpaper);
 	// adzm - 2010-07 - Disable more effects or font smoothing
@@ -2127,6 +2177,8 @@ vncProperties::SaveUserPrefs(HKEY appkey)
 	SaveInt(appkey, "QueryTimeout", m_server->QueryTimeout());
 	SaveInt(appkey, "QueryDisableTime", m_server->QueryDisableTime());
 	SaveInt(appkey, "QueryAccept", m_server->QueryAcceptForSave());
+	SaveInt(appkey, "MaxViewerSetting", m_server->getMaxViewerSetting());
+	SaveInt(appkey, "MaxViewers", m_server->getMaxViewers());
 
 	// Lock settings
 	SaveInt(appkey, "LockSetting", m_server->LockSettings());
@@ -2256,6 +2308,8 @@ void vncProperties::LoadFromIniFile()
 	m_pref_QueryDisableTime=0;
 	m_pref_QueryAccept=0;
 	m_pref_IdleTimeout=0;
+	m_pref_MaxViewerSetting = 0;
+	m_pref_MaxViewers = 128;
 	m_pref_EnableRemoteInputs=TRUE;
 	m_pref_DisableLocalInputs=FALSE;
 	m_pref_EnableJapInput=FALSE;
@@ -2355,6 +2409,11 @@ void vncProperties::LoadUserPrefsFromIniFile()
 	m_server->SetQueryDisableTime(m_pref_QueryDisableTime);	
 	m_pref_QueryAccept=myIniFile.ReadInt("admin", "QueryAccept", m_pref_QueryAccept);
 	m_server->SetQueryAccept(m_pref_QueryAccept);
+
+	m_pref_MaxViewerSetting = myIniFile.ReadInt("admin", "MaxViewerSetting", m_pref_MaxViewerSetting);
+	m_server->setMaxViewerSetting(m_pref_MaxViewerSetting);
+	m_pref_MaxViewers = myIniFile.ReadInt("admin", "MaxViewers", m_pref_MaxViewers);
+	m_server->setMaxViewers(m_pref_MaxViewers);
 
 	// marscha@2006 - Is AcceptDialog required even if no user is logged on
 	m_pref_QueryIfNoLogon=myIniFile.ReadInt("admin", "QueryIfNoLogon", m_pref_QueryIfNoLogon);
@@ -2503,6 +2562,8 @@ void vncProperties::SaveUserPrefsToIniFile()
 	myIniFile.WriteInt("admin", "QueryTimeout", m_server->QueryTimeout());
 	myIniFile.WriteInt("admin", "QueryDisableTime", m_server->QueryDisableTime());
 	myIniFile.WriteInt("admin", "QueryAccept", m_server->QueryAcceptForSave());
+	myIniFile.WriteInt("admin", "MaxViewerSetting", m_server->getMaxViewerSetting());
+	myIniFile.WriteInt("admin", "MaxViewers", m_server->getMaxViewers());
 
 	// Lock settings
 	myIniFile.WriteInt("admin", "LockSetting", m_server->LockSettings());

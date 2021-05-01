@@ -151,6 +151,8 @@ public:
 	virtual void InitialUpdate(bool value);
 	virtual void AutoCapt(int autocapt);
 	virtual int AutoCapt() { return m_autocapt; }
+	short getOldestViewer();
+	int getNumberViewers();
 
 	virtual BOOL All_clients_initialalized();
 	void initialCapture_done();
@@ -342,6 +344,26 @@ public:
 	// marscha@2006 - Is AcceptDialog required even if no user is logged on
     virtual void SetQueryIfNoLogon(const UINT setting) {m_queryifnologon = (setting != 0);};
 	virtual BOOL QueryIfNoLogon() {return m_queryifnologon;};
+
+	UINT getMaxViewerSetting()
+	{
+		return m_maxViewerSetting;
+	};
+
+	void setMaxViewerSetting(const UINT setting)
+	{
+		m_maxViewerSetting = setting;
+	};
+
+	UINT getMaxViewers()
+	{
+		return m_maxViewers;
+	};
+
+	void setMaxViewers(const UINT setting)
+	{
+		m_maxViewers = setting;
+	};
 
 	// Whether or not to allow connections from the local machine
 	virtual void SetLoopbackOk(BOOL ok) {m_loopback_allowed = ok;};
@@ -541,6 +563,8 @@ protected:
 	BOOL				m_queryifnologon;
  	UINT				m_idle_timeout;
 
+	UINT				m_maxViewerSetting;
+	UINT				m_maxViewers;
 	BOOL				m_remove_wallpaper;
 	// adzm - 2010-07 - Disable more effects or font smoothing
 	BOOL				m_remove_effects;

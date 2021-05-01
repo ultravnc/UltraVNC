@@ -80,6 +80,9 @@ LONG QueryDisableTime=0;
 LONG QueryAccept=4;
 LONG QueryIfNoLogon=1;
 
+LONG MaxViewerSettings = 0;
+LONG MaxViewers = 128;
+
 LONG EnableRemoteInputs=1;
 LONG LockSettings=0;
 LONG DisableLocalInputs=0;
@@ -251,6 +254,11 @@ myIniFile_Out.WriteInt("admin", "QueryTimeout", QueryTimeout);
 myIniFile_Out.WriteInt("admin", "QueryDisableTime", QueryDisableTime);
 myIniFile_Out.WriteInt("admin", "QueryAccept", QueryAccept);
 myIniFile_Out.WriteInt("admin", "QueryIfNoLogon", QueryIfNoLogon);
+
+MaxViewerSettings = myIniFile_In.ReadInt("admin", "MaxViewerSetting", MaxViewerSettings);
+myIniFile_Out.WriteInt("admin", "MaxViewerSetting", MaxViewerSettings);
+MaxViewers = myIniFile_In.ReadInt("admin", "MaxViewers", MaxViewers);
+myIniFile_Out.WriteInt("admin", "MaxViewers", MaxViewers);
 
 myIniFile_In.ReadPassword(passwd,MAXPWLEN);
 myIniFile_Out.WritePassword(passwd);
