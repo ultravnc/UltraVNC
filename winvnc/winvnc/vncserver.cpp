@@ -153,6 +153,7 @@ vncServer::vncServer()
 
 	m_maxViewerSetting = 0;
 	m_maxViewers = 128;
+	m_Collabo = false;
 	// Autolock settings
 	m_lock_on_exit = 0;
 

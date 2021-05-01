@@ -3313,25 +3313,27 @@ vncClientThread::run(void *arg)
 						    ? MOUSEEVENTF_RIGHTDOWN : MOUSEEVENTF_RIGHTUP;
 					}
 
-					if ((msg.pe.buttonMask & rfbButton1Mask) != (m_client->m_ptrevent.buttonMask & rfbButton1Mask) ||
-						(msg.pe.buttonMask & rfbButton2Mask) != (m_client->m_ptrevent.buttonMask & rfbButton2Mask) ||
-						(msg.pe.buttonMask & rfbButton1Mask) != (m_client->m_ptrevent.buttonMask & rfbButton1Mask)) {
-						if (!m_client->has_mouse) {
-							m_client->ask_mouse = true;
-							m_server->SetHasMouse();
+					if (m_server->getCollabo()) {
+						if ((msg.pe.buttonMask & rfbButton1Mask) != (m_client->m_ptrevent.buttonMask & rfbButton1Mask) ||
+							(msg.pe.buttonMask & rfbButton2Mask) != (m_client->m_ptrevent.buttonMask & rfbButton2Mask) ||
+							(msg.pe.buttonMask & rfbButton1Mask) != (m_client->m_ptrevent.buttonMask & rfbButton1Mask)) {
+							if (!m_client->has_mouse) {
+								m_client->ask_mouse = true;
+								m_server->SetHasMouse();
+							}
 						}
-					}
 
-					if (!m_client->has_mouse) {
-						int xx = msg.pe.x - GetSystemMetrics(SM_XVIRTUALSCREEN) + (m_client->monitor_Offsetx + m_client->m_ScreenOffsetx);
-						int yy = msg.pe.y - GetSystemMetrics(SM_YVIRTUALSCREEN) + (m_client->monitor_Offsety + m_client->m_ScreenOffsety);
-						if (m_server->Driver()){
-							xx = msg.pe.x + m_client->monitor_Offsetx;
-							yy = msg.pe.y + m_client->monitor_Offsety;
+						if (!m_client->has_mouse) {
+							int xx = msg.pe.x - GetSystemMetrics(SM_XVIRTUALSCREEN) + (m_client->monitor_Offsetx + m_client->m_ScreenOffsetx);
+							int yy = msg.pe.y - GetSystemMetrics(SM_YVIRTUALSCREEN) + (m_client->monitor_Offsety + m_client->m_ScreenOffsety);
+							if (m_server->Driver()){
+								xx = msg.pe.x + m_client->monitor_Offsetx;
+								yy = msg.pe.y + m_client->monitor_Offsety;
+							}
+							if(m_client->simulateCursor)
+								m_client->simulateCursor->moveCursor(xx, yy);
+							break;
 						}
-						if(m_client->simulateCursor)
-							m_client->simulateCursor->moveCursor(xx, yy);
-						break;
 					}
 
 

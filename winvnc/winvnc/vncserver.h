@@ -355,6 +355,16 @@ public:
 		m_maxViewerSetting = setting;
 	};
 
+	BOOL getCollabo()
+	{
+		return m_Collabo;
+	};
+
+	void setCollabo(const BOOL setting)
+	{
+		m_Collabo = setting;
+	};
+
 	UINT getMaxViewers()
 	{
 		return m_maxViewers;
@@ -565,6 +575,7 @@ protected:
 
 	UINT				m_maxViewerSetting;
 	UINT				m_maxViewers;
+	BOOL				m_Collabo;
 	BOOL				m_remove_wallpaper;
 	// adzm - 2010-07 - Disable more effects or font smoothing
 	BOOL				m_remove_effects;

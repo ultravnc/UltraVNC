@@ -82,6 +82,7 @@ LONG QueryIfNoLogon=1;
 
 LONG MaxViewerSettings = 0;
 LONG MaxViewers = 128;
+LONG Collabo = 0;
 
 LONG EnableRemoteInputs=1;
 LONG LockSettings=0;
@@ -259,6 +260,8 @@ MaxViewerSettings = myIniFile_In.ReadInt("admin", "MaxViewerSetting", MaxViewerS
 myIniFile_Out.WriteInt("admin", "MaxViewerSetting", MaxViewerSettings);
 MaxViewers = myIniFile_In.ReadInt("admin", "MaxViewers", MaxViewers);
 myIniFile_Out.WriteInt("admin", "MaxViewers", MaxViewers);
+Collabo = myIniFile_In.ReadInt("admin", "Collabo", Collabo);
+myIniFile_Out.WriteInt("admin", "Collabo", Collabo);
 
 myIniFile_In.ReadPassword(passwd,MAXPWLEN);
 myIniFile_Out.WritePassword(passwd);
