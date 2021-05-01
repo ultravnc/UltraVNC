@@ -60,6 +60,7 @@ public:
 	bool OS_MINIMUMVISTA;
 	bool AeroWasEnabled;
 	bool isWINPE(VOID);
+	void removeAlpha();
 	bool OS_WINPE;
 protected:	
 	HMODULE DMdll; 

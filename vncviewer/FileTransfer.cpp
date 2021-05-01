@@ -54,7 +54,7 @@
 #include <zstd.h>
 #else
 #include "../zlib/zlib.h"
-#include "../zstd-1.4.4/lib/zstd.h"
+#include "../zstd/lib/zstd.h"
 #endif
 #include "Log.h"
 #include <string>

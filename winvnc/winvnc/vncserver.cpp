@@ -151,6 +151,9 @@ vncServer::vncServer()
 	m_querytimeout = 10;
 	m_querydisabletime = 10;
 
+	m_maxViewerSetting = 0;
+	m_maxViewers = 128;
+	m_Collabo = false;
 	// Autolock settings
 	m_lock_on_exit = 0;
 
@@ -521,7 +524,7 @@ vncClientId vncServer::AddClient(VSocket *socket,
 		delete socket;
 		return -1;
 	}
-
+	client->setTiming(GetTickCount());
 	// Set the client's settings
 	client->SetOutgoing(outgoing);
 	client->SetProtocolVersion(protocolMsg);
@@ -2569,6 +2572,8 @@ vncServer::initialCapture_done() {
 
 void
 vncServer::TriggerUpdate() {
+	omni_mutex_lock l1(m_desktopLock, 150);
+	omni_mutex_lock l(m_clientsLock, 150);
 	vncClientList::iterator i;
 	// Post this update to all the connected clients
 	for (i = m_authClients.begin(); i != m_authClients.end(); i++)
@@ -2733,4 +2738,29 @@ void vncServer::SetFTTimeout(int msecs)
 void vncServer::AutoCapt(int autocapt)
 {
 	m_autocapt = autocapt; 
+}
+
+short vncServer::getOldestViewer()
+{
+	omni_mutex_lock l(m_clientsLock, 43);
+	short clientId = 0;
+	DWORD timing = 0;
+
+	vncClientList::iterator i;
+
+	for (i = m_authClients.begin(); i != m_authClients.end(); i++)
+	{
+		if (!GetClient(*i))
+			continue;
+		if (timing == 0 || GetClient(*i)->getTiming() < timing) {
+			timing = GetClient(*i)->getTiming();
+			clientId = GetClient(*i)->GetClientId();
+		}
+	}
+	return clientId;
+}
+
+int vncServer::getNumberViewers()
+{
+	return  m_authClients.size();
 }

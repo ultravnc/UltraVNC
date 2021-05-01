@@ -142,6 +142,9 @@ protected:
 	UINT m_pref_QueryTimeout;
 	UINT m_pref_QueryDisableTime;
 	UINT m_pref_IdleTimeout;
+	UINT m_pref_MaxViewerSetting;
+	UINT m_pref_MaxViewers;
+	BOOL m_pref_Collabo;
 	BOOL m_pref_RemoveWallpaper;
 	// adzm - 2010-07 - Disable more effects or font smoothing
 	BOOL m_pref_RemoveEffects;

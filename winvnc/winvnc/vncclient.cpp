@@ -67,7 +67,7 @@
 #include <zstd.h>
 #else
 #include "../zlib/zlib.h"
-#include "../zstd-1.4.4/lib/zstd.h"
+#include "../zstd/lib/zstd.h"
 #endif
 
 #include "mmsystem.h" // sf@2002
@@ -1123,6 +1123,27 @@ vncClientThread::InitAuthenticate()
 		if (!AuthenticateLegacyClient()) {
 			return FALSE;
 		}
+	}
+
+	if (m_server->getNumberViewers() > m_server->getMaxViewers() -1)
+	{
+		if (m_server->getMaxViewerSetting() == 0) {
+			SendConnFailed("Max viewers reached");
+			return FALSE;
+		}
+		else {
+
+			m_server->AddAuthHostsBlacklist(m_client->GetClientName());
+			m_server->AddAuthHostsBlacklist(m_client->GetClientName());
+			m_server->AddAuthHostsBlacklist(m_client->GetClientName());
+			m_server->AddAuthHostsBlacklist(m_client->GetClientName());
+			m_server->AddAuthHostsBlacklist(m_client->GetClientName());
+			m_server->AddAuthHostsBlacklist(m_client->GetClientName());
+			
+			m_server->GetClient(m_server->getOldestViewer())->Kill();
+			m_client->forceBlacklist = true;
+		}
+
 	}
 
 
@@ -2248,7 +2269,9 @@ vncClientThread::run(void *arg)
 	}
 
 	// Authenticated OK - remove from blacklist and remove timeout
-	m_server->RemAuthHostsBlacklist(m_client->GetClientName());
+	if (!m_client->forceBlacklist)
+		m_server->RemAuthHostsBlacklist(m_client->GetClientName());
+	m_client->forceBlacklist = false;
 	m_socket->SetTimeout(m_server->AutoIdleDisconnectTimeout()*1000);
 	vnclog.Print(LL_INTINFO, VNCLOG("authenticated connection\n"));
 
@@ -3290,25 +3313,27 @@ vncClientThread::run(void *arg)
 						    ? MOUSEEVENTF_RIGHTDOWN : MOUSEEVENTF_RIGHTUP;
 					}
 
-					if ((msg.pe.buttonMask & rfbButton1Mask) != (m_client->m_ptrevent.buttonMask & rfbButton1Mask) ||
-						(msg.pe.buttonMask & rfbButton2Mask) != (m_client->m_ptrevent.buttonMask & rfbButton2Mask) ||
-						(msg.pe.buttonMask & rfbButton1Mask) != (m_client->m_ptrevent.buttonMask & rfbButton1Mask)) {
-						if (!m_client->has_mouse) {
-							m_client->ask_mouse = true;
-							m_server->SetHasMouse();
+					if (m_server->getCollabo()) {
+						if ((msg.pe.buttonMask & rfbButton1Mask) != (m_client->m_ptrevent.buttonMask & rfbButton1Mask) ||
+							(msg.pe.buttonMask & rfbButton2Mask) != (m_client->m_ptrevent.buttonMask & rfbButton2Mask) ||
+							(msg.pe.buttonMask & rfbButton1Mask) != (m_client->m_ptrevent.buttonMask & rfbButton1Mask)) {
+							if (!m_client->has_mouse) {
+								m_client->ask_mouse = true;
+								m_server->SetHasMouse();
+							}
 						}
-					}
 
-					if (!m_client->has_mouse) {
-						int xx = msg.pe.x - GetSystemMetrics(SM_XVIRTUALSCREEN) + (m_client->monitor_Offsetx + m_client->m_ScreenOffsetx);
-						int yy = msg.pe.y - GetSystemMetrics(SM_YVIRTUALSCREEN) + (m_client->monitor_Offsety + m_client->m_ScreenOffsety);
-						if (m_server->Driver()){
-							xx = msg.pe.x + m_client->monitor_Offsetx;
-							yy = msg.pe.y + m_client->monitor_Offsety;
+						if (!m_client->has_mouse) {
+							int xx = msg.pe.x - GetSystemMetrics(SM_XVIRTUALSCREEN) + (m_client->monitor_Offsetx + m_client->m_ScreenOffsetx);
+							int yy = msg.pe.y - GetSystemMetrics(SM_YVIRTUALSCREEN) + (m_client->monitor_Offsety + m_client->m_ScreenOffsety);
+							if (m_server->Driver()){
+								xx = msg.pe.x + m_client->monitor_Offsetx;
+								yy = msg.pe.y + m_client->monitor_Offsety;
+							}
+							if(m_client->simulateCursor)
+								m_client->simulateCursor->moveCursor(xx, yy);
+							break;
 						}
-						if(m_client->simulateCursor)
-							m_client->simulateCursor->moveCursor(xx, yy);
-						break;
 					}
 
 
@@ -4649,6 +4674,7 @@ vncClient::vncClient() : m_clipboard(ClipboardSettings::defaultServerCaps), Send
 	has_mouse = false;
 	ask_mouse = false;
 	simulateCursor = NULL;
+	forceBlacklist = false;
 }
 
 vncClient::~vncClient()

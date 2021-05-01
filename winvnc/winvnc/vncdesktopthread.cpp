@@ -660,6 +660,13 @@ void vncDesktopThread::do_polling(HANDLE& threadHandle, rfb::Region2D& rgncache,
 
 		}
 	}
+	if (VNC_OSVersion::getInstance()->OS_WINPE) {
+		int timeSinceLastMouseMove = lTime - m_lLastUpdate;
+		if (timeSinceLastMouseMove > 5000) {
+			m_lLastUpdate = lTime;
+			VNC_OSVersion::getInstance()->removeAlpha();
+		}
+	}
 }
 
 

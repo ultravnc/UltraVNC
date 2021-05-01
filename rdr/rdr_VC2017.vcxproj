@@ -285,46 +285,46 @@
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'" />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SolutionDir)..\zstd-1.4.4\zlibWrapper\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\zstd\zlibWrapper\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">
-    <IncludePath>$(SolutionDir)..\zstd-1.4.4\zlibWrapper\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\zstd\zlibWrapper\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(SolutionDir)..\zstd-1.4.4\zlibWrapper\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\zstd\zlibWrapper\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NOacceleration|Win32'">
-    <IncludePath>$(SolutionDir)..\zstd-1.4.4\zlibWrapper\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\zstd\zlibWrapper\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">
-    <IncludePath>$(SolutionDir)..\zstd-1.4.4\zlibWrapper\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\zstd\zlibWrapper\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Vista|Win32'">
-    <IncludePath>$(SolutionDir)..\zstd-1.4.4\zlibWrapper\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\zstd\zlibWrapper\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='XP|Win32'">
-    <IncludePath>$(SolutionDir)..\zstd-1.4.4\zlibWrapper\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\zstd\zlibWrapper\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)..\zstd-1.4.4\zlibWrapper\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\zstd\zlibWrapper\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='IPV6|x64'">
-    <IncludePath>$(SolutionDir)..\zstd-1.4.4\zlibWrapper\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\zstd\zlibWrapper\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)..\zstd-1.4.4\zlibWrapper\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\zstd\zlibWrapper\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NOacceleration|x64'">
-    <IncludePath>$(SolutionDir)..\zstd-1.4.4\zlibWrapper\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\zstd\zlibWrapper\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">
-    <IncludePath>$(SolutionDir)..\zstd-1.4.4\zlibWrapper\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\zstd\zlibWrapper\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">
-    <IncludePath>$(SolutionDir)..\zstd-1.4.4\zlibWrapper\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\zstd\zlibWrapper\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='XP|x64'">
-    <IncludePath>$(SolutionDir)..\zstd-1.4.4\zlibWrapper\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\zstd\zlibWrapper\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>

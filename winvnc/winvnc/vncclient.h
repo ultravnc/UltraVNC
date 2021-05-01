@@ -268,6 +268,13 @@ public:
 	void Clear_Update_Tracker();
 	void TriggerUpdate();
 	void UpdateCursorShape();
+	void setTiming(DWORD value) {
+		m_timing = value;
+	}
+	DWORD getTiming() {
+		return m_timing;
+	}
+	bool forceBlacklist;
 
 	// adzm 2009-07-05 - repeater IDs
 	void SetRepeaterID(char* szid)
@@ -492,6 +499,7 @@ protected:
 	bool			m_singleExtendMode;
 	bool			m_firstExtDesktop;
 	bool			m_firstExtDesktopIncremental;
+	DWORD			m_timing;
 
 	// The server
 	vncServer		*m_server;
