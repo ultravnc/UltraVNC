@@ -464,7 +464,7 @@ vncMenu::AddTrayIcon()
 			IsIconSet=false;
 			if (!m_server->GetDisableTrayIcon()) 
 				IconFaultCounter++;
-			m_server->TriggerUpdate();
+			//m_server->TriggerUpdate();
 			return;
 		}
 

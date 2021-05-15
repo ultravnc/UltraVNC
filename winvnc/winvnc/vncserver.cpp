@@ -2572,6 +2572,8 @@ vncServer::initialCapture_done() {
 
 void
 vncServer::TriggerUpdate() {
+	omni_mutex_lock l1(m_desktopLock, 150);
+	omni_mutex_lock l(m_clientsLock, 150);
 	vncClientList::iterator i;
 	// Post this update to all the connected clients
 	for (i = m_authClients.begin(); i != m_authClients.end(); i++)
