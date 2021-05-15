@@ -195,16 +195,23 @@ HWND GetConsoleHwnd(void)
 	return FindWindow("ConsoleWindowClass", NULL);
 }
 
+BOOL CALLBACK speichereFenster(HWND hwnd, LPARAM substring) {
+	if (WS_EX_LAYERED == (GetWindowLong(hwnd, GWL_EXSTYLE) & WS_EX_LAYERED)) {
+		SetWindowLong(hwnd, GWL_EXSTYLE, GetWindowLong(hwnd, GWL_EXSTYLE) & ~WS_EX_LAYERED);
+		RedrawWindow(hwnd, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
+	}
+	return true;
+}
+
 bool
 VNC_OSVersion::isWINPE(VOID)
 {
 	HKEY hCurrentVersion = NULL;
-	bool winpe = (RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\WinPE", 0, KEY_QUERY_VALUE | KEY_WOW64_64KEY, &hCurrentVersion) == ERROR_SUCCESS);
-	if (winpe) {		
-		HWND hWnd = GetConsoleHwnd();
-		SetWindowLong(hWnd, GWL_EXSTYLE, GetWindowLong(hWnd, GWL_EXSTYLE) & ~WS_EX_LAYERED);
-		RedrawWindow(hWnd, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
-		RegCloseKey(hCurrentVersion);
-	}	
+	bool winpe = (RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\WinPE", 0, KEY_QUERY_VALUE | KEY_WOW64_64KEY, &hCurrentVersion) == ERROR_SUCCESS);	
 	return winpe;
+}
+
+void VNC_OSVersion::removeAlpha()
+{
+	EnumWindows(speichereFenster, NULL);
 }
