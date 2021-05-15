@@ -24,7 +24,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "omnithread", "omnithread\om
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "liblzma", "..\xz-5.2.1\windows\liblzma.vcxproj", "{12728250-16EC-4DC6-94D7-E21DD88947F8}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libzstd", "..\zstd-1.4.4\build\VS2017\libzstd\libzstd.vcxproj", "{8BFD8150-94D5-4BF9-8A50-7BD9929A0850}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libzstd", "..\zstd\build\VS2017\libzstd\libzstd.vcxproj", "{8BFD8150-94D5-4BF9-8A50-7BD9929A0850}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zlib", "..\zlib\zlib.vcxproj", "{1E589AD6-7C41-3AFD-BC5F-4752E29B2B84}"
 EndProject

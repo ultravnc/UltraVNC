@@ -282,40 +282,40 @@
     <PostBuildEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</PostBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SolutionDir)..\zstd-1.4.4\zlibWrapper\;$(SolutionDir)..\zlib;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\zstd\zlibWrapper\;$(SolutionDir)..\zlib;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">
-    <IncludePath>$(SolutionDir)..\zstd-1.4.4\zlibWrapper\;$(SolutionDir)..\zlib;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\zstd\zlibWrapper\;$(SolutionDir)..\zlib;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(SolutionDir)..\zstd-1.4.4\zlibWrapper\;$(SolutionDir)..\zlib;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\zstd\zlibWrapper\;$(SolutionDir)..\zlib;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NOacceleration|Win32'">
-    <IncludePath>$(SolutionDir)..\zstd-1.4.4\zlibWrapper\;$(SolutionDir)..\zlib;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\zstd\zlibWrapper\;$(SolutionDir)..\zlib;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Vista|Win32'">
-    <IncludePath>$(SolutionDir)..\zstd-1.4.4\zlibWrapper\;$(SolutionDir)..\zlib;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\zstd\zlibWrapper\;$(SolutionDir)..\zlib;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='XP|Win32'">
-    <IncludePath>$(SolutionDir)..\zstd-1.4.4\zlibWrapper\;$(SolutionDir)..\zlib;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\zstd\zlibWrapper\;$(SolutionDir)..\zlib;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)..\zstd-1.4.4\zlibWrapper\;$(SolutionDir)..\zlib;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\zstd\zlibWrapper\;$(SolutionDir)..\zlib;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='IPV6|x64'">
-    <IncludePath>$(SolutionDir)..\zstd-1.4.4\zlibWrapper\;$(SolutionDir)..\zlib;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\zstd\zlibWrapper\;$(SolutionDir)..\zlib;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)..\zstd-1.4.4\zlibWrapper\;$(SolutionDir)..\zlib;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\zstd\zlibWrapper\;$(SolutionDir)..\zlib;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NOacceleration|x64'">
-    <IncludePath>$(SolutionDir)..\zstd-1.4.4\zlibWrapper\;$(SolutionDir)..\zlib;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\zstd\zlibWrapper\;$(SolutionDir)..\zlib;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">
-    <IncludePath>$(SolutionDir)..\zstd-1.4.4\zlibWrapper\;$(SolutionDir)..\zlib;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\zstd\zlibWrapper\;$(SolutionDir)..\zlib;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='XP|x64'">
-    <IncludePath>$(SolutionDir)..\zstd-1.4.4\zlibWrapper\;$(SolutionDir)..\zlib;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\zstd\zlibWrapper\;$(SolutionDir)..\zlib;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
@@ -2667,7 +2667,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\win8</Command>
     <ProjectReference Include="..\..\zlib\zlib.vcxproj">
       <Project>{1e589ad6-7c41-3afd-bc5f-4752e29b2b84}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\zstd-1.4.4\build\VS2017\libzstd\libzstd.vcxproj">
+    <ProjectReference Include="..\..\zstd\build\VS2017\libzstd\libzstd.vcxproj">
       <Project>{8bfd8150-94d5-4bf9-8a50-7bd9929a0850}</Project>
     </ProjectReference>
     <ProjectReference Include="..\omnithread\omnithread_VC2017.vcxproj">

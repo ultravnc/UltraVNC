@@ -29,7 +29,7 @@
 #ifdef _INTERNALLIB
 #include <zstd.h>
 #else
-#include "../zstd-1.4.4/lib/zstd.h"
+#include "../zstd/lib/zstd.h"
 #endif
 
 struct z_stream_s;
