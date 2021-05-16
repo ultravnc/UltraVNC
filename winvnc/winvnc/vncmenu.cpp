@@ -840,43 +840,55 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 	switch (iMsg) {
 	// Every five seconds, a timer message causes the icon to update
 	case WM_TIMER:
-		// sf@2007 - Can't get the WTS_CONSOLE_CONNECT message work properly for now..
-		// So use a hack instead
-        // jdp reread some ini settings
-        _this->m_properties.ReloadDynamicSettings();
+		if (wParam == 1) {
+			// sf@2007 - Can't get the WTS_CONSOLE_CONNECT message work properly for now..
+			// So use a hack instead
+			// jdp reread some ini settings
+			_this->m_properties.ReloadDynamicSettings();
 
-		
-		if (G_1111==true && _this->IsIconSet==true) { // G_1111==true --> reconnect
-			vnclog.Print(LL_INTERR, VNCLOG("Add client reconnect from timer\n"));
-			G_1111=false;
-			PostMessage(hwnd,MENU_ADD_CLIENT_MSG,1111,1111);		
-		}
 
-		if (_this->m_server->RunningFromExternalService()) {
-			strcpy_s(newuser,"");
-			if (vncService::CurrentUser((char *) &newuser, sizeof(newuser))) {
-				// Check whether the user name has changed!
-				if (_stricmp(newuser, _this->m_username) != 0 || ( _this->IconFaultCounter>2 && !_this->m_server->GetDisableTrayIcon())) {
-					Sleep(1000);
-					vnclog.Print(LL_INTINFO,VNCLOG("user name has changed\n"));
-					// User has changed!
-					strcpy_s(_this->m_username, newuser);
-					// Order impersonation thread killing
-					PostQuitMessage(0);
-					break;
+			if (G_1111 == true && _this->IsIconSet == true) { // G_1111==true --> reconnect
+				vnclog.Print(LL_INTERR, VNCLOG("Add client reconnect from timer\n"));
+				G_1111 = false;
+				PostMessage(hwnd, MENU_ADD_CLIENT_MSG, 1111, 1111);
+			}
+
+			if (_this->m_server->RunningFromExternalService()) {
+				strcpy_s(newuser, "");
+				if (vncService::CurrentUser((char*)&newuser, sizeof(newuser))) {
+					// Check whether the user name has changed!
+					if (_stricmp(newuser, _this->m_username) != 0 || (_this->IconFaultCounter > 2 && !_this->m_server->GetDisableTrayIcon())) {
+						Sleep(1000);
+						vnclog.Print(LL_INTINFO, VNCLOG("user name has changed\n"));
+						// User has changed!
+						strcpy_s(_this->m_username, newuser);
+						// Order impersonation thread killing
+						PostQuitMessage(0);
+						break;
+					}
 				}
 			}
-		}
 
-		// *** HACK for running servicified
-		if (vncService::RunningAsService()) {
-			// Attempt to add the icon if it's not already there
-			_this->AddTrayIcon();
-			// Trigger a check of the current user
-			PostMessage(hwnd, WM_USERCHANGED, 0, 0);
+			// *** HACK for running servicified
+			if (vncService::RunningAsService()) {
+				// Attempt to add the icon if it's not already there
+				_this->AddTrayIcon();
+				// Trigger a check of the current user
+				PostMessage(hwnd, WM_USERCHANGED, 0, 0);
+			}
+			// Update the icon
+			_this->FlashTrayIcon(_this->m_server->AuthClientCount() != 0);
 		}
-		// Update the icon
-		_this->FlashTrayIcon(_this->m_server->AuthClientCount() != 0);
+		else if (wParam == 2) {
+			if (_this->m_server->RunningFromExternalService() && _this->m_server->GetRdpmode()) {
+				fShutdownOrdered = TRUE;
+				vnclog.Print(LL_INTINFO, VNCLOG("RdpMode auto 30s auto reset \n"));
+				_this->m_server->KillAuthClients();
+				if (_this->FunctionWTSUnRegisterSessionNotification)
+					_this->FunctionWTSUnRegisterSessionNotification(hwnd);
+				PostMessage(hwnd, WM_CLOSE, 0, 0);
+			}
+		}
 		break;
 
 		// DEAL WITH NOTIFICATIONS FROM THE SERVER:
@@ -898,6 +910,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			if (_this->m_server->RemoveAeroEnabled()) // Moved, redundant if //PGM @ Advantig
 				DisableAero(); // Moved, redundant if //PGM @ Advantig
 			VNC_OSVersion::getInstance()->SetAeroState();
+			KillTimer(hwnd, 2);
 		} else {
 			if (_this->m_server->RemoveAeroEnabled()) // Moved, redundant if //PGM @ Advantig
 				ResetAero(); // Moved, redundant if //PGM @ Advantig
@@ -912,6 +925,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			if (_this->m_server->RemoveFontSmoothingEnabled()) {
 				RestoreFontSmoothing();
 			}
+			SetTimer(hwnd, 2, 30000, NULL);
 		}
 		return 0;
 

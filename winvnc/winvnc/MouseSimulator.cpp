@@ -169,7 +169,7 @@ HWND SimulateCursor::create_window(SimulateCursor* simulateCursor)
     lExStyle &= ~(WS_EX_DLGMODALFRAME | WS_EX_CLIENTEDGE | WS_EX_STATICEDGE);
     SetWindowLong(hWnd, GWL_EXSTYLE, lExStyle);
 #else
-    LONG lExStyle = GetWindowLongPtr(hWnd, GWL_EXSTYLE);
+    LONG_PTR lExStyle = GetWindowLongPtr(hWnd, GWL_EXSTYLE);
     lExStyle &= ~(WS_EX_DLGMODALFRAME | WS_EX_CLIENTEDGE | WS_EX_STATICEDGE);
     SetWindowLongPtr(hWnd, GWL_EXSTYLE, lExStyle);
 #endif
@@ -215,19 +215,7 @@ LRESULT CALLBACK SimulateCursor::realWndProc(HWND hWnd, UINT message, WPARAM wPa
     switch (message)
     {
     case WM_COMMAND:
-    {
-        int wmId = LOWORD(wParam);
-        // Parse the menu selections:
-        switch (wmId)
-        {
-        //case IDM_EXIT:
-        //    DestroyWindow(hWnd);
-        //    break;
-        default:
-            return DefWindowProc(hWnd, message, wParam, lParam);
-        }
-    }
-    break;
+        return DefWindowProc(hWnd, message, wParam, lParam);
     case WM_PAINT:
     {
         PAINTSTRUCT ps;

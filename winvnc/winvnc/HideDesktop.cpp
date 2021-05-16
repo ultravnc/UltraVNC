@@ -30,7 +30,9 @@
 #if !__GNUC__ && _MSC_VER < 1400
 #define _WIN32_IE 0x0400
 #endif
-#define _WIN32_WINNT 0x0A00
+#ifndef _WIN32_WINNT
+	#define _WIN32_WINNT 0x0A00
+#endif
 #define _ATL_APARTMENT_THREADED
 #define _USING_V110_SDK71_
 #define _ATL_XP_TARGETING
@@ -189,7 +191,7 @@ void RestoreWallpaperStyle()
 
     if (::RegOpenKeyEx(HKEY_CURRENT_USER, DESKTOP_KEYNAME, 0, KEY_WRITE, &hKey) == ERROR_SUCCESS)
     {
-        DWORD sz = strlen((const char *)WallpaperStyle);
+        DWORD sz = (DWORD)strlen((const char *)WallpaperStyle);
         ::RegSetValueEx(hKey, DESKTOP_WALLPAPER_STYLE_KEYNAME, 0, REG_SZ, WallpaperStyle, sz);
         ::RegCloseKey(hKey);
     }
