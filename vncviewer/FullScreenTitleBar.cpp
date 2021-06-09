@@ -227,7 +227,7 @@ void CTitleBar::CreateDisplay()
 				(HMENU)tbIDC_PHOTO,
                 hInstance,
 				nullptr);
-	CreateToolTipForRect(Photo, PhotoTip, "Screenshot, dubble click for settings");
+	CreateToolTipForRect(Photo, PhotoTip, "Screenshot, double click for settings");
 
 	SwitchMonitor=CreateWindow("STATIC",
 				"SwitchMonitor",
@@ -236,7 +236,7 @@ void CTitleBar::CreateDisplay()
 				(HMENU)tbIDC_SWITCHMONITOR,
                 hInstance,
 				nullptr);
-	CreateToolTipForRect(SwitchMonitor, SwitchMonitorTip, "Swicth monitor");
+	CreateToolTipForRect(SwitchMonitor, SwitchMonitorTip, "Switch monitor");
 
 	//Pin button
 	Pin=CreateWindow("STATIC",
