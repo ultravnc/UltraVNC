@@ -46,7 +46,6 @@ void ClientConnection::ReadHextileRect(rfbFramebufferUpdateRectHeader *pfburh)
 void ClientConnection::HandleHextileEncoding##bpp(int rx, int ry, int rw, int rh)                    \
 {                                                                             \
     CARD##bpp bg, fg;                                                         \
-	COLORREF bgcolor, fgcolor;												  \
     int i;                                                                    \
     CARD8 *ptr;                                                               \
     int x, y, w, h;                                                           \
@@ -55,7 +54,6 @@ void ClientConnection::HandleHextileEncoding##bpp(int rx, int ry, int rw, int rh
     CARD8 nSubrects;                                                          \
 																			  \
     CheckBufferSize( 16 * 16 * bpp );										  \
-	SETUP_COLOR_SHORTCUTS;                                                    \
                                                                               \
     for (y = ry; y < ry+rh; y += 16) {                                        \
 		omni_mutex_lock l(m_bitmapdcMutex);									  \
@@ -80,13 +78,11 @@ void ClientConnection::HandleHextileEncoding##bpp(int rx, int ry, int rw, int rh
                                                                               \
 		    if (subencoding & rfbHextileBackgroundSpecified) {                \
                 ReadExact((char *)&bg, (bpp/8));                              \
-				bgcolor = COLOR_FROM_PIXEL##bpp##_ADDRESS(&bg);  			  \
 			}																  \
             FillSolidRect_ultra(x,y,w,h, m_myFormat.bitsPerPixel,(BYTE*)&bg);\
                                                                               \
             if (subencoding & rfbHextileForegroundSpecified)  {               \
                 ReadExact((char *)&fg, (bpp/8));                              \
-				fgcolor = COLOR_FROM_PIXEL##bpp##_ADDRESS(&fg);				  \
 			}                                                                 \
                                                                               \
             if (!(subencoding & rfbHextileAnySubrects)) {                     \
@@ -106,7 +102,6 @@ void ClientConnection::HandleHextileEncoding##bpp(int rx, int ry, int rw, int rh
                 ReadExact( m_netbuf, nSubrects * (2 + (bpp / 8)));            \
                                                                               \
                 for (i = 0; i < nSubrects; i++) {                             \
-                    fgcolor = COLOR_FROM_PIXEL##bpp##_ADDRESS(ptr);           \
 					memcpy(&fg,ptr,bpp/8);									  \
 					ptr += (bpp/8);                                           \
                     sx = *ptr >> 4;                                           \

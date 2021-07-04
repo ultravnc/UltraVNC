@@ -41,7 +41,7 @@ HANDLE hEventcad=NULL;
 HANDLE hEventPreConnect = NULL;
 HANDLE hMapFile=NULL;
 LPVOID data = NULL;
-extern HANDLE stopServiceEvent;
+HANDLE hEndSessionEvent = NULL;
 static char app_path[MAX_PATH];
 typedef DWORD (*WTSGETACTIVECONSOLESESSIONID)();
 typedef bool (*WTSQUERYUSERTOKEN)(ULONG,PHANDLE);
@@ -479,6 +479,8 @@ GetSessionUserTokenWin(OUT LPHANDLE  lphUserToken,DWORD mysessionID)
 BOOL
 LaunchProcessWin(DWORD dwSessionId,bool preconnect, bool rdpselect)
 {
+	if (Shutdown)
+		return false;
   BOOL                 bReturn = FALSE;
   HANDLE               hToken=NULL;
   STARTUPINFO          StartUPInfo;
@@ -670,14 +672,15 @@ void monitor_sessions_RDP()
 	hEvent = CreateEvent(NULL, FALSE, FALSE, "Global\\SessionEventUltra");
 	hEventcad = CreateEvent(NULL, FALSE, FALSE, "Global\\SessionEventUltraCad");
 	hEventPreConnect = CreateEvent(NULL, FALSE, FALSE, "Global\\SessionEventUltraPreConnect");
+	hEndSessionEvent = CreateEvent(NULL, FALSE, FALSE, "Global\\EndSessionEvent");
 	hMapFile = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, sizeof(int), "Global\\SessionUltraPreConnect");
 	if (hMapFile)data = MapViewOfFile(hMapFile, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, 0);
 	Sleep(3000);
 	int *a = (int*)data;
-	testevent3[0] = stopServiceEvent;
+	testevent3[0] = hEndSessionEvent;
 	testevent3[1] = hEventcad;
 	testevent3[2] = hEventPreConnect;
-	testevent2[0] = stopServiceEvent;
+	testevent2[0] = hEndSessionEvent;
 	testevent2[1] = hEventcad;
 
 	//IsAnyRDPSessionActive()
@@ -891,6 +894,8 @@ whileloop:
 		CloseHandle(hEventcad);
 	if (hEventPreConnect) 
 		CloseHandle(hEventPreConnect);
+	if (hEndSessionEvent)
+		CloseHandle(hEndSessionEvent);
 	if (data) 
 		UnmapViewOfFile(data);
 	if (hMapFile != NULL) 

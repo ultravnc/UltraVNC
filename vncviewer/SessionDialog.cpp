@@ -17,11 +17,10 @@
 //  USA.
 //
 // If the source code for the program is not available from the place from
-// which you received this file, check 
+// which you received this file, check
 // http://www.uvnc.com/
 //
 ////////////////////////////////////////////////////////////////////////////
-
 
 // SessionDialog.cpp: implementation of the SessionDialog class.
 
@@ -50,33 +49,35 @@ extern char sz_F9[64];
 extern char sz_F10[64];
 extern char sz_F11[64];
 
-SessionDialog::SessionDialog(VNCOptions *pOpt, ClientConnection* pCC, CDSMPlugin* pDSMPlugin)
+SessionDialog::SessionDialog(VNCOptions* pOpt, ClientConnection* pCC, CDSMPlugin* pDSMPlugin)
 {
 	m_bExpanded = true;
-	cy =0;
+	cy = 0;
 	cx = 0;
+	dpichanged = false;
 	m_pCC = pCC;
 	m_pOpt = pOpt;
-	m_pMRU = new MRU(SESSION_MRU_KEY_NAME,98);
+	m_pMRU = new MRU(SESSION_MRU_KEY_NAME, 98);
 	m_pDSMPlugin = pDSMPlugin;
-	/////////////////////////////////////////////////	
+	/////////////////////////////////////////////////
 	TCHAR tmphost2[256];
 	_tcscpy_s(m_proxyhost, m_pOpt->m_proxyhost);
-	if (strcmp(m_proxyhost,"")!=NULL) {
-		_tcscat_s(m_proxyhost,":");
-		_tcscat_s(m_proxyhost, 256, _itoa(m_pOpt->m_proxyport,tmphost2,10));
+	if (strcmp(m_proxyhost, "") != NULL) {
+		_tcscat_s(m_proxyhost, ":");
+		_tcscat_s(m_proxyhost, 256, _itoa(m_pOpt->m_proxyport, tmphost2, 10));
 	}
-	
+
 	for (int i = rfbEncodingRaw; i <= LASTENCODING; i++) {
 		UseEnc[i] = m_pOpt->m_UseEnc[i];
 	}
 
 	PreferredEncodings.clear();
-	for (int i=0; i<m_pOpt->m_PreferredEncodings.size(); i++) 
-        PreferredEncodings.push_back(m_pOpt->m_PreferredEncodings[i]); 
+	for (int i = 0; i < m_pOpt->m_PreferredEncodings.size(); i++)
+		PreferredEncodings.push_back(m_pOpt->m_PreferredEncodings[i]);
 
 	ViewOnly = m_pOpt->m_ViewOnly;
 	fAutoScaling = m_pOpt->m_fAutoScaling;
+	fAutoScalingEven = m_pOpt->m_fAutoScalingEven;
 	fExitCheck = m_pOpt->m_fExitCheck;
 	m_fUseProxy = m_pOpt->m_fUseProxy;
 	allowMonitorSpanning = m_pOpt->m_allowMonitorSpanning;
@@ -95,7 +96,7 @@ SessionDialog::SessionDialog(VNCOptions *pOpt, ClientConnection* pCC, CDSMPlugin
 	running = m_pOpt->m_running;
 	ShowToolbar = m_pOpt->m_ShowToolbar;
 	scale_num = m_pOpt->m_scale_num;
-	scale_den = m_pOpt->m_scale_den;				  
+	scale_den = m_pOpt->m_scale_den;
 	nServerScale = m_pOpt->m_nServerScale;
 	reconnectcounter = m_pOpt->m_reconnectcounter;
 	autoReconnect = m_pOpt->m_autoReconnect;
@@ -119,17 +120,15 @@ SessionDialog::SessionDialog(VNCOptions *pOpt, ClientConnection* pCC, CDSMPlugin
 	SavePos = m_pOpt->m_SavePos;
 	SaveSize = m_pOpt->m_SaveSize;
 	fUseDSMPlugin = m_pOpt->m_fUseDSMPlugin;
-	strcpy_s( szDSMPluginFilename, m_pOpt->m_szDSMPluginFilename);
+	strcpy_s(szDSMPluginFilename, m_pOpt->m_szDSMPluginFilename);
 	listening = m_pOpt->m_listening;
 	oldplugin = m_pOpt->m_oldplugin;
-
 
 	strcpy_s(folder, m_pOpt->m_document_folder);
 	strcpy_s(prefix, m_pOpt->m_prefix);
 	strcpy_s(imageFormat, m_pOpt->m_imageFormat);
 
 	scaling = m_pOpt->m_scaling;
-
 
 	keepAliveInterval = m_pOpt->m_keepAliveInterval;
 #ifdef _Gii
@@ -174,182 +173,236 @@ SessionDialog::~SessionDialog()
 		DestroyWindow(hTabQuickOptions);
 	if (hTabListen)
 		DestroyWindow(hTabListen);
-    delete m_pMRU;
+	delete m_pMRU;
 }
 
-BOOL CALLBACK SessDlgProc(  HWND hwnd,  UINT uMsg,  WPARAM wParam, LPARAM lParam );
+BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 // It's exceedingly unlikely, but possible, that if two modal dialogs were
-// closed at the same time, the static variables used for transfer between 
+// closed at the same time, the static variables used for transfer between
 // window procedure and this method could overwrite each other.
 int SessionDialog::DoDialog()
 {
- 	return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_SESSION_DLG), 
-		NULL, (DLGPROC) SessDlgProc, (LONG_PTR) this);
+	return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_SESSION_DLG),
+		NULL, (DLGPROC)SessDlgProc, (LONG_PTR)this);
 }
 
-BOOL CALLBACK SessDlgProc(  HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam ) 
-{	
+BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
 	SessionDialog* _this;
-    if(uMsg == WM_INITDIALOG){
-      _this = (SessionDialog*)lParam;
-     helper::SafeSetWindowUserData(hwnd, lParam);
-    }
-    else
-      _this= (SessionDialog*)helper::SafeGetWindowUserData<SessionDialog>(hwnd);	                       
+	if (uMsg == WM_INITDIALOG) {
+		_this = (SessionDialog*)lParam;
+		helper::SafeSetWindowUserData(hwnd, lParam);
+	}
+	else
+		_this = (SessionDialog*)helper::SafeGetWindowUserData<SessionDialog>(hwnd);
 	switch (uMsg) {
 	case WM_INITDIALOG:
-		{			
-            helper::SafeSetWindowUserData(hwnd, lParam);
-            SessionDialog *l_this = (SessionDialog *) lParam;
-			SetForegroundWindow(hwnd);
-			l_this->m_fFromOptions = false;
-			l_this->m_fFromFile = false;
-			l_this->m_pCC->m_hSessionDialog = hwnd;
-			l_this->SessHwnd = hwnd;
-			_this->InitDlgProc();
-			HWND hExitCheck = GetDlgItem(hwnd, IDC_EXIT_CHECK); //PGM @ Advantig
-			SendMessage(hExitCheck, BM_SETCHECK, l_this->fExitCheck, 0); //PGM @ Advantig
-			
-			_this->ExpandBox(hwnd, !_this->m_bExpanded);						
-			SendMessage(GetDlgItem(hwnd, IDC_BUTTON_EXPAND), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)_this->hBmpExpand);
-            return TRUE;
-		}
+	{
+		helper::SafeSetWindowUserData(hwnd, lParam);
+		SessionDialog* l_this = (SessionDialog*)lParam;
+		SetForegroundWindow(hwnd);
+		l_this->m_fFromOptions = false;
+		l_this->m_fFromFile = false;
+		l_this->m_pCC->m_hSessionDialog = hwnd;
+		l_this->SessHwnd = hwnd;
+		_this->InitDlgProc();
+		HWND hExitCheck = GetDlgItem(hwnd, IDC_EXIT_CHECK); //PGM @ Advantig
+		SendMessage(hExitCheck, BM_SETCHECK, l_this->fExitCheck, 0); //PGM @ Advantig
 
-	case WM_NOTIFY:		
+		_this->ExpandBox(hwnd, !_this->m_bExpanded);
+		SendMessage(GetDlgItem(hwnd, IDC_BUTTON_EXPAND), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)_this->hBmpExpand);
+		return TRUE;
+	}
+
+	case WM_NOTIFY:
 		return _this->HandleNotify(hwnd, wParam, lParam);
 
 	case WM_COMMAND:
 		switch (LOWORD(wParam))
 		{
-			case IDC_RADIOREPEATER:
-			case IDC_RADIODIRECT:
-				_this->ModeSwitch(hwnd, wParam);
-				break;
-			case IDC_HOSTNAME_EDIT: 
-				if (HIWORD(wParam) == CBN_SELCHANGE) {					
-					TCHAR hostname[256];
-					int ItemIndex = SendMessage((HWND) lParam, CB_GETCURSEL, 0, 0);
-					SendMessage((HWND) lParam, (UINT) CB_GETLBTEXT, (WPARAM) ItemIndex, (LPARAM) hostname);
-					_this->m_pMRU->RemoveItem(hostname);
-					_this->m_pMRU->AddItem(hostname);
-					_this->IfHostExistLoadSettings(hostname);
-					_this->SettingsToUI(false);
-				}
-				if (HIWORD(wParam) == CBN_SELENDOK) {
+		case IDC_RADIOREPEATER:
+		case IDC_RADIODIRECT:
+			_this->ModeSwitch(hwnd, wParam);
+			break;
+		case IDC_HOSTNAME_EDIT:
+			if (HIWORD(wParam) == CBN_SELCHANGE) {
+				TCHAR hostname[256];
+				int ItemIndex = SendMessage((HWND)lParam, CB_GETCURSEL, 0, 0);
+				SendMessage((HWND)lParam, (UINT)CB_GETLBTEXT, (WPARAM)ItemIndex, (LPARAM)hostname);
+				_this->m_pMRU->RemoveItem(hostname);
+				_this->m_pMRU->AddItem(hostname);
+				_this->IfHostExistLoadSettings(hostname);
+				_this->SettingsToUI(false);
+			}
+			if (HIWORD(wParam) == CBN_SELENDOK) {
 				TCHAR hostname[256];
 				int ItemIndex = SendMessage((HWND)lParam, CB_GETCURSEL, 0, 0);
 				SendMessage((HWND)lParam, (UINT)CB_SETCURSEL, (WPARAM)ItemIndex, (LPARAM)hostname);
-				}
-				break;
-			case IDC_SAVEASDEFAULT:
-				_this->SaveToFile(_this->m_pOpt->getDefaultOptionsFileName(), true);
-				return true;
-			case IDC_DELETE: 
-					DeleteFile(_this->m_pOpt->getDefaultOptionsFileName());
-					_this->SetDefaults();
-					return TRUE;
-			case IDC_SAVE:
-				_this->SaveConnection(hwnd, false);
-				break;
-			case IDC_SAVEAS:
-				_this->SaveConnection(hwnd, true);
-				break;
-			case IDCONNECT:				
+			}
+			break;
+		case IDC_SAVEASDEFAULT:
+			_this->SaveToFile(_this->m_pOpt->getDefaultOptionsFileName(), true);
+			return true;
+		case IDC_DELETE:
+			DeleteFile(_this->m_pOpt->getDefaultOptionsFileName());
+			_this->SetDefaults();
+			return TRUE;
+		case IDC_SAVE:
+			_this->SaveConnection(hwnd, false);
+			break;
+		case IDC_SAVEAS:
+			_this->SaveConnection(hwnd, true);
+			break;
+		case IDCONNECT:
+			_this->InitTab(hwnd);
+			return _this->connect(hwnd);
+		case IDCANCEL:
+			EndDialog(hwnd, FALSE);
+			return TRUE;
+		case IDC_SHOWOPTIONS:
+		case IDC_BUTTON_EXPAND:
+			_this->ExpandBox(hwnd, !_this->m_bExpanded);
+			if (_this->m_bExpanded)
 				_this->InitTab(hwnd);
-				return _this->connect(hwnd);			
-			case IDCANCEL:				
-				EndDialog(hwnd, FALSE);
-				return TRUE;		
-			case IDC_SHOWOPTIONS:
-			case IDC_BUTTON_EXPAND:
-					_this->ExpandBox(hwnd, !_this->m_bExpanded);
-				if (_this->m_bExpanded)
-					_this->InitTab(hwnd);
-				return TRUE;
-			case IDC_OPTIONBUTTON:
-				{				
-					if (!_this->m_fFromFile){								
-						HWND hExitCheck = GetDlgItem(hwnd, IDC_EXIT_CHECK); //PGM @ Advantig
-						_this->fExitCheck = (SendMessage(hExitCheck, BM_GETCHECK, 0, 0) == BST_CHECKED); //PGM @ Advantig
-					}
-				
-					//if (_this->m_pOpt->DoDialog())
-					{
-					_this->m_fFromOptions = true;
-					 HWND hDyn = GetDlgItem(hwnd, IDC_DYNAMIC);
-					SendMessage(hDyn, BM_SETCHECK, false, 0);
-					HWND hLan = GetDlgItem(hwnd, IDC_LAN_RB);
-					SendMessage(hLan, BM_SETCHECK, false, 0);
-					HWND hUltraLan = GetDlgItem(hwnd, IDC_ULTRA_LAN_RB);
-					SendMessage(hUltraLan, BM_SETCHECK, false, 0);
-					HWND hMedium = GetDlgItem(hwnd, IDC_MEDIUM_RB);
-					SendMessage(hMedium, BM_SETCHECK, false, 0);
-					HWND hModem = GetDlgItem(hwnd, IDC_MODEM_RB);
-					SendMessage(hModem, BM_SETCHECK, false, 0);
-					HWND hSlow = GetDlgItem(hwnd, IDC_SLOW_RB);
-					SendMessage(hSlow, BM_SETCHECK, false, 0);
-					HWND hManual = GetDlgItem(hwnd, IDC_MANUAL);
-					SendMessage(hManual, BM_SETCHECK, true, 0);
-					_this->quickoption = 8;
-					}
-					return TRUE;
-				}
-			case IDC_LOADPROFILE_B:
-				{
-					TCHAR szFileName[MAX_PATH];
-					memset(szFileName, '\0', MAX_PATH);
-					if (_this->m_pCC->LoadConnection(szFileName, true) != -1)
-					{
-						TCHAR szHost[250];
-						if (_this->m_pCC->m_port == 5900)
-							_tcscpy_s(szHost, _this->m_pCC->m_host);
-						else if (_this->m_pCC->m_port > 5900 && _this->m_pCC->m_port <= 5999)
-							_snprintf_s(szHost, 250, TEXT("%s:%d"), _this->m_pCC->m_host, _this->m_pCC->m_port - 5900);
-						else
-							_snprintf_s(szHost, 250, TEXT("%s::%d"), _this->m_pCC->m_host, _this->m_pCC->m_port);
+			return TRUE;
+		case IDC_OPTIONBUTTON:
+		{
+			if (!_this->m_fFromFile) {
+				HWND hExitCheck = GetDlgItem(hwnd, IDC_EXIT_CHECK); //PGM @ Advantig
+				_this->fExitCheck = (SendMessage(hExitCheck, BM_GETCHECK, 0, 0) == BST_CHECKED); //PGM @ Advantig
+			}
 
-						SetDlgItemText(hwnd, IDC_HOSTNAME_EDIT, szHost);
-						//AaronP
-						HWND hPlugins = GetDlgItem(hwnd, IDC_PLUGINS_COMBO);
-						if( strcmp( _this->szDSMPluginFilename, "" ) != 0 && _this->fUseDSMPlugin ) { 
-							int pos = SendMessage(hPlugins, CB_FINDSTRINGEXACT, -1,
-								(LPARAM)&(_this->szDSMPluginFilename[0]));
+			//if (_this->m_pOpt->DoDialog())
+			{
+				_this->m_fFromOptions = true;
+				HWND hDyn = GetDlgItem(hwnd, IDC_DYNAMIC);
+				SendMessage(hDyn, BM_SETCHECK, false, 0);
+				HWND hLan = GetDlgItem(hwnd, IDC_LAN_RB);
+				SendMessage(hLan, BM_SETCHECK, false, 0);
+				HWND hUltraLan = GetDlgItem(hwnd, IDC_ULTRA_LAN_RB);
+				SendMessage(hUltraLan, BM_SETCHECK, false, 0);
+				HWND hMedium = GetDlgItem(hwnd, IDC_MEDIUM_RB);
+				SendMessage(hMedium, BM_SETCHECK, false, 0);
+				HWND hModem = GetDlgItem(hwnd, IDC_MODEM_RB);
+				SendMessage(hModem, BM_SETCHECK, false, 0);
+				HWND hSlow = GetDlgItem(hwnd, IDC_SLOW_RB);
+				SendMessage(hSlow, BM_SETCHECK, false, 0);
+				HWND hManual = GetDlgItem(hwnd, IDC_MANUAL);
+				SendMessage(hManual, BM_SETCHECK, true, 0);
+				_this->quickoption = 8;
+			}
+			return TRUE;
+		}
+		case IDC_LOADPROFILE_B:
+		{
+			TCHAR szFileName[MAX_PATH];
+			memset(szFileName, '\0', MAX_PATH);
+			if (_this->m_pCC->LoadConnection(szFileName, true) != -1)
+			{
+				TCHAR szHost[250];
+				if (_this->m_pCC->m_port == 5900)
+					_tcscpy_s(szHost, _this->m_pCC->m_host);
+				else if (_this->m_pCC->m_port > 5900 && _this->m_pCC->m_port <= 5999)
+					_snprintf_s(szHost, 250, TEXT("%s:%d"), _this->m_pCC->m_host, _this->m_pCC->m_port - 5900);
+				else
+					_snprintf_s(szHost, 250, TEXT("%s::%d"), _this->m_pCC->m_host, _this->m_pCC->m_port);
 
-							if( pos != CB_ERR ) {
-								SendMessage(hPlugins, CB_SETCURSEL, pos, 0);
-								HWND hUsePlugin = GetDlgItem(hwnd, IDC_PLUGIN_CHECK);
-								SendMessage(hUsePlugin, BM_SETCHECK, TRUE, 0);
-							}
-						}
-						//EndAaronP
-						_this->LoadFromFile(szFileName);
-						_this->SettingsToUI();
+				SetDlgItemText(hwnd, IDC_HOSTNAME_EDIT, szHost);
+				//AaronP
+				HWND hPlugins = GetDlgItem(hwnd, IDC_PLUGINS_COMBO);
+				if (strcmp(_this->szDSMPluginFilename, "") != 0 && _this->fUseDSMPlugin) {
+					int pos = SendMessage(hPlugins, CB_FINDSTRINGEXACT, -1,
+						(LPARAM) & (_this->szDSMPluginFilename[0]));
+
+					if (pos != CB_ERR) {
+						SendMessage(hPlugins, CB_SETCURSEL, pos, 0);
+						HWND hUsePlugin = GetDlgItem(hwnd, IDC_PLUGIN_CHECK);
+						SendMessage(hUsePlugin, BM_SETCHECK, TRUE, 0);
 					}
-					_this->m_fFromOptions = true;
-					_this->m_fFromFile = true;
-					return TRUE;
 				}
+				//EndAaronP
+				_this->LoadFromFile(szFileName);
+				_this->SettingsToUI();
+			}
+			_this->m_fFromOptions = true;
+			_this->m_fFromFile = true;
+			return TRUE;
+		}
 
-			// [v1.0.2-jp1 fix]
-			case IDC_HOSTNAME_DEL:
-				HWND hcombo = GetDlgItem(  hwnd, IDC_HOSTNAME_EDIT);
-				int sel = SendMessage(hcombo, CB_GETCURSEL, 0, 0);
-				if(sel != CB_ERR){
-					SendMessage(hcombo, CB_DELETESTRING, sel, 0);
-					_this->m_pMRU->RemoveItem(sel);
-				}
-				return TRUE;
+		// [v1.0.2-jp1 fix]
+		case IDC_HOSTNAME_DEL:
+			_this->SettingsFromUI();
+			HWND hcombo = GetDlgItem(hwnd, IDC_HOSTNAME_EDIT);
+			int sel = SendMessage(hcombo, CB_GETCURSEL, 0, 0);
+			if (sel != CB_ERR) {
+				SendMessage(hcombo, CB_DELETESTRING, sel, 0);
+				_this->m_pMRU->RemoveItem(sel);
+				char fname[_MAX_PATH];
+				int disp = PORT_TO_DISPLAY(_this->m_port);
+				sprintf_s(fname, "%.15s-%d.vnc", _this->m_host_dialog, (disp > 0 && disp < 100) ? disp : _this->m_port);
+				char buffer[_MAX_PATH];
+				_this->getAppData(buffer);
+				strcat_s(buffer, "\\UltraVNC");
+				_mkdir(buffer);
+				strcat_s(buffer, "\\");
+				strcat_s(buffer, fname);
+				DeleteFile(buffer);
+				_this->SetDefaults();
+			}
+			return TRUE;
 		}
 
 		break;
-
+	case WM_DPICHANGED:
+		_this->dpichanged = true;
+		return FALSE;
+	case WM_MOVE:
+		if (_this->dpichanged)
+			if (_this->IsOnlyOneMonitor(hwnd))
+			{
+				_this->dpichanged = false;
+				_this->DpiChange(hwnd);
+			}
+		return FALSE;
 	case WM_CLOSE:
 		return FALSE;
-	case WM_DESTROY:		
+	case WM_DESTROY:
 		EndDialog(hwnd, FALSE);
 		return TRUE;
 	}
 	return 0;
+}
+
+bool SessionDialog::IsOnlyOneMonitor(HWND hDlg)
+{
+	RECT windowRect;
+	GetWindowRect(hDlg, &windowRect);
+	HMONITOR hMonitor = ::MonitorFromWindow(hDlg, MONITOR_DEFAULTTONEAREST);
+	MONITORINFO mi;
+	mi.cbSize = sizeof(MONITORINFO);
+	GetMonitorInfo(hMonitor, &mi);
+	return ((windowRect.top >= mi.rcMonitor.top) && (windowRect.bottom <= mi.rcMonitor.bottom) && (windowRect.left >= mi.rcMonitor.left) && (windowRect.right <= mi.rcMonitor.right))
+		|| (windowRect.right - windowRect.left) >= (mi.rcMonitor.right - mi.rcMonitor.left) || (windowRect.bottom - windowRect.top) >= (mi.rcMonitor.bottom - mi.rcMonitor.top);  // or Bigger
+}
+
+void SessionDialog::DpiChange(HWND hDlg)
+{
+	if (m_bExpanded)
+	{
+		cx = 0;
+		cy = 0;
+	}
+	else
+	{
+		RECT rcWnd, rcDefaultBox;
+		HWND wndDefaultBox = NULL;
+		GetWindowRect(hDlg, &rcWnd);
+		wndDefaultBox = GetDlgItem(hDlg, IDC_DEFAULTBOX);
+		if (wndDefaultBox == NULL) return;
+		GetWindowRect(wndDefaultBox, &rcDefaultBox);
+		cx = rcDefaultBox.right - rcWnd.left; // OK
+		// cy = rcWnd.bottom - rcWnd.top;  // not OK, toDo  size wrong after dpichange
+	}
 }
 
 void SessionDialog::ExpandBox(HWND hDlg, BOOL fExpand)
@@ -359,15 +412,15 @@ void SessionDialog::ExpandBox(HWND hDlg, BOOL fExpand)
 	if (fExpand == m_bExpanded) return;
 
 	RECT rcWnd, rcDefaultBox, rcChild, rcIntersection;
-	HWND wndChild=NULL;
-	HWND wndDefaultBox=NULL;
-	
-	// get the window of the button 
+	HWND wndChild = NULL;
+	HWND wndDefaultBox = NULL;
+
+	// get the window of the button
 	HWND  pCtrl = GetDlgItem(hDlg, IDC_SHOWOPTIONS);
-	if (pCtrl==NULL) return;
+	if (pCtrl == NULL) return;
 
 	wndDefaultBox = GetDlgItem(hDlg, IDC_DEFAULTBOX);
-	if (wndDefaultBox==NULL) return;
+	if (wndDefaultBox == NULL) return;
 
 	if (!fExpand) SendMessage(GetDlgItem(hDlg, IDC_BUTTON_EXPAND), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)hBmpExpand);
 	else SendMessage(GetDlgItem(hDlg, IDC_BUTTON_EXPAND), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)hBmpCollaps);
@@ -377,12 +430,12 @@ void SessionDialog::ExpandBox(HWND hDlg, BOOL fExpand)
 	// enable/disable all of the child window outside of the default box.
 	wndChild = GetTopWindow(hDlg);
 
-	for ( ; wndChild != NULL; wndChild = GetWindow(wndChild, GW_HWNDNEXT))
+	for (; wndChild != NULL; wndChild = GetWindow(wndChild, GW_HWNDNEXT))
 	{
 		// get rectangle occupied by child window in screen coordinates.
 		GetWindowRect(wndChild, &rcChild);
 
-		if (!IntersectRect(&rcIntersection, &rcChild,&rcDefaultBox))
+		if (!IntersectRect(&rcIntersection, &rcChild, &rcDefaultBox))
 		{
 			EnableWindow(wndChild, fExpand);
 		}
@@ -392,13 +445,13 @@ void SessionDialog::ExpandBox(HWND hDlg, BOOL fExpand)
 	{
 		_ASSERT(m_bExpanded);
 		GetWindowRect(hDlg, &rcWnd);
-		
+
 		// this is the first time we are being called to shrink the dialog
 		// box.  The dialog box is currently in its expanded size and we must
 		// save the expanded width and height so that it can be restored
 		// later when the dialog box is expanded.
 
-		if (cx ==0 && cy == 0)
+		if (cx == 0 && cy == 0)
 		{
 			cx = rcDefaultBox.right - rcWnd.left;
 			cy = rcWnd.bottom - rcWnd.top;
@@ -406,14 +459,13 @@ void SessionDialog::ExpandBox(HWND hDlg, BOOL fExpand)
 			// we also hide the default box here so that it is not visible
 			ShowWindow(wndDefaultBox, SW_HIDE);
 		}
-		
 
 		// shrink the dialog box so that it encompasses everything from the top,
 		// left up to and including the default box.
-		SetWindowPos(hDlg, NULL,0,0,
-			rcDefaultBox.right - rcWnd.left, 
+		SetWindowPos(hDlg, NULL, 0, 0,
+			rcDefaultBox.right - rcWnd.left,
 			rcDefaultBox.bottom - rcWnd.top,
-			SWP_NOZORDER|SWP_NOMOVE);
+			SWP_NOZORDER | SWP_NOMOVE);
 
 		SetWindowText(pCtrl, "Show Options");
 
@@ -423,11 +475,11 @@ void SessionDialog::ExpandBox(HWND hDlg, BOOL fExpand)
 	else // we are expanding
 	{
 		_ASSERT(!m_bExpanded);
-		SetWindowPos(hDlg, NULL,0,0,cx,cy,SWP_NOZORDER|SWP_NOMOVE);
+		SetWindowPos(hDlg, NULL, 0, 0, cx, cy, SWP_NOZORDER | SWP_NOMOVE);
 
 		// make sure that the entire dialog box is visible on the user's
 		// screen.
-		SendMessage(hDlg, DM_REPOSITION,0,0);
+		SendMessage(hDlg, DM_REPOSITION, 0, 0);
 		SetWindowText(pCtrl, "Hide Options");
 		m_bExpanded = TRUE;
 	}
@@ -435,41 +487,41 @@ void SessionDialog::ExpandBox(HWND hDlg, BOOL fExpand)
 
 void SessionDialog::InitPlugin(HWND hwnd)
 {
-				// sf@2002 - List available DSM Plugins
-			HWND hPlugins = GetDlgItem(hwnd, IDC_PLUGINS_COMBO);
-			int nPlugins = m_pDSMPlugin->ListPlugins(hPlugins);
-			if (!nPlugins)
-			{
-				SendMessage(hPlugins, CB_ADDSTRING, 0, (LPARAM) sz_F11);
-			}
+	// sf@2002 - List available DSM Plugins
+	HWND hPlugins = GetDlgItem(hwnd, IDC_PLUGINS_COMBO);
+	int nPlugins = m_pDSMPlugin->ListPlugins(hPlugins);
+	if (!nPlugins)
+	{
+		SendMessage(hPlugins, CB_ADDSTRING, 0, (LPARAM)sz_F11);
+	}
 
-			SendMessage(hPlugins, CB_SETCURSEL, 0, 0);
+	SendMessage(hPlugins, CB_SETCURSEL, 0, 0);
 
-			EnableWindow(GetDlgItem(hwnd, IDC_PLUGIN_BUTTON), FALSE); // sf@2009 - Disable plugin config button by default			
-			EnableWindow(GetDlgItem(hwnd, IDC_PLUGINS_COMBO), fUseDSMPlugin);
+	EnableWindow(GetDlgItem(hwnd, IDC_PLUGIN_BUTTON), FALSE); // sf@2009 - Disable plugin config button by default
+	EnableWindow(GetDlgItem(hwnd, IDC_PLUGINS_COMBO), fUseDSMPlugin);
 
-			//AaronP
-			if( strcmp( szDSMPluginFilename, "" ) != 0 && fUseDSMPlugin )
-			{ 
-				int pos = SendMessage(hPlugins, CB_FINDSTRINGEXACT, -1,
-					(LPARAM)&(szDSMPluginFilename[0]));
+	//AaronP
+	if (strcmp(szDSMPluginFilename, "") != 0 && fUseDSMPlugin)
+	{
+		int pos = SendMessage(hPlugins, CB_FINDSTRINGEXACT, -1,
+			(LPARAM) & (szDSMPluginFilename[0]));
 
-				if( pos != CB_ERR )
-				{
-					SendMessage(hPlugins, CB_SETCURSEL, pos, 0);
-					HWND hUsePlugin = GetDlgItem(hwnd, IDC_PLUGIN_CHECK);
-					SendMessage(hUsePlugin, BM_SETCHECK, TRUE, 0);
-					EnableWindow(GetDlgItem(hwnd, IDC_PLUGIN_BUTTON), TRUE); // sf@2009 - Enable plugin config button
-				}
-			}
-			//EndAaron
+		if (pos != CB_ERR)
+		{
+			SendMessage(hPlugins, CB_SETCURSEL, pos, 0);
+			HWND hUsePlugin = GetDlgItem(hwnd, IDC_PLUGIN_CHECK);
+			SendMessage(hUsePlugin, BM_SETCHECK, TRUE, 0);
+			EnableWindow(GetDlgItem(hwnd, IDC_PLUGIN_BUTTON), TRUE); // sf@2009 - Enable plugin config button
+		}
+	}
+	//EndAaron
 }
 
 void SessionDialog::InitDlgProc(bool loadhost, bool initMruNeeded)
-{	
-	HWND hwnd = SessHwnd;		
+{
+	HWND hwnd = SessHwnd;
 	if (!setdefaults) {
-		if (loadhost && (m_pCC->m_port != 0 || strlen(m_pCC->m_host) != 0)) {		
+		if (loadhost && (m_pCC->m_port != 0 || strlen(m_pCC->m_host) != 0)) {
 			TCHAR szHost[250];
 			if (m_pCC->m_port == 5900)
 				_tcscpy_s(szHost, m_pCC->m_host);
@@ -484,15 +536,14 @@ void SessionDialog::InitDlgProc(bool loadhost, bool initMruNeeded)
 	}
 	TCHAR tmphost[256];
 	TCHAR tmphost2[256];
-	if (strcmp(m_proxyhost,"")!=NULL) {
+	if (strcmp(m_proxyhost, "") != NULL) {
 		_tcscpy_s(tmphost, m_proxyhost);
-		_tcscat_s(tmphost,":");
-		_tcscat_s(tmphost, 256, _itoa(m_proxyport,tmphost2,10));
+		_tcscat_s(tmphost, ":");
+		_tcscat_s(tmphost, 256, _itoa(m_proxyport, tmphost2, 10));
 		SetDlgItemText(hwnd, IDC_PROXY_EDIT, tmphost);
 	}
 	else
 		SetDlgItemText(hwnd, IDC_PROXY_EDIT, "");
-
 
 	if (m_fUseProxy) {
 		SendMessage(GetDlgItem(hwnd, IDC_RADIOREPEATER), BM_SETCHECK, m_fUseProxy, 0);
@@ -501,41 +552,41 @@ void SessionDialog::InitDlgProc(bool loadhost, bool initMruNeeded)
 	else {
 		SendMessage(GetDlgItem(hwnd, IDC_RADIODIRECT), BM_SETCHECK, true, 0);
 		ModeSwitch(hwnd, IDC_RADIODIRECT);
-	}	
+	}
 
 	HFONT font = CreateFont(
-      24,                        // nHeight
-      0,                         // nWidth
-      0,                         // nEscapement
-      0,                         // nOrientation
-      FW_BOLD,                 // nWeight
-      TRUE,                     // bItalic
-      FALSE,                     // bUnderline
-      0,                         // cStrikeOut
-      ANSI_CHARSET,              // nCharSet
-      OUT_DEFAULT_PRECIS,        // nOutPrecision
-      CLIP_DEFAULT_PRECIS,       // nClipPrecision
-      DEFAULT_QUALITY,           // nQuality
-      DEFAULT_PITCH | FF_SWISS,  // nPitchAndFamily
-      _T("Arial"));                 // lpszFacename
+		24,                        // nHeight
+		0,                         // nWidth
+		0,                         // nEscapement
+		0,                         // nOrientation
+		FW_BOLD,                 // nWeight
+		TRUE,                     // bItalic
+		FALSE,                     // bUnderline
+		0,                         // cStrikeOut
+		ANSI_CHARSET,              // nCharSet
+		OUT_DEFAULT_PRECIS,        // nOutPrecision
+		CLIP_DEFAULT_PRECIS,       // nClipPrecision
+		DEFAULT_QUALITY,           // nQuality
+		DEFAULT_PITCH | FF_SWISS,  // nPitchAndFamily
+		_T("Arial"));                 // lpszFacename
 
-	  SendMessage(GetDlgItem(hwnd, IDC_LOGO), WM_SETFONT, (WPARAM)font, TRUE);
+	SendMessage(GetDlgItem(hwnd, IDC_LOGO), WM_SETFONT, (WPARAM)font, TRUE);
 }
 
 void SessionDialog::InitMRU(HWND hwnd)
 {
 	// Set up recently-used list
-    HWND hcombo = GetDlgItem(  hwnd, IDC_HOSTNAME_EDIT);
-    TCHAR valname[256];
+	HWND hcombo = GetDlgItem(hwnd, IDC_HOSTNAME_EDIT);
+	TCHAR valname[256];
 	SendMessage(hcombo, CB_RESETCONTENT, 0, 0);
-    for (int i = 0; i < m_pMRU->NumItems(); i++) {
+	for (int i = 0; i < m_pMRU->NumItems(); i++) {
 		m_pMRU->GetItem(i, valname, 255);
 		if (strlen(valname) != 0)
-			SendMessage(hcombo, CB_ADDSTRING, 0, (LPARAM) valname);
+			SendMessage(hcombo, CB_ADDSTRING, 0, (LPARAM)valname);
 	}
-    SendMessage(hcombo, CB_SETCURSEL, 0, 0);
+	SendMessage(hcombo, CB_SETCURSEL, 0, 0);
 
-	m_pMRU->GetItem(0, valname, 255);					
+	m_pMRU->GetItem(0, valname, 255);
 	IfHostExistLoadSettings(valname);
 }
 
@@ -547,8 +598,8 @@ bool SessionDialog::connect(HWND hwnd)
 	}
 
 	m_pOpt->m_PreferredEncodings.clear();
-	for (int i=0; i<PreferredEncodings.size(); i++) 
-        m_pOpt->m_PreferredEncodings.push_back(PreferredEncodings[i]); 
+	for (int i = 0; i < PreferredEncodings.size(); i++)
+		m_pOpt->m_PreferredEncodings.push_back(PreferredEncodings[i]);
 
 	m_pOpt->autoDetect = autoDetect;
 	m_pOpt->m_fExitCheck = fExitCheck;
@@ -569,6 +620,7 @@ bool SessionDialog::connect(HWND hwnd)
 	m_pOpt->m_ViewOnly = ViewOnly;
 	m_pOpt->m_ShowToolbar = ShowToolbar;
 	m_pOpt->m_fAutoScaling = fAutoScaling;
+	m_pOpt->m_fAutoScalingEven = fAutoScalingEven;
 	m_pOpt->m_scale_num = scale_num;
 	m_pOpt->m_scale_den = scale_den;
 	m_pOpt->m_nServerScale = nServerScale;
@@ -594,7 +646,7 @@ bool SessionDialog::connect(HWND hwnd)
 	m_pOpt->m_SavePos = SavePos;
 	m_pOpt->m_SaveSize = SaveSize;
 	m_pOpt->m_fUseDSMPlugin = fUseDSMPlugin;
-	strcpy_s( m_pOpt->m_szDSMPluginFilename, szDSMPluginFilename);
+	strcpy_s(m_pOpt->m_szDSMPluginFilename, szDSMPluginFilename);
 	m_pOpt->m_listening = listening;
 	m_pOpt->m_oldplugin = oldplugin;
 	strcpy_s(m_pOpt->m_document_folder, folder);
@@ -606,31 +658,31 @@ bool SessionDialog::connect(HWND hwnd)
 	m_pOpt->m_giiEnable = giiEnable;
 #endif
 	m_pOpt->m_fAutoAcceptIncoming = fAutoAcceptIncoming;
-	m_pOpt->m_fAutoAcceptNoDSM =fAutoAcceptNoDSM;
+	m_pOpt->m_fAutoAcceptNoDSM = fAutoAcceptNoDSM;
 	m_pOpt->m_fRequireEncryption = fRequireEncryption;
 	m_pOpt->m_restricted = restricted;
 	m_pOpt->m_NoStatus = NoStatus;
 	m_pOpt->m_NoHotKeys = NoHotKeys;
 
-	if (fUseDSMPlugin){
-		if (!m_pDSMPlugin->IsLoaded()){
+	if (fUseDSMPlugin) {
+		if (!m_pDSMPlugin->IsLoaded()) {
 			m_pDSMPlugin->LoadPlugin(szDSMPluginFilename, listening);
-			if (m_pDSMPlugin->IsLoaded()){
-				if (m_pDSMPlugin->InitPlugin()){
+			if (m_pDSMPlugin->IsLoaded()) {
+				if (m_pDSMPlugin->InitPlugin()) {
 					if (!m_pDSMPlugin->SupportsMultithreaded())
-						oldplugin=true; //PGM
+						oldplugin = true; //PGM
 					else //PGM
-						oldplugin=false;
+						oldplugin = false;
 					m_pDSMPlugin->SetEnabled(true);
 					m_pDSMPlugin->DescribePlugin();
 				}
-				else{
+				else {
 					m_pDSMPlugin->SetEnabled(false);
 					MessageBox(hwnd, sz_F7, sz_F6, MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TOPMOST);
 					return TRUE;
-					}
+				}
 			}
-			else{
+			else {
 				m_pDSMPlugin->SetEnabled(false);
 				MessageBox(hwnd, sz_F5, sz_F6, MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TOPMOST);
 				return TRUE;
@@ -639,31 +691,31 @@ bool SessionDialog::connect(HWND hwnd)
 		else {
 			// sf@2003 - If the plugin is already loaded here it has been loaded
 			// by clicking on the config button: we need to init it !
-			// But we must first check that the loaded plugin is the same that 
+			// But we must first check that the loaded plugin is the same that
 			// the one currently selected...
 			m_pDSMPlugin->DescribePlugin();
-			if (_stricmp(m_pDSMPlugin->GetPluginFileName(), szDSMPluginFilename)){
+			if (_stricmp(m_pDSMPlugin->GetPluginFileName(), szDSMPluginFilename)) {
 				// Unload the previous plugin
 				m_pDSMPlugin->UnloadPlugin();
 				// Load the new selected one
 				m_pDSMPlugin->LoadPlugin(szDSMPluginFilename, listening);
 			}
-			if (m_pDSMPlugin->IsLoaded()){
-				if (m_pDSMPlugin->InitPlugin()){
+			if (m_pDSMPlugin->IsLoaded()) {
+				if (m_pDSMPlugin->InitPlugin()) {
 					if (!m_pDSMPlugin->SupportsMultithreaded())
-						oldplugin=true; //PGM
+						oldplugin = true; //PGM
 					else //PGM
-						oldplugin=false;
+						oldplugin = false;
 					m_pDSMPlugin->SetEnabled(true);
 					m_pDSMPlugin->DescribePlugin();
 				}
-				else{
+				else {
 					m_pDSMPlugin->SetEnabled(false);
 					MessageBox(hwnd, sz_F7, sz_F6, MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TOPMOST);
 					return TRUE;
 				}
 			}
-			else{
+			else {
 				m_pDSMPlugin->SetEnabled(false);
 				MessageBox(hwnd, sz_F5, sz_F6, MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TOPMOST);
 				return TRUE;
@@ -703,15 +755,15 @@ void SessionDialog::ModeSwitch(HWND hwnd, WPARAM wParam)
 		EnableWindow(GetDlgItem(hwnd, IDC_PROXY_EDIT), true);
 		ShowWindow(GetDlgItem(hwnd, IDC_HOSTNAME_EDIT), true);
 		ShowWindow(GetDlgItem(hwnd, IDC_PROXY_EDIT), true);
-		SetDlgItemText(hwnd, IDC_LINE1, "ID:12345679"); 
-		SetDlgItemText(hwnd, IDC_LINE2, "repeater:port");	
+		SetDlgItemText(hwnd, IDC_LINE1, "ID:12345679");
+		SetDlgItemText(hwnd, IDC_LINE2, "repeater:port");
 		break;
 	case IDC_RADIODIRECT:
 		EnableWindow(GetDlgItem(hwnd, IDC_PROXY_EDIT), false);
 		ShowWindow(GetDlgItem(hwnd, IDC_HOSTNAME_EDIT), true);
-		ShowWindow(GetDlgItem(hwnd, IDC_PROXY_EDIT), true);		
+		ShowWindow(GetDlgItem(hwnd, IDC_PROXY_EDIT), true);
 		SetDlgItemText(hwnd, IDC_LINE1, "server:port");
 		SetDlgItemText(hwnd, IDC_LINE2, "");
-			break;
+		break;
 	}
 }

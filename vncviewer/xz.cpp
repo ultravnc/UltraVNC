@@ -21,11 +21,8 @@
 #define BPP 8
 #define XZYW_ENDIAN ENDIAN_NO
 #define IMAGE_RECT(x,y,w,h,data)                \
-    SETUP_COLOR_SHORTCUTS;                      \
     SETPIXELS(m_netbuf,8,x,y,w,h)
 #define FILL_RECT(x,y,w,h,pix)                          \
-    SETUP_COLOR_SHORTCUTS;                              \
-    COLORREF color = COLOR_FROM_PIXEL8_ADDRESS(&pix);   \
     FillSolidRect_ultra(x,y,w,h, m_myFormat.bitsPerPixel,(BYTE*)&pix)
 
 #include <rfb/xzDecode.h>
@@ -37,11 +34,8 @@
 #define BPP 16
 #define XZYW_ENDIAN ENDIAN_LITTLE
 #define IMAGE_RECT(x,y,w,h,data)                \
-    SETUP_COLOR_SHORTCUTS;                      \
     SETPIXELS(m_netbuf,16,x,y,w,h)
 #define FILL_RECT(x,y,w,h,pix)                          \
-    SETUP_COLOR_SHORTCUTS;                              \
-    COLORREF color = COLOR_FROM_PIXEL16_ADDRESS(&pix);  \
     FillSolidRect_ultra(x,y,w,h, m_myFormat.bitsPerPixel,(BYTE*)&pix)
 
 #include <rfb/xzDecode.h>
@@ -56,11 +50,8 @@
 #undef FILL_RECT
 
 #define IMAGE_RECT(x,y,w,h,data)                \
-    SETUP_COLOR_SHORTCUTS;                      \
     SETPIXELS(m_netbuf,32,x,y,w,h)
 #define FILL_RECT(x,y,w,h,pix)                          \
-    SETUP_COLOR_SHORTCUTS;                              \
-    COLORREF color = COLOR_FROM_PIXEL32_ADDRESS(&pix);  \
     FillSolidRect_ultra(x,y,w,h, m_myFormat.bitsPerPixel,(BYTE*)&pix)
 
 
@@ -118,9 +109,9 @@ void ClientConnection::xzDecode(int x, int y, int w, int h)
 
     case 32:
       bool fitsInLS3Bytes
-        = ((m_myFormat.redMax   << m_myFormat.redShift)   < (1<<24) &&
-           (m_myFormat.greenMax << m_myFormat.greenShift) < (1<<24) &&
-           (m_myFormat.blueMax  << m_myFormat.blueShift)  < (1<<24));
+        = (((CARD32)m_myFormat.redMax   << m_myFormat.redShift)   < (1<<24) &&
+           ((CARD32)m_myFormat.greenMax << m_myFormat.greenShift) < (1<<24) &&
+           ((CARD32)m_myFormat.blueMax  << m_myFormat.blueShift)  < (1<<24));
 
       bool fitsInMS3Bytes = (m_myFormat.redShift   > 7  &&
                              m_myFormat.greenShift > 7  &&

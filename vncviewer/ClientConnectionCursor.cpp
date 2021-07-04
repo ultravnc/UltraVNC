@@ -94,11 +94,13 @@ void ClientConnection::ReadCursorShape(rfbFramebufferUpdateRectHeader *pfburh) {
 				p++;
 				break;
 			case 16:
-				rcSource[i] = COLOR_FROM_PIXEL16_ADDRESS(p);
+				// rcSource[i] = COLOR_FROM_PIXEL16_ADDRESS(p);
+				rcSource[i] = *(CARD16*)p; /* No conversion because BI_BITFIELDS is used. */
 				p += 2;
 				break;
 			case 32:
-				rcSource[i] = COLOR_FROM_PIXEL32_ADDRESS(p);
+				//rcSource[i] = COLOR_FROM_PIXEL32_ADDRESS(p);
+				rcSource[i] = *(CARD32*)p; /* No conversion because BI_BITFIELDS is used. */
 				p += 4;
 				break;
 			}
@@ -329,8 +331,6 @@ void ClientConnection::SoftCursorDraw() {
 	int offset;
 
 	omni_mutex_lock l(m_bitmapdcMutex);
-
-	SETUP_COLOR_SHORTCUTS;
 
 	for (y = 0; y < rcHeight; y++) {
 		y0 = rcCursorY - rcHotY + y;

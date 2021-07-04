@@ -54,29 +54,18 @@ void ClientConnection::ReadTightRect(rfbFramebufferUpdateRectHeader *pfburh, boo
   /* Handle solid rectangles. */
   BYTE colorpointer[4];
   if (comp_ctl == rfbTightFill) {
-    COLORREF fillColour;
     if (m_myFormat.depth == 24 && m_myFormat.redMax == 0xFF &&
         m_myFormat.greenMax == 0xFF && m_myFormat.blueMax == 0xFF) {
       CARD8 fillColourBuf[3];
       ReadExact((char *)&fillColourBuf, 3);
-	  memcpy(colorpointer,&fillColourBuf, 3);
-      fillColour = COLOR_FROM_PIXEL24_ADDRESS(fillColourBuf);
+      CARD32 *p = (CARD32*)colorpointer;
+      *p = ((CARD32)fillColourBuf[0] << m_myFormat.redShift)
+         | ((CARD32)fillColourBuf[1] << m_myFormat.greenShift)
+         | ((CARD32)fillColourBuf[2] << m_myFormat.blueShift);
     } else {
       CARD32 fillColourBuf;
       ReadExact((char *)&fillColourBuf, m_myFormat.bitsPerPixel / 8);
 	  memcpy(colorpointer,&fillColourBuf, m_myFormat.bitsPerPixel / 8);
-      SETUP_COLOR_SHORTCUTS;
-
-      switch (m_myFormat.bitsPerPixel) {
-      case 8:
-        fillColour = COLOR_FROM_PIXEL8_ADDRESS(&fillColourBuf);
-        break;
-      case 16:
-        fillColour = COLOR_FROM_PIXEL16_ADDRESS(&fillColourBuf);
-        break;
-      default:
-        fillColour = COLOR_FROM_PIXEL32_ADDRESS(&fillColourBuf);
-      }
     }
 
     omni_mutex_lock l(m_bitmapdcMutex);

@@ -42,18 +42,6 @@ void ClientConnection::ReadRRERect(rfbFramebufferUpdateRectHeader *pfburh)
 
 	prreh->nSubrects = Swap32IfLE(prreh->nSubrects);
 	
-	SETUP_COLOR_SHORTCUTS;
-    COLORREF color;
-    switch (m_myFormat.bitsPerPixel) {
-        case 8:
-            color = COLOR_FROM_PIXEL8_ADDRESS(pcolor); break;
-        case 16:
-			color = COLOR_FROM_PIXEL16_ADDRESS(pcolor); break;
-        case 24:
-        case 32:
-            color = COLOR_FROM_PIXEL32_ADDRESS(pcolor); break;
-    }
-
 	// No other threads can use bitmap DC
 	omni_mutex_lock l(m_bitmapdcMutex);
 		
@@ -75,15 +63,6 @@ void ClientConnection::ReadRRERect(rfbFramebufferUpdateRectHeader *pfburh)
 	BYTE *p = (BYTE *) m_netbuf;
 	for (CARD32 i = 0; i < prreh->nSubrects; i++) {
 		pRect = (rfbRectangle *) (p + m_minPixelBytes);
-		
-		switch (m_myFormat.bitsPerPixel) {
-		case 8:
-			color = COLOR_FROM_PIXEL8_ADDRESS(p); break;
-		case 16:
-			color = COLOR_FROM_PIXEL16_ADDRESS(p); break;
-		case 32:
-			color = COLOR_FROM_PIXEL32_ADDRESS(p); break;
-		};
 		
 		rect.x = (CARD16) (Swap16IfLE(pRect->x) + pfburh->r.x);
 		rect.y = (CARD16) (Swap16IfLE(pRect->y) + pfburh->r.y);

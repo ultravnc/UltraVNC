@@ -314,7 +314,8 @@ private:
 	int initialupdate_counter;
 	void ReadScreenUpdate();
 	void Update(RECT *pRect);
-	void SizeWindow(bool reconnect = false, bool SizeMultimon = true);
+	bool IsOnlyOneMonitor();
+	void SizeWindow(bool noPosChange = true, bool noSizeChange = false);
 	bool ScrollScreen(int dx, int dy, bool absolute = false);
 	void UpdateScrollbars();
 	void AddRemoveScrollbars(HWND hwnd, RECT Rtb);
@@ -347,6 +348,7 @@ private:
 	void saveScreenPosition();
 	void restoreScreenPosition();
 	RECT mainRect;
+	bool saveScreenPositionOK;
 	void RealiseFullScreenMode();
 	void BorderlessMode();
 	bool BumpScroll(int x, int y);
@@ -834,9 +836,13 @@ private:
 	DWORD prevMousekeyflags;
 	UINT prevMousemsg;
 
+	UINT m_Dpi;
+	UINT m_DpiOld;
+	bool m_DpiMove;
 public:
 	// RFB settings
 	VNCOptions m_opts;
+	bool m_FullScreenNotDone;
 	int m_autoReconnect;
 	int reconnectcounter;
 	void DoConnection(bool reconnect = false);
@@ -920,22 +926,6 @@ public:
                 (int) ((( *(CARD32 *)(p) >> rs) & rm) * 255 / rm), \
                 (int) ((( *(CARD32 *)(p) >> gs) & gm) * 255 / gm), \
                 (int) ((( *(CARD32 *)(p) >> bs) & bm) * 255 / bm) ))
-
-// The following may be faster if you already have a pixel value of the appropriate size
-#define COLOR_FROM_PIXEL8(p) (PALETTERGB( \
-                (int) (((p >> rs) & rm) * 255 / rm), \
-                (int) (((p >> gs) & gm) * 255 / gm), \
-                (int) (((p >> bs) & bm) * 255 / bm) ))
-
-#define COLOR_FROM_PIXEL16(p) (PALETTERGB( \
-                (int) ((( p >> rs) & rm) * 255 / rm), \
-                (int) ((( p >> gs) & gm) * 255 / gm), \
-                (int) ((( p >> bs) & bm) * 255 / bm) ))
-
-#define COLOR_FROM_PIXEL32(p) (PALETTERGB( \
-                (int) (((p >> rs) & rm) * 255 / rm), \
-                (int) (((p >> gs) & gm) * 255 / gm), \
-                (int) (((p >> bs) & bm) * 255 / bm) ))
 
 #define SETPIXEL(b,x,y,c) SetPixelV((b),(x),(y),(c))
 

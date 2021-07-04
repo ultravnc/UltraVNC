@@ -62,8 +62,6 @@ void ClientConnection::ReadZlibRect(rfbFramebufferUpdateRectHeader *pfburh, bool
 	if (ultraVncZlib->decompress(numCompBytes, numRawBytes, (unsigned char *)m_netbuf, m_zlibbuf, zstd) != Z_OK)
 		return;
 
-	SETUP_COLOR_SHORTCUTS;
-
 	// No other threads can use bitmap DC
 	omni_mutex_lock l(m_bitmapdcMutex);	
 
@@ -156,7 +154,6 @@ void ClientConnection::ReadQueueZip(rfbFramebufferUpdateRectHeader *pfburh,HRGN 
 		SaveArea(rect);
 		if ( surh.encoding==rfbEncodingRaw) {
 			UINT numpixels = surh.r.w * surh.r.h;
-			SETUP_COLOR_SHORTCUTS;
 			omni_mutex_lock l(m_bitmapdcMutex);						  
 
 			// This big switch is untidy but fast

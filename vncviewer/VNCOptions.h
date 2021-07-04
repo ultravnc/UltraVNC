@@ -87,6 +87,7 @@ public:
 	int     m_throttleMouse; // adzm 2010-10
 	bool	m_scaling;
 	bool    m_fAutoScaling;
+	bool    m_fAutoScalingEven;
 	int		m_scale_num, m_scale_den; // Numerator & denominator
 	// Tight specific
 	bool	m_useCompressLevel;

@@ -45,19 +45,6 @@ void ClientConnection::ReadCoRRERect(rfbFramebufferUpdateRectHeader *pfburh)
 
 	prreh->nSubrects = Swap32IfLE(prreh->nSubrects);
 
-	SETUP_COLOR_SHORTCUTS;
-
-    COLORREF color;
-    switch (m_myFormat.bitsPerPixel) {
-        case 8:
-            color = COLOR_FROM_PIXEL8_ADDRESS(pcolor); break;
-        case 16:
-			color = COLOR_FROM_PIXEL16_ADDRESS(pcolor); break;
-        case 24:
-        case 32:
-            color = COLOR_FROM_PIXEL32_ADDRESS(pcolor); break;
-    }
-
     // Draw the background of the rectangle
 	FillSolidRect_ultra(pfburh->r.x, pfburh->r.y, pfburh->r.w, pfburh->r.h, m_myFormat.bitsPerPixel,pcolor);
 
@@ -84,16 +71,6 @@ void ClientConnection::ReadCoRRERect(rfbFramebufferUpdateRectHeader *pfburh)
 			
 			pRect = (rfbCoRRERectangle *) (p + m_minPixelBytes);
 			
-			switch (m_myFormat.bitsPerPixel) {
-			case 8:
-				color = COLOR_FROM_PIXEL8_ADDRESS(p); break;
-			case 16:
-				color = COLOR_FROM_PIXEL16_ADDRESS(p); break;
-			case 32:
-				color = COLOR_FROM_PIXEL32_ADDRESS(p); break;
-			};
-			
-			// color = COLOR_FROM_PIXEL8_ADDRESS(netbuf);
 			rect.x = pRect->x + pfburh->r.x;
 			rect.y = pRect->y + pfburh->r.y;
 			rect.w = pRect->w;

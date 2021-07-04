@@ -96,8 +96,10 @@ void CTitleBar::Init()
     long lfHeight;
     
     hdc = GetDC(nullptr);
-    lfHeight = -MulDiv(10, GetDeviceCaps(hdc, LOGPIXELSY), 72);
-    ReleaseDC(nullptr, hdc);
+	int devcap = GetDeviceCaps(hdc, LOGPIXELSY);  // 100% = 96
+    //lfHeight = -MulDiv(10, devcap, 72);
+	lfHeight = -MulDiv(12, devcap, 96);
+	ReleaseDC(nullptr, hdc);
 
 	Font=CreateFont(lfHeight, 0, 0, 0, 0, FALSE, 0, 0, 0, 0, 0, 0, 0, "Arial");
 
@@ -590,7 +592,13 @@ LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg,
 
 			break;
 		}
-	}//Case - end
+	case WM_DPICHANGED:
+	{
+		TitleBarThis->Font = CreateFont(-MulDiv(12, HIWORD(wParam), 96), 0, 0, 0, 0, FALSE, 0, 0, 0, 0, 0, 0, 0, "Arial");
+		//toDo Repaint 
+	}
+
+}//Case - end
 	
 	return DefWindowProc(hwnd, iMsg, wParam, lParam);
 }

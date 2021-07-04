@@ -35,7 +35,7 @@ static int pad();
 
 SERVICE_STATUS serviceStatus;
 static SERVICE_STATUS_HANDLE serviceStatusHandle=0;
-HANDLE stopServiceEvent=0;
+extern HANDLE hEndSessionEvent;
 extern HANDLE hEvent;
 static char service_path[MAX_PATH];
 void monitor_sessions();
@@ -88,9 +88,6 @@ static void WINAPI service_main(DWORD argc, LPTSTR* argv) {
         serviceStatus.dwCurrentState=SERVICE_START_PENDING;
         SetServiceStatus(serviceStatusHandle, &serviceStatus);
 
-        /* do initialisation here */
-        stopServiceEvent=CreateEvent(0, FALSE, FALSE, 0);
-
         /* running */
         serviceStatus.dwControlsAccepted |= (SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_SHUTDOWN);
         if (!IsWin2000())
@@ -106,10 +103,6 @@ static void WINAPI service_main(DWORD argc, LPTSTR* argv) {
         /* service was stopped */
         serviceStatus.dwCurrentState=SERVICE_STOP_PENDING;
         SetServiceStatus(serviceStatusHandle, &serviceStatus);
-
-        /* do cleanup here */
-        if (stopServiceEvent) CloseHandle(stopServiceEvent);
-        stopServiceEvent=0;
 
         /* service is now stopped */
         serviceStatus.dwControlsAccepted&=
@@ -133,7 +126,7 @@ static DWORD WINAPI control_handler_ex(DWORD controlCode, DWORD dwEventType, LPV
     case SERVICE_CONTROL_STOP:
         serviceStatus.dwCurrentState=SERVICE_STOP_PENDING;
         SetServiceStatus(serviceStatusHandle, &serviceStatus);
-        SetEvent(stopServiceEvent);
+        SetEvent(hEndSessionEvent);
 		SetEvent(hEvent);
         return NO_ERROR;
 

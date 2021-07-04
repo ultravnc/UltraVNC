@@ -1348,38 +1348,6 @@ DWORD WINAPI imp_desktop_thread(LPVOID lpParam)
 	return 0;
 }
 
-/*
-// sf@2007 - For now we use a mmtimer to test the shutdown event periodically
-// Maybe there's a less rude method...
-void CALLBACK fpTimer(UINT uID, UINT uMsg, DWORD dwUser, DWORD dw1, DWORD dw2)
-{
-	if (hShutdownEvent)
-	{
-		// vnclog.Print(LL_INTERR, VNCLOG("****************** SDTimer tic\n"));
-		DWORD result=WaitForSingleObject(hShutdownEvent, 0);
-		if (WAIT_OBJECT_0==result)
-		{
-			ResetEvent(hShutdownEvent);
-			fShutdownOrdered = true;
-			//vnclog.Print(LL_INTERR, VNCLOG("****************** WaitForSingleObject - Shutdown server\n"));
-		}
-	}
-}
-
-void InitSDTimer()
-{
-	if (mmRes != -1) return;
-	//vnclog.Print(LL_INTERR, VNCLOG("****************** Init SDTimer\n"));
-	mmRes = timeSetEvent( 2000, 0, (LPTIMECALLBACK)fpTimer, 0, TIME_PERIODIC );
-}
-
-void KillSDTimer()
-{
-	//vnclog.Print(LL_INTERR, VNCLOG("****************** Kill SDTimer\n"));
-	timeKillEvent(mmRes);
-	mmRes = -1;
-}*/
-
 // This is the main routine for WinVNC when running as an application
 // (under Windows 95 or Windows NT)
 // Under NT, WinVNC can also run as a service.  The WinVNCServerMain routine,

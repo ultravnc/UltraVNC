@@ -39,45 +39,66 @@ extern char sz_J2[64];
 
 void ClientConnection::saveScreenPosition()
 {
-	if (!m_opts.m_SavePos)
-		GetWindowRect(m_hwndMain, &mainRect);
+//	if (!m_opts.m_SavePos)
+	GetWindowRect(m_hwndMain, &mainRect);
+
+	// if doubleclick Title don´t save     
+	HMONITOR hMonitor = ::MonitorFromWindow(m_hwndMain, MONITOR_DEFAULTTONEAREST);
+	MONITORINFO mi;
+	mi.cbSize = sizeof(MONITORINFO);
+	GetMonitorInfo(hMonitor, &mi);
+	
+	saveScreenPositionOK = (mainRect.left > mi.rcMonitor.left);
+	//saveScreenPositionOK = (mainRect.left > 0) && (mainRect.top > 0);
 }
 
 void ClientConnection::restoreScreenPosition()
 {
-	if (!m_opts.m_SavePos)
-		SetWindowPos(m_hwndMain, HWND_NOTOPMOST, mainRect.left, mainRect.top, mainRect.right- mainRect.left, mainRect.bottom- mainRect.top, SWP_FRAMECHANGED);
+//	if (!m_opts.m_SavePos)
+	if (saveScreenPositionOK)
+	  SetWindowPos(m_hwndMain, HWND_NOTOPMOST, mainRect.left, mainRect.top, mainRect.right - mainRect.left, mainRect.bottom - mainRect.top, SWP_FRAMECHANGED);
+    saveScreenPositionOK = false;
 }
 
 bool ClientConnection::InFullScreenMode() 
 {
-	return m_opts.m_FullScreen; 
+	if (m_FullScreenNotDone)
+		return !m_FullScreen;
+	else
+		return m_FullScreen;
 };
 
 // You can explicitly change mode by calling this
 void ClientConnection::SetFullScreenMode(bool enable)
 {
+	if (enable ^ m_opts.m_FullScreen)
+		m_fScalingDone = false;
+	
 	if (enable) {
 		ShowToolbar = m_opts.m_ShowToolbar;
 		m_opts.m_ShowToolbar = 0;		
-		saveScreenPosition();
-		SizeWindow(enable);
-		m_opts.m_FullScreen = enable;
-		RealiseFullScreenMode();
+        saveScreenPosition();
+		m_FullScreenNotDone = enable ^ m_opts.m_FullScreen;
+		m_opts.m_FullScreen = enable;		
+		SizeWindow(true, true);
+		//m_FullScreen = enable;
+		m_FullScreenNotDone = false;
+		RealiseFullScreenMode();		
 	}
 	else if (ShowToolbar != -1) {		
 		m_opts.m_ShowToolbar = ShowToolbar;
-		ShowToolbar = -1;		
-		SizeWindow();	
+		ShowToolbar = -1;
 		m_opts.m_FullScreen = enable;
+		SizeWindow();
 		RealiseFullScreenMode();
 		if (extSDisplay)
 			ScrollScreen(offsetXExtSDisplay, offsetYExtSDisplay, true);
 
 	}
-
 	SendFullFramebufferUpdateRequest(false);
     RedrawWindow(m_hwndMain, NULL, NULL, RDW_FRAME | RDW_INVALIDATE);
+	if (!enable)
+	  SizeWindow(true, m_opts.m_Directx); // true, m_opts.m_SaveSize && m_opts.m_Directx
 }
 
 // If the options have been changed other than by calling 

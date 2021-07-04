@@ -151,6 +151,7 @@ VNCOptions::VNCOptions()
 	m_Use8Bit = rfbPFFullColors; //false;
 	m_ShowToolbar = true;
 	m_fAutoScaling = false;
+	m_fAutoScalingEven = false;
 	m_NoStatus = false;
 	m_NoHotKeys = false;
 	m_PreferredEncodings.push_back(rfbEncodingUltra2);
@@ -166,6 +167,7 @@ VNCOptions::VNCOptions()
 	m_localCursor = DOTCURSOR; // NOCURSOR;
 	m_scaling = false;
 	m_fAutoScaling = false;
+	m_fAutoScalingEven = false;
 	m_scale_num = 100;
 	m_scale_den = 100;
 	// Modif sf@2002 - Server Scaling
@@ -342,6 +344,7 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
 	m_DisableClipboard = s.m_DisableClipboard;
 	m_scaling = s.m_scaling;
 	m_fAutoScaling = s.m_fAutoScaling;
+	m_fAutoScalingEven = s.m_fAutoScalingEven;
 	m_scale_num = s.m_scale_num;
 	m_scale_den = s.m_scale_den;
 	m_localCursor = s.m_localCursor;
@@ -352,6 +355,7 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
 	m_quickoption = s.m_quickoption;
 	m_ShowToolbar = s.m_ShowToolbar;
 	m_fAutoScaling = s.m_fAutoScaling;
+	m_fAutoScalingEven = s.m_fAutoScalingEven;
 	m_fUseDSMPlugin = s.m_fUseDSMPlugin;
 	m_NoHotKeys = s.m_NoHotKeys;
 
@@ -1099,6 +1103,7 @@ void VNCOptions::Save(char* fname)
 	saveInt("nohotkeys", m_NoHotKeys, fname);
 	saveInt("showtoolbar", m_ShowToolbar, fname);
 	saveInt("AutoScaling", m_fAutoScaling, fname);
+	saveInt("AutoScalingEven", m_fAutoScalingEven, fname);
 	saveInt("fullscreen", m_FullScreen, fname);
 	saveInt("SavePos", m_SavePos, fname);
 	saveInt("SaveSize", m_SaveSize, fname);
@@ -1116,6 +1121,7 @@ void VNCOptions::Save(char* fname)
 	saveInt("localcursor", m_localCursor, fname);
 	saveInt("Scaling", m_scaling, fname);
 	saveInt("AutoScaling", m_fAutoScaling, fname);
+	saveInt("AutoScalingEven", m_fAutoScalingEven, fname);
 	saveInt("scale_num", m_scale_num, fname);
 	saveInt("scale_den", m_scale_den, fname);
 	// Tight Specific
@@ -1190,6 +1196,7 @@ void VNCOptions::Load(char* fname)
 	m_NoHotKeys = readInt("nohotkeys", m_NoHotKeys, fname) != 0;
 	m_ShowToolbar = readInt("showtoolbar", m_ShowToolbar, fname) != 0;
 	m_fAutoScaling = readInt("AutoScaling", m_fAutoScaling, fname) != 0;
+	m_fAutoScalingEven = readInt("AutoScalingEven", m_fAutoScalingEven, fname) != 0;
 	m_FullScreen = readInt("fullscreen", m_FullScreen, fname) != 0;
 	m_SavePos = readInt("SavePos", m_SavePos, fname) != 0;
 	m_SaveSize = readInt("SaveSize", m_SaveSize, fname) != 0;
@@ -1207,6 +1214,7 @@ void VNCOptions::Load(char* fname)
 	m_localCursor = readInt("localcursor", m_localCursor, fname);
 	m_scaling = readInt("Scaling", m_scaling, fname) != 0;
 	m_fAutoScaling = readInt("AutoScaling", m_fAutoScaling, fname) != 0;
+	m_fAutoScalingEven = readInt("AutoScalingEven", m_fAutoScalingEven, fname) != 0;
 	m_scale_num = readInt("scale_num", m_scale_num, fname);
 	m_scale_den = readInt("scale_den", m_scale_den, fname);
 	// Tight specific

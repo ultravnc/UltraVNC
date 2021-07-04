@@ -585,6 +585,9 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	ShowToolbar = -1;
 	ExtDesktop = false;
 	tbWM_Set = false;
+	m_Dpi = GetDeviceCaps(GetDC(m_hwndMain), LOGPIXELSX);
+	m_DpiOld = m_Dpi;
+	m_FullScreenNotDone = false;
 }
 
 // helper functions for setting socket timeouts during file transfer
@@ -659,7 +662,7 @@ void ClientConnection::Run()
 	WatchClipboard();
 
 	Createdib();
-	SizeWindow(false, false);
+	SizeWindow(false);  // saved Size/Pos set
 
 	// This starts the worker thread.
 	// The rest of the processing continues in run_undetached.
@@ -3610,6 +3613,16 @@ void ClientConnection::ReadServerInit(bool reconnect)
     m_si.format.blueMax = Swap16IfLE(m_si.format.blueMax);
     m_si.nameLength = Swap32IfLE(m_si.nameLength);
 
+#if 0
+    if (m_si.format.redShift == 0 && m_si.format.greenShift == 11 && m_si.format.blueShift == 22) {
+		m_si.format.depth = 24;
+		m_si.format.redMax = m_si.format.greenMax = m_si.format.blueMax = 255;
+		m_si.format.redShift = 16;
+		m_si.format.greenShift = 8;
+		m_si.format.blueShift = 0;
+	}
+#endif
+
     m_desktopName = new TCHAR[1024];
 	m_desktopName_viewonly = new TCHAR[1024];
 	if (m_si.nameLength > 256) {
@@ -3645,33 +3658,81 @@ void ClientConnection::ReadServerInit(bool reconnect)
 
 	if (m_opts.m_ViewOnly) SetWindowText(m_hwndMain, m_desktopName_viewonly);
 	else SetWindowText(m_hwndMain, m_desktopName);
-	SizeWindow(reconnect, false);
+	SizeWindow();
 }
 
-void ClientConnection::SizeWindow(bool reconnect, bool sizeMultimon)
+bool ClientConnection::IsOnlyOneMonitor()
+{
+	RECT windowRect;
+	GetWindowRect(m_hwndMain, &windowRect);
+	HMONITOR hMonitor = ::MonitorFromWindow(m_hwndMain, MONITOR_DEFAULTTONEAREST);
+	MONITORINFO mi;
+	mi.cbSize = sizeof(MONITORINFO);
+	GetMonitorInfo(hMonitor, &mi);
+	return ((windowRect.top >= mi.rcMonitor.top) && (windowRect.bottom <= mi.rcMonitor.bottom) && (windowRect.left >= mi.rcMonitor.left) && (windowRect.right <= mi.rcMonitor.right)) 
+		|| (windowRect.right - windowRect.left) >= (mi.rcMonitor.right - mi.rcMonitor.left) || (windowRect.bottom - windowRect.top) >= (mi.rcMonitor.bottom - mi.rcMonitor.top);  // or Bigger
+}
+
+void ClientConnection::SizeWindow(bool noPosChange, bool noSizeChange)
 {
 	int uni_screenWidth = extSDisplay ? widthExtSDisplay : m_si.framebufferWidth;
 	int uni_screenHeight = extSDisplay ? heightExtSDisplay : m_si.framebufferHeight;
 
-	bool pos_set = reconnect;
-	bool size_set = reconnect;
+	bool pos_set = false;
+	bool size_set = false;
 	// Find how large the desktop work area is
 	RECT workrect;
 	tempdisplayclass tdc;
 	tdc.Init();
+
+	// Auto sizeMultimon
+	int monact = tdc.getSelectedScreen(m_hwndMain, false);
+	int monactwidth = tdc.monarray[monact].width;
+	int monactheight = tdc.monarray[monact].height;
+	int minwidth;
+	int minheight;
+	if (m_opts.m_scaling && (!m_opts.m_fAutoScaling || m_fScalingDone))
+	{
+		minwidth = m_si.framebufferWidth * (m_opts.m_scale_num / m_opts.m_scale_den);
+		minheight = m_si.framebufferHeight * (m_opts.m_scale_num / m_opts.m_scale_den);
+	}
+	else
+	{
+		minwidth = m_si.framebufferWidth;
+		minheight = m_si.framebufferHeight;
+	}
+	bool sizeMultimon = ((minwidth > monactwidth) || (minheight > monactheight)) && !m_opts.m_FullScreen && (!m_opts.m_fAutoScaling || m_opts.m_fAutoScalingEven) && !m_opts.m_Directx;
+
 	int mon = tdc.getSelectedScreen(m_hwndMain, (m_opts.m_allowMonitorSpanning || sizeMultimon) && !m_opts.m_showExtend);
-	workrect.left=tdc.monarray[mon].wl;
-	workrect.right=tdc.monarray[mon].wr;
-	workrect.top=tdc.monarray[mon].wt;
-	workrect.bottom=tdc.monarray[mon].wb;
+	workrect.left = tdc.monarray[mon].wl;
+	workrect.right = tdc.monarray[mon].wr;
+	workrect.top = tdc.monarray[mon].wt;
+	workrect.bottom = tdc.monarray[mon].wb;
 	//SystemParametersInfo(SPI_GETWORKAREA, 0, &workrect, 0);
-	int workwidth = workrect.right -  workrect.left;
-	int workheight = workrect.bottom - workrect.top;
+	int workwidth;
+	int workheight;
+	if (m_opts.m_FullScreen)
+	{
+		workwidth = tdc.monarray[mon].width;
+		workheight = tdc.monarray[mon].height;
+	}
+	else
+	{
+		workwidth = workrect.right - workrect.left;
+		workheight = workrect.bottom - workrect.top;
+	}
 	vnclog.Print(2, _T("Screen work area is %d x %d\n"), workwidth, workheight);
 
-	int widthwindow,heightwindow;
+	// AdjustWindowRectExForDpi   Windows 10, version 1607 [desktop apps only]
+	HMODULE hUser32 = LoadLibrary(_T("user32.dll"));
+	typedef HRESULT(*AdjustWindowRectExForDpi) (LPRECT, DWORD, BOOL, DWORD, UINT);
+	AdjustWindowRectExForDpi adjustWindowRectExForDpi = NULL;
+	if (hUser32)
+		adjustWindowRectExForDpi = (AdjustWindowRectExForDpi)GetProcAddress(hUser32, "AdjustWindowRectExForDpi");
 
-	// sf@2003 - AutoScaling
+
+	// sf@2003 - AutoScaling   
+	// Thomas Levering 
 	if (m_opts.m_fAutoScaling && !m_fScalingDone)
 	{
 		// We save the scales values coming from options
@@ -3679,27 +3740,59 @@ void ClientConnection::SizeWindow(bool reconnect, bool sizeMultimon)
 		m_opts.m_saved_scale_den = m_opts.m_scale_den;
 		m_opts.m_saved_scaling = m_opts.m_scaling;
 
-		RECT myrect,myclrect;
-		GetWindowRect(m_hwndMain,&myrect);
-		GetClientRect(m_hwndMain,&myclrect);
-		int dx=(myrect.right-myrect.left)-(myclrect.right-myclrect.left);
-		int dy=(myrect.bottom-myrect.top)-(myclrect.bottom-myclrect.top);
-
-		//case one, does the scaling fit the window include borders?
-
+		// we change the scaling to fit the window
+		// max windows size including borders etc..
+		int horizontalRatio;
+		int verticalRatio;
+		if (m_opts.m_FullScreen)
 		{
-			// we change the scaling to fit the window
-			// max windows size including borders etc..
-			int horizontalRatio= (int) (((workwidth-dx)*100)/uni_screenWidth);
-			int verticalRatio = (int) (((workheight-dy*2)*100)/uni_screenHeight);
-			int Ratio= min(verticalRatio, horizontalRatio);
-			widthwindow=uni_screenWidth*Ratio/100;
-			heightwindow=uni_screenHeight*Ratio/100;
-			m_opts.m_scale_num =Ratio;
-			m_opts.m_scale_den = 100;
-			m_opts.m_scaling = true;
-			m_fScalingDone = true;
+			horizontalRatio = (int)(((monactwidth) * 100) / uni_screenWidth);
+			verticalRatio = (int)(((monactheight) * 100) / uni_screenHeight);
 		}
+		else
+		{
+			RECT testrect;
+			SetRect(&testrect, 0, 0, uni_screenWidth, uni_screenHeight);
+			if (adjustWindowRectExForDpi)
+			{
+				adjustWindowRectExForDpi(&testrect,
+					GetWindowLong(m_hwndMain, GWL_STYLE) & ~WS_VSCROLL & ~WS_HSCROLL,
+					FALSE,
+					GetWindowLong(m_hwndMain, GWL_EXSTYLE),
+					m_Dpi);
+			}
+			else
+			{
+				AdjustWindowRectEx(&testrect,
+					GetWindowLong(m_hwndMain, GWL_STYLE) & ~WS_VSCROLL & ~WS_HSCROLL,
+					FALSE,
+					GetWindowLong(m_hwndMain, GWL_EXSTYLE));
+			}
+			int dx = (testrect.right - testrect.left) - (uni_screenWidth);
+			int dy = (testrect.bottom - testrect.top) - (uni_screenHeight);
+			if (m_opts.m_ShowToolbar)
+				dy = dy + m_TBr.bottom - m_TBr.top;
+			horizontalRatio = (int)(((workwidth - dx) * 100) / uni_screenWidth);
+			verticalRatio = (int)(((workheight - dy) * 100) / uni_screenHeight);
+		}
+		int Ratio= min(verticalRatio, horizontalRatio);
+		
+		// Option only use 100,200,300%
+		if (m_opts.m_fAutoScalingEven)
+		{
+			if (Ratio >= 300)
+				Ratio = 300;
+			else if (Ratio >= 200)
+				Ratio = 200;
+			else if (((horizontalRatio > 190) || (verticalRatio > 170) ) && (m_Dpi >= 192) && (!m_opts.m_FullScreen))
+				Ratio = 200;
+			else
+				Ratio = 100;
+		}
+		m_opts.m_scale_num =Ratio;
+		m_opts.m_scale_den = 100;
+		m_opts.m_scaling = !(Ratio == 100);
+		m_fScalingDone = true;		
 	}
 
 	if (!m_opts.m_fAutoScaling && m_fScalingDone)
@@ -3724,9 +3817,21 @@ void ClientConnection::SizeWindow(bool reconnect, bool sizeMultimon)
 	else
 		SetRect(&fullwinrect, 0, 0, uni_screenWidth, uni_screenHeight);
 
-	AdjustWindowRectEx(&fullwinrect,
-			   GetWindowLong(m_hwndcn, GWL_STYLE) & ~WS_VSCROLL & ~WS_HSCROLL,
-			   FALSE, GetWindowLong(m_hwndcn, GWL_EXSTYLE));
+	if (adjustWindowRectExForDpi)
+	{
+		adjustWindowRectExForDpi(&fullwinrect,
+			                     GetWindowLong(m_hwndcn, GWL_STYLE) & ~WS_VSCROLL & ~WS_HSCROLL,
+			                     FALSE, 
+			                     GetWindowLong(m_hwndcn, GWL_EXSTYLE),
+			                     m_Dpi);
+	} 
+	else
+	{ 
+	    AdjustWindowRectEx(&fullwinrect,
+			               GetWindowLong(m_hwndcn, GWL_STYLE) & ~WS_VSCROLL & ~WS_HSCROLL,
+			               FALSE, 
+			               GetWindowLong(m_hwndcn, GWL_EXSTYLE));
+	}
 
 	m_fullwinwidth = fullwinrect.right - fullwinrect.left;
 	m_fullwinheight = (fullwinrect.bottom - fullwinrect.top);
@@ -3744,9 +3849,21 @@ void ClientConnection::SizeWindow(bool reconnect, bool sizeMultimon)
 	}
 
    // Hauptfenster positionieren
-	AdjustWindowRectEx(&fullwinrect,
-					   GetWindowLong(m_hwndMain, GWL_STYLE) & ~WS_VSCROLL & ~WS_HSCROLL,
-					   FALSE, GetWindowLong(m_hwndMain, GWL_EXSTYLE));
+	if (adjustWindowRectExForDpi)
+	{
+		adjustWindowRectExForDpi(&fullwinrect,
+			                     GetWindowLong(m_hwndMain, GWL_STYLE) & ~WS_VSCROLL & ~WS_HSCROLL,
+			                     FALSE,
+			                     GetWindowLong(m_hwndMain, GWL_EXSTYLE),
+			                     m_Dpi);
+	}
+	else
+	{
+		AdjustWindowRectEx(&fullwinrect,
+			               GetWindowLong(m_hwndMain, GWL_STYLE) & ~WS_VSCROLL & ~WS_HSCROLL,
+			               FALSE, 
+			               GetWindowLong(m_hwndMain, GWL_EXSTYLE));
+	}
 
 	m_fullwinwidth = fullwinrect.right - fullwinrect.left;
 	m_fullwinheight = (fullwinrect.bottom - fullwinrect.top);
@@ -3773,7 +3890,7 @@ void ClientConnection::SizeWindow(bool reconnect, bool sizeMultimon)
 	}
 
 	//added position x y w y via commandline or x y 0 0
-	if ((m_opts.m_w != 0 || m_opts.m_h != 0 || m_opts.m_x != 0 || m_opts.m_y!=0) && !pos_set)
+	if ((m_opts.m_w != 0 || m_opts.m_h != 0 || m_opts.m_x != 0 || m_opts.m_y!=0) && !pos_set && !noPosChange)
 	{
 		// x y w h
 		if (m_opts.m_w != 0 && m_opts.m_h != 0)
@@ -3787,7 +3904,7 @@ void ClientConnection::SizeWindow(bool reconnect, bool sizeMultimon)
 			SetWindowPos(m_hwndMain, HWND_TOP, m_opts.m_x, m_opts.m_y, m_opts.m_w, m_opts.m_h, SWP_SHOWWINDOW | SWP_NOSIZE);
 		}
 	}
-	else if ((m_opts.m_SavePos || m_opts.m_SaveSize) && !pos_set)
+	else if ((m_opts.m_SavePos || m_opts.m_SaveSize) && !pos_set && !noPosChange)
 	{
 
 		if (m_opts.m_SavePos && m_opts.m_SaveSize && temp_w != 0 && temp_h != 0)
@@ -3814,10 +3931,10 @@ void ClientConnection::SizeWindow(bool reconnect, bool sizeMultimon)
 
 	if (m_opts.m_allowMonitorSpanning && !m_opts.m_showExtend && (m_fullwinwidth <= tdc.monarray[1].wr - tdc.monarray[1].wl + GetSystemMetrics(SM_CXBORDER) + GetSystemMetrics(SM_CXHSCROLL))) //fit on primary -20 for border
 	{
-		if (pos_set == false) 
+		if (!pos_set && !noPosChange)
 			SetWindowPos(m_hwndMain, HWND_TOP,tdc.monarray[1].wl + ((tdc.monarray[1].wr-tdc.monarray[1].wl)-m_winwidth) / 2,tdc.monarray[1].wt +
 					((tdc.monarray[1].wb - tdc.monarray[1].wt) - m_winheight) / 2, m_winwidth, m_winheight, SWP_SHOWWINDOW | SWP_NOSIZE);
-        if (size_set == false)
+        if (!size_set && !noSizeChange)
         {
             m_winwidth = act_width;
             m_winheight = act_height;
@@ -3828,9 +3945,9 @@ void ClientConnection::SizeWindow(bool reconnect, bool sizeMultimon)
 	else
 	{
         
-		if (pos_set == false) 
+		if (!pos_set && !noPosChange)
 			SetWindowPos(m_hwndMain, HWND_TOP, workrect.left + (workwidth - m_winwidth) / 2, workrect.top + (workheight - m_winheight) / 2, m_winwidth, m_winheight, SWP_SHOWWINDOW | SWP_NOSIZE);
-        if (size_set == false)
+        if (!size_set && !noSizeChange)
         {
             m_winwidth = act_width;
             m_winheight = act_height;
@@ -3838,7 +3955,7 @@ void ClientConnection::SizeWindow(bool reconnect, bool sizeMultimon)
         }
 	}
 
-	SetForegroundWindow(m_hwndMain);
+    SetForegroundWindow(m_hwndMain);
 
 	if (m_opts.m_ShowToolbar)
 		MoveWindow(m_hwndTBwin, 0, 0, workwidth, m_TBr.bottom - m_TBr.top, TRUE);
@@ -4120,9 +4237,9 @@ void ClientConnection::Createdib()
     bi.bmiHeader.biWidth = m_si.framebufferWidth;
     bi.bmiHeader.biHeight = -m_si.framebufferHeight;
     bi.bmiHeader.biCompression = (m_myFormat.bitsPerPixel > 8) ? BI_BITFIELDS : BI_RGB;
-    bi.mask.red = m_myFormat.redMax << m_myFormat.redShift;
-    bi.mask.green = m_myFormat.greenMax << m_myFormat.greenShift;
-    bi.mask.blue = m_myFormat.blueMax << m_myFormat.blueShift;
+    bi.mask.red = (CARD32)m_myFormat.redMax << m_myFormat.redShift;
+    bi.mask.green = (CARD32)m_myFormat.greenMax << m_myFormat.greenShift;
+    bi.mask.blue = (CARD32)m_myFormat.blueMax << m_myFormat.blueShift;
 
 	if (directx_used)
 		{
@@ -4958,8 +5075,13 @@ inline void ClientConnection::DoBlit()
 
 				int n = m_opts.m_scale_num;
 				int d = m_opts.m_scale_den;
+				int m = n % d;
+				if (m == 0)
+					// Text at High DPI Monitor 200% or 300%
+					SetStretchBltMode(hdc, BLACKONWHITE);
+				else
+					SetStretchBltMode(hdc, HALFTONE);
 
-				SetStretchBltMode(hdc, HALFTONE);
 				SetBrushOrgEx(hdc, 0, 0, NULL);
 				{
 					if (m_hmemdc)
@@ -5049,9 +5171,9 @@ void* ClientConnection::run_undetached(void* arg) {
 	//adzm 2010-09 - all socket writes must remain on a single thread
 	SendFullFramebufferUpdateRequest(false);
 
-	SizeWindow(false, false);
+	SizeWindow(false);
 	RealiseFullScreenMode();
-	if (!InFullScreenMode()) SizeWindow(false, false);
+	if (!InFullScreenMode()) SizeWindow(false);
 
 	m_running = true;
 	UpdateWindow(m_hwndcn);
@@ -5308,6 +5430,7 @@ void ClientConnection::Internal_SendFramebufferUpdateRequest(int x, int y, int w
 		fur.incremental = incremental ? 1 : 0;
 	else
 		fur.incremental = (incremental || ExtDesktop) ? 1 : 0;
+    ExtDesktop = false;
     fur.x = Swap16IfLE(x);
     fur.y = Swap16IfLE(y);
     fur.w = Swap16IfLE(w);
@@ -5526,6 +5649,7 @@ inline void ClientConnection::ReadScreenUpdate()
 
     //if (sut.nRects == 0) return;  XXX tjr removed this - is this OK?
 
+	bool bNeedVnc4Fix = false;
 	for (UINT iCurrentRect=0; iCurrentRect < sut.nRects; iCurrentRect++)
 	{
 		rfbFramebufferUpdateRectHeader surh;
@@ -5535,6 +5659,33 @@ inline void ClientConnection::ReadScreenUpdate()
 		surh.r.w = Swap16IfLE(surh.r.w);
 		surh.r.h = Swap16IfLE(surh.r.h);
 		surh.encoding = Swap32IfLE(surh.encoding);
+
+#if 1
+		/* vnc4server in debian jessie and wheezy offers pixel format bgr101111
+			if the color depth is 32. This means it is necessary to send whole
+			32bit (4 bytes) for each pixel. However vnc4server sends only 3 bytes
+			 blueMax is declared as signed 32bit int in vnc4server. The following
+			code falls the connection back to 24 bit color depth (rgb888) to prevent
+			the bug if pixel format bgr101111 is requested. */
+
+	if (surh.encoding == rfbEncodingZRLE && m_myFormat.redShift == 0
+			&& m_myFormat.greenShift == 11 && m_myFormat.blueShift == 22) {
+		m_myFormat.depth = 24;
+		m_myFormat.redMax = m_myFormat.greenMax = m_myFormat.blueMax = 255;
+		m_myFormat.redShift = 16;
+		m_myFormat.greenShift = 8;
+		m_myFormat.blueShift = 0;
+		bNeedVnc4Fix = true;
+	}
+	if (surh.encoding == rfbEncodingZRLE && bNeedVnc4Fix) {
+	    /* Discard Rect */
+		int length = fis->readU32();
+		zis->setUnderlying(fis, length);
+		zis->reset();
+		continue;
+		
+	}
+#endif
 
 		// Tight - If lastrect we must quit this loop (nRects = 0xFFFF)
 		if (surh.encoding == rfbEncodingLastRect)
@@ -6049,6 +6200,11 @@ inline void ClientConnection::ReadScreenUpdate()
 		SendAppropriateFramebufferUpdateRequest(true);	
 	}
 	DeleteObject(UpdateRegion);
+	if (bNeedVnc4Fix) {
+		SetFormatAndEncodings();
+		Createdib();
+		Internal_SendFullFramebufferUpdateRequest();
+	}
 }
 
 void ClientConnection::SetDormant(int newstate)
@@ -6936,7 +7092,7 @@ void ClientConnection::ReadNewFBSize(rfbFramebufferUpdateRectHeader *pfburh)
 	m_pendingFormatChange = true;
 	}
 
-	SizeWindow();
+	SizeWindow(true, m_opts.m_SaveSize && m_opts.m_Directx);
 	InvalidateRect(m_hwndcn, NULL, TRUE);
 	RealiseFullScreenMode();
 	SendFullFramebufferUpdateRequest(false);
@@ -7557,7 +7713,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 					// Toggle toolbar & toolbar menu option
 					case ID_DBUTTON:
 						_this->m_opts.m_ShowToolbar = !_this->m_opts.m_ShowToolbar;
-						_this->SizeWindow(false, false);
+						_this->SizeWindow();
 						_this->SetFullScreenMode(_this->InFullScreenMode());
 						// adzm - 2010-07 - Extended clipboard
 						//_this->UpdateMenuItems(); // Handled in WM_INITMENUPOPUP
@@ -7604,7 +7760,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							ShowWindow(_this->m_hwndStatus,SW_MINIMIZE);
 						break;
 
-					case SC_MAXIMIZE:
+					case SC_MAXIMIZE:					
 						_this->SetFullScreenMode(!_this->InFullScreenMode());
 						break;
 
@@ -7655,7 +7811,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 										prev_scale_den != _this->m_opts.m_scale_den)
 									{
 										// Resize the window if scaling factors were changed
-										_this->SizeWindow(/*false*/);
+										_this->SizeWindow();
 										InvalidateRect(hwnd, NULL, TRUE);
 										// Make the window corresponds to the requested state
 										_this->RealiseFullScreenMode();
@@ -7695,8 +7851,10 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						_this->ShowConnInfo();
 						return 0;
 
-					case ID_FULLSCREEN:
+					case ID_FULLSCREEN: // CTRL+ALT+F12
 						_this->SetFullScreenMode(!_this->InFullScreenMode());
+						if (!_this->InFullScreenMode())
+						  _this->restoreScreenPosition();
 						return 0;
 
 					case ID_VIEWONLYTOGGLE:
@@ -8064,6 +8222,27 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 					break;
 				}//end case wm_syscommand
 
+				case WM_MOVE:
+					if (_this->m_DpiMove)
+						if (_this->IsOnlyOneMonitor())
+						{
+							_this->m_DpiMove = false;
+							if (_this->m_opts.m_fAutoScaling)
+							{
+								_this->m_fScalingDone = false;
+								_this->SendFullFramebufferUpdateRequest(false);
+						    }
+						    _this->SizeWindow();
+				     	}
+				   return 0;
+
+				case WM_DPICHANGED:
+					_this->m_Dpi = HIWORD(wParam);
+					_this->m_DpiMove = true;
+					
+					//_this->SizeWindow(true,true);
+					_this->m_DpiOld = _this->m_Dpi;
+					return 0;
 				case WM_SIZING:
 					if (_this->m_opts.m_Directx) 
 						return 0;
@@ -8463,7 +8642,6 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 
 				case tbWM_MAXIMIZE:
 					_this->SetFullScreenMode(FALSE);
-					_this->SizeWindow(); // Thomas Levering
 					_this->restoreScreenPosition();
 					return 0;
 
@@ -9384,12 +9562,10 @@ ClientConnection:: ConvertPixel_to_bpp_from_32(int xx, int yy,int bytes_per_pixe
 		break;
 	case 4:
 		{
-		BYTE color[4];
-		color[0]=source[2];
-		color[1]=source[1];
-		color[2]=source[0];
-		color[3]=0;
-		memcpy(destpos, &color, bytes_per_pixel);
+		CARD32 *p = (CARD32*)destpos;
+		*p = ((((CARD32)b*(bm+1)) >> 8) << bs)
+		   | ((((CARD32)g*(gm+1)) >> 8) << gs)
+		   | ((((CARD32)r*(rm+1)) >> 8) << rs);
 		}
 		break;
 	}
