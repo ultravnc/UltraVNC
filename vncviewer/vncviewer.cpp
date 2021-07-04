@@ -344,13 +344,59 @@ static BOOL read_reg_string(HKEY key, char* sub_key, char* val_name, LPBYTE data
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR szCmdLine, int iCmdShow)
 {
+	HMODULE hUser32 = LoadLibrary(_T("user32.dll"));
+	HMODULE shcoreDLL = LoadLibrary("SHCORE.DLL");
+	/* For Vista, Win7 and Win8 */
+	typedef BOOL(*SetProcessDPIAwareFunc)();
+	SetProcessDPIAwareFunc setDPIAwareF = NULL;
 
-HMODULE hUser32 = LoadLibrary(_T("user32.dll"));
-typedef BOOL(*SetProcessDPIAwareFunc)();
-SetProcessDPIAwareFunc setDPIAware=NULL;
-if (hUser32) setDPIAware = (SetProcessDPIAwareFunc)GetProcAddress(hUser32, "SetProcessDPIAware");
-if (setDPIAware) setDPIAware();
-if (hUser32) FreeLibrary(hUser32);
+	/* Win8.1 and later */
+	typedef enum _Process_DPI_Awareness {
+		Process_DPI_Unaware = 0,
+		Process_System_DPI_Aware = 1,
+		Process_Per_Monitor_DPI_Aware = 2,
+	} Process_DPI_Awareness;
+
+	typedef enum DPI_AWARENESS_CONTEXT
+	{
+		DPI_AWARENESS_CONTEXT_DEFAULT = 0, // Undocumented
+		DPI_AWARENESS_CONTEXT_UNAWARE = -1, // Undocumented
+		DPI_AWARENESS_CONTEXT_SYSTEM_AWARE = -2, // Undocumented
+		DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE = -3, // Undocumented
+		DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2 = -4
+	}DPI_AWARENESS_CONTEXT;
+
+
+	typedef HRESULT(*SetProcessDpiAwarenessFunc) (Process_DPI_Awareness);
+	SetProcessDpiAwarenessFunc setDPIpiAwarenessF = NULL;
+
+	//Windows 10
+	typedef HRESULT(*SetProcessDpiAwarenessContextFunc) (DPI_AWARENESS_CONTEXT);
+	SetProcessDpiAwarenessContextFunc setDPIpiAwarenessContext = NULL;
+
+
+	if (hUser32) {
+		setDPIAwareF = (SetProcessDPIAwareFunc)GetProcAddress(hUser32, "SetProcessDPIAware");
+		setDPIpiAwarenessContext = (SetProcessDpiAwarenessContextFunc)GetProcAddress(hUser32, "SetProcessDpiAwarenessContext");
+	}
+
+	if (shcoreDLL) {
+		setDPIpiAwarenessF =  (SetProcessDpiAwarenessFunc)GetProcAddress(shcoreDLL, "SetProcessDpiAwareness");
+	}
+
+	if (setDPIpiAwarenessContext) {
+		setDPIpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+	}
+	else if (setDPIpiAwarenessF) {
+		setDPIpiAwarenessF(Process_Per_Monitor_DPI_Aware);
+	}
+	else if (setDPIAwareF) 
+		setDPIAwareF();
+
+	if (hUser32) 
+		FreeLibrary(hUser32);
+	if (shcoreDLL) 
+		FreeLibrary(shcoreDLL);
 
 #ifdef CRASHRPT
 	CR_INSTALL_INFO info;
