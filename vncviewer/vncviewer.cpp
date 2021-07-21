@@ -357,21 +357,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR szCmdLin
 		Process_Per_Monitor_DPI_Aware = 2,
 	} Process_DPI_Awareness;
 
-	typedef enum DPI_AWARENESS_CONTEXT
-	{
-		DPI_AWARENESS_CONTEXT_DEFAULT = 0, // Undocumented
-		DPI_AWARENESS_CONTEXT_UNAWARE = -1, // Undocumented
-		DPI_AWARENESS_CONTEXT_SYSTEM_AWARE = -2, // Undocumented
-		DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE = -3, // Undocumented
-		DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2 = -4
-	}DPI_AWARENESS_CONTEXT;
+	typedef enum _DPI_AWARENESS_CONTEXT {
+		dpi_AWARENESS_CONTEXT_DEFAULT = 0,
+		dpi_AWARENESS_CONTEXT_UNAWARE = -1,
+		dpi_AWARENESS_CONTEXT_SYSTEM_AWARE = -2,
+		dpi_AWARENESS_CONTEXT_PER_MONITOR_AWARE = -3,
+		dpi_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2 = -4
+	}dpi_AWARENESS_CONTEXT;
 
 
 	typedef HRESULT(*SetProcessDpiAwarenessFunc) (Process_DPI_Awareness);
 	SetProcessDpiAwarenessFunc setDPIpiAwarenessF = NULL;
 
 	//Windows 10
-	typedef HRESULT(*SetProcessDpiAwarenessContextFunc) (DPI_AWARENESS_CONTEXT);
+	typedef HRESULT(*SetProcessDpiAwarenessContextFunc) (dpi_AWARENESS_CONTEXT);
 	SetProcessDpiAwarenessContextFunc setDPIpiAwarenessContext = NULL;
 
 
@@ -385,7 +384,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR szCmdLin
 	}
 
 	if (setDPIpiAwarenessContext) {
-		setDPIpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+		setDPIpiAwarenessContext(dpi_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 	}
 	else if (setDPIpiAwarenessF) {
 		setDPIpiAwarenessF(Process_Per_Monitor_DPI_Aware);
