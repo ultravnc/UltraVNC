@@ -585,6 +585,8 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	ShowToolbar = -1;
 	ExtDesktop = false;
 	tbWM_Set = false;
+	m_Dpi = GetDeviceCaps(GetDC(m_hwndMain), LOGPIXELSX);
+	m_DpiOld = m_Dpi;
 }
 
 // helper functions for setting socket timeouts during file transfer
@@ -659,7 +661,7 @@ void ClientConnection::Run()
 	WatchClipboard();
 
 	Createdib();
-	SizeWindow(false, false);
+	SizeWindow(false);  // saved Size/Pos set
 
 	// This starts the worker thread.
 	// The rest of the processing continues in run_undetached.
@@ -3645,20 +3647,39 @@ void ClientConnection::ReadServerInit(bool reconnect)
 
 	if (m_opts.m_ViewOnly) SetWindowText(m_hwndMain, m_desktopName_viewonly);
 	else SetWindowText(m_hwndMain, m_desktopName);
-	SizeWindow(reconnect, false);
+	SizeWindow();
 }
 
-void ClientConnection::SizeWindow(bool reconnect, bool sizeMultimon)
+void ClientConnection::SizeWindow(bool noPosChange, bool noSizeChange)
 {
 	int uni_screenWidth = extSDisplay ? widthExtSDisplay : m_si.framebufferWidth;
 	int uni_screenHeight = extSDisplay ? heightExtSDisplay : m_si.framebufferHeight;
 
-	bool pos_set = reconnect;
-	bool size_set = reconnect;
+	bool pos_set = false;
+	bool size_set = false;
 	// Find how large the desktop work area is
 	RECT workrect;
 	tempdisplayclass tdc;
 	tdc.Init();
+
+	// Auto sizeMultimon
+	int monact = tdc.getSelectedScreen(m_hwndMain, false);
+	int monactwidth = tdc.monarray[monact].wr - tdc.monarray[monact].wl;
+	int monactheight = tdc.monarray[monact].wb - tdc.monarray[monact].wt;
+	int minwidth;
+	int minheight;
+	if (m_opts.m_scaling)
+	{
+		minwidth = m_si.framebufferWidth * (m_opts.m_scale_num / m_opts.m_scale_den);
+		minheight = m_si.framebufferHeight * (m_opts.m_scale_num / m_opts.m_scale_den);
+	}
+	else
+	{
+		minwidth = m_si.framebufferWidth;
+		minheight = m_si.framebufferHeight;
+	}
+	bool sizeMultimon = ((minwidth > monactwidth) || (minheight > monactheight)) && !m_opts.m_FullScreen && !m_opts.m_fAutoScaling && !m_opts.m_Directx;
+
 	int mon = tdc.getSelectedScreen(m_hwndMain, (m_opts.m_allowMonitorSpanning || sizeMultimon) && !m_opts.m_showExtend);
 	workrect.left=tdc.monarray[mon].wl;
 	workrect.right=tdc.monarray[mon].wr;
@@ -3724,9 +3745,29 @@ void ClientConnection::SizeWindow(bool reconnect, bool sizeMultimon)
 	else
 		SetRect(&fullwinrect, 0, 0, uni_screenWidth, uni_screenHeight);
 
-	AdjustWindowRectEx(&fullwinrect,
-			   GetWindowLong(m_hwndcn, GWL_STYLE) & ~WS_VSCROLL & ~WS_HSCROLL,
-			   FALSE, GetWindowLong(m_hwndcn, GWL_EXSTYLE));
+
+	// AdjustWindowRectExForDpi   Windows 10, version 1607 [desktop apps only]
+	HMODULE hUser32 = LoadLibrary(_T("user32.dll"));
+	typedef HRESULT(*AdjustWindowRectExForDpi) (LPRECT, DWORD, BOOL, DWORD, UINT);
+	AdjustWindowRectExForDpi adjustWindowRectExForDpi = NULL;
+	if (hUser32)
+		adjustWindowRectExForDpi = (AdjustWindowRectExForDpi)GetProcAddress(hUser32, "AdjustWindowRectExForDpi");
+
+	if (adjustWindowRectExForDpi)
+	{
+		adjustWindowRectExForDpi(&fullwinrect,
+			                     GetWindowLong(m_hwndcn, GWL_STYLE) & ~WS_VSCROLL & ~WS_HSCROLL,
+			                     FALSE, 
+			                     GetWindowLong(m_hwndcn, GWL_EXSTYLE),
+			                     m_Dpi);
+	} 
+	else
+	{ 
+	    AdjustWindowRectEx(&fullwinrect,
+			               GetWindowLong(m_hwndcn, GWL_STYLE) & ~WS_VSCROLL & ~WS_HSCROLL,
+			               FALSE, 
+			               GetWindowLong(m_hwndcn, GWL_EXSTYLE));
+	}
 
 	m_fullwinwidth = fullwinrect.right - fullwinrect.left;
 	m_fullwinheight = (fullwinrect.bottom - fullwinrect.top);
@@ -3744,9 +3785,21 @@ void ClientConnection::SizeWindow(bool reconnect, bool sizeMultimon)
 	}
 
    // Hauptfenster positionieren
-	AdjustWindowRectEx(&fullwinrect,
-					   GetWindowLong(m_hwndMain, GWL_STYLE) & ~WS_VSCROLL & ~WS_HSCROLL,
-					   FALSE, GetWindowLong(m_hwndMain, GWL_EXSTYLE));
+	if (adjustWindowRectExForDpi)
+	{
+		adjustWindowRectExForDpi(&fullwinrect,
+			                     GetWindowLong(m_hwndMain, GWL_STYLE) & ~WS_VSCROLL & ~WS_HSCROLL,
+			                     FALSE,
+			                     GetWindowLong(m_hwndMain, GWL_EXSTYLE),
+			                     m_Dpi);
+	}
+	else
+	{
+		AdjustWindowRectEx(&fullwinrect,
+			               GetWindowLong(m_hwndMain, GWL_STYLE) & ~WS_VSCROLL & ~WS_HSCROLL,
+			               FALSE, 
+			               GetWindowLong(m_hwndMain, GWL_EXSTYLE));
+	}
 
 	m_fullwinwidth = fullwinrect.right - fullwinrect.left;
 	m_fullwinheight = (fullwinrect.bottom - fullwinrect.top);
@@ -3773,7 +3826,7 @@ void ClientConnection::SizeWindow(bool reconnect, bool sizeMultimon)
 	}
 
 	//added position x y w y via commandline or x y 0 0
-	if ((m_opts.m_w != 0 || m_opts.m_h != 0 || m_opts.m_x != 0 || m_opts.m_y!=0) && !pos_set)
+	if ((m_opts.m_w != 0 || m_opts.m_h != 0 || m_opts.m_x != 0 || m_opts.m_y!=0) && !pos_set && !noPosChange)
 	{
 		// x y w h
 		if (m_opts.m_w != 0 && m_opts.m_h != 0)
@@ -3787,7 +3840,7 @@ void ClientConnection::SizeWindow(bool reconnect, bool sizeMultimon)
 			SetWindowPos(m_hwndMain, HWND_TOP, m_opts.m_x, m_opts.m_y, m_opts.m_w, m_opts.m_h, SWP_SHOWWINDOW | SWP_NOSIZE);
 		}
 	}
-	else if ((m_opts.m_SavePos || m_opts.m_SaveSize) && !pos_set)
+	else if ((m_opts.m_SavePos || m_opts.m_SaveSize) && !pos_set && !noPosChange)
 	{
 
 		if (m_opts.m_SavePos && m_opts.m_SaveSize && temp_w != 0 && temp_h != 0)
@@ -3814,10 +3867,10 @@ void ClientConnection::SizeWindow(bool reconnect, bool sizeMultimon)
 
 	if (m_opts.m_allowMonitorSpanning && !m_opts.m_showExtend && (m_fullwinwidth <= tdc.monarray[1].wr - tdc.monarray[1].wl + GetSystemMetrics(SM_CXBORDER) + GetSystemMetrics(SM_CXHSCROLL))) //fit on primary -20 for border
 	{
-		if (pos_set == false) 
+		if (!pos_set && !noPosChange)
 			SetWindowPos(m_hwndMain, HWND_TOP,tdc.monarray[1].wl + ((tdc.monarray[1].wr-tdc.monarray[1].wl)-m_winwidth) / 2,tdc.monarray[1].wt +
 					((tdc.monarray[1].wb - tdc.monarray[1].wt) - m_winheight) / 2, m_winwidth, m_winheight, SWP_SHOWWINDOW | SWP_NOSIZE);
-        if (size_set == false)
+        if (!size_set && !noSizeChange)
         {
             m_winwidth = act_width;
             m_winheight = act_height;
@@ -3828,9 +3881,9 @@ void ClientConnection::SizeWindow(bool reconnect, bool sizeMultimon)
 	else
 	{
         
-		if (pos_set == false) 
+		if (!pos_set && !noPosChange)
 			SetWindowPos(m_hwndMain, HWND_TOP, workrect.left + (workwidth - m_winwidth) / 2, workrect.top + (workheight - m_winheight) / 2, m_winwidth, m_winheight, SWP_SHOWWINDOW | SWP_NOSIZE);
-        if (size_set == false)
+        if (!size_set && !noSizeChange)
         {
             m_winwidth = act_width;
             m_winheight = act_height;
@@ -3838,7 +3891,7 @@ void ClientConnection::SizeWindow(bool reconnect, bool sizeMultimon)
         }
 	}
 
-	SetForegroundWindow(m_hwndMain);
+    SetForegroundWindow(m_hwndMain);
 
 	if (m_opts.m_ShowToolbar)
 		MoveWindow(m_hwndTBwin, 0, 0, workwidth, m_TBr.bottom - m_TBr.top, TRUE);
@@ -5049,9 +5102,9 @@ void* ClientConnection::run_undetached(void* arg) {
 	//adzm 2010-09 - all socket writes must remain on a single thread
 	SendFullFramebufferUpdateRequest(false);
 
-	SizeWindow(false, false);
+	SizeWindow(false);
 	RealiseFullScreenMode();
-	if (!InFullScreenMode()) SizeWindow(false, false);
+	if (!InFullScreenMode()) SizeWindow(false);
 
 	m_running = true;
 	UpdateWindow(m_hwndcn);
@@ -6936,7 +6989,7 @@ void ClientConnection::ReadNewFBSize(rfbFramebufferUpdateRectHeader *pfburh)
 	m_pendingFormatChange = true;
 	}
 
-	SizeWindow();
+	SizeWindow(true, m_opts.m_SaveSize && m_opts.m_Directx);
 	InvalidateRect(m_hwndcn, NULL, TRUE);
 	RealiseFullScreenMode();
 	SendFullFramebufferUpdateRequest(false);
@@ -7557,7 +7610,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 					// Toggle toolbar & toolbar menu option
 					case ID_DBUTTON:
 						_this->m_opts.m_ShowToolbar = !_this->m_opts.m_ShowToolbar;
-						_this->SizeWindow(false, false);
+						_this->SizeWindow();
 						_this->SetFullScreenMode(_this->InFullScreenMode());
 						// adzm - 2010-07 - Extended clipboard
 						//_this->UpdateMenuItems(); // Handled in WM_INITMENUPOPUP
@@ -7604,7 +7657,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							ShowWindow(_this->m_hwndStatus,SW_MINIMIZE);
 						break;
 
-					case SC_MAXIMIZE:
+					case SC_MAXIMIZE:					
 						_this->SetFullScreenMode(!_this->InFullScreenMode());
 						break;
 
@@ -7655,7 +7708,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 										prev_scale_den != _this->m_opts.m_scale_den)
 									{
 										// Resize the window if scaling factors were changed
-										_this->SizeWindow(/*false*/);
+										_this->SizeWindow();
 										InvalidateRect(hwnd, NULL, TRUE);
 										// Make the window corresponds to the requested state
 										_this->RealiseFullScreenMode();
@@ -8064,6 +8117,39 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 					break;
 				}//end case wm_syscommand
 
+				case WM_MOVE:
+				   return 0;
+
+				case WM_DPICHANGED:
+					_this->m_Dpi = HIWORD(wParam);
+					/* toDo not working
+					if (_this->m_opts.m_Directx)
+						;
+					else if (_this->m_opts.m_fAutoScaling)
+					{
+						//_this->m_fScalingDone = false;
+						//_this->SizeWindow(true, true);
+					}
+					else
+					{
+						
+						if (_this->m_opts.m_scale_den == 1)
+						{
+							_this->m_opts.m_scale_num = _this->m_opts.m_scale_num * 96;
+							_this->m_opts.m_scale_den = 96;
+						}
+						if (_this->m_opts.m_scale_num == 0)
+							_this->m_opts.m_scale_num = _this->m_opts.m_scale_den;
+
+						_this->m_opts.m_scale_num = (_this->m_opts.m_scale_num * _this->m_Dpi) / _this->m_DpiOld;
+						_this->m_opts.m_scaling = !(_this->m_opts.m_scale_num == _this->m_opts.m_scale_den);
+						
+						_this->SizeWindow(true, true);					
+					} 
+					*/
+					_this->SizeWindow();
+					_this->m_DpiOld = _this->m_Dpi;
+					return 0;
 				case WM_SIZING:
 					if (_this->m_opts.m_Directx) 
 						return 0;
@@ -8463,7 +8549,6 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 
 				case tbWM_MAXIMIZE:
 					_this->SetFullScreenMode(FALSE);
-					_this->SizeWindow(); // Thomas Levering
 					_this->restoreScreenPosition();
 					return 0;
 
