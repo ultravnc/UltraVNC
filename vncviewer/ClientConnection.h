@@ -314,6 +314,7 @@ private:
 	int initialupdate_counter;
 	void ReadScreenUpdate();
 	void Update(RECT *pRect);
+	bool IsOnlyOneMonitor();
 	void SizeWindow(bool noPosChange = true, bool noSizeChange = false);
 	bool ScrollScreen(int dx, int dy, bool absolute = false);
 	void UpdateScrollbars();
@@ -837,6 +838,7 @@ private:
 
 	UINT m_Dpi;
 	UINT m_DpiOld;
+	bool m_DpiMove;
 public:
 	// RFB settings
 	VNCOptions m_opts;

@@ -3650,6 +3650,18 @@ void ClientConnection::ReadServerInit(bool reconnect)
 	SizeWindow();
 }
 
+bool ClientConnection::IsOnlyOneMonitor()
+{
+	RECT windowRect;
+	GetWindowRect(m_hwndMain, &windowRect);
+	HMONITOR hMonitor = ::MonitorFromWindow(m_hwndMain, MONITOR_DEFAULTTONEAREST);
+	MONITORINFO mi;
+	mi.cbSize = sizeof(MONITORINFO);
+	GetMonitorInfo(hMonitor, &mi);
+	return ((windowRect.top >= mi.rcMonitor.top) && (windowRect.bottom <= mi.rcMonitor.bottom) && (windowRect.left >= mi.rcMonitor.left) && (windowRect.right <= mi.rcMonitor.right)) 
+		|| (windowRect.right - windowRect.left) >= (mi.rcMonitor.right - mi.rcMonitor.left) || (windowRect.bottom - windowRect.top) >= (mi.rcMonitor.bottom - mi.rcMonitor.top);  // or Bigger
+}
+
 void ClientConnection::SizeWindow(bool noPosChange, bool noSizeChange)
 {
 	int uni_screenWidth = extSDisplay ? widthExtSDisplay : m_si.framebufferWidth;
@@ -7748,8 +7760,10 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						_this->ShowConnInfo();
 						return 0;
 
-					case ID_FULLSCREEN:
+					case ID_FULLSCREEN: // CTRL+ALT+F12
 						_this->SetFullScreenMode(!_this->InFullScreenMode());
+						if (!_this->InFullScreenMode())
+						  _this->restoreScreenPosition();
 						return 0;
 
 					case ID_VIEWONLYTOGGLE:
@@ -8118,36 +8132,24 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 				}//end case wm_syscommand
 
 				case WM_MOVE:
+					if (_this->m_DpiMove)
+						if (_this->IsOnlyOneMonitor())
+						{
+							_this->m_DpiMove = false;
+							if (_this->m_opts.m_fAutoScaling)
+							{
+								_this->m_fScalingDone = false;
+								_this->SendFullFramebufferUpdateRequest(false);
+						    }
+						    _this->SizeWindow();
+				     	}
 				   return 0;
 
 				case WM_DPICHANGED:
 					_this->m_Dpi = HIWORD(wParam);
-					/* toDo not working
-					if (_this->m_opts.m_Directx)
-						;
-					else if (_this->m_opts.m_fAutoScaling)
-					{
-						//_this->m_fScalingDone = false;
-						//_this->SizeWindow(true, true);
-					}
-					else
-					{
-						
-						if (_this->m_opts.m_scale_den == 1)
-						{
-							_this->m_opts.m_scale_num = _this->m_opts.m_scale_num * 96;
-							_this->m_opts.m_scale_den = 96;
-						}
-						if (_this->m_opts.m_scale_num == 0)
-							_this->m_opts.m_scale_num = _this->m_opts.m_scale_den;
-
-						_this->m_opts.m_scale_num = (_this->m_opts.m_scale_num * _this->m_Dpi) / _this->m_DpiOld;
-						_this->m_opts.m_scaling = !(_this->m_opts.m_scale_num == _this->m_opts.m_scale_den);
-						
-						_this->SizeWindow(true, true);					
-					} 
-					*/
-					_this->SizeWindow();
+					_this->m_DpiMove = true;
+					
+					//_this->SizeWindow(true,true);
 					_this->m_DpiOld = _this->m_Dpi;
 					return 0;
 				case WM_SIZING:

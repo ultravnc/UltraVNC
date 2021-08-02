@@ -42,16 +42,12 @@ void ClientConnection::saveScreenPosition()
 //	if (!m_opts.m_SavePos)
 	GetWindowRect(m_hwndMain, &mainRect);
 
-
 	// if doubleclick Title don´t save     
 	HMONITOR hMonitor = ::MonitorFromWindow(m_hwndMain, MONITOR_DEFAULTTONEAREST);
 	MONITORINFO mi;
 	mi.cbSize = sizeof(MONITORINFO);
 	GetMonitorInfo(hMonitor, &mi);
-	int x = mi.rcMonitor.left;
-	int y = mi.rcMonitor.top;
-	int cx = mi.rcMonitor.right - x;
-	int cy = mi.rcMonitor.bottom - y;
+	
 	saveScreenPositionOK = (mainRect.left > mi.rcMonitor.left);
 	//saveScreenPositionOK = (mainRect.left > 0) && (mainRect.top > 0);
 }

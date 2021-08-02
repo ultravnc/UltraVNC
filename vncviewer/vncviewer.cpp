@@ -38,6 +38,7 @@
 
 #include "omnithread/omnithread.h"
 #include "VNCviewerApp32.h"
+#include "shellscalingapi.h"
 
 // All logging is done via the log object
 Log vnclog;
@@ -346,50 +347,29 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR szCmdLin
 {
 	HMODULE hUser32 = LoadLibrary(_T("user32.dll"));
 	HMODULE shcoreDLL = LoadLibrary("SHCORE.DLL");
-	/* For Vista, Win7 and Win8 */
+	//Min  Vista
 	typedef BOOL(*SetProcessDPIAwareFunc)();
 	SetProcessDPIAwareFunc setDPIAwareF = NULL;
-
-	/* Win8.1 and later */
-	typedef enum _Process_DPI_Awareness {
-		Process_DPI_Unaware = 0,
-		Process_System_DPI_Aware = 1,
-		Process_Per_Monitor_DPI_Aware = 2,
-	} Process_DPI_Awareness;
-
-	typedef enum _DPI_AWARENESS_CONTEXT {
-		dpi_AWARENESS_CONTEXT_DEFAULT = 0,
-		dpi_AWARENESS_CONTEXT_UNAWARE = -1,
-		dpi_AWARENESS_CONTEXT_SYSTEM_AWARE = -2,
-		dpi_AWARENESS_CONTEXT_PER_MONITOR_AWARE = -3,
-		dpi_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2 = -4
-	}dpi_AWARENESS_CONTEXT;
-
-
-	typedef HRESULT(*SetProcessDpiAwarenessFunc) (Process_DPI_Awareness);
+	//Min Windows 8.1
+	typedef HRESULT(*SetProcessDpiAwarenessFunc) (PROCESS_DPI_AWARENESS);
 	SetProcessDpiAwarenessFunc setDPIpiAwarenessF = NULL;
-
-	//Windows 10
-	typedef HRESULT(*SetProcessDpiAwarenessContextFunc) (dpi_AWARENESS_CONTEXT);
-	SetProcessDpiAwarenessContextFunc setDPIpiAwarenessContext = NULL;
-
-
+	//Min Windows 10, version 1703
+	typedef HRESULT(*SetProcessDpiAwarenessContextFunc) (DPI_AWARENESS_CONTEXT);
+	SetProcessDpiAwarenessContextFunc SetProcessDpiAwarenessContextF = NULL;
 	if (hUser32) {
 		setDPIAwareF = (SetProcessDPIAwareFunc)GetProcAddress(hUser32, "SetProcessDPIAware");
-		setDPIpiAwarenessContext = (SetProcessDpiAwarenessContextFunc)GetProcAddress(hUser32, "SetProcessDpiAwarenessContext");
+		SetProcessDpiAwarenessContextF = (SetProcessDpiAwarenessContextFunc)GetProcAddress(hUser32, "SetProcessDpiAwarenessContext");
 	}
-
 	if (shcoreDLL) {
 		setDPIpiAwarenessF =  (SetProcessDpiAwarenessFunc)GetProcAddress(shcoreDLL, "SetProcessDpiAwareness");
 	}
 
-	if (setDPIpiAwarenessContext) {
-		setDPIpiAwarenessContext(dpi_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
-	}
-	else if (setDPIpiAwarenessF) {
-		setDPIpiAwarenessF(Process_Per_Monitor_DPI_Aware);
-	}
-	else if (setDPIAwareF) 
+	HRESULT hr = S_FALSE;
+	if (SetProcessDpiAwarenessContextF) 
+		hr = SetProcessDpiAwarenessContextF(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+	if (hr != S_OK && setDPIpiAwarenessF)
+		hr = setDPIpiAwarenessF(PROCESS_PER_MONITOR_DPI_AWARE);
+	if (hr != S_OK && (setDPIAwareF))
 		setDPIAwareF();
 
 	if (hUser32) 
