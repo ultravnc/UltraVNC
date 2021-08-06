@@ -5023,8 +5023,13 @@ inline void ClientConnection::DoBlit()
 
 				int n = m_opts.m_scale_num;
 				int d = m_opts.m_scale_den;
+				int m = n % d;
+				if (m == 0)
+					// Text at High DPI Monitor 200% or 300%
+					SetStretchBltMode(hdc, BLACKONWHITE);
+				else
+					SetStretchBltMode(hdc, HALFTONE);
 
-				SetStretchBltMode(hdc, HALFTONE);
 				SetBrushOrgEx(hdc, 0, 0, NULL);
 				{
 					if (m_hmemdc)
