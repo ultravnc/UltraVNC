@@ -60,8 +60,6 @@ void ClientConnection::ReadZlibHexRect(rfbFramebufferUpdateRectHeader *pfburh, b
 	}
 }
 
-COLORREF bgcolor = 0;
-COLORREF fgcolor = 0;
 BYTE pfgcolor[4];
 BYTE pbgcolor[4];
 
@@ -74,7 +72,6 @@ void ClientConnection::HandleZlibHexEncoding##bpp(int rx, int ry, int rw, int rh
 																				\
     CheckBufferSize((( 16 * 16 + 2 ) * bpp / 8 ) + 20 );											\
     CheckZlibBufferSize((( 16 * 16 + 2 ) * bpp / 8 ) + 20 );										\
-	SETUP_COLOR_SHORTCUTS;														\
 																				\
     for (y = ry; y < ry+rh; y += 16) {											\
 		omni_mutex_lock l(m_bitmapdcMutex);										\
@@ -135,18 +132,14 @@ void ClientConnection::HandleZlibHexSubencodingStream##bpp(int x, int y, int w, 
     int sx, sy, sw, sh;															\
     CARD8 nSubrects;															\
 																				\
-	SETUP_COLOR_SHORTCUTS;														\
-																				\
 	if (subencoding & rfbHextileBackgroundSpecified) {							\
 		ReadExact((char *)&bg, (bpp/8));										\
-		bgcolor = COLOR_FROM_PIXEL##bpp##_ADDRESS(&bg);							\
 		memcpy(pbgcolor,&bg,bpp/8);												\
 	}																			\
 	FillSolidRect_ultra(x,y,w,h, m_myFormat.bitsPerPixel,(BYTE*)pbgcolor);\
 																				\
 	if (subencoding & rfbHextileForegroundSpecified)  {							\
 		ReadExact((char *)&fg, (bpp/8));										\
-		fgcolor = COLOR_FROM_PIXEL##bpp##_ADDRESS(&fg);							\
 		memcpy(pfgcolor,&fg,bpp/8);												\
 	}																			\
 																				\
@@ -163,7 +156,6 @@ void ClientConnection::HandleZlibHexSubencodingStream##bpp(int x, int y, int w, 
 		ReadExact( m_netbuf, nSubrects * (2 + (bpp / 8)));						\
 																				\
 		for (i = 0; i < nSubrects; i++) {										\
-			fgcolor = COLOR_FROM_PIXEL##bpp##_ADDRESS(ptr);						\
 			memcpy(pfgcolor,ptr,bpp/8);											\
 			ptr += (bpp/8);														\
 			sx = *ptr >> 4;														\
@@ -196,13 +188,10 @@ void ClientConnection::HandleZlibHexSubencodingBuf##bpp(int x, int y, int w, int
 	CARD8 nSubrects;															\
 	int bufIndex = 0;															\
 																				\
-	SETUP_COLOR_SHORTCUTS;														\
-																				\
 	if (subencoding & rfbHextileBackgroundSpecified) {							\
 		bg = *((CARD##bpp *)(buffer + bufIndex));								\
 		bufIndex += (bpp/8);													\
 		/* ReadExact((char *)&bg, (bpp/8)); */									\
-		bgcolor = COLOR_FROM_PIXEL##bpp##_ADDRESS(&bg);							\
 		memcpy(pbgcolor,&bg,bpp/8);												\
 	}																			\
 	FillSolidRect_ultra(x,y,w,h, m_myFormat.bitsPerPixel,(BYTE*)pbgcolor);\
@@ -211,7 +200,6 @@ void ClientConnection::HandleZlibHexSubencodingBuf##bpp(int x, int y, int w, int
 		fg = *((CARD##bpp *)(buffer + bufIndex));								\
 		bufIndex += (bpp/8);													\
 		/* ReadExact((char *)&fg, (bpp/8)); */									\
-		fgcolor = COLOR_FROM_PIXEL##bpp##_ADDRESS(&fg);							\
 		memcpy(pfgcolor,&fg,bpp/8);												\
 	}																			\
 																				\
@@ -230,7 +218,6 @@ void ClientConnection::HandleZlibHexSubencodingBuf##bpp(int x, int y, int w, int
 		/* ReadExact( m_netbuf, nSubrects * (2 + (bpp / 8))); */				\
 																				\
 		for (i = 0; i < nSubrects; i++) {										\
-			fgcolor = COLOR_FROM_PIXEL##bpp##_ADDRESS(ptr);						\
 			memcpy(pfgcolor,ptr,bpp/8);											\
 			ptr += (bpp/8);														\
 			sx = *ptr >> 4;														\

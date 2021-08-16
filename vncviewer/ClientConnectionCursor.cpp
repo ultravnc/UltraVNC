@@ -330,8 +330,6 @@ void ClientConnection::SoftCursorDraw() {
 
 	omni_mutex_lock l(m_bitmapdcMutex);
 
-	SETUP_COLOR_SHORTCUTS;
-
 	for (y = 0; y < rcHeight; y++) {
 		y0 = rcCursorY - rcHotY + y;
 		if (y0 >= 0 && y0 < m_si.framebufferHeight) {

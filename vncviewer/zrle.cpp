@@ -21,11 +21,8 @@
 #define BPP 8
 #define ZYWRLE_ENDIAN ENDIAN_NO
 #define IMAGE_RECT(x,y,w,h,data)                \
-    SETUP_COLOR_SHORTCUTS;                      \
     SETPIXELS(m_netbuf,8,x,y,w,h)
 #define FILL_RECT(x,y,w,h,pix)                          \
-    SETUP_COLOR_SHORTCUTS;                              \
-    COLORREF color = COLOR_FROM_PIXEL8_ADDRESS(&pix);   \
     FillSolidRect_ultra(x,y,w,h, m_myFormat.bitsPerPixel,(BYTE*)&pix)
 
 #include <rfb/zrleDecode.h>
@@ -37,11 +34,8 @@
 #define BPP 16
 #define ZYWRLE_ENDIAN ENDIAN_LITTLE
 #define IMAGE_RECT(x,y,w,h,data)                \
-    SETUP_COLOR_SHORTCUTS;                      \
     SETPIXELS(m_netbuf,16,x,y,w,h)
 #define FILL_RECT(x,y,w,h,pix)                          \
-    SETUP_COLOR_SHORTCUTS;                              \
-    COLORREF color = COLOR_FROM_PIXEL16_ADDRESS(&pix);  \
     FillSolidRect_ultra(x,y,w,h, m_myFormat.bitsPerPixel,(BYTE*)&pix)
 
 #include <rfb/zrleDecode.h>
@@ -56,11 +50,8 @@
 #undef FILL_RECT
 
 #define IMAGE_RECT(x,y,w,h,data)                \
-    SETUP_COLOR_SHORTCUTS;                      \
     SETPIXELS(m_netbuf,32,x,y,w,h)
 #define FILL_RECT(x,y,w,h,pix)                          \
-    SETUP_COLOR_SHORTCUTS;                              \
-    COLORREF color = COLOR_FROM_PIXEL32_ADDRESS(&pix);  \
     FillSolidRect_ultra(x,y,w,h, m_myFormat.bitsPerPixel,(BYTE*)&pix)
 
 
