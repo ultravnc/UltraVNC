@@ -108,9 +108,9 @@ void ClientConnection::zrleDecode(int x, int y, int w, int h, bool use_zstd)
 
 		case 32:
 			bool fitsInLS3Bytes
-				= ((m_myFormat.redMax << m_myFormat.redShift) < (1 << 24) &&
-				(m_myFormat.greenMax << m_myFormat.greenShift) < (1 << 24) &&
-					(m_myFormat.blueMax << m_myFormat.blueShift) < (1 << 24));
+				= (((CARD32)m_myFormat.redMax << m_myFormat.redShift) < (1 << 24) &&
+				((CARD32)m_myFormat.greenMax << m_myFormat.greenShift) < (1 << 24) &&
+					((CARD32)m_myFormat.blueMax << m_myFormat.blueShift) < (1 << 24));
 
 			bool fitsInMS3Bytes = (m_myFormat.redShift > 7 &&
 				m_myFormat.greenShift > 7 &&
@@ -151,9 +151,9 @@ void ClientConnection::zrleDecode(int x, int y, int w, int h, bool use_zstd)
 
 		case 32:
 			bool fitsInLS3Bytes
-				= ((m_myFormat.redMax << m_myFormat.redShift) < (1 << 24) &&
-				(m_myFormat.greenMax << m_myFormat.greenShift) < (1 << 24) &&
-					(m_myFormat.blueMax << m_myFormat.blueShift) < (1 << 24));
+				= (((CARD32)m_myFormat.redMax << m_myFormat.redShift) < (1 << 24) &&
+				((CARD32)m_myFormat.greenMax << m_myFormat.greenShift) < (1 << 24) &&
+					((CARD32)m_myFormat.blueMax << m_myFormat.blueShift) < (1 << 24));
 
 			bool fitsInMS3Bytes = (m_myFormat.redShift > 7 &&
 				m_myFormat.greenShift > 7 &&

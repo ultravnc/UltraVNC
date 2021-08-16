@@ -4185,9 +4185,9 @@ void ClientConnection::Createdib()
     bi.bmiHeader.biWidth = m_si.framebufferWidth;
     bi.bmiHeader.biHeight = -m_si.framebufferHeight;
     bi.bmiHeader.biCompression = (m_myFormat.bitsPerPixel > 8) ? BI_BITFIELDS : BI_RGB;
-    bi.mask.red = m_myFormat.redMax << m_myFormat.redShift;
-    bi.mask.green = m_myFormat.greenMax << m_myFormat.greenShift;
-    bi.mask.blue = m_myFormat.blueMax << m_myFormat.blueShift;
+    bi.mask.red = (CARD32)m_myFormat.redMax << m_myFormat.redShift;
+    bi.mask.green = (CARD32)m_myFormat.greenMax << m_myFormat.greenShift;
+    bi.mask.blue = (CARD32)m_myFormat.blueMax << m_myFormat.blueShift;
 
 	if (directx_used)
 		{
