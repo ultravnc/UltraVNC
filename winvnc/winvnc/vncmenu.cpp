@@ -1427,14 +1427,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			return 0;
 		}
 		
-	case WM_CLOSE:
-		
-		// Only accept WM_CLOSE if the logged on user has AllowShutdown set
-		// Error this clock the service restart.
-		/*if (!_this->m_properties.AllowShutdown())
-		{
-			return 0;
-		}*/
+	case WM_CLOSE:				
 		// tnatsni Wallpaper fix
 		if (_this->m_server->RemoveWallpaperEnabled())
 			RestoreWallpaper();
@@ -1467,28 +1460,21 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				vnclog.Print(LL_INTINFO, VNCLOG("KillAuthClients() ID_CLOSE \n"));
 				_this->m_server->OS_Shutdown=true;
 				_this->m_server->KillAuthClients();				
-				PostMessage(hwnd, WM_CLOSE, 0, 0);
-				break;
+				_this->DelTrayIcon();
+				HANDLE hEndSessionEvent = OpenEvent(EVENT_MODIFY_STATE, FALSE, "Global\\EndSessionEvent");
+				if (hEndSessionEvent != NULL) {
+					SetEvent(hEndSessionEvent);
+					CloseHandle(hEndSessionEvent);
+				}
 			}
-			/*DWORD SessionID;
-			SessionID=GetCurrentSessionID();
-			vnclog.Print(LL_INTERR, VNCLOG("Session ID %i\n"),SessionID);
-			if (SessionID!=0)
-			{
-				fShutdownOrdered=TRUE;
-				Sleep(1000);
-				vnclog.Print(LL_INTERR, VNCLOG("WM_QUERYENDSESSION session!=0\n"));
-				vnclog.Print(LL_INTINFO, VNCLOG("KillAuthClients() ID_CLOSE \n"));
-				_this->m_server->KillAuthClients();				
-				PostMessage(hwnd, WM_CLOSE, 0, 0);
-			}*/
 		}	
-		break;
+		return 1;
 		
 	case WM_ENDSESSION:
 		fShutdownOrdered = TRUE;
 		vnclog.Print(LL_INTERR, VNCLOG("WM_ENDSESSION\n"));
-		break;
+		DestroyWindow(hwnd);
+		return 0;
 
 	case WM_USERCHANGED:
 		// The current user may have changed.
