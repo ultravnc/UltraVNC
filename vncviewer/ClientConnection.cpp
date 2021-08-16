@@ -3612,6 +3612,16 @@ void ClientConnection::ReadServerInit(bool reconnect)
     m_si.format.blueMax = Swap16IfLE(m_si.format.blueMax);
     m_si.nameLength = Swap32IfLE(m_si.nameLength);
 
+#if 0
+    if (m_si.format.redShift == 0 && m_si.format.greenShift == 11 && m_si.format.blueShift == 22) {
+		m_si.format.depth = 24;
+		m_si.format.redMax = m_si.format.greenMax = m_si.format.blueMax = 255;
+		m_si.format.redShift = 16;
+		m_si.format.greenShift = 8;
+		m_si.format.blueShift = 0;
+	}
+#endif
+
     m_desktopName = new TCHAR[1024];
 	m_desktopName_viewonly = new TCHAR[1024];
 	if (m_si.nameLength > 256) {
@@ -5606,6 +5616,18 @@ inline void ClientConnection::ReadScreenUpdate()
 		surh.r.w = Swap16IfLE(surh.r.w);
 		surh.r.h = Swap16IfLE(surh.r.h);
 		surh.encoding = Swap32IfLE(surh.encoding);
+
+#if 0
+        if ((surh.encoding == rfbEncodingZRLE || surh.encoding == rfbEncodingZYWRLE)
+            m_si.format.redShift == 0 && m_si.format.greenShift == 11 && m_si.format.blueShift == 22) {
+		    m_si.format.depth = 24;
+		    m_si.format.redMax = m_si.format.greenMax = m_si.format.blueMax = 255;
+		    m_si.format.redShift = 16;
+		    m_si.format.greenShift = 8;
+		    m_si.format.blueShift = 0;
+		    m_pendingFormatChange = true;
+	    }
+#endif
 
 		// Tight - If lastrect we must quit this loop (nRects = 0xFFFF)
 		if (surh.encoding == rfbEncodingLastRect)
