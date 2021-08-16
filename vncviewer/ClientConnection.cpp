@@ -5378,6 +5378,7 @@ void ClientConnection::Internal_SendFramebufferUpdateRequest(int x, int y, int w
 		fur.incremental = incremental ? 1 : 0;
 	else
 		fur.incremental = (incremental || ExtDesktop) ? 1 : 0;
+    ExtDesktop = false;
     fur.x = Swap16IfLE(x);
     fur.y = Swap16IfLE(y);
     fur.w = Swap16IfLE(w);
