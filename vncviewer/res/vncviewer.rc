@@ -1283,7 +1283,7 @@ BEGIN
     CTEXT           "%",IDC_STATIC,102,107,8,8,0,WS_EX_TRANSPARENT
     LTEXT           "1  /",IDC_STATIC,91,119,12,8
     CTEXT           "",IDC_RES,181,12,47,8
-    CONTROL         "Allow multi monitor spanning",IDC_ALLOWSPAN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,74,111,10
+    CONTROL         "Allow Fullscreen multi monitor spanning",IDC_ALLOWSPAN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,74,141,10
     LTEXT           "Small",IDC_STATIC,19,12,19,8
     CONTROL         "Change server resolution.",IDC_CHANGESERVER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,1,100,10
     CONTROL         "Use only virtual displays  (win 10 1903 >=)",IDC_RADIO_ONLY_VIRTUAL,

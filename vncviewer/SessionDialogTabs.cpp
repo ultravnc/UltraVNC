@@ -1500,6 +1500,7 @@ void SessionDialog::StartListener()
 	m_pOpt->m_ViewOnly = ViewOnly;
 	m_pOpt->m_ShowToolbar = ShowToolbar;
 	m_pOpt->m_fAutoScaling = fAutoScaling;
+	m_pOpt->m_fAutoScalingEven = fAutoScalingEven;
 	m_pOpt->m_scale_num = scale_num;
 	m_pOpt->m_scale_den = scale_den;
 	m_pOpt->m_nServerScale = nServerScale;

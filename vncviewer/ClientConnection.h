@@ -842,6 +842,7 @@ private:
 public:
 	// RFB settings
 	VNCOptions m_opts;
+	bool m_FullScreenNotDone;
 	int m_autoReconnect;
 	int reconnectcounter;
 	void DoConnection(bool reconnect = false);

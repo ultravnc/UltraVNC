@@ -587,6 +587,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	tbWM_Set = false;
 	m_Dpi = GetDeviceCaps(GetDC(m_hwndMain), LOGPIXELSX);
 	m_DpiOld = m_Dpi;
+	m_FullScreenNotDone = false;
 }
 
 // helper functions for setting socket timeouts during file transfer
@@ -3686,11 +3687,11 @@ void ClientConnection::SizeWindow(bool noPosChange, bool noSizeChange)
 
 	// Auto sizeMultimon
 	int monact = tdc.getSelectedScreen(m_hwndMain, false);
-	int monactwidth = tdc.monarray[monact].wr - tdc.monarray[monact].wl;
-	int monactheight = tdc.monarray[monact].wb - tdc.monarray[monact].wt;
+	int monactwidth = tdc.monarray[monact].width;
+	int monactheight = tdc.monarray[monact].height;
 	int minwidth;
 	int minheight;
-	if (m_opts.m_scaling)
+	if (m_opts.m_scaling && (!m_opts.m_fAutoScaling || m_fScalingDone))
 	{
 		minwidth = m_si.framebufferWidth * (m_opts.m_scale_num / m_opts.m_scale_den);
 		minheight = m_si.framebufferHeight * (m_opts.m_scale_num / m_opts.m_scale_den);
@@ -3700,21 +3701,38 @@ void ClientConnection::SizeWindow(bool noPosChange, bool noSizeChange)
 		minwidth = m_si.framebufferWidth;
 		minheight = m_si.framebufferHeight;
 	}
-	bool sizeMultimon = ((minwidth > monactwidth) || (minheight > monactheight)) && !m_opts.m_FullScreen && !m_opts.m_fAutoScaling && !m_opts.m_Directx;
+	bool sizeMultimon = ((minwidth > monactwidth) || (minheight > monactheight)) && !m_opts.m_FullScreen && (!m_opts.m_fAutoScaling || m_opts.m_fAutoScalingEven) && !m_opts.m_Directx;
 
 	int mon = tdc.getSelectedScreen(m_hwndMain, (m_opts.m_allowMonitorSpanning || sizeMultimon) && !m_opts.m_showExtend);
-	workrect.left=tdc.monarray[mon].wl;
-	workrect.right=tdc.monarray[mon].wr;
-	workrect.top=tdc.monarray[mon].wt;
-	workrect.bottom=tdc.monarray[mon].wb;
+	workrect.left = tdc.monarray[mon].wl;
+	workrect.right = tdc.monarray[mon].wr;
+	workrect.top = tdc.monarray[mon].wt;
+	workrect.bottom = tdc.monarray[mon].wb;
 	//SystemParametersInfo(SPI_GETWORKAREA, 0, &workrect, 0);
-	int workwidth = workrect.right -  workrect.left;
-	int workheight = workrect.bottom - workrect.top;
+	int workwidth;
+	int workheight;
+	if (m_opts.m_FullScreen)
+	{
+		workwidth = tdc.monarray[mon].width;
+		workheight = tdc.monarray[mon].height;
+	}
+	else
+	{
+		workwidth = workrect.right - workrect.left;
+		workheight = workrect.bottom - workrect.top;
+	}
 	vnclog.Print(2, _T("Screen work area is %d x %d\n"), workwidth, workheight);
 
-	int widthwindow,heightwindow;
+	// AdjustWindowRectExForDpi   Windows 10, version 1607 [desktop apps only]
+	HMODULE hUser32 = LoadLibrary(_T("user32.dll"));
+	typedef HRESULT(*AdjustWindowRectExForDpi) (LPRECT, DWORD, BOOL, DWORD, UINT);
+	AdjustWindowRectExForDpi adjustWindowRectExForDpi = NULL;
+	if (hUser32)
+		adjustWindowRectExForDpi = (AdjustWindowRectExForDpi)GetProcAddress(hUser32, "AdjustWindowRectExForDpi");
 
-	// sf@2003 - AutoScaling
+
+	// sf@2003 - AutoScaling   
+	// Thomas Levering 
 	if (m_opts.m_fAutoScaling && !m_fScalingDone)
 	{
 		// We save the scales values coming from options
@@ -3722,27 +3740,59 @@ void ClientConnection::SizeWindow(bool noPosChange, bool noSizeChange)
 		m_opts.m_saved_scale_den = m_opts.m_scale_den;
 		m_opts.m_saved_scaling = m_opts.m_scaling;
 
-		RECT myrect,myclrect;
-		GetWindowRect(m_hwndMain,&myrect);
-		GetClientRect(m_hwndMain,&myclrect);
-		int dx=(myrect.right-myrect.left)-(myclrect.right-myclrect.left);
-		int dy=(myrect.bottom-myrect.top)-(myclrect.bottom-myclrect.top);
-
-		//case one, does the scaling fit the window include borders?
-
+		// we change the scaling to fit the window
+		// max windows size including borders etc..
+		int horizontalRatio;
+		int verticalRatio;
+		if (m_opts.m_FullScreen)
 		{
-			// we change the scaling to fit the window
-			// max windows size including borders etc..
-			int horizontalRatio= (int) (((workwidth-dx)*100)/uni_screenWidth);
-			int verticalRatio = (int) (((workheight-dy*2)*100)/uni_screenHeight);
-			int Ratio= min(verticalRatio, horizontalRatio);
-			widthwindow=uni_screenWidth*Ratio/100;
-			heightwindow=uni_screenHeight*Ratio/100;
-			m_opts.m_scale_num =Ratio;
-			m_opts.m_scale_den = 100;
-			m_opts.m_scaling = true;
-			m_fScalingDone = true;
+			horizontalRatio = (int)(((monactwidth) * 100) / uni_screenWidth);
+			verticalRatio = (int)(((monactheight) * 100) / uni_screenHeight);
 		}
+		else
+		{
+			RECT testrect;
+			SetRect(&testrect, 0, 0, uni_screenWidth, uni_screenHeight);
+			if (adjustWindowRectExForDpi)
+			{
+				adjustWindowRectExForDpi(&testrect,
+					GetWindowLong(m_hwndMain, GWL_STYLE) & ~WS_VSCROLL & ~WS_HSCROLL,
+					FALSE,
+					GetWindowLong(m_hwndMain, GWL_EXSTYLE),
+					m_Dpi);
+			}
+			else
+			{
+				AdjustWindowRectEx(&testrect,
+					GetWindowLong(m_hwndMain, GWL_STYLE) & ~WS_VSCROLL & ~WS_HSCROLL,
+					FALSE,
+					GetWindowLong(m_hwndMain, GWL_EXSTYLE));
+			}
+			int dx = (testrect.right - testrect.left) - (uni_screenWidth);
+			int dy = (testrect.bottom - testrect.top) - (uni_screenHeight);
+			if (m_opts.m_ShowToolbar)
+				dy = dy + m_TBr.bottom - m_TBr.top;
+			horizontalRatio = (int)(((workwidth - dx) * 100) / uni_screenWidth);
+			verticalRatio = (int)(((workheight - dy) * 100) / uni_screenHeight);
+		}
+		int Ratio= min(verticalRatio, horizontalRatio);
+		
+		// Option only use 100,200,300%
+		if (m_opts.m_fAutoScalingEven)
+		{
+			if (Ratio >= 300)
+				Ratio = 300;
+			else if (Ratio >= 200)
+				Ratio = 200;
+			else if (((horizontalRatio > 190) || (verticalRatio > 170) ) && (m_Dpi >= 192) && (!m_opts.m_FullScreen))
+				Ratio = 200;
+			else
+				Ratio = 100;
+		}
+		m_opts.m_scale_num =Ratio;
+		m_opts.m_scale_den = 100;
+		m_opts.m_scaling = !(Ratio == 100);
+		m_fScalingDone = true;		
 	}
 
 	if (!m_opts.m_fAutoScaling && m_fScalingDone)
@@ -3766,14 +3816,6 @@ void ClientConnection::SizeWindow(bool noPosChange, bool noSizeChange)
 				uni_screenHeight * m_opts.m_scale_num / m_opts.m_scale_den);
 	else
 		SetRect(&fullwinrect, 0, 0, uni_screenWidth, uni_screenHeight);
-
-
-	// AdjustWindowRectExForDpi   Windows 10, version 1607 [desktop apps only]
-	HMODULE hUser32 = LoadLibrary(_T("user32.dll"));
-	typedef HRESULT(*AdjustWindowRectExForDpi) (LPRECT, DWORD, BOOL, DWORD, UINT);
-	AdjustWindowRectExForDpi adjustWindowRectExForDpi = NULL;
-	if (hUser32)
-		adjustWindowRectExForDpi = (AdjustWindowRectExForDpi)GetProcAddress(hUser32, "AdjustWindowRectExForDpi");
 
 	if (adjustWindowRectExForDpi)
 	{

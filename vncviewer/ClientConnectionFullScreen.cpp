@@ -62,25 +62,34 @@ void ClientConnection::restoreScreenPosition()
 
 bool ClientConnection::InFullScreenMode() 
 {
-	return m_opts.m_FullScreen; 
+	if (m_FullScreenNotDone)
+		return !m_FullScreen;
+	else
+		return m_FullScreen;
 };
 
 // You can explicitly change mode by calling this
 void ClientConnection::SetFullScreenMode(bool enable)
 {
+	if (enable ^ m_opts.m_FullScreen)
+		m_fScalingDone = false;
+	
 	if (enable) {
 		ShowToolbar = m_opts.m_ShowToolbar;
 		m_opts.m_ShowToolbar = 0;		
         saveScreenPosition();
+		m_FullScreenNotDone = enable ^ m_opts.m_FullScreen;
+		m_opts.m_FullScreen = enable;		
 		SizeWindow(true, true);
-		m_opts.m_FullScreen = enable;
-		RealiseFullScreenMode();
+		//m_FullScreen = enable;
+		m_FullScreenNotDone = false;
+		RealiseFullScreenMode();		
 	}
 	else if (ShowToolbar != -1) {		
 		m_opts.m_ShowToolbar = ShowToolbar;
-		ShowToolbar = -1;		
-		SizeWindow();
+		ShowToolbar = -1;
 		m_opts.m_FullScreen = enable;
+		SizeWindow();
 		RealiseFullScreenMode();
 		if (extSDisplay)
 			ScrollScreen(offsetXExtSDisplay, offsetYExtSDisplay, true);

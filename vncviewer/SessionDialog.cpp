@@ -54,6 +54,7 @@ SessionDialog::SessionDialog(VNCOptions* pOpt, ClientConnection* pCC, CDSMPlugin
 	m_bExpanded = true;
 	cy = 0;
 	cx = 0;
+	dpichanged = false;
 	m_pCC = pCC;
 	m_pOpt = pOpt;
 	m_pMRU = new MRU(SESSION_MRU_KEY_NAME, 98);
@@ -76,6 +77,7 @@ SessionDialog::SessionDialog(VNCOptions* pOpt, ClientConnection* pCC, CDSMPlugin
 
 	ViewOnly = m_pOpt->m_ViewOnly;
 	fAutoScaling = m_pOpt->m_fAutoScaling;
+	fAutoScalingEven = m_pOpt->m_fAutoScalingEven;
 	fExitCheck = m_pOpt->m_fExitCheck;
 	m_fUseProxy = m_pOpt->m_fUseProxy;
 	allowMonitorSpanning = m_pOpt->m_allowMonitorSpanning;
@@ -351,7 +353,17 @@ BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 
 		break;
-
+	case WM_DPICHANGED:
+		_this->dpichanged = true;
+		return FALSE;
+	case WM_MOVE:
+		if (_this->dpichanged)
+			if (_this->IsOnlyOneMonitor(hwnd))
+			{
+				_this->dpichanged = false;
+				_this->DpiChange(hwnd);
+			}
+		return FALSE;
 	case WM_CLOSE:
 		return FALSE;
 	case WM_DESTROY:
@@ -359,6 +371,38 @@ BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		return TRUE;
 	}
 	return 0;
+}
+
+bool SessionDialog::IsOnlyOneMonitor(HWND hDlg)
+{
+	RECT windowRect;
+	GetWindowRect(hDlg, &windowRect);
+	HMONITOR hMonitor = ::MonitorFromWindow(hDlg, MONITOR_DEFAULTTONEAREST);
+	MONITORINFO mi;
+	mi.cbSize = sizeof(MONITORINFO);
+	GetMonitorInfo(hMonitor, &mi);
+	return ((windowRect.top >= mi.rcMonitor.top) && (windowRect.bottom <= mi.rcMonitor.bottom) && (windowRect.left >= mi.rcMonitor.left) && (windowRect.right <= mi.rcMonitor.right))
+		|| (windowRect.right - windowRect.left) >= (mi.rcMonitor.right - mi.rcMonitor.left) || (windowRect.bottom - windowRect.top) >= (mi.rcMonitor.bottom - mi.rcMonitor.top);  // or Bigger
+}
+
+void SessionDialog::DpiChange(HWND hDlg)
+{
+	if (m_bExpanded)
+	{
+		cx = 0;
+		cy = 0;
+	}
+	else
+	{
+		RECT rcWnd, rcDefaultBox;
+		HWND wndDefaultBox = NULL;
+		GetWindowRect(hDlg, &rcWnd);
+		wndDefaultBox = GetDlgItem(hDlg, IDC_DEFAULTBOX);
+		if (wndDefaultBox == NULL) return;
+		GetWindowRect(wndDefaultBox, &rcDefaultBox);
+		cx = rcDefaultBox.right - rcWnd.left; // OK
+		// cy = rcWnd.bottom - rcWnd.top;  // not OK, toDo  size wrong after dpichange
+	}
 }
 
 void SessionDialog::ExpandBox(HWND hDlg, BOOL fExpand)
@@ -576,6 +620,7 @@ bool SessionDialog::connect(HWND hwnd)
 	m_pOpt->m_ViewOnly = ViewOnly;
 	m_pOpt->m_ShowToolbar = ShowToolbar;
 	m_pOpt->m_fAutoScaling = fAutoScaling;
+	m_pOpt->m_fAutoScalingEven = fAutoScalingEven;
 	m_pOpt->m_scale_num = scale_num;
 	m_pOpt->m_scale_den = scale_den;
 	m_pOpt->m_nServerScale = nServerScale;
