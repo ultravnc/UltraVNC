@@ -5607,6 +5607,7 @@ inline void ClientConnection::ReadScreenUpdate()
 
     //if (sut.nRects == 0) return;  XXX tjr removed this - is this OK?
 
+	bool bNeedVnc4Fix = false;
 	for (UINT iCurrentRect=0; iCurrentRect < sut.nRects; iCurrentRect++)
 	{
 		rfbFramebufferUpdateRectHeader surh;
@@ -5617,16 +5618,31 @@ inline void ClientConnection::ReadScreenUpdate()
 		surh.r.h = Swap16IfLE(surh.r.h);
 		surh.encoding = Swap32IfLE(surh.encoding);
 
-#if 0
-        if ((surh.encoding == rfbEncodingZRLE || surh.encoding == rfbEncodingZYWRLE)
-            m_si.format.redShift == 0 && m_si.format.greenShift == 11 && m_si.format.blueShift == 22) {
-		    m_si.format.depth = 24;
-		    m_si.format.redMax = m_si.format.greenMax = m_si.format.blueMax = 255;
-		    m_si.format.redShift = 16;
-		    m_si.format.greenShift = 8;
-		    m_si.format.blueShift = 0;
-		    m_pendingFormatChange = true;
-	    }
+#if 1
+		/* vnc4server in debian jessie and wheezy offers pixel format bgr101111
+			if the color depth is 32. This means it is necessary to send whole
+			32bit (4 bytes) for each pixel. However vnc4server sends only 3 bytes
+			 blueMax is declared as signed 32bit int in vnc4server. The following
+			code falls the connection back to 24 bit color depth (rgb888) to prevent
+			the bug if pixel format bgr101111 is requested. */
+
+	if (surh.encoding == rfbEncodingZRLE && m_myFormat.redShift == 0
+			&& m_myFormat.greenShift == 11 && m_myFormat.blueShift == 22) {
+		m_myFormat.depth = 24;
+		m_myFormat.redMax = m_myFormat.greenMax = m_myFormat.blueMax = 255;
+		m_myFormat.redShift = 16;
+		m_myFormat.greenShift = 8;
+		m_myFormat.blueShift = 0;
+		bNeedVnc4Fix = true;
+	}
+	if (surh.encoding == rfbEncodingZRLE && bNeedVnc4Fix) {
+	    /* Discard Rect */
+		int length = fis->readU32();
+		zis->setUnderlying(fis, length);
+		zis->reset();
+		continue;
+		
+	}
 #endif
 
 		// Tight - If lastrect we must quit this loop (nRects = 0xFFFF)
@@ -6142,6 +6158,11 @@ inline void ClientConnection::ReadScreenUpdate()
 		SendAppropriateFramebufferUpdateRequest(true);	
 	}
 	DeleteObject(UpdateRegion);
+	if (bNeedVnc4Fix) {
+		SetFormatAndEncodings();
+		Createdib();
+		Internal_SendFullFramebufferUpdateRequest();
+	}
 }
 
 void ClientConnection::SetDormant(int newstate)
