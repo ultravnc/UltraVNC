@@ -9562,12 +9562,10 @@ ClientConnection:: ConvertPixel_to_bpp_from_32(int xx, int yy,int bytes_per_pixe
 		break;
 	case 4:
 		{
-		BYTE color[4];
-		color[0]=source[2];
-		color[1]=source[1];
-		color[2]=source[0];
-		color[3]=0;
-		memcpy(destpos, &color, bytes_per_pixel);
+		CARD32 *p = (CARD32*)destpos;
+		*p = ((((CARD32)b*(bm+1)) >> 8) << bs)
+		   | ((((CARD32)g*(gm+1)) >> 8) << gs)
+		   | ((((CARD32)r*(rm+1)) >> 8) << rs);
 		}
 		break;
 	}

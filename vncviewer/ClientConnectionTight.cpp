@@ -58,10 +58,10 @@ void ClientConnection::ReadTightRect(rfbFramebufferUpdateRectHeader *pfburh, boo
         m_myFormat.greenMax == 0xFF && m_myFormat.blueMax == 0xFF) {
       CARD8 fillColourBuf[3];
       ReadExact((char *)&fillColourBuf, 3);
-      colorpointer[0] = fillColourBuf[2];
-      colorpointer[1] = fillColourBuf[1];
-      colorpointer[2] = fillColourBuf[0];
-      colorpointer[3] = 0;
+      CARD32 *p = (CARD32*)colorpointer;
+      *p = ((CARD32)fillColourBuf[0] << m_myFormat.redShift)
+         | ((CARD32)fillColourBuf[1] << m_myFormat.greenShift)
+         | ((CARD32)fillColourBuf[2] << m_myFormat.blueShift);
     } else {
       CARD32 fillColourBuf;
       ReadExact((char *)&fillColourBuf, m_myFormat.bitsPerPixel / 8);
