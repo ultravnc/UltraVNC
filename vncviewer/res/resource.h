@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ generated include file.
-// Used by vncviewer.rc
+// Von Microsoft Visual C++ generierte Includedatei.
+// Verwendet durch vncviewer.rc
 //
 #define IDCANCEL2                       4
 #define IDQUIT                          9
@@ -106,8 +106,7 @@
 #define IDC_FULLSCREEN                  1011
 #define IDC_DISABLECLIPBOARD            1012
 #define IDC_SCALING                     1013
-#define IDC_SCALE_NUM                   1014
-#define IDC_SCALE_DEN                   1015
+#define IDC_SCALINGEVEN                 1014
 #define IDC_AUTODETECT                  1016
 #define IDC_BUILDTIME                   1017
 #define IDC_CSHAPE_DISABLE_RADIO        1018
