@@ -3789,6 +3789,7 @@ void ClientConnection::SizeWindow(bool noPosChange, bool noSizeChange)
 			else
 				Ratio = 100;
 		}
+		vnclog.Print(2, _T("Autosize %d\n"), Ratio);
 		m_opts.m_scale_num =Ratio;
 		m_opts.m_scale_den = 100;
 		m_opts.m_scaling = !(Ratio == 100);
@@ -7796,14 +7797,27 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							// adzm - 2010-07 - Extended clipboard
 							bool bOldViewOnly = _this->m_opts.m_ViewOnly;
 							bool bOldDisableClipboard = _this->m_opts.m_DisableClipboard;
+							bool bOldAutoScaling = _this->m_opts.m_fAutoScaling;
+							bool bOldAutoScalingEven = _this->m_opts.m_fAutoScalingEven;
 
 							if (_this->m_opts.DoDialog(true,hwnd))
 							{
+								if ((_this->m_opts.m_fAutoScaling ^ bOldAutoScaling) || (_this->m_opts.m_fAutoScalingEven ^ bOldAutoScalingEven))
+								{
+									_this->m_fScalingDone = false;
+								}
+								
 								// Modif sf@2002 - Server Scaling
 								_this->m_nServerScale = _this->m_opts.m_nServerScale;
 								if (_this->m_nServerScale != nOldServerScale)
 								{
 									_this->SendServerScale(_this->m_nServerScale);
+								}
+								else if (_this->m_opts.m_fAutoScaling && !_this->m_fScalingDone)
+								{
+									_this->SizeWindow();
+									if (_this->m_running)
+										_this->SendFullFramebufferUpdateRequest(false);
 								}
 								else
 								{
@@ -8230,17 +8244,18 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							if (_this->m_opts.m_fAutoScaling)
 							{
 								_this->m_fScalingDone = false;
-								_this->SendFullFramebufferUpdateRequest(false);
+								if (_this->m_running)
+									_this->SendFullFramebufferUpdateRequest(false);
 						    }
-						    _this->SizeWindow();
+							vnclog.Print(2, _T("DPI changed, SizeWindow\n"));
+							_this->SizeWindow();
 				     	}
 				   return 0;
 
 				case WM_DPICHANGED:
 					_this->m_Dpi = HIWORD(wParam);
-					_this->m_DpiMove = true;
-					
-					//_this->SizeWindow(true,true);
+					vnclog.Print(2, _T("DPI changed, new=%d old=%d\n"), _this->m_Dpi, _this->m_DpiOld);
+					_this->m_DpiMove = true;					
 					_this->m_DpiOld = _this->m_Dpi;
 					return 0;
 				case WM_SIZING:

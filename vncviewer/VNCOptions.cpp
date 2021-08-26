@@ -1462,6 +1462,9 @@ BOOL CALLBACK VNCOptions::OptDlgProc(HWND hwnd, UINT uMsg,
 		HWND hAutoScaling = GetDlgItem(hwnd, IDC_SCALING);
 		SendMessage(hAutoScaling, BM_SETCHECK, _this->m_fAutoScaling, 0);
 
+		HWND hAutoScalingEven = GetDlgItem(hwnd, IDC_SCALINGEVEN);
+		SendMessage(hAutoScalingEven, BM_SETCHECK, _this->m_fAutoScalingEven, 0);
+
 		// SetDlgItemInt( hwnd, IDC_SCALE_NUM, _this->m_scale_num, FALSE);
 		// SetDlgItemInt( hwnd, IDC_SCALE_DEN, _this->m_scale_den, FALSE);
 
@@ -1652,6 +1655,9 @@ BOOL CALLBACK VNCOptions::OptDlgProc(HWND hwnd, UINT uMsg,
 
 			HWND hAutoScaling = GetDlgItem(hwnd, IDC_SCALING);
 			_this->m_fAutoScaling = (SendMessage(hAutoScaling, BM_GETCHECK, 0, 0) == BST_CHECKED);
+
+			HWND hAutoScalingEven = GetDlgItem(hwnd, IDC_SCALINGEVEN);
+			_this->m_fAutoScalingEven = (SendMessage(hAutoScalingEven, BM_GETCHECK, 0, 0) == BST_CHECKED);
 
 			HWND hViewerScaling = GetDlgItem(hwnd, IDC_SCALE_CB);
 			int nErr;
