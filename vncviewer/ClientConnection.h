@@ -133,6 +133,7 @@ struct BitmapInfo {
 };
 
 namespace rdr { class InStream; class FdInStream; class ZlibInStream; class xzInStream; class ZstdInStream; }
+typedef BOOL(WINAPI* PFN_AdjustWindowRectExForDpi) (LPRECT, DWORD, BOOL, DWORD, UINT);
 
 class ClientConnection  : public omni_thread
 {
@@ -266,7 +267,6 @@ private:
 	
 	void SetupPixelFormat();
 	void SetFormatAndEncodings();
-	void SendSetPixelFormat(rfbPixelFormat newFormat);
 
 	// adzm 2010-09
 	void HandleFramebufferUpdateRequest(WPARAM wParam, LPARAM lParam);
@@ -839,6 +839,8 @@ private:
 	UINT m_Dpi;
 	UINT m_DpiOld;
 	bool m_DpiMove;
+	HMODULE hUser32;
+	PFN_AdjustWindowRectExForDpi adjustWindowRectExForDpi;
 public:
 	// RFB settings
 	VNCOptions m_opts;

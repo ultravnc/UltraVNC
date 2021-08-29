@@ -78,6 +78,7 @@ SessionDialog::SessionDialog(VNCOptions* pOpt, ClientConnection* pCC, CDSMPlugin
 	ViewOnly = m_pOpt->m_ViewOnly;
 	fAutoScaling = m_pOpt->m_fAutoScaling;
 	fAutoScalingEven = m_pOpt->m_fAutoScalingEven;
+	fAutoScalingLimit = m_pOpt->m_fAutoScalingLimit;
 	fExitCheck = m_pOpt->m_fExitCheck;
 	m_fUseProxy = m_pOpt->m_fUseProxy;
 	allowMonitorSpanning = m_pOpt->m_allowMonitorSpanning;
@@ -111,6 +112,7 @@ SessionDialog::SessionDialog(VNCOptions* pOpt, ClientConnection* pCC, CDSMPlugin
 	throttleMouse = m_pOpt->m_throttleMouse;
 	requestShapeUpdates = m_pOpt->m_requestShapeUpdates;
 	ignoreShapeUpdates = m_pOpt->m_ignoreShapeUpdates;
+	BlockSameMouse = m_pOpt->m_BlockSameMouse;
 	Emul3Buttons = m_pOpt->m_Emul3Buttons;
 	JapKeyboard = m_pOpt->m_JapKeyboard;
 	quickoption = m_pOpt->m_quickoption;
@@ -621,6 +623,7 @@ bool SessionDialog::connect(HWND hwnd)
 	m_pOpt->m_ShowToolbar = ShowToolbar;
 	m_pOpt->m_fAutoScaling = fAutoScaling;
 	m_pOpt->m_fAutoScalingEven = fAutoScalingEven;
+	m_pOpt->m_fAutoScalingLimit = fAutoScalingLimit;
 	m_pOpt->m_scale_num = scale_num;
 	m_pOpt->m_scale_den = scale_den;
 	m_pOpt->m_nServerScale = nServerScale;
@@ -637,6 +640,7 @@ bool SessionDialog::connect(HWND hwnd)
 	m_pOpt->m_throttleMouse = throttleMouse;
 	m_pOpt->m_requestShapeUpdates = requestShapeUpdates;
 	m_pOpt->m_ignoreShapeUpdates = ignoreShapeUpdates;
+	m_pOpt->m_BlockSameMouse = BlockSameMouse;
 	m_pOpt->m_Emul3Buttons = Emul3Buttons;
 	m_pOpt->m_JapKeyboard = JapKeyboard;
 	m_pOpt->m_quickoption = quickoption;

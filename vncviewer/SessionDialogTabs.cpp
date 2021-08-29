@@ -894,6 +894,8 @@ void SessionDialog::InitDlgProcDisplay()
 
 	HWND hAutoScaling = GetDlgItem(hwnd, IDC_SCALING);
 	SendMessage(hAutoScaling, BM_SETCHECK, fAutoScaling, 0);
+	HWND hAutoScalingEven = GetDlgItem(hwnd, IDC_SCALINGEVEN);
+	SendMessage(hAutoScalingEven, BM_SETCHECK, fAutoScalingEven, 0);
 
 	int Scales[13] = { 25, 50, 75, 80, 85, 90, 95, 100, 125, 150, 200, 300, 400 };
 	HWND hViewerScale = GetDlgItem(hwnd, IDC_SCALE_CB);
@@ -1100,6 +1102,8 @@ void SessionDialog::ReadDlgProcDisplay()
 
 	HWND hAutoScaling = GetDlgItem(hwnd, IDC_SCALING);
 	fAutoScaling = (SendMessage(hAutoScaling, BM_GETCHECK, 0, 0) == BST_CHECKED);
+	HWND hAutoScalingEven = GetDlgItem(hwnd, IDC_SCALINGEVEN);
+	fAutoScalingEven = (SendMessage(hAutoScalingEven, BM_GETCHECK, 0, 0) == BST_CHECKED);
 
 	HWND hViewerScaling = GetDlgItem(hwnd, IDC_SCALE_CB);
 	int nErr;
@@ -1501,6 +1505,7 @@ void SessionDialog::StartListener()
 	m_pOpt->m_ShowToolbar = ShowToolbar;
 	m_pOpt->m_fAutoScaling = fAutoScaling;
 	m_pOpt->m_fAutoScalingEven = fAutoScalingEven;
+	m_pOpt->m_fAutoScalingLimit = fAutoScalingLimit;
 	m_pOpt->m_scale_num = scale_num;
 	m_pOpt->m_scale_den = scale_den;
 	m_pOpt->m_nServerScale = nServerScale;
@@ -1517,6 +1522,7 @@ void SessionDialog::StartListener()
 	m_pOpt->m_throttleMouse = throttleMouse;
 	m_pOpt->m_requestShapeUpdates = requestShapeUpdates;
 	m_pOpt->m_ignoreShapeUpdates = ignoreShapeUpdates;
+	m_pOpt->m_BlockSameMouse = BlockSameMouse;
 	m_pOpt->m_Emul3Buttons = Emul3Buttons;
 	m_pOpt->m_JapKeyboard = JapKeyboard;
 	m_pOpt->m_quickoption = quickoption;

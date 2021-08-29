@@ -1282,6 +1282,11 @@ vncServer::RemoveClient(vncClientId clientid)
 						vnclog.Print(LL_CONNERR, VNCLOG("client disconnect - failed to logoff user!\n"));
 				}
 			}
+			if (vncService::RunningAsService() && m_Rdpmode) {
+				fShutdownOrdered = true;
+				vnclog.Print(LL_CONNERR, VNCLOG("last client disconnect - restart server for rdpmode\n"));
+
+			}
 		}
 
 		// Delete the screen server

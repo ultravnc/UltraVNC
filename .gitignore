@@ -85,3 +85,8 @@ winvnc/createpassword/x64/
 setpasswd/setpasswd/Debug/
 winvnc/createpassword/Debug/
 libjpeg-turbo-win/DebugLib-Static/
+*.recipe
+*.pch
+*.idb
+addon/ms-logon/logging/x64/
+*.suo
