@@ -19,18 +19,18 @@
 //===========================================================================
 
 //Width and heigth for the toolbar
-#define tbWidth				700
-#define tbHeigth			20
+#define ctbWidth			700
+#define ctbHeigth			20
 
 //Default size on every picture used as buttons
-#define tbcxPicture			16
-#define tbcyPicture			14
+#define ctbcxPicture		16
+#define ctbcyPicture		14
 
 //Margins for placing buttons on screen
-#define tbTopSpace			3
-#define tbLeftSpace			20
-#define tbRightSpace		20
-#define tbButtonSpace		1
+#define ctbTopSpace			3
+#define ctbLeftSpace		20
+#define ctbRightSpace		20
+#define ctbButtonSpace		1
 
 //Color and layout
 #define tbFont				"Arial"

@@ -107,6 +107,7 @@
 #define IDC_DISABLECLIPBOARD            1012
 #define IDC_SCALING                     1013
 #define IDC_SCALINGEVEN                 1014
+#define IDC_SCALING2                    1014
 #define IDC_AUTODETECT                  1016
 #define IDC_BUILDTIME                   1017
 #define IDC_CSHAPE_DISABLE_RADIO        1018

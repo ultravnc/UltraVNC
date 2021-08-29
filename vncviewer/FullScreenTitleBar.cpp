@@ -91,17 +91,15 @@ void CTitleBar::Init()
 	IntAutoHideCounter=0;
 	HideAfterSlide=FALSE;
 
-	//Create font
-    HDC hdc;
-    long lfHeight;
-    
+	// Get DPI
+    HDC hdc;   
     hdc = GetDC(nullptr);
-	int devcap = GetDeviceCaps(hdc, LOGPIXELSY);  // 100% = 96
-    //lfHeight = -MulDiv(10, devcap, 72);
-	lfHeight = -MulDiv(12, devcap, 96);
+	dpi = GetDeviceCaps(hdc, LOGPIXELSY);  // 100% = 96
 	ReleaseDC(nullptr, hdc);
+	SetScale();
 
-	Font=CreateFont(lfHeight, 0, 0, 0, 0, FALSE, 0, 0, 0, 0, 0, 0, 0, "Arial");
+	//Create font
+	Font = CreateFont(-MulDiv(tbFontSize, dpi, 72), 0, 0, 0, 0, FALSE, 0, 0, 0, 0, 0, 0, 0, tbFont);
 
 	Text=""; //No text at startup...
 
@@ -111,8 +109,28 @@ void CTitleBar::Init()
 	{
 		// TitleBarThis=this; // Added Jef Fix
 		this->CreateDisplay();
-	}
-	
+	}	
+}
+
+//***************************************************************************************
+
+void CTitleBar::SetScale()
+{
+	tbWidth = ScaleDpi(ctbWidth);
+	tbHeigth = ScaleDpi(ctbHeigth);
+	tbcxPicture = ScaleDpi(ctbcxPicture);
+	tbcyPicture = ScaleDpi(ctbcyPicture);
+	tbTopSpace = ScaleDpi(ctbTopSpace);
+	tbLeftSpace = ScaleDpi(ctbLeftSpace);
+	tbRightSpace = ScaleDpi(ctbRightSpace);
+	tbButtonSpace = ScaleDpi(ctbButtonSpace);
+}
+
+//***************************************************************************************
+
+int CTitleBar::ScaleDpi(int i)
+{
+	return (i * dpi) / 96;
 }
 
 //***************************************************************************************
@@ -338,15 +356,18 @@ LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg,
 			if(lpdis->CtlID==tbIDC_SWITCHMONITOR)
 					hbrOld=SelectObject(hdcMem, TitleBarThis->hSwitchMonitor); 
 
-			BitBlt(lpdis->hDC,
-					lpdis->rcItem.left,
-					lpdis->rcItem.top,
-	                lpdis->rcItem.right - lpdis->rcItem.left, 
-					lpdis->rcItem.bottom - lpdis->rcItem.top, 
-	                hdcMem,
-					0,
-					0,
-					SRCCOPY);
+			StretchBlt(lpdis->hDC,
+				lpdis->rcItem.left,
+				lpdis->rcItem.top,
+				lpdis->rcItem.right - lpdis->rcItem.left,
+				lpdis->rcItem.bottom - lpdis->rcItem.top,
+				hdcMem,
+				0,
+				0,
+				ctbcxPicture,
+				ctbcyPicture,
+				SRCCOPY);
+			
 			if (hbrOld) SelectObject(hdcMem,hbrOld);
             DeleteDC(hdcMem); 
             return TRUE; 
@@ -542,7 +563,7 @@ LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg,
 
 				if( ((lpRect.top== TitleBarThis->MonitorTop)&&(TitleBarThis->SlideDown==TRUE))
 					||
-					((lpRect.top== TitleBarThis->MonitorTop -tbHeigth+1)&&(TitleBarThis->SlideDown==FALSE)))
+					((lpRect.top== TitleBarThis->MonitorTop - TitleBarThis->tbHeigth+1)&&(TitleBarThis->SlideDown==FALSE)))
 				{
 					KillTimer(TitleBarThis->m_hWnd, tbScrollTimerID);
 
@@ -594,8 +615,11 @@ LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg,
 		}
 	case WM_DPICHANGED:
 	{
-		TitleBarThis->Font = CreateFont(-MulDiv(12, HIWORD(wParam), 96), 0, 0, 0, 0, FALSE, 0, 0, 0, 0, 0, 0, 0, "Arial");
-		//toDo Repaint 
+		TitleBarThis->dpi = HIWORD(wParam);
+		TitleBarThis->Font = CreateFont(-MulDiv(tbFontSize, TitleBarThis->dpi, 72), 0, 0, 0, 0, FALSE, 0, 0, 0, 0, 0, 0, 0, tbFont);
+		TitleBarThis->SetScale();
+		TitleBarThis->MoveToMonitor(nullptr);
+		TitleBarThis->Draw();
 	}
 
 }//Case - end
@@ -776,35 +800,36 @@ void CTitleBar::DisplayWindow(BOOL Show, BOOL SetHideFlag)
 // 7 May 2008 jdp
 void CTitleBar::MoveToMonitor(HMONITOR hMonitor)
 {
-    int dx;
-    int dy;
-
-    HMONITOR hOrigMonitor = ::MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTOPRIMARY);
-    // don't do anything if we're on the same monitor
-    if (hOrigMonitor == hMonitor)
-        return;
+	HMONITOR hSetMonitor;
+	if (!hMonitor)
+		// Only DPI chnage
+		hSetMonitor = ::MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTOPRIMARY);
+	else
+		hSetMonitor = hMonitor;
 
     // get our window rect 
     RECT wndRect;
     ::GetWindowRect(m_hWnd, &wndRect);
-
     MONITORINFO mi;
     mi.cbSize = sizeof (MONITORINFO);
-    GetMonitorInfo(hOrigMonitor, &mi);
-    // ... and calculate the offsets of our origin from the desktop's origin
-    dx = wndRect.left - mi.rcMonitor.left;
-    dy = wndRect.top - mi.rcMonitor.top;
-
 
     // now calculate our new origin relative to the new monitor.
-    GetMonitorInfo(hMonitor, &mi);
+    GetMonitorInfo(hSetMonitor, &mi);
     int x = mi.rcMonitor.left + (  mi.rcMonitor.right-mi.rcMonitor.left)/2-tbWidth/2;
     int y = mi.rcMonitor.top -tbHeigth;
 	MonitorTop = mi.rcMonitor.top;
-    // finally move the window.
 
+	// finally move the window.
+	::SetWindowPos(m_hWnd, 0, x, y, tbWidth, tbHeigth, SWP_NOACTIVATE | SWP_NOZORDER);
 
-    ::SetWindowPos(m_hWnd, 0, x, y, 0,0, SWP_NOSIZE|SWP_NOACTIVATE|SWP_NOZORDER);
+	// DPI picture Pos/Size
+	::SetWindowPos(Close, 0, tbWidth - tbRightSpace - tbcxPicture, tbTopSpace, tbcxPicture, tbcyPicture, SWP_NOACTIVATE | SWP_NOZORDER);
+	::SetWindowPos(Maximize,0, tbWidth - tbRightSpace - (tbcxPicture * 2) - (tbButtonSpace * 1), tbTopSpace, tbcxPicture, tbcyPicture, SWP_NOACTIVATE | SWP_NOZORDER);
+	::SetWindowPos(Minimize, 0, tbWidth - tbRightSpace - (tbcxPicture * 3) - (tbButtonSpace * 2), tbTopSpace, tbcxPicture, tbcyPicture, SWP_NOACTIVATE | SWP_NOZORDER);
+	::SetWindowPos(Screen, 0, tbLeftSpace + (tbcxPicture * 1) + (tbButtonSpace * 1), tbTopSpace, tbcxPicture, tbcyPicture, SWP_NOACTIVATE | SWP_NOZORDER);
+	::SetWindowPos(Photo, 0, tbLeftSpace + (tbcxPicture * 2) + (tbButtonSpace * 2), tbTopSpace, tbcxPicture, tbcyPicture, SWP_NOACTIVATE | SWP_NOZORDER);
+	::SetWindowPos(SwitchMonitor, 0, tbLeftSpace + (tbcxPicture * 3) + (tbButtonSpace * 3), tbTopSpace, tbcxPicture, tbcyPicture, SWP_NOACTIVATE | SWP_NOZORDER);
+	::SetWindowPos(Pin, 0, tbLeftSpace, tbTopSpace, tbcxPicture, tbcyPicture, SWP_NOACTIVATE | SWP_NOZORDER);
 }
 
 //***************************************************************************************

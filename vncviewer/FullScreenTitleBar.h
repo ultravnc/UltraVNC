@@ -59,6 +59,19 @@ private:
 
 	//StartPaint/EndPaint routine...
 	void Draw();
+	void SetScale();
+	int ScaleDpi(int i);
+	int dpi;
+
+	// DPI Scaled 
+	int tbWidth = ctbWidth;
+	int tbHeigth = ctbHeigth;
+	int tbcxPicture = ctbcxPicture;
+	int tbcyPicture = ctbcyPicture;
+	int tbTopSpace = ctbTopSpace;
+	int tbLeftSpace = ctbLeftSpace;
+	int tbRightSpace = ctbRightSpace;
+	int tbButtonSpace = ctbButtonSpace;
 
 	//Default variabled used for creation of the window
 	HINSTANCE hInstance;

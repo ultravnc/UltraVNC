@@ -9556,28 +9556,17 @@ ClientConnection:: ConvertPixel_to_bpp_from_32(int xx, int yy,int bytes_per_pixe
 	{
 	case 1:
 		{
-		unsigned char color=0;
-		if (gs==1) // 8 color
-		{
-			color=((r >> 7)<<2) | ((g>>7) << 1) | (b >> 7);
-		}
-		if (gs==2) // 64 color
-		{
-			color=((r >> 6)<<4) | ((g>>6) << 2) | (b >> 6);
-		}
-		if (gs==3) // 254 color
-		{
-			color=(r >> 5) | ((g>>5) << 3) | (b >> 6)<<6;
-		}
-		memcpy(destpos, &color, bytes_per_pixel);
+		*destpos = (((b*(bm+1)) >> 8) << bs)
+		         | (((g*(gm+1)) >> 8) << gs)
+		         | (((r*(rm+1)) >> 8) << rs);
 		}
 		break;
 	case 2:
 		{
-		unsigned short color;
-		if (gs==5) color=(r>>3 << 11)|(g>>2 << 5)|(b>>3);
-		else color=(r>>3 << 11)|(g>>3 << 5)|(b>>3)<<1;
-		memcpy(destpos, &color, bytes_per_pixel);
+		CARD16 *p = (CARD16*)destpos;
+		*p = ((((CARD16)b*(bm+1)) >> 8) << bs)
+		   | ((((CARD16)g*(gm+1)) >> 8) << gs)
+		   | ((((CARD16)r*(rm+1)) >> 8) << rs);
 		}
 		break;
 	case 4:
