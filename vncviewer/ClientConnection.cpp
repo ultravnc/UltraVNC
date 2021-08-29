@@ -588,6 +588,12 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_Dpi = GetDeviceCaps(GetDC(m_hwndMain), LOGPIXELSX);
 	m_DpiOld = m_Dpi;
 	m_FullScreenNotDone = false;
+
+	// AdjustWindowRectExForDpi   Windows 10, version 1607 [desktop apps only]
+	hUser32 = LoadLibrary(_T("user32.dll"));
+	adjustWindowRectExForDpi = NULL;
+	if (hUser32)
+		adjustWindowRectExForDpi = (PFN_AdjustWindowRectExForDpi) GetProcAddress(hUser32, "AdjustWindowRectExForDpi");
 }
 
 // helper functions for setting socket timeouts during file transfer
@@ -3727,13 +3733,6 @@ void ClientConnection::SizeWindow(bool noPosChange, bool noSizeChange)
 		workheight = workrect.bottom - workrect.top;
 	}
 	vnclog.Print(2, _T("Screen work area is %d x %d\n"), workwidth, workheight);
-
-	// AdjustWindowRectExForDpi   Windows 10, version 1607 [desktop apps only]
-	HMODULE hUser32 = LoadLibrary(_T("user32.dll"));
-	typedef HRESULT(*AdjustWindowRectExForDpi) (LPRECT, DWORD, BOOL, DWORD, UINT);
-	AdjustWindowRectExForDpi adjustWindowRectExForDpi = NULL;
-	if (hUser32)
-		adjustWindowRectExForDpi = (AdjustWindowRectExForDpi)GetProcAddress(hUser32, "AdjustWindowRectExForDpi");
 
 
 	// sf@2003 - AutoScaling   
