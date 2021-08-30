@@ -204,6 +204,7 @@ void TextChat::ProcessTextChatMsg()
 void TextChat::SendTextChatRequest(int nMsg)
 {
     rfbTextChatMsg tcm;
+	memset(&tcm, 0, sizeof(rfbTextChatMsg));
     tcm.type = rfbTextChat;
 	tcm.length = Swap32IfLE(nMsg);
     m_pCC->WriteExact((char *)&tcm, sz_rfbTextChatMsg, rfbTextChat);
@@ -320,6 +321,7 @@ void TextChat::SendLocalText(void)
 	PrintMessage(m_szLocalText, m_szLocalName, BLUE);
 
     rfbTextChatMsg tcm;
+	memset(&tcm, 0, sizeof(rfbTextChatMsg));
     tcm.type = rfbTextChat;
 	tcm.length = Swap32IfLE(strlen(m_szLocalText));
 	//adzm 2010-09

@@ -173,7 +173,7 @@ protected:
 	UINT		m_clientbuffsize;
 
 	// Pixel formats, translation and encoding
-	rfbPixelFormat	m_clientformat;
+	rfbPixelFormat	m_clientformat = {};
 	BOOL			m_clientfmtset;
 	rfbTranslateFnType	m_transfunc;
 	vncEncoder*		m_encoder;

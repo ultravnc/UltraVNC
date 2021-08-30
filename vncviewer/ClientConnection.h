@@ -267,7 +267,6 @@ private:
 	
 	void SetupPixelFormat();
 	void SetFormatAndEncodings();
-	void SendSetPixelFormat(rfbPixelFormat newFormat);
 
 	// adzm 2010-09
 	void HandleFramebufferUpdateRequest(WPARAM wParam, LPARAM lParam);

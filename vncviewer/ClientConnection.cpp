@@ -4067,7 +4067,7 @@ void ClientConnection::SetFormatAndEncodings()
 	// Set pixel format to myFormat
 
 	rfbSetPixelFormatMsg spf;
-	memset(&spf, 0, sizeof(spf));
+	memset(&spf, 0, sizeof(rfbSetPixelFormatMsg));
 
     spf.type = rfbSetPixelFormat;
     spf.format = m_myFormat;
@@ -7119,6 +7119,7 @@ void ClientConnection::SendMonitorSizes()
 		flag = 3;
 	
 	rfbSetDesktopSizeMsg sdmz;
+	memset(&sdmz, 0, sizeof(rfbSetDesktopSizeMsg));
 	tempdisplayclass tdc;
 	if (desktopsize_requested) {	
 		desktopsize_requested = false;

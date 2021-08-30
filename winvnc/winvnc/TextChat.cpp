@@ -262,6 +262,7 @@ void TextChat::SendTextChatRequest(int nMsg)
 {
 	if (m_pCC->m_fFileTransferRunning) return; // Don't break a running file transfer please...
     rfbTextChatMsg tcm;
+	memset(&tcm, 0, sizeof(rfbTextChatMsg));
     tcm.type = rfbTextChat;
 	tcm.length = Swap32IfLE(nMsg);
 	omni_mutex_lock l(m_pCC->GetUpdateLock(), 82);
@@ -365,6 +366,7 @@ void TextChat::SendLocalText(void)
 	PrintMessage(m_szLocalText, m_szLocalName, BLUE);
 
     rfbTextChatMsg tcm;
+	memset(&tcm, 0, sizeof(rfbTextChatMsg));
     tcm.type = rfbTextChat;
 	tcm.length = Swap32IfLE(strlen(m_szLocalText));
 	//adzm 2010-09 - minimize packets. SendExact flushes the queue.

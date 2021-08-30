@@ -523,7 +523,8 @@ vncClientUpdateThread::run_undetached(void *arg)
 				}
 				else // eSVNC-UltraVNC Scaling
 				{
-					rfbResizeFrameBufferMsg rsmsg = {0};
+					rfbResizeFrameBufferMsg rsmsg;
+					memset(&rsmsg, 0, sizeof(rfbResizeFrameBufferMsg));
 					rsmsg.type = rfbResizeFrameBuffer;
 					rsmsg.framebufferWidth  = Swap16IfLE(ViewerSize.br.x);
 					rsmsg.framebufferHeigth = Swap16IfLE(ViewerSize.br.y);
