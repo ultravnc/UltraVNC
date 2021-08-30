@@ -62,6 +62,7 @@ private:
 	void SetScale();
 	int ScaleDpi(int i);
 	int dpi;
+	HMONITOR hLastMonitor;
 
 	// DPI Scaled 
 	int tbWidth = ctbWidth;

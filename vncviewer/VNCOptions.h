@@ -75,6 +75,7 @@ public:
 	std::vector<int> m_PreferredEncodings;
 
 	bool	m_SwapMouse;
+	bool	m_BlockSameMouse;
 	bool    m_Emul3Buttons;
 	bool    m_JapKeyboard;
 	int     m_Emul3Timeout;
@@ -88,6 +89,7 @@ public:
 	bool	m_scaling;
 	bool    m_fAutoScaling;
 	bool    m_fAutoScalingEven;
+	bool    m_fAutoScalingLimit;
 	int		m_scale_num, m_scale_den; // Numerator & denominator
 	// Tight specific
 	bool	m_useCompressLevel;

@@ -587,6 +587,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	tbWM_Set = false;
 	m_Dpi = GetDeviceCaps(GetDC(m_hwndMain), LOGPIXELSX);
 	m_DpiOld = m_Dpi;
+	vnclog.Print(2, _T("DPI %d\n"), m_Dpi);
 	m_FullScreenNotDone = false;
 
 	// AdjustWindowRectExForDpi   Windows 10, version 1607 [desktop apps only]
@@ -3781,7 +3782,14 @@ void ClientConnection::SizeWindow(bool noPosChange, bool noSizeChange)
 		}
 		int Ratio= min(verticalRatio, horizontalRatio);
 		
-		// Option only use 100,200,300%
+		// Option "Limit" AutoScaling to Screen DPI
+		if (m_opts.m_fAutoScalingLimit)
+		{
+			int Limit = (m_Dpi * 100) / 96;
+			Ratio = min(Ratio, Limit);
+		}
+
+		// Option "Even" only use 100,200,300%
 		if (m_opts.m_fAutoScalingEven)
 		{
 			if (Ratio >= 300)
@@ -4597,6 +4605,14 @@ inline bool ClientConnection::ProcessPointerEvent(int x, int y, DWORD keyflags, 
 				m_PendingMouseMove.dwLastSentMouseMove = GetTickCount();
 			}
 		}
+		else
+		{
+			// Option if not UltraVnc Server, more then one Client 
+			if (m_opts.m_BlockSameMouse)
+				return false;
+		}
+
+
 	} else {
 		//adzm 2010-09 - If we are sending an input, ensure the mouse is moved to the last known spot before sending
 		//the input message
@@ -7804,10 +7820,11 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							bool bOldDisableClipboard = _this->m_opts.m_DisableClipboard;
 							bool bOldAutoScaling = _this->m_opts.m_fAutoScaling;
 							bool bOldAutoScalingEven = _this->m_opts.m_fAutoScalingEven;
+							bool bOldAutoScalingLimit = _this->m_opts.m_fAutoScalingLimit;
 
 							if (_this->m_opts.DoDialog(true,hwnd))
 							{
-								if ((_this->m_opts.m_fAutoScaling ^ bOldAutoScaling) || (_this->m_opts.m_fAutoScalingEven ^ bOldAutoScalingEven))
+								if ((_this->m_opts.m_fAutoScaling ^ bOldAutoScaling) || (_this->m_opts.m_fAutoScalingEven ^ bOldAutoScalingEven) || (_this->m_opts.m_fAutoScalingLimit ^ bOldAutoScalingLimit))
 								{
 									_this->m_fScalingDone = false;
 								}

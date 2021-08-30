@@ -615,7 +615,8 @@ LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg,
 		}
 	case WM_DPICHANGED:
 	{
-		TitleBarThis->dpi = HIWORD(wParam);
+		TitleBarThis->dpi = HIWORD(wParam);		
+		vnclog.Print(2, _T("FullScreenTitelbar DPI change %d \n"), TitleBarThis->dpi);		
 		TitleBarThis->Font = CreateFont(-MulDiv(tbFontSize, TitleBarThis->dpi, 72), 0, 0, 0, 0, FALSE, 0, 0, 0, 0, 0, 0, 0, tbFont);
 		TitleBarThis->SetScale();
 		TitleBarThis->MoveToMonitor(nullptr);
@@ -802,10 +803,17 @@ void CTitleBar::MoveToMonitor(HMONITOR hMonitor)
 {
 	HMONITOR hSetMonitor;
 	if (!hMonitor)
+	{
 		// Only DPI chnage
-		hSetMonitor = ::MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTOPRIMARY);
+		if (!hLastMonitor)
+			hLastMonitor = ::MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST);
+		hSetMonitor = hLastMonitor;
+	}
 	else
+	{
 		hSetMonitor = hMonitor;
+		hLastMonitor = hMonitor;
+	}
 
     // get our window rect 
     RECT wndRect;
@@ -830,6 +838,20 @@ void CTitleBar::MoveToMonitor(HMONITOR hMonitor)
 	::SetWindowPos(Photo, 0, tbLeftSpace + (tbcxPicture * 2) + (tbButtonSpace * 2), tbTopSpace, tbcxPicture, tbcyPicture, SWP_NOACTIVATE | SWP_NOZORDER);
 	::SetWindowPos(SwitchMonitor, 0, tbLeftSpace + (tbcxPicture * 3) + (tbButtonSpace * 3), tbTopSpace, tbcxPicture, tbcyPicture, SWP_NOACTIVATE | SWP_NOZORDER);
 	::SetWindowPos(Pin, 0, tbLeftSpace, tbTopSpace, tbcxPicture, tbcyPicture, SWP_NOACTIVATE | SWP_NOZORDER);
+
+	// after DPI change, Set region to window so it is non rectangular
+	HRGN Range;
+	POINT Points[4];
+	Points[0].x = 0;
+	Points[0].y = 0;
+	Points[1].x = tbTriangularPoint;
+	Points[1].y = tbHeigth;
+	Points[2].x = tbWidth - tbTriangularPoint;
+	Points[2].y = tbHeigth;
+	Points[3].x = tbWidth;
+	Points[3].y = 0;
+	Range = ::CreatePolygonRgn(Points, 4, ALTERNATE);
+	::SetWindowRgn(m_hWnd, Range, TRUE); // Added Jef Fix
 }
 
 //***************************************************************************************

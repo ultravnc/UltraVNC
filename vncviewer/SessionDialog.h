@@ -69,6 +69,7 @@ public:
 	bool ViewOnly;
 	bool fAutoScaling;
 	bool fAutoScalingEven;
+	bool fAutoScalingLimit;
 	bool fExitCheck;
 	bool allowMonitorSpanning;
 	bool changeServerRes;
@@ -101,6 +102,7 @@ public:
 	bool requestShapeUpdates;
 	int  quickoption;
 	bool ignoreShapeUpdates;
+	bool BlockSameMouse;
 	bool Emul3Buttons; 
 	bool JapKeyboard;
 	bool preemptiveUpdates;
