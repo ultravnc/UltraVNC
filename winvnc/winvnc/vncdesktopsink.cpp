@@ -586,9 +586,9 @@ vncDesktop::InitWindow()
 			if (p == NULL) return 0;
 			*p = '\0';
 #ifdef _X64
-			strcat_s(szCurrentDirSC,"\\schook64.dll");
+			strcat_s(szCurrentDirSC,"\\schook_legacy64.dll");
 #else
-			strcat_s(szCurrentDirSC,"\\schook.dll");
+			strcat_s(szCurrentDirSC,"\\schook_legacy.dll");
 #endif
 		}
 
