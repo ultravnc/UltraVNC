@@ -255,7 +255,7 @@ BEGIN
     EDITTEXT        IDC_SERVER_RECON,177,199,16,14,ES_AUTOHSCROLL | ES_NUMBER
     GROUPBOX        "",IDC_STATIC,84,22,65,86,WS_GROUP
     LTEXT           "timeout",IDC_STATIC,295,202,25,8
-    LTEXT           "Filetranfer Timeout:",IDC_STATIC,177,219,65,8
+    LTEXT           "Filetransfer Timeout:",IDC_STATIC,177,219,65,8
     CONTROL         "Use Zstd instead of zlib",IDC_ZSTD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,168,90,10
     CONTROL         "Even",IDC_SCALINGEVEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,251,160,27,11
 END
