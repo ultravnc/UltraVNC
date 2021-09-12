@@ -34,6 +34,7 @@ BOOL BUseRegistry;
 LONG Secure;
 LONG MSLogonRequired;
 LONG NewMSLogon;
+LONG ReverseAuthRequired;
 LONG locdom1;
 LONG locdom2;
 LONG locdom3;
@@ -138,6 +139,9 @@ MSLogonRequired=myIniFile_In.ReadInt("admin", "MSLogonRequired", false);
 myIniFile_Out.WriteInt("admin", "MSLogonRequired", MSLogonRequired);
 NewMSLogon=myIniFile_In.ReadInt("admin", "NewMSLogon", false);
 myIniFile_Out.WriteInt("admin", "NewMSLogon", NewMSLogon);
+
+ReverseAuthRequired = myIniFile_In.ReadInt("admin", "ReverseAuthRequired", true);
+myIniFile_Out.WriteInt("admin", "ReverseAuthRequired", ReverseAuthRequired);
 
 myIniFile_In.ReadString("admin_auth","group1",group1,150);
 myIniFile_In.ReadString("admin_auth","group2",group2,150);

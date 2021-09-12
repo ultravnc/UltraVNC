@@ -105,7 +105,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,8,135,54,16
     CONTROL         IDB_LOGO64,IDC_VNCLOGO,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_SUNKEN,7,5,53,46,WS_EX_TRANSPARENT
-    LTEXT           "UltraVNC Server  1.3.4",IDC_VERSION,73,5,145,11
+    LTEXT           "UltraVNC Server  1.3.4.1",IDC_VERSION,73,5,145,11
     LTEXT           "Copyright © 2002-2020 UltraVNC Team\nCopyright © 2001-2002 Sam - eSVNC \nCopyright © 1999-2002 Rudi D. V. - VdaccVNC \nCopyright © 2001 Harakan Software - PalmVNC\nCopyright © 1999-2002 Const. Kaplinsky - TightVNC \n",IDC_NAME,74,27,202,41
     LTEXT           "For more Information and Links please visit: \nhttps://www.uvnc.com",IDC_WWW,74,135,201,19
     LTEXT           "Build:",IDC_BUILDTEXT,74,16,20,10
@@ -238,11 +238,11 @@ BEGIN
     CONTROL         "Use :",IDC_PLUGIN_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,174,31,10
     COMBOBOX        IDC_PLUGINS_COMBO,46,173,115,86,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "Config",IDC_PLUGIN_BUTTON,170,173,29,12
-    CONTROL         "Log debug infos to the WinVNC.log file",IDC_LOG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,237,158,139,10
-    CONTROL         "Log to video",IDC_VIDEO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,237,186,58,10
-    PUSHBUTTON      "Clear avi encoder",IDC_CLEAR,301,187,75,9
-    LTEXT           "Path:",IDC_STATIC,237,173,18,8
-    EDITTEXT        IDC_EDIT_PATH,259,170,132,14,ES_AUTOHSCROLL
+    CONTROL         "Log debug infos to the WinVNC.log file",IDC_LOG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,237,170,139,10
+    CONTROL         "Log to video",IDC_VIDEO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,237,198,58,10
+    PUSHBUTTON      "Clear avi encoder",IDC_CLEAR,301,199,75,9
+    LTEXT           "Path:",IDC_STATIC,237,185,18,8
+    EDITTEXT        IDC_EDIT_PATH,259,182,132,14,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "&OK",IDOK,273,214,43,14
     PUSHBUTTON      "&Apply",IDC_APPLY,322,214,43,14
     PUSHBUTTON      "&Cancel",IDCANCEL,371,214,44,14
@@ -260,21 +260,23 @@ BEGIN
     LTEXT           "Encryption:",IDC_STATIC,7,161,38,8
     LTEXT           "File transfer",IDC_STATIC,7,192,40,8
     LTEXT           "Network",IDC_STATIC,7,69,28,8
-    LTEXT           "Logging",IDC_STATIC,232,145,26,8
+    LTEXT           "Logging",IDC_STATIC,232,157,26,8
     PUSHBUTTON      "",IDC_BUTTON_EXPAND,6,221,11,11,BS_ICON
     LTEXT           "Advanced options",IDC_SHOWOPTIONS,20,222,62,10,SS_NOTIFY | SS_CENTERIMAGE
     CONTROL         "",IDC_DEFAULTBOX,"Static",SS_BLACKFRAME,-1,0,427,241
-    LTEXT           "Repeater",IDC_STATIC,232,66,31,8
-    EDITTEXT        IDC_SERVICE_COMMANDLINE,232,118,182,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "Start",IDC_STARTREP,344,74,29,12
-    LTEXT           "Initiate invers connection:",IDC_STATIC,239,77,84,8
-    LTEXT           "(-autoreconnect ID:123456789 -connect [ip repeater])",IDC_STATIC,235,107,171,8
-    LTEXT           "service command line",IDC_STATIC,232,97,83,8
+    EDITTEXT        IDC_SERVICE_COMMANDLINE,239,97,166,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "Start",IDC_STARTREP,345,71,29,12
+    LTEXT           "Connect to a listening viewer:",IDC_STATIC,239,73,103,8
+    LTEXT           "-autoreconnect ID:1234 -connect [ip repeater]",IDC_STATIC,244,113,157,8
+    LTEXT           "service initiate invers connection",IDC_STATIC,240,86,134,8
     EDITTEXT        IDC_MAXVIEWERS,311,253,18,12,ES_AUTOHSCROLL
     LTEXT           "Max Viewers:",IDC_STATIC,263,255,46,8
     CONTROL         "Refuse",IDC_MAXREFUSE,"Button",BS_AUTORADIOBUTTON,339,253,38,10
     CONTROL         "Disconnect oldest",IDC_MAXDISCONNECT,"Button",BS_AUTORADIOBUTTON,339,266,73,10
     CONTROL         "Collaborative",IDC_COLLABO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,381,58,10
+    GROUPBOX        "Reverse connection",IDC_STATIC,232,61,182,88
+    CONTROL         "  Authentication required for server \n  initiated connections",IDC_REVERSEAUTH,
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,239,128,166,16
 END
 
 IDD_ABOUT1 DIALOGEX 0, 0, 286, 222
@@ -380,7 +382,9 @@ BEGIN
         VERTGUIDE, 200
         VERTGUIDE, 212
         VERTGUIDE, 232
+        VERTGUIDE, 239
         VERTGUIDE, 374
+        VERTGUIDE, 405
         VERTGUIDE, 414
         BOTTOMMARGIN, 402
         HORZGUIDE, 235

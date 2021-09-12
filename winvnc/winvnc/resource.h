@@ -230,6 +230,8 @@
 #define IDC_MAXDISCONNECT               1155
 #define IDC_CHECK8                      1156
 #define IDC_COLLABO                     1156
+#define IDC_CHECK9                      1157
+#define IDC_REVERSEAUTH                 1157
 #define IDC_SHOWOPTIONS                 2032
 #define IDC_BUTTON_EXPAND               2048
 #define IDC_FINGER                      9000
@@ -321,7 +323,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        176
 #define _APS_NEXT_COMMAND_VALUE         40030
-#define _APS_NEXT_CONTROL_VALUE         1157
+#define _APS_NEXT_CONTROL_VALUE         1158
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
