@@ -97,7 +97,11 @@ static void WINAPI service_main(DWORD argc, LPTSTR* argv) {
         SetServiceStatus(serviceStatusHandle, &serviceStatus);
 
 		Restore_after_reboot();
-		monitor_sessions_RDP();
+		
+		while (serviceStatus.dwCurrentState == SERVICE_RUNNING) {
+			monitor_sessions_RDP();
+			Sleep(3000);
+		}
 
 
         /* service was stopped */
