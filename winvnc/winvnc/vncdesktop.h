@@ -271,6 +271,7 @@ public:
 	ScreenCapture *m_screenCapture;
 	// Screen info
 	rfbServerInitMsg	m_scrinfo;
+	void requestMouseShapeUpdate();
 protected:
 
 	// Routines to hook and unhook us

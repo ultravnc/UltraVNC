@@ -172,47 +172,47 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		vnclog.Print(LL_INTERR, VNCLOG("wmcreate  \n"));
 		break;
 	case WM_TIMER:
-		if (_this->can_be_hooked)
+		if (wParam == 100 && _this->can_be_hooked)
 		{
-			if (wParam==100)
+
+			KillTimer(hwnd, 100);
+			if (_this->SetHook)
 			{
-					KillTimer(hwnd, 100);
-					if (_this->SetHook)
-					{
-						_this->SetHook(hwnd);
-						vnclog.Print(LL_INTERR, VNCLOG("set SC hooks OK\n"));
-						_this->m_hookinited = TRUE;
-						if (_this->SetKeyboardFilterHooks) _this->SetKeyboardFilterHooks( _this->m_bIsInputDisabledByClient || _this->m_server->LocalInputsDisabled());
-						if (_this->SetMouseFilterHooks) _this->SetMouseFilterHooks( _this->m_bIsInputDisabledByClient || _this->m_server->LocalInputsDisabled());
-					}
-					else if (_this->SetHooks)
-					{
-						if (!_this->SetHooks(
-							GetCurrentThreadId(),
-							RFB_SCREEN_UPDATE,
-							RFB_COPYRECT_UPDATE,
-							RFB_MOUSE_UPDATE, 0
-							))
-						{
-							vnclog.Print(LL_INTERR, VNCLOG("failed to set system hooks\n"));
-							// Switch on full screen polling, so they can see something, at least...
-							_this->m_server->PollFullScreen(TRUE);
-							_this->m_hookinited = FALSE;
-						}
-						else
-						{
-							vnclog.Print(LL_INTERR, VNCLOG("set hooks OK\n"));
-							_this->m_hookinited = TRUE;
-							// Start up the keyboard and mouse filters
-							if (_this->SetKeyboardFilterHook) _this->SetKeyboardFilterHook(_this->m_bIsInputDisabledByClient || _this->m_server->LocalInputsDisabled());
-							if (_this->SetMouseFilterHook) _this->SetMouseFilterHook(_this->m_bIsInputDisabledByClient || _this->m_server->LocalInputsDisabled());
-						}
-					}
+				_this->SetHook(hwnd);
+				vnclog.Print(LL_INTERR, VNCLOG("set SC hooks OK\n"));
+				_this->m_hookinited = TRUE;
+				if (_this->SetKeyboardFilterHooks) _this->SetKeyboardFilterHooks(_this->m_bIsInputDisabledByClient || _this->m_server->LocalInputsDisabled());
+				if (_this->SetMouseFilterHooks) _this->SetMouseFilterHooks(_this->m_bIsInputDisabledByClient || _this->m_server->LocalInputsDisabled());
 			}
-			else if (wParam==1001){
-				if (_this->m_server->Win8HelperEnabled())
-					keepalive();
+			else if (_this->SetHooks)
+			{
+				if (!_this->SetHooks(
+					GetCurrentThreadId(),
+					RFB_SCREEN_UPDATE,
+					RFB_COPYRECT_UPDATE,
+					RFB_MOUSE_UPDATE, 0
+				))
+				{
+					vnclog.Print(LL_INTERR, VNCLOG("failed to set system hooks\n"));
+					// Switch on full screen polling, so they can see something, at least...
+					_this->m_server->PollFullScreen(TRUE);
+					_this->m_hookinited = FALSE;
+				}
+				else
+				{
+					vnclog.Print(LL_INTERR, VNCLOG("set hooks OK\n"));
+					_this->m_hookinited = TRUE;
+					// Start up the keyboard and mouse filters
+					if (_this->SetKeyboardFilterHook) _this->SetKeyboardFilterHook(_this->m_bIsInputDisabledByClient || _this->m_server->LocalInputsDisabled());
+					if (_this->SetMouseFilterHook) _this->SetMouseFilterHook(_this->m_bIsInputDisabledByClient || _this->m_server->LocalInputsDisabled());
+				}
 			}
+		}
+		if (wParam==1001 && _this->m_server->Win8HelperEnabled())
+			keepalive();
+		if (wParam == 110) {
+			_this->m_buffer.m_cursor_shape_cleared = TRUE;
+			KillTimer(hwnd, 110);
 		}
 		break;
 	case WM_MOUSESHAPE:
@@ -220,6 +220,9 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		{
 			SetEvent(_this->trigger_events[3]);
 		}
+		break;
+	case WM_REQUESTMOUSESHAPE:
+		SetTimer(hwnd, 110, 3000, NULL);
 		break;
 	case WM_HOOKCHANGE:
 		if (wParam==1)

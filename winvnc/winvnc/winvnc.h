@@ -40,6 +40,7 @@
 #define WM_MOUSESHAPE				WM_APP+6
 #define WM_HOOKCHANGE				WM_APP+7
 #define WM_SHUTDOWN					WM_APP+8
+#define WM_REQUESTMOUSESHAPE		WM_APP+9
 
 
 // Export the application details

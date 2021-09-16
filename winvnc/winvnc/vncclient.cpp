@@ -2703,16 +2703,16 @@ vncClientThread::run(void *arg)
 					if (Swap32IfLE(encoding) == rfbEncodingXCursor) {
 						m_client->m_encodemgr.EnableXCursor(TRUE);
 						m_server->EnableXRichCursor(TRUE);
-						m_client->m_encodemgr.m_buffer->m_cursor_shape_cleared = TRUE;
+						m_client->m_encodemgr.m_buffer->m_desktop->requestMouseShapeUpdate();
 						vnclog.Print(LL_INTINFO, VNCLOG("X-style cursor shape updates enabled\n"));
 						continue;
 					}
 
 					// Is this a RichCursor encoding request?
 					if (Swap32IfLE(encoding) == rfbEncodingRichCursor) {
-						m_client->m_encodemgr.EnableRichCursor(TRUE);
-						m_client->m_encodemgr.m_buffer->m_cursor_shape_cleared = TRUE;
+						m_client->m_encodemgr.EnableRichCursor(TRUE);						
 						m_server->EnableXRichCursor(TRUE);
+						m_client->m_encodemgr.m_buffer->m_desktop->requestMouseShapeUpdate();
 						vnclog.Print(LL_INTINFO, VNCLOG("Full-color cursor shape updates enabled\n"));
 						continue;
 					}

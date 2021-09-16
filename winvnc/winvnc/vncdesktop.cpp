@@ -2572,3 +2572,8 @@ bool vncDesktop::block_input(bool first)
 		return Blockinput_val;
 	}
 }
+
+void vncDesktop::requestMouseShapeUpdate()
+{
+	PostMessage(m_hwnd, WM_REQUESTMOUSESHAPE, 0, 0);
+}
