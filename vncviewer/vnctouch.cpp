@@ -532,7 +532,7 @@ int  vnctouch::rfb_send_gii_mt_empty_event(rfbGIIValuatorEventMsg *val, DWORD ti
 	cc->WriteExact((char*)val, sz_rfbGIIValuatorEventMsg);
 	cc->WriteExact((char*)&flag, sizeof(DWORD)); 
 	cc->WriteExact((char*) &time_msec, sizeof(DWORD));
-	cc->WriteExact((char*) &time_usec, sizeof(LONG));
+	cc->WriteExact((char*) &time_usec, sizeof(DWORD64));
 	return 1;
 }
 
