@@ -332,7 +332,12 @@ static int pad()
 
     strcpy_s(service_path, "\"");
     strcat_s(service_path, exe_file_name);
-	strcat_s(service_path, "\" -service");
+	strcat_s(service_path, "\"");
+	if (g_szIniFile) {
+		strcat_s(service_path, " -inifile ");
+		strcat_s(service_path, g_szIniFile);
+	}
+	strcat_s(service_path, " -service");
 	return 0;
 }
 ////////////////////////////////////////////////////////////////////////////////
