@@ -1421,6 +1421,8 @@ void ClientConnection::CreateDisplay()
 		AppendMenu(hsysmenu, MF_STRING, ID_TEXTCHAT,	sz_L17);
 		AppendMenu(hsysmenu, MF_SEPARATOR, NULL, NULL);
 		AppendMenu(hsysmenu, MF_STRING, ID_DBUTTON,	sz_L18);
+		AppendMenu(hsysmenu, MF_SEPARATOR, NULL, NULL);
+		AppendMenu(hsysmenu, MF_STRING, ID_SW, "Take Snapshot");
 		// AppendMenu(hsysmenu, MF_STRING, ID_BUTTON,	_T("Show Toolbar Buttons"));
 		AppendMenu(hsysmenu, MF_SEPARATOR, NULL, NULL);
 		AppendMenu(hsysmenu, MF_STRING, ID_DINPUT,	sz_L19); // disable remote input
