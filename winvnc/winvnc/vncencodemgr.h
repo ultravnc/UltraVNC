@@ -723,7 +723,7 @@ vncEncodeMgr::SetEncoding(CARD32 encoding,BOOL reinitialize)
 			return FALSE;
 		}
 	}
-	if (reinitialize && m_encoder != NULL) {
+	if (m_encoder != NULL) {
 		m_encoder->EnableXCursor(m_use_xcursor);
 		m_encoder->EnableRichCursor(m_use_richcursor);
 		m_encoder->SetCompressLevel(m_compresslevel);

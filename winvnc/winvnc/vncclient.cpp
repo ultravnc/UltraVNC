@@ -2583,6 +2583,7 @@ vncClientThread::run(void *arg)
 			// Tight - CURSOR HANDLING
 			m_client->m_encodemgr.EnableXCursor(FALSE);
 			m_client->m_encodemgr.EnableRichCursor(FALSE);
+			m_client->m_use_PointerPos = FALSE;
 			m_server->EnableXRichCursor(FALSE);
 			m_client->m_cursor_update_pending = FALSE;
 			m_client->m_cursor_update_sent = FALSE;
@@ -2817,6 +2818,16 @@ vncClientThread::run(void *arg)
 
 						m_client->cl_connected = FALSE;
 					}
+				}
+
+				// If PointerPos not supported use framebuffr drawing
+				if (!m_client->m_use_PointerPos) {
+					m_client->m_encodemgr.EnableXCursor(FALSE);
+					m_client->m_encodemgr.EnableRichCursor(FALSE);
+					m_client->m_use_PointerPos = FALSE;
+					m_server->EnableXRichCursor(FALSE);
+					m_client->m_cursor_update_pending = FALSE;
+					m_client->m_cursor_update_sent = FALSE;
 				}
 
 				// sf@2002 - For now we disable cache protocole when more than one client are connected
