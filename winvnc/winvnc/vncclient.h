@@ -493,9 +493,9 @@ protected:
 	bool has_mouse;
 	SimulateCursor* simulateCursor;
 	// Per-client settings
-	BOOL			m_IsLoopback;
-	BOOL			m_keyboardenabled = true;
-	BOOL			m_pointerenabled = true;
+	bool			m_IsLoopback;
+	bool			m_keyboardenabled = true;
+	bool			m_pointerenabled = true;
 	bool			m_jap;
 	bool			m_unicode;
 	int				m_capability;

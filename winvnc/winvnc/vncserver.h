@@ -150,7 +150,7 @@ public:
 	virtual void AutoCapt(int autocapt);
 	virtual int AutoCapt() { return m_autocapt; }
 	short getOldestViewer();
-	int getNumberViewers();
+	UINT getNumberViewers();
 
 	virtual BOOL All_clients_initialalized();
 	void initialCapture_done();

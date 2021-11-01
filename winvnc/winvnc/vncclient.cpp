@@ -611,7 +611,7 @@ vncClientUpdateThread::run_undetached(void *arg)
 						// since Unix won't like it
 						int unixpos=0;
                         size_t cliplen=strlen(cliptext);
-						for (int x=0; x<cliplen; x++) {
+						for (unsigned int x=0; x<cliplen; x++) {
 							if (cliptext[x] != '\x0d') {
 								unixtext[unixpos] = cliptext[x];
 								unixpos++;
@@ -3032,7 +3032,7 @@ vncClientThread::run(void *arg)
 						if (contact == NULL)  goto mydllend;
 						memset(contact, 0, sizeof(POINTER_TOUCH_INFO) * rfbGIIValutorEvent.first);
 
-						for (int i = 0; i < rfbGIIValutorEvent.first; i++)
+						for (unsigned int i = 0; i < rfbGIIValutorEvent.first; i++)
 						{
 							contact[i].pointerInfo.pointerType = PT_TOUCH; //we're sending touch input		
 							contact[i].pointerInfo.ptPixelLocation.x = ti_array[i].X;

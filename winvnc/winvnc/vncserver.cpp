@@ -2758,7 +2758,7 @@ short vncServer::getOldestViewer()
 	return clientId;
 }
 
-int vncServer::getNumberViewers()
+UINT vncServer::getNumberViewers()
 {
 	return  m_authClients.size();
 }
