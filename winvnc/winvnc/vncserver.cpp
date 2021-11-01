@@ -1164,26 +1164,6 @@ vncServer::SetCapability(vncClientId clientid, int capability)
 		client->SetCapability(capability);
 }
 
-void
-vncServer::SetKeyboardEnabled(vncClientId clientid, BOOL enabled)
-{
-	omni_mutex_lock l(m_clientsLock,36);
-
-	vncClient *client = GetClient(clientid);
-	if (client != NULL)
-		client->EnableKeyboard(enabled);
-}
-
-void
-vncServer::SetPointerEnabled(vncClientId clientid, BOOL enabled)
-{
-	omni_mutex_lock l(m_clientsLock,37);
-
-	vncClient *client = GetClient(clientid);
-	if (client != NULL)
-		client->EnablePointer(enabled);
-}
-
 int
 vncServer::GetCapability(vncClientId clientid)
 {

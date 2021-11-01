@@ -131,8 +131,6 @@ public:
 	virtual vncClientList ClientList();
 
 	virtual void SetCapability(vncClientId client, int capability);
-	virtual void SetKeyboardEnabled(vncClientId client, BOOL enabled);
-	virtual void SetPointerEnabled(vncClientId client, BOOL enabled);
 
 	virtual int GetCapability(vncClientId client);
 	virtual const char* GetClientName(vncClientId client);
