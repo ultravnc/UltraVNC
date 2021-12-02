@@ -108,6 +108,7 @@ protected:
 	void LoadPassword2(HKEY k, char *buffer); //PGM
 	void SavePassword2(HKEY k, char *buffer); //PGM
 	char service_commandline[1024];
+	char accept_reject_mesg[512];
 
 	// String handling
 	char * LoadString(HKEY k, LPCSTR valname);
@@ -149,7 +150,6 @@ protected:
 	// adzm - 2010-07 - Disable more effects or font smoothing
 	BOOL m_pref_RemoveEffects;
 	BOOL m_pref_RemoveFontSmoothing;
-	BOOL m_pref_RemoveAero;
 	BOOL m_pref_EnableRemoteInputs;
 	int m_pref_LockSettings;
 	BOOL m_pref_DisableLocalInputs;
@@ -186,6 +186,10 @@ protected:
 	char m_Tempfile[MAX_PATH];
 	BOOL m_pref_Primary;
 	BOOL m_pref_Secondary;
+
+	BOOL m_pref_Frame;
+	BOOL m_pref_Notification;
+	int	m_pref_NotificationSelection;
 
 private:
 	void InitPortSettings(HWND hwnd); // TightVNC 1.1.8

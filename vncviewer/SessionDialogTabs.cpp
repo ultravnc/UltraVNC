@@ -973,6 +973,8 @@ void SessionDialog::InitDlgProcSecurity()
 	SendMessage(hrestricted, BM_SETCHECK, restricted, 0);
 	HWND hfUseEncryption = GetDlgItem(hwnd, IDC_PLUGIN_CHECK);
 	SendMessage(hfUseEncryption, BM_SETCHECK, fUseDSMPlugin, 0);
+	SendDlgItemMessage(hwnd, IDC_EDITCUSTOMMESSAGE, EM_SETLIMITTEXT, 244, 0);
+	SetDlgItemText(hwnd, IDC_EDITCUSTOMMESSAGE, InfoMsg);
 }
 ////////////////////////////////////////////////////////////////////////////////
 void SessionDialog::InitDlgProcListen()
@@ -1212,6 +1214,7 @@ void SessionDialog::ReadDlgProcSecurity()
 	fAutoAcceptIncoming = (SendMessage(GetDlgItem(hwnd, IDC_AUTOACCEPT), BM_GETCHECK, 0, 0) == BST_CHECKED);
 	fAutoAcceptNoDSM = (SendMessage(GetDlgItem(hwnd, IDC_AUTOACCEPTNOWARN), BM_GETCHECK, 0, 0) == BST_CHECKED);
 	restricted = (SendMessage(GetDlgItem(hwnd, IDC_HIDEMENU), BM_GETCHECK, 0, 0) == BST_CHECKED);
+	GetDlgItemText(hwnd, IDC_EDITCUSTOMMESSAGE, InfoMsg, 255);
 }
 ////////////////////////////////////////////////////////////////////////////////
 void SessionDialog::ReadDlgProc()

@@ -232,6 +232,13 @@
 #define IDC_COLLABO                     1156
 #define IDC_CHECK9                      1157
 #define IDC_REVERSEAUTH                 1157
+#define IDC_FRAME                       1158
+#define IDC_NOTIFOCATION                1159
+#define IDC_RADIONOTIFICATIONON         1160
+#define IDC_RADIO6                      1161
+#define IDC_RADIONOTIFICATIONIFPROVIDED 1161
+#define IDC_EDITQUERYYEXT               1162
+#define IDC_EDITQUERYTEXT               1162
 #define IDC_SHOWOPTIONS                 2032
 #define IDC_BUTTON_EXPAND               2048
 #define IDC_FINGER                      9000
@@ -323,7 +330,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        176
 #define _APS_NEXT_COMMAND_VALUE         40030
-#define _APS_NEXT_CONTROL_VALUE         1158
+#define _APS_NEXT_CONTROL_VALUE         1163
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -167,6 +167,7 @@ public:
 	bool dpichanged;
 	UINT m_Dpi;
 	UINT m_DpiOld;
+	char InfoMsg[255]{0};
 private:
 	int cx, cy;
 	HWND hTabEncoders, hTabKeyboardMouse, hTabDisplay, hTabMisc, hTabSecurity, hTabQuickOptions, hTabListen;

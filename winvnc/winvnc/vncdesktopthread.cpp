@@ -1300,7 +1300,8 @@ vncDesktopThread::run_undetached(void *arg)
 	// Switch back into our home desktop, under NT (no effect under 9x)
 	//TAG14
 	HWND mywin=FindWindow("blackscreen",NULL);
-	if (mywin)SendMessage(mywin,WM_CLOSE, 0, 0);
+	if (mywin)
+		SendMessage(mywin,WM_CLOSE, 0, 0);
 	g_DesktopThread_running=false;
 	vnclog.Print(LL_INTINFO, VNCLOG("quitting desktop server thread:g_DesktopThread_running=false\n"));
 	m_desktop->Shutdown();

@@ -397,9 +397,6 @@ public:
 	virtual BOOL RemoveEffectsEnabled() {return m_remove_effects;};
 	virtual void EnableRemoveFontSmoothing(const BOOL enable) {m_remove_fontsmoothing = enable;};
 	virtual BOOL RemoveFontSmoothingEnabled() {return m_remove_fontsmoothing;};
-	// Removal of desktop composit desktop, etc
-	virtual void EnableRemoveAero(const BOOL enable) {m_remove_Aero = enable;};
-	virtual BOOL RemoveAeroEnabled() {return m_remove_Aero;};
 
 	// sf@2002 - v1.1.x - Server Default Scale
 	virtual UINT GetDefaultScale();
@@ -515,6 +512,13 @@ public:
 	int m_virtualDisplaySupported;
 	VirtualDisplay *virtualDisplay;
 
+	BOOL getFrame(){return m_Frame;};
+	void setFrame(const BOOL setting){m_Frame = setting;};
+	BOOL getNotification() { return m_Notification; };
+	void setNotification(const BOOL setting) { m_Notification = setting; };
+	int getNotificationSelection() { return m_NotificationSelection; };
+	void setNotificationSelection(const int setting) { m_NotificationSelection = setting; };
+
 protected:
 	// The vncServer UpdateTracker class
 	// Behaves like a standard UpdateTracker, but propagates update
@@ -581,7 +585,6 @@ protected:
 	// adzm - 2010-07 - Disable more effects or font smoothing
 	BOOL				m_remove_effects;
 	BOOL				m_remove_fontsmoothing;
-	BOOL				m_remove_Aero;
 	BOOL				m_disableTrayIcon;
 	BOOL				m_Rdpmode;
 	BOOL				m_NoScreensaver;
@@ -681,6 +684,9 @@ protected:
 	DWORD startTime;
     BOOL m_fSendExtraMouse;
 	bool KillAuthClientsBuzy;	
+	BOOL m_Frame;
+	BOOL m_Notification;
+	int	m_NotificationSelection;
 };
 
 #endif

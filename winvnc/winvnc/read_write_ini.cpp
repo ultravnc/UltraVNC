@@ -73,7 +73,6 @@ LONG IdleTimeout=0;
 LONG IdleInputTimeout = 0;
 
 LONG RemoveWallpaper=0;
-LONG RemoveAero=0;
 
 LONG QuerySetting=1;
 LONG QueryTimeout=10;
@@ -85,6 +84,9 @@ LONG MaxViewerSettings = 0;
 LONG MaxViewers = 128;
 LONG Collabo = 0;
 
+LONG Frame = 0;
+LONG Notification = 0;
+LONG NotificationSelection = 0;
 LONG EnableRemoteInputs=1;
 LONG LockSettings=0;
 LONG DisableLocalInputs=0;
@@ -244,9 +246,7 @@ myIniFile_Out.WriteInt("admin", "IdleTimeout", IdleTimeout);
 myIniFile_Out.WriteInt("admin", "IdleInputTimeout", IdleInputTimeout);
 
 RemoveWallpaper=myIniFile_In.ReadInt("admin", "RemoveWallpaper", RemoveWallpaper);
-RemoveAero=myIniFile_In.ReadInt("admin", "RemoveAero", RemoveAero);
 myIniFile_Out.WriteInt("admin", "RemoveWallpaper", RemoveWallpaper);
-myIniFile_Out.WriteInt("admin", "RemoveAero", RemoveAero);
 
 	// Connection querying settings
 QuerySetting=myIniFile_In.ReadInt("admin", "QuerySetting", QuerySetting);
@@ -267,6 +267,12 @@ myIniFile_Out.WriteInt("admin", "MaxViewers", MaxViewers);
 Collabo = myIniFile_In.ReadInt("admin", "Collabo", Collabo);
 myIniFile_Out.WriteInt("admin", "Collabo", Collabo);
 
+Frame = myIniFile_In.ReadInt("admin", "Frame", Frame);
+Notification = myIniFile_In.ReadInt("admin", "Notification", Notification);
+NotificationSelection = myIniFile_In.ReadInt("admin", "NotificationSelection", NotificationSelection);
+myIniFile_Out.WriteInt("admin", "Frame", Frame);
+myIniFile_Out.WriteInt("admin", "Notification", Notification);
+myIniFile_Out.WriteInt("admin", "NotificationSelection", NotificationSelection);
 myIniFile_In.ReadPassword(passwd,MAXPWLEN);
 myIniFile_Out.WritePassword(passwd);
 memset(passwd, '\0', MAXPWLEN); //PGM

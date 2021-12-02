@@ -195,6 +195,7 @@ void SessionDialog::SaveToFile(char *fname, bool asDefault)
 	WritePrivateProfileString("options", "folder",		folder, fname);
 	WritePrivateProfileString("options", "prefix",		prefix, fname);
 	WritePrivateProfileString("options", "imageFormat",		imageFormat, fname);
+	WritePrivateProfileString("options", "InfoMsg", InfoMsg, fname);
 	saveInt("AutoReconnect",		autoReconnect,	fname);
 	saveInt("FileTransferTimeout",  FTTimeout,    fname);
 	saveInt("ThrottleMouse",		throttleMouse,    fname); 
@@ -280,6 +281,7 @@ void SessionDialog::LoadFromFile(char *fname)
   GetPrivateProfileString("options", "folder", folder, folder, MAX_PATH, fname);
   GetPrivateProfileString("options", "prefix", prefix, prefix, 56, fname);
   GetPrivateProfileString("options", "imageFormat", imageFormat, imageFormat, 56, fname);  
+  GetPrivateProfileString("options", "InfoMsg", InfoMsg, InfoMsg, 254, fname);
   if (!g_disable_sponsor) g_disable_sponsor=readInt("sponsor",			g_disable_sponsor, fname) != 0;
   autoReconnect =		readInt("AutoReconnect",	autoReconnect, fname);
   FTTimeout  =			readInt("FileTransferTimeout", FTTimeout, fname);

@@ -302,6 +302,7 @@ typedef char rfbProtocolVersionMsg[13];	/* allow extra byte for null */
 //Only new viewers can connect
 #define rfbUltraVNC_SecureVNCPluginAuth 0x72
 #define rfbUltraVNC_SecureVNCPluginAuth_new 0x73
+#define rfbClientInitExtraMsgSupport 0x74
 
 //adzm 2010-05-10 - for backwards compatibility with pre-3.8
 #define rfbLegacy_SecureVNCPlugin 17
@@ -357,12 +358,19 @@ typedef struct {
     CARD8 flags; // rfbClientInitMsgFlags
 } rfbClientInitMsg;
 
+typedef struct {
+    CARD8 textLength;
+    /* followed by char text[nameLength] */
+} rfbClientInitExtraMsg;
+
 // adzm 2010-09
 typedef enum {
-	clientInitShared       = 0x01,
+    clientInitNotShare      = 0x00, // 00
+	clientInitShared        = 0x01, // 01
 } rfbClientInitMsgFlags;
 
 #define sz_rfbClientInitMsg 1
+#define sz_rfbClientInitExtraMsg 1
 
 
 /*-----------------------------------------------------------------------------

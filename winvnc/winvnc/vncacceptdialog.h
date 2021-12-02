@@ -35,7 +35,7 @@ class vncAcceptDialog
 {
 public:
 
-	vncAcceptDialog(UINT timeoutSecs,BOOL acceptOnTimeout, const char *ipAddress);
+	vncAcceptDialog(UINT timeoutSecs,BOOL acceptOnTimeout, const char *ipAddress, char* infoMsg, bool notification);
 	virtual ~vncAcceptDialog();
 	BOOL DoDialog();
 	BOOL m_acceptOnTimeout;
@@ -52,6 +52,8 @@ private:
 	// Address of the offending machine
 	char *m_ipAddress;	
 	HANDLE ThreadHandle;
+	char *infoMsg;
+	bool notification;
 };
 
 #endif

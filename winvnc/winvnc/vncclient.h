@@ -365,6 +365,7 @@ public:
 	HANDLE ThreadHandleCompressFolder;
 	// sf@2002 
 	// Update routines
+	char infoMsg[255] = { 0 };
 protected:
 	BOOL SendUpdate(rfb::SimpleUpdateTracker &update);
 	BOOL SendRFBMsg(CARD8 type, BYTE *buffer, int buflen);

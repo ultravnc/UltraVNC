@@ -35,45 +35,42 @@ void vncDesktop::SetBlankMonitor(bool enabled)
 	// Also Turn Off the Monitor if allowed ("Blank Screen", "Blank Monitor")
 	if (m_server->BlankMonitorEnabled())
     {
-	    if (enabled)
-	    {
-			if (VNC_OSVersion::getInstance()->OS_AERO_ON) VNC_OSVersion::getInstance()->DisableAero();
-			Sleep(1000);
-		    if (!VNC_OSVersion::getInstance()->CaptureAlphaBlending() || VideoBuffer())
-		    {			   
-			    SendMessage(m_hwnd,WM_SYSCOMMAND,SC_MONITORPOWER,(LPARAM)2);
-				m_screen_in_powersave=true;
-		    }
-		    else
-		    {
-			    HANDLE ThreadHandle2=NULL;
-			    DWORD dwTId;
-			    ThreadHandle2 = CreateThread(NULL, 0, BlackWindow, NULL, 0, &dwTId);
-			   if (ThreadHandle2)  CloseHandle(ThreadHandle2);
-			    m_Black_window_active=true;
-		    }
+	    if (enabled){
+			if (VNC_OSVersion::getInstance()->OS_AERO_ON) 
+				VNC_OSVersion::getInstance()->DisableAero();
+			
+			HANDLE ThreadHandle2=NULL;
+			DWORD dwTId;
+			ThreadHandle2 = CreateThread(NULL, 0, BlackWindow, NULL, 0, &dwTId);
+			if (ThreadHandle2)  
+				CloseHandle(ThreadHandle2);
+			m_Black_window_active=true;
 	    }
-	    else // Monitor On
-	    {			
-		    if (!VNC_OSVersion::getInstance()->CaptureAlphaBlending() || VideoBuffer())
-		    {			   
-			    SendMessage(m_hwnd,WM_SYSCOMMAND,SC_MONITORPOWER,(LPARAM)-1);
-				//win8 require mouse move
-				mouse_event(MOUSEEVENTF_MOVE, 0, 1, 0, NULL);
-				Sleep(40);
-				mouse_event(MOUSEEVENTF_MOVE, 0, -1, 0, NULL);
-				//JUst in case video driver state was changed
-				HWND Blackhnd = FindWindow(("blackscreen"), 0);
-			    if (Blackhnd) PostMessage(Blackhnd, WM_CLOSE, 0, 0);
-				 m_screen_in_powersave=false;
-		    }
-		    else
-		    {
-			    HWND Blackhnd = FindWindow(("blackscreen"), 0);
-			    if (Blackhnd) PostMessage(Blackhnd, WM_CLOSE, 0, 0);
-			    m_Black_window_active=false;
-		    }
+	    else {					    
+			HWND Blackhnd = FindWindow(("blackscreen"), 0);
+			if (Blackhnd) 
+				PostMessage(Blackhnd, WM_CLOSE, 0, 0);
+			m_Black_window_active=false;
 			VNC_OSVersion::getInstance()->ResetAero();
 	    }
     }
+}
+
+DWORD WINAPI BorderWindow(LPVOID lpParam);
+extern RECT g_rect;
+void vncDesktop::SetBorderWindow(bool enabled, RECT rect)
+{
+	g_rect = rect;
+	if (enabled) {
+		HANDLE ThreadHandle2 = NULL;
+		DWORD dwTId;
+		ThreadHandle2 = CreateThread(NULL, 0, BorderWindow,NULL, 0, &dwTId);
+		if (ThreadHandle2)
+			CloseHandle(ThreadHandle2);
+	}
+	else {
+		HWND Blackhnd = FindWindow(("borderscreen"), 0);
+		if (Blackhnd)
+			PostMessage(Blackhnd, WM_CLOSE, 0, 0);
+	}
 }

@@ -87,6 +87,7 @@ vncProperties::vncProperties()
 	cy = 0;
 	cx = 0;
 	service_commandline[0] = '\0';
+	accept_reject_mesg[0] = '\0';
 
 }
 
@@ -587,12 +588,6 @@ vncProperties::DialogProc(HWND hwnd,
 				BM_SETCHECK,
 				_this->m_server->RemoveWallpaperEnabled(),
 				0);
-			// Remove the composit desktop
-			HWND hRemoveAero = GetDlgItem(hwnd, IDC_REMOVE_Aero);
-			SendMessage(hRemoveAero,
-				BM_SETCHECK,
-				_this->m_server->RemoveAeroEnabled(),
-				0);
 
 			// Lock settings
 			HWND hLockSetting;
@@ -607,6 +602,21 @@ vncProperties::DialogProc(HWND hwnd,
 				hLockSetting = GetDlgItem(hwnd, IDC_LOCKSETTING_NOTHING);
 			};
 			SendMessage(hLockSetting,
+				BM_SETCHECK,
+				TRUE,
+				0);
+
+			HWND hNotificationSelection;
+			switch (_this->m_server->getNotificationSelection()) {
+			case 1:
+				hNotificationSelection = GetDlgItem(hwnd, IDC_RADIONOTIFICATIONIFPROVIDED);
+				break;
+			default:
+				hNotificationSelection = GetDlgItem(hwnd,
+					IDC_RADIONOTIFICATIONON);
+				break;
+			};
+			SendMessage(hNotificationSelection,
 				BM_SETCHECK,
 				TRUE,
 				0);
@@ -670,6 +680,18 @@ vncProperties::DialogProc(HWND hwnd,
 				_this->m_server->getCollabo(),
 				0);
 
+			HWND hwndDlg = GetDlgItem(hwnd, IDC_FRAME);
+			SendMessage(hwndDlg,
+				BM_SETCHECK,
+				_this->m_server->getFrame(),
+				0);
+
+			hwndDlg = GetDlgItem(hwnd, IDC_NOTIFOCATION);
+			SendMessage(hwndDlg,
+				BM_SETCHECK,
+				_this->m_server->getNotification(),
+				0);
+
 			char maxviewersChar[128];
 			UINT maxviewers = _this->m_server->getMaxViewers();
 			sprintf_s(maxviewersChar, "%d", (int)maxviewers);
@@ -699,6 +721,7 @@ vncProperties::DialogProc(HWND hwnd,
 			EnableWindow(GetDlgItem(hwnd, IDC_DACCEPT), queryEnabled);
 
 			SetDlgItemText(hwnd, IDC_SERVICE_COMMANDLINE, _this->service_commandline);
+			SetDlgItemText(hwnd, IDC_EDITQUERYTEXT, _this->accept_reject_mesg);
 
 
 			char timeout[128];
@@ -883,12 +906,6 @@ vncProperties::DialogProc(HWND hwnd,
 					SendMessage(hRemoveWallpaper, BM_GETCHECK, 0, 0) == BST_CHECKED
 					);
 
-				// Aero handling
-				HWND hRemoveAero = GetDlgItem(hwnd, IDC_REMOVE_Aero);
-				_this->m_server->EnableRemoveAero(
-					SendMessage(hRemoveAero, BM_GETCHECK, 0, 0) == BST_CHECKED
-					);
-
 				// Lock settings handling
 				if (SendMessage(GetDlgItem(hwnd, IDC_LOCKSETTING_LOCK), BM_GETCHECK, 0, 0)
 					== BST_CHECKED) {
@@ -898,6 +915,15 @@ vncProperties::DialogProc(HWND hwnd,
 					_this->m_server->SetLockSettings(2);
 				} else {
 					_this->m_server->SetLockSettings(0);
+				}
+
+				if (SendMessage(GetDlgItem(hwnd, IDC_RADIONOTIFICATIONON), BM_GETCHECK, 0, 0)
+					== BST_CHECKED) {
+					_this->m_server->setNotificationSelection(0);
+				}
+				else if (SendMessage(GetDlgItem(hwnd, IDC_RADIONOTIFICATIONIFPROVIDED), BM_GETCHECK, 0, 0)
+					== BST_CHECKED) {
+					_this->m_server->setNotificationSelection(1);
 				}
 
 				if (SendMessage(GetDlgItem(hwnd, IDC_DREFUSE), BM_GETCHECK, 0, 0)
@@ -932,6 +958,16 @@ vncProperties::DialogProc(HWND hwnd,
 				_this->m_server->setCollabo(
 					SendMessage(hCollabo, BM_GETCHECK, 0, 0) == BST_CHECKED
 					);
+
+				HWND hwndDlg = GetDlgItem(hwnd, IDC_FRAME);
+				_this->m_server->setFrame(
+					SendMessage(hwndDlg, BM_GETCHECK, 0, 0) == BST_CHECKED
+				);
+
+				hwndDlg = GetDlgItem(hwnd, IDC_NOTIFOCATION);
+				_this->m_server->setNotification(
+					SendMessage(hwndDlg, BM_GETCHECK, 0, 0) == BST_CHECKED
+				);
 
 				if (SendMessage(GetDlgItem(hwnd, IDC_MV1), BM_GETCHECK, 0, 0)
 					== BST_CHECKED) {
@@ -1045,6 +1081,7 @@ vncProperties::DialogProc(HWND hwnd,
 				    _this->m_server->SetQueryDisableTime(atoi(disabletime));
 
 				GetDlgItemText(hwnd, IDC_SERVICE_COMMANDLINE, _this->service_commandline, 1024);
+				GetDlgItemText(hwnd, IDC_EDITQUERYTEXT, _this->accept_reject_mesg, 512);
 
 
 				HWND hQuery = GetDlgItem(hwnd, IDQUERY);
@@ -1750,6 +1787,11 @@ LABELUSERSETTINGS:
 	m_pref_MaxViewerSetting = 0;
 	m_pref_MaxViewers = 128;
 	m_pref_Collabo = false;
+
+	m_pref_Frame = FALSE;
+	m_pref_Notification = FALSE;
+	m_pref_NotificationSelection = 0;
+
 	m_pref_EnableRemoteInputs=TRUE;
 	m_pref_DisableLocalInputs=FALSE;
 	m_pref_EnableJapInput=FALSE;
@@ -1762,7 +1804,6 @@ LABELUSERSETTINGS:
 	// adzm - 2010-07 - Disable more effects or font smoothing
 	m_pref_RemoveEffects=FALSE;
 	m_pref_RemoveFontSmoothing=FALSE;
-	m_pref_RemoveAero=FALSE;
     m_alloweditclients = TRUE;
 	m_allowshutdown = TRUE;
 	m_allowproperties = TRUE;
@@ -1885,7 +1926,6 @@ vncProperties::LoadUserPrefs(HKEY appkey)
 	// adzm - 2010-07 - Disable more effects or font smoothing
 	m_pref_RemoveEffects=LoadInt(appkey, "RemoveEffects", m_pref_RemoveEffects);
 	m_pref_RemoveFontSmoothing=LoadInt(appkey, "RemoveFontSmoothing", m_pref_RemoveFontSmoothing);
-	m_pref_RemoveAero=LoadInt(appkey, "RemoveAero", m_pref_RemoveAero);
 
 	// Connection querying settings
 	m_pref_QuerySetting=LoadInt(appkey, "QuerySetting", m_pref_QuerySetting);
@@ -1903,6 +1943,13 @@ vncProperties::LoadUserPrefs(HKEY appkey)
 	m_server->setMaxViewers(m_pref_MaxViewers);	
 	m_pref_Collabo = LoadInt(appkey, "Collabo", m_pref_Collabo);
 	m_server->setCollabo(m_pref_Collabo);
+
+	m_pref_Frame = LoadInt(appkey, "Frame", m_pref_Frame);
+	m_server->setFrame(m_pref_Frame);
+	m_pref_Notification = LoadInt(appkey, "Notification", m_pref_Notification);
+	m_server->setNotification(m_pref_Notification);
+	m_pref_NotificationSelection = LoadInt(appkey, "NotificationSelection", m_pref_NotificationSelection);
+	m_server->setNotificationSelection(m_pref_NotificationSelection);
 	
 
 	// marscha@2006 - Is AcceptDialog required even if no user is logged on
@@ -1946,12 +1993,16 @@ vncProperties::ApplyUserPrefs()
 	m_server->setMaxViewerSetting(m_pref_MaxViewerSetting);
 	m_server->setMaxViewers(m_pref_MaxViewers);
 	m_server->setCollabo(m_pref_Collabo);
+
+	m_server->setFrame(m_pref_Frame);
+	m_server->setNotification(m_pref_Notification);
+	m_server->setNotificationSelection(m_pref_NotificationSelection);
+
 	m_server->SetAutoIdleDisconnectTimeout(m_pref_IdleTimeout);
 	m_server->EnableRemoveWallpaper(m_pref_RemoveWallpaper);
 	// adzm - 2010-07 - Disable more effects or font smoothing
 	m_server->EnableRemoveFontSmoothing(m_pref_RemoveFontSmoothing);
 	m_server->EnableRemoveEffects(m_pref_RemoveEffects);
-	m_server->EnableRemoveAero(m_pref_RemoveAero);
 
 	// Is the listening socket closing?
 
@@ -2207,6 +2258,10 @@ vncProperties::SaveUserPrefs(HKEY appkey)
 	SaveInt(appkey, "MaxViewerSetting", m_server->getMaxViewerSetting());
 	SaveInt(appkey, "MaxViewers", m_server->getMaxViewers());
 	SaveInt(appkey, "Collabo", m_server->getCollabo());
+	SaveInt(appkey, "Frame", m_server->getFrame());
+	SaveInt(appkey, "Notification", m_server->getNotification());
+	SaveInt(appkey, "NotificationSelection", m_server->getNotificationSelection());
+
 
 	// Lock settings
 	SaveInt(appkey, "LockSetting", m_server->LockSettings());
@@ -2217,8 +2272,6 @@ vncProperties::SaveUserPrefs(HKEY appkey)
 	// adzm - 2010-07 - Disable more effects or font smoothing
 	SaveInt(appkey, "RemoveEffects", m_server->RemoveEffectsEnabled());
 	SaveInt(appkey, "RemoveFontSmoothing", m_server->RemoveFontSmoothingEnabled());
-	// Composit desktop removal
-	SaveInt(appkey, "RemoveAero", m_server->RemoveAeroEnabled());
 
 	// Save the password
 	char passwd[MAXPWLEN];
@@ -2351,11 +2404,14 @@ void vncProperties::LoadFromIniFile()
 	m_pref_LockSettings=-1;
 	m_pref_Collabo=false;
 
+	m_pref_Frame = FALSE;
+	m_pref_Notification = FALSE;
+	m_pref_NotificationSelection = 0;
+
 	m_pref_RemoveWallpaper=FALSE;
 	// adzm - 2010-07 - Disable more effects or font smoothing
 	m_pref_RemoveEffects=FALSE;
 	m_pref_RemoveFontSmoothing=FALSE;
-	m_pref_RemoveAero=FALSE;
     m_alloweditclients = TRUE;
 	m_allowshutdown = TRUE;
 	m_allowproperties = TRUE;
@@ -2395,6 +2451,7 @@ void vncProperties::LoadFromIniFile()
 	m_server->SetIdleInputTimeout(m_IdleInputTimeout);
     
 	myIniFile.ReadString("admin", "service_commandline", service_commandline, 1024);
+	myIniFile.ReadString("admin", "accept_reject_mesg", accept_reject_mesg, 512);
 
 	ApplyUserPrefs();
 }
@@ -2431,7 +2488,6 @@ void vncProperties::LoadUserPrefsFromIniFile()
 	// adzm - 2010-07 - Disable more effects or font smoothing
 	m_pref_RemoveEffects=myIniFile.ReadInt("admin", "RemoveEffects", m_pref_RemoveEffects);
 	m_pref_RemoveFontSmoothing=myIniFile.ReadInt("admin", "RemoveFontSmoothing", m_pref_RemoveFontSmoothing);
-	m_pref_RemoveAero=myIniFile.ReadInt("admin", "RemoveAero", m_pref_RemoveAero);
 
 	// Connection querying settings
 	m_pref_QuerySetting=myIniFile.ReadInt("admin", "QuerySetting", m_pref_QuerySetting);
@@ -2447,8 +2503,16 @@ void vncProperties::LoadUserPrefsFromIniFile()
 	m_server->setMaxViewerSetting(m_pref_MaxViewerSetting);
 	m_pref_MaxViewers = myIniFile.ReadInt("admin", "MaxViewers", m_pref_MaxViewers);
 	m_server->setMaxViewers(m_pref_MaxViewers);
+
 	m_pref_Collabo = myIniFile.ReadInt("admin", "Collabo", m_pref_Collabo);
 	m_server->setCollabo(m_pref_Collabo);
+
+	m_pref_Frame = myIniFile.ReadInt("admin", "Frame", m_pref_Frame);
+	m_server->setFrame(m_pref_Frame);
+	m_pref_Notification = myIniFile.ReadInt("admin", "Notification", m_pref_Notification);
+	m_server->setNotification(m_pref_Notification);
+	m_pref_NotificationSelection = myIniFile.ReadInt("admin", "NotificationSelection", m_pref_NotificationSelection);
+	m_server->setNotificationSelection(m_pref_NotificationSelection);
 
 	// marscha@2006 - Is AcceptDialog required even if no user is logged on
 	m_pref_QueryIfNoLogon=myIniFile.ReadInt("admin", "QueryIfNoLogon", m_pref_QueryIfNoLogon);
@@ -2518,6 +2582,7 @@ void vncProperties::SaveToIniFile()
 				// sf@2003 - DSM params here
 				myIniFile.WriteInt("admin", "ConnectPriority", m_server->ConnectPriority());
 				myIniFile.WriteString("admin", "service_commandline", service_commandline);
+				myIniFile.WriteString("admin", "accept_reject_mesg", accept_reject_mesg);
 				myIniFile.copy_to_secure();
 				myIniFile.IniFileSetSecure();
 				return;
@@ -2552,6 +2617,7 @@ void vncProperties::SaveToIniFile()
 	myIniFile.WriteInt("admin", "ConnectPriority", m_server->ConnectPriority());
 
 	myIniFile.WriteString("admin", "service_commandline", service_commandline);
+	myIniFile.WriteString("admin", "accept_reject_mesg", accept_reject_mesg);
 	return;
 }
 
@@ -2602,6 +2668,9 @@ void vncProperties::SaveUserPrefsToIniFile()
 	myIniFile.WriteInt("admin", "MaxViewerSetting", m_server->getMaxViewerSetting());
 	myIniFile.WriteInt("admin", "MaxViewers", m_server->getMaxViewers());
 	myIniFile.WriteInt("admin", "Collabo", m_server->getCollabo());
+	myIniFile.WriteInt("admin", "Frame", m_server->getFrame());
+	myIniFile.WriteInt("admin", "Notification", m_server->getNotification());
+	myIniFile.WriteInt("admin", "NotificationSelection", m_server->getNotificationSelection());
 	// Lock settings
 	myIniFile.WriteInt("admin", "LockSetting", m_server->LockSettings());
 
@@ -2611,8 +2680,6 @@ void vncProperties::SaveUserPrefsToIniFile()
 	// adzm - 2010-07 - Disable more effects or font smoothing
 	myIniFile.WriteInt("admin", "RemoveEffects", m_server->RemoveEffectsEnabled());
 	myIniFile.WriteInt("admin", "RemoveFontSmoothing", m_server->RemoveFontSmoothingEnabled());
-	// Composit desktop removal
-	myIniFile.WriteInt("admin", "RemoveAero", m_server->RemoveAeroEnabled());
 
 	// Save the password
 	char passwd[MAXPWLEN];

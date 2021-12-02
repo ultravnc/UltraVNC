@@ -81,7 +81,7 @@ public:
 	void Shutdown(bool kill_client); // sf@2007
 
 	// adzm 2009-07-05 - Tray icon balloon tips
-	static BOOL NotifyBalloon(char* szInfo, char* szTitle);
+	static void NotifyBalloon(char* szInfo, char* szTitle = NULL);
 
 	WTSREGISTERSESSIONNOTIFICATION FunctionWTSRegisterSessionNotification;
 	WTSUNREGISTERSESSIONNOTIFICATION FunctionWTSUnRegisterSessionNotification;
@@ -91,8 +91,15 @@ protected:
 	void AddTrayIcon();
 	void DelTrayIcon();
 	void FlashTrayIcon(BOOL flash);
-	void SendTrayMsg(DWORD msg, BOOL flash);
+	void SendTrayMsg(DWORD msg, bool balloon, BOOL flash);
 	void GetIPAddrString(char *buffer, int buflen);
+
+	BOOL AddNotificationIcon();
+	BOOL DeleteNotificationIcon();
+	void setToolTip();
+	void setBalloonInfo();
+	void addMenus();
+	void RestoreTooltip();
 
 	// Message handler for the tray window
 	static LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam);
@@ -118,7 +125,7 @@ protected:
 	HWND			m_hwnd;
 	HMENU			m_hmenu;
 
-	NOTIFYICONDATA	m_nid;
+	NOTIFYICONDATA	m_nid{};
 	omni_mutex		m_mutexTrayIcon; // adzm 2009-07-05
 	char*			m_BalloonInfo;
 	char*			m_BalloonTitle;
@@ -138,6 +145,7 @@ protected:
 
 	bool IsIconSet;
 	int IconFaultCounter;
+	bool balloonset = false;
 };
 
 

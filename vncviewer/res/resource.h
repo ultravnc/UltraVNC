@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Von Microsoft Visual C++ generierte Includedatei.
-// Verwendet durch vncviewer.rc
+// Microsoft Visual C++ generated include file.
+// Used by vncviewer.rc
 //
 #define IDCANCEL2                       4
 #define IDQUIT                          9
@@ -254,6 +254,7 @@
 #define IDC_LIST1                       1176
 #define IDC_EDIT1                       1177
 #define IDC_LISTENPORT                  1177
+#define IDC_EDITCUSTOMMESSAGE           1177
 #define IDC_MOUSE_THROTTLE              1178
 #define IDC_FOLDER                      1179
 #define IDC_COMBO2                      1180

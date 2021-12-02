@@ -40,13 +40,15 @@ extern HINSTANCE	hInstResDLL;
 
 // Constructor
 
-vncAcceptDialog::vncAcceptDialog(UINT timeoutSecs,BOOL acceptOnTimeout, const char *ipAddress)
+vncAcceptDialog::vncAcceptDialog(UINT timeoutSecs,BOOL acceptOnTimeout, const char *ipAddress, char *infoMsg, bool notification)
 {
 	m_timeoutSecs = timeoutSecs;
 	m_ipAddress = _strdup(ipAddress);
 	m_foreground_hack=FALSE;
 	m_acceptOnTimeout = acceptOnTimeout;
 	ThreadHandle = NULL;
+	this->infoMsg = infoMsg;
+	this->notification = notification;
 }
 
 // Destructor
@@ -125,7 +127,14 @@ BOOL CALLBACK vncAcceptDialog::vncAcceptDlgProc(HWND hwnd,
 			char accept_reject_mesg[512];
 			IniFile myIniFile;
 			myIniFile.ReadString("admin", "accept_reject_mesg", accept_reject_mesg,512);
-			if (strlen(accept_reject_mesg)==0) strcpy_s(accept_reject_mesg,"WinVNC has received an incoming connection from");
+
+			if (strlen(accept_reject_mesg) == 0) 
+				strcpy_s(accept_reject_mesg,"WinVNC has received an incoming connection from");
+
+			if (strlen(_this->infoMsg) > 0 && _this->notification) {
+				strcat_s(accept_reject_mesg, "\r\n");
+				strcat_s(accept_reject_mesg, _this->infoMsg);
+			}
 			SetDlgItemText(hwnd, IDC_STATIC_TEXT1, accept_reject_mesg);
 			SetDlgItemText(hwnd, IDC_ACCEPT_IP, _this->m_ipAddress);
 

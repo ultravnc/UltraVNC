@@ -834,13 +834,7 @@ vncClientThread::InitVersion()
 
 	m_ms_logon = m_server->MSLogonRequired();
 	vnclog.Print(LL_INTINFO, VNCLOG("m_ms_logon set to %s"), m_ms_logon ? "true" : "false");
-
-	// adzm 2010-09 - see rfbproto.h for more discussion on all this
-	m_client->SetUltraViewer(false); // sf@2005 - Fix Open TextChat from server bug 
-	// UltraViewer will be set when viewer responds with rfbUltraVNC Auth type
-	// RDV 2010-6-10 
-	// removed SPECIAL_SC_PROMPT
-	
+	m_client->SetUltraViewer(false);
 	if ( (m_minor >= 7) && m_socket->IsUsePluginEnabled() && m_server->GetDSMPluginPointer()->IsEnabled() && m_socket->GetIntegratedPlugin() != NULL) {
 		m_socket->SetPluginStreamingIn();
 		m_socket->SetPluginStreamingOut();
@@ -915,7 +909,7 @@ vncClientThread::FilterClients_Ask_Permission()
 					//m_queryaccept==2, new method to allow accept on locked user
 					verified = vncServer::aqrAccept;
             } else {
-				vncAcceptDialog *acceptDlg = new vncAcceptDialog(m_server->QueryTimeout(),m_server->QueryAccept(), m_socket->GetPeerName());
+				vncAcceptDialog *acceptDlg = new vncAcceptDialog(m_server->QueryTimeout(),m_server->QueryAccept(), m_socket->GetPeerName(), m_client->infoMsg, m_server->m_Notification);
 				if (acceptDlg == NULL) {
 					if (m_server->QueryAccept()==1) 
 						verified = vncServer::aqrAccept;
@@ -1204,6 +1198,8 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth)
 		// send the UltraVNC auth type to identify ourselves as an UltraVNC server, but only initially
 		auth_types.push_back(rfbUltraVNC);
 	}
+	//Just tell the viewer we support ClientInitExtraMsg
+	auth_types.push_back(rfbClientInitExtraMsgSupport);
 
 	// encryption takes priority over everything, for now at least.
 	// would be useful to have a host list to configure these settings.
@@ -1309,6 +1305,10 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth)
 		// adzm 2010-10 - Do the SessionSelect auth
 		auth_success = AuthSessionSelect(auth_message);
 		break;
+	case rfbClientInitExtraMsgSupport:
+		auth_success = true;
+		break;
+
 	default:
 		auth_success = FALSE;
 		break;
@@ -1332,6 +1332,15 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth)
 			auth_result = rfbVncAuthContinue;
 		} else if (bUseSessionSelect && !bSessionSelectActive) {
 			auth_result = rfbVncAuthContinue;
+		} else if (auth_accepted == rfbClientInitExtraMsgSupport) {
+			auth_result = rfbVncAuthContinue;
+			rfbClientInitExtraMsg msg;
+			if (!m_socket->ReadExact((char*)&msg, sz_rfbClientInitExtraMsg))
+				return FALSE;
+			if (msg.textLength < 0 || msg.textLength > 254)
+				return FALSE;
+			if (!m_socket->ReadExact(m_client->infoMsg, msg.textLength))
+				return FALSE;			
 		} else {
 			auth_result = rfbVncAuthOK;
 		}
@@ -2205,21 +2214,7 @@ vncClientThread::run(void *arg)
 
 	// GET PROTOCOL VERSION
 	if (!InitVersion())
-	{
-		// adzm 2009-07-05
-		{
-			char szInfo[256];
-
-			if (m_client->GetRepeaterID() && (strlen(m_client->GetRepeaterID()) > 0) ) {
-				_snprintf_s(szInfo, 255, "Could not connect using %s!", m_client->GetRepeaterID());
-			} else {
-				_snprintf_s(szInfo, 255, "Could not connect to %s!", m_client->GetClientName());
-			}
-
-			szInfo[255] = '\0';
-
-			if (m_client->m_outgoing) vncMenu::NotifyBalloon(szInfo, NULL);
-		}
+	{		
 		// wa@2005 - AutoReconnection attempt if required
 		if (m_client->m_Autoreconnect && !fShutdownOrdered)
 		{

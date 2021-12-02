@@ -747,6 +747,7 @@ bool SessionDialog::connect(HWND hwnd)
 	TCHAR hostname[256];
 	GetDlgItemText(hwnd, IDC_HOSTNAME_EDIT, hostname, 256);
 	m_pMRU->AddItem(hostname);
+	strcpy_s(m_pOpt->m_InfoMsg, 255, InfoMsg);
 	EndDialog(hwnd, TRUE);
 	return TRUE;
 }
