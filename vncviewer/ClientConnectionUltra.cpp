@@ -52,7 +52,7 @@ void ClientConnection::ReadUltraRect(rfbFramebufferUpdateRectHeader *pfburh) {
 	CheckZlibBufferSize(numRawBytes+ 500);
 	new_len = numRawBytes + 500;
 	//m_zlibbuf is bad after !LZO_E_OK
-	if (lzo1x_decompress((BYTE*)m_netbuf,numCompBytes,(BYTE*)m_zlibbuf,&new_len,NULL) != LZO_E_OK)
+	if (lzo1x_decompress_safe((BYTE*)m_netbuf,numCompBytes,(BYTE*)m_zlibbuf,&new_len,NULL) != LZO_E_OK)
 		return;
 	SoftCursorLockArea(pfburh->r.x, pfburh->r.y,pfburh->r.w,pfburh->r.h);
 	if (!Check_Rectangle_borders(pfburh->r.x, pfburh->r.y,pfburh->r.w,pfburh->r.h)) return;
@@ -86,7 +86,7 @@ void ClientConnection::ReadUltraZip(rfbFramebufferUpdateRectHeader *pfburh,HRGN 
 	CheckZlibBufferSize(numRawBytes+500);
 	new_len = numRawBytes+500;
 	//m_zlibbuf is bad after !LZO_E_OK
-	if (lzo1x_decompress((BYTE*)m_netbuf,numCompBytes,(BYTE*)m_zlibbuf,&new_len,NULL) != LZO_E_OK)
+	if (lzo1x_decompress_safe((BYTE*)m_netbuf,numCompBytes,(BYTE*)m_zlibbuf,&new_len,NULL) != LZO_E_OK)
 		return;
 	BYTE* pzipbuf = m_zlibbuf;
 	UINT m_zlibbuf_size = 0;

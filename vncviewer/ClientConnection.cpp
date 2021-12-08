@@ -3652,7 +3652,10 @@ void ClientConnection::ReadServerInit(bool reconnect)
     m_desktopName = new TCHAR[1024];
 	m_desktopName_viewonly = new TCHAR[1024];
 	if (m_si.nameLength > 256) {
-		  MessageBox(NULL,"Server tried to overload buffer, name to long","Error",MB_OK|MB_ICONINFORMATION);
+		int msgboxID = MessageBox(NULL,"Server is trying yo overload a memory buffer.\Possible exploit","Error", MB_OKCANCEL |MB_ICONINFORMATION);
+		if (msgboxID == IDCANCEL)
+			exit;
+		m_si.nameLength = 256;
 	}
     ReadString(m_desktopName, m_si.nameLength);
 	strcat_s(m_desktopName, 1024, " ");
@@ -9614,6 +9617,8 @@ ClientConnection:: ConvertPixel_to_bpp_from_32(int xx, int yy,int bytes_per_pixe
 void
 ClientConnection::SolidColor(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth)
 {
+	if (!Check_Rectangle_borders(xx, yy, width, height))
+		return;
 	int bytesPerOutputRow = framebufferWidth * bytes_per_pixel;
 	//8bit pitch need to be taken in account
 	if (bytesPerOutputRow % 4)

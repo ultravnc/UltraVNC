@@ -22,7 +22,6 @@
 // Before including this file, you must define a number of CPP macros.
 //
 // BPP should be 8, 16 or 32 depending on the bits per pixel.
-// FILL_RECT
 // IMAGE_RECT
 
 #include <rdr/ZlibInStream.h>
@@ -156,11 +155,6 @@ top:
           }
         }
 
-#ifdef FAVOUR_FILL_RECT
-       //fprintf(stderr,"copying data to screen %dx%d at %d,%d\n",tw,th,tx,ty);
-        IMAGE_RECT(tx,ty,tw,th,buf);
-#endif
-
       } else {
 
         if (palSize == 0) {
@@ -180,34 +174,7 @@ top:
 
             assert(len <= end - ptr);
 
-#ifdef FAVOUR_FILL_RECT
-            int i = ptr - buf;
-            ptr += len;
-
-            int runX = i % tw;
-            int runY = i / tw;
-
-            if (runX + len > tw) {
-              if (runX != 0) {
-                FILL_RECT(tx+runX, ty+runY, tw-runX, 1, pix);
-                len -= tw-runX;
-                runX = 0;
-                runY++;
-              }
-
-              if (len > tw) {
-                FILL_RECT(tx, ty+runY, tw, len/tw, pix);
-                runY += len / tw;
-                len = len % tw;
-              }
-            }
-
-            if (len != 0) {
-              FILL_RECT(tx+runX, ty+runY, len, 1, pix);
-            }
-#else
             while (len-- > 0) *ptr++ = pix;
-#endif
 
           }
         } else {
@@ -233,39 +200,11 @@ top:
 
             PIXEL_T pix = palette[index];
 
-#ifdef FAVOUR_FILL_RECT
-            int i = ptr - buf;
-            ptr += len;
-
-            int runX = i % tw;
-            int runY = i / tw;
-
-            if (runX + len > tw) {
-              if (runX != 0) {
-                FILL_RECT(tx+runX, ty+runY, tw-runX, 1, pix);
-                len -= tw-runX;
-                runX = 0;
-                runY++;
-              }
-
-              if (len > tw) {
-                FILL_RECT(tx, ty+runY, tw, len/tw, pix);
-                runY += len / tw;
-                len = len % tw;
-              }
-            }
-
-            if (len != 0) {
-              FILL_RECT(tx+runX, ty+runY, len, 1, pix);
-            }
-#else
             while (len-- > 0) *ptr++ = pix;
-#endif
           }
         }
       }
 
-#ifndef FAVOUR_FILL_RECT
       //fprintf(stderr,"copying data to screen %dx%d at %d,%d\n",tw,th,tx,ty);
 draw:
 	  omni_mutex_lock l(m_bitmapdcMutex);
@@ -277,7 +216,6 @@ draw:
 #endif
       IMAGE_RECT(tx,ty,tw,th,buf);
 	   if (initialupdate_counter < 4) if (!directx_used)InvalidateRect(m_hwndcn, NULL, FALSE);
-#endif
     }
   }
 

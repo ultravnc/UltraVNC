@@ -11,8 +11,6 @@
 
 // Instantiate the decoding function for 8, 16 and 32 BPP
 
-//#define FAVOUR_FILL_RECT
-
 #define zrleDecode ClientConnection::zrleDecode
 
 #define ENDIAN_LITTLE 0
@@ -22,21 +20,16 @@
 #define ZYWRLE_ENDIAN ENDIAN_NO
 #define IMAGE_RECT(x,y,w,h,data)                \
     SETPIXELS(m_netbuf,8,x,y,w,h)
-#define FILL_RECT(x,y,w,h,pix)                          \
-    FillSolidRect_ultra(x,y,w,h, m_myFormat.bitsPerPixel,(BYTE*)&pix)
 
 #include <rfb/zrleDecode.h>
 #undef BPP
 #undef ZYWRLE_ENDIAN
 #undef IMAGE_RECT
-#undef FILL_RECT
 
 #define BPP 16
 #define ZYWRLE_ENDIAN ENDIAN_LITTLE
 #define IMAGE_RECT(x,y,w,h,data)                \
     SETPIXELS(m_netbuf,16,x,y,w,h)
-#define FILL_RECT(x,y,w,h,pix)                          \
-    FillSolidRect_ultra(x,y,w,h, m_myFormat.bitsPerPixel,(BYTE*)&pix)
 
 #include <rfb/zrleDecode.h>
 #undef BPP
@@ -47,12 +40,9 @@
 #undef BPP
 #undef ZYWRLE_ENDIAN
 #undef IMAGE_RECT
-#undef FILL_RECT
 
 #define IMAGE_RECT(x,y,w,h,data)                \
     SETPIXELS(m_netbuf,32,x,y,w,h)
-#define FILL_RECT(x,y,w,h,pix)                          \
-    FillSolidRect_ultra(x,y,w,h, m_myFormat.bitsPerPixel,(BYTE*)&pix)
 
 
 #define BPP 32
@@ -67,7 +57,6 @@
 #undef BPP
 #undef ZYWRLE_ENDIAN
 #undef IMAGE_RECT
-#undef FILL_RECT
 
 #undef zrleDecode
 
