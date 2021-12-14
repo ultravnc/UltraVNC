@@ -124,7 +124,7 @@ public:
 	bool	m_extendDisplay;
 	bool	m_showExtend;
 	bool	m_use_virt;
-	bool	m_use_allmonitors;
+	bool	m_useAllMonitors;
 	int		m_requestedWidth;
 	int		m_requestedHeight;
 

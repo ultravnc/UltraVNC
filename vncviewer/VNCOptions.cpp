@@ -220,7 +220,7 @@ VNCOptions::VNCOptions()
 	m_extendDisplay = 0;
 	m_showExtend = 0;
 	m_use_virt = 0;
-	m_use_allmonitors = 0;
+	m_useAllMonitors = 0;
 	m_requestedWidth = 0;
 	m_requestedHeight = 0;
 
@@ -383,7 +383,7 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
 	m_extendDisplay = s.m_extendDisplay;
 	m_showExtend = s.m_showExtend;
 	m_use_virt = s.m_use_virt;
-	m_use_allmonitors = s.m_use_allmonitors;
+	m_useAllMonitors = s.m_useAllMonitors;
 	m_requestedWidth = s.m_requestedWidth;
 	m_requestedHeight = s.m_requestedHeight;
 
@@ -1151,7 +1151,7 @@ void VNCOptions::Save(char* fname)
 	saveInt("extendDisplay", m_extendDisplay, fname);
 	saveInt("showExtend", m_showExtend, fname);
 	saveInt("use_virt", m_use_virt, fname);
-	saveInt("use_allmonitors", m_use_allmonitors, fname);
+	saveInt("useAllMonitors", m_useAllMonitors, fname);
 	saveInt("requestedWidth", m_requestedWidth, fname);
 	saveInt("requestedHeight", m_requestedHeight, fname);
 
@@ -1247,7 +1247,7 @@ void VNCOptions::Load(char* fname)
 	m_extendDisplay = readInt("extendDisplay", m_extendDisplay, fname);
 	m_showExtend = readInt("showExtend", m_showExtend, fname);
 	m_use_virt = readInt("use_virt", m_use_virt, fname);
-	m_use_allmonitors = readInt("use_allmonitors", m_use_allmonitors, fname);
+	m_useAllMonitors = readInt("useAllMonitors", m_useAllMonitors, fname);
 	m_requestedWidth = readInt("requestedWidth", m_requestedWidth, fname);
 	m_requestedHeight = readInt("requestedHeight", m_requestedHeight, fname);
 

@@ -318,7 +318,7 @@ BOOL CALLBACK DlgProcDisplay(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			EnableWindow(GetDlgItem(hwnd, IDC_RADIO_ONLY_VIRTUAL), _this->changeServerRes);
 			EnableWindow(GetDlgItem(hwnd, IDC_RADIO_NOVIRT), _this->changeServerRes);
 			EnableWindow(GetDlgItem(hwnd, IDC_ALLMONS), _this->changeServerRes);
-			EnableWindow(GetDlgItem(hwnd, IDC_SLIDERRES), _this->changeServerRes && !_this->use_allmonitors);
+			EnableWindow(GetDlgItem(hwnd, IDC_SLIDERRES), _this->changeServerRes && !_this->useAllMonitors);
 			EnableWindow(GetDlgItem(hwnd, IDC_SHOW_EXTEND), _this->changeServerRes && _this->extendDisplay);
 			break;
 		case IDC_RADIO_NOVIRT:
@@ -328,8 +328,8 @@ BOOL CALLBACK DlgProcDisplay(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			EnableWindow(GetDlgItem(hwnd, IDC_SHOW_EXTEND), _this->changeServerRes && _this->extendDisplay);
 			break;
 		case IDC_ALLMONS:
-			_this->use_allmonitors = (SendMessage(GetDlgItem(hwnd, IDC_ALLMONS), BM_GETCHECK, 0, 0) == BST_CHECKED);
-			EnableWindow(GetDlgItem(hwnd, IDC_SLIDERRES), _this->changeServerRes && !_this->use_allmonitors);
+			_this->useAllMonitors = (SendMessage(GetDlgItem(hwnd, IDC_ALLMONS), BM_GETCHECK, 0, 0) == BST_CHECKED);
+			EnableWindow(GetDlgItem(hwnd, IDC_SLIDERRES), _this->changeServerRes && !_this->useAllMonitors);
 			break;
 		case IDC_SHOW_EXTEND:
 			_this->showExtend =(SendMessage(GetDlgItem(hwnd, IDC_SHOW_EXTEND), BM_GETCHECK, 0, 0) == BST_CHECKED);
@@ -879,12 +879,12 @@ void SessionDialog::InitDlgProcDisplay()
 	SendMessage(hNoVirt, BM_SETCHECK, !use_virt && !extendDisplay, 0);
 
 	HWND hAllMons = GetDlgItem(hwnd, IDC_ALLMONS);
-	SendMessage(hAllMons, BM_SETCHECK, use_allmonitors, 0);
+	SendMessage(hAllMons, BM_SETCHECK, useAllMonitors, 0);
 
 	EnableWindow(hExtendDisplay, changeServerRes);
 	EnableWindow(hUseVirt, changeServerRes);
 	EnableWindow(hAllMons, changeServerRes);
-	EnableWindow(GetDlgItem(hwnd, IDC_SLIDERRES) , changeServerRes && !use_allmonitors);
+	EnableWindow(GetDlgItem(hwnd, IDC_SLIDERRES) , changeServerRes && !useAllMonitors);
 	EnableWindow(GetDlgItem(hwnd, IDC_SHOW_EXTEND), changeServerRes && extendDisplay);
 	EnableWindow(GetDlgItem(hwnd, IDC_ALLOWSPAN), !showExtend);
 	EnableWindow(GetDlgItem(hwnd, IDC_DIRECTX), !showExtend);
@@ -1166,7 +1166,7 @@ void SessionDialog::ReadDlgProcDisplay()
 		(SendMessage(hUseVirt, BM_GETCHECK, 0, 0) == BST_CHECKED);
 
 	HWND hAllMons = GetDlgItem(hwnd, IDC_ALLMONS);
-	use_allmonitors =
+	useAllMonitors =
 		(SendMessage(hAllMons, BM_GETCHECK, 0, 0) == BST_CHECKED);
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -1496,7 +1496,7 @@ void SessionDialog::StartListener()
 	m_pOpt->m_extendDisplay = extendDisplay;
 	m_pOpt->m_showExtend = showExtend;
 	m_pOpt->m_use_virt = use_virt;
-	m_pOpt->m_use_allmonitors = use_allmonitors;
+	m_pOpt->m_useAllMonitors = useAllMonitors;
 	m_pOpt->m_requestedWidth = requestedWidth;
 	m_pOpt->m_requestedHeight = requestedHeight;
 	m_pOpt->m_SwapMouse = SwapMouse;

@@ -7148,7 +7148,7 @@ void ClientConnection::SendMonitorSizes()
 		flag = 1;
 	if (m_opts.m_extendDisplay)
 		flag = 2;
-	if (m_opts.m_extendDisplay && m_opts.m_showExtend && !m_opts.m_use_allmonitors)
+	if (m_opts.m_extendDisplay && m_opts.m_showExtend && !m_opts.m_useAllMonitors)
 		flag = 3;
 	
 	rfbSetDesktopSizeMsg sdmz;
@@ -7157,7 +7157,7 @@ void ClientConnection::SendMonitorSizes()
 	if (desktopsize_requested) {	
 		desktopsize_requested = false;
 		tdc.Init();
-		if (m_opts.m_use_allmonitors) {
+		if (m_opts.m_useAllMonitors) {
 			sdmz.numberOfScreens = tdc.nr_monitors;
 			sdmz.height = tdc.monarray[0].height;
 			sdmz.width = tdc.monarray[0].width;

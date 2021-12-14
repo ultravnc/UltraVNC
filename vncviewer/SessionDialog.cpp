@@ -86,7 +86,7 @@ SessionDialog::SessionDialog(VNCOptions* pOpt, ClientConnection* pCC, CDSMPlugin
 	extendDisplay = m_pOpt->m_extendDisplay;
 	showExtend = m_pOpt->m_showExtend;
 	use_virt = m_pOpt->m_use_virt;
-	use_allmonitors = m_pOpt->m_use_allmonitors;
+	useAllMonitors = m_pOpt->m_useAllMonitors;
 	requestedWidth = m_pOpt->m_requestedWidth;
 	requestedHeight = m_pOpt->m_requestedHeight;
 	autoDetect = m_pOpt->autoDetect;
@@ -611,7 +611,7 @@ bool SessionDialog::connect(HWND hwnd)
 	m_pOpt->m_extendDisplay = extendDisplay;
 	m_pOpt->m_showExtend = showExtend;
 	m_pOpt->m_use_virt = use_virt;
-	m_pOpt->m_use_allmonitors = use_allmonitors;
+	m_pOpt->m_useAllMonitors = useAllMonitors;
 	m_pOpt->m_requestedWidth = requestedWidth;
 	m_pOpt->m_requestedHeight = requestedHeight;
 	m_pOpt->m_SwapMouse = SwapMouse;

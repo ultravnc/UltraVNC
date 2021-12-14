@@ -186,7 +186,7 @@ void SessionDialog::SaveToFile(char *fname, bool asDefault)
 	saveInt("extendDisplay", extendDisplay, fname);
 	saveInt("showExtend", showExtend, fname);
 	saveInt("use_virt", use_virt, fname);	
-	saveInt("useAllMonitors", use_allmonitors, fname);
+	saveInt("useAllMonitors", useAllMonitors, fname);
 	saveInt("requestedWidth", requestedWidth, fname);
 	saveInt("requestedHeight", requestedHeight, fname);
 
@@ -272,7 +272,7 @@ void SessionDialog::LoadFromFile(char *fname)
   extendDisplay = readInt("extendDisplay", extendDisplay, fname);
   showExtend = readInt("showExtend", showExtend, fname);
   use_virt = readInt("use_virt", use_virt, fname);
-  use_allmonitors = readInt("useAllMonitors", use_allmonitors, fname);
+  useAllMonitors = readInt("useAllMonitors", useAllMonitors, fname);
 
   requestedWidth = readInt("requestedWidth", requestedWidth, fname);
   requestedHeight = readInt("requestedHeight", requestedHeight, fname);
@@ -381,7 +381,7 @@ void SessionDialog::SetDefaults()
 	extendDisplay = 0;
 	showExtend = 0;
 	use_virt = 0;
-	use_allmonitors =0;
+	useAllMonitors =0;
 	requestedWidth = 0;
 	requestedHeight = 0;
 	_tcscpy_s(prefix, "vnc_");

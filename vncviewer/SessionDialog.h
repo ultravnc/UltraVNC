@@ -76,7 +76,7 @@ public:
 	bool extendDisplay;
 	bool showExtend;
 	bool use_virt;
-	bool use_allmonitors;
+	bool useAllMonitors;
 	int requestedWidth;
 	int requestedHeight;
 	bool UseEnc[LASTENCODING+1];
