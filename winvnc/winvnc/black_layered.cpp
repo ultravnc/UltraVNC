@@ -304,7 +304,7 @@ bool create_border_window(RECT rect)
 	wndClass.lpszClassName = "borderscreen";
 
 	RegisterClassEx(&wndClass);
-	hwnd = CreateWindowEx(NULL, "borderscreen", "borderscreen",
+	hwnd = CreateWindowEx(WS_EX_TOOLWINDOW, "borderscreen", "borderscreen",
 		WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN ,
 		CW_USEDEFAULT, CW_USEDEFAULT, rect.right - rect.left, rect.bottom - rect.top, NULL, NULL, hInst, NULL);
 	typedef DWORD(WINAPI* PSLWA)(HWND, DWORD, BYTE, DWORD);

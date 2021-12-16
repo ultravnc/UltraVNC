@@ -459,8 +459,7 @@ vncMenu::AddTrayIcon()
 		HWND tray = FindWindow(("Shell_TrayWnd"), 0);
 		if (!tray) {
 			IsIconSet=false;
-			if (!m_server->GetDisableTrayIcon()) 
-				IconFaultCounter++;
+			IconFaultCounter++;
 			//m_server->TriggerUpdate();
 			return;
 		}
@@ -660,8 +659,11 @@ BOOL vncMenu::AddNotificationIcon()
 	m_nid.hWnd = m_hwnd;
 	m_nid.cbSize = sizeof(m_nid);
 	m_nid.uID = IDI_WINVNC;			// never changes after construction	
-	m_nid.hIcon = m_winvnc_icon;
-	m_nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_STATE | NIF_TIP | NIF_SHOWTIP;
+	m_nid.hIcon = m_server->GetDisableTrayIcon() ? NULL : m_winvnc_icon;
+
+	m_nid.uFlags = m_server->GetDisableTrayIcon()
+		? NIF_MESSAGE | NIF_STATE | NIF_TIP | NIF_SHOWTIP
+		: NIF_ICON | NIF_MESSAGE | NIF_STATE | NIF_TIP | NIF_SHOWTIP;
 	m_nid.uTimeout = 29000;
 	m_nid.uCallbackMessage = WM_TRAYNOTIFY;
 	if (m_server->GetDisableTrayIcon()) {
@@ -679,7 +681,8 @@ BOOL vncMenu::AddNotificationIcon()
 		IsIconSet = true;
 		IconFaultCounter = 0;
 		setToolTip();
-		addMenus();
+		if (!m_server->GetDisableTrayIcon())
+			addMenus();
 		return true;
 	}
 	if (!vncService::RunningAsService()) {
@@ -693,8 +696,7 @@ BOOL vncMenu::AddNotificationIcon()
 	}
 	else {
 		IsIconSet = false;
-		if (!m_server->GetDisableTrayIcon())
-			IconFaultCounter++;
+		IconFaultCounter++;
 		m_server->TriggerUpdate();
 		vnclog.Print(LL_INTINFO, VNCLOG("Failed IsIconSet \n"));
 	}
@@ -768,15 +770,28 @@ void vncMenu::setToolTip()
 void vncMenu::RestoreTooltip()
 {
 	m_nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_STATE | NIF_TIP | NIF_SHOWTIP;
+	if (m_server->GetDisableTrayIcon()) {
+		m_nid.dwState = NIS_HIDDEN;
+		m_nid.dwStateMask = NIS_HIDDEN;
+	}
+	else {
+		m_nid.dwState = 0;
+		m_nid.dwStateMask = NIS_HIDDEN;
+	}
 	Shell_NotifyIcon(NIM_MODIFY, &m_nid);
 	balloonset = false;
 }
 
 void vncMenu::setBalloonInfo() 
 {
-
+	if (m_server->GetDisableTrayIcon()) {
+		m_nid.dwState = 0;
+		m_nid.dwStateMask = NIS_HIDDEN;
+	}
 	if (m_BalloonInfo && (strlen(m_BalloonInfo) > 0)) {
-		m_nid.uFlags =  NIF_ICON | NIF_MESSAGE | NIF_STATE | NIF_TIP | NIF_INFO;
+		m_nid.uFlags = m_server->GetDisableTrayIcon() 
+				? NIF_MESSAGE | NIF_STATE | NIF_TIP | NIF_INFO
+				: NIF_ICON | NIF_MESSAGE | NIF_STATE | NIF_TIP | NIF_INFO;
 		strncpy_s(m_nid.szInfo, m_BalloonInfo, 255);
 		m_nid.szInfo[255] = '\0';
 		strcpy_s(m_nid.szInfoTitle, "UltraVNC Connection...");
@@ -817,7 +832,7 @@ vncMenu::SendTrayMsg(DWORD msg, bool balloon, BOOL flash)
 	}
 	
 	if (msg == NIM_MODIFY && !balloonset) {
-		m_nid.hIcon = flash ? m_flash_icon : m_winvnc_icon;		
+		m_nid.hIcon = m_server->GetDisableTrayIcon() ? NULL : flash ? m_flash_icon : m_winvnc_icon;
 		setToolTip();
 		if (balloon) 
 			setBalloonInfo();
@@ -881,7 +896,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				strcpy_s(newuser, "");
 				if (vncService::CurrentUser((char*)&newuser, sizeof(newuser))) {
 					// Check whether the user name has changed!
-					if (_stricmp(newuser, _this->m_username) != 0 || (_this->IconFaultCounter > 2 && !_this->m_server->GetDisableTrayIcon())) {
+					if (_stricmp(newuser, _this->m_username) != 0 || (_this->IconFaultCounter > 2 )) {
 						Sleep(1000);
 						vnclog.Print(LL_INTINFO, VNCLOG("user name has changed\n"));
 						// User has changed!
