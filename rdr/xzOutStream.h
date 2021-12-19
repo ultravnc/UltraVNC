@@ -32,7 +32,7 @@
 #include <stdint.h>
 #endif
 #ifdef _XZ
-#include "../xz-5.2.1/src/liblzma/api/lzma.h"
+#include "../xz/src/liblzma/api/lzma.h"
 #endif
 
 namespace rdr {

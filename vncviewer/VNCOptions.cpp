@@ -1159,6 +1159,7 @@ void VNCOptions::Save(char* fname)
 	WritePrivateProfileString("options", "folder", m_document_folder, fname);
 	WritePrivateProfileString("options", "prefix", m_prefix, fname);
 	WritePrivateProfileString("options", "imageFormat", m_imageFormat, fname);
+	WritePrivateProfileString("options", "InfoMsg", m_InfoMsg, fname);
 	saveInt("AutoReconnect", m_autoReconnect, fname);
 
 	saveInt("ExitCheck", m_fExitCheck, fname); //PGM @ Advantig
@@ -1255,6 +1256,7 @@ void VNCOptions::Load(char* fname)
 	GetPrivateProfileString("options", "folder", m_document_folder, m_document_folder, MAX_PATH, fname);
 	GetPrivateProfileString("options", "prefix", m_prefix, m_prefix, 56, fname);
 	GetPrivateProfileString("options", "imageFormat", m_imageFormat, m_imageFormat, 56, fname);
+	GetPrivateProfileString("options", "InfoMsg", m_InfoMsg, m_InfoMsg, 254, fname);
 	if (!g_disable_sponsor) g_disable_sponsor = readInt("sponsor", g_disable_sponsor, fname) != 0;
 
 	/*if (!g_disable_sponsor)

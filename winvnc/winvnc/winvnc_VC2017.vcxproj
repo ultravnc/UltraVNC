@@ -2658,7 +2658,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\win8</Command>
     <ProjectReference Include="..\..\rdr\rdr_VC2017.vcxproj">
       <Project>{f5244002-0fff-4f19-a941-fcce1861f132}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\xz-5.2.1\windows\liblzma_VC2017.vcxproj">
+    <ProjectReference Include="..\..\xz\windows\vs2019\liblzma.vcxproj">
       <Project>{12728250-16ec-4dc6-94d7-e21dd88947f8}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\zipunzip_src\unzip\windll\vc6\lib\unz32lib_VC2017.vcxproj">

@@ -30,7 +30,7 @@
 
 #define LZMA_API_STATIC
 #include <stdint.h>
-#include "../xz-5.2.1/src/liblzma/api/lzma.h"
+#include "../xz/src/liblzma/api/lzma.h"
 
 namespace rdr {
 
