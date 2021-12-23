@@ -2,7 +2,7 @@
 ; jidctint.asm - accurate integer IDCT (MMX)
 ;
 ; Copyright 2009 Pierre Ossman <ossman@cendio.se> for Cendio AB
-; Copyright (C) 2016, D. R. Commander.
+; Copyright (C) 2016, 2020, D. R. Commander.
 ;
 ; Based on the x86 SIMD extension for IJG JPEG library
 ; Copyright (C) 1999-2006, MIYASAKA Masaru.
@@ -14,12 +14,10 @@
 ; NASM is available from http://nasm.sourceforge.net/ or
 ; http://sourceforge.net/project/showfiles.php?group_id=6208
 ;
-; This file contains a slow-but-accurate integer implementation of the
+; This file contains a slower but more accurate integer implementation of the
 ; inverse DCT (Discrete Cosine Transform). The following code is based
 ; directly on the IJG's original jidctint.c; see the jidctint.c for
 ; more details.
-;
-; [TAB8]
 
 %include "jsimdext.inc"
 %include "jdct.inc"
@@ -136,8 +134,8 @@ EXTN(jsimd_idct_islow_mmx):
     alignx      16, 7
 .columnloop:
 %ifndef NO_ZERO_COLUMN_TEST_ISLOW_MMX
-    mov         eax, DWORD [DWBLOCK(1,0,esi,SIZEOF_JCOEF)]
-    or          eax, DWORD [DWBLOCK(2,0,esi,SIZEOF_JCOEF)]
+    mov         eax, dword [DWBLOCK(1,0,esi,SIZEOF_JCOEF)]
+    or          eax, dword [DWBLOCK(2,0,esi,SIZEOF_JCOEF)]
     jnz         short .columnDCT
 
     movq        mm0, MMWORD [MMBLOCK(1,0,esi,SIZEOF_JCOEF)]

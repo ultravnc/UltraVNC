@@ -3,6 +3,7 @@
 ;
 ; Copyright 2009 Pierre Ossman <ossman@cendio.se> for Cendio AB
 ; Copyright (C) 2009, 2016, D. R. Commander.
+; Copyright (C) 2018, Matthias Räncker.
 ;
 ; Based on the x86 SIMD extension for IJG JPEG library
 ; Copyright (C) 1999-2006, MIYASAKA Masaru.
@@ -18,8 +19,6 @@
 ; output: either 4x4 or 2x2 pixels from an 8x8 DCT block.
 ; The following code is based directly on the IJG's original jidctred.c;
 ; see the jidctred.c for more details.
-;
-; [TAB8]
 
 %include "jsimdext.inc"
 %include "jdct.inc"
@@ -132,8 +131,8 @@ EXTN(jsimd_idct_4x4_sse2):
     mov         rsi, r11                ; inptr
 
 %ifndef NO_ZERO_COLUMN_TEST_4X4_SSE2
-    mov         eax, DWORD [DWBLOCK(1,0,rsi,SIZEOF_JCOEF)]
-    or          eax, DWORD [DWBLOCK(2,0,rsi,SIZEOF_JCOEF)]
+    mov         eax, dword [DWBLOCK(1,0,rsi,SIZEOF_JCOEF)]
+    or          eax, dword [DWBLOCK(2,0,rsi,SIZEOF_JCOEF)]
     jnz         short .columnDCT
 
     movdqa      xmm0, XMMWORD [XMMBLOCK(1,0,rsi,SIZEOF_JCOEF)]
@@ -381,12 +380,12 @@ EXTN(jsimd_idct_4x4_sse2):
     pshufd      xmm1, xmm4, 0x4E        ; xmm1=(20 21 22 23 30 31 32 33 00 ..)
     pshufd      xmm3, xmm4, 0x93        ; xmm3=(30 31 32 33 00 01 02 03 10 ..)
 
-    mov         rdx, JSAMPROW [rdi+0*SIZEOF_JSAMPROW]
-    mov         rsi, JSAMPROW [rdi+1*SIZEOF_JSAMPROW]
+    mov         rdxp, JSAMPROW [rdi+0*SIZEOF_JSAMPROW]
+    mov         rsip, JSAMPROW [rdi+1*SIZEOF_JSAMPROW]
     movd        XMM_DWORD [rdx+rax*SIZEOF_JSAMPLE], xmm4
     movd        XMM_DWORD [rsi+rax*SIZEOF_JSAMPLE], xmm2
-    mov         rdx, JSAMPROW [rdi+2*SIZEOF_JSAMPROW]
-    mov         rsi, JSAMPROW [rdi+3*SIZEOF_JSAMPROW]
+    mov         rdxp, JSAMPROW [rdi+2*SIZEOF_JSAMPROW]
+    mov         rsip, JSAMPROW [rdi+3*SIZEOF_JSAMPROW]
     movd        XMM_DWORD [rdx+rax*SIZEOF_JSAMPLE], xmm1
     movd        XMM_DWORD [rsi+rax*SIZEOF_JSAMPLE], xmm3
 
@@ -560,10 +559,10 @@ EXTN(jsimd_idct_2x2_sse2):
     pextrw      ebx, xmm6, 0x00         ; ebx=(C0 D0 -- --)
     pextrw      ecx, xmm6, 0x01         ; ecx=(C1 D1 -- --)
 
-    mov         rdx, JSAMPROW [rdi+0*SIZEOF_JSAMPROW]
-    mov         rsi, JSAMPROW [rdi+1*SIZEOF_JSAMPROW]
-    mov         WORD [rdx+rax*SIZEOF_JSAMPLE], bx
-    mov         WORD [rsi+rax*SIZEOF_JSAMPLE], cx
+    mov         rdxp, JSAMPROW [rdi+0*SIZEOF_JSAMPROW]
+    mov         rsip, JSAMPROW [rdi+1*SIZEOF_JSAMPROW]
+    mov         word [rdx+rax*SIZEOF_JSAMPLE], bx
+    mov         word [rsi+rax*SIZEOF_JSAMPLE], cx
 
     pop         rbx
     uncollect_args 4

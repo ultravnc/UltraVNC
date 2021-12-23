@@ -5,7 +5,7 @@
  * Copyright (C) 1991-1996, Thomas G. Lane.
  * Modified 2009 by Guido Vollbeding.
  * libjpeg-turbo Modifications:
- * Copyright (C) 2017, D. R. Commander.
+ * Copyright (C) 2017, 2019-2020, D. R. Commander.
  * For conditions of distribution and use, see the accompanying README.ijg
  * file.
  *
@@ -108,17 +108,17 @@ copy_pixel_rows(j_decompress_ptr cinfo, djpeg_dest_ptr dinfo,
   ppm_dest_ptr dest = (ppm_dest_ptr)dinfo;
   register char *bufferptr;
   register JSAMPROW ptr;
-#if BITS_IN_JSAMPLE != 8 || (!defined(HAVE_UNSIGNED_CHAR) && !defined(__CHAR_UNSIGNED__))
+#if BITS_IN_JSAMPLE != 8
   register JDIMENSION col;
 #endif
 
   ptr = dest->pub.buffer[0];
   bufferptr = dest->iobuffer;
-#if BITS_IN_JSAMPLE == 8 && (defined(HAVE_UNSIGNED_CHAR) || defined(__CHAR_UNSIGNED__))
+#if BITS_IN_JSAMPLE == 8
   MEMCOPY(bufferptr, ptr, dest->samples_per_row);
 #else
   for (col = dest->samples_per_row; col > 0; col--) {
-    PUTPPMSAMPLE(bufferptr, GETJSAMPLE(*ptr++));
+    PUTPPMSAMPLE(bufferptr, *ptr++);
   }
 #endif
   (void)JFWRITE(dest->pub.output_file, dest->iobuffer, dest->buffer_width);
@@ -200,10 +200,10 @@ put_demapped_rgb(j_decompress_ptr cinfo, djpeg_dest_ptr dinfo,
   ptr = dest->pub.buffer[0];
   bufferptr = dest->iobuffer;
   for (col = cinfo->output_width; col > 0; col--) {
-    pixval = GETJSAMPLE(*ptr++);
-    PUTPPMSAMPLE(bufferptr, GETJSAMPLE(color_map0[pixval]));
-    PUTPPMSAMPLE(bufferptr, GETJSAMPLE(color_map1[pixval]));
-    PUTPPMSAMPLE(bufferptr, GETJSAMPLE(color_map2[pixval]));
+    pixval = *ptr++;
+    PUTPPMSAMPLE(bufferptr, color_map0[pixval]);
+    PUTPPMSAMPLE(bufferptr, color_map1[pixval]);
+    PUTPPMSAMPLE(bufferptr, color_map2[pixval]);
   }
   (void)JFWRITE(dest->pub.output_file, dest->iobuffer, dest->buffer_width);
 }
@@ -222,7 +222,7 @@ put_demapped_gray(j_decompress_ptr cinfo, djpeg_dest_ptr dinfo,
   ptr = dest->pub.buffer[0];
   bufferptr = dest->iobuffer;
   for (col = cinfo->output_width; col > 0; col--) {
-    PUTPPMSAMPLE(bufferptr, GETJSAMPLE(color_map[GETJSAMPLE(*ptr++)]));
+    PUTPPMSAMPLE(bufferptr, color_map[*ptr++]);
   }
   (void)JFWRITE(dest->pub.output_file, dest->iobuffer, dest->buffer_width);
 }
@@ -256,6 +256,8 @@ start_output_ppm(j_decompress_ptr cinfo, djpeg_dest_ptr dinfo)
   case JCS_EXT_ABGR:
   case JCS_EXT_ARGB:
   case JCS_CMYK:
+    if (!IsExtRGB(cinfo->out_color_space) && cinfo->quantize_colors)
+      ERREXIT(cinfo, JERR_PPM_COLORSPACE);
     /* emit header for raw PPM format */
     fprintf(dest->pub.output_file, "P6\n%ld %ld\n%d\n",
             (long)cinfo->output_width, (long)cinfo->output_height, PPM_MAXVAL);
@@ -324,11 +326,12 @@ jinit_write_ppm(j_decompress_ptr cinfo)
 
   if (cinfo->quantize_colors || BITS_IN_JSAMPLE != 8 ||
       sizeof(JSAMPLE) != sizeof(char) ||
-      (cinfo->out_color_space != JCS_EXT_RGB
 #if RGB_RED == 0 && RGB_GREEN == 1 && RGB_BLUE == 2 && RGB_PIXELSIZE == 3
-       && cinfo->out_color_space != JCS_RGB
+      (cinfo->out_color_space != JCS_EXT_RGB &&
+       cinfo->out_color_space != JCS_RGB)) {
+#else
+      cinfo->out_color_space != JCS_EXT_RGB) {
 #endif
-      )) {
     /* When quantizing, we need an output buffer for colormap indexes
      * that's separate from the physical I/O buffer.  We also need a
      * separate buffer if pixel format translation must take place.
@@ -337,13 +340,14 @@ jinit_write_ppm(j_decompress_ptr cinfo)
       ((j_common_ptr)cinfo, JPOOL_IMAGE,
        cinfo->output_width * cinfo->output_components, (JDIMENSION)1);
     dest->pub.buffer_height = 1;
-    if (IsExtRGB(cinfo->out_color_space))
-      dest->pub.put_pixel_rows = put_rgb;
-    else if (cinfo->out_color_space == JCS_CMYK)
-      dest->pub.put_pixel_rows = put_cmyk;
-    else if (!cinfo->quantize_colors)
-      dest->pub.put_pixel_rows = copy_pixel_rows;
-    else if (cinfo->out_color_space == JCS_GRAYSCALE)
+    if (!cinfo->quantize_colors) {
+      if (IsExtRGB(cinfo->out_color_space))
+        dest->pub.put_pixel_rows = put_rgb;
+      else if (cinfo->out_color_space == JCS_CMYK)
+        dest->pub.put_pixel_rows = put_cmyk;
+      else
+        dest->pub.put_pixel_rows = copy_pixel_rows;
+    } else if (cinfo->out_color_space == JCS_GRAYSCALE)
       dest->pub.put_pixel_rows = put_demapped_gray;
     else
       dest->pub.put_pixel_rows = put_demapped_rgb;

@@ -3,6 +3,7 @@
 ;
 ; Copyright 2009, 2012 Pierre Ossman <ossman@cendio.se> for Cendio AB
 ; Copyright (C) 2009, 2012, 2016, D. R. Commander.
+; Copyright (C) 2018, Matthias Räncker.
 ;
 ; Based on the x86 SIMD extension for IJG JPEG library
 ; Copyright (C) 1999-2006, MIYASAKA Masaru.
@@ -13,8 +14,6 @@
 ; assembler (including Borland's Turbo Assembler).
 ; NASM is available from http://nasm.sourceforge.net/ or
 ; http://sourceforge.net/project/showfiles.php?group_id=6208
-;
-; [TAB8]
 
 %include "jcolsamp.inc"
 
@@ -59,9 +58,9 @@ EXTN(jsimd_ycc_rgb_convert_sse2):
 
     mov         rdi, r11
     mov         ecx, r12d
-    mov         rsi, JSAMPARRAY [rdi+0*SIZEOF_JSAMPARRAY]
-    mov         rbx, JSAMPARRAY [rdi+1*SIZEOF_JSAMPARRAY]
-    mov         rdx, JSAMPARRAY [rdi+2*SIZEOF_JSAMPARRAY]
+    mov         rsip, JSAMPARRAY [rdi+0*SIZEOF_JSAMPARRAY]
+    mov         rbxp, JSAMPARRAY [rdi+1*SIZEOF_JSAMPARRAY]
+    mov         rdxp, JSAMPARRAY [rdi+2*SIZEOF_JSAMPARRAY]
     lea         rsi, [rsi+rcx*SIZEOF_JSAMPROW]
     lea         rbx, [rbx+rcx*SIZEOF_JSAMPROW]
     lea         rdx, [rdx+rcx*SIZEOF_JSAMPROW]
@@ -80,10 +79,10 @@ EXTN(jsimd_ycc_rgb_convert_sse2):
     push        rsi
     push        rcx                     ; col
 
-    mov         rsi, JSAMPROW [rsi]     ; inptr0
-    mov         rbx, JSAMPROW [rbx]     ; inptr1
-    mov         rdx, JSAMPROW [rdx]     ; inptr2
-    mov         rdi, JSAMPROW [rdi]     ; outptr
+    mov         rsip, JSAMPROW [rsi]    ; inptr0
+    mov         rbxp, JSAMPROW [rbx]    ; inptr1
+    mov         rdxp, JSAMPROW [rdx]    ; inptr2
+    mov         rdip, JSAMPROW [rdi]    ; outptr
 .columnloop:
 
     movdqa      xmm5, XMMWORD [rbx]     ; xmm5=Cb(0123456789ABCDEF)
@@ -306,7 +305,7 @@ EXTN(jsimd_ycc_rgb_convert_sse2):
     movd        eax, xmmA
     cmp         rcx, byte SIZEOF_WORD
     jb          short .column_st1
-    mov         WORD [rdi], ax
+    mov         word [rdi], ax
     add         rdi, byte SIZEOF_WORD
     sub         rcx, byte SIZEOF_WORD
     shr         rax, 16
@@ -315,7 +314,7 @@ EXTN(jsimd_ycc_rgb_convert_sse2):
     ; space.
     test        rcx, rcx
     jz          short .nextrow
-    mov         BYTE [rdi], al
+    mov         byte [rdi], al
 
 %else  ; RGB_PIXELSIZE == 4 ; -----------
 

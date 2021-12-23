@@ -2,7 +2,8 @@
 ; jidctint.asm - accurate integer IDCT (64-bit AVX2)
 ;
 ; Copyright 2009 Pierre Ossman <ossman@cendio.se> for Cendio AB
-; Copyright (C) 2009, 2016, 2018, D. R. Commander.
+; Copyright (C) 2009, 2016, 2018, 2020, D. R. Commander.
+; Copyright (C) 2018, Matthias Räncker.
 ;
 ; Based on the x86 SIMD extension for IJG JPEG library
 ; Copyright (C) 1999-2006, MIYASAKA Masaru.
@@ -14,12 +15,10 @@
 ; NASM is available from http://nasm.sourceforge.net/ or
 ; http://sourceforge.net/project/showfiles.php?group_id=6208
 ;
-; This file contains a slow-but-accurate integer implementation of the
+; This file contains a slower but more accurate integer implementation of the
 ; inverse DCT (Discrete Cosine Transform). The following code is based
 ; directly on the IJG's original jidctint.c; see the jidctint.c for
 ; more details.
-;
-; [TAB8]
 
 %include "jsimdext.inc"
 %include "jdct.inc"
@@ -115,7 +114,7 @@ F_3_072 equ DESCALE(3299298341, 30 - CONST_BITS)  ; FIX(3.072711026)
 %endmacro
 
 ; --------------------------------------------------------------------------
-; In-place 8x8x16-bit slow integer inverse DCT using AVX2 instructions
+; In-place 8x8x16-bit accurate integer inverse DCT using AVX2 instructions
 ; %1-%4:  Input/output registers
 ; %5-%12: Temp registers
 ; %9:     Pass (1 or 2)
@@ -292,8 +291,8 @@ EXTN(jsimd_idct_islow_avx2):
     ; ---- Pass 1: process columns.
 
 %ifndef NO_ZERO_COLUMN_TEST_ISLOW_AVX2
-    mov         eax, DWORD [DWBLOCK(1,0,r11,SIZEOF_JCOEF)]
-    or          eax, DWORD [DWBLOCK(2,0,r11,SIZEOF_JCOEF)]
+    mov         eax, dword [DWBLOCK(1,0,r11,SIZEOF_JCOEF)]
+    or          eax, dword [DWBLOCK(2,0,r11,SIZEOF_JCOEF)]
     jnz         near .columnDCT
 
     movdqa      xmm0, XMMWORD [XMMBLOCK(1,0,r11,SIZEOF_JCOEF)]
@@ -389,23 +388,23 @@ EXTN(jsimd_idct_islow_avx2):
 
     mov         eax, r13d
 
-    mov         rdx, JSAMPROW [r12+0*SIZEOF_JSAMPROW]  ; (JSAMPLE *)
-    mov         rsi, JSAMPROW [r12+1*SIZEOF_JSAMPROW]  ; (JSAMPLE *)
+    mov         rdxp, JSAMPROW [r12+0*SIZEOF_JSAMPROW]  ; (JSAMPLE *)
+    mov         rsip, JSAMPROW [r12+1*SIZEOF_JSAMPROW]  ; (JSAMPLE *)
     movq        XMM_MMWORD [rdx+rax*SIZEOF_JSAMPLE], xmm0
     movq        XMM_MMWORD [rsi+rax*SIZEOF_JSAMPLE], xmm1
 
-    mov         rdx, JSAMPROW [r12+2*SIZEOF_JSAMPROW]  ; (JSAMPLE *)
-    mov         rsi, JSAMPROW [r12+3*SIZEOF_JSAMPROW]  ; (JSAMPLE *)
+    mov         rdxp, JSAMPROW [r12+2*SIZEOF_JSAMPROW]  ; (JSAMPLE *)
+    mov         rsip, JSAMPROW [r12+3*SIZEOF_JSAMPROW]  ; (JSAMPLE *)
     movq        XMM_MMWORD [rdx+rax*SIZEOF_JSAMPLE], xmm2
     movq        XMM_MMWORD [rsi+rax*SIZEOF_JSAMPLE], xmm3
 
-    mov         rdx, JSAMPROW [r12+4*SIZEOF_JSAMPROW]  ; (JSAMPLE *)
-    mov         rsi, JSAMPROW [r12+5*SIZEOF_JSAMPROW]  ; (JSAMPLE *)
+    mov         rdxp, JSAMPROW [r12+4*SIZEOF_JSAMPROW]  ; (JSAMPLE *)
+    mov         rsip, JSAMPROW [r12+5*SIZEOF_JSAMPROW]  ; (JSAMPLE *)
     movq        XMM_MMWORD [rdx+rax*SIZEOF_JSAMPLE], xmm4
     movq        XMM_MMWORD [rsi+rax*SIZEOF_JSAMPLE], xmm5
 
-    mov         rdx, JSAMPROW [r12+6*SIZEOF_JSAMPROW]  ; (JSAMPLE *)
-    mov         rsi, JSAMPROW [r12+7*SIZEOF_JSAMPROW]  ; (JSAMPLE *)
+    mov         rdxp, JSAMPROW [r12+6*SIZEOF_JSAMPROW]  ; (JSAMPLE *)
+    mov         rsip, JSAMPROW [r12+7*SIZEOF_JSAMPROW]  ; (JSAMPLE *)
     movq        XMM_MMWORD [rdx+rax*SIZEOF_JSAMPLE], xmm6
     movq        XMM_MMWORD [rsi+rax*SIZEOF_JSAMPLE], xmm7
 
