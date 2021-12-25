@@ -172,7 +172,7 @@ void ClientConnection::ReadQueueZip(rfbFramebufferUpdateRectHeader *pfburh,HRGN 
 					vnclog.Print(0, _T("Invalid number of bits per pixel: %d\n"), m_myFormat.bitsPerPixel);
 			}
 			pzipbuf +=numpixels*m_myFormat.bitsPerPixel/8;
-			if (!m_opts.m_Directx)InvalidateRegion(&rect,prgn);
+			if (!m_opts->m_Directx)InvalidateRegion(&rect,prgn);
 		}
 	}
 }

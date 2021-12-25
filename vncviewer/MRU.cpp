@@ -38,7 +38,7 @@ static const int MRU_MAX_ITEM_LENGTH = 256;
 
 MRU::MRU(LPTSTR keyname, unsigned int maxnum)
 {
-    m_index[0] = _T('\0');
+    VNCOptions::setDefaultOptionsFileName(m_optionfile);
     m_maxnum = maxnum;
 
     // Read the index entry
@@ -84,7 +84,7 @@ void MRU::AddItem(LPTSTR txt)
     TCHAR valname[2];
     valname[0] = firstUnusedId;
     valname[1] = _T('\0');
-	WritePrivateProfileString("connection", valname, txt, m_opts.getDefaultOptionsFileName());    
+	WritePrivateProfileString("connection", valname, txt, m_optionfile);    
     // move all the current ids up one
     for (int j = _tcslen(m_index)+1; j >= 0; j--)
         m_index[j] = m_index[j-1];
@@ -112,7 +112,7 @@ int MRU::GetItem(int index, LPTSTR buf, int buflen)
     valname[0] = m_index[index];
     valname[1] = _T('\0');
     DWORD dwbuflen = buflen;
-	GetPrivateProfileString("connection", valname, "",buf, buflen, m_opts.getDefaultOptionsFileName());
+	GetPrivateProfileString("connection", valname, "",buf, buflen, m_optionfile);
     return _tcslen(buf);
 }
 
@@ -136,38 +136,38 @@ void MRU::SetPos(LPTSTR txt, int x, int y, int w, int h)
 {
 	char buf[32];
 	sprintf_s(buf, "%d", x);
-	WritePrivateProfileString(txt, "x", buf, m_opts.getDefaultOptionsFileName());
+	WritePrivateProfileString(txt, "x", buf, m_optionfile);
 	sprintf_s(buf, "%d", y);
-	WritePrivateProfileString(txt, "y", buf, m_opts.getDefaultOptionsFileName());
+	WritePrivateProfileString(txt, "y", buf, m_optionfile);
 	sprintf_s(buf, "%d", w);
-	WritePrivateProfileString(txt, "w", buf, m_opts.getDefaultOptionsFileName());
+	WritePrivateProfileString(txt, "w", buf, m_optionfile);
 	sprintf_s(buf, "%d", h);
-	WritePrivateProfileString(txt, "h", buf, m_opts.getDefaultOptionsFileName());
+	WritePrivateProfileString(txt, "h", buf, m_optionfile);
 }
 
 int MRU::Get_x(LPTSTR txt)
 {
 	char buf[32];
-	GetPrivateProfileString(txt, "x", "", buf, 32, m_opts.getDefaultOptionsFileName());
+	GetPrivateProfileString(txt, "x", "", buf, 32, m_optionfile);
 	return atoi(buf);
 }
 
 int MRU::Get_y(LPTSTR txt)
 {
 	char buf[32];
-	GetPrivateProfileString(txt, "y", "", buf, 32, m_opts.getDefaultOptionsFileName());
+	GetPrivateProfileString(txt, "y", "", buf, 32, m_optionfile);
 	return atoi(buf);
 }
 int MRU::Get_w(LPTSTR txt)
 {
 	char buf[32];
-	GetPrivateProfileString(txt, "w", "", buf, 32, m_opts.getDefaultOptionsFileName());
+	GetPrivateProfileString(txt, "w", "", buf, 32, m_optionfile);
 	return atoi(buf);
 }
 int MRU::Get_h(LPTSTR txt)
 {
 	char buf[32];
-	GetPrivateProfileString(txt, "h", "", buf, 32, m_opts.getDefaultOptionsFileName());
+	GetPrivateProfileString(txt, "h", "", buf, 32, m_optionfile);
 	return atoi(buf);
 }
 // Remove the item with the given index.
@@ -178,7 +178,7 @@ void MRU::RemoveItem(int index)
     TCHAR valname[2];
     valname[0] = m_index[index];
     valname[1] = _T('\0');
-	WritePrivateProfileString("connection", valname, NULL, m_opts.getDefaultOptionsFileName());
+	WritePrivateProfileString("connection", valname, NULL, m_optionfile);
 
     for (unsigned int i = index; i <= _tcslen(m_index); i++)
         m_index[i] = m_index[i+1];    
@@ -190,7 +190,7 @@ void MRU::ReadIndex()
 {
     // read the index
     DWORD dwindexlen = sizeof(m_index);
-	if (GetPrivateProfileString("connection", INDEX_VAL_NAME, "", m_index, dwindexlen, m_opts.getDefaultOptionsFileName()) == 0) 
+	if (GetPrivateProfileString("connection", INDEX_VAL_NAME, "", m_index, dwindexlen, m_optionfile) == 0) 
 		WriteIndex();
 	int size = NumItems();
 }
@@ -198,7 +198,7 @@ void MRU::ReadIndex()
 // Save the index string to the registry
 void MRU::WriteIndex()
 {
-	WritePrivateProfileString("connection", INDEX_VAL_NAME, m_index, m_opts.getDefaultOptionsFileName());
+	WritePrivateProfileString("connection", INDEX_VAL_NAME, m_index, m_optionfile);
 }
 
 

@@ -120,7 +120,7 @@ void ClientConnection::ReadUltraZip(rfbFramebufferUpdateRectHeader *pfburh,HRGN 
 				UINT numpixels = surh.r.w * surh.r.h;							  
 				if (m_DIBbits) ConvertAll(surh.r.w,surh.r.h,surh.r.x, surh.r.y,m_myFormat.bitsPerPixel/8,(BYTE *)pzipbuf,(BYTE *)m_DIBbits,m_si.framebufferWidth,m_si.framebufferHeight);
 				pzipbuf +=numpixels*m_myFormat.bitsPerPixel/8;
-				if (!m_opts.m_Directx)InvalidateRegion(&rect,prgn);
+				if (!m_opts->m_Directx)InvalidateRegion(&rect,prgn);
 			}
 	}
 }

@@ -69,11 +69,11 @@ void ClientConnection::xzDecode(int x, int y, int w, int h)
 	//int length = fis->readU32();
 
 	if( xzyw ){
-	  if( !m_opts.m_enableJpegCompression ){
+	  if( !m_opts->m_enableJpegCompression ){
 		  xzyw_level = 1;
-	  }else if( m_opts.m_jpegQualityLevel < 3 ){
+	  }else if( m_opts->m_jpegQualityLevel < 3 ){
 		  xzyw_level = 3;
-	  }else if( m_opts.m_jpegQualityLevel < 6 ){
+	  }else if( m_opts->m_jpegQualityLevel < 6 ){
 		  xzyw_level = 2;
 	  }else{
 		  xzyw_level = 1;

@@ -254,9 +254,9 @@ ClientConnection::ClientConnection(VNCviewerApp *pApp, SOCKET sock)
   : fis(0), zis(0), zstdis(0), m_clipboard(ClipboardSettings::defaultViewerCaps)
 {
 	Init(pApp);
-    if (m_opts.autoDetect)
+    if (m_opts->autoDetect)
 	{
-      m_opts.m_Use8Bit = rfbPFFullColors; //true;
+      m_opts->m_Use8Bit = rfbPFFullColors; //true;
 	}
 	m_sock = sock;
 	m_serverInitiated = true;
@@ -324,15 +324,15 @@ ClientConnection::ClientConnection(VNCviewerApp *pApp, LPTSTR host, int port)
   : fis(0), zis(0), zstdis(0), m_clipboard(ClipboardSettings::defaultViewerCaps)
 {
 	Init(pApp);
-    if (m_opts.autoDetect)
+    if (m_opts->autoDetect)
 	{
-		m_opts.m_Use8Bit = rfbPFFullColors; //true;
+		m_opts->m_Use8Bit = rfbPFFullColors; //true;
 	}
 	_tcsncpy_s(m_host, host, MAX_HOST_NAME_LEN);
 	m_port = port;
-	_tcsncpy_s(m_proxyhost,m_opts.m_proxyhost, MAX_HOST_NAME_LEN);
-	m_proxyport=m_opts.m_proxyport;
-	m_fUseProxy = m_opts.m_fUseProxy;
+	_tcsncpy_s(m_proxyhost,m_opts->m_proxyhost, MAX_HOST_NAME_LEN);
+	m_proxyport=m_opts->m_proxyport;
+	m_fUseProxy = m_opts->m_fUseProxy;
 }
 
 void ClientConnection::Init(VNCviewerApp *pApp)
@@ -375,7 +375,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_keymapJap = new KeyMapJap;
 
 	// We take the initial conn options from the application defaults
-	m_opts = m_pApp->m_options;
+	m_opts = &m_pApp->m_options;
 
 	// Pass the connection option(s) to module(s)
     m_keymap->SetKeyMapOption1(false);
@@ -538,7 +538,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	xzyw = 0;
 #endif
 
-	m_autoReconnect = m_opts.m_autoReconnect;
+	m_autoReconnect = m_opts->m_autoReconnect;
 	ThreadSocketTimeout=NULL;
 	m_statusThread=NULL;
 	m_SavedAreaBIB=NULL;
@@ -572,7 +572,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_fPluginStreamingOut = false;
 
 	//adzm 2010-10
-	m_PendingMouseMove.dwMinimumMouseMoveInterval = m_opts.m_throttleMouse;
+	m_PendingMouseMove.dwMinimumMouseMoveInterval = m_opts->m_throttleMouse;
 	directx_used=false;
 	directx_output = new ViewerDirectxClass;
 #ifdef _Gii
@@ -600,7 +600,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 // helper functions for setting socket timeouts during file transfer
 bool ClientConnection::SetSendTimeout(int msecs)
 {
-    int timeout= msecs < 0 ? m_opts.m_FTTimeout * 1000 : msecs;
+    int timeout= msecs < 0 ? m_opts->m_FTTimeout * 1000 : msecs;
 	if (setsockopt(m_sock, SOL_SOCKET, SO_SNDTIMEO, (char*)&timeout, sizeof(timeout)) == SOCKET_ERROR)
 	{
 		return false;
@@ -610,7 +610,7 @@ bool ClientConnection::SetSendTimeout(int msecs)
 
 bool ClientConnection::SetRecvTimeout(int msecs)
 {
-    int timeout= msecs < 0 ? m_opts.m_FTTimeout * 1000 : msecs;
+    int timeout= msecs < 0 ? m_opts->m_FTTimeout * 1000 : msecs;
 	if (setsockopt(m_sock, SOL_SOCKET, SO_RCVTIMEO, (char*)&timeout, sizeof(timeout)) == SOCKET_ERROR)
 	{
 		return false;
@@ -685,7 +685,7 @@ void ClientConnection::DoConnection(bool reconnect)
 	omni_mutex_lock l(m_bitmapdcMutex);
 	if (m_pDSMPlugin->IsEnabled())
 	{
-		if (!m_opts.m_NoStatus && !m_hwndStatus)
+		if (!m_opts->m_NoStatus && !m_hwndStatus)
 			GTGBS_ShowConnectWindow();
 		int somethingwrong_counter = 0;
 		while (!m_hwndStatus)
@@ -1178,7 +1178,7 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 
 void ClientConnection::RebuildToolbar(HWND hwnd)
 {
-    if (m_opts.m_ShowToolbar)
+    if (m_opts->m_ShowToolbar)
     {
         RECT rect;
         GetWindowRect(hwnd, &rect);
@@ -1210,7 +1210,7 @@ void ClientConnection::GTGBS_CreateToolbar()
 	wndclass.cbWndExtra		= 0;
 	wndclass.hInstance		= m_pApp->m_instance;
 	wndclass.hIcon			= LoadIcon(m_pApp->m_instance, MAKEINTRESOURCE(IDR_TRAY));
-	switch (m_opts.m_localCursor) {
+	switch (m_opts->m_localCursor) {
 	case NOCURSOR:
 		wndclass.hCursor		= LoadCursor(m_pApp->m_instance, MAKEINTRESOURCE(IDC_NOCURSOR));
 		break;
@@ -1344,7 +1344,7 @@ void ClientConnection::CreateDisplay()
 	wndclass.cbWndExtra		= 0;
 	wndclass.hInstance		= m_pApp->m_instance;
 	wndclass.hIcon			= LoadIcon(m_pApp->m_instance, MAKEINTRESOURCE(IDR_TRAY));
-	switch (m_opts.m_localCursor) {
+	switch (m_opts->m_localCursor) {
 	case NOCURSOR:
 		wndclass.hCursor		= LoadCursor(m_pApp->m_instance, MAKEINTRESOURCE(IDC_NOCURSOR));
 		break;
@@ -1414,7 +1414,7 @@ void ClientConnection::CreateDisplay()
 
 	// Add stuff to System menu
 	HMENU hsysmenu = GetSystemMenu(m_hwndMain, FALSE);
-	if (!m_opts.m_restricted) {
+	if (!m_opts->m_restricted) {
 		// Modif sf@2002
 		AppendMenu(hsysmenu, MF_SEPARATOR, NULL, NULL);
 		AppendMenu(hsysmenu, MF_STRING, ID_FILETRANSFER,	sz_L16);
@@ -1495,12 +1495,12 @@ void ClientConnection::CreateDisplay()
 	}
     AppendMenu(hsysmenu, MF_SEPARATOR, NULL, NULL);
 	AppendMenu(hsysmenu, MF_STRING, IDD_APP_ABOUT,		sz_L39);
-	if (m_opts.m_listening) {
+	if (m_opts->m_listening) {
 		AppendMenu(hsysmenu, MF_SEPARATOR, NULL, NULL);
 		AppendMenu(hsysmenu, MF_STRING, ID_CLOSEDAEMON, sz_L40);
 	}
 	DrawMenuBar(m_hwndMain);
-	TheAccelKeys.SetWindowHandle(m_opts.m_NoHotKeys ? 0 : m_hwndMain);
+	TheAccelKeys.SetWindowHandle(m_opts->m_NoHotKeys ? 0 : m_hwndMain);
 
 	// adzm - 2010-07 - Extended clipboard
 	UpdateMenuItems();
@@ -1510,7 +1510,7 @@ void ClientConnection::CreateDisplay()
 
 	//Added by: Lars Werner (http://lars.werner.no)
 	if(TitleBar.GetSafeHwnd()==NULL)
-		TitleBar.Create(m_pApp->m_instance, m_hwndMain, !m_opts.m_Directx, &m_opts);
+		TitleBar.Create(m_pApp->m_instance, m_hwndMain, !m_opts->m_Directx, m_opts);
 }
 
 // adzm - 2010-07 - Fix clipboard hangs
@@ -1538,21 +1538,21 @@ void ClientConnection::UpdateMenuItems()
 
 	CheckMenuItem(hsysmenu,
 				  ID_DBUTTON,
-				  MF_BYCOMMAND | (m_opts.m_ShowToolbar ? MF_CHECKED :MF_UNCHECKED));
+				  MF_BYCOMMAND | (m_opts->m_ShowToolbar ? MF_CHECKED :MF_UNCHECKED));
 
 	CheckMenuItem(hsysmenu,
 				  ID_VIEWONLYTOGGLE,
-				  MF_BYCOMMAND | (m_opts.m_ViewOnly ? MF_CHECKED :MF_UNCHECKED));
+				  MF_BYCOMMAND | (m_opts->m_ViewOnly ? MF_CHECKED :MF_UNCHECKED));
 
 	// display menu
 	CheckMenuItem(m_hPopupMenuDisplay,
 				  ID_AUTOSCALING,
-				  MF_BYCOMMAND | (m_opts.m_fAutoScaling ? MF_CHECKED :MF_UNCHECKED));
+				  MF_BYCOMMAND | (m_opts->m_fAutoScaling ? MF_CHECKED :MF_UNCHECKED));
 
 	// clipboard menu
 	CheckMenuItem(m_hPopupMenuClipboard,
 				  ID_ENABLE_CLIPBOARD,
-				  MF_BYCOMMAND | (m_opts.m_DisableClipboard ? MF_UNCHECKED : MF_CHECKED));
+				  MF_BYCOMMAND | (m_opts->m_DisableClipboard ? MF_UNCHECKED : MF_CHECKED));
 	// don't allow text format to be interacted with
 	CheckMenuItem(m_hPopupMenuClipboardFormats,
 				  ID_CLIPBOARD_TEXT,
@@ -1572,7 +1572,7 @@ void ClientConnection::UpdateMenuItems()
 
 	EnableMenuItem(m_hPopupMenuClipboard,
 				  ID_ENABLE_CLIPBOARD,
-				  m_opts.m_ViewOnly ? MF_DISABLED : MF_ENABLED);
+				  m_opts->m_ViewOnly ? MF_DISABLED : MF_ENABLED);
 
 	// don't allow text format to be interacted with
 	EnableMenuItem(m_hPopupMenuClipboardFormats,
@@ -1580,11 +1580,11 @@ void ClientConnection::UpdateMenuItems()
 				  MF_DISABLED);
 	EnableMenuItem(m_hPopupMenuClipboardFormats,
 				  ID_CLIPBOARD_RTF,
-				  (m_opts.m_ViewOnly || m_opts.m_DisableClipboard || !m_clipboard.settings.m_bSupportsEx || !(m_clipboard.settings.m_remoteCaps & clipRTF)) ? MF_DISABLED : MF_ENABLED);
+				  (m_opts->m_ViewOnly || m_opts->m_DisableClipboard || !m_clipboard.settings.m_bSupportsEx || !(m_clipboard.settings.m_remoteCaps & clipRTF)) ? MF_DISABLED : MF_ENABLED);
 
 	EnableMenuItem(m_hPopupMenuClipboardFormats,
 				  ID_CLIPBOARD_HTML,
-				  (m_opts.m_ViewOnly || m_opts.m_DisableClipboard || !m_clipboard.settings.m_bSupportsEx || !(m_clipboard.settings.m_remoteCaps & clipHTML)) ? MF_DISABLED : MF_ENABLED);
+				  (m_opts->m_ViewOnly || m_opts->m_DisableClipboard || !m_clipboard.settings.m_bSupportsEx || !(m_clipboard.settings.m_remoteCaps & clipHTML)) ? MF_DISABLED : MF_ENABLED);
 
 	EnableMenuItem(m_hPopupMenuClipboardFormats,
 				  ID_CLIPBOARD_DIB,
@@ -1600,7 +1600,7 @@ void ClientConnection::UpdateMenuItems()
 //
 void ClientConnection::LoadDSMPlugin(bool fForceReload)
 {
-	if (m_opts.m_fUseDSMPlugin)
+	if (m_opts->m_fUseDSMPlugin)
 	{
 		// sf@2007 - Autoreconnect stuff - Reload/Reset of the plugin
 		if (m_pDSMPlugin->IsLoaded() && fForceReload)
@@ -1614,16 +1614,16 @@ void ClientConnection::LoadDSMPlugin(bool fForceReload)
 
 		if (!m_pDSMPlugin->IsLoaded())
 		{
-			m_pDSMPlugin->LoadPlugin(m_opts.m_szDSMPluginFilename, m_opts.m_listening);
+			m_pDSMPlugin->LoadPlugin(m_opts->m_szDSMPluginFilename, m_opts->m_listening);
 			if (m_pDSMPlugin->IsLoaded())
 			{
 				if (m_pDSMPlugin->InitPlugin())
 				{
 					//detect old_plugin
 					if (!m_pDSMPlugin->SupportsMultithreaded()) //PGM
-					m_opts.m_oldplugin=true; //PGM
+					m_opts->m_oldplugin=true; //PGM
 					else //PGM
-					m_opts.m_oldplugin=false; //PGM
+					m_opts->m_oldplugin=false; //PGM
 
 					m_pDSMPlugin->SetEnabled(true);
 					m_pDSMPlugin->DescribePlugin();
@@ -1731,79 +1731,79 @@ void ClientConnection::SetDSMPluginStuff()
 //
 void ClientConnection::HandleQuickOption()
 {
-	switch (m_opts.m_quickoption)
+	switch (m_opts->m_quickoption)
 	{
 	case 1:
-		m_opts.m_PreferredEncodings.clear();
-		//if (new_ultra_server) m_opts.m_PreferredEncodings.push_back(rfbEncodingUltra2);
+		m_opts->m_PreferredEncodings.clear();
+		//if (new_ultra_server) m_opts->m_PreferredEncodings.push_back(rfbEncodingUltra2);
 		//else 
-		m_opts.m_PreferredEncodings.push_back(rfbEncodingHextile);
-		m_opts.m_Use8Bit = rfbPFFullColors; //false;
-		m_opts.m_fEnableCache = false;
-		m_opts.autoDetect = true;
+		m_opts->m_PreferredEncodings.push_back(rfbEncodingHextile);
+		m_opts->m_Use8Bit = rfbPFFullColors; //false;
+		m_opts->m_fEnableCache = false;
+		m_opts->autoDetect = true;
 		break;
 
 	case 2:
-		m_opts.m_PreferredEncodings.clear();
-		m_opts.m_PreferredEncodings.push_back(rfbEncodingHextile);
-		m_opts.m_Use8Bit = rfbPFFullColors; // false; // Max colors
-		m_opts.autoDetect = false;
-		m_opts.m_fEnableCache = false;
-//		m_opts.m_localCursor = NOCURSOR;
-		// m_opts.m_requestShapeUpdates = true;
-		// m_opts.m_ignoreShapeUpdates = false;
+		m_opts->m_PreferredEncodings.clear();
+		m_opts->m_PreferredEncodings.push_back(rfbEncodingHextile);
+		m_opts->m_Use8Bit = rfbPFFullColors; // false; // Max colors
+		m_opts->autoDetect = false;
+		m_opts->m_fEnableCache = false;
+//		m_opts->m_localCursor = NOCURSOR;
+		// m_opts->m_requestShapeUpdates = true;
+		// m_opts->m_ignoreShapeUpdates = false;
 		break;
 
 	case 3:
-		m_opts.m_PreferredEncodings.clear();
-		m_opts.m_PreferredEncodings.push_back(rfbEncodingZRLE);
-		m_opts.m_Use8Bit = rfbPF256Colors; //false;
-		m_opts.autoDetect = false;
-		m_opts.m_fEnableCache = false;
-//		m_opts.m_localCursor = NOCURSOR;
+		m_opts->m_PreferredEncodings.clear();
+		m_opts->m_PreferredEncodings.push_back(rfbEncodingZRLE);
+		m_opts->m_Use8Bit = rfbPF256Colors; //false;
+		m_opts->autoDetect = false;
+		m_opts->m_fEnableCache = false;
+//		m_opts->m_localCursor = NOCURSOR;
 		break;
 
 	case 4:
-		m_opts.m_PreferredEncodings.clear();
-		m_opts.m_PreferredEncodings.push_back(rfbEncodingZRLE);
-		m_opts.m_Use8Bit = rfbPF64Colors; //true;
-		m_opts.autoDetect = false;
-		m_opts.m_fEnableCache = true;
+		m_opts->m_PreferredEncodings.clear();
+		m_opts->m_PreferredEncodings.push_back(rfbEncodingZRLE);
+		m_opts->m_Use8Bit = rfbPF64Colors; //true;
+		m_opts->autoDetect = false;
+		m_opts->m_fEnableCache = true;
 		break;
 
 	case 5:
-		m_opts.m_PreferredEncodings.clear();
-		m_opts.m_PreferredEncodings.push_back(rfbEncodingZRLE);
-		m_opts.m_Use8Bit = rfbPF8Colors; //true;
-		// m_opts.m_scaling = true;
-		// m_opts.m_scale_num = 200;
-		// m_opts.m_scale_den = 100;
-		// m_opts.m_nServerScale = 2;
-		m_opts.m_enableJpegCompression = false;
-		m_opts.autoDetect = false;
-		m_opts.m_fEnableCache = true;
+		m_opts->m_PreferredEncodings.clear();
+		m_opts->m_PreferredEncodings.push_back(rfbEncodingZRLE);
+		m_opts->m_Use8Bit = rfbPF8Colors; //true;
+		// m_opts->m_scaling = true;
+		// m_opts->m_scale_num = 200;
+		// m_opts->m_scale_den = 100;
+		// m_opts->m_nServerScale = 2;
+		m_opts->m_enableJpegCompression = false;
+		m_opts->autoDetect = false;
+		m_opts->m_fEnableCache = true;
 		break;
 
 	case 7:
-		m_opts.m_PreferredEncodings.clear();
-		m_opts.m_PreferredEncodings.push_back(rfbEncodingUltra2);
-		m_opts.m_Use8Bit = rfbPFFullColors; //false; // Max colors
-		m_opts.autoDetect = false;
+		m_opts->m_PreferredEncodings.clear();
+		m_opts->m_PreferredEncodings.push_back(rfbEncodingUltra2);
+		m_opts->m_Use8Bit = rfbPFFullColors; //false; // Max colors
+		m_opts->autoDetect = false;
 		// [v1.0.2-jp2 fix-->]
-		m_opts.m_UseEnc[rfbEncodingCopyRect] = false;
+		m_opts->m_UseEnc[rfbEncodingCopyRect] = false;
 		// [<--v1.0.2-jp2 fix]
-		m_opts.m_fEnableCache = false;
-		m_opts.m_requestShapeUpdates = false;
-		m_opts.m_ignoreShapeUpdates = true;
-//		m_opts.m_localCursor = NOCURSOR;
+		m_opts->m_fEnableCache = false;
+		m_opts->m_requestShapeUpdates = false;
+		m_opts->m_ignoreShapeUpdates = true;
+//		m_opts->m_localCursor = NOCURSOR;
 		break;
 
 	default: // 0 can be set by noauto command line option. Do not chnage any setting in this case
 		/* sf@2005
-		m_opts.m_PreferredEncoding = rfbEncodingZRLE;
-		m_opts.m_Use8Bit = rfbPF256Colors; //false;
-		m_opts.m_fEnableCache = true;
-		m_opts.autoDetect = false;
+		m_opts->m_PreferredEncoding = rfbEncodingZRLE;
+		m_opts->m_Use8Bit = rfbPF256Colors; //false;
+		m_opts->m_fEnableCache = true;
+		m_opts->autoDetect = false;
 		*/
 		break;
 	}
@@ -1811,12 +1811,12 @@ void ClientConnection::HandleQuickOption()
 
 void ClientConnection::GetConnectDetails()
 {
-	if (m_opts.m_configSpecified) {
-		LoadConnection(m_opts.m_configFilename, false);
+	if (m_opts->m_configSpecified) {
+		LoadConnection(m_opts->m_configFilename, false);
 	}
 	else {
-		if (!command_line && LoadConnection(m_opts.getDefaultOptionsFileName(), true, true)==-1) {
-			SessionDialog sessdlg(&m_opts, this, m_pDSMPlugin); //sf@2002
+		if (!command_line && LoadConnection(m_opts->getDefaultOptionsFileName(), true, true)==-1) {
+			SessionDialog sessdlg(m_opts, this, m_pDSMPlugin); //sf@2002
 			if (!sessdlg.DoDialog())
 					throw QuietException(sz_L42);
 			_tcsncpy_s(m_host, sessdlg.m_host_dialog, MAX_HOST_NAME_LEN);
@@ -1824,11 +1824,11 @@ void ClientConnection::GetConnectDetails()
 			_tcsncpy_s(m_proxyhost, sessdlg.m_proxyhost, MAX_HOST_NAME_LEN);
 			m_proxyport = sessdlg.m_proxyport;
 			m_fUseProxy = sessdlg.m_fUseProxy;
-			if (m_opts.autoDetect)
-					m_opts.m_Use8Bit = rfbPFFullColors;				
+			if (m_opts->autoDetect)
+					m_opts->m_Use8Bit = rfbPFFullColors;				
 		}
 		else {
-			SessionDialog sessdlg(&m_opts, this, m_pDSMPlugin); //sf@2002
+			SessionDialog sessdlg(m_opts, this, m_pDSMPlugin); //sf@2002
 			if (!sessdlg.DoDialog())
 					throw QuietException(sz_L42);
 			_tcsncpy_s(m_host, sessdlg.m_host_dialog, MAX_HOST_NAME_LEN);
@@ -1836,8 +1836,8 @@ void ClientConnection::GetConnectDetails()
 			_tcsncpy_s(m_proxyhost, sessdlg.m_proxyhost, MAX_HOST_NAME_LEN);
 			m_proxyport = sessdlg.m_proxyport;
 			m_fUseProxy = sessdlg.m_fUseProxy;
-			if (m_opts.autoDetect)
-				m_opts.m_Use8Bit = rfbPFFullColors;
+			if (m_opts->autoDetect)
+				m_opts->m_Use8Bit = rfbPFFullColors;
 		}
 	}
 	// This is a bit of a hack:
@@ -1956,7 +1956,7 @@ void ClientConnection::Connect()
 		freeaddrinfo(serverinfo);
 	}
 
-	if (!m_opts.m_NoStatus && !m_hwndStatus) GTGBS_ShowConnectWindow();
+	if (!m_opts->m_NoStatus && !m_hwndStatus) GTGBS_ShowConnectWindow();
 	int escapecounter = 0;
 	while (!m_hwndStatus)
 	{
@@ -2096,7 +2096,7 @@ void ClientConnection::Connect()
 #else
 	struct sockaddr_in thataddr;
 	int res;
-	if (!m_opts.m_NoStatus && !m_hwndStatus) GTGBS_ShowConnectWindow();
+	if (!m_opts->m_NoStatus && !m_hwndStatus) GTGBS_ShowConnectWindow();
 	if (m_sock != NULL && m_sock != INVALID_SOCKET) closesocket(m_sock);
 	m_sock = socket(PF_INET, SOCK_STREAM, 0);
 	if (m_hwndStatus) SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L43);
@@ -2247,7 +2247,7 @@ void ClientConnection::ConnectProxy()
 		freeaddrinfo(serverinfo);
 	}
 
-	if (!m_opts.m_NoStatus && !m_hwndStatus) GTGBS_ShowConnectWindow();
+	if (!m_opts->m_NoStatus && !m_hwndStatus) GTGBS_ShowConnectWindow();
 	int escapecounter = 0;
 	while (!m_hwndStatus)
 	{
@@ -2373,7 +2373,7 @@ void ClientConnection::ConnectProxy()
 #else
 	struct sockaddr_in thataddr;
 	int res;
-	if (!m_opts.m_NoStatus && !m_hwndStatus) GTGBS_ShowConnectWindow();
+	if (!m_opts->m_NoStatus && !m_hwndStatus) GTGBS_ShowConnectWindow();
 
 	m_sock = socket(PF_INET, SOCK_STREAM, 0);
 	if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L43);
@@ -2523,7 +2523,7 @@ void ClientConnection::NegotiateProtocolVersion()
 	//1096 !m_pIntegratedPluginInterface is NEEDED
 	if (m_fUsePlugin && fNotEncrypted && !m_pIntegratedPluginInterface) {
 		//adzm 2010-05-12
-		if (m_opts.m_fRequireEncryption) {
+		if (m_opts->m_fRequireEncryption) {
 			throw WarningException("The insecure connection was refused.");
 		}
 		else
@@ -2540,7 +2540,7 @@ void ClientConnection::NegotiateProtocolVersion()
 				//adzm 2010-05-10
 				m_pIntegratedPluginInterface = NULL;
 			}
-			if (!m_opts.m_fAutoAcceptNoDSM)
+			if (!m_opts->m_fAutoAcceptNoDSM)
 			{
 				//adzm 2009-07-19 - Auto-accept the connection if it is unencrypted if that option is specified
 
@@ -2674,7 +2674,7 @@ void ClientConnection::NegotiateProtocolVersion()
 		mytext[size]=0;
 
 		//adzm 2009-06-21 - auto-accept if specified
-		if (!m_opts.m_fAutoAcceptIncoming) {
+		if (!m_opts->m_fAutoAcceptIncoming) {
 			int returnvalue=MessageBox(m_hwndMain,   mytext,"Accept Incoming SC Connection", MB_YESNO |  MB_TOPMOST);
 			if (returnvalue==IDNO)
 			{
@@ -2872,10 +2872,10 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 			WriteExact((char *)&authSchemeMsg, sizeof(authSchemeMsg));
 			if (authScheme == rfbClientInitExtraMsgSupport) {
 				rfbClientInitExtraMsg msg;
-				msg.textLength = strlen(m_opts.m_InfoMsg);
+				msg.textLength = strlen(m_opts->m_InfoMsg);
 				WriteExact((char*)&msg, sz_rfbClientInitExtraMsg);
-				if (strlen(m_opts.m_InfoMsg) > 0) {					
-					WriteExact(m_opts.m_InfoMsg, msg.textLength);
+				if (strlen(m_opts->m_InfoMsg) > 0) {					
+					WriteExact(m_opts->m_InfoMsg, msg.textLength);
 				}
 			}
 		}
@@ -2902,7 +2902,7 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 	if (!bSecureVNCPluginActive && m_fUsePlugin && m_pIntegratedPluginInterface && authScheme != rfbConnFailed && authScheme != rfbUltraVNC_SecureVNCPluginAuth  && authScheme != rfbUltraVNC_SecureVNCPluginAuth_new && authScheme != rfbUltraVNC)
 	{
 		//adzm 2010-05-12
-		if (m_opts.m_fRequireEncryption) {
+		if (m_opts->m_fRequireEncryption) {
 			throw WarningException("The insecure connection was refused.");
 		}
 		else
@@ -2921,7 +2921,7 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 			}
 
 			//adzm 2009-07-19 - Auto-accept the connection if it is unencrypted if that option is specified
-			if (!m_opts.m_fAutoAcceptNoDSM) {
+			if (!m_opts->m_fAutoAcceptNoDSM) {
 				int returnvalue=MessageBox(m_hwndMain, "You have specified an encryption plugin, however this connection is unencrypted! Do you want to continue?", "Accept insecure connection", MB_YESNO | MB_ICONEXCLAMATION | MB_TOPMOST);
 				if (returnvalue==IDNO)
 				{
@@ -3588,7 +3588,7 @@ void ClientConnection::AuthSCPrompt()
 
 	//adzm 2009-06-21 - auto-accept if specified
 	int accepted = 0;
-	if (!m_opts.m_fAutoAcceptIncoming) {
+	if (!m_opts->m_fAutoAcceptIncoming) {
 		int returnvalue=MessageBox(m_hwndMain,   mytext,"Accept Incoming SC Connection", MB_YESNO |  MB_TOPMOST);
 		if (returnvalue != IDNO)
 		{
@@ -3621,7 +3621,7 @@ void ClientConnection::SendClientInit()
     rfbClientInitMsg ci{};
 	// adzm 2010-09
 	ci.flags = clientInitNotShare;
-	if (m_opts.m_Shared) {
+	if (m_opts->m_Shared) {
 		ci.flags |= clientInitShared;
 	}
 
@@ -3663,7 +3663,7 @@ void ClientConnection::ReadServerInit(bool reconnect)
 	strcpy_s(m_desktopName_viewonly, 1024, m_desktopName);
 	strcat_s(m_desktopName_viewonly, 1024, "viewonly");
 
-	if (m_opts.m_ViewOnly) SetWindowText(m_hwndMain, m_desktopName_viewonly);
+	if (m_opts->m_ViewOnly) SetWindowText(m_hwndMain, m_desktopName_viewonly);
 	else SetWindowText(m_hwndMain, m_desktopName);
 
 	vnclog.Print(0, _T("Desktop name \"%s\"\n"),m_desktopName);
@@ -3685,7 +3685,7 @@ void ClientConnection::ReadServerInit(bool reconnect)
 	strcpy_s(m_desktopName_viewonly, 1024, m_desktopName);
 	strcat_s(m_desktopName_viewonly, 1024, "viewonly");
 
-	if (m_opts.m_ViewOnly) SetWindowText(m_hwndMain, m_desktopName_viewonly);
+	if (m_opts->m_ViewOnly) SetWindowText(m_hwndMain, m_desktopName_viewonly);
 	else SetWindowText(m_hwndMain, m_desktopName);
 	SizeWindow();
 }
@@ -3720,19 +3720,19 @@ void ClientConnection::SizeWindow(bool noPosChange, bool noSizeChange)
 	int monactheight = tdc.monarray[monact].height;
 	int minwidth;
 	int minheight;
-	if (m_opts.m_scaling && (!m_opts.m_fAutoScaling || m_fScalingDone))
+	if (m_opts->m_scaling && (!m_opts->m_fAutoScaling || m_fScalingDone))
 	{
-		minwidth = m_si.framebufferWidth * (m_opts.m_scale_num / m_opts.m_scale_den);
-		minheight = m_si.framebufferHeight * (m_opts.m_scale_num / m_opts.m_scale_den);
+		minwidth = m_si.framebufferWidth * (m_opts->m_scale_num / m_opts->m_scale_den);
+		minheight = m_si.framebufferHeight * (m_opts->m_scale_num / m_opts->m_scale_den);
 	}
 	else
 	{
 		minwidth = m_si.framebufferWidth;
 		minheight = m_si.framebufferHeight;
 	}
-	bool sizeMultimon = ((minwidth > monactwidth) || (minheight > monactheight)) && !m_opts.m_FullScreen && (!m_opts.m_fAutoScaling || m_opts.m_fAutoScalingEven) && !m_opts.m_Directx;
+	bool sizeMultimon = ((minwidth > monactwidth) || (minheight > monactheight)) && !m_opts->m_FullScreen && (!m_opts->m_fAutoScaling || m_opts->m_fAutoScalingEven) && !m_opts->m_Directx;
 
-	int mon = tdc.getSelectedScreen(m_hwndMain, (m_opts.m_allowMonitorSpanning || sizeMultimon) && !m_opts.m_showExtend);
+	int mon = tdc.getSelectedScreen(m_hwndMain, (m_opts->m_allowMonitorSpanning || sizeMultimon) && !m_opts->m_showExtend);
 	workrect.left = tdc.monarray[mon].wl;
 	workrect.right = tdc.monarray[mon].wr;
 	workrect.top = tdc.monarray[mon].wt;
@@ -3740,7 +3740,7 @@ void ClientConnection::SizeWindow(bool noPosChange, bool noSizeChange)
 	//SystemParametersInfo(SPI_GETWORKAREA, 0, &workrect, 0);
 	int workwidth;
 	int workheight;
-	if (m_opts.m_FullScreen)
+	if (m_opts->m_FullScreen)
 	{
 		workwidth = tdc.monarray[mon].width;
 		workheight = tdc.monarray[mon].height;
@@ -3755,18 +3755,18 @@ void ClientConnection::SizeWindow(bool noPosChange, bool noSizeChange)
 
 	// sf@2003 - AutoScaling   
 	// Thomas Levering 
-	if (m_opts.m_fAutoScaling && !m_fScalingDone)
+	if (m_opts->m_fAutoScaling && !m_fScalingDone)
 	{
 		// We save the scales values coming from options
-		m_opts.m_saved_scale_num = m_opts.m_scale_num;
-		m_opts.m_saved_scale_den = m_opts.m_scale_den;
-		m_opts.m_saved_scaling = m_opts.m_scaling;
+		m_opts->m_saved_scale_num = m_opts->m_scale_num;
+		m_opts->m_saved_scale_den = m_opts->m_scale_den;
+		m_opts->m_saved_scaling = m_opts->m_scaling;
 
 		// we change the scaling to fit the window
 		// max windows size including borders etc..
 		int horizontalRatio;
 		int verticalRatio;
-		if (m_opts.m_FullScreen)
+		if (m_opts->m_FullScreen)
 		{
 			horizontalRatio = (int)(((monactwidth) * 100) / uni_screenWidth);
 			verticalRatio = (int)(((monactheight) * 100) / uni_screenHeight);
@@ -3792,7 +3792,7 @@ void ClientConnection::SizeWindow(bool noPosChange, bool noSizeChange)
 			}
 			int dx = (testrect.right - testrect.left) - (uni_screenWidth);
 			int dy = (testrect.bottom - testrect.top) - (uni_screenHeight);
-			if (m_opts.m_ShowToolbar)
+			if (m_opts->m_ShowToolbar)
 				dy = dy + m_TBr.bottom - m_TBr.top;
 			horizontalRatio = (int)(((workwidth - dx) * 100) / uni_screenWidth);
 			verticalRatio = (int)(((workheight - dy) * 100) / uni_screenHeight);
@@ -3800,37 +3800,37 @@ void ClientConnection::SizeWindow(bool noPosChange, bool noSizeChange)
 		int Ratio= min(verticalRatio, horizontalRatio);
 		
 		// Option "Limit" AutoScaling to Screen DPI
-		if (m_opts.m_fAutoScalingLimit)
+		if (m_opts->m_fAutoScalingLimit)
 		{
 			int Limit = (m_Dpi * 100) / 96;
 			Ratio = min(Ratio, Limit);
 		}
 
 		// Option "Even" only use 100,200,300%
-		if (m_opts.m_fAutoScalingEven)
+		if (m_opts->m_fAutoScalingEven)
 		{
 			if (Ratio >= 300)
 				Ratio = 300;
 			else if (Ratio >= 200)
 				Ratio = 200;
-			else if (((horizontalRatio > 190) || (verticalRatio > 170) ) && (m_Dpi >= 192) && (!m_opts.m_FullScreen))
+			else if (((horizontalRatio > 190) || (verticalRatio > 170) ) && (m_Dpi >= 192) && (!m_opts->m_FullScreen))
 				Ratio = 200;
 			else
 				Ratio = 100;
 		}
 		vnclog.Print(2, _T("Autosize %d\n"), Ratio);
-		m_opts.m_scale_num =Ratio;
-		m_opts.m_scale_den = 100;
-		m_opts.m_scaling = !(Ratio == 100);
+		m_opts->m_scale_num =Ratio;
+		m_opts->m_scale_den = 100;
+		m_opts->m_scaling = !(Ratio == 100);
 		m_fScalingDone = true;		
 	}
 
-	if (!m_opts.m_fAutoScaling && m_fScalingDone)
+	if (!m_opts->m_fAutoScaling && m_fScalingDone)
 	{
 		// Restore scale values to the original options values
-		m_opts.m_scale_num = m_opts.m_saved_scale_num;
-		m_opts.m_scale_den = m_opts.m_saved_scale_den;
-		m_opts.m_scaling = m_opts.m_saved_scaling;
+		m_opts->m_scale_num = m_opts->m_saved_scale_num;
+		m_opts->m_scale_den = m_opts->m_saved_scale_den;
+		m_opts->m_scaling = m_opts->m_saved_scaling;
 		m_fScalingDone = false;
 	}
 
@@ -3840,10 +3840,10 @@ void ClientConnection::SizeWindow(bool noPosChange, bool noSizeChange)
 
 	RECT fullwinrect;
 
-	if (m_opts.m_scaling)
+	if (m_opts->m_scaling)
 		SetRect(&fullwinrect, 0, 0,
-				uni_screenWidth * m_opts.m_scale_num / m_opts.m_scale_den,
-				uni_screenHeight * m_opts.m_scale_num / m_opts.m_scale_den);
+				uni_screenWidth * m_opts->m_scale_num / m_opts->m_scale_den,
+				uni_screenHeight * m_opts->m_scale_num / m_opts->m_scale_den);
 	else
 		SetRect(&fullwinrect, 0, 0, uni_screenWidth, uni_screenHeight);
 
@@ -3870,7 +3870,7 @@ void ClientConnection::SizeWindow(bool noPosChange, bool noSizeChange)
 	m_winheight = min(m_fullwinheight, workheight);
 
 	//SetWindowPos(m_hwnd, HWND_TOP,
-	if (m_opts.m_ShowToolbar)
+	if (m_opts->m_ShowToolbar)
 		SetWindowPos(m_hwndcn, m_hwndTBwin, 0, m_TBr.bottom, m_winwidth, m_winheight, SWP_SHOWWINDOW);
 	else
 	{
@@ -3901,7 +3901,7 @@ void ClientConnection::SizeWindow(bool noPosChange, bool noSizeChange)
 	//m_winwidth  = min(m_fullwinwidth+16,  workwidth);
 	m_winwidth  = min(m_fullwinwidth,  workwidth);
 	//m_winheight = min(m_fullwinheight+m_TBr.bottom + m_TBr.top+16 , workheight);
-	if (m_opts.m_ShowToolbar)
+	if (m_opts->m_ShowToolbar)
 		m_winheight = min(m_fullwinheight + m_TBr.bottom + m_TBr.top , workheight);
 	else
 		m_winheight = min(m_fullwinheight, workheight);
@@ -3920,34 +3920,34 @@ void ClientConnection::SizeWindow(bool noPosChange, bool noSizeChange)
 	}
 
 	//added position x y w y via commandline or x y 0 0
-	if ((m_opts.m_w != 0 || m_opts.m_h != 0 || m_opts.m_x != 0 || m_opts.m_y!=0) && !pos_set && !noPosChange)
+	if ((m_opts->m_w != 0 || m_opts->m_h != 0 || m_opts->m_x != 0 || m_opts->m_y!=0) && !pos_set && !noPosChange)
 	{
 		// x y w h
-		if (m_opts.m_w != 0 && m_opts.m_h != 0)
+		if (m_opts->m_w != 0 && m_opts->m_h != 0)
 		{
 			pos_set = true; size_set = true;
-			SetWindowPos(m_hwndMain, HWND_TOP, m_opts.m_x, m_opts.m_y, m_opts.m_w, m_opts.m_h, SWP_SHOWWINDOW);
+			SetWindowPos(m_hwndMain, HWND_TOP, m_opts->m_x, m_opts->m_y, m_opts->m_w, m_opts->m_h, SWP_SHOWWINDOW);
 		}
-		else if (m_opts.m_x != 0 && m_opts.m_y != 0)
+		else if (m_opts->m_x != 0 && m_opts->m_y != 0)
 		{
 			pos_set = true;
-			SetWindowPos(m_hwndMain, HWND_TOP, m_opts.m_x, m_opts.m_y, m_opts.m_w, m_opts.m_h, SWP_SHOWWINDOW | SWP_NOSIZE);
+			SetWindowPos(m_hwndMain, HWND_TOP, m_opts->m_x, m_opts->m_y, m_opts->m_w, m_opts->m_h, SWP_SHOWWINDOW | SWP_NOSIZE);
 		}
 	}
-	else if ((m_opts.m_SavePos || m_opts.m_SaveSize) && !pos_set && !noPosChange)
+	else if ((m_opts->m_SavePos || m_opts->m_SaveSize) && !pos_set && !noPosChange)
 	{
 
-		if (m_opts.m_SavePos && m_opts.m_SaveSize && temp_w != 0 && temp_h != 0)
+		if (m_opts->m_SavePos && m_opts->m_SaveSize && temp_w != 0 && temp_h != 0)
 		{
 			pos_set = true; size_set = true;
 			SetWindowPos(m_hwndMain, HWND_TOP, temp_x, temp_y, temp_w, temp_h, SWP_SHOWWINDOW);
 		}
-		if (m_opts.m_SavePos && !m_opts.m_SaveSize)
+		if (m_opts->m_SavePos && !m_opts->m_SaveSize)
 		{
 			pos_set = true;
 			SetWindowPos(m_hwndMain, HWND_TOP, temp_x, temp_y, temp_w, temp_h, SWP_SHOWWINDOW | SWP_NOSIZE);
 		}
-		if (!m_opts.m_SavePos && m_opts.m_SaveSize && temp_w != 0 && temp_h != 0)
+		if (!m_opts->m_SavePos && m_opts->m_SaveSize && temp_w != 0 && temp_h != 0)
 		{
 			size_set = true;
 			SetWindowPos(m_hwndMain, HWND_TOP, temp_x, temp_y, temp_w, temp_h, SWP_SHOWWINDOW | SWP_NOMOVE);
@@ -3959,7 +3959,7 @@ void ClientConnection::SizeWindow(bool noPosChange, bool noSizeChange)
     int act_width = m_winwidth;
     int act_height = m_winheight;
 
-	if (m_opts.m_allowMonitorSpanning && !m_opts.m_showExtend && (m_fullwinwidth <= tdc.monarray[1].wr - tdc.monarray[1].wl + GetSystemMetrics(SM_CXBORDER) + GetSystemMetrics(SM_CXHSCROLL))) //fit on primary -20 for border
+	if (m_opts->m_allowMonitorSpanning && !m_opts->m_showExtend && (m_fullwinwidth <= tdc.monarray[1].wr - tdc.monarray[1].wl + GetSystemMetrics(SM_CXBORDER) + GetSystemMetrics(SM_CXHSCROLL))) //fit on primary -20 for border
 	{
 		if (!pos_set && !noPosChange)
 			SetWindowPos(m_hwndMain, HWND_TOP,tdc.monarray[1].wl + ((tdc.monarray[1].wr-tdc.monarray[1].wl)-m_winwidth) / 2,tdc.monarray[1].wt +
@@ -3987,18 +3987,18 @@ void ClientConnection::SizeWindow(bool noPosChange, bool noSizeChange)
 
     SetForegroundWindow(m_hwndMain);
 
-	if (m_opts.m_ShowToolbar)
+	if (m_opts->m_ShowToolbar)
 		MoveWindow(m_hwndTBwin, 0, 0, workwidth, m_TBr.bottom - m_TBr.top, TRUE);
 
-	if (m_opts.m_ShowToolbar)
+	if (m_opts->m_ShowToolbar)
 		MoveWindow(m_hwndTB, 0, 0, m_winwidth-200, m_TBr.bottom - m_TBr.top, TRUE);
 
-	if (m_opts.m_ShowToolbar)
+	if (m_opts->m_ShowToolbar)
 		ShowWindow(m_hwndTB, SW_SHOW);
 	else
 		ShowWindow(m_hwndTB, SW_HIDE);
 
-	if (m_opts.m_ShowToolbar)
+	if (m_opts->m_ShowToolbar)
 		ShowWindow(m_hwndTBwin, SW_SHOW);
 	else
 		ShowWindow(m_hwndTBwin, SW_HIDE);
@@ -4014,9 +4014,9 @@ void ClientConnection::CreateLocalFramebuffer()
 
 void ClientConnection::SetupPixelFormat() {
 	// Have we requested a reduction to 8-bit?
-    if (m_opts.m_Use8Bit)
+    if (m_opts->m_Use8Bit)
 	{
-		switch (m_opts.m_Use8Bit)
+		switch (m_opts->m_Use8Bit)
 		{
 		case rfbPF256Colors:
 			m_myFormat = vnc8bitFormat;
@@ -4119,7 +4119,7 @@ void ClientConnection::SetFormatAndEncodings()
 	//
 	if (!new_ultra_server)
 	{
-		for (std::vector<int>::iterator it = m_opts.m_PreferredEncodings.begin(); it != m_opts.m_PreferredEncodings.end(); ++it) {
+		for (std::vector<int>::iterator it = m_opts->m_PreferredEncodings.begin(); it != m_opts->m_PreferredEncodings.end(); ++it) {
 			if (*it == rfbEncodingUltra2) {
 				*it = rfbEncodingZRLE;
 			}
@@ -4127,18 +4127,18 @@ void ClientConnection::SetFormatAndEncodings()
 	}
 	// Put the preferred encoding first, and change it if the
 	// preferred encoding is not actually usable.
-	std::vector<int> preferred_encodings = m_opts.m_PreferredEncodings;
+	std::vector<int> preferred_encodings = m_opts->m_PreferredEncodings;
 
 	for (std::vector<int>::iterator it = preferred_encodings.begin(); it != preferred_encodings.end(); it++) {
-		if (*it == rfbEncodingZlib && m_opts.m_fEnableZstd)
+		if (*it == rfbEncodingZlib && m_opts->m_fEnableZstd)
 			preferred_encodings.insert(preferred_encodings.begin(), 1, rfbEncodingZstd);
-		else if (*it == rfbEncodingTight && m_opts.m_fEnableZstd)
+		else if (*it == rfbEncodingTight && m_opts->m_fEnableZstd)
 			preferred_encodings.insert(preferred_encodings.begin(), 1, rfbEncodingTightZstd);
-		else if (*it == rfbEncodingZlibHex && m_opts.m_fEnableZstd)
+		else if (*it == rfbEncodingZlibHex && m_opts->m_fEnableZstd)
 			preferred_encodings.insert(preferred_encodings.begin(), 1, rfbEncodingZstdHex);
-		//else if (*it == rfbEncodingZRLE && m_opts.m_fEnableZstd)
+		//else if (*it == rfbEncodingZRLE && m_opts->m_fEnableZstd)
 		//	preferred_encodings.insert(preferred_encodings.begin(), 1, rfbEncodingZSTDRLE);
-		else if (*it == rfbEncodingZYWRLE && m_opts.m_fEnableZstd)
+		else if (*it == rfbEncodingZYWRLE && m_opts->m_fEnableZstd)
 			preferred_encodings.insert(preferred_encodings.begin(), 1, rfbEncodingZSTDYWRLE);
 		break;
 	}
@@ -4162,7 +4162,7 @@ void ClientConnection::SetFormatAndEncodings()
 	// desirable!
 	for (i = LASTENCODING; i >= rfbEncodingRaw; i--)
 	{
-		if (m_opts.m_UseEnc[i] && preferred_encodings.end() == std::find(preferred_encodings.begin(), preferred_encodings.end(), i)) {
+		if (m_opts->m_UseEnc[i] && preferred_encodings.end() == std::find(preferred_encodings.begin(), preferred_encodings.end(), i)) {
 			preferred_encodings.push_back(i);
 		}
 	}
@@ -4184,27 +4184,27 @@ void ClientConnection::SetFormatAndEncodings()
 	}
 
 	// Tight - Request desired compression level if applicable
-	if ( useCompressLevel && m_opts.m_useCompressLevel &&
-		 m_opts.m_compressLevel >= 0 &&
-		 m_opts.m_compressLevel <= 9) {
+	if ( useCompressLevel && m_opts->m_useCompressLevel &&
+		 m_opts->m_compressLevel >= 0 &&
+		 m_opts->m_compressLevel <= 9) {
 		encs[se->nEncodings++] = Swap32IfLE( rfbEncodingCompressLevel0 +
-											 m_opts.m_compressLevel );
+											 m_opts->m_compressLevel );
 	}
 
 	// Tight - Request cursor shape updates if enabled by user
-	if (m_opts.m_requestShapeUpdates) {
+	if (m_opts->m_requestShapeUpdates) {
 		//encs[se->nEncodings++] = Swap32IfLE(rfbEncodingXCursor);
 		encs[se->nEncodings++] = Swap32IfLE(rfbEncodingRichCursor);
-		if (!m_opts.m_ignoreShapeUpdates)
+		if (!m_opts->m_ignoreShapeUpdates)
 			encs[se->nEncodings++] = Swap32IfLE(rfbEncodingPointerPos); // marscha PointerPos
 	}
 
 	// Tight - Request JPEG quality level if JPEG compression was enabled by user
-	if ( m_opts.m_enableJpegCompression &&
-		 m_opts.m_jpegQualityLevel >= 0 &&
-		 m_opts.m_jpegQualityLevel <= 9) {
+	if ( m_opts->m_enableJpegCompression &&
+		 m_opts->m_jpegQualityLevel >= 0 &&
+		 m_opts->m_jpegQualityLevel <= 9) {
 		encs[se->nEncodings++] = Swap32IfLE( rfbEncodingQualityLevel0 +
-											 m_opts.m_jpegQualityLevel );
+											 m_opts->m_jpegQualityLevel );
 	}
 
     // Modif rdv@2002
@@ -4218,7 +4218,7 @@ void ClientConnection::SetFormatAndEncodings()
 	encs[se->nEncodings++] = Swap32IfLE(rfbEncodingExtDesktopSize);
 
 	// Modif sf@2002
-	if (m_opts.m_fEnableCache)
+	if (m_opts->m_fEnableCache)
 	{
 		encs[se->nEncodings++] = Swap32IfLE(rfbEncodingCacheEnable);
 		// vnclog.Print(0, _T("Cache: Enable Cache sent to Server\n"));
@@ -4239,7 +4239,7 @@ void ClientConnection::SetFormatAndEncodings()
 	}
 
 #ifdef _Gii
-	if (m_opts.m_giiEnable)
+	if (m_opts->m_giiEnable)
 		encs[se->nEncodings++] = Swap32IfLE(rfbEncodingGII);
 #endif
 
@@ -4306,7 +4306,7 @@ void ClientConnection::Createdib()
 		}
 		SetDIBColorTable(m_hmemdc, 0, 256, bi.color);
 		}
-		if (m_opts.m_fEnableCache)
+		if (m_opts->m_fEnableCache)
 		{
 			if (m_DIBbitsCache != NULL) delete [] m_DIBbitsCache;
 			int Pitch=m_si.framebufferWidth*m_myFormat.bitsPerPixel/8;
@@ -4316,7 +4316,7 @@ void ClientConnection::Createdib()
 			vnclog.Print(0, _T("Cache: Cache buffer bitmap creation\n"));
 		}
 	}
-	if (m_opts.m_Directx && !m_opts.m_showExtend && (m_myFormat.bitsPerPixel==32 || m_myFormat.bitsPerPixel==16))
+	if (m_opts->m_Directx && !m_opts->m_showExtend && (m_myFormat.bitsPerPixel==32 || m_myFormat.bitsPerPixel==16))
 	if (!FAILED(directx_output->InitD3D(m_hwndcn,m_hwndMain, m_si.framebufferWidth, m_si.framebufferHeight, false,m_myFormat.bitsPerPixel,m_myFormat.redShift)))
 			{
 				if (directx_output->m_directxformat.bitsPerPixel ==m_myFormat.bitsPerPixel)
@@ -4576,7 +4576,7 @@ bool ClientConnection::ScrollScreen(int dx, int dy, bool absolute)
 		RECT clirect;
 		RECT Rtb;
 		GetClientRect(m_hwndMain, &clirect);
-		if (m_opts.m_ShowToolbar)
+		if (m_opts->m_ShowToolbar)
 			GetClientRect(m_hwndTBwin, &Rtb);
 		else
 			{
@@ -4625,7 +4625,7 @@ inline bool ClientConnection::ProcessPointerEvent(int x, int y, DWORD keyflags, 
 		else
 		{
 			// Option if not UltraVnc Server, more then one Client 
-			if (m_opts.m_BlockSameMouse)
+			if (m_opts->m_BlockSameMouse)
 				return false;
 		}
 
@@ -4635,7 +4635,7 @@ inline bool ClientConnection::ProcessPointerEvent(int x, int y, DWORD keyflags, 
 		//the input message
 		FlushThrottledMouseMove();
 	}
-	if (m_opts.m_Emul3Buttons) {
+	if (m_opts->m_Emul3Buttons) {
 		// XXX To be done:
 		// If this is a left or right press, the user may be
 		// about to press the other button to emulate a middle press.
@@ -4646,8 +4646,8 @@ inline bool ClientConnection::ProcessPointerEvent(int x, int y, DWORD keyflags, 
 		if (m_waitingOnEmulateTimer)
 		{
 			if (msg == WM_LBUTTONUP || msg == WM_RBUTTONUP ||
-				abs(x - m_emulateButtonPressedX) > m_opts.m_Emul3Fuzz ||
-				abs(y - m_emulateButtonPressedY) > m_opts.m_Emul3Fuzz)
+				abs(x - m_emulateButtonPressedX) > m_opts->m_Emul3Fuzz ||
+				abs(y - m_emulateButtonPressedY) > m_opts->m_Emul3Fuzz)
 			{
 				// if button released or we moved too far then cancel.
 				// First let the remote know where the button was down
@@ -4712,7 +4712,7 @@ inline bool ClientConnection::ProcessPointerEvent(int x, int y, DWORD keyflags, 
 					SetTimer(
 					m_hwndcn,
 					IDT_EMULATE3BUTTONSTIMER,
-					m_opts.m_Emul3Timeout,
+					m_opts->m_Emul3Timeout,
 					NULL);
 
 				if (!m_emulate3ButtonsTimer)
@@ -4771,7 +4771,7 @@ inline void ClientConnection::SubProcessPointerEvent(int x, int y, DWORD keyflag
 {
 	int mask;
 
-	if (m_opts.m_SwapMouse) {
+	if (m_opts->m_SwapMouse) {
 		mask = ( ((keyflags & MK_LBUTTON) ? rfbButton1Mask : 0) |
 				 ((keyflags & MK_MBUTTON) ? rfbButton3Mask : 0) |
 				 ((keyflags & MK_RBUTTON) ? rfbButton2Mask : 0) );
@@ -4789,14 +4789,14 @@ inline void ClientConnection::SubProcessPointerEvent(int x, int y, DWORD keyflag
 
 	try {
 		int x_scaled =
-			(x + m_hScrollPos) * m_opts.m_scale_den / m_opts.m_scale_num;
+			(x + m_hScrollPos) * m_opts->m_scale_den / m_opts->m_scale_num;
 		int y_scaled =
-			(y + m_vScrollPos) * m_opts.m_scale_den / m_opts.m_scale_num;
+			(y + m_vScrollPos) * m_opts->m_scale_den / m_opts->m_scale_num;
 
-		if (m_opts.m_Directx)
+		if (m_opts->m_Directx)
 		{
 			x_scaled = (x ) *  m_si.framebufferWidth /m_cliwidth ;
-			if(m_opts.m_ShowToolbar) y_scaled =(y) * m_si.framebufferHeight / (m_cliheight-m_TBr.bottom) ;
+			if(m_opts->m_ShowToolbar) y_scaled =(y) * m_si.framebufferHeight / (m_cliheight-m_TBr.bottom) ;
 			else y_scaled =(y) * m_si.framebufferHeight / m_cliheight ;
 		}
 
@@ -4909,7 +4909,7 @@ inline void ClientConnection::ProcessKeyEvent(int virtKey, DWORD keyData)
     //      calculate what the ascii would be without mods
     //      send that
 
-	if (m_opts.m_JapKeyboard==0 && virtKey!=69)
+	if (m_opts->m_JapKeyboard==0 && virtKey!=69)
 	{
 		try {
 			m_keymap->PCtoX(virtKey, keyData, this);
@@ -5058,7 +5058,7 @@ inline void ClientConnection::DoBlit()
 	//	PaletteSelector p(hdc, m_hPalette);
 	//	ObjectSelector b(m_hBitmapDC, m_hBitmap);
 
-		if (m_opts.m_delay) {
+		if (m_opts->m_delay) {
 			// Display the area to be updated for debugging purposes
 			/*
 			COLORREF oldbgcol = SetBkColor(hdc, RGB(0,0,0));
@@ -5070,10 +5070,10 @@ inline void ClientConnection::DoBlit()
 			::Sleep(m_pApp->m_options.m_delay);
 		}
 
-		if (m_opts.m_scaling || (m_opts.m_Directx && !m_opts.m_showExtend))
+		if (m_opts->m_scaling || (m_opts->m_Directx && !m_opts->m_showExtend))
 		{
 
-			if (m_opts.m_Directx && !m_opts.m_showExtend)
+			if (m_opts->m_Directx && !m_opts->m_showExtend)
 			{
 
 				RECT myclrect;
@@ -5081,7 +5081,7 @@ inline void ClientConnection::DoBlit()
 				int w = myclrect.right - myclrect.left;
 				int h = myclrect.bottom - myclrect.top;
 
-				if (m_opts.m_ShowToolbar) h = h - m_TBr.bottom;
+				if (m_opts->m_ShowToolbar) h = h - m_TBr.bottom;
 
 				float horizontalRatio = (float)w / (float)m_si.framebufferWidth;
 				float verticalRatio = (float)h / (float)m_si.framebufferHeight;
@@ -5111,8 +5111,8 @@ inline void ClientConnection::DoBlit()
 			else
 			{
 
-				int n = m_opts.m_scale_num;
-				int d = m_opts.m_scale_den;
+				int n = m_opts->m_scale_num;
+				int d = m_opts->m_scale_den;
 				int m = n % d;
 				if (m == 0)
 					// Text at High DPI Monitor 200% or 300%
@@ -5197,10 +5197,10 @@ void* ClientConnection::run_undetached(void* arg) {
 
 
 	// Modif sf@2002 - Server Scaling
-	m_nServerScale = m_opts.m_nServerScale;
+	m_nServerScale = m_opts->m_nServerScale;
 
-	m_reconnectcounter = m_opts.m_reconnectcounter;
-	m_autoReconnect = m_opts.m_autoReconnect;
+	m_reconnectcounter = m_opts->m_reconnectcounter;
+	m_autoReconnect = m_opts->m_autoReconnect;
 	if (m_Is_Listening)m_reconnectcounter=0;
 	reconnectcounter = m_reconnectcounter;
 
@@ -5556,7 +5556,7 @@ void ClientConnection::Internal_SendAppropriateFramebufferUpdateRequest()
 		// Cache init/reinit - A SetFormatAndEncoding() implies a cache reinit on server side
 		// Cache enabled, so it's going to be reallocated/reinited on server side
 		omni_mutex_lock l(m_bitmapdcMutex);//m_cursorMutex);
-		if (m_opts.m_fEnableCache)
+		if (m_opts->m_fEnableCache)
 		{
 			// create viewer cache buffer if necessary
 			if (m_DIBbitsCache == NULL)
@@ -5648,9 +5648,9 @@ bool ClientConnection::SendSW(int x, int y)
 	else
 	{
 		int x_scaled =
-			(x + m_hScrollPos) * m_opts.m_scale_den / m_opts.m_scale_num;
+			(x + m_hScrollPos) * m_opts->m_scale_den / m_opts->m_scale_num;
 		int y_scaled =
-			(y + m_vScrollPos) * m_opts.m_scale_den / m_opts.m_scale_num;
+			(y + m_vScrollPos) * m_opts->m_scale_den / m_opts->m_scale_num;
 
 		sw.type = rfbSetSW;
 		sw.x = Swap16IfLE(x_scaled);
@@ -5667,7 +5667,7 @@ inline void ClientConnection::ReadScreenUpdate()
 {
 	//adzm 2010-07-04
 	bool bSentUpdateRequest = false;
-	if (m_opts.m_preemptiveUpdates && !m_pendingFormatChange) {
+	if (m_opts->m_preemptiveUpdates && !m_pendingFormatChange) {
 		bSentUpdateRequest = true;
 		//PostMessage(m_hwndcn, WM_REGIONUPDATED, NULL, NULL);
 		//adzm 2010-09 - We can simply call SendAppropriateFramebufferUpdateRequest now, with a true bAsync param so the request is posted rather than sent.
@@ -5824,7 +5824,7 @@ inline void ClientConnection::ReadScreenUpdate()
 			{
 				if ((surh.encoding == rfbEncodingZYWRLE)||(surh.encoding == rfbEncodingZRLE) || (surh.encoding == rfbEncodingZSTDYWRLE) || (surh.encoding == rfbEncodingZSTDRLE))
 				{
-					if (m_minorVersion==6 || m_minorVersion==4 || m_minorVersion==16 || m_minorVersion==14 || m_opts.m_oldplugin)
+					if (m_minorVersion==6 || m_minorVersion==4 || m_minorVersion==16 || m_minorVersion==14 || m_opts->m_oldplugin)
 					{
 						ReadExact((char*)&(m_nZRLEReadSize), sizeof(CARD32));
 						m_nZRLEReadSize = Swap32IfLE(m_nZRLEReadSize);
@@ -5854,7 +5854,7 @@ inline void ClientConnection::ReadScreenUpdate()
 		}
 
 		RECT cacherect;
-		if (m_opts.m_fEnableCache)
+		if (m_opts->m_fEnableCache)
 		{
 			cacherect.left=surh.r.x;
 			cacherect.right=surh.r.x+surh.r.w;
@@ -6107,7 +6107,7 @@ inline void ClientConnection::ReadScreenUpdate()
 			rect.right  = surh.r.x + surh.r.w ;
 			rect.bottom = surh.r.y + surh.r.h;
 
-			if (!m_opts.m_Directx)
+			if (!m_opts->m_Directx)
 				InvalidateRegion(&rect,&UpdateRegion);
 		}
 
@@ -6125,7 +6125,7 @@ inline void ClientConnection::ReadScreenUpdate()
 		SoftCursorUnlockScreen();
 	}
 
-	if (m_opts.m_Directx)
+	if (m_opts->m_Directx)
 	{
 		InvalidateRect(m_hwndcn, NULL, TRUE);
 	}
@@ -6152,7 +6152,7 @@ inline void ClientConnection::ReadScreenUpdate()
 	// sf@2002
 	// We only change the preferred encoding if FileTransfer is not running and if
 	// the last encoding change occured more than 30s ago
-	if (avg_kbitsPerSecond !=0 && m_opts.autoDetect && !m_pFileTransfer->m_fFileTransferRunning && (timeGetTime() - m_lLastChangeTime) > m_lLastChangeTimeTimeout)
+	if (avg_kbitsPerSecond !=0 && m_opts->autoDetect && !m_pFileTransfer->m_fFileTransferRunning && (timeGetTime() - m_lLastChangeTime) > m_lLastChangeTimeTimeout)
 	{
 		//Beep(1000,1000);
 		m_lLastChangeTimeTimeout=60000;  // set to 1 minutes
@@ -6162,32 +6162,32 @@ inline void ClientConnection::ReadScreenUpdate()
 		{
 			m_nConfig = 1;
 			int encoding = 0;
-			for (std::vector<int>::iterator it = m_opts.m_PreferredEncodings.begin(); it != m_opts.m_PreferredEncodings.end(); ++it) {
+			for (std::vector<int>::iterator it = m_opts->m_PreferredEncodings.begin(); it != m_opts->m_PreferredEncodings.end(); ++it) {
 				encoding = *it;
 				break;
 			}
-			m_opts.m_PreferredEncodings.clear();
-			//if (new_ultra_server) m_opts.m_PreferredEncodings.push_back(rfbEncodingUltra2);
+			m_opts->m_PreferredEncodings.clear();
+			//if (new_ultra_server) m_opts->m_PreferredEncodings.push_back(rfbEncodingUltra2);
 			//else 
-			m_opts.m_PreferredEncodings.push_back(rfbEncodingHextile);
-			//m_opts.m_Use8Bit = rfbPFFullColors;			
-			//if (new_ultra_server && encoding == rfbEncodingUltra2 && m_opts.m_fEnableCache == false){}
+			m_opts->m_PreferredEncodings.push_back(rfbEncodingHextile);
+			//m_opts->m_Use8Bit = rfbPFFullColors;			
+			//if (new_ultra_server && encoding == rfbEncodingUltra2 && m_opts->m_fEnableCache == false){}
 			//else 
-			if (encoding == rfbEncodingHextile && m_opts.m_fEnableCache == false){}
+			if (encoding == rfbEncodingHextile && m_opts->m_fEnableCache == false){}
 			else m_pendingFormatChange = true;
 
-			m_opts.m_fEnableCache = false;
+			m_opts->m_fEnableCache = false;
 			m_lLastChangeTime = timeGetTime();
 		}
 		else if (avg_kbitsPerSecond < 10000 && avg_kbitsPerSecond > 256 && (m_nConfig != 2))
 		{
 			m_nConfig = 1;		
-			m_opts.m_PreferredEncodings.clear();
-			//if (new_ultra_server) m_opts.m_PreferredEncodings.push_back(rfbEncodingUltra2);
+			m_opts->m_PreferredEncodings.clear();
+			//if (new_ultra_server) m_opts->m_PreferredEncodings.push_back(rfbEncodingUltra2);
 			//else 
-			m_opts.m_PreferredEncodings.push_back(rfbEncodingZRLE); //rfbEncodingZlibHex;
-			//m_opts.m_Use8Bit = rfbPFFullColors; // Max colors
-			m_opts.m_fEnableCache = false;
+			m_opts->m_PreferredEncodings.push_back(rfbEncodingZRLE); //rfbEncodingZlibHex;
+			//m_opts->m_Use8Bit = rfbPFFullColors; // Max colors
+			m_opts->m_fEnableCache = false;
 			m_pendingFormatChange = true;
 			m_lLastChangeTime = timeGetTime();
 		}
@@ -6195,10 +6195,10 @@ inline void ClientConnection::ReadScreenUpdate()
 		else if (avg_kbitsPerSecond < 256 && avg_kbitsPerSecond > 128 && (m_nConfig != 2))
 		{
 			m_nConfig = 2;
-			m_opts.m_PreferredEncodings.clear();
-			m_opts.m_PreferredEncodings.push_back(rfbEncodingZRLE); //rfbEncodingZlibHex;
-			//m_opts.m_Use8Bit = rfbPF256Colors;
-			m_opts.m_fEnableCache = false;
+			m_opts->m_PreferredEncodings.clear();
+			m_opts->m_PreferredEncodings.push_back(rfbEncodingZRLE); //rfbEncodingZlibHex;
+			//m_opts->m_Use8Bit = rfbPF256Colors;
+			m_opts->m_fEnableCache = false;
 			m_pendingFormatChange = true;
 			m_lLastChangeTime = timeGetTime();
 		}
@@ -6206,10 +6206,10 @@ inline void ClientConnection::ReadScreenUpdate()
 		else if (avg_kbitsPerSecond < 128 && avg_kbitsPerSecond > 19 && (m_nConfig != 3))
 		{
 			m_nConfig = 3;
-			m_opts.m_PreferredEncodings.clear();
-			m_opts.m_PreferredEncodings.push_back(rfbEncodingTight); // rfbEncodingZRLE;
-			//m_opts.m_Use8Bit = rfbPF64Colors;
-			m_opts.m_fEnableCache = false;
+			m_opts->m_PreferredEncodings.clear();
+			m_opts->m_PreferredEncodings.push_back(rfbEncodingTight); // rfbEncodingZRLE;
+			//m_opts->m_Use8Bit = rfbPF64Colors;
+			m_opts->m_fEnableCache = false;
 			m_pendingFormatChange = true;
 			m_lLastChangeTime = timeGetTime();
 		}
@@ -6222,10 +6222,10 @@ inline void ClientConnection::ReadScreenUpdate()
 		else if (avg_kbitsPerSecond < 19 && avg_kbitsPerSecond > 5 && (m_nConfig != 4))
 		{
 			m_nConfig = 4;
-			m_opts.m_PreferredEncodings.clear();
-			m_opts.m_PreferredEncodings.push_back(rfbEncodingTight); //rfbEncodingZRLE;
-			//m_opts.m_Use8Bit = rfbPF8Colors;
-			m_opts.m_fEnableCache = false;
+			m_opts->m_PreferredEncodings.clear();
+			m_opts->m_PreferredEncodings.push_back(rfbEncodingTight); //rfbEncodingZRLE;
+			//m_opts->m_Use8Bit = rfbPF8Colors;
+			m_opts->m_fEnableCache = false;
 			m_pendingFormatChange = true;
 		}
 	}
@@ -6303,7 +6303,7 @@ void ClientConnection::ReadServerCutText()
 			case clipProvide:
 				{
 					{
-						if (!m_opts.m_DisableClipboard && !m_opts.m_ViewOnly) {
+						if (!m_opts->m_DisableClipboard && !m_opts->m_ViewOnly) {
 							omni_mutex_lock l(m_clipMutex);
 
 							ClipboardData newClipboard;
@@ -6365,7 +6365,7 @@ void ClientConnection::ReadBell()
 		SND_APPLICATION | SND_ALIAS | SND_NODEFAULT | SND_ASYNC) ) {
 		::Beep(440, 125);
 	}
-	if (m_opts.m_DeiconifyOnBell) {
+	if (m_opts->m_DeiconifyOnBell) {
 		if (IsIconic(m_hwndcn)) {
 			SetDormant(false);
 			ShowWindow(m_hwndcn, SW_SHOWNORMAL);
@@ -6393,27 +6393,27 @@ void ClientConnection::ReadServerState()
         break;
 
     case rfbKeepAliveInterval:
-        m_opts.m_keepAliveInterval = value;
-        if (m_opts.m_keepAliveInterval >= (m_opts.m_FTTimeout - KEEPALIVE_HEADROOM))
-          m_opts.m_keepAliveInterval = (m_opts.m_FTTimeout  - KEEPALIVE_HEADROOM);
-        vnclog.Print(1, _T("New keepalive interval %u"), m_opts.m_keepAliveInterval);
+        m_opts->m_keepAliveInterval = value;
+        if (m_opts->m_keepAliveInterval >= (m_opts->m_FTTimeout - KEEPALIVE_HEADROOM))
+          m_opts->m_keepAliveInterval = (m_opts->m_FTTimeout  - KEEPALIVE_HEADROOM);
+        vnclog.Print(1, _T("New keepalive interval %u"), m_opts->m_keepAliveInterval);
 		m_keepalive_timer = 1011;
 		KillTimer(m_hwndcn, m_keepalive_timer);
-		if (m_opts.m_keepAliveInterval > 0) {
-			SetTimer(m_hwndcn, m_keepalive_timer, m_opts.m_keepAliveInterval * 1000, NULL);
+		if (m_opts->m_keepAliveInterval > 0) {
+			SetTimer(m_hwndcn, m_keepalive_timer, m_opts->m_keepAliveInterval * 1000, NULL);
 		} else {
 			m_keepalive_timer = 0;
 		}
         break;
 
 	case rfbIdleInputTimeout:
-		m_opts.m_IdleInterval = value;		
-		vnclog.Print(1, _T("New IdleTiler interval %u"), m_opts.m_IdleInterval);
+		m_opts->m_IdleInterval = value;		
+		vnclog.Print(1, _T("New IdleTiler interval %u"), m_opts->m_IdleInterval);
 		m_idle_timer = 1012;
 		m_idle_time = value * 1000;
 		KillTimer(m_hwndcn, m_idle_timer);
 		KillTimer(m_hwndcn, 1013);
-		if (m_opts.m_IdleInterval > 0) {
+		if (m_opts->m_IdleInterval > 0) {
 			SetTimer(m_hwndcn, m_idle_timer, m_idle_time, NULL);			
 		}
 		else {
@@ -7130,7 +7130,7 @@ void ClientConnection::ReadNewFBSize(rfbFramebufferUpdateRectHeader *pfburh)
 	m_pendingFormatChange = true;
 	}
 
-	SizeWindow(true, m_opts.m_SaveSize && m_opts.m_Directx);
+	SizeWindow(true, m_opts->m_SaveSize && m_opts->m_Directx);
 	InvalidateRect(m_hwndcn, NULL, TRUE);
 	RealiseFullScreenMode();
 	SendFullFramebufferUpdateRequest(false);
@@ -7138,17 +7138,17 @@ void ClientConnection::ReadNewFBSize(rfbFramebufferUpdateRectHeader *pfburh)
 
 void ClientConnection::SendMonitorSizes()
 {	
-	if (!m_opts.m_ChangeServerRes) {
+	if (!m_opts->m_ChangeServerRes) {
 		SendFullFramebufferUpdateRequest(false);
 		return;
 	}
 
 	int flag = 0;
-	if (m_opts.m_use_virt)
+	if (m_opts->m_use_virt)
 		flag = 1;
-	if (m_opts.m_extendDisplay)
+	if (m_opts->m_extendDisplay)
 		flag = 2;
-	if (m_opts.m_extendDisplay && m_opts.m_showExtend && !m_opts.m_useAllMonitors)
+	if (m_opts->m_extendDisplay && m_opts->m_showExtend && !m_opts->m_useAllMonitors)
 		flag = 3;
 	
 	rfbSetDesktopSizeMsg sdmz;
@@ -7157,7 +7157,7 @@ void ClientConnection::SendMonitorSizes()
 	if (desktopsize_requested) {	
 		desktopsize_requested = false;
 		tdc.Init();
-		if (m_opts.m_useAllMonitors) {
+		if (m_opts->m_useAllMonitors) {
 			sdmz.numberOfScreens = tdc.nr_monitors;
 			sdmz.height = tdc.monarray[0].height;
 			sdmz.width = tdc.monarray[0].width;
@@ -7184,8 +7184,8 @@ void ClientConnection::SendMonitorSizes()
 			eds.id = Swap32IfLE(1);
 			eds.x = Swap16IfLE(0);
 			eds.y = Swap16IfLE(0); 
-			eds.width = Swap16IfLE(m_opts.m_requestedWidth == 0 ? tdc.monarray[1].width : m_opts.m_requestedWidth);
-			eds.height = Swap16IfLE(m_opts.m_requestedHeight == 0 ? tdc.monarray[1].height : m_opts.m_requestedHeight);
+			eds.width = Swap16IfLE(m_opts->m_requestedWidth == 0 ? tdc.monarray[1].width : m_opts->m_requestedWidth);
+			eds.height = Swap16IfLE(m_opts->m_requestedHeight == 0 ? tdc.monarray[1].height : m_opts->m_requestedHeight);
 			eds.flags = Swap32IfLE(flag);
 			WriteExact((char*)&eds, sz_rfbExtDesktopScreen);
 
@@ -7358,60 +7358,60 @@ void ClientConnection::UpdateStatusFields()
 			switch (EncodingStatusWindow)
 			{
 			case rfbEncodingRaw:
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "Raw, Cache" : "Raw");
+				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "Raw, Cache" : "Raw");
 				break;
 			case rfbEncodingRRE:
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "RRE, Cache" : "RRE");
+				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "RRE, Cache" : "RRE");
 				break;
 			case rfbEncodingCoRRE:
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "CoRRE, Cache" : "CoRRE");
+				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "CoRRE, Cache" : "CoRRE");
 				break;
 			case rfbEncodingHextile:
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "Hextile, Cache" : "Hextile");
+				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "Hextile, Cache" : "Hextile");
 				break;
 			case rfbEncodingUltra:
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "Ultra, Cache" : "Ultra");
+				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "Ultra, Cache" : "Ultra");
 				break;
 			case rfbEncodingUltra2:
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "Ultra2, Cache" : "Ultra2");
+				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "Ultra2, Cache" : "Ultra2");
 				break;
 			case rfbEncodingZlib:
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "Zlib, Cache" : "Zlib");
+				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "Zlib, Cache" : "Zlib");
 				break;
 			case rfbEncodingZstd:
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "ZSTD, Cache" : "ZSTD");
+				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "ZSTD, Cache" : "ZSTD");
 				break;
   			case rfbEncodingZRLE:
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "ZRLE, Cache" :"ZRLE");
+				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "ZRLE, Cache" :"ZRLE");
   				break;
   			case rfbEncodingZYWRLE:
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "ZYWRLE, Cache" :"ZYWRLE");
+				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "ZYWRLE, Cache" :"ZYWRLE");
   				break;
 			case rfbEncodingZSTDRLE:
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "ZSTDRLE, Cache" : "ZSTDRLE");
+				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "ZSTDRLE, Cache" : "ZSTDRLE");
 				break;
 			case rfbEncodingZSTDYWRLE:
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "ZSTDYWRLE, Cache" : "ZSTDYWRLE");
+				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "ZSTDYWRLE, Cache" : "ZSTDYWRLE");
 				break;
 #ifdef _XZ
   			case rfbEncodingXZ:		
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "XZ, Cache" :"XZ");
+				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "XZ, Cache" :"XZ");
   				break;
   			case rfbEncodingXZYW:		
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "XZYW, Cache" :"XZYW");
+				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "XZYW, Cache" :"XZYW");
   				break;
 #endif
 			case rfbEncodingTight:
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "Tight, Cache" : "Tight");
+				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "Tight, Cache" : "Tight");
 				break;
 			case rfbEncodingZlibHex:
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "ZlibHex, Cache" : "ZlibHex");
+				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "ZlibHex, Cache" : "ZlibHex");
 				break;
 			case rfbEncodingTightZstd:
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "TightZstd, Cache" : "TightZstd");
+				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "TightZstd, Cache" : "TightZstd");
 				break;
 			case rfbEncodingZstdHex:
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts.m_fEnableCache ? "ZstdHex, Cache" : "ZstdHex");
+				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "ZstdHex, Cache" : "ZstdHex");
 				break;
 			}
 		}
@@ -7436,7 +7436,7 @@ void ClientConnection::GTGBS_CreateDisplay()
 	wndclass.cbWndExtra		= 0;
 	wndclass.hInstance		= m_pApp->m_instance;
 	wndclass.hIcon			= LoadIcon(m_pApp->m_instance, MAKEINTRESOURCE(IDR_TRAY));
-	switch (m_opts.m_localCursor) {
+	switch (m_opts->m_localCursor) {
 	case NOCURSOR:
 		wndclass.hCursor		= LoadCursor(m_pApp->m_instance, MAKEINTRESOURCE(IDC_NOCURSOR));
 		break;
@@ -7544,7 +7544,7 @@ LRESULT CALLBACK ClientConnection::GTGBS_StatusProc(HWND hwnd, UINT iMsg, WPARAM
 					} else if (_this->m_pPluginInterface) {
 						SetDlgItemText(hwnd,IDC_PLUGIN_STATUS,"(plugin default encryption)");
 					} else {
-						if (_this->m_opts.m_oldplugin)
+						if (_this->m_opts->m_oldplugin)
 						{
 							if (_stricmp(_this->m_pDSMPlugin->GetPluginParams(), "NoPassword")==0)
 								SetDlgItemText(hwnd,IDC_PLUGIN_STATUS,"(old plugin, rc4.key, encryption)");
@@ -7730,9 +7730,9 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 					case ID_SW:
 						{
 						Snapshot snapshot;
-						snapshot.SaveJpeg(_this->m_membitmap,_this->m_opts.m_document_folder, _this->m_opts.m_prefix,  _this->m_opts.m_imageFormat);
-						_tcscpy_s(_this->m_opts.m_document_folder,snapshot.getFolder());
-						_tcscpy_s(_this->m_opts.m_prefix, snapshot.getPrefix());
+						snapshot.SaveJpeg(_this->m_membitmap,_this->m_opts->m_document_folder, _this->m_opts->m_prefix,  _this->m_opts->m_imageFormat);
+						_tcscpy_s(_this->m_opts->m_document_folder,snapshot.getFolder());
+						_tcscpy_s(_this->m_opts->m_prefix, snapshot.getPrefix());
 						}
 						//if (!_this->m_SWselect)
 						//{
@@ -7751,7 +7751,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 
 					// Toggle toolbar & toolbar menu option
 					case ID_DBUTTON:
-						_this->m_opts.m_ShowToolbar = !_this->m_opts.m_ShowToolbar;
+						_this->m_opts->m_ShowToolbar = !_this->m_opts->m_ShowToolbar;
 						_this->SizeWindow();
 						_this->SetFullScreenMode(_this->InFullScreenMode());
 						// adzm - 2010-07 - Extended clipboard
@@ -7759,7 +7759,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						break;
 
 					case ID_AUTOSCALING:
-						_this->m_opts.m_fAutoScaling = !_this->m_opts.m_fAutoScaling;
+						_this->m_opts->m_fAutoScaling = !_this->m_opts->m_fAutoScaling;
 						_this->SizeWindow();
 						InvalidateRect(hwnd, NULL, TRUE);
 						_this->RealiseFullScreenMode();
@@ -7769,25 +7769,25 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 
 					case ID_DINPUT:
 						_this->m_remote_mouse_disable = true;
-						if (_this->m_opts.m_ShowToolbar)
+						if (_this->m_opts->m_ShowToolbar)
 						{
                             // 24 March 2008 jdp
                             _this->RebuildToolbar(hwnd);
 							SendMessage(hwnd,WM_SIZE,(WPARAM)ID_DINPUT,(LPARAM)0);
 						}
-						if (_this->m_opts.m_ViewOnly) return 0;
+						if (_this->m_opts->m_ViewOnly) return 0;
 						_this->SendServerInput(true);
 						break;
 
 					case ID_INPUT:
 						_this->m_remote_mouse_disable = false;
-						if (_this->m_opts.m_ShowToolbar)
+						if (_this->m_opts->m_ShowToolbar)
 						{
                             // 24 March 2008 jdp
                             _this->RebuildToolbar(hwnd);
 							SendMessage(hwnd,WM_SIZE,(WPARAM)ID_DINPUT,(LPARAM)0);
 						}
-						if (_this->m_opts.m_ViewOnly) return 0;
+						if (_this->m_opts->m_ViewOnly) return 0;
 						_this->SendServerInput(false);
 						break;
 
@@ -7828,31 +7828,31 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 
 							// Modif sf@2002 - Server Scaling
 							int nOldServerScale = _this->m_nServerScale;
-							int prev_scale_num = _this->m_opts.m_scale_num;
-							int prev_scale_den = _this->m_opts.m_scale_den;
-							bool fOldToolbarState = _this->m_opts.m_ShowToolbar;
-							bool nOldAutoMode = _this->m_opts.autoDetect;
+							int prev_scale_num = _this->m_opts->m_scale_num;
+							int prev_scale_den = _this->m_opts->m_scale_den;
+							bool fOldToolbarState = _this->m_opts->m_ShowToolbar;
+							bool nOldAutoMode = _this->m_opts->autoDetect;
 							// adzm - 2010-07 - Extended clipboard
-							bool bOldViewOnly = _this->m_opts.m_ViewOnly;
-							bool bOldDisableClipboard = _this->m_opts.m_DisableClipboard;
-							bool bOldAutoScaling = _this->m_opts.m_fAutoScaling;
-							bool bOldAutoScalingEven = _this->m_opts.m_fAutoScalingEven;
-							bool bOldAutoScalingLimit = _this->m_opts.m_fAutoScalingLimit;
+							bool bOldViewOnly = _this->m_opts->m_ViewOnly;
+							bool bOldDisableClipboard = _this->m_opts->m_DisableClipboard;
+							bool bOldAutoScaling = _this->m_opts->m_fAutoScaling;
+							bool bOldAutoScalingEven = _this->m_opts->m_fAutoScalingEven;
+							bool bOldAutoScalingLimit = _this->m_opts->m_fAutoScalingLimit;
 
-							if (_this->m_opts.DoDialog(true,hwnd))
+							if (_this->m_opts->DoDialog(true,hwnd))
 							{
-								if ((_this->m_opts.m_fAutoScaling ^ bOldAutoScaling) || (_this->m_opts.m_fAutoScalingEven ^ bOldAutoScalingEven) || (_this->m_opts.m_fAutoScalingLimit ^ bOldAutoScalingLimit))
+								if ((_this->m_opts->m_fAutoScaling ^ bOldAutoScaling) || (_this->m_opts->m_fAutoScalingEven ^ bOldAutoScalingEven) || (_this->m_opts->m_fAutoScalingLimit ^ bOldAutoScalingLimit))
 								{
 									_this->m_fScalingDone = false;
 								}
 								
 								// Modif sf@2002 - Server Scaling
-								_this->m_nServerScale = _this->m_opts.m_nServerScale;
+								_this->m_nServerScale = _this->m_opts->m_nServerScale;
 								if (_this->m_nServerScale != nOldServerScale)
 								{
 									_this->SendServerScale(_this->m_nServerScale);
 								}
-								else if (_this->m_opts.m_fAutoScaling && !_this->m_fScalingDone)
+								else if (_this->m_opts->m_fAutoScaling && !_this->m_fScalingDone)
 								{
 									_this->SizeWindow();
 									if (_this->m_running)
@@ -7860,8 +7860,8 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 								}
 								else
 								{
-									if (prev_scale_num != _this->m_opts.m_scale_num ||
-										prev_scale_den != _this->m_opts.m_scale_den)
+									if (prev_scale_num != _this->m_opts->m_scale_num ||
+										prev_scale_den != _this->m_opts->m_scale_den)
 									{
 										// Resize the window if scaling factors were changed
 										_this->SizeWindow();
@@ -7869,26 +7869,26 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 										// Make the window corresponds to the requested state
 										_this->RealiseFullScreenMode();
 									}
-									if (fOldToolbarState != _this->m_opts.m_ShowToolbar)
+									if (fOldToolbarState != _this->m_opts->m_ShowToolbar)
 										_this->SizeWindow();
 									_this->m_pendingFormatChange = true;
 								}
 
 								// adzm 2010-10
-								_this->m_PendingMouseMove.dwMinimumMouseMoveInterval = _this->m_opts.m_throttleMouse;
+								_this->m_PendingMouseMove.dwMinimumMouseMoveInterval = _this->m_opts->m_throttleMouse;
 							}
 
 							// adzm - 2010-07 - Extended clipboard
-							if ( (bOldViewOnly != _this->m_opts.m_ViewOnly) || (bOldDisableClipboard != _this->m_opts.m_DisableClipboard) )
+							if ( (bOldViewOnly != _this->m_opts->m_ViewOnly) || (bOldDisableClipboard != _this->m_opts->m_DisableClipboard) )
 							{
 								_this->UpdateRemoteClipboardCaps();
 
-								if (!_this->m_opts.m_ViewOnly && !_this->m_opts.m_DisableClipboard) {
+								if (!_this->m_opts->m_ViewOnly && !_this->m_opts->m_DisableClipboard) {
 									_this->UpdateRemoteClipboard(); // update the clipboard if we are no longer view only and the clipboard is enabled
 								}
 							}
 
-							 if (nOldAutoMode != _this->m_opts.autoDetect)
+							 if (nOldAutoMode != _this->m_opts->autoDetect)
 								 _this->m_nConfig = 0;
 							_this->OldEncodingStatusWindow = -2; // force update in status window
 							_this->m_fOptionsOpen = false;
@@ -7912,16 +7912,16 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 
 					case ID_VIEWONLYTOGGLE:
 						// Toggle view only mode
-						_this->m_opts.m_ViewOnly = !_this->m_opts.m_ViewOnly;
+						_this->m_opts->m_ViewOnly = !_this->m_opts->m_ViewOnly;
 
 						// adzm - 2010-07 - Extended clipboard
-						if (_this->m_opts.m_ViewOnly) SetWindowText(_this->m_hwndMain, _this->m_desktopName_viewonly);
+						if (_this->m_opts->m_ViewOnly) SetWindowText(_this->m_hwndMain, _this->m_desktopName_viewonly);
 						else SetWindowText(_this->m_hwndMain, _this->m_desktopName);
 						//_this->UpdateMenuItems(); // Handled in WM_INITMENUPOPUP
 
 						_this->UpdateRemoteClipboardCaps();
 
-						if (!_this->m_opts.m_ViewOnly && !_this->m_opts.m_DisableClipboard) {
+						if (!_this->m_opts->m_ViewOnly && !_this->m_opts->m_DisableClipboard) {
 							_this->UpdateRemoteClipboard(); // update the clipboard if we are no longer view only and the clipboard is enabled
 						}
 						return 0;
@@ -7933,37 +7933,37 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						return 0;
 
 					case ID_VK_LWINDOWN:
-						if (_this->m_opts.m_ViewOnly) return 0;
+						if (_this->m_opts->m_ViewOnly) return 0;
 						_this->SendKeyEvent(XK_Super_L, true);
 						//adzm 2010-09
 						_this->FlushWriteQueue(true, 5);
 						return 0;
 					case ID_VK_LWINUP:
-						if (_this->m_opts.m_ViewOnly) return 0;
+						if (_this->m_opts->m_ViewOnly) return 0;
 						_this->SendKeyEvent(XK_Super_L, false);
 						//adzm 2010-09
 						_this->FlushWriteQueue(true, 5);
 						return 0;
 					case ID_VK_RWINDOWN:
-						if (_this->m_opts.m_ViewOnly) return 0;
+						if (_this->m_opts->m_ViewOnly) return 0;
 						_this->SendKeyEvent(XK_Super_R, true);
 						//adzm 2010-09
 						_this->FlushWriteQueue(true, 5);
 						return 0;
 					case ID_VK_RWINUP:
-						if (_this->m_opts.m_ViewOnly) return 0;
+						if (_this->m_opts->m_ViewOnly) return 0;
 						_this->SendKeyEvent(XK_Super_R, false);
 						//adzm 2010-09
 						_this->FlushWriteQueue(true, 5);
 						return 0;
 					case ID_VK_APPSDOWN:
-						if (_this->m_opts.m_ViewOnly) return 0;
+						if (_this->m_opts->m_ViewOnly) return 0;
 						_this->SendKeyEvent(XK_Menu, true);
 						//adzm 2010-09
 						_this->FlushWriteQueue(true, 5);
 						return 0;
 					case ID_VK_APPSUP:
-						if (_this->m_opts.m_ViewOnly) return 0;
+						if (_this->m_opts->m_ViewOnly) return 0;
 						_this->SendKeyEvent(XK_Menu, false);
 						//adzm 2010-09
 						_this->FlushWriteQueue(true, 5);
@@ -7971,7 +7971,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 
 					// Send START Button
 					case ID_CONN_CTLESC:
-						if (_this->m_opts.m_ViewOnly) return 0;
+						if (_this->m_opts->m_ViewOnly) return 0;
 						_this->SendKeyEvent(XK_Control_L,true);
 						_this->SendKeyEvent(XK_Escape,true);
 						_this->SendKeyEvent(XK_Control_L,false);
@@ -7982,7 +7982,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 
 					// Send Ctrl-Alt-Del
 					case ID_CONN_CTLALTDEL:
-						if (_this->m_opts.m_ViewOnly) return 0;
+						if (_this->m_opts->m_ViewOnly) return 0;
 						_this->SendKeyEvent(XK_Control_L, true);
 						_this->SendKeyEvent(XK_Alt_L,     true);
 						_this->SendKeyEvent(XK_Delete,    true);
@@ -7994,28 +7994,28 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						return 0;
 
 					case ID_CONN_CTLDOWN:
-						if (_this->m_opts.m_ViewOnly) return 0;
+						if (_this->m_opts->m_ViewOnly) return 0;
 						_this->SendKeyEvent(XK_Control_L, true);
 						//adzm 2010-09
 						_this->FlushWriteQueue(true, 5);
 						return 0;
 
 					case ID_CONN_CTLUP:
-						if (_this->m_opts.m_ViewOnly) return 0;
+						if (_this->m_opts->m_ViewOnly) return 0;
 						_this->SendKeyEvent(XK_Control_L, false);
 						//adzm 2010-09
 						_this->FlushWriteQueue(true, 5);
 						return 0;
 
 					case ID_CONN_ALTDOWN:
-						if (_this->m_opts.m_ViewOnly) return 0;
+						if (_this->m_opts->m_ViewOnly) return 0;
 						_this->SendKeyEvent(XK_Alt_L, true);
 						//adzm 2010-09
 						_this->FlushWriteQueue(true, 5);
 						return 0;
 
 					case ID_CONN_ALTUP:
-						if (_this->m_opts.m_ViewOnly) return 0;
+						if (_this->m_opts->m_ViewOnly) return 0;
 						_this->SendKeyEvent(XK_Alt_L, false);
 						//adzm 2010-09
 						_this->FlushWriteQueue(true, 5);
@@ -8109,9 +8109,9 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 
 						// sf@2002
 					case ID_MAXCOLORS:
-						if (_this->m_opts.m_Use8Bit)
+						if (_this->m_opts->m_Use8Bit)
 						{
-							_this->m_opts.m_Use8Bit = rfbPFFullColors; //false;
+							_this->m_opts->m_Use8Bit = rfbPFFullColors; //false;
 							_this->m_pendingFormatChange = true;
 							InvalidateRect(hwnd, NULL, TRUE);
 						}
@@ -8119,9 +8119,9 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 
 						// sf@2002
 					case ID_256COLORS:
-						// if (!_this->m_opts.m_Use8Bit)
+						// if (!_this->m_opts->m_Use8Bit)
 						{
-							_this->m_opts.m_Use8Bit = rfbPF256Colors; //true;
+							_this->m_opts->m_Use8Bit = rfbPF256Colors; //true;
 							_this->m_pendingFormatChange = true;
 							InvalidateRect(hwnd, NULL, TRUE);
 						}
@@ -8142,12 +8142,12 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							int nOldServerScale = _this->m_nServerScale;
 
 							// Modif sf@2002 - Server Scaling
-							_this->m_opts.m_fAutoScaling = false;
+							_this->m_opts->m_fAutoScaling = false;
 							_this->m_nServerScale = 2;
-							_this->m_opts.m_nServerScale = 2;
-							_this->m_opts.m_scaling = true;
-							_this->m_opts.m_scale_num = 100;
-							_this->m_opts.m_scale_den = 100;
+							_this->m_opts->m_nServerScale = 2;
+							_this->m_opts->m_scaling = true;
+							_this->m_opts->m_scale_num = 100;
+							_this->m_opts->m_scale_den = 100;
 
 							if (_this->m_nServerScale != nOldServerScale)
 							{
@@ -8173,10 +8173,10 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							// We don't forbid AutoScaling if selected
 							// so the viewer zoom factor is more accurate
 							_this->m_nServerScale = 2;
-							_this->m_opts.m_nServerScale = 2;
-							_this->m_opts.m_scaling = true;
-							_this->m_opts.m_scale_num = 200;
-							_this->m_opts.m_scale_den = 100;
+							_this->m_opts->m_nServerScale = 2;
+							_this->m_opts->m_scaling = true;
+							_this->m_opts->m_scale_num = 200;
+							_this->m_opts->m_scale_den = 100;
 
 							if (_this->m_nServerScale != nOldServerScale)
 							{
@@ -8199,12 +8199,12 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							// Toggle normal screen
 							int nOldServerScale = _this->m_nServerScale;
 
-							_this->m_opts.m_fAutoScaling = false;
+							_this->m_opts->m_fAutoScaling = false;
 							_this->m_nServerScale = 1;
-							_this->m_opts.m_nServerScale = 1;
-							_this->m_opts.m_scaling = false;
-							_this->m_opts.m_scale_num = 100;
-							_this->m_opts.m_scale_den = 100;
+							_this->m_opts->m_nServerScale = 1;
+							_this->m_opts->m_scaling = false;
+							_this->m_opts->m_scale_num = 100;
+							_this->m_opts->m_scale_den = 100;
 
 							if (_this->m_nServerScale != nOldServerScale)
 							{
@@ -8223,10 +8223,10 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 
 					// adzm - 2010-07 - Extended clipboard
 					case ID_ENABLE_CLIPBOARD:
-						_this->m_opts.m_DisableClipboard = !_this->m_opts.m_DisableClipboard;
+						_this->m_opts->m_DisableClipboard = !_this->m_opts->m_DisableClipboard;
 						_this->UpdateRemoteClipboardCaps();
 
-						if (!_this->m_opts.m_ViewOnly && !_this->m_opts.m_DisableClipboard) {
+						if (!_this->m_opts->m_ViewOnly && !_this->m_opts->m_DisableClipboard) {
 							_this->UpdateRemoteClipboard(); // update the clipboard if we are no longer view only and the clipboard is enabled
 						}
 						//_this->UpdateMenuItems(); // Handled in WM_INITMENUPOPUP
@@ -8280,7 +8280,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						if (_this->IsOnlyOneMonitor())
 						{
 							_this->m_DpiMove = false;
-							if (_this->m_opts.m_fAutoScaling)
+							if (_this->m_opts->m_fAutoScaling)
 							{
 								_this->m_fScalingDone = false;
 								if (_this->m_running)
@@ -8298,7 +8298,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 					_this->m_DpiOld = _this->m_Dpi;
 					return 0;
 				case WM_SIZING:
-					if (_this->m_opts.m_Directx) 
+					if (_this->m_opts->m_Directx) 
 						return 0;
 					_this->Scollbar_wm_sizing(wParam, lParam);
 					return 0;
@@ -8313,7 +8313,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						SetWindowPos(hwnd, HWND_TOPMOST, 0,0,100,100, SWP_NOMOVE | SWP_NOSIZE);
 					}
 
-					TheAccelKeys.SetWindowHandle(_this->m_opts.m_NoHotKeys ? 0 : hwnd);
+					TheAccelKeys.SetWindowHandle(_this->m_opts->m_NoHotKeys ? 0 : hwnd);
 					_this->m_keymap->Reset();					
 					return 0;
 
@@ -8322,7 +8322,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 					if (_this->InFullScreenMode()  && !_this->m_pFileTransfer->m_fFileTransferRunning && !_this->m_pTextChat->m_fTextChatRunning && !_this->m_fOptionsOpen) {
 						SetWindowPos(hwnd, HWND_TOP, 0,0,100,100, SWP_NOMOVE | SWP_NOSIZE| SWP_NOACTIVATE);
 					}
-					if ( _this->m_opts.m_ViewOnly) return 0;
+					if ( _this->m_opts->m_ViewOnly) return 0;
 					_this->m_keymap->ReleaseAllKeys(_this);
 					//adzm 2010-09
 					_this->FlushWriteQueue(true, 5);
@@ -8345,8 +8345,8 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						RECT rect;
 						if (GetWindowRect(hwnd, &rect) != 0 && !IsIconic(hwnd))
 							{
-								if (_this->m_opts.m_SavePos && !_this->m_opts.m_SaveSize) m_pMRUxy->SetPos(_this->m_host, rect.left, rect.top, 0, 0);
-								if (_this->m_opts.m_SavePos && _this->m_opts.m_SaveSize) m_pMRUxy->SetPos(_this->m_host, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
+								if (_this->m_opts->m_SavePos && !_this->m_opts->m_SaveSize) m_pMRUxy->SetPos(_this->m_host, rect.left, rect.top, 0, 0);
+								if (_this->m_opts->m_SavePos && _this->m_opts->m_SaveSize) m_pMRUxy->SetPos(_this->m_host, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
 							}
 						if (m_pMRUxy) delete m_pMRUxy;
 					}
@@ -8356,7 +8356,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						if (boxopen) return 0;
                         if (lParam == 0 && !_this->m_bKillThread)
 						{
-							if (_this->m_opts.m_fExitCheck) //PGM @ Advantig
+							if (_this->m_opts->m_fExitCheck) //PGM @ Advantig
 							{ //PGM @ Advantig
 								boxopen=true;
 							    if (MessageBox(hwnd, sz_L75,sz_L76,MB_YESNO | MB_ICONQUESTION | MB_SETFOREGROUND | MB_TOPMOST|MB_SYSTEMMODAL) == IDNO)
@@ -8442,7 +8442,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							strcat_s(wtext,temp);
 							strcat_s(wtext,")");
 							SetWindowText(_this->m_hwndMain, wtext);
-							_this->m_opts.m_NoStatus = true;
+							_this->m_opts->m_NoStatus = true;
 							_this->SuspendThread();
 							//_this->Reconnect()
 							DWORD dw;
@@ -8540,7 +8540,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 				case WM_SYSKEYUP:
 					{
 						if (!_this->m_running) return 0;
-						if ( _this->m_opts.m_ViewOnly) return 0;
+						if ( _this->m_opts->m_ViewOnly) return 0;
 						_this->ProcessKeyEvent((int) wParam, (DWORD) lParam);
 						//adzm 2010-09
 						_this->FlushWriteQueue(true, 5);
@@ -8565,12 +8565,12 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						
 						_this->AddRemoveScrollbars(hwnd, Rtb);						
 
-						if (_this->m_opts.m_Directx) { // full-screen mode
+						if (_this->m_opts->m_Directx) { // full-screen mode
 							GetClientRect(hwnd, &rect);
 							_this->m_cliwidth = rect.right - rect.left;
 							_this->m_cliheight = (int)(rect.bottom - rect.top);
 
-							if (_this->m_opts.m_ShowToolbar)
+							if (_this->m_opts->m_ShowToolbar)
 								SetWindowPos(_this->m_hwndcn, _this->m_hwndTBwin, 0, _this->m_TBr.bottom, _this->m_cliwidth, _this->m_cliheight-_this->m_TBr.bottom, SWP_SHOWWINDOW);
 							else SetWindowPos(_this->m_hwndcn, _this->m_hwndTBwin, 0, 0, _this->m_cliwidth, _this->m_cliheight, SWP_SHOWWINDOW);
 							InvalidateRect(_this->m_hwndcn,&rect,false);
@@ -8581,22 +8581,22 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							int uni_screenHeight =  _this->m_si.framebufferHeight;
 
 							_this->m_cliwidth = min( (int)(rect.right - rect.left),
-													 (int)(uni_screenWidth * _this->m_opts.m_scale_num / _this->m_opts.m_scale_den));
-							if (_this->m_opts.m_ShowToolbar)
+													 (int)(uni_screenWidth * _this->m_opts->m_scale_num / _this->m_opts->m_scale_den));
+							if (_this->m_opts->m_ShowToolbar)
 								_this->m_cliheight = min( (int)rect.bottom - rect.top ,
-														  (int)uni_screenHeight * _this->m_opts.m_scale_num / _this->m_opts.m_scale_den + _this->m_TBr.bottom);
+														  (int)uni_screenHeight * _this->m_opts->m_scale_num / _this->m_opts->m_scale_den + _this->m_TBr.bottom);
 							else
 								_this->m_cliheight = min( (int)(rect.bottom - rect.top) ,
-														  (int)(uni_screenHeight * _this->m_opts.m_scale_num / _this->m_opts.m_scale_den));
+														  (int)(uni_screenHeight * _this->m_opts->m_scale_num / _this->m_opts->m_scale_den));
 
-							_this->m_hScrollMax = (int)_this->m_si.framebufferWidth * _this->m_opts.m_scale_num / _this->m_opts.m_scale_den;
-							if (_this->m_opts.m_ShowToolbar)
+							_this->m_hScrollMax = (int)_this->m_si.framebufferWidth * _this->m_opts->m_scale_num / _this->m_opts->m_scale_den;
+							if (_this->m_opts->m_ShowToolbar)
 								_this->m_vScrollMax = (int)(_this->m_si.framebufferHeight *
-															_this->m_opts.m_scale_num / _this->m_opts.m_scale_den)
+															_this->m_opts->m_scale_num / _this->m_opts->m_scale_den)
 															+ _this->m_TBr.bottom;
 							else
 								_this->m_vScrollMax = (int)(_this->m_si.framebufferHeight*
-														   _this->m_opts.m_scale_num / _this->m_opts.m_scale_den);
+														   _this->m_opts->m_scale_num / _this->m_opts->m_scale_den);
 
 
 							int newhpos, newvpos;
@@ -8675,7 +8675,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 
 					// RealVNC 335 method
 				case WM_MOUSEWHEEL:
-					if (!_this->m_opts.m_ViewOnly) {
+					if (!_this->m_opts->m_ViewOnly) {
 						_this->ProcessMouseWheel((SHORT)HIWORD(wParam));
 						//adzm 2010-09
 						_this->FlushWriteQueue(true, 5);
@@ -8700,14 +8700,14 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 					return 0;
 
 				case tbWM_FITSCREEN:
-					_this->m_opts.m_Directx = !_this->m_opts.m_showExtend;
+					_this->m_opts->m_Directx = !_this->m_opts->m_showExtend;
 					_this->m_pendingFormatChange = true;
 					InvalidateRect(hwnd, NULL, TRUE);
 					_this->RealiseFullScreenMode();
 					return 0;
 
 				case tbWM_NOSCALE:
-					_this->m_opts.m_Directx = false;
+					_this->m_opts->m_Directx = false;
 					_this->m_pendingFormatChange = true;
 					InvalidateRect(hwnd, NULL, TRUE);
 					_this->RealiseFullScreenMode();
@@ -8720,9 +8720,9 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 				case tbWM_PHOTO:
 					{
 						Snapshot snapshot;
-						snapshot.SaveJpeg(_this->m_membitmap,_this->m_opts.m_document_folder, _this->m_opts.m_prefix,  _this->m_opts.m_imageFormat);
-						_tcscpy_s(_this->m_opts.m_document_folder,snapshot.getFolder());
-						_tcscpy_s(_this->m_opts.m_prefix, snapshot.getPrefix());
+						snapshot.SaveJpeg(_this->m_membitmap,_this->m_opts->m_document_folder, _this->m_opts->m_prefix,  _this->m_opts->m_imageFormat);
+						_tcscpy_s(_this->m_opts->m_document_folder,snapshot.getFolder());
+						_tcscpy_s(_this->m_opts->m_prefix, snapshot.getPrefix());
 					}
 					return 0;
 
@@ -8744,7 +8744,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
             // 24 March 2008 jdp
             if (iMsg == RebuildToolbarMessage)
             {
-		        if (_this->m_opts.m_ShowToolbar)
+		        if (_this->m_opts->m_ShowToolbar)
 		        {
                     _this->RebuildToolbar(hwnd);
 			        SendMessage(hwnd,WM_SIZE,(WPARAM)ID_DINPUT,(LPARAM)0);
@@ -8765,7 +8765,7 @@ LRESULT CALLBACK ClientConnection::WndProcTBwin(HWND hwnd, UINT iMsg, WPARAM wPa
     if (_this == NULL) return DefWindowProc(hwnd, iMsg, wParam, lParam);
 
 	HWND parent;
-	if (_this->m_opts.m_ShowToolbar==true)
+	if (_this->m_opts->m_ShowToolbar==true)
 		{
 			parent = _this->m_hwndMain;
 			switch (iMsg)
@@ -9100,7 +9100,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 					if (_this->BumpScroll(x, y))
 						return 0;
 				}
-				if (_this->m_opts.m_ViewOnly) return 0;
+				if (_this->m_opts->m_ViewOnly) return 0;
 #ifdef _Gii
 				//Filter touch/pen events
 				if(_this->mytouch->TouchActivated()==true) {
@@ -9123,7 +9123,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 				//view_only is also for the touch
 				SetTimer(hwnd, TOUCH_SLEEP_TIMER, 1000, NULL);
 				mouse_enable = false;
-				if (_this->m_opts.m_ViewOnly) return 0;
+				if (_this->m_opts->m_ViewOnly) return 0;
 				_this->mytouch->OnTouch(hwnd, wParam, lParam);
 				return 0;
 #endif
@@ -9134,7 +9134,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 				{					
 					_this->processIdleTimer(hwnd);
 					if (!_this->m_running) return 0;
-					if ( _this->m_opts.m_ViewOnly) return 0;
+					if ( _this->m_opts->m_ViewOnly) return 0;
 					_this->ProcessKeyEvent((int) wParam, (DWORD) lParam);
 					//adzm 2010-09
 					_this->FlushWriteQueue(true, 5);
@@ -9163,7 +9163,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 					if (!_this->m_running) return 0;
 					if (_this->InFullScreenMode())
 						SetWindowPos(hwnd, HWND_TOP, 0,0,100,100, SWP_NOMOVE | SWP_NOSIZE| SWP_NOACTIVATE);
-					if (_this->m_opts.m_ViewOnly) return 0;
+					if (_this->m_opts->m_ViewOnly) return 0;
 					_this->m_keymap->ReleaseAllKeys(_this);
 					//adzm 2010-09
 					_this->FlushWriteQueue(true, 5);
@@ -9186,7 +9186,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 					if (boxopen) return 0;
                     if (lParam == 0)
 					{
-						if (_this->m_opts.m_fExitCheck) //PGM @ Advantig
+						if (_this->m_opts->m_fExitCheck) //PGM @ Advantig
 						{ //PGM @ Advantig
 						    boxopen=true;
 						    if (MessageBox(hwnd, sz_L75,sz_L76,MB_YESNO | MB_ICONQUESTION | MB_SETFOREGROUND | MB_TOPMOST|MB_SYSTEMMODAL) == IDNO)
@@ -9306,7 +9306,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 						break;
 
 					HCURSOR h;
-					switch (_this->m_opts.m_localCursor) {
+					switch (_this->m_opts->m_localCursor) {
 					case NOCURSOR:
 						h= LoadCursor(_this->m_pApp->m_instance, MAKEINTRESOURCE(IDC_NOCURSOR));
 						break;
@@ -9360,11 +9360,11 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 
 			case WM_SETSCALING:
 				{
-					_this->m_opts.m_scaling = true;
-					_this->m_opts.m_scale_num = wParam;
-					_this->m_opts.m_scale_den = lParam;
-					if (_this->m_opts.m_scale_num == 1 && _this->m_opts.m_scale_den == 1)
-						_this->m_opts.m_scaling = false;
+					_this->m_opts->m_scaling = true;
+					_this->m_opts->m_scale_num = wParam;
+					_this->m_opts->m_scale_den = lParam;
+					if (_this->m_opts->m_scale_num == 1 && _this->m_opts->m_scale_den == 1)
+						_this->m_opts->m_scaling = false;
 					_this->SizeWindow();
 					InvalidateRect(hwnd, NULL, TRUE);
 					return TRUE;
@@ -9376,10 +9376,10 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 						// adzm - 2010-07 - Extended clipboard
 						bool bNewViewOnly = (wParam == 1);
 						bool bUpdateCaps = false;
-						if (_this->m_opts.m_ViewOnly != bNewViewOnly) {
+						if (_this->m_opts->m_ViewOnly != bNewViewOnly) {
 							bUpdateCaps = true;
 						}
-						_this->m_opts.m_ViewOnly = bNewViewOnly;
+						_this->m_opts->m_ViewOnly = bNewViewOnly;
 
 						if (bUpdateCaps) {
 							_this->UpdateRemoteClipboardCaps();
@@ -9395,7 +9395,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 
 void ClientConnection::processIdleTimer(HWND hwnd)
 {
-	if (m_opts.m_IdleInterval > 0) {
+	if (m_opts->m_IdleInterval > 0) {
 		KillTimer(m_hwndcn, 1013);
 		SetTimer(hwnd, m_idle_timer, m_idle_time, NULL);		
 		SetDormant(false); 
@@ -9652,7 +9652,7 @@ ClientConnection:: Check_Rectangle_borders(int x,int y,int w,int h)
 // adzm 2010-09
 void ClientConnection::SendKeepAlive(bool bForce, bool bAsync)
 {
-	if (m_opts.m_keepAliveInterval > 0)
+	if (m_opts->m_keepAliveInterval > 0)
 	{
 		if (bAsync) {
 			PostMessage(m_hwndcn, WM_SENDKEEPALIVE, (WPARAM)(bForce ? 1 : 0), (LPARAM)0);
@@ -9673,7 +9673,7 @@ void ClientConnection::Internal_SendKeepAlive(bool bForce)
 		}
 
 		//adzm 2010-08-01
-		DWORD nInterval = (DWORD)m_opts.m_keepAliveInterval * 1000;
+		DWORD nInterval = (DWORD)m_opts->m_keepAliveInterval * 1000;
 		DWORD nTicksSinceLastSent = GetTickCount() - m_LastSentTick;
 
 		if (!bForce && nTicksSinceLastSent < nInterval) {
@@ -9698,8 +9698,8 @@ void ClientConnection::Internal_SendKeepAlive(bool bForce)
         kp.type = rfbKeepAlive;
         WriteExact_timeout((char*)&kp, sz_rfbKeepAliveMsg, rfbKeepAlive,5);
 
-		if (m_keepalive_timer != 0 && m_opts.m_keepAliveInterval > 0) {
-			SetTimer(m_hwndcn, m_keepalive_timer, m_opts.m_keepAliveInterval * 1000, NULL);
+		if (m_keepalive_timer != 0 && m_opts->m_keepAliveInterval > 0) {
+			SetTimer(m_hwndcn, m_keepalive_timer, m_opts->m_keepAliveInterval * 1000, NULL);
 		}
     }
 }
@@ -9900,7 +9900,7 @@ BOOL CALLBACK DialogProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 
 inline void ClientConnection::AddRemoveScrollbars(HWND hwnd, RECT Rtb)
 {
-	if (!InFullScreenMode() && !m_opts.m_Directx)
+	if (!InFullScreenMode() && !m_opts->m_Directx)
 	{
 		if ((m_winwidth == m_fullwinwidth) && (m_winheight == (m_fullwinheight +(Rtb.bottom - Rtb.top)))) {
 			SB_HORZ_BOOL = false;
@@ -9954,7 +9954,7 @@ inline void ClientConnection::UpdateScrollbars()
 
 void ClientConnection::ResizeToolbar(RECT& Rtb)
 {
-	if (!m_opts.m_ShowToolbar) {
+	if (!m_opts->m_ShowToolbar) {
 		Rtb.top = 0; Rtb.bottom = 0;
 		return;
 	}
@@ -10025,7 +10025,7 @@ void ClientConnection::Scollbar_wm_sizing(WPARAM wParam, LPARAM lParam)
 	case WMSZ_TOP:
 	case WMSZ_TOPLEFT:
 	case WMSZ_TOPRIGHT:
-		if (m_opts.m_ShowToolbar)
+		if (m_opts->m_ShowToolbar)
 			lprc->top = max(lprc->top, lprc->bottom - (m_fullwinheight + hScrollSize) - m_TBr.bottom);
 		else
 			lprc->top = max(lprc->top, lprc->bottom - (m_fullwinheight + hScrollSize));
@@ -10033,7 +10033,7 @@ void ClientConnection::Scollbar_wm_sizing(WPARAM wParam, LPARAM lParam)
 	case WMSZ_BOTTOM:
 	case WMSZ_BOTTOMLEFT:
 	case WMSZ_BOTTOMRIGHT:
-		if (m_opts.m_ShowToolbar)
+		if (m_opts->m_ShowToolbar)
 			lprc->bottom = min(lprc->bottom, lprc->top + (m_fullwinheight + hScrollSize) + m_TBr.bottom);
 		else
 			lprc->bottom = min(lprc->bottom, lprc->top + (m_fullwinheight + hScrollSize));
@@ -10043,7 +10043,7 @@ void ClientConnection::Scollbar_wm_sizing(WPARAM wParam, LPARAM lParam)
 
 void ClientConnection::Scrollbar_RecalculateSize(HWND hwnd)
 {
-	if (!InFullScreenMode() && !m_opts.m_Directx) {
+	if (!InFullScreenMode() && !m_opts->m_Directx) {
 		RECT rect;
 		GetWindowRect(hwnd, &rect);
 		int hScrollSize = SB_HORZ_BOOL ? GetSystemMetrics(SM_CYHSCROLL) : 0;
@@ -10051,12 +10051,12 @@ void ClientConnection::Scrollbar_RecalculateSize(HWND hwnd)
 		rect.right = min(rect.right, rect.left + (m_fullwinwidth + vSchrollSize) + 1);
 		rect.left = max(rect.left, rect.right - (m_fullwinwidth + vSchrollSize));
 
-		if (m_opts.m_ShowToolbar)
+		if (m_opts->m_ShowToolbar)
 			rect.top = max(rect.top, rect.bottom - (m_fullwinheight + hScrollSize) - m_TBr.bottom);
 		else
 			rect.top = max(rect.top, rect.bottom - (m_fullwinheight + hScrollSize));
 
-		if (m_opts.m_ShowToolbar)
+		if (m_opts->m_ShowToolbar)
 			rect.bottom = min(rect.bottom, rect.top + (m_fullwinheight + hScrollSize) + m_TBr.bottom);
 		else
 			rect.bottom = min(rect.bottom, rect.top + (m_fullwinheight + hScrollSize));

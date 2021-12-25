@@ -52,7 +52,6 @@ public:
    	virtual ~SessionDialog();
 
 	ClientConnection *m_pCC;
-	//VNCOptions *m_pOpt;
 	MRU *m_pMRU;
 	CDSMPlugin* m_pDSMPlugin; // sf@2002
 

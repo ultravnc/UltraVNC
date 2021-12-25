@@ -47,7 +47,7 @@ void ClientConnection::ReadCacheRect(rfbFramebufferUpdateRectHeader *pfburh)
 
 void ClientConnection::SaveArea(RECT &r)
 {
-	if (!m_opts.m_fEnableCache) return; // sf@2002
+	if (!m_opts->m_fEnableCache) return; // sf@2002
 
 	int x = r.left;
 	int y = r.top;
@@ -78,7 +78,7 @@ void ClientConnection::RestoreArea(RECT &r)
 // 
 void ClientConnection::ClearCache()
 {
-	if (!m_opts.m_fEnableCache) return;
+	if (!m_opts->m_fEnableCache) return;
 	if (m_DIBbitsCache) 
 		memset(m_DIBbitsCache,0,m_si.framebufferWidth * m_si.framebufferHeight *m_myFormat.bitsPerPixel/8);
 }
@@ -137,7 +137,7 @@ void ClientConnection::ReadCacheZip(rfbFramebufferUpdateRectHeader *pfburh,HRGN 
 
 		SoftCursorLockArea(cacherect.left, cacherect.top, cacherect.right - cacherect.left, cacherect.bottom - cacherect.top);
 		RestoreArea(cacherect);
-		if (!m_opts.m_Directx) InvalidateRegion(&cacherect,prgn);
+		if (!m_opts->m_Directx) InvalidateRegion(&cacherect,prgn);
 	}
 
 }

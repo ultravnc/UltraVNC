@@ -843,7 +843,7 @@ private:
 	PFN_AdjustWindowRectExForDpi adjustWindowRectExForDpi;
 public:
 	// RFB settings
-	VNCOptions m_opts;
+	VNCOptions *m_opts;
 	bool m_FullScreenNotDone;
 	int m_autoReconnect;
 	int reconnectcounter;

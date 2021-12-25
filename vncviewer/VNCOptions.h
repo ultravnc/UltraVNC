@@ -46,8 +46,8 @@ public:
 	virtual ~VNCOptions();
 
 	// Save and load a set of options from a config file
-	void Save(char* fname);
-	void Load(char* fname);
+	void SaveOptions(char* fname);
+	void LoadOptions(char* fname);
 
 	// process options
 	bool	m_listening;
@@ -161,8 +161,8 @@ public:
 	bool m_running;
 
 	TCHAR m_optionfile[MAX_PATH];
-	void VNCOptions::setDefaultOptionsFileName();
-	TCHAR* VNCOptions::getDefaultOptionsFileName();
+	static void setDefaultOptionsFileName(TCHAR* optionfile);
+	TCHAR* getDefaultOptionsFileName();
 	char m_InfoMsg[255]{ 0 };
 
 private:
