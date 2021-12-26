@@ -38,7 +38,7 @@
 #  define ISspace(c) isspace((unsigned)c)
 #endif /* ?__EMX__ */
 
-#ifndef RISCOS
+#if (!defined(RISCOS) && (!defined(MODERN) || defined(NO_STDLIB_H)))
 extern char *getenv();
 #endif
 static int count_args OF((ZCONST char *));

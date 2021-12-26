@@ -1,6 +1,6 @@
 # Makefile for UnZip, fUnZip and UnZipSFX
-# for rsxntdj 1.6beta2 (with djgpp v2.3) under Windows 95 and Windows NT.
-# By E-Yen Tan. Last updated 20th January 2002.
+# for rsxntdj 1.6beta2 (with djgpp v2.3) under Windows 9x and Windows NT.
+# By E-Yen Tan. Last updated 25th December 2006.
 
 CC = gcc -Zwin32
 CFLAGS = -O2 -Wall -I. -DWIN32 -DASM_CRC $(LOCAL_UNZIP)
@@ -14,14 +14,15 @@ ADVAPI32 = advapi32
 ADVAPI32LIB = lib$(ADVAPI32).a
 L_ADVAPI32 = -l$(ADVAPI32)
 
-OBJU1 = unzip.o crc_gcc.o crctab.o crypt.o envargs.o explode.o extract.o
+OBJU1 = unzip.o crc_gcc.o crc32.o crypt.o envargs.o explode.o extract.o
 OBJU2 = fileio.o globals.o inflate.o list.o match.o process.o ttyio.o
-OBJU3 = unreduce.o unshrink.o zipinfo.o win32.o nt.o
+OBJU3 = ubz2err.o unreduce.o unshrink.o zipinfo.o win32.o nt.o
 OBJU  = $(OBJU1) $(OBJU2) $(OBJU3)
-OBJX1 = unzipsf_.o crc_gcc.o crctab_.o crypt_.o extract_.o fileio_.o
-OBJX2 = globals_.o inflate_.o match_.o process_.o ttyio_.o win32_.o nt_.o
+OBJX1 = unzipsf_.o crc_gcc.o crc32_.o crypt_.o extract_.o fileio_.o globals_.o
+OBJX2 = inflate_.o match_.o process_.o ttyio_.o ubz2err_.o win32_.o nt_.o
 OBJX  = $(OBJX1) $(OBJX2)
-OBJF  = funzip.o crc_gcc.o cryptf.o inflatef.o globalsf.o ttyiof.o win32f.o
+OBJF  = funzip.o crc_gcc.o crc32f.o cryptf.o inflatef.o globalsf.o ttyiof.o \
+	win32f.o
 
 UNZIP_H = unzip.h unzpriv.h globals.h win32/w32cfg.h
 
@@ -52,7 +53,7 @@ uzexampl.exe:	uzexampl$(OBJ)
 $(ADVAPI32LIB):
 	makelib "$(windir)/system/advapi32.dll" -o ./$@
 
-crctab.o:	crctab.c $(UNZIP_H) zip.h
+crc32.o:	crc32.c $(UNZIP_H) crc32.h
 envargs.o:	envargs.c $(UNZIP_H)
 explode.o:	explode.c $(UNZIP_H)
 extract.o:	extract.c $(UNZIP_H) crypt.h
@@ -63,12 +64,13 @@ list.o:		list.c $(UNZIP_H)
 match.o:	match.c $(UNZIP_H)
 process.o:	process.c $(UNZIP_H)
 ttyio.o:	ttyio.c $(UNZIP_H) zip.h crypt.h ttyio.h
+ubz2err.o:	ubz2err.c $(UNZIP_H)
 unreduce.o:	unreduce.c $(UNZIP_H)
 unshrink.o:	unshrink.c $(UNZIP_H)
 unzip.o:	unzip.c $(UNZIP_H) crypt.h unzvers.h consts.h
 zipinfo.o:	zipinfo.c $(UNZIP_H)
 
-funzip.o:	funzip.c $(UNZIP_H) crypt.h ttyio.h tables.h
+funzip.o:	funzip.c $(UNZIP_H) crc32.h crypt.h ttyio.h
 	$(CC) -c $(CFLAGS) -o$@ funzip.c
 
 uzexampl$(OBJ):	windll/uzexampl.c windll/uzexampl.h
@@ -92,13 +94,13 @@ nt_.o:	win32/nt.c $(UNZIP_H) win32/nt.h
 crc_gcc.o:	crc_i386.S
 	$(AS) $(ASFLAGS) -x assembler-with-cpp -c -o $@ crc_i386.S
 
-crypt.o:	crypt.c $(UNZIP_H) zip.h crypt.h ttyio.h
+crypt.o:	crypt.c $(UNZIP_H) zip.h crypt.h crc32.h ttyio.h
 	$(CC) -c $(CFLAGS) -o$@ crypt.c
 
-cryptf.o:	crypt.c $(UNZIP_H) zip.h crypt.h ttyio.h
+cryptf.o:	crypt.c $(UNZIP_H) zip.h crypt.h crc32.h ttyio.h
 	$(CC) -c $(CFLAGS) -DFUNZIP -o$@ crypt.c
 
-crc32f.o:	crc32.c $(UNZIP_H) zip.h
+crc32f.o:	crc32.c $(UNZIP_H) zip.h crc32.h
 	$(CC) -c $(CFLAGS) -DFUNZIP -o$@ crc32.c
 
 globalsf.o:	globals.c $(UNZIP_H)
@@ -110,10 +112,10 @@ inflatef.o:	inflate.c inflate.h $(UNZIP_H) crypt.h
 ttyiof.o:	ttyio.c $(UNZIP_H) zip.h crypt.h ttyio.h
 	$(CC) -c $(CFLAGS) -DFUNZIP -o$@ ttyio.c
 
-crctab_.o:	crctab.c $(UNZIP_H) zip.h
-	$(CC) -c $(CFLAGS) -DSFX -o$@ crctab.c
+crc32_.o:	crc32.c $(UNZIP_H) crc32.h
+	$(CC) -c $(CFLAGS) -DSFX -o$@ crc32.c
 
-crypt_.o:	crypt.c $(UNZIP_H) zip.h crypt.h ttyio.h
+crypt_.o:	crypt.c $(UNZIP_H) zip.h crypt.h crc32.h ttyio.h
 	$(CC) -c $(CFLAGS) -DSFX -o$@ crypt.c
 
 extract_.o:	extract.c $(UNZIP_H) crypt.h
@@ -136,6 +138,9 @@ process_.o:	process.c $(UNZIP_H)
 
 ttyio_.o:	ttyio.c $(UNZIP_H) zip.h crypt.h ttyio.h
 	$(CC) -c $(CFLAGS) -DSFX -o$@ ttyio.c
+
+ubz2err_.o:	ubz2err.c $(UNZIP_H)
+	$(CC) -c $(CFLAGS) -DSFX -o$@ ubz2err.c
 
 unzipsf_.o:	unzip.c $(UNZIP_H) crypt.h unzvers.h consts.h
 	$(CC) -c $(CFLAGS) -DSFX -o$@ unzip.c

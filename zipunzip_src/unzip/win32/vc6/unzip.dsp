@@ -1,26 +1,26 @@
 # Microsoft Developer Studio Project File - Name="unzip" - Package Owner=<4>
 # Microsoft Developer Studio Generated Build File, Format Version 6.00
-# ** NICHT BEARBEITEN **
+# ** DO NOT EDIT **
 
 # TARGTYPE "Win32 (x86) Console Application" 0x0103
 
 CFG=unzip - Win32 ASM Debug
-!MESSAGE Dies ist kein gültiges Makefile. Zum Erstellen dieses Projekts mit NMAKE
-!MESSAGE verwenden Sie den Befehl "Makefile exportieren" und führen Sie den Befehl
+!MESSAGE This is not a valid makefile. To build this project using NMAKE,
+!MESSAGE use the Export Makefile command and run
 !MESSAGE 
 !MESSAGE NMAKE /f "unzip.mak".
 !MESSAGE 
-!MESSAGE Sie können beim Ausführen von NMAKE eine Konfiguration angeben
-!MESSAGE durch Definieren des Makros CFG in der Befehlszeile. Zum Beispiel:
+!MESSAGE You can specify a configuration when running NMAKE
+!MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
 !MESSAGE NMAKE /f "unzip.mak" CFG="unzip - Win32 ASM Debug"
 !MESSAGE 
-!MESSAGE Für die Konfiguration stehen zur Auswahl:
+!MESSAGE Possible choices for configuration are:
 !MESSAGE 
-!MESSAGE "unzip - Win32 Release" (basierend auf  "Win32 (x86) Console Application")
-!MESSAGE "unzip - Win32 Debug" (basierend auf  "Win32 (x86) Console Application")
-!MESSAGE "unzip - Win32 ASM Release" (basierend auf  "Win32 (x86) Console Application")
-!MESSAGE "unzip - Win32 ASM Debug" (basierend auf  "Win32 (x86) Console Application")
+!MESSAGE "unzip - Win32 Release" (based on "Win32 (x86) Console Application")
+!MESSAGE "unzip - Win32 Debug" (based on "Win32 (x86) Console Application")
+!MESSAGE "unzip - Win32 ASM Release" (based on "Win32 (x86) Console Application")
+!MESSAGE "unzip - Win32 ASM Debug" (based on "Win32 (x86) Console Application")
 !MESSAGE 
 
 # Begin Project
@@ -82,13 +82,13 @@ LINK32=link.exe
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
-# PROP BASE Output_Dir "unzip___Win32_ASM_Release"
-# PROP BASE Intermediate_Dir "unzip___Win32_ASM_Release"
+# PROP BASE Output_Dir "unzip__Win32_ASM_Release"
+# PROP BASE Intermediate_Dir "unzip__Win32_ASM_Release"
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 0
-# PROP Output_Dir "unzip___Win32_ASM_Release"
-# PROP Intermediate_Dir "unzip___Win32_ASM_Release"
+# PROP Output_Dir "unzip__Win32_ASM_Release"
+# PROP Intermediate_Dir "unzip__Win32_ASM_Release"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "NDEBUG" /D "WIN32" /FD /c
@@ -106,14 +106,14 @@ LINK32=link.exe
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
-# PROP BASE Output_Dir "unzip___Win32_ASM_Debug"
-# PROP BASE Intermediate_Dir "unzip___Win32_ASM_Debug"
+# PROP BASE Output_Dir "unzip__Win32_ASM_Debug"
+# PROP BASE Intermediate_Dir "unzip__Win32_ASM_Debug"
 # PROP BASE Ignore_Export_Lib 0
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 1
-# PROP Output_Dir "unzip___Win32_ASM_Debug"
-# PROP Intermediate_Dir "unzip___Win32_ASM_Debug"
+# PROP Output_Dir "unzip__Win32_ASM_Debug"
+# PROP Intermediate_Dir "unzip__Win32_ASM_Debug"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "_DEBUG" /D "WIN32" /FD /GZ /c
@@ -145,10 +145,6 @@ SOURCE=..\..\crc32.c
 # Begin Source File
 
 SOURCE=..\crc_i386.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\crctab.c
 # End Source File
 # Begin Source File
 
@@ -200,6 +196,10 @@ SOURCE=..\..\ttyio.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\ubz2err.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\unreduce.c
 # End Source File
 # Begin Source File
@@ -216,6 +216,10 @@ SOURCE=..\win32.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\win32i64.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\zipinfo.c
 # End Source File
 # End Group
@@ -225,6 +229,10 @@ SOURCE=..\..\zipinfo.c
 # Begin Source File
 
 SOURCE=..\..\consts.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\crc32.h
 # End Source File
 # Begin Source File
 
@@ -245,10 +253,6 @@ SOURCE=..\..\inflate.h
 # Begin Source File
 
 SOURCE=..\nt.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\tables.h
 # End Source File
 # Begin Source File
 

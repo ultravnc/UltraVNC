@@ -1,5 +1,5 @@
 ;===========================================================================
-; Copyright (c) 1990-2000 Info-ZIP.  All rights reserved.
+; Copyright (c) 1990-2006 Info-ZIP.  All rights reserved.
 ;
 ; See the accompanying file LICENSE, version 2000-Apr-09 or later
 ; (the contents of which are also included in zip.h) for terms of use.
@@ -7,7 +7,7 @@
 ; also may be found at:  ftp://ftp.info-zip.org/pub/infozip/license.html
 ;===========================================================================
 ; crc_lcc.asm, optimized CRC calculation function for Zip and UnZip,
-; created by Paul Kienitz and Christian Spieler.  Last revised 24 Dec 98.
+; created by Paul Kienitz and Christian Spieler.  Last revised 02 Jan 2006.
 ;
 ; The code in this file has been copied verbatim from crc_i386.{asm|S};
 ; only the assembler syntax and metacommands have been adapted to
@@ -59,11 +59,10 @@ _$5:
 	jnz	_$5
 _$6:
 	movl	%ecx,%edx
-	shrl	$3,%ecx
+	shrl	$4,%ecx
 	jz	_$8
 _$7:
 	xorl	(%esi),%eax
-	addl	$4,%esi
 	movzbl	%al,%ebx
 	shrl	$8,%eax
 	xorl	(%edi,%ebx,4),%eax
@@ -76,14 +75,40 @@ _$7:
 	movzbl	%al,%ebx
 	shrl	$8,%eax
 	xorl	(%edi,%ebx,4),%eax
-	xorl	(%esi),%eax
-	addl	$4,%esi
+	xorl	4(%esi),%eax
 	movzbl	%al,%ebx
 	shrl	$8,%eax
 	xorl	(%edi,%ebx,4),%eax
 	movzbl	%al,%ebx
 	shrl	$8,%eax
 	xorl	(%edi,%ebx,4),%eax
+	movzbl	%al,%ebx
+	shrl	$8,%eax
+	xorl	(%edi,%ebx,4),%eax
+	movzbl	%al,%ebx
+	shrl	$8,%eax
+	xorl	(%edi,%ebx,4),%eax
+	xorl	8(%esi),%eax
+	movzbl	%al,%ebx
+	shrl	$8,%eax
+	xorl	(%edi,%ebx,4),%eax
+	movzbl	%al,%ebx
+	shrl	$8,%eax
+	xorl	(%edi,%ebx,4),%eax
+	movzbl	%al,%ebx
+	shrl	$8,%eax
+	xorl	(%edi,%ebx,4),%eax
+	movzbl	%al,%ebx
+	shrl	$8,%eax
+	xorl	(%edi,%ebx,4),%eax
+	xorl	12(%esi),%eax
+	movzbl	%al,%ebx
+	shrl	$8,%eax
+	xorl	(%edi,%ebx,4),%eax
+	movzbl	%al,%ebx
+	shrl	$8,%eax
+	xorl	(%edi,%ebx,4),%eax
+	addl	$16,%esi
 	movzbl	%al,%ebx
 	shrl	$8,%eax
 	xorl	(%edi,%ebx,4),%eax
@@ -94,16 +119,38 @@ _$7:
 	jnz	_$7
 _$8:
 	movl	%edx,%ecx
-	andl	$7,%ecx
-	jz	_$4
+	andl	$0x0f,%ecx
+        shrl	$2,%ecx
+	jz	_$10
 _$9:
+	xorl	(%esi),%eax
+	movzbl	%al,%ebx
+	shrl	$8,%eax
+	xorl	(%edi,%ebx,4),%eax
+	movzbl	%al,%ebx
+	shrl	$8,%eax
+	xorl	(%edi,%ebx,4),%eax
+	addl	$4,%esi
+	movzbl	%al,%ebx
+	shrl	$8,%eax
+	xorl	(%edi,%ebx,4),%eax
+	movzbl	%al,%ebx
+	shrl	$8,%eax
+	xorl	(%edi,%ebx,4),%eax
+	decl	%ecx
+	jnz	_$9
+_$10:
+	movl	%edx,%ecx
+	andl	$0x03,%ecx
+	jz	_$4
+_$11:
 	xorb    (%esi),%al
 	incl    %esi
 	movzbl	%al,%ebx
 	shrl	$8,%eax
 	xorl	(%edi,%ebx,4),%eax
 	decl	%ecx
-	jnz	_$9
+	jnz	_$11
 _$4:
 	xorl	$0xffffffff,%eax
 _$3:

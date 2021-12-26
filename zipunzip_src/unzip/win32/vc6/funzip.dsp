@@ -1,26 +1,26 @@
 # Microsoft Developer Studio Project File - Name="funzip" - Package Owner=<4>
 # Microsoft Developer Studio Generated Build File, Format Version 6.00
-# ** NICHT BEARBEITEN **
+# ** DO NOT EDIT **
 
 # TARGTYPE "Win32 (x86) Console Application" 0x0103
 
 CFG=funzip - Win32 ASM Debug
-!MESSAGE Dies ist kein gültiges Makefile. Zum Erstellen dieses Projekts mit NMAKE
-!MESSAGE verwenden Sie den Befehl "Makefile exportieren" und führen Sie den Befehl
+!MESSAGE This is not a valid makefile. To build this project using NMAKE,
+!MESSAGE use the Export Makefile command and run
 !MESSAGE 
 !MESSAGE NMAKE /f "funzip.mak".
 !MESSAGE 
-!MESSAGE Sie können beim Ausführen von NMAKE eine Konfiguration angeben
-!MESSAGE durch Definieren des Makros CFG in der Befehlszeile. Zum Beispiel:
+!MESSAGE You can specify a configuration when running NMAKE
+!MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
 !MESSAGE NMAKE /f "funzip.mak" CFG="funzip - Win32 ASM Debug"
 !MESSAGE 
-!MESSAGE Für die Konfiguration stehen zur Auswahl:
+!MESSAGE Possible choices for configuration are:
 !MESSAGE 
-!MESSAGE "funzip - Win32 Release" (basierend auf  "Win32 (x86) Console Application")
-!MESSAGE "funzip - Win32 Debug" (basierend auf  "Win32 (x86) Console Application")
-!MESSAGE "funzip - Win32 ASM Release" (basierend auf  "Win32 (x86) Console Application")
-!MESSAGE "funzip - Win32 ASM Debug" (basierend auf  "Win32 (x86) Console Application")
+!MESSAGE "funzip - Win32 Release" (based on "Win32 (x86) Console Application")
+!MESSAGE "funzip - Win32 Debug" (based on "Win32 (x86) Console Application")
+!MESSAGE "funzip - Win32 ASM Release" (based on "Win32 (x86) Console Application")
+!MESSAGE "funzip - Win32 ASM Debug" (based on "Win32 (x86) Console Application")
 !MESSAGE 
 
 # Begin Project
@@ -175,6 +175,10 @@ SOURCE=..\win32.c
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
+SOURCE=..\..\crc32.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\crypt.h
 # End Source File
 # Begin Source File
@@ -188,10 +192,6 @@ SOURCE=..\..\inflate.h
 # Begin Source File
 
 SOURCE=..\nt.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\tables.h
 # End Source File
 # Begin Source File
 

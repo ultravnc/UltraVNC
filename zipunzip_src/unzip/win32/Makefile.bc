@@ -1,10 +1,10 @@
-# Makefile for UnZip(SFX) and fUnZip for Borland C++ for Windows 95/NT
-# Version: 5.5 and later
+# Makefile for UnZip(SFX) and fUnZip for Borland C++ for Windows 9x/NT
+# Version: 6.0 and later
 # Alvin Koh, Jim Knoble, Christian Spieler, E-Yen Tan, Cosmin Truta, etc.
 #
 # Tested with Borland C++ 5.5 (may work with older C++Builder 3.0, too)
 #
-# Last revised: 20 Feb 2005 (Christian Spieler)
+# Last revised: 07 Sep 2008 (Christian Spieler)
 #
 #
 
@@ -142,35 +142,35 @@ OBDIR = ow32lib
 OB = $(OBDIR)/
 
 # object files
-OBJU1 = unzip.obj $(CRC32).obj crctab.obj crypt.obj envargs.obj explode.obj
+OBJU1 = unzip.obj $(CRC32).obj crypt.obj envargs.obj explode.obj
 OBJU2 = extract.obj fileio.obj globals.obj inflate.obj list.obj match.obj
-OBJU3 = process.obj ttyio.obj unreduce.obj unshrink.obj zipinfo.obj
-OBJUS = win32.obj nt.obj $(TIMEZONE_OBJU)
+OBJU3 = process.obj ttyio.obj ubz2err.obj unreduce.obj unshrink.obj zipinfo.obj
+OBJUS = win32.obj win32i64.obj nt.obj $(TIMEZONE_OBJU)
 OBJU  = $(OBJU1) $(OBJU2) $(OBJU3) $(OBJUS)
 OBJF  = funzip.obj $(CRC32F).obj cryptf.obj globalsf.obj inflatef.obj \
-	ttyiof.obj win32f.obj
-OBJX1 = unzipsfx.obj $(CRC32X).obj crctabx.obj cryptx.obj
+	ttyiof.obj win32f.obj win32i64f.obj
+OBJX1 = unzipsfx.obj $(CRC32X).obj cryptx.obj
 OBJX2 = extractx.obj fileiox.obj globalsx.obj inflatex.obj matchx.obj
-OBJX3 = processx.obj ttyiox.obj
-OBJXS = win32x.obj ntx.obj $(TIMEZONE_OBJX)
+OBJX3 = processx.obj ttyiox.obj ubz2errx.obj
+OBJXS = win32x.obj win32i64x.obj ntx.obj $(TIMEZONE_OBJX)
 OBJX  = $(OBJX1) $(OBJX2) $(OBJX3) $(OBJXS)
-OBJD1 = api.obj $(CRC32L).obj crctabl.obj cryptl.obj explodel.obj
+OBJD1 = api.obj $(CRC32L).obj cryptl.obj explodel.obj
 OBJD2 = extractl.obj fileiol.obj globalsl.obj inflatel.obj listl.obj matchl.obj
-OBJD3 = processl.obj unreducl.obj unshrnkl.obj zipinfol.obj
-OBJDS = win32l.obj ntl.obj windll.obj $(ASMOBJS) $(TIMEZONE_OBJD)
+OBJD3 = processl.obj ubz2errl.obj unreducl.obj unshrnkl.obj zipinfol.obj
+OBJDS = win32l.obj win32i64l.obj ntl.obj windll.obj $(ASMOBJS) $(TIMEZONE_OBJD)
 OBJD  = $(OBJD1) $(OBJD2) $(OBJD3) $(OBJDS)
-OBLX1 = apig.obj $(CRC32G).obj crctabg.obj cryptg.obj
+OBLX1 = apig.obj $(CRC32G).obj cryptg.obj
 OBLX2 = extractg.obj fileiog.obj globalsg.obj inflateg.obj
-OBLX3 = matchg.obj processg.obj
-OBLXS = win32g.obj ntg.obj windllg.obj $(TIMEZONE_OBLX)
+OBLX3 = matchg.obj processg.obj ubz2errg.obj
+OBLXS = win32g.obj win32i64g.obj ntg.obj windllg.obj $(TIMEZONE_OBLX)
 OBLX  = $(OBLX1) $(OBLX2) $(OBLX3) $(OBLXS)
 OBGX  = sfxwiz.obj
 OBJLIB = $(OB)windllb.obj $(OB)apib.obj
-OBJB1 = $(CRC32B).obj $(OB)crctabb.obj $(OB)cryptb.obj
+OBJB1 = $(CRC32B).obj $(OB)cryptb.obj
 OBJB2 = $(OB)explodeb.obj $(OB)extractb.obj $(OB)fileiob.obj $(OB)globalsb.obj
 OBJB3 = $(OB)inflateb.obj $(OB)listb.obj $(OB)matchb.obj $(OB)processb.obj
-OBJB4 = $(OB)unreducb.obj $(OB)unshrnkb.obj $(OB)zipinfob.obj
-OBJBS = $(OB)win32b.obj $(OB)ntb.obj $(TIMEZONE_OBJB)
+OBJB4 = $(OB)ubz2errb.obj $(OB)unreducb.obj $(OB)unshrnkb.obj $(OB)zipinfob.obj
+OBJBS = $(OB)win32b.obj $(OB)win32i64b.obj $(OB)ntb.obj $(TIMEZONE_OBJB)
 OBJB  = $(OBJLIB) $(OBJB1) $(OBJB2) $(OBJB3) $(OBJB4) $(OBJBS)
 
 UNZIP_H = unzip.h unzpriv.h globals.h win32/w32cfg.h
@@ -196,7 +196,7 @@ guisfx: SFXWiz32.exe
 lib:    $(OBDIR) $(OB)unzip32.lib
 all:    unzips dll dllsample guisfx lib
 
-unzip.exe:      $(OBJU)
+unzip.exe:      $(OBJU) winapp.res
 	$(CC) $(LDFLAGS) -e$@ @&&|
 $(OBJU)
 |
@@ -244,27 +244,37 @@ $(OB)unzip32.lib: $(OBJB)
 clean:
 	rem Ignore any errors in the following...
 	-del *.obj
+	-del winapp.res
 	-del unzip.exe
 	-del funzip.exe
 	-del unzipsfx.exe
+	-del windll.res
+	-del unzip32.dll
+	-del uzexampl.exe
+	-del sfxwiz.res
+	-del unzsfx32.lib
+	-del SFXWiz32.exe
+	-del $(OB:/=\)*.obj
+	-del $(OB:/=\)unzip32.lib
 	-del *.tds
+	-del $(OB:/=\)*.tds
 
 # individual file dependencies
 
-crc32.obj:      crc32.c $(UNZIP_H) zip.h
-crctab.obj:     crctab.c $(UNZIP_H) zip.h
-crypt.obj:      crypt.c $(UNZIP_H) zip.h crypt.h ttyio.h
+crc32.obj:      crc32.c $(UNZIP_H) zip.h crc32.h
+crypt.obj:      crypt.c $(UNZIP_H) zip.h crypt.h crc32.h ttyio.h
 envargs.obj:    envargs.c $(UNZIP_H)
 explode.obj:    explode.c $(UNZIP_H)
-extract.obj:    extract.c $(UNZIP_H) crypt.h
-fileio.obj:     fileio.c $(UNZIP_H) crypt.h ttyio.h ebcdic.h
+extract.obj:    extract.c $(UNZIP_H) crc32.h crypt.h
+fileio.obj:     fileio.c $(UNZIP_H) crc32.h crypt.h ttyio.h ebcdic.h
 globals.obj:    globals.c $(UNZIP_H)
 inflate.obj:    inflate.c inflate.h $(UNZIP_H)
 list.obj:       list.c $(UNZIP_H)
 match.obj:      match.c $(UNZIP_H)
-process.obj:    process.c $(UNZIP_H)
+process.obj:    process.c $(UNZIP_H) crc32.h
 timezone.obj:   timezone.c $(UNZIP_H) zip.h timezone.h
 ttyio.obj:      ttyio.c $(UNZIP_H) zip.h crypt.h ttyio.h
+ubz2err.obj:    ubz2err.c $(UNZIP_H)
 unreduce.obj:   unreduce.c $(UNZIP_H)
 unshrink.obj:   unshrink.c $(UNZIP_H)
 unzip.obj:      unzip.c $(UNZIP_H) crypt.h unzvers.h consts.h
@@ -286,16 +296,19 @@ crc_i386.obj:	win32/crc_i386.c
 win32.obj:      win32/win32.c $(UNZIP_H) win32/nt.h
 	$(CC) -c $(UNFLAGS) win32/win32.c
 
+win32i64.obj:   win32/win32i64.c $(UNZIP_H)
+	$(CC) -c $(UNFLAGS) win32/win32i64.c
+
 nt.obj:         win32/nt.c $(UNZIP_H) win32/nt.h
 	$(CC) -c $(UNFLAGS) win32/nt.c
 
-funzip.obj:     funzip.c $(UNZIP_H) crypt.h ttyio.h tables.h
+funzip.obj:     funzip.c $(UNZIP_H) crc32.h crypt.h ttyio.h
 	$(CC) -c $(FUFLAGS) -o$@ funzip.c
 
-crc32f.obj:     crc32.c $(UNZIP_H) zip.h
+crc32f.obj:     crc32.c $(UNZIP_H) zip.h crc32.h
 	$(CC) -c $(FUFLAGS) -o$@ crc32.c
 
-cryptf.obj:     crypt.c $(UNZIP_H) zip.h crypt.h ttyio.h
+cryptf.obj:     crypt.c $(UNZIP_H) zip.h crypt.h crc32.h ttyio.h
 	$(CC) -c $(FUFLAGS) -o$@ crypt.c
 
 globalsf.obj:   globals.c $(UNZIP_H)
@@ -310,22 +323,22 @@ ttyiof.obj:     ttyio.c $(UNZIP_H) zip.h crypt.h ttyio.h
 win32f.obj:     win32/win32.c $(UNZIP_H) win32/nt.h
 	$(CC) -c $(FUFLAGS) -o$@ win32/win32.c
 
+win32i64f.obj:  win32/win32i64.c $(UNZIP_H)
+	$(CC) -c $(FUFLAGS) -o$@ win32/win32i64.c
+
 unzipsfx.obj:   unzip.c $(UNZIP_H) crypt.h unzvers.h consts.h
 	$(CC) -c $(SXFLAGS) -o$@ unzip.c
 
-crc32x.obj:     crc32.c $(UNZIP_H) zip.h
+crc32x.obj:     crc32.c $(UNZIP_H) zip.h crc32.h
 	$(CC) -c $(SXFLAGS) -o$@ crc32.c
 
-crctabx.obj:    crctab.c $(UNZIP_H) zip.h
-	$(CC) -c $(SXFLAGS) -o$@ crctab.c
-
-cryptx.obj:     crypt.c $(UNZIP_H) zip.h crypt.h ttyio.h
+cryptx.obj:     crypt.c $(UNZIP_H) zip.h crypt.h crc32.h ttyio.h
 	$(CC) -c $(SXFLAGS) -o$@ crypt.c
 
-extractx.obj:   extract.c $(UNZIP_H) crypt.h
+extractx.obj:   extract.c $(UNZIP_H) crc32.h crypt.h
 	$(CC) -c $(SXFLAGS) -o$@ extract.c
 
-fileiox.obj:    fileio.c $(UNZIP_H) crypt.h ttyio.h ebcdic.h
+fileiox.obj:    fileio.c $(UNZIP_H) crc32.h crypt.h ttyio.h ebcdic.h
 	$(CC) -c $(SXFLAGS) -o$@ fileio.c
 
 globalsx.obj:   globals.c $(UNZIP_H)
@@ -337,7 +350,7 @@ inflatex.obj:   inflate.c inflate.h $(UNZIP_H)
 matchx.obj:     match.c $(UNZIP_H)
 	$(CC) -c $(SXFLAGS) -o$@ match.c
 
-processx.obj:   process.c $(UNZIP_H)
+processx.obj:   process.c $(UNZIP_H) crc32.h
 	$(CC) -c $(SXFLAGS) -o$@ process.c
 
 timezonx.obj:   timezone.c $(UNZIP_H) zip.h timezone.h
@@ -346,8 +359,14 @@ timezonx.obj:   timezone.c $(UNZIP_H) zip.h timezone.h
 ttyiox.obj:     ttyio.c $(UNZIP_H) zip.h crypt.h ttyio.h
 	$(CC) -c $(SXFLAGS) -o$@ ttyio.c
 
+ubz2errx.obj:   ubz2err.c $(UNZIP_H)
+	$(CC) -c $(SXFLAGS) -o$@ ubz2err.c
+
 win32x.obj:     win32/win32.c $(UNZIP_H) win32/nt.h
 	$(CC) -c $(SXFLAGS) -o$@ win32/win32.c
+
+win32i64x.obj:  win32/win32i64.c $(UNZIP_H)
+	$(CC) -c $(SXFLAGS) -o$@ win32/win32i64.c
 
 ntx.obj:        win32/nt.c $(UNZIP_H) win32/nt.h
 	$(CC) -c $(SXFLAGS) -o$@ win32/nt.c
@@ -355,26 +374,26 @@ ntx.obj:        win32/nt.c $(UNZIP_H) win32/nt.h
 uzexampl.obj:   windll/uzexampl.c windll/uzexampl.h
 	$(CC) -c $(UNFLAGS) -I./windll -o$@ windll/uzexampl.c
 
+winapp.res:	win32/winapp.rc unzvers.h
+	$(RC) /l 0x409 /fo$@ /i win32 /d WIN32 win32/winapp.rc
+
 # DLL compilation section
 api.obj:        api.c $(UNZIP_H) $(WINDLL_H) unzvers.h
 	$(CC) -c $(DLFLAGS) -o$@ api.c
 
-crc32l.obj:     crc32.c $(UNZIP_H) zip.h
+crc32l.obj:     crc32.c $(UNZIP_H) zip.h crc32.h
 	$(CC) -c $(DLFLAGS) -o$@ crc32.c
 
-crctabl.obj:    crctab.c $(UNZIP_H) zip.h
-	$(CC) -c $(DLFLAGS) -o$@ crctab.c
-
-cryptl.obj:     crypt.c $(UNZIP_H) zip.h crypt.h ttyio.h
+cryptl.obj:     crypt.c $(UNZIP_H) zip.h crypt.h crc32.h ttyio.h
 	$(CC) -c $(DLFLAGS) -o$@ crypt.c
 
 explodel.obj:    explode.c $(UNZIP_H)
 	$(CC) -c $(DLFLAGS) -o$@ explode.c
 
-extractl.obj:   extract.c $(UNZIP_H) $(WINDLL_H) crypt.h
+extractl.obj:   extract.c $(UNZIP_H) $(WINDLL_H) crc32.h crypt.h
 	$(CC) -c $(DLFLAGS) -o$@ extract.c
 
-fileiol.obj:    fileio.c $(UNZIP_H) $(WINDLL_H) crypt.h ttyio.h ebcdic.h
+fileiol.obj:    fileio.c $(UNZIP_H) $(WINDLL_H) crc32.h crypt.h ttyio.h ebcdic.h
 	$(CC) -c $(DLFLAGS) -o$@ fileio.c
 
 globalsl.obj:   globals.c $(UNZIP_H)
@@ -389,11 +408,14 @@ listl.obj:      list.c $(UNZIP_H) $(WINDLL_H)
 matchl.obj:     match.c $(UNZIP_H)
 	$(CC) -c $(DLFLAGS) -o$@ match.c
 
-processl.obj:   process.c $(UNZIP_H) $(WINDLL_H)
+processl.obj:   process.c $(UNZIP_H) $(WINDLL_H) crc32.h
 	$(CC) -c $(DLFLAGS) -o$@ process.c
 
 timezonl.obj:   timezone.c $(UNZIP_H) zip.h timezone.h
 	$(CC) -c $(DLFLAGS) -o$@ timezone.c
+
+ubz2errl.obj:   ubz2err.c $(UNZIP_H)
+	$(CC) -c $(DLFLAGS) -o$@ ubz2err.c
 
 unreducl.obj:   unreduce.c $(UNZIP_H)
 	$(CC) -c $(DLFLAGS) -o$@ unreduce.c
@@ -406,6 +428,9 @@ zipinfol.obj:   zipinfo.c $(UNZIP_H)
 
 win32l.obj:     win32/win32.c $(UNZIP_H) win32/nt.h
 	$(CC) -c $(DLFLAGS) -o$@ win32/win32.c
+
+win32i64l.obj:  win32/win32i64.c $(UNZIP_H)
+	$(CC) -c $(DLFLAGS) -o$@ win32/win32i64.c
 
 ntl.obj:        win32/nt.c $(UNZIP_H) win32/nt.h
 	$(CC) -c $(DLFLAGS) -o$@ win32/nt.c
@@ -420,22 +445,19 @@ windll.res:	windll/windll.rc unzvers.h
 apig.obj:       api.c $(UNZIP_H) $(WINDLL_H) unzvers.h
 	$(CC) -c $(SLFLAGS) -o$@ api.c
 
-crc32g.obj:     crc32.c $(UNZIP_H) zip.h
+crc32g.obj:     crc32.c $(UNZIP_H) zip.h crc32.h
 	$(CC) -c $(SLFLAGS) -o$@ crc32.c
 
-crctabg.obj:    crctab.c $(UNZIP_H) zip.h
-	$(CC) -c $(SLFLAGS) -o$@ crctab.c
-
-cryptg.obj:     crypt.c $(UNZIP_H) zip.h crypt.h ttyio.h
+cryptg.obj:     crypt.c $(UNZIP_H) zip.h crypt.h crc32.h ttyio.h
 	$(CC) -c $(SLFLAGS) -o$@ crypt.c
 
 explodeg.obj:    explode.c $(UNZIP_H)
 	$(CC) -c $(SLFLAGS) -o$@ explode.c
 
-extractg.obj:   extract.c $(UNZIP_H) $(WINDLL_H) crypt.h
+extractg.obj:   extract.c $(UNZIP_H) $(WINDLL_H) crc32.h crypt.h
 	$(CC) -c $(SLFLAGS) -o$@ extract.c
 
-fileiog.obj:    fileio.c $(UNZIP_H) $(WINDLL_H) crypt.h ttyio.h ebcdic.h
+fileiog.obj:    fileio.c $(UNZIP_H) $(WINDLL_H) crc32.h crypt.h ttyio.h ebcdic.h
 	$(CC) -c $(SLFLAGS) -o$@ fileio.c
 
 globalsg.obj:   globals.c $(UNZIP_H)
@@ -447,14 +469,20 @@ inflateg.obj:   inflate.c inflate.h $(UNZIP_H) crypt.h
 matchg.obj:     match.c $(UNZIP_H)
 	$(CC) -c $(SLFLAGS) -o$@ match.c
 
-processg.obj:   process.c $(UNZIP_H) $(WINDLL_H)
+processg.obj:   process.c $(UNZIP_H) $(WINDLL_H) crc32.h
 	$(CC) -c $(SLFLAGS) -o$@ process.c
 
 timezong.obj:   timezone.c $(UNZIP_H) zip.h timezone.h
 	$(CC) -c $(SLFLAGS) -o$@ timezone.c
 
+ubz2errg.obj:   ubz2err.c $(UNZIP_H)
+	$(CC) -c $(SLFLAGS) -o$@ ubz2err.c
+
 win32g.obj:     win32/win32.c $(UNZIP_H) win32/nt.h
 	$(CC) -c $(SLFLAGS) -o$@ win32/win32.c
+
+win32i64g.obj:  win32/win32i64.c $(UNZIP_H)
+	$(CC) -c $(SLFLAGS) -o$@ win32/win32i64.c
 
 ntg.obj:        win32/nt.c $(UNZIP_H) win32/nt.h
 	$(CC) -c $(SLFLAGS) -o$@ win32/nt.c
@@ -472,22 +500,19 @@ sfxwiz.res:     windll/guisfx/sfxwiz.rc
 $(OB)apib.obj:      api.c $(UNZIP_H) $(WINDLL_H) unzvers.h
 	$(CC) -c $(LBFLAGS) -o$@ api.c
 
-$(OB)crc32b.obj:    crc32.c $(UNZIP_H) zip.h
+$(OB)crc32b.obj:    crc32.c $(UNZIP_H) zip.h crc32.h
 	$(CC) -c $(LBFLAGS) -o$@ crc32.c
 
-$(OB)crctabb.obj:   crctab.c $(UNZIP_H) zip.h
-	$(CC) -c $(LBFLAGS) -o$@ crctab.c
-
-$(OB)cryptb.obj:    crypt.c $(UNZIP_H) zip.h crypt.h ttyio.h
+$(OB)cryptb.obj:    crypt.c $(UNZIP_H) zip.h crypt.h crc32.h ttyio.h
 	$(CC) -c $(LBFLAGS) -o$@ crypt.c
 
 $(OB)explodeb.obj:  explode.c $(UNZIP_H)
 	$(CC) -c $(LBFLAGS) -o$@ explode.c
 
-$(OB)extractb.obj:  extract.c $(UNZIP_H) $(WINDLL_H) crypt.h
+$(OB)extractb.obj:  extract.c $(UNZIP_H) $(WINDLL_H) crc32.h crypt.h
 	$(CC) -c $(LBFLAGS) -o$@ extract.c
 
-$(OB)fileiob.obj:   fileio.c $(UNZIP_H) $(WINDLL_H) crypt.h ttyio.h ebcdic.h
+$(OB)fileiob.obj:   fileio.c $(UNZIP_H) $(WINDLL_H) crc32.h crypt.h ttyio.h ebcdic.h
 	$(CC) -c $(LBFLAGS) -o$@ fileio.c
 
 $(OB)globalsb.obj:  globals.c $(UNZIP_H)
@@ -502,11 +527,14 @@ $(OB)listb.obj:     list.c $(UNZIP_H) $(WINDLL_H)
 $(OB)matchb.obj:    match.c $(UNZIP_H)
 	$(CC) -c $(LBFLAGS) -o$@ match.c
 
-$(OB)processb.obj:  process.c $(UNZIP_H) $(WINDLL_H)
+$(OB)processb.obj:  process.c $(UNZIP_H) $(WINDLL_H) crc32.h
 	$(CC) -c $(LBFLAGS) -o$@ process.c
 
 $(OB)timezonb.obj:  timezone.c $(UNZIP_H) zip.h timezone.h
 	$(CC) -c $(LBFLAGS) -o$@ timezone.c
+
+$(OB)ubz2errb.obj:  ubz2err.c $(UNZIP_H)
+	$(CC) -c $(LBFLAGS) -o$@ ubz2err.c
 
 $(OB)unreducb.obj:  unreduce.c $(UNZIP_H)
 	$(CC) -c $(LBFLAGS) -o$@ unreduce.c
@@ -519,6 +547,9 @@ $(OB)zipinfob.obj:  zipinfo.c $(UNZIP_H)
 
 $(OB)win32b.obj:    win32/win32.c $(UNZIP_H) win32/nt.h
 	$(CC) -c $(LBFLAGS) -o$@ win32/win32.c
+
+$(OB)win32i64b.obj: win32/win32i64.c $(UNZIP_H)
+	$(CC) -c $(LBFLAGS) -o$@ win32/win32i64.c
 
 $(OB)ntb.obj:       win32/nt.c $(UNZIP_H) win32/nt.h
 	$(CC) -c $(LBFLAGS) -o$@ win32/nt.c

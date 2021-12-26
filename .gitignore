@@ -90,3 +90,7 @@ libjpeg-turbo-win/DebugLib-Static/
 *.idb
 addon/ms-logon/logging/x64/
 *.suo
+zipunzip_src/unzip/windll/vc8/.vs/unzip32/v16/Browse.VC.db
+libjpeg-turbo-win/.vs/libjpeg-turbo-win_VC2017/v16/Browse.VC.db
+libjpeg-turbo-win/.vs/libjpeg-turbo-win_VC2017/v16/Browse.VC.db-wal
+libjpeg-turbo-win/.vs/libjpeg-turbo-win_VC2017/v16/Browse.VC.db-shm

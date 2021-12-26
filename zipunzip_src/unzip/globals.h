@@ -1,7 +1,7 @@
 /*
-  Copyright (c) 1990-2004 Info-ZIP.  All rights reserved.
+  Copyright (c) 1990-2009 Info-ZIP.  All rights reserved.
 
-  See the accompanying file LICENSE, version 2000-Apr-09 or later
+  See the accompanying file LICENSE, version 2009-Jan-02 or later
   (the contents of which are also included in unzip.h) for terms of use.
   If, for some reason, all these files are missing, the Info-ZIP license
   also may be found at:  ftp://ftp.info-zip.org/pub/infozip/license.html
@@ -136,10 +136,14 @@
 #define __globals_h
 
 #ifdef USE_ZLIB
-#  include "zstd_zlibwrapper.h"
+#  include "../../zlib/zlib.h"
 #  ifdef zlib_version           /* This name is used internally in unzip */
 #    undef zlib_version         /*  and must not be defined as a macro. */
 #  endif
+#endif
+
+#ifdef USE_BZIP2
+#  include "bzlib.h"
 #endif
 
 
@@ -181,10 +185,10 @@ typedef struct Globals {
     int create_dirs;      /* used by main(), mapname(), checkdir() */
     int extract_flag;
     int newzip;           /* reset in extract.c; used in crypt.c */
-    Z_OFF_T   real_ecrec_offset;
-    Z_OFF_T   expect_ecrec_offset;
-    long csize;           /* used by decompr. (NEXTBYTE): must be signed */
-    long used_csize;      /* used by extract_or_test_member(), explode() */
+    zoff_t   real_ecrec_offset;
+    zoff_t   expect_ecrec_offset;
+    zoff_t   csize;       /* used by decompr. (NEXTBYTE): must be signed */
+    zoff_t   used_csize;  /* used by extract_or_test_member(), explode() */
 
 #ifdef DLL
      int fValidate;       /* true if only validating an archive */
@@ -219,17 +223,15 @@ typedef struct Globals {
 #endif /* !FUNZIP */
     union work area;                /* see unzpriv.h for definition of work */
 
-#ifndef FUNZIP
-#  if (!defined(USE_ZLIB) || defined(USE_OWN_CRCTAB))
+#if (!defined(USE_ZLIB) || defined(USE_OWN_CRCTAB))
     ZCONST ulg near *crc_32_tab;
-#  else
+#else
     ZCONST ulg Far *crc_32_tab;
-#  endif
 #endif
-    ulg       crc32_unzipval;             /* CRC shift reg. (was static in funzip) */
+    ulg       crc32val;             /* CRC shift reg. (was static in funzip) */
 
 #ifdef FUNZIP
-    FILE     *in;                   /* file descriptor of compressed stream */
+    FILE      *in;                  /* file descriptor of compressed stream */
 #endif
     uch       *inbuf;               /* input buffer (any size is OK) */
     uch       *inptr;               /* pointer into input buffer */
@@ -247,16 +249,16 @@ typedef struct Globals {
 #else
     int       zipfd;                /* zipfile file handle */
 #endif
-    Z_OFF_T   ziplen;
-    Z_OFF_T   cur_zipfile_bufstart; /* extract_or_test, readbuf, ReadByte */
-    Z_OFF_T   extra_bytes;          /* used in unzip.c, misc.c */
+    zoff_t    ziplen;
+    zoff_t    cur_zipfile_bufstart; /* extract_or_test, readbuf, ReadByte */
+    zoff_t    extra_bytes;          /* used in unzip.c, misc.c */
     uch       *extra_field;         /* Unix, VMS, Mac, OS/2, Acorn, ... */
     uch       *hold;
 
     local_file_hdr  lrec;          /* used in unzip.c, extract.c */
     cdir_file_hdr   crec;          /* used in unzip.c, extract.c, misc.c */
     ecdir_rec       ecrec;         /* used in unzip.c, extract.c */
-    struct stat     statbuf;       /* used by main, mapname, check_for_newer */
+    z_stat   statbuf;              /* used by main, mapname, check_for_newer */
 
     int      mem_mode;
     uch      *outbufptr;           /* extract.c static */
@@ -290,6 +292,19 @@ typedef struct Globals {
     ulg      outcnt;               /* number of chars stored in outbuf */
 #ifndef FUNZIP
     char     filename[FILNAMSIZ];  /* also used by NT for temporary SFX path */
+#ifdef UNICODE_SUPPORT
+    char     *filename_full;       /* the full path so Unicode checks work */
+    extent   fnfull_bufsize;       /* size of allocated filename buffer */
+    int      unicode_escape_all;
+    int      unicode_mismatch;
+#ifdef UTF8_MAYBE_NATIVE
+    int      native_is_utf8;       /* bool, TRUE => native charset == UTF-8 */
+#endif
+
+    int      unipath_version;      /* version of Unicode field */
+    ulg      unipath_checksum;     /* Unicode field checksum */
+    char     *unipath_filename;    /* UTF-8 path */
+#endif /* UNICODE_SUPPORT */
 
 #ifdef CMS_MVS
     char     *tempfn;              /* temp file used; erase on close */
@@ -298,7 +313,7 @@ typedef struct Globals {
     char *key;         /* crypt static: decryption password or NULL */
     int nopwd;         /* crypt static */
 #endif /* !FUNZIP */
-    ulg keys[3];       /* crypt static: keys defining pseudo-random sequence */
+    z_uint4 keys[3];   /* crypt static: keys defining pseudo-random sequence */
 
 #if (!defined(DOS_FLX_H68_NLM_OS2_W32) && !defined(AMIGA) && !defined(RISCOS))
 #if (!defined(MACOS) && !defined(ATARI) && !defined(VMS))
@@ -332,6 +347,10 @@ typedef struct Globals {
 #endif /* ?USE_ZLIB */
 
 #ifndef FUNZIP
+    /* cylindric buffer space for formatting zoff_t values (fileio static) */
+    char fzofft_buf[FZOFFT_NUM][FZOFFT_LEN];
+    int fzofft_index;
+
 #ifdef SMALL_MEM
     char rgchBigBuffer[512];
     char rgchSmallBuffer[96];
@@ -371,16 +390,7 @@ typedef struct Globals {
 /***************************************************************************/
 
 
-#ifdef FUNZIP
-#  if (!defined(USE_ZLIB) || defined(USE_OWN_CRCTAB))
-     extern ZCONST ulg near  crc_32_tab[256];
-#  else
-     extern ZCONST ulg Far *crc_32_tab;
-#  endif
-#  define CRC_32_TAB  crc_32_tab
-#else
-#  define CRC_32_TAB  G.crc_32_tab
-#endif
+#define CRC_32_TAB      G.crc_32_tab
 
 
 Uz_Globs *globalsCtor   OF((void));
@@ -391,6 +401,9 @@ Uz_Globs *globalsCtor   OF((void));
 extern char local_hdr_sig[4];
 extern char central_hdr_sig[4];
 extern char end_central_sig[4];
+extern char end_central32_sig[4];
+extern char end_central64_sig[4];
+extern char end_centloc64_sig[4];
 /* extern char extd_local_sig[4];  NOT USED YET */
 
 #ifdef REENTRANT

@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 1990-2005 Info-ZIP.  All rights reserved.
+  Copyright (c) 1990-2007 Info-ZIP.  All rights reserved.
 
   See the accompanying file LICENSE, version 2000-Apr-09 or later
   (the contents of which are also included in unzip.h) for terms of use.
@@ -52,6 +52,12 @@
 #  define FILE_SHARE_DELETE 0x00000004
 #endif
 
+/* This macro definition is missing in old versions of MS' winbase.h. */
+#ifndef InterlockedExchangePointer
+#  define InterlockedExchangePointer(Target, Value) \
+      (PVOID)InterlockedExchange((PLONG)(Target), (LONG)(Value))
+#endif
+
 
 /* private prototypes */
 
@@ -60,8 +66,8 @@ static VOID GetRemotePrivilegesSet(CHAR *FileName, PDWORD dwRemotePrivileges);
 static VOID InitLocalPrivileges(VOID);
 
 
-BOOL bInitialized = FALSE;  /* module level stuff initialized? */
-HANDLE hInitMutex = NULL;   /* prevent multiple initialization */
+volatile BOOL bInitialized = FALSE; /* module level stuff initialized? */
+HANDLE hInitMutex = NULL;           /* prevent multiple initialization */
 
 BOOL g_bRestorePrivilege = FALSE;   /* for local set file security override */
 BOOL g_bSaclPrivilege = FALSE;      /* for local set sacl operations, only when
@@ -89,16 +95,18 @@ static BOOL Initialize(VOID)
     HANDLE hMutex;
     HANDLE hOldMutex;
 
-    if(bInitialized) return TRUE;
+    if (bInitialized) return TRUE;
 
     hMutex = CreateMutex(NULL, TRUE, NULL);
     if(hMutex == NULL) return FALSE;
 
-    hOldMutex = (HANDLE)InterlockedExchange((LPLONG)&hInitMutex, (LONG)hMutex);
+    hOldMutex = (HANDLE)InterlockedExchangePointer((void *)&hInitMutex,
+                                                   hMutex);
 
-    if(hOldMutex != NULL) {
+    if (hOldMutex != NULL) {
         /* somebody setup the mutex already */
-        InterlockedExchange((LPLONG)&hInitMutex, (LONG)hOldMutex);
+        InterlockedExchangePointer((void *)&hInitMutex,
+                                   hOldMutex);
 
         CloseHandle(hMutex); /* close new, un-needed mutex */
 
@@ -109,16 +117,23 @@ static BOOL Initialize(VOID)
         return bInitialized;
     }
 
-    /* initialize module level resources */
+    if (!bInitialized) {
+        /* initialize module level resources */
 
-    InitializeCriticalSection( &VolumeCapsLock );
-    memset(&g_VolumeCaps, 0, sizeof(VOLUMECAPS));
+        InitializeCriticalSection( &VolumeCapsLock );
+        memset(&g_VolumeCaps, 0, sizeof(VOLUMECAPS));
 
-    InitLocalPrivileges();
+        InitLocalPrivileges();
 
-    bInitialized = TRUE;
+        bInitialized = TRUE;
+    }
+
+    InterlockedExchangePointer((void *)&hInitMutex,
+                               NULL);
 
     ReleaseMutex(hMutex); /* release correct mutex */
+
+    CloseHandle(hMutex);  /* free the no longer needed handle resource */
 
     return TRUE;
 }
@@ -141,7 +156,7 @@ BOOL ValidateSecurity(uch *securitydata)
     if(!GetSecurityDescriptorDacl(sd, &bAclPresent, &pAcl, &bDefaulted))
         return FALSE;
 
-    if(bAclPresent) {
+    if(bAclPresent && pAcl!=NULL) {
         if(!IsValidAcl(pAcl)) return FALSE;
     }
 
@@ -150,7 +165,7 @@ BOOL ValidateSecurity(uch *securitydata)
     if(!GetSecurityDescriptorSacl(sd, &bAclPresent, &pAcl, &bDefaulted))
         return FALSE;
 
-    if(bAclPresent) {
+    if(bAclPresent && pAcl!=NULL) {
         if(!IsValidAcl(pAcl)) return FALSE;
     }
 
@@ -257,7 +272,7 @@ BOOL GetVolumeCaps(
     if(rootpath != NULL && rootpath[0] != '\0') {
         DWORD i;
 
-        cchTempRootPath = lstrlen(rootpath);
+        cchTempRootPath = lstrlenA(rootpath);
         if(cchTempRootPath > MAX_PATH) return FALSE;
 
         /* copy input, converting forward slashes to back slashes as we go */
@@ -329,7 +344,7 @@ BOOL GetVolumeCaps(
     EnterCriticalSection( &VolumeCapsLock );
 
     if(!g_VolumeCaps.bValid ||
-       lstrcmpi(g_VolumeCaps.RootPath, TempRootPath) != 0)
+       lstrcmpiA(g_VolumeCaps.RootPath, TempRootPath) != 0)
     {
 
         /* no match found, build up new entry */
@@ -341,7 +356,7 @@ BOOL GetVolumeCaps(
         /* release lock during expensive operations */
         LeaveCriticalSection( &VolumeCapsLock );
 
-        bSuccess = GetVolumeInformation(
+        bSuccess = GetVolumeInformationA(
             (TempRootPath[0] == '\0') ? NULL : TempRootPath,
             NULL, 0,
             NULL, NULL,
@@ -355,7 +370,7 @@ BOOL GetVolumeCaps(
         if(bSuccess && (dwFileSystemFlags & FS_PERSISTENT_ACLS) &&
            VolumeCaps->bUsePrivileges)
         {
-            if(GetDriveType( (TempRootPath[0] == '\0') ? NULL : TempRootPath )
+            if(GetDriveTypeA( (TempRootPath[0] == '\0') ? NULL : TempRootPath )
                == DRIVE_REMOTE)
             {
                 bRemote = TRUE;

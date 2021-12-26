@@ -1,26 +1,26 @@
 # Microsoft Developer Studio Project File - Name="unzipsfx" - Package Owner=<4>
 # Microsoft Developer Studio Generated Build File, Format Version 6.00
-# ** NICHT BEARBEITEN **
+# ** DO NOT EDIT **
 
 # TARGTYPE "Win32 (x86) Console Application" 0x0103
 
 CFG=unzipsfx - Win32 ASM Debug
-!MESSAGE Dies ist kein gültiges Makefile. Zum Erstellen dieses Projekts mit NMAKE
-!MESSAGE verwenden Sie den Befehl "Makefile exportieren" und führen Sie den Befehl
+!MESSAGE This is not a valid makefile. To build this project using NMAKE,
+!MESSAGE use the Export Makefile command and run
 !MESSAGE 
 !MESSAGE NMAKE /f "unzipsfx.mak".
 !MESSAGE 
-!MESSAGE Sie können beim Ausführen von NMAKE eine Konfiguration angeben
-!MESSAGE durch Definieren des Makros CFG in der Befehlszeile. Zum Beispiel:
+!MESSAGE You can specify a configuration when running NMAKE
+!MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
 !MESSAGE NMAKE /f "unzipsfx.mak" CFG="unzipsfx - Win32 ASM Debug"
 !MESSAGE 
-!MESSAGE Für die Konfiguration stehen zur Auswahl:
+!MESSAGE Possible choices for configuration are:
 !MESSAGE 
-!MESSAGE "unzipsfx - Win32 Release" (basierend auf  "Win32 (x86) Console Application")
-!MESSAGE "unzipsfx - Win32 Debug" (basierend auf  "Win32 (x86) Console Application")
-!MESSAGE "unzipsfx - Win32 ASM Release" (basierend auf  "Win32 (x86) Console Application")
-!MESSAGE "unzipsfx - Win32 ASM Debug" (basierend auf  "Win32 (x86) Console Application")
+!MESSAGE "unzipsfx - Win32 Release" (based on "Win32 (x86) Console Application")
+!MESSAGE "unzipsfx - Win32 Debug" (based on "Win32 (x86) Console Application")
+!MESSAGE "unzipsfx - Win32 ASM Release" (based on "Win32 (x86) Console Application")
+!MESSAGE "unzipsfx - Win32 ASM Debug" (based on "Win32 (x86) Console Application")
 !MESSAGE 
 
 # Begin Project
@@ -147,10 +147,6 @@ SOURCE=..\crc_i386.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\crctab.c
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\crypt.c
 # End Source File
 # Begin Source File
@@ -187,6 +183,10 @@ SOURCE=..\..\ttyio.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\ubz2err.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\unzip.c
 # End Source File
 # Begin Source File
@@ -200,6 +200,10 @@ SOURCE=..\win32.c
 # Begin Source File
 
 SOURCE=..\..\consts.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\crc32.h
 # End Source File
 # Begin Source File
 

@@ -1,13 +1,13 @@
 /*
-  Copyright (c) 1990-2005 Info-ZIP.  All rights reserved.
+  Copyright (c) 1990-2008 Info-ZIP.  All rights reserved.
 
-  See the accompanying file LICENSE, version 2000-Apr-09 or later
+  See the accompanying file LICENSE, version 2007-Mar-04 or later
   (the contents of which are also included in unzip.h) for terms of use.
   If, for some reason, all these files are missing, the Info-ZIP license
   also may be found at:  ftp://ftp.info-zip.org/pub/infozip/license.html
 */
 /* inflate.c -- by Mark Adler
-   version c17a, 04 Feb 2001 */
+   version c17e, 30 Mar 2007 */
 
 
 /* Copyright history:
@@ -115,10 +115,18 @@
     c17  31 Dec 00  C. Spieler      added preliminary support for Deflate64
    c17a  04 Feb 01  C. Spieler      complete integration of Deflate64 support
    c17b  16 Feb 02  C. Spieler      changed type of "extra bits" arrays and
-                                    corresponding huft_buid() parameter e from
+                                    corresponding huft_build() parameter e from
                                     ush into uch, to save space
    c17c   9 Mar 02  C. Spieler      fixed NEEDBITS() "read beyond EOF" problem
                                     with CHECK_EOF enabled
+   c17d  23 Jul 05  C. Spieler      fixed memory leaks in inflate_dynamic()
+                                    when processing invalid compressed literal/
+                                    distance table data
+   c17e  30 Mar 07  C. Spieler      in inflate_dynamic(), initialize tl and td
+                                    to prevent freeing unallocated huft tables
+                                    when processing invalid compressed data and
+                                    hitting premature EOF, do not reuse td as
+                                    temp work ptr during tables decoding
  */
 
 
@@ -322,6 +330,67 @@
 /*---------------------------------------------------------------------------*/
 #ifdef USE_ZLIB
 
+/* Beginning with zlib version 1.2.0, a new inflate callback interface is
+   provided that allows tighter integration of the zlib inflate service
+   into unzip's extraction framework.
+   The advantages are:
+   - uses the windows buffer supplied by the unzip code; this saves one
+     copy process between zlib's internal decompression buffer and unzip's
+     post-decompression output buffer and improves performance.
+   - does not pull in unused checksum code (adler32).
+   The preprocessor flag NO_ZLIBCALLBCK can be set to force usage of the
+   old zlib 1.1.x interface, for testing purpose.
+ */
+#ifdef USE_ZLIB_INFLATCB
+#  undef USE_ZLIB_INFLATCB
+#endif
+#if (defined(ZLIB_VERNUM) && ZLIB_VERNUM >= 0x1200 && !defined(NO_ZLIBCALLBCK))
+#  define USE_ZLIB_INFLATCB 1
+#else
+#  define USE_ZLIB_INFLATCB 0
+#endif
+
+/* Check for incompatible combinations of zlib and Deflate64 support. */
+#if defined(USE_DEFLATE64)
+# if !USE_ZLIB_INFLATCB
+  #error Deflate64 is incompatible with traditional (pre-1.2.x) zlib interface!
+# else
+   /* The Deflate64 callback function in the framework of zlib 1.2.x requires
+      the inclusion of the unsupported infback9 header file:
+    */
+#  include "infback9.h"
+# endif
+#endif /* USE_DEFLATE64 */
+
+
+#if USE_ZLIB_INFLATCB
+
+static unsigned zlib_inCB OF((void FAR *pG, unsigned char FAR * FAR * pInbuf));
+static int zlib_outCB OF((void FAR *pG, unsigned char FAR *outbuf,
+                          unsigned outcnt));
+
+static unsigned zlib_inCB(pG, pInbuf)
+    void FAR *pG;
+    unsigned char FAR * FAR * pInbuf;
+{
+    *pInbuf = G.inbuf;
+    return fillinbuf(__G);
+}
+
+static int zlib_outCB(pG, outbuf, outcnt)
+    void FAR *pG;
+    unsigned char FAR *outbuf;
+    unsigned outcnt;
+{
+#ifdef FUNZIP
+    return flush(__G__ (ulg)(outcnt));
+#else
+    return ((G.mem_mode) ? memflush(__G__ outbuf, (ulg)(outcnt))
+                         : flush(__G__ outbuf, (ulg)(outcnt), 0));
+#endif
+}
+#endif /* USE_ZLIB_INFLATCB */
+
 
 /*
    GRR:  return values for both original inflate() and UZinflate()
@@ -342,6 +411,154 @@ int UZinflate(__G__ is_defl64)
 {
     int retval = 0;     /* return code: 0 = "no error" */
     int err=Z_OK;
+#if USE_ZLIB_INFLATCB
+
+#if (defined(DLL) && !defined(NO_SLIDE_REDIR))
+    if (G.redirect_slide)
+        wsize = G.redirect_size, redirSlide = G.redirect_buffer;
+    else
+        wsize = WSIZE, redirSlide = slide;
+#endif
+
+    if (!G.inflInit) {
+        /* local buffer for efficiency */
+        ZCONST char *zlib_RtVersion = zlibVersion();
+
+        /* only need to test this stuff once */
+        if ((zlib_RtVersion[0] != ZLIB_VERSION[0]) ||
+            (zlib_RtVersion[2] != ZLIB_VERSION[2])) {
+            Info(slide, 0x21, ((char *)slide,
+              "error:  incompatible zlib version (expected %s, found %s)\n",
+              ZLIB_VERSION, zlib_RtVersion));
+            return 3;
+        } else if (strcmp(zlib_RtVersion, ZLIB_VERSION) != 0)
+            Info(slide, 0x21, ((char *)slide,
+              "warning:  different zlib version (expected %s, using %s)\n",
+              ZLIB_VERSION, zlib_RtVersion));
+
+        G.dstrm.zalloc = (alloc_func)Z_NULL;
+        G.dstrm.zfree = (free_func)Z_NULL;
+
+        G.inflInit = 1;
+    }
+
+#ifdef USE_DEFLATE64
+    if (is_defl64)
+    {
+        Trace((stderr, "initializing inflate9()\n"));
+        err = inflateBack9Init(&G.dstrm, redirSlide);
+
+        if (err == Z_MEM_ERROR)
+            return 3;
+        else if (err != Z_OK) {
+            Trace((stderr, "oops!  (inflateBack9Init() err = %d)\n", err));
+            return 2;
+        }
+
+        G.dstrm.next_in = G.inptr;
+        G.dstrm.avail_in = G.incnt;
+
+        err = inflateBack9(&G.dstrm, zlib_inCB, &G, zlib_outCB, &G);
+        if (err != Z_STREAM_END) {
+            if (err == Z_DATA_ERROR || err == Z_STREAM_ERROR) {
+                Trace((stderr, "oops!  (inflateBack9() err = %d)\n", err));
+                retval = 2;
+            } else if (err == Z_MEM_ERROR) {
+                retval = 3;
+            } else if (err == Z_BUF_ERROR) {
+                Trace((stderr, "oops!  (inflateBack9() err = %d)\n", err));
+                if (G.dstrm.next_in == Z_NULL) {
+                    /* input failure */
+                    Trace((stderr, "  inflateBack9() input failure\n"));
+                    retval = 2;
+                } else {
+                    /* output write failure */
+                    retval = (G.disk_full != 0 ? PK_DISK : IZ_CTRLC);
+                }
+            } else {
+                Trace((stderr, "oops!  (inflateBack9() err = %d)\n", err));
+                retval = 2;
+            }
+        }
+        if (G.dstrm.next_in != NULL) {
+            G.inptr = (uch *)G.dstrm.next_in;
+            G.incnt = G.dstrm.avail_in;
+        }
+
+        err = inflateBack9End(&G.dstrm);
+        if (err != Z_OK) {
+            Trace((stderr, "oops!  (inflateBack9End() err = %d)\n", err));
+            if (retval == 0)
+                retval = 2;
+        }
+    }
+    else
+#endif /* USE_DEFLATE64 */
+    {
+        /* For the callback interface, inflate initialization has to
+           be called before each decompression call.
+         */
+        {
+            unsigned i;
+            int windowBits;
+            /* windowBits = log2(wsize) */
+            for (i = (unsigned)wsize, windowBits = 0;
+                 !(i & 1);  i >>= 1, ++windowBits);
+            if ((unsigned)windowBits > (unsigned)15)
+                windowBits = 15;
+            else if (windowBits < 8)
+                windowBits = 8;
+
+            Trace((stderr, "initializing inflate()\n"));
+            err = inflateBackInit(&G.dstrm, windowBits, redirSlide);
+
+            if (err == Z_MEM_ERROR)
+                return 3;
+            else if (err != Z_OK) {
+                Trace((stderr, "oops!  (inflateBackInit() err = %d)\n", err));
+                return 2;
+            }
+        }
+
+        G.dstrm.next_in = G.inptr;
+        G.dstrm.avail_in = G.incnt;
+
+        err = inflateBack(&G.dstrm, zlib_inCB, &G, zlib_outCB, &G);
+        if (err != Z_STREAM_END) {
+            if (err == Z_DATA_ERROR || err == Z_STREAM_ERROR) {
+                Trace((stderr, "oops!  (inflateBack() err = %d)\n", err));
+                retval = 2;
+            } else if (err == Z_MEM_ERROR) {
+                retval = 3;
+            } else if (err == Z_BUF_ERROR) {
+                Trace((stderr, "oops!  (inflateBack() err = %d)\n", err));
+                if (G.dstrm.next_in == Z_NULL) {
+                    /* input failure */
+                    Trace((stderr, "  inflateBack() input failure\n"));
+                    retval = 2;
+                } else {
+                    /* output write failure */
+                    retval = (G.disk_full != 0 ? PK_DISK : IZ_CTRLC);
+                }
+            } else {
+                Trace((stderr, "oops!  (inflateBack() err = %d)\n", err));
+                retval = 2;
+            }
+        }
+        if (G.dstrm.next_in != NULL) {
+            G.inptr = (uch *)G.dstrm.next_in;
+            G.incnt = G.dstrm.avail_in;
+        }
+
+        err = inflateBackEnd(&G.dstrm);
+        if (err != Z_OK) {
+            Trace((stderr, "oops!  (inflateBackEnd() err = %d)\n", err));
+            if (retval == 0)
+                retval = 2;
+        }
+    }
+
+#else /* !USE_ZLIB_INFLATCB */
     int repeated_buf_err;
 
 #if (defined(DLL) && !defined(NO_SLIDE_REDIR))
@@ -490,6 +707,7 @@ uzinflate_cleanup_exit:
     if (err != Z_OK)
         Trace((stderr, "oops!  (inflateReset() err = %d)\n", err));
 
+#endif /* ?USE_ZLIB_INFLATCB */
     return retval;
 }
 
@@ -983,8 +1201,9 @@ static int inflate_dynamic(__G)
   unsigned l;           /* last length */
   unsigned m;           /* mask for bit lengths table */
   unsigned n;           /* number of lengths to get */
-  struct huft *tl;      /* literal/length code table */
-  struct huft *td;      /* distance code table */
+  struct huft *tl = (struct huft *)NULL; /* literal/length code table */
+  struct huft *td = (struct huft *)NULL; /* distance code table */
+  struct huft *th;      /* temp huft table pointer used in tables decoding */
   unsigned bl;          /* lookup bits for tl */
   unsigned bd;          /* lookup bits for td */
   unsigned nb;          /* number of bit length codes */
@@ -1047,9 +1266,9 @@ static int inflate_dynamic(__G)
   while (i < n)
   {
     NEEDBITS(bl)
-    j = (td = tl + ((unsigned)b & m))->b;
+    j = (th = tl + ((unsigned)b & m))->b;
     DUMPBITS(j)
-    j = td->v.n;
+    j = th->v.n;
     if (j < 16)                 /* length of code in bits (0..15) */
       ll[i++] = l = j;          /* save last length in l */
     else if (j == 16)           /* repeat last length 3 to 6 times */
@@ -1057,8 +1276,10 @@ static int inflate_dynamic(__G)
       NEEDBITS(2)
       j = 3 + ((unsigned)b & 3);
       DUMPBITS(2)
-      if ((unsigned)i + j > n)
+      if ((unsigned)i + j > n) {
+        huft_free(tl);
         return 1;
+      }
       while (j--)
         ll[i++] = l;
     }
@@ -1067,8 +1288,10 @@ static int inflate_dynamic(__G)
       NEEDBITS(3)
       j = 3 + ((unsigned)b & 7);
       DUMPBITS(3)
-      if ((unsigned)i + j > n)
+      if ((unsigned)i + j > n) {
+        huft_free(tl);
         return 1;
+      }
       while (j--)
         ll[i++] = 0;
       l = 0;
@@ -1078,8 +1301,10 @@ static int inflate_dynamic(__G)
       NEEDBITS(7)
       j = 11 + ((unsigned)b & 0x7f);
       DUMPBITS(7)
-      if ((unsigned)i + j > n)
+      if ((unsigned)i + j > n) {
+        huft_free(tl);
         return 1;
+      }
       while (j--)
         ll[i++] = 0;
       l = 0;
@@ -1149,8 +1374,10 @@ static int inflate_dynamic(__G)
 
 cleanup_and_exit:
   /* free the decoding tables, return */
-  huft_free(tl);
-  huft_free(td);
+  if (tl != (struct huft *)NULL)
+    huft_free(tl);
+  if (td != (struct huft *)NULL)
+    huft_free(td);
   return retval;
 }
 
@@ -1207,7 +1434,7 @@ cleanup_and_exit:
 
 
 
-int inflate_copy(__G__ is_defl64)
+int inflate(__G__ is_defl64)
     __GDEF
     int is_defl64;
 /* decompress an inflated entry */

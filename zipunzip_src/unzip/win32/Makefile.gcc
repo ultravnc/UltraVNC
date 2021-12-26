@@ -2,9 +2,20 @@
 # Currently supported implementations: Cygnus/Win32 and MinGW32.
 #
 # First version: Cosmin Truta, Dec 1997.
-# Last revision: Christian Spieler, 20-Feb-2005.
+# Last revision: Christian Spieler, 09-Aug-2008.
 #
 # To use, do "make -f win32/makefile.gcc".
+
+# configuration switches supported:
+#   NOASM=1     disable assembler crc32 code, the generic C source code
+#               is used instead.
+#   NOCRC_OPT=1 disable "unfolding CRC tables" optimization.
+#   OPT_P6=1    add "modern gcc" tuning option for PentiumPro family CPU.
+#   USEBZ2=1    activate integrated compilation of bzip2 compression support,
+#               this requires the bzip2 sources present in the bzip2 subfolder.
+#   USEZLIB=1   replace internal deflate code by externally provided zlib.
+#   USE_POSIX=1 build posix-style binaries targeted for the CygWin unix
+#               emulation environment.
 
 
 ### Optional section
@@ -17,19 +28,55 @@ ifdef USEASM
 APPLY_ASMCRC=1
 endif
 
+# The external zlib library supplies its own crc32 implementation...
+ifdef USEZLIB
+APPLY_ASMCRC=0
+endif
+
 # default is ASM CRC code (from .S source) for now...
 ifndef APPLY_ASMCRC
 APPLY_ASMCRC=1
+endif
+
+# optional inclusion of bzip2 decompression
+IZ_BZIP2 = bzip2
+ifdef USEBZ2
+INC_BZ2LIB = -I$(IZ_BZIP2)
+LOCFLAGS = $(INC_BZ2LIB) -DUSE_BZIP2
+LD_BZ2LIB = -L$(IZ_BZIP2) -lbz2
+LIBBZIP2 = $(IZ_BZIP2)/libbz2.a
+else
+INC_BZ2LIB =
+LOCFLAGS =
+LD_BZ2LIB =
+LIBBZIP2 =
+endif
+LIBBZIP2X = $(LIBBZIP2)
+
+ifndef USEZLIB
+
+# Apply the "CRC unfolding tables" optimization unless explicitly disabled.
+# (This optimization might have negative effects on old CPU designs with a
+# small first-level data cache.)
+ifndef NOCRC_OPT
+LOCFLAGS += -DIZ_CRCOPTIM_UNFOLDTBL
 endif
 
 # Optional nonstandard preprocessor flags (as -DUSE_ZLIB or -DUSE_SMITH_CODE)
 # should be added to the environment via "set LOCAL_UNZIP=-DFOO" or added
 # to the declaration of LOCFLAGS here:
 ifneq ($(APPLY_ASMCRC),0)
-LOCFLAGS = -DASM_CRC $(LOCAL_UNZIP)
-else
-LOCFLAGS = $(LOCAL_UNZIP)
+LOCFLAGS += -DASM_CRC
 endif
+
+else    # ifndef USEZLIB
+
+LOCFLAGS += -DUSE_ZLIB
+
+endif   # ifndef USEZLIB ... else ...
+
+# Finally, append additional externally supplied options.
+LOCFLAGS += $(LOCAL_UNZIP)
 
 # Some gcc distributions for Win32 (e.g. CygWin) try to emulate a POSIX-
 # compatible (Unix-style) environment.  This Makefile defaults to a
@@ -94,13 +141,17 @@ CC_SPEED_OPT = -O2 $(CC_CPU_OPT)
 CC_OUT_OPT = -o
 
 # Other specific options
-CC_SPECIFIC_OPT = -c -DASM_CRC $(CC_ENVIR_OPT)
+CC_SPECIFIC_OPT = -c $(CC_ENVIR_OPT)
 AS_SPECIFIC_OPT = -c
 LD_SPECIFIC_OPT = -o $@
 
 # Libraries for the debug & release version
-# (GCC 2.95 and newer does not require the following library specifications)
+# (GCC 2.95 and newer does not require the system library specifications)
+ifdef USEZLIB
+LD_RELEASE_LIBS = -L. -lz -luser32 -ladvapi32
+else
 LD_RELEASE_LIBS = -luser32 -ladvapi32
+endif
 LD_DEBUG_LIBS = $(LD_RELEASE_LIBS)
 
 
@@ -111,6 +162,7 @@ OBJ = .o
 EXE = .exe
 
 .SUFFIXES: .c .S $(OBJ) $(EXE)
+.PHONY: FORCE
 
 # Commands
 RM = rm -f
@@ -152,41 +204,45 @@ endif
 GUILDFLAG=-mwindows
 
 # Object files
+ifneq ($(APPLY_ASMCRC),0)
 OBJA  = crc_i386$(OBJ)
-OBJU1 = unzip$(OBJ) crc32$(OBJ) crctab$(OBJ) crypt$(OBJ) envargs$(OBJ)
+else
+OBJA  =
+endif
+OBJU1 = unzip$(OBJ) crc32$(OBJ) crypt$(OBJ) envargs$(OBJ)
 OBJU2 = explode$(OBJ) extract$(OBJ) fileio$(OBJ) globals$(OBJ) inflate$(OBJ)
-OBJU3 = list$(OBJ) match$(OBJ) process$(OBJ) ttyio$(OBJ) unreduce$(OBJ)
-OBJU4 = unshrink$(OBJ) zipinfo$(OBJ)
-OBJUS = win32$(OBJ) nt$(OBJ)
+OBJU3 = list$(OBJ) match$(OBJ) process$(OBJ) ttyio$(OBJ) ubz2err$(OBJ)
+OBJU4 = unreduce$(OBJ) unshrink$(OBJ) zipinfo$(OBJ)
+OBJUS = win32$(OBJ) win32i64$(OBJ) nt$(OBJ) winapprc$(OBJ)
 OBJU  = $(OBJU1) $(OBJU2) $(OBJU3) $(OBJU4) $(OBJA) $(OBJUS)
-OBJX1 = unzipsfx$(OBJ) crc32x$(OBJ) crctabx$(OBJ) cryptx$(OBJ) extractx$(OBJ)
+OBJX1 = unzipsfx$(OBJ) crc32x$(OBJ) cryptx$(OBJ) extractx$(OBJ)
 OBJX2 = fileiox$(OBJ) globalsx$(OBJ) inflatex$(OBJ) matchx$(OBJ) processx$(OBJ)
-OBJX3 = ttyiox$(OBJ)
-OBJXS = win32x$(OBJ) ntx$(OBJ)
+OBJX3 = ttyiox$(OBJ) ubz2errx$(OBJ)
+OBJXS = win32x$(OBJ) win32i64x$(OBJ) ntx$(OBJ)
 OBJX  = $(OBJX1) $(OBJX2) $(OBJX3) $(OBJA) $(OBJXS)
 OBJF1 = funzip$(OBJ) crc32$(OBJ) cryptf$(OBJ) globalsf$(OBJ) inflatef$(OBJ)
 OBJF2 = ttyiof$(OBJ)
-OBJFS = win32f$(OBJ)
+OBJFS = win32f$(OBJ) win32i64f$(OBJ)
 OBJF  = $(OBJF1) $(OBJF2) $(OBJA) $(OBJFS)
 OBJDLL = windll$(OBJ) windllrc$(OBJ) api$(OBJ)
-OBJD1 = crc32l$(OBJ) crctabl$(OBJ) cryptl$(OBJ)
+OBJD1 = crc32l$(OBJ) cryptl$(OBJ)
 OBJD2 = explodel$(OBJ) extractl$(OBJ) fileiol$(OBJ) globalsl$(OBJ)
-OBJD3 = inflatel$(OBJ) listl$(OBJ) matchl$(OBJ) processl$(OBJ)
+OBJD3 = inflatel$(OBJ) listl$(OBJ) matchl$(OBJ) processl$(OBJ) ubz2errl$(OBJ)
 OBJD4 = unreducl$(OBJ) unshrnkl$(OBJ) zipinfol$(OBJ)
-OBJDS = win32l$(OBJ) ntl$(OBJ)
+OBJDS = win32l$(OBJ) win32i64l$(OBJ) ntl$(OBJ)
 OBJD  = $(OBJDLL) $(OBJD1) $(OBJD2) $(OBJD3) $(OBJD4) $(OBJA) $(OBJDS)
-OBLX1 = apig$(OBJ) crc32g$(OBJ) crctabg$(OBJ) cryptg$(OBJ)
+OBLX1 = apig$(OBJ) crc32g$(OBJ) cryptg$(OBJ)
 OBLX2 = extractg$(OBJ) fileiog$(OBJ) globalsg$(OBJ) inflateg$(OBJ)
-OBLX3 = matchg$(OBJ) processg$(OBJ)
-OBLXS = win32g$(OBJ) ntg$(OBJ) windllg$(OBJ)
+OBLX3 = matchg$(OBJ) processg$(OBJ) ubz2errg$(OBJ)
+OBLXS = win32g$(OBJ) win32i64g$(OBJ) ntg$(OBJ) windllg$(OBJ)
 OBLX  = $(OBLX1) $(OBLX2) $(OBLX3) $(OBJA) $(OBLXS)
 OBGX  = sfxwiz$(OBJ) sfxwizrc$(OBJ)
 OBJLIB = windllb$(OBJ) apib$(OBJ)
-OBJB1 = crc32b$(OBJ) crctabb$(OBJ) cryptb$(OBJ)
+OBJB1 = crc32b$(OBJ) cryptb$(OBJ)
 OBJB2 = explodeb$(OBJ) extractb$(OBJ) fileiob$(OBJ) globalsb$(OBJ)
-OBJB3 = inflateb$(OBJ) listb$(OBJ) matchb$(OBJ) processb$(OBJ)
+OBJB3 = inflateb$(OBJ) listb$(OBJ) matchb$(OBJ) processb$(OBJ) ubz2errb$(OBJ)
 OBJB4 = unreducb$(OBJ) unshrnkb$(OBJ) zipinfob$(OBJ)
-OBJBS = win32b$(OBJ) ntb$(OBJ)
+OBJBS = win32b$(OBJ) win32i64b$(OBJ) ntb$(OBJ)
 OBJB  = $(OBJLIB) $(OBJB1) $(OBJB2) $(OBJB3) $(OBJB4) $(OBJA) $(OBJBS)
 
 UNZIP_H = unzip.h unzpriv.h globals.h win32/w32cfg.h
@@ -203,22 +259,22 @@ guisfx: SFXWiz32$(EXE)
 lib:    libunzip32.a
 all:    unzips dll dllsample guisfx lib
 
-unzip$(EXE): $(OBJU)
-	$(LD) $(LDFLAGS) $(LDVER) $(OBJU) $(LDLIBS)
+unzip$(EXE): $(OBJU) $(LIBBZIP2)
+	$(LD) $(LDFLAGS) $(LDVER) $(OBJU) $(LD_BZ2LIB) $(LDLIBS)
 
-unzipsfx$(EXE): $(OBJX)
+unzipsfx$(EXE): $(OBJX) $(LIBBZIP2X)
 	$(LD) $(LDFLAGS) $(LDVER) $(OBJX) $(LDLIBS)
 
 funzip$(EXE): $(OBJF)
 	$(LD) $(LDFLAGS) $(LDVER) $(OBJF) $(LDLIBS)
 
-unzip32.dll: $(DLLDEF) $(OBJD)
-	dllwrap --driver-name $(CC) --def $(DLLDEF) $(LDFLAGS) $(LDVER) $(OBJD) $(LDLIBS)
+unzip32.dll: $(DLLDEF) $(OBJD) $(LIBBZIP2)
+	dllwrap --driver-name $(CC) --def $(DLLDEF) $(LDFLAGS) $(LDVER) $(OBJD) $(LD_BZ2LIB) $(LDLIBS)
 
 libunzsfx32.a: $(OBLX)
 	$(AR) -rus $@ $(OBLX)
 
-SFXWiz32$(EXE): $(OBGX) libunzsfx32.a
+SFXWiz32$(EXE): $(OBGX) libunzsfx32.a $(LIBBZIP2X)
 	$(LD) $(GUILDFLAG) $(LDFLAGS) $(LDVER) $(OBGX) -L. -lunzsfx32 $(LDLIBS)
 
 uzexampl$(EXE): uzexampl$(OBJ)
@@ -228,6 +284,11 @@ libunzip32.a: $(OBJB)
 	$(AR) -rus $@ $(OBJB)
 
 
+# create/update the library for the optional bzip2 support:
+$(IZ_BZIP2)/libbz2.a: FORCE
+	$(subst /,\,$(MAKE)) -C $(IZ_BZIP2) -f Makebz2.iz CC="$(CC)" RM="$(RM)"
+FORCE:
+
 # How to compile sources
 .c$(OBJ):
 	$(CC) $(CFLAGS) $(CVER) $(GENFLAGS) $<
@@ -235,20 +296,20 @@ libunzip32.a: $(OBJB)
 	$(AS) $(ASFLAGS) $(ASVER) $(GENFLAGS) $<
 
 # Dependencies
-crc32$(OBJ):    crc32.c $(UNZIP_H) zip.h
-crctab$(OBJ):   crctab.c $(UNZIP_H) zip.h
-crypt$(OBJ):    crypt.c $(UNZIP_H) zip.h crypt.h ttyio.h
+crc32$(OBJ):    crc32.c $(UNZIP_H) zip.h crc32.h
+crypt$(OBJ):    crypt.c $(UNZIP_H) zip.h crypt.h crc32.h ttyio.h
 envargs$(OBJ):  envargs.c $(UNZIP_H)
 explode$(OBJ):  explode.c $(UNZIP_H)
-extract$(OBJ):  extract.c $(UNZIP_H) crypt.h
-fileio$(OBJ):   fileio.c $(UNZIP_H) crypt.h ttyio.h ebcdic.h
-funzip$(OBJ):   funzip.c $(UNZIP_H) crypt.h ttyio.h tables.h
+extract$(OBJ):  extract.c $(UNZIP_H) crc32.h crypt.h
+fileio$(OBJ):   fileio.c $(UNZIP_H) crc32.h crypt.h ttyio.h ebcdic.h
+funzip$(OBJ):   funzip.c $(UNZIP_H) crc32.h crypt.h ttyio.h
 globals$(OBJ):  globals.c $(UNZIP_H)
 inflate$(OBJ):  inflate.c inflate.h $(UNZIP_H)
 list$(OBJ):     list.c $(UNZIP_H)
 match$(OBJ):    match.c $(UNZIP_H)
-process$(OBJ):  process.c $(UNZIP_H)
+process$(OBJ):  process.c $(UNZIP_H) crc32.h
 ttyio$(OBJ):    ttyio.c $(UNZIP_H) zip.h crypt.h ttyio.h
+ubz2err$(OBJ): ubz2err.c $(UNZIP_H)
 unreduce$(OBJ): unreduce.c $(UNZIP_H)
 unshrink$(OBJ): unshrink.c $(UNZIP_H)
 unzip$(OBJ):    unzip.c $(UNZIP_H) crypt.h unzvers.h consts.h
@@ -256,230 +317,254 @@ zipinfo$(OBJ):  zipinfo.c $(UNZIP_H)
 crc_i386$(OBJ): crc_i386.S
 
 win32$(OBJ): win32/win32.c $(UNZIP_H) win32/nt.h
-	$(CC) $(CFLAGS) $(CVER) $(GENFLAGS) -I. win32/win32.c
+	$(CC) $(CFLAGS) $(CVER) $(GENFLAGS) -I. $<
+
+win32i64$(OBJ): win32/win32i64.c $(UNZIP_H)
+	$(CC) $(CFLAGS) $(CVER) $(GENFLAGS) -I. $<
 
 nt$(OBJ): win32/nt.c $(UNZIP_H) win32/nt.h
-	$(CC) $(CFLAGS) $(CVER) $(GENFLAGS) -I. win32/nt.c
+	$(CC) $(CFLAGS) $(CVER) $(GENFLAGS) -I. $<
 
-win32x$(OBJ): win32/win32.c $(UNZIP_H) win32/nt.h		# unzipsfx only
-	$(CC) $(CFLAGS) $(CVER) $(SFXFLAGS) -I. win32/win32.c
+winapprc$(OBJ):	win32/winapp.rc unzvers.h
+	- $(RC) -o $@ $<
 
-ntx$(OBJ): win32/nt.c $(UNZIP_H) win32/nt.h			# unzipsfx only
-	$(CC) $(CFLAGS) $(CVER) $(SFXFLAGS) -I. win32/nt.c
+# UnZipSFX compilation section
+crc32x$(OBJ): crc32.c $(UNZIP_H) zip.h crc32.h
+	$(CC) $(CFLAGS) $(CVER) $(SFXFLAGS) $<
 
-win32f$(OBJ): win32/win32.c $(UNZIP_H) win32/nt.h		# funzip only
-	$(CC) $(CFLAGS) $(CVER) $(FFLAGS) -I. win32/win32.c
+cryptx$(OBJ): crypt.c $(UNZIP_H) zip.h crypt.h crc32.h ttyio.h
+	$(CC) $(CFLAGS) $(CVER) $(SFXFLAGS) $<
 
-crc32x$(OBJ): crc32.c $(UNZIP_H) zip.h				# unzipsfx only
-	$(CC) $(CFLAGS) $(CVER) $(SFXFLAGS) crc32.c
+extractx$(OBJ): extract.c $(UNZIP_H) crc32.h crypt.h
+	$(CC) $(CFLAGS) $(CVER) $(SFXFLAGS) $<
 
-crctabx$(OBJ): crctab.c $(UNZIP_H) zip.h			# unzipsfx only
-	$(CC) $(CFLAGS) $(CVER) $(SFXFLAGS) crctab.c
+fileiox$(OBJ):   fileio.c $(UNZIP_H) crc32.h crypt.h ttyio.h ebcdic.h
+	$(CC) $(CFLAGS) $(CVER) $(SFXFLAGS) $<
 
-cryptx$(OBJ): crypt.c $(UNZIP_H) zip.h crypt.h ttyio.h		# unzipsfx only
-	$(CC) $(CFLAGS) $(CVER) $(SFXFLAGS) crypt.c
+globalsx$(OBJ): globals.c $(UNZIP_H)
+	$(CC) $(CFLAGS) $(CVER) $(SFXFLAGS) $<
 
-cryptf$(OBJ): crypt.c $(UNZIP_H) zip.h crypt.h ttyio.h		# funzip only
-	$(CC) $(CFLAGS) $(CVER) $(FFLAGS) crypt.c
+inflatex$(OBJ): inflate.c inflate.h $(UNZIP_H) crypt.h
+	$(CC) $(CFLAGS) $(CVER) $(SFXFLAGS) $<
 
-extractx$(OBJ): extract.c $(UNZIP_H) crypt.h			# unzipsfx only
-	$(CC) $(CFLAGS) $(CVER) $(SFXFLAGS) extract.c
+matchx$(OBJ): match.c $(UNZIP_H)
+	$(CC) $(CFLAGS) $(CVER) $(SFXFLAGS) $<
 
-fileiox$(OBJ):   fileio.c $(UNZIP_H) crypt.h ttyio.h ebcdic.h	# unzipsfx only
-	$(CC) $(CFLAGS) $(CVER) $(SFXFLAGS) fileio.c
+processx$(OBJ): process.c $(UNZIP_H) crc32.h
+	$(CC) $(CFLAGS) $(CVER) $(SFXFLAGS) $<
 
-globalsx$(OBJ): globals.c $(UNZIP_H)				# unzipsfx only
-	$(CC) $(CFLAGS) $(CVER) $(SFXFLAGS) globals.c
+ttyiox$(OBJ): ttyio.c $(UNZIP_H) zip.h crypt.h ttyio.h
+	$(CC) $(CFLAGS) $(CVER) $(SFXFLAGS) $<
 
-globalsf$(OBJ): globals.c $(UNZIP_H)				# funzip only
-	$(CC) $(CFLAGS) $(CVER) $(FFLAGS) globals.c
+ubz2errx$(OBJ): ubz2err.c $(UNZIP_H)
+	$(CC) $(CFLAGS) $(CVER) $(SFXFLAGS) $<
 
-inflatex$(OBJ): inflate.c inflate.h $(UNZIP_H) crypt.h		# unzipsfx only
-	$(CC) $(CFLAGS) $(CVER) $(SFXFLAGS) inflate.c
+unzipsfx$(OBJ): unzip.c $(UNZIP_H) crypt.h unzvers.h consts.h
+	$(CC) $(CFLAGS) $(CVER) $(SFXFLAGS) $<
 
-inflatef$(OBJ): inflate.c inflate.h $(UNZIP_H) crypt.h		# funzip only
-	$(CC) $(CFLAGS) $(CVER) $(FFLAGS) inflate.c
+win32x$(OBJ): win32/win32.c $(UNZIP_H) win32/nt.h
+	$(CC) $(CFLAGS) $(CVER) $(SFXFLAGS) -I. $<
 
-matchx$(OBJ): match.c $(UNZIP_H)				# unzipsfx only
-	$(CC) $(CFLAGS) $(CVER) $(SFXFLAGS) match.c
+win32i64x$(OBJ): win32/win32i64.c $(UNZIP_H)
+	$(CC) $(CFLAGS) $(CVER) $(SFXFLAGS) -I. $<
 
-processx$(OBJ): process.c $(UNZIP_H)				# unzipsfx only
-	$(CC) $(CFLAGS) $(CVER) $(SFXFLAGS) process.c
+ntx$(OBJ): win32/nt.c $(UNZIP_H) win32/nt.h
+	$(CC) $(CFLAGS) $(CVER) $(SFXFLAGS) -I. $<
 
-ttyiox$(OBJ): ttyio.c $(UNZIP_H) zip.h crypt.h ttyio.h		# unzipsfx only
-	$(CC) $(CFLAGS) $(CVER) $(SFXFLAGS) ttyio.c
+# fUnZip compilation section
+cryptf$(OBJ): crypt.c $(UNZIP_H) zip.h crypt.h crc32.h ttyio.h
+	$(CC) $(CFLAGS) $(CVER) $(FFLAGS) $<
 
-ttyiof$(OBJ): ttyio.c $(UNZIP_H) zip.h crypt.h ttyio.h		# funzip only
-	$(CC) $(CFLAGS) $(CVER) $(FFLAGS) ttyio.c
+globalsf$(OBJ): globals.c $(UNZIP_H)
+	$(CC) $(CFLAGS) $(CVER) $(FFLAGS) $<
 
-unzipsfx$(OBJ): unzip.c $(UNZIP_H) crypt.h unzvers.h consts.h	# unzipsfx only
-	$(CC) $(CFLAGS) $(CVER) $(SFXFLAGS) unzip.c
+inflatef$(OBJ): inflate.c inflate.h $(UNZIP_H) crypt.h
+	$(CC) $(CFLAGS) $(CVER) $(FFLAGS) $<
 
-uzexampl$(OBJ):	windll/uzexampl.c windll/uzexampl.h		# WINDLL sample
-	$(CC) $(CFLAGS) $(CVER) $(GENFLAGS) -I. windll/uzexampl.c
+ttyiof$(OBJ): ttyio.c $(UNZIP_H) zip.h crypt.h ttyio.h
+	$(CC) $(CFLAGS) $(CVER) $(FFLAGS) $<
+
+win32f$(OBJ): win32/win32.c $(UNZIP_H) win32/nt.h
+	$(CC) $(CFLAGS) $(CVER) $(FFLAGS) -I. $<
+
+win32i64f$(OBJ): win32/win32i64.c $(UNZIP_H)
+	$(CC) $(CFLAGS) $(CVER) $(FFLAGS) -I. $<
+
+# WINDLL sample
+uzexampl$(OBJ):	windll/uzexampl.c windll/uzexampl.h
+	$(CC) $(CFLAGS) $(CVER) $(GENFLAGS) -I. $<
 
 # DLL compilation section
 api$(OBJ): api.c $(UNZIP_H) $(WINDLL_H) unzvers.h
-	$(CC) $(CFLAGS) $(CVER) $(GENDLLFL) api.c
+	$(CC) $(CFLAGS) $(CVER) $(GENDLLFL) $<
 
-crc32l$(OBJ):	crc32.c $(UNZIP_H) zip.h
-	$(CC) $(CFLAGS) $(CVER) $(GENDLLFL) crc32.c
+crc32l$(OBJ):	crc32.c $(UNZIP_H) zip.h crc32.h
+	$(CC) $(CFLAGS) $(CVER) $(GENDLLFL) $<
 
-crctabl$(OBJ):	crctab.c $(UNZIP_H) zip.h
-	$(CC) $(CFLAGS) $(CVER) $(GENDLLFL) crctab.c
-
-cryptl$(OBJ):	crypt.c $(UNZIP_H) zip.h crypt.h ttyio.h
-	$(CC) $(CFLAGS) $(CVER) $(GENDLLFL) crypt.c
+cryptl$(OBJ):	crypt.c $(UNZIP_H) zip.h crypt.h crc32.h ttyio.h
+	$(CC) $(CFLAGS) $(CVER) $(GENDLLFL) $<
 
 explodel$(OBJ):	explode.c $(UNZIP_H)
-	$(CC) $(CFLAGS) $(CVER) $(GENDLLFL) explode.c
+	$(CC) $(CFLAGS) $(CVER) $(GENDLLFL) $<
 
-extractl$(OBJ):	extract.c $(UNZIP_H) $(WINDLL_H) crypt.h
-	$(CC) $(CFLAGS) $(CVER) $(GENDLLFL) extract.c
+extractl$(OBJ):	extract.c $(UNZIP_H) $(WINDLL_H) crc32.h crypt.h
+	$(CC) $(CFLAGS) $(CVER) $(GENDLLFL) $<
 
-fileiol$(OBJ):	fileio.c $(UNZIP_H) $(WINDLL_H) crypt.h ttyio.h ebcdic.h
-	$(CC) $(CFLAGS) $(CVER) $(GENDLLFL) fileio.c
+fileiol$(OBJ):	fileio.c $(UNZIP_H) $(WINDLL_H) crc32.h crypt.h ttyio.h ebcdic.h
+	$(CC) $(CFLAGS) $(CVER) $(GENDLLFL) $<
 
 globalsl$(OBJ):	globals.c $(UNZIP_H)
-	$(CC) $(CFLAGS) $(CVER) $(GENDLLFL) globals.c
+	$(CC) $(CFLAGS) $(CVER) $(GENDLLFL) $<
 
 inflatel$(OBJ):	inflate.c inflate.h $(UNZIP_H) crypt.h
-	$(CC) $(CFLAGS) $(CVER) $(GENDLLFL) inflate.c
+	$(CC) $(CFLAGS) $(CVER) $(GENDLLFL) $<
 
 listl$(OBJ):	list.c $(UNZIP_H) $(WINDLL_H)
-	$(CC) $(CFLAGS) $(CVER) $(GENDLLFL) list.c
+	$(CC) $(CFLAGS) $(CVER) $(GENDLLFL) $<
 
 matchl$(OBJ):	match.c $(UNZIP_H)
-	$(CC) $(CFLAGS) $(CVER) $(GENDLLFL) match.c
+	$(CC) $(CFLAGS) $(CVER) $(GENDLLFL) $<
 
-processl$(OBJ):	process.c $(UNZIP_H) $(WINDLL_H)
-	$(CC) $(CFLAGS) $(CVER) $(GENDLLFL) process.c
+processl$(OBJ):	process.c $(UNZIP_H) $(WINDLL_H) crc32.h
+	$(CC) $(CFLAGS) $(CVER) $(GENDLLFL) $<
+
+ubz2errl$(OBJ): ubz2err.c $(UNZIP_H)
+	$(CC) $(CFLAGS) $(CVER) $(GENDLLFL) $<
 
 unreducl$(OBJ):	unreduce.c $(UNZIP_H)
-	$(CC) $(CFLAGS) $(CVER) $(GENDLLFL) unreduce.c
+	$(CC) $(CFLAGS) $(CVER) $(GENDLLFL) $<
 
 unshrnkl$(OBJ):	unshrink.c $(UNZIP_H)
-	$(CC) $(CFLAGS) $(CVER) $(GENDLLFL) unshrink.c
+	$(CC) $(CFLAGS) $(CVER) $(GENDLLFL) $<
 
 zipinfol$(OBJ):	zipinfo.c $(UNZIP_H)
-	$(CC) $(CFLAGS) $(CVER) $(GENDLLFL) zipinfo.c
+	$(CC) $(CFLAGS) $(CVER) $(GENDLLFL) $<
 
 win32l$(OBJ): win32/win32.c $(UNZIP_H) win32/nt.h
-	$(CC) $(CFLAGS) $(CVER) $(GENDLLFL) -I. win32/win32.c
+	$(CC) $(CFLAGS) $(CVER) $(GENDLLFL) -I. $<
+
+win32i64l$(OBJ): win32/win32i64.c $(UNZIP_H)
+	$(CC) $(CFLAGS) $(CVER) $(GENDLLFL) -I. $<
 
 ntl$(OBJ): win32/nt.c $(UNZIP_H) win32/nt.h
-	$(CC) $(CFLAGS) $(CVER) $(GENDLLFL) -I. win32/nt.c
+	$(CC) $(CFLAGS) $(CVER) $(GENDLLFL) -I. $<
 
 windll$(OBJ): windll/windll.c $(UNZIP_H) $(WINDLL_H) crypt.h unzvers.h consts.h
-	$(CC) $(CFLAGS) $(CVER) $(GENDLLFL) -I. windll/windll.c
+	$(CC) $(CFLAGS) $(CVER) $(GENDLLFL) -I. $<
 
 windllrc$(OBJ):	windll/windll.rc unzvers.h
-	- $(RC) -o $@ windll/windll.rc
+	- $(RC) -o $@ $<
 
 # SFX Lib compilation section
 apig$(OBJ):	api.c $(UNZIP_H) $(WINDLL_H) unzvers.h
-	$(CC) $(CFLAGS) $(CVER) $(GENGUILB) api.c
+	$(CC) $(CFLAGS) $(CVER) $(GENGUILB) $<
 
-crc32g$(OBJ):	crc32.c $(UNZIP_H) zip.h
-	$(CC) $(CFLAGS) $(CVER) $(GENGUILB) crc32.c
+crc32g$(OBJ):	crc32.c $(UNZIP_H) zip.h crc32.h
+	$(CC) $(CFLAGS) $(CVER) $(GENGUILB) $<
 
-crctabg$(OBJ):	crctab.c $(UNZIP_H) zip.h
-	$(CC) $(CFLAGS) $(CVER) $(GENGUILB) crctab.c
+cryptg$(OBJ):	crypt.c $(UNZIP_H) zip.h crypt.h crc32.h ttyio.h
+	$(CC) $(CFLAGS) $(CVER) $(GENGUILB) $<
 
-cryptg$(OBJ):	crypt.c $(UNZIP_H) zip.h crypt.h ttyio.h
-	$(CC) $(CFLAGS) $(CVER) $(GENGUILB) crypt.c
+extractg$(OBJ):	extract.c $(UNZIP_H) $(WINDLL_H) crc32.h crypt.h
+	$(CC) $(CFLAGS) $(CVER) $(GENGUILB) $<
 
-extractg$(OBJ):	extract.c $(UNZIP_H) $(WINDLL_H) crypt.h
-	$(CC) $(CFLAGS) $(CVER) $(GENGUILB) extract.c
-
-fileiog$(OBJ):	fileio.c $(UNZIP_H) $(WINDLL_H) crypt.h ttyio.h ebcdic.h
-	$(CC) $(CFLAGS) $(CVER) $(GENGUILB) fileio.c
+fileiog$(OBJ):	fileio.c $(UNZIP_H) $(WINDLL_H) crc32.h crypt.h ttyio.h ebcdic.h
+	$(CC) $(CFLAGS) $(CVER) $(GENGUILB) $<
 
 globalsg$(OBJ):	globals.c $(UNZIP_H)
-	$(CC) $(CFLAGS) $(CVER) $(GENGUILB) globals.c
+	$(CC) $(CFLAGS) $(CVER) $(GENGUILB) $<
 
 inflateg$(OBJ):	inflate.c inflate.h $(UNZIP_H)
-	$(CC) $(CFLAGS) $(CVER) $(GENGUILB) inflate.c
+	$(CC) $(CFLAGS) $(CVER) $(GENGUILB) $<
 
 matchg$(OBJ):	match.c $(UNZIP_H)
-	$(CC) $(CFLAGS) $(CVER) $(GENGUILB) match.c
+	$(CC) $(CFLAGS) $(CVER) $(GENGUILB) $<
 
-processg$(OBJ):	process.c $(UNZIP_H) $(WINDLL_H)
-	$(CC) $(CFLAGS) $(CVER) $(GENGUILB) process.c
+processg$(OBJ):	process.c $(UNZIP_H) $(WINDLL_H) crc32.h
+	$(CC) $(CFLAGS) $(CVER) $(GENGUILB) $<
+
+ubz2errg$(OBJ): ubz2err.c $(UNZIP_H)
+	$(CC) $(CFLAGS) $(CVER) $(GENGUILB) $<
 
 win32g$(OBJ):	win32/win32.c $(UNZIP_H) win32/nt.h
-	$(CC) $(CFLAGS) $(CVER) $(GENGUILB) -I. win32/win32.c
+	$(CC) $(CFLAGS) $(CVER) $(GENGUILB) -I. $<
+
+win32i64g$(OBJ):	win32/win32i64.c $(UNZIP_H)
+	$(CC) $(CFLAGS) $(CVER) $(GENGUILB) -I. $<
 
 ntg$(OBJ):	win32/nt.c $(UNZIP_H) win32/nt.h
-	$(CC) $(CFLAGS) $(CVER) $(GENGUILB) -I. win32/nt.c
+	$(CC) $(CFLAGS) $(CVER) $(GENGUILB) -I. $<
 
 windllg$(OBJ):  windll/windll.c $(UNZIP_H) $(WINDLL_H) crypt.h unzvers.h consts.h
-	$(CC) $(CFLAGS) $(CVER) $(GENGUILB) windll/windll.c
+	$(CC) $(CFLAGS) $(CVER) $(GENGUILB) -I. $<
 
 sfxwiz$(OBJ):	windll/guisfx/sfxwiz.c windll/guisfx/dialog.h $(WINDLL_IMP_H)
-	$(CC) $(CFLAGS) $(CVER) $(GENGUISX) -I. windll/guisfx/sfxwiz.c
+	$(CC) $(CFLAGS) $(CVER) $(GENGUISX) -I. $<
 
 sfxwizrc$(OBJ):	windll/guisfx/sfxwiz.rc
-	- $(RC)  --include-dir windll/guisfx --define WIN32 -o$@ \
-		windll/guisfx/sfxwiz.rc
+	- $(RC)  --include-dir windll/guisfx --define WIN32 -o$@ $<
 
 # Static LIB compilation section
 apib$(OBJ): api.c $(UNZIP_H) $(WINDLL_H) unzvers.h
-	$(CC) $(CFLAGS) $(CVER) $(GENLIBFL) api.c
+	$(CC) $(CFLAGS) $(CVER) $(GENLIBFL) $<
 
-crc32b$(OBJ):	crc32.c $(UNZIP_H) zip.h
-	$(CC) $(CFLAGS) $(CVER) $(GENLIBFL) crc32.c
+crc32b$(OBJ):	crc32.c $(UNZIP_H) zip.h crc32.h
+	$(CC) $(CFLAGS) $(CVER) $(GENLIBFL) $<
 
-crctabb$(OBJ):	crctab.c $(UNZIP_H) zip.h
-	$(CC) $(CFLAGS) $(CVER) $(GENLIBFL) crctab.c
-
-cryptb$(OBJ):	crypt.c $(UNZIP_H) zip.h crypt.h ttyio.h
-	$(CC) $(CFLAGS) $(CVER) $(GENLIBFL) crypt.c
+cryptb$(OBJ):	crypt.c $(UNZIP_H) zip.h crypt.h crc32.h ttyio.h
+	$(CC) $(CFLAGS) $(CVER) $(GENLIBFL) $<
 
 explodeb$(OBJ):	explode.c $(UNZIP_H)
-	$(CC) $(CFLAGS) $(CVER) $(GENLIBFL) explode.c
+	$(CC) $(CFLAGS) $(CVER) $(GENLIBFL) $<
 
-extractb$(OBJ):	extract.c $(UNZIP_H) crypt.h
-	$(CC) $(CFLAGS) $(CVER) $(GENLIBFL) extract.c
+extractb$(OBJ):	extract.c $(UNZIP_H) crc32.h crypt.h
+	$(CC) $(CFLAGS) $(CVER) $(GENLIBFL) $<
 
-fileiob$(OBJ):	fileio.c $(UNZIP_H) crypt.h ttyio.h ebcdic.h
-	$(CC) $(CFLAGS) $(CVER) $(GENLIBFL) fileio.c
+fileiob$(OBJ):	fileio.c $(UNZIP_H) crc32.h crypt.h ttyio.h ebcdic.h
+	$(CC) $(CFLAGS) $(CVER) $(GENLIBFL) $<
 
 globalsb$(OBJ):	globals.c $(UNZIP_H)
-	$(CC) $(CFLAGS) $(CVER) $(GENLIBFL) globals.c
+	$(CC) $(CFLAGS) $(CVER) $(GENLIBFL) $<
 
 inflateb$(OBJ):	inflate.c inflate.h $(UNZIP_H) crypt.h
-	$(CC) $(CFLAGS) $(CVER) $(GENLIBFL) inflate.c
+	$(CC) $(CFLAGS) $(CVER) $(GENLIBFL) $<
 
 listb$(OBJ):	list.c $(UNZIP_H) $(WINDLL_H)
-	$(CC) $(CFLAGS) $(CVER) $(GENLIBFL) list.c
+	$(CC) $(CFLAGS) $(CVER) $(GENLIBFL) $<
 
 matchb$(OBJ):	match.c $(UNZIP_H)
-	$(CC) $(CFLAGS) $(CVER) $(GENLIBFL) match.c
+	$(CC) $(CFLAGS) $(CVER) $(GENLIBFL) $<
 
-processb$(OBJ):	process.c $(UNZIP_H)
-	$(CC) $(CFLAGS) $(CVER) $(GENLIBFL) process.c
+processb$(OBJ):	process.c $(UNZIP_H) crc32.h
+	$(CC) $(CFLAGS) $(CVER) $(GENLIBFL) $<
+
+ubz2errb$(OBJ): ubz2err.c $(UNZIP_H)
+	$(CC) $(CFLAGS) $(CVER) $(GENLIBFL) $<
 
 unreducb$(OBJ):	unreduce.c $(UNZIP_H)
-	$(CC) $(CFLAGS) $(CVER) $(GENLIBFL) unreduce.c
+	$(CC) $(CFLAGS) $(CVER) $(GENLIBFL) $<
 
 unshrnkb$(OBJ):	unshrink.c $(UNZIP_H)
-	$(CC) $(CFLAGS) $(CVER) $(GENLIBFL) unshrink.c
+	$(CC) $(CFLAGS) $(CVER) $(GENLIBFL) $<
 
 zipinfob$(OBJ):	zipinfo.c $(UNZIP_H)
-	$(CC) $(CFLAGS) $(CVER) $(GENLIBFL) zipinfo.c
+	$(CC) $(CFLAGS) $(CVER) $(GENLIBFL) $<
 
 win32b$(OBJ): win32/win32.c $(UNZIP_H) win32/nt.h
-	$(CC) $(CFLAGS) $(CVER) $(GENLIBFL) -I. win32/win32.c
+	$(CC) $(CFLAGS) $(CVER) $(GENLIBFL) -I. $<
+
+win32i64b$(OBJ): win32/win32i64.c $(UNZIP_H)
+	$(CC) $(CFLAGS) $(CVER) $(GENLIBFL) -I. $<
 
 ntb$(OBJ): win32/nt.c $(UNZIP_H) win32/nt.h
-	$(CC) $(CFLAGS) $(CVER) $(GENLIBFL) -I. win32/nt.c
+	$(CC) $(CFLAGS) $(CVER) $(GENLIBFL) -I. $<
 
 windllb$(OBJ): windll/windll.c $(UNZIP_H) $(WINDLL_H) crypt.h unzvers.h consts.h
-	$(CC) $(CFLAGS) $(CVER) $(GENLIBFL) -I. windll/windll.c
+	$(CC) $(CFLAGS) $(CVER) $(GENLIBFL) -I. $<
 
 clean:
-	$(RM) *$(OBJ)
-	$(RM) unzip$(EXE) funzip$(EXE) unzipsfx$(EXE)
-	$(RM) unzip32.dll uzexampl$(EXE) SFXWiz32$(EXE)
-	$(RM) libunzip32.a libunzsfx32.a
+	-$(subst /,\,$(MAKE)) -C $(IZ_BZIP2) -f Makebz2.iz RM="$(RM)" clean
+	-$(RM) *$(OBJ)
+	-$(RM) unzip$(EXE) funzip$(EXE) unzipsfx$(EXE)
+	-$(RM) unzip32.dll uzexampl$(EXE) SFXWiz32$(EXE)
+	-$(RM) libunzip32.a libunzsfx32.a

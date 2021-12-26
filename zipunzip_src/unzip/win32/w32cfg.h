@@ -1,7 +1,7 @@
 /*
-  Copyright (c) 1990-2005 Info-ZIP.  All rights reserved.
+  Copyright (c) 1990-2009 Info-ZIP.  All rights reserved.
 
-  See the accompanying file LICENSE, version 2000-Apr-09 or later
+  See the accompanying file LICENSE, version 2009-Jan-02 or later
   (the contents of which are also included in unzip.h) for terms of use.
   If, for some reason, all these files are missing, the Info-ZIP license
   also may be found at:  ftp://ftp.info-zip.org/pub/infozip/license.html
@@ -27,8 +27,11 @@
 #endif
 
 /* enable multibyte character set support by default */
-#ifndef _MBCS
+#if (!defined(_MBCS) && !defined(NO_MBCS))
 #  define _MBCS
+#endif
+#if (defined(_MBCS) && defined(NO_MBCS))
+#  undef _MBCS
 #endif
 #if (defined(__CYGWIN__) && defined(_MBCS))
 #  undef _MBCS                  /* Cygwin RTL lacks support for __mb_cur_max */
@@ -98,11 +101,12 @@
 #define GOT_UTIMBUF
 
 #ifdef _MBCS
-#  if (!defined(__EMX__) && !defined(__MINGW32__) && !defined(__CYGWIN__))
-#  if (!defined(__DJGPP__))
+#  if (!defined(__EMX__) && !defined(__DJGPP__) && !defined(__CYGWIN__))
+#  if (!defined(__MINGW32__) || defined(__MSVCRT__))
 #    include <stdlib.h>
 #    include <mbstring.h>
      /* for MSC (and compatible compilers), use routines supplied by RTL */
+#    define CLEN(ptr) _mbclen((const uch *)(ptr))
 #    define PREINCSTR(ptr) (ptr = (char *)_mbsinc((const uch *)(ptr)))
 #    define MBSCHR(str, c) (char *)_mbschr((const uch *)(str), (c))
 #    define MBSRCHR(str, c) (char *)_mbsrchr((const uch *)(str), (c))
@@ -209,6 +213,38 @@
 #if (defined(NTSD_EAS) && !defined(RESTORE_ACL))
 #  define RESTORE_ACL   /* "restore ACLs" only needed when NTSD_EAS active */
 #endif
+#if (!defined(NO_UNICODE_SUPPORT) && !defined(UNICODE_SUPPORT))
+#  define UNICODE_SUPPORT       /* enable UTF-8 filename support by default */
+#endif
+#if (defined(UNICODE_SUPPORT) && !defined(UNICODE_WCHAR))
+#  define UNICODE_WCHAR         /* wchar_t is UTF-16 encoded on WIN32 */
+#endif
+#ifdef UTF8_MAYBE_NATIVE
+#  undef UTF8_MAYBE_NATIVE      /* UTF-8 cannot be system charset on WIN32 */
+#endif
+
+/* The following compiler systems provide or use a runtime library with a
+ * locale-aware isprint() implementation.  For these systems, the "enhanced"
+ * unprintable charcode detection in fnfilter() gets enabled.
+ */
+#if (!defined(HAVE_WORKING_ISPRINT) && !defined(NO_WORKING_ISPRINT))
+#  if defined(MSC) || defined(__BORLANDC__)
+#    define HAVE_WORKING_ISPRINT
+#  endif
+#  if defined(__MINGW32__) && defined(__MSVCRT__)
+#    define HAVE_WORKING_ISPRINT
+#  endif
+#endif
+
+/* WIN32 runs solely on little-endian processors; enable support
+ * for the 32-bit optimized CRC-32 C code by default.
+ */
+#ifdef IZ_CRC_BE_OPTIMIZ
+#  undef IZ_CRC_BE_OPTIMIZ
+#endif
+#if !defined(IZ_CRC_LE_OPTIMIZ) && !defined(NO_CRC_OPTIMIZ)
+#  define IZ_CRC_LE_OPTIMIZ
+#endif
 
 /* handlers for OEM <--> ANSI string conversions */
 #ifdef __RSXNT__
@@ -301,7 +337,7 @@ int getch_win32  OF((void));
       defined(W32_USE_IZ_TIMEZONE))
 #   define iz_w32_prepareTZenv()
 # else
-#   define iz_w32_prepareTZenv()        _putenv("TZ=")
+#   define iz_w32_prepareTZenv()        putenv("TZ=")
 # endif
 #endif
 
@@ -354,11 +390,6 @@ int getch_win32  OF((void));
                                       modify [eax ecx edx]
 #    endif /* !USE_ZLIB */
 #  endif /* __386__ */
-
-#  ifndef EPIPE
-#    define EPIPE 29    /* Watcom 11.0c(+) errno.h contains this define */
-#  endif
-#  define PIPE_ERROR (errno == EPIPE)
 #endif /* __WATCOMC__ */
 
 #define SCREENWIDTH 80
@@ -368,5 +399,175 @@ int screensize(int *tt_rows, int *tt_cols);
 /* on the DOS or NT console screen, line-wraps are always enabled */
 #define SCREENLWRAP 1
 #define TABSIZE 8
+
+
+/* 64-bit-Integers & Large File Support
+ * (pasted here from Zip 3b, osdep.h - Myles Bennett 7-jun-2004)
+ * (updated from Zip 3.0d - Ed Gordon 6-oct-2004)
+ *
+ *  If this is set it is assumed that the port
+ *  supports 64-bit file calls.  The types are
+ *  defined here.  Any local implementations are
+ *  in w32i64.c and the prototypes for the calls are
+ *  in unzip.h.  Note that a port must support
+ *  these calls fully or should not set
+ *  LARGE_FILE_SUPPORT.
+ */
+
+/* Automatically set ZIP64_SUPPORT if supported */
+
+#ifndef NO_ZIP64_SUPPORT
+# ifndef ZIP64_SUPPORT
+#   if defined(_MSC_VER) || defined(__MINGW32__) || defined(__CYGWIN__)
+#     define ZIP64_SUPPORT
+#   elif defined(__LCC__)
+      /* LCC links against crtdll.dll -> no support of 64-bit offsets :( */
+#   elif (defined(__WATCOMC__) && (__WATCOMC__ >= 1100))
+#     define ZIP64_SUPPORT
+#   elif (defined(__BORLANDC__) && (__BORLANDC__ >= 0x0520))
+      /* Borland C RTL lacks any support to get/set 64-bit file pointer :( */
+#   endif
+# endif
+#endif
+
+#ifdef ZIP64_SUPPORT
+  /* base type for file offsets and file sizes */
+# if (defined(__GNUC__) || defined(ULONG_LONG_MAX))
+    typedef long long    zoff_t;
+# else
+    /* all other compilers use this as intrinsic 64-bit type */
+    typedef __int64      zoff_t;
+# endif
+# define ZOFF_T_DEFINED
+
+  /* user-defined types and format strings for 64-bit numbers and
+   * file pointer functions  (these depend on the rtl library and library
+   * headers used; they are NOT compiler-specific)
+   */
+# if defined(_MSC_VER) || defined(__MINGW32__) || defined(__LCC__)
+    /* MS C and VC, MinGW32, lcc32 */
+    /* these systems use the Microsoft C RTL */
+
+    /* 64-bit stat struct */
+    typedef struct _stati64 z_stat;
+#   define Z_STAT_DEFINED
+
+#   ifdef __LCC__
+      /* The LCC headers lack these declarations of MSC rtl functions in
+         sys/stat.h. */
+      struct _stati64 {
+        unsigned int st_dev;
+        unsigned short st_ino;
+        unsigned short st_mode;
+        short st_nlink;
+        short st_uid;
+        short st_gid;
+        unsigned int st_rdev;
+        __int64 st_size;
+        time_t st_atime;
+        time_t st_mtime;
+        time_t st_ctime;
+      };
+      int _stati64(const char *, struct _stati64 *);
+      int _fstati64(int, struct _stati64 *);
+       __int64 _lseeki64(int, __int64, int);
+#   endif /* __LCC__ */
+
+    /* printf format size prefix for zoff_t values */
+#   define FZOFFT_FMT "I64"
+#   define FZOFFT_HEX_WID_VALUE "16"
+
+#   define SHORTHDRSTATS "%9I64u  %02u%c%02u%c%02u %02u:%02u  %c"
+#   define SHORTFILETRAILER " --------                   -------\n%9I64u                   %9lu file%s\n"
+
+# elif (defined(__BORLANDC__) && (__BORLANDC__ >= 0x0520))
+    /* Borland C 5.2 or newer */
+
+    /* 64-bit stat struct */
+    typedef struct stati64 z_stat;
+#   define Z_STAT_DEFINED
+
+    /* Borland C does not provide a 64-bit-capable _lseeki64(), so we
+       need to use the stdio.h stream functions instead. */
+#   ifndef USE_STRM_INPUT
+#     define USE_STRM_INPUT
+#   endif
+
+    /* printf format size prefix for zoff_t values */
+#   define FZOFFT_FMT "L"
+#   define FZOFFT_HEX_WID_VALUE "16"
+
+#   define SHORTHDRSTATS "%9Lu  %02u%c%02u%c%02u %02u:%02u  %c"
+#   define SHORTFILETRAILER " --------                   -------\n%9Lu                   %9lu file%s\n"
+
+# elif (defined(__WATCOMC__) && (__WATCOMC__ >= 1100))
+    /* WATCOM C */
+
+    /* 64-bit stat struct */
+    typedef struct _stati64 z_stat;
+#   define Z_STAT_DEFINED
+
+    /* printf format size prefix for zoff_t values */
+#   define FZOFFT_FMT "ll"
+#   define FZOFFT_HEX_WID_VALUE "16"
+
+#   define SHORTHDRSTATS "%9llu  %02u%c%02u%c%02u %02u:%02u  %c"
+#   define SHORTFILETRAILER " --------                   -------\n%9llu                   %9lu file%s\n"
+
+# elif (defined(__IBMC__) && (__IBMC__ >= 350))
+    /* IBM C */
+
+    /* 64-bit stat struct */
+
+    /* printf format size prefix for zoff_t values */
+#   define FZOFFT_FMT "I64"
+#   define FZOFFT_HEX_WID_VALUE "16"
+
+#   define SHORTHDRSTATS "%9I64u  %02u%c%02u%c%02u %02u:%02u  %c"
+#   define SHORTFILETRAILER " --------                   -------\n%9I64u                   %9lu file%s\n"
+
+# endif
+
+#endif
+
+/* If port has LARGE_FILE_SUPPORT then define here
+   to make automatic unless overridden */
+
+#ifndef LARGE_FILE_SUPPORT
+# ifndef NO_LARGE_FILE_SUPPORT
+#   if defined(_MSC_VER) || defined(__MINGW32__)
+#     define LARGE_FILE_SUPPORT
+#   elif defined(__LCC__)
+      /* LCC links against crtdll.dll -> no support of 64-bit offsets :( */
+#   elif defined(__CYGWIN__)
+#     define LARGE_FILE_SUPPORT
+#   elif (defined(__WATCOMC__) && (__WATCOMC__ >= 1100))
+#     define LARGE_FILE_SUPPORT
+#   elif (defined(__BORLANDC__) && (__BORLANDC__ >= 0x0520))
+      /* Borland C RTL lacks any support to get/set 64-bit file pointer :( */
+#   endif
+# endif
+#endif
+
+
+#ifndef LARGE_FILE_SUPPORT
+  /* No Large File Support */
+
+  /* base type for file offsets and file sizes */
+  typedef long zoff_t;
+# define ZOFF_T_DEFINED
+
+  /* stat struct */
+  typedef struct stat z_stat;
+# define Z_STAT_DEFINED
+
+#  define FZOFFT_FMT "l"
+#  define FZOFFT_HEX_WID_VALUE "8"
+
+
+#  define SHORTHDRSTATS "%9lu  %02u%c%02u%c%02u %02u:%02u  %c"
+#  define SHORTFILETRAILER " --------                   -------\n%9lu                   %9lu file%s\n"
+
+#endif /* LARGE_FILE_SUPPORT */
 
 #endif /* !__w32cfg_h */

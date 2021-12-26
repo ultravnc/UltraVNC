@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 1990-2005 Info-ZIP.  All rights reserved.
+  Copyright (c) 1990-2007 Info-ZIP.  All rights reserved.
 
   See the accompanying file LICENSE, version 2000-Apr-09 or later
   (the contents of which are also included in zip.h) for terms of use.
@@ -8,7 +8,7 @@
 */
 /* crc_i386.c -- Microsoft 32-bit C/C++ adaptation of crc_i386.asm
  * Created by Rodney Brown from crc_i386.asm, modified by Chr. Spieler.
- * Last revised: 16-Jan-2005
+ * Last revised: 07-Jan-2007
  *
  * Original coded (in crc_i386.asm) and put into the public domain
  * by Paul Kienitz and Christian Spieler.
@@ -57,6 +57,16 @@
  *   Also enabled the 686 build by default, because there are hardly any
  *   pre-686 CPUs in serious use nowadays. (See the 12-Oct-97 note above.)
  *
+ * Revised 03-Jan-2006, Chr. Spieler
+ *   Enlarged unrolling loops to "do 16 bytes per turn"; optimized access to
+ *   data buffer in loop body (adjust pointer only once in loop body and use
+ *   offsets to access each item); added additional support for the "unfolded
+ *   tables" optimization variant (enabled by IZ_CRCOPTIM_UNFOLDTBL).
+ *
+ * Revised 07-Jan-2007, Chr. Spieler
+ *   Recognize additional conditional flag CRC_TABLE_ONLY that prevents
+ *   compilation of the crc32() function.
+ *
  * FLAT memory model assumed.
  *
  * Loop unrolling can be disabled by defining the macro NO_UNROLLED_LOOPS.
@@ -65,8 +75,9 @@
  */
 
 #include "../zip.h"
+#include "../crc32.h"
 
-#if defined(ASM_CRC) && !defined(USE_ZLIB)
+#if defined(ASM_CRC) && !defined(USE_ZLIB) && !defined(CRC_TABLE_ONLY)
 
 #if !defined(PRE_686) && !defined(__686)
 #  define __686
@@ -120,18 +131,68 @@
   __asm { inc   esi }; \
   Do_CRC; }
 
+#define Do_CRC_byteof(ofs) { \
+  __asm { xor   al, byte ptr [esi+(ofs)] }; \
+  Do_CRC; }
+
 #ifndef NO_32_BIT_LOADS
+#ifdef IZ_CRCOPTIM_UNFOLDTBL
+# define SavLen  len            /* the edx register is needed elsewhere */
+# define UpdCRC_dword { \
+   __asm { movzx   ebx,al }; \
+   __asm { mov     edx,[edi+ebx*4+3072] }; \
+   __asm { movzx   ebx,ah }; \
+   __asm { shr     eax,16 }; \
+   __asm { xor     edx,[edi+ebx*4+2048] }; \
+   __asm { movzx   ebx,al }; \
+   __asm { shr     eax,8 }; \
+   __asm { xor     edx,[edi+ebx*4+1024] }; \
+   __asm { mov     eax,[edi+eax*4] }; \
+   __asm { xor     eax,edx }; }
+# define UpdCRC_dword_sh(dwPtrIncr) { \
+   __asm { movzx   ebx,al }; \
+   __asm { mov     edx,[edi+ebx*4+3072] }; \
+   __asm { movzx   ebx,ah }; \
+   __asm { xor     edx,[edi+ebx*4+2048] }; \
+   __asm { shr     eax,16 }; \
+   __asm { movzx   ebx,al }; \
+   __asm { add     esi, 4*dwPtrIncr }; \
+   __asm { shr     eax,8 }; \
+   __asm { xor     edx,[edi+ebx*4+1024] }; \
+   __asm { mov     eax,[edi+eax*4] }; \
+   __asm { xor     eax,edx }; }
+#else /* !IZ_CRCOPTIM_UNFOLDTBL */
+# define SavLen  edx            /* the edx register is free for use here */
+# define UpdCRC_dword { \
+    Do_CRC; \
+    Do_CRC; \
+    Do_CRC; \
+    Do_CRC; }
+# define UpdCRC_dword_sh(dwPtrIncr) { \
+    Do_CRC; \
+    Do_CRC; \
+    __asm { add   esi, 4*(dwPtrIncr) }; \
+    Do_CRC; \
+    Do_CRC; }
+#endif /* ?IZ_CRCOPTIM_UNFOLDTBL */
+
 #define Do_CRC_dword { \
   __asm { xor   eax, dword ptr [esi] }; \
-  __asm { add   esi, 4 }; \
-  Do_CRC; \
-  Do_CRC; \
-  Do_CRC; \
-  Do_CRC; }
+  UpdCRC_dword_sh(1); }
+
+#define Do_CRC_4dword { \
+  __asm { xor   eax, dword ptr [esi] }; \
+  UpdCRC_dword; \
+  __asm { xor   eax, dword ptr [esi+4] }; \
+  UpdCRC_dword; \
+  __asm { xor   eax, dword ptr [esi+8] }; \
+  UpdCRC_dword; \
+  __asm { xor   eax, dword ptr [esi+12] }; \
+  UpdCRC_dword_sh(4); }
 #endif /* !NO_32_BIT_LOADS */
 
 /* ========================================================================= */
-ulg crc32_unzip(crc, buf, len)
+ulg crc32(crc, buf, len)
     ulg crc;                    /* crc shift register */
     ZCONST uch *buf;            /* pointer to bytes to pump through */
     extent len;                 /* number of bytes in buf[] */
@@ -148,7 +209,7 @@ ulg crc32_unzip(crc, buf, len)
                 test    esi,esi         ;/*>   return 0;                   */
                 jz      fine            ;/*> else {                        */
 
-                call    get_crc_table_unzip
+                call    get_crc_table
                 mov     edi,eax
                 mov     eax,crc         ;/* 1st arg: ulg crc               */
 #ifndef __686
@@ -171,46 +232,66 @@ align_loop:
                 jnz     align_loop
 aligned_now:
 #  endif /* !NO_32_BIT_LOADS */
-                mov     edx,ecx         ;/* save len in edx  */
-                shr     ecx,3           ;/* ecx = len / 8    */
-                jz      No_Eights
+                mov     SavLen,ecx      ;/* save current len for later  */
+                shr     ecx,4           ;/* ecx = len / 16    */
+                jz      No_Sixteens
 ; align loop head at start of 486 internal cache line !!
                 align   16
-Next_Eight:
+Next_Sixteen:
     }
 #  ifndef NO_32_BIT_LOADS
-                Do_CRC_dword ;
-                Do_CRC_dword ;
+                Do_CRC_4dword ;
 #  else /* NO_32_BIT_LOADS */
-                Do_CRC_byte ;
-                Do_CRC_byte ;
-                Do_CRC_byte ;
-                Do_CRC_byte ;
-                Do_CRC_byte ;
-                Do_CRC_byte ;
-                Do_CRC_byte ;
-                Do_CRC_byte ;
+                Do_CRC_byteof(0) ;
+                Do_CRC_byteof(1) ;
+                Do_CRC_byteof(2) ;
+                Do_CRC_byteof(3) ;
+                Do_CRC_byteof(4) ;
+                Do_CRC_byteof(5) ;
+                Do_CRC_byteof(6) ;
+                Do_CRC_byteof(7) ;
+                Do_CRC_byteof(8) ;
+                Do_CRC_byteof(9) ;
+                Do_CRC_byteof(10) ;
+                Do_CRC_byteof(11) ;
+                Do_CRC_byteof(12) ;
+                Do_CRC_byteof(13) ;
+                Do_CRC_byteof(14) ;
+                Do_CRC_byteof(15) ;
+    __asm {     add     esi,16 };
 #  endif /* ?NO_32_BIT_LOADS */
     __asm {
                 dec     ecx
-                jnz     Next_Eight
-No_Eights:
-                mov     ecx,edx
-                and     ecx,000000007H  ;/* ecx = len % 8    */
-
+                jnz     Next_Sixteen
+No_Sixteens:
+                mov     ecx,SavLen
+                and     ecx,00000000FH  ;/* ecx = len % 16    */
+#  ifndef NO_32_BIT_LOADS
+                shr     ecx,2
+                jz      No_Fours
+Next_Four:
+    }
+                Do_CRC_dword ;
+    __asm {
+                dec     ecx
+                jnz     Next_Four
+No_Fours:
+                mov     ecx,SavLen
+                and     ecx,000000003H  ;/* ecx = len % 4    */
+#  endif /* !NO_32_BIT_LOADS */
 #endif /* !NO_UNROLLED_LOOPS */
-                jz      bail            ;/*>  if (len)                     */
+                jz      bail            ;/*>  if (len)                       */
 ; align loop head at start of 486 internal cache line !!
                 align   16
-loupe:                                  ;/*>    do { */
+loupe:                                  ;/*>    do {                         */
     }
-                Do_CRC_byte             ;/*       c = CRC32(c, *buf++);    */
+                Do_CRC_byte             ;/*       c = CRC32(c,*buf++,crctab);*/
     __asm {
-                dec     ecx             ;/*>    } while (--len);           */
+                dec     ecx             ;/*>    } while (--len);             */
                 jnz     loupe
 
-bail:                                   ;/*> }                             */
-                not     eax             ;/*> return ~c;                    */
+bail:                                   ;/*> }                               */
+                not     eax             ;/*> return ~c;                      */
 fine:
                 pop     ecx
                 pop     edx
@@ -226,4 +307,4 @@ fine:
 #  pragma warning( default : 4035 )
 #endif
 #endif
-#endif /* ASM_CRC && !USE_ZLIB */
+#endif /* ASM_CRC && !USE_ZLIB && !CRC_TABLE_ONLY */

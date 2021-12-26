@@ -116,7 +116,8 @@ int recmatch OF((ZCONST uch *pattern, ZCONST uch *string,
 #endif /* 0 */
 static int recmatch OF((ZCONST uch *pattern, ZCONST uch *string,
                         int ignore_case __WDLPRO));
-
+static char *isshexp OF((ZCONST char *p));
+static int namecmp OF((ZCONST char *s1, ZCONST char *s2));
 
 
 /* match() is a shell to recmatch() to return only Boolean values. */
@@ -226,10 +227,61 @@ static int recmatch(p, s, ic __WDL)
 #endif /* WILD_STOP_AT_DIR */
         if (*p == 0)
             return 1;
-        for (; *s; INCSTR(s))
-            if ((c = recmatch(p, s, ic __WDL)) != 0)
-                return (int)c;
-        return 2;       /* 2 means give up--match will return false */
+        if (isshexp((ZCONST char *)p) == NULL) {
+            /* Optimization for rest of pattern being a literal string:
+             * If there are no other shell expression chars in the rest
+             * of the pattern behind the multi-char wildcard, then just
+             * compare the literal string tail.
+             */
+            ZCONST uch *srest;
+
+            srest = s + (strlen((ZCONST char *)s) - strlen((ZCONST char *)p));
+            if (srest - s < 0)
+                /* remaining literal string from pattern is longer than rest
+                 * of test string, there can't be a match
+                 */
+                return 0;
+            else
+              /* compare the remaining literal pattern string with the last
+               * bytes of the test string to check for a match
+               */
+#ifdef _MBCS
+            {
+                ZCONST uch *q = s;
+
+                /* MBCS-aware code must not scan backwards into a string from
+                 * the end.
+                 * So, we have to move forward by character from our well-known
+                 * character position s in the test string until we have
+                 * advanced to the srest position.
+                 */
+                while (q < srest)
+                  INCSTR(q);
+                /* In case the byte *srest is a trailing byte of a multibyte
+                 * character in the test string s, we have actually advanced
+                 * past the position (srest).
+                 * For this case, the match has failed!
+                 */
+                if (q != srest)
+                    return 0;
+                return ((ic
+                         ? namecmp((ZCONST char *)p, (ZCONST char *)q)
+                         : strcmp((ZCONST char *)p, (ZCONST char *)q)
+                        ) == 0);
+            }
+#else /* !_MBCS */
+                return ((ic
+                         ? namecmp((ZCONST char *)p, (ZCONST char *)srest)
+                         : strcmp((ZCONST char *)p, (ZCONST char *)srest)
+                        ) == 0);
+#endif /* ?_MBCS */
+        } else {
+            /* pattern contains more wildcards, continue with recursion... */
+            for (; *s; INCSTR(s))
+                if ((c = recmatch(p, s, ic __WDL)) != 0)
+                    return (int)c;
+            return 2;  /* 2 means give up--match will return false */
+        }
     }
 
     /* Parse and process the list of characters and ranges in brackets */
@@ -285,6 +337,40 @@ static int recmatch(p, s, ic __WDL)
 #endif
 
 } /* end function recmatch() */
+
+
+
+static char *isshexp(p)
+ZCONST char *p;
+/* If p is a sh expression, a pointer to the first special character is
+   returned.  Otherwise, NULL is returned. */
+{
+    for (; *p; INCSTR(p))
+        if (*p == '\\' && *(p+1))
+            p++;
+        else if (*p == WILDCHAR || *p == '*' || *p == BEG_RANGE)
+            return (char *)p;
+    return NULL;
+} /* end function isshexp() */
+
+
+
+static int namecmp(s1, s2)
+    ZCONST char *s1, *s2;
+{
+    int d;
+
+    for (;;) {
+        d = (int)ToLower((uch)*s1)
+          - (int)ToLower((uch)*s2);
+
+        if (d || *s1 == 0 || *s2 == 0)
+            return d;
+
+        s1++;
+        s2++;
+    }
+} /* end function namecmp() */
 
 #endif /* !THEOS */
 

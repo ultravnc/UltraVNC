@@ -1,14 +1,14 @@
 /*
-  Copyright (c) 1990-2002 Info-ZIP.  All rights reserved.
+  Copyright (c) 1990-2009 Info-ZIP.  All rights reserved.
 
-  See the accompanying file LICENSE, version 2000-Apr-09 or later
+  See the accompanying file LICENSE, version 2009-Jan-02 or later
   (the contents of which are also included in unzip.h) for terms of use.
   If, for some reason, all these files are missing, the Info-ZIP license
   also may be found at:  ftp://ftp.info-zip.org/pub/infozip/license.html
 */
 /* funzip.c -- by Mark Adler */
 
-#define VERSION "3.94 of 17 February 2002"
+#define VERSION "3.95 of 20 January 2009"
 
 
 /* Copyright history:
@@ -116,13 +116,13 @@
 #endif
 #define UNZIP_INTERNAL
 #include "unzip.h"
+#include "crc32.h"
 #include "crypt.h"
 #include "ttyio.h"
 
 #ifdef EBCDIC
 #  undef EBCDIC                 /* don't need ebcdic[] */
 #endif
-#include "tables.h"             /* crc_32_tab[] */
 
 #ifndef USE_ZLIB  /* zlib's function is called inflate(), too */
 #  define UZinflate inflate
@@ -216,21 +216,6 @@ __GDEF
 }
 
 #endif /* USE_ZLIB */
-
-
-#if (!defined(USE_ZLIB) || defined(USE_OWN_CRCTAB))
-#ifdef USE_ZLIB
-ZCONST uLongf *get_crc_table()
-{
-  return (ZCONST uLongf *)crc_32_tab;
-}
-#else /* !USE_ZLIB */
-ZCONST ulg near *get_crc_table()
-{
-  return crc_32_tab;
-}
-#endif /* ?USE_ZLIB */
-#endif /* !USE_ZLIB || USE_OWN_CRCTAB */
 
 
 static void err(n, m)
@@ -452,10 +437,9 @@ char **argv;
         else if ((p = getp("Enter password: ", p, IZ_PWLEN+1)) == (char *)NULL)
           err(1, "no tty to prompt for password");
       }
-#if (defined(USE_ZLIB) && !defined(USE_OWN_CRCTAB))
       /* initialize crc_32_tab pointer for decryption */
-      CRC_32_TAB = (ZCONST ulg Far *)get_crc_table();
-#endif
+      CRC_32_TAB = get_crc_table();
+      /* prepare the decryption keys for extraction and check the password */
       init_keys(p);
       for (i = 0; i < RAND_HEAD_LEN; i++)
         e = NEXTBYTE;

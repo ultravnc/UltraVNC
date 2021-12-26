@@ -1,0 +1,69 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31702.278
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "unz32lib", "lib\unz32lib.vcxproj", "{F9321962-FBED-4581-BF7D-D0EBC303D891}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		ASM Debug|Win32 = ASM Debug|Win32
+		ASM Debug|x64 = ASM Debug|x64
+		ASM Release|Win32 = ASM Release|Win32
+		ASM Release|x64 = ASM Release|x64
+		ASM Static Debug|Win32 = ASM Static Debug|Win32
+		ASM Static Debug|x64 = ASM Static Debug|x64
+		ASM Static Release|Win32 = ASM Static Release|Win32
+		ASM Static Release|x64 = ASM Static Release|x64
+		Debug|Win32 = Debug|Win32
+		Debug|x64 = Debug|x64
+		Release|Win32 = Release|Win32
+		Release|x64 = Release|x64
+		RelIPv6|Win32 = RelIPv6|Win32
+		RelIPv6|x64 = RelIPv6|x64
+		Static Debug|Win32 = Static Debug|Win32
+		Static Debug|x64 = Static Debug|x64
+		Static Release|Win32 = Static Release|Win32
+		Static Release|x64 = Static Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F9321962-FBED-4581-BF7D-D0EBC303D891}.ASM Debug|Win32.ActiveCfg = ASM Debug|Win32
+		{F9321962-FBED-4581-BF7D-D0EBC303D891}.ASM Debug|Win32.Build.0 = ASM Debug|Win32
+		{F9321962-FBED-4581-BF7D-D0EBC303D891}.ASM Debug|x64.ActiveCfg = ASM Debug|x64
+		{F9321962-FBED-4581-BF7D-D0EBC303D891}.ASM Debug|x64.Build.0 = ASM Debug|x64
+		{F9321962-FBED-4581-BF7D-D0EBC303D891}.ASM Release|Win32.ActiveCfg = ASM Release|Win32
+		{F9321962-FBED-4581-BF7D-D0EBC303D891}.ASM Release|Win32.Build.0 = ASM Release|Win32
+		{F9321962-FBED-4581-BF7D-D0EBC303D891}.ASM Release|x64.ActiveCfg = ASM Release|x64
+		{F9321962-FBED-4581-BF7D-D0EBC303D891}.ASM Release|x64.Build.0 = ASM Release|x64
+		{F9321962-FBED-4581-BF7D-D0EBC303D891}.ASM Static Debug|Win32.ActiveCfg = ASM Static Debug|Win32
+		{F9321962-FBED-4581-BF7D-D0EBC303D891}.ASM Static Debug|Win32.Build.0 = ASM Static Debug|Win32
+		{F9321962-FBED-4581-BF7D-D0EBC303D891}.ASM Static Debug|x64.ActiveCfg = ASM Static Debug|Win32
+		{F9321962-FBED-4581-BF7D-D0EBC303D891}.ASM Static Release|Win32.ActiveCfg = ASM Static Release|Win32
+		{F9321962-FBED-4581-BF7D-D0EBC303D891}.ASM Static Release|Win32.Build.0 = ASM Static Release|Win32
+		{F9321962-FBED-4581-BF7D-D0EBC303D891}.ASM Static Release|x64.ActiveCfg = ASM Static Release|Win32
+		{F9321962-FBED-4581-BF7D-D0EBC303D891}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F9321962-FBED-4581-BF7D-D0EBC303D891}.Debug|Win32.Build.0 = Debug|Win32
+		{F9321962-FBED-4581-BF7D-D0EBC303D891}.Debug|x64.ActiveCfg = Debug|x64
+		{F9321962-FBED-4581-BF7D-D0EBC303D891}.Debug|x64.Build.0 = Debug|x64
+		{F9321962-FBED-4581-BF7D-D0EBC303D891}.Release|Win32.ActiveCfg = Release|Win32
+		{F9321962-FBED-4581-BF7D-D0EBC303D891}.Release|Win32.Build.0 = Release|Win32
+		{F9321962-FBED-4581-BF7D-D0EBC303D891}.Release|x64.ActiveCfg = Release|x64
+		{F9321962-FBED-4581-BF7D-D0EBC303D891}.Release|x64.Build.0 = Release|x64
+		{F9321962-FBED-4581-BF7D-D0EBC303D891}.RelIPv6|Win32.ActiveCfg = RelIPv6|Win32
+		{F9321962-FBED-4581-BF7D-D0EBC303D891}.RelIPv6|Win32.Build.0 = RelIPv6|Win32
+		{F9321962-FBED-4581-BF7D-D0EBC303D891}.RelIPv6|x64.ActiveCfg = RelIPv6|x64
+		{F9321962-FBED-4581-BF7D-D0EBC303D891}.RelIPv6|x64.Build.0 = RelIPv6|x64
+		{F9321962-FBED-4581-BF7D-D0EBC303D891}.Static Debug|Win32.ActiveCfg = Static Debug|Win32
+		{F9321962-FBED-4581-BF7D-D0EBC303D891}.Static Debug|Win32.Build.0 = Static Debug|Win32
+		{F9321962-FBED-4581-BF7D-D0EBC303D891}.Static Debug|x64.ActiveCfg = Static Debug|Win32
+		{F9321962-FBED-4581-BF7D-D0EBC303D891}.Static Release|Win32.ActiveCfg = Static Release|Win32
+		{F9321962-FBED-4581-BF7D-D0EBC303D891}.Static Release|Win32.Build.0 = Static Release|Win32
+		{F9321962-FBED-4581-BF7D-D0EBC303D891}.Static Release|x64.ActiveCfg = Static Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B6B60BD9-2F38-4A65-A6F8-59864B591270}
+	EndGlobalSection
+EndGlobal
