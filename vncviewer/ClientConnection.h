@@ -805,7 +805,7 @@ private:
  	VOID			*m_DIBbits;
 	BYTE			*m_DIBbitsCache;
 
-	void ClientConnection::Createdib();
+	void Createdib();
 	bool Check_Rectangle_borders(int x,int y,int w,int h);
 	BOOL m_BigToolbar;
 	DWORD newtick;
