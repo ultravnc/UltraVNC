@@ -77,14 +77,13 @@ void Log::SetMode(int mode) {
             _fdopen(2, "wt");
             printf("fh is %d\n",fh);
             fflush(stdout);
-
+#endif
         }
 
         m_toconsole = true;
     } else {
         m_toconsole = false;
     }
-#endif
 }
 
 
