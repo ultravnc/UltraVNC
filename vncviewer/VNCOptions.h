@@ -172,4 +172,4 @@ private:
 	HWND hwnd;
 };
 
-#endif VNCOPTIONS_H__
+#endif //VNCOPTIONS_H__
