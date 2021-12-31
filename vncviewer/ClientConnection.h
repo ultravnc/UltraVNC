@@ -148,7 +148,7 @@ public:
 	TCHAR m_proxyhost[MAX_HOST_NAME_LEN];
 	bool m_fUseProxy;
 //	TCHAR m_remotehost[MAX_HOST_NAME_LEN];
-	int  LoadConnection(char *fname, bool fFromDialog, bool default = false);
+	int  LoadConnection(char *fname, bool fFromDialog, bool defaultOption = false);
 	void HandleQuickOption();
 
     void RebuildToolbar(HWND hwnd); // 24 March 2008 jdp

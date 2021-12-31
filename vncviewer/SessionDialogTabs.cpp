@@ -1295,8 +1295,8 @@ int SessionDialog::HandeleEncodersMessages(HWND hwnd, WPARAM wParam)
 					   return TRUE;
 
 	case IDC_ZLIBRADIO: {
-		bool xor = IsDlgButtonChecked(hwnd, IDC_ZLIBRADIO) ? true : false;
-		if (xor) {
+		bool xor_ = IsDlgButtonChecked(hwnd, IDC_ZLIBRADIO) ? true : false;
+		if (xor_) {
 			SendMessage(GetDlgItem(hwnd, ID_SESSION_SET_CACHE), BM_SETCHECK, true, 0);
 		}
 		return TRUE;
