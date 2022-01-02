@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "resource.h"
+#include <stdio.h>
 #include <comutil.h>
 #include "vncsetauth.h"
 #include "DSMPlugin.h"
