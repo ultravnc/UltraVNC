@@ -136,7 +136,7 @@ int ZstdOutStream::overrun(int itemSize, int nItems)
 			// but didn't consume all the data?  try shifting what's left to the
 			// start of the buffer.
 			fprintf(stderr, "z out buf not full, but in data not consumed\n");
-			memmove(start, inBuffer->src, ptr - inBuffer->src);
+			memmove(start, inBuffer->src, ptr - (U8*)inBuffer->src);
 			offset += (int)((U8*)inBuffer->src - start);
 			ptr -= (U8*)inBuffer->src - start;
 		}

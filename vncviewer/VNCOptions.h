@@ -161,8 +161,8 @@ public:
 	bool m_running;
 
 	TCHAR m_optionfile[MAX_PATH];
-	void VNCOptions::setDefaultOptionsFileName();
-	TCHAR* VNCOptions::getDefaultOptionsFileName();
+	void setDefaultOptionsFileName();
+	TCHAR* getDefaultOptionsFileName();
 	char m_InfoMsg[255]{ 0 };
 
 private:
@@ -172,4 +172,4 @@ private:
 	HWND hwnd;
 };
 
-#endif VNCOPTIONS_H__
+#endif //VNCOPTIONS_H__

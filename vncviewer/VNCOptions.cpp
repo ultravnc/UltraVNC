@@ -1839,8 +1839,8 @@ BOOL CALLBACK VNCOptions::OptDlgProc(HWND hwnd, UINT uMsg,
 		// (the user can still uncheck it if he wants)
 		case IDC_ZLIBRADIO:
 		{
-			bool xor = IsDlgButtonChecked(hwnd, IDC_ZLIBRADIO) ? true : false;
-			if (xor)
+			bool xor_ = IsDlgButtonChecked(hwnd, IDC_ZLIBRADIO) ? true : false;
+			if (xor_)
 			{
 				HWND hCache = GetDlgItem(hwnd, ID_SESSION_SET_CACHE);
 				SendMessage(hCache, BM_SETCHECK, true, 0);

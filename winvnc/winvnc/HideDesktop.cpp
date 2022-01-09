@@ -39,6 +39,7 @@
 #include <atlbase.h> // ATL smart pointers
 #include <shlguid.h> // shell GUIDs
 #include <shlobj.h>  // IActiveDesktop
+#include <shlwapi.h> // DLLVERSIONINFO
 #include "stdhdrs.h"
 
 struct __declspec(uuid("F490EB00-1240-11D1-9888-006097DEACF9")) IActiveDesktop;

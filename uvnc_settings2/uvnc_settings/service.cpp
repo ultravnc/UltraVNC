@@ -12,6 +12,7 @@
 	#include <winsock2.h>
 	#pragma comment(lib, "ws2_32.lib")
 #endif
+#include <stdio.h>
 
 static char service_path[MAX_PATH];
 static char service_file[MAX_PATH];
