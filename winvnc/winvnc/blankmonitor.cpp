@@ -27,9 +27,7 @@
 #include "vncdesktopthread.h"
 #include "vncOSVersion.h"
 
-DWORD WINAPI BlackWindow(LPVOID lpParam);
-
-void vncDesktop::SetBlankMonitor(bool enabled)
+/*void vncDesktop::SetBlankMonitor(bool enabled)
 {
 
 	// Also Turn Off the Monitor if allowed ("Blank Screen", "Blank Monitor")
@@ -56,11 +54,8 @@ void vncDesktop::SetBlankMonitor(bool enabled)
     }
 }
 
-DWORD WINAPI BorderWindow(LPVOID lpParam);
-extern RECT g_rect;
-void vncDesktop::SetBorderWindow(bool enabled, RECT rect)
+void vncDesktop::SetBorderWindow(bool enabled, RECT rect, char *infoMsg)
 {
-	g_rect = rect;
 	if (enabled) {
 		HANDLE ThreadHandle2 = NULL;
 		DWORD dwTId;
@@ -73,4 +68,4 @@ void vncDesktop::SetBorderWindow(bool enabled, RECT rect)
 		if (Blackhnd)
 			PostMessage(Blackhnd, WM_CLOSE, 0, 0);
 	}
-}
+}*/

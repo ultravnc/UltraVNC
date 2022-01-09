@@ -2757,6 +2757,21 @@ void vncServer::StopReconnectAll()
 	}
 }
 
+char *vncServer::getInfoMsg()
+{
+	vncClient* client = NULL;
+
+	vncClientList::iterator i;
+
+	for (i = m_authClients.begin(); i != m_authClients.end(); i++)
+	{
+		// Is this the right client?
+		if (strlen(GetClient(*i)->infoMsg) > 0)
+			return GetClient(*i)->infoMsg;
+	}
+	return "";
+}
+
 void vncServer::SetFTTimeout(int msecs)
 {
     m_ftTimeout = msecs;

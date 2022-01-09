@@ -509,6 +509,7 @@ public:
 
 	bool OS_Shutdown;
 	void StopReconnectAll();
+	char* getInfoMsg();
 	int m_virtualDisplaySupported;
 	VirtualDisplay *virtualDisplay;
 

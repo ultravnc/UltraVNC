@@ -1198,6 +1198,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\win8</Command>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='IPV6|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="LayeredWindows.cpp" />
     <ClCompile Include="MouseSimulator.cpp" />
     <ClCompile Include="read_write_ini.cpp" />
     <ClCompile Include="rfbRegion_win32.cpp" />
@@ -2513,6 +2514,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\win8</Command>
     <ClInclude Include="inifile.h" />
     <ClInclude Include="IPC.h" />
     <ClInclude Include="keysymdef.h" />
+    <ClInclude Include="LayeredWindows.h" />
     <ClInclude Include="MouseSimulator.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="rfb.h" />
