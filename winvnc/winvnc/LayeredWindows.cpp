@@ -26,6 +26,7 @@ RECT LayeredWindows::rect;
 HFONT LayeredWindows::hFont;
 HPEN LayeredWindows::hPen;
 char LayeredWindows::infoMsg[255] = { 0 };
+bool LayeredWindows::set_OSD = false;
 
 LayeredWindows::LayeredWindows()
 {
@@ -204,7 +205,8 @@ bool LayeredWindows::create_black_window(void)
     if (pSetLayeredWindowAttributes != NULL)
         pSetLayeredWindowAttributes(hwnd, RGB(255, 255, 255), 255, LWA_ALPHA);
     SetWindowPos(hwnd, HWND_TOPMOST, x, y, cx, cy, SWP_FRAMECHANGED | SWP_NOACTIVATE);
-    SetWindowDisplayAffinity(hwnd, WDA_EXCLUDEFROMCAPTURE);
+    if (VNC_OSVersion::getInstance()->OS_WIN10_TRANS)
+        SetWindowDisplayAffinity(hwnd, WDA_EXCLUDEFROMCAPTURE);
     return true;
 }
 
@@ -257,11 +259,13 @@ LRESULT CALLBACK LayeredWindows::WndBorderProc(HWND hwnd, UINT uMsg, WPARAM wPar
         SetTextColor(hdc, RGB(255, 0, 0));
         SetBkMode(hdc, TRANSPARENT);
         
-        RECT rc;
-        GetClientRect(hwnd, &rc);
-        rc.left += 10;
-        rc.top += 10;
-        DrawText(hdc, infoMsg, strlen(infoMsg), &rc, DT_LEFT);
+        if (set_OSD) {
+            RECT rc;
+            GetClientRect(hwnd, &rc);
+            rc.left += 10;
+            rc.top += 10;
+            DrawText(hdc, infoMsg, strlen(infoMsg), &rc, DT_LEFT);
+        }
 
         SelectObject(hdc, original);
         DeleteObject(hPen);
@@ -363,12 +367,16 @@ bool LayeredWindows::create_border_window(RECT rect)
     if (pSetLayeredWindowAttributes != NULL)
         pSetLayeredWindowAttributes(hwnd, RGB(255, 255, 255), 0, LWA_COLORKEY);
     SetWindowPos(hwnd, HWND_TOPMOST, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, SWP_FRAMECHANGED | SWP_NOACTIVATE);
-    SetWindowDisplayAffinity(hwnd, WDA_EXCLUDEFROMCAPTURE);
+    if (VNC_OSVersion::getInstance()->OS_WIN10_TRANS)
+        SetWindowDisplayAffinity(hwnd, WDA_EXCLUDEFROMCAPTURE);
     return true;
 }
 
 bool LayeredWindows::SetBlankMonitor(bool enabled, bool blankMonitorEnabled, bool black_window_active)
 {
+    if (!VNC_OSVersion::getInstance()->OS_WIN10_TRANS && VNC_OSVersion::getInstance()->OS_WIN10
+        || VNC_OSVersion::getInstance()->OS_WIN8)
+        return false;
 
     // Also Turn Off the Monitor if allowed ("Blank Screen", "Blank Monitor")
     if (blankMonitorEnabled)
@@ -395,10 +403,11 @@ bool LayeredWindows::SetBlankMonitor(bool enabled, bool blankMonitorEnabled, boo
     return black_window_active;
 }
 
-void LayeredWindows::SetBorderWindow(bool enabled, RECT rect, char* infoMsg)
+void LayeredWindows::SetBorderWindow(bool enabled, RECT rect, char* infoMsg, bool set_OSD)
 {
     strcpy_s(this->infoMsg, infoMsg);
     this->rect = rect;
+    this->set_OSD = set_OSD;
     if (enabled) {
         HANDLE ThreadHandle2 = NULL;
         DWORD dwTId;

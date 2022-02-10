@@ -465,7 +465,10 @@ vncProperties::DialogProc(HWND hwnd,
 		   
 		   HWND hBlank = GetDlgItem(hwnd, IDC_BLANK);
            SendMessage(hBlank, BM_SETCHECK, _this->m_server->BlankMonitorEnabled(), 0);
-
+		   if (!VNC_OSVersion::getInstance()->OS_WIN10_TRANS && VNC_OSVersion::getInstance()->OS_WIN10)
+			   SetDlgItemText(hwnd, IDC_BLANK, "Enable Blank Monitor on Viewer Request require Min Win10 build 19041 ");
+		   if (VNC_OSVersion::getInstance()->OS_WIN8)
+			   SetDlgItemText(hwnd, IDC_BLANK, "Enable Blank Monitor on Viewer Not supported on windows 8 ");
 		   HWND hBlank2 = GetDlgItem(hwnd, IDC_BLANK2); //PGM
            SendMessage(hBlank2, BM_SETCHECK, _this->m_server->BlankInputsOnly(), 0); //PGM
 		   
@@ -690,6 +693,12 @@ vncProperties::DialogProc(HWND hwnd,
 			SendMessage(hwndDlg,
 				BM_SETCHECK,
 				_this->m_server->getNotification(),
+				0);
+
+			hwndDlg = GetDlgItem(hwnd, IDC_OSD);
+			SendMessage(hwndDlg,
+				BM_SETCHECK,
+				_this->m_server->getOSD(),
 				0);
 
 			char maxviewersChar[128];
@@ -969,6 +978,11 @@ vncProperties::DialogProc(HWND hwnd,
 					SendMessage(hwndDlg, BM_GETCHECK, 0, 0) == BST_CHECKED
 				);
 
+				hwndDlg = GetDlgItem(hwnd, IDC_OSD);
+				_this->m_server->setOSD(
+					SendMessage(hwndDlg, BM_GETCHECK, 0, 0) == BST_CHECKED
+				);
+
 				if (SendMessage(GetDlgItem(hwnd, IDC_MV1), BM_GETCHECK, 0, 0)
 					== BST_CHECKED) {
 					_this->m_server->SetConnectPriority(0);
@@ -992,7 +1006,7 @@ vncProperties::DialogProc(HWND hwnd,
 				_this->m_server->FTUserImpersonation(SendMessage(hFileTransferUserImp, BM_GETCHECK, 0, 0) == BST_CHECKED);
 
 				HWND hBlank = GetDlgItem(hwnd, IDC_BLANK);
-				_this->m_server->BlankMonitorEnabled(SendMessage(hBlank, BM_GETCHECK, 0, 0) == BST_CHECKED);
+				_this->m_server->BlankMonitorEnabled(SendMessage(hBlank, BM_GETCHECK, 0, 0) == BST_CHECKED);				
 				HWND hBlank2 = GetDlgItem(hwnd, IDC_BLANK2); //PGM
 				_this->m_server->BlankInputsOnly(SendMessage(hBlank2, BM_GETCHECK, 0, 0) == BST_CHECKED); //PGM				
 				
@@ -1790,6 +1804,7 @@ LABELUSERSETTINGS:
 
 	m_pref_Frame = FALSE;
 	m_pref_Notification = FALSE;
+	m_pref_OSD = FALSE;
 	m_pref_NotificationSelection = 0;
 
 	m_pref_EnableRemoteInputs=TRUE;
@@ -1948,6 +1963,8 @@ vncProperties::LoadUserPrefs(HKEY appkey)
 	m_server->setFrame(m_pref_Frame);
 	m_pref_Notification = LoadInt(appkey, "Notification", m_pref_Notification);
 	m_server->setNotification(m_pref_Notification);
+	m_pref_OSD = LoadInt(appkey, "OSD", m_pref_OSD);
+	m_server->setOSD(m_pref_OSD);
 	m_pref_NotificationSelection = LoadInt(appkey, "NotificationSelection", m_pref_NotificationSelection);
 	m_server->setNotificationSelection(m_pref_NotificationSelection);
 	
@@ -1996,6 +2013,7 @@ vncProperties::ApplyUserPrefs()
 
 	m_server->setFrame(m_pref_Frame);
 	m_server->setNotification(m_pref_Notification);
+	m_server->setOSD(m_pref_OSD);
 	m_server->setNotificationSelection(m_pref_NotificationSelection);
 
 	m_server->SetAutoIdleDisconnectTimeout(m_pref_IdleTimeout);
@@ -2260,6 +2278,7 @@ vncProperties::SaveUserPrefs(HKEY appkey)
 	SaveInt(appkey, "Collabo", m_server->getCollabo());
 	SaveInt(appkey, "Frame", m_server->getFrame());
 	SaveInt(appkey, "Notification", m_server->getNotification());
+	SaveInt(appkey, "OSD", m_server->getOSD());
 	SaveInt(appkey, "NotificationSelection", m_server->getNotificationSelection());
 
 
@@ -2406,6 +2425,7 @@ void vncProperties::LoadFromIniFile()
 
 	m_pref_Frame = FALSE;
 	m_pref_Notification = FALSE;
+	m_pref_OSD = FALSE;
 	m_pref_NotificationSelection = 0;
 
 	m_pref_RemoveWallpaper=FALSE;
@@ -2511,6 +2531,9 @@ void vncProperties::LoadUserPrefsFromIniFile()
 	m_server->setFrame(m_pref_Frame);
 	m_pref_Notification = myIniFile.ReadInt("admin", "Notification", m_pref_Notification);
 	m_server->setNotification(m_pref_Notification);
+
+	m_pref_OSD = myIniFile.ReadInt("admin", "OSD", m_pref_OSD);
+	m_server->setOSD(m_pref_OSD);
 	m_pref_NotificationSelection = myIniFile.ReadInt("admin", "NotificationSelection", m_pref_NotificationSelection);
 	m_server->setNotificationSelection(m_pref_NotificationSelection);
 
@@ -2670,6 +2693,7 @@ void vncProperties::SaveUserPrefsToIniFile()
 	myIniFile.WriteInt("admin", "Collabo", m_server->getCollabo());
 	myIniFile.WriteInt("admin", "Frame", m_server->getFrame());
 	myIniFile.WriteInt("admin", "Notification", m_server->getNotification());
+	myIniFile.WriteInt("admin", "OSD", m_server->getOSD());
 	myIniFile.WriteInt("admin", "NotificationSelection", m_server->getNotificationSelection());
 	// Lock settings
 	myIniFile.WriteInt("admin", "LockSetting", m_server->LockSettings());

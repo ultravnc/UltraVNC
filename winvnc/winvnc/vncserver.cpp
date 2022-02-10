@@ -260,6 +260,7 @@ vncServer::vncServer()
 	DriverWantedSet = FALSE;
 	m_Frame = FALSE;
 	m_Notification = FALSE;
+	m_OSD = FALSE;
 	m_NotificationSelection = 0;
 }
 
@@ -2806,3 +2807,13 @@ UINT vncServer::getNumberViewers()
 {
 	return  m_authClients.size();
 }
+
+BOOL vncServer::getOSD() 
+{ 
+	return m_OSD; 
+};
+
+void vncServer::setOSD(const BOOL setting) 
+{ 
+	m_OSD = setting; 
+};

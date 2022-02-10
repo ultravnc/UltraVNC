@@ -189,6 +189,7 @@ protected:
 
 	BOOL m_pref_Frame;
 	BOOL m_pref_Notification;
+	BOOL m_pref_OSD;
 	int	m_pref_NotificationSelection;
 
 private:

@@ -516,7 +516,9 @@ public:
 	BOOL getFrame(){return m_Frame;};
 	void setFrame(const BOOL setting){m_Frame = setting;};
 	BOOL getNotification() { return m_Notification; };
+	BOOL getOSD();
 	void setNotification(const BOOL setting) { m_Notification = setting; };
+	void setOSD(const BOOL setting);
 	int getNotificationSelection() { return m_NotificationSelection; };
 	void setNotificationSelection(const int setting) { m_NotificationSelection = setting; };
 
@@ -687,6 +689,7 @@ protected:
 	bool KillAuthClientsBuzy;	
 	BOOL m_Frame;
 	BOOL m_Notification;
+	BOOL m_OSD;
 	int	m_NotificationSelection;
 };
 

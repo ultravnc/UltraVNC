@@ -219,7 +219,7 @@ BEGIN
     CONTROL         "Remove Wallpaper while connected",IDC_REMOVE_WALLPAPER,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,251,348,134,10
     CONTROL         "Enable Blank Monitor on Viewer Request",IDC_BLANK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,251,362,144,10
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,251,359,144,15
     CONTROL         "Disable Only Inputs on Blanking Request",IDC_BLANK2,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,255,376,142,10
     CONTROL         "DisableTrayIcon",IDC_DISABLETRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,251,404,67,10
@@ -278,15 +278,15 @@ BEGIN
     GROUPBOX        "Incoming connection",IDC_STATIC,7,335,220,144
     CONTROL         "Sharing indicator frame around shared screen",IDC_FRAME,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,416,167,10
-    CONTROL         "Show notification on connect",IDC_NOTIFOCATION,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,428,110,10
-    CONTROL         "Always show on client connect",IDC_RADIONOTIFICATIONON,
-                    "Button",BS_AUTORADIOBUTTON,15,452,115,10
+    CONTROL         "Show notification on connect",IDC_NOTIFOCATION,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,439,110,10
+    CONTROL         "Always show notification ",IDC_RADIONOTIFICATIONON,
+                    "Button",BS_AUTORADIOBUTTON,15,452,98,10
     CONTROL         "Show only if client provides notification information",IDC_RADIONOTIFICATIONIFPROVIDED,
                     "Button",BS_AUTORADIOBUTTON,15,464,182,10
     LTEXT           "Connection notifications:",IDC_STATIC,16,405,81,8
-    LTEXT           "Notification control:",IDC_STATIC,16,442,64,8
     EDITTEXT        IDC_EDITQUERYTEXT,14,359,213,14,ES_AUTOHSCROLL
     LTEXT           "Query Text",IDC_STATIC,190,349,37,8
+    CONTROL         "Show notification as OSD",IDC_OSD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,30,427,120,10
 END
 
 IDD_ABOUT1 DIALOGEX 0, 0, 286, 222

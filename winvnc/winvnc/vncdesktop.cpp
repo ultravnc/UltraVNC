@@ -845,7 +845,7 @@ vncDesktop::Shutdown()
 	ShutdownInitWindowthread();
 
 	RECT rect{};
-	layeredWindows->SetBorderWindow(0, rect, "");
+	layeredWindows->SetBorderWindow(0, rect, "", false);
 	// Now free all the bitmap stuff
 	if (m_hrootdc_Desktop != NULL)
 	{
@@ -1090,7 +1090,7 @@ vncDesktop::InitBitmap()
 	vnclog.Print(LL_INTINFO, VNCLOG("bitmap dimensions are %d x %d\n"), m_bmrect.br.x, m_bmrect.br.y);
 
 	if (m_server->getFrame())
-		layeredWindows->SetBorderWindow(true, rect, m_server->getInfoMsg());
+		layeredWindows->SetBorderWindow(true, rect, m_server->getInfoMsg(), m_server->getOSD());
 
 	// Create a compatible memory DC
 	m_hmemdc = CreateCompatibleDC(m_hrootdc_Desktop);

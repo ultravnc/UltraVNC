@@ -17,10 +17,11 @@ private:
 	static HFONT hFont;
 	static HPEN hPen;
 	static char infoMsg[255];
+	static bool set_OSD;
 	int nHeight;
 public:
 	LayeredWindows();
 	~LayeredWindows();
 	bool SetBlankMonitor(bool enabled, bool blankMonitorEnabled, bool black_window_activ);
-	void SetBorderWindow(bool enabled, RECT rect, char* infoMsg);
+	void SetBorderWindow(bool enabled, RECT rect, char* infoMsg, bool set_OSD);
 };
