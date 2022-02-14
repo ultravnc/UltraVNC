@@ -1,13 +1,13 @@
 /*
-  Copyright (c) 1990-2007 Info-ZIP.  All rights reserved.
+  Copyright (c) 1990-2002 Info-ZIP.  All rights reserved.
 
-  See the accompanying file LICENSE, version 2007-Mar-04 or later
+  See the accompanying file LICENSE, version 2000-Apr-09 or later
   (the contents of which are also included in unzip.h) for terms of use.
   If, for some reason, all these files are missing, the Info-ZIP license
   also may be found at:  ftp://ftp.info-zip.org/pub/infozip/license.html
 */
 /* explode.c -- by Mark Adler
-   version c17d, 01 December 2007 */
+   version c15, 6 July 1996 */
 
 
 /* Copyright history:
@@ -64,9 +64,6 @@
                                     get_tree() failed).
     c17b 16 Feb 02  C. Spieler      changed type of the "extra lengths" array
                                     "extra" from ush into uch (to save space)
-    c17c 10 Aug 04  NN              file sizes use zoff_t.
-    c17d 01 Dec 07  C. Spieler      type for file sizes changed from zoff_t
-                                    into zusz_t.
  */
 
 
@@ -258,7 +255,7 @@ unsigned bdl;                   /* number of distance low bits */
 /* Decompress the imploded data using coded literals and a sliding
    window (of size 2^(6+bdl) bytes). */
 {
-  zusz_t s;             /* bytes to decompress */
+  ulg s;                /* bytes to decompress */
   register unsigned e;  /* table entry flag/number of extra bits */
   unsigned n, d;        /* length and index for copy */
   unsigned w;           /* current window position */
@@ -313,7 +310,7 @@ unsigned bdl;                   /* number of distance low bits */
       }
 
       /* do the copy */
-      s = (s > (zusz_t)n ? s - (zusz_t)n : 0);
+      s = (s > (ulg)n ? s - (ulg)n : 0);
       do {
 #if (defined(DLL) && !defined(NO_SLIDE_REDIR))
         if (G.redirect_slide) {
@@ -376,7 +373,7 @@ unsigned bdl;           /* number of distance low bits */
 /* Decompress the imploded data using uncoded literals and a sliding
    window (of size 2^(6+bdl) bytes). */
 {
-  zusz_t s;             /* bytes to decompress */
+  ulg s;                /* bytes to decompress */
   register unsigned e;  /* table entry flag/number of extra bits */
   unsigned n, d;        /* length and index for copy */
   unsigned w;           /* current window position */
@@ -431,7 +428,7 @@ unsigned bdl;           /* number of distance low bits */
       }
 
       /* do the copy */
-      s = (s > (zusz_t)n ? s - (zusz_t)n : 0);
+      s = (s > (ulg)n ? s - (ulg)n : 0);
       do {
 #if (defined(DLL) && !defined(NO_SLIDE_REDIR))
         if (G.redirect_slide) {

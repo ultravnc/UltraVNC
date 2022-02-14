@@ -1,7 +1,7 @@
 /*
-  Copyright (c) 1990-2008 Info-ZIP.  All rights reserved.
+  Copyright (c) 1990-2005 Info-ZIP.  All rights reserved.
 
-  See the accompanying file LICENSE, version 2007-Mar-04 or later
+  See the accompanying file LICENSE, version 2000-Apr-09 or later
   (the contents of which are also included in unzip.h) for terms of use.
   If, for some reason, all these files are missing, the Info-ZIP license
   also may be found at:  ftp://ftp.info-zip.org/pub/infozip/license.html
@@ -71,7 +71,7 @@
 #if (defined(__EMX__) || defined(__CYGWIN__))
 #  define MKDIR(path,mode)   mkdir(path,mode)
 #else
-#  define MKDIR(path,mode)   mkdir(path)
+#  define MKDIR(path,mode)   _mkdir(path)
 #endif
 
 #ifdef HAVE_WORKING_DIRENT_H
@@ -157,7 +157,7 @@ static void maskDOSdevice   (__GPRO__ char *pathcomp);
 static void map2fat         (char *pathcomp, char **pEndFAT);
 
 
-#if (defined(__MINGW32__) && !defined(USE_MINGW_GLOBBING))
+#ifdef __MINGW32__
    int _CRT_glob = 0;   /* suppress command line globbing by C RTL */
 #endif
 
@@ -197,7 +197,7 @@ char *GetLoadPath(__GPRO)
 
 #else    /* use generic API call */
 
-    GetModuleFileName(NULL, G.filename, FILNAMSIZ);
+    GetModuleFileName(NULL, G.filename, FILNAMSIZ-1);
     _ISO_INTERN(G.filename);    /* translate to codepage of C rtl's stdio */
     return G.filename;
 #endif
@@ -221,7 +221,7 @@ static zDIR *Opendir(n)
 {
     zDIR *d;                /* malloc'd return value */
     char *p;                /* malloc'd temporary string */
-    WIN32_FIND_DATAA fd;
+    WIN32_FIND_DATA fd;
     extent len = strlen(n);
 
     /* Start searching for files in directory n */
@@ -242,7 +242,7 @@ static zDIR *Opendir(n)
     }
     strcpy(p+len, "/*");
 
-    if (INVALID_HANDLE_VALUE == (d->d_hFindFile = FindFirstFileA(p, &fd))) {
+    if (INVALID_HANDLE_VALUE == (d->d_hFindFile = FindFirstFile(p, &fd))) {
         free((zvoid *)d);
         free((zvoid *)p);
         return NULL;
@@ -271,9 +271,9 @@ static struct zdirent *Readdir(d)
         d->d_first = 0;
     else
     {
-        WIN32_FIND_DATAA fd;
+        WIN32_FIND_DATA fd;
 
-        if ( !FindNextFileA(d->d_hFindFile, &fd) )
+        if ( !FindNextFile(d->d_hFindFile, &fd) )
             return NULL;
 
         ISO_TO_INTERN(fd.cFileName, d->d_name);
@@ -631,9 +631,6 @@ static void utime2VFatFileTime(time_t ut, FILETIME *pft, int clipDosMin)
     SYSTEMTIME w32tm;
     FILETIME lft;
 
-    /* The milliseconds field gets always initialized to 0. */
-    w32tm.wMilliseconds = 0;
-
 #ifdef __BORLANDC__   /* Borland C++ 5.x crashes when trying to reference tm */
     if (utc < UTIME_1980_JAN_01_00_00)
         utc = UTIME_1980_JAN_01_00_00;
@@ -809,9 +806,8 @@ static int VFatFileTime2utime(const FILETIME *pft, time_t *ut)
 #endif
 
     if (!FileTimeToLocalFileTime(pft, &lft)) {
-        /* if pft cannot be converted to local time, set ut to current time */
-        time(ut);
-        return FALSE;
+        /* if pft cannot be converted to local time, return current time */
+        return (int)time(NULL);
     }
     FTTrace((stdout, "VFatFT2utime, feed for mktime()", 1, &lft));
 #ifndef HAVE_MKTIME
@@ -996,7 +992,7 @@ static int getNTfiletime(__G__ pModFT, pAccFT, pCreFT)
 /* Function SetFileSize() */
 /**************************/
 
-int SetFileSize(FILE *file, zusz_t filesize)
+int SetFileSize(FILE *file, ulg filesize)
 {
 #ifdef __RSXNT__
     /* RSXNT environment lacks a translation function from C file pointer
@@ -1007,9 +1003,6 @@ int SetFileSize(FILE *file, zusz_t filesize)
       rommel@ars.de
      */
     HANDLE os_fh;
-#ifdef Z_UINT8_DEFINED
-    LARGE_INTEGER fsbuf;
-#endif
 
     /* Win9x supports FAT file system, only; presetting file size does
        not help to prevent fragmentation. */
@@ -1021,15 +1014,9 @@ int SetFileSize(FILE *file, zusz_t filesize)
        available for every Win32 compiler environment.
        (see also win32/win32.c of the Zip distribution)
      */
-    os_fh = (HANDLE)_get_osfhandle(fileno(file));
+    os_fh = (HANDLE)_get_osfhandle(_fileno(file));
     /* move file pointer behind the last byte of the expected file size */
-#ifdef Z_UINT8_DEFINED
-    fsbuf.QuadPart = filesize;
-    if ((SetFilePointer(os_fh, fsbuf.LowPart, &fsbuf.HighPart, FILE_BEGIN)
-         == 0xFFFFFFFF) && GetLastError() != NO_ERROR)
-#else
-    if (SetFilePointer(os_fh, (ulg)filesize, 0, FILE_BEGIN) == 0xFFFFFFFF)
-#endif
+    if (SetFilePointer(os_fh, filesize, 0, FILE_BEGIN) == 0xFFFFFFFF)
         return -1;
     /* extend/truncate file to the current position */
     if (SetEndOfFile(os_fh) == 0)
@@ -1052,7 +1039,7 @@ void close_outfile(__G)
     FILETIME Modft;    /* File time type defined in NT, `last modified' time */
     FILETIME Accft;    /* NT file time type, `last access' time */
     FILETIME Creft;    /* NT file time type, `file creation' time */
-    HANDLE hFile = INVALID_HANDLE_VALUE;        /* File handle defined in NT */
+    HANDLE hFile;      /* File handle defined in NT    */
     int gotTime;
 #ifdef NTSD_EAS
     uch *ebSDptr;
@@ -1067,15 +1054,6 @@ void close_outfile(__G)
 #   define Ansi_Fname  G.filename
 #endif
 
-#ifndef __RSXNT__
-    if (IsWinNT()) {
-        /* Truncate the file to the current position.
-         * This is needed to remove excess allocation in case the
-         * extraction has failed or stopped prematurely. */
-        SetEndOfFile((HANDLE)_get_osfhandle(fileno(G.outfile)));
-    }
-#endif
-
     /* Close the file and then re-open it using the Win32
      * CreateFile call, so that the file can be created
      * with GENERIC_WRITE access, otherwise the SetFileTime
@@ -1086,18 +1064,13 @@ void close_outfile(__G)
     if (uO.cflag)
         return;
 
-    /* skip restoring time stamps on user's request */
-    if (uO.D_flag <= 1) {
-        gotTime = getNTfiletime(__G__ &Modft, &Accft, &Creft);
+    gotTime = getNTfiletime(__G__ &Modft, &Accft, &Creft);
 
-        /* open a handle to the file before processing extra fields;
-           we do this in case new security on file prevents us from updating
-           time stamps */
-        hFile = CreateFileA(Ansi_Fname, GENERIC_WRITE, FILE_SHARE_WRITE, NULL,
-             OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-    } else {
-        gotTime = 0;
-    }
+    /* open a handle to the file before processing extra fields;
+       we do this in case new security on file prevents us from updating
+       time stamps */
+    hFile = CreateFile(Ansi_Fname, GENERIC_WRITE, FILE_SHARE_WRITE, NULL,
+         OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 
     /* sfield@microsoft.com: set attributes before time in case we decide to
        support other filetime members later.  This also allows us to apply
@@ -1107,8 +1080,8 @@ void close_outfile(__G)
        FILE_ATTRIBUTE_ARCHIVE appears in the attributes.  This works well
        as an optimization because FILE_ATTRIBUTE_ARCHIVE gets applied to the
        file anyway, when it's created new. */
-    if ((G.pInfo->file_attr & 0x7F) & ~FILE_ATTRIBUTE_ARCHIVE) {
-        if (!SetFileAttributesA(Ansi_Fname, G.pInfo->file_attr & 0x7F))
+    if((G.pInfo->file_attr & 0x7F) & ~FILE_ATTRIBUTE_ARCHIVE) {
+        if (!SetFileAttributes(Ansi_Fname, G.pInfo->file_attr & 0x7F))
             Info(slide, 1, ((char *)slide,
               "\nwarning (%d): could not set file attributes\n",
               (int)GetLastError()));
@@ -1133,24 +1106,21 @@ void close_outfile(__G)
     }
 #endif /* NTSD_EAS */
 
-    /* skip restoring time stamps on user's request */
-    if (uO.D_flag <= 1) {
-        if ( hFile == INVALID_HANDLE_VALUE )
-            Info(slide, 1, ((char *)slide,
-              "\nCreateFile() error %d when trying set file time\n",
-              (int)GetLastError()));
-        else {
-            if (gotTime) {
-                FILETIME *pModft = (gotTime & EB_UT_FL_MTIME) ? &Modft : NULL;
-                FILETIME *pAccft = (gotTime & EB_UT_FL_ATIME) ? &Accft : NULL;
-                FILETIME *pCreft = (gotTime & EB_UT_FL_CTIME) ? &Creft : NULL;
+    if ( hFile == INVALID_HANDLE_VALUE )
+        Info(slide, 1, ((char *)slide,
+          "\nCreateFile() error %d when trying set file time\n",
+          (int)GetLastError()));
+    else {
+        if (gotTime) {
+            FILETIME *pModft = (gotTime & EB_UT_FL_MTIME) ? &Modft : NULL;
+            FILETIME *pAccft = (gotTime & EB_UT_FL_ATIME) ? &Accft : NULL;
+            FILETIME *pCreft = (gotTime & EB_UT_FL_CTIME) ? &Creft : NULL;
 
-                if (!SetFileTime(hFile, pCreft, pAccft, pModft))
-                    Info(slide, 0, ((char *)slide,
-                      "\nSetFileTime failed: %d\n", (int)GetLastError()));
-            }
-            CloseHandle(hFile);
+            if (!SetFileTime(hFile, pCreft, pAccft, pModft))
+                Info(slide, 0, ((char *)slide, "\nSetFileTime failed: %d\n",
+                  (int)GetLastError()));
         }
+        CloseHandle(hFile);
     }
 
     return;
@@ -1216,10 +1186,8 @@ int defer_dir_attribs(__G__ pd)
 
     d_entry->perms = G.pInfo->file_attr;
 
-    d_entry->gotTime = (uO.D_flag <= 0
-                        ? getNTfiletime(__G__ &(d_entry->Modft),
-                                        &(d_entry->Accft), &(d_entry->Creft))
-                        : 0);
+    d_entry->gotTime = getNTfiletime(__G__ &(d_entry->Modft),
+                                     &(d_entry->Accft), &(d_entry->Creft));
     return PK_OK;
 } /* end function defer_dir_attribs() */
 
@@ -1229,7 +1197,7 @@ int set_direc_attribs(__G__ d)
     direntry *d;
 {
     int errval;
-    HANDLE hFile = INVALID_HANDLE_VALUE;        /* File handle defined in NT */
+    HANDLE hFile;      /* File handle defined in NT    */
 #ifdef __RSXNT__
     char *ansi_name;
 #endif
@@ -1247,21 +1215,18 @@ int set_direc_attribs(__G__ d)
 #   define Ansi_Dirname  d->fn
 #endif
 
-    /* Skip restoring directory time stamps on user' request. */
-    if (uO.D_flag <= 0) {
-        /* Open a handle to the directory before processing extra fields;
-           we do this in case new security on file prevents us from updating
-           time stamps.
-           Although the WIN32 documentation recommends to use GENERIC_WRITE
-           access flag to create the handle for SetFileTime(), this is too
-           demanding for directories with the "read-only" attribute bit set.
-           So we use the more specific flag FILE_WRITE_ATTRIBUTES here to
-           request the minimum required access rights. (This problem is a
-           Windows bug that has been silently fixed in Windows XP SP2.) */
-        hFile = CreateFileA(Ansi_Dirname, FILE_WRITE_ATTRIBUTES,
-                            FILE_SHARE_READ|FILE_SHARE_WRITE, NULL,
-                            OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
-    }
+    /* Open a handle to the directory before processing extra fields;
+       we do this in case new security on file prevents us from updating
+       time stamps.
+       Although the WIN32 documentation recommends to use GENERIC_WRITE
+       access flag to create the handle for SetFileTime(), this is too
+       demanding for directories with the "read-only" attribute bit set.
+       So we use the more specific flag FILE_WRITE_ATTRIBUTES here to
+       request the minimum required access rights. (This problem is a
+       Windows bug that has been silently fixed in Windows XP SP2.) */
+    hFile = CreateFile(Ansi_Dirname, FILE_WRITE_ATTRIBUTES,
+                       FILE_SHARE_READ|FILE_SHARE_WRITE, NULL,
+                       OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
 
 #ifdef NTSD_EAS
     if (NtAtt(d)->SDlen > 0) {
@@ -1289,33 +1254,30 @@ int set_direc_attribs(__G__ d)
     }
 #endif /* NTSD_EAS */
 
-    /* Skip restoring directory time stamps on user' request. */
-    if (uO.D_flag <= 0) {
-        if (hFile == INVALID_HANDLE_VALUE) {
-            Info(slide, 1, ((char *)slide,
-              "warning: CreateFile() error %d (set file times for %s)\n",
-              (int)GetLastError(), FnFilter1(d->fn)));
-            if (!errval)
-                errval = PK_WARN;
-        } else {
-            if (NtAtt(d)->gotTime) {
-                FILETIME *pModft = (NtAtt(d)->gotTime & EB_UT_FL_MTIME)
-                                  ? &(NtAtt(d)->Modft) : NULL;
-                FILETIME *pAccft = (NtAtt(d)->gotTime & EB_UT_FL_ATIME)
-                                  ? &(NtAtt(d)->Accft) : NULL;
-                FILETIME *pCreft = (NtAtt(d)->gotTime & EB_UT_FL_CTIME)
-                                  ? &(NtAtt(d)->Creft) : NULL;
+    if (hFile == INVALID_HANDLE_VALUE) {
+        Info(slide, 1, ((char *)slide,
+          "warning: CreateFile() error %d (set file times for %s)\n",
+          (int)GetLastError(), FnFilter1(d->fn)));
+        if (!errval)
+            errval = PK_WARN;
+    } else {
+        if (NtAtt(d)->gotTime) {
+            FILETIME *pModft = (NtAtt(d)->gotTime & EB_UT_FL_MTIME)
+                              ? &(NtAtt(d)->Modft) : NULL;
+            FILETIME *pAccft = (NtAtt(d)->gotTime & EB_UT_FL_ATIME)
+                              ? &(NtAtt(d)->Accft) : NULL;
+            FILETIME *pCreft = (NtAtt(d)->gotTime & EB_UT_FL_CTIME)
+                              ? &(NtAtt(d)->Creft) : NULL;
 
-                if (!SetFileTime(hFile, pCreft, pAccft, pModft)) {
-                    Info(slide, 0, ((char *)slide,
-                      "warning:  SetFileTime() for %s error %d\n",
-                      FnFilter1(d->fn), (int)GetLastError()));
-                    if (!errval)
-                        errval = PK_WARN;
-                }
+            if (!SetFileTime(hFile, pCreft, pAccft, pModft)) {
+                Info(slide, 0, ((char *)slide,
+                  "warning:  SetFileTime() for %s error %d\n",
+                  FnFilter1(d->fn), (int)GetLastError()));
+                if (!errval)
+                    errval = PK_WARN;
             }
-            CloseHandle(hFile);
         }
+        CloseHandle(hFile);
     }
 
     return errval;
@@ -1348,7 +1310,7 @@ int stamp_file(__GPRO__ ZCONST char *fname, time_t modtime)
 #endif
 
     /* open a handle to the file to prepare setting the mod-time stamp */
-    hFile = CreateFileA(Ansi_Fname, GENERIC_WRITE, FILE_SHARE_WRITE, NULL,
+    hFile = CreateFile(Ansi_Fname, GENERIC_WRITE, FILE_SHARE_WRITE, NULL,
          OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
     if ( hFile == INVALID_HANDLE_VALUE ) {
         errstat = -1;
@@ -1385,7 +1347,7 @@ static int isfloppy(int nDrive)   /* 1 == A:, 2 == B:, etc. */
     rootPathName[2] = '/';
     rootPathName[3] = '\0';
 
-    return (GetDriveTypeA(rootPathName) == DRIVE_REMOVABLE);
+    return (GetDriveType(rootPathName) == DRIVE_REMOVABLE);
 
 } /* end function isfloppy() */
 
@@ -1418,7 +1380,7 @@ static int NTQueryVolInfo(__GPRO__ const char *name)
     name = ansi_name;
 #endif
 
-    if ((!strncmp(name, "//", 2) || !strncmp(name, "\\\\", 2)) &&
+    if ((!strncmp(name, "//", 2) || !strncmp(name,"\\\\", 2)) &&
         (name[2] != '\0' && name[2] != '/' && name[2] != '\\')) {
         /* GetFullPathname() and GetVolumeInformation() do not work
          * on UNC names. For now, we return "error".
@@ -1431,7 +1393,7 @@ static int NTQueryVolInfo(__GPRO__ const char *name)
         tmp0 = (char *)name;
     else
     {
-        if (!GetFullPathNameA(name, MAX_PATH, tmp1, &tmp0))
+        if (!GetFullPathName(name, MAX_PATH, tmp1, &tmp0))
             return FALSE;
         tmp0 = &tmp1[0];
     }
@@ -1441,10 +1403,10 @@ static int NTQueryVolInfo(__GPRO__ const char *name)
         G.lastRootPath[2] = '/';            /* e.g. "A:/"                */
         G.lastRootPath[3] = '\0';
 
-        if (!GetVolumeInformationA((LPCSTR)G.lastRootPath,
-              (LPSTR)tmp1, (DWORD)MAX_PATH,
+        if (!GetVolumeInformation((LPCTSTR)G.lastRootPath,
+              (LPTSTR)tmp1, (DWORD)MAX_PATH,
               &volSerNo, &maxCompLen, &fileSysFlags,
-              (LPSTR)tmp2, (DWORD)MAX_PATH)) {
+              (LPTSTR)tmp2, (DWORD)MAX_PATH)) {
             G.lastRootPath[0] = '\0';
             return FALSE;
         }
@@ -1456,7 +1418,7 @@ static int NTQueryVolInfo(__GPRO__ const char *name)
         /* Volumes in (V)FAT and (OS/2) HPFS format store file timestamps in
          * local time!
          */
-        G.lastVolLocTim = !strncmp(strupr(tmp2), "VFAT", 4) ||
+        G.lastVolLocTim = !strncmp(_strupr(tmp2), "VFAT", 4) ||
                           !strncmp(tmp2, "HPFS", 4) ||
                           !strncmp(tmp2, "FAT", 3);
     }
@@ -1832,7 +1794,7 @@ int mapname(__G__ renamed)
                attribute need not be masked, since it does not prevent
                modifications in the new directory. */
             if(G.pInfo->file_attr & (0x7F & ~FILE_ATTRIBUTE_DIRECTORY)) {
-                if (!SetFileAttributesA(Ansi_Fname, G.pInfo->file_attr & 0x7F))
+                if (!SetFileAttributes(Ansi_Fname, G.pInfo->file_attr & 0x7F))
                     Info(slide, 1, ((char *)slide,
                       "\nwarning (%d): could not set file attributes for %s\n",
                       (int)GetLastError(), FnFilter1(G.filename)));
@@ -1845,7 +1807,7 @@ int mapname(__G__ renamed)
 
             /* set file attributes: */
             if(G.pInfo->file_attr & (0x7F & ~FILE_ATTRIBUTE_DIRECTORY)) {
-                if (!SetFileAttributesA(Ansi_Fname, G.pInfo->file_attr & 0x7F))
+                if (!SetFileAttributes(Ansi_Fname, G.pInfo->file_attr & 0x7F))
                     Info(slide, 1, ((char *)slide,
                       "\nwarning (%d): could not set file attributes for %s\n",
                       (int)GetLastError(), FnFilter1(G.filename)));
@@ -1913,7 +1875,7 @@ int mapname(__G__ renamed)
         if (QCOND2)
             Info(slide, 0, ((char *)slide, "labelling %s %-22s\n", drive,
               FnFilter1(G.filename)));
-        if (!SetVolumeLabelA(drive, Ansi_Fname)) {
+        if (!SetVolumeLabel(drive, Ansi_Fname)) {
             Info(slide, 1, ((char *)slide,
               "mapname:  error setting volume label\n"));
             return (error & ~MPN_MASK) | MPN_ERR_SKIP;
@@ -1957,7 +1919,7 @@ static void maskDOSdevice(__G__ pathcomp)
 #endif
 
 #ifdef DEBUG
-    if (zstat(pathcomp, &G.statbuf) == 0) {
+    if (stat(pathcomp, &G.statbuf) == 0) {
         Trace((stderr,
                "maskDOSdevice() stat(\"%s\", buf) st_mode result: %X, %o\n",
                FnFilter1(pathcomp), G.statbuf.st_mode, G.statbuf.st_mode));
@@ -1966,7 +1928,7 @@ static void maskDOSdevice(__G__ pathcomp)
                FnFilter1(pathcomp)));
     }
 #endif
-    if (zstat(pathcomp, &G.statbuf) == 0 && S_ISCHR(G.statbuf.st_mode)) {
+    if (stat(pathcomp, &G.statbuf) == 0 && S_ISCHR(G.statbuf.st_mode)) {
         extent i;
 
         /* pathcomp contains a name of a DOS character device (builtin or
@@ -2171,11 +2133,8 @@ int checkdir(__G__ pathcomp, flag)
             if (MKDIR(G.buildpathFAT, 0777) == -1) { /* create the directory */
                 Info(slide, 1, ((char *)slide,
                   "checkdir error:  cannot create %s\n\
-                 %s\n\
                  unable to process %s.\n",
-                  FnFilter2(G.buildpathFAT),
-                  strerror(errno),
-                  FnFilter1(G.filename)));
+                  FnFilter2(G.buildpathFAT), FnFilter1(G.filename)));
                 free(G.buildpathHPFS);
                 free(G.buildpathFAT);
                 /* path didn't exist, tried to create, failed */
@@ -2204,11 +2163,8 @@ int checkdir(__G__ pathcomp, flag)
             if (MKDIR(G.buildpathFAT, 0777) == -1) { /* create the directory */
                 Info(slide, 1, ((char *)slide,
                   "checkdir error:  cannot create %s\n\
-                 %s\n\
                  unable to process %s.\n",
-                  FnFilter2(G.buildpathFAT),
-                  strerror(errno),
-                  FnFilter1(G.filename)));
+                  FnFilter2(G.buildpathFAT), FnFilter1(G.filename)));
                 free(G.buildpathHPFS);
                 free(G.buildpathFAT);
                 /* path didn't exist, tried to create, failed */
@@ -2217,8 +2173,8 @@ int checkdir(__G__ pathcomp, flag)
             G.created_dir = TRUE;
         } else if (!S_ISDIR(G.statbuf.st_mode)) {
             Info(slide, 1, ((char *)slide,
-              "checkdir error:  %s exists but is not directory\n\
-                 unable to process %s.\n",
+              "checkdir error:  %s exists but is not directory\n   \
+              unable to process %s.\n",
               FnFilter2(G.buildpathFAT), FnFilter1(G.filename)));
             free(G.buildpathHPFS);
             free(G.buildpathFAT);
@@ -2228,7 +2184,7 @@ int checkdir(__G__ pathcomp, flag)
         if (too_long) {
             Info(slide, 1, ((char *)slide,
               "checkdir error:  path too long: %s\n",
-              FnFilter1(G.buildpathHPFS)));
+               FnFilter1(G.buildpathHPFS)));
             free(G.buildpathHPFS);
             free(G.buildpathFAT);
             /* no room for filenames:  fatal */
@@ -2271,47 +2227,24 @@ int checkdir(__G__ pathcomp, flag)
         int error = MPN_OK;
 
         Trace((stderr, "appending filename [%s]\n", FnFilter1(pathcomp)));
-        /* The buildpathHPFS buffer has been allocated large enough to
-         * hold the complete combined name, so there is no need to check
-         * for OS filename size limit overflow within the copy loop.
-         */
         while ((*G.endHPFS = *p++) != '\0') {   /* copy to HPFS filename */
             ++G.endHPFS;
-        }
-        /* Now, check for OS filename size overflow.  When detected, the
-         * mapped HPFS name is truncated and a warning message is shown.
-         */
-        if ((G.endHPFS-G.buildpathHPFS) >= FILNAMSIZ) {
-            G.buildpathHPFS[FILNAMSIZ-1] = '\0';
-            Info(slide, 1, ((char *)slide,
-              "checkdir warning:  path too long; truncating\n \
-              %s\n                -> %s\n",
-              FnFilter1(G.filename), FnFilter2(G.buildpathHPFS)));
-            error = MPN_INF_TRUNC;  /* filename truncated */
+            if ((G.endHPFS-G.buildpathHPFS) >= FILNAMSIZ) {
+                *--G.endHPFS = '\0';
+                Info(slide, 1, ((char *)slide,
+                  "checkdir warning:  path too long; truncating\n \
+                  %s\n                -> %s\n",
+                  FnFilter1(G.filename), FnFilter2(G.buildpathHPFS)));
+                error = MPN_INF_TRUNC;   /* filename truncated */
+            }
         }
 
-        /* The buildpathFAT buffer has the same allocated size as the
-         * buildpathHPFS buffer, so there is no need for an overflow check
-         * within the following copy loop, either.
-         */
-        if (G.pInfo->vollabel || !IsVolumeOldFAT(__G__ G.buildpathHPFS)) {
-            /* copy to FAT filename, too */
+        if ( G.pInfo->vollabel || !IsVolumeOldFAT(__G__ G.buildpathHPFS)) {
             p = pathcomp;
-            while ((*G.endFAT = *p++) != '\0')
+            while ((*G.endFAT = *p++) != '\0')  /* copy to FAT filename, too */
                 ++G.endFAT;
         } else
-            /* map into FAT fn, update endFAT */
-            map2fat(pathcomp, &G.endFAT);
-
-        /* Check that the FAT path does not exceed the FILNAMSIZ limit, and
-         * truncate when neccessary.
-         * Note that truncation can only happen when the HPFS path (which is
-         * never shorter than the FAT path) has been already truncated.
-         * So, emission of the warning message and setting the error code
-         * has already happened.
-         */
-        if ((G.endFAT-G.buildpathFAT) >= FILNAMSIZ)
-            G.buildpathFAT[FILNAMSIZ-1] = '\0';
+            map2fat(pathcomp, &G.endFAT);   /* map into FAT fn, update endFAT */
         Trace((stderr, "buildpathHPFS: %s\nbuildpathFAT:  %s\n",
           FnFilter1(G.buildpathHPFS), FnFilter2(G.buildpathFAT)));
 
@@ -2354,7 +2287,7 @@ int checkdir(__G__ pathcomp, flag)
                 *G.buildpathHPFS = (char)ToLower(*G.rootpath);
             else {
                 char tmpN[MAX_PATH], *tmpP;
-                if (GetFullPathNameA(".", MAX_PATH, tmpN, &tmpP) > MAX_PATH)
+                if (GetFullPathName(".", MAX_PATH, tmpN, &tmpP) > MAX_PATH)
                 { /* by definition of MAX_PATH we should never get here */
                     Info(slide, 1, ((char *)slide,
                       "checkdir warning: current dir path too long\n"));
@@ -2410,9 +2343,9 @@ int checkdir(__G__ pathcomp, flag)
             return MPN_OK;
         if ((G.rootlen = strlen(pathcomp)) > 0) {
             int had_trailing_pathsep=FALSE, has_drive=FALSE, add_dot=FALSE;
-            char *tmproot;
-
-            if ((tmproot = (char *)malloc(G.rootlen+3)) == (char *)NULL) {
+            char *tmproot=NULL;
+			tmproot = (char *)malloc(G.rootlen+3);
+            if (tmproot == (char *)NULL) {
                 G.rootlen = 0;
                 return MPN_NOMEM;
             }
@@ -2494,9 +2427,9 @@ int checkdir(__G__ pathcomp, flag)
 
 int dateformat()
 {
-  char df[2];   /* LOCALE_IDATE has a maximum value of 2 */
+  TCHAR df[2];  /* LOCALE_IDATE has a maximum value of 2 */
 
-  if (GetLocaleInfoA(LOCALE_USER_DEFAULT, LOCALE_IDATE, df, 2) != 0) {
+  if (GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_IDATE, df, 2) != 0) {
     switch (df[0])
     {
       case '0':
@@ -2517,9 +2450,9 @@ int dateformat()
 
 char dateseparator()
 {
-  char df[2];   /* use only if it is one character */
+  TCHAR df[2];  /* use only if it is one character */
 
-  if ((GetLocaleInfoA(LOCALE_USER_DEFAULT, LOCALE_SDATE, df, 2) != 0) &&
+  if ((GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_SDATE, df, 2) != 0) &&
       (df[0] != '\0'))
     return df[0];
   else
@@ -2689,7 +2622,7 @@ int screensize(int *tt_rows, int *tt_cols)
  * are not stable but vary according to the seasonal change of "daylight
  * saving time in effect / not in effect".
  *
- * Other C runtime libs (CygWin), or the crtdll.dll supplied with Win9x/NT
+ * Other C runtime libs (CygWin, or the crtdll.dll supplied with Win9x/NT
  * return the unix-time equivalent of the UTC FILETIME values as got back
  * from the Win32 API call. This time, return values from NTFS are correct
  * whereas utimes from files on (V)FAT volumes vary according to the DST
@@ -2712,9 +2645,9 @@ int screensize(int *tt_rows, int *tt_cols)
  * detects the case and fills in reasonable values.  Otherwise we get    *
  * effects like failure to extract to a root dir because it's not found. */
 
-int zstat_win32(__W32STAT_GLOBALS__ const char *path, z_stat *buf)
+int zstat_win32(__W32STAT_GLOBALS__ const char *path, struct stat *buf)
 {
-    if (!zstat(path, buf))
+    if (!stat(path, buf))
     {
         /* stat was successful, now redo the time-stamp fetches */
 #ifndef NO_W32TIMES_IZFIX
@@ -2732,9 +2665,9 @@ int zstat_win32(__W32STAT_GLOBALS__ const char *path, z_stat *buf)
 #endif
 
         TTrace((stdout, "stat(%s) finds modtime %08lx\n", path, buf->st_mtime));
-        h = CreateFileA(Ansi_Path, GENERIC_READ,
-                        FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
-                        OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+        h = CreateFile(Ansi_Path, GENERIC_READ,
+                       FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
+                       OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
         if (h != INVALID_HANDLE_VALUE) {
             BOOL ftOK = GetFileTime(h, &Creft, &Accft, &Modft);
             CloseHandle(h);
@@ -2797,11 +2730,11 @@ int zstat_win32(__W32STAT_GLOBALS__ const char *path, z_stat *buf)
 #       define Ansi_Path  path
 #endif
 
-        flags = GetFileAttributesA(Ansi_Path);
+        flags = GetFileAttributes(Ansi_Path);
         if (flags != 0xFFFFFFFF && flags & FILE_ATTRIBUTE_DIRECTORY) {
             Trace((stderr, "\nstat(\"%s\",...) failed on existing directory\n",
                    FnFilter1(path)));
-            memset(buf, 0, sizeof(z_stat));
+            memset(buf, 0, sizeof(struct stat));
             buf->st_atime = buf->st_ctime = buf->st_mtime =
               dos_to_unix_time(DOSTIME_MINIMUM);        /* 1-1-80 */
             buf->st_mode = S_IFDIR | S_IREAD |
@@ -2917,8 +2850,8 @@ int getch_win32(void)
 #  ifdef PASSWD_FROM_STDIN
   stin = GetStdHandle(STD_INPUT_HANDLE);
 #  else
-  stin = CreateFileA("CONIN$", GENERIC_READ | GENERIC_WRITE,
-                     FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+  stin = CreateFile("CONIN$", GENERIC_READ | GENERIC_WRITE,
+                    FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
   if (stin == INVALID_HANDLE_VALUE)
     return -1;
 #  endif
@@ -2941,199 +2874,3 @@ int getch_win32(void)
   return ret;
 }
 #endif /* !WINDLL */
-
-
-
-#if (defined(UNICODE_SUPPORT) && !defined(FUNZIP))
-/* convert wide character string to multi-byte character string */
-char *wide_to_local_string(wide_string, escape_all)
-  ZCONST zwchar *wide_string;
-  int escape_all;
-{
-  int i;
-  wchar_t wc;
-  int bytes_char;
-  int default_used;
-  int wsize = 0;
-  int max_bytes = 9;
-  char buf[9];
-  char *buffer = NULL;
-  char *local_string = NULL;
-
-  for (wsize = 0; wide_string[wsize]; wsize++) ;
-
-  if (max_bytes < MB_CUR_MAX)
-    max_bytes = MB_CUR_MAX;
-
-  if ((buffer = (char *)malloc(wsize * max_bytes + 1)) == NULL) {
-    return NULL;
-  }
-
-  /* convert it */
-  buffer[0] = '\0';
-  for (i = 0; i < wsize; i++) {
-    if (sizeof(wchar_t) < 4 && wide_string[i] > 0xFFFF) {
-      /* wchar_t probably 2 bytes */
-      /* could do surrogates if state_dependent and wctomb can do */
-      wc = zwchar_to_wchar_t_default_char;
-    } else {
-      wc = (wchar_t)wide_string[i];
-    }
-    /* Unter some vendor's C-RTL, the Wide-to-MultiByte conversion functions
-     * (like wctomb() et. al.) do not use the same codepage as the other
-     * string arguments I/O functions (fopen, mkdir, rmdir etc.).
-     * Therefore, we have to fall back to the underlying Win32-API call to
-     * achieve a consistent behaviour for all supported compiler environments.
-     * Failing RTLs are for example:
-     *   Borland (locale uses OEM-CP as default, but I/O functions expect ANSI
-     *            names)
-     *   Watcom  (only "C" locale, wctomb() always uses OEM CP)
-     * (in other words: all supported environments except the Microsoft RTLs)
-     */
-    bytes_char = WideCharToMultiByte(
-                          CP_ACP, WC_COMPOSITECHECK,
-                          &wc, 1,
-                          (LPSTR)buf, sizeof(buf),
-                          NULL, &default_used);
-    if (default_used)
-      bytes_char = -1;
-    if (escape_all) {
-      if (bytes_char == 1 && (uch)buf[0] <= 0x7f) {
-        /* ASCII */
-        strncat(buffer, buf, 1);
-      } else {
-        /* use escape for wide character */
-        char *escape_string = wide_to_escape_string(wide_string[i]);
-        strcat(buffer, escape_string);
-        free(escape_string);
-      }
-    } else if (bytes_char > 0) {
-      /* multi-byte char */
-      strncat(buffer, buf, bytes_char);
-    } else {
-      /* no MB for this wide */
-      /* use escape for wide character */
-      char *escape_string = wide_to_escape_string(wide_string[i]);
-      strcat(buffer, escape_string);
-      free(escape_string);
-    }
-  }
-  if ((local_string = (char *)realloc(buffer, strlen(buffer) + 1)) == NULL) {
-    free(buffer);
-    return NULL;
-  }
-
-  return local_string;
-}
-
-
-#if 0
-wchar_t *utf8_to_wchar_string(utf8_string)
-  char *utf8_string;       /* path to get utf-8 name for */
-{
-  wchar_t  *qw;
-  int       ulen;
-  int       ulenw;
-
-  if (utf8_string == NULL)
-    return NULL;
-
-    /* get length */
-    ulenw = MultiByteToWideChar(
-                CP_UTF8,           /* UTF-8 code page */
-                0,                 /* flags for character-type options */
-                utf8_string,       /* string to convert */
-                -1,                /* string length (-1 = NULL terminated) */
-                NULL,              /* buffer */
-                0 );               /* buffer length (0 = return length) */
-    if (ulenw == 0) {
-      /* failed */
-      return NULL;
-    }
-    ulenw++;
-    /* get length in bytes */
-    ulen = sizeof(wchar_t) * (ulenw + 1);
-    if ((qw = (wchar_t *)malloc(ulen + 1)) == NULL) {
-      return NULL;
-    }
-    /* convert multibyte to wide */
-    ulen = MultiByteToWideChar(
-               CP_UTF8,           /* UTF-8 code page */
-               0,                 /* flags for character-type options */
-               utf8_string,       /* string to convert */
-               -1,                /* string length (-1 = NULL terminated) */
-               qw,                /* buffer */
-               ulenw);            /* buffer length (0 = return length) */
-    if (ulen == 0) {
-      /* failed */
-      free(qw);
-      return NULL;
-    }
-
-  return qw;
-}
-
-wchar_t *local_to_wchar_string(local_string)
-  char *local_string;       /* path of local name */
-{
-  wchar_t  *qw;
-  int       ulen;
-  int       ulenw;
-
-  if (local_string == NULL)
-    return NULL;
-
-    /* get length */
-    ulenw = MultiByteToWideChar(
-                CP_ACP,            /* ANSI code page */
-                0,                 /* flags for character-type options */
-                local_string,      /* string to convert */
-                -1,                /* string length (-1 = NULL terminated) */
-                NULL,              /* buffer */
-                0 );               /* buffer length (0 = return length) */
-    if (ulenw == 0) {
-      /* failed */
-      return NULL;
-    }
-    ulenw++;
-    /* get length in bytes */
-    ulen = sizeof(wchar_t) * (ulenw + 1);
-    if ((qw = (wchar_t *)malloc(ulen + 1)) == NULL) {
-      return NULL;
-    }
-    /* convert multibyte to wide */
-    ulen = MultiByteToWideChar(
-               CP_ACP,            /* ANSI code page */
-               0,                 /* flags for character-type options */
-               local_string,      /* string to convert */
-               -1,                /* string length (-1 = NULL terminated) */
-               qw,                /* buffer */
-               ulenw);            /* buffer length (0 = return length) */
-    if (ulen == 0) {
-      /* failed */
-      free(qw);
-      return NULL;
-    }
-
-  return qw;
-}
-#endif /* 0 */
-#endif /* UNICODE_SUPPORT && !FUNZIP */
-
-
-
-/* --------------------------------------------------- */
-/* Large File Support
- *
- * Initial functions by E. Gordon and R. Nausedat
- * 9/10/2003
- * Lifted from Zip 3b, win32.c and place here by Myles Bennett
- * 7/6/2004
- *
- * These implement 64-bit file support for Windows.  The
- * defines and headers are in win32/w32cfg.h.
- *
- * Moved to win32i64.c by Mike White to avoid conflicts in
- * same name functions in WiZ using UnZip and Zip libraries.
- * 9/25/2003
- */

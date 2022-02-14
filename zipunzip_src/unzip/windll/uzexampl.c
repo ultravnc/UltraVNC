@@ -1,7 +1,7 @@
 /*
-  Copyright (c) 1990-2009 Info-ZIP.  All rights reserved.
+  Copyright (c) 1990-2005 Info-ZIP.  All rights reserved.
 
-  See the accompanying file LICENSE, version 2009-Jan-02 or later
+  See the accompanying file LICENSE, version 2000-Apr-09 or later
   (the contents of which are also included in unzip.h) for terms of use.
   If, for some reason, all these files are missing, the Info-ZIP license
   also may be found at:  ftp://ftp.info-zip.org/pub/infozip/license.html
@@ -22,19 +22,6 @@
 #  define WIN32
 #endif
 
-/* Tell Microsoft Visual C++ 2005 to leave us alone and
- * let us use standard C functions the way we're supposed to.
- */
-#if defined(_MSC_VER) && (_MSC_VER >= 1400)
-#  ifndef _CRT_SECURE_NO_WARNINGS
-#    define _CRT_SECURE_NO_WARNINGS
-#  endif
-#  ifndef _CRT_NONSTDC_NO_WARNINGS
-#    define _CRT_NONSTDC_NO_WARNINGS
-#  endif
-#endif
-
-#include <stddef.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <time.h>
@@ -75,16 +62,15 @@ HANDLE hZCL = (HANDLE)NULL;
 #ifdef WIN32
 DWORD dwPlatformId = 0xFFFFFFFF;
 #endif
-static ZCONST UzpVer *lpUzVersInfo = NULL;
 
 
 /* Forward References */
 int WINAPI DisplayBuf(LPSTR, unsigned long);
-int WINAPI GetReplaceDlgRetVal(LPSTR, unsigned);
+int WINAPI GetReplaceDlgRetVal(LPSTR);
 int WINAPI password(LPSTR, int, LPCSTR, LPCSTR);
-
-ZCONST UzpVer * UZ_EXP UzpVersion  OF((void));
-_DLL_UZVER pUzpVersion;
+void WINAPI ReceiveDllMessage(unsigned long, unsigned long, unsigned,
+    unsigned, unsigned, unsigned, unsigned, unsigned,
+    char, LPSTR, LPSTR, unsigned long, char);
 _DLL_UNZIP pWiz_SingleEntryUnzip;
 
 static void FreeUpMemory(void);
@@ -108,30 +94,21 @@ HANDLE  hMem;         /* handle to mem alloc'ed */
 
 if (argc < 2)   /* We must have an archive to unzip */
    {
-   char *progname = strrchr(argv[0], '\\');
-
-   if (progname != NULL)
-      progname++;
-   else
-      {
-      progname = argv[0];
-      if (progname == NULL || *progname == '\0') progname = "example";
-      }
    printf("usage: %s <zipfile> [entry1 [entry2 [...]]] [-x xentry1 [...]]",
-          progname);
+          "example");
    return 0;
    }
 
 hDCL = GlobalAlloc( GPTR, (DWORD)sizeof(DCL));
 if (!hDCL)
    {
-   return -1;
+   return 0;
    }
 lpDCL = (LPDCL)GlobalLock(hDCL);
 if (!lpDCL)
    {
    GlobalFree(hDCL);
-   return -1;
+   return 0;
    }
 
 hUF = GlobalAlloc( GPTR, (DWORD)sizeof(USERFUNCTIONS));
@@ -139,16 +116,16 @@ if (!hUF)
    {
    GlobalUnlock(hDCL);
    GlobalFree(hDCL);
-   return -1;
+   return 0;
    }
 lpUserFunctions = (LPUSERFUNCTIONS)GlobalLock(hUF);
 
 if (!lpUserFunctions)
    {
-   GlobalFree(hUF);
    GlobalUnlock(hDCL);
    GlobalFree(hDCL);
-   return -1;
+   GlobalFree(hUF);
+   return 0;
    }
 
 lpUserFunctions->password = password;
@@ -176,7 +153,7 @@ if (hfile == HFILE_ERROR)
    wsprintf (str, DLL_WARNING, UNZ_DLL_NAME);
    printf("%s\n", str);
    FreeUpMemory();
-   return -1;
+   return 0;
    }
 #ifndef WIN32
 else
@@ -220,10 +197,10 @@ if (dwVerInfoSize)
          {
          wsprintf (str, DLL_VERSION_WARNING, UNZ_DLL_NAME);
          printf("%s\n", str);
+         FreeUpMemory();
          GlobalUnlock(hMem);
          GlobalFree(hMem);
-         FreeUpMemory();
-         return -1;
+         return 0;
          }
       }
       /* free memory */
@@ -236,7 +213,7 @@ else
    wsprintf (str, DLL_VERSION_WARNING, UNZ_DLL_NAME);
    printf("%s\n", str);
    FreeUpMemory();
-   return -1;
+   return 0;
    }
 /* Okay, now we know that the dll exists, and has the proper version
  * information in it. We can go ahead and load it.
@@ -248,8 +225,6 @@ if (hUnzipDll > HINSTANCE_ERROR)
 if (hUnzipDll != NULL)
 #endif
    {
-   pUzpVersion =
-     (_DLL_UZVER)GetProcAddress(hUnzipDll, "UzpVersion");
    pWiz_SingleEntryUnzip =
      (_DLL_UNZIP)GetProcAddress(hUnzipDll, "Wiz_SingleEntryUnzip");
    }
@@ -259,96 +234,31 @@ else
    wsprintf (str, "Could not load %s", UNZ_DLL_NAME);
    printf("%s\n", str);
    FreeUpMemory();
-   return -1;
+   return 0;
    }
-
-/*
-   Before we actually start with the extraction process, we should first
-   check whether the API of the loaded dll is compatible with the API
-   definition used to compile this frontend program.
- */
-lpUzVersInfo = (*pUzpVersion)();
-
-/* The UnZip WinDLL code may change quite frequently.  To be safe, we
- * require the DLL to be at least at the release level of this example
- * frontend code.
- */
-#   define UZDLL_MINVERS_MAJOR          UZ_MAJORVER
-#   define UZDLL_MINVERS_MINOR          UZ_MINORVER
-#   define UZDLL_MINVERS_PATCHLEVEL     UZ_PATCHLEVEL
-/* This UnZip DLL stub requires a DLL version of at least: */
-if ( (lpUzVersInfo->unzip.major < UZDLL_MINVERS_MAJOR) ||
-     ((lpUzVersInfo->unzip.major == UZDLL_MINVERS_MAJOR) &&
-      ((lpUzVersInfo->unzip.minor < UZDLL_MINVERS_MINOR) ||
-       ((lpUzVersInfo->unzip.minor == UZDLL_MINVERS_MINOR) &&
-        (lpUzVersInfo->unzip.patchlevel < UZDLL_MINVERS_PATCHLEVEL)
-       )
-      )
-     ) )
-{
-  char str[256];
-  wsprintf(str, "The version %u.%u%u of the loaded UnZip DLL is too old!",
-           lpUzVersInfo->unzip.major, lpUzVersInfo->unzip.minor,
-           lpUzVersInfo->unzip.patchlevel);
-  printf("%s\n", str);
-  FreeLibrary(hUnzipDll);
-  FreeUpMemory();
-  return -1;
-}
-
-if (lpUzVersInfo->structlen >=
-    (offsetof(UzpVer, dllapimin) + sizeof(_version_type)))
-{
-  if ( (lpUzVersInfo->dllapimin.major > UZ_WINAPI_COMP_MAJOR) ||
-       ((lpUzVersInfo->dllapimin.major == UZ_WINAPI_COMP_MAJOR) &&
-        ((lpUzVersInfo->dllapimin.minor > UZ_WINAPI_COMP_MINOR) ||
-         ((lpUzVersInfo->dllapimin.minor == UZ_WINAPI_COMP_MINOR) &&
-          (lpUzVersInfo->dllapimin.patchlevel > UZ_WINAPI_COMP_REVIS)
-         )
-        )
-       ) )
-  {
-    char str[256];
-    wsprintf(str, "Found incompatible WinDLL API version %u.%u%u, aborting!",
-             lpUzVersInfo->dllapimin.major, lpUzVersInfo->dllapimin.minor,
-             lpUzVersInfo->dllapimin.patchlevel);
-    printf("%s\n", str);
-    FreeLibrary(hUnzipDll);
-    FreeUpMemory();
-    return -1;
-  }
-}
 
 /*
    Here is where the actual extraction process begins. First we set up the
    flags to be passed into the dll.
  */
-lpDCL->StructVersID = UZ_DCL_STRUCTVER; /* version of this structure */
-lpDCL->ncflag = 0;              /* write to stdout if true */
-lpDCL->fQuiet = 0;              /* we want all messages
-                                   1 = fewer messages,
-                                   2 = no messages */
-lpDCL->ntflag = 0;              /* test zip file if true */
-lpDCL->nvflag = 0;              /* give a verbose listing if true */
-lpDCL->nzflag = 0;              /* display zip file comment if true */
-lpDCL->ndflag = 1;              /* recreate directories != 0,
-                                   skip "../" if < 2 */
-lpDCL->naflag = 0;              /* do not convert CR to CRLF */
-lpDCL->nfflag = 0;              /* do not freshen existing files only */
-lpDCL->noflag = 1;              /* over-write all files if true */
-lpDCL->nZIflag = 0;             /* no ZipInfo output mode */
-lpDCL->B_flag = 0;              /* do not backup existing files */
-lpDCL->C_flag = 0;              /* do not match case-insensitive */
-lpDCL->D_flag = 0;              /* restore all timestamps */
-lpDCL->U_flag = 0;              /* do not disable UTF-8 support */
-lpDCL->ExtractOnlyNewer = 0;    /* do not extract only newer */
-lpDCL->SpaceToUnderscore = 0;   /* do not convert space to '_' in filenames */
-lpDCL->PromptToOverwrite = 0;   /* "overwrite all" selected -> no query mode */
-lpDCL->lpszZipFN = argv[1];     /* the archive name */
-lpDCL->lpszExtractDir = NULL;   /* the directory to extract to.
-                                   This is set to NULL if you are extracting
-                                   to the current directory.
-                                 */
+lpDCL->ncflag = 0; /* Write to stdout if true */
+lpDCL->fQuiet = 0; /* We want all messages.
+                      1 = fewer messages,
+                      2 = no messages */
+lpDCL->ntflag = 0; /* test zip file if true */
+lpDCL->nvflag = 0; /* give a verbose listing if true */
+lpDCL->nzflag = 0; /* display a zip file comment if true */
+lpDCL->ndflag = 1; /* Recreate directories != 0, skip "../" if < 2 */
+lpDCL->naflag = 0; /* Do not convert CR to CRLF */
+lpDCL->nfflag = 0; /* Do not freshen existing files only */
+lpDCL->noflag = 1; /* Over-write all files if true */
+lpDCL->ExtractOnlyNewer = 0; /* Do not extract only newer */
+lpDCL->PromptToOverwrite = 0; /* "Overwrite all" selected -> no query mode */
+lpDCL->lpszZipFN = argv[1]; /* The archive name */
+lpDCL->lpszExtractDir = NULL; /* The directory to extract to. This is set
+                                 to NULL if you are extracting to the
+                                 current directory.
+                               */
 /*
    As this is a quite short example, intended primarily to show how to
    load and call in to the dll, the command-line parameters are only
@@ -392,14 +302,14 @@ if (x_opt) {
 }
 
 if (retcode != 0)
-   printf("Error unzipping (error/warning code %d)...\n", retcode);
+   printf("Error unzipping...\n");
 
-FreeLibrary(hUnzipDll);
 FreeUpMemory();
-return retcode;
+FreeLibrary(hUnzipDll);
+return 1;
 }
 
-int WINAPI GetReplaceDlgRetVal(LPSTR filename, unsigned fnbufsiz)
+int WINAPI GetReplaceDlgRetVal(LPSTR filename)
 {
 /* This is where you will decide if you want to replace, rename etc existing
    files.
@@ -409,15 +319,15 @@ return 1;
 
 static void FreeUpMemory(void)
 {
-if (hUF)
-   {
-   GlobalUnlock(hUF);
-   GlobalFree(hUF);
-   }
 if (hDCL)
    {
    GlobalUnlock(hDCL);
    GlobalFree(hDCL);
+   }
+if (hUF)
+   {
+   GlobalUnlock(hUF);
+   GlobalFree(hUF);
    }
 }
 
@@ -426,17 +336,10 @@ if (hDCL)
    is actually never called in this example, but a dummy procedure had to
    be put in, so this was used.
  */
-#ifdef Z_UINT8_DEFINED
-void WINAPI ReceiveDllMessage(z_uint8 ucsize, z_uint8 csiz,
-    unsigned cfactor, unsigned mo, unsigned dy, unsigned yr,
-    unsigned hh, unsigned mm, char c, LPCSTR filename,
-    LPCSTR methbuf, unsigned long crc, char fCrypt)
-#else
 void WINAPI ReceiveDllMessage(unsigned long ucsize, unsigned long csiz,
     unsigned cfactor,
     unsigned mo, unsigned dy, unsigned yr, unsigned hh, unsigned mm,
-    char c, LPCSTR filename, LPCSTR methbuf, unsigned long crc, char fCrypt)
-#endif
+    char c, LPSTR filename, LPSTR methbuf, unsigned long crc, char fCrypt)
 {
 char psLBEntry[_MAX_PATH];
 char LongHdrStats[] =

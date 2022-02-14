@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 1990-2008 Info-ZIP.  All rights reserved.
+  Copyright (c) 1990-2001 Info-ZIP.  All rights reserved.
 
   See the accompanying file LICENSE, version 2000-Apr-09 or later
   (the contents of which are also included in unzip.h) for terms of use.
@@ -8,7 +8,7 @@
 */
 /*---------------------------------------------------------------------------
 
-  unshrink.c                     version 1.22                     19 Mar 2008
+  unshrink.c                     version 1.21                     23 Nov 95
 
 
        NOTE:  This code may or may not infringe on the so-called "Welch
@@ -67,12 +67,12 @@
 
 #define __UNSHRINK_C    /* identifies this source module */
 #define UNZIP_INTERNAL
-#include "unzip.h"
+#include "unzip.h"      /* defines LZW_CLEAN by default */
 
 
 #ifndef LZW_CLEAN
 
-static void  partial_clear  OF((__GPRO__ int lastcodeused));
+static void  partial_clear  OF((__GPRO));
 
 #ifdef DEBUG
 #  define OUTDBG(c) \
@@ -81,7 +81,7 @@ static void  partial_clear  OF((__GPRO__ int lastcodeused));
 #  define OUTDBG(c)
 #endif
 
-/* HSIZE is defined as 2^13 (8192) in unzip.h (resp. unzpriv.h */
+/* HSIZE is defined as 2^13 (8192) in unzip.h */
 #define BOGUSCODE  256
 #define FLAG_BITS  parent        /* upper bits of parent[] used as flag bits */
 #define CODE_MASK  (HSIZE - 1)   /* 0x1fff (lower bits are parent's index) */
@@ -100,11 +100,11 @@ static void  partial_clear  OF((__GPRO__ int lastcodeused));
 int unshrink(__G)
      __GDEF
 {
-    uch *stacktop = stack + (HSIZE - 1);
+    int offset = (HSIZE - 1);
+    uch *stacktop = stack + offset;
     register uch *newstr;
-    uch finalval;
-    int codesize=9, len, error;
-    shrint code, oldcode, curcode;
+    int codesize=9, len, KwKwK, error;
+    shrint code, oldcode, freecode, curcode;
     shrint lastfreecode;
     unsigned int outbufsiz;
 #if (defined(DLL) && !defined(NO_SLIDE_REDIR))
@@ -163,32 +163,26 @@ int unshrink(__G)
   ---------------------------------------------------------------------------*/
 
     READBITS(codesize, oldcode)
-    if (G.zipeof)
-        return PK_OK;
+    if (!G.zipeof) {
+        *G.outptr++ = (uch)oldcode;
+        OUTDBG((uch)oldcode)
+        ++G.outcnt;
+    }
 
-    finalval = (uch)oldcode;
-    OUTDBG(finalval)
-    *G.outptr++ = finalval;
-    ++G.outcnt;
-
-    while (TRUE) {
+    do {
         READBITS(codesize, code)
         if (G.zipeof)
             break;
         if (code == BOGUSCODE) {   /* possible to have consecutive escapes? */
             READBITS(codesize, code)
-            if (G.zipeof)
-                break;
             if (code == 1) {
                 ++codesize;
                 Trace((stderr, " (codesize now %d bits)\n", codesize));
-                if (codesize > MAX_BITS) return PK_ERR;
             } else if (code == 2) {
                 Trace((stderr, " (partial clear code)\n"));
-                /* clear leafs (nodes with no children) */
-                partial_clear(__G__ lastfreecode);
+                partial_clear(__G);   /* clear leafs (nodes with no children) */
                 Trace((stderr, " (done with partial clear)\n"));
-                lastfreecode = BOGUSCODE; /* reset start of free-node search */
+                lastfreecode = BOGUSCODE;  /* reset start of free-node search */
             }
             continue;
         }
@@ -200,43 +194,31 @@ int unshrink(__G)
         newstr = stacktop;
         curcode = code;
 
-        if (parent[code] == FREE_CODE) {
-            /* or (FLAG_BITS[code] & FREE_CODE)? */
+        if (parent[curcode] == FREE_CODE) {
+            /* or (FLAG_BITS[curcode] & FREE_CODE)? */
+            KwKwK = TRUE;
             Trace((stderr, " (found a KwKwK code %d; oldcode = %d)\n", code,
               oldcode));
-            *newstr-- = finalval;
-            code = oldcode;
-        }
+            --newstr;   /* last character will be same as first character */
+            curcode = oldcode;
+        } else
+            KwKwK = FALSE;
 
-        while (code != BOGUSCODE) {
-            if (newstr < stack) {
-                /* Bogus compression stream caused buffer underflow! */
-                Trace((stderr, "unshrink stack overflow!\n"));
-                return PK_ERR;
-            }
-            if (parent[code] == FREE_CODE) {
-                /* or (FLAG_BITS[code] & FREE_CODE)? */
-                Trace((stderr, " (found a KwKwK code %d; oldcode = %d)\n",
-                  code, oldcode));
-                *newstr-- = finalval;
-                code = oldcode;
-            } else {
-                *newstr-- = Value[code];
-                code = (shrint)(parent[code] & CODE_MASK);
-            }
-        }
+        do {
+            *newstr-- = Value[curcode];
+            curcode = (shrint)(parent[curcode] & CODE_MASK);
+        } while (curcode != BOGUSCODE);
 
         len = (int)(stacktop - newstr++);
-        finalval = *newstr;
+        if (KwKwK)
+            *stacktop = *newstr;
 
     /*-----------------------------------------------------------------------
         Write expanded string in reverse order to output buffer.
       -----------------------------------------------------------------------*/
 
-        Trace((stderr,
-          "code %4d; oldcode %4d; char %3d (%c); len %d; string [", curcode,
-          oldcode, (int)(*newstr), (*newstr<32 || *newstr>=127)? ' ':*newstr,
-          len));
+        Trace((stderr, "code %4d; oldcode %4d; char %3d (%c); string [", code,
+          oldcode, (int)(*newstr), (*newstr<32 || *newstr>=127)? ' ':*newstr));
 
         {
             register uch *p;
@@ -263,21 +245,18 @@ int unshrink(__G)
       -----------------------------------------------------------------------*/
 
         /* search for freecode */
-        code = (shrint)(lastfreecode + 1);
+        freecode = (shrint)(lastfreecode + 1);
         /* add if-test before loop for speed? */
-        while ((code < HSIZE) && (parent[code] != FREE_CODE))
-            ++code;
-        lastfreecode = code;
-        Trace((stderr, "]; newcode %d\n", code));
-        if (code >= HSIZE)
-            /* invalid compressed data caused max-code overflow! */
-            return PK_ERR;
+        while (parent[freecode] != FREE_CODE)
+            ++freecode;
+        lastfreecode = freecode;
+        Trace((stderr, "]; newcode %d\n", freecode));
 
-        Value[code] = finalval;
-        parent[code] = oldcode;
-        oldcode = curcode;
+        Value[freecode] = *newstr;
+        parent[freecode] = oldcode;
+        oldcode = code;
 
-    }
+    } while (!G.zipeof);
 
 /*---------------------------------------------------------------------------
     Flush any remaining data and return to sender...
@@ -304,24 +283,23 @@ int unshrink(__G)
 /* Function partial_clear() */      /* no longer recursive... */
 /****************************/
 
-static void partial_clear(__G__ lastcodeused)
-    __GDEF
-    int lastcodeused;
+static void partial_clear(__G)
+     __GDEF
 {
     register shrint code;
 
     /* clear all nodes which have no children (i.e., leaf nodes only) */
 
     /* first loop:  mark each parent as such */
-    for (code = BOGUSCODE+1;  code <= lastcodeused;  ++code) {
+    for (code = BOGUSCODE+1;  code < HSIZE;  ++code) {
         register shrint cparent = (shrint)(parent[code] & CODE_MASK);
 
-        if (cparent > BOGUSCODE)
+        if (cparent > BOGUSCODE && cparent != FREE_CODE)
             FLAG_BITS[cparent] |= HAS_CHILD;   /* set parent's child-bit */
     }
 
     /* second loop:  clear all nodes *not* marked as parents; reset flag bits */
-    for (code = BOGUSCODE+1;  code <= lastcodeused;  ++code) {
+    for (code = BOGUSCODE+1;  code < HSIZE;  ++code) {
         if (FLAG_BITS[code] & HAS_CHILD)    /* just clear child-bit */
             FLAG_BITS[code] &= ~HAS_CHILD;
         else {                              /* leaf:  lose it */

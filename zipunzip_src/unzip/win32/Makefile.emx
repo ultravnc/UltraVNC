@@ -1,6 +1,6 @@
 # Makefile for UnZip, fUnZip and UnZipSFX
 # for emx 0.9d + rsxnt 1.42 / gcc under WIN32. Derived from makefile.os2
-# By E-Yen Tan and Christian Spieler. Last updated 25 December 2006.
+# By E-Yen Tan and Christian Spieler. Last updated 10 February 2001.
 #
 # This makefile should work fine with GNU make and hopefully some others.
 # Tested with Spieler's special GNU make 3.74 gnuish 16-bit version.
@@ -34,9 +34,13 @@ OUT=-o
 OBJ=.o
 
 #ifdef NOASM
-#CRCA_O=
+#CRC32=crc32
+#CRC32F=crc32f
+#CRC32X=crc32_
 #else
-CRCA_O=crc_gcc
+CRC32=crc_gcc
+CRC32F=crc_gcc
+CRC32X=crc_gcc
 #endif
 OBJUS=win32$(OBJ) nt$(OBJ)
 OBJXS=win32_$(OBJ) nt_$(OBJ)
@@ -48,16 +52,16 @@ OSDEP_H=win32/w32cfg.h
 DIRSEP = /
 AS_DIRSEP = /
 
-OBJU1 = unzip$(OBJ) crc32$(OBJ) $(CRCA_O) crypt$(OBJ) envargs$(OBJ)
+OBJU1 = unzip$(OBJ) $(CRC32)$(OBJ) crctab$(OBJ) crypt$(OBJ) envargs$(OBJ)
 OBJU2 = explode$(OBJ) extract$(OBJ) fileio$(OBJ) globals$(OBJ)
 OBJU3 = inflate$(OBJ) list$(OBJ) match$(OBJ) process$(OBJ) ttyio$(OBJ)
-OBJU4 = ubz2err$(OBJ) unreduce$(OBJ) unshrink$(OBJ) zipinfo$(OBJ)
+OBJU4 = unreduce$(OBJ) unshrink$(OBJ) zipinfo$(OBJ)
 OBJU  = $(OBJU1) $(OBJU2) $(OBJU3) $(OBJU4) $(OBJUS)
-OBJX1 = unzipsf_$(OBJ) crc32_$(OBJ) $(CRCA_O) crypt_$(OBJ)
+OBJX1 = unzipsf_$(OBJ) $(CRC32X)$(OBJ) crctab_$(OBJ) crypt_$(OBJ)
 OBJX2 = extract_$(OBJ) fileio_$(OBJ) globals_$(OBJ) inflate_$(OBJ)
-OBJX3 = match_$(OBJ) process_$(OBJ) ttyio_$(OBJ) ubz2err_$(OBJ)
+OBJX3 = match_$(OBJ) process_$(OBJ) ttyio_$(OBJ)
 OBJX  = $(OBJX1) $(OBJX2) $(OBJX3) $(OBJXS)
-OBJF  = funzip$(OBJ) crc32f$(OBJ) $(CRCA_O) cryptf$(OBJ) inflatef$(OBJ) \
+OBJF  = funzip$(OBJ) $(CRC32F)$(OBJ) cryptf$(OBJ) inflatef$(OBJ) \
 	globalsf$(OBJ) ttyiof$(OBJ) $(OBJFS)
 
 UNZIP_H = unzip.h unzpriv.h globals.h $(OSDEP_H)
@@ -109,25 +113,25 @@ uzexampl.exe:	uzexampl$(OBJ)
 # dependencies
 
 apihelp$(OBJ):	apihelp.c $(UNZIP_H) unzvers.h
-crc32$(OBJ):	crc32.c $(UNZIP_H) zip.h crc32.h
+crc32$(OBJ):	crc32.c $(UNZIP_H) zip.h
+crctab$(OBJ):	crctab.c $(UNZIP_H) zip.h
 envargs$(OBJ):	envargs.c $(UNZIP_H)
 explode$(OBJ):	explode.c $(UNZIP_H)
-extract$(OBJ):	extract.c $(UNZIP_H) crc32.h crypt.h
-fileio$(OBJ):	fileio.c $(UNZIP_H) crc32.h crypt.h ttyio.h ebcdic.h
+extract$(OBJ):	extract.c $(UNZIP_H) crypt.h
+fileio$(OBJ):	fileio.c $(UNZIP_H) crypt.h ttyio.h ebcdic.h
 globals$(OBJ):	globals.c $(UNZIP_H)
 inflate$(OBJ):	inflate.c $(UNZIP_H)
 list$(OBJ):	list.c $(UNZIP_H)
 match$(OBJ):	match.c $(UNZIP_H)
-process$(OBJ):	process.c $(UNZIP_H) crc32.h
+process$(OBJ):	process.c $(UNZIP_H)
 ttyio$(OBJ):	ttyio.c $(UNZIP_H) zip.h crypt.h ttyio.h
-ubz2err$(OBJ):	ubz2err.c $(UNZIP_H)
 unreduce$(OBJ):	unreduce.c $(UNZIP_H)
 unshrink$(OBJ):	unshrink.c $(UNZIP_H)
 unzip$(OBJ):	unzip.c $(UNZIP_H) crypt.h unzvers.h consts.h
 api$(OBJ):	api.c $(UNZIP_H) unzvers.h
 zipinfo$(OBJ):	zipinfo.c $(UNZIP_H)
 
-funzip$(OBJ):	funzip.c $(UNZIP_H) crc32.h crypt.h ttyio.h	# funzip only
+funzip$(OBJ):	funzip.c $(UNZIP_H) crypt.h ttyio.h tables.h	# funzip only
 	$(CC) -c $(CFLAGS) $(OUT)$@ funzip.c
 
 unzipstb$(OBJ):	unzipstb.c					# DLL version
@@ -175,55 +179,53 @@ crc_i386$(OBJ):	win32/crc_i386.asm				# 32bit, MASM
 crc_gcc$(OBJ):	crc_i386.S					# 32bit, GNU AS
 	$(AS) $(ASFLAGS) -x assembler-with-cpp -c -o $@ crc_i386.S
 
-crypt$(OBJ):	crypt.c $(UNZIP_H) zip.h crypt.h crc32.h ttyio.h
+crypt$(OBJ):	crypt.c $(UNZIP_H) zip.h crypt.h ttyio.h
 	$(CC) -c $(CFLAGS) $(DLLFLAG) $(OUT)$@ crypt.c
 
-# funzip compilation section
-cryptf$(OBJ):	crypt.c $(UNZIP_H) zip.h crypt.h crc32.h ttyio.h
+cryptf$(OBJ):	crypt.c $(UNZIP_H) zip.h crypt.h ttyio.h	# funzip only
 	$(CC) -c $(CFLAGSF) $(OUT)$@ crypt.c
 
-crc32f$(OBJ):	crc32.c $(UNZIP_H) zip.h crc32.h
+crc32f$(OBJ):	crc32.c $(UNZIP_H) zip.h			# funzip only
 	$(CC) -c $(CFLAGSF) $(OUT)$@ crc32.c
 
-globalsf$(OBJ):	globals.c $(UNZIP_H)
+globalsf$(OBJ):	globals.c $(UNZIP_H)				# funzip only
 	$(CC) -c $(CFLAGSF) $(OUT)$@ globals.c
 
-inflatef$(OBJ):	inflate.c inflate.h $(UNZIP_H) crypt.h
+inflatef$(OBJ):	inflate.c inflate.h $(UNZIP_H) crypt.h		# funzip only
 	$(CC) -c $(CFLAGSF) $(OUT)$@ inflate.c
 
-ttyiof$(OBJ):	ttyio.c $(UNZIP_H) zip.h crypt.h ttyio.h
+ttyiof$(OBJ):	ttyio.c $(UNZIP_H) zip.h crypt.h ttyio.h	# funzip only
 	$(CC) -c $(CFLAGSF) $(OUT)$@ ttyio.c
 
-# unzipsfx compilation section
-crc32_$(OBJ):	crc32.c $(UNZIP_H) zip.h crc32.h
+crc32_$(OBJ):	crc32.c $(UNZIP_H) zip.h			# unzipsfx only
 	$(CC) -c $(CFLAGSX) $(OUT)$@ crc32.c
 
-crypt_$(OBJ):	crypt.c $(UNZIP_H) zip.h crypt.h crc32.h ttyio.h
+crctab_$(OBJ):	crctab.c $(UNZIP_H) zip.h			# unzipsfx only
+	$(CC) -c $(CFLAGSX) $(OUT)$@ crctab.c
+
+crypt_$(OBJ):	crypt.c $(UNZIP_H) zip.h crypt.h ttyio.h	# unzipsfx only
 	$(CC) -c $(CFLAGSX) $(OUT)$@ crypt.c
 
-extract_$(OBJ):	extract.c $(UNZIP_H) crc32.h crypt.h
+extract_$(OBJ):	extract.c $(UNZIP_H) crypt.h			# unzipsfx only
 	$(CC) -c $(CFLAGSX) $(OUT)$@ extract.c
 
-fileio_$(OBJ):	fileio.c $(UNZIP_H) crc32.h crypt.h ttyio.h ebcdic.h
+fileio_$(OBJ):	fileio.c $(UNZIP_H) crypt.h ttyio.h ebcdic.h	# unzipsfx only
 	$(CC) -c $(CFLAGSX) $(OUT)$@ fileio.c
 
-globals_$(OBJ):	globals.c $(UNZIP_H)
+globals_$(OBJ):	globals.c $(UNZIP_H)				# unzipsfx only
 	$(CC) -c $(CFLAGSX) $(OUT)$@ globals.c
 
-inflate_$(OBJ):	inflate.c inflate.h $(UNZIP_H) crypt.h
+inflate_$(OBJ):	inflate.c inflate.h $(UNZIP_H) crypt.h		# unzipsfx only
 	$(CC) -c $(CFLAGSX) $(OUT)$@ inflate.c
 
-match_$(OBJ):	match.c $(UNZIP_H)
+match_$(OBJ):	match.c $(UNZIP_H)				# unzipsfx only
 	$(CC) -c $(CFLAGSX) $(OUT)$@ match.c
 
-process_$(OBJ):	process.c $(UNZIP_H) crc32.h
+process_$(OBJ):	process.c $(UNZIP_H)				# unzipsfx only
 	$(CC) -c $(CFLAGSX) $(OUT)$@ process.c
 
-ttyio_$(OBJ):	ttyio.c $(UNZIP_H) zip.h crypt.h ttyio.h
+ttyio_$(OBJ):	ttyio.c $(UNZIP_H) zip.h crypt.h ttyio.h	# unzipsfx only
 	$(CC) -c $(CFLAGSX) $(OUT)$@ ttyio.c
 
-ubz2err_$(OBJ):	ubz2err.c $(UNZIP_H)
-	$(CC) -c $(CFLAGSX) $(OUT)$@ ubz2err.c
-
-unzipsf_$(OBJ):	unzip.c $(UNZIP_H) crypt.h unzvers.h consts.h
+unzipsf_$(OBJ):	unzip.c $(UNZIP_H) crypt.h unzvers.h consts.h	# unzipsfx only
 	$(CC) -c $(CFLAGSX) $(OUT)$@ unzip.c
