@@ -4,7 +4,6 @@
     <ClCompile Include="..\..\common\Clipboard.cpp" />
     <ClCompile Include="benchmark.cpp" />
     <ClCompile Include="black_layered.cpp" />
-    <ClCompile Include="blankmonitor.cpp" />
     <ClCompile Include="buildtime.cpp" />
     <ClCompile Include="CpuUsage.cpp" />
     <ClCompile Include="d3des.c" />
