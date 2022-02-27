@@ -464,9 +464,13 @@ vncMenu::AddTrayIcon()
 			return;
 		}
 
-		SendTrayMsg(NIM_ADD, false, FALSE);
+		if (!IsIconSet)
+			AddNotificationIcon();
+		setToolTip();
+		strcpy(m_nid.szTip, m_tooltip);
+		Shell_NotifyIcon(NIM_MODIFY, &m_nid);		
 
-		if (m_server->AuthClientCount() != 0) { //PGM @ Advantig
+		/*if (m_server->AuthClientCount() != 0) { //PGM @ Advantig
 			// adzm - 2010-07 - Disable more effects or font smoothing
 			if (IsUserDesktop()) {				
 				if (m_server->RemoveWallpaperEnabled()) //PGM @ Advantig
@@ -479,7 +483,7 @@ vncMenu::AddTrayIcon()
 			if (m_server->RemoveWallpaperEnabled()) //PGM @ Advantig
 				DisableAero(); //PGM @ Advantig
 			VNC_OSVersion::getInstance()->SetAeroState();
-		} //PGM @ Advantig
+		} //PGM @ Advantig*/
 	}
 }
 
@@ -680,7 +684,6 @@ BOOL vncMenu::AddNotificationIcon()
 		Shell_NotifyIcon(NIM_SETVERSION, &m_nid);
 		IsIconSet = true;
 		IconFaultCounter = 0;
-		setToolTip();
 		if (!m_server->GetDisableTrayIcon())
 			addMenus();
 		return true;
@@ -744,26 +747,26 @@ BOOL vncMenu::DeleteNotificationIcon()
 
 void vncMenu::setToolTip()
 {
-	LoadString(hInstResDLL, IDI_WINVNC, m_nid.szTip, sizeof(m_nid.szTip));
-	strncat_s(m_nid.szTip, " - ", (sizeof(m_nid.szTip) - 1) - strlen(m_nid.szTip));
+	LoadString(hInstResDLL, IDI_WINVNC, m_tooltip, sizeof(m_tooltip));
+	strncat_s(m_tooltip, " - ", (sizeof(m_tooltip) - 1) - strlen(m_tooltip));
 	if (m_server->SockConnected()) {
-		unsigned long tiplen = (ULONG)strlen(m_nid.szTip);
-		char* tipptr = ((char*)&m_nid.szTip) + tiplen;
-		GetIPAddrString(tipptr, sizeof(m_nid.szTip) - tiplen);
+		unsigned long tiplen = (ULONG)strlen(m_tooltip);
+		char* tipptr = ((char*)&m_tooltip) + tiplen;
+		GetIPAddrString(tipptr, sizeof(m_tooltip) - tiplen);
 	}
 	else
-		strncat_s(m_nid.szTip, "Not listening", (sizeof(m_nid.szTip) - 1) - strlen(m_nid.szTip));
+		strncat_s(m_tooltip, "Not listening", (sizeof(m_tooltip) - 1) - strlen(m_tooltip));
 	char namebuf[256];
 
 	if (gethostname(namebuf, 256) == 0) {
-		strncat_s(m_nid.szTip, " - ", (sizeof(m_nid.szTip) - 1) - strlen(m_nid.szTip));
-		strncat_s(m_nid.szTip, namebuf, (sizeof(m_nid.szTip) - 1) - strlen(m_nid.szTip));
+		strncat_s(m_tooltip, " - ", (sizeof(m_tooltip) - 1) - strlen(m_tooltip));
+		strncat_s(m_tooltip, namebuf, (sizeof(m_tooltip) - 1) - strlen(m_tooltip));
 	}
 
 	if (vncService::RunningAsService())
-		strncat_s(m_nid.szTip, " - service - ", (sizeof(m_nid.szTip) - 1) - strlen(m_nid.szTip));
+		strncat_s(m_tooltip, " - service - ", (sizeof(m_tooltip) - 1) - strlen(m_tooltip));
 	else
-		strncat_s(m_nid.szTip, " - application - ", (sizeof(m_nid.szTip) - 1) - strlen(m_nid.szTip));
+		strncat_s(m_tooltip, " - application - ", (sizeof(m_tooltip) - 1) - strlen(m_tooltip));
 	strncat_s(m_nid.szTip, g_hookstring, (sizeof(m_nid.szTip) - 1) - strlen(m_nid.szTip));
 }
 
@@ -784,6 +787,7 @@ void vncMenu::RestoreTooltip()
 
 void vncMenu::setBalloonInfo() 
 {
+	m_nid.uTimeout = 29000; // minimum
 	if (m_server->GetDisableTrayIcon()) {
 		m_nid.dwState = 0;
 		m_nid.dwStateMask = NIS_HIDDEN;
@@ -794,8 +798,7 @@ void vncMenu::setBalloonInfo()
 				: NIF_ICON | NIF_MESSAGE | NIF_STATE | NIF_TIP | NIF_INFO;
 		strncpy_s(m_nid.szInfo, m_BalloonInfo, 255);
 		m_nid.szInfo[255] = '\0';
-		strcpy_s(m_nid.szInfoTitle, "UltraVNC Connection...");
-		m_nid.uTimeout = 29000; // minimum
+		strcpy_s(m_nid.szInfoTitle, "UltraVNC Connection...");		
 		m_nid.dwInfoFlags = NIIF_INFO;
 		balloonset = true;
 	}
@@ -819,28 +822,31 @@ void vncMenu::setBalloonInfo()
 void
 vncMenu::SendTrayMsg(DWORD msg, bool balloon, BOOL flash)
 {
-	omni_mutex_lock sync(m_mutexTrayIcon, 69);
-	if (msg == NIM_ADD)
-		AddNotificationIcon();
-	if (!IsIconSet)
+	if (!IsIconSet) //We only need to continue if we have an TryIcon
 		return;
-	//We only need to continue if we have an TryIcon
+	omni_mutex_lock sync(m_mutexTrayIcon, 69);
+	
 
 	if (msg == NIM_DELETE) {
 		DeleteNotificationIcon();
 		return;
 	}
-	
-	if (msg == NIM_MODIFY && !balloonset) {
-		m_nid.hIcon = m_server->GetDisableTrayIcon() ? NULL : flash ? m_flash_icon : m_winvnc_icon;
-		setToolTip();
-		if (balloon) 
-			setBalloonInfo();
+
+	if (!balloonset && balloon) {
+		setBalloonInfo();
 		Shell_NotifyIcon(NIM_MODIFY, &m_nid);
 	}
-
-	if (balloonset && !flash && (msg == NIM_MODIFY))
+	else if (balloonset && !flash && msg == NIM_MODIFY)
 		RestoreTooltip();
+	else {
+		setToolTip();
+		if (!balloonset && msg == NIM_MODIFY && (m_nid.hIcon != (m_server->GetDisableTrayIcon() ? NULL : flash ? m_flash_icon : m_winvnc_icon)
+			|| strcmp(m_nid.szTip, m_tooltip) != 0)) { //balloonset = 1 , ballon is showing, don't update icon and tip 
+			m_nid.hIcon = m_server->GetDisableTrayIcon() ? NULL : flash ? m_flash_icon : m_winvnc_icon;
+			strcpy(m_nid.szTip, m_tooltip);
+			Shell_NotifyIcon(NIM_MODIFY, &m_nid);
+		}
+	}
 }
 
 

@@ -207,6 +207,7 @@ void SessionDialog::SaveToFile(char *fname, bool asDefault)
 #endif
 	saveInt("RequireEncryption",	fRequireEncryption, fname);
 	saveInt("restricted",			restricted,		fname);  //hide menu
+	saveInt("AllowUntrustedServers", AllowUntrustedServers, fname);
 	saveInt("nostatus",				NoStatus,			fname); //hide status window
 	saveInt("nohotkeys",			NoHotKeys,		fname); //disable hotkeys
 	saveInt("sponsor",				g_disable_sponsor,	fname);
@@ -225,6 +226,7 @@ void SessionDialog::LoadFromFile(char *fname)
   PreferredEncodings.push_back(nPreferredEncoding);
 
   restricted =			readInt("restricted",		restricted,	fname) != 0 ;
+  AllowUntrustedServers = readInt("AllowUntrustedServers", AllowUntrustedServers, fname) != 0;
   ViewOnly =			readInt("viewonly",			ViewOnly,		fname) != 0;
   NoStatus =			readInt("nostatus",			NoStatus,		fname) != 0;
   NoHotKeys =			readInt("nohotkeys",			NoHotKeys,	fname) != 0;
@@ -366,6 +368,7 @@ void SessionDialog::SetDefaults()
 	listening = false;
 	listenport = INCOMING_PORT_OFFSET;
 	restricted = false;
+	AllowUntrustedServers = false;
 	// Tight specific
 	useCompressLevel = true;
 	compressLevel = 6;		

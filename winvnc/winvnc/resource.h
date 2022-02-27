@@ -239,7 +239,6 @@
 #define IDC_RADIONOTIFICATIONIFPROVIDED 1161
 #define IDC_EDITQUERYYEXT               1162
 #define IDC_EDITQUERYTEXT               1162
-#define IDC_CHECK10                     1163
 #define IDC_OSD                         1163
 #define IDC_SHOWOPTIONS                 2032
 #define IDC_BUTTON_EXPAND               2048

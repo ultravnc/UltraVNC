@@ -122,6 +122,7 @@ public:
 	bool fAutoAcceptNoDSM;
 	bool fRequireEncryption;
 	bool restricted;
+	bool AllowUntrustedServers;
 	bool NoStatus;
 	bool NoHotKeys;
 	bool setdefaults;

@@ -2976,7 +2976,7 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L92);
 		vnclog.Print(0, _T("No authentication needed\n"));
 
-		if (!m_Is_Listening && MessageBox(m_hwndMain, "The Server has been setup without authentication, do you trust this server?", "Accept server without authentification", MB_YESNO | MB_ICONEXCLAMATION | MB_TOPMOST) == IDNO)
+		if (!m_Is_Listening && !m_pApp->m_options.m_AllowUntrustedServers  && MessageBox(m_hwndMain, "The Server has been setup without authentication, do you trust this server?", "Accept server without authentification", MB_YESNO | MB_ICONEXCLAMATION | MB_TOPMOST) == IDNO)
 		{
 			throw WarningException("You refused a untrusted server.");
 		}

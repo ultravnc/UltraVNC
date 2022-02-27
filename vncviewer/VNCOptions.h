@@ -59,6 +59,7 @@ public:
 	int     m_quickoption; // Modif sf@2002 - v1.1.2
 	TCHAR   m_configFilename[_MAX_PATH];
 	bool	m_restricted;
+	bool m_AllowUntrustedServers;
 
 	// default connection options - can be set through Dialog
 	bool	m_ViewOnly;

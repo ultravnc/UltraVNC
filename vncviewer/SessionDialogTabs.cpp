@@ -965,6 +965,9 @@ void SessionDialog::InitDlgProcSecurity()
 
 	HWND hfRequireEncryption = GetDlgItem(hwnd, IDC_ONLYENCRYPTED);
 	SendMessage(hfRequireEncryption, BM_SETCHECK, fRequireEncryption, 0);
+	HWND hAllowUntrustedServers = GetDlgItem(hwnd, IDC_ONLYPASSWORD);
+	SendMessage(hAllowUntrustedServers, BM_SETCHECK, !AllowUntrustedServers, 0);
+
 	HWND hfAutoAcceptIncoming = GetDlgItem(hwnd, IDC_AUTOACCEPT);
 	SendMessage(hfAutoAcceptIncoming, BM_SETCHECK, fAutoAcceptIncoming, 0);
 	HWND hfAutoAcceptNoDSM = GetDlgItem(hwnd, IDC_AUTOACCEPTNOWARN);
@@ -1211,6 +1214,7 @@ void SessionDialog::ReadDlgProcSecurity()
 	else
 		fUseDSMPlugin = false;
 	fRequireEncryption = (SendMessage(GetDlgItem(hwnd, IDC_ONLYENCRYPTED), BM_GETCHECK, 0, 0) == BST_CHECKED);
+	AllowUntrustedServers = !(SendMessage(GetDlgItem(hwnd, IDC_ONLYPASSWORD), BM_GETCHECK, 0, 0) == BST_CHECKED);
 	fAutoAcceptIncoming = (SendMessage(GetDlgItem(hwnd, IDC_AUTOACCEPT), BM_GETCHECK, 0, 0) == BST_CHECKED);
 	fAutoAcceptNoDSM = (SendMessage(GetDlgItem(hwnd, IDC_AUTOACCEPTNOWARN), BM_GETCHECK, 0, 0) == BST_CHECKED);
 	restricted = (SendMessage(GetDlgItem(hwnd, IDC_HIDEMENU), BM_GETCHECK, 0, 0) == BST_CHECKED);
@@ -1547,6 +1551,7 @@ void SessionDialog::StartListener()
 	m_pOpt->m_fAutoAcceptNoDSM = fAutoAcceptNoDSM;
 	m_pOpt->m_fRequireEncryption = fRequireEncryption;
 	m_pOpt->m_restricted = restricted;
+	m_pOpt->m_AllowUntrustedServers = AllowUntrustedServers;
 	m_pOpt->m_NoStatus = NoStatus;
 	m_pOpt->m_NoHotKeys = NoHotKeys;
 #ifdef _Gii

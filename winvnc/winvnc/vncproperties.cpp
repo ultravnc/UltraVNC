@@ -1006,7 +1006,7 @@ vncProperties::DialogProc(HWND hwnd,
 				_this->m_server->FTUserImpersonation(SendMessage(hFileTransferUserImp, BM_GETCHECK, 0, 0) == BST_CHECKED);
 
 				HWND hBlank = GetDlgItem(hwnd, IDC_BLANK);
-				_this->m_server->BlankMonitorEnabled(SendMessage(hBlank, BM_GETCHECK, 0, 0) == BST_CHECKED);				
+				_this->m_server->BlankMonitorEnabled(SendMessage(hBlank, BM_GETCHECK, 0, 0) == BST_CHECKED);
 				HWND hBlank2 = GetDlgItem(hwnd, IDC_BLANK2); //PGM
 				_this->m_server->BlankInputsOnly(SendMessage(hBlank2, BM_GETCHECK, 0, 0) == BST_CHECKED); //PGM				
 				

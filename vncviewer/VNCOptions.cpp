@@ -201,6 +201,7 @@ VNCOptions::VNCOptions()
 	m_listening = false;
 	m_listenPort = INCOMING_PORT_OFFSET;
 	m_restricted = false;
+	m_AllowUntrustedServers = false;
 	// Tight specific
 	m_useCompressLevel = true;
 	m_compressLevel = 6;
@@ -408,6 +409,7 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
 	m_listening = s.m_listening;
 	m_listenPort = s.m_listenPort;
 	m_restricted = s.m_restricted;
+	m_AllowUntrustedServers = s.m_AllowUntrustedServers;
 
 	// Tight specific
 	m_useCompressLevel = s.m_useCompressLevel;
@@ -593,6 +595,9 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 		else if (SwitchMatch(args[j], _T("restricted"))) {
 			m_restricted = true;
 		}
+		else if (SwitchMatch(args[j], _T("AllowUntrustedServers"))) {
+			m_AllowUntrustedServers = true;
+		}		
 		else if (SwitchMatch(args[j], _T("viewonly"))) {
 			m_ViewOnly = true;
 		}
@@ -1109,6 +1114,7 @@ void VNCOptions::SaveOptions(char* fname)
 		saveInt("preferred_encoding", m_PreferredEncodings[0], fname);
 	}
 	saveInt("restricted", m_restricted, fname);
+	saveInt("AllowUntrustedServers", m_AllowUntrustedServers, fname);
 	saveInt("viewonly", m_ViewOnly, fname);
 	saveInt("nostatus", m_NoStatus, fname);
 	saveInt("nohotkeys", m_NoHotKeys, fname);
@@ -1203,6 +1209,7 @@ void VNCOptions::LoadOptions(char* fname)
 	m_PreferredEncodings.push_back(nPreferredEncoding);
 
 	m_restricted = readInt("restricted", m_restricted, fname) != 0;
+	m_AllowUntrustedServers = readInt("AllowUntrustedServers", m_AllowUntrustedServers, fname) != 0;
 	m_ViewOnly = readInt("viewonly", m_ViewOnly, fname) != 0;
 	m_NoStatus = readInt("nostatus", m_NoStatus, fname) != 0;
 	m_NoHotKeys = readInt("nohotkeys", m_NoHotKeys, fname) != 0;

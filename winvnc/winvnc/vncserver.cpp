@@ -667,10 +667,12 @@ vncServer::Authenticated(vncClientId clientid)
 
 			//If we are the only client, we give it mouse access.
 			//Other client can take access when the click a mouse button
-			if (m_authClients.size() == 1)
-				client->SetHasMouse(true);
-			else
-				client->SetHasMouse(false);
+			if (getCollabo()) {
+				if (m_authClients.size() == 1)
+					client->SetHasMouse(true);
+				else
+					client->SetHasMouse(false);
+			}
 
 
 			// Create the screen handler if necessary
