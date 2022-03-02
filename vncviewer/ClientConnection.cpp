@@ -2847,10 +2847,10 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 			if (!auth_supported.empty()) {
 				std::vector<CARD8> auth_priority;
 				auth_priority.push_back(rfbUltraVNC);
+				auth_priority.push_back(rfbClientInitExtraMsgSupport);
 				auth_priority.push_back(rfbUltraVNC_SecureVNCPluginAuth_new);
 				auth_priority.push_back(rfbUltraVNC_SecureVNCPluginAuth);				
-				auth_priority.push_back(rfbUltraVNC_SCPrompt); // adzm 2010-10
-				auth_priority.push_back(rfbClientInitExtraMsgSupport);
+				auth_priority.push_back(rfbUltraVNC_SCPrompt); // adzm 2010-10				
 				auth_priority.push_back(rfbUltraVNC_SessionSelect);
 				auth_priority.push_back(rfbUltraVNC_MsLogonIIAuth);
 				auth_priority.push_back(rfbVncAuth);
@@ -2899,7 +2899,8 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 	bool bSecureVNCPluginActive = std::find(current_auth.begin(), current_auth.end(), rfbUltraVNC_SecureVNCPluginAuth) != current_auth.end();
 	if (!bSecureVNCPluginActive) bSecureVNCPluginActive = std::find(current_auth.begin(), current_auth.end(), rfbUltraVNC_SecureVNCPluginAuth_new) != current_auth.end();
 
-	if (!bSecureVNCPluginActive && m_fUsePlugin && m_pIntegratedPluginInterface && authScheme != rfbConnFailed && authScheme != rfbUltraVNC_SecureVNCPluginAuth  && authScheme != rfbUltraVNC_SecureVNCPluginAuth_new && authScheme != rfbUltraVNC)
+	if (!bSecureVNCPluginActive && m_fUsePlugin && m_pIntegratedPluginInterface && authScheme != rfbConnFailed &&
+		authScheme != rfbUltraVNC_SecureVNCPluginAuth  && authScheme != rfbUltraVNC_SecureVNCPluginAuth_new && authScheme != rfbUltraVNC && authScheme != rfbClientInitExtraMsgSupport)
 	{
 		//adzm 2010-05-12
 		if (m_opts->m_fRequireEncryption) {
