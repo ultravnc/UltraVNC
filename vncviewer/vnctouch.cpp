@@ -321,14 +321,14 @@ int vnctouch::GetContactIndex(int dwID){
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 int vnctouch::scale_coordinates(int x, int y, int *nx, int *ny)
 {
-	int x_scaled = (x + cc->m_hScrollPos) * cc->m_opts.m_scale_den / cc->m_opts.m_scale_num;
-	if (cc->m_opts.m_Directx) x_scaled = (x)*  cc->m_si.framebufferWidth / cc->m_cliwidth;
+	int x_scaled = (x + cc->m_hScrollPos) * cc->m_opts->m_scale_den / cc->m_opts->m_scale_num;
+	if (cc->m_opts->m_Directx) x_scaled = (x)*  cc->m_si.framebufferWidth / cc->m_cliwidth;
 	*nx = x_scaled;
 
-	int y_scaled = (y + cc->m_vScrollPos) * cc->m_opts.m_scale_den / cc->m_opts.m_scale_num;
-	if (cc->m_opts.m_Directx)
+	int y_scaled = (y + cc->m_vScrollPos) * cc->m_opts->m_scale_den / cc->m_opts->m_scale_num;
+	if (cc->m_opts->m_Directx)
 	{
-		if (cc->m_opts.m_ShowToolbar) y_scaled = (y)* cc->m_si.framebufferHeight / (cc->m_cliheight - cc->m_TBr.bottom);
+		if (cc->m_opts->m_ShowToolbar) y_scaled = (y)* cc->m_si.framebufferHeight / (cc->m_cliheight - cc->m_TBr.bottom);
 		else y_scaled = (y)*cc->m_si.framebufferHeight / cc->m_cliheight;
 	}
 	*ny = y_scaled;
@@ -504,13 +504,13 @@ int vnctouch::_handle_gii_version_message(rfbGIIMsg *msg, int gii_bigendian)
 		max < rfbGIIMinVersion)
 		return 0;
 	if ((cmsg.version = _find_gii_version(min, max)) == -1) {
-		cc->m_opts.m_giiEnable = 0;
+		cc->m_opts->m_giiEnable = 0;
 		return 0;
 	}
 	serverVersion = cmsg.version;
 	cmsg.version = Swap16IfLE(cmsg.version);
 	cc->WriteExact((char*)&cmsg, sz_rfbGIIClientVersionMsg);
-	cc->m_opts.m_giiEnable = 1;
+	cc->m_opts->m_giiEnable = 1;
 	return 1;
 }
 

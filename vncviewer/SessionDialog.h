@@ -52,7 +52,6 @@ public:
    	virtual ~SessionDialog();
 
 	ClientConnection *m_pCC;
-	//VNCOptions *m_pOpt;
 	MRU *m_pMRU;
 	CDSMPlugin* m_pDSMPlugin; // sf@2002
 
@@ -123,6 +122,7 @@ public:
 	bool fAutoAcceptNoDSM;
 	bool fRequireEncryption;
 	bool restricted;
+	bool AllowUntrustedServers;
 	bool NoStatus;
 	bool NoHotKeys;
 	bool setdefaults;

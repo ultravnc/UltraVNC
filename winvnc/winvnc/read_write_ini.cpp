@@ -86,6 +86,7 @@ LONG Collabo = 0;
 
 LONG Frame = 0;
 LONG Notification = 0;
+LONG OSD = 0;
 LONG NotificationSelection = 0;
 LONG EnableRemoteInputs=1;
 LONG LockSettings=0;
@@ -269,9 +270,11 @@ myIniFile_Out.WriteInt("admin", "Collabo", Collabo);
 
 Frame = myIniFile_In.ReadInt("admin", "Frame", Frame);
 Notification = myIniFile_In.ReadInt("admin", "Notification", Notification);
+OSD = myIniFile_In.ReadInt("admin", "OSD", OSD);
 NotificationSelection = myIniFile_In.ReadInt("admin", "NotificationSelection", NotificationSelection);
 myIniFile_Out.WriteInt("admin", "Frame", Frame);
 myIniFile_Out.WriteInt("admin", "Notification", Notification);
+myIniFile_Out.WriteInt("admin", "OSD", OSD);
 myIniFile_Out.WriteInt("admin", "NotificationSelection", NotificationSelection);
 myIniFile_In.ReadPassword(passwd,MAXPWLEN);
 myIniFile_Out.WritePassword(passwd);

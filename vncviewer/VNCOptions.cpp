@@ -201,6 +201,7 @@ VNCOptions::VNCOptions()
 	m_listening = false;
 	m_listenPort = INCOMING_PORT_OFFSET;
 	m_restricted = false;
+	m_AllowUntrustedServers = false;
 	// Tight specific
 	m_useCompressLevel = true;
 	m_compressLevel = 6;
@@ -250,11 +251,11 @@ VNCOptions::VNCOptions()
 	m_keepAliveInterval = KEEPALIVE_INTERVAL;
 	m_IdleInterval = 0;
 	m_throttleMouse = 0; // adzm 2010-10
-	setDefaultOptionsFileName();
-	Load(getDefaultOptionsFileName());
+	setDefaultOptionsFileName(m_optionfile);
+	LoadOptions(getDefaultOptionsFileName());
 }
 
-void VNCOptions::setDefaultOptionsFileName()
+void VNCOptions::setDefaultOptionsFileName(TCHAR * optionfile)
 {
 	char szFileName[MAX_PATH];
 	if (GetModuleFileName(NULL, szFileName, MAX_PATH)) {
@@ -270,27 +271,27 @@ void VNCOptions::setDefaultOptionsFileName()
 		m_hDestFile = CreateFile(szFileName, GENERIC_WRITE | GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, NULL);
 	}
 	if (m_hDestFile != INVALID_HANDLE_VALUE) {
-		strcpy_s(m_optionfile, MAX_PATH, szFileName);
+		strcpy_s(optionfile, MAX_PATH, szFileName);
 		CloseHandle(m_hDestFile);
 		return;
 	}
 	const char* APPDIR = "UltraVNC";
-	if (SHGetFolderPath(0, CSIDL_APPDATA, NULL, SHGFP_TYPE_CURRENT, m_optionfile) == S_OK) {
-		strcat_s(m_optionfile, MAX_PATH, "\\");
-		strcat_s(m_optionfile, MAX_PATH, APPDIR);
+	if (SHGetFolderPath(0, CSIDL_APPDATA, NULL, SHGFP_TYPE_CURRENT, optionfile) == S_OK) {
+		strcat_s(optionfile, MAX_PATH, "\\");
+		strcat_s(optionfile, MAX_PATH, APPDIR);
 		struct _stat st;
-		if (_stat(m_optionfile, &st) == -1)
-			_mkdir(m_optionfile);
+		if (_stat(optionfile, &st) == -1)
+			_mkdir(optionfile);
 	}
 	else {
 		char* tempvar = NULL;
 		tempvar = getenv("TEMP");
 		if (tempvar)
-			strcpy_s(m_optionfile, MAX_PATH, tempvar);
+			strcpy_s(optionfile, MAX_PATH, tempvar);
 		else
-			strcpy_s(m_optionfile, MAX_PATH, "");
+			strcpy_s(optionfile, MAX_PATH, "");
 	}
-	strcat_s(m_optionfile, MAX_PATH, "\\options.vnc");
+	strcat_s(optionfile, MAX_PATH, "\\options.vnc");
 }
 
 TCHAR* VNCOptions::getDefaultOptionsFileName()
@@ -408,6 +409,7 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
 	m_listening = s.m_listening;
 	m_listenPort = s.m_listenPort;
 	m_restricted = s.m_restricted;
+	m_AllowUntrustedServers = s.m_AllowUntrustedServers;
 
 	// Tight specific
 	m_useCompressLevel = s.m_useCompressLevel;
@@ -593,6 +595,9 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 		else if (SwitchMatch(args[j], _T("restricted"))) {
 			m_restricted = true;
 		}
+		else if (SwitchMatch(args[j], _T("AllowUntrustedServers"))) {
+			m_AllowUntrustedServers = true;
+		}		
 		else if (SwitchMatch(args[j], _T("viewonly"))) {
 			m_ViewOnly = true;
 		}
@@ -771,10 +776,18 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 				continue;
 			}
 			else {
-				Load(m_configFilename);
+				LoadOptions(m_configFilename);
 				m_configSpecified = true;
 			}
 		}
+			else if (SwitchMatch(args[j], _T("InfoMsg"))) {
+			if (++j == i) {
+				ArgError("No InfoMsg");
+				continue;
+			}
+			strcpy_s(m_InfoMsg, args[j]);
+		}
+
 		else if (SwitchMatch(args[j], _T("register"))) {
 			//      Register();
 			PostQuitMessage(0);
@@ -1090,7 +1103,7 @@ int readInt(char* name, int defval, char* fname)
 	return GetPrivateProfileInt("options", name, defval, fname);
 }
 
-void VNCOptions::Save(char* fname)
+void VNCOptions::SaveOptions(char* fname)
 {
 	for (int i = rfbEncodingRaw; i <= LASTENCODING; i++) {
 		char buf[128];
@@ -1101,6 +1114,7 @@ void VNCOptions::Save(char* fname)
 		saveInt("preferred_encoding", m_PreferredEncodings[0], fname);
 	}
 	saveInt("restricted", m_restricted, fname);
+	saveInt("AllowUntrustedServers", m_AllowUntrustedServers, fname);
 	saveInt("viewonly", m_ViewOnly, fname);
 	saveInt("nostatus", m_NoStatus, fname);
 	saveInt("nohotkeys", m_NoHotKeys, fname);
@@ -1182,7 +1196,7 @@ void VNCOptions::Save(char* fname)
 	saveInt("PreemptiveUpdates", m_preemptiveUpdates, fname);
 }
 
-void VNCOptions::Load(char* fname)
+void VNCOptions::LoadOptions(char* fname)
 {
 	for (int i = rfbEncodingRaw; i <= LASTENCODING; i++) {
 		char buf[128];
@@ -1195,6 +1209,7 @@ void VNCOptions::Load(char* fname)
 	m_PreferredEncodings.push_back(nPreferredEncoding);
 
 	m_restricted = readInt("restricted", m_restricted, fname) != 0;
+	m_AllowUntrustedServers = readInt("AllowUntrustedServers", m_AllowUntrustedServers, fname) != 0;
 	m_ViewOnly = readInt("viewonly", m_ViewOnly, fname) != 0;
 	m_NoStatus = readInt("nostatus", m_NoStatus, fname) != 0;
 	m_NoHotKeys = readInt("nohotkeys", m_NoHotKeys, fname) != 0;
@@ -1259,23 +1274,6 @@ void VNCOptions::Load(char* fname)
 	GetPrivateProfileString("options", "InfoMsg", m_InfoMsg, m_InfoMsg, 254, fname);
 	if (!g_disable_sponsor) g_disable_sponsor = readInt("sponsor", g_disable_sponsor, fname) != 0;
 
-	/*if (!g_disable_sponsor)
-	{
-	HKEY hRegKey;
-		  DWORD sponsor = 0;
-		  if ( RegCreateKey(HKEY_CURRENT_USER, SETTINGS_KEY_NAME, &hRegKey)  != ERROR_SUCCESS ) {
-			  hRegKey = NULL;
-		  } else {
-			  DWORD sponsorsize = sizeof(sponsor);
-			  DWORD valtype=REG_DWORD;
-			  if ( RegQueryValueEx( hRegKey,  "sponsor", NULL, &valtype,
-				  (LPBYTE) &sponsor, &sponsorsize) == ERROR_SUCCESS) {
-				  g_disable_sponsor=sponsor ? true : false;
-			  }
-			  RegCloseKey(hRegKey);
-		  }
-	}*/
-
 	m_autoReconnect = readInt("AutoReconnect", m_autoReconnect, fname);
 
 	m_fExitCheck = readInt("ExitCheck", m_fExitCheck, fname) != 0; //PGM @ Advantig
@@ -1326,7 +1324,7 @@ void VNCOptions::ShowUsage(LPTSTR info) {
 			"      [/8colors] [/8greycolors] [/4greycolors] [/2greycolors]\r\n"
 			"      [/encoding [xz | xzyw | zrle | zywrle | tight | zlib | zlibhex | ultra | ultra2 | corre | rre | raw]\r\n"
 			"      [/encodings xz zrle ...]  (in order of priority)\r\n"
-			"      [/autoacceptincoming] [/autoacceptnodsm] [/disablesponsor]\r\n" //adzm 2009-06-21, adzm 2009-07-19
+			"      [/autoacceptincoming] [/autoacceptnodsm] [/disablesponsor][/InfoMsg \"Messages need quotes\"]\r\n" //adzm 2009-06-21, adzm 2009-07-19
 			"      [/requireencryption] [/enablecache] [/throttlemouse n] [/socketkeepalivetimeout n]\r\n" //adzm 2010-05-12
 			"For full details see documentation."),
 		tmpinf);

@@ -564,7 +564,7 @@ vncEncodeTight::SendSolidRect(BYTE *dest)
 	int len;
 
 	if (m_usePixelFormat24) {
-		//Pack24(m_buffer, 1); give wrong color
+		Pack24(m_buffer, 1);
 		len = 3;
 	} else
 		len = m_remoteformat.bitsPerPixel / 8;

@@ -146,6 +146,7 @@ protected:
 	bool IsIconSet;
 	int IconFaultCounter;
 	bool balloonset = false;
+	char m_tooltip[128]{};
 };
 
 

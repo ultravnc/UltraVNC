@@ -46,8 +46,8 @@ public:
 	virtual ~VNCOptions();
 
 	// Save and load a set of options from a config file
-	void Save(char* fname);
-	void Load(char* fname);
+	void SaveOptions(char* fname);
+	void LoadOptions(char* fname);
 
 	// process options
 	bool	m_listening;
@@ -59,6 +59,7 @@ public:
 	int     m_quickoption; // Modif sf@2002 - v1.1.2
 	TCHAR   m_configFilename[_MAX_PATH];
 	bool	m_restricted;
+	bool m_AllowUntrustedServers;
 
 	// default connection options - can be set through Dialog
 	bool	m_ViewOnly;
@@ -161,7 +162,7 @@ public:
 	bool m_running;
 
 	TCHAR m_optionfile[MAX_PATH];
-	void setDefaultOptionsFileName();
+	static void setDefaultOptionsFileName(TCHAR* optionfile);
 	TCHAR* getDefaultOptionsFileName();
 	char m_InfoMsg[255]{ 0 };
 

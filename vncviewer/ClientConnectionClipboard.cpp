@@ -67,7 +67,7 @@ void ClientConnection::ProcessLocalClipboardChange()
 	/*} else if (!m_initialClipboardSeen) {
 		vnclog.Print(2, _T("Don't send initial clipboard!\n"));
 		m_initialClipboardSeen = true;*/
-	} else if (!m_opts.m_DisableClipboard && !m_opts.m_ViewOnly) {
+	} else if (!m_opts->m_DisableClipboard && !m_opts->m_ViewOnly) {
 		UpdateRemoteClipboard();
 	}
 	// Pass the message to the next window in clipboard viewer chain
@@ -189,7 +189,7 @@ void ClientConnection::UpdateRemoteClipboardCaps(bool bSavePreferences)
 
 	ExtendedClipboardDataMessage extendedClipboardDataMessage;
 	
-	if (m_opts.m_DisableClipboard || m_opts.m_ViewOnly) {
+	if (m_opts->m_DisableClipboard || m_opts->m_ViewOnly) {
 		// messages and formats that we can handle
 		extendedClipboardDataMessage.m_pExtendedData->flags = Swap32IfLE(clipCaps | clipText | clipRTF | clipHTML | clipDIB);
 
@@ -244,7 +244,7 @@ void ClientConnection::RequestRemoteClipboard()
 // adzm - 2010-07 - Extended clipboard
 void ClientConnection::UpdateLocalClipboard(char *buf, int len)
 {	
-	if (m_opts.m_DisableClipboard || m_opts.m_ViewOnly)
+	if (m_opts->m_DisableClipboard || m_opts->m_ViewOnly)
 		return;
 
 	// Copy to wincontents replacing LF with CR-LF
@@ -321,10 +321,10 @@ void ClientConnection::SaveClipboardPreferences()
 			dwClipboardPrefs |= clipHTML;
 		}
 		//ofnInit();
-		vnclog.Print(1, "Saving to %s\n", m_opts.getDefaultOptionsFileName());
+		vnclog.Print(1, "Saving to %s\n", m_opts->getDefaultOptionsFileName());
 		char buf[32];
 		sprintf_s(buf, "%d", dwClipboardPrefs);
-		WritePrivateProfileString("connection", "ClipboardPrefs", buf, m_opts.getDefaultOptionsFileName());
+		WritePrivateProfileString("connection", "ClipboardPrefs", buf, m_opts->getDefaultOptionsFileName());
 	}
 }
 
@@ -333,9 +333,9 @@ bool ClientConnection::LoadClipboardPreferences()
 	omni_mutex_lock l(m_clipMutex);
 	DWORD dwClipboardPrefs = 0;
 //	ofnInit();
-	vnclog.Print(1, "Saving to %s\n", m_opts.getDefaultOptionsFileName());
+	vnclog.Print(1, "Saving to %s\n", m_opts->getDefaultOptionsFileName());
 	dwClipboardPrefs = clipText | clipRTF | clipHTML;
-	dwClipboardPrefs = GetPrivateProfileInt("connection", "ClipboardPrefs", dwClipboardPrefs, m_opts.getDefaultOptionsFileName());
+	dwClipboardPrefs = GetPrivateProfileInt("connection", "ClipboardPrefs", dwClipboardPrefs, m_opts->getDefaultOptionsFileName());
 	dwClipboardPrefs |= clipText;
 	if (!(dwClipboardPrefs & clipRTF)) {
 		m_clipboard.settings.m_nLimitRTF = 0;

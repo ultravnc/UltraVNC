@@ -67,11 +67,11 @@ void ClientConnection::zrleDecode(int x, int y, int w, int h, bool use_zstd)
     //omni_mutex_lock l(m_bitmapdcMutex);
 
 	if( zywrle ){
-	  if( !m_opts.m_enableJpegCompression ){
+	  if( !m_opts->m_enableJpegCompression ){
 		  zywrle_level = 1;
-	  }else if( m_opts.m_jpegQualityLevel < 3 ){
+	  }else if( m_opts->m_jpegQualityLevel < 3 ){
 		  zywrle_level = 3;
-	  }else if( m_opts.m_jpegQualityLevel < 6 ){
+	  }else if( m_opts->m_jpegQualityLevel < 6 ){
 		  zywrle_level = 2;
 	  }else{
 		  zywrle_level = 1;

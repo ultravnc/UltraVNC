@@ -66,19 +66,19 @@
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='XP|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v141_xp</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v141_xp</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Vista|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
@@ -112,7 +112,7 @@
     <UseIntelTBB>false</UseIntelTBB>
     <UseIntelMKL>No</UseIntelMKL>
     <UseILP64Interfaces>false</UseILP64Interfaces>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='XP|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
@@ -123,7 +123,7 @@
     <UseIntelTBB>false</UseIntelTBB>
     <UseIntelMKL>No</UseIntelMKL>
     <UseILP64Interfaces>false</UseILP64Interfaces>
-    <PlatformToolset>v141_xp</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='IPV6|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
@@ -503,8 +503,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\32\oldCPU</Command>
       <OutputFile>.\..\Release/vnchooks.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      <Command>"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe" sign /sha1 075BD1CAB5AE085E523AF7883FC0A8127BE08C71 /n "uvnc bvba" /v /fd sha1 /t http://timestamp.verisign.com/scripts/timstamp.dll "$(OutDir)$(TargetName)$(TargetExt)"
-"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe" sign /sha1 0F96782496EA96F2BA96CF177E61F993CA5BC2E8 /n "uvnc bvba" /v /as /fd sha256 /tr http://timestamp.geotrust.com/tsa "$(OutDir)$(TargetName)$(TargetExt)"</Command>
+      <Command>C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe" sign /tr http://timestamp.digicert.com /td sha256 /fd sha256 /as /sha1 7686bed45b491e41586b7d2a3c63cbd7e2f3d0ca "$(OutDir)$(TargetName)$(TargetExt)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Vista|Win32'">
@@ -759,8 +758,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
       <OutputFile>.\..\Release/vnchooks.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      <Command>"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe" sign /sha1 075BD1CAB5AE085E523AF7883FC0A8127BE08C71 /n "uvnc bvba" /v /fd sha1 /t http://timestamp.verisign.com/scripts/timstamp.dll "$(OutDir)$(TargetName)$(TargetExt)"
-"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe" sign /sha1 0F96782496EA96F2BA96CF177E61F993CA5BC2E8 /n "uvnc bvba" /v /as /fd sha256 /tr http://timestamp.geotrust.com/tsa "$(OutDir)$(TargetName)$(TargetExt)"</Command>
+      <Command>"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe" sign /tr http://timestamp.digicert.com /td sha256 /fd sha256 /as /sha1 7686bed45b491e41586b7d2a3c63cbd7e2f3d0ca "$(OutDir)$(TargetName)$(TargetExt)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">

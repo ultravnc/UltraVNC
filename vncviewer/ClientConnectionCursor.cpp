@@ -49,7 +49,7 @@ void ClientConnection::ReadCursorShape(rfbFramebufferUpdateRectHeader *pfburh) {
 
 
 	// Ignore cursor shape updates if requested by user
-	if (m_opts.m_ignoreShapeUpdates) {
+	if (m_opts->m_ignoreShapeUpdates) {
 		int bytesToSkip = (pfburh->encoding == rfbEncodingXCursor) ?
 			(6 + 2 * bytesMaskData) : (bytesSourceData + bytesMaskData);
 		CheckBufferSize(bytesToSkip);
@@ -152,10 +152,10 @@ void ClientConnection::ReadCursorShape(rfbFramebufferUpdateRectHeader *pfburh) {
 // marscha PointerPos
 void ClientConnection::ReadCursorPos(rfbFramebufferUpdateRectHeader *pfburh)
 {
-	int x = (int)pfburh->r.x / this->m_opts.m_nServerScale;
+	int x = (int)pfburh->r.x / this->m_opts->m_nServerScale;
 	if (x >= m_si.framebufferWidth)
 		x = m_si.framebufferWidth - 1;
-	int y = (int)pfburh->r.y / this->m_opts.m_nServerScale;
+	int y = (int)pfburh->r.y / this->m_opts->m_nServerScale;
 	if (y >= m_si.framebufferHeight)
 		y = m_si.framebufferHeight - 1;
 	//vnclog.Print(2, _T("reading cursor pos (%d, %d)\n"), x, y);
@@ -318,7 +318,7 @@ void ClientConnection::SoftCursorRestoreArea() {
 	omni_mutex_lock l(m_bitmapdcMutex);
 	if (m_DIBbits && m_SavedAreaBIB) Copyfrom0buffer(w, h, x, y,m_myFormat.bitsPerPixel/8,m_SavedAreaBIB,(BYTE*)m_DIBbits,m_si.framebufferWidth,m_si.framebufferHeight);
 
-	if (!m_opts.m_Directx)InvalidateScreenRect(&r);
+	if (!m_opts->m_Directx)InvalidateScreenRect(&r);
 }
 
 //
@@ -349,7 +349,7 @@ void ClientConnection::SoftCursorDraw() {
 
 	RECT r;
 	SoftCursorToScreen(&r, NULL);
-	if (!m_opts.m_Directx) InvalidateScreenRect(&r);
+	if (!m_opts->m_Directx) InvalidateScreenRect(&r);
 }
 
 //
@@ -404,10 +404,10 @@ void ClientConnection::InvalidateScreenRect(const RECT *pRect) {
 	// received into the corresponding window coords, and invalidate
 	// *that* region.
 
-	if (m_opts.m_scaling) {
+	if (m_opts->m_scaling) {
 		// First, we adjust coords to avoid rounding down when scaling.
-		int n = m_opts.m_scale_num;
-		int d = m_opts.m_scale_den;
+		int n = m_opts->m_scale_num;
+		int d = m_opts->m_scale_den;
 		int left   = (pRect->left / d) * d;
 		int top    = (pRect->top  / d) * d;
 		int right  = (pRect->right  + d - 1) / d * d; // round up
@@ -434,10 +434,10 @@ void ClientConnection::InvalidateRegion(const RECT *pRect,HRGN *prgn) {
 	// received into the corresponding window coords, and invalidate
 	// *that* region.
 
-	if (m_opts.m_scaling) {
+	if (m_opts->m_scaling) {
 		// First, we adjust coords to avoid rounding down when scaling.
-		int n = m_opts.m_scale_num;
-		int d = m_opts.m_scale_den;
+		int n = m_opts->m_scale_num;
+		int d = m_opts->m_scale_den;
 		int left   = (pRect->left / d) * d;
 		int top    = (pRect->top  / d) * d;
 		int right  = (pRect->right  + d - 1) / d * d; // round up

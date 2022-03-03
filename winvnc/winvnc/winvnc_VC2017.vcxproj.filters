@@ -4,7 +4,6 @@
     <ClCompile Include="..\..\common\Clipboard.cpp" />
     <ClCompile Include="benchmark.cpp" />
     <ClCompile Include="black_layered.cpp" />
-    <ClCompile Include="blankmonitor.cpp" />
     <ClCompile Include="buildtime.cpp" />
     <ClCompile Include="CpuUsage.cpp" />
     <ClCompile Include="d3des.c" />
@@ -85,6 +84,7 @@
     <ClCompile Include="..\..\common\UltraVncZ.cpp" />
     <ClCompile Include="VirtualDisplay.cpp" />
     <ClCompile Include="MouseSimulator.cpp" />
+    <ClCompile Include="LayeredWindows.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\ZipUnZip32\ZipUnZip32.h">
@@ -284,6 +284,7 @@
     <ClInclude Include="..\..\common\UltraVncZ.h" />
     <ClInclude Include="VirtualDisplay.h" />
     <ClInclude Include="MouseSimulator.h" />
+    <ClInclude Include="LayeredWindows.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="VTune\winvnc.vpj" />

@@ -104,6 +104,8 @@ typedef BOOL (WINAPI*  pBlockInput) (BOOL);
 typedef BOOL (WINAPI* LPGETMONITORINFO)(HMONITOR, LPMONITORINFO);
 typedef HMONITOR (WINAPI* LPMONITOTFROMPOINT) (POINT,DWORD);
 
+class LayeredWindows;
+
 // Class definition
 // multi monitor
 struct monitor
@@ -231,8 +233,7 @@ public:
 	int DriverType;
 	DWORD color[10];
 	// added jeff
-	void SetBlankMonitor(bool enabled);
-	void SetBorderWindow(bool enabled, RECT rect);
+	LayeredWindows *layeredWindows;
 	// Modif rdv@2002 Dis/enable input
 	void SetDisableInput();
 	void SetSW(int x,int y);

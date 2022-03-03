@@ -93,7 +93,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -128,7 +128,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -446,7 +446,8 @@
     </Bscmake>
     <PostBuildEvent>
       <Command>"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe" sign /tr http://timestamp.digicert.com /td sha256 /fd sha256 /as /sha1 7686bed45b491e41586b7d2a3c63cbd7e2f3d0ca "$(OutDir)$(TargetName)$(TargetExt)"
-copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\32\xp</Command>
+copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\32\xp
+copy "$(OutDir)$(TargetName)$(TargetExt)" C:\Users\rudi\Desktop\git_ultravnc\Files\vncviewer.exe</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='NOacceleration|Win32'">
@@ -790,7 +791,8 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\32\ipv6</Command>
     </Bscmake>
     <PostBuildEvent>
       <Command>"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe" sign /tr http://timestamp.digicert.com /td sha256 /fd sha256 /as /sha1 7686bed45b491e41586b7d2a3c63cbd7e2f3d0ca "$(OutDir)$(TargetName)$(TargetExt)"
-copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\XP</Command>
+copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\XP
+copy "$(OutDir)$(TargetName)$(TargetExt)" C:\Users\rudi\Desktop\git_ultravnc\Files\vncviewer64.exe</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='NOacceleration|x64'">

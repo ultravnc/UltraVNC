@@ -79,7 +79,7 @@ void VNCviewerApp32::NewConnection(bool Is_Listening) {
 	ClientConnection *pcc = new ClientConnection(this);
 	try {
 		//memcpy((char*)&pcc->m_opts,(char*)&m_options,sizeof(m_options));
-		pcc->m_opts = m_options;
+		pcc->m_opts = &m_options;
 		pcc->m_Is_Listening=Is_Listening;
 		pcc->Run();
 	} catch (Exception &e) {
@@ -94,7 +94,7 @@ void VNCviewerApp32::NewConnection(bool Is_Listening,TCHAR *host, int port) {
 	ClientConnection *pcc = new ClientConnection(this, host,port);
 	try {
 		//memcpy((char*)&pcc->m_opts,(char*)&m_options,sizeof(m_options));
-		pcc->m_opts = m_options;
+		pcc->m_opts = &m_options;
 		pcc->m_Is_Listening=Is_Listening;
 		pcc->Run();
 	} catch (Exception &e) {
@@ -109,7 +109,7 @@ void VNCviewerApp32::NewConnection(bool Is_Listening,SOCKET sock) {
 	ClientConnection *pcc = new ClientConnection(this, sock);
 	try {
 		//memcpy((char*)&pcc->m_opts,(char*)&m_options,sizeof(m_options));
-		pcc->m_opts = m_options;
+		pcc->m_opts = &m_options;
 		pcc->m_Is_Listening=Is_Listening;
 		pcc->Run();
 	} catch (Exception &e) {

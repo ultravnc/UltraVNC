@@ -122,28 +122,17 @@ void ClientConnection::SaveConnection()
 	} else
 		buf[0] = '\0';
 	WritePrivateProfileString("connection", "password", buf, fname);
-	m_opts.Save(fname);
-	//m_opts.Register();
+	m_opts->SaveOptions(fname);
+	//m_opts->Register();
 }
 
 
 void ClientConnection::Save_Latest_Connection()
 {
+	if (config_specified) 
+		return;
 	vnclog.Print(2, _T("Saving connection info\n"));
-	// don't save in case of .vnc file
-	if (config_specified) return;
-	//ofnInit();
-	/*vnclog.Print(1, "Saving to %s\n", m_opts.getDefaultOptionsFileName());	
-	int ret = WritePrivateProfileString("connection", "host", m_host, m_opts.getDefaultOptionsFileName());
-	char buf[32];
-	sprintf_s(buf, "%d", m_port);
-	WritePrivateProfileString("connection", "port", buf, m_opts.getDefaultOptionsFileName());
-	ret = WritePrivateProfileString("connection", "proxyhost", m_proxyhost, m_opts.getDefaultOptionsFileName());
-	sprintf_s(buf, "%d", m_proxyport);
-	WritePrivateProfileString("connection", "proxyport", buf, m_opts.getDefaultOptionsFileName());
-	buf[0] = '\0';*/
-	m_opts.Save(m_opts.getDefaultOptionsFileName());
-
+	m_opts->SaveOptions(m_opts->getDefaultOptionsFileName());
 }
 
 // returns zero if successful
@@ -185,16 +174,16 @@ int ClientConnection::LoadConnection(char *fname, bool fFromDialog, bool default
 	}
 	
 	if (fFromDialog)
-		m_opts.Load(fname);
-	else if (strcmp(m_host, "") == 0 || strcmp(fname, m_opts.getDefaultOptionsFileName())==0 ) {
+		m_opts->LoadOptions(fname);
+	else if (strcmp(m_host, "") == 0 || strcmp(fname, m_opts->getDefaultOptionsFileName())==0 ) {
 		// Load the rest of params 
-		strcpy_s(m_opts.m_proxyhost,m_proxyhost);
-		m_opts.m_proxyport=m_proxyport;
-		m_opts.m_fUseProxy=m_fUseProxy;
-		m_opts.Load(fname);
-		//m_opts.Register();
+		strcpy_s(m_opts->m_proxyhost,m_proxyhost);
+		m_opts->m_proxyport=m_proxyport;
+		m_opts->m_fUseProxy=m_fUseProxy;
+		m_opts->LoadOptions(fname);
+		//m_opts->Register();
 		// Then display the session dialog to get missing params again
-		SessionDialog sessdlg(&m_opts, this, m_pDSMPlugin); //sf@2002
+		SessionDialog sessdlg(m_opts, this, m_pDSMPlugin); //sf@2002
 		if (!sessdlg.DoDialog())
 			throw QuietException("");
 		_tcsncpy_s(m_host, sessdlg.m_host_dialog, MAX_HOST_NAME_LEN);
@@ -204,10 +193,10 @@ int ClientConnection::LoadConnection(char *fname, bool fFromDialog, bool default
 		m_fUseProxy = sessdlg.m_fUseProxy;
 	}
 	else if (config_specified) {
-		strcpy_s(m_opts.m_proxyhost,m_proxyhost);
-		m_opts.m_proxyport=m_proxyport;
-		m_opts.m_fUseProxy=m_fUseProxy;
-		m_opts.Load(fname);
+		strcpy_s(m_opts->m_proxyhost,m_proxyhost);
+		m_opts->m_proxyport=m_proxyport;
+		m_opts->m_fUseProxy=m_fUseProxy;
+		m_opts->LoadOptions(fname);
 	}
 	return 0;
 }
