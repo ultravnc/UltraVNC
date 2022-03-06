@@ -43,6 +43,7 @@
 #include "vncConnDialog.h"
 
 #include "Localization.h" // ACT : Add localization on messages
+#include "shlwapi.h"
 
 //extern HINSTANCE g_hInst;
 
@@ -719,7 +720,7 @@ vncProperties::DialogProc(HWND hwnd,
 
 			// Modif sf@2002
 			SendMessage(GetDlgItem(hwnd, IDC_PLUGIN_CHECK), BM_SETCHECK, _this->m_server->IsDSMPluginEnabled(), 0);
-			EnableWindow(GetDlgItem(hwnd, IDC_PLUGIN_BUTTON), _this->m_server->IsDSMPluginEnabled());
+			EnableWindow(GetDlgItem(hwnd, IDC_PLUGIN_BUTTON),  (_this->m_server->AuthClientCount() == 0 ? _this->m_server->IsDSMPluginEnabled(): false));
 
 			// Query window option - Taken from TightVNC advanced properties 
 			BOOL queryEnabled = (_this->m_server->QuerySetting() == 4);
@@ -1285,8 +1286,9 @@ vncProperties::DialogProc(HWND hwnd,
 		// sf@2002 - DSM Plugin
 		case IDC_PLUGIN_CHECK:
 			{
-				EnableWindow(GetDlgItem(hwnd, IDC_PLUGIN_BUTTON),
-					SendMessage(GetDlgItem(hwnd, IDC_PLUGIN_CHECK), BM_GETCHECK, 0, 0) == BST_CHECKED);
+				EnableWindow(GetDlgItem(hwnd, IDC_PLUGIN_BUTTON), _this->m_server->AuthClientCount() == 0 
+						? SendMessage(GetDlgItem(hwnd, IDC_PLUGIN_CHECK), BM_GETCHECK, 0, 0) == BST_CHECKED 
+						: BST_UNCHECKED);
 			}
 			return TRUE;
 			// Marscha@2004 - authSSP: moved MSLogon checkbox back to admin props page
@@ -1368,6 +1370,8 @@ vncProperties::DialogProc(HWND hwnd,
 				{
 					TCHAR szPlugin[MAX_PATH];
 					GetDlgItemText(hwnd, IDC_PLUGINS_COMBO, szPlugin, MAX_PATH);
+					PathStripPathA(szPlugin);
+
 					if (!_this->m_server->GetDSMPluginPointer()->IsLoaded())
 						_this->m_server->GetDSMPluginPointer()->LoadPlugin(szPlugin, false);
 					else
