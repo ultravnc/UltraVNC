@@ -35,13 +35,8 @@
 #include "ZipUnZip32.h"
 
 extern "C" {
-#ifdef _INTERNALLIB
-#include <zip.h>
-#include <unzip.h>
-#else
 #include "../zipunzip_src/zip20/zip.h"
 #include "../zipunzip_src/unzip/unzip.h"
-#endif
 int   EXPENTRY ZpInit(LPZIPUSERFUNCTIONS lpZipUserFunc);
 BOOL  EXPENTRY ZpSetOptions(LPZPOPT Opts);
 int   EXPENTRY ZpArchive(ZCL C);

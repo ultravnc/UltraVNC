@@ -1,6 +1,7 @@
 #pragma once
 #include "ScreenCapture.h"
 #include <tchar.h>
+#include <memory>
 
 typedef bool(*StartW8Fn)(bool);
 typedef bool(*StartW8V2Fn)(bool, bool, UINT);
@@ -16,6 +17,10 @@ const static LPCTSTR g_szIPCSharedMMF = _T("{3DA76AC7-62E7-44AF-A8D1-45022044BB3
 const static LPCTSTR g_szIPCSharedMMFBitmap = _T("{0E3D996F-B070-4503-9090-198A9DA092D5}");
 const static LPCTSTR g_szIPCSharedEvent = _T("{3BFBA3A0-2133-48B5-B5BD-E58C72853FFB}");
 const static LPCTSTR g_szIPCSharedPointerEvent = _T("{3A77E11C-B0B4-40F9-BC8B-D249116A76FE}");
+
+#ifdef SC_20
+class LoadDllFromMemory;
+#endif
 
 class DeskDupEngine : public ScreenCapture
 {
@@ -49,5 +54,8 @@ private:
 	LPVOID fileViewBitmap;
 	HANDLE hScreenEvent;
 	HANDLE hPointerEvent;
+#ifdef SC_20
+	std::unique_ptr<LoadDllFromMemory> loadDllFromMemory;
+#endif
 };
 

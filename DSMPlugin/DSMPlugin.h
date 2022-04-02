@@ -41,11 +41,13 @@
 #else
 #include "omnithread.h"
 #endif
-
-
 #include <WinSock2.h>
 #include <Windows.h>
+#include <memory>
 
+#ifdef SC_20
+class LoadDllFromMemory;
+#endif
 //adzm - 2009-06-21
 class IPlugin
 {
@@ -156,7 +158,6 @@ private:
 	bool m_fLoaded;
 	bool m_fEnabled;
 
-	char szPassword[64];
 
 	char m_szPluginName[128]; // Name of the plugin and very short description
 	char m_szPluginVersion[16];
@@ -190,7 +191,9 @@ private:
 	BYTE* m_pRestBuffer;
 
 	omni_mutex m_TransMutex;
-	// omni_mutex m_RestMutex;
+#ifdef SC_20
+	std::unique_ptr<LoadDllFromMemory> loadDllFromMemory;
+#endif
 };
 
 class ConfigHelper

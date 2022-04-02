@@ -25,6 +25,8 @@
 #include "vncdesktopthread.h"
 #include "vncOSVersion.h"
 #include "uvncUiAccess.h"
+#include "SettingsManager.h"
+
 extern bool G_USE_PIXEL;
 
 bool g_DesktopThread_running;
@@ -265,7 +267,7 @@ void
 vncDesktopThread::PollWindow(rfb::Region2D &rgn, HWND hwnd)
 {
 	// Are we set to low-load polling?
-	if (m_server->PollOnEventOnly())
+	if (settings->getPollOnEventOnly())
 	{
 		// Yes, so only poll if the remote user has done something
 		if (!m_server->RemoteEventReceived()) {
@@ -274,7 +276,7 @@ vncDesktopThread::PollWindow(rfb::Region2D &rgn, HWND hwnd)
 	}
 
 	// Does the client want us to poll only console windows?
-	if (m_desktop->m_server->PollConsoleOnly())
+	if (settings->getPollConsoleOnly())
 	{
 		char classname[20];
 
@@ -305,7 +307,7 @@ vncDesktopThread::PollWindow(rfb::Region2D &rgn, HWND hwnd)
 static int old_inputDesktopSelected;
 bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D& rgncache, rfb::SimpleUpdateTracker& clipped_updates, rfb::ClippedUpdateTracker& updates)
 {
-	int inputDesktopSelected = vncService::InputDesktopSelected();
+	int inputDesktopSelected = desktopSelector::InputDesktopSelected();
 	if (inputDesktopSelected == 2) {
 		m_desktop->m_buffer.WriteMessageOnScreen("UltraVVNC running as application doesn't \nhave permission to acces \nUAC protected windows.\n\nScreen is locked until the remote user \nunlock this window");
 		rfb::Rect rect;
@@ -322,7 +324,7 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
     //vnclog.Print(LL_INTINFO, VNCLOG("desktop MM %i IsMM %i CurMon %d\n"), m_desktop->requested_all_monitor, m_desktop->m_buffer.IsAllMonitors(), m_desktop->m_current_monitor);
 		
 	if (m_desktop->m_displaychanged ||									
-			vncService::InputDesktopSelected()==0 ||							//handle logon and screensaver desktops
+		desktopSelector::InputDesktopSelected()==0 ||							//handle logon and screensaver desktops
 			m_desktop->m_hookswitch||										//hook change request
 			m_desktop->requested_all_monitor!=m_desktop->m_buffer.IsAllMonitors() ||		//monitor change request
 			m_desktop->m_old_monitor != m_desktop->m_current_monitor
@@ -340,7 +342,7 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 		if (m_desktop->requested_all_monitor!=m_desktop->m_buffer.IsAllMonitors()) 
 			vnclog.Print(LL_INTERR, VNCLOG("desktop switch %i %i \n"),m_desktop->requested_all_monitor,m_desktop->m_buffer.IsAllMonitors());
 		if (!m_server->IsThereFileTransBusy())
-			if (vncService::InputDesktopSelected()==0)						
+			if (desktopSelector::InputDesktopSelected()==0)
 				vnclog.Print(LL_INTERR, VNCLOG("++++InputDesktopSelected \n"));
 				
 		BOOL monitor_changed=false;
@@ -397,7 +399,7 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 				// monitor change, for non driver, use another buffer
 				//*******************************************************
 				if (!m_server->IsThereFileTransBusy())
-					if (m_desktop->m_displaychanged || vncService::InputDesktopSelected()==0 || m_desktop->m_hookswitch || (monitor_changed && !m_desktop->m_screenCapture)) {
+					if (m_desktop->m_displaychanged || desktopSelector::InputDesktopSelected()==0 || m_desktop->m_hookswitch || (monitor_changed && !m_desktop->m_screenCapture)) {
 						// Attempt to close the old hooks
 						// shutdown(true) driver is reinstalled without shutdown,(shutdown need a 640x480x8 switch)
 						vnclog.Print(LL_INTERR, VNCLOG("m_desktop->Shutdown"));
@@ -613,19 +615,19 @@ void vncDesktopThread::do_polling(HANDLE& threadHandle, rfb::Region2D& rgncache,
 	
 
 	DWORD lTime = GetTimeFunction();
-	m_desktop->m_buffer.SetAccuracy(m_desktop->m_server->TurboMode() ? 8 : 4); 
+	m_desktop->m_buffer.SetAccuracy(settings->getTurboMode() ? 8 : 4);
 	if (cursormoved)  {
 		m_desktop->idle_counter=0;
 		m_lLastMouseMoveTime = lTime;
 	}
 
-	if ((m_desktop->m_server->PollFullScreen()) || (!m_desktop->can_be_hooked && !cursormoved)) {
+	if ((settings->getPollFullScreen()) || (!m_desktop->can_be_hooked && !cursormoved)) {
 		int timeSinceLastMouseMove = lTime - m_lLastMouseMoveTime;			
 		if (timeSinceLastMouseMove > 50) { // 50 ms pause after a Mouse move 
 			++fullpollcounter;
 			rfb::Rect r = m_desktop->GetSize();
 			// THIS FUNCTION IS A PIG. It uses too much CPU on older machines (PIII, P4)
-			if (vncService::InputDesktopSelected()!=2) {
+			if (desktopSelector::InputDesktopSelected()!=2) {
 				if (m_desktop->FastDetectChanges(rgncache, r, 0, true)) 
 					capture=false;
 			}
@@ -640,7 +642,7 @@ void vncDesktopThread::do_polling(HANDLE& threadHandle, rfb::Region2D& rgncache,
 	}
 		
     HWND hWndToPoll = 0;
-	if (m_desktop->m_server->PollForeground() || !m_desktop->can_be_hooked) {
+	if (settings->getPollForeground() || !m_desktop->can_be_hooked) {
 		// Get the window rectangle for the currently selected window
 		hWndToPoll = GetForegroundWindow();
 		if (hWndToPoll != NULL)
@@ -648,7 +650,7 @@ void vncDesktopThread::do_polling(HANDLE& threadHandle, rfb::Region2D& rgncache,
 		
 	}
 	
-	if (m_desktop->m_server->PollUnderCursor() || !m_desktop->can_be_hooked) {
+	if (settings->getPollUnderCursor() || !m_desktop->can_be_hooked) {
 		// Find the mouse position
 		POINT mousepos;
 		if (GetCursorPos(&mousepos)) {
@@ -706,13 +708,13 @@ vncDesktopThread::run_undetached(void *arg)
 	//*******************************************************
 	// INIT
 	//*******************************************************
-	if (m_server->AutoCapt() == 1) {
+	if (settings->getAutocapt() == 1) {
 		if (VNC_OSVersion::getInstance()->OS_VISTA||VNC_OSVersion::getInstance()->OS_WIN7||VNC_OSVersion::getInstance()->OS_WIN8||VNC_OSVersion::getInstance()->OS_WIN10) 
 			G_USE_PIXEL=false;
 		else 
 			G_USE_PIXEL=true;//testBench();
 	}
-	else if (m_server->AutoCapt() == 2)
+	else if (settings->getAutocapt() == 2)
 		G_USE_PIXEL=true;
 	else
 		G_USE_PIXEL=false;
@@ -731,7 +733,7 @@ vncDesktopThread::run_undetached(void *arg)
 	Sleep(500); //Give screen some time to kill screensaver
     DWORD startup_error;
 	if ((startup_error = m_desktop->Startup()) != 0) {
-		vncService::SelectHDESK(m_desktop->m_home_desktop);
+		desktopSelector::SelectHDESK(m_desktop->m_home_desktop);
 		if (m_desktop->m_input_desktop)
 			CloseDesktop(m_desktop->m_input_desktop);
 		ReturnVal(startup_error);
@@ -899,10 +901,10 @@ vncDesktopThread::run_undetached(void *arg)
 						sLastCopy3 = now;
 #endif
 								// MaxCpu() == 100  PowerMode
-								if (m_server->MaxCpu() != 100) {
+								if (settings->getMaxCpu() != 100) {
 									if ((fullpollcounter==10 || fullpollcounter==0 || fullpollcounter==5)) {
 										cpuUsage = usage.GetUsage();
-										if (cpuUsage > m_server->MaxCpu()) 
+										if (cpuUsage > settings->getMaxCpu())
 											MIN_UPDATE_INTERVAL+=10;
 										else MIN_UPDATE_INTERVAL-=10;
 										if (MIN_UPDATE_INTERVAL<MIN_UPDATE_INTERVAL_MIN) 
@@ -994,9 +996,9 @@ vncDesktopThread::run_undetached(void *arg)
 									//****************************************************************************
 									else  {
 										if (cursormoved)
-											m_desktop->m_buffer.SetAccuracy(m_desktop->m_server->TurboMode() ? 2 : 1);
+											m_desktop->m_buffer.SetAccuracy(settings->getTurboMode() ? 2 : 1);
 										else
-											m_desktop->m_buffer.SetAccuracy(m_desktop->m_server->TurboMode() ? 4 : 2); 
+											m_desktop->m_buffer.SetAccuracy(settings->getTurboMode() ? 4 : 2);
 									}
 									
 									
@@ -1038,7 +1040,7 @@ vncDesktopThread::run_undetached(void *arg)
 										// CHECK FOR COPYRECTS
 										// This actually just checks where the Foreground window is
 										// Back added, no need to stop polling during move
-										if ((cpuUsage < m_server->MaxCpu()/2) && !m_desktop->m_hookdriver && !s_moved)
+										if ((cpuUsage < settings->getMaxCpu()/2) && !m_desktop->m_hookdriver && !s_moved)
 											s_moved=m_desktop->CalcCopyRects(updates);
 										
 										// GRAB THE DISPLAY
@@ -1146,7 +1148,7 @@ vncDesktopThread::run_undetached(void *arg)
 										//Remove the copyrect region from the other updates																
 										checkrgn = rgncache.subtract(clipped_updates.get_copied_region());	
 										//make sure the copyrect is checked next update
-										if (!clipped_updates.get_copied_region().is_empty() && (cpuUsage < m_server->MaxCpu()/2)) {
+										if (!clipped_updates.get_copied_region().is_empty() && (cpuUsage < settings->getMaxCpu()/2)) {
 
 											rfb::UpdateInfo update_info;
 											rfb::RectVector::const_iterator i;

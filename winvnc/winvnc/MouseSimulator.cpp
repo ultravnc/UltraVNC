@@ -71,9 +71,8 @@ SimulateCursor::SimulateCursor(HINSTANCE hInst)
     CursorColorManager::getInstance()->Init((HINSTANCE)hInst);
     hIconMouse = CursorColorManager::getInstance()->getCursor();
     hIconErase = CursorColorManager::getInstance()->getEraser();
-    HANDLE ThreadHandle2 = NULL;
     DWORD dwTId;
-    ThreadHandle2 = CreateThread(NULL, 0, Start, this, 0, &dwTId);
+    CreateThread(NULL, 0, Start, this, 0, &dwTId);
 }
 
 SimulateCursor:: ~SimulateCursor()
@@ -85,7 +84,6 @@ SimulateCursor:: ~SimulateCursor()
 DWORD WINAPI SimulateCursor::Start(LPVOID lpParam)
 {
     SimulateCursor* sc = (SimulateCursor*)lpParam;
-    HINSTANCE hInst = sc->hInst;
     HDESK desktop;
     desktop = OpenInputDesktop(0, FALSE,
         DESKTOP_CREATEMENU | DESKTOP_CREATEWINDOW |
@@ -154,7 +152,6 @@ HWND SimulateCursor::create_window(SimulateCursor* simulateCursor)
 
 #ifndef _X64
     LONG style = GetWindowLong(hWnd, GWL_STYLE);
-    style = GetWindowLong(hWnd, GWL_STYLE);
     style &= ~(WS_CAPTION | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU);
     SetWindowLong(hWnd, GWL_STYLE, style);
 #else
@@ -182,7 +179,7 @@ HWND SimulateCursor::create_window(SimulateCursor* simulateCursor)
 
 void SimulateCursor::moveCursor(int x, int y)
 {
-    this->x = x;
+    /*this->x = x;
     this->y = y;
     RECT rect;
     rect.left = x; rect.top = y;
@@ -190,7 +187,7 @@ void SimulateCursor::moveCursor(int x, int y)
     RECT rect2;
     rect2.left = oldx; rect2.top = oldy;
     rect2.right = oldx + 32; rect2.bottom = oldy + 32;
-    HRGN rgn = CreateRectRgn(rect.left, rect.top, rect.right, rect.bottom);
+    HRGN rgn = CreateRectRgn(rect.left, rect.top, rect.right, rect.bottom);*/
 
     InvalidateRect(hWnd, NULL, true);
 }

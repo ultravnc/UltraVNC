@@ -1193,7 +1193,7 @@ vncEncodeTight::SendJpegRect(BYTE *source, BYTE *dst, int x, int y, int w,
 		return SendFullColorRect(dst, w, h);
 
 	cinfo.err = jpeg_std_error(&jerr);
-	int size=sizeof(cinfo);
+	sizeof(cinfo);
 	jpeg_create_compress(&cinfo);
 
 	cinfo.image_width = w;

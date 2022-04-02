@@ -75,12 +75,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_42FE7889F2707625AD708AD6969D5CE5"
-        "OwnerKey" = "8:_26A88B0595B5471B8B4F81FFBB8B5087"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_496FDBFD8E724200972D9572D0438D7C"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -357,6 +351,38 @@
                 }
             }
         }
+        "SC_20"
+        {
+        "DisplayName" = "8:SC_20"
+        "IsDebugOnly" = "11:FALSE"
+        "IsReleaseOnly" = "11:FALSE"
+        "OutputFilename" = "8:SC_20\\UltraVnc_VS2015.msi"
+        "PackageFilesAs" = "3:2"
+        "PackageFileSize" = "3:-2147483648"
+        "CabType" = "3:1"
+        "Compression" = "3:2"
+        "SignOutput" = "11:FALSE"
+        "CertificateFile" = "8:"
+        "PrivateKeyFile" = "8:"
+        "TimeStampServer" = "8:"
+        "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.Windows.Installer.4.5"
+                    {
+                    "Name" = "8:Windows Installer 4.5"
+                    "ProductCode" = "8:Microsoft.Windows.Installer.4.5"
+                    }
+                }
+            }
+        }
     }
     "Deployable"
     {
@@ -499,26 +525,6 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_42FE7889F2707625AD708AD6969D5CE5"
-            {
-            "SourcePath" = "8:ACTIVEDS.dll"
-            "TargetName" = "8:ACTIVEDS.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_555773131B8644CBA9F11E35B3AC5D62"
@@ -1977,7 +1983,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_057C03B3B6C348A59E8D997A9884CC96"
             {
-            "SourcePath" = "8:..\\..\\addon\\ms-logon\\logging\\x64\\Release\\logging.dll"
+            "SourcePath" = "8:..\\SC_20\\logging.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2005,7 +2011,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_0F3E5B898783469D8773791F4330AA21"
             {
-            "SourcePath" = "8:..\\x64\\Release\\uvnc_settings.exe"
+            "SourcePath" = "8:..\\SC_20\\uvnc_settings.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2033,7 +2039,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_1D605486DA064476BC03795B9D1F0A1D"
             {
-            "SourcePath" = "8:..\\..\\addon\\ms-logon\\authSSP\\x64\\Release\\authSSP.dll"
+            "SourcePath" = "8:..\\SC_20\\authSSP.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2061,7 +2067,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_2499FE2BC2EC43FC827586F2B36F2483"
             {
-            "SourcePath" = "8:..\\..\\addon\\ms-logon\\testauth\\x64\\Release\\testauth.exe"
+            "SourcePath" = "8:..\\..\\addon\\Release\\testauth.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2089,7 +2095,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_26A88B0595B5471B8B4F81FFBB8B5087"
             {
-            "SourcePath" = "8:..\\..\\addon\\ms-logon\\ldapauth\\x64\\Release\\ldapauth.dll"
+            "SourcePath" = "8:..\\SC_20\\ldapauth.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2117,7 +2123,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_2C1853F772494048B3B26B78A53486F4"
             {
-            "SourcePath" = "8:..\\..\\addon\\ms-logon\\MSLogonACL\\x64\\Release\\MSLogonACL.exe"
+            "SourcePath" = "8:..\\SC_20\\MSLogonACL.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2145,7 +2151,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_30A3C3ED62BD436097EAA36546BB4380"
             {
-            "SourcePath" = "8:..\\..\\addon\\ms-logon\\authadm\\x64\\Release\\authadmin.dll"
+            "SourcePath" = "8:..\\SC_20\\authadmin.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2173,7 +2179,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_496FDBFD8E724200972D9572D0438D7C"
             {
-            "SourcePath" = "8:..\\Release\\setpasswd.exe"
+            "SourcePath" = "8:..\\SC_20\\setpasswd.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2201,7 +2207,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_7E9202FA9ECA4F4E821B4ABFAFEE00A5"
             {
-            "SourcePath" = "8:..\\..\\addon\\ms-logon\\ldapauthNT4\\x64\\Release\\ldapauthnt4.dll"
+            "SourcePath" = "8:..\\SC_20\\ldapauthnt4.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2229,7 +2235,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_87DB62653B71411E93DD76EF68D97A39"
             {
-            "SourcePath" = "8:..\\..\\addon\\ms-logon\\workgrpdomnt4\\x64\\Release\\workgrpdomnt4.dll"
+            "SourcePath" = "8:..\\SC_20\\workgrpdomnt4.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2257,7 +2263,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_9FFC46783A7F4BCB9DDA60B790D35975"
             {
-            "SourcePath" = "8:..\\..\\addon\\ms-logon\\ldapauth9x\\x64\\Release\\ldapauth9x.dll"
+            "SourcePath" = "8:..\\SC_20\\ldapauth9x.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2285,7 +2291,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_B0AE7F7B374D4940BFC810B4E4ED9394"
             {
-            "SourcePath" = "8:..\\Release\\setcad.exe"
+            "SourcePath" = "8:..\\SC_20\\setcad.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2313,7 +2319,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_E7889E76F1B34653A90C53D3F997EBAF"
             {
-            "SourcePath" = "8:..\\winvnc\\x64\\Release\\winvnc.exe"
+            "SourcePath" = "8:..\\SC_20\\winvnc.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2341,7 +2347,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_FE82FF2D562E4B80928D6FEB67F9F479"
             {
-            "SourcePath" = "8:..\\x64\\Release\\vnchooks.dll"
+            "SourcePath" = "8:..\\SC_20\\vnchooks.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"

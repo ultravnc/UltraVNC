@@ -555,7 +555,7 @@ HDC VideoDriver::getDcMirror()
 	FillMemory(&devmode, sizeof(DEVMODE), 0);
 	devmode.dmSize = sizeof(DEVMODE);
 	devmode.dmDriverExtra = 0;
-	BOOL change = EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &devmode);
+	EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &devmode);
 	devmode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
 
 	LPSTR deviceName = NULL;
@@ -576,7 +576,6 @@ HDC VideoDriver::getDcMirror()
 	if (DriverFound) {
 		deviceName = (LPSTR)&dd.DeviceName[0];
 		m_hrootdc = CreateDC("DISPLAY", deviceName, NULL, NULL);
-		DWORD myerror = GetLastError();
 		if (m_hrootdc)
 			DeleteDC(m_hrootdc);
 	}

@@ -29,6 +29,7 @@
 #include "winvnc.h"
 #include "vncListDlg.h"
 #include "common/win32_helpers.h"
+#include "SettingsManager.h"
 
 // [v1.0.2-jp1 fix] Load resouce from dll
 extern HINSTANCE	hInstResDLL;
@@ -101,7 +102,7 @@ BOOL CALLBACK vncListDlg::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 
 			SetForegroundWindow(hwnd);
 			_this->m_dlgvisible = TRUE;
-			if (!_this->m_pServer->GetAllowEditClients())
+			if (!settings->getAllowEditClients())
 			{
 				EnableWindow(GetDlgItem(hwnd, IDC_KILL_B), false);
 			}

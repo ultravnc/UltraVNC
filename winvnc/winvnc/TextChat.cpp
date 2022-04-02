@@ -204,7 +204,7 @@ void TextChat::ProcessTextChatMsg(int nTO)
 	
 	if (len == CHAT_OPEN)
 	{
-		PlayResource("IDR_WAVE1");
+		PlayResource((char*)"IDR_WAVE1");
 		if (m_fTextChatRunning) return;
 		// PostMessage(m_pCC->m_server->GetDesktopPointer()->Window(), WM_USER+888, 0, (LPARAM)this);
 		DisplayTextChat();
@@ -620,7 +620,7 @@ INT_PTR CALLBACK TextChat::TextChatDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM wPar
 		case IDC_SEND_B:
 			{
 			memset(_this->m_szLocalText,0,TEXTMAXSIZE);
-			UINT nRes = GetDlgItemText( hWnd, IDC_LOCALTEXT_EDIT, _this->m_szLocalText, TEXTMAXSIZE-1);
+			GetDlgItemText( hWnd, IDC_LOCALTEXT_EDIT, _this->m_szLocalText, TEXTMAXSIZE-1);
 			strcat_s(_this->m_szLocalText, TEXTMAXSIZE, "\n");
 			_this->SendLocalText();	
 			SetFocus(GetDlgItem(hWnd, IDC_INPUTAREA_EDIT));
@@ -630,10 +630,9 @@ INT_PTR CALLBACK TextChat::TextChatDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM wPar
 		case IDC_INPUTAREA_EDIT:
 			if(HIWORD(wParam) == EN_UPDATE)			
 			{
-				UINT nRes = GetDlgItemText( hWnd, IDC_INPUTAREA_EDIT, _this->m_szLocalText, TEXTMAXSIZE);
-				if (strstr(_this->m_szLocalText, "\n") > 0 ) // Enter triggers the message transmission
+				GetDlgItemText( hWnd, IDC_INPUTAREA_EDIT, _this->m_szLocalText, TEXTMAXSIZE);
+				if (strstr(_this->m_szLocalText, "\n") != NULL ) // Enter triggers the message transmission
 				{
-					// nRes = GetDlgItemText( hWnd, IDC_USERID_EDIT, _this->m_szUserID, 16);
 					_this->SendLocalText();
 				}								
 			}

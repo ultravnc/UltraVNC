@@ -39,32 +39,6 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// Cursor
-//
-
-IDC_FINGER              CURSOR                  "res\\Finger.cur"
-
-IDC_CURSORBLANK         CURSOR                  "res\\cursor5.cur"
-
-IDC_CURSOR9             CURSOR                  "res\\cursor9.cur"
-
-IDC_CURSOR8             CURSOR                  "res\\cursor8.cur"
-
-IDC_CURSOR7             CURSOR                  "res\\cursor7.cur"
-
-IDC_CURSOR6             CURSOR                  "res\\cursor6.cur"
-
-IDC_CURSOR4             CURSOR                  "res\\cursor4.cur"
-
-IDC_CURSOR2             CURSOR                  "res\\cursor2.cur"
-
-IDC_CURSOR1             CURSOR                  "res\\cursor1.cur"
-
-IDC_CURSOR3             CURSOR                  "res\\cursor3.cur"
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
 // Dialog
 //
 
@@ -105,7 +79,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,8,135,54,16
     CONTROL         IDB_LOGO64,IDC_VNCLOGO,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_SUNKEN,7,5,53,46,WS_EX_TRANSPARENT
-    LTEXT           "UltraVNC Server 1.3.8.2",IDC_VERSION,73,5,145,11
+    LTEXT           "UltraVNC Server 1.3.9_dev1",IDC_VERSION,73,5,145,11
     LTEXT           "Copyright © 2002-2020 UltraVNC Team\nCopyright © 2001-2002 Sam - eSVNC \nCopyright © 1999-2002 Rudi D. V. - VdaccVNC \nCopyright © 2001 Harakan Software - PalmVNC\nCopyright © 1999-2002 Const. Kaplinsky - TightVNC \n",IDC_NAME,74,27,202,41
     LTEXT           "For more Information and Links please visit: \nhttps://www.uvnc.com",IDC_WWW,74,135,201,19
     LTEXT           "Build:",IDC_BUILDTEXT,74,16,20,10
@@ -298,6 +272,26 @@ BEGIN
     CONTROL         153,IDC_VNCLOGO,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_SUNKEN,7,5,269,199,WS_EX_TRANSPARENT
 END
 
+IDC_TITLEWINDOW DIALOGEX 0, 0, 269, 206
+STYLE DS_SYSMODAL | DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | WS_CAPTION
+EXSTYLE WS_EX_TOPMOST | WS_EX_TRANSPARENT | WS_EX_TOOLWINDOW
+CAPTION "UltraVNC SC 2.0"
+FONT 10, "Calibri", 700, 0, 0x0
+BEGIN
+    CONTROL         "List1",IDC_LIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_NOLABELWRAP | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,4,0,171,120
+    LTEXT           "TEXTTOP",IDC_TEXTTOP,4,141,141,8
+    LTEXT           "TEXTMIDDLE",IDC_TEXTMIDDLE,4,153,141,8
+    LTEXT           "TEXTBOTTOM",IDC_TEXTBOTTOM,4,165,141,8
+    PUSHBUTTON      "Info",IDC_HELPWEB,4,179,80,14,BS_FLAT
+    RTEXT           "Team UltraVNC 2022",IDC_TEXTRIGHTBOTTOM,2,195,173,8
+    PUSHBUTTON      "Close",IDC_CLOSE,95,179,80,14,BS_FLAT
+    DEFPUSHBUTTON   "Connect",IDC_CONNECT,4,123,171,14,BS_FLAT
+    CONTROL         IDB_BITMAP3,IDC_LOGO,"Static",SS_BITMAP,146,151,26,21
+    CONTROL         "",IDC_SCEXPAND,"Static",SS_BLACKFRAME,0,0,183,206
+    CTEXT           "Enter your connection  code",IDC_STATICIDCODE,183,6,81,27
+    EDITTEXT        IDC_IDCODE,183,40,78,11,ES_AUTOHSCROLL | NOT WS_BORDER,WS_EX_CLIENTEDGE
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -422,8 +416,51 @@ BEGIN
         HORZGUIDE, 90
         HORZGUIDE, 100
     END
+
+    IDC_TITLEWINDOW, DIALOG
+    BEGIN
+        LEFTMARGIN, 2
+        VERTGUIDE, 4
+        VERTGUIDE, 51
+        VERTGUIDE, 58
+        VERTGUIDE, 175
+    END
 END
 #endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_BITMAP3             BITMAP                  "res\\world3a.bmp"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Cursor
+//
+
+IDC_FINGER              CURSOR                  "res\\Finger.cur"
+
+IDC_CURSORBLANK         CURSOR                  "res\\cursor5.cur"
+
+IDC_CURSOR9             CURSOR                  "res\\cursor9.cur"
+
+IDC_CURSOR8             CURSOR                  "res\\cursor8.cur"
+
+IDC_CURSOR7             CURSOR                  "res\\cursor7.cur"
+
+IDC_CURSOR6             CURSOR                  "res\\cursor6.cur"
+
+IDC_CURSOR4             CURSOR                  "res\\cursor4.cur"
+
+IDC_CURSOR2             CURSOR                  "res\\cursor2.cur"
+
+IDC_CURSOR1             CURSOR                  "res\\cursor1.cur"
+
+IDC_CURSOR3             CURSOR                  "res\\cursor3.cur"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -432,8 +469,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,3,8,2
- PRODUCTVERSION 1,3,8,2
+ FILEVERSION 1,3,9,1
+ PRODUCTVERSION 1,3,9,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x2dL
@@ -451,14 +488,14 @@ BEGIN
             VALUE "Comments", "UltraVNC - Remote Control for all"
             VALUE "CompanyName", "UltraVNC"
             VALUE "FileDescription", "VNC server"
-            VALUE "FileVersion", "1.3.8.2"
+            VALUE "FileVersion", "1.3.9_dev1"
             VALUE "InternalName", "WinVNC"
             VALUE "LegalCopyright", "Copyright © 2021 UltraVNC"
             VALUE "LegalTrademarks", "VNC"
             VALUE "OriginalFilename", "WinVNC.exe"
-            VALUE "PrivateBuild", "1.3.8.2"
+            VALUE "PrivateBuild", "1.3.9_dev1"
             VALUE "ProductName", "UltraVNC"
-            VALUE "ProductVersion", "1.3.8.2"
+            VALUE "ProductVersion", "1.3.9_dev1"
         END
     END
     BLOCK "VarFileInfo"
@@ -503,6 +540,16 @@ BEGIN
     END
 END
 
+IDR_TRAYMENU1 MENU
+BEGIN
+    POPUP "tray"
+    BEGIN
+        MENUITEM "&About WinVNC",               ID_ABOUT
+        MENUITEM SEPARATOR
+        MENUITEM "&Close VNC Connections",      ID_CLOSE
+    END
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -537,6 +584,27 @@ BEGIN
     0
 END
 
+IDC_TITLEWINDOW AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+#if defined(SC_20)
+/////////////////////////////////////////////////////////////////////////////
+//
+// DLL
+//
+
+IDR_DLL1                DLL                     "res\\ddengine.dll"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// ENCRYPTIONDLL
+//
+
+IDR_ENCRYPTIONDLL1      ENCRYPTIONDLL           "res\\SecureVNCPlugin.dsm"
+#endif
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -674,16 +742,6 @@ LANGUAGE LANG_DUTCH, SUBLANG_DUTCH_BELGIAN
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// Bitmap
-//
-
-IDB_LOGO64              BITMAP                  "res\\vnc-1.bmp"
-
-IDB_EXPAND              BITMAP                  "res\\down.bmp"
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
 // Dialog
 //
 
@@ -742,6 +800,16 @@ BEGIN
     END
 END
 #endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_LOGO64              BITMAP                  "res\\vnc-1.bmp"
+
+IDB_EXPAND              BITMAP                  "res\\down.bmp"
 
 
 /////////////////////////////////////////////////////////////////////////////

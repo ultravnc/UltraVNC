@@ -86,7 +86,7 @@ UINT UltraVncZ::compressZlib (int compresslevel, UINT avail_in, UINT avail_out, 
 	}
 	previousTotalOut = compStream.total_out;
 	if (this->compresslevel != compresslevel) {
-		int err = deflateParams(&compStream, compresslevel, Z_DEFAULT_STRATEGY);
+		deflateParams(&compStream, compresslevel, Z_DEFAULT_STRATEGY);
 		this->compresslevel = compresslevel;
 	}
 	deflateResult = deflate(&compStream, Z_SYNC_FLUSH);

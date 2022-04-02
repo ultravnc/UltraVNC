@@ -29,7 +29,6 @@
 // key presses, to keep this messy code on one place!
 #pragma warning(disable : 4786)
 #include <stdlib.h>
-#include "vncservice.h"
 #include "vnckeymap.h"
 #include <rdr/types.h>
 #define XK_MISCELLANY
@@ -49,6 +48,7 @@
 #include <ime.h>
 #include <map>
 #include <vector>
+#include "SettingsManager.h"
 
 // Mapping of X keysyms to windows VK codes.  Ordering here is the same as
 // keysymdef.h to make checking easier
@@ -605,12 +605,8 @@ public:
               KeyStateModifier lshift(VK_LSHIFT);
               KeyStateModifier rshift(VK_RSHIFT);
 
-              if (vncService::IsWin95()) {
-                shift.release();
-              } else {
-                lshift.release();
-                rshift.release();
-			  }
+              lshift.release();
+              rshift.release();			  
 
               vnclog.Print(LL_INTWARN, " Simulating ALT+%d%d%d\n", a0, a1 ,a2);
 
@@ -672,12 +668,8 @@ public:
           if (vkCode == 0x20){
 		  }
 		  else{
-            if (vncService::IsWin95()) {
-              shift.release();
-			} else {
               lshift.release();
               rshift.release();
-			}
 		  }
         }
       }
@@ -731,13 +723,12 @@ public:
 
       if (down && (vkCode == VK_DELETE) &&
           ((GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0) &&
-          ((GetAsyncKeyState(VK_MENU) & 0x8000) != 0) &&
-          vncService::IsWinNT())
+          ((GetAsyncKeyState(VK_MENU) & 0x8000) != 0))
       {
 		vnclog.Print(LL_INTINFO,
                  "CAD\n");
 		// If running under Vista and started from Session0 in Application mode
-		if (vncService::VersionMajor()>=6 && vncService::RunningFromExternalService() )
+		if (settings->RunningFromExternalService())
 		{
 			      vnclog.Print(LL_INTINFO,
                  "Vista and runnning as system -> CAD\n");
@@ -748,35 +739,15 @@ public:
 				ThreadHandle2 = CreateThread(NULL, 0, vncCad::Cadthread, NULL, 0, &dwTId);
 				CloseHandle(ThreadHandle2);
 		}
-		else if (vncService::VersionMajor()>=6)
+		else
 		{
 			vnclog.Print(LL_INTINFO,
                  "Vista and runnning as user -> Taskmgr\n");
 			WinExec("taskmgr.exe", SW_SHOWNORMAL);
-		}
-		else if (vncService::VersionMajor()<6 && vncService::RunningFromExternalService() )
-		{
-			vnclog.Print(LL_INTINFO,
-                 "Not Vista and runnning as system, use old method\n");
-			vncService::SimulateCtrlAltDel();
-		}
-		else if (vncService::VersionMajor()<6)
-		{
-			vnclog.Print(LL_INTINFO,
-                 "Not Vista and runnning as user -> Taskmgr\n");
-			WinExec("taskmgr.exe", SW_SHOWNORMAL);
-		}
+		}		
+
         return;
       }
-
-      if (vncService::IsWin95()) {
-        switch (vkCode) {
-        case VK_RSHIFT:   vkCode = VK_SHIFT;   break;
-        case VK_RCONTROL: vkCode = VK_CONTROL; break;
-        case VK_RMENU:    vkCode = VK_MENU;    break;
-        }
-      }
-
       doKeyboardEvent(vkCode, flags);
     }
   }
@@ -819,27 +790,14 @@ SetShiftState(BYTE key, BOOL down)
 void
 vncKeymap::ClearShiftKeys()
 {
-	if (vncService::IsWinNT())
-	{
-		// On NT, clear both sets of keys
+	// On NT, clear both sets of keys
+	// LEFT
+	SetShiftState(VK_LSHIFT, FALSE);
+	SetShiftState(VK_LCONTROL, FALSE);
+	SetShiftState(VK_LMENU, FALSE);
+	// RIGHT
+	SetShiftState(VK_RSHIFT, FALSE);
+	SetShiftState(VK_RCONTROL, FALSE);
+	SetShiftState(VK_RMENU, FALSE);
 
-		// LEFT
-		SetShiftState(VK_LSHIFT, FALSE);
-		SetShiftState(VK_LCONTROL, FALSE);
-		SetShiftState(VK_LMENU, FALSE);
-
-		// RIGHT
-		SetShiftState(VK_RSHIFT, FALSE);
-		SetShiftState(VK_RCONTROL, FALSE);
-		SetShiftState(VK_RMENU, FALSE);
-	}
-	else
-	{
-		// Otherwise, we can't distinguish the keys anyway...
-
-		// Clear the shift key states
-		SetShiftState(VK_SHIFT, FALSE);
-		SetShiftState(VK_CONTROL, FALSE);
-		SetShiftState(VK_MENU, FALSE);
-	}
 }

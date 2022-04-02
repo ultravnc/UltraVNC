@@ -28,7 +28,6 @@
 #include "vncserver.h"
 #include "vnckeymap.h"
 #include "vncdesktop.h"
-#include "vncservice.h"
 #include "mmsystem.h"
 #include "IPC.h"
 #include "CpuUsage.h"
@@ -44,8 +43,6 @@ typedef struct _CURSORINFO
 // This handles the messages posted by RFBLib to the vncDesktop window
 typedef BOOL (WINAPI *_GetCursorInfo)(PMyCURSORINFO pci);
 extern bool g_DesktopThread_running;
-#define MSGFLT_ADD		1
-typedef BOOL (WINAPI *CHANGEWINDOWMESSAGEFILTER)(UINT message, DWORD dwFlag);
 
 extern const UINT RFB_SCREEN_UPDATE;
 extern const UINT RFB_COPYRECT_UPDATE;
@@ -64,17 +61,11 @@ public:
 		m_lLastMouseMoveTime = 0L;
 		m_lLastUpdate = 0L;
 		
-		CHANGEWINDOWMESSAGEFILTER pfnFilter = NULL;
-		if (hUser32)
-		{
-		pfnFilter =(CHANGEWINDOWMESSAGEFILTER)GetProcAddress(hUser32,"ChangeWindowMessageFilter");
-		if (pfnFilter) 
-			{
-				pfnFilter(RFB_SCREEN_UPDATE, MSGFLT_ADD);
-				pfnFilter(RFB_COPYRECT_UPDATE, MSGFLT_ADD);
-				pfnFilter(RFB_MOUSE_UPDATE, MSGFLT_ADD);
-			}
-		}
+
+		ChangeWindowMessageFilter(RFB_SCREEN_UPDATE, MSGFLT_ADD);
+		ChangeWindowMessageFilter(RFB_COPYRECT_UPDATE, MSGFLT_ADD);
+		ChangeWindowMessageFilter(RFB_MOUSE_UPDATE, MSGFLT_ADD);
+
 		cpuUsage=0;
 		MIN_UPDATE_INTERVAL=33;
 		MIN_UPDATE_INTERVAL_MAX=500;

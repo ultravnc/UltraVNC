@@ -71,9 +71,12 @@
 #include <stdio.h>
 #include <string.h>
 #include "DSMPlugin.h"
-
 #include <stdlib.h>
 #include <limits.h>
+#include <memory>
+#ifdef SC_20
+#include "../loadmemory/loadDllFromMemory.h"
+#endif
 //
 // Utils
 //
@@ -243,7 +246,6 @@ bool CDSMPlugin::SetPluginParams(HWND hWnd, char* szParams, char* szConfig, char
 
 	//adzm 2010-05-12 - dsmplugin config
 	if (m_PConfig) {
-		char* szNewConfig = NULL;
 		int nRes = (*m_PConfig)(hWnd, szParams, szConfig, pszNewConfig);		
 		if (nRes > 0) return true; else return false;
 	} else {
@@ -316,6 +318,7 @@ int CDSMPlugin::ListPlugins(HWND hComboBox)
 //
 bool CDSMPlugin::LoadPlugin(char* szPlugin, bool fAllowMulti)
 {
+#ifndef SC_20
 	// sf@2003 - Multi dll trick 
 	// I really don't like doing this kind of dirty workaround but I have no time to do
 	// better for now. Used only by a listening viewer.
@@ -411,16 +414,25 @@ bool CDSMPlugin::LoadPlugin(char* szPlugin, bool fAllowMulti)
 	m_PCreateIntegratedPluginInterface	= (CREATEINTEGRATEDPLUGININTERFACE)	GetProcAddress(m_hPDll, "CreateIntegratedPluginInterface");
 	//adzm 2010-05-12 - dsmplugin config
 	m_PConfig         = (CONFIG)           GetProcAddress(m_hPDll, "Config");
+#else
+	loadDllFromMemory = std::make_unique<LoadDllFromMemory>();
+	loadDllFromMemory->LoadPlugin(m_PDescription, m_PShutdown, m_PStartup, m_PSetParams, m_PGetParams,
+		m_PTransformBuffer, m_PRestoreBuffer, m_PFreeBuffer, m_PReset,
+		m_PCreatePluginInterface, m_PCreateIntegratedPluginInterface, m_PConfig);
+#endif
 
 	if (m_PStartup == NULL || m_PShutdown == NULL || m_PSetParams == NULL || m_PGetParams == NULL
-		|| m_PTransformBuffer == NULL || m_PRestoreBuffer == NULL || m_PFreeBuffer == NULL)
+		|| m_PTransformBuffer == NULL || m_PRestoreBuffer == NULL || m_PFreeBuffer == NULL ||
+		m_PReset == NULL || m_PCreatePluginInterface == NULL || m_PCreateIntegratedPluginInterface == NULL ||
+		m_PConfig == NULL)
 	{
+#ifndef SC_20
 		FreeLibrary(m_hPDll); 
 		if (*m_szDllName) DeleteFile(m_szDllName);
+#endif
 		return false;
 	}
 
-	// return ((*m_PStartup)());
 	SetLoaded(true);
 	return true;
 }
@@ -444,8 +456,10 @@ bool CDSMPlugin::UnloadPlugin(void)
 	if ((*m_PShutdown)())
 	{
 		bool fFreed = false;
+#ifndef SC_20
 		fFreed = (FALSE != FreeLibrary(m_hPDll));
 		if (*m_szDllName) DeleteFile(m_szDllName);
+#endif
 		return fFreed;
 	}
 	else
@@ -553,8 +567,8 @@ void Base64::decodeblock(BYTE in[4], BYTE out[3])
 
 void Base64::encode(const char* szIn, char* szOut)
 {
-    BYTE in[3], out[4];
-    int i, len, blocksout = 0;
+    BYTE in[3]{}, out[4];
+    int i, len;
 
 	const char* pIn = szIn;
 	char* pOut = szOut;
@@ -584,7 +598,7 @@ void Base64::encode(const char* szIn, char* szOut)
 
 void Base64::decode(const char* szIn, char* szOut)
 {
-    BYTE in[4], out[3], v, o;
+    BYTE in[4]{}, out[3], v, o;
     int i, len;
 
 	const char* pIn = szIn;
@@ -631,7 +645,7 @@ void ConfigHelper::SetConfigHelper(DWORD dwFlags, char* szPassphrase)
 	m_szConfig = new char[512];
 	m_szConfig[0] = '\0';
 
-	char szEncoded[256];
+	char szEncoded[256]{};
 	szEncoded[0] = '\0';
 	if (szPassphrase[0] != '\0') {
 		Base64::encode(szPassphrase, szEncoded);
@@ -668,7 +682,7 @@ ConfigHelper::ConfigHelper(const char* szConfig)
 			//m_szPassphrase = new char[256];
 			//m_szPassphrase[0] = '\0';
 
-			char szEncoded[256];
+			char szEncoded[256]{};
 			szEncoded[0] = '\0';
 
 			strcpy_s(szEncoded, 256 - 1, szEnd + 1);

@@ -65,7 +65,6 @@ BOOL GetDllProductVersion(char* dllName, char *vBuffer, int size)
       return(FALSE);
 
    DWORD sVersion = GetFileVersionInfoSize(dllName, &rBuffer);
-   DWORD myerror=GetLastError();
    if (sVersion==0)
 	   {
 		   strcpy_s(vBuffer, 512, "Fail: Using 32bit winvnc.exe with  a 64bit driver? \n");		   
@@ -75,7 +74,7 @@ BOOL GetDllProductVersion(char* dllName, char *vBuffer, int size)
 
    versionInfo = new char[sVersion];
 
-   BOOL resultVersion = GetFileVersionInfo(dllName,
+   GetFileVersionInfo(dllName,
                                            NULL,
                                            sVersion,
                                            versionInfo);
@@ -116,7 +115,6 @@ CheckVideoDriver(bool Box)
 	if (IsWindows8OrGreater())
 		return true;
 		typedef BOOL (WINAPI* pEnumDisplayDevices)(PVOID,DWORD,PVOID,DWORD);
-		HDC m_hrootdc=NULL;
 		pEnumDisplayDevices pd=NULL;
 		LPSTR driverName = "mv video hook driver2";
 		BOOL DriverFound;
@@ -124,7 +122,7 @@ CheckVideoDriver(bool Box)
 		FillMemory(&devmode, sizeof(DEVMODE), 0);
 		devmode.dmSize = sizeof(DEVMODE);
 		devmode.dmDriverExtra = 0;
-		BOOL change = EnumDisplaySettings(NULL,ENUM_CURRENT_SETTINGS,&devmode);
+		EnumDisplaySettings(NULL,ENUM_CURRENT_SETTINGS,&devmode);
 		devmode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
 		HMODULE hUser32=LoadLibrary("USER32");
 		if (hUser32) pd = (pEnumDisplayDevices)GetProcAddress( hUser32, "EnumDisplayDevicesA");

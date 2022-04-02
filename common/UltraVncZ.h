@@ -1,14 +1,9 @@
 #if !defined(_WINVNC_VNCZ)
 #define _WINVNC_VNCZ
 #pragma once
-
-#ifdef _INTERNALLIB
-#include <zlib.h>
-#include <zstd.h>
-#else
 #include "../zlib/zlib.h"
 #include "../zstd/lib/zstd.h"
-#endif
+
 
 class UltraVncZ 
 {

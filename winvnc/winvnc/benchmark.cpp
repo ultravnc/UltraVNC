@@ -72,7 +72,7 @@ void testBench()
 	if (result == 0) {
 		return;
 	}
-	RECT testRect;
+	RECT testRect{};
 	testRect.left=0;
 	testRect.top=0;
 	testRect.right=GetDeviceCaps(m_hrootdc, HORZRES);
@@ -116,7 +116,7 @@ void testBench()
 	{
 	if ((m_oldbitmap = (HBITMAP) SelectObject(m_hmemdc, m_membitmap)) == NULL)
 					return;
-	BOOL blitok = BitBlt(m_hmemdc, 0, 0, testRect.right, testRect.bottom, m_hrootdc, 0, 0, CAPTUREBLT | SRCCOPY);
+	BitBlt(m_hmemdc, 0, 0, testRect.right, testRect.bottom, m_hrootdc, 0, 0, CAPTUREBLT | SRCCOPY);
 	SelectObject(m_hmemdc, m_oldbitmap);
 	}
 	COLORREF cr = 0;
@@ -137,10 +137,9 @@ void testBench()
 	DWORD start= GetTimeFunction();
 	
 	{
-	COLORREF cr = 0;
 	for (int xx=0;xx<testRect.right*testRect.bottom/32/32/200;xx++)
 		{
-			cr=GetPixel(m_hrootdc, 1, 1);
+			GetPixel(m_hrootdc, 1, 1);
 		}
 	}
 	DWORD stop= GetTimeFunction();

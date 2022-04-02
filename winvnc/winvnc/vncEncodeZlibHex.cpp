@@ -552,14 +552,12 @@ vncEncodeZlibHex::AddToQueu(BYTE *source,int sizerect,VSocket *outConn)
 void
 vncEncodeZlibHex::SendZlibHexrects(VSocket *outConn)
 {
-	const int rawDataSize = (m_Queuelen);
-
-	if (m_Queuelen==0) return; // NO update
-	
-		outConn->SendExactQueue( (char *)m_Queuebuffer, m_Queuelen); // 1 Small update
-		m_Queuelen=0;
-		encodedSize += m_Queuelen-sz_rfbFramebufferUpdateRectHeader;
-		return;
+	if (m_Queuelen==0) 
+		return; // NO update
+	outConn->SendExactQueue( (char *)m_Queuebuffer, m_Queuelen); // 1 Small update
+	m_Queuelen=0;
+	encodedSize += m_Queuelen-sz_rfbFramebufferUpdateRectHeader;
+	return;
 }
 
 void

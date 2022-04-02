@@ -1,6 +1,9 @@
 #include "DeskdupEngine.h"
 #include <stdio.h>
 #include "stdhdrs.h"
+#ifdef SC_20
+#include "../loadmemory/loadDllFromMemory.h"
+#endif
 //-----------------------------------------------------------
 DeskDupEngine::DeskDupEngine()
 {
@@ -16,14 +19,43 @@ DeskDupEngine::DeskDupEngine()
 
 	init = true;
 	hModule = NULL;
+	StartW8 = NULL;
+	StartW8V2 = NULL;
+	StopW8 = NULL;
+	LockW8 = NULL;
+	UnlockW8 = NULL;
+	ShowCursorW8 = NULL;
+	HideCursorW8 = NULL;
 	osVer = osVersion();
 	if (osVer == OSWIN10) {
 #ifdef _X64
-		hModule = LoadLibrary("ddengine64.dll");
+		char szCurrentDir[MAX_PATH];
+		if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
+		{
+			char* p = strrchr(szCurrentDir, '\\');
+			if (p == NULL) return;
+			*p = '\0';
+			strcat_s(szCurrentDir, "\\ddengine64.dll");
+		}
+#endif	
+#ifdef SC_20
+		loadDllFromMemory = std::make_unique<LoadDllFromMemory>();
+		loadDllFromMemory->loadDDengine( StartW8,  StartW8V2,  StopW8,  LockW8,  UnlockW8,  ShowCursorW8,  HideCursorW8);
+		if (StartW8 == NULL || StopW8 == NULL || LockW8 == NULL || UnlockW8 == NULL || ShowCursorW8 == NULL || HideCursorW8 == NULL)
+			init = false;
 #else
-		hModule = LoadLibrary("ddengine.dll");
-#endif
+#ifndef _X64
+		char szCurrentDir[MAX_PATH];
+		if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
+		{
+			char* p = strrchr(szCurrentDir, '\\');
+			if (p == NULL) return;
+			*p = '\0';
+			strcat_s(szCurrentDir, "\\ddengine.dll");
+		}
 		
+#endif
+		hModule = LoadLibrary(szCurrentDir);
 		if (hModule) {
 			StartW8 = (StartW8Fn)GetProcAddress(hModule, "StartW8");
 			StartW8V2 = (StartW8V2Fn)GetProcAddress(hModule, "StartW8V2");
@@ -40,8 +72,9 @@ DeskDupEngine::DeskDupEngine()
 		}
 		else
 			init = false;
-		
+#endif		
 	}
+
 #ifdef _DEBUG
 	char			szText[256];
 	sprintf_s(szText, "DeskDupEngine\n");
@@ -104,7 +137,7 @@ void DeskDupEngine::videoDriver_start(int x, int y, int w, int h, bool onlyVirtu
 		return;
 
 	pChangebuf = (CHANGES_BUF*)fileView;
-	int size = pChangebuf->pointrect[0].rect.left;
+	pChangebuf->pointrect[0].rect.left;
 
 	if (hFileMapBitmap != NULL)
 		return;

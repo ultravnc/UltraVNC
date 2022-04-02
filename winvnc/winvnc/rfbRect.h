@@ -32,7 +32,6 @@
 #include <vector>
 
 namespace rfb {
-
 	// rfb::Point
 	//
 	// Represents a point in 2D space, by X and Y coordinates.
@@ -46,11 +45,11 @@ namespace rfb {
 		Point() : x(0), y(0) {}
 		Point(int x_, int y_) : x(x_), y(y_) {}
 #ifdef WIN32
-		Point(const POINT &p) : x(p.x), y(p.y) {}
+		Point(const POINT& p) : x(p.x), y(p.y) {}
 #endif
-		Point negate() const {return Point(-x, -y);}
-		bool equals(const Point &p) const {return x==p.x && y==p.y;}
-		Point translate(const Point &p) const {return Point(x+p.x, y+p.y);}
+		Point negate() const { return Point(-x, -y); }
+		bool equals(const Point& p) const { return x == p.x && y == p.y; }
+		Point translate(const Point& p) const { return Point(x + p.x, y + p.y); }
 		int x, y;
 	};
 
@@ -70,9 +69,9 @@ namespace rfb {
 		Rect(Point tl_, Point br_) : tl(tl_), br(br_) {}
 		Rect(int x1, int y1, int x2, int y2) : tl(x1, y1), br(x2, y2) {}
 #ifdef WIN32
-		Rect(const RECT &r) : tl(r.left, r.top), br(r.right, r.bottom) {}
+		Rect(const RECT& r) : tl(r.left, r.top), br(r.right, r.bottom) {}
 #endif
-		Rect intersect(const Rect &r) const {
+		Rect intersect(const Rect& r) const {
 			Rect result;
 			result.tl.x = std::max(tl.x, r.tl.x);
 			result.tl.y = std::max(tl.y, r.tl.y);
@@ -80,7 +79,7 @@ namespace rfb {
 			result.br.y = std::min(br.y, r.br.y);
 			return result;
 		}
-		Rect union_boundary(const Rect &r) const {
+		Rect union_boundary(const Rect& r) const {
 			Rect result;
 			if (is_empty()) return r;
 			if (r.is_empty()) return *this;
@@ -90,28 +89,26 @@ namespace rfb {
 			result.br.y = std::max(br.y, r.br.y);
 			return result;
 		}
-		Rect translate(const Point &p) const {
+		Rect translate(const Point& p) const {
 			return Rect(tl.translate(p), br.translate(p));
 		}
-		bool equals(const Rect &r) const {return r.tl.equals(tl) && r.br.equals(br);}
-		bool is_empty() const {return (tl.x >= br.x) || (tl.y >= br.y);}
-		void clear() {tl = Point(); br = Point();}
-		bool enclosed_by(const Rect &r) const {
-			return (tl.x>=r.tl.x) && (tl.y>=r.tl.y) && (br.x<=r.br.x) && (br.y<=r.br.y);
+		bool equals(const Rect& r) const { return r.tl.equals(tl) && r.br.equals(br); }
+		bool is_empty() const { return (tl.x >= br.x) || (tl.y >= br.y); }
+		void clear() { tl = Point(); br = Point(); }
+		bool enclosed_by(const Rect& r) const {
+			return (tl.x >= r.tl.x) && (tl.y >= r.tl.y) && (br.x <= r.br.x) && (br.y <= r.br.y);
 		}
-		unsigned int area() const {return is_empty() ? 0 : width()*height();}
-    inline int width() const {return br.x-tl.x;}
-    inline int height() const {return br.y-tl.y;}
+		unsigned int area() const { return is_empty() ? 0 : width() * height(); }
+		inline int width() const { return br.x - tl.x; }
+		inline int height() const { return br.y - tl.y; }
 		Point tl;
 		Point br;
 	};
 
 	// rfb::RectVector
 	//
-	// An STL vector containing Rects. 
+	// An STL vector containing Rects.
 	typedef std::vector<Rect> RectVector;
-
 }
-
 
 #endif // __RFB_RECT_INCLUDED__

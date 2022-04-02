@@ -81,7 +81,6 @@ bool Shellexecuteforuiaccess()
 		shExecInfo.hInstApp = NULL;
 		if (!ShellExecuteEx(&shExecInfo))
 		{
-			DWORD error=GetLastError();
 			return false;
 		}
 		return true;
@@ -126,11 +125,8 @@ void keybd_uni_event(_In_  BYTE bVk,_In_  BYTE bScan,_In_  DWORD dwFlags,_In_  U
 	}
 	mini_lock ml(2);
 	bool ldown = HIBYTE(::GetKeyState(VK_LMENU)) != 0;
-	bool rdown = HIBYTE(::GetKeyState(VK_RMENU)) != 0;	
 	bool lcdown = HIBYTE(::GetKeyState(VK_LCONTROL)) != 0;	
-	bool rcdown = HIBYTE(::GetKeyState(VK_RCONTROL)) != 0;	
 	bool lwindown = HIBYTE(::GetKeyState(VK_LWIN)) != 0;
-	bool rwindown = HIBYTE(::GetKeyState(VK_RWIN)) != 0;
 	// The shared memory trick to inject keys seems to generate an overhead when fast key presses are done.
 	// Actual we only need it for special keys, so we better ctivate the check
 	 if (keyEventFn==NULL || (!ldown && !lcdown && !lwindown) )
@@ -287,15 +283,9 @@ void
 		secAttr.lpSecurityDescriptor = &secDesc;
 		InitializeSecurityDescriptor(secAttr.lpSecurityDescriptor, SECURITY_DESCRIPTOR_REVISION);
 		SetSecurityDescriptorDacl(secAttr.lpSecurityDescriptor, TRUE, 0, FALSE);
-		TCHAR * szSD = TEXT("D:")       // Discretionary ACL
-			//TEXT("(D;OICI;GA;;;BG)")     // Deny access to built-in guests
-			//TEXT("(D;OICI;GA;;;AN)")     // Deny access to anonymous logon
-			TEXT("(A;OICI;GRGWGX;;;AU)") // Allow read/write/execute to authenticated users
-			TEXT("(A;OICI;GA;;;BA)");    // Allow full control to administrators
 
 		PSECURITY_DESCRIPTOR pSD;
 		BOOL retcode =ConvertStringSecurityDescriptorToSecurityDescriptor("S:(ML;;NW;;;LW)",SDDL_REVISION_1,&pSD,NULL);
-		DWORD aa=GetLastError();
 
 		if(retcode != 0){ 
 		PACL pSacl = NULL;
@@ -321,15 +311,9 @@ bool comm_serv::Init(char *name,int IN_datasize_IN,int IN_datasize_OUT,bool app,
 		secAttr.lpSecurityDescriptor = &secDesc;
 		InitializeSecurityDescriptor(secAttr.lpSecurityDescriptor, SECURITY_DESCRIPTOR_REVISION);
 		SetSecurityDescriptorDacl(secAttr.lpSecurityDescriptor, TRUE, 0, FALSE);
-		TCHAR * szSD = TEXT("D:")       // Discretionary ACL
-			//TEXT("(D;OICI;GA;;;BG)")     // Deny access to built-in guests
-			//TEXT("(D;OICI;GA;;;AN)")     // Deny access to anonymous logon
-			TEXT("(A;OICI;GRGWGX;;;AU)") // Allow read/write/execute to authenticated users
-			TEXT("(A;OICI;GA;;;BA)");    // Allow full control to administrators
 
 		PSECURITY_DESCRIPTOR pSD;
 		BOOL retcode =ConvertStringSecurityDescriptorToSecurityDescriptor("S:(ML;;NW;;;LW)",SDDL_REVISION_1,&pSD,NULL);
-		DWORD aa=GetLastError();
 
 		if(retcode != 0){ 
 		PACL pSacl = NULL;
@@ -452,7 +436,6 @@ bool comm_serv::Init(char *name,int IN_datasize_IN,int IN_datasize_OUT,bool app,
 			if (datasize_IN!=0)
 			{
 			hMapFile_IN = OpenFileMapping(FILE_MAP_ALL_ACCESS,FALSE,filemapping_IN);
-			DWORD aa=GetLastError();
 			if (hMapFile_IN == NULL) return false;
 			data_IN=(char*)MapViewOfFile(hMapFile_IN,FILE_MAP_ALL_ACCESS,0,0,datasize_IN);           
 			if(data_IN==NULL) return false;
@@ -633,7 +616,7 @@ void comm_serv::SetData(char *databuffer)
 	if (!GLOBAL_RUNNING) return;
 	memcpy(data_OUT,databuffer,datasize_OUT);
 	if (event_E_OUT)SetEvent(event_E_OUT);
-	DWORD r=WaitForSingleObject(event_E_OUT_DONE,2000);	
+	WaitForSingleObject(event_E_OUT_DONE,2000);	
 }
 
 void comm_serv::Force_unblock()

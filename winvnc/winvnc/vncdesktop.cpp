@@ -40,7 +40,6 @@
 #include "rfbRegion.h"
 #include "rfbRect.h"
 #include "vncdesktop.h"
-#include "vncservice.h"
 // Modif rdv@2002 - v1.1.x - videodriver
 #include "vncOSVersion.h"
 #include "DeskdupEngine.h"
@@ -52,6 +51,7 @@
 #include <algorithm>
 #include <commctrl.h>
 #include "LayeredWindows.h"
+#include "SettingsManager.h"
 
 extern bool PreConnect;
 int getinfo(char mytext[1024]);
@@ -167,17 +167,12 @@ PixelCaptureEngine::CapturePixel(int x, int y)
 	if (m_bIsVista)
 	{
 		COLORREF cr = 0;
-		int tx = x - m_rect.tl.x;
-		int ty = y - m_rect.tl.y;
-
 		unsigned int index = (m_bytesPerRow * y) + (m_bytesPerPixel * x);
 		memcpy(&cr, ((char*)m_DIBbits) + index, m_bytesPerPixel);
-
 		return cr;
 	}
 	else
 	{
-
 		COLORREF cr = 0;
 		cr = GetPixel(m_hrootdc_PixelEngine, x, y);
 		return cr;
@@ -281,7 +276,6 @@ bool vncDesktop::FastDetectChanges(rfb::Region2D &rgn, rfb::Rect &rect, int nZon
 	// vnclog.Print(LL_INTINFO, VNCLOG("### Polling Grid %d - SubGrid %d\n"), nZone, m_nGridCycle); 
 	GridsList::iterator iGrid;
 	int nGridPos = (nZone * PIXEL_BLOCK_SIZE / GRID_OFFSET) + m_nGridCycle;
-	int nIndex = nGridPos;
 
 	iGrid = m_lGridsList.begin();
 	std::advance(iGrid, nGridPos);
@@ -561,7 +555,6 @@ vncDesktop::~vncDesktop()
 	if (m_thread != NULL)
 	{
 		StopInitWindowthread();
-		vncDesktopThread *thread = (vncDesktopThread*)m_thread;
 		int counter = 0;
 		while (g_DesktopThread_running != false)
 		{
@@ -730,14 +723,14 @@ vncDesktop::Startup()
 		m_server->DriverWantedSet = FALSE;
 	}
 	no_default_desktop = false;
-	if (m_server->Driver()) {
+	if (settings->getDriver()) {
 		vnclog.Print(LL_INTINFO, VNCLOG("Driver option enabled \n"));
 		//Enable only the video driver for the Default desktop
 		HDESK desktop = GetThreadDesktop(GetCurrentThreadId());
 		DWORD dummy;
 		char new_name[256];
 		if (GetUserObjectInformation(desktop, UOI_NAME, &new_name, 256, &dummy)) {
-			if (strcmp(new_name, "Default") == 0 && vncService::InputDesktopSelected() != 2) {
+			if (strcmp(new_name, "Default") == 0 && desktopSelector::InputDesktopSelected() != 2) {
 				InitVideoDriver();
 				no_default_desktop = false;
 			}
@@ -886,7 +879,7 @@ vncDesktop::Shutdown()
 	ShutdownVideoDriver();
 
 	if (m_home_desktop)
-		vncService::SelectHDESK(m_home_desktop);
+		desktopSelector::SelectHDESK(m_home_desktop);
 	if (m_input_desktop)
 	{
 		if (!CloseDesktop(m_input_desktop))
@@ -920,11 +913,11 @@ vncDesktop::Shutdown()
 BOOL
 vncDesktop::InitDesktop()
 {
-	int result = vncService::InputDesktopSelected();
+	int result = desktopSelector::InputDesktopSelected();
 	if (result == 1 || result == 2)
 		return TRUE;
 	vnclog.Print(LL_INTINFO, VNCLOG("InitDesktop...\n"));
-	return vncService::SelectDesktop(NULL, &m_input_desktop);
+	return desktopSelector::SelectDesktop(NULL, &m_input_desktop);
 }
 
 // Routine used to close the screen saver, if it's active...
@@ -1007,9 +1000,8 @@ vncDesktop::InitBitmap()
 		FillMemory(&devmode, sizeof(DEVMODE), 0);
 		devmode.dmSize = sizeof(DEVMODE);
 		devmode.dmDriverExtra = 0;
-		BOOL change = EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &devmode);
+		EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &devmode);
 		devmode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
-		HMODULE hUser32 = LoadLibrary("USER32");
 		LPSTR deviceName = NULL;
 		DISPLAY_DEVICE dd;
 		ZeroMemory(&dd, sizeof(dd));
@@ -1036,7 +1028,7 @@ vncDesktop::InitBitmap()
 			}
 			m_hrootdc_Desktop = CreateDC("DISPLAY", deviceName, NULL, NULL);
 			//m_hrootdc = GetDC(NULL);
-			BOOL temp_para = EnumDisplaySettings(deviceName, ENUM_CURRENT_SETTINGS, &devmode);
+			EnumDisplaySettings(deviceName, ENUM_CURRENT_SETTINGS, &devmode);
 			if (m_hrootdc_Desktop) 
 				DriverType = MIRROR;
 		}
@@ -1089,8 +1081,8 @@ vncDesktop::InitBitmap()
 
 	vnclog.Print(LL_INTINFO, VNCLOG("bitmap dimensions are %d x %d\n"), m_bmrect.br.x, m_bmrect.br.y);
 
-	if (m_server->getFrame())
-		layeredWindows->SetBorderWindow(true, rect, m_server->getInfoMsg(), m_server->getOSD());
+	if (settings->getFrame())
+		layeredWindows->SetBorderWindow(true, rect, m_server->getInfoMsg(), settings->getOSD());
 
 	// Create a compatible memory DC
 	m_hmemdc = CreateCompatibleDC(m_hrootdc_Desktop);
@@ -1553,7 +1545,6 @@ vncDesktop::WriteMessageOnScreen(char * tt, BYTE *scrBuff, UINT scrBuffSize)
 
 #include "wtsapi32.h"
 char mytext22[1024] = "";
-DWORD GetCurrentConsoleSessionID();
 
 void
 vncDesktop::WriteMessageOnScreenPreConnect(BYTE *scrBuff, UINT scrBuffSize)
@@ -1570,7 +1561,7 @@ vncDesktop::WriteMessageOnScreenPreConnect(BYTE *scrBuff, UINT scrBuffSize)
 	int coutersessionid = 0;
 	while (SessionId == 0xFFFFFFFF)
 	{
-		SessionId = GetCurrentConsoleSessionID();
+		SessionId = processHelper::GetCurrentConsoleSessionID();
 		Sleep(1000);
 		coutersessionid++;
 		if (coutersessionid > 10) break;
@@ -1775,7 +1766,7 @@ vncDesktop::CaptureScreen(const rfb::Rect &rect, BYTE *scrBuff, UINT scrBuffSize
 				m_hrootdc_Desktop,
 				rect.tl.x + m_ScreenOffsetx,
 				rect.tl.y + m_ScreenOffsety,
-				((VNC_OSVersion::getInstance()->CaptureAlphaBlending() || m_server->AutoCapt() == 2) && !m_Black_window_active) ? (CAPTUREBLT | SRCCOPY) : SRCCOPY
+				((VNC_OSVersion::getInstance()->CaptureAlphaBlending() || settings->getAutocapt() == 2) && !m_Black_window_active) ? (CAPTUREBLT | SRCCOPY) : SRCCOPY
 			);
 		}
 		else
@@ -1789,7 +1780,7 @@ vncDesktop::CaptureScreen(const rfb::Rect &rect, BYTE *scrBuff, UINT scrBuffSize
 				rect.tl.y,
 				(rect.br.x - rect.tl.x),
 				(rect.br.y - rect.tl.y),
-				m_hrootdc_Desktop, rect.tl.x + xoffset, rect.tl.y + yoffset, ((VNC_OSVersion::getInstance()->CaptureAlphaBlending() || m_server->AutoCapt() == 2) && !m_Black_window_active) ? (CAPTUREBLT | SRCCOPY) : SRCCOPY);
+				m_hrootdc_Desktop, rect.tl.x + xoffset, rect.tl.y + yoffset, ((VNC_OSVersion::getInstance()->CaptureAlphaBlending() || settings->getAutocapt() == 2) && !m_Black_window_active) ? (CAPTUREBLT | SRCCOPY) : SRCCOPY);
 		}
 		/*#if defined(_DEBUG)
 			DWORD e = GetTimeFunction() - t;
@@ -2331,7 +2322,6 @@ BOOL vncDesktop::InitVideoDriver()
 	}
 	if (IsWindows8OrGreater() && !VNC_OSVersion::getInstance()->OS_WINPE)
 	{
-		int a = 0;
 		vnclog.Print(LL_INTERR, VNCLOG("Try ddengine\n"));
 		m_screenCapture = new DeskDupEngine;
 	}
@@ -2346,12 +2336,12 @@ BOOL vncDesktop::InitVideoDriver()
 	if (nr_monitors == 1)
 	{
 		if (m_screenCapture != NULL) 
-			m_screenCapture->videoDriver_start(mymonitor[MULTI_MON_PRIMARY].offsetx, mymonitor[MULTI_MON_PRIMARY].offsety, mymonitor[MULTI_MON_PRIMARY].Width, mymonitor[MULTI_MON_PRIMARY].Height, m_server->singleExtendRequested(), m_server->MaxFPS());
+			m_screenCapture->videoDriver_start(mymonitor[MULTI_MON_PRIMARY].offsetx, mymonitor[MULTI_MON_PRIMARY].offsety, mymonitor[MULTI_MON_PRIMARY].Width, mymonitor[MULTI_MON_PRIMARY].Height, m_server->singleExtendRequested(), settings->getMaxFPS());
 	}
 	if (nr_monitors > 1)
 	{
 		if (m_screenCapture != NULL)
-			m_screenCapture->videoDriver_start(mymonitor[MULTI_MON_ALL].offsetx, mymonitor[MULTI_MON_ALL].offsety, mymonitor[MULTI_MON_ALL].Width, mymonitor[MULTI_MON_ALL].Height, m_server->singleExtendRequested(), m_server->MaxFPS());
+			m_screenCapture->videoDriver_start(mymonitor[MULTI_MON_ALL].offsetx, mymonitor[MULTI_MON_ALL].offsety, mymonitor[MULTI_MON_ALL].Width, mymonitor[MULTI_MON_ALL].Height, m_server->singleExtendRequested(), settings->getMaxFPS());
 	}
 	vnclog.Print(LL_INTERR, VNCLOG("Start Mirror driver\n"));
 
@@ -2370,12 +2360,12 @@ BOOL vncDesktop::InitVideoDriver()
 			// sf@2002 - Necessary for the following InitHookSettings() call
 			// Remember old states
 			m_server->DriverWantedSet = true;
-			m_server->DriverWanted = m_server->Driver();
-			m_server->HookWanted = m_server->Hook();
+			m_server->DriverWanted = settings->getDriver();
+			m_server->HookWanted = settings->getHook();
 			m_server->Driver(false);
 			m_server->Hook(true);
-			m_server->PollFullScreen(true);
-			m_server->TurboMode(true);
+			settings->setPollFullScreen(true);
+			settings->setTurboMode(true);
 			return false;
 		}
 
@@ -2421,10 +2411,10 @@ void vncDesktop::SethookMechanism(BOOL hookall, BOOL hookdriver)
 {
 	m_hookswitch = false;
 	// Force at least one updates handling method !
-	if (!hookall && !hookdriver && !m_server->PollFullScreen())
+	if (!hookall && !hookdriver && !settings->getPollFullScreen())
 	{
 		hookall = TRUE;
-		m_server->PollFullScreen(TRUE);
+		settings->setPollFullScreen(TRUE);
 	}
 
 	// sf@2002 - We forbid hoodll and hookdriver at the same time (pointless and high CPU load)
@@ -2505,12 +2495,12 @@ void vncDesktop::StartStophookdll(BOOL enabled)
 //
 void vncDesktop::InitHookSettings()
 {
-	SethookMechanism(m_server->Hook(), m_server->Driver());
+	SethookMechanism(settings->getHook(), settings->getDriver());
 }
 
 void vncDesktop::PreventScreensaver(bool state)
 {
-	if (state && m_server->GetNoScreensaver()) {
+	if (state && settings->getnoscreensaver()) {
 		SetThreadExecutionState(ES_CONTINUOUS | ES_DISPLAY_REQUIRED | ES_SYSTEM_REQUIRED | ES_AWAYMODE_REQUIRED);
 	}
 	else
@@ -2520,18 +2510,18 @@ void vncDesktop::PreventScreensaver(bool state)
 void vncDesktop::SetBlockInputState(bool newstate)
 {
 	CARD32 state;
-	if (m_server->BlankMonitorEnabled())
+	if (settings->getEnableBlankMonitor())
 	{
-		if (!m_server->BlankInputsOnly())
+		if (!settings->getBlankInputsOnly())
 		{
 			if ((blankmonitorstate == newstate) && (newstate == 1))
 			{
-				m_Black_window_active = layeredWindows->SetBlankMonitor(0, m_server->BlankMonitorEnabled(), m_Black_window_active);
+				m_Black_window_active = layeredWindows->SetBlankMonitor(0, settings->getBlankInputsOnly(), m_Black_window_active);
 				blankmonitorstate = 0;
 			}
 			else
 			{
-				m_Black_window_active = layeredWindows->SetBlankMonitor(newstate, m_server->BlankMonitorEnabled(), m_Black_window_active);
+				m_Black_window_active = layeredWindows->SetBlankMonitor(newstate, settings->getEnableBlankMonitor(), m_Black_window_active);
 				blankmonitorstate = newstate;
 			}
 		}
@@ -2551,14 +2541,14 @@ bool vncDesktop::block_input(bool first)
 	if (first)
 	{
 		old_Blockinput1 = m_bIsInputDisabledByClient ? 1 : 0;
-		old_Blockinput2 = m_server->LocalInputsDisabled() ? 1 : 0;
+		old_Blockinput2 = settings->getDisableLocalInputs() ? 1 : 0;
 		return false;
 	}
 	else
 	{
 		bool Blockinput_val;
 		BOOL returnvalue;
-		if (m_bIsInputDisabledByClient || m_server->LocalInputsDisabled())
+		if (m_bIsInputDisabledByClient || settings->getDisableLocalInputs())
 		{
 			Blockinput_val = true;
 		}
@@ -2574,7 +2564,7 @@ bool vncDesktop::block_input(bool first)
 						OutputDebugString(szText);
 		#endif*/
 
-		if (old_Blockinput1 != (m_bIsInputDisabledByClient ? 1 : 0) || old_Blockinput2 != (m_server->LocalInputsDisabled() ? 1 : 0))
+		if (old_Blockinput1 != (m_bIsInputDisabledByClient ? 1 : 0) || old_Blockinput2 != (settings->getDisableLocalInputs() ? 1 : 0))
 		{
 			CARD32 state;
 			state = !Blockinput_val;
@@ -2593,7 +2583,7 @@ bool vncDesktop::block_input(bool first)
 
 		}
 		old_Blockinput1 = m_bIsInputDisabledByClient ? 1 : 0;
-		old_Blockinput2 = m_server->LocalInputsDisabled() ? 1 : 0;
+		old_Blockinput2 = settings->getDisableLocalInputs() ? 1 : 0;
 		old_Blockinput = Blockinput_val;
 		return Blockinput_val;
 	}

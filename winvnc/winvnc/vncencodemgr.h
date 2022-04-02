@@ -21,7 +21,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the VNC system is not available from the place 
+// If the source code for the VNC system is not available from the place
 // whence you received this file, check http://www.uk.research.att.com/vnc or contact
 // the authors on vnc@uk.research.att.com for information on obtaining it.
 
@@ -83,7 +83,7 @@ static const subsamp_type coarsequal2subsamp[10] =
 
 //
 // -=- Define the Encoding Manager interface
-// 
+//
 
 class vncEncodeMgr
 {
@@ -92,23 +92,22 @@ public:
 	inline vncEncodeMgr();
 	inline ~vncEncodeMgr();
 
-	inline void SetBuffer(vncBuffer *buffer);
+	inline void SetBuffer(vncBuffer* buffer);
 
 	// BUFFER INFO
 	inline rfb::Rect GetSize();
-	inline BYTE *GetClientBuffer();
-	inline UINT GetClientBuffSize() {return m_clientbuffsize;}; // sf@2002
-	inline BOOL GetPalette(RGBQUAD *quadbuff, UINT ncolours);
+	inline BYTE* GetClientBuffer();
+	inline UINT GetClientBuffSize() { return m_clientbuffsize; }; // sf@2002
+	inline BOOL GetPalette(RGBQUAD* quadbuff, UINT ncolours);
 
-	inline omni_mutex& GetUpdateLock() {return m_buffer->m_desktop->GetUpdateLock();};
+	inline omni_mutex& GetUpdateLock() { return m_buffer->m_desktop->GetUpdateLock(); };
 
 	// ENCODING & TRANSLATION
-	inline UINT GetNumCodedRects(const rfb::Rect &rect);
-	inline BOOL SetEncoding(CARD32 encoding,BOOL reinitialize);
+	inline UINT GetNumCodedRects(const rfb::Rect& rect);
+	inline BOOL SetEncoding(CARD32 encoding, BOOL reinitialize);
 	//inline UINT EncodeRect(const rfb::Rect &rect);
-	inline UINT EncodeRect(const rfb::Rect &rect,VSocket *outconn);
-	inline UINT EncodeBulkRects(const rfb::RectVector &allRects, int nScale, VSocket *outconn);
-
+	inline UINT EncodeRect(const rfb::Rect& rect, VSocket* outconn);
+	inline UINT EncodeBulkRects(const rfb::RectVector& allRects, int nScale, VSocket* outconn);
 
 	// Tight - CONFIGURING ENCODER
 	inline void SetCompressLevel(int level);
@@ -122,23 +121,23 @@ public:
 	inline void EnableXCursor(BOOL enable);
 	inline void EnableRichCursor(BOOL enable);
 	inline BOOL SetServerFormat();
-	inline BOOL SetClientFormat(rfbPixelFormat &format);
-	inline rfbPixelFormat GetClientFormat() {return m_clientformat;};
-	inline void SetBufferOffset(int x,int y);
+	inline BOOL SetClientFormat(rfbPixelFormat& format);
+	inline rfbPixelFormat GetClientFormat() { return m_clientformat; };
+	inline void SetBufferOffset(int x, int y);
 	// CURSOR HANDLING
 	inline BOOL IsCursorUpdatePending();
 	inline BOOL WasCursorUpdatePending();
-	inline BOOL SendCursorShape(VSocket *outConn);
-	inline BOOL SendEmptyCursorShape(VSocket *outConn);
+	inline BOOL SendCursorShape(VSocket* outConn);
+	inline BOOL SendEmptyCursorShape(VSocket* outConn);
 	inline BOOL IsXCursorSupported();
 	// CLIENT OPTIONS
-	inline void AvailableQueueEnabled(BOOL enable){m_use_queue = enable;};
-	inline void AvailableZRLE(BOOL enable){m_use_zrle = enable;};
+	inline void AvailableQueueEnabled(BOOL enable) { m_use_queue = enable; };
+	inline void AvailableZRLE(BOOL enable) { m_use_zrle = enable; };
 #ifdef _XZ
-	inline void AvailableXZ(BOOL enable){m_use_xz = enable;};
+	inline void AvailableXZ(BOOL enable) { m_use_xz = enable; };
 #endif
-	inline void AvailableTight(BOOL enable){m_use_tight = enable;};
-	inline void EnableQueuing(BOOL enable){m_fEnableQueuing = enable;};
+	inline void AvailableTight(BOOL enable) { m_use_tight = enable; };
+	inline void EnableQueuing(BOOL enable) { m_fEnableQueuing = enable; };
 	inline BOOL IsMouseWheelTight();
 	// CACHE HANDLING
 	inline void EnableCache(BOOL enabled);
@@ -148,20 +147,21 @@ public:
 	inline void EnableGreyPalette(BOOL enable);
 
 	// QUEUE ZLIBXOR
-	inline void LastRect(VSocket *outConn);
+	inline void LastRect(VSocket* outConn);
 
-	inline bool IsSlowEncoding() {return (m_encoding == rfbEncodingZYWRLE || m_encoding == rfbEncodingZRLE || m_encoding == rfbEncodingTight ||m_encoding == rfbEncodingZlib 
+	inline bool IsSlowEncoding() {
+		return (m_encoding == rfbEncodingZYWRLE || m_encoding == rfbEncodingZRLE || m_encoding == rfbEncodingTight || m_encoding == rfbEncodingZlib
 #ifdef _XZ
-		|| m_encoding == rfbEncodingXZYW || m_encoding == rfbEncodingXZ
+			|| m_encoding == rfbEncodingXZYW || m_encoding == rfbEncodingXZ
 #endif
-		);};
+			);
+	};
 #ifdef _XZ
-	inline bool IsBulkRectEncoding() {return (m_encoding == rfbEncodingXZ || m_encoding == rfbEncodingXZYW);};
+	inline bool IsBulkRectEncoding() { return (m_encoding == rfbEncodingXZ || m_encoding == rfbEncodingXZYW); };
 #endif
-	inline bool IsUltraEncoding() {return (m_encoding == rfbEncodingUltra || m_encoding == rfbEncodingUltra2);};
-	inline bool IsUltra2Encoding() {return (m_encoding == rfbEncodingUltra2);};
+	inline bool IsUltraEncoding() { return (m_encoding == rfbEncodingUltra || m_encoding == rfbEncodingUltra2); };
+	inline bool IsUltra2Encoding() { return (m_encoding == rfbEncodingUltra2); };
 	inline bool IsEncoderSet() { return ((m_encoder != NULL) && (m_encoding != rfbEncodingRaw)); };
-
 
 protected:
 
@@ -169,28 +169,28 @@ protected:
 	inline BOOL CheckBuffer();
 
 	// Pixel buffers and access to display buffer
-	BYTE		*m_clientbuff;
+	BYTE* m_clientbuff;
 	UINT		m_clientbuffsize;
 
 	// Pixel formats, translation and encoding
 	rfbPixelFormat	m_clientformat = {};
 	BOOL			m_clientfmtset;
 	rfbTranslateFnType	m_transfunc;
-	vncEncoder*		m_encoder;
-	vncEncoder*		zrleEncoder;
+	vncEncoder* m_encoder;
+	vncEncoder* zrleEncoder;
 	bool			xz_encoder_in_use;
-	vncEncoder*		m_hold_xz_encoder;
+	vncEncoder* m_hold_xz_encoder;
 	bool			zlib_encoder_in_use;
-	vncEncoder*		m_hold_zlib_encoder;
+	vncEncoder* m_hold_zlib_encoder;
 	bool			ultra_encoder_in_use;
-	vncEncoder*		m_hold_ultra_encoder;
-	vncEncoder*		m_hold_ultra2_encoder;
+	vncEncoder* m_hold_ultra_encoder;
+	vncEncoder* m_hold_ultra2_encoder;
 	bool			zlibhex_encoder_in_use;
-	vncEncoder*		m_hold_zlibhex_encoder;
+	vncEncoder* m_hold_zlibhex_encoder;
 	bool			tight_encoder_in_use;
-	vncEncoder*		m_hold_tight_encoder;
+	vncEncoder* m_hold_tight_encoder;
 
-	// Tight 
+	// Tight
 	int				m_compresslevel;
 	int				m_qualitylevel;
 	int				m_finequalitylevel;
@@ -215,7 +215,7 @@ protected:
 	int		monitor_Offsety;
 
 public:
-	vncBuffer	*m_buffer;
+	vncBuffer* m_buffer;
 	rfbServerInitMsg	m_scrinfo;
 	CARD32		m_encoding;
 	bool			ultra2_encoder_in_use;
@@ -230,19 +230,19 @@ inline vncEncodeMgr::vncEncodeMgr()
 	m_encoding = rfbEncodingRaw;
 	m_transfunc = NULL;
 
-	zrleEncoder=NULL;
+	zrleEncoder = NULL;
 	m_encoder = NULL;
-	m_buffer=NULL;
+	m_buffer = NULL;
 
 	m_clientbuff = NULL;
 	m_clientbuffsize = 0;
-/*	m_clientbackbuff = NULL;
-	m_clientbackbuffsize = 0;*/
+	/*	m_clientbackbuff = NULL;
+		m_clientbackbuffsize = 0;*/
 
 	m_clientfmtset = FALSE;
 	zlib_encoder_in_use = false;
 	m_hold_zlib_encoder = NULL;
-    ultra_encoder_in_use = false;
+	ultra_encoder_in_use = false;
 	ultra2_encoder_in_use = false;
 	m_hold_ultra_encoder = NULL;
 	m_hold_ultra2_encoder = NULL;
@@ -253,7 +253,7 @@ inline vncEncodeMgr::vncEncodeMgr()
 	xz_encoder_in_use = false;
 	m_hold_xz_encoder = NULL;
 
-	// Tight 
+	// Tight
 	m_compresslevel = 6;
 	m_qualitylevel = -1;
 	m_finequalitylevel = -1;
@@ -262,11 +262,10 @@ inline vncEncodeMgr::vncEncodeMgr()
 	// Tight CURSOR HANDLING
 	m_use_xcursor = FALSE;
 	m_use_richcursor = FALSE;
-//	m_hcursor = NULL;
+	//	m_hcursor = NULL;
 
 	monitor_Offsetx = 0;
 	monitor_Offsety = 0;
-
 }
 
 inline vncEncodeMgr::~vncEncodeMgr()
@@ -320,20 +319,20 @@ inline vncEncodeMgr::~vncEncodeMgr()
 	}
 	if (m_clientbuff != NULL)
 	{
-		delete [] m_clientbuff;
+		delete[] m_clientbuff;
 		m_clientbuff = NULL;
 	}
-/*	if (m_clientbackbuff != NULL)
-	{
-		delete m_clientbackbuff;
-		m_clientbackbuff = NULL;
-	}*/
+	/*	if (m_clientbackbuff != NULL)
+		{
+			delete m_clientbackbuff;
+			m_clientbackbuff = NULL;
+		}*/
 }
 
 inline void
-vncEncodeMgr::SetBuffer(vncBuffer *buffer)
+vncEncodeMgr::SetBuffer(vncBuffer* buffer)
 {
-	m_buffer=buffer;
+	m_buffer = buffer;
 	CheckBuffer();
 }
 
@@ -341,14 +340,14 @@ vncEncodeMgr::SetBuffer(vncBuffer *buffer)
 // -=- Encoding of pixel data for transmission
 //
 
-inline BYTE *
+inline BYTE*
 vncEncodeMgr::GetClientBuffer()
 {
 	return m_clientbuff;
 }
 
 inline BOOL
-vncEncodeMgr::GetPalette(RGBQUAD *quadlist, UINT ncolours)
+vncEncodeMgr::GetPalette(RGBQUAD* quadlist, UINT ncolours)
 {
 	// Try to get the RGBQUAD data from the encoder
 	// This will only work if the remote client is palette-based,
@@ -371,64 +370,64 @@ vncEncodeMgr::CheckBuffer()
 
 	// If the client has not specified a pixel format then set one for it
 	if (!m_clientfmtset) {
-	    m_clientfmtset = TRUE;
-	    m_clientformat = m_scrinfo.format;
+		m_clientfmtset = TRUE;
+		m_clientformat = m_scrinfo.format;
 	}
 
 	// If the client has not selected an encoding then set one for it
-	if ((m_encoder == NULL) && (!SetEncoding(rfbEncodingRaw,FALSE)))
+	if ((m_encoder == NULL) && (!SetEncoding(rfbEncodingRaw, FALSE)))
 		return FALSE;
 
 	// Check the client buffer is sufficient
 	const UINT clientbuffsize =
-	    m_encoder->RequiredBuffSize(m_scrinfo.framebufferWidth,
-									m_scrinfo.framebufferHeight);
+		m_encoder->RequiredBuffSize(m_scrinfo.framebufferWidth,
+			m_scrinfo.framebufferHeight);
 	if (m_clientbuffsize != clientbuffsize)
 	{
 		vnclog.Print(LL_INTINFO, VNCLOG("request client buffer[%u]\n"), clientbuffsize);
-	    if (m_clientbuff != NULL)
-	    {
-			delete [] m_clientbuff;
+		if (m_clientbuff != NULL)
+		{
+			delete[] m_clientbuff;
 			m_clientbuff = NULL;
-	    }
-	    m_clientbuffsize = 0;
+		}
+		m_clientbuffsize = 0;
 
-	    m_clientbuff = new BYTE [clientbuffsize];
+		m_clientbuff = new BYTE[clientbuffsize];
 
 		memset(m_clientbuff, 0, clientbuffsize);
-	    m_clientbuffsize = clientbuffsize;
+		m_clientbuffsize = clientbuffsize;
 	}
 
-/*	// Check the client backing buffer matches the server back buffer
-	const UINT backbuffsize = m_buffer->m_backbuffsize;
-	if (m_clientbackbuffsize != backbuffsize)
-	{
-		vnclog.Print(LL_INTINFO, VNCLOG("request client back buffer[%u]\n"), backbuffsize);
-		if (m_clientbackbuff) {
-			delete [] m_clientbackbuff;
-			m_clientbackbuff = 0;
-		}
-		m_clientbackbuffsize = 0;
+	/*	// Check the client backing buffer matches the server back buffer
+		const UINT backbuffsize = m_buffer->m_backbuffsize;
+		if (m_clientbackbuffsize != backbuffsize)
+		{
+			vnclog.Print(LL_INTINFO, VNCLOG("request client back buffer[%u]\n"), backbuffsize);
+			if (m_clientbackbuff) {
+				delete [] m_clientbackbuff;
+				m_clientbackbuff = 0;
+			}
+			m_clientbackbuffsize = 0;
 
-		m_clientbackbuff = new BYTE[backbuffsize];
-		if (!m_clientbackbuff) {
-			vnclog.Print(LL_INTERR, VNCLOG("unable to allocate client back buffer[%u]\n"), backbuffsize);
-			return FALSE;
+			m_clientbackbuff = new BYTE[backbuffsize];
+			if (!m_clientbackbuff) {
+				vnclog.Print(LL_INTERR, VNCLOG("unable to allocate client back buffer[%u]\n"), backbuffsize);
+				return FALSE;
+			}
+			memset(m_clientbackbuff, 0, backbuffsize);
+			m_clientbackbuffsize = backbuffsize;
 		}
-		memset(m_clientbackbuff, 0, backbuffsize);
-		m_clientbackbuffsize = backbuffsize;
-	}
 
-	vnclog.Print(LL_INTINFO, VNCLOG("remote buffer=%u\n"), m_clientbuffsize);*/
+		vnclog.Print(LL_INTINFO, VNCLOG("remote buffer=%u\n"), m_clientbuffsize);*/
 
 	return TRUE;
 }
 
 // Set the encoding to use
 inline BOOL
-vncEncodeMgr::SetEncoding(CARD32 encoding,BOOL reinitialize)
+vncEncodeMgr::SetEncoding(CARD32 encoding, BOOL reinitialize)
 {
-	if (m_scrinfo.format.bitsPerPixel!=32 && encoding==rfbEncodingUltra2)
+	if (m_scrinfo.format.bitsPerPixel != 32 && encoding == rfbEncodingUltra2)
 	{
 		//This is not supported, jpeg require 32bit buffers
 		//to avoif a server crash we switch to zrle encoding
@@ -441,46 +440,45 @@ vncEncodeMgr::SetEncoding(CARD32 encoding,BOOL reinitialize)
 
 	if (reinitialize)
 	{
-		encoding=m_encoding;
+		encoding = m_encoding;
 		if (!m_buffer->CheckBuffer())
-            return FALSE;
+			return FALSE;
 	}
-	else m_encoding=encoding;
+	else m_encoding = encoding;
 
 	// Delete the old encoder
 	if (m_encoder != NULL)
 	{
-		if ( zlib_encoder_in_use )
+		if (zlib_encoder_in_use)
 		{
 			m_hold_zlib_encoder = m_encoder;
 		}
-		else if ( ultra_encoder_in_use )
+		else if (ultra_encoder_in_use)
 		{
 			m_hold_ultra_encoder = m_encoder;
 		}
-		else if ( ultra2_encoder_in_use )
+		else if (ultra2_encoder_in_use)
 		{
 			m_hold_ultra2_encoder = m_encoder;
 		}
-		else if ( zlibhex_encoder_in_use )
+		else if (zlibhex_encoder_in_use)
 		{
 			m_hold_zlibhex_encoder = m_encoder;
 		}
-		else if ( tight_encoder_in_use )
+		else if (tight_encoder_in_use)
 		{
 			m_hold_tight_encoder = m_encoder;
 		}
-		else if ( xz_encoder_in_use )
+		else if (xz_encoder_in_use)
 		{
 			m_hold_xz_encoder = m_encoder;
 		}
 		else
 		{
-		if (m_encoder != zrleEncoder)
-			delete m_encoder;
+			if (m_encoder != zrleEncoder)
+				delete m_encoder;
 		}
 		m_encoder = NULL;
-		
 	}
 	zlib_encoder_in_use = false;
 	ultra_encoder_in_use = false;
@@ -489,9 +487,8 @@ vncEncodeMgr::SetEncoding(CARD32 encoding,BOOL reinitialize)
 	tight_encoder_in_use = false;
 	xz_encoder_in_use = false;
 	// Returns FALSE if the desired encoding cannot be used
-	switch(encoding)
+	switch (encoding)
 	{
-
 	case rfbEncodingRaw:
 
 		vnclog.Print(LL_INTINFO, VNCLOG("raw encoder requested\n"));
@@ -531,7 +528,7 @@ vncEncodeMgr::SetEncoding(CARD32 encoding,BOOL reinitialize)
 		// Create a Zlib encoder, if needed.
 		// If a Zlib encoder was used previously, then reuse it here
 		// to maintain zlib dictionary synchronization with the viewer.
-		if ( m_hold_ultra_encoder == NULL )
+		if (m_hold_ultra_encoder == NULL)
 		{
 			m_encoder = new vncEncodeUltra;
 		}
@@ -554,7 +551,7 @@ vncEncodeMgr::SetEncoding(CARD32 encoding,BOOL reinitialize)
 	case rfbEncodingUltra2:
 
 		vnclog.Print(LL_INTINFO, VNCLOG("Ultra encoder requested\n"));
-		if (m_scrinfo.format.bitsPerPixel!=32 || m_clientformat.bitsPerPixel != 32)
+		if (m_scrinfo.format.bitsPerPixel != 32 || m_clientformat.bitsPerPixel != 32)
 		{
 			vnclog.Print(LL_INTINFO, VNCLOG("jpeg encoder is only supported on 32bit color display\n"));
 			return false;
@@ -562,7 +559,7 @@ vncEncodeMgr::SetEncoding(CARD32 encoding,BOOL reinitialize)
 		// Create a Zlib encoder, if needed.
 		// If a Zlib encoder was used previously, then reuse it here
 		// to maintain zlib dictionary synchronization with the viewer.
-		if ( m_hold_ultra2_encoder == NULL )
+		if (m_hold_ultra2_encoder == NULL)
 		{
 			m_encoder = new vncEncodeUltra2;
 		}
@@ -582,7 +579,7 @@ vncEncodeMgr::SetEncoding(CARD32 encoding,BOOL reinitialize)
 		break;
 
 	case rfbEncodingZSTDRLE:
-		vnclog.Print(LL_INTINFO, VNCLOG("ZSTDRLE encoder requested\n"));			
+		vnclog.Print(LL_INTINFO, VNCLOG("ZSTDRLE encoder requested\n"));
 		if (!zrleEncoder)
 			zrleEncoder = new vncEncodeZRLE;
 		m_encoder = zrleEncoder;
@@ -590,7 +587,7 @@ vncEncodeMgr::SetEncoding(CARD32 encoding,BOOL reinitialize)
 		((vncEncodeZRLE*)zrleEncoder)->set_use_zstd(true);
 		break;
 	case rfbEncodingZRLE:
-		vnclog.Print(LL_INTINFO, VNCLOG("ZRLE encoder requested\n"));			
+		vnclog.Print(LL_INTINFO, VNCLOG("ZRLE encoder requested\n"));
 		if (!zrleEncoder)
 			zrleEncoder = new vncEncodeZRLE;
 		m_encoder = zrleEncoder;
@@ -599,7 +596,7 @@ vncEncodeMgr::SetEncoding(CARD32 encoding,BOOL reinitialize)
 		break;
 
 	case rfbEncodingZSTDYWRLE:
-		vnclog.Print(LL_INTINFO, VNCLOG("ZSTDYWRLE encoder requested\n"));		
+		vnclog.Print(LL_INTINFO, VNCLOG("ZSTDYWRLE encoder requested\n"));
 		if (!zrleEncoder)
 			zrleEncoder = new vncEncodeZRLE;
 		m_encoder = zrleEncoder;
@@ -607,7 +604,7 @@ vncEncodeMgr::SetEncoding(CARD32 encoding,BOOL reinitialize)
 		((vncEncodeZRLE*)zrleEncoder)->set_use_zstd(true);
 		break;
 	case rfbEncodingZYWRLE:
-		vnclog.Print(LL_INTINFO, VNCLOG("ZYWRLE encoder requested\n"));			
+		vnclog.Print(LL_INTINFO, VNCLOG("ZYWRLE encoder requested\n"));
 		if (!zrleEncoder)
 			zrleEncoder = new vncEncodeZRLE;
 		m_encoder = zrleEncoder;
@@ -617,7 +614,7 @@ vncEncodeMgr::SetEncoding(CARD32 encoding,BOOL reinitialize)
 #ifdef _XZ
 	case rfbEncodingXZ:
 		vnclog.Print(LL_INTINFO, VNCLOG("XZ encoder requested\n"));
-		if ( m_hold_xz_encoder == NULL )
+		if (m_hold_xz_encoder == NULL)
 			m_encoder = new vncEncodeXZ;
 		else
 			m_encoder = m_hold_xz_encoder;
@@ -627,7 +624,7 @@ vncEncodeMgr::SetEncoding(CARD32 encoding,BOOL reinitialize)
 
 	case rfbEncodingXZYW:
 		vnclog.Print(LL_INTINFO, VNCLOG("XZYW encoder requested\n"));
-		if ( m_hold_xz_encoder == NULL )
+		if (m_hold_xz_encoder == NULL)
 			m_encoder = new vncEncodeXZ;
 		else
 			m_encoder = m_hold_xz_encoder;
@@ -637,7 +634,7 @@ vncEncodeMgr::SetEncoding(CARD32 encoding,BOOL reinitialize)
 #endif
 
 	case rfbEncodingZlib:
-		vnclog.Print(LL_INTINFO, VNCLOG("Zlib encoder requested\n"));		
+		vnclog.Print(LL_INTINFO, VNCLOG("Zlib encoder requested\n"));
 		if (m_hold_zlib_encoder == NULL)
 			m_encoder = new vncEncodeZlib;
 		else
@@ -650,7 +647,7 @@ vncEncodeMgr::SetEncoding(CARD32 encoding,BOOL reinitialize)
 
 	case rfbEncodingZstd:
 		vnclog.Print(LL_INTINFO, VNCLOG("Zstd encoder requested\n"));
-		if ( m_hold_zlib_encoder == NULL )
+		if (m_hold_zlib_encoder == NULL)
 			m_encoder = new vncEncodeZlib;
 		else
 			m_encoder = m_hold_zlib_encoder;
@@ -674,7 +671,7 @@ vncEncodeMgr::SetEncoding(CARD32 encoding,BOOL reinitialize)
 
 	case rfbEncodingZstdHex:
 		vnclog.Print(LL_INTINFO, VNCLOG("ZstdbHex encoder requested\n"));
-		if ( m_hold_zlibhex_encoder == NULL )
+		if (m_hold_zlibhex_encoder == NULL)
 			m_encoder = new vncEncodeZlibHex;
 		else
 			m_encoder = m_hold_zlibhex_encoder;
@@ -686,7 +683,7 @@ vncEncodeMgr::SetEncoding(CARD32 encoding,BOOL reinitialize)
 
 	case rfbEncodingTight:
 		vnclog.Print(LL_INTINFO, VNCLOG("Tight encoder requested\n"));
-		if ( m_hold_tight_encoder == NULL )
+		if (m_hold_tight_encoder == NULL)
 			m_encoder = new vncEncodeTight;
 		else
 			m_encoder = m_hold_tight_encoder;
@@ -734,7 +731,7 @@ vncEncodeMgr::SetEncoding(CARD32 encoding,BOOL reinitialize)
 	}
 
 	m_buffer->ClearCache();
-	m_buffer->ClearBack();		
+	m_buffer->ClearBack();
 	m_encoder->SetBufferOffset(monitor_Offsetx, monitor_Offsety);
 	return CheckBuffer();
 }
@@ -743,7 +740,7 @@ vncEncodeMgr::SetEncoding(CARD32 encoding,BOOL reinitialize)
 // For Raw, RRE or Hextile, this is always 1.  For CoRRE, may be more,
 // because each update rect is limited in size.
 inline UINT
-vncEncodeMgr::GetNumCodedRects(const rfb::Rect &rect)
+vncEncodeMgr::GetNumCodedRects(const rfb::Rect& rect)
 {
 	// sf@2002 - Tight encoding
 	// TODO: Add the appropriate virtual NumCodedRects function to Tight encoder instead.
@@ -779,10 +776,10 @@ vncEncodeMgr::SetServerFormat()
 
 // Specify the client's pixel format
 inline BOOL
-vncEncodeMgr::SetClientFormat(rfbPixelFormat &format)
+vncEncodeMgr::SetClientFormat(rfbPixelFormat& format)
 {
 	vnclog.Print(LL_INTINFO, VNCLOG("SetClientFormat called\n"));
-	
+
 	// Save the desired format
 	m_clientfmtset = TRUE;
 	m_clientformat = format;
@@ -800,39 +797,39 @@ vncEncodeMgr::SetClientFormat(rfbPixelFormat &format)
 
 // Translate a rectangle to the client's pixel format
 inline UINT
-vncEncodeMgr::EncodeRect(const rfb::Rect &rect,VSocket *outconn)
+vncEncodeMgr::EncodeRect(const rfb::Rect& rect, VSocket* outconn)
 {
 	//Fix crash after resolution change
 	// vncencoder seems still to have to old resolution while other parts are already updated
 	// Could not find it, but this extra check eliminate the out of buffer updates during transition
-	if(rect.br.x>m_scrinfo.framebufferWidth) 
+	if (rect.br.x > m_scrinfo.framebufferWidth)
 		return 0;
-	if(rect.br.y>m_scrinfo.framebufferHeight) 
+	if (rect.br.y > m_scrinfo.framebufferHeight)
 		return 0;
 	// Call the encoder to encode the rectangle into the client buffer...
 	/*if (!m_clientbackbuffif){*/
-	if (!m_buffer->m_backbuff){
+	if (!m_buffer->m_backbuff) {
 		vnclog.Print(LL_INTERR, "no client back-buffer available in EncodeRect\n");
 		return 0;
 	}
 	if (zlib_encoder_in_use)
 	{
 		if (m_use_queue)
-			return m_encoder->EncodeRect(m_buffer->m_backbuff, outconn ,m_clientbuff, rect, 1);
-		else 
-			return m_encoder->EncodeRect(m_buffer->m_backbuff, outconn ,m_clientbuff, rect, 0);
+			return m_encoder->EncodeRect(m_buffer->m_backbuff, outconn, m_clientbuff, rect, 1);
+		else
+			return m_encoder->EncodeRect(m_buffer->m_backbuff, outconn, m_clientbuff, rect, 0);
 	}
 	if (ultra_encoder_in_use)
 	{
-		return m_encoder->EncodeRect(m_buffer->m_backbuff, outconn ,m_clientbuff, rect);
+		return m_encoder->EncodeRect(m_buffer->m_backbuff, outconn, m_clientbuff, rect);
 	}
 	if (ultra2_encoder_in_use)
 	{
-		return m_encoder->EncodeRect(m_buffer->m_backbuff, outconn ,m_clientbuff, rect);
+		return m_encoder->EncodeRect(m_buffer->m_backbuff, outconn, m_clientbuff, rect);
 	}
 
 	// sf@2002 - Tight encoding
-	if (tight_encoder_in_use || zlibhex_encoder_in_use  || ultra_encoder_in_use || ultra2_encoder_in_use)
+	if (tight_encoder_in_use || zlibhex_encoder_in_use || ultra_encoder_in_use || ultra2_encoder_in_use)
 	{
 		RECT TRect;
 		TRect.right = rect.br.x;
@@ -846,9 +843,9 @@ vncEncodeMgr::EncodeRect(const rfb::Rect &rect,VSocket *outconn)
 }
 
 inline UINT
-vncEncodeMgr::EncodeBulkRects(const rfb::RectVector &allRects, int nScale, VSocket *outconn)
+vncEncodeMgr::EncodeBulkRects(const rfb::RectVector& allRects, int nScale, VSocket* outconn)
 {
-	if (!m_buffer->m_backbuff){
+	if (!m_buffer->m_backbuff) {
 		vnclog.Print(LL_INTERR, "no client back-buffer available in EncodeRect\n");
 		return 0;
 	}
@@ -858,7 +855,7 @@ vncEncodeMgr::EncodeBulkRects(const rfb::RectVector &allRects, int nScale, VSock
 	// Work through the list of rectangles, sending each one
 	rfb::RectVector::const_iterator i;
 
-	for (i=allRects.begin();i!=allRects.end();i++) {
+	for (i = allRects.begin(); i != allRects.end(); i++) {
 		rfb::Rect ScaledRect = *i;
 		if (nScale != 1) {
 			ScaledRect.tl.y = ScaledRect.tl.y / nScale;
@@ -866,8 +863,8 @@ vncEncodeMgr::EncodeBulkRects(const rfb::RectVector &allRects, int nScale, VSock
 			ScaledRect.tl.x = ScaledRect.tl.x / nScale;
 			ScaledRect.br.x = ScaledRect.br.x / nScale;
 		}
-		if(ScaledRect.br.x>m_scrinfo.framebufferWidth) return 0;
-		if(ScaledRect.br.y>m_scrinfo.framebufferHeight) return 0;
+		if (ScaledRect.br.x > m_scrinfo.framebufferWidth) return 0;
+		if (ScaledRect.br.y > m_scrinfo.framebufferHeight) return 0;
 
 		scaledRects.push_back(ScaledRect);
 	}
@@ -875,18 +872,17 @@ vncEncodeMgr::EncodeBulkRects(const rfb::RectVector &allRects, int nScale, VSock
 	return m_encoder->EncodeBulkRects(scaledRects, m_buffer->m_backbuff, m_clientbuff, outconn);
 }
 
-
-rfb::Rect 
+rfb::Rect
 vncEncodeMgr::GetSize()
 {
 	return m_buffer->GetSize();
 }
 inline void
-vncEncodeMgr::SetBufferOffset(int x,int y)
+vncEncodeMgr::SetBufferOffset(int x, int y)
 {
 	monitor_Offsetx = x;
 	monitor_Offsety = y;
-	m_encoder->SetBufferOffset(x,y);
+	m_encoder->SetBufferOffset(x, y);
 }
 
 inline void
@@ -922,18 +918,18 @@ vncEncodeMgr::IsCursorUpdatePending()
 inline BOOL
 vncEncodeMgr::WasCursorUpdatePending()
 {
-	BOOL pending=m_buffer->IsCursorUpdatePending();
+	BOOL pending = m_buffer->IsCursorUpdatePending();
 	m_buffer->SetCursorPending(FALSE);
 	return pending;
 }
 
 inline BOOL
-vncEncodeMgr::SendCursorShape(VSocket *outConn) {
+vncEncodeMgr::SendCursorShape(VSocket* outConn) {
 	return m_encoder->SendCursorShape(outConn, m_buffer->m_desktop);
 }
 
 inline BOOL
-vncEncodeMgr::SendEmptyCursorShape(VSocket *outConn) {
+vncEncodeMgr::SendEmptyCursorShape(VSocket* outConn) {
 	return m_encoder->SendEmptyCursorShape(outConn);
 }
 
@@ -1018,10 +1014,9 @@ vncEncodeMgr::IsCacheEnabled()
 }
 
 inline void
-vncEncodeMgr::LastRect(VSocket *outConn)
+vncEncodeMgr::LastRect(VSocket* outConn)
 {
 	m_encoder->LastRect(outConn);
 }
 
 #endif // _WINVNC_VNCENCODEMGR
-

@@ -69,6 +69,7 @@
 #include <stdio.h>
 #include <process.h>
 #include <crtdbg.h>
+#include "HelperFunctions.h"
 
 //#include "dpi.h"
 
@@ -113,7 +114,6 @@ extern VNCLog vnclog;
 //#endif
 //#define memcpy memcpy_amd
 //remove comment to compiler for >=athlon  or >=PIII
-DWORD MessageBoxSecure(HWND hWnd,LPCTSTR lpText,LPCTSTR lpCaption,UINT uType);
 
 extern void WriteLog(char* sender, char *format, ...);
 #ifdef _DEBUG

@@ -35,7 +35,8 @@
 #include "rfbRegion.h"
 #include "rfbRect.h"
 #include "vncdesktop.h"
-#include "vncservice.h"
+
+
 
 rfb::Rect vncDesktop::GetSize()
 {

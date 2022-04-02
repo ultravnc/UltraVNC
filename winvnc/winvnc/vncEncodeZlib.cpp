@@ -183,7 +183,6 @@ inline UINT vncEncodeZlib::EncodeOneRect(BYTE *source, BYTE *dest, const RECT &r
 	if (rawDataSize < ultraVncZ->minSize())
 		return vncEncoder::EncodeRect(source, dest, rect);
 
-	UINT newsize=0;
 	if (rawDataSize < 1000 && m_queueEnable) {
 		surh->encoding = Swap32IfLE(rfbEncodingRaw);
 		memcpy(dest + sz_rfbFramebufferUpdateRectHeader, m_buffer, rawDataSize);

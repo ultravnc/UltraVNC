@@ -36,10 +36,10 @@
 #include <ctype.h>
 
 #include "Localization.h" // ACT : Add localization on messages
+#include "SettingsManager.h"
 
 //	[v1.0.2-jp1 fix] Load resouce from dll
 extern HINSTANCE	hInstResDLL;
-extern BOOL SPECIAL_SC_PROMPT;
 
 // Constructor
 
@@ -66,7 +66,6 @@ INT_PTR vncConnDialog::DoDialog(bool rep)
 	//adzm 2009-06-20 - Return the result
 	INT_PTR nResult = DialogBoxParam(hInstResDLL, MAKEINTRESOURCE(IDD_OUTGOING_CONN), 
 		NULL, (DLGPROC) vncConnDlgProc, (LONG_PTR) this);
-	delete this;
 	return nResult;
 }
 
@@ -98,7 +97,7 @@ BOOL CALLBACK vncConnDialog::vncConnDlgProc(HWND hwnd,
 				SetDlgItemText(hwnd, IDC_HOSTNAME_EDIT, g_szRepeaterHost);
 
 				//adzm 2009-06-20
-				if (SPECIAL_SC_PROMPT) {
+				if (settings->getScPrompt()) {
 					HWND hwndChild = GetDlgItem(hwnd, IDC_HOSTNAME_EDIT);
 					if (hwndChild) {
 						ShowWindow(hwndChild, SW_HIDE);
@@ -308,11 +307,11 @@ BOOL CALLBACK vncConnDialog::vncConnDlgProc(HWND hwnd,
 						// adzm 2009-07-05 - repeater IDs
 						// Add the new client to this server
 						// adzm 2009-08-02
-						_this->m_server->AddClient(tmpsock, !_this->m_server->GetReverseAuthRequired(), TRUE, 0, NULL, finalidcode, actualhostname, port,true);
+						_this->m_server->AddClient(tmpsock, !settings->getReverseAuthRequired(), TRUE, 0, NULL, finalidcode, actualhostname, port,true);
 					} else {
 						// Add the new client to this server
 						// adzm 2009-08-02
-						_this->m_server->AddClient(tmpsock, !_this->m_server->GetReverseAuthRequired(), TRUE, 0, NULL, NULL, actualhostname, port,true);
+						_this->m_server->AddClient(tmpsock, !settings->getReverseAuthRequired(), TRUE, 0, NULL, NULL, actualhostname, port,true);
 					}
 				// And close the dialog
 				EndDialog(hwnd, TRUE);

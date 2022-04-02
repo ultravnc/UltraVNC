@@ -25,15 +25,13 @@
 #include "winvnc.h"
 #include "vncserver.h"
 #include "vncdesktop.h"
-#include "vncservice.h"
 #include <string.h>
 #include "uvncUiAccess.h"
 #include "vncOSVersion.h"
+#include "SettingsManager.h"
 
 #define WM_DPICHANGED       0x02E0
 
-#define MSGFLT_ADD		1
-typedef BOOL (WINAPI *CHANGEWINDOWMESSAGEFILTER)(UINT message, DWORD dwFlag);
 int OSversion();
 DWORD WINAPI InitWindowThread(LPVOID lpParam);
 extern char g_hookstring[16];
@@ -103,7 +101,7 @@ vncDesktop::StartInitWindowthread()
 			if (InitWindowThreadh==NULL)
 			{
 				ResetEvent(restart_event);
-				if (m_server->Win8HelperEnabled()) 
+				if (settings->getEnableWin8Helper())
 					keybd_initialize();
 				InitWindowThreadh=CreateThread(NULL,0,InitWindowThread,this,0,&pumpID);
 				DWORD status=WaitForSingleObject(restart_event,10000);
@@ -147,7 +145,7 @@ InitWindowThread(LPVOID lpParam)
 	//if (mydesk->m_server->Win8HelperEnabled()) 
 		//keybd_initialize();
 	mydesk->InitWindow();
-	if (mydesk->m_server->Win8HelperEnabled())
+	if (settings->getEnableWin8Helper())
 		keybd_delete();
 	return 0;
 }
@@ -181,8 +179,8 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 				_this->SetHook(hwnd);
 				vnclog.Print(LL_INTERR, VNCLOG("set SC hooks OK\n"));
 				_this->m_hookinited = TRUE;
-				if (_this->SetKeyboardFilterHooks) _this->SetKeyboardFilterHooks(_this->m_bIsInputDisabledByClient || _this->m_server->LocalInputsDisabled());
-				if (_this->SetMouseFilterHooks) _this->SetMouseFilterHooks(_this->m_bIsInputDisabledByClient || _this->m_server->LocalInputsDisabled());
+				if (_this->SetKeyboardFilterHooks) _this->SetKeyboardFilterHooks(_this->m_bIsInputDisabledByClient || settings->getDisableLocalInputs());
+				if (_this->SetMouseFilterHooks) _this->SetMouseFilterHooks(_this->m_bIsInputDisabledByClient || settings->getDisableLocalInputs());
 			}
 			else if (_this->SetHooks)
 			{
@@ -195,7 +193,7 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 				{
 					vnclog.Print(LL_INTERR, VNCLOG("failed to set system hooks\n"));
 					// Switch on full screen polling, so they can see something, at least...
-					_this->m_server->PollFullScreen(TRUE);
+					settings->setPollFullScreen(TRUE);
 					_this->m_hookinited = FALSE;
 				}
 				else
@@ -203,12 +201,12 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 					vnclog.Print(LL_INTERR, VNCLOG("set hooks OK\n"));
 					_this->m_hookinited = TRUE;
 					// Start up the keyboard and mouse filters
-					if (_this->SetKeyboardFilterHook) _this->SetKeyboardFilterHook(_this->m_bIsInputDisabledByClient || _this->m_server->LocalInputsDisabled());
-					if (_this->SetMouseFilterHook) _this->SetMouseFilterHook(_this->m_bIsInputDisabledByClient || _this->m_server->LocalInputsDisabled());
+					if (_this->SetKeyboardFilterHook) _this->SetKeyboardFilterHook(_this->m_bIsInputDisabledByClient || settings->getDisableLocalInputs());
+					if (_this->SetMouseFilterHook) _this->SetMouseFilterHook(_this->m_bIsInputDisabledByClient || settings->getDisableLocalInputs());
 				}
 			}
 		}
-		if (wParam==1001 && _this->m_server->Win8HelperEnabled())
+		if (wParam==1001 && settings->getEnableWin8Helper())
 			keepalive();
 		if (wParam == 110) {
 			_this->m_buffer.m_cursor_shape_cleared = TRUE;
@@ -236,13 +234,13 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 				{
 					if (_this->SetHook)
 					{
-						if (_this->SetKeyboardFilterHooks) _this->SetKeyboardFilterHooks( _this->m_bIsInputDisabledByClient || _this->m_server->LocalInputsDisabled());
-						if (_this->SetMouseFilterHooks) _this->SetMouseFilterHooks( _this->m_bIsInputDisabledByClient || _this->m_server->LocalInputsDisabled());
+						if (_this->SetKeyboardFilterHooks) _this->SetKeyboardFilterHooks( _this->m_bIsInputDisabledByClient || settings->getEnableWin8Helper());
+						if (_this->SetMouseFilterHooks) _this->SetMouseFilterHooks( _this->m_bIsInputDisabledByClient || settings->getEnableWin8Helper());
 					}
 					else if (_this->SetHooks)
 					{
-						if (_this->SetKeyboardFilterHook) _this->SetKeyboardFilterHook( _this->m_bIsInputDisabledByClient || _this->m_server->LocalInputsDisabled());
-						if (_this->SetMouseFilterHook) _this->SetMouseFilterHook( _this->m_bIsInputDisabledByClient || _this->m_server->LocalInputsDisabled());
+						if (_this->SetKeyboardFilterHook) _this->SetKeyboardFilterHook( _this->m_bIsInputDisabledByClient || settings->getEnableWin8Helper());
+						if (_this->SetMouseFilterHook) _this->SetMouseFilterHook( _this->m_bIsInputDisabledByClient || settings->getEnableWin8Helper());
 					}
 				}
 		}
@@ -505,18 +503,12 @@ vncDesktop::InitWindow()
 	{
 		vnclog.Print(LL_INTERR, VNCLOG("InitWindow:SelectHDESK:!SetThreadDesktop \n"));
 	}
-
-	HMODULE  hUser32 = LoadLibrary("user32.dll");
-	CHANGEWINDOWMESSAGEFILTER pfnFilter = NULL;
-	pfnFilter =(CHANGEWINDOWMESSAGEFILTER)GetProcAddress(hUser32,"ChangeWindowMessageFilter");
-	if (pfnFilter) 
-		{	
-			pfnFilter(RFB_SCREEN_UPDATE, MSGFLT_ADD);
-			pfnFilter(RFB_COPYRECT_UPDATE, MSGFLT_ADD);
-			pfnFilter(RFB_MOUSE_UPDATE, MSGFLT_ADD);
-			pfnFilter(WM_QUIT, MSGFLT_ADD);
-			pfnFilter(WM_SHUTDOWN, MSGFLT_ADD);
-		}
+	
+	ChangeWindowMessageFilter(RFB_SCREEN_UPDATE, MSGFLT_ADD);
+	ChangeWindowMessageFilter(RFB_COPYRECT_UPDATE, MSGFLT_ADD);
+	ChangeWindowMessageFilter(RFB_MOUSE_UPDATE, MSGFLT_ADD);
+	ChangeWindowMessageFilter(WM_QUIT, MSGFLT_ADD);
+	ChangeWindowMessageFilter(WM_SHUTDOWN, MSGFLT_ADD);
 
 	if (m_wndClass == 0) {
 		// Create the window class

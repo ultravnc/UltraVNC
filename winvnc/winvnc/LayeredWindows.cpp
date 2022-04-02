@@ -12,7 +12,6 @@
 #include <time.h>
 #include "stdhdrs.h"
 #include "resource.h"
-#include "vncservice.h"
 #include "vncdesktop.h"
 #include "vncdesktopthread.h"
 #include "vncOSVersion.h"
@@ -374,7 +373,7 @@ bool LayeredWindows::create_border_window(RECT rect)
 
 bool LayeredWindows::SetBlankMonitor(bool enabled, bool blankMonitorEnabled, bool black_window_active)
 {
-    if (!VNC_OSVersion::getInstance()->OS_WIN10_TRANS && VNC_OSVersion::getInstance()->OS_WIN10
+    if ((!VNC_OSVersion::getInstance()->OS_WIN10_TRANS && VNC_OSVersion::getInstance()->OS_WIN10)
         || VNC_OSVersion::getInstance()->OS_WIN8)
         return false;
 

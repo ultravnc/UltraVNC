@@ -35,8 +35,8 @@
 #include "vncserver.h"
 #include <omnithread.h>
 #include "resource.h"
-
 #include <ctype.h>
+#include "SettingsManager.h"
 
 //	[v1.0.2-jp1 fix]
 extern	HINSTANCE	hInstResDLL;
@@ -109,15 +109,6 @@ const char HTTP_MSG_NOSOCKCONN [] =
 "  <BODY>\n"
 "    <H1>Connections Disabled</H1>\n"
 "    The requested desktop is not configured to accept incoming connections.\n"
-"  </BODY>\n"
-"</HTML>\n";
-
-const char HTTP_MSG_BADPARAMS [] =
-"<HTML>\n"
-"  <HEAD><TITLE>UltraVNC desktop</TITLE></HEAD>\n"
-"  <BODY>\n"
-"    <H1>Bad Parameters</H1>\n"
-"    The sequence of applet parameters specified within the URL is invalid.\n"
 "  </BODY>\n"
 "</HTML>\n";
 
@@ -330,8 +321,8 @@ void vncHTTPConnectThread::DoHTTP(VSocket *socket)
 			// Send the java applet page
 			sprintf_s(indexpage, HTTP_FMT_INDEX,
 				desktopname, width, height+32,
-				m_server->GetPort(), width, height+32,
-				m_server->GetPort()
+				settings->getPortNumber(), width, height+32,
+				settings->getPortNumber()
 				);
 		}
 		else
@@ -350,7 +341,7 @@ void vncHTTPConnectThread::DoHTTP(VSocket *socket)
 	// File requested was not the index so check the mappings
 	// list for a different file.
 
-	if (m_server->MSLogonRequired())
+	if (settings->getRequireMSLogon())
 	{
 
 		for (int x=0; x < filemappingsize; x++)
@@ -547,7 +538,7 @@ BOOL vncHTTPConnect::Init(vncServer *server, UINT port)
 	// Save the port id
 	m_port = port;
 #ifdef IPV6V4
-	if (!m_socket.CreateBindListen(m_port, server->LoopbackOnly()))
+	if (!m_socket.CreateBindListen(m_port, settings->getLoopbackOnly()))
 		return FALSE;
 #else
 	// Create the listening socket
@@ -555,7 +546,7 @@ BOOL vncHTTPConnect::Init(vncServer *server, UINT port)
 		return FALSE;
 
 	// Bind it
-	if (!m_socket.Bind(m_port, server->LoopbackOnly()))
+	if (!m_socket.Bind(m_port, settings->getAllowLoopback()))
 		return FALSE;
 
 	// Set it to listen

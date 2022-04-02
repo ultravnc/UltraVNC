@@ -38,85 +38,22 @@ public:
 	// Constructor/destructor
 	vncPropertiesPoll();
 	~vncPropertiesPoll();
-
-	// Initialisation
 	BOOL Init(vncServer *server);
 
 	// The dialog box window proc
 	static BOOL CALLBACK DialogProcPoll(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	void Show();
 
-	// Display the properties dialog
-	// If usersettings is TRUE then the per-user settings come up
-	// If usersettings is FALSE then the default system settings come up
-	void Show(BOOL show, BOOL usersettings);
-
-	// Loading & saving of preferences
-	void Load(BOOL usersettings);
-	void ResetRegistry();
-
-	void Save();
-
-	BOOL m_fUseRegistry;
 	// Ini file
 	IniFile myIniFile;
 	void LoadFromIniFile();
-	void LoadUserPrefsPollFromIniFile();
 	void SaveToIniFile();
-	void SaveUserPrefsPollToIniFile();
 
 	// Implementation
 protected:
 	// The server object to which this properties object is attached.
 	vncServer *			m_server;
-
-	// Flag to indicate whether the currently loaded settings are for
-	// the current user, or are default system settings
-	BOOL				m_usersettings;
-
-
-	// String handling
-	char * LoadString(HKEY k, LPCSTR valname);
-	void SaveString(HKEY k, LPCSTR valname, const char *buffer);
-
-	// Manipulate the registry settings
-	LONG LoadInt(HKEY key, LPCSTR valname, LONG defval);
-	void SaveInt(HKEY key, LPCSTR valname, LONG val);
-
-
-	// Loading/saving all the user prefs
-	void LoadUserPrefsPoll(HKEY appkey);
-	void SaveUserPrefsPoll(HKEY appkey);
-
-	// [v1.0.2-jp2 fix]
-	void LoadSingleWindowName(HKEY key, char *buffer);
-
-	// Making the loaded user prefs active
-	void ApplyUserPrefs();
-	
-	BOOL m_returncode_valid;
 	BOOL m_dlgvisible;
-
-	BOOL m_pref_TurboMode;
-	
-	BOOL m_pref_PollUnderCursor;
-	BOOL m_pref_PollForeground;
-	BOOL m_pref_PollFullScreen;
-	BOOL m_pref_PollConsoleOnly;
-	BOOL m_pref_PollOnEventOnly;
-	LONG m_pref_MaxCpu;
-	LONG m_pref_MaxFPS;
-
-	BOOL m_pref_Driver;
-	BOOL m_pref_Hook;
-	BOOL m_pref_Virtual;
-
-	// [v1.0.2-jp2 fix]
-	BOOL m_pref_SingleWindow;
-	char m_pref_szSingleWindowName[32];
-	char m_Tempfile[MAX_PATH];
-	bool ddEngine;
-	int m_pref_autocapt;
-
 };
 
 #endif // _WINVNC_vncPropertiesPoll

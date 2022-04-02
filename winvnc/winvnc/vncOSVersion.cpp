@@ -26,6 +26,7 @@
 #include <windows.h>
 #include "vncOSVersion.h"
 #include "stdhdrs.h"
+#include "dwmapi.h"
 #ifndef SUCCEEDED
 #define SUCCEEDED(hr) (((HRESULT)(hr)) >= 0)
 #endif
@@ -126,9 +127,10 @@ VNC_OSVersion::SetAeroState()
 	else OS_LAYER_ON=false;
 	//is aero on/off
 	BOOL pfnDwmEnableCompositiond = FALSE;
-	if (pfnDwmIsCompositionEnabled==NULL) OS_AERO_ON=false;
-	else if (SUCCEEDED(pfnDwmIsCompositionEnabled(&pfnDwmEnableCompositiond))) OS_AERO_ON=pfnDwmEnableCompositiond;
-	else OS_AERO_ON=false;	
+	if (SUCCEEDED(DwmIsCompositionEnabled(&pfnDwmEnableCompositiond)))
+		OS_AERO_ON = pfnDwmEnableCompositiond;
+	else
+		OS_AERO_ON = false;
 }
 
 bool
@@ -169,9 +171,11 @@ VNC_OSVersion::DisableAero(VOID)
  { 
 
 	     BOOL pfnDwmEnableCompositiond = FALSE;   
-         if (!(pfnDwmIsCompositionEnabled && SUCCEEDED(pfnDwmIsCompositionEnabled(&pfnDwmEnableCompositiond))))  return; 
-         if (!pfnDwmEnableCompositiond) return;   
-		 if (pfnDwmEnableComposition && SUCCEEDED(pfnDwmEnableComposition(FALSE))) {			  
+         if (!(SUCCEEDED(DwmIsCompositionEnabled(&pfnDwmEnableCompositiond))))  
+			 return; 
+         if (!pfnDwmEnableCompositiond) 
+			 return;   
+		 if (SUCCEEDED(DwmEnableComposition(FALSE))) {			  
 			AeroWasEnabled = pfnDwmEnableCompositiond;
 		  }
 

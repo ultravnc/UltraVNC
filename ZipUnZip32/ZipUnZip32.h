@@ -197,12 +197,8 @@ public:
 
 private:
 	// Zip part
-	_DLL_ZIP				m_PZipArchive; // Zip function
-	_ZIP_USER_FUNCTIONS		m_PZipInit;    // Zip init
-	ZIPSETOPTIONS			m_PZipSetOptions; // Zip set options
 
 	LPZIPUSERFUNCTIONS m_lpZipUserFunctions;
-	int m_hFile;
 
 	ZCL m_ZpZCL;
 	ZPOPT m_ZpOpt;
@@ -213,16 +209,13 @@ private:
 
 	// Unzip part
 	//_DLL_UNZIP m_PWiz_SingleEntryUnzip; // Unzip function pointer
-	_USER_FUNCTIONS m_PWiz_Init;        // Init function pointer
 
 	LPUSERFUNCTIONS m_lpUserFunctions;
 	LPDCL m_lpDCL;
 //	HINSTANCE m_hUnzipDll;
-	int m_hUnzipFile;
 
 	HANDLE m_hUF;
 	HANDLE m_hDCL;
-	HANDLE m_hZCL;
 
 	void FreeUpUnzipMemory(void);
 

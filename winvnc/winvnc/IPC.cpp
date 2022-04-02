@@ -67,7 +67,6 @@ bool CIPC::CreateIPCMMF(void)
 			0,
 			listsize,
 			g_szIPCSharedMMF);
-		DWORD error=GetLastError();
 		if(m_hFileMap != NULL)
 			bCreated = true;
 	}

@@ -36,7 +36,6 @@
 #include "rfbRegion.h"
 #include "rfbRect.h"
 #include "vncdesktop.h"
-#include "vncservice.h"
 // Modif rdv@2002 - v1.1.x - videodriver
 #include "vncOSVersion.h"
 

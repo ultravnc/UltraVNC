@@ -163,7 +163,6 @@ void ShowActiveDesktop()
 }
 		
 // OK, so this doesn't work in multiple threads or nest...
-static TCHAR	DesktopPattern[40];
 static BOOL		ADWasEnabled = false;
 static BOOL		ISWallPaperHided = false;
 static TCHAR SCREENNAME[1024];

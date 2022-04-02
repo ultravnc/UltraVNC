@@ -32,7 +32,6 @@
 // These macros are pdefined only when standard equivalents cannot
 // be found.
 
-
 #ifdef WIN32
 
 // WIN32-ONLY PROFILING CODE
@@ -58,17 +57,16 @@
 // This code works only on platforms providing __int64
 
 namespace rfb {
-
 	class CpuTime {
 	public:
-		CpuTime(const char *name)
+		CpuTime(const char* name)
 			: timer_name(_strdup(name)),
-			  kernel_time(0), user_time(0), iterations(0), max_user_time(0) {}
+			kernel_time(0), user_time(0), iterations(0), max_user_time(0) {}
 		~CpuTime() {
 			vnclog.Print(0, "timer %s : %I64ums (krnl), %I64ums (user), %I64uus (user-max) (%I64u its)\n",
-				timer_name, kernel_time/10000, user_time/10000, max_user_time/10,
+				timer_name, kernel_time / 10000, user_time / 10000, max_user_time / 10,
 				iterations);
-			delete [] timer_name;
+			delete[] timer_name;
 		}
 		char* timer_name;
 		__int64 kernel_time;
@@ -79,8 +77,8 @@ namespace rfb {
 
 	class CpuTimer {
 	public:
-		inline CpuTimer(CpuTime &ct) : cputime(ct) {
-			FILETIME create_time, end_time;
+		inline CpuTimer(CpuTime& ct) : cputime(ct) {
+			FILETIME create_time{}, end_time{};
 			if (!GetThreadTimes(GetCurrentThread(),
 				&create_time, &end_time,
 				(LPFILETIME)&start_kernel_time,
@@ -89,8 +87,8 @@ namespace rfb {
 			}
 		}
 		inline ~CpuTimer() {
-			FILETIME create_time, end_time;
-			__int64 end_kernel_time, end_user_time;
+			FILETIME create_time{}, end_time{};
+			__int64 end_kernel_time{}, end_user_time{};
 			if (!GetThreadTimes(GetCurrentThread(),
 				&create_time, &end_time,
 				(LPFILETIME)&end_kernel_time,
@@ -114,5 +112,3 @@ namespace rfb {
 #endif
 
 #endif // __RFB_MISC_INCLUDED__
-
-

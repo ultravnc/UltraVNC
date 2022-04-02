@@ -11,7 +11,7 @@
     <ClCompile Include="..\..\DSMPlugin\DSMPlugin.cpp" />
     <ClCompile Include="Dtwinver.cpp" />
     <ClCompile Include="getinfo.cpp" />
-    <ClCompile Include="helpers.cpp" />
+    <ClCompile Include="HelperFunctions.cpp" />
     <ClCompile Include="HideDesktop.cpp" />
     <ClCompile Include="inifile.cpp" />
     <ClCompile Include="initipp.cpp" />
@@ -21,8 +21,7 @@
     <ClCompile Include="rfbRegion_win32.cpp" />
     <ClCompile Include="rfbRegion_X11.cxx" />
     <ClCompile Include="rfbUpdateTracker.cpp" />
-    <ClCompile Include="service.cpp" />
-    <ClCompile Include="service_motor.cpp" />
+    <ClCompile Include="UltraVNCService.cpp" />
     <ClCompile Include="stdhdrs.cpp" />
     <ClCompile Include="tableinitcmtemplate.cpp" />
     <ClCompile Include="tableinittctemplate.cpp" />
@@ -67,7 +66,6 @@
     <ClCompile Include="vncproperties.cpp" />
     <ClCompile Include="vncpropertiesPoll.cpp" />
     <ClCompile Include="vncserver.cpp" />
-    <ClCompile Include="vncservice.cpp" />
     <ClCompile Include="vncsetauth.cpp" />
     <ClCompile Include="vncsockconnect.cpp" />
     <ClCompile Include="vnctimedmsgbox.cpp" />
@@ -77,7 +75,7 @@
     <ClCompile Include="..\..\ZipUnZip32\ZipUnzip32.cpp">
       <Filter>headers</Filter>
     </ClCompile>
-    <ClCompile Include="security.cpp" />
+    <ClCompile Include="credentials.cpp" />
     <ClCompile Include="DeskdupEngine.cpp" />
     <ClCompile Include="ScreenCapture.cpp" />
     <ClCompile Include="cadthread.cpp" />
@@ -85,6 +83,10 @@
     <ClCompile Include="VirtualDisplay.cpp" />
     <ClCompile Include="MouseSimulator.cpp" />
     <ClCompile Include="LayeredWindows.cpp" />
+    <ClCompile Include="..\loadmemory\MemoryModule.c" />
+    <ClCompile Include="..\loadmemory\loadDllFromMemory.cpp" />
+    <ClCompile Include="ScSelect.cpp" />
+    <ClCompile Include="SettingsManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\ZipUnZip32\ZipUnZip32.h">
@@ -109,9 +111,6 @@
       <Filter>headers</Filter>
     </ClInclude>
     <ClInclude Include="vncsetauth.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="vncservice.h">
       <Filter>headers</Filter>
     </ClInclude>
     <ClInclude Include="vncserver.h">
@@ -285,6 +284,15 @@
     <ClInclude Include="VirtualDisplay.h" />
     <ClInclude Include="MouseSimulator.h" />
     <ClInclude Include="LayeredWindows.h" />
+    <ClInclude Include="HelperFunctions.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="UltraVNCService.h" />
+    <ClInclude Include="..\loadmemory\MemoryModule.h" />
+    <ClInclude Include="..\loadmemory\loadDllFromMemory.h" />
+    <ClInclude Include="ScSelect.h" />
+    <ClInclude Include="SettingsManager.h" />
+    <ClInclude Include="credentials.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="VTune\winvnc.vpj" />
@@ -426,24 +434,63 @@
     <None Include="res\world3a.ico">
       <Filter>resources</Filter>
     </None>
-    <None Include="cursor1.cur" />
-    <None Include="cursor2.cur" />
-    <None Include="cursor3.cur" />
-    <None Include="cursor4.cur" />
-    <None Include="cursor5.cur" />
-    <None Include="cursor6.cur" />
-    <None Include="cursor7.cur" />
-    <None Include="cursor8.cur" />
-    <None Include="cursor9.cur" />
-    <None Include="res\cursor1.cur" />
-    <None Include="res\cursor2.cur" />
-    <None Include="res\cursor3.cur" />
-    <None Include="res\cursor4.cur" />
-    <None Include="res\cursor5.cur" />
-    <None Include="res\cursor6.cur" />
-    <None Include="res\cursor7.cur" />
-    <None Include="res\cursor8.cur" />
-    <None Include="res\cursor9.cur" />
+    <None Include="cursor1.cur">
+      <Filter>resources</Filter>
+    </None>
+    <None Include="res\cursor1.cur">
+      <Filter>resources</Filter>
+    </None>
+    <None Include="res\cursor2.cur">
+      <Filter>resources</Filter>
+    </None>
+    <None Include="cursor2.cur">
+      <Filter>resources</Filter>
+    </None>
+    <None Include="cursor3.cur">
+      <Filter>resources</Filter>
+    </None>
+    <None Include="res\cursor3.cur">
+      <Filter>resources</Filter>
+    </None>
+    <None Include="cursor4.cur">
+      <Filter>resources</Filter>
+    </None>
+    <None Include="res\cursor4.cur">
+      <Filter>resources</Filter>
+    </None>
+    <None Include="res\cursor5.cur">
+      <Filter>resources</Filter>
+    </None>
+    <None Include="cursor5.cur">
+      <Filter>resources</Filter>
+    </None>
+    <None Include="res\cursor6.cur">
+      <Filter>resources</Filter>
+    </None>
+    <None Include="cursor6.cur">
+      <Filter>resources</Filter>
+    </None>
+    <None Include="res\cursor7.cur">
+      <Filter>resources</Filter>
+    </None>
+    <None Include="cursor7.cur">
+      <Filter>resources</Filter>
+    </None>
+    <None Include="cursor8.cur">
+      <Filter>resources</Filter>
+    </None>
+    <None Include="res\cursor8.cur">
+      <Filter>resources</Filter>
+    </None>
+    <None Include="cursor9.cur">
+      <Filter>resources</Filter>
+    </None>
+    <None Include="res\cursor9.cur">
+      <Filter>resources</Filter>
+    </None>
+    <None Include="..\SC_20\ddengine.dll" />
+    <None Include="..\SC_20\SecureVNCPlugin.dsm" />
+    <None Include="cpp.hint" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="resources">
@@ -451,9 +498,6 @@
     </Filter>
     <Filter Include="headers">
       <UniqueIdentifier>{9539db56-2e5e-4122-8bf0-7323b90ec8a6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="tabbedmenu">
-      <UniqueIdentifier>{43cd190c-e28b-442f-b9b8-1376d3a46d2d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -463,10 +507,18 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="up.bmp" />
-    <Image Include="down.bmp" />
-    <Image Include="res\LedGreen.bmp" />
-    <Image Include="res\LedRed.bmp" />
-    <Image Include="res\down.bmp" />
     <Image Include="res\up.bmp" />
+    <Image Include="res\down.bmp">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="down.bmp">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="res\LedGreen.bmp">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="res\LedRed.bmp">
+      <Filter>resources</Filter>
+    </Image>
   </ItemGroup>
 </Project>

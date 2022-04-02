@@ -27,8 +27,6 @@
 #include "stdhdrs.h"
 #include "vncacceptdialog.h"
 #include "winvnc.h"
-#include "vncservice.h"
-
 #include "resource.h"
 #include "common/win32_helpers.h"
 #include "inifile.h"
@@ -169,20 +167,6 @@ BOOL CALLBACK vncAcceptDialog::vncAcceptDlgProc(HWND hwnd,
 				sprintf_s(temp, "AutoReject:%u", (_this->m_timeoutCount));
 			SetDlgItemText(hwnd, IDC_ACCEPT_TIMEOUT, temp);
 
-			// Attempt to mimic Win98/2000 dialog behaviour
-			if ((vncService::IsWinNT() && (vncService::VersionMajor() <= 4)) ||
-				(vncService::IsWin95() && (vncService::VersionMinor() == 0)))
-			{
-				// Perform special hack to display the dialog safely
-				if (GetWindowThreadProcessId(GetForegroundWindow(), NULL) != GetCurrentProcessId())
-				{
-					// We can't set our dialog as foreground if the foreground window
-					// doesn't belong to us - it's unsafe!
-					SetActiveWindow(hwnd);
-					_this->m_foreground_hack = TRUE;
-					_this->m_flash_state = FALSE;
-				}
-			}
 			if (!_this->m_foreground_hack) {
 				SetForegroundWindow(hwnd);
 			}

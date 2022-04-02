@@ -39,38 +39,6 @@ class vncMenu;
 #include "vncabout.h"
 #include "vncListDlg.h"
 
-// Constants
-extern const UINT MENU_ADD_CLIENT_MSG;
-extern const UINT MENU_ADD_CLIENT_MSG_INIT;
-#ifdef IPV6V4
-extern const UINT MENU_ADD_CLIENT6_MSG;
-extern const UINT MENU_ADD_CLIENT6_MSG_INIT;
-#endif
-extern const UINT MENU_AUTO_RECONNECT_MSG;
-extern const UINT MENU_STOP_RECONNECT_MSG;
-extern const UINT MENU_STOP_ALL_RECONNECT_MSG;
-extern const UINT MENU_REPEATER_ID_MSG;
-// adzm 2009-07-05 - Tray icon balloon tips
-extern const UINT MENU_TRAYICON_BALLOON_MSG;
-extern const char *MENU_CLASS_NAME;
-
-// WTS Stuff for FastUserSwitching management
-typedef BOOL (WINAPI *WTSREGISTERSESSIONNOTIFICATION)(HWND, DWORD);
-typedef BOOL (WINAPI *WTSUNREGISTERSESSIONNOTIFICATION)(HWND);
-#define WM_WTSSESSION_CHANGE            0x02B1
-#define WTS_CONSOLE_CONNECT                0x1
-#define WTS_CONSOLE_DISCONNECT             0x2
-#define WTS_REMOTE_CONNECT                 0x3
-#define WTS_REMOTE_DISCONNECT              0x4
-#define WTS_SESSION_LOGON                  0x5
-#define WTS_SESSION_LOGOFF                 0x6
-#define WTS_SESSION_LOCK                   0x7
-#define WTS_SESSION_UNLOCK                 0x8
-#define WTS_SESSION_REMOTE_CONTROL         0x9
-#define NOTIFY_FOR_THIS_SESSION     0
-
-extern const UINT FileTransferSendPacketMessage;
-
 // The tray menu class itself
 class vncMenu
 {
@@ -82,9 +50,6 @@ public:
 
 	// adzm 2009-07-05 - Tray icon balloon tips
 	static void NotifyBalloon(char* szInfo, char* szTitle = NULL);
-
-	WTSREGISTERSESSIONNOTIFICATION FunctionWTSRegisterSessionNotification;
-	WTSUNREGISTERSESSIONNOTIFICATION FunctionWTSUnRegisterSessionNotification;
 
 protected:
 	// Tray icon handling
@@ -136,7 +101,6 @@ protected:
 	HICON			m_winvnc_icon;
 	HICON			m_flash_icon;
 
-	HINSTANCE   hWTSDll;
 	BOOL bConnectSock;
 	BOOL bAutoPort;
 	UINT port_rfb;

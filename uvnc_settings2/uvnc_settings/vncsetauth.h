@@ -79,7 +79,6 @@ public:
 	char pszgroup2[256];
 	char pszgroup3[256];
 
-	BOOL m_fUseRegistry;
 	IniFile myIniFile;
 };
 

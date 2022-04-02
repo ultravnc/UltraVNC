@@ -24,9 +24,6 @@
 
 #include "stdhdrs.h"
 #include "inifile.h"
-void Set_settings_as_admin(char *mycommand);
-
-//#define INIFILE_NAME "ultravnc.ini"
 
 char *g_szIniFile = 0;
 
@@ -81,32 +78,6 @@ IniFile::IniFileSetTemp(char *lpCmdLine)
 	strcpy_s(myInifile,260,lpCmdLine);
 }
 
-/*void
-IniFile::IniFileSetTemp()
-{
-char WORKDIR[MAX_PATH];
-
-	if (!GetTempPath(MAX_PATH,WORKDIR))
-	{
-		//Function failed, just set something
-		if (GetModuleFileName(NULL, WORKDIR, MAX_PATH))
-		{
-		char* p = strrchr(WORKDIR, '\\');
-		if (p == NULL) return;
-		*p = '\0';
-		}
-		strcpy_s(myInifile,"");
-		strcat_s(myInifile,WORKDIR);//set the directory
-		strcat_s(myInifile,"\\");
-		strcat_s(myInifile,INIFILE_NAME);
-		return;
-	}
-
-	strcpy_s(myInifile,"");
-	strcat_s(myInifile,WORKDIR);//set the directory
-	strcat_s(myInifile,INIFILE_NAME);
-}*/
-
 void
 IniFile::copy_to_secure()
 {
@@ -152,7 +123,7 @@ IniFile::copy_to_secure()
 		return;
 	}
 		error:
-		Set_settings_as_admin(myInifile);
+		settingsHelpers::Set_settings_as_admin(myInifile);
 }
 
 IniFile::~IniFile()
