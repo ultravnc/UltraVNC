@@ -1193,13 +1193,12 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth)
 	bool bSecureVNCPluginActive = std::find(current_auth.begin(), current_auth.end(), rfbUltraVNC_SecureVNCPluginAuth_new) != current_auth.end();
 	bool bSCPromptActive = std::find(current_auth.begin(), current_auth.end(), rfbUltraVNC_SCPrompt) != current_auth.end();
 	bool bSessionSelectActive = std::find(current_auth.begin(), current_auth.end(), rfbUltraVNC_SessionSelect) != current_auth.end();
+	bool brfbClientInitExtraMsgSupport = std::find(current_auth.begin(), current_auth.end(), rfbClientInitExtraMsgSupport) != current_auth.end();
 
 	if (current_auth.empty()) {
 		// send the UltraVNC auth type to identify ourselves as an UltraVNC server, but only initially
 		auth_types.push_back(rfbUltraVNC);
-	}
-	//Just tell the viewer we support ClientInitExtraMsg
-	auth_types.push_back(rfbClientInitExtraMsgSupport);
+	}	
 
 	// encryption takes priority over everything, for now at least.
 	// would be useful to have a host list to configure these settings.
@@ -1219,6 +1218,9 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth)
 		// adzm 2010-10 - Add the SessionSelect pseudo-auth
 		auth_types.push_back(rfbUltraVNC_SessionSelect);
 	}
+	else if (!brfbClientInitExtraMsgSupport)
+		//Just tell the viewer we support ClientInitExtraMsg
+		auth_types.push_back(rfbClientInitExtraMsgSupport);
 	else
 	{			
 		// Retrieve the local password
