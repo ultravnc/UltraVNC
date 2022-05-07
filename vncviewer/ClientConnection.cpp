@@ -585,7 +585,22 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	ShowToolbar = -1;
 	ExtDesktop = false;
 	tbWM_Set = false;
-	m_Dpi = GetDeviceCaps(GetDC(m_hwndMain), LOGPIXELSX);
+
+	hShcore = LoadLibrary(_T("Shcore.dll"));
+	if (hShcore)
+		// GetDpiForMonitor, Windows 8.1 [desktop apps only]
+		getDpiForMonitor = (PFN_GetDpiForMonitor)GetProcAddress(hShcore, "GetDpiForMonitor");
+	if (getDpiForMonitor)
+	{
+		HMONITOR monitor = MonitorFromWindow(m_hwndMain, MONITOR_DEFAULTTONEAREST);
+		UINT xScale, yScale;
+		getDpiForMonitor(monitor, MDT_DEFAULT, &xScale, &yScale);
+		m_Dpi = xScale;
+	}
+	else
+	{
+		m_Dpi = GetDeviceCaps(GetDC(m_hwndMain), LOGPIXELSX);
+	}
 	m_DpiOld = m_Dpi;
 	vnclog.Print(2, _T("DPI %d\n"), m_Dpi);
 	m_FullScreenNotDone = false;
@@ -3752,7 +3767,6 @@ void ClientConnection::SizeWindow(bool noPosChange, bool noSizeChange)
 		workheight = workrect.bottom - workrect.top;
 	}
 	vnclog.Print(2, _T("Screen work area is %d x %d\n"), workwidth, workheight);
-
 
 	// sf@2003 - AutoScaling   
 	// Thomas Levering 
