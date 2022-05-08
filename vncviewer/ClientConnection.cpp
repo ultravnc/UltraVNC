@@ -2861,11 +2861,11 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 
 			if (!auth_supported.empty()) {
 				std::vector<CARD8> auth_priority;
-				auth_priority.push_back(rfbUltraVNC);
-				auth_priority.push_back(rfbClientInitExtraMsgSupport);
+				auth_priority.push_back(rfbUltraVNC);				
 				auth_priority.push_back(rfbUltraVNC_SecureVNCPluginAuth_new);
 				auth_priority.push_back(rfbUltraVNC_SecureVNCPluginAuth);				
-				auth_priority.push_back(rfbUltraVNC_SCPrompt); // adzm 2010-10				
+				auth_priority.push_back(rfbUltraVNC_SCPrompt); // adzm 2010-10	
+				auth_priority.push_back(rfbClientInitExtraMsgSupport);
 				auth_priority.push_back(rfbUltraVNC_SessionSelect);
 				auth_priority.push_back(rfbUltraVNC_MsLogonIIAuth);
 				auth_priority.push_back(rfbVncAuth);
