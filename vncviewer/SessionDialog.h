@@ -45,10 +45,12 @@ public:
 	int m_port;
 	int m_proxyport;
 	bool m_fUseProxy;
+	bool m_fUseCloud;
 	bool m_fFromOptions; // sf@2002
 	bool m_fFromFile; // sf@2002
-	TCHAR m_host_dialog[256];
-	TCHAR m_proxyhost[256];
+	TCHAR m_host_dialog[MAX_HOST_NAME_LEN];
+	TCHAR m_proxyhost[MAX_HOST_NAME_LEN];
+	TCHAR m_Cloudhost[MAX_HOST_NAME_LEN];
    	virtual ~SessionDialog();
 
 	ClientConnection *m_pCC;

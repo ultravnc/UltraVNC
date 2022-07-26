@@ -35,13 +35,16 @@
 #define IDB_BITMAP1                     144
 #define IDD_MSLOGON                     145
 #define IDD_PROPERTIES1                 146
-#define IDD_ABOUT1                      147
 #define IDR_JAVAARCHIVE1                155
 #if defined(SC_20)
 #define IDR_DLL1                        176
 #define IDR_ENCRYPTIONDLL1              177
 #endif
-#define IDB_BITMAP3                     179
+#define IDD_DIALOGCLOUD                 178
+#define IDB_RED                         179
+#define IDB_GREEN                       180
+#define IDB_BITMAP3                     181
+#define IDB_YELLOW                      181
 #define IDB_EXPAND                      218
 #define IDB_COLLAPS                     219
 #define IDD_USER_NAME                   604
@@ -259,7 +262,14 @@
 #define IDC_EDITQUERYYEXT               1162
 #define IDC_EDITQUERYTEXT               1162
 #define IDC_OSD                         1163
-#define IDC_SCEXPAND                    1164
+#define IDC_CHECKCLOUD                  1164
+#define IDC_CLOUDSERVER                 1165
+#define IDC_CLOUDCODE                   1166
+#define IDC_STARTCLOUD                  1167
+#define IDC_EXTERNALIPADDRESS           1168
+#define IDC_CLOUDSTATUS                 1169
+#define IDC_YELLOW                      1170
+#define IDC_SCEXPAND                    1171
 #define IDC_SHOWOPTIONS                 2032
 #define IDC_BUTTON_EXPAND               2048
 #define IDC_FINGER                      9000
@@ -288,6 +298,8 @@
 #define ID_TRAY_DELETESOFTWARECAD       40026
 #define ID_TRAY_FORCEREBOOT             40028
 #define ID_REBOOT_FORCE                 40029
+#define ID_TRAY_CLOUDCONNECT            40030
+#define ID_MENU_CLOUDCONNECT            40031
 #define ID_FAILED_INIT                  41000
 #define ID_WINVNC_USAGE                 41001
 #define ID_ANOTHER_INST                 41002
@@ -349,9 +361,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        180
-#define _APS_NEXT_COMMAND_VALUE         40030
-#define _APS_NEXT_CONTROL_VALUE         1165
+#define _APS_NEXT_RESOURCE_VALUE        182
+#define _APS_NEXT_COMMAND_VALUE         40032
+#define _APS_NEXT_CONTROL_VALUE         1172
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

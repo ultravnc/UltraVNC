@@ -25,6 +25,7 @@
 #ifndef VNCOPTIONS_H__
 #define VNCOPTIONS_H__
 
+#define MAX_HOST_NAME_LEN 250
 #pragma once
 
 #include <vector>
@@ -115,11 +116,13 @@ public:
 	TCHAR	m_kbdname[9];
 	bool	m_kbdSpecified;
 	bool	m_UseEnc[LASTENCODING + 1];
-	TCHAR   m_host_options[256];
+	TCHAR   m_host_options[MAX_HOST_NAME_LEN];
 	int     m_port;
-	TCHAR   m_proxyhost[256];
+	TCHAR   m_proxyhost[MAX_HOST_NAME_LEN];
+	TCHAR   m_Cloudhost[MAX_HOST_NAME_LEN];
 	int     m_proxyport;
 	bool	m_fUseProxy;
+	bool	m_fUseCloud;
 	bool	m_allowMonitorSpanning;
 	bool	m_ChangeServerRes;
 	bool	m_extendDisplay;

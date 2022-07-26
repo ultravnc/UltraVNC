@@ -5,6 +5,7 @@
 
 #define MAXPWLEN 8
 #define MAXMSPWLEN 32
+#define MAX_HOST_NAME_LEN 250
 
 class SettingsManager
 {
@@ -217,6 +218,12 @@ public:
 	void setLocdom3(BOOL value) { m_pref_locdom3 = value; };
 	BOOL getLocdom3() { return m_pref_locdom3; };
 
+	void setCloudEnabled(BOOL value) { m_pref_cloudEnabled = value; };
+	BOOL getCloudEnabled() { return m_pref_cloudEnabled; };
+
+	void setCloudServer(TCHAR* value) { strcpy_s(m_pref_cloudServer, value); };
+	TCHAR* getCloudServer() { return m_pref_cloudServer; };
+
 
 #ifdef IPV6V4
 	// Whether or not to allow connections from the local machine
@@ -333,6 +340,9 @@ private:
 	BOOL m_pref_locdom1;
 	BOOL m_pref_locdom2;
 	BOOL m_pref_locdom3;
+
+	TCHAR m_pref_cloudServer[MAX_HOST_NAME_LEN];
+	bool m_pref_cloudEnabled;
 };
 
 extern SettingsManager* settings;

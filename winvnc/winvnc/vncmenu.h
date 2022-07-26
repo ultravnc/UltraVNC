@@ -38,6 +38,7 @@ class vncMenu;
 #include "vncpropertiesPoll.h"
 #include "vncabout.h"
 #include "vncListDlg.h"
+#include "CloudDialog.h"
 
 // The tray menu class itself
 class vncMenu
@@ -80,6 +81,7 @@ protected:
 	// Properties object for this server
 	vncProperties	m_properties;
 	vncPropertiesPoll	m_propertiesPoll;
+	CloudDialog	m_CloudDialog;
 
 	// About dialog for this server
 	vncAbout		m_about;

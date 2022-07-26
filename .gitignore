@@ -90,3 +90,9 @@ libjpeg-turbo-win/DebugLib-Static/
 *.idb
 addon/ms-logon/logging/x64/
 *.suo
+udt4/win/.vs/
+udt4/win/x64/
+rdr/.vs/
+*.ilk
+zipunzip_src/zip20/windll/visualc/lib/.vs/
+vncviewer/VTune Profiler Results/

@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>Introduction</title>
+<link rel="stylesheet" href="udtdoc.css" type="text/css" />
+</head>
+
+<body>
+<div class="ref_head">&nbsp;UDT Tutorial</div>
+
+<h3><font color="#000080">Introduction to Programming with UDT</font></h3>
+<p>The prerequisite knowledge for using UDT is sound experience on C++ and socket programing. This is enough to use UDT in distributed applications. If you are familiar with computer 
+networking, you may find UDT more powerful.</p>
+
+<p>UDT is a C++ library, which has almost identical routines as the BSD socket APIs. Using UDT in a C++ program is very straightforward. In fact, you may easily modify your existing code 
+from TCP to UDT.</p>
+
+<p>Because of the similarity between UDT API and BSD socket API, UDT defines its own namespace UDT to differentiate the UDT APIs from the regular socket APIs. A qualifier of UDT:: should be 
+put before the UDT socket call. UDTSOCKET is a data type to describe a UDT socket. For a complete UDT structures and constant definitions, please see Reference:UDT Structures. For a complete 
+description of UDT socket APIs, please see Reference:UDT Functions.</p>
+
+<p>For those socket APIs that does not involve with a socket descriptor, e.g., inet_pton, they are not wrapped by UDT API, and the applications should continue to use the original functions. 
+For those socket APIs or options not appropriate to UDT, e.g., certain TCP options, they are simply not available in UDT API.</p>
+
+<p>For example, using BSD socket, you write:</p>
+
+<div class="code">
+int s = socket(AF_INET, SOCK_STREAM, 0);
+</div>
+
+<p>Its counterpart in UDT is like this:</p>
+
+<div class="code">
+UDTSOCKET u = UDT::socket(AF_INET, SOCK_STREAM, 0);
+</div>
+
+<p>UDT API is thread-safe. UDT sockets can be shared by multiple threads and UDT API on the same socket can be made concurrently. However, because of its application level nature, UDT 
+sockets cannot be shared among processes. That is, a UDT socket created in one process cannot be used in another process.</p>
+
+<p>If you use a programming language other than C++, you may need to write certain wrapper for the UDT C++ API. For example, you may use "extern C" to wrap UDT API in C; there are also 
+ways to call C++ API in Java.</p>
+
+<p>To use UDT in a C++ application:</p>
+
+<p><b>Header</b></p>
+<p>#include &lt;udt.h&gt;</p>
+
+<p><b>Library (depending on platforms)</b></p>
+<p>libudt.so<br>libudt.a<br>udt.dll<br>udt.lib<br>udt.dylib</p>
+
+<p><b>Namespace</b></p>
+<p>UDT</p>
+
+<p>&nbsp;</p>
+</body>
+</html>

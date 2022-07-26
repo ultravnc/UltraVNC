@@ -104,6 +104,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NOacceleration|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -2355,6 +2356,12 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\ipv6</Command>
     <ProjectReference Include="..\rdr\rdrv12.vcxproj">
       <Project>{f5244002-0fff-4f19-a941-fcce1861f132}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\udt4\win\udt.vcxproj">
+      <Project>{d84d100a-7c21-4ccb-b16e-0fb37137c16c}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\UdtCloudlib\UdtCloudlib.vcxproj">
+      <Project>{b259a7a9-29b9-4783-b92f-6ddf524a3f19}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\xz\windows\vs2019\liblzma.vcxproj">
       <Project>{12728250-16ec-4dc6-94d7-e21dd88947f8}</Project>
     </ProjectReference>
@@ -2378,6 +2385,10 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\ipv6</Command>
     <ResourceCompile Include="res\vncviewer.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="LedGreen.bmp" />
+    <Image Include="LedGreen.png" />
+    <Image Include="LedRed.bmp" />
+    <Image Include="LedYellow.bmp" />
     <Image Include="res\B46.ico" />
     <Image Include="res\dir.ico" />
     <Image Include="res\down.bmp" />
@@ -2388,6 +2399,10 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\ipv6</Command>
     <Image Include="res\idr_tray_disabled.ico" />
     <Image Include="res\l1.bmp" />
     <Image Include="res\l2.bmp" />
+    <Image Include="res\LedGreen.bmp" />
+    <Image Include="res\LedGreen.png" />
+    <Image Include="res\LedRed.bmp" />
+    <Image Include="res\LedYellow.bmp" />
     <Image Include="res\quer.bmp" />
     <Image Include="res\stat\1op1.bmp" />
     <Image Include="res\stat\back.bmp" />

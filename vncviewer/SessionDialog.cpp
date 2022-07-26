@@ -33,6 +33,7 @@
 #include <sys/stat.h>
 #include <direct.h>
 #include "display.h"
+#include "../UdtCloudlib/proxy/Cloudthread.h"
 
 #define SESSION_MRU_KEY_NAME _T("Software\\ORL\\VNCviewer\\MRU")
 #define NUM_MRU_ENTRIES 8
@@ -62,6 +63,7 @@ SessionDialog::SessionDialog(VNCOptions* pOpt, ClientConnection* pCC, CDSMPlugin
 	/////////////////////////////////////////////////
 	TCHAR tmphost2[256];
 	_tcscpy_s(m_proxyhost, m_pOpt->m_proxyhost);
+	_tcscpy_s(m_Cloudhost, m_pOpt->m_Cloudhost);
 	if (strcmp(m_proxyhost, "") != NULL) {
 		_tcscat_s(m_proxyhost, ":");
 		_tcscat_s(m_proxyhost, 256, _itoa(m_pOpt->m_proxyport, tmphost2, 10));
@@ -81,6 +83,7 @@ SessionDialog::SessionDialog(VNCOptions* pOpt, ClientConnection* pCC, CDSMPlugin
 	fAutoScalingLimit = m_pOpt->m_fAutoScalingLimit;
 	fExitCheck = m_pOpt->m_fExitCheck;
 	m_fUseProxy = m_pOpt->m_fUseProxy;
+	m_fUseCloud = m_pOpt->m_fUseCloud;
 	allowMonitorSpanning = m_pOpt->m_allowMonitorSpanning;
 	changeServerRes = m_pOpt->m_ChangeServerRes;
 	extendDisplay = m_pOpt->m_extendDisplay;
@@ -223,9 +226,15 @@ BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_COMMAND:
 		switch (LOWORD(wParam))
 		{
+		case IDC_RADIOCLOUD:
 		case IDC_RADIOREPEATER:
 		case IDC_RADIODIRECT:
 			_this->ModeSwitch(hwnd, wParam);
+			SetTimer(hwnd, 100, 3000, NULL);
+			break;
+		case IDC_CLOUD_EDIT:
+			if (HIWORD(wParam) == EN_CHANGE)
+				SetTimer(hwnd, 100, 3000, NULL);
 			break;
 		case IDC_HOSTNAME_EDIT:
 			if (HIWORD(wParam) == CBN_SELCHANGE) {
@@ -242,6 +251,7 @@ BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				int ItemIndex = SendMessage((HWND)lParam, CB_GETCURSEL, 0, 0);
 				SendMessage((HWND)lParam, (UINT)CB_SETCURSEL, (WPARAM)ItemIndex, (LPARAM)hostname);
 			}
+			SetTimer(hwnd, 100, 3000, NULL);
 			break;
 		case IDC_SAVEASDEFAULT:
 			_this->SaveToFile(_this->m_pOpt->getDefaultOptionsFileName(), true);
@@ -257,6 +267,8 @@ BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			_this->SaveConnection(hwnd, true);
 			break;
 		case IDCONNECT:
+			if (_this->m_fUseCloud && _this->m_pCC->cloudThread->getStatus() != csConnected)
+				return true;
 			_this->InitTab(hwnd);
 			return _this->connect(hwnd);
 		case IDCANCEL:
@@ -371,7 +383,67 @@ BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		return FALSE;
 	case WM_DESTROY:
 		EndDialog(hwnd, FALSE);
+		KillTimer(hwnd, 100);
+		KillTimer(hwnd, 101);
 		return TRUE;
+	case WM_TIMER:
+		if ((UINT)wParam == 100) {
+			if (_this->m_fUseCloud) {
+				TCHAR hostname[MAX_HOST_NAME_LEN];
+				GetDlgItemText(hwnd, IDC_HOSTNAME_EDIT, hostname, MAX_HOST_NAME_LEN);
+				TCHAR cloudhostname[MAX_HOST_NAME_LEN];
+				GetDlgItemText(hwnd, IDC_CLOUD_EDIT, cloudhostname, MAX_HOST_NAME_LEN);
+
+				if (strcmp(_this->m_pCC->c_proxyhost, hostname) == NULL &&
+					strcmp(_this->m_pCC->c_Cloudhost, cloudhostname) == NULL &&
+					_this->m_pCC->c_fUseCloud == _this->m_fUseCloud) {
+					KillTimer(hwnd, 100);
+					return 0;
+				}
+				strcpy_s(_this->m_pCC->c_proxyhost, hostname);
+				strcpy_s(_this->m_pCC->c_Cloudhost, cloudhostname);
+				_this->m_pCC->c_fUseCloud = _this->m_fUseCloud;
+				_this->m_pCC->cloudThread->setVNcPort(5953);
+				if (strlen(cloudhostname) != 0 && strlen(hostname) != 0) {
+					_this->m_pCC->cloudThread->stopThread();
+					_this->m_pCC->cloudThread->startThread(5352, cloudhostname, hostname, ctVIEWER);
+				}
+			}
+			else if (_this->m_pCC->c_fUseCloud != _this->m_fUseCloud) {
+				_this->m_pCC->c_fUseCloud = _this->m_fUseCloud;
+				_this->m_pCC->cloudThread->stopThread();
+			}
+			KillTimer(hwnd, 100);
+		}
+		if ((UINT)wParam == 101) 
+			if (_this->m_fUseCloud) {
+				if (_this->m_pCC->cloudThread->getStatus() == csOnline ||
+					_this->m_pCC->cloudThread->getStatus() == csRendezvous) {
+					ShowWindow(GetDlgItem(hwnd, IDC_GREEN), false);
+					ShowWindow(GetDlgItem(hwnd, IDC_RED), false);
+					ShowWindow(GetDlgItem(hwnd, IDC_YELLOW), true);
+					EnableWindow(GetDlgItem(hwnd, IDCONNECT), false);
+				}
+				else if (_this->m_pCC->cloudThread->getStatus() == csConnected) {
+					ShowWindow(GetDlgItem(hwnd, IDC_GREEN), true);
+					ShowWindow(GetDlgItem(hwnd, IDC_RED), false);
+					ShowWindow(GetDlgItem(hwnd, IDC_YELLOW), false);
+					EnableWindow(GetDlgItem(hwnd, IDCONNECT), true);
+				}
+				else {
+					ShowWindow(GetDlgItem(hwnd, IDC_GREEN), false);
+					ShowWindow(GetDlgItem(hwnd, IDC_RED), true);
+					ShowWindow(GetDlgItem(hwnd, IDC_YELLOW), false);
+					EnableWindow(GetDlgItem(hwnd, IDCONNECT), false);
+				}
+			}
+			else {
+				ShowWindow(GetDlgItem(hwnd, IDC_GREEN), false);
+				ShowWindow(GetDlgItem(hwnd, IDC_RED), false);
+				ShowWindow(GetDlgItem(hwnd, IDC_YELLOW), false);
+				EnableWindow(GetDlgItem(hwnd, IDCONNECT), true);
+			}
+		return 0;
 	}
 	return 0;
 }
@@ -545,12 +617,17 @@ void SessionDialog::InitDlgProc(bool loadhost, bool initMruNeeded)
 		_tcscat_s(tmphost, 256, _itoa(m_proxyport, tmphost2, 10));
 		SetDlgItemText(hwnd, IDC_PROXY_EDIT, tmphost);
 	}
-	else
-		SetDlgItemText(hwnd, IDC_PROXY_EDIT, "");
+	if (strcmp(m_Cloudhost, "") != NULL) {
+		SetDlgItemText(hwnd, IDC_CLOUD_EDIT, m_Cloudhost);
+	}
 
 	if (m_fUseProxy) {
 		SendMessage(GetDlgItem(hwnd, IDC_RADIOREPEATER), BM_SETCHECK, m_fUseProxy, 0);
 		ModeSwitch(hwnd, IDC_RADIOREPEATER);
+	}
+	else if (m_fUseCloud) {
+		SendMessage(GetDlgItem(hwnd, IDC_RADIOCLOUD), BM_SETCHECK, m_fUseCloud, 0);
+		ModeSwitch(hwnd, IDC_RADIOCLOUD);
 	}
 	else {
 		SendMessage(GetDlgItem(hwnd, IDC_RADIODIRECT), BM_SETCHECK, true, 0);
@@ -607,6 +684,7 @@ bool SessionDialog::connect(HWND hwnd)
 	m_pOpt->autoDetect = autoDetect;
 	m_pOpt->m_fExitCheck = fExitCheck;
 	m_pOpt->m_fUseProxy = m_fUseProxy;
+	m_pOpt->m_fUseCloud = m_fUseCloud;
 	m_pOpt->m_allowMonitorSpanning = allowMonitorSpanning;
 	m_pOpt->m_ChangeServerRes = changeServerRes;
 	m_pOpt->m_extendDisplay = extendDisplay;
@@ -746,10 +824,13 @@ bool SessionDialog::connect(HWND hwnd)
 	strcat_s(buffer, "\\");
 	strcat_s(buffer, fname);
 	SaveToFile(buffer);
+
 	TCHAR hostname[256];
-	GetDlgItemText(hwnd, IDC_HOSTNAME_EDIT, hostname, 256);
+	GetDlgItemText(hwnd, IDC_HOSTNAME_EDIT, hostname, 256);		
 	m_pMRU->AddItem(hostname);
 	strcpy_s(m_pOpt->m_InfoMsg, 255, InfoMsg);
+	//if (m_fUseCloud)
+	//	strcpy_s(hostname, "127.0.0.1:5953");
 	EndDialog(hwnd, TRUE);
 	return TRUE;
 }
@@ -758,19 +839,53 @@ void SessionDialog::ModeSwitch(HWND hwnd, WPARAM wParam)
 {
 	switch (LOWORD(wParam))
 	{
+	case IDC_RADIOCLOUD:
+		
+		EnableWindow(GetDlgItem(hwnd, IDC_PROXY_EDIT), false);
+		EnableWindow(GetDlgItem(hwnd, IDC_CLOUD_EDIT), true);
+		ShowWindow(GetDlgItem(hwnd, IDC_HOSTNAME_EDIT), true);
+		ShowWindow(GetDlgItem(hwnd, IDC_PROXY_EDIT), false);
+		ShowWindow(GetDlgItem(hwnd, IDC_CLOUD_EDIT), true);
+		SetDlgItemText(hwnd, IDC_LINE1, "Cloud Code:");
+		SetDlgItemText(hwnd, IDC_LINE2, "Cloud server:");
+		SetTimer(hwnd, 100, 1000, NULL);
+		SetTimer(hwnd, 101, 1000, NULL);
+		if (!m_fUseCloud) {
+			ShowWindow(GetDlgItem(hwnd, IDC_GREEN), false);
+			ShowWindow(GetDlgItem(hwnd, IDC_RED), true);
+			ShowWindow(GetDlgItem(hwnd, IDC_YELLOW), false);
+		}
+		EnableWindow(GetDlgItem(hwnd, IDCONNECT), false);
+		m_fUseCloud = true;
+		break;
 	case IDC_RADIOREPEATER:
+		m_fUseCloud = false;
+		SetTimer(hwnd, 100, 1000, NULL);
 		EnableWindow(GetDlgItem(hwnd, IDC_PROXY_EDIT), true);
+		EnableWindow(GetDlgItem(hwnd, IDC_CLOUD_EDIT), false);
 		ShowWindow(GetDlgItem(hwnd, IDC_HOSTNAME_EDIT), true);
 		ShowWindow(GetDlgItem(hwnd, IDC_PROXY_EDIT), true);
+		ShowWindow(GetDlgItem(hwnd, IDC_CLOUD_EDIT), false);
 		SetDlgItemText(hwnd, IDC_LINE1, "ID:12345679");
 		SetDlgItemText(hwnd, IDC_LINE2, "repeater:port");
+		ShowWindow(GetDlgItem(hwnd, IDC_GREEN), false);
+		ShowWindow(GetDlgItem(hwnd, IDC_RED), false);
+		ShowWindow(GetDlgItem(hwnd, IDC_YELLOW), false);
+		EnableWindow(GetDlgItem(hwnd, IDCONNECT), true);
 		break;
 	case IDC_RADIODIRECT:
+		m_fUseCloud = false;
+		SetTimer(hwnd, 100, 1000, NULL);
 		EnableWindow(GetDlgItem(hwnd, IDC_PROXY_EDIT), false);
 		ShowWindow(GetDlgItem(hwnd, IDC_HOSTNAME_EDIT), true);
-		ShowWindow(GetDlgItem(hwnd, IDC_PROXY_EDIT), true);
+		ShowWindow(GetDlgItem(hwnd, IDC_PROXY_EDIT), false);
+		ShowWindow(GetDlgItem(hwnd, IDC_CLOUD_EDIT), false);
 		SetDlgItemText(hwnd, IDC_LINE1, "server:port");
 		SetDlgItemText(hwnd, IDC_LINE2, "");
+		ShowWindow(GetDlgItem(hwnd, IDC_GREEN), false);
+		ShowWindow(GetDlgItem(hwnd, IDC_RED), false);
+		ShowWindow(GetDlgItem(hwnd, IDC_YELLOW), false);
+		EnableWindow(GetDlgItem(hwnd, IDCONNECT), true);
 		break;
 	}
 }

@@ -382,8 +382,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR szCmdLin
 	memset(&info, 0, sizeof(CR_INSTALL_INFO));
 	info.cb = sizeof(CR_INSTALL_INFO);
 	info.pszAppName = _T("UVNC");
-	info.pszAppVersion = _T("1.3.8.2");
-	info.pszEmailSubject = _T("UVNC viewer 1.3.8.2 Error Report");
+	info.pszAppVersion = _T("1.3.9.0");
+	info.pszEmailSubject = _T("UVNC viewer 1.3.9.0 Error Report");
 	info.pszEmailTo = _T("uvnc@skynet.be");
 	info.uPriorities[CR_SMAPI] = 1; // Third try send report over Simple MAPI    
 	// Install all available exception handlers
@@ -848,11 +848,11 @@ bool ParseDisplay(LPTSTR display, LPTSTR phost, int hostlen, int *pport)
 	{
 		// No colon -- use default port number
         tmp_port = RFB_PORT_OFFSET;
-		_tcsncpy_s(phost, 256, display, MAX_HOST_NAME_LEN);
+		_tcsncpy_s(phost, MAX_HOST_NAME_LEN, display, MAX_HOST_NAME_LEN);
 	}
 	else
 	{
-		_tcsncpy_s(phost, 256, display, colonpos - display);
+		_tcsncpy_s(phost, MAX_HOST_NAME_LEN, display, colonpos - display);
 		phost[colonpos - display] = L'\0';
 		if (colonpos[1] == L':') {
 			// Two colons -- interpret as a port number

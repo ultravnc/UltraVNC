@@ -108,6 +108,7 @@ extern const UINT FileTransferSendPacketMessage;
 #define TIGHT_ZLIB_BUFFER_SIZE 512 // Tight encoding
 class ClientConnection;
 class CDSMPlugin;
+class CloudThread;
 typedef void (ClientConnection:: *tightFilterFunc)(int);
 
 struct mybool {
@@ -148,7 +149,9 @@ public:
 	bool saved_set;
     TCHAR m_host[MAX_HOST_NAME_LEN];
 	TCHAR m_proxyhost[MAX_HOST_NAME_LEN];
+	TCHAR m_Cloudhost[MAX_HOST_NAME_LEN];
 	bool m_fUseProxy;
+	bool m_fUseCloud;
 //	TCHAR m_remotehost[MAX_HOST_NAME_LEN];
 	int  LoadConnection(char *fname, bool fFromDialog, bool defaultOption = false);
 	void HandleQuickOption();
@@ -245,7 +248,7 @@ private:
 	void LoadDSMPlugin(bool fForceReload); // sf@2002 - DSM Plugin
 	void SetDSMPluginStuff();
 	void GetConnectDetails();
-	void Connect();
+	void Connect(bool cloud);
 	void ConnectProxy();
 	void SetSocketOptions();
 	///////////////////////////////////////////////
@@ -845,8 +848,10 @@ private:
 	HMODULE hUser32;
 	PFN_GetDpiForMonitor getDpiForMonitor;
 	PFN_AdjustWindowRectExForDpi adjustWindowRectExForDpi;
+
 public:
 	// RFB settings
+	CloudThread* cloudThread = NULL;
 	VNCOptions *m_opts;
 	bool m_FullScreenNotDone;
 	int m_autoReconnect;
@@ -861,7 +866,9 @@ public:
 	void Save_Latest_Connection();	
 	bool tbWM_Set;
 	RECT tbWM_rect;
-
+	TCHAR c_proxyhost[MAX_HOST_NAME_LEN]{};
+	TCHAR c_Cloudhost[MAX_HOST_NAME_LEN]{};
+	bool c_fUseCloud = false;
 };
 
 // Some handy classes for temporary GDI object selection

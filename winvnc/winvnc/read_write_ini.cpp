@@ -23,6 +23,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "inifile.h"
+#define MAX_HOST_NAME_LEN 250
 DWORD MessageBoxSecure(HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT uType);
 
 bool do_copy(IniFile& myIniFile_In, IniFile& myIniFile_Out)
@@ -96,6 +97,8 @@ bool do_copy(IniFile& myIniFile_In, IniFile& myIniFile_Out)
 	LONG EnableWin8Helper = 0;
 	LONG kickrdp = 0;
 	LONG clearconsole = 0;
+	char cloudServer[MAX_HOST_NAME_LEN];
+	LONG cloudEnabled = 0;
 
 #define MAXPWLEN 8
 	char passwd[MAXPWLEN];
@@ -281,6 +284,11 @@ bool do_copy(IniFile& myIniFile_In, IniFile& myIniFile_Out)
 	memset(passwd, '\0', MAXPWLEN); //PGM
 	myIniFile_In.ReadPassword2(passwd, MAXPWLEN); //PGM
 	myIniFile_Out.WritePassword2(passwd); //PGM
+	myIniFile_In.ReadString("admin", "cloudServer", cloudServer, MAX_HOST_NAME_LEN);
+	myIniFile_Out.WriteString("admin", "cloudServer", cloudServer);
+	cloudEnabled = myIniFile_In.ReadInt("admin", "cloudEnabled", cloudEnabled);
+	myIniFile_Out.WriteInt("admin", "cloudEnabled", cloudEnabled);
+	
 
 	EnableRemoteInputs = myIniFile_In.ReadInt("admin", "InputsEnabled", EnableRemoteInputs);
 	LockSettings = myIniFile_In.ReadInt("admin", "LockSetting", LockSettings);

@@ -1223,18 +1223,23 @@ void SessionDialog::ReadDlgProcSecurity()
 ////////////////////////////////////////////////////////////////////////////////
 void SessionDialog::ReadDlgProc()
 {
-	TCHAR tmphost[256];
-	TCHAR hostname[256];
+	TCHAR tmphost[MAX_HOST_NAME_LEN];
+	TCHAR hostname[MAX_HOST_NAME_LEN];
+	TCHAR cloudhostname[MAX_HOST_NAME_LEN];
 	HWND hwnd = SessHwnd;
-	GetDlgItemText(hwnd, IDC_HOSTNAME_EDIT, hostname, 256);
-	if (ParseDisplay(hostname, tmphost, 255, &m_port)) {
+	GetDlgItemText(hwnd, IDC_HOSTNAME_EDIT, hostname, MAX_HOST_NAME_LEN);
+	if (ParseDisplay(hostname, tmphost, MAX_HOST_NAME_LEN, &m_port)) {
 		for (size_t i = 0, len = strlen(tmphost); i < len; i++)
 			tmphost[i] = toupper(tmphost[i]);
 		_tcscpy_s(m_host_dialog, tmphost);
 	}
 	_tcscpy_s(m_proxyhost, "");
-	GetDlgItemText(hwnd, IDC_PROXY_EDIT, hostname, 256);
-
+	_tcscpy_s(m_Cloudhost, "");
+	GetDlgItemText(hwnd, IDC_PROXY_EDIT, hostname, MAX_HOST_NAME_LEN);
+	GetDlgItemText(hwnd, IDC_CLOUD_EDIT, cloudhostname, MAX_HOST_NAME_LEN);
+	
+	m_fUseProxy = SendMessage(GetDlgItem(hwnd, IDC_RADIOREPEATER), BM_GETCHECK, 0, 0) == BST_CHECKED;
+	m_fUseCloud = SendMessage(GetDlgItem(hwnd, IDC_RADIOCLOUD), BM_GETCHECK, 0, 0) == BST_CHECKED;
 	//adzm 2010-02-15
 	if (strlen(hostname) > 0) {
 		TCHAR actualProxy[256];
@@ -1260,12 +1265,11 @@ void SessionDialog::ReadDlgProc()
 				}
 			}
 		}
-		if (ParseDisplay(actualProxy, tmphost, 255, &m_proxyport)) {
+		if (ParseDisplay(actualProxy, tmphost, MAX_HOST_NAME_LEN, &m_proxyport)) {
 			_tcscpy_s(m_proxyhost, tmphost);
-		}
-	}
-
-	m_fUseProxy = SendMessage(GetDlgItem(hwnd, IDC_RADIOREPEATER), BM_GETCHECK, 0, 0) == BST_CHECKED;
+		}		
+	}	
+	_tcscpy_s(m_Cloudhost, cloudhostname);
 }
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -1495,6 +1499,7 @@ void SessionDialog::StartListener()
 	m_pOpt->autoDetect = autoDetect;
 	m_pOpt->m_fExitCheck = fExitCheck;
 	m_pOpt->m_fUseProxy = m_fUseProxy;
+	m_pOpt->m_fUseCloud = m_fUseCloud;
 	m_pOpt->m_allowMonitorSpanning = allowMonitorSpanning;
 	m_pOpt->m_ChangeServerRes = changeServerRes;
 	m_pOpt->m_extendDisplay = extendDisplay;

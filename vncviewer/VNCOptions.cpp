@@ -186,6 +186,7 @@ VNCOptions::VNCOptions()
 	// m_fAutoAdjust = false;
 	m_host_options[0] = '\0';
 	m_proxyhost[0] = '\0';
+	m_Cloudhost[0] = '\0';
 	m_port = -1;
 	m_proxyport = -1;
 	m_kbdname[0] = '\0';
@@ -216,6 +217,7 @@ VNCOptions::VNCOptions()
 	m_oldplugin = false;
 	//g_disable_sponsor= false;
 	m_fUseProxy = false;
+	m_fUseCloud = false;
 	m_allowMonitorSpanning = 0;
 	m_ChangeServerRes = 0;
 	m_extendDisplay = 0;
@@ -373,12 +375,14 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
 	strcpy_s(m_prefix, 56, s.m_prefix);
 	strcpy_s(m_imageFormat, 56, s.m_imageFormat);
 
-	strcpy_s(m_host_options, 256, s.m_host_options);
+	strcpy_s(m_host_options, MAX_HOST_NAME_LEN, s.m_host_options);
 	m_port = s.m_port;
 
-	strcpy_s(m_proxyhost, 256, s.m_proxyhost);
+	strcpy_s(m_proxyhost, MAX_HOST_NAME_LEN, s.m_proxyhost);
+	strcpy_s(m_Cloudhost, MAX_HOST_NAME_LEN, s.m_Cloudhost);
 	m_proxyport = s.m_proxyport;
 	m_fUseProxy = s.m_fUseProxy;
+	m_fUseCloud = s.m_fUseCloud;
 	m_allowMonitorSpanning = s.m_allowMonitorSpanning;
 	m_ChangeServerRes = s.m_ChangeServerRes;
 	m_extendDisplay = s.m_extendDisplay;
@@ -929,6 +933,17 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 			//adzm 2010-02-15
 			CheckProxyAndHost();
 		}
+		else if (SwitchMatch(args[j], _T("cloud")))
+		{
+			if (++j == i)
+			{
+				ArgError("no cloud server defined"); // sf@ - Todo: put correct message here
+				continue;
+			}
+			m_fUseCloud = true;
+			_tcscpy_s(m_Cloudhost, args[j]);
+			//adzm 2010-02-15
+		}
 		else if (SwitchMatch(args[j], _T("reconnectcounter")))
 		{
 			if (++j == i) {
@@ -1016,8 +1031,8 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 		}
 		else
 		{
-			TCHAR phost[256];
-			if (!ParseDisplay(args[j], phost, 255, &m_port)) {
+			TCHAR phost[MAX_HOST_NAME_LEN];
+			if (!ParseDisplay(args[j], phost, MAX_HOST_NAME_LEN, &m_port)) {
 				ShowUsage(sz_D28);
 				PostQuitMessage(1);
 			}
@@ -1050,7 +1065,7 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 void VNCOptions::CheckProxyAndHost()
 {
 	if (strlen(m_proxyhost) > 0) {
-		TCHAR actualProxy[256];
+		TCHAR actualProxy[MAX_HOST_NAME_LEN];
 		strcpy_s(actualProxy, m_proxyhost);
 
 		if (strlen(m_host_options) > 0) {
@@ -1083,7 +1098,7 @@ void VNCOptions::CheckProxyAndHost()
 				}
 			}
 
-			if (!ParseDisplay(actualProxy, m_proxyhost, 255, &m_proxyport)) {
+			if (!ParseDisplay(actualProxy, m_proxyhost, MAX_HOST_NAME_LEN, &m_proxyport)) {
 				ShowUsage(sz_D28);
 				PostQuitMessage(1);
 			}
@@ -1159,6 +1174,7 @@ void VNCOptions::SaveOptions(char* fname)
 	saveInt("QuickOption", m_quickoption, fname);
 	saveInt("UseDSMPlugin", m_fUseDSMPlugin, fname);
 	saveInt("UseProxy", m_fUseProxy, fname);
+	saveInt("UseCloud", m_fUseCloud, fname);
 	saveInt("sponsor", g_disable_sponsor, fname);
 	saveInt("allowMonitorSpanning", m_allowMonitorSpanning, fname);
 	saveInt("ChangeServerRes", m_ChangeServerRes, fname);
@@ -1257,7 +1273,7 @@ void VNCOptions::LoadOptions(char* fname)
 	m_quickoption = readInt("QuickOption", m_quickoption, fname);
 	m_fUseDSMPlugin = readInt("UseDSMPlugin", m_fUseDSMPlugin, fname) != 0;
 	m_fUseProxy = readInt("UseProxy", m_fUseProxy, fname) != 0;
-
+	m_fUseCloud = readInt("UseCloud", m_fUseCloud, fname) != 0;
 	m_allowMonitorSpanning = readInt("allowMonitorSpanning", m_allowMonitorSpanning, fname);
 	m_ChangeServerRes = readInt("ChangeServerRes", m_ChangeServerRes, fname);
 	m_extendDisplay = readInt("extendDisplay", m_extendDisplay, fname);

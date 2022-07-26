@@ -84,6 +84,10 @@
 #define IDD_SAVEIMAGE                   216
 #define IDB_EXPAND                      218
 #define IDB_COLLAPS                     219
+#define IDB_GREEN                       229
+#define IDB_RED                         230
+#define IDB_BITMAP1                     231
+#define IDB_YELLOW                      231
 #define IDD_USER_NAME                   604
 #define ID_VK_LWINDOWN                  605
 #define ID_VK_RWINDOWN                  606
@@ -196,6 +200,7 @@
 #define IDC_PROXY_CHECK                 1129
 #define IDC_PROXY_EDIT                  1130
 #define IDC_PERCENT                     1131
+#define IDC_CLOUD_EDIT                  1131
 #define IDC_APPLYTOALLCHECK             1132
 #define IDC_YESALL_B                    1133
 #define IDC_YES_B                       1134
@@ -264,6 +269,7 @@
 #define IDC_PREFIX                      1184
 #define IDC_RADIO3                      1185
 #define IDC_RADIO_NOVIRT                1185
+#define IDC_RADIOCLOUD                  1185
 #define IDC_ENCODING_BASE               1199
 #define IDC_RAWRADIO                    2000
 #define IDC_RRERADIO                    2002
@@ -322,6 +328,11 @@
 #define IDC_GII                         2059
 #define IDC_SHOW_EXTEND                 2060
 #define IDC_ONLYPASSWORD                2061
+#define IDC_CLOUDSTATUS                 2062
+#define IDC_CLOUDLINE                   2063
+#define IDC_GREEN                       2064
+#define IDC_RED                         2065
+#define IDC_YELLOW                      2066
 #define IDC_STATIC_SPLIT                9000
 #define IDC_HOSTNAME_DEL                9001
 #define ID_SESSION_SET_CRECT            32777
@@ -616,9 +627,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        227
+#define _APS_NEXT_RESOURCE_VALUE        232
 #define _APS_NEXT_COMMAND_VALUE         50025
-#define _APS_NEXT_CONTROL_VALUE         2062
+#define _APS_NEXT_CONTROL_VALUE         2067
 #define _APS_NEXT_SYMED_VALUE           154
 #endif
 #endif

@@ -98,6 +98,12 @@ IDB_PINUP               BITMAP                  "stat\\pinup.bmp"
 
 IDB_VNC32               BITMAP                  "vnc32.BMP"
 
+IDB_GREEN               BITMAP                  "LedGreen.bmp"
+
+IDB_RED                 BITMAP                  "LedRed.bmp"
+
+IDB_YELLOW              BITMAP                  "LedYellow.bmp"
+
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -301,29 +307,34 @@ BEGIN
     PUSHBUTTON      "Forced Close",IDCANCEL2,248,355,60,14
 END
 
-IDD_SESSION_DLG DIALOGEX 0, 0, 259, 313
+IDD_SESSION_DLG DIALOGEX 0, 0, 259, 325
 STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "UltraVNC Viewer - 1.3.8.2"
+CAPTION "UltraVNC Viewer - 1.3.9.0"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    COMBOBOX        IDC_HOSTNAME_EDIT,76,27,162,66,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    EDITTEXT        IDC_PROXY_EDIT,76,42,162,12,ES_AUTOHSCROLL
-    PUSHBUTTON      "",IDC_BUTTON_EXPAND,14,72,11,11,BS_ICON
-    DEFPUSHBUTTON   "Connect",IDCONNECT,174,72,64,14
-    PUSHBUTTON      "Save as",IDC_SAVEAS,134,100,50,13
-    PUSHBUTTON      "Load ",IDC_LOADPROFILE_B,6,100,50,13
-    PUSHBUTTON      "Delete",IDC_HOSTNAME_DEL,70,100,50,13
-    PUSHBUTTON      "Save",IDC_SAVE,198,100,50,13
-    CONTROL         "",IDC_TAB,"SysTabControl32",TCS_MULTILINE | WS_TABSTOP,5,118,243,172
-    PUSHBUTTON      "Reset defaults",IDC_DELETE,179,294,68,14
-    LTEXT           "Computer:",IDC_LINE1,11,29,46,8
-    LTEXT           "Show Options",IDC_SHOWOPTIONS,28,73,45,10,SS_NOTIFY | SS_CENTERIMAGE
+    COMBOBOX        IDC_HOSTNAME_EDIT,76,32,162,66,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_PROXY_EDIT,76,47,162,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "",IDC_BUTTON_EXPAND,14,82,11,11,BS_ICON
+    DEFPUSHBUTTON   "Connect",IDCONNECT,174,85,64,14
+    PUSHBUTTON      "Save as",IDC_SAVEAS,134,110,50,13
+    PUSHBUTTON      "Load ",IDC_LOADPROFILE_B,6,110,50,13
+    PUSHBUTTON      "Delete",IDC_HOSTNAME_DEL,70,110,50,13
+    PUSHBUTTON      "Save",IDC_SAVE,198,110,50,13
+    CONTROL         "",IDC_TAB,"SysTabControl32",TCS_MULTILINE | WS_TABSTOP,5,128,243,172
+    PUSHBUTTON      "Reset defaults",IDC_DELETE,179,304,68,14
+    LTEXT           "Computer:",IDC_LINE1,11,34,46,8
+    LTEXT           "Show Options",IDC_SHOWOPTIONS,28,83,45,10,SS_NOTIFY | SS_CENTERIMAGE
     CONTROL         IDB_VNC32,IDC_STATIC,"Static",SS_BITMAP,11,5,18,16
-    CTEXT           "UltraVNC Viewer",IDC_LOGO,67,4,109,17,SS_CENTERIMAGE
-    LTEXT           "Computer:",IDC_LINE2,11,44,47,8
-    CONTROL         "Direct",IDC_RADIODIRECT,"Button",BS_AUTORADIOBUTTON,75,61,32,10
-    CONTROL         "Repeater",IDC_RADIOREPEATER,"Button",BS_AUTORADIOBUTTON,111,61,46,10
-    CONTROL         "",IDC_DEFAULTBOX,"Static",SS_BLACKFRAME | SS_REALSIZEIMAGE,0,0,257,95
+    CTEXT           "UltraVNC Viewer",IDC_LOGO,50,9,178,8,SS_CENTERIMAGE
+    LTEXT           "Computer:",IDC_LINE2,11,49,47,8
+    CONTROL         "Direct",IDC_RADIODIRECT,"Button",BS_AUTORADIOBUTTON,75,66,47,10
+    CONTROL         "Repeater",IDC_RADIOREPEATER,"Button",BS_AUTORADIOBUTTON,128,66,47,10
+    CONTROL         "",IDC_DEFAULTBOX,"Static",SS_BLACKFRAME | SS_REALSIZEIMAGE,0,0,257,108
+    CONTROL         "Cloud",IDC_RADIOCLOUD,"Button",BS_AUTORADIOBUTTON,181,66,32,10
+    EDITTEXT        IDC_CLOUD_EDIT,76,47,162,12,ES_AUTOHSCROLL
+    CONTROL         IDB_GREEN,IDC_GREEN,"Static",SS_BITMAP,222,67,9,8
+    CONTROL         IDB_YELLOW,IDC_YELLOW,"Static",SS_BITMAP,222,67,9,8
+    CONTROL         IDB_RED,IDC_RED,"Static",SS_BITMAP,222,67,9,8
 END
 
 IDD_SERVINFO_DLG DIALOGEX 0, 0, 224, 170
@@ -382,38 +393,38 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,167,32,50,14
 END
 
-IDD_STATUS DIALOGEX 0, 0, 204, 156
+IDD_STATUS DIALOGEX 0, 0, 232, 178
 STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOOLWINDOW
 CAPTION " VNC Viewer Connection Status"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "Close",IDCLOSE,146,139,50,14
-    GROUPBOX        "Connection",IDC_STATIC,4,0,186,92
-    GROUPBOX        "Traffic",IDC_STATIC,7,94,186,42
-    LTEXT           "Port:",IDC_STATIC,13,23,52,9
-    LTEXT           "Bytes Sent",IDC_STATIC,11,107,63,9
-    RTEXT           "Bytes Received",IDC_STATIC,121,107,68,9
-    RTEXT           "Sent",IDC_SEND,9,123,64,9
-    RTEXT           "Received",IDC_RECEIVED,117,123,72,9
-    RTEXT           "Port Number",IDC_PORT,96,23,89,9
-    ICON            IDI_NET,IDC_STATIC,93,103,21,20
-    CONTROL         167,IDC_STATIC,"Static",SS_BITMAP | SS_REALSIZEIMAGE,75,111,13,1,WS_EX_TRANSPARENT
-    CONTROL         167,IDC_STATIC,"Static",SS_BITMAP | SS_REALSIZEIMAGE,113,111,13,1,WS_EX_TRANSPARENT
-    CONTROL         166,IDC_STATIC,"Static",SS_BITMAP | SS_REALSIZEIMAGE,109,123,1,10,WS_EX_TRANSPARENT
-    LTEXT           "VNC Server:",IDC_STATIC,13,12,64,9
-    RTEXT           "Server Name",IDC_VNCSERVER,94,12,91,9
-    LTEXT           "Status:",IDC_STATIC,13,30,52,9
-    RTEXT           "Connection closed",IDC_STATUS,44,30,141,24
-    RTEXT           "",IDC_PLUGIN_STATUS,7,45,178,9
-    PUSHBUTTON      "Cancel",IDQUIT,7,139,50,14
-    LTEXT           "Speed:",IDC_STATIC,13,66,64,8
-    RTEXT           "123",IDC_SPEED,81,66,62,8
-    RTEXT           "kbit/s",IDC_STATIC,147,66,38,8
-    RTEXT           "",IDC_ENCODER,65,55,120,8
-    LTEXT           "Encoder:",IDC_STATIC,13,55,63,8
-    LTEXT           "FPS:",IDC_STATIC,13,79,16,8
-    RTEXT           "1",IDC_FPS,81,78,62,8
+    DEFPUSHBUTTON   "Close",IDCLOSE,174,157,50,14
+    GROUPBOX        "Connection",IDC_STATIC,7,0,217,112
+    GROUPBOX        "Traffic",IDC_STATIC,7,112,217,42
+    LTEXT           "Port:",IDC_STATIC,13,24,46,9
+    LTEXT           "Bytes Sent",IDC_STATIC,11,125,63,9
+    RTEXT           "Bytes Received",IDC_STATIC,121,125,68,9
+    RTEXT           "Sent",IDC_SEND,9,141,64,9
+    RTEXT           "Received",IDC_RECEIVED,117,141,72,9
+    LTEXT           "Port Number",IDC_PORT,77,24,101,8
+    ICON            IDI_NET,IDC_STATIC,93,121,20,20
+    CONTROL         167,IDC_STATIC,"Static",SS_BITMAP | SS_REALSIZEIMAGE,75,129,13,11,WS_EX_TRANSPARENT
+    CONTROL         167,IDC_STATIC,"Static",SS_BITMAP | SS_REALSIZEIMAGE,113,129,13,11,WS_EX_TRANSPARENT
+    CONTROL         166,IDC_STATIC,"Static",SS_BITMAP | SS_REALSIZEIMAGE,109,141,13,11,WS_EX_TRANSPARENT
+    LTEXT           "VNC Server:",IDC_STATIC,13,12,46,9
+    LTEXT           "Server Name",IDC_VNCSERVER,77,12,101,8
+    LTEXT           "Status:",IDC_STATIC,14,83,46,9
+    LTEXT           "Connection closed",IDC_STATUS,77,84,147,24
+    RTEXT           "",IDC_PLUGIN_STATUS,13,48,46,9
+    PUSHBUTTON      "Cancel",IDQUIT,7,157,50,14
+    LTEXT           "Speed:",IDC_STATIC,13,47,31,8
+    LTEXT           "123",IDC_SPEED,77,48,26,8
+    LTEXT           "kbit/s",IDC_STATIC,110,47,38,8
+    LTEXT           "",IDC_ENCODER,77,36,101,8
+    LTEXT           "Encoder:",IDC_STATIC,13,36,46,9
+    LTEXT           "FPS:",IDC_STATIC,13,60,46,9
+    LTEXT           "1",IDC_FPS,77,60,101,8
 END
 
 IDD_AUTH_DIALOG1 DIALOGEX 101, 66, 234, 58
@@ -460,7 +471,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,8,137,62,14
     CONTROL         IDB_VNC64,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_SUNKEN,8,7,62,54
-    LTEXT           "UltraVNC Viewer 1.3.8.2",IDC_STATIC,86,6,197,11
+    LTEXT           "UltraVNC Viewer 1.3.9.0",IDC_STATIC,86,6,197,11
     LTEXT           "For more Information and Links please visit: \nhttps://www.uvnc.com",IDC_STATIC,86,133,197,19
     LTEXT           "Copyright © 2002-2020 UltraVNC Team\nCopyright © 2001-2002 Sam - eSVNC \nCopyright © 1999-2002 Rudi D. V. - VdaccVNC \nCopyright © 1999-2002 Const. Kaplinsky - TightVNC \nCopyright © 2002 RealVNC Ltd. - RealVNC\n",IDC_STATIC,86,30,200,40
     LTEXT           "Built:",IDC_STATIC,87,17,15,10
@@ -490,7 +501,7 @@ BEGIN
     DEFPUSHBUTTON   "Close",IDOK,185,110,56,14
     LTEXT           "BuildTime",IDC_BUILDTIME,9,11,265,88
     GROUPBOX        "Info Message",IDC_STATIC,3,1,274,100,BS_CENTER
-    CTEXT           "UltraVNC 1.3.8.2",IDC_STATIC,178,145,66,12
+    CTEXT           "UltraVNC 1.3.9.0",IDC_STATIC,178,145,66,12
     PUSHBUTTON      "",IDC_BUTTON1,7,104,170,47,BS_BITMAP
 END
 
@@ -503,7 +514,7 @@ BEGIN
     LTEXT           "BuildTime",IDC_BUILDTIME,9,11,258,97
     PUSHBUTTON      "",IDC_BUTTON2,7,114,170,47,BS_BITMAP
     GROUPBOX        "Info Message",IDC_STATIC,3,1,264,110,BS_CENTER
-    CTEXT           "UltraVNC 1.3.8.2",IDC_STATIC,175,204,69,12
+    CTEXT           "UltraVNC 1.3.9.0",IDC_STATIC,175,204,69,12
     PUSHBUTTON      "",IDC_BUTTON1,7,163,170,47,BS_BITMAP
     CTEXT           "Sponsored\n Link",IDC_STATIC,179,127,36,21
 END
@@ -551,9 +562,9 @@ BEGIN
     IDD_SESSION_DLG, DIALOG
     BEGIN
         RIGHTMARGIN, 258
-        VERTGUIDE, 214
+        VERTGUIDE, 213
         VERTGUIDE, 248
-        BOTTOMMARGIN, 309
+        BOTTOMMARGIN, 321
         HORZGUIDE, 145
     END
 
@@ -600,11 +611,10 @@ BEGIN
     IDD_STATUS, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 196
-        VERTGUIDE, 185
-        VERTGUIDE, 190
+        RIGHTMARGIN, 224
+        VERTGUIDE, 209
         TOPMARGIN, 7
-        BOTTOMMARGIN, 153
+        BOTTOMMARGIN, 171
     END
 
     IDD_AUTH_DIALOG1, DIALOG
@@ -722,8 +732,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,3,8,2
- PRODUCTVERSION 1,3,8,2
+ FILEVERSION 1,3,9,0
+ PRODUCTVERSION 1,3,9,0
  FILEFLAGSMASK 0x37L
 #ifdef _DEBUG
  FILEFLAGS 0x25L
@@ -741,12 +751,12 @@ BEGIN
             VALUE "Comments", "UltraVNC Viewer"
             VALUE "CompanyName", "UltraVNC"
             VALUE "FileDescription", "VNCViewer"
-            VALUE "FileVersion", "1.3.8.2"
+            VALUE "FileVersion", "1.3.9.0"
             VALUE "InternalName", "VNCViewer"
             VALUE "LegalCopyright", "Copyright © 2021 UltraVNC team members"
             VALUE "OriginalFilename", "VNCViewer.exe"
             VALUE "ProductName", "UltraVNC VNCViewer"
-            VALUE "ProductVersion", "1.3.8.2"
+            VALUE "ProductVersion", "1.3.9.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -777,6 +787,11 @@ BEGIN
 END
 
 IDD_APP_ABOUT AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_STATUS AFX_DIALOG_LAYOUT
 BEGIN
     0
 END

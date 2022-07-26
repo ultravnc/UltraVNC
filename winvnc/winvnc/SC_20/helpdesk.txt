@@ -61,5 +61,9 @@ You can break the connection any time
 [BALLOON2C]
 by using the close button
 
+[DIRECT]
+
+[ENTERCODE]
+
 [WEBPAGE]
 http://www.ultravnc.net

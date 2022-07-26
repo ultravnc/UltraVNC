@@ -296,6 +296,7 @@ BOOL CALLBACK DlgProcService(HWND hwnd, UINT uMsg,WPARAM wParam, LPARAM lParam)
 			else EnableWindow(GetDlgItem(hwnd, IDC_STARTS), FALSE);
 			if (s_running)EnableWindow(GetDlgItem(hwnd, IDC_STOPS), TRUE);
 			else EnableWindow(GetDlgItem(hwnd, IDC_STOPS), FALSE);		
+			break;
 		}
 	
 	case WM_COMMAND: 

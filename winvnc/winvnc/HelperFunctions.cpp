@@ -143,6 +143,8 @@ namespace settingsHelpers {
 		LONG EnableWin8Helper = 0;
 		LONG kickrdp = 0;
 		LONG clearconsole = 0;
+		char cloudServer[MAX_HOST_NAME_LEN];
+		LONG cloudEnabled = 0;
 
 #define MAXPWLEN 8
 		char passwd[MAXPWLEN];
@@ -337,6 +339,11 @@ namespace settingsHelpers {
 		memset(passwd, '\0', MAXPWLEN); //PGM
 		myIniFile_In.ReadPassword2(passwd, MAXPWLEN); //PGM
 		myIniFile_Out.WritePassword2(passwd); //PGM
+
+		myIniFile_In.ReadString("admin", "cloudServer", cloudServer, 64);
+		myIniFile_Out.WriteString("admin", "cloudServer", cloudServer);
+		cloudEnabled = myIniFile_In.ReadInt("admin", "cloudEnabled", cloudEnabled);
+		myIniFile_Out.WriteInt("admin", "cloudEnabled", cloudEnabled);
 
 		EnableRemoteInputs = myIniFile_In.ReadInt("admin", "InputsEnabled", 0);
 		LockSettings = myIniFile_In.ReadInt("admin", "LockSetting", 0);
@@ -772,6 +779,7 @@ namespace desktopSelector {
 
 namespace postHelper {
 	UINT MENU_ADD_CLIENT_MSG = RegisterWindowMessage("WinVNC.AddClient.Message");
+	UINT MENU_ADD_CLOUD_MSG = RegisterWindowMessage("WinVNC.AddCloud.Message");
 	UINT MENU_REPEATER_ID_MSG = RegisterWindowMessage("WinVNC.AddRepeaterID.Message");
 	UINT MENU_AUTO_RECONNECT_MSG = RegisterWindowMessage("WinVNC.AddAutoClient.Message");
 	UINT MENU_STOP_RECONNECT_MSG = RegisterWindowMessage("WinVNC.AddStopClient.Message");
@@ -795,6 +803,14 @@ namespace postHelper {
 		// assumes the -repeater command line set the repeater global variable.
 		// Post to the WinVNC menu window (usually expected to fail at program startup)
 		if (!PostToWinVNC(MENU_ADD_CLIENT_MSG, (WPARAM)0xFFFFFFFF, (LPARAM)0xFFFFFFFF))
+			return FALSE;
+		return TRUE;
+	}
+
+	BOOL PostAddNewCloudClient() {
+		// assumes the -repeater command line set the repeater global variable.
+		// Post to the WinVNC menu window (usually expected to fail at program startup)
+		if (!PostToWinVNC(MENU_ADD_CLOUD_MSG, (WPARAM)0xFFFFFFFF, (LPARAM)0xFFFFFFFF))
 			return FALSE;
 		return TRUE;
 	}

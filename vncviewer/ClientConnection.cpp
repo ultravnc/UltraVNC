@@ -63,6 +63,7 @@ extern "C" {
 #include <LMaccess.h>
 #include <LMat.h>
 #include <LMalert.h>
+#include "../UdtCloudlib/proxy/Cloudthread.h"
 
 // [v1.0.2-jp1 fix]
 #pragma comment(lib, "imm32.lib")
@@ -331,12 +332,17 @@ ClientConnection::ClientConnection(VNCviewerApp *pApp, LPTSTR host, int port)
 	_tcsncpy_s(m_host, host, MAX_HOST_NAME_LEN);
 	m_port = port;
 	_tcsncpy_s(m_proxyhost,m_opts->m_proxyhost, MAX_HOST_NAME_LEN);
+	_tcsncpy_s(m_Cloudhost, m_opts->m_Cloudhost, MAX_HOST_NAME_LEN);
 	m_proxyport=m_opts->m_proxyport;
 	m_fUseProxy = m_opts->m_fUseProxy;
+	m_fUseCloud = m_opts->m_fUseCloud;
 }
 
 void ClientConnection::Init(VNCviewerApp *pApp)
 {
+	if (cloudThread)
+		delete cloudThread;
+	cloudThread = new CloudThread();
 	InitializeCriticalSection(&crit);
 	m_hSessionDialog = NULL;
 	new_ultra_server=false;
@@ -349,6 +355,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_proxyport = -1;
 	m_host[0] = '\0';
 	m_proxyhost[0] = '\0';
+	m_Cloudhost[0] = '\0';
 //	m_proxy = 0;
 	m_serverInitiated = false;
 	m_netbuf = NULL;
@@ -395,6 +402,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_pDSMPlugin = new CDSMPlugin();
 	m_fUsePlugin = false;
 	m_fUseProxy = false;
+	m_fUseCloud = false;
 	m_pNetRectBuf = NULL;
 	m_fReadFromNetRectBuf = false;  //
 	m_nNetRectBufOffset = 0;
@@ -521,6 +529,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_membitmap=NULL;
 	m_BigToolbar=false;
 	strcpy_s(m_proxyhost,"");
+	strcpy_s(m_Cloudhost, "");
 	KillEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 	KillUpdateThreadEvent = CreateEvent(NULL, FALSE, TRUE, NULL);
 	newtick=0;
@@ -717,10 +726,12 @@ void ClientConnection::DoConnection(bool reconnect)
 	havetobekilled=true;
 	// Connect if we're not already connected
 	if (m_sock == INVALID_SOCKET)
-		if (strcmp(m_proxyhost,"") !=NULL && m_fUseProxy)
+		if (strcmp(m_proxyhost, "") != NULL && m_fUseProxy)
 			ConnectProxy();
+		else if (strcmp(m_Cloudhost, "") != NULL && m_fUseCloud)
+			Connect(true);
 		else
-			Connect();
+			Connect(false);
 
 	SetSocketOptions();
 
@@ -1333,6 +1344,11 @@ void ClientConnection::GTGBS_CreateToolbar()
 		_snprintf_s(proxyname, MAX_HOST_NAME_LEN-1, "%s:%li (%s:%li)", m_host, m_port, m_proxyhost, m_proxyport);
 		SendMessage(m_logo_wnd, CB_ADDSTRING, 0, (LPARAM)proxyname);
 	}
+	if (m_fUseCloud && strlen(m_Cloudhost) > 0) {
+		TCHAR cloudname[MAX_HOST_NAME_LEN];
+		_snprintf_s(cloudname, MAX_HOST_NAME_LEN - 1, "%s", m_Cloudhost);
+		SendMessage(m_logo_wnd, CB_ADDSTRING, 0, (LPARAM)cloudname);
+	}
     for (int i = 0; i < m_pMRU->NumItems(); i++) {
         m_pMRU->GetItem(i, valname, 255);
         int pos = SendMessage(m_logo_wnd, CB_ADDSTRING, 0, (LPARAM) valname);
@@ -1830,30 +1846,20 @@ void ClientConnection::GetConnectDetails()
 		LoadConnection(m_opts->m_configFilename, false);
 	}
 	else {
-		if (!command_line && LoadConnection(m_opts->getDefaultOptionsFileName(), true, true)==-1) {
+			if (!command_line)
+				LoadConnection(m_opts->getDefaultOptionsFileName(), true, true);
 			SessionDialog sessdlg(m_opts, this, m_pDSMPlugin); //sf@2002
 			if (!sessdlg.DoDialog())
-					throw QuietException(sz_L42);
+				throw QuietException(sz_L42);
 			_tcsncpy_s(m_host, sessdlg.m_host_dialog, MAX_HOST_NAME_LEN);
 			m_port = sessdlg.m_port;
 			_tcsncpy_s(m_proxyhost, sessdlg.m_proxyhost, MAX_HOST_NAME_LEN);
+			_tcsncpy_s(m_Cloudhost, sessdlg.m_Cloudhost, MAX_HOST_NAME_LEN);
 			m_proxyport = sessdlg.m_proxyport;
 			m_fUseProxy = sessdlg.m_fUseProxy;
+			m_fUseCloud = sessdlg.m_fUseCloud;
 			if (m_opts->autoDetect)
-					m_opts->m_Use8Bit = rfbPFFullColors;				
-		}
-		else {
-			SessionDialog sessdlg(m_opts, this, m_pDSMPlugin); //sf@2002
-			if (!sessdlg.DoDialog())
-					throw QuietException(sz_L42);
-			_tcsncpy_s(m_host, sessdlg.m_host_dialog, MAX_HOST_NAME_LEN);
-			m_port = sessdlg.m_port;
-			_tcsncpy_s(m_proxyhost, sessdlg.m_proxyhost, MAX_HOST_NAME_LEN);
-			m_proxyport = sessdlg.m_proxyport;
-			m_fUseProxy = sessdlg.m_fUseProxy;
-			if (m_opts->autoDetect)
-				m_opts->m_Use8Bit = rfbPFFullColors;
-		}
+				m_opts->m_Use8Bit = rfbPFFullColors;				
 	}
 	// This is a bit of a hack:
 	// The config file may set various things in the app-level defaults which
@@ -1864,6 +1870,7 @@ void ClientConnection::GetConnectDetails()
 	m_pApp->m_options.m_host_options[0] = '\0';
 	m_pApp->m_options.m_port = -1;
 	m_pApp->m_options.m_proxyhost[0] = '\0';
+	m_pApp->m_options.m_Cloudhost[0] = '\0';
 	m_pApp->m_options.m_proxyport = -1;
 	m_pApp->m_options.m_connectionSpecified = false;
 	m_pApp->m_options.m_configSpecified = false;
@@ -1886,8 +1893,13 @@ DWORD WINAPI SocketTimeout(LPVOID lpParam)
 	}
 	return 0;
 }
-void ClientConnection::Connect()
+void ClientConnection::Connect(bool cloud)
 {
+	if (cloud) {
+		strcpy_s(m_host, "127.0.0.1");
+		m_port = 5953;
+	}
+
 #ifdef IPV6V4
 	bool IsIpv4 = false;
 	bool IsIpv6 = false;
@@ -2111,15 +2123,24 @@ void ClientConnection::Connect()
 #else
 	struct sockaddr_in thataddr;
 	int res;
-	if (!m_opts->m_NoStatus && !m_hwndStatus) GTGBS_ShowConnectWindow();
-	if (m_sock != NULL && m_sock != INVALID_SOCKET) closesocket(m_sock);
+	if (!m_opts->m_NoStatus && !m_hwndStatus) 
+		GTGBS_ShowConnectWindow();
+	if (m_sock != NULL && m_sock != INVALID_SOCKET) 
+		closesocket(m_sock);
 	m_sock = socket(PF_INET, SOCK_STREAM, 0);
-	if (m_hwndStatus) SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L43);
-	if (m_sock == INVALID_SOCKET) { if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L44); throw WarningException(sz_L44); }
+	if (m_hwndStatus) 
+		SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L43);
+	if (m_sock == INVALID_SOCKET) { 
+		if (m_hwndStatus)
+			SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L44); 
+		throw WarningException(sz_L44); 
+	}
 
 
-	if (m_hwndStatus) SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L45);
-	if (m_hwndStatus) UpdateWindow(m_hwndStatus);
+	if (m_hwndStatus) {
+		SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L45);
+		UpdateWindow(m_hwndStatus);
+	}
 
 	// The host may be specified as a dotted address "a.b.c.d"
 	// Try that first
@@ -2132,24 +2153,25 @@ void ClientConnection::Connect()
 
 		if (lphost == NULL)
 		{
-			//if(myDialog!=0)DestroyWindow(myDialog);
 			SetEvent(KillEvent);
-			if (m_hwndStatus) SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L46);
+			if (m_hwndStatus) 
+				SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L46);
 			throw WarningException(sz_L46, IDS_L46);
 		};
 		thataddr.sin_addr.s_addr = ((LPIN_ADDR)lphost->h_addr)->s_addr;
 	};
 
-	if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L47);
-	if (m_hwndStatus)ShowWindow(m_hwndStatus, SW_SHOW);
-	if (m_hwndStatus)UpdateWindow(m_hwndStatus);
-	if (m_hwndStatus)SetDlgItemInt(m_hwndStatus, IDC_PORT, m_port, FALSE);
+	if (m_hwndStatus) {
+		SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L47);
+		ShowWindow(m_hwndStatus, SW_SHOW);
+		UpdateWindow(m_hwndStatus);
+		SetDlgItemInt(m_hwndStatus, IDC_PORT, m_port, FALSE);
+	}
 	thataddr.sin_family = AF_INET;
 	thataddr.sin_port = htons(m_port);
 	///Force break after timeout
 	DWORD				  threadID;
-	if (ThreadSocketTimeout)
-	{
+	if (ThreadSocketTimeout){
 		havetobekilled = false; //force SocketTimeout thread to quit
 		WaitForSingleObject(ThreadSocketTimeout, 5000);
 		CloseHandle(ThreadSocketTimeout);
@@ -2158,22 +2180,26 @@ void ClientConnection::Connect()
 	ThreadSocketTimeout = CreateThread(NULL, 0, SocketTimeout, (LPVOID)&m_sock, 0, &threadID);
 	res = connect(m_sock, (LPSOCKADDR)&thataddr, sizeof(thataddr));
 
-	if (res == SOCKET_ERROR)
-	{
+	if (res == SOCKET_ERROR){
 		int a = WSAGetLastError();
 		vnclog.Print(0, _T("socket error %i\n"), a);
 		if (a == 6)
 			Sleep(5000);
-		if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L48);
+		if (m_hwndStatus)
+			SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L48);
 		SetEvent(KillEvent);
-		if (!Pressed_Cancel) throw WarningException(sz_L48, IDS_L48);
-		else throw QuietException(sz_L48);
+		if (!Pressed_Cancel) 
+			throw WarningException(sz_L48, IDS_L48);
+		else 
+			throw QuietException(sz_L48);
 	}
 	vnclog.Print(0, _T("Connected to %s port %d\n"), m_host, m_port);
-	if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L49);
-	if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_VNCSERVER, m_host);
-	if (m_hwndStatus)ShowWindow(m_hwndStatus, SW_SHOW);
-	if (m_hwndStatus)UpdateWindow(m_hwndStatus);
+	if (m_hwndStatus) {
+		SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L49);
+		SetDlgItemText(m_hwndStatus, IDC_VNCSERVER, m_host);
+		ShowWindow(m_hwndStatus, SW_SHOW);
+		UpdateWindow(m_hwndStatus);
+	}
 #endif
 }
 
@@ -3668,9 +3694,9 @@ void ClientConnection::ReadServerInit(bool reconnect)
     m_desktopName = new TCHAR[1024];
 	m_desktopName_viewonly = new TCHAR[1024];
 	if (m_si.nameLength > 256) {
-		int msgboxID = MessageBox(NULL,"Server is trying yo overload a memory buffer.\Possible exploit","Error", MB_OKCANCEL |MB_ICONINFORMATION);
+		int msgboxID = MessageBox(NULL,"Server is trying yo overload a memory buffer.\nPossible exploit","Error", MB_OKCANCEL |MB_ICONINFORMATION);
 		if (msgboxID == IDCANCEL)
-			exit;
+			exit(0);
 		m_si.nameLength = 256;
 	}
     ReadString(m_desktopName, m_si.nameLength);
@@ -4568,6 +4594,8 @@ ClientConnection::~ClientConnection()
 	delete directx_output;
 	delete ultraVncZlib;
 	DeleteCriticalSection(&crit);
+	if (cloudThread)
+		delete cloudThread;
 }
 
 // You can specify a dx & dy outside the limits; the return value will

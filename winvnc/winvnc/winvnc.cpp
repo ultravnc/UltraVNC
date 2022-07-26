@@ -60,6 +60,7 @@ DWORD		mainthreadId;
 
 //adzm 2009-06-20
 char* g_szRepeaterHost = NULL;
+char* g_szCloudHost = NULL;
 
 // sf@2007 - New shutdown order handling stuff (with uvnc_service)
 bool			fShutdownOrdered = false;
@@ -76,6 +77,7 @@ bool PostAddAutoConnectClient_bool_null=false;
 bool PostAddConnectClient_bool=false;
 bool PostAddConnectClient_bool_null=false;
 bool PostAddNewRepeaterClient_bool=false;
+bool PostAddNewCloudClient_bool = false;
 
 char pszId_char[20];
 #ifdef IPV6V4
@@ -1083,6 +1085,34 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 			continue;
 		}
 
+		if (strncmp(&szCmdLine[i], winvncCloud, strlen(winvncCloud)) == 0)
+		{
+			i += strlen(winvncCloud);
+			size_t start, end;
+			start = i;
+			while (szCmdLine[start] <= ' ' && szCmdLine[start] != 0) 
+				start++;
+			end = start;
+			while (szCmdLine[end] > ' ') 
+				end++;
+
+			if (end - start > 0) {
+				if (g_szCloudHost) {
+					delete[] g_szCloudHost;
+					g_szCloudHost = NULL;
+				}
+				g_szCloudHost = new char[end - start + 1];
+				strncpy_s(g_szCloudHost, end - start + 1, &(szCmdLine[start]), end - start);
+				g_szCloudHost[end - start] = 0;
+				if (!postHelper::PostAddNewCloudClient()) {
+					PostAddNewCloudClient_bool = true;
+				}
+				i = end;
+				continue;
+			}
+			continue;
+		}
+
 		//adzm 2009-06-20
 		if (strncmp(&szCmdLine[i], winvncRepeater, strlen(winvncRepeater)) == 0)
 		{
@@ -1125,22 +1155,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 				}
 				i=end;
 				continue;
-			}
-			else
-			{
-				/*
-				// Tell the server to show the Add New Client dialog
-				// We can not contact a runnning service, permissions, so we must store the settings
-				// and process until the vncmenu has been started
-				vnclog.Print(LL_INTERR, VNCLOG("PostAddNewClient IIII\n"));
-				if (!PostAddNewClient(0, 0))
-				{
-				PostAddNewClient_bool=true;
-				port_int=0;
-				address_vcard=0;
-				}
-				*/
-			}
+			}			
 			continue;
 		}
 
@@ -1281,6 +1296,12 @@ DWORD WINAPI imp_desktop_thread(LPVOID lpParam)
 		vnclog.Print(LL_INTERR, VNCLOG("PostAddNewRepeaterClient II\n"));
 		postHelper::PostAddNewRepeaterClient();
 	}
+	if (PostAddNewCloudClient_bool)
+	{
+		PostAddNewCloudClient_bool = false;
+		vnclog.Print(LL_INTERR, VNCLOG("PostAddNewCloudClient II\n"));
+		postHelper::PostAddNewCloudClient();
+	}
 	bool Runonce=false;
 	MSG msg;
 	while (GetMessage(&msg,0,0,0) != 0)
@@ -1387,6 +1408,10 @@ int WinVNCAppMain()
 	if (g_szRepeaterHost) {
 		delete[] g_szRepeaterHost;
 		g_szRepeaterHost = NULL;
+	}
+	if (g_szCloudHost) {
+		delete[] g_szCloudHost;
+		g_szCloudHost = NULL;
 	}
 	return 1;
 };

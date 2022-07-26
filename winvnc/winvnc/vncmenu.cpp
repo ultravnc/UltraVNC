@@ -241,9 +241,12 @@ vncMenu::vncMenu(vncServer* server)
 		return;
 	}
 
+	m_CloudDialog.Init(m_server);
+	m_server->setVNcPort();
 	if (settings->getAllowInjection()) {
 		ChangeWindowMessageFilter(postHelper::MENU_ADD_CLIENT_MSG, MSGFLT_ADD);
 		ChangeWindowMessageFilter(postHelper::MENU_ADD_CLIENT_MSG_INIT, MSGFLT_ADD);
+		ChangeWindowMessageFilter(postHelper::MENU_ADD_CLOUD_MSG, MSGFLT_ADD);
 #ifdef IPV6V4
 		ChangeWindowMessageFilter(postHelper::MENU_ADD_CLIENT6_MSG, MSGFLT_ADD);
 		ChangeWindowMessageFilter(postHelper::MENU_ADD_CLIENT6_MSG_INIT, MSGFLT_ADD);
@@ -634,7 +637,7 @@ void vncMenu::setToolTip()
 		strncat_s(m_tooltip, " - service - ", (sizeof(m_tooltip) - 1) - strlen(m_tooltip));
 	else
 		strncat_s(m_tooltip, " - application - ", (sizeof(m_tooltip) - 1) - strlen(m_tooltip));
-	strncat_s(m_nid.szTip, g_hookstring, (sizeof(m_nid.szTip) - 1) - strlen(m_nid.szTip));
+	strncat_s(m_tooltip, g_hookstring, (sizeof(m_tooltip) - 1) - strlen(m_tooltip));
 }
 
 void vncMenu::RestoreTooltip()
@@ -854,6 +857,11 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			_this->FlashTrayIcon(_this->m_server->AuthClientCount() != 0);
 			break;
 
+		case ID_MENU_CLOUDCONNECT:
+			_this->m_CloudDialog.Show(TRUE);
+			break;
+
+		
 		case ID_OUTGOING_CONN:
 			// Connect out to a listening VNC viewer
 		{
@@ -1727,6 +1735,10 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			return 0;
 		}
 #else
+		if (iMsg == postHelper::MENU_ADD_CLOUD_MSG) {
+			settings->setCloudServer(g_szCloudHost);
+			_this->m_CloudDialog.Show(TRUE, true);
+		}
 		if (iMsg == postHelper::MENU_ADD_CLIENT_MSG || iMsg == postHelper::MENU_ADD_CLIENT_MSG_INIT)
 		{
 			if (iMsg == postHelper::MENU_ADD_CLIENT_MSG_INIT)

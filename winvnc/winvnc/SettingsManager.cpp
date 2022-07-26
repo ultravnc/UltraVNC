@@ -208,6 +208,9 @@ void SettingsManager::setDefaults()
 	m_pref_locdom1 = false;
 	m_pref_locdom2 = false;
 	m_pref_locdom3 = false;
+
+	memset(m_pref_cloudServer, 0, MAX_HOST_NAME_LEN);
+	m_pref_cloudEnabled = false;
 };
 
 void SettingsManager::load()
@@ -319,6 +322,9 @@ void SettingsManager::load()
 	myIniFile.ReadString("admin_auth", "group3", m_pref_group3, 150);
 	_tcscpy_s(m_pref_group3, "VNCVIEWONLY");
 
+	myIniFile.ReadString("admin", "cloudServer", m_pref_cloudServer, MAX_HOST_NAME_LEN);
+	m_pref_cloudEnabled = myIniFile.ReadInt("admin", "cloudEnabled", m_pref_cloudEnabled);
+
 
 	m_pref_locdom1 = myIniFile.ReadInt("admin_auth", "locdom1", m_pref_locdom1);
 	m_pref_locdom2 = myIniFile.ReadInt("admin_auth", "locdom2", m_pref_locdom2);
@@ -428,6 +434,9 @@ void SettingsManager::save()
 	myIniFile.WriteInt("poll", "EnableHook", m_pref_Hook);
 	myIniFile.WriteInt("poll", "EnableVirtual", m_pref_Virtual);
 	myIniFile.WriteInt("poll", "autocapt", m_pref_autocapt);
+
+	myIniFile.WriteString("admin", "cloudServer", m_pref_cloudServer);
+	myIniFile.WriteInt("admin", "cloudEnabled", m_pref_cloudEnabled);
 
 	if (tempset) {
 		myIniFile.copy_to_secure();

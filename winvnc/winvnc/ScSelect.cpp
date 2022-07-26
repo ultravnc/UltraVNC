@@ -172,6 +172,7 @@ namespace ScSelect {
 		}
 		else
 			strcpy_s(defaultCommandLine, temp1);
+
 		DeleteObject(defaultbrush);
 		DeleteObject(selectbrush);
 		DeleteObject(hotbrush);
@@ -500,7 +501,8 @@ namespace ScSelect {
 				}
 				fclose(fid);
 			}
-			else EndDialog(hWnd, 0);
+			else 
+				EndDialog(hWnd, 0);
 			if (i == 1 && direct) {
 				strcpy_s(defaultCommandLine, g_var[0]);
 				if (entercode)

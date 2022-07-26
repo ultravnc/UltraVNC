@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title> UDT Reference</title>
+<link rel="stylesheet" href="udtdoc.css" type="text/css" />
+</head>
+
+<body>
+<div class="ref_head">&nbsp;UDT Reference: Functions</div>
+
+<h4 class="func_name"><strong>listen</strong></h4>
+<p>The <b>listen</b> method enables a server UDT entity to wait for clients to connect.</p>
+
+<div class="code">int list(<br />
+&nbsp; UDTSOCKET <font color="#FFFFFF">u</font><br />
+&nbsp; int <font color="#FFFFFF">backlog</font><br />
+);</div>
+
+<h5>Parameters</h5>
+<dl>
+  <dt><i>u</i></dt>
+  <dd>[in] Descriptor identifying the server socket.</dd>
+  <dt><i>backlog</i></dt>
+  <dd>[in] Maximum number of pending connections.</dd>
+</dl>
+
+<h5>Return Value</h5>
+<p>If success, 0 is returned; otherwise, UDT::ERROR is returned and specific error information can be retrieved by <a href="error.htm">getlasterror</a>.</p>
+
+<table width="100%" border="1" cellpadding="2" cellspacing="0" bordercolor="#CCCCCC">
+  <tr>
+    <td width="17%" class="table_headline"><strong>Error Name</strong></td>
+    <td width="17%" class="table_headline"><strong>Error Code</strong></td>
+    <td width="83%" class="table_headline"><strong>Comment</strong></td>
+  </tr>
+  <tr>
+    <td>ECONNSOCK</td>
+    <td>5002</td>
+    <td><i>u</i> is already connected.</td>
+  </tr>
+  <tr>
+    <td>EINVSOCK</td>
+    <td>5004</td>
+    <td><i>u</i> is an invalid socket.</td>
+  </tr>
+  <tr>
+    <td>EUNBOUNDSOCK</td>
+    <td>5005</td>
+    <td><i>u</i> is not bound.</td>
+  </tr>
+  <tr>
+    <td>ERDVNOSERV</td>
+    <td>5007</td>
+    <td><i>u</i> is in rendezvous mode.</td>
+  </tr>
+</table>
+
+<h5>Description</h5>
+<p>The <strong>listen</strong> method lets a UDT socket enter listening state. The socket must call <strong>bind</strong> before a <strong>listen</strong> call. In addition, if the 
+socket is enable for rendezvous mode, neither <strong>listen</strong> nor <strong>accept</strong> can be used on the socket. A UDT socket can call <strong>listen</strong> more than once, 
+in which case only the first call is effective, while all subsequent calls will be ignored if the socket is already in listening state.</p>
+
+<h5>See Also</h5>
+<p><strong><a href="bind.htm">bind</a>, <a href="accept.htm">accpet</a>, <a href="connect.htm">connect</a></strong></p>
+<p>&nbsp;</p>
+
+</body>
+</html>

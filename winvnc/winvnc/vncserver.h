@@ -66,6 +66,8 @@ const int MAX_CLIENTS = 128;
 
 // The vncServer class itself
 
+class CloudThread;
+
 class vncServer
 {
 public:
@@ -76,6 +78,9 @@ public:
 	// Constructor/destructor
 	vncServer();
 	~vncServer();
+
+	char code[18]{};
+	char* generateCode();
 
 	// Client handling functions
 	virtual vncClientId AddClient(VSocket *socket, BOOL auth, BOOL shared, BOOL outgoing);
@@ -273,6 +278,13 @@ public:
 	int m_virtualDisplaySupported;
 	VirtualDisplay *virtualDisplay;
 
+
+	void cloudConnect(bool start, char* cloudServer);
+	bool isCloudThreadRunning();
+	char* getExternalIpAddress();
+	int getStatus();
+	void setVNcPort();
+
 protected:
 	// The vncServer UpdateTracker class
 	// Behaves like a standard UpdateTracker, but propagates update
@@ -356,6 +368,7 @@ protected:
     BOOL m_fSendExtraMouse;
 	bool KillAuthClientsBuzy;	
 	BOOL sethook;
+	CloudThread* cloudThread;
 };
 
 #endif
