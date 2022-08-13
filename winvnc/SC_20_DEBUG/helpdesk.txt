@@ -1,0 +1,76 @@
+[TITLE]
+           UltraVnc SC
+
+[HOST]
+Internet support
+-connect somehost:5500
+
+[HOST]
+Special chars ûïéç support encryption
+-secureplugin -connect somehost:5500
+
+[HOST]
+Repeater enter id code
+-autoreconnect ID:[ENTERCODE] repeaterhost:5500
+
+[HOST]
+Using cloud connect
+-cloudserver cloud.uvnc.com
+
+[TEXTTOP]
+Double click to make a connection
+
+[TEXTMIDDLE]
+Before making a connection
+
+[TEXTBOTTOM]
+Please Call 56 576896 to get your ticket
+
+[TEXTRBOTTOM]
+
+
+[TEXTRMIDDLE]
+Kasteelpleinstraat 56
+
+[TEXTRTOP]
+Ultravnc PC support
+
+[TEXTBUTTON]
+More Info
+
+[WEBPAGE]
+http://www.uvnc.com
+
+[TEXTCLOSEBUTTON]
+STOP test
+
+
+[BALLOON1TITLE]
+Establishing connection ...
+
+[BALLOON1A]
+5 min try period
+
+[BALLOON1B]
+If it fails, the software will remove himself
+
+[BALLOON1C]
+from your system. 
+
+[BALLOON2TITLE]
+Connection active.
+
+[BALLOON2A]
+Warning, your desktop is remote visable
+
+[BALLOON2B]
+You can break the connection any time
+
+[BALLOON2C]
+by using the close button
+
+[WEBPAGE]
+http://www.uvnc.com
+
+[ENTERCODE]
+ENTER YOUR IDE
