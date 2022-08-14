@@ -308,7 +308,7 @@ BEGIN
     RTEXT           "Team UltraVNC 2022",IDC_TEXTRIGHTBOTTOM,2,195,173,8
     PUSHBUTTON      "Close",IDC_CLOSE,95,179,80,14,BS_FLAT
     DEFPUSHBUTTON   "Connect",IDC_CONNECT,4,123,171,14,BS_FLAT
-    CONTROL         IDB_BITMAP3,IDC_LOGO,"Static",SS_BITMAP,146,151,26,21
+    CONTROL         IDB_LOGO64,IDC_LOGO,"Static",SS_BITMAP,136,145,28,24
     CONTROL         "",IDC_SCEXPAND,"Static",SS_BLACKFRAME,0,0,183,206
     CTEXT           "Enter your connection  code",IDC_STATICIDCODE,183,6,81,27
     EDITTEXT        IDC_IDCODE,183,40,78,11,ES_AUTOHSCROLL | NOT WS_BORDER,WS_EX_CLIENTEDGE
@@ -596,6 +596,21 @@ BEGIN
     0
 END
 
+#if defined(SC_20)
+/////////////////////////////////////////////////////////////////////////////
+//
+// DLL
+//
+
+IDR_DLL1                DLL                     "res\\ddengine.dll"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// ENCRYPTIONDLL
+//
+IDR_ENCRYPTIONDLL1      ENCRYPTIONDLL           "res\\SecureVNCPlugin.dsm"
+#endif
 
 /////////////////////////////////////////////////////////////////////////////
 //
