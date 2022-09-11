@@ -4,7 +4,24 @@
 #include <stdio.h>
 #include <vector>
 #include <list>
+#if !defined(__MINGW32__)
 #include <swdevice.h>
+#else
+#include <memory>
+enum SWDeviceCapabilities { SWDeviceCapabilitiesRemovable = 0x1, SWDeviceCapabilitiesSilentInstall = 0x2, SWDeviceCapabilitiesDriverRequired = 0x8 };
+typedef void (WINAPI *SW_DEVICE_CREATE_CALLBACK)(HANDLE, HRESULT, PVOID, PCWSTR);
+typedef HANDLE HSWDEVICE;
+typedef HANDLE* PHSWDEVICE;
+typedef int DEVPROPERTY;
+typedef struct SW_DEVICE_CREATE_INFO_ {
+    int cbSize;
+    PCWSTR pszzCompatibleIds;
+    PCWSTR pszInstanceId;
+    PCWSTR pszzHardwareIds;
+    PCWSTR pszDeviceDescription;
+    int CapabilityFlags;
+} SW_DEVICE_CREATE_INFO;
+#endif //__MINGW32__
 #include <aclapi.h>
 #include<map>
 using namespace std;
