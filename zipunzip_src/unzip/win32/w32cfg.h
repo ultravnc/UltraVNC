@@ -47,12 +47,6 @@
 #if (defined(__LCC__) && !defined(tzset))
 #  define tzset _tzset
 #endif
-#ifdef __MINGW32__
-   extern void _tzset(void);    /* this is missing in <time.h> */
-#  ifndef tzset
-#    define tzset _tzset
-#  endif
-#endif
 #ifdef W32_USE_IZ_TIMEZONE
 #  ifdef __BORLANDC__
 #    define tzname tzname
