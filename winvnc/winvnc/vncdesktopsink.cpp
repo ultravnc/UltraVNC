@@ -30,7 +30,9 @@
 #include "vncOSVersion.h"
 #include "SettingsManager.h"
 
+#if !defined(WM_DPICHANGED)
 #define WM_DPICHANGED       0x02E0
+#endif
 
 int OSversion();
 DWORD WINAPI InitWindowThread(LPVOID lpParam);
