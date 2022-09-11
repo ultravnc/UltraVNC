@@ -76,25 +76,25 @@ IDB_BITMAP2             BITMAP                  "hoch.bmp"
 
 IDB_BITMAP3             BITMAP                  "quer.bmp"
 
-IDB_STAT_BACK           BITMAP                  "stat\\back.bmp"
+IDB_STAT_BACK           BITMAP                  "stat/back.bmp"
 
-IDB_STAT_BOTH           BITMAP                  "stat\\both.bmp"
+IDB_STAT_BOTH           BITMAP                  "stat/both.bmp"
 
-IDB_STAT_FRONT          BITMAP                  "stat\\front.bmp"
+IDB_STAT_FRONT          BITMAP                  "stat/front.bmp"
 
-IDB_STAT_NONE           BITMAP                  "stat\\none.bmp"
+IDB_STAT_NONE           BITMAP                  "stat/none.bmp"
 
 IDB_VNC64               BITMAP                  "vnc64.BMP"
 
-IDB_CLOSE               BITMAP                  "stat\\closeup.bmp"
+IDB_CLOSE               BITMAP                  "stat/closeup.bmp"
 
-IDB_MAXIMIZE            BITMAP                  "stat\\maximizeup.bmp"
+IDB_MAXIMIZE            BITMAP                  "stat/maximizeup.bmp"
 
-IDB_MINIMIZE            BITMAP                  "stat\\minimizeup.bmp"
+IDB_MINIMIZE            BITMAP                  "stat/minimizeup.bmp"
 
-IDB_PINDOWN             BITMAP                  "stat\\pindown.bmp"
+IDB_PINDOWN             BITMAP                  "stat/pindown.bmp"
 
-IDB_PINUP               BITMAP                  "stat\\pinup.bmp"
+IDB_PINUP               BITMAP                  "stat/pinup.bmp"
 
 IDB_VNC32               BITMAP                  "vnc32.BMP"
 
@@ -1187,13 +1187,13 @@ IDB_BITMAP14            BITMAP                  "l2.bmp"
 
 IDB_BITMAP13            BITMAP                  "l1.bmp"
 
-IDB_FITSCREEN           BITMAP                  "stat\\1op1.bmp"
+IDB_FITSCREEN           BITMAP                  "stat/1op1.bmp"
 
-IDB_NOSCALE             BITMAP                  "stat\\full.bmp"
+IDB_NOSCALE             BITMAP                  "stat/full.bmp"
 
-IDB_PHOTO               BITMAP                  "stat\\photo.bmp"
+IDB_PHOTO               BITMAP                  "stat/photo.bmp"
 
-IDB_SWITCHMONITOR       BITMAP                  "stat\\switch.bmp"
+IDB_SWITCHMONITOR       BITMAP                  "stat/switch.bmp"
 
 IDB_EXPAND              BITMAP                  "down.bmp"
 

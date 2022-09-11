@@ -24,7 +24,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_NEUTRAL
 // Bitmap
 //
 
-IDB_COLLAPS             BITMAP                  "res\\up.bmp"
+IDB_COLLAPS             BITMAP                  "res/up.bmp"
 
 #endif    // English resources
 /////////////////////////////////////////////////////////////////////////////
@@ -42,11 +42,11 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // Bitmap
 //
 
-IDB_RED                 BITMAP                  "res\\LedRed.bmp"
+IDB_RED                 BITMAP                  "res/LedRed.bmp"
 
-IDB_GREEN               BITMAP                  "res\\LedGreen.bmp"
+IDB_GREEN               BITMAP                  "res/LedGreen.bmp"
 
-IDB_YELLOW              BITMAP                  "res\\LedYellow.bmp"
+IDB_YELLOW              BITMAP                  "res/LedYellow.bmp"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -443,25 +443,25 @@ END
 // Cursor
 //
 
-IDC_FINGER              CURSOR                  "res\\Finger.cur"
+IDC_FINGER              CURSOR                  "res/Finger.cur"
 
-IDC_CURSORBLANK         CURSOR                  "res\\cursor5.cur"
+IDC_CURSORBLANK         CURSOR                  "res/cursor5.cur"
 
-IDC_CURSOR9             CURSOR                  "res\\cursor9.cur"
+IDC_CURSOR9             CURSOR                  "res/cursor9.cur"
 
-IDC_CURSOR8             CURSOR                  "res\\cursor8.cur"
+IDC_CURSOR8             CURSOR                  "res/cursor8.cur"
 
-IDC_CURSOR7             CURSOR                  "res\\cursor7.cur"
+IDC_CURSOR7             CURSOR                  "res/cursor7.cur"
 
-IDC_CURSOR6             CURSOR                  "res\\cursor6.cur"
+IDC_CURSOR6             CURSOR                  "res/cursor6.cur"
 
-IDC_CURSOR4             CURSOR                  "res\\cursor4.cur"
+IDC_CURSOR4             CURSOR                  "res/cursor4.cur"
 
-IDC_CURSOR2             CURSOR                  "res\\cursor2.cur"
+IDC_CURSOR2             CURSOR                  "res/cursor2.cur"
 
-IDC_CURSOR1             CURSOR                  "res\\cursor1.cur"
+IDC_CURSOR1             CURSOR                  "res/cursor1.cur"
 
-IDC_CURSOR3             CURSOR                  "res\\cursor3.cur"
+IDC_CURSOR3             CURSOR                  "res/cursor3.cur"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -558,7 +558,7 @@ END
 // JAVAARCHIVE
 //
 
-IDR_VNCVIEWER_JAR       JAVAARCHIVE             "res\\vncviewer.jar"
+IDR_VNCVIEWER_JAR       JAVAARCHIVE             "res/vncviewer.jar"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -602,14 +602,14 @@ END
 // DLL
 //
 
-IDR_DLL1                DLL                     "res\\ddengine.dll"
+IDR_DLL1                DLL                     "res/ddengine.dll"
 
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // ENCRYPTIONDLL
 //
-IDR_ENCRYPTIONDLL1      ENCRYPTIONDLL           "res\\SecureVNCPlugin.dsm"
+IDR_ENCRYPTIONDLL1      ENCRYPTIONDLL           "res/SecureVNCPlugin.dsm"
 #endif
 
 /////////////////////////////////////////////////////////////////////////////
@@ -751,9 +751,9 @@ LANGUAGE LANG_DUTCH, SUBLANG_DUTCH_BELGIAN
 // Bitmap
 //
 
-IDB_LOGO64              BITMAP                  "res\\vnc-1.bmp"
+IDB_LOGO64              BITMAP                  "res/vnc-1.bmp"
 
-IDB_EXPAND              BITMAP                  "res\\down.bmp"
+IDB_EXPAND              BITMAP                  "res/down.bmp"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -823,7 +823,7 @@ END
 // JAVAARCHIVE
 //
 
-IDR_JAVAARCHIVE1        JAVAARCHIVE             "res\\mslogon\\VncViewer.jar"
+IDR_JAVAARCHIVE1        JAVAARCHIVE             "res/mslogon/VncViewer.jar"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -833,9 +833,9 @@ IDR_JAVAARCHIVE1        JAVAARCHIVE             "res\\mslogon\\VncViewer.jar"
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_WINVNC              ICON                    "res\\world3a.ico"
+IDI_WINVNC              ICON                    "res/world3a.ico"
 
-IDI_FLASH               ICON                    "res\\icon2.ico"
+IDI_FLASH               ICON                    "res/icon2.ico"
 
 #endif    // Dutch (Belgium) resources
 /////////////////////////////////////////////////////////////////////////////
