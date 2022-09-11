@@ -1,7 +1,9 @@
 #include "stdafx.h"
 #include "resource.h"
 #include <time.h>
+#if !defined(__MINGW32__)
 #include "upnp.h"
+#endif
 #include "firewall.h"
 #include "log.h"
 #include <iphlpapi.h>

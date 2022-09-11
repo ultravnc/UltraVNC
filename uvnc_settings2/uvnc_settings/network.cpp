@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "resource.h"
+#if !defined(__MINGW32__)
 #include "upnp.h"
+#endif
 #include "firewall.h"
 #include "log.h"
 #include <iphlpapi.h>
@@ -32,6 +34,7 @@ char strExternIP[256];
 
 DWORD WINAPI upnpthread( LPVOID lpParam )
 {
+#if !defined(__MINGW32__)
 	if(FAILED(CoInitializeEx(0, COINIT_APARTMENTTHREADED)))
     {
        CoUninitialize();
@@ -72,11 +75,13 @@ DWORD WINAPI upnpthread( LPVOID lpParam )
 	debug("Close 5999");
 	WSACleanup();
 	CoUninitialize();
+#endif //__MINGW32__
 	return 0;
 }
 
 DWORD WINAPI checkthread( LPVOID lpParam )
 {
+#if !defined(__MINGW32__)
 	if(FAILED(CoInitializeEx(0, COINIT_APARTMENTTHREADED)))
     {
         CoUninitialize();
@@ -88,11 +93,13 @@ DWORD WINAPI checkthread( LPVOID lpParam )
 	
 	WSACleanup();
 	CoUninitialize();
+#endif //__MINGW32__
 	return 0;
 }
 
 DWORD WINAPI mapthread( LPVOID lpParam )
 {
+#if !defined(__MINGW32__)
 	if(FAILED(CoInitializeEx(0, COINIT_APARTMENTTHREADED)))
     {
        CoUninitialize();
@@ -131,11 +138,13 @@ DWORD WINAPI mapthread( LPVOID lpParam )
 	free(pAdapterInfo);
 	WSACleanup();
 	CoUninitialize();
+#endif //__MINGW32__
 	return 0;
 }
 
 DWORD WINAPI unmapthread( LPVOID lpParam )
 {
+#if !defined(__MINGW32__)
 	if(FAILED(CoInitializeEx(0, COINIT_APARTMENTTHREADED)))
     {
        CoUninitialize();
@@ -174,11 +183,13 @@ DWORD WINAPI unmapthread( LPVOID lpParam )
 	UPnPvar.ClosePorts(true);
 	WSACleanup();
 	CoUninitialize();
+#endif //__MINGW32__
 	return 0;
 }
 
 DWORD WINAPI Fixhread( LPVOID lpParam )
 {
+#if !defined(__MINGW32__)
 	if(FAILED(CoInitializeEx(0, COINIT_APARTMENTTHREADED)))
     {
         CoUninitialize();
@@ -199,6 +210,7 @@ DWORD WINAPI Fixhread( LPVOID lpParam )
 	WSACleanup();
 	CoUninitialize();
 	SendMessage(networkproc,WM_COMMAND,2001,0);
+#endif //__MINGW32__
 	return 0;
 }
 bool initdone=false;
