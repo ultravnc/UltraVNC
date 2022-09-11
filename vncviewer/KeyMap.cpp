@@ -40,7 +40,7 @@ class ModifierKeyReleaser {
   public:
     ModifierKeyReleaser(ClientConnection* clientCon_, BYTE virtKey, bool extended)
       : clientCon(clientCon_), extVkey(virtKey + (extended ? 256 : 0)), keysym(0),
-        modKeyName(_T('\0'))
+        modKeyName(_T(""))
     {
         switch (extVkey) {
             case VK_CONTROL :
