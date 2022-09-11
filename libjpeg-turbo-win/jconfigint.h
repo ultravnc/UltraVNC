@@ -5,7 +5,11 @@
 #undef inline
 
 /* How to obtain function inlining. */
+#if !defined(__MINGW32__)
 #define INLINE  __forceinline
+#else
+#define INLINE  inline
+#endif /*__MINGW32__*/
 
 /* How to obtain thread-local storage */
 #define THREAD_LOCAL  __declspec(thread)
