@@ -21,7 +21,7 @@
 // which you received this file, check 
 // http://www.uvnc.com
 // /macine-vnc Greg Wood (wood@agressiv.com)
-//#include "..\..\winvnc\stdhdrs.h"
+//#include "../../winvnc/stdhdrs.h"
 #include <objbase.h> // for CoInitialize/CoUninitialize ???
 #include <time.h>
 #include "vncSSP.h"
@@ -29,7 +29,7 @@
 #define ViewOnly 0x0001
 #define Interact 0x0002
 
-#include "..\..\..\winvnc\winvnc\localization.h" // Act : add localization on messages
+#include "../../../winvnc/winvnc/localization.h" // Act : add localization on messages
 
 CheckUserPasswordSDFn CheckUserPasswordSD = 0;
 

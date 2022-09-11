@@ -46,9 +46,9 @@
 
 #include "deflate.h"
 #if defined(_M_IX86) || defined(_M_AMD64)
-#include "arch\x86\x86.h"
+#include "arch/x86/x86.h"
 #elif defined(_M_ARM64)
-#include "arch\aarch64\aarch64.h"
+#include "arch/aarch64/aarch64.h"
 #endif
 #include "zutil.h"      /* for STDC and FAR definitions */
 
