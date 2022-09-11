@@ -26,7 +26,7 @@ static int CALLBACK BrowseCallbackProc(HWND hwnd,UINT uMsg, LPARAM lParam, LPARA
 
 TCHAR * BrowseFolder(TCHAR * saved_path, HWND hwnd)
 {
-    TCHAR path[MAX_PATH];
+    static TCHAR path[MAX_PATH];
 
     const char * path_param = saved_path;
 
