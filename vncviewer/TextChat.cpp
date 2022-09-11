@@ -566,7 +566,7 @@ BOOL CALLBACK TextChat::TextChatDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM wParam,
 			{
 				memset(_this->m_szLocalText,0,TEXTMAXSIZE);
 				UINT nRes = GetDlgItemText( hWnd, IDC_INPUTAREA_EDIT, _this->m_szLocalText, TEXTMAXSIZE);
-				if (strstr(_this->m_szLocalText,"\n") >0 ) 
+				if (strstr(_this->m_szLocalText, "\n") != 0 )
 				{
 					_this->SendLocalText();			
 				}								

@@ -631,7 +631,7 @@ INT_PTR CALLBACK TextChat::TextChatDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM wPar
 			if(HIWORD(wParam) == EN_UPDATE)			
 			{
 				GetDlgItemText( hWnd, IDC_INPUTAREA_EDIT, _this->m_szLocalText, TEXTMAXSIZE);
-				if (strstr(_this->m_szLocalText, "\n") != NULL ) // Enter triggers the message transmission
+				if (strstr(_this->m_szLocalText, "\n") != 0 ) // Enter triggers the message transmission
 				{
 					_this->SendLocalText();
 				}								
