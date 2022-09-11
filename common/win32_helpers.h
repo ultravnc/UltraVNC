@@ -47,7 +47,7 @@ void SafeSetMsgResult(HWND hwnd, LPARAM result);
 HINSTANCE SafeGetWindowInstance(HWND hWnd);
 // GWL_WNDPROC
 LONG SafeGetWindowProc(HWND hWnd);
-void SafeSetWindowProc(HWND hWnd, LONG pWndProc);
+void SafeSetWindowProc(HWND hWnd, LONG_PTR pWndProc);
 
 void close_handle(HANDLE& h);
 

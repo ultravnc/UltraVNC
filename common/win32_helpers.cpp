@@ -66,7 +66,7 @@ LONG SafeGetWindowProc(HWND hWnd)
     return pWndProc;
 }
 
-void SafeSetWindowProc(HWND hWnd, LONG pWndProc)
+void SafeSetWindowProc(HWND hWnd, LONG_PTR pWndProc)
 {
 #ifndef _X64
     SetWindowLong(hWnd, GWL_WNDPROC, pWndProc);

@@ -890,7 +890,7 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 						,IDR_TOOLBAR
 						,nr_buttons
 						,NULL
-						,(UINT)hbmToolsmallX
+						,(UINT_PTR)hbmToolsmallX
 						,(LPCTBBUTTON)&tbButtons
 						,nr_buttons
 						,10
@@ -907,7 +907,7 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 						,IDR_TOOLBAR
 						,nr_buttons
 						,NULL
-						,(UINT)hbmToolbigX
+						,(UINT_PTR)hbmToolbigX
 						,(LPCTBBUTTON)&tbButtons
 						,nr_buttons
 						,20
@@ -927,7 +927,7 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 						,IDR_TOOLBAR
 						,nr_buttons
 						,NULL
-						,(UINT)hbmToolsmall
+						,(UINT_PTR)hbmToolsmall
 						,(LPCTBBUTTON)&tbButtons
 						,nr_buttons
 						,10
@@ -944,7 +944,7 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 						,IDR_TOOLBAR
 						,nr_buttons
 						,NULL
-						,(UINT)hbmToolbig
+						,(UINT_PTR)hbmToolbig
 						,(LPCTBBUTTON)&tbButtons
 						,nr_buttons
 						,20
