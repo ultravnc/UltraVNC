@@ -726,9 +726,9 @@ void ClientConnection::DoConnection(bool reconnect)
 	havetobekilled=true;
 	// Connect if we're not already connected
 	if (m_sock == INVALID_SOCKET)
-		if (strcmp(m_proxyhost, "") != NULL && m_fUseProxy)
+		if (strcmp(m_proxyhost, "") != 0 && m_fUseProxy)
 			ConnectProxy();
-		else if (strcmp(m_Cloudhost, "") != NULL && m_fUseCloud)
+		else if (strcmp(m_Cloudhost, "") != 0 && m_fUseCloud)
 			Connect(true);
 		else
 			Connect(false);
@@ -738,7 +738,7 @@ void ClientConnection::DoConnection(bool reconnect)
 	SetDSMPluginStuff(); // The Plugin is now activated BEFORE the protocol negociation
 						 // so ALL the communication data travel through the DSMPlugin
 
-	if (strcmp(m_proxyhost,"")!=NULL && m_fUseProxy)
+	if (strcmp(m_proxyhost,"")!=0 && m_fUseProxy)
 		NegotiateProxy();
 
 	NegotiateProtocolVersion();
@@ -2125,7 +2125,7 @@ void ClientConnection::Connect(bool cloud)
 	int res;
 	if (!m_opts->m_NoStatus && !m_hwndStatus) 
 		GTGBS_ShowConnectWindow();
-	if (m_sock != NULL && m_sock != INVALID_SOCKET) 
+	if (m_sock != 0 && m_sock != INVALID_SOCKET)
 		closesocket(m_sock);
 	m_sock = socket(PF_INET, SOCK_STREAM, 0);
 	if (m_hwndStatus) 
@@ -2824,7 +2824,7 @@ void ClientConnection::NegotiateProxy()
 	::ZeroMemory(tmphost, sizeof(tmphost));
 	::ZeroMemory(tmphost2, sizeof(tmphost2));
 	_tcscpy_s(tmphost,m_host);
-	if (strcmp(tmphost,"")!=NULL)
+	if (strcmp(tmphost,"")!=0)
 	{
 	_tcscat_s(tmphost,":");
 	_tcscat_s(tmphost, MAX_HOST_NAME_LEN, _itoa(m_port,tmphost2, 10));
@@ -5450,12 +5450,12 @@ void* ClientConnection::run_undetached(void* arg) {
 			// m_pFileTransfer->m_fFileTransferRunning = false;
 			// m_pTextChat->m_fTextChatRunning = false;
 			// throw QuietException(e.str());
-			if ((strcmp(e.str(),"rdr::EndOfStream: read")==NULL) && !m_bClosedByUser)
+			if ((strcmp(e.str(),"rdr::EndOfStream: read")==0) && !m_bClosedByUser)
 			{
 				WarningException w(sz_L94,200);
                // w.Report();
 			}
-			else if ((strcmp(e.str(),"rdr::SystemException: read: Unknown error (10054)")==NULL) && !m_bClosedByUser)
+			else if ((strcmp(e.str(),"rdr::SystemException: read: Unknown error (10054)")==0) && !m_bClosedByUser)
 			{
 				//ErrorException w(sz_L94,200);
 
@@ -7563,12 +7563,12 @@ LRESULT CALLBACK ClientConnection::GTGBS_StatusProc(HWND hwnd, UINT iMsg, WPARAM
 				SetWindowText(hwnd,sz_L73);
 			}
 
-			if(_this->m_port != NULL)
+			if(_this->m_port != 0)
 				SetDlgItemInt(hwnd,IDC_PORT,_this->m_port,FALSE);
 			else
 				SetDlgItemText(hwnd,IDC_PORT,_T(""));
 
-			if(_this->m_sock != NULL )
+			if(_this->m_sock != 0 )
 			{
 				if (_this->m_pDSMPlugin->IsEnabled())
 				{

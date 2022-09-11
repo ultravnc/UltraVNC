@@ -156,7 +156,7 @@ CheckVideoDriver(bool Box)
 						strcpy_s(buf2,"");
 						strcpy_s(buf2,"Driver found. \n");
 						GetDllProductVersion("mv2.dll",buf,512);
-						if (strcmp(buf,"1.00.22")==NULL)
+						if (strcmp(buf,"1.00.22")==0)
 						{
 							strcat_s(buf2,"Driver version OK \n");
 						}

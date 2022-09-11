@@ -100,13 +100,13 @@ void Snapshot::SaveJpeg(HBITMAP membit,TCHAR folder[MAX_PATH], TCHAR prefix[56],
 	{		
 		Gdiplus::Bitmap bitmap(membit, NULL);
 		CLSID clsid;
-		if (strcmp(imageFormat, ".jpeg") == NULL)
+		if (strcmp(imageFormat, ".jpeg") == 0)
 			GetEncoderClsid(L"image/jpeg", &clsid);
-		else if (strcmp(imageFormat, ".png") == NULL)
+		else if (strcmp(imageFormat, ".png") == 0)
 			GetEncoderClsid(L"image/png", &clsid);
-		else if (strcmp(imageFormat, ".gif") == NULL)
+		else if (strcmp(imageFormat, ".gif") == 0)
 			GetEncoderClsid(L"image/gif", &clsid);
-		else if (strcmp(imageFormat, ".bmp") == NULL)
+		else if (strcmp(imageFormat, ".bmp") == 0)
 			GetEncoderClsid(L"image/bmp", &clsid);
 
 		WCHAR wc[MAX_PATH];

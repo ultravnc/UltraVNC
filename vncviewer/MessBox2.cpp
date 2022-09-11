@@ -40,8 +40,8 @@ static LRESULT CALLBACK MessageDlgProc2(HWND hwnd, UINT iMsg,
 			SetForegroundWindow(hwnd);
             extern char buildtime[];
             SetDlgItemText(hwnd, IDC_BUILDTIME, infomsg2);
-			if ( (strcmp(infomsg2,"Your connection has been rejected.")==NULL)) g_error_nr2=1000;
-			if ( (strcmp(infomsg2,"Local loop-back connections are disabled.")==NULL)) g_error_nr2=1001;
+			if ( (strcmp(infomsg2,"Your connection has been rejected.")==0)) g_error_nr2=1000;
+			if ( (strcmp(infomsg2,"Local loop-back connections are disabled.")==0)) g_error_nr2=1001;
 
 			if (g_error_nr2!=0)
 			{

@@ -492,7 +492,7 @@ bool VirtualDisplay::ContainDisplayName(char naam[256])
 	std::list<NAMES>::iterator displayInfoIter;
 	displayInfoIter = displayList.begin();
 	while (displayInfoIter != displayList.end()) {
-		if (strcmp((*displayInfoIter).naam, naam) == NULL)
+		if (strcmp((*displayInfoIter).naam, naam) == 0)
 			return true;
 		displayInfoIter++;
 	}
@@ -528,7 +528,7 @@ void VirtualDisplay::recordDisplayNames()
 
 			NAMES naam;
 			strcpy_s(naam.naam, 256, dd.DeviceName);
-			if (strcmp(dd.DeviceString, "UVncVirtualDisplay Device") == NULL)
+			if (strcmp(dd.DeviceString, "UVncVirtualDisplay Device") == 0)
 				displayList.push_back(naam);
 		}
 		ZeroMemory(&dd, sizeof(dd));
@@ -572,7 +572,7 @@ void VirtualDisplay::getSetDisplayName(char* gdiDeviceName)
 
 				NAMES naam;
 				strcpy_s(naam.naam, 256, dd.DeviceName);
-				if (strcmp(dd.DeviceString, "UVncVirtualDisplay Device") == NULL) {
+				if (strcmp(dd.DeviceString, "UVncVirtualDisplay Device") == 0) {
 					if (!ContainDisplayName(naam.naam)) {
 						strcpy_s(gdiDeviceName, 256, naam.naam);
 						found = true;

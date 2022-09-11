@@ -64,7 +64,7 @@ SessionDialog::SessionDialog(VNCOptions* pOpt, ClientConnection* pCC, CDSMPlugin
 	TCHAR tmphost2[256];
 	_tcscpy_s(m_proxyhost, m_pOpt->m_proxyhost);
 	_tcscpy_s(m_Cloudhost, m_pOpt->m_Cloudhost);
-	if (strcmp(m_proxyhost, "") != NULL) {
+	if (strcmp(m_proxyhost, "") != 0) {
 		_tcscat_s(m_proxyhost, ":");
 		_tcscat_s(m_proxyhost, 256, _itoa(m_pOpt->m_proxyport, tmphost2, 10));
 	}
@@ -394,8 +394,8 @@ BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				TCHAR cloudhostname[MAX_HOST_NAME_LEN];
 				GetDlgItemText(hwnd, IDC_CLOUD_EDIT, cloudhostname, MAX_HOST_NAME_LEN);
 
-				if (strcmp(_this->m_pCC->c_proxyhost, hostname) == NULL &&
-					strcmp(_this->m_pCC->c_Cloudhost, cloudhostname) == NULL &&
+				if (strcmp(_this->m_pCC->c_proxyhost, hostname) == 0 &&
+					strcmp(_this->m_pCC->c_Cloudhost, cloudhostname) == 0 &&
 					_this->m_pCC->c_fUseCloud == _this->m_fUseCloud) {
 					KillTimer(hwnd, 100);
 					return 0;
@@ -611,13 +611,13 @@ void SessionDialog::InitDlgProc(bool loadhost, bool initMruNeeded)
 	}
 	TCHAR tmphost[256];
 	TCHAR tmphost2[256];
-	if (strcmp(m_proxyhost, "") != NULL) {
+	if (strcmp(m_proxyhost, "") != 0) {
 		_tcscpy_s(tmphost, m_proxyhost);
 		_tcscat_s(tmphost, ":");
 		_tcscat_s(tmphost, 256, _itoa(m_proxyport, tmphost2, 10));
 		SetDlgItemText(hwnd, IDC_PROXY_EDIT, tmphost);
 	}
-	if (strcmp(m_Cloudhost, "") != NULL) {
+	if (strcmp(m_Cloudhost, "") != 0) {
 		SetDlgItemText(hwnd, IDC_CLOUD_EDIT, m_Cloudhost);
 	}
 

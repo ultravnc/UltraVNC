@@ -943,13 +943,13 @@ void SessionDialog::InitDlgProcMisc()
 	SendMessage(hcomboscreen, CB_ADDSTRING, 0, (LPARAM)".png");
 	SendMessage(hcomboscreen, CB_ADDSTRING, 0, (LPARAM)".gif");
 	SendMessage(hcomboscreen, CB_ADDSTRING, 0, (LPARAM)".bmp");
-	if (strcmp(imageFormat, ".jpeg") == NULL)
+	if (strcmp(imageFormat, ".jpeg") == 0)
 		SendMessage(hcomboscreen, CB_SETCURSEL, 0, 0);
-	if (strcmp(imageFormat, ".png") == NULL)
+	if (strcmp(imageFormat, ".png") == 0)
 		SendMessage(hcomboscreen, CB_SETCURSEL, 1, 0);
-	if (strcmp(imageFormat, ".gif") == NULL)
+	if (strcmp(imageFormat, ".gif") == 0)
 		SendMessage(hcomboscreen, CB_SETCURSEL, 2, 0);
-	if (strcmp(imageFormat, ".bmp") == NULL)
+	if (strcmp(imageFormat, ".bmp") == 0)
 		SendMessage(hcomboscreen, CB_SETCURSEL, 3, 0);
 }
 ////////////////////////////////////////////////////////////////////////////////
