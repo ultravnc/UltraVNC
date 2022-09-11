@@ -3005,8 +3005,10 @@ vncClientThread::run(void* arg)
 					// Copy src from dll
 					//////////////////////////////////////////////////
 					MyTouchINfo* ti_array = TI;
+					BOOL value = FALSE;
+					POINTER_TOUCH_INFO *contact = NULL;
 					if (rfbGIIValutorEvent.first < 0 || rfbGIIValutorEvent.first >254) goto mydllend;
-					POINTER_TOUCH_INFO* contact = new POINTER_TOUCH_INFO[rfbGIIValutorEvent.first];
+					contact = new POINTER_TOUCH_INFO[rfbGIIValutorEvent.first];
 					if (contact == NULL)  goto mydllend;
 					memset(contact, 0, sizeof(POINTER_TOUCH_INFO) * rfbGIIValutorEvent.first);
 
@@ -3031,7 +3033,7 @@ vncClientThread::run(void* arg)
 						contact[i].pointerInfo.pointerId = ti_array[i].TouchId;          //contact 0
 						contact[i].pointerInfo.pointerFlags = ti_array[i].pointerflag;
 					}
-					BOOL value = InjectTouchInputUVNC(rfbGIIValutorEvent.first, contact);
+					value = InjectTouchInputUVNC(rfbGIIValutorEvent.first, contact);
 #ifdef _DEBUG
 					if (value == 0) sprintf_s(szText, "FAIL index %d %i\n", GetLastError(), rfbGIIValutorEvent.first);
 					else sprintf_s(szText, "OK number points %i\n", rfbGIIValutorEvent.first);

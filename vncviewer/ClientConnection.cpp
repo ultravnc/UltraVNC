@@ -9506,10 +9506,11 @@ error:
 void
 ClientConnection:: Copybuffer(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth,int framebufferHeight)
 {
+	int bytesPerOutputRow = framebufferWidth * bytes_per_pixel;
+
 	if ( ((width + xx) * (height + yy)) > (framebufferWidth * framebufferHeight))
 			goto error;
 
-	int bytesPerOutputRow = framebufferWidth * bytes_per_pixel;
 	//8bit pitch need to be taken in account
 	if (bytesPerOutputRow % 4)
 		bytesPerOutputRow += 4 - bytesPerOutputRow % 4;
@@ -9532,9 +9533,11 @@ error:
 void
 ClientConnection:: Copyto0buffer(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth,int framebufferHeight)
 {
+	int bytesPerOutputRow = framebufferWidth * bytes_per_pixel;
+
 	if ( ((width + xx) * (height + yy)) > (framebufferWidth * framebufferHeight))
 			goto error;
-	int bytesPerOutputRow = framebufferWidth * bytes_per_pixel;
+
 	//8bit pitch need to be taken in account
 	if (bytesPerOutputRow % 4)
 		bytesPerOutputRow += 4 - bytesPerOutputRow % 4;
@@ -9556,9 +9559,11 @@ ClientConnection:: Copyto0buffer(int width, int height, int xx, int yy,int bytes
 void
 ClientConnection:: Copyfrom0buffer(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth,int framebufferHeight)
 {
+	int bytesPerOutputRow = framebufferWidth * bytes_per_pixel;
+
 	if ( ((width + xx) * (height + yy)) > (framebufferWidth * framebufferHeight))
 		goto error;
-	int bytesPerOutputRow = framebufferWidth * bytes_per_pixel;
+
 	//8bit pitch need to be taken in account
 	if (bytesPerOutputRow % 4)
 		bytesPerOutputRow += 4 - bytesPerOutputRow % 4;

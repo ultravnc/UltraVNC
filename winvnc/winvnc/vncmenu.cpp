@@ -1063,6 +1063,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
 		case ID_RUNASSERVICE:
 		{
+			DWORD errorcode = 0;
 			DesktopUsersToken desktopUsersToken;
 			HANDLE hPToken = desktopUsersToken.getDesktopUsersToken();
 			if (!hPToken)
@@ -1083,7 +1084,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			StartUPInfo.cb = sizeof(STARTUPINFO);
 
 			CreateProcessAsUser(hPToken, NULL, dir, NULL, NULL, FALSE, DETACHED_PROCESS, NULL, NULL, &StartUPInfo, &ProcessInfo);
-			DWORD errorcode = GetLastError();
+			errorcode = GetLastError();
 			if (ProcessInfo.hProcess)
 				CloseHandle(ProcessInfo.hProcess);
 			if (ProcessInfo.hThread)
@@ -1112,6 +1113,14 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			DWORD id = processHelper::GetExplorerLogonPid();
 			if (id != 0)
 			{
+				DWORD errorcode = 0;
+				STARTUPINFO          StartUPInfo;
+				PROCESS_INFORMATION  ProcessInfo;
+				HANDLE Token=NULL;
+				HANDLE process=NULL;
+				ZeroMemory(&StartUPInfo,sizeof(STARTUPINFO));
+				ZeroMemory(&ProcessInfo,sizeof(PROCESS_INFORMATION));
+
 				hProcess = OpenProcess(MAXIMUM_ALLOWED, FALSE, id);
 				if (!hProcess) goto error7;
 				if (!OpenProcessToken(hProcess, TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY
@@ -1128,18 +1137,12 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				strcpy_s(dir, exe_file_name);
 				strcat_s(dir, " -stopservicehelper");
 
-				STARTUPINFO          StartUPInfo;
-				PROCESS_INFORMATION  ProcessInfo;
-				HANDLE Token = NULL;
-				HANDLE process = NULL;
-				ZeroMemory(&StartUPInfo, sizeof(STARTUPINFO));
-				ZeroMemory(&ProcessInfo, sizeof(PROCESS_INFORMATION));
 				StartUPInfo.wShowWindow = SW_SHOW;
 				StartUPInfo.lpDesktop = "Winsta0\\Default";
 				StartUPInfo.cb = sizeof(STARTUPINFO);
 
 				CreateProcessAsUser(hPToken, NULL, dir, NULL, NULL, FALSE, DETACHED_PROCESS, NULL, NULL, &StartUPInfo, &ProcessInfo);
-				DWORD errorcode = GetLastError();
+				errorcode = GetLastError();
 				if (process) CloseHandle(process);
 				if (Token) CloseHandle(Token);
 				if (hProcess) CloseHandle(hProcess);
@@ -1158,6 +1161,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			const DWORD id = processHelper::GetExplorerLogonPid();
 			if (id != 0)
 			{
+				DWORD errorcode = 0;
 				hProcess = OpenProcess(MAXIMUM_ALLOWED, FALSE, id);
 				if (!hProcess) {
 					serviceHelpers::Set_start_service_as_admin();
@@ -1199,7 +1203,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				StartUPInfo.cb = sizeof(STARTUPINFO);
 
 				CreateProcessAsUser(hPToken, NULL, dir, NULL, NULL, FALSE, DETACHED_PROCESS, NULL, NULL, &StartUPInfo, &ProcessInfo);
-				DWORD errorcode = GetLastError();
+				errorcode = GetLastError();
 				if (hPToken) CloseHandle(hPToken);
 				if (process) CloseHandle(process);
 				if (Token) CloseHandle(Token);
