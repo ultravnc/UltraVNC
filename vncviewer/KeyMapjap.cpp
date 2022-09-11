@@ -26,7 +26,7 @@
 #include "stdhdrs.h"
 
 // [v1.0.2-jp1 fix]
-#include <Ime.h>
+#include <ime.h>
 
 #include "KeyMapjap.h"
 #include "vncviewer.h"

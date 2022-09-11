@@ -29,7 +29,7 @@
 #include "VNCOptions.h"
 #include "Exception.h"
 #include "common/win32_helpers.h"
-#include <ShlObj.h>
+#include <shlobj.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <direct.h>

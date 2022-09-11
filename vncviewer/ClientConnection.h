@@ -70,7 +70,7 @@ extern "C"
 #include <algorithm>
 #include "./directx/directxviewer.h"
 #include "FpsCounter.h"
-#include "ShellScalingApi.h"
+#include "shellscalingapi.h"
 
 #ifdef _Gii
 #include "vnctouch.h"

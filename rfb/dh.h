@@ -46,8 +46,8 @@
 
 #ifndef __RFB_DH_H__
 #define __RFB_DH_H__
-#include <WinSock2.h>
-#include <Windows.h>
+#include <winsock2.h>
+#include <windows.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

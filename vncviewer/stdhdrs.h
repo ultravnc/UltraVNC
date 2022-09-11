@@ -46,9 +46,9 @@
 #endif
 #define VC_EXTRALEAN
 
-#include <WinSock2.h>
+#include <winsock2.h>
 #include <ws2ipdef.h>
-#include <WS2tcpip.h>
+#include <ws2tcpip.h>
 #include <stdio.h>
 #include <process.h>
 #include <assert.h>
@@ -56,7 +56,7 @@
 #include <locale.h>
 #include <time.h>
 #include <tchar.h>
-#include <Windows.h>
+#include <windows.h>
 #include <io.h>
  
 #include "rfb.h"

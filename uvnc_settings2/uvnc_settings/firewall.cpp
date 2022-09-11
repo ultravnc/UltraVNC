@@ -3,7 +3,7 @@
 #include "firewall.h"
 // Windows Firewall API
 #ifndef __netfw_h__
-	#include <Netfw.h>
+	#include <netfw.h>
 #endif
 // ICS API
 #ifndef __netcon_h__

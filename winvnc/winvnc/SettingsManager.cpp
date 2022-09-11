@@ -2,7 +2,7 @@
 #include <common/rfb.h>
 #include "vncpasswd.h"
 #include <VersionHelpers.h>
-#include <UserEnv.h>
+#include <userenv.h>
 #include "credentials.h"
 #include <tchar.h>
 

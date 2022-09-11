@@ -28,7 +28,7 @@
 extern Log vnclog;
 #define COMPILE_MULTIMON_STUBS
 #include "multimon.h"
-#include <CommCtrl.h>
+#include <commctrl.h>
 #include "VNCOptions.h"
 
 //***************************************************************************************

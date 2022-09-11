@@ -47,8 +47,8 @@
 #include "vncviewer.h"
 #include "FileTransfer.h"
 #include "Exception.h"
-#include "CommCtrl.h"
-#include "ShlObj.h"
+#include "commctrl.h"
+#include "shlobj.h"
 #ifdef _INTERNALLIB
 #include <zlib.h>
 #include <zstd.h>

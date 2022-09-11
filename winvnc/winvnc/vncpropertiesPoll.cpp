@@ -35,7 +35,7 @@
 #include "vncpropertiesPoll.h"
 #include "vncserver.h"
 #include "vncOSVersion.h"
-#include <ShlObj.h>
+#include <shlobj.h>
 #include "common/win32_helpers.h"
 #include "Localization.h" // ACT : Add localization on messages
 #include "SettingsManager.h"

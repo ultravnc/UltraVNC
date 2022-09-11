@@ -1,6 +1,6 @@
 #pragma once
 #include <iostream>
-#include <Windows.h>
+#include <windows.h>
 #include <stdio.h>
 #include <vector>
 #include <list>

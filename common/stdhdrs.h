@@ -46,8 +46,8 @@
 #define VC_EXTRALEAN
 
 #include <winsock2.h>
-#include <Ws2ipdef.h>
-#include <Ws2tcpip.h>
+#include <ws2ipdef.h>
+#include <ws2tcpip.h>
 #include <stdio.h>
 #include <process.h>
 #include <assert.h>

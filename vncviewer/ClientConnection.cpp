@@ -58,11 +58,11 @@ extern "C" {
 #include "common/win32_helpers.h"
 #include "display.h"
 #include "Snapshot.h"
-#include <CommCtrl.h>
+#include <commctrl.h>
 #include <shellapi.h>
-#include <LMaccess.h>
-#include <LMat.h>
-#include <LMalert.h>
+#include <lmaccess.h>
+#include <lmat.h>
+#include <lmalert.h>
 #include "../UdtCloudlib/proxy/Cloudthread.h"
 
 // [v1.0.2-jp1 fix]

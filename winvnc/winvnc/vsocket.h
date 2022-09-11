@@ -40,7 +40,7 @@ extern BOOL G_ipv6_allowed;
 #include "vtypes.h"
 #include <DSMPlugin/DSMPlugin.h>
 ////////////////////////////
-#include <Iphlpapi.h>
+#include <iphlpapi.h>
 extern "C" {
         typedef ULONG (WINAPI *t_GetPerTcpConnectionEStats)(
                 PMIB_TCPROW Row, TCP_ESTATS_TYPE EstatsType,

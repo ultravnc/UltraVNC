@@ -1,9 +1,9 @@
 #include "stdhdrs.h"
 #include "Snapshot.h"
 #include "vncviewer.h"
-#include <Windows.h>
+#include <windows.h>
 #include <string>
-#include <ShlObj.h>
+#include <shlobj.h>
 #include <iostream>
 #include <sstream>
 #include "common/win32_helpers.h"
