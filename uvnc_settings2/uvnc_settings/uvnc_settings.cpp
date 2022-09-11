@@ -430,6 +430,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine
 	DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_PARENT), 
 							NULL, (DLGPROC) DlgProc, NULL);
 	
+	return 1;
 }
 
 
