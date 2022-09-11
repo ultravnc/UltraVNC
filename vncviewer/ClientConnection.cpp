@@ -86,7 +86,10 @@ const UINT RebuildToolbarMessage = RegisterWindowMessage("UltraVNC.Viewer.Rebuil
 extern bool g_ConnectionLossAlreadyReported;
 extern bool paintbuzy;
 extern HWND hFTWnd;
+
+#if !defined(FAILED)
 #define FAILED(hr) (((HRESULT)(hr)) < 0)
+#endif
 
 /*
  * Macro to compare pixel formats.
