@@ -36,7 +36,9 @@
 #define _ATL_APARTMENT_THREADED
 #define _USING_V110_SDK71_
 #define _ATL_XP_TARGETING
+#if !defined(__MINGW32__)
 #include <atlbase.h> // ATL smart pointers
+#endif
 #include <shlguid.h> // shell GUIDs
 #include <shlobj.h>  // IActiveDesktop
 #include <shlwapi.h> // DLLVERSIONINFO
@@ -120,6 +122,7 @@ BOOL SHDesktopHTML()
 static 
 HRESULT EnableActiveDesktop(bool enable)
 {
+#if !defined(__MINGW32__)
 	CoInitialize(NULL);
 	CComQIPtr<IActiveDesktop, &IID_IActiveDesktop>	pIActiveDesktop;
 	
@@ -143,6 +146,9 @@ HRESULT EnableActiveDesktop(bool enable)
 	hr = pIActiveDesktop->ApplyChanges(AD_APPLY_REFRESH);
 	CoUninitialize();
 	return hr;
+#else
+	return E_NOTIMPL;
+#endif //__MINGW32__
 }
 
 bool HideActiveDesktop()
