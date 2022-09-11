@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "RingBuffer.h"
+#include "ringbuffer.h"
 
 RingBuffer::RingBuffer()
 {

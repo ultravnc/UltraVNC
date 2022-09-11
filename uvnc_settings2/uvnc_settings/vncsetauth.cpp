@@ -27,7 +27,7 @@
 
 // Implementation of the About dialog!
 #include "stdafx.h"
-#include "vncsetAuth.h"
+#include "vncsetauth.h"
 #include "resource.h"
 #define MAXSTRING 254
 extern HINSTANCE hInst;

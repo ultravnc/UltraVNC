@@ -1,5 +1,5 @@
 #include "cadthread.h"
-#include "localization.h"
+#include "Localization.h"
 #include "SettingsManager.h"
 #include "credentials.h"
 

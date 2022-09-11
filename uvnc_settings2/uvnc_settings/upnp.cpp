@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "log.h"
 
-#include "UPnP.h"
+#include "upnp.h"
 #include <comdef.h>
 
 #include <iphlpapi.h>

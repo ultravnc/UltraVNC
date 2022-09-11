@@ -65,7 +65,7 @@ typedef std::list<vncClientId> vncClientList;
 #include "vncbuffer.h"
 #include "vncencodemgr.h"
 #include "TextChat.h" // sf@2002 - TextChat
-#include "ZipUnZip32/zipUnZip32.h"
+#include "ZipUnZip32/ZipUnZip32.h"
 //#include "timer.h"
 // adzm - 2010-07 - Extended clipboard
 #include "common/Clipboard.h"
