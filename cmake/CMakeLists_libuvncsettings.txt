@@ -1,0 +1,19 @@
+
+ 
+set(LIBUVNCSETTINGS_SOURCES_${PROJECT_NAME}
+    capture.cpp
+    connections.cpp
+    filetransfer.cpp
+    firewall.cpp
+    log.cpp
+    misc.cpp
+    network.cpp
+    security.cpp
+    service.cpp
+)
+add_library(libuvncsettings_${PROJECT_NAME} STATIC)
+target_include_directories(libuvncsettings_${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/../DSMPlugin")
+target_include_directories(libuvncsettings_${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/../winvnc/omnithread")
+foreach(file ${LIBUVNCSETTINGS_SOURCES_${PROJECT_NAME}})
+    target_sources(libuvncsettings_${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/../uvnc_settings2/uvnc_settings/${file}")
+endforeach(file)

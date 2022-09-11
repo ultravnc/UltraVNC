@@ -1,0 +1,28 @@
+
+
+set(LIBZ_SOURCES_${PROJECT_NAME}
+    adler32.c
+    arch/x86/crc_folding.c
+    arch/x86/slide_sse.c
+    arch/x86/x86.c
+    compress.c
+    crc32.c
+    deflate.c
+    inffast.c
+    inflate.c
+    inftrees.c
+    trees.c
+    uncompr.c
+    zutil.c
+)
+add_library(libz_${PROJECT_NAME} STATIC)
+target_include_directories(libz_${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/../zlib/")
+foreach(file ${LIBZ_SOURCES_${PROJECT_NAME}})
+    target_sources(libz_${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/../zlib/${file}")
+endforeach(file)
+set_source_files_properties( "${CMAKE_SOURCE_DIR}/../zlib/arch/x86/slide_sse.c"
+    PROPERTIES COMPILE_FLAGS "-mavx512f -mpclmul -msse2 -D_MSC_VER")
+set_source_files_properties( "${CMAKE_SOURCE_DIR}/../zlib/arch/x86/x86.c"
+    PROPERTIES COMPILE_FLAGS "-mavx512f -mpclmul -msse2 -D_MSC_VER")
+set_source_files_properties( "${CMAKE_SOURCE_DIR}/../zlib/arch/x86/crc_folding.c"
+    PROPERTIES COMPILE_FLAGS "-mavx512f -mpclmul -msse2 -D_MSC_VER") 
