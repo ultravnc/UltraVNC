@@ -367,6 +367,7 @@ typedef struct {
 typedef enum {
     clientInitNotShare      = 0x00, // 00
 	clientInitShared        = 0x01, // 01
+    clientInitExtraMsgSupport = 0x02
 } rfbClientInitMsgFlags;
 
 #define sz_rfbClientInitMsg 1

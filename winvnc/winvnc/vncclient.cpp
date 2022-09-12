@@ -1129,6 +1129,16 @@ vncClientThread::InitAuthenticate()
 	if (!m_socket->ReadExact((char*)&client_ini, sz_rfbClientInitMsg))
 		return FALSE;
 
+	if (client_ini.flags & clientInitExtraMsgSupport) {
+		rfbClientInitExtraMsg msg{};
+		if (!m_socket->ReadExact((char*)&msg, sz_rfbClientInitExtraMsg))
+			return FALSE;
+		if (msg.textLength < 0 || msg.textLength > 254)
+			return FALSE;
+		if (!m_socket->ReadExact(m_client->infoMsg, msg.textLength))
+			return FALSE;
+	}
+
 	// If the client wishes to have exclusive access then remove other clients
 	if (settings->getConnectPriority() == 3 && !m_shared)
 	{
@@ -1176,11 +1186,11 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth)
 	bool bSecureVNCPluginActive = std::find(current_auth.begin(), current_auth.end(), rfbUltraVNC_SecureVNCPluginAuth_new) != current_auth.end();
 	bool bSCPromptActive = std::find(current_auth.begin(), current_auth.end(), rfbUltraVNC_SCPrompt) != current_auth.end();
 	bool bSessionSelectActive = std::find(current_auth.begin(), current_auth.end(), rfbUltraVNC_SessionSelect) != current_auth.end();
-	bool brfbClientInitExtraMsgSupport = std::find(current_auth.begin(), current_auth.end(), rfbClientInitExtraMsgSupport) != current_auth.end();
 
 	if (current_auth.empty()) {
 		// send the UltraVNC auth type to identify ourselves as an UltraVNC server, but only initially
 		auth_types.push_back(rfbUltraVNC);
+		auth_types.push_back(rfbClientInitExtraMsgSupport);
 	}	
 
 	// encryption takes priority over everything, for now at least.
@@ -1200,10 +1210,7 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth)
 	{
 		// adzm 2010-10 - Add the SessionSelect pseudo-auth
 		auth_types.push_back(rfbUltraVNC_SessionSelect);
-	}
-	else if (!brfbClientInitExtraMsgSupport)
-		//Just tell the viewer we support ClientInitExtraMsg
-		auth_types.push_back(rfbClientInitExtraMsgSupport);
+	}		
 	else
 	{
 		vncPasswd::ToText plain(settings->getPasswd(), settings->getSecure());
@@ -1288,10 +1295,6 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth)
 		// adzm 2010-10 - Do the SessionSelect auth
 		auth_success = AuthSessionSelect(auth_message);
 		break;
-	case rfbClientInitExtraMsgSupport:
-		auth_success = true;
-		break;
-
 	default:
 		auth_success = FALSE;
 		break;
@@ -1318,17 +1321,7 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth)
 		}
 		else if (bUseSessionSelect && !bSessionSelectActive) {
 			auth_result = rfbVncAuthContinue;
-		}
-		else if (auth_accepted == rfbClientInitExtraMsgSupport) {
-			auth_result = rfbVncAuthContinue;
-			rfbClientInitExtraMsg msg{};
-			if (!m_socket->ReadExact((char*)&msg, sz_rfbClientInitExtraMsg))
-				return FALSE;
-			if (msg.textLength < 0 || msg.textLength > 254)
-				return FALSE;
-			if (!m_socket->ReadExact(m_client->infoMsg, msg.textLength))
-				return FALSE;
-		}
+		}		
 		else {
 			auth_result = rfbVncAuthOK;
 		}

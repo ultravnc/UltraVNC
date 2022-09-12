@@ -2874,11 +2874,13 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 				}
 
 				switch (authAllowed[i]) {
+				case rfbClientInitExtraMsgSupport:
+					brfbClientInitExtraMsgSupport = true;
+					break;
 				case rfbUltraVNC:
 				case rfbUltraVNC_SecureVNCPluginAuth:
 				case rfbUltraVNC_SecureVNCPluginAuth_new:
-				case rfbUltraVNC_SCPrompt: // adzm 2010-10
-				case rfbClientInitExtraMsgSupport:
+				case rfbUltraVNC_SCPrompt: // adzm 2010-10				
 				case rfbUltraVNC_SessionSelect:
 				case rfbUltraVNC_MsLogonIIAuth:
 				case rfbVncAuth:
@@ -2894,7 +2896,6 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 				auth_priority.push_back(rfbUltraVNC_SecureVNCPluginAuth_new);
 				auth_priority.push_back(rfbUltraVNC_SecureVNCPluginAuth);				
 				auth_priority.push_back(rfbUltraVNC_SCPrompt); // adzm 2010-10	
-				auth_priority.push_back(rfbClientInitExtraMsgSupport);
 				auth_priority.push_back(rfbUltraVNC_SessionSelect);
 				auth_priority.push_back(rfbUltraVNC_MsLogonIIAuth);
 				auth_priority.push_back(rfbVncAuth);
@@ -2911,17 +2912,8 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 			if (authScheme == rfbInvalidAuth) {
 				throw WarningException("No supported authentication methods!");
 			}
-
 			CARD8 authSchemeMsg = (CARD8)authScheme;
 			WriteExact((char *)&authSchemeMsg, sizeof(authSchemeMsg));
-			if (authScheme == rfbClientInitExtraMsgSupport) {
-				rfbClientInitExtraMsg msg;
-				msg.textLength = strlen(m_opts->m_InfoMsg);
-				WriteExact((char*)&msg, sz_rfbClientInitExtraMsg);
-				if (strlen(m_opts->m_InfoMsg) > 0) {					
-					WriteExact(m_opts->m_InfoMsg, msg.textLength);
-				}
-			}
 		}
 	}
 
@@ -2944,7 +2936,7 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 	if (!bSecureVNCPluginActive) bSecureVNCPluginActive = std::find(current_auth.begin(), current_auth.end(), rfbUltraVNC_SecureVNCPluginAuth_new) != current_auth.end();
 
 	if (!bSecureVNCPluginActive && m_fUsePlugin && m_pIntegratedPluginInterface && authScheme != rfbConnFailed &&
-		authScheme != rfbUltraVNC_SecureVNCPluginAuth  && authScheme != rfbUltraVNC_SecureVNCPluginAuth_new && authScheme != rfbUltraVNC && authScheme != rfbClientInitExtraMsgSupport)
+		authScheme != rfbUltraVNC_SecureVNCPluginAuth  && authScheme != rfbUltraVNC_SecureVNCPluginAuth_new && authScheme != rfbUltraVNC)
 	{
 		//adzm 2010-05-12
 		if (m_opts->m_fRequireEncryption) {
@@ -3011,8 +3003,6 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 		break;
 	case rfbUltraVNC_SCPrompt:
 		AuthSCPrompt();
-		break;
-	case rfbClientInitExtraMsgSupport:
 		break;
 	case rfbUltraVNC_SessionSelect:
 		AuthSessionSelect();
@@ -3669,8 +3659,20 @@ void ClientConnection::SendClientInit()
 	if (m_opts->m_Shared) {
 		ci.flags |= clientInitShared;
 	}
+	if (brfbClientInitExtraMsgSupport) {
+		ci.flags |= clientInitExtraMsgSupport;
+	}
 
     WriteExact((char *)&ci, sz_rfbClientInitMsg); // sf@2002 - RSM Plugin
+	if (brfbClientInitExtraMsgSupport) {
+		brfbClientInitExtraMsgSupport = false;
+		rfbClientInitExtraMsg msg;
+		msg.textLength = strlen(m_opts->m_InfoMsg);
+		WriteExact((char*)&msg, sz_rfbClientInitExtraMsg);
+		if (strlen(m_opts->m_InfoMsg) > 0) {
+			WriteExact(m_opts->m_InfoMsg, msg.textLength);
+		}
+	}
 }
 
 void ClientConnection::ReadServerInit(bool reconnect)
