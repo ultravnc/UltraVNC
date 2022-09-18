@@ -85,7 +85,7 @@ vncServer::ServerUpdateTracker::add_copied(const rfb::Region2D& dest, const rfb:
 }
 
 char* vncServer::generateCode() {
-	PIP_ADAPTER_INFO AdapterInfo;
+	PIP_ADAPTER_INFO AdapterInfo{};
 	DWORD dwBufLen = sizeof(IP_ADAPTER_INFO);
 	char* mac_addr = (char*)malloc(18);
 
@@ -108,17 +108,23 @@ char* vncServer::generateCode() {
 	if (GetAdaptersInfo(AdapterInfo, &dwBufLen) == NO_ERROR) {
 		// Contains pointer to current adapter info
 		PIP_ADAPTER_INFO pAdapterInfo = AdapterInfo;
-		//do {
+		do {
 			// technically should look at pAdapterInfo->AddressLength
 			//   and not assume it is 6.
-		sprintf_s(mac_addr, 18, "%02X%02X%02X%02X%02X",
-			pAdapterInfo->Address[0],// pAdapterInfo->Address[1],
-			pAdapterInfo->Address[4], pAdapterInfo->Address[3],
-			pAdapterInfo->Address[2], pAdapterInfo->Address[5]);
-		//    printf("Address: %s, mac: %s\n", pAdapterInfo->IpAddressList.IpAddress.String, mac_addr);
-		//    printf("\n");
-		//    pAdapterInfo = pAdapterInfo->Next;
-		//} while (pAdapterInfo);
+			sprintf_s(mac_addr, 18, "%02X%02X%02X%02X%02X",
+				pAdapterInfo->Address[0],// pAdapterInfo->Address[1],
+				pAdapterInfo->Address[4], pAdapterInfo->Address[3],
+				pAdapterInfo->Address[2], pAdapterInfo->Address[5]);
+
+			if (!(pAdapterInfo->Address[0] == 0 && pAdapterInfo->Address[4] == 0 &&
+					pAdapterInfo->Address[3] == 0 && pAdapterInfo->Address[2] == 0 &&
+					pAdapterInfo->Address[5] == 0)) {
+				free(AdapterInfo);
+				return mac_addr; // caller must free.
+			}
+
+			pAdapterInfo = pAdapterInfo->Next;
+		} while (pAdapterInfo && pAdapterInfo->Address[0] == 0);
 	}
 	free(AdapterInfo);
 	return mac_addr; // caller must free.

@@ -202,7 +202,7 @@ public:
 	void ResizeToolbar(RECT& rect);
 
 private:
-	bool brfbClientInitExtraMsgSupport = false;
+	bool brfbClientInitExtraMsgSupportNew = false;
 	CRITICAL_SECTION crit;
 	UltraVncZ *ultraVncZlib;
 	UltraVncZ ultraVncZTight[4];

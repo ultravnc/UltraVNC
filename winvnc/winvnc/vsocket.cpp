@@ -863,8 +863,8 @@ VSocket::GetPeerName6()
 VString
 VSocket::GetPeerName()
 {
-	struct sockaddr_in	sockinfo;
-	struct in_addr		address;
+	struct sockaddr_in	sockinfo{};
+	struct in_addr		address{};
 	int					sockinfosize = sizeof(sockinfo);
 	VString				name;
 
@@ -872,6 +872,11 @@ VSocket::GetPeerName()
 	getpeername(sock, (struct sockaddr *)&sockinfo, &sockinfosize);
 	memcpy(&address, &sockinfo.sin_addr, sizeof(address));
 
+	struct hostent* remoteHost = gethostbyaddr((char*)&address, sizeof(address), AF_INET);
+	if (remoteHost != NULL) {
+		name = remoteHost->h_name;
+		return name;
+	}
 	name = inet_ntoa(address);
 	if (name == NULL)
 		return "<unavailable>";
