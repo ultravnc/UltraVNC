@@ -169,7 +169,6 @@ void SettingsManager::setDefaults()
 //unsigned int G_SENDBUFFER=8192;
 	G_SENDBUFFER_EX = 1452;
 
-	memset(reinterpret_cast<void*>(m_Tempfile), 0, sizeof(m_Tempfile));
 	m_pref_fEnableStateUpdates = false;
 	m_pref_fEnableKeepAlive = false;
 	m_pref_fRunningFromExternalService = false;
@@ -453,7 +452,7 @@ void SettingsManager::setkeepAliveInterval(int secs) {
 static bool notset = false;
 bool SettingsManager::IsRunninAsAdministrator()
 {
-	if (notset)
+	if (!notset)
 		m_pref_RunninAsAdministrator = Credentials::RunningAsAdministrator();
 	notset = true;
 	return m_pref_RunninAsAdministrator;
