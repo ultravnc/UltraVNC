@@ -143,7 +143,7 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\DigiCertUtil .exe" sign /sha1 7686bed45b491e41586b7d2a3c63cbd7e2f3d0ca /noInput "$(OutDir)$(TargetName)$(TargetExt)"
+      <Command>"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\DigiCertUtil .exe" sign /sha1 adc749d2f75f158c8218857ff187f81b97b3872a /noInput "$(OutDir)$(TargetName)$(TargetExt)"
 copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\32\xp</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -168,7 +168,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\32\xp</Command>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
     </Link>
     <PostBuildEvent>
-      <Command>"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\DigiCertUtil .exe" sign /sha1 7686bed45b491e41586b7d2a3c63cbd7e2f3d0ca /noInput "$(OutDir)$(TargetName)$(TargetExt)"
+      <Command>"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\DigiCertUtil .exe" sign /sha1 adc749d2f75f158c8218857ff187f81b97b3872a /noInput "$(OutDir)$(TargetName)$(TargetExt)"
 copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
