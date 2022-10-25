@@ -163,7 +163,7 @@ BOOL vncSockConnect::Init(vncServer *server, UINT port)
 		return FALSE;
 
 	// Bind it
-	if (!m_socket.Bind(m_port, settings->getAllowLoopback()))
+	if (!m_socket.Bind(m_port, settings->getLoopbackOnly()))
 		return FALSE;
 
 	// Set it to listen

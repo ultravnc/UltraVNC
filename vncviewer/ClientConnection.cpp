@@ -3708,19 +3708,20 @@ void ClientConnection::ReadServerInit(bool reconnect)
 	}
 #endif
 
-    m_desktopName = new TCHAR[1024];
-	m_desktopName_viewonly = new TCHAR[1024];
-	if (m_si.nameLength > 256) {
+    m_desktopName = new TCHAR[2024];
+	m_desktopName_viewonly = new TCHAR[2024];
+	if (m_si.nameLength > 2024) {
 		int msgboxID = MessageBox(NULL,"Server is trying yo overload a memory buffer.\nPossible exploit","Error", MB_OKCANCEL |MB_ICONINFORMATION);
 		if (msgboxID == IDCANCEL)
 			exit(0);
-		m_si.nameLength = 256;
+		m_si.nameLength = 2024;
 	}
     ReadString(m_desktopName, m_si.nameLength);
-	strcat_s(m_desktopName, 1024, " ");
+	m_desktopName[256] = '\0';
+	strcat_s(m_desktopName, 2024, " ");
 
-	strcpy_s(m_desktopName_viewonly, 1024, m_desktopName);
-	strcat_s(m_desktopName_viewonly, 1024, "viewonly");
+	strcpy_s(m_desktopName_viewonly, 2024, m_desktopName);
+	strcat_s(m_desktopName_viewonly, 2024, "viewonly");
 
 	if (m_opts->m_ViewOnly) SetWindowText(m_hwndMain, m_desktopName_viewonly);
 	else SetWindowText(m_hwndMain, m_desktopName);
@@ -3739,10 +3740,10 @@ void ClientConnection::ReadServerInit(bool reconnect)
 					m_pDSMPlugin->GetPluginName(),
 					m_pDSMPlugin->GetPluginVersion()
 					);
-			strcat_s(m_desktopName, 1024, szMess);
+			strcat_s(m_desktopName, 2024, szMess);
 	}
-	strcpy_s(m_desktopName_viewonly, 1024, m_desktopName);
-	strcat_s(m_desktopName_viewonly, 1024, "viewonly");
+	strcpy_s(m_desktopName_viewonly, 2024, m_desktopName);
+	strcat_s(m_desktopName_viewonly, 2024, "viewonly");
 
 	if (m_opts->m_ViewOnly) SetWindowText(m_hwndMain, m_desktopName_viewonly);
 	else SetWindowText(m_hwndMain, m_desktopName);

@@ -91,7 +91,7 @@ namespace settingsHelpers {
 		LONG DisableTrayIcon = 0;
 		LONG Rdpmode = 0;
 		LONG NoScreensaver = 0;
-		LONG LoopbackOnly;
+		LONG LoopbackOnly = 0;
 		LONG UseDSMPlugin;
 		LONG AllowLoopback = 1;
 		LONG AuthRequired;
@@ -1023,7 +1023,7 @@ namespace processHelper {
 	{
 		DesktopUsersToken desktopUsersToken;
 		HANDLE hPToken = desktopUsersToken.getDesktopUsersToken();
-		if (hPToken = NULL) {
+		if (hPToken == NULL) {
 			strcpy_s(buffer, UNLEN + 1, "");
 			return 0;
 		}
