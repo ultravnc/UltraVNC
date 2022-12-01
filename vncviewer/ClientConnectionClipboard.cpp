@@ -142,12 +142,12 @@ void ClientConnection::UpdateRemoteClipboard(CARD32 overrideFlags)
 		}
 	} else {		
 		vnclog.Print(6, _T("Checking clipboard...\n"));
-		if (OpenClipboard(m_hwndcn)) { 
+		ClipboardHolder holder(m_hwndcn);
+		if (holder.m_bIsOpen) {
 			vnclog.Print(6, _T("Opened...\n"));
 			HGLOBAL hglb = GetClipboardData(CF_TEXT); 
 			if (hglb == NULL) {				
 				vnclog.Print(6, _T("No CF_TEXT!\n"));
-				CloseClipboard();
 			} else {
 				vnclog.Print(6, _T("Got CF_TEXT!\n"));
 				LPSTR lpstr = (LPSTR) GlobalLock(hglb);  
@@ -155,8 +155,7 @@ void ClientConnection::UpdateRemoteClipboard(CARD32 overrideFlags)
 				char *contents = new char[strlen(lpstr) + 1];
 				char *unixcontents = new char[strlen(lpstr) + 1];
 				strcpy_s(contents, strlen(lpstr) + 1, lpstr);
-				GlobalUnlock(hglb); 
-				CloseClipboard();       		
+				GlobalUnlock(hglb);  		
 				
 				// Translate to Unix-format lines before sending
 				int j = 0;
@@ -175,9 +174,7 @@ void ClientConnection::UpdateRemoteClipboard(CARD32 overrideFlags)
 				delete [] contents; 
 				delete [] unixcontents;
 			}
-		} else {
-			vnclog.Print(1, _T("Failed to open clipboard! Last error 0x%08x\n"), GetLastError());
-		}
+		} 
 	}
 }
 
@@ -263,18 +260,16 @@ void ClientConnection::UpdateLocalClipboard(char *buf, int len)
     // The clipboard should not be modified by more than one thread at once
     {
         omni_mutex_lock l(m_clipMutex);
+		ClipboardHolder holder(m_hwndcn);
 
-        if (!OpenClipboard(m_hwndcn)) {
+		if (!holder.m_bIsOpen) {
 			vnclog.Print(2, "UpdateLocalClipboard: Failed to open clipboard! Last error 0x%08x", GetLastError());
 			delete [] wincontents;
-	        //throw WarningException(sz_C1);
 			return;
         }
         if (! ::EmptyClipboard()) {
 			vnclog.Print(2, "UpdateLocalClipboard: Failed to empty clipboard! Last error 0x%08x", GetLastError());
 			delete [] wincontents;
-			::CloseClipboard();
-	        //throw WarningException(sz_C2);
 			return;
         }
 			
@@ -295,15 +290,8 @@ void ClientConnection::UpdateLocalClipboard(char *buf, int len)
         }
 		
         delete [] wincontents;
-
-        if (! ::CloseClipboard()) {
-			vnclog.Print(2, "UpdateLocalClipboard: Failed to close clipboard! Last error 0x%08x", GetLastError());
-	        //throw WarningException(sz_C3);
-        }
     }
 }
-
-//void ofnInit();
 
 void ClientConnection::SaveClipboardPreferences()
 {
