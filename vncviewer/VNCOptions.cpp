@@ -186,6 +186,7 @@ VNCOptions::VNCOptions()
 	// m_fAutoAdjust = false;
 	m_host_options[0] = '\0';
 	m_proxyhost[0] = '\0';
+	m_Cloudhost[0] = '\0';
 	m_port = -1;
 	m_proxyport = -1;
 	m_kbdname[0] = '\0';
@@ -216,6 +217,7 @@ VNCOptions::VNCOptions()
 	m_oldplugin = false;
 	//g_disable_sponsor= false;
 	m_fUseProxy = false;
+	m_fUseCloud = false;
 	m_allowMonitorSpanning = 0;
 	m_ChangeServerRes = 0;
 	m_extendDisplay = 0;
@@ -377,8 +379,10 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
 	m_port = s.m_port;
 
 	strcpy_s(m_proxyhost, MAX_HOST_NAME_LEN, s.m_proxyhost);
+	strcpy_s(m_Cloudhost, MAX_HOST_NAME_LEN, s.m_Cloudhost);
 	m_proxyport = s.m_proxyport;
 	m_fUseProxy = s.m_fUseProxy;
+	m_fUseCloud = s.m_fUseCloud;
 	m_allowMonitorSpanning = s.m_allowMonitorSpanning;
 	m_ChangeServerRes = s.m_ChangeServerRes;
 	m_extendDisplay = s.m_extendDisplay;
@@ -936,6 +940,8 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 				ArgError("no cloud server defined"); // sf@ - Todo: put correct message here
 				continue;
 			}
+			m_fUseCloud = true;
+			_tcscpy_s(m_Cloudhost, args[j]);
 			//adzm 2010-02-15
 		}
 		else if (SwitchMatch(args[j], _T("reconnectcounter")))
@@ -1168,6 +1174,7 @@ void VNCOptions::SaveOptions(char* fname)
 	saveInt("QuickOption", m_quickoption, fname);
 	saveInt("UseDSMPlugin", m_fUseDSMPlugin, fname);
 	saveInt("UseProxy", m_fUseProxy, fname);
+	saveInt("UseCloud", m_fUseCloud, fname);
 	saveInt("sponsor", g_disable_sponsor, fname);
 	saveInt("allowMonitorSpanning", m_allowMonitorSpanning, fname);
 	saveInt("ChangeServerRes", m_ChangeServerRes, fname);
@@ -1266,6 +1273,7 @@ void VNCOptions::LoadOptions(char* fname)
 	m_quickoption = readInt("QuickOption", m_quickoption, fname);
 	m_fUseDSMPlugin = readInt("UseDSMPlugin", m_fUseDSMPlugin, fname) != 0;
 	m_fUseProxy = readInt("UseProxy", m_fUseProxy, fname) != 0;
+	m_fUseCloud = readInt("UseCloud", m_fUseCloud, fname) != 0;
 	m_allowMonitorSpanning = readInt("allowMonitorSpanning", m_allowMonitorSpanning, fname);
 	m_ChangeServerRes = readInt("ChangeServerRes", m_ChangeServerRes, fname);
 	m_extendDisplay = readInt("extendDisplay", m_extendDisplay, fname);

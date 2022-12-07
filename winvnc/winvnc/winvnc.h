@@ -71,7 +71,9 @@ const char winvnchttp[]	= "-httpproxy";
 //adzm 2009-06-20
 // for use with -sc
 const char winvncRepeater[]	= "-repeater"; // set default repeater host
+const char winvncCloud[] = "-cloudserver";
 extern char* g_szRepeaterHost;
+extern char* g_szCloudHost;
 
 const char winvncSettingshelper[]		= "-settingshelper";
 const char winvncSettings[]				= "-settings";
