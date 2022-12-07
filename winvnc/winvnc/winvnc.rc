@@ -517,6 +517,7 @@ BEGIN
     BEGIN
         MENUITEM "&Properties",                 ID_PROPERTIES
         MENUITEM "&Admin Properties",           ID_ADMIN_PROPERTIES
+        MENUITEM "Cloud Connect",               ID_MENU_CLOUDCONNECT
         MENUITEM SEPARATOR
         MENUITEM "&About WinVNC",               ID_ABOUT
         POPUP "Visit our site"

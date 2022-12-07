@@ -135,6 +135,7 @@ void SessionDialog::SaveToFile(char *fname, bool asDefault)
 	else
 		SettingsFromUI();
 	ret = WritePrivateProfileString("connection", "proxyhost", m_proxyhost, fname);
+	ret = WritePrivateProfileString("connection", "cloudhost", m_Cloudhost, fname);
 	sprintf_s(buf, "%d", m_proxyport);
 	WritePrivateProfileString("connection", "proxyport", buf, fname);
 	for (int i = rfbEncodingRaw; i<= LASTENCODING; i++) {
@@ -181,6 +182,7 @@ void SessionDialog::SaveToFile(char *fname, bool asDefault)
 	saveInt("QuickOption",			quickoption,	fname);
 	saveInt("UseDSMPlugin",			fUseDSMPlugin,	fname);
 	saveInt("UseProxy",				m_fUseProxy,	fname);
+	saveInt("UseCloud",				m_fUseCloud,	fname);
 	saveInt("allowMonitorSpanning", allowMonitorSpanning, fname);
 	saveInt("ChangeServerRes", changeServerRes, fname);
 	saveInt("extendDisplay", extendDisplay, fname);
@@ -269,6 +271,7 @@ void SessionDialog::LoadFromFile(char *fname)
   quickoption  =		readInt("QuickOption",		quickoption, fname);
   fUseDSMPlugin =		readInt("UseDSMPlugin",		fUseDSMPlugin, fname) != 0;
   m_fUseProxy =			readInt("UseProxy",			m_fUseProxy, fname) != 0;
+  m_fUseCloud =			readInt("UseCloud",			m_fUseCloud, fname) != 0;
   allowMonitorSpanning = readInt("allowMonitorSpanning", allowMonitorSpanning, fname);
   changeServerRes = readInt("ChangeServerRes", changeServerRes, fname);
   extendDisplay = readInt("extendDisplay", extendDisplay, fname);
@@ -302,6 +305,7 @@ void SessionDialog::LoadFromFile(char *fname)
   preemptiveUpdates = readInt("PreemptiveUpdates", (int)preemptiveUpdates, fname) ? true : false;
 
   GetPrivateProfileString("connection", "proxyhost", "", m_proxyhost, MAX_HOST_NAME_LEN, fname);
+  GetPrivateProfileString("connection", "cloudhost", "", m_Cloudhost, MAX_HOST_NAME_LEN, fname);
   m_proxyport = GetPrivateProfileInt("connection", "proxyport", 0, fname);
 
 
