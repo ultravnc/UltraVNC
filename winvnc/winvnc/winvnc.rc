@@ -534,7 +534,12 @@ BEGIN
     POPUP "tray"
     BEGIN
         MENUITEM "&Properties",                 ID_PROPERTIES
+<<<<<<< HEAD
         MENUITEM "&Administrator Properties",   ID_ADMIN_PROPERTIES
+=======
+        MENUITEM "&Admin Properties",           ID_ADMIN_PROPERTIES
+        MENUITEM "Cloud Connect",               ID_MENU_CLOUDCONNECT
+>>>>>>> Rebase on main + Revert "revert cloud for rel"
         MENUITEM SEPARATOR
         MENUITEM "&About UltraVNC Server",      ID_ABOUT
         POPUP "Visit our site"

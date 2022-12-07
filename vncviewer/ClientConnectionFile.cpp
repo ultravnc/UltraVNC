@@ -109,6 +109,7 @@ void ClientConnection::SaveConnection()
 	WritePrivateProfileString("connection", "port", buf, fname);
 
 	ret = WritePrivateProfileString("connection", "proxyhost", m_proxyhost, fname);
+	ret = WritePrivateProfileString("connection", "cloudhost", m_Cloudhost, fname);
 	sprintf_s(buf, "%d", m_proxyport);
 	WritePrivateProfileString("connection", "proxyport", buf, fname);
 	BOOL bCheckboxChecked;
@@ -159,8 +160,10 @@ int ClientConnection::LoadConnection(char *fname, bool fFromDialog, bool default
 		m_port = -1;
 	}
 	GetPrivateProfileString("connection", "proxyhost", "", m_proxyhost, MAX_HOST_NAME_LEN, fname);
+	GetPrivateProfileString("connection", "cloudhost", "", m_Cloudhost, MAX_HOST_NAME_LEN, fname);
 	m_proxyport = GetPrivateProfileInt("connection", "proxyport", 0, fname);
     m_fUseProxy = GetPrivateProfileInt("options", "UseProxy", 0, fname) ? true : false;
+	m_fUseCloud = GetPrivateProfileInt("options", "UseCloud", 0, fname) ? true : false;
 
 	char buf[32];
 	m_encPasswd[0] = '\0';
@@ -177,8 +180,10 @@ int ClientConnection::LoadConnection(char *fname, bool fFromDialog, bool default
 	else if (strcmp(m_host, "") == 0 || strcmp(fname, m_opts->getDefaultOptionsFileName())==0 ) {
 		// Load the rest of params 
 		strcpy_s(m_opts->m_proxyhost,m_proxyhost);
+		strcpy_s(m_opts->m_Cloudhost, m_Cloudhost);
 		m_opts->m_proxyport=m_proxyport;
 		m_opts->m_fUseProxy=m_fUseProxy;
+		m_opts->m_fUseCloud = m_fUseCloud;
 		m_opts->LoadOptions(fname);
 		//m_opts->Register();
 		// Then display the session dialog to get missing params again
@@ -188,13 +193,16 @@ int ClientConnection::LoadConnection(char *fname, bool fFromDialog, bool default
 		_tcsncpy_s(m_host, sessdlg.m_host_dialog, MAX_HOST_NAME_LEN);
 		m_port = sessdlg.m_port;	
 		_tcsncpy_s(m_proxyhost, sessdlg.m_proxyhost, MAX_HOST_NAME_LEN);
+		_tcsncpy_s(m_Cloudhost, sessdlg.m_Cloudhost, MAX_HOST_NAME_LEN);
 		m_proxyport = sessdlg.m_proxyport;
 		m_fUseProxy = sessdlg.m_fUseProxy;
 	}
 	else if (config_specified) {
 		strcpy_s(m_opts->m_proxyhost,m_proxyhost);
+		strcpy_s(m_opts->m_Cloudhost, m_Cloudhost);
 		m_opts->m_proxyport=m_proxyport;
 		m_opts->m_fUseProxy=m_fUseProxy;
+		m_opts->m_fUseCloud = m_fUseCloud;
 		m_opts->LoadOptions(fname);
 	}
 	return 0;

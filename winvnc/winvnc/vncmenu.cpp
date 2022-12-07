@@ -241,6 +241,7 @@ vncMenu::vncMenu(vncServer* server)
 		return;
 	}
 
+	m_CloudDialog.Init(m_server);
 	m_server->setVNcPort();
 	if (settings->getAllowInjection()) {
 		ChangeWindowMessageFilter(postHelper::MENU_ADD_CLIENT_MSG, MSGFLT_ADD);
@@ -956,6 +957,9 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			_this->FlashTrayIcon(_this->m_server->AuthClientCount() != 0);
 			break;
 
+		case ID_MENU_CLOUDCONNECT:
+			_this->m_CloudDialog.Show(TRUE);
+			break;
 
 		
 		case ID_OUTGOING_CONN:
@@ -1792,6 +1796,10 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			return 0;
 		}
 #else
+		if (iMsg == postHelper::MENU_ADD_CLOUD_MSG) {
+			settings->setCloudServer(g_szCloudHost);
+			_this->m_CloudDialog.Show(TRUE, true);
+		}
 		if (iMsg == postHelper::MENU_ADD_CLIENT_MSG || iMsg == postHelper::MENU_ADD_CLIENT_MSG_INIT)
 		{
 			if (iMsg == postHelper::MENU_ADD_CLIENT_MSG_INIT)

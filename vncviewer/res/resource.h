@@ -198,6 +198,7 @@
 #define IDC_PROXY_CHECK                 1129
 #define IDC_PROXY_EDIT                  1130
 #define IDC_PERCENT                     1131
+#define IDC_CLOUD_EDIT                  1131
 #define IDC_APPLYTOALLCHECK             1132
 #define IDC_YESALL_B                    1133
 #define IDC_YES_B                       1134
@@ -266,6 +267,7 @@
 #define IDC_PREFIX                      1184
 #define IDC_RADIO3                      1185
 #define IDC_RADIO_NOVIRT                1185
+#define IDC_RADIOCLOUD                  1185
 #define IDC_ENCODING_BASE               1199
 #define IDC_RAWRADIO                    2000
 #define IDC_RRERADIO                    2002
@@ -324,6 +326,8 @@
 #define IDC_GII                         2059
 #define IDC_SHOW_EXTEND                 2060
 #define IDC_ONLYPASSWORD                2061
+#define IDC_CLOUDSTATUS                 2062
+#define IDC_CLOUDLINE                   2063
 #define IDC_GREEN                       2064
 #define IDC_RED                         2065
 #define IDC_YELLOW                      2066
