@@ -1234,12 +1234,9 @@ void SessionDialog::ReadDlgProc()
 		_tcscpy_s(m_host_dialog, tmphost);
 	}
 	_tcscpy_s(m_proxyhost, "");
-	_tcscpy_s(m_Cloudhost, "");
 	GetDlgItemText(hwnd, IDC_PROXY_EDIT, hostname, MAX_HOST_NAME_LEN);
-	GetDlgItemText(hwnd, IDC_CLOUD_EDIT, cloudhostname, MAX_HOST_NAME_LEN);
 	
 	m_fUseProxy = SendMessage(GetDlgItem(hwnd, IDC_RADIOREPEATER), BM_GETCHECK, 0, 0) == BST_CHECKED;
-	m_fUseCloud = SendMessage(GetDlgItem(hwnd, IDC_RADIOCLOUD), BM_GETCHECK, 0, 0) == BST_CHECKED;
 	//adzm 2010-02-15
 	if (strlen(hostname) > 0) {
 		TCHAR actualProxy[256];
@@ -1269,7 +1266,6 @@ void SessionDialog::ReadDlgProc()
 			_tcscpy_s(m_proxyhost, tmphost);
 		}		
 	}	
-	_tcscpy_s(m_Cloudhost, cloudhostname);
 }
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -1499,7 +1495,6 @@ void SessionDialog::StartListener()
 	m_pOpt->autoDetect = autoDetect;
 	m_pOpt->m_fExitCheck = fExitCheck;
 	m_pOpt->m_fUseProxy = m_fUseProxy;
-	m_pOpt->m_fUseCloud = m_fUseCloud;
 	m_pOpt->m_allowMonitorSpanning = allowMonitorSpanning;
 	m_pOpt->m_ChangeServerRes = changeServerRes;
 	m_pOpt->m_extendDisplay = extendDisplay;

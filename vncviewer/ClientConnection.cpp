@@ -335,10 +335,8 @@ ClientConnection::ClientConnection(VNCviewerApp *pApp, LPTSTR host, int port)
 	_tcsncpy_s(m_host, host, MAX_HOST_NAME_LEN);
 	m_port = port;
 	_tcsncpy_s(m_proxyhost,m_opts->m_proxyhost, MAX_HOST_NAME_LEN);
-	_tcsncpy_s(m_Cloudhost, m_opts->m_Cloudhost, MAX_HOST_NAME_LEN);
 	m_proxyport=m_opts->m_proxyport;
 	m_fUseProxy = m_opts->m_fUseProxy;
-	m_fUseCloud = m_opts->m_fUseCloud;
 }
 
 void ClientConnection::Init(VNCviewerApp *pApp)
@@ -358,7 +356,6 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_proxyport = -1;
 	m_host[0] = '\0';
 	m_proxyhost[0] = '\0';
-	m_Cloudhost[0] = '\0';
 //	m_proxy = 0;
 	m_serverInitiated = false;
 	m_netbuf = NULL;
@@ -405,7 +402,6 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_pDSMPlugin = new CDSMPlugin();
 	m_fUsePlugin = false;
 	m_fUseProxy = false;
-	m_fUseCloud = false;
 	m_pNetRectBuf = NULL;
 	m_fReadFromNetRectBuf = false;  //
 	m_nNetRectBufOffset = 0;
@@ -532,7 +528,6 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_membitmap=NULL;
 	m_BigToolbar=false;
 	strcpy_s(m_proxyhost,"");
-	strcpy_s(m_Cloudhost, "");
 	KillEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 	KillUpdateThreadEvent = CreateEvent(NULL, FALSE, TRUE, NULL);
 	newtick=0;
@@ -731,8 +726,6 @@ void ClientConnection::DoConnection(bool reconnect)
 	if (m_sock == INVALID_SOCKET)
 		if (strcmp(m_proxyhost, "") != 0 && m_fUseProxy)
 			ConnectProxy();
-		else if (strcmp(m_Cloudhost, "") != 0 && m_fUseCloud)
-			Connect(true);
 		else
 			Connect(false);
 
@@ -1347,11 +1340,6 @@ void ClientConnection::GTGBS_CreateToolbar()
 		_snprintf_s(proxyname, MAX_HOST_NAME_LEN-1, "%s:%li (%s:%li)", m_host, m_port, m_proxyhost, m_proxyport);
 		SendMessage(m_logo_wnd, CB_ADDSTRING, 0, (LPARAM)proxyname);
 	}
-	if (m_fUseCloud && strlen(m_Cloudhost) > 0) {
-		TCHAR cloudname[MAX_HOST_NAME_LEN];
-		_snprintf_s(cloudname, MAX_HOST_NAME_LEN - 1, "%s", m_Cloudhost);
-		SendMessage(m_logo_wnd, CB_ADDSTRING, 0, (LPARAM)cloudname);
-	}
     for (int i = 0; i < m_pMRU->NumItems(); i++) {
         m_pMRU->GetItem(i, valname, 255);
         int pos = SendMessage(m_logo_wnd, CB_ADDSTRING, 0, (LPARAM) valname);
@@ -1857,10 +1845,8 @@ void ClientConnection::GetConnectDetails()
 			_tcsncpy_s(m_host, sessdlg.m_host_dialog, MAX_HOST_NAME_LEN);
 			m_port = sessdlg.m_port;
 			_tcsncpy_s(m_proxyhost, sessdlg.m_proxyhost, MAX_HOST_NAME_LEN);
-			_tcsncpy_s(m_Cloudhost, sessdlg.m_Cloudhost, MAX_HOST_NAME_LEN);
 			m_proxyport = sessdlg.m_proxyport;
 			m_fUseProxy = sessdlg.m_fUseProxy;
-			m_fUseCloud = sessdlg.m_fUseCloud;
 			if (m_opts->autoDetect)
 				m_opts->m_Use8Bit = rfbPFFullColors;				
 	}
@@ -1873,7 +1859,6 @@ void ClientConnection::GetConnectDetails()
 	m_pApp->m_options.m_host_options[0] = '\0';
 	m_pApp->m_options.m_port = -1;
 	m_pApp->m_options.m_proxyhost[0] = '\0';
-	m_pApp->m_options.m_Cloudhost[0] = '\0';
 	m_pApp->m_options.m_proxyport = -1;
 	m_pApp->m_options.m_connectionSpecified = false;
 	m_pApp->m_options.m_configSpecified = false;

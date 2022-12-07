@@ -60,7 +60,6 @@ DWORD		mainthreadId;
 
 //adzm 2009-06-20
 char* g_szRepeaterHost = NULL;
-char* g_szCloudHost = NULL;
 
 // sf@2007 - New shutdown order handling stuff (with uvnc_service)
 bool			fShutdownOrdered = false;
@@ -1085,33 +1084,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 			continue;
 		}
 
-		if (strncmp(&szCmdLine[i], winvncCloud, strlen(winvncCloud)) == 0)
-		{
-			i += strlen(winvncCloud);
-			size_t start, end;
-			start = i;
-			while (szCmdLine[start] <= ' ' && szCmdLine[start] != 0) 
-				start++;
-			end = start;
-			while (szCmdLine[end] > ' ') 
-				end++;
-
-			if (end - start > 0) {
-				if (g_szCloudHost) {
-					delete[] g_szCloudHost;
-					g_szCloudHost = NULL;
-				}
-				g_szCloudHost = new char[end - start + 1];
-				strncpy_s(g_szCloudHost, end - start + 1, &(szCmdLine[start]), end - start);
-				g_szCloudHost[end - start] = 0;
-				if (!postHelper::PostAddNewCloudClient()) {
-					PostAddNewCloudClient_bool = true;
-				}
-				i = end;
-				continue;
-			}
-			continue;
-		}
 
 		//adzm 2009-06-20
 		if (strncmp(&szCmdLine[i], winvncRepeater, strlen(winvncRepeater)) == 0)
@@ -1408,10 +1380,6 @@ int WinVNCAppMain()
 	if (g_szRepeaterHost) {
 		delete[] g_szRepeaterHost;
 		g_szRepeaterHost = NULL;
-	}
-	if (g_szCloudHost) {
-		delete[] g_szCloudHost;
-		g_szCloudHost = NULL;
 	}
 	return 1;
 };

@@ -81,7 +81,6 @@ protected:
 	// Properties object for this server
 	vncProperties	m_properties;
 	vncPropertiesPoll	m_propertiesPoll;
-	CloudDialog	m_CloudDialog;
 
 	// About dialog for this server
 	vncAbout		m_about;
