@@ -1190,7 +1190,7 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth)
 	if (current_auth.empty()) {
 		// send the UltraVNC auth type to identify ourselves as an UltraVNC server, but only initially
 		auth_types.push_back(rfbUltraVNC);
-		auth_types.push_back(rfbClientInitExtraMsgSupport);
+		auth_types.push_back(rfbClientInitExtraMsgSupportNew);
 	}	
 
 	// encryption takes priority over everything, for now at least.
