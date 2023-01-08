@@ -1571,7 +1571,7 @@ BOOL vncClientThread::AuthSecureVNCPlugin(std::string& auth_message)
 		}
 		if (wResponseLength > 2024) return FALSE;
 		BYTE* pResponseData = new BYTE[wResponseLength];
-
+		ZeroMemory(pResponseData, wResponseLength);
 		if (!m_socket->ReadExact((char*)pResponseData, wResponseLength)) {
 			delete[] pResponseData;
 			return FALSE;

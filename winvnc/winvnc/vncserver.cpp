@@ -525,10 +525,12 @@ vncServer::Authenticated(vncClientId clientid)
 				char szInfo[256] = { 0 };
 				char szTitle[63] = { 0 };
 				if (client->GetRepeaterID() && (strlen(client->GetRepeaterID()) > 0)) {
-					_snprintf_s(szTitle, 255, "Connection from: %s", client->GetRepeaterID());
+					_snprintf_s(szTitle, 63,"Connection from: %s", client->GetRepeaterID());
 				}
 				else {
-					_snprintf_s(szTitle, 255, "Connection from: %s", client->GetClientName());
+					strcpy_s(szTitle, "Connection from: ");
+					strncat_s(szTitle, client->GetClientName(), 45);
+					szTitle[62] = '\0';
 				}
 				strcpy_s(szInfo, 255, client->infoMsg);
 				vncMenu::NotifyBalloon(szInfo, szTitle);

@@ -57,10 +57,6 @@ SettingsManager::SettingsManager()
 	if (iImpersonateResult == ERROR_SUCCESS)
 		RevertToSelf();
 }
-SettingsManager::~SettingsManager()
-{
-	delete s_instance;
-}
 
 void SettingsManager::setDefaults()
 {

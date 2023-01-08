@@ -11,7 +11,6 @@ class SettingsManager
 {
 public:
 	static SettingsManager* getInstance();
-	~SettingsManager();
 
 	void load();
 	void save();

@@ -251,8 +251,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 	memset(&info, 0, sizeof(CR_INSTALL_INFO));
 	info.cb = sizeof(CR_INSTALL_INFO);
 	info.pszAppName = _T("UVNC");
-	info.pszAppVersion = _T("1.4.0.2");
-	info.pszEmailSubject = _T("UVNC server 1.4.0.2 Error Report");
+	info.pszAppVersion = _T("1.4.0.3");
+	info.pszEmailSubject = _T("UVNC server 1.4.0.3 Error Report");
 	info.pszEmailTo = _T("uvnc@skynet.be");
 	info.uPriorities[CR_SMAPI] = 1; // Third try send report over Simple MAPI    
 	// Install all available exception handlers
@@ -1381,5 +1381,9 @@ int WinVNCAppMain()
 		delete[] g_szRepeaterHost;
 		g_szRepeaterHost = NULL;
 	}
+	if (settings)
+		delete settings;
+	if (VNC_OSVersion::getInstance())
+		delete VNC_OSVersion::getInstance();
 	return 1;
 };

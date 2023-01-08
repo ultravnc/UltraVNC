@@ -378,7 +378,7 @@ bool CDSMPlugin::LoadPlugin(char* szPlugin, bool fAllowMulti)
 	}
 	else // Use the original plugin dll
 	{
-		ZeroMemory(m_szDllName, strlen(m_szDllName));
+		ZeroMemory(m_szDllName, 260);
 		m_hPDll = LoadLibrary(szPlugin);
 		//Try current PATH
 		if (m_hPDll==NULL)
