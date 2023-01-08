@@ -1756,9 +1756,7 @@ BOOL vncServer::SetDSMPlugin(BOOL bForceReload)
 		// sf@2003 - We check if the loaded plugin is the same than
 		// the currently selected one or not
 		m_pDSMPlugin->DescribePlugin();
-		char* a = m_pDSMPlugin->GetPluginFileName();
-		char* b = settings->getSzDSMPlugin();
-		if (_stricmp(m_pDSMPlugin->GetPluginFileName(), settings->getSzDSMPlugin()) || bForceReload) {
+		if ( bForceReload) {
 			//if (bForceReload)
 			//	vnclog.Print(LL_INTINFO, VNCLOG("$$$$$$$$$$ SetDSMPlugin - FORCE RELOADING OF THE PLUGIN \n"));
 			//vnclog.Print(LL_INTINFO, VNCLOG("$$$$$$$$$$ SetDSMPlugin - New one - Unload the current \n"));
