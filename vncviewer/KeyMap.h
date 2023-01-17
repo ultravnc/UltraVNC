@@ -157,6 +157,9 @@ static const vncKeyMapping_t keyMap[] = {
     {XK_KP_7                , VK_NUMPAD7        , 0},
     {XK_KP_8                , VK_NUMPAD8        , 0},
     {XK_KP_9                , VK_NUMPAD9        , 0},
+
+    // Add hangul keymapping
+    {XK_Hangul              , VK_HANGEUL        , 0},
 };
 
 // Define the deadKeyMap structure
