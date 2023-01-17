@@ -37,6 +37,7 @@
 #define XK_GREEK
 #define XK_TECHNICAL
 #define XK_XKB_KEYS
+#define XK_KOREAN
 
 //	[v1.0.2-jp1 fix] IOport's patch (Define XK_KATAKANA)
 #define XK_KATAKANA
@@ -190,6 +191,8 @@ static keymap_t keymap[] = {
   { XK_Super_R,			VK_RWIN, 0 }, 
   { XK_Menu,			VK_APPS, 0 }, 
 
+  // Adding Hangul Key
+  { XK_Hangul,			VK_HANGEUL, 0 },
 };
 
 struct latin1ToDeadChars_t {
@@ -658,21 +661,23 @@ public:
       KeyStateModifier lshift(VK_LSHIFT);
       KeyStateModifier rshift(VK_RSHIFT);
 
-      if (down) {
-        if (modifierState & 2) ctrl.press();
-        if (modifierState & 4) alt.press();
-        if (modifierState & 1) {
-          shift.press(); 
-        } else {
-		  // [v1.0.2-jp1 fix] Even if "SHIFT + SPACE" are pressed, "SHIFT" is valid
-          if (vkCode == 0x20){
+	  if (down) {
+		  if (modifierState & 2) ctrl.press();
+		  if (modifierState & 4) alt.press();
+		  if (modifierState & 1) {
+			  shift.press();
 		  }
-		  else{
-              lshift.release();
-              rshift.release();
+		  else {
+			  // [v1.0.2-jp1 fix] Even if "SHIFT + SPACE" are pressed, "SHIFT" is valid
+			  if (vkCode == 0x20) {
+			  }
+			  else {
+				  lshift.release();
+				  rshift.release();
+			  }
 		  }
-        }
-      }
+	  } 
+
       vnclog.Print(LL_INTINFO,
                    "latin-1 key: keysym %d(0x%x) vkCode 0x%x down %d capslockOn %d\n",
                    keysym, keysym, vkCode, down, capslockOn);
@@ -748,6 +753,43 @@ public:
 
         return;
       }
+	  else if (down && (vkCode == VK_HANGEUL))
+	  {
+		  HWND hWnd = GetForegroundWindow();
+		  HWND hIME_Main = ImmGetDefaultIMEWnd(hWnd);
+		  LRESULT MainStatus = ::SendMessage(hIME_Main, WM_IME_CONTROL, 5, 0);
+		  char ch[255];
+		  GetWindowText(hWnd, ch, 254);
+		  HWND hChildWnd = GetWindow(hWnd, GW_CHILD);
+		  long childCount = 0L;
+		  while (IsWindow(hChildWnd))
+		  {
+			  char chName[255];
+			  GetWindowText(hChildWnd, chName, 254);
+
+			  HWND hIME = ImmGetDefaultIMEWnd(hChildWnd);
+			  if (MainStatus == 1)
+			  {
+				  ::SendMessage(hIME, WM_IME_CONTROL, 2, 0);
+				  ::SendMessage(hIME, WM_IME_CONTROL, 1, 0);
+				  ::SendMessage(hIME, WM_IME_CONTROL, 3, 0);
+				  ::SendMessage(hIME, WM_IME_CONTROL, 4, 0);
+				  ::SendMessage(hIME, WM_IME_CONTROL, 6, 0);
+			  }
+			  else if (MainStatus == 0)
+			  {
+				  ::SendMessage(hIME, WM_IME_CONTROL, 2, 1);
+				  ::SendMessage(hIME, WM_IME_CONTROL, 1, 1);
+				  ::SendMessage(hIME, WM_IME_CONTROL, 3, 1);
+				  ::SendMessage(hIME, WM_IME_CONTROL, 4, 1);
+				  ::SendMessage(hIME, WM_IME_CONTROL, 6, 1);
+			  }
+
+			  childCount++;
+			  hChildWnd = GetWindow(hChildWnd, GW_HWNDNEXT);
+		  }
+		  return;
+	  }
       doKeyboardEvent(vkCode, flags);
     }
   }
