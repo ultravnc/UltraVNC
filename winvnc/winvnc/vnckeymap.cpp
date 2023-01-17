@@ -756,17 +756,15 @@ public:
 	  else if (down && (vkCode == VK_HANGEUL))
 	  {
 		  HWND hWnd = GetForegroundWindow();
+		  
 		  HWND hIME_Main = ImmGetDefaultIMEWnd(hWnd);
 		  LRESULT MainStatus = ::SendMessage(hIME_Main, WM_IME_CONTROL, 5, 0);
-		  char ch[255];
-		  GetWindowText(hWnd, ch, 254);
+		  
 		  HWND hChildWnd = GetWindow(hWnd, GW_CHILD);
 		  long childCount = 0L;
+
 		  while (IsWindow(hChildWnd))
 		  {
-			  char chName[255];
-			  GetWindowText(hChildWnd, chName, 254);
-
 			  HWND hIME = ImmGetDefaultIMEWnd(hChildWnd);
 			  if (MainStatus == 1)
 			  {
