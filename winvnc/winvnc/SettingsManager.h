@@ -47,6 +47,8 @@ public:
 	BOOL getRemoveEffects() { return m_pref_RemoveEffects; };
 	BOOL getEnableConnections() { return m_pref_EnableConnection; };
 	BOOL getHTTPConnect() { return m_pref_EnableHTTPConnect; };
+	void setEnableConnections(bool value) { m_pref_EnableConnection = value; };
+	void setHTTPConnect(bool value) { m_pref_EnableHTTPConnect = value; };
 	BOOL getEnableRemoteInputs() { return m_pref_EnableRemoteInputs; };
 	BOOL getDisableLocalInputs() { return m_pref_DisableLocalInputs; };
 	BOOL getEnableJapInput() { return m_pref_EnableJapInput; };
@@ -97,6 +99,10 @@ public:
 	void setEnableFileTransfer(BOOL value) { m_pref_EnableFileTransfer = value; };
 	void setFTUserImpersonation(BOOL value) { m_pref_FTUserImpersonation = value; };
 	void setAutoPortSelect(BOOL value) { m_pref_AutoPortSelect = value; };
+	void setPortNumber(LONG port) { m_pref_PortNumber = port; };
+	void setHttpPortNumber(LONG port) { m_pref_HttpPortNumber = port; };
+
+
 	void setAuthhosts(char* value) { strcpy_s(m_pref_authhosts, value); };
 
 	void setEnableRemoteInputs(BOOL value) { m_pref_EnableRemoteInputs = value; };
@@ -249,6 +255,7 @@ private:
 	char m_pref_accept_reject_mesg[512];
 	BOOL m_pref_EnableConnection;
 	BOOL m_pref_EnableHTTPConnect;
+
 	BOOL m_pref_AutoPortSelect;
 	LONG m_pref_PortNumber;
 	LONG m_pref_HttpPortNumber;

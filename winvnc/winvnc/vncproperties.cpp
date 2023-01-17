@@ -593,12 +593,16 @@ vncProperties::DialogProc(HWND hwnd,
 					BOOL ok1{}, ok2{};
 					UINT port_rfb = GetDlgItemInt(hwnd, IDC_PORTRFB, &ok1, TRUE);
 					UINT port_http = GetDlgItemInt(hwnd, IDC_PORTHTTP, &ok2, TRUE);
-					if (ok1 && ok2)
+					if (ok1 && ok2) {
 						_this->m_server->SetPorts(port_rfb, port_http);
+						settings->setPortNumber(port_rfb);
+						settings->setHttpPortNumber(port_http);
+					}
 				}
 			}
 			HWND hConnectSock = GetDlgItem(hwnd, IDC_CONNECT_SOCK);
 			_this->m_server->EnableConnections(SendMessage(hConnectSock, BM_GETCHECK, 0, 0) == BST_CHECKED);
+			settings->setEnableConnections(SendMessage(hConnectSock, BM_GETCHECK, 0, 0) == BST_CHECKED);			
 
 			// Update display/port controls on pressing the "Apply" button
 			if (LOWORD(wParam) == IDC_APPLY)
@@ -606,6 +610,7 @@ vncProperties::DialogProc(HWND hwnd,
 
 			HWND hConnectHTTP = GetDlgItem(hwnd, IDC_CONNECT_HTTP);
 			_this->m_server->EnableHTTPConnect(SendMessage(hConnectHTTP, BM_GETCHECK, 0, 0) == BST_CHECKED);
+			settings->setHTTPConnect(SendMessage(hConnectHTTP, BM_GETCHECK, 0, 0) == BST_CHECKED);
 
 			// Remote input stuff
 			HWND hEnableRemoteInputs = GetDlgItem(hwnd, IDC_DISABLE_INPUTS);
@@ -1149,8 +1154,9 @@ void vncProperties::LoadFromIniFile()
 
 	// Now change the listening port settings
 	m_server->SetAutoPortSelect(settings->getAutoPortSelect());
-	if (!settings->getAutoPortSelect())
+	if (!settings->getAutoPortSelect()) {
 		m_server->SetPorts(settings->getPortNumber(), settings->getHttpPortNumber());
+	}
 
 	m_server->EnableConnections(settings->getEnableConnections());
 
