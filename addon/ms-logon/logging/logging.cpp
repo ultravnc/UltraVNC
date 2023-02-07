@@ -133,7 +133,7 @@ void LOGEXIT(char *machine)
 		SYSTEMTIME time;
 		GetLocalTime(& time);
 		char			szText[256];
-		sprintf(szText,"%d/%d/%d %d:%.2d   ", time.wDay,time.wMonth,time.wYear,time.wHour,time.wMinute );
+		sprintf(szText, "%02d/%02d/%d %02d:%02d:%02d\t", time.wDay, time.wMonth, time.wYear, time.wHour, time.wMinute, time.wSecond);
 		strcpy(texttowrite,szText);
 		strcat(texttowrite,"Client ");
 		strcat(texttowrite,machine);
@@ -171,7 +171,7 @@ void LOGLOGON(char *machine)
 		SYSTEMTIME time;
 		GetLocalTime(& time);
 		char			szText[256];
-		sprintf(szText,"%d/%d/%d %d:%.2d   ", time.wDay,time.wMonth,time.wYear,time.wHour,time.wMinute );
+		sprintf(szText, "%02d/%02d/%d %02d:%02d:%02d\t", time.wDay, time.wMonth, time.wYear, time.wHour, time.wMinute, time.wSecond);
 		strcpy(texttowrite,szText);
 		strcat(texttowrite,"Connection received from ");
 		strcat(texttowrite,machine);
@@ -207,7 +207,7 @@ void LOGFAILED(char *machine)
 		SYSTEMTIME time;
 		GetLocalTime(& time);
 		char			szText[256];
-		sprintf(szText,"%d/%d/%d %d:%.2d   ", time.wDay,time.wMonth,time.wYear,time.wHour,time.wMinute );
+		sprintf(szText, "%02d/%02d/%d %02d:%02d:%02d\t", time.wDay, time.wMonth, time.wYear, time.wHour, time.wMinute, time.wSecond);
 		strcpy(texttowrite,szText);
 		strcat(texttowrite,"Invalid attempt from client ");
 		strcat(texttowrite,machine);
@@ -243,7 +243,7 @@ void LOGLOGONUSER(char *machine,char *user)
 		SYSTEMTIME time;
 		GetLocalTime(& time);
 		char			szText[256];
-		sprintf(szText,"%d/%d/%d %d:%.2d   ", time.wDay,time.wMonth,time.wYear,time.wHour,time.wMinute );
+		sprintf(szText, "%02d/%02d/%d %02d:%02d:%02d\t", time.wDay, time.wMonth, time.wYear, time.wHour, time.wMinute, time.wSecond);
 		strcpy(texttowrite,szText);
 		strcat(texttowrite,"Connection received from ");
 		strcat(texttowrite,machine);
@@ -282,7 +282,7 @@ void LOGFAILEDUSER(char *machine, char *user)
 		SYSTEMTIME time;
 		GetLocalTime(& time);
 		char			szText[256];
-		sprintf(szText,"%d/%d/%d %d:%.2d   ", time.wDay,time.wMonth,time.wYear,time.wHour,time.wMinute );
+		sprintf(szText, "%02d/%02d/%d %02d:%02d:%02d\t", time.wDay, time.wMonth, time.wYear, time.wHour, time.wMinute, time.wSecond);
 		strcpy(texttowrite,szText);
 		strcat(texttowrite,"Invalid attempt from client ");
 		strcat(texttowrite,machine);

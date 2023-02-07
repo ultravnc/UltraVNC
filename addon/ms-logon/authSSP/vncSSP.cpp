@@ -90,9 +90,9 @@ int CUPSD(const char * userin, const char *password, const char *machine)
 	//LookupAccountName(NULL, user2, Sid, cbSid, DomainName, cbDomainName, peUse);
 
 	if (isInteract)	{
-		LOG(0x00640001L, _T("Connection received from %s using %s account\n"), machine2, user2);
+		LOG(0x00640001L, _T("Connection received from %s using %s account (Interact)\n"), machine2, user2);
 	} else if (isViewOnly) {
-		LOG(0x00640001L, _T("Connection received from %s using %s account\n"), machine2, user2);
+		LOG(0x00640001L, _T("Connection received from %s using %s account (ViewOnly)\n"), machine2, user2);
 		isAccessOK = 2;
 	} else {
 		LOG(0x00640002L, _T("Invalid attempt (not %s) from client %s using %s account\n"), 
