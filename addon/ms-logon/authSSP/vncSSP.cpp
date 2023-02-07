@@ -90,13 +90,13 @@ int CUPSD(const char * userin, const char *password, const char *machine)
 	//LookupAccountName(NULL, user2, Sid, cbSid, DomainName, cbDomainName, peUse);
 
 	if (isInteract)	{
-		LOG(0x00640001L, _T("Connection received from %s using %s account\n"), machine2, user2);
+		LOG(0x00640001L, _T("MSLogon authentication accepted from %s using %s account (Interactive)\n"), machine2, user2);
 	} else if (isViewOnly) {
-		LOG(0x00640001L, _T("Connection received from %s using %s account\n"), machine2, user2);
+		LOG(0x00640001L, _T("MSLogon authentication accepted from %s using %s account (ViewOnly)\n"), machine2, user2);
 		isAccessOK = 2;
 	} else {
-		LOG(0x00640002L, _T("Invalid attempt (not %s) from client %s using %s account\n"), 
-			isAuthenticated ? _T("authorized") : _T("authenticated"), machine2, user2);
+		LOG(0x00640002L, _T("MSLogon authentication refused from %s using %s account (not %s)\n"), machine2, user2, 
+			isAuthenticated ? _T("authorized") : _T("authenticated"));
 	}
 	return isAccessOK;
 }

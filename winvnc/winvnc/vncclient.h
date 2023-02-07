@@ -228,12 +228,14 @@ public:
 		if (m_pointerenabled == true)
 			m_pointerenabled = enable;
 	};
+
 	virtual void EnableJap(bool enable) {m_jap = enable;};
 	virtual void EnableUnicode(bool enable) {m_unicode = enable;};
 	virtual void SetCapability(int capability) {m_capability = capability;};
 
 	virtual int GetCapability() {return m_capability;};
 	virtual const char *GetClientName();
+	virtual const char *GetClientDomainUsername();
 	virtual vncClientId GetClientId() {return m_id;};
 
 	// Disable/enable protocol messages to the client
@@ -494,6 +496,7 @@ protected:
 	vncServer		*m_server;
 	
 	char			*m_client_name;
+	char			*m_client_domain_username;
 
 	// The client thread
 	omni_thread		*m_thread_ClientThread;
@@ -648,8 +651,8 @@ public:
 	BOOL InitGiiVersion();
 #endif
 	virtual BOOL InitAuthenticate();
-	virtual BOOL AuthenticateClient(std::vector<CARD8>& current_auth);
-	virtual BOOL AuthenticateLegacyClient();
+	virtual BOOL AuthenticateClient(std::vector<CARD8>& current_auth, bool isconnected);
+	virtual BOOL AuthenticateLegacyClient(bool isconnected);
 
 	BOOL AuthSecureVNCPlugin(std::string& auth_message); // must SetHandshakeComplete after sending auth result!
 	BOOL AuthSecureVNCPlugin_old(std::string& auth_message);
@@ -664,7 +667,7 @@ public:
 #endif
 	BOOL CheckEmptyPasswd();
 	BOOL CheckLoopBack();
-	void LogAuthResult(bool success);
+	void LogAuthResult(bool success, bool isconnected);
 	void SendConnFailed(const char* szMessage);
 
 	// adzm 2010-08

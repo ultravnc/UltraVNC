@@ -1025,7 +1025,7 @@ void vncClientThread::SendConnFailed(const char* szMessage)
 	m_socket->SendExact(szMessage, (const VCard)strlen(szMessage));
 }
 
-void vncClientThread::LogAuthResult(bool success)
+void vncClientThread::LogAuthResult(bool success, bool isconnected)
 {
 #ifndef SC_20
 	if (!success)
@@ -1050,7 +1050,7 @@ void vncClientThread::LogAuthResult(bool success)
 	}
 	else
 	{
-		typedef BOOL(*LogeventFn)(char* machine);
+		typedef BOOL(*LogeventFn)(char* machine, vncClientId *clientId, bool *isinteractive);
 		LogeventFn Logevent = 0;
 		char szCurrentDir[MAX_PATH];
 		if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
@@ -1062,8 +1062,12 @@ void vncClientThread::LogAuthResult(bool success)
 		HMODULE hModule = LoadLibrary(szCurrentDir);
 		if (hModule)
 		{
-			Logevent = (LogeventFn)GetProcAddress(hModule, "LOGLOGON");
-			Logevent((char*)m_client->GetClientName());
+			if (!isconnected) {
+				Logevent = (LogeventFn)GetProcAddress(hModule, "LOGCONN");
+			} else {
+				Logevent = (LogeventFn)GetProcAddress(hModule, "LOGLOGON");
+			}
+			Logevent((char*)m_client->GetClientName(), (vncClientId*)m_client->GetClientId(), (bool *)(m_client->m_keyboardenabled && m_client->m_pointerenabled));
 			FreeLibrary(hModule);
 		}
 	}
@@ -1087,7 +1091,7 @@ vncClientThread::InitAuthenticate()
 	//adzm 2010-09 - Do the actual authentication
 	if (m_minor >= 7) {
 		std::vector<CARD8> current_auth;
-		if (!AuthenticateClient(current_auth)) {
+		if (!AuthenticateClient(current_auth, false)) {
 			return FALSE;
 		}
 	}
@@ -1100,7 +1104,7 @@ vncClientThread::InitAuthenticate()
 			return FALSE;
 		}
 #endif
-		if (!AuthenticateLegacyClient()) {
+		if (!AuthenticateLegacyClient(true)) {
 			return FALSE;
 		}
 	}
@@ -1175,7 +1179,7 @@ vncClientThread::InitAuthenticate()
 	return m_server->Authenticated(m_client->GetClientId());
 }
 
-BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth)
+BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth, bool connected)
 {
 	// adzm 2010-09 - Gather all authentication types we support
 	std::vector<CARD8> auth_types;
@@ -1262,6 +1266,7 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth)
 
 	// Authenticate the connection, if required
 	BOOL auth_success = FALSE;
+	BOOL auth_is_mslogon = FALSE;
 	BOOL version_warning = FALSE;
 	std::string auth_message;
 	switch (auth_accepted)
@@ -1280,6 +1285,9 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth)
 		break;
 	case rfbUltraVNC_MsLogonIIAuth:
 		auth_success = AuthMsLogon(auth_message);
+		if (auth_success) {
+			auth_is_mslogon = TRUE;
+		}
 		break;
 	case rfbVncAuth:
 		auth_success = AuthVnc(auth_message);
@@ -1300,7 +1308,9 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth)
 		break;
 	}
 	// Log authentication success or failure
-	LogAuthResult(auth_success ? true : false);
+	if (!auth_is_mslogon) {
+		LogAuthResult(auth_success ? true : false, connected);
+	}
 
 	// Return the result
 	CARD32 auth_result = rfbVncAuthFailed;
@@ -1392,7 +1402,7 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth)
 		return FALSE;
 
 	if (auth_success && auth_result == rfbVncAuthContinue) {
-		if (!AuthenticateClient(current_auth)) {
+		if (!AuthenticateClient(current_auth, true)) {
 			return FALSE;
 		}
 	}
@@ -1405,7 +1415,7 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth)
 	}
 }
 
-BOOL vncClientThread::AuthenticateLegacyClient()
+BOOL vncClientThread::AuthenticateLegacyClient(bool isconnected)
 {
 	vncPasswd::ToText plain(settings->getPasswd(), settings->getSecure());
 
@@ -1446,6 +1456,8 @@ BOOL vncClientThread::AuthenticateLegacyClient()
 
 	// Authenticate the connection, if required
 	BOOL auth_success = FALSE;
+	BOOL auth_is_mslogon = FALSE;
+
 	std::string auth_message;
 	switch (auth_type)
 	{
@@ -1468,6 +1480,9 @@ BOOL vncClientThread::AuthenticateLegacyClient()
 		break;
 	case rfbLegacy_MsLogon:
 		auth_success = AuthMsLogon(auth_message);
+		if (auth_success) {
+			auth_is_mslogon = TRUE;
+		}
 		break;
 	case rfbVncAuth:
 		auth_success = AuthVnc(auth_message);
@@ -1481,7 +1496,9 @@ BOOL vncClientThread::AuthenticateLegacyClient()
 	}
 
 	// Log authentication success or failure
-	LogAuthResult(auth_success ? true : false);
+	if (!auth_is_mslogon) {
+		LogAuthResult(auth_success ? true : false, false);
+	}
 
 	// Return the result
 	CARD32 auth_result = rfbVncAuthFailed;
@@ -1722,12 +1739,16 @@ vncClientThread::AuthMsLogon(std::string& auth_message)
 
 	int result = CheckUserGroupPasswordUni(user, passwd, m_client->GetClientName());
 	vnclog.Print(LL_INTINFO, "CheckUserGroupPasswordUni result=%i\n", result);
-	if (result == 2) {
+	if (result == 2) { // ViewOnly?
 		m_client->EnableKeyboard(false);
 		m_client->EnablePointer(false);
 	}
 
 	if (result) {
+		if (user != NULL)
+			m_client->m_client_domain_username = _strdup(user);
+		else
+			m_client->m_client_domain_username = _strdup("<unknown>");
 		return TRUE;
 	}
 	else {
@@ -4431,23 +4452,21 @@ vncClientThread::run(void* arg)
 	// LOG it also in the event
 	//////////////////
 #ifndef SC_20
+	typedef BOOL(*LogeventFn)(char* machine, char* user, vncClientId *clientId, bool *isinteractive);
+	LogeventFn Logevent = 0;
+	char szCurrentDir[MAX_PATH];
+	if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
 	{
-		typedef BOOL(*LogeventFn)(char* machine);
-		LogeventFn Logevent = 0;
-		char szCurrentDir[MAX_PATH];
-		if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
-		{
-			char* p = strrchr(szCurrentDir, '\\');
-			*p = '\0';
-			strcat_s(szCurrentDir, "\\logging.dll");
-		}
-		HMODULE hModule = LoadLibrary(szCurrentDir);
-		if (hModule)
-		{
-			Logevent = (LogeventFn)GetProcAddress(hModule, "LOGEXIT");
-			Logevent((char*)m_client->GetClientName());
-			FreeLibrary(hModule);
-		}
+		char* p = strrchr(szCurrentDir, '\\');
+		*p = '\0';
+		strcat_s(szCurrentDir, "\\logging.dll");
+	}
+	HMODULE hModule = LoadLibrary(szCurrentDir);
+	if (hModule)
+	{
+		Logevent = (LogeventFn)GetProcAddress(hModule, "LOGEXIT");
+		Logevent((char*)m_client->GetClientName(), (char*)m_client->GetClientDomainUsername(), (vncClientId*)m_client->GetClientId(), (bool*)(m_client->m_keyboardenabled && m_client->m_pointerenabled));
+		FreeLibrary(hModule);
 	}
 #endif
 
@@ -4495,6 +4514,7 @@ vncClient::vncClient() : m_clipboard(ClipboardSettings::defaultServerCaps), Send
 
 	m_socket = NULL;
 	m_client_name = NULL;
+	m_client_domain_username = NULL;
 
 	// Initialise mouse fields
 	m_mousemoved = FALSE;
@@ -4642,6 +4662,11 @@ vncClient::~vncClient()
 	if (m_client_name != NULL) {
 		free(m_client_name);
 		m_client_name = NULL;
+	}
+	
+	if (m_client_domain_username != NULL) {
+		free(m_client_domain_username);
+		m_client_domain_username = NULL;
 	}
 
 	// If we have a socket then kill it
@@ -4999,6 +5024,12 @@ vncClient::SetNewSWSize(long w, long h, BOOL Desktop)
 	EnableProtocol_no_mutex();
 
 	return TRUE;
+}
+
+const char*
+vncClient::GetClientDomainUsername()
+{
+	return m_client_domain_username;
 }
 
 // Functions used to set and retrieve the client settings
