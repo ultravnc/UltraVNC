@@ -125,7 +125,7 @@ void EventLogging::AddEventSourceToRegistry(LPCTSTR lpszSourceName)
 /////////////////////////
 ///////////////////////
 LOGGING_API
-void LOGEXIT(char *machine)
+void LOGEXIT(char *machine, char *user, vncClientId *clientId, bool *isinteractive)
 {
 	    FILE *file;
 		const char* ps[3];
@@ -133,11 +133,19 @@ void LOGEXIT(char *machine)
 		SYSTEMTIME time;
 		GetLocalTime(& time);
 		char			szText[256];
-		sprintf(szText,"%d/%d/%d %d:%.2d   ", time.wDay,time.wMonth,time.wYear,time.wHour,time.wMinute );
+		char mode_id[64];
+		sprintf (mode_id, " (%s) (ID:%d)", isinteractive ? "Interactive" : "ViewOnly", clientId);
+		sprintf(szText, "%02d/%02d/%d %02d:%02d:%02d\t", time.wDay, time.wMonth, time.wYear, time.wHour, time.wMinute, time.wSecond);
 		strcpy(texttowrite,szText);
 		strcat(texttowrite,"Client ");
 		strcat(texttowrite,machine);
+		if (user != NULL) {
+			strcat(texttowrite," using ");
+			strcat(texttowrite,user);
+			strcat(texttowrite," account");
+		}
 		strcat(texttowrite," disconnected");
+		strcat(texttowrite,mode_id);
 		strcat(texttowrite,"\n");
 		ps[0] = texttowrite;
 	    EventLogging log;
@@ -163,7 +171,7 @@ void LOGEXIT(char *machine)
 }
 
 LOGGING_API
-void LOGLOGON(char *machine)
+void LOGLOGON(char *machine, vncClientId *clientId, bool *isinteractive)
 {
 		FILE *file;
 		const char* ps[3];
@@ -171,10 +179,13 @@ void LOGLOGON(char *machine)
 		SYSTEMTIME time;
 		GetLocalTime(& time);
 		char			szText[256];
-		sprintf(szText,"%d/%d/%d %d:%.2d   ", time.wDay,time.wMonth,time.wYear,time.wHour,time.wMinute );
+		char mode_id[64];
+		sprintf (mode_id, " (%s) (ID:%d)", isinteractive ? "Interactive" : "ViewOnly", clientId);
+		sprintf(szText, "%02d/%02d/%d %02d:%02d:%02d\t", time.wDay, time.wMonth, time.wYear, time.wHour, time.wMinute, time.wSecond);
 		strcpy(texttowrite,szText);
-		strcat(texttowrite,"Connection received from ");
+		strcat(texttowrite,"Password authentication accepted from ");
 		strcat(texttowrite,machine);
+		strcat(texttowrite,mode_id);
 		strcat(texttowrite,"\n");
 		ps[0] = texttowrite;
 	    EventLogging log;
@@ -198,6 +209,41 @@ void LOGLOGON(char *machine)
 			}
 }
 
+void LOGCONN(char* machine, vncClientId *clientId, bool *isinteractive)
+{
+	FILE* file;
+	const char* ps[3];
+	char texttowrite[512];
+	SYSTEMTIME time;
+	GetLocalTime(&time);
+	char			szText[256];
+	sprintf(szText, "%02d/%02d/%d %02d:%02d:%02d\t", time.wDay, time.wMonth, time.wYear, time.wHour, time.wMinute, time.wSecond);
+	strcpy(texttowrite, szText);
+	strcat(texttowrite, "Connection received from ");
+	strcat(texttowrite, machine);
+	strcat(texttowrite, "\n");
+	ps[0] = texttowrite;
+	EventLogging log;
+	log.AddEventSourceToRegistry(NULL);
+	log.LogIt(1, 0x00640001L, ps, 1, NULL, 0);
+	char szMslogonLog[MAX_PATH];
+	if (GetModuleFileName(NULL, szMslogonLog, MAX_PATH))
+	{
+		char* p = strrchr(szMslogonLog, '\\');
+		if (p != NULL)
+		{
+			*p = '\0';
+			strcat_s(szMslogonLog, "\\mslogon.log");
+		}
+	}
+	file = fopen(szMslogonLog, "a");
+	if (file != NULL)
+	{
+		fwrite(texttowrite, sizeof(char), strlen(texttowrite), file);
+		fclose(file);
+	}
+}
+
 LOGGING_API
 void LOGFAILED(char *machine)
 {
@@ -207,7 +253,7 @@ void LOGFAILED(char *machine)
 		SYSTEMTIME time;
 		GetLocalTime(& time);
 		char			szText[256];
-		sprintf(szText,"%d/%d/%d %d:%.2d   ", time.wDay,time.wMonth,time.wYear,time.wHour,time.wMinute );
+		sprintf(szText, "%02d/%02d/%d %02d:%02d:%02d\t", time.wDay, time.wMonth, time.wYear, time.wHour, time.wMinute, time.wSecond);
 		strcpy(texttowrite,szText);
 		strcat(texttowrite,"Invalid attempt from client ");
 		strcat(texttowrite,machine);
@@ -235,7 +281,7 @@ void LOGFAILED(char *machine)
 }
 
 LOGGING_API
-void LOGLOGONUSER(char *machine,char *user)
+void LOGLOGONUSER(char *machine, char *user)
 {
 		FILE *file;
 		const char* ps[3];
@@ -243,9 +289,9 @@ void LOGLOGONUSER(char *machine,char *user)
 		SYSTEMTIME time;
 		GetLocalTime(& time);
 		char			szText[256];
-		sprintf(szText,"%d/%d/%d %d:%.2d   ", time.wDay,time.wMonth,time.wYear,time.wHour,time.wMinute );
+		sprintf(szText, "%02d/%02d/%d %02d:%02d:%02d\t", time.wDay, time.wMonth, time.wYear, time.wHour, time.wMinute, time.wSecond);
 		strcpy(texttowrite,szText);
-		strcat(texttowrite,"Connection received from ");
+		strcat(texttowrite,"Authentication accepted from ");
 		strcat(texttowrite,machine);
 		strcat(texttowrite," using ");
 		strcat(texttowrite,user);
@@ -282,9 +328,9 @@ void LOGFAILEDUSER(char *machine, char *user)
 		SYSTEMTIME time;
 		GetLocalTime(& time);
 		char			szText[256];
-		sprintf(szText,"%d/%d/%d %d:%.2d   ", time.wDay,time.wMonth,time.wYear,time.wHour,time.wMinute );
+		sprintf(szText, "%02d/%02d/%d %02d:%02d:%02d\t", time.wDay, time.wMonth, time.wYear, time.wHour, time.wMinute, time.wSecond);
 		strcpy(texttowrite,szText);
-		strcat(texttowrite,"Invalid attempt from client ");
+		strcat(texttowrite,"Connection rejected from client ");
 		strcat(texttowrite,machine);
 		strcat(texttowrite," using ");
 		strcat(texttowrite,user);
@@ -311,4 +357,3 @@ void LOGFAILEDUSER(char *machine, char *user)
 				fclose(file);
 			}
 }
-

@@ -22,7 +22,9 @@
 #include <lm.h>
 #include <stdio.h>
 #pragma hdrstop
-LOGGING_API void LOGEXIT(char *machine);
+typedef SHORT vncClientId;
+
+LOGGING_API void LOGEXIT(char *machine, char *user, vncClientId *clientId, bool *isinteractive);
 
 class EventLogging
 {

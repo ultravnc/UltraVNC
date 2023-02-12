@@ -112,7 +112,13 @@ void LOG(long EventID, const TCHAR *format, ...) {
 	va_start(ap, format);
 	_vstprintf_s(szText, format, ap);
 	va_end(ap);
-	ps[0] = szText;
+	// Prepend timestamp to message
+	GetLocalTime(& time);
+	_stprintf_s(szTimestamp,_T("%.2d/%.2d/%d %.2d:%.2d:%.2d\t"), 
+		time.wDay, time.wMonth, time.wYear, time.wHour, time.wMinute, time.wSecond);
+	_tcscpy_s(textbuf,szTimestamp);
+	_tcscat_s(textbuf,szText);
+	ps[0] = textbuf;
     EventLogging log;
 	log.AddEventSourceToRegistry(NULL);
 	log.LogIt(1,EventID, ps,1,NULL,0);
@@ -128,12 +134,6 @@ void LOG(long EventID, const TCHAR *format, ...) {
 	file = _tfopen(szMslogonLog, _T("a"));
 	if(file!=NULL) 
 	{
-		// Prepend timestamp to message
-		GetLocalTime(& time);
-		_stprintf_s(szTimestamp,_T("%.2d/%.2d/%d %.2d:%.2d:%.2d  "), 
-			time.wDay, time.wMonth, time.wYear, time.wHour, time.wMinute, time.wSecond);
-		_tcscpy_s(textbuf,szTimestamp);
-		_tcscat_s(textbuf,szText);
 
 		// Write ANSI
 #if defined UNICODE || defined _UNICODE

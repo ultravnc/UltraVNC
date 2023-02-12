@@ -3,6 +3,7 @@ LIBRARY   Logging
              EXPORTS
 			   LOGEXIT
 			   LOGLOGON
+			   LOGCONN
 			   LOGFAILED
 			   LOGLOGONUSER
 			   LOGFAILEDUSER
