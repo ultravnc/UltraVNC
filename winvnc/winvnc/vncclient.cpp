@@ -874,7 +874,7 @@ vncClientThread::FilterClients_Ask_Permission()
 		verified = vncServer::aqrAccept;
 	}
 	else {
-		verified = m_server->VerifyHost(m_socket->GetPeerName());
+		verified = m_server->VerifyHost(m_socket->GetPeerName(false));
 	}
 
 	// If necessary, query the connection with a timed dialog
@@ -892,7 +892,7 @@ vncClientThread::FilterClients_Ask_Permission()
 					verified = vncServer::aqrAccept;
 			}
 			else {
-				vncAcceptDialog* acceptDlg = new vncAcceptDialog(settings->getQueryTimeout(), m_server->QueryAccept(), m_socket->GetPeerName(), m_client->infoMsg, settings->getNotification());
+				vncAcceptDialog* acceptDlg = new vncAcceptDialog(settings->getQueryTimeout(), m_server->QueryAccept(), m_socket->GetPeerName(true), m_client->infoMsg, settings->getNotification());
 				if (acceptDlg == NULL) {
 					if (m_server->QueryAccept() == 1)
 						verified = vncServer::aqrAccept;
@@ -924,7 +924,7 @@ vncClientThread::FilterClients_Blacklist()
 		verified = vncServer::aqrAccept;
 	}
 	else {
-		verified = m_server->VerifyHost(m_socket->GetPeerName());
+		verified = m_server->VerifyHost(m_socket->GetPeerName(false));
 	}
 
 	if (verified == vncServer::aqrReject) {
@@ -954,7 +954,7 @@ vncClientThread::CheckLoopBack()
 	if (!settings->getAllowLoopback())
 	{
 		char* localname = _strdup(m_socket->GetSockName());
-		char* remotename = _strdup(m_socket->GetPeerName());
+		char* remotename = _strdup(m_socket->GetPeerName(false));
 
 		// Check that the local & remote names are different!
 		if ((localname != NULL) && (remotename != NULL))
@@ -978,7 +978,7 @@ vncClientThread::CheckLoopBack()
 	else
 	{
 		char* localname = _strdup(m_socket->GetSockName());
-		char* remotename = _strdup(m_socket->GetPeerName());
+		char* remotename = _strdup(m_socket->GetPeerName(false));
 
 		// Check that the local & remote names are different!
 		if ((localname != NULL) && (remotename != NULL))
@@ -1044,7 +1044,7 @@ void vncClientThread::LogAuthResult(bool success, bool isconnected)
 		if (hModule)
 		{
 			Logevent = (LogeventFn)GetProcAddress(hModule, "LOGFAILED");
-			Logevent((char*)m_client->GetClientName());
+			Logevent((char*)m_client->GetClientNameName());
 			FreeLibrary(hModule);
 		}
 	}
@@ -1067,7 +1067,7 @@ void vncClientThread::LogAuthResult(bool success, bool isconnected)
 			} else {
 				Logevent = (LogeventFn)GetProcAddress(hModule, "LOGLOGON");
 			}
-			Logevent((char*)m_client->GetClientName(), (vncClientId*)m_client->GetClientId(), (bool *)(m_client->m_keyboardenabled && m_client->m_pointerenabled));
+			Logevent((char*)m_client->GetClientNameName(), (vncClientId*)m_client->GetClientId(), (bool *)(m_client->m_keyboardenabled && m_client->m_pointerenabled));
 			FreeLibrary(hModule);
 		}
 	}
@@ -1116,12 +1116,12 @@ vncClientThread::InitAuthenticate()
 			return FALSE;
 		}
 		else {
-			m_server->AddAuthHostsBlacklist(m_client->GetClientName());
-			m_server->AddAuthHostsBlacklist(m_client->GetClientName());
-			m_server->AddAuthHostsBlacklist(m_client->GetClientName());
-			m_server->AddAuthHostsBlacklist(m_client->GetClientName());
-			m_server->AddAuthHostsBlacklist(m_client->GetClientName());
-			m_server->AddAuthHostsBlacklist(m_client->GetClientName());
+			m_server->AddAuthHostsBlacklist(m_client->GetClientNameAddress());
+			m_server->AddAuthHostsBlacklist(m_client->GetClientNameAddress());
+			m_server->AddAuthHostsBlacklist(m_client->GetClientNameAddress());
+			m_server->AddAuthHostsBlacklist(m_client->GetClientNameAddress());
+			m_server->AddAuthHostsBlacklist(m_client->GetClientNameAddress());
+			m_server->AddAuthHostsBlacklist(m_client->GetClientNameAddress());
 
 			m_server->GetClient(m_server->getOldestViewer())->Kill();
 			m_client->forceBlacklist = true;
@@ -1737,7 +1737,7 @@ vncClientThread::AuthMsLogon(std::string& auth_message)
 	vncDecryptBytes((unsigned char*)user, sizeof(user), key); user[255] = '\0';
 	vncDecryptBytes((unsigned char*)passwd, sizeof(passwd), key); passwd[63] = '\0';
 
-	int result = CheckUserGroupPasswordUni(user, passwd, m_client->GetClientName());
+	int result = CheckUserGroupPasswordUni(user, passwd, m_client->GetClientNameAddress());
 	vnclog.Print(LL_INTINFO, "CheckUserGroupPasswordUni result=%i\n", result);
 	if (result == 2) { // ViewOnly?
 		m_client->EnableKeyboard(false);
@@ -2190,14 +2190,14 @@ vncClientThread::run(void* arg)
 	SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX);
 
 	vnclog.Print(LL_CLIENTS, VNCLOG("client connected : %s (%hd)\n"),
-		m_client->GetClientName(),
+		m_client->GetClientNameName(),
 		m_client->GetClientId());
 	// Save the handle to the thread's original desktop
 	HDESK home_desktop = GetThreadDesktop(GetCurrentThreadId());
 	HDESK input_desktop = 0;
 
 	// Initially blacklist the client so that excess connections from it get dropped
-	m_server->AddAuthHostsBlacklist(m_client->GetClientName());
+	m_server->AddAuthHostsBlacklist(m_client->GetClientNameAddress());
 
 	// adzm 2010-08
 	if (!InitSocket()) {
@@ -2259,7 +2259,7 @@ vncClientThread::run(void* arg)
 
 	// Authenticated OK - remove from blacklist and remove timeout
 	if (!m_client->forceBlacklist)
-		m_server->RemAuthHostsBlacklist(m_client->GetClientName());
+		m_server->RemAuthHostsBlacklist(m_client->GetClientNameAddress());
 	m_client->forceBlacklist = false;
 	m_socket->SetTimeout(settings->getIdleTimeout() * 1000);
 	vnclog.Print(LL_INTINFO, VNCLOG("authenticated connection\n"));
@@ -4446,7 +4446,7 @@ vncClientThread::run(void* arg)
 	// Quit this thread.  This will automatically delete the thread and the
 	// associated client.
 	vnclog.Print(LL_CLIENTS, VNCLOG("client disconnected : %s (%hd)\n"),
-		m_client->GetClientName(),
+		m_client->GetClientNameName(),
 		m_client->GetClientId());
 	//////////////////
 	// LOG it also in the event
@@ -4465,7 +4465,7 @@ vncClientThread::run(void* arg)
 	if (hModule)
 	{
 		Logevent = (LogeventFn)GetProcAddress(hModule, "LOGEXIT");
-		Logevent((char*)m_client->GetClientName(), (char*)m_client->GetClientDomainUsername(), (vncClientId*)m_client->GetClientId(), (bool*)(m_client->m_keyboardenabled && m_client->m_pointerenabled));
+		Logevent((char*)m_client->GetClientNameName(), (char*)m_client->GetClientDomainUsername(), (vncClientId*)m_client->GetClientId(), (bool*)(m_client->m_keyboardenabled && m_client->m_pointerenabled));
 		FreeLibrary(hModule);
 	}
 #endif
@@ -4513,7 +4513,8 @@ vncClient::vncClient() : m_clipboard(ClipboardSettings::defaultServerCaps), Send
 	m_hPToken = 0;
 
 	m_socket = NULL;
-	m_client_name = NULL;
+	m_client_name_name = NULL;
+	m_client_name_address = NULL;
 	m_client_domain_username = NULL;
 
 	// Initialise mouse fields
@@ -4659,14 +4660,18 @@ vncClient::~vncClient()
 	if (m_pZipUnZip) delete m_pZipUnZip;
 
 	// We now know the thread is dead, so we can clean up
-	if (m_client_name != NULL) {
-		free(m_client_name);
-		m_client_name = NULL;
+	if (m_client_name_address != NULL) {
+		free(m_client_name_address);
+		m_client_name_address = NULL;
 	}
 	
 	if (m_client_domain_username != NULL) {
 		free(m_client_domain_username);
 		m_client_domain_username = NULL;
+	}
+	if (m_client_name_name != NULL) {
+		free(m_client_name_name);
+		m_client_name_name = NULL;
 	}
 
 	// If we have a socket then kill it
@@ -4761,11 +4766,17 @@ vncClient::Init(vncServer* server,
 	m_socket = socket;
 
 	// Save the name of the connecting client
-	char* name = m_socket->GetPeerName();
+	char* name = m_socket->GetPeerName(true);
 	if (name != NULL)
-		m_client_name = _strdup(name);
+		m_client_name_name = _strdup(name);
 	else
-		m_client_name = _strdup("<unknown>");
+		m_client_name_name = _strdup("<unknown>");
+
+	char* address = m_socket->GetPeerName(false);
+	if (address != NULL)
+		m_client_name_address = _strdup(address);
+	else
+		m_client_name_address = _strdup("<unknown>");
 
 	// Save the client id
 	m_id = newid;
@@ -5034,9 +5045,15 @@ vncClient::GetClientDomainUsername()
 
 // Functions used to set and retrieve the client settings
 const char*
-vncClient::GetClientName()
+vncClient::GetClientNameName()
 {
-	return m_client_name;
+	return m_client_name_name;
+}
+
+const char*
+vncClient::GetClientNameAddress()
+{
+	return m_client_name_address;
 }
 
 // Enabling and disabling clipboard/GFX updates

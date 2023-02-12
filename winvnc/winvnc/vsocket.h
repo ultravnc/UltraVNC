@@ -152,11 +152,11 @@ public:
   //        of the machine to which it is connected.
   //        This string MUST be copied before the next socket call...
 #ifdef IPV6V4
-  VString GetPeerName();
-  VString GetPeerName4();
-  VString GetPeerName6();
+  VString GetPeerName(bool naam);
+  VString GetPeerName4(bool naam);
+  VString GetPeerName6(bool naam);
 #else
-  VString GetPeerName();
+  VString GetPeerName(bool naam);
 #endif
 
   // GetSockName

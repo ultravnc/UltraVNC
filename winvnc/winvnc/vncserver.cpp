@@ -366,7 +366,7 @@ vncClientId vncServer::AddClient(VSocket* socket, BOOL auth, BOOL shared, int ca
 				strncat_s(szInfo, 255, pclient->GetRepeaterID(), _TRUNCATE);
 			}
 			else {
-				strncat_s(szInfo, 255, pclient->GetClientName(), _TRUNCATE);
+				strncat_s(szInfo, 255, pclient->GetClientNameName(), _TRUNCATE);
 			}
 			// adzm 2009-07-05
 			strncat_s(szInfo, 255, ", ", _TRUNCATE);
@@ -515,7 +515,7 @@ vncServer::Authenticated(vncClientId clientid)
 				_snprintf_s(szInfo, 255, "UltraVNC is controling your device. \r Remote access from ID: %s", client->GetRepeaterID());
 			}
 			else {
-				_snprintf_s(szInfo, 255, "UltraVNC is controling your device. \r Remote access from ip address %s", client->GetClientName());
+				_snprintf_s(szInfo, 255, "UltraVNC is controling your device. \r Remote access from ip address %s", client->GetClientNameName());
 			}
 			vncMenu::NotifyBalloon(szInfo);
 		}
@@ -529,7 +529,7 @@ vncServer::Authenticated(vncClientId clientid)
 				}
 				else {
 					strcpy_s(szTitle, "Connection from: ");
-					strncat_s(szTitle, client->GetClientName(), 45);
+					strncat_s(szTitle, client->GetClientNameName(), 45);
 					szTitle[62] = '\0';
 				}
 				strcpy_s(szInfo, 255, client->infoMsg);
@@ -541,7 +541,7 @@ vncServer::Authenticated(vncClientId clientid)
 					_snprintf_s(szInfo, 255, "UltraVNC is controling your device. \r Remote access from ID: %s", client->GetRepeaterID());
 				}
 				else {
-					_snprintf_s(szInfo, 255, "UltraVNC is controling your device. \r Remote access from ip address %s", client->GetClientName());
+					_snprintf_s(szInfo, 255, "UltraVNC is controling your device. \r Remote access from ip address %s", client->GetClientNameName());
 				}
 				vncMenu::NotifyBalloon(szInfo);
 			}
@@ -601,7 +601,7 @@ void vncServer::KillClient(LPSTR szClientName)
 
 	for (i = m_authClients.begin(); i != m_authClients.end(); i++) {
 		pClient = GetClient(*i);
-		if (!_stricmp(pClient->GetClientName(), szClientName)) {
+		if (!_stricmp(pClient->GetClientNameName(), szClientName)) { //TOCHECK
 			vnclog.Print(LL_INTINFO, VNCLOG("Killing client named: %s\n"), szClientName);
 			pClient->Kill();
 		}
@@ -620,7 +620,7 @@ void vncServer::TextChatClient(LPSTR szClientName)
 
 	for (i = m_authClients.begin(); i != m_authClients.end(); i++) {
 		pClient = GetClient(*i);
-		if (!_stricmp(pClient->GetClientName(), szClientName)) {
+		if (!_stricmp(pClient->GetClientNameName(), szClientName)) { //TOCHECK
 			if (!pClient->IsUltraViewer()) {
 				vnclog.Print(LL_INTINFO, VNCLOG("Client %s is not Ultra. Doesn't know TextChat\n"), szClientName);
 				vncTimedMsgBox::Do(
@@ -695,13 +695,13 @@ void vncServer::ListAuthClients(HWND hListBox)
 		vncClient* client = GetClient(*i);
 		if (client->GetRepeaterID() && (strlen(client->GetRepeaterID()) > 0)) {
 			char szDescription[256];
-			_snprintf_s(szDescription, 255, "%s - %s", client->GetRepeaterID(), client->GetClientName());
+			_snprintf_s(szDescription, 255, "%s - %s", client->GetRepeaterID(), client->GetClientNameName());
 			szDescription[255] = '\0';
 
 			SendMessage(hListBox, LB_ADDSTRING, 0, (LPARAM)szDescription);
 		}
 		else {
-			SendMessage(hListBox, LB_ADDSTRING, 0, (LPARAM)client->GetClientName());
+			SendMessage(hListBox, LB_ADDSTRING, 0, (LPARAM)client->GetClientNameName());
 		}
 	}
 }
@@ -717,13 +717,13 @@ void vncServer::ListUnauthClients(HWND hListBox)
 		vncClient* client = GetClient(*i);
 		if (client->GetRepeaterID() && (strlen(client->GetRepeaterID()) > 0)) {
 			char szDescription[256];
-			_snprintf_s(szDescription, 255, "%s - %s", client->GetRepeaterID(), client->GetClientName());
+			_snprintf_s(szDescription, 255, "%s - %s", client->GetRepeaterID(), client->GetClientNameName());
 			szDescription[255] = '\0';
 
 			SendMessage(hListBox, LB_ADDSTRING, 0, (LPARAM)szDescription);
 		}
 		else {
-			SendMessage(hListBox, LB_ADDSTRING, 0, (LPARAM)client->GetClientName());
+			SendMessage(hListBox, LB_ADDSTRING, 0, (LPARAM)client->GetClientNameName());
 		}
 	}
 }
@@ -913,12 +913,12 @@ vncServer::GetCapability(vncClientId clientid)
 }
 
 const char*
-vncServer::GetClientName(vncClientId clientid)
+vncServer::GetClientNameName(vncClientId clientid)
 {
 	omni_mutex_lock l(m_clientsLock, 39);
 	vncClient* client = GetClient(clientid);
 	if (client != NULL)
-		return client->GetClientName();
+		return client->GetClientNameName();
 	return NULL;
 }
 

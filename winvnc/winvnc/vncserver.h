@@ -122,7 +122,7 @@ public:
 	virtual void SetCapability(vncClientId client, int capability);
 
 	virtual int GetCapability(vncClientId client);
-	virtual const char* GetClientName(vncClientId client);
+	virtual const char* GetClientNameName(vncClientId client);
 
 	// Let a client remove itself
 	virtual void RemoveClient(vncClientId client);

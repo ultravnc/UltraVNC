@@ -524,7 +524,7 @@ INT_PTR CALLBACK TextChat::TextChatDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM wPar
 			_this->m_hWnd = hWnd;
 			_this->m_hDlg = hWnd;
 
-			if (_snprintf_s(_this->m_szRemoteName, MAXNAMESIZE, MAXNAMESIZE-1,"%s", _this->m_pCC->GetClientName()) < 0 )
+			if (_snprintf_s(_this->m_szRemoteName, MAXNAMESIZE, MAXNAMESIZE-1,"%s", _this->m_pCC->GetClientNameName()) < 0 )
 			{
 				_this->m_szRemoteName[MAXNAMESIZE-4]='.';
 				_this->m_szRemoteName[MAXNAMESIZE-3]='.';

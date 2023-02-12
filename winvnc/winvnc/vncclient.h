@@ -234,8 +234,9 @@ public:
 	virtual void SetCapability(int capability) {m_capability = capability;};
 
 	virtual int GetCapability() {return m_capability;};
-	virtual const char *GetClientName();
 	virtual const char *GetClientDomainUsername();
+	virtual const char *GetClientNameName();
+	const char* GetClientNameAddress();
 	virtual vncClientId GetClientId() {return m_id;};
 
 	// Disable/enable protocol messages to the client
@@ -495,8 +496,9 @@ protected:
 	// The server
 	vncServer		*m_server;
 	
-	char			*m_client_name;
 	char			*m_client_domain_username;
+	char			*m_client_name_name;
+	char			* m_client_name_address;
 
 	// The client thread
 	omni_thread		*m_thread_ClientThread;
