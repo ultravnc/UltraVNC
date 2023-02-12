@@ -574,11 +574,26 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 							m_server->UpdateLocalFormat(true); // must have the update lock
 						}
 
-					if (m_desktop->m_screensize_changed) 
+					if (m_desktop->m_screensize_changed)
 						{
 							m_desktop->m_screensize_changed = false;
 							monitor_changed = false;
-							m_server->SetNewSWSize(m_desktop->m_scrinfo.framebufferWidth,m_desktop->m_scrinfo.framebufferHeight, monitor_changed);//changed no lock ok
+							if (!m_desktop->m_screenCapture) {
+								if (m_desktop->m_current_monitor == MULTI_MON_ALL) {
+									rc.right = m_desktop->mymonitor[MULTI_MON_ALL].Width;
+									rc.bottom = m_desktop->mymonitor[MULTI_MON_ALL].Height;
+									m_desktop->m_ScreenOffsetx = m_desktop->mymonitor[MULTI_MON_ALL].offsetx;
+									m_desktop->m_ScreenOffsety = m_desktop->mymonitor[MULTI_MON_ALL].offsety;
+								}
+								else
+								{
+									rc.right = m_desktop->mymonitor[m_desktop->m_current_monitor].Width;
+									rc.bottom = m_desktop->mymonitor[m_desktop->m_current_monitor].Height;
+									m_desktop->m_ScreenOffsetx = m_desktop->mymonitor[m_desktop->m_current_monitor].offsetx;
+									m_desktop->m_ScreenOffsety = m_desktop->mymonitor[m_desktop->m_current_monitor].offsety;
+								}
+							}
+							m_server->SetNewSWSize(rc.right, rc.bottom, monitor_changed);//changed no lock ok
 							m_server->SetScreenOffset(m_desktop->m_ScreenOffsetx, m_desktop->m_ScreenOffsety, m_desktop->nr_monitors == 1);// no lock ok							
 						}
 					
