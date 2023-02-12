@@ -125,7 +125,7 @@ void EventLogging::AddEventSourceToRegistry(LPCTSTR lpszSourceName)
 /////////////////////////
 ///////////////////////
 LOGGING_API
-void LOGEXIT(char *machine, char *user, vncClientId *clientId, bool *isinteractive)
+void LOGEXIT(char *machine, char *user, int clientId, bool isinteractive)
 {
 	    FILE *file;
 		const char* ps[3];
@@ -171,7 +171,7 @@ void LOGEXIT(char *machine, char *user, vncClientId *clientId, bool *isinteracti
 }
 
 LOGGING_API
-void LOGLOGON(char *machine, vncClientId *clientId, bool *isinteractive)
+void LOGLOGON(char *machine, int clientId, bool isinteractive)
 {
 		FILE *file;
 		const char* ps[3];
@@ -209,7 +209,7 @@ void LOGLOGON(char *machine, vncClientId *clientId, bool *isinteractive)
 			}
 }
 
-void LOGCONN(char* machine, vncClientId *clientId, bool *isinteractive)
+void LOGCONN(char* machine, int clientId, bool isinteractive)
 {
 	FILE* file;
 	const char* ps[3];

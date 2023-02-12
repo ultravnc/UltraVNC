@@ -1050,7 +1050,7 @@ void vncClientThread::LogAuthResult(bool success, bool isconnected)
 	}
 	else
 	{
-		typedef BOOL(*LogeventFn)(char* machine, vncClientId *clientId, bool *isinteractive);
+		typedef BOOL(*LogeventFn)(char* machine, int clientId, bool isinteractive);
 		LogeventFn Logevent = 0;
 		char szCurrentDir[MAX_PATH];
 		if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
@@ -1067,7 +1067,7 @@ void vncClientThread::LogAuthResult(bool success, bool isconnected)
 			} else {
 				Logevent = (LogeventFn)GetProcAddress(hModule, "LOGLOGON");
 			}
-			Logevent((char*)m_client->GetClientNameName(), (vncClientId*)m_client->GetClientId(), (bool *)(m_client->m_keyboardenabled && m_client->m_pointerenabled));
+			Logevent((char*)m_client->GetClientNameName(), m_client->GetClientId(), m_client->m_keyboardenabled && m_client->m_pointerenabled);
 			FreeLibrary(hModule);
 		}
 	}
@@ -4452,7 +4452,7 @@ vncClientThread::run(void* arg)
 	// LOG it also in the event
 	//////////////////
 #ifndef SC_20
-	typedef BOOL(*LogeventFn)(char* machine, char* user, vncClientId *clientId, bool *isinteractive);
+	typedef BOOL(*LogeventFn)(char* machine, char* user, int clientId, bool isinteractive);
 	LogeventFn Logevent = 0;
 	char szCurrentDir[MAX_PATH];
 	if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
@@ -4465,7 +4465,7 @@ vncClientThread::run(void* arg)
 	if (hModule)
 	{
 		Logevent = (LogeventFn)GetProcAddress(hModule, "LOGEXIT");
-		Logevent((char*)m_client->GetClientNameName(), (char*)m_client->GetClientDomainUsername(), (vncClientId*)m_client->GetClientId(), (bool*)(m_client->m_keyboardenabled && m_client->m_pointerenabled));
+		Logevent((char*)m_client->GetClientNameName(), (char*)m_client->GetClientDomainUsername(), m_client->GetClientId(), m_client->m_keyboardenabled && m_client->m_pointerenabled);
 		FreeLibrary(hModule);
 	}
 #endif
