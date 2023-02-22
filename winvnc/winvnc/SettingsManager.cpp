@@ -51,9 +51,7 @@ SettingsManager::SettingsManager()
 		}
 	}
 	setDefaults();
-#ifndef SC_20
 	load();
-#endif
 	if (iImpersonateResult == ERROR_SUCCESS)
 		RevertToSelf();
 }
@@ -210,6 +208,7 @@ void SettingsManager::setDefaults()
 
 void SettingsManager::load()
 {
+#ifndef SC_20
 	// Disable Tray Icon
 	m_pref_DisableTrayIcon = myIniFile.ReadInt("admin", "DisableTrayIcon", m_pref_DisableTrayIcon);
 	m_pref_Rdpmode = myIniFile.ReadInt("admin", "rdpmode", m_pref_Rdpmode);
@@ -292,7 +291,21 @@ void SettingsManager::load()
 	m_pref_EnableWin8Helper = myIniFile.ReadInt("admin", "EnableWin8Helper", m_pref_EnableWin8Helper);
 	m_pref_clearconsole = myIniFile.ReadInt("admin", "clearconsole", m_pref_clearconsole);
 	G_SENDBUFFER_EX = myIniFile.ReadInt("admin", "sendbuffer", G_SENDBUFFER_EX);
+	myIniFile.ReadString("admin_auth", "group1", m_pref_group1, 150);
+	_tcscpy_s(m_pref_group1, "VNCACCESS");
+	myIniFile.ReadString("admin_auth", "group2", m_pref_group2, 150);
+	_tcscpy_s(m_pref_group2, "Administrators");
+	myIniFile.ReadString("admin_auth", "group3", m_pref_group3, 150);
+	_tcscpy_s(m_pref_group3, "VNCVIEWONLY");
 
+	myIniFile.ReadString("admin", "cloudServer", m_pref_cloudServer, MAX_HOST_NAME_LEN);
+	m_pref_cloudEnabled = myIniFile.ReadInt("admin", "cloudEnabled", m_pref_cloudEnabled);
+
+
+	m_pref_locdom1 = myIniFile.ReadInt("admin_auth", "locdom1", m_pref_locdom1);
+	m_pref_locdom2 = myIniFile.ReadInt("admin_auth", "locdom2", m_pref_locdom2);
+	m_pref_locdom3 = myIniFile.ReadInt("admin_auth", "locdom3", m_pref_locdom2);
+#endif
 	m_pref_TurboMode = myIniFile.ReadInt("poll", "TurboMode", m_pref_TurboMode);
 	m_pref_PollUnderCursor = myIniFile.ReadInt("poll", "PollUnderCursor", m_pref_PollUnderCursor);
 	m_pref_PollForeground = myIniFile.ReadInt("poll", "PollForeground", m_pref_PollForeground);
@@ -309,22 +322,6 @@ void SettingsManager::load()
 	m_pref_Hook = myIniFile.ReadInt("poll", "EnableHook", m_pref_Hook);
 	m_pref_Virtual = myIniFile.ReadInt("poll", "EnableVirtual", m_pref_Virtual);
 	m_pref_autocapt = myIniFile.ReadInt("poll", "autocapt", m_pref_autocapt);
-
-	myIniFile.ReadString("admin_auth", "group1", m_pref_group1, 150);
-	_tcscpy_s(m_pref_group1, "VNCACCESS");
-	myIniFile.ReadString("admin_auth", "group2", m_pref_group2, 150);
-	_tcscpy_s(m_pref_group2, "Administrators");
-	myIniFile.ReadString("admin_auth", "group3", m_pref_group3, 150);
-	_tcscpy_s(m_pref_group3, "VNCVIEWONLY");
-
-	myIniFile.ReadString("admin", "cloudServer", m_pref_cloudServer, MAX_HOST_NAME_LEN);
-	m_pref_cloudEnabled = myIniFile.ReadInt("admin", "cloudEnabled", m_pref_cloudEnabled);
-
-
-	m_pref_locdom1 = myIniFile.ReadInt("admin_auth", "locdom1", m_pref_locdom1);
-	m_pref_locdom2 = myIniFile.ReadInt("admin_auth", "locdom2", m_pref_locdom2);
-	m_pref_locdom3 = myIniFile.ReadInt("admin_auth", "locdom3", m_pref_locdom2);
-
 }
 
 void SettingsManager::save()

@@ -1028,7 +1028,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 					delete[] name;
 #else
 					VCard32 address = VSocket::Resolve(name);
-					delete [] name;
+#ifdef SC_20
+					if (address == 0) {
+						char text[1024]{};
+						sprintf(text, " Hostnamee (%s) could not be resolved", name);
+						MessageBox(NULL, text, szAppName, MB_ICONEXCLAMATION | MB_OK);
+						delete[] name;
+						return 0;
+					}					
+#endif
+					delete[] name;
 					if (address != 0) {
 						// Post the IP address to the server
 						// We can not contact a runnning service, permissions, so we must store the settings
