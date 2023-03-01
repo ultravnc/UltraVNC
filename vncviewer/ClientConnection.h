@@ -326,6 +326,7 @@ private:
 	void Scollbar_wm_sizing(WPARAM wParam, LPARAM lParam);
 	void Scollbar_wm_siz(HWND hwnd);
 	void Scrollbar_RecalculateSize(HWND hwnd);
+	bool incorrectParameters(CARD16 width, CARD16 height, CARD16 xx, CARD16 yy, int framebufferWidth, int framebufferHeight);
     
 	void ReadRawRect(rfbFramebufferUpdateRectHeader *pfburh);
 	void ReadUltraRect(rfbFramebufferUpdateRectHeader *pfburh);
@@ -795,8 +796,8 @@ private:
 	int xzywBuf[rfbXZTileWidth*rfbXZTileHeight];
 #endif
 
-	void ConvertAll(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth, int framebufferHeight);
-	void ConvertAll_secure(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth, int sourceSize, int framebufferHeight);
+	void ConvertAll(CARD16 width, CARD16 height, CARD16 xx, CARD16 yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth, int framebufferHeight);
+	void ConvertAll_secure(CARD16 width, CARD16 height, CARD16 xx, CARD16 yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth, int sourceSize, int framebufferHeight);
 	void ConvertPixel(int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth);
 	void Copybuffer(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth,int framebufferHeight);
 	void Copyto0buffer(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth,int framebufferHeight);

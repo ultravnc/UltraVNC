@@ -3692,6 +3692,13 @@ void ClientConnection::ReadServerInit(bool reconnect)
 		m_si.format.blueShift = 0;
 	}
 #endif
+	if (m_si.framebufferWidth > 20000 || m_si.framebufferHeight >20000) { // a screensize > 20 000 is not possible with current OS
+		int msgboxID = MessageBox(NULL, "Server is sending a screensize with height or with > 20000", "Error", MB_OKCANCEL | MB_ICONINFORMATION);
+		if (msgboxID == IDCANCEL)
+			exit(0);
+		m_si.framebufferWidth = 1024;
+		m_si.framebufferHeight = 800;
+	}
 
     m_desktopName = new TCHAR[2024];
 	m_desktopName_viewonly = new TCHAR[2024];
@@ -9448,7 +9455,7 @@ void ClientConnection::processIdleTimer(HWND hwnd)
 	}
 }
 
-void ClientConnection::ConvertAll(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth, int framebufferHeight)
+void ClientConnection::ConvertAll(CARD16 width, CARD16 height, CARD16 xx, CARD16 yy, int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth, int framebufferHeight)
 {
 	int bytesPerInputRow = width * bytes_per_pixel;
 	int bytesPerOutputRow = framebufferWidth * bytes_per_pixel;
@@ -9456,7 +9463,7 @@ void ClientConnection::ConvertAll(int width, int height, int xx, int yy,int byte
 	if (bytesPerOutputRow % 4)
 		bytesPerOutputRow += 4 - bytesPerOutputRow % 4;
 
-	if ( ((width + xx) * (height + yy)) > (framebufferWidth * framebufferHeight))
+	if (incorrectParameters(width, height, xx, yy, framebufferWidth, framebufferHeight))
 			goto error;
 
 	BYTE *sourcepos,*destpos;
@@ -9475,7 +9482,7 @@ error:
 	assert(true);
 }
 
-void ClientConnection:: ConvertAll_secure(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth, int sourceSize, int framebufferHeight)
+void ClientConnection:: ConvertAll_secure(CARD16 width, CARD16 height, CARD16 xx, CARD16 yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth, int sourceSize, int framebufferHeight)
 {
 	int bytesPerInputRow = width * bytes_per_pixel;
 	int bytesPerOutputRow = framebufferWidth * bytes_per_pixel;
@@ -9486,8 +9493,8 @@ void ClientConnection:: ConvertAll_secure(int width, int height, int xx, int yy,
 	if (bytesPerOutputRow % 4)
 		bytesPerOutputRow += 4 - bytesPerOutputRow % 4;
 	//security check dibits
-	if ( ((width + xx) * (height + yy)) > (framebufferWidth * framebufferHeight))
-			goto error;
+	if (incorrectParameters(width, height, xx, yy, framebufferWidth, framebufferHeight))
+		goto error;
 
 
 	BYTE *sourcepos,*destpos;
@@ -9511,8 +9518,8 @@ ClientConnection:: Copybuffer(int width, int height, int xx, int yy,int bytes_pe
 {
 	int bytesPerOutputRow = framebufferWidth * bytes_per_pixel;
 
-	if ( ((width + xx) * (height + yy)) > (framebufferWidth * framebufferHeight))
-			goto error;
+	if (incorrectParameters(width, height, xx, yy, framebufferWidth, framebufferHeight))
+		goto error;
 
 	//8bit pitch need to be taken in account
 	if (bytesPerOutputRow % 4)
@@ -9564,7 +9571,7 @@ ClientConnection:: Copyfrom0buffer(int width, int height, int xx, int yy,int byt
 {
 	int bytesPerOutputRow = framebufferWidth * bytes_per_pixel;
 
-	if ( ((width + xx) * (height + yy)) > (framebufferWidth * framebufferHeight))
+	if (incorrectParameters(width, height, xx, yy, framebufferWidth, framebufferHeight))
 		goto error;
 
 	//8bit pitch need to be taken in account
@@ -10114,4 +10121,13 @@ void ClientConnection::Scrollbar_RecalculateSize(HWND hwnd)
 
 		SetWindowPos(hwnd, NULL, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, SWP_NOZORDER | SWP_NOMOVE);
 	}
+}
+
+bool ClientConnection::incorrectParameters(CARD16 width, CARD16 height, CARD16 xx, CARD16 yy, int framebufferWidth, int framebufferHeight)
+{
+	return (width > framebufferWidth ||
+		xx > framebufferWidth ||
+		height > framebufferHeight ||
+		yy > framebufferHeight ||
+		((width + xx) * (height + yy)) > (framebufferWidth * framebufferHeight));
 }
