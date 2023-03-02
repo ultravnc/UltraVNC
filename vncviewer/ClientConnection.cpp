@@ -7175,6 +7175,15 @@ void ClientConnection::ReadNewFBSize(rfbFramebufferUpdateRectHeader *pfburh)
 	{omni_mutex_lock l(m_bitmapdcMutex);
 	ClearCache();
 	m_fScalingDone = false;
+
+	if (m_si.framebufferWidth > 20000 || m_si.framebufferHeight > 20000) { // a screensize > 20 000 is not possible with current OS
+		int msgboxID = MessageBox(NULL, "Server is sending a screensize with height or with > 20000", "Error", MB_OKCANCEL | MB_ICONINFORMATION);
+		if (msgboxID == IDCANCEL)
+			exit(0);
+		m_si.framebufferWidth = 1024;
+		m_si.framebufferHeight = 800;
+	}
+
 	m_si.framebufferWidth = pfburh->r.w / m_nServerScale;
 	m_si.framebufferHeight = pfburh->r.h / m_nServerScale;
 
