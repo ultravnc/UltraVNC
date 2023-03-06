@@ -162,6 +162,7 @@ namespace settingsHelpers {
 		char SingleWindowName[32];
 		char path[512];
 		char accept_reject_mesg[512];
+		char service_commandline[1024];
 		LONG MaxCpu = 100;
 		LONG MaxFPS = 25;
 
@@ -222,6 +223,7 @@ namespace settingsHelpers {
 		Avilog = myIniFile_In.ReadInt("admin", "Avilog", 0);
 		myIniFile_In.ReadString("admin", "path", path, 512);
 		myIniFile_In.ReadString("admin", "accept_reject_mesg", accept_reject_mesg, 512);
+		myIniFile_In.ReadString("admin", "service_commandline", service_commandline, 1024);
 		DebugLevel = myIniFile_In.ReadInt("admin", "DebugLevel", 0);
 		DisableTrayIcon = myIniFile_In.ReadInt("admin", "DisableTrayIcon", false);
 		Rdpmode = myIniFile_In.ReadInt("admin", "rdpmode", 0);
@@ -232,6 +234,7 @@ namespace settingsHelpers {
 		myIniFile_Out.WriteInt("admin", "Avilog", Avilog);
 		myIniFile_Out.WriteString("admin", "path", path);
 		myIniFile_Out.WriteString("admin", "accept_reject_mesg", accept_reject_mesg);
+		myIniFile_Out.WriteString("admin", "service_commandline", service_commandline);
 		myIniFile_Out.WriteInt("admin", "DebugLevel", DebugLevel);
 		myIniFile_Out.WriteInt("admin", "DisableTrayIcon", DisableTrayIcon);
 		myIniFile_Out.WriteInt("admin", "rdpmode", Rdpmode);
