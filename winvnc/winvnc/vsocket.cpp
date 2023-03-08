@@ -863,20 +863,25 @@ VSocket::GetPeerName6(bool naam)
 VString
 VSocket::GetPeerName(bool naam)
 {
+	// the lookup is to slow
+	naam = false;
 	struct sockaddr_in	sockinfo{};
 	struct in_addr		address{};
 	int					sockinfosize = sizeof(sockinfo);
-	VString				name;
+	VString				name{};
 
 	// Get the peer address for the client socket
 	getpeername(sock, (struct sockaddr *)&sockinfo, &sockinfosize);
 	memcpy(&address, &sockinfo.sin_addr, sizeof(address));
 
-	struct hostent* remoteHost = gethostbyaddr((char*)&address, sizeof(address), AF_INET);
+	
 
-	if (remoteHost != NULL && naam) {
-		name = remoteHost->h_name;
-		return name;
+	if (naam) {
+		struct hostent* remoteHost = gethostbyaddr((char*)&address, sizeof(address), AF_INET);
+		if (remoteHost != NULL) {
+			name = remoteHost->h_name;
+			return name;
+		}
 	}
 
 	name = inet_ntoa(address);;
