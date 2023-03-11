@@ -1,6 +1,6 @@
 // upnp.cpp : Defines the entry point for the console application.
 //
-#if !defined(__MINGW32__)
+//#if !defined(__MINGW32__)
 
 #include "stdafx.h"
 #include "log.h"
@@ -278,6 +278,6 @@ bool mapport(short port)
 	UPnPvar.ClosePorts(true);
 	return 0;
 }
-#endif /*__MINGW32__*/
+//#endif /*__MINGW32__*/
 
 
