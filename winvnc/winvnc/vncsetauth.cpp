@@ -169,15 +169,20 @@ BOOL CALLBACK vncSetAuth::DialogProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lP
 				return TRUE;
 		case IDOK:
 			{
-				if (SendMessage(GetDlgItem(hwnd, IDC_CHECKG1L),BM_GETCHECK,0,0) == BST_CHECKED) settings->setLocdom1( settings->getLocdom1() +1);
-				if (SendMessage(GetDlgItem(hwnd, IDC_CHECKG1D),BM_GETCHECK,0,0) == BST_CHECKED) settings->setLocdom1(settings->getLocdom1() +2);
+				int locdom1 = 0;
+				int locdom2 = 0;
+				int locdom3 = 0;
+				if (SendMessage(GetDlgItem(hwnd, IDC_CHECKG1L),BM_GETCHECK,0,0) == BST_CHECKED) locdom1 = locdom1 +1;
+				if (SendMessage(GetDlgItem(hwnd, IDC_CHECKG1D),BM_GETCHECK,0,0) == BST_CHECKED) locdom1 = locdom1 +2;
 
-				if (SendMessage(GetDlgItem(hwnd, IDC_CHECKG2L),BM_GETCHECK,0,0) == BST_CHECKED) settings->setLocdom2(settings->getLocdom2() +1);
-				if (SendMessage(GetDlgItem(hwnd, IDC_CHECKG2D),BM_GETCHECK,0,0) == BST_CHECKED) settings->setLocdom2(settings->getLocdom2() +2);
+				if (SendMessage(GetDlgItem(hwnd, IDC_CHECKG2L),BM_GETCHECK,0,0) == BST_CHECKED) locdom2 = locdom2 + 1;
+				if (SendMessage(GetDlgItem(hwnd, IDC_CHECKG2D),BM_GETCHECK,0,0) == BST_CHECKED) locdom2 = locdom2 + 2;
 
-				if (SendMessage(GetDlgItem(hwnd, IDC_CHECKG3L),BM_GETCHECK,0,0) == BST_CHECKED) settings->setLocdom3(settings->getLocdom3() +1);
-				if (SendMessage(GetDlgItem(hwnd, IDC_CHECKG3D),BM_GETCHECK,0,0) == BST_CHECKED) settings->setLocdom3(settings->getLocdom3() +2);
-
+				if (SendMessage(GetDlgItem(hwnd, IDC_CHECKG3L),BM_GETCHECK,0,0) == BST_CHECKED) locdom3 = locdom3 + 1;
+				if (SendMessage(GetDlgItem(hwnd, IDC_CHECKG3D),BM_GETCHECK,0,0) == BST_CHECKED) locdom3 = locdom3 + 2;
+				settings->setLocdom1(locdom1);
+				settings->setLocdom2(locdom2);
+				settings->setLocdom3(locdom2);
 				GetDlgItemText(hwnd, IDC_GROUP1, (LPSTR)settings->getGroup1(), 240);
 				GetDlgItemText(hwnd, IDC_GROUP2, (LPSTR)settings->getGroup2(), 240);
 				GetDlgItemText(hwnd, IDC_GROUP3, (LPSTR)settings->getGroup3(), 240);

@@ -304,7 +304,7 @@ void SettingsManager::load()
 
 	m_pref_locdom1 = myIniFile.ReadInt("admin_auth", "locdom1", m_pref_locdom1);
 	m_pref_locdom2 = myIniFile.ReadInt("admin_auth", "locdom2", m_pref_locdom2);
-	m_pref_locdom3 = myIniFile.ReadInt("admin_auth", "locdom3", m_pref_locdom2);
+	m_pref_locdom3 = myIniFile.ReadInt("admin_auth", "locdom3", m_pref_locdom3);
 #endif
 	m_pref_TurboMode = myIniFile.ReadInt("poll", "TurboMode", m_pref_TurboMode);
 	m_pref_PollUnderCursor = myIniFile.ReadInt("poll", "PollUnderCursor", m_pref_PollUnderCursor);
@@ -430,10 +430,18 @@ void SettingsManager::save()
 	myIniFile.WriteString("admin", "cloudServer", m_pref_cloudServer);
 	myIniFile.WriteInt("admin", "cloudEnabled", m_pref_cloudEnabled);
 
+	myIniFile.WriteString("admin_auth", "group1", m_pref_group1);
+	myIniFile.WriteString("admin_auth", "group2", m_pref_group2);
+	myIniFile.WriteString("admin_auth", "group3", m_pref_group3);
+
+	myIniFile.WriteInt("admin_auth", "locdom1", m_pref_locdom1);
+	myIniFile.WriteInt("admin_auth", "locdom2", m_pref_locdom2);
+	myIniFile.WriteInt("admin_auth", "locdom3", m_pref_locdom3);
+
 	if (tempset) {
 		myIniFile.copy_to_secure();
 		myIniFile.IniFileSetSecure();
-	}
+	}	
 }
 
 void SettingsManager::setkeepAliveInterval(int secs) {

@@ -815,7 +815,7 @@ if ( isNT )
 	if ( hLoc != 0 )
 		FreeLibrary( hLoc );
 	//check user
-	if (isNT)
+	/*if (isNT)
 	{
 	size_t pnconv;
 #if _MSC_VER < 1400
@@ -823,7 +823,9 @@ if ( isNT )
 #else
 		wcstombs_s(&pnconv,  user, MAXLEN, (const wchar_t *)user, MAXLEN);	
 #endif
-	}
+	}*/
+
+	strcpy_s(user, userin);
 
 	BOOL logon_OK=false;
 	BOOL passwd_OK=false;
