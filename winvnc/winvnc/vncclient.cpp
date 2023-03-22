@@ -892,7 +892,7 @@ vncClientThread::FilterClients_Ask_Permission()
 					verified = vncServer::aqrAccept;
 			}
 			else {
-				vncAcceptDialog* acceptDlg = new vncAcceptDialog(settings->getQueryTimeout(), m_server->QueryAccept(), m_socket->GetPeerName(true), m_client->infoMsg, settings->getNotification());
+				vncAcceptDialog* acceptDlg = new vncAcceptDialog(settings->getQueryTimeout(), m_server->QueryAccept() == 1, m_socket->GetPeerName(true), m_client->infoMsg, settings->getNotification());
 				if (acceptDlg == NULL) {
 					if (m_server->QueryAccept() == 1)
 						verified = vncServer::aqrAccept;

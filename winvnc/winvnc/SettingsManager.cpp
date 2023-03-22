@@ -133,7 +133,7 @@ void SettingsManager::setDefaults()
 	m_pref_FTUserImpersonation = TRUE;
 	m_pref_EnableBlankMonitor = TRUE;
 	m_pref_BlankInputsOnly = FALSE;
-	m_pref_QueryIfNoLogon = FALSE;
+	m_pref_QueryIfNoLogon = 1;
 	m_pref_DefaultScale = 1;
 	m_pref_RequireMSLogon = false;
 	m_pref_Secure = false;

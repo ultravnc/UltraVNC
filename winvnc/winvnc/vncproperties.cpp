@@ -655,7 +655,9 @@ vncProperties::DialogProc(HWND hwnd,
 			}
 
 			if (SendMessage(GetDlgItem(hwnd, IDC_DREFUSE), BM_GETCHECK, 0, 0) == BST_CHECKED) {
-				settings->setQueryAccept(0);
+				settings->getQueryIfNoLogon() == 0
+					? settings->setQueryAccept(2)
+					: settings->setQueryAccept(0);
 			}
 			else if (SendMessage(GetDlgItem(hwnd, IDC_DACCEPT), BM_GETCHECK, 0, 0) == BST_CHECKED) {
 				settings->setQueryAccept(1);
