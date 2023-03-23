@@ -3692,13 +3692,7 @@ void ClientConnection::ReadServerInit(bool reconnect)
 		m_si.format.blueShift = 0;
 	}
 #endif
-	if (m_si.framebufferWidth > 20000 || m_si.framebufferHeight >20000) { // a screensize > 20 000 is not possible with current OS
-		int msgboxID = MessageBox(NULL, "Server is sending a screensize with height or with > 20000", "Error", MB_OKCANCEL | MB_ICONINFORMATION);
-		if (msgboxID == IDCANCEL)
-			exit(0);
-		m_si.framebufferWidth = 1024;
-		m_si.framebufferHeight = 800;
-	}
+	checkParemeters();
 
     m_desktopName = new TCHAR[2024];
 	m_desktopName_viewonly = new TCHAR[2024];
@@ -4321,6 +4315,9 @@ void ClientConnection::Createdib()
     bi.mask.red = (CARD32)m_myFormat.redMax << m_myFormat.redShift;
     bi.mask.green = (CARD32)m_myFormat.greenMax << m_myFormat.greenShift;
     bi.mask.blue = (CARD32)m_myFormat.blueMax << m_myFormat.blueShift;
+
+	if (bi.bmiHeader.biSizeImage > 625000000) // this crash
+		exit(0);
 
 	if (directx_used)
 		{
@@ -5380,6 +5377,7 @@ void* ClientConnection::run_undetached(void* arg) {
 						m_si.framebufferHeight = Swap16IfLE(rsmsg.framebufferHeigth);
 
 						//CreateLocalFramebuffer();
+						checkParemeters();
 						Createdib();
 						m_pendingScaleChange = true;
 						m_pendingFormatChange = true; 
@@ -10139,4 +10137,15 @@ bool ClientConnection::incorrectParameters(CARD16 width, CARD16 height, CARD16 x
 		height > framebufferHeight ||
 		yy > framebufferHeight ||
 		((width + xx) * (height + yy)) > (framebufferWidth * framebufferHeight));
+}
+
+void ClientConnection::checkParemeters()
+{
+	if (m_si.framebufferWidth > 20000 || m_si.framebufferHeight > 20000) { // a screensize > 20 000 is not possible with current OS
+		int msgboxID = MessageBox(NULL, "Server is sending a screensize with height or with > 20000", "Error", MB_OKCANCEL | MB_ICONINFORMATION);
+		if (msgboxID == IDCANCEL)
+			exit(0);
+		m_si.framebufferWidth = 1024;
+		m_si.framebufferHeight = 800;
+	}
 }

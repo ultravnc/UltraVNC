@@ -327,6 +327,7 @@ private:
 	void Scollbar_wm_siz(HWND hwnd);
 	void Scrollbar_RecalculateSize(HWND hwnd);
 	bool incorrectParameters(CARD16 width, CARD16 height, CARD16 xx, CARD16 yy, int framebufferWidth, int framebufferHeight);
+	void checkParemeters();
     
 	void ReadRawRect(rfbFramebufferUpdateRectHeader *pfburh);
 	void ReadUltraRect(rfbFramebufferUpdateRectHeader *pfburh);
