@@ -498,15 +498,14 @@ vncServer::Authenticated(vncClientId clientid)
 	if (client != NULL) {
 
 #ifdef SC_20
-		char all[256];
-		strcpy_s(all, ScSelect::Balloon2A);
-		strcat_s(all, "\n");
-		strcat_s(all, ScSelect::Balloon2B);
-		strcat_s(all, "\n");
-		strcat_s(all, ScSelect::Balloon2C);
+		char szTitle[256] = { 0 };
+		char szInfo[256] = { 0 };
+
+		_snprintf_s(szInfo, 255, "%s \n%s \n %s", ScSelect::Balloon2A, ScSelect::Balloon2B, ScSelect::Balloon2C);
 		if (settings->getNotification() && strlen(client->infoMsg) > 0)
-			strcpy_s(all, client->infoMsg);
-		vncMenu::NotifyBalloon(all, ScSelect::Balloon2Title);
+			_snprintf_s(szInfo, 255, "%s", client->infoMsg);
+		_snprintf_s(szTitle, 255, "%s", ScSelect::Balloon2Title);
+		vncMenu::NotifyBalloon(szInfo, szTitle);
 #else
 		// adzm 2009-07-05 - Balloon
 		if (settings->getScPrompt()) {

@@ -171,139 +171,111 @@ BOOL CALLBACK vncConnDialog::vncConnDlgProc(HWND hwnd,
 
 		// Dialog has just received a command
 	case WM_COMMAND:
-		switch (LOWORD(wParam))
-		{
-			// User clicked OK or pressed return
+		switch (LOWORD(wParam)) { // User clicked OK or pressed return
 		case IDOK:
-		{
-			// sf@2002 - host:num & host::num analyse.
-			// Compatible with both RealVNC and TightVNC methods
-			char hostname[_MAX_PATH];
-			char actualhostname[_MAX_PATH];
-			char idcode[_MAX_PATH];
-			char *portp;
-			int port;
-			bool id;
+			{
+				// sf@2002 - host:num & host::num analyse.
+				// Compatible with both RealVNC and TightVNC methods
+				char hostname[_MAX_PATH];
+				char actualhostname[_MAX_PATH];
+				char idcode[_MAX_PATH];
+				char *portp;
+				int port;
+				bool id;
 
-			// Get the hostname of the VNCviewer
-			GetDlgItemText(hwnd, IDC_HOSTNAME_EDIT, hostname, _MAX_PATH);
-			GetDlgItemText(hwnd, IDC_IDCODE, idcode, _MAX_PATH);
-			if (strcmp(idcode,"")==0) id=false;
-			else id=true;
+				// Get the hostname of the VNCviewer
+				GetDlgItemText(hwnd, IDC_HOSTNAME_EDIT, hostname, _MAX_PATH);
+				GetDlgItemText(hwnd, IDC_IDCODE, idcode, _MAX_PATH);
+				if (strcmp(idcode,"")==0) 
+					id=false;
+				else 
+					id=true;
 
-			strcpy_s(actualhostname, hostname);
+				strcpy_s(actualhostname, hostname);
 			
-			//adzm 2010-02-15 - Multiple repeaters chosen by modulo of ID
+				//adzm 2010-02-15 - Multiple repeaters chosen by modulo of ID
 
-			char finalidcode[_MAX_PATH];
-			//adzm 2010-08 - this was sending uninitialized data over the wire
-			ZeroMemory(finalidcode, sizeof(finalidcode));
+				char finalidcode[_MAX_PATH];
+				//adzm 2010-08 - this was sending uninitialized data over the wire
+				ZeroMemory(finalidcode, sizeof(finalidcode));
 
-			//adzm 2009-06-20
-			if (id) {
-				size_t i = 0;
-
-				for (i = 0; i < strlen(idcode); i++)
-				{
-					finalidcode[i] = toupper(idcode[i]);
-				} 
-				finalidcode[i] = 0;
-
-				if (0 != strncmp("ID:", idcode, 3)) {
-					strcpy_s(finalidcode, "ID:");
-					
-					for (i = 0; i < strlen(idcode); i++)
-					{
-						finalidcode[i+3] = toupper(idcode[i]);
+				//adzm 2009-06-20
+				if (id) {
+					size_t i = 0;
+					for (i = 0; i < strlen(idcode); i++){
+						finalidcode[i] = toupper(idcode[i]);
 					} 
-					finalidcode[i+3] = 0;
-				}
-
-				
-				//adzm 2010-02-15 - At this point, finalidcode is of the form "ID:#####"
-				int numericId = atoi(finalidcode + 3);
-
-				int numberOfHosts = 1;
-				for (i = 0; i < strlen(hostname); i++) {
-					if (hostname[i] == ';') {
-						numberOfHosts++;
+					finalidcode[i] = 0;
+					if (0 != strncmp("ID:", idcode, 3)) {
+						strcpy_s(finalidcode, "ID:");					
+						for (i = 0; i < strlen(idcode); i++){
+							finalidcode[i+3] = toupper(idcode[i]);
+						} 
+						finalidcode[i+3] = 0;
 					}
-				}
+	
+					//adzm 2010-02-15 - At this point, finalidcode is of the form "ID:#####"
+					int numericId = atoi(finalidcode + 3);
 
-				if (numberOfHosts <= 1) {
-					// then hostname == actualhostname
-				} else {
-					int modulo = numericId % numberOfHosts;
-
-					char* szToken = strtok(hostname, ";");
-					while (szToken) {
-						if (modulo == 0) {
-							strcpy_s(actualhostname, szToken);
-							break;
+					int numberOfHosts = 1;
+					for (i = 0; i < strlen(hostname); i++) {
+						if (hostname[i] == ';') {
+							numberOfHosts++;
 						}
-
-						modulo--;
-						szToken = strtok(NULL, ";");
 					}
-				}
-			}
 
-			// Calculate the Display and Port offset.
-			port = INCOMING_PORT_OFFSET;
-			portp = strchr(actualhostname, ':');
-			if (portp)
-			{
-				*portp++ = '\0';
-				if (*portp == ':') // Tight127 method
-				{
-					port = atoi(++portp);		// Port number after "::"
-				}
-				else // RealVNC method
-				{
-					if (atoi(portp) < 100)		// If < 100 after ":" -> display number
-						port += atoi(portp);
-					else
-						port = atoi(portp);	    // If > 100 after ":" -> Port number
-				}
-			}
-
-
-			
-			// Attempt to create a new socket
-			VSocket *tmpsock;
-			tmpsock = new VSocket;
-			if (!tmpsock) {
-				return TRUE;
-			}
-			
-			// Connect out to the specified host on the VNCviewer listen port
-			// To be really good, we should allow a display number here but
-			// for now we'll just assume we're connecting to display zero
-#ifdef IPV6V4
-			if (tmpsock->CreateConnect(actualhostname, port))
-#else
-			tmpsock->Create();
-			if (tmpsock->Connect(actualhostname, port))
-#endif
-			{
-				if (id) 
-					{							
-						
-
-						tmpsock->Send(finalidcode,250);
-						tmpsock->SetTimeout(0);
-/*						if (strncmp(hostname,"ID",2)!=0)
-						{
-						while (true)
-						{
-							char result[1];
-							tmpsock->Read(result,1);
-							if (strcmp(result,"2")==0)
+					if (numberOfHosts > 1) {
+						int modulo = numericId % numberOfHosts;
+						char* szToken = strtok(hostname, ";");
+						while (szToken) {
+							if (modulo == 0) {
+								strcpy_s(actualhostname, szToken);
 								break;
-							tmpsock->Send("1",1);
+							}
+							modulo--;
+							szToken = strtok(NULL, ";");
 						}
-						}*/
-						
+					}
+				}
+
+				// Calculate the Display and Port offset.
+				port = INCOMING_PORT_OFFSET;
+				portp = strchr(actualhostname, ':');
+				if (portp)
+				{
+					*portp++ = '\0';
+					if (*portp == ':') // Tight127 method
+					{
+						port = atoi(++portp);		// Port number after "::"
+					}
+					else // RealVNC method
+					{
+						if (atoi(portp) < 100)		// If < 100 after ":" -> display number
+							port += atoi(portp);
+						else
+							port = atoi(portp);	    // If > 100 after ":" -> Port number
+					}
+				}
+			
+				// Attempt to create a new socket
+				VSocket *tmpsock;
+				tmpsock = new VSocket;
+				if (!tmpsock) {
+					return TRUE;
+				}
+			
+				// Connect out to the specified host on the VNCviewer listen port
+				// To be really good, we should allow a display number here but
+				// for now we'll just assume we're connecting to display zero
+	#ifdef IPV6V4
+				if (tmpsock->CreateConnect(actualhostname, port)) {
+	#else
+				tmpsock->Create();
+				if (tmpsock->Connect(actualhostname, port)) {
+	#endif				
+					if (id) {												
+						tmpsock->Send(finalidcode,250);
+						tmpsock->SetTimeout(0);						
 						// adzm 2009-07-05 - repeater IDs
 						// Add the new client to this server
 						// adzm 2009-08-02
@@ -313,20 +285,19 @@ BOOL CALLBACK vncConnDialog::vncConnDlgProc(HWND hwnd,
 						// adzm 2009-08-02
 						_this->m_server->AddClient(tmpsock, !settings->getReverseAuthRequired(), TRUE, 0, NULL, NULL, actualhostname, port,true);
 					}
-				// And close the dialog
-				EndDialog(hwnd, TRUE);
+					// And close the dialog
+					EndDialog(hwnd, TRUE);
+				}
+				else {
+					// Print up an error message
+					MessageBoxSecure(NULL, 
+						sz_ID_FAILED_CONNECT_LISTING_VIEW,
+						sz_ID_OUTGOING_CONNECTION,
+						MB_OK | MB_ICONEXCLAMATION );
+					delete tmpsock;
+				}
+				return TRUE;
 			}
-			else
-			{
-				// Print up an error message
-				MessageBoxSecure(NULL, 
-					sz_ID_FAILED_CONNECT_LISTING_VIEW,
-					sz_ID_OUTGOING_CONNECTION,
-					MB_OK | MB_ICONEXCLAMATION );
-				delete tmpsock;
-			}
-			return TRUE;
-		}
 		
 			// Cancel the dialog
 		case IDCANCEL:

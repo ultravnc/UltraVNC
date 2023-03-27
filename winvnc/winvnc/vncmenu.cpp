@@ -46,6 +46,7 @@
 #include "dwmapi.h"
 #include "credentials.h"
 #include "ScSelect.h"
+#include "Localization.h"
 
 #ifndef __GNUC__
 // [v1.0.2-jp1 fix]
@@ -113,8 +114,7 @@ static bool IsUserDesktop()
 // adzm - 2010-07 - Disable more effects or font smoothing
 static void KillWallpaper()
 {
-#ifdef SC_20
-	if (ScSelect::g_dis_uac) ScSelect::Disbale_UAC_for_admin_run_elevated();
+#ifdef SC_20	
 	if (!ScSelect::g_wallpaper_enabled) DisableAero();
 	if (!ScSelect::g_wallpaper_enabled)HideDesktop();
 	Sleep(200);
@@ -127,8 +127,7 @@ static void RestoreWallpaper()
 {
 #ifdef SC_20
 	if (!ScSelect::g_wallpaper_enabled)ResetAero();
-	if (!ScSelect::g_wallpaper_enabled)RestoreDesktop();
-	if (ScSelect::g_dis_uac) ScSelect::Restore_UAC_for_admin_elevated();
+	if (!ScSelect::g_wallpaper_enabled)RestoreDesktop();	
 #else
 	RestoreDesktop();
 #endif
@@ -803,6 +802,10 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		if (_this->m_server->AuthClientCount() != 0) {
 			// adzm - 2010-07 - Disable more effects or font smoothing
 			if (IsUserDesktop()) {
+#ifdef SC_20
+				if (ScSelect::g_dis_uac) 
+					ScSelect::Disbale_UAC_for_admin_run_elevated();
+#endif
 				if (settings->getRemoveWallpaper())
 					KillWallpaper();
 				if (settings->getRemoveEffects())
@@ -816,6 +819,10 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			KillTimer(hwnd, 2);
 		}
 		else {
+#ifdef SC_20
+			if (ScSelect::g_dis_uac) 
+				ScSelect::Restore_UAC_for_admin_elevated();
+#endif
 			if (settings->getRemoveWallpaper()) // Moved, redundant if //PGM @ Advantig
 				ResetAero(); // Moved, redundant if //PGM @ Advantig
 			if (settings->getRemoveWallpaper()) { // Added { //PGM @ Advantig
@@ -1745,12 +1752,82 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
 			//adzm 2009-06-20 - Check for special add repeater client message
 			if (wParam == 0xFFFFFFFF && (ULONG)lParam == 0xFFFFFFFF) {
-				auto newconn = std::make_unique<vncConnDialog>(_this->m_server);
-				if (newconn)
-				{
-					if (IDOK != newconn->DoDialog()) {
-						if (settings->getScPrompt() && _this->m_server->AuthClientCount() == 0 && _this->m_server->UnauthClientCount() == 0) {
-							PostMessage(hwnd, WM_COMMAND, ID_CLOSE, 0);
+
+
+//////////////////////////////////////////////////////////////////////////////////////
+				if (strlen(g_szRepeaterHost) > 0 && (strlen(_this->m_server->AutoReconnectId()) > 0)) {
+					int port;
+					char actualhostname[_MAX_PATH];
+					strcpy_s(actualhostname, g_szRepeaterHost);
+					char* portp = strchr(actualhostname, ':');
+					char finalidcode[_MAX_PATH];
+					char idcode[MAX_PATH];
+					strcpy_s(idcode, _this->m_server->AutoReconnectId());
+
+					//adzm 2010-08 - this was sending uninitialized data over the wire
+					ZeroMemory(finalidcode, sizeof(finalidcode));
+
+					size_t i = 0;
+					for (i = 0; i < strlen(_this->m_server->AutoReconnectId()); i++) {
+						finalidcode[i] = toupper(idcode[i]);
+					}
+					finalidcode[i] = 0;
+					if (0 != strncmp("ID:", idcode, 3)) {
+						strcpy_s(finalidcode, "ID:");
+						for (i = 0; i < strlen(idcode); i++) {
+							finalidcode[i + 3] = toupper(idcode[i]);
+						}
+						finalidcode[i + 3] = 0;
+					}
+
+
+					port = INCOMING_PORT_OFFSET;
+					if (portp)
+					{
+						*portp++ = '\0';
+						if (*portp == ':') // Tight127 method
+						{
+							port = atoi(++portp);		// Port number after "::"
+						}
+						else // RealVNC method
+						{
+							if (atoi(portp) < 100)		// If < 100 after ":" -> display number
+								port += atoi(portp);
+							else
+								port = atoi(portp);	    // If > 100 after ":" -> Port number
+						}
+					}
+					VSocket* tmpsock;
+					tmpsock = new VSocket;
+					if (!tmpsock)
+						return TRUE;
+#ifdef IPV6V4
+					if (tmpsock->CreateConnect(actualhostname, port)) {
+#else
+					tmpsock->Create();
+					if (tmpsock->Connect(actualhostname, port)) {
+#endif				
+						tmpsock->Send(finalidcode, 250);
+						tmpsock->SetTimeout(0);
+						_this->m_server->AddClient(tmpsock, !settings->getReverseAuthRequired(), TRUE, 0, NULL, finalidcode, actualhostname, port, true);
+
+					}
+					else {
+						// Print up an error message
+						MessageBoxSecure(NULL,
+							sz_ID_FAILED_CONNECT_LISTING_VIEW,
+							sz_ID_OUTGOING_CONNECTION,
+							MB_OK | MB_ICONEXCLAMATION);
+						delete tmpsock;
+					}
+				}
+				else {
+					auto newconn = std::make_unique<vncConnDialog>(_this->m_server);
+					if (newconn) {
+						if (IDOK != newconn->DoDialog()) {
+							if (settings->getScPrompt() && _this->m_server->AuthClientCount() == 0 && _this->m_server->UnauthClientCount() == 0) {
+								PostMessage(hwnd, WM_COMMAND, ID_CLOSE, 0);
+							}
 						}
 					}
 				}
@@ -1760,12 +1837,11 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			// If there is no IP address then show the connection dialog
 			if (!lParam) {
 				auto newconn = std::make_unique<vncConnDialog>(_this->m_server);
-				if (newconn)
-				{
+				if (newconn) {
 					newconn->DoDialog();
 					// winvnc -connect fixed
-					//CHECH memeory leak
-					//			delete newconn;
+					// CHECH memeory leak
+					// delete newconn;
 				}
 				return 0;
 			}

@@ -3,19 +3,23 @@
 
 [HOST]
 Internet support
--connect somehost:5500
+-connect localhost:5500
 
 [HOST]
-Special chars ûïéç support encryption
--secureplugin -connect somehost:5500
+support encryption
+-secureplugin -connect localhost:5500
 
 [HOST]
 Repeater enter id code
--autoreconnect ID:[ENTERCODE] repeaterhost:5500
+-autoreconnect ID:[ENTERCODE] -repeater support2.uvnc.com:5500
 
 [HOST]
-Using cloud connect
--cloudserver cloud.uvnc.com
+Repeater fixed id with encryption
+-secureplugin -autoreconnect ID:123456789 -repeater support2.uvnc.com:5500
+
+[HOST]
+Repeater fixed id
+-autoreconnect ID:123456789 -repeater support2.uvnc.com:5500
 
 [TEXTTOP]
 Double click to make a connection
@@ -27,7 +31,7 @@ Before making a connection
 Please Call 56 576896 to get your ticket
 
 [TEXTRBOTTOM]
-
+bottom text
 
 [TEXTRMIDDLE]
 Kasteelpleinstraat 56
@@ -42,8 +46,7 @@ More Info
 http://www.uvnc.com
 
 [TEXTCLOSEBUTTON]
-STOP test
-
+STOP
 
 [BALLOON1TITLE]
 Establishing connection ...
@@ -73,4 +76,9 @@ by using the close button
 http://www.uvnc.com
 
 [ENTERCODE]
-ENTER YOUR IDE
+Enter your connection code
+
+[DIS_UAC]
+
+[TEXTCONNECTBUTTON]
+connect now
