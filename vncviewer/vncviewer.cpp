@@ -23,7 +23,6 @@
 ////////////////////////////////////////////////////////////////////////////
  
 
-
 #include "stdhdrs.h"
 #include "vncviewer.h"
 #include "Exception.h"
@@ -382,8 +381,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR szCmdLin
 	memset(&info, 0, sizeof(CR_INSTALL_INFO));
 	info.cb = sizeof(CR_INSTALL_INFO);
 	info.pszAppName = _T("UVNC");
-	info.pszAppVersion = _T("1.4.0.10");
-	info.pszEmailSubject = _T("UVNC viewer 1.4.0.10 Error Report");
+	info.pszAppVersion = _T("1.4.0.11");
+	info.pszEmailSubject = _T("UVNC viewer 1.4.0.11 Error Report");
 	info.pszEmailTo = _T("uvnc@skynet.be");
 	info.uPriorities[CR_SMAPI] = 1; // Third try send report over Simple MAPI    
 	// Install all available exception handlers

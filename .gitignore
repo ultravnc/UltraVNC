@@ -96,3 +96,7 @@ rdr/.vs/
 *.ilk
 zipunzip_src/zip20/windll/visualc/lib/.vs/
 vncviewer/VTune Profiler Results/
+winvnc/SC_20_DEBUG/
+winvnc/SC_20/workgrpdomnt4.exp
+winvnc/SC_20/
+winvnc/vnchooks/x64/
