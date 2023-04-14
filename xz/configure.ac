@@ -18,11 +18,11 @@
 AC_PREREQ([2.69])
 
 AC_INIT([XZ Utils], m4_esyscmd([/bin/sh build-aux/version.sh]),
-	[lasse.collin@tukaani.org], [xz], [https://tukaani.org/xz/])
+	[xz@tukaani.org], [xz], [https://tukaani.org/xz/])
 AC_CONFIG_SRCDIR([src/liblzma/common/common.h])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([m4])
-AC_CONFIG_HEADER([config.h])
+AC_CONFIG_HEADERS([config.h])
 
 echo
 echo "$PACKAGE_STRING"
@@ -79,8 +79,8 @@ fi
 # Filters #
 ###########
 
-m4_define([SUPPORTED_FILTERS], [lzma1,lzma2,delta,x86,powerpc,ia64,arm,armthumb,sparc])dnl
-m4_define([SIMPLE_FILTERS], [x86,powerpc,ia64,arm,armthumb,sparc])
+m4_define([SUPPORTED_FILTERS], [lzma1,lzma2,delta,x86,powerpc,ia64,arm,armthumb,arm64,sparc])dnl
+m4_define([SIMPLE_FILTERS], [x86,powerpc,ia64,arm,armthumb,arm64,sparc])
 m4_define([LZ_FILTERS], [lzma1,lzma2])
 
 m4_foreach([NAME], [SUPPORTED_FILTERS],
@@ -210,6 +210,10 @@ AC_ARG_ENABLE([match-finders], AS_HELP_STRING([--enable-match-finders=LIST],
 	[enable_match_finders=SUPPORTED_MATCH_FINDERS])
 enable_match_finders=`echo "$enable_match_finders" | sed 's/,/ /g'`
 if test "x$enable_encoder_lz" = xyes ; then
+	if test -z "$enable_match_finders"; then
+		AC_MSG_ERROR([At least one match finder is required for an LZ-based encoder.])
+	fi
+
 	for arg in $enable_match_finders
 		do
 		case $arg in m4_foreach([NAME], [SUPPORTED_MATCH_FINDERS], [
@@ -290,6 +294,49 @@ else
 fi
 
 
+#############
+# MicroLZMA #
+#############
+
+AC_MSG_CHECKING([if MicroLZMA support should be built])
+AC_ARG_ENABLE([microlzma], AS_HELP_STRING([--disable-microlzma],
+		[Do not build MicroLZMA encoder and decoder.
+		It is needed by specific applications only,
+		for example, erofs-utils.]),
+	[], [enable_microlzma=yes])
+case $enable_microlzma in
+	yes | no)
+		AC_MSG_RESULT([$enable_microlzma])
+		;;
+	*)
+		AC_MSG_RESULT([])
+		AC_MSG_ERROR([--enable-microlzma accepts only `yes' or `no'.])
+		;;
+esac
+AM_CONDITIONAL(COND_MICROLZMA, test "x$enable_microlzma" = xyes)
+
+
+#############################
+# .lz (lzip) format support #
+#############################
+
+AC_MSG_CHECKING([if .lz (lzip) decompression support should be built])
+AC_ARG_ENABLE([lzip-decoder], AS_HELP_STRING([--disable-lzip-decoder],
+		[Disable decompression support for .lz (lzip) files.]),
+	[], [enable_lzip_decoder=yes])
+if test "x$enable_decoder_lzma1" != xyes; then
+	enable_lzip_decoder=no
+	AC_MSG_RESULT([no because LZMA1 decoder is disabled])
+elif test "x$enable_lzip_decoder" = xyes; then
+	AC_DEFINE([HAVE_LZIP_DECODER], [1],
+		[Define to 1 if .lz (lzip) decompression support is enabled.])
+	AC_MSG_RESULT([yes])
+else
+	AC_MSG_RESULT([no])
+fi
+AM_CONDITIONAL(COND_LZIP_DECODER, test "x$enable_lzip_decoder" = xyes)
+
+
 ###########################
 # Assembler optimizations #
 ###########################
@@ -307,22 +354,30 @@ if test "x$enable_assembler" = xyes; then
 		linux* | *bsd* | mingw* | cygwin | msys | *djgpp*)
 			case $host_cpu in
 				i?86)   enable_assembler=x86 ;;
-				x86_64) enable_assembler=x86_64 ;;
 			esac
 			;;
 	esac
 fi
 case $enable_assembler in
-	x86 | x86_64 | no)
+	x86 | no)
 		AC_MSG_RESULT([$enable_assembler])
 		;;
 	*)
 		AC_MSG_RESULT([])
-		AC_MSG_ERROR([--enable-assembler accepts only `yes', `no', `x86', or `x86_64'.])
+		AC_MSG_ERROR([--enable-assembler accepts only `yes', `no', or `x86' (32-bit).])
 		;;
 esac
 AM_CONDITIONAL(COND_ASM_X86, test "x$enable_assembler" = xx86)
-AM_CONDITIONAL(COND_ASM_X86_64, test "x$enable_assembler" = xx86_64)
+
+
+#############
+# CLMUL CRC #
+#############
+
+AC_ARG_ENABLE([clmul-crc], AS_HELP_STRING([--disable-clmul-crc],
+		[Do not use carryless multiplication for CRC calculation
+		even if support for it is detected.]),
+	[], [enable_clmul_crc=yes])
 
 
 #####################
@@ -465,40 +520,14 @@ AC_ARG_ENABLE([doc], [AS_HELP_STRING([--disable-doc],
 AM_CONDITIONAL([COND_DOC], [test x$enable_doc != xno])
 
 
-#####################
-# Symbol versioning #
-#####################
-
-AC_MSG_CHECKING([if library symbol versioning should be used])
-AC_ARG_ENABLE([symbol-versions], [AS_HELP_STRING([--enable-symbol-versions],
-		[Use symbol versioning for liblzma. Enabled by default on
-		GNU/Linux, other GNU-based systems, and FreeBSD.])],
-	[], [enable_symbol_versions=auto])
-if test "x$enable_symbol_versions" = xauto; then
-	case $host_os in
-		# NOTE: Even if one omits -gnu on GNU/Linux (e.g.
-		# i486-slackware-linux), configure will (via config.sub)
-		# append -gnu (e.g. i486-slackware-linux-gnu), and this
-		# test will work correctly.
-		gnu* | *-gnu* | freebsd*)
-			enable_symbol_versions=yes
-			;;
-		*)
-			enable_symbol_versions=no
-			;;
-	esac
-fi
-AC_MSG_RESULT([$enable_symbol_versions])
-AM_CONDITIONAL([COND_SYMVERS], [test "x$enable_symbol_versions" = xyes])
-
-
 ##############
 # Sandboxing #
 ##############
 
 AC_MSG_CHECKING([if sandboxing should be used])
 AC_ARG_ENABLE([sandbox], [AS_HELP_STRING([--enable-sandbox=METHOD],
-		[Sandboxing METHOD can be `auto', `no', or `capsicum'.
+		[Sandboxing METHOD can be
+		`auto', `no', `capsicum', or `pledge'.
 		The default is `auto' which enables sandboxing if
 		a supported sandboxing method is found.])],
 	[], [enable_sandbox=auto])
@@ -506,12 +535,12 @@ case $enable_sandbox in
 	auto)
 		AC_MSG_RESULT([maybe (autodetect)])
 		;;
-	no | capsicum)
+	no | capsicum | pledge)
 		AC_MSG_RESULT([$enable_sandbox])
 		;;
 	*)
 		AC_MSG_RESULT([])
-		AC_MSG_ERROR([--enable-sandbox only accepts `auto', `no', or `capsicum'.])
+		AC_MSG_ERROR([--enable-sandbox only accepts `auto', `no', `capsicum', or `pledge'.])
 		;;
 esac
 
@@ -567,10 +596,10 @@ echo "Initializing Automake:"
 
 # We don't use "subdir-objects" yet because it breaks "make distclean" when
 # dependencies are enabled (as of Automake 1.14.1) due to this bug:
-# http://debbugs.gnu.org/cgi/bugreport.cgi?bug=17354
+# https://debbugs.gnu.org/cgi/bugreport.cgi?bug=17354
 # The -Wno-unsupported is used to silence warnings about missing
 # "subdir-objects".
-AM_INIT_AUTOMAKE([1.12 foreign tar-v7 filename-length-max=99 serial-tests -Wno-unsupported])
+AM_INIT_AUTOMAKE([1.12 foreign tar-v7 filename-length-max=99 -Wno-unsupported])
 AC_PROG_LN_S
 
 AC_PROG_CC_C99
@@ -609,7 +638,10 @@ case $enable_threads in
 		CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
 		AC_SEARCH_LIBS([clock_gettime], [rt])
 		AC_CHECK_FUNCS([clock_gettime pthread_condattr_setclock])
-		AC_CHECK_DECLS([CLOCK_MONOTONIC], [], [], [[#include <time.h>]])
+		AC_CHECK_DECL([CLOCK_MONOTONIC], [AC_DEFINE(
+			[HAVE_CLOCK_MONOTONIC], [1], [Define to 1 if
+			`CLOCK_MONOTONIC' is declared in <time.h>.])], [],
+			[[#include <time.h>]])
 		CFLAGS=$OLD_CFLAGS
 		;;
 	win95)
@@ -637,6 +669,109 @@ LT_LANG([Windows Resource])
 # breaks only on Windows (at least for now) if the user enables only some
 # libs as shared.
 AM_CONDITIONAL([COND_SHARED], [test "x$enable_shared" != xno])
+
+#####################
+# Symbol versioning #
+#####################
+
+# NOTE: This checks if we are building shared or static library
+# and if --with-pic or --without-pic was used. Thus this check
+# must be after Libtool initialization.
+AC_MSG_CHECKING([if library symbol versioning should be used])
+AC_ARG_ENABLE([symbol-versions], [AS_HELP_STRING([--enable-symbol-versions],
+		[Use symbol versioning for liblzma. Enabled by default on
+		GNU/Linux, other GNU-based systems, and FreeBSD.])],
+	[], [enable_symbol_versions=auto])
+if test "x$enable_symbol_versions" = xauto; then
+	case $host_os in
+		# NOTE: Even if one omits -gnu on GNU/Linux (e.g.
+		# i486-slackware-linux), configure will (via config.sub)
+		# append -gnu (e.g. i486-slackware-linux-gnu), and this
+		# test will work correctly.
+		gnu* | *-gnu* | freebsd*)
+			enable_symbol_versions=yes
+			;;
+		*)
+			enable_symbol_versions=no
+			;;
+	esac
+fi
+
+# There are two variants for symbol versioning.
+# See src/liblzma/validate_map.sh for details.
+#
+# On GNU/Linux, extra symbols are added in the C code. These extra symbols
+# must not be put into a static library as they can cause problems (and
+# even if they didn't cause problems, they would be useless). On other
+# systems symbol versioning may be used too but there is no problem as only
+# a linker script is specified in src/liblzma/Makefile.am and that isn't
+# used when creating a static library.
+#
+# Libtool always uses -DPIC when building shared libraries by default and
+# doesn't use it for static libs by default. This can be overriden with
+# --with-pic and --without-pic though. As long as neither --with-pic nor
+# --without-pic is used then we can use #ifdef PIC to detect if the file is
+# being built for a shared library.
+if test "x$enable_symbol_versions" = xno ; then
+	enable_symbol_versions=no
+	AC_MSG_RESULT([no])
+elif test "x$enable_shared" = xno ; then
+	enable_symbol_versions=no
+	AC_MSG_RESULT([no (not building a shared library)])
+else
+	case "$host_cpu-$host_os" in
+		microblaze*)
+			# GCC 12 on MicroBlaze doesn't support __symver__
+			# attribute. It's simplest and safest to use the
+			# generic version on that platform since then only
+			# the linker script is needed. The RHEL/CentOS 7
+			# compatibility symbols don't matter on MicroBlaze.
+			enable_symbol_versions=generic
+			;;
+		*-linux*)
+			case "$pic_mode-$enable_static" in
+				default-*)
+					# Use symvers if PIC is defined.
+					have_symbol_versions_linux=2
+					;;
+				*-no)
+					# Not building static library.
+					# Use symvers unconditionally.
+					have_symbol_versions_linux=1
+					;;
+				*)
+					AC_MSG_RESULT([])
+					AC_MSG_ERROR([
+    On GNU/Linux, building both shared and static library at the same time
+    is not supported if --with-pic or --without-pic is used.
+    Use either --disable-shared or --disable-static to build one type
+    of library at a time. If both types are needed, build one at a time,
+    possibly picking only src/liblzma/.libs/liblzma.a from the static build.])
+					;;
+			esac
+			enable_symbol_versions=linux
+			AC_DEFINE_UNQUOTED([HAVE_SYMBOL_VERSIONS_LINUX],
+				[$have_symbol_versions_linux],
+				[Define to 1 to if GNU/Linux-specific details
+				are unconditionally wanted for symbol
+				versioning. Define to 2 to if these are wanted
+				only if also PIC is defined (allows building
+				both shared and static liblzma at the same
+				time with Libtool if neither --with-pic nor
+				--without-pic is used). This define must be
+				used together with liblzma_linux.map.])
+			;;
+		*)
+			enable_symbol_versions=generic
+			;;
+	esac
+	AC_MSG_RESULT([yes ($enable_symbol_versions)])
+fi
+
+AM_CONDITIONAL([COND_SYMVERS_LINUX],
+	[test "x$enable_symbol_versions" = xlinux])
+AM_CONDITIONAL([COND_SYMVERS_GENERIC],
+	[test "x$enable_symbol_versions" = xgeneric])
 
 
 ###############################################################################
@@ -666,17 +801,14 @@ AC_CHECK_HEADERS([fcntl.h limits.h sys/time.h],
 	[],
 	[AC_MSG_ERROR([Required header file(s) are missing.])])
 
-# This allows the use of the intrinsic functions if they are available.
-AC_CHECK_HEADERS([immintrin.h])
+# immintrin.h allows the use of the intrinsic functions if they are available.
+# cpuid.h may be used for detecting x86 processor features at runtime.
+AC_CHECK_HEADERS([immintrin.h cpuid.h])
 
 
 ###############################################################################
 # Checks for typedefs, structures, and compiler characteristics.
 ###############################################################################
-
-dnl We don't need these as long as we need a C99 compiler anyway.
-dnl AC_C_INLINE
-dnl AC_C_RESTRICT
 
 AC_HEADER_STDBOOL
 
@@ -702,6 +834,29 @@ AC_CHECK_MEMBERS([
 
 AC_SYS_LARGEFILE
 AC_C_BIGENDIAN
+
+# __attribute__((__constructor__)) can be used for one-time initializations.
+# Use -Werror because some compilers accept unknown attributes and just
+# give a warning. If it works this should give no warnings, even
+# clang -Weverything should be fine.
+# dnl This doesn't need AC_LANG_SOURCE, minimal code is enough.
+AC_MSG_CHECKING([if __attribute__((__constructor__)) can be used])
+have_func_attribute_constructor=no
+OLD_CFLAGS="$CFLAGS"
+CFLAGS="$CFLAGS -Werror"
+AC_COMPILE_IFELSE([
+	__attribute__((__constructor__))
+	static void my_constructor_func(void) { return; }
+], [
+	AC_DEFINE([HAVE_FUNC_ATTRIBUTE_CONSTRUCTOR], [1],
+		[Define to 1 if __attribute__((__constructor__))
+		is supported for functions.])
+	have_func_attribute_constructor=yes
+	AC_MSG_RESULT([yes])
+], [
+	AC_MSG_RESULT([no])
+])
+CFLAGS="$OLD_CFLAGS"
 
 
 ###############################################################################
@@ -776,7 +931,10 @@ if test "x$enable_external_sha256$sha256_func_found" = xyesno; then
 	AC_MSG_ERROR([--enable-external-sha256 was specified but no supported external SHA-256 implementation was found])
 fi
 
-# Check for SSE2 intrinsics.
+# Check for SSE2 intrinsics. There is no run-time detection for SSE2 so if
+# compiler options enable SSE2 then SSE2 support is required by the binaries.
+# The compile-time check for SSE2 is done with #ifdefs because some compilers
+# (ICC, MSVC) allow SSE2 intrinsics even when SSE2 isn't enabled.
 AC_CHECK_DECL([_mm_movemask_epi8],
 	[AC_DEFINE([HAVE__MM_MOVEMASK_EPI8], [1],
 		[Define to 1 if _mm_movemask_epi8 is available.])],
@@ -785,10 +943,63 @@ AC_CHECK_DECL([_mm_movemask_epi8],
 #include <immintrin.h>
 #endif])
 
+# For faster CRC on 32/64-bit x86 and E2K (see also crc64_fast.c):
+#
+#   - Check for the CLMUL intrinsic _mm_clmulepi64_si128 in <immintrin.h>.
+#     Check also for _mm_set_epi64x for consistency with CMake build
+#     where it's needed to disable CLMUL with VS2013.
+#
+#   - Check that __attribute__((__target__("ssse3,sse4.1,pclmul"))) works
+#     together with _mm_clmulepi64_si128 from <immintrin.h>. The attribute
+#     was added in GCC 4.4 but some GCC 4.x versions don't allow intrinsics
+#     with it. Exception: it must be not be used with EDG-based compilers
+#     like ICC and the compiler on E2K.
+#
+# If everything above is supported, runtime detection will be used to keep the
+# binaries working on systems that don't support the required extensions.
+AC_MSG_CHECKING([if _mm_clmulepi64_si128 is usable])
+if test "x$enable_clmul_crc" = xno ; then
+	AC_MSG_RESULT([no, --disable-clmul-crc was used])
+else
+	AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
+#include <immintrin.h>
+
+// CLMUL works on older E2K instruction set but it is slow due to emulation.
+#if defined(__e2k__) && __iset__ < 6
+#	error
+#endif
+
+// Intel's old compiler (ICC) can define __GNUC__ but the attribute must not
+// be used with it. The new Clang-based ICX needs the attribute.
+// Checking for !defined(__EDG__) catches ICC and other EDG-based compilers.
+#if (defined(__GNUC__) || defined(__clang__)) && !defined(__EDG__)
+__attribute__((__target__("ssse3,sse4.1,pclmul")))
+#endif
+__m128i my_clmul(__m128i a)
+{
+	const __m128i b = _mm_set_epi64x(1, 2);
+	return _mm_clmulepi64_si128(a, b, 0);
+}
+	]])], [
+		AC_DEFINE([HAVE_USABLE_CLMUL], [1],
+			[Define to 1 if _mm_set_epi64x and
+			_mm_clmulepi64_si128 are usable.
+			See configure.ac for details.])
+		AC_MSG_RESULT([yes])
+	], [
+		AC_MSG_RESULT([no])
+	])
+fi
+
 # Check for sandbox support. If one is found, set enable_sandbox=found.
 case $enable_sandbox in
 	auto | capsicum)
 		AX_CHECK_CAPSICUM([enable_sandbox=found], [:])
+		;;
+esac
+case $enable_sandbox in
+	auto | pledge)
+		AC_CHECK_FUNCS([pledge], [enable_sandbox=found ; break])
 		;;
 esac
 
@@ -826,34 +1037,59 @@ if test "$GCC" = yes ; then
 	#     backed up with "return LZMA_PROG_ERROR".
 	#   * -Wcast-qual would break various things where we need a non-const
 	#     pointer although we don't modify anything through it.
-	#   * -Wcast-align breaks optimized CRC32 and CRC64 implementation
-	#     on some architectures (not on x86), where this warning is bogus,
-	#     because we take care of correct alignment.
 	#   * -Winline, -Wdisabled-optimization, -Wunsafe-loop-optimizations
 	#     don't seem so useful here; at least the last one gives some
 	#     warnings which are not bugs.
+	#   * -Wconversion still shows too many warnings.
+	#
+	# The flags before the empty line are for GCC and many of them
+	# are supported by Clang too. The flags after the empty line are
+	# for Clang.
 	for NEW_FLAG in \
 			-Wall \
 			-Wextra \
 			-Wvla \
+			-Wc99-c11-compat \
 			-Wformat=2 \
 			-Winit-self \
 			-Wmissing-include-dirs \
-			-Wstrict-aliasing \
+			-Wshift-overflow=2 \
+			-Wstrict-overflow=3 \
+			-Walloc-zero \
+			-Wduplicated-cond \
 			-Wfloat-equal \
 			-Wundef \
 			-Wshadow \
 			-Wpointer-arith \
 			-Wbad-function-cast \
 			-Wwrite-strings \
+			-Wdate-time \
+			-Wsign-conversion \
+			-Wfloat-conversion \
 			-Wlogical-op \
 			-Waggregate-return \
 			-Wstrict-prototypes \
 			-Wold-style-definition \
 			-Wmissing-prototypes \
 			-Wmissing-declarations \
-			-Wmissing-noreturn \
-			-Wredundant-decls
+			-Wredundant-decls \
+			\
+			-Wc99-compat \
+			-Wc11-extensions \
+			-Wc2x-compat \
+			-Wc2x-extensions \
+			-Wpre-c2x-compat \
+			-Warray-bounds-pointer-arithmetic \
+			-Wassign-enum \
+			-Wconditional-uninitialized \
+			-Wdocumentation \
+			-Wduplicate-enum \
+			-Wempty-translation-unit \
+			-Wflexible-array-extensions \
+			-Wmissing-variable-declarations \
+			-Wnewline-eof \
+			-Wshift-sign-overflow \
+			-Wstring-conversion
 	do
 		AC_MSG_CHECKING([if $CC accepts $NEW_FLAG])
 		OLD_CFLAGS="$CFLAGS"
@@ -896,7 +1132,6 @@ xz=`echo xz | sed "$program_transform_name"`
 AC_SUBST([xz])
 
 AC_CONFIG_FILES([
-	Doxyfile
 	Makefile
 	po/Makefile.in
 	lib/Makefile
@@ -932,9 +1167,11 @@ if test x$tuklib_cv_cpucores_method = xunknown; then
 	echo "No supported method to detect the number of CPU cores."
 fi
 
-if test "x$enable_threads$enable_small" = xnoyes; then
+if test "x$enable_threads$enable_small$have_func_attribute_constructor" \
+		= xnoyesno; then
 	echo
 	echo "NOTE:"
-	echo "liblzma will be thread unsafe due the combination"
-	echo "of --disable-threads --enable-small."
+	echo "liblzma will be thread-unsafe due to the combination"
+	echo "of --disable-threads --enable-small when using a compiler"
+	echo "that doesn't support __attribute__((__constructor__))."
 fi

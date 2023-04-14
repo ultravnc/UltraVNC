@@ -10,7 +10,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "index.h"
+#include "index_decoder.h"
 #include "check.h"
 
 
@@ -80,7 +80,7 @@ index_decode(void *coder_ptr, const lzma_allocator *allocator,
 		// format". One could argue that the application should
 		// verify the Index Indicator before trying to decode the
 		// Index, but well, I suppose it is simpler this way.
-		if (in[(*in_pos)++] != 0x00)
+		if (in[(*in_pos)++] != INDEX_INDICATOR)
 			return LZMA_DATA_ERROR;
 
 		coder->sequence = SEQ_COUNT;
@@ -180,8 +180,11 @@ index_decode(void *coder_ptr, const lzma_allocator *allocator,
 				return LZMA_OK;
 
 			if (((coder->crc32 >> (coder->pos * 8)) & 0xFF)
-					!= in[(*in_pos)++])
+					!= in[(*in_pos)++]) {
+#ifndef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
 				return LZMA_DATA_ERROR;
+#endif
+			}
 
 		} while (++coder->pos < 4);
 
@@ -200,9 +203,16 @@ index_decode(void *coder_ptr, const lzma_allocator *allocator,
 	}
 
 out:
-	// Update the CRC32,
-	coder->crc32 = lzma_crc32(in + in_start,
-			*in_pos - in_start, coder->crc32);
+	// Update the CRC32.
+	//
+	// Avoid null pointer + 0 (undefined behavior) in "in + in_start".
+	// In such a case we had no input and thus in_used == 0.
+	{
+		const size_t in_used = *in_pos - in_start;
+		if (in_used > 0)
+			coder->crc32 = lzma_crc32(in + in_start,
+					in_used, coder->crc32);
+	}
 
 	return ret;
 }
@@ -265,11 +275,11 @@ index_decoder_reset(lzma_index_coder *coder, const lzma_allocator *allocator,
 }
 
 
-static lzma_ret
-index_decoder_init(lzma_next_coder *next, const lzma_allocator *allocator,
+extern lzma_ret
+lzma_index_decoder_init(lzma_next_coder *next, const lzma_allocator *allocator,
 		lzma_index **i, uint64_t memlimit)
 {
-	lzma_next_coder_init(&index_decoder_init, next, allocator);
+	lzma_next_coder_init(&lzma_index_decoder_init, next, allocator);
 
 	if (i == NULL)
 		return LZMA_PROG_ERROR;
@@ -296,7 +306,7 @@ index_decoder_init(lzma_next_coder *next, const lzma_allocator *allocator,
 extern LZMA_API(lzma_ret)
 lzma_index_decoder(lzma_stream *strm, lzma_index **i, uint64_t memlimit)
 {
-	lzma_next_strm_init(index_decoder_init, strm, i, memlimit);
+	lzma_next_strm_init(lzma_index_decoder_init, strm, i, memlimit);
 
 	strm->internal->supported_actions[LZMA_RUN] = true;
 	strm->internal->supported_actions[LZMA_FINISH] = true;

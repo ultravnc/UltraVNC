@@ -140,7 +140,7 @@ io_write_to_user_abort_pipe(void)
 	// handler. So ignore the errors and try to avoid warnings with
 	// GCC and glibc when _FORTIFY_SOURCE=2 is used.
 	uint8_t b = '\0';
-	const int ret = write(user_abort_pipe[1], &b, 1);
+	const ssize_t ret = write(user_abort_pipe[1], &b, 1);
 	(void)ret;
 	return;
 }
@@ -192,13 +192,24 @@ io_sandbox_enter(int src_fd)
 	// Capsicum needs FreeBSD 10.0 or later.
 	cap_rights_t rights;
 
+	if (cap_enter())
+		goto error;
+
 	if (cap_rights_limit(src_fd, cap_rights_init(&rights,
 			CAP_EVENT, CAP_FCNTL, CAP_LOOKUP, CAP_READ, CAP_SEEK)))
+		goto error;
+
+	if (src_fd != STDIN_FILENO && cap_rights_limit(
+			STDIN_FILENO, cap_rights_clear(&rights)))
 		goto error;
 
 	if (cap_rights_limit(STDOUT_FILENO, cap_rights_init(&rights,
 			CAP_EVENT, CAP_FCNTL, CAP_FSTAT, CAP_LOOKUP,
 			CAP_WRITE, CAP_SEEK)))
+		goto error;
+
+	if (cap_rights_limit(STDERR_FILENO, cap_rights_init(&rights,
+			CAP_WRITE)))
 		goto error;
 
 	if (cap_rights_limit(user_abort_pipe[0], cap_rights_init(&rights,
@@ -209,8 +220,16 @@ io_sandbox_enter(int src_fd)
 			CAP_WRITE)))
 		goto error;
 
-	if (cap_enter())
+#elif defined(HAVE_PLEDGE)
+	// pledge() was introduced in OpenBSD 5.9.
+	//
+	// main() unconditionally calls pledge() with fairly relaxed
+	// promises which work in all situations. Here we make the
+	// sandbox more strict.
+	if (pledge("stdio", ""))
 		goto error;
+
+	(void)src_fd;
 
 #else
 #	error ENABLE_SANDBOX is defined but no sandboxing method was found.
@@ -221,7 +240,16 @@ io_sandbox_enter(int src_fd)
 	return;
 
 error:
-	message(V_DEBUG, _("Failed to enable the sandbox"));
+#ifdef HAVE_CAPSICUM
+	// If a kernel is configured without capability mode support or
+	// used in an emulator that does not implement the capability
+	// system calls, then the Capsicum system calls will fail and set
+	// errno to ENOSYS. In that case xz will silently run without
+	// the sandbox.
+	if (errno == ENOSYS)
+		return;
+#endif
+	message_fatal(_("Failed to enable the sandbox"));
 }
 #endif // ENABLE_SANDBOX
 
@@ -330,14 +358,14 @@ io_unlink(const char *name, const struct stat *known_st)
 		// it is possible that the user has put a new file in place
 		// of the original file, and in that case it obviously
 		// shouldn't be removed.
-		message_error(_("%s: File seems to have been moved, "
+		message_warning(_("%s: File seems to have been moved, "
 				"not removing"), name);
 	else
 #endif
 		// There's a race condition between lstat() and unlink()
 		// but at least we have tried to avoid removing wrong file.
 		if (unlink(name))
-			message_error(_("%s: Cannot remove: %s"),
+			message_warning(_("%s: Cannot remove: %s"),
 					name, strerror(errno));
 
 	return;
@@ -368,7 +396,14 @@ io_copy_attrs(const file_pair *pair)
 
 	mode_t mode;
 
-	if (fchown(pair->dest_fd, (uid_t)(-1), pair->src_st.st_gid)) {
+	// With BSD semantics the new dest file may have a group that
+	// does not belong to the user. If the src file has the same gid
+	// nothing has to be done. Nevertheless OpenBSD fchown(2) fails
+	// in this case which seems to be POSIX compliant. As there is
+	// nothing to do, skip the system call.
+	if (pair->dest_st.st_gid != pair->src_st.st_gid
+			&& fchown(pair->dest_fd, (uid_t)(-1),
+				pair->src_st.st_gid)) {
 		message_warning(_("%s: Cannot set the file group: %s"),
 				pair->dest_name, strerror(errno));
 		// We can still safely copy some additional permissions:
@@ -536,8 +571,9 @@ io_open_src_real(file_pair *pair)
 	}
 
 	// Symlinks are not followed unless writing to stdout or --force
-	// was used.
-	const bool follow_symlinks = opt_stdout || opt_force;
+	// or --keep was used.
+	const bool follow_symlinks
+			= opt_stdout || opt_force || opt_keep_original;
 
 	// We accept only regular files if we are writing the output
 	// to disk too. bzip2 allows overriding this with --force but
@@ -674,7 +710,7 @@ io_open_src_real(file_pair *pair)
 	}
 
 #ifndef TUKLIB_DOSLIKE
-	if (reg_files_only && !opt_force) {
+	if (reg_files_only && !opt_force && !opt_keep_original) {
 		if (pair->src_st.st_mode & (S_ISUID | S_ISGID)) {
 			// gzip rejects setuid and setgid files even
 			// when --force was used. bzip2 doesn't check
@@ -683,7 +719,7 @@ io_open_src_real(file_pair *pair)
 			// and setgid bits there.
 			//
 			// We accept setuid and setgid files if
-			// --force was used. We drop these bits
+			// --force or --keep was used. We drop these bits
 			// explicitly in io_copy_attr().
 			message_warning(_("%s: File has setuid or "
 					"setgid bit set, skipping"),
@@ -740,13 +776,19 @@ error:
 extern file_pair *
 io_open_src(const char *src_name)
 {
-	if (is_empty_filename(src_name))
+	if (src_name[0] == '\0') {
+		message_error(_("Empty filename, skipping"));
 		return NULL;
+	}
 
 	// Since we have only one file open at a time, we can use
 	// a statically allocated structure.
 	static file_pair pair;
 
+	// This implicitly also initializes src_st.st_size to zero
+	// which is expected to be <= 0 by default. fstat() isn't
+	// called when reading from standard input but src_st.st_size
+	// is still read.
 	pair = (file_pair){
 		.src_name = src_name,
 		.dest_name = NULL,
@@ -1183,15 +1225,35 @@ io_read(file_pair *pair, io_buf *buf, size_t size)
 
 
 extern bool
-io_pread(file_pair *pair, io_buf *buf, size_t size, off_t pos)
+io_seek_src(file_pair *pair, uint64_t pos)
 {
-	// Using lseek() and read() is more portable than pread() and
-	// for us it is as good as real pread().
-	if (lseek(pair->src_fd, pos, SEEK_SET) != pos) {
+	// Caller must not attempt to seek past the end of the input file
+	// (seeking to 100 in a 100-byte file is seeking to the end of
+	// the file, not past the end of the file, and thus that is allowed).
+	//
+	// This also validates that pos can be safely cast to off_t.
+	if (pos > (uint64_t)(pair->src_st.st_size))
+		message_bug();
+
+	if (lseek(pair->src_fd, (off_t)(pos), SEEK_SET) == -1) {
 		message_error(_("%s: Error seeking the file: %s"),
 				pair->src_name, strerror(errno));
 		return true;
 	}
+
+	pair->src_eof = false;
+
+	return false;
+}
+
+
+extern bool
+io_pread(file_pair *pair, io_buf *buf, size_t size, uint64_t pos)
+{
+	// Using lseek() and read() is more portable than pread() and
+	// for us it is as good as real pread().
+	if (io_seek_src(pair, pos))
+		return true;
 
 	const size_t amount = io_read(pair, buf, size);
 	if (amount == SIZE_MAX)

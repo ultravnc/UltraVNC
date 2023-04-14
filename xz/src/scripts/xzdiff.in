@@ -51,7 +51,7 @@ escape='
 while :; do
   case $1 in
     --h*) printf '%s\n' "$usage" || exit 2; exit;;
-    --v*) echo "$version" || exit 2; exit;;
+    --v*) printf '%s\n' "$version" || exit 2; exit;;
     --) shift; break;;
     -*\'*) cmp="$cmp '"`printf '%sX\n' "$1" | sed "$escape"`;;
     -?*) cmp="$cmp '$1'";;
@@ -65,14 +65,15 @@ for file; do
   test "X$file" = X- || <"$file" || exit 2
 done
 
-xz1=$xz
-xz2=$xz
+# xz needs -qQ to ignore warnings like unsupported check type.
+xz1="$xz -qQ"
+xz2="$xz -qQ"
 xz_status=0
 exec 3>&1
 
 if test $# -eq 1; then
   case $1 in
-    *[-.]xz | *[-.]lzma | *.t[lx]z)
+    *[-.]xz | *[-.]lzma | *[-.]lz | *.t[lx]z)
       ;;
     *[-.]bz2 | *.tbz | *.tbz2)
       xz1=bzip2;;
@@ -80,19 +81,23 @@ if test $# -eq 1; then
       xz1=gzip;;
     *[-.]lzo | *.tzo)
       xz1=lzop;;
+    *[-.]zst | *.tzst)
+      xz1='zstd -q';;
     *)
-      echo >&2 "$0: $1: Unknown compressed file name suffix"
+      printf '%s\n' "$0: $1: Unknown compressed file name suffix" >&2
       exit 2;;
   esac
   case $1 in
-    *[-.][zZ] | *_z | *[-.][gx]z | *[-.]bz2 | *[-.]lzma | *[-.]lzo)
-      FILE=`expr "X$1" : 'X\(.*\)[-.][abglmoxzZ2]*$'`;;
+    *[-.][zZ] | *_z | *[-.][gx]z | *[-.]bz2 | *[-.]lzma | *[-.]lz | *[-.]lzo | *[-.]zst)
+      FILE=`expr "X$1" : 'X\(.*\)[-.][abglmostxzZ2]*$'`;;
     *.t[abglx]z)
       FILE=`expr "X$1" : 'X\(.*[-.]t\)[abglx]z$'`ar;;
     *.tbz2)
       FILE=`expr "X$1" : 'X\(.*[-.]t\)bz2$'`ar;;
     *.tzo)
       FILE=`expr "X$1" : 'X\(.*[-.]t\)zo$'`ar;;
+    *.tzst)
+      FILE=`expr "X$1" : 'X\(.*[-.]t\)zst$'`ar;;
   esac
   xz_status=$(
     exec 4>&1
@@ -103,36 +108,33 @@ elif test $# -eq 2; then
     *[-.]bz2 | *.tbz | *.tbz2) xz1=bzip2;;
     *[-.][zZ] | *_z | *[-.]gz | *.t[ag]z) xz1=gzip;;
     *[-.]lzo | *.tzo) xz1=lzop;;
+    *[-.]zst | *.tzst) xz1='zstd -q';;
   esac
   case $2 in
     *[-.]bz2 | *.tbz | *.tbz2) xz2=bzip2;;
     *[-.][zZ] | *_z | *[-.]gz | *.t[ag]z) xz2=gzip;;
     *[-.]lzo | *.tzo) xz2=lzop;;
+    *[-.]zst | *.tzst) xz2='zstd -q';;
   esac
   case $1 in
-    *[-.][zZ] | *_z | *[-.][gx]z | *[-.]bz2 | *[-.]lzma | *.t[abglx]z | *.tbz2 | *[-.]lzo | *.tzo | -)
+    *[-.][zZ] | *_z | *[-.][gx]z | *[-.]bz2 | *[-.]lzma | *[-.]lz | *.t[abglx]z | *.tbz2 | *[-.]lzo | *.tzo | *[-.]zst | *.tzst | -)
       case "$2" in
-        *[-.][zZ] | *_z | *[-.][gx]z | *[-.]bz2 | *[-.]lzma | *.t[abglx]z | *.tbz2 | *[-.]lzo | *.tzo | -)
+        *[-.][zZ] | *_z | *[-.][gx]z | *[-.]bz2 | *[-.]lzma | *[-.]lz | *.t[abglx]z | *.tbz2 | *[-.]lzo | *.tzo | *[-.]zst | *.tzst | -)
           if test "$1$2" = --; then
             xz_status=$(
               exec 4>&1
-              ($xz1 -cdfq - 4>&-; echo $? >&4) 3>&- |
+              ($xz1 -cdf - 4>&-; echo $? >&4) 3>&- |
                 eval "$cmp" - - >&3
             )
           elif # Reject Solaris 8's buggy /bin/bash 2.03.
               echo X | (echo X | eval "$cmp" /dev/fd/5 - >/dev/null 2>&1) 5<&0; then
+            # NOTE: xz_status will contain two numbers.
             xz_status=$(
               exec 4>&1
-              ($xz1 -cdfq -- "$1" 4>&-; echo $? >&4) 3>&- |
-                ( ($xz2 -cdfq -- "$2" 4>&-; echo $? >&4) 3>&- 5<&- </dev/null |
+              ($xz1 -cdf -- "$1" 4>&-; echo $? >&4) 3>&- |
+                ( ($xz2 -cdf -- "$2" 4>&-; echo $? >&4) 3>&- 5<&- </dev/null |
                 eval "$cmp" /dev/fd/5 - >&3) 5<&0
             )
-            cmp_status=$?
-            case $xz_status in
-              *[1-9]*) xz_status=1;;
-              *) xz_status=0;;
-            esac
-            (exit $cmp_status)
           else
             F=`expr "/$2" : '.*/\(.*\)[-.][ablmotxz2]*$'` || F=$prog
             tmp=
@@ -161,10 +163,10 @@ elif test $# -eq 2; then
               mkdir -- "${TMPDIR-/tmp}/$prog.$$" || exit 2
               tmp="${TMPDIR-/tmp}/$prog.$$"
             fi
-            $xz2 -cdfq -- "$2" > "$tmp/$F" || exit 2
+            $xz2 -cdf -- "$2" > "$tmp/$F" || exit 2
             xz_status=$(
               exec 4>&1
-              ($xz1 -cdfq -- "$1" 4>&-; echo $? >&4) 3>&- |
+              ($xz1 -cdf -- "$1" 4>&-; echo $? >&4) 3>&- |
                 eval "$cmp" - '"$tmp/$F"' >&3
             )
             cmp_status=$?
@@ -175,16 +177,16 @@ elif test $# -eq 2; then
       *)
         xz_status=$(
           exec 4>&1
-          ($xz1 -cdfq -- "$1" 4>&-; echo $? >&4) 3>&- |
+          ($xz1 -cdf -- "$1" 4>&-; echo $? >&4) 3>&- |
             eval "$cmp" - '"$2"' >&3
         );;
     esac;;
   *)
     case "$2" in
-      *[-.][zZ] | *_z | *[-.][gx]z | *[-.]bz2 | *[-.]lzma | *.t[abglx]z | *.tbz2 | *[-.]lzo | *.tzo | -)
+      *[-.][zZ] | *_z | *[-.][gx]z | *[-.]bz2 | *[-.]lzma | *[-.]lz | *.t[abglx]z | *.tbz2 | *[-.]lzo | *.tzo | *[-.]zst | *.tzst | -)
         xz_status=$(
           exec 4>&1
-          ($xz2 -cdfq -- "$2" 4>&-; echo $? >&4) 3>&- |
+          ($xz2 -cdf -- "$2" 4>&-; echo $? >&4) 3>&- |
             eval "$cmp" '"$1"' - >&3
          );;
       *)
@@ -192,10 +194,22 @@ elif test $# -eq 2; then
     esac;;
   esac
 else
-  echo >&2 "$0: Invalid number of operands; try \`${0##*/} --help' for help"
+  printf '%s\n' "$0: Invalid number of operands; try \`${0##*/} --help' for help" >&2
   exit 2
 fi
 
 cmp_status=$?
-test "$xz_status" -eq 0 || exit 2
+for num in $xz_status ; do
+  # 0 from decompressor means successful decompression. SIGPIPE from
+  # decompressor is possible when diff or cmp exits before the whole file
+  # has been decompressed. In that case we want to retain the exit status
+  # from diff or cmp. Note that using "trap '' PIPE" is not possible
+  # because gzip changes its behavior (including exit status) if SIGPIPE
+  # is ignored.
+  test "$num" -eq 0 && continue
+  test "$num" -ge 128 \
+      && test "$(kill -l "$num" 2> /dev/null)" = "PIPE" \
+      && continue
+  exit 2
+done
 exit $cmp_status

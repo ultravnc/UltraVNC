@@ -18,6 +18,9 @@
 
 // For case-insensitive filename suffix on case-insensitive systems
 #if defined(TUKLIB_DOSLIKE) || defined(__VMS)
+#	ifdef HAVE_STRINGS_H
+#		include <strings.h>
+#	endif
 #	define strcmp strcasecmp
 #endif
 
@@ -119,23 +122,16 @@ uncompressed_name(const char *src_name, const size_t src_len)
 #ifdef __DJGPP__
 		{ ".lzm",   "" },
 #endif
-		{ ".tlz",   ".tar" },
-		// { ".gz",    "" },
-		// { ".tgz",   ".tar" },
+		{ ".tlz",   ".tar" }, // Both .tar.lzma and .tar.lz
+#ifdef HAVE_LZIP_DECODER
+		{ ".lz",    "" },
+#endif
 	};
 
 	const char *new_suffix = "";
 	size_t new_len = 0;
 
-	if (opt_format == FORMAT_RAW) {
-		// Don't check for known suffixes when --format=raw was used.
-		if (custom_suffix == NULL) {
-			message_error(_("%s: With --format=raw, "
-					"--suffix=.SUF is required unless "
-					"writing to stdout"), src_name);
-			return NULL;
-		}
-	} else {
+	if (opt_format != FORMAT_RAW) {
 		for (size_t i = 0; i < ARRAY_SIZE(suffixes); ++i) {
 			new_len = test_suffix(suffixes[i].compressed,
 					src_name, src_len);
@@ -208,12 +204,15 @@ compressed_name(const char *src_name, size_t src_len)
 #endif
 			".tlz",
 			NULL
-/*
+#ifdef HAVE_LZIP_DECODER
+		// This is needed to keep the table indexing in sync with
+		// enum format_type from coder.h.
 		}, {
-			".gz",
-			".tgz",
-			NULL
+/*
+			".lz",
 */
+			NULL
+#endif
 		}, {
 			// --format=raw requires specifying the suffix
 			// manually or using stdout.
@@ -221,8 +220,11 @@ compressed_name(const char *src_name, size_t src_len)
 		}
 	};
 
-	// args.c ensures this.
+	// args.c ensures these.
 	assert(opt_format != FORMAT_AUTO);
+#ifdef HAVE_LZIP_DECODER
+	assert(opt_format != FORMAT_LZIP);
+#endif
 
 	const size_t format = opt_format - 1;
 	const char *const *suffixes = all_suffixes[format];
@@ -250,15 +252,6 @@ compressed_name(const char *src_name, size_t src_len)
 			msg_suffix(src_name, custom_suffix);
 			return NULL;
 		}
-	}
-
-	// TODO: Hmm, maybe it would be better to validate this in args.c,
-	// since the suffix handling when decoding is weird now.
-	if (opt_format == FORMAT_RAW && custom_suffix == NULL) {
-		message_error(_("%s: With --format=raw, "
-				"--suffix=.SUF is required unless "
-				"writing to stdout"), src_name);
-		return NULL;
 	}
 
 	const char *suffix = custom_suffix != NULL
@@ -299,9 +292,11 @@ compressed_name(const char *src_name, size_t src_len)
 			// xz foo.tar          -> foo.txz
 			// xz -F lzma foo.tar  -> foo.tlz
 			static const char *const tar_suffixes[] = {
-				".txz",
-				".tlz",
-				// ".tgz",
+				".txz", // .tar.xz
+				".tlz", // .tar.lzma
+/*
+				".tlz", // .tar.lz
+*/
 			};
 			suffix = tar_suffixes[format];
 			suffix_len = 4;
@@ -396,4 +391,11 @@ suffix_set(const char *suffix)
 	free(custom_suffix);
 	custom_suffix = xstrdup(suffix);
 	return;
+}
+
+
+extern bool
+suffix_is_set(void)
+{
+	return custom_suffix != NULL;
 }
