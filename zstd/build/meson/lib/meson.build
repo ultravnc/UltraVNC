@@ -45,6 +45,15 @@ libzstd_sources = [join_paths(zstd_rootdir, 'lib/common/entropy_common.c'),
   join_paths(zstd_rootdir, 'lib/dictBuilder/divsufsort.c'),
   join_paths(zstd_rootdir, 'lib/dictBuilder/zdict.c')]
 
+# really we need anything that defines __GNUC__ as that is what ZSTD_ASM_SUPPORTED is gated on
+# but these are the two compilers that are supported in tree and actually handle this correctly
+# Otherwise, explicitly disable assembly.
+if [compiler_gcc, compiler_clang].contains(cc_id)
+  libzstd_sources += join_paths(zstd_rootdir, 'lib/decompress/huf_decompress_amd64.S')
+else
+  add_project_arguments('-DZSTD_DISABLE_ASM', language: 'c')
+endif
+
 # Explicit define legacy support
 add_project_arguments('-DZSTD_LEGACY_SUPPORT=@0@'.format(legacy_level),
   language: 'c')
@@ -74,7 +83,8 @@ libzstd_c_args = []
 if cc_id == compiler_msvc
   if default_library_type != 'static'
     libzstd_sources += [windows_mod.compile_resources(
-      join_paths(zstd_rootdir, 'build/VS2010/libzstd-dll/libzstd-dll.rc'))]
+      join_paths(zstd_rootdir, 'build/VS2010/libzstd-dll/libzstd-dll.rc'),
+      include_directories: libzstd_includes)]
     libzstd_c_args += ['-DZSTD_DLL_EXPORT=1',
       '-DZSTD_HEAPMODE=0',
       '-D_CONSOLE',
@@ -108,6 +118,7 @@ libzstd = library('zstd',
   libzstd_sources,
   include_directories: libzstd_includes,
   c_args: libzstd_c_args,
+  gnu_symbol_visibility: 'hidden',
   dependencies: libzstd_deps,
   install: true,
   version: zstd_libversion)
@@ -115,12 +126,41 @@ libzstd = library('zstd',
 libzstd_dep = declare_dependency(link_with: libzstd,
   include_directories: libzstd_includes)
 
+# we link to both:
+# - the shared library (for public symbols)
+# - the static library (for private symbols)
+#
+# this is needed because internally private symbols are used all the time, and
+# -fvisibility=hidden means those cannot be found
+if get_option('default_library') == 'static'
+  libzstd_static = libzstd
+  libzstd_internal_dep = libzstd_dep
+else
+  if get_option('default_library') == 'shared'
+    libzstd_static = static_library('zstd_objlib',
+      objects: libzstd.extract_all_objects(recursive: true),
+      build_by_default: false)
+  else
+    libzstd_static = libzstd.get_static_lib()
+  endif
+
+  if cc_id == compiler_msvc
+    # msvc does not actually support linking to both, but errors out with:
+    #   error LNK2005: ZSTD_<foo> already defined in zstd.lib(zstd-1.dll)
+    libzstd_internal_dep = declare_dependency(link_with: libzstd_static)
+  else
+    libzstd_internal_dep = declare_dependency(link_with: libzstd,
+      # the static library must be linked after the shared one
+      dependencies: declare_dependency(link_with: libzstd_static))
+  endif
+endif
+
 pkgconfig.generate(libzstd,
   name: 'libzstd',
   filebase: 'libzstd',
   description: 'fast lossless compression algorithm library',
   version: zstd_libversion,
-  url: 'http://www.zstd.net/')
+  url: 'https://facebook.github.io/zstd/')
 
 install_headers(join_paths(zstd_rootdir, 'lib/zstd.h'),
   join_paths(zstd_rootdir, 'lib/zdict.h'),

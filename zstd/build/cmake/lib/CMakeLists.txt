@@ -1,5 +1,5 @@
 # ################################################################
-# Copyright (c) 2015-present, Yann Collet, Facebook, Inc.
+# Copyright (c) Meta Platforms, Inc. and affiliates.
 # All rights reserved.
 #
 # This source code is licensed under both the BSD-style license (found in the
@@ -7,7 +7,7 @@
 # in the COPYING file in the root directory of this source tree).
 # ################################################################
 
-project(libzstd C)
+project(libzstd C ASM)
 
 set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
 option(ZSTD_BUILD_STATIC "BUILD STATIC LIBRARIES" ON)
@@ -22,7 +22,12 @@ include_directories(${LIBRARY_DIR} ${LIBRARY_DIR}/common)
 
 file(GLOB CommonSources ${LIBRARY_DIR}/common/*.c)
 file(GLOB CompressSources ${LIBRARY_DIR}/compress/*.c)
-file(GLOB DecompressSources ${LIBRARY_DIR}/decompress/*.c)
+if (MSVC)
+    file(GLOB DecompressSources ${LIBRARY_DIR}/decompress/*.c)
+    add_compile_options(-DZSTD_DISABLE_ASM)
+else ()
+    file(GLOB DecompressSources ${LIBRARY_DIR}/decompress/*.c ${LIBRARY_DIR}/decompress/*.S)
+endif ()
 file(GLOB DictBuilderSources ${LIBRARY_DIR}/dictBuilder/*.c)
 
 set(Sources
@@ -72,6 +77,12 @@ if (MSVC)
     set(PlatformDependResources ${MSVC_RESOURCE_DIR}/libzstd-dll.rc)
 endif ()
 
+# Explicitly set the language to C for all files, including ASM files.
+# Our assembly expects to be compiled by a C compiler, and is only enabled for
+# __GNUC__ compatible compilers. Otherwise all the ASM code is disabled by
+# macros.
+set_source_files_properties(${Sources} PROPERTIES LANGUAGE C)
+
 # Split project to static and shared libraries build
 set(library_targets)
 if (ZSTD_BUILD_SHARED)
@@ -106,7 +117,7 @@ if (MSVC)
 endif ()
 
 # With MSVC static library needs to be renamed to avoid conflict with import library
-if (MSVC)
+if (MSVC OR (WIN32 AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND NOT MINGW))
     set(STATIC_LIBRARY_BASE_NAME zstd_static)
 else ()
     set(STATIC_LIBRARY_BASE_NAME zstd)
@@ -130,30 +141,17 @@ if (ZSTD_BUILD_STATIC)
             OUTPUT_NAME ${STATIC_LIBRARY_BASE_NAME})
 endif ()
 
-if (UNIX OR MINGW)
-    # pkg-config
-    set(PREFIX "${CMAKE_INSTALL_PREFIX}")
-    set(EXEC_PREFIX "\${prefix}")
-    set(LIBDIR "${CMAKE_INSTALL_FULL_LIBDIR}")
-    set(INCLUDEDIR "${CMAKE_INSTALL_FULL_INCLUDEDIR}")
-    set(VERSION "${zstd_VERSION}")
+# pkg-config
+include(JoinPaths) # can be replaced by cmake_path(APPEND) in CMake 3.20
+set(PREFIX "${CMAKE_INSTALL_PREFIX}")
+set(EXEC_PREFIX "\${prefix}")
+join_paths(LIBDIR "\${exec_prefix}" "${CMAKE_INSTALL_LIBDIR}")
+join_paths(INCLUDEDIR "\${prefix}" "${CMAKE_INSTALL_INCLUDEDIR}")
+set(LIBS_PRIVATE "${THREADS_LIBS}")
+set(VERSION "${zstd_VERSION}")
 
-    string(LENGTH "${PREFIX}" PREFIX_LENGTH)
-    string(SUBSTRING "${LIBDIR}" 0 ${PREFIX_LENGTH} LIBDIR_PREFIX)
-    string(SUBSTRING "${LIBDIR}" ${PREFIX_LENGTH} -1 LIBDIR_SUFFIX)
-    string(SUBSTRING "${INCLUDEDIR}" 0 ${PREFIX_LENGTH} INCLUDEDIR_PREFIX)
-    string(SUBSTRING "${INCLUDEDIR}" ${PREFIX_LENGTH} -1 INCLUDEDIR_SUFFIX)
-
-    if ("${INCLUDEDIR_PREFIX}" STREQUAL "${PREFIX}")
-        set(INCLUDEDIR "\${prefix}${INCLUDEDIR_SUFFIX}")
-    endif()
-    if ("${LIBDIR_PREFIX}" STREQUAL "${PREFIX}")
-        set(LIBDIR "\${exec_prefix}${LIBDIR_SUFFIX}")
-    endif()
-
-    configure_file("${LIBRARY_DIR}/libzstd.pc.in" "${CMAKE_CURRENT_BINARY_DIR}/libzstd.pc" @ONLY)
-    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/libzstd.pc" DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
-endif ()
+configure_file("${LIBRARY_DIR}/libzstd.pc.in" "${CMAKE_CURRENT_BINARY_DIR}/libzstd.pc" @ONLY)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/libzstd.pc" DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 
 # install target
 install(FILES
@@ -168,6 +166,7 @@ install(TARGETS ${library_targets}
     ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+    BUNDLE DESTINATION "${CMAKE_INSTALL_BINDIR}"
     )
 
 # uninstall target

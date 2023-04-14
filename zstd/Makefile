@@ -1,5 +1,5 @@
 # ################################################################
-# Copyright (c) 2015-2021, Yann Collet, Facebook, Inc.
+# Copyright (c) Meta Platforms, Inc. and affiliates.
 # All rights reserved.
 #
 # This source code is licensed under both the BSD-style license (found in the
@@ -29,6 +29,7 @@ VOID = /dev/null
 # fail on other tested distros (ubuntu, debian) even
 # without manually specifying the TARGET_SYSTEM.
 TARGET_SYSTEM ?= $(OS)
+CP ?= cp
 
 ifneq (,$(filter Windows%,$(TARGET_SYSTEM)))
   EXT =.exe
@@ -69,7 +70,7 @@ zstd zstd-release:
 .PHONY: zstdmt
 zstdmt:
 	$(Q)$(MAKE) -C $(PRGDIR) $@
-	$(Q)cp $(PRGDIR)/zstd$(EXT) ./zstdmt$(EXT)
+	$(Q)$(CP) $(PRGDIR)/zstd$(EXT) ./zstdmt$(EXT)
 
 .PHONY: zlibwrapper
 zlibwrapper: lib
@@ -122,6 +123,7 @@ contrib: lib
 	$(MAKE) -C contrib/seekable_format/examples all
 	$(MAKE) -C contrib/seekable_format/tests test
 	$(MAKE) -C contrib/largeNbDicts all
+	$(MAKE) -C contrib/externalSequenceProducer all
 	cd build/single_file_libs/ ; ./build_decoder_test.sh
 	cd build/single_file_libs/ ; ./build_library_test.sh
 
@@ -141,6 +143,7 @@ clean:
 	$(Q)$(MAKE) -C contrib/seekable_format/examples $@ > $(VOID)
 	$(Q)$(MAKE) -C contrib/seekable_format/tests $@ > $(VOID)
 	$(Q)$(MAKE) -C contrib/largeNbDicts $@ > $(VOID)
+	$(Q)$(MAKE) -C contrib/externalSequenceProducer $@ > $(VOID)
 	$(Q)$(RM) zstd$(EXT) zstdmt$(EXT) tmp*
 	$(Q)$(RM) -r lz4
 	@echo Cleaning completed
@@ -148,13 +151,15 @@ clean:
 #------------------------------------------------------------------------------
 # make install is validated only for Linux, macOS, Hurd and some BSD targets
 #------------------------------------------------------------------------------
-ifneq (,$(filter $(shell uname),Linux Darwin GNU/kFreeBSD GNU OpenBSD FreeBSD DragonFly NetBSD MSYS_NT Haiku))
+ifneq (,$(filter $(shell uname),Linux Darwin GNU/kFreeBSD GNU OpenBSD FreeBSD DragonFly NetBSD MSYS_NT Haiku AIX))
 
 HOST_OS = POSIX
 
+MKDIR ?= mkdir -p
+
 HAVE_COLORNEVER = $(shell echo a | egrep --color=never a > /dev/null 2> /dev/null && echo 1 || echo 0)
 EGREP_OPTIONS ?=
-ifeq ($HAVE_COLORNEVER, 1)
+ifeq ($(HAVE_COLORNEVER), 1)
 EGREP_OPTIONS += --color=never
 endif
 EGREP = egrep $(EGREP_OPTIONS)
@@ -195,15 +200,15 @@ travis-install:
 .PHONY: gcc5build gcc6build gcc7build clangbuild m32build armbuild aarch64build ppcbuild ppc64build
 gcc5build: clean
 	gcc-5 -v
-	CC=gcc-5 $(MAKE) all MOREFLAGS="-Werror"
+	CC=gcc-5 $(MAKE) all MOREFLAGS="-Werror $(MOREFLAGS)"
 
 gcc6build: clean
 	gcc-6 -v
-	CC=gcc-6 $(MAKE) all MOREFLAGS="-Werror"
+	CC=gcc-6 $(MAKE) all MOREFLAGS="-Werror $(MOREFLAGS)"
 
 gcc7build: clean
 	gcc-7 -v
-	CC=gcc-7 $(MAKE) all MOREFLAGS="-Werror"
+	CC=gcc-7 $(MAKE) all MOREFLAGS="-Werror $(MOREFLAGS)"
 
 clangbuild: clean
 	clang -v
@@ -217,7 +222,7 @@ armbuild: clean
 	CC=arm-linux-gnueabi-gcc CFLAGS="-Werror" $(MAKE) allzstd
 
 aarch64build: clean
-	CC=aarch64-linux-gnu-gcc CFLAGS="-Werror" $(MAKE) allzstd
+	CC=aarch64-linux-gnu-gcc CFLAGS="-Werror -O0" $(MAKE) allzstd
 
 ppcbuild: clean
 	CC=powerpc-linux-gnu-gcc CFLAGS="-m32 -Wno-attributes -Werror" $(MAKE) -j allzstd
@@ -227,17 +232,17 @@ ppc64build: clean
 
 .PHONY: armfuzz aarch64fuzz ppcfuzz ppc64fuzz
 armfuzz: clean
-	CC=arm-linux-gnueabi-gcc QEMU_SYS=qemu-arm-static MOREFLAGS="-static" FUZZER_FLAGS=--no-big-tests $(MAKE) -C $(TESTDIR) fuzztest
+	CC=arm-linux-gnueabi-gcc QEMU_SYS=qemu-arm-static MOREFLAGS="-static $(MOREFLAGS)" FUZZER_FLAGS="--no-big-tests $(FUZZER_FLAGS)" $(MAKE) -C $(TESTDIR) fuzztest
 
 aarch64fuzz: clean
 	ld -v
-	CC=aarch64-linux-gnu-gcc QEMU_SYS=qemu-aarch64-static MOREFLAGS="-static" FUZZER_FLAGS=--no-big-tests $(MAKE) -C $(TESTDIR) fuzztest
+	CC=aarch64-linux-gnu-gcc QEMU_SYS=qemu-aarch64-static MOREFLAGS="-static $(MOREFLAGS)" FUZZER_FLAGS="--no-big-tests $(FUZZER_FLAGS)" $(MAKE) -C $(TESTDIR) fuzztest
 
 ppcfuzz: clean
-	CC=powerpc-linux-gnu-gcc QEMU_SYS=qemu-ppc-static MOREFLAGS="-static" FUZZER_FLAGS=--no-big-tests $(MAKE) -C $(TESTDIR) fuzztest
+	CC=powerpc-linux-gnu-gcc QEMU_SYS=qemu-ppc-static MOREFLAGS="-static $(MOREFLAGS)" FUZZER_FLAGS="--no-big-tests $(FUZZER_FLAGS)" $(MAKE) -C $(TESTDIR) fuzztest
 
 ppc64fuzz: clean
-	CC=powerpc-linux-gnu-gcc QEMU_SYS=qemu-ppc64-static MOREFLAGS="-m64 -static" FUZZER_FLAGS=--no-big-tests $(MAKE) -C $(TESTDIR) fuzztest
+	CC=powerpc-linux-gnu-gcc QEMU_SYS=qemu-ppc64-static MOREFLAGS="-m64 -static $(MOREFLAGS)" FUZZER_FLAGS="--no-big-tests $(FUZZER_FLAGS)" $(MAKE) -C $(TESTDIR) fuzztest
 
 .PHONY: cxxtest gcc5test gcc6test armtest aarch64test ppctest ppc64test
 cxxtest: CXXFLAGS += -Wall -Wextra -Wundef -Wshadow -Wcast-align -Werror
@@ -246,34 +251,34 @@ cxxtest: clean
 
 gcc5test: clean
 	gcc-5 -v
-	$(MAKE) all CC=gcc-5 MOREFLAGS="-Werror"
+	$(MAKE) all CC=gcc-5 MOREFLAGS="-Werror $(MOREFLAGS)"
 
 gcc6test: clean
 	gcc-6 -v
-	$(MAKE) all CC=gcc-6 MOREFLAGS="-Werror"
+	$(MAKE) all CC=gcc-6 MOREFLAGS="-Werror $(MOREFLAGS)"
 
 armtest: clean
 	$(MAKE) -C $(TESTDIR) datagen   # use native, faster
-	$(MAKE) -C $(TESTDIR) test CC=arm-linux-gnueabi-gcc QEMU_SYS=qemu-arm-static ZSTDRTTEST= MOREFLAGS="-Werror -static" FUZZER_FLAGS=--no-big-tests
+	$(MAKE) -C $(TESTDIR) test CC=arm-linux-gnueabi-gcc QEMU_SYS=qemu-arm-static ZSTDRTTEST= MOREFLAGS="-Werror -static $(MOREFLAGS)" FUZZER_FLAGS="--no-big-tests $(FUZZER_FLAGS)"
 
 aarch64test:
 	$(MAKE) -C $(TESTDIR) datagen   # use native, faster
-	$(MAKE) -C $(TESTDIR) test CC=aarch64-linux-gnu-gcc QEMU_SYS=qemu-aarch64-static ZSTDRTTEST= MOREFLAGS="-Werror -static" FUZZER_FLAGS=--no-big-tests
+	$(MAKE) -C $(TESTDIR) test CC=aarch64-linux-gnu-gcc QEMU_SYS=qemu-aarch64-static ZSTDRTTEST= MOREFLAGS="-Werror -static $(MOREFLAGS)" FUZZER_FLAGS="--no-big-tests $(FUZZER_FLAGS)"
 
 ppctest: clean
 	$(MAKE) -C $(TESTDIR) datagen   # use native, faster
-	$(MAKE) -C $(TESTDIR) test CC=powerpc-linux-gnu-gcc QEMU_SYS=qemu-ppc-static ZSTDRTTEST= MOREFLAGS="-Werror -Wno-attributes -static" FUZZER_FLAGS=--no-big-tests
+	$(MAKE) -C $(TESTDIR) test CC=powerpc-linux-gnu-gcc QEMU_SYS=qemu-ppc-static ZSTDRTTEST= MOREFLAGS="-Werror -Wno-attributes -static $(MOREFLAGS)" FUZZER_FLAGS="--no-big-tests $(FUZZER_FLAGS)"
 
 ppc64test: clean
 	$(MAKE) -C $(TESTDIR) datagen   # use native, faster
-	$(MAKE) -C $(TESTDIR) test CC=powerpc-linux-gnu-gcc QEMU_SYS=qemu-ppc64-static ZSTDRTTEST= MOREFLAGS="-m64 -static" FUZZER_FLAGS=--no-big-tests
+	$(MAKE) -C $(TESTDIR) test CC=powerpc-linux-gnu-gcc QEMU_SYS=qemu-ppc64-static ZSTDRTTEST= MOREFLAGS="-m64 -static $(MOREFLAGS)" FUZZER_FLAGS="--no-big-tests $(FUZZER_FLAGS)"
 
 .PHONY: arm-ppc-compilation
 arm-ppc-compilation:
-	$(MAKE) -C $(PRGDIR) clean zstd CC=arm-linux-gnueabi-gcc QEMU_SYS=qemu-arm-static ZSTDRTTEST= MOREFLAGS="-Werror -static"
-	$(MAKE) -C $(PRGDIR) clean zstd CC=aarch64-linux-gnu-gcc QEMU_SYS=qemu-aarch64-static ZSTDRTTEST= MOREFLAGS="-Werror -static"
-	$(MAKE) -C $(PRGDIR) clean zstd CC=powerpc-linux-gnu-gcc QEMU_SYS=qemu-ppc-static ZSTDRTTEST= MOREFLAGS="-Werror -Wno-attributes -static"
-	$(MAKE) -C $(PRGDIR) clean zstd CC=powerpc-linux-gnu-gcc QEMU_SYS=qemu-ppc64-static ZSTDRTTEST= MOREFLAGS="-m64 -static"
+	$(MAKE) -C $(PRGDIR) clean zstd CC=arm-linux-gnueabi-gcc QEMU_SYS=qemu-arm-static ZSTDRTTEST= MOREFLAGS="-Werror -static $(MOREFLAGS)"
+	$(MAKE) -C $(PRGDIR) clean zstd CC=aarch64-linux-gnu-gcc QEMU_SYS=qemu-aarch64-static ZSTDRTTEST= MOREFLAGS="-Werror -static $(MOREFLAGS)"
+	$(MAKE) -C $(PRGDIR) clean zstd CC=powerpc-linux-gnu-gcc QEMU_SYS=qemu-ppc-static ZSTDRTTEST= MOREFLAGS="-Werror -Wno-attributes -static $(MOREFLAGS)"
+	$(MAKE) -C $(PRGDIR) clean zstd CC=powerpc-linux-gnu-gcc QEMU_SYS=qemu-ppc64-static ZSTDRTTEST= MOREFLAGS="-m64 -static $(MOREFLAGS)"
 
 regressiontest:
 	$(MAKE) -C $(FUZZDIR) regressiontest
@@ -284,37 +289,55 @@ uasanregressiontest:
 msanregressiontest:
 	$(MAKE) -C $(FUZZDIR) regressiontest CC=clang CXX=clang++ CFLAGS="-O3 -fsanitize=memory" CXXFLAGS="-O3 -fsanitize=memory"
 
+update_regressionResults : REGRESS_RESULTS_DIR := /tmp/regress_results_dir/
+update_regressionResults:
+	$(MAKE) -C programs zstd
+	$(MAKE) -C tests/regression test
+	$(RM) -rf $(REGRESS_RESULTS_DIR)
+	$(MKDIR) $(REGRESS_RESULTS_DIR)
+	./tests/regression/test                         \
+        --cache  tests/regression/cache             \
+        --output $(REGRESS_RESULTS_DIR)/results.csv \
+        --zstd   programs/zstd
+	echo "Showing results differences"
+	! diff tests/regression/results.csv $(REGRESS_RESULTS_DIR)/results.csv
+	echo "Updating results.csv"
+	$(CP) $(REGRESS_RESULTS_DIR)/results.csv tests/regression/results.csv
+
+
 # run UBsan with -fsanitize-recover=pointer-overflow
 # this only works with recent compilers such as gcc 8+
 usan: clean
-	$(MAKE) test CC=clang MOREFLAGS="-g -fno-sanitize-recover=all -fsanitize-recover=pointer-overflow -fsanitize=undefined -Werror"
+	$(MAKE) test CC=clang MOREFLAGS="-g -fno-sanitize-recover=all -fsanitize-recover=pointer-overflow -fsanitize=undefined -Werror $(MOREFLAGS)"
 
 asan: clean
-	$(MAKE) test CC=clang MOREFLAGS="-g -fsanitize=address -Werror"
+	$(MAKE) test CC=clang MOREFLAGS="-g -fsanitize=address -Werror $(MOREFLAGS)"
 
 asan-%: clean
-	LDFLAGS=-fuse-ld=gold MOREFLAGS="-g -fno-sanitize-recover=all -fsanitize=address -Werror" $(MAKE) -C $(TESTDIR) $*
+	LDFLAGS=-fuse-ld=gold MOREFLAGS="-g -fno-sanitize-recover=all -fsanitize=address -Werror $(MOREFLAGS)" $(MAKE) -C $(TESTDIR) $*
 
 msan: clean
-	$(MAKE) test CC=clang MOREFLAGS="-g -fsanitize=memory -fno-omit-frame-pointer -Werror" HAVE_LZMA=0   # datagen.c fails this test for no obvious reason
+	$(MAKE) test CC=clang MOREFLAGS="-g -fsanitize=memory -fno-omit-frame-pointer -Werror $(MOREFLAGS)" HAVE_LZMA=0   # datagen.c fails this test for no obvious reason
 
 msan-%: clean
-	LDFLAGS=-fuse-ld=gold MOREFLAGS="-g -fno-sanitize-recover=all -fsanitize=memory -fno-omit-frame-pointer -Werror" FUZZER_FLAGS=--no-big-tests $(MAKE) -C $(TESTDIR) HAVE_LZMA=0 $*
+	LDFLAGS=-fuse-ld=gold MOREFLAGS="-g -fno-sanitize-recover=all -fsanitize=memory -fno-omit-frame-pointer -Werror $(MOREFLAGS)" FUZZER_FLAGS="--no-big-tests $(FUZZER_FLAGS)" $(MAKE) -C $(TESTDIR) HAVE_LZMA=0 $*
 
 asan32: clean
-	$(MAKE) -C $(TESTDIR) test32 CC=clang MOREFLAGS="-g -fsanitize=address"
+	$(MAKE) -C $(TESTDIR) test32 CC=clang MOREFLAGS="-g -fsanitize=address $(MOREFLAGS)"
 
 uasan: clean
-	$(MAKE) test CC=clang MOREFLAGS="-g -fno-sanitize-recover=all -fsanitize-recover=pointer-overflow -fsanitize=address,undefined -Werror"
+	$(MAKE) test CC=clang MOREFLAGS="-g -fno-sanitize-recover=all -fsanitize-recover=pointer-overflow -fsanitize=address,undefined -Werror $(MOREFLAGS)"
 
 uasan-%: clean
-	LDFLAGS=-fuse-ld=gold MOREFLAGS="-g -fno-sanitize-recover=all -fsanitize-recover=pointer-overflow -fsanitize=address,undefined -Werror" $(MAKE) -C $(TESTDIR) $*
+	LDFLAGS=-fuse-ld=gold MOREFLAGS="-g -fno-sanitize-recover=all -fsanitize-recover=pointer-overflow -fsanitize=address,undefined -Werror $(MOREFLAGS)" $(MAKE) -C $(TESTDIR) $*
 
 tsan-%: clean
-	LDFLAGS=-fuse-ld=gold MOREFLAGS="-g -fno-sanitize-recover=all -fsanitize=thread -Werror" $(MAKE) -C $(TESTDIR) $* FUZZER_FLAGS=--no-big-tests
+	LDFLAGS=-fuse-ld=gold MOREFLAGS="-g -fno-sanitize-recover=all -fsanitize=thread -Werror $(MOREFLAGS)" $(MAKE) -C $(TESTDIR) $* FUZZER_FLAGS="--no-big-tests $(FUZZER_FLAGS)"
 
 .PHONY: apt-install
 apt-install:
+	# TODO: uncomment once issue 3011 is resolved and remove hack from Github Actions .yml
+	# sudo apt-get update
 	sudo apt-get -yq --no-install-suggests --no-install-recommends --force-yes install $(APT_PACKAGES)
 
 .PHONY: apt-add-repo
@@ -372,7 +395,7 @@ ifneq (,$(filter $(HOST_OS),MSYS POSIX))
 cmakebuild:
 	cmake --version
 	$(RM) -r $(BUILDIR)/cmake/build
-	mkdir $(BUILDIR)/cmake/build
+	$(MKDIR) $(BUILDIR)/cmake/build
 	cd $(BUILDIR)/cmake/build; cmake -DCMAKE_INSTALL_PREFIX:PATH=~/install_test_dir $(CMAKE_PARAMS) ..
 	$(MAKE) -C $(BUILDIR)/cmake/build -j4;
 	$(MAKE) -C $(BUILDIR)/cmake/build install;
@@ -381,23 +404,23 @@ cmakebuild:
 
 c89build: clean
 	$(CC) -v
-	CFLAGS="-std=c89 -Werror" $(MAKE) allmost  # will fail, due to missing support for `long long`
+	CFLAGS="-std=c89 -Werror -Wno-attributes -Wpedantic -Wno-long-long -Wno-variadic-macros -O0" $(MAKE) lib zstd
 
 gnu90build: clean
 	$(CC) -v
-	CFLAGS="-std=gnu90 -Werror" $(MAKE) allmost
+	CFLAGS="-std=gnu90 -Werror -O0" $(MAKE) allmost
 
 c99build: clean
 	$(CC) -v
-	CFLAGS="-std=c99 -Werror" $(MAKE) allmost
+	CFLAGS="-std=c99 -Werror -O0" $(MAKE) allmost
 
 gnu99build: clean
 	$(CC) -v
-	CFLAGS="-std=gnu99 -Werror" $(MAKE) allmost
+	CFLAGS="-std=gnu99 -Werror -O0" $(MAKE) allmost
 
 c11build: clean
 	$(CC) -v
-	CFLAGS="-std=c11 -Werror" $(MAKE) allmost
+	CFLAGS="-std=c11 -Werror -O0" $(MAKE) allmost
 
 bmix64build: clean
 	$(CC) -v
@@ -416,5 +439,5 @@ bmi32build: clean
 staticAnalyze: SCANBUILD ?= scan-build
 staticAnalyze:
 	$(CC) -v
-	CC=$(CC) CPPFLAGS=-g $(SCANBUILD) --status-bugs -v $(MAKE) allzstd examples contrib
+	CC=$(CC) CPPFLAGS=-g $(SCANBUILD) --status-bugs -v $(MAKE) zstd
 endif

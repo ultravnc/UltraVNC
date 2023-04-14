@@ -1,5 +1,5 @@
 # ################################################################
-# Copyright (c) 2016-present, Facebook, Inc.
+# Copyright (c) Meta Platforms, Inc. and affiliates.
 # All rights reserved.
 #
 # This source code is licensed under both the BSD-style license (found in the
@@ -21,10 +21,16 @@ add_executable(pzstd ${PROGRAMS_DIR}/util.c ${PZSTD_DIR}/main.cpp ${PZSTD_DIR}/O
 set_property(TARGET pzstd APPEND PROPERTY COMPILE_DEFINITIONS "NDEBUG")
 set_property(TARGET pzstd APPEND PROPERTY COMPILE_OPTIONS "-Wno-shadow")
 
+if (ZSTD_BUILD_SHARED)
+    set(ZSTD_LIB libzstd_shared)
+else()
+    set(ZSTD_LIB libzstd_static)
+endif()
+
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 if (CMAKE_USE_PTHREADS_INIT)
-    target_link_libraries(pzstd libzstd_shared ${CMAKE_THREAD_LIBS_INIT})
+  target_link_libraries(pzstd ${ZSTD_LIB} ${CMAKE_THREAD_LIBS_INIT})
 else()
     message(SEND_ERROR "ZSTD currently does not support thread libraries other than pthreads")
 endif()
