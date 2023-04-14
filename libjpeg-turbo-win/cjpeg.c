@@ -5,7 +5,7 @@
  * Copyright (C) 1991-1998, Thomas G. Lane.
  * Modified 2003-2011 by Guido Vollbeding.
  * libjpeg-turbo Modifications:
- * Copyright (C) 2010, 2013-2014, 2017, 2019-2021, D. R. Commander.
+ * Copyright (C) 2010, 2013-2014, 2017, 2019-2022, D. R. Commander.
  * For conditions of distribution and use, see the accompanying README.ijg
  * file.
  *
@@ -27,27 +27,16 @@
  * works regardless of which command line style is used.
  */
 
+#ifdef _MSC_VER
+#define _CRT_SECURE_NO_DEPRECATE
+#endif
+
 #ifdef CJPEG_FUZZER
 #define JPEG_INTERNALS
 #endif
 #include "cdjpeg.h"             /* Common decls for cjpeg/djpeg applications */
 #include "jversion.h"           /* for version message */
 #include "jconfigint.h"
-
-#ifndef HAVE_STDLIB_H           /* <stdlib.h> should declare malloc(),free() */
-extern void *malloc(size_t size);
-extern void free(void *ptr);
-#endif
-
-#ifdef USE_CCOMMAND             /* command-line reader for Macintosh */
-#ifdef __MWERKS__
-#include <SIOUX.h>              /* Metrowerks needs this */
-#include <console.h>            /* ... and this */
-#endif
-#ifdef THINK_C
-#include <console.h>            /* Think declares it here */
-#endif
-#endif
 
 
 /* Create the add-on message string table. */
@@ -166,7 +155,7 @@ void my_error_exit(j_common_ptr cinfo)
   longjmp(myerr->setjmp_buffer, 1);
 }
 
-static void my_emit_message(j_common_ptr cinfo, int msg_level)
+static void my_emit_message_fuzzer(j_common_ptr cinfo, int msg_level)
 {
   if (msg_level < 0)
     cinfo->err->num_warnings++;
@@ -585,11 +574,6 @@ main(int argc, char **argv)
   unsigned long outsize = 0;
   JDIMENSION num_scanlines;
 
-  /* On Mac, fetch a command line. */
-#ifdef USE_CCOMMAND
-  argc = ccommand(&argv);
-#endif
-
   progname = argv[0];
   if (progname == NULL || progname[0] == 0)
     progname = "cjpeg";         /* in case C library doesn't provide it */
@@ -699,7 +683,7 @@ main(int argc, char **argv)
 
 #ifdef CJPEG_FUZZER
   jerr.error_exit = my_error_exit;
-  jerr.emit_message = my_emit_message;
+  jerr.emit_message = my_emit_message_fuzzer;
   if (setjmp(myerr.setjmp_buffer))
     HANDLE_ERROR()
 #endif

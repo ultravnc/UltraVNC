@@ -503,5 +503,29 @@
     <Image Include="res\idr_tray_disabled.ico">
       <Filter>Resources</Filter>
     </Image>
+    <Image Include="LedGreen.bmp">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="LedGreen.png">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="LedRed.bmp">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="LedYellow.bmp">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="res\LedGreen.bmp">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="res\LedGreen.png">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="res\LedRed.bmp">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="res\LedYellow.bmp">
+      <Filter>Resources</Filter>
+    </Image>
   </ItemGroup>
 </Project>

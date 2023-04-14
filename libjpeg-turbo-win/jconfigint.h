@@ -1,15 +1,11 @@
 /* libjpeg-turbo build number */
-#define BUILD  "20211223"
+#define BUILD  "20230414"
 
 /* Compiler's inline keyword */
 #undef inline
 
 /* How to obtain function inlining. */
-#if !defined(__MINGW32__)
 #define INLINE  __forceinline
-#else
-#define INLINE  inline
-#endif /*__MINGW32__*/
 
 /* How to obtain thread-local storage */
 #define THREAD_LOCAL  __declspec(thread)
@@ -18,10 +14,14 @@
 #define PACKAGE_NAME  "libjpeg-turbo"
 
 /* Version number of package */
-#define VERSION  "2.1.2"
+#define VERSION  "2.1.5.1"
 
 /* The size of `size_t', as computed by sizeof. */
+#ifdef _X64
+#define SIZEOF_SIZE_T  8
+#else
 #define SIZEOF_SIZE_T  4
+#endif
 
 /* Define if your compiler has __builtin_ctzl() and sizeof(unsigned long) == sizeof(size_t). */
 /* #undef HAVE_BUILTIN_CTZL */

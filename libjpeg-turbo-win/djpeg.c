@@ -5,7 +5,7 @@
  * Copyright (C) 1991-1997, Thomas G. Lane.
  * Modified 2013-2019 by Guido Vollbeding.
  * libjpeg-turbo Modifications:
- * Copyright (C) 2010-2011, 2013-2017, 2019-2020, D. R. Commander.
+ * Copyright (C) 2010-2011, 2013-2017, 2019-2020, 2022, D. R. Commander.
  * Copyright (C) 2015, Google, Inc.
  * For conditions of distribution and use, see the accompanying README.ijg
  * file.
@@ -28,25 +28,15 @@
  * works regardless of which command line style is used.
  */
 
+#ifdef _MSC_VER
+#define _CRT_SECURE_NO_DEPRECATE
+#endif
+
 #include "cdjpeg.h"             /* Common decls for cjpeg/djpeg applications */
 #include "jversion.h"           /* for version message */
 #include "jconfigint.h"
 
-#ifndef HAVE_STDLIB_H           /* <stdlib.h> should declare free() */
-extern void free(void *ptr);
-#endif
-
 #include <ctype.h>              /* to declare isprint() */
-
-#ifdef USE_CCOMMAND             /* command-line reader for Macintosh */
-#ifdef __MWERKS__
-#include <SIOUX.h>              /* Metrowerks needs this */
-#include <console.h>            /* ... and this */
-#endif
-#ifdef THINK_C
-#include <console.h>            /* Think declares it here */
-#endif
-#endif
 
 
 /* Create the add-on message string table. */
@@ -326,7 +316,9 @@ parse_switches(j_decompress_ptr cinfo, int argc, char **argv,
       if (++argn >= argc)       /* advance to next argument */
         usage();
       icc_filename = argv[argn];
+#ifdef SAVE_MARKERS_SUPPORTED
       jpeg_save_markers(cinfo, JPEG_APP0 + 2, 0xFFFF);
+#endif
 
     } else if (keymatch(arg, "map", 3)) {
       /* Quantize to a color map taken from an input file. */
@@ -550,11 +542,6 @@ main(int argc, char **argv)
 #endif
   JDIMENSION num_scanlines;
 
-  /* On Mac, fetch a command line. */
-#ifdef USE_CCOMMAND
-  argc = ccommand(&argv);
-#endif
-
   progname = argv[0];
   if (progname == NULL || progname[0] == 0)
     progname = "djpeg";         /* in case C library doesn't provide it */
@@ -651,7 +638,7 @@ main(int argc, char **argv)
         fprintf(stderr, "%s: memory allocation failure\n", progname);
         exit(EXIT_FAILURE);
       }
-      nbytes = JFREAD(input_file, &inbuffer[insize], INPUT_BUF_SIZE);
+      nbytes = fread(&inbuffer[insize], 1, INPUT_BUF_SIZE, input_file);
       if (nbytes < INPUT_BUF_SIZE && ferror(input_file)) {
         if (file_index < argc)
           fprintf(stderr, "%s: can't read from %s\n", progname,
@@ -721,7 +708,7 @@ main(int argc, char **argv)
      * that skip_start <= skip_end.
      */
     if (skip_end > cinfo.output_height - 1) {
-      fprintf(stderr, "%s: skip region exceeds image height %d\n", progname,
+      fprintf(stderr, "%s: skip region exceeds image height %u\n", progname,
               cinfo.output_height);
       exit(EXIT_FAILURE);
     }
@@ -742,7 +729,7 @@ main(int argc, char **argv)
     }
     if ((tmp = jpeg_skip_scanlines(&cinfo, skip_end - skip_start + 1)) !=
         skip_end - skip_start + 1) {
-      fprintf(stderr, "%s: jpeg_skip_scanlines() returned %d rather than %d\n",
+      fprintf(stderr, "%s: jpeg_skip_scanlines() returned %u rather than %u\n",
               progname, tmp, skip_end - skip_start + 1);
       exit(EXIT_FAILURE);
     }
@@ -761,7 +748,7 @@ main(int argc, char **argv)
      */
     if (crop_x + crop_width > cinfo.output_width ||
         crop_y + crop_height > cinfo.output_height) {
-      fprintf(stderr, "%s: crop dimensions exceed image dimensions %d x %d\n",
+      fprintf(stderr, "%s: crop dimensions exceed image dimensions %u x %u\n",
               progname, cinfo.output_width, cinfo.output_height);
       exit(EXIT_FAILURE);
     }
@@ -782,7 +769,7 @@ main(int argc, char **argv)
 
     /* Process data */
     if ((tmp = jpeg_skip_scanlines(&cinfo, crop_y)) != crop_y) {
-      fprintf(stderr, "%s: jpeg_skip_scanlines() returned %d rather than %d\n",
+      fprintf(stderr, "%s: jpeg_skip_scanlines() returned %u rather than %u\n",
               progname, tmp, crop_y);
       exit(EXIT_FAILURE);
     }
@@ -795,7 +782,7 @@ main(int argc, char **argv)
          jpeg_skip_scanlines(&cinfo,
                              cinfo.output_height - crop_y - crop_height)) !=
         cinfo.output_height - crop_y - crop_height) {
-      fprintf(stderr, "%s: jpeg_skip_scanlines() returned %d rather than %d\n",
+      fprintf(stderr, "%s: jpeg_skip_scanlines() returned %u rather than %u\n",
               progname, tmp, cinfo.output_height - crop_y - crop_height);
       exit(EXIT_FAILURE);
     }

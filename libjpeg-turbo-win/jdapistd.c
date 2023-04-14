@@ -4,7 +4,7 @@
  * This file was part of the Independent JPEG Group's software:
  * Copyright (C) 1994-1996, Thomas G. Lane.
  * libjpeg-turbo Modifications:
- * Copyright (C) 2010, 2015-2020, D. R. Commander.
+ * Copyright (C) 2010, 2015-2020, 2022, D. R. Commander.
  * Copyright (C) 2015, Google, Inc.
  * For conditions of distribution and use, see the accompanying README.ijg
  * file.
@@ -159,8 +159,12 @@ jpeg_crop_scanline(j_decompress_ptr cinfo, JDIMENSION *xoffset,
   JDIMENSION input_xoffset;
   boolean reinit_upsampler = FALSE;
   jpeg_component_info *compptr;
+#ifdef UPSAMPLE_MERGING_SUPPORTED
+  my_master_ptr master = (my_master_ptr)cinfo->master;
+#endif
 
-  if (cinfo->global_state != DSTATE_SCANNING || cinfo->output_scanline != 0)
+  if ((cinfo->global_state != DSTATE_SCANNING &&
+       cinfo->global_state != DSTATE_BUFIMAGE) || cinfo->output_scanline != 0)
     ERREXIT1(cinfo, JERR_BAD_STATE, cinfo->global_state);
 
   if (!xoffset || !width)
@@ -208,6 +212,13 @@ jpeg_crop_scanline(j_decompress_ptr cinfo, JDIMENSION *xoffset,
    */
   *width = *width + input_xoffset - *xoffset;
   cinfo->output_width = *width;
+#ifdef UPSAMPLE_MERGING_SUPPORTED
+  if (master->using_merged_upsample && cinfo->max_v_samp_factor == 2) {
+    my_merged_upsample_ptr upsample = (my_merged_upsample_ptr)cinfo->upsample;
+    upsample->out_row_width =
+      cinfo->output_width * cinfo->out_color_components;
+  }
+#endif
 
   /* Set the first and last iMCU columns that we must decompress.  These values
    * will be used in single-scan decompressions.
@@ -318,7 +329,9 @@ LOCAL(void)
 read_and_discard_scanlines(j_decompress_ptr cinfo, JDIMENSION num_lines)
 {
   JDIMENSION n;
+#ifdef UPSAMPLE_MERGING_SUPPORTED
   my_master_ptr master = (my_master_ptr)cinfo->master;
+#endif
   JSAMPLE dummy_sample[1] = { 0 };
   JSAMPROW dummy_row = dummy_sample;
   JSAMPARRAY scanlines = NULL;
@@ -342,10 +355,12 @@ read_and_discard_scanlines(j_decompress_ptr cinfo, JDIMENSION num_lines)
     cinfo->cquantize->color_quantize = noop_quantize;
   }
 
+#ifdef UPSAMPLE_MERGING_SUPPORTED
   if (master->using_merged_upsample && cinfo->max_v_samp_factor == 2) {
     my_merged_upsample_ptr upsample = (my_merged_upsample_ptr)cinfo->upsample;
     scanlines = &upsample->spare_row;
   }
+#endif
 
   for (n = 0; n < num_lines; n++)
     jpeg_read_scanlines(cinfo, scanlines, 1);
@@ -511,7 +526,7 @@ jpeg_skip_scanlines(j_decompress_ptr cinfo, JDIMENSION num_lines)
    * all of the entropy decoding occurs in jpeg_start_decompress(), assuming
    * that the input data source is non-suspending.  This makes skipping easy.
    */
-  if (cinfo->inputctl->has_multiple_scans) {
+  if (cinfo->inputctl->has_multiple_scans || cinfo->buffered_image) {
     if (cinfo->upsample->need_context_rows) {
       cinfo->output_scanline += lines_to_skip;
       cinfo->output_iMCU_row += lines_to_skip / lines_per_iMCU_row;
