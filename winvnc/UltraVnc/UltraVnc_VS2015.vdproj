@@ -27,12 +27,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_11276E5D18D1F8A028D0E38F745FFA00"
-        "OwnerKey" = "8:_0F3E5B898783469D8773791F4330AA21"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_1B421F33586245439CC8F9D0F60C7412"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -137,12 +131,6 @@
         {
         "MsmKey" = "8:_D31D96A9FDA64480BAEE40566CC253B6"
         "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_D9CCD7A410A61576D752DC9362953245"
-        "OwnerKey" = "8:_0F3E5B898783469D8773791F4330AA21"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -516,26 +504,6 @@
         }
         "File"
         {
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_11276E5D18D1F8A028D0E38F745FFA00"
-            {
-            "SourcePath" = "8:IPHLPAPI.DLL"
-            "TargetName" = "8:IPHLPAPI.DLL"
-            "Tag" = "8:"
-            "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1B421F33586245439CC8F9D0F60C7412"
             {
             "SourcePath" = "8:..\\..\\Files\\plugins\\SecureVNCPlugin.dsm"
@@ -696,26 +664,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D9CCD7A410A61576D752DC9362953245"
-            {
-            "SourcePath" = "8:VERSION.dll"
-            "TargetName" = "8:VERSION.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E98B3D199C8F4CBB9445914AB95FB543"
             {
             "SourcePath" = "8:..\\..\\Files\\logmessages.dll"
@@ -792,15 +740,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:UltraVnc"
-        "ProductCode" = "8:{96250B16-A1C9-40D2-B3B3-E523E13316DE}"
-        "PackageCode" = "8:{2EE3BE49-4DCE-4941-AC63-8463FEF09155}"
+        "ProductCode" = "8:{5DFCA16A-A3D2-40E4-852F-8AC6A5373583}"
+        "PackageCode" = "8:{EF311E80-CC13-46D8-8E30-720F523AF6A3}"
         "UpgradeCode" = "8:{25A3A242-EEA3-4731-A2D0-E990D2EA5A23}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.4.09"
+        "ProductVersion" = "8:1.4.20"
         "Manufacturer" = "8:uvnc bvba"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:https://support.uvnc.com"
@@ -1429,7 +1377,7 @@
                             "ContextData" = "8:"
                             "Attributes" = "3:0"
                             "Setting" = "3:2"
-                            "Value" = "8:UltraVnc 1.4.0.9 X86"
+                            "Value" = "8:UltraVnc 1.4.2.0 X86"
                             "DefaultValue" = "8:#1215"
                             "UsePlugInResources" = "11:TRUE"
                             }
