@@ -388,7 +388,7 @@ bool comm_serv::Init(char *name,int IN_datasize_IN,int IN_datasize_OUT,bool app,
 		event_E_IN=CreateEvent(&secAttr, FALSE, FALSE, event_IN);
 		if(event_E_IN==NULL) return false;
 		event_E_IN_DONE=CreateEvent(&secAttr, FALSE, FALSE, event_IN_DONE);
-		if(event_IN_DONE==NULL) return false;
+		if(event_E_IN_DONE==NULL) return false;
 
 		if (datasize_OUT!=0)
 		{
@@ -400,7 +400,7 @@ bool comm_serv::Init(char *name,int IN_datasize_IN,int IN_datasize_OUT,bool app,
 		event_E_OUT=CreateEvent(&secAttr, FALSE, FALSE, event_OUT);
 		if(event_E_OUT==NULL) return false;
 		event_E_OUT_DONE=CreateEvent(&secAttr, FALSE, FALSE, event_OUT_DONE);
-		if(event_OUT_DONE==NULL) return false;
+		if(event_E_OUT_DONE==NULL) return false;
 	}
 	else
 	{
@@ -414,7 +414,7 @@ bool comm_serv::Init(char *name,int IN_datasize_IN,int IN_datasize_OUT,bool app,
 		event_E_IN=CreateEvent(NULL, FALSE, FALSE, event_IN);
 		if(event_E_IN==NULL) return false;
 		event_E_IN_DONE=CreateEvent(NULL, FALSE, FALSE, event_IN_DONE);
-		if(event_IN_DONE==NULL) return false;
+		if(event_E_IN_DONE==NULL) return false;
 
 		if (datasize_OUT!=0)
 		{
@@ -426,7 +426,7 @@ bool comm_serv::Init(char *name,int IN_datasize_IN,int IN_datasize_OUT,bool app,
 		event_E_OUT=CreateEvent(NULL, FALSE, FALSE, event_OUT);
 		if(event_E_OUT==NULL) return false;
 		event_E_OUT_DONE=CreateEvent(NULL, FALSE, FALSE, event_OUT_DONE);
-		if(event_OUT_DONE==NULL) return false;
+		if(event_E_OUT_DONE==NULL) return false;
 	}
 	}
 	else
@@ -444,8 +444,8 @@ bool comm_serv::Init(char *name,int IN_datasize_IN,int IN_datasize_OUT,bool app,
 			if(event_E_IN==NULL) return false;
 			ResetEvent(event_E_IN);
 			event_E_IN_DONE=OpenEvent(EVENT_ALL_ACCESS, FALSE, event_IN_DONE);
-			if(event_IN_DONE==NULL) return false;
-			ResetEvent(event_IN_DONE);
+			if(event_E_IN_DONE==NULL) return false;
+			ResetEvent(event_E_IN_DONE);
 			if (datasize_OUT!=0)
 			{
 			hMapFile_OUT = OpenFileMapping(FILE_MAP_ALL_ACCESS,FALSE,filemapping_OUT);
@@ -457,8 +457,8 @@ bool comm_serv::Init(char *name,int IN_datasize_IN,int IN_datasize_OUT,bool app,
 			if(event_E_OUT==NULL) return false;
 			ResetEvent(event_E_OUT);
 			event_E_OUT_DONE=OpenEvent(EVENT_ALL_ACCESS, FALSE, event_OUT_DONE);
-			if(event_OUT_DONE==NULL) return false;
-			ResetEvent(event_OUT_DONE);
+			if(event_E_OUT_DONE==NULL) return false;
+			ResetEvent(event_E_OUT_DONE);
 		}
 		else
 		{
@@ -473,8 +473,8 @@ bool comm_serv::Init(char *name,int IN_datasize_IN,int IN_datasize_OUT,bool app,
 			if(event_E_IN==NULL) return false;
 			ResetEvent(event_E_IN);
 			event_E_IN_DONE=OpenEvent(EVENT_ALL_ACCESS, FALSE, event_IN_DONE);
-			if(event_IN_DONE==NULL) return false;
-			ResetEvent(event_IN_DONE);
+			if(event_E_IN_DONE==NULL) return false;
+			ResetEvent(event_E_IN_DONE);
 
 			if (datasize_OUT!=0)
 			{
@@ -487,8 +487,8 @@ bool comm_serv::Init(char *name,int IN_datasize_IN,int IN_datasize_OUT,bool app,
 			if(event_E_OUT==NULL) return false;
 			ResetEvent(event_E_OUT);
 			event_E_OUT_DONE=OpenEvent(EVENT_ALL_ACCESS, FALSE, event_OUT_DONE);
-			if(event_OUT_DONE==NULL) return false;
-			ResetEvent(event_OUT_DONE);
+			if(event_E_OUT_DONE==NULL) return false;
+			ResetEvent(event_E_OUT_DONE);
 		}
 	}
 	return true;
