@@ -197,6 +197,8 @@ BOOL
 vncEncoder::GetRemotePalette(RGBQUAD *quadlist, UINT ncolours)
 {
 	vnclog.Print(LL_INTINFO, VNCLOG("remote palette data requested\n"));
+	if (m_transformat.blueMax == 0 || m_transformat.redMax == 0 || m_transformat.greenMax == 0)
+		return FALSE;
 
 	// If the local server is palette-based then call SetTranslateFunction
 	// to update the palette-to-truecolour mapping:
