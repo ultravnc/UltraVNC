@@ -63,7 +63,7 @@ BOOL g_restore_ActiveDesktop = FALSE;
 extern HINSTANCE	hInstResDLL;
 
 extern bool	fShutdownOrdered;
-extern char g_hookstring[16];
+extern wchar_t g_hookstring[16];
 
 static BOOL AeroWasEnabled = FALSE;
 
@@ -356,8 +356,8 @@ vncMenu::AddTrayIcon()
 		if (!IsIconSet)
 			AddNotificationIcon();
 		setToolTip();
-		strcpy_s(m_nid.szTip, m_tooltip);
-		Shell_NotifyIcon(NIM_MODIFY, &m_nid);
+		wcscpy_s(m_nid.szTip, m_tooltip);
+		Shell_NotifyIconW(NIM_MODIFY, &m_nid);
 
 		/*if (m_server->AuthClientCount() != 0) { //PGM @ Advantig
 			// adzm - 2010-07 - Disable more effects or font smoothing
@@ -547,9 +547,9 @@ BOOL vncMenu::AddNotificationIcon()
 		m_nid.dwStateMask = NIS_HIDDEN;
 	}
 
-	if (Shell_NotifyIcon(NIM_ADD, &m_nid)) {
+	if (Shell_NotifyIconW(NIM_ADD, &m_nid)) {
 		m_nid.uVersion = NOTIFYICON_VERSION_4;
-		Shell_NotifyIcon(NIM_SETVERSION, &m_nid);
+		Shell_NotifyIconW(NIM_SETVERSION, &m_nid);
 		IsIconSet = true;
 		IconFaultCounter = 0;
 		if (!settings->getDisableTrayIcon())
@@ -608,32 +608,36 @@ BOOL vncMenu::DeleteNotificationIcon()
 {
 	IsIconSet = false;
 	IconFaultCounter = 0;
-	return Shell_NotifyIcon(NIM_DELETE, &m_nid);
+	return Shell_NotifyIconW(NIM_DELETE, &m_nid);
 }
 
 void vncMenu::setToolTip()
 {
-	LoadString(hInstResDLL, IDI_WINVNC, m_tooltip, sizeof(m_tooltip));
-	strncat_s(m_tooltip, " - ", (sizeof(m_tooltip) - 1) - strlen(m_tooltip));
+	LoadStringW(hInstResDLL, IDI_WINVNC, m_tooltip, sizeof(m_tooltip));
+	wcsncat_s(m_tooltip, L" - ", _TRUNCATE);
 	if (m_server->SockConnected()) {
-		unsigned long tiplen = (ULONG)strlen(m_tooltip);
-		char* tipptr = ((char*)&m_tooltip) + tiplen;
-		GetIPAddrString(tipptr, sizeof(m_tooltip) - tiplen);
+		char ipstring[100];
+		wchar_t wipstring[100];
+		GetIPAddrString(ipstring, 100);
+		mbstowcs(wipstring, ipstring, 100);
+		wcsncat_s(m_tooltip, wipstring, _TRUNCATE);
 	}
 	else
-		strncat_s(m_tooltip, "Not listening", (sizeof(m_tooltip) - 1) - strlen(m_tooltip));
-	char namebuf[256];
+		wcsncat_s(m_tooltip, L"Not listening", _TRUNCATE);
+	wchar_t namebufw[256]{};
+	char namebuf[256]{};
 
 	if (gethostname(namebuf, 256) == 0) {
-		strncat_s(m_tooltip, " - ", (sizeof(m_tooltip) - 1) - strlen(m_tooltip));
-		strncat_s(m_tooltip, namebuf, (sizeof(m_tooltip) - 1) - strlen(m_tooltip));
+		mbstowcs(namebufw, namebuf, strlen(namebuf));
+		wcsncat_s(m_tooltip, L" - ", _TRUNCATE);
+		wcsncat_s(m_tooltip, namebufw, _TRUNCATE);
 	}
 
 	if (settings->RunningFromExternalService())
-		strncat_s(m_tooltip, " - service - ", (sizeof(m_tooltip) - 1) - strlen(m_tooltip));
+		wcsncat_s(m_tooltip, L" - service - ", _TRUNCATE);
 	else
-		strncat_s(m_tooltip, " - application - ", (sizeof(m_tooltip) - 1) - strlen(m_tooltip));
-	strncat_s(m_tooltip, g_hookstring, (sizeof(m_tooltip) - 1) - strlen(m_tooltip));
+		wcsncat_s(m_tooltip, L" - application - ", _TRUNCATE);
+	wcsncat_s(m_tooltip, g_hookstring, _TRUNCATE);
 }
 
 void vncMenu::RestoreTooltip()
@@ -647,7 +651,7 @@ void vncMenu::RestoreTooltip()
 		m_nid.dwState = 0;
 		m_nid.dwStateMask = NIS_HIDDEN;
 	}
-	Shell_NotifyIcon(NIM_MODIFY, &m_nid);
+	Shell_NotifyIconW(NIM_MODIFY, &m_nid);
 	balloonset = false;
 }
 
@@ -658,19 +662,19 @@ void vncMenu::setBalloonInfo()
 		m_nid.dwState = 0;
 		m_nid.dwStateMask = NIS_HIDDEN;
 	}
-	if (m_BalloonInfo && (strlen(m_BalloonInfo) > 0)) {
+	if (m_BalloonInfo && (wcslen(m_BalloonInfo) > 0)) {
 		m_nid.uFlags = settings->getDisableTrayIcon()
 			? NIF_MESSAGE | NIF_STATE | NIF_TIP | NIF_INFO
 			: NIF_ICON | NIF_MESSAGE | NIF_STATE | NIF_TIP | NIF_INFO;
-		strncpy_s(m_nid.szInfo, m_BalloonInfo, 255);
+		wcsncpy_s(m_nid.szInfo, m_BalloonInfo, 255);
 		m_nid.szInfo[255] = '\0';
-		strcpy_s(m_nid.szInfoTitle, "UltraVNC Connection...");
+		wcscpy_s(m_nid.szInfoTitle, L"UltraVNC Connection...");
 		m_nid.dwInfoFlags = NIIF_INFO;
 		balloonset = true;
 	}
 
-	if (m_BalloonTitle && (strlen(m_BalloonTitle) > 0)) {
-		strncpy_s(m_nid.szInfoTitle, m_BalloonTitle, 63);
+	if (m_BalloonTitle && (wcslen(m_BalloonTitle) > 0)) {
+		wcsncpy_s(m_nid.szInfoTitle, m_BalloonTitle, 63);
 		m_nid.szInfoTitle[63] = '\0';
 	}
 
@@ -698,17 +702,17 @@ vncMenu::SendTrayMsg(DWORD msg, bool balloon, BOOL flash)
 
 	if (!balloonset && balloon) {
 		setBalloonInfo();
-		Shell_NotifyIcon(NIM_MODIFY, &m_nid);
+		Shell_NotifyIconW(NIM_MODIFY, &m_nid);
 	}
 	else if (balloonset && !flash && msg == NIM_MODIFY)
 		RestoreTooltip();
 	else {
 		setToolTip();
 		if (!balloonset && msg == NIM_MODIFY && (m_nid.hIcon != (settings->getDisableTrayIcon() ? NULL : flash ? m_flash_icon : m_winvnc_icon)
-			|| strcmp(m_nid.szTip, m_tooltip) != 0)) { //balloonset = 1 , ballon is showing, don't update icon and tip
+			|| wcscmp(m_nid.szTip, m_tooltip) != 0)) { //balloonset = 1 , ballon is showing, don't update icon and tip
 			m_nid.hIcon = settings->getDisableTrayIcon() ? NULL : flash ? m_flash_icon : m_winvnc_icon;
-			strcpy_s(m_nid.szTip, m_tooltip);
-			Shell_NotifyIcon(NIM_MODIFY, &m_nid);
+			wcscpy_s(m_nid.szTip, m_tooltip);
+			Shell_NotifyIconW(NIM_MODIFY, &m_nid);
 		}
 	}
 }
@@ -1964,13 +1968,13 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			try {
 				omni_mutex_lock sync(_this->m_mutexTrayIcon, 70);
 
-				char* szTitle = (char*)lParam;
-				char* szInfo = (char*)wParam;
+				wchar_t* szTitle = (wchar_t*)lParam;
+				wchar_t* szInfo = (wchar_t*)wParam;
 
-				if (szInfo && (strlen(szInfo) > 0))
-					_this->m_BalloonInfo = _strdup(szInfo);
-				if (szTitle && (strlen(szTitle) > 0))
-					_this->m_BalloonTitle = _strdup(szTitle);
+				if (szInfo && (wcslen(szInfo) > 0))
+					_this->m_BalloonInfo = _wcsdup(szInfo);
+				if (szTitle && (wcslen(szTitle) > 0))
+					_this->m_BalloonTitle = _wcsdup(szTitle);
 
 				if (szInfo)
 					free(szInfo);
@@ -1993,10 +1997,10 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 }
 
 // adzm 2009-07-05 - Tray icon balloon tips
-void  vncMenu::NotifyBalloon(char* szInfo, char* szTitle)
+void  vncMenu::NotifyBalloon(wchar_t* szInfo, wchar_t* szTitle)
 {
-	char* szInfoCopy = _strdup(szInfo);
-	char* szTitleCopy = _strdup(szTitle);
+	wchar_t* szInfoCopy = _wcsdup(szInfo);
+	wchar_t* szTitleCopy = _wcsdup(szTitle);
 	if (!postHelper::PostToThisWinVNC(postHelper::MENU_TRAYICON_BALLOON_MSG, (WPARAM)szInfoCopy, (LPARAM)szTitleCopy)) {
 		if (szInfoCopy)
 			free(szInfoCopy);

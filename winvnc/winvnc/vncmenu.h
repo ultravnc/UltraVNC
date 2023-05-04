@@ -50,7 +50,7 @@ public:
 	void Shutdown(bool kill_client); // sf@2007
 
 	// adzm 2009-07-05 - Tray icon balloon tips
-	static void NotifyBalloon(char* szInfo, char* szTitle = NULL);
+	static void NotifyBalloon(wchar_t* szInfo, wchar_t* szTitle = NULL);
 
 protected:
 	// Tray icon handling
@@ -91,10 +91,10 @@ protected:
 	HWND			m_hwnd;
 	HMENU			m_hmenu;
 
-	NOTIFYICONDATA	m_nid{};
+	NOTIFYICONDATAW	m_nid{};
 	omni_mutex		m_mutexTrayIcon; // adzm 2009-07-05
-	char*			m_BalloonInfo;
-	char*			m_BalloonTitle;
+	wchar_t*			m_BalloonInfo;
+	wchar_t*			m_BalloonTitle;
 
 	char			m_username[UNLEN+1];
 
@@ -111,7 +111,7 @@ protected:
 	bool IsIconSet;
 	int IconFaultCounter;
 	bool balloonset = false;
-	char m_tooltip[128]{};
+	wchar_t m_tooltip[128]{};
 };
 
 

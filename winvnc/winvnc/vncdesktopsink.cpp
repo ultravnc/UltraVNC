@@ -36,7 +36,7 @@
 
 int OSversion();
 DWORD WINAPI InitWindowThread(LPVOID lpParam);
-extern char g_hookstring[16];
+extern wchar_t g_hookstring[16];
 extern int g_lockcode;
 
 
@@ -641,7 +641,7 @@ vncDesktop::InitWindow()
 				}
 			else if (msg.message==RFB_SCREEN_UPDATE)
 				{
-					strcpy_s(g_hookstring,"vnchook");
+					wcscpy_s(g_hookstring,L"vnchook");
 					if (can_be_hooked)
 					{
 					vnclog.Print(LL_INTERR, VNCLOG("RFB_SCREEN_UPDATE  \n"));

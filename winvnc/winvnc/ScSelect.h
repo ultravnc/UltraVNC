@@ -6,14 +6,14 @@
 
 namespace ScSelect
 {
-	extern char	Balloon1Title[150];
-	extern char	Balloon2Title[150];
-	extern char	Balloon1A[150];
-	extern char	Balloon1B[150];
-	extern char	Balloon1C[150];
-	extern char	Balloon2A[150];
-	extern char	Balloon2B[150];
-	extern char	Balloon2C[150];
+	extern wchar_t	Balloon1Title[150];
+	extern wchar_t	Balloon2Title[150];
+	extern wchar_t	Balloon1A[150];
+	extern wchar_t	Balloon1B[150];
+	extern wchar_t	Balloon1C[150];
+	extern wchar_t	Balloon2A[150];
+	extern wchar_t	Balloon2B[150];
+	extern wchar_t	Balloon2C[150];
 	extern LONG old_pref;
 	extern bool g_dis_uac;
 	extern bool	g_wallpaper_enabled;

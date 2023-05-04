@@ -17,14 +17,14 @@ namespace ScSelect {
 	wchar_t		TextTitle[150] = L"";
 	wchar_t		Webpage[150] = L"";
 	bool		bWebpage = false;
-	char		Balloon1Title[150] = "";
-	char		Balloon2Title[150] = "";
-	char		Balloon1A[150] = "";
-	char		Balloon1B[150] = "";
-	char		Balloon1C[150] = "";
-	char		Balloon2A[150] = "";
-	char		Balloon2B[150] = "";
-	char		Balloon2C[150] = "";
+	wchar_t		Balloon1Title[150] = L"";
+	wchar_t		Balloon2Title[150] = L"";
+	wchar_t		Balloon1A[150] = L"";
+	wchar_t		Balloon1B[150] = L"";
+	wchar_t		Balloon1C[150] = L"";
+	wchar_t		Balloon2A[150] = L"";
+	wchar_t		Balloon2B[150] = L"";
+	wchar_t		Balloon2C[150] = L"";
 	wchar_t		TextENTERCODE[150] = L"";
 	char		idStr[15] = "";
 	int			 wdd = 0;
@@ -445,37 +445,37 @@ namespace ScSelect {
 
 					if (strncmp(myline, "[BALLOON1TITLE]", strlen("[BALLOON1TITLE]")) == 0) {
 						fgets(myline, sizeof(myline), fid);
-						strcpy_s(Balloon1Title, myline);
+						toUnicode(Balloon1Title, myline);
 						//Balloon1Title[strlen(Balloon1Title) - 1] = '\0';
 					}
 					if (strncmp(myline, "[BALLOON1A]", strlen("[BALLOON1A]")) == 0) {
 						fgets(myline, sizeof(myline), fid);
-						strcpy_s(Balloon1A, myline);
+						toUnicode(Balloon1A, myline);
 					}
 					if (strncmp(myline, "[BALLOON1B]", strlen("[BALLOON1B]")) == 0) {
 						fgets(myline, sizeof(myline), fid);
-						strcpy_s(Balloon1B, myline);
+						toUnicode(Balloon1B, myline);
 					}
 					if (strncmp(myline, "[BALLOON1C]", strlen("[BALLOON1C]")) == 0) {
 						fgets(myline, sizeof(myline), fid);
-						strcpy_s(Balloon1C, myline);
+						toUnicode(Balloon1C, myline);
 					}
 
 					if (strncmp(myline, "[BALLOON2TITLE]", strlen("[BALLOON2TITLE]")) == 0) {
 						fgets(myline, sizeof(myline), fid);
-						strcpy_s(Balloon2Title, myline);
+						toUnicode(Balloon2Title, myline);
 					}
 					if (strncmp(myline, "[BALLOON2A]", strlen("[BALLOON2A]")) == 0) {
 						fgets(myline, sizeof(myline), fid);
-						strcpy_s(Balloon2A, myline);
+						toUnicode(Balloon2A, myline);
 					}
 					if (strncmp(myline, "[BALLOON2B]", strlen("[BALLOON2B]")) == 0) {
 						fgets(myline, sizeof(myline), fid);
-						strcpy_s(Balloon2B, myline);
+						toUnicode(Balloon2B, myline);
 					}
 					if (strncmp(myline, "[BALLOON2C]", strlen("[BALLOON2C]")) == 0) {
 						fgets(myline, sizeof(myline), fid);
-						strcpy_s(Balloon2C, myline);
+						toUnicode(Balloon2C, myline);
 					}
 					if (strncmp(myline, "[DIRECT]", strlen("[DIRECT]")) == 0) {
 						direct = true;

@@ -33,7 +33,7 @@ bool g_DesktopThread_running;
 DWORD WINAPI hookwatch(LPVOID lpParam);
 extern bool stop_hookwatch;
 void testBench();
-char g_hookstring[16]="";
+wchar_t g_hookstring[16]=L"";
 bool PreConnect = false;
 
 inline bool
@@ -616,13 +616,13 @@ void vncDesktopThread::do_polling(HANDLE& threadHandle, rfb::Region2D& rgncache,
 	// if can_be_hooked==false, hooking is temp disabled, use polling
 	if (m_desktop->On_Off_hookdll) {
 		if (m_desktop->SetHook && g_obIPC.listall()!=NULL && m_desktop->can_be_hooked) {
-			strcpy_s(g_hookstring,"schook");
+			wcscpy_s(g_hookstring,L"schook");
 			DWORD dwTId(0);
 			if (threadHandle==NULL) threadHandle = CreateThread(NULL, 0, hookwatch, this, 0, &dwTId);
 			if (Handle_Ringbuffer(g_obIPC.listall(),rgncache)) return;
 		}
 		if (m_desktop->can_be_hooked && !m_desktop->m_hookinited && m_desktop->m_bitmappointer) {
-			strcpy_s(g_hookstring, "");
+			wcscpy_s(g_hookstring, L"");
 			m_desktop->m_bitmappointer=false;
 			m_desktop->m_DIBbits=NULL;
 		}
@@ -694,7 +694,7 @@ DWORD WINAPI ThreadCheckMirrorDriverUpdates(LPVOID lpParam)
 	{	
 			if  (dt->m_desktop->m_screenCapture && dt->m_desktop->m_screenCapture->getPreviousCounter() != dt->m_desktop->pchanges_buf->counter)
 			{
-				strcpy_s(g_hookstring,"driver");
+				wcscpy_s(g_hookstring,L"driver");
 				SetEvent(dt->m_desktop->trigger_events[0]);				
 			}
 		Sleep(5);
@@ -904,7 +904,7 @@ vncDesktopThread::run_undetached(void *arg)
 				break;
 				case WAIT_OBJECT_0+6:
 					ResetEvent(m_desktop->trigger_events[6]);
-					strcpy_s(g_hookstring,"ddengine");
+					wcscpy_s(g_hookstring,L"ddengine");
 				case WAIT_TIMEOUT:				
 				case WAIT_OBJECT_0: {
 					ResetEvent(m_desktop->trigger_events[0]);

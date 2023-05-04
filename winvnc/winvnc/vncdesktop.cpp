@@ -66,7 +66,7 @@ const char szDesktopSink[] = "WinVNC desktop sink";
 
 bool g_Desktop_running;
 extern bool g_DesktopThread_running;
-extern char g_hookstring[16];
+extern wchar_t g_hookstring[16];
 
 //
 // // Modif sf@2002 - v1.1.0 - Optimization
@@ -547,7 +547,7 @@ vncDesktop::vncDesktop()
 
 vncDesktop::~vncDesktop()
 {
-	strcpy_s(g_hookstring, "");
+	wcscpy_s(g_hookstring, L"");
 	vnclog.Print(LL_INTINFO, VNCLOG("~vncDesktop \n"));
 
 	// If we created a thread then here we delete it
