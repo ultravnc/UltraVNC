@@ -60,6 +60,8 @@
 #include <string>
 #include <vector>
 #include "common/win32_helpers.h"
+#include "shlwapi.h"
+#pragma comment(lib, "Shlwapi.lib")
 
 // [v1.0.2-jp1 fix] yak!'s File transfer patch
 // Simply forward strchr() and strrchr() to _mbschr() and _mbsrchr() to avoid 0x5c problem, respectively.
@@ -2084,7 +2086,7 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, UINT nLen)
 
 
     
-    strcat_s(m_szDestFileName, make_temp_filename(strrchr(szRemoteFileName, '\\') + 1).c_str());
+    strcat_s(m_szDestFileName, make_temp_filename(PathFindFileName(szRemoteFileName)).c_str());
 
 	m_nnFileSize = (((__int64)(sizeH)) << 32) + lSize;
 	char szFFS[96];
