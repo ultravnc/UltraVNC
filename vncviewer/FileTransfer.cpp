@@ -312,6 +312,8 @@ FileTransfer::FileTransfer(VNCviewerApp *l_pApp, ClientConnection *pCC)
 		MessageBox( NULL, sz_E1, sz_E2, MB_OK | MB_ICONEXCLAMATION );
     }
 	InitializeCriticalSection(&crit);
+	rfbFileHeaderRequested = false;
+	rfbFileTransferOfferRequested = false;
 }
 
 //
@@ -538,15 +540,21 @@ void FileTransfer::ProcessFileTransferMsg(void)
 	// In response to a rfbFileTransferRequest request
 	// A file is received from the server.
 	case rfbFileHeader:
-		ReceiveFiles(Swap32IfLE(ft.size), Swap32IfLE(ft.length));
+		if (rfbFileHeaderRequested) {
+			ReceiveFiles(Swap32IfLE(ft.size), Swap32IfLE(ft.length));
+			rfbFileHeaderRequested = false;
+		}
 		break;
 
 	// In response to a rfbFileTransferOffer request
 	// The server can send the checksums of the destination file before sending a ack through
 	// rfbFileAcceptHeader (only if the destination file already exists and is accessible)
 	case rfbFileChecksums:
-		ReceiveDestinationFileChecksums(Swap32IfLE(ft.size), Swap32IfLE(ft.length));
-        m_pCC->SetRecvTimeout();
+		if (rfbFileTransferOfferRequested) {
+			ReceiveDestinationFileChecksums(Swap32IfLE(ft.size), Swap32IfLE(ft.length));
+			m_pCC->SetRecvTimeout();
+			rfbFileTransferOfferRequested = false;
+		}
 		break;
 
 	// In response to a rfbFileTransferOffer request
@@ -1940,7 +1948,7 @@ void FileTransfer::RequestRemoteFile(LPSTR szRemoteFileName)
 	//adzm 2010-09
     m_pCC->WriteExactQueue((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
     m_pCC->WriteExact((char *)szRemoteFileName, strlen(szRemoteFileName));
-
+	rfbFileHeaderRequested = true;
 	return;
 }
 
@@ -2593,7 +2601,7 @@ bool FileTransfer::OfferLocalFile(LPSTR szSrcFileName)
 	//adzm 2010-09
     m_pCC->WriteExactQueue((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
 	m_pCC->WriteExactQueue((char *)szDstFileName, strlen(szDstFileName));
-
+	rfbFileTransferOfferRequested = true;
 	if (!UsingOldProtocol())
 	{
 		CARD32 sizeH = Swap32IfLE(n2SrcSize.HighPart);
