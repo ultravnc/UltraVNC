@@ -229,6 +229,12 @@ public:
 			m_pointerenabled = enable;
 	};
 
+	virtual void EnableGii(BOOL enable)
+	{
+		if (m_GiiEnabled == true)
+			m_GiiEnabled = enable;
+	};
+
 	virtual void EnableJap(bool enable) {m_jap = enable;};
 	virtual void EnableUnicode(bool enable) {m_unicode = enable;};
 	virtual void SetCapability(int capability) {m_capability = capability;};
@@ -480,6 +486,7 @@ protected:
 	bool			m_IsLoopback;
 	bool			m_keyboardenabled = true;
 	bool			m_pointerenabled = true;
+	bool			m_GiiEnabled = true;
 	bool			m_jap;
 	bool			m_unicode;
 	int				m_capability;

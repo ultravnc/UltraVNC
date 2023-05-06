@@ -326,6 +326,7 @@ vncClientId vncServer::AddClient(VSocket* socket, BOOL auth, BOOL shared, int ca
 	client->SetCapability(capability);
 	client->EnableKeyboard(settings->getEnableRemoteInputs());
 	client->EnablePointer(settings->getEnableRemoteInputs());
+	client->EnableGii(settings->getEnableRemoteInputs());
 	client->EnableJap(settings->getEnableJapInput() ? true : false);
 	client->EnableUnicode(settings->getEnableUnicodeInput() ? true : false);
 
@@ -1163,6 +1164,7 @@ vncServer::EnableRemoteInputs(BOOL enable)
 	for (i = m_authClients.begin(); i != m_authClients.end(); i++) {
 		GetClient(*i)->EnableKeyboard(settings->getEnableRemoteInputs());
 		GetClient(*i)->EnablePointer(settings->getEnableRemoteInputs());
+		GetClient(*i)->EnableGii(settings->getEnableRemoteInputs());
 	}
 }
 
