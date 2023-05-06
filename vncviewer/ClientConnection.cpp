@@ -6377,7 +6377,7 @@ void ClientConnection::ReadServerCutText()
 				}
 				break;
 			case clipRequest:
-				{
+				if (!m_opts->m_DisableClipboard && !m_opts->m_ViewOnly) {
 					ClipboardData clipboardData;
 
 					// only need an owner window when setting clipboard data -- by using NULL we can rely on fewer locks
