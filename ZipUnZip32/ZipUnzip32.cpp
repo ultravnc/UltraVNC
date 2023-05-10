@@ -255,7 +255,7 @@ bool CZipUnZip32::UnZipDirectory(char* szRootDir, char* szZipFileName)
 	m_lpDCL->nfflag = 0; // Do not freshen existing files only 
 	m_lpDCL->noflag = 1; // Over-write all files if true
 	m_lpDCL->ExtractOnlyNewer = 0; // Do not extract only newer
-	m_lpDCL->PromptToOverwrite = 0; // "Overwrite all" selected -> no query mode
+	m_lpDCL->PromptToOverwrite = 1; // "Overwrite all" selected -> no query mode
 	m_lpDCL->lpszZipFN = szZipFileName; // The archive name 
 	m_lpDCL->lpszExtractDir = szRootDir; // The directory to extract to. This is set to NULL if you are extracting to the current directory.
 	
