@@ -386,7 +386,7 @@ vncClientId vncServer::AddClient(VSocket* socket, BOOL auth, BOOL shared, int ca
 		if (m_unauthClients.size() > 0) {
 			szInfo[strlen(szInfo) - 2] = '\0';
 			wchar_t temp[256] = { 0 };
-			_snwprintf_s(temp, 255, L"%s", szInfo);
+			_snwprintf_s(temp, 255, L"%hs", szInfo);
 			vncMenu::NotifyBalloon(temp);
 		}
 	}
@@ -513,10 +513,10 @@ vncServer::Authenticated(vncClientId clientid)
 		if (settings->getScPrompt()) {
 			wchar_t szInfo[256] = { 0 };
 			if (client->GetRepeaterID() && (strlen(client->GetRepeaterID()) > 0)) {
-				_snwprintf_s(szInfo, 255, L"UltraVNC is controling your device. \r Remote access from ID: %s", client->GetRepeaterID());
+				_snwprintf_s(szInfo, 255, L"UltraVNC is controling your device. \r Remote access from ID: %hs", client->GetRepeaterID());
 			}
 			else {
-				_snwprintf_s(szInfo, 255, L"UltraVNC is controling your device. \r Remote access from ip address %s", client->GetClientNameName());
+				_snwprintf_s(szInfo, 255, L"UltraVNC is controling your device. \r Remote access from ip address %hs", client->GetClientNameName());
 			}
 			vncMenu::NotifyBalloon(szInfo);
 		}
@@ -526,22 +526,22 @@ vncServer::Authenticated(vncClientId clientid)
 				wchar_t szInfo[256] = { 0 };
 				wchar_t szTitle[63] = { 0 };
 				if (client->GetRepeaterID() && (strlen(client->GetRepeaterID()) > 0)) {
-					_snwprintf_s(szTitle, 63,L"Connection from: %s", client->GetRepeaterID());
+					_snwprintf_s(szTitle, 63,L"Connection from: %hs", client->GetRepeaterID());
 				}
 				else {
-					_snwprintf_s(szTitle, 63, L"Connection from: %s", client->GetClientNameName());
+					_snwprintf_s(szTitle, 63, L"Connection from: %hs", client->GetClientNameName());
 					szTitle[62] = '\0';
 				}
-				_snwprintf_s(szInfo, 255, L"%s", client->infoMsg);
+				_snwprintf_s(szInfo, 255, L"%hs", client->infoMsg);
 				vncMenu::NotifyBalloon(szInfo, szTitle);
 			}
 			else if (settings->getNotificationSelection() == 0) {
 				wchar_t szInfo[256] = { 0 };
 				if (client->GetRepeaterID() && (strlen(client->GetRepeaterID()) > 0)) {
-					_snwprintf_s(szInfo, 255, L"UltraVNC is controling your device. \r Remote access from ID: %s", client->GetRepeaterID());
+					_snwprintf_s(szInfo, 255, L"UltraVNC is controling your device. \r Remote access from ID: %hs", client->GetRepeaterID());
 				}
 				else {
-					_snwprintf_s(szInfo, 255, L"UltraVNC is controling your device. \r Remote access from ip address %s", client->GetClientNameName());
+					_snwprintf_s(szInfo, 255, L"UltraVNC is controling your device. \r Remote access from ip address %hs", client->GetClientNameName());
 				}
 				vncMenu::NotifyBalloon(szInfo);
 			}
