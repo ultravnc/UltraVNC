@@ -377,7 +377,7 @@ vncClientId vncServer::AddClient(VSocket* socket, BOOL auth, BOOL shared, int ca
 		wchar_t szTitle2[256] = { 0 };
 		wchar_t szInfo2[256] = { 0 };
 
-		_snwprintf_s(szInfo2, 255, L"%s \n%s \n %s", ScSelect::Balloon1A, ScSelect::Balloon1B, ScSelect::Balloon1C);
+		_snwprintf_s(szInfo2, 255, L"%s %s %s", ScSelect::Balloon1A, ScSelect::Balloon1B, ScSelect::Balloon1C);
 		_snwprintf_s(szTitle2, 255, L"%s", ScSelect::Balloon1Title);
 		vncMenu::NotifyBalloon(szInfo2, szTitle2);
 		return clientid;
@@ -503,7 +503,7 @@ vncServer::Authenticated(vncClientId clientid)
 		wchar_t szTitle[256] = { 0 };
 		wchar_t szInfo[256] = { 0 };
 
-		_snwprintf_s(szInfo, 255, L"%s \n%s \n %s", ScSelect::Balloon2A, ScSelect::Balloon2B, ScSelect::Balloon2C);
+		_snwprintf_s(szInfo, 255, L"%s %s %s", ScSelect::Balloon2A, ScSelect::Balloon2B, ScSelect::Balloon2C);
 		if (settings->getNotification() && strlen(client->infoMsg) > 0)
 			_snwprintf_s(szInfo, 255, L"%s", client->infoMsg);
 		_snwprintf_s(szTitle, 255, L"%s", ScSelect::Balloon2Title);
