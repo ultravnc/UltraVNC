@@ -40,7 +40,6 @@ extern VNCLog vnclog;
 #include "Localization.h" // Act : add localization on messages
 
 typedef BOOL(*CheckUserGroupPasswordFn)(char* userin, char* password, char* machine, char* group, int locdom);
-CheckUserGroupPasswordFn CheckUserGroupPassword = 0;
 
 int CheckUserGroupPasswordUni(char* userin, char* password, const char* machine);
 int CheckUserGroupPasswordUni2(char* userin, char* password, const char* machine);
@@ -103,6 +102,7 @@ bool CheckNetApiNT()
 int CheckUserGroupPasswordUni(char* userin, char* password, const char* machine)
 {
 	int result = 0;
+	HMODULE hModuleAuthSSP = NULL;
 	// Marscha@2004 - authSSP: if "New MS-Logon" is checked, call CUPSD in authSSP.dll,
 	// else call "old" mslogon method.
 	if (IsNewMSLogon()) {
@@ -112,15 +112,15 @@ int CheckUserGroupPasswordUni(char* userin, char* password, const char* machine)
 			*p = '\0';
 			strcat_s(szCurrentDir, "\\authSSP.dll");
 		}
-		HMODULE hModule = LoadLibrary(szCurrentDir);
-		if (hModule) {
-			CheckUserPasswordSDUni = (CheckUserPasswordSDUniFn)GetProcAddress(hModule, "CUPSD");
+		hModuleAuthSSP = LoadLibrary(szCurrentDir);
+		if (hModuleAuthSSP) {
+			CheckUserPasswordSDUni = (CheckUserPasswordSDUniFn)GetProcAddress(hModuleAuthSSP, "CUPSD");
 			vnclog.Print(LL_INTINFO, VNCLOG("GetProcAddress"));
 			CoInitialize(NULL);
 			result = CheckUserPasswordSDUni(userin, password, machine);
 			vnclog.Print(LL_INTINFO, "CheckUserPasswordSDUni result=%i", result);
 			CoUninitialize();
-			FreeLibrary(hModule);
+			FreeLibrary(hModuleAuthSSP);
 			//result = CheckUserPasswordSDUni(userin, password, machine);
 		}
 		else {
@@ -136,6 +136,18 @@ int CheckUserGroupPasswordUni(char* userin, char* password, const char* machine)
 
 int CheckUserGroupPasswordUni2(char* userin, char* password, const char* machine)
 {
+	HMODULE hModuleAdmin = NULL;
+	HMODULE hModuleWorkgroup = NULL;
+	HMODULE hModuleLdapAuth = NULL;
+	HMODULE hModuleLdapAuthNT4 = NULL;
+	HMODULE hModuleLdapAuth9x = NULL;
+
+	CheckUserGroupPasswordFn CheckUserGroupPasswordAdmin = NULL;
+	CheckUserGroupPasswordFn CheckUserGroupPasswordWorkgroup = NULL;
+	CheckUserGroupPasswordFn CheckUserGroupPasswordLdapAuth = NULL;
+	CheckUserGroupPasswordFn CheckUserGroupPasswordLdapAuthNT4 = NULL;
+	CheckUserGroupPasswordFn CheckUserGroupPasswordLdapAuth9x = NULL;
+
 	int result = 0;
 	BOOL NT4OS = false;
 	BOOL W2KOS = false;
@@ -159,6 +171,69 @@ int CheckUserGroupPasswordUni2(char* userin, char* password, const char* machine
 	{
 		W2KOS = true;
 	}
+
+
+	char szCurrentDir[MAX_PATH];
+	if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
+	{
+		char* p = strrchr(szCurrentDir, '\\');
+		if (p == NULL) return false;
+		*p = '\0';
+		strcat_s(szCurrentDir, "\\authadmin.dll");
+	}
+	hModuleAdmin = LoadLibrary(szCurrentDir);
+	if (hModuleAdmin)
+	{
+		CheckUserGroupPasswordAdmin = (CheckUserGroupPasswordFn)GetProcAddress(hModuleAdmin, "CUGP");
+	}
+	if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
+	{
+		char* p = strrchr(szCurrentDir, '\\');
+		if (p == NULL) return false;
+		*p = '\0';
+		strcat_s(szCurrentDir, "\\workgrpdomnt4.dll");
+	}
+	hModuleWorkgroup = LoadLibrary(szCurrentDir);
+	if (hModuleWorkgroup)
+	{
+		CheckUserGroupPasswordWorkgroup = (CheckUserGroupPasswordFn)GetProcAddress(hModuleWorkgroup, "CUGP");
+	}
+	if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
+	{
+		char* p = strrchr(szCurrentDir, '\\');
+		if (p == NULL) return false;
+		*p = '\0';
+		strcat_s(szCurrentDir, "\\ldapauth.dll");
+	}
+	hModuleLdapAuth = LoadLibrary(szCurrentDir);
+	if (hModuleLdapAuth)
+	{
+		CheckUserGroupPasswordLdapAuth = (CheckUserGroupPasswordFn)GetProcAddress(hModuleLdapAuth, "CUGP");
+	}
+	if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
+	{
+		char* p = strrchr(szCurrentDir, '\\');
+		if (p == NULL) return false;
+		*p = '\0';
+		strcat_s(szCurrentDir, "\\ldapauthnt4.dll");
+	}
+	hModuleLdapAuthNT4 = LoadLibrary(szCurrentDir);
+	if (hModuleLdapAuthNT4)
+	{
+		CheckUserGroupPasswordLdapAuthNT4 = (CheckUserGroupPasswordFn)GetProcAddress(hModuleLdapAuthNT4, "CUGP");
+	}
+	if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
+	{
+		char* p = strrchr(szCurrentDir, '\\');
+		if (p == NULL) return false;
+		*p = '\0';
+		strcat_s(szCurrentDir, "\\ldapauth9x.dll");
+	}
+	hModuleLdapAuth9x = LoadLibrary(szCurrentDir);
+	if (hModuleLdapAuth9x)
+	{
+		CheckUserGroupPasswordLdapAuth9x = (CheckUserGroupPasswordFn)GetProcAddress(hModuleLdapAuth9x, "CUGP");
+	}
 	//////////////////////////////////////////////////
 	// Load reg settings
 	//////////////////////////////////////////////////
@@ -173,22 +248,11 @@ int CheckUserGroupPasswordUni2(char* userin, char* password, const char* machine
 ////////////////////////////////////////////////////
 	if (strcmp(settings->getGroup1(), "") == 0 && strcmp(settings->getGroup2(), "") == 0 && strcmp(settings->getGroup3(), "") == 0)
 		if (NT4OS || W2KOS) {
-			char szCurrentDir[MAX_PATH];
-			if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
+			if (CheckUserGroupPasswordAdmin)
 			{
-				char* p = strrchr(szCurrentDir, '\\');
-				if (p == NULL) return false;
-				*p = '\0';
-				strcat_s(szCurrentDir, "\\authadmin.dll");
-			}
-			HMODULE hModule = LoadLibrary(szCurrentDir);
-			if (hModule)
-			{
-				CheckUserGroupPassword = (CheckUserGroupPasswordFn)GetProcAddress(hModule, "CUGP");
 				CoInitialize(NULL);
-				result = CheckUserGroupPassword(userin, password, clientname, settings->getGroup1(), settings->getLocdom1());
+				result = CheckUserGroupPasswordAdmin(userin, password, clientname, settings->getGroup1(), settings->getLocdom1());
 				CoUninitialize();
-				FreeLibrary(hModule);
 			}
 			else
 			{
@@ -205,22 +269,12 @@ int CheckUserGroupPasswordUni2(char* userin, char* password, const char* machine
 		//
 		///////////////////////////////////////////////////
 		{
-			char szCurrentDir[MAX_PATH];
-			if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
+			
+			if (CheckUserGroupPasswordWorkgroup)
 			{
-				char* p = strrchr(szCurrentDir, '\\');
-				if (p == NULL) return false;
-				*p = '\0';
-				strcat_s(szCurrentDir, "\\workgrpdomnt4.dll");
-			}
-			HMODULE hModule = LoadLibrary(szCurrentDir);
-			if (hModule)
-			{
-				CheckUserGroupPassword = (CheckUserGroupPasswordFn)GetProcAddress(hModule, "CUGP");
 				CoInitialize(NULL);
-				result = CheckUserGroupPassword(userin, password, clientname, settings->getGroup1(), settings->getLocdom1());
+				result = CheckUserGroupPasswordWorkgroup(userin, password, clientname, settings->getGroup1(), settings->getLocdom1());
 				CoUninitialize();
-				FreeLibrary(hModule);
 			}
 			else
 			{
@@ -232,22 +286,11 @@ int CheckUserGroupPasswordUni2(char* userin, char* password, const char* machine
 		/////////////////////////////////////////////////////////////////
 		if (CheckAD() && W2KOS && (settings->getLocdom1() == 2 || settings->getLocdom1() == 3))
 		{
-			char szCurrentDir[MAX_PATH];
-			if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
+			if (CheckUserGroupPasswordLdapAuth)
 			{
-				char* p = strrchr(szCurrentDir, '\\');
-				if (p == NULL) return false;
-				*p = '\0';
-				strcat_s(szCurrentDir, "\\ldapauth.dll");
-			}
-			HMODULE hModule = LoadLibrary(szCurrentDir);
-			if (hModule)
-			{
-				CheckUserGroupPassword = (CheckUserGroupPasswordFn)GetProcAddress(hModule, "CUGP");
 				CoInitialize(NULL);
-				result = CheckUserGroupPassword(userin, password, clientname, settings->getGroup1(), settings->getLocdom1());
+				result = CheckUserGroupPasswordLdapAuth(userin, password, clientname, settings->getGroup1(), settings->getLocdom1());
 				CoUninitialize();
-				FreeLibrary(hModule);
 			}
 			else
 			{
@@ -259,22 +302,12 @@ int CheckUserGroupPasswordUni2(char* userin, char* password, const char* machine
 		//////////////////////////////////////////////////////////////////////
 		if (CheckAD() && NT4OS && CheckDsGetDcNameW() && (settings->getLocdom1() == 2 || settings->getLocdom1() == 3))
 		{
-			char szCurrentDir[MAX_PATH];
-			if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
+			
+			if (CheckUserGroupPasswordLdapAuthNT4)
 			{
-				char* p = strrchr(szCurrentDir, '\\');
-				if (p == NULL) return false;
-				*p = '\0';
-				strcat_s(szCurrentDir, "\\ldapauthnt4.dll");
-			}
-			HMODULE hModule = LoadLibrary(szCurrentDir);
-			if (hModule)
-			{
-				CheckUserGroupPassword = (CheckUserGroupPasswordFn)GetProcAddress(hModule, "CUGP");
 				CoInitialize(NULL);
-				result = CheckUserGroupPassword(userin, password, clientname, settings->getGroup1(), settings->getLocdom1());
+				result = CheckUserGroupPasswordLdapAuthNT4(userin, password, clientname, settings->getGroup1(), settings->getLocdom1());
 				CoUninitialize();
-				FreeLibrary(hModule);
 			}
 			else
 			{
@@ -286,22 +319,11 @@ int CheckUserGroupPasswordUni2(char* userin, char* password, const char* machine
 		//////////////////////////////////////////////////////////////////////
 		if (CheckAD() && !NT4OS && !W2KOS && (settings->getLocdom1() == 2 || settings->getLocdom1() == 3))
 		{
-			char szCurrentDir[MAX_PATH];
-			if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
+			if (CheckUserGroupPasswordLdapAuth9x)
 			{
-				char* p = strrchr(szCurrentDir, '\\');
-				if (p == NULL) return false;
-				*p = '\0';
-				strcat_s(szCurrentDir, "\\ldapauth9x.dll");
-			}
-			HMODULE hModule = LoadLibrary(szCurrentDir);
-			if (hModule)
-			{
-				CheckUserGroupPassword = (CheckUserGroupPasswordFn)GetProcAddress(hModule, "CUGP");
 				CoInitialize(NULL);
-				result = CheckUserGroupPassword(userin, password, clientname, settings->getGroup1(), settings->getLocdom1());
+				result = CheckUserGroupPasswordLdapAuth9x(userin, password, clientname, settings->getGroup1(), settings->getLocdom1());
 				CoUninitialize();
-				FreeLibrary(hModule);
 			}
 			else
 			{
@@ -319,22 +341,11 @@ int CheckUserGroupPasswordUni2(char* userin, char* password, const char* machine
 		//
 		///////////////////////////////////////////////////
 		{
-			char szCurrentDir[MAX_PATH];
-			if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
+			if (CheckUserGroupPasswordWorkgroup)
 			{
-				char* p = strrchr(szCurrentDir, '\\');
-				if (p == NULL) return false;
-				*p = '\0';
-				strcat_s(szCurrentDir, "\\workgrpdomnt4.dll");
-			}
-			HMODULE hModule = LoadLibrary(szCurrentDir);
-			if (hModule)
-			{
-				CheckUserGroupPassword = (CheckUserGroupPasswordFn)GetProcAddress(hModule, "CUGP");
 				CoInitialize(NULL);
-				result = CheckUserGroupPassword(userin, password, clientname, settings->getGroup2(), settings->getLocdom2());
+				result = CheckUserGroupPasswordWorkgroup(userin, password, clientname, settings->getGroup2(), settings->getLocdom2());
 				CoUninitialize();
-				FreeLibrary(hModule);
 			}
 			else
 			{
@@ -345,22 +356,11 @@ int CheckUserGroupPasswordUni2(char* userin, char* password, const char* machine
 		if (result == 1) goto accessOK;
 		//////////////////////////////////////////////////////
 		if (NT4OS || W2KOS) {
-			char szCurrentDir[MAX_PATH];
-			if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
+			if (CheckUserGroupPasswordAdmin)
 			{
-				char* p = strrchr(szCurrentDir, '\\');
-				if (p == NULL) return false;
-				*p = '\0';
-				strcat_s(szCurrentDir, "\\authadmin.dll");
-			}
-			HMODULE hModule = LoadLibrary(szCurrentDir);
-			if (hModule)
-			{
-				CheckUserGroupPassword = (CheckUserGroupPasswordFn)GetProcAddress(hModule, "CUGP");
 				CoInitialize(NULL);
-				result = CheckUserGroupPassword(userin, password, clientname, settings->getGroup2(), settings->getLocdom2());
+				result = CheckUserGroupPasswordAdmin(userin, password, clientname, settings->getGroup2(), settings->getLocdom2());
 				CoUninitialize();
-				FreeLibrary(hModule);
 			}
 			else
 			{
@@ -372,22 +372,11 @@ int CheckUserGroupPasswordUni2(char* userin, char* password, const char* machine
 		//////////////////////////////////////////////////////////////////
 		if (CheckAD() && W2KOS && (settings->getLocdom2() == 2 || settings->getLocdom2() == 3))
 		{
-			char szCurrentDir[MAX_PATH];
-			if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
+			if (CheckUserGroupPasswordLdapAuth)
 			{
-				char* p = strrchr(szCurrentDir, '\\');
-				if (p == NULL) return false;
-				*p = '\0';
-				strcat_s(szCurrentDir, "\\ldapauth.dll");
-			}
-			HMODULE hModule = LoadLibrary(szCurrentDir);
-			if (hModule)
-			{
-				CheckUserGroupPassword = (CheckUserGroupPasswordFn)GetProcAddress(hModule, "CUGP");
 				CoInitialize(NULL);
-				result = CheckUserGroupPassword(userin, password, clientname, settings->getGroup2(), settings->getLocdom2());
+				result = CheckUserGroupPasswordLdapAuth(userin, password, clientname, settings->getGroup2(), settings->getLocdom2());
 				CoUninitialize();
-				FreeLibrary(hModule);
 			}
 			else
 			{
@@ -399,22 +388,11 @@ int CheckUserGroupPasswordUni2(char* userin, char* password, const char* machine
 		///////////////////////////////////////////////////////////////////////
 		if (CheckAD() && NT4OS && CheckDsGetDcNameW() && (settings->getLocdom2() == 2 || settings->getLocdom2() == 3))
 		{
-			char szCurrentDir[MAX_PATH];
-			if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
+			if (CheckUserGroupPasswordLdapAuthNT4)
 			{
-				char* p = strrchr(szCurrentDir, '\\');
-				if (p == NULL) return false;
-				*p = '\0';
-				strcat_s(szCurrentDir, "\\ldapauthnt4.dll");
-			}
-			HMODULE hModule = LoadLibrary(szCurrentDir);
-			if (hModule)
-			{
-				CheckUserGroupPassword = (CheckUserGroupPasswordFn)GetProcAddress(hModule, "CUGP");
 				CoInitialize(NULL);
-				result = CheckUserGroupPassword(userin, password, clientname, settings->getGroup2(), settings->getLocdom2());
+				result = CheckUserGroupPasswordLdapAuthNT4(userin, password, clientname, settings->getGroup2(), settings->getLocdom2());
 				CoUninitialize();
-				FreeLibrary(hModule);
 			}
 			else
 			{
@@ -426,22 +404,11 @@ int CheckUserGroupPasswordUni2(char* userin, char* password, const char* machine
 		///////////////////////////////////////////////////////////////////////
 		if (CheckAD() && !NT4OS && !W2KOS && (settings->getLocdom2() == 2 || settings->getLocdom2() == 3))
 		{
-			char szCurrentDir[MAX_PATH];
-			if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
+			if (CheckUserGroupPasswordLdapAuth9x)
 			{
-				char* p = strrchr(szCurrentDir, '\\');
-				if (p == NULL) return false;
-				*p = '\0';
-				strcat_s(szCurrentDir, "\\ldapauth9x.dll");
-			}
-			HMODULE hModule = LoadLibrary(szCurrentDir);
-			if (hModule)
-			{
-				CheckUserGroupPassword = (CheckUserGroupPasswordFn)GetProcAddress(hModule, "CUGP");
 				CoInitialize(NULL);
-				result = CheckUserGroupPassword(userin, password, clientname, settings->getGroup2(), settings->getLocdom2());
+				result = CheckUserGroupPasswordLdapAuth9x(userin, password, clientname, settings->getGroup2(), settings->getLocdom2());
 				CoUninitialize();
-				FreeLibrary(hModule);
 			}
 			else
 			{
@@ -459,22 +426,11 @@ int CheckUserGroupPasswordUni2(char* userin, char* password, const char* machine
 		//
 		///////////////////////////////////////////////////
 		{
-			char szCurrentDir[MAX_PATH];
-			if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
+			if (CheckUserGroupPasswordWorkgroup)
 			{
-				char* p = strrchr(szCurrentDir, '\\');
-				if (p == NULL) return false;
-				*p = '\0';
-				strcat_s(szCurrentDir, "\\workgrpdomnt4.dll");
-			}
-			HMODULE hModule = LoadLibrary(szCurrentDir);
-			if (hModule)
-			{
-				CheckUserGroupPassword = (CheckUserGroupPasswordFn)GetProcAddress(hModule, "CUGP");
 				CoInitialize(NULL);
-				result = CheckUserGroupPassword(userin, password, clientname, settings->getGroup3(), settings->getLocdom3());
+				result = CheckUserGroupPasswordWorkgroup(userin, password, clientname, settings->getGroup3(), settings->getLocdom3());
 				CoUninitialize();
-				FreeLibrary(hModule);
 			}
 			else
 			{
@@ -485,22 +441,11 @@ int CheckUserGroupPasswordUni2(char* userin, char* password, const char* machine
 		if (result == 1) goto accessOK2;
 		////////////////////////////////////////////////////////
 		if (NT4OS || W2KOS) {
-			char szCurrentDir[MAX_PATH];
-			if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
+			if (CheckUserGroupPasswordAdmin)
 			{
-				char* p = strrchr(szCurrentDir, '\\');
-				if (p == NULL) return false;
-				*p = '\0';
-				strcat_s(szCurrentDir, "\\authadmin.dll");
-			}
-			HMODULE hModule = LoadLibrary(szCurrentDir);
-			if (hModule)
-			{
-				CheckUserGroupPassword = (CheckUserGroupPasswordFn)GetProcAddress(hModule, "CUGP");
 				CoInitialize(NULL);
-				result = CheckUserGroupPassword(userin, password, clientname, settings->getGroup3(), settings->getLocdom3());
+				result = CheckUserGroupPasswordAdmin(userin, password, clientname, settings->getGroup3(), settings->getLocdom3());
 				CoUninitialize();
-				FreeLibrary(hModule);
 			}
 			else
 			{
@@ -512,22 +457,11 @@ int CheckUserGroupPasswordUni2(char* userin, char* password, const char* machine
 		////////////////////////////////////////////////////////////////
 		if (CheckAD() && W2KOS && (settings->getLocdom3() == 2 || settings->getLocdom3() == 3))
 		{
-			char szCurrentDir[MAX_PATH];
-			if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
+			if (CheckUserGroupPasswordLdapAuth)
 			{
-				char* p = strrchr(szCurrentDir, '\\');
-				if (p == NULL) return false;
-				*p = '\0';
-				strcat_s(szCurrentDir, "\\ldapauth.dll");
-			}
-			HMODULE hModule = LoadLibrary(szCurrentDir);
-			if (hModule)
-			{
-				CheckUserGroupPassword = (CheckUserGroupPasswordFn)GetProcAddress(hModule, "CUGP");
 				CoInitialize(NULL);
-				result = CheckUserGroupPassword(userin, password, clientname, settings->getGroup3(), settings->getLocdom3());
+				result = CheckUserGroupPasswordLdapAuth(userin, password, clientname, settings->getGroup3(), settings->getLocdom3());
 				CoUninitialize();
-				FreeLibrary(hModule);
 			}
 			else
 			{
@@ -539,22 +473,11 @@ int CheckUserGroupPasswordUni2(char* userin, char* password, const char* machine
 		///////////////////////////////////////////////////////////////////
 		if (CheckAD() && NT4OS && CheckDsGetDcNameW() && (settings->getLocdom3() == 2 || settings->getLocdom3() == 3))
 		{
-			char szCurrentDir[MAX_PATH];
-			if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
+			if (CheckUserGroupPasswordLdapAuthNT4)
 			{
-				char* p = strrchr(szCurrentDir, '\\');
-				if (p == NULL) return false;
-				*p = '\0';
-				strcat_s(szCurrentDir, "\\ldapauthnt4.dll");
-			}
-			HMODULE hModule = LoadLibrary(szCurrentDir);
-			if (hModule)
-			{
-				CheckUserGroupPassword = (CheckUserGroupPasswordFn)GetProcAddress(hModule, "CUGP");
 				CoInitialize(NULL);
-				result = CheckUserGroupPassword(userin, password, clientname, settings->getGroup3(), settings->getLocdom3());
+				result = CheckUserGroupPasswordLdapAuthNT4(userin, password, clientname, settings->getGroup3(), settings->getLocdom3());
 				CoUninitialize();
-				FreeLibrary(hModule);
 			}
 			else
 			{
@@ -566,22 +489,11 @@ int CheckUserGroupPasswordUni2(char* userin, char* password, const char* machine
 		///////////////////////////////////////////////////////////////////
 		if (CheckAD() && !NT4OS && !W2KOS && (settings->getLocdom3() == 2 || settings->getLocdom3() == 3))
 		{
-			char szCurrentDir[MAX_PATH];
-			if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
+			if (CheckUserGroupPasswordLdapAuth9x)
 			{
-				char* p = strrchr(szCurrentDir, '\\');
-				if (p == NULL) return false;
-				*p = '\0';
-				strcat_s(szCurrentDir, "\\ldapauth9x.dll");
-			}
-			HMODULE hModule = LoadLibrary(szCurrentDir);
-			if (hModule)
-			{
-				CheckUserGroupPassword = (CheckUserGroupPasswordFn)GetProcAddress(hModule, "CUGP");
 				CoInitialize(NULL);
-				result = CheckUserGroupPassword(userin, password, clientname, settings->getGroup3(), settings->getLocdom3());
+				result = CheckUserGroupPasswordLdapAuth9x(userin, password, clientname, settings->getGroup3(), settings->getLocdom3());
 				CoUninitialize();
-				FreeLibrary(hModule);
 			}
 			else
 			{
@@ -612,6 +524,16 @@ int CheckUserGroupPasswordUni2(char* userin, char* password, const char* machine
 			Logevent((char*)clientname, userin);
 			FreeLibrary(hModule);
 		}
+		if (hModuleAdmin) FreeLibrary(hModuleAdmin);
+		if (hModuleWorkgroup) FreeLibrary(hModuleWorkgroup);
+		if (hModuleLdapAuth) FreeLibrary(hModuleLdapAuth);
+		if (hModuleLdapAuthNT4) FreeLibrary(hModuleLdapAuthNT4);
+		if (hModuleLdapAuth9x) FreeLibrary(hModuleLdapAuth9x);
+		hModuleAdmin = NULL;
+		hModuleWorkgroup = NULL;
+		hModuleLdapAuth = NULL;
+		hModuleLdapAuthNT4 = NULL;
+		hModuleLdapAuth9x = NULL;
 		return result;
 	}
 
@@ -633,6 +555,19 @@ accessOK://full access
 			Logevent((char*)clientname, userin);
 			FreeLibrary(hModule);
 		}
+
+
+		if (hModuleAdmin) FreeLibrary(hModuleAdmin);
+		if (hModuleWorkgroup) FreeLibrary(hModuleWorkgroup);
+		if (hModuleLdapAuth) FreeLibrary(hModuleLdapAuth);
+		if (hModuleLdapAuthNT4) FreeLibrary(hModuleLdapAuthNT4);
+		if (hModuleLdapAuth9x) FreeLibrary(hModuleLdapAuth9x);
+		hModuleAdmin = NULL;
+		hModuleWorkgroup = NULL;
+		hModuleLdapAuth = NULL;
+		hModuleLdapAuthNT4 = NULL;
+		hModuleLdapAuth9x = NULL;
+
 		return result;
 	}
 
@@ -654,9 +589,28 @@ accessOK2://readonly
 			Logevent((char*)clientname, userin);
 			FreeLibrary(hModule);
 		}
+		if (hModuleAdmin) FreeLibrary(hModuleAdmin);
+		if (hModuleWorkgroup) FreeLibrary(hModuleWorkgroup);
+		if (hModuleLdapAuth) FreeLibrary(hModuleLdapAuth);
+		if (hModuleLdapAuthNT4) FreeLibrary(hModuleLdapAuthNT4);
+		if (hModuleLdapAuth9x) FreeLibrary(hModuleLdapAuth9x);
+		hModuleAdmin = NULL;
+		hModuleWorkgroup = NULL;
+		hModuleLdapAuth = NULL;
+		hModuleLdapAuthNT4 = NULL;
+		hModuleLdapAuth9x = NULL;
 		result = 2;
 	}
-
+	if (hModuleAdmin) FreeLibrary(hModuleAdmin);
+	if (hModuleWorkgroup) FreeLibrary(hModuleWorkgroup);
+	if (hModuleLdapAuth) FreeLibrary(hModuleLdapAuth);
+	if (hModuleLdapAuthNT4) FreeLibrary(hModuleLdapAuthNT4);
+	if (hModuleLdapAuth9x) FreeLibrary(hModuleLdapAuth9x);
+	hModuleAdmin = NULL;
+	hModuleWorkgroup = NULL;
+	hModuleLdapAuth = NULL;
+	hModuleLdapAuthNT4 = NULL;
+	hModuleLdapAuth9x = NULL;
 	return result;
 }
 

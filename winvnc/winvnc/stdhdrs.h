@@ -41,7 +41,7 @@
 #endif
 #endif
 
-#ifdef _USE_DESKTOPDUPLICATION
+/*#ifdef _USE_DESKTOPDUPLICATION
 #define _WIN32_WINNT 0x0602
 #ifndef WINVER
 #define WINVER 0x0602
@@ -51,7 +51,7 @@
 #ifndef WINVER
 #define WINVER 0x0500
 #endif
-#endif
+#endif*/
 
 #define WIN32_LEAN_AND_MEAN
 #ifndef STRICT
