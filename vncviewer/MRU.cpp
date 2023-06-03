@@ -34,6 +34,9 @@
 #include <direct.h>
 
 static const TCHAR * INDEX_VAL_NAME = _T("index");
+static const TCHAR * RESERVED_CHARS = _T("[;");  //String of characters that will cause a key/value line to be parsed differently if set as a key
+static const TCHAR FIRST_USEABLE_ID = _T('A');
+static const TCHAR LAST_USEABLE_ID = _T('~');
 static const int MRU_MAX_ITEM_LENGTH = 256;
 
 MRU::MRU(LPTSTR keyname, unsigned int maxnum)
@@ -58,12 +61,12 @@ void MRU::AddItem(LPTSTR txt)
     // Read each value in index,
     // noting which is the first unused id
     TCHAR id = _T('\0');
-    TCHAR firstUnusedId = _T('A');
+    TCHAR firstUnusedId = FIRST_USEABLE_ID;
     TCHAR itembuf[MRU_MAX_ITEM_LENGTH+1];
-	// Find first unused letter.
-	while (_tcschr(m_index, firstUnusedId) != NULL)
-		firstUnusedId++;
-    for (int i = 0; i < (int) _tcslen(m_index); i++) {       
+
+    // Scan through the index
+    for (int i = 0; i < (int)_tcslen(m_index); i++) {
+    id = m_index[i];
         // Does this entry already contain the item we're adding
         if (GetItem(i, itembuf, MRU_MAX_ITEM_LENGTH) != 0) {           
             // If a value matches the txt specified, move it to the front.
@@ -71,7 +74,6 @@ void MRU::AddItem(LPTSTR txt)
                 id = m_index[i];
                 for (int j = i; j > 0; j--)
                     m_index[j] = m_index[j-1];
-                m_index[0] = id;
                 WriteIndex();
                 // That's all we need to do.
                 return;
@@ -79,14 +81,24 @@ void MRU::AddItem(LPTSTR txt)
         }
     }
 
-    // If we haven't found it, then we need to create a new entry and put it
+    // Find first available unused id
+    while ((_tcschr(m_index, _totupper(firstUnusedId)) != NULL || _tcschr((TCHAR*)RESERVED_CHARS, firstUnusedId) != NULL) && _tcscmp(&firstUnusedId, &LAST_USEABLE_ID) <= 0)
+        firstUnusedId++;
+    // If we've run out of unused ids, use the last one in the index and then remove it from the end.
+    if (_tcscmp(&firstUnusedId, (TCHAR*)LAST_USEABLE_ID) > 0) {
+    firstUnusedId = id;
+    m_index[_tcslen(m_index) - 1] = _T('\0');
+    
+    }
+    
+    // If we haven't found a match, then we need to create a new entry and put it
     // at the front of the index.
     TCHAR valname[2];
     valname[0] = firstUnusedId;
     valname[1] = _T('\0');
 	WritePrivateProfileString("connection", valname, txt, m_optionfile);    
     // move all the current ids up one
-    for (int j = _tcslen(m_index)+1; j >= 0; j--)
+    for (int j = _tcslen(m_index) + 1; j >= 0; j--)
         m_index[j] = m_index[j-1];
 	m_index[MRU_MAX_ITEM_LENGTH] = _T('\0');
     // and insert this one at the front
