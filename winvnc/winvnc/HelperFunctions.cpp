@@ -409,12 +409,12 @@ namespace settingsHelpers {
 
 void Open_homepage()
 {
-	ShellExecute(0, "open", "http://www.uvnc.com", 0, 0, 1);
+	ShellExecute(0, "open", "https://www.uvnc.com", 0, 0, 1);
 }
 
 void Open_forum()
 {
-	ShellExecute(0, "open", "http://forum.uvnc.com", 0, 0, 1);
+	ShellExecute(0, "open", "https://forum.uvnc.com", 0, 0, 1);
 }
 
 #ifndef SC_20
