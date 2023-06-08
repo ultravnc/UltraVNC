@@ -69,6 +69,8 @@ protected:
 
 	// Message handler for the tray window
 	static LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam);
+	static bool OpenWebpageFromApp(int iMsg);
+	static bool OpenWebpageFromService(char* cmdline);
 
 	// Fields
 protected:

@@ -726,8 +726,92 @@ void vncMenu::Shutdown(bool kill_client)
 	if (kill_client) m_server->KillAuthClients();
 	G_MENU_HWND = NULL;
 }
+bool vncMenu::OpenWebpageFromService( char * cmdline)
+{
+	char dir[MAX_PATH];
+	strcpy_s(dir, cmdline);
+	WTS_SESSION_INFO* pSessionInfo;
+	DWORD n_sessions = 0;
+	if (WTSEnumerateSessions(WTS_CURRENT_SERVER, 0, 1, &pSessionInfo, &n_sessions)) {
+		DWORD SessionId = 0;
+		for (DWORD i = 0; i < n_sessions; ++i) {
+			if (pSessionInfo[i].State == WTSActive) {
+				SessionId = pSessionInfo[i].SessionId;
+				break;
+			}
+		}
+		WTSFreeMemory(pSessionInfo);
+		if (SessionId != 0) {
+			HANDLE hToken;
+			if (WTSQueryUserToken(SessionId, &hToken)) {
+				void* environment = NULL;
+				if (CreateEnvironmentBlock(&environment, hToken, TRUE)) {
+					HANDLE hToken2;
+					DuplicateTokenEx(hToken, MAXIMUM_ALLOWED, NULL, SecurityIdentification, TokenPrimary, &hToken2);
+					DWORD dwUIAccess = 1;
+					SetTokenInformation(hToken2, TokenUIAccess, &dwUIAccess, sizeof(dwUIAccess));
+					STARTUPINFO si = { 0 };
+					PROCESS_INFORMATION pi = { 0 };
+					si.cb = sizeof(STARTUPINFO);
+					si.dwFlags = STARTF_USESHOWWINDOW;
+					si.wShowWindow = FALSE;
+					si.lpDesktop = "winsta0\\default";
+					DWORD dwCreationFlags = NORMAL_PRIORITY_CLASS | CREATE_UNICODE_ENVIRONMENT;
+					if (CreateProcessAsUser(hToken2, NULL, dir, NULL, NULL, FALSE,
+						dwCreationFlags, environment, NULL, &si, &pi)) {
+						CloseHandle(pi.hThread);
+						CloseHandle(pi.hProcess);
+					}
+					DestroyEnvironmentBlock(environment);
+					CloseHandle(hToken);
+					CloseHandle(hToken2);
+					return true;
+				}
+				else
+					CloseHandle(hToken);
+			}
+		}
+	}
+	return false;
+}
 
-//extern BOOL G_HTTP;
+bool vncMenu::OpenWebpageFromApp(int iMsg)
+{
+	DesktopUsersToken desktopUsersToken;
+	HANDLE hPToken = desktopUsersToken.getDesktopUsersToken();
+	if (!hPToken)
+		return false;
+
+	char dir[MAX_PATH];
+	char exe_file_name[MAX_PATH];
+	GetModuleFileName(0, exe_file_name, MAX_PATH);
+	strcpy_s(dir, exe_file_name);
+	if (iMsg == ID_VISITUSONLINE_HOMEPAGE)
+		strcat_s(dir, " -openhomepage");
+	if (iMsg == ID_VISITUSONLINE_FORUM)
+		strcat_s(dir, " -openforum");
+
+	STARTUPINFO          StartUPInfo;
+	PROCESS_INFORMATION  ProcessInfo;
+	ZeroMemory(&StartUPInfo, sizeof(STARTUPINFO));
+	ZeroMemory(&ProcessInfo, sizeof(PROCESS_INFORMATION));
+	StartUPInfo.wShowWindow = SW_SHOW;
+	StartUPInfo.lpDesktop = "Winsta0\\Default";
+	StartUPInfo.cb = sizeof(STARTUPINFO);
+	PVOID                lpEnvironment = NULL;
+	if (CreateEnvironmentBlock(&lpEnvironment, hPToken, FALSE))
+		CreateProcessAsUser(hPToken, NULL, dir, NULL, NULL, FALSE, CREATE_UNICODE_ENVIRONMENT | DETACHED_PROCESS, lpEnvironment, NULL, &StartUPInfo, &ProcessInfo);
+	else
+		CreateProcessAsUser(hPToken, NULL, dir, NULL, NULL, FALSE, DETACHED_PROCESS, NULL, NULL, &StartUPInfo, &ProcessInfo);
+
+	if (ProcessInfo.hThread)
+		CloseHandle(ProcessInfo.hThread);
+	if (ProcessInfo.hProcess)
+		CloseHandle(ProcessInfo.hProcess);
+	if (lpEnvironment)
+		DestroyEnvironmentBlock(lpEnvironment);
+	return true;
+}
 
 char newuser[UNLEN + 1];
 // Process window messages
@@ -897,162 +981,19 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			break;
 
 		case ID_VISITUSONLINE_HOMEPAGE:
-			if (settings->RunningFromExternalService()) {
-				char dir[MAX_PATH];
-				strcpy_s(dir, "cmd /c start https://www.uvnc.com");
-				WTS_SESSION_INFO* pSessionInfo;
-				DWORD n_sessions = 0;
-				if (WTSEnumerateSessions(WTS_CURRENT_SERVER, 0, 1, &pSessionInfo, &n_sessions)) {
-					DWORD SessionId = 0;
-					for (DWORD i = 0; i < n_sessions; ++i) {
-						if (pSessionInfo[i].State == WTSActive) {
-							SessionId = pSessionInfo[i].SessionId;
-							break;
-						}
-					}
-					WTSFreeMemory(pSessionInfo);
-					if (SessionId != 0) {
-						HANDLE hToken;
-						if (WTSQueryUserToken(SessionId, &hToken)) {
-							void* environment = NULL;
-							if (CreateEnvironmentBlock(&environment, hToken, TRUE)) {
-								HANDLE hToken2;
-								DuplicateTokenEx(hToken, MAXIMUM_ALLOWED, NULL, SecurityIdentification, TokenPrimary, &hToken2);
-								DWORD dwUIAccess = 1;
-								SetTokenInformation(hToken2, TokenUIAccess, &dwUIAccess, sizeof(dwUIAccess));
-								STARTUPINFO si = { 0 };
-								PROCESS_INFORMATION pi = { 0 };
-								si.cb = sizeof(STARTUPINFO);
-								si.dwFlags = STARTF_USESHOWWINDOW;
-								si.wShowWindow = FALSE;
-								si.lpDesktop = "winsta0\\default";
-								DWORD dwCreationFlags = NORMAL_PRIORITY_CLASS | CREATE_UNICODE_ENVIRONMENT;
-								if (CreateProcessAsUser(hToken2, NULL, dir, NULL, NULL, FALSE,
-									dwCreationFlags, environment, NULL, &si, &pi)) {
-									CloseHandle(pi.hThread);
-									CloseHandle(pi.hProcess);
-								}
-								DestroyEnvironmentBlock(environment);
-								CloseHandle(hToken);
-								CloseHandle(hToken2);
-								break;
-							}
-							else
-								CloseHandle(hToken);
-						}
-					}
-				}
-			}
-			{				
-				DesktopUsersToken desktopUsersToken;
-				HANDLE hPToken = desktopUsersToken.getDesktopUsersToken();
-				if (!hPToken)
-					break;
-
-				char dir[MAX_PATH];
-				char exe_file_name[MAX_PATH];
-				GetModuleFileName(0, exe_file_name, MAX_PATH);
-				strcpy_s(dir, exe_file_name);
-				strcat_s(dir, " -openhomepage");
-
-				STARTUPINFO          StartUPInfo;
-				PROCESS_INFORMATION  ProcessInfo;
-				ZeroMemory(&StartUPInfo, sizeof(STARTUPINFO));
-				ZeroMemory(&ProcessInfo, sizeof(PROCESS_INFORMATION));
-				StartUPInfo.wShowWindow = SW_SHOW;
-				StartUPInfo.lpDesktop = "Winsta0\\Default";
-				StartUPInfo.cb = sizeof(STARTUPINFO);
-				PVOID                lpEnvironment = NULL;
-				if (CreateEnvironmentBlock(&lpEnvironment, hPToken, FALSE))
-					CreateProcessAsUser(hPToken, NULL, dir, NULL, NULL, FALSE, CREATE_UNICODE_ENVIRONMENT | DETACHED_PROCESS, lpEnvironment, NULL, &StartUPInfo, &ProcessInfo);
-				else
-					CreateProcessAsUser(hPToken, NULL, dir, NULL, NULL, FALSE, DETACHED_PROCESS, NULL, NULL, &StartUPInfo, &ProcessInfo);
-
-				if (ProcessInfo.hThread)
-					CloseHandle(ProcessInfo.hThread);
-				if (ProcessInfo.hProcess)
-					CloseHandle(ProcessInfo.hProcess);
-				if (lpEnvironment)
-					DestroyEnvironmentBlock(lpEnvironment);
-			}
-		break;
+			if (settings->RunningFromExternalService() && OpenWebpageFromService("cmd /c start https://www.uvnc.com"));
+			else 
+				OpenWebpageFromApp(ID_VISITUSONLINE_HOMEPAGE);
+			
+			break;
 
 		case ID_VISITUSONLINE_FORUM:
-		{
-			if (settings->RunningFromExternalService()) {
-				char dir[MAX_PATH];
-				strcpy_s(dir, "cmd /c start https://forum.uvnc.com");
-				WTS_SESSION_INFO* pSessionInfo;
-				DWORD n_sessions = 0;
-				if (WTSEnumerateSessions(WTS_CURRENT_SERVER, 0, 1, &pSessionInfo, &n_sessions)) {
-					DWORD SessionId = 0;
-					for (DWORD i = 0; i < n_sessions; ++i) {
-						if (pSessionInfo[i].State == WTSActive) {
-							SessionId = pSessionInfo[i].SessionId;
-							break;
-						}
-					}
-					WTSFreeMemory(pSessionInfo);
-					if (SessionId != 0) {
-						HANDLE hToken;
-						if (WTSQueryUserToken(SessionId, &hToken)) {
-							void* environment = NULL;
-							if (CreateEnvironmentBlock(&environment, hToken, TRUE)) {
-								HANDLE hToken2;
-								DuplicateTokenEx(hToken, MAXIMUM_ALLOWED, NULL, SecurityIdentification, TokenPrimary, &hToken2);
-								DWORD dwUIAccess = 1;
-								SetTokenInformation(hToken2, TokenUIAccess, &dwUIAccess, sizeof(dwUIAccess));
-								STARTUPINFO si = { 0 };
-								PROCESS_INFORMATION pi = { 0 };
-								si.cb = sizeof(STARTUPINFO);
-								si.dwFlags = STARTF_USESHOWWINDOW;
-								si.wShowWindow = FALSE;
-								si.lpDesktop = "winsta0\\default";
-								DWORD dwCreationFlags = NORMAL_PRIORITY_CLASS | CREATE_UNICODE_ENVIRONMENT;
-								if (CreateProcessAsUser(hToken2, NULL, dir, NULL, NULL, FALSE,
-									dwCreationFlags, environment, NULL, &si, &pi)) {
-									CloseHandle(pi.hThread);
-									CloseHandle(pi.hProcess);
-								}
-								DestroyEnvironmentBlock(environment);
-								CloseHandle(hToken);
-								CloseHandle(hToken2);
-								break;
-							}
-							else
-								CloseHandle(hToken);
-						}
-					}
-				}
-			}
-			{
-				DesktopUsersToken desktopUsersToken;
-				HANDLE hPToken = desktopUsersToken.getDesktopUsersToken();
-				if (!hPToken)
-					break;
+			if (settings->RunningFromExternalService() && OpenWebpageFromService("cmd /c start https://forum.uvnc.com"));
+			else
+				OpenWebpageFromApp(ID_VISITUSONLINE_HOMEPAGE);
 
-				char dir[MAX_PATH];
-				char exe_file_name[MAX_PATH];
-				GetModuleFileName(0, exe_file_name, MAX_PATH);
-				strcpy_s(dir, exe_file_name);
-				strcat_s(dir, " -openforum");
-
-				STARTUPINFO          StartUPInfo;
-				PROCESS_INFORMATION  ProcessInfo;
-				ZeroMemory(&StartUPInfo, sizeof(STARTUPINFO));
-				ZeroMemory(&ProcessInfo, sizeof(PROCESS_INFORMATION));
-				StartUPInfo.wShowWindow = SW_SHOW;
-				StartUPInfo.lpDesktop = "Winsta0\\Default";
-				StartUPInfo.cb = sizeof(STARTUPINFO);
-
-				CreateProcessAsUser(hPToken, NULL, dir, NULL, NULL, FALSE, DETACHED_PROCESS, NULL, NULL, &StartUPInfo, &ProcessInfo);
-				if (ProcessInfo.hThread)
-					CloseHandle(ProcessInfo.hThread);
-				if (ProcessInfo.hProcess)
-					CloseHandle(ProcessInfo.hProcess);
-			}
-		}
-		break;
+			break;
+	
 
 		case ID_CLOSE:
 			// User selected Close from the tray menu

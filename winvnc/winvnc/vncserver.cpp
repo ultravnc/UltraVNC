@@ -182,7 +182,9 @@ vncServer::vncServer()
 	HookWanted = FALSE;
 	DriverWantedSet = FALSE;
 	sethook = false;
-	strcpy_s(code, generateCode());
+	char* generatedcode = generateCode();
+	strcpy_s(code, generatedcode);
+	free(generatedcode);
 	cloudThread = new CloudThread();
 }
 
