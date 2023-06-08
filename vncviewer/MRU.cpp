@@ -82,10 +82,10 @@ void MRU::AddItem(LPTSTR txt)
     }
 
     // Find first available unused id
-    while ((_tcschr(m_index, _totupper(firstUnusedId)) != NULL || _tcschr((TCHAR*)RESERVED_CHARS, firstUnusedId) != NULL) && _tcscmp(&firstUnusedId, &LAST_USEABLE_ID) <= 0)
+    while ((_tcschr(m_index, _totupper(firstUnusedId)) != NULL || _tcschr(RESERVED_CHARS, firstUnusedId) != NULL) && _tcscmp(&firstUnusedId, &LAST_USEABLE_ID) <= 0)
         firstUnusedId++;
     // If we've run out of unused ids, use the last one in the index and then remove it from the end.
-    if (_tcscmp(&firstUnusedId, (TCHAR*)LAST_USEABLE_ID) > 0) {
+    if (_tcscmp(&firstUnusedId, &LAST_USEABLE_ID) > 0) {
     firstUnusedId = id;
     m_index[_tcslen(m_index) - 1] = _T('\0');
     
