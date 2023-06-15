@@ -206,6 +206,7 @@ void *vncHTTPConnectThread::run_undetached(void * arg)
 	vnclog.Print(LL_INTINFO, VNCLOG("started HTTP server thread\n"));
 
 	// Go into a loop, listening for connections on the given socket
+	VSocket* new_socket = NULL;
 	while (!m_shutdown)
 	{
 		// Accept an incoming connection
@@ -227,8 +228,10 @@ void *vncHTTPConnectThread::run_undetached(void * arg)
 		new_socket->Shutdown();
 		new_socket->Close();
 		delete new_socket;
+		new_socket = NULL;
 	}
-
+	if (new_socket)
+		delete new_socket;
 	vnclog.Print(LL_INTINFO, VNCLOG("quitting HTTP server thread\n"));
 
 	return NULL;

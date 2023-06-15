@@ -104,7 +104,7 @@ extern VNCLog vnclog;
 #define LL_ALL		10
 
 // Macros for sticking in the current file name
-#define VNCLOG(s)	(__FILE__ " : " s)
+#define VNCLOG(s)	(__FUNCTION__ " : " s)
 //#if MSC_VER > 12
 #ifndef _X64
 #pragma comment(linker,"/manifestdependency:\"type='Win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='X86' publicKeyToken='6595b64144ccf1df' language='*'\"")

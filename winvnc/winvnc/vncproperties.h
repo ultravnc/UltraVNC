@@ -40,6 +40,7 @@ class vncProperties
 {
 public:
 	vncProperties();
+	~vncProperties();
 	void LoadFromIniFile();
 	void ShowAdmin();
 	BOOL Init(vncServer* server);

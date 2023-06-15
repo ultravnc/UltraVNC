@@ -69,6 +69,12 @@ vncProperties::vncProperties()
 	m_server = NULL;
 }
 
+vncProperties::~vncProperties()
+{
+	DeleteObject(hBmpExpand);
+	DeleteObject(hBmpCollaps);
+}
+
 // Initialisation
 BOOL
 vncProperties::Init(vncServer* server)

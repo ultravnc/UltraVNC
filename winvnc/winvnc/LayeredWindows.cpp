@@ -34,6 +34,7 @@ LayeredWindows::LayeredWindows()
    hInst = NULL;
    HDC hDC = GetDC(NULL);
    nHeight = MulDiv(-18, GetDeviceCaps(hDC, LOGPIXELSY), 72);
+   ReleaseDC(NULL, hDC);
    hPen = CreatePen(PS_DASHDOTDOT, 5, RGB(255, 0, 0));
    hFont = CreateFont(nHeight, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, NONANTIALIASED_QUALITY, DEFAULT_PITCH, "Verdana");   
 }

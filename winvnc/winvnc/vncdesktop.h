@@ -406,7 +406,7 @@ protected:
 	void StartStopddihook(BOOL enabled);
 	void StartStophookdll(BOOL enabled);
 	void InitHookSettings();
-	HMODULE hModule;
+	HMODULE hModuleVNCHook;
 	HMODULE hSCModule;
 	SetHooksFn SetHooks;
 	UnSetHooksFn  UnSetHooks;

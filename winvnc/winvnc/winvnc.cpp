@@ -1167,6 +1167,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 	crUninstall();
 #endif
 	VNC_OSVersion::releaseInstance();
+	if (SettingsManager::getInstance())
+		delete SettingsManager::getInstance();
 	return 0;
 }
 

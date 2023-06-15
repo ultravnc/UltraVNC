@@ -3,6 +3,7 @@
 #include "SettingsManager.h"
 #include "resource.h"
 
+#ifdef _CLOUD
 #include "./UdtCloudlib/proxy/Cloudthread.h"
 
 extern HINSTANCE	hInstResDLL;
@@ -198,3 +199,4 @@ CloudDialog::DialogProc(HWND hwnd,
 	}
 	return 0;
 }
+#endif
