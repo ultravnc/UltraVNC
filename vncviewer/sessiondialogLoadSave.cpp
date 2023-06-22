@@ -150,6 +150,7 @@ void SessionDialog::SaveToFile(char *fname, bool asDefault)
 	saveInt("fullscreen",			FullScreen,		fname);
 	saveInt("SavePos",				SavePos, fname);
 	saveInt("SaveSize",				SaveSize, fname);
+	saveInt("GNOME",				GNOME, fname);
 	saveInt("directx",				Directx,		fname);
 	saveInt("autoDetect",			autoDetect, fname);
 	saveInt("8bit",					Use8Bit,			fname);
@@ -234,6 +235,7 @@ void SessionDialog::LoadFromFile(char *fname)
   FullScreen =			readInt("fullscreen",		FullScreen,	fname) != 0;
   SavePos =				readInt("SavePos", SavePos, fname) != 0;
   SaveSize =			readInt("SaveSize", SaveSize, fname) != 0;
+  GNOME =				readInt("GNOME", GNOME, fname) != 0;
   Directx =				readInt("directx",		Directx,	fname) != 0;
   autoDetect =			readInt("autoDetect", autoDetect, fname) != 0;
   Use8Bit =				readInt("8bit",				Use8Bit,		fname);
@@ -341,6 +343,7 @@ void SessionDialog::SetDefaults()
 	FullScreen = false;
 	SavePos = false;
 	SaveSize = false;
+	GNOME = false;
 	Directx = false;
 	autoDetect = false;
 	Use8Bit = rfbPFFullColors; //false;

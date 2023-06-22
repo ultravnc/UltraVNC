@@ -108,6 +108,7 @@ public:
 	bool FullScreen;
 	bool SavePos;
 	bool SaveSize;
+	bool GNOME;
 	bool Directx;
 	bool fUseDSMPlugin;
 	TCHAR szDSMPluginFilename[_MAX_PATH];

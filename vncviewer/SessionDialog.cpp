@@ -33,7 +33,9 @@
 #include <sys/stat.h>
 #include <direct.h>
 #include "display.h"
+#ifdef _CLOUD
 #include "../UdtCloudlib/proxy/Cloudthread.h"
+#endif
 
 #define SESSION_MRU_KEY_NAME _T("Software\\ORL\\VNCviewer\\MRU")
 #define NUM_MRU_ENTRIES 8
@@ -122,6 +124,7 @@ SessionDialog::SessionDialog(VNCOptions* pOpt, ClientConnection* pCC, CDSMPlugin
 	Directx = m_pOpt->m_Directx;
 	SavePos = m_pOpt->m_SavePos;
 	SaveSize = m_pOpt->m_SaveSize;
+	GNOME = m_pOpt->m_GNOME;
 	fUseDSMPlugin = m_pOpt->m_fUseDSMPlugin;
 	strcpy_s(szDSMPluginFilename, m_pOpt->m_szDSMPluginFilename);
 	listening = m_pOpt->m_listening;
@@ -659,6 +662,7 @@ bool SessionDialog::connect(HWND hwnd)
 	m_pOpt->m_Directx = Directx;
 	m_pOpt->m_SavePos = SavePos;
 	m_pOpt->m_SaveSize = SaveSize;
+	m_pOpt->m_GNOME = GNOME;
 	m_pOpt->m_fUseDSMPlugin = fUseDSMPlugin;
 	strcpy_s(m_pOpt->m_szDSMPluginFilename, szDSMPluginFilename);
 	m_pOpt->m_listening = listening;

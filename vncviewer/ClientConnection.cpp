@@ -63,7 +63,9 @@ extern "C" {
 #include <lmaccess.h>
 #include <lmat.h>
 #include <lmalert.h>
+#ifdef _CLOUD
 #include "../UdtCloudlib/proxy/Cloudthread.h"
+#endif
 
 // [v1.0.2-jp1 fix]
 #pragma comment(lib, "imm32.lib")
@@ -341,9 +343,11 @@ ClientConnection::ClientConnection(VNCviewerApp *pApp, LPTSTR host, int port)
 
 void ClientConnection::Init(VNCviewerApp *pApp)
 {
+#ifdef _CLOUD
 	if (cloudThread)
 		delete cloudThread;
 	cloudThread = new CloudThread();
+#endif
 	InitializeCriticalSection(&crit);
 	m_hSessionDialog = NULL;
 	new_ultra_server=false;
@@ -3713,7 +3717,7 @@ void ClientConnection::ReadServerInit(bool reconnect)
 	else SetWindowText(m_hwndMain, m_desktopName);
 
 	vnclog.Print(0, _T("Desktop name \"%s\"\n"),m_desktopName);
-	vnclog.Print(1, _T("Geometry %d x %d depth %d\n"),
+	vnclog.Print(0, _T("Geometry %d x %d depth %d\n"),
 		m_si.framebufferWidth, m_si.framebufferHeight, m_si.format.depth );
 
 	//SetWindowText(m_hwndMain, m_desktopName);
@@ -4601,8 +4605,10 @@ ClientConnection::~ClientConnection()
 	delete directx_output;
 	delete ultraVncZlib;
 	DeleteCriticalSection(&crit);
+#ifdef _CLOUD
 	if (cloudThread)
 		delete cloudThread;
+#endif
 }
 
 // You can specify a dx & dy outside the limits; the return value will
@@ -5809,7 +5815,36 @@ inline void ClientConnection::ReadScreenUpdate()
 			for (int i = 0; i < edsHdr.numberOfScreens; i++) {
 				ReadExact((char*)&eds, sz_rfbExtDesktopScreen);
 			}
-			SendMonitorSizes();
+			if (edsHdr.numberOfScreens == 1 && m_opts->m_GNOME) {
+				int height = Swap16IfLE(eds.height);
+				offsetXExtSDisplay = Swap16IfLE(eds.x) / m_nServerScale;
+				offsetYExtSDisplay = Swap16IfLE(eds.y) / m_nServerScale;
+				widthExtSDisplay = Swap16IfLE(eds.width) / m_nServerScale;
+				heightExtSDisplay = Swap16IfLE(eds.height) / m_nServerScale;
+				if (m_si.framebufferWidth != widthExtSDisplay && m_si.framebufferHeight != heightExtSDisplay)
+				{
+					{
+						omni_mutex_lock l(m_bitmapdcMutex);
+						ClearCache();
+						m_si.framebufferWidth = widthExtSDisplay;
+						m_si.framebufferHeight = heightExtSDisplay;
+						checkParemeters();
+						Createdib();
+					}
+				m_pendingScaleChange = true;
+				m_pendingFormatChange = true;
+
+				extSDisplay = true;
+				SizeWindow();
+				InvalidateRect(m_hwndcn, NULL, TRUE);
+				RealiseFullScreenMode();
+				ScrollScreen(offsetXExtSDisplay, offsetYExtSDisplay, true);
+
+				SendAppropriateFramebufferUpdateRequest(false);
+				}
+			}
+			if (!m_opts->m_GNOME)
+				SendMonitorSizes();
 			break;
 		}
 

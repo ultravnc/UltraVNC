@@ -146,6 +146,7 @@ VNCOptions::VNCOptions()
 	m_FullScreen = false;
 	m_SavePos = false;
 	m_SaveSize = false;
+	m_GNOME = false;
 	m_Directx = false;
 	autoDetect = false;
 	m_Use8Bit = rfbPFFullColors; //false;
@@ -334,6 +335,7 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
 	m_FullScreen = s.m_FullScreen;
 	m_SavePos = s.m_SavePos;
 	m_SaveSize = s.m_SaveSize;
+	m_GNOME = s.m_GNOME;
 	m_Directx = s.m_Directx;
 	autoDetect = s.autoDetect;
 	m_Use8Bit = s.m_Use8Bit;
@@ -621,6 +623,9 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 		}
 		else if (SwitchMatch(args[j], _T("savesize"))) {
 			m_SaveSize = true;
+		}
+		else if (SwitchMatch(args[j], _T("gnome"))) {
+			m_GNOME = true;
 		}
 		else if (SwitchMatch(args[j], _T("directx"))) {
 			m_Directx = true;
@@ -1131,6 +1136,7 @@ void VNCOptions::SaveOptions(char* fname)
 	saveInt("fullscreen", m_FullScreen, fname);
 	saveInt("SavePos", m_SavePos, fname);
 	saveInt("SaveSize", m_SaveSize, fname);
+	saveInt("GNOME", m_GNOME, fname);
 	saveInt("directx", m_Directx, fname);
 	saveInt("autoDetect", autoDetect, fname);
 	saveInt("8bit", m_Use8Bit, fname);
@@ -1226,6 +1232,7 @@ void VNCOptions::LoadOptions(char* fname)
 	m_FullScreen = readInt("fullscreen", m_FullScreen, fname) != 0;
 	m_SavePos = readInt("SavePos", m_SavePos, fname) != 0;
 	m_SaveSize = readInt("SaveSize", m_SaveSize, fname) != 0;
+	m_GNOME = readInt("GNOME", m_GNOME, fname) != 0;
 	m_Directx = readInt("directx", m_Directx, fname) != 0;
 	autoDetect = readInt("autoDetect", autoDetect, fname) != 0;
 	m_Use8Bit = readInt("8bit", m_Use8Bit, fname);
@@ -1531,6 +1538,9 @@ BOOL CALLBACK VNCOptions::OptDlgProc(HWND hwnd, UINT uMsg,
 		HWND hSaveSize = GetDlgItem(hwnd, IDC_SAVESIZE);
 		SendMessage(hSaveSize, BM_SETCHECK, _this->m_SaveSize, 0);
 
+		HWND hGNOME = GetDlgItem(hwnd, IDC_GNOME);
+		SendMessage(hGNOME, BM_SETCHECK, _this->m_GNOME, 0);
+
 		HWND hDirectx = GetDlgItem(hwnd, IDC_DIRECTX);
 		SendMessage(hDirectx, BM_SETCHECK, _this->m_Directx, 0);
 
@@ -1719,6 +1729,10 @@ BOOL CALLBACK VNCOptions::OptDlgProc(HWND hwnd, UINT uMsg,
 			HWND hSaveSize = GetDlgItem(hwnd, IDC_SAVESIZE);
 			_this->m_SaveSize =
 				(SendMessage(hSaveSize, BM_GETCHECK, 0, 0) == BST_CHECKED);
+
+			HWND hGNOME = GetDlgItem(hwnd, IDC_GNOME);
+			_this->m_GNOME =
+				(SendMessage(hGNOME, BM_GETCHECK, 0, 0) == BST_CHECKED);
 
 			HWND hDirectx = GetDlgItem(hwnd, IDC_DIRECTX);
 			_this->m_Directx =

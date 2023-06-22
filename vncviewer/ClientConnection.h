@@ -108,7 +108,9 @@ extern const UINT FileTransferSendPacketMessage;
 #define TIGHT_ZLIB_BUFFER_SIZE 512 // Tight encoding
 class ClientConnection;
 class CDSMPlugin;
+#ifdef _CLOUD
 class CloudThread;
+#endif
 typedef void (ClientConnection:: *tightFilterFunc)(int);
 
 struct mybool {
@@ -852,7 +854,9 @@ private:
 
 public:
 	// RFB settings
+#ifdef _CLOUD
 	CloudThread* cloudThread = NULL;
+#endif
 	VNCOptions *m_opts;
 	bool m_FullScreenNotDone;
 	int m_autoReconnect;

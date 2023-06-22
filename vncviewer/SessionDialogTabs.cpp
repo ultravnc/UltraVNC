@@ -916,6 +916,8 @@ void SessionDialog::InitDlgProcDisplay()
 	SendMessage(hSavePos, BM_SETCHECK, SavePos, 0);
 	HWND hSaveSize = GetDlgItem(hwnd, IDC_SAVESIZE);
 	SendMessage(hSaveSize, BM_SETCHECK, SaveSize, 0);
+	HWND hGNOME = GetDlgItem(hwnd, IDC_GNOME);
+	SendMessage(hGNOME, BM_SETCHECK, GNOME, 0);
 	setDisplays();
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -1142,6 +1144,11 @@ void SessionDialog::ReadDlgProcDisplay()
 	HWND hSaveSize = GetDlgItem(hwnd, IDC_SAVESIZE);
 	SaveSize =
 		(SendMessage(hSaveSize, BM_GETCHECK, 0, 0) == BST_CHECKED);
+	HWND hGNOME = GetDlgItem(hwnd, IDC_GNOME);
+	GNOME =
+		(SendMessage(hGNOME, BM_GETCHECK, 0, 0) == BST_CHECKED);
+
+	
 
 	HWND hDirectx = GetDlgItem(hwnd, IDC_DIRECTX);
 	Directx =
@@ -1538,6 +1545,7 @@ void SessionDialog::StartListener()
 	m_pOpt->m_Directx = Directx;
 	m_pOpt->m_SavePos = SavePos;
 	m_pOpt->m_SaveSize = SaveSize;
+	m_pOpt->m_GNOME = GNOME;
 	m_pOpt->m_fUseDSMPlugin = fUseDSMPlugin;
 	strcpy_s(m_pOpt->m_szDSMPluginFilename, szDSMPluginFilename);
 	m_pOpt->m_listening = listening;

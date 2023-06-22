@@ -71,6 +71,7 @@ public:
 	bool	m_SaveSize;
 	bool	m_Directx;
 	bool    m_ShowToolbar;
+	bool	m_GNOME;
 
 	bool	autoDetect;
 	int		m_Use8Bit;

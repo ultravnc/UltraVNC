@@ -309,7 +309,7 @@ END
 
 IDD_SESSION_DLG DIALOGEX 0, 0, 259, 325
 STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "UltraVNC Viewer - 1.4.2.2-dev"
+CAPTION "UltraVNC Viewer - 1.4.2.3-dev"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     COMBOBOX        IDC_HOSTNAME_EDIT,76,32,162,66,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
@@ -331,7 +331,7 @@ BEGIN
     CONTROL         "Repeater",IDC_RADIOREPEATER,"Button",BS_AUTORADIOBUTTON,128,66,47,10
     CONTROL         "",IDC_DEFAULTBOX,"Static",SS_BLACKFRAME | SS_REALSIZEIMAGE,0,0,257,108
     CONTROL         IDB_GREEN,IDC_GREEN,"Static",SS_BITMAP,222,67,9,8
-    CONTROL         IDB_YELLOW,IDC_YELLOW,"Static",SS_BITMAP,222,67,9,8
+    CONTROL         IDB_BITMAP1,IDC_YELLOW,"Static",SS_BITMAP,222,67,9,8
     CONTROL         IDB_RED,IDC_RED,"Static",SS_BITMAP,222,67,9,8
 END
 
@@ -469,7 +469,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,8,137,62,14
     CONTROL         IDB_VNC64,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_SUNKEN,8,7,62,54
-    LTEXT           "UltraVNC Viewer 1.4.2.2-dev",IDC_STATIC,86,6,197,11
+    LTEXT           "UltraVNC Viewer 1.4.2.3-dev",IDC_STATIC,86,6,197,11
     LTEXT           "For more Information and Links please visit: \nhttps://www.uvnc.com",IDC_STATIC,86,133,197,19
     LTEXT           "Copyright © 2002-2020 UltraVNC Team\nCopyright © 2001-2002 Sam - eSVNC \nCopyright © 1999-2002 Rudi D. V. - VdaccVNC \nCopyright © 1999-2002 Const. Kaplinsky - TightVNC \nCopyright © 2002 RealVNC Ltd. - RealVNC\n",IDC_STATIC,86,30,200,40
     LTEXT           "Built:",IDC_STATIC,87,17,15,10
@@ -499,7 +499,7 @@ BEGIN
     DEFPUSHBUTTON   "Close",IDOK,185,110,56,14
     LTEXT           "BuildTime",IDC_BUILDTIME,9,11,265,88
     GROUPBOX        "Info Message",IDC_STATIC,3,1,274,100,BS_CENTER
-    CTEXT           "UltraVNC 1.4.2.2-dev",IDC_STATIC,178,145,66,12
+    CTEXT           "UltraVNC 1.4.2.3-dev",IDC_STATIC,178,145,66,12
     PUSHBUTTON      "",IDC_BUTTON1,7,104,170,47,BS_BITMAP
 END
 
@@ -512,7 +512,7 @@ BEGIN
     LTEXT           "BuildTime",IDC_BUILDTIME,9,11,258,97
     PUSHBUTTON      "",IDC_BUTTON2,7,114,170,47,BS_BITMAP
     GROUPBOX        "Info Message",IDC_STATIC,3,1,264,110,BS_CENTER
-    CTEXT           "UltraVNC 1.4.2.2-dev",IDC_STATIC,175,204,69,12
+    CTEXT           "UltraVNC 1.4.2.3-dev",IDC_STATIC,175,204,69,12
     PUSHBUTTON      "",IDC_BUTTON1,7,163,170,47,BS_BITMAP
     CTEXT           "Sponsored\n Link",IDC_STATIC,179,127,36,21
 END
@@ -730,8 +730,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,4,2,2
- PRODUCTVERSION 1,4,2,2
+ FILEVERSION 1,4,2,3
+ PRODUCTVERSION 1,4,2,3
  FILEFLAGSMASK 0x37L
 #ifdef _DEBUG
  FILEFLAGS 0x25L
@@ -749,12 +749,12 @@ BEGIN
             VALUE "Comments", "UltraVNC Viewer"
             VALUE "CompanyName", "UltraVNC"
             VALUE "FileDescription", "VNCViewer"
-            VALUE "FileVersion", "1.4.2.2-dev"
+            VALUE "FileVersion", "1.4.2.3-dev"
             VALUE "InternalName", "VNCViewer"
             VALUE "LegalCopyright", "Copyright © 2023 UltraVNC team members"
             VALUE "OriginalFilename", "VNCViewer.exe"
             VALUE "ProductName", "UltraVNC VNCViewer"
-            VALUE "ProductVersion", "1.4.2.2-dev"
+            VALUE "ProductVersion", "1.4.2.3-dev"
         END
     END
     BLOCK "VarFileInfo"
@@ -1286,8 +1286,8 @@ BEGIN
     CONTROL         "Auto scale by",IDC_SCALING,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,107,64,10
     COMBOBOX        IDC_SCALE_CB,69,105,30,117,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     EDITTEXT        IDC_SERVER_SCALE,107,117,14,12,ES_AUTOHSCROLL
-    CONTROL         "Start in fullscreen mode.",IDC_FULLSCREEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,125,96,101,10
-    CONTROL         "Save size on exit.",IDC_SAVESIZE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,137,129,73,10
+    CONTROL         "Start in fullscreen mode.",IDC_FULLSCREEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,139,96,90,10
+    CONTROL         "Save size on exit.",IDC_SAVESIZE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,139,129,73,10
     CONTROL         "Show toolbar.",IDC_SHOWTOOLBAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,96,60,10
     CONTROL         "Save position on exit.",IDC_SAVEPOS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,129,97,10
     LTEXT           "Server Screen Scale by :",IDC_STATIC,4,119,80,8
@@ -1305,7 +1305,8 @@ BEGIN
     CONTROL         "Show only extend ( portable as extra display)",IDC_SHOW_EXTEND,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,33,65,164,10
     CONTROL         "Main screen resolution",IDC_RADIO_NOVIRT,"Button",BS_AUTORADIOBUTTON,22,35,90,10
-    CONTROL         "Auto scale Even",IDC_SCALINGEVEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,125,107,65,10
+    CONTROL         "Auto scale Even",IDC_SCALINGEVEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,139,107,65,10
+    CONTROL         "GNOME R.D.",IDC_GNOME,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,139,118,56,10
 END
 
 IDD_MISC DIALOGEX 0, 0, 240, 145
