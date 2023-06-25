@@ -66,14 +66,14 @@ void MRU::AddItem(LPTSTR txt)
 
     // Scan through the index
     for (int i = 0; i < (int)_tcslen(m_index); i++) {
-    id = m_index[i];
+        id = m_index[i];
         // Does this entry already contain the item we're adding
         if (GetItem(i, itembuf, MRU_MAX_ITEM_LENGTH) != 0) {           
             // If a value matches the txt specified, move it to the front.
             if (_tcscmp(itembuf, txt) == 0) {
-                id = m_index[i];
                 for (int j = i; j > 0; j--)
                     m_index[j] = m_index[j-1];
+                m_index[0] = id;
                 WriteIndex();
                 // That's all we need to do.
                 return;
@@ -86,9 +86,8 @@ void MRU::AddItem(LPTSTR txt)
         firstUnusedId++;
     // If we've run out of unused ids, use the last one in the index and then remove it from the end.
     if (_tcscmp(&firstUnusedId, &LAST_USEABLE_ID) > 0) {
-    firstUnusedId = id;
-    m_index[_tcslen(m_index) - 1] = _T('\0');
-    
+        firstUnusedId = id;
+        m_index[_tcslen(m_index) - 1] = _T('\0');    
     }
     
     // If we haven't found a match, then we need to create a new entry and put it
