@@ -662,6 +662,13 @@ DWORD MessageBoxSecure(HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT uType)
 }
 
 namespace desktopSelector {
+	int closeHandlesAndReturn(HDESK threaddesktop, HDESK inputdesktop, int value) {
+		if(threaddesktop)
+			CloseDesktop(threaddesktop);
+		if (inputdesktop)
+			CloseDesktop(inputdesktop);
+		return value;
+	}
 	int InputDesktopSelected() {
 		// Get the input and thread desktops
 		HDESK threaddesktop = GetThreadDesktop(GetCurrentThreadId());
@@ -673,14 +680,14 @@ namespace desktopSelector {
 
 		if (inputdesktop == NULL) {
 			if (!settings->RunningFromExternalService())
-				return 2; 			//Running as SC we want to keep the viewer open in case UAC or screensaver jump in
+				return closeHandlesAndReturn(threaddesktop, inputdesktop, 2); 			//Running as SC we want to keep the viewer open in case UAC or screensaver jump in
 			DWORD lasterror;
 			lasterror = GetLastError();
 			if (lasterror == 170)
-				return 1;
+				return closeHandlesAndReturn(threaddesktop, inputdesktop, 1);
 			if (lasterror == 624)
-				return 1;
-			return 0;
+				return closeHandlesAndReturn(threaddesktop, inputdesktop, 1);
+			return closeHandlesAndReturn(threaddesktop, inputdesktop, 0);
 		}
 
 		DWORD dummy;
@@ -689,23 +696,23 @@ namespace desktopSelector {
 
 		if (!GetUserObjectInformation(threaddesktop, UOI_NAME, &threadname, 256, &dummy)) {
 			if (!settings->RunningFromExternalService())
-				return 2;
-			return 0;
+				return closeHandlesAndReturn(threaddesktop, inputdesktop, 2);
+			return closeHandlesAndReturn(threaddesktop, inputdesktop, 0);
 		}
 		assert(dummy <= 256);
 		if (!GetUserObjectInformation(inputdesktop, UOI_NAME, &inputname, 256, &dummy)) {
 			if (!settings->RunningFromExternalService())
-				return 2;
-			return 0;
+				return closeHandlesAndReturn(threaddesktop, inputdesktop, 2);
+			return closeHandlesAndReturn(threaddesktop, inputdesktop, 0);
 		}
 		assert(dummy <= 256);
 
 		if (strcmp(threadname, inputname) != 0) {
 			if (!settings->RunningFromExternalService())
-				return 2;
-			return 0;
+				return closeHandlesAndReturn(threaddesktop, inputdesktop, 2);
+			return closeHandlesAndReturn(threaddesktop, inputdesktop, 0);
 		}
-		return 1;
+		return closeHandlesAndReturn(threaddesktop, inputdesktop, 1);
 	}
 
 	BOOL SelectHDESK(HDESK new_desktop) {
