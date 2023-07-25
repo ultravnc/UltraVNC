@@ -1955,6 +1955,18 @@ void FileTransfer::RequestRemoteFile(LPSTR szRemoteFileName)
 	return;
 }
 
+bool endsWith(const char* str, const char* ending) {
+	if (str == nullptr || ending == nullptr)
+		return false;
+
+	size_t strLength = strlen(str);
+	size_t endingLength = strlen(ending);
+
+	if (endingLength > strLength)
+		return false;
+
+	return (strcmp(str + strLength - endingLength, ending) == 0);
+}
 
 //
 // Receive a file
@@ -2023,7 +2035,7 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, UINT nLen)
 	}
 
     char  displayName[MAX_PATH + 32];
-    sprintf_s(displayName, "%s%s", m_szDestFileName, PathFindFileName(szRemoteFileName));
+    sprintf_s(displayName, "%s%s", m_szDestFileName, strrchr(szRemoteFileName, '\\') + 1);
 	// Check the free space on local destination drive
 	bool fErr = false;
 	ULARGE_INTEGER lpFreeBytesAvailable = { 0, 0 };
@@ -2036,8 +2048,10 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, UINT nLen)
 	*strrchr(szDestPath, '\\') = '\0'; // We don't handle UNCs for now
 
 	//security requested filename must be the received filename
-	if (strcmp(szRemoteFileName, szRemoteFileNameRequested) != NULL)
-		return false;
+	if (strcmp(szRemoteFileName, szRemoteFileNameRequested) != NULL) {
+		if (!endsWith(szRemoteFileName, ".zip"))
+			return false;
+	}
 
     // only check root folder on drive, in case we have no permissions on dest folder
     if (szDestPath[1] == ':')
