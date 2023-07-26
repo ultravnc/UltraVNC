@@ -4771,6 +4771,7 @@ vncClient::~vncClient()
 		delete simulateCursor;
 	if (desktopUsersToken)
 		delete desktopUsersToken;
+	desktopUsersToken = NULL;
 }
 
 // Init
@@ -6590,6 +6591,7 @@ void vncClient::UndoFTUserImpersonation()
 	m_fFTUserImpersonatedOk = false;
 	if (desktopUsersToken)
 		delete desktopUsersToken;
+	desktopUsersToken = NULL;
 	m_hPToken = 0;
 }
 #endif
