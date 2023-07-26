@@ -3800,7 +3800,7 @@ void ClientConnection::SizeWindow(bool noPosChange, bool noSizeChange)
 		workwidth = workrect.right - workrect.left;
 		workheight = workrect.bottom - workrect.top;
 	}
-	if (workwidth > 4320 || workheight > 4320) {
+	if (workwidth > 4320 || workheight > 4320 || workwidth < 0 || workheight < 0) {
 		workrect = { 0,0,1027,768 };
 	}
 
