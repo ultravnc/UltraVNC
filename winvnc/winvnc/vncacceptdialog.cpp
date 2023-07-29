@@ -129,7 +129,7 @@ BOOL CALLBACK vncAcceptDialog::vncAcceptDlgProc(HWND hwnd,
 			if (strlen(accept_reject_mesg) == 0) 
 				strcpy_s(accept_reject_mesg,"WinVNC has received an incoming connection from");
 
-			if (strlen(_this->infoMsg) > 0 && _this->notification) {
+			if (strlen(_this->infoMsg) > 0) {
 				strcat_s(accept_reject_mesg, "\r\n");
 				strcat_s(accept_reject_mesg, _this->infoMsg);
 			}

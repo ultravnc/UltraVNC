@@ -357,3 +357,39 @@ void LOGFAILEDUSER(char *machine, char *user)
 				fclose(file);
 			}
 }
+
+LOGGING_API
+void LOGEXTRAINFO(char* info)
+{
+	FILE* file;
+	const char* ps[3];
+	char texttowrite[512];
+	SYSTEMTIME time;
+	GetLocalTime(&time);
+	char			szText[256];
+	sprintf(szText, "%02d/%02d/%d %02d:%02d:%02d\t", time.wDay, time.wMonth, time.wYear, time.wHour, time.wMinute, time.wSecond);
+	strcpy(texttowrite, szText);
+	strcat(texttowrite, "Viewer message: ");
+	strcat(texttowrite, info);
+	strcat(texttowrite, "\n");
+	ps[0] = texttowrite;
+	EventLogging log;
+	log.AddEventSourceToRegistry(NULL);
+	log.LogIt(1, 0x00640002L, ps, 1, NULL, 0);
+	char szMslogonLog[MAX_PATH];
+	if (GetModuleFileName(NULL, szMslogonLog, MAX_PATH))
+	{
+		char* p = strrchr(szMslogonLog, '\\');
+		if (p != NULL)
+		{
+			*p = '\0';
+			strcat_s(szMslogonLog, "\\mslogon.log");
+		}
+	}
+	file = fopen(szMslogonLog, "a");
+	if (file != NULL)
+	{
+		fwrite(texttowrite, sizeof(char), strlen(texttowrite), file);
+		fclose(file);
+	}
+}
