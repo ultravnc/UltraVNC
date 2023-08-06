@@ -425,13 +425,13 @@ wi_sockaccept()
 int
 wi_parseheader( wi_sess * sess )
 {
-   char *   cp;
-   char *   cl;
-   char *   rxend;
-   char *   pairs;
-   u_long   cmd;
-   int      error;
-   int i;
+   char *   cp = NULL;
+   char *   cl = NULL;
+   char *   rxend = NULL;
+   char *   pairs = NULL;
+   u_long   cmd = 0;
+   int      error = 0;
+   int i = 0;
    	char *strs[38] = {"index.html","passwd.html","settings.html","ok.html","nok.html","log.html","comment.html","images2.jpg",
 	 "connections.txt","viewer_access.txt","server_access.txt","memory.ssi","mode1.ssi","mode2.ssi","sport.ssi",
 	 "vport.ssi","acon.ssi","rcon.ssi","aid.ssi","acons.ssi","rcons.ssi","aids.ssi","webport.ssi","log.ssi","ucom.ssi",

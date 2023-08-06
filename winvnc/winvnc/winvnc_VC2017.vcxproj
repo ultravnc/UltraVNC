@@ -428,8 +428,13 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
+<<<<<<< HEAD
       <AdditionalIncludeDirectories>..\..\omnithread;..;..\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;__x86__;__WIN32__;WIN32;_WINDOWS;XMD_H;_WINSTATIC;_XZ;_USE_DESKTOPDUPLICATION;_RDPMODE;remIPV6STRICT;remIPV6V4;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+=======
+      <AdditionalIncludeDirectories>..\omnithread;..;..\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_DEBUG;__x86__;__WIN32__;WIN32;_WINDOWS;XMD_H;_WINSTATIC;_XZ;_USE_DESKTOPDUPLICATION;_RDPMODE;remIPV6STRICT;remIPV6V4;_WINSOCK_DEPRECATED_NO_WARNINGS;_CLOUD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+>>>>>>> Cloud fixes
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -623,8 +628,13 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>true</WholeProgramOptimization>
+<<<<<<< HEAD
       <AdditionalIncludeDirectories>..\..\omnithread;..;..\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;__x86__;__WIN32__;WIN32;_WINDOWS;XMD_H;_WINSTATIC;_CRT_SECURE_NO_WARNINGS;_XZ;rem_USE_DESKTOPDUPLICATION;_RDPMODE;WIN32_WINNT=0x601;rem_WIN32_IE=0x0600;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+=======
+      <AdditionalIncludeDirectories>..\omnithread;..;..\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NDEBUG;__x86__;__WIN32__;WIN32;_WINDOWS;XMD_H;_WINSTATIC;_CRT_SECURE_NO_WARNINGS;_XZ;rem_USE_DESKTOPDUPLICATION;_RDPMODE;WIN32_WINNT=0x601;rem_WIN32_IE=0x0600;_CLOUD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+>>>>>>> Cloud fixes
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
