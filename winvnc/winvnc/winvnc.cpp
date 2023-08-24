@@ -251,8 +251,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 	memset(&info, 0, sizeof(CR_INSTALL_INFO));
 	info.cb = sizeof(CR_INSTALL_INFO);
 	info.pszAppName = _T("UVNC");
-	info.pszAppVersion = _T("1.4.3.2-dev");
-	info.pszEmailSubject = _T("UVNC server 1.4.3.2-dev Error Report");
+	info.pszAppVersion = _T("1.4.3.3-dev");
+	info.pszEmailSubject = _T("UVNC server 1.4.3.3-dev Error Report");
 	info.pszEmailTo = _T("uvnc@skynet.be");
 	info.uPriorities[CR_SMAPI] = 1; // Third try send report over Simple MAPI    
 	// Install all available exception handlers

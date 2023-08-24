@@ -1148,7 +1148,7 @@ vncClientThread::InitAuthenticate()
 	if (strlen(m_client->infoMsg) > 0)
 	{
 		typedef BOOL(*LogeventFn)(char* info);
-		LogeventFn Logevent = 0;
+		LogeventFn Logevent = NULL;
 		char szCurrentDir[MAX_PATH];
 		if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
 		{
@@ -1160,7 +1160,9 @@ vncClientThread::InitAuthenticate()
 		if (hModule)
 		{
 			Logevent = (LogeventFn)GetProcAddress(hModule, "LOGEXTRAINFO");
-			Logevent((char*)m_client->infoMsg);
+			
+			if (Logevent)
+				Logevent((char*)m_client->infoMsg);
 			FreeLibrary(hModule);
 		}
 	}
