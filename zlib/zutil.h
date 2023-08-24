@@ -1,5 +1,5 @@
 /* zutil.h -- internal interface and configuration of the compression library
- * Copyright (C) 1995-2016 Jean-loup Gailly, Mark Adler
+ * Copyright (C) 1995-2022 Jean-loup Gailly, Mark Adler
  * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
@@ -29,10 +29,6 @@
 #  include <stdlib.h>
 #endif
 
-#ifdef Z_SOLO
-   typedef long ptrdiff_t;  /* guess -- will be caught if guess is wrong */
-#endif
-
 #ifndef local
 #  define local static
 #endif
@@ -45,6 +41,17 @@ typedef uch FAR uchf;
 typedef unsigned short ush;
 typedef ush FAR ushf;
 typedef unsigned long  ulg;
+
+#if !defined(Z_U8) && !defined(Z_SOLO) && defined(STDC)
+#  include <limits.h>
+#  if (ULONG_MAX == 0xffffffffffffffff)
+#    define Z_U8 unsigned long
+#  elif (ULLONG_MAX == 0xffffffffffffffff)
+#    define Z_U8 unsigned long long
+#  elif (UINT_MAX == 0xffffffffffffffff)
+#    define Z_U8 unsigned
+#  endif
+#endif
 
 extern z_const char * const z_errmsg[10]; /* indexed by 2-zlib_error */
 /* (size given to avoid silly warnings with Visual C++) */
@@ -170,10 +177,6 @@ extern z_const char * const z_errmsg[10]; /* indexed by 2-zlib_error */
 #if (defined(_MSC_VER) && (_MSC_VER > 600)) && !defined __INTERIX
 #  if defined(_WIN32_WCE)
 #    define fdopen(fd,mode) NULL /* No fdopen() */
-#    ifndef _PTRDIFF_T_DEFINED
-       typedef int ptrdiff_t;
-#      define _PTRDIFF_T_DEFINED
-#    endif
 #  else
 #    define fdopen(fd,type)  _fdopen(fd,type)
 #  endif
@@ -188,8 +191,9 @@ extern z_const char * const z_errmsg[10]; /* indexed by 2-zlib_error */
 /* provide prototypes for these when building zlib without LFS */
 #if !defined(_WIN32) && \
     (!defined(_LARGEFILE64_SOURCE) || _LFS64_LARGEFILE-0 == 0)
-    ZEXTERN uLong ZEXPORT adler32_combine64 OF((uLong, uLong, z_off_t));
-    ZEXTERN uLong ZEXPORT crc32_combine64 OF((uLong, uLong, z_off_t));
+    ZEXTERN uLong ZEXPORT adler32_combine64(uLong, uLong, z_off_t);
+    ZEXTERN uLong ZEXPORT crc32_combine64(uLong, uLong, z_off_t);
+    ZEXTERN uLong ZEXPORT crc32_combine_gen64(z_off_t);
 #endif
 
         /* common defaults */
@@ -228,16 +232,16 @@ extern z_const char * const z_errmsg[10]; /* indexed by 2-zlib_error */
 #    define zmemzero(dest, len) memset(dest, 0, len)
 #  endif
 #else
-   void ZLIB_INTERNAL zmemcpy OF((Bytef* dest, const Bytef* source, uInt len));
-   int ZLIB_INTERNAL zmemcmp OF((const Bytef* s1, const Bytef* s2, uInt len));
-   void ZLIB_INTERNAL zmemzero OF((Bytef* dest, uInt len));
+   void ZLIB_INTERNAL zmemcpy(Bytef* dest, const Bytef* source, uInt len);
+   int ZLIB_INTERNAL zmemcmp(const Bytef* s1, const Bytef* s2, uInt len);
+   void ZLIB_INTERNAL zmemzero(Bytef* dest, uInt len);
 #endif
 
 /* Diagnostic functions */
 #ifdef ZLIB_DEBUG
 #  include <stdio.h>
    extern int ZLIB_INTERNAL z_verbose;
-   extern void ZLIB_INTERNAL z_error OF((char *m));
+   extern void ZLIB_INTERNAL z_error(char *m);
 #  define Assert(cond,msg) {if(!(cond)) z_error(msg);}
 #  define Trace(x) {if (z_verbose>=0) fprintf x ;}
 #  define Tracev(x) {if (z_verbose>0) fprintf x ;}
@@ -254,9 +258,9 @@ extern z_const char * const z_errmsg[10]; /* indexed by 2-zlib_error */
 #endif
 
 #ifndef Z_SOLO
-   voidpf ZLIB_INTERNAL zcalloc OF((voidpf opaque, unsigned items,
-                                    unsigned size));
-   void ZLIB_INTERNAL zcfree  OF((voidpf opaque, voidpf ptr));
+   voidpf ZLIB_INTERNAL zcalloc(voidpf opaque, unsigned items,
+                                unsigned size);
+   void ZLIB_INTERNAL zcfree(voidpf opaque, voidpf ptr);
 #endif
 
 #define ZALLOC(strm, items, size) \
@@ -264,60 +268,8 @@ extern z_const char * const z_errmsg[10]; /* indexed by 2-zlib_error */
 #define ZFREE(strm, addr)  (*((strm)->zfree))((strm)->opaque, (voidpf)(addr))
 #define TRY_FREE(s, p) {if (p) ZFREE(s, p);}
 
-   /* Reverse the bytes in a 32-bit value. Use compiler intrinsics when
-   possible to take advantage of hardware implementations. */
-#if defined(_WIN32) && (_MSC_VER >= 1300)
-#  pragma intrinsic(_byteswap_ulong)
-#  define ZSWAP32(q) _byteswap_ulong(q)
-
-#elif defined(__Clang__) || (defined(__GNUC__) && \
-        (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 2)))
-#  define ZSWAP32(q) __builtin_bswap32(q)
-
-#elif defined(__GNUC__) && (__GNUC__ >= 2) && defined(__linux__)
-#  include <byteswap.h>
-#  define ZSWAP32(q) bswap_32(q)
-
-#elif defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__DragonFly__)
-#  include <sys/endian.h>
-#  define ZSWAP32(q) bswap32(q)
-
-#elif defined(__INTEL_COMPILER)
-#  define ZSWAP32(q) _bswap(q)
-
-#else
-#  define ZSWAP32(q) ((((q) >> 24) & 0xff) + (((q) >> 8) & 0xff00) + \
+/* Reverse the bytes in a 32-bit value */
+#define ZSWAP32(q) ((((q) >> 24) & 0xff) + (((q) >> 8) & 0xff00) + \
                     (((q) & 0xff00) << 8) + (((q) & 0xff) << 24))
-#endif /* ZSWAP32 */
-
-/* Only enable likely/unlikely if the compiler is known to support it */
-#if (defined(__GNUC__) && (__GNUC__ >= 3)) || defined(__INTEL_COMPILER) || defined(__Clang__)
-#  ifndef likely
-#    define likely(x)      __builtin_expect(!!(x), 1)
-#  endif
-#  ifndef unlikely
-#    define unlikely(x)    __builtin_expect(!!(x), 0)
-#  endif
-#else
-#  ifndef likely
-#    define likely(x)      x
-#  endif
-#  ifndef unlikely
-#    define unlikely(x)    x
-#  endif
-#endif /* (un)likely */
-
-#ifdef _MSC_VER
-#define zalign(x) __declspec(align(x))
-#else
-#define zalign(x) __attribute__((aligned((x))))
-#endif
-
-#ifdef _MSC_VER
-// __forceinline is apparently required (__inline is not sufficient) for VS14 to inline the insert_string_sse function with /O2
-#define INLINE __forceinline
-#else
-#define INLINE inline
-#endif
 
 #endif /* ZUTIL_H */
