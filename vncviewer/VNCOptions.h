@@ -150,6 +150,8 @@ public:
 	bool m_giiEnable;
 #endif
 
+	bool m_dontShowDialogs;
+
 	int DoDialog(bool running = false, HWND hwnd = NULL);
 	void SetFromCommandLine(LPTSTR szCmdLine);
 
