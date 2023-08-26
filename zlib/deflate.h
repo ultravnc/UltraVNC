@@ -1,5 +1,5 @@
 /* deflate.h -- internal compression state
- * Copyright (C) 1995-2016 Jean-loup Gailly
+ * Copyright (C) 1995-2018 Jean-loup Gailly
  * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
@@ -110,8 +110,6 @@ typedef struct internal_state {
     Byte  method;        /* can only be DEFLATED */
     int   last_flush;    /* value of flush param for previous deflate call */
 
-    unsigned zalign(16) crc0[4 * 5];
-
                 /* used by deflate.c: */
 
     uInt  w_size;        /* LZ77 window size (32K by default) */
@@ -219,7 +217,7 @@ typedef struct internal_state {
     /* Depth of each subtree used as tie breaker for trees of equal frequency
      */
 
-    uchf *l_buf;          /* buffer for literals or lengths */
+    uchf *sym_buf;        /* buffer for distances and literals/lengths */
 
     uInt  lit_bufsize;
     /* Size of match buffer for literals/lengths.  There are 4 reasons for
@@ -241,13 +239,8 @@ typedef struct internal_state {
      *   - I can't count above 4
      */
 
-    uInt last_lit;      /* running index in l_buf */
-
-    ushf *d_buf;
-    /* Buffer for distances. To simplify the code, d_buf and l_buf have
-     * the same number of elements. To use different lengths, an extra flag
-     * array would be necessary.
-     */
+    uInt sym_next;      /* running index in sym_buf */
+    uInt sym_end;       /* symbol table full when sym_next reaches this */
 
     ulg opt_len;        /* bit length of current block with optimal trees */
     ulg static_len;     /* bit length of current block with static trees */
@@ -282,30 +275,6 @@ typedef struct internal_state {
  */
 #define put_byte(s, c) {s->pending_buf[s->pending++] = (Bytef)(c);}
 
-/* ===========================================================================
- * Output a short LSB first on the stream.
- * IN assertion: there is enough room in pendingBuf.
- */
-#ifdef UNALIGNED_OK
-/* Compared to the else-clause's implementation, there are few advantages:
- *  - s->pending is loaded only once (else-clause's implementation needs to
- *    load s->pending twice due to the alias between s->pending and
- *    s->pending_buf[].
- *  - no instructions for extracting bytes from short.
- *  - needs less registers
- *  - stores to adjacent bytes are merged into a single store, albeit at the
- *    cost of penalty of potentially unaligned access. 
- */
-#define put_short(s, w) { \
-    *(ushf*)(&s->pending_buf[s->pending]) = (w) ; \
-    s->pending += 2; \
-}
-#else
-#define put_short(s, w) { \
-    put_byte(s, (uch)((w) & 0xff)); \
-    put_byte(s, (uch)((ush)(w) >> 8)); \
-}
-#endif
 
 #define MIN_LOOKAHEAD (MAX_MATCH+MIN_MATCH+1)
 /* Minimum amount of lookahead, except at the end of the input file.
@@ -322,14 +291,14 @@ typedef struct internal_state {
    memory checker errors from longest match routines */
 
         /* in trees.c */
-void ZLIB_INTERNAL _tr_init OF((deflate_state *s));
-int ZLIB_INTERNAL _tr_tally OF((deflate_state *s, unsigned dist, unsigned lc));
-void ZLIB_INTERNAL _tr_flush_block OF((deflate_state *s, charf *buf,
-                        ulg stored_len, int last));
-void ZLIB_INTERNAL _tr_flush_bits OF((deflate_state *s));
-void ZLIB_INTERNAL _tr_align OF((deflate_state *s));
-void ZLIB_INTERNAL _tr_stored_block OF((deflate_state *s, charf *buf,
-                        ulg stored_len, int last));
+void ZLIB_INTERNAL _tr_init(deflate_state *s);
+int ZLIB_INTERNAL _tr_tally(deflate_state *s, unsigned dist, unsigned lc);
+void ZLIB_INTERNAL _tr_flush_block(deflate_state *s, charf *buf,
+                                   ulg stored_len, int last);
+void ZLIB_INTERNAL _tr_flush_bits(deflate_state *s);
+void ZLIB_INTERNAL _tr_align(deflate_state *s);
+void ZLIB_INTERNAL _tr_stored_block(deflate_state *s, charf *buf,
+                                    ulg stored_len, int last);
 
 #define d_code(dist) \
    ((dist) < 256 ? _dist_code[dist] : _dist_code[256+((dist)>>7)])
@@ -351,33 +320,27 @@ void ZLIB_INTERNAL _tr_stored_block OF((deflate_state *s, charf *buf,
 
 # define _tr_tally_lit(s, c, flush) \
   { uch cc = (c); \
-    s->d_buf[s->last_lit] = 0; \
-    s->l_buf[s->last_lit++] = cc; \
+    s->sym_buf[s->sym_next++] = 0; \
+    s->sym_buf[s->sym_next++] = 0; \
+    s->sym_buf[s->sym_next++] = cc; \
     s->dyn_ltree[cc].Freq++; \
-    flush = (s->last_lit == s->lit_bufsize-1); \
+    flush = (s->sym_next == s->sym_end); \
    }
 # define _tr_tally_dist(s, distance, length, flush) \
   { uch len = (uch)(length); \
     ush dist = (ush)(distance); \
-    s->d_buf[s->last_lit] = dist; \
-    s->l_buf[s->last_lit++] = len; \
+    s->sym_buf[s->sym_next++] = (uch)dist; \
+    s->sym_buf[s->sym_next++] = (uch)(dist >> 8); \
+    s->sym_buf[s->sym_next++] = len; \
     dist--; \
     s->dyn_ltree[_length_code[len]+LITERALS+1].Freq++; \
     s->dyn_dtree[d_code(dist)].Freq++; \
-    flush = (s->last_lit == s->lit_bufsize-1); \
+    flush = (s->sym_next == s->sym_end); \
   }
 #else
 # define _tr_tally_lit(s, c, flush) flush = _tr_tally(s, 0, c)
 # define _tr_tally_dist(s, distance, length, flush) \
               flush = _tr_tally(s, distance, length)
 #endif
-
-/* ===========================================================================
- * Update a hash value with the given input byte
- * IN  assertion: all calls to UPDATE_HASH are made with consecutive input
- *    characters, so that a running hash key can be computed from the previous
- *    key instead of complete recalculation each time.
- */
-#define UPDATE_HASH_C(s,h,c) (h = (((h)<<s->hash_shift) ^ (c)) & s->hash_mask)
 
 #endif /* DEFLATE_H */
