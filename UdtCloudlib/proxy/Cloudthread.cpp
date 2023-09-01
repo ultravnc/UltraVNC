@@ -110,21 +110,23 @@ DWORD CloudThread::ThreadStart(void)
     struct fd_set fds;
     while ( (cStatus == csConnecting  || cStatus == csOnline) && threadRunning) {
         
-        timeout.tv_sec = 2;
+        timeout.tv_sec = 6;
         timeout.tv_usec = 0;
         FD_ZERO(&fds);
         FD_SET(udpSocket, &fds);
         int value = select(0, &fds, 0, 0, &timeout);
-        if (!threadRunning) 
+        if (!threadRunning) {            
             return 0;
+        }
 
         switch (value) {
             case -1:
                 cStatus = csError;
+                SendDisconnectInfo();
                 return 0;
             case 0:
                 counter++;
-                if (counter == 30) {//60s
+                if (counter == 10) {//60s
                     if (!SendInfo())
                         return 0;
                     counter = 0;
@@ -141,9 +143,10 @@ DWORD CloudThread::ThreadStart(void)
                         cStatus = csOnline;
                     else if (sp.contype == 1) {
                         cStatus = csRendezvous;
+                        SendDisconnectInfo();
                         if (rendezvous(udpSocket, sp.externip, sp.externport)) {
                             if (ctSERVER == ctType) {
-                                ConnectToVNCServer();
+                                ConnectToVNCServer();                                
                                 return 1;
                             }
                             else {
@@ -154,6 +157,7 @@ DWORD CloudThread::ThreadStart(void)
                     }
                     else if (sp.contype == 2) {
                         cStatus = csRendezvous;
+                        SendDisconnectInfo();
                         if (rendezvous(udpSocket, sp.localip, sp.localport)) {
                             if (ctSERVER == ctType) {
                                 ConnectToVNCServer();
@@ -167,14 +171,16 @@ DWORD CloudThread::ThreadStart(void)
                     }                   
                     strncpy_s(G_externalip, sp.externip, 16);
                     for (int i = 0; i < 10; i++) {
-                        if (!threadRunning)
+                        if (!threadRunning) {
                             return 0;
+                        }
                         Sleep(500);
                     }
                 }
             }
         }
     }
+    SendDisconnectInfo();
     return 0;
 }
 
@@ -257,6 +263,7 @@ void CloudThread::ConnectVNCViewer()
 void CloudThread::stopThread()
 {
     threadRunning = false;
+    SendDisconnectInfo();
     if (udpSocket != INVALID_SOCKET) {
         closesocket(udpSocket);
     }
@@ -287,9 +294,9 @@ void CloudThread::stopThread()
     memset(G_externalip, 0, 16);
 }
 
-bool CloudThread::SendInfo()
+bool CloudThread::SendDisconnectInfo()
 {
-    udppacket up;
+    udppacket up{};
     up.serverviewer = ctType;
     strcpy_s(up.name, code);
     strcpy_s(up.group, "ikke");
@@ -306,6 +313,35 @@ bool CloudThread::SendInfo()
     receiverAddr.sin_family = AF_INET;
     receiverAddr.sin_port = htons(NATREMOTE);
     inet_pton(AF_INET, server, &receiverAddr.sin_addr.s_addr);
+    up.contype = 10;
+    int result = sendto(udpSocket, (char*)&up, sizeof(up), 0, (SOCKADDR*)&receiverAddr, sizeof(receiverAddr));   
+    if (result == -1) {
+        cStatus = csError;
+        return false;
+    }
+    return true;
+}
+
+bool CloudThread::SendInfo()
+{
+    udppacket up{};
+    up.serverviewer = ctType;
+    strcpy_s(up.name, code);
+    strcpy_s(up.group, "ikke");
+    strcpy_s(up.ident, "uvnc677");
+    char szHostName[MAX_HOST_NAME_LEN];
+    gethostname(szHostName, MAX_HOST_NAME_LEN);
+    struct hostent* host_entry;
+    host_entry = gethostbyname(szHostName);
+    char* szLocalIP;
+    szLocalIP = inet_ntoa(*(struct in_addr*)*host_entry->h_addr_list);
+    strncpy_s(up.localip, szLocalIP, 32);
+    up.localport = udpPort;
+    memset(&receiverAddr, 0, sizeof(SOCKADDR_IN));
+    receiverAddr.sin_family = AF_INET;
+    receiverAddr.sin_port = htons(NATREMOTE);
+    inet_pton(AF_INET, server, &receiverAddr.sin_addr.s_addr);
+    up.contype = 11;
     int result = sendto(udpSocket, (char*)&up, sizeof(up), 0, (SOCKADDR*)&receiverAddr, sizeof(receiverAddr));
     if (result == -1) {
         cStatus = csError;

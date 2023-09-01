@@ -67,6 +67,7 @@ private:
 	void ConnectVNCViewer();
 	bool rendezvous(UDPSOCKET udpsock, char* ip, int port);
 	bool SendInfo();
+	bool SendDisconnectInfo();
 	int m_VncPort = 0;
 	Proxy *proxy = NULL;
 
