@@ -188,8 +188,6 @@ void ClientConnection::BorderlessMode()
 	SetWindowLong(m_hwndMain, GWL_STYLE, style);
 	m_opts->m_ShowToolbar = false;	
 	SetWindowPos(m_hwndMain, HWND_NOTOPMOST, 0, 0, 100, 100, SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED); 
-
-	SetWindowPos(m_hwndcn, m_hwndTBwin, 0, 0, 100, 100, SWP_SHOWWINDOW);
 	SetWindowPos(m_hwndTBwin, NULL, 0, 0, 0, 0, SWP_HIDEWINDOW);
 
 	// adzm - 2010-07 - Extended clipboard

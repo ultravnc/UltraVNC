@@ -5286,6 +5286,7 @@ void* ClientConnection::run_undetached(void* arg) {
 	if (m_autoReconnect==0) m_autoReconnect=1;
 	initialupdate_counter=0;
 	ResetEvent(KillUpdateThreadEvent);
+	RealiseFullScreenMode();
 	while (m_autoReconnect > 0)
 	{
 		try
