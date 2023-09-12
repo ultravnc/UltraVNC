@@ -2304,8 +2304,8 @@ vncClientThread::run(void* arg)
 	// Get the name of this desktop
 	// sf@2002 - v1.1.x - Complete the computer name with the IP address if necessary
 	bool fIP = false;
-	char desktopname[MAX_COMPUTERNAME_LENGTH + 3 + 256] = { 0 };
-	DWORD desktopnamelen = MAX_COMPUTERNAME_LENGTH + 1 + 256;
+	char desktopname[MAX_COMPUTERNAME_LENGTH + 3 + 256 + 32] = { 0 };
+	DWORD desktopnamelen = MAX_COMPUTERNAME_LENGTH + 1 + 256 + 32;
 	memset((char*)desktopname, 0, sizeof(desktopname));
 	if (GetComputerName(desktopname, &desktopnamelen))
 	{
