@@ -6,8 +6,8 @@
 #define MyAppSupportURL    "http://forum.uvnc.com"
 #define MyAppUpdatesURL    "http://www.uvnc.com"
 
-#define MyAppVersion       "1.4.2.2"
-#define MyAppOutputVersion "1_4_2_2_dev"
+#define MyAppVersion       "1.4.3.5"
+#define MyAppOutputVersion "1435"
 
 [Setup]
 AppName={#MyAppName}
@@ -211,10 +211,10 @@ Source: "bmp\isdonate.bmp"; Flags: dontcopy
 ; component independent files
 Source: "download\isxdl.dll"; Flags: dontcopy
 ; Add the ISSkin DLL used for skinning Inno Setup installations.
-Source: "style\ISSkin.dll"; DestDir: "{app}"; Flags: dontcopy
+//Source: "style\ISSkin.dll"; DestDir: "{app}"; Flags: dontcopy
 ; Add the Visual Style resource contains resources used for skinning,
 ; you can also use Microsoft Visual Styles (*.msstyles) resources.
-Source: "style\Vista.cjstyles"; DestDir: "{tmp}"; Flags: dontcopy
+//Source: "style\Vista.cjstyles"; DestDir: "{tmp}"; Flags: dontcopy
 Source: "icon\UltraVNC.ico"; Flags: dontcopy
 Source: "bmp\WizModernSmallImage-IS.bmp"; Flags: dontcopy
 
@@ -233,7 +233,7 @@ Source: "64\xp\vnchooks.dll"; DestDir: "{app}"; Flags: ignoreversion replacesame
 Source: "64\xp\ddengine64.dll"; DestDir: "{app}"; Flags: ignoreversion replacesameversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Server
 Source: "64\xp\UVncVirtualDisplay64\*"; DestDir: "{app}\UVncVirtualDisplay64"; Flags: ignoreversion replacesameversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Server
 Source: "repeater\repeater.exe"; DestDir: "{app}"; Flags: ignoreversion replacesameversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Repeater
-Source: "encryptionplugins\xp\64\SecureVNCPlugin64.dsm"; DestDir: "{app}"; Flags: ignoreversion replacesameversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Viewer UltraVNC_Server
+Source: "64\xp\SecureVNCPlugin64.dsm"; DestDir: "{app}"; Flags: ignoreversion replacesameversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Viewer UltraVNC_Server
 
 Source: "64\xp\uvnckeyboardhelper.exe"; DestDir: "{app}"; Flags: ignoreversion replacesameversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Server
 ; mslogon I files
@@ -318,11 +318,11 @@ SelectedTasks: String;
 ConCont: Integer;
 
 // Importing LoadSkin API from ISSkin.DLL
-procedure LoadSkin(lpszPath: String; lpszIniFileName: String);
-external 'LoadSkin@files:isskin.dll stdcall';
+//procedure LoadSkin(lpszPath: String; lpszIniFileName: String);
+//external 'LoadSkin@files:isskin.dll stdcall';
 // Importing UnloadSkin API from ISSkin.DLL
-procedure UnloadSkin();
-external 'UnloadSkin@files:isskin.dll stdcall';
+//procedure UnloadSkin();
+//external 'UnloadSkin@files:isskin.dll stdcall';
 // Importing ShowWindow Windows API from User32.DLL
 function ShowWindow(hWnd: Integer; uType: Integer): Integer;
 external 'ShowWindow@user32.dll stdcall';
@@ -384,8 +384,8 @@ end;
 
 function InitializeSetup(): Boolean;
 begin
-   ExtractTemporaryFile('Vista.cjstyles');
-   LoadSkin(ExpandConstant('{tmp}\Vista.cjstyles'), '');
+   //ExtractTemporaryFile('Vista.cjstyles');
+   //LoadSkin(ExpandConstant('{tmp}\Vista.cjstyles'), '');
    Result := True;
 end; 
 
@@ -394,7 +394,7 @@ begin
    // Hide Window before unloading skin so user does not get
    // a glimpse of an unskinned window before it is closed.
    ShowWindow(StrToInt(ExpandConstant('{wizardhwnd}')), 0);
-   UnloadSkin();
+   //UnloadSkin();
 end;
 
 procedure DonateImageOnClick(Sender: TObject);
