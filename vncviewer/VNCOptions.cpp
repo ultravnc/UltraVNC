@@ -1341,6 +1341,7 @@ void VNCOptions::ShowUsage(LPTSTR info) {
 			"      [/encodings xz zrle ...]  (in order of priority)\r\n"
 			"      [/autoacceptincoming] [/autoacceptnodsm] [/disablesponsor][/InfoMsg \"Messages need quotes\"]\r\n" //adzm 2009-06-21, adzm 2009-07-19
 			"      [/requireencryption] [/enablecache] [/throttlemouse n] [/socketkeepalivetimeout n]\r\n" //adzm 2010-05-12
+			"      [/gnome]\r\n"
 			"For full details see documentation."),
 		tmpinf);
 	MessageBox(NULL, msg, sz_A2, MB_OK | MB_ICONINFORMATION | MB_TOPMOST);
