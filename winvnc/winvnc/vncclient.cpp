@@ -4778,8 +4778,6 @@ vncClient::~vncClient()
 		WaitForSingleObject(ThreadHandleCompressFolder, INFINITE);
 		CloseHandle(ThreadHandleCompressFolder);
 	}
-	if (m_server->virtualDisplay)
-		m_server->virtualDisplay->disconnectDisplay(m_id, !m_server->AreThereMultipleViewers() && initialCapture_done);
 	if (simulateCursor)
 		delete simulateCursor;
 	if (desktopUsersToken)
@@ -4837,6 +4835,8 @@ vncClient::Kill(bool deleted)
 		m_socket->Close();
 	if (deleted)
 		((vncClientThread*)m_thread_ClientThread)->m_deleted = true;
+	if (m_server->virtualDisplay)
+		m_server->virtualDisplay->disconnectDisplay(m_id, !m_server->AreThereMultipleViewers() && initialCapture_done);
 }
 
 // Client manipulation functions for use by the server

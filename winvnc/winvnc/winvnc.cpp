@@ -1392,8 +1392,7 @@ int WinVNCAppMain()
 		delete[] g_szRepeaterHost;
 		g_szRepeaterHost = NULL;
 	}
-	if (settings)
-		delete settings;
+
 	if (VNC_OSVersion::getInstance())
 		delete VNC_OSVersion::getInstance();
 	return 1;
