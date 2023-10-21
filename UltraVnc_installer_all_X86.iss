@@ -6,8 +6,8 @@
 #define MyAppSupportURL    "http://forum.uvnc.com"
 #define MyAppUpdatesURL    "http://uvnc.com"
 
-#define MyAppVersion       "1.4.3.5"
-#define MyAppOutputVersion "1435"
+#define MyAppVersion       "1.4.3.6"
+#define MyAppOutputVersion "1436"
 
 [Setup]
 AppName={#MyAppName}
