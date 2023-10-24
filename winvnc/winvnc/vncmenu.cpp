@@ -297,6 +297,12 @@ vncMenu::vncMenu(vncServer* server)
 
 vncMenu::~vncMenu()
 {
+#ifdef SC_20
+	if (ScSelect::g_dis_uac)
+		ScSelect::Restore_UAC_for_admin_elevated();
+	ScSelect::g_dis_uac = false;
+#endif
+
 	KillTimer(m_hwnd, 1);
 	vnclog.Print(LL_INTERR, VNCLOG("vncmenu killed\n"));
 
