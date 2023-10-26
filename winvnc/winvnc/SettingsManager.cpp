@@ -290,13 +290,13 @@ void SettingsManager::load()
 	m_pref_EnableUnicodeInput = myIniFile.ReadInt("admin", "EnableUnicodeInput", m_pref_EnableUnicodeInput);
 	m_pref_EnableWin8Helper = myIniFile.ReadInt("admin", "EnableWin8Helper", m_pref_EnableWin8Helper);
 	m_pref_clearconsole = myIniFile.ReadInt("admin", "clearconsole", m_pref_clearconsole);
-	G_SENDBUFFER_EX = myIniFile.ReadInt("admin", "sendbuffer", G_SENDBUFFER_EX);
-	myIniFile.ReadString("admin_auth", "group1", m_pref_group1, 150);
+	G_SENDBUFFER_EX = myIniFile.ReadInt("admin", "sendbuffer", G_SENDBUFFER_EX);	
 	_tcscpy_s(m_pref_group1, "VNCACCESS");
-	myIniFile.ReadString("admin_auth", "group2", m_pref_group2, 150);
+	myIniFile.ReadString("admin_auth", "group1", m_pref_group1, 150);
 	_tcscpy_s(m_pref_group2, "Administrators");
-	myIniFile.ReadString("admin_auth", "group3", m_pref_group3, 150);
+	myIniFile.ReadString("admin_auth", "group2", m_pref_group2, 150);	
 	_tcscpy_s(m_pref_group3, "VNCVIEWONLY");
+	myIniFile.ReadString("admin_auth", "group3", m_pref_group3, 150);
 
 	myIniFile.ReadString("admin", "cloudServer", m_pref_cloudServer, MAX_HOST_NAME_LEN);
 	m_pref_cloudEnabled = myIniFile.ReadInt("admin", "cloudEnabled", m_pref_cloudEnabled);
