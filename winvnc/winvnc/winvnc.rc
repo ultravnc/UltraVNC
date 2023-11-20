@@ -160,7 +160,7 @@ BEGIN
 END
 
 IDD_PROPERTIES1 DIALOGEX 0, 0, 663, 483
-STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_VSCROLL | WS_HSCROLL | WS_SYSMENU | WS_THICKFRAME
 CAPTION " UltraVNC Server Property Page"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
@@ -201,7 +201,7 @@ BEGIN
     CONTROL         "MS Logon",IDC_MSLOGON_CHECKD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,237,19,67,10
     CONTROL         "New MS Logon, multiple domains",IDC_NEW_MSLOGON,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,237,32,153,11
     PUSHBUTTON      "Configure MS Logon Groups",IDC_MSLOGON,248,44,98,12
-    GROUPBOX        "Misc.",IDC_STATIC,231,328,187,151,BS_LEFT
+    GROUPBOX        "Misc.",IDC_STATIC,231,318,187,151,BS_LEFT
     CONTROL         "Remove Wallpaper while connected",IDC_REMOVE_WALLPAPER,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,237,363,134,10
     CONTROL         "Enable Blank Monitor on Viewer Request",IDC_BLANK,
@@ -260,7 +260,7 @@ BEGIN
     GROUPBOX        "Reverse connection",IDC_STATIC,232,61,182,88
     CONTROL         "  Authentication required for server \n  initiated connections",IDC_REVERSEAUTH,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,239,128,166,16
-    GROUPBOX        "Incoming connection",IDC_STATIC,7,335,220,144
+    GROUPBOX        "Incoming connection",IDC_STATIC,7,325,220,144
     CONTROL         "Sharing indicator frame around shared screen",IDC_FRAME,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,416,167,10
     CONTROL         "Show notification on connect",IDC_NOTIFOCATION,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,439,110,10
@@ -400,7 +400,7 @@ BEGIN
 
     IDD_PROPERTIES1, DIALOG
     BEGIN
-        RIGHTMARGIN, 603
+        RIGHTMARGIN, 591
         VERTGUIDE, 7
         VERTGUIDE, 14
         VERTGUIDE, 62
@@ -414,7 +414,7 @@ BEGIN
         VERTGUIDE, 374
         VERTGUIDE, 405
         VERTGUIDE, 414
-        BOTTOMMARGIN, 479
+        BOTTOMMARGIN, 469
         HORZGUIDE, 235
     END
 
@@ -595,21 +595,6 @@ BEGIN
     0
 END
 
-#if defined(SC_20)
-/////////////////////////////////////////////////////////////////////////////
-//
-// DLL
-//
-
-IDR_DLL1                DLL                     "res/ddengine.dll"
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// ENCRYPTIONDLL
-//
-IDR_ENCRYPTIONDLL1      ENCRYPTIONDLL           "res/SecureVNCPlugin.dsm"
-#endif
 
 /////////////////////////////////////////////////////////////////////////////
 //

@@ -61,6 +61,15 @@ private:
 	vncSetAuth	m_vncauth;
 	BOOL		m_dlgvisible;
 	IniFile		myIniFile;
+	BOOL SD_OnInitDialog(HWND hwnd);
+	void SD_OnSize(HWND hwnd, UINT state, int cx, int cy);
+	void SD_OnHScroll(HWND hwnd, UINT code);
+	void SD_OnVScroll(HWND hwnd, UINT code);
+	void SD_OnHVScroll(HWND hwnd, int bar, UINT code);
+	void SD_ScrollClient(HWND hwnd, int bar, int pos);
+	int SD_GetScrollPos(HWND hwnd, int bar, UINT code);
+	int maxHeight = 0;
+	int maxWidth = 0;
 };
 
 #endif // _WINVNC_VNCPROPERTIES

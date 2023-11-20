@@ -206,7 +206,7 @@ vncProperties::DialogProc(HWND hwnd,
 		_this = (vncProperties*)lParam;
 		_this->m_dlgvisible = TRUE;
 
-		_this->LoadFromIniFile();
+		_this->LoadFromIniFile();		
 
 		// Initialise the properties controls
 		HWND hConnectSock = GetDlgItem(hwnd, IDC_CONNECT_SOCK);
@@ -494,8 +494,7 @@ vncProperties::DialogProc(HWND hwnd,
 		_this->ExpandBox(hwnd, !_this->bExpanded);
 		SendMessage(GetDlgItem(hwnd, IDC_BUTTON_EXPAND), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)_this->hBmpExpand);
 
-		SetForegroundWindow(hwnd);
-
+		SetForegroundWindow(hwnd);		
 		return FALSE; // Because we've set the focus
 	}
 	case WM_DESTROY :
@@ -1055,6 +1054,24 @@ vncProperties::DialogProc(HWND hwnd,
 		}
 		}
 		break;
+	case WM_SIZE:
+			_this->SD_OnSize(hwnd, wParam, LOWORD(lParam), HIWORD(lParam));			
+		break;
+	case WM_HSCROLL:
+		_this->SD_OnHScroll(hwnd, LOWORD(wParam));
+		break;
+	case  WM_VSCROLL:
+		_this->SD_OnVScroll(hwnd, LOWORD(wParam));
+		break;
+	case WM_GETMINMAXINFO:
+		MINMAXINFO* mmi = reinterpret_cast<MINMAXINFO*>(lParam);
+		if (_this->maxWidth != 0 && _this->maxHeight != 0) {
+			mmi->ptMaxSize.x = _this->maxWidth;
+			mmi->ptMaxSize.y = _this->maxHeight;
+			mmi->ptMaxTrackSize.x = _this->maxWidth;
+			mmi->ptMaxTrackSize.y = _this->maxHeight;
+		}
+		break;
 	}
 	return 0;
 }
@@ -1347,10 +1364,14 @@ void vncProperties::ExpandBox(HWND hDlg, BOOL fExpand)
 
 		// shrink the dialog box so that it encompasses everything from the top,
 		// left up to and including the default box.
+		maxWidth = rcDefaultBox.right - rcWnd.left;
+		maxHeight = rcDefaultBox.bottom - rcWnd.top;
 		SetWindowPos(hDlg, NULL, 0, 0,
 			rcDefaultBox.right - rcWnd.left,
 			rcDefaultBox.bottom - rcWnd.top,
 			SWP_NOZORDER | SWP_NOMOVE);
+
+
 
 		SetWindowText(pCtrl, "Advanced options");
 
@@ -1360,6 +1381,8 @@ void vncProperties::ExpandBox(HWND hDlg, BOOL fExpand)
 	else // we are expanding
 	{
 		_ASSERT(!bExpanded);
+		maxWidth = cx;
+		maxHeight =cy;
 		SetWindowPos(hDlg, NULL, 0, 0, cx, cy, SWP_NOZORDER | SWP_NOMOVE);
 
 		// make sure that the entire dialog box is visible on the user's
@@ -1368,4 +1391,158 @@ void vncProperties::ExpandBox(HWND hDlg, BOOL fExpand)
 		SetWindowText(pCtrl, "Hide");
 		bExpanded = TRUE;
 	}
+	SD_OnInitDialog(hDlg);
+}
+
+BOOL vncProperties::SD_OnInitDialog(HWND hwnd)
+{
+	RECT rc = {};
+	GetClientRect(hwnd, &rc);
+
+	const SIZE sz = { rc.right - rc.left, rc.bottom - rc.top };
+
+	SCROLLINFO si = {};
+	si.cbSize = sizeof(SCROLLINFO);
+	si.fMask = SIF_PAGE | SIF_POS | SIF_RANGE;
+	si.nPos = si.nMin = 1;
+
+	si.nMax = sz.cx;
+	si.nPage = sz.cx;
+	SetScrollInfo(hwnd, SB_HORZ, &si, FALSE);
+
+	si.nMax = sz.cy;
+	si.nPage = sz.cy;
+	SetScrollInfo(hwnd, SB_VERT, &si, FALSE);
+	return FALSE;
+}
+
+void vncProperties::SD_OnSize(HWND hwnd, UINT state, int cx, int cy)
+{
+	if (state != SIZE_RESTORED && state != SIZE_MAXIMIZED)
+		return;
+
+	SCROLLINFO si = {};
+	si.cbSize = sizeof(SCROLLINFO);
+
+	const int bar[] = { SB_HORZ, SB_VERT };
+	const int page[] = { cx, cy };
+
+	for (size_t i = 0; i < ARRAYSIZE(bar); ++i)
+	{
+		si.fMask = SIF_PAGE;
+		si.nPage = page[i];
+		SetScrollInfo(hwnd, bar[i], &si, TRUE);
+
+		si.fMask = SIF_RANGE | SIF_POS;
+		GetScrollInfo(hwnd, bar[i], &si);
+
+		const int maxScrollPos = si.nMax - (page[i] - 1);
+
+		// Scroll client only if scroll bar is visible and window's
+		// content is fully scrolled toward right and/or bottom side.
+		// Also, update window's content on maximize.
+		const bool needToScroll =
+			(si.nPos != si.nMin && si.nPos == maxScrollPos) ||
+			(state == SIZE_MAXIMIZED);
+
+		if (needToScroll)
+		{
+			SD_ScrollClient(hwnd, bar[i], si.nPos);
+		}
+	}
+}
+
+void vncProperties::SD_OnHScroll(HWND hwnd, UINT code)
+{
+	SD_OnHVScroll(hwnd, SB_HORZ, code);
+}
+
+void vncProperties::SD_OnVScroll(HWND hwnd,  UINT code)
+{
+	SD_OnHVScroll(hwnd, SB_VERT, code);
+}
+
+void vncProperties::SD_OnHVScroll(HWND hwnd, int bar, UINT code)
+{
+	const int scrollPos = SD_GetScrollPos(hwnd, bar, code);
+
+	if (scrollPos == -1)
+		return;
+
+	SetScrollPos(hwnd, bar, scrollPos, TRUE);
+	SD_ScrollClient(hwnd, bar, scrollPos);
+}
+
+void vncProperties::SD_ScrollClient(HWND hwnd, int bar, int pos)
+{
+	static int s_prevx = 1;
+	static int s_prevy = 1;
+
+	int cx = 0;
+	int cy = 0;
+
+	int& delta = (bar == SB_HORZ ? cx : cy);
+	int& prev = (bar == SB_HORZ ? s_prevx : s_prevy);
+
+	delta = prev - pos;
+	prev = pos;
+
+	if (cx || cy)
+	{
+		ScrollWindow(hwnd, cx, cy, NULL, NULL);
+	}
+}
+
+int vncProperties::SD_GetScrollPos(HWND hwnd, int bar, UINT code)
+{
+	SCROLLINFO si = {};
+	si.cbSize = sizeof(SCROLLINFO);
+	si.fMask = SIF_PAGE | SIF_POS | SIF_RANGE | SIF_TRACKPOS;
+	GetScrollInfo(hwnd, bar, &si);
+
+	const int minPos = si.nMin;
+	const int maxPos = si.nMax - (si.nPage - 1);
+
+	int result = -1;
+
+	switch (code)
+	{
+	case SB_LINEUP /*SB_LINELEFT*/:
+		result = std::max(si.nPos - 1, minPos);
+		break;
+
+	case SB_LINEDOWN /*SB_LINERIGHT*/:
+		result = std::min(si.nPos + 1, maxPos);
+		break;
+
+	case SB_PAGEUP /*SB_PAGELEFT*/:
+		result = std::max(si.nPos - (int)si.nPage, minPos);
+		break;
+
+	case SB_PAGEDOWN /*SB_PAGERIGHT*/:
+		result = std::min(si.nPos + (int)si.nPage, maxPos);
+		break;
+
+	case SB_THUMBPOSITION:
+		// do nothing
+		break;
+
+	case SB_THUMBTRACK:
+		result = si.nTrackPos;
+		break;
+
+	case SB_TOP /*SB_LEFT*/:
+		result = minPos;
+		break;
+
+	case SB_BOTTOM /*SB_RIGHT*/:
+		result = maxPos;
+		break;
+
+	case SB_ENDSCROLL:
+		// do nothing
+		break;
+	}
+
+	return result;
 }
