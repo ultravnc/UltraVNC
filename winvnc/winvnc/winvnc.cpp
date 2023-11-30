@@ -209,683 +209,698 @@ Myinit(HINSTANCE hInstance)
 #endif
 #endif
 
+bool return2(bool value)
+{
+#ifdef CRASHRPT
+	crUninstall();
+#endif
+	if (SettingsManager::getInstance())
+		delete SettingsManager::getInstance();
+#ifdef SC_20
+	if (ScSelect::g_dis_uac)
+		ScSelect::Restore_UAC_for_admin_elevated();
+#endif
+	return value;
+}
+
 // WinMain parses the command line and either calls the main App
 // routine or, under NT, the main service routine.
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2, int iCmdShow)
 {
-	if (VNC_OSVersion::getInstance()->OS_XP==true)
-		 MessageBoxSecure(NULL, "WIndows XP require special build", "Warning", MB_ICONERROR);
+	try {
+		if (VNC_OSVersion::getInstance()->OS_XP == true)
+			MessageBoxSecure(NULL, "WIndows XP require special build", "Warning", MB_ICONERROR);
 
-	if (VNC_OSVersion::getInstance()->OS_NOTSUPPORTED==true)
-	{
-		 MessageBoxSecure(NULL, "Error OS not supported","Unsupported OS", MB_ICONERROR);
-		return true;
-	}
-	// make vnc last service to stop
-	SetProcessShutdownParameters(0x100,false);
-	// handle dpi on aero
-	HMODULE hUser32 = LoadLibrary(_T("user32.dll"));
-	HMODULE hSHCore = LoadLibrary(_T("SHCore.dll"));
-
-	HRESULT(WINAPI *_SetProcessDpiAwareness)(DWORD value);
-	_SetProcessDpiAwareness	= 
-					(HRESULT(WINAPI*)(DWORD))GetProcAddress(hSHCore, "SetProcessDpiAwareness");
-	if (_SetProcessDpiAwareness)
-		_SetProcessDpiAwareness(2);
-	else  {
-		BOOL(WINAPI *_SetProcessDPIAware)();
-		_SetProcessDPIAware = (BOOL(WINAPI*)())GetProcAddress(hUser32, "SetProcessDPIAware");
-		if (_SetProcessDPIAware) 
-			_SetProcessDPIAware();
-	}
-	if (hUser32) 
-		FreeLibrary(hUser32);
-	if (hSHCore) 
-		FreeLibrary(hSHCore);
-
-#ifdef IPP
-	InitIpp();
-#endif
-#ifdef CRASHRPT
-	CR_INSTALL_INFO info;
-	memset(&info, 0, sizeof(CR_INSTALL_INFO));
-	info.cb = sizeof(CR_INSTALL_INFO);
-	info.pszAppName = _T("UVNC");
-	info.pszAppVersion = _T("1.4.3.7");
-	info.pszEmailSubject = _T("UVNC server 1.4.3.7 Error Report");
-	info.pszEmailTo = _T("uvnc@skynet.be");
-	info.uPriorities[CR_SMAPI] = 1; // Third try send report over Simple MAPI    
-	// Install all available exception handlers
-	info.dwFlags |= CR_INST_ALL_POSSIBLE_HANDLERS;
-	// Restart the app on crash 
-	info.dwFlags |= CR_INST_APP_RESTART;
-	info.dwFlags |= CR_INST_SEND_QUEUED_REPORTS;
-	info.dwFlags |= CR_INST_AUTO_THREAD_HANDLERS;
-	info.pszRestartCmdLine = _T("/restart");
-	// Define the Privacy Policy URL 
-
-	// Install crash reporting
-	int nResult = crInstall(&info);
-	if (nResult != 0)
-	{
-		// Something goes wrong. Get error message.
-		TCHAR szErrorMsg[512] = _T("");
-		crGetLastErrorMsg(szErrorMsg, 512);
-		_tprintf_s(_T("%s\n"), szErrorMsg);
-		return 1;
-	}
-#endif
-	bool Injected_autoreconnect=false;
-#ifndef SC_20
-	settings->setScExit(false);
-	settings->setScPrompt(false);
-#endif
-	setbuf(stderr, 0);
-
-	// [v1.0.2-jp1 fix] Load resouce from dll
-	hInstResDLL = NULL;
-
-	 //limit the vnclang.dll searchpath to avoid
-	char szCurrentDir[MAX_PATH];
-	char szCurrentDir_vnclangdll[MAX_PATH];
-	if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
-	{
-		char* p = strrchr(szCurrentDir, '\\');
-		*p = '\0';
-	}
-	strcpy_s(szCurrentDir_vnclangdll,szCurrentDir);
-	strcat_s(szCurrentDir_vnclangdll,"\\");
-	strcat_s(szCurrentDir_vnclangdll,"vnclang_server.dll");
-
-	hInstResDLL = LoadLibrary(szCurrentDir_vnclangdll);
-
-	if (hInstResDLL == NULL)
-	{
-		hInstResDLL = hInstance;
-	}
-//	RegisterLinkLabel(hInstResDLL);
-
-    //Load all messages from ressource file
-    Load_Localization(hInstResDLL) ;
-
-	char WORKDIR[MAX_PATH];
-	if (GetModuleFileName(NULL, WORKDIR, MAX_PATH))
+		if (VNC_OSVersion::getInstance()->OS_NOTSUPPORTED == true)
 		{
-		char* p = strrchr(WORKDIR, '\\');
-		if (p == NULL) return 0;
-		*p = '\0';
+			MessageBoxSecure(NULL, "Error OS not supported", "Unsupported OS", MB_ICONERROR);
+			return return2(true);
 		}
-    char progname[MAX_PATH];
-    strncpy_s(progname, WORKDIR, sizeof progname);
-    progname[MAX_PATH - 1] = 0;
-	vnclog.SetFile();
+		// make vnc last service to stop
+		SetProcessShutdownParameters(0x100, false);
+		// handle dpi on aero
+		HMODULE hUser32 = LoadLibrary(_T("user32.dll"));
+		HMODULE hSHCore = LoadLibrary(_T("SHCore.dll"));
 
+		HRESULT(WINAPI * _SetProcessDpiAwareness)(DWORD value);
+		_SetProcessDpiAwareness =
+			(HRESULT(WINAPI*)(DWORD))GetProcAddress(hSHCore, "SetProcessDpiAwareness");
+		if (_SetProcessDpiAwareness)
+			_SetProcessDpiAwareness(2);
+		else {
+			BOOL(WINAPI * _SetProcessDPIAware)();
+			_SetProcessDPIAware = (BOOL(WINAPI*)())GetProcAddress(hUser32, "SetProcessDPIAware");
+			if (_SetProcessDPIAware)
+				_SetProcessDPIAware();
+		}
+		if (hUser32)
+			FreeLibrary(hUser32);
+		if (hSHCore)
+			FreeLibrary(hSHCore);
 
-#ifdef _DEBUG
-	{
-		// Get current flag
-		int tmpFlag = _CrtSetDbgFlag( _CRTDBG_REPORT_FLAG );
+	#ifdef IPP
+		InitIpp();
+	#endif
+	#ifdef CRASHRPT
+		CR_INSTALL_INFO info;
+		memset(&info, 0, sizeof(CR_INSTALL_INFO));
+		info.cb = sizeof(CR_INSTALL_INFO);
+		info.pszAppName = _T("UVNC");
+		info.pszAppVersion = _T("1.4.3.7");
+		info.pszEmailSubject = _T("UVNC server 1.4.3.7 Error Report");
+		info.pszEmailTo = _T("uvnc@skynet.be");
+		info.uPriorities[CR_SMAPI] = 1; // Third try send report over Simple MAPI    
+		// Install all available exception handlers
+		info.dwFlags |= CR_INST_ALL_POSSIBLE_HANDLERS;
+		// Restart the app on crash 
+		info.dwFlags |= CR_INST_APP_RESTART;
+		info.dwFlags |= CR_INST_SEND_QUEUED_REPORTS;
+		info.dwFlags |= CR_INST_AUTO_THREAD_HANDLERS;
+		info.pszRestartCmdLine = _T("/restart");
+		// Define the Privacy Policy URL 
 
-		// Turn on leak-checking bit
-		tmpFlag |= _CRTDBG_LEAK_CHECK_DF;
-
-		// Set flag to the new value
-		_CrtSetDbgFlag( tmpFlag );
-	}
-#endif
-
-	// Save the application instance and main thread id
-	hAppInstance = hInstance;
-	mainthreadId = GetCurrentThreadId();
-
-	// Initialise the VSocket system
-	VSocketSystem socksys;
-	if (!socksys.Initialised())
-	{
-		MessageBoxSecure(NULL, sz_ID_FAILED_INIT, szAppName, MB_OK);
-#ifdef CRASHRPT
-		crUninstall();
-#endif
-		return 0;
-	}
-#ifdef SC_20
-	char  *szCmdLine = ScSelect::InitSC(hInstance, szCmdLine2);
-#else
-	char* szCmdLine = szCmdLine2;
-#endif
-    // look up the current service name in the registry.
-	//serviceHelpers::ExistServiceName(progname, UltraVNCService::service_name);
-
-	// Make the command-line lowercase and parse it
-	size_t i;
-	for (i = 0; i < strlen(szCmdLine); i++)
-	{
-		szCmdLine[i] = tolower(szCmdLine[i]);
-	}
-	BOOL argfound = FALSE;
-	for (i = 0; i < strlen(szCmdLine); i++)
-	{
-		if (szCmdLine[i] <= ' ')
-			continue;
-		argfound = TRUE;
-        if (strncmp(&szCmdLine[i], winvncinipath, strlen(winvncinipath)) == 0)
-        {
-            char filepath[MAX_PATH];
-            i += strlen(winvncinipath);
-            char Drv[_MAX_PATH];
-            char Path[_MAX_PATH];
-            char FileName[_MAX_PATH];
-            char FileExt[_MAX_PATH];
-            _splitpath_s(&(szCmdLine[i + 1]), Drv, Path, FileName, FileExt);
-            char *p = strchr(FileExt, ' ');
-            if (p) *p = 0;
-            _makepath_s(filepath, Drv, Path, FileName, FileExt);
-            g_szIniFile = _strdup(filepath);
-            i += strlen(filepath);
-#ifdef CRASHRPT
-            crUninstall();
-#endif
-            continue;
-        }
-
-		if (strncmp(&szCmdLine[i], winvncSettingshelper, strlen(winvncSettingshelper)) == 0)
+		// Install crash reporting
+		int nResult = crInstall(&info);
+		if (nResult != 0)
 		{
-			Sleep(3000);
-			char mycommand[MAX_PATH];
-			i+=strlen(winvncSettingshelper);
-			strcpy_s( mycommand, &(szCmdLine[i+1]));
-			settingsHelpers::Set_settings_as_admin(mycommand);
-#ifdef CRASHRPT
+			// Something goes wrong. Get error message.
+			TCHAR szErrorMsg[512] = _T("");
+			crGetLastErrorMsg(szErrorMsg, 512);
+			_tprintf_s(_T("%s\n"), szErrorMsg);
+			return2 1;
+		}
+	#endif
+		bool Injected_autoreconnect = false;
+	#ifndef SC_20
+		settings->setScExit(false);
+		settings->setScPrompt(false);
+	#endif
+		setbuf(stderr, 0);
+
+		// [v1.0.2-jp1 fix] Load resouce from dll
+		hInstResDLL = NULL;
+
+		//limit the vnclang.dll searchpath to avoid
+		char szCurrentDir[MAX_PATH];
+		char szCurrentDir_vnclangdll[MAX_PATH];
+		if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
+		{
+			char* p = strrchr(szCurrentDir, '\\');
+			*p = '\0';
+		}
+		strcpy_s(szCurrentDir_vnclangdll, szCurrentDir);
+		strcat_s(szCurrentDir_vnclangdll, "\\");
+		strcat_s(szCurrentDir_vnclangdll, "vnclang_server.dll");
+
+		hInstResDLL = LoadLibrary(szCurrentDir_vnclangdll);
+
+		if (hInstResDLL == NULL)
+		{
+			hInstResDLL = hInstance;
+		}
+		//	RegisterLinkLabel(hInstResDLL);
+
+			//Load all messages from ressource file
+		Load_Localization(hInstResDLL);
+
+		char WORKDIR[MAX_PATH];
+		if (GetModuleFileName(NULL, WORKDIR, MAX_PATH))
+		{
+			char* p = strrchr(WORKDIR, '\\');
+			if (p == NULL) return return2(0);
+			*p = '\0';
+		}
+		char progname[MAX_PATH];
+		strncpy_s(progname, WORKDIR, sizeof progname);
+		progname[MAX_PATH - 1] = 0;
+		vnclog.SetFile();
+
+
+	#ifdef _DEBUG
+		{
+			// Get current flag
+			int tmpFlag = _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
+
+			// Turn on leak-checking bit
+			tmpFlag |= _CRTDBG_LEAK_CHECK_DF;
+
+			// Set flag to the new value
+			_CrtSetDbgFlag(tmpFlag);
+		}
+	#endif
+
+		// Save the application instance and main thread id
+		hAppInstance = hInstance;
+		mainthreadId = GetCurrentThreadId();
+
+		// Initialise the VSocket system
+		VSocketSystem socksys;
+		if (!socksys.Initialised())
+		{
+			MessageBoxSecure(NULL, sz_ID_FAILED_INIT, szAppName, MB_OK);
+	#ifdef CRASHRPT
 			crUninstall();
-#endif
-			return 0;
+	#endif
+			return return2(0);
 		}
-#ifndef SC_20
-		if (strncmp(&szCmdLine[i], winvncStopserviceHelper, strlen(winvncStopserviceHelper)) == 0)
+	#ifdef SC_20
+		char* szCmdLine = ScSelect::InitSC(hInstance, szCmdLine2);
+	#else
+		char* szCmdLine = szCmdLine2;
+	#endif
+		// look up the current service name in the registry.
+		//serviceHelpers::ExistServiceName(progname, UltraVNCService::service_name);
+
+		// Make the command-line lowercase and parse it
+		size_t i;
+		for (i = 0; i < strlen(szCmdLine); i++)
 		{
-			Sleep(3000);
-			serviceHelpers::Set_stop_service_as_admin();
-#ifdef CRASHRPT
-			crUninstall();
-#endif
-			return 0;
+			szCmdLine[i] = tolower(szCmdLine[i]);
 		}
-#endif
-
-		if (strncmp(&szCmdLine[i], winvncKill, strlen(winvncKill)) == 0)
+		BOOL argfound = FALSE;
+		for (i = 0; i < strlen(szCmdLine); i++)
 		{
-			static HANDLE		hShutdownEventTmp;
-			hShutdownEventTmp = OpenEvent(EVENT_ALL_ACCESS, FALSE, "Global\\SessionEventUltra");
-			SetEvent(hShutdownEventTmp);
-			CloseHandle(hShutdownEventTmp);
+			if (szCmdLine[i] <= ' ')
+				continue;
+			argfound = TRUE;
+			if (strncmp(&szCmdLine[i], winvncinipath, strlen(winvncinipath)) == 0)
+			{
+				char filepath[MAX_PATH];
+				i += strlen(winvncinipath);
+				char Drv[_MAX_PATH];
+				char Path[_MAX_PATH];
+				char FileName[_MAX_PATH];
+				char FileExt[_MAX_PATH];
+				_splitpath_s(&(szCmdLine[i + 1]), Drv, Path, FileName, FileExt);
+				char* p = strchr(FileExt, ' ');
+				if (p) *p = 0;
+				_makepath_s(filepath, Drv, Path, FileName, FileExt);
+				g_szIniFile = _strdup(filepath);
+				i += strlen(filepath);
+	#ifdef CRASHRPT
+				crUninstall();
+	#endif
+				continue;
+			}
 
-			//adzm 2010-02-10 - Finds the appropriate VNC window for any process. Sends this message to all of them!
-			// do removed, loops forever with cpu 100
-			HWND hservwnd = NULL;
-			hservwnd = postHelper::FindWinVNCWindow(false);
-				if (hservwnd!=NULL)
+			if (strncmp(&szCmdLine[i], winvncSettingshelper, strlen(winvncSettingshelper)) == 0)
+			{
+				Sleep(3000);
+				char mycommand[MAX_PATH];
+				i += strlen(winvncSettingshelper);
+				strcpy_s(mycommand, &(szCmdLine[i + 1]));
+				settingsHelpers::Set_settings_as_admin(mycommand);
+	#ifdef CRASHRPT
+				crUninstall();
+	#endif
+				return return2(0);
+			}
+	#ifndef SC_20
+			if (strncmp(&szCmdLine[i], winvncStopserviceHelper, strlen(winvncStopserviceHelper)) == 0)
+			{
+				Sleep(3000);
+				serviceHelpers::Set_stop_service_as_admin();
+	#ifdef CRASHRPT
+				crUninstall();
+	#endif
+				return return2(0);
+			}
+	#endif
+
+			if (strncmp(&szCmdLine[i], winvncKill, strlen(winvncKill)) == 0)
+			{
+				static HANDLE		hShutdownEventTmp;
+				hShutdownEventTmp = OpenEvent(EVENT_ALL_ACCESS, FALSE, "Global\\SessionEventUltra");
+				SetEvent(hShutdownEventTmp);
+				CloseHandle(hShutdownEventTmp);
+
+				//adzm 2010-02-10 - Finds the appropriate VNC window for any process. Sends this message to all of them!
+				// do removed, loops forever with cpu 100
+				HWND hservwnd = NULL;
+				hservwnd = postHelper::FindWinVNCWindow(false);
+				if (hservwnd != NULL)
 				{
 					PostMessage(hservwnd, WM_COMMAND, 40002, 0);
 					PostMessage(hservwnd, WM_CLOSE, 0, 0);
 				}
-#ifdef CRASHRPT
+	#ifdef CRASHRPT
 				crUninstall();
-#endif
-			return 0;
-		}
+	#endif
+				return return2(0);
+			}
 
-		if (strncmp(&szCmdLine[i], winvncopenhomepage, strlen(winvncopenhomepage)) == 0)
-		{
-			Open_homepage();
-#ifdef CRASHRPT
-			crUninstall();
-#endif
-			return 0;
-		}
+			if (strncmp(&szCmdLine[i], winvncopenhomepage, strlen(winvncopenhomepage)) == 0)
+			{
+				Open_homepage();
+	#ifdef CRASHRPT
+				crUninstall();
+	#endif
+				return return2(0);
+			}
 
-		if (strncmp(&szCmdLine[i], winvncopenforum, strlen(winvncopenforum)) == 0)
-		{
-			Open_forum();
-#ifdef CRASHRPT
-			crUninstall();
-#endif
-			return 0;
-		}
-#ifdef SC_20
-		if (strncmp(&szCmdLine[i], "-noregistry", strlen("-noregistry")) == 0)
-		{
-			i += strlen("-noregistry");
-			continue;
-		}
-		if (strncmp(&szCmdLine[i], "-secureplugin", strlen("-secureplugin")) == 0)
-		{
-			i += strlen("-secureplugin");
-			settings->setUseDSMPlugin(true);
-			continue;
-		}
-#endif
-#ifndef SC_20
-		if (strncmp(&szCmdLine[i], winvncStartserviceHelper, strlen(winvncStartserviceHelper)) == 0)
-		{
-			Sleep(3000);
-			serviceHelpers::Set_start_service_as_admin();
-#ifdef CRASHRPT
-			crUninstall();
-#endif
-			return 0;
-		}
+			if (strncmp(&szCmdLine[i], winvncopenforum, strlen(winvncopenforum)) == 0)
+			{
+				Open_forum();
+	#ifdef CRASHRPT
+				crUninstall();
+	#endif
+				return return2(0);
+			}
+	#ifdef SC_20
+			if (strncmp(&szCmdLine[i], "-noregistry", strlen("-noregistry")) == 0)
+			{
+				i += strlen("-noregistry");
+				continue;
+			}
+			if (strncmp(&szCmdLine[i], "-secureplugin", strlen("-secureplugin")) == 0)
+			{
+				i += strlen("-secureplugin");
+				settings->setUseDSMPlugin(true);
+				continue;
+			}
+	#endif
+	#ifndef SC_20
+			if (strncmp(&szCmdLine[i], winvncStartserviceHelper, strlen(winvncStartserviceHelper)) == 0)
+			{
+				Sleep(3000);
+				serviceHelpers::Set_start_service_as_admin();
+	#ifdef CRASHRPT
+				crUninstall();
+	#endif
+				return return2(0);
+			}
 
-		if (strncmp(&szCmdLine[i], winvncInstallServiceHelper, strlen(winvncInstallServiceHelper)) == 0)
+			if (strncmp(&szCmdLine[i], winvncInstallServiceHelper, strlen(winvncInstallServiceHelper)) == 0)
 			{
 				//Sleeps are realy needed, else runas fails...
 				Sleep(3000);
 				serviceHelpers::Set_install_service_as_admin();
-#ifdef CRASHRPT
+	#ifdef CRASHRPT
 				crUninstall();
-#endif
-				return 0;
+	#endif
+				return return2(0);
 			}
-		if (strncmp(&szCmdLine[i], winvncUnInstallServiceHelper, strlen(winvncUnInstallServiceHelper)) == 0)
+			if (strncmp(&szCmdLine[i], winvncUnInstallServiceHelper, strlen(winvncUnInstallServiceHelper)) == 0)
 			{
 				Sleep(3000);
 				serviceHelpers::Set_uninstall_service_as_admin();
-#ifdef CRASHRPT
+	#ifdef CRASHRPT
 				crUninstall();
-#endif
-				return 0;
+	#endif
+				return return2(0);
 			}
-		if (strncmp(&szCmdLine[i], winvncSoftwarecadHelper, strlen(winvncSoftwarecadHelper)) == 0)
+			if (strncmp(&szCmdLine[i], winvncSoftwarecadHelper, strlen(winvncSoftwarecadHelper)) == 0)
 			{
 				Sleep(3000);
 				vncCad::Enable_softwareCAD_elevated();
-#ifdef CRASHRPT
+	#ifdef CRASHRPT
 				crUninstall();
-#endif
-				return 0;
-			}		 
-		if (strncmp(&szCmdLine[i], winvncdelSoftwarecadHelper, strlen(winvncdelSoftwarecadHelper)) == 0)
+	#endif
+				return return2(0);
+			}
+			if (strncmp(&szCmdLine[i], winvncdelSoftwarecadHelper, strlen(winvncdelSoftwarecadHelper)) == 0)
 			{
 				Sleep(3000);
 				vncCad::delete_softwareCAD_elevated();
-#ifdef CRASHRPT
+	#ifdef CRASHRPT
 				crUninstall();
-#endif
-				return 0;
+	#endif
+				return return2(0);
 			}
-		if (strncmp(&szCmdLine[i], winvncRebootSafeHelper, strlen(winvncRebootSafeHelper)) == 0)
+			if (strncmp(&szCmdLine[i], winvncRebootSafeHelper, strlen(winvncRebootSafeHelper)) == 0)
 			{
 				Sleep(3000);
 				UltraVNCService::Reboot_in_safemode_elevated();
-#ifdef CRASHRPT
+	#ifdef CRASHRPT
 				crUninstall();
-#endif
-				return 0;
+	#endif
+				return return2(0);
 			}
 
-		if (strncmp(&szCmdLine[i], winvncRebootForceHelper, strlen(winvncRebootForceHelper)) == 0)
+			if (strncmp(&szCmdLine[i], winvncRebootForceHelper, strlen(winvncRebootForceHelper)) == 0)
 			{
 				Sleep(3000);
 				UltraVNCService::Reboot_with_force_reboot_elevated();
-#ifdef CRASHRPT
+	#ifdef CRASHRPT
 				crUninstall();
-#endif
-				return 0;
+	#endif
+				return return2(0);
 			}
-		if (strncmp(&szCmdLine[i], winvncSecurityEditorHelper, strlen(winvncSecurityEditorHelper)) == 0)
+			if (strncmp(&szCmdLine[i], winvncSecurityEditorHelper, strlen(winvncSecurityEditorHelper)) == 0)
 			{
 				Sleep(3000);
 				serviceHelpers::winvncSecurityEditorHelper_as_admin();
-#ifdef CRASHRPT
+	#ifdef CRASHRPT
 				crUninstall();
-#endif
-				return 0;
+	#endif
+				return return2(0);
 			}
-#endif
-		if (strncmp(&szCmdLine[i], winvncSecurityEditor, strlen(winvncSecurityEditor)) == 0)
+	#endif
+			if (strncmp(&szCmdLine[i], winvncSecurityEditor, strlen(winvncSecurityEditor)) == 0)
 			{
-			    typedef void (*vncEditSecurityFn) (HWND hwnd, HINSTANCE hInstance);
+				typedef void (*vncEditSecurityFn) (HWND hwnd, HINSTANCE hInstance);
 				vncEditSecurityFn vncEditSecurity = 0;
 				char szCurrentDirl[MAX_PATH];
-					if (GetModuleFileName(NULL, szCurrentDirl, MAX_PATH)) {
-						char* p = strrchr(szCurrentDirl, '\\');
-						*p = '\0';
-						strcat_s(szCurrentDirl,"\\authSSP.dll");
-					}
-					HMODULE hModule = LoadLibrary(szCurrentDirl);
-					if (hModule) {
-						vncEditSecurity = (vncEditSecurityFn) GetProcAddress(hModule, "vncEditSecurity");
-						CoInitialize(NULL);
-						vncEditSecurity(NULL, hAppInstance);
-						CoUninitialize();
-						FreeLibrary(hModule);
-					}
-#ifdef CRASHRPT
-					crUninstall();
-#endif
-				return 0;
+				if (GetModuleFileName(NULL, szCurrentDirl, MAX_PATH)) {
+					char* p = strrchr(szCurrentDirl, '\\');
+					*p = '\0';
+					strcat_s(szCurrentDirl, "\\authSSP.dll");
+				}
+				HMODULE hModule = LoadLibrary(szCurrentDirl);
+				if (hModule) {
+					vncEditSecurity = (vncEditSecurityFn)GetProcAddress(hModule, "vncEditSecurity");
+					CoInitialize(NULL);
+					vncEditSecurity(NULL, hAppInstance);
+					CoUninitialize();
+					FreeLibrary(hModule);
+				}
+	#ifdef CRASHRPT
+				crUninstall();
+	#endif
+				return return2(0);
 			}
 
-		if (strncmp(&szCmdLine[i], winvncSettings, strlen(winvncSettings)) == 0)
-		{
-			char mycommand[MAX_PATH];
-			i+=strlen(winvncSettings);
-			strcpy_s( mycommand, &(szCmdLine[i+1]));
-			settingsHelpers::Real_settings(mycommand);
-#ifdef CRASHRPT
-			crUninstall();
-#endif
-			return 0;
-		}
-		
-		if (strncmp(&szCmdLine[i], dsmpluginhelper, strlen(dsmpluginhelper)) == 0)
-		{
-			char mycommand[MAX_PATH];
-			i += strlen(dsmpluginhelper);
-			strcpy_s(mycommand, &(szCmdLine[i + 1]));
-			Secure_Plugin_elevated(mycommand);
-#ifdef CRASHRPT
-			crUninstall();
-#endif
-			return 0;
-		}
-
-		if (strncmp(&szCmdLine[i], dsmplugininstance, strlen(dsmplugininstance)) == 0)
-		{
-			char mycommand[MAX_PATH];
-			i += strlen(dsmplugininstance);
-			strcpy_s(mycommand, &(szCmdLine[i + 1]));
-			Secure_Plugin(mycommand);
-#ifdef CRASHRPT
-			crUninstall();
-#endif
-			return 0;
-		}
-
-#ifndef SC_20
-		if (strncmp(&szCmdLine[i], winvncSoftwarecad, strlen(winvncSoftwarecad)) == 0)
-		{
-			vncCad::Enable_softwareCAD();
-#ifdef CRASHRPT
-			crUninstall();
-#endif
-			return 0;
-		}
-
-		if (strncmp(&szCmdLine[i], winvncdelSoftwarecad, strlen(winvncdelSoftwarecad)) == 0)
-		{
-			vncCad::delete_softwareCAD();
-#ifdef CRASHRPT
-			crUninstall();
-#endif
-			return 0;
-		}
-
-		if (strncmp(&szCmdLine[i], winvncRebootSafe, strlen(winvncRebootSafe)) == 0)
-		{
-			UltraVNCService::Reboot_in_safemode();
-#ifdef CRASHRPT
-			crUninstall();
-#endif
-			return 0;
-		}
-
-		if (strncmp(&szCmdLine[i], winvncRebootForce, strlen(winvncRebootForce)) == 0)
-		{
-			UltraVNCService::Reboot_with_force_reboot();
-#ifdef CRASHRPT
-			crUninstall();
-#endif
-			return 0;
-		}
-
-		if (strncmp(&szCmdLine[i], winvncStopservice, strlen(winvncStopservice)) == 0)
-		{
-			serviceHelpers::Real_stop_service();
-#ifdef CRASHRPT
-			crUninstall();
-#endif
-			return 0;
-		}
-
-		if (strncmp(&szCmdLine[i], winvncStartservice, strlen(winvncStartservice)) == 0)
-		{
-			serviceHelpers::Real_start_service();
-#ifdef CRASHRPT
-			crUninstall();
-#endif
-			return 0;
-		}
-
-		if (strncmp(&szCmdLine[i], winvncInstallDriver, strlen(winvncInstallDriver)) == 0) {
-			VirtualDisplay::InstallDriver(true);
-			return 0;
-		}
-
-		if (strncmp(&szCmdLine[i], winvncInstallService, strlen(winvncInstallService)) == 0)
+			if (strncmp(&szCmdLine[i], winvncSettings, strlen(winvncSettings)) == 0)
 			{
-                // rest of command line service name, if provided.
-                char *pServiceName = &szCmdLine[i];
-                // skip over command switch, find next whitepace
-                while (*pServiceName && !isspace(*(unsigned char*)pServiceName))
-                    ++pServiceName;
+				char mycommand[MAX_PATH];
+				i += strlen(winvncSettings);
+				strcpy_s(mycommand, &(szCmdLine[i + 1]));
+				settingsHelpers::Real_settings(mycommand);
+	#ifdef CRASHRPT
+				crUninstall();
+	#endif
+				return return2(0);
+			}
 
-                // skip past whitespace to service name
-                while (*pServiceName && isspace(*(unsigned char*)pServiceName))
-                    ++pServiceName;
+			if (strncmp(&szCmdLine[i], dsmpluginhelper, strlen(dsmpluginhelper)) == 0)
+			{
+				char mycommand[MAX_PATH];
+				i += strlen(dsmpluginhelper);
+				strcpy_s(mycommand, &(szCmdLine[i + 1]));
+				Secure_Plugin_elevated(mycommand);
+	#ifdef CRASHRPT
+				crUninstall();
+	#endif
+				return return2(0);
+			}
 
-                // strip off any quotes
-                if (*pServiceName && *pServiceName == '\"')
-                    ++pServiceName;
+			if (strncmp(&szCmdLine[i], dsmplugininstance, strlen(dsmplugininstance)) == 0)
+			{
+				char mycommand[MAX_PATH];
+				i += strlen(dsmplugininstance);
+				strcpy_s(mycommand, &(szCmdLine[i + 1]));
+				Secure_Plugin(mycommand);
+	#ifdef CRASHRPT
+				crUninstall();
+	#endif
+				return return2(0);
+			}
 
-                if (*pServiceName)
-                {
-                    // look for trailing quote, if found, terminate the string there.
-                    char *pQuote = pServiceName;
-                    pQuote = strrchr(pServiceName, '\"');
-                    if (pQuote)
-                        *pQuote = 0;
-                }
-                // if a service name is supplied, and it differs except in case from
-                // the default, use the supplied service name instead
-                if (*pServiceName && (_strcmpi(pServiceName, UltraVNCService::service_name) != 0))
-                {
-                    strncpy_s(UltraVNCService::service_name, 256, pServiceName, 256);
+	#ifndef SC_20
+			if (strncmp(&szCmdLine[i], winvncSoftwarecad, strlen(winvncSoftwarecad)) == 0)
+			{
+				vncCad::Enable_softwareCAD();
+	#ifdef CRASHRPT
+				crUninstall();
+	#endif
+				return return2(0);
+			}
+
+			if (strncmp(&szCmdLine[i], winvncdelSoftwarecad, strlen(winvncdelSoftwarecad)) == 0)
+			{
+				vncCad::delete_softwareCAD();
+	#ifdef CRASHRPT
+				crUninstall();
+	#endif
+				return return2(0);
+			}
+
+			if (strncmp(&szCmdLine[i], winvncRebootSafe, strlen(winvncRebootSafe)) == 0)
+			{
+				UltraVNCService::Reboot_in_safemode();
+	#ifdef CRASHRPT
+				crUninstall();
+	#endif
+				return return2(0);
+			}
+
+			if (strncmp(&szCmdLine[i], winvncRebootForce, strlen(winvncRebootForce)) == 0)
+			{
+				UltraVNCService::Reboot_with_force_reboot();
+	#ifdef CRASHRPT
+				crUninstall();
+	#endif
+				return return2(0);
+			}
+
+			if (strncmp(&szCmdLine[i], winvncStopservice, strlen(winvncStopservice)) == 0)
+			{
+				serviceHelpers::Real_stop_service();
+	#ifdef CRASHRPT
+				crUninstall();
+	#endif
+				return return2(0);
+			}
+
+			if (strncmp(&szCmdLine[i], winvncStartservice, strlen(winvncStartservice)) == 0)
+			{
+				serviceHelpers::Real_start_service();
+	#ifdef CRASHRPT
+				crUninstall();
+	#endif
+				return return2(0);
+			}
+
+			if (strncmp(&szCmdLine[i], winvncInstallDriver, strlen(winvncInstallDriver)) == 0) {
+				VirtualDisplay::InstallDriver(true);
+				return return2(0);
+			}
+
+			if (strncmp(&szCmdLine[i], winvncInstallService, strlen(winvncInstallService)) == 0)
+			{
+				// rest of command line service name, if provided.
+				char* pServiceName = &szCmdLine[i];
+				// skip over command switch, find next whitepace
+				while (*pServiceName && !isspace(*(unsigned char*)pServiceName))
+					++pServiceName;
+
+				// skip past whitespace to service name
+				while (*pServiceName && isspace(*(unsigned char*)pServiceName))
+					++pServiceName;
+
+				// strip off any quotes
+				if (*pServiceName && *pServiceName == '\"')
+					++pServiceName;
+
+				if (*pServiceName)
+				{
+					// look for trailing quote, if found, terminate the string there.
+					char* pQuote = pServiceName;
+					pQuote = strrchr(pServiceName, '\"');
+					if (pQuote)
+						*pQuote = 0;
+				}
+				// if a service name is supplied, and it differs except in case from
+				// the default, use the supplied service name instead
+				if (*pServiceName && (_strcmpi(pServiceName, UltraVNCService::service_name) != 0))
+				{
+					strncpy_s(UltraVNCService::service_name, 256, pServiceName, 256);
 					UltraVNCService::service_name[255] = 0;
-                }
+				}
 				UltraVNCService::install_service();
 				Sleep(2000);
 				char command[MAX_PATH + 32]; // 29 January 2008 jdp
-                _snprintf_s(command, sizeof command, "net start \"%s\"", UltraVNCService::service_name);
-				WinExec(command,SW_HIDE);
-#ifdef CRASHRPT
+				_snprintf_s(command, sizeof command, "net start \"%s\"", UltraVNCService::service_name);
+				WinExec(command, SW_HIDE);
+	#ifdef CRASHRPT
 				crUninstall();
-#endif
-				return 0;
+	#endif
+				return return2(0);
 			}
-		if (strncmp(&szCmdLine[i], winvncUnInstallService, strlen(winvncUnInstallService)) == 0)
+			if (strncmp(&szCmdLine[i], winvncUnInstallService, strlen(winvncUnInstallService)) == 0)
 			{
 				char command[MAX_PATH + 32]; // 29 January 2008 jdp
-                // rest of command line service name, if provided.
-                char *pServiceName = &szCmdLine[i];
-                // skip over command switch, find next whitepace
-                while (*pServiceName && !isspace(*(unsigned char*)pServiceName))
-                    ++pServiceName;
+				// rest of command line service name, if provided.
+				char* pServiceName = &szCmdLine[i];
+				// skip over command switch, find next whitepace
+				while (*pServiceName && !isspace(*(unsigned char*)pServiceName))
+					++pServiceName;
 
-                // skip past whitespace to service name
-                while (*pServiceName && isspace(*(unsigned char*)pServiceName))
-                    ++pServiceName;
+				// skip past whitespace to service name
+				while (*pServiceName && isspace(*(unsigned char*)pServiceName))
+					++pServiceName;
 
-                // strip off any quotes
-                if (*pServiceName && *pServiceName == '\"')
-                    ++pServiceName;
+				// strip off any quotes
+				if (*pServiceName && *pServiceName == '\"')
+					++pServiceName;
 
-                if (*pServiceName)
-                {
-                    // look for trailing quote, if found, terminate the string there.
-                    char *pQuote = pServiceName;
-                    pQuote = strrchr(pServiceName, '\"');
-                    if (pQuote)
-                        *pQuote = 0;
-                }
+				if (*pServiceName)
+				{
+					// look for trailing quote, if found, terminate the string there.
+					char* pQuote = pServiceName;
+					pQuote = strrchr(pServiceName, '\"');
+					if (pQuote)
+						*pQuote = 0;
+				}
 
-                if (*pServiceName && (_strcmpi(pServiceName, UltraVNCService::service_name) != 0))
-                {
-                    strncpy_s(UltraVNCService::service_name, 256, pServiceName, 256);
+				if (*pServiceName && (_strcmpi(pServiceName, UltraVNCService::service_name) != 0))
+				{
+					strncpy_s(UltraVNCService::service_name, 256, pServiceName, 256);
 					UltraVNCService::service_name[255] = 0;
-                }
-                _snprintf_s(command, sizeof command, "net stop \"%s\"", UltraVNCService::service_name);
-				WinExec(command,SW_HIDE);
+				}
+				_snprintf_s(command, sizeof command, "net stop \"%s\"", UltraVNCService::service_name);
+				WinExec(command, SW_HIDE);
 				UltraVNCService::uninstall_service();
-#ifdef CRASHRPT
+	#ifdef CRASHRPT
 				crUninstall();
-#endif
-				return 0;
+	#endif
+				return return2(0);
 			}
-#endif
-		if (strncmp(&szCmdLine[i], winvncPreConnect, strlen(winvncPreConnect)) == 0)
-		{			
-			i += strlen(winvncPreConnect);
-			PreConnect = true;
-			continue;
-		}
-		if (strncmp(&szCmdLine[i], winvncRunService, strlen(winvncRunService)) == 0)
-		{
-			//Run as service
-			if (!Myinit(hInstance)) return 0;
-			settings->RunningFromExternalService(true);
-			int returnvalue = WinVNCAppMain();
-#ifdef CRASHRPT
-			crUninstall();
-#endif
-			return returnvalue;
-		}
-
-		if (strncmp(&szCmdLine[i], winvncRunServiceRdp, strlen(winvncRunServiceRdp)) == 0)
-		{
-			//Run as service
-			if (!Myinit(hInstance)) return 0;
-			settings->RunningFromExternalService(true);
-			settings->RunningFromExternalServiceRdp(true);
-			int returnvalue = WinVNCAppMain();
-#ifdef CRASHRPT
-			crUninstall();
-#endif
-			return returnvalue;
-		}
-#ifndef SC_20
-		if (strncmp(&szCmdLine[i], winvncStartService, strlen(winvncStartService)) == 0)
-		{
-			UltraVNCService::start_service(szCmdLine);
-#ifdef CRASHRPT
-		crUninstall();
-#endif
-		return 0;
-		}
-#endif
-		if (strncmp(&szCmdLine[i], winvncRunAsUserApp, strlen(winvncRunAsUserApp)) == 0)
-		{
-			// WinVNC is being run as a user-level program
-			if (!Myinit(hInstance)) return 0;
-			int returnvalue = WinVNCAppMain();
-#ifdef CRASHRPT
-			crUninstall();
-#endif
-			return returnvalue;
-		}
-
-		if (strncmp(&szCmdLine[i], winvncSCexit, strlen(winvncSCexit)) == 0)
-		{
-			settings->setScExit(true);
-			i+=strlen(winvncSCexit);
-			continue;
-		}
-
-		if (strncmp(&szCmdLine[i], winvncSCprompt, strlen(winvncSCprompt)) == 0)
-		{
-			settings->setScPrompt(true);
-			i+=strlen(winvncSCprompt);
-			continue;
-		}
-
-		if (strncmp(&szCmdLine[i], winvncmulti, strlen(winvncmulti)) == 0)
-		{
-			allowMultipleInstances =true;
-			i+=strlen(winvncmulti);
-			continue;
-		}
-		/*
-		if (strncmp(&szCmdLine[i], winvnchttp, strlen(winvnchttp)) == 0)
-		{
-			G_HTTP=true;
-			i+=strlen(winvnchttp);
-			continue;
-		}*/
-
-		if (strncmp(&szCmdLine[i], winvncStopReconnect, strlen(winvncStopReconnect)) == 0)
-		{
-			i+=strlen(winvncStopReconnect);
-			postHelper::PostAddStopConnectClientAll();
-			continue;
-		}
-
-		if (strncmp(&szCmdLine[i], winvncAutoReconnect, strlen(winvncAutoReconnect)) == 0)
-		{
-			// Note that this "autoreconnect" param MUST be BEFORE the "connect" one
-			// on the command line !
-			// wa@2005 -- added support for the AutoReconnectId
-			i+=strlen(winvncAutoReconnect);
-			Injected_autoreconnect=true;
-            size_t start, end;
-			char* pszId = NULL;
-			start = i;
-			// skip any spaces and grab the parameter
-			while (szCmdLine[start] <= ' ' && szCmdLine[start] != 0) start++;
-
-			if ( strncmp( &szCmdLine[start], winvncAutoReconnectId, strlen(winvncAutoReconnectId) ) == 0 )
+	#endif
+			if (strncmp(&szCmdLine[i], winvncPreConnect, strlen(winvncPreConnect)) == 0)
 			{
-				end = start;
-				while (szCmdLine[end] > ' ') end++;
-
-				if (end - start > 0)
-				{
-
-					pszId = new char[end - start + 1];
-
-					strncpy_s(pszId, end - start + 1, &(szCmdLine[start]), end - start);
-					pszId[end - start] = 0;
-					pszId = _strupr(pszId);
-				}
-//multiple spaces between autoreconnect and id
-				i = end;
-			}// end of condition we found the ID: parameter
-
-			// NOTE:  id must be NULL or the ID:???? (pointer will get deleted when message is processed)
-			// We can not contact a runnning service, permissions, so we must store the settings
-			// and process until the vncmenu has been started
-
-			if (!postHelper::PostAddAutoConnectClient( pszId ))
-			{
-				PostAddAutoConnectClient_bool=true;
-				if (pszId==NULL)
-				{
-					PostAddAutoConnectClient_bool_null=true;
-					PostAddAutoConnectClient_bool=false;
-				}
-				else
-				{
-					strcpy_s(pszId_char,pszId);
-					//memory leak fix
-					delete[] pszId; pszId = NULL;
-				}
+				i += strlen(winvncPreConnect);
+				PreConnect = true;
+				continue;
 			}
-			if (pszId != NULL) delete[] pszId; pszId = NULL;
-			continue;
-		}
-
-		if ( strncmp( &szCmdLine[i], winvncReconnectId, strlen(winvncReconnectId) ) == 0 )
+			if (strncmp(&szCmdLine[i], winvncRunService, strlen(winvncRunService)) == 0)
 			{
-				i+=strlen("-");
-                size_t start, end;
+				//Run as service
+				if (!Myinit(hInstance)) return return2(0);
+				settings->RunningFromExternalService(true);
+				int return2value = WinVNCAppMain();
+	#ifdef CRASHRPT
+				crUninstall();
+	#endif
+				return return2(return2value);
+			}
+
+			if (strncmp(&szCmdLine[i], winvncRunServiceRdp, strlen(winvncRunServiceRdp)) == 0)
+			{
+				//Run as service
+				if (!Myinit(hInstance)) return return2(0);
+				settings->RunningFromExternalService(true);
+				settings->RunningFromExternalServiceRdp(true);
+				int return2value = WinVNCAppMain();
+	#ifdef CRASHRPT
+				crUninstall();
+	#endif
+				return return2(return2value);
+			}
+	#ifndef SC_20
+			if (strncmp(&szCmdLine[i], winvncStartService, strlen(winvncStartService)) == 0)
+			{
+				UltraVNCService::start_service(szCmdLine);
+	#ifdef CRASHRPT
+				crUninstall();
+	#endif
+				return return2(0);
+			}
+	#endif
+			if (strncmp(&szCmdLine[i], winvncRunAsUserApp, strlen(winvncRunAsUserApp)) == 0)
+			{
+				// WinVNC is being run as a user-level program
+				if (!Myinit(hInstance)) return return2(0);
+				int return2value = WinVNCAppMain();
+	#ifdef CRASHRPT
+				crUninstall();
+	#endif
+				return return2(return2value);
+			}
+
+			if (strncmp(&szCmdLine[i], winvncSCexit, strlen(winvncSCexit)) == 0)
+			{
+				settings->setScExit(true);
+				i += strlen(winvncSCexit);
+				continue;
+			}
+
+			if (strncmp(&szCmdLine[i], winvncSCprompt, strlen(winvncSCprompt)) == 0)
+			{
+				settings->setScPrompt(true);
+				i += strlen(winvncSCprompt);
+				continue;
+			}
+
+			if (strncmp(&szCmdLine[i], winvncmulti, strlen(winvncmulti)) == 0)
+			{
+				allowMultipleInstances = true;
+				i += strlen(winvncmulti);
+				continue;
+			}
+			/*
+			if (strncmp(&szCmdLine[i], winvnchttp, strlen(winvnchttp)) == 0)
+			{
+				G_HTTP=true;
+				i+=strlen(winvnchttp);
+				continue;
+			}*/
+
+			if (strncmp(&szCmdLine[i], winvncStopReconnect, strlen(winvncStopReconnect)) == 0)
+			{
+				i += strlen(winvncStopReconnect);
+				postHelper::PostAddStopConnectClientAll();
+				continue;
+			}
+
+			if (strncmp(&szCmdLine[i], winvncAutoReconnect, strlen(winvncAutoReconnect)) == 0)
+			{
+				// Note that this "autoreconnect" param MUST be BEFORE the "connect" one
+				// on the command line !
+				// wa@2005 -- added support for the AutoReconnectId
+				i += strlen(winvncAutoReconnect);
+				Injected_autoreconnect = true;
+				size_t start, end;
+				char* pszId = NULL;
+				start = i;
+				// skip any spaces and grab the parameter
+				while (szCmdLine[start] <= ' ' && szCmdLine[start] != 0) start++;
+
+				if (strncmp(&szCmdLine[start], winvncAutoReconnectId, strlen(winvncAutoReconnectId)) == 0)
+				{
+					end = start;
+					while (szCmdLine[end] > ' ') end++;
+
+					if (end - start > 0)
+					{
+
+						pszId = new char[end - start + 1];
+
+						strncpy_s(pszId, end - start + 1, &(szCmdLine[start]), end - start);
+						pszId[end - start] = 0;
+						pszId = _strupr(pszId);
+					}
+					//multiple spaces between autoreconnect and id
+					i = end;
+				}// end of condition we found the ID: parameter
+
+				// NOTE:  id must be NULL or the ID:???? (pointer will get deleted when message is processed)
+				// We can not contact a runnning service, permissions, so we must store the settings
+				// and process until the vncmenu has been started
+
+				if (!postHelper::PostAddAutoConnectClient(pszId))
+				{
+					PostAddAutoConnectClient_bool = true;
+					if (pszId == NULL)
+					{
+						PostAddAutoConnectClient_bool_null = true;
+						PostAddAutoConnectClient_bool = false;
+					}
+					else
+					{
+						strcpy_s(pszId_char, pszId);
+						//memory leak fix
+						delete[] pszId; pszId = NULL;
+					}
+				}
+				if (pszId != NULL) delete[] pszId; pszId = NULL;
+				continue;
+			}
+
+			if (strncmp(&szCmdLine[i], winvncReconnectId, strlen(winvncReconnectId)) == 0)
+			{
+				i += strlen("-");
+				size_t start, end;
 				char* pszId = NULL;
 				start = i;
 				end = start;
@@ -901,90 +916,154 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 					}
 				}
 				i = end;
-			if (!postHelper::PostAddConnectClient( pszId ))
-			{
-				PostAddConnectClient_bool=true;
-				if (pszId==NULL)
+				if (!postHelper::PostAddConnectClient(pszId))
 				{
-					PostAddConnectClient_bool_null=true;
-					PostAddConnectClient_bool=false;
-				}
-				else
-				{
-					strcpy_s(pszId_char,pszId);
-					//memory leak fix
-					delete[] pszId; pszId = NULL;
-				}
-				}
-			if (pszId != NULL) delete[] pszId; pszId = NULL;
-			continue;
-		}
-
-		if (strncmp(&szCmdLine[i], winvncConnect, strlen(winvncConnect)) == 0)
-		{
-			if (!Injected_autoreconnect)
-			{
-				postHelper::PostAddStopConnectClient();
-			}
-			// Add a new client to an existing copy of winvnc
-			i+=strlen(winvncConnect);
-
-			// First, we have to parse the command line to get the filename to use
-            size_t start, end;
-			start=i;
-			while (szCmdLine[start] <= ' ' && szCmdLine[start] != 0) start++;
-			end = start;
-			while (szCmdLine[end] > ' ') end++;
-
-			// Was there a hostname (and optionally a port number) given?
-			if (end-start > 0)
-			{
-				char *name = new char[end-start+1];
-				char *name2 = new char[end - start + 1];
-				if (name != 0) {
-					strncpy_s(name, end-start+1, &(szCmdLine[start]), end-start);
-					name[end-start] = 0;
-					strcpy_s(name2, end - start + 1,name);
-					//detect braceletes in ipv6 address or remove port number from name
-					char *bs = strchr(name, '[');
-					char *be = strchr(name, ']');
-					if (bs && be) {
-						strncpy_s(name2, end - start + 1, be + 1, strlen(be));
-						*be = '\0';
-						strcpy_s(name, end - start + 1, bs + 1);
+					PostAddConnectClient_bool = true;
+					if (pszId == NULL)
+					{
+						PostAddConnectClient_bool_null = true;
+						PostAddConnectClient_bool = false;
 					}
-					else {
-						char *portp = strchr(name, ':');
+					else
+					{
+						strcpy_s(pszId_char, pszId);
+						//memory leak fix
+						delete[] pszId; pszId = NULL;
+					}
+				}
+				if (pszId != NULL) delete[] pszId; pszId = NULL;
+				continue;
+			}
+
+			if (strncmp(&szCmdLine[i], winvncConnect, strlen(winvncConnect)) == 0)
+			{
+				if (!Injected_autoreconnect)
+				{
+					postHelper::PostAddStopConnectClient();
+				}
+				// Add a new client to an existing copy of winvnc
+				i += strlen(winvncConnect);
+
+				// First, we have to parse the command line to get the filename to use
+				size_t start, end;
+				start = i;
+				while (szCmdLine[start] <= ' ' && szCmdLine[start] != 0) start++;
+				end = start;
+				while (szCmdLine[end] > ' ') end++;
+
+				// Was there a hostname (and optionally a port number) given?
+				if (end - start > 0)
+				{
+					char* name = new char[end - start + 1];
+					char* name2 = new char[end - start + 1];
+					if (name != 0) {
+						strncpy_s(name, end - start + 1, &(szCmdLine[start]), end - start);
+						name[end - start] = 0;
+						strcpy_s(name2, end - start + 1, name);
+						//detect braceletes in ipv6 address or remove port number from name
+						char* bs = strchr(name, '[');
+						char* be = strchr(name, ']');
+						if (bs && be) {
+							strncpy_s(name2, end - start + 1, be + 1, strlen(be));
+							*be = '\0';
+							strcpy_s(name, end - start + 1, bs + 1);
+						}
+						else {
+							char* portp = strchr(name, ':');
+							if (portp) {
+								*portp++ = '\0';
+							}
+						}
+						int port = INCOMING_PORT_OFFSET;
+						char* portp = strchr(name2, ':');
 						if (portp) {
 							*portp++ = '\0';
+							if (*portp == ':') {
+								port = atoi(++portp);	// Port number after "::"
+							}
+							else {
+								port = atoi(portp);	// Display number after ":"
+							}
 						}
-					}
-					int port = INCOMING_PORT_OFFSET;
-					char *portp = strchr(name2, ':');
-					if (portp) {
-						*portp++ = '\0';
-						if (*portp == ':') {
-							port = atoi(++portp);	// Port number after "::"
-						} else {
-							port = atoi(portp);	// Display number after ":"
-						}
-					}
-					delete[] name2;
-					vnclog.Print(LL_STATE, VNCLOG("test... %s %d\n"),name,port);
-					strcpy_s(dnsname,name);
-#ifdef IPV6V4
-					if (settings->getIPV6())
-					{
-						in6_addr address;
-						memset(&address, 0, sizeof(address));
-						if (VSocket::Resolve6(name, &address))
+						delete[] name2;
+						vnclog.Print(LL_STATE, VNCLOG("test... %s %d\n"), name, port);
+						strcpy_s(dnsname, name);
+	#ifdef IPV6V4
+						if (settings->getIPV6())
 						{
+							in6_addr address;
+							memset(&address, 0, sizeof(address));
+							if (VSocket::Resolve6(name, &address))
+							{
+								vnclog.Print(LL_INTERR, VNCLOG("PostAddNewClient III \n"));
+								if (!postHelper::PostAddNewClientInit6(&address, port))
+								{
+									PostAddNewClient_bool = true;
+									port_int = port;
+									address_in6 = address;
+								}
+							}
+							else
+							{
+								//ask for host,port
+								PostAddNewClient_bool = true;
+								port_int = 0;
+								memset(&address_in6, 0, sizeof(address_in6));
+								Sleep(2000);
+								delete[] name;
+								return return2(0);
+							}
+						}
+						if (port_int == 0)
+						{
+							VCard32 address = VSocket::Resolve4(name);
+							if (address != 0) {
+								// Post the IP address to the server
+								// We can not contact a runnning service, permissions, so we must store the settings
+								// and process until the vncmenu has been started
+								vnclog.Print(LL_INTERR, VNCLOG("PostAddNewClient III \n"));
+								if (!postHelper::PostAddNewClientInit4(address, port))
+								{
+									PostAddNewClient_bool = true;
+									port_int = port;
+									address_vcard4 = address;
+								}
+							}
+							else
+							{
+								//ask for host,port
+								PostAddNewClient_bool = true;
+								port_int = 0;
+								address_vcard4 = 0;
+								Sleep(2000);
+								delete[] name;
+								return return2(0);
+							}
+						}
+
+						delete[] name;
+	#else
+						VCard32 address = VSocket::Resolve(name);
+	#ifdef SC_20
+						if (address == 0) {
+							char text[1024]{};
+							sprintf(text, " Hostnamee (%s) could not be resolved", name);
+							MessageBox(NULL, text, szAppName, MB_ICONEXCLAMATION | MB_OK);
+							delete[] name;
+							return return2(0);
+						}
+	#endif
+						delete[] name;
+						if (address != 0) {
+							// Post the IP address to the server
+							// We can not contact a runnning service, permissions, so we must store the settings
+							// and process until the vncmenu has been started
 							vnclog.Print(LL_INTERR, VNCLOG("PostAddNewClient III \n"));
-							if (!postHelper::PostAddNewClientInit6(&address, port))
+							if (!postHelper::PostAddNewClientInit(address, port))
 							{
 								PostAddNewClient_bool = true;
 								port_int = port;
-								address_in6 = address;
+								address_vcard = address;
 							}
 						}
 						else
@@ -992,184 +1071,120 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 							//ask for host,port
 							PostAddNewClient_bool = true;
 							port_int = 0;
-							memset(&address_in6, 0, sizeof(address_in6));
+							address_vcard = 0;
 							Sleep(2000);
-							delete[] name;
-							return 0;
-						}						
-					}
-					if (port_int == 0)
-					{
-						VCard32 address = VSocket::Resolve4(name);
-						if (address != 0) {
-							// Post the IP address to the server
-							// We can not contact a runnning service, permissions, so we must store the settings
-							// and process until the vncmenu has been started
-							vnclog.Print(LL_INTERR, VNCLOG("PostAddNewClient III \n"));
-							if (!postHelper::PostAddNewClientInit4(address, port))
-							{
-								PostAddNewClient_bool=true;
-								port_int=port;
-								address_vcard4=address;
-							}
+							//Beep(200,1000);
+							return return2(0);
 						}
-						else
-						{
-							//ask for host,port
-							PostAddNewClient_bool=true;
-							port_int=0;
-							address_vcard4=0;
-							Sleep(2000);
-							delete[] name;
-							return 0;
-						}
+	#endif
 					}
-
-					delete[] name;
-#else
-					VCard32 address = VSocket::Resolve(name);
-#ifdef SC_20
-					if (address == 0) {
-						char text[1024]{};
-						sprintf(text, " Hostnamee (%s) could not be resolved", name);
-						MessageBox(NULL, text, szAppName, MB_ICONEXCLAMATION | MB_OK);
-						delete[] name;
-						return 0;
-					}					
-#endif
-					delete[] name;
-					if (address != 0) {
-						// Post the IP address to the server
-						// We can not contact a runnning service, permissions, so we must store the settings
-						// and process until the vncmenu has been started
-						vnclog.Print(LL_INTERR, VNCLOG("PostAddNewClient III \n"));
-						if (!postHelper::PostAddNewClientInit(address, port))
-						{
-						PostAddNewClient_bool=true;
-						port_int=port;
-						address_vcard=address;
-						}
-					}
-					else
-					{
-						//ask for host,port
-						PostAddNewClient_bool=true;
-						port_int=0;
-						address_vcard=0;
-						Sleep(2000);
-						//Beep(200,1000);
-						return 0;
-					}
-#endif
+					i = end;
+					continue;
 				}
-				i=end;
-				continue;
-			}
-			else
-			{
-				// Tell the server to show the Add New Client dialog
-				// We can not contact a runnning service, permissions, so we must store the settings
-				// and process until the vncmenu has been started
-				vnclog.Print(LL_INTERR, VNCLOG("PostAddNewClient IIII\n"));
-#ifdef IPV6V4
-				if (!postHelper::PostAddNewClient4(0, 0))
+				else
 				{
-					PostAddNewClient_bool=true;
-					port_int=0;
-					if (settings->getIPV6()) 
-						memset(&address_in6, 0, sizeof(address_in6));
-					else 
-						address_vcard4=0;
-				}
-#else
-				if (!postHelper::PostAddNewClient(0, 0))
-				{
-				PostAddNewClient_bool=true;
-				port_int=0;
-				address_vcard=0;
-				}
-#endif
-			}
-			continue;
-		}
-
-
-		//adzm 2009-06-20
-		if (strncmp(&szCmdLine[i], winvncRepeater, strlen(winvncRepeater)) == 0)
-		{
-			// set the default repeater host
-			i+=strlen(winvncRepeater);
-
-			// First, we have to parse the command line to get the host to use
-            size_t start, end;
-			start=i;
-			while (szCmdLine[start] <= ' ' && szCmdLine[start] != 0) start++;
-			end = start;
-			while (szCmdLine[end] > ' ') end++;
-
-			// Was there a hostname (and optionally a port number) given?
-			if (end-start > 0)
-			{
-				if (g_szRepeaterHost) {
-					delete[] g_szRepeaterHost;
-					g_szRepeaterHost = NULL;
-				}
-				g_szRepeaterHost = new char[end-start+1];
-				if (g_szRepeaterHost != 0) {
-					strncpy_s(g_szRepeaterHost, end-start+1, &(szCmdLine[start]), end-start);
-					g_szRepeaterHost[end-start] = 0;
-
+					// Tell the server to show the Add New Client dialog
 					// We can not contact a runnning service, permissions, so we must store the settings
 					// and process until the vncmenu has been started
-					vnclog.Print(LL_INTERR, VNCLOG("PostAddNewRepeaterClient I\n"));
-					if (!postHelper::PostAddNewRepeaterClient())
+					vnclog.Print(LL_INTERR, VNCLOG("PostAddNewClient IIII\n"));
+	#ifdef IPV6V4
+					if (!postHelper::PostAddNewClient4(0, 0))
 					{
-						PostAddNewRepeaterClient_bool=true;
-						port_int=0;
-#ifdef IPV6V4
-						address_vcard4=0;
-						memset(&address_in6, 0, sizeof(address_in6));
-#else
-						address_vcard=0;
-#endif
+						PostAddNewClient_bool = true;
+						port_int = 0;
+						if (settings->getIPV6())
+							memset(&address_in6, 0, sizeof(address_in6));
+						else
+							address_vcard4 = 0;
 					}
+	#else
+					if (!postHelper::PostAddNewClient(0, 0))
+					{
+						PostAddNewClient_bool = true;
+						port_int = 0;
+						address_vcard = 0;
+					}
+	#endif
 				}
-				i=end;
 				continue;
-			}			
-			continue;
-		}
+			}
 
-		// Either the user gave the -help option or there is something odd on the cmd-line!
 
-		// Show the usage dialog
-		MessageBoxSecure(NULL, winvncUsageText, sz_ID_WINVNC_USAGE, MB_OK | MB_ICONINFORMATION);
-		break;
-	};
+			//adzm 2009-06-20
+			if (strncmp(&szCmdLine[i], winvncRepeater, strlen(winvncRepeater)) == 0)
+			{
+				// set the default repeater host
+				i += strlen(winvncRepeater);
 
-	// If no arguments were given then just run
-	if (!argfound)
-	{
-		if (!Myinit(hInstance))
+				// First, we have to parse the command line to get the host to use
+				size_t start, end;
+				start = i;
+				while (szCmdLine[start] <= ' ' && szCmdLine[start] != 0) start++;
+				end = start;
+				while (szCmdLine[end] > ' ') end++;
+
+				// Was there a hostname (and optionally a port number) given?
+				if (end - start > 0)
+				{
+					if (g_szRepeaterHost) {
+						delete[] g_szRepeaterHost;
+						g_szRepeaterHost = NULL;
+					}
+					g_szRepeaterHost = new char[end - start + 1];
+					if (g_szRepeaterHost != 0) {
+						strncpy_s(g_szRepeaterHost, end - start + 1, &(szCmdLine[start]), end - start);
+						g_szRepeaterHost[end - start] = 0;
+
+						// We can not contact a runnning service, permissions, so we must store the settings
+						// and process until the vncmenu has been started
+						vnclog.Print(LL_INTERR, VNCLOG("PostAddNewRepeaterClient I\n"));
+						if (!postHelper::PostAddNewRepeaterClient())
+						{
+							PostAddNewRepeaterClient_bool = true;
+							port_int = 0;
+	#ifdef IPV6V4
+							address_vcard4 = 0;
+							memset(&address_in6, 0, sizeof(address_in6));
+	#else
+							address_vcard = 0;
+	#endif
+						}
+					}
+					i = end;
+					continue;
+				}
+				continue;
+			}
+
+			// Either the user gave the -help option or there is something odd on the cmd-line!
+
+			// Show the usage dialog
+			MessageBoxSecure(NULL, winvncUsageText, sz_ID_WINVNC_USAGE, MB_OK | MB_ICONINFORMATION);
+			break;
+		};
+
+		// If no arguments were given then just run
+		if (!argfound)
 		{
-#ifdef CRASHRPT
+			if (!Myinit(hInstance))
+			{
+	#ifdef CRASHRPT
+				crUninstall();
+	#endif
+				return return2(0);
+			}
+			int return2value = WinVNCAppMain();
+	#ifdef CRASHRPT
 			crUninstall();
-#endif
-			return 0;
+	#endif
+			return return2(return2value);
 		}
-		int returnvalue= WinVNCAppMain();
-#ifdef CRASHRPT
-		crUninstall();
-#endif
-		return returnvalue;
 	}
-#ifdef CRASHRPT
-	crUninstall();
-#endif
-	VNC_OSVersion::releaseInstance();
-	if (SettingsManager::getInstance())
-		delete SettingsManager::getInstance();
-	return 0;
+	catch (...) {
+		return return2(0);
+	}
+
+	return return2(0);
 }
 
 // rdv&sf@2007 - New TrayIcon impuDEsktop/impersonation thread stuff
