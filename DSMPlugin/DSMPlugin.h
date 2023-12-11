@@ -36,11 +36,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#ifdef _VNCVIEWER
-#include "../vncviewer/omnithread/omnithread.h"
-#else
 #include "omnithread.h"
-#endif
 #include <winsock2.h>
 #include <windows.h>
 #include <memory>

@@ -844,7 +844,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
       <Project>{f5244002-0fff-4f19-a941-fcce1861f132}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="omnithread\omnithread.vcxproj">
+    <ProjectReference Include="..\omnithread\omnithread.vcxproj">
       <Project>{ab1ce62f-4a4d-4daa-831d-5c93ad68f5f1}</Project>
     </ProjectReference>
   </ItemGroup>

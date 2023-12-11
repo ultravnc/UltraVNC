@@ -175,8 +175,8 @@ omni_condition::~omni_condition(void)
 }
 
 
-void
-omni_condition::wait(void)
+bool
+omni_condition::wait(DWORD dwTimeout)
 {
     _internal_omni_thread_helper me;
 
@@ -195,14 +195,15 @@ omni_condition::wait(void)
 
     mutex->unlock();
 
-    DWORD result = WaitForSingleObject(me->cond_semaphore, INFINITE);
+    DWORD result = WaitForSingleObject(me->cond_semaphore, dwTimeout);
 
     mutex->lock();
 
-    if (result != WAIT_OBJECT_0)
+    if (result != WAIT_OBJECT_0 && result != WAIT_TIMEOUT)
 	throw omni_thread_fatal(GetLastError());
-}
 
+	return result==WAIT_TIMEOUT?FALSE:TRUE;
+}
 
 int
 omni_condition::timedwait(unsigned long abs_sec, unsigned long abs_nsec)

@@ -27,13 +27,13 @@
 #include "vncviewer.h"
 #include "Exception.h"
 #include "display.h"
-#ifdef _INTERNALLIB
+/*#ifdef _INTERNALLIB
 #pragma comment(lib, "zlibstat.lib")
 #pragma comment(lib, "zip32.lib")
 #pragma comment(lib, "unz32lib.lib")
 #pragma comment(lib, "libjpeg-turbo-win-static.lib")
 #pragma comment(lib, "libzstd_static.lib")
-#endif
+#endif*/
 
 #include "omnithread/omnithread.h"
 #include "VNCviewerApp32.h"
