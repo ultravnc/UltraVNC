@@ -87,7 +87,7 @@ void Snapshot::SaveJpeg(HBITMAP membit,TCHAR folder[MAX_PATH], TCHAR prefix[56],
     TCHAR buffer[80];
     time (&rawtime);
     timeinfo = localtime(&rawtime);
-    _tcsftime(buffer,80,"%d-%m-%Y %H-%M-%S",timeinfo);
+    _tcsftime(buffer,80,"%Y%m%d_%H%M%S",timeinfo);
 	_tcscat_s(filename, "_");
 	_tcscat_s(filename, buffer);
 	_tcscat_s(filename, imageFormat);
