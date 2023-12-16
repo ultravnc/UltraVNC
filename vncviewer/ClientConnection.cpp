@@ -64,7 +64,7 @@ extern "C" {
 #include <lmat.h>
 #include <lmalert.h>
 #ifdef _CLOUD
-#include "../UdtCloudlib/proxy/Cloudthread.h"
+#include "../UdtCloudlib/CloudManager.h"
 #endif
 #include "UltraVNCHelperFunctions.h"
 
@@ -347,9 +347,9 @@ ClientConnection::ClientConnection(VNCviewerApp *pApp, LPTSTR host, int port)
 void ClientConnection::Init(VNCviewerApp *pApp)
 {
 #ifdef _CLOUD
-	if (cloudThread)
-		delete cloudThread;
-	cloudThread = new CloudThread();
+	if (cloudManager)
+		delete cloudManager;
+	cloudManager = new CloudManager();
 #endif
 	InitializeCriticalSection(&crit);
 	m_hSessionDialog = NULL;
@@ -4647,8 +4647,8 @@ ClientConnection::~ClientConnection()
 	delete ultraVncZlib;
 	DeleteCriticalSection(&crit);
 #ifdef _CLOUD
-	if (cloudThread)
-		delete cloudThread;
+	if (cloudManager)
+		delete cloudManager;
 #endif
 }
 

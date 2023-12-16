@@ -86,7 +86,7 @@ CloudDialog::DialogProc(HWND hwnd,
 		SetDlgItemText(hwnd, IDC_CLOUDSERVER, settings->getCloudServer());
 		SetDlgItemText(hwnd, IDC_CLOUDCODE, _this->m_server->code);
 		SendMessage(GetDlgItem(hwnd, IDC_CHECKCLOUD), BM_SETCHECK, settings->getCloudEnabled(), 0);
-		if (_this->m_server->isCloudThreadRunning()) {
+		if (_this->m_server->isUdpConnecting()) {
 			SetDlgItemText(hwnd, IDC_STARTCLOUD, "Stop");
 			ShowWindow(GetDlgItem(hwnd, IDC_CLOUDCODE), true);
 		}
@@ -126,7 +126,7 @@ CloudDialog::DialogProc(HWND hwnd,
 	}
 	case WM_TIMER:
 		if (wParam == 120) {
-			if (_this->m_server->isCloudThreadRunning()) {
+			if (_this->m_server->isUdpConnecting()) {
 				SetDlgItemText(hwnd, IDC_STARTCLOUD, "Stop");
 				ShowWindow(GetDlgItem(hwnd, IDC_CLOUDCODE), true);
 			}
@@ -180,7 +180,7 @@ CloudDialog::DialogProc(HWND hwnd,
 		case IDC_STARTCLOUD:
 			ShowWindow(GetDlgItem(hwnd, IDC_CLOUDCODE), true);
 			GetDlgItemText(hwnd, IDC_CLOUDSERVER, settings->getCloudServer(), MAX_HOST_NAME_LEN);
-			if (!_this->m_server->isCloudThreadRunning()) {
+			if (!_this->m_server->isUdpConnecting()) {
 				_this->m_server->cloudConnect(true, settings->getCloudServer());
 			}
 			else {				

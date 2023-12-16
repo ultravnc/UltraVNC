@@ -1,9 +1,10 @@
 #include "pch.h"
 #include "Cloudthread.h"
 #include "../proxy/proxy.h"
+#include "../CloudManager.h"
 
 
-CloudThread::CloudThread()
+CloudThread::CloudThread(CloudManager * cloudManager) :cloudManager(cloudManager)
 {   
     usock = UDT::INVALID_SOCK;
     WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -35,7 +36,7 @@ void convertHostnameToIp(char *server)
     }
 }
 
-void CloudThread::startThread(int port, char* server, char *code, CONNECTIONTYPE ctType)
+void CloudThread::startThread(int port, int vncPort, char* server, char *code, CONNECTIONTYPE ctType)
 {
     if (!isThreadRunning()) {  
         convertHostnameToIp(server);
@@ -46,35 +47,15 @@ void CloudThread::startThread(int port, char* server, char *code, CONNECTIONTYPE
         DWORD ThreadID;
         threadRunning = true;
         hThread = CreateThread(NULL, 0, StaticThreadStart, (void*)this, 0, &ThreadID);
+        setVNcPort(vncPort);
     }
 }
 
 DWORD WINAPI CloudThread::StaticThreadStart(void* Param)
 {
     CloudThread* This = (CloudThread*)Param;
-    while (This->ThreadStart() == 1) {
-        if (This->proxy)
-            delete This->proxy;
-        This->proxy = NULL;
-        if (This->udpSocket != INVALID_SOCKET) {
-            closesocket(This->udpSocket);
-        }
-        if (This->serverSocket != INVALID_SOCKET) {
-            shutdown(This->serverSocket, 2);
-            closesocket(This->serverSocket);
-        }
-        if (This->viewerSocket != INVALID_SOCKET) {
-            shutdown(This->viewerSocket, 2);
-            closesocket(This->viewerSocket);
-        }
-        if (This->usock != UDT::INVALID_SOCK) {
-            UDT::close(This->usock);
-        }
-        This->udpSocket = INVALID_SOCKET;
-        This->serverSocket = INVALID_SOCKET;
-        This->viewerSocket = INVALID_SOCKET;
-        This->usock = UDT::INVALID_SOCK;
-    }
+    This->ThreadStart();
+    This->cloudManager->isConnected();
     return 0;
 }
 

@@ -109,7 +109,7 @@ extern const UINT FileTransferSendPacketMessage;
 class ClientConnection;
 class CDSMPlugin;
 #ifdef _CLOUD
-class CloudThread;
+class CloudManager;
 #endif
 typedef void (ClientConnection:: *tightFilterFunc)(int);
 
@@ -859,7 +859,7 @@ private:
 public:
 	// RFB settings
 #ifdef _CLOUD
-	CloudThread* cloudThread = NULL;
+	CloudManager* cloudManager = NULL;
 #endif
 	VNCOptions *m_opts;
 	bool m_FullScreenNotDone;

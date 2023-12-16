@@ -46,7 +46,7 @@
 #include "ScSelect.h"
 
 #ifdef _CLOUD
-#include "./UdtCloudlib/proxy/Cloudthread.h"
+#include "./UdtCloudlib/CloudManager.h"
 #endif
 
 #pragma comment(lib, "iphlpapi.lib")
@@ -188,15 +188,14 @@ vncServer::vncServer()
 	strcpy_s(code, generatedcode);
 	free(generatedcode);
 #ifdef _CLOUD
-	cloudThread = new CloudThread();
+	cloudManager = new CloudManager();
 #endif
 }
 
 vncServer::~vncServer()
 {
 #ifdef _CLOUD
-	cloudThread->stopThread();
-	delete cloudThread;
+	delete cloudManager;
 #endif
 	ShutdownServer();}
 
@@ -2095,46 +2094,33 @@ void vncServer::SetAutoPortSelect(const BOOL autoport)
 		EnableConnections(SockConnected());
 };
 
+#ifdef _CLOUD
 void vncServer::cloudConnect(bool start, char *cloudServer)
 {
-#ifdef _CLOUD
 	if (start)
-		cloudThread->startThread(5352, cloudServer, code, ctSERVER);
+		cloudManager->addThread(5352, cloudServer, code, ctSERVER);
 	else
-		cloudThread->stopThread();
-#endif
+		cloudManager->stopActiveThread();
 }
 
-bool vncServer::isCloudThreadRunning()
+bool vncServer::isUdpConnecting()
 {
-#ifdef _CLOUD
-	return cloudThread->isThreadRunning();
-#else
-	return false;
-#endif
+
+	return cloudManager->isUdpConnecting();
 }
 
 char *vncServer::getExternalIpAddress()
 {
-#ifdef _CLOUD
-	return cloudThread->getExternalIpAddress();
-#else
-	return "";
-#endif
+	return cloudManager->getExternalIpAddress();
 }
 
 int vncServer::getStatus()
 {
-#ifdef _CLOUD
-	return cloudThread->getStatus();
-#else
-	return 0;
-#endif
+	return cloudManager->getStatus();
 }
 
 void vncServer::setVNcPort()
 {
-#ifdef _CLOUD
-	cloudThread->setVNcPort(m_port);
-#endif
+	cloudManager->setVNcPort(m_port);
 }
+#endif

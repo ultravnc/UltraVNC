@@ -66,7 +66,7 @@ const int MAX_CLIENTS = 128;
 
 // The vncServer class itself
 
-class CloudThread;
+class CloudManager;
 
 class vncServer
 {
@@ -278,12 +278,13 @@ public:
 	int m_virtualDisplaySupported;
 	VirtualDisplay *virtualDisplay;
 
-
+#ifdef _CLOUD
 	void cloudConnect(bool start, char* cloudServer);
-	bool isCloudThreadRunning();
+	bool isUdpConnecting();
 	char* getExternalIpAddress();
 	int getStatus();
 	void setVNcPort();
+#endif
 
 protected:
 	// The vncServer UpdateTracker class
@@ -368,7 +369,7 @@ protected:
     BOOL m_fSendExtraMouse;
 	bool KillAuthClientsBuzy;	
 	BOOL sethook;
-	CloudThread* cloudThread;
+	CloudManager* cloudManager;
 };
 
 #endif

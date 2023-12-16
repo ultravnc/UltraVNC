@@ -40,6 +40,8 @@ struct udppacket
 	};
 };
 
+class CloudManager;
+
 class CloudThread
 {
 
@@ -70,12 +72,13 @@ private:
 	bool SendDisconnectInfo();
 	int m_VncPort = 0;
 	Proxy *proxy = NULL;
+	CloudManager* cloudManager;
 
 public:
-	CloudThread();
+	CloudThread(CloudManager* cloudManager);
 	~CloudThread();
 	
-	void startThread(int port, char* server, char* code, CONNECTIONTYPE type);
+	void startThread(int port, int vncPort, char* server, char* code, CONNECTIONTYPE type);
 	void stopThread();
 	bool isThreadRunning();
 	char* getExternalIpAddress();

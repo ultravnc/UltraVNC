@@ -34,7 +34,7 @@
 #include <direct.h>
 #include "display.h"
 #ifdef _CLOUD
-#include "../UdtCloudlib/proxy/Cloudthread.h"
+#include "../UdtCloudlib/CloudManager.h"
 #endif
 #include "AboutBox.h"
 #include "UltraVNCHelperFunctions.h"
@@ -280,7 +280,7 @@ BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			_this->SaveConnection(hwnd, true);
 			break;
 		case IDCONNECT:
-			if (_this->m_fUseCloud && _this->m_pCC->cloudThread->getStatus() != csConnected)
+			if (_this->m_fUseCloud && _this->m_pCC->cloudManager->getStatus() != csConnected)
 				return true;
 			_this->InitTab(hwnd);
 			return _this->connect(hwnd);
@@ -416,28 +416,28 @@ BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				strcpy_s(_this->m_pCC->c_proxyhost, hostname);
 				strcpy_s(_this->m_pCC->c_Cloudhost, cloudhostname);
 				_this->m_pCC->c_fUseCloud = _this->m_fUseCloud;
-				_this->m_pCC->cloudThread->setVNcPort(5953);
+				_this->m_pCC->cloudManager->setVNcPort(5953);
 				if (strlen(cloudhostname) != 0 && strlen(hostname) != 0) {
-					_this->m_pCC->cloudThread->stopThread();
-					_this->m_pCC->cloudThread->startThread(5352, cloudhostname, hostname, ctVIEWER);
+					_this->m_pCC->cloudManager->stopActiveThread();
+					_this->m_pCC->cloudManager->addThread(5352, cloudhostname, hostname, ctVIEWER);
 				}
 			}
 			else if (_this->m_pCC->c_fUseCloud != _this->m_fUseCloud) {
 				_this->m_pCC->c_fUseCloud = _this->m_fUseCloud;
-				_this->m_pCC->cloudThread->stopThread();
+				_this->m_pCC->cloudManager->stopActiveThread();
 			}
 			KillTimer(hwnd, 100);
 		}
 		if ((UINT)wParam == 101) 
 			if (_this->m_fUseCloud) {
-				if (_this->m_pCC->cloudThread->getStatus() == csOnline ||
-					_this->m_pCC->cloudThread->getStatus() == csRendezvous) {
+				if (_this->m_pCC->cloudManager->getStatus() == csOnline ||
+					_this->m_pCC->cloudManager->getStatus() == csRendezvous) {
 					ShowWindow(GetDlgItem(hwnd, IDC_GREEN), false);
 					ShowWindow(GetDlgItem(hwnd, IDC_RED), false);
 					ShowWindow(GetDlgItem(hwnd, IDC_YELLOW), true);
 					EnableWindow(GetDlgItem(hwnd, IDCONNECT), false);
 				}
-				else if (_this->m_pCC->cloudThread->getStatus() == csConnected) {
+				else if (_this->m_pCC->cloudManager->getStatus() == csConnected) {
 					ShowWindow(GetDlgItem(hwnd, IDC_GREEN), true);
 					ShowWindow(GetDlgItem(hwnd, IDC_RED), false);
 					ShowWindow(GetDlgItem(hwnd, IDC_YELLOW), false);
