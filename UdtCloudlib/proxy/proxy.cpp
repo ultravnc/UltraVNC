@@ -56,23 +56,13 @@ void Proxy::proxyAll()
         int result = UDT::epoll_wait(eid, &readfds, NULL, -1, &lrfds);
         if (result < 0) {
             CUDTException& lasterror = UDT::getlasterror();
-            int error_code = lasterror.getErrorCode();
-            closesocket(tcpsocket);            
-            UDT::close(usock);
-            tcpsocket = INVALID_SOCKET;
-            usock = UDT::INVALID_SOCK;
-            return;
+            goto error;
         }
         else if (result > 0) {
             if (readfds.size() > 0) {
                 int recvlen = UDT::recv(usock, (char*)tempbuffer, READSIZE, 0);
                 if (recvlen <= 0) {
-                    UDT::epoll_remove_usock(eid, usock);
-                    closesocket(tcpsocket);
-                    UDT::close(usock);
-                    tcpsocket = INVALID_SOCKET;
-                    usock = UDT::INVALID_SOCK;
-                    return;
+                    goto error;
                 }
                 while (udtBuffer.GetWriteAvail() < recvlen)
                 {
@@ -86,12 +76,7 @@ void Proxy::proxyAll()
             {
                 int recvlen = recv(tcpsocket, tempbuffer, READSIZE, 0);
                 if (recvlen <= 0) {
-                    UDT::epoll_remove_ssock(eid, tcpsocket);
-                    closesocket(tcpsocket);
-                    UDT::close(usock);
-                    tcpsocket = INVALID_SOCKET;
-                    usock = UDT::INVALID_SOCK;
-                    return;
+                    goto error;
                 }
                 while (tcpBuffer.GetWriteAvail() < recvlen)
                 {
@@ -104,6 +89,15 @@ void Proxy::proxyAll()
         }
         
     }
+    error:
+        UDT::epoll_remove_usock(eid, usock);
+        shutdown(tcpsocket, SD_BOTH);
+        closesocket(tcpsocket);
+        UDT::close(usock);
+        tcpsocket = INVALID_SOCKET;
+        usock = UDT::INVALID_SOCK;
+        running = false;
+
 }
 void Proxy::proxyBuffer()
 {
@@ -122,8 +116,10 @@ void Proxy::proxyBuffer()
                 int recvlen = tcpBuffer.Read(tempbuffer, READSIZE);
                 while (totsend < recvlen) {
                     val = UDT::send(usock, tempbuffer + totsend, recvlen - totsend, 0);
-                    if (val == UDT::ERROR)
+                    if (val == UDT::ERROR) {
+                        running = false;
                         return;
+                    }
                     totsend += val;
                 }
             }
@@ -136,8 +132,10 @@ void Proxy::proxyBuffer()
                 int recvlen = udtBuffer.Read(tempbuffer, READSIZE);
                 while (totsend < recvlen) {
                     val = send(tcpsocket, tempbuffer + totsend, recvlen - totsend, 0);
-                    if (val == SOCKET_ERROR)
+                    if (val == SOCKET_ERROR) {
+                        running = false;
                         return;
+                    }
                     totsend += val;
                 }
             }

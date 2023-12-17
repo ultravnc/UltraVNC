@@ -419,7 +419,7 @@ BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				_this->m_pCC->cloudManager->setVNcPort(5953);
 				if (strlen(cloudhostname) != 0 && strlen(hostname) != 0) {
 					_this->m_pCC->cloudManager->stopActiveThread();
-					_this->m_pCC->cloudManager->addThread(5352, cloudhostname, hostname, ctVIEWER);
+					_this->m_pCC->cloudManager->addThread(NATREMOTE, cloudhostname, hostname, ctVIEWER);
 				}
 			}
 			else if (_this->m_pCC->c_fUseCloud != _this->m_fUseCloud) {

@@ -168,6 +168,7 @@ DWORD CloudThread::ThreadStart(void)
 void CloudThread::ConnectToVNCServer()
 {
     cStatus = csConnected;
+    cloudManager->isConnected();
     //first package instruct to connect to uvnc server
     char pk[32];
     int len = UDT::recv(usock, pk, 32, 0);
@@ -194,7 +195,7 @@ void CloudThread::ConnectToVNCServer()
 
 void CloudThread::ConnectVNCViewer()
 {
-    cStatus = csConnected;
+    cStatus = csConnected;    
     struct in_addr addr;
     if (inet_pton(AF_INET, ADDR_LOCALHOST, &addr) <= 0)
         return;
@@ -238,6 +239,7 @@ void CloudThread::ConnectVNCViewer()
         return;
     char pk[32]{};
     int len = UDT::send(usock, pk, 32, 0);
+    cloudManager->isConnected();
     proxy = new Proxy(viewerSocket, usock);
 }
 

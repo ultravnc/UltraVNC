@@ -11,7 +11,7 @@ class Proxy;
 
 enum CONNECTIONTYPE { ctVIEWER, ctSERVER, ctInfo };
 enum CONNECTIONSTATUS { csUnknown, csConnecting, csOnline, csRendezvous, csConnected, csError };
-#define NATREMOTE 5352
+#define NATREMOTE 5354
 #define ADDR_LOCALHOST "127.0.0.1"
 
 struct udppacket

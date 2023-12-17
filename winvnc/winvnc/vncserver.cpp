@@ -2098,7 +2098,7 @@ void vncServer::SetAutoPortSelect(const BOOL autoport)
 void vncServer::cloudConnect(bool start, char *cloudServer)
 {
 	if (start)
-		cloudManager->addThread(5352, cloudServer, code, ctSERVER);
+		cloudManager->addThread(NATREMOTE, cloudServer, code, ctSERVER);
 	else
 		cloudManager->stopActiveThread();
 }
