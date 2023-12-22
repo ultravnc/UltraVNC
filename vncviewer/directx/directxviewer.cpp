@@ -523,8 +523,11 @@ ViewerDirectxClass:: Preupdate(unsigned char * bits)
 			break;
 	}
 
-	if (!valid())
+	if (!valid()) {
+		DestroyD3D();
+		if(ReInitD3D() != S_OK)
 			return NULL;
+	}
 	if (directxlocked == true) 
 		return bits;
 #ifdef _DEBUG
