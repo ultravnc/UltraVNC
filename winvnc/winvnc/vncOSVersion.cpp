@@ -80,7 +80,7 @@ VNC_OSVersion::VNC_OSVersion()
 	switch(OSversion.dwPlatformId)
 	{
 		case VER_PLATFORM_WIN32_NT:
-								  if (OSversion.dwMajorVersion==6 && OSversion.dwMinorVersion>=2) OS_WIN8=true;
+								  if ((OSversion.dwMajorVersion==6 && OSversion.dwMinorVersion>=2) || OSversion.dwMajorVersion > 6 ) OS_WIN8=true;
 								  else if(OSversion.dwMajorVersion==6 && OSversion.dwMinorVersion==1) OS_WIN7=true;
 								  else if(OSversion.dwMajorVersion==6 && OSversion.dwMinorVersion==0) OS_VISTA=true;
 								  else if (OSversion.dwMajorVersion == 5 && OSversion.dwMinorVersion == 2) { OS_XP = true; OS_BEFOREVISTA = true; }
