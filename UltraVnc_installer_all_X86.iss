@@ -77,7 +77,7 @@ en.firewall=Configuring Windows firewall...
 en.LaunchProgram=Start UltraVnc after finishing installation
 en.FullInstall=Full installation
 en.CustomInstall=Custom installation
-en.RepetearInstall=Repetear
+en.RepeaterInstall=Repeater
 en.UpgradeInstall=Upgrade
 en.ServerOnly=UltraVNC Server Only
 en.ServerOnlyS=UltraVNC Server Only   "silent"
@@ -101,9 +101,9 @@ en.ShowLatestVersions=Show latest versions
 
 de.firewall=Die Windows Firewall wird konfiguriert...
 ;de.LaunchProgram=
-de.FullInstall=Vollständige Installation
+de.FullInstall=Vollstï¿½ndige Installation
 de.CustomInstall=Benutzerdefinierte Installation
-;de.RepetearInstall=
+;de.RepeaterInstall=
 ;de.UpgradeInstall=
 de.ServerOnly=Nur UltraVNC Server
 de.ServerOnlyS=Nur UltraVNC Server  "silent"
@@ -127,22 +127,22 @@ de.Passwd=Check set initial password...
 
 fr.firewall=Configuration du Pare Feu de Windows...
 ;fr.LaunchProgram=
-fr.FullInstall=Installation complète
-fr.CustomInstall=Installation personnalisée
-;fr.RepetearInstall=
+fr.FullInstall=Installation complï¿½te
+fr.CustomInstall=Installation personnalisï¿½e
+;fr.RepeaterInstall=
 ;fr.UpgradeInstall=
 fr.ServerOnly=Seulement UltraVNC Server
 fr.ServerOnlyS=Seulement UltraVNC Server "mode silencieux"
 fr.ViewerOnly=Seulement UltraVNC Viewer
-fr.InstallService=&Installation et enregistrement d'%1 comme service système
+fr.InstallService=&Installation et enregistrement d'%1 comme service systï¿½me
 fr.ServerConfig=Configuration serveur:
-fr.StartService=&Démarrer ou redémarrer %1 le service
-fr.CreateDesktopIcons=Créer les icônes d'%1 sur le &bureau
-fr.Starting=Démarrage du service %1...
-fr.Stopping=Arrêt du service %1...
+fr.StartService=&Dï¿½marrer ou redï¿½marrer %1 le service
+fr.CreateDesktopIcons=Crï¿½er les icï¿½nes d'%1 sur le &bureau
+fr.Starting=Dï¿½marrage du service %1...
+fr.Stopping=Arrï¿½t du service %1...
 fr.Removing=Suppression du service %1...
 fr.Registering=Enregistrement du service %1...
-fr.Passwd=Vérification du mot de passe initial...
+fr.Passwd=Vï¿½rification du mot de passe initial...
 ;fr.IsDonateAndMailDonateHint=
 ;fr.AddingTrustedPublisher=
 ;fr.InstallingVirtualDriver=
@@ -155,10 +155,10 @@ it.firewall=Configurazione firewall di Windows...
 it.LaunchProgram=Avvia UltraVnc dopo aver cmpletato l'installazione
 it.FullInstall=Installazione completa
 it.CustomInstall=Installazione personalizzata
-it.RepetearInstall=Repetear
+it.RepeaterInstall=Repeater
 it.UpgradeInstall=Aggiorna
 it.ServerOnly=Solo UltraVNC Server
-it.ServerOnlyS=Solo UltraVNC Server "modalità silenziosa"
+it.ServerOnlyS=Solo UltraVNC Server "modalitï¿½ silenziosa"
 it.ViewerOnly=Solo UltraVNC Viewer
 it.InstallService=&Registra '%1' come servizio di sistema
 it.ServerConfig=Configurazione server:
@@ -182,7 +182,7 @@ Name: full; Description: {cm:FullInstall}
 Name: server; Description: {cm:ServerOnly}
 Name: server_silent; Description: {cm:ServerOnlyS}
 Name: viewer; Description: {cm:ViewerOnly}
-Name: repeater; Description: {cm:RepetearInstall}
+Name: repeater; Description: {cm:RepeaterInstall}
 Name: custom; Description: {cm:CustomInstall}; Flags: iscustom
 Name: Upgrade; Description: {cm:UpgradeInstall}
 
