@@ -2873,6 +2873,8 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 				case rfbUltraVNC_SCPrompt: // adzm 2010-10				
 				case rfbUltraVNC_SessionSelect:
 				case rfbUltraVNC_MsLogonIIAuth:
+				case rfbRSAAES:
+				case rfbRSAAESne:
 				case rfbVncAuth:
 				case rfbNoAuth:
 					auth_supported.push_back(authAllowed[i]);
@@ -2889,6 +2891,8 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 				auth_priority.push_back(rfbClientInitExtraMsgSupport);
 				auth_priority.push_back(rfbUltraVNC_SessionSelect);
 				auth_priority.push_back(rfbUltraVNC_MsLogonIIAuth);
+				auth_priority.push_back(rfbRSAAES);
+				auth_priority.push_back(rfbRSAAESne);
 				auth_priority.push_back(rfbVncAuth);
 				auth_priority.push_back(rfbNoAuth);
 
@@ -2999,6 +3003,10 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 		} else {
 			AuthVnc();
 		}
+		break;
+	case rfbRSAAES:
+	case rfbRSAAESne:
+		AuthRSAAES(128, authScheme == rfbRSAAES);
 		break;
 	case rfbUltraVNC_SCPrompt:
 		AuthSCPrompt();
@@ -6536,7 +6544,7 @@ void ClientConnection::ReadExact(char *inbuf, int wanted)
 		// sf@2002 - DSM Plugin
 		if (m_fUsePlugin)
 		{
-			if (m_pDSMPlugin->IsEnabled())
+			if (m_pPluginInterface || m_pDSMPlugin->IsEnabled())
 			{
 				//omni_mutex_lock l(m_pDSMPlugin->m_RestMutex);
 				//adzm - 2009-06-21
@@ -6992,7 +7000,7 @@ bool ClientConnection::WriteTransformed(char *buf, int bytes, bool bQueue)
 	char *pBuffer = buf;
 	if (m_fUsePlugin)
 	{
-		if (m_pDSMPlugin->IsEnabled())
+		if (m_pPluginInterface || m_pDSMPlugin->IsEnabled())
 		{
 			int nTransDataLen = 0;
 			pBuffer = (char*)TransformBuffer((BYTE*)buf, bytes, &nTransDataLen);
@@ -7054,7 +7062,7 @@ void ClientConnection::WriteTransformed_timeout(char *buf, int bytes,int timeout
 	char *pBuffer = buf;
 	if (m_fUsePlugin)
 	{
-		if (m_pDSMPlugin->IsEnabled())
+		if (m_pPluginInterface || m_pDSMPlugin->IsEnabled())
 		{
 			int nTransDataLen = 0;
 			pBuffer = (char*)TransformBuffer((BYTE*)buf, bytes, &nTransDataLen);

@@ -36,6 +36,8 @@ class VNCviewerApp;
 
 #include "ClientConnection.h"
 
+class ClientConnection;
+
 class VNCviewerApp {
 public:
 	VNCviewerApp(HINSTANCE hInstance, LPTSTR szCmdLine);
