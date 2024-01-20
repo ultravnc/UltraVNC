@@ -59,13 +59,14 @@ struct AESImpl
 			vnclog.Print(0, _T("AESImpl: CryptAcquireContext failed (%d)\n"), GetLastError());
 			return false;
 		}
-		SymKeyBlob keyBlob = { 0 };
+		SymKeyBlob keyBlob;
+		memset(&keyBlob, 0, sizeof(keyBlob));
 		keyBlob.hdr.bType = PLAINTEXTKEYBLOB;
 		keyBlob.hdr.bVersion = CUR_BLOB_VERSION;
 		keyBlob.hdr.aiKeyAlg = (keySize == 128 ? CALG_AES_128 : CALG_AES_256);
 		keyBlob.cbKeySize = keySize / 8;
 		memcpy(keyBlob.key, key, keyBlob.cbKeySize);
-		if (!CryptImportKey(hProv, (BYTE *)&keyBlob, sizeof(SymKeyBlob) - 32 + keyBlob.cbKeySize, NULL, 0, &hKey))
+		if (!CryptImportKey(hProv, (BYTE *)&keyBlob, offsetof(SymKeyBlob, key) + keyBlob.cbKeySize, NULL, 0, &hKey))
 		{
 			vnclog.Print(0, _T("AESImpl: CryptImportKey failed (%d)\n"), GetLastError());
 			return false;
@@ -89,7 +90,6 @@ struct AESImpl
 	}
 };
 
-
 struct CMACImpl
 {
 	static const DWORD BlockSize = AESImpl::BlockSize;
@@ -103,7 +103,7 @@ struct CMACImpl
 	{
 		if (!aes.Init(keySize, key))
 			return false;
-		memset(pad, 0, sizeof(pad));
+		Reset();
 		aes.Encrypt(pad);
 		DoubleBlock(pad, k1);
 		DoubleBlock(k1, k2);
@@ -261,80 +261,6 @@ struct AESEAXImpl
 	}
 };
 
-static void TestCmac() {
-	{
-		BYTE key[] = { 0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c };
-		BYTE buf[] = { 0x6b, 0xc1, 0xbe, 0xe2, 0x2e, 0x40, 0x9f, 0x96, 0xe9, 0x3d, 0x7e, 0x11, 0x73, 0x93, 0x17, 0x2a };
-		BYTE tag[] = { 0x07, 0x0a, 0x16, 0xb4, 0x6b, 0x4d, 0x41, 0x44, 0xf7, 0x9b, 0xdd, 0x9d, 0xd0, 0x4a, 0x28, 0x7c };
-		BYTE calctag[16];
-
-		CMACImpl cmac;
-		cmac.Init(sizeof(key) * 8, key);
-		cmac.Process(buf, sizeof(buf));
-		cmac.Finalize(calctag, sizeof(calctag));
-		for (int i = 0; i < 16; i++)
-		{
-			if (tag[i] != calctag[i])
-			{
-				break;
-			}
-		}
-	}
-	{
-		BYTE key[] = { 0x83, 0x95, 0xfc, 0xf1, 0xe9, 0x5b, 0xeb, 0xd6, 0x97, 0xbd, 0x01, 0x0b, 0xc7, 0x66, 0xaa, 0xc3 };
-		BYTE nonce[] = { 0x22, 0xe7, 0xad, 0xd9, 0x3c, 0xfc, 0x63, 0x93, 0xc5, 0x7e, 0xc0, 0xb3, 0xc1, 0x7d, 0x6b, 0x44 };
-		BYTE aad[] = { 0x12, 0x67, 0x35, 0xfc, 0xc3, 0x20, 0xd2, 0x5a };
-		BYTE plain[] = { 0xca, 0x40, 0xd7, 0x44, 0x6e, 0x54, 0x5f, 0xfa, 0xed, 0x3b, 0xd1, 0x2a, 0x74, 0x0a, 0x65, 0x9f, 0xfb, 0xbb, 0x3c, 0xea, 0xb7 };
-		BYTE enc[] = { 0xcb, 0x89, 0x20, 0xf8, 0x7a, 0x6c, 0x75, 0xcf, 0xf3, 0x96, 0x27, 0xb5, 0x6e, 0x3e, 0xd1, 0x97, 0xc5, 0x52, 0xd2, 0x95, 0xa7 };
-		BYTE tag[] = { 0xcf, 0xc4, 0x6a, 0xfc, 0x25, 0x3b, 0x46, 0x52, 0xb1, 0xaf, 0x37, 0x95, 0xb1, 0x24, 0xab, 0x6e };
-		BYTE buf[100];
-		BYTE calctag[16];
-
-		AESEAXImpl aes;
-		aes.Init(sizeof(key) * 8, key);
-		aes.SetNonce(nonce, sizeof(nonce));
-		aes.SetAad(aad, sizeof(aad));
-		memcpy(buf, plain, sizeof(plain));
-		aes.Process(buf, sizeof(plain));
-		aes.Finalize(calctag, sizeof(calctag));
-		for (int i = 0; i < sizeof(plain); i++)
-		{
-			if (buf[i] != enc[i])
-			{
-				break;
-			}
-		}
-		for (int i = 0; i < 16; i++)
-		{
-			if (tag[i] != calctag[i])
-			{
-				break;
-			}
-		}
-
-		aes.Init(sizeof(key) * 8, key);
-		aes.SetNonce(nonce, sizeof(nonce));
-		aes.SetAad(aad, sizeof(aad));
-		memcpy(buf, enc, sizeof(enc));
-		aes.Process(buf, sizeof(enc), false);
-		aes.Finalize(calctag, sizeof(calctag));
-		for (int i = 0; i < sizeof(enc); i++)
-		{
-			if (buf[i] != plain[i])
-			{
-				break;
-			}
-		}
-		for (int i = 0; i < 16; i++)
-		{
-			if (tag[i] != calctag[i])
-			{
-				break;
-			}
-		}
-	}
-}
-
 struct AESEAXPlugin : IPlugin
 {
 	static const int BlockSize = AESEAXImpl::BlockSize;
@@ -349,14 +275,17 @@ struct AESEAXPlugin : IPlugin
 		DynBuffer() : buffer(0), pos(0), size(0), capacity(0) { }
 		~DynBuffer()
 		{
-			delete[] buffer;
+			delete [] buffer;
 		}
 
 		BYTE* EnsureAvailable(DWORD avail)
 		{
 			if (size + avail > capacity) {
-				delete[] buffer;
+				BYTE *prev = buffer;
 				buffer = new BYTE[size + avail];
+				if (size > 0)
+					memcpy(buffer, prev, size);
+				delete [] prev;
 				capacity = size + avail;
 			}
 			return buffer + size;
@@ -365,7 +294,7 @@ struct AESEAXPlugin : IPlugin
 
 	AESEAXImpl	encAes, decAes;
 	DWORD		encMsg, decMsg;
-	DynBuffer	encBuffer, decBuffer;
+	DynBuffer	encBuffer, decBuffer, decPlain;
 	DWORD		wanted;
 
 	AESEAXPlugin(DWORD keySize, void *encKey, void *decKey)
@@ -402,18 +331,28 @@ struct AESEAXPlugin : IPlugin
 		if (!pTransBuffer)
 		{
 			wanted = nTransDataLen;
-			*pnRestoredDataLen = AadSize + nTransDataLen + MacSize;
-			BYTE *dst = encBuffer.EnsureAvailable(*pnRestoredDataLen);
-			encBuffer.size += *pnRestoredDataLen;
+			if (decPlain.size >= wanted)
+				*pnRestoredDataLen = 0;
+			else if (decBuffer.size < AadSize)
+				*pnRestoredDataLen = AadSize - decBuffer.size;
+			else
+			{
+				DWORD needed = AadSize + Swap16IfLE(*((CARD16 *)decBuffer.buffer)) + MacSize;
+				*pnRestoredDataLen = (needed > decBuffer.size ? needed - decBuffer.size : 0);
+			}
+			BYTE *dst = decBuffer.EnsureAvailable(*pnRestoredDataLen);
+			decBuffer.size += *pnRestoredDataLen;
 			return dst;
 		}
-		DWORD size = Swap16IfLE(*((CARD16 *)encBuffer.buffer));
-		while (AadSize + size + MacSize <= (DWORD)encBuffer.size)
+		while (decBuffer.size >= AadSize)
 		{
-			BYTE *dst = decBuffer.EnsureAvailable(size);
+			DWORD size = Swap16IfLE(*((CARD16*)decBuffer.buffer));
+			if (AadSize + size + MacSize > (DWORD)decBuffer.size)
+				break;
+			BYTE* dst = decPlain.EnsureAvailable(size);
 			decAes.SetNonce(decMsg++);
-			decAes.SetAad(encBuffer.buffer, AadSize);
-			memcpy(dst, encBuffer.buffer + AadSize, size);
+			decAes.SetAad(decBuffer.buffer, AadSize);
+			memcpy(dst, decBuffer.buffer + AadSize, size);
 			if (!decAes.Process(dst, size, false))
 			{
 				vnclog.Print(0, _T("AESEAXPlugin: Decryption failed\n"));
@@ -423,24 +362,25 @@ struct AESEAXPlugin : IPlugin
 			{
 				vnclog.Print(0, _T("AESEAXPlugin: Tag failed on decryption\n"));
 			}
-			if (memcmp(tag, encBuffer.buffer + AadSize + size, MacSize) != 0)
+			if (memcmp(tag, decBuffer.buffer + AadSize + size, MacSize) != 0)
 			{
 				vnclog.Print(0, _T("AESEAXPlugin: Tag does not match\n"));
 			}
-			decBuffer.size += size;
-			encBuffer.size -= AadSize + size + MacSize;
-			if (encBuffer.size > 0)
-				memcpy(encBuffer.buffer, encBuffer.buffer + AadSize + size + MacSize, encBuffer.size);
-			size = (encBuffer.size >= 2 ? Swap16IfLE(*((CARD16*)encBuffer.buffer)) : 0);
+			decPlain.size += size;
+			decBuffer.size -= AadSize + size + MacSize;
+			if (decBuffer.size > 0)
+				memcpy(decBuffer.buffer, decBuffer.buffer + AadSize + size + MacSize, decBuffer.size);
 		}
-		if (decBuffer.size >= wanted)
+		if (decPlain.size >= wanted)
 		{
 			*pnRestoredDataLen = wanted;
-			memcpy(pTransBuffer, decBuffer.buffer, wanted);
-			decBuffer.size -= wanted;
-			if (decBuffer.size > 0)
-				memcpy(decBuffer.buffer, decBuffer.buffer + wanted, decBuffer.size);
+			memcpy(pTransBuffer, decPlain.buffer, wanted);
+			decPlain.size -= wanted;
+			if (decPlain.size > 0)
+				memcpy(decPlain.buffer, decPlain.buffer + wanted, decPlain.size);
 		}
+		else
+			*pnRestoredDataLen = -1;
 		return NULL;
 	}
 };
@@ -582,7 +522,7 @@ struct RSAImpl
 			sprintf_s(lastError, "Unexpected error. CryptGenKey failed (%u)", GetLastError());
 			return false;
 		}
-		BYTE keyData[2048] = { 0 };
+		BYTE keyData[2048];
 		DWORD size = sizeof(keyData);
 		if (!CryptExportKey(hClientKey, NULL, PUBLICKEYBLOB, 0, keyData, &size))
 		{
@@ -740,12 +680,12 @@ struct RSAImpl
 		if (strlen(clearPasswd) == 0)
 		{
 			AuthDialog ad;
-			if (!ad.DoDialog(false, pConn->m_host, pConn->m_port, true))
+			if (!ad.DoDialog(false, pConn->m_host, pConn->m_port, subtype == secTypeRA2UserPass))
 			{
-				sprintf_s(lastError, "Logon cancelled");
-				return false;
+				throw QuietException("Authentication cancelled");
 			}
-			strcpy(cmdlnUser, ad.m_user);
+			if (subtype == secTypeRA2UserPass)
+				strcpy(cmdlnUser, ad.m_user);
 			strcpy(clearPasswd, ad.m_passwd);
 		}
 		size = (subtype == secTypeRA2UserPass ? (DWORD)strlen(cmdlnUser) : 0);
@@ -838,7 +778,6 @@ struct RSAImpl
 
 void ClientConnection::AuthRSAAES(int keySize, bool encrypted)
 {
-	TestCmac();
 	RSAImpl st(this, (DWORD)keySize);
 	if (!st.ReadPublicKey()
 		|| !st.VerifyServer() 
@@ -850,7 +789,10 @@ void ClientConnection::AuthRSAAES(int keySize, bool encrypted)
 		|| !st.ReadHash()
 		|| !st.ReadSubtype()
 		|| !st.WriteCredentials(m_cmdlnUser, m_clearPasswd)) {
-		vnclog.Print(0, _T("AuthRSAAES: %s\n"), st.lastError);
-		throw WarningException(st.lastError);
+		if (strlen(st.lastError))
+		{
+			vnclog.Print(0, _T("AuthRSAAES: %s\n"), st.lastError);
+			throw WarningException(st.lastError);
+		}
 	}
 }
