@@ -5883,7 +5883,7 @@ inline void ClientConnection::ReadScreenUpdate()
 		// With DSM, all rects contents (excepted caches) are buffered into memory in one shot
 		// then they will be read in this buffer by the "regular" Read*Type*Rect() functions
 		// adzm 2010-09
-		if (m_fUsePlugin && !m_fPluginStreamingIn && (m_pPluginInterface || m_pDSMPlugin->IsEnabled()))
+		if (m_fUsePlugin && !m_fPluginStreamingIn && m_pDSMPlugin->IsEnabled())
 		{
 			if (!m_fReadFromNetRectBuf)
 			{
@@ -6588,7 +6588,7 @@ void ClientConnection::ReadExact(char *inbuf, int wanted)
 						int nRestDataLen = 0;
 						RestoreBufferStep2((BYTE*)inbuf, nTransDataLen, &nRestDataLen);
 
-						if (nRestDataLen > 0)
+						if (nRestDataLen >= 0)
 						{
 							// Check if we actually get the real original data length
 							if (nRestDataLen != wanted)
@@ -6721,7 +6721,7 @@ void ClientConnection::ReadExactProtocolVersion(char *inbuf, int wanted, bool& f
 						int nRestDataLen = 0;
 						RestoreBufferStep2((BYTE*)inbuf, nTransDataLen, &nRestDataLen);
 
-						if (nRestDataLen > 0)
+						if (nRestDataLen >= 0)
 						{
 							// Check if we actually get the real original data length
 							if (nRestDataLen != wanted)
