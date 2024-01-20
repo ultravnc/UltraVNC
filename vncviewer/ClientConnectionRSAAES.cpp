@@ -64,7 +64,7 @@ struct AESImpl
 		keyBlob.hdr.bType = PLAINTEXTKEYBLOB;
 		keyBlob.hdr.bVersion = CUR_BLOB_VERSION;
 		keyBlob.hdr.aiKeyAlg = (keySize == 128 ? CALG_AES_128 : CALG_AES_256);
-		keyBlob.cbKeySize = keySize / 8;
+		keyBlob.cbKeySize = min(keySize / 8, sizeof(keyBlob.key));
 		memcpy(keyBlob.key, key, keyBlob.cbKeySize);
 		if (!CryptImportKey(hProv, (BYTE *)&keyBlob, offsetof(SymKeyBlob, key) + keyBlob.cbKeySize, NULL, 0, &hKey))
 		{
@@ -390,8 +390,9 @@ const int secTypeRA2Pass = 2;
 
 struct RSAImpl
 {
-	static const int MinKeyLength = 1024;
-	static const int MaxKeyLength = 8192;
+	static const int MinRsaKeyLength = 1024;
+	static const int MaxRsaKeyLength = 8192;
+	static const int MaxRsaKeyBytes = MaxRsaKeyLength / 8;
 	static const int MaxAesKeyBytes = 256 / 8;
 	static const int MaxHashBytes = 32;
 
@@ -399,20 +400,20 @@ struct RSAImpl
 	{
 		BLOBHEADER  hdr;
 		RSAPUBKEY   key;
-		BYTE		modulus[MaxKeyLength / 8];
+		BYTE		modulus[MaxRsaKeyBytes];
 	};
 
 	struct RSAKeyInfo
 	{
 		DWORD		length, bytes;
-		BYTE		modulus[MaxKeyLength / 8];
-		BYTE		exp[MaxKeyLength / 8];
+		BYTE		modulus[MaxRsaKeyBytes];
+		BYTE		exp[MaxRsaKeyBytes];
 	};
 
 	ClientConnection *pConn;
 	DWORD		keySize;
 	RSAKeyInfo	serverKey, clientKey;
-	HCRYPTPROV	hProv, hClientProv;
+	HCRYPTPROV	hProv;
 	HCRYPTKEY	hServerKey, hClientKey;
 	HCRYPTHASH	hHash;
 	BYTE		serverRandom[MaxAesKeyBytes], clientRandom[MaxAesKeyBytes];
@@ -420,7 +421,7 @@ struct RSAImpl
 	char		lastError[1024];
 
 	RSAImpl(ClientConnection *pcc, DWORD keysz) : pConn(pcc), keySize(keysz),
-			hProv(0), hClientProv(0), hServerKey(0), hClientKey(0), hHash(0)
+			hProv(0), hServerKey(0), hClientKey(0), hHash(0)
 	{
 		lastError[0] = 0;
 	}
@@ -439,8 +440,6 @@ struct RSAImpl
 			CryptDestroyKey(hServerKey);
 		if (hProv)
 			CryptReleaseContext(hProv, 0);
-		if (hClientProv)
-			CryptReleaseContext(hClientProv, 0);
 	}
 
 	bool ReadPublicKey()
@@ -449,12 +448,12 @@ struct RSAImpl
 
 		pConn->ReadExact((char *)&serverKey.length, sizeof(serverKey.length));
 		serverKey.length = Swap32IfLE(serverKey.length);
-		if (serverKey.length < MinKeyLength)
+		if (serverKey.length < MinRsaKeyLength)
 		{
 			sprintf_s(lastError, "Server RSA key is too small (%d)", serverKey.length);
 			return false;
 		}
-		if (serverKey.length > MaxKeyLength)
+		if (serverKey.length > MaxRsaKeyLength)
 		{
 			sprintf_s(lastError, "Server RSA key is too big (%d)", serverKey.length);
 			return false;
@@ -511,13 +510,8 @@ struct RSAImpl
 
 	bool WritePublicKey()
 	{
-		if (!hClientProv && !CryptAcquireContext(&hClientProv, NULL, NULL, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT))
-		{
-			sprintf_s(lastError, "Unexpected error. CryptAcquireContext failed (%u)", GetLastError());
-			return false;
-		}
 		#define RSA2048BIT_KEY (RSA1024BIT_KEY << 1)
-		if (!CryptGenKey(hClientProv, AT_KEYEXCHANGE, RSA2048BIT_KEY | CRYPT_EXPORTABLE, &hClientKey))
+		if (!CryptGenKey(hProv, AT_KEYEXCHANGE, RSA2048BIT_KEY | CRYPT_EXPORTABLE, &hClientKey))
 		{
 			sprintf_s(lastError, "Unexpected error. CryptGenKey failed (%u)", GetLastError());
 			return false;
@@ -550,7 +544,7 @@ struct RSAImpl
 
 	bool WriteRandom()
 	{
-		BYTE buffer[MaxKeyLength / 8];
+		BYTE buffer[MaxRsaKeyBytes];
 		DWORD size = keySize / 8;
 
 		if (!CryptGenRandom(hProv, size, (BYTE *)clientRandom))
@@ -578,7 +572,7 @@ struct RSAImpl
 
 	bool ReadRandom()
 	{
-		BYTE buffer[MaxKeyLength / 8];
+		BYTE buffer[MaxRsaKeyBytes];
 		DWORD size = 0;
 
 		pConn->ReadExact((char *)&size, 2);
