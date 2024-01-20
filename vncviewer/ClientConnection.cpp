@@ -5307,16 +5307,16 @@ void* ClientConnection::run_undetached(void* arg) {
 					msgType = fis->readU8();
 					m_nTO = 1; // Read the rest of the rfb message (normal case)
 				}
-				else if (m_pDSMPlugin->IsEnabled())
+				else if (m_pPluginInterface || m_pDSMPlugin->IsEnabled())
 				{
 					// Read the additional type char sent by the DSM Plugin (server)
 					// We need it to know the type of rfb message that follows
 					// because we can't see the type inside the transformed rfb message.
 					ReadExact((char *)&msgType, sizeof(msgType));
 					// adzm 2010-09
-					if (m_fPluginStreamingIn)
+					if (m_pPluginInterface || m_fPluginStreamingIn)
 					{
-						m_nTO = 1; // we'll need to read the whole transformed rfb message that follows
+						m_nTO = 1; // Read the rest of the rfb message (normal case)
 					}
 					else
 					{
@@ -5883,7 +5883,7 @@ inline void ClientConnection::ReadScreenUpdate()
 		// With DSM, all rects contents (excepted caches) are buffered into memory in one shot
 		// then they will be read in this buffer by the "regular" Read*Type*Rect() functions
 		// adzm 2010-09
-		if (m_fUsePlugin && !m_fPluginStreamingIn && m_pDSMPlugin->IsEnabled())
+		if (m_fUsePlugin && !m_fPluginStreamingIn && (m_pPluginInterface || m_pDSMPlugin->IsEnabled()))
 		{
 			if (!m_fReadFromNetRectBuf)
 			{
@@ -5916,7 +5916,7 @@ inline void ClientConnection::ReadScreenUpdate()
 		}
 
 		// adzm 2010-09
-		if (m_fUsePlugin && m_pDSMPlugin->IsEnabled())
+		if (m_fUsePlugin && (m_pPluginInterface || m_pDSMPlugin->IsEnabled()))
 		{
 			// ZRLE special case
 			if (!fis->GetReadFromMemoryBuffer())
@@ -6569,27 +6569,34 @@ void ClientConnection::ReadExact(char *inbuf, int wanted)
 				}
 				else // read tansformed data from the socket (normal case)
 				{
-					// Get the DSMPlugin destination buffer where to put transformed incoming data
-					// The number of bytes to read calculated from bufflen is given back in nTransDataLen
-					int nTransDataLen = 0;
-					BYTE* pTransBuffer = RestoreBufferStep1(NULL, wanted, &nTransDataLen);
-					if (pTransBuffer == NULL)
+					while (TRUE)
 					{
-						// m_pDSMPlugin->RestoreBufferUnlock();
-						throw WarningException(sz_L65);
-					}
+						// Get the DSMPlugin destination buffer where to put transformed incoming data
+						// The number of bytes to read calculated from bufflen is given back in nTransDataLen
+						int nTransDataLen = 0;
+						BYTE* pTransBuffer = RestoreBufferStep1(NULL, wanted, &nTransDataLen);
+						if (pTransBuffer == NULL)
+						{
+							// m_pDSMPlugin->RestoreBufferUnlock();
+							throw WarningException(sz_L65);
+						}
 
-					// Read bytes directly into Plugin Dest rest. buffer
-					fis->readBytes(pTransBuffer, nTransDataLen);
+						// Read bytes directly into Plugin Dest rest. buffer
+						fis->readBytes(pTransBuffer, nTransDataLen);
 
-					// Ask plugin to restore data from its local rest. buffer into inbuf
-					int nRestDataLen = 0;
-					RestoreBufferStep2((BYTE*)inbuf, nTransDataLen, &nRestDataLen);
+						// Ask plugin to restore data from its local rest. buffer into inbuf
+						int nRestDataLen = 0;
+						RestoreBufferStep2((BYTE*)inbuf, nTransDataLen, &nRestDataLen);
 
-					// Check if we actually get the real original data length
-					if (nRestDataLen != wanted)
-					{
-						throw WarningException(sz_L66);
+						if (nRestDataLen > 0)
+						{
+							// Check if we actually get the real original data length
+							if (nRestDataLen != wanted)
+							{
+								throw WarningException(sz_L66);
+							}
+							break;
+						}
 					}
 				}
 			}
@@ -6642,7 +6649,7 @@ void ClientConnection::ReadExactProtocolVersion(char *inbuf, int wanted, bool& f
 		// sf@2002 - DSM Plugin
 		if (m_fUsePlugin)
 		{
-			if (m_pDSMPlugin->IsEnabled())
+			if (m_pPluginInterface || m_pDSMPlugin->IsEnabled())
 			{
 				//omni_mutex_lock l(m_pDSMPlugin->m_RestMutex);
 				//adzm - 2009-06-21
@@ -6693,29 +6700,36 @@ void ClientConnection::ReadExactProtocolVersion(char *inbuf, int wanted, bool& f
 						m_pPluginInterface = m_pDSMPlugin->CreatePluginInterface();
 					}
 
-					// Get the DSMPlugin destination buffer where to put transformed incoming data
-					// The number of bytes to read calculated from bufflen is given back in nTransDataLen
-					int nTransDataLen = 0;
-					BYTE* pTransBuffer = RestoreBufferStep1(NULL, wanted, &nTransDataLen);
-					if (pTransBuffer == NULL)
+					while (TRUE)
 					{
-						// m_pDSMPlugin->RestoreBufferUnlock();
-						throw WarningException(sz_L65);
-					}
+						// Get the DSMPlugin destination buffer where to put transformed incoming data
+						// The number of bytes to read calculated from bufflen is given back in nTransDataLen
+						int nTransDataLen = 0;
+						BYTE* pTransBuffer = RestoreBufferStep1(NULL, wanted, &nTransDataLen);
+						if (pTransBuffer == NULL)
+						{
+							// m_pDSMPlugin->RestoreBufferUnlock();
+							throw WarningException(sz_L65);
+						}
 
-					// Read bytes directly into Plugin Dest rest. buffer
-					//adzm 2009-06-21 - we already got 4 bytes
-					memcpy(pTransBuffer, testBuffer, 4);
-					fis->readBytes(pTransBuffer+4, nTransDataLen-4);
+						// Read bytes directly into Plugin Dest rest. buffer
+						//adzm 2009-06-21 - we already got 4 bytes
+						memcpy(pTransBuffer, testBuffer, 4);
+						fis->readBytes(pTransBuffer + 4, nTransDataLen - 4);
 
-					// Ask plugin to restore data from its local rest. buffer into inbuf
-					int nRestDataLen = 0;
-					RestoreBufferStep2((BYTE*)inbuf, nTransDataLen, &nRestDataLen);
+						// Ask plugin to restore data from its local rest. buffer into inbuf
+						int nRestDataLen = 0;
+						RestoreBufferStep2((BYTE*)inbuf, nTransDataLen, &nRestDataLen);
 
-					// Check if we actually get the real original data length
-					if (nRestDataLen != wanted)
-					{
-						throw WarningException(sz_L66);
+						if (nRestDataLen > 0)
+						{
+							// Check if we actually get the real original data length
+							if (nRestDataLen != wanted)
+							{
+								throw WarningException(sz_L66);
+							}
+							break;
+						}
 					}
 				}
 			}
@@ -6819,7 +6833,7 @@ ClientConnection::Send(const char *buff, const unsigned int bufflen,int timeout)
 void ClientConnection::WriteTransformed(char *buf, int bytes, CARD8 msgType, bool bQueue)
 {
 	// adzm 2010-09
-	if (!m_fUsePlugin || m_fPluginStreamingOut)
+	if (!m_fUsePlugin || m_fPluginStreamingOut || m_pPluginInterface)
 	{
 		//adzm 2010-09
 		WriteTransformed(buf, bytes, bQueue);
@@ -6851,7 +6865,7 @@ void ClientConnection::WriteExact(char *buf, int bytes, CARD8 msgType)
 void ClientConnection::WriteTransformed_timeout(char *buf, int bytes, CARD8 msgType,int timeout, bool bQueue)
 {
 	// adzm 2010-09
-	if (!m_fUsePlugin || m_fPluginStreamingOut)
+	if (!m_fUsePlugin || m_fPluginStreamingOut || m_pPluginInterface)
 	{
 		WriteTransformed_timeout(buf, bytes,timeout, bQueue);
 	}
