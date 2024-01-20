@@ -269,7 +269,9 @@ struct AESEAXPlugin : IPlugin
 
 	struct DynBuffer
 	{
-		BYTE* buffer;
+		static const int CapacityStep = 1024;
+
+		BYTE		*buffer;
 		DWORD		pos, size, capacity;
 
 		DynBuffer() : buffer(0), pos(0), size(0), capacity(0) { }
@@ -280,15 +282,31 @@ struct AESEAXPlugin : IPlugin
 
 		BYTE* EnsureAvailable(DWORD avail)
 		{
-			if (size + avail > capacity) {
+			if (pos > 0 && size + avail > capacity)
+			{
+				size -= pos;
+				memcpy(buffer, buffer + pos, size);
+				pos = 0;
+			}
+			if (size + avail > capacity)
+			{
+				capacity = (size + avail + CapacityStep - 1) & -CapacityStep;
 				BYTE *prev = buffer;
-				buffer = new BYTE[size + avail];
-				if (size > 0)
-					memcpy(buffer, prev, size);
+				buffer = new BYTE[capacity];
+				memcpy(buffer, prev, size);
 				delete [] prev;
-				capacity = size + avail;
 			}
 			return buffer + size;
+		}
+
+		inline BYTE* GetHead()
+		{
+			return buffer + pos;
+		}
+
+		inline DWORD GetAvailable()
+		{
+			return size - pos;
 		}
 	};
 
@@ -331,28 +349,28 @@ struct AESEAXPlugin : IPlugin
 		if (!pTransBuffer)
 		{
 			wanted = nTransDataLen;
-			if (decPlain.size >= wanted)
+			if (decPlain.GetAvailable() >= wanted)
 				*pnRestoredDataLen = 0;
-			else if (decBuffer.size < AadSize)
-				*pnRestoredDataLen = AadSize - decBuffer.size;
+			else if (decBuffer.GetAvailable() < AadSize)
+				*pnRestoredDataLen = AadSize - decBuffer.GetAvailable();
 			else
 			{
-				DWORD needed = AadSize + Swap16IfLE(*((CARD16 *)decBuffer.buffer)) + MacSize;
-				*pnRestoredDataLen = (needed > decBuffer.size ? needed - decBuffer.size : 0);
+				int needed = AadSize + Swap16IfLE(*((CARD16 *)decBuffer.GetHead())) + MacSize;
+				*pnRestoredDataLen = max(needed - decBuffer.GetAvailable(), 0);
 			}
 			BYTE *dst = decBuffer.EnsureAvailable(*pnRestoredDataLen);
 			decBuffer.size += *pnRestoredDataLen;
 			return dst;
 		}
-		while (decBuffer.size >= AadSize)
+		while (decBuffer.GetAvailable() >= AadSize)
 		{
-			DWORD size = Swap16IfLE(*((CARD16*)decBuffer.buffer));
-			if (AadSize + size + MacSize > (DWORD)decBuffer.size)
+			DWORD size = Swap16IfLE(*((CARD16*)decBuffer.GetHead()));
+			if (AadSize + size + MacSize > (DWORD)decBuffer.GetAvailable())
 				break;
 			BYTE* dst = decPlain.EnsureAvailable(size);
 			decAes.SetNonce(decMsg++);
-			decAes.SetAad(decBuffer.buffer, AadSize);
-			memcpy(dst, decBuffer.buffer + AadSize, size);
+			decAes.SetAad(decBuffer.GetHead(), AadSize);
+			memcpy(dst, decBuffer.GetHead() + AadSize, size);
 			if (!decAes.Process(dst, size, false))
 			{
 				vnclog.Print(0, _T("AESEAXPlugin: Decryption failed\n"));
@@ -362,22 +380,18 @@ struct AESEAXPlugin : IPlugin
 			{
 				vnclog.Print(0, _T("AESEAXPlugin: Tag failed on decryption\n"));
 			}
-			if (memcmp(tag, decBuffer.buffer + AadSize + size, MacSize) != 0)
+			if (memcmp(tag, decBuffer.GetHead() + AadSize + size, MacSize) != 0)
 			{
 				vnclog.Print(0, _T("AESEAXPlugin: Tag does not match\n"));
 			}
 			decPlain.size += size;
-			decBuffer.size -= AadSize + size + MacSize;
-			if (decBuffer.size > 0)
-				memcpy(decBuffer.buffer, decBuffer.buffer + AadSize + size + MacSize, decBuffer.size);
+			decBuffer.pos += AadSize + size + MacSize;
 		}
-		if (decPlain.size >= wanted)
+		if (decPlain.GetAvailable() >= wanted)
 		{
 			*pnRestoredDataLen = wanted;
-			memcpy(pTransBuffer, decPlain.buffer, wanted);
-			decPlain.size -= wanted;
-			if (decPlain.size > 0)
-				memcpy(decPlain.buffer, decPlain.buffer + wanted, decPlain.size);
+			memcpy(pTransBuffer, decPlain.GetHead(), wanted);
+			decPlain.pos += wanted;
 		}
 		else
 			*pnRestoredDataLen = -1;
