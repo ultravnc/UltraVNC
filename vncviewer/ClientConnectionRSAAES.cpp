@@ -79,6 +79,7 @@ struct AESImpl
 		}
 		return true;
 	}
+
 	bool Encrypt(void *buf, DWORD size = BlockSize)
 	{
 		if (!CryptEncrypt(hKey, NULL, FALSE, 0, (BYTE *)buf, &size, size))
@@ -94,17 +95,16 @@ struct CMACImpl
 {
 	static const DWORD BlockSize = AESImpl::BlockSize;
 
-	AESImpl		aes;
+	AESImpl		*aes;
 	BYTE		k1[BlockSize], k2[BlockSize];
 	BYTE		pad[BlockSize];
 	DWORD		pos;
 
-	bool Init(DWORD keySize, void *key)
+	bool Init(AESImpl &a)
 	{
-		if (!aes.Init(keySize, key))
-			return false;
+		aes = &a;
 		Reset();
-		aes.Encrypt(pad);
+		aes->Encrypt(pad);
 		DoubleBlock(pad, k1);
 		DoubleBlock(k1, k2);
 		Reset();
@@ -123,7 +123,7 @@ struct CMACImpl
 		{
 			if (pos == BlockSize)
 			{
-				if (!aes.Encrypt(pad))
+				if (!aes->Encrypt(pad))
 					return false;
 				pos = 0;
 			}
@@ -144,13 +144,14 @@ struct CMACImpl
 		BYTE *key = (pos < BlockSize ? k2 : k1);
 		for (DWORD i = 0; i < BlockSize; i++)
 			pad[i] ^= key[i];
-		if (!aes.Encrypt(pad))
+		if (!aes->Encrypt(pad))
 			return false;
 		pos = 0;
 		memcpy(tag, pad, size);
 		return true;
 	}
 
+private:
 	void DoubleBlock(BYTE *in, BYTE *out)
 	{
 		DWORD c = 0;
@@ -178,18 +179,12 @@ struct AESEAXImpl
 
 	bool Init(DWORD keySize, void *key)
 	{
-		if (!cmac.Init(keySize, key))
-			return false;
 		if (!aes.Init(keySize, key))
+			return false;
+		if (!cmac.Init(aes))
 			return false;
 		pos = -1;
 		return true;
-	}
-
-	void SetNonce(void *buf, DWORD size)
-	{
-		Mac(0, buf, size, tagNonce);
-		memcpy(ctr, tagNonce, sizeof(ctr));
 	}
 
 	void SetNonce(DWORD msg)
@@ -198,6 +193,12 @@ struct AESEAXImpl
 		memcpy(buf, &msg, 4);
 		memset(buf + 4, 0, BlockSize - 4);
 		SetNonce(buf, BlockSize);
+	}
+
+	void SetNonce(void* buf, DWORD size)
+	{
+		Mac(0, buf, size, tagNonce);
+		memcpy(ctr, tagNonce, sizeof(ctr));
 	}
 
 	void SetAad(void* buf, DWORD size)
@@ -241,6 +242,7 @@ struct AESEAXImpl
 		return true;
 	}
 
+private:
 	void Mac(BYTE step, void *buf, DWORD size, void *tag)
 	{
 		BYTE block[BlockSize];
@@ -304,16 +306,16 @@ struct AESEAXPlugin : IPlugin
 			return buffer + pos;
 		}
 
-		inline DWORD GetAvailable()
+		inline int GetAvailable()
 		{
-			return size - pos;
+			return max(size - pos, 0);
 		}
 	};
 
 	AESEAXImpl	encAes, decAes;
 	DWORD		encMsg, decMsg;
 	DynBuffer	encBuffer, decBuffer, decPlain;
-	DWORD		wanted;
+	int			wanted;
 
 	AESEAXPlugin(DWORD keySize, void *encKey, void *decKey)
 	{
@@ -612,7 +614,7 @@ struct RSAImpl
 		return true;
 	}
 
-	bool SetCipher(bool &fUsePlugin, IPlugin **pPluginInterface)
+	bool SetCipher(bool &fUsePlugin, IPlugin **ppPluginInterface)
 	{
 		ALG_ID algId = (keySize == 128 ? CALG_SHA1 : CALG_SHA_256);
 		DWORD size = keySize / 8;
@@ -630,10 +632,10 @@ struct RSAImpl
 		{
 			return false;
 		}
-		if (pPluginInterface)
+		if (ppPluginInterface)
 		{
 			fUsePlugin = true;
-			*pPluginInterface = new AESEAXPlugin(keySize, encKey, decKey);
+			*ppPluginInterface = new AESEAXPlugin(keySize, encKey, decKey);
 		}
 		return true;
 	}
@@ -715,6 +717,7 @@ struct RSAImpl
 		return true;
 	}
 
+private:
 	bool CalcKeysHash(RSAKeyInfo &clientKey, RSAKeyInfo &serverKey, BYTE *hash, DWORD &size)
 	{
 		ALG_ID algId = (keySize == 128 ? CALG_SHA1 : CALG_SHA_256);
