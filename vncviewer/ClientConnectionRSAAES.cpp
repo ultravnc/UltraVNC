@@ -23,12 +23,38 @@
 ////////////////////////////////////////////////////////////////////////////
 
 // RSA-AES authentication and encryption
+
 #include "ClientConnection.h"
 #include "Exception.h"
 #include "AuthDialog.h"
 #include "DSMPlugin/DSMPlugin.h"
 
-struct AESImpl
+const int secTypeRA2UserPass = 1;
+const int secTypeRA2Pass = 2;
+
+static char	lastError[1024];
+
+static void ArraySwap(BYTE* p, DWORD size)
+{
+	for (DWORD i = 0; i < size / 2; i++)
+	{
+		const BYTE t = p[i];
+		p[i] = p[size - 1 - i];
+		p[size - 1 - i] = t;
+	}
+}
+
+static bool ArrayEqual(BYTE* a, BYTE *b, DWORD size)
+{
+	BYTE r = 0;
+	for (DWORD i = 0; i < size; i++)
+		r |= a[i] ^ b[i];
+	return r == 0;
+}
+
+// AES cipher implementation as wrapper for Crypto API forward permutaion
+
+struct AESCipher
 {
 	static const DWORD BlockSize = 16;
 
@@ -42,9 +68,9 @@ struct AESImpl
 	HCRYPTPROV	hProv;
 	HCRYPTKEY	hKey;
 
-	AESImpl() : hProv(0), hKey(0) { }
+	AESCipher() : hProv(0), hKey(0) { }
 
-	~AESImpl()
+	~AESCipher()
 	{
 		if (hKey)
 			CryptDestroyKey(hKey);
@@ -56,8 +82,8 @@ struct AESImpl
 	{
 		if (!CryptAcquireContext(&hProv, NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
 		{
-			vnclog.Print(0, _T("AESImpl: CryptAcquireContext failed (%d)\n"), GetLastError());
-			return false;
+			sprintf_s(lastError, "CryptAcquireContext failed (%d)", GetLastError());
+			return SetLastError(lastError);
 		}
 		SymKeyBlob keyBlob;
 		memset(&keyBlob, 0, sizeof(keyBlob));
@@ -68,14 +94,14 @@ struct AESImpl
 		memcpy(keyBlob.key, key, keyBlob.cbKeySize);
 		if (!CryptImportKey(hProv, (BYTE *)&keyBlob, offsetof(SymKeyBlob, key) + keyBlob.cbKeySize, NULL, 0, &hKey))
 		{
-			vnclog.Print(0, _T("AESImpl: CryptImportKey failed (%d)\n"), GetLastError());
-			return false;
+			sprintf_s(lastError, "CryptImportKey failed (%d)", GetLastError());
+			return SetLastError(lastError);
 		}
 		DWORD mode = CRYPT_MODE_ECB;
 		if (!CryptSetKeyParam(hKey, KP_MODE, (BYTE *)&mode, 0))
 		{
-			vnclog.Print(0, _T("AESImpl: CryptSetKeyParam(KP_MODE) failed (%d)\n"), GetLastError());
-			return false;
+			sprintf_s(lastError, "CryptSetKeyParam(KP_MODE) failed (%d)", GetLastError());
+			return SetLastError(lastError);
 		}
 		return true;
 	}
@@ -84,27 +110,37 @@ struct AESImpl
 	{
 		if (!CryptEncrypt(hKey, NULL, FALSE, 0, (BYTE *)buf, &size, size))
 		{
-			vnclog.Print(0, _T("AESImpl: CryptEncrypt failed (%d)\n"), GetLastError());
-			return false;
+			sprintf_s(lastError, "CryptEncrypt failed (%d)", GetLastError());
+			return SetLastError(lastError);
 		}
 		return true;
 	}
+
+private:
+	static bool SetLastError(char *error)
+	{
+		vnclog.Print(0, _T("AESCipher: %s\n"), error);
+		throw WarningException(error);
+		return false;
+	}
 };
 
-struct CMACImpl
-{
-	static const DWORD BlockSize = AESImpl::BlockSize;
+// CMAC authenticator implementation
 
-	AESImpl		*aes;
+struct CMACAuth
+{
+	static const DWORD BlockSize = AESCipher::BlockSize;
+
+	AESCipher	*cipher;
 	BYTE		k1[BlockSize], k2[BlockSize];
 	BYTE		pad[BlockSize];
 	DWORD		pos;
 
-	bool Init(AESImpl &a)
+	bool Init(AESCipher &c)
 	{
-		aes = &a;
+		cipher = &c;
 		Reset();
-		aes->Encrypt(pad);
+		cipher->Encrypt(pad);
 		DoubleBlock(pad, k1);
 		DoubleBlock(k1, k2);
 		Reset();
@@ -123,7 +159,7 @@ struct CMACImpl
 		{
 			if (pos == BlockSize)
 			{
-				if (!aes->Encrypt(pad))
+				if (!cipher->Encrypt(pad))
 					return false;
 				pos = 0;
 			}
@@ -136,15 +172,15 @@ struct CMACImpl
 	{
 		if (size < 4 || size > BlockSize)
 		{
-			vnclog.Print(0, _T("CMACImpl: Invalid tag size for CMAC (%d)\n"), size);
-			return false;
+			sprintf_s(lastError, "Invalid tag size for CMAC (%d)", size);
+			return SetLastError(lastError);
 		}
 		if (pos < BlockSize)
 			pad[pos] ^= 0x80;
 		BYTE *key = (pos < BlockSize ? k2 : k1);
 		for (DWORD i = 0; i < BlockSize; i++)
 			pad[i] ^= key[i];
-		if (!aes->Encrypt(pad))
+		if (!cipher->Encrypt(pad))
 			return false;
 		pos = 0;
 		memcpy(tag, pad, size);
@@ -152,7 +188,7 @@ struct CMACImpl
 	}
 
 private:
-	void DoubleBlock(BYTE *in, BYTE *out)
+	static void DoubleBlock(BYTE *in, BYTE *out)
 	{
 		DWORD c = 0;
 		for (int i = BlockSize - 1; i >= 0; i--)
@@ -163,15 +199,24 @@ private:
 		}
 		out[BlockSize - 1] ^= c * 0x87;
 	}
+
+	static bool SetLastError(char* error)
+	{
+		vnclog.Print(0, _T("CMACAuth: %s\n"), error);
+		throw WarningException(error);
+		return false;
+	}
 };
 
-struct AESEAXImpl
-{
-	static const DWORD BlockSize = AESImpl::BlockSize;
-	static const DWORD MacSize = CMACImpl::BlockSize;
+// EAX cipher mode AEAD (authenticated encryption with associated data) implementation
 
-	AESImpl		aes;
-	CMACImpl	cmac;
+struct EAXMode
+{
+	static const DWORD BlockSize = AESCipher::BlockSize;
+	static const DWORD MacSize = CMACAuth::BlockSize;
+
+	AESCipher	cipher;
+	CMACAuth	auth;
 	BYTE		ctr[BlockSize], pad[BlockSize];
 	int 		pos;
 	BYTE		tagNonce[MacSize];
@@ -179,9 +224,9 @@ struct AESEAXImpl
 
 	bool Init(DWORD keySize, void *key)
 	{
-		if (!aes.Init(keySize, key))
+		if (!cipher.Init(keySize, key))
 			return false;
-		if (!cmac.Init(aes))
+		if (!auth.Init(cipher))
 			return false;
 		pos = -1;
 		return true;
@@ -206,35 +251,35 @@ struct AESEAXImpl
 		Mac(1, buf, size, tagAad);
 	}
 
-	bool Process(void *buf, DWORD size, bool encr = true)
+	bool Process(void *buf, DWORD size, bool encrypt = true)
 	{
 		if (pos < 0)
 		{
 			Mac(2, NULL, 0, NULL);
 			pos = 0;
 		}
-		if (!encr && !cmac.Process(buf, size))
+		if (!encrypt && !auth.Process(buf, size))
 			return false;
 		for (DWORD i = 0; i < size; i++)
 		{
 			if (pos == 0 || pos == BlockSize)
 			{
 				memcpy(pad, ctr, BlockSize);
-				if (!aes.Encrypt(pad))
+				if (!cipher.Encrypt(pad))
 					return false;
 				WrapIncr(ctr);
 				pos = 0;
 			}
 			((BYTE *)buf)[i] ^= pad[pos++];
 		}
-		if (encr && !cmac.Process(buf, size))
+		if (encrypt && !auth.Process(buf, size))
 			return false;
 		return true;
 	}
 
 	bool Finalize(void *tag, DWORD size = MacSize)
 	{
-		if (!cmac.Finalize(tag, size))
+		if (!auth.Finalize(tag, size))
 			return false;
 		for (DWORD i = 0; i < size; i++)
 			((BYTE *)tag)[i] ^= tagNonce[i] ^ tagAad[i];
@@ -248,11 +293,11 @@ private:
 		BYTE block[BlockSize];
 		memset(block, 0, BlockSize);
 		block[BlockSize - 1] = step;
-		cmac.Reset();
-		cmac.Process(block, sizeof(block));
-		cmac.Process(buf, size);
+		auth.Reset();
+		auth.Process(block, sizeof(block));
+		auth.Process(buf, size);
 		if (tag)
-			cmac.Finalize(tag, MacSize);
+			auth.Finalize(tag, MacSize);
 	}
 
 	static void WrapIncr(BYTE ctr[BlockSize])
@@ -263,10 +308,12 @@ private:
 	}
 };
 
+// Encryption/decryption plugin based on AES in EAX mode
+
 struct AESEAXPlugin : IPlugin
 {
-	static const int BlockSize = AESEAXImpl::BlockSize;
-	static const int MacSize = AESEAXImpl::MacSize;
+	static const int BlockSize = EAXMode::BlockSize;
+	static const int MacSize = EAXMode::MacSize;
 	static const int AadSize = 2;
 
 	struct DynBuffer
@@ -312,15 +359,15 @@ struct AESEAXPlugin : IPlugin
 		}
 	};
 
-	AESEAXImpl	encAes, decAes;
+	EAXMode		encAead, decAead;
 	DWORD		encMsg, decMsg;
 	DynBuffer	encBuffer, decBuffer, decPlain;
 	int			wanted;
 
 	AESEAXPlugin(DWORD keySize, void *encKey, void *decKey)
 	{
-		encAes.Init(keySize, encKey);
-		decAes.Init(keySize, decKey);
+		encAead.Init(keySize, encKey);
+		decAead.Init(keySize, decKey);
 		encMsg = decMsg = 0;
 	}
 
@@ -333,16 +380,12 @@ struct AESEAXPlugin : IPlugin
 		BYTE *dst = encBuffer.EnsureAvailable(*pnTransformedDataLen);
 		*((CARD16 *)dst) = Swap16IfLE(nDataLen);
 		memcpy(dst + AadSize, pDataBuffer, nDataLen);
-		encAes.SetNonce(encMsg++);
-		encAes.SetAad(dst, AadSize);
-		if (!encAes.Process(dst + AadSize, nDataLen))
-		{
-			vnclog.Print(0, _T("AESEAXPlugin: Encryption failed\n"));
-		}
-		if (!encAes.Finalize(dst + AadSize + nDataLen, MacSize))
-		{
-			vnclog.Print(0, _T("AESEAXPlugin: Tag failed on encryption\n"));
-		}
+		encAead.SetNonce(encMsg++);
+		encAead.SetAad(dst, AadSize);
+		if (!encAead.Process(dst + AadSize, nDataLen))
+			SetLastError("Encryption failed");
+		if (!encAead.Finalize(dst + AadSize + nDataLen, MacSize))
+			SetLastError("Tag failed on encryption");
 		return dst;
 	}
 
@@ -370,22 +413,16 @@ struct AESEAXPlugin : IPlugin
 			if (AadSize + size + MacSize > (DWORD)decBuffer.GetAvailable())
 				break;
 			BYTE* dst = decPlain.EnsureAvailable(size);
-			decAes.SetNonce(decMsg++);
-			decAes.SetAad(decBuffer.GetHead(), AadSize);
+			decAead.SetNonce(decMsg++);
+			decAead.SetAad(decBuffer.GetHead(), AadSize);
 			memcpy(dst, decBuffer.GetHead() + AadSize, size);
-			if (!decAes.Process(dst, size, false))
-			{
-				vnclog.Print(0, _T("AESEAXPlugin: Decryption failed\n"));
-			}
+			if (!decAead.Process(dst, size, false))
+				SetLastError("Decryption failed");
 			BYTE tag[MacSize];
-			if (!decAes.Finalize(tag, MacSize))
-			{
-				vnclog.Print(0, _T("AESEAXPlugin: Tag failed on decryption\n"));
-			}
-			if (memcmp(tag, decBuffer.GetHead() + AadSize + size, MacSize) != 0)
-			{
-				vnclog.Print(0, _T("AESEAXPlugin: Tag does not match\n"));
-			}
+			if (!decAead.Finalize(tag, MacSize))
+				SetLastError("Tag failed on decryption");
+			if (!ArrayEqual(tag, decBuffer.GetHead() + AadSize + size, MacSize))
+				SetLastError("Decryption tag does not match");
 			decPlain.size += size;
 			decBuffer.pos += AadSize + size + MacSize;
 		}
@@ -399,17 +436,24 @@ struct AESEAXPlugin : IPlugin
 			*pnRestoredDataLen = -1;
 		return NULL;
 	}
+
+private:
+	static bool SetLastError(char* error)
+	{
+		vnclog.Print(0, _T("AESEAXPlugin: %s\n"), error);
+		throw WarningException(error);
+		return false;
+	}
 };
 
-const int secTypeRA2UserPass = 1;
-const int secTypeRA2Pass = 2;
+// RSA bases key exchange
 
-struct RSAImpl
+struct RSAKEX
 {
 	static const int MinRsaKeyLength = 1024;
 	static const int MaxRsaKeyLength = 8192;
 	static const int MaxRsaKeyBytes = MaxRsaKeyLength / 8;
-	static const int MaxAesKeyBytes = 256 / 8;
+	static const int MaxSymKeyBytes = 256 / 8;
 	static const int MaxHashBytes = 32;
 
 	struct PubKeyBlob
@@ -432,17 +476,17 @@ struct RSAImpl
 	HCRYPTPROV	hProv;
 	HCRYPTKEY	hServerKey, hClientKey;
 	HCRYPTHASH	hHash;
-	BYTE		serverRandom[MaxAesKeyBytes], clientRandom[MaxAesKeyBytes];
+	BYTE		serverRandom[MaxSymKeyBytes], clientRandom[MaxSymKeyBytes];
 	int			subtype;
 	char		lastError[1024];
 
-	RSAImpl(ClientConnection *pcc, DWORD keysz) : pConn(pcc), keySize(keysz),
+	RSAKEX(ClientConnection *pcc, DWORD keysz) : pConn(pcc), keySize(keysz),
 			hProv(0), hServerKey(0), hClientKey(0), hHash(0)
 	{
 		lastError[0] = 0;
 	}
 
-	~RSAImpl()
+	~RSAKEX()
 	{
 		memset(&serverKey, 0, sizeof(serverKey));
 		memset(&clientKey, 0, sizeof(clientKey));
@@ -487,7 +531,7 @@ struct RSAImpl
 		}
 		if (!hProv && !CryptAcquireContext(&hProv, NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
 		{
-			sprintf_s(lastError, "Unexpected error. CryptAcquireContext failed (%u)", GetLastError());
+			sprintf_s(lastError, "CryptAcquireContext failed (%u)", GetLastError());
 			return false;
 		}
 		keyBlob.hdr.bType = PUBLICKEYBLOB;
@@ -498,7 +542,7 @@ struct RSAImpl
 		keyBlob.key.bitlen = serverKey.length;
 		keyBlob.key.pubexp = Swap32IfLE(*((DWORD*)&serverKey.exp[serverKey.bytes - 4]));
 		memcpy(keyBlob.modulus, serverKey.modulus, serverKey.bytes);
-		SwapArray(keyBlob.modulus, serverKey.bytes);
+		ArraySwap(keyBlob.modulus, serverKey.bytes);
 		if (!CryptImportKey(hProv, (BYTE *)&keyBlob, offsetof(PubKeyBlob, modulus) + serverKey.bytes, 0, 0, &hServerKey))
 		{
 			sprintf_s(lastError, "Invalid server RSA key (%u)", GetLastError());
@@ -529,20 +573,20 @@ struct RSAImpl
 		#define RSA2048BIT_KEY (RSA1024BIT_KEY << 1)
 		if (!CryptGenKey(hProv, AT_KEYEXCHANGE, RSA2048BIT_KEY | CRYPT_EXPORTABLE, &hClientKey))
 		{
-			sprintf_s(lastError, "Unexpected error. CryptGenKey failed (%u)", GetLastError());
+			sprintf_s(lastError, "CryptGenKey failed (%u)", GetLastError());
 			return false;
 		}
 		BYTE keyData[2048];
 		DWORD size = sizeof(keyData);
 		if (!CryptExportKey(hClientKey, NULL, PUBLICKEYBLOB, 0, keyData, &size))
 		{
-			sprintf_s(lastError, "Unexpected error. CryptExportKey failed (%u)", GetLastError());
+			sprintf_s(lastError, "CryptExportKey failed (%u)", GetLastError());
 			return false;
 		}
 		PubKeyBlob *keyBlob = (PubKeyBlob*)keyData;
 		if (keyBlob->hdr.aiKeyAlg != CALG_RSA_KEYX || keyBlob->key.magic != BCRYPT_RSAPUBLIC_MAGIC)
 		{
-			sprintf_s(lastError, "Unexpected error. Invalid client key generated");
+			sprintf_s(lastError, "Invalid client key generated");
 			return false;
 		}
 		clientKey.length = keyBlob->key.bitlen;
@@ -550,7 +594,7 @@ struct RSAImpl
 		memset(clientKey.exp, 0, clientKey.bytes);
 		*((DWORD*)&clientKey.exp[clientKey.bytes - 4]) = Swap32IfLE(keyBlob->key.pubexp);
 		memcpy(clientKey.modulus, keyBlob->modulus, clientKey.bytes);
-		SwapArray(clientKey.modulus, clientKey.bytes);
+		ArraySwap(clientKey.modulus, clientKey.bytes);
 		DWORD keyLength = Swap32IfLE(clientKey.length);
 		pConn->WriteExact((char *)&keyLength, 4);
 		pConn->WriteExact((char *)clientKey.modulus, clientKey.bytes);
@@ -565,13 +609,13 @@ struct RSAImpl
 
 		if (!CryptGenRandom(hProv, size, (BYTE *)clientRandom))
 		{
-			sprintf_s(lastError, "Unexpected error. CryptGenRandom failed (%u)", GetLastError());
+			sprintf_s(lastError, "CryptGenRandom failed (%u)", GetLastError());
 			return false;
 		}
 		memcpy(buffer, clientRandom, size);
 		if (!CryptEncrypt(hServerKey, NULL, TRUE, 0, buffer, &size, sizeof(buffer)))
 		{
-			sprintf_s(lastError, "Unexpected error. CryptEncrypt failed (%u)", GetLastError());
+			sprintf_s(lastError, "CryptEncrypt failed (%u)", GetLastError());
 			return false;
 		}
 		if (size != serverKey.bytes)
@@ -581,7 +625,7 @@ struct RSAImpl
 		}
 		DWORD bufSize = Swap16IfLE(size);
 		pConn->WriteExact((char *)&bufSize, 2);
-		SwapArray(buffer, size);
+		ArraySwap(buffer, size);
 		pConn->WriteExact((char *)buffer, size);
 		return true;
 	}
@@ -599,7 +643,7 @@ struct RSAImpl
 			return false;
 		}
 		pConn->ReadExact((char *)buffer, size);
-		SwapArray(buffer, size);
+		ArraySwap(buffer, size);
 		if (!CryptDecrypt(hClientKey, NULL, TRUE, 0, (BYTE *)buffer, &size))
 		{
 			sprintf_s(lastError, "Cannot decrypt server random (%u)", GetLastError());
@@ -618,7 +662,7 @@ struct RSAImpl
 	{
 		ALG_ID algId = (keySize == 128 ? CALG_SHA1 : CALG_SHA_256);
 		DWORD size = keySize / 8;
-		BYTE encKey[MaxAesKeyBytes], decKey[MaxAesKeyBytes];
+		BYTE encKey[MaxSymKeyBytes], decKey[MaxSymKeyBytes];
 
 		if (!HashUpdate(algId, serverRandom, size)
 			|| !HashUpdate(algId, clientRandom, size)
@@ -663,7 +707,7 @@ struct RSAImpl
 			return false;
 		}
 		pConn->ReadExact((char *)hash, size);
-		if (memcmp(hash, calcHash, size) != 0)
+		if (!ArrayEqual(hash, calcHash, size))
 		{
 			sprintf_s(lastError, "Hash does not match");
 			return false;
@@ -727,7 +771,7 @@ private:
 
 		if (hashSize > size)
 		{
-			sprintf_s(lastError, "Unexpected error. Keys hash buffer too small (%u vs %u)", size, hashSize);
+			sprintf_s(lastError, "Keys hash buffer too small (%u vs %u)", size, hashSize);
 			return false;
 		}
 		if (!HashUpdate(algId, &clientLength, 4)
@@ -748,12 +792,12 @@ private:
 	{
 		if (!hHash && !CryptCreateHash(hProv, algId, 0, 0, &hHash))
 		{
-			sprintf_s(lastError, "Unexpected error. CryptCreateHash failed (%u)", GetLastError());
+			sprintf_s(lastError, "CryptCreateHash failed (%u)", GetLastError());
 			return false;
 		}
 		if (!CryptHashData(hHash, (BYTE *)data, size, 0))
 		{
-			sprintf_s(lastError, "Unexpected error. CryptHashData failed (%u)", GetLastError());
+			sprintf_s(lastError, "CryptHashData failed (%u)", GetLastError());
 			return false;
 		}
 		return true;
@@ -766,7 +810,7 @@ private:
 
 		if (!CryptGetHashParam(hHash, HP_HASHVAL, (BYTE *)buffer, &bufSize, 0))
 		{
-			sprintf_s(lastError, "Unexpected error. CryptGetHashParam failed (%u)", GetLastError());
+			sprintf_s(lastError, "CryptGetHashParam failed (%u)", GetLastError());
 			return false;
 		}
 		CryptDestroyHash(hHash);
@@ -775,21 +819,11 @@ private:
 		memcpy(out, buffer, size < bufSize ? size : bufSize);
 		return true;
 	}
-
-	static void SwapArray(BYTE *p, DWORD size)
-	{
-		for (DWORD i = 0; i < size / 2; i++)
-		{
-			const BYTE t = p[i];
-			p[i] = p[size - 1 - i];
-			p[size - 1 - i] = t;
-		}
-	}
 };
 
 void ClientConnection::AuthRSAAES(int keySize, bool encrypted)
 {
-	RSAImpl st(this, (DWORD)keySize);
+	RSAKEX st(this, (DWORD)keySize);
 	if (!st.ReadPublicKey()
 		|| !st.VerifyServer() 
 		|| !st.WritePublicKey()
