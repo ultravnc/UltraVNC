@@ -287,6 +287,8 @@ typedef char rfbProtocolVersionMsg[13];	/* allow extra byte for null */
 #define rfbVncAuth 2
 #define rfbRSAAES 5
 #define rfbRSAAESne 6
+#define rfbRSAAES_256 129
+#define rfbRSAAESne_256 130
 #define rfbUltraVNC 17
 // adzm 2010-09 - After rfbUltraVNC, auth repeats via rfbVncAuthContinue
 

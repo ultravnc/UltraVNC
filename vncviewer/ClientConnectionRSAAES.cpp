@@ -485,7 +485,7 @@ struct RSAImpl
 				return false;
 			}
 		}
-		if (!hProv && !CryptAcquireContext(&hProv, NULL, NULL, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT))
+		if (!hProv && !CryptAcquireContext(&hProv, NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
 		{
 			sprintf_s(lastError, "Unexpected error. CryptAcquireContext failed (%u)", GetLastError());
 			return false;
