@@ -34,7 +34,7 @@ const int secTypeRA2Pass = 2;
 
 static char	lastError[1024];
 
-static void ArraySwap(BYTE* p, DWORD size)
+static void ArraySwap(BYTE *p, DWORD size)
 {
 	for (DWORD i = 0; i < size / 2; i++)
 	{
@@ -44,7 +44,7 @@ static void ArraySwap(BYTE* p, DWORD size)
 	}
 }
 
-static bool ArrayEqual(BYTE* a, BYTE *b, DWORD size)
+static bool ArrayEqual(BYTE *a, BYTE *b, DWORD size)
 {
 	BYTE r = 0;
 	for (DWORD i = 0; i < size; i++)
@@ -200,7 +200,7 @@ private:
 		out[BlockSize - 1] ^= c * 0x87;
 	}
 
-	static bool SetLastError(char* error)
+	static bool SetLastError(char *error)
 	{
 		vnclog.Print(0, _T("CMACAuth: %s\n"), error);
 		throw WarningException(error);
@@ -240,13 +240,13 @@ struct EAXMode
 		SetNonce(buf, BlockSize);
 	}
 
-	void SetNonce(void* buf, DWORD size)
+	void SetNonce(void *buf, DWORD size)
 	{
 		Mac(0, buf, size, tagNonce);
 		memcpy(ctr, tagNonce, sizeof(ctr));
 	}
 
-	void SetAad(void* buf, DWORD size)
+	void SetAad(void *buf, DWORD size)
 	{
 		Mac(1, buf, size, tagAad);
 	}
@@ -329,7 +329,7 @@ struct AESEAXPlugin : IPlugin
 			delete [] buffer;
 		}
 
-		BYTE* EnsureAvailable(DWORD avail)
+		BYTE *EnsureAvailable(DWORD avail)
 		{
 			if (pos > 0 && size + avail > capacity)
 			{
@@ -348,7 +348,7 @@ struct AESEAXPlugin : IPlugin
 			return buffer + size;
 		}
 
-		inline BYTE* GetHead()
+		inline BYTE *GetHead()
 		{
 			return buffer + pos;
 		}
@@ -412,7 +412,7 @@ struct AESEAXPlugin : IPlugin
 			DWORD size = Swap16IfLE(*((CARD16*)decBuffer.GetHead()));
 			if (AadSize + size + MacSize > (DWORD)decBuffer.GetAvailable())
 				break;
-			BYTE* dst = decPlain.EnsureAvailable(size);
+			BYTE *dst = decPlain.EnsureAvailable(size);
 			decAead.SetNonce(decMsg++);
 			decAead.SetAad(decBuffer.GetHead(), AadSize);
 			memcpy(dst, decBuffer.GetHead() + AadSize, size);
@@ -438,7 +438,7 @@ struct AESEAXPlugin : IPlugin
 	}
 
 private:
-	static bool SetLastError(char* error)
+	static bool SetLastError(char *error)
 	{
 		vnclog.Print(0, _T("AESEAXPlugin: %s\n"), error);
 		throw WarningException(error);
@@ -470,7 +470,13 @@ struct RSAKEX
 		BYTE		exp[MaxRsaKeyBytes];
 	};
 
-	ClientConnection *pConn;
+	struct IConnection
+	{
+		virtual void ReadExact(char *, int) = 0;
+		virtual void WriteExact(char *, int) = 0;
+	};
+
+	IConnection	&conn;
 	DWORD		keySize;
 	RSAKeyInfo	serverKey, clientKey;
 	HCRYPTPROV	hProv;
@@ -480,7 +486,7 @@ struct RSAKEX
 	int			subtype;
 	char		lastError[1024];
 
-	RSAKEX(ClientConnection *pcc, DWORD keysz) : pConn(pcc), keySize(keysz),
+	RSAKEX(IConnection &c, DWORD keysz) : conn(c), keySize(keysz),
 			hProv(0), hServerKey(0), hClientKey(0), hHash(0)
 	{
 		lastError[0] = 0;
@@ -506,7 +512,7 @@ struct RSAKEX
 	{
 		PubKeyBlob keyBlob;
 
-		pConn->ReadExact((char *)&serverKey.length, sizeof(serverKey.length));
+		conn.ReadExact((char *)&serverKey.length, sizeof(serverKey.length));
 		serverKey.length = Swap32IfLE(serverKey.length);
 		if (serverKey.length < MinRsaKeyLength)
 		{
@@ -519,8 +525,8 @@ struct RSAKEX
 			return false;
 		}
 		serverKey.bytes = (serverKey.length + 7) / 8;
-		pConn->ReadExact((char *)serverKey.modulus, serverKey.bytes);
-		pConn->ReadExact((char *)serverKey.exp, serverKey.bytes);
+		conn.ReadExact((char *)serverKey.modulus, serverKey.bytes);
+		conn.ReadExact((char *)serverKey.exp, serverKey.bytes);
 		for (DWORD i = 0; i < serverKey.bytes - 4; i++)
 		{
 			if (serverKey.exp[i] != 0)
@@ -540,7 +546,7 @@ struct RSAKEX
 		keyBlob.hdr.aiKeyAlg = CALG_RSA_KEYX;
 		keyBlob.key.magic = BCRYPT_RSAPUBLIC_MAGIC; // RSA1
 		keyBlob.key.bitlen = serverKey.length;
-		keyBlob.key.pubexp = Swap32IfLE(*((DWORD*)&serverKey.exp[serverKey.bytes - 4]));
+		keyBlob.key.pubexp = Swap32IfLE(*((DWORD *)&serverKey.exp[serverKey.bytes - 4]));
 		memcpy(keyBlob.modulus, serverKey.modulus, serverKey.bytes);
 		ArraySwap(keyBlob.modulus, serverKey.bytes);
 		if (!CryptImportKey(hProv, (BYTE *)&keyBlob, offsetof(PubKeyBlob, modulus) + serverKey.bytes, 0, 0, &hServerKey))
@@ -583,7 +589,7 @@ struct RSAKEX
 			sprintf_s(lastError, "CryptExportKey failed (%u)", GetLastError());
 			return false;
 		}
-		PubKeyBlob *keyBlob = (PubKeyBlob*)keyData;
+		PubKeyBlob *keyBlob = (PubKeyBlob *)keyData;
 		if (keyBlob->hdr.aiKeyAlg != CALG_RSA_KEYX || keyBlob->key.magic != BCRYPT_RSAPUBLIC_MAGIC)
 		{
 			sprintf_s(lastError, "Invalid client key generated");
@@ -592,13 +598,13 @@ struct RSAKEX
 		clientKey.length = keyBlob->key.bitlen;
 		clientKey.bytes = (clientKey.length + 7) / 8;
 		memset(clientKey.exp, 0, clientKey.bytes);
-		*((DWORD*)&clientKey.exp[clientKey.bytes - 4]) = Swap32IfLE(keyBlob->key.pubexp);
+		*((DWORD *)&clientKey.exp[clientKey.bytes - 4]) = Swap32IfLE(keyBlob->key.pubexp);
 		memcpy(clientKey.modulus, keyBlob->modulus, clientKey.bytes);
 		ArraySwap(clientKey.modulus, clientKey.bytes);
 		DWORD keyLength = Swap32IfLE(clientKey.length);
-		pConn->WriteExact((char *)&keyLength, 4);
-		pConn->WriteExact((char *)clientKey.modulus, clientKey.bytes);
-		pConn->WriteExact((char *)clientKey.exp, clientKey.bytes);
+		conn.WriteExact((char *)&keyLength, 4);
+		conn.WriteExact((char *)clientKey.modulus, clientKey.bytes);
+		conn.WriteExact((char *)clientKey.exp, clientKey.bytes);
 		return true;
 	}
 
@@ -624,9 +630,9 @@ struct RSAKEX
 			return false;
 		}
 		DWORD bufSize = Swap16IfLE(size);
-		pConn->WriteExact((char *)&bufSize, 2);
+		conn.WriteExact((char *)&bufSize, 2);
 		ArraySwap(buffer, size);
-		pConn->WriteExact((char *)buffer, size);
+		conn.WriteExact((char *)buffer, size);
 		return true;
 	}
 
@@ -635,14 +641,14 @@ struct RSAKEX
 		BYTE buffer[MaxRsaKeyBytes];
 		DWORD size = 0;
 
-		pConn->ReadExact((char *)&size, 2);
+		conn.ReadExact((char *)&size, 2);
 		size = Swap16IfLE(size);
 		if (size != clientKey.bytes)
 		{
 			sprintf_s(lastError, "Client key size doesn't match (%u vs %u)", size, clientKey.bytes);
 			return false;
 		}
-		pConn->ReadExact((char *)buffer, size);
+		conn.ReadExact((char *)buffer, size);
 		ArraySwap(buffer, size);
 		if (!CryptDecrypt(hClientKey, NULL, TRUE, 0, (BYTE *)buffer, &size))
 		{
@@ -693,7 +699,7 @@ struct RSAKEX
 		{
 			return false;
 		}
-		pConn->WriteExact((char *)calcHash, size);
+		conn.WriteExact((char *)calcHash, size);
 		return true;
 	}
 
@@ -706,7 +712,7 @@ struct RSAKEX
 		{
 			return false;
 		}
-		pConn->ReadExact((char *)hash, size);
+		conn.ReadExact((char *)hash, size);
 		if (!ArrayEqual(hash, calcHash, size))
 		{
 			sprintf_s(lastError, "Hash does not match");
@@ -718,7 +724,7 @@ struct RSAKEX
 	bool ReadSubtype()
 	{
 		subtype = 0;
-		pConn->ReadExact((char *)&subtype, 1);
+		conn.ReadExact((char *)&subtype, 1);
 		if (subtype != secTypeRA2UserPass && subtype != secTypeRA2Pass)
 		{
 			sprintf_s(lastError, "Invalid subtype (%d)", subtype);
@@ -727,14 +733,14 @@ struct RSAKEX
 		return true;
 	}
 
-	bool WriteCredentials(char *cmdlnUser, char *clearPasswd)
+	bool WriteCredentials(TCHAR *host, int port, char *cmdlnUser, char *clearPasswd)
 	{
 		DWORD size;
 
 		if (strlen(clearPasswd) == 0)
 		{
 			AuthDialog ad;
-			if (!ad.DoDialog(false, pConn->m_host, pConn->m_port, subtype == secTypeRA2UserPass))
+			if (!ad.DoDialog(false, host, port, subtype == secTypeRA2UserPass))
 			{
 				throw QuietException("Authentication cancelled");
 			}
@@ -748,16 +754,16 @@ struct RSAKEX
 			sprintf_s(lastError, "User name too long (%u)", size);
 			return false;
 		}
-		pConn->WriteExact((char *)&size, 1);
-		pConn->WriteExact(cmdlnUser, size);
+		conn.WriteExact((char *)&size, 1);
+		conn.WriteExact(cmdlnUser, size);
 		size = (DWORD)strlen(clearPasswd);
 		if (size > 255)
 		{
 			sprintf_s(lastError, "Password too long (%u)", size);
 			return false;
 		}
-		pConn->WriteExact((char*)&size, 1);
-		pConn->WriteExact(clearPasswd, size);
+		conn.WriteExact((char *)&size, 1);
+		conn.WriteExact(clearPasswd, size);
 		return true;
 	}
 
@@ -803,7 +809,7 @@ private:
 		return true;
 	}
 
-	bool HashDigest(void* out, DWORD size)
+	bool HashDigest(void *out, DWORD size)
 	{
 		BYTE buffer[256];
 		DWORD bufSize = sizeof(buffer);
@@ -821,19 +827,27 @@ private:
 	}
 };
 
+struct KEXIO : public RSAKEX::IConnection
+{
+	ClientConnection *pConn;
+	KEXIO(ClientConnection *pcc) : pConn(pcc) { }
+	virtual void ReadExact(char *buf, int bytes) { pConn->ReadExact(buf, bytes); }
+	virtual void WriteExact(char *buf, int bytes) { pConn->WriteExact(buf, bytes); }
+};
+
 void ClientConnection::AuthRSAAES(int keySize, bool encrypted)
 {
-	RSAKEX st(this, (DWORD)keySize);
+	RSAKEX st(KEXIO(this), (DWORD)keySize);
 	if (!st.ReadPublicKey()
 		|| !st.VerifyServer() 
 		|| !st.WritePublicKey()
 		|| !st.WriteRandom()
 		|| !st.ReadRandom()
-		|| !st.SetCipher(m_fUsePlugin, encrypted ? &m_pPluginInterface : NULL)
+		|| (!encrypted || !st.SetCipher(m_fUsePlugin, &m_pPluginInterface))
 		|| !st.WriteHash()
 		|| !st.ReadHash()
 		|| !st.ReadSubtype()
-		|| !st.WriteCredentials(m_cmdlnUser, m_clearPasswd)) {
+		|| !st.WriteCredentials(m_host, m_port, m_cmdlnUser, m_clearPasswd)) {
 		if (strlen(st.lastError))
 		{
 			vnclog.Print(0, _T("AuthRSAAES: %s\n"), st.lastError);
