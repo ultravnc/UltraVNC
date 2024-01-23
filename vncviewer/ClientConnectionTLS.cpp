@@ -27,12 +27,10 @@
 #include "ClientConnection.h"
 #include "Exception.h"
 #include "AuthDialog.h"
-#include "DSMPlugin/DSMPlugin.h"
-#include "rdr/FdInStream.h"
 
 #define SECURITY_WIN32
 #include <security.h>
-#include <Winternl.h>
+#include <winternl.h>
 #define SCHANNEL_USE_BLACKLISTS
 #include <schannel.h>
 
