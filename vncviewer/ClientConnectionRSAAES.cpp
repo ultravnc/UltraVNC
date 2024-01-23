@@ -329,8 +329,10 @@ struct AESEAXPlugin : IPlugin
 			delete [] buffer;
 		}
 
-		BYTE *EnsureAvailable(DWORD avail)
+		BYTE *EnsureFree(DWORD avail)
 		{
+			if (pos > 0 && pos == size)
+				pos = size = 0;
 			if (pos > 0 && size + avail > capacity)
 			{
 				size -= pos;
@@ -377,7 +379,7 @@ struct AESEAXPlugin : IPlugin
 	{
 		*pnTransformedDataLen = AadSize + nDataLen + MacSize;
 		encBuffer.size = 0;
-		BYTE *dst = encBuffer.EnsureAvailable(*pnTransformedDataLen);
+		BYTE *dst = encBuffer.EnsureFree(*pnTransformedDataLen);
 		*((CARD16 *)dst) = Swap16IfLE(nDataLen);
 		memcpy(dst + AadSize, pDataBuffer, nDataLen);
 		encAead.SetNonce(encMsg++);
@@ -403,7 +405,7 @@ struct AESEAXPlugin : IPlugin
 				int needed = AadSize + Swap16IfLE(*((CARD16 *)decBuffer.GetHead())) + MacSize;
 				*pnRestoredDataLen = max(needed - decBuffer.GetAvailable(), 0);
 			}
-			BYTE *dst = decBuffer.EnsureAvailable(*pnRestoredDataLen);
+			BYTE *dst = decBuffer.EnsureFree(*pnRestoredDataLen);
 			decBuffer.size += *pnRestoredDataLen;
 			return dst;
 		}
@@ -412,7 +414,7 @@ struct AESEAXPlugin : IPlugin
 			DWORD size = Swap16IfLE(*((CARD16*)decBuffer.GetHead()));
 			if (AadSize + size + MacSize > (DWORD)decBuffer.GetAvailable())
 				break;
-			BYTE *dst = decPlain.EnsureAvailable(size);
+			BYTE *dst = decPlain.EnsureFree(size);
 			decAead.SetNonce(decMsg++);
 			decAead.SetAad(decBuffer.GetHead(), AadSize);
 			memcpy(dst, decBuffer.GetHead() + AadSize, size);
@@ -749,19 +751,9 @@ struct RSAKEX
 			strcpy(clearPasswd, ad.m_passwd);
 		}
 		size = (subtype == secTypeRA2UserPass ? (DWORD)strlen(cmdlnUser) : 0);
-		if (size > 255)
-		{
-			sprintf_s(lastError, "User name too long (%u)", size);
-			return false;
-		}
 		conn.WriteExact((char *)&size, 1);
 		conn.WriteExact(cmdlnUser, size);
 		size = (DWORD)strlen(clearPasswd);
-		if (size > 255)
-		{
-			sprintf_s(lastError, "Password too long (%u)", size);
-			return false;
-		}
 		conn.WriteExact((char *)&size, 1);
 		conn.WriteExact(clearPasswd, size);
 		return true;
