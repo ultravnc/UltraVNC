@@ -2873,6 +2873,7 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 				case rfbUltraVNC_SCPrompt: // adzm 2010-10				
 				case rfbUltraVNC_SessionSelect:
 				case rfbUltraVNC_MsLogonIIAuth:
+				case rfbVeNCypt:
 				case rfbRSAAES_256:
 				case rfbRSAAES:
 				case rfbRSAAESne_256:
@@ -2893,6 +2894,7 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 				auth_priority.push_back(rfbClientInitExtraMsgSupport);
 				auth_priority.push_back(rfbUltraVNC_SessionSelect);
 				auth_priority.push_back(rfbUltraVNC_MsLogonIIAuth);
+				auth_priority.push_back(rfbVeNCypt);
 				auth_priority.push_back(rfbRSAAES_256);
 				auth_priority.push_back(rfbRSAAES);
 				auth_priority.push_back(rfbRSAAESne_256);
@@ -3007,6 +3009,9 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 		} else {
 			AuthVnc();
 		}
+		break;
+	case rfbVeNCypt:
+		AuthVeNCrypt();
 		break;
 	case rfbRSAAES:
 	case rfbRSAAESne:
