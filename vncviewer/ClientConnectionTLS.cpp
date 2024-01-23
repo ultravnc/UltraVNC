@@ -199,8 +199,6 @@ struct TLSTransport
                 newCred.pTlsParameters = &params;
                 if (cred.grbitEnabledProtocols)
                     params.grbitDisabledProtocols = ~cred.grbitEnabledProtocols;
-                else
-                    params.grbitDisabledProtocols = SP_PROT_TLS1_3;
                 hr = AcquireCredentialsHandle(NULL, UNISP_NAME, (isServer ? SECPKG_CRED_INBOUND : SECPKG_CRED_OUTBOUND), NULL, &newCred, NULL, NULL, &hCredentials, NULL);
             }
             else hr = -1;
@@ -568,20 +566,20 @@ void ClientConnection::AuthVeNCrypt()
     if (temp != 1)
         throw WarningException("AuthVeNCrypt: Server unsupported sub-type");
     TLSTransport chan;
-    chan.Init(m_host, !(subType >= secTypeX509None));
+    chan.Init(m_host, subType >= secTypeX509None);
     DynBuffer inbuf, outbuf;
     while (TRUE)
     {
         if (!chan.Handshake(inbuf, outbuf))
             return;
-        if (chan.IsReady())
-            break;
         size = outbuf.GetAvailable();
         if (size > 0)
         {
             WriteExact((char *)outbuf.GetHead(), size);
             outbuf.size = 0;
         }
+        if (chan.IsReady())
+            break;
         size = 1; // fis->Check_if_buffer_has_data();
         inbuf.EnsureFree(size);
         ReadExact((char*)inbuf.GetTail(), size);
