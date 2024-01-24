@@ -33,11 +33,16 @@
 #include <winternl.h>
 #define SCHANNEL_USE_BLACKLISTS
 #include <schannel.h>
+#include <cryptuiapi.h>
+#include <commctrl.h>
+#include <wincrypt.h>
+#include <shlwapi.h>
 
 #pragma comment(lib, "secur32.lib")
 #pragma comment(lib, "crypt32.lib")
+#pragma comment(lib, "cryptui.lib")
 
-static char	lastError[1024];
+// Dynamicly sized I/O buffers
 
 struct DynBuffer
 {
@@ -82,7 +87,9 @@ struct DynBuffer
 	inline int GetFree() { return max(capacity - size, 0); }
 };
 
-struct TLSTransport
+// Schannel based TLS wrapper implemented as a "Sans I/O" protocol
+
+struct TLSSession
 {
 	enum State
 	{
@@ -94,8 +101,7 @@ struct TLSTransport
 	};
 
 	State			state;
-	char			*host;
-	bool			noCertErrors;
+	char			*hostName;
 	bool			isServer;
 	PCCERT_CONTEXT	pLocalCert, pRemoteCert;
 	DWORD			contextReq;
@@ -104,8 +110,9 @@ struct TLSTransport
 	SecBufferDesc	inDesc, outDesc;
 	SecBuffer		inBuffers[5], outBuffers[5];
 	SecPkgContext_StreamSizes tlsSizes;
+	char			lastError[1024];
 
-	TLSTransport() : state(New), host(NULL), noCertErrors(true), isServer(false), pLocalCert(NULL), pRemoteCert(NULL), contextReq(0)
+	TLSSession() : state(New), hostName(NULL), isServer(false), pLocalCert(NULL), pRemoteCert(NULL), contextReq(0)
 	{ 
 		SecInvalidateHandle(&hCredentials);
 		SecInvalidateHandle(&hContext);
@@ -119,9 +126,9 @@ struct TLSTransport
 		memset(outBuffers, 0, sizeof(outBuffers));
 	}
 
-	TLSTransport(TLSTransport& from)
+	TLSSession(TLSSession& from)
 	{
-		memcpy(this, &from, sizeof(TLSTransport));
+		memcpy(this, &from, sizeof(TLSSession));
 		inDesc.pBuffers = inBuffers;
 		outDesc.pBuffers = outBuffers;
 		SecInvalidateHandle(&from.hContext);
@@ -129,7 +136,7 @@ struct TLSTransport
 		from.pLocalCert = from.pRemoteCert = NULL;
 	}
 
-	~TLSTransport()
+	~TLSSession()
 	{
 		if (SecIsValidHandle(&hContext))
 			DeleteSecurityContext(&hContext);
@@ -141,10 +148,9 @@ struct TLSTransport
 			CertFreeCertificateContext(pRemoteCert);
 	}
 
-	void Init(char* _host, bool _noCertErrors, bool _isServer = false, PCERT_CONTEXT _pLocalCert = NULL)
+	void Init(char* _hostName, bool _isServer = false, PCERT_CONTEXT _pLocalCert = NULL)
 	{
-		host = _host;
-		noCertErrors = _noCertErrors;
+		hostName = _hostName;
 		isServer = _isServer;
 		pLocalCert = _pLocalCert;
 		state = HandshakeStart;
@@ -168,7 +174,7 @@ struct TLSTransport
 		{
 			SCHANNEL_CRED cred = { 0 };
 			cred.dwVersion = SCHANNEL_CRED_VERSION;
-			cred.dwFlags = (noCertErrors ? SCH_CRED_MANUAL_CRED_VALIDATION | SCH_CRED_NO_DEFAULT_CREDS : 0) | SCH_CRED_REVOCATION_CHECK_CHAIN_EXCLUDE_ROOT;
+			cred.dwFlags = SCH_CRED_MANUAL_CRED_VALIDATION | SCH_CRED_NO_DEFAULT_CREDS | SCH_CRED_REVOCATION_CHECK_CHAIN_EXCLUDE_ROOT;
 			if (pLocalCert)
 			{
 				cred.cCreds = 1;
@@ -187,11 +193,13 @@ struct TLSTransport
 				newCred.pTlsParameters = &params;
 				if (cred.grbitEnabledProtocols)
 					params.grbitDisabledProtocols = ~cred.grbitEnabledProtocols;
-				hr = AcquireCredentialsHandle(NULL, UNISP_NAME, (isServer ? SECPKG_CRED_INBOUND : SECPKG_CRED_OUTBOUND), NULL, &newCred, NULL, NULL, &hCredentials, NULL);
+				hr = AcquireCredentialsHandle(NULL, UNISP_NAME, (isServer ? SECPKG_CRED_INBOUND : SECPKG_CRED_OUTBOUND), NULL,
+					&newCred, NULL, NULL, &hCredentials, NULL);
 			}
 			else hr = -1;
 			if (FAILED(hr))
-				hr = AcquireCredentialsHandle(NULL, UNISP_NAME, (isServer ? SECPKG_CRED_INBOUND : SECPKG_CRED_OUTBOUND), NULL, &cred, NULL, NULL, &hCredentials, NULL);
+				hr = AcquireCredentialsHandle(NULL, UNISP_NAME, (isServer ? SECPKG_CRED_INBOUND : SECPKG_CRED_OUTBOUND), NULL,
+					&cred, NULL, NULL, &hCredentials, NULL);
 			if (FAILED(hr))
 				return SetLastError("AcquireCredentialsHandle failed", hr);
 		}
@@ -207,15 +215,11 @@ struct TLSTransport
 				pIn = &inDesc;
 			}
 			if (isServer)
-			{
 				hr = AcceptSecurityContext(&hCredentials, SecIsValidHandle(&hContext) ? &hContext : NULL, pIn, contextReq,
 					SECURITY_NATIVE_DREP, &hContext, &outDesc, &contextAttr, NULL);
-			}
 			else
-			{
-				hr = InitializeSecurityContext(&hCredentials, SecIsValidHandle(&hContext) ? &hContext : NULL, host, contextReq, 0,
+				hr = InitializeSecurityContext(&hCredentials, SecIsValidHandle(&hContext) ? &hContext : NULL, hostName, contextReq, 0,
 					SECURITY_NATIVE_DREP, pIn, 0, &hContext, &outDesc, &contextAttr, NULL);
-			}
 			if (hr == SEC_E_INCOMPLETE_MESSAGE)
 			{
 				memset(inBuffers, 0, sizeof(inBuffers));
@@ -223,7 +227,7 @@ struct TLSTransport
 			}
 			inbuf.size = 0;
 			if (FAILED(hr))
-				return SetLastError("InitializeSecurityContext failed", hr);
+				return SetLastError(isServer ? "AcceptSecurityContext failed" : "InitializeSecurityContext failed", hr);
 			for (DWORD i = 0; i < inDesc.cBuffers; i++)
 			{
 				if (inBuffers[i].cbBuffer > 0 && inBuffers[i].BufferType == SECBUFFER_EXTRA)
@@ -261,20 +265,16 @@ struct TLSTransport
 					return SetLastError("Not enough I/O buffers");
 				inDesc.cBuffers = tlsSizes.cBuffers;
 				outDesc.cBuffers = tlsSizes.cBuffers;
-				if (pRemoteCert)
-					CertFreeCertificateContext(pRemoteCert), pRemoteCert = NULL;
-				hr = QueryContextAttributes(&hContext, SECPKG_ATTR_REMOTE_CERT_CONTEXT, &pRemoteCert);
-				if (FAILED(hr))
-					pRemoteCert = NULL;
+				QueryContextAttributes(&hContext, SECPKG_ATTR_REMOTE_CERT_CONTEXT, &pRemoteCert);
 				state = PostHandshake;
 				done = true;
 				{
 					SecPkgContext_CipherInfo cipherInfo;
 					SecPkgContext_ConnectionInfo connInfo;
 					if (QueryContextAttributes(&hContext, SECPKG_ATTR_CIPHER_INFO, &cipherInfo) == S_OK)
-						vnclog.Print(0, _T("TLSTransport: Using %ls (0x%X) ciphersuite\n"), cipherInfo.szCipherSuite, cipherInfo.dwCipherSuite);
+						vnclog.Print(0, _T("TLSSession: Using %ls (0x%X) ciphersuite\n"), cipherInfo.szCipherSuite, cipherInfo.dwCipherSuite);
 					if (QueryContextAttributes(&hContext, SECPKG_ATTR_CONNECTION_INFO, &connInfo) == S_OK)
-						vnclog.Print(0, _T("TLSTransport: %s using %s cipher with %s hash and %s key-exchange\n"), GetAlgName(connInfo.dwProtocol), 
+						vnclog.Print(0, _T("TLSSession: %s using %s cipher with %s hash and %s key-exchange\n"), GetAlgName(connInfo.dwProtocol), 
 							GetAlgName(connInfo.aiCipher), GetAlgName(connInfo.aiHash), GetAlgName(connInfo.aiExch));
 				}
 				break;
@@ -333,18 +333,17 @@ struct TLSTransport
 		{
 			inBuffers[0].BufferType = SECBUFFER_DATA;
 			inBuffers[0].pvBuffer = inbuf.GetHead();
-			inBuffers[0].cbBuffer = inbuf.size;
+			inBuffers[0].cbBuffer = inbuf.GetAvailable();
 			HRESULT hr = DecryptMessage(&hContext, &inDesc, 0, NULL);
 			if (hr == SEC_E_INCOMPLETE_MESSAGE)
 			{
 				memset(inBuffers, 0, sizeof(inBuffers));
-				return false;
+				return true;
 			}
 			if (hr == SEC_E_INVALID_HANDLE) // session on hContext already closed
 				break;
 			if (FAILED(hr))
 				return SetLastError("DecryptMessage failed", hr);
-			DWORD origsize = inbuf.size;
 			inbuf.size = 0;
 			for (DWORD i = 0; i < inDesc.cBuffers; i++)
 			{
@@ -382,13 +381,105 @@ struct TLSTransport
 				state = Shutdown;
 				done = true;
 				break;
+			default:
+				return SetLastError("Unexpected DecryptMessage result", hr);
 			}
 		}
 		return true;
 	}
+	bool ValidateRemoteCertificate()
+	{
+		std::wstring host = toWide(hostName);
+		PCCERT_CONTEXT pCert = (pRemoteCert->hCertStore ? CertEnumCertificatesInStore(pRemoteCert->hCertStore, NULL) : pRemoteCert);
+		while (pCert)
+		{
+			std::vector<std::wstring> dnsNames;
+			if (GetSubjectAltName2(pCert, &dnsNames))
+			{
+				bool match = false;
+				for(auto &name : dnsNames)
+				{
+					if (name[0] == L'*')
+					{
+						std::wstring temp = std::wstring(L"*.") + name;
+						if (PathMatchSpecW(host.c_str(), name.c_str()) && !PathMatchSpecW(host.c_str(), temp.c_str()))
+							match = true;
+					}
+					else if (host == name || std::wstring(L"www.") + host == name)
+						match = true;
+				}
+				if (match && CanBuildChain(pCert))
+					return true;
+			}
+			pCert = (pRemoteCert->hCertStore ? CertEnumCertificatesInStore(pRemoteCert->hCertStore, pCert) : NULL);
+		}
+		sprintf_s(lastError, "No certificate subject name matches target host name '%s'", hostName);
+		return false;
+	}
 
 private:
-	static char *GetAlgName(ALG_ID algId)
+	bool GetSubjectAltName2(PCCERT_CONTEXT pCert, std::vector<std::wstring> *names, DWORD dwAltNameChoice = CERT_ALT_NAME_DNS_NAME)
+	{		
+		PCERT_EXTENSION pExt = CertFindExtension(szOID_SUBJECT_ALT_NAME2, pCert->pCertInfo->cExtension, pCert->pCertInfo->rgExtension);
+		if (!pExt)
+			return false;
+		PCERT_ALT_NAME_INFO pInfo = NULL;
+		DWORD size = 0;
+		if (!CryptDecodeObjectEx(X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, szOID_SUBJECT_ALT_NAME2, pExt->Value.pbData, pExt->Value.cbData,
+				CRYPT_DECODE_ALLOC_FLAG | CRYPT_DECODE_NOCOPY_FLAG | CRYPT_DECODE_SHARE_OID_STRING_FLAG, NULL, &pInfo, &size))
+			return false;
+		size = 0;
+		for (DWORD i = 0; i < pInfo->cAltEntry; i++)
+			if (pInfo->rgAltEntry[i].dwAltNameChoice == dwAltNameChoice)
+				names->push_back(pInfo->rgAltEntry[i].pwszDNSName);
+		LocalFree(pInfo);
+		return true;
+	}
+
+	bool CanBuildChain(PCCERT_CONTEXT pCert)
+	{
+		PCCERT_CHAIN_CONTEXT pChainContext = NULL;
+		CERT_CHAIN_PARA chainParams = { 0 };
+		chainParams.cbSize = sizeof(CERT_CHAIN_PARA);
+		if (!CertGetCertificateChain(NULL, pCert, NULL, NULL, &chainParams, CERT_CHAIN_REVOCATION_CHECK_CHAIN, 0, &pChainContext))
+			return SetLastError("CertGetCertificateChain failed", FACILITY_WIN32 | GetLastError());
+		bool found = false;
+		for (DWORD i = 0; i < pChainContext->cChain; i++)
+		{
+			DWORD dwErrorStatus = pChainContext->rgpChain[i]->TrustStatus.dwErrorStatus & ~CERT_TRUST_IS_NOT_TIME_NESTED;
+			if (dwErrorStatus == 0)
+			{
+				found = true;
+				break;
+			}
+			if ((dwErrorStatus & CERT_TRUST_IS_NOT_TIME_VALID) != 0)
+				sprintf_s(lastError, "The certificate has expired (0x%X)", dwErrorStatus);
+			else if ((dwErrorStatus & CERT_TRUST_IS_REVOKED) != 0)
+				sprintf_s(lastError, "Trust for this certificate or one of the certificates in the certificate chain has been revoked (0x%X)", dwErrorStatus);
+			else if ((dwErrorStatus & CERT_TRUST_IS_NOT_SIGNATURE_VALID) != 0)
+				sprintf_s(lastError, "The certificate or one of the certificates in the certificate chain does not have a valid signature (0x%X)", dwErrorStatus);
+			else if ((dwErrorStatus & CERT_TRUST_IS_UNTRUSTED_ROOT) != 0)
+				sprintf_s(lastError, "The certificate chain was issued by an authority that is not trusted (0x%X)", dwErrorStatus);
+			else if ((dwErrorStatus & CERT_TRUST_REVOCATION_STATUS_UNKNOWN) != 0)
+				sprintf_s(lastError, "The revocation status of the certificate or one of the certificates in the certificate chain is unknown (0x%X)", dwErrorStatus);
+			else if ((dwErrorStatus & CERT_TRUST_IS_PARTIAL_CHAIN) != 0)
+				sprintf_s(lastError, "The certificate chain is not complete (0x%X)", dwErrorStatus);
+			else 
+				sprintf_s(lastError, "Unknown CertGetCertificateChain error mask (0x%X)", dwErrorStatus);
+		}
+		if (pChainContext)
+			CertFreeCertificateChain(pChainContext);
+		return found;
+	}
+
+	static std::wstring toWide(const char* src)
+	{
+		std::wstring dst(strlen(src), L' ');
+		dst.resize(mbstowcs(&dst[0], src, strlen(src)));
+		return dst;
+	}
+
+	char *GetAlgName(ALG_ID algId)
 	{
 		switch (algId)
 		{
@@ -428,34 +519,35 @@ private:
 		}
 	}
 
-	static bool SetLastError(char *error, HRESULT hr = S_OK)
+	bool SetLastError(char *error, HRESULT hr = S_OK)
 	{
-		strcpy_s(lastError, error);
-		if (FAILED(hr))
+		if (hr != S_OK)
 		{
 			char msg[1024];
 			FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, hr, 0, msg, _countof(msg), NULL);
-			sprintf_s(lastError, "%s. %s", error, msg);
-		}
-	    vnclog.Print(0, FAILED(hr) ? _T("TLSTransport: %s (0x%X)\n") : _T("TLSTransport: %s\n"), lastError, hr);
-		throw WarningException(lastError);
+			sprintf_s(lastError, "%s. %s (0x%X)", error, msg, hr);
+		} 
+		else strcpy_s(lastError, error);
 		return false;
 	}
 };
 
+// Encryption/decryption plugin based on TLS session
+
 struct TLSPlugin : public IPlugin
 {
-	TLSTransport    session;
+	TLSSession		session;
 	DynBuffer	    encBuffer, decBuffer, decPlain;
 	int             wanted;
 
-	TLSPlugin(TLSTransport &s) : session(s) { }
+	TLSPlugin(TLSSession &s) : session(s) { }
 
 	virtual ~TLSPlugin() { }
 
 	virtual BYTE *TransformBuffer(BYTE *pDataBuffer, int nDataLen, int *pnTransformedDataLen)
 	{
-		session.Send(pDataBuffer, nDataLen, encBuffer);
+		if (!session.Send(pDataBuffer, nDataLen, encBuffer))
+			SetLastError(session.lastError);
 		*pnTransformedDataLen = encBuffer.size;
 		encBuffer.size = 0;
 		return encBuffer.buffer;
@@ -469,10 +561,9 @@ struct TLSPlugin : public IPlugin
 			if (decPlain.GetAvailable() >= wanted)
 			{
 				*pnRestoredDataLen = 0;
-				return decBuffer.buffer + decBuffer.size;
+				return decBuffer.buffer; // anything non-NULL
 			}
-			else
-				*pnRestoredDataLen = 1;
+			*pnRestoredDataLen = 1;
 			BYTE *dst = decBuffer.EnsureFree(*pnRestoredDataLen);
 			decBuffer.size += *pnRestoredDataLen;
 			return dst;
@@ -480,9 +571,10 @@ struct TLSPlugin : public IPlugin
 		if (decBuffer.GetAvailable() > 0)
 		{
 			DynBuffer outBuffer;
-			session.Receive(decBuffer, decPlain, outBuffer);
+			if (!session.Receive(decBuffer, decPlain, outBuffer))
+				SetLastError(session.lastError);
 			if (outBuffer.size > 0)
-				throw WarningException("TLSPlugin: Renegotiation request not implemented");
+				SetLastError("Renegotiation request not implemented");
 		}
 		if (decPlain.GetAvailable() >= wanted)
 		{
@@ -493,6 +585,14 @@ struct TLSPlugin : public IPlugin
 		else
 			*pnRestoredDataLen = -1;
 		return NULL;
+	}
+
+private:
+	static bool SetLastError(char* error)
+	{
+		vnclog.Print(0, _T("TLSPlugin: %s\n"), error);
+		throw WarningException(error);
+		return false;
 	}
 };
 
@@ -506,6 +606,11 @@ const int secTypeX509Plain = 262;
 void ClientConnection::AuthVeNCrypt()
 {
 	int version, temp, size, subType;
+	auto SetLastError = [](char *error)
+	{
+		vnclog.Print(0, _T("AuthVeNCrypt: %s\n"), error);
+		throw WarningException(error);
+	};
 
 	ReadExact((char *)&version, 2);
 	version = Swap16IfLE(version);
@@ -518,12 +623,12 @@ void ClientConnection::AuthVeNCrypt()
 	{
 		version = 0;
 		WriteExact((char *)&version, 2);
-		throw WarningException("AuthVeNCrypt: Unsupported version");
+		SetLastError("Unsupported version");
 	}
 	temp = 0;
 	ReadExact((char *)&temp, 1);
 	if (temp)
-		throw WarningException("AuthVeNCrypt: Server reported unsupported version");
+		SetLastError("Server reported unsupported version");
 	size = 0;
 	ReadExact((char *)&size, 1);
 	subType = -1;
@@ -545,22 +650,22 @@ void ClientConnection::AuthVeNCrypt()
 		}
 	}
 	if (subType < 0)
-		throw WarningException("AuthVeNCrypt: No valid sub-type");
+		SetLastError("No valid sub-type");
 	temp = Swap32IfLE(subType);
 	WriteExact((char *)&temp, 4);
 	temp = 0;
 	ReadExact((char *)&temp, 1);
 	if (temp != 1)
-		throw WarningException("AuthVeNCrypt: Server unsupported sub-type");
+		SetLastError("Server unsupported sub-type");
 
 	// start TLS on existing connection
-	TLSTransport session;
-	session.Init(m_host, subType >= secTypeX509None);
+	TLSSession session;
+	session.Init(m_host);
 	DynBuffer inbuf, outbuf;
 	while (TRUE)
 	{
 		if (!session.Handshake(inbuf, outbuf))
-			return;
+			SetLastError(session.lastError);
 		size = outbuf.GetAvailable();
 		if (size > 0)
 		{
@@ -573,6 +678,46 @@ void ClientConnection::AuthVeNCrypt()
 		inbuf.EnsureFree(size);
 		ReadExact((char *)inbuf.GetTail(), size);
 		inbuf.size += size;
+	}
+	if (subType <= secTypeTLSPlain && !session.ValidateRemoteCertificate())
+	{
+		bool done = false;
+		while (!done)
+		{
+			int nButtonPressed = 0;
+			WCHAR msg[1024];
+			swprintf_s(msg, L"%hs\n\nDo you want to continue?\n", session.lastError);
+			TASKDIALOGCONFIG tc = { 0 };
+			const TASKDIALOG_BUTTON buttons[] = { { IDNO, L"View Certificate" } };
+			tc.cbSize = sizeof(tc);
+			tc.dwFlags = TDF_SIZE_TO_CONTENT;
+			tc.dwCommonButtons = TDCBF_OK_BUTTON | TDCBF_CANCEL_BUTTON;
+			tc.pszWindowTitle = L"Warning";
+			tc.pszMainIcon = TD_WARNING_ICON;
+			tc.pszMainInstruction = L"Invalid server certificate";
+			tc.pszContent = msg;
+			tc.pButtons = buttons;
+			tc.cButtons = _countof(buttons);
+			TaskDialogIndirect(&tc, &nButtonPressed, NULL, NULL);
+			switch(nButtonPressed)
+			{
+			case IDNO:
+				{
+					BOOL changed = FALSE;
+					CRYPTUI_VIEWCERTIFICATE_STRUCT vc = { 0 };
+					vc.dwSize = sizeof(vc);
+					vc.pCertContext = session.pRemoteCert;
+					CryptUIDlgViewCertificate(&vc, &changed);
+					break;
+				}
+			case IDCANCEL:
+				throw QuietException(session.lastError);
+				break;
+			default:
+				done = true;
+				break;
+			}
+		}
 	}
 	m_fUsePlugin = true;
 	m_pPluginInterface = new TLSPlugin(session);
