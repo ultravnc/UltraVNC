@@ -27,7 +27,8 @@
 #include "ClientConnection.h"
 #include "Exception.h"
 #include "AuthDialog.h"
-#include "DSMPlugin/DSMPlugin.h"
+
+#include <commctrl.h>
 
 const int secTypeRA2UserPass = 1;
 const int secTypeRA2Pass = 2;
@@ -85,8 +86,7 @@ struct AESCipher
 			sprintf_s(lastError, "CryptAcquireContext failed (%d)", GetLastError());
 			return SetLastError(lastError);
 		}
-		SymKeyBlob keyBlob;
-		memset(&keyBlob, 0, sizeof(keyBlob));
+		SymKeyBlob keyBlob = { 0 };
 		keyBlob.hdr.bType = PLAINTEXTKEYBLOB;
 		keyBlob.hdr.bVersion = CUR_BLOB_VERSION;
 		keyBlob.hdr.aiKeyAlg = (keySize == 128 ? CALG_AES_128 : CALG_AES_256);
@@ -234,9 +234,8 @@ struct EAXMode
 
 	void SetNonce(DWORD msg)
 	{
-		BYTE buf[BlockSize];
+		BYTE buf[BlockSize] = { 0 };
 		memcpy(buf, &msg, 4);
-		memset(buf + 4, 0, BlockSize - 4);
 		SetNonce(buf, BlockSize);
 	}
 
@@ -290,8 +289,7 @@ struct EAXMode
 private:
 	void Mac(BYTE step, void *buf, DWORD size, void *tag)
 	{
-		BYTE block[BlockSize];
-		memset(block, 0, BlockSize);
+		BYTE block[BlockSize] = { 0 };
 		block[BlockSize - 1] = step;
 		auth.Reset();
 		auth.Process(block, sizeof(block));
@@ -350,15 +348,9 @@ struct AESEAXPlugin : IPlugin
 			return buffer + size;
 		}
 
-		inline BYTE *GetHead()
-		{
-			return buffer + pos;
-		}
+		inline BYTE *GetHead() { return buffer + pos; }
 
-		inline int GetAvailable()
-		{
-			return max(size - pos, 0);
-		}
+		inline int GetAvailable() { return max(size - pos, 0); }
 	};
 
 	EAXMode		encAead, decAead;
@@ -561,9 +553,11 @@ struct RSAKEX
 
 	bool VerifyServer()
 	{
-		DWORD size = Swap32IfLE(serverKey.length);
 		BYTE f[8];
+		char hex[24];
+		WCHAR msg[1024];
 
+		DWORD size = Swap32IfLE(serverKey.length);
 		if (!HashUpdate(CALG_SHA1, &size, 4)
 			|| !HashUpdate(CALG_SHA1, serverKey.modulus, serverKey.bytes)
 			|| !HashUpdate(CALG_SHA1, serverKey.exp, serverKey.bytes)
@@ -571,8 +565,21 @@ struct RSAKEX
 		{
 			return false;
 		}
-		vnclog.Print(0, "The server has provided the following identifying information:\n"
-			"Fingerprint: %02x-%02x-%02x-%02x-%02x-%02x-%02x-%02x\n", f[0], f[1], f[2], f[3], f[4], f[5], f[6], f[7]);
+		sprintf_s(hex, "%02x-%02x-%02x-%02x-%02x-%02x-%02x-%02x", f[0], f[1], f[2], f[3], f[4], f[5], f[6], f[7]);
+		vnclog.Print(0, _T("RSAKEX: Server fingerprint is %s\n"), hex);
+		int nButtonPressed = 0;
+		swprintf_s(msg, L"The server has provided the following identifying information:\nFingerprint: %hs\n\nDo you want to continue?\n", hex);
+		TASKDIALOGCONFIG tc = { 0 };
+		tc.cbSize = sizeof(tc);
+		tc.dwFlags = TDF_SIZE_TO_CONTENT;
+		tc.dwCommonButtons = TDCBF_OK_BUTTON | TDCBF_CANCEL_BUTTON;
+		tc.pszWindowTitle = L"Warning";
+		tc.pszMainIcon = TD_WARNING_ICON;
+		tc.pszMainInstruction = L"Identity confirmation";
+		tc.pszContent = msg;
+		TaskDialogIndirect(&tc, &nButtonPressed, NULL, NULL);
+		if (nButtonPressed != IDOK)
+			throw QuietException("Authentication cancelled");
 		return true;
 	}
 
