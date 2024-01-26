@@ -623,12 +623,12 @@ void ClientConnection::AuthVeNCrypt()
 	{
 		version = 0;
 		WriteExact((char *)&version, 2);
-		SetLastError("Unsupported version");
+		return SetLastError("Unsupported version");
 	}
 	temp = 0;
 	ReadExact((char *)&temp, 1);
 	if (temp)
-		SetLastError("Server reported unsupported version");
+		return SetLastError("Server reported unsupported version");
 	size = 0;
 	ReadExact((char *)&size, 1);
 	subType = -1;
@@ -641,8 +641,10 @@ void ClientConnection::AuthVeNCrypt()
 			switch (temp)
 			{
 			case secTypeTLSNone:
+			case secTypeTLSVnc:
 			case secTypeTLSPlain:
 			case secTypeX509None:
+			case secTypeX509Vnc:
 			case secTypeX509Plain:
 				subType = temp;
 				break;
@@ -650,13 +652,13 @@ void ClientConnection::AuthVeNCrypt()
 		}
 	}
 	if (subType < 0)
-		SetLastError("No valid sub-type");
+		return SetLastError("No valid sub-type");
 	temp = Swap32IfLE(subType);
 	WriteExact((char *)&temp, 4);
 	temp = 0;
 	ReadExact((char *)&temp, 1);
 	if (temp != 1)
-		SetLastError("Server unsupported sub-type");
+		return SetLastError("Server unsupported sub-type");
 
 	// start TLS on existing connection
 	TLSSession session;
@@ -665,7 +667,7 @@ void ClientConnection::AuthVeNCrypt()
 	while (TRUE)
 	{
 		if (!session.Handshake(inbuf, outbuf))
-			SetLastError(session.lastError);
+			return SetLastError(session.lastError);
 		size = outbuf.GetAvailable();
 		if (size > 0)
 		{
@@ -720,9 +722,19 @@ void ClientConnection::AuthVeNCrypt()
 		}
 	}
 	m_fUsePlugin = true;
-	m_pPluginInterface = new TLSPlugin(session);
-	if (subType == secTypeTLSPlain || subType == secTypeX509Plain)
+	m_pPluginInterface = new TLSPlugin(session);	
+	switch (subType)
 	{
+	case secTypeTLSNone:
+	case secTypeX509None:
+		// do nothing
+		break;
+	case secTypeTLSVnc:
+	case secTypeX509Vnc:
+		AuthVnc();
+		break;
+	case secTypeTLSPlain:
+	case secTypeX509Plain:
 		if (strlen(m_clearPasswd) == 0)
 		{
 			AuthDialog ad;
@@ -739,5 +751,8 @@ void ClientConnection::AuthVeNCrypt()
 		WriteExact((char *)&temp, 4);
 		WriteExact(m_cmdlnUser, (int)strlen(m_cmdlnUser));
 		WriteExact(m_clearPasswd, (int)strlen(m_clearPasswd));
+		break;
+	default:
+		return SetLastError("Cannot complete sub-type authentication");
 	}
 }
