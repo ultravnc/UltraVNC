@@ -468,6 +468,8 @@ struct RSAKEX
 	{
 		virtual void ReadExact(char *, int) = 0;
 		virtual void WriteExact(char *, int) = 0;
+		virtual bool CompareFingerprint(char *hex) = 0;
+		virtual void SaveFingerprint(char *hex) = 0;
 	};
 
 	IConnection	&conn;
@@ -567,19 +569,26 @@ struct RSAKEX
 		}
 		sprintf_s(hex, "%02x-%02x-%02x-%02x-%02x-%02x-%02x-%02x", f[0], f[1], f[2], f[3], f[4], f[5], f[6], f[7]);
 		vnclog.Print(0, _T("RSAKEX: Server fingerprint is %s\n"), hex);
+		if (conn.CompareFingerprint(hex))
+			return true;
 		int nButtonPressed = 0;
 		swprintf_s(msg, L"The server has provided the following identifying information:\nFingerprint: %hs\n\nDo you want to continue?\n", hex);
 		TASKDIALOGCONFIG tc = { 0 };
+		BOOL bPersist = FALSE;
 		tc.cbSize = sizeof(tc);
 		tc.dwFlags = TDF_SIZE_TO_CONTENT;
 		tc.dwCommonButtons = TDCBF_OK_BUTTON | TDCBF_CANCEL_BUTTON;
 		tc.pszWindowTitle = L"Warning";
-		tc.pszMainIcon = TD_WARNING_ICON;
+		tc.hInstance = pApp->m_instance;
+		tc.pszMainIcon = MAKEINTRESOURCEW(IDR_TRAY);
 		tc.pszMainInstruction = L"Identity confirmation";
 		tc.pszContent = msg;
-		TaskDialogIndirect(&tc, &nButtonPressed, NULL, NULL);
+		tc.pszVerificationText = L"Don't ask anymore";
+		TaskDialogIndirect(&tc, &nButtonPressed, NULL, &bPersist);
 		if (nButtonPressed != IDOK)
 			throw QuietException("Authentication cancelled");
+		if (bPersist)
+			conn.SaveFingerprint(hex);
 		return true;
 	}
 
@@ -826,17 +835,35 @@ private:
 	}
 };
 
-struct KEXIO : public RSAKEX::IConnection
+static const TCHAR *FingerprintSection = _T("fingerprint");
+
+struct KEXHost : public RSAKEX::IConnection
 {
 	ClientConnection *pConn;
-	KEXIO(ClientConnection *pcc) : pConn(pcc) { }
+	TCHAR *key, *fname;
+
+	KEXHost(ClientConnection *pcc, TCHAR *k, TCHAR *f) : pConn(pcc), key(k), fname(f) { }
+
 	virtual void ReadExact(char *buf, int bytes) { pConn->ReadExact(buf, bytes); }
+
 	virtual void WriteExact(char *buf, int bytes) { pConn->WriteExact(buf, bytes); }
+	
+	virtual bool CompareFingerprint(char *hex)
+	{ 
+		TCHAR buf[32] = { 0 };
+		GetPrivateProfileString(FingerprintSection, key, NULL, buf, sizeof(buf), fname);
+		return _tcscmp(hex, buf) == 0;
+	}
+	
+	virtual void SaveFingerprint(char *hex) { WritePrivateProfileString(FingerprintSection, key, hex, fname); }
 };
 
 void ClientConnection::AuthRSAAES(int keySize, bool encrypted)
 {
-	RSAKEX st(KEXIO(this), (DWORD)keySize);
+	TCHAR key[MAX_HOST_NAME_LEN];
+	sprintf_s(key, "%s:%d", m_host, m_port);
+	KEXHost host(this, key, m_opts->getDefaultOptionsFileName());
+	RSAKEX st(host, (DWORD)keySize);
 	if (!st.ReadPublicKey()
 		|| !st.VerifyServer() 
 		|| !st.WritePublicKey()
