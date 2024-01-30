@@ -57,6 +57,7 @@ FdInStream::FdInStream(int fd_, int timeout_, int bufSize_)
 	m_fReadFromNetRectBuf = false;
 	m_nNetRectBufOffset = 0;
 	m_nReadSize = 0;
+	m_pNetRectSavePtr = m_pNetRectSaveEnd = m_pNetRectSaveStart = NULL;
 
 	m_nBytesRead = 0; // For stats
 }
@@ -75,6 +76,7 @@ FdInStream::FdInStream(int fd_, void (*blockCallback_)(void*),
 	m_fReadFromNetRectBuf = false;
 	m_nNetRectBufOffset = 0;
 	m_nReadSize = 0;
+	m_pNetRectSavePtr = m_pNetRectSaveEnd = m_pNetRectSaveStart = NULL;
 }
 
 FdInStream::~FdInStream()
@@ -123,6 +125,15 @@ int FdInStream::overrun(int itemSize, int nItems)
 {
   if (itemSize > bufSize)
     throw Exception("FdInStream overrun: max itemSize exceeded");
+
+  if (!m_fReadFromNetRectBuf && m_pNetRectSaveStart)
+  {
+	  delete [] start;
+	  ptr = m_pNetRectSavePtr;
+	  end = m_pNetRectSaveEnd;
+	  start = m_pNetRectSaveStart;
+	  m_pNetRectSavePtr = m_pNetRectSaveEnd = m_pNetRectSaveStart = NULL;
+  }
 
   if (end - ptr != 0)
     memmove(start, ptr, end - ptr);
@@ -375,6 +386,13 @@ void FdInStream::SetReadFromMemoryBuffer(int nReadSize, char* pMemBuffer)
 	m_nNetRectBufOffset = 0;   // Initial offset
 
 	m_fReadFromNetRectBuf = true; // Order to read from the buffer
+	if (end - ptr > 0)
+	{
+		m_pNetRectSavePtr = ptr;
+		m_pNetRectSaveEnd = end;
+		m_pNetRectSaveStart = start;
+		ptr = end = start = new U8[bufSize];
+	}
 }
 
 

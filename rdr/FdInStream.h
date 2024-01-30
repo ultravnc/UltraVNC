@@ -81,6 +81,9 @@ namespace rdr {
 	int m_nNetRectBufOffset;
 	int m_nReadSize;
 	__int64 m_nBytesRead;
+    const U8* m_pNetRectSavePtr;
+    const U8* m_pNetRectSaveEnd;
+    U8* m_pNetRectSaveStart;
   };
 
 } // end of namespace rdr

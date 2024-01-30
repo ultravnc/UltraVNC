@@ -869,7 +869,7 @@ void ClientConnection::AuthRSAAES(int keySize, bool encrypted)
 		|| !st.WritePublicKey()
 		|| !st.WriteRandom()
 		|| !st.ReadRandom()
-		|| (!encrypted || !st.SetCipher(m_fUsePlugin, &m_pPluginInterface))
+		|| !st.SetCipher(m_fUsePlugin, &m_pPluginInterface)
 		|| !st.WriteHash()
 		|| !st.ReadHash()
 		|| !st.ReadSubtype()
@@ -879,5 +879,11 @@ void ClientConnection::AuthRSAAES(int keySize, bool encrypted)
 			vnclog.Print(0, _T("AuthRSAAES: %s\n"), st.lastError);
 			throw WarningException(st.lastError);
 		}
+	}
+	if (!encrypted && m_pPluginInterface)
+	{
+		m_fUsePlugin = false;
+		delete m_pPluginInterface;
+		m_pPluginInterface = NULL;
 	}
 }
