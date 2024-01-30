@@ -148,7 +148,7 @@ struct TLSSession
 			CertFreeCertificateContext(pRemoteCert);
 	}
 
-	void Init(char* _hostName, bool _isServer = false, PCERT_CONTEXT _pLocalCert = NULL)
+	void Init(char *_hostName, bool _isServer = false, PCERT_CONTEXT _pLocalCert = NULL)
 	{
 		hostName = _hostName;
 		isServer = _isServer;
@@ -232,7 +232,7 @@ struct TLSSession
 			{
 				if (inBuffers[i].cbBuffer > 0 && inBuffers[i].BufferType == SECBUFFER_EXTRA)
 				{
-					BYTE* dst = inbuf.EnsureFree(inBuffers[i].cbBuffer);
+					BYTE *dst = inbuf.EnsureFree(inBuffers[i].cbBuffer);
 					memcpy(dst, inBuffers[i].pvBuffer, inBuffers[i].cbBuffer);
 					inbuf.size += inBuffers[i].cbBuffer;
 				}
@@ -244,7 +244,7 @@ struct TLSSession
 				{
 					if (outBuffers[i].BufferType == SECBUFFER_TOKEN)
 					{
-						BYTE* dst = outbuf.EnsureFree(outBuffers[i].cbBuffer);
+						BYTE *dst = outbuf.EnsureFree(outBuffers[i].cbBuffer);
 						memcpy(dst, outBuffers[i].pvBuffer, outBuffers[i].cbBuffer);
 						outbuf.size += outBuffers[i].cbBuffer;
 					}
@@ -280,8 +280,7 @@ struct TLSSession
 				break;
 			case SEC_I_CONTEXT_EXPIRED:
 				state = Shutdown;
-				done = true;
-				break;
+				return SetLastError("Handshake aborted", hr);
 			default:
 				return SetLastError("Handshake cannot be completed", hr);
 			}
@@ -387,10 +386,11 @@ struct TLSSession
 		}
 		return true;
 	}
+
 	bool ValidateRemoteCertificate()
 	{
 		std::wstring host = toWide(hostName);
-		PCCERT_CONTEXT pCert = (pRemoteCert->hCertStore ? CertEnumCertificatesInStore(pRemoteCert->hCertStore, NULL) : pRemoteCert);
+		PCCERT_CONTEXT pCert = (pRemoteCert && pRemoteCert->hCertStore ? CertEnumCertificatesInStore(pRemoteCert->hCertStore, NULL) : pRemoteCert);
 		while (pCert)
 		{
 			std::vector<std::wstring> dnsNames;
@@ -472,7 +472,7 @@ private:
 		return found;
 	}
 
-	static std::wstring toWide(const char* src)
+	static std::wstring toWide(const char *src)
 	{
 		std::wstring dst(strlen(src), L' ');
 		dst.resize(mbstowcs(&dst[0], src, strlen(src)));
@@ -524,7 +524,7 @@ private:
 		if (hr != S_OK)
 		{
 			char msg[1024];
-			FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, hr, 0, msg, _countof(msg), NULL);
+			FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, hr, 0, msg, _countof(msg), NULL);
 			sprintf_s(lastError, "%s. %s (0x%X)", error, msg, hr);
 		} 
 		else strcpy_s(lastError, error);
@@ -588,7 +588,7 @@ struct TLSPlugin : public IPlugin
 	}
 
 private:
-	static bool SetLastError(char* error)
+	static bool SetLastError(char *error)
 	{
 		vnclog.Print(0, _T("TLSPlugin: %s\n"), error);
 		throw WarningException(error);
@@ -602,6 +602,36 @@ const int secTypeTLSPlain = 259;
 const int secTypeX509None = 260;
 const int secTypeX509Vnc = 261;
 const int secTypeX509Plain = 262;
+
+static const TCHAR *ThumbprintSection = _T("thumbprint");
+
+struct ThumbHost
+{
+	TCHAR *key, *fname;
+
+	ThumbHost(TCHAR *k, TCHAR *f) : key(k), fname(f) { }
+
+	bool CompareThumbprint(char *hex)
+	{ 
+		TCHAR buf[64] = { 0 };
+		GetPrivateProfileString(ThumbprintSection, key, NULL, buf, sizeof(buf), fname);
+		return _tcscmp(hex, buf) == 0;
+	}
+	
+	void SaveThumbprint(char *hex) { WritePrivateProfileString(ThumbprintSection, key, hex, fname); }
+};
+
+static bool GetCertificateThumbprint(PCCERT_CONTEXT pCert, char *hex, int hexsize)
+{
+	BYTE thumb[64] = { 0 };
+	DWORD size = sizeof(thumb);
+	if (!pCert || !CertGetCertificateContextProperty(pCert, CERT_HASH_PROP_ID, thumb, &size))
+		return false;
+	snprintf(hex, hexsize, "%02x", thumb[0]);
+	for (DWORD i = 1; i < size; i++)
+		snprintf(hex + strlen(hex), hexsize - strlen(hex), "-%02x", thumb[i]);
+	return true;
+}
 
 void ClientConnection::AuthVeNCrypt()
 {
@@ -681,9 +711,15 @@ void ClientConnection::AuthVeNCrypt()
 		ReadExact((char *)inbuf.GetTail(), size);
 		inbuf.size += size;
 	}
-	if (subType <= secTypeTLSPlain && !session.ValidateRemoteCertificate())
+	if (!session.ValidateRemoteCertificate())
 	{
+		TCHAR key[MAX_HOST_NAME_LEN];
+		sprintf_s(key, "%s:%d", m_host, m_port);
+		ThumbHost host(key, m_opts->getDefaultOptionsFileName());
+		char hex[64];
 		bool done = false;
+		if (GetCertificateThumbprint(session.pRemoteCert, hex, sizeof(hex)) && host.CompareThumbprint(hex))
+			done = true;
 		while (!done)
 		{
 			int nButtonPressed = 0;
@@ -691,6 +727,7 @@ void ClientConnection::AuthVeNCrypt()
 			swprintf_s(msg, L"%hs\n\nDo you want to continue?\n", session.lastError);
 			TASKDIALOGCONFIG tc = { 0 };
 			const TASKDIALOG_BUTTON buttons[] = { { IDNO, L"View Certificate" } };
+			BOOL bPersist = FALSE;
 			tc.cbSize = sizeof(tc);
 			tc.dwFlags = TDF_SIZE_TO_CONTENT;
 			tc.dwCommonButtons = TDCBF_OK_BUTTON | TDCBF_CANCEL_BUTTON;
@@ -700,7 +737,10 @@ void ClientConnection::AuthVeNCrypt()
 			tc.pszContent = msg;
 			tc.pButtons = buttons;
 			tc.cButtons = _countof(buttons);
-			TaskDialogIndirect(&tc, &nButtonPressed, NULL, NULL);
+			tc.nDefaultButton = 1;
+			if (secTypeTLSNone <= subType && subType <= secTypeTLSPlain)
+				tc.pszVerificationText = L"Don't ask anymore";
+			TaskDialogIndirect(&tc, &nButtonPressed, NULL, &bPersist);
 			switch(nButtonPressed)
 			{
 			case IDNO:
@@ -708,6 +748,7 @@ void ClientConnection::AuthVeNCrypt()
 					BOOL changed = FALSE;
 					CRYPTUI_VIEWCERTIFICATE_STRUCT vc = { 0 };
 					vc.dwSize = sizeof(vc);
+					vc.hwndParent = m_hwndStatus;
 					vc.pCertContext = session.pRemoteCert;
 					CryptUIDlgViewCertificate(&vc, &changed);
 					break;
@@ -716,6 +757,8 @@ void ClientConnection::AuthVeNCrypt()
 				throw QuietException(session.lastError);
 				break;
 			default:
+				if (bPersist)
+					host.SaveThumbprint(hex);
 				done = true;
 				break;
 			}
@@ -738,7 +781,7 @@ void ClientConnection::AuthVeNCrypt()
 		if (strlen(m_clearPasswd) == 0)
 		{
 			AuthDialog ad;
-			if (!ad.DoDialog(false, m_host, m_port, true))
+			if (!ad.DoDialog(dtUserPass, m_host, m_port))
 				throw QuietException("Authentication cancelled");
 			strcpy_s(m_cmdlnUser, ad.m_user);
 			strcpy_s(m_clearPasswd, ad.m_passwd);
