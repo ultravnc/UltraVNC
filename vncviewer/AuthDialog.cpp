@@ -48,16 +48,32 @@ AuthDialog::~AuthDialog()
 {
 }
 
-int AuthDialog::DoDialog(bool ms_logon, TCHAR IN_host[MAX_HOST_NAME_LEN], int IN_port, bool isSecure, bool warning)
+int AuthDialog::DoDialog(DialogType dialogType, TCHAR IN_host[MAX_HOST_NAME_LEN], int IN_port, char hex[24], char catchphrase[1024])
 {
 	TCHAR tempchar[10];
 	strcpy_s(_host, IN_host);
 	strcat_s(_host, ":");
 	strcat_s(_host, _itoa(IN_port, tempchar, 10));
-	if (isSecure) return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG), NULL, (DLGPROC) DlgProc, (LONG_PTR) this);
-	else if (ms_logon) return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG2), NULL, (DLGPROC) DlgProc, (LONG_PTR) this);
-	else if (warning) return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG1), NULL, (DLGPROC) DlgProc1, (LONG_PTR) this);
-	else return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG3), NULL, (DLGPROC) DlgProc1, (LONG_PTR) this);
+	this->dialogType = dialogType;
+	strcpy(this->hex, hex);
+	strcpy(this->catchphrase, catchphrase);
+	switch (dialogType)
+	{
+	case dtUserPass:
+		return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG), NULL, (DLGPROC)DlgProc, (LONG_PTR)this);
+	case dtPass:
+		return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG3), NULL, (DLGPROC)DlgProc1, (LONG_PTR)this);
+	case  dtUserPassNotEncryption:
+		return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG2), NULL, (DLGPROC)DlgProc, (LONG_PTR)this);
+	case dtPassUpgrade:
+		return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG1), NULL, (DLGPROC)DlgProc1, (LONG_PTR)this);
+	case dtUserPassRSA:
+		m_bPassphraseMode = true;
+		return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG4), NULL, (DLGPROC)DlgProc, (LONG_PTR)this);
+	case dtPassRSA:
+		m_bPassphraseMode = true;
+		return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG5), NULL, (DLGPROC)DlgProc1, (LONG_PTR)this);
+	}
 }
 
 BOOL CALLBACK AuthDialog::DlgProc(  HWND hwnd,  UINT uMsg,  
@@ -76,8 +92,11 @@ BOOL CALLBACK AuthDialog::DlgProc(  HWND hwnd,  UINT uMsg,
             helper::SafeSetWindowUserData(hwnd, lParam);
 
 			_this = (AuthDialog *) lParam;
-
-            Edit_LimitText(GetDlgItem(hwnd, IDC_PASSWD_EDIT), 32);
+			
+			if (_this->dialogType == dtUserPassRSA)
+				Edit_LimitText(GetDlgItem(hwnd, IDC_PASSWD_EDIT), 256);
+            else
+				Edit_LimitText(GetDlgItem(hwnd, IDC_PASSWD_EDIT), 32);
 			//CentreWindow(hwnd);
 			TCHAR tempchar[MAX_HOST_NAME_LEN];
 			GetWindowText(hwnd, tempchar, MAX_HOST_NAME_LEN);
@@ -85,6 +104,8 @@ BOOL CALLBACK AuthDialog::DlgProc(  HWND hwnd,  UINT uMsg,
 			strcat_s(tempchar, _this->_host);
 			SetWindowText(hwnd, tempchar);
 			SetForegroundWindow(hwnd);
+			SetDlgItemText(hwnd, IDC_CATCHPHRASE, _this->catchphrase);
+			SetDlgItemText(hwnd, IDC_SIGNATURE, _this->hex);
 			return TRUE;
 		}
 	case WM_COMMAND:
@@ -136,6 +157,8 @@ BOOL CALLBACK AuthDialog::DlgProc1(  HWND hwnd,  UINT uMsg,
 			strcat_s(tempchar, "   ");
 			strcat_s(tempchar, _this->_host);
 			SetWindowText(hwnd, tempchar);
+			SetDlgItemText(hwnd, IDC_CATCHPHRASE, _this->catchphrase);
+			SetDlgItemText(hwnd, IDC_SIGNATURE, _this->hex);
 			return TRUE;
 		}
 	case WM_COMMAND:

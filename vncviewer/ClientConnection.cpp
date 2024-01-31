@@ -1707,7 +1707,7 @@ void ClientConnection::SetDSMPluginStuff()
 			if (strlen(m_clearPasswd) == 0) // Possibly set using -password command line
 			{
 				AuthDialog ad;
-				if (ad.DoDialog(false,m_host,m_port))
+				if (ad.DoDialog(dtPass,m_host,m_port))
 				{
 					strncpy_s(m_clearPasswd, ad.m_passwd,254);
 				}
@@ -3225,7 +3225,7 @@ void ClientConnection::AuthSecureVNCPlugin()
 				}
 				else
 				{
-					if (ad.DoDialog(false,m_host,m_port))
+					if (ad.DoDialog(dtPass, m_host, m_port))
 						{
 							strncpy_s(passwd, ad.m_passwd,254);
 							if (!bPassphraseRequired && strlen(passwd) > 8) {
@@ -3323,7 +3323,7 @@ void ClientConnection::AuthSecureVNCPlugin_old()
 					//adzm 2010-05-12 - passphrase
 					ad.m_bPassphraseMode = bPassphraseRequired;
 
-					if (ad.DoDialog(false,false,true))
+					if (ad.DoDialog(dtPassUpgrade, m_host, m_port))
 					{
 						strncpy_s(passwd, ad.m_passwd,254);
 						if (!bPassphraseRequired && strlen(passwd) > 8) {
@@ -3424,7 +3424,7 @@ void ClientConnection::AuthMsLogonII()
 	{
 	AuthDialog ad;
 	// adzm 2010-10 - RFB3.8 - the 'mslogon' param woudl always be true here
-	if (ad.DoDialog(true, m_host, m_port, true)) {
+	if (ad.DoDialog(dtUserPass, m_host, m_port)) {
 		strncpy_s(passwd, ad.m_passwd, 64);
 		strncpy_s(user, ad.m_user, 254);
 		vncEncryptPasswdMs(m_encPasswdMs, passwd);
@@ -3501,7 +3501,7 @@ void ClientConnection::AuthMsLogonI()
 	{
 		AuthDialog ad;
 		///////////////ppppppppppppppppppppppppppppppppppppppppp // adzm 2010-10 - what?
-		if (ad.DoDialog(true,m_host, m_port))
+		if (ad.DoDialog(dtUserPassNotEncryption, m_host, m_port))
 		{
 //					flash = new BmpFlasher;
 			strncpy_s(passwd, ad.m_passwd,254);
@@ -3588,7 +3588,7 @@ void ClientConnection::AuthVnc()
 	else
 	{
 		AuthDialog ad;
-		if (ad.DoDialog(false, m_host, m_port))
+		if (ad.DoDialog(dtPass, m_host, m_port))
 		{
 			strncpy_s(passwd, ad.m_passwd,254);
 			if (strlen(passwd) == 0)

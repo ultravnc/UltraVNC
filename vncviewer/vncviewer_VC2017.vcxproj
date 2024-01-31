@@ -1085,6 +1085,8 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\ipv6</Command>
     <None Include="ToDo.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\common\mnemonic.c" />
+    <ClCompile Include="..\common\mn_wordlist.c" />
     <ClCompile Include="..\common\UltraVncZ.cpp" />
     <ClCompile Include="AboutBox.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -2307,6 +2309,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\ipv6</Command>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\common\mnemonic.h" />
     <ClInclude Include="..\common\UltraVncZ.h" />
     <ClInclude Include="..\rfb\zrleDecode.h" />
     <ClInclude Include="AboutBox.h" />

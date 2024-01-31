@@ -27,13 +27,18 @@
 #include "ClientConnection.h"
 #include "Exception.h"
 #include "AuthDialog.h"
-
 #include <commctrl.h>
+extern "C" {
+#include "../common/mnemonic.h"
+}
+
 
 const int secTypeRA2UserPass = 1;
 const int secTypeRA2Pass = 2;
 
 static char	lastError[1024];
+char hex[24];
+char catchphrase[1024];
 
 static void ArraySwap(BYTE *p, DWORD size)
 {
@@ -555,8 +560,7 @@ struct RSAKEX
 
 	bool VerifyServer()
 	{
-		BYTE f[8];
-		char hex[24];
+		BYTE f[8];		
 		WCHAR msg[1024];
 
 		DWORD size = Swap32IfLE(serverKey.length);
@@ -568,6 +572,8 @@ struct RSAKEX
 			return false;
 		}
 		sprintf_s(hex, "%02x-%02x-%02x-%02x-%02x-%02x-%02x-%02x", f[0], f[1], f[2], f[3], f[4], f[5], f[6], f[7]);
+		mn_encode(f, 8, catchphrase, 1024, "x x x. x x x. x x x\n");
+		strcat(catchphrase, ".");
 		vnclog.Print(0, _T("RSAKEX: Server fingerprint is %s\n"), hex);
 		if (conn.CompareFingerprint(hex))
 			return true;
@@ -758,7 +764,7 @@ struct RSAKEX
 		if (strlen(clearPasswd) == 0)
 		{
 			AuthDialog ad;
-			if (!ad.DoDialog(false, host, port, subtype == secTypeRA2UserPass))
+			if (!ad.DoDialog((subtype == secTypeRA2UserPass) ? dtUserPassRSA  : dtPassRSA, host, port, hex, catchphrase))
 			{
 				throw QuietException("Authentication cancelled");
 			}

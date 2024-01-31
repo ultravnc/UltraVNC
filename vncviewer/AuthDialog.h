@@ -27,12 +27,14 @@
 
 #pragma once
 
+enum DialogType{dtUserPass, dtPass, dtUserPassNotEncryption, dtPassUpgrade, dtUserPassRSA, dtPassRSA};
+
 class AuthDialog  
 {
 public:
 	AuthDialog();
 	virtual ~AuthDialog();
-	int DoDialog(bool ms_logon, TCHAR IN_host[MAX_HOST_NAME_LEN], int IN_port, bool isSecure = false, bool warning = false);
+	int DoDialog(DialogType dialogType, TCHAR IN_host[MAX_HOST_NAME_LEN], int IN_port, char hex[24] ="", char catchphrase[1024] ="");
 	TCHAR m_passwd[256];
 	TCHAR m_domain[256];
 	TCHAR m_user[256];
@@ -46,4 +48,7 @@ public:
 	bool m_bPassphraseMode;
 	TCHAR _host[MAX_HOST_NAME_LEN];
 	int _port;
+	DialogType dialogType;
+	char hex[24]{};
+	char catchphrase[1024]{};
 };
