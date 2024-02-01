@@ -257,6 +257,7 @@ private:
 	void AuthenticateServer(CARD32 authScheme, std::vector<CARD32>& current_auth);
 	void NegotiateProtocolVersion();
 	void AuthRSAAES(int keySize, bool encrypted);
+	void AuthVeNCrypt();
 	void AuthVnc();
 	void AuthSCPrompt(); // adzm 2010-10
 	void AuthSessionSelect(); // adzm 2010-10
