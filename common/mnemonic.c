@@ -387,6 +387,10 @@ mn_encode (void *src, int srcsize, char *dest, int destsize, char *format)
   char *fmt;
   char *destend = dest + destsize;
   char *word;
+  char capitalword[16];
+  char *capitalwordPtr;
+  memset(capitalword, 0, 16);
+
 
   if (format == 0 || format[0] == '\0')
     format = MN_FDEFAULT;
@@ -408,16 +412,15 @@ mn_encode (void *src, int srcsize, char *dest, int destsize, char *format)
 	    return MN_EFORMAT;
 	}
       word = mn_encode_word (src, srcsize, n);
-      if (n == 0 || n == 3) {
-          word[0] = toupper(word[0]);
-      }
+      for (int i =0; i<strlen(word); i++)
+        capitalword[i] = (i == 0 && (n == 0 || n == 3)) ? toupper(word[i]) : word[i];
       if (word == 0)
 	return MN_EOVERRUN;	/* shouldn't happen, actually */
-
+      capitalwordPtr = capitalword;
       while (isalpha (*fmt))
 	fmt++;
-      while (dest < destend && *word != '\0')
-	*dest++ = *word++;
+      while (dest < destend && *capitalwordPtr != '\0')
+	*dest++ = *capitalwordPtr++;
     }
   if (dest < destend)
     *dest++ = '\0';
