@@ -93,11 +93,11 @@ struct TLSSession
 {
 	enum State
 	{
-		New = 0,
-		Closed = 1,
-		HandshakeStart = 2,
-		PostHandshake = 8,
-		Shutdown = 9,
+		StateNew = 0,
+		StateClosed = 1,
+		StateHandshakeStart = 2,
+		StatePostHandshake = 8,
+		StateShutdown = 9,
 	};
 
 	State			state;
@@ -112,7 +112,7 @@ struct TLSSession
 	SecPkgContext_StreamSizes tlsSizes;
 	char			lastError[1024];
 
-	TLSSession() : state(New), hostName(NULL), isServer(false), pLocalCert(NULL), pRemoteCert(NULL), contextReq(0)
+	TLSSession() : state(StateNew), hostName(NULL), isServer(false), pLocalCert(NULL), pRemoteCert(NULL), contextReq(0)
 	{ 
 		SecInvalidateHandle(&hCredentials);
 		SecInvalidateHandle(&hContext);
@@ -153,17 +153,17 @@ struct TLSSession
 		hostName = _hostName;
 		isServer = _isServer;
 		pLocalCert = _pLocalCert;
-		state = HandshakeStart;
+		state = StateHandshakeStart;
 	}
 
-	bool IsReady() { return state >= PostHandshake; }
+	bool IsReady() { return state >= StatePostHandshake; }
 
 	bool Handshake(DynBuffer &inbuf, DynBuffer &outbuf)
 	{
 		HRESULT hr;
 		DWORD contextAttr;
 
-		if (state == Closed)
+		if (state == StateClosed)
 			return SetLastError("Connection closed");
 		if (contextReq == 0)
 		{
@@ -266,7 +266,7 @@ struct TLSSession
 				inDesc.cBuffers = tlsSizes.cBuffers;
 				outDesc.cBuffers = tlsSizes.cBuffers;
 				QueryContextAttributes(&hContext, SECPKG_ATTR_REMOTE_CERT_CONTEXT, &pRemoteCert);
-				state = PostHandshake;
+				state = StatePostHandshake;
 				done = true;
 				{
 					SecPkgContext_CipherInfo cipherInfo;
@@ -279,7 +279,7 @@ struct TLSSession
 				}
 				break;
 			case SEC_I_CONTEXT_EXPIRED:
-				state = Shutdown;
+				state = StateShutdown;
 				return SetLastError("Handshake aborted", hr);
 			default:
 				return SetLastError("Handshake cannot be completed", hr);
@@ -292,7 +292,7 @@ struct TLSSession
 
 	bool Send(BYTE *pDataBuffer, int nDataLen, DynBuffer &outbuf)
 	{
-		if (state == Closed || !SecIsValidHandle(&hContext))
+		if (state == StateClosed || !SecIsValidHandle(&hContext))
 			return SetLastError("Connection closed");
 		int cnt = (nDataLen + tlsSizes.cbMaximumMessage - 1) / tlsSizes.cbMaximumMessage;
 		outbuf.EnsureFree(tlsSizes.cbHeader * cnt + nDataLen + tlsSizes.cbTrailer * cnt);
@@ -325,7 +325,7 @@ struct TLSSession
 
 	bool Receive(DynBuffer &inbuf, DynBuffer &plainbuf, DynBuffer &outbuf)
 	{
-		if (state == Closed || !SecIsValidHandle(&hContext))
+		if (state == StateClosed || !SecIsValidHandle(&hContext))
 			return SetLastError("Connection closed");
 		bool done = false;
 		while (!done && inbuf.size > 0)
@@ -371,13 +371,13 @@ struct TLSSession
 			case SEC_E_OK:
 				break;
 			case SEC_I_RENEGOTIATE:
-				state = HandshakeStart;
+				state = StateHandshakeStart;
 				if (!Handshake(DynBuffer(), outbuf))
 					return false;
 				done = true;
 				break;
 			case SEC_I_CONTEXT_EXPIRED:
-				state = Shutdown;
+				state = StateShutdown;
 				done = true;
 				break;
 			default:
@@ -387,91 +387,93 @@ struct TLSSession
 		return true;
 	}
 
-	bool ValidateRemoteCertificate()
+	bool Shutdown(DynBuffer& outbuf)
 	{
-		std::wstring host = toWide(hostName);
-		PCCERT_CONTEXT pCert = (pRemoteCert && pRemoteCert->hCertStore ? CertEnumCertificatesInStore(pRemoteCert->hCertStore, NULL) : pRemoteCert);
-		while (pCert)
-		{
-			std::vector<std::wstring> dnsNames;
-			if (GetSubjectAltName2(pCert, &dnsNames))
-			{
-				bool match = false;
-				for(auto &name : dnsNames)
-				{
-					if (name[0] == L'*')
-					{
-						std::wstring temp = std::wstring(L"*.") + name;
-						if (PathMatchSpecW(host.c_str(), name.c_str()) && !PathMatchSpecW(host.c_str(), temp.c_str()))
-							match = true;
-					}
-					else if (host == name || std::wstring(L"www.") + host == name)
-						match = true;
-				}
-				if (match && CanBuildChain(pCert))
-					return true;
-			}
-			pCert = (pRemoteCert->hCertStore ? CertEnumCertificatesInStore(pRemoteCert->hCertStore, pCert) : NULL);
-		}
-		sprintf_s(lastError, "No certificate subject name matches target host name '%s'", hostName);
-		return false;
-	}
+		HRESULT hr;
+		DWORD contextAttr;
+		DWORD type = SCHANNEL_SHUTDOWN;
 
-private:
-	bool GetSubjectAltName2(PCCERT_CONTEXT pCert, std::vector<std::wstring> *names, DWORD dwAltNameChoice = CERT_ALT_NAME_DNS_NAME)
-	{		
-		PCERT_EXTENSION pExt = CertFindExtension(szOID_SUBJECT_ALT_NAME2, pCert->pCertInfo->cExtension, pCert->pCertInfo->rgExtension);
-		if (!pExt)
-			return false;
-		PCERT_ALT_NAME_INFO pInfo = NULL;
-		DWORD size = 0;
-		if (!CryptDecodeObjectEx(X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, szOID_SUBJECT_ALT_NAME2, pExt->Value.pbData, pExt->Value.cbData,
-				CRYPT_DECODE_ALLOC_FLAG | CRYPT_DECODE_NOCOPY_FLAG | CRYPT_DECODE_SHARE_OID_STRING_FLAG, NULL, &pInfo, &size))
-			return false;
-		size = 0;
-		for (DWORD i = 0; i < pInfo->cAltEntry; i++)
-			if (pInfo->rgAltEntry[i].dwAltNameChoice == dwAltNameChoice)
-				names->push_back(pInfo->rgAltEntry[i].pwszDNSName);
-		LocalFree(pInfo);
+		inBuffers[0].BufferType = SECBUFFER_TOKEN;
+		inBuffers[0].pvBuffer = &type;
+		inBuffers[0].cbBuffer = sizeof(type);
+		// note: passing more than one input buffer fails w/ SEC_E_INVALID_TOKEN (&H80090308)
+		inDesc.cBuffers = 1; 
+		hr = ApplyControlToken(&hContext, &inDesc);
+		inDesc.cBuffers = tlsSizes.cBuffers;
+		if (FAILED(hr))
+			return SetLastError("ApplyControlToken failed", hr);
+		outBuffers[0].BufferType = SECBUFFER_TOKEN;
+		if (isServer)
+			hr = AcceptSecurityContext(&hCredentials, &hContext, NULL, contextReq,
+					SECURITY_NATIVE_DREP, &hContext, &outDesc, &contextAttr, NULL);
+		else
+			hr = InitializeSecurityContext(&hCredentials, &hContext, hostName, contextReq, 0,
+					SECURITY_NATIVE_DREP, NULL, 0, &hContext, &outDesc, &contextAttr, NULL);
+		if (FAILED(hr))
+			return SetLastError(isServer ? "AcceptSecurityContext failed" : "InitializeSecurityContext failed", hr);
+		memset(inBuffers, 0, sizeof(inBuffers));
+		for (DWORD i = 0; i < outDesc.cBuffers; i++)
+		{
+			if (outBuffers[i].cbBuffer > 0)
+			{
+				if (outBuffers[i].BufferType == SECBUFFER_TOKEN)
+				{
+					BYTE *dst = outbuf.EnsureFree(outBuffers[i].cbBuffer);
+					memcpy(dst, outBuffers[i].pvBuffer, outBuffers[i].cbBuffer);
+					outbuf.size += outBuffers[i].cbBuffer;
+				}
+				FreeContextBuffer(outBuffers[i].pvBuffer);
+			}
+		}
+		memset(outBuffers, 0, sizeof(outBuffers));
 		return true;
 	}
 
-	bool CanBuildChain(PCCERT_CONTEXT pCert)
+	bool ValidateRemoteCertificate()
 	{
+		bool isvalid = false;
+		std::wstring host = toWide(hostName);
 		PCCERT_CHAIN_CONTEXT pChainContext = NULL;
 		CERT_CHAIN_PARA chainParams = { 0 };
-		chainParams.cbSize = sizeof(CERT_CHAIN_PARA);
-		if (!CertGetCertificateChain(NULL, pCert, NULL, NULL, &chainParams, CERT_CHAIN_REVOCATION_CHECK_CHAIN, 0, &pChainContext))
-			return SetLastError("CertGetCertificateChain failed", FACILITY_WIN32 | GetLastError());
-		bool found = false;
-		for (DWORD i = 0; i < pChainContext->cChain; i++)
+		CERT_CHAIN_POLICY_PARA policyPara = { 0 };
+		CERT_CHAIN_POLICY_STATUS policyStatus = { 0 };
+		HTTPSPolicyCallbackData httpsPolicy = { 0 };
+
+		chainParams.cbSize = sizeof(chainParams);
+		if (!CertGetCertificateChain(NULL, pRemoteCert, NULL, NULL, &chainParams, CERT_CHAIN_REVOCATION_CHECK_CHAIN, 0, &pChainContext))
 		{
-			DWORD dwErrorStatus = pChainContext->rgpChain[i]->TrustStatus.dwErrorStatus & ~CERT_TRUST_IS_NOT_TIME_NESTED;
-			if (dwErrorStatus == 0)
-			{
-				found = true;
-				break;
-			}
-			if ((dwErrorStatus & CERT_TRUST_IS_NOT_TIME_VALID) != 0)
-				sprintf_s(lastError, "The certificate has expired (0x%X)", dwErrorStatus);
-			else if ((dwErrorStatus & CERT_TRUST_IS_REVOKED) != 0)
-				sprintf_s(lastError, "Trust for this certificate or one of the certificates in the certificate chain has been revoked (0x%X)", dwErrorStatus);
-			else if ((dwErrorStatus & CERT_TRUST_IS_NOT_SIGNATURE_VALID) != 0)
-				sprintf_s(lastError, "The certificate or one of the certificates in the certificate chain does not have a valid signature (0x%X)", dwErrorStatus);
-			else if ((dwErrorStatus & CERT_TRUST_IS_UNTRUSTED_ROOT) != 0)
-				sprintf_s(lastError, "The certificate chain was issued by an authority that is not trusted (0x%X)", dwErrorStatus);
-			else if ((dwErrorStatus & CERT_TRUST_REVOCATION_STATUS_UNKNOWN) != 0)
-				sprintf_s(lastError, "The revocation status of the certificate or one of the certificates in the certificate chain is unknown (0x%X)", dwErrorStatus);
-			else if ((dwErrorStatus & CERT_TRUST_IS_PARTIAL_CHAIN) != 0)
-				sprintf_s(lastError, "The certificate chain is not complete (0x%X)", dwErrorStatus);
-			else 
-				sprintf_s(lastError, "Unknown CertGetCertificateChain error mask (0x%X)", dwErrorStatus);
+			SetLastError("CertGetCertificateChain failed", FACILITY_WIN32 | GetLastError());
+			goto Exit;
 		}
+		if (pChainContext->cChain == 0)
+		{
+			SetLastError(NULL, CERT_E_CHAINING);
+			goto Exit;
+		}
+		httpsPolicy.cbSize = sizeof(httpsPolicy);
+		httpsPolicy.dwAuthType = (isServer ? AUTHTYPE_CLIENT : AUTHTYPE_SERVER);
+		httpsPolicy.pwszServerName = (isServer ? NULL : (WCHAR *)host.c_str());
+		policyPara.cbSize = sizeof(policyPara);
+		policyPara.pvExtraPolicyPara = &httpsPolicy;
+		policyStatus.cbSize = sizeof(policyStatus);
+		if (!CertVerifyCertificateChainPolicy(CERT_CHAIN_POLICY_SSL, pChainContext, &policyPara, &policyStatus))
+		{
+			SetLastError("CertVerifyCertificateChainPolicy failed", FACILITY_WIN32 | GetLastError());
+			goto Exit;
+		}
+		if (FAILED(policyStatus.dwError))
+		{
+			SetLastError(NULL, policyStatus.dwError);
+			goto Exit;
+		}
+		isvalid = true;
+	Exit:
 		if (pChainContext)
 			CertFreeCertificateChain(pChainContext);
-		return found;
+		return isvalid;
 	}
 
+private:
 	static std::wstring toWide(const char *src)
 	{
 		std::wstring dst(strlen(src), L' ');
@@ -483,36 +485,36 @@ private:
 	{
 		switch (algId)
 		{
-		case 0x8:		return "SSL2_CLIENT";
-		case 0x20:		return "SSL3_CLIENT";
-		case 0x80:		return "TLS1_0_CLIENT";
-		case 0x200:		return "TLS1_1_CLIENT";
-		case 0x800:		return "TLS1_2_CLIENT";
-		case 0x2000:	return "TLS1_3_CLIENT";
-		case 0x4:		return "SSL2_SERVER";
-		case 0x10:		return "SSL3_SERVER";
-		case 0x40:		return "TLS1_0_SERVER";
-		case 0x100:		return "TLS1_1_SERVER";
-		case 0x400:		return "TLS1_2_SERVER";
-		case 0x1000:	return "TLS1_3_SERVER";
-		case 0x6602:	return "RC2";
-		case 0x6801:	return "RC4";
-		case 0x6601:	return "DES";
-		case 0x6603:	return "3DES";
-		case 0x660E:	return "AES_128";
-		case 0x660F:	return "AES_192";
-		case 0x6610:	return "AES_256";
-		case 0x8001:	return "MD2";
-		case 0x8003:	return "MD5";
-		case 0x8004:	return "SHA1";
-		case 0x800C:	return "SHA_256";
-		case 0x800D:	return "SHA_384";
-		case 0x800E:	return "SHA_512";
-		case 0xA400:	return "RSA_KEYX";
-		case 0x2400:	return "RSA_SIGN";
-		case 0xAA02:	return "DH_EPHEM";
-		case 0xAA05:	return "ECDH";
-		case 0xAE06:	return "ECDH_EPHEM";
+		case SP_PROT_SSL2_SERVER:	return "SSL2_SERVER";
+		case SP_PROT_SSL2_CLIENT:	return "SSL2_CLIENT";
+		case SP_PROT_SSL3_SERVER:	return "SSL3_SERVER";
+		case SP_PROT_SSL3_CLIENT:	return "SSL3_CLIENT";
+		case SP_PROT_TLS1_0_SERVER:	return "TLS1_0_SERVER";
+		case SP_PROT_TLS1_0_CLIENT:	return "TLS1_0_CLIENT";
+		case SP_PROT_TLS1_1_SERVER:	return "TLS1_1_SERVER";
+		case SP_PROT_TLS1_1_CLIENT:	return "TLS1_1_CLIENT";
+		case SP_PROT_TLS1_2_SERVER:	return "TLS1_2_SERVER";
+		case SP_PROT_TLS1_2_CLIENT:	return "TLS1_2_CLIENT";
+		case SP_PROT_TLS1_3_SERVER:	return "TLS1_3_SERVER";
+		case SP_PROT_TLS1_3_CLIENT:	return "TLS1_3_CLIENT";
+		case CALG_RC2:				return "RC2";
+		case CALG_RC4:				return "RC4";
+		case CALG_DES:				return "DES";
+		case CALG_3DES:				return "3DES";
+		case CALG_AES_128:			return "AES_128";
+		case CALG_AES_192:			return "AES_192";
+		case CALG_AES_256:			return "AES_256";
+		case CALG_MD2:				return "MD2";
+		case CALG_MD5:				return "MD5";
+		case CALG_SHA1:				return "SHA1";
+		case CALG_SHA_256:			return "SHA_256";
+		case CALG_SHA_384:			return "SHA_384";
+		case CALG_SHA_512:			return "SHA_512";
+		case CALG_RSA_KEYX:			return "RSA_KEYX";
+		case CALG_RSA_SIGN:			return "RSA_SIGN";
+		case CALG_DH_EPHEM:			return "DH_EPHEM";
+		case CALG_ECDH:				return "ECDH";
+		case CALG_ECDH_EPHEM:		return "ECDH_EPHEM";
 		default:
 			sprintf_s(lastError, "0x%X", algId);
 			return lastError;
@@ -525,7 +527,13 @@ private:
 		{
 			char msg[1024];
 			FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, hr, 0, msg, _countof(msg), NULL);
-			sprintf_s(lastError, "%s. %s (0x%X)", error, msg, hr);
+			for (int i = (int)strlen(msg) - 1; i >= 0 && !msg[i + 1]; i--)
+				if (msg[i] == '\r' || msg[i] == '\n' || msg[i] == '.')
+					msg[i] = '\0';
+			if (error)
+				sprintf_s(lastError, "%s. %s (0x%X)", error, msg, hr);
+			else
+				sprintf_s(lastError, "%s (0x%X)", msg, hr);
 		} 
 		else strcpy_s(lastError, error);
 		return false;
@@ -732,7 +740,8 @@ void ClientConnection::AuthVeNCrypt()
 			tc.dwFlags = TDF_SIZE_TO_CONTENT;
 			tc.dwCommonButtons = TDCBF_OK_BUTTON | TDCBF_CANCEL_BUTTON;
 			tc.pszWindowTitle = L"Warning";
-			tc.pszMainIcon = TD_WARNING_ICON;
+			tc.hInstance = pApp->m_instance;
+			tc.pszMainIcon = MAKEINTRESOURCEW(IDR_TRAY);
 			tc.pszMainInstruction = L"Invalid server certificate";
 			tc.pszContent = msg;
 			tc.pButtons = buttons;
@@ -741,20 +750,28 @@ void ClientConnection::AuthVeNCrypt()
 			if (secTypeTLSNone <= subType && subType <= secTypeTLSPlain)
 				tc.pszVerificationText = L"Don't ask anymore";
 			TaskDialogIndirect(&tc, &nButtonPressed, NULL, &bPersist);
-			switch(nButtonPressed)
+			switch (nButtonPressed)
 			{
 			case IDNO:
-				{
-					BOOL changed = FALSE;
-					CRYPTUI_VIEWCERTIFICATE_STRUCT vc = { 0 };
-					vc.dwSize = sizeof(vc);
-					vc.hwndParent = m_hwndStatus;
-					vc.pCertContext = session.pRemoteCert;
-					CryptUIDlgViewCertificate(&vc, &changed);
-					break;
-				}
+			{
+				BOOL changed = FALSE;
+				CRYPTUI_VIEWCERTIFICATE_STRUCT vc = { 0 };
+				vc.dwSize = sizeof(vc);
+				vc.hwndParent = m_hwndStatus;
+				vc.pCertContext = session.pRemoteCert;
+				CryptUIDlgViewCertificate(&vc, &changed);
+				break;
+			}
 			case IDCANCEL:
-				throw QuietException(session.lastError);
+				if (!session.Shutdown(outbuf))
+					return SetLastError(session.lastError);
+				size = outbuf.GetAvailable();
+				if (size > 0)
+				{
+					WriteExact((char*)outbuf.GetHead(), size);
+					outbuf.size = 0;
+				}
+				throw QuietException("Authentication cancelled");
 				break;
 			default:
 				if (bPersist)
