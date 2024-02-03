@@ -7,17 +7,10 @@
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#include "afxres.h"
+#include "winres.h"
 
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
-
-/////////////////////////////////////////////////////////////////////////////
-// Japanese (Japan) resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
-LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
-#pragma code_page(932)
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -26,17 +19,6 @@ LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
 
 IDC_FINGER              CURSOR                  "Finger.cur"
 
-#endif    // Japanese (Japan) resources
-/////////////////////////////////////////////////////////////////////////////
-
-
-/////////////////////////////////////////////////////////////////////////////
-// English resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-LANGUAGE LANG_ENGLISH, SUBLANG_NEUTRAL
-#pragma code_page(1252)
-
 /////////////////////////////////////////////////////////////////////////////
 //
 // Bitmap
@@ -44,16 +26,6 @@ LANGUAGE LANG_ENGLISH, SUBLANG_NEUTRAL
 
 IDB_COLLAPS             BITMAP                  "up.bmp"
 
-#endif    // English resources
-/////////////////////////////////////////////////////////////////////////////
-
-
-/////////////////////////////////////////////////////////////////////////////
-// English (United States) resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
-#pragma code_page(1252)
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -103,32 +75,6 @@ IDB_GREEN               BITMAP                  "LedGreen.bmp"
 IDB_RED                 BITMAP                  "LedRed.bmp"
 
 IDB_YELLOW              BITMAP                  "LedYellow.bmp"
-
-
-#ifdef APSTUDIO_INVOKED
-/////////////////////////////////////////////////////////////////////////////
-//
-// TEXTINCLUDE
-//
-
-1 TEXTINCLUDE 
-BEGIN
-    "resource.h\0"
-END
-
-2 TEXTINCLUDE 
-BEGIN
-    "#include ""afxres.h""\r\n"
-    "\0"
-END
-
-3 TEXTINCLUDE 
-BEGIN
-    "\r\n"
-    "\0"
-END
-
-#endif    // APSTUDIO_INVOKED
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1295,16 +1241,6 @@ BEGIN
     IDS_L94                 "Server closed connection"
 END
 
-#endif    // English (United States) resources
-/////////////////////////////////////////////////////////////////////////////
-
-
-/////////////////////////////////////////////////////////////////////////////
-// Dutch (Netherlands) resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NLD)
-LANGUAGE LANG_DUTCH, SUBLANG_DUTCH
-#pragma code_page(1252)
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1319,16 +1255,6 @@ IDB_BITMAPlx            BITMAP                  "Tango_lx.bmp"
 
 IDB_BITMAPs             BITMAP                  "Tango_s.bmp"
 
-#endif    // Dutch (Netherlands) resources
-/////////////////////////////////////////////////////////////////////////////
-
-
-/////////////////////////////////////////////////////////////////////////////
-// Dutch (Belgium) resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NLB)
-LANGUAGE LANG_DUTCH, SUBLANG_DUTCH_BELGIAN
-#pragma code_page(1252)
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1690,9 +1616,6 @@ IDD_SESSIONSELECTOR AFX_DIALOG_LAYOUT
 BEGIN
     0
 END
-
-#endif    // Dutch (Belgium) resources
-/////////////////////////////////////////////////////////////////////////////
 
 
 
