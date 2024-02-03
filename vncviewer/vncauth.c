@@ -38,7 +38,7 @@
 
 #include "stdhdrs.h"
 #include "vncauth.h"
-#include "d3des.h"
+#include "../common/d3des.h"
 
 
 /*

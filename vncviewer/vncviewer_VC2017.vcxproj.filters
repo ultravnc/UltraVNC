@@ -64,9 +64,6 @@
     <ClCompile Include="..\common\Clipboard.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="d3des.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Daemon.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -172,6 +169,15 @@
     <ClCompile Include="ClientConnectionTLS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\common\mnemonic.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\mn_wordlist.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\d3des.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AboutBox.h">
@@ -187,9 +193,6 @@
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="..\common\Clipboard.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="d3des.h">
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="Daemon.h">
@@ -298,6 +301,12 @@
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="res\resource.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\mnemonic.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\d3des.h">
       <Filter>header</Filter>
     </ClInclude>
   </ItemGroup>

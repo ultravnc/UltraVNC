@@ -5,7 +5,6 @@
     <ClCompile Include="benchmark.cpp" />
     <ClCompile Include="buildtime.cpp" />
     <ClCompile Include="CpuUsage.cpp" />
-    <ClCompile Include="d3des.c" />
     <ClCompile Include="..\..\rfb\dh.cpp" />
     <ClCompile Include="..\..\DSMPlugin\DSMPlugin.cpp" />
     <ClCompile Include="Dtwinver.cpp" />
@@ -87,6 +86,7 @@
     <ClCompile Include="ScSelect.cpp" />
     <ClCompile Include="SettingsManager.cpp" />
     <ClCompile Include="CloudDialog.cpp" />
+    <ClCompile Include="..\..\common\d3des.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\ZipUnZip32\ZipUnZip32.h">
@@ -263,9 +263,6 @@
     <ClInclude Include="..\..\rfb\dh.h">
       <Filter>headers</Filter>
     </ClInclude>
-    <ClInclude Include="d3des.h">
-      <Filter>headers</Filter>
-    </ClInclude>
     <ClInclude Include="CpuUsage.h">
       <Filter>headers</Filter>
     </ClInclude>
@@ -313,6 +310,9 @@
       <Filter>headers</Filter>
     </ClInclude>
     <ClInclude Include="VirtualDisplay.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\d3des.h">
       <Filter>headers</Filter>
     </ClInclude>
   </ItemGroup>

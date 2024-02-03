@@ -34,7 +34,7 @@
 #include <sys/stat.h>
 #include <process.h>
 #include "vncauth.h"
-#include "d3des.h"
+#include "../common/d3des.h"
 
 unsigned char dynkey[8] = { 23,82,107,6,35,78,88,7 };
 void vncSetDynKey(unsigned char key[8])
