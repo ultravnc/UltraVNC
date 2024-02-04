@@ -1,2 +1,0 @@
-Usage:
-copy dll in the same folder as the vncviewer and rename to vnclang.dll

@@ -7,10 +7,17 @@
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#include "winres.h"
+#include "afxres.h"
 
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -18,19 +25,6 @@
 //
 
 IDC_FINGER              CURSOR                  "Finger.cur"
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Bitmap
-//
-
-IDB_COLLAPS             BITMAP                  "up.bmp"
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Cursor
-//
 
 IDC_CURSOR1             CURSOR                  "cursorsel.cur"
 
@@ -43,6 +37,8 @@ IDC_NOCURSOR            CURSOR                  "nocursor.cur"
 //
 // Bitmap
 //
+
+IDB_COLLAPS             BITMAP                  "up.bmp"
 
 IDB_BITMAP2             BITMAP                  "hoch.bmp"
 
@@ -76,6 +72,54 @@ IDB_RED                 BITMAP                  "LedRed.bmp"
 
 IDB_YELLOW              BITMAP                  "LedYellow.bmp"
 
+IDB_BITMAPsx            BITMAP                  "Tango_sx.bmp"
+
+IDB_BITMAPl             BITMAP                  "Tango_l.bmp"
+
+IDB_BITMAPlx            BITMAP                  "Tango_lx.bmp"
+
+IDB_BITMAPs             BITMAP                  "Tango_s.bmp"
+
+IDB_BITMAP14            BITMAP                  "l2.bmp"
+
+IDB_BITMAP13            BITMAP                  "l1.bmp"
+
+IDB_FITSCREEN           BITMAP                  "stat/1op1.bmp"
+
+IDB_NOSCALE             BITMAP                  "stat/full.bmp"
+
+IDB_PHOTO               BITMAP                  "stat/photo.bmp"
+
+IDB_SWITCHMONITOR       BITMAP                  "stat/switch.bmp"
+
+IDB_EXPAND              BITMAP                  "down.bmp"
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -94,6 +138,8 @@ IDI_DIR                 ICON                    "dir.ico"
 
 IDI_DRIVE               ICON                    "drive.ico"
 
+IDR_TRAY_DISABLED       ICON                    "idr_tray_disabled.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -107,7 +153,7 @@ BEGIN
         MENUITEM "New connection",              ID_NEWCONN
         MENUITEM "Default connection options...", IDC_OPTIONBUTTON
         MENUITEM SEPARATOR
-        MENUITEM "About VNCviewer...",          IDD_APP_ABOUT
+        MENUITEM "About UltraVNC Viewer...",    IDD_APP_ABOUT
         MENUITEM SEPARATOR
         MENUITEM "Toggle Listen Mode (On/Off)", ID_LISTEN_MODE
         MENUITEM "Close TrayIcon",              ID_CLOSEAPP
@@ -416,7 +462,7 @@ END
 IDD_APP_ABOUT DIALOGEX 0, 0, 289, 156
 STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOOLWINDOW
-CAPTION " About VNCviewer"
+CAPTION " About UltraVNC Viewer"
 FONT 11, "Arial", 400, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,8,137,62,14
@@ -446,7 +492,7 @@ END
 IDD_APP_MESSAGE1 DIALOGEX 0, 0, 278, 158
 STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOOLWINDOW
-CAPTION "VncViewer MessageBox"
+CAPTION "UltraVNC Viewer MessageBox"
 FONT 11, "Arial", 400, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "Close",IDOK,185,110,56,14
@@ -459,7 +505,7 @@ END
 IDD_APP_MESSAGE2 DIALOGEX 0, 0, 273, 217
 STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOOLWINDOW
-CAPTION "VncViewer MessageBox"
+CAPTION "UltraVNC Viewer MessageBox"
 FONT 11, "Arial", 400, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "Close",IDOK,185,163,54,14
@@ -518,6 +564,197 @@ BEGIN
     LTEXT           "Signature:",IDC_STATIC,14,47,35,8
     LTEXT           "",IDC_CATCHPHRASE,65,32,159,8
     LTEXT           "",IDC_SIGNATURE,65,47,159,8
+END
+
+IDD_SESSIONSELECTOR DIALOGEX 0, 0, 316, 183
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "Session Selector"
+FONT 11, "Arial", 400, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,205,162,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,259,162,50,14
+    CONTROL         "",IDC_LIST1,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_NOLABELWRAP | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,7,302,149
+END
+
+IDD_SAVEIMAGE DIALOGEX 0, 0, 316, 59
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_CENTER | DS_CENTERMOUSE | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_TOPMOST | WS_EX_TOOLWINDOW
+CAPTION "Snapshot"
+FONT 11, "Arial", 400, 0, 0x0
+BEGIN
+    EDITTEXT        IDC_FOLDER,51,7,189,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "Browse",IDC_BROWSE,259,7,50,14
+    EDITTEXT        IDC_PREFIX,51,26,40,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,205,38,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,259,38,50,14
+    LTEXT           "Folder:",IDC_STATIC,13,9,24,9
+    LTEXT           "Prefix:",IDC_STATIC,13,28,22,8
+END
+
+IDD_ENCODERS DIALOGEX 0, 0, 240, 145
+STYLE DS_SETFONT | DS_CONTROL | WS_CHILD
+FONT 11, "Arial", 400, 0, 0x0
+BEGIN
+    CONTROL         "Auto select best settings (need stable network)",IDC_AUTODETECT,
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,4,4,217,10
+    CONTROL         "Raw",IDC_RAWRADIO,"Button",BS_AUTORADIOBUTTON,14,28,29,10
+    CONTROL         "Ultra",IDC_ULTRA,"Button",BS_AUTORADIOBUTTON,54,28,29,10
+    CONTROL         "Hextile",IDC_HEXTILERADIO,"Button",BS_AUTORADIOBUTTON,86,28,37,10
+    CONTROL         "Zlib",IDC_ZLIBRADIO,"Button",BS_AUTORADIOBUTTON,14,51,29,10
+    CONTROL         "ZlibHex",IDC_ZLIBHEXRADIO,"Button",BS_AUTORADIOBUTTON,54,51,34,10
+    CONTROL         "Tight",IDC_TIGHTRADIO,"Button",BS_AUTORADIOBUTTON,14,74,29,10
+    CONTROL         "ZRLE",IDC_ZRLERADIO,"Button",BS_AUTORADIOBUTTON,54,74,31,10
+    CONTROL         "Video",IDC_ULTRA2,"Button",BS_AUTORADIOBUTTON,86,74,49,10
+    CONTROL         "ZYWRLE",IDC_ZYWRLERADIO,"Button",BS_AUTORADIOBUTTON,14,97,38,10
+    CONTROL         "XZ",IDC_XZRADIO,"Button",BS_AUTORADIOBUTTON,54,97,24,10
+    CONTROL         "XZYW",IDC_XZYWRADIO,"Button",BS_AUTORADIOBUTTON,86,97,37,10
+    CONTROL         "Full Colors",IDC_FULLCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,153,27,48,10
+    CONTROL         "256 Colors",IDC_256COLORS_RADIO,"Button",BS_AUTORADIOBUTTON,153,37,49,10
+    CONTROL         "64 Colors",IDC_64COLORS_RADIO,"Button",BS_AUTORADIOBUTTON,153,47,45,10
+    CONTROL         "8 Colors",IDC_8COLORS_RADIO,"Button",BS_AUTORADIOBUTTON,153,57,41,10
+    CONTROL         "8 Dark Colors",IDC_8GREYCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON,153,67,54,10
+    CONTROL         "4 Grey Colors",IDC_4GREYCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON,153,77,58,10
+    CONTROL         "Black && White",IDC_2GREYCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON,153,87,57,10
+    CONTROL         "zlib compression:",IDC_ALLOW_COMPRESSLEVEL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,114,68,10
+    EDITTEXT        IDC_COMPRESSLEVEL,87,113,14,12,ES_AUTOHSCROLL
+    CONTROL         "Jpeg Quality:",IDC_ALLOW_JPEG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,127,54,10
+    EDITTEXT        IDC_QUALITYLEVEL,87,126,14,12,ES_AUTOHSCROLL
+    CONTROL         "Use Zstd instead of zlib",IDC_ZSTD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,142,100,90,10
+    CONTROL         "Use CopyRect encoding",ID_SESSION_SET_CRECT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,142,110,94,10
+    CONTROL         "Use Cache Encoding",ID_SESSION_SET_CACHE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,142,120,90,10
+    CONTROL         "Preemptive Updates",IDC_PREEMPTIVEUPDATES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,142,130,81,10
+    LTEXT           "High CPU lower bandwidth ",IDC_STATIC,8,87,87,8
+    LTEXT           "Low CPU high bandwidth",IDC_STATIC,8,17,80,8
+    LTEXT           "High CPU middle bandwidth (lossless)",IDC_STATIC,8,41,119,8
+    LTEXT           "Middle CPU low bandwidth (lossy)",IDC_STATIC,8,64,108,8
+    LTEXT           "Less colors=less bandwidth",IDC_STATIC,142,17,90,10
+END
+
+IDD_DISPLAY DIALOGEX 0, 0, 240, 145
+STYLE DS_SETFONT | DS_CONTROL | WS_CHILD
+FONT 11, "Arial", 400, 0, 0x0
+BEGIN
+    CONTROL         "",IDC_SLIDERRES,"msctls_trackbar32",TBS_AUTOTICKS | TBS_ENABLESELRANGE | WS_TABSTOP,43,12,133,11
+    CONTROL         "Use all my monitors for the remote session",IDC_ALLMONS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,22,24,157,10
+    CONTROL         "Fit to screen, no scrollbars.",IDC_DIRECTX,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,85,103,10
+    CONTROL         "Auto scale by",IDC_SCALING,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,107,64,10
+    COMBOBOX        IDC_SCALE_CB,69,105,30,117,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_SERVER_SCALE,107,117,14,12,ES_AUTOHSCROLL
+    CONTROL         "Start in fullscreen mode.",IDC_FULLSCREEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,139,96,90,10
+    CONTROL         "Save size on exit.",IDC_SAVESIZE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,139,129,73,10
+    CONTROL         "Show toolbar.",IDC_SHOWTOOLBAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,96,60,10
+    CONTROL         "Save position on exit.",IDC_SAVEPOS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,129,97,10
+    LTEXT           "Server Screen Scale by :",IDC_STATIC,4,119,80,8
+    CTEXT           "%",IDC_STATIC,102,107,8,8,0,WS_EX_TRANSPARENT
+    LTEXT           "1  /",IDC_STATIC,91,119,12,8
+    CTEXT           "",IDC_RES,181,12,47,8
+    CONTROL         "Allow Fullscreen multi monitor spanning",IDC_ALLOWSPAN,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,74,141,10
+    LTEXT           "Small",IDC_STATIC,19,12,19,8
+    CONTROL         "Change server resolution.",IDC_CHANGESERVER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,1,100,10
+    CONTROL         "Use only virtual displays  (win 10 1903 >=)",IDC_RADIO_ONLY_VIRTUAL,
+                    "Button",BS_AUTORADIOBUTTON,22,45,157,10
+    CONTROL         "Extend main display  (win 10 1903 >=)",IDC_RADIO_EXTEND,
+                    "Button",BS_AUTORADIOBUTTON,22,55,143,10
+    CONTROL         "Show only extend ( portable as extra display)",IDC_SHOW_EXTEND,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,33,65,164,10
+    CONTROL         "Main screen resolution",IDC_RADIO_NOVIRT,"Button",BS_AUTORADIOBUTTON,22,35,90,10
+    CONTROL         "Auto scale Even",IDC_SCALINGEVEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,139,107,65,10
+    CONTROL         "GNOME R.D.",IDC_GNOME,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,139,118,56,10
+END
+
+IDD_MISC DIALOGEX 0, 0, 240, 145
+STYLE DS_SETFONT | DS_CONTROL | WS_CHILD
+FONT 11, "Arial", 400, 0, 0x0
+BEGIN
+    EDITTEXT        IDC_FOLDER,29,15,150,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "Browse",IDC_BROWSE,186,15,46,14
+    EDITTEXT        IDC_PREFIX,29,30,49,14,ES_AUTOHSCROLL
+    COMBOBOX        IDC_IMAGEFORMAT,131,30,48,30,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_SERVER_RECON,82,51,16,14,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_SERVER_RECON_TIME,143,51,16,14,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_FTTIMEOUT,82,69,16,14,ES_AUTOHSCROLL
+    CONTROL         "Do not display the sponsor advertisement",IDC_CHECK1,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,87,145,10
+    CONTROL         "Hide status window",IDC_HIDESTATUS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,99,78,10
+    LTEXT           "Folder:",IDC_STATIC,4,18,24,9
+    LTEXT           "Prefix:",IDC_STATIC,4,32,25,8
+    LTEXT           "Snapshot folder and prefix.",IDC_STATIC,4,4,232,8
+    LTEXT           "reconnection attempts:",IDC_STATIC,4,54,75,8
+    LTEXT           "timeout:",IDC_STATIC,112,54,28,8
+    LTEXT           "Filetransfer timeout:",IDC_STATIC,4,72,67,8
+END
+
+IDD_SECURITY DIALOGEX 0, 0, 240, 145
+STYLE DS_SETFONT | DS_CONTROL | WS_CHILD
+FONT 11, "Arial", 400, 0, 0x0
+BEGIN
+    CONTROL         "Use Encryption:",IDC_PLUGIN_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,13,66,10
+    COMBOBOX        IDC_PLUGINS_COMBO,74,11,138,55,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Config encryption plugins",IDC_PLUGIN_BUTTON,74,25,138,12
+    CONTROL         "Only allow encrypted servers.",IDC_ONLYENCRYPTED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,40,112,10
+    CONTROL         "Share the Server, allow other to connect.",IDC_SHARED,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,50,149,10
+    CONTROL         "Disable clipboard transfer",IDC_DISABLECLIPBOARD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,60,138,10
+    CONTROL         "Auto accept incoming (listener mode)",IDC_AUTOACCEPT,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,70,134,10
+    CONTROL         "ingnore no encryption warning (listener mode)",IDC_AUTOACCEPTNOWARN,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,80,180,10
+    CONTROL         "Hide menu",IDC_HIDEMENU,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,91,49,10
+    EDITTEXT        IDC_EDITCUSTOMMESSAGE,4,105,232,36,ES_MULTILINE
+    LTEXT           "Notification on connect",IDC_STATIC,90,97,75,8
+    CONTROL         "Only servers with password",IDC_ONLYPASSWORD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,125,40,104,10
+END
+
+IDD_KEYBOARDMOUSE DIALOGEX 0, 0, 240, 145
+STYLE DS_SETFONT | DS_CONTROL | WS_CHILD
+FONT 11, "Arial", 400, 0, 0x0
+BEGIN
+    CONTROL         "Track remote cursor locally",IDC_CSHAPE_ENABLE_RADIO,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,6,8,144,10
+    CONTROL         "Let remote server deal with mouse cursor",IDC_CSHAPE_DISABLE_RADIO,
+                    "Button",BS_AUTORADIOBUTTON,6,19,147,10
+    CONTROL         "Don't show remote cursor",IDC_CSHAPE_IGNORE_RADIO,
+                    "Button",BS_AUTORADIOBUTTON,6,30,142,10
+    CONTROL         "View only, no input.",IDC_VIEWONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,47,129,10
+    CONTROL         "Disable hotkeys",IDC_NOHOTKEYS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,58,66,10
+    CONTROL         "Emulate 3 Buttons (with 2-button click)",IDC_EMULATECHECK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,69,139,10
+    CONTROL         "Swap mouse buttons 2 and 3",ID_SESSION_SWAPMOUSE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,80,126,10
+    CONTROL         "Japanese keyboard",IDC_JAPKEYBOARD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,91,78,10
+    LTEXT           "Mouse event throttle (ms):",IDC_STATIC,6,106,89,11
+    EDITTEXT        IDC_MOUSE_THROTTLE,106,104,22,12,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "Gii",IDC_GII,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,117,24,10
+END
+
+IDD_QUICKOPTIONS DIALOGEX 0, 0, 240, 145
+STYLE DS_SETFONT | DS_CONTROL | WS_CHILD
+FONT 11, "Arial", 400, 0, 0x0
+BEGIN
+    CONTROL         "AUTO          (Auto select best settings)",IDC_DYNAMIC,
+                    "Button",BS_AUTORADIOBUTTON,9,14,177,10
+    CONTROL         "VIDEO       (>2Mbit/s)",IDC_ULTRA_LAN_RB,"Button",BS_AUTORADIOBUTTON,9,28,176,10
+    CONTROL         "LAN             (> 1Mbit/s) - Max Colors",IDC_LAN_RB,
+                    "Button",BS_AUTORADIOBUTTON,9,42,176,10
+    CONTROL         "MEDIUM     (128 - 256Kbit/s) - 256 Colors",IDC_MEDIUM_RB,
+                    "Button",BS_AUTORADIOBUTTON,9,56,153,10
+    CONTROL         "MODEM      (19 - 128Kbit/s) - 64 Colors",IDC_MODEM_RB,
+                    "Button",BS_AUTORADIOBUTTON,9,70,148,10
+    CONTROL         "SLOW         (< 19kKbit/s) - 8 Colors",IDC_SLOW_RB,
+                    "Button",BS_AUTORADIOBUTTON,9,84,128,10
+    CONTROL         "MANUAL     ( Use options button )",IDC_MANUAL,"Button",BS_AUTORADIOBUTTON,9,98,123,10
+END
+
+IDD_LISTEN DIALOGEX 0, 0, 240, 145
+STYLE DS_SETFONT | DS_CONTROL | WS_CHILD
+FONT 11, "Arial", 400, 0, 0x0
+BEGIN
+    EDITTEXT        IDC_LISTENPORT,23,24,40,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "Start Listening",IDC_STARTLISTEN,169,121,61,14
+    LTEXT           "Listen mode",IDC_STATIC,4,10,39,8
+    LTEXT           "Port:",IDC_STATIC,4,27,17,8
 END
 
 
@@ -742,6 +979,79 @@ BEGIN
         HORZGUIDE, 36
         HORZGUIDE, 52
     END
+
+    IDD_SESSIONSELECTOR, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 309
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 176
+    END
+
+    IDD_SAVEIMAGE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 309
+        VERTGUIDE, 107
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 52
+    END
+
+    IDD_ENCODERS, DIALOG
+    BEGIN
+        RIGHTMARGIN, 236
+        VERTGUIDE, 4
+        VERTGUIDE, 8
+        VERTGUIDE, 14
+        BOTTOMMARGIN, 141
+        HORZGUIDE, 4
+    END
+
+    IDD_DISPLAY, DIALOG
+    BEGIN
+        RIGHTMARGIN, 234
+        VERTGUIDE, 4
+        BOTTOMMARGIN, 141
+    END
+
+    IDD_MISC, DIALOG
+    BEGIN
+        RIGHTMARGIN, 236
+        VERTGUIDE, 4
+        VERTGUIDE, 29
+        BOTTOMMARGIN, 141
+        HORZGUIDE, 4
+    END
+
+    IDD_SECURITY, DIALOG
+    BEGIN
+        RIGHTMARGIN, 236
+        VERTGUIDE, 4
+        BOTTOMMARGIN, 141
+        HORZGUIDE, 5
+    END
+
+    IDD_KEYBOARDMOUSE, DIALOG
+    BEGIN
+        RIGHTMARGIN, 236
+        VERTGUIDE, 6
+        BOTTOMMARGIN, 141
+    END
+
+    IDD_QUICKOPTIONS, DIALOG
+    BEGIN
+        RIGHTMARGIN, 236
+        VERTGUIDE, 4
+        BOTTOMMARGIN, 141
+        HORZGUIDE, 5
+    END
+
+    IDD_LISTEN, DIALOG
+    BEGIN
+        RIGHTMARGIN, 236
+        VERTGUIDE, 4
+        BOTTOMMARGIN, 141
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -783,12 +1093,12 @@ BEGIN
         BEGIN
             VALUE "Comments", "UltraVNC Viewer"
             VALUE "CompanyName", "UltraVNC"
-            VALUE "FileDescription", "VNCViewer"
+            VALUE "FileDescription", "UltraVNC Viewer"
             VALUE "FileVersion", "1.4.4.0-dev"
-            VALUE "InternalName", "VNCViewer"
+            VALUE "InternalName", "UltraVNC Viewer"
             VALUE "LegalCopyright", "Copyright © 2023 UltraVNC team members"
-            VALUE "OriginalFilename", "VNCViewer.exe"
-            VALUE "ProductName", "UltraVNC VNCViewer"
+            VALUE "OriginalFilename", "UltraVNC Viewer.exe"
+            VALUE "ProductName", "UltraVNC Viewer"
             VALUE "ProductVersion", "1.4.4.0-dev"
         END
     END
@@ -894,6 +1204,51 @@ BEGIN
     0
 END
 
+IDD_ENCODERS AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_DISPLAY AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_SECURITY AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_LISTEN AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_KEYBOARDMOUSE AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_QUICKOPTIONS AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_MISC AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_SAVEIMAGE AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_SESSIONSELECTOR AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -924,7 +1279,7 @@ BEGIN
     IDS_A1                  "Stop viewer systray"
     IDS_A2                  "UltraVNC info"
     IDS_A3                  "Error creating listening daemon:\n\r"
-    IDS_A4                  "Perhaps another VNCviewer is already running?"
+    IDS_A4                  "Perhaps another UltraVNC Viewer is already running?"
     IDS_A5                  "VNC Viewer error"
     IDS_B1                  "Error initialising sockets library"
     IDS_B2                  "Client list overflow!"
@@ -1067,8 +1422,8 @@ BEGIN
     IDS_I1                  "Error creating Daemon socket"
     IDS_I2                  "Error binding Daemon socket"
     IDS_I3                  "Error when Daemon listens"
-    IDS_J1                  "To exit from full-screen mode, use Ctrl-Esc Esc and then\r\nright-click on the vncviewer taskbar icon to see the menu."
-    IDS_J2                  "VNCviewer full-screen mode"
+    IDS_J1                  "To exit from full-screen mode, use Ctrl-Esc Esc and then\r\nright-click on the UltraVNC Viewer taskbar icon to see the menu."
+    IDS_J2                  "UltraVNC Viewer full-screen mode"
     IDS_K2                  "Error saving file"
     IDS_K1                  "Invalid filename"
     IDS_K3                  "Do you want to save the password in this file?\n\r (Yes) Saving a password to a file is unsecure."
@@ -1171,7 +1526,7 @@ BEGIN
     IDS_L73                 "VNC Viewer Status"
     IDS_L74                 "No Connection"
     IDS_L75                 "Are you sure you want to exit?"
-    IDS_L76                 "Closing VNCviewer"
+    IDS_L76                 "Closing UltraVNC Viewer"
 END
 
 STRINGTABLE
@@ -1241,381 +1596,8 @@ BEGIN
     IDS_L94                 "Server closed connection"
 END
 
-
+#endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
-//
-// Bitmap
-//
-
-IDB_BITMAPsx            BITMAP                  "Tango_sx.bmp"
-
-IDB_BITMAPl             BITMAP                  "Tango_l.bmp"
-
-IDB_BITMAPlx            BITMAP                  "Tango_lx.bmp"
-
-IDB_BITMAPs             BITMAP                  "Tango_s.bmp"
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Bitmap
-//
-
-IDB_BITMAP14            BITMAP                  "l2.bmp"
-
-IDB_BITMAP13            BITMAP                  "l1.bmp"
-
-IDB_FITSCREEN           BITMAP                  "stat/1op1.bmp"
-
-IDB_NOSCALE             BITMAP                  "stat/full.bmp"
-
-IDB_PHOTO               BITMAP                  "stat/photo.bmp"
-
-IDB_SWITCHMONITOR       BITMAP                  "stat/switch.bmp"
-
-IDB_EXPAND              BITMAP                  "down.bmp"
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Icon
-//
-
-// Icon with lowest ID value placed first to ensure application icon
-// remains consistent on all systems.
-IDR_TRAY_DISABLED       ICON                    "idr_tray_disabled.ico"
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Dialog
-//
-
-IDD_SESSIONSELECTOR DIALOGEX 0, 0, 316, 183
-STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | WS_POPUP | WS_CAPTION | WS_SYSMENU
-EXSTYLE WS_EX_TOOLWINDOW
-CAPTION "Session Selector"
-FONT 11, "Arial", 400, 0, 0x0
-BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,205,162,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,259,162,50,14
-    CONTROL         "",IDC_LIST1,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_NOLABELWRAP | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,7,302,149
-END
-
-IDD_SAVEIMAGE DIALOGEX 0, 0, 316, 59
-STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_CENTER | DS_CENTERMOUSE | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
-EXSTYLE WS_EX_TOPMOST | WS_EX_TOOLWINDOW
-CAPTION "Snapshot"
-FONT 11, "Arial", 400, 0, 0x0
-BEGIN
-    EDITTEXT        IDC_FOLDER,51,7,189,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "Browse",IDC_BROWSE,259,7,50,14
-    EDITTEXT        IDC_PREFIX,51,26,40,14,ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "OK",IDOK,205,38,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,259,38,50,14
-    LTEXT           "Folder:",IDC_STATIC,13,9,24,9
-    LTEXT           "Prefix:",IDC_STATIC,13,28,22,8
-END
-
-IDD_ENCODERS DIALOGEX 0, 0, 240, 145
-STYLE DS_SETFONT | DS_CONTROL | WS_CHILD
-FONT 11, "Arial", 400, 0, 0x0
-BEGIN
-    CONTROL         "Auto select best settings (need stable network)",IDC_AUTODETECT,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,4,4,217,10
-    CONTROL         "Raw",IDC_RAWRADIO,"Button",BS_AUTORADIOBUTTON,14,28,29,10
-    CONTROL         "Ultra",IDC_ULTRA,"Button",BS_AUTORADIOBUTTON,54,28,29,10
-    CONTROL         "Hextile",IDC_HEXTILERADIO,"Button",BS_AUTORADIOBUTTON,86,28,37,10
-    CONTROL         "Zlib",IDC_ZLIBRADIO,"Button",BS_AUTORADIOBUTTON,14,51,29,10
-    CONTROL         "ZlibHex",IDC_ZLIBHEXRADIO,"Button",BS_AUTORADIOBUTTON,54,51,34,10
-    CONTROL         "Tight",IDC_TIGHTRADIO,"Button",BS_AUTORADIOBUTTON,14,74,29,10
-    CONTROL         "ZRLE",IDC_ZRLERADIO,"Button",BS_AUTORADIOBUTTON,54,74,31,10
-    CONTROL         "Video",IDC_ULTRA2,"Button",BS_AUTORADIOBUTTON,86,74,49,10
-    CONTROL         "ZYWRLE",IDC_ZYWRLERADIO,"Button",BS_AUTORADIOBUTTON,14,97,38,10
-    CONTROL         "XZ",IDC_XZRADIO,"Button",BS_AUTORADIOBUTTON,54,97,24,10
-    CONTROL         "XZYW",IDC_XZYWRADIO,"Button",BS_AUTORADIOBUTTON,86,97,37,10
-    CONTROL         "Full Colors",IDC_FULLCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,153,27,48,10
-    CONTROL         "256 Colors",IDC_256COLORS_RADIO,"Button",BS_AUTORADIOBUTTON,153,37,49,10
-    CONTROL         "64 Colors",IDC_64COLORS_RADIO,"Button",BS_AUTORADIOBUTTON,153,47,45,10
-    CONTROL         "8 Colors",IDC_8COLORS_RADIO,"Button",BS_AUTORADIOBUTTON,153,57,41,10
-    CONTROL         "8 Dark Colors",IDC_8GREYCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON,153,67,54,10
-    CONTROL         "4 Grey Colors",IDC_4GREYCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON,153,77,58,10
-    CONTROL         "Black && White",IDC_2GREYCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON,153,87,57,10
-    CONTROL         "zlib compression:",IDC_ALLOW_COMPRESSLEVEL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,114,68,10
-    EDITTEXT        IDC_COMPRESSLEVEL,87,113,14,12,ES_AUTOHSCROLL
-    CONTROL         "Jpeg Quality:",IDC_ALLOW_JPEG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,127,54,10
-    EDITTEXT        IDC_QUALITYLEVEL,87,126,14,12,ES_AUTOHSCROLL
-    CONTROL         "Use Zstd instead of zlib",IDC_ZSTD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,142,100,90,10
-    CONTROL         "Use CopyRect encoding",ID_SESSION_SET_CRECT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,142,110,94,10
-    CONTROL         "Use Cache Encoding",ID_SESSION_SET_CACHE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,142,120,90,10
-    CONTROL         "Preemptive Updates",IDC_PREEMPTIVEUPDATES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,142,130,81,10
-    LTEXT           "High CPU lower bandwidth ",IDC_STATIC,8,87,87,8
-    LTEXT           "Low CPU high bandwidth",IDC_STATIC,8,17,80,8
-    LTEXT           "High CPU middle bandwidth (lossless)",IDC_STATIC,8,41,119,8
-    LTEXT           "Middle CPU low bandwidth (lossy)",IDC_STATIC,8,64,108,8
-    LTEXT           "Less colors=less bandwidth",IDC_STATIC,142,17,90,10
-END
-
-IDD_DISPLAY DIALOGEX 0, 0, 240, 145
-STYLE DS_SETFONT | DS_CONTROL | WS_CHILD
-FONT 11, "Arial", 400, 0, 0x0
-BEGIN
-    CONTROL         "",IDC_SLIDERRES,"msctls_trackbar32",TBS_AUTOTICKS | TBS_ENABLESELRANGE | WS_TABSTOP,43,12,133,11
-    CONTROL         "Use all my monitors for the remote session",IDC_ALLMONS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,22,24,157,10
-    CONTROL         "Fit to screen, no scrollbars.",IDC_DIRECTX,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,85,103,10
-    CONTROL         "Auto scale by",IDC_SCALING,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,107,64,10
-    COMBOBOX        IDC_SCALE_CB,69,105,30,117,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    EDITTEXT        IDC_SERVER_SCALE,107,117,14,12,ES_AUTOHSCROLL
-    CONTROL         "Start in fullscreen mode.",IDC_FULLSCREEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,139,96,90,10
-    CONTROL         "Save size on exit.",IDC_SAVESIZE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,139,129,73,10
-    CONTROL         "Show toolbar.",IDC_SHOWTOOLBAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,96,60,10
-    CONTROL         "Save position on exit.",IDC_SAVEPOS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,129,97,10
-    LTEXT           "Server Screen Scale by :",IDC_STATIC,4,119,80,8
-    CTEXT           "%",IDC_STATIC,102,107,8,8,0,WS_EX_TRANSPARENT
-    LTEXT           "1  /",IDC_STATIC,91,119,12,8
-    CTEXT           "",IDC_RES,181,12,47,8
-    CONTROL         "Allow Fullscreen multi monitor spanning",IDC_ALLOWSPAN,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,74,141,10
-    LTEXT           "Small",IDC_STATIC,19,12,19,8
-    CONTROL         "Change server resolution.",IDC_CHANGESERVER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,1,100,10
-    CONTROL         "Use only virtual displays  (win 10 1903 >=)",IDC_RADIO_ONLY_VIRTUAL,
-                    "Button",BS_AUTORADIOBUTTON,22,45,157,10
-    CONTROL         "Extend main display  (win 10 1903 >=)",IDC_RADIO_EXTEND,
-                    "Button",BS_AUTORADIOBUTTON,22,55,143,10
-    CONTROL         "Show only extend ( portable as extra display)",IDC_SHOW_EXTEND,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,33,65,164,10
-    CONTROL         "Main screen resolution",IDC_RADIO_NOVIRT,"Button",BS_AUTORADIOBUTTON,22,35,90,10
-    CONTROL         "Auto scale Even",IDC_SCALINGEVEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,139,107,65,10
-    CONTROL         "GNOME R.D.",IDC_GNOME,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,139,118,56,10
-END
-
-IDD_MISC DIALOGEX 0, 0, 240, 145
-STYLE DS_SETFONT | DS_CONTROL | WS_CHILD
-FONT 11, "Arial", 400, 0, 0x0
-BEGIN
-    EDITTEXT        IDC_FOLDER,29,15,150,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "Browse",IDC_BROWSE,186,15,46,14
-    EDITTEXT        IDC_PREFIX,29,30,49,14,ES_AUTOHSCROLL
-    COMBOBOX        IDC_IMAGEFORMAT,131,30,48,30,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
-    EDITTEXT        IDC_SERVER_RECON,82,51,16,14,ES_AUTOHSCROLL | ES_NUMBER
-    EDITTEXT        IDC_SERVER_RECON_TIME,143,51,16,14,ES_AUTOHSCROLL | ES_NUMBER
-    EDITTEXT        IDC_FTTIMEOUT,82,69,16,14,ES_AUTOHSCROLL
-    CONTROL         "Do not display the sponsor advertisement",IDC_CHECK1,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,87,145,10
-    CONTROL         "Hide status window",IDC_HIDESTATUS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,99,78,10
-    LTEXT           "Folder:",IDC_STATIC,4,18,24,9
-    LTEXT           "Prefix:",IDC_STATIC,4,32,25,8
-    LTEXT           "Snapshot folder and prefix.",IDC_STATIC,4,4,232,8
-    LTEXT           "reconnection attempts:",IDC_STATIC,4,54,75,8
-    LTEXT           "timeout:",IDC_STATIC,112,54,28,8
-    LTEXT           "Filetransfer timeout:",IDC_STATIC,4,72,67,8
-END
-
-IDD_SECURITY DIALOGEX 0, 0, 240, 145
-STYLE DS_SETFONT | DS_CONTROL | WS_CHILD
-FONT 11, "Arial", 400, 0, 0x0
-BEGIN
-    CONTROL         "Use Encryption:",IDC_PLUGIN_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,13,66,10
-    COMBOBOX        IDC_PLUGINS_COMBO,74,11,138,55,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "Config encryption plugins",IDC_PLUGIN_BUTTON,74,25,138,12
-    CONTROL         "Only allow encrypted servers.",IDC_ONLYENCRYPTED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,40,112,10
-    CONTROL         "Share the Server, allow other to connect.",IDC_SHARED,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,50,149,10
-    CONTROL         "Disable clipboard transfer",IDC_DISABLECLIPBOARD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,60,138,10
-    CONTROL         "Auto accept incoming (listener mode)",IDC_AUTOACCEPT,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,70,134,10
-    CONTROL         "ingnore no encryption warning (listener mode)",IDC_AUTOACCEPTNOWARN,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,80,180,10
-    CONTROL         "Hide menu",IDC_HIDEMENU,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,91,49,10
-    EDITTEXT        IDC_EDITCUSTOMMESSAGE,4,105,232,36,ES_MULTILINE
-    LTEXT           "Notification on connect",IDC_STATIC,90,97,75,8
-    CONTROL         "Only servers with password",IDC_ONLYPASSWORD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,125,40,104,10
-END
-
-IDD_KEYBOARDMOUSE DIALOGEX 0, 0, 240, 145
-STYLE DS_SETFONT | DS_CONTROL | WS_CHILD
-FONT 11, "Arial", 400, 0, 0x0
-BEGIN
-    CONTROL         "Track remote cursor locally",IDC_CSHAPE_ENABLE_RADIO,
-                    "Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,6,8,144,10
-    CONTROL         "Let remote server deal with mouse cursor",IDC_CSHAPE_DISABLE_RADIO,
-                    "Button",BS_AUTORADIOBUTTON,6,19,147,10
-    CONTROL         "Don't show remote cursor",IDC_CSHAPE_IGNORE_RADIO,
-                    "Button",BS_AUTORADIOBUTTON,6,30,142,10
-    CONTROL         "View only, no input.",IDC_VIEWONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,47,129,10
-    CONTROL         "Disable hotkeys",IDC_NOHOTKEYS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,58,66,10
-    CONTROL         "Emulate 3 Buttons (with 2-button click)",IDC_EMULATECHECK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,69,139,10
-    CONTROL         "Swap mouse buttons 2 and 3",ID_SESSION_SWAPMOUSE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,80,126,10
-    CONTROL         "Japanese keyboard",IDC_JAPKEYBOARD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,91,78,10
-    LTEXT           "Mouse event throttle (ms):",IDC_STATIC,6,106,89,11
-    EDITTEXT        IDC_MOUSE_THROTTLE,106,104,22,12,ES_AUTOHSCROLL | ES_NUMBER
-    CONTROL         "Gii",IDC_GII,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,117,24,10
-END
-
-IDD_QUICKOPTIONS DIALOGEX 0, 0, 240, 145
-STYLE DS_SETFONT | DS_CONTROL | WS_CHILD
-FONT 11, "Arial", 400, 0, 0x0
-BEGIN
-    CONTROL         "AUTO          (Auto select best settings)",IDC_DYNAMIC,
-                    "Button",BS_AUTORADIOBUTTON,9,14,177,10
-    CONTROL         "VIDEO       (>2Mbit/s)",IDC_ULTRA_LAN_RB,"Button",BS_AUTORADIOBUTTON,9,28,176,10
-    CONTROL         "LAN             (> 1Mbit/s) - Max Colors",IDC_LAN_RB,
-                    "Button",BS_AUTORADIOBUTTON,9,42,176,10
-    CONTROL         "MEDIUM     (128 - 256Kbit/s) - 256 Colors",IDC_MEDIUM_RB,
-                    "Button",BS_AUTORADIOBUTTON,9,56,153,10
-    CONTROL         "MODEM      (19 - 128Kbit/s) - 64 Colors",IDC_MODEM_RB,
-                    "Button",BS_AUTORADIOBUTTON,9,70,148,10
-    CONTROL         "SLOW         (< 19kKbit/s) - 8 Colors",IDC_SLOW_RB,
-                    "Button",BS_AUTORADIOBUTTON,9,84,128,10
-    CONTROL         "MANUAL     ( Use options button )",IDC_MANUAL,"Button",BS_AUTORADIOBUTTON,9,98,123,10
-END
-
-IDD_LISTEN DIALOGEX 0, 0, 240, 145
-STYLE DS_SETFONT | DS_CONTROL | WS_CHILD
-FONT 11, "Arial", 400, 0, 0x0
-BEGIN
-    EDITTEXT        IDC_LISTENPORT,23,24,40,14,ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "Start Listening",IDC_STARTLISTEN,169,121,61,14
-    LTEXT           "Listen mode",IDC_STATIC,4,10,39,8
-    LTEXT           "Port:",IDC_STATIC,4,27,17,8
-END
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// DESIGNINFO
-//
-
-#ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO
-BEGIN
-    IDD_SESSIONSELECTOR, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 309
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 176
-    END
-
-    IDD_SAVEIMAGE, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 309
-        VERTGUIDE, 107
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 52
-    END
-
-    IDD_ENCODERS, DIALOG
-    BEGIN
-        RIGHTMARGIN, 236
-        VERTGUIDE, 4
-        VERTGUIDE, 8
-        VERTGUIDE, 14
-        BOTTOMMARGIN, 141
-        HORZGUIDE, 4
-    END
-
-    IDD_DISPLAY, DIALOG
-    BEGIN
-        RIGHTMARGIN, 234
-        VERTGUIDE, 4
-        BOTTOMMARGIN, 141
-    END
-
-    IDD_MISC, DIALOG
-    BEGIN
-        RIGHTMARGIN, 236
-        VERTGUIDE, 4
-        VERTGUIDE, 29
-        BOTTOMMARGIN, 141
-        HORZGUIDE, 4
-    END
-
-    IDD_SECURITY, DIALOG
-    BEGIN
-        RIGHTMARGIN, 236
-        VERTGUIDE, 4
-        BOTTOMMARGIN, 141
-        HORZGUIDE, 5
-    END
-
-    IDD_KEYBOARDMOUSE, DIALOG
-    BEGIN
-        RIGHTMARGIN, 236
-        VERTGUIDE, 6
-        BOTTOMMARGIN, 141
-    END
-
-    IDD_QUICKOPTIONS, DIALOG
-    BEGIN
-        RIGHTMARGIN, 236
-        VERTGUIDE, 4
-        BOTTOMMARGIN, 141
-        HORZGUIDE, 5
-    END
-
-    IDD_LISTEN, DIALOG
-    BEGIN
-        RIGHTMARGIN, 236
-        VERTGUIDE, 4
-        BOTTOMMARGIN, 141
-    END
-END
-#endif    // APSTUDIO_INVOKED
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// AFX_DIALOG_LAYOUT
-//
-
-IDD_ENCODERS AFX_DIALOG_LAYOUT
-BEGIN
-    0
-END
-
-IDD_DISPLAY AFX_DIALOG_LAYOUT
-BEGIN
-    0
-END
-
-IDD_SECURITY AFX_DIALOG_LAYOUT
-BEGIN
-    0
-END
-
-IDD_LISTEN AFX_DIALOG_LAYOUT
-BEGIN
-    0
-END
-
-IDD_KEYBOARDMOUSE AFX_DIALOG_LAYOUT
-BEGIN
-    0
-END
-
-IDD_QUICKOPTIONS AFX_DIALOG_LAYOUT
-BEGIN
-    0
-END
-
-IDD_MISC AFX_DIALOG_LAYOUT
-BEGIN
-    0
-END
-
-IDD_SAVEIMAGE AFX_DIALOG_LAYOUT
-BEGIN
-    0
-END
-
-IDD_SESSIONSELECTOR AFX_DIALOG_LAYOUT
-BEGIN
-    0
-END
 
 
 
