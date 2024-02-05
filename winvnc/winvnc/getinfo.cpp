@@ -343,7 +343,7 @@ int getinfo(char mytext[1024])
 #ifndef UNDER_CE
 	switch (osvi.UnderlyingProcessorType)
 	{
-	case COSVersion::IA32_PROCESSOR:
+	case COSVersion::X86_PROCESSOR:
 	{
 		_tcscat_s(sText, _T(", (x86-32 Processor)"));
 		break;
@@ -509,7 +509,7 @@ int getinfo(char mytext[1024])
 		_tcscat_s(sText, _T(", (Windows Essential Business Server Security Server)"));
 	if (os.IsClusterServer(&osvi))
 		_tcscat_s(sText, _T(", (Cluster Server)"));
-	if (os.IsSmallBusinessServer(&osvi))
+	if (os.IsSmallBusiness(&osvi))
 		_tcscat_s(sText, _T(", (Small Business Server)"));
 	if (os.IsSmallBusinessServerPremium(&osvi))
 		_tcscat_s(sText, _T(", (Small Business Server Premium)"));
@@ -533,7 +533,7 @@ int getinfo(char mytext[1024])
 		_tcscat_s(sText, _T(", (Student)"));
 	if (os.IsMobile(&osvi))
 		_tcscat_s(sText, _T(", (Mobile)"));
-	if (os.IsIoT(&osvi))
+	if (os.IsIoTOS(&osvi))
 		_tcscat_s(sText, _T(", (IoT Core)"));
 	if (os.IsCloudHostInfrastructureServer(&osvi))
 		_tcscat_s(sText, _T(", (Cloud Host Infrastructure Server)"));
