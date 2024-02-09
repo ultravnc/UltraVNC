@@ -65,6 +65,7 @@ extern char sz_D26[64];
 extern char sz_D27[64];
 extern char sz_D28[64];
 extern bool g_disable_sponsor;
+extern bool g_dont_show_dialogs;
 bool config_specified = false;
 
 int EncodingFromString(const char* szEncoding)
@@ -225,6 +226,7 @@ VNCOptions::VNCOptions()
 	m_useAllMonitors = 0;
 	m_requestedWidth = 0;
 	m_requestedHeight = 0;
+	m_dontShowDialogs = false;
 
 	m_szDSMPluginFilename[0] = '\0';
 	setDefaultDocumentPath();
@@ -389,6 +391,7 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
 	m_useAllMonitors = s.m_useAllMonitors;
 	m_requestedWidth = s.m_requestedWidth;
 	m_requestedHeight = s.m_requestedHeight;
+	m_dontShowDialogs = s.m_dontShowDialogs;
 
 	m_x = s.m_x;
 	m_y = s.m_y;
@@ -1200,6 +1203,8 @@ void VNCOptions::SaveOptions(char* fname)
 
 	//adzm 2009-06-21
 	saveInt("AutoAcceptIncoming", m_fAutoAcceptIncoming, fname);
+	
+	saveInt("DontShowDialogs", m_dontShowDialogs, fname);
 
 	//adzm 2009-07-19
 	saveInt("AutoAcceptNoDSM", m_fAutoAcceptNoDSM, fname);
@@ -1281,6 +1286,8 @@ void VNCOptions::LoadOptions(char* fname)
 	m_useAllMonitors = readInt("useAllMonitors", m_useAllMonitors, fname);
 	m_requestedWidth = readInt("requestedWidth", m_requestedWidth, fname);
 	m_requestedHeight = readInt("requestedHeight", m_requestedHeight, fname);
+	m_dontShowDialogs = readInt("DontShowDialogs", (int)m_dontShowDialogs, fname) ? true : false;
+	g_dont_show_dialogs = m_dontShowDialogs;
 
 	GetPrivateProfileString("options", "DSMPlugin", "NoPlugin", m_szDSMPluginFilename, MAX_PATH, fname);
 	GetPrivateProfileString("options", "folder", m_document_folder, m_document_folder, MAX_PATH, fname);

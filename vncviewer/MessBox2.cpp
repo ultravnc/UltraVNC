@@ -30,6 +30,7 @@
 char *infomsg2;
 int g_error_nr2;
 bool	g_disable_sponsor=false;
+bool    g_dont_show_dialogs=false;
 // Process the About dialog.
 static LRESULT CALLBACK MessageDlgProc2(HWND hwnd, UINT iMsg, 
 										   WPARAM wParam, LPARAM lParam) {
@@ -90,6 +91,12 @@ void ShowMessageBox2(char *info,int error_nr)
 {
 	infomsg2=info;
 	g_error_nr2=error_nr;
+	
+	if (g_dont_show_dialogs) 
+	{
+		return;
+	}
+	
 	if (g_disable_sponsor)
 	{
 	int res = DialogBox(pApp->m_instance, 
