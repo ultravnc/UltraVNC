@@ -43,8 +43,9 @@ IDB_EXPAND              BITMAP                  "res/down.bmp"
 //
 
 IDD_TEXTCHAT_DLG DIALOGEX 0, 0, 308, 177
-STYLE DS_SETFONT | DS_3DLOOK | DS_CENTER | WS_POPUP | WS_CAPTION | WS_THICKFRAME
-CAPTION " Chat - UltraVNC"
+STYLE DS_SETFONT | DS_3DLOOK | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "UltraVNC Server - Chat"
 FONT 11, "Arial", 400, 0, 0x0
 BEGIN
     EDITTEXT        IDC_INPUTAREA_EDIT,4,135,255,39,ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN | NOT WS_BORDER | WS_VSCROLL,WS_EX_STATICEDGE
@@ -59,7 +60,7 @@ END
 IDD_LIST_DLG DIALOGEX 0, 0, 288, 123
 STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOOLWINDOW
-CAPTION " List of Clients - UltraVNC"
+CAPTION "UltraVNC Server -  List Clients"
 FONT 11, "Arial", 400, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "Close",IDOK,118,94,50,14
@@ -72,25 +73,27 @@ BEGIN
     LISTBOX         IDC_PENDING_LISTBOX,175,16,103,93,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP,WS_EX_STATICEDGE
 END
 
-IDD_ABOUT DIALOGEX 0, 0, 282, 158
+IDD_ABOUT DIALOGEX 0, 0, 326, 146
 STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION " About WinVNC"
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "UltraVNC Server - About"
 FONT 11, "Arial", 400, 0, 0x0
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,8,135,54,16
-    CONTROL         IDB_LOGO64,IDC_VNCLOGO,"Static",SS_BITMAP | SS_CENTERIMAGE,7,5,53,46
-    LTEXT           "UltraVNC Server 1.4.3.7",IDC_VERSION,73,5,145,11
-    LTEXT           "Copyright © 2002-2020 UltraVNC Team\nCopyright © 2001-2002 Sam - eSVNC \nCopyright © 1999-2002 Rudi D. V. - VdaccVNC \nCopyright © 2001 Harakan Software - PalmVNC\nCopyright © 1999-2002 Const. Kaplinsky - TightVNC \n",IDC_NAME,74,27,202,41
-    LTEXT           "For more Information and Links please visit: \nhttps://www.uvnc.com",IDC_WWW,74,135,201,19
-    LTEXT           "Build:",IDC_BUILDTEXT,74,16,20,10
-    LTEXT           "BuildTime",IDC_BUILDTIME,97,16,92,10
-    LTEXT           "Copyright © 2002 RealVNC Ltd. - RealVNC\nCopyright © 1999-2002 Tridia Corporation - TridiaVNC \nCopyright © 1994-2001 AT&&T Laboratories Cambridge/Olivetti Research Ltd. - VNC",IDC_STATIC,74,67,203,32
-    LTEXT           "Copyright © 1990-2002 Info-ZIP\nCopyright © 1996-2002 Markus Franz Xaver Johannes Oberhumer - Mini LZO library",IDC_STATIC,74,99,200,27
+    DEFPUSHBUTTON   "OK",IDOK,258,125,54,16
+    CONTROL         IDB_LOGO64,IDC_VNCLOGO,"Static",SS_BITMAP | SS_CENTERIMAGE,7,5,39,25,WS_EX_TRANSPARENT
+    LTEXT           "UltraVNC Server 1.4.3.7",IDC_VERSION,48,5,145,11
+    LTEXT           "Copyright © 2002-2024 UltraVNC Team Members\nCopyright © 2001-2002 Sam - eSVNC \nCopyright © 1999-2002 Rudi D. V. - VdaccVNC \nCopyright © 2001 Harakan Software - PalmVNC\nCopyright © 1999-2002 Const. Kaplinsky - TightVNC \n",IDC_NAME,49,32,202,41
+    LTEXT           "For more Information and Links please visit: \nhttps://uvnc.com/",IDC_WWW,7,127,201,19
+    LTEXT           "Build:",IDC_BUILDTEXT,48,16,20,10
+    LTEXT           "BuildTime",IDC_BUILDTIME,72,16,92,10
+    LTEXT           "Copyright © 2002 RealVNC Ltd. - RealVNC\nCopyright © 1999-2002 Tridia Corporation - TridiaVNC \nCopyright © 1994-2001 AT&&T Laboratories Cambridge/Olivetti Research Ltd. - VNC",IDC_STATIC,49,72,270,32
+    LTEXT           "Copyright © 1990-2002 Info-ZIP\nCopyright © 1996-2002 Markus Franz Xaver Johannes Oberhumer - Mini LZO library",IDC_STATIC,49,96,200,27
 END
 
 IDD_OUTGOING_CONN DIALOGEX 0, 0, 223, 88
 STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
-CAPTION "Initiate Connection"
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "UltraVNC Server - Initiate Connection"
 FONT 11, "Arial", 400, 0, 0x0
 BEGIN
     CTEXT           "",IDC_CAPTION_STATIC,7,6,209,15,NOT WS_VISIBLE
@@ -105,12 +108,12 @@ END
 IDD_ACCEPT_CONN DIALOGEX 0, 0, 186, 95
 STYLE DS_SYSMODAL | DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION
 EXSTYLE WS_EX_TOPMOST
-CAPTION "Accept WinVNC Connection?"
+CAPTION "UltraVNC Server - Accept connection"
 FONT 11, "Arial", 400, 0, 0x0
 BEGIN
     PUSHBUTTON      "&Accept",IDACCEPT,7,74,53,14
     DEFPUSHBUTTON   "&Reject",IDREJECT,130,74,49,14
-    LTEXT           "WinVNC has received an incoming connection from",IDC_STATIC_TEXT1,7,7,107,36
+    LTEXT           "UltraVNC Server has received an incoming connection from",IDC_STATIC_TEXT1,7,7,107,36
     CTEXT           "<unknown host>",IDC_ACCEPT_IP,5,47,172,9,SS_CENTERIMAGE
     CTEXT           "Do you wish to Accept or Reject the connection?",IDC_STATIC_TEXT,7,58,172,15,SS_CENTERIMAGE
     CTEXT           "AutoReject:",IDC_ACCEPT_TIMEOUT,60,74,70,14,SS_CENTERIMAGE
@@ -119,7 +122,8 @@ END
 
 IDD_PROPERTIES DIALOGEX 0, 0, 241, 196
 STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_CENTER | WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
-CAPTION " UltraVNC Server Property Page"
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION " UltraVNC Server - Property Page"
 FONT 11, "Arial", 400, 0, 0x0
 BEGIN
     CONTROL         "Poll Full Screen",IDC_POLL_FULLSCREEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,13,112,13
@@ -146,9 +150,10 @@ BEGIN
     LTEXT           "60",IDC_STATICFPS,214,98,9,8
 END
 
-IDD_PROPERTIES1 DIALOGEX 0, 0, 660, 492
+IDD_PROPERTIES1 DIALOGEX 0, 0, 444, 492
 STYLE DS_SETFONT | DS_3DLOOK | DS_CENTER | WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_VSCROLL | WS_HSCROLL | WS_SYSMENU | WS_THICKFRAME
-CAPTION " UltraVNC Server Property Page"
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION " UltraVNC Server - Property Page"
 FONT 11, "Arial", 400, 0, 0x0
 BEGIN
     CONTROL         "Enable connections",IDC_CONNECT_SOCK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,85,75,11
@@ -198,7 +203,7 @@ BEGIN
     CONTROL         "DisableTrayIcon",IDC_DISABLETRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,237,411,67,10
     CONTROL         "Disable clients options in tray icon menu",IDC_ALLOWEDITCLIENTS,
                     "Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_DISABLED | WS_TABSTOP,237,447,141,10
-    CONTROL         "Forbid the user to close down WinVNC",IDC_ALLOWSHUTDOWN,
+    CONTROL         "Forbid the user to close down UltraVNC Server",IDC_ALLOWSHUTDOWN,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,237,423,151,10
     LTEXT           "Default Server Screen Scale:",IDC_STATIC,252,464,84,8
     LTEXT           "1 / ",IDC_STATIC,327,464,12,8
@@ -264,7 +269,8 @@ END
 
 IDD_DIALOGCLOUD DIALOGEX 0, 0, 311, 103
 STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Cloud connect"
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "UltraVNC Server - Cloud connect"
 FONT 11, "Arial", 400, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "Save",IDOK,253,82,50,14
@@ -284,7 +290,7 @@ END
 IDC_TITLEWINDOW DIALOGEX 0, 0, 269, 206
 STYLE DS_SYSMODAL | DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | WS_CAPTION
 EXSTYLE WS_EX_TOPMOST | WS_EX_TRANSPARENT | WS_EX_TOOLWINDOW
-CAPTION "UltraVNC SC 2.0"
+CAPTION "UltraVNC - SC 2.0"
 FONT 11, "Arial", 400, 0, 0x0
 BEGIN
     CONTROL         "List1",IDC_LIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_NOLABELWRAP | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,4,0,171,120
@@ -303,7 +309,8 @@ END
 
 IDD_MSLOGON DIALOGEX 0, 0, 186, 166
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "MS login setup"
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "UltraVNC Server - MS login setup"
 FONT 11, "Arial", 400, 0, 0x0
 BEGIN
     GROUPBOX        "",IDC_STATIC,5,0,178,74
@@ -357,7 +364,7 @@ BEGIN
     IDD_ABOUT, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 275
+        RIGHTMARGIN, 319
         VERTGUIDE, 80
         VERTGUIDE, 90
         VERTGUIDE, 100
@@ -367,7 +374,7 @@ BEGIN
         HORZGUIDE, 20
         HORZGUIDE, 30
         HORZGUIDE, 40
-        HORZGUIDE, 50
+        HORZGUIDE, 47
         HORZGUIDE, 60
         HORZGUIDE, 70
         HORZGUIDE, 80
@@ -415,7 +422,7 @@ BEGIN
 
     IDD_PROPERTIES1, DIALOG
     BEGIN
-        RIGHTMARGIN, 592
+        RIGHTMARGIN, 431
         VERTGUIDE, 7
         VERTGUIDE, 14
         VERTGUIDE, 62
@@ -448,6 +455,10 @@ BEGIN
         VERTGUIDE, 51
         VERTGUIDE, 58
         VERTGUIDE, 175
+    END
+
+    IDD_MSLOGON, DIALOG
+    BEGIN
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -533,7 +544,7 @@ BEGIN
         MENUITEM "&Properties",                 ID_PROPERTIES
         MENUITEM "&Administrator Properties",   ID_ADMIN_PROPERTIES
         MENUITEM SEPARATOR
-        MENUITEM "&About WinVNC",               ID_ABOUT
+        MENUITEM "&About UltraVNC Server",      ID_ABOUT
         POPUP "Visit our site"
         BEGIN
             MENUITEM "Homepage",                    ID_VISITUSONLINE_HOMEPAGE
@@ -560,7 +571,7 @@ IDR_TRAYMENU1 MENU
 BEGIN
     POPUP "tray"
     BEGIN
-        MENUITEM "&About WinVNC",               ID_ABOUT
+        MENUITEM "&About UltraVNC Server",      ID_ABOUT
         MENUITEM SEPARATOR
         MENUITEM "&Close VNC Connections",      ID_CLOSE
     END
@@ -678,61 +689,61 @@ IDI_FLASH               ICON                    "res/icon2.ico"
 
 STRINGTABLE
 BEGIN
-    IDI_WINVNC              "WinVNC"
+    IDI_WINVNC              "UltraVNC Server"
     IDS_WARNING             "WARNING: By default, this session do not use any encryption whatsoever. Please do not use it to send sensitive data unless you are sure your connection is secure.\n\n"
 END
 
 STRINGTABLE
 BEGIN
     ID_FAILED_INIT          "Failed to initialize the socket system"
-    ID_WINVNC_USAGE         "WinVNC Usage"
-    ID_ANOTHER_INST         "Another instance of WinVNC is already running"
-    ID_NO_EXIST_INST        "No existing instance of WinVNC could be contacted"
-    ID_UNABLE_INST          "Unable to install WinVNC service"
-    ID_SCM_NOT_HERE         "The SCM could not be contacted - the WinVNC service was not installed"
-    ID_SERV_NOT_REG         "The WinVNC service could not be registered"
-    ID_SERV_FAIL_ST         "The WinVNC service failed to start"
+    ID_WINVNC_USAGE         "UltraVNC Server Usage"
+    ID_ANOTHER_INST         "Another instance of UltraVNC Server is already running"
+    ID_NO_EXIST_INST        "No existing instance of UltraVNC Server could be contacted"
+    ID_UNABLE_INST          "Unable to install UltraVNC Server service"
+    ID_SCM_NOT_HERE         "The SCM could not be contacted - the UltraVNC Server service was not installed"
+    ID_SERV_NOT_REG         "The UltraVNC Server service could not be registered"
+    ID_SERV_FAIL_ST         "The UltraVNC Server service failed to start"
 END
 
 STRINGTABLE
 BEGIN
-    ID_SERV_CT_MISS         "The Service Control Manager could not be contacted - the WinVNC service was not registered"
-    ID_SERV_OLD_REG         "The WinVNC service is already registered"
+    ID_SERV_CT_MISS         "The Service Control Manager could not be contacted - the UltraVNC Server service was not registered"
+    ID_SERV_OLD_REG         "The UltraVNC Server service is already registered"
     ID_SERVHELP_UNAB        "WARNING:Unable to install the ServiceHelper hook\nGlobal user-specific registry settings will not be loaded"
-    ID_SERV_CT_UNREG        "The Service Control Manager could not be contacted - the WinVNC service was not unregistered"
-    ID_SERV_NOT_UNRG        "The WinVNC service could not be unregistered"
-    ID_SERV_NCONTACT        "The WinVNC service could not be contacted"
+    ID_SERV_CT_UNREG        "The Service Control Manager could not be contacted - the UltraVNC Server service was not unregistered"
+    ID_SERV_NOT_UNRG        "The UltraVNC Server service could not be unregistered"
+    ID_SERV_NCONTACT        "The UltraVNC Server service could not be contacted"
     ID_SERVHELP_NREM        "WARNING:The ServiceHelper hook entry could not be removed from the registry"
-    ID_SERV_NOT_STOP        "The WinVNC service could not be stopped"
-    ID_SERV_MK_UNREG        "The WinVNC service is already marked to be unregistered"
-    ID_SERV_NT_FOUND        "The WinVNC service could not be found"
-    ID_WINVNC_ERROR         "WinVNC Error"
-    ID_WINVNC_WARNIN        "WinVNC Warning"
+    ID_SERV_NOT_STOP        "The UltraVNC Server service could not be stopped"
+    ID_SERV_MK_UNREG        "The UltraVNC Server service is already marked to be unregistered"
+    ID_SERV_NT_FOUND        "The UltraVNC Server service could not be found"
+    ID_WINVNC_ERROR         "UltraVNC Server Error"
+    ID_WINVNC_WARNIN        "UltraVNC Server Warning"
     ID_PLUGIN_LOADIN        "Plugin Loading"
     ID_NO_PASSWD_NO_OVERRIDE_ERR 
-                            "No password has been set & this machine has been preconfigured to prevent users from setting their own.\nYou must contact a System Administrator to configure WinVNC properly."
+                            "No password has been set & this machine has been preconfigured to prevent users from setting their own.\nYou must contact a System Administrator to configure UltraVNC Server properly."
     ID_NO_PASSWD_NO_OVERRIDE_WARN 
                             "WARNING : This machine has been preconfigured to allow unauthenticated\nconnections to be accepted and to prevent users from enabling authentication."
     ID_NO_PASSWD_NO_LOGON_WARN 
-                            "WARNING : This machine has no default password set.  WinVNC will present the Default Properties dialog now to allow one to be entered."
+                            "WARNING : This machine has no default password set.  UltraVNC Server will present the Default Properties dialog now to allow one to be entered."
 END
 
 STRINGTABLE
 BEGIN
-    ID_NO_OVERRIDE_ERR      "This machine has been preconfigured with WinVNC settings, which cannot be overridden by individual users.  The preconfigured settings may be modified only by a System Administrator."
-    ID_NO_CURRENT_USER_ERR  "The WinVNC settings for the current user are unavailable at present."
+    ID_NO_OVERRIDE_ERR      "This machine has been preconfigured with UltraVNC Server settings, which cannot be overridden by individual users.  The preconfigured settings may be modified only by a System Administrator."
+    ID_NO_CURRENT_USER_ERR  "The UltraVNC Server settings for the current user are unavailable at present."
     ID_CANNOT_EDIT_DEFAULT_PREFS 
-                            "You do not have sufficient privileges to edit the default local WinVNC settings."
-    ID_NO_PASSWORD_WARN     "WARNING : Running WinVNC without setting a password is a dangerous security risk!\nUntil you set a password, WinVNC will not accept incoming connections."
+                            "You do not have sufficient privileges to edit the default local UltraVNC Server settings."
+    ID_NO_PASSWORD_WARN     "WARNING : Running UltraVNC Server without setting a password is a dangerous security risk!\nUntil you set a password, UltraVNC Server will not accept incoming connections."
     ID_PLUGIN_NOT_LOAD      "The Plugin cannot be loaded.\n\rPlease check its integrity."
     ID_MB1                  "MB1"
     ID_WVNC                 "WVNC"
     ID_AUTHAD_NOT_FO        "You selected ms-login, but the authad.dll\nwas not found.Check you installation"
     ID_WARNING              "WARNING"
     ID_AUTH_NOT_FO          "You selected ms-login, but the auth.dll\nwas not found.Check you installation"
-    ID_DESKTOP_BITBLT_ROOT  "vncDesktop : root device doesn't support BitBlt\nWinVNC cannot be used with this graphic device driver"
-    ID_DESKTOP_BITBLT_MEM   "vncDesktop : memory device doesn't support GetDIBits\nWinVNC cannot be used with this graphics device driver"
-    ID_DESKTOP_PLANAR_NOTC  "vncDesktop : current display is PLANAR, not CHUNKY!\nWinVNC cannot be used with this graphics device driver"
+    ID_DESKTOP_BITBLT_ROOT  "vncDesktop : root device doesn't support BitBlt\nUltraVNC Server cannot be used with this graphic device driver"
+    ID_DESKTOP_BITBLT_MEM   "vncDesktop : memory device doesn't support GetDIBits\nUltraVNC Server cannot be used with this graphics device driver"
+    ID_DESKTOP_PLANAR_NOTC  "vncDesktop : current display is PLANAR, not CHUNKY!\nUltraVNC Server cannot be used with this graphics device driver"
     ID_FAILED_CONNECT_LISTING_VIEW "Failed to connect to listening VNC viewer"
     ID_OUTGOING_CONNECTION  "Outgoing Connection"
     ID_UNABLE_PROC_MSLOGON  "Unable to process MS login"
@@ -742,15 +753,15 @@ STRINGTABLE
 BEGIN
     ID_RICHED32_UNLOAD      "Unable to load the Rich Edit (RICHED32.DLL) control!"
     ID_RICHED32_DLL_LD      "Rich Edit Dll Loading"
-    ID_SERV_SUCCESS_INST    "The WinVNC service was successfully installed\nThe service will start now and will automatically\nbe run the next time this machine is reset"
-    ID_SERV_SUCCESS_REG     "The WinVNC service was successfully registered\nThe service may be started from the Control Panel, and will\nautomatically be run the next time this machine is reset"
-    ID_SERV_SUCCESS_UNREG   "The WinVNC service has been unregistered"
+    ID_SERV_SUCCESS_INST    "The UltraVNC Server service was successfully installed\nThe service will start now and will automatically\nbe run the next time this machine is reset"
+    ID_SERV_SUCCESS_REG     "The UltraVNC Server service was successfully registered\nThe service may be started from the Control Panel, and will\nautomatically be run the next time this machine is reset"
+    ID_SERV_SUCCESS_UNREG   "The UltraVNC Server service has been unregistered"
     ID_ULTRAVNC_TEXTCHAT    "The selected client is not an UltraVNC Viewer !\nIt presumably does not support TextChat\n"
     ID_ULTRAVNC_WARNING     "UltraVNC Warning"
     ID_NO_PLUGIN_DETECT     "No Plugin detected..."
     ID_CHAT_WITH_S_ULTRAVNC " Chat with <%s> - UltraVNC"
-    ID_CURRENT_USER_PROP    "WinVNC: Current User Properties"
-    ID_DEFAULT_SYST_PROP    "WinVNC: Default Local System Properties"
+    ID_CURRENT_USER_PROP    "UltraVNC Server: Current User Properties"
+    ID_DEFAULT_SYST_PROP    "UltraVNC Server: Default Local System Properties"
     ID_AUTOREJECT_U         "AutoReject:%u"
     ID_AUTOACCEPT_U         "AutoAccept:%u"
     ID_CADERROR             "Ctrl-alt-del require service, no permission"

@@ -36,6 +36,7 @@
 #ifdef _CLOUD
 #include "../UdtCloudlib/proxy/Cloudthread.h"
 #endif
+#include "AboutBox.h"
 
 #define SESSION_MRU_KEY_NAME _T("Software\\ORL\\VNCviewer\\MRU")
 #define NUM_MRU_ENTRIES 8
@@ -227,6 +228,9 @@ BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_COMMAND:
 		switch (LOWORD(wParam))
 		{
+		case IDC_ABOUT:
+			ShowAboutBox();
+			break;
 		case IDC_RADIOREPEATER:
 		case IDC_RADIODIRECT:
 			_this->ModeSwitch(hwnd, wParam);
