@@ -421,6 +421,7 @@ void SessionDialog::DpiChange(HWND hDlg)
 		wndDefaultBox = GetDlgItem(hDlg, IDC_DEFAULTBOX);
 		if (wndDefaultBox == NULL) return;
 		GetWindowRect(wndDefaultBox, &rcDefaultBox);
+		rcDefaultBox.left += 2;
 		cx = rcDefaultBox.right - rcWnd.left; // OK
 		// cy = rcWnd.bottom - rcWnd.top;  // not OK, toDo  size wrong after dpichange
 	}
@@ -442,12 +443,11 @@ void SessionDialog::ExpandBox(HWND hDlg, BOOL fExpand)
 
 	wndDefaultBox = GetDlgItem(hDlg, IDC_DEFAULTBOX);
 	if (wndDefaultBox == NULL) return;
-
 	if (!fExpand) SendMessage(GetDlgItem(hDlg, IDC_BUTTON_EXPAND), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)hBmpExpand);
 	else SendMessage(GetDlgItem(hDlg, IDC_BUTTON_EXPAND), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)hBmpCollaps);
 	// retrieve coordinates for the default child window
 	GetWindowRect(wndDefaultBox, &rcDefaultBox);
-
+	rcDefaultBox.left += 2;
 	// enable/disable all of the child window outside of the default box.
 	wndChild = GetTopWindow(hDlg);
 
@@ -579,7 +579,7 @@ void SessionDialog::InitDlgProc(bool loadhost, bool initMruNeeded)
 		0,                         // nEscapement
 		0,                         // nOrientation
 		FW_BOLD,                 // nWeight
-		TRUE,                     // bItalic
+		false,                     // bItalic
 		FALSE,                     // bUnderline
 		0,                         // cStrikeOut
 		ANSI_CHARSET,              // nCharSet
