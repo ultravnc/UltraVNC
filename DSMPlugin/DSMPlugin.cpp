@@ -75,7 +75,7 @@
 #include <limits.h>
 #include <memory>
 #ifdef SC_20
-#include "../loadmemory/loadDllFromMemory.h"
+#include "./winvnc/loadmemory/loadDllFromMemory.h"
 #endif
 //
 // Utils
