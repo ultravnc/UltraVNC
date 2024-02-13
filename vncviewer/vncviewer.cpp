@@ -38,6 +38,7 @@
 #include "omnithread/omnithread.h"
 #include "VNCviewerApp32.h"
 #include "shellscalingapi.h"
+#include "UltraVNCMessageBox.h"
 
 // All logging is done via the log object
 Log vnclog;
@@ -295,6 +296,7 @@ char sz_M5[64];
 char sz_M6[64];
 char sz_M7[64];
 char sz_M8[64];
+
 
 bool command_line=true;
 bool g_passwordfailed=true;
@@ -742,7 +744,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR szCmdLin
     LoadString(m_hInstResDLL, IDS_H101, sz_H101, 64 -1);
     LoadString(m_hInstResDLL, IDS_H102, sz_H102, 128 -1);
 //	RegisterLinkLabel(m_hInstResDLL);
-
+	loadStrings(m_hInstResDLL);
 
 	/////////////////////////////////////////////////////////////
 

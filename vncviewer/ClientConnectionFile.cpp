@@ -32,6 +32,7 @@
 //EndAaronP
 
 #include "vncauth.h"
+#include "UltraVNCMessageBox.h"
 
 extern char sz_K1[64];
 extern char sz_K2[64];
@@ -110,11 +111,9 @@ void ClientConnection::SaveConnection()
 	ret = WritePrivateProfileString("connection", "proxyhost", m_proxyhost, fname);
 	sprintf_s(buf, "%d", m_proxyport);
 	WritePrivateProfileString("connection", "proxyport", buf, fname);
-
-	if (MessageBox(m_hwndcn,
-		sz_K3,  
-		sz_K4, 
-		MB_YESNO | MB_ICONWARNING) == IDYES) 
+	BOOL bCheckboxChecked;
+	int yes = yesnoBox(m_pApp->m_instance, m_hwndcn, sz_K3, sz_K4, str50287, str50288, "", bCheckboxChecked);
+	if (yes)
 	{
 		for (int i = 0; i < MAXPWLEN; i++) {
 			sprintf_s(buf+i*2, 32-i*2, "%02x", (unsigned int) m_encPasswd[i]);

@@ -624,6 +624,20 @@
 #define IDS_H101                        50272
 #define IDS_H102                        50273
 #define IDS_L94                         50274
+#define IDS_STRING50275                 50275
+#define IDS_STRING50276                 50276
+#define IDS_STRING50277                 50277
+#define IDS_STRING50278                 50278
+#define IDS_STRING50279                 50279
+#define IDS_STRING50280                 50280
+#define IDS_STRING50281                 50281
+#define IDS_STRING50282                 50282
+#define IDS_STRING50283                 50283
+#define IDS_STRING50284                 50284
+#define IDS_STRING50285                 50285
+#define IDS_STRING50286                 50286
+#define IDS_STRING50287                 50287
+#define IDS_STRING50288                 50288
 
 // Next default values for new objects
 // 

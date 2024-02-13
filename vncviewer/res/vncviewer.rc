@@ -1408,7 +1408,7 @@ BEGIN
     IDS_J2                  "UltraVNC Viewer full-screen mode"
     IDS_K2                  "Error saving file"
     IDS_K1                  "Invalid filename"
-    IDS_K3                  "Do you want to save the password in this file?\n\r (Yes) Saving a password to a file is insecure."
+    IDS_K3                  "Do you want to save the password in this file?\n\r Saving a password to a file is insecure."
 END
 
 STRINGTABLE
@@ -1507,8 +1507,8 @@ BEGIN
     IDS_L72                 "VNC Viewer Status for"
     IDS_L73                 "VNC Viewer Status"
     IDS_L74                 "No Connection"
-    IDS_L75                 "Are you sure you want to exit?"
-    IDS_L76                 "Closing UltraVNC Viewer"
+    IDS_L75                 "Are you certain you wish to exit?"
+    IDS_L76                 "This action will close the UltraVNC Viewer"
 END
 
 STRINGTABLE
@@ -1576,6 +1576,24 @@ BEGIN
     IDS_H101                "Folder Transfer Warning"
     IDS_H102                "a file or folder of that name already exists."
     IDS_L94                 "Server closed connection"
+    IDS_STRING50275         "The server does not support encryption, despite the viewer's request for it."
+    IDS_STRING50276         "Do you want to continue?"
+    IDS_STRING50277         "Accept insecure connection"
+    IDS_STRING50278         "Refuse insecure connection"
+    IDS_STRING50279         "Don't ask anymore, always allow insecure connection."
+    IDS_STRING50280         "Accept incoming Connection"
+    IDS_STRING50281         "Refuse incoming connection"
+    IDS_STRING50282         "Incoming connection"
+    IDS_STRING50283         "The server has been configured without authentication. Can it be trusted?"
+    IDS_STRING50284         "Do you  trust it and connect without authentication"
+    IDS_STRING50285         "Don't make a connection"
+    IDS_STRING50286         "Security"
+    IDS_STRING50287         "Yes i want to save the password "
+END
+
+STRINGTABLE
+BEGIN
+    IDS_STRING50288         "No, save without password"
 END
 
 #endif    // English (United States) resources

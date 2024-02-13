@@ -66,6 +66,7 @@ extern "C" {
 #ifdef _CLOUD
 #include "../UdtCloudlib/proxy/Cloudthread.h"
 #endif
+#include "UltraVNCMessageBox.h"
 
 // [v1.0.2-jp1 fix]
 #pragma comment(lib, "imm32.lib")
@@ -2576,9 +2577,9 @@ void ClientConnection::NegotiateProtocolVersion()
 			if (!m_opts->m_fAutoAcceptNoDSM)
 			{
 				//adzm 2009-07-19 - Auto-accept the connection if it is unencrypted if that option is specified
-
-				int returnvalue=MessageBox(m_hwndMain, "You have specified an encryption plugin, however this connection is unencrypted! Do you want to continue?", "Accept insecure connection", MB_YESNO | MB_ICONEXCLAMATION | MB_TOPMOST);
-				if (returnvalue==IDNO)
+				BOOL bCheckboxChecked;
+				bool  yes = yesnoBox(m_pApp->m_instance, m_hwndMain, str50275, str50276, str50277, str50278, str50279, bCheckboxChecked);
+				if (!yes)
 				{
 					throw WarningException("You refused the insecure connection.");
 				}
@@ -2708,8 +2709,9 @@ void ClientConnection::NegotiateProtocolVersion()
 
 		//adzm 2009-06-21 - auto-accept if specified
 		if (!m_opts->m_fAutoAcceptIncoming) {
-			int returnvalue=MessageBox(m_hwndMain,   mytext,"Accept Incoming SC Connection", MB_YESNO |  MB_TOPMOST);
-			if (returnvalue==IDNO)
+			BOOL bCheckboxChecked;
+			int yes= yesnoBox(m_pApp->m_instance, m_hwndMain, str50282, mytext, str50280, str50281, "", bCheckboxChecked);
+			if (!yes)
 			{
 				int nummer=0;
 				WriteExact((char *)&nummer,sizeof(int));
@@ -2968,8 +2970,9 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 
 			//adzm 2009-07-19 - Auto-accept the connection if it is unencrypted if that option is specified
 			if (!m_opts->m_fAutoAcceptNoDSM) {
-				int returnvalue=MessageBox(m_hwndMain, "You have specified an encryption plugin, however this connection is unencrypted! Do you want to continue?", "Accept insecure connection", MB_YESNO | MB_ICONEXCLAMATION | MB_TOPMOST);
-				if (returnvalue==IDNO)
+				BOOL bCheckboxChecked;
+				bool  yes = yesnoBox(m_pApp->m_instance, m_hwndMain, str50275, str50276, str50277, str50278, str50279, bCheckboxChecked);
+				if (!yes)
 				{
 					throw WarningException("You refused the insecure connection.");
 				}
@@ -3032,8 +3035,9 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 	case rfbNoAuth:				
 		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L92);
 		vnclog.Print(0, _T("No authentication needed\n"));
-
-		if (!m_Is_Listening && !m_pApp->m_options.m_AllowUntrustedServers  && MessageBox(m_hwndMain, "The Server has been setup without authentication, do you trust this server?", "Accept server without authentification", MB_YESNO | MB_ICONEXCLAMATION | MB_TOPMOST) == IDNO)
+		BOOL bCheckboxChecked;
+		if (!m_Is_Listening && !m_pApp->m_options.m_AllowUntrustedServers  && 
+			yesnoBox(m_pApp->m_instance, m_hwndMain, str50286, str50283, str50284, str50285, str50279, bCheckboxChecked) == false) 
 		{
 			throw WarningException("You refused a untrusted server.");
 		}
@@ -3645,9 +3649,10 @@ void ClientConnection::AuthSCPrompt()
 
 	//adzm 2009-06-21 - auto-accept if specified
 	int accepted = 0;
+	BOOL bCheckboxChecked;
 	if (!m_opts->m_fAutoAcceptIncoming) {
-		int returnvalue=MessageBox(m_hwndMain,   mytext,"Accept Incoming SC Connection", MB_YESNO |  MB_TOPMOST);
-		if (returnvalue != IDNO)
+		int yes = yesnoBox(m_pApp->m_instance, m_hwndMain, str50282, mytext, str50280, str50281, "", bCheckboxChecked);
+		if (!yes)
 		{
 			accepted = 1;
 		}
