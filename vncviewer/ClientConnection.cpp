@@ -3722,8 +3722,9 @@ void ClientConnection::ReadServerInit(bool reconnect)
     m_desktopName = new TCHAR[2024];
 	m_desktopName_viewonly = new TCHAR[2024];
 	if (m_si.nameLength > 2024) {
-		int msgboxID = MessageBox(NULL,"Server is trying yo overload a memory buffer.\nPossible exploit","Error", MB_OKCANCEL |MB_ICONINFORMATION);
-		if (msgboxID == IDCANCEL)
+		BOOL bCheckboxChecked;
+		bool yes = yesnoUVNCMessageBox(NULL, str50289, str50290, str50293, str50294, "", bCheckboxChecked);
+		if (!yes)
 			exit(0);
 		m_si.nameLength = 2024;
 	}
@@ -5477,7 +5478,7 @@ void* ClientConnection::run_undetached(void* arg) {
 				m_pTextChat->m_fTextChatRunning = false;
 				m_pFileTransfer->m_fFileTransferRunning = false;
 				m_bKillThread = true;
-				MessageBox(m_hwndMain, "Filetransfer interupted: reason connection with server broken", "Warning", MB_ICONEXCLAMATION | MB_TOPMOST);
+				yesUVNCMessageBox(m_hwndMain, str50295, str50296, MB_ICONEXCLAMATION);
 				PostMessage(m_hwndMain, WM_CLOSE, 0, 1);
 				return this;
 			}
@@ -5510,7 +5511,7 @@ void* ClientConnection::run_undetached(void* arg) {
 					m_pTextChat->m_fTextChatRunning = false;
 					m_pFileTransfer->m_fFileTransferRunning = false;
 					m_bKillThread = true;
-					MessageBox(m_hwndMain, "Filetransfer interupted: reason connection with server broken", "Warning",  MB_ICONEXCLAMATION | MB_TOPMOST);
+					yesUVNCMessageBox(m_hwndMain, str50295, str50296,  MB_ICONEXCLAMATION);
 					PostMessage(m_hwndMain, WM_CLOSE, 0, 1);
 					return this;
 				}
@@ -7250,8 +7251,9 @@ void ClientConnection::ReadNewFBSize(rfbFramebufferUpdateRectHeader *pfburh)
 	m_fScalingDone = false;
 
 	if (m_si.framebufferWidth > 20000 || m_si.framebufferHeight > 20000) { // a screensize > 20 000 is not possible with current OS
-		int msgboxID = MessageBox(NULL, "Server is sending a screensize with height or with > 20000", "Error", MB_OKCANCEL | MB_ICONINFORMATION);
-		if (msgboxID == IDCANCEL)
+		BOOL somebool;
+		bool yes = yesnoUVNCMessageBox(NULL, str50297, str50290, str50293, str50294, "",somebool);
+		if (!yes)
 			exit(0);
 		m_si.framebufferWidth = 1024;
 		m_si.framebufferHeight = 800;
@@ -10203,8 +10205,9 @@ bool ClientConnection::incorrectParameters(CARD16 width, CARD16 height, CARD16 x
 void ClientConnection::checkParemeters()
 {
 	if (m_si.framebufferWidth > 20000 || m_si.framebufferHeight > 20000) { // a screensize > 20 000 is not possible with current OS
-		int msgboxID = MessageBox(NULL, "Server is sending a screensize with height or with > 20000", "Error", MB_OKCANCEL | MB_ICONINFORMATION);
-		if (msgboxID == IDCANCEL)
+		BOOL somebool;
+		bool yes = yesnoUVNCMessageBox(NULL, str50297, str50290, str50293, str50294, "", somebool);
+		if (!yes)
 			exit(0);
 		m_si.framebufferWidth = 1024;
 		m_si.framebufferHeight = 800;

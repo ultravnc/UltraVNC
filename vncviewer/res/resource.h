@@ -638,6 +638,18 @@
 #define IDS_STRING50286                 50286
 #define IDS_STRING50287                 50287
 #define IDS_STRING50288                 50288
+#define IDS_STRING50289                 50289
+#define IDS_STRING50290                 50290
+#define IDS_STRING103                   50293
+#define IDS_STRING50293                 50293
+#define IDS_STRING104                   50294
+#define IDS_STRING50294                 50294
+#define IDS_STRING105                   50295
+#define IDS_STRING50295                 50295
+#define IDS_STRING106                   50296
+#define IDS_STRING50296                 50296
+#define IDS_STRING107                   50297
+#define IDS_STRING50297                 50297
 
 // Next default values for new objects
 // 

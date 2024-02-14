@@ -14,6 +14,13 @@ char str50285[128];
 char str50286[128];
 char str50287[128];
 char str50288[128];
+char str50289[128];
+char str50290[128];
+char str50293[128];
+char str50294[128];
+char str50295[128];
+char str50296[128];
+char str50297[128];
 extern HINSTANCE m_hInstResDLL;
 
 
@@ -33,6 +40,13 @@ void loadStrings(HINSTANCE m_hInstResDLL)
     LoadString(m_hInstResDLL, IDS_STRING50286, str50286, 128 - 1);
     LoadString(m_hInstResDLL, IDS_STRING50287, str50287, 128 - 1);
     LoadString(m_hInstResDLL, IDS_STRING50288, str50288, 128 - 1);
+    LoadString(m_hInstResDLL, IDS_STRING50289, str50289, 128 - 1);
+    LoadString(m_hInstResDLL, IDS_STRING50290, str50290, 128 - 1);
+    LoadString(m_hInstResDLL, IDS_STRING50293, str50293, 128 - 1);
+    LoadString(m_hInstResDLL, IDS_STRING50294, str50294, 128 - 1);
+    LoadString(m_hInstResDLL, IDS_STRING50295, str50295, 128 - 1);
+    LoadString(m_hInstResDLL, IDS_STRING50296, str50296, 128 - 1);
+    LoadString(m_hInstResDLL, IDS_STRING50297, str50297, 128 - 1);
 }
 
 bool yesnoUVNCMessageBox(HWND m_hWnd, char* szHeader, char* body, char* okStr, char* cancelStr, char* checkbox, BOOL &bCheckboxChecked)

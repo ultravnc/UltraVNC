@@ -1594,6 +1594,13 @@ END
 STRINGTABLE
 BEGIN
     IDS_STRING50288         "No, save without password"
+    IDS_STRING50289         "The server appears to be attempting to overload a memory buffer, indicating a potential exploit."
+    IDS_STRING50290         "Error"
+    IDS_STRING50293         "Try to continue"
+    IDS_STRING50294         "Exit"
+    IDS_STRING50295         "File transfer interrupted: Connection with server lost"
+    IDS_STRING50296         "Warning"
+    IDS_STRING50297         "The server is sending a screen size that exceeds the limits"
 END
 
 #endif    // English (United States) resources

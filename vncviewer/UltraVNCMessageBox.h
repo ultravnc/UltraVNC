@@ -30,6 +30,13 @@ extern char str50285[128];
 extern char str50286[128];
 extern char str50287[128];
 extern char str50288[128];
+extern char str50289[128];
+extern char str50290[128];
+extern char str50293[128];
+extern char str50294[128];
+extern char str50295[128];
+extern char str50296[128];
+extern char str50297[128];
 
 bool yesnoUVNCMessageBox(HWND m_hWnd, char* szHeader, char* body, char* okStr, char* cancelStr, char* checkbox, BOOL &bCheckboxChecked);
 void yesUVNCMessageBox(HWND m_hWnd, char* body, char* szHeader, int icon);

@@ -3991,7 +3991,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 				int nCount = ListView_GetSelectedCount(hWndLocalList);
 				if (nCount == 0 || nCount > 1)
 				{
-					MessageBox(	_this->hWnd,
+					yesUVNCMessageBox(	_this->hWnd,
 								sz_M1, 
 								sz_M2, MB_ICONINFORMATION);
 					break; 
@@ -4064,7 +4064,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 				int nCount = ListView_GetSelectedCount(hWndRemoteList);
 				if (nCount == 0 || nCount > 1)
 				{
-					MessageBox(	_this->hWnd,
+					yesUVNCMessageBox(	_this->hWnd,
 								sz_M1, 
 								sz_M2, MB_ICONINFORMATION);
 					break; 
