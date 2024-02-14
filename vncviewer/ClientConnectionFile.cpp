@@ -93,7 +93,7 @@ void ClientConnection::SaveConnection()
 			break;
 		case FNERR_INVALIDFILENAME:
 			strcpy_s(msg, sz_K1);
-			MessageBox(m_hwndcn, msg, sz_K2, MB_ICONERROR | MB_OK | MB_SETFOREGROUND | MB_TOPMOST);
+			yesUVNCMessageBox(m_hwndcn, msg, sz_K2, MB_ICONERROR);
 			break;
 		default:
 			vnclog.Print(0, "Error %d from GetSaveFileName\n", err);
@@ -112,7 +112,7 @@ void ClientConnection::SaveConnection()
 	sprintf_s(buf, "%d", m_proxyport);
 	WritePrivateProfileString("connection", "proxyport", buf, fname);
 	BOOL bCheckboxChecked;
-	int yes = yesnoBox(m_pApp->m_instance, m_hwndcn, sz_K3, sz_K4, str50287, str50288, "", bCheckboxChecked);
+	int yes = yesnoUVNCMessageBox(m_hwndcn, sz_K3, sz_K4, str50287, str50288, "", bCheckboxChecked);
 	if (yes)
 	{
 		for (int i = 0; i < MAXPWLEN; i++) {

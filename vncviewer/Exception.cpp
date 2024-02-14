@@ -79,7 +79,6 @@ void WarningException::Report()
 	_RPT1(_CRT_WARN, "Warning : %s\n", m_info);
 #endif
 	ShowMessageBox2(m_info,m_error_nr);
-	//MessageBox(NULL, m_info, " UltraVNC Info", MB_OK| MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TOPMOST);
 }
 
 // ---------------------------------------
@@ -100,5 +99,4 @@ void ErrorException::Report()
 	_RPT1(_CRT_WARN, "Warning : %s\n", m_info);
 #endif
 	ShowMessageBox2(m_info,m_error_nr);
-	//MessageBox(NULL, m_info, " UltraVNC Info", MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST);
 }

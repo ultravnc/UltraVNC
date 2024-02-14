@@ -26,6 +26,7 @@
 #include "SessionDialog.h"
 #include <shlobj.h>
 #include "common/win32_helpers.h"
+#include "UltraVNCMessageBox.h"
 
 BOOL CALLBACK DlgProcEncoders(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DlgProcKeyboardMouse(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -537,7 +538,7 @@ BOOL CALLBACK DlgProcSecurity(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 				}
 				else
 				{
-					MessageBox(hwnd, sz_F1, sz_F3, MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TOPMOST);
+					yesUVNCMessageBox(hwnd, sz_F1, sz_F3, MB_ICONEXCLAMATION);
 				}
 			}
 			return TRUE;
@@ -1475,7 +1476,7 @@ void SessionDialog::FixScaling()
 {
 	if (scale_num < 1 || scale_den < 1 || scale_num > 400 || scale_den > 100)
 	{
-		MessageBox(NULL, sz_D2, sz_D1, MB_OK | MB_TOPMOST | MB_ICONWARNING);
+		yesUVNCMessageBox(NULL, sz_D2, sz_D1, MB_ICONWARNING);
 		scale_num = 1;
 		scale_den = 1;
 		scaling = false;

@@ -14,6 +14,8 @@ char str50285[128];
 char str50286[128];
 char str50287[128];
 char str50288[128];
+extern HINSTANCE m_hInstResDLL;
+
 
 void loadStrings(HINSTANCE m_hInstResDLL)
 {
@@ -33,7 +35,7 @@ void loadStrings(HINSTANCE m_hInstResDLL)
     LoadString(m_hInstResDLL, IDS_STRING50288, str50288, 128 - 1);
 }
 
-bool yesnoBox(HINSTANCE hInst, HWND m_hWnd, char* szHeader, char* body, char* okStr, char* cancelStr, char* checkbox, BOOL &bCheckboxChecked)
+bool yesnoUVNCMessageBox(HWND m_hWnd, char* szHeader, char* body, char* okStr, char* cancelStr, char* checkbox, BOOL &bCheckboxChecked)
 {
     wchar_t w_header[128];
     wchar_t w_body[1024];
@@ -68,7 +70,7 @@ bool yesnoBox(HINSTANCE hInst, HWND m_hWnd, char* szHeader, char* body, char* ok
     tdc.pszWindowTitle = szTitle;
     tdc.nDefaultButton = 1001;
 
-    tdc.hInstance = hInst;
+    tdc.hInstance = m_hInstResDLL;
     tdc.pszMainIcon = MAKEINTRESOURCEW(IDR_TRAY);// TD_INFORMATION_ICON;
     tdc.pszMainInstruction = w_header;
     tdc.pszContent = w_body;
@@ -80,4 +82,40 @@ bool yesnoBox(HINSTANCE hInst, HWND m_hWnd, char* szHeader, char* body, char* ok
     if (SUCCEEDED(hr) && 1000 == nClickedBtn)
         return true;
     return false;
+}
+
+void yesUVNCMessageBox(HWND m_hWnd, char* body, char* szHeader, int icon)
+{
+    wchar_t w_header[128];
+    wchar_t w_body[1024];
+    size_t outSize;
+
+    mbstowcs_s(&outSize, w_header, szHeader, strlen(szHeader) + 1);
+    mbstowcs_s(&outSize, w_body, body, strlen(body) + 1);
+
+    HRESULT hr;
+    TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
+    int nClickedBtn;
+    LPCWSTR szTitle = L"UltraVNC Viewer";
+
+
+    tdc.hwndParent = m_hWnd;
+    tdc.dwCommonButtons = TDCBF_YES_BUTTON;
+    tdc.pszWindowTitle = szTitle;
+
+    switch (icon) {
+    case MB_ICONEXCLAMATION:
+        tdc.pszMainIcon = TD_WARNING_ICON;
+        break;
+    case MB_ICONINFORMATION:
+        tdc.pszMainIcon = TD_INFORMATION_ICON;
+        break;
+    case MB_ICONERROR:
+        tdc.pszMainIcon = TD_ERROR_ICON;
+        break;
+    }
+    tdc.pszMainInstruction = w_header;
+    tdc.pszContent = w_body;
+
+    hr = TaskDialogIndirect(&tdc, &nClickedBtn, NULL, NULL);
 }

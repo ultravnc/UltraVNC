@@ -30,6 +30,7 @@
 #include "richedit.h"
 #include "common/win32_helpers.h"
 #include <rdr/Exception.h>
+#include "UltraVNCMessageBox.h"
 
 #define TEXTMAXSIZE 16384
 #define MAXNAMESIZE	128 // MAX_COMPUTERNAME_LENGTH+1 (32)
@@ -87,8 +88,8 @@ TextChat::TextChat(VNCviewerApp *pApp, ClientConnection *pCC)
 	m_hRichEdit = LoadLibrary( "RICHED32.DLL" );
 	if (!m_hRichEdit)
 	{  
-		MessageBox( NULL, sz_E1,
-					sz_E2, MB_OK | MB_ICONEXCLAMATION );
+		yesUVNCMessageBox( NULL, sz_E1,
+					sz_E2, MB_ICONEXCLAMATION );
 		// Todo: do normal edit instead (no colors)
 	}
 

@@ -37,6 +37,7 @@
 #include "../UdtCloudlib/proxy/Cloudthread.h"
 #endif
 #include "AboutBox.h"
+#include "UltraVNCMessageBox.h"
 
 #define SESSION_MRU_KEY_NAME _T("Software\\ORL\\VNCviewer\\MRU")
 #define NUM_MRU_ENTRIES 8
@@ -701,13 +702,13 @@ bool SessionDialog::connect(HWND hwnd)
 				}
 				else {
 					m_pDSMPlugin->SetEnabled(false);
-					MessageBox(hwnd, sz_F7, sz_F6, MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TOPMOST);
+					yesUVNCMessageBox(hwnd, sz_F7, sz_F6,MB_ICONEXCLAMATION);
 					return TRUE;
 				}
 			}
 			else {
 				m_pDSMPlugin->SetEnabled(false);
-				MessageBox(hwnd, sz_F5, sz_F6, MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TOPMOST);
+				yesUVNCMessageBox(hwnd, sz_F5, sz_F6, MB_ICONEXCLAMATION);
 				return TRUE;
 			}
 		}
@@ -734,13 +735,13 @@ bool SessionDialog::connect(HWND hwnd)
 				}
 				else {
 					m_pDSMPlugin->SetEnabled(false);
-					MessageBox(hwnd, sz_F7, sz_F6, MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TOPMOST);
+					yesUVNCMessageBox(hwnd, sz_F7, sz_F6, MB_ICONEXCLAMATION);
 					return TRUE;
 				}
 			}
 			else {
 				m_pDSMPlugin->SetEnabled(false);
-				MessageBox(hwnd, sz_F5, sz_F6, MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TOPMOST);
+				yesUVNCMessageBox(hwnd, sz_F5, sz_F6,MB_ICONEXCLAMATION);
 				return TRUE;
 			}
 		}

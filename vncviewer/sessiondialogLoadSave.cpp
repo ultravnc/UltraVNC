@@ -27,6 +27,7 @@
 #include <shlobj.h>
 #include <direct.h>
 #include <fstream>
+#include "UltraVNCMessageBox.h"
 extern char sz_K1[64];
 extern char sz_K2[64];
 extern bool g_disable_sponsor;
@@ -67,7 +68,7 @@ void SessionDialog::SaveConnection(HWND hwnd, bool saveAs)
 				break;
 			case FNERR_INVALIDFILENAME:
 				strcpy_s(msg, sz_K1);
-				MessageBox(hwnd, msg, sz_K2, MB_ICONERROR | MB_OK | MB_SETFOREGROUND | MB_TOPMOST);
+				yesUVNCMessageBox(hwnd, msg, sz_K2, MB_ICONERROR);
 				break;
 			default:
 				vnclog.Print(0, "Error %d from GetSaveFileName\n", err);

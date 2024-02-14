@@ -31,6 +31,7 @@ extern char str50286[128];
 extern char str50287[128];
 extern char str50288[128];
 
-bool yesnoBox(HINSTANCE hInst, HWND m_hWnd, char* szHeader, char* body, char* okStr, char* cancelStr, char* checkbox, BOOL &bCheckboxChecked);
+bool yesnoUVNCMessageBox(HWND m_hWnd, char* szHeader, char* body, char* okStr, char* cancelStr, char* checkbox, BOOL &bCheckboxChecked);
+void yesUVNCMessageBox(HWND m_hWnd, char* body, char* szHeader, int icon);
 void loadStrings(HINSTANCE m_hInstResDLL);
 #endif

@@ -1654,27 +1654,22 @@ void ClientConnection::LoadDSMPlugin(bool fForceReload)
 
 					m_pDSMPlugin->SetEnabled(true);
 					m_pDSMPlugin->DescribePlugin();
-					/*
-					MessageBox(NULL,
-					_T(_this->m_pDSMPlugin->DescribePlugin()),
-					_T("Plugin Description"), MB_OK | MB_ICONEXCLAMATION );
-					*/
 				}
 				else
 				{
 					m_pDSMPlugin->SetEnabled(false);
-					MessageBox(m_hwndMain,
+					yesUVNCMessageBox(m_hwndMain,
 						sz_F1,
-						sz_F6, MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TOPMOST);
+						sz_F6, MB_ICONEXCLAMATION);
 					return;
 				}
 			}
 			else
 			{
 				m_pDSMPlugin->SetEnabled(false);
-				MessageBox(m_hwndMain,
+				yesUVNCMessageBox(m_hwndMain,
 					sz_F5,
-					sz_F6, MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TOPMOST);
+					sz_F6,MB_ICONEXCLAMATION);
 				return;
 			}
 		}
@@ -2578,7 +2573,7 @@ void ClientConnection::NegotiateProtocolVersion()
 			{
 				//adzm 2009-07-19 - Auto-accept the connection if it is unencrypted if that option is specified
 				BOOL bCheckboxChecked;
-				bool  yes = yesnoBox(m_pApp->m_instance, m_hwndMain, str50275, str50276, str50277, str50278, str50279, bCheckboxChecked);
+				bool  yes = yesnoUVNCMessageBox(m_hwndMain, str50275, str50276, str50277, str50278, str50279, bCheckboxChecked);
 				if (!yes)
 				{
 					throw WarningException("You refused the insecure connection.");
@@ -2710,7 +2705,7 @@ void ClientConnection::NegotiateProtocolVersion()
 		//adzm 2009-06-21 - auto-accept if specified
 		if (!m_opts->m_fAutoAcceptIncoming) {
 			BOOL bCheckboxChecked;
-			int yes= yesnoBox(m_pApp->m_instance, m_hwndMain, str50282, mytext, str50280, str50281, "", bCheckboxChecked);
+			int yes= yesnoUVNCMessageBox(m_hwndMain, str50282, mytext, str50280, str50281, "", bCheckboxChecked);
 			if (!yes)
 			{
 				int nummer=0;
@@ -2971,7 +2966,7 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 			//adzm 2009-07-19 - Auto-accept the connection if it is unencrypted if that option is specified
 			if (!m_opts->m_fAutoAcceptNoDSM) {
 				BOOL bCheckboxChecked;
-				bool  yes = yesnoBox(m_pApp->m_instance, m_hwndMain, str50275, str50276, str50277, str50278, str50279, bCheckboxChecked);
+				bool  yes = yesnoUVNCMessageBox(m_hwndMain, str50275, str50276, str50277, str50278, str50279, bCheckboxChecked);
 				if (!yes)
 				{
 					throw WarningException("You refused the insecure connection.");
@@ -3037,7 +3032,7 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 		vnclog.Print(0, _T("No authentication needed\n"));
 		BOOL bCheckboxChecked;
 		if (!m_Is_Listening && !m_pApp->m_options.m_AllowUntrustedServers  && 
-			yesnoBox(m_pApp->m_instance, m_hwndMain, str50286, str50283, str50284, str50285, str50279, bCheckboxChecked) == false) 
+			yesnoUVNCMessageBox(m_hwndMain, str50286, str50283, str50284, str50285, str50279, bCheckboxChecked) == false) 
 		{
 			throw WarningException("You refused a untrusted server.");
 		}
@@ -3576,7 +3571,7 @@ void ClientConnection::AuthVnc()
 	{
 		/* if server is 3.2 we can't use the new authentication */
 		vnclog.Print(0, _T("Can't use IDEA authentication\n"));
-		MessageBox(m_hwndMain,sz_L51, sz_L52, MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST);
+		yesUVNCMessageBox(m_hwndMain,sz_L51, sz_L52, MB_ICONSTOP);
 		throw WarningException("Can't use IDEA authentication any more!");
 	}
 	// rdv@2002 - v1.1.x
@@ -3651,7 +3646,7 @@ void ClientConnection::AuthSCPrompt()
 	int accepted = 0;
 	BOOL bCheckboxChecked;
 	if (!m_opts->m_fAutoAcceptIncoming) {
-		int yes = yesnoBox(m_pApp->m_instance, m_hwndMain, str50282, mytext, str50280, str50281, "", bCheckboxChecked);
+		int yes = yesnoUVNCMessageBox( m_hwndMain, str50282, mytext, str50280, str50281, "", bCheckboxChecked);
 		if (!yes)
 		{
 			accepted = 1;
@@ -5270,7 +5265,7 @@ void ClientConnection::ShowConnInfo()
 		kbdname,
 		m_pDSMPlugin->IsEnabled() ? m_pDSMPlugin->GetPluginName() : "",
 		m_pDSMPlugin->IsEnabled() ? m_pDSMPlugin->GetPluginVersion() : "");
-	MessageBox(m_hwndMain, buf, _T("VNC connection info"), MB_ICONINFORMATION | MB_OK | MB_SETFOREGROUND | MB_TOPMOST);
+	yesUVNCMessageBox(m_hwndMain, buf, _T("VNC connection info"), MB_ICONINFORMATION);
 }
 
 // ********************************************************************
@@ -8173,9 +8168,8 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						// Check if the Server knows FileTransfer
 						if (!_this->m_fServerKnowsFileTransfer)
 						{
-							MessageBox(hwnd, sz_L77,
-								sz_L78,
-								MB_OK | MB_ICONINFORMATION | MB_SETFOREGROUND | MB_TOPMOST|MB_SYSTEMMODAL);
+							yesUVNCMessageBox(hwnd, sz_L77,
+								sz_L78, MB_ICONINFORMATION);
 							return 0;
 						}
 						// Don't call FileTRansfer GUI is already open !
@@ -8183,20 +8177,14 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						{
 							_this->m_pFileTransfer->ShowFileTransferWindow(true);
 							return 0;
-							/*
-							MessageBox(NULL, sz_L79,
-								sz_L80,
-								MB_OK | MB_ICONINFORMATION | MB_SETFOREGROUND | MB_TOPMOST);
-							return 0;
-							*/
 						}
 						if (_this->m_pTextChat->m_fTextChatRunning)
 						{
 							_this->m_pTextChat->ShowChatWindow(true);
-							MessageBox(	hwnd,
+							yesUVNCMessageBox(	hwnd,
 										sz_L86,
 										sz_L88,
-										MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST|MB_SYSTEMMODAL);
+										MB_ICONSTOP);
 							return 0;
 						}
 
@@ -8218,29 +8206,22 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						// Check if the Server knows FileTransfer
 						if (!_this->m_fServerKnowsFileTransfer)
 						{
-							MessageBox(hwnd, sz_L81,
-								sz_L82,
-								MB_OK | MB_ICONINFORMATION | MB_SETFOREGROUND | MB_TOPMOST|MB_SYSTEMMODAL);
+							yesUVNCMessageBox(hwnd, sz_L81,
+								sz_L82,MB_ICONINFORMATION);
 							return 0;
 						}
 						if (_this->m_pTextChat->m_fTextChatRunning)
 						{
 							_this->m_pTextChat->ShowChatWindow(true);
 							return 0;
-							/*
-							MessageBox(NULL, sz_L83,
-								sz_L84,
-								MB_OK | MB_ICONINFORMATION | MB_SETFOREGROUND | MB_TOPMOST);
-							return 0;
-							*/
 						}
 						if (_this->m_pFileTransfer->m_fFileTransferRunning)
 						{
 							_this->m_pFileTransfer->ShowFileTransferWindow(true);
-							MessageBox(hwnd,
+							yesUVNCMessageBox(hwnd,
 										sz_L85,
 										sz_L88,
-										MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST|MB_SYSTEMMODAL);
+										MB_ICONSTOP);
 							return 0;
 						}
 						_this->m_pTextChat->m_fTextChatRunning = true;
@@ -8516,9 +8497,9 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
     							return 0;
                             }
 							_this->m_pFileTransfer->ShowFileTransferWindow(true);
-							MessageBox(hwnd, sz_L85,
+							yesUVNCMessageBox(hwnd, sz_L85,
 								sz_L88,
-								MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST|MB_SYSTEMMODAL);
+								MB_ICONSTOP);
 							return 0;
 						}
 
@@ -8532,17 +8513,17 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
                             }
 
 							_this->m_pTextChat->ShowChatWindow(true);
-							MessageBox(hwnd, sz_L86,
+							yesUVNCMessageBox(hwnd, sz_L86,
 								sz_L88,
-								MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST|MB_SYSTEMMODAL);
+								MB_ICONSTOP);
 							return 0;
 						}
 
 						if (_this->m_fOptionsOpen)
 						{
-                            MessageBox(hwnd, sz_L87,
+							yesUVNCMessageBox(hwnd, sz_L87,
 								sz_L88,
-								MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST|MB_SYSTEMMODAL);
+								MB_ICONSTOP);
 							return 0;
 						}
 
@@ -9342,9 +9323,9 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 					if (_this->m_pFileTransfer->m_fFileTransferRunning)
 					{
 						_this->m_pFileTransfer->ShowFileTransferWindow(true);
-						MessageBox(hwnd, sz_L85,
+						yesUVNCMessageBox(hwnd, sz_L85,
 							sz_L88,
-							MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST|MB_SYSTEMMODAL);
+							MB_ICONSTOP);
 						return 0;
 					}
 
@@ -9352,17 +9333,17 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 					if (_this->m_pTextChat->m_fTextChatRunning)
 					{
 						_this->m_pTextChat->ShowChatWindow(true);
-						MessageBox(hwnd, sz_L86,
+						yesUVNCMessageBox(hwnd, sz_L86,
 							sz_L88,
-							MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST|MB_SYSTEMMODAL);
+							MB_ICONSTOP);
 						return 0;
 					}
 
 					if (_this->m_fOptionsOpen)
 					{
-						MessageBox(hwnd, sz_L87,
+						yesUVNCMessageBox(hwnd, sz_L87,
 							sz_L88,
-							MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TOPMOST|MB_SYSTEMMODAL);
+							MB_ICONSTOP);
 						return 0;
 					}
 
@@ -9907,7 +9888,7 @@ BOOL CALLBACK DialogProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 
 				  if(iSlected==-1)
 				  {
-                    MessageBox(hWnd,"No Items in ListView","Error",MB_OK|MB_ICONINFORMATION);
+                   yesUVNCMessageBox(hWnd,"No Items in ListView","Error",MB_ICONINFORMATION);
 					break;
 				  }
 
@@ -9926,7 +9907,7 @@ BOOL CALLBACK DialogProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 
 					if(iSelect==-1)
 					{
-                      MessageBox(hWnd,"No Vnc server selected","Error",MB_OK|MB_ICONINFORMATION);
+                      yesUVNCMessageBox(hWnd,"No Vnc server selected","Error",MB_ICONINFORMATION);
 					  break;
 					}
 					flag=1;
@@ -10021,7 +10002,7 @@ BOOL CALLBACK DialogProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 						  iSlected=SendMessage(hList,LVM_GETNEXTITEM,-1,LVNI_FOCUSED);
 						  if(iSlected==-1)
 						  {
-							MessageBox(hWnd,"No Items in ListView","Error",MB_OK|MB_ICONINFORMATION);
+							yesUVNCMessageBox(hWnd,"No Items in ListView","Error",MB_ICONINFORMATION);
 							break;
 						  }
 						EndDialog(hWnd,iSlected+1); // kill dialog

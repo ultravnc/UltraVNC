@@ -34,6 +34,7 @@
 #include <sys/stat.h>
 #include <direct.h>
 #include "Snapshot.h"
+#include "UltraVNCMessageBox.h"
 
 extern char sz_A2[64];
 extern char sz_D1[64];
@@ -461,7 +462,7 @@ inline bool SwitchMatch(LPCTSTR arg, LPCTSTR swtch) {
 }
 
 static void ArgError(LPTSTR msg) {
-	MessageBox(NULL, msg, sz_D1, MB_OK | MB_TOPMOST | MB_ICONSTOP);
+	yesUVNCMessageBox(NULL, msg, sz_D1, MB_ICONSTOP);
 }
 
 // Greatest common denominator, by Euclid
@@ -475,8 +476,7 @@ void VNCOptions::FixScaling()
 {
 	if (m_scale_num < 1 || m_scale_den < 1 || m_scale_num > 400 || m_scale_den > 100)
 	{
-		MessageBox(NULL, sz_D2,
-			sz_D1, MB_OK | MB_TOPMOST | MB_ICONWARNING);
+		yesUVNCMessageBox(NULL, sz_D2,sz_D1,  MB_ICONWARNING);
 		m_scale_num = 1;
 		m_scale_den = 1;
 		m_scaling = false;
@@ -1344,7 +1344,7 @@ void VNCOptions::ShowUsage(LPTSTR info) {
 			"      [/gnome]\r\n"
 			"For full details see documentation."),
 		tmpinf);
-	MessageBox(NULL, msg, sz_A2, MB_OK | MB_ICONINFORMATION | MB_TOPMOST);
+	yesUVNCMessageBox(NULL, msg, sz_A2, MB_ICONINFORMATION);
 }
 
 // The dialog box allows you to change the session-specific parameters

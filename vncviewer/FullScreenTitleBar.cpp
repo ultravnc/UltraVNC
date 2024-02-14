@@ -436,7 +436,7 @@ LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg,
 					if (TitleBarThis->Fit == TRUE)
 						::SendMessage(TitleBarThis->Parent, tbWM_PHOTO, 0, 0);
 					else
-						MessageBox(TitleBarThis->Parent, _T("Function only supported in 1:1 mode"), _T("uVNC snapshot"), MB_ICONINFORMATION | MB_OK | MB_SETFOREGROUND | MB_TOPMOST);
+						MessageBox(TitleBarThis->Parent, _T("Function only supported in 1:1 mode"), _T("uVNC snapshot"), MB_ICONINFORMATION);
 				if(LOWORD(wParam) == tbIDC_SWITCHMONITOR)
 					::SendMessage(TitleBarThis->Parent, tbWM_SWITCHMONITOR, 0, 0);
 			}
