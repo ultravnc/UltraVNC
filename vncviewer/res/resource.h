@@ -335,6 +335,11 @@
 #define IDC_CATCHPHRASE                 2068
 #define IDC_SIGNATURE                   2069
 #define IDC_ABOUT                       2070
+#define IDC_Message2                    2071
+#define IDC_FORUMHYPERLINK              2072
+#define IDC_GIT                         2073
+#define IDC_WEBSITE                     2074
+#define IDC_WEBDOWNLOAD                 2075
 #define IDC_STATIC_SPLIT                9000
 #define IDC_HOSTNAME_DEL                9001
 #define ID_SESSION_SET_CRECT            32777
@@ -658,7 +663,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        238
 #define _APS_NEXT_COMMAND_VALUE         50025
-#define _APS_NEXT_CONTROL_VALUE         2071
+#define _APS_NEXT_CONTROL_VALUE         2076
 #define _APS_NEXT_SYMED_VALUE           154
 #endif
 #endif

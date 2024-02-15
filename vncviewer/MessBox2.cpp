@@ -22,14 +22,15 @@
 //
 ////////////////////////////////////////////////////////////////////////////
  
-
-
-
 #include "stdhdrs.h"
 #include "vncviewer.h"
+#include "Hyperlinks.h"
+
 char *infomsg2;
 int g_error_nr2;
 bool	g_disable_sponsor=false;
+extern char buildtime[];
+
 // Process the About dialog.
 static LRESULT CALLBACK MessageDlgProc2(HWND hwnd, UINT iMsg, 
 										   WPARAM wParam, LPARAM lParam) {
@@ -37,29 +38,15 @@ static LRESULT CALLBACK MessageDlgProc2(HWND hwnd, UINT iMsg,
 	case WM_INITDIALOG:
 		{
 			//CentreWindow(hwnd);
-			SetForegroundWindow(hwnd);
-            extern char buildtime[];
-            SetDlgItemText(hwnd, IDC_BUILDTIME, infomsg2);
+			SetForegroundWindow(hwnd);            
+			SetDlgItemText(hwnd, IDC_BUILDTIME, buildtime);
+            SetDlgItemText(hwnd, IDC_Message2, infomsg2);
 			if ( (strcmp(infomsg2,"Your connection has been rejected.")==0)) g_error_nr2=1000;
 			if ( (strcmp(infomsg2,"Local loop-back connections are disabled.")==0)) g_error_nr2=1001;
-
-			if (g_error_nr2!=0)
-			{
-				HWND button=GetDlgItem(hwnd,IDC_BUTTON1);
-				HBITMAP hbmBkGnd;
-				hbmBkGnd = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BITMAP13),IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
-				SendMessage( button, BM_SETIMAGE, (WPARAM)IMAGE_BITMAP,(LPARAM)hbmBkGnd );
-			}
-			else
-			{
-				HWND button=GetDlgItem(hwnd,IDC_BUTTON1);
-				ShowWindow(button,SW_HIDE);
-			}
-				HWND button=GetDlgItem(hwnd,IDC_BUTTON2);
-				HBITMAP hbmBkGnd;
-				hbmBkGnd = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BITMAP14),IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
-				SendMessage( button, BM_SETIMAGE, (WPARAM)IMAGE_BITMAP,(LPARAM)hbmBkGnd );
-
+			ConvertStaticToHyperlink(hwnd, IDC_FORUMHYPERLINK);
+			ConvertStaticToHyperlink(hwnd, IDC_WEBSITE);
+			ConvertStaticToHyperlink(hwnd, IDC_GIT);
+			ConvertStaticToHyperlink(hwnd, IDC_WEBDOWNLOAD);
 			return TRUE;
 		}
 	case WM_CLOSE:
@@ -69,18 +56,17 @@ static LRESULT CALLBACK MessageDlgProc2(HWND hwnd, UINT iMsg,
 		if (LOWORD(wParam) == IDOK) {
 			EndDialog(hwnd, TRUE);
 		}
-		if (LOWORD(wParam) == IDC_BUTTON1) {
-			ShellExecute(GetDesktopWindow(), "open", "https://www.uvnc.com", "", 0, SW_SHOWNORMAL);
-			/*char link[256];
-			char tempchar[10];
-			strcpy_s(link,"https://www.uvnc.com");
-			_itoa_s(g_error_nr2,tempchar,10);
-			strcat_s(link,tempchar);
-			strcat_s(link,".html");
-			ShellExecute(GetDesktopWindow(), "open", link, "", 0, SW_SHOWNORMAL);*/
+		if (LOWORD(wParam) == IDC_FORUMHYPERLINK) {
+			ShellExecute(GetDesktopWindow(), "open", "https://forum.uvnc.com", "", 0, SW_SHOWNORMAL);
 		}
-		if (LOWORD(wParam) == IDC_BUTTON2) {
-			ShellExecute(GetDesktopWindow(), "open", "https://www.uvnc2me.com", "", 0, SW_SHOWNORMAL);
+		if (LOWORD(wParam) == IDC_WEBSITE) {
+			ShellExecute(GetDesktopWindow(), "open", "https://uvnc.com", "", 0, SW_SHOWNORMAL);
+		}
+		if (LOWORD(wParam) == IDC_GIT) {
+			ShellExecute(GetDesktopWindow(), "open", "https://github.com/ultravnc/ultravnc", "", 0, SW_SHOWNORMAL);
+		}
+		if (LOWORD(wParam) == IDC_WEBDOWNLOAD) {
+			ShellExecute(GetDesktopWindow(), "open", "https://uvnc.com/downloads/ultravnc.html", "", 0, SW_SHOWNORMAL);
 		}
 	}
 	return FALSE;
@@ -88,19 +74,8 @@ static LRESULT CALLBACK MessageDlgProc2(HWND hwnd, UINT iMsg,
 
 void ShowMessageBox2(char *info,int error_nr)
 {
-	infomsg2=info;
-	g_error_nr2=error_nr;
-	if (g_disable_sponsor)
-	{
-	int res = DialogBox(pApp->m_instance, 
- 		DIALOG_MAKEINTRESOURCE(IDD_APP_MESSAGE1),
-		NULL, (DLGPROC) MessageDlgProc2);
-	}
-	else
-	{
-		int res = DialogBox(pApp->m_instance, 
- 		DIALOG_MAKEINTRESOURCE(IDD_APP_MESSAGE2),
-		NULL, (DLGPROC) MessageDlgProc2);
-	}
+	infomsg2 = info;
+	g_error_nr2 = error_nr;
+	int res = DialogBox(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_APP_MESSAGE2), NULL, (DLGPROC) MessageDlgProc2);
 }
 	
