@@ -44,7 +44,6 @@ setpasswd/setpasswd/Debug/
 udt4/win/.vs/
 udt4/win/x64/
 uvnc_settings2/.vs/
-uvnc_settings2/uvnc_settings/
 uvnc_settings2/uvnc_settings/Release/
 uvnc_settings2/uvnc_settings/x64/Release/uvnc_settings.exe.recipe
 vncviewer/.vs/
@@ -100,3 +99,7 @@ zlib/lib/Win32/
 zlib/lib/x64/
 zlib/x64/Debug/
 zlib/x64/Release/
+translations2/
+winvnc/IPV6/
+vncviewer/RelIPv6/
+repeater/Release/
