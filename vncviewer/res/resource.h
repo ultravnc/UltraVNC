@@ -61,8 +61,6 @@
 #define IDI_FILE                        184
 #define IDI_DIR                         185
 #define IDI_DRIVE                       186
-#define IDB_BITMAP13                    187
-#define IDB_BITMAP14                    188
 #define IDB_BITMAPsx                    189
 #define IDB_BITMAPl                     198
 #define IDB_BITMAPlx                    199
