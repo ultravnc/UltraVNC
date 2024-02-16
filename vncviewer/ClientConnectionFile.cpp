@@ -32,7 +32,7 @@
 //EndAaronP
 
 #include "vncauth.h"
-#include "UltraVNCMessageBox.h"
+#include "UltraVNCHerlperFunctions.h"
 
 extern char sz_K1[64];
 extern char sz_K2[64];

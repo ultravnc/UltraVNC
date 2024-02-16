@@ -1937,8 +1937,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\ipv6</Command>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='OldCPU|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="MessBox.cpp" />
-    <ClCompile Include="MessBox2.cpp" />
+    <ClCompile Include="InfoBox.cpp" />
     <ClCompile Include="..\lzo\minilzo.c">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -2096,7 +2095,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\ipv6</Command>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='OldCPU|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="UltraVNCMessageBox.cpp" />
+    <ClCompile Include="UltraVNCHerlperFunctions.cpp" />
     <ClCompile Include="vncauth.c">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -2309,7 +2308,6 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\ipv6</Command>
     <ClInclude Include="keysymdefjap.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="LowLevelHook.h" />
-    <ClInclude Include="MEssBox.h" />
     <ClInclude Include="MRU.h" />
     <ClInclude Include="multimon.h" />
     <ClInclude Include="Natplugin.h" />
@@ -2318,7 +2316,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\ipv6</Command>
     <ClInclude Include="SessionDialog.h" />
     <ClInclude Include="stdhdrs.h" />
     <ClInclude Include="TextChat.h" />
-    <ClInclude Include="UltraVNCMessageBox.h" />
+    <ClInclude Include="UltraVNCHerlperFunctions.h" />
     <ClInclude Include="vncauth.h" />
     <ClInclude Include="VNCOptions.h" />
     <ClInclude Include="vnctouch.h" />

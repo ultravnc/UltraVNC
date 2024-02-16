@@ -209,7 +209,6 @@
 #define IDC_64COLORS_RADIO              1138
 #define IDC_FTPCONFIRMCOMMENT           1139
 #define IDC_8COLORS_RADIO               1140
-#define IDC_BUTTON1                     1141
 #define IDC_RENAME_B                    1142
 #define IDC_8GREYCOLORS_RADIO           1143
 #define IDC_DEFAULT                     1144
@@ -224,7 +223,6 @@
 #define IDD_AUTH_DIALOG2                1153
 #define IDD_APP_MESSAGE                 1154
 #define IDC_BUTTON2                     1155
-#define IDD_APP_MESSAGE1                1156
 #define IDD_APP_MESSAGE2                1157
 #define IDD_AUTH_DIALOG3                1158
 #define IDD_OPTION1                     1159
@@ -340,6 +338,9 @@
 #define IDC_GIT                         2073
 #define IDC_WEBSITE                     2074
 #define IDC_WEBDOWNLOAD                 2075
+#define IDC_UVNCCOM                     2076
+#define IDC_UVVERSION                   2077
+#define IDC_UVVERSION2                  2078
 #define IDC_STATIC_SPLIT                9000
 #define IDC_HOSTNAME_DEL                9001
 #define ID_SESSION_SET_CRECT            32777
@@ -663,7 +664,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        238
 #define _APS_NEXT_COMMAND_VALUE         50025
-#define _APS_NEXT_CONTROL_VALUE         2076
+#define _APS_NEXT_CONTROL_VALUE         2079
 #define _APS_NEXT_SYMED_VALUE           154
 #endif
 #endif

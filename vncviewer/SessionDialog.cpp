@@ -37,7 +37,7 @@
 #include "../UdtCloudlib/proxy/Cloudthread.h"
 #endif
 #include "AboutBox.h"
-#include "UltraVNCMessageBox.h"
+#include "UltraVNCHerlperFunctions.h"
 
 #define SESSION_MRU_KEY_NAME _T("Software\\ORL\\VNCviewer\\MRU")
 #define NUM_MRU_ENTRIES 8
@@ -201,6 +201,11 @@ BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	if (uMsg == WM_INITDIALOG) {
 		_this = (SessionDialog*)lParam;
 		helper::SafeSetWindowUserData(hwnd, lParam);
+		char version[50]{};
+		char title[256]{};
+		strcpy_s(title, "ULtraVNC Viewer - ");
+		strcat_s(title, GetVersionFromResource(version));
+		SetWindowText(hwnd, title);
 	}
 	else
 		_this = (SessionDialog*)helper::SafeGetWindowUserData<SessionDialog>(hwnd);

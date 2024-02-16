@@ -25,6 +25,7 @@
 #include "stdhdrs.h"
 #include "vncviewer.h"
 #include "Hyperlinks.h"
+#include "UltraVNCHerlperFunctions.h"
 
 char *infomsg2;
 int g_error_nr2;
@@ -47,6 +48,11 @@ static LRESULT CALLBACK MessageDlgProc2(HWND hwnd, UINT iMsg,
 			ConvertStaticToHyperlink(hwnd, IDC_WEBSITE);
 			ConvertStaticToHyperlink(hwnd, IDC_GIT);
 			ConvertStaticToHyperlink(hwnd, IDC_WEBDOWNLOAD);
+			char version[50]{};
+			char title[256]{};
+			strcpy_s(title, "ULtraVNC Viewer - ");
+			strcat_s(title, GetVersionFromResource(version));
+			SetDlgItemText(hwnd, IDC_UVVERSION2, title);
 			return TRUE;
 		}
 	case WM_CLOSE:

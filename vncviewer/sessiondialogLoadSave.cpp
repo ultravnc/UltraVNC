@@ -27,7 +27,7 @@
 #include <shlobj.h>
 #include <direct.h>
 #include <fstream>
-#include "UltraVNCMessageBox.h"
+#include "UltraVNCHerlperFunctions.h"
 extern char sz_K1[64];
 extern char sz_K2[64];
 extern bool g_disable_sponsor;

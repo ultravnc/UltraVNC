@@ -30,7 +30,7 @@ extern Log vnclog;
 #include "multimon.h"
 #include <commctrl.h>
 #include "VNCOptions.h"
-#include "UltraVNCMessageBox.h"
+#include "UltraVNCHerlperFunctions.h"
 
 //***************************************************************************************
 

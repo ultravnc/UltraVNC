@@ -1,4 +1,6 @@
-#include "UltraVNCMessageBox.h"
+#include "UltraVNCHerlperFunctions.h"
+#pragma comment(lib, "Comctl32.lib")
+#pragma comment(lib, "Version.lib")
 
 char str50275[128];
 char str50276[128];
@@ -132,4 +134,53 @@ void yesUVNCMessageBox(HWND m_hWnd, char* body, char* szHeader, int icon)
     tdc.pszContent = w_body;
 
     hr = TaskDialogIndirect(&tdc, &nClickedBtn, NULL, NULL);
+}
+
+char * GetVersionFromResource(char *version)
+{
+    HRSRC hResInfo;
+    DWORD dwSize;
+    HGLOBAL hResData;
+    LPVOID pRes, pResCopy;
+    UINT uLen = 0;
+    VS_FIXEDFILEINFO* lpFfi = NULL;
+    HINSTANCE hInst = ::GetModuleHandle(NULL);
+
+    hResInfo = FindResource(hInst, MAKEINTRESOURCE(1), RT_VERSION);
+    if (hResInfo)
+    {
+        dwSize = SizeofResource(hInst, hResInfo);
+        hResData = LoadResource(hInst, hResInfo);
+        if (hResData)
+        {
+            pRes = LockResource(hResData);
+            if (pRes)
+            {
+                pResCopy = LocalAlloc(LMEM_FIXED, dwSize);
+                if (pResCopy)
+                {
+                    CopyMemory(pResCopy, pRes, dwSize);
+
+                    if (VerQueryValue(pResCopy, _T("\\"), (LPVOID*)&lpFfi, &uLen))
+                    {
+                        if (lpFfi != NULL)
+                        {
+                            DWORD dwFileVersionMS = lpFfi->dwFileVersionMS;
+                            DWORD dwFileVersionLS = lpFfi->dwFileVersionLS;
+
+                            DWORD dwLeftMost = HIWORD(dwFileVersionMS);
+                            DWORD dwSecondLeft = LOWORD(dwFileVersionMS);
+                            DWORD dwSecondRight = HIWORD(dwFileVersionLS);
+                            DWORD dwRightMost = LOWORD(dwFileVersionLS);
+
+                            sprintf(version, " %d.%d.%d.%d", dwLeftMost, dwSecondLeft, dwSecondRight, dwRightMost);
+                        }
+                    }
+
+                    LocalFree(pResCopy);
+                }
+            }
+        }
+    }
+    return version;
 }

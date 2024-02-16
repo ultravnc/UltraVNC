@@ -1,7 +1,6 @@
 #include "stdhdrs.h"
 #include <commctrl.h>
 #include "./res/resource.h"
-#pragma comment(lib, "Comctl32.lib")
 
 #if defined _M_IX86
 #pragma comment(linker, "/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='x86' publicKeyToken='6595b64144ccf1df' language='*'\"")
@@ -12,8 +11,8 @@
 #else
 #pragma comment(linker, "/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #endif
-#ifndef UlTRAVNCMESSAGEBOX_H__
-#define UlTRAVNCMESSAGEBOX_H__
+#ifndef UltraVNCHerlperFunctions_H__
+#define UltraVNCHerlperFunctions_H__
 #pragma once
 
 extern char str50275[128];
@@ -41,4 +40,5 @@ extern char str50297[128];
 bool yesnoUVNCMessageBox(HWND m_hWnd, char* szHeader, char* body, char* okStr, char* cancelStr, char* checkbox, BOOL &bCheckboxChecked);
 void yesUVNCMessageBox(HWND m_hWnd, char* body, char* szHeader, int icon);
 void loadStrings(HINSTANCE m_hInstResDLL);
+char* GetVersionFromResource(char* version);
 #endif

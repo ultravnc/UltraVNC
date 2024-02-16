@@ -27,6 +27,8 @@
 
 #include "stdhdrs.h"
 #include "vncviewer.h"
+#include "Hyperlinks.h"
+#include "UltraVNCHerlperFunctions.h"
 
 HBITMAP
     DoGetBkGndBitmap(IN CONST UINT uBmpResId )
@@ -111,6 +113,12 @@ static LRESULT CALLBACK AboutDlgProc(HWND hwnd, UINT iMsg,
 			SetForegroundWindow(hwnd);
             extern char buildtime[];
             SetDlgItemText(hwnd, IDC_BUILDTIME, buildtime);
+            ConvertStaticToHyperlink(hwnd, IDC_UVNCCOM);
+            char version[50]{};
+            char title[256]{};
+            strcpy_s(title, "ULtraVNC Viewer - ");
+            strcat_s(title, GetVersionFromResource(version));
+            SetDlgItemText(hwnd, IDC_UVVERSION, title);
 			return TRUE;
 		}
 	case WM_CLOSE:
@@ -120,16 +128,10 @@ static LRESULT CALLBACK AboutDlgProc(HWND hwnd, UINT iMsg,
 		if (LOWORD(wParam) == IDOK) {
 			EndDialog(hwnd, TRUE);
 		}
-	/*case WM_ERASEBKGND:
-            {
-               DoSDKEraseBkGnd((HDC)wParam, RGB(255,0,0));
-				return true;
-            }
-	case WM_CTLCOLORSTATIC:
-			{
-				SetBkMode((HDC) wParam, TRANSPARENT);
-				return (DWORD) GetStockObject(NULL_BRUSH);
-			}*/
+        if (LOWORD(wParam) == IDC_UVNCCOM) {
+            ShellExecute(GetDesktopWindow(), "open", "https://uvnc.com", "", 0, SW_SHOWNORMAL);
+        }
+            
 	}
 	return FALSE;
 }

@@ -26,7 +26,7 @@
 #include "vncviewer.h"
 #include "VNCviewerApp.h"
 #include "Exception.h"
-#include "UltraVNCMessageBox.h"
+#include "UltraVNCHerlperFunctions.h"
 extern char sz_A2[64];
 extern char sz_B1[64];
 extern char sz_B2[64];

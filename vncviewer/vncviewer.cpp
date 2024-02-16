@@ -38,7 +38,7 @@
 #include "omnithread/omnithread.h"
 #include "VNCviewerApp32.h"
 #include "shellscalingapi.h"
-#include "UltraVNCMessageBox.h"
+#include "UltraVNCHerlperFunctions.h"
 
 // All logging is done via the log object
 Log vnclog;
