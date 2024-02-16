@@ -37,7 +37,7 @@
 #include "../UdtCloudlib/proxy/Cloudthread.h"
 #endif
 #include "AboutBox.h"
-#include "UltraVNCHerlperFunctions.h"
+#include "UltraVNCHelperFunctions.h"
 
 #define SESSION_MRU_KEY_NAME _T("Software\\ORL\\VNCviewer\\MRU")
 #define NUM_MRU_ENTRIES 8

@@ -28,7 +28,7 @@
 #include "stdhdrs.h"
 #include "vncviewer.h"
 #include "Hyperlinks.h"
-#include "UltraVNCHerlperFunctions.h"
+#include "UltraVNCHelperFunctions.h"
 
 HBITMAP
     DoGetBkGndBitmap(IN CONST UINT uBmpResId )

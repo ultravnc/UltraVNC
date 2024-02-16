@@ -142,12 +142,6 @@
     <ClCompile Include="..\lzo\minilzo.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MessBox2.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MessBox.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="LowLevelHook.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -176,6 +170,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\common\d3des.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UltraVNCHerperFunctions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="InfoBox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Hyperlinks.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -291,9 +294,6 @@
     <ClInclude Include="keysym.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="MEssBox.h">
-      <Filter>header</Filter>
-    </ClInclude>
     <ClInclude Include="Natplugin.h">
       <Filter>header</Filter>
     </ClInclude>
@@ -307,6 +307,9 @@
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="..\common\d3des.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="UltraVNCHelperFunctions.h">
       <Filter>header</Filter>
     </ClInclude>
   </ItemGroup>
@@ -494,12 +497,6 @@
     <Image Include="res\Tango_s.bmp">
       <Filter>Resources</Filter>
     </Image>
-    <Image Include="res\l2.bmp">
-      <Filter>Resources</Filter>
-    </Image>
-    <Image Include="res\l1.bmp">
-      <Filter>Resources</Filter>
-    </Image>
     <Image Include="res\stat\1op1.bmp">
       <Filter>Resources</Filter>
     </Image>
@@ -518,22 +515,7 @@
     <Image Include="res\idr_tray_disabled.ico">
       <Filter>Resources</Filter>
     </Image>
-    <Image Include="LedGreen.bmp">
-      <Filter>Resources</Filter>
-    </Image>
-    <Image Include="LedGreen.png">
-      <Filter>Resources</Filter>
-    </Image>
-    <Image Include="LedRed.bmp">
-      <Filter>Resources</Filter>
-    </Image>
-    <Image Include="LedYellow.bmp">
-      <Filter>Resources</Filter>
-    </Image>
     <Image Include="res\LedGreen.bmp">
-      <Filter>Resources</Filter>
-    </Image>
-    <Image Include="res\LedGreen.png">
       <Filter>Resources</Filter>
     </Image>
     <Image Include="res\LedRed.bmp">

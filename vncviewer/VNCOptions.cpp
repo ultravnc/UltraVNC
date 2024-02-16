@@ -34,7 +34,7 @@
 #include <sys/stat.h>
 #include <direct.h>
 #include "Snapshot.h"
-#include "UltraVNCHerlperFunctions.h"
+#include "UltraVNCHelperFunctions.h"
 
 extern char sz_A2[64];
 extern char sz_D1[64];

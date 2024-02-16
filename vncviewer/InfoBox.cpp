@@ -25,7 +25,7 @@
 #include "stdhdrs.h"
 #include "vncviewer.h"
 #include "Hyperlinks.h"
-#include "UltraVNCHerlperFunctions.h"
+#include "UltraVNCHelperFunctions.h"
 
 char *infomsg2;
 int g_error_nr2;

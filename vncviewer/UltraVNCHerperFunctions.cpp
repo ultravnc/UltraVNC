@@ -1,4 +1,4 @@
-#include "UltraVNCHerlperFunctions.h"
+#include "UltraVNCHelperFunctions.h"
 #pragma comment(lib, "Comctl32.lib")
 #pragma comment(lib, "Version.lib")
 

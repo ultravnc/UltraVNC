@@ -11,8 +11,8 @@
 #else
 #pragma comment(linker, "/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #endif
-#ifndef UltraVNCHerlperFunctions_H__
-#define UltraVNCHerlperFunctions_H__
+#ifndef UltraVNCHelperFunctions_H__
+#define UltraVNCHelperFunctions_H__
 #pragma once
 
 extern char str50275[128];

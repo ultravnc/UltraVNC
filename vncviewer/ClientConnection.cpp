@@ -66,7 +66,7 @@ extern "C" {
 #ifdef _CLOUD
 #include "../UdtCloudlib/proxy/Cloudthread.h"
 #endif
-#include "UltraVNCHerlperFunctions.h"
+#include "UltraVNCHelperFunctions.h"
 
 // [v1.0.2-jp1 fix]
 #pragma comment(lib, "imm32.lib")

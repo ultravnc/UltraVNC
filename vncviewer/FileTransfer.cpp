@@ -61,7 +61,7 @@
 #include <vector>
 #include "common/win32_helpers.h"
 #include "shlwapi.h"
-#include "UltraVNCHerlperFunctions.h"
+#include "UltraVNCHelperFunctions.h"
 #pragma comment(lib, "Shlwapi.lib")
 
 // [v1.0.2-jp1 fix] yak!'s File transfer patch

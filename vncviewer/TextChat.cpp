@@ -30,7 +30,7 @@
 #include "richedit.h"
 #include "common/win32_helpers.h"
 #include <rdr/Exception.h>
-#include "UltraVNCHerlperFunctions.h"
+#include "UltraVNCHelperFunctions.h"
 
 #define TEXTMAXSIZE 16384
 #define MAXNAMESIZE	128 // MAX_COMPUTERNAME_LENGTH+1 (32)
