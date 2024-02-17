@@ -488,8 +488,8 @@ IDC_CURSOR3             CURSOR                  "res/cursor3.cur"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,4,4,0
- PRODUCTVERSION 1,4,4,0
+ FILEVERSION 2024,02,17,3
+ PRODUCTVERSION 2024,02,17,3
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x2dL
@@ -507,14 +507,14 @@ BEGIN
             VALUE "Comments", "UltraVNC - Remote Control for all"
             VALUE "CompanyName", "UltraVNC"
             VALUE "FileDescription", "VNC server"
-            VALUE "FileVersion", "1.4.4.0"
+            VALUE "FileVersion", "2024.02.17.3"
             VALUE "InternalName", "WinVNC"
             VALUE "LegalCopyright", "Copyright © 2021 UltraVNC"
             VALUE "LegalTrademarks", "VNC"
             VALUE "OriginalFilename", "WinVNC.exe"
             VALUE "PrivateBuild", "1.4.4.0"
             VALUE "ProductName", "UltraVNC"
-            VALUE "ProductVersion", "1.4.4.0"
+            VALUE "ProductVersion", "2024.02.17.3"
         END
     END
     BLOCK "VarFileInfo"
