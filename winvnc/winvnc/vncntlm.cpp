@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002-2013 UltraVNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,9 +16,9 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the program is not available from the place from
-// which you received this file, check
-// http://www.uvnc.com/
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
 //
 ////////////////////////////////////////////////////////////////////////////
 
@@ -104,7 +104,7 @@ int CheckUserGroupPasswordUni(char* userin, char* password, const char* machine)
 	int result = 0;
 	HMODULE hModuleAuthSSP = NULL;
 	// Marscha@2004 - authSSP: if "New MS-Logon" is checked, call CUPSD in authSSP.dll,
-	// else call "old" mslogon method.
+	// else call "old" MS-Logon method.
 	if (IsNewMSLogon()) {
 		char szCurrentDir[MAX_PATH];
 		if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH)) {
@@ -125,7 +125,7 @@ int CheckUserGroupPasswordUni(char* userin, char* password, const char* machine)
 		}
 		else {
 			LPCTSTR sz_ID_AUTHSSP_NOT_FO = // to be moved to localization.h
-				"You selected ms-logon, but authSSP.dll\nwas not found.Check you installation";
+				"You selected MS-Logon, but authSSP.dll\nwas not found.Check you installation";
 			MessageBoxSecure(NULL, sz_ID_AUTHSSP_NOT_FO, sz_ID_WARNING, MB_OK);
 		}
 	}
@@ -239,9 +239,9 @@ int CheckUserGroupPasswordUni2(char* userin, char* password, const char* machine
 	//////////////////////////////////////////////////
 
 	//////////////////////////////////////////////////
-	// logon user only works on NT>
-	// NT4/w2k only as service (system account)
-	// XP> works also as application
+	// logon user only works on Windows NT>
+	// Windows NT4/Windows 2000 only as service (system account)
+	// Windows XP> works also as application
 	// Group is not used...admin access rights is needed
 	// MS keep changes there security model for each version....
 	//////////////////////////////////////////////////

@@ -1,9 +1,8 @@
-//  Copyright (C) 2002 UltraVNC Team Members. All Rights Reserved.
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //  Copyright (C) 1999 AT&T Laboratories Cambridge. All Rights Reserved.
 //
-//  This file is part of the VNC system.
-//
-//  The VNC system is free software; you can redistribute it and/or modify
+//  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
@@ -18,9 +17,11 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the VNC system is not available from the place 
-// whence you received this file, check http://www.uk.research.att.com/vnc or contact
-// the authors on vnc@uk.research.att.com for information on obtaining it.
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
 
 
 // vncConnDialog.cpp: implementation of the vncConnDialog class, used
@@ -183,7 +184,7 @@ BOOL CALLBACK vncConnDialog::vncConnDlgProc(HWND hwnd,
 				int port;
 				bool id;
 
-				// Get the hostname of the VNCviewer
+				// Get the hostname of the UltraVNC Viewer
 				GetDlgItemText(hwnd, IDC_HOSTNAME_EDIT, hostname, _MAX_PATH);
 				GetDlgItemText(hwnd, IDC_IDCODE, idcode, _MAX_PATH);
 				if (strcmp(idcode,"")==0) 
@@ -264,7 +265,7 @@ BOOL CALLBACK vncConnDialog::vncConnDlgProc(HWND hwnd,
 					return TRUE;
 				}
 			
-				// Connect out to the specified host on the VNCviewer listen port
+				// Connect out to the specified host on the UltraVNC Viewer listen port
 				// To be really good, we should allow a display number here but
 				// for now we'll just assume we're connecting to display zero
 	#ifdef IPV6V4

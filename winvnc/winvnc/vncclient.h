@@ -1,11 +1,10 @@
-//  Copyright (C) 2002 UltraVNC Team Members. All Rights Reserved.
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //  Copyright (C) 2000-2002 Const Kaplinsky. All Rights Reserved.
 //  Copyright (C) 2002 RealVNC Ltd. All Rights Reserved.
 //  Copyright (C) 1999 AT&T Laboratories Cambridge. All Rights Reserved.
 //
-//  This file is part of the VNC system.
-//
-//  The VNC system is free software; you can redistribute it and/or modify
+//  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
@@ -20,9 +19,11 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the VNC system is not available from the place 
-// whence you received this file, check http://www.uk.research.att.com/vnc or contact
-// the authors on vnc@uk.research.att.com for information on obtaining it.
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
 
 
 // vncClient.h
@@ -64,7 +65,7 @@ typedef std::list<vncClientId> vncClientList;
 #include "rfbUpdateTracker.h"
 #include "vncbuffer.h"
 #include "vncencodemgr.h"
-#include "TextChat.h" // sf@2002 - TextChat
+#include "TextChat.h" // sf@2002 - Text Chat
 #include "ZipUnZip32/ZipUnZip32.h"
 //#include "timer.h"
 // adzm - 2010-07 - Extended clipboard
@@ -80,9 +81,9 @@ typedef UINT (WINAPI *pSendinput)(UINT,LPINPUT,INT);
 
 class vncClientUpdateThread;
 
-#define FT_PROTO_VERSION_OLD 1  // <= RC18 server.. "fOldFTPRotocole" version
-#define FT_PROTO_VERSION_2   2  // base ft protocol
-#define FT_PROTO_VERSION_3   3  // new ft protocol session messages
+#define FT_PROTO_VERSION_OLD 1  // <= RC18 UltraVNC Server "fOldFTPRotocole" version
+#define FT_PROTO_VERSION_2   2  // base File Transfer Protocol
+#define FT_PROTO_VERSION_3   3  // new File Transfer Protocol session messages
 
 #ifdef _Gii
 struct MyTouchINfo
@@ -315,7 +316,7 @@ public:
 		return m_hostPort;
 	};
 
-	// sf@2004 - Asynchronous FileTransfer - Delta Transfer
+	// sf@2004 - Asynchronous File Transfer - Delta Transfer
 	int  GenerateFileChecksums(HANDLE hFile, char* lpCSBuffer, int nCSBufferSize);
 	bool ReceiveDestinationFileChecksums(int nSize, int nLen);
 	bool ReceiveFileChunk(int nLen, int nSize);
@@ -327,7 +328,7 @@ public:
 	int  CheckAndZipDirectoryForChecksuming(LPSTR szSrcFileName);
 	bool  UnzipPossibleDirectory(LPSTR szFileName);
 	bool MyGetFileSize(char* szFilePath, ULARGE_INTEGER* n2FileSize);
-    HANDLE m_hPToken; //used to set FT thread to correct user token
+    HANDLE m_hPToken; //used to set File Transfer thread to correct user token
 #ifndef SC_20
 	bool DoFTUserImpersonation();
 	void UndoFTUserImpersonation();
@@ -518,7 +519,7 @@ protected:
 
 
 	// Count to indicate whether updates, clipboards, etc can be sent
-	// to the client.  If 0 then OK, otherwise not.
+	// to the client. If 0 then OK, otherwise not.
 	ULONG			m_disable_protocol;
 
 	// User input information
@@ -566,7 +567,7 @@ protected:
 	BOOL			m_use_PointerPos;
 	POINT			m_cursor_pos;
 
-	// Modif sf@2002 - FileTransfer 
+	// Modif sf@2002 - File Transfer 
 	BOOL m_fFileTransferRunning;
 	CZipUnZip32		*m_pZipUnZip;
 

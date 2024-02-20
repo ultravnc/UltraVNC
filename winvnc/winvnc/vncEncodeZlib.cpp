@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002-2020 UltraVNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,9 +16,9 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the program is not available from the place from
-// which you received this file, check 
-// http://www.uvnc.com/
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
 //
 ////////////////////////////////////////////////////////////////////////////
 
@@ -83,7 +83,7 @@ UINT vncEncodeZlib::RequiredBuffSize(UINT width, UINT height)
 	int result;
 
 	// The zlib library specifies a maximum compressed size of
-	// the raw size plus one percent plus 8 bytes.  We also need
+	// the raw size plus one percent plus 8 bytes. We also need
 	// to cover the zlib header space.
 	result = vncEncoder::RequiredBuffSize(width, height);
 	Firstrun=result*2;//Needed to exclude xor when cachebuffer is empty
@@ -102,7 +102,7 @@ UINT vncEncodeZlib::NumCodedRects(const rfb::Rect &rect)
 		return 0;
 	}
 	// Return the number of rectangles needed to encode the given
-	// update.  ( ZLIB_MAX_SIZE(rectW) / rectW ) is the number of lines in 
+	// update. ( ZLIB_MAX_SIZE(rectW) / rectW ) is the number of lines in 
 	// each maximum size rectangle.
 	// When solid is enabled, most of the pixels are removed
 	return (( rectH - 1 ) / (ultraVncZ->maxSize(rectW * rectH) / rectW ) + 1 );

@@ -1,3 +1,28 @@
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
+//
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
+//  USA.
+//
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
+
+
 // Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
@@ -17,7 +42,8 @@
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENG)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
-#pragma code_page(1252)
+#pragma code_page(65001)
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -41,14 +67,17 @@ BEGIN
     BEGIN
         BLOCK "080904b0"
         BEGIN
+            VALUE "Comments", "UltraVNC VNCHooks"
             VALUE "CompanyName", "UltraVNC"
-            VALUE "FileDescription", "VNC hooks DLL for Win32"
+            VALUE "FileDescription", "UltraVNC VNC hooks DLL for Windows"
             VALUE "FileVersion", "1.1.0.2"
             VALUE "InternalName", "VNCHooks"
-            VALUE "LegalCopyright", "Copyright (C) 2016 UltraVNC, Copyright RealVNC Ltd.© 2002, AT&T Research Labs Cambridge© 1996-2001"
+            VALUE "LegalCopyright", "Copyright Â© 2002-2024 UltraVNC Team Members. All Rights Reserved."
             VALUE "OriginalFilename", "VNCHooks.dll"
-            VALUE "ProductName", "UltraVNC - VNCHooks"
+            VALUE "PrivateBuild", ""
+            VALUE "ProductName", "UltraVNC VNCHooks"
             VALUE "ProductVersion", "1.1.0.2"
+            VALUE "SpecialBuild", ""
         END
     END
     BLOCK "VarFileInfo"
@@ -66,19 +95,17 @@ END
 
 1 TEXTINCLUDE 
 BEGIN
-    "resource.h\0"
+    "resource.h"
 END
 
 2 TEXTINCLUDE 
 BEGIN
     "#include ""afxres.h""\r\n"
-    "\0"
 END
 
 3 TEXTINCLUDE 
 BEGIN
     "\r\n"
-    "\0"
 END
 
 #endif    // APSTUDIO_INVOKED

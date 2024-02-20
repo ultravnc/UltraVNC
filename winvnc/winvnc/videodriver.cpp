@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002-2013 UltraVNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,9 +16,9 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the program is not available from the place from
-// which you received this file, check 
-// http://www.uvnc.com/
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
 //
 ////////////////////////////////////////////////////////////////////////////
 
@@ -247,7 +247,7 @@ bool VideoDriver::mirror_driver_Vista(DWORD dwAttach, int x, int y, int w, int h
 		if (cxPrimary == 0xffffffff || cyPrimary == 0xffffffff)
 			return false;
 
-		// Enumerate again for the mirror driver:
+		// Enumerate again for the Mirror Driver:
 		devNum = 0;
 		while (result = EnumDisplayDevicesA(NULL, devNum, &dispDevice, 0)) {
 			if (strcmp(&dispDevice.DeviceString[0], driverName) == 0)
@@ -262,7 +262,7 @@ bool VideoDriver::mirror_driver_Vista(DWORD dwAttach, int x, int y, int w, int h
 		CHAR deviceNum[MAX_PATH];
 		LPSTR deviceSub;
 
-		// Simply extract 'DEVICE#' from registry key.  This will depend
+		// Simply extract 'DEVICE#' from registry key. This will depend
 		// on how many mirrored devices your driver has and which ones
 		// you intend to use.
 
@@ -274,7 +274,7 @@ bool VideoDriver::mirror_driver_Vista(DWORD dwAttach, int x, int y, int w, int h
 		else
 			StringCbCopy(&deviceNum[0], sizeof(deviceNum), ++deviceSub);
 
-		// Reset the devmode for mirror driver use:
+		// Reset the devmode for Mirror Driver use:
 		int depth = devmode.dmBitsPerPel;
 		FillMemory(&devmode, sizeof(DEVMODE), 0);
 		devmode.dmSize = sizeof(DEVMODE);
@@ -316,7 +316,7 @@ bool VideoDriver::mirror_driver_Vista(DWORD dwAttach, int x, int y, int w, int h
 			//            GetDispCode(code);
 			if (code != 0)
 				return false;
-			// Now do the real mode change to take mirror driver changes into
+			// Now do the real mode change to take Mirror Driver changes into
 			// effect.
 			code = ChangeDisplaySettingsEx(NULL, NULL, NULL, 0, NULL);
 
@@ -381,7 +381,7 @@ void VideoDriver::mirror_driver_detach_XP()
 		CHAR deviceNum[MAX_PATH];
 		LPSTR deviceSub;
 
-		// Simply extract 'DEVICE#' from registry key.  This will depend
+		// Simply extract 'DEVICE#' from registry key. This will depend
 		// on how many mirrored devices your driver has and which ones
 		// you intend to use.
 
@@ -487,7 +487,7 @@ bool VideoDriver::mirror_driver_attach_XP(int x, int y, int w, int h)
 		CHAR deviceNum[MAX_PATH];
 		LPSTR deviceSub;
 
-		// Simply extract 'DEVICE#' from registry key.  This will depend
+		// Simply extract 'DEVICE#' from registry key. This will depend
 		// on how many mirrored devices your driver has and which ones
 		// you intend to use.
 

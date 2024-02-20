@@ -1,10 +1,9 @@
-//  Copyright (C) 2002 UltraVNC Team Members. All Rights Reserved.
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //  Copyright (C) 2002 RealVNC Ltd. All Rights Reserved.
 //  Copyright (C) 1997 AT&T Laboratories Cambridge. All Rights Reserved.
 //
-//  This file is part of the VNC system.
-//
-//  The VNC system is free software; you can redistribute it and/or modify
+//  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
@@ -19,9 +18,12 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the VNC system is not available from the place 
-// whence you received this file, check http://www.uk.research.att.com/vnc or contact
-// the authors on vnc@uk.research.att.com for information on obtaining it.
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
+
 
 // VNC update hook implementation.
 //
@@ -102,7 +104,7 @@ BOOL prf_use_RButtonUp = FALSE;						// Use right mouse button up events
 BOOL prf_use_Deferral = FALSE;						// Use deferred updates
 
 HINSTANCE hInstance = NULL;							// This instance of the DLL
-BOOL HookMaster = FALSE;							// Is this instance WinVNC itself?
+BOOL HookMaster = FALSE;							// Is this instance UltraVNC Server itself?
 
 BOOL appHookedOK = FALSE;							// Did InitInstance succeed?
 
@@ -241,7 +243,7 @@ DllExport BOOL SetHooks(DWORD thread_id, UINT UpdateMsg, UINT CopyMsg, UINT Mous
 					(HOOKPROC) CallWndProc,			// Hook procedure
 					hInstance,						// This DLL instance
 					0L								// Hook in to all apps
-//					GetCurrentThreadId()			// DEBUG : HOOK ONLY WinVNC
+//					GetCurrentThreadId()			// DEBUG : HOOK ONLY ULTRAVNC SERVER
 					);
 
 	// Add the GetMessage hook
@@ -250,7 +252,7 @@ DllExport BOOL SetHooks(DWORD thread_id, UINT UpdateMsg, UINT CopyMsg, UINT Mous
 					(HOOKPROC) GetMessageProc,			// Hook procedure
 					hInstance,						// This DLL instance
 					0L								// Hook in to all apps
-//					GetCurrentThreadId()			// DEBUG : HOOK ONLY WinVNC
+//					GetCurrentThreadId()			// DEBUG : HOOK ONLY ULTRAVNC SERVER
 					);
 
 		// Add the GetMessage hook
@@ -264,7 +266,7 @@ DllExport BOOL SetHooks(DWORD thread_id, UINT UpdateMsg, UINT CopyMsg, UINT Mous
 	// Check that it worked
 	if ((hCallWndHook != NULL) && (hGetMsgHook != NULL) && (hDialogMsgHook != NULL))
 	{
-		 g_shdata->vnc_thread_id = thread_id;			// Save the WinVNC thread id
+		 g_shdata->vnc_thread_id = thread_id;			// Save the UltraVNC Server thread id
 		 g_shdata->UpdateRectMessage = UpdateMsg;		// Save the message ID to use for rectangle updates
 		 g_shdata->CopyRectMessage = CopyMsg;			// Save the message ID to use for copyrect
 		 g_shdata->MouseMoveMessage = MouseMsg;		// Save the message ID to send when mouse moves
@@ -454,7 +456,7 @@ inline BOOL GetAbsoluteClientRect(HWND hwnd, RECT *rect)
 	return TRUE;
 }
 
-// Routine to send an UpdateRect message to WinVNC
+// Routine to send an UpdateRect message to UltraVNC Server
 inline void SendUpdateRect(SHORT x, SHORT y, SHORT x2, SHORT y2)
 {
 	WPARAM vwParam;
@@ -463,7 +465,7 @@ inline void SendUpdateRect(SHORT x, SHORT y, SHORT x2, SHORT y2)
 	vwParam = MAKELONG(x, y);
 	vlParam = MAKELONG(x2, y2);
 
-	// Send the update to WinVNC
+	// Send the update to UltraVNC Server
 	PostThreadMessage(
 		 g_shdata->vnc_thread_id,
 		 g_shdata->UpdateRectMessage,
@@ -474,7 +476,7 @@ inline void SendUpdateRect(SHORT x, SHORT y, SHORT x2, SHORT y2)
 	if (hWndRemote==NULL) UnSetHooks( g_shdata->vnc_thread_id);
 }
 
-// Send a window's position to WinVNC
+// Send a window's position to UltraVNC Server
 
 inline void SendWindowRect(HWND hWnd)
 {
@@ -517,7 +519,7 @@ inline void SendDeferredUpdateRect(HWND hWnd, SHORT x, SHORT y, SHORT x2, SHORT 
 	}
 	else
 	{
-		// Send the update to WinVNC
+		// Send the update to UltraVNC Server
 		PostThreadMessage(
 			 g_shdata->vnc_thread_id,
 			 g_shdata->UpdateRectMessage,
@@ -571,7 +573,7 @@ inline BOOL HookHandleddi(UINT MessageId, HWND hWnd, WPARAM wParam, LPARAM lPara
 	{
 	case WM_NCMOUSEMOVE:
 	case WM_MOUSEMOVE:
-		// Inform WinVNC that the mouse has moved and pass it the current cursor handle
+		// Inform UltraVNC Server that the mouse has moved and pass it the current cursor handle
 		{
 			HICON new_cursor = GetCursor();
 			if (new_cursor != old_cursor) {
@@ -601,7 +603,7 @@ inline BOOL HookHandle(UINT MessageId, HWND hWnd, WPARAM wParam, LPARAM lParam)
 		//		from here, or you'll get an infinite loop....!
 
 		// NB : The format of DEFERRED_UPDATE matches that of UpdateRectMessage,
-		//		so just send the exact same message data to WinVNC
+		//		so just send the exact same message data to UltraVNC Server
 
 		PostThreadMessage(
 			 g_shdata->vnc_thread_id,
@@ -613,7 +615,7 @@ inline BOOL HookHandle(UINT MessageId, HWND hWnd, WPARAM wParam, LPARAM lParam)
 		return FALSE;
 	}
 
-	// *** Could use WM_COPYDATA to send data to WinVNC
+	// *** Could use WM_COPYDATA to send data to UltraVNC Server
 
 /*
 	if (GetClassLong(hWnd, GCW_ATOM) == 32768)
@@ -780,10 +782,10 @@ inline BOOL HookHandle(UINT MessageId, HWND hWnd, WPARAM wParam, LPARAM lParam)
 		break;
 
 	////////////////////////////////////////////////////////////////
-	// WinVNC also wants to know about mouse movement
+	// UltraVNC Server also wants to know about mouse movement
 	case WM_NCMOUSEMOVE:
 	case WM_MOUSEMOVE:
-		// Inform WinVNC that the mouse has moved and pass it the current cursor handle
+		// Inform UltraVNC Server that the mouse has moved and pass it the current cursor handle
 		{
 			HICON new_cursor = GetCursor();
 			if (new_cursor != old_cursor) {
@@ -820,7 +822,7 @@ LRESULT CALLBACK CallWndProc(int nCode, WPARAM wParam, LPARAM lParam)
       // Do we have to handle this message?
 	   if (nCode == HC_ACTION)
 	   {
-		   // Process the hook if the WinVNC thread ID is valid
+		   // Process the hook if the UltraVNC Server thread ID is valid
 		   if ( g_shdata->vnc_thread_id)
 		   {
 			   CWPSTRUCT *cwpStruct = (CWPSTRUCT *) lParam;
@@ -842,7 +844,7 @@ LRESULT CALLBACK GetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
       // Do we have to handle this message?
 	   if (nCode == HC_ACTION)
 	   {
-		   // Process the hook only if the WinVNC thread id is valid
+		   // Process the hook only if the UltraVNC Server thread id is valid
 		   if ( g_shdata->vnc_thread_id)
 		   {
 			   MSG *msg = (MSG *) lParam;
@@ -873,7 +875,7 @@ LRESULT CALLBACK DialogMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
       // Do we have to handle this message?
 	   if (nCode >= 0)
 	   {
-		   // Process the hook only if the WinVNC thread ID is valid
+		   // Process the hook only if the UltraVNC Server thread ID is valid
 		   if ( g_shdata->vnc_thread_id)
 		   {
 			   MSG *msg = (MSG *) lParam;
@@ -970,7 +972,7 @@ char * NameFromPath(const char *path)
 
 /////////////////////////////////////////////////////////////////////////////
 // Initialise / Exit routines.
-// These functions handle the update settings for any apps used with WinVNC.
+// These functions handle the update settings for any apps used with UltraVNC Server.
 
 static const TCHAR szSoftware[] = "Software";
 static const TCHAR szCompany[] = "ORL";

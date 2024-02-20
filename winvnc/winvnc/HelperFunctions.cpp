@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002-2013 UltraVNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,11 +16,12 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the program is not available from the place from
-// which you received this file, check
-// http://www.uvnc.com/
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
 //
 ////////////////////////////////////////////////////////////////////////////
+
 
 #include <algorithm>
 #include "stdhdrs.h"
@@ -37,7 +38,7 @@
 //	Runas is standard OS, so no security risk
 
 HWND G_MENU_HWND = NULL;
-char* MENU_CLASS_NAME = "WinVNC Tray Icon";
+char* MENU_CLASS_NAME = "ultravnc-server-tray-icon";
 bool ClientTimerReconnect = false;
 bool allowMultipleInstances = false;
 
@@ -409,12 +410,42 @@ namespace settingsHelpers {
 
 void Open_homepage()
 {
-	ShellExecute(0, "open", "https://www.uvnc.com", 0, 0, 1);
+	ShellExecute(0, "open", "https://uvnc.com/", 0, 0, 1);
 }
 
 void Open_forum()
 {
-	ShellExecute(0, "open", "https://forum.uvnc.com", 0, 0, 1);
+	ShellExecute(0, "open", "https://forum.uvnc.com/", 0, 0, 1);
+}
+
+void Open_github()
+{
+	ShellExecute(0, "open", "https://github.com/ultravnc", 0, 0, 1);
+}
+
+void Open_mastodon()
+{
+	ShellExecute(0, "open", "https://mastodon.social/@ultravnc", 0, 0, 1);
+}
+
+void Open_facebook()
+{
+	ShellExecute(0, "open", "https://www.facebook.com/ultravnc1", 0, 0, 1);
+}
+
+void Open_xtwitter()
+{
+	ShellExecute(0, "open", "https://twitter.com/ultravnc1", 0, 0, 1);
+}
+
+void Open_reddit()
+{
+	ShellExecute(0, "open", "https://www.reddit.com/r/ultravnc", 0, 0, 1);
+}
+
+void Open_openhub()
+{
+	ShellExecute(0, "open", "https://openhub.net/p/ultravnc", 0, 0, 1);
 }
 
 #ifndef SC_20
@@ -811,7 +842,7 @@ namespace postHelper {
 
 	BOOL PostAddNewRepeaterClient() {
 		// assumes the -repeater command line set the repeater global variable.
-		// Post to the WinVNC menu window (usually expected to fail at program startup)
+		// Post to the UltraVNC Server menu window (usually expected to fail at program startup)
 		if (!PostToWinVNC(MENU_ADD_CLIENT_MSG, (WPARAM)0xFFFFFFFF, (LPARAM)0xFFFFFFFF))
 			return FALSE;
 		return TRUE;
@@ -819,7 +850,7 @@ namespace postHelper {
 
 	BOOL PostAddNewCloudClient() {
 		// assumes the -repeater command line set the repeater global variable.
-		// Post to the WinVNC menu window (usually expected to fail at program startup)
+		// Post to the UltraVNC Server menu window (usually expected to fail at program startup)
 		if (!PostToWinVNC(MENU_ADD_CLOUD_MSG, (WPARAM)0xFFFFFFFF, (LPARAM)0xFFFFFFFF))
 			return FALSE;
 		return TRUE;
@@ -831,11 +862,11 @@ namespace postHelper {
 
 	BOOL PostAddStopConnectClientAll() {
 		PostToWinVNC(MENU_STOP_RECONNECT_MSG, 0, 0); // stop running reconnect in server class
-		return (PostToWinVNC(MENU_STOP_ALL_RECONNECT_MSG, 0, 0)); //disable reconnect for tunning clients
+		return (PostToWinVNC(MENU_STOP_ALL_RECONNECT_MSG, 0, 0)); // disable reconnect for tunning clients
 	}
 
 	BOOL PostAddNewClientInit(unsigned long ipaddress, unsigned short port) {
-		// Post to the WinVNC menu window
+		// Post to the UltraVNC Server menu window
 		if (!PostToWinVNC(MENU_ADD_CLIENT_MSG_INIT, (WPARAM)port, (LPARAM)ipaddress))
 		{
 			//MessageBoxSecure(NULL, sz_ID_NO_EXIST_INST, szAppName, MB_ICONEXCLAMATION | MB_OK);
@@ -851,7 +882,7 @@ namespace postHelper {
 	}
 
 	BOOL PostAddNewClient4(unsigned long ipaddress, unsigned short port) {
-		// Post to the WinVNC menu window
+		// Post to the UltraVNC Server menu window
 		if (!PostToWinVNC(MENU_ADD_CLIENT_MSG, (WPARAM)port, (LPARAM)ipaddress))
 		{
 			//MessageBoxSecure(NULL, sz_ID_NO_EXIST_INST, szAppName, MB_ICONEXCLAMATION | MB_OK);
@@ -867,7 +898,7 @@ namespace postHelper {
 	}
 
 	BOOL PostAddNewClientInit4(unsigned long ipaddress, unsigned short port) {
-		// Post to the WinVNC menu window
+		// Post to the UltraVNC Server menu window
 		if (!PostToWinVNC(MENU_ADD_CLIENT_MSG_INIT, (WPARAM)port, (LPARAM)ipaddress)) {
 			//MessageBoxSecure(NULL, sz_ID_NO_EXIST_INST, szAppName, MB_ICONEXCLAMATION | MB_OK);
 			//Little hack, seems postmessage fail in some cases on some os.
@@ -880,8 +911,8 @@ namespace postHelper {
 		return TRUE;
 	}
 	BOOL PostAddNewClient6(in6_addr* ipaddress, unsigned short port) {
-		// Post to the WinVNC menu window
-		// We can not sen a ipv6 address with a LPARAM, so we fake the message by copying in a gloobal var.
+		// Post to the UltraVNC Server menu window
+		// We can not sen a IPv6 address with a LPARAM, so we fake the message by copying in a gloobal var.
 		memcpy(&G_LPARAM_IN6, ipaddress, sizeof(in6_addr));
 		if (!PostToWinVNC(MENU_ADD_CLIENT6_MSG, (WPARAM)port, (LPARAM)ipaddress))
 			return FALSE;
@@ -889,8 +920,8 @@ namespace postHelper {
 	}
 
 	BOOL PostAddNewClientInit6(in6_addr* ipaddress, unsigned short port) {
-		// Post to the WinVNC menu window
-		// We can not sen a ipv6 address with a LPARAM, so we fake the message by copying in a gloobal var.
+		// Post to the UltraVNC Server menu window
+		// We can not sen a IPv6 address with a LPARAM, so we fake the message by copying in a gloobal var.
 		memcpy(&G_LPARAM_IN6, ipaddress, sizeof(in6_addr));
 		if (!PostToWinVNC(MENU_ADD_CLIENT6_MSG_INIT, (WPARAM)port, (LPARAM)ipaddress))
 			return FALSE;
@@ -898,7 +929,7 @@ namespace postHelper {
 	}
 
 	BOOL PostAddNewClient(unsigned long ipaddress, unsigned short port) {
-		// Post to the WinVNC menu window
+		// Post to the UltraVNC Server menu window
 		if (!PostToWinVNC(MENU_ADD_CLIENT_MSG, (WPARAM)port, (LPARAM)ipaddress))
 		{
 			//MessageBoxSecure(NULL, sz_ID_NO_EXIST_INST, szAppName, MB_ICONEXCLAMATION | MB_OK);
@@ -926,15 +957,15 @@ namespace postHelper {
 		if (hservwnd == NULL)
 			return FALSE;
 
-		// Post the message to WinVNC
+		// Post the message to UltraVNC Server
 		PostMessage(hservwnd, message, wParam, lParam);
 		return TRUE;
 	}
 
 	BOOL PostToWinVNC(UINT message, WPARAM wParam, LPARAM lParam) {
-		// Locate the hidden WinVNC menu window
+		// Locate the hidden UltraVNC Server menu window
 		// adzm 2010-02-10 - If we are in SC mode, then we know we want to only post messages to our own instance. This prevents
-		// conflicts if the user already has another copy of a WinVNC-derived application running.
+		// conflicts if the user already has another copy of a UltraVNC Server derived application running.
 		if (allowMultipleInstances || settings->getScExit() || settings->getScPrompt()) {
 			return PostToThisWinVNC(message, wParam, lParam);
 		}
@@ -944,13 +975,13 @@ namespace postHelper {
 		if (hservwnd == NULL)
 			return FALSE;
 
-		// Post the message to WinVNC
+		// Post the message to UltraVNC Server
 		PostMessage(hservwnd, message, wParam, lParam);
 		return TRUE;
 	}
 
 	HWND FindWinVNCWindow(bool bThisProcess) {
-		// Locate the hidden WinVNC menu window
+		// Locate the hidden UltraVNC Server menu window
 		if (!bThisProcess) {
 			// Find any window with the MENU_CLASS_NAME window class
 			HWND returnvalue = FindWindow(MENU_CLASS_NAME, NULL);
@@ -1155,7 +1186,7 @@ namespace processHelper {
 	{
 		bool bLocked = false;
 
-		// Original code does not work if running as a service...  apparently no access to the desktop.
+		// Original code does not work if running as a service... apparently no access to the desktop.
 		// Alternative is to check for a running LogonUI.exe (if present, system is either not logged in or locked)
 		HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 

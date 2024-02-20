@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002-2013 UltraVNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,9 +16,9 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the program is not available from the place from
-// which you received this file, check 
-// http://www.uvnc.com/
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
 //
 ////////////////////////////////////////////////////////////////////////////
 
@@ -212,14 +212,14 @@ void TextChat::ProcessTextChatMsg(int nTO)
 	}
 	else if (len == CHAT_CLOSE)
 	{
-		// Close TextChat Dialog
+		// Close Text Chat Dialog
 		if (!m_fTextChatRunning) return;
 		PostMessage(m_hDlg, WM_COMMAND, IDOK, 0);
 		return;
 	}
 	else if (len == CHAT_FINISHED)
 	{
-		// Close TextChat Dialog
+		// Close Text Chat Dialog
 		if (!m_fTextChatRunning) return;
 		// m_fTextChatRunning = false;
 		// PostMessage(m_hDlg, WM_COMMAND, IDCANCEL, 0);
@@ -246,7 +246,7 @@ void TextChat::ProcessTextChatMsg(int nTO)
 
 
 //
-// Tell the client to initiate a TextChat
+// Tell the client to initiate a Text Chat
 //
 void TextChat::OrderTextChat()
 {
@@ -260,7 +260,7 @@ void TextChat::OrderTextChat()
 //
 void TextChat::SendTextChatRequest(int nMsg)
 {
-	if (m_pCC->m_fFileTransferRunning) return; // Don't break a running file transfer please...
+	if (m_pCC->m_fFileTransferRunning) return; // Don't break a running File Transfer please...
     rfbTextChatMsg tcm;
 	memset(&tcm, 0, sizeof(rfbTextChatMsg));
     tcm.type = rfbTextChat;
@@ -347,7 +347,7 @@ void TextChat::PrintMessage(const char* szMessage,const char* szSender,DWORD dwC
 	si.nPos = si.nMax - std::max((int)(si.nPage - 1), 0);
 	SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT, WM_VSCROLL, MAKELONG(SB_THUMBPOSITION, si.nPos), 0L);	// Scroll down the ch
 
-	// This line does the bottom scrolling correctly under NT4,W2K, XP...
+	// This line does the bottom scrolling correctly under Windows NT4, Windows 2000, Windows XP...
 	// SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT, WM_VSCROLL, SB_BOTTOM, 0L);
 
 }
@@ -357,7 +357,7 @@ void TextChat::PrintMessage(const char* szMessage,const char* szSender,DWORD dwC
 //
 void TextChat::SendLocalText(void)
 {
-	if (m_pCC->m_fFileTransferRunning) return; // Don't break a running file transfer please...
+	if (m_pCC->m_fFileTransferRunning) return; // Don't break a running File Transfer please...
 
 	// We keep it because we could use it
 	// for future retype functionality. (F3)
@@ -598,7 +598,7 @@ INT_PTR CALLBACK TextChat::TextChatDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM wPar
 		*/
 
 		case IDOK:
-			// Client order to close TextChat 			
+			// Client order to close Text Chat 			
 
 			//	[v1.0.2-jp1 fix] UNSUBCLASS Split bar
             helper::SafeSetWindowProc(GetDlgItem(hWnd, IDC_STATIC_SPLIT), pDefSBProc);
@@ -608,7 +608,7 @@ INT_PTR CALLBACK TextChat::TextChatDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM wPar
 			return TRUE;
 
 		case IDCANCEL:			
-			_this->SendTextChatRequest(CHAT_CLOSE); // Client must close TextChat
+			_this->SendTextChatRequest(CHAT_CLOSE); // Client must close Text Chat
 
 			//	[v1.0.2-jp1 fix] UNSUBCLASS Split bar
             helper::SafeSetWindowProc(GetDlgItem(hWnd, IDC_STATIC_SPLIT), pDefSBProc);

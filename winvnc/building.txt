@@ -1,7 +1,31 @@
-NOTES ON BUILDING WINVNC:
+//  /////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
+//
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
+//  USA.
+//
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
 
-The WinVNC project file (WinVNC.dsp) contains four sets of project
-settings.  The settings required to re-build the publicly released
+NOTES ON BUILDING ULTRAVNC SERVER:
+
+The UltraVNC Server project file (WinVNC.dsp) contains four sets of project
+settings. The settings required to re-build the publicly released
 executable are stored in the Release configuration.
 
 The public configurations are:
@@ -14,26 +38,26 @@ Release -	This is the intended build configuration for external use
 			barring the use of the definition NCORBA rather than the
 			definition _CORBA.
 
-**>		Use this release when building WinVNC for general distribution.	<**
+**> Use this release when building UltraVNC Server for general distribution. <**
 
-Debug -		The public debug build.  This builds debug executables and
-			libraries, equivalent in all other respects to the release builds.  
+Debug -		The public debug build. This builds debug executables and
+			libraries, equivalent in all other respects to the release builds.
 
 ///////////////////////////////////////////////////////////////////////////
 
 Internally, AT&T Labs and the Laboratory for Communications Engineering use
-CORBA-based session-management.  Within the labs, the following builds are used
+CORBA-based session-management. Within the labs, the following builds are used
 in place of the public builds above.
 
 Release (CORBA) -
 			Release build providing session management interface.
 			This build assumes the presence of CORBA session-control code
-			in the vncCorbaConnect files.  These are not supplied
+			in the vncCorbaConnect files. These are not supplied
 			as part of the public release distribution because
 			they are dependent upon AT&T infrastructure.
 
 Debug (CORBA) -
-			Debug build providing session management.  This build
+			Debug build providing session management. This build
 			also assumes the presence of the CORBA session-control
 			routines.
 
