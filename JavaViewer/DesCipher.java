@@ -1,11 +1,36 @@
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
+//
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
+//  USA.
+//
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
+
+
 //
 // This DES class has been extracted from package Acme.Crypto for use in VNC.
 // The bytebit[] array has been reversed so that the most significant bit
-// in each byte of the key is ignored, not the least significant.  Also the
+// in each byte of the key is ignored, not the least significant. Also the
 // unnecessary odd parity code has been removed.
 //
 // These changes are:
-//  Copyright (C) 1999 AT&T Laboratories Cambridge.  All Rights Reserved.
+//  Copyright (C) 1999 AT&T Laboratories Cambridge. All Rights Reserved.
 //
 // This software is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -36,14 +61,14 @@
 // NAVIGATION OR COMMUNICATION SYSTEMS, AIR TRAFFIC CONTROL, DIRECT LIFE
 // SUPPORT MACHINES, OR WEAPONS SYSTEMS, IN WHICH THE FAILURE OF THE
 // SOFTWARE COULD LEAD DIRECTLY TO DEATH, PERSONAL INJURY, OR SEVERE
-// PHYSICAL OR ENVIRONMENTAL DAMAGE ("HIGH RISK ACTIVITIES").  WIDGET WORKSHOP
+// PHYSICAL OR ENVIRONMENTAL DAMAGE ("HIGH RISK ACTIVITIES"). WIDGET WORKSHOP
 // SPECIFICALLY DISCLAIMS ANY EXPRESS OR IMPLIED WARRANTY OF FITNESS FOR
 // HIGH RISK ACTIVITIES.
 //
 //
 // The rest is:
 //
-// Copyright (C) 1996 by Jef Poskanzer <jef@acme.com>.  All rights reserved.
+// Copyright (C) 1996 by Jef Poskanzer <jef@acme.com>. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
@@ -57,7 +82,7 @@
 // THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
 // ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-// ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
 // FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
 // DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
 // OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
@@ -74,12 +99,12 @@
 
 /// The DES encryption method.
 // <P>
-// This is surprisingly fast, for pure Java.  On a SPARC 20, wrapped
+// This is surprisingly fast, for pure Java. On a SPARC 20, wrapped
 // in Acme.Crypto.EncryptedOutputStream or Acme.Crypto.EncryptedInputStream,
 // it does around 7000 bytes/second.
 // <P>
 // Most of this code is by Dave Zimmerman <dzimm@widget.com>, and is
-// Copyright (c) 1996 Widget Workshop, Inc.  See the source file for details.
+// Copyright (c) 1996 Widget Workshop, Inc. See the source file for details.
 // <P>
 // <A HREF="/resources/classes/Acme/Crypto/DesCipher.java">Fetch the software.</A><BR>
 // <A HREF="/resources/classes/Acme.tar.Z">Fetch the entire Acme package.</A>

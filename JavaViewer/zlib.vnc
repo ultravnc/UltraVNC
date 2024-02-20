@@ -1,7 +1,7 @@
-<!-- zlib.vnc - zlib html page for Java VNC viewer applet.  On any file
+<!-- zlib.vnc - zlib html page for Java UltraVNC Viewer applet. On any file
      ending in .vnc, the HTTP server embedded in Xvnc will substitute the
      following variables when preceded by a dollar: USER, DESKTOP, DISPLAY,
-     APPLETWIDTH, APPLETHEIGHT, WIDTH, HEIGHT, PORT.  Use two dollar signs
+     APPLETWIDTH, APPLETHEIGHT, WIDTH, HEIGHT, PORT. Use two dollar signs
      ($$) to get a dollar sign in the generated html. -->
 
 <HTML>
@@ -14,5 +14,5 @@ $USER's $DESKTOP desktop ($DISPLAY)
 <param name=ENCODING value=Zlib>
 </APPLET>
 <BR>
-<A href="http://ultravnc.sf.net/">UltraVNC Site</A>
+<A href="https://uvnc.com/">UltraVNC Official Website</A>
 </HTML>
