@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002-2013 UltraVNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,11 +16,12 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the program is not available from the place from
-// which you received this file, check
-// http://www.uvnc.com/
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
 //
 ////////////////////////////////////////////////////////////////////////////
+
 
 // SessionDialog.cpp: implementation of the SessionDialog class.
 
@@ -474,7 +475,7 @@ void SessionDialog::ExpandBox(HWND hDlg, BOOL fExpand)
 		GetWindowRect(hDlg, &rcWnd);
 
 		// this is the first time we are being called to shrink the dialog
-		// box.  The dialog box is currently in its expanded size and we must
+		// box. The dialog box is currently in its expanded size and we must
 		// save the expanded width and height so that it can be restored
 		// later when the dialog box is expanded.
 
@@ -584,8 +585,8 @@ void SessionDialog::InitDlgProc(bool loadhost, bool initMruNeeded)
 		0,                         // nWidth
 		0,                         // nEscapement
 		0,                         // nOrientation
-		FW_BOLD,                 // nWeight
-		false,                     // bItalic
+		FW_BOLD,                   // nWeight
+		FALSE,                     // bItalic
 		FALSE,                     // bUnderline
 		0,                         // cStrikeOut
 		ANSI_CHARSET,              // nCharSet
@@ -593,7 +594,7 @@ void SessionDialog::InitDlgProc(bool loadhost, bool initMruNeeded)
 		CLIP_DEFAULT_PRECIS,       // nClipPrecision
 		DEFAULT_QUALITY,           // nQuality
 		DEFAULT_PITCH | FF_SWISS,  // nPitchAndFamily
-		_T("Arial"));                 // lpszFacename
+		_T("Arial"));              // lpszFacename
 
 	SendMessage(GetDlgItem(hwnd, IDC_LOGO), WM_SETFONT, (WPARAM)font, TRUE);
 }

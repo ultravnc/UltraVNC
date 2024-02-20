@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002-2013 UltraVNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,11 +16,12 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the program is not available from the place from
-// which you received this file, check 
-// http://www.uvnc.com/
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
 //
 ////////////////////////////////////////////////////////////////////////////
+
 
 // This is the source for the low-level keyboard hook, which allows intercepting and sending
 // special keys (such as ALT,CTRL, ALT+TAB, etc) to the VNCServer side.
@@ -70,7 +71,7 @@ BOOL LowLevelHook::Initialize(HWND hwndMain)
         GetWindowThreadProcessId(g_hwndVNCViewer,&g_VncProcessID);
 
 		// adzm 2009-09-25 - Install the hook on a different thread. We recieve the hook callbacks via the message pump, so
-		// by using it on the main connection thread, it could be delayed due to file transfers, etc. So now we have a dedicated
+		// by using it on the main connection thread, it could be delayed due to File Transfers, etc. So now we have a dedicated
 		// thread that handles the low level keyboard hook.
 		g_hThread = CreateThread(NULL, 0, HookThreadProc, hInstance, 0, &g_nThreadID);
 
@@ -203,7 +204,7 @@ LRESULT CALLBACK LowLevelHook::VncLowLevelKbHookProc(INT nCode, WPARAM wParam, L
                     }
 				}
 
-                //only if this is "our" process (vncviewer's process)
+                //only if this is "our" process (UltraVNC Viewer's process)
                 //we should intecept the key-presses
 				// adzm 2009-09-25 - Call CheckScrollLock() which will query the scroll lock state if necessary
                 if (ProcessID==g_VncProcessID) {
@@ -301,7 +302,7 @@ LRESULT CALLBACK LowLevelHook::VncLowLevelKbHookProc(INT nCode, WPARAM wParam, L
 
 
                                 //SPACEBAR = When key interception is Active, no special handling is required for 'spacebar'.
-                                //But when key interception is turned off, I want ALT+SPACE to open the VNCViewer's System Menu.
+                                //But when key interception is turned off, I want ALT+SPACE to open the UltraVNC Viewer's System Menu.
                         case VK_SPACE:
                                 if (!CheckScrollLock()) {
                                         if (pkbdllhook->flags & LLKHF_ALTDOWN) {
@@ -316,7 +317,7 @@ LRESULT CALLBACK LowLevelHook::VncLowLevelKbHookProc(INT nCode, WPARAM wParam, L
 
                                 
                                 //TAB = If the user presses ALT+TAB, we must block the TAB key (fHandled=TRUE),
-                                //Otherwise windows (on the VNCViewer's side) will switch to another application.
+                                //Otherwise windows (on the UltraVNC Viewer's side) will switch to another application.
                                 //But because we block the TAB key, the 'ClientConnection' window won't know to send
                                 //a TAB key to the VNCServer. so we simulate a TAB key pressed. 
                                 //(The ALT key down was already sent to the VNCServer when the user pressed ALT)
@@ -339,7 +340,7 @@ LRESULT CALLBACK LowLevelHook::VncLowLevelKbHookProc(INT nCode, WPARAM wParam, L
                                 break;
 
                                 //ESCAPE = ALT+ESC is also a way to switch application, so we block the ESCAPE key,
-                                //Otherwise windows (on the VNCViewer's side) will switch to another application.
+                                //Otherwise windows (on the UltraVNC Viewer's side) will switch to another application.
                                 //Transmitting the ALT+ESCAPE combination to a VNCServer running Windows doesn't work
                                 //very well, so for now, we'll just block the ALT+ESCAPE combination.
                                 //(CTRL+ESC work OK, BTW)

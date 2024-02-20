@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002-2013 UltraVNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,12 +16,12 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the program is not available from the place from
-// which you received this file, check 
-// http://www.uvnc.com/
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
 //
 ////////////////////////////////////////////////////////////////////////////
- 
+
 #include "stdhdrs.h"
 #include "vncviewer.h"
 #include "Hyperlinks.h"
@@ -33,13 +33,13 @@ bool	g_disable_sponsor=false;
 extern char buildtime[];
 
 // Process the About dialog.
-static LRESULT CALLBACK MessageDlgProc2(HWND hwnd, UINT iMsg, 
+static LRESULT CALLBACK MessageDlgProc2(HWND hwnd, UINT iMsg,
 										   WPARAM wParam, LPARAM lParam) {
 	switch (iMsg) {
 	case WM_INITDIALOG:
 		{
 			//CentreWindow(hwnd);
-			SetForegroundWindow(hwnd);            
+			SetForegroundWindow(hwnd);
 			SetDlgItemText(hwnd, IDC_BUILDTIME, buildtime);
             SetDlgItemText(hwnd, IDC_Message2, infomsg2);
 			if ( (strcmp(infomsg2,"Your connection has been rejected.")==0)) g_error_nr2=1000;
@@ -84,4 +84,3 @@ void ShowMessageBox2(char *info,int error_nr)
 	g_error_nr2 = error_nr;
 	int res = DialogBox(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_APP_MESSAGE2), NULL, (DLGPROC) MessageDlgProc2);
 }
-	

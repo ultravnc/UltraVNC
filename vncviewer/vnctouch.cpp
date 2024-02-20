@@ -1,3 +1,28 @@
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
+//
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
+//  USA.
+//
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
+
+
 #include "vnctouch.h"
 #ifdef _Gii
 
@@ -12,12 +37,12 @@
 #define TI_flag 0x1000000//'Ti'mestamp : Der Zeitstempel zu dem das Ereignis am Touchdevice entstanden ist, wird mit übertragen.
 #define HC_flag 0x800000//'H'igh Performance 'C'ounter
 
- // Reserverd   0x40000-0x100
+// Reserverd   0x40000-0x100
 #define FORMAT_0_flag 0x0
-#define LANGE_16_flag 0x10 //16bit signed für x gefolgt von 16bit signed für y gemeinsam in einem DWORD
-#define LANGE_32_flag 0x20 //32bit signed für x gefolgt von 32bit signed für y in jeweils einem DWORD
-#define LANGE_64_flag 0x30 //64bit signed für x gefolgt von 64bit signed für y in jeweils 2 DWORD
-#define IDFORMAT_32  0x1 //32bit ID
+#define LANGE_16_flag 0x10 //16-bit signed für x gefolgt von 16-bit signed für y gemeinsam in einem DWORD
+#define LANGE_32_flag 0x20 //32-bit signed für x gefolgt von 32-bit signed für y in jeweils einem DWORD
+#define LANGE_64_flag 0x30 //64-bit signed für x gefolgt von 64-bit signed für y in jeweils 2 DWORD
+#define IDFORMAT_32  0x1 //32-bit ID
 #define IDFORMAT_CLEAR 0xF // No more touch points
 
 /////////////////////////////////////////////////////
@@ -57,7 +82,7 @@ sein gemäß valuator.first.
 Die Anzahl der Werte für einen Touchevent berechnet sich aus der Gesamtanzahl der Werte
 geteilt durch die Anzahl der Touchevents(valuator.count / valuator.first).
 ////////////////////////////////////////////////////////////////////////////////
-//UVNC: REMARK
+//ULTRAVNC: REMARK
 //There is an issue when not all pointers have the same size.
 //valuator.count / valuator.first expext that all arrays are the same while they are actual
 //defined with (can be missing)...
@@ -111,13 +136,13 @@ Als Kombination zwischen Länge und Format
 +--------+-------+
 Länge 0: sollte zur Erkennung von Übertragungsfehlern nicht verwendet werden
 Länge 1: 1 DWORD
---> Format       0 : 16bit signed für x gefolgt von 16bit signed für y gemeinsam in einem DWORD
+--> Format       0 : 16-bit signed für x gefolgt von 16-bit signed für y gemeinsam in einem DWORD
 Formate > 1..3 : noch nicht definiert und dürfen derzeit nicht benutzt werden.
 Länge 2: 2 DWORD
---> Format       0 : 32bit signed für x gefolgt von 32bit signed für y in jeweils einem DWORD
+--> Format       0 : 32-bit signed für x gefolgt von 32-bit signed für y in jeweils einem DWORD
 Formate > 1..3 : noch nicht definiert und dürfen derzeit nicht benutzt werden.
 Länge 3: 4 DWORD
---> Format       0 : 64bit signed für x gefolgt von 64bit signed für y in jeweils 2 DWORDs
+--> Format       0 : 64-bit signed für x gefolgt von 64-bit signed für y in jeweils 2 DWORDs
 Formate > 1..3 : noch nicht definiert und dürfen derzeit nicht benutzt werden.
 
 ID Format  - Format des vorzeichenbehafteter Identifier des jeweiligen "Fingers"
@@ -154,8 +179,8 @@ Koordinaten: (wenn 0 < ID Format < 15 && Pix-Format = 1)
 +----------+----------+
 | x-pos    | y-pos    |
 +----------+----------+
-x-pos  - x Koordinate absolut 16bit (-32768 .. 32768 Pixel)
-y-pos  - y Koordinate absolut 16bit (-32768 .. 32768 Pixel)
+x-pos  - x Koordinate absolut 16-bit (-32768 .. 32768 Pixel)
+y-pos  - y Koordinate absolut 16-bit (-32768 .. 32768 Pixel)
 Koordinaten: (wenn 0 < ID Format < 15 && Pix-Format != 1)
 noch nicht definiert!
 
@@ -553,8 +578,8 @@ void vnctouch::rfb_gii_init_valuator(rfbGIIValuatorEventMsg *val, int cnt)
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
-//switch x and y coordinates
-// UVNC windows: our touch "driver" does not switch touch coordinates
+// Switch x and y coordinates
+// UltraVNC Windows: our touch "driver" does not switch touch coordinates
 // MOUSE coordinates are switched by windows!!
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 void vnctouch::doczka_vertical()
@@ -562,8 +587,8 @@ void vnctouch::doczka_vertical()
 	int i = 0;
 	if (cc->m_si.framebufferWidth < cc->m_si.framebufferHeight)
 	{
-		//switch x and y coordinates
-		// UVNC windows: our touch "driver" does not switch touch coordinates
+		// Switch x and y coordinates
+		// UltraVNC Windows: our touch "driver" does not switch touch coordinates
 		// MOUSE coordinates are switched by windows!!
 		int tmppos;
 		for (i = 0; i < MAXPOINTS; ++i) {

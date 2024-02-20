@@ -1,7 +1,32 @@
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
+//
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
+//  USA.
+//
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
+
+
 //===========================================================================
 //	FullScreen Titlebar
 //	2004 - All rights reservered
-//  2019 - modified for uVNc
+//  2019 - modified for UltraVNC
 //===========================================================================
 //
 //	Project/Product :	FullScreenTitlebar
@@ -10,7 +35,7 @@
 //  Homepage		:	http://lars.werner.no
 //
 //	Description		:	Creates a titlebar window used on fullscreen apps.
-//                  
+//
 //	Classes			:	CTitleBar
 //
 //	History
@@ -53,7 +78,7 @@ CTitleBar::CTitleBar()
 	ScreenTip = nullptr;
 	PhotoTip = nullptr;
 	SwitchMonitorTip = nullptr;
-	MonitorTop = 0;	
+	MonitorTop = 0;
 }
 
 CTitleBar::CTitleBar(HINSTANCE hInst, HWND ParentWindow, bool Fit)
@@ -93,7 +118,7 @@ void CTitleBar::Init()
 	HideAfterSlide=FALSE;
 
 	// Get DPI
-    HDC hdc;   
+    HDC hdc;
     hdc = GetDC(nullptr);
 	dpi = GetDeviceCaps(hdc, LOGPIXELSY);  // 100% = 96
 	ReleaseDC(nullptr, hdc);
@@ -110,7 +135,7 @@ void CTitleBar::Init()
 	{
 		// TitleBarThis=this; // Added Jef Fix
 		this->CreateDisplay();
-	}	
+	}
 }
 
 //***************************************************************************************
@@ -151,7 +176,7 @@ void CTitleBar::CreateDisplay()
 {
 	//Consts are used to select margins
 	//GetParent size and size after that!
-	RECT lpRect;	
+	RECT lpRect;
 	::GetWindowRect(::GetDesktopWindow(), &lpRect);
 
 	// Create the window
@@ -224,7 +249,7 @@ void CTitleBar::CreateDisplay()
 				(HMENU)tbIDC_MAXIMIZE,
                 hInstance,
 				nullptr);
-	
+
 	//Minimize button
 	Minimize=CreateWindow("STATIC",
 				"Minimize",
@@ -288,7 +313,7 @@ void CTitleBar::CreateDisplay()
 
 //***************************************************************************************
 
-LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg, 
+LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg,
 					   WPARAM wParam, LPARAM lParam)
 {
 	// Added Jef Fix
@@ -323,39 +348,39 @@ LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg,
 
 	case WM_DRAWITEM:
 		{
-			HDC hdcMem; 
-			LPDRAWITEMSTRUCT lpdis; 
+			HDC hdcMem;
+			LPDRAWITEMSTRUCT lpdis;
 
-            lpdis = (LPDRAWITEMSTRUCT) lParam; 
-            hdcMem = CreateCompatibleDC(lpdis->hDC); 
+            lpdis = (LPDRAWITEMSTRUCT) lParam;
+            hdcMem = CreateCompatibleDC(lpdis->hDC);
 			HGDIOBJ hbrOld=nullptr;
- 
+
 			if(lpdis->CtlID==tbIDC_CLOSE)
-					hbrOld=SelectObject(hdcMem, TitleBarThis->hClose); 
+					hbrOld=SelectObject(hdcMem, TitleBarThis->hClose);
 			if(lpdis->CtlID==tbIDC_MAXIMIZE)
-					hbrOld=SelectObject(hdcMem, TitleBarThis->hMaximize); 
+					hbrOld=SelectObject(hdcMem, TitleBarThis->hMaximize);
 			if(lpdis->CtlID==tbIDC_MINIMIZE)
-					hbrOld=SelectObject(hdcMem, TitleBarThis->hMinimize); 
-			
+					hbrOld=SelectObject(hdcMem, TitleBarThis->hMinimize);
+
 			if(lpdis->CtlID==tbIDC_PIN)
 			{
 				if(TitleBarThis->AutoHide==TRUE)
-					hbrOld=SelectObject(hdcMem, TitleBarThis->hPinUp); 
+					hbrOld=SelectObject(hdcMem, TitleBarThis->hPinUp);
 				else
-					hbrOld=SelectObject(hdcMem, TitleBarThis->hPinDown); 
+					hbrOld=SelectObject(hdcMem, TitleBarThis->hPinDown);
 			}
 
 			if(lpdis->CtlID==tbIDC_SCREEN)
 			{
 				if(TitleBarThis->Fit==TRUE)
-					hbrOld=SelectObject(hdcMem, TitleBarThis->hFitScreen); 
+					hbrOld=SelectObject(hdcMem, TitleBarThis->hFitScreen);
 				else
-					hbrOld=SelectObject(hdcMem, TitleBarThis->hNoScaleScreen); 
+					hbrOld=SelectObject(hdcMem, TitleBarThis->hNoScaleScreen);
 			}
 			if(lpdis->CtlID==tbIDC_PHOTO)
-					hbrOld=SelectObject(hdcMem, TitleBarThis->hPhoto); 
+					hbrOld=SelectObject(hdcMem, TitleBarThis->hPhoto);
 			if(lpdis->CtlID==tbIDC_SWITCHMONITOR)
-					hbrOld=SelectObject(hdcMem, TitleBarThis->hSwitchMonitor); 
+					hbrOld=SelectObject(hdcMem, TitleBarThis->hSwitchMonitor);
 
 			StretchBlt(lpdis->hDC,
 				lpdis->rcItem.left,
@@ -368,10 +393,10 @@ LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg,
 				ctbcxPicture,
 				ctbcyPicture,
 				SRCCOPY);
-			
+
 			if (hbrOld) SelectObject(hdcMem,hbrOld);
-            DeleteDC(hdcMem); 
-            return TRUE; 
+            DeleteDC(hdcMem);
+            return TRUE;
 		}
 
 	case WM_COMMAND:
@@ -398,7 +423,7 @@ LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg,
 			{
 					if (TitleBarThis->Fit == TRUE)
 						TitleBarThis->Fit = FALSE;
-					else 
+					else
 						TitleBarThis->Fit = TRUE;
 					::RedrawWindow(TitleBarThis->Screen, nullptr, nullptr, RDW_INVALIDATE);
 			}
@@ -437,7 +462,7 @@ LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg,
 					if (TitleBarThis->Fit == TRUE)
 						::SendMessage(TitleBarThis->Parent, tbWM_PHOTO, 0, 0);
 					else
-						yesUVNCMessageBox(TitleBarThis->Parent, _T("Function only supported in 1:1 mode"), _T("uVNC snapshot"), MB_ICONINFORMATION);
+						yesUVNCMessageBox(TitleBarThis->Parent, _T("Function only supported in 1:1 mode"), _T("UltraVNC Viewer - Snapshot"), MB_ICONINFORMATION);
 				if(LOWORD(wParam) == tbIDC_SWITCHMONITOR)
 					::SendMessage(TitleBarThis->Parent, tbWM_SWITCHMONITOR, 0, 0);
 			}
@@ -446,7 +471,7 @@ LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg,
 		//Menu part starts here
 		{
 			UINT IDNum=LOWORD(wParam);
-		
+
 			if(IDNum>=tbWMCOMMANDIDStart&&IDNum<tbWMCOMMANDIDEnd) //The ID is in range for a menuclick
 			{
 				UINT Num=IDNum-tbWMCOMMANDIDStart;
@@ -485,7 +510,7 @@ LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg,
 		}
 
         break;
-	
+
 	case WM_MOUSEMOVE:
 			if(TitleBarThis->HideAfterSlide==FALSE)
 			{
@@ -516,7 +541,7 @@ LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg,
 				TCHAR Text[MAX_PATH];
 				ZeroMemory(Text,sizeof(Text));
 				int res=::GetMenuString(SubMenu, i, Text, MAX_PATH, MF_BYPOSITION);
-				
+
 				if(res!=0)
 				{
 					::ModifyMenu(SubMenu,i,MF_BYPOSITION, tbWMCOMMANDIDStart+Pos,Text);
@@ -533,7 +558,7 @@ LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg,
 					TCHAR Text[MAX_PATH];
 					ZeroMemory(Text,sizeof(Text));
 					int res=::GetMenuString(SubMenu, i, Text, MAX_PATH, MF_BYPOSITION);
-					
+
 					if(res!=0)
 					{
 						RealPos++;
@@ -556,7 +581,7 @@ LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg,
 	case WM_TIMER:
 		{
 			UINT TimerID=(UINT)wParam;
-			
+
 			if(TimerID==tbScrollTimerID)
 			{
 				RECT lpRect;
@@ -596,7 +621,7 @@ LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg,
 				::GetWindowRect(TitleBarThis->m_hWnd, &lpRect);
 				::GetCursorPos(&pt);
 
-				if(PtInRect(&lpRect, pt)==FALSE) 
+				if(PtInRect(&lpRect, pt)==FALSE)
 				{
 					TitleBarThis->IntAutoHideCounter++;
 
@@ -616,8 +641,8 @@ LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg,
 		}
 	case WM_DPICHANGED:
 	{
-		TitleBarThis->dpi = HIWORD(wParam);		
-		vnclog.Print(2, _T("FullScreenTitelbar DPI change %d \n"), TitleBarThis->dpi);		
+		TitleBarThis->dpi = HIWORD(wParam);
+		vnclog.Print(2, _T("FullScreenTitelbar DPI change %d \n"), TitleBarThis->dpi);
 		TitleBarThis->Font = CreateFont(-MulDiv(tbFontSize, TitleBarThis->dpi, 72), 0, 0, 0, 0, FALSE, 0, 0, 0, 0, 0, 0, 0, tbFont);
 		TitleBarThis->SetScale();
 		TitleBarThis->MoveToMonitor(nullptr);
@@ -625,7 +650,7 @@ LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg,
 	}
 
 }//Case - end
-	
+
 	return DefWindowProc(hwnd, iMsg, wParam, lParam);
 }
 
@@ -676,13 +701,13 @@ void CTitleBar::Draw()
 	if(tbGradientWay==TRUE)
 	{
 		for ( int x = 0; x<tbWidth; x++)
-		{ 
+		{
 			RECT Rect;
 			Rect.left=x;
 			Rect.top=0;
 			Rect.right=x+1;
 			Rect.bottom=tbHeigth;
-			HBRUSH Brush=CreateSolidBrush(RGB(r1 * (tbWidth-x)/tbWidth + r2 * x/tbWidth, 
+			HBRUSH Brush=CreateSolidBrush(RGB(r1 * (tbWidth-x)/tbWidth + r2 * x/tbWidth,
 				g1 * (tbWidth-x)/tbWidth + g2 * x/tbWidth, b1 * (tbWidth-x)/tbWidth + b2 * x/tbWidth));
 
 			::FillRect(hdc, &Rect, Brush);
@@ -692,14 +717,14 @@ void CTitleBar::Draw()
 	else
 	{
 		for ( int y = 0; y<tbHeigth; y++)
-		{ 
+		{
 			RECT Rect;
 			Rect.left=0;
 			Rect.top=y;
 			Rect.right=tbWidth;
 			Rect.bottom=y+1;
-			
-			HBRUSH Brush=CreateSolidBrush(RGB(r1 * (tbHeigth-y)/tbHeigth + r2 * y/tbHeigth, 
+
+			HBRUSH Brush=CreateSolidBrush(RGB(r1 * (tbHeigth-y)/tbHeigth + r2 * y/tbHeigth,
 				g1 * (tbHeigth-y)/tbHeigth + g2 * y/tbHeigth, b1 * (tbHeigth-y)/tbHeigth + b2 * y/tbHeigth));
 
 			::FillRect(hdc, &Rect, Brush);
@@ -734,7 +759,7 @@ void CTitleBar::Draw()
 	lpRect.top=tbBorderWidth;
 	lpRect.right=tbWidth-tbRightSpace-(tbcxPicture*3)-(tbButtonSpace*3);
 	lpRect.bottom=tbHeigth-tbBorderWidth;
-	
+
 	//Draw text
 	::SelectObject(hdc, Font);
 	::SetBkMode(hdc, TRANSPARENT);
@@ -816,7 +841,7 @@ void CTitleBar::MoveToMonitor(HMONITOR hMonitor)
 		hLastMonitor = hMonitor;
 	}
 
-    // get our window rect 
+    // get our window rect
     RECT wndRect;
     ::GetWindowRect(m_hWnd, &wndRect);
     MONITORINFO mi;
@@ -858,9 +883,9 @@ void CTitleBar::MoveToMonitor(HMONITOR hMonitor)
 //***************************************************************************************
 void CTitleBar::CreateToolTipForRect(HWND hwndParent, HWND hwndTip, char * text)
 {
-    hwndTip = CreateWindowEx(WS_EX_TOPMOST, TOOLTIPS_CLASS, NULL, 
-                                 WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP, 
-                                 CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, 
+    hwndTip = CreateWindowEx(WS_EX_TOPMOST, TOOLTIPS_CLASS, NULL,
+                                 WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP,
+                                 CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
                                  hwndParent, NULL, hInstance, NULL);
     SetWindowPos(hwndTip, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
     TOOLINFO ti = { 0 };
@@ -868,8 +893,8 @@ void CTitleBar::CreateToolTipForRect(HWND hwndParent, HWND hwndTip, char * text)
     ti.uFlags   = TTF_SUBCLASS;
     ti.hwnd     = hwndParent;
     ti.hinst    = hInstance;
-    ti.lpszText = text;    
+    ti.lpszText = text;
     GetClientRect (hwndParent, &ti.rect);
-    SendMessage(hwndTip, TTM_ADDTOOL, 0, (LPARAM) (LPTOOLINFO) &ti); 
-} 
+    SendMessage(hwndTip, TTM_ADDTOOL, 0, (LPARAM) (LPTOOLINFO) &ti);
+}
 //***************************************************************************************
