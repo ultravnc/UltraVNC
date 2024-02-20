@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002 UltraVNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,10 +16,15 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the program is not available from the place from
-// which you received this file, check 
-// http://www.uvnc.com
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
+
 // /macine-vnc Greg Wood (wood@agressiv.com)
+
+
 #include "workgrpdomnt4.h"
 
 /////////////////////////
@@ -81,8 +86,8 @@ HMODULE LoadSecurityDll() {
 
    // 
    //  Find out which security DLL to use, depending on
-   //  whether we are on NT or Win95 or 2000 or XP or .NET Server
-   //  We have to use security.dll on Windows NT 4.0.
+   //  whether we are on Windows NT or Windows 95 or Windows 2000 or Windows XP or .NET Server
+   //  We have to use security.dll on Windows NT4.
    //  All other operating systems, we have to use Secur32.dll
    // 
    VerInfo.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
@@ -190,7 +195,7 @@ BOOL GenClientContext(PAUTH_SEQ pAS, PSEC_WINNT_AUTH_IDENTITY pAuthIdentity,
  Routine Description:
 
    Optionally takes an input buffer coming from the server and returns
-   a buffer of information to send back to the server.  Also returns
+   a buffer of information to send back to the server. Also returns
    an indication of whether or not the context is complete.
 
  Return Value:
@@ -291,7 +296,7 @@ BOOL GenServerContext(PAUTH_SEQ pAS, PVOID pIn, DWORD cbIn, PVOID pOut,
  Routine Description:
 
     Takes an input buffer coming from the client and returns a buffer
-    to be sent to the client.  Also returns an indication of whether or
+    to be sent to the client. Also returns an indication of whether or
     not the context is complete.
 
  Return Value:
@@ -552,7 +557,7 @@ BOOL CUGP(char * userin,char *password,char *machine, char *groupin, int locdom)
 		NetWkstaGetInfoNT = (NetWkstaGetInfoNT_t)GetProcAddress( hNet,"NetWkstaGetInfo" );
 		if ( NetGetDCNameNT == 0 || NetUserGetGroupsNT == 0 || NetWkstaGetInfoNT==0 ||NetUserGetGroupsNT2 == 0)
 		{
-			printf( "Oops! Some functions not found ...\n" );
+			printf( "Oops! Some functions not found...\n" );
 			return false;
 		}
 	}
@@ -564,7 +569,7 @@ BOOL CUGP(char * userin,char *password,char *machine, char *groupin, int locdom)
 
 		if ( NetGetDCName95 == 0 || NetUserGetGroups95 == 0 ||NetWkstaGetInfo95 == 0)
 		{
-			printf( "Oops! Some functions not found ...\n" );
+			printf( "Oops! Some functions not found...\n" );
 			return false;
 		}
 	}
@@ -695,12 +700,12 @@ if ( isNT )
 								printf( "compare %s %s\n", groupname, group);
 								if (strcmp(groupname, groupin)==0) 
 								{
-									printf( "match ...\n" );
+									printf( "match...\n" );
 									laccess_vnc=TRUE;
 								}
-								else printf( "no match ...\n" );
+								else printf( "no match...\n" );
 							}
-						if (laccess_vnc==TRUE) printf( "group found ...\n" );
+						if (laccess_vnc==TRUE) printf( "group found...\n" );
 						else printf( "No group found \n" );
 
 					}
@@ -747,12 +752,12 @@ if ( isNT )
 								printf( "compare %s %s\n", groupname, group);
 								if (strcmp(groupname, groupin)==0) 
 								{
-									printf( "match ...\n" );
+									printf( "match...\n" );
 									laccess_vnc=TRUE;
 								}
-								else printf( "no match ...\n" );
+								else printf( "no match...\n" );
 							}
-						if (laccess_vnc==TRUE) printf( "group found ...\n" );
+						if (laccess_vnc==TRUE) printf( "group found...\n" );
 						else printf( "No group found \n" );
 
 					}
@@ -800,7 +805,7 @@ if ( isNT )
 								printf( "%s\n", groupname);
 								if (strcmp(groupname, group)==0) laccess_vnc=TRUE;
 							}
-						if (access_vnc==TRUE) printf( "NT: Domain group found ...\n" );
+						if (access_vnc==TRUE) printf( "NT: Domain group found...\n" );
 						else printf( "No Domain group found \n" );
 					}
 				NetApiBufferFree( buf2 );

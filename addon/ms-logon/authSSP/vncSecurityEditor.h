@@ -1,4 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //  Copyright (C) 2004 Martin Scharpf, B. Braun Melsungen AG. All Rights Reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -16,9 +17,12 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the program is not available from the place from
-// which you received this file, check 
-// http://www.uvnc.com
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
+
 
 // The following ifdef block is the standard way of creating macros which make exporting 
 // from a DLL simpler. All files within this DLL are compiled with the AUTHSSP_EXPORTS
