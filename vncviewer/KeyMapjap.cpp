@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002-2013 UltraVNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,11 +16,12 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the program is not available from the place from
-// which you received this file, check 
-// http://www.uvnc.com/
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
 //
 ////////////////////////////////////////////////////////////////////////////
+
 
 // KeyMap.cpp
 #include "stdhdrs.h"
@@ -253,7 +254,7 @@ KeyActionSpec KeyMapJap::PCtoX(UINT virtkey, DWORD keyData) {
 
                // Send the modifiers up, then the keystroke, then mods down
                // We don't release the right control; this allows German users
-               // to use it for doing Ctl-@ etc. (though not under Win95 --
+               // to use it for doing Ctl-@ etc. (though not under Windows 95 --
                // see below)
 
                if (GetKeyState(VK_LCONTROL) & 0x8000) kas.releaseModifiers |= KEYMAP_LCONTROL;
@@ -263,7 +264,7 @@ KeyActionSpec KeyMapJap::PCtoX(UINT virtkey, DWORD keyData) {
 				   kas.releaseModifiers |= KEYMAP_RALT;
 				}
 
-               // This is for windows 95, and possibly other systems.  
+               // This is for windows 95, and possibly other systems.
                // The above GetKeyState calls don't work in 95 - they always return 0.
                // But if we're here at all we know that control and alt are pressed, so let's
                // raise all Control and Alt keys if we haven't registered any yet.
@@ -289,7 +290,7 @@ KeyActionSpec KeyMapJap::PCtoX(UINT virtkey, DWORD keyData) {
 //			 vnclog.Print(8,_T("Numkey =0 \n "));
 
             // There are no keysyms corresponding to control characters 
-            // Eg Ctrl F.  The server already knows whether the control 
+            // Eg Ctrl F. The server already knows whether the control 
             // key is pressed. So we are interested in the key that would be 
             // there if the Ctrl were not pressed.
             keystate[VK_CONTROL] = keystate[VK_LCONTROL] = keystate[VK_RCONTROL] = 0;

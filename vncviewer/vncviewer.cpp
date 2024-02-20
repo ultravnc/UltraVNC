@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002-2013 UltraVNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,12 +16,12 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the program is not available from the place from
-// which you received this file, check 
-// http://www.uvnc.com/
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
 //
 ////////////////////////////////////////////////////////////////////////////
- 
+
 
 #include "stdhdrs.h"
 #include "vncviewer.h"
@@ -156,7 +156,7 @@ char sz_H57[64];
 char sz_H58[64];
 char sz_H59[64];
 char sz_H60[64];
-char sz_H61[64]; 
+char sz_H61[64];
 char sz_H62[128];
 char sz_H63[64];
 char sz_H64[64];
@@ -316,8 +316,8 @@ static BOOL read_reg_string(HKEY key, char* sub_key, char* val_name, LPBYTE data
         BOOL ret = FALSE;
         int retv;
 
-        if(ERROR_SUCCESS == RegOpenKeyEx(key, 
-                                         sub_key, 
+        if(ERROR_SUCCESS == RegOpenKeyEx(key,
+                                         sub_key,
 					 0,  KEY_QUERY_VALUE, &hkey)) {
                 if(ERROR_SUCCESS == (retv=RegQueryValueEx(hkey, val_name, 0, NULL, data, data_len)))
                         ret = TRUE;
@@ -348,7 +348,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR szCmdLin
 {
 	HMODULE hUser32 = LoadLibrary(_T("user32.dll"));
 	HMODULE shcoreDLL = LoadLibrary("SHCORE.DLL");
-	//Min  Vista
+	//Min Windows Vista
 	typedef BOOL(*SetProcessDPIAwareFunc)();
 	SetProcessDPIAwareFunc setDPIAwareF = NULL;
 	//Min Windows 8.1
@@ -366,16 +366,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR szCmdLin
 	}
 
 	HRESULT hr = S_FALSE;
-	if (SetProcessDpiAwarenessContextF) 
+	if (SetProcessDpiAwarenessContextF)
 		hr = SetProcessDpiAwarenessContextF(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 	if (hr != S_OK && setDPIpiAwarenessF)
 		hr = setDPIpiAwarenessF(PROCESS_PER_MONITOR_DPI_AWARE);
 	if (hr != S_OK && (setDPIAwareF))
 		setDPIAwareF();
 
-	if (hUser32) 
+	if (hUser32)
 		FreeLibrary(hUser32);
-	if (shcoreDLL) 
+	if (shcoreDLL)
 		FreeLibrary(shcoreDLL);
 
 #ifdef CRASHRPT
@@ -384,17 +384,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR szCmdLin
 	info.cb = sizeof(CR_INSTALL_INFO);
 	info.pszAppName = _T("UVNC");
 	info.pszAppVersion = _T("1.4.4.0-dev");
-	info.pszEmailSubject = _T("UVNC viewer 1.4.4.0-dev Error Report");
+	info.pszEmailSubject = _T("UltraVNC Viewer 1.4.4.0-dev Error Report");
 	info.pszEmailTo = _T("uvnc@skynet.be");
-	info.uPriorities[CR_SMAPI] = 1; // Third try send report over Simple MAPI    
+	info.uPriorities[CR_SMAPI] = 1; // Third try send report over Simple MAPI
 	// Install all available exception handlers
 	info.dwFlags |= CR_INST_ALL_POSSIBLE_HANDLERS;
-	// Restart the app on crash 
+	// Restart the app on crash
 	info.dwFlags |= CR_INST_APP_RESTART;
 	info.dwFlags |= CR_INST_SEND_QUEUED_REPORTS;
 	info.dwFlags |= CR_INST_AUTO_THREAD_HANDLERS;
 	info.pszRestartCmdLine = _T("/restart");
-	// Define the Privacy Policy URL 
+	// Define the Privacy Policy URL
 
 	// Install crash reporting
 	int nResult = crInstall(&info);
@@ -416,7 +416,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR szCmdLin
   //m_hInstResDLL = LoadLibrary("lang.dll");
   HMODULE hmod;
   HKEY hkey;
-  if((hmod=GetModuleHandle("kernel32.dll"))) 
+  if((hmod=GetModuleHandle("kernel32.dll")))
   {
 	MySetDllDirectory = (LPFNSETDLLDIRECTORY)GetProcAddress(hmod, "SetDllDirectoryA");
 	if(MySetDllDirectory)  MySetDllDirectory("");
@@ -426,7 +426,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR szCmdLin
 		osinfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 		GetVersionEx(&osinfo);
 		if((osinfo.dwMajorVersion == 5 && osinfo.dwMinorVersion == 0 && strcmp(osinfo.szCSDVersion, "Service Pack 3") >= 0) ||
-                   (osinfo.dwMajorVersion == 5 &&  osinfo.dwMinorVersion == 1 && strcmp(osinfo.szCSDVersion, "") >= 0)) 
+                   (osinfo.dwMajorVersion == 5 &&  osinfo.dwMinorVersion == 1 && strcmp(osinfo.szCSDVersion, "") >= 0))
 		{
 			DWORD regval = 1;
                         DWORD reglen = sizeof(DWORD);
@@ -441,10 +441,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR szCmdLin
                         if(regval != 0) {
                                 vnclog.Print(3,"Trying to set SafeDllSearchMode to 0\n");
                                 regval = 0;
-                                if(RegOpenKeyEx(HKEY_LOCAL_MACHINE, 
-                                                "System\\CurrentControlSet\\Control\\Session Manager", 
+                                if(RegOpenKeyEx(HKEY_LOCAL_MACHINE,
+                                                "System\\CurrentControlSet\\Control\\Session Manager",
                                                 0,  KEY_SET_VALUE, &hkey) == ERROR_SUCCESS) {
-                                        if(RegSetValueEx(hkey, 
+                                        if(RegSetValueEx(hkey,
                                                          "SafeDllSearchMode",
                                                          0,
                                                          REG_DWORD,
@@ -479,7 +479,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR szCmdLin
   strcat_s (szCurrentDir_vnclangdll,"vnclang.dll");
   m_hInstResDLL = LoadLibrary(szCurrentDir_vnclangdll);
 
-  
+
   if (m_hInstResDLL==NULL)
   {
 	  m_hInstResDLL = hInstance;
@@ -614,7 +614,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR szCmdLin
   LoadString(m_hInstResDLL, IDS_H72, sz_H72, 128 -1);
   LoadString(m_hInstResDLL, IDS_H73, sz_H73, 64 -1);
 
-  
+
 	LoadString(m_hInstResDLL, IDS_I1, sz_I1, 64 -1);
 	LoadString(m_hInstResDLL, IDS_I2, sz_I2, 64 -1);
 	LoadString(m_hInstResDLL, IDS_I3, sz_I3, 64 -1);
@@ -731,7 +731,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR szCmdLin
 	LoadString(m_hInstResDLL, IDS_M5, sz_M5, 64 -1);
 	LoadString(m_hInstResDLL, IDS_M6, sz_M6, 64 -1);
 	LoadString(m_hInstResDLL, IDS_M7, sz_M7, 64 -1);
-	LoadString(m_hInstResDLL, IDS_M8, sz_M8, 64 -1);  
+	LoadString(m_hInstResDLL, IDS_M8, sz_M8, 64 -1);
 
     // 14 April 2008 jdp
 	LoadString(m_hInstResDLL, IDS_H94, sz_H94, 64 -1);
@@ -753,7 +753,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR szCmdLin
 
     console = app.m_options.m_logToConsole;
 
-	// Start a new connection if specified on command line, 
+	// Start a new connection if specified on command line,
 	// or if not in listening mode
 	MSG msg;
 	while(g_passwordfailed==true)
@@ -775,7 +775,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR szCmdLin
 							TranslateMessage(&msg);
 							DispatchMessage(&msg);
 						}
-					} 
+					}
 			}
 			catch (Exception &e)
 			{
@@ -784,12 +784,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR szCmdLin
 			}
 		}
 		// Clean up winsock
-	WSACleanup();	
+	WSACleanup();
 	vnclog.Print(3, _T("Exiting\n"));
 #ifdef CRASHRPT
 	crUninstall();
 #endif
-    if (console) Sleep(2000);	
+    if (console) Sleep(2000);
 	return msg.wParam;
 }
 
@@ -799,7 +799,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR szCmdLin
 void CentreWindow(HWND hwnd)
 {
 	RECT winrect, workrect;
-	
+
 	// Find how large the desktop work area is
 	SystemParametersInfo(SPI_GETWORKAREA, 0, &workrect, 0);
 	//RECT workrect;
@@ -812,7 +812,7 @@ void CentreWindow(HWND hwnd)
 
 	int workwidth = workrect.right -  workrect.left;
 	int workheight = workrect.bottom - workrect.top;
-	
+
 	// And how big the window is
 	GetWindowRect(hwnd, &winrect);
 	int winwidth = winrect.right - winrect.left;
@@ -822,11 +822,11 @@ void CentreWindow(HWND hwnd)
 	winheight = min(winheight, workheight);
 
 	// Now centre it
-	SetWindowPos(hwnd, 
+	SetWindowPos(hwnd,
 		HWND_TOP,
 		workrect.left + (workwidth-winwidth) / 2,
 		workrect.top + (workheight-winheight) / 2,
-		winwidth, winheight, 
+		winwidth, winheight,
 		SWP_SHOWWINDOW);
 	SetForegroundWindow(hwnd);
 }
@@ -838,7 +838,7 @@ void CentreWindow(HWND hwnd)
 // Takes initial string, addresses of results and size of host buffer in wchars.
 // If the display info passed in is longer than the size of the host buffer, it
 // is assumed to be invalid, so false is returned.
-bool ParseDisplay(LPTSTR display, LPTSTR phost, int hostlen, int *pport) 
+bool ParseDisplay(LPTSTR display, LPTSTR phost, int hostlen, int *pport)
 {
     if (hostlen < (int)_tcslen(display))
         return false;
@@ -857,13 +857,13 @@ bool ParseDisplay(LPTSTR display, LPTSTR phost, int hostlen, int *pport)
 		phost[colonpos - display] = L'\0';
 		if (colonpos[1] == L':') {
 			// Two colons -- interpret as a port number
-			if (_stscanf_s(colonpos + 2, TEXT("%d"), &tmp_port) != 1) 
+			if (_stscanf_s(colonpos + 2, TEXT("%d"), &tmp_port) != 1)
 				return false;
 		}
 		else
 		{
 			// One colon -- interpret as a display number or port number
-			if (_stscanf_s(colonpos + 1, TEXT("%d"), &tmp_port) != 1) 
+			if (_stscanf_s(colonpos + 1, TEXT("%d"), &tmp_port) != 1)
 				return false;
 
 			// RealVNC method - If port < 100 interpret as display number else as Port number
@@ -874,6 +874,3 @@ bool ParseDisplay(LPTSTR display, LPTSTR phost, int hostlen, int *pport)
     *pport = tmp_port;
     return true;
 }
-
-
-

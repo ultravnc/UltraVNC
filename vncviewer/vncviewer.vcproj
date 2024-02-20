@@ -428,7 +428,7 @@
 			RelativePathToProject="..\zlib-1.2.5\contrib\vstudio\vc9\zlibstat.vcproj"
 		/>
 		<ProjectReference
-			ReferencedProjectIdentifier="{AB1CE62F-4A4D-4DAA-831D-5C93AD68F5F1}"
+			ReferencedProjectIdentifier="{E52B9956-FE67-47F7-BC4F-67CC5A64B708}"
 			RelativePathToProject=".\omnithread\omnithread.vcproj"
 		/>
 	</References>
