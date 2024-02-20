@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{397db461-4b9f-4dc7-854e-838aef398c4f}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{21951d5f-42db-48cb-9de0-f5db491eaa93}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{574c01ab-3a85-4741-92ce-d2f2170ed857}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Source Files\webgui">
+      <UniqueIdentifier>{e84cc5f7-2e9f-48f1-abd5-1fb44203a0bc}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="gui.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="repeater.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="webgui\webclib.c">
+      <Filter>Source Files\webgui</Filter>
+    </ClCompile>
+    <ClCompile Include="webgui\webfs.c">
+      <Filter>Source Files\webgui</Filter>
+    </ClCompile>
+    <ClCompile Include="webgui\webio.c">
+      <Filter>Source Files\webgui</Filter>
+    </ClCompile>
+    <ClCompile Include="webgui\webobjs.c">
+      <Filter>Source Files\webgui</Filter>
+    </ClCompile>
+    <ClCompile Include="webgui\websys.c">
+      <Filter>Source Files\webgui</Filter>
+    </ClCompile>
+    <ClCompile Include="webgui\webtest.c">
+      <Filter>Source Files\webgui</Filter>
+    </ClCompile>
+    <ClCompile Include="webgui\webutils.c">
+      <Filter>Source Files\webgui</Filter>
+    </ClCompile>
+    <ClCompile Include="webgui\wsfdata.c">
+      <Filter>Source Files\webgui</Filter>
+    </ClCompile>
+    <ClCompile Include="mode12_listener.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lists_functions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mode2_listener_server.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="socket_functions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="webgui\settings.c">
+      <Filter>Source Files\webgui</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resources.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="repeater.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="list_functions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="webgui\webgui.h">
+      <Filter>Source Files\webgui</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Image2.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Image4.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="ReadMe.txt" />
+    <None Include="stunnel.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="winvnc.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="resources.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>
