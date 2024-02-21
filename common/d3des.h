@@ -1,3 +1,28 @@
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
+//
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
+//  USA.
+//
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
+
+
 /*
  * This is D3DES (V5.09) by Richard Outerbridge with the double and
  * triple-length support removed for use in VNC.
@@ -44,7 +69,7 @@ extern void des(unsigned char *, unsigned char *);
 /*                  from[8]           to[8]
  * Encrypts/Decrypts (according to the key currently loaded in the
  * internal key register) one block of eight bytes at address 'from'
- * into the block at address 'to'.  They can be the same.
+ * into the block at address 'to'. They can be the same.
  */
 
 /* d3des.h V5.09 rwo 9208.04 15:06 Graven Imagery
