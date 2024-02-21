@@ -41,7 +41,7 @@
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v100</PlatformToolset>
+    <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -123,9 +123,6 @@
       <OptimizeReferences>true</OptimizeReferences>
       <UACUIAccess>true</UACUIAccess>
     </Link>
-    <PostBuildEvent>
-      <Command>"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe" sign /sha1 6D4DE9F8F9626857AEA19A9D95405BBF1A800532 /n "uvnc bvba" /v /as /fd sha256 /tr http://sha256timestamp.ws.symantec.com/sha256/timestamp "$(OutDir)$(TargetName)$(TargetExt)"</Command>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -144,9 +141,6 @@
       <OptimizeReferences>true</OptimizeReferences>
       <UACUIAccess>true</UACUIAccess>
     </Link>
-    <PostBuildEvent>
-      <Command>"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe" sign /sha1 6D4DE9F8F9626857AEA19A9D95405BBF1A800532 /n "uvnc bvba" /v /as /fd sha256 /tr http://sha256timestamp.ws.symantec.com/sha256/timestamp "$(OutDir)$(TargetName)$(TargetExt)"</Command>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
