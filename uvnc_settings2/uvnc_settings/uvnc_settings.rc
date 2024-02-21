@@ -1,3 +1,28 @@
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
+//
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
+//  USA.
+//
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
+
+
 // Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
@@ -19,7 +44,7 @@
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NLD)
 LANGUAGE LANG_DUTCH, SUBLANG_DUTCH
-#pragma code_page(1252)
+#pragma code_page(65001)
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -34,7 +59,7 @@ BEGIN
     END
     POPUP "&Help"
     BEGIN
-        MENUITEM "&About ...",                  IDM_ABOUT
+        MENUITEM "&About UltraVNC uvnc_settings...",                  IDM_ABOUT
     END
 END
 
@@ -58,7 +83,7 @@ END
 
 IDD_MSLOGON DIALOG 0, 0, 186, 166
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "MS logon setup"
+CAPTION "MS-Logon Setup"
 FONT 8, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,77,148,50,14
@@ -79,7 +104,7 @@ BEGIN
     LTEXT           "2",IDC_STATIC,11,38,8,8
     LTEXT           "3",IDC_STATIC,11,56,8,8
     LTEXT           "Group 1, 2 = Full Access       Group 3 = Read Only",IDC_STATIC,16,88,162,8
-    LTEXT           "Must be run as a Service on NT4, W2K\nCan be run as a Service or Application on XP, W2003\nLocal admins have always access.\nFor NT4 and W2K in Application mode you need to add the Local Admin Group.",IDC_STATIC,8,100,174,41
+    LTEXT           "Must be run as a Service on Windows NT4, Windows 2000\nCan be run as a Service or Application on Windows XP, Windows Server 2003\nLocal admins have always access.\nFor Windows NT4 and Windows 2000 in Application mode you need to add the Local Admin Group.",IDC_STATIC,8,100,174,41
     GROUPBOX        "",IDC_STATIC,5,0,178,74
     GROUPBOX        "Rules",IDC_STATIC,5,77,178,68
 END
@@ -103,8 +128,8 @@ BEGIN
     CONTROL         "Enable Java port",IDC_CONNECT_HTTP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,24,26,74,10
     EDITTEXT        IDC_PORTRFB,159,11,40,14,ES_AUTOHSCROLL
     EDITTEXT        IDC_PORTHTTP,159,26,40,14,ES_AUTOHSCROLL
-    LTEXT           "RFB Port:",IDC_STATIC,119,14,32,8
-    LTEXT           "Http Port:",IDC_STATIC,119,28,33,8
+    LTEXT           "RFB Port",IDC_STATIC,119,14,32,8
+    LTEXT           "HTTP Port",IDC_STATIC,119,28,33,8
     CONTROL         "Auto",IDC_PORTNO_AUTO,"Button",BS_AUTORADIOBUTTON,209,16,31,10
     CONTROL         "Manual",IDC_SPECPORT,"Button",BS_AUTORADIOBUTTON,209,27,39,10
     CONTROL         "Allow Loopback connections",IDC_ALLOWLOOPBACK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,40,102,10
@@ -112,8 +137,8 @@ BEGIN
     PUSHBUTTON      "Find Ext IP",IDC_TESTNET,14,116,50,14
     PUSHBUTTON      "Forward RFB Port (UPnP)",IDC_UPNPON,14,132,90,14
     PUSHBUTTON      "Close Port (UPnP)",IDC_UPNPOFF,14,148,90,14
-    LTEXT           "Local IP:",IDC_STATIC,11,87,32,8
-    LTEXT           "External IP:",IDC_STATIC,141,87,39,8
+    LTEXT           "Local IP",IDC_STATIC,11,87,32,8
+    LTEXT           "External IP",IDC_STATIC,141,87,39,8
     LTEXT           "mylocalip",IDC_LOCAL,57,87,71,8
     LTEXT           "myexternip",IDC_REMOTE,187,87,60,8
     EDITTEXT        IDC_EDIT3,107,98,141,63,ES_MULTILINE | ES_AUTOVSCROLL
@@ -125,7 +150,7 @@ END
 IDD_PARENT DIALOGEX 0, 0, 277, 231
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION
 EXSTYLE WS_EX_CONTEXTHELP | WS_EX_CONTROLPARENT
-CAPTION "UltraVNC settings "
+CAPTION "UltraVNC Settings"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     PUSHBUTTON      "&OK",IDOK,140,210,75,14
@@ -140,15 +165,15 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     GROUPBOX        "Security",IDC_STATIC,3,1,253,170
     GROUPBOX        "Authentication",IDC_STATIC,11,11,236,64
-    LTEXT           "VNC Password:",IDC_STATIC,17,21,50,8
+    LTEXT           "VNC Password",IDC_STATIC,17,21,50,8
     EDITTEXT        IDC_PASSWORD,68,18,49,14,ES_PASSWORD | ES_AUTOHSCROLL
-    LTEXT           "View-Only Password:",IDC_STATIC,124,21,68,8
+    LTEXT           "View-Only Password",IDC_STATIC,124,21,68,8
     EDITTEXT        IDC_PASSWORD2,194,18,49,14,ES_PASSWORD | ES_AUTOHSCROLL
-    CONTROL         "Require MS Logon (User/Password/Domain)",IDC_MSLOGON_CHECKD,
+    CONTROL         "Require MS-Logon (User/Password/Domain)",IDC_MSLOGON_CHECKD,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,35,155,10
-    CONTROL         "New MS Logon (Support multiple domains)",IDC_NEW_MSLOGON,
+    CONTROL         "New MS-Logon (Support multiple domains)",IDC_NEW_MSLOGON,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,35,46,149,10
-    PUSHBUTTON      "Configure MS Logon Groups",IDC_MSLOGON,62,58,132,14
+    PUSHBUTTON      "Configure MS-Logon Groups",IDC_MSLOGON,62,58,132,14
     GROUPBOX        "Advanced",IDC_STATIC,11,75,236,40
     CONTROL         "Password Required",IDC_PASSRECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,93,77,10
     CONTROL         "Allow shutdown UltraVNC",IDC_ALLOWSHUTDOWN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,115,82,95,10
@@ -171,7 +196,7 @@ BEGIN
     LTEXT           "FileTransferTimeout",IDC_STATIC,31,49,64,8
     EDITTEXT        IDC_FTTIMEOUT,103,46,40,14,ES_AUTOHSCROLL
     GROUPBOX        "Input",IDC_STATIC,3,68,253,103
-    CONTROL         "Disable Viewers inputs",IDC_DISABLE_INPUTS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,89,87,10
+    CONTROL         "Disable VNC Viewer inputs",IDC_DISABLE_INPUTS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,89,87,10
     CONTROL         "Disable Local inputs",IDC_DISABLE_LOCAL_INPUTS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,101,78,10
     CONTROL         "Japanese (v102 keyboard method)",IDC_JAP_INPUTS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,113,128,10
     CONTROL         "Enable Blank Monitor on Viewer Request",IDC_BLANK,
@@ -199,20 +224,20 @@ BEGIN
     LTEXT           "Timeout: ",IDC_STATIC,181,41,31,8
     EDITTEXT        IDQUERYTIMEOUT,215,41,14,14,ES_AUTOHSCROLL
     LTEXT           "s",IDC_STATIC,237,41,8,8
-    LTEXT           "Default action: ",IDC_STATIC,16,58,50,8
+    LTEXT           "Default action",IDC_STATIC,16,58,50,8
     CONTROL         "Refuse",IDC_DREFUSE,"Button",BS_AUTORADIOBUTTON,67,55,39,10
     CONTROL         "Accept",IDC_DACCEPT,"Button",BS_AUTORADIOBUTTON,117,55,38,10
     CONTROL         "Refuse (allow locked)",IDC_DRefuseOnly,"Button",BS_AUTORADIOBUTTON,166,55,84,10
     EDITTEXT        IDC_AUTHHOST,60,67,188,14,ES_AUTOHSCROLL
-    LTEXT           "AuthHosts:",IDC_STATIC,15,70,37,8
+    LTEXT           "AuthHosts",IDC_STATIC,15,70,37,8
     CONTROL         "Query If No Logon",IDC_QNOLOGON,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,103,41,71,10
-    LTEXT           "Idle Timeout:\nsocket",IDC_STATIC,16,13,44,17
+    LTEXT           "Idle Timeout \n socket",IDC_STATIC,16,13,44,17
     EDITTEXT        IDC_IDLETIME,55,16,24,14,ES_AUTOHSCROLL
     EDITTEXT        IDC_QMESG,61,83,185,14,ES_AUTOHSCROLL
-    LTEXT           "Query Msg:",IDC_STATIC,15,84,38,8
+    LTEXT           "Query Msg",IDC_STATIC,15,84,38,8
     EDITTEXT        IDC_KINTERVAL,124,16,24,14,ES_AUTOHSCROLL
-    LTEXT           "Keepalive: \n Interval",IDC_STATIC,86,13,37,17
-    LTEXT           "Idle Timeout:\ninput",IDC_STATIC,160,12,44,17
+    LTEXT           "Keepalive \n interval",IDC_STATIC,86,13,37,17
+    LTEXT           "Idle Timeout \n input",IDC_STATIC,160,12,44,17
     EDITTEXT        IDC_IDLETIMEINPUT,209,15,27,14,ES_AUTOHSCROLL
 END
 
@@ -230,7 +255,7 @@ BEGIN
     CONTROL         "Poll On Event Only",IDC_ONEVENT_ONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,142,49,75,10
     CONTROL         "Low Accuracy",IDC_TURBOMODE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,24,60,60,10
     CONTROL         "Use system hookdll",IDC_HOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,83,77,10
-    CONTROL         "Use mirror driver",IDC_DRIVER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,94,69,10
+    CONTROL         "Use Mirror Driver",IDC_DRIVER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,94,69,10
     PUSHBUTTON      "Check the Mirror Driver",IDC_CHECKDRIVER,110,92,84,14
     CONTROL         "Remove Aero while connected",IDC_REMOVE_Aero,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,140,125,10
     CONTROL         "Remove Wallpaper while connected",IDC_REMOVE_WALLPAPER,
@@ -238,10 +263,10 @@ BEGIN
     CONTROL         "Show Primary Display",IDC_PRIM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,45,111,84,10
     CONTROL         "Show Secondary Display",IDC_SEC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,139,111,94,10
     EDITTEXT        IDC_MAXCPU,49,124,22,14,ES_AUTOHSCROLL
-    LTEXT           "Max Cpu:",IDC_STATIC,15,127,32,8
+    LTEXT           "Max CPU",IDC_STATIC,15,127,32,8
     EDITTEXT        IDC_MAXFPS,128,124,25,14,ES_AUTOHSCROLL
-    LTEXT           "Max FPS:",IDC_STATIC,95,127,32,8
-    LTEXT           "Used by the ddengine.",IDC_STATIC,158,127,74,8
+    LTEXT           "Max FPS",IDC_STATIC,95,127,32,8
+    LTEXT           "Used by the DDEngine",IDC_STATIC,158,127,74,8
 END
 
 IDD_MISC DIALOGEX 0, 0, 260, 180
@@ -250,13 +275,13 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     GROUPBOX        "Misc",IDC_STATIC,3,4,253,67
     CONTROL         "Disable Tray icon",IDC_DISABLETRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,14,70,10
-    LTEXT           "Default Server screen scale:  1/",IDC_STATIC,13,25,108,8
-    CONTROL         "Disable ini file settings and use registry",IDC_DISINI,
+    LTEXT           "Default Server Screen Scale  1/",IDC_STATIC,13,25,108,8
+    CONTROL         "Disable .ini file settings and use registry",IDC_DISINI,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,34,140,10
     EDITTEXT        IDC_SCALE,119,21,21,14,ES_AUTOHSCROLL
     CONTROL         "Log debug infos",IDC_LOG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,84,67,10
     CONTROL         "Log to video",IDC_VIDEO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,128,55,10
-    LTEXT           "Path: ",IDC_STATIC,13,147,20,8
+    LTEXT           "Path",IDC_STATIC,13,147,20,8
     EDITTEXT        IDC_EDIT_PATH,35,144,152,14,ES_AUTOHSCROLL
     PUSHBUTTON      "Reset Avi encoder",IDC_CLEAR,69,125,71,14
     CONTROL         "File (winvnc.log)",IDC_FILE,"Button",BS_AUTORADIOBUTTON,23,97,68,10
@@ -267,7 +292,7 @@ BEGIN
     GROUPBOX        "Logging",IDC_STATIC,3,73,253,98
     CONTROL         "Fast User Switching fix",IDC_KICKRDP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,45,114,10
     EDITTEXT        IDC_SCL,89,55,164,14,ES_AUTOHSCROLL
-    LTEXT           "Service command line:",IDC_STATIC,15,58,72,8
+    LTEXT           "Service command line",IDC_STATIC,15,58,72,8
     CONTROL         "RDPmode",IDC_RDPMODE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,163,16,47,10
 END
 
@@ -316,12 +341,12 @@ END
 
 IDD_ABOUTBOX DIALOG 22, 17, 230, 75
 STYLE DS_SETFONT | DS_MODALFRAME | WS_CAPTION | WS_SYSMENU
-CAPTION "About"
+CAPTION "UltraVNC uvnc_settings - About"
 FONT 8, "MS Shell Dlg"
 BEGIN
     ICON            107,IDC_MYICON,14,9,16,16
-    LTEXT           "uvnc_settings Version 1.0",IDC_STATIC,49,10,119,8,SS_NOPREFIX
-    LTEXT           "Copyright (C) 2008",IDC_STATIC,49,20,119,8
+    LTEXT           "UltraVNC uvnc_settings 2024",IDC_STATIC,49,10,119,8,SS_NOPREFIX
+    LTEXT           "Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.",IDC_STATIC,49,20,119,8
     DEFPUSHBUTTON   "OK",IDOK,195,6,30,11,WS_GROUP
 END
 
@@ -334,7 +359,7 @@ END
 
 1 TEXTINCLUDE 
 BEGIN
-    "resource.h\0"
+    "resource.h"
 END
 
 2 TEXTINCLUDE 
@@ -342,13 +367,11 @@ BEGIN
     "#define APSTUDIO_HIDDEN_SYMBOLS\r\n"
     "#include ""windows.h""\r\n"
     "#undef APSTUDIO_HIDDEN_SYMBOLS\r\n"
-    "\0"
 END
 
 3 TEXTINCLUDE 
 BEGIN
     "\r\n"
-    "\0"
 END
 
 #endif    // APSTUDIO_INVOKED
@@ -434,7 +457,7 @@ END
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NLB)
 LANGUAGE LANG_DUTCH, SUBLANG_DUTCH_BELGIAN
-#pragma code_page(1252)
+#pragma code_page(65001)
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -470,13 +493,15 @@ BEGIN
         BEGIN
             VALUE "Comments", "Standalone UltraVNC.ini editor"
             VALUE "CompanyName", "uvnc bvba"
-            VALUE "FileDescription", "uvnc_set Application"
+            VALUE "FileDescription", "Standalone UltraVNC.ini editor"
             VALUE "FileVersion", "1.2.0.5"
-            VALUE "InternalName", "uvnc_set"
-            VALUE "LegalCopyright", "Copyright (C) 2010"
-            VALUE "OriginalFilename", "uvnc_set.exe"
-            VALUE "ProductName", "uvnc_set Application"
+            VALUE "InternalName", "uvnc_settings"
+            VALUE "LegalCopyright", "Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved."
+            VALUE "OriginalFilename", "uvnc_settings.exe"
+            VALUE "PrivateBuild", ""
+            VALUE "ProductName", "UltraVNC uvnc_settings"
             VALUE "ProductVersion", "1.2.0.5"
+            VALUE "SpecialBuild", ""
         END
     END
     BLOCK "VarFileInfo"
