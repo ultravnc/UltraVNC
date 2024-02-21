@@ -1,7 +1,8 @@
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //  Copyright (C) 2005 Sean E. Covel All Rights Reserved.
 //
-//  Created by Sean E. Covel
-//
+//  Created by Sean E. Covel based on UltraVNC's excellent TestPlugin project.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -18,20 +19,17 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the program is not available from the place from
-// which you received this file, check 
-// http://home.comcast.net/~msrc4plugin
-// or
-// mail: msrc4plugin@comcast.net
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
 //
-//
-//
-/////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+
 
 #include "utils.h"
 
-//Ugly function to pull environment variables
-//wrapper to decide if getenv or registry should be used.
+// Ugly function to pull environment variables
+// wrapper to decide if getenv or registry should be used.
 BOOL GetEnvVar(LPTSTR lpName, LPTSTR buffer, DWORD nSize)
 {
 	BOOL bRC = false;
@@ -41,12 +39,12 @@ BOOL GetEnvVar(LPTSTR lpName, LPTSTR buffer, DWORD nSize)
 
 	buffer[0] = '\0';
 
-	//try the registry first
+	// Try the registry first
 	bRC = GetEnvironmentVariableFromRegistry(lpName, buffer, nSize);
 
 	if (strlen(buffer) == 0)
 	{
-		//Failed, try GetEnvironmentVariable
+		// Failed, try GetEnvironmentVariable
 
 		buffer[0] = '\0';
 		pEnvVar = getenv(lpName);
@@ -58,9 +56,9 @@ BOOL GetEnvVar(LPTSTR lpName, LPTSTR buffer, DWORD nSize)
 		//if (pEnvVar != 0)
 		//	strncpy_s(buffer,nSize, pEnvVar, nSize);
 
-		//GetEnvironmentVariable() was returning strings with additional variables in the string.
+		// GetEnvironmentVariable() was returning strings with additional variables in the string.
 		//      ex) programfiles = "%systemdisk%\program files" (or some such thing...)
-		//getenv() seems to have all the variables already resolved.
+		// getenv() seems to have all the variables already resolved.
 		//      ex) programfiles = "c:\program files"
 
 		//if (GetEnvironmentVariable(lpName, buffer, nSize) > nSize)
@@ -89,7 +87,7 @@ BOOL GetEnvVar(LPTSTR lpName, LPTSTR buffer, DWORD nSize)
 int WhatWindowsVer(void)
 {
 
-//Modified From an MSDN example...
+// Modified From an MSDN example...
 
 OSVERSIONINFOEX osvi;
 BOOL bOsVersionInfoEx;
@@ -104,7 +102,7 @@ osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
 
 bOsVersionInfoEx = GetVersionEx ((OSVERSIONINFO *) &osvi);
 
-//success is non-zero return, if not success...
+// Success is non-zero return, if not success...
 if( !(bOsVersionInfoEx))
 {
   osvi.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
@@ -118,19 +116,19 @@ switch (osvi.dwPlatformId)
   case VER_PLATFORM_WIN32_NT:
 
      // Test for the specific product family.
-     if ( osvi.dwMajorVersion >= 6 )	//Vista or Win2008 or Win7 or above //pgm added
-        iVersion = WINVISTA; //pgm added
+     if ( osvi.dwMajorVersion >= 6 )	// Windows Vista or Windows Server 2008 or Windows 7 or above // pgm added
+        iVersion = WINVISTA; // pgm added
 
-     if ( osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 2 )	//Win2003
+     if ( osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 2 )	// Windows Server 2003
         iVersion = WIN2003;
 
-     if ( osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 1 )	//WinXP
+     if ( osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 1 )	// Windows XP
         iVersion = WINXP;
 
-     if ( osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 0 )	//Win2000
+     if ( osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 0 )	// Windows 2000
         iVersion = WIN2000;
 
-     if ( osvi.dwMajorVersion <= 4 )	//WinNT
+     if ( osvi.dwMajorVersion <= 4 )	// Windows NT
         iVersion = WINNT;
 
      break;
@@ -141,28 +139,28 @@ switch (osvi.dwPlatformId)
      if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 0)
      {
          if ( osvi.szCSDVersion[1] == 'C' || osvi.szCSDVersion[1] == 'B' )
-            iVersion = WIN95B;	//Win95 osr2
+            iVersion = WIN95B;	// Windows 95 OSR2
 		 else
-			iVersion = WIN95;	//Win95
+			iVersion = WIN95;	// Windows 95
      } 
 
      if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 10)
      {
          if ( osvi.szCSDVersion[1] == 'A' )
-			 iVersion = WIN98SE;	//Win98SE
+			 iVersion = WIN98SE;	// Windows 98 SE
 		 else
-		 iVersion = WIN98;		//Win98
+		 iVersion = WIN98;		// Windows 98
      } 
 
      if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 90)
      {
-		  iVersion = WINME;	//WinME
+		  iVersion = WINME;	// Windows ME
      } 
      break;
 
   case VER_PLATFORM_WIN32s:
 
-		 iVersion = WIN3_1;	//Win3.1
+		 iVersion = WIN3_1;	// Windows 3.1
      break;
 }
 
@@ -203,7 +201,7 @@ int WinVer()
 #ifdef _WITH_LOG  
          // Test for the specific product family.
          if ( osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 2 )
-            PrintLog((DEST,"Microsoft Windows Server 2003 family, "));
+            PrintLog((DEST,"Microsoft Windows Server 2003 "));
 
          if ( osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 1 )
             PrintLog((DEST,"Microsoft Windows XP "));
@@ -214,12 +212,12 @@ int WinVer()
          if ( osvi.dwMajorVersion <= 4 )
             PrintLog((DEST,"Microsoft Windows NT "));
 #endif  
-         // Test for specific product on Windows NT 4.0 SP6 and later.
+         // Test for specific product on Windows NT4 SP6 and later.
          if( bOsVersionInfoEx )
          {
             // Test for the workstation type.
          }
-         else  // Test for specific product on Windows NT 4.0 SP5 and earlier
+         else  // Test for specific product on Windows NT4 SP5 and earlier
          {
             HKEY hKey;
             char szProductType[BUFSIZE];
@@ -344,7 +342,7 @@ int FindKey(const char* sPluginName, const char* sDefaultKeyName, const char* sV
 
 	strcat(output, "Trying to find the key file:\r\n\r\n");
 	
-	//*** Get the "local" version of Program Files
+	// *** Get the "local" version of Program Files
 	GetEnvVar(PROGRAMFILES, sProgramFiles, BufSize);
 	if (strlen(sProgramFiles)== 0)
 	{
@@ -355,11 +353,11 @@ int FindKey(const char* sPluginName, const char* sDefaultKeyName, const char* sV
 	}
 	
 
-	//default to "didn't work"
+	// Default to "didn't work"
 	*hKeyFile = INVALID_HANDLE_VALUE;
 	
 #ifdef _WITH_REGISTRY  
-	//** FIRST, look for the environment variable...
+	// ** FIRST, look for the environment variable...
 #ifdef _WITH_LOG  
 	PrintLog((DEST,"Looking at %s", sVariable));
 #endif 
@@ -378,7 +376,7 @@ int FindKey(const char* sPluginName, const char* sDefaultKeyName, const char* sV
 		strcat(output, "Looking in pluginkey = ");
 		strcat(output, sEnvVar);
 		strcat(output, "\r\n");
-		//open the key file
+		// Open the key file
 		*hKeyFile = CreateFile(sEnvVar, GENERIC_READ, FILE_SHARE_READ, 
 			NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	}
@@ -386,7 +384,7 @@ int FindKey(const char* sPluginName, const char* sDefaultKeyName, const char* sV
 	if (*hKeyFile == INVALID_HANDLE_VALUE) 
 	{
 #endif 
-		//** SECOND look for the key file in the "current" directory
+		// ** SECOND look for the key file in the "current" directory
 		hModule = GetModuleHandle(sPluginName);
 		rc = GetModuleFileName(hModule, (LPSTR) pFilename, nSize);
 #ifdef _WITH_LOG  
@@ -417,7 +415,7 @@ int FindKey(const char* sPluginName, const char* sDefaultKeyName, const char* sV
 
 	if (*hKeyFile == INVALID_HANDLE_VALUE) 
 	{
-		//** SECOND look for the key file in the "current" directory
+		// ** SECOND look for the key file in the "current" directory
 #ifdef _WITH_LOG  
 		PrintLog((DEST,"Looking for %s",sDefaultKeyName));
 #endif  
@@ -435,7 +433,7 @@ int FindKey(const char* sPluginName, const char* sDefaultKeyName, const char* sV
 #ifdef _WITH_REGISTRY  
 	if (*hKeyFile == INVALID_HANDLE_VALUE) 
 	{
-		//** THIRD if the key wasn't found, try Program Files\UltraVNC
+		// ** THIRD if the key wasn't found, try Program Files\UltraVNC
 #ifdef _WITH_LOG  
 		PrintLog((DEST,"Looking for ProgramFiles\\UltraVNC"));
 #endif  
@@ -456,7 +454,7 @@ int FindKey(const char* sPluginName, const char* sDefaultKeyName, const char* sV
 	
 	if (*hKeyFile == INVALID_HANDLE_VALUE) 
 	{
-		//** LAST if the key wasn't found, try Program Files\OLR\VNC
+		// ** LAST if the key wasn't found, try Program Files\OLR\VNC
 #ifdef _WITH_LOG  
 		PrintLog((DEST,"Looking for ProgramFiles\\OLR\\VNC"));
 #endif  
@@ -480,7 +478,7 @@ int FindKey(const char* sPluginName, const char* sDefaultKeyName, const char* sV
 	if (*hKeyFile == INVALID_HANDLE_VALUE)
 	{
 #ifdef _WITH_LOG  
-		PrintLog((DEST,"KEY FILE NOT FOUND.  Using Password"));
+		PrintLog((DEST,"KEY FILE NOT FOUND. Using Password"));
 #endif  
 		strcat(output, "\r\nKEY FILE NOT FOUND.\r\n\r\nUsing Password.\r\n");
 		return 0;

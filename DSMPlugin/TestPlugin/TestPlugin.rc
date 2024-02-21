@@ -1,3 +1,28 @@
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
+//
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
+//  USA.
+//
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
+
+
 #include "resource.h"
 
 #define APSTUDIO_READONLY_SYMBOLS
@@ -10,7 +35,7 @@
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_FRA)
 #ifdef _WIN32
 LANGUAGE LANG_FRENCH, SUBLANG_FRENCH
-#pragma code_page(1252)
+#pragma code_page(65001)
 #endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
@@ -21,19 +46,17 @@ LANGUAGE LANG_FRENCH, SUBLANG_FRENCH
 
 1 TEXTINCLUDE DISCARDABLE 
 BEGIN
-    "resource.h\0"
+    "resource.h"
 END
 
 2 TEXTINCLUDE DISCARDABLE 
 BEGIN
     "#include ""afxres.h""\r\n"
-    "\0"
 END
 
 3 TEXTINCLUDE DISCARDABLE 
 BEGIN
     "\r\n"
-    "\0"
 END
 
 #endif    // APSTUDIO_INVOKED
@@ -46,7 +69,7 @@ END
 
 IDD_CONFIG_DIALOG DIALOG DISCARDABLE  0, 0, 186, 95
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION " TestPlugin Configuration"
+CAPTION "UltraVNC TestPlugin - Configuration"
 FONT 8, "MS Sans Serif"
 BEGIN
     DEFPUSHBUTTON   "Save",IDOK,28,75,50,14,NOT WS_VISIBLE | WS_DISABLED
@@ -55,7 +78,7 @@ BEGIN
                     IDC_STATIC,13,6,161,19
     LTEXT           "A Plugin that really does something may get its various parameters from this dialog box",
                     IDC_STATIC,14,27,155,17
-    LTEXT           "By default, Ultr@VNC uses the VNC password as the only Plugin parameter.",
+    LTEXT           "By default, UltraVNC uses the VNC password as the only Plugin parameter.",
                     IDC_STATIC,14,50,161,19
 END
 

@@ -1,7 +1,8 @@
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //  Copyright (C) 2005 Sean E. Covel All Rights Reserved.
 //
-//  Created by Sean E. Covel
-//
+//  Created by Sean E. Covel based on UltraVNC's excellent TestPlugin project.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -18,20 +19,17 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the program is not available from the place from
-// which you received this file, check 
-// http://home.comcast.net/~msrc4plugin
-// or
-// mail: msrc4plugin@comcast.net
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
 //
-//
-//
-/////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+
 
 #include "logging.h"
 
 HANDLE hLogFile;
-long LOGIT = 0;	//flag to turn on/off logging
+long LOGIT = 0;	// Flag to turn on/off logging
 long DEBUGIT = 0;
 bool nameSet = false;
 char logFile[LOGNAME_SIZE];
@@ -70,7 +68,7 @@ int SetLogging(const char * logname)
 	return SetLogStatus(dsmdebug);
 }
 
-//same as PrintIt, but checks a different variable
+// Same as PrintIt, but checks a different variable
 void DebugIt(const char * sMsg)
 {
 	long saveIt = 0;
@@ -87,7 +85,7 @@ void DebugIt(const char * sMsg)
 
 }
 
-//stupid error logging function.  (Kinda nice actually!)
+// Stupid error logging function. (Kinda nice actually!)
 void PrintIt(const char * sMsg) 
 {
 	char logname[LOGNAME_SIZE];
@@ -101,13 +99,13 @@ void PrintIt(const char * sMsg)
 		char dbuffer [10];
 		char tbuffer [10];
 		
-		//kinda cool, get last error and write it out.  Helps with the API stuff
+		// Kinda cool, get last error and write it out. Helps with the API stuff
 		lLastError = GetLastError();
     
  //pgm 		_strdate( dbuffer );
  //pgm 		_strtime( tbuffer );
 
-		//always append...
+		// Always append...
 		if (hLogFile == 0)
 		{
 			time_t ltime;
@@ -139,9 +137,9 @@ void PrintIt(const char * sMsg)
 
 			strcpy(logFile,logname);
 			if (APPEND)
-				SetFilePointer( hLogFile, 0, NULL, FILE_END );	//append
+				SetFilePointer( hLogFile, 0, NULL, FILE_END );	// Append
 			else 
-				SetEndOfFile( hLogFile );	//overwrite
+				SetEndOfFile( hLogFile );	// Overwrite
 		}
 
 		if(_snprintf(tmpMsg, sizeof(tmpMsg),"%s %s : ",dbuffer, tbuffer)< 0)
@@ -160,7 +158,7 @@ void PrintIt(const char * sMsg)
 		
 		SetLastError(0);
 
-		//cheap way to clean up...
+		// Cheap way to clean up...
 		if (strcmp(sMsg, "Shutting Down.") == 0)
 			CloseHandle(hLogFile);
 		

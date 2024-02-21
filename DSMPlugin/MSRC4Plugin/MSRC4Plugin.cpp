@@ -1,8 +1,9 @@
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //  Copyright (C) 2005 Sean E. Covel All Rights Reserved.
 //
 //  Created by Sean E. Covel based on UltraVNC's excellent TestPlugin project.
 //
-//
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
@@ -18,50 +19,27 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the program is not available from the place from
-// which you received this file, check 
-// http://home.comcast.net/~msrc4plugin
-// or
-// mail: msrc4plugin@comcast.net
-//
-//
-//
-/////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2005 Ultr@VNC All Rights Reserved.
-//
-//  This program is free software; you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 2 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
-//  USA.
-//
-// If the source code for the program is not available from the place from
-// which you received this file, check 
-// http://ultravnc.sourceforge.net/
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
 //
 ////////////////////////////////////////////////////////////////////////////
+//
 // IF YOU USE THIS GPL SOURCE CODE TO MAKE YOUR DSM PLUGIN, PLEASE ADD YOUR
-// COPYRIGHT TO THIS FILE AND SHORTLY DESCRIBE/EXPLAIN THE MODIFICATIONS
-// YOU'VE MADE. THANKS.
+// COPYRIGHT TO THE TOP OF THIS FILE AND SHORTLY DESCRIBE/EXPLAIN THE 
+// MODIFICATIONS YOU'VE MADE. THANKS.
 //
 // IF YOU DON'T USE THIS CODE AS A BASE FOR YOUR PLUGIN, THE HEADER ABOVE AND
-// ULTR@VNC COPYRIGHT SHOULDN'T BE FOUND IN YOUR PLUGIN SOURCE CODE.
+// ULTRAVNC COPYRIGHT SHOULDN'T BE FOUND IN YOUR PLUGIN SOURCE CODE.
 //
+////////////////////////////////////////////////////////////////////////////
 
 //
 // Mar 22 2009 Update
-// The #ifdef _WITH_LOG test and fix for Vista and Win7 versions was done 
+// The #ifdef _WITH_LOG test and fix for Windows Vista and Windows 7 versions was done 
 // by pgm of Advantig Corporation
 //
+
 
 //#include "stdafx.h"
 #define _WIN32_WINNT 0x0410     //must be defined for the crypto api
@@ -85,7 +63,7 @@
 #include "utils.h"
 #include "version.h"
 
-#ifdef _WITH_LOG // PGM ifdef'ed all logging out as any logging can cause crash trying to access log file in program files folder on Vista and Win7 so log not used in 1.4.0.  Might move log to temp or public folder later if needed. Do same with registry access #ifdef _WITH_REGISTRY
+#ifdef _WITH_LOG // PGM ifdef'ed all logging out as any logging can cause crash trying to access log file in program files folder on Windows Vista and Windows 7 so log not used in 1.4.0. Might move log to temp or public folder later if needed. Do same with registry access #ifdef _WITH_REGISTRY
 	static const TCHAR * INDEXVAL_LOG = _T("DebugLog");
 #endif 
 static const TCHAR * INDEXVAL_KEYFILE = _T("KeyFile");
@@ -115,10 +93,10 @@ int HeaderLen = SALT_SIZE + IV_SIZE; //length of additional header
 
 #ifdef _WITH_REGISTRY
 #define PLUGIN_FILE "MSRC4Plugin.dsm"
-#define PLUGIN_DESCRIPTION  "MS RC4 Plugin,Sean E. Covel,Mar 12 2005," BUILD_NUMBER ",MSRC4Plugin.dsm"
+#define PLUGIN_DESCRIPTION  "MS RC4 Encryption Plugin, Sean E. Covel, 2005-03-12, " BUILD_NUMBER, PLUGIN_FILE
 #else
 #define PLUGIN_FILE "MSRC4Plugin140.dsm"
-#define PLUGIN_DESCRIPTION  "MS RC4 Encryption Plug-in, Sean E. Covel, Updated Mar 22 2009," BUILD_NUMBER ",MSRC4Plugin140.dsm"
+#define PLUGIN_DESCRIPTION  "MS RC4 Encryption Plugin, Sean E. Covel, Updated: 2009-03-22, " BUILD_NUMBER, PLUGIN_FILE
 #endif
 
 char getParams[BUFFER_SIZE];
@@ -301,28 +279,28 @@ return 1;
 // to acquire additionnal parameters and to ensure their persistence if necessary.
 // Same thing for events/errors logging.
 // 
-// This function can be called 2 times, both from vncviewer and WinVNC:
+// This function can be called 2 times, both from UltraVNC Viewer and UltraVNC Server:
 // 
-// 1.If the user clicks on the Plugin's "config" button in vncviewer and WinVNC dialog boxes
+// 1.If the user clicks on the Plugin's "config" button in UltraVNC Viewer and UltraVNC Server dialog boxes
 //   In this case this function is called with hVNC != 0 (CASE 1)
 //
 //   -> szParams is a string formatted as follow: "Part1,Part2"
 //   Part1 = "NoPassword"
 //   Part2 = type of application that has loaded the plugin
-//     "viewer"     : for vncviewer
-//     "server-svc" : for WinVNC run as a service
-//     "server-app" : for WINVNC run as an application
+//     "viewer"     : for UltraVNC Viewer
+//     "server-svc" : for UltraVNC Server run as a service
+//     "server-app" : for UltraVNC Server run as an application
 //
 //   -> The Plugin Config dialog box is displayed if any.
 // 
-// 2.When then plugin is Inited from VNC viewer or Server, right after Startup() call (CASE 2);
+// 2.When then plugin is Inited from UltraVNC Viewer or UltraVNC Server, right after Startup() call (CASE 2);
 //   In this case, this function is called with hVNC = 0 and
 //   szParams is a string formatted as follows: "part1,Part2"
 //   Part1 = The VNC password, if required by the GetParams() function return value
 //   Part2 = type of application that has loaded the plugin
-//      "viewer"     : for vncviewer
-//      "server-svc" : for WinVNC run as a service
-//      "server-app" : for WINVNC run as an application
+//      "viewer"     : for UltraVNC Viewer
+//      "server-svc" : for UltraVNC Server run as a service
+//      "server-app" : for UltraVNC Server run as an application
 //   (this info can be used for application/environnement dependent
 //    operations (config saving...))
 //   
@@ -390,7 +368,7 @@ PrintLog((DEST,"Set Params"));
 #endif  
 
     // Get the environnement (szLoaderType) value that is always sent from 
-    // VNC viewer or server
+    // UltraVNC Viewer or UltraVNC Server
     MyStrToken(szLoaderType, szParams, 2, ',');
 
 	GetEnvVar(PROGRAMFILES, sProgramFiles, BufSize);
@@ -476,9 +454,9 @@ PrintLog((DEST,"Set Params"));
         MyStrToken(szExternalKey, szParams, 1, ',');
         
         // The second parameter is the type of application that has loaded the plugin
-        // "viewer"     : for vncviewer
-        // "server-svc" : for WinVNC run as a service
-        // "server-app" : for WINVNC run as an application
+        // "viewer"     : for UltraVNC Viewer
+        // "server-svc" : for UltraVNC Server run as a service
+        // "server-app" : for UltraVNC Server run as an application
         // this info can be used for application/environnement dependent operations (config saving...)
         MyStrToken(szLoaderType, szParams, 2, ',');
 //#endif
@@ -718,7 +696,7 @@ PLUGIN_API BYTE* TransformBuffer(BYTE* pDataBuffer, int nDataLen, int* pnTransfo
 //
 // 1. If pRestoredDataBuffer is NULL, the function must return the pointer to current
 //    LocalRestBuffer that is going to receive the Transformed data to restore
-//    from VNC viewer/server's socket.
+//    from UltraVNC Viewer or UltraVNC Server's socket.
 //    This buffer must be of the size of transformed data, calculated from nDataLen
 //    and this size must be given back in pnRestoredDataLen.
 //
@@ -727,7 +705,7 @@ PLUGIN_API BYTE* TransformBuffer(BYTE* pDataBuffer, int nDataLen, int* pnTransfo
 //    local pLocalRestBuffer (nDataLen long) and put the result in pRestoredDataBuffer.
 //    The length of the resulting data is given back in pnTransformedDataLen
 //
-// Explanation: Actually, when VNC viewer/server wants to restore some data, it does the following:
+// Explanation: Actually, when UltraVNC Viewer or UltraVNC Server wants to restore some data, it does the following:
 // - Calls RestoreBuffer with NULL to get the buffer (and its length) to store incoming transformed data
 // - Reads incoming transformed data from socket directly into the buffer given (and of given length)
 // - Calls RestoreBuffer again to actually restore data into the given destination buffer.
@@ -809,7 +787,7 @@ PLUGIN_API BYTE* RestoreBuffer(BYTE* pRestoredDataBuffer, int nDataLen, int* pnR
 	
     dwByteCount = nDataLen-headerLen;
 	
-    //Call CryptDecrypt with the key and the buffer.  The buffer will be transformed in place
+    //Call CryptDecrypt with the key and the buffer. The buffer will be transformed in place
     if (! CryptDecrypt(hKey2, 0, false, 0, pRestoredDataBuffer, &dwByteCount)) {
 #ifdef _WITH_LOG  
 		PrintLog((DEST,"CryptDecrypt failed."));
@@ -1044,9 +1022,9 @@ DWORD keyLen = 0;
 					keyLen = KEYLEN_40BIT;
 			}
 			//Button Generate Key
-			//Generates a file in c:\program files\ultravnc\new_rc4.key
+			//Generates a file in C:\Program Files\uvnc bvba\UltraVNC\new_rc4.key
 			//you will need to copy it to the client AND the server as 
-			//c:\program files\ultravnc\rc4.key
+			//C:\Program Files\uvnc bvba\UltraVNC\rc4.key
 			
 			//save the path in case they changed it!
 #ifdef _WITH_REGISTRY
@@ -1060,7 +1038,7 @@ DWORD keyLen = 0;
 				strcpy(pPlugin->szDescription,"GenerateKey Failed");
 				DoError();
 			}
-			keyLen = KEYLEN_128BIT;  //default back to 128bit
+			keyLen = KEYLEN_128BIT;  //default back to 128-bit
             EndDialog(hwnd, TRUE);
             return TRUE;
         case IDCANCEL:
@@ -1153,8 +1131,8 @@ BOOL MyStrToken(LPSTR szToken, LPSTR lpString, int nTokenNum, char cSep)
 // ONLY knowing the source data length ! (=> forget compression algos...)
 //
 // Example:
-// For 128bits key encryption, the typical calculation would be;
-// Pad the DataBuffer so it is 16 bytes (128 bits) modulo 
+// For 128-bit key encryption, the typical calculation would be;
+// Pad the DataBuffer so it is 16 bytes (128-bit) modulo 
 //      nPad = (nDataLen % 16 == 0) ? 0 : (16 - (nDataLen % 16));
 // Then add a 16 bytes to store the original buffer length (this way it's 
 // still 16 bytes modulo) that will be necessary for decryption
