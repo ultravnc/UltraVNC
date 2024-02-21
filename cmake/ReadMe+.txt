@@ -23,10 +23,10 @@
 ////////////////////////////////////////////////////////////////////////////
 
 
-set(LIBOMNITHREAD_SOURCES_${PROJECT_NAME}
-    nt.cpp
-)
-add_library(libomnithread_${PROJECT_NAME} STATIC)
-foreach(file ${LIBOMNITHREAD_SOURCES_${PROJECT_NAME}})
-    target_sources(libomnithread_${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/../${PROJECT_NAME}/omnithread/${file}")
-endforeach(file)
+# cmake, mingw-w64 and nasm should be installed
+
+git clone https://github.com/bernhardu/UltraVNC.git
+mkdir obj
+cd obj
+cmake --toolchain ../UltraVNC/cmake/toolchain-mingw32-w64_x86_64.cmake ../UltraVNC/cmake
+make -j`nproc`
