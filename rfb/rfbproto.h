@@ -1,26 +1,32 @@
-/*
-//  Copyright (C) 2020 UltraVNC Team Members. All Rights Reserved.
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //  Copyright (C) 2000-2002 Const Kaplinsky. All Rights Reserved.
- *  Copyright (C) 2009 D. R. Commander. All Rights Reserved.
- *  Copyright (C) 2008 Sun Microsystems, Inc. All Rights Reserved.
- *  Copyright (C) 2002 RealVNC Ltd.  All Rights Reserved.
- *  Copyright (C) 1999 AT&T Laboratories Cambridge.  All Rights Reserved.
- *
- *  This is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  This software is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this software; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
- *  USA.
- */
+//  Copyright (C) 2009 D. R. Commander. All Rights Reserved.
+//  Copyright (C) 2008 Sun Microsystems, Inc. All Rights Reserved.
+//  Copyright (C) 2002 RealVNC Ltd. All Rights Reserved.
+//  Copyright (C) 1999 AT&T Laboratories Cambridge. All Rights Reserved.
+//
+//  This is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
+//  (at your option) any later version.
+//
+//  This software is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this software; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
+//  USA.
+//
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
+
 
 /*
  * rfbproto.h - header file for the RFB protocol version 3.3
@@ -29,12 +35,12 @@
  * integer (for n = 8, 16 and 32).
  *
  * All multiple byte integers are in big endian (network) order (most
- * significant byte first).  Unless noted otherwise there is no special
+ * significant byte first). Unless noted otherwise there is no special
  * alignment of protocol structures.
  *
  *
  * Once the initial handshaking is done, all messages start with a type byte,
- * (usually) followed by message-specific data.  The order of definitions in
+ * (usually) followed by message-specific data. The order of definitions in
  * this file is as follows:
  *
  *  (1) Structures used in several types of message.
@@ -54,7 +60,7 @@
  *****************************************************************************/
 
 /*-----------------------------------------------------------------------------
- * Structure used to specify a rectangle.  This structure is a multiple of 4
+ * Structure used to specify a rectangle. This structure is a multiple of 4
  * bytes so that it can be interspersed with 32-bit pixel data without
  * affecting alignment.
  */
@@ -83,10 +89,10 @@ typedef struct {
 				   as big endian, or if single-bit-per-pixel
 				   has most significant bit of the byte
 				   corresponding to first (leftmost) pixel. Of
-				   course this is meaningless for 8 bits/pix */
+				   course this is meaningless for 8-bit/pix */
 
     CARD8 trueColour;		/* If false then we need a "colour map" to
-				   convert pixels to RGB.  If true, xxxMax and
+				   convert pixels to RGB. If true, xxxMax and
 				   xxxShift specify bits used for red, green
 				   and blue */
 
@@ -143,7 +149,7 @@ typedef struct {
  * Protocol Version
  *
  * The server always sends 12 bytes to start which identifies the latest RFB
- * protocol version number which it supports.  These bytes are interpreted
+ * protocol version number which it supports. These bytes are interpreted
  * as a string of 12 ASCII characters in the format "RFB xxx.yyy\n" where
  * xxx and yyy are the major and minor version numbers (for version 3.3
  * this is "RFB 003.003\n").
@@ -153,11 +159,11 @@ typedef struct {
  * to that quoted by the server).
  *
  * It is intended that both clients and servers may provide some level of
- * backwards compatibility by this mechanism.  Servers in particular should
+ * backwards compatibility by this mechanism. Servers in particular should
  * attempt to provide backwards compatibility, and even forwards compatibility
- * to some extent.  For example if a client demands version 3.1 of the
+ * to some extent. For example if a client demands version 3.1 of the
  * protocol, a 3.0 server can probably assume that by ignoring requests for
- * encoding types it doesn't understand, everything will still work OK.  This
+ * encoding types it doesn't understand, everything will still work OK. This
  * will probably not be the case for changes in the major version number.
  *
  * The format string below can be used in sprintf or sscanf to generate or
@@ -173,22 +179,22 @@ typedef struct {
  For clarity, I'll explain the way the protocol version numbers worked before RFB 3.8
 
  The 'base' minor version was 4, eg 3.4
- If mslogon is NOT enabled:
+ If MS-Logon is NOT enabled:
    2 is added to the base (3.6, 3.16 if SC_PROMPT)
-   Note that recent uvnc servers simply send rfbMsLogon as an auth type which makes this entirely unnecessary
+   Note that recent UltraVNC Servers simply send rfbMsLogon as an auth type which makes this entirely unnecessary
  If SC_PROMPT is enabled:
-   10 is added to the base (3.14, 3.16 if NOT mslogon)
+   10 is added to the base (3.14, 3.16 if NOT MS-Logon)
 
- In summary, 3.6 is 'standard'. 3.4 if using mslogon, 3.14 if mslogon + sc_prompt, 3.16 if sc_prompt and not mslogon
+ In summary, 3.6 is 'standard'. 3.4 if using MS-Logon, 3.14 if MS-Logon + sc_prompt, 3.16 if sc_prompt and not MS-Logon
 
  Now the server sends the version, and the viewer negotiates the version to send back.
 
  The viewer handles the minor version as thus:
- (note that 'file transfer' is a generic term for various UltraVNC features, such as chat, etc)
- 4 - mslogon, file transfer
- 6 - file transfer
- 14 - mslogon, file transfer, SC_PROMPT
- 16 - file transfer, SC_PROMPT
+ (note that 'File Transfer' is a generic term for various UltraVNC features, such as chat, etc)
+ 4 - MS-Logon, File Transfer
+ 6 - File Transfer
+ 14 - MS-Logon, File Transfer, SC_PROMPT
+ 16 - File Transfer, SC_PROMPT
  <=3 - nothing special
  if minor version falls into any of the above categories, the same version is echoed back to the server
  otherwise, the default (3.4) is sent.
@@ -199,15 +205,15 @@ typedef struct {
      The viewer sends back a 32-bit int (little endian) value of 1 to accept, or 0 to refuse the connection
 
  RFB 3.8 changes:
-  mslogon is part of the authentication enum, and has been for a while. we don't need it in the RFB version any longer.
-  SC_PROMPT is definitely a strange beast, and one that is unique enough to uvnc that I think we can continue
+  MS-Logon is part of the authentication enum, and has been for a while. we don't need it in the RFB version any longer.
+  SC_PROMPT is definitely a strange beast, and one that is unique enough to UltraVNC that I think we can continue
     the way we have been. So for SC_PROMPT, we can just send RFB 003.018\n. We really want to know about this
     before the connection continues further.
 
  In summary, server will now always send 3.8 unless it needs to send 3.18 for SC_PROMPT.
-   in both situations, the old uvnc viewer will reply with 3.4
+   in both situations, the old UltraVNC Viewer will reply with 3.4
    the server can easily disable the SC_PROMPT stuff if the viewer does not indicate that it can support it.
- Downside is that old viewers will no longer have file transfer and text chat available,
+ Downside is that old viewers will no longer have File Transfer and Text Chat available,
    but that kind of stuff should have been negotiated via pseudoencodings anyway!
    Since the basic VNC functionality remains, I think that is acceptable.
 */
@@ -222,7 +228,7 @@ typedef char rfbProtocolVersionMsg[13];	/* allow extra byte for null */
  *
  * Once the protocol version has been decided, the server then sends a 32-bit
  * word indicating whether any authentication is needed on the connection.
- * The value of this word determines the authentication scheme in use.  For
+ * The value of this word determines the authentication scheme in use. For
  * version 3.0 of the protocol this may have one of the following values:
  */
 
@@ -230,7 +236,7 @@ typedef char rfbProtocolVersionMsg[13];	/* allow extra byte for null */
 /*
  pre-RFB 3.8 -- rfbUltraVNC_SecureVNCPlugin extension
 
- If using SecureVNCPlugin (or any plugin that uses the integrated plugin architecture) the unofficial 1.0.8.2 version sends
+ If using SecureVNC Plugin (or any plugins that use the integrated plugin architecture) the unofficial 1.0.8.2 version sends
  the auth type rfbUltraVNC_SecureVNCPlugin.
 
  The intention of this auth type is to act as a 'master' and once complete, allow other authentication types to occur
@@ -245,11 +251,11 @@ typedef char rfbProtocolVersionMsg[13];	/* allow extra byte for null */
  If there was a failure, and an error message is available, rfbVncAuthFailedEx (3) is sent followed by the length of the
    error string and then the error string
  If there was a failure, and no error message is available, simply send rfbVncAuthFailed (1)
- otherwise, if using mslogon, send rfbMsLogon, and if not using mslogon, send rfbVncAuthOK(0)
+ otherwise, if using MS-Logon, send rfbMsLogon, and if not using MS-Logon, send rfbVncAuthOK(0)
 
  at this point the handshake is 'complete' and all further communication is encrypted.
 
- if using mslogon, mslogon authentication will now occur (since the rfbMsLogon packet was sent)
+ if using MS-Logon, MS-Logon authentication will now occur (since the rfbMsLogon packet was sent)
 
  RFB 3.8 changes
 
@@ -258,9 +264,9 @@ typedef char rfbProtocolVersionMsg[13];	/* allow extra byte for null */
  rfbUltraVNC is not being used for anything, although rfbUltraVNC_SecureVNCPlugin has been established somewhat.
  Like a lot of these things, most of the values in the authentication range will end up going unused.
  
- Rather than complicate things further, I hereby declare this scheme: the top 4 bits will define the 'owner'
- of that set of values, and the bottom 4 bits will define the type. All of the values in the RFB 3.8 spec
- can then be covered by 0x0 and 0x1 for the top 4 bits.
+ Rather than complicate things further, I hereby declare this scheme: the top 4-bit will define the 'owner'
+ of that set of values, and the bottom 4-bit will define the type. All of the values in the RFB 3.8 spec
+ can then be covered by 0x0 and 0x1 for the top 4-bit.
 
                               mask
  RealVNC-approved values:     0x0F
@@ -298,8 +304,8 @@ typedef char rfbProtocolVersionMsg[13];	/* allow extra byte for null */
 // adzm 2010-09 - Ultra subtypes
 #define rfbUltraVNC_MsLogonIAuth 0x70
 
-	// mslogonI never seems to be used anymore -- the old code would say if (m_ms_logon) AuthMsLogon (II) else AuthVnc
-	// and within AuthVnc would be if (m_ms_logon) { /* mslogon code */ }. That could never be hit since the first case
+	// MS-Logon I never seems to be used anymore -- the old code would say if (m_ms_logon) AuthMsLogon (II) else AuthVnc
+	// and within AuthVnc would be if (m_ms_logon) { /* MS-Logon code */ }. That could never be hit since the first case
 	// would always match!
 
 #define rfbUltraVNC_MsLogonIIAuth 0x71
@@ -319,22 +325,22 @@ typedef char rfbProtocolVersionMsg[13];	/* allow extra byte for null */
 
 /*
  * rfbConnFailed:	For some reason the connection failed (e.g. the server
- *			cannot support the desired protocol version).  This is
+ *			cannot support the desired protocol version). This is
  *			followed by a string describing the reason (where a
  *			string is specified as a 32-bit length followed by that
  *			many ASCII characters).
  *
  * rfbNoAuth:		No authentication is needed.
  *
- * rfbVncAuth:		The VNC authentication scheme is to be used.  A 16-byte
+ * rfbVncAuth:		The VNC authentication scheme is to be used. A 16-byte
  *			challenge follows, which the client encrypts as
  *			appropriate using the password and sends the resulting
- *			16-byte response.  If the response is correct, the
- *			server sends the 32-bit word rfbVncAuthOK.  If a simple
+ *			16-byte response. If the response is correct, the
+ *			server sends the 32-bit word rfbVncAuthOK. If a simple
  *			failure happens, the server sends rfbVncAuthFailed and
  *			closes the connection. If the server decides that too
  *			many failures have occurred, it sends rfbVncAuthTooMany
- *			and closes the connection.  In the latter case, the
+ *			and closes the connection. In the latter case, the
  *			server should not allow an immediate reconnection by
  *			the client.
  */
@@ -353,7 +359,7 @@ typedef char rfbProtocolVersionMsg[13];	/* allow extra byte for null */
  * Client Initialisation Message
  *
  * Once the client and server are sure that they're happy to talk to one
- * another, the client sends an initialisation message.  At present this
+ * another, the client sends an initialisation message. At present this
  * message only consists of a boolean indicating whether the server should try
  * to share the desktop by leaving other clients connected, or give exclusive
  * access to this client by disconnecting all other clients.
@@ -401,11 +407,11 @@ typedef struct {
 
 /*
  * Following the server initialisation message it's up to the client to send
- * whichever protocol messages it wants.  Typically it will send a
+ * whichever protocol messages it wants. Typically it will send a
  * SetPixelFormat message and a SetEncodings message, followed by a
- * FramebufferUpdateRequest.  From then on the server will send
+ * FramebufferUpdateRequest. From then on the server will send
  * FramebufferUpdate messages in response to the client's
- * FramebufferUpdateRequest messages.  The client should send
+ * FramebufferUpdateRequest messages. The client should send
  * FramebufferUpdateRequest messages with incremental set to true when it has
  * finished processing one FramebufferUpdate and is ready to process another.
  * With a fast client, the rate at which FramebufferUpdateRequests are sent
@@ -434,17 +440,17 @@ typedef struct {
 /* client -> server */
 
 #define rfbSetPixelFormat 0
-#define rfbFixColourMapEntries 1	/* not currently supported */
+#define rfbFixColourMapEntries 1 /* not currently supported */
 #define rfbSetEncodings 2
 #define rfbFramebufferUpdateRequest 3
 #define rfbKeyEvent 4
 #define rfbPointerEvent 5
 #define rfbClientCutText 6
-#define rfbFileTransfer 7     // Modif sf@2002 - actually bidirectionnal
+#define rfbFileTransfer 7 // Modif sf@2002 - actually bidirectionnal
 #define rfbSetScale 8 // Modif sf@2002
-#define rfbSetServerInput	9 // Modif rdv@2002
-#define rfbSetSW	10// Modif rdv@2002
-#define rfbTextChat	11// Modif sf@2002 - TextChat - Bidirectionnal
+#define rfbSetServerInput 9 // Modif rdv@2002
+#define rfbSetSW 10 // Modif rdv@2002
+#define rfbTextChat 11 // Modif sf@2002 - Text Chat - Bidirectionnal
 #define rfbKeepAlive 13 // 16 July 2008 jdp -- bidirectional
 #define rfbPalmVNCSetScaleFactor 0xF // PalmVNC 1.4 & 2.0 SetScale Factor message
 // adzm 2010-09 - Notify streaming DSM plugin support
@@ -589,7 +595,7 @@ typedef struct {
  * FramebufferUpdate - a block of rectangles to be copied to the framebuffer.
  *
  * This message consists of a header giving the number of rectangles of pixel
- * data followed by the rectangles themselves.  The header is padded so that
+ * data followed by the rectangles themselves. The header is padded so that
  * together with the type byte it is an exact multiple of 4 bytes (to help
  * with alignment of 32-bit pixels):
  */
@@ -606,7 +612,7 @@ typedef struct {
 /*
  * Each rectangle of pixel data consists of a header describing the position
  * and size of the rectangle and a type word describing the encoding of the
- * pixel data, followed finally by the pixel data.  Note that if the client has
+ * pixel data, followed finally by the pixel data. Note that if the client has
  * not sent a SetEncodings message then it will only receive raw pixel data.
  * Also note again that this structure is a multiple of 4 bytes.
  */
@@ -620,13 +626,13 @@ typedef struct {
 
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- * Raw Encoding.  Pixels are sent in top-to-bottom scanline order,
+ * Raw Encoding. Pixels are sent in top-to-bottom scanline order,
  * left-to-right within a scanline with no padding in between.
  */
 
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- * CopyRect Encoding.  The pixels are specified simply by the x and y position
+ * CopyRect Encoding. The pixels are specified simply by the x and y position
  * of the source rectangle.
  */
 
@@ -639,8 +645,8 @@ typedef struct {
 
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- * RRE - Rise-and-Run-length Encoding.  We have an rfbRREHeader structure
- * giving the number of subrectangles following.  Finally the data follows in
+ * RRE - Rise-and-Run-length Encoding. We have an rfbRREHeader structure
+ * giving the number of subrectangles following. Finally the data follows in
  * the form [<bgpixel><subrect><subrect>...] where each <subrect> is
  * [<pixel><rfbRectangle>].
  */
@@ -653,10 +659,10 @@ typedef struct {
 
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- * CoRRE - Compact RRE Encoding.  We have an rfbRREHeader structure giving
- * the number of subrectangles following.  Finally the data follows in the form
+ * CoRRE - Compact RRE Encoding. We have an rfbRREHeader structure giving
+ * the number of subrectangles following. Finally the data follows in the form
  * [<bgpixel><subrect><subrect>...] where each <subrect> is
- * [<pixel><rfbCoRRERectangle>].  This means that
+ * [<pixel><rfbCoRRERectangle>]. This means that
  * the whole rectangle must be at most 255x255 pixels.
  */
 
@@ -671,22 +677,22 @@ typedef struct {
 
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- * Hextile Encoding.  The rectangle is divided up into "tiles" of 16x16 pixels,
- * starting at the top left going in left-to-right, top-to-bottom order.  If
+ * Hextile Encoding. The rectangle is divided up into "tiles" of 16x16 pixels,
+ * starting at the top left going in left-to-right, top-to-bottom order. If
  * the width of the rectangle is not an exact multiple of 16 then the width of
- * the last tile in each row will be correspondingly smaller.  Similarly if the
+ * the last tile in each row will be correspondingly smaller. Similarly if the
  * height is not an exact multiple of 16 then the height of each tile in the
- * final row will also be smaller.  Each tile begins with a "subencoding" type
- * byte, which is a mask made up of a number of bits.  If the Raw bit is set
+ * final row will also be smaller. Each tile begins with a "subencoding" type
+ * byte, which is a mask made up of a number of bits. If the Raw bit is set
  * then the other bits are irrelevant; w*h pixel values follow (where w and h
- * are the width and height of the tile).  Otherwise the tile is encoded in a
+ * are the width and height of the tile). Otherwise the tile is encoded in a
  * similar way to RRE, except that the position and size of each subrectangle
- * can be specified in just two bytes.  The other bits in the mask are as
+ * can be specified in just two bytes. The other bits in the mask are as
  * follows:
  *
  * BackgroundSpecified - if set, a pixel value follows which specifies
- *    the background colour for this tile.  The first non-raw tile in a
- *    rectangle must have this bit set.  If this bit isn't set then the
+ *    the background colour for this tile. The first non-raw tile in a
+ *    rectangle must have this bit set. If this bit isn't set then the
  *    background is the same as the last tile.
  *
  * ForegroundSpecified - if set, a pixel value follows which specifies
@@ -694,16 +700,16 @@ typedef struct {
  *    If this bit is set then the SubrectsColoured bit must be zero.
  *
  * AnySubrects - if set, a single byte follows giving the number of
- *    subrectangles following.  If not set, there are no subrectangles (i.e.
+ *    subrectangles following. If not set, there are no subrectangles (i.e.
  *    the whole tile is just solid background colour).
  *
  * SubrectsColoured - if set then each subrectangle is preceded by a pixel
- *    value giving the colour of that subrectangle.  If not set, all
+ *    value giving the colour of that subrectangle. If not set, all
  *    subrectangles are the same colour, the foreground colour;  if the
  *    ForegroundSpecified bit wasn't set then the foreground is the same as
  *    the last tile.
  *
- * The position and size of each subrectangle is specified in two bytes.  The
+ * The position and size of each subrectangle is specified in two bytes. The
  * Pack macros below can be used to generate the two bytes from x, y, w, h,
  * and the Extract macros can be used to extract the x, y, w, h values from
  * the two bytes.
@@ -723,8 +729,8 @@ typedef struct {
 #define rfbHextileExtractH(byte) (((byte) & 0xf) + 1)
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- * ZLIB - zlib compression Encoding.  We have an rfbZlibHeader structure
- * giving the number of bytes to follow.  Finally the data follows in
+ * Zlib - Zlib compression encoding. We have an rfbZlibHeader structure
+ * giving the number of bytes to follow. Finally the data follows in
  * zlib compressed format.
  */
 
@@ -816,7 +822,7 @@ typedef struct {
  *
  * Here each character denotes one bit, xxxxxxx are the least significant 7
  * bits of the value (bits 0-6), yyyyyyy are bits 7-13, and zzzzzzzz are the
- * most significant 8 bits (bits 14-21). For example, decimal value 10000
+ * most significant 8-bit (bits 14-21). For example, decimal value 10000
  * should be represented as two bytes: binary 10010000 01001110, or
  * hexadecimal 90 4E.
  *
@@ -852,7 +858,7 @@ typedef struct {
  *
  *-- The "palette" filter converts true-color pixel data to indexed colors
  * and a palette which can consist of 2..256 colors. If the number of colors
- * is 2, then each pixel is encoded in 1 bit, otherwise 8 bits is used to
+ * is 2, then each pixel is encoded in 1-bit, otherwise 8-bit is used to
  * encode one pixel. 1-bit encoding is performed such way that the most
  * significant bits correspond to the leftmost pixels, and each raw of pixels
  * is aligned to the byte boundary. When "palette" filter is used, the
@@ -910,11 +916,11 @@ typedef struct {
 
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- * ZLIBHEX - zlib compressed Hextile Encoding.  Essentially, this is the
- * hextile encoding with zlib compression on the tiles that can not be
- * efficiently encoded with one of the other hextile subencodings.  The
+ * ZLIBHEX - zlib compressed Hextile Encoding. Essentially, this is the
+ * hextile encoding with Zlib compression on the tiles that can not be
+ * efficiently encoded with one of the other hextile subencodings. The
  * new zlib subencoding uses two bytes to specify the length of the
- * compressed tile and then the compressed data follows.  As with the
+ * compressed tile and then the compressed data follows. As with the
  * raw sub-encoding, the zlib subencoding invalidates the other
  * values, if they are also set.
  */
@@ -927,9 +933,9 @@ typedef struct {
 /*-----------------------------------------------------------------------------
  * SetColourMapEntries - these messages are only sent if the pixel
  * format uses a "colour map" (i.e. trueColour false) and the client has not
- * fixed the entire colour map using FixColourMapEntries.  In addition they
+ * fixed the entire colour map using FixColourMapEntries. In addition they
  * will only start being sent after the client has sent its first
- * FramebufferUpdateRequest.  So if the client always tells the server to use
+ * FramebufferUpdateRequest. So if the client always tells the server to use
  * trueColour then it never needs to process this type of message.
  */
 
@@ -956,7 +962,7 @@ typedef struct {
  * denote foreground and background colors of the cursor. If a client
  * supports only black-and-white cursors, it should ignore these colors and
  * assume that foreground is black and background is white. Next, two bitmaps
- * (1 bits per pixel) follow: first one with actual data (value 0 denotes
+ * (1-bit per pixel) follow: first one with actual data (value 0 denotes
  * background color, value 1 denotes foreground color), second one with
  * transparency data (bits with zero value mean that these pixels are
  * transparent). Both bitmaps represent cursor data in a byte stream, from
@@ -1102,42 +1108,42 @@ typedef struct {
 
 /*-----------------------------------------------------------------------------
  * // Modif sf@2002
- * FileTransferMsg - The client sends FileTransfer message.
+ * FileTransferMsg - The client sends File Transfer message.
  * Bidirectional message - Files can be sent from client to server & vice versa
  */
 
 typedef struct _rfbFileTransferMsg {
-    CARD8 type;			/* always rfbFileTransfer */
-    CARD8 contentType;  // See defines below
-    CARD16 contentParam;// Other possible content classification (Dir or File name, etc..)
-	CARD32 size;		// FileSize or packet index or error or other 
-	// CARD32 sizeH;		// Additional 32Bits params to handle big values. Only for V2 (we want backward compatibility between all V1 versions)
+    CARD8 type;          /* always rfbFileTransfer */
+    CARD8 contentType;   // See defines below
+    CARD16 contentParam; // Other possible content classification (Dir or File name, etc..)
+	CARD32 size;         // FileSize or packet index or error or other 
+	// CARD32 sizeH;     // Additional 32Bits params to handle big values. Only for V2 (we want backward compatibility between all V1 versions)
     CARD32 length;
     /* followed by data char text[length] */
 } rfbFileTransferMsg;
 
 #define sz_rfbFileTransferMsg	12
 
-#define rfbFileTransferVersion  3 // v1 is the old FT version ( <= 1.0.0 RC18 versions)
+#define rfbFileTransferVersion  3 // v1 is the old File Transfer version (<= 1.0.0 RC18)
 
 // FileTransfer Content types and Params defines
 #define rfbDirContentRequest	1 // Client asks for the content of a given Server directory
 #define rfbDirPacket			2 // Full directory name or full file name.
 								  // Null content means end of Directory
 #define rfbFileTransferRequest	3 // Client asks the server for the transfer of a given file
-#define rfbFileHeader			4 // First packet of a file transfer, containing file's features
+#define rfbFileHeader			4 // First packet of a File Transfer, containing file's features
 #define rfbFilePacket			5 // One chunk of the file
-#define rfbEndOfFile			6 // End of file transfer (the file has been received or error)
-#define rfbAbortFileTransfer	7 // The file transfer must be aborted, whatever the state
+#define rfbEndOfFile			6 // End of File Transfer (the file has been received or error)
+#define rfbAbortFileTransfer	7 // The File Transfer must be aborted, whatever the state
 #define rfbFileTransferOffer	8 // The client offers to send a file to the server
 #define rfbFileAcceptHeader		9 // The server accepts or rejects the file
 #define rfbCommand				10 // The Client sends a simple command (File Delete, Dir create etc...)
 #define rfbCommandReturn		11 // The Client receives the server's answer about a simple command
 #define rfbFileChecksums		12 // The zipped checksums of the destination file (Delta Transfer)
-#define rfbFileTransferAccess	14 // Request FileTransfer authorization
-#define rfbFileTransferSessionStart 15 // indicates a client has the FT gui open
-#define rfbFileTransferSessionEnd   16 // indicates a client has closed the ft gui.
-#define rfbFileTransferProtocolVersion 17 // indicates ft protocol version understood by sender. contentParam is version #
+#define rfbFileTransferAccess	14 // Request File Transfer authorization
+#define rfbFileTransferSessionStart 15 // indicates a client has the File Transfer GUI open
+#define rfbFileTransferSessionEnd   16 // indicates a client has closed the File Transfer GUI.
+#define rfbFileTransferProtocolVersion 17 // indicates File Transfer Protocol version understood by sender. contentParam is version #
 
 								// rfbDirContentRequest client Request - content params 
 #define rfbRDirContent			1 // Request a Server Directory contents
@@ -1167,7 +1173,7 @@ typedef struct _rfbFileTransferMsg {
 #define rfbCDirRename			6 // Request the server to rename the given directory
 
 								// Errors - content params or "size" field
-#define rfbRErrorUnknownCmd     1  // Unknown FileTransfer command.
+#define rfbRErrorUnknownCmd     1  // Unknown File Transfer command.
 #define rfbRErrorCmd			0xFFFFFFFF// Error when a command fails on remote side (ret in "size" field)
 
 #define sz_rfbBlockSize			8192  // Size of a File Transfer packet (before compression)
@@ -1183,7 +1189,7 @@ typedef struct _rfbFileTransferMsg {
 
 /*-----------------------------------------------------------------------------
  * Modif sf@2002
- * TextChatMsg - Utilized to order the TextChat mode on server or client
+ * TextChatMsg - Utilized to order the Text Chat mode on server or client
  * Bidirectional message
  */
 
@@ -1375,9 +1381,9 @@ typedef union {
 
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- * RDV Cache Encoding.  
+ * RDV Cache Encoding.
  * special is not used at this point, can be used to reset cache or other specials
- * just put it to make sure we don't have to change the encoding again.  
+ * just put it to make sure we don't have to change the encoding again.
  */
 
 typedef struct {
@@ -1434,8 +1440,8 @@ typedef struct {
 
 
 /*-----------------------------------------------------------------------------
- * SetEncodings - tell the RFB server which encoding types we accept.  Put them
- * in order of preference, if we have any.  We may always receive raw
+ * SetEncodings - tell the RFB server which encoding types we accept. Put them
+ * in order of preference, if we have any. We may always receive raw
  * encoding, even if we don't specify it here.
  */
 
@@ -1450,8 +1456,8 @@ typedef struct {
 
 
 /*-----------------------------------------------------------------------------
- * FramebufferUpdateRequest - request for a framebuffer update.  If incremental
- * is true then the client just wants the changes since the last update.  If
+ * FramebufferUpdateRequest - request for a framebuffer update. If incremental
+ * is true then the client just wants the changes since the last update. If
  * false then it wants the whole of the specified rectangle.
  */
 
@@ -1472,7 +1478,7 @@ typedef struct {
  *
  * Keys are specified using the "keysym" values defined by the X Window System.
  * For most ordinary keys, the keysym is the same as the corresponding ASCII
- * value.  Other common keys are:
+ * value. Other common keys are:
  *
  * BackSpace		0xff08
  * Tab			0xff09

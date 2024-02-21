@@ -1,3 +1,28 @@
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
+//
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
+//  USA.
+//
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
+
+
 #ifndef GII_H
 #define GII_H
 /*
@@ -184,22 +209,22 @@ typedef struct {
 //+-- + -- + -- + -- + -- + -- + -- + -- + -- + -------- - +------------ + ---------- - +
 //
 /////////////////////////////////////////////////////
-#define PF_flag 0x80000000// 'P'ressed 'F'lag : es wird übertragen, ob der Touchpunkt gedrückt oder losgelassen wurde. 
+#define PF_flag 0x80000000// 'P'ressed 'F'lag : es wird Ã¼bertragen, ob der Touchpunkt gedrÃ¼ckt oder losgelassen wurde. 
 #define R1_flag 0x40000000 //Reserved 1
-#define IF_flag 0x20000000//pr'I'mary 'F'lag : es wird übertragen, ob der Touchpunkt der primäre Touchpunkt ist.
-#define S1_flag 0x10000000//'S'ize Flag : es werden zusätzlich zur Position auch die Daten der Touchfläche übertragen. Die Touchfläche wird(derzeit) als symmetrische Ellipse übertragen
-#define S2_flag 0x8000000//reserviert für asymetrische Ellipse, wird momentan nicht unterstützt und muss 0 sein.
-#define RT_flag 0x4000000//'R'ec't'angle : Die Touchfläche wurde vom Treiber als Rechteck, und nicht als Ellipse ermittelt.
-#define PR_flag 0x2000000//'Pr'essure Flag : Der Druck, welcher auf die Touchfläche ausgeübt wird, wird mit übertragen.
-#define TI_flag 0x1000000//'Ti'mestamp : Der Zeitstempel zu dem das Ereignis am Touchdevice entstanden ist, wird mit übertragen.
+#define IF_flag 0x20000000//pr'I'mary 'F'lag : es wird Ã¼bertragen, ob der Touchpunkt der primÃ¤re Touchpunkt ist.
+#define S1_flag 0x10000000//'S'ize Flag : es werden zusÃ¤tzlich zur Position auch die Daten der TouchflÃ¤che Ã¼bertragen. Die TouchflÃ¤che wird(derzeit) als symmetrische Ellipse Ã¼bertragen
+#define S2_flag 0x8000000//reserviert fÃ¼r asymetrische Ellipse, wird momentan nicht unterstÃ¼tzt und muss 0 sein.
+#define RT_flag 0x4000000//'R'ec't'angle : Die TouchflÃ¤che wurde vom Treiber als Rechteck, und nicht als Ellipse ermittelt.
+#define PR_flag 0x2000000//'Pr'essure Flag : Der Druck, welcher auf die TouchflÃ¤che ausgeÃ¼bt wird, wird mit Ã¼bertragen.
+#define TI_flag 0x1000000//'Ti'mestamp : Der Zeitstempel zu dem das Ereignis am Touchdevice entstanden ist, wird mit Ã¼bertragen.
 #define HC_flag 0x800000//'H'igh Performance 'C'ounter
 
 // Reserverd   0x40000-0x100
 #define FORMAT_0_flag 0x0
-#define LANGE_16_flag 0x10 //16bit signed für x gefolgt von 16bit signed für y gemeinsam in einem DWORD
-#define LANGE_32_flag 0x20 //32bit signed für x gefolgt von 32bit signed für y in jeweils einem DWORD
-#define LANGE_64_flag 0x30 //64bit signed für x gefolgt von 64bit signed für y in jeweils 2 DWORD
-#define IDFORMAT_32  0x1 //32bit ID
+#define LANGE_16_flag 0x10 //16-bit signed fÃ¼r x gefolgt von 16-bit signed fÃ¼r y gemeinsam in einem DWORD
+#define LANGE_32_flag 0x20 //32-bit signed fÃ¼r x gefolgt von 32-bit signed fÃ¼r y in jeweils einem DWORD
+#define LANGE_64_flag 0x30 //64-bit signed fÃ¼r x gefolgt von 64-bit signed fÃ¼r y in jeweils 2 DWORD
+#define IDFORMAT_32  0x1 //32-bit ID
 #define IDFORMAT_CLEAR 0xF // No more touch points
 
 // just define else we need increase the winver setting
