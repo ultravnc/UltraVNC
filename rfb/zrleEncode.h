@@ -1,20 +1,28 @@
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002 RealVNC Ltd. All Rights Reserved.
 //
-// Copyright (C) 2002 RealVNC Ltd.  All Rights Reserved.
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
+//  (at your option) any later version.
 //
-// This is free software; you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
-// (at your option) any later version.
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
 //
-// This software is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
+//  USA.
 //
-// You should have received a copy of the GNU General Public License
-// along with this software; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
-// USA.
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
+
 
 //
 // zrleEncode.h - zrle encoding function.
@@ -23,7 +31,7 @@
 //
 // BPP should be 8, 16 or 32 depending on the bits per pixel.
 // GET_IMAGE_INTO_BUF should be some code which gets a rectangle of pixel data
-// into the given buffer.  EXTRA_ARGS can be defined to pass any other
+// into the given buffer. EXTRA_ARGS can be defined to pass any other
 // arguments needed by GET_IMAGE_INTO_BUF.
 //
 // Note that the buf argument to ZRLE_ENCODE needs to be at least one pixel
@@ -36,7 +44,7 @@
 
 using namespace rdr;
 
-/* __RFB_CONCAT2 concatenates its two arguments.  __RFB_CONCAT2E does the same
+/* __RFB_CONCAT2 concatenates its two arguments. __RFB_CONCAT2E does the same
    but also expands its arguments if they are macros */
 
 #ifndef __RFB_CONCAT2E
@@ -202,9 +210,9 @@ void ZRLE_ENCODE_TILE (PIXEL_T* data, int w, int h, rdr::OutStream* os)
     return;
   }
 
-  // Try to work out whether to use RLE and/or a palette.  We do this by
+  // Try to work out whether to use RLE and/or a palette. We do this by
   // estimating the number of bytes which will be generated and picking the
-  // method which results in the fewest bytes.  Of course this may not result
+  // method which results in the fewest bytes. Of course this may not result
   // in the fewest bytes after compression...
 
   bool useRle = false;
