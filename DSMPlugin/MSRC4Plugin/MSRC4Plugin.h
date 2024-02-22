@@ -1,11 +1,9 @@
-#ifndef _MSRC4PLUGIN_H
-#define _MSRC4PLUGIN_H
-
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //  Copyright (C) 2005 Sean E. Covel All Rights Reserved.
 //
 //  Created by Sean E. Covel based on UltraVNC's excellent TestPlugin project.
 //
-//
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
@@ -21,45 +19,24 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the program is not available from the place from
-// which you received this file, check 
-// http://home.comcast.net/~msrc4plugin
-// or
-// mail: msrc4plugin@comcast.net
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
 //
+////////////////////////////////////////////////////////////////////////////
 //
-//
-/////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2005 Ultr@Vnc All Rights Reserved.
-//
-//  This program is free software; you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 2 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
-//  USA.
-//
-// If the source code for the program is not available from the place from
-// which you received this file, check 
-// http://ultravnc.sourceforge.net/
-//
-//
-//////////////////////////////////////////////////////////////////////////////
 // IF YOU USE THIS GPL SOURCE CODE TO MAKE YOUR DSM PLUGIN, PLEASE ADD YOUR
-// COPYRIGHT TO THIS FILE AND SHORTLY DESCRIBE/EXPLAIN THE MODIFICATIONS
-// YOU'VE MADE. THANKS.
+// COPYRIGHT TO THE TOP OF THIS FILE AND SHORTLY DESCRIBE/EXPLAIN THE 
+// MODIFICATIONS YOU'VE MADE. THANKS.
 //
 // IF YOU DON'T USE THIS CODE AS A BASE FOR YOUR PLUGIN, THE HEADER ABOVE AND
-// ULTR@VNC COPYRIGHT SHOULDN'T BE FOUND IN YOUR PLUGIN SOURCE CODE.
+// ULTRAVNC COPYRIGHT SHOULDN'T BE FOUND IN YOUR PLUGIN SOURCE CODE.
 //
+////////////////////////////////////////////////////////////////////////////
+
+
+#ifndef _MSRC4PLUGIN_H
+#define _MSRC4PLUGIN_H
 
 #ifdef PLUGIN_EXPORTS
 #define PLUGIN_API __declspec(dllexport)
@@ -83,7 +60,7 @@
 #include "EnvReg.h"
 
 #ifdef _WITH_REGISTRY
-				//registry key locations
+				// Registry key locations
 #define MSRC4_KEY_NAME_VIEWER _T("Software\\ORL\\VNCViewer\\DSMPlugins\\MSRC4")
 #define MSRC4_KEY_NAME_SERVER _T("Software\\ORL\\WinVNC3\\DSMPlugins\\MSRC4")
 
@@ -102,7 +79,7 @@ BYTE* pLocalRestBuffer = NULL;  // Local Restoration buffer (freed on VNC demand
 int   nLocalTransBufferSize = 0;
 int   nLocalRestBufferSize = 0;
 
-//*** 2 of everything here.  1 for input, 1 for output.***
+// *** 2 of everything here. 1 for input, 1 for output.***
 HCRYPTPROV    hProvider = 0;                // crypto provider
 HCRYPTPROV    hProvider2 = 0;               // crypto provider
 HCRYPTKEY     hKey = 0;                     // generated key 
@@ -112,7 +89,7 @@ HCRYPTKEY     hExchangeKey2 = 0;            // user's exchange key
 
 //////////////////////////////////////////////////////////////////////////
 
-const char ErrorDialog[] = "The plugin was unable to locate the key file.  Please ensure that the registry entry is properly set and that the key file exists.";
+const char ErrorDialog[] = "The plugin was unable to locate the key file. Please ensure that the registry entry is properly set and that the key file exists.";
 
 #define KEYFILENAME_SIZE 256
 #define SALT_SIZE 11
@@ -123,7 +100,7 @@ const char ErrorDialog[] = "The plugin was unable to locate the key file.  Pleas
 #endif  
 
 const char * sDefaultKeyName = "rc4.key";
-const char * sLogItDef = "0";	//default to off
+const char * sLogItDef = "0";	// Default to off
 
 DWORD maxKeyLen = 0;
 

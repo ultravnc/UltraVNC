@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002 Ultr@VNC. All Rights Reserved.
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,9 +16,9 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the program is not available from the place from
-// which you received this file, check 
-// http://ultravnc.sourceforge.net/
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
 //
 ////////////////////////////////////////////////////////////////////////////
 //
@@ -27,7 +27,7 @@
 // MODIFICATIONS YOU'VE MADE. THANKS.
 //
 // IF YOU DON'T USE THIS CODE AS A BASE FOR YOUR PLUGIN, THE HEADER ABOVE AND
-// ULTR@VNC COPYRIGHT SHOULDN'T BE FOUND IN YOUR PLUGIN SOURCE CODE.
+// ULTRAVNC COPYRIGHT SHOULDN'T BE FOUND IN YOUR PLUGIN SOURCE CODE.
 //
 ////////////////////////////////////////////////////////////////////////////
 //
@@ -45,6 +45,7 @@
 // may occur at the same time.
 // 
 //////////////////////////////////////////////////////////////////////////////
+
 
 #include "TestPlugin.h"
 
@@ -67,7 +68,7 @@ int   nLocalRestBufferSize = 0;
 // Name-Description,Author,Date,Version,FileName-Comment
 // For the version, we recommend the following format: x.y.z
 // The other fields (Name-Description, Author, Date, FileName-Comment) are format free (don't use ',' in them, of course)
-#define PLUGIN_DESCRIPTION  "TestPlugin,Sam,Nov 21 2002,1.0.0,TestPlugin.dsm"
+#define PLUGIN_DESCRIPTION  "TestPlugin, Sam, Nov 21 2002, 1.0.0, TestPlugin.dsm"
 
 
 
@@ -138,28 +139,28 @@ TESTPLUGIN_API int Reset(void)
 // to acquire additionnal parameters and to ensure their persistence if necessary.
 // Same thing for events/errors logging.
 // 
-// This function can be called 2 times, both from vncviewer and WinVNC:
+// This function can be called 2 times, both from UltraVNC Viewer and UltraVNC Server:
 // 
-// 1.If the user clicks on the Plugin's "config" button in vncviewer and WinVNC dialog boxes
+// 1.If the user clicks on the Plugin's "config" button in UltraVNC Viewer and UltraVNC Server dialog boxes
 //   In this case this function is called with hVNC != 0 (CASE 1)
 //
 //   -> szParams is a string formatted as follow: "Part1,Part2"
 //   Part1 = "NoPassword"
 //   Part2 = type of application that has loaded the plugin
-//     "viewer"     : for vncviewer
-//     "server-svc" : for WinVNC run as a service
-//     "server-app" : for WINVNC run as an application
+//     "viewer"     : for UltraVNC Viewer
+//     "server-svc" : for UltraVNC Server run as a service
+//     "server-app" : for UltraVNC Server run as an application
 //
 //   -> The Plugin Config dialog box is displayed if any.
 // 
-// 2.When then plugin is Inited from VNC viewer or Server, right after Startup() call (CASE 2);
+// 2.When then plugin is Inited from UltraVNC Viewer or UltraVNC Server, right after Startup() call (CASE 2);
 //   In this case, this function is called with hVNC = 0 and
 //   szParams is a string formatted as follows: "part1,Part2"
 //   Part1 = The VNC password, if required by the GetParams() function return value
 //   Part2 = type of application that has loaded the plugin
-//      "viewer"     : for vncviewer
-//      "server-svc" : for WinVNC run as a service
-//      "server-app" : for WINVNC run as an application
+//      "viewer"     : for UltraVNC Viewer
+//      "server-svc" : for UltraVNC Server run as a service
+//      "server-app" : for UltraVNC Server run as an application
 //   (this info can be used for application/environnement dependent
 //    operations (config saving...))
 //   
@@ -167,7 +168,7 @@ TESTPLUGIN_API int SetParams(HWND hVNC, char* szParams)
 {
 	// CASE 1
 	// Get the environnement (szLoaderType) value that is always sent from 
-	// VNC viewer or server
+	// UltraVNC Viewer or UltraVNC Server
 	MyStrToken(szLoaderType, szParams, 2, ',');
 
 	// If hVNC != 0, display for instance the Plugin Config Dialog box 
@@ -195,7 +196,7 @@ TESTPLUGIN_API int SetParams(HWND hVNC, char* szParams)
 // as a parameter to do its job correctly (for login step).
 // Thus this function is called once before the SetParams() function is called
 //  - Return "VNCPasswordNeeded" if VNC password must be transmitted by the UltraVNC app
-//  - Return any other Plugin parameters value otherwise (not used in WinVNC & vncviewer for now)
+//  - Return any other Plugin parameters value otherwise (not used in UltraVNC Viewer and UltraVNC Server for now)
 TESTPLUGIN_API char* GetParams(void)
 {
 	if (strlen(szExternalKey) > 0)
@@ -244,7 +245,7 @@ TESTPLUGIN_API BYTE* TransformBuffer(BYTE* pDataBuffer, int nDataLen, int* pnTra
 //
 // 1. If pRestoredDataBuffer is NULL, the function must return the pointer to current
 //    LocalRestBuffer that is going to receive the Transformed data to restore
-//    from VNC viewer/server's socket.
+//    from UltraVNC Viewer or UltraVNC Server's socket.
 //    This buffer must be of the size of transformed data, calculated from nDataLen
 //    and this size must be given back in pnRestoredDataLen.
 //
@@ -253,7 +254,7 @@ TESTPLUGIN_API BYTE* TransformBuffer(BYTE* pDataBuffer, int nDataLen, int* pnTra
 //    local pLocalRestBuffer (nDataLen long) and put the result in pRestoredDataBuffer.
 //    The length of the resulting data is given back in pnTransformedDataLen
 //
-// Explanation: When VNC viewer/server wants to restore some data, it does the following:
+// Explanation: When UltraVNC Viewer or UltraVNC Server wants to restore some data, it does the following:
 // - Calls RestoreBuffer with NULL to get the buffer (and its length) to store incoming transformed data
 // - Reads incoming transformed data from socket directly into the buffer given (and of given length)
 // - Calls RestoreBuffer again to actually restore data into the given destination buffer.

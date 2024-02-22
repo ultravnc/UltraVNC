@@ -142,7 +142,7 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 user32.lib advapi32.lib /nologo /dll /debug /machine:I386 /out:"c:\program files\ultravnc\MSRC4Plugin_debug.dsm" /pdbtype:sept
+# ADD BASE LINK32 user32.lib advapi32.lib /nologo /dll /debug /machine:I386 /out:"C:\Program Files\uvnc bvba\UltraVNC\MSRC4Plugin_debug.dsm" /pdbtype:sept
 # SUBTRACT BASE LINK32 /pdb:none
 # ADD LINK32 user32.lib advapi32.lib /nologo /dll /debug /machine:I386 /out:"Debug\MSRC4Plugin_NoReg.dsm" /pdbtype:sept
 # SUBTRACT LINK32 /pdb:none

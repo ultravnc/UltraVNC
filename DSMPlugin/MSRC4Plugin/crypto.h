@@ -1,7 +1,8 @@
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //  Copyright (C) 2005 Sean E. Covel All Rights Reserved.
 //
-//  Created by Sean E. Covel
-//
+//  Created by Sean E. Covel based on UltraVNC's excellent TestPlugin project.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -18,15 +19,12 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the program is not available from the place from
-// which you received this file, check 
-// http://home.comcast.net/~msrc4plugin
-// or
-// mail: msrc4plugin@comcast.net
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
 //
-//
-//
-/////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+
 
 #ifndef _CRYPTO_H
 #define _CRYPTO_H
@@ -34,30 +32,30 @@
 #pragma once
 #include <tchar.h>
 
-#define KEYLEN_128BIT 0x00800000	//128 bit RC4 key
-#define KEYLEN_56BIT  0x00380000	//56 bit RC4 key
-#define KEYLEN_40BIT  0x00280000	//40 bit RC4 key
+#define KEYLEN_128BIT 0x00800000	// 128-bit RC4 key
+#define KEYLEN_56BIT  0x00380000	// 56-bit RC4 key
+#define KEYLEN_40BIT  0x00280000	// 40-bit RC4 key
 #define BLOBSIZE 76
 
 #define KEYFILENAME_SIZE 256
 #define CSP_SIZE 70
 //#define CSP_PROV	PROV_DSS_DH
 
-//#define CTX "MSRC4Plugin"	//key container name
+//#define CTX "MSRC4Plugin"	// Key container name
 
-#define CTX "MSRC4Plugin"	//key container name  (Don't need one anymore.  Keys are not persisted...)
-							//Ah crap.  Windows 95/98/98SE/ME/NT still need the container.
+#define CTX "MSRC4Plugin"	// Key container name (Don't need one anymore. Keys are not persisted...)
+							// Ah crap. Windows 95/98/98SE/ME/NT still need the container.
 
 #define KEYSize 200
 
-long GetCryptoVersion(void);	//Get crypto version
+long GetCryptoVersion(void);	// Get crypto version
 static const TCHAR * INDEXVAL_KEYGEN = _T("GenKeyFile");
 
 #ifdef _WITH_REGISTRY  
 	#define MSRC4_KEY_FILE        _T("Software\\ORL\\WinVNC3\\DSMPlugins\\MSRC4")
 #endif  
 
-		//Figure out CSP, Provider, OS Version, Crypto version, and Max keylength
+		// Figure out CSP, Provider, OS Version, Crypto version, and Max keylength
 BOOL InitVars(char *szCSPName, long *iWinVer, long *iCryptVer, DWORD * iMaxKey);
 
 BOOL GenKey(char * sDefaultGenKey, DWORD keyLen);
@@ -77,10 +75,10 @@ int CreateDerivedCryptKey(HCRYPTPROV hProvider, HCRYPTKEY * hKey, char* password
 
 
 // An "Exponent of One" key is a key that doesn't actually do anything
-// we use it to export the RC4 key plaintext.  Otherwise you need to do a full
+// we use it to export the RC4 key plaintext. Otherwise you need to do a full
 // public key exchange on the client/server machines to allow the rc4.key key to
-// be imported.  By default the import/export functions use the public\private key
-// pairs to encrypt the RC4 key.  Its a great security practice, but a pain
+// be imported. By default the import/export functions use the public\private key
+// pairs to encrypt the RC4 key. Its a great security practice, but a pain
 // for what I'm trying to accomplish here.
 static BYTE PrivateKeyWithExponentOfOne[] =
 {

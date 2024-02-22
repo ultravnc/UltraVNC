@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002-2013 UltraVNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,11 +16,13 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the program is not available from the place from
-// which you received this file, check 
-// http://www.uvnc.com/
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
 //
 ////////////////////////////////////////////////////////////////////////////
+
+
 //
 //
 // DSMPlugin.cpp: implementation of the CDSMPlugin class.
@@ -31,7 +33,7 @@
 // (third party dlls) that may be developed (written, exported and 
 // provided by authorized individuals - according to the law of their 
 // country) to alter/modify/process/encrypt rfb data streams between 
-// vnc viewer and vnc server.
+// UltraVNC Viewer and UltraVNC Server.
 //
 // The goal here is not to design and develop an extensive, versatile
 // and powerfull plugin system but to provide people a way
@@ -62,8 +64,8 @@
 //   - CreatePluginInterface -- returns a pointer to a new IPlugin-derived class,
 //       which is then used to transform and restore buffers in a threadsafe manner.
 // 
-// WARNING: For the moment, only ONE instance of this class must exist in Vncviewer and WinVNC
-// Consequently, WinVNc will impose all its clients to use the same plugin. Maybe we'll 
+// WARNING: For the moment, only ONE instance of this class must exist in UltraVNC Viewer and UltraVNC Server
+// Consequently, UltraVNC Server will impose all its clients to use the same plugin. Maybe we'll 
 // improve that soon. It depends on the demand/production of DSM plugins.
 
 #include <winsock2.h>
@@ -505,7 +507,7 @@ bool CDSMPlugin::SupportsIntegrated()
 //
 BYTE* CDSMPlugin::TransformBuffer(BYTE* pDataBuffer, int nDataLen, int* pnTransformedDataLen)
 {
-	// FixME: possible pb with this mutex in WinVNC
+	// FixME: possible pb with this mutex in UltraVNC Server
 #ifdef _VIEWER
 	omni_mutex_lock l(m_TransMutex);
 #else
