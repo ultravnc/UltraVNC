@@ -1,8 +1,9 @@
-//
-//  Copyright (C) 2001 HorizonLive.com, Inc.  All Rights Reserved.
-//  Copyright (C) 2001 Constantin Kaplinsky.  All Rights Reserved.
-//  Copyright (C) 2000 Tridia Corporation.  All Rights Reserved.
-//  Copyright (C) 1999 AT&T Laboratories Cambridge.  All Rights Reserved.
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
+//  Copyright (C) 2001 HorizonLive.com, Inc. All Rights Reserved.
+//  Copyright (C) 2001 Constantin Kaplinsky. All Rights Reserved.
+//  Copyright (C) 2000 Tridia Corporation. All Rights Reserved.
+//  Copyright (C) 1999 AT&T Laboratories Cambridge. All Rights Reserved.
 //
 //  This is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -19,6 +20,12 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
+
 
 //
 // Options frame.
@@ -95,12 +102,12 @@ class OptionsFrame extends Frame
   boolean viewOnly;
 
   //
-  // Constructor.  Set up the labels and choices from the names and values
+  // Constructor. Set up the labels and choices from the names and values
   // arrays.
   //
 
   OptionsFrame(VncViewer v) {
-    super("Ultr@VNC Options");
+    super("UltraVNC Options");
 
     viewer = v;
 
@@ -183,7 +190,7 @@ class OptionsFrame extends Frame
   //
   // setEncodings looks at the encoding, compression level, JPEG
   // quality level, cursor shape updates and copyRect choices and sets
-  // the encodings array appropriately. It also calls the VncViewer's
+  // the encodings array appropriately. It also calls the UltraVNC Viewer's
   // setEncodings method to send a message to the RFB server if
   // necessary.
   //

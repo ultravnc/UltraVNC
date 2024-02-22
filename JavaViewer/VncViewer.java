@@ -1,10 +1,10 @@
-
-//  Copyright (C) 2002-2005 Ultr@VNC Team.  All Rights Reserved.
-//  Copyright (C) 2004 Kenn Min Chong, John Witchel.  All Rights Reserved.
-//  Copyright (C) 2004 Alban Chazot.  All Rights Reserved.
-//  Copyright (C) 2001,2002 HorizonLive.com, Inc.  All Rights Reserved.
-//  Copyright (C) 2002 Constantin Kaplinsky.  All Rights Reserved.
-//  Copyright (C) 1999 AT&T Laboratories Cambridge.  All Rights Reserved.
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
+//  Copyright (C) 2004 Kenn Min Chong, John Witchel. All Rights Reserved.
+//  Copyright (C) 2004 Alban Chazot. All Rights Reserved.
+//  Copyright (C) 2001,2002 HorizonLive.com, Inc. All Rights Reserved.
+//  Copyright (C) 2002 Constantin Kaplinsky. All Rights Reserved.
+//  Copyright (C) 1999 AT&T Laboratories Cambridge. All Rights Reserved.
 //
 //  This is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -21,18 +21,24 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
+
 
 //
-// VncViewer.java - the VNC viewer applet.  This class mainly just sets up the
+// VncViewer.java - the UltraVNC Viewer applet. This class mainly just sets up the
 // user interface, leaving it to the VncCanvas to do the actual rendering of
 // a VNC desktop.
 //
 
 // Alban Chazot - Carmi Grenoble July 5th 2004 
-// * Add support for Ultr@VNC mslogon feature.
-//   You can now be connected to a Ultr@VNC box with mslogon required.
-//   Thanks to Wim Vandersmissen, who provide a TightVNC viewer patch do to so.
-//   That give me the idea to provide it in the java viewer too.
+// * Add support for UltraVNC MS-Logon feature.
+//   You can now be connected to a UltraVNC box with MS-Logon required.
+//   Thanks to Wim Vandersmissen, who provide a TightVNC Viewer patch do to so.
+//   That give me the idea to provide it in the UltraVNC Java Viewer too.
 //
 // * Add ScrollPanel to applet mode
 //
@@ -48,11 +54,11 @@ public class VncViewer extends java.applet.Applet
   boolean inAnApplet = true;
   boolean inSeparateFrame = false;
 
-  // mslogon support
+  // MS-Logon support
 
   boolean mslogon = false;
 
-  // mslogon support end
+  // MS-Logon support end
 
   //
   // main() is called when run as a java program from the command line.
@@ -105,7 +111,7 @@ public class VncViewer extends java.applet.Applet
   int deferCursorUpdates;
   int deferUpdateRequests;
 
-  // mslogon support 2
+  // MS-Logon support 2
   String usernameParam;
   String encUsernameParam;
   String dm; 
@@ -113,7 +119,7 @@ public class VncViewer extends java.applet.Applet
   byte[] user = new byte[256];
   byte[] passwd = new byte[32];
   int i;
-  // mslogon support 2 end
+  // MS-Logon support 2 end
 
   //
   // init()
@@ -124,7 +130,7 @@ public class VncViewer extends java.applet.Applet
     readParameters();
 
     if (inSeparateFrame) {
-      vncFrame = new Frame("Ultr@VNC");
+      vncFrame = new Frame("UltraVNC");
       if (!inAnApplet) {
 	vncFrame.add("Center", this);
       }
@@ -137,7 +143,7 @@ public class VncViewer extends java.applet.Applet
 
     options = new OptionsFrame(this);
     clipboard = new ClipboardFrame(this);
-    // authenticator = new AuthPanel(false);   // mslogon support : go to connectAndAuthenticate()
+    // authenticator = new AuthPanel(false);   // MS-Logon support : go to connectAndAuthenticate()
     if (RecordingFrame.checkSecurity())
       rec = new RecordingFrame(this);
 
@@ -329,9 +335,9 @@ public class VncViewer extends java.applet.Applet
     // for a password, try to authenticate, retry on authentication
     // failures.
 
-    // mslogon support
+    // MS-Logon support
     //
-    // Detect Auth Protocol (Ultr@VNC or the standard One)
+    // Detect Auth Protocol (UltraVNC or the standard One)
     // To know if we must show the username box
     //
 
@@ -340,7 +346,7 @@ public class VncViewer extends java.applet.Applet
 
     authenticator = new AuthPanel(mslogon);
     
-    // mslogon support end
+    // MS-Logon support end
     
     GridBagConstraints gbc = new GridBagConstraints();
     gbc.gridwidth = GridBagConstraints.REMAINDER;
@@ -366,9 +372,9 @@ public class VncViewer extends java.applet.Applet
       // solve this problem.
       //   -- const
       
-     //mslogon support 
+     // MS-Logon support 
       authenticator.moveFocusToUsernameField();
-     //mslogon support end
+     // MS-Logon support end
     }
 
     while (true) {
@@ -381,14 +387,14 @@ public class VncViewer extends java.applet.Applet
       }
 
       // Try to authenticate with a given password.
-      //mslogon support 
+      // MS-Logon support 
       String us;
       if (mslogon) { us = authenticator.username.getText(); }
       else { us = "";}
 
       if (tryAuthenticate(us,authenticator.password.getText()))
 	break;
-      //mslogon support end
+      // MS-Logon support end
 
       // Retry on authentication failure.
       authenticator.retry();
@@ -397,7 +403,7 @@ public class VncViewer extends java.applet.Applet
     vncContainer.remove(authenticator);
   }
 
-  // mslogon support
+  // MS-Logon support
   //
   // Detect Server rfb Protocol to know the auth Method
   // Perform a connexion to detect the Serverminor 
@@ -412,17 +418,17 @@ public class VncViewer extends java.applet.Applet
     System.out.println("RFB server supports protocol version " +
 		       rfb.serverMajor + "." + rfb.serverMinor);
 
-    // Mslogon support 
+    // MS-Logon support 
     if (rfb.serverMinor == 4) {
 	    mslogon = true;    
-	    System.out.println("Ultr@VNC mslogon detected");
+	    System.out.println("UltraVNC MS-Logon detected");
     }
     
     rfb.writeVersionMsg();
 
   }
   
-  // mslogon support end
+  // MS-Logon support end
 
 
   //
@@ -461,7 +467,7 @@ public class VncViewer extends java.applet.Applet
               throw new Exception("User cancelled insecure MS-Logon");
           }
       }
-      // mslogon support 
+      // MS-Logon support 
       byte[] challengems = new byte[64];
       if (mslogon) { 
         // copy the us (user) parameter into the user Byte formated variable 
@@ -495,10 +501,10 @@ public class VncViewer extends java.applet.Applet
 
         // end equivalent of vncEncryptPasswdMS
 
-	// get the mslogon Challenge from server 
+	// get the MS-Logon Challenge from server 
         rfb.is.readFully(challengems);
       }
-      // mslogon support end
+      // MS-Logon support end
       
       byte[] challenge = new byte[16];
       rfb.is.readFully(challenge);
@@ -512,7 +518,7 @@ public class VncViewer extends java.applet.Applet
       if (firstZero != -1)
 	pw = pw.substring(0, firstZero);
 
-      // mslogon support
+      // MS-Logon support
       if (mslogon ){ 
         for (i= 0; i<32; i++) {
 		challengems[i]= (byte) (passwd[i]^challengems[i]);
@@ -521,7 +527,7 @@ public class VncViewer extends java.applet.Applet
         rfb.os.write(domain);
         rfb.os.write(challengems);
       }
-      // mslogon support end
+      // MS-Logon support end
 
       byte[] key = {0, 0, 0, 0, 0, 0, 0, 0};
       System.arraycopy(pw.getBytes(), 0, key, 0, pw.length());
@@ -761,7 +767,7 @@ public class VncViewer extends java.applet.Applet
 
   //
   // readParameters() - read parameters from the html source or from the
-  // command line.  On the command line, the arguments are just a sequence of
+  // command line. On the command line, the arguments are just a sequence of
   // param_name/param_value pairs where the names and values correspond to
   // those expected in the html applet tag source.
   //

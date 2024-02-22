@@ -1,9 +1,10 @@
-//  Copyright (C) 2002-2004 Ultr@VNC Team.  All Rights Reserved.
-//  Copyright (C) 2004 Kenn Min Chong, John Witchel.  All Rights Reserved.
-//  Copyright (C) 2001,2002 HorizonLive.com, Inc.  All Rights Reserved.
-//  Copyright (C) 2001,2002 Constantin Kaplinsky.  All Rights Reserved.
-//  Copyright (C) 2000 Tridia Corporation.  All Rights Reserved.
-//  Copyright (C) 1999 AT&T Laboratories Cambridge.  All Rights Reserved.
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
+//  Copyright (C) 2004 Kenn Min Chong, John Witchel. All Rights Reserved.
+//  Copyright (C) 2001,2002 HorizonLive.com, Inc. All Rights Reserved.
+//  Copyright (C) 2001,2002 Constantin Kaplinsky. All Rights Reserved.
+//  Copyright (C) 2000 Tridia Corporation. All Rights Reserved.
+//  Copyright (C) 1999 AT&T Laboratories Cambridge. All Rights Reserved.
 //
 //  This is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -20,6 +21,12 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
+
 
 //
 // RfbProto.java
@@ -85,7 +92,7 @@ class RfbProto {
 
 	final static int TightMinToCompress = 12;
 
-	// sf@2004 - FileTransfer part
+	// sf@2004 - File Transfer part
 	ArrayList remoteDirsList;
 	ArrayList remoteFilesList;
 	ArrayList a;
@@ -104,7 +111,7 @@ class RfbProto {
 	long fileChunkCounter;
 
 	final static int sz_rfbFileTransferMsg = 12,
-	// FileTransfer Content types and Params defines
+	// File Transfer Content types and Params defines
 	rfbDirContentRequest = 1,
 	// Client asks for the content of a given Server directory
 	rfbDirPacket = 2, // Full directory name or full file name.
@@ -112,19 +119,19 @@ class RfbProto {
 	rfbFileTransferRequest = 3,
 	// Client asks the server for the tranfer of a given file
 	rfbFileHeader = 4,
-	// First packet of a file transfer, containing file's features
+	// First packet of a File Transfer, containing file's features
 	rfbFilePacket = 5, // One slice of the file
 	rfbEndOfFile = 6,
-	// End of file transfer (the file has been received or error)
+	// End of File Transfer (the file has been received or error)
 	rfbAbortFileTransfer = 7,
-	// The file transfer must be aborted, whatever the state
+	// The File Transfer must be aborted, whatever the state
 	rfbFileTransferOffer = 8,
 	// The client offers to send a file to the server
 	rfbFileAcceptHeader = 9, // The server accepts or rejects the file
 	rfbCommand = 10,
 	// The Client sends a simple command (File Delete, Dir create etc...)
 	rfbCommandReturn = 11,
-	//	New FT Protocole (V2) The zipped checksums of the destination file (Delta Transfer)
+	//	New v2 File Transfer Protocol: The zipped checksums of the destination file (Delta Transfer)
 	rfbFileChecksums = 12,
 	// The Client receives the server's answer about a simple command
 	// rfbDirContentRequest client Request - content params 
@@ -147,11 +154,11 @@ class RfbProto {
 	rfbCFileDelete = 4, // Request the server to delete the given file
 	
 	// Errors - content params or "size" field
-	rfbRErrorUnknownCmd = 1, // Unknown FileTransfer command.
+	rfbRErrorUnknownCmd = 1, // Unknown File Transfer command.
 	rfbRErrorCmd = 0xFFFFFFFF,
 	
 	// Error when a command fails on remote side (ret in "size" field)
-	sz_rfbBlockSize = 8192, // new FT protocole (v2)
+	sz_rfbBlockSize = 8192, // New v2 File Transfer Protocol
 	
 	// Size of a File Transfer packet (before compression)
 	sz_rfbZipDirectoryPrefix = 9;
@@ -159,7 +166,7 @@ class RfbProto {
 	String rfbZipDirectoryPrefix = "!UVNCDIR-\0";
 	// Transfered directory are zipped in a file with this prefix. Must end with "-"
 
-	// End of FileTransfer part 
+	// End of File Transfer part 
 	
 	String host;
 	int port;
@@ -1116,7 +1123,7 @@ class RfbProto {
 			writeRfbFileTransferMsg(rfbAbortFileTransfer, 0, 0, 0, null);
 			
 		}
-		// sf@2004 - For old FT protocole only
+		// sf@2004 - For old File Transfer Protocol only
 		/*
 		if(fileChunkCounter==10)
 		{
@@ -1218,7 +1225,7 @@ class RfbProto {
 		}
 		else
 		{
-			// sf@2004 - New FT protocole sends remote directory name
+			// sf@2004 - New File Transfer Protocol sends remote directory name
 			String str = "";
 			for (int i = 0; i < length; i++)
 			{
@@ -1452,7 +1459,7 @@ class RfbProto {
 	}
 
 	//
-	// Write a FixColourMapEntries message.  The values in the red, green and
+	// Write a FixColourMapEntries message. The values in the red, green and
 	// blue arrays are from 0 to 65535.
 	//
 
@@ -1528,9 +1535,9 @@ class RfbProto {
 	}
 
 	//
-	// A buffer for putting pointer and keyboard events before being sent.  This
+	// A buffer for putting pointer and keyboard events before being sent. This
 	// is to ensure that multiple RFB events generated from a single Java Event 
-	// will all be sent in a single network packet.  The maximum possible
+	// will all be sent in a single network packet. The maximum possible
 	// length is 4 modifier down events, a single key event followed by 4
 	// modifier up events i.e. 9 key events or 72 bytes.
 	//
@@ -1546,7 +1553,7 @@ class RfbProto {
 	final static int ALT_MASK = InputEvent.ALT_MASK;
 
 	//
-	// Write a pointer event message.  We may need to send modifier key events
+	// Write a pointer event message. We may need to send modifier key events
 	// around it to set the correct modifier state.
 	//
 
@@ -1617,8 +1624,8 @@ class RfbProto {
 	}
 
 	//
-	// Write a key event message.  We may need to send modifier key events
-	// around it to set the correct modifier state.  Also we need to translate
+	// Write a key event message. We may need to send modifier key events
+	// around it to set the correct modifier state. Also we need to translate
 	// from the Java key values to the X keysym values used by the RFB protocol.
 	//
 
@@ -1739,7 +1746,7 @@ class RfbProto {
 		} else {
 
 			//
-			// A "normal" key press.  Ordinary ASCII characters go straight through.
+			// A "normal" key press. Ordinary ASCII characters go straight through.
 			// For CTRL-<letter>, CTRL is sent separately so just send <letter>.
 			// Backspace, tab, return, escape and delete have special keysyms.
 			// Anything else we ignore.
@@ -1771,7 +1778,7 @@ class RfbProto {
 				key = 0xffff;
 			} else if (key > 0xff) {
 				// JDK1.1 on X incorrectly passes some keysyms straight through,
-				// so we do too.  JDK1.1.4 seems to have fixed this.
+				// so we do too. JDK1.1.4 seems to have fixed this.
 				// The keysyms passed are 0xff00 .. XK_BackSpace .. XK_Delete
 				if ((key < 0xff00) || (key > 0xffff))
 					return;
