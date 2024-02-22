@@ -1,3 +1,28 @@
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
+//
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
+//  USA.
+//
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
+
+
 //				Package : omnithread
 // omnithread/nt.cc		Created : 6/95 tjr
 //
@@ -76,7 +101,7 @@ omni_mutex::unlock(void)
 //
 // Condition variables are tricky to implement using NT synchronisation
 // primitives, since none of them have the atomic "release mutex and wait to be
-// signalled" which is central to the idea of a condition variable.  To get
+// signalled" which is central to the idea of a condition variable. To get
 // around this the solution is to record which threads are waiting and
 // explicitly wake up those threads.
 //
@@ -85,15 +110,15 @@ omni_mutex::unlock(void)
 // actually only needs to be a binary semaphore).
 //
 // To wait on the cv, a thread puts itself on the list of waiting threads for
-// that cv, then releases the mutex and waits on its own personal semaphore.  A
+// that cv, then releases the mutex and waits on its own personal semaphore. A
 // signalling thread simply takes a thread from the head of the list and kicks
-// that thread's semaphore.  Broadcast is simply implemented by kicking the
+// that thread's semaphore. Broadcast is simply implemented by kicking the
 // semaphore of each waiting thread.
 //
 // The only other tricky part comes when a thread gets a timeout from a timed
-// wait on its semaphore.  Between returning with a timeout from the wait and
+// wait on its semaphore. Between returning with a timeout from the wait and
 // entering the critical section, a signalling thread could get in, kick the
-// waiting thread's semaphore and remove it from the list.  If this happens,
+// waiting thread's semaphore and remove it from the list. If this happens,
 // the waiting thread's semaphore is now out of step so it needs resetting, and
 // the thread should indicate that it was signalled rather than that it timed
 // out.
@@ -257,9 +282,9 @@ omni_condition::timedwait(unsigned long abs_sec, unsigned long abs_nsec)
 	}
 
 	//
-	// We timed out but another thread still signalled us.  Wait for
+	// We timed out but another thread still signalled us. Wait for
 	// the semaphore (it _must_ have been signalled) to decrement it
-	// again.  Return that we were signalled, not that we timed out.
+	// again. Return that we were signalled, not that we timed out.
 	//
 
 	LeaveCriticalSection(&crit);
@@ -694,7 +719,7 @@ omni_thread::set_priority(priority_t pri)
 
 
 //
-// create - construct a new thread object and start it running.  Returns thread
+// create - construct a new thread object and start it running. Returns thread
 // object if successful, null pointer if not.
 //
 
@@ -720,11 +745,11 @@ omni_thread::create(void* (*fn)(void*), void* arg, priority_t pri)
 
 
 //
-// exit() _must_ lock the mutex even in the case of a detached thread.  This is
+// exit() _must_ lock the mutex even in the case of a detached thread. This is
 // because a thread may run to completion before the thread that created it has
-// had a chance to get out of start().  By locking the mutex we ensure that the
+// had a chance to get out of start(). By locking the mutex we ensure that the
 // creating thread must have reached the end of start() before we delete the
-// thread object.  Of course, once the call to start() returns, the user can
+// thread object. Of course, once the call to start() returns, the user can
 // still incorrectly refer to the thread object, but that's their problem.
 //
 
