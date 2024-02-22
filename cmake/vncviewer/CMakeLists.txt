@@ -1,3 +1,28 @@
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
+//
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
+//  USA.
+//
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
+
+
 cmake_minimum_required(VERSION 3.1.0)
 
 project(vncviewer LANGUAGES C CXX RC)
@@ -23,6 +48,7 @@ set(VNCVIEWER_SOURCES
     ../DSMPlugin/DSMPlugin.cpp
     ../ZipUnZip32/ZipUnzip32.cpp
     ../common/Clipboard.cpp
+    ../common/d3des.c
     ../common/UltraVncZ.cpp
     ../common/win32_helpers.cpp
     ../lzo/minilzo.c
@@ -65,7 +91,6 @@ set(VNCVIEWER_SOURCES
     VNCviewerApp.cpp
     VNCviewerApp32.cpp
     buildtime.cpp
-    d3des.c
     directx/directxviewer.cpp
     display.cpp
     sessiondialogLoadSave.cpp
