@@ -881,7 +881,7 @@
 				>
 				<Tool
 					Name="VCResourceCompilerTool"
-					AdditionalIncludeDirectories="\DATA\ultravnc\UltraVNC Project Root\UltraVNC\zipunzip_src\zip20\windll"
+					AdditionalIncludeDirectories="C:\UltraVNC\zipunzip_src\zip20\windll"
 				/>
 			</FileConfiguration>
 			<FileConfiguration
@@ -889,7 +889,7 @@
 				>
 				<Tool
 					Name="VCResourceCompilerTool"
-					AdditionalIncludeDirectories="\DATA\ultravnc\UltraVNC Project Root\UltraVNC\zipunzip_src\zip20\windll"
+					AdditionalIncludeDirectories="C:\UltraVNC\zipunzip_src\zip20\windll"
 				/>
 			</FileConfiguration>
 			<FileConfiguration
@@ -897,7 +897,7 @@
 				>
 				<Tool
 					Name="VCResourceCompilerTool"
-					AdditionalIncludeDirectories="\DATA\ultravnc\UltraVNC Project Root\UltraVNC\zipunzip_src\zip20\windll"
+					AdditionalIncludeDirectories="C:\UltraVNC\zipunzip_src\zip20\windll"
 				/>
 			</FileConfiguration>
 			<FileConfiguration
@@ -905,7 +905,7 @@
 				>
 				<Tool
 					Name="VCResourceCompilerTool"
-					AdditionalIncludeDirectories="\DATA\ultravnc\UltraVNC Project Root\UltraVNC\zipunzip_src\zip20\windll"
+					AdditionalIncludeDirectories="C:\UltraVNC\zipunzip_src\zip20\windll"
 				/>
 			</FileConfiguration>
 		</File>

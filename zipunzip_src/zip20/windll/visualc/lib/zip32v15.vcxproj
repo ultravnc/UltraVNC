@@ -919,16 +919,16 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\windll.rc">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">\DATA\ultravnc\UltraVNC Project Root\UltraVNC\zipunzip_src\zip20\windll;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">\DATA\ultravnc\UltraVNC Project Root\UltraVNC\zipunzip_src\zip20\windll;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">\DATA\ultravnc\UltraVNC Project Root\UltraVNC\zipunzip_src\zip20\windll;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Rel_Vista|Win32'">\DATA\ultravnc\UltraVNC Project Root\UltraVNC\zipunzip_src\zip20\windll;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Rel_XP|Win32'">\DATA\ultravnc\UltraVNC Project Root\UltraVNC\zipunzip_src\zip20\windll;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release_Vista|Win32'">\DATA\ultravnc\UltraVNC Project Root\UltraVNC\zipunzip_src\zip20\windll;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">\DATA\ultravnc\UltraVNC Project Root\UltraVNC\zipunzip_src\zip20\windll;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Rel_Vista|x64'">\DATA\ultravnc\UltraVNC Project Root\UltraVNC\zipunzip_src\zip20\windll;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Rel_XP|x64'">\DATA\ultravnc\UltraVNC Project Root\UltraVNC\zipunzip_src\zip20\windll;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release_Vista|x64'">\DATA\ultravnc\UltraVNC Project Root\UltraVNC\zipunzip_src\zip20\windll;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\UltraVNC\zipunzip_src\zip20\windll;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\UltraVNC\zipunzip_src\zip20\windll;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\UltraVNC\zipunzip_src\zip20\windll;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Rel_Vista|Win32'">C:\UltraVNC\zipunzip_src\zip20\windll;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Rel_XP|Win32'">C:\UltraVNC\zipunzip_src\zip20\windll;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release_Vista|Win32'">C:\UltraVNC\zipunzip_src\zip20\windll;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\UltraVNC\zipunzip_src\zip20\windll;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Rel_Vista|x64'">C:\UltraVNC\zipunzip_src\zip20\windll;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Rel_XP|x64'">C:\UltraVNC\zipunzip_src\zip20\windll;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release_Vista|x64'">C:\UltraVNC\zipunzip_src\zip20\windll;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
