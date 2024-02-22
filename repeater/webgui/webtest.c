@@ -116,7 +116,7 @@ DWORD WINAPI ThreadStartWeb(LPVOID lpParam)
 		{
 			char text[200];
 			sprintf_s(text, 200, "The defined web port is already in use. \nChanged to http://localhost:%i \nVerify settings!\n Default user and password is admin.",saved_portHTTP);
-			MessageBox(NULL,text,"UltraVnc Repeater: Warning",MB_ICONEXCLAMATION);
+			MessageBox(NULL,text,"UltraVNC Repeater: Warning",MB_ICONEXCLAMATION);
 		}
 		/* Install our port-local authentication routine */
 		emfs.wfs_fauth = wfs_auth;
