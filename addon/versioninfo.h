@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //  Copyright (C) 2004 Martin Scharpf, B. Braun Melsungen AG. All Rights Reserved.
-//  Copyright (C) 2002 Ultr@VNC Team Members. All Rights Reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -17,9 +17,12 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the program is not available from the place from
-// which you received this file, check 
-// http://ultravnc.sourceforge.net/
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
+
 
 /* versioninfo.h: Defines 
 	STR_COMPANYNAME, 
@@ -35,8 +38,8 @@
 
 // ======================== Define Version here =======================
 #define MAJ 1
-#define MIN 0
-#define V3 90
+#define MIN 4
+#define V3 4
 #define V4 0 // Used as ReleaseCandidate minor version in SpecialBuildDescription
 
 // Set to 1 if ReleaseCandidate (toggles visibility of SpecialBuildDescription)
@@ -60,17 +63,17 @@
 #define INT_FILEVERSION INT_VERSION
 #define INT_PRODUCTVERSION INT_VERSION
 
-#define STR_FILEVERSION XSTR(STR_VERSION) "\0"
-#define STR_PRODUCTVERSION XSTR(STR_VERSION) "\0"
-#define STR_COPYRIGHT "Copyright © 2002-2005 UltraVNC team members\0"
-#define STR_SPECIALBUILD "v" XSTR(STR_MAINVER) " ReleaseCandidate " XSTR(STR_RC_VERSION) "\0"
+#define STR_FILEVERSION XSTR(STR_VERSION)
+#define STR_PRODUCTVERSION XSTR(STR_VERSION)
+#define STR_COPYRIGHT "Copyright Â© 2002-2024 UltraVNC Team Members. All Rights Reserved."
+#define STR_SPECIALBUILD "v" XSTR(STR_MAINVER) " ReleaseCandidate " XSTR(STR_RC_VERSION)
 #if isRC == 1
-#define STR_ABOUT_SERVER_VERSION XSTR(UltraVNC Win32 Server v STR_MAINVER RC STR_RC_VERSION)
-#define STR_ABOUT_VIEWER_VERSION XSTR(UltraVNC Win32 Viewer v STR_MAINVER RC STR_RC_VERSION)
+#define STR_ABOUT_SERVER_VERSION XSTR(UltraVNC Server v STR_MAINVER RC STR_RC_VERSION)
+#define STR_ABOUT_VIEWER_VERSION XSTR(UltraVNC Viewer v STR_MAINVER RC STR_RC_VERSION)
 #else
-#define STR_ABOUT_SERVER_VERSION XSTR(UltraVNC Win32 Server v STR_VERSION)
-#define STR_ABOUT_VIEWER_VERSION XSTR(UltraVNC Win32 Viewer v STR_VERSION)
+#define STR_ABOUT_SERVER_VERSION XSTR(UltraVNC Server v STR_VERSION)
+#define STR_ABOUT_VIEWER_VERSION XSTR(UltraVNC Viewer v STR_VERSION)
 #endif
-#define STR_COMPANYNAME "UltraVNC\0"
+#define STR_COMPANYNAME "uvnc bvba"
 
 #endif // ULTRAVNC_VERSIONINFO_H

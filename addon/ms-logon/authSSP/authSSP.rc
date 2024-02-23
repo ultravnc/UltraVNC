@@ -1,3 +1,28 @@
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
+//
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
+//  USA.
+//
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
+
+
 //Microsoft Developer Studio generated resource script.
 //
 #include "resource.h"
@@ -18,7 +43,7 @@
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEU)
 #ifdef _WIN32
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
-#pragma code_page(1252)
+#pragma code_page(65001)
 #endif //_WIN32
 
 #ifndef _MAC
@@ -51,19 +76,20 @@ BEGIN
 #include "buildtime.h" // Defines macro BUILDTIME
             VALUE "Buildtime", BUILDTIME
 #endif
-            VALUE "Comments", "Cross-domain Windows authentication for UltraVNC\0"
+            VALUE "Comments", "Cross-domain Windows authentication for UltraVNC"
             VALUE "CompanyName", STR_COMPANYNAME
-            VALUE "FileDescription", "MS-Logon II for UltraVNC\0"
+            VALUE "FileDescription", "MS-Logon II for UltraVNC"
             VALUE "FileVersion", STR_FILEVERSION
-            VALUE "InternalName", "authSSP\0"
+            VALUE "InternalName", "authSSP"
             VALUE "LegalCopyright", STR_COPYRIGHT
-            VALUE "OriginalFilename", "authSSP.dll\0"
-            VALUE "ProductName", "UltraVNC authSSP\0"
+            VALUE "OriginalFilename", "authSSP.dll"
+            VALUE "PrivateBuild", ""
+            VALUE "ProductName", "UltraVNC authSSP"
             VALUE "ProductVersion", STR_PRODUCTVERSION
 #if isRC == 1
 			VALUE "SpecialBuild", STR_SPECIALBUILD
 #endif
-			END
+        END
     END
     BLOCK "VarFileInfo"
     BEGIN
@@ -82,19 +108,17 @@ END
 
 1 TEXTINCLUDE DISCARDABLE 
 BEGIN
-    "resource.h\0"
+    "resource.h"
 END
 
 2 TEXTINCLUDE DISCARDABLE 
 BEGIN
     "#include ""afxres.h""\r\n"
-    "\0"
 END
 
 3 TEXTINCLUDE DISCARDABLE 
 BEGIN
     "\r\n"
-    "\0"
 END
 
 #endif    // APSTUDIO_INVOKED
