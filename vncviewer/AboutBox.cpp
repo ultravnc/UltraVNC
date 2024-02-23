@@ -29,7 +29,7 @@
 #include "UltraVNCHelperFunctions.h"
 
 HBITMAP
-    DoGetBkGndBitmap(IN CONST UINT uBmpResId )
+    DoGetBkGndBitmap(IN CONST UINT uBmpResId)
     {
         static HBITMAP hbmBkGnd = NULL;
         if (NULL == hbmBkGnd)
