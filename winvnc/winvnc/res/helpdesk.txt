@@ -1,0 +1,91 @@
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
+//
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
+//  USA.
+//
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
+
+
+[TITLE]
+UltraVNC SC
+
+[HOST]
+Internet support
+-connect localhost:5500 -noregistry
+
+[HOST]
+Internet support eéncryption
+-secureplugin -connect localhost:5500 -noregistry
+
+[TEXTTOP]
+Dubble Click to make a connection
+
+[TEXTMIDDLE]
+Before making a connection
+
+[TEXTBOTTOM]
+Please Call 56 576896 to get your ticket
+
+[TEXTRBOTTOM]
+
+
+[TEXTRMIDDLE]
+Kasteelpleinstraat 56
+
+[TEXTRTOP]
+UltraVNC PC support
+
+[TEXTBUTTON]
+More Info
+
+[WEBPAGE]
+https://uvnc.com/
+
+[TEXTCLOSEBUTTON]
+STOP test
+
+
+[BALLOON1TITLE]
+Establishing connection...
+
+[BALLOON1A]
+5 min try period
+
+[BALLOON1B]
+If it fails, the software will remove himself
+
+[BALLOON1C]
+from your system. 
+
+[BALLOON2TITLE]
+Connection active.
+
+[BALLOON2A]
+Warning, your desktop is remote visable
+
+[BALLOON2B]
+You can break the connection any time
+
+[BALLOON2C]
+by using the close button
+
+[DIRECT]
+
+[ENTERCODE]

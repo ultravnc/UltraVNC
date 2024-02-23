@@ -1,8 +1,33 @@
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
+//
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
+//  USA.
+//
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
+
+
 WinVNC Version History
 
 	The AllowEditClients registry option is used like AllowProperties,
 	and allows VNC to be configured not to show the Add New Client or
-	Kill All Clients menu items in the tray icon menu.
+	Kill All Clients menu items in the Tray icon menu.
 
 	Implemented the -reinstall option, which unregisters the WinVNC
 	service if registered, then re-registers it.
@@ -27,7 +52,7 @@ Changes from AT&T Labs' Version 3.3.3 Revision 10:
 
 	The HTTP server can be disabled by the HTTPConnect registry key.
 
-	LockSettings can now lock Windows 2000/XP boxes on disconnect.
+	LockSettings can now lock Windows 2000/Windows XP boxes on disconnect.
 
 	Improved update tracking code.
 
@@ -78,15 +103,15 @@ Changes from Version 3.3.3 Revision 7:
 
 	Fixed AddClient semantics in vncServer to avoid a socket leak.
 
-	Fixed AuthHosts dialog display.  Now flashes titlebar/tray button if not foreground window.
+	Fixed AuthHosts dialog display. Now flashes titlebar/tray button if not foreground window.
 
-	Fixed AuthHosts string parsing.  Filters such as 10.0.0.1 no longer match 10.0.0.10.
+	Fixed AuthHosts string parsing. Filters such as 10.0.0.1 no longer match 10.0.0.10.
 
-	QuerySetting didn't work correctly if the AuthHosts string was empty.  Fixed.
+	QuerySetting didn't work correctly if the AuthHosts string was empty. Fixed.
 
 	Closing the screen-saver now works, so it's back in there.
 
-	Changed the shutdown-dialog behaviour.  It now only operates in application mode.
+	Changed the shutdown-dialog behaviour. It now only operates in application mode.
 
 -=-	Bug Fixes to VNCHooks:
 
@@ -94,7 +119,7 @@ Changes from Version 3.3.3 Revision 7:
 	hooking version easily.
 	
 	VNCHooks DLL did not remove properties from windows correctly when
-	UnsetHooks() was called.  Fixed.
+	UnsetHooks() was called. Fixed.
 
 -=-	Minor Fixes
 
@@ -104,22 +129,22 @@ Changes from Version 3.3.3 Revision 7:
 	An idle connection is one in which the client has sent no data for a fixed period,
 	whether the data be an update request, input events, or clipboard data.
 
-	Only incoming connections are now checked for validity.  Outgoing (Add New Client)
+	Only incoming connections are now checked for validity. Outgoing (Add New Client)
 	or CORBA-initiated connections are not checked via AuthHosts.
 
 Version 3.3.3 (VNC Version 3.3.3, revision 7)
 Changes from Version 3.3.3 Revision 6:
 
 	WinVNC did not correctly handle Winsock1.1, causing all client connections to be
-	erroneously dropped by the anti-DoS code.  Now fixed.
+	erroneously dropped by the anti-DoS code. Now fixed.
 
 Version 3.3.3 (VNC Version 3.3.3, revision 6)
 Changes from Version 3.3.3 Revision 4:
 
-	The anti denial-of-service blacklist code was very buggy.  It's now fixed.
+	The anti denial-of-service blacklist code was very buggy. It's now fixed.
 
 	An serious potential deadlock condition in the negotiation phase of new
-	clients has been fixed.  The problem was incredibly rare on uniprocessors
+	clients has been fixed. The problem was incredibly rare on uniprocessors
 	but much more noticable on multiprocessors, unsurprisingly.
 
 	Pointer is now rendered slightly better.
@@ -127,7 +152,7 @@ Changes from Version 3.3.3 Revision 4:
 Version 3.3.3 (VNC Version 3.3.3, revision 4)
 Changes from Version 3.3.3 Revision 3:
 
-	Implemented some simple Denial-of-Service protection.  After five consecutive failed
+	Implemented some simple Denial-of-Service protection. After five consecutive failed
 	connection attempts from a client, that client is "blacklisted" for ten seconds.
 	In addition, connections which hang before the authentication stage has completed are
 	timed out after thirty seconds, to prevent malicious users gradually eating up socket
@@ -135,29 +160,29 @@ Changes from Version 3.3.3 Revision 3:
 
 	Corrected a bug initialising the back-buffer.
 
-	Added hooking for dialog boxes, menus and scrollbars.  Seems to fix some dialogs but not
+	Added hooking for dialog boxes, menus and scrollbars. Seems to fix some dialogs but not
 	many scrollbars or menus..
 
 	Improved the GetChangedRect code with some alignment patches suggested by Will Dean.
 
-	Fixed an *IDIOTIC* bug in the handling of user-specific settings.  They were completely
-	broken before.  Now they should work.  I'm such an idiot.  Idiot idiot idiot.
+	Fixed an *IDIOTIC* bug in the handling of user-specific settings. They were completely
+	broken before. Now they should work. I'm such an idiot. Idiot idiot idiot.
 	See MS Knowledge Base articles Q168877 & Q199190.
 
 	The idiot bug-fix above broke roaming profiles on NT domains!  That's now fixed, too.
 	Idiot idiot idiot.
 
-	Added a dialog to query whether to accept or reject incoming connections.  The dialog is
+	Added a dialog to query whether to accept or reject incoming connections. The dialog is
 	currently controlled ONLY via the registry!  The AuthHosts setting is now extended, while
 	some new user-specific settings are provided so that users can tailor the query feature.
 	Relevant keys are:
 	- QuerySetting (DWORD) (local&global user-specific)
 		[Least secure]
-		0 - Accept or Query.  If AuthHosts says Reject then query, otherwise Accept.
-		1 - Accept or Reject.  Reject if AuthHosts says so, otherwise Accept.
-		2 - Obey AuthHosts.  Obey AuthHosts Accept, Query, Reject settings. [Default!]
-		3 - Query or Reject.  If AuthHosts says Reject then Reject, otherwise Query.
-		4 - Ultimate Paranoia.  If AuthHosts says Accept then Query, otherwise Reject!
+		0 - Accept or Query. If AuthHosts says Reject then query, otherwise Accept.
+		1 - Accept or Reject. Reject if AuthHosts says so, otherwise Accept.
+		2 - Obey AuthHosts. Obey AuthHosts Accept, Query, Reject settings. [Default!]
+		3 - Query or Reject. If AuthHosts says Reject then Reject, otherwise Query.
+		4 - Ultimate Paranoia. If AuthHosts says Accept then Query, otherwise Reject!
 		[Most secure]
 
 		Summary:	Actual Effect
@@ -171,15 +196,15 @@ Changes from Version 3.3.3 Revision 3:
 	- QueryTimeout (DWORD) (local&global user-specific)
 		Number of seconds before Accept/Reject dialog should timeout and reject.
 	- AuthHosts (SZ) (machine-local)
-		Match terms may now start with "-", "+" or "?".  "?" indicates that the connection
+		Match terms may now start with "-", "+" or "?". "?" indicates that the connection
 		attempt should be queried.
 
 Version 3.3.3 (VNC Version 3.3.3, revision 3)
 Changes from Version 3.3.3 Revision 2:
 
-	Implemented Will Dean's DIBsection patch to retrive screen data.  This reduces
+	Implemented Will Dean's DIBsection patch to retrive screen data. This reduces
 	both the retrieval time & the memory usage of WinVNC but currently only works
-	for VNC-format-compatible 16 and 32 bit displays.  If your display is incompatible
+	for VNC-format-compatible 16 and 32-bit displays. If your display is incompatible
 	then WinVNC falls back to the old, slow, memory hungry mode.
 
 	Fixed a bug in VNCHooks which cause very large updates to be spuriously created on occasion.
@@ -212,23 +237,23 @@ Version 3.3.3 (VNC Version 3.3.3, revision 1)
 Release version, patched for HTML bug below.
 
 	[The initial 3.3.3 release featured a bug in the rendering of HTML for the Java-based
-	viewer.  3.3.3 was quickly withdrawn and 3.3.3R1 is now the base Version 3.3.3 release.]
+	viewer. 3.3.3 was quickly withdrawn and 3.3.3R1 is now the base Version 3.3.3 release.]
 
 	-=- NEW FEATURES:
 
 	REGISTRY SETTINGS ARE NOW LOADED CORRECTLY FROM THE CURRENT_USER REGISTRY HIVE!
 	When running as a service under Windows NT, WinVNC was unable to correctly load
-	settings stored in the current user's HKEY_CURRENT_USER hive.  As a workaround
+	settings stored in the current user's HKEY_CURRENT_USER hive. As a workaround
 	for this, a special helper-hook is installed when the service itself is
-	installed.  The helper-hook runs when a user logs in and passes enough information
+	installed. The helper-hook runs when a user logs in and passes enough information
 	to the WinVNC service for it to locate their preferences correctly.
 	If the helper hook fails to install or isn't run for some reason, then WinVNC
 	will continue to operate based on ALL the WinVNC HKEY_LOCAL_MACHINE settings.
 
 	A new command-line option, -defaultsettings, has been added, which will cause the
-	running WinVNC server to show a Default Properties dialog, through which the default
-	local properties can be editted.  (While the dialog is displayed, the properties used
-	will be the default ones.  When it dissappears, WinVNC reverts to the user's settings.)
+	running WinVNC Server to show a Default Properties dialog, through which the default
+	local properties can be edited. (While the dialog is displayed, the properties used
+	will be the default ones. When it dissappears, WinVNC reverts to the user's settings.)
 
 	Nagle's algorithm is now disabled on all WinVNC connections, decreasing latency
 	considerably.
@@ -249,12 +274,12 @@ Release version, patched for HTML bug below.
 	[This scheme does not currently filter by DNS name]
 
 	In addition to the above, incoming connections may be restricted on a server-wide
-	basis to being accepted only on the local-loopback interface.  This is controlled
+	basis to being accepted only on the local-loopback interface. This is controlled
 	through the LoopbackOnly registry setting, which overrides the AllowLoopback and
 	AuthHosts settings when active.
 
 	The WinVNC priority is now increased while processing its message queue and put
-	back to normal while preparing updates for sending.  This results in apparent
+	back to normal while preparing updates for sending. This results in apparent
 	increase in performance, particularly when used in conjunction with some common
 	applications.
 
@@ -265,14 +290,14 @@ Release version, patched for HTML bug below.
 	- Major:
 
 	Under Windows NT, a handle was leaked whenever the SelectDesktop function was
-	called to move a thread into a different desktop.  In practice, this meant a leak
+	called to move a thread into a different desktop. In practice, this meant a leak
 	everytime someone logged in, connected remotely, or used C-A-D to access security
-	features in NT.  Not pretty.
+	features in NT. Not pretty.
 
 	Related to the above fix:  When simulating Ctrl-Alt-Del, WinVNC would switch a
-	dedicated thread into the WinLogon desktop to achieve the desired effect.  When
+	dedicated thread into the WinLogon desktop to achieve the desired effect. When
 	the thread quit, the handle to the WinLogon desktop was not properly freed by
-	WinNT.  This is now worked around by WinVNC internally.
+	WinNT. This is now worked around by WinVNC internally.
 
 	When killing the vncServer object, a race condition occurred because
 	WaitUntilAuthEmpty() was used to wait for ALL clients being removed - potentially,
@@ -284,25 +309,25 @@ Release version, patched for HTML bug below.
 	- Minor:
 
 	The LockSetting option was not correctly loaded by the Properties class in some
-	common cases.  This is now fixed.
+	common cases. This is now fixed.
 
 	WinVNC was using ExitWindows but specifying parameters according to the
-	specification of ExitWindowsEx.  ExitWindowsEx is now used instead.
+	specification of ExitWindowsEx. ExitWindowsEx is now used instead.
 
 	-=- OTHER MODIFICATIONS:
 
 	When starting up without a password set, WinVNC will first check whether the
 	Properties dialog has been disabled with AllowProperties=0 before attempting
-	to open it for the user to set one.  Instead a dialog indicating the problem
+	to open it for the user to set one. Instead a dialog indicating the problem
 	will be displayed.
 
 	-=- NOTES:
 
-	BUGLET:PLANAR vs CHUNKY.  It transpires that problems encountered with WinVNC and
-	16-colour Windows 95 displays are due to Win95 VGA drivers giving a "planar" view
-	of the world.  Internally, Win95 is very bad at handling planar pixels and is
-	also very bad at making them chunky.  WinNT does not have this problem.  A new
-	error dialog has been added to warn about this problem on Win95.
+	BUGLET:PLANAR vs CHUNKY. It transpires that problems encountered with WinVNC and
+	16-colour Windows 95 displays are due to Windows 95 VGA drivers giving a "planar" view
+	of the world. Internally, Windows 95 is very bad at handling planar pixels and is
+	also very bad at making them chunky. WinNT does not have this problem. A new
+	error dialog has been added to warn about this problem on Windows 95.
 
 Version 3.3.2 (VNC Version 3.3.2, revision 8)
 Changes from revision 7:
@@ -313,7 +338,7 @@ Changes from revision 7:
 
 	Fix in vncKeymap.cpp which should sort out the CapsLock on connect problem.
 
-	Added an Initiate Outgoing Connection (Add New Client) dialog.  If a machine is
+	Added an Initiate Outgoing Connection (Add New Client) dialog. If a machine is
 	running a vncviewer with the -listen option then WinVNC can be made to export
 	the display it is managing to this listening viewer.
 
@@ -339,10 +364,10 @@ Changes from revision 6:
 	Fixed HANDLE to HINSTANCE casting problem in VNCHooks.cpp, which prevented WinVNC
 	from compiling under Microsoft Visual C++ 6.0
 
-	Tray icon is now refreshed every five seconds.  This may help detect dynamically added
+	Tray icon is now refreshed every five seconds. This may help detect dynamically added
 	IP addresses correctly
 
-	Every five seconds, WinVNC will re-attempt to add the tray icon, even under Win95.
+	Every five seconds, WinVNC will re-attempt to add the Tray icon, even under Windows 95.
 	If Explorer crashes or Windows 95 is being run then this should ensure the icon appears.
 
 Version 3.3.2 (VNC Version 3.3.2, revision 6)
@@ -351,7 +376,7 @@ Changes from revision 5:
 	Fixed minor protocol non-compliance bug with regard to clients which fail to send
 	SetPixelFormat messages.
 
-	Fixed DOS-prompt polling under Windows 95.  DOS boxes are now polled correctly.
+	Fixed DOS-prompt polling under Windows 95. DOS boxes are now polled correctly.
 
 Version 3.3.2 (VNC Version 3.3.2, revision 5)
 Changes from revision 4:
@@ -365,13 +390,13 @@ Changes from revision 4:
 Version 3.3.2 (VNC Version 3.3.2, revision 4)
 Changes from revision 3:
 
-	Fixed a tray icon bug, in which the tray icon was being produced before the menu
+	Fixed a Tray icon bug, in which the Tray icon was being produced before the menu
 	had been loaded.
 
 	Replaced the thread package with the latest version, which fixes a few resource leaks.
 
 	Mouse events are now produced to reflect those sent on the wire, regardless of whether
-	the mouse buttons would locally be swapped by the OS.  This means that left- or right-
+	the mouse buttons would locally be swapped by the OS. This means that left- or right-
 	handedness is a client-side feature.
 
 Version 3.3.2 (VNC Version 3.3.2, revision 3)
@@ -389,10 +414,10 @@ Changes from revision 2:
 	Global per user settings are stored under HKEY_CURRENT_USER/Software/ORL/WinVNC3
 	
 	These groups of settings have the following priority:
-	1.	Machine settings are always read, from the machine settings location.  Not overridable.
+	1.	Machine settings are always read, from the machine settings location. Not overridable.
 	2.	Default user settings are read.
 	3.	Local-machine, per-user settings are read for the current user, or for SYSTEM if
-		there is no current user.  These override the Default settings.
+		there is no current user. These override the Default settings.
 	4.	If AllowProperties is not zero, the global per-user settings are read.
 		These override both the Default settings & the local-machine, per-user settings.
 
@@ -406,21 +431,21 @@ Changes from revision 2:
 
 	UPDATE ROUTINES FIXED!
 	If a client chose to send multiple update requests to the server without waiting for
-	the update data, then the server would only consider the last request.  This behaviour
-	was incorrect and has now been fixed.  As a result, WinVNC will now work properly with
+	the update data, then the server would only consider the last request. This behaviour
+	was incorrect and has now been fixed. As a result, WinVNC will now work properly with
 	the PalmVNC viewer.
 
 	HTTP SERVER FIXED!
 	The HTTP server section of WinVNC could end up listening on the wrong port number when
-	automatic display number selection was in use.  This is now fixed.
+	automatic display number selection was in use. This is now fixed.
 
 	MEMORY LEAK FIXED!
 	A small memory leak in the WinNT side of the vncService::CurrentUser function has been fixed.
 	Although the amount lost on each execution was small, the function is called often enough
 	for this to cause problems over long periods of use.
 
-	Established that the Ctrl-Alt-Del problem under NT 3.51 is because GetAsyncKeyState for
-	ctrl and alt ALWAYS returns zero.  Don't know why...
+	Established that the Ctrl-Alt-Del problem under Windows NT 3.51 is because GetAsyncKeyState for
+	ctrl and alt ALWAYS returns zero. Don't know why...
 
 	Fixed a potential lockup when the Properties dialog is closed by the OS rather than by
 	the Ok or Cancel buttons.
@@ -430,28 +455,28 @@ Changes from revision 1:
 
 	CTRL-ALT-DEL IMPROVED!
 	Ctrl-Alt-Del will now work both with the Delete key and with the keypad Del key, from
-	Unix clients.  Unix clients treat these two keys differently but Windows doesn't, so
+	Unix clients. Unix clients treat these two keys differently but Windows doesn't, so
 	WinVNC now maps both on to VK_DELETE internally.
 
 	MENU UPDATES IMPROVED!
 	Extra hook code has been added to the VNCHooks library to catch the messages used to
-	update the contents of pop-up menus, etc.  As a result, menus tend to suffer much less
+	update the contents of pop-up menus, etc. As a result, menus tend to suffer much less
 	from the characteristic colour-smear effect.
 
 	Code is now in place to perform automatic locking or logoff of the workstation
-	when all remote clients have closed, for security reasons.  Unfortunately, the
+	when all remote clients have closed, for security reasons. Unfortunately, the
 	LockWorkstation function doesn't work on pre-NT5 machines, so only the logoff
 	functionality is implemented.
 
-	The new ConnectPriority option is available, on a per-machine basis.  The
+	The new ConnectPriority option is available, on a per-machine basis. The
 	HKEY_LOCAL_MACHINE/Software/ORL/WinVNC3/ConnectPriority
 	setting can take one of three values:
 		0 - new, non-shared incoming connections kick off existing ones.
 		1 - all incoming connections are treated as shared, regardless of the -shared viewer option.
 		2 - new, non-shared incoming connections will be refused if a current connection exists.
 
-	Automatic display number selection is now available.  This option is set through the WinVNC
-	properties dialog.  When this option is used, the display number parameter in the dialog
+	Automatic display number selection is now available. This option is set through the WinVNC
+	properties dialog. When this option is used, the display number parameter in the dialog
 	is ignored and the display number to use is instead allocated on the fly by WinVNC.
 
 Version 3.3.2 (VNC Version 3.3.2, revision 1)
@@ -464,7 +489,7 @@ Changes from base 3.3.2 release:
 	svncviewer will now work with 8-bit WinVNC desktops as well as Xvnc ones.
 
 	LOGGING SUPPORTED!
-	Run-time logging of all internal debug messages is now supported.  Log data
+	Run-time logging of all internal debug messages is now supported. Log data
 	may be output to a file or a console window (or the MSVC debugger if the
 	program was compiled with debugging active.)
 	Two registry keys under HKEY_LOCAL_MACHINE/Software/ORL/WinVNC3 are used:
@@ -473,17 +498,17 @@ Changes from base 3.3.2 release:
 		2 = Output to log file Winvnc.log in the WinVNC directory
 		4 = Output to a console window, displayed on-screen
 	Any combination of the above values may be used.
-	DebugLevel indicates how much debug information to present.  Any positive
-	integer is valid.  Zero indicates that no debugging information should be
+	DebugLevel indicates how much debug information to present. Any positive
+	integer is valid. Zero indicates that no debugging information should be
 	produced and is the default.
 
 	Loopback (local-machine) connections to WinVNC will now be allowed if the
 	HKEY_LOCAL_MACHINE/Software/ORL/WinVNC3/AllowLoopback registry entry is set
-	to 1.  The default is 0.
+	to 1. The default is 0.
 
-	Connections may now be made to WinVNC servers without requiring authentication
+	Connections may now be made to WinVNC Servers without requiring authentication
 	if the HKEY_LOCAL_MACHINE/Software/ORL/WinVNC3/AuthRequired registry entry is
-	set to 0.  The default is 1.
+	set to 0. The default is 1.
 
 	Microsoft Developer Studio configurations are included (but not tested) for 
 	Alpha NT, to make compilations for this platform more straightforward.
@@ -516,14 +541,14 @@ Changes from revision 19:
 
 	If a client requests the CopyRect encoding in the list of encodings it supports
 	then WinVNC will now use the CopyRect primitive when doing simple tasks like
-	dragging windows.  This still has some flaws in it but generally improves performance.
+	dragging windows. This still has some flaws in it but generally improves performance.
 
 	Updated the Java classes exported by WinVNC to include the Send-Ctrl-Alt-Del button.
 
 	Added a "-about" option, which will cause an _already running_ copy of WinVNC to
 	display its About box, making it easier to check that you have the latest version!
 
-	Added version information to the VNCHooks Dynamic Link Library.  This can be viewed
+	Added version information to the VNCHooks Dynamic Link Library. This can be viewed
 	selecting the properties dialog for the vnchooks.dll file.
 
 Version 3.3.1 (VNC Version 3.3, revision 19)
@@ -545,12 +570,12 @@ Changes from revision 16:
 	This means an increase in memory usage but delivers a noticable performance
 	boost on most screen formats.
 
-	1, 4 and 8 bit palette-based local displays are now handled directly by
+	1, 4 and 8-bit palette-based local displays are now handled directly by
 	WinVNC, resulting in a significant performance boost, although there are
 	currently problems with the palette layout being confused in places.
 
 	More intelligent culling of unchanged regions of the screen from the list of
-	rectangles to be sent has been implemented.  Generally, this isn't noticable
+	rectangles to be sent has been implemented. Generally, this isn't noticable
 	but over low-bandwidth links, it should have a significant effect.
 
 	WM_ENDSESSION is handled properly for full system shutdown.
@@ -562,7 +587,7 @@ Changes from revision 16:
 
 	When installing WinVNC as a service, quotes are now placed around the
 	executable's name, to avoid problems if there are whitespace characters
-	in the path.  (Common because of installing to "program files\orl\vnc")
+	in the path. (Common because of installing to "program files\orl\vnc")
 
 	The command-line options available have changed slightly:
 	-run			Causes WinVNC to run normally & ignore rest of command-line.
@@ -578,14 +603,14 @@ Changes from revision 16:
 		WinVNC_new -kill -run
 	which will stop the running copy & run the new version normally.
 
-	The Java viewer class files have been updated.  The new classes are slightly more
+	The Java Viewer class files have been updated. The new classes are slightly more
 	compatible with borderline Java VMs.
 
 	Deferred update messages are no longer removed from the application's message queue
 	behind it's back, hopefully resulting in more reliable behaviour & fewer lock-ups.
 
 	The screen-saver is now not disabled when WinVNC is running in service mode and a
-	connection is made, to avoid a potential race condition.  This will be handled better
+	connection is made, to avoid a potential race condition. This will be handled better
 	in a future revision.
 
 	WIN-NT ONLY:
@@ -621,7 +646,7 @@ Changes from revision 13:
 
 	WinVNC will now run as a service on both Windows NT and Windows 95.
 	Running WinVNC with the -install command-line option will install it into the system
-	service control manager and set it to auto-run on bootup.  The -remove option will stop
+	service control manager and set it to auto-run on bootup. The -remove option will stop
 	the service if necessary and will then remove it.
 	WIN-95 : winvnc -install will cause the service to run immediately.
 	WIN-NT : winvnc -install will install the service into the manager but not start it.
@@ -644,13 +669,13 @@ Changes from revision 13:
 	WIN-95 ONLY:
 
 	Shift, Alt and Control were broken in Revision 13, since Windows 95 cannot distinguish
-	left and right shift keys at all.  This is now fixed.
+	left and right shift keys at all. This is now fixed.
 
 	NOTES:
 
 	When typing into an application set to use keyboard layout A, using WinVNC run with
 	keyboard layout B, problems may be experienced because of WinVNC setting the wrong Shift
-	key states to generate particular characters.  As long as only one keyboard layout is used
+	key states to generate particular characters. As long as only one keyboard layout is used
 	consistently across all applications, this shouldn't be a problem.
 
 Version 3.3.1 (VNC Version 3.3, revision 13)
@@ -681,7 +706,7 @@ Changes from revision 9:
 Version 3.3.1 (VNC Version 3.3, revision 9)
 Changes from revision 8:
 
-	Local connections to WinVNC servers are now filtered out.
+	Local connections to WinVNC Servers are now filtered out.
 
 	The OMNIthread package is now included as part of the WinVNC source distribution.
 
@@ -694,7 +719,7 @@ Changes from revision 5:
 
 	The resource leak while rendering the mouse pointer has been fixed.
 
-	The WinVNC tray icon changes colour when there is a remote connection.
+	The WinVNC Tray icon changes colour when there is a remote connection.
 
 	An Apply button has been added to the Properties dialog so that it can be used as the main
 	WinVNC window on Windows NT 3.51 (or any other system without a system tray.)
@@ -729,7 +754,7 @@ Changes from version 3.05:
 
 	The new, DES-based authentication scheme is used. This results in incompatibility with VNC
 	clients using version 3.2 or lower of the protocol. To avoid this problem, connect via the
-	HTTP interface, which provides the correct version of the Java viewer. Version 3.3+ based
+	HTTP interface, which provides the correct version of the Java Viewer. Version 3.3+ based
 	clients will handle the new scheme correctly.
 
 	Shared VNC client connections are now fully supported.

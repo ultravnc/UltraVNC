@@ -24,7 +24,7 @@
  *
  *
  * THeller: Added binary search in MemoryGetProcAddress function
- * (#define USE_BINARY_SEARCH to enable it).  This gives a very large
+ * (#define USE_BINARY_SEARCH to enable it). This gives a very large
  * speedup for libraries that exports lots of functions.
  *
  * These portions are Copyright (C) 2013 Thomas Heller.
@@ -50,7 +50,7 @@
 #endif
 
 #ifndef IMAGE_SIZEOF_BASE_RELOCATION
-// Vista SDKs no longer define IMAGE_SIZEOF_BASE_RELOCATION!?
+// Windows Vista SDKs no longer define IMAGE_SIZEOF_BASE_RELOCATION!?
 #define IMAGE_SIZEOF_BASE_RELOCATION (sizeof(IMAGE_BASE_RELOCATION))
 #endif
 
@@ -197,7 +197,7 @@ CopySections(const unsigned char *data, size_t size, PIMAGE_NT_HEADERS old_heade
                 // Always use position from file to support alignments smaller
                 // than page size (allocation above will align to page size).
                 dest = codeBase + section->VirtualAddress;
-                // NOTE: On 64bit systems we truncate to 32bit here but expand
+                // NOTE: On 64-bit systems we truncate to 32-bit here but expand
                 // again later when "PhysicalAddress" is used.
                 section->Misc.PhysicalAddress = (DWORD) ((uintptr_t) dest & 0xffffffff);
                 memset(dest, 0, section_size);
@@ -225,7 +225,7 @@ CopySections(const unsigned char *data, size_t size, PIMAGE_NT_HEADERS old_heade
         // than page size (allocation above will align to page size).
         dest = codeBase + section->VirtualAddress;
         memcpy(dest, data + section->PointerToRawData, section->SizeOfRawData);
-        // NOTE: On 64bit systems we truncate to 32bit here but expand
+        // NOTE: On 64-bit systems we truncate to 32-bit here but expand
         // again later when "PhysicalAddress" is used.
         section->Misc.PhysicalAddress = (DWORD) ((uintptr_t) dest & 0xffffffff);
     }
@@ -307,8 +307,8 @@ FinalizeSections(PMEMORYMODULE module)
     int i;
     PIMAGE_SECTION_HEADER section = IMAGE_FIRST_SECTION(module->headers);
 #ifdef _WIN64
-    // "PhysicalAddress" might have been truncated to 32bit above, expand to
-    // 64bits again.
+    // "PhysicalAddress" might have been truncated to 32-bit above, expand to
+    // 64-bit again.
     uintptr_t imageOffset = ((uintptr_t) module->headers->OptionalHeader.ImageBase & 0xffffffff00000000);
 #else
     static const uintptr_t imageOffset = 0;
@@ -395,9 +395,9 @@ PerformBaseRelocation(PMEMORYMODULE module, ptrdiff_t delta)
         unsigned char *dest = codeBase + relocation->VirtualAddress;
         unsigned short *relInfo = (unsigned short*) OffsetPointer(relocation, IMAGE_SIZEOF_BASE_RELOCATION);
         for (i=0; i<((relocation->SizeOfBlock-IMAGE_SIZEOF_BASE_RELOCATION) / 2); i++, relInfo++) {
-            // the upper 4 bits define the type of relocation
+            // the upper 4-bit define the type of relocation
             int type = *relInfo >> 12;
-            // the lower 12 bits define the offset
+            // the lower 12-bit define the offset
             int offset = *relInfo & 0xfff;
 
             switch (type)
@@ -407,7 +407,7 @@ PerformBaseRelocation(PMEMORYMODULE module, ptrdiff_t delta)
                 break;
 
             case IMAGE_REL_BASED_HIGHLOW:
-                // change complete 32 bit address
+                // change complete 32-bit address
                 {
                     DWORD *patchAddrHL = (DWORD *) (dest + offset);
                     *patchAddrHL += (DWORD) delta;
@@ -956,7 +956,7 @@ static PIMAGE_RESOURCE_DIRECTORY_ENTRY _MemorySearchResourceEntry(
 #if defined(UNICODE)
         searchKey = key;
 #else
-        // Resource names are always stored using 16bit characters, need to
+        // Resource names are always stored using 16-bit characters, need to
         // convert string we search for.
 #define MAX_LOCAL_KEY_LENGTH 2048
         // In most cases resource names are short, so optimize for that by

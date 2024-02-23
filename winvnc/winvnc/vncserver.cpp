@@ -1,11 +1,10 @@
-//  Copyright (C) 2002 UltraVNC Team Members. All Rights Reserved.
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //  Copyright (C) 2000-2002 Const Kaplinsky. All Rights Reserved.
 //  Copyright (C) 2002 RealVNC Ltd. All Rights Reserved.
 //  Copyright (C) 1999 AT&T Laboratories Cambridge. All Rights Reserved.
 //
-//  This file is part of the VNC system.
-//
-//  The VNC system is free software; you can redistribute it and/or modify
+//  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
@@ -20,9 +19,12 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the VNC system is not available from the place
-// whence you received this file, check http://www.uk.research.att.com/vnc or contact
-// the authors on vnc@uk.research.att.com for information on obtaining it.
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
+
 
 // vncServer.cpp
 
@@ -618,7 +620,7 @@ void vncServer::KillClient(LPSTR szClientName)
 }
 
 //
-// sf@2002 - Open a textchat window with the named client
+// sf@2002 - Open a Text Chat window with the named client
 //
 void vncServer::TextChatClient(LPSTR szClientName)
 {
@@ -630,7 +632,7 @@ void vncServer::TextChatClient(LPSTR szClientName)
 		pClient = GetClient(*i);
 		if (!_stricmp(pClient->GetClientNameName(), szClientName)) { //TOCHECK
 			if (!pClient->IsUltraViewer()) {
-				vnclog.Print(LL_INTINFO, VNCLOG("Client %s is not Ultra. Doesn't know TextChat\n"), szClientName);
+				vnclog.Print(LL_INTINFO, VNCLOG("Client %s is not Ultra. Doesn't know Text Chat\n"), szClientName);
 				vncTimedMsgBox::Do(
 					sz_ID_ULTRAVNC_TEXTCHAT,
 					sz_ID_ULTRAVNC_WARNING,
@@ -638,7 +640,7 @@ void vncServer::TextChatClient(LPSTR szClientName)
 				);
 				break;
 			}
-			vnclog.Print(LL_INTINFO, VNCLOG("TextChat with client named: %s\n"), szClientName);
+			vnclog.Print(LL_INTINFO, VNCLOG("Text Chat with client named: %s\n"), szClientName);
 			pClient->GetTextChatPointer()->OrderTextChat();
 			break;
 		}
@@ -978,7 +980,7 @@ vncServer::RemoveClient(vncClientId clientid)
 	if (m_authClients.empty() && (m_desktop != NULL)) {
 		vnclog.Print(LL_STATE, VNCLOG("deleting desktop server\n"));
 
-		// sf@2007 - Do not lock/logoff even if required when WinVNC autorestarts (on desktop change (XP FUS / Vista))
+		// sf@2007 - Do not lock/logoff even if required when UltraVNC Server autorestarts (on desktop change (Windows XP FUS / Windows Vista))
 		if (!settings->AutoRestartFlag() && !OS_Shutdown) {
 			// Are there locksettings set?
 			if (settings->getLockSettings() == 1 || settings->getClearconsole()) {
@@ -1492,7 +1494,7 @@ vncServer::VerifyHost(const char* hostname) {
 	while (current) {
 		// Has the blacklist entry timed out?
 		if ((now.QuadPart - current->_lastRefTime.QuadPart) > 0) {
-			// Yes.  Is it a "blocked" entry?
+			// Yes. Is it a "blocked" entry?
 			if (current->_blocked) {
 				// Yes, so unblock it & re-set the reference time
 				current->_blocked = FALSE;
@@ -1798,7 +1800,7 @@ BOOL vncServer::SetDSMPlugin(BOOL bForceReload)
 			strcpy_s(szParams, "NoPassword");
 
 		// The second parameter tells the plugin the kind of program is using it
-		// (in WinVNC : "server-app" or "server-svc"
+		// (in UltraVNC Server : "server-app" or "server-svc"
 		strcat_s(szParams, ",");
 		strcat_s(szParams, settings->RunningFromExternalService() ? "server-svc" : "server-app");
 		if (m_pDSMPlugin->SetPluginParams(NULL, szParams, settings->getDSMPluginConfig(), NULL)) {
@@ -1964,7 +1966,7 @@ void vncServer::actualRetryThread()
 		vnclog.Print(LL_INTINFO, VNCLOG("Attempting AutoReconnect....\n"));
 		retrysock = new VSocket;
 		if (retrysock) {
-			// Connect out to the specified host on the VNCviewer listen port
+			// Connect out to the specified host on the UltraVNC Viewer listen port
 #ifdef IPV6V4
 			if (retrysock->CreateConnect(m_szAutoReconnectAdr, m_AutoReconnectPort)) {
 #else

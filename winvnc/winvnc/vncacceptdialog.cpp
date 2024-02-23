@@ -1,8 +1,8 @@
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //  Copyright (C) 1999 AT&T Laboratories Cambridge. All Rights Reserved.
 //
-//  This file is part of the VNC system.
-//
-//  The VNC system is free software; you can redistribute it and/or modify
+//  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
@@ -17,9 +17,12 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the VNC system is not available from the place
-// whence you received this file, check http://www.uk.research.att.com/vnc or contact
-// the authors on vnc@uk.research.att.com for information on obtaining it.
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
+
 
 // vncAcceptDialog.cpp: implementation of the vncAcceptDialog class, used
 // to query whether or not to accept incoming connections.
@@ -127,7 +130,7 @@ BOOL CALLBACK vncAcceptDialog::vncAcceptDlgProc(HWND hwnd,
 			myIniFile.ReadString("admin", "accept_reject_mesg", accept_reject_mesg,512);
 
 			if (strlen(accept_reject_mesg) == 0) 
-				strcpy_s(accept_reject_mesg,"WinVNC has received an incoming connection from");
+				strcpy_s(accept_reject_mesg,"UltraVNC Server has received an incoming connection from");
 
 			if (strlen(_this->infoMsg) > 0) {
 				strcat_s(accept_reject_mesg, "\r\n");

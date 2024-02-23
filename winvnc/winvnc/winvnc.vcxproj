@@ -1409,10 +1409,10 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\rdr\rdr.vcxproj">
-      <Project>{f5244002-0fff-4f19-a941-fcce1861f132}</Project>
+      <Project>{F5244002-0FFF-4F19-A941-FCCE1861F132}</Project>
     </ProjectReference>
     <ProjectReference Include="..\omnithread\omnithread.vcxproj">
-      <Project>{e52b9956-fe67-47f7-bc4f-67cc5a64b708}</Project>
+      <Project>{E52B9956-FE67-47F7-BC4F-67CC5A64B708}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

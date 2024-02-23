@@ -1,9 +1,9 @@
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //  Copyright (C) 2002 RealVNC Ltd. All Rights Reserved.
 //  Copyright (C) 1999 AT&T Laboratories Cambridge. All Rights Reserved.
 //
-//  This file is part of the VNC system.
-//
-//  The VNC system is free software; you can redistribute it and/or modify
+//  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
@@ -18,19 +18,21 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the VNC system is not available from the place 
-// whence you received this file, check http://www.uk.research.att.com/vnc or contact
-// the authors on vnc@uk.research.att.com for information on obtaining it.
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
 
 
 // vncEncodeCoRRE
 
 // This file implements the vncEncoder-derived vncEncodeCoRRE class.
 // This class overrides some vncEncoder functions to produce a 
-// Compact RRE encoder.  Compact RRE (CoRRE) uses fewer bytes to
-// encode each subrect, which makes it faster in general.  It also
+// Compact RRE encoder. Compact RRE (CoRRE) uses fewer bytes to
+// encode each subrect, which makes it faster in general. It also
 // splits large rectangles up into ones of at most 256 pixels width
-// & height.  This results in better granularity to use for deciding
+// & height. This results in better granularity to use for deciding
 // whether to send RAW or CoRRE/RRE. 
 #include "stdhdrs.h"
 #include "vncencodecorre.h"
@@ -171,12 +173,12 @@ vncEncodeCoRRE::NumCodedRects(const rfb::Rect &rect)
 /*
  * corre.c
  *
- * Routines to implement Compact Rise-and-Run-length Encoding (CoRRE).  This
+ * Routines to implement Compact Rise-and-Run-length Encoding (CoRRE). This
  * code is based on krw's original javatel rfbserver.
  */
 
 /*
- * This version modified for WinVNC by jnw.
+ * This version modified for UltraVNC Server by jnw.
  */
 
 static int rreAfterBufLen;
@@ -362,9 +364,9 @@ vncEncodeCoRRE::EncodeSmallRect(BYTE *source, BYTE *dest, const rfb::Rect &rect)
 
 /*
  * subrectEncode() encodes the given multicoloured rectangle as a background 
- * colour overwritten by single-coloured rectangles.  It returns the number 
+ * colour overwritten by single-coloured rectangles. It returns the number 
  * of subrectangles in the encoded buffer, or -1 if subrect encoding won't
- * fit in the buffer.  It puts the encoded rectangles in rreAfterBuf.  The
+ * fit in the buffer. It puts the encoded rectangles in rreAfterBuf. The
  * single-colour rectangle partition is not optimal, but does find the biggest
  * horizontal or vertical rectangle top-left anchored to each consecutive 
  * coordinate position.

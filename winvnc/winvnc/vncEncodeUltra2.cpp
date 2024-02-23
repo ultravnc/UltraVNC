@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002-2013 UltraVNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,9 +16,9 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the program is not available from the place from
-// which you received this file, check 
-// http://www.uvnc.com/
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
 //
 ////////////////////////////////////////////////////////////////////////////
 #include "stdhdrs.h"
@@ -81,7 +81,7 @@ vncEncodeUltra2::RequiredBuffSize(UINT width, UINT height)
 	int result;
 
 	// The Ultra library specifies a maximum compressed size of
-	// the raw size plus one percent plus 8 bytes.  We also need
+	// the raw size plus one percent plus 8 bytes. We also need
 	// to cover the Ultra header space.
 	result = vncEncoder::RequiredBuffSize(width, height);
 	result += result/ 64 + 16 + 3 + sz_rfbZlibHeader+sz_rfbFramebufferUpdateRectHeader+ sz_rfbZlibHeader;
@@ -127,7 +127,7 @@ vncEncodeUltra2::EncodeRect(BYTE *source, VSocket *outConn, BYTE *dest, const rf
 	surh->r.h = Swap16IfLE(surh->r.h);
 	surh->encoding = Swap32IfLE(rfbEncodingUltra2);
 
-	// create a space big enough for the Jpeg encoded pixels
+	// create a space big enough for the JPEG encoded pixels
 	if (m_bufflen < rawDataSize + 1000) {
 		if (m_buffer != NULL) {
 			delete [] m_buffer;

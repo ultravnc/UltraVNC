@@ -1,11 +1,10 @@
-//  Copyright (C) 2002 UltraVNC Team Members. All Rights Reserved.
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //  Copyright (C) 2015 D. R. Commander. All Rights Reserved.
 //  Copyright (C) 2002 RealVNC Ltd. All Rights Reserved.
 //  Copyright (C) 1999 AT&T Laboratories Cambridge. All Rights Reserved.
 //
-//  This file is part of the VNC system.
-//
-//  The VNC system is free software; you can redistribute it and/or modify
+//  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
@@ -20,9 +19,11 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the VNC system is not available from the place 
-// whence you received this file, check http://www.uk.research.att.com/vnc or contact
-// the authors on vnc@uk.research.att.com for information on obtaining it.
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
 
 
 // vncEncoder - Object used to encode data for RFB
@@ -284,7 +285,7 @@ vncEncoder::SetTranslateFunction()
 		(m_transformat.bitsPerPixel != 32))
     {
 		vnclog.Print(LL_CONNERR,
-			VNCLOG("only 8, 16 or 32 bits supported remotely - %d requested\n"),
+			VNCLOG("only 8, 16 or 32-bit supported remotely - %d requested\n"),
 			m_transformat.bitsPerPixel
 			);
 
@@ -296,7 +297,7 @@ vncEncoder::SetTranslateFunction()
 		(m_localformat.bitsPerPixel != 32))
     {
 		vnclog.Print(LL_CONNERR,
-			VNCLOG("only 8, 16 or 32 bits supported locally - %d in use\n"),
+			VNCLOG("only 8, 16 or 32-bit supported locally - %d in use\n"),
 			m_localformat.bitsPerPixel
 			);
 
@@ -335,7 +336,7 @@ vncEncoder::SetTranslateFunction()
 		else if (m_localformat.trueColour)
 		{
 			// Local side is truecolour, remote is palettized
-			vnclog.Print(LL_INTINFO, VNCLOG("local truecolour, remote palettized.  using BGR233 palette\n"));
+			vnclog.Print(LL_INTINFO, VNCLOG("local truecolour, remote palettized. using BGR233 palette\n"));
 
 			// Fill out the translation table as if writing to BGR233
 			m_transformat = BGR233Format;
