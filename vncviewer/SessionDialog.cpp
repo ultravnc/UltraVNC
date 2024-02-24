@@ -204,7 +204,7 @@ BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		helper::SafeSetWindowUserData(hwnd, lParam);
 		char version[50]{};
 		char title[256]{};
-		strcpy_s(title, "ULtraVNC Viewer - ");
+		strcpy_s(title, "UltraVNC Viewer - ");
 		strcat_s(title, GetVersionFromResource(version));
 		SetWindowText(hwnd, title);
 	}
