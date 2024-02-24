@@ -66,15 +66,20 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zip32", "..\zipunzip_src\zi
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zlib", "..\zlib\zlib.vcxproj", "{1E589AD6-7C41-3AFD-BC5F-4752E29B2B84}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "UltraVNC+_x86", "UltraVNC+\UltraVNC+_VS2015_x86.vdproj", "{D20CB3B1-32B1-4FEA-8C10-5CED57035808}"
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "UltraVNC_x86", "UltraVNC+\UltraVNC_x86.vdproj", "{D20CB3B1-32B1-4FEA-8C10-5CED57035808}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "UltraVNC+_x64", "UltraVNC+\UltraVNC+_VS2015_x64.vdproj", "{9AA91151-DD71-4031-82CA-0F94A966AC17}"
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "UltraVNC_x64", "UltraVNC+\UltraVNC_x64.vdproj", "{9AA91151-DD71-4031-82CA-0F94A966AC17}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "logmessages", "..\addon\logger\logmessages.vcxproj", "{E543B602-5529-4B23-8D2A-3709857F5066}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM64 = Debug|ARM64
 		Debug|Win32 = Debug|Win32
 		Debug|x64 = Debug|x64
+		IPP|ARM64 = IPP|ARM64
+		IPP|Win32 = IPP|Win32
+		IPP|x64 = IPP|x64
 		IPV6|ARM64 = IPV6|ARM64
 		IPV6|Win32 = IPV6|Win32
 		IPV6|x64 = IPV6|x64
