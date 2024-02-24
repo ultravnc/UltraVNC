@@ -1,28 +1,3 @@
-/////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
-//
-//  This program is free software; you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 2 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
-//  USA.
-//
-//  If the source code for the program is not available from the place from
-//  which you received this file, check
-//  https://uvnc.com/
-//
-////////////////////////////////////////////////////////////////////////////
-
-
 // Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
@@ -42,7 +17,7 @@
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
-#pragma code_page(65001)
+#pragma code_page(1252)
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -122,19 +97,19 @@ IDB_EXPAND              BITMAP                  "down.bmp"
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE
+1 TEXTINCLUDE 
 BEGIN
-    "resource.h"
+    "resource.\0"
 END
 
-2 TEXTINCLUDE
+2 TEXTINCLUDE 
 BEGIN
-    "#include ""afxres.h""\r\n"
+    "#include ""afxres.h""\r\0"
 END
 
-3 TEXTINCLUDE
+3 TEXTINCLUDE 
 BEGIN
-    "\r\n"
+    "\r\0"
 END
 
 #endif    // APSTUDIO_INVOKED
@@ -172,7 +147,7 @@ BEGIN
         MENUITEM "New connection",              ID_NEWCONN
         MENUITEM "Connection options",          IDC_OPTIONBUTTON
         MENUITEM SEPARATOR
-        MENUITEM "&About UltraVNC Viewer...",    IDD_APP_ABOUT
+        MENUITEM "&About UltraVNC Viewer...",   IDD_APP_ABOUT
         MENUITEM SEPARATOR
         MENUITEM "Toggle Listen Mode (On/Off)", ID_LISTEN_MODE
         MENUITEM "Close Tray icon",             ID_CLOSEAPP
@@ -232,13 +207,18 @@ BEGIN
     CONTROL         "Share the Server",IDC_SHARED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,196,71,10
     CONTROL         "Deiconify on Bell",IDC_BELLDEICONIFY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,207,137,8
     CONTROL         "Disable clipboard transfer",IDC_DISABLECLIPBOARD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,216,138,10
-    CONTROL         "Do not display the sponsor advertisement",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,226,145,10
-    CONTROL         "Emulate 3 buttons (with 2-button click)",IDC_EMULATECHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,15,139,10
+    CONTROL         "Do not display the sponsor advertisement",IDC_CHECK1,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,226,145,10
+    CONTROL         "Emulate 3 buttons (with 2-button click)",IDC_EMULATECHECK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,15,139,10
     CONTROL         "Swap mouse buttons 2 and 3",ID_SESSION_SWAPMOUSE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,27,126,10
     CONTROL         "Japanese keyboard",IDC_JAPKEYBOARD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,39,78,10
-    CONTROL         "Track remote cursor locally",IDC_CSHAPE_ENABLE_RADIO,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,179,52,144,10
-    CONTROL         "Let remote server deal with mouse cursor",IDC_CSHAPE_DISABLE_RADIO,"Button",BS_AUTORADIOBUTTON,179,63,147,10
-    CONTROL         "Don't show remote cursor",IDC_CSHAPE_IGNORE_RADIO,"Button",BS_AUTORADIOBUTTON,179,74,142,10
+    CONTROL         "Track remote cursor locally",IDC_CSHAPE_ENABLE_RADIO,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,179,52,144,10
+    CONTROL         "Let remote server deal with mouse cursor",IDC_CSHAPE_DISABLE_RADIO,
+                    "Button",BS_AUTORADIOBUTTON,179,63,147,10
+    CONTROL         "Don't show remote cursor",IDC_CSHAPE_IGNORE_RADIO,
+                    "Button",BS_AUTORADIOBUTTON,179,74,142,10
     EDITTEXT        IDC_MOUSE_THROTTLE,179,86,22,12,ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "Show Buttons Bar (""Toolbar"")",IDC_SHOWTOOLBAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,116,104,10
     CONTROL         "View only (inputs ignored)",IDC_VIEWONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,127,129,10
@@ -474,12 +454,13 @@ BEGIN
     CONTROL         IDB_VNC64,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE,8,1,34,29
     LTEXT           "UltraVNC Viewer 1.4.4.0-dev",IDC_UVVERSION,44,7,199,11
     LTEXT           "For more informations, please visit",IDC_STATIC,12,132,197,8
-    LTEXT           "Copyright Â© 2002-2024 UltraVNC Team Members\nCopyright Â© 2001-2002 Sam - eSVNC\nCopyright Â© 1999-2002 Rudi D. V. - VdaccVNC\nCopyright Â© 1999-2002 Const. Kaplinsky - TightVNC\nCopyright Â© 2002 RealVNC Ltd. - RealVNC\n",IDC_STATIC,44,34,200,40
+    LTEXT           "Copyright © 2002-2024 UltraVNC Team Members\nCopyright © 2001-2002 Sam - eSVNC\nCopyright © 1999-2002 Rudi D. V. - VdaccVNC",IDC_STATIC,44,34,200,25
     LTEXT           "Built",IDC_STATIC,45,18,15,10
     LTEXT           "BuildTime",IDC_BUILDTIME,78,18,98,10
-    LTEXT           "Copyright Â© 2002 VNC QuickDesk\nCopyright Â© 1999-2002 Tridia Corporation - TridiaVNC\nCopyright Â© 1994-2001 AT&&T Laboratories Cambridge/Olivetti Research Ltd. - VNC",IDC_STATIC,44,74,271,25
-    LTEXT           "Copyright Â© 1990-2002 Info-ZIP\nCopyright Â© 1996-2002 Markus Franz Xaver Johannes Oberhumer - Mini LZO library",IDC_STATIC,44,98,198,24
+    LTEXT           "Copyright © 2002 VNC QuickDesk\nCopyright © 1999-2002 Tridia Corporation - TridiaVNC\nCopyright © 1994-2001 AT&&T Laboratories Cambridge/Olivetti Research Ltd. - VNC",IDC_STATIC,44,74,271,25
+    LTEXT           "Copyright © 1990-2002 Info-ZIP\nCopyright © 1996-2002 Markus Franz Xaver Johannes Oberhumer - Mini LZO library",IDC_STATIC,44,98,198,24
     LTEXT           "https://uvnc.com/",IDC_UVNCCOM,12,142,55,8
+    LTEXT           "Copyright © 1999-2002 Const. Kaplinsky - TightVNC\nCopyright © 2002 RealVNC Ltd. - RealVNC\n",IDC_STATIC,44,58,203,16
 END
 
 IDD_FTCONFIRM_DLG DIALOGEX 0, 0, 227, 86
@@ -730,8 +711,10 @@ BEGIN
     CONTROL         "AUTO    (Auto-select best settings)",IDC_DYNAMIC,"Button",BS_AUTORADIOBUTTON,9,14,177,10
     CONTROL         "VIDEO   (> 2Mbit/s)",IDC_ULTRA_LAN_RB,"Button",BS_AUTORADIOBUTTON,9,28,176,10
     CONTROL         "LAN     (> 1Mbit/s) - Max colors",IDC_LAN_RB,"Button",BS_AUTORADIOBUTTON,9,42,176,10
-    CONTROL         "MEDIUM  (128 - 256Kbit/s) - 256 colors",IDC_MEDIUM_RB,"Button",BS_AUTORADIOBUTTON,9,56,153,10
-    CONTROL         "MODEM   (19 - 128Kbit/s) - 64 colors",IDC_MODEM_RB,"Button",BS_AUTORADIOBUTTON,9,70,148,10
+    CONTROL         "MEDIUM  (128 - 256Kbit/s) - 256 colors",IDC_MEDIUM_RB,
+                    "Button",BS_AUTORADIOBUTTON,9,56,153,10
+    CONTROL         "MODEM   (19 - 128Kbit/s) - 64 colors",IDC_MODEM_RB,
+                    "Button",BS_AUTORADIOBUTTON,9,70,148,10
     CONTROL         "SLOW    (< 19kKbit/s) - 8 colors",IDC_SLOW_RB,"Button",BS_AUTORADIOBUTTON,9,84,128,10
     CONTROL         "MANUAL  (Use options button)",IDC_MANUAL,"Button",BS_AUTORADIOBUTTON,9,98,123,10
 END
@@ -1070,12 +1053,10 @@ BEGIN
             VALUE "FileDescription", "UltraVNC Viewer"
             VALUE "FileVersion", "1.4.4.0"
             VALUE "InternalName", "VNCViewer"
-            VALUE "LegalCopyright", "Copyright Â© 2002-2024 UltraVNC Team Members. All Rights Reserved."
+            VALUE "LegalCopyright", "Copyright © 2002-2024 UltraVNC Team Members. All Rights Reserved."
             VALUE "OriginalFilename", "VNCViewer.exe"
-            VALUE "PrivateBuild", ""
             VALUE "ProductName", "UltraVNC Viewer"
             VALUE "ProductVersion", "1.4.4.0"
-            VALUE "SpecialBuild", ""
         END
     END
     BLOCK "VarFileInfo"
@@ -1606,3 +1587,4 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
+
