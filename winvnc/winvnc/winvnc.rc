@@ -1,28 +1,3 @@
-/////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
-//
-//  This program is free software; you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 2 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
-//  USA.
-//
-//  If the source code for the program is not available from the place from
-//  which you received this file, check
-//  https://uvnc.com/
-//
-////////////////////////////////////////////////////////////////////////////
-
-
 // Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
@@ -42,7 +17,7 @@
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 LANGUAGE LANG_ENGLISH, SUBLANG_NEUTRAL
-#pragma code_page(65001)
+#pragma code_page(1252)
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -104,12 +79,12 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,258,125,54,16
     CONTROL         IDB_LOGO64,IDC_VNCLOGO,"Static",SS_BITMAP | SS_CENTERIMAGE,7,5,39,25,WS_EX_TRANSPARENT
     LTEXT           "UltraVNC Server 1.4.4.0-dev",IDC_VERSION,48,5,145,11
-    LTEXT           "Copyright Â© 2002-2024 UltraVNC Team Members\nCopyright Â© 2001-2002 Sam - eSVNC\nCopyright Â© 1999-2002 Rudi D. V. - VdaccVNC\nCopyright Â© 2001 Harakan Software - PalmVNC\nCopyright Â© 1999-2002 Const. Kaplinsky - TightVNC\n",IDC_NAME,49,32,202,41
+    LTEXT           "Copyright © 2002-2024 UltraVNC Team Members\nCopyright © 2001-2002 Sam - eSVNC\nCopyright © 1999-2002 Rudi D. V. - VdaccVNC\nCopyright © 2001 Harakan Software - PalmVNC\nCopyright © 1999-2002 Const. Kaplinsky - TightVNC\n",IDC_NAME,49,32,202,41
     LTEXT           "For more informations, please visit: \nhttps://uvnc.com/",IDC_WWW,7,127,201,19
     LTEXT           "Built",IDC_BUILDTEXT,48,16,20,10
     LTEXT           "BuildTime",IDC_BUILDTIME,72,16,92,10
-    LTEXT           "Copyright Â© 2002 RealVNC Ltd. - RealVNC\nCopyright Â© 1999-2002 Tridia Corporation - TridiaVNC\nCopyright Â© 1994-2001 AT&&T Laboratories Cambridge/Olivetti Research Ltd. - VNC",IDC_STATIC,49,72,270,32
-    LTEXT           "Copyright Â© 1990-2002 Info-ZIP\nCopyright Â© 1996-2002 Markus Franz Xaver Johannes Oberhumer - Mini LZO library",IDC_STATIC,49,96,200,27
+    LTEXT           "Copyright © 2002 RealVNC Ltd. - RealVNC\nCopyright © 1999-2002 Tridia Corporation - TridiaVNC\nCopyright © 1994-2001 AT&&T Laboratories Cambridge/Olivetti Research Ltd. - VNC",IDC_STATIC,49,72,270,32
+    LTEXT           "Copyright © 1990-2002 Info-ZIP\nCopyright © 1996-2002 Markus Franz Xaver Johannes Oberhumer - Mini LZO library",IDC_STATIC,49,96,200,27
 END
 
 IDD_OUTGOING_CONN DIALOGEX 0, 0, 223, 88
@@ -187,7 +162,8 @@ BEGIN
     CONTROL         "LoopbackOnly",IDC_LOOPBACKONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,121,132,58,10
     GROUPBOX        "When Last Client Disconnects",IDC_LOCKSETTINGS,7,236,220,47,BS_LEFT
     CONTROL         "Do Nothing",IDC_LOCKSETTING_NOTHING,"Button",BS_AUTORADIOBUTTON | WS_GROUP,11,245,80,12
-    CONTROL         "Lock Workstation (Windows 2000)",IDC_LOCKSETTING_LOCK,"Button",BS_AUTORADIOBUTTON,11,256,96,13
+    CONTROL         "Lock Workstation (Windows 2000)",IDC_LOCKSETTING_LOCK,
+                    "Button",BS_AUTORADIOBUTTON,11,256,96,13
     CONTROL         "Log-off Workstation",IDC_LOCKSETTING_LOGOFF,"Button",BS_AUTORADIOBUTTON,11,269,80,11
     GROUPBOX        "Keyboard && Mouse",IDC_STATIC,7,284,220,49,BS_LEFT
     CONTROL         "Disable Viewers inputs",IDC_DISABLE_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,13,294,92,10
@@ -345,7 +321,7 @@ BEGIN
     CONTROL         "",IDC_CHECKG3D,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,153,56,16,8
     GROUPBOX        "Rules",IDC_STATIC,5,77,178,68
     LTEXT           "Group 1, 2 = Full Access       Group 3 = Read Only",IDC_STATIC,16,88,162,8
-    LTEXT           "Must be run as a Service on Windows NT4, Windows 2000\nCan be run as a Service or Application on Windows XP, Windows Server 2003\nLocal administrators have always access.\nFor Windows NT4 and Windows 2000 in Application mode you need to add the Local Admin Group.",IDC_STATIC,8,100,174,41
+    LTEXT           "Must be run as a Service on Windows NT4, Windows 2000\nCan be run as a Service or Application on Windows XP, Windows Server 2003\nLocal administrators have always access.\nFor Windows NT4 and Windows 2000 in Application mode you need to add the Local Admin G",IDC_STATIC,8,100,174,41
     DEFPUSHBUTTON   "OK",IDOK,77,148,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,132,148,50,14
     LTEXT           "1",IDC_STATIC,11,22,8,8
@@ -513,8 +489,8 @@ IDC_CURSOR3             CURSOR                  "res/cursor3.cur"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,4,4,0
- PRODUCTVERSION 1,4,4,0
+ FILEVERSION 1,5,0,0
+ PRODUCTVERSION 1,5,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x2dL
@@ -532,14 +508,12 @@ BEGIN
             VALUE "Comments", "UltraVNC Server"
             VALUE "CompanyName", "UltraVNC"
             VALUE "FileDescription", "UltraVNC Server"
-            VALUE "FileVersion", "1.4.4.0"
+            VALUE "FileVersion", "1.5.0.0"
             VALUE "InternalName", "WinVNC"
-            VALUE "LegalCopyright", "Copyright Â© 2002-2024 UltraVNC Team Members. All Rights Reserved."
+            VALUE "LegalCopyright", "Copyright © 2002-2024 UltraVNC Team Members. All Rights Reserved."
             VALUE "OriginalFilename", "WinVNC.exe"
-            VALUE "PrivateBuild", ""
             VALUE "ProductName", "UltraVNC Server"
-            VALUE "ProductVersion", "1.4.4.0"
-            VALUE "SpecialBuild", ""
+            VALUE "ProductVersion", "1.5.0.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -564,14 +538,14 @@ BEGIN
         MENUITEM "&About UltraVNC Server...",   ID_ABOUT
         POPUP "Visit our links"
         BEGIN
-            MENUITEM "Homepage",                ID_VISITUSONLINE_HOMEPAGE
-            MENUITEM "Forum",                   ID_VISITUSONLINE_FORUM
-            MENUITEM "GitHub",                  ID_VISITUSONLINE_GITHUB
-            MENUITEM "Mastodon",                ID_VISITUSONLINE_MASTODON
-            MENUITEM "Facebook",                ID_VISITUSONLINE_FACEBOOK
-            MENUITEM "X/Twitter",               ID_VISITUSONLINE_XTWITTER
-            MENUITEM "Reddit",                  ID_VISITUSONLINE_REDDIT
-            MENUITEM "OpenHub",                 ID_VISITUSONLINE_OPENHUB
+            MENUITEM "Homepage",                    ID_VISITUSONLINE_HOMEPAGE
+            MENUITEM "Forum",                       ID_VISITUSONLINE_FORUM
+            MENUITEM "GitHub",                      ID_VISITUSONLINE_GITHUB
+            MENUITEM "Mastodon",                    ID_VISITUSONLINE_MASTODON
+            MENUITEM "Facebook",                    ID_VISITUSONLINE_FACEBOOK
+            MENUITEM "X/Twitter",                   ID_VISITUSONLINE_XTWITTER
+            MENUITEM "Reddit",                      ID_VISITUSONLINE_REDDIT
+            MENUITEM "OpenHub",                     ID_VISITUSONLINE_OPENHUB
         END
         MENUITEM SEPARATOR
         MENUITEM "Add &New Client",             ID_OUTGOING_CONN
@@ -609,21 +583,7 @@ END
 IDR_VNCVIEWER_JAR       JAVAARCHIVE             "res/vncviewer.jar"
 
 IDR_JAVAARCHIVE1        JAVAARCHIVE             "res/mslogon/VncViewer.jar"
-#if defined(SC_20)
-/////////////////////////////////////////////////////////////////////////////
-//
-// DLL
-//
 
-IDR_DLL1                DLL                     "res/ddengine.dll"
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// ENCRYPTIONDLL
-//
-IDR_ENCRYPTIONDLL1      ENCRYPTIONDLL           "res/SecureVNCPlugin.dsm"
-#endif
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -687,19 +647,19 @@ END
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE
+1 TEXTINCLUDE 
 BEGIN
-    "resource.h"
+    "resource.\0"
 END
 
-2 TEXTINCLUDE
+2 TEXTINCLUDE 
 BEGIN
-    "#include ""afxres.h""\r\n"
+    "#include ""afxres.h""\r\0"
 END
 
-3 TEXTINCLUDE
+3 TEXTINCLUDE 
 BEGIN
-    "\r\n"
+    "\r\0"
 END
 
 #endif    // APSTUDIO_INVOKED
@@ -755,11 +715,11 @@ BEGIN
     ID_WINVNC_ERROR         "UltraVNC Server - Error"
     ID_WINVNC_WARNIN        "UltraVNC Server - Warning"
     ID_PLUGIN_LOADIN        "Plugin Loading"
-    ID_NO_PASSWD_NO_OVERRIDE_ERR
+    ID_NO_PASSWD_NO_OVERRIDE_ERR 
                             "No password has been set & this machine has been preconfigured to prevent users from setting their own.\nYou must contact a System Administrator to configure UltraVNC Server properly."
-    ID_NO_PASSWD_NO_OVERRIDE_WARN
+    ID_NO_PASSWD_NO_OVERRIDE_WARN 
                             "WARNING: This machine has been preconfigured to allow unauthenticated\nconnections to be accepted and to prevent users from enabling authentication."
-    ID_NO_PASSWD_NO_LOGON_WARN
+    ID_NO_PASSWD_NO_LOGON_WARN 
                             "WARNING: This machine has no default password set. UltraVNC Server will present the Default Properties dialog now to allow one to be entered."
 END
 
@@ -767,7 +727,8 @@ STRINGTABLE
 BEGIN
     ID_NO_OVERRIDE_ERR      "This machine has been preconfigured with UltraVNC Server settings, which cannot be overridden by individual users. The preconfigured settings may be modified only by a System Administrator."
     ID_NO_CURRENT_USER_ERR  "The UltraVNC Server settings for the current user are unavailable at present."
-    ID_CANNOT_EDIT_DEFAULT_PREFS "You do not have sufficient privileges to edit the default local UltraVNC Server settings."
+    ID_CANNOT_EDIT_DEFAULT_PREFS 
+                            "You do not have sufficient privileges to edit the default local UltraVNC Server settings."
     ID_NO_PASSWORD_WARN     "WARNING: Running UltraVNC Server without setting a password is a dangerous security risk!\nUntil you set a password, UltraVNC Server will not accept incoming connections."
     ID_PLUGIN_NOT_LOAD      "The Plugin cannot be loaded.\n\rPlease check its integrity."
     ID_MB1                  "MB1"
@@ -817,3 +778,4 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
+

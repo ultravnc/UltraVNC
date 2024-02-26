@@ -1,29 +1,4 @@
-/////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
-//
-//  This program is free software; you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 2 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
-//  USA.
-//
-//  If the source code for the program is not available from the place from
-//  which you received this file, check
-//  https://uvnc.com/
-//
-////////////////////////////////////////////////////////////////////////////
-
-
-//Microsoft Developer Studio generated resource script.
+// Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
 
@@ -41,23 +16,17 @@
 // Neutral resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEU)
-#ifdef _WIN32
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
-#pragma code_page(65001)
-#endif //_WIN32
+#pragma code_page(1252)
 
-#ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
 //
 // Version
 //
 
-// Defines STR_COMPANYNAME, STR_FILEVERSION, STR_PRODUCTVERSION, STR_COPYRIGHT,
-// STR_SPECIALBUILD, FILEVERSION, PRODUCTVERSION
-#include "../../versioninfo.h"
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION INT_FILEVERSION
- PRODUCTVERSION INT_PRODUCTVERSION
+ FILEVERSION 1,5,0,0
+ PRODUCTVERSION 1,5,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -72,23 +41,15 @@ BEGIN
     BEGIN
         BLOCK "000004b0"
         BEGIN
-#if isRC == 1
-#include "buildtime.h" // Defines macro BUILDTIME
-            VALUE "Buildtime", BUILDTIME
-#endif
             VALUE "Comments", "Test utility for UltraVNC's MS-Logon I"
-            VALUE "CompanyName", STR_COMPANYNAME
+            VALUE "CompanyName", "uvnc bvba"
             VALUE "FileDescription", "MS-Logon I for UltraVNC"
-            VALUE "FileVersion", STR_FILEVERSION
+            VALUE "FileVersion", "1.5.0.0"
             VALUE "InternalName", "testauth"
-            VALUE "LegalCopyright", STR_COPYRIGHT
+            VALUE "LegalCopyright", "Copyright © 2002-2024 UltraVNC Team Members. All Rights Reserved."
             VALUE "OriginalFilename", "testauth.dll"
-            VALUE "PrivateBuild", ""
             VALUE "ProductName", "UltraVNC testauth"
-            VALUE "ProductVersion", STR_PRODUCTVERSION
-#if isRC == 1
-			VALUE "SpecialBuild", STR_SPECIALBUILD
-#endif
+            VALUE "ProductVersion", "1.5.0.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -97,8 +58,6 @@ BEGIN
     END
 END
 
-#endif    // !_MAC
-
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -106,19 +65,19 @@ END
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE DISCARDABLE 
+1 TEXTINCLUDE 
 BEGIN
-    "resource.h"
+    "resource.\0"
 END
 
-2 TEXTINCLUDE DISCARDABLE 
+2 TEXTINCLUDE 
 BEGIN
-    "#include ""afxres.h""\r\n"
+    "#include ""afxres.h""\r\0"
 END
 
-3 TEXTINCLUDE DISCARDABLE 
+3 TEXTINCLUDE 
 BEGIN
-    "\r\n"
+    "\r\0"
 END
 
 #endif    // APSTUDIO_INVOKED

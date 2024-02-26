@@ -35,6 +35,12 @@
     <ClCompile Include="ZstdOutStream.cxx">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="xzInStream.cxx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="xzOutStream.cxx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Exception.h">
@@ -77,6 +83,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ZstdOutStream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="xzInStream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="xzOutStream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

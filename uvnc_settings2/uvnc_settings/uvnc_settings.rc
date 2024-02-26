@@ -1,28 +1,3 @@
-/////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
-//
-//  This program is free software; you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 2 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
-//  USA.
-//
-//  If the source code for the program is not available from the place from
-//  which you received this file, check
-//  https://uvnc.com/
-//
-////////////////////////////////////////////////////////////////////////////
-
-
 // Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
@@ -44,7 +19,7 @@
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NLD)
 LANGUAGE LANG_DUTCH, SUBLANG_DUTCH
-#pragma code_page(65001)
+#pragma code_page(1252)
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -59,7 +34,7 @@ BEGIN
     END
     POPUP "&Help"
     BEGIN
-        MENUITEM "&About UltraVNC uvnc_settings...",                  IDM_ABOUT
+        MENUITEM "&About UltraVNC uvnc_settings...", IDM_ABOUT
     END
 END
 
@@ -359,19 +334,19 @@ END
 
 1 TEXTINCLUDE 
 BEGIN
-    "resource.h"
+    "resource.\0"
 END
 
 2 TEXTINCLUDE 
 BEGIN
     "#define APSTUDIO_HIDDEN_SYMBOLS\r\n"
     "#include ""windows.h""\r\n"
-    "#undef APSTUDIO_HIDDEN_SYMBOLS\r\n"
+    "#undef APSTUDIO_HIDDEN_SYMBOLS\r\0"
 END
 
 3 TEXTINCLUDE 
 BEGIN
-    "\r\n"
+    "\r\0"
 END
 
 #endif    // APSTUDIO_INVOKED
@@ -457,7 +432,7 @@ END
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NLB)
 LANGUAGE LANG_DUTCH, SUBLANG_DUTCH_BELGIAN
-#pragma code_page(65001)
+#pragma code_page(1252)
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -475,8 +450,8 @@ IDI_ICON1               ICON                    "settings.ico"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,2,0,5
- PRODUCTVERSION 1,2,0,5
+ FILEVERSION 1,5,0,0
+ PRODUCTVERSION 1,5,0,0
  FILEFLAGSMASK 0x17L
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -494,14 +469,12 @@ BEGIN
             VALUE "Comments", "Standalone UltraVNC.ini editor"
             VALUE "CompanyName", "uvnc bvba"
             VALUE "FileDescription", "Standalone UltraVNC.ini editor"
-            VALUE "FileVersion", "1.2.0.5"
+            VALUE "FileVersion", "1.5.0.0"
             VALUE "InternalName", "uvnc_settings"
             VALUE "LegalCopyright", "Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved."
             VALUE "OriginalFilename", "uvnc_settings.exe"
-            VALUE "PrivateBuild", ""
             VALUE "ProductName", "UltraVNC uvnc_settings"
-            VALUE "ProductVersion", "1.2.0.5"
-            VALUE "SpecialBuild", ""
+            VALUE "ProductVersion", "1.5.0.0"
         END
     END
     BLOCK "VarFileInfo"
