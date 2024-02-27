@@ -1,4 +1,4 @@
-#define MyAppName          "UltraVNC"
+﻿#define MyAppName          "UltraVNC"
 #define MyAppID            "Ultravnc2"
 #define MyAppPublisher     "uvnc bvba"
 #define MyAppCopyright     "Copyright © 2002-2024 UltraVNC Team Members. All Rights Reserved."
@@ -227,8 +227,8 @@ Source: "ultravnc.cer"; DestDir: "{app}"
 ; winvnc.exe needs to be first here because it triggers stopping UltraVNC Server service/app.
 Source: "64\xp\winvnc.exe"; DestDir: "{app}"; DestName: "winvnc.exe"; Flags: ignoreversion replacesameversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Server
 Source: "64\xp\vnchooks.dll"; DestDir: "{app}"; Flags: ignoreversion replacesameversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Server
-Source: "64\xp\ddengine.dll"; DestDir: "{app}"; Flags: ignoreversion replacesameversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Server
-Source: "64\xp\UVncVirtualDisplay\*"; DestDir: "{app}\UVncVirtualDisplay"; Flags: ignoreversion replacesameversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Server
+Source: "64\xp\ddengine64.dll"; DestDir: "{app}"; Flags: ignoreversion replacesameversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Server
+Source: "64\xp\UVncVirtualDisplay64\*"; DestDir: "{app}\UVncVirtualDisplay64"; Flags: ignoreversion replacesameversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Server
 Source: "64\xp\repeater.exe"; DestDir: "{app}"; Flags: ignoreversion replacesameversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Repeater
 Source: "64\xp\SecureVNCPlugin.dsm"; DestDir: "{app}"; Flags: ignoreversion replacesameversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Viewer UltraVNC_Server
 //Source: "64\xp\MSRC4Plugin_for_sc.dsm"; DestDir: "{app}"; Flags: ignoreversion replacesameversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Viewer UltraVNC_Server

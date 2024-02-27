@@ -1,4 +1,4 @@
-#define MyAppName          "UltraVNC"
+﻿#define MyAppName          "UltraVNC"
 #define MyAppID            "Ultravnc2"
 #define MyAppPublisher     "uvnc bvba"
 #define MyAppCopyright     "Copyright © 2002-2024 UltraVNC Team Members. All Rights Reserved."
