@@ -585,7 +585,21 @@ END
 IDR_VNCVIEWER_JAR       JAVAARCHIVE             "res/vncviewer.jar"
 
 IDR_JAVAARCHIVE1        JAVAARCHIVE             "res/mslogon/VncViewer.jar"
+#if defined(SC_20)
+/////////////////////////////////////////////////////////////////////////////
+//
+// DLL
+//
 
+IDR_DLL1                DLL                     "res/ddengine.dll"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// ENCRYPTIONDLL
+//
+IDR_ENCRYPTIONDLL1      ENCRYPTIONDLL           "res/SecureVNCPlugin.dsm"
+#endif
 
 /////////////////////////////////////////////////////////////////////////////
 //
