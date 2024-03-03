@@ -326,7 +326,7 @@ BEGIN
     CONTROL         "",IDC_CHECKG3D,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,153,56,16,8
     GROUPBOX        "Rules",IDC_STATIC,5,77,178,68
     LTEXT           "Group 1, 2 = Full Access       Group 3 = Read Only",IDC_STATIC,16,88,162,8
-    LTEXT           "Must be run as a Service on Windows NT4, Windows 2000\nCan be run as a Service or Application on Windows XP, Windows Server 2003\nLocal administrators have always access.\nFor Windows NT4 and Windows 2000 in Application mode you need to add the Local Admin Group.",IDC_STATIC,8,100,174,41
+    LTEXT           "Local administrators have always access.",IDC_STATIC,8,100,174,41
     DEFPUSHBUTTON   "OK",IDOK,77,148,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,132,148,50,14
     LTEXT           "1",IDC_STATIC,11,22,8,8
