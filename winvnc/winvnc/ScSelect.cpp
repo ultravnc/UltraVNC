@@ -24,9 +24,9 @@
 
 
 #ifdef SC_20
-#include "ScSelect.h"
-#include "resource.h"
-#pragma comment (lib, "comctl32")
+	#include "ScSelect.h"
+	#include "resource.h"
+	#pragma comment (lib, "comctl32")
 
 namespace ScSelect {
 	LONG old_pref = 99;
@@ -878,4 +878,4 @@ namespace ScSelect {
 		}
 	}
 }
-#endif
+#endif // SC_20

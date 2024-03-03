@@ -665,7 +665,7 @@ namespace serviceHelpers {
 		return bResult;
 	}
 }
-#endif
+#endif // SC_20
 
 DWORD MessageBoxSecure(HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT uType)
 {
@@ -1173,7 +1173,7 @@ namespace processHelper {
 			}
 			::CloseServiceHandle(hSCM);
 		}
-#endif
+#endif // SC_20
 		return (FALSE != bResult);
 	}
 

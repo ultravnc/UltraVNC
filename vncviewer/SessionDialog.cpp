@@ -29,7 +29,7 @@
 #include "vncviewer.h"
 #include "SessionDialog.h"
 #include "Exception.h"
-#include "common/win32_helpers.h"
+#include "../common/win32_helpers.h"
 #include <shlobj.h>
 #include <sys/stat.h>
 #include <direct.h>

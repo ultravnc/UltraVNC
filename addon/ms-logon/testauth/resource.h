@@ -1,12 +1,7 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ generated include file.
+// Microsoft Developer Studio generated include file.
 // Used by testauth.rc
 //
-#define V4                              0
-#define isRC                            0
-#define MAJ                             1
-#define MIN                             4
-#define V3                              4
 
 // Next default values for new objects
 // 

@@ -56,7 +56,7 @@ extern "C" {
 #include <rfb/dh.h>
 
 #include <DSMPlugin/DSMPlugin.h> // sf@2002
-#include "common/win32_helpers.h"
+#include "../common/win32_helpers.h"
 #include "display.h"
 #include "Snapshot.h"
 #include <commctrl.h>

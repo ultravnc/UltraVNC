@@ -50,7 +50,7 @@ typedef SHORT vncClientId;
 #include <string>
 #include <vector>
 #include <algorithm>
-#include "common/win32_helpers.h"
+#include "../common/win32_helpers.h"
 
 typedef std::list<vncClientId> vncClientList;
 
@@ -69,7 +69,7 @@ typedef std::list<vncClientId> vncClientList;
 #include "ZipUnZip32/ZipUnZip32.h"
 //#include "timer.h"
 // adzm - 2010-07 - Extended clipboard
-#include "common/Clipboard.h"
+#include "../common/Clipboard.h"
 
 #include "MouseSimulator.h"
 
@@ -332,7 +332,7 @@ public:
 #ifndef SC_20
 	bool DoFTUserImpersonation();
 	void UndoFTUserImpersonation();
-#endif
+#endif // SC_20
 
     // jdp@2008 - File Transfer event hooks
     void FTUploadStartHook();
@@ -674,7 +674,7 @@ public:
 	BOOL FilterClients_Blacklist();
 #ifndef SC_20
 	BOOL FilterClients_Ask_Permission();
-#endif
+#endif // SC_20
 	BOOL CheckEmptyPasswd();
 	BOOL CheckLoopBack();
 	void LogAuthResult(bool success, bool isconnected);

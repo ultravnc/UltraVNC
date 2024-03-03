@@ -31,7 +31,7 @@
 #include <shlobj.h>
 #include <iostream>
 #include <sstream>
-#include "common/win32_helpers.h"
+#include "../common/win32_helpers.h"
 #include <gdiplus.h>
 
 #pragma comment( lib, "gdiplus" )

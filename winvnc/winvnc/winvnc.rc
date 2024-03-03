@@ -12,12 +12,16 @@
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
-/////////////////////////////////////////////////////////////////////////////
-// English resources
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-LANGUAGE LANG_ENGLISH, SUBLANG_NEUTRAL
-#pragma code_page(1252)
+/////////////////////////////////////////////////////////////////////////////
+// Neutral resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEU)
+#ifdef _WIN32
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+#pragma code_page(65001)
+#endif //_WIN32
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -79,13 +83,13 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,268,118,54,16
     CONTROL         IDB_LOGO64,IDC_VNCLOGO,"Static",SS_BITMAP | SS_CENTERIMAGE,7,5,39,25,WS_EX_TRANSPARENT
     LTEXT           "UltraVNC Server 1.4.4.0-dev",IDC_VERSION,49,5,145,11
-    LTEXT           "Copyright © 2002-2024 UltraVNC Team Members\nCopyright © 2001-2002 Sam - eSVNC\nCopyright © 1999-2002 Rudi D. V. - VdaccVNC",IDC_NAME,49,32,222,28
+    LTEXT           "Copyright Â© 2002-2024 UltraVNC Team Members\nCopyright Â© 2001-2002 Sam - eSVNC\nCopyright Â© 1999-2002 Rudi D. V. - VdaccVNC",IDC_NAME,49,32,222,28
     LTEXT           "For more informations, please visit: ",IDC_WWW2,17,128,123,11
     LTEXT           "Built",IDC_BUILDTEXT,49,16,20,10
     LTEXT           "BuildTime",IDC_BUILDTIME,72,16,92,10
-    LTEXT           "Copyright © 2002 RealVNC Ltd. - RealVNC\nCopyright © 1999-2002 Tridia Corporation - TridiaVNC\nCopyright © 1994-2001 AT&&T Laboratories Cambridge/Olivetti Research Ltd. - VNC",IDC_STATIC,49,72,272,25
-    LTEXT           "Copyright © 1990-2002 Info-ZIP\nCopyright © 1996-2002 Markus Franz Xaver Johannes Oberhumer - Mini LZO library",IDC_STATIC,49,96,279,20
-    LTEXT           "Copyright © 2001 Harakan Software - PalmVNC\nCopyright © 1999-2002 Const. Kaplinsky - TightVNC\n",IDC_STATIC,49,56,261,16
+    LTEXT           "Copyright Â© 2002 RealVNC Ltd. - RealVNC\nCopyright Â© 1999-2002 Tridia Corporation - TridiaVNC\nCopyright Â© 1994-2001 AT&&T Laboratories Cambridge/Olivetti Research Ltd. - VNC",IDC_STATIC,49,72,272,25
+    LTEXT           "Copyright Â© 1990-2002 Info-ZIP\nCopyright Â© 1996-2002 Markus Franz Xaver Johannes Oberhumer - Mini LZO library",IDC_STATIC,49,96,279,20
+    LTEXT           "Copyright Â© 2001 Harakan Software - PalmVNC\nCopyright Â© 1999-2002 Const. Kaplinsky - TightVNC\n",IDC_STATIC,49,56,261,16
     LTEXT           "https://uvnc.com/",IDC_WWW,151,128,55,8
 END
 
@@ -164,8 +168,7 @@ BEGIN
     CONTROL         "LoopbackOnly",IDC_LOOPBACKONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,121,132,58,10
     GROUPBOX        "When Last Client Disconnects",IDC_LOCKSETTINGS,7,236,220,47,BS_LEFT
     CONTROL         "Do Nothing",IDC_LOCKSETTING_NOTHING,"Button",BS_AUTORADIOBUTTON | WS_GROUP,11,245,80,12
-    CONTROL         "Lock Workstation (Windows 2000)",IDC_LOCKSETTING_LOCK,
-                    "Button",BS_AUTORADIOBUTTON,11,256,96,13
+    CONTROL         "Lock Workstation (Windows 2000)",IDC_LOCKSETTING_LOCK,"Button",BS_AUTORADIOBUTTON,11,256,96,13
     CONTROL         "Log-off Workstation",IDC_LOCKSETTING_LOGOFF,"Button",BS_AUTORADIOBUTTON,11,269,80,11
     GROUPBOX        "Keyboard && Mouse",IDC_STATIC,7,284,220,49,BS_LEFT
     CONTROL         "Disable Viewers inputs",IDC_DISABLE_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,13,294,92,10
@@ -323,7 +326,7 @@ BEGIN
     CONTROL         "",IDC_CHECKG3D,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,153,56,16,8
     GROUPBOX        "Rules",IDC_STATIC,5,77,178,68
     LTEXT           "Group 1, 2 = Full Access       Group 3 = Read Only",IDC_STATIC,16,88,162,8
-    LTEXT           "Must be run as a Service on Windows NT4, Windows 2000\nCan be run as a Service or Application on Windows XP, Windows Server 2003\nLocal administrators have always access.\nFor Windows NT4 and Windows 2000 in Application mode you need to add the Local Admin G",IDC_STATIC,8,100,174,41
+    LTEXT           "Must be run as a Service on Windows NT4, Windows 2000\nCan be run as a Service or Application on Windows XP, Windows Server 2003\nLocal administrators have always access.\nFor Windows NT4 and Windows 2000 in Application mode you need to add the Local Admin Group.",IDC_STATIC,8,100,174,41
     DEFPUSHBUTTON   "OK",IDOK,77,148,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,132,148,50,14
     LTEXT           "1",IDC_STATIC,11,22,8,8
@@ -332,12 +335,12 @@ BEGIN
 END
 
 
+#ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
 //
 // DESIGNINFO
 //
 
-#ifdef APSTUDIO_INVOKED
 GUIDELINES DESIGNINFO
 BEGIN
     IDD_TEXTCHAT_DLG, DIALOG
@@ -485,14 +488,18 @@ IDC_CURSOR1             CURSOR                  "res/cursor1.cur"
 IDC_CURSOR3             CURSOR                  "res/cursor3.cur"
 
 
+#ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
 //
 // Version
 //
 
+// Defines STR_COMPANYNAME, STR_FILEVERSION, STR_PRODUCTVERSION, STR_COPYRIGHT,
+// STR_SPECIALBUILD, FILEVERSION, PRODUCTVERSION
+#include "../../common/versioninfo.h"
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,5,0,0
- PRODUCTVERSION 1,5,0,0
+ FILEVERSION INT_FILEVERSION_VS
+ PRODUCTVERSION INT_PRODUCTVERSION_VS
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x2dL
@@ -507,15 +514,23 @@ BEGIN
     BEGIN
         BLOCK "000004b0"
         BEGIN
+#if isRC == 1
+#include "buildtime.h" // Defines macro BUILDTIME
+            VALUE "Buildtime", BUILDTIME
+#endif
             VALUE "Comments", "UltraVNC Server"
-            VALUE "CompanyName", "UltraVNC"
+            VALUE "CompanyName", STR_COMPANYNAME
             VALUE "FileDescription", "UltraVNC Server"
-            VALUE "FileVersion", "1.5.0.0"
+            VALUE "FileVersion", STR_FILEVERSION_VS
             VALUE "InternalName", "WinVNC"
-            VALUE "LegalCopyright", "Copyright © 2002-2024 UltraVNC Team Members. All Rights Reserved."
+            VALUE "LegalCopyright", STR_COPYRIGHT
             VALUE "OriginalFilename", "WinVNC.exe"
+            VALUE "PrivateBuild", ""
             VALUE "ProductName", "UltraVNC Server"
-            VALUE "ProductVersion", "1.5.0.0"
+            VALUE "ProductVersion", STR_PRODUCTVERSION_VS
+#if isRC == 1
+            VALUE "SpecialBuild", STR_SPECIALBUILD_VS
+#endif
         END
     END
     BLOCK "VarFileInfo"
@@ -523,6 +538,8 @@ BEGIN
         VALUE "Translation", 0x0, 1200
     END
 END
+
+#endif    // !_MAC
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -585,6 +602,8 @@ END
 IDR_VNCVIEWER_JAR       JAVAARCHIVE             "res/vncviewer.jar"
 
 IDR_JAVAARCHIVE1        JAVAARCHIVE             "res/mslogon/VncViewer.jar"
+
+
 #if defined(SC_20)
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -599,7 +618,8 @@ IDR_DLL1                DLL                     "res/ddengine.dll"
 // ENCRYPTIONDLL
 //
 IDR_ENCRYPTIONDLL1      ENCRYPTIONDLL           "res/SecureVNCPlugin.dsm"
-#endif
+#endif // SC_20
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -663,19 +683,19 @@ END
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE 
+1 TEXTINCLUDE
 BEGIN
-    "resource.\0"
+    "resource.h"
 END
 
-2 TEXTINCLUDE 
+2 TEXTINCLUDE
 BEGIN
-    "#include ""afxres.h""\r\0"
+    "#include ""afxres.h""\r\n"
 END
 
-3 TEXTINCLUDE 
+3 TEXTINCLUDE
 BEGIN
-    "\r\0"
+    "\r\n"
 END
 
 #endif    // APSTUDIO_INVOKED
@@ -731,20 +751,16 @@ BEGIN
     ID_WINVNC_ERROR         "UltraVNC Server - Error"
     ID_WINVNC_WARNIN        "UltraVNC Server - Warning"
     ID_PLUGIN_LOADIN        "Plugin Loading"
-    ID_NO_PASSWD_NO_OVERRIDE_ERR 
-                            "No password has been set & this machine has been preconfigured to prevent users from setting their own.\nYou must contact a System Administrator to configure UltraVNC Server properly."
-    ID_NO_PASSWD_NO_OVERRIDE_WARN 
-                            "WARNING: This machine has been preconfigured to allow unauthenticated\nconnections to be accepted and to prevent users from enabling authentication."
-    ID_NO_PASSWD_NO_LOGON_WARN 
-                            "WARNING: This machine has no default password set. UltraVNC Server will present the Default Properties dialog now to allow one to be entered."
+    ID_NO_PASSWD_NO_OVERRIDE_ERR  "No password has been set & this machine has been preconfigured to prevent users from setting their own.\nYou must contact a System Administrator to configure UltraVNC Server properly."
+    ID_NO_PASSWD_NO_OVERRIDE_WARN "WARNING: This machine has been preconfigured to allow unauthenticated\nconnections to be accepted and to prevent users from enabling authentication."
+    ID_NO_PASSWD_NO_LOGON_WARN    "WARNING: This machine has no default password set. UltraVNC Server will present the Default Properties dialog now to allow one to be entered."
 END
 
 STRINGTABLE
 BEGIN
     ID_NO_OVERRIDE_ERR      "This machine has been preconfigured with UltraVNC Server settings, which cannot be overridden by individual users. The preconfigured settings may be modified only by a System Administrator."
     ID_NO_CURRENT_USER_ERR  "The UltraVNC Server settings for the current user are unavailable at present."
-    ID_CANNOT_EDIT_DEFAULT_PREFS 
-                            "You do not have sufficient privileges to edit the default local UltraVNC Server settings."
+    ID_CANNOT_EDIT_DEFAULT_PREFS "You do not have sufficient privileges to edit the default local UltraVNC Server settings."
     ID_NO_PASSWORD_WARN     "WARNING: Running UltraVNC Server without setting a password is a dangerous security risk!\nUntil you set a password, UltraVNC Server will not accept incoming connections."
     ID_PLUGIN_NOT_LOAD      "The Plugin cannot be loaded.\n\rPlease check its integrity."
     ID_MB1                  "MB1"
@@ -780,7 +796,8 @@ BEGIN
     ID_CADPERMISSION        "Permission denied on cad.exe, UltraVNC must be installed in ""program files"" else special cad permission is refused."
 END
 
-#endif    // English resources
+
+#endif    // Neutral resources
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -794,4 +811,3 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
-

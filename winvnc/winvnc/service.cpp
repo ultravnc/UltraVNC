@@ -33,7 +33,7 @@
 #include <stdio.h>
 #include <tlhelp32.h>
 #include "inifile.h"
-#include "common/win32_helpers.h"
+#include "../common/win32_helpers.h"
 #include <tlhelp32.h>
 
 HANDLE hEvent=NULL;

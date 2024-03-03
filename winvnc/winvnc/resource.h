@@ -45,9 +45,9 @@
 #define IDD_TEXTCHAT_DLG                137
 #define IDD_USER_NAME                   138
 #if defined(SC_20)
-#define IDR_DLL1                        176
-#define IDR_ENCRYPTIONDLL1              177
-#endif
+	#define IDR_DLL1                    176
+	#define IDR_ENCRYPTIONDLL1          177
+#endif // SC_20
 #define IDS_WARNING                     200
 #define IDC_ACCEPTLOGO                  1001
 #define IDC_ACCEPT_IP                   1002

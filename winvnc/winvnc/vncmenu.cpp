@@ -41,7 +41,7 @@
 
 #include "vncmenu.h"
 #include "HideDesktop.h"
-#include "common/win32_helpers.h"
+#include "../common/win32_helpers.h"
 #include "vncOSVersion.h"
 #include "UltraVNCService.h"
 #include "SettingsManager.h"
@@ -129,7 +129,7 @@ static void KillWallpaper()
 	Sleep(200);
 #else
 	HideDesktop();
-#endif
+#endif // SC_20
 }
 
 static void RestoreWallpaper()
@@ -139,7 +139,7 @@ static void RestoreWallpaper()
 	if (!ScSelect::g_wallpaper_enabled)RestoreDesktop();	
 #else
 	RestoreDesktop();
-#endif
+#endif // SC_20
 }
 
 // adzm - 2010-07 - Disable more effects or font smoothing
@@ -296,7 +296,7 @@ vncMenu::vncMenu(vncServer* server)
 	m_hmenu = LoadMenu(hInstResDLL, MAKEINTRESOURCE(IDR_TRAYMENU1));
 #else
 	m_hmenu = LoadMenu(hInstResDLL, MAKEINTRESOURCE(IDR_TRAYMENU));
-#endif
+#endif // SC_20
 
 	// Install the Tray icon!
 	AddTrayIcon();
@@ -309,7 +309,7 @@ vncMenu::~vncMenu()
 	if (ScSelect::g_dis_uac)
 		ScSelect::Restore_UAC_for_admin_elevated();
 	ScSelect::g_dis_uac = false;
-#endif
+#endif // SC_20
 
 	KillTimer(m_hwnd, 1);
 	vnclog.Print(LL_INTERR, VNCLOG("vncmenu killed\n"));
@@ -918,7 +918,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 #ifdef SC_20
 				if (ScSelect::g_dis_uac) 
 					ScSelect::Disbale_UAC_for_admin_run_elevated();
-#endif
+#endif // SC_20
 				if (settings->getRemoveWallpaper())
 					KillWallpaper();
 				if (settings->getRemoveEffects())
@@ -935,7 +935,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 #ifdef SC_20
 			if (ScSelect::g_dis_uac) 
 				ScSelect::Restore_UAC_for_admin_elevated();
-#endif
+#endif // SC_20
 			if (settings->getRemoveWallpaper()) // Moved, redundant if //PGM @ Advantig
 				ResetAero(); // Moved, redundant if //PGM @ Advantig
 			if (settings->getRemoveWallpaper()) { // Added { //PGM @ Advantig
@@ -1328,7 +1328,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			}
 		}
 		break;
-#endif
+#endif // SC_20
 		}
 		return 0;
 

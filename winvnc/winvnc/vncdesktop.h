@@ -56,7 +56,7 @@ class vncServer;
 #ifdef AVILOG
 #include "avilog/avilog/AVIGenerator.h"
 #endif
-#include "common/Clipboard.h"
+#include "../common/Clipboard.h"
 #include "IPC.h"
 #include <map>
 #include <string>

@@ -30,10 +30,10 @@ bool Copy_to_Temp(char *tempfile);
 bool Copy_to_Secure_from_temp(char *tempfile);
 
 #ifndef SC_20
-#define INIFILE_NAME "ultravnc.ini"
+	#define INIFILE_NAME "ultravnc.ini"
 #else
-#define INIFILE_NAME "SC_20.ini"
-#endif
+	#define INIFILE_NAME "SC_20.ini"
+#endif // SC_20
 
 extern char *g_szIniFile;
 

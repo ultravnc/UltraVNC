@@ -44,8 +44,8 @@ const static LPCTSTR g_szIPCSharedEvent = _T("{3BFBA3A0-2133-48B5-B5BD-E58C72853
 const static LPCTSTR g_szIPCSharedPointerEvent = _T("{3A77E11C-B0B4-40F9-BC8B-D249116A76FE}");
 
 #ifdef SC_20
-class LoadDllFromMemory;
-#endif
+	class LoadDllFromMemory;
+#endif // SC_20
 
 class DeskDupEngine : public ScreenCapture
 {
@@ -81,6 +81,5 @@ private:
 	HANDLE hPointerEvent;
 #ifdef SC_20
 	std::unique_ptr<LoadDllFromMemory> loadDllFromMemory;
-#endif
+#endif // SC_20
 };
-

@@ -25,7 +25,7 @@
 #include "stdhdrs.h"
 #include <windows.h>
 #include <wtsapi32.h>
-#include "common/win32_helpers.h"
+#include "../common/win32_helpers.h"
 #include "inifile.h"
 #include "UltraVNCService.h"
 #include <userenv.h>

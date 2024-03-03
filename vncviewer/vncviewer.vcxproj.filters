@@ -10,7 +10,7 @@
     <ClCompile Include="AccelKeys.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="buildtime.cpp">
+    <ClCompile Include="..\common\buildtime.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ClientConnection.cpp">

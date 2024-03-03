@@ -33,7 +33,7 @@
 #define CDSMPlugin_H
 
 #if _MSC_VER > 1000
-#pragma once
+	#pragma once
 #endif // _MSC_VER > 1000
 
 #include "omnithread.h"
@@ -42,8 +42,9 @@
 #include <memory>
 
 #ifdef SC_20
-class LoadDllFromMemory;
-#endif
+	class LoadDllFromMemory;
+#endif // SC_20
+
 //adzm - 2009-06-21
 class IPlugin
 {
@@ -189,7 +190,7 @@ private:
 	omni_mutex m_TransMutex;
 #ifdef SC_20
 	std::unique_ptr<LoadDllFromMemory> loadDllFromMemory;
-#endif
+#endif // SC_20
 };
 
 class ConfigHelper

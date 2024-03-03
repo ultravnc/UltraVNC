@@ -33,7 +33,7 @@
 
 #include "winvnc.h"
 #include "vncsetauth.h"
-#include "common/win32_helpers.h"
+#include "../common/win32_helpers.h"
 #include "SettingsManager.h"
 
 #define MAXSTRING 254
