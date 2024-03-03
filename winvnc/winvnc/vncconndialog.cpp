@@ -32,7 +32,7 @@
 #include "winvnc.h"
 
 #include "resource.h"
-#include "common/win32_helpers.h"
+#include "../common/win32_helpers.h"
 
 #include <ctype.h>
 

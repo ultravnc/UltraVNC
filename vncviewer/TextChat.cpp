@@ -28,7 +28,7 @@
 #include "Exception.h"
 #include "commctrl.h"
 #include "richedit.h"
-#include "common/win32_helpers.h"
+#include "../common/win32_helpers.h"
 #include <rdr/Exception.h>
 #include "UltraVNCHelperFunctions.h"
 

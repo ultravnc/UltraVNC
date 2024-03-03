@@ -49,6 +49,7 @@ include(../CMakeLists_libzipunzip.txt)
 set(WINVNC_SOURCES
     ../../DSMPlugin/DSMPlugin.cpp
     ../../ZipUnZip32/ZipUnzip32.cpp
+    ../../common/buildtime.cpp
     ../../common/Clipboard.cpp
     ../../common/d3des.c
     ../../common/UltraVncZ.cpp
@@ -70,7 +71,6 @@ set(WINVNC_SOURCES
     UltraVNCService.cpp
     VirtualDisplay.cpp
     benchmark.cpp
-    buildtime.cpp
     cadthread.cpp
     credentials.cpp
     getinfo.cpp

@@ -25,9 +25,8 @@
 
 #pragma once
 #ifdef SC_20
-
-#include "stdhdrs.h"
-#include "CommCtrl.h"
+	#include "stdhdrs.h"
+	#include "CommCtrl.h"
 
 namespace ScSelect
 {
@@ -55,5 +54,4 @@ namespace ScSelect
 	char *InitSC(HINSTANCE hInstance, PSTR szCmdLine);
 	void ExpandBox(HWND hDlg, bool fExpand);
 };
-#endif
-
+#endif // SC_20

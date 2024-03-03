@@ -1059,7 +1059,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\win8</Command>
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="buildtime.in">
+    <CustomBuild Include="..\..\..\common\buildtime.in">
       <FileType>Document</FileType>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create Buildtime for VERSIONINFO</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='SC_20_DEBUG|Win32'">Create Buildtime for VERSIONINFO</Message>

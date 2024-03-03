@@ -38,7 +38,7 @@
 #include "vncserver.h"
 #include "vncOSVersion.h"
 #include <shlobj.h>
-#include "common/win32_helpers.h"
+#include "../common/win32_helpers.h"
 #include "Localization.h" // ACT : Add localization on messages
 #include "SettingsManager.h"
 #include "credentials.h"
@@ -306,7 +306,7 @@ BOOL CALLBACK vncPropertiesPoll::DialogProcPoll(HWND hwnd,
 			);
 #ifndef SC_20
 			_this->SaveToIniFile();
-#endif
+#endif // SC_20
 			// Was ok pressed?
 			if (LOWORD(wParam) == IDOK)
 			{
@@ -365,7 +365,7 @@ void vncPropertiesPoll::LoadFromIniFile()
 {
 #ifndef SC_20
 	settings->load();
-#endif
+#endif // SC_20
 	if (!(CheckVideoDriver(0) && settings->getDriver()))
 		settings->setDriver(false);
 }
@@ -374,6 +374,5 @@ void vncPropertiesPoll::SaveToIniFile()
 {
 #ifndef SC_20
 	settings->save();
-#endif
+#endif // SC_20
 }
-

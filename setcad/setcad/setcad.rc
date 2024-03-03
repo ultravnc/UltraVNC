@@ -13,20 +13,27 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Neutral (Default) resources
+// Neutral resources
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEUD)
-LANGUAGE LANG_NEUTRAL, SUBLANG_DEFAULT
-#pragma code_page(1252)
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEU)
+#ifdef _WIN32
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+#pragma code_page(65001)
+#endif //_WIN32
 
+
+#ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
 //
 // Version
 //
 
+// Defines STR_COMPANYNAME, STR_FILEVERSION, STR_PRODUCTVERSION, STR_COPYRIGHT,
+// STR_SPECIALBUILD, FILEVERSION, PRODUCTVERSION
+#include "../../common/versioninfo.h"
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,5,0,0
- PRODUCTVERSION 1,5,0,0
+ FILEVERSION INT_FILEVERSION_SETCAD
+ PRODUCTVERSION INT_PRODUCTVERSION_SETCAD
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -39,34 +46,35 @@ VS_VERSION_INFO VERSIONINFO
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
-        BLOCK "040004b0"
+        BLOCK "000004b0"
         BEGIN
-            VALUE "CompanyName", "uvnc bvba"
+#if isRC == 1
+#include "buildtime.h" // Defines macro BUILDTIME
+            VALUE "Buildtime", BUILDTIME
+#endif
+            VALUE "Comments", ""
+            VALUE "CompanyName", STR_COMPANYNAME
             VALUE "FileDescription", "send ctrl-alt-del helper"
-            VALUE "FileVersion", "1.5.0.0"
+            VALUE "FileVersion", STR_FILEVERSION_SETCAD
             VALUE "InternalName", "setcad.exe"
-            VALUE "LegalCopyright", "Copyright © 2002-2024 UltraVNC Team Members. All Rights Reserved."
+            VALUE "LegalCopyright", STR_COPYRIGHT
             VALUE "OriginalFilename", "setcad.exe"
+            VALUE "PrivateBuild", ""
             VALUE "ProductName", "UltraVNC setcad"
-            VALUE "ProductVersion", "1.5.0.0"
+            VALUE "ProductVersion", STR_PRODUCTVERSION_SETCAD
+#if isRC == 1
+            VALUE "SpecialBuild", STR_SPECIALBUILD_SETCAD
+#endif
         END
     END
     BLOCK "VarFileInfo"
     BEGIN
-        VALUE "Translation", 0x400, 1200
+        VALUE "Translation", 0x0, 1200
     END
 END
 
-#endif    // Neutral (Default) resources
-/////////////////////////////////////////////////////////////////////////////
+#endif    // !_MAC
 
-
-/////////////////////////////////////////////////////////////////////////////
-// Dutch (Belgium) resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NLB)
-LANGUAGE LANG_DUTCH, SUBLANG_DUTCH_BELGIAN
-#pragma code_page(1252)
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -93,7 +101,7 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-#endif    // Dutch (Belgium) resources
+#endif    // Neutral resources
 /////////////////////////////////////////////////////////////////////////////
 
 

@@ -49,7 +49,7 @@
 #include "mmsystem.h" // sf@2002
 #include "TextChat.h" // sf@2002
 #include "vncdesktopthread.h"
-#include "common/win32_helpers.h"
+#include "../common/win32_helpers.h"
 #include <algorithm>
 #include <commctrl.h>
 #include "LayeredWindows.h"

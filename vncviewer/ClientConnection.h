@@ -64,7 +64,7 @@ extern "C"
 #include "FullScreenTitleBar.h" //Added by: Lars Werner (http://lars.werner.no)
 
 // adzm - 2010-07 - Extended clipboard
-#include "common/Clipboard.h"
+#include "../common/Clipboard.h"
 
 #include <vector>
 #include <algorithm>

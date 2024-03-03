@@ -26,7 +26,7 @@
 #pragma once
 #include <winsock2.h>
 #include <windows.h>
-#include "common/VersionHelpers.h"
+#include "../common/VersionHelpers.h"
 
 #define MAXCHANGES_BUF 2000
 #define OSWIN10 10

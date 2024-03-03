@@ -24,9 +24,9 @@
 
 
 #ifdef SC_20
-#include "loadDllFromMemory.h"
-#include "windows.h"
-#include "./winvnc/resource.h"
+	#include "loadDllFromMemory.h"
+	#include "windows.h"
+	#include "./winvnc/resource.h"
 
 LoadDllFromMemory::LoadDllFromMemory()
 {
@@ -100,4 +100,4 @@ void LoadDllFromMemory::LoadPlugin(DESCRIPTION& m_PDescription, SHUTDOWN& m_PShu
 	m_PCreateIntegratedPluginInterface = (CREATEINTEGRATEDPLUGININTERFACE)MemoryGetProcAddress(handleDsmpluginBuf, "CreateIntegratedPluginInterface");
 	m_PConfig = (CONFIG)MemoryGetProcAddress(handleDsmpluginBuf, "Config");
 }
-#endif
+#endif // SC_20

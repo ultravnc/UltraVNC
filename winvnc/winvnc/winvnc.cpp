@@ -221,7 +221,7 @@ bool return2(bool value)
 #ifdef SC_20
 	if (ScSelect::g_dis_uac)
 		ScSelect::Restore_UAC_for_admin_elevated();
-#endif
+#endif // SC_20
 	return value;
 }
 
@@ -296,7 +296,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 	#ifndef SC_20
 		settings->setScExit(false);
 		settings->setScPrompt(false);
-	#endif
+	#endif // SC_20
 		setbuf(stderr, 0);
 
 		// [v1.0.2-jp1 fix] Load resouce from dll
@@ -369,7 +369,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 		char* szCmdLine = ScSelect::InitSC(hInstance, szCmdLine2);
 	#else
 		char* szCmdLine = szCmdLine2;
-	#endif
+	#endif // SC_20
 		// look up the current service name in the registry.
 		//serviceHelpers::ExistServiceName(progname, UltraVNCService::service_name);
 
@@ -427,7 +427,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 	#endif
 				return return2(0);
 			}
-	#endif
+	#endif // SC_20
 
 			if (strncmp(&szCmdLine[i], winvncKill, strlen(winvncKill)) == 0)
 			{
@@ -535,7 +535,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 				settings->setUseDSMPlugin(true);
 				continue;
 			}
-	#endif
+	#endif // SC_20
 	#ifndef SC_20
 			if (strncmp(&szCmdLine[i], winvncStartserviceHelper, strlen(winvncStartserviceHelper)) == 0)
 			{
@@ -612,7 +612,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 	#endif
 				return return2(0);
 			}
-	#endif
+	#endif // SC_20
 			if (strncmp(&szCmdLine[i], winvncSecurityEditor, strlen(winvncSecurityEditor)) == 0)
 			{
 				typedef void (*vncEditSecurityFn) (HWND hwnd, HINSTANCE hInstance);
@@ -813,7 +813,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 	#endif
 				return return2(0);
 			}
-	#endif
+	#endif // SC_20
 			if (strncmp(&szCmdLine[i], winvncPreConnect, strlen(winvncPreConnect)) == 0)
 			{
 				i += strlen(winvncPreConnect);
@@ -853,7 +853,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 	#endif
 				return return2(0);
 			}
-	#endif
+	#endif // SC_20
 			if (strncmp(&szCmdLine[i], winvncRunAsUserApp, strlen(winvncRunAsUserApp)) == 0)
 			{
 				// WinVNC is being run as a user-level program
@@ -1109,7 +1109,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 							delete[] name;
 							return return2(0);
 						}
-	#endif
+	#endif // SC_20
 						delete[] name;
 						if (address != 0) {
 							// Post the IP address to the server

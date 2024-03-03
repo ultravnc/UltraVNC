@@ -31,7 +31,7 @@
 #include "Exception.h"
 //#include "ClientConnection.h"
 #include "AboutBox.h"
-#include "common/win32_helpers.h"
+#include "../common/win32_helpers.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

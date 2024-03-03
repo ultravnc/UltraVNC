@@ -29,7 +29,7 @@
 #include "TextChat.h"
 #include "commctrl.h"
 #include "richedit.h"
-#include "common/win32_helpers.h"
+#include "../common/win32_helpers.h"
 #include <algorithm>
 #include "Localization.h" // Act : add localization on messages
 

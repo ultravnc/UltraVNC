@@ -328,7 +328,7 @@
     </ResourceCompile>
     <PreLinkEvent>
       <Message>Setting build time...</Message>
-      <Command>cl /nologo /MTd /FoDebug\ /FdDebug\ /c buildtime.cpp</Command>
+      <Command>cl /nologo /MTd /FoDebug\ /FdDebug\ /c ..\common\buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
       <AdditionalDependencies>comctl32.lib;winmm.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -375,7 +375,7 @@
     </ResourceCompile>
     <PreLinkEvent>
       <Message>Setting build time...</Message>
-      <Command>cl /nologo /MTd /Fo.\x64\Debug\ /Fd.\x64\Debug\ /c buildtime.cpp</Command>
+      <Command>cl /nologo /MTd /Fo.\x64\Debug\ /Fd.\x64\Debug\ /c ..\common\buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
       <AdditionalDependencies>comctl32.lib;winmm.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -430,7 +430,7 @@
     </ResourceCompile>
     <PreLinkEvent>
       <Message>Setting build time...</Message>
-      <Command>cl /nologo /MT /FoRelease\ /FdRelease\ /c buildtime.cpp</Command>
+      <Command>cl /nologo /MT /FoRelease\ /FdRelease\ /c ..\common\buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
       <AdditionalOptions>/LTCG %(AdditionalOptions)</AdditionalOptions>
@@ -489,7 +489,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" ..\Files\x86\vncviewer.exe</Command>
     </ResourceCompile>
     <PreLinkEvent>
       <Message>Setting build time...</Message>
-      <Command>cl /nologo /MT /FoRelease\ /FdRelease\ /c buildtime.cpp</Command>
+      <Command>cl /nologo /MT /FoRelease\ /FdRelease\ /c ..\common\buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
       <AdditionalOptions>/LTCG %(AdditionalOptions)</AdditionalOptions>
@@ -547,7 +547,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\32\xp</Command>
     </ResourceCompile>
     <PreLinkEvent>
       <Message>Setting build time...</Message>
-      <Command>cl /nologo /MT /FoRelease\ /FdRelease\ /c buildtime.cpp</Command>
+      <Command>cl /nologo /MT /FoRelease\ /FdRelease\ /c ..\common\buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
       <AdditionalOptions>/LTCG %(AdditionalOptions)</AdditionalOptions>
@@ -605,7 +605,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\32\xp\vncviewer_xp.exe</Comman
     </ResourceCompile>
     <PreLinkEvent>
       <Message>Setting build time...</Message>
-      <Command>cl /nologo /MT /FoRelease\ /FdRelease\ /c buildtime.cpp</Command>
+      <Command>cl /nologo /MT /FoRelease\ /FdRelease\ /c ..\common\buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
       <AdditionalOptions>/LTCG %(AdditionalOptions)</AdditionalOptions>
@@ -662,7 +662,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\32\win8\</Command>
     </ResourceCompile>
     <PreLinkEvent>
       <Message>Setting build time...</Message>
-      <Command>cl /nologo /MT /FoRelease\ /FdRelease\ /c buildtime.cpp</Command>
+      <Command>cl /nologo /MT /FoRelease\ /FdRelease\ /c ..\common\buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
       <AdditionalOptions>/LTCG %(AdditionalOptions)</AdditionalOptions>
@@ -719,7 +719,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\32\xp\xp</Command>
     </ResourceCompile>
     <PreLinkEvent>
       <Message>Setting build time...</Message>
-      <Command>cl /nologo /MT /FoRelease\ /FdRelease\ /c buildtime.cpp</Command>
+      <Command>cl /nologo /MT /FoRelease\ /FdRelease\ /c ..\common\buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
       <AdditionalOptions>/LTCG %(AdditionalOptions)</AdditionalOptions>
@@ -778,7 +778,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\32\ipv6</Command>
     </ResourceCompile>
     <PreLinkEvent>
       <Message>Setting build time...</Message>
-      <Command>cl /nologo /MT /Fo.\x64\Release\ /Fd.\x64\Release\ /c buildtime.cpp</Command>
+      <Command>cl /nologo /MT /Fo.\x64\Release\ /Fd.\x64\Release\ /c ..\common\buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
       <AdditionalDependencies>comctl32.lib;winmm.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -830,7 +830,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" ..\Files\x64\vncviewer.exe</Command>
     </ResourceCompile>
     <PreLinkEvent>
       <Message>Setting build time...</Message>
-      <Command>cl /nologo /MT /Fo.\x64\Release\ /Fd.\x64\Release\ /c buildtime.cpp</Command>
+      <Command>cl /nologo /MT /Fo.\x64\Release\ /Fd.\x64\Release\ /c ..\common\buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
       <AdditionalDependencies>comctl32.lib;winmm.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -881,7 +881,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
     </ResourceCompile>
     <PreLinkEvent>
       <Message>Setting build time...</Message>
-      <Command>cl /nologo /MT /Fo.\x64\Release\ /Fd.\x64\Release\ /c buildtime.cpp</Command>
+      <Command>cl /nologo /MT /Fo.\x64\Release\ /Fd.\x64\Release\ /c ..\common\buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
       <AdditionalDependencies>comctl32.lib;winmm.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -932,7 +932,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
     </ResourceCompile>
     <PreLinkEvent>
       <Message>Setting build time...</Message>
-      <Command>cl /nologo /MT /Fo.\x64\Release\ /Fd.\x64\Release\ /c buildtime.cpp</Command>
+      <Command>cl /nologo /MT /Fo.\x64\Release\ /Fd.\x64\Release\ /c ..\common\buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
       <AdditionalDependencies>comctl32.lib;winmm.lib;ws2_32.lib;rdr.lib;libjpeg-turbo-win.lib;zlibstat.lib;liblzma.lib;omnithread.lib;zip32.lib;unz32lib.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -983,7 +983,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
     </ResourceCompile>
     <PreLinkEvent>
       <Message>Setting build time...</Message>
-      <Command>cl /nologo /MT /FoRelease\ /FdRelease\ /c buildtime.cpp</Command>
+      <Command>cl /nologo /MT /FoRelease\ /FdRelease\ /c ..\common\buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
       <AdditionalDependencies>comctl32.lib;winmm.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -1034,7 +1034,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp\xp</Command>
     </ResourceCompile>
     <PreLinkEvent>
       <Message>Setting build time...</Message>
-      <Command>cl /nologo /MT /FoRelease\ /FdRelease\ /c buildtime.cpp</Command>
+      <Command>cl /nologo /MT /FoRelease\ /FdRelease\ /c ..\common\buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
       <AdditionalDependencies>comctl32.lib;winmm.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -1183,7 +1183,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\ipv6</Command>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='OldCPU|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="buildtime.cpp">
+    <ClCompile Include="..\common\buildtime.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>

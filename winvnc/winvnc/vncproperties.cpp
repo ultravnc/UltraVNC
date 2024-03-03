@@ -38,7 +38,7 @@
 #include "vncserver.h"
 #include "vncpasswd.h"
 #include "vncOSVersion.h"
-#include "common/win32_helpers.h"
+#include "../common/win32_helpers.h"
 #include "vncconndialog.h"
 
 #include "Localization.h" // ACT : Add localization on messages
@@ -224,7 +224,7 @@ vncProperties::DialogProc(HWND hwnd,
 		// Set the content of the view-only password field to a predefined string. //PGM
 		SetDlgItemText(hwnd, IDC_PASSWORD2, "~~~~~~~~"); //PGM
 		EnableWindow(GetDlgItem(hwnd, IDC_PASSWORD2), bConnectSock); //PGM
-#endif
+#endif // SC_20
 			// Set the initial keyboard focus
 		if (bConnectSock) {
 			SetFocus(GetDlgItem(hwnd, IDC_PASSWORD));
@@ -466,7 +466,7 @@ vncProperties::DialogProc(HWND hwnd,
 		SendMessage(hPlugins, CB_ADDSTRING, 0, (LPARAM)settings->getSzDSMPlugin());
 		SendMessage(hPlugins, CB_SETCURSEL, 0, 0);
 		SendMessage(hPlugins, CB_SELECTSTRING, 0, (LPARAM)settings->getSzDSMPlugin());
-#endif
+#endif // SC_20
 
 		// Modif sf@2002
 		SendMessage(GetDlgItem(hwnd, IDC_PLUGIN_CHECK), BM_SETCHECK, settings->getUseDSMPlugin(), 0);
@@ -813,7 +813,7 @@ vncProperties::DialogProc(HWND hwnd,
 			settings->setQuerySetting((SendMessage(hQuery, BM_GETCHECK, 0, 0) == BST_CHECKED) ? 4 : 2);
 #ifndef SC_20
 			_this->SaveToIniFile();
-#endif
+#endif // SC_20
 			// Was ok pressed?
 			if (LOWORD(wParam) == IDOK) {
 				// Yes, so close the dialog
@@ -1023,7 +1023,7 @@ vncProperties::DialogProc(HWND hwnd,
 			}
 		}
 		return TRUE;
-#endif
+#endif // SC_20
 		case IDC_CHECKDRIVER:
 			CheckVideoDriver(1);
 			return TRUE;
@@ -1128,7 +1128,7 @@ void vncProperties::LoadFromIniFile()
 {
 #ifndef SC_20
 	settings->load();
-#endif
+#endif // SC_20
 	vnclog.SetMode(settings->getDebugMode());
 	vnclog.SetPath(settings->getDebugPath());
 	vnclog.SetLevel(settings->getDebugLevel());
@@ -1196,7 +1196,7 @@ void vncProperties::SaveToIniFile()
 {
 #ifndef SC_20
 	settings->save();
-#endif
+#endif // SC_20
 }
 
 

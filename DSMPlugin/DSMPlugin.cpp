@@ -77,8 +77,9 @@
 #include <limits.h>
 #include <memory>
 #ifdef SC_20
-#include "./winvnc/loadmemory/loadDllFromMemory.h"
-#endif
+	#include "./winvnc/loadmemory/loadDllFromMemory.h"
+#endif // SC_20
+
 //
 // Utils
 //
@@ -420,7 +421,7 @@ bool CDSMPlugin::LoadPlugin(char* szPlugin, bool fAllowMulti)
 	loadDllFromMemory->LoadPlugin(m_PDescription, m_PShutdown, m_PStartup, m_PSetParams, m_PGetParams,
 		m_PTransformBuffer, m_PRestoreBuffer, m_PFreeBuffer, m_PReset,
 		m_PCreatePluginInterface, m_PCreateIntegratedPluginInterface, m_PConfig);
-#endif
+#endif // SC_20
 
 	if (m_PStartup == NULL || m_PShutdown == NULL || m_PSetParams == NULL || m_PGetParams == NULL
 		|| m_PTransformBuffer == NULL || m_PRestoreBuffer == NULL || m_PFreeBuffer == NULL ||
@@ -430,7 +431,7 @@ bool CDSMPlugin::LoadPlugin(char* szPlugin, bool fAllowMulti)
 #ifndef SC_20
 		FreeLibrary(m_hPDll); 
 		if (*m_szDllName) DeleteFile(m_szDllName);
-#endif
+#endif // SC_20
 		return false;
 	}
 
@@ -460,7 +461,7 @@ bool CDSMPlugin::UnloadPlugin(void)
 #ifndef SC_20
 		fFreed = (FALSE != FreeLibrary(m_hPDll));
 		if (*m_szDllName) DeleteFile(m_szDllName);
-#endif
+#endif // SC_20
 		return fFreed;
 	}
 	else
@@ -512,7 +513,7 @@ BYTE* CDSMPlugin::TransformBuffer(BYTE* pDataBuffer, int nDataLen, int* pnTransf
 	omni_mutex_lock l(m_TransMutex);
 #else
 	omni_mutex_lock l(m_TransMutex,105);
-#endif
+#endif // _VIEWER
 
 	m_pTransBuffer = (*m_PTransformBuffer)(pDataBuffer, nDataLen, pnTransformedDataLen);
 
@@ -707,4 +708,3 @@ ConfigHelper::~ConfigHelper()
 		m_szPassphrase = NULL;
 	}
 }
-

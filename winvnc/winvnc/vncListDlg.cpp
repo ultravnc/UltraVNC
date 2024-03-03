@@ -29,7 +29,7 @@
 
 #include "winvnc.h"
 #include "vncListDlg.h"
-#include "common/win32_helpers.h"
+#include "../common/win32_helpers.h"
 #include "SettingsManager.h"
 
 // [v1.0.2-jp1 fix] Load resouce from dll

@@ -1,2 +1,12 @@
-LANGUAGE 0x9,0x1
+/////////////////////////////////////////////////////////////////////////////
+// Neutral resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEU)
+#ifdef _WIN32
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+#pragma code_page(65001)
+#endif //_WIN32
+
+#endif    // Neutral resources
+
 1 11 "MSG00001.bin"
