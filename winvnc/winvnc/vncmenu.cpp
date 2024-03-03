@@ -1015,43 +1015,43 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		case ID_VISITUSONLINE_FORUM:
 			if (settings->RunningFromExternalService() && OpenWebpageFromService("cmd /c start https://forum.uvnc.com/"));
 			else
-				OpenWebpageFromApp(ID_VISITUSONLINE_HOMEPAGE);
+				OpenWebpageFromApp(ID_VISITUSONLINE_FORUM);
 			break;
 
 		case ID_VISITUSONLINE_GITHUB:
 			if (settings->RunningFromExternalService() && OpenWebpageFromService("cmd /c start https://github.com/ultravnc"));
 			else 
-				OpenWebpageFromApp(ID_VISITUSONLINE_HOMEPAGE);
+				OpenWebpageFromApp(ID_VISITUSONLINE_GITHUB);
 			break;
 
 		case ID_VISITUSONLINE_MASTODON:
 			if (settings->RunningFromExternalService() && OpenWebpageFromService("cmd /c start https://mastodon.social/@ultravnc"));
 			else
-				OpenWebpageFromApp(ID_VISITUSONLINE_HOMEPAGE);
+				OpenWebpageFromApp(ID_VISITUSONLINE_MASTODON);
 			break;
 
 		case ID_VISITUSONLINE_FACEBOOK:
 			if (settings->RunningFromExternalService() && OpenWebpageFromService("cmd /c start https://www.facebook.com/ultravnc1"));
 			else 
-				OpenWebpageFromApp(ID_VISITUSONLINE_HOMEPAGE);
+				OpenWebpageFromApp(ID_VISITUSONLINE_FACEBOOK);
 			break;
 
 		case ID_VISITUSONLINE_XTWITTER:
 			if (settings->RunningFromExternalService() && OpenWebpageFromService("cmd /c start https://twitter.com/ultravnc1"));
 			else
-				OpenWebpageFromApp(ID_VISITUSONLINE_HOMEPAGE);
+				OpenWebpageFromApp(ID_VISITUSONLINE_XTWITTER);
 			break;
 
 		case ID_VISITUSONLINE_REDDIT:
 			if (settings->RunningFromExternalService() && OpenWebpageFromService("cmd /c start https://www.reddit.com/r/ultravnc"));
 			else 
-				OpenWebpageFromApp(ID_VISITUSONLINE_HOMEPAGE);
+				OpenWebpageFromApp(ID_VISITUSONLINE_REDDIT);
 			break;
 
 		case ID_VISITUSONLINE_OPENHUB:
 			if (settings->RunningFromExternalService() && OpenWebpageFromService("cmd /c start https://openhub.net/p/ultravnc"));
 			else
-				OpenWebpageFromApp(ID_VISITUSONLINE_HOMEPAGE);
+				OpenWebpageFromApp(ID_VISITUSONLINE_OPENHUB);
 			break;
 
 
