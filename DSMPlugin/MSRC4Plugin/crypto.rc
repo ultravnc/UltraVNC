@@ -1,29 +1,4 @@
-/////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
-//
-//  This program is free software; you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 2 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
-//  USA.
-//
-//  If the source code for the program is not available from the place from
-//  which you received this file, check
-//  https://uvnc.com/
-//
-////////////////////////////////////////////////////////////////////////////
-
-
-//Microsoft Developer Studio generated resource script.
+// Microsoft Developer Studio generated resource script.
 //
 #include "resource.h"
 
@@ -37,14 +12,16 @@
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
-/////////////////////////////////////////////////////////////////////////////
-// English (U.S.) resources
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+/////////////////////////////////////////////////////////////////////////////
+// Neutral resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEU)
 #ifdef _WIN32
-LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 #pragma code_page(65001)
 #endif //_WIN32
+
 
 #ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
@@ -52,9 +29,12 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // Version
 //
 
+// Defines STR_COMPANYNAME, STR_FILEVERSION, STR_PRODUCTVERSION, STR_COPYRIGHT,
+// STR_SPECIALBUILD, FILEVERSION, PRODUCTVERSION
+#include "../../common/versioninfo.h"
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,1,9,0
- PRODUCTVERSION 1,1,9,0
+ FILEVERSION INT_FILEVERSION_MSRC4PLUGIN_CRYPTO
+ PRODUCTVERSION INT_PRODUCTVERSION_MSRC4PLUGIN_CRYPTO
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -67,24 +47,30 @@ VS_VERSION_INFO VERSIONINFO
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
-        BLOCK "040904b0"
+        BLOCK "000004b0"
         BEGIN
+#if isRC == 1
+#include "buildtime.h" // Defines macro BUILDTIME
+            VALUE "Buildtime", BUILDTIME
+#endif
             VALUE "Comments", "UltraVNC Crypto test utility"
-            VALUE "CompanyName", "uvnc bvba"
+            VALUE "CompanyName", STR_COMPANYNAME
             VALUE "FileDescription", "crypto.exe"
-            VALUE "FileVersion", "1, 1, 9, 0"
+            VALUE "FileVersion", STR_FILEVERSION_MSRC4Plugin_CRYPTO
             VALUE "InternalName", "crypto"
-            VALUE "LegalCopyright", "Copyright © 2002-2024 UltraVNC Team Members. All Rights Reserved."
+            VALUE "LegalCopyright", STR_COPYRIGHT
             VALUE "OriginalFilename", "crypto.exe"
             VALUE "PrivateBuild", ""
             VALUE "ProductName", "crypto.exe"
-            VALUE "ProductVersion", "1, 1, 9, 0"
-            VALUE "SpecialBuild", ""
+            VALUE "ProductVersion", STR_PRODUCTVERSION_MSRC4PLUGIN_CRYPTO
+#if isRC == 1
+            VALUE "SpecialBuild", STR_SPECIALBUILD_MSRC4PLUGIN_CRYPTO
+#endif
         END
     END
     BLOCK "VarFileInfo"
     BEGIN
-        VALUE "Translation", 0x409, 1200
+        VALUE "Translation", 0x0, 1200
     END
 END
 
@@ -114,7 +100,8 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-#endif    // English (U.S.) resources
+
+#endif    // Neutral resources
 /////////////////////////////////////////////////////////////////////////////
 
 

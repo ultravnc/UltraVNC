@@ -24,12 +24,12 @@
 
 
 #ifdef SC_20
-#pragma once
+	#pragma once
 
-#include <WinSock2.h>
-#include <Windows.h>
-#include "MemoryModule.h"
-#include "../DSMPlugin/DSMPlugin.h"
+	#include <WinSock2.h>
+	#include <Windows.h>
+	#include "MemoryModule.h"
+	#include "../DSMPlugin/DSMPlugin.h"
 
 typedef bool(*StartW8Fn)(bool);
 typedef bool(*StartW8V2Fn)(bool, bool, UINT);
@@ -58,4 +58,4 @@ public:
 		TRANSFORMBUFFER& m_PTransformBuffer, RESTOREBUFFER& m_PRestoreBuffer, FREEBUFFER& m_PFreeBuffer, RESET& m_PReset,
 		CREATEPLUGININTERFACE& m_PCreatePluginInterface, CREATEINTEGRATEDPLUGININTERFACE& m_PCreateIntegratedPluginInterface, CONFIG& m_PConfig);
 };
-#endif
+#endif // SC_20

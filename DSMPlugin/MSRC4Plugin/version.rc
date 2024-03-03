@@ -1,38 +1,15 @@
-/////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
-//
-//  This program is free software; you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 2 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
-//  USA.
-//
-//  If the source code for the program is not available from the place from
-//  which you received this file, check
-//  https://uvnc.com/
-//
-////////////////////////////////////////////////////////////////////////////
-
-
 #ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
 //
 // Version
 //
 
-#include "version.h"
+// Defines STR_COMPANYNAME, STR_FILEVERSION, STR_PRODUCTVERSION, STR_COPYRIGHT,
+// STR_SPECIALBUILD, FILEVERSION, PRODUCTVERSION
+#include "../../common/versioninfo.h"
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION MAJOR_INT,MINOR_INT,BUILD_INT,SPECIAL_INT
- PRODUCTVERSION MAJOR_INT,MINOR_INT,BUILD_INT,SPECIAL_INT
+ FILEVERSION INT_FILEVERSION_MSRC4PLUGIN
+ PRODUCTVERSION INT_PRODUCTVERSION_MSRC4PLUGIN
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -45,24 +22,30 @@ VS_VERSION_INFO VERSIONINFO
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
-        BLOCK "040904b0"
+        BLOCK "000004b0"
         BEGIN
-            VALUE "Comments", "UltraVNC MS Encryption Plugin using RC4 encryption from the Microsoft RSA provider"
-            VALUE "CompanyName", "uvnc bvba"
-            VALUE "FileDescription", PLUGIN_NAME BUILD_NUMBER
-            VALUE "FileVersion", BUILD_NUMBER
-            VALUE "InternalName", PLUGIN_NAME
-            VALUE "LegalCopyright", "Copyright © 2002-2024 UltraVNC Team Members. All Rights Reserved."
-            VALUE "OriginalFilename", PLUGIN_FILE
+#if isRC == 1
+#include "buildtime.h" // Defines macro BUILDTIME
+            VALUE "Buildtime", BUILDTIME
+#endif
+            VALUE "Comments", ""
+            VALUE "CompanyName", STR_COMPANYNAME
+            VALUE "FileDescription", "UltraVNC MS RC4 Encryption Plugin"
+            VALUE "FileVersion", STR_FILEVERSION_ADDON
+            VALUE "InternalName", "MSRC4Plugin"
+            VALUE "LegalCopyright", STR_COPYRIGHT
+            VALUE "OriginalFilename", "MSRC4Plugin.dsm"
             VALUE "PrivateBuild", ""
-            VALUE "ProductName", PLUGIN_NAME BUILD_NUMBER
-            VALUE "ProductVersion", BUILD_NUMBER
-            VALUE "SpecialBuild", ""
+            VALUE "ProductName", "UltraVNC MSRC4Plugin"
+            VALUE "ProductVersion", STR_PRODUCTVERSION_MSRC4PLUGIN
+#if isRC == 1
+            VALUE "SpecialBuild", STR_SPECIALBUILD_MSRC4PLUGIN
+#endif
         END
     END
     BLOCK "VarFileInfo"
     BEGIN
-        VALUE "Translation", 0x409, 1200
+        VALUE "Translation", 0x0, 1200
     END
 END
 

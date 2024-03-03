@@ -25,7 +25,7 @@
 #include "vncviewer.h"
 #include "SessionDialog.h"
 #include <shlobj.h>
-#include "common/win32_helpers.h"
+#include "../common/win32_helpers.h"
 #include "UltraVNCHelperFunctions.h"
 
 BOOL CALLBACK DlgProcEncoders(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);

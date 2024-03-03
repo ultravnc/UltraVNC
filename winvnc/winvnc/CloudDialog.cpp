@@ -46,13 +46,13 @@ void CloudDialog::LoadFromIniFile()
 {
 #ifndef SC_20
 	settings->load();
-#endif
+#endif // SC_20
 }
 void CloudDialog::SaveToIniFile()
 {
 #ifndef SC_20
 	settings->save();
-#endif
+#endif // SC_20
 }
 
 // Initialisation
@@ -90,7 +90,7 @@ CloudDialog::DialogProc(HWND hwnd,
 	CloudDialog* _this = (CloudDialog*)GetWindowLong(hwnd, GWL_USERDATA);
 #else
 	CloudDialog* _this = (CloudDialog*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
-#endif
+#endif // _X64
 	switch (uMsg)
 	{
 
@@ -102,7 +102,7 @@ CloudDialog::DialogProc(HWND hwnd,
 		SetWindowLong(hwnd, GWL_USERDATA, lParam);
 #else
 		SetWindowLongPtr(hwnd, GWLP_USERDATA, lParam);
-#endif
+#endif // _X64
 		_this = (CloudDialog*)lParam;
 		if (_this->SC) {
 			ShowWindow(GetDlgItem(hwnd, IDC_CHECKCLOUD), false);
@@ -224,4 +224,4 @@ CloudDialog::DialogProc(HWND hwnd,
 	}
 	return 0;
 }
-#endif
+#endif // _CLOUD

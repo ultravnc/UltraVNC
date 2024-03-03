@@ -29,7 +29,7 @@
 
 #include "LowLevelHook.h"
 #include "res/resource.h"
-#include "common/win32_helpers.h"
+#include "../common/win32_helpers.h"
 
 HWND LowLevelHook::g_hwndVNCViewer=NULL;
 DWORD LowLevelHook::g_VncProcessID=0;

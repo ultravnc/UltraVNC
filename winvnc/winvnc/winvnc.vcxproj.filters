@@ -3,7 +3,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\common\Clipboard.cpp" />
     <ClCompile Include="benchmark.cpp" />
-    <ClCompile Include="buildtime.cpp" />
+    <ClCompile Include="..\..\common\buildtime.cpp" />
     <ClCompile Include="CpuUsage.cpp" />
     <ClCompile Include="..\..\rfb\dh.cpp" />
     <ClCompile Include="..\..\DSMPlugin\DSMPlugin.cpp" />

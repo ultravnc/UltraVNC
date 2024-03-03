@@ -27,8 +27,9 @@
 #include <stdio.h>
 #include "stdhdrs.h"
 #ifdef SC_20
-#include "../loadmemory/loadDllFromMemory.h"
-#endif
+	#include "../loadmemory/loadDllFromMemory.h"
+#endif // SC_20
+
 //-----------------------------------------------------------
 DeskDupEngine::DeskDupEngine()
 {
@@ -62,7 +63,7 @@ DeskDupEngine::DeskDupEngine()
 			*p = '\0';
 			strcat_s(szCurrentDir, "\\ddengine64.dll");
 		}
-#endif	
+#endif // _X64
 #ifdef SC_20
 		loadDllFromMemory = std::make_unique<LoadDllFromMemory>();
 		loadDllFromMemory->loadDDengine( StartW8,  StartW8V2,  StopW8,  LockW8,  UnlockW8,  ShowCursorW8,  HideCursorW8);
@@ -79,7 +80,7 @@ DeskDupEngine::DeskDupEngine()
 			strcat_s(szCurrentDir, "\\ddengine.dll");
 		}
 		
-#endif
+#endif // _X64
 		hModule = LoadLibrary(szCurrentDir);
 		if (hModule) {
 			StartW8 = (StartW8Fn)GetProcAddress(hModule, "StartW8");
@@ -97,14 +98,14 @@ DeskDupEngine::DeskDupEngine()
 		}
 		else
 			init = false;
-#endif		
+#endif // SC_20
 	}
 
 #ifdef _DEBUG
 	char			szText[256];
 	sprintf_s(szText, "DeskDupEngine\n");
 	OutputDebugString(szText);
-#endif
+#endif // _DEBUG
 	hScreenEvent = NULL;
 	hPointerEvent = NULL;
 }
@@ -115,7 +116,7 @@ DeskDupEngine::~DeskDupEngine()
 	char			szText[256];
 	sprintf_s(szText, "~DeskDupEngine\n");
 	OutputDebugString(szText);
-#endif
+#endif // _DEBUG
 	videoDriver_Stop();
 	if (osVer == OSWIN10) {
 		if (hModule)
@@ -129,7 +130,7 @@ void DeskDupEngine::videoDriver_start(int x, int y, int w, int h, bool onlyVirtu
 	char			szText[256];
 	sprintf_s(szText, "DeskDupEngine Start\n");
 	OutputDebugString(szText);
-#endif
+#endif // _DEBUG
 	oldAantal = 1;
 
 	if (!init)
@@ -195,7 +196,7 @@ void DeskDupEngine::videoDriver_Stop()
 	char			szText[256];
 	sprintf_s(szText, "DeskDupEngine Stop\n");
 	OutputDebugString(szText);
-#endif
+#endif // _DEBUG
 	if (!init)
 		return;	
 	if (fileView)

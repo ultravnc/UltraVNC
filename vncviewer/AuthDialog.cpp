@@ -30,7 +30,7 @@
 #include "AuthDialog.h"
 #include "Exception.h"
 #include <windowsx.h>
-#include "common/win32_helpers.h"
+#include "../common/win32_helpers.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

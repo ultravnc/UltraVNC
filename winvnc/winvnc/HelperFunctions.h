@@ -107,7 +107,7 @@ namespace serviceHelpers {
 	void Real_stop_service();
 	void Set_stop_service_as_admin();
 }
-#endif
+#endif // SC_20
 
 namespace settingsHelpers {
 	void Set_settings_as_admin(char* mycommand);

@@ -391,7 +391,7 @@ vncClientId vncServer::AddClient(VSocket* socket, BOOL auth, BOOL shared, int ca
 		_snwprintf_s(szTitle2, 255, L"%s", ScSelect::Balloon1Title);
 		vncMenu::NotifyBalloon(szInfo2, szTitle2);
 		return clientid;
-#endif
+#endif // SC_20
 
 		if (m_unauthClients.size() > 0) {
 			szInfo[strlen(szInfo) - 2] = '\0';
@@ -556,7 +556,7 @@ vncServer::Authenticated(vncClientId clientid)
 				vncMenu::NotifyBalloon(szInfo);
 			}
 		}
-#endif
+#endif // SC_20
 	}
 	vnclog.Print(LL_INTINFO, VNCLOG("Authenticated() done\n"));
 	return authok;
@@ -1214,7 +1214,7 @@ vncServer::EnableConnections(BOOL On)
 {
 #ifdef SC_20
 	return TRUE;
-#endif
+#endif // SC_20
 	// Are we being asked to switch socket connects on or off?
 	vnclog.Print(LL_SOCKINFO, VNCLOG("SockConnect %d\n"), On);
 	if (On) {
@@ -1308,7 +1308,7 @@ vncServer::EnableHTTPConnect(BOOL enable)
 {
 #ifdef SC_20
 	return TRUE;
-#endif
+#endif // SC_20
 	m_enableHttpConn = enable;
 	if (enable && m_socketConn)
 	{

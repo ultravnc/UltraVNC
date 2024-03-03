@@ -26,7 +26,7 @@
 #include "stdhdrs.h"
 #include "lmcons.h"
 #include "vncOSVersion.h"
-#include "common/ScopeGuard.h"
+#include "../common/ScopeGuard.h"
 #include "SettingsManager.h"
 #include "credentials.h"
 

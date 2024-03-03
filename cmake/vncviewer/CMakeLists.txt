@@ -47,6 +47,7 @@ include(../CMakeLists_libzipunzip.txt)
 set(VNCVIEWER_SOURCES
     ../DSMPlugin/DSMPlugin.cpp
     ../ZipUnZip32/ZipUnzip32.cpp
+    ../common/buildtime.cpp
     ../common/Clipboard.cpp
     ../common/d3des.c
     ../common/UltraVncZ.cpp
@@ -90,7 +91,6 @@ set(VNCVIEWER_SOURCES
     VNCOptions.cpp
     VNCviewerApp.cpp
     VNCviewerApp32.cpp
-    buildtime.cpp
     directx/directxviewer.cpp
     display.cpp
     sessiondialogLoadSave.cpp

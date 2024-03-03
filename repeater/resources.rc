@@ -1,28 +1,3 @@
-/////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
-//
-//  This program is free software; you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 2 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
-//  USA.
-//
-//  If the source code for the program is not available from the place from
-//  which you received this file, check
-//  https://uvnc.com/
-//
-////////////////////////////////////////////////////////////////////////////
-
-
 // Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
@@ -40,12 +15,16 @@
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
-/////////////////////////////////////////////////////////////////////////////
-// Dutch (Belgium) resources
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NLB)
-LANGUAGE LANG_DUTCH, SUBLANG_DUTCH_BELGIAN
+/////////////////////////////////////////////////////////////////////////////
+// Neutral resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEU)
+#ifdef _WIN32
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 #pragma code_page(65001)
+#endif //_WIN32
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -55,6 +34,7 @@ LANGUAGE LANG_DUTCH, SUBLANG_DUTCH_BELGIAN
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDI_MYICON              ICON                    "winvnc.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -163,12 +143,12 @@ END
 #endif    // APSTUDIO_INVOKED
 
 
+#ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
 //
 // DESIGNINFO
 //
 
-#ifdef APSTUDIO_INVOKED
 GUIDELINES DESIGNINFO
 BEGIN
     ID_SETTINGS, DIALOG
@@ -192,14 +172,18 @@ END
 #endif    // APSTUDIO_INVOKED
 
 
+#ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
 //
 // Version
 //
 
+// Defines STR_COMPANYNAME, STR_FILEVERSION, STR_PRODUCTVERSION, STR_COPYRIGHT,
+// STR_SPECIALBUILD, FILEVERSION, PRODUCTVERSION
+#include "../common/versioninfo.h"
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,5,0,0
- PRODUCTVERSION 1,5,0,0
+ FILEVERSION INT_FILEVERSION_REPEATER
+ PRODUCTVERSION INT_PRODUCTVERSION_REPEATER
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -212,28 +196,37 @@ VS_VERSION_INFO VERSIONINFO
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
-        BLOCK "081304b0"
+        BLOCK "000004b0"
         BEGIN
+#if isRC == 1
+#include "buildtime.h" // Defines macro BUILDTIME
+            VALUE "Buildtime", BUILDTIME
+#endif
             VALUE "Comments", "UltraVNC Repeater"
-            VALUE "CompanyName", "uvnc bvba"
+            VALUE "CompanyName", STR_COMPANYNAME
             VALUE "FileDescription", "UltraVNC Repeater"
-            VALUE "FileVersion", "1.5.0.0"
+            VALUE "FileVersion", STR_FILEVERSION_REPEATER
             VALUE "InternalName", "Repeater"
-            VALUE "LegalCopyright", "Copyright © 2002-2024 UltraVNC Team Members. All Rights Reserved."
+            VALUE "LegalCopyright", STR_COPYRIGHT
             VALUE "OriginalFilename", "repeater.exe"
             VALUE "PrivateBuild", ""
             VALUE "ProductName", "UltraVNC Repeater"
-            VALUE "ProductVersion", "1.5.0.0"
-            VALUE "SpecialBuild", ""
+            VALUE "ProductVersion", STR_PRODUCTVERSION_REPEATER
+#if isRC == 1
+            VALUE "SpecialBuild", STR_SPECIALBUILD_REPEATER
+#endif
         END
     END
     BLOCK "VarFileInfo"
     BEGIN
-        VALUE "Translation", 0x813, 1200
+        VALUE "Translation", 0x0, 1200
     END
 END
 
-#endif    // Dutch (Belgium) resources
+#endif    // !_MAC
+
+
+#endif    // Neutral resources
 /////////////////////////////////////////////////////////////////////////////
 
 

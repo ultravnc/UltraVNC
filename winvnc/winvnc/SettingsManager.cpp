@@ -24,7 +24,7 @@
 
 
 #include "SettingsManager.h"
-#include <common/rfb.h>
+#include <../common/rfb.h>
 #include "vncpasswd.h"
 #include <VersionHelpers.h>
 #include <userenv.h>
@@ -86,7 +86,7 @@ void SettingsManager::setDefaults()
 	memset(reinterpret_cast<void*>(m_pref_DSMPluginConfig), 0, sizeof(m_pref_DSMPluginConfig));
 #ifdef SC_20
 	strcpy_s(m_pref_DSMPluginConfig, "DSMPluginConfig = SecureVNC; 0; 0x00104001;");
-#endif
+#endif // SC_20
 	memset(reinterpret_cast<void*>(m_pref_service_commandline), 0, sizeof(m_pref_service_commandline));
 	memset(reinterpret_cast<void*>(m_pref_accept_reject_mesg), 0, sizeof(m_pref_accept_reject_mesg));
 	memset(reinterpret_cast<void*>(m_pref_passwd), 0, sizeof(m_pref_passwd));
@@ -95,7 +95,7 @@ void SettingsManager::setDefaults()
 	memset(reinterpret_cast<void*>(m_pref_szDSMPlugin), 0, sizeof(m_pref_szDSMPlugin));
 #else
 	strcpy_s(m_pref_szDSMPlugin, "SecureVNCPlugin.dsm");
-#endif
+#endif // SC_20
 	
 	memset(reinterpret_cast<void*>(m_pref_authhosts), 0, sizeof(m_pref_authhosts));
 
@@ -120,7 +120,7 @@ void SettingsManager::setDefaults()
 	m_pref_PortNumber = RFB_PORT_OFFSET;
 	m_pref_EnableConnection = false;
 	m_pref_HttpPortNumber = DISPLAY_TO_HPORT(PORT_TO_DISPLAY(m_pref_PortNumber));
-#endif
+#endif // SC_20
 
 	m_pref_QuerySetting = 2;
 	m_pref_QueryTimeout = 10;
@@ -143,7 +143,7 @@ void SettingsManager::setDefaults()
 #else
 	m_pref_Frame = true;
 	m_pref_Notification = true;
-#endif
+#endif // SC_20
 	m_pref_OSD = FALSE;
 	m_pref_NotificationSelection = 0;
 	m_pref_RemoveWallpaper = FALSE;
@@ -170,13 +170,13 @@ void SettingsManager::setDefaults()
 	m_pref_Noscreensaver = 0;
 #ifdef SC_20
 	m_pref_Noscreensaver = 1;	
-#endif
+#endif // SC_20
 	m_pref_LoopbackOnly = false;
 	m_pref_AllowLoopback = true;
 	m_pref_AuthRequired = true;
 #ifdef SC_20
 	m_pref_AuthRequired = false;
-#endif
+#endif // SC_20
 	m_pref_ConnectPriority = 0;
 
 	m_pref_DebugMode = 0;
@@ -200,7 +200,7 @@ void SettingsManager::setDefaults()
 	m_pref_ScExit = true;
 	m_pref_ScPrompt = true;
 
-#endif
+#endif // SC_20
 
 	m_pref_ddEngine = IsWindows8OrGreater();
 	m_pref_TurboMode = TRUE;
@@ -217,7 +217,7 @@ void SettingsManager::setDefaults()
 	m_pref_autocapt = 1;
 #ifdef IPV6V4
 	m_pref_ipv6_allowed = false;
-#endif
+#endif // IPV6V4
 	m_pref_RunninAsAdministrator = false;
 
 	memset(reinterpret_cast<void*>(m_pref_group1), 0, sizeof(m_pref_group1));
@@ -248,7 +248,7 @@ void SettingsManager::load()
 	myIniFile.ReadString("admin", "DSMPluginConfig", m_pref_DSMPluginConfig, 512);
 #ifdef IPV6V4
 	m_pref_ipv6_allowed = myIniFile.ReadInt("admin", "UseIpv6", m_pref_ipv6_allowed);
-#endif
+#endif // IPV6V4
 	m_pref_AllowLoopback = myIniFile.ReadInt("admin", "AllowLoopback", m_pref_AllowLoopback);
 	m_pref_AuthRequired = myIniFile.ReadInt("admin", "AuthRequired", m_pref_AuthRequired);
 	m_pref_ConnectPriority = myIniFile.ReadInt("admin", "ConnectPriority", m_pref_ConnectPriority);
@@ -274,7 +274,7 @@ void SettingsManager::load()
 	m_pref_Avilog = myIniFile.ReadInt("admin", "Avilog", m_pref_Avilog);
 #ifdef IPV6V4
 	m_pref_UseIpv6 = myIniFile.ReadInt("admin", "UseIpv6", m_pref_UseIpv6);
-#endif
+#endif // IPV6V4
 	m_pref_EnableFileTransfer = myIniFile.ReadInt("admin", "FileTransferEnabled", m_pref_EnableFileTransfer);
 	m_pref_FTUserImpersonation = myIniFile.ReadInt("admin", "FTUserImpersonation", m_pref_FTUserImpersonation); // sf@2005
 	m_pref_EnableBlankMonitor = myIniFile.ReadInt("admin", "BlankMonitorEnabled", m_pref_EnableBlankMonitor);
@@ -330,7 +330,7 @@ void SettingsManager::load()
 	m_pref_locdom1 = myIniFile.ReadInt("admin_auth", "locdom1", m_pref_locdom1);
 	m_pref_locdom2 = myIniFile.ReadInt("admin_auth", "locdom2", m_pref_locdom2);
 	m_pref_locdom3 = myIniFile.ReadInt("admin_auth", "locdom3", m_pref_locdom3);
-#endif
+#endif // SC_20
 	m_pref_TurboMode = myIniFile.ReadInt("poll", "TurboMode", m_pref_TurboMode);
 	m_pref_PollUnderCursor = myIniFile.ReadInt("poll", "PollUnderCursor", m_pref_PollUnderCursor);
 	m_pref_PollForeground = myIniFile.ReadInt("poll", "PollForeground", m_pref_PollForeground);
@@ -420,7 +420,7 @@ void SettingsManager::save()
 	myIniFile.WriteInt("admin", "AllowLoopback", m_pref_AllowLoopback);
 #ifdef IPV6V4
 	myIniFile.WriteInt("admin", "UseIpv6", settings->getIPV6());
-#endif
+#endif // IPV6V4
 	myIniFile.WriteInt("admin", "LoopbackOnly", m_pref_LoopbackOnly);
 	myIniFile.WriteInt("admin", "AllowShutdown", m_pref_allowshutdown);
 	myIniFile.WriteInt("admin", "AllowProperties", m_pref_allowproperties);

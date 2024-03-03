@@ -62,7 +62,7 @@ void VNCLog::SetMode(int mode)
 {
 #ifdef SC_20
     return;
-#endif
+#endif // SC_20
 	m_mode = mode;
     if (mode & ToDebug)
         m_todebug = true;
@@ -109,7 +109,7 @@ void VNCLog::SetFile()
 {
 #ifdef SC_20
     return;
-#endif
+#endif // SC_20
 	char temp[512];
 	IniFile myIniFile;
 	myIniFile.ReadString("admin", "path", temp,512);
@@ -126,7 +126,7 @@ void VNCLog::OpenFile()
 {
 #ifdef SC_20
     return;
-#endif
+#endif // SC_20
 	// Is there a file-name?
 	if (strlen(m_filename) == 0)
 	{
@@ -178,7 +178,7 @@ void VNCLog::OpenFile()
 void VNCLog::CloseFile() {
 #ifdef SC_20
     return;
-#endif
+#endif // SC_20
     if (hlogfile != NULL) {
         CloseHandle(hlogfile);
         hlogfile = NULL;
@@ -189,7 +189,7 @@ inline void VNCLog::ReallyPrintLine(const char* line)
 {
 #ifdef SC_20
     return;
-#endif
+#endif // SC_20
     if (m_todebug) OutputDebugString(line);
     if (m_toconsole) {
         DWORD byteswritten;
@@ -205,7 +205,7 @@ void VNCLog::ReallyPrint(const char* format, va_list ap)
 {
 #ifdef SC_20
     return;
-#endif
+#endif // SC_20
 	time_t current = time(0);
 	if (current != m_lastLogTime) {
 		m_lastLogTime = current;

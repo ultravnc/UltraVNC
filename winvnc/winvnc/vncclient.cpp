@@ -73,7 +73,7 @@
 #include <iterator>
 #include <shlobj.h>
 #include "vncOSVersion.h"
-#include "common/win32_helpers.h"
+#include "../common/win32_helpers.h"
 #include "uvncUiAccess.h"
 #include "VirtualDisplay.h"
 #include<map>
@@ -912,7 +912,7 @@ vncClientThread::FilterClients_Ask_Permission()
 	}
 	return TRUE;
 }
-#endif
+#endif // SC_20
 
 // RDV 2010-4-10
 // Filter Blacklisted are refused connection
@@ -1073,7 +1073,7 @@ void vncClientThread::LogAuthResult(bool success, bool isconnected)
 			FreeLibrary(hModule);
 		}
 	}
-#endif
+#endif // SC_20
 }
 
 BOOL
@@ -1105,7 +1105,7 @@ vncClientThread::InitAuthenticate()
 			SendConnFailed("Your connection has been rejected.");
 			return FALSE;
 		}
-#endif
+#endif // SC_20
 		if (!AuthenticateLegacyClient(true)) {
 			return FALSE;
 		}
@@ -1173,7 +1173,7 @@ vncClientThread::InitAuthenticate()
 		vnclog.Print(LL_CLIENTS, VNCLOG("Your connection has been rejected.\n"));
 		return FALSE;
 	}
-#endif
+#endif // SC_20
 
 	// If the client wishes to have exclusive access then remove other clients
 	if (settings->getConnectPriority() == 3 && !m_shared)
@@ -3735,7 +3735,7 @@ vncClientThread::run(void* arg)
 			{
 				fUserOk = m_client->DoFTUserImpersonation();
 			}
-#endif
+#endif // SC_20
 
 			if (!m_client->m_keyboardenabled || !m_client->m_pointerenabled) fUserOk = false; //PGM
 
@@ -4442,7 +4442,7 @@ vncClientThread::run(void* arg)
 		{
 			m_client->UndoFTUserImpersonation();
 		}
-#endif
+#endif // SC_20
 	}
 
 	if (fShutdownOrdered) {
@@ -4505,7 +4505,7 @@ vncClientThread::run(void* arg)
 		Logevent((char*)m_client->GetClientNameName(), (char*)m_client->GetClientDomainUsername(), m_client->GetClientId(), m_client->m_keyboardenabled && m_client->m_pointerenabled);
 		FreeLibrary(hModule);
 	}
-#endif
+#endif // SC_20
 
 	// Disable the protocol to ensure that the update thread
 	// is not accessing the desktop and buffer objects
@@ -6609,7 +6609,7 @@ void vncClient::UndoFTUserImpersonation()
 	desktopUsersToken = NULL;
 	m_hPToken = 0;
 }
-#endif
+#endif // SC_20
 
 // 10 April 2008 jdp paquette@atnetsend.net
 // This can crash as we can not send middle in an update...

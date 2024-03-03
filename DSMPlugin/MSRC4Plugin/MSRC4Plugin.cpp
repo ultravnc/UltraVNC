@@ -52,7 +52,7 @@
 #include <tchar.h>
 #include "logging.h"
 
-#include <wincrypt.h>       //windows crypto api
+#include <wincrypt.h>       // Windows crypto api
 
 #ifdef _WITH_REGISTRY // PGM registry not used in 1.2.4
 	#include "REGISTRY.h"
@@ -61,7 +61,6 @@
 #include "MSRC4Plugin.h"
 #include "crypto.h"
 #include "utils.h"
-#include "version.h"
 
 #ifdef _WITH_LOG // PGM ifdef'ed all logging out as any logging can cause crash trying to access log file in program files folder on Windows Vista and Windows 7 so log not used in 1.4.0. Might move log to temp or public folder later if needed. Do same with registry access #ifdef _WITH_REGISTRY
 	static const TCHAR * INDEXVAL_LOG = _T("DebugLog");
@@ -92,11 +91,8 @@ int HeaderLen = SALT_SIZE + IV_SIZE; //length of additional header
 // The other fields (Name, Date, Author, FileName) are format free (don't use ',' in them, of course)
 
 #ifdef _WITH_REGISTRY
-#define PLUGIN_FILE "MSRC4Plugin.dsm"
-#define PLUGIN_DESCRIPTION  "MS RC4 Encryption Plugin, Sean E. Covel, 2005-03-12, " BUILD_NUMBER, PLUGIN_FILE
-#else
-#define PLUGIN_FILE "MSRC4Plugin140.dsm"
-#define PLUGIN_DESCRIPTION  "MS RC4 Encryption Plugin, Sean E. Covel, Updated: 2009-03-22, " BUILD_NUMBER, PLUGIN_FILE
+    #define PLUGIN_FILE "MSRC4Plugin.dsm"
+    #define PLUGIN_DESCRIPTION  "MS RC4 Encryption Plugin, Sean E. Covel, Updated: 2024, " STR_VERSION_MSRC4PLUGIN, PLUGIN_FILE
 #endif
 
 char getParams[BUFFER_SIZE];

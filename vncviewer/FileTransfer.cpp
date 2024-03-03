@@ -59,7 +59,7 @@
 #include "Log.h"
 #include <string>
 #include <vector>
-#include "common/win32_helpers.h"
+#include "../common/win32_helpers.h"
 #include "shlwapi.h"
 #include "UltraVNCHelperFunctions.h"
 #pragma comment(lib, "Shlwapi.lib")
