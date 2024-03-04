@@ -56,7 +56,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UdtCloudlib", "..\UdtCloudl
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "unz32lib", "..\zipunzip_src\unzip\windll\vc6\lib\unz32lib.vcxproj", "{F9321962-FBED-4581-BF7D-D0EBC303D891}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "uvnc_settings", "..\uvnc_settings2\uvnc_settings\uvnc_settings.vcxproj", "{3B4D8565-E321-48B6-BF15-4EB7ADEC6BFC}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "uvnc_settings", "..\uvnc_settings\uvnc_settings\uvnc_settings.vcxproj", "{3B4D8565-E321-48B6-BF15-4EB7ADEC6BFC}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vnchooks", "vnchooks\vnchooks.vcxproj", "{1D18E045-6B72-43F4-ACBD-3E679A3DE349}"
 EndProject

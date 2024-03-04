@@ -114,10 +114,10 @@ UdtCloudlib/Debug
 UdtCloudlib/Release
 UdtCloudlib/x64/
 
-uvnc_settings2/uvnc_settings/.vs/
-uvnc_settings2/uvnc_settings/Debug/
-uvnc_settings2/uvnc_settings/Release/
-uvnc_settings2/uvnc_settings/x64/
+uvnc_settings/uvnc_settings/.vs/
+uvnc_settings/uvnc_settings/Debug/
+uvnc_settings/uvnc_settings/Release/
+uvnc_settings/uvnc_settings/x64/
 
 vncviewer/.vs/
 vncviewer/Debug/
