@@ -309,9 +309,6 @@
     <ClInclude Include="Log.h">
       <Filter>Source Files\header</Filter>
     </ClInclude>
-    <ClInclude Include="Natplugin.h">
-      <Filter>Resources</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\B46.ico">
@@ -412,30 +409,6 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\stat\background2.bmp">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="res\background2.bmp">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="res\bitmap1.bmp">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="res\bitmap2.bmp">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="res\stat\bitmap4.bmp">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="res\stat\bitmap5.bmp">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="res\stat\bitmap8.bmp">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="res\stat\bitmap9.bmp">
-      <Filter>Resources</Filter>
-    </None>
     <None Include="COPYING.txt">
       <Filter>Resources</Filter>
     </None>
@@ -457,52 +430,7 @@
     <None Include="res\nocursor.cur">
       <Filter>Resources</Filter>
     </None>
-    <None Include="Tango_l.bmp">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="Tango_lx.bmp">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="Tango_s.bmp">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="Tango_sx.bmp">
-      <Filter>Resources</Filter>
-    </None>
     <None Include="ToDo.txt">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="res\toolbar1.bmp">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="res\toollb_large.bmp">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="res\toollb_largecolor.bmp">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="res\toollb_largecolormx.bmp">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="res\toollb_largemouseX.bmp">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="res\toollb_small.bmp">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="res\toollb_smallcolor.bmp">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="res\toollb_smallcolormx.bmp">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="res\toollb_smallmouseX.bmp">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="res\ultra-logo.bmp">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="res\vnc.bmp">
       <Filter>Resources</Filter>
     </None>
   </ItemGroup>

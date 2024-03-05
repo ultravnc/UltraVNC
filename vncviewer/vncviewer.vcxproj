@@ -1058,33 +1058,10 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\ipv6</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="res\background2.bmp" />
     <None Include="res\cursor1.cur" />
     <None Include="res\cursorsel.cur" />
     <None Include="res\Finger.cur" />
     <None Include="res\nocursor.cur" />
-    <None Include="res\stat\background2.bmp" />
-    <None Include="res\bitmap1.bmp" />
-    <None Include="res\bitmap2.bmp" />
-    <None Include="res\stat\bitmap4.bmp" />
-    <None Include="res\stat\bitmap5.bmp" />
-    <None Include="res\stat\bitmap8.bmp" />
-    <None Include="res\stat\bitmap9.bmp" />
-    <None Include="Tango_l.bmp" />
-    <None Include="Tango_lx.bmp" />
-    <None Include="Tango_s.bmp" />
-    <None Include="Tango_sx.bmp" />
-    <None Include="res\toolbar1.bmp" />
-    <None Include="res\toollb_large.bmp" />
-    <None Include="res\toollb_largecolor.bmp" />
-    <None Include="res\toollb_largecolormx.bmp" />
-    <None Include="res\toollb_largemouseX.bmp" />
-    <None Include="res\toollb_small.bmp" />
-    <None Include="res\toollb_smallcolor.bmp" />
-    <None Include="res\toollb_smallcolormx.bmp" />
-    <None Include="res\toollb_smallmouseX.bmp" />
-    <None Include="res\ultra-logo.bmp" />
-    <None Include="res\vnc.bmp" />
     <None Include="COPYING.txt" />
     <None Include="History.txt" />
     <None Include="LICENCE.txt" />
@@ -2316,7 +2293,6 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\ipv6</Command>
     <ClInclude Include="LowLevelHook.h" />
     <ClInclude Include="MRU.h" />
     <ClInclude Include="multimon.h" />
-    <ClInclude Include="Natplugin.h" />
     <ClInclude Include="res\resource.h" />
     <ClInclude Include="rfb.h" />
     <ClInclude Include="SessionDialog.h" />
