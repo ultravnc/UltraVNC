@@ -42,8 +42,14 @@
 #include <rdr/MemInStream.h>
 #include <rdr/ZlibOutStream.h>
 #include <rdr/ZlibInStream.h>
+#ifdef _VCPKG
+#include  <zlib.h>
+#include  <zstd.h>
+#else
 #include "../zlib/zlib.h"
 #include "../zstd/lib/zstd.h"
+#endif
+
 
 
 

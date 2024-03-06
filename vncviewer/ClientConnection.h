@@ -36,7 +36,7 @@
 #include "KeyMapjap.h"
 #include <rdr/types.h>
 #include "../common/UltraVncZ.h"
-#ifdef _INTERNALLIB
+#ifdef _VCPKG
 #include <zlib.h>
 #include <zstd.h>
 #else
@@ -46,7 +46,7 @@
 
 extern "C"
 {
-#ifdef _INTERNALLIB
+#ifdef _VCPKG
 #include <jpeglib.h>
 #else
 #include "libjpeg-turbo-win/jpeglib.h"

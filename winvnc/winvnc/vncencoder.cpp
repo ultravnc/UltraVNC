@@ -29,8 +29,13 @@
 #include "stdhdrs.h"
 #include "vncencoder.h"
 #include "vncbuffer.h"
+#ifdef _VCPKG
+#include <zlib.h>
+#include <zstd.h>
+#else
 #include "../zlib/zlib.h"
 #include "../zstd/lib/zstd.h"
+#endif
 
 
 // Pixel format used internally when the client is palette-based & server is truecolour

@@ -26,7 +26,7 @@
 #pragma once
 
 #include "InStream.h"
-#ifdef _INTERNALLIB
+#ifdef _VCPKG
 #include <zstd.h>
 #else
 #include "../zstd/lib/zstd.h"
