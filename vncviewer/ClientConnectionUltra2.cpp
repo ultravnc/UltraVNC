@@ -29,7 +29,7 @@
 #include "stdhdrs.h"
 #include "vncviewer.h"
 #include "ClientConnection.h"
-#ifdef _INTERNALLIB
+#ifdef _VCPKG
 #include <jpeglib.h>
 #else
 #include "libjpeg-turbo-win/jpeglib.h"

@@ -40,7 +40,11 @@ class vncEncodeTight;
 
 extern "C"
 {
+#ifdef _VCPKG
+#include <jpeglib.h>
+#else
 #include "libjpeg-turbo-win/jpeglib.h"
+#endif
 }
 #include <math.h>
 

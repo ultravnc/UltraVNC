@@ -49,7 +49,7 @@
 #include "Exception.h"
 #include "commctrl.h"
 #include "shlobj.h"
-#ifdef _INTERNALLIB
+#ifdef _VCPKG
 #include <zlib.h>
 #include <zstd.h>
 #else

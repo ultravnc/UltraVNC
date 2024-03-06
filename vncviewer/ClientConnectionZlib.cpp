@@ -30,7 +30,7 @@
 #include "vncviewer.h"
 #include "ClientConnection.h"
 #include "Exception.h"
-#ifdef _INTERNALLIB
+#ifdef _VCPKG
 #include <zlib.h>
 #include <zstd.h>
 #else

@@ -60,8 +60,13 @@
 #include "rfb/dh.h"
 #include "vncauth.h"
 
+#ifdef _VCPKG
+#include <zlib.h>
+#include <zstd.h>
+#else
 #include "../zlib/zlib.h"
 #include "../zstd/lib/zstd.h"
+#endif
 
 #include "mmsystem.h" // sf@2002
 #include "sys/types.h"

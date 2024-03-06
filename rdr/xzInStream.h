@@ -30,7 +30,12 @@
 
 #define LZMA_API_STATIC
 #include <stdint.h>
+
+#ifdef _VCPKG
+#include  <lzma.h>
+#else
 #include "../xz/src/liblzma/api/lzma.h"
+#endif
 
 namespace rdr {
 

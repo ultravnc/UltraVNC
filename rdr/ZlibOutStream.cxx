@@ -18,7 +18,7 @@
 
 #include "ZlibOutStream.h"
 #include "Exception.h"
-#ifdef _INTERNALLIB
+#ifdef _VCPKG
 #include <zlib.h>
 #else
 #include "../zlib/zlib.h"
