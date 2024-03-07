@@ -28,7 +28,7 @@
 // written by Assaf Gordon (Assaf@mazleg.com), 10/9/2003
 
 #include "LowLevelHook.h"
-#include "res/resource.h"
+#include "resource.h"
 #include "../common/win32_helpers.h"
 
 HWND LowLevelHook::g_hwndVNCViewer=NULL;

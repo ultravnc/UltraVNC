@@ -258,7 +258,7 @@
     <ClInclude Include="rfb.h">
       <Filter>Source Files\header</Filter>
     </ClInclude>
-    <ClInclude Include="res\resource.h">
+    <ClInclude Include="resource.h">
       <Filter>Source Files\header</Filter>
     </ClInclude>
     <ClInclude Include="multimon.h">
@@ -449,7 +449,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="res\vncviewer.rc">
+    <ResourceCompile Include="vncviewer.rc">
       <Filter>Resources</Filter>
     </ResourceCompile>
   </ItemGroup>

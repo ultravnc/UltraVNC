@@ -871,7 +871,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\win8</Command>
     <ClInclude Include="upnp.h" />
     <ClInclude Include="vncOSVersion.h" />
     <ClInclude Include="vncsetauth.h" />
-    <ClInclude Include="Resource.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="uvnc_settings.h" />
   </ItemGroup>

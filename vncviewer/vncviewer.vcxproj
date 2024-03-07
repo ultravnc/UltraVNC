@@ -2293,7 +2293,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\ipv6</Command>
     <ClInclude Include="LowLevelHook.h" />
     <ClInclude Include="MRU.h" />
     <ClInclude Include="multimon.h" />
-    <ClInclude Include="res\resource.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="rfb.h" />
     <ClInclude Include="SessionDialog.h" />
     <ClInclude Include="stdhdrs.h" />
@@ -2341,7 +2341,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\ipv6</Command>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="res\vncviewer.rc" />
+    <ResourceCompile Include="vncviewer.rc" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\B46.ico" />

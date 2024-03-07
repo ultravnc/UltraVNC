@@ -58,7 +58,7 @@ uvnckeyboardhelper+.rc
     in the RES subdirectory. This file can be directly edited in Microsoft
     Visual C++.
 
-Resource.h
+resource+.h
     This is the standard header file, which defines new resource IDs.
     Microsoft Visual C++ reads and updates this file.
 

@@ -28,7 +28,7 @@
 
 #pragma once
 
-#include "res/resource.h"
+#include "resource.h"
 #include "VNCviewerApp.h"
 #include "Log.h"
 #include "AccelKeys.h"

@@ -46,7 +46,7 @@
 //===========================================================================
 
 #include "stdhdrs.h"
-#include "res/resource.h"
+#include "resource.h"
 #include "FullScreenTitleBar.h"
 #include "Log.h"
 #include "../common/win32_helpers.h"
