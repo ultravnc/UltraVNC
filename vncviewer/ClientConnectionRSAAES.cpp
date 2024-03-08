@@ -578,7 +578,7 @@ struct RSAKEX
 		if (conn.CompareFingerprint(hex))
 			return true;
 		int nButtonPressed = 0;
-		swprintf_s(msg, L"The server has provided the following identifying information:\nFingerprint: %hs\n\nDo you want to continue?\n", hex);
+		swprintf_s(msg, L"The server has provided the following identifying information:\nFingerprint: %hs\n\nCatchphrase: %hs\n\nDo you want to continue?\n", hex, catchphrase);
 		TASKDIALOGCONFIG tc = { 0 };
 		BOOL bPersist = FALSE;
 		tc.cbSize = sizeof(tc);
