@@ -73,29 +73,29 @@ const char winvnchttp[]	= "-httpproxy";
 const char winvncRepeater[]	= "-repeater"; // set default repeater host
 extern char* g_szRepeaterHost;
 
-const char winvncSettingshelper[]		= "-settingshelper";
-const char winvncSettings[]				= "-settings";
-const char winvncStopserviceHelper[]	= "-stopservicehelper";
-const char winvncStopservice[]			= "-stopservice";
-const char winvncStartserviceHelper[]	= "-startservicehelper";
-const char winvncStartservice[]			= "-startservice";
+const char winvncSettingshelper[]			= "-settingshelper";
+const char winvncSettings[]					= "-settings";
+const char winvncStopserviceHelper[]		= "-stopservicehelper";
+const char winvncStopservice[]				= "-stopservice";
+const char winvncStartserviceHelper[]		= "-startservicehelper";
+const char winvncStartservice[]				= "-startservice";
 
-const char winvncInstallService[]		= "-install";
-const char winvncInstallDriver[]		= "-installdriver";
-const char winvncUnInstallService[]		= "-uninstall";
+const char winvncInstallService[]			= "-install";
+const char winvncInstallDriver[]			= "-installdriver";
+const char winvncUnInstallService[]			= "-uninstall";
 const char winvncInstallServiceHelper[]		= "-installhelper";
 const char winvncUnInstallServiceHelper[]	= "-uninstallhelper";
 
-const char winvncSoftwarecad[]		= "-softwarecad";
+const char winvncSoftwarecad[]				= "-softwarecad";
 const char winvncSoftwarecadHelper[]		= "-softwarecadhelper";
 
-const char winvncRebootSafe[]		= "-rebootsafemode";
-const char winvncRebootSafeHelper[]	= "-rebootsafemodehelper";
+const char winvncRebootSafe[]				= "-rebootsafemode";
+const char winvncRebootSafeHelper[]			= "-rebootsafemodehelper";
 
-const char winvncRebootForce[]		= "-rebootforce";
-const char winvncRebootForceHelper[]	= "-rebootforcehelper";
+const char winvncRebootForce[]				= "-rebootforce";
+const char winvncRebootForceHelper[]		= "-rebootforcehelper";
 
-const char winvncdelSoftwarecad[]		= "-delsoftwarecad";
+const char winvncdelSoftwarecad[]			= "-delsoftwarecad";
 const char winvncdelSoftwarecadHelper[]		= "-delsoftwarecadhelper";
 
 const char winvncSecurityEditorHelper[]		= "-securityeditorhelper";
@@ -103,11 +103,17 @@ const char winvncSecurityEditor[]			= "-securityeditor";
 const char winvncKill[]						= "-kill";
 const char winvncopenhomepage[]				= "-openhomepage";
 const char winvncopenforum[]				= "-openforum";
+const char winvncopengithub[]				= "-opengithub";
+const char winvncopenmastodon[]				= "-openmastodon";
+const char winvncopenfacebook[]				= "-openfacebook";
+const char winvncopenxtwitter[]				= "-openxtwitter";
+const char winvncopenreddit[]				= "-openreddit";
+const char winvncopenopenhub[]				= "-openopenhub";
 
-const char dsmpluginhelper[] = "-dsmpluginhelper";
-const char dsmplugininstance[] = "-dsmplugininstance";
+const char dsmpluginhelper[]				= "-dsmpluginhelper";
+const char dsmplugininstance[]				= "-dsmplugininstance";
 
-const char winvncinipath[] = "-inifile";
+const char winvncinipath[]					= "-inifile";
 
 // Usage string
 const char winvncUsageText[]		= "winvnc [-sc_prompt] [-sc_exit] [-id:????] [-stopreconnect][-autoreconnect[ ID:????]] [-connect host[:display]] [-connect host[::port]] [-repeater host[:port]] [-inifile ????] [-run]\n";

@@ -73,6 +73,12 @@ static BOOL AeroWasEnabled = FALSE;
 static unsigned int WM_TASKBARCREATED = 0;
 void Open_homepage();
 void Open_forum();
+void Open_github();
+void Open_mastodon();
+void Open_facebook();
+void Open_xtwitter();
+void Open_reddit();
+void Open_openhub();
 
 //HACK to use name in autoreconnect from service with dyn dns
 extern char dnsname[255];
@@ -798,6 +804,18 @@ bool vncMenu::OpenWebpageFromApp(int iMsg)
 		strcat_s(dir, " -openhomepage");
 	if (iMsg == ID_VISITUSONLINE_FORUM)
 		strcat_s(dir, " -openforum");
+	if (iMsg == ID_VISITUSONLINE_GITHUB)
+		strcat_s(dir, " -opengithub");
+	if (iMsg == ID_VISITUSONLINE_MASTODON)
+		strcat_s(dir, " -openmastodon");
+	if (iMsg == ID_VISITUSONLINE_FACEBOOK)
+		strcat_s(dir, " -openfacebook");
+	if (iMsg == ID_VISITUSONLINE_XTWITTER)
+		strcat_s(dir, " -openxtwitter");
+	if (iMsg == ID_VISITUSONLINE_REDDIT)
+		strcat_s(dir, " -openreddit");
+	if (iMsg == ID_VISITUSONLINE_OPENHUB)
+		strcat_s(dir, " -openopenhub");
 
 	STARTUPINFO          StartUPInfo;
 	PROCESS_INFORMATION  ProcessInfo;
@@ -998,9 +1016,44 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			if (settings->RunningFromExternalService() && OpenWebpageFromService("cmd /c start https://forum.uvnc.com/"));
 			else
 				OpenWebpageFromApp(ID_VISITUSONLINE_FORUM);
-
 			break;
-	
+
+		case ID_VISITUSONLINE_GITHUB:
+			if (settings->RunningFromExternalService() && OpenWebpageFromService("cmd /c start https://github.com/ultravnc"));
+			else 
+				OpenWebpageFromApp(ID_VISITUSONLINE_GITHUB);
+			break;
+
+		case ID_VISITUSONLINE_MASTODON:
+			if (settings->RunningFromExternalService() && OpenWebpageFromService("cmd /c start https://mastodon.social/@ultravnc"));
+			else
+				OpenWebpageFromApp(ID_VISITUSONLINE_MASTODON);
+			break;
+
+		case ID_VISITUSONLINE_FACEBOOK:
+			if (settings->RunningFromExternalService() && OpenWebpageFromService("cmd /c start https://www.facebook.com/ultravnc1"));
+			else 
+				OpenWebpageFromApp(ID_VISITUSONLINE_FACEBOOK);
+			break;
+
+		case ID_VISITUSONLINE_XTWITTER:
+			if (settings->RunningFromExternalService() && OpenWebpageFromService("cmd /c start https://twitter.com/ultravnc1"));
+			else
+				OpenWebpageFromApp(ID_VISITUSONLINE_XTWITTER);
+			break;
+
+		case ID_VISITUSONLINE_REDDIT:
+			if (settings->RunningFromExternalService() && OpenWebpageFromService("cmd /c start https://www.reddit.com/r/ultravnc"));
+			else 
+				OpenWebpageFromApp(ID_VISITUSONLINE_REDDIT);
+			break;
+
+		case ID_VISITUSONLINE_OPENHUB:
+			if (settings->RunningFromExternalService() && OpenWebpageFromService("cmd /c start https://openhub.net/p/ultravnc"));
+			else
+				OpenWebpageFromApp(ID_VISITUSONLINE_OPENHUB);
+			break;
+
 
 		case ID_CLOSE:
 			// User selected Close from the tray menu
