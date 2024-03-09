@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002-2013 UltraVNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,12 +16,11 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the program is not available from the place from
-// which you received this file, check 
-// http://www.uvnc.com/
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
 //
-//////////////////////////////////////////////////////////////////////////// 
- 
+////////////////////////////////////////////////////////////////////////////
 
 
 // Daemon.cpp: implementation of the Daemon class.
@@ -185,20 +184,20 @@ Daemon::Daemon(int port)
 #endif	
 	
 
-	// Create the tray icon
+	// Create the Tray icon
 	AddTrayIcon();
 	
-	// A timer checks that the tray icon is intact
+	// A timer checks that the Tray icon is intact
 	m_timer = SetTimer( m_hwnd, IDT_TRAYTIMER,  15000, NULL);
 }
 
 void Daemon::AddTrayIcon() {
-	vnclog.Print(4, _T("Adding tray icon\n"));
+	vnclog.Print(4, _T("Adding Tray icon\n"));
 	SendTrayMsg(NIM_ADD);
 }
 
 void Daemon::CheckTrayIcon() {
-	vnclog.Print(8, _T("Checking tray icon\n"));
+	vnclog.Print(8, _T("Checking Tray icon\n"));
 	if (!SendTrayMsg(NIM_MODIFY)) {
 		vnclog.Print(4, _T("Tray icon not there - reinstalling\n"));
 		AddTrayIcon();
@@ -206,7 +205,7 @@ void Daemon::CheckTrayIcon() {
 }
 
 void Daemon::RemoveTrayIcon() {
-	vnclog.Print(4, _T("Deleting tray icon\n"));
+	vnclog.Print(4, _T("Deleting Tray icon\n"));
 	SendTrayMsg(NIM_DELETE);
 }
 

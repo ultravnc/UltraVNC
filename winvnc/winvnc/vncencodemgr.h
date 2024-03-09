@@ -1,12 +1,11 @@
-//  Copyright (C) 2020 UltraVNC Team Members. All Rights Reserved.
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //  Copyright (C) 2015 D. R. Commander. All Rights Reserved.
 //  Copyright (C) 2000-2002 Const Kaplinsky. All Rights Reserved.
 //  Copyright (C) 2002 RealVNC Ltd. All Rights Reserved.
 //  Copyright (C) 1999 AT&T Laboratories Cambridge. All Rights Reserved.
 //
-//  This file is part of the VNC system.
-//
-//  The VNC system is free software; you can redistribute it and/or modify
+//  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
@@ -21,14 +20,17 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the VNC system is not available from the place
-// whence you received this file, check http://www.uk.research.att.com/vnc or contact
-// the authors on vnc@uk.research.att.com for information on obtaining it.
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
+
 
 // vncEncodeMgr
 
 // This class is used internally by vncClient to offload the handling of
-// bitmap data encoding and translation.  Trying to avoid bloating the
+// bitmap data encoding and translation. Trying to avoid bloating the
 // already rather bloaty vncClient class!
 
 class vncEncodeMgr;
@@ -55,8 +57,8 @@ class vncEncodeMgr;
 #include "vncbuffer.h"
 
 // Mapping of coarse-grained to fine-grained quality levels, inherited from
-// TigerVNC.  These map roughly to the compression ratios indicated, but only
-// for a fairly arbitrary test case.  Further study on this is warranted.
+// TigerVNC. These map roughly to the compression ratios indicated, but only
+// for a fairly arbitrary test case. Further study on this is warranted.
 // 9 = JPEG quality 100, no subsampling (ratio ~= 10:1)
 //     [this should be lossless, except for round-off error]
 // 8 = JPEG quality 92,  no subsampling (ratio ~= 20:1)
@@ -429,7 +431,7 @@ vncEncodeMgr::SetEncoding(CARD32 encoding, BOOL reinitialize)
 {
 	if (m_scrinfo.format.bitsPerPixel != 32 && encoding == rfbEncodingUltra2)
 	{
-		//This is not supported, jpeg require 32bit buffers
+		//This is not supported, jpeg require 32-bit buffers
 		//to avoif a server crash we switch to zrle encoding
 		//hextile is better as u2 replacement
 		encoding = rfbEncodingHextile;
@@ -553,7 +555,7 @@ vncEncodeMgr::SetEncoding(CARD32 encoding, BOOL reinitialize)
 		vnclog.Print(LL_INTINFO, VNCLOG("Ultra encoder requested\n"));
 		if (m_scrinfo.format.bitsPerPixel != 32 || m_clientformat.bitsPerPixel != 32)
 		{
-			vnclog.Print(LL_INTINFO, VNCLOG("jpeg encoder is only supported on 32bit color display\n"));
+			vnclog.Print(LL_INTINFO, VNCLOG("jpeg encoder is only supported on 32-bit color display\n"));
 			return false;
 		}
 		// Create a Zlib encoder, if needed.
@@ -737,7 +739,7 @@ vncEncodeMgr::SetEncoding(CARD32 encoding, BOOL reinitialize)
 }
 
 // Predict how many update rectangles a given rect will encode to
-// For Raw, RRE or Hextile, this is always 1.  For CoRRE, may be more,
+// For Raw, RRE or Hextile, this is always 1. For CoRRE, may be more,
 // because each update rect is limited in size.
 inline UINT
 vncEncodeMgr::GetNumCodedRects(const rfb::Rect& rect)

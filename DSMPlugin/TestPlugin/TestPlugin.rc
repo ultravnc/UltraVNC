@@ -46,7 +46,7 @@ END
 
 IDD_CONFIG_DIALOG DIALOG DISCARDABLE  0, 0, 186, 95
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION " TestPlugin Configuration"
+CAPTION "UltraVNC TestPlugin - Configuration"
 FONT 8, "MS Sans Serif"
 BEGIN
     DEFPUSHBUTTON   "Save",IDOK,28,75,50,14,NOT WS_VISIBLE | WS_DISABLED
@@ -55,7 +55,7 @@ BEGIN
                     IDC_STATIC,13,6,161,19
     LTEXT           "A Plugin that really does something may get its various parameters from this dialog box",
                     IDC_STATIC,14,27,155,17
-    LTEXT           "By default, Ultr@VNC uses the VNC password as the only Plugin parameter.",
+    LTEXT           "By default, UltraVNC uses the VNC password as the only Plugin parameter.",
                     IDC_STATIC,14,50,161,19
 END
 

@@ -1,8 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002 Ultr@VNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //
-//
-//  The VNC system is free software; you can redistribute it and/or modify
+//  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
@@ -17,8 +16,13 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
 //
-/////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+
+
 #include <setjmp.h>
 #include <windows.h>
 #include <windowsx.h>
@@ -149,7 +153,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
         ptr[1]='\0'; /* truncate program name */
     if(!SetCurrentDirectory(dir)) {
         MessageBox(hwnd, "Cannot set current directory",
-            "Ultravnc", MB_ICONERROR);
+            "UltraVNC", MB_ICONERROR);
         return 1;
     }
 
@@ -261,7 +265,7 @@ static void update_taskbar(void) { /* create the taskbar icon */
     if(error_mode)
         strcpy_s(nid.szTip, "Server is down");
     else
-        strcpy_s(nid.szTip, "UltraVnc Repeater");
+        strcpy_s(nid.szTip, "UltraVNC Repeater");
     nid.uFlags=NIF_TIP;
     /* only nid.szTip and nid.uID are valid, change tip */
     if(Shell_NotifyIcon(NIM_MODIFY, &nid)) /* modify tooltip */

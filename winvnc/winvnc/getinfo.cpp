@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002-2013 UltraVNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,11 +16,13 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the program is not available from the place from
-// which you received this file, check 
-// http://www.uvnc.com/
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
 //
 ////////////////////////////////////////////////////////////////////////////
+
+
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <windows.h> 
@@ -423,10 +425,10 @@ int getinfo(char mytext[1024])
 	{
 		if (osvi.wUnderlyingServicePackMinor)
 		{
-			//Handle the special case of NT 4 SP 6a which Dtwinver treats as SP 6.1
+			// Handle the special case of Windows NT4 SP6a which Dtwinver treats as SP 6.1
 			if (os.IsNTPreWin2k(&osvi, TRUE) && (osvi.wUnderlyingServicePackMajor == 6) && (osvi.wUnderlyingServicePackMinor == 1))
 				_stprintf_s(sBuf, _T("Service Pack: 6a"));
-			//Handle the special case of XP SP 1a which Dtwinver treats as SP 1.1
+			// Handle the special case of Windows XP SP1a which Dtwinver treats as SP 1.1
 			else if (os.IsWindowsXP(&osvi, TRUE) && (osvi.wUnderlyingServicePackMajor == 1) && (osvi.wUnderlyingServicePackMinor == 1))
 				_stprintf_s(sBuf, _T("Service Pack: 1a"));
 			else
@@ -619,19 +621,19 @@ int getinfo(char mytext[1024])
 	if (IsIpv6 && IsIpv4)
 	{
 		char			szText[256];
-		sprintf_s(szText, "Ipv4: %s\nIpv6: %s \n", inet_ntoa(Ipv4Addr.sin_addr), ipstringbuffer);
+		sprintf_s(szText, "IPv4: %s\nIPv6: %s \n", inet_ntoa(Ipv4Addr.sin_addr), ipstringbuffer);
 		strcat_s(mytext, 1024, szText);
 	}
 	else if (IsIpv6)
 	{
 		char			szText[256];
-		sprintf_s(szText, "Ipv6: %s \n", ipstringbuffer);
+		sprintf_s(szText, "IPv6: %s \n", ipstringbuffer);
 		strcat_s(mytext, 1024, szText);
 	}
 	else if (IsIpv4)
 	{
 		char			szText[256];
-		sprintf_s(szText, "Ipv4: %s \n", inet_ntoa(Ipv4Addr.sin_addr));
+		sprintf_s(szText, "IPv4: %s \n", inet_ntoa(Ipv4Addr.sin_addr));
 		strcat_s(mytext, 1024, szText);
 	}
 #else

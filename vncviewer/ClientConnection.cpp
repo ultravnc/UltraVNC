@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002-2020 UltraVNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,11 +16,12 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the program is not available from the place from
-// which you received this file, check 
-// http://www.uvnc.com/
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
 //
 ////////////////////////////////////////////////////////////////////////////
+
 
 #include "stdhdrs.h"
 
@@ -268,7 +269,7 @@ ClientConnection::ClientConnection(VNCviewerApp *pApp, SOCKET sock)
 	m_sock = sock;
 	m_serverInitiated = true;
 	//WE write port and ip in m_port and m_host
-	//Using ipv4 a.b.c.d  ipv6  xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx
+	//Using IPv4 a.b.c.d  IPv6  xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx
 
 #ifdef IPV6V4
 	struct sockaddr_storage svraddr;
@@ -478,7 +479,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	rcCursorX = 0;
 	rcCursorY = 0;
 
-	// Modif sf@2002 - FileTransfer
+	// Modif sf@2002 - File Transfer
 	m_pFileTransfer = new FileTransfer(m_pApp, this);
 	m_filezipbuf = NULL;
 	m_filezipbufsize = 0;
@@ -495,10 +496,10 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_reconnectcounter = 3;
 	m_Is_Listening=0;
 
-	//ms logon
+	// MS-Logon
 	m_ms_logon_I_legacy=false;
 
-	// sf@2002 - FileTransfer on server
+	// sf@2002 - File Transfer on server
 	m_fServerKnowsFileTransfer = false;
 
 	// Auto Mode
@@ -624,7 +625,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 		adjustWindowRectExForDpi = (PFN_AdjustWindowRectExForDpi) GetProcAddress(hUser32, "AdjustWindowRectExForDpi");
 }
 
-// helper functions for setting socket timeouts during file transfer
+// helper functions for setting socket timeouts during File Transfer
 bool ClientConnection::SetSendTimeout(int msecs)
 {
     int timeout= msecs < 0 ? m_opts->m_FTTimeout * 1000 : msecs;
@@ -1391,7 +1392,7 @@ void ClientConnection::CreateDisplay()
 
 	m_hwndcn = CreateWindow(VWR_WND_CLASS_NAME_VIEWER,
 	//m_hwnd = CreateWindow(_T("VNCMDI_Window"),
-			      _T("VNCviewer"),
+			      _T("UltraVNC Viewer"),
 			      winstyle ,
 			      0,
 			      Rtb.top + Rtb.bottom,
@@ -1714,7 +1715,7 @@ void ClientConnection::SetDSMPluginStuff()
 			strcpy_s(szParams, "NoPassword");
 
 		// The second parameter tells the plugin the kind of program is using it
-		// (in vncviewer : "viewer")
+		// (in UltraVNC Viewer : "viewer")
 		strcat_s(szParams, ",");
 		strcat_s(szParams, "viewer");
 
@@ -1903,7 +1904,7 @@ void ClientConnection::Connect(bool cloud)
 	DWORD ipbufferlength = 46;
 
 
-	//test if m_host is a ipv4 or ipv6 ip address	
+	//test if m_host is a IPv4 or IPv6 ip address
 	hint.ai_family = AF_UNSPEC;
 	hint.ai_flags = AI_NUMERICHOST;
 	if (getaddrinfo(m_host, 0, &hint, &info) == 0)
@@ -1925,7 +1926,7 @@ void ClientConnection::Connect(bool cloud)
 	}
 	freeaddrinfo(info);
 	// Use dns to find the corresponding ip address
-	// It can be ipv4 ipv6 or both
+	// It can be IPv4 IPv6 or both
 	if (!IsIpv4 && !IsIpv6)
 	{
 		struct addrinfo *serverinfo = 0;
@@ -1992,19 +1993,19 @@ void ClientConnection::Connect(bool cloud)
 	if (IsIpv6 && IsIpv4)
 	{
 		char			szText[256];
-		_snprintf_s(szText, 256,  "Ipv4: %s\nIpv6: %s \n", inet_ntoa(Ipv4Addr.sin_addr), ipstringbuffer);
-		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500); }		
+		_snprintf_s(szText, 256,  "IPv4: %s\nIPv6: %s \n", inet_ntoa(Ipv4Addr.sin_addr), ipstringbuffer);
+		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500); }
 	}
 	else if (IsIpv6)
 	{
 		char			szText[256];
-		_snprintf_s(szText, 256,  "Ipv6: %s \n", ipstringbuffer);
+		_snprintf_s(szText, 256,  "IPv6: %s \n", ipstringbuffer);
 		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500); }
 	}
 	else if (IsIpv4)
 	{
 		char			szText[256];
-		_snprintf_s(szText, 256,  "Ipv4: %s \n", inet_ntoa(Ipv4Addr.sin_addr));
+		_snprintf_s(szText, 256,  "IPv4: %s \n", inet_ntoa(Ipv4Addr.sin_addr));
 		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500); }
 	}
 
@@ -2020,7 +2021,7 @@ void ClientConnection::Connect(bool cloud)
 		{
 			int res;
 			char			szText[256];
-			_snprintf_s(szText, 256,  "Ipv6: %s \n", sz_L47);
+			_snprintf_s(szText, 256,  "IPv6: %s \n", sz_L47);
 			if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, szText);
 			if (m_hwndStatus)ShowWindow(m_hwndStatus, SW_SHOW);
 			if (m_hwndStatus)UpdateWindow(m_hwndStatus);
@@ -2056,7 +2057,7 @@ void ClientConnection::Connect(bool cloud)
 				if (m_hwndStatus)UpdateWindow(m_hwndStatus);
 				return;
 			}
-			_snprintf_s(szText, 256,  "Ipv6: %s \n", sz_L48);
+			_snprintf_s(szText, 256,  "IPv6: %s \n", sz_L48);
 			if (m_hwndStatus) {SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500);}
 
 		}
@@ -2071,7 +2072,7 @@ void ClientConnection::Connect(bool cloud)
 			throw WarningException(sz_L44); 
 		}
 		char			szText[256];
-		_snprintf_s(szText, 256,  "Ipv4: %s \n", sz_L47);
+		_snprintf_s(szText, 256,  "IPv4: %s \n", sz_L47);
 		if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, szText);
 		if (m_hwndStatus)ShowWindow(m_hwndStatus,SW_SHOW);
 		if (m_hwndStatus)UpdateWindow(m_hwndStatus);
@@ -2208,7 +2209,7 @@ void ClientConnection::ConnectProxy()
 	DWORD ipbufferlength = 46;
 
 
-	//test if m_host is a ipv4 or ipv6 ip address	
+	//test if m_host is a IPv4 or IPv6 ip address
 	hint.ai_family = AF_UNSPEC;
 	hint.ai_flags = AI_NUMERICHOST;
 	if (getaddrinfo(m_proxyhost, 0, &hint, &info) == 0)
@@ -2230,7 +2231,7 @@ void ClientConnection::ConnectProxy()
 	}
 	freeaddrinfo(info);
 	// Use dns to find the corresponding ip address
-	// It can be ipv4 ipv6 or both
+	// It can be IPv4 IPv6 or both
 	if (!IsIpv4 && !IsIpv6)
 	{
 		struct addrinfo *serverinfo = 0;
@@ -2297,19 +2298,19 @@ void ClientConnection::ConnectProxy()
 	if (IsIpv6 && IsIpv4)
 	{
 		char			szText[256];
-		_snprintf_s(szText, 256,  "Ipv4: %s\nIpv6: %s \n", inet_ntoa(Ipv4Addr.sin_addr), ipstringbuffer);
+		_snprintf_s(szText, 256,  "IPv4: %s\nIPv6: %s \n", inet_ntoa(Ipv4Addr.sin_addr), ipstringbuffer);
 		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500); }
 	}
 	else if (IsIpv6)
 	{
 		char			szText[256];
-		_snprintf_s(szText, 256,  "Ipv6: %s \n", ipstringbuffer);
+		_snprintf_s(szText, 256,  "IPv6: %s \n", ipstringbuffer);
 		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500); }
 	}
 	else if (IsIpv4)
 	{
 		char			szText[256];
-		_snprintf_s(szText, 256,  "Ipv4: %s \n", inet_ntoa(Ipv4Addr.sin_addr));
+		_snprintf_s(szText, 256,  "IPv4: %s \n", inet_ntoa(Ipv4Addr.sin_addr));
 		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500); }
 	}
 
@@ -2325,7 +2326,7 @@ void ClientConnection::ConnectProxy()
 		{
 			int res;
 			char			szText[256];
-			_snprintf_s(szText, 256,  "Ipv6: %s \n", sz_L47);
+			_snprintf_s(szText, 256,  "IPv6: %s \n", sz_L47);
 			if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, szText);
 			if (m_hwndStatus)ShowWindow(m_hwndStatus, SW_SHOW);
 			if (m_hwndStatus)UpdateWindow(m_hwndStatus);
@@ -2355,7 +2356,7 @@ void ClientConnection::ConnectProxy()
 				if (m_hwndStatus)UpdateWindow(m_hwndStatus);
 				return;
 			}
-			_snprintf_s(szText, 256,  "Ipv6: %s \n", sz_L48);
+			_snprintf_s(szText, 256,  "IPv6: %s \n", sz_L48);
 			if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500); }
 
 		}
@@ -2370,7 +2371,7 @@ void ClientConnection::ConnectProxy()
 			throw WarningException(sz_L44);
 		}
 		char			szText[256];
-		_snprintf_s(szText, 256,  "Ipv4: %s \n", sz_L47);
+		_snprintf_s(szText, 256,  "IPv4: %s \n", sz_L47);
 		if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, szText);
 		if (m_hwndStatus)ShowWindow(m_hwndStatus, SW_SHOW);
 		if (m_hwndStatus)UpdateWindow(m_hwndStatus);
@@ -2618,10 +2619,10 @@ void ClientConnection::NegotiateProtocolVersion()
 	    m_majorVersion,m_minorVersion);
 
 	// UltraVNC specific functionnalities
-	// - ms logon
-	// - FileTransfer (TODO: change Minor version in next eSVNC release so it's compatible with Ultra)
-	// Minor = 4 means that server supports FileTransfer and requires ms logon
-	// Minor = 6 means that server support FileTransfer and requires normal VNC logon
+	// - MS-Logon
+	// - File Transfer (TODO: change Minor version in next eSVNC release so it's compatible with Ultra)
+	// Minor = 4 means that server supports File Transfer and requires MS-Logon
+	// Minor = 6 means that server support File Transfer and requires normal VNC login
 	if (m_minorVersion == 4)
 	{
 		m_ms_logon_I_legacy = true;
@@ -2763,7 +2764,7 @@ void ClientConnection::NegotiateProxy()
 			throw WarningException("Proxy Connection failed - Error reading Protocol Version\r\n\n\r"
 									"Possible causes:\r\r"
 									"- You've forgotten to select a DSMPlugin and the Server uses a DSMPlugin\r\n"
-									"- Viewer and Server are not compatible (they use different RFB protocoles)\r\n"
+									"- Viewer and Server are not compatible (they use different RFB protocols)\r\n"
 									"- Bad connection\r\n"
 									);
 
@@ -3143,9 +3144,9 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 void ClientConnection::AuthSecureVNCPlugin()
 {
 	if (m_pIntegratedPluginInterface==NULL) {
-		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,"SecureVNCPlugin authentication failed (SecureVNCPlugin interface available)");
+		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,"SecureVNC Plugin authentication failed (SecureVNC Plugin interface available)");
 		SetEvent(KillEvent);
-		throw ErrorException("SecureVNCPlugin authentication failed (no plugin interface available)");
+		throw ErrorException("SecureVNC Plugin authentication failed (no plugin interface available)");
 	}
 
 	char passwd[256];
@@ -3272,9 +3273,9 @@ void ClientConnection::AuthSecureVNCPlugin()
 void ClientConnection::AuthSecureVNCPlugin_old()
 {
 	if (!m_pIntegratedPluginInterface) {
-		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,"SecureVNCPlugin authentication failed (SecureVNCPlugin interface available)");
+		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,"SecureVNC Plugin authentication failed (SecureVNC Plugin interface available)");
 		SetEvent(KillEvent);
-		throw ErrorException("SecureVNCPlugin authentication failed (no plugin interface available)");
+		throw ErrorException("SecureVNC Plugin authentication failed (no plugin interface available)");
 	}
 
 	char passwd[256];
@@ -3322,7 +3323,7 @@ void ClientConnection::AuthSecureVNCPlugin_old()
 					Sleep(3000);
 					if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,"Using the vncpasswd as encryption key");
 					Sleep(3000);
-					if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,"is not save.  Password can be hacked !!");
+					if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,"is not save. Password can be hacked!");
 					AuthDialog ad;
 					//adzm 2010-05-12 - passphrase
 					ad.m_bPassphraseMode = bPassphraseRequired;
@@ -3427,7 +3428,7 @@ void ClientConnection::AuthMsLogonII()
 	else
 	{
 	AuthDialog ad;
-	// adzm 2010-10 - RFB3.8 - the 'mslogon' param woudl always be true here
+	// adzm 2010-10 - RFB3.8 - the 'MS-Logon' param woudl always be true here
 	if (ad.DoDialog(dtUserPass, m_host, m_port)) {
 		strncpy_s(passwd, ad.m_passwd, 64);
 		strncpy_s(user, ad.m_user, 254);
@@ -3484,7 +3485,7 @@ void ClientConnection::AuthMsLogonI()
 	}
 
 	// Was the password already specified in a config file or entered for DSMPlugin ?
-	// Modif sf@2002 - A clear password can be transmitted via the vncviewer command line
+	// Modif sf@2002 - A clear password can be transmitted via the UltraVNC Viewer command line
 	if (strlen(m_clearPasswd)>0)
 	{
 		strcpy_s(passwd, m_clearPasswd);
@@ -3578,7 +3579,7 @@ void ClientConnection::AuthVnc()
 	char passwd[256];
 	memset(passwd, 0, sizeof(char)*256);
 	// Was the password already specified in a config file or entered for DSMPlugin ?
-	// Modif sf@2002 - A clear password can be transmitted via the vncviewer command line
+	// Modif sf@2002 - A clear password can be transmitted via the UltraVNC Viewer command line
 	if (strlen(m_clearPasswd)>0)
 	{
 		strcpy_s(passwd, m_clearPasswd);
@@ -3828,8 +3829,8 @@ void ClientConnection::SizeWindow(bool noPosChange, bool noSizeChange)
 
 	vnclog.Print(2, _T("Screen work area is %d x %d\n"), workwidth, workheight);
 
-	// sf@2003 - AutoScaling   
-	// Thomas Levering 
+	// sf@2003 - AutoScaling
+	// Thomas Levering
 	if (m_opts->m_fAutoScaling && !m_fScalingDone)
 	{
 		// We save the scales values coming from options
@@ -4079,7 +4080,7 @@ void ClientConnection::SizeWindow(bool noPosChange, bool noSizeChange)
 		ShowWindow(m_hwndTBwin, SW_HIDE);
 }
 
-// We keep a local copy of the whole screen.  This is not strictly necessary
+// We keep a local copy of the whole screen. This is not strictly necessary
 // for VNC, but makes scrolling & deiconifying much smoother.
 
 void ClientConnection::CreateLocalFramebuffer()
@@ -4130,7 +4131,7 @@ void ClientConnection::SetupPixelFormat() {
 		// It's silly requesting more bits than our current display has, but
 		// in fact it doesn't usually amount to much on the network.
 		// Windows doesn't support 8-bit truecolour.
-		// If our display is palette-based, we want more than 8 bit anyway,
+		// If our display is palette-based, we want more than 8-bit anyway,
 		// unless we're going to start doing palette stuff at the server.
 		// So the main use would be a 24-bit true-colour desktop being viewed
 		// on a 16-bit true-colour display, and unless you have lots of images
@@ -4299,7 +4300,7 @@ void ClientConnection::SetFormatAndEncodings()
 		// vnclog.Print(0, _T("Cache: Enable Cache sent to Server\n"));
 	}
 
-    // len = sz_rfbSetEncodingsMsg + se->nEncodings * 4;	
+    // len = sz_rfbSetEncodingsMsg + se->nEncodings * 4;
     encs[se->nEncodings++] = Swap32IfLE(rfbEncodingServerState);
     encs[se->nEncodings++] = Swap32IfLE(rfbEncodingEnableKeepAlive);
 	encs[se->nEncodings++] = Swap32IfLE(rfbEncodingEnableIdleTime);
@@ -4457,7 +4458,7 @@ void ClientConnection::SuspendThread()
 	m_nTO = 1;
 	LoadDSMPlugin(true);
 	// WHat is this doing here ???
-	// m_fUseProxy = false;  << repeater block after reconnect+	
+	// m_fUseProxy = false;  << repeater block after reconnect+
 
 	delete[] m_pNetRectBuf;
 	m_pNetRectBuf = NULL;
@@ -4509,7 +4510,7 @@ ClientConnection::~ClientConnection()
 		delete [] m_pNetRectBuf;
 	LowLevelHook::Release();
 
-	// Modif sf@2002 - FileTransfer
+	// Modif sf@2002 - File Transfer
 	if (m_pFileTransfer)
 		delete(m_pFileTransfer);
 
@@ -4706,7 +4707,7 @@ inline bool ClientConnection::ProcessPointerEvent(int x, int y, DWORD keyflags, 
 		}
 		else
 		{
-			// Option if not UltraVnc Server, more then one Client 
+			// Option if not UltraVNC Server, more then one Client
 			if (m_opts->m_BlockSameMouse)
 				return false;
 		}
@@ -4952,7 +4953,7 @@ ClientConnection::SendPointerEvent(int x, int y, int buttonMask)
 // ProcessKeyEvent
 //
 // Normally a single Windows key event will map onto a single RFB
-// key message, but this is not always the case.  Much of the stuff
+// key message, but this is not always the case. Much of the stuff
 // here is to handle AltGr (=Ctrl-Alt) on international keyboards.
 // Example cases:
 //
@@ -4962,7 +4963,7 @@ ClientConnection::SendPointerEvent(int x, int y, int buttonMask)
 //    will already have been sent by the time we get the F.
 //
 //    On German keyboards, @ is produced using AltGr-Q, which is
-//    Ctrl-Alt-Q.  But @ is a valid keysym in its own right, and when
+//    Ctrl-Alt-Q. But @ is a valid keysym in its own right, and when
 //    a German user types this combination, he doesn't mean Ctrl-@.
 //    So for this we will send, in total:
 //
@@ -5083,11 +5084,11 @@ void ClientConnection::SendClientCutText(char *str, int len)
 {
 	// adzm - 2010-07 - Extended clipboard
 	if (m_pFileTransfer->m_fFileTransferRunning && ( m_pFileTransfer->m_fVisible || m_pFileTransfer->UsingOldProtocol())) {
-		vnclog.Print(6, _T("Ignoring SendClientCutText due to in-progress file transfer\n"));
+		vnclog.Print(6, _T("Ignoring SendClientCutText due to in-progress File Transfer\n"));
 		return;
 	}
 	if (m_pTextChat->m_fTextChatRunning && m_pTextChat->m_fVisible) {
-		vnclog.Print(6, _T("Ignoring SendClientCutText due to in-progress text chat\n"));
+		vnclog.Print(6, _T("Ignoring SendClientCutText due to in-progress Text Chat\n"));
 		return;
 	}
 
@@ -5266,7 +5267,7 @@ void ClientConnection::ShowConnInfo()
 		kbdname,
 		m_pDSMPlugin->IsEnabled() ? m_pDSMPlugin->GetPluginName() : "",
 		m_pDSMPlugin->IsEnabled() ? m_pDSMPlugin->GetPluginVersion() : "");
-	yesUVNCMessageBox(m_hwndMain, buf, _T("VNC connection info"), MB_ICONINFORMATION);
+	yesUVNCMessageBox(m_hwndMain, buf, _T("UltraVNC Viewer - Connection Informations"), MB_ICONINFORMATION);
 }
 
 // ********************************************************************
@@ -5304,7 +5305,7 @@ void* ClientConnection::run_undetached(void* arg) {
     rdr::U8 msgType=0;
 
 	// sf@2007 - AutoReconnect
-	// Error, value can be set 0 by gui in that case you get a gray screen
+	// Error, value can be set 0 by GUI in that case you get a gray screen
 	if (m_autoReconnect==0) m_autoReconnect=1;
 	initialupdate_counter=0;
 	ResetEvent(KillUpdateThreadEvent);
@@ -5378,13 +5379,13 @@ void* ClientConnection::run_undetached(void* arg) {
 					ReadServerCutText();
 					break;
 
-				// Modif sf@2002 - FileTransfer
+				// Modif sf@2002 - File Transfer
 				// File Transfer Message
 				case rfbFileTransfer:
 					{
 					// vnclog.Print(0, _T("rfbFileTransfer\n") );
 					// m_pFileTransfer->ProcessFileTransferMsg();
-					// sf@2005 - FileTransfer rfbMessage and screen updates must be sent/received
+					// sf@2005 - File Transfer rfbMessage and screen updates must be sent/received
 					// by the same thread
 					SendMessage(m_hwndMain, FileTransferSendPacketMessage, 1, 0);
 					}
@@ -5785,9 +5786,9 @@ inline void ClientConnection::ReadScreenUpdate()
 #if 1
 		/* vnc4server in debian jessie and wheezy offers pixel format bgr101111
 			if the color depth is 32. This means it is necessary to send whole
-			32bit (4 bytes) for each pixel. However vnc4server sends only 3 bytes
-			 blueMax is declared as signed 32bit int in vnc4server. The following
-			code falls the connection back to 24 bit color depth (rgb888) to prevent
+			32-bit (4 bytes) for each pixel. However vnc4server sends only 3 bytes
+			 blueMax is declared as signed 32-bit int in vnc4server. The following
+			code falls the connection back to 24-bit color depth (rgb888) to prevent
 			the bug if pixel format bgr101111 is requested. */
 
 	if (surh.encoding == rfbEncodingZRLE && m_myFormat.redShift == 0
@@ -6211,7 +6212,7 @@ inline void ClientConnection::ReadScreenUpdate()
 			break;
 		}
 
-		//Todo: surh.encoding != rfbEncodingXZ && surh.encoding != rfbEncodingXZYW && 
+		//Todo: surh.encoding != rfbEncodingXZ && surh.encoding != rfbEncodingXZYW &&
 		if (surh.encoding != rfbEncodingExtViewSize && surh.encoding !=rfbEncodingNewFBSize && surh.encoding != rfbEncodingCacheZip && surh.encoding != rfbEncodingQueueZip && surh.encoding != rfbEncodingUltraZip)
 		{
 			RECT rect;
@@ -6263,7 +6264,7 @@ inline void ClientConnection::ReadScreenUpdate()
 	}
 
 	// sf@2002
-	// We only change the preferred encoding if FileTransfer is not running and if
+	// We only change the preferred encoding if File Transfer is not running and if
 	// the last encoding change occured more than 30s ago
 	if (avg_kbitsPerSecond !=0 && m_opts->autoDetect && !m_pFileTransfer->m_fFileTransferRunning && (timeGetTime() - m_lLastChangeTime) > m_lLastChangeTimeTimeout)
 	{
@@ -6281,11 +6282,11 @@ inline void ClientConnection::ReadScreenUpdate()
 			}
 			m_opts->m_PreferredEncodings.clear();
 			//if (new_ultra_server) m_opts->m_PreferredEncodings.push_back(rfbEncodingUltra2);
-			//else 
+			//else
 			m_opts->m_PreferredEncodings.push_back(rfbEncodingHextile);
-			//m_opts->m_Use8Bit = rfbPFFullColors;			
+			//m_opts->m_Use8Bit = rfbPFFullColors;
 			//if (new_ultra_server && encoding == rfbEncodingUltra2 && m_opts->m_fEnableCache == false){}
-			//else 
+			//else
 			if (encoding == rfbEncodingHextile && m_opts->m_fEnableCache == false){}
 			else m_pendingFormatChange = true;
 
@@ -7122,7 +7123,7 @@ bool ClientConnection::WriteExactProxy(char *buf, int bytes)
 	return Write(buf, bytes, false);
 }
 
-// Security fix for uvnc 1.0.5 and 1.0.2 (should be ok for all version...)
+// Security fix for UltraVNC 1.0.5 and 1.0.2 (Should be ok for all versions...)
 // Replace the corresponding functions with the following fixed ones in vncviewer\ClientConnection.cpp file
 
 // Makes sure netbuf is at least as big as the specified size.
@@ -8165,16 +8166,16 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							PostQuitMessage(0);
 						return 0;
 
-						// Modif sf@2002 - FileTransfer
+						// Modif sf@2002 - File Transfer
 					case ID_FILETRANSFER:
-						// Check if the Server knows FileTransfer
+						// Check if the Server knows File Transfer
 						if (!_this->m_fServerKnowsFileTransfer)
 						{
 							yesUVNCMessageBox(hwnd, sz_L77,
 								sz_L78, MB_ICONINFORMATION);
 							return 0;
 						}
-						// Don't call FileTRansfer GUI is already open !
+						// Don't call File Transfer GUI is already open!
 						if (_this->m_pFileTransfer->m_fFileTransferRunning)
 						{
 							_this->m_pFileTransfer->ShowFileTransferWindow(true);
@@ -8190,7 +8191,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							return 0;
 						}
 
-						// Call FileTransfer Dialog
+						// Call File Transfer Dialog
 						_this->m_pFileTransfer->m_fFileTransferRunning = true;
 						_this->m_pFileTransfer->m_fFileCommandPending = false;
 						_this->m_pFileTransfer->DoDialog();
@@ -8204,8 +8205,8 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 
 						// sf@2002 - Text Chat
 					case ID_TEXTCHAT:
-						// We use same flag as FT for now
-						// Check if the Server knows FileTransfer
+						// We use same flag as File Transfer for now
+						// Check if the Server knows File Transfer
 						if (!_this->m_fServerKnowsFileTransfer)
 						{
 							yesUVNCMessageBox(hwnd, sz_L81,
@@ -8505,7 +8506,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							return 0;
 						}
 
-						// sf@2002 - Do not close vncviewer if the Text Chat GUI is open !
+						// sf@2002 - Do not close UltraVNC Viewer if the Text Chat GUI is open !
 						if (_this->m_pTextChat->m_fTextChatRunning)
 						{
                             if (_this->m_bKillThread)
@@ -8853,7 +8854,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 
 			//return DefWindowProc(hwnd, iMsg, wParam, lParam);
 
-			// Process asynchronous FileTransfer in this thread
+			// Process asynchronous File Transfer in this thread
 			if ((iMsg == FileTransferSendPacketMessage) && (_this->m_pFileTransfer != NULL))
 			{
 				if (LOWORD(wParam) == 0)
@@ -9321,7 +9322,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
     					boxopen=false;
                         _this->m_bClosedByUser = true;
 					}
-					// sf@2002 - Do not close vncviewer if the File Transfer GUI is open !
+					// sf@2002 - Do not close UltraVNC Viewer if the File Transfer GUI is open!
 					if (_this->m_pFileTransfer->m_fFileTransferRunning)
 					{
 						_this->m_pFileTransfer->ShowFileTransferWindow(true);
@@ -9331,7 +9332,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 						return 0;
 					}
 
-					// sf@2002 - Do not close vncviewer if the Text Chat GUI is open !
+					// sf@2002 - Do not close UltraVNC Viewer if the Text Chat GUI is open!
 					if (_this->m_pTextChat->m_fTextChatRunning)
 					{
 						_this->m_pTextChat->ShowChatWindow(true);
@@ -9529,7 +9530,7 @@ void ClientConnection::ConvertAll(CARD16 width, CARD16 height, CARD16 xx, CARD16
 {
 	int bytesPerInputRow = width * bytes_per_pixel;
 	int bytesPerOutputRow = framebufferWidth * bytes_per_pixel;
-	//8bit pitch need to be taken in account
+	//8-bit pitch need to be taken in account
 	if (bytesPerOutputRow % 4)
 		bytesPerOutputRow += 4 - bytesPerOutputRow % 4;
 
@@ -9559,7 +9560,7 @@ void ClientConnection:: ConvertAll_secure(CARD16 width, CARD16 height, CARD16 xx
 	//security check input buffer
 	if ((bytes_per_pixel * height) > sourceSize)
 			goto error;
-	//8bit pitch need to be taken in account
+	//8-bit pitch need to be taken in account
 	if (bytesPerOutputRow % 4)
 		bytesPerOutputRow += 4 - bytesPerOutputRow % 4;
 	//security check dibits
@@ -9591,7 +9592,7 @@ ClientConnection:: Copybuffer(int width, int height, int xx, int yy,int bytes_pe
 	if (incorrectParameters(width, height, xx, yy, framebufferWidth, framebufferHeight))
 		goto error;
 
-	//8bit pitch need to be taken in account
+	//8-bit pitch need to be taken in account
 	if (bytesPerOutputRow % 4)
 		bytesPerOutputRow += 4 - bytesPerOutputRow % 4;
 	BYTE *sourcepos,*destpos;
@@ -9618,7 +9619,7 @@ ClientConnection:: Copyto0buffer(int width, int height, int xx, int yy,int bytes
 	if ( ((width + xx) * (height + yy)) > (framebufferWidth * framebufferHeight))
 			goto error;
 
-	//8bit pitch need to be taken in account
+	//8-bit pitch need to be taken in account
 	if (bytesPerOutputRow % 4)
 		bytesPerOutputRow += 4 - bytesPerOutputRow % 4;
 	BYTE *sourcepos,*destpos;
@@ -9644,7 +9645,7 @@ ClientConnection:: Copyfrom0buffer(int width, int height, int xx, int yy,int byt
 	if (incorrectParameters(width, height, xx, yy, framebufferWidth, framebufferHeight))
 		goto error;
 
-	//8bit pitch need to be taken in account
+	//8-bit pitch need to be taken in account
 	if (bytesPerOutputRow % 4)
 		bytesPerOutputRow += 4 - bytesPerOutputRow % 4;
 	BYTE *sourcepos,*destpos;
@@ -9667,7 +9668,7 @@ void
 ClientConnection:: Switchbuffer(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth)
 {
 	int bytesPerOutputRow = framebufferWidth * bytes_per_pixel;
-	//8bit pitch need to be taken in account
+	//8-bit pitch need to be taken in account
 	if (bytesPerOutputRow % 4)
 		bytesPerOutputRow += 4 - bytesPerOutputRow % 4;
 	BYTE *sourcepos,*destpos,*tempbuffer;
@@ -9691,7 +9692,7 @@ ClientConnection:: ConvertPixel(int xx, int yy,int bytes_per_pixel,BYTE* source,
 {
 
 	int bytesPerOutputRow = framebufferWidth * bytes_per_pixel;
-	//8bit pitch need to be taken in account
+	//8-bit pitch need to be taken in account
 	if (bytesPerOutputRow % 4)
 		bytesPerOutputRow += 4 - bytesPerOutputRow % 4;
 	BYTE *sourcepos,*destpos;
@@ -9705,7 +9706,7 @@ ClientConnection:: ConvertPixel_to_bpp_from_32(int xx, int yy,int bytes_per_pixe
 {
 
 	int bytesPerOutputRow = framebufferWidth * bytes_per_pixel;
-	//8bit pitch need to be taken in account
+	//8-bit pitch need to be taken in account
 	if (bytesPerOutputRow % 4)
 		bytesPerOutputRow += 4 - bytesPerOutputRow % 4;
 	BYTE *destpos;
@@ -9748,7 +9749,7 @@ ClientConnection::SolidColor(int width, int height, int xx, int yy,int bytes_per
 	if (!Check_Rectangle_borders(xx, yy, width, height))
 		return;
 	int bytesPerOutputRow = framebufferWidth * bytes_per_pixel;
-	//8bit pitch need to be taken in account
+	//8-bit pitch need to be taken in account
 	if (bytesPerOutputRow % 4)
 		bytesPerOutputRow += 4 - bytesPerOutputRow % 4;
 	BYTE *sourcepos,*destpos;
@@ -9909,7 +9910,7 @@ BOOL CALLBACK DialogProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 
 					if(iSelect==-1)
 					{
-                      yesUVNCMessageBox(hWnd,"No Vnc server selected","Error",MB_ICONINFORMATION);
+                      yesUVNCMessageBox(hWnd,"No VNC Server selected","Error",MB_ICONINFORMATION);
 					  break;
 					}
 					flag=1;

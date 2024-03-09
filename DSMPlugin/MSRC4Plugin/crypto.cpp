@@ -1,7 +1,8 @@
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //  Copyright (C) 2005 Sean E. Covel All Rights Reserved.
 //
-//  Created by Sean E. Covel
-//
+//  Created by Sean E. Covel based on UltraVNC's excellent TestPlugin project.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -18,18 +19,15 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the program is not available from the place from
-// which you received this file, check 
-// http://home.comcast.net/~msrc4plugin
-// or
-// mail: msrc4plugin@comcast.net
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
 //
-//
-//
-/////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+
 
 //#include "stdafx.h"
-#define _WIN32_WINNT 0x0410     //must be defined for the crypto api
+#define _WIN32_WINNT 0x0410     // Must be defined for the crypto api
 #define _WIN32_WINDOWS 0x0410
 #define WINVER 0x0400
 
@@ -39,14 +37,14 @@
 //#include <tchar.h>
 
 
-#include <wincrypt.h>       //windows crypto api
+#include <wincrypt.h>       // Windows crypto api
 #include "crypto.h"
 #ifdef _WITH_LOG  
 	#include "logging.h"
 #endif  
 #include "utils.h"
 
-int CSP_PROV =	PROV_RSA_FULL;	//Microsoft Basic/Enhanced provider
+int CSP_PROV =	PROV_RSA_FULL;	// Microsoft Basic/Enhanced provider
 char DEFAULTKEY[KEYSize];
 
 CHAR szUserName[100];         // Buffer to hold the name of the key container.
@@ -56,24 +54,24 @@ DWORD dwUserNameLen = 100;    // Length of the buffer.
 char CSP_NAME[CSP_SIZE];
 
 DWORD VERIFY_CONTEXT_FLAG = CRYPT_VERIFYCONTEXT;
-DWORD MACHINE_CONTEXT_FLAG = CRYPT_MACHINE_KEYSET;	//Test for Win98 winvnc problem
+DWORD MACHINE_CONTEXT_FLAG = CRYPT_MACHINE_KEYSET;	// Test for UltraVNC Server Win98 problem
 DWORD NULL_CONTEXT_FLAG = 0;
 DWORD CONTEXT_FLAG = CRYPT_VERIFYCONTEXT;
 
 DWORD KEYLEN = KEYLEN_128BIT;
-DWORD MAXKEYLEN = KEYLEN_128BIT;	//I'm going to do something with this some day...
+DWORD MAXKEYLEN = KEYLEN_128BIT;	// I'm going to do something with this some day...
 
 
 BOOL GenKey(char * sDefaultGenKey, DWORD keyLen)
 {
 	
-    //Generates the RC4 key and writes it to a file
-    //The key contains information about the algorithm used and
-    //the key length.
+    // Generates the RC4 key and writes it to a file
+    // The key contains information about the algorithm used and
+    // the key length.
     char GkeyFile[KEYFILENAME_SIZE];
 	
     const int IN_BUFFER_SIZE    = 2048;
-    const int OUT_BUFFER_SIZE   = IN_BUFFER_SIZE + 64; // extra padding
+    const int OUT_BUFFER_SIZE   = IN_BUFFER_SIZE + 64; // Extra padding
 	
     HANDLE     hGKeyFile = 0;
     BYTE       pbBuffer[OUT_BUFFER_SIZE];
@@ -109,7 +107,7 @@ BOOL GenKey(char * sDefaultGenKey, DWORD keyLen)
 #endif
     
 
-	//Windows OS before 2000 won't import ExponentOfOne key in a verify context.
+	// Windows OS before Windows 2000 won't import ExponentOfOne key in a verify context.
 	if (iWinVer >= WIN2000)
 	{
 #ifdef _WITH_LOG  
@@ -139,11 +137,11 @@ BOOL GenKey(char * sDefaultGenKey, DWORD keyLen)
 	PrintLog((DEST,"Generating key file: %s",GkeyFile));
 #endif 
 
-    //open both the output file
+    // Open both the output file
 	hGKeyFile = CreateFile(GkeyFile, GENERIC_WRITE, FILE_SHARE_READ, 
 		NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
-	//check if the file created ok
+	// Check if the file created ok
 	if (hGKeyFile == INVALID_HANDLE_VALUE)
 	{
 #ifdef _WITH_LOG  
@@ -198,7 +196,7 @@ BOOL GenKey(char * sDefaultGenKey, DWORD keyLen)
 #ifdef _WITH_LOG  
 	PrintLog((DEST,"Export the key blob"));
 #endif  
-	//Generate the actual key
+	// Generate the actual key
 	rc = CryptExportKey(hGKey, hGExchangeKey, SIMPLEBLOB, 0, pbBuffer, 
 		&dwByteCount);
     if (rc == 0)
@@ -209,7 +207,7 @@ BOOL GenKey(char * sDefaultGenKey, DWORD keyLen)
 		return false;
 	}
 	
-	//assertion
+	// Assertion
 	if (dwByteCount != BLOBSIZE)
 	{
 #ifdef _WITH_LOG  
@@ -222,38 +220,38 @@ BOOL GenKey(char * sDefaultGenKey, DWORD keyLen)
 	if (KEYLEN == 0x00800000)
 	{
 #ifdef _WITH_LOG  
-		DebugLog((DEST,"128 bit key."));
+		DebugLog((DEST,"128-bit key."));
 #endif  
-		WriteFile(hGKeyFile, "128 bit", 7, &dwBytesWritten, NULL);
+		WriteFile(hGKeyFile, "128-bit", 7, &dwBytesWritten, NULL);
 	}
 	else {
 			if (KEYLEN == 0x00380000)
 			{
 #ifdef _WITH_LOG  
-				DebugLog((DEST,"56 bit key."));
+				DebugLog((DEST,"56-bit key."));
 #endif  
-				WriteFile(hGKeyFile, " 56 bit", 7, &dwBytesWritten, NULL);
+				WriteFile(hGKeyFile, " 56-bit", 7, &dwBytesWritten, NULL);
 			}
 			else
 			{
 #ifdef _WITH_LOG  
-				DebugLog((DEST,"40 bit key."));
+				DebugLog((DEST,"40-bit key."));
 #endif  
-				WriteFile(hGKeyFile, " 40 bit", 7, &dwBytesWritten, NULL);
+				WriteFile(hGKeyFile, " 40-bit", 7, &dwBytesWritten, NULL);
 			}
 	}
 
 	// Write size of key blob
 	WriteFile(hGKeyFile, &dwByteCount, sizeof(dwByteCount), &dwBytesWritten, NULL);
 	
-	//Write key blob itself
+	// Write key blob itself
 	WriteFile(hGKeyFile, pbBuffer, dwByteCount, &dwBytesWritten, NULL);
 	
 	// Clean up: release handles
 	CryptDestroyKey(hGKey);
 	CryptDestroyKey(hGExchangeKey);
 	
-	//We’re finished using the CSP handle, so we must release it. We close the input and output files, and we’re finished.
+	// We’re finished using the CSP handle, so we must release it. We close the input and output files, and we’re finished.
 	CryptReleaseContext(hGProvider, 0);
 	
     CloseHandle(hGKeyFile);
@@ -263,7 +261,7 @@ BOOL GenKey(char * sDefaultGenKey, DWORD keyLen)
 
 
 long GetCryptoVersion() {
-//Determine the Crypto API version
+// Determine the Crypto API version
 
 BYTE pbData[1000];
 unsigned long cbData;
@@ -296,11 +294,11 @@ else {
 	cbData = 1000;
 
 	rc = CryptGetProvParam(
-				hProvider,          // handle to an open cryptographic provider
-				PP_VERSION,			//get VERSION information
-				(BYTE *)&pbData,  // information on the version
-				&cbData,            // number of bytes 
-				0);       // flag for enumeration functions
+				hProvider,          // Handle to an open cryptographic provider
+				PP_VERSION,			// Get VERSION information
+				(BYTE *)&pbData,  // Information on the version
+				&cbData,            // Number of bytes 
+				0);       // Flag for enumeration functions
 	if (rc != TRUE)
 	{
 #ifdef _WITH_LOG  
@@ -321,15 +319,15 @@ ptr = pbData;
 
 version = *(DWORD *)ptr;
 
-//version - M = major version, mm = minor version...
-//  0x00000101 = Version 1.1
+// Version - M = major version, mm = minor version...
+// 0x00000101 = Version 1.1
 
 					//       Mmm        Mmm
-if (version < 511)	//0x00000100-0x000001FF (0-511)
+if (version < 511)	// 0x00000100-0x000001FF (0-511)
 	return 1;
 
 					//       Mmm        Mmm
-if (version < 767)  //0x00000200-0x000002FF  (512-767)
+if (version < 767)  // 0x00000200-0x000002FF  (512-767)
 	return 2;
 
 return 0;
@@ -339,9 +337,9 @@ return 0;
 
 BOOL InitVars(char *szCSPName, long *iWinVer, long *iCryptVer, DWORD * iMaxKey) {
 
-//Get the windows version, crypto version, best crypto provider, and best bit-depth supported.
+// Get the windows version, crypto version, best crypto provider, and best bit-depth supported.
 
-HCRYPTPROV    hProvider = 0;                // crypto provider
+HCRYPTPROV    hProvider = 0;                // Crypto provider
 
 	*iWinVer = 0;
 	*iCryptVer = 0;
@@ -353,29 +351,29 @@ HCRYPTPROV    hProvider = 0;                // crypto provider
 	PrintLog((DEST,"InitVars"));
 #endif 
 
-	//*iCryptVer 
+	// *iCryptVer
 	*iCryptVer = GetCryptoVersion();
 
 	if (*iCryptVer == 1) {
-		//Version 1 doesn't support anything usefull for finding bit depth and whatnot...
-		//I think you only see this on 95 anyway...
-		//*** Only on 95 without the High Encryption pack ***
-		//not much works with version 1.
-		szCSPName[0] = '\0';	//default
+		// Version 1 doesn't support anything usefull for finding bit depth and whatnot...
+		// I think you only see this on 95 anyway...
+		// *** Only on 95 without the High Encryption pack ***
+		// not much works with version 1.
+		szCSPName[0] = '\0';	// Default
 		*iMaxKey = KEYLEN_40BIT;
 	}
 	else
 	{
-		//Version 2 has better features, but we don't want to waste a lot of time...
+		// Version 2 has better features, but we don't want to waste a lot of time...
 
-		if (*iWinVer>= WINXP) {	//XP and up come with 128bit out of the box.
-			szCSPName[0] = '\0';	//default
+		if (*iWinVer>= WINXP) {	// Windows XP and up come with 128-bit out of the box.
+			szCSPName[0] = '\0';	// Default
 			*iMaxKey = KEYLEN_128BIT;
 		}
 		else {	
 			
-			if (*iWinVer == WINNT) {  //NT does not support GetDefaultProvider function...
-				//look for MS_ENHANCED_PROV
+			if (*iWinVer == WINNT) {  // Windows NT does not support GetDefaultProvider function...
+				// Look for MS_ENHANCED_PROV
 
 #ifdef _WITH_LOG  
 	PrintLog((DEST,"CryptAcquireContext |%d| |%s| |%s| |%d| |%d|",hProvider, NULL, MS_ENHANCED_PROV, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT));
@@ -391,10 +389,10 @@ HCRYPTPROV    hProvider = 0;                // crypto provider
 				}
 			   CryptReleaseContext(hProvider, 0);
 			}
-			else {	//98, 98SE, ME, 2000
-				//We gotta look and see what we have available...
-				//I was going to use GetDefaultProvider, but it returns MS Base Provider
-				//Even when the Enhanced provider is available...
+			else {	// Windows 98, Windows 98 SE, Windows ME, Windows 2000
+				// We gotta look and see what we have available...
+				// I was going to use GetDefaultProvider, but it returns MS Base Provider
+				// Even when the Enhanced provider is available...
 #ifdef _WITH_LOG  
 	PrintLog((DEST,"CryptAcquireContext |%d| |%s| |%s| |%d| |%d|",hProvider, NULL, MS_ENHANCED_PROV, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT));
 #endif 
@@ -413,7 +411,7 @@ HCRYPTPROV    hProvider = 0;                // crypto provider
 	}
 
 
-	//copy the values to the global variables
+	// Copy the values to the global variables
 	strcpy(CSP_NAME, szCSPName);
 	MAXKEYLEN = *iMaxKey;
 
@@ -424,10 +422,10 @@ HCRYPTPROV    hProvider = 0;                // crypto provider
 int ResetCrypto(HCRYPTKEY hKey)
 {
   DWORD dwByteCount = 1;
-  CHAR temp[] = "a";		//decrypt/encrypt some junk.
+  CHAR temp[] = "a";		// Decrypt/Encrypt some junk.
 
-	//reset the crypto context to prepare for the next connection
-	//true means "this is the last bunch of data, so reset"
+	// Reset the crypto context to prepare for the next connection
+	// True means "this is the last bunch of data, so reset"
     return CryptDecrypt(hKey, 0, true, 0, (BYTE *)temp, &dwByteCount);
 
 }
@@ -438,7 +436,7 @@ int PrepContext(int iWinVer, HCRYPTKEY * hProvider)
 #ifdef _WITH_LOG  
 		PrintLog((DEST,"PrepContext"));
 #endif 
-	//Windows OS before 2000 won't import ExponentOfOne key in a verify context.
+	// Windows OS before Windows 2000 won't import ExponentOfOne key in a verify context.
 	if (iWinVer >= WIN2000)
 	{
 #ifdef _WITH_LOG  
@@ -553,7 +551,7 @@ int ImportCryptKey(HCRYPTPROV hProvider, HCRYPTKEY * hKey, HANDLE hKeyFile)
 #ifdef _WITH_LOG  
             PrintLog((DEST,"Reading KeyBlob"));
 #endif 
-				//read in "bitness"
+				// Read in "bitness"
 
 			if (! ReadFile(hKeyFile,bitNess,7,&dwBytesWritten,NULL)) {
 #ifdef _WITH_LOG  
@@ -576,7 +574,7 @@ int ImportCryptKey(HCRYPTPROV hProvider, HCRYPTKEY * hKey, HANDLE hKeyFile)
 
 			if (dwByteCount <= OUT_BUFFER_SIZE)
 			{
-				//read in the key blob itself from input file.
+				// Read in the key blob itself from input file.
 				if (! ReadFile(hKeyFile, pbBuffer, dwByteCount, &dwBytesWritten, NULL)) {
 #ifdef _WITH_LOG  
 					PrintLog((DEST,"Reading BLOB failed"));
@@ -608,7 +606,7 @@ int ImportCryptKey(HCRYPTPROV hProvider, HCRYPTKEY * hKey, HANDLE hKeyFile)
     PrintLog((DEST,"Importing KEY KeyBlob"));
 #endif 
 
-    //now, we convert the key blob back into a key (internally to the CSP), with the call to CryptImportKey.
+    // Now, we convert the key blob back into a key (internally to the CSP), with the call to CryptImportKey.
     if (! CryptImportKey(hProvider, (const BYTE *)pbBuffer, dwByteCount, hExchangeKey, 0, hKey)) {
 #ifdef _WITH_LOG  
         PrintLog((DEST,"Error importing key."));
@@ -630,7 +628,7 @@ int GetKeyLen(HCRYPTKEY hKey)
 	DWORD		pdwDataLen		  = 20;
 	int keyLen = 0;
 
-	//check the imported key's length
+	// Check the imported key's length
 			CryptGetKeyParam(hKey, KP_KEYLEN, pbDataBuf, &pdwDataLen, 0);
 
 			if (_snprintf(pKeyLN, sizeof(pKeyLN),"%2.2x",pbDataBuf[0]) < 0)
@@ -644,14 +642,14 @@ int GetKeyLen(HCRYPTKEY hKey)
 			{
 				keyLen = 128;
 #ifdef _WITH_LOG  
-				PrintLog((DEST,"Imported Key is 128bit"));
+				PrintLog((DEST,"Imported Key is 128-bit"));
 #endif  
 			}
 			if (strcmp(pKeyLN,"28")==0)
 			{
 				keyLen = 40;
 #ifdef _WITH_LOG  
-				PrintLog((DEST,"Imported Key is 40bit"));
+				PrintLog((DEST,"Imported Key is 40-bit"));
 #endif 
 			}
 
@@ -659,7 +657,7 @@ int GetKeyLen(HCRYPTKEY hKey)
 			{
 				keyLen = 56;
 #ifdef _WITH_LOG  
-				PrintLog((DEST,"Imported Key is 56bit"));
+				PrintLog((DEST,"Imported Key is 56-bit"));
 #endif 
 			}
 
@@ -674,8 +672,8 @@ BOOL CreateContainer(char * container)
 	
 	// Code from MSDN example
 	
-	HCRYPTPROV hCryptProv = 0;        // handle for the cryptographic provider context
-	HCRYPTKEY hCKey;               // public/private key handle
+	HCRYPTPROV hCryptProv = 0;        // Handle for the cryptographic provider context
+	HCRYPTKEY hCKey;               // Public/Private key handle
 
 #ifdef _WITH_LOG  
     PrintLog((DEST,"CreateContainer %s", container));
@@ -686,11 +684,11 @@ BOOL CreateContainer(char * container)
 
 	// CryptAcquireContext. Try to open the key container
 	if(CryptAcquireContext(
-		&hCryptProv,               // handle to the CSP
-		container,                  // container name 
-		CSP_NAME,                      // use the default provider
-		CSP_PROV,             // provider type
-		0))                        // flag values
+		&hCryptProv,               // Handle to the CSP
+		container,                  // Container name 
+		CSP_NAME,                      // Use the default provider
+		CSP_PROV,             // Provider type
+		0))                        // Flag values
 	{
 #ifdef _WITH_LOG  
 		PrintLog((DEST,"A crypto context with the %s key container already exists.", szUserName));
@@ -700,7 +698,7 @@ BOOL CreateContainer(char * container)
 	{ 
 		//--------------------------------------------------------------------
 		// Some sort of error occurred in acquiring the context.
-		//probably didn't exist yet.
+		// Probably didn't exist yet.
 		// Create a new key container. 
 		
 #ifdef _WITH_LOG  
@@ -725,17 +723,17 @@ BOOL CreateContainer(char * container)
 #endif 
 			return false;
 		}
-	} // end else
+	} // End else
 
 /*
 	//--------------------------------------------------------------------
 	// A cryptographic context with a key container is available. Get the
 	// name of the key container. 
 	if(CryptGetProvParam(
-		hCryptProv,               // handle to the CSP
-		PP_CONTAINER,             // get the key container name 
-		(BYTE *)szUserName,       // pointer to the key container name
-		&dwUserNameLen,           // length of name, preset to 100
+		hCryptProv,               // Handle to the CSP
+		PP_CONTAINER,             // Get the key container name 
+		(BYTE *)szUserName,       // Pointer to the key container name
+		&dwUserNameLen,           // Length of name, preset to 100
 		0)) 
 	{
 		PrintLog((DEST,"A crypto context has been acquired and the name on the key container is %s",szUserName));
@@ -753,9 +751,9 @@ BOOL CreateContainer(char * container)
 	// Attempt to get the handle to the key exchange key. 
 	
 	if(CryptGetUserKey(
-		hCryptProv,                     // handle to the CSP
-		AT_SIGNATURE,                   // key specification
-		&hCKey))                         // handle to the key
+		hCryptProv,                     // Handle to the CSP
+		AT_SIGNATURE,                   // Key specification
+		&hCKey))                         // Handle to the key
 	{
 #ifdef _WITH_LOG  
 		PrintLog((DEST,"A signature key is available."));
@@ -799,7 +797,7 @@ BOOL CreateContainer(char * container)
 #endif 
 		return false;
 		}
-	} // end if
+	} // End if
 	
 	//PrintLog((DEST,"A signature key pair existed, or one was created."));
 	
@@ -907,7 +905,7 @@ BOOL DeleteContainer(char * container)
 	// Delete the Key Container (it will get re-created next time the plugin is used)
 	
 
-	HCRYPTPROV hCryptProv = 0;        // handle for the cryptographic provider context
+	HCRYPTPROV hCryptProv = 0;        // Handle for the cryptographic provider context
 	
 #ifdef _WITH_LOG  
     PrintLog((DEST,"DeleteContainer %s", container));
@@ -917,11 +915,11 @@ BOOL DeleteContainer(char * container)
 #endif 
 	// CryptAcquireContext. 
 	  if(CryptAcquireContext(
-		&hCryptProv,               // handle to the CSP
-		container,                  // container name 
-		CSP_NAME,                      // use the default provider
-		CSP_PROV,             // provider type
-		CRYPT_DELETEKEYSET))                        // flag values
+		&hCryptProv,               // Handle to the CSP
+		container,                  // Container name 
+		CSP_NAME,                      // Use the default provider
+		CSP_PROV,             // Provider type
+		CRYPT_DELETEKEYSET))                        // Flag values
 	{
 #ifdef _WITH_LOG  
 		PrintLog((DEST,"The %s key container has been deleted.", container));
@@ -935,7 +933,7 @@ BOOL DeleteContainer(char * container)
 		PrintLog((DEST,"Could not delete container %s.", container));
 #endif 
 		return false;
-	} // end else
+	} // End else
 
 	return true;
 }

@@ -9,7 +9,7 @@
  *                                                                  *
  * THE 'ZYWRLE' VNC CODEC SOURCE CODE IS (C) COPYRIGHT 2006         *
  * BY Hitachi Systems & Services, Ltd.                              *
- * (Noriaki Yamazaki, Research & Developement Center)               *                                                                 *
+ * (Noriaki Yamazaki, Research & Developement Center)               *
  *                                                                  *
  ********************************************************************
 Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,7 @@ permission.
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE FOUNDATION
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE FOUNDATION
 OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
 SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
 LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
@@ -510,7 +510,7 @@ static InlineX void InvWavelet( int* pBuf, int width, int height, int level ){
 #endif
 
 // Load/Save coefficients stuffs.
-// Coefficients manages as 24 bits little-endian pixel.
+// Coefficients manages as 24-bit little-endian pixel.
 #define ZYWRLE_LOAD_COEFF(pSrc,R,G,B) { \
 	R = ((signed char*)pSrc)[2];	\
 	G = ((signed char*)pSrc)[1];	\

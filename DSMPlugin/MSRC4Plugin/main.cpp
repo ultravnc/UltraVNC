@@ -1,7 +1,8 @@
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //  Copyright (C) 2005 Sean E. Covel All Rights Reserved.
 //
-//  Created by Sean E. Covel
-//
+//  Created by Sean E. Covel based on UltraVNC's excellent TestPlugin project.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -18,15 +19,11 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the program is not available from the place from
-// which you received this file, check 
-// http://home.comcast.net/~msrc4plugin
-// or
-// mail: msrc4plugin@comcast.net
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
 //
-//
-//
-/////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 
 
 #include "stdafx.h"
@@ -147,7 +144,7 @@ cbName = 100;
 //PrintLog((DEST,"Default Provider %s",cspName));
 PrintLog((DEST,"Crypto Version %d ",iVer));
 
-//Windows OS before 2000 won't import ExponentOfOne key in a verify context.
+//Windows OS before Windows 2000 won't import ExponentOfOne key in a verify context.
 if (iWinVer > WIN2000)
 {
 	CONTEXT_FLAG = VERIFY_CONTEXT_FLAG;

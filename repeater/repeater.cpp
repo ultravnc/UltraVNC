@@ -1,8 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002 Ultr@VNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //
-//
-//  The VNC system is free software; you can redistribute it and/or modify
+//  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
@@ -17,8 +16,12 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
 //
-/////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+
 
 #include "repeater.h"
 
@@ -196,7 +199,7 @@ debug( const char *fmt, ... )
     va_list args;
 	memset(myoutput2,0,256);
 	va_start( args, fmt );
-	sprintf_s(myoutput, "UltraVnc> ");
+	sprintf_s(myoutput, "UltraVNC> ");
 	vsprintf_s( myoutput, fmt, args );
 	va_end( args );
 	strncpy_s(myoutput2,myoutput,strlen(myoutput)-1);
@@ -253,7 +256,7 @@ main_test()// int argc, char **argv )
 		Clean_viewer_List();
 	
 
-		debug("Copyright (C) 2005 Ultr@VNC Team Members. All Rights Reserved.\n");
+		debug("Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.\n");
 		debug("\n");
 		debug("\n");
 		debug("The Repeater is free software; you can redistribute it and/or modify\n");

@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002-2010 UltraVNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,9 +16,9 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the program is not available from the place from
-// which you received this file, check
-// http://www.uvnc.com/
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
 //
 ////////////////////////////////////////////////////////////////////////////
 
@@ -54,7 +54,7 @@ void
 vncDesktop::StopInitWindowthread()
 {
 	//vndesktopthread is closing, all threads need to be stopped
-	//else winvnc wil stay running in background on exit
+	//else UltraVNC Server will stay running in background on exit
 	g_lockcode = 0;
 		can_be_hooked=true;
 		if (InitWindowThreadh)
@@ -65,7 +65,7 @@ vncDesktop::StopInitWindowthread()
 			if (status==WAIT_TIMEOUT)
 			{
 				vnclog.Print(LL_INTERR, VNCLOG("~vncDesktop::ERROR:  messageloop blocked \n"));
-				// WE need to kill the thread to prevent a winvnc lock
+				// WE need to kill the thread to prevent a UltraVNC Server lock
 				TerminateThread(InitWindowThreadh,0);
 				CloseHandle(InitWindowThreadh);
 				m_hwnd=NULL;
@@ -369,7 +369,7 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		// WE change the clients screensize, if they support it.
 		vnclog.Print(LL_INTERR, VNCLOG("WM_DISPLAYCHANGE\n"));
 		// We First check if the Resolution changed is caused by a temp resolution switch
-		// For a temp resolution we don't use the driver, to fix the mirror driver
+		// For a temp resolution we don't use the driver, to fix the Mirror Driver
 		// to the new change, a resolution switch is needed, preventing screensaver locking.
 
 		if (_this->m_screenCapture != NULL) //Video driver active

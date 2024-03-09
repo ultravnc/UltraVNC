@@ -1,3 +1,5 @@
+//  /////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //  Copyright (C) 2002 RealVNC Ltd. All Rights Reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -15,9 +17,12 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the program is not available from the place from
-// which you received this file, check http://www.realvnc.com/ or contact
-// the authors on info@realvnc.com for information on obtaining it.
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
+
 
 // Log.cpp: implementation of the VNCLog class.
 //
@@ -57,7 +62,7 @@ void VNCLog::SetMode(int mode)
 {
 #ifdef SC_20
     return;
-#endif
+#endif // SC_20
 	m_mode = mode;
     if (mode & ToDebug)
         m_todebug = true;
@@ -104,7 +109,7 @@ void VNCLog::SetFile()
 {
 #ifdef SC_20
     return;
-#endif
+#endif // SC_20
 	char temp[512];
 	IniFile myIniFile;
 	myIniFile.ReadString("admin", "path", temp,512);
@@ -121,7 +126,7 @@ void VNCLog::OpenFile()
 {
 #ifdef SC_20
     return;
-#endif
+#endif // SC_20
 	// Is there a file-name?
 	if (strlen(m_filename) == 0)
 	{
@@ -173,7 +178,7 @@ void VNCLog::OpenFile()
 void VNCLog::CloseFile() {
 #ifdef SC_20
     return;
-#endif
+#endif // SC_20
     if (hlogfile != NULL) {
         CloseHandle(hlogfile);
         hlogfile = NULL;
@@ -184,7 +189,7 @@ inline void VNCLog::ReallyPrintLine(const char* line)
 {
 #ifdef SC_20
     return;
-#endif
+#endif // SC_20
     if (m_todebug) OutputDebugString(line);
     if (m_toconsole) {
         DWORD byteswritten;
@@ -200,7 +205,7 @@ void VNCLog::ReallyPrint(const char* format, va_list ap)
 {
 #ifdef SC_20
     return;
-#endif
+#endif // SC_20
 	time_t current = time(0);
 	if (current != m_lastLogTime) {
 		m_lastLogTime = current;

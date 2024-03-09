@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002-2020 UltraVNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,9 +16,9 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the program is not available from the place from
-// which you received this file, check 
-// http://www.uvnc.com/
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
 //
 ////////////////////////////////////////////////////////////////////////////
  
@@ -498,7 +498,7 @@ private:
 	void * run_undetached(void* arg);
 	
 
-	// Modif sf@2002 - FileTransfer
+	// Modif sf@2002 - File Transfer
 	friend class FileTransfer;  
 	friend class TextChat;  
 
@@ -567,7 +567,7 @@ private:
 	unsigned char *m_zipbuf;
 	int m_zipbufsize;
 
-	// sf@2002 - v1.1.0 - Buffer for zip decompression (FileTransfer)
+	// sf@2002 - v1.1.0 - Buffer for zip decompression (File Transfer)
 	void CheckFileZipBufferSize(int bufsize);
 	unsigned char *m_filezipbuf;
 	int m_filezipbufsize;
@@ -598,7 +598,7 @@ private:
     KeyMap *m_keymap;
 	KeyMapJap *m_keymapJap;
 
-	FileTransfer *m_pFileTransfer; // Modif sf@2002 - FileTransfer
+	FileTransfer *m_pFileTransfer; // Modif sf@2002 - File Transfer
 	TextChat *m_pTextChat;			// Modif sf@2002 - Text Chat
 	int m_nServerScale; 	       // Modif sf@2002 - Server Scaling
 
@@ -652,7 +652,7 @@ private:
 	TCHAR *m_desktopName_viewonly;
 	unsigned char m_encPasswd[8];
 	unsigned char m_encPasswdMs[32];
-	char m_ms_user[256];  // act: add user storage for mslogon autoreconnect
+	char m_ms_user[256];  // act: add user storage for MS-Logon autoreconnect
 	char m_cmdlnUser[256]; // act: add user option on command line
 	char m_clearPasswd[256]; // Modif sf@2002
 
@@ -720,13 +720,13 @@ private:
 
 //	BmpFlasher *flash;
 
-	// ms logon
+	// MS-Logon
 	bool m_ms_logon_I_legacy;
 	char m_ad_passwd[256];
 	char m_ad_domain[256];
 	char m_ad_user[256];
 
-	// sf@2002 - FileTRansfer on server
+	// sf@2002 - File Transfer on server
 	BOOL m_fServerKnowsFileTransfer;
 
 	// sf@2002 - Auto mode

@@ -1,3 +1,28 @@
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
+//
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
+//  USA.
+//
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
+
+
 ========================================================================
     WIN32 APPLICATION : uvnckeyboardhelper Project Overview
 ========================================================================
@@ -27,24 +52,24 @@ uvnckeyboardhelper.cpp
 /////////////////////////////////////////////////////////////////////////////
 AppWizard has created the following resources:
 
-uvnckeyboardhelper.rc
+uvnckeyboardhelper+.rc
     This is a listing of all of the Microsoft Windows resources that the
-    program uses.  It includes the icons, bitmaps, and cursors that are stored
-    in the RES subdirectory.  This file can be directly edited in Microsoft
+    program uses. It includes the icons, bitmaps, and cursors that are stored
+    in the RES subdirectory. This file can be directly edited in Microsoft
     Visual C++.
 
-Resource.h
+resource+.h
     This is the standard header file, which defines new resource IDs.
     Microsoft Visual C++ reads and updates this file.
 
 uvnckeyboardhelper.ico
     This is an icon file, which is used as the application's icon (32x32).
-    This icon is included by the main resource file uvnckeyboardhelper.rc.
+    This icon is included by the main resource file uvnckeyboardhelper+.rc.
 
 small.ico
     This is an icon file, which contains a smaller version (16x16)
     of the application's icon. This icon is included by the main resource
-    file uvnckeyboardhelper.rc.
+    file uvnckeyboardhelper+.rc.
 
 /////////////////////////////////////////////////////////////////////////////
 Other standard files:

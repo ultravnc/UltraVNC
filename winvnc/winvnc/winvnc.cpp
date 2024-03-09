@@ -1,9 +1,8 @@
-//  Copyright (C) 2007 UltraVNC Team Members. All Rights Reserved.
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //  Copyright (C) 1999 AT&T Laboratories Cambridge. All Rights Reserved.
 //
-//  This file is part of the VNC system.
-//
-//  The VNC system is free software; you can redistribute it and/or modify
+//  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
@@ -18,15 +17,18 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the VNC system is not available from the place
-// whence you received this file, check http://www.uk.research.att.com/vnc or contact
-// the authors on vnc@uk.research.att.com for information on obtaining it.
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
+
 
 // WinVNC.cpp
 
 // 24/11/97		WEZ
 
-// WinMain and main WndProc for the new version of WinVNC
+// WinMain and main WndProc for the new version of UltraVNC Server
 ////////////////////////////
 // System headers
 #include "stdhdrs.h"
@@ -100,7 +102,7 @@ void Secure_Plugin(char *szPlugin);
 //HACK to use name in autoreconnect from service with dyn dns
 char dnsname[255];
 extern bool PreConnect;
-// winvnc.exe will also be used for helper exe
+// UltraVNC Server winvnc.exe will also be used for helper exe
 // This allow us to minimize the number of seperate exe
 #define u16 unsigned short
 #define u32 unsigned int
@@ -219,7 +221,7 @@ bool return2(bool value)
 #ifdef SC_20
 	if (ScSelect::g_dis_uac)
 		ScSelect::Restore_UAC_for_admin_elevated();
-#endif
+#endif // SC_20
 	return value;
 }
 
@@ -229,7 +231,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 {
 	try {
 		if (VNC_OSVersion::getInstance()->OS_XP == true)
-			MessageBoxSecure(NULL, "WIndows XP require special build", "Warning", MB_ICONERROR);
+			MessageBoxSecure(NULL, "Windows XP requires special build", "Warning", MB_ICONERROR);
 
 		if (VNC_OSVersion::getInstance()->OS_NOTSUPPORTED == true)
 		{
@@ -267,17 +269,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 		info.cb = sizeof(CR_INSTALL_INFO);
 		info.pszAppName = _T("UVNC");
 		info.pszAppVersion = _T("1.4.4.0-dev");
-		info.pszEmailSubject = _T("UVNC server 1.4.4.0-dev Error Report");
+		info.pszEmailSubject = _T("UltraVNC Server 1.4.4.0-dev Error Report");
 		info.pszEmailTo = _T("uvnc@skynet.be");
-		info.uPriorities[CR_SMAPI] = 1; // Third try send report over Simple MAPI    
+		info.uPriorities[CR_SMAPI] = 1; // Third try send report over Simple MAPI
 		// Install all available exception handlers
 		info.dwFlags |= CR_INST_ALL_POSSIBLE_HANDLERS;
-		// Restart the app on crash 
+		// Restart the app on crash
 		info.dwFlags |= CR_INST_APP_RESTART;
 		info.dwFlags |= CR_INST_SEND_QUEUED_REPORTS;
 		info.dwFlags |= CR_INST_AUTO_THREAD_HANDLERS;
 		info.pszRestartCmdLine = _T("/restart");
-		// Define the Privacy Policy URL 
+		// Define the Privacy Policy URL
 
 		// Install crash reporting
 		int nResult = crInstall(&info);
@@ -294,7 +296,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 	#ifndef SC_20
 		settings->setScExit(false);
 		settings->setScPrompt(false);
-	#endif
+	#endif // SC_20
 		setbuf(stderr, 0);
 
 		// [v1.0.2-jp1 fix] Load resouce from dll
@@ -367,7 +369,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 		char* szCmdLine = ScSelect::InitSC(hInstance, szCmdLine2);
 	#else
 		char* szCmdLine = szCmdLine2;
-	#endif
+	#endif // SC_20
 		// look up the current service name in the registry.
 		//serviceHelpers::ExistServiceName(progname, UltraVNCService::service_name);
 
@@ -425,7 +427,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 	#endif
 				return return2(0);
 			}
-	#endif
+	#endif // SC_20
 
 			if (strncmp(&szCmdLine[i], winvncKill, strlen(winvncKill)) == 0)
 			{
@@ -478,7 +480,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 				settings->setUseDSMPlugin(true);
 				continue;
 			}
-	#endif
+	#endif // SC_20
 	#ifndef SC_20
 			if (strncmp(&szCmdLine[i], winvncStartserviceHelper, strlen(winvncStartserviceHelper)) == 0)
 			{
@@ -555,7 +557,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 	#endif
 				return return2(0);
 			}
-	#endif
+	#endif // SC_20
 			if (strncmp(&szCmdLine[i], winvncSecurityEditor, strlen(winvncSecurityEditor)) == 0)
 			{
 				typedef void (*vncEditSecurityFn) (HWND hwnd, HINSTANCE hInstance);
@@ -756,7 +758,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 	#endif
 				return return2(0);
 			}
-	#endif
+	#endif // SC_20
 			if (strncmp(&szCmdLine[i], winvncPreConnect, strlen(winvncPreConnect)) == 0)
 			{
 				i += strlen(winvncPreConnect);
@@ -796,7 +798,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 	#endif
 				return return2(0);
 			}
-	#endif
+	#endif // SC_20
 			if (strncmp(&szCmdLine[i], winvncRunAsUserApp, strlen(winvncRunAsUserApp)) == 0)
 			{
 				// WinVNC is being run as a user-level program
@@ -960,7 +962,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 						strncpy_s(name, end - start + 1, &(szCmdLine[start]), end - start);
 						name[end - start] = 0;
 						strcpy_s(name2, end - start + 1, name);
-						//detect braceletes in ipv6 address or remove port number from name
+						//detect braceletes in IPv6 address or remove port number from name
 						char* bs = strchr(name, '[');
 						char* be = strchr(name, ']');
 						if (bs && be) {
@@ -1052,7 +1054,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 							delete[] name;
 							return return2(0);
 						}
-	#endif
+	#endif // SC_20
 						delete[] name;
 						if (address != 0) {
 							// Post the IP address to the server
@@ -1252,7 +1254,7 @@ DWORD WINAPI imp_desktop_thread(LPVOID lpParam)
 	}
     vnclog.Print(LL_INTERR, VNCLOG("Username %s \n"),m_username);
 
-	// Create tray icon and menu
+	// Create Tray icon and menu
 	auto menu = std::make_unique<vncMenu>(server);
 	if(menu == NULL){
 		vnclog.Print(LL_INTERR, VNCLOG("failed to create tray menu\n"));
@@ -1332,9 +1334,9 @@ DWORD WINAPI imp_desktop_thread(LPVOID lpParam)
 	return 0;
 }
 
-// This is the main routine for WinVNC when running as an application
+// This is the main routine for UltraVNC Server when running as an application
 // (under Windows 95 or Windows NT)
-// Under NT, WinVNC can also run as a service.  The WinVNCServerMain routine,
+// Under NT, UltraVNC Server can also run as a service. The WinVNCServerMain routine,
 // defined in the vncService header, is used instead when running as a service.
 
 int WinVNCAppMain()
@@ -1350,7 +1352,7 @@ int WinVNCAppMain()
 #endif
 
 	// Set this process to be the last application to be shut down.
-	// Check for previous instances of WinVNC!
+	// Check for previous instances of UltraVNC Server!
 	auto  instancehan = std::make_unique<vncInstHandler>();
 	if (!allowMultipleInstances) // this allow to overwrite the multiple instance check
 	{
@@ -1373,7 +1375,7 @@ int WinVNCAppMain()
 	vnclog.Print(LL_STATE, VNCLOG("server created ok\n"));
 	///uninstall driver before cont
 
-	// sf@2007 - New impersonation thread stuff for tray icon & menu
+	// sf@2007 - New impersonation thread stuff for Tray icon & menu
 	// Subscribe to shutdown event
 	hShutdownEvent = OpenEvent(EVENT_ALL_ACCESS, FALSE, "Global\\SessionEventUltra");
 	if (hShutdownEvent) ResetEvent(hShutdownEvent);
@@ -1399,7 +1401,7 @@ int WinVNCAppMain()
 	}
 	fShutdownOrdered = true;
 
-	if (hShutdownEvent)CloseHandle(hShutdownEvent);	
+	if (hShutdownEvent)CloseHandle(hShutdownEvent);
 	vnclog.Print(LL_STATE, VNCLOG("################## SHUTING DOWN SERVER ####################\n"));
 
 	//adzm 2009-06-20

@@ -1,10 +1,9 @@
-//  Copyright (C) 2020 UltraVnc
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //  Copyright (C) 2000 Tridia Corporation. All Rights Reserved.
 //  Copyright (C) 1999 AT&T Laboratories Cambridge. All Rights Reserved.
 //
-//  This file is part of the VNC system.
-//
-//  The VNC system is free software; you can redistribute it and/or modify
+//  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
@@ -19,20 +18,20 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// TightVNC distribution homepage on the Web: http://www.tightvnc.com/
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
 //
-// If the source code for the VNC system is not available from the place 
-// whence you received this file, check http://www.uk.research.att.com/vnc or contact
-// the authors on vnc@uk.research.att.com for information on obtaining it.
+////////////////////////////////////////////////////////////////////////////
 
 
 // vncEncodeZlibHex object
 
 // The vncEncodeZlibHex object uses a compression encoding to send rectangles
-// to a client.  As with the hextile encoding, all rectangles are broken down
+// to a client. As with the hextile encoding, all rectangles are broken down
 // into a matrix of 16x16 (or smaller at bottom/right) tiles, which are 
-// individually encoded with a subencoding mechanism.  This encoding addds
-// the ability to apply zlib compression to the raw and other hextile
+// individually encoded with a subencoding mechanism. This encoding addds
+// the ability to apply Zlib compression to the raw and other hextile
 // subencodings.
 
 class vncEncodeZlibHex;
@@ -44,7 +43,7 @@ class vncEncodeZlibHex;
 #include "vncencoder.h"
 #include "lzo/minilzo.h"
 
-// Minimum zlib rectangle size in bytes.  Anything smaller will
+// Minimum zlib rectangle size in bytes. Anything smaller will
 // not compress well due to overhead.
 // temp change lzo
 //#define VNC_ENCODE_ZLIBHEX_MIN_COMP_SIZE (17)
@@ -53,7 +52,7 @@ class vncEncodeZlibHex;
 #define ZLIBHEX_COMP_UNINITED (-1)
 
 // Size of the smallest update portion sent independently across
-// the network.  This encoder can transmit partial updates to
+// the network. This encoder can transmit partial updates to
 // improve latency issues with performance.
 #define VNC_ENCODE_ZLIBHEX_MIN_DATAXFER (1400)
 

@@ -1,10 +1,9 @@
-//  Copyright (C) 2002 UltraVNC Team Members. All Rights Reserved.
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //  Copyright (C) 2002 RealVNC Ltd. All Rights Reserved.
 //  Copyright (C) 1999 AT&T Laboratories Cambridge. All Rights Reserved.
 //
-//  This file is part of the VNC system.
-//
-//  The VNC system is free software; you can redistribute it and/or modify
+//  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
@@ -19,14 +18,17 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the VNC system is not available from the place
-// whence you received this file, check http://www.uk.research.att.com/vnc or contact
-// the authors on vnc@uk.research.att.com for information on obtaining it.
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
+
 
 #define _WINSOCK_DEPRECATED_NO_WARNINGS 1
 // vncMenu
 
-// Implementation of a system tray icon & menu for WinVNC
+// Implementation of a system Tray icon & menu for UltraVNC Server
 
 #include "stdhdrs.h"
 #include "winvnc.h"
@@ -121,7 +123,7 @@ static void KillWallpaper()
 	Sleep(200);
 #else
 	HideDesktop();
-#endif
+#endif // SC_20
 }
 
 static void RestoreWallpaper()
@@ -131,7 +133,7 @@ static void RestoreWallpaper()
 	if (!ScSelect::g_wallpaper_enabled)RestoreDesktop();	
 #else
 	RestoreDesktop();
-#endif
+#endif // SC_20
 }
 
 // adzm - 2010-07 - Disable more effects or font smoothing
@@ -188,7 +190,7 @@ vncMenu::vncMenu(vncServer* server)
 	//	strcpy_s((char *)&m_username, "SYSTEM");
 	//vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::vncMenu - UserName = %s\n"), m_username);
 
-	// Create a dummy window to handle tray icon messages
+	// Create a dummy window to handle Tray icon messages
 	WNDCLASSEX wndclass{};
 
 	wndclass.cbSize = sizeof(wndclass);
@@ -288,9 +290,9 @@ vncMenu::vncMenu(vncServer* server)
 	m_hmenu = LoadMenu(hInstResDLL, MAKEINTRESOURCE(IDR_TRAYMENU1));
 #else
 	m_hmenu = LoadMenu(hInstResDLL, MAKEINTRESOURCE(IDR_TRAYMENU));
-#endif
+#endif // SC_20
 
-	// Install the tray icon!
+	// Install the Tray icon!
 	AddTrayIcon();
 	CoUninitialize();
 }
@@ -301,7 +303,7 @@ vncMenu::~vncMenu()
 	if (ScSelect::g_dis_uac)
 		ScSelect::Restore_UAC_for_admin_elevated();
 	ScSelect::g_dis_uac = false;
-#endif
+#endif // SC_20
 
 	KillTimer(m_hwnd, 1);
 	vnclog.Print(LL_INTERR, VNCLOG("vncmenu killed\n"));
@@ -321,7 +323,7 @@ vncMenu::~vncMenu()
 	if (m_flash_icon)
 		DestroyIcon(m_flash_icon);
 
-	// Remove the tray icon
+	// Remove the Tray icon
 	DelTrayIcon();
 
 	// Destroy the loaded menu
@@ -351,7 +353,7 @@ vncMenu::AddTrayIcon()
 	if (strcmp(m_username, "") != 0 && strcmp(m_username, "SYSTEM") != 0)
 	{
 		// Make sure the server has not been configured to
-		// suppress the tray icon.
+		// suppress the Tray icon.
 		HWND tray = FindWindow(("Shell_TrayWnd"), 0);
 		if (!tray) {
 			IsIconSet = false;
@@ -386,14 +388,14 @@ vncMenu::AddTrayIcon()
 void
 vncMenu::DelTrayIcon()
 {
-	//vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::DelTrayIcon - DEL Tray Icon call\n"));
+	//vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::DelTrayIcon - DEL Tray icon call\n"));
 	SendTrayMsg(NIM_DELETE, false, FALSE);
 }
 
 void
 vncMenu::FlashTrayIcon(BOOL flash)
 {
-	//vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::FlashTrayIcon - FLASH Tray Icon call\n"));
+	//vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::FlashTrayIcon - FLASH Tray icon call\n"));
 	SendTrayMsg(NIM_MODIFY, false, flash);
 }
 
@@ -534,7 +536,7 @@ BOOL vncMenu::AddNotificationIcon()
 	if (IsIconSet == true)
 		return true;
 	memset(&m_nid, 0, sizeof(m_nid));
-	// Create the tray icon message
+	// Create the Tray icon message
 	m_nid.hWnd = m_hwnd;
 	m_nid.cbSize = sizeof(m_nid);
 	m_nid.uID = IDI_WINVNC;			// never changes after construction
@@ -564,7 +566,7 @@ BOOL vncMenu::AddNotificationIcon()
 		return true;
 	}
 	if (!settings->RunningFromExternalService()) {
-		// The tray icon couldn't be created, so use the Properties dialog
+		// The Tray icon couldn't be created, so use the Properties dialog
 		// as the main program window
 		// sf@2007 - Do not display Properties pages when running in Application0 mode
 		if (!settings->RunningFromExternalService()) {
@@ -898,7 +900,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 #ifdef SC_20
 				if (ScSelect::g_dis_uac) 
 					ScSelect::Disbale_UAC_for_admin_run_elevated();
-#endif
+#endif // SC_20
 				if (settings->getRemoveWallpaper())
 					KillWallpaper();
 				if (settings->getRemoveEffects())
@@ -915,7 +917,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 #ifdef SC_20
 			if (ScSelect::g_dis_uac) 
 				ScSelect::Restore_UAC_for_admin_elevated();
-#endif
+#endif // SC_20
 			if (settings->getRemoveWallpaper()) // Moved, redundant if //PGM @ Advantig
 				ResetAero(); // Moved, redundant if //PGM @ Advantig
 			if (settings->getRemoveWallpaper()) { // Added { //PGM @ Advantig
@@ -959,7 +961,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
 		
 		case ID_OUTGOING_CONN:
-			// Connect out to a listening VNC viewer
+			// Connect out to a listening VNC Viewer
 		{
 			auto newconn = std::make_unique<vncConnDialog>(_this->m_server);
 			if (newconn)
@@ -987,16 +989,15 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			break;
 
 		case ID_VISITUSONLINE_HOMEPAGE:
-			if (settings->RunningFromExternalService() && OpenWebpageFromService("cmd /c start https://www.uvnc.com"));
+			if (settings->RunningFromExternalService() && OpenWebpageFromService("cmd /c start https://uvnc.com/"));
 			else 
 				OpenWebpageFromApp(ID_VISITUSONLINE_HOMEPAGE);
-			
 			break;
 
 		case ID_VISITUSONLINE_FORUM:
-			if (settings->RunningFromExternalService() && OpenWebpageFromService("cmd /c start https://forum.uvnc.com"));
+			if (settings->RunningFromExternalService() && OpenWebpageFromService("cmd /c start https://forum.uvnc.com/"));
 			else
-				OpenWebpageFromApp(ID_VISITUSONLINE_HOMEPAGE);
+				OpenWebpageFromApp(ID_VISITUSONLINE_FORUM);
 
 			break;
 	
@@ -1274,12 +1275,12 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			}
 		}
 		break;
-#endif
+#endif // SC_20
 		}
 		return 0;
 
 	case WM_TRAYNOTIFY:
-		// User has clicked on the tray icon or the menu
+		// User has clicked on the Tray icon or the menu
 	{
 		// Get the submenu to use as a pop-up menu
 		HMENU submenu = GetSubMenu(_this->m_hmenu, 0);
@@ -1386,7 +1387,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		break;
 
 	case WM_DESTROY:
-		// The user wants WinVNC to quit cleanly...
+		// The user wants UltraVNC Server to quit cleanly...
 		_this->DeleteNotificationIcon();
 		vnclog.Print(LL_INTINFO, VNCLOG("quitting from WM_DESTROY\n"));
 		PostQuitMessage(0);
@@ -1437,7 +1438,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				// User has changed!
 				strcpy_s(_this->m_username, newuser);
 
-				// Redraw the tray icon and set it's state
+				// Redraw the Tray icon and set it's state
 				_this->DelTrayIcon();
 				_this->AddTrayIcon();
 				_this->FlashTrayIcon(_this->m_server->AuthClientCount() != 0);
@@ -1509,7 +1510,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			if (iMsg == postHelper::MENU_ADD_CLIENT6_MSG_INIT)
 				_this->m_server->AutoReconnectAdr("");
 
-			// Add Client message.  This message includes an IP address
+			// Add Client message. This message includes an IP address
 			// of a listening client, to which we should connect.
 
 			//adzm 2009-06-20 - Check for special add repeater client message
@@ -1613,7 +1614,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				VSocket* tmpsock;
 				tmpsock = new VSocket;
 				if (tmpsock) {
-					// Connect out to the specified host on the VNCviewer listen port
+					// Connect out to the specified host on the UltraVNC Viewer listen port
 #ifdef IPV6V4
 					if (tmpsock->CreateConnect(szAdrName, nport))
 #else
@@ -1653,7 +1654,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			if (iMsg == postHelper::MENU_ADD_CLIENT_MSG_INIT)
 				_this->m_server->AutoReconnectAdr("");
 
-			// Add Client message.  This message includes an IP address
+			// Add Client message. This message includes an IP address
 			// of a listening client, to which we should connect.
 
 			//adzm 2009-06-20 - Check for special add repeater client message
@@ -1757,7 +1758,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				VSocket* tmpsock;
 				tmpsock = new VSocket;
 				if (tmpsock) {
-					// Connect out to the specified host on the VNCviewer listen port
+					// Connect out to the specified host on the UltraVNC Viewer listen port
 #ifdef IPV6V4
 					if (tmpsock->CreateConnect(szAdrName, nport))
 #else
@@ -1797,7 +1798,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			if (iMsg == postHelper::MENU_ADD_CLIENT_MSG_INIT)
 				_this->m_server->AutoReconnectAdr("");
 
-			// Add Client message.  This message includes an IP address
+			// Add Client message. This message includes an IP address
 			// of a listening client, to which we should connect.
 
 			//adzm 2009-06-20 - Check for special add repeater client message
@@ -2004,7 +2005,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		}
 #endif
 
-		// Process FileTransfer asynchronous Send Packet Message
+		// Process File Transfer asynchronous Send Packet Message
 		if (iMsg == postHelper::FileTransferSendPacketMessage)
 		{
 			vncClient* pClient = (vncClient*)wParam;

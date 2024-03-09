@@ -1,3 +1,5 @@
+//  /////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //  Copyright (C) 2002 RealVNC Ltd. All Rights Reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -15,9 +17,12 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the program is not available from the place from
-// which you received this file, check http://www.realvnc.com/ or contact
-// the authors on info@realvnc.com for information on obtaining it.
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
+
 
 #include <algorithm>
 
@@ -39,7 +44,7 @@
 // CpuTime and CpuTimer provide a simple way to profile particular
 // sections of code
 //
-// Use one CpuTime object per task to be profiled.  CpuTime instances
+// Use one CpuTime object per task to be profiled. CpuTime instances
 // maintain a cumulative total of time spent in user and kernel space
 // by threads.
 // When a CpuTime object is created, a label must be specified to
@@ -48,10 +53,10 @@
 // containing the user and kernel times accumulated.
 //
 // Place a CpuTimer object in each section of code which is to be
-// profiled.  When the object is created, it snapshots the current
-// kernel and user times and stores them.  These are used when the
+// profiled. When the object is created, it snapshots the current
+// kernel and user times and stores them. These are used when the
 // object is destroyed to establish how much time has elapsed in the
-// intervening period.  The accumulated time is then added to the
+// intervening period. The accumulated time is then added to the
 // associated CpuTime object.
 //
 // This code works only on platforms providing __int64

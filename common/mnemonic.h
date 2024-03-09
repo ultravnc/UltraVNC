@@ -48,8 +48,8 @@
 /* Note that the last format does not fit in a standard 80 character line */
 
 typedef unsigned char mn_byte;		/* 8 bit quantity */
-typedef unsigned long mn_word32;	/* temporary value, at least 32 bits */
-/* Range checks assume that mn_index is unsigned (=> can't be <0).  --DV */
+typedef unsigned long mn_word32;	/* temporary value, at least 32-bit */
+/* Range checks assume that mn_index is unsigned (=> can't be <0). --DV */
 typedef unsigned int mn_index;		/* index into wordlist */
 
 extern const char *mn_words[];		/* the word list itself */

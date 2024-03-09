@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002 Ultr@VNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //
 //
 // Redistribution and use in source and binary forms,
@@ -10,7 +10,7 @@
 // Redistributions in binary form must reproduce the above copyright notice,
 // this list of conditions and the following disclaimer in the documentation
 // and/or other materials provided with the distribution. 
-// Neither the name of the Ultr@VNC nor the names of its contributors
+// Neither the name of the UltraVNC nor the names of its contributors
 // may be used to endorse or promote products derived from this software
 // without specific prior written permission. 
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
@@ -29,7 +29,7 @@
 //	Program use functions from the connect.c (GPL)
 //  http://www.imasy.or.jp/~gotoh/ssh/connect.c
 //
-//  To author Shun-ichi GOTO has granted Ultr@vnc the permission
+//  To author Shun-ichi GOTO has granted UltraVNC the permission
 //  to use his code as BSD style license.
 //
 //

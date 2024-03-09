@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002-2013 UltraVNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,9 +16,9 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the program is not available from the place from
-// which you received this file, check 
-// http://www.uvnc.com/
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
 //
 ////////////////////////////////////////////////////////////////////////////
 #include <winsock2.h>
@@ -67,7 +67,7 @@ BOOL GetDllProductVersion(char* dllName, char *vBuffer, int size)
    DWORD sVersion = GetFileVersionInfoSize(dllName, &rBuffer);
    if (sVersion==0)
 	   {
-		   strcpy_s(vBuffer, 512, "Fail: Using 32bit winvnc.exe with  a 64bit driver? \n");		   
+		   strcpy_s(vBuffer, 512, "Fail: Using 32-bit UltraVNC Server winvnc.exe with a 64-bit driver? \n");		   
 		   return (FALSE);
 		}
 
@@ -186,7 +186,7 @@ CheckVideoDriver(bool Box)
                         else
                         {
                             strcat_s(buf2, "Driver Not Activated, is the viewer current connected ?\n");
-                            strcat_s(buf2, "A mirrior driver can only be started if winvnc is a service or running as admin\n");
+                            strcat_s(buf2, "A mirrior driver can only be started if UltraVNC Server is a service or running as admin\n");
                         }
 						MessageBoxSecure(NULL,buf2,buf,0);
 					}
