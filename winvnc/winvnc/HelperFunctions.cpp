@@ -418,6 +418,36 @@ void Open_forum()
 	ShellExecute(0, "open", "https://forum.uvnc.com/", 0, 0, 1);
 }
 
+void Open_github()
+{
+	ShellExecute(0, "open", "https://github.com/ultravnc", 0, 0, 1);
+}
+
+void Open_mastodon()
+{
+	ShellExecute(0, "open", "https://mastodon.social/@ultravnc", 0, 0, 1);
+}
+
+void Open_facebook()
+{
+	ShellExecute(0, "open", "https://www.facebook.com/ultravnc1", 0, 0, 1);
+}
+
+void Open_xtwitter()
+{
+	ShellExecute(0, "open", "https://twitter.com/ultravnc1", 0, 0, 1);
+}
+
+void Open_reddit()
+{
+	ShellExecute(0, "open", "https://www.reddit.com/r/ultravnc", 0, 0, 1);
+}
+
+void Open_openhub()
+{
+	ShellExecute(0, "open", "https://openhub.net/p/ultravnc", 0, 0, 1);
+}
+
 #ifndef SC_20
 namespace serviceHelpers {
 	void Set_stop_service_as_admin() {

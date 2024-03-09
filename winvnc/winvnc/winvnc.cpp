@@ -468,6 +468,61 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 	#endif
 				return return2(0);
 			}
+
+			if (strncmp(&szCmdLine[i], winvncopengithub, strlen(winvncopengithub)) == 0)
+			{
+				Open_github();
+	#ifdef CRASHRPT
+				crUninstall();
+	#endif
+				return return2(0);
+			}
+
+			if (strncmp(&szCmdLine[i], winvncopenmastodon, strlen(winvncopenmastodon)) == 0)
+			{
+				Open_mastodon();
+	#ifdef CRASHRPT
+				crUninstall();
+	#endif
+				return return2(0);
+			}
+
+			if (strncmp(&szCmdLine[i], winvncopenfacebook, strlen(winvncopenfacebook)) == 0)
+			{
+				Open_facebook();
+	#ifdef CRASHRPT
+				crUninstall();
+	#endif
+				return return2(0);
+			}
+
+			if (strncmp(&szCmdLine[i], winvncopenxtwitter, strlen(winvncopenxtwitter)) == 0)
+			{
+				Open_xtwitter();
+	#ifdef CRASHRPT
+				crUninstall();
+	#endif
+				return return2(0);
+			}
+
+			if (strncmp(&szCmdLine[i], winvncopenreddit, strlen(winvncopenreddit)) == 0)
+			{
+				Open_reddit();
+	#ifdef CRASHRPT
+				crUninstall();
+	#endif
+				return return2(0);
+			}
+
+			if (strncmp(&szCmdLine[i], winvncopenopenhub, strlen(winvncopenopenhub)) == 0)
+			{
+				Open_openhub();
+	#ifdef CRASHRPT
+				crUninstall();
+	#endif
+				return return2(0);
+			}
+
 	#ifdef SC_20
 			if (strncmp(&szCmdLine[i], "-noregistry", strlen("-noregistry")) == 0)
 			{

@@ -40,6 +40,12 @@ extern bool allowMultipleInstances;
 
 void Open_homepage();
 void Open_forum();
+void Open_github();
+void Open_mastodon();
+void Open_facebook();
+void Open_xtwitter();
+void Open_reddit();
+void Open_openhub();
 
 namespace postHelper {
 	extern UINT MENU_ADD_CLIENT_MSG;
