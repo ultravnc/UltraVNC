@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002-2007 UltraVNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,31 +16,31 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the program is not available from the place from
-// which you received this file, check 
-// http://www.uvnc.com
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
 //
 ////////////////////////////////////////////////////////////////////////////
 
 
-// FileTransfer.cpp: implementation of the FileTransfer class.
+// FileTransfer.cpp: implementation of the File Transfer class.
 
-// sf@2002 - sf@2003 - sf@2004 - FileTransfer
-// This class handles all the FileTransfer messages, events and procs, as well as the
+// sf@2002 - sf@2003 - sf@2004 - File Transfer
+// This class handles all the File Transfer messages, events and procs, as well as the
 // DialogBox which allows the user to browse Client ans Server disks-directories,
 // and select some files to transfer between Client and Server.
 //
-// The GUI is very basic because I don't want to include MFC Classes in VNC...
+// The GUI is very basic because I don't want to include MFC Classes in UltraVNC...
 // I use only Windows SDK.
 //
 //
 // The GUI is now quite bearable, but following modifs could be done one day or another
 // - Add more columns to FileLists (File type, Attributes...)
 // - Total progress should be based on total files' size instead of total number of files
-// - Make the History persistent (file) so it's not lost each time the FileTransfer Win is closed
+// - Make the History persistent (file) so it's not lost each time the File Transfer Win is closed
 // - Clean-up the code (duplicated parts, arrays and strings dimensions checks...)
 // - Display the total files size in the currently displayed directory
-// - Remember the current directories - Partially done: the FT window can be minimized...
+// - Remember the current directories - Partially done: the File Transfer window can be minimized...
 
 
 #include "stdhdrs.h"
@@ -71,7 +71,7 @@
 #define strchr(a, b) reinterpret_cast<char*>(_mbschr(reinterpret_cast<unsigned char*>(a), b))
 #define strrchr(a, b) reinterpret_cast<char*>(_mbsrchr(reinterpret_cast<unsigned char*>(a), b))
 
-// These strings contain all the translated FT messages 
+// These strings contain all the translated File Transfer messages 
 extern char sz_H1[64];
 extern char sz_H2[64];
 extern char sz_H3[128];
@@ -427,7 +427,7 @@ void FileTransfer::ShowFileTransferWindow(bool fVisible)
 	if (fVisible) {
 		SetForegroundWindow(hWnd);
 	}
-	// Put the FT Windows always on Top if fullscreen
+	// Put the File Transfer Windows always on Top if fullscreen
 	if (fVisible && m_pCC->InFullScreenMode())
 	{
 		RECT Rect;
@@ -442,7 +442,7 @@ void FileTransfer::ShowFileTransferWindow(bool fVisible)
 	}
 
 	m_fVisible = fVisible; // This enables screen updates to be processed in ClientConnection
-	// Refresh screen view if FileTransfer window has been hidden
+	// Refresh screen view if File Transfer window has been hidden
 	//adzm 2010-09 - all socket writes must remain on a single thread, but we only need an async request here
 	if (bChanged && !fVisible)
 		m_pCC->SendAppropriateFramebufferUpdateRequest(true);
@@ -473,7 +473,7 @@ bool PseudoYield(HWND hWnd)
 //
 //  Here we process all incoming FileTransferMsg stuff
 //  coming from the server.
-//  The server only sends FileTransfer data when requested
+//  The server only sends File Transfer data when requested
 //  by the client. Possible request are:
 //
 //  - Send the list of your drives
@@ -600,8 +600,8 @@ void FileTransfer::ProcessFileTransferMsg(void)
 		FinishFileReception();
 		break;
 
-	// Abort current file transfer
-	// For versions <=RC18 we also use it to test if we're allowed to use FileTransfer on the server
+	// Abort current File Transfer
+	// For versions <= RC18 we also use it to test if we're allowed to use File Transfer on the server
 	case rfbAbortFileTransfer:
 		// AbortFileDownload();
 		if (m_fFileDownloadRunning)
@@ -611,8 +611,8 @@ void FileTransfer::ProcessFileTransferMsg(void)
 		}
 		else
 		{
-			// We want the viewer to be backward compatible with UltraWinVNC running the old FT protocole
-            m_ServerFTProtocolVersion = FT_PROTO_VERSION_OLD; // Old permission method -> it's a <=RC18 server
+			// We want the viewer to be backward compatible with UltraVNC Server running the old File Transfer Protocol
+            m_ServerFTProtocolVersion = FT_PROTO_VERSION_OLD; // Old permission method -> it's a <= RC18 UltraVNC Server
 			m_nBlockSize = 4096; // Old packet size value...
 			ShowWindow(GetDlgItem(hWnd, IDC_RENAME_B), SW_HIDE);
 
@@ -620,7 +620,7 @@ void FileTransfer::ProcessFileTransferMsg(void)
 		}
 		break;
 	
-	// New FT handshaking/permission method (from RC19)
+	// New File Transfer handshaking/permission method (from RC19)
 	case rfbFileTransferAccess:
 		TestPermission(Swap32IfLE(ft.size), ft.contentParam);
 		break;
@@ -633,7 +633,7 @@ void FileTransfer::ProcessFileTransferMsg(void)
 
 
 //
-// request file transfer permission 
+// request File Transfer permission 
 //
 void FileTransfer::RequestPermission()
 {
@@ -645,8 +645,8 @@ void FileTransfer::RequestPermission()
 	ft.contentType = rfbAbortFileTransfer; 
 	// ft.contentParam = 0; 
 	ft.contentParam = rfbFileTransferVersion; // Old viewer will send 0
-	// New method can't be used yet as we want backward compatibility (new viewer FT must 
-	// work with old UltraWinVNC FT
+	// New method can't be used yet as we want backward compatibility (new UltraVNC Viewer File Transfer must 
+	// work with old UltraVNC Server File Transfer
 	// ft.contentType = rfbFileTransferAccess; 
 	// ft.contentParam = rfbFileTransferVersion;
 	ft.length = 0;
@@ -679,7 +679,7 @@ void FileTransfer::EndFTSession()
     m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
 }
 //
-// Test if we are allowed to access filetransfer
+// Test if we are allowed to access File Transfer
 //
 bool FileTransfer::TestPermission(long lSize, int nVersion)
 {
@@ -1500,7 +1500,7 @@ void FileTransfer::PopulateRemoteListBox(HWND hWnd, UINT nLen)
 	m_nFileCount = 0;
 	m_fDirectoryReceptionRunning = true;
 
-	// FT Backward compatibility DIRTY hack for DSMPlugin mode...
+	// File Transfer Backward compatibility DIRTY hack for DSMPlugin mode...
 	if (UsingOldProtocol() && m_pCC->m_fUsePlugin && !m_pCC->m_fPluginStreamingIn)
 	{
 		m_pCC->m_nTO = 0;
@@ -1532,7 +1532,7 @@ void FileTransfer::ReceiveDirectoryItem(HWND hWnd, UINT nLen)
 	// PseudoYield(pFileTransfer->hWnd);
 	if (!PseudoYield(GetParent(hWnd))) return;
 
-	// FT Backward compatibility DIRTY hack for DSMPlugin mode...
+	// File Transfer Backward compatibility DIRTY hack for DSMPlugin mode...
 	if (UsingOldProtocol() && m_pCC->m_fUsePlugin && !m_pCC->m_fPluginStreamingIn)
 	{
 		m_pCC->m_nTO = 0;
@@ -1919,7 +1919,7 @@ void FileTransfer::RequestRemoteFile(LPSTR szRemoteFileName)
 //	vnclog.Print(0, _T("RequestRemoteFile\n"));
 	if (!m_fFTAllowed) return;
 
-	// Ensure Backward FT compatibility (Directory reception)....
+	// Ensure Backward File Transfer compatibility (Directory reception)....
 	if (UsingOldProtocol())
 	{
 		char* p1 = strrchr(szRemoteFileName, '\\') + 1;
@@ -2207,7 +2207,7 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, UINT nLen)
 
 	m_dwStartTick = GetTickCount();
 
-	// FT Backward compatibility DIRTY hack for DSMPlugin mode...
+	// File Transfer Backward compatibility DIRTY hack for DSMPlugin mode...
 	if (UsingOldProtocol() && m_pCC->m_fUsePlugin && !m_pCC->m_fPluginStreamingIn)
 	{
 		m_pCC->m_nTO = 0;
@@ -2291,7 +2291,7 @@ bool FileTransfer::ReceiveFileChunk(UINT nLen, int nSize)
 	SetGauge(hWnd, m_dwTotalNbBytesWritten);
 	PseudoYield(GetParent(hWnd));
 
-	// We still support the *dirty* old "Abort" method (for backward compatibility wirh UltraVNC Servers <=RC18)
+	// We still support the *dirty* old "Abort" method (for backward compatibility with UltraVNC Server <= RC18)
 	if (UsingOldProtocol())
 	{
 		// Every 10 packets, test if the transfer must be stopped
@@ -2320,9 +2320,9 @@ bool FileTransfer::ReceiveFileChunk(UINT nLen, int nSize)
 			m_nPacketCount = 0;
 		}
 	}
-	else // New V2 FT Protocole
+	else // New v2 File Transfer Protocol
 	{
-		// Now abort the file transfer if required by the user
+		// Now abort the File Transfer if required by the user
 		if (m_fAbort && !m_fAborted)
 		{
 			m_fAborted = true;
@@ -2336,7 +2336,7 @@ bool FileTransfer::ReceiveFileChunk(UINT nLen, int nSize)
 		}
 	}
 
-	// FT Backward compatibility DIRTY hack for DSMPlugin mode...
+	// File Transfer Backward compatibility DIRTY hack for DSMPlugin mode...
 	if (UsingOldProtocol() && m_pCC->m_fUsePlugin && !m_pCC->m_fPluginStreamingIn)
 	{
 		m_pCC->m_nTO = 0;
@@ -2974,7 +2974,7 @@ bool FileTransfer::FinishFileSending()
 			m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
 		sprintf_s(szStatus, " %s < %s > %s", sz_H17, m_szSrcFileName, sz_H27/*, (int)((lTotalComp * 100) / dwTotalNbBytesWritten), fCompress ? "C" : "N"*//*, szDstFileName*/); 
 	}
-	else // Error during file transfer loop
+	else // Error during File Transfer loop
 	{
 		rfbFileTransferMsg ft;
 		ft.type = rfbFileTransfer;
@@ -3270,7 +3270,7 @@ int FileTransfer::DoDialog()
 
 
 //
-// 2006 - Resizable FT Window mod - By Roytam1 & and KP774
+// 2006 - Resizable File Transfer Window mod - By Roytam1 & and KP774
 //
 void FTAdjustLeft(LPRECT lprc)
 {
@@ -4396,7 +4396,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 
 	}
 	/*
-	// Process FileTransfer asynchronous Send Packet Message
+	// Process File Transfer asynchronous Send Packet Message
 	if (uMsg == FileTransferSendPacketMessage)
 	{
 		_this->SendFileChunk();

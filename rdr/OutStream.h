@@ -1,20 +1,28 @@
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002 RealVNC Ltd. All Rights Reserved.
 //
-// Copyright (C) 2002 RealVNC Ltd.  All Rights Reserved.
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
+//  (at your option) any later version.
 //
-// This is free software; you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
-// (at your option) any later version.
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
 //
-// This software is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
+//  USA.
 //
-// You should have received a copy of the GNU General Public License
-// along with this software; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
-// USA.
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
+
 
 //
 // rdr::OutStream marshalls data into a buffer stored in RDR (RFB Data
@@ -42,7 +50,7 @@ namespace rdr {
     virtual ~OutStream() {}
 
     // check() ensures there is buffer space for at least one item of size
-    // itemSize bytes.  Returns the number of items which fit (up to a maximum
+    // itemSize bytes. Returns the number of items which fit (up to a maximum
     // of nItems).
 
     inline int check(int itemSize, int nItems=1)
@@ -67,7 +75,7 @@ namespace rdr {
     inline void writeS16(S16 s) { writeU16((U16)s); }
     inline void writeS32(S32 s) { writeU32((U32)s); }
 
-    // writeString() writes a string - a U32 length followed by the data.  The
+    // writeString() writes a string - a U32 length followed by the data. The
     // given string should be null-terminated (but the terminating null is not
     // written to the stream).
 
@@ -127,7 +135,7 @@ namespace rdr {
     virtual void flush() {}
 
     // getptr(), getend() and setptr() are "dirty" methods which allow you to
-    // manipulate the buffer directly.  This is useful for a stream which is a
+    // manipulate the buffer directly. This is useful for a stream which is a
     // wrapper around an underlying stream.
 
     inline U8* getptr() { return ptr; }
@@ -137,8 +145,8 @@ namespace rdr {
   private:
 
     // overrun() is implemented by a derived class to cope with buffer overrun.
-    // It ensures there are at least itemSize bytes of buffer space.  Returns
-    // the number of items which fit (up to a maximum of nItems).  itemSize is
+    // It ensures there are at least itemSize bytes of buffer space. Returns
+    // the number of items which fit (up to a maximum of nItems). itemSize is
     // supposed to be "small" (a few bytes).
 
     virtual int overrun(int itemSize, int nItems) = 0;

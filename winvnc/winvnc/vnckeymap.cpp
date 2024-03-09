@@ -1,9 +1,9 @@
+//  /////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //  Copyright (C) 2002 RealVNC Ltd. All Rights Reserved.
 //  Copyright (C) 1999 AT&T Laboratories Cambridge. All Rights Reserved.
 //
-//  This file is part of the VNC system.
-//
-//  The VNC system is free software; you can redistribute it and/or modify
+//  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
@@ -18,14 +18,17 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the program is not available from the place from
-// which you received this file, check http://www.realvnc.com/ or contact
-// the authors on info@realvnc.com for information on obtaining it.
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
+
 
 // vncKeymap.cpp
 
 // This code originally just mapped between X keysyms and local Windows
-// virtual keycodes.  Now it actually does the local-end simulation of
+// virtual keycodes. Now it actually does the local-end simulation of
 // key presses, to keep this messy code on one place!
 #pragma warning(disable : 4786)
 #include <stdlib.h>
@@ -51,7 +54,7 @@
 #include <vector>
 #include "SettingsManager.h"
 
-// Mapping of X keysyms to windows VK codes.  Ordering here is the same as
+// Mapping of X keysyms to windows VK codes. Ordering here is the same as
 // keysymdef.h to make checking easier
 rdr::U32 keysymDead=0;
 
@@ -353,10 +356,10 @@ inline void doKeyboardEvent(BYTE vkCode, DWORD flags) {
 }
 
 // KeyStateModifier is a class which helps simplify generating a "fake" press
-// or release of shift, ctrl, alt, etc.  An instance of the class is created
-// for every key which may need to be pressed or released.  Then either press()
+// or release of shift, ctrl, alt, etc. An instance of the class is created
+// for every key which may need to be pressed or released. Then either press()
 // or release() may be called to make sure that the corresponding key is in the
-// right state.  The destructor of the class automatically reverts to the
+// right state. The destructor of the class automatically reverts to the
 // previous state.
 
 class KeyStateModifier {
@@ -732,13 +735,13 @@ public:
       {
 		vnclog.Print(LL_INTINFO,
                  "CAD\n");
-		// If running under Vista and started from Session0 in Application mode
+		// If running under Windows Vista and started from Session0 in Application mode
 		if (settings->RunningFromExternalService())
 		{
 			      vnclog.Print(LL_INTINFO,
-                 "Vista and runnning as system -> CAD\n");
+                 "Windows Vista and runnning as system -> CAD\n");
 
-				// Try to run the special Vista cad.exe file...
+				// Try to run the special Windows Vista cad.exe file...
 				HANDLE ThreadHandle2;
 				DWORD dwTId;
 				ThreadHandle2 = CreateThread(NULL, 0, vncCad::Cadthread, NULL, 0, &dwTId);
@@ -747,7 +750,7 @@ public:
 		else
 		{
 			vnclog.Print(LL_INTINFO,
-                 "Vista and runnning as user -> Taskmgr\n");
+                 "Windows Vista and runnning as user -> Taskmgr\n");
 			WinExec("taskmgr.exe", SW_SHOWNORMAL);
 		}		
 

@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002-2013 UltraVNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,9 +16,9 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the program is not available from the place from
-// which you received this file, check 
-// http://www.uvnc.com/
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
 //
 ////////////////////////////////////////////////////////////////////////////
 
@@ -567,11 +567,11 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 						{
 							vnclog.Print(LL_INTERR, VNCLOG("Format changed\n"));
 							m_server->UpdatePalette(false); // changed no lock ok
-							//UpdateLocalFormat without updatelock can cause stuck in m_signal->wait(), because not returning from mutex->lock()
-							//the synchonisation of EnableUpdates(TRUE|FALSE) does not work without getting the UpdateLock.
-							//this is a weakness in the vnc server implementation
-							//we had the problem on XP, running in a virtual machine of win7 virtualbox.
-							m_server->UpdateLocalFormat(true); // must have the update lock
+							// UpdateLocalFormat without updatelock can cause stuck in m_signal->wait(), because not returning from mutex->lock()
+							// the synchonisation of EnableUpdates(TRUE|FALSE) does not work without getting the UpdateLock.
+							// This is a weakness in the VNC Server implementation
+							// We had the problem on Windows XP, running in a virtual machine of Windows 7 VirtualBox.
+							m_server->UpdateLocalFormat(true); // Must have the update lock
 						}
 
 					if (m_desktop->m_screensize_changed)
@@ -855,7 +855,7 @@ vncDesktopThread::run_undetached(void *arg)
 	
 	if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver && !VNC_OSVersion::getInstance()->OS_WIN8 && !VNC_OSVersion::getInstance()->OS_WIN10)
 		{
-			//MIRROR DRIVER....still to check if this works			
+			// MIRROR DRIVER... still to check if this works			
 			DWORD dw;
 			if (ThreadHandleCheckMirrorDriverUpdates == NULL)
 				ThreadHandleCheckMirrorDriverUpdates = CreateThread(NULL, 0, ThreadCheckMirrorDriverUpdates, this, 0, &dw);
@@ -866,7 +866,7 @@ vncDesktopThread::run_undetached(void *arg)
 		}
 	else if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver && (VNC_OSVersion::getInstance()->OS_WIN8||VNC_OSVersion::getInstance()->OS_WIN10))
 		{
-			//DDENGINE
+			// DDENGINE
 			m_desktop->trigger_events[6] = m_desktop->m_screenCapture->getHScreenEvent();
 			m_desktop->trigger_events[7] = m_desktop->m_screenCapture->getHPointerEvent();			
 			waittime = 1000;
@@ -904,7 +904,7 @@ vncDesktopThread::run_undetached(void *arg)
 				break;
 				case WAIT_OBJECT_0+6:
 					ResetEvent(m_desktop->trigger_events[6]);
-					wcscpy_s(g_hookstring,L"ddengine");
+					wcscpy_s(g_hookstring,L"DDEngine");
 				case WAIT_TIMEOUT:				
 				case WAIT_OBJECT_0: {
 					ResetEvent(m_desktop->trigger_events[0]);

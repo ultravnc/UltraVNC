@@ -1,3 +1,28 @@
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
+//
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
+//  USA.
+//
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
+
+
 #pragma once
 #include "ScreenCapture.h"
 #include <tchar.h>
@@ -19,8 +44,8 @@ const static LPCTSTR g_szIPCSharedEvent = _T("{3BFBA3A0-2133-48B5-B5BD-E58C72853
 const static LPCTSTR g_szIPCSharedPointerEvent = _T("{3A77E11C-B0B4-40F9-BC8B-D249116A76FE}");
 
 #ifdef SC_20
-class LoadDllFromMemory;
-#endif
+	class LoadDllFromMemory;
+#endif // SC_20
 
 class DeskDupEngine : public ScreenCapture
 {
@@ -56,6 +81,5 @@ private:
 	HANDLE hPointerEvent;
 #ifdef SC_20
 	std::unique_ptr<LoadDllFromMemory> loadDllFromMemory;
-#endif
+#endif // SC_20
 };
-

@@ -1,21 +1,27 @@
-// Copyright (C) 2002-2005 Ultr@VNC Team.  All Rights Reserved.
-// Copyright (C) 2004 Kenn Min Chong, John Witchel.  All Rights Reserved.
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
+//  Copyright (C) 2004 Kenn Min Chong, John Witchel. All Rights Reserved.
 //
-//This is free software; you can redistribute it and/or modify
-//it under the terms of the GNU General Public License as published by
-//the Free Software Foundation; either version 2 of the License, or
-//(at your option) any later version.
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
+//  (at your option) any later version.
 //
-//This software is distributed in the hope that it will be useful,
-//but WITHOUT ANY WARRANTY; without even the implied warranty of
-//MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//GNU General Public License for more details.
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
 //
-//You should have received a copy of the GNU General Public License
-//along with this software; if not, write to the Free Software
-//Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
-//USA.
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
+//  USA.
 //
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
 
 
 import javax.swing.JFrame;
@@ -111,7 +117,7 @@ public class FTPFrame extends JFrame implements ActionListener, MouseListener {
 	 */
 
 	FTPFrame(VncViewer v) {
-		super("Ultr@VNC File Transfer");
+		super("UltraVNC File Transfer");
 		viewer = v;
 		initialize();
 	}
@@ -177,7 +183,7 @@ public class FTPFrame extends JFrame implements ActionListener, MouseListener {
 	}
 
 	/**
-	 * Disable buttons/lists while file transfer is in progress
+	 * Disable buttons/lists while File Transfer is in progress
 	 * @return void
 	 */
 
@@ -202,7 +208,7 @@ public class FTPFrame extends JFrame implements ActionListener, MouseListener {
 	}
 
 	/**
-	 * Enable buttons/lists when file transfer is done
+	 * Enable buttons/lists when File Transfer is done
 	 * @return void
 	 */
 	
@@ -291,7 +297,7 @@ public class FTPFrame extends JFrame implements ActionListener, MouseListener {
 
 	 
 	/**
-	 * Prints the list of drives on the remote directory and returns a String[].  
+	 * Prints the list of drives on the remote directory and returns a String[].
 	 * str takes as string like A:fC:lD:lE:lF:lG:cH:c
 	 * in the form Drive Letter:Drive Type where 
 	 * f = floppy, l = local drive, c=CD-ROM, n = network
@@ -322,7 +328,7 @@ public class FTPFrame extends JFrame implements ActionListener, MouseListener {
 
 			remoteDrivesComboBox.addItem(drive[i / 3]);
 		}
-		//sf@ - Select Drive C:as default if possible
+		// sf@ - Select Drive C:as default if possible
 		boolean bFound = false;
 		for(int i = 0; i < remoteDrivesComboBox.getItemCount() ; i++)
 		{
@@ -355,7 +361,7 @@ public class FTPFrame extends JFrame implements ActionListener, MouseListener {
 			if(name.equals("[..]")) {
 				remoteList.add(name);
 			}
-			// blank before '[' is mandatory!
+			// Blank before '[' is mandatory!
 			else if(name.startsWith(" [") && name.endsWith("]")) {
 				dirs.add(name.substring(2, name.length() - 1));
 			}
@@ -434,15 +440,15 @@ public class FTPFrame extends JFrame implements ActionListener, MouseListener {
 	private void doDelete() {
 		
 		System.out.println("Delete Button Pressed");
-		//Call this method to delete a file at server
+		// Call this method to delete a file at server
 		if(selectedTable.equals("remote"))
 		{	
 			String sFileName = ((String) this.remoteFileTable.getSelectedValue());
 			
-//			 sf@2004 - Directory can't be deleted
+			// sf@2004 - Directory can't be deleted
 			if (sFileName.substring(0, 2).equals(" [") && sFileName.substring((sFileName.length() - 1), sFileName.length()).equals("]"))
 			{
-				JOptionPane.showMessageDialog(null, (String)"Directory Deletion is not yet available in this version...", "FileTransfer Info", JOptionPane.INFORMATION_MESSAGE);
+				JOptionPane.showMessageDialog(null, (String)"Directory Deletion is not yet available in this version...", "File Transfer Info", JOptionPane.INFORMATION_MESSAGE);
 				return;
 			}			
 			// for (int i = 0; i < remoteList.contains(size(); i++)
@@ -462,10 +468,10 @@ public class FTPFrame extends JFrame implements ActionListener, MouseListener {
 		{
 			String sFileName = ((String) this.localFileTable.getSelectedValue());
 			
-//			 sf@2004 - Directory can't be deleted
+			// sf@2004 - Directory can't be deleted
 			if (sFileName.substring(0, 2).equals(" [") && sFileName.substring((sFileName.length() - 1), sFileName.length()).equals("]"))
 			{
-				JOptionPane.showMessageDialog(null, (String)"Directory Deletion is not yet available in this version...", "FileTransfer Info", JOptionPane.INFORMATION_MESSAGE);
+				JOptionPane.showMessageDialog(null, (String)"Directory Deletion is not yet available in this version...", "File Transfer Info", JOptionPane.INFORMATION_MESSAGE);
 				return;
 			}			
 			// sf@2004 - Delete prompt
@@ -493,7 +499,7 @@ public class FTPFrame extends JFrame implements ActionListener, MouseListener {
 		// sf@2004 - Directory can't be transfered
 		if (sFileName.substring(0, 2).equals(" [") && sFileName.substring((sFileName.length() - 1), sFileName.length()).equals("]"))
 		{
-			JOptionPane.showMessageDialog(null, (String)"Directory Transfer is not yet available in this version...", "FileTransfer Info", JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(null, (String)"Directory Transfer is not yet available in this version...", "File Transfer Info", JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
 		
@@ -522,7 +528,7 @@ public class FTPFrame extends JFrame implements ActionListener, MouseListener {
 		// sf@2004 - Directory can't be transfered
 		if (sFileName.substring(0, 2).equals(" [") && sFileName.substring((sFileName.length() - 1), sFileName.length()).equals("]"))
 		{
-			JOptionPane.showMessageDialog(null, (String)"Directory Transfer is not yet available in this version...", "FileTransfer Info", JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(null, (String)"Directory Transfer is not yet available in this version...", "File Transfer Info", JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
 		
@@ -542,7 +548,7 @@ public class FTPFrame extends JFrame implements ActionListener, MouseListener {
 	}
 
 	//
-	// sf@2004 - The user stops the current file transfer
+	// sf@2004 - The user stops the current File Transfer
 	// 
 	private void doStop() {
 		viewer.rfb.fAbort = true;
@@ -593,7 +599,7 @@ public class FTPFrame extends JFrame implements ActionListener, MouseListener {
 	}
 	
 	/**
-	 * Updates the Remote File Table based on selection.  Called from mouseClicked handler
+	 * Updates the Remote File Table based on selection. Called from mouseClicked handler
 	 */
 	
 	public void updateRemoteFileTable() {
@@ -604,7 +610,7 @@ public class FTPFrame extends JFrame implements ActionListener, MouseListener {
 
 		if (name.equals("[..]")) {
 			drive = remoteLocation.getText().substring(0, remoteLocation.getText().length() - 1);
-			// JOptionPane.showMessageDialog(null, (String)drive, "FileTransfer ", JOptionPane.INFORMATION_MESSAGE);
+			// JOptionPane.showMessageDialog(null, (String)drive, "File Transfer ", JOptionPane.INFORMATION_MESSAGE);
 			int index = drive.lastIndexOf("\\");
 			drive = drive.substring(0, index + 1);
 
@@ -784,7 +790,7 @@ public class FTPFrame extends JFrame implements ActionListener, MouseListener {
 	//////////////////////////////////////////////
 	
 	/**
-	 * This method initializes jContentPane.  This is the main content pane
+	 * This method initializes jContentPane. This is the main content pane
 	 * 
 	 * @return javax.swing.JPanel
 	 */
@@ -1305,7 +1311,7 @@ public class FTPFrame extends JFrame implements ActionListener, MouseListener {
 			historyComboBox = new javax.swing.JComboBox();
 			historyComboBox.setFont(
 				new java.awt.Font("Dialog", java.awt.Font.BOLD, 10));
-			historyComboBox.insertItemAt(new String("Pulldown to view history ..."),0);
+			historyComboBox.insertItemAt(new String("Pulldown to view history..."),0);
 			historyComboBox.setSelectedIndex(0);
 			historyComboBox.addActionListener(this);
 		}

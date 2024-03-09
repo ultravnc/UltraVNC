@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002-2013 UltraVNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,9 +16,9 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the program is not available from the place from
-// which you received this file, check 
-// http://www.uvnc.com/
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
 //
 ////////////////////////////////////////////////////////////////////////////
 
@@ -37,11 +37,11 @@ class vncEncodeUltra;
 #include "vncencoder.h"
 #include "lzo/minilzo.h"
 
-// Minimum Ultra rectangle size in bytes.  Anything smaller will
+// Minimum Ultra rectangle size in bytes. Anything smaller will
 // not compress well due to overhead.
 #define VNC_ENCODE_ULTRA_MIN_COMP_SIZE (32)
 
-// Set maximum Ultra rectangle size in pixels.  Always allow at least
+// Set maximum Ultra rectangle size in pixels. Always allow at least
 // two scan lines.
 #define Ultra_MAX_RECT_SIZE (16*1024)
 #define Ultra_MAX_SIZE(min) ((( min * 2 ) > Ultra_MAX_RECT_SIZE ) ? ( min * 2 ) : Ultra_MAX_RECT_SIZE )

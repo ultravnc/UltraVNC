@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002-2013 UltraVNC Team Members. All Rights Reserved.
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,11 +16,13 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the program is not available from the place from
-// which you received this file, check 
-// http://www.uvnc.com/
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
 //
 ////////////////////////////////////////////////////////////////////////////
+
+
 #include "stdhdrs.h"
 #define WIN32_LEAN_AND_MEAN
 //#include <shlwapi.h>
@@ -214,7 +216,7 @@ void HideDesktop()
 
 	// Tell all applications that there is no wallpaper
 	// Note that this doesn't change the wallpaper registry setting!
-	// @@@efh On Win98 and Win95 this returns an error in the debug build (but not in release)...
+	// @@@efh On Windows 95 and Windows 98 this returns an error in the debug build (but not in release)...
 	vnclog.Print(LL_INTWARN, VNCLOG("Killwallpaper %i\n"),ISWallPaperHided);
 	if (!ISWallPaperHided)
 	{

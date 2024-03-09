@@ -1,3 +1,28 @@
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
+//
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
+//  USA.
+//
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
+
+
 //				Package : omnithread
 // omnithread.h 		Created : 7/94 tjr
 //
@@ -8,11 +33,11 @@
 //    The omnithread library is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Library General Public
 //    License as published by the Free Software Foundation; either
-//    version 2 of the License, or (at your option) any later version.  
+//    version 2 of the License, or (at your option) any later version.
 //
 //    This library is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 //    Library General Public License for more details.
 //
 //    You should have received a copy of the GNU Library General Public
@@ -28,7 +53,7 @@
 // (mutexes, condition variables and counting semaphores).
 //
 // Wherever a seemingly arbitrary choice has had to be made as to the interface
-// provided, the intention here has been to be as POSIX-like as possible.  This
+// provided, the intention here has been to be as POSIX-like as possible. This
 // is why there is no semaphore timed wait, for example.
 //
 
@@ -46,7 +71,7 @@ class omni_thread;
 
 //
 // OMNI_THREAD_EXPOSE can be defined as public or protected to expose the
-// implementation class - this may be useful for debugging.  Hopefully this
+// implementation class - this may be useful for debugging. Hopefully this
 // won't change the underlying structure which the compiler generates so that
 // this can work without recompiling the library.
 //
@@ -60,7 +85,7 @@ class omni_thread;
 // Include implementation-specific header file.
 //
 // This must define 4 CPP macros of the form OMNI_x_IMPLEMENTATION for mutex,
-// condition variable, semaphore and thread.  Each should define any
+// condition variable, semaphore and thread. Each should define any
 // implementation-specific members of the corresponding classes.
 //
 
@@ -277,13 +302,13 @@ public:
     ~omni_condition(void);
 
     bool wait(DWORD dwTimeout=INFINITE);
-	// wait for the condition variable to be signalled.  The mutex is
+	// wait for the condition variable to be signalled. The mutex is
 	// implicitly released before waiting and locked again after waking up.
 	// If wait() is called by multiple threads, a signal may wake up more
-	// than one thread.  See POSIX threads documentation for details.
+	// than one thread. See POSIX threads documentation for details.
 
     int timedwait(unsigned long secs, unsigned long nanosecs = 0);
-	// timedwait() is given an absolute time to wait until.  To wait for a
+	// timedwait() is given an absolute time to wait until. To wait for a
 	// relative time from now, use omni_thread::get_time. See POSIX threads
 	// documentation for why absolute times are better than relative.
 	// Returns 1 (true) if successfully signalled, 0 (false) if time
@@ -392,7 +417,7 @@ public:
     omni_thread(void* (*fn)(void*), void* arg = NULL,
 		priority_t pri = PRIORITY_NORMAL);
 	// these constructors create a thread which will run the given function
-	// when start() is called.  The thread will be detached if given a
+	// when start() is called. The thread will be detached if given a
 	// function with void return type, undetached if given a function
 	// returning void*. If a thread is detached, storage for the thread is
 	// reclaimed automatically on termination. Only an undetached thread
@@ -405,13 +430,13 @@ public:
 protected:
 
     omni_thread(void* arg = NULL, priority_t pri = PRIORITY_NORMAL);
-	// this constructor is used in a derived class.  The thread will
+	// this constructor is used in a derived class. The thread will
 	// execute the run() or run_undetached() member functions depending on
 	// whether start() or start_undetached() is called respectively.
 
     void start_undetached(void);
 	// can be used with the above constructor in a derived class to cause
-	// the thread to be undetached.  In this case the thread executes the
+	// the thread to be undetached. In this case the thread executes the
 	// run_undetached member function.
 
     virtual ~omni_thread(void);
@@ -466,7 +491,7 @@ private:
 
     virtual void run(void* arg) {}
     virtual void* run_undetached(void* arg) { return NULL; }
-	// can be overridden in a derived class.  When constructed using the
+	// can be overridden in a derived class. When constructed using the
 	// the constructor omni_thread(void*, priority_t), these functions are
 	// called by start() and start_undetached() respectively.
 

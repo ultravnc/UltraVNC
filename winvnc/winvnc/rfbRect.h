@@ -1,3 +1,5 @@
+//  /////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //  Copyright (C) 2002-2003 RealVNC Ltd. All Rights Reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -15,9 +17,12 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the program is not available from the place from
-// which you received this file, check http://www.realvnc.com/ or contact
-// the authors on info@realvnc.com for information on obtaining it.
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
+
 
 // rfb::Rect and rfb::Point structures
 
@@ -59,7 +64,7 @@ namespace rfb {
 	// and bottom-right (br) Points.
 	// Rects may be compared for equality, checked to determine whether
 	// or not they are empty, cleared (made empty), or intersected with
-	// one another.  The bounding rectangle of two existing Rects
+	// one another. The bounding rectangle of two existing Rects
 	// may be calculated, as may the area of a Rect.
 	// Rects may also be translated, in the same way as Points, by
 	// an offset specified in a Point structure.

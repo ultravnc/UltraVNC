@@ -1,4 +1,5 @@
-//  Copyright (C) 2020, UltraVnc
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
 //  Copyright (C) 2010, 2015 D. R. Commander. All Rights Reserved.
 //  Copyright (C) 2004 Landmark Graphics Corporation. All Rights Reserved.
 //  Copyright (C) 2005-2008 Sun Microsystems, Inc. All Rights Reserved.
@@ -6,9 +7,7 @@
 //  Copyright (C) 2000 Tridia Corporation. All Rights Reserved.
 //  Copyright (C) 1999 AT&T Laboratories Cambridge. All Rights Reserved.
 //
-//  This file is part of the VNC system.
-//
-//  The VNC system is free software; you can redistribute it and/or modify
+//  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
@@ -23,11 +22,12 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// TightVNC distribution homepage on the Web: http://www.tightvnc.com/
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
 //
-// If the source code for the VNC system is not available from the place
-// whence you received this file, check http://www.uk.research.att.com/vnc or contact
-// the authors on vnc@uk.research.att.com for information on obtaining it.
+////////////////////////////////////////////////////////////////////////////
+
 
 // vncEncodeTight
 
@@ -128,7 +128,7 @@ vncEncodeTight::EncodeRect(BYTE *source, VSocket *outConn, BYTE *dest,
 	m_turboCompressLevel = m_compresslevel;
 
 	// We only allow compression levels that have a demonstrable performance
-	// benefit.  For low-color workloads, CL 2 with JPEG can provide typically
+	// benefit. For low-color workloads, CL 2 with JPEG can provide typically
 	// 20-40% better compression than CL 1 (with a commensurate increase in CPU
 	// usage.)  For high-color workloads, CL 1 should always be used, as higher
 	// compression levels increase CPU usage for these workloads without
@@ -142,9 +142,9 @@ vncEncodeTight::EncodeRect(BYTE *source, VSocket *outConn, BYTE *dest,
 	else if (m_turboCompressLevel > 1) m_turboCompressLevel = 1;
 
 	// CL 9 (which maps internally to CL 3) is included mainly for backward
-	// compatibility with TightVNC Compression Levels 5-9.  It should be used
+	// compatibility with TightVNC Compression Levels 5-9. It should be used
 	// only in extremely low-bandwidth cases in which it can be shown to have a
-	// benefit.  For low-color workloads, it provides typically only 10-20%
+	// benefit. For low-color workloads, it provides typically only 10-20%
 	// better compression than CL 2 with JPEG and CL 1 without JPEG, and it
  	// uses, on average, twice as much CPU time.
 	if (m_compresslevel == 9) m_turboCompressLevel = 3;

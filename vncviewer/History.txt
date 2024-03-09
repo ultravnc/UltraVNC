@@ -1,3 +1,28 @@
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
+//
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
+//  USA.
+//
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
+
+
 Changes to VNCviewer
 
 3.3.3 R3
@@ -41,7 +66,7 @@ line.
 
 3.3.2 R10
 
-Added 3-button emulation.  
+Added 3-button emulation.
 Many thanks to Randy Brown <rgb@inven.com> for providing the basis of this.
  New options -emulate3, -emulate3timeout, -emulate3fuzz.
 Added -fullscreen option to start in full-screen mode. Based on 
@@ -118,7 +143,7 @@ Added logging facilities and -console option to aid debugging.
 
 Shortened the bell beep for those without sound cards.
 
-AltGr works better on Win95 - now raises all the modifiers when it can't
+AltGr works better on Windows 95 - now raises all the modifiers when it can't
  detect which ones are needed.
 
 An rfbConnFailed error now produces a WarningException instead of an 

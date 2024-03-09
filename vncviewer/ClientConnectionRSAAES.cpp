@@ -16,11 +16,12 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 //  USA.
 //
-// If the source code for the program is not available from the place from
-// which you received this file, check 
-// http://www.uvnc.com/
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
 //
 ////////////////////////////////////////////////////////////////////////////
+
 
 // RSA-AES authentication and encryption
 
@@ -578,13 +579,13 @@ struct RSAKEX
 		if (conn.CompareFingerprint(hex))
 			return true;
 		int nButtonPressed = 0;
-		swprintf_s(msg, L"The server has provided the following identifying information:\nFingerprint: %hs\n\nCatchphrase: %hs\n\nDo you want to continue?\n", hex, catchphrase);
+		swprintf_s(msg, L"The server has provided the following identifying information:\n\nFingerprint: %hs\n\nDo you want to continue?\n", hex);
 		TASKDIALOGCONFIG tc = { 0 };
 		BOOL bPersist = FALSE;
 		tc.cbSize = sizeof(tc);
 		tc.dwFlags = TDF_SIZE_TO_CONTENT;
 		tc.dwCommonButtons = TDCBF_OK_BUTTON | TDCBF_CANCEL_BUTTON;
-		tc.pszWindowTitle = L"Warning";
+		tc.pszWindowTitle = L"UltraVNC Viewer - Warning";
 		tc.hInstance = pApp->m_instance;
 		tc.pszMainIcon = MAKEINTRESOURCEW(IDR_TRAY);
 		tc.pszMainInstruction = L"Identity confirmation";
