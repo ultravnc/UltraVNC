@@ -470,11 +470,11 @@ BEGIN
         BEGIN
             VALUE "Comments", "Standalone UltraVNC.ini editor"
             VALUE "CompanyName", "uvnc bvba"
-            VALUE "FileDescription", "uvnc_set Application"
+            VALUE "FileDescription", "Standalone UltraVNC.ini editor"
             VALUE "FileVersion", "1.2.0.5"
-            VALUE "InternalName", "uvnc_set"
-            VALUE "LegalCopyright", "Copyright (C) 2010"
-            VALUE "OriginalFilename", "uvnc_set.exe"
+            VALUE "InternalName", "uvnc_settings.exe"
+            VALUE "LegalCopyright", "Copyright © 2010-2024 UltraVNC Team Members. All Rights Reserved."
+            VALUE "OriginalFilename", "uvnc_settings.exe"
             VALUE "ProductName", "uvnc_set Application"
             VALUE "ProductVersion", "1.2.0.5"
         END
