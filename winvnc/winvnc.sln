@@ -2,9 +2,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31105.61
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "omnithread", "..\omnithread\omnithread_VC2017.vcxproj", "{E52B9956-FE67-47F7-BC4F-67CC5A64B708}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "omnithread", "..\omnithread\omnithread.vcxproj", "{E52B9956-FE67-47F7-BC4F-67CC5A64B708}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rdr", "..\rdr\rdr_VC2017.vcxproj", "{F5244002-0FFF-4F19-A941-FCCE1861F132}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rdr", "..\rdr\rdr.vcxproj", "{F5244002-0FFF-4F19-A941-FCCE1861F132}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vnchooks", "vnchooks\vnchooks_VC2017.vcxproj", "{1D18E045-6B72-43F4-ACBD-3E679A3DE349}"
 EndProject
@@ -20,15 +20,15 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "winvnc", "winvnc\winvnc.vcx
 		{3F5AB9E4-C106-43E2-98D2-718292AD4A9A} = {3F5AB9E4-C106-43E2-98D2-718292AD4A9A}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "avilog", "..\avilog\avilog\avilog_VC2017.vcxproj", "{CD0D6EC9-D652-4D1B-B23B-18E1AC3AA683}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "avilog", "..\avilog\avilog\avilog.vcxproj", "{CD0D6EC9-D652-4D1B-B23B-18E1AC3AA683}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "unz32lib", "..\zipunzip_src\unzip\windll\vc6\lib\unz32lib_VC2017.vcxproj", "{F9321962-FBED-4581-BF7D-D0EBC303D891}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "unz32lib", "..\zipunzip_src\unzip\windll\vc6\lib\unz32lib.vcxproj", "{F9321962-FBED-4581-BF7D-D0EBC303D891}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zip32", "..\zipunzip_src\zip20\windll\visualc\lib\zip32_VC2017.vcxproj", "{E8BA959F-B652-4BAB-9EA7-8E9FC8D7F39C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zip32", "..\zipunzip_src\zip20\windll\visualc\lib\zip32.vcxproj", "{E8BA959F-B652-4BAB-9EA7-8E9FC8D7F39C}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "setcad", "..\setcad\setcad\setcad_VC2017.vcxproj", "{3F5AB9E4-C106-43E2-98D2-718292AD4A9A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "setcad", "..\setcad\setcad\setcad.vcxproj", "{3F5AB9E4-C106-43E2-98D2-718292AD4A9A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "setpasswd", "..\setpasswd\setpasswd\setpasswd_VC2017.vcxproj", "{7DDBFA32-44F6-44CA-BDBE-CF8B32EDC6B1}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "setpasswd", "..\setpasswd\setpasswd\setpasswd.vcxproj", "{7DDBFA32-44F6-44CA-BDBE-CF8B32EDC6B1}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "authadmin", "..\addon\ms-logon\authadm\authadmin_VC2017.vcxproj", "{334467FD-E35E-4C3D-9410-69B2171C2BB2}"
 EndProject
