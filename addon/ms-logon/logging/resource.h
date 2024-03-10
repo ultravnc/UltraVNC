@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Developer Studio generated include file.
-// Used by authSSP.rc
+// Used by logging.rc
 //
 
 // Next default values for new objects

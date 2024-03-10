@@ -1,3 +1,28 @@
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
+//
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
+//  USA.
+//
+//  If the source code for the program is not available from the place from
+//  which you received this file, check
+//  https://uvnc.com/
+//
+////////////////////////////////////////////////////////////////////////////
+
+
 #include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -106,7 +131,7 @@ int main(int argc, char* argv[])
 	{
 	returnvalue=false;
 	printf("\nTrying authlogonuser.dll \n");
-		printf("This only works on XP> \n");
+		printf("This only works on Windows XP> \n");
 		printf("test is runnning as application and not a service \n");
 		printf("------------------------ \n");
 		printf("------------------------ \n");
@@ -149,7 +174,7 @@ int main(int argc, char* argv[])
 	returnvalue=false;
 	if (CheckAD())
 	{
-		printf("\nTrying authaddll \n");
+		printf("\nTrying authad.dll \n");
 		printf("------------------------ \n");
 		printf("------------------------ \n");
 		HMODULE hModule = LoadLibrary("authad.dll");
@@ -182,7 +207,7 @@ int main(int argc, char* argv[])
 	{
 		if (CheckAD() && CheckDsGetDcNameW())
 		{
-			printf("\nTrying ldapauthNT4 .dll \n");
+			printf("\nTrying ldapauthNT4.dll \n");
 		printf("------------------------ \n");
 		printf("------------------------ \n");
 		HMODULE hModule = LoadLibrary("ldapauthnt4.dll");
@@ -208,7 +233,7 @@ int main(int argc, char* argv[])
 	{
 		if (CheckAD())
 		{
-			printf("\nTrying ldapauth .dll \n");
+			printf("\nTrying ldapauth.dll \n");
 		printf("------------------------ \n");
 		printf("------------------------ \n");
 		HMODULE hModule = LoadLibrary("ldapauth.dll");
