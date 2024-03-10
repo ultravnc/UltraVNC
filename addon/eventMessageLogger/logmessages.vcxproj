@@ -28,43 +28,44 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{E543B602-5529-4B23-8D2A-3709857F5066}</ProjectGuid>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='IPP|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>Intel C++ Compiler XE 12.0</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>Intel C++ Compiler XE 12.0</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>Intel C++ Compiler XE 12.0</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='IPP|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>Intel C++ Compiler XE 12.0</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>Intel C++ Compiler XE 12.0</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>Intel C++ Compiler XE 12.0</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -125,13 +126,31 @@
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='IPP|Win32'">
+    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='IPP|x64'">
+    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <CustomBuildStep>
       <Command>mc messages.mc
 rc -r -fo messages.res messages.rc
-link -dll -manifest:no -noentry -out:..\Release\logmessages.dll messages.res
+link -dll -manifest:no -noentry -out:$(OutDir)$(TargetName)$(TargetExt)\logmessages.dll messages.res
 </Command>
-      <Outputs>messages.res;messages.rc;messages.h;..\Release\logmessages.dll;%(Outputs)</Outputs>
+      <Outputs>messages.res;messages.rc;messages.h;$(OutDir)$(TargetName)$(TargetExt)\logmessages.dll;%(Outputs)</Outputs>
     </CustomBuildStep>
     <Midl>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -162,7 +181,6 @@ link -dll -manifest:no -noentry -out:..\Release\logmessages.dll messages.res
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>messages.mc</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateManifest>false</GenerateManifest>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
@@ -174,14 +192,18 @@ link -dll -manifest:no -noentry -out:..\Release\logmessages.dll messages.res
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <OutputFile>.\..\..\Release/logmessages.bsc</OutputFile>
     </Bscmake>
+    <PostBuildEvent>
+      <Command>"signtool.exe" sign /tr http://timestamp.sectigo.com?td=sha256 /td sha256 /fd sha256 /as /sha1 adc749d2f75f158c8218857ff187f81b97b3872a "$(OutDir)$(TargetName)$(TargetExt)"
+copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\32\xp</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <CustomBuildStep>
       <Command>mc messages.mc
 rc -r -fo messages.res messages.rc
-link -dll -manifest:no -noentry -out:..\Release\logmessages.dll messages.res
+link -dll -manifest:no -noentry -out:$(OutDir)$(TargetName)$(TargetExt)\logmessages.dll messages.res
 </Command>
-      <Outputs>messages.res;messages.rc;messages.h;..\Release\logmessages.dll;%(Outputs)</Outputs>
+      <Outputs>messages.res;messages.rc;messages.h;$(OutDir)$(TargetName)$(TargetExt)\logmessages.dll;%(Outputs)</Outputs>
     </CustomBuildStep>
     <Midl>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -212,7 +234,6 @@ link -dll -manifest:no -noentry -out:..\Release\logmessages.dll messages.res
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>messages.mc</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
@@ -223,14 +244,18 @@ link -dll -manifest:no -noentry -out:..\Release\logmessages.dll messages.res
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <OutputFile>.\..\..\Release/logmessages.bsc</OutputFile>
     </Bscmake>
+    <PostBuildEvent>
+      <Command>"signtool.exe" sign /tr http://timestamp.sectigo.com?td=sha256 /td sha256 /fd sha256 /as /sha1 adc749d2f75f158c8218857ff187f81b97b3872a "$(OutDir)$(TargetName)$(TargetExt)"
+copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <CustomBuildStep>
       <Command>mc messages.mc
 rc -r -fo messages.res messages.rc
-link -dll -manifest:no -noentry -out:..\Debug\logmessages.dll messages.res
+link -dll -manifest:no -noentry -out:$(OutDir)$(TargetName)$(TargetExt)\logmessages.dll messages.res
 </Command>
-      <Outputs>messages.res;messages.rc;messages.h;..\Debug\logmessages.dll;%(Outputs)</Outputs>
+      <Outputs>messages.res;messages.rc;messages.h;$(OutDir)$(TargetName)$(TargetExt)\logmessages.dll;%(Outputs)</Outputs>
     </CustomBuildStep>
     <Midl>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -280,9 +305,9 @@ link -dll -manifest:no -noentry -out:..\Debug\logmessages.dll messages.res
     <CustomBuildStep>
       <Command>mc messages.mc
 rc -r -fo messages.res messages.rc
-link -dll -manifest:no -noentry -out:..\Debug\logmessages.dll messages.res
+link -dll -manifest:no -noentry -out:$(OutDir)$(TargetName)$(TargetExt)\logmessages.dll messages.res
 </Command>
-      <Outputs>messages.res;messages.rc;messages.h;..\Debug\logmessages.dll;%(Outputs)</Outputs>
+      <Outputs>messages.res;messages.rc;messages.h;$(OutDir)$(TargetName)$(TargetExt)\logmessages.dll;%(Outputs)</Outputs>
     </CustomBuildStep>
     <Midl>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -331,9 +356,9 @@ link -dll -manifest:no -noentry -out:..\Debug\logmessages.dll messages.res
     <CustomBuildStep>
       <Command>mc messages.mc
 rc -r -fo messages.res messages.rc
-link -dll -manifest:no -noentry -out:..\Release\logmessages.dll messages.res
+link -dll -manifest:no -noentry -out:$(OutDir)$(TargetName)$(TargetExt)\logmessages.dll messages.res
 </Command>
-      <Outputs>messages.res;messages.rc;messages.h;..\Release\logmessages.dll;%(Outputs)</Outputs>
+      <Outputs>messages.res;messages.rc;messages.h;$(OutDir)$(TargetName)$(TargetExt)\logmessages.dll;%(Outputs)</Outputs>
     </CustomBuildStep>
     <Midl>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -383,9 +408,9 @@ link -dll -manifest:no -noentry -out:..\Release\logmessages.dll messages.res
     <CustomBuildStep>
       <Command>mc messages.mc
 rc -r -fo messages.res messages.rc
-link -dll -manifest:no -noentry -out:..\Release\logmessages.dll messages.res
+link -dll -manifest:no -noentry -out:$(OutDir)$(TargetName)$(TargetExt)\logmessages.dll messages.res
 </Command>
-      <Outputs>messages.res;messages.rc;messages.h;..\Release\logmessages.dll;%(Outputs)</Outputs>
+      <Outputs>messages.res;messages.rc;messages.h;$(OutDir)$(TargetName)$(TargetExt)\logmessages.dll;%(Outputs)</Outputs>
     </CustomBuildStep>
     <Midl>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
