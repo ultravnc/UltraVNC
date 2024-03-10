@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Developer Studio generated include file.
-// Used by authSSP.rc
+// Used by workgrpdomnt4.rc
 //
 
 // Next default values for new objects
