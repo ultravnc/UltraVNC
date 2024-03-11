@@ -6,7 +6,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "omnithread", "..\omnithread
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rdr", "..\rdr\rdr.vcxproj", "{F5244002-0FFF-4F19-A941-FCCE1861F132}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vnchooks", "vnchooks\vnchooks_VC2017.vcxproj", "{1D18E045-6B72-43F4-ACBD-3E679A3DE349}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vnchooks", "vnchooks\vnchooks.vcxproj", "{1D18E045-6B72-43F4-ACBD-3E679A3DE349}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "winvnc", "winvnc\winvnc.vcxproj", "{C05AE605-1250-4F58-911B-EC99AE2C25AF}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -50,9 +50,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "workgrpdomnt4", "..\addon\m
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "uvnc_settings", "..\uvnc_settings\uvnc_settings\uvnc_settings.vcxproj", "{3B4D8565-E321-48B6-BF15-4EB7ADEC6BFC}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "UltraVnc_x86", "UltraVnc\UltraVnc_VS2015.vdproj", "{D20CB3B1-32B1-4FEA-8C10-5CED57035808}"
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "UltraVnc_x86", "UltraVnc\UltraVnc.vdproj", "{D20CB3B1-32B1-4FEA-8C10-5CED57035808}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "UltraVnc_x64", "UltraVnc\UltraVnc_VS2015_X64.vdproj", "{9AA91151-DD71-4031-82CA-0F94A966AC17}"
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "UltraVnc_x64", "UltraVnc\UltraVnc_X64.vdproj", "{9AA91151-DD71-4031-82CA-0F94A966AC17}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "createpassword", "createpassword\createpassword.vcxproj", "{FA83DC58-34F9-4E04-8B45-A75538946914}"
 EndProject
