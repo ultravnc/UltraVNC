@@ -30,23 +30,23 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "setcad", "..\setcad\setcad\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "setpasswd", "..\setpasswd\setpasswd\setpasswd.vcxproj", "{7DDBFA32-44F6-44CA-BDBE-CF8B32EDC6B1}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "authadmin", "..\addon\ms-logon\authadm\authadmin_VC2017.vcxproj", "{334467FD-E35E-4C3D-9410-69B2171C2BB2}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "authadmin", "..\addon\ms-logon\authadm\authadmin.vcxproj", "{334467FD-E35E-4C3D-9410-69B2171C2BB2}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "authSSP", "..\addon\ms-logon\authSSP\authSSP_VC2017.vcxproj", "{2F5FBC3F-4CCD-4C26-9719-C9166D8B0C7D}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "authSSP", "..\addon\ms-logon\authSSP\authSSP.vcxproj", "{2F5FBC3F-4CCD-4C26-9719-C9166D8B0C7D}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ldapauth", "..\addon\ms-logon\ldapauth\ldapauth_VC2017.vcxproj", "{BC78A3C8-2280-42AB-BB6F-14FB674E2A0C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ldapauth", "..\addon\ms-logon\ldapauth\ldapauth.vcxproj", "{BC78A3C8-2280-42AB-BB6F-14FB674E2A0C}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ldapauth9x", "..\addon\ms-logon\ldapauth9x\ldapauth9x_VC2017.vcxproj", "{CAA83204-EBF8-4369-B152-011EA957784C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ldapauth9x", "..\addon\ms-logon\ldapauth9x\ldapauth9x.vcxproj", "{CAA83204-EBF8-4369-B152-011EA957784C}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ldapauthnt4", "..\addon\ms-logon\ldapauthNT4\ldapauthnt4_VC2017.vcxproj", "{31AC9E7D-64B7-4301-ADE2-5EFF15AA6BDE}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ldapauthnt4", "..\addon\ms-logon\ldapauthNT4\ldapauthnt4.vcxproj", "{31AC9E7D-64B7-4301-ADE2-5EFF15AA6BDE}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "logging", "..\addon\ms-logon\logging\logging_VC2017.vcxproj", "{D50AEB07-5F5E-4401-9B50-C1660E693833}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "logging", "..\addon\ms-logon\logging\logging.vcxproj", "{D50AEB07-5F5E-4401-9B50-C1660E693833}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MSLogonACL", "..\addon\ms-logon\MSLogonACL\MSLogonACL_VC2017.vcxproj", "{F4E39BD7-C841-4F21-B40C-293D7E017EA1}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MSLogonACL", "..\addon\ms-logon\MSLogonACL\MSLogonACL.vcxproj", "{F4E39BD7-C841-4F21-B40C-293D7E017EA1}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testauth", "..\addon\ms-logon\testauth\testauth_VC2017.vcxproj", "{C05BE60B-FBDF-430F-B041-5089262E8FB5}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testauth", "..\addon\ms-logon\testauth\testauth.vcxproj", "{C05BE60B-FBDF-430F-B041-5089262E8FB5}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "workgrpdomnt4", "..\addon\ms-logon\workgrpdomnt4\workgrpdomnt4_VC2017.vcxproj", "{8D7757CB-5125-4633-AFB1-4B30ED24955F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "workgrpdomnt4", "..\addon\ms-logon\workgrpdomnt4\workgrpdomnt4.vcxproj", "{8D7757CB-5125-4633-AFB1-4B30ED24955F}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "uvnc_settings", "..\uvnc_settings\uvnc_settings\uvnc_settings.vcxproj", "{3B4D8565-E321-48B6-BF15-4EB7ADEC6BFC}"
 EndProject
