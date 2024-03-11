@@ -1,7 +1,8 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Developer Studio generated include file.
+// Microsoft Visual C++ generated include file.
 // Used by winvnc.rc
 //
+#define IDI_WINVNC                      9
 #define IDACCEPT                        10
 #define IDQUERY                         11
 #define IDQUERYTIMEOUT                  12
@@ -28,7 +29,6 @@
 #define IDB_VNCLOGO                     120
 #define IDB_YELLOW                      121
 #define IDI_FLASH                       122
-#define IDI_WINVNC                      123
 #define IDD_ABOUT                       124
 #define IDD_ACCEPT_CONN                 125
 #define IDD_AUTH_DIALOG                 126
@@ -274,6 +274,7 @@
 #define IDC_WWW2                        1223
 #define IDC_WWW3                        1224
 #define IDC_YELLOW                      1225
+#define IDE_CUSTOM1                     4377
 #define ID_ABOUT                        32771
 #define ID_ADMIN_PROPERTIES             32772
 #define ID_ANOTHER_INST                 32773
@@ -361,14 +362,13 @@
 #define ID_WINVNC_USAGE                 32855
 #define ID_WINVNC_WARNIN                32856
 #define ID_WVNC                         32857
-#define IDE_CUSTOM1                     4377
 
 // Next default values for new objects
-//
+// 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_3D_CONTROLS                1
-#define _APS_NEXT_RESOURCE_VALUE        201
+#define _APS_3D_CONTROLS                     1
+#define _APS_NEXT_RESOURCE_VALUE        202
 #define _APS_NEXT_COMMAND_VALUE         32858
 #define _APS_NEXT_CONTROL_VALUE         1226
 #define _APS_NEXT_SYMED_VALUE           101
