@@ -2,7 +2,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30611.23
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rdr", "..\rdr\rdrv12.vcxproj", "{F5244002-0FFF-4F19-A941-FCCE1861F132}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rdr", "..\rdr\rdr.vcxproj", "{F5244002-0FFF-4F19-A941-FCCE1861F132}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vncviewer", "vncviewer.vcxproj", "{357D07B6-0613-4B05-9D22-1764A49AC945}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -12,11 +12,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vncviewer", "vncviewer.vcxp
 		{E8BA959F-B652-4BAB-9EA7-8E9FC8D7F39C} = {E8BA959F-B652-4BAB-9EA7-8E9FC8D7F39C}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "unz32lib", "..\zipunzip_src\unzip\windll\vc6\lib\unz32libv12.vcxproj", "{F9321962-FBED-4581-BF7D-D0EBC303D891}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "unz32lib", "..\zipunzip_src\unzip\windll\vc6\lib\unz32lib.vcxproj", "{F9321962-FBED-4581-BF7D-D0EBC303D891}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zip32", "..\zipunzip_src\zip20\windll\visualc\lib\zip32v12.vcxproj", "{E8BA959F-B652-4BAB-9EA7-8E9FC8D7F39C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zip32", "..\zipunzip_src\zip20\windll\visualc\lib\zip32.vcxproj", "{E8BA959F-B652-4BAB-9EA7-8E9FC8D7F39C}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "omnithread", "..\omnithread\omnithreadv12.vcxproj", "{E52B9956-FE67-47F7-BC4F-67CC5A64B708}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "omnithread", "..\omnithread\omnithread.vcxproj", "{E52B9956-FE67-47F7-BC4F-67CC5A64B708}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "udt", "..\udt4\win\udt.vcxproj", "{D84D100A-7C21-4CCB-B16E-0FB37137C16C}"
 EndProject
