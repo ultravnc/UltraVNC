@@ -281,21 +281,25 @@
     <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)..\zlib;$(IncludePath)</IncludePath>
     <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(LibraryPath)</LibraryPath>
     <PostBuildEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</PostBuildEventUseInBuild>
-    <PostBuildEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='NOacceleration|Win32'">true</PostBuildEventUseInBuild>
-    <PostBuildEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='XP|Win32'">true</PostBuildEventUseInBuild>
+    <PostBuildEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='NOacceleration|Win32'">false</PostBuildEventUseInBuild>
+    <PostBuildEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='XP|Win32'">false</PostBuildEventUseInBuild>
     <PostBuildEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">false</PostBuildEventUseInBuild>
-    <PostBuildEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='OldCPU|Win32'">true</PostBuildEventUseInBuild>
+    <PostBuildEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='OldCPU|Win32'">false</PostBuildEventUseInBuild>
     <PostBuildEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">true</PostBuildEventUseInBuild>
     <PostBuildEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</PostBuildEventUseInBuild>
-    <PostBuildEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='NOacceleration|x64'">true</PostBuildEventUseInBuild>
-    <PostBuildEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">true</PostBuildEventUseInBuild>
+    <PostBuildEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='NOacceleration|x64'">false</PostBuildEventUseInBuild>
+    <PostBuildEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='XP|x64'">false</PostBuildEventUseInBuild>
     <PostBuildEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">false</PostBuildEventUseInBuild>
-    <PostBuildEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='OldCPU|x64'">true</PostBuildEventUseInBuild>
+    <PostBuildEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='OldCPU|x64'">false</PostBuildEventUseInBuild>
     <PostBuildEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">true</PostBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>$(SolutionDir)..\zlib;$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
+    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
@@ -446,9 +450,11 @@
       <OutputFile>.\Release/vncviewer.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      <Command>"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe" sign /tr http://timestamp.sectigo.com?td=sha256 /td sha256 /fd sha256 /as /sha1 adc749d2f75f158c8218857ff187f81b97b3872a "$(OutDir)$(TargetName)$(TargetExt)"
-copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\32\xp
-copy "$(OutDir)$(TargetName)$(TargetExt)" ..\Files\vncviewer.exe</Command>
+      <Command>if exist c:\uvnc\sign.bat (
+    c:\uvnc\sign.bat  "$(OutDir)$(TargetName)$(TargetExt)"
+    copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\32\xp
+    copy "$(OutDir)$(TargetName)$(TargetExt)" ..\Files\vncviewer.exe
+)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='NOacceleration|Win32'">
@@ -505,8 +511,8 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" ..\Files\vncviewer.exe</Command>
       <OutputFile>.\Release/vncviewer.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      <Command>"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe" sign /tr http://timestamp.sectigo.com?td=sha256 /td sha256 /fd sha256 /as /sha1 adc749d2f75f158c8218857ff187f81b97b3872a "$(OutDir)$(TargetName)$(TargetExt)"
-copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\32\xp</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='XP|Win32'">
@@ -563,8 +569,8 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\32\xp</Command>
       <OutputFile>.\Release/vncviewer.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      <Command>"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\DigiCertUtil .exe" sign /sha1 adc749d2f75f158c8218857ff187f81b97b3872a /noInput "$(OutDir)$(TargetName)$(TargetExt)"
-copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\32\xp\vncviewer_xp.exe</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_viewer|Win32'">
@@ -620,8 +626,8 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\32\xp\vncviewer_xp.exe</Comman
       <OutputFile>.\Release/vncviewer.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      <Command>"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe" sign /sha1 6D4DE9F8F9626857AEA19A9D95405BBF1A800532 /n "uvnc bvba" /v /as /fd sha256 /tr http://sha256timestamp.ws.symantec.com/sha256/timestamp "$(OutDir)$(TargetName)$(TargetExt)"
-copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\32\win8\</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='OldCPU|Win32'">
@@ -677,8 +683,8 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\32\win8\</Command>
       <OutputFile>.\Release/vncviewer.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      <Command>"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\DigiCertUtil .exe" sign /sha1 adc749d2f75f158c8218857ff187f81b97b3872a /noInput "$(OutDir)$(TargetName)$(TargetExt)"
-copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\32\xp\xp</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelIPv6|Win32'">
@@ -734,8 +740,11 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\32\xp\xp</Command>
       <OutputFile>.\Release/vncviewer.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      <Command>"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\DigiCertUtil .exe" sign /sha1 adc749d2f75f158c8218857ff187f81b97b3872a /noInput "$(OutDir)$(TargetName)$(TargetExt)"
-copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\32\ipv6</Command>
+      <Command>if exist c:\uvnc\sign.bat (
+    c:\uvnc\sign.bat  "$(OutDir)$(TargetName)$(TargetExt)"
+   copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\32\ipv6
+)
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -791,9 +800,11 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\32\ipv6</Command>
       <OutputFile>.\Release/vncviewer.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      <Command>"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe" sign /tr http://timestamp.sectigo.com?td=sha256 /td sha256 /fd sha256 /as /sha1 adc749d2f75f158c8218857ff187f81b97b3872a "$(OutDir)$(TargetName)$(TargetExt)"
-copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\XP
-copy "$(OutDir)$(TargetName)$(TargetExt)" ..\Files\vncviewer64.exe</Command>
+      <Command>if exist c:\uvnc\sign.bat (
+    c:\uvnc\sign.bat  "$(OutDir)$(TargetName)$(TargetExt)"
+    copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\XP
+    copy "$(OutDir)$(TargetName)$(TargetExt)" ..\Files\vncviewer64.exe
+)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='NOacceleration|x64'">
@@ -843,8 +854,8 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" ..\Files\vncviewer64.exe</Command>
       <OutputFile>.\Release/vncviewer.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      <Command>"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe" sign /tr http://timestamp.sectigo.com?td=sha256 /td sha256 /fd sha256 /as /sha1 adc749d2f75f158c8218857ff187f81b97b3872a "$(OutDir)$(TargetName)$(TargetExt)"
-copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\XP</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='XP|x64'">
@@ -894,8 +905,8 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\XP</Command>
       <OutputFile>.\Release/vncviewer.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      <Command>"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\DigiCertUtil .exe" sign /sha1 adc749d2f75f158c8218857ff187f81b97b3872a /noInput "$(OutDir)$(TargetName)$(TargetExt)"
-copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\XP</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_viewer|x64'">
@@ -945,8 +956,8 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\XP</Command>
       <OutputFile>.\Release/vncviewer.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      <Command>"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe" sign /sha1 6D4DE9F8F9626857AEA19A9D95405BBF1A800532 /n "uvnc bvba" /v /as /fd sha256 /tr http://sha256timestamp.ws.symantec.com/sha256/timestamp "$(OutDir)$(TargetName)$(TargetExt)"
-copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\XP</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='OldCPU|x64'">
@@ -996,8 +1007,8 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\XP</Command>
       <OutputFile>.\Release/vncviewer.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      <Command>"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\DigiCertUtil .exe" sign /sha1 adc749d2f75f158c8218857ff187f81b97b3872a /noInput "$(OutDir)$(TargetName)$(TargetExt)"
-copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp\xp</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">
@@ -1047,8 +1058,10 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp\xp</Command>
       <OutputFile>.\Release/vncviewer.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      <Command>"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\DigiCertUtil .exe" sign /sha1 adc749d2f75f158c8218857ff187f81b97b3872a /noInput "$(OutDir)$(TargetName)$(TargetExt)"
-copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\ipv6</Command>
+      <Command>if exist c:\uvnc\sign.bat (
+    c:\uvnc\sign.bat  "$(OutDir)$(TargetName)$(TargetExt)"
+   copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\ipv6
+)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
