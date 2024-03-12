@@ -487,48 +487,6 @@ IDC_CURSOR3             CURSOR                  "res/cursor3.cur"
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// Version
-//
-
-VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,4,4,0
- PRODUCTVERSION 1,4,4,0
- FILEFLAGSMASK 0x3fL
-#ifdef _DEBUG
- FILEFLAGS 0x2dL
-#else
- FILEFLAGS 0x2cL
-#endif
- FILEOS 0x40004L
- FILETYPE 0x2L
- FILESUBTYPE 0x0L
-BEGIN
-    BLOCK "StringFileInfo"
-    BEGIN
-        BLOCK "000004b0"
-        BEGIN
-            VALUE "Comments", "UltraVNC - Remote Control for all"
-            VALUE "CompanyName", "uvnc bvba"
-            VALUE "FileDescription", "VNC server"
-            VALUE "FileVersion", "1.4.4.0"
-            VALUE "InternalName", "WinVNC"
-            VALUE "LegalCopyright", "Copyright © 2002-2024 UltraVNC Team Members. All Rights Reserved."
-            VALUE "LegalTrademarks", "VNC"
-            VALUE "OriginalFilename", "WinVNC.exe"
-            VALUE "PrivateBuild", "1.4.4.0"
-            VALUE "ProductName", "UltraVNC"
-            VALUE "ProductVersion", "1.4.4.0"
-        END
-    END
-    BLOCK "VarFileInfo"
-    BEGIN
-        VALUE "Translation", 0x0, 1200
-    END
-END
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
 // Menu
 //
 
@@ -679,8 +637,7 @@ END
 
 3 TEXTINCLUDE 
 BEGIN
-    "\r\n"
-    "\0"
+    "#include ""version.rc2""\0"
 END
 
 #endif    // APSTUDIO_INVOKED
@@ -693,9 +650,9 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_FLASH               ICON                    "res/icon2.ico"
-
 IDI_WINVNC              ICON                    "res/world3a.ico"
+
+IDI_FLASH               ICON                    "res/icon2.ico"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -807,8 +764,7 @@ END
 //
 // Generated from the TEXTINCLUDE 3 resource.
 //
-
-
+#include "version.rc2"
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
 

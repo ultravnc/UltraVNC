@@ -516,6 +516,12 @@
     <None Include="..\SC_20\SecureVNCPlugin.dsm">
       <Filter>resources</Filter>
     </None>
+    <None Include="version.rc2">
+      <Filter>resources</Filter>
+    </None>
+    <None Include="..\..\common\versionServerViewer.inc">
+      <Filter>resources</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="resources">

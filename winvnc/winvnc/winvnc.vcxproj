@@ -3288,6 +3288,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\common\versionServerViewer.inc" />
     <None Include="..\SC_20\ddengine.dll" />
     <None Include="..\SC_20\SecureVNCPlugin.dsm" />
     <None Include="cpp.hint" />
@@ -3323,6 +3324,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
     <None Include="res\mslogon\VncCanvas.class" />
     <None Include="res\mslogon\VncViewer.class" />
     <None Include="res\mslogon\VncViewer.jar" />
+    <None Include="version.rc2" />
     <None Include="vnc.hh" />
     <None Include="res\background.bmp" />
     <None Include="res\background2.bmp" />
