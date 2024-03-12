@@ -1,6 +1,10 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "logmessages", "eventMessageLogger\logmessages.vcxproj", "{E543B602-5529-4B23-8D2A-3709857F5066}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "authadmin", "ms-logon\authadm\authadmin.vcxproj", "{334467FD-E35E-4C3D-9410-69B2171C2BB2}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "authSSP", "ms-logon\authSSP\authSSP.vcxproj", "{2F5FBC3F-4CCD-4C26-9719-C9166D8B0C7D}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ldapauth", "ms-logon\ldapauth\ldapauth.vcxproj", "{BC78A3C8-2280-42AB-BB6F-14FB674E2A0C}"
@@ -16,10 +20,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testauth", "ms-logon\testauth\testauth.vcxproj", "{C05BE60B-FBDF-430F-B041-5089262E8FB5}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "workgrpdomnt4", "ms-logon\workgrpdomnt4\workgrpdomnt4.vcxproj", "{8D7757CB-5125-4633-AFB1-4B30ED24955F}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "logmessages", "eventMessageLogger\logmessages.vcxproj", "{E543B602-5529-4B23-8D2A-3709857F5066}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "authadmin", "ms-logon\authadm\authadmin.vcxproj", "{334467FD-E35E-4C3D-9410-69B2171C2BB2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
