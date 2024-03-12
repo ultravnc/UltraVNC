@@ -301,6 +301,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
   </PropertyGroup>
+  <PropertyGroup Label="Vcpkg">
+    <VcpkgEnableManifest>true</VcpkgEnableManifest>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -451,7 +454,7 @@
     </Bscmake>
     <PostBuildEvent>
       <Command>if exist c:\uvnc\sign.bat (
-    c:\uvnc\sign.bat  "$(OutDir)$(TargetName)$(TargetExt)"
+    c:\uvnc\sign.bat "$(OutDir)$(TargetName)$(TargetExt)"
     copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\32\xp
     copy "$(OutDir)$(TargetName)$(TargetExt)" ..\Files\vncviewer.exe
 )</Command>
@@ -741,7 +744,7 @@
     </Bscmake>
     <PostBuildEvent>
       <Command>if exist c:\uvnc\sign.bat (
-    c:\uvnc\sign.bat  "$(OutDir)$(TargetName)$(TargetExt)"
+    c:\uvnc\sign.bat "$(OutDir)$(TargetName)$(TargetExt)"
    copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\32\ipv6
 )
 </Command>
@@ -801,7 +804,7 @@
     </Bscmake>
     <PostBuildEvent>
       <Command>if exist c:\uvnc\sign.bat (
-    c:\uvnc\sign.bat  "$(OutDir)$(TargetName)$(TargetExt)"
+    c:\uvnc\sign.bat "$(OutDir)$(TargetName)$(TargetExt)"
     copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\XP
     copy "$(OutDir)$(TargetName)$(TargetExt)" ..\Files\vncviewer64.exe
 )</Command>
@@ -1059,7 +1062,7 @@
     </Bscmake>
     <PostBuildEvent>
       <Command>if exist c:\uvnc\sign.bat (
-    c:\uvnc\sign.bat  "$(OutDir)$(TargetName)$(TargetExt)"
+    c:\uvnc\sign.bat "$(OutDir)$(TargetName)$(TargetExt)"
    copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\ipv6
 )</Command>
     </PostBuildEvent>
@@ -2342,7 +2345,7 @@
     <ClInclude Include="..\ZipUnZip32\ZipUnZip32.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\rdr\rdrv12.vcxproj">
+    <ProjectReference Include="..\rdr\rdr.vcxproj">
       <Project>{f5244002-0fff-4f19-a941-fcce1861f132}</Project>
     </ProjectReference>
     <ProjectReference Include="..\udt4\win\udt.vcxproj">
@@ -2351,13 +2354,13 @@
     <ProjectReference Include="..\UdtCloudlib\UdtCloudlib.vcxproj">
       <Project>{b259a7a9-29b9-4783-b92f-6ddf524a3f19}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\zipunzip_src\unzip\windll\vc6\lib\unz32libv12.vcxproj">
+    <ProjectReference Include="..\zipunzip_src\unzip\windll\vc6\lib\unz32lib.vcxproj">
       <Project>{f9321962-fbed-4581-bf7d-d0ebc303d891}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\zipunzip_src\zip20\windll\visualc\lib\zip32v12.vcxproj">
+    <ProjectReference Include="..\zipunzip_src\zip20\windll\visualc\lib\zip32.vcxproj">
       <Project>{e8ba959f-b652-4bab-9ea7-8e9fc8d7f39c}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\omnithread\omnithreadv12.vcxproj">
+    <ProjectReference Include="..\omnithread\omnithread.vcxproj">
       <Project>{ab1ce62f-4a4d-4daa-831d-5c93ad68f5f1}</Project>
     </ProjectReference>
   </ItemGroup>

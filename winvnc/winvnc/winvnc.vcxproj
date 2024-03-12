@@ -416,6 +416,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='XP|x64'">
     <IncludePath>$(SolutionDir)..\zstd\zlibWrapper\;$(SolutionDir)..\zlib;$(IncludePath)</IncludePath>
   </PropertyGroup>
+  <PropertyGroup Label="Vcpkg">
+    <VcpkgEnableManifest>true</VcpkgEnableManifest>
+  </PropertyGroup>
+  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <VcpkgUseStatic>false</VcpkgUseStatic>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -1011,7 +1017,7 @@
     <PostBuildEvent>
       <Command>if exist c:\uvnc\sign.bat (
     c:\uvnc\sign.bat  "$(OutDir)$(TargetName)$(TargetExt)"
-    copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\x64\xp
+    copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp
 )
 </Command>
     </PostBuildEvent>

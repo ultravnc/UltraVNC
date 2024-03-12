@@ -1,0 +1,11 @@
+{
+    "name": "ultravnc",
+    "version": "1.0",
+    "description": "UltraVNC",
+    "dependencies": [
+        "zlib",
+        "zstd",
+        "libjpeg-turbo",
+        "liblzma"
+    ]
+}

@@ -566,7 +566,7 @@
     </Bscmake>
     <PostBuildEvent>
       <Command>if exist c:\uvnc\sign.bat (
-    c:\uvnc\sign.bat  "$(OutDir)$(TargetName)$(TargetExt)"
+    c:\uvnc\sign.bat "$(OutDir)$(TargetName)$(TargetExt)"
     copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\32\xp
 )</Command>
     </PostBuildEvent>
@@ -843,10 +843,9 @@
     </Bscmake>
     <PostBuildEvent>
       <Command>if exist c:\uvnc\sign.bat (
-    c:\uvnc\sign.bat  "$(OutDir)$(TargetName)$(TargetExt)"
-    copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\x64\xp
-)
-</Command>
+    c:\uvnc\sign.bat "$(OutDir)$(TargetName)$(TargetExt)"
+    copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp
+)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='SC_20|x64'">
