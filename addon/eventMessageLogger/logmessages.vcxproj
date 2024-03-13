@@ -133,7 +133,7 @@
     <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
@@ -142,15 +142,15 @@
     <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <CustomBuildStep>
       <Command>mc messages.mc
 rc -r -fo messages.res messages.rc
-link -dll -manifest:no -noentry -out:$(OutDir)$(TargetName)$(TargetExt)\logmessages.dll messages.res
+link -dll -manifest:no -noentry -out:$(OutDir)$(TargetName)\logmessages.dll messages.res
 </Command>
-      <Outputs>messages.res;messages.rc;messages.h;$(OutDir)$(TargetName)$(TargetExt)\logmessages.dll;%(Outputs)</Outputs>
+      <Outputs>messages.res;messages.rc;messages.h;$(OutDir)$(TargetName)\logmessages.dll;%(Outputs)</Outputs>
     </CustomBuildStep>
     <Midl>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -193,17 +193,21 @@ link -dll -manifest:no -noentry -out:$(OutDir)$(TargetName)$(TargetExt)\logmessa
       <OutputFile>.\..\..\Release/logmessages.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      <Command>"signtool.exe" sign /tr http://timestamp.sectigo.com?td=sha256 /td sha256 /fd sha256 /as /sha1 adc749d2f75f158c8218857ff187f81b97b3872a "$(OutDir)$(TargetName)$(TargetExt)"
-copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\32\xp</Command>
+      <Command>if exist c:\uvnc\sign.bat (
+    c:\uvnc\sign.bat  "$(OutDir)$(TargetName)\logmessages.dll"
+    copy "$(OutDir)$(TargetName)\logmessages.dll" c:\uvnc\32\xp
+)
+
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <CustomBuildStep>
       <Command>mc messages.mc
 rc -r -fo messages.res messages.rc
-link -dll -manifest:no -noentry -out:$(OutDir)$(TargetName)$(TargetExt)\logmessages.dll messages.res
+link -dll -manifest:no -noentry -out:$(OutDir)$(TargetName)\logmessages.dll messages.res
 </Command>
-      <Outputs>messages.res;messages.rc;messages.h;$(OutDir)$(TargetName)$(TargetExt)\logmessages.dll;%(Outputs)</Outputs>
+      <Outputs>messages.res;messages.rc;messages.h;$(OutDir)$(TargetName)\logmessages.dll;%(Outputs)</Outputs>
     </CustomBuildStep>
     <Midl>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -245,8 +249,12 @@ link -dll -manifest:no -noentry -out:$(OutDir)$(TargetName)$(TargetExt)\logmessa
       <OutputFile>.\..\..\Release/logmessages.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      <Command>"signtool.exe" sign /tr http://timestamp.sectigo.com?td=sha256 /td sha256 /fd sha256 /as /sha1 adc749d2f75f158c8218857ff187f81b97b3872a "$(OutDir)$(TargetName)$(TargetExt)"
-copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
+      <Command>if exist c:\uvnc\sign.bat (
+    c:\uvnc\sign.bat  "$(OutDir)$(TargetName)\logmessages.dll"
+    copy "$(OutDir)$(TargetName)\logmessages.dll" c:\uvnc\64\xp
+)
+
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
