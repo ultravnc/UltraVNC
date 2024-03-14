@@ -349,13 +349,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR szCmdLin
 	HMODULE hUser32 = LoadLibrary(_T("user32.dll"));
 	HMODULE shcoreDLL = LoadLibrary("SHCORE.DLL");
 	//Min  Vista
-	typedef BOOL(*SetProcessDPIAwareFunc)();
+	typedef BOOL(WINAPI *SetProcessDPIAwareFunc)();
 	SetProcessDPIAwareFunc setDPIAwareF = NULL;
 	//Min Windows 8.1
-	typedef HRESULT(*SetProcessDpiAwarenessFunc) (PROCESS_DPI_AWARENESS);
+	typedef HRESULT(WINAPI *SetProcessDpiAwarenessFunc) (PROCESS_DPI_AWARENESS);
 	SetProcessDpiAwarenessFunc setDPIpiAwarenessF = NULL;
 	//Min Windows 10, version 1703
-	typedef HRESULT(*SetProcessDpiAwarenessContextFunc) (DPI_AWARENESS_CONTEXT);
+	typedef HRESULT(WINAPI *SetProcessDpiAwarenessContextFunc) (DPI_AWARENESS_CONTEXT);
 	SetProcessDpiAwarenessContextFunc SetProcessDpiAwarenessContextF = NULL;
 	if (hUser32) {
 		setDPIAwareF = (SetProcessDPIAwareFunc)GetProcAddress(hUser32, "SetProcessDPIAware");
