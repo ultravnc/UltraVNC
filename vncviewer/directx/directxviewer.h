@@ -2,6 +2,7 @@
 #include <winsock2.h>
 #include <windows.h>
 #include <d3d9.h>
+#include "omnithread.h"
 //#include <d3dx9.h>
 
 typedef struct {
@@ -57,5 +58,6 @@ bool devicelost;
 //////////////////////
 HMODULE D3DLibrary;
 D3DCREATETYPE d3dCreate;
+omni_mutex directxMutex;
 
 };

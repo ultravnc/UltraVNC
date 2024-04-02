@@ -684,11 +684,16 @@ void ClientConnection::Run()
 		Save_Latest_Connection();
 	}
 
+	//DoConnection(); // sf@2007 - Autoreconnect - Must be done after windows creation, otherwise ReadServerInit does not initialise the title bar...
+
 	GTGBS_CreateDisplay();
 	GTGBS_CreateToolbar();
 	CreateDisplay();
 
 	DoConnection(); // sf@2007 - Autoreconnect - Must be done after windows creation, otherwise ReadServerInit does not initialise the title bar...
+	setTitle();
+
+	
 
 	//adzm 2009-06-21 - if we are connected now, show the window
 	ShowWindow(m_hwndcn, SW_SHOW);
@@ -3757,7 +3762,9 @@ void ClientConnection::ReadServerInit(bool reconnect)
 	}
 	strcpy_s(m_desktopName_viewonly, 2024, m_desktopName);
 	strcat_s(m_desktopName_viewonly, 2024, "viewonly");
+}
 
+void  ClientConnection::setTitle(){
 	if (m_opts->m_ViewOnly) SetWindowText(m_hwndMain, m_desktopName_viewonly);
 	else SetWindowText(m_hwndMain, m_desktopName);
 	SizeWindow();
@@ -7859,6 +7866,22 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 
 			switch (iMsg)
 			{
+			case WM_COPYDATA:
+				PCOPYDATASTRUCT pMyCDS;
+				pMyCDS = (PCOPYDATASTRUCT)lParam;
+				switch (pMyCDS->dwData)
+				{
+				case 0://aspect ratio
+					COPYDATASTRUCT cdsResponse;
+					int aspect = _this->m_si.framebufferWidth *100 / _this->m_si.framebufferHeight;
+					cdsResponse.cbData = 5;
+					cdsResponse.dwData = 0;					
+					cdsResponse.lpData = (PVOID)&aspect;
+					SendMessage((HWND)wParam, WM_COPYDATA, (WPARAM)hwnd, (LPARAM)&cdsResponse);
+					//SendMessage((HWND)pMyCDS->lpData, WM_COPYDATA, (WPARAM)hwnd, (LPARAM)&cdsResponse);
+					break;
+				}
+				break;
 			case WM_SYSCHAR:
 				return true;
 			case WM_SYSCOMMAND:

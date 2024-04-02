@@ -57,7 +57,9 @@ ViewerDirectxClass::~ViewerDirectxClass()
 void 
 ViewerDirectxClass::DestroyD3D(void)
 {
+	omni_mutex_lock l(directxMutex);
 	if (directxlocked==true) Afterupdate();
+	directxlocked = true;
 	if (surface)
 		{
 			surface->Release();
@@ -79,7 +81,7 @@ ViewerDirectxClass::DestroyD3D(void)
 HRESULT
 ViewerDirectxClass::InitD3D(HWND hwnd, HWND hwndm,int width, int height, bool fullscreen,int bit,int shift)
 {
-	
+	omni_mutex_lock l(directxMutex);
 	if (!D3DLibrary) return E_FAIL;
 	//PITCHTEST
 	parent_hwnd=hwnd;
@@ -253,7 +255,7 @@ ViewerDirectxClass::InitD3D(HWND hwnd, HWND hwndm,int width, int height, bool fu
 HRESULT
 ViewerDirectxClass::ReInitD3D()
 {
-	
+	omni_mutex_lock l(directxMutex);
 	if (!D3DLibrary) return E_FAIL;
 	//PITCHTEST
 	HWND hwnd=parent_hwnd;
@@ -424,69 +426,70 @@ ViewerDirectxClass::ReInitD3D()
 
 bool
 ViewerDirectxClass:: valid()
-	{
-		return pD3DDevice9!=0 && surface!=0;
-	}
+{
+	return pD3DDevice9!=0 && surface!=0;
+}
 bool
 ViewerDirectxClass:: paintdevice()
+{
+	// check if valid
+
+	if (!valid())
+		return false;
+
+	// copy surface to back buffer
+
+	LPDIRECT3DSURFACE9 backBuffer;
+	HRESULT result=NULL;
+
+	if (SUCCEEDED(pD3DDevice9->BeginScene()))
 	{
-		// check if valid
-
-		if (!valid())
-			return false;
-
-		// copy surface to back buffer
-
-		LPDIRECT3DSURFACE9 backBuffer;
-		HRESULT result=NULL;
-
-		if (SUCCEEDED(pD3DDevice9->BeginScene()))
-		{
 #ifdef _DEBUG
-		char			szText[256];
-		_snprintf_s(szText, 256, " ++++++++++BeginScene \n");
-		OutputDebugString(szText);		
+	char			szText[256];
+	_snprintf_s(szText, 256, " ++++++++++BeginScene \n");
+	OutputDebugString(szText);		
 #endif
-		pD3DDevice9->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &backBuffer);
+	pD3DDevice9->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &backBuffer);
 
-		if (!backBuffer)
-			return false;
+	if (!backBuffer)
+		return false;
 
-		result = pD3DDevice9->UpdateSurface(surface, 0, backBuffer, NULL);
+	result = pD3DDevice9->UpdateSurface(surface, 0, backBuffer, NULL);
 
-		backBuffer->Release();
-		pD3DDevice9->EndScene();
+	backBuffer->Release();
+	pD3DDevice9->EndScene();
 #ifdef _DEBUG
-		_snprintf_s(szText, 256, " ++++++++++ENdScene \n");
-		OutputDebugString(szText);		
+	_snprintf_s(szText, 256, " ++++++++++ENdScene \n");
+	OutputDebugString(szText);		
 #endif
-		}
-
-
-		if (result!= D3D_OK)
-			return false;
-
-		// present back buffer to display
-#ifdef _DEBUG
-		char			szText[256];
-		_snprintf_s(szText, 256, " ++++++++++Present \n");
-		OutputDebugString(szText);		
-#endif
-		if (pD3DDevice9->Present(NULL, NULL, NULL, NULL)!= D3D_OK)
-			return false;
-#ifdef _DEBUG
-		_snprintf_s(szText, 256, " ++++++++++Present2 \n");
-		OutputDebugString(szText);		
-#endif
-		// tell windows that we dont need to repaint anything
-
-		ValidateRect(parent_hwnd, NULL);
-
-		return true;
 	}
+
+
+	if (result!= D3D_OK)
+		return false;
+
+	// present back buffer to display
+#ifdef _DEBUG
+	char			szText[256];
+	_snprintf_s(szText, 256, " ++++++++++Present \n");
+	OutputDebugString(szText);		
+#endif
+	if (pD3DDevice9->Present(NULL, NULL, NULL, NULL)!= D3D_OK)
+		return false;
+#ifdef _DEBUG
+	_snprintf_s(szText, 256, " ++++++++++Present2 \n");
+	OutputDebugString(szText);		
+#endif
+	// tell windows that we dont need to repaint anything
+
+	ValidateRect(parent_hwnd, NULL);
+
+	return true;
+}
 bool
 ViewerDirectxClass:: paint()
 {
+	omni_mutex_lock l(directxMutex);
 	if (directxlocked==true)
 		Afterupdate();	
 	if (devicelost==true) 
@@ -515,6 +518,7 @@ ViewerDirectxClass:: paint()
 unsigned char *
 ViewerDirectxClass:: Preupdate(unsigned char * bits)
 {
+	omni_mutex_lock l(directxMutex);
 	int counter2=0;
 	while (paintbuzy) {
 		Sleep(2);
@@ -553,54 +557,56 @@ ViewerDirectxClass:: Preupdate(unsigned char * bits)
 
 unsigned char *
 ViewerDirectxClass:: Preupdate2(unsigned char * bits)
-	{
-		HRESULT result = pD3DDevice9->TestCooperativeLevel();
+{
+	omni_mutex_lock l(directxMutex);
+	HRESULT result = pD3DDevice9->TestCooperativeLevel();
 
-		if (result==D3DERR_DEVICELOST)
-			{
-			Sleep( 250 );
-			devicelost=true;
-			return NULL;
-			}
-
-		if (result==D3DERR_DRIVERINTERNALERROR)
-			{
-			devicelost=true;
-			return NULL;
-			}
-
-		if (result==D3DERR_DEVICENOTRESET)
-		{             
-			// reset device
-
-			if (FAILED(pD3DDevice9->Reset(&d3dpp)))
-			{
-			devicelost=true;
-			return NULL;
-			}
-		}
-
-		// copy pixels to surface
-
-		if (!surface)
-			{
-			devicelost=true;
-			return NULL;
-			}
-
-		D3DLOCKED_RECT lock;
-
-		if (FAILED(surface->LockRect(&lock, NULL, D3DLOCK_DISCARD)))
+	if (result==D3DERR_DEVICELOST)
 		{
-			devicelost=true;
-			return NULL;
+		Sleep( 250 );
+		devicelost=true;
+		return NULL;
 		}
-		directxlocked=true;
-		devicelost=false;
-		unsigned char *data = (unsigned char*) lock.pBits;
-		pitch=lock.Pitch;
-		return data;
+
+	if (result==D3DERR_DRIVERINTERNALERROR)
+		{
+		devicelost=true;
+		return NULL;
+		}
+
+	if (result==D3DERR_DEVICENOTRESET)
+	{             
+		// reset device
+
+		if (FAILED(pD3DDevice9->Reset(&d3dpp)))
+		{
+		devicelost=true;
+		return NULL;
+		}
+	}
+
+	// copy pixels to surface
+
+	if (!surface)
+		{
+		devicelost=true;
+		return NULL;
+		}
+
+	D3DLOCKED_RECT lock;
+
+	if (FAILED(surface->LockRect(&lock, NULL, D3DLOCK_DISCARD)))
+	{
+		devicelost=true;
+		return NULL;
+	}
+	directxlocked=true;
+	devicelost=false;
+	unsigned char *data = (unsigned char*) lock.pBits;
+	pitch=lock.Pitch;
+	return data;
 }
+
 bool
 ViewerDirectxClass:: Afterupdate()
 {

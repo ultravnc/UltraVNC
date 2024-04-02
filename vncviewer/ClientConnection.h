@@ -323,6 +323,7 @@ private:
 	void ReadScreenUpdate();
 	void Update(RECT *pRect);
 	bool IsOnlyOneMonitor();
+	void  setTitle();
 	void SizeWindow(bool noPosChange = true, bool noSizeChange = false);
 	bool ScrollScreen(int dx, int dy, bool absolute = false);
 	void UpdateScrollbars();
