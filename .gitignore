@@ -146,3 +146,9 @@ zipunzip_src/zip20/windll/visualc/lib/Release/
 zipunzip_src/zip20/windll/visualc/lib/x64/
 vncviewer/vcpkg_installed/
 winvnc/winvnc/vcpkg_installed/
+LAuncher2.0/__astcache/
+LAuncher2.0/__history/
+LAuncher2.0/Win32/
+UltraViewer/__astcache/
+UltraViewer/__history/
+UltraViewer/Win32/
