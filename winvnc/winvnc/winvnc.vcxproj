@@ -1680,6 +1680,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="SettingsManager.cpp" />
+    <ClCompile Include="UdpEchoServer.cpp" />
     <ClCompile Include="UltraVNCService.cpp" />
     <ClCompile Include="stdhdrs.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -3271,6 +3272,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
     <ClInclude Include="stdhdrs.h" />
     <ClInclude Include="TextChat.h" />
     <ClInclude Include="translate.h" />
+    <ClInclude Include="UdpEchoServer.h" />
     <ClInclude Include="UltraVNCService.h" />
     <ClInclude Include="uvncUiAccess.h" />
     <ClInclude Include="videodriver.h" />

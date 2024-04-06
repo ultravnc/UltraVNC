@@ -1017,6 +1017,14 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 			//adzm 2010-08
 			m_fEnableCache = true;
 		}
+		else if (SwitchMatch(args[j], _T("classname")))
+		{
+			if (++j == i) {
+				ArgError("No classname");
+			continue;
+			}
+			strcpy_s(m_ClassName, args[j]);
+		}
 		else if (SwitchMatch(args[j], _T("throttlemouse")))
 		{
 			//adzm 2010-10

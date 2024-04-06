@@ -459,6 +459,8 @@ typedef struct {
 #define rfbRequestSession 20
 #define rfbSetSession 21
 #define rfbSetDesktopSize 251
+#define rfbMonitorInfo 252
+#define rfbSetMonitor 254
 
 
 
@@ -512,6 +514,7 @@ typedef struct {
 #define rfbEncodingFTProtocolVersion    	0xFFFF8002
 #define rfbEncodingpseudoSession    		0xFFFF8003
 #define rfbEncodingEnableIdleTime           0xFFFF8004
+#define rfbEncodingMonitorInfo              0xFFFF8005
 
 // Same encoder number as in tight 
 /*
@@ -1338,6 +1341,13 @@ typedef struct {
 } rfbKeepAliveMsg;
 
 typedef struct {
+    CARD8   type;          /* always rfbServerState */
+    CARD8   nbr;
+    CARD8   pad2;
+    CARD8   pad3;
+} rfbMonitorMsg;
+
+typedef struct {
     CARD8 type;
 } rfbRequestSessionMsg;
 
@@ -1349,6 +1359,8 @@ typedef struct {
 #define sz_rfbKeepAliveMsg 1
 #define sz_rfbRequestSessionMsg 1
 #define sz_rfbSetSessionMsg 2
+#define sz_rfbMonitorMsg 4
+#define sz_rfSetMonitorMsg 4
 #define KEEPALIVE_INTERVAL 5
 #define KEEPALIVE_HEADROOM 1
 // adzm 2010-08
@@ -1640,4 +1652,5 @@ typedef union {
 	rfbRequestSessionMsg rs;
 	rfbSetSessionMsg ss;
     rfbSetDesktopSizeMsg sdm;
+    rfbMonitorMsg mm;
 } rfbClientToServerMsg;

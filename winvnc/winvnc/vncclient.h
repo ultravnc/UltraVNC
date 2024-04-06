@@ -351,6 +351,7 @@ public:
     void SendServerStateUpdate(CARD32 state, CARD32 value);
 	void Record_SendServerStateUpdate(CARD32 state, CARD32 value);
     void SendKeepAlive(bool bForce = false);
+	void SendMonitorInfo();
     void SendFTProtocolMsg();
 	// adzm - 2010-07 - Extended clipboard
 	void NotifyExtendedClipboardSupport();

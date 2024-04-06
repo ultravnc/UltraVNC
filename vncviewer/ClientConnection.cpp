@@ -684,13 +684,12 @@ void ClientConnection::Run()
 		Save_Latest_Connection();
 	}
 
-	//DoConnection(); // sf@2007 - Autoreconnect - Must be done after windows creation, otherwise ReadServerInit does not initialise the title bar...
+	DoConnection(); // sf@2007 - Autoreconnect - Must be done after windows creation, otherwise ReadServerInit does not initialise the title bar...
 
 	GTGBS_CreateDisplay();
 	GTGBS_CreateToolbar();
 	CreateDisplay();
 
-	DoConnection(); // sf@2007 - Autoreconnect - Must be done after windows creation, otherwise ReadServerInit does not initialise the title bar...
 	setTitle();
 
 	
@@ -1396,7 +1395,6 @@ void ClientConnection::CreateDisplay()
 	RegisterClass(&wndclass);
 
 	m_hwndcn = CreateWindow(VWR_WND_CLASS_NAME_VIEWER,
-	//m_hwnd = CreateWindow(_T("VNCMDI_Window"),
 			      _T("UltraVNC Viewer"),
 			      winstyle ,
 			      0,
@@ -4313,6 +4311,7 @@ void ClientConnection::SetFormatAndEncodings()
 	encs[se->nEncodings++] = Swap32IfLE(rfbEncodingEnableIdleTime);
     encs[se->nEncodings++] = Swap32IfLE(rfbEncodingFTProtocolVersion);
 	encs[se->nEncodings++] = Swap32IfLE(rfbEncodingpseudoSession);
+	encs[se->nEncodings++] = Swap32IfLE(rfbEncodingMonitorInfo);
 
 	// adzm - 2010-07 - Extended clipboard
 	encs[se->nEncodings++] = Swap32IfLE(rfbEncodingExtendedClipboard);
@@ -5367,6 +5366,11 @@ void* ClientConnection::run_undetached(void* arg) {
                     }
 #endif
                     break;
+
+				case rfbMonitorInfo:
+					ReadMonitorInfo();
+					break;
+
 				case rfbRequestSession:
 					break;
 				case rfbFramebufferUpdate:
@@ -5726,6 +5730,18 @@ bool ClientConnection::SendServerInput(BOOL enabled)
 //
 // Modif rdv@2002 - Single window
 //
+
+bool ClientConnection::SendSetMonitor(int nbr)
+{
+	rfbMonitorMsg mm;
+	memset(&mm, 0, sizeof(mm));
+	mm.type = rfbSetMonitor;
+	mm.nbr = nbr;
+	if (nbrMonitors != 0) //we need to receiev the number of monitor to be sure the server support the set
+		WriteExact_timeout((char*)&mm, sz_rfbMonitorMsg, rfbSetMonitor, 5);
+	return true;
+}
+
 bool ClientConnection::SendSW(int x, int y)
 {
     rfbSetSWMsg sw;
@@ -6494,6 +6510,15 @@ void ClientConnection::ReadBell()
 	}
 	vnclog.Print(6, _T("Bell!\n"));
 }
+
+void ClientConnection::ReadMonitorInfo()
+{
+	rfbMonitorMsg mi;
+	memset(&mi, 0, sizeof mi);
+	ReadExact(((char*)&mi) + m_nTO, sz_rfbMonitorMsg - m_nTO);
+	nbrMonitors = mi.nbr;
+}
+
 void ClientConnection::ReadServerState()
 {
     rfbServerStateMsg ss;
@@ -7571,6 +7596,14 @@ void ClientConnection::UpdateStatusFields()
 
 void ClientConnection::GTGBS_CreateDisplay()
 {
+	char ClassName[256]{};
+	if (strlen(m_opts->m_ClassName) > 0) {
+		strcpy(ClassName, m_opts->m_ClassName);
+	}
+	else {
+		strcpy(ClassName, _T("VNCMDI_Window"));
+	}
+
 	// Das eigendliche HauptFenster erstellen,
 	// welches das VNC-Fenster und die Toolbar enthält
 	WNDCLASS wndclass;
@@ -7594,11 +7627,11 @@ void ClientConnection::GTGBS_CreateDisplay()
 	}
 	wndclass.hbrBackground	= (HBRUSH) GetStockObject(BLACK_BRUSH);
     wndclass.lpszMenuName	= (const TCHAR *) NULL;
-	wndclass.lpszClassName	= _T("VNCMDI_Window");
+	wndclass.lpszClassName	= ClassName;
 	RegisterClass(&wndclass);
 	const DWORD winstyle = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU |
 	  WS_MINIMIZEBOX |WS_MAXIMIZEBOX | WS_THICKFRAME | WS_VSCROLL | WS_HSCROLL;
-	m_hwndMain = CreateWindow(_T("VNCMDI_Window"),
+	m_hwndMain = CreateWindow(ClassName,
 			  _T("VNCviewer"),
 			  winstyle,
 			  CW_USEDEFAULT,
@@ -7872,14 +7905,31 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 				switch (pMyCDS->dwData)
 				{
 				case 0://aspect ratio
-					COPYDATASTRUCT cdsResponse;
-					int aspect = _this->m_si.framebufferWidth *100 / _this->m_si.framebufferHeight;
-					cdsResponse.cbData = 5;
-					cdsResponse.dwData = 0;					
-					cdsResponse.lpData = (PVOID)&aspect;
-					SendMessage((HWND)wParam, WM_COPYDATA, (WPARAM)hwnd, (LPARAM)&cdsResponse);
-					//SendMessage((HWND)pMyCDS->lpData, WM_COPYDATA, (WPARAM)hwnd, (LPARAM)&cdsResponse);
+					{
+						COPYDATASTRUCT cdsResponse{};
+						int aspect = _this->m_si.framebufferWidth * 100 / _this->m_si.framebufferHeight;
+						cdsResponse.cbData = 5;
+						cdsResponse.dwData = 0;
+						cdsResponse.lpData = (PVOID)&aspect;
+						SendMessage((HWND)wParam, WM_COPYDATA, (WPARAM)hwnd, (LPARAM)&cdsResponse);
+						break;
+					}
+				case 1://get nt monitors
+					{
+						COPYDATASTRUCT cdsResponse{};
+						int nbrMonitors = _this->nbrMonitors;
+						cdsResponse.cbData = 5;
+						cdsResponse.dwData = 1;
+						cdsResponse.lpData = (PVOID)&nbrMonitors;
+						SendMessage((HWND)wParam, WM_COPYDATA, (WPARAM)hwnd, (LPARAM)&cdsResponse);
+						break;
+					}
+				case 2://set monitor x
+				{
+					int monitor = *(int*)pMyCDS->lpData;
+					_this->SendSetMonitor(monitor);
 					break;
+				}
 				}
 				break;
 			case WM_SYSCHAR:

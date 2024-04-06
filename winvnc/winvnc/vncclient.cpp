@@ -2404,6 +2404,7 @@ vncClientThread::run(void* arg)
 	bool need_first_keepalive = false;
 	bool need_keepalive = false;
 	bool need_first_idletime = false;
+	bool need_monitor_info = false;
 	bool firstrun = true;
 	bool need_ft_version_msg = false;
 	// adzm - 2010-07 - Extended clipboard
@@ -2464,6 +2465,13 @@ vncClientThread::run(void* arg)
 			// send idletime to let the client know we accepted the encoding request
 			m_client->SendServerStateUpdate(rfbIdleInputTimeout, settings->getIdleInputTimeout());
 			need_first_idletime = false;
+		}
+
+		if (need_monitor_info)
+		{
+			// send idletime to let the client know we accepted the encoding request
+			m_client->SendMonitorInfo();
+			need_monitor_info = false;
 		}
 
 		if (m_client->m_want_update_state && m_client->m_Support_rfbSetServerInput)
@@ -2754,6 +2762,12 @@ vncClientThread::run(void* arg)
 
 					if (Swap32IfLE(encoding) == rfbEncodingEnableIdleTime) {
 						need_first_idletime = true;
+						vnclog.Print(LL_INTINFO, VNCLOG("IdleTime protocol extension enabled\n"));
+						continue;
+					}
+
+					if (Swap32IfLE(encoding) == rfbEncodingMonitorInfo) {
+						need_monitor_info = true;
 						vnclog.Print(LL_INTINFO, VNCLOG("IdleTime protocol extension enabled\n"));
 						continue;
 					}
@@ -3708,6 +3722,12 @@ vncClientThread::run(void* arg)
 			}
 			break;
 			// Set Single Window
+		case rfbSetMonitor:
+			if (m_socket->ReadExact(((char*)&msg) + nTO, sz_rfbMonitorMsg - nTO))
+			{
+				m_client->m_encodemgr.m_buffer->m_desktop->SetMonitor(msg.mm.nbr);
+			}
+			break;
 		case rfbSetSW:
 			if (!m_socket->ReadExact(((char*)&msg) + nTO, sz_rfbSetSWMsg - nTO))
 			{
@@ -6644,6 +6664,15 @@ void vncClient::SendServerStateUpdate(CARD32 state, CARD32 value)
 
 		m_socket->SendExact((char*)&rsmsg, sz_rfbServerStateMsg, rfbServerState);
 	}
+}
+
+void vncClient::SendMonitorInfo()
+{
+	rfbMonitorMsg mm;
+	memset(&mm, 0, sizeof mm);
+	mm.type = rfbMonitorInfo;
+	mm.nbr = m_encodemgr.m_buffer->m_desktop->nr_monitors;
+	m_socket->SendExact((char*)&mm, sz_rfbMonitorMsg, rfbMonitorInfo);
 }
 
 void vncClient::SendKeepAlive(bool bForce)

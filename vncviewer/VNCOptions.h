@@ -167,6 +167,7 @@ public:
 	static void setDefaultOptionsFileName(TCHAR* optionfile);
 	TCHAR* getDefaultOptionsFileName();
 	char m_InfoMsg[255]{ 0 };
+	char m_ClassName[255]{ 0 };
 
 private:
 	void ShowUsage(LPTSTR info = NULL);

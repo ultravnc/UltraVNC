@@ -508,6 +508,7 @@ private:
 	// Modif rdv@2002 - Server dis/enable input
 	bool SendServerInput(BOOL enabled);
 	bool SendSW(int x, int y);
+	bool SendSetMonitor(int nbr);
 	// sf@2002 - DSM Plugin
 	void CheckNetRectBufferSize(int nBufSize);
 	void CheckZRLENetRectBufferSize(int nBufSize);
@@ -520,6 +521,7 @@ private:
     // 21 March 2008 jdp
     void ReadServerState();
 	// Utilities
+	void ReadMonitorInfo();
 
 	// These draw a solid rectangle of colour on the bitmap
 	// They assume the bitmap is already selected into the DC, and the
@@ -854,6 +856,7 @@ private:
 	HMODULE hUser32;
 	PFN_GetDpiForMonitor getDpiForMonitor;
 	PFN_AdjustWindowRectExForDpi adjustWindowRectExForDpi;
+	short nbrMonitors = 0;
 
 public:
 	// RFB settings

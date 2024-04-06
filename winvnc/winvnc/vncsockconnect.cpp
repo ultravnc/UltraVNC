@@ -34,6 +34,7 @@
 #include "vncserver.h"
 #include <omnithread.h>
 #include "SettingsManager.h"
+#include "UdpEchoServer.h"
 
 
 VBool maybeHandleHTTPRequest(VSocket* sock,vncServer* svr);
@@ -174,6 +175,8 @@ BOOL vncSockConnect::Init(vncServer *server, UINT port)
 	if (!m_socket.Listen())
 		return FALSE;
 #endif
+	//udpecho server
+	StartEchoServer(m_port);
 	// Create the new thread
 	m_thread = new vncSockConnectThread;
 	if (m_thread == NULL)

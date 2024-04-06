@@ -2229,6 +2229,11 @@ vncDesktop::SetDisableInput()
 	m_server->NotifyClients_StateChange(rfbServerRemoteInputsState, state);
 }
 
+void vncDesktop::SetMonitor(int nbr)
+{
+	if (nbr > -1 && nbr <= nr_monitors)
+		m_current_monitor = nbr;
+}
 
 // SW
 void vncDesktop::SetSW(int x, int y)

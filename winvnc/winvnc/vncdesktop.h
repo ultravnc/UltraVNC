@@ -238,6 +238,7 @@ public:
 	// Modif rdv@2002 Dis/enable input
 	void SetDisableInput();
 	void SetSW(int x,int y);
+	void SetMonitor(int nbr);
 	//hook selection
 	BOOL m_hookdriver;
 	void SethookMechanism(BOOL hookall,BOOL hookdriver);
@@ -275,6 +276,7 @@ public:
 	// Screen info
 	rfbServerInitMsg	m_scrinfo;
 	void requestMouseShapeUpdate();
+	int nr_monitors;
 protected:
 
 	// Routines to hook and unhook us
@@ -437,8 +439,7 @@ protected:
 	rfb::Region2D iconregion;
 	bool blankmonitorstate;
 
-	//Multi monitor
-	int nr_monitors;
+	//Multi monitor	
 	bool show_all_monitors;
 	bool requested_all_monitor;
 
