@@ -37,6 +37,57 @@
 //	[v1.0.2-jp1 fix] Load resouce from dll
 extern HINSTANCE	hInstResDLL;
 
+char* GetVersionFromResource(char* version)
+{
+    HRSRC hResInfo;
+    DWORD dwSize;
+    HGLOBAL hResData;
+    LPVOID pRes, pResCopy;
+    UINT uLen = 0;
+    VS_FIXEDFILEINFO* lpFfi = NULL;
+    HINSTANCE hInst = ::GetModuleHandle(NULL);
+
+    hResInfo = FindResource(hInst, MAKEINTRESOURCE(1), RT_VERSION);
+    if (hResInfo)
+    {
+        dwSize = SizeofResource(hInst, hResInfo);
+        hResData = LoadResource(hInst, hResInfo);
+        if (hResData)
+        {
+            pRes = LockResource(hResData);
+            if (pRes)
+            {
+                pResCopy = LocalAlloc(LMEM_FIXED, dwSize);
+                if (pResCopy)
+                {
+                    CopyMemory(pResCopy, pRes, dwSize);
+
+                    if (VerQueryValue(pResCopy, ("\\"), (LPVOID*)&lpFfi, &uLen))
+                    {
+                        if (lpFfi != NULL)
+                        {
+                            DWORD dwFileVersionMS = lpFfi->dwFileVersionMS;
+                            DWORD dwFileVersionLS = lpFfi->dwFileVersionLS;
+
+                            DWORD dwLeftMost = HIWORD(dwFileVersionMS);
+                            DWORD dwSecondLeft = LOWORD(dwFileVersionMS);
+                            DWORD dwSecondRight = HIWORD(dwFileVersionLS);
+                            DWORD dwRightMost = LOWORD(dwFileVersionLS);
+
+                            sprintf(version, " %d.%d.%d.%d", dwLeftMost, dwSecondLeft, dwSecondRight, dwRightMost);
+                        }
+                    }
+
+                    LocalFree(pResCopy);
+                }
+            }
+        }
+    }
+    strcat(version, (char*)"-dev");
+    return version;
+}
+
+
 HBITMAP
     DoGetBkGndBitmap(IN CONST UINT uBmpResId )
     {
@@ -180,7 +231,11 @@ vncAbout::DialogProc(HWND hwnd,
 			SetForegroundWindow(hwnd);
 
 			_this->m_dlgvisible = TRUE;
-
+            char version[50]{};
+			char title[256]{};
+			strcpy_s(title, "UltraVNC Server - ");
+			strcat_s(title, GetVersionFromResource(version));
+			SetDlgItemText(hwnd, IDC_VERSION, title);
 			return TRUE;
 		}
 

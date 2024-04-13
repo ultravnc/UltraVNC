@@ -207,5 +207,6 @@ char * GetVersionFromResource(char *version)
             }
         }
     }
+    strcat(version, (char* )"-dev");
     return version;
 }

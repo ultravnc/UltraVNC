@@ -348,13 +348,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR szCmdLin
 {
 	HMODULE hUser32 = LoadLibrary(_T("user32.dll"));
 	HMODULE shcoreDLL = LoadLibrary("SHCORE.DLL");
-<<<<<<< HEAD
 	//Min  Vista
 	typedef BOOL(WINAPI *SetProcessDPIAwareFunc)();
-=======
-	//Min Windows Vista
-	typedef BOOL(*SetProcessDPIAwareFunc)();
->>>>>>> Typo's and file header copyright fixes ( No code changes)
 	SetProcessDPIAwareFunc setDPIAwareF = NULL;
 	//Min Windows 8.1
 	typedef HRESULT(WINAPI *SetProcessDpiAwarenessFunc) (PROCESS_DPI_AWARENESS);
