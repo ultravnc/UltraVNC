@@ -9,6 +9,7 @@
 #include "CardList.h"
 #include "Tabsheet.h"
 #include "TabsheetList.h"
+#include "DlgPasswordBox.h"
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
 #pragma resource "*.dfm"
@@ -19,6 +20,16 @@ __fastcall TMainForm::TMainForm(TComponent* Owner)
 {
 	SettingsManager sm;
 	TStyleManager::SetStyle(sm.loadTheme());
+	SplitView->Opened = false;
+	if (sm.isEncryptionUsed()) {
+		TPasswordDialog *dialog = new TPasswordDialog(this, 2);
+		if (dialog->ShowModal() == mrOk) {
+			globalPassword = dialog->getNewPassword();
+			if (!sm.ispasswordCorrect(globalPassword))
+				Close();
+		}
+		delete dialog;
+	}
 
 	sections = new TStringList();
 	thread = new SizeChangedThread(false);
@@ -30,13 +41,17 @@ __fastcall TMainForm::TMainForm(TComponent* Owner)
 		{
 			if (sections->Strings[i] == "theme")
 				continue;
-			sm.load(sections->Strings[i]);
-			TfrmCard *frmCard = new TfrmCard(NULL, this); // Create a new instance of your frame
+			if (sections->Strings[i] == "UltraViewer")
+				continue;
+
+			if (sm.load(sections->Strings[i], globalPassword)) {
+			TfrmCard *frmCard = new TfrmCard(NULL, this, globalPassword); // Create a new instance of your frame
 			CardList::getInstance()->addToCardList(sections->Strings[i], frmCard);
 			frmCard->Parent = FlowPanel1;
 			frmCard->setCustumName(sections->Strings[i]);
 			frmCard->copyCardSetting(sm.getCardSetting());
 			frmCard->Show();
+			}
 		}
 	}
 	__finally
@@ -77,7 +92,7 @@ void __fastcall TMainForm::FormResize( TObject* Sender )
   if ( MainForm->Width <= 640 )
   {
     if ( SplitView->Opened == true )
-      SplitView->Opened = false;
+	  SplitView->Opened = false;
   }
 }
 //---------------------------------------------------------------------------
@@ -93,7 +108,7 @@ void __fastcall TMainForm::FormCreate(TObject *Sender)
 //---------------------------------------------------------------------------
 void __fastcall TMainForm::AddSessionClick(TObject *Sender)
 {
-   TAddCard *addCard(new TAddCard (NULL));
+   TAddCard *addCard(new TAddCard (NULL, globalPassword));
 	int result = addCard->ShowModal();
 	if (addCard->ModalResult == mrOk)
 	{
@@ -101,9 +116,9 @@ void __fastcall TMainForm::AddSessionClick(TObject *Sender)
 		String customname = addCard->getCustomName();
 		if (!CardList::getInstance()->existInCardList(customname))
 		{
-			sm.load(customname);
+			sm.load(customname, globalPassword);
 
-			TfrmCard  *frmCard =new TfrmCard(NULL, this); // Create a new instance of your frame
+			TfrmCard  *frmCard =new TfrmCard(NULL, this, globalPassword); // Create a new instance of your frame
 			CardList::getInstance()->addToCardList(customname, frmCard);
 			frmCard->Parent = FlowPanel1;
 			frmCard->setCustumName(customname);
@@ -127,7 +142,7 @@ void __fastcall TMainForm::AddSessionClick(TObject *Sender)
 		ZeroMemory(&pi, sizeof(pi));
 
 		SettingsManager sm;
-		sm.load(caption);
+		sm.load(caption, globalPassword);
 		CardSetting * cs = sm.getCardSetting();
 
 		String command = String("vncviewer.exe");
@@ -200,87 +215,8 @@ void __fastcall TMainForm::AddSessionClick(TObject *Sender)
 	}
 }
 //---------------------------------------------------------------------------
-bool decryptStr(const char *pEncryptTxt, const char* pKey, int length, char * pDecryptTxt)
-{
-    HCRYPTPROV hProv;
-    HCRYPTHASH hHash;
-    HCRYPTKEY hKey;
-    DWORD todwSize = (DWORD)strlen(pEncryptTxt);
-    PBYTE pBuffer = (BYTE *)_alloca(todwSize);
-    char *txtBuf = (char *)_alloca(todwSize + 1);
 
 
-    if (CryptAcquireContext(&hProv, NULL, NULL, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT))
-    {
-        if (CryptCreateHash(hProv, CALG_SHA1, 0, 0, &hHash))
-        {
-            if (CryptHashData(hHash, (BYTE*)pKey, (DWORD)strlen(pKey), 0) &&
-                CryptDeriveKey(hProv, CALG_RC4, hHash, 0, &hKey))
-            {
-                memcpy(pBuffer, pEncryptTxt, todwSize);
-
-                if (CryptDecrypt(hKey, 0, TRUE, 0, pBuffer, &todwSize))
-                {
-
-                    txtBuf[todwSize] = NULL;
-                    memcpy(txtBuf, pBuffer, todwSize);
-                    memcpy(pDecryptTxt, txtBuf, todwSize + 1);
-
-                }
-
-                CryptDestroyKey(hKey);
-            }
-            CryptDestroyHash(hHash);
-        }
-        CryptReleaseContext(hProv, 0);
-    }
-
-
-    return true;
-}
-//---------------------------------------------------------------------------
-bool encryptStr(const char *pSourceTxt,const char* pKey,  int length, char * pEncryptTxt)
-{
-    HCRYPTPROV hProv;
-    HCRYPTHASH hHash;
-    HCRYPTKEY hKey;
-    DWORD todwSize = (DWORD)strlen(pSourceTxt), needSize;
-    PBYTE pBuffer;
-    char *txtBuf = (char *)_alloca(todwSize + 1);
-
-	if (CryptAcquireContext(&hProv, NULL, NULL, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT))
-    {
-        if (CryptCreateHash(hProv, CALG_SHA1, 0, 0, &hHash))
-        {
-            if (CryptHashData(hHash, (BYTE*)pKey, (DWORD)strlen(pKey), 0) &&
-                CryptDeriveKey(hProv, CALG_RC4, hHash, 0, &hKey))
-            {
-                if (CryptEncrypt(hKey, 0, TRUE, 0, NULL, &(needSize = todwSize), 0))
-                {
-                    memcpy(pBuffer = (BYTE *)_alloca(needSize), pSourceTxt, todwSize);
-
-                    if (CryptEncrypt(hKey, 0, TRUE, 0, pBuffer, &todwSize, needSize))
-                    {
-
-                        txtBuf[todwSize] = NULL;
-                        memcpy(txtBuf, pBuffer, todwSize);
-                        memcpy(pEncryptTxt, txtBuf, todwSize + 1);
-                    }
-                }
-                CryptDestroyKey(hKey);
-            }
-            CryptDestroyHash(hHash);
-        }
-        CryptReleaseContext(hProv, 0);
-	}
-    return true;
-}
-
-void __fastcall TMainForm::GlobalPasswordChange(TObject *Sender)
-{
-	globalPassword =  GlobalPassword->Text;
-}
-//---------------------------------------------------------------------------
 void __fastcall TMainForm::FormClose(TObject *Sender, TCloseAction &Action)
 {
 	TabsheetList::getInstance()->closeAll();
@@ -297,7 +233,7 @@ void __fastcall TMainForm::VCLStylesCBMouseLeave(TObject *Sender)
 //---------------------------------------------------------------------------
 void __fastcall TMainForm::DashboardTabMouseEnter(TObject *Sender)
 {
-	SplitView->Opened = false;
+   //	SplitView->Opened = false;
 }
 //---------------------------------------------------------------------------
 void __fastcall TMainForm::PageControlDrawTab(TCustomTabControl *Control, int TabIndex,
@@ -342,7 +278,6 @@ void __fastcall TMainForm::PageControlMouseDown(TObject *Sender, TMouseButton Bu
 	}
 }
 //---------------------------------------------------------------------------
-
 void __fastcall TMainForm::close1Click(TObject *Sender)
 {
 	String caption = PageControl->Pages[selectedTab]->Caption;
@@ -350,7 +285,6 @@ void __fastcall TMainForm::close1Click(TObject *Sender)
 	tab->Close();
 }
 //---------------------------------------------------------------------------
-
 void __fastcall TMainForm::RemoveToolbarClick(TObject *Sender)
 {
 	String caption = PageControl->Pages[selectedTab]->Caption;
@@ -358,7 +292,6 @@ void __fastcall TMainForm::RemoveToolbarClick(TObject *Sender)
 	tab->RemoveToolbar();
 }
 //---------------------------------------------------------------------------
-
 void __fastcall TMainForm::Top1Click(TObject *Sender)
 {
 	String caption = PageControl->Pages[selectedTab]->Caption;
@@ -366,12 +299,76 @@ void __fastcall TMainForm::Top1Click(TObject *Sender)
 	tab->TopToolbar();
 }
 //---------------------------------------------------------------------------
-
 void __fastcall TMainForm::Left1Click(TObject *Sender)
 {
 	String caption = PageControl->Pages[selectedTab]->Caption;
 	Tabsheet*  tab = TabsheetList::getInstance()->getTabsheet(caption.TrimRight());
 	tab->LeftToolbar();
+}
+//---------------------------------------------------------------------------
+void __fastcall TMainForm::btnPaswordClick(TObject *Sender)
+{
+	if (globalPassword.IsEmpty()) {
+
+		TPasswordDialog *dialog = new TPasswordDialog(this, 1);
+		if (dialog->ShowModal() == mrOk) {
+			globalPassword = dialog->getNewPassword();
+			SettingsManager sm;
+			sm.SettingsManager::AddPassword(globalPassword, "");
+		}
+	}
+	else if (!globalPassword.IsEmpty()) {
+		TPasswordDialog *dialog = new TPasswordDialog(this, 0);
+		if (dialog->ShowModal() == mrOk) {
+			String oldpassword = dialog->getOldPassword();
+			if (oldpassword == globalPassword) {
+				globalPassword = dialog->getNewPassword();
+				SettingsManager sm;
+				sm.SettingsManager::AddPassword(globalPassword, oldpassword);
+			}
+			else
+                ShowMessage("Incorrect password");
+		}
+		delete dialog;
+    }
+}
+//---------------------------------------------------------------------------
+void __fastcall TMainForm::PageControlChange(TObject *Sender)
+{
+	String toCaption = PageControl->ActivePage->Caption;
+
+	if (toCaption == "Sessions    ")  {
+		TfrmCard *card = CardList::getInstance()->getCard(toCaption.TrimRight());
+		if (oldVNCCard) {
+			oldVNCCard->SetVNCParent(hOldVNCWnd);
+		}
+		
+	}
+	else if (fromsession){
+		Tabsheet*  tab = TabsheetList::getInstance()->getTabsheet(toCaption.TrimRight());
+		if(tab)
+			tab->SetVNCParent();
+			TfrmCard *card = CardList::getInstance()->getCard(toCaption.TrimRight());
+		if (card) {
+			card->UnSetVNCParent();
+		}
+
+	}
+
+}
+//---------------------------------------------------------------------------
+void __fastcall TMainForm::PageControlChanging(TObject *Sender, bool &AllowChange)
+{
+	String fromCaption = PageControl->ActivePage->Caption;
+	if (fromCaption != "Sessions    "){
+		Tabsheet*  tab = TabsheetList::getInstance()->getTabsheet(fromCaption.TrimRight());
+        if(tab)
+			hOldVNCWnd =  tab->getVNCWnd();
+		oldVNCCard = CardList::getInstance()->getCard(fromCaption.TrimRight());
+		fromsession = false;
+	}
+	if (fromCaption == "Sessions    ")
+		fromsession = true;
 }
 //---------------------------------------------------------------------------
 

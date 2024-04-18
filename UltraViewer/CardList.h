@@ -21,5 +21,6 @@ class CardList
 		bool existInCardList(String customName);
 		void pollAlive();
 		void stopPoll();
+		TfrmCard * getCard(String customName);
 };
 #endif

@@ -79,5 +79,7 @@ public:		// User declarations
 	void __fastcall RemoveToolbar();
 	void __fastcall TopToolbar();
 	void __fastcall LeftToolbar();
+	HWND  getVNCWnd() {return hVNCWnd;}
+	void  SetVNCParent();
 };
 #endif

@@ -1,9 +1,8 @@
 object frmCard: TfrmCard
   Left = 0
   Top = 0
-  Width = 286
+  Width = 292
   Height = 186
-  AutoSize = True
   Ctl3D = True
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -17,7 +16,7 @@ object frmCard: TfrmCard
     AlignWithMargins = True
     Left = 3
     Top = 3
-    Width = 280
+    Width = 286
     Height = 180
     ControlCollection = <
       item
@@ -67,7 +66,7 @@ object frmCard: TfrmCard
         AlignVerticalCenterWithPanel = False
       end
       item
-        Control = Viewonly
+        Control = Full
         AlignBottomWithPanel = True
         AlignHorizontalCenterWithPanel = True
         AlignLeftWithPanel = False
@@ -94,14 +93,52 @@ object frmCard: TfrmCard
         AlignRightWithPanel = False
         AlignTopWithPanel = True
         AlignVerticalCenterWithPanel = False
+      end
+      item
+        Control = PreviewPanel
+        AlignBottomWithPanel = False
+        AlignHorizontalCenterWithPanel = False
+        AlignLeftWithPanel = False
+        AlignRightWithPanel = False
+        AlignTopWithPanel = False
+        AlignVerticalCenterWithPanel = False
+      end
+      item
+        Control = PreviewCustomName
+        AlignBottomWithPanel = False
+        AlignHorizontalCenterWithPanel = False
+        AlignLeftWithPanel = False
+        AlignRightWithPanel = False
+        AlignTopWithPanel = False
+        AlignVerticalCenterWithPanel = False
+      end
+      item
+        Control = unencrypted
+        AlignBottomWithPanel = True
+        AlignHorizontalCenterWithPanel = False
+        AlignLeftWithPanel = True
+        AlignRightWithPanel = False
+        AlignTopWithPanel = False
+        AlignVerticalCenterWithPanel = False
+      end
+      item
+        Control = ViewOnly
+        AlignBottomWithPanel = True
+        AlignHorizontalCenterWithPanel = True
+        AlignLeftWithPanel = False
+        AlignRightWithPanel = False
+        AlignTopWithPanel = False
+        AlignVerticalCenterWithPanel = False
+        RightOf = encryption
       end>
+    Align = alClient
     Color = clWhite
     FullRepaint = False
     ParentBackground = False
     TabOrder = 0
     OnClick = RelativePanel2Click
     DesignSize = (
-      280
+      286
       180)
     object lblCustumName: TLabel
       AlignWithMargins = True
@@ -126,17 +163,19 @@ object frmCard: TfrmCard
       OnClick = RelativePanel2Click
     end
     object imgSettings: TImage
-      Left = 227
+      Left = 233
       Top = 33
       Width = 52
       Height = 32
       Cursor = crHandPoint
+      Hint = 'Settings'
       Margins.Left = 24
       Margins.Top = 24
       Margins.Right = 24
       Margins.Bottom = 24
       Anchors = []
       Center = True
+      ParentShowHint = False
       Picture.Data = {
         0954506E67496D61676589504E470D0A1A0A0000000D49484452000000200000
         00200806000000737A7AF400000006624B474400FF00FF00FFA0BDA793000003
@@ -173,17 +212,15 @@ object frmCard: TfrmCard
         1032078014C4BACB8986CE56B35EF5AF6236DAC2A5EC75AF399F445B460E856E
         2C2980BCC5D6F7181E5CC0FE0149B6A6DAB5FE9DBF66FF29007F00AABC483F41
         4278660000000049454E44AE426082}
+      ShowHint = True
       OnClick = imgSettingsClick
     end
     object offline: TImage
-      Left = 1
-      Top = 1
+      AlignWithMargins = True
+      Left = 4
+      Top = 4
       Width = 32
       Height = 32
-      Margins.Left = 24
-      Margins.Top = 24
-      Margins.Right = 24
-      Margins.Bottom = 24
       Anchors = []
       Picture.Data = {
         0954506E67496D61676589504E470D0A1A0A0000000D49484452000000200000
@@ -214,13 +251,15 @@ object frmCard: TfrmCard
         0049454E44AE426082}
     end
     object imgRemove: TImage
-      Left = 227
+      Left = 233
       Top = 1
       Width = 52
       Height = 32
       Cursor = crHandPoint
+      Hint = 'Remove card'
       Anchors = []
       Center = True
+      ParentShowHint = False
       Picture.Data = {
         055449636F6E0000010002001010000001002000680400002600000020200000
         01002000A81000008E0400002800000010000000200000000100200000000000
@@ -392,6 +431,7 @@ object frmCard: TfrmCard
         F9FFFF9FF9EFFF9FF9C7E79FF9E3C79FF9F18F9FF9F81F9FF9FC3F9FF9FC3F9F
         F9F81F9FF9F18F9FF9E3C79FF9E7E79FF9FFFF9FF9FFFF9FF9FFFF9FF9FFFF9F
         F800001FF800001FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
+      ShowHint = True
       OnClick = imgRemoveClick
     end
     object encryption: TImage
@@ -399,7 +439,9 @@ object frmCard: TfrmCard
       Top = 147
       Width = 32
       Height = 32
+      Hint = 'Encryption selected'
       Anchors = []
+      ParentShowHint = False
       Picture.Data = {
         0954506E67496D61676589504E470D0A1A0A0000000D49484452000000200000
         00200806000000737A7AF400000006624B474400FF00FF00FFA0BDA793000002
@@ -423,13 +465,16 @@ object frmCard: TfrmCard
         82CA87926B3E2CF2C88DB7265DC9129B0ADB2D74CA0991B13F7DC78AC2E798E3
         A15CCB555E6DFE5CAD584D6CD8AEE5C366A302465CC03F3BA689215291D66E00
         00000049454E44AE426082}
+      ShowHint = True
     end
-    object Viewonly: TImage
+    object Full: TImage
       Left = 33
       Top = 147
       Width = 32
       Height = 32
+      Hint = 'Input allowed'
       Anchors = []
+      ParentShowHint = False
       Picture.Data = {
         0954506E67496D61676589504E470D0A1A0A0000000D49484452000000200000
         00200806000000737A7AF400000006624B474400FF00FF00FFA0BDA793000000
@@ -439,6 +484,7 @@ object frmCard: TfrmCard
         7307D01A0C3E073C0562293A590E038F81580EE6001F209E494747803C9CC680
         D420193030EA8051078C3A0000400B42216E893B9B0000000049454E44AE4260
         82}
+      ShowHint = True
     end
     object Host: TLabel
       AlignWithMargins = True
@@ -461,8 +507,9 @@ object frmCard: TfrmCard
       OnClick = RelativePanel2Click
     end
     object online: TImage
-      Left = 1
-      Top = 1
+      AlignWithMargins = True
+      Left = 4
+      Top = 4
       Width = 32
       Height = 32
       Anchors = []
@@ -491,6 +538,104 @@ object frmCard: TfrmCard
         10B297F7E142860D8645E8752C21F326F397950F128BAC7E924964FDA3745A23
         97402E817F9C13A5211BE6953F0000000049454E44AE426082}
       Visible = False
+    end
+    object PreviewPanel: TPanel
+      AlignWithMargins = True
+      Left = 42
+      Top = 34
+      Width = 185
+      Height = 107
+      Anchors = []
+      BevelOuter = bvNone
+      Caption = 'PreviewPanel'
+      ParentShowHint = False
+      ShowCaption = False
+      ShowHint = False
+      TabOrder = 0
+      Visible = False
+    end
+    object PreviewCustomName: TLabel
+      Left = 44
+      Top = 0
+      Width = 181
+      Height = 25
+      Margins.Left = 5
+      Margins.Top = 25
+      Margins.Right = 5
+      Margins.Bottom = 5
+      Alignment = taCenter
+      AutoSize = False
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -14
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentFont = False
+    end
+    object unencrypted: TImage
+      Left = 1
+      Top = 147
+      Width = 32
+      Height = 32
+      Hint = 'Unencrypted'
+      Anchors = []
+      ParentShowHint = False
+      Picture.Data = {
+        0954506E67496D61676589504E470D0A1A0A0000000D49484452000000200000
+        00200806000000737A7AF4000000017352474200AECE1CE90000000467414D41
+        0000B18F0BFC6105000000097048597300000EC300000EC301C76FA864000003
+        2F4944415478DABD9779884D7114C7CF58478352964CC83E46510A898CADEC32
+        4623140D8514896CF107FE996C7F3048A244917D4B614AC688142985B10E9165
+        1019A321F27CBF9DF39AD79BFBEEBDBF37BAA73EBD77EFBBF7DCEF3DBF737EE7
+        BC0CA9B3C1E015F828115A867D0E05A5E039180DBE442DA00328037DC05D3006
+        54472980960DCA410F70138C033FA21440EB026ED8E7353009D426FCDE114C03
+        534167D0CECE7F02AFC17970167C4857805804CA2D229741BE3DAC184C078D02
+        7CFE05A7C13AD19C721640CBB5083037EE80BE200BFC0227C119701F7CB5EBDB
+        8001169D42D00CD48039E05C3A0268FDC12D7B30ED1458255AAA7ED61D6C0305
+        168D1560673A02F22D94F1901F06F3CC69185B6E42F80CE6CC4517019DC023D0
+        0AECB207B704FBC062100B298211DB0ABE892EEBFBB0020E8222D18C66284780
+        4BA085857335D80466D9F547C106F0DBC3FF0530191C000BC208E80A5E803FA6
+        BAD2CE8F3567CDC16D3024E93E56C97A0F7FBDC043D1A5EC06DE040958067680
+        63096F18B729A279D1D48E4799E3ABE0AD2D9D979D10AD8EA560779000D63E77
+        C199E0B8C7EF85E690B646748D633EFE68B3C111D1659C1824E019E869A14BDE
+        48C2265FB2DF1CF0183C11ED37BE02BE8B663C2BA0E63F09A0AF6AF3DD3A4800
+        1F9A6522929B5172A8B9A625A27B4391E85ED160014F45C39F63DFFD04D05892
+        5B44ABA6490ABF0C7B85E832E40609F04BC254C9C63D60A38F5FA7245C22BAFB
+        799561D81CE00B94261CF3456698EF3D410258CB2F45D73571237211506B6F5A
+        26BA9C0F406309B911D1B8E72F146DA5050E0FA6BFBD609168328F076B45B7E2
+        FDE6B3DE0D5EC6618409C3ECE5F65A1C52008D3B237BC95CF013644A1ACD8816
+        6FC7BC86D3CD660711AC867BA09F1DD7DB82C308A07198D86ED7B90C24BC87D3
+        51CCEEAD12ED1B15AE02689C030F49DD48C616CD72E2F85E693E985C83C0048B
+        1C3B267360BEC15C7807F2443BAD93005A5BB052B45366065CCB0A28B1287C16
+        9D21380DF10F0F27E7E1F6E924206E896339CB2BDBCEB315B389A51ACB19BD2B
+        60984520CF22E22CA021C61EC0B961A068858D0455510AA0717CE7B8DF5B345F
+        AE472D80D65E74F9F8F72FD225F0B47F634EB721841EDF870000000049454E44
+        AE426082}
+      ShowHint = True
+    end
+    object ViewOnly: TImage
+      Left = 33
+      Top = 147
+      Width = 32
+      Height = 32
+      Hint = 'ViewOnly'
+      Anchors = []
+      ParentShowHint = False
+      Picture.Data = {
+        0954506E67496D61676589504E470D0A1A0A0000000D49484452000000200000
+        00200806000000737A7AF4000000017352474200AECE1CE90000000467414D41
+        0000B18F0BFC6105000000097048597300000EC300000EC301C76FA864000001
+        1C4944415478DAC5D6B10E01311807F0F61D2444422E8C0633AB98780E9B97B1
+        791183C46A3758442488C4C033F0BFE8274DA9F6AAFDEE9FFC432F5C7F77DF25
+        48F14A0FDDA177C11C89F6D125BA4707DC881C5045576807DD7023A47A2D0D21
+        B5F7A520A4B16647C82FC758110418A133B495F26AB51CD029BA20C0096D306D
+        4E39A219011EC61DA1A41AC77B3F172015C209B0AD8542743D3FEF5C17FDC256
+        DD09E1BB4128C09658E30806C442788F40588ED734449E8A42143D4F30807E45
+        AF6A4D77E2160BE09BD07144038422FE1E812BE633613B4F3280F94C140684C6
+        771CC900BE880FC005AD47D8BC48CE6893006374CE88C82F7822B43F24A9E21C
+        476A8013C101F889E00258119C80AF086E808EC8D061190042B4D1F5131FB982
+        6D720547E60000000049454E44AE426082}
+      ShowHint = True
     end
   end
 end

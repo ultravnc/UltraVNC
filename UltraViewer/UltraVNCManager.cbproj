@@ -4,7 +4,7 @@
         <ProjectVersion>19.5</ProjectVersion>
         <FrameworkType>VCL</FrameworkType>
         <AppType>Application</AppType>
-        <MainSource>UltraViewer.cpp</MainSource>
+        <MainSource>UltraVNCManager.cpp</MainSource>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
@@ -78,7 +78,7 @@
         <UWP_CppLogo150>$(BDS)\bin\Artwork\Windows\UWP\cppreg_UwpDefault_150.png</UWP_CppLogo150>
         <IncludePath>..\..\..\Documents\Embarcadero\Studio\22.0\CatalogRepository\Essentials-12cb\packages\11AndAbove\cpp\Win32\Debug\;C:\SimpleCRMCPP\;$(IncludePath)</IncludePath>
         <ILINK_LibraryPath>..\..\..\Documents\Embarcadero\Studio\22.0\CatalogRepository\Essentials-12cb\packages\11AndAbove\cpp\Win32\Debug\;C:\SimpleCRMCPP\;$(ILINK_LibraryPath)</ILINK_LibraryPath>
-        <SanitizedProjectName>UltraViewer</SanitizedProjectName>
+        <SanitizedProjectName>UltraVNCManager</SanitizedProjectName>
         <Custom_Styles>&quot;Aqua Light Slate|VCLSTYLE|$(BDSCOMMONDIR)\Styles\AquaLightSlate.vsf&quot;;&quot;Tablet Light|VCLSTYLE|$(BDSCOMMONDIR)\Styles\TabletLight.vsf&quot;;Windows10|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows10.vsf;&quot;Windows10 Blue|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows10Blue.vsf&quot;;&quot;Windows10 SlateGray|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows10SlateGray.vsf&quot;;Glossy|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Glossy.vsf</Custom_Styles>
         <VerInfo_Locale>2067</VerInfo_Locale>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
@@ -92,7 +92,7 @@
         <VerInfo_Locale>1033</VerInfo_Locale>
         <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
         <Icon_MainIcon>UltraVNCLauncher_Icon.ico</Icon_MainIcon>
-        <BCC_PCHName_Clang>UltraViewerPCH1.h</BCC_PCHName_Clang>
+        <BCC_PCHName_Clang>UltraVNCManagerPCH1.h</BCC_PCHName_Clang>
         <UWP_CppLogo44>res\vncviewer.png</UWP_CppLogo44>
         <UWP_CppLogo150>res\vncviewer.png</UWP_CppLogo150>
         <AppDPIAwarenessMode>none</AppDPIAwarenessMode>
@@ -100,7 +100,7 @@
     <PropertyGroup Condition="'$(Base_Win64)'!=''">
         <PackageImports>adortl;appanalytics;bcbie;bcbsmp;bindcomp;bindcompdbx;bindcompfmx;bindcompvcl;bindcompvclsmp;bindengine;CloudService;CustomIPTransport;DataSnapClient;DataSnapCommon;DataSnapConnectors;DatasnapConnectorsFreePascal;DataSnapFireDAC;DataSnapIndy10ServerTransport;DataSnapNativeClient;DataSnapProviderClient;DataSnapServer;DataSnapServerMidas;dbexpress;dbrtl;dbxcds;DbxClientDriver;DbxCommonDriver;DBXDb2Driver;DBXFirebirdDriver;DBXInformixDriver;DBXInterBaseDriver;DBXMSSQLDriver;DBXMySQLDriver;DBXOdbcDriver;DBXOracleDriver;DBXSqliteDriver;DBXSybaseASADriver;DBXSybaseASEDriver;dsnap;dsnapcon;dsnapxml;emsclient;emsclientfiredac;emsedge;emshosting;emsserverresource;FireDAC;FireDACADSDriver;FireDACASADriver;FireDACCommon;FireDACCommonDriver;FireDACCommonODBC;FireDACDb2Driver;FireDACDBXDriver;FireDACDSDriver;FireDACIBDriver;FireDACInfxDriver;FireDACMongoDBDriver;FireDACMSAccDriver;FireDACMSSQLDriver;FireDACMySQLDriver;FireDACODBCDriver;FireDACOracleDriver;FireDACPgDriver;FireDACSqliteDriver;FireDACTDataDriver;fmx;fmxase;fmxdae;fmxFireDAC;fmxobj;ibmonitor;ibxbindings;ibxpress;IndyCore;IndyIPClient;IndyIPCommon;IndyIPServer;IndyProtocols;IndySystem;inet;inetdb;inetdbxpress;RESTBackendComponents;RESTComponents;rtl;soapmidas;soaprtl;soapserver;tethering;vcl;vclactnband;vcldb;vcldsnap;vclFireDAC;vclib;vclie;vcledge;vclimg;VCLRESTComponents;VclSmp;vcltouch;vclwinx;vclx;xmlrtl;$(PackageImports)</PackageImports>
         <IncludePath>$(BDSINCLUDE)\windows\vcl;$(IncludePath)</IncludePath>
-        <BCC_PCHName_Clang>UltraViewerPCH1.h</BCC_PCHName_Clang>
+        <BCC_PCHName_Clang>UltraVNCManagerPCH1.h</BCC_PCHName_Clang>
         <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
         <BT_BuildType>Debug</BT_BuildType>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -175,9 +175,19 @@
         <None Include="CardSetting.h">
             <BuildOrder>6</BuildOrder>
         </None>
+        <CppCompile Include="DlgPasswordBox.cpp">
+            <Form>PasswordDialog</Form>
+            <FormType>dfm</FormType>
+            <DependentOn>DlgPasswordBox.h</DependentOn>
+            <BuildOrder>16</BuildOrder>
+        </CppCompile>
         <CppCompile Include="PollThread.cpp">
             <DependentOn>PollThread.h</DependentOn>
-            <BuildOrder>12</BuildOrder>
+            <BuildOrder>14</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="Rijndael.cpp">
+            <DependentOn>Rijndael.h</DependentOn>
+            <BuildOrder>15</BuildOrder>
         </CppCompile>
         <CppCompile Include="SettingsManager.cpp">
             <DependentOn>SettingsManager.h</DependentOn>
@@ -222,10 +232,10 @@
             <DependentOn>uFrmCard.h</DependentOn>
             <BuildOrder>6</BuildOrder>
         </CppCompile>
-        <CppCompile Include="UltraViewer.cpp">
+        <CppCompile Include="UltraVNCManager.cpp">
             <BuildOrder>0</BuildOrder>
         </CppCompile>
-        <PCHCompile Include="UltraViewerPCH1.h">
+        <PCHCompile Include="UltraVNCManagerPCH1.h">
             <BuildOrder>1</BuildOrder>
             <PCH>true</PCH>
         </PCHCompile>
@@ -238,8 +248,9 @@
         <FormResources Include="UdpPoll.dfm"/>
         <FormResources Include="uAddCard.dfm"/>
         <FormResources Include="TopBarPanel.dfm"/>
-        <FormResources Include="uFrmCard.dfm"/>
         <FormResources Include="uMainForm.dfm"/>
+        <FormResources Include="uFrmCard.dfm"/>
+        <FormResources Include="DlgPasswordBox.dfm"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -264,7 +275,7 @@
                     <ProjectProperties Name="IndexFiles">False</ProjectProperties>
                 </ProjectProperties>
                 <Source>
-                    <Source Name="MainSource">UltraViewer.cpp</Source>
+                    <Source Name="MainSource">UltraVNCManager.cpp</Source>
                 </Source>
                 <Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\bcboffice2k280.bpl">Embarcadero C++Builder Office 2000 Servers Package</Excluded_Packages>
@@ -330,15 +341,15 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName=".\Win32\Debug\UltraViewer.exe" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName=".\Win32\Debug\UltraVNCManager.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
-                        <RemoteName>UltraViewer.exe</RemoteName>
+                        <RemoteName>UltraVNCManager.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName=".\Win32\Debug\UltraViewer.tds" Configuration="Debug" Class="DebugSymbols">
+                <DeployFile LocalName=".\Win32\Debug\UltraVNCManager.tds" Configuration="Debug" Class="DebugSymbols">
                     <Platform Name="Win32">
-                        <RemoteName>UltraViewer.tds</RemoteName>
+                        <RemoteName>UltraVNCManager.tds</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

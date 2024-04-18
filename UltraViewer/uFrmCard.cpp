@@ -11,10 +11,13 @@
 #pragma package(smart_init)
 #pragma resource "*.dfm"
 //---------------------------------------------------------------------------
-__fastcall TfrmCard::TfrmCard(TComponent* Owner, TMainForm* mainform)
+__fastcall TfrmCard::TfrmCard(TComponent* Owner, TMainForm* mainform,String globalPassword)
 	: TFrame(Owner)
 {
+    this->globalPassword = globalPassword;
 	this->mainform = mainform;
+    PreviewPanel->Visible = false;
+
 }
 //---------------------------------------------------------------------------
 __fastcall TfrmCard::~TfrmCard()
@@ -25,6 +28,7 @@ __fastcall TfrmCard::~TfrmCard()
 void TfrmCard::setCustumName(String custumName)
 {
 	lblCustumName->Caption = custumName;
+	PreviewCustomName->Caption = custumName;
 }
 //---------------------------------------------------------------------------
 void TfrmCard::copyCardSetting(CardSetting *setting)
@@ -58,7 +62,7 @@ void __fastcall TfrmCard::imgRemoveClick(TObject *Sender)
 //---------------------------------------------------------------------------
 void __fastcall TfrmCard::imgSettingsClick(TObject *Sender)
 {
-	TAddCard *addCard = new TAddCard(NULL);
+	TAddCard *addCard = new TAddCard(NULL, globalPassword);
 
 	addCard->importSettings(&cardSetting);
 	int result = addCard->ShowModal();
@@ -73,9 +77,24 @@ void TfrmCard::updatUI()
 	else
 		Host->Caption = cardSetting.host;
 
-	encryption->Visible = cardSetting.useEncryption;
+	if (cardSetting.useEncryption) {
+		encryption->Visible = true;
+		unencrypted->Visible = false;
+	}
+	else {
+		encryption->Visible = false;
+		unencrypted->Visible = true;
+	}
 
-	Viewonly->Visible = !cardSetting.viewOnly;
+	if (cardSetting.viewOnly) {
+		ViewOnly->Visible = true;
+		Full->Visible = false;
+	}
+	else {
+		ViewOnly->Visible = false;
+		Full->Visible = true;
+    }
+
 }
 
 void __fastcall TfrmCard::RelativePanel2Click(TObject *Sender)
@@ -90,7 +109,39 @@ String TfrmCard::getHost()
 //---------------------------------------------------------------------------
 void TfrmCard::setOnline(bool value)
 {
-	offline->Visible = !value;
-	online->Visible = value;
+	if (!preview) {
+		offline->Visible = !value;
+		online->Visible = value;
+	}
+}
+//---------------------------------------------------------------------------
+void TfrmCard::SetVNCParent(HWND hOldVNCWnd)
+{
+	::SetParent(hOldVNCWnd, PreviewPanel->Handle);
+	PreviewPanel->Visible = true;
+	PreviewCustomName->Visible = true;
+	offline->Visible = false;
+	online->Visible = false;
+	ViewOnly->Visible = false;
+	Full->Visible = false;
+	encryption->Visible = false;
+	unencrypted->Visible = false;
+	imgRemove->Visible = false;
+	imgSettings->Visible = false;
+	preview = true;
+	Host->Visible = false;
+	lblCustumName->Visible = false;
+	SetWindowPos(hOldVNCWnd, NULL, 0, 0, PreviewPanel->Width, PreviewPanel->Height, SWP_NOZORDER | SWP_NOACTIVATE);
+}
+//---------------------------------------------------------------------------
+void TfrmCard::UnSetVNCParent()
+{
+	PreviewPanel->Visible = false;
+	PreviewCustomName->Visible = false;
+	imgRemove->Visible = true;
+	updatUI();
+	preview = false;
+	Host->Visible = true;
+	lblCustumName->Visible = true;
 }
 

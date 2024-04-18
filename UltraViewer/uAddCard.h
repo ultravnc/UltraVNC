@@ -79,8 +79,9 @@ __published:	// IDE-managed Components
 	void __fastcall UseEncryptionClick(TObject *Sender);
 private:	// User declarations
 	CardSetting *cardSetting = NULL;
+	String globalPassword;
 public:		// User declarations
-	__fastcall TAddCard(TComponent* Owner);
+	__fastcall TAddCard(TComponent* Owner, String globalPassword);
 	String getCustomName();
 	void importSettings(CardSetting *settings);
 };

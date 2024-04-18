@@ -24,23 +24,31 @@ __published:	// IDE-managed Components
 	TImage *offline;
 	TImage *imgRemove;
 	TImage *encryption;
-	TImage *Viewonly;
+	TImage *Full;
 	TLabel *Host;
 	TImage *online;
+	TPanel *PreviewPanel;
+	TLabel *PreviewCustomName;
+	TImage *unencrypted;
+	TImage *ViewOnly;
 	void __fastcall imgRemoveClick(TObject *Sender);
 	void __fastcall imgSettingsClick(TObject *Sender);
 	void __fastcall RelativePanel2Click(TObject *Sender);
 private:	// User declarations
 	CardSetting cardSetting;
 	void updatUI();
-    TMainForm * mainform;
+	TMainForm * mainform;
+	String globalPassword;
+    bool preview = false;
 public:		// User declarations
-	__fastcall TfrmCard(TComponent* Owner, TMainForm* Owner2);
+	__fastcall TfrmCard(TComponent* Owner, TMainForm* Owner2, String globalPassword);
 	__fastcall ~TfrmCard();
 	void setCustumName(String custumName);
 	void copyCardSetting(CardSetting *cardSetting);
 	String getHost();
 	void setOnline(bool value);
+	void SetVNCParent(HWND hOldVNCWnd);
+	void UnSetVNCParent();
 };
 //---------------------------------------------------------------------------
 
