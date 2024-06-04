@@ -7682,9 +7682,15 @@ LRESULT CALLBACK ClientConnection::GTGBS_StatusProc(HWND hwnd, UINT iMsg, WPARAM
 				Rect.bottom - Rect.top,
 				SWP_SHOWWINDOW);
 
-			char wt[MAX_PATH];
+			char wt[MAX_PATH]{};
 			ClientConnection *_this = (ClientConnection *)lParam;
             helper::SafeSetWindowUserData(hwnd, lParam);
+
+			char version[50]{};
+			char title[256]{};
+			strcpy_s(title, "UltraVNC Viewer - ");
+			strcat_s(title, GetVersionFromResource(version));
+			SetDlgItemText(hwnd, IDC_UVVERSION, title);
 
 			SetDlgItemInt(hwnd,IDC_RECEIVED,_this->m_BytesRead,false);
 			SetDlgItemInt(hwnd,IDC_SEND,_this->m_BytesSend,false);

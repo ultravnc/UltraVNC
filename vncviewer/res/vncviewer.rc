@@ -173,9 +173,9 @@ END
 //
 
 IDD_OPTIONDIALOG DIALOGEX 0, 0, 335, 253
-STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTERMOUSE | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "UltraVNC Viewer - Connection Settings"
-FONT 11, "Arial", 400, 0, 0x0
+FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     CONTROL         "Auto-select best settings",IDC_AUTODETECT,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,10,12,136,12
     CONTROL         "ZRLE",IDC_ZRLERADIO,"Button",BS_AUTORADIOBUTTON,12,30,31,10
@@ -254,10 +254,10 @@ BEGIN
 END
 
 IDD_FILETRANSFER_DLG DIALOGEX 0, 0, 555, 414
-STYLE DS_SYSMODAL | DS_SETFONT | DS_SETFOREGROUND | DS_3DLOOK | DS_CENTER | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+STYLE DS_SYSMODAL | DS_SETFONT | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 EXSTYLE WS_EX_TOPMOST
 CAPTION "UltraVNC Viewer - File Transfer"
-FONT 11, "Arial", 400, 0, 0x0
+FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     LTEXT           "History",IDC_HS_STATIC,4,374,26,8
     COMBOBOX        IDC_HISTORY_CB,45,372,507,71,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
@@ -295,9 +295,9 @@ BEGIN
 END
 
 IDD_SESSION_DLG DIALOGEX 0, 0, 260, 312
-STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "UltraVNC Viewer 1.4.4.0-dev - Connection"
-FONT 11, "Arial", 400, 0, 0x0
+FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     COMBOBOX        IDC_HOSTNAME_EDIT,76,21,162,66,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     EDITTEXT        IDC_PROXY_EDIT,76,36,162,12,ES_AUTOHSCROLL
@@ -324,19 +324,19 @@ BEGIN
 END
 
 IDD_SERVINFO_DLG DIALOGEX 0, 0, 224, 170
-STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | WS_POPUP | WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "UltraVNC Viewer - RFB Server information"
-FONT 11, "Arial", 400, 0, 0x0
+FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,167,149,50,14
     EDITTEXT        IDC_SERVINFO_EDIT,7,7,210,134,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY
 END
 
 IDD_AUTH_DIALOG DIALOGEX 101, 66, 214, 63
-STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOPMOST
 CAPTION "UltraVNC Viewer - Authentication"
-FONT 11, "Arial", 400, 0, 0x0
+FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     EDITTEXT        IDD_USER_NAME,104,6,96,14,ES_AUTOHSCROLL
     EDITTEXT        IDC_PASSWD_EDIT,104,22,96,14,ES_PASSWORD | ES_AUTOHSCROLL
@@ -348,10 +348,10 @@ BEGIN
 END
 
 IDD_AUTH_DIALOG2 DIALOGEX 101, 66, 214, 113
-STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOPMOST
 CAPTION "UltraVNC Viewer - Authentication - Unsecured Transmission"
-FONT 11, "Arial", 400, 0, 0x0
+FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     LTEXT           "With the current UltraVNC Viewer version, the password you provide is not transferred securely, except if you are using the encryption DSMPlugin.\r\nPlease update the UltraVNC Server on the remote computer to v1.0.2 or above for secure password transmission.",IDC_STATIC,8,6,196,44
     EDITTEXT        IDD_USER_NAME,114,57,92,14,ES_AUTOHSCROLL
@@ -364,10 +364,10 @@ BEGIN
 END
 
 IDD_CUSTUM_KEY DIALOGEX 0, 0, 224, 58
-STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | WS_POPUP | WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOPMOST
 CAPTION "UltraVNC Viewer - Send Custom Key (Experimental...)"
-FONT 11, "Arial", 400, 0, 0x0
+FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     LTEXT           "KeyCode (decimal)",IDC_STATIC,7,9,87,12
     EDITTEXT        IDC_CUSTOM_KEY,100,7,51,14,ES_AUTOHSCROLL
@@ -379,41 +379,42 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,167,37,50,14
 END
 
-IDD_STATUS DIALOGEX 0, 0, 214, 178
-STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | WS_CAPTION | WS_SYSMENU
+IDD_STATUS DIALOGEX 0, 0, 214, 201
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | WS_CAPTION | WS_SYSMENU
 CAPTION "UltraVNC Viewer - Connection Status"
-FONT 11, "Arial", 400, 0, 0x0
+FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    DEFPUSHBUTTON   "Close",IDCLOSE,157,157,50,14
+    DEFPUSHBUTTON   "Close",IDCLOSE,157,180,50,14
     GROUPBOX        "Connection",IDC_STATIC,7,0,199,112
     GROUPBOX        "Traffic",IDC_STATIC,7,112,199,42
-    LTEXT           "Port",IDC_STATIC,14,26,46,9
-    LTEXT           "Bytes Sent",IDC_STATIC,11,125,63,9
+    LTEXT           "Port",IDC_STATIC,12,26,46,9
+    LTEXT           "Bytes Sent",IDC_STATIC,12,125,63,9
     RTEXT           "Bytes Received",IDC_STATIC,117,125,68,9
     RTEXT           "Sent",IDC_SEND,11,141,64,9
     RTEXT           "Received",IDC_RECEIVED,117,141,72,9
     LTEXT           "Port Number",IDC_PORT,101,26,101,9
     ICON            IDI_NET,IDC_STATIC,93,121,20,20
-    LTEXT           "VNC Server",IDC_STATIC,14,12,46,9
+    LTEXT           "VNC Server",IDC_STATIC,11,12,46,9
     LTEXT           "Server Name",IDC_VNCSERVER,101,12,101,9
-    LTEXT           "Status",IDC_STATIC,14,54,46,9
+    LTEXT           "Status",IDC_STATIC,12,54,46,9
     LTEXT           "Connection closed",IDC_STATUS,101,54,105,9
     RTEXT           "",IDC_PLUGIN_STATUS,14,68,46,9
-    PUSHBUTTON      "Cancel",IDQUIT,7,157,50,14
-    LTEXT           "Speed",IDC_STATIC,14,85,31,8
+    PUSHBUTTON      "Cancel",IDQUIT,7,180,50,14
+    LTEXT           "Speed",IDC_STATIC,12,85,31,8
     LTEXT           "123",IDC_SPEED,101,85,26,8
     LTEXT           "kbit/s",IDC_STATIC,134,85,50,8
     LTEXT           "",IDC_ENCODER,101,40,101,9
-    LTEXT           "Encoder",IDC_STATIC,14,40,46,9
-    LTEXT           "FPS",IDC_STATIC,14,99,46,8
+    LTEXT           "Encoder",IDC_STATIC,12,40,46,9
+    LTEXT           "FPS",IDC_STATIC,12,99,46,8
     LTEXT           "1",IDC_FPS,101,99,58,8
+    LTEXT           "UltraVNC Viewer 1.4.4.0-dev",IDC_UVVERSION,12,161,191,11
 END
 
 IDD_AUTH_DIALOG1 DIALOGEX 101, 66, 234, 58
-STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOPMOST
 CAPTION "UltraVNC Viewer - WARNING: Upgrade server..."
-FONT 11, "Arial", 400, 0, 0x0
+FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     EDITTEXT        IDC_PASSWD_EDIT,108,13,110,14,ES_PASSWORD | ES_AUTOHSCROLL
     DEFPUSHBUTTON   "Login",IDOK,108,37,54,15
@@ -423,9 +424,9 @@ BEGIN
 END
 
 IDD_FTPARAM_DLG DIALOGEX 0, 0, 241, 60
-STYLE DS_SYSMODAL | DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+STYLE DS_SYSMODAL | DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "UltraVNC Viewer - File Transfer Param Dialog"
-FONT 11, "Arial", 400, 0, 0x0
+FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     EDITTEXT        IDC_FTPARAM_EDIT,10,21,224,14,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "OK",IDOK,128,42,50,14
@@ -434,9 +435,9 @@ BEGIN
 END
 
 IDD_TEXTCHAT_DLG DIALOGEX 0, 0, 307, 175
-STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "UltraVNC Viewer - Chat"
-FONT 11, "Arial", 400, 0, 0x0
+FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     EDITTEXT        IDC_INPUTAREA_EDIT,4,136,255,36,ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN | NOT WS_BORDER | WS_VSCROLL,WS_EX_STATICEDGE
     PUSHBUTTON      "Send",IDC_SEND_B,264,135,39,14,BS_CENTER | BS_MULTILINE
@@ -447,9 +448,9 @@ BEGIN
 END
 
 IDD_APP_ABOUT DIALOGEX 0, 0, 327, 136
-STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "UltraVNC Viewer - About"
-FONT 11, "Arial", 400, 0, 0x0
+FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,252,118,62,14
     CONTROL         IDB_VNC64,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE,8,1,34,29
@@ -466,10 +467,10 @@ BEGIN
 END
 
 IDD_FTCONFIRM_DLG DIALOGEX 0, 0, 227, 86
-STYLE DS_SYSMODAL | DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+STYLE DS_SYSMODAL | DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOPMOST
 CAPTION "UltraVNC Viewer"
-FONT 11, "Arial", 400, 0, 0x0
+FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     LTEXT           "Confirm message here",IDC_FTPCONFIRMCOMMENT,4,8,163,53
     DEFPUSHBUTTON   "Yes",IDC_YES_B,4,65,53,14
@@ -479,9 +480,9 @@ BEGIN
 END
 
 IDD_APP_MESSAGE2 DIALOGEX 0, 0, 273, 123
-STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "UltraVNC Viewer - Information"
-FONT 11, "Arial", 400, 0, 0x0
+FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "Close",IDOK,213,101,54,15
     LTEXT           "Info Message",IDC_Message2,48,35,215,26
@@ -502,10 +503,10 @@ BEGIN
 END
 
 IDD_AUTH_DIALOG3 DIALOGEX 101, 66, 234, 58
-STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOPMOST
 CAPTION "UltraVNC Viewer - Authentication"
-FONT 11, "Arial", 400, 0, 0x0
+FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     EDITTEXT        IDC_PASSWD_EDIT,118,13,100,14,ES_PASSWORD | ES_AUTOHSCROLL
     DEFPUSHBUTTON   "Login",IDOK,108,37,54,15
@@ -515,10 +516,10 @@ BEGIN
 END
 
 IDD_AUTH_DIALOG4 DIALOGEX 101, 66, 215, 91
-STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOPMOST
 CAPTION "UltraVNC Viewer - Authentication"
-FONT 11, "Arial", 400, 0, 0x0
+FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     EDITTEXT        IDD_USER_NAME,96,7,110,14,ES_AUTOHSCROLL
     EDITTEXT        IDC_PASSWD_EDIT,96,25,110,14,ES_PASSWORD | ES_AUTOHSCROLL
@@ -534,10 +535,10 @@ BEGIN
 END
 
 IDD_AUTH_DIALOG5 DIALOGEX 101, 66, 235, 79
-STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOPMOST
 CAPTION "UltraVNC Viewer - Authentication"
-FONT 11, "Arial", 400, 0, 0x0
+FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     EDITTEXT        IDC_PASSWD_EDIT,107,6,117,14,ES_PASSWORD | ES_AUTOHSCROLL
     DEFPUSHBUTTON   "Login",IDOK,114,59,50,15
@@ -551,9 +552,9 @@ BEGIN
 END
 
 IDD_SESSIONSELECTOR DIALOGEX 0, 0, 316, 183
-STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | WS_POPUP | WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "UltraVNC Viewer - Session Selector"
-FONT 11, "Arial", 400, 0, 0x0
+FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,205,162,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,259,162,50,14
@@ -561,10 +562,10 @@ BEGIN
 END
 
 IDD_SAVEIMAGE DIALOGEX 0, 0, 316, 59
-STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_CENTER | DS_CENTERMOUSE | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | DS_CENTERMOUSE | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOPMOST | WS_EX_TOOLWINDOW
 CAPTION "UltraVNC Viewer - Snapshot"
-FONT 11, "Arial", 400, 0, 0x0
+FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     EDITTEXT        IDC_FOLDER,51,7,189,14,ES_AUTOHSCROLL
     PUSHBUTTON      "Browse",IDC_BROWSE,259,7,50,14
@@ -576,8 +577,8 @@ BEGIN
 END
 
 IDD_ENCODERS DIALOGEX 0, 0, 240, 145
-STYLE DS_SETFONT | DS_CONTROL | WS_CHILD
-FONT 11, "Arial", 400, 0, 0x0
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
+FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     CONTROL         "Auto-select best settings (need stable network)",IDC_AUTODETECT,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,4,4,217,10
@@ -615,8 +616,8 @@ BEGIN
 END
 
 IDD_DISPLAY DIALOGEX 0, 0, 240, 145
-STYLE DS_SETFONT | DS_CONTROL | WS_CHILD
-FONT 11, "Arial", 400, 0, 0x0
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
+FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     CONTROL         "",IDC_SLIDERRES,"msctls_trackbar32",TBS_AUTOTICKS | TBS_ENABLESELRANGE | WS_TABSTOP,43,12,133,11
     CONTROL         "Use all my monitors for the remote session",IDC_ALLMONS,
@@ -649,8 +650,8 @@ BEGIN
 END
 
 IDD_MISC DIALOGEX 0, 0, 240, 145
-STYLE DS_SETFONT | DS_CONTROL | WS_CHILD
-FONT 11, "Arial", 400, 0, 0x0
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
+FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     EDITTEXT        IDC_FOLDER,40,15,137,14,ES_AUTOHSCROLL
     PUSHBUTTON      "Browse",IDC_BROWSE,186,15,46,14
@@ -671,8 +672,8 @@ BEGIN
 END
 
 IDD_SECURITY DIALOGEX 0, 0, 240, 145
-STYLE DS_SETFONT | DS_CONTROL | WS_CHILD
-FONT 11, "Arial", 400, 0, 0x0
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
+FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     CONTROL         "Use Encryption",IDC_PLUGIN_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,8,66,10
     COMBOBOX        IDC_PLUGINS_COMBO,74,6,138,55,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
@@ -692,8 +693,8 @@ BEGIN
 END
 
 IDD_KEYBOARDMOUSE DIALOGEX 0, 0, 240, 145
-STYLE DS_SETFONT | DS_CONTROL | WS_CHILD
-FONT 11, "Arial", 400, 0, 0x0
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
+FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     CONTROL         "Track remote cursor locally",IDC_CSHAPE_ENABLE_RADIO,
                     "Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,6,8,144,10
@@ -713,8 +714,8 @@ BEGIN
 END
 
 IDD_QUICKOPTIONS DIALOGEX 0, 0, 240, 145
-STYLE DS_SETFONT | DS_CONTROL | WS_CHILD
-FONT 11, "Arial", 400, 0, 0x0
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
+FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     CONTROL         "AUTO    (Auto-select best settings)",IDC_DYNAMIC,"Button",BS_AUTORADIOBUTTON,9,14,177,10
     CONTROL         "VIDEO   (> 2Mbit/s)",IDC_ULTRA_LAN_RB,"Button",BS_AUTORADIOBUTTON,9,28,176,10
@@ -728,8 +729,8 @@ BEGIN
 END
 
 IDD_LISTEN DIALOGEX 0, 0, 240, 145
-STYLE DS_SETFONT | DS_CONTROL | WS_CHILD
-FONT 11, "Arial", 400, 0, 0x0
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
+FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     EDITTEXT        IDC_LISTENPORT,23,24,40,14,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "Start Listening",IDC_STARTLISTEN,169,121,61,14
@@ -821,9 +822,10 @@ BEGIN
     BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 206
+        VERTGUIDE, 11
         VERTGUIDE, 209
         TOPMARGIN, 7
-        BOTTOMMARGIN, 171
+        BOTTOMMARGIN, 194
     END
 
     IDD_AUTH_DIALOG1, DIALOG
@@ -1180,49 +1182,11 @@ END
 
 STRINGTABLE
 BEGIN
-    ID_BUTTON_SW            "Select SW"
-    ID_CLOSEDAEMON          "Stop listening for incoming connections"
-END
-
-STRINGTABLE
-BEGIN
-    ID_SHOWWINDOW           "Display a connection window"
-END
-
-STRINGTABLE
-BEGIN
-    ID_NEWCONN              "Make a manual connection"
-END
-
-STRINGTABLE
-BEGIN
-    ID_BUTTON_CAD           "Send CTRL+ALT+DEL to host"
-    ID_BUTTON_DBUTTON       "Disable server mouse and keyboard"
-    ID_BUTTON_DESKTOP       "Select Desktop"
     ID_BUTTON_DINPUT        "Disable buttons"
-    ID_BUTTON_FTRANS        "FileTansfer"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_STRING50283         "The server has been configured without authentication. Can it be trusted?"
-    IDS_STRING50284         "Do you  trust it and connect without authentication"
-    IDS_STRING50285         "Don't make a connection"
-    IDS_STRING50286         "Security"
-    IDS_STRING50287         "Yes i want to save the password "
-    IDS_STRING50288         "No, save without password"
-    IDS_STRING50289         "The server appears to be attempting to overload a memory buffer, indicating a potential exploit."
-    IDS_STRING50290         "Error"
-    IDS_STRING50293         "Try to continue"
-    IDS_STRING50294         "Exit"
-    IDS_STRING50295         "File transfer interrupted: Connection with server lost"
-    IDS_STRING50296         "Warning"
-    IDS_STRING50297         "The server is sending a screen size that exceeds the limits"
+    ID_BUTTON_DBUTTON       "Disable server mouse and keyboard"
+    ID_BUTTON_SW            "Select SW"
+    ID_BUTTON_DESKTOP       "Select Desktop"
     IDS_WARNING             "WARNING: By default, this session does not use any encryption whatsoever. Please do not use it to send sensitive data unless you are sure your connection is secure (by using an encryption plugin, for instance).\n\n"
-END
-
-STRINGTABLE
-BEGIN
     IDS_A1                  "Stop viewer systray"
     IDS_A2                  "UltraVNC info"
     IDS_A3                  "Error creating listening daemon:\n\r"
@@ -1231,6 +1195,47 @@ BEGIN
     IDS_B1                  "Error initializing sockets library"
     IDS_B2                  "Client list overflow!"
     IDS_B3                  "VNC error"
+END
+
+STRINGTABLE
+BEGIN
+    ID_CLOSEDAEMON          "Stop listening for incoming connections"
+    ID_SHOWWINDOW           "Display a connection window"
+    ID_NEWCONN              "Make a manual connection"
+    ID_BUTTON_CAD           "Send CTRL+ALT+DEL to host"
+    ID_BUTTON_FTRANS        "FileTansfer"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_H101                "Folder Transfer Warning"
+    IDS_H102                "a file or folder of that name already exists."
+    IDS_L94                 "Server closed connection"
+    IDS_STRING50275         "The server does not support encryption, despite the viewer's request for it."
+    IDS_STRING50276         "Do you want to continue?"
+    IDS_STRING50277         "Accept insecure connection"
+    IDS_STRING50278         "Refuse insecure connection"
+    IDS_STRING50279         "Don't ask anymore, always allow insecure connection."
+    IDS_STRING50280         "Accept incoming Connection"
+    IDS_STRING50281         "Refuse incoming connection"
+    IDS_STRING50282         "Incoming connection"
+    IDS_STRING50283         "The server has been configured without authentication. Can it be trusted?"
+    IDS_STRING50284         "Do you  trust it and connect without authentication"
+    IDS_STRING50285         "Don't make a connection"
+    IDS_STRING50286         "Security"
+    IDS_STRING50287         "Yes i want to save the password "
+END
+
+STRINGTABLE
+BEGIN
+    IDS_STRING50288         "No, save without password"
+    IDS_STRING50289         "The server appears to be attempting to overload a memory buffer, indicating a potential exploit."
+    IDS_STRING50290         "Error"
+    IDS_STRING50293         "Try to continue"
+    IDS_STRING50294         "Exit"
+    IDS_STRING50295         "File transfer interrupted: Connection with server lost"
+    IDS_STRING50296         "Warning"
+    IDS_STRING50297         "The server is sending a screen size that exceeds the limits"
 END
 
 STRINGTABLE
@@ -1244,21 +1249,28 @@ BEGIN
     IDS_C2                  "Failed to empty clipboard\n"
     IDS_C3                  "Failed to close clipboard\n"
     IDS_D1                  "Argument error"
+    IDS_D2                  "Invalid scale factor - resetting to normal scale"
+    IDS_D3                  "Invalid listen port specified"
+    IDS_D4                  "No scaling factor specified"
+    IDS_D5                  "Invalid scaling specified"
+    IDS_D6                  "No timeout specified"
+    IDS_D7                  "Invalid timeout specified"
+    IDS_D8                  "No fuzz specified"
+    IDS_D9                  "Invalid fuzz specified"
     IDS_D10                 "No delay specified"
     IDS_D11                 "Invalid delay specified"
     IDS_D12                 "No loglevel specified"
     IDS_D13                 "Invalid loglevel specified"
+END
+
+STRINGTABLE
+BEGIN
     IDS_D14                 "No logfile specified"
     IDS_D15                 "Invalid logfile specified"
     IDS_D16                 "No config file specified"
     IDS_D17                 "Can't open specified config file for reading."
     IDS_D18                 "No encoding specified"
     IDS_D19                 "Invalid encoding specified"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_D2                  "Invalid scale factor - resetting to normal scale"
     IDS_D20                 "No compression level specified"
     IDS_D21                 "Invalid compression level specified"
     IDS_D22                 "No image quality level specified"
@@ -1268,28 +1280,21 @@ BEGIN
     IDS_D26                 "No quick option number specified"
     IDS_D27                 "No DSM plugin specified ('PluginName.dsm')"
     IDS_D28                 "Invalid VNC Server specified."
-    IDS_D3                  "Invalid listen port specified"
-    IDS_D4                  "No scaling factor specified"
-    IDS_D5                  "Invalid scaling specified"
-    IDS_D6                  "No timeout specified"
-    IDS_D7                  "Invalid timeout specified"
-    IDS_D8                  "No fuzz specified"
+    IDS_E1                  "Unable to load the Rich Edit (RICHED32.DLL) control!"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_D9                  "Invalid fuzz specified"
-    IDS_E1                  "Unable to load the Rich Edit (RICHED32.DLL) control!"
     IDS_E2                  "Rich Edit Dll Loading"
     IDS_F1                  "The Plugin cannot be loaded.\n\rPlease check its integrity."
-    IDS_F10                 "Connection setup"
-    IDS_F11                 "No Plugin detected..."
     IDS_F3                  "Plugin Activation"
     IDS_F4                  "NoPassword,viewer"
     IDS_F5                  "The Plugin cannot be loaded.\n\rPlease check its name integrity."
     IDS_F6                  "Plugin Loading"
     IDS_F7                  "The Plugin cannot be Initialized.\n\rPlease check its name integrity."
     IDS_F8                  "Invalid VNC Server specified.\n\rServer should be of the form host:display."
+    IDS_F10                 "Connection setup"
+    IDS_F11                 "No Plugin detected..."
     IDS_G1                  "Error creating Flasher socket"
     IDS_G2                  "Error binding Flasher socket"
     IDS_G3                  "Error when Flasher tries to listen"
@@ -1298,10 +1303,15 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_H2                  "> WARNING: File Transfer is Disabled on the Remote Machine"
+    IDS_H3                  "File Transfer permission denied: Disabled or unknown user or version incompatibility"
+    IDS_H4                  "Connected..."
+    IDS_H5                  "Transfer interrupted by user"
+    IDS_H6                  "Transfer completed"
+    IDS_H7                  "Transfer interrupted by user"
+    IDS_H8                  "> Browsing The Local Directory. Please Wait..."
+    IDS_H9                  "> ERROR: Media is not present in the Local Drive."
     IDS_H10                 "> ERROR: Media is not present in the Remote Drive."
-    IDS_H100                "Create New Folder"
-    IDS_H101                "Folder Transfer Warning"
-    IDS_H102                "a file or folder of that name already exists."
     IDS_H11                 "> Browsing The Remote Directory. Please Wait..."
     IDS_H12                 "ERROR: File"
     IDS_H13                 "is not accessible on Remote Machine"
@@ -1309,15 +1319,34 @@ BEGIN
     IDS_H15                 "Receiving File"
     IDS_H16                 "cannot be created on Local Machine"
     IDS_H17                 "File"
-    IDS_H18                 "successfully RECEIVED..."
-    IDS_H19                 "ERROR: Transfer of File"
-    IDS_H2                  "> WARNING: File Transfer is Disabled on the Remote Machine"
-    IDS_H20                 "failed on Remote Machine. Canceled."
-    IDS_H21                 "ERROR: Access problem with file"
 END
 
 STRINGTABLE
 BEGIN
+    IDS_M1                  "One File or Directory can be renamed at a time"
+    IDS_M2                  "File & Directory Rename Warning"
+    IDS_M3                  "File & Directory Rename"
+    IDS_M4                  "Please enter the new name:"
+    IDS_M5                  "ERROR: Rename failed for "
+    IDS_M6                  "Renamed LOCAL"
+    IDS_M7                  "to"
+    IDS_M8                  "Renamed REMOTE"
+    IDS_H94                 "Folder Deletion Warning"
+    IDS_H95                 "Are you sure you want to delete the LOCAL folder"
+    IDS_H96                 "Are you sure you want to delete the REMOTE folder"
+    IDS_H97                 "Unable to delete the local folder"
+    IDS_H98                 "Unable to delete the remote folder"
+    IDS_H99                 "Unable to delete the folder"
+    IDS_H100                "Create New Folder"
+    IDS_L93                 "View Only... \tCtrl+Alt+F3"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_H18                 "successfully RECEIVED..."
+    IDS_H19                 "ERROR: Transfer of File"
+    IDS_H20                 "failed on Remote Machine. Canceled."
+    IDS_H21                 "ERROR: Access problem with file"
     IDS_H22                 "Sending File"
     IDS_H23                 "ERROR: Access problem with file"
     IDS_H24                 "cannot be created on Remote Machine"
@@ -1326,22 +1355,20 @@ BEGIN
     IDS_H27                 "successfully SENT..."
     IDS_H28                 "failed on Local Machine. Canceled"
     IDS_H29                 "Unable to create the Folder"
-    IDS_H3                  "File Transfer permission denied: Disabled or unknown user or version incompatibility"
     IDS_H30                 "on the Remote Machine"
     IDS_H31                 "Folder"
     IDS_H32                 "has been created on the Remote Machine"
     IDS_H33                 "Unable to delete the File"
-    IDS_H34                 "has been deleted on the Remote Machine"
-    IDS_H35                 "File Transfer with"
-    IDS_H36                 "Connected"
 END
 
 STRINGTABLE
 BEGIN
+    IDS_H34                 "has been deleted on the Remote Machine"
+    IDS_H35                 "File Transfer with"
+    IDS_H36                 "Connected"
     IDS_H37                 "Connecting. Please Wait..."
     IDS_H38                 "already exists on REMOTE machine.\n\n Do you want to overwrite it or resume the transfer ?\n"
     IDS_H39                 "File Transfer Warning"
-    IDS_H4                  "Connected..."
     IDS_H40                 "File(s)/Folder(s) selected for transfer"
     IDS_H41                 "Starting Transfer. Sending"
     IDS_H42                 "File(s)/Folder(s) to Remote Machine"
@@ -1352,12 +1379,11 @@ BEGIN
     IDS_H47                 "File Deletion Warning"
     IDS_H48                 "Are you sure you want to Delete the LOCAL File"
     IDS_H49                 "Unable to delete the Local File"
-    IDS_H5                  "Transfer interrupted by user"
-    IDS_H50                 "has been Deleted"
 END
 
 STRINGTABLE
 BEGIN
+    IDS_H50                 "has been Deleted"
     IDS_H51                 "Are you sure you want to Delete the REMOTE File"
     IDS_H52                 "Please enter new Local Folder Name:"
     IDS_H53                 "Unable to create the Local Folder"
@@ -1365,60 +1391,58 @@ BEGIN
     IDS_H55                 "has been created"
     IDS_H56                 "Please enter new Remote Folder Name:"
     IDS_H57                 "File Transfer"
+    IDS_I1                  "Error creating Daemon socket"
+    IDS_I2                  "Error binding Daemon socket"
+    IDS_I3                  "Error when Daemon listens"
+    IDS_J1                  "To exit from full-screen mode, use Ctrl-Esc Esc and then\r\nright-click on the UltraVNC Viewer taskbar icon to see the menu."
+    IDS_J2                  "UltraVNC Viewer full-screen mode"
+    IDS_K2                  "Error saving file"
+    IDS_K1                  "Invalid filename"
+    IDS_K3                  "Do you want to save the password in this file?\n\r Saving a password to a file is insecure."
+END
+
+STRINGTABLE
+BEGIN
     IDS_H58                 "File(s)/Folder(s)"
     IDS_H59                 "Decompressing Folder"
-    IDS_H6                  "Transfer completed"
     IDS_H60                 "after reception. Please Wait..."
     IDS_H61                 "Remote Folder"
     IDS_H62                 "ERROR during decompression of received Remote Folder"
     IDS_H63                 "Aborted."
     IDS_H64                 "Compressing Local Folder"
     IDS_H65                 "for transfer. Please Wait..."
-END
-
-STRINGTABLE
-BEGIN
     IDS_H66                 "Local Folder"
     IDS_H67                 "successfully compressed."
     IDS_H68                 "ERROR during compression of Local Folder ( some files are protected)"
     IDS_H69                 "Transfer Aborted."
-    IDS_H7                  "Transfer interrupted by user"
     IDS_H70                 "successfully SENT."
     IDS_H71                 "The REMOTE Folder"
     IDS_H72                 "already exists.\n\n Are you sure you want to OVERWRITE it as well as ALL its Files and SubFolders ?"
     IDS_H73                 "The LOCAL Folder"
-    IDS_H8                  "> Browsing The Local Directory. Please Wait..."
-    IDS_H9                  "> ERROR: Media is not present in the Local Drive."
-    IDS_H94                 "Folder Deletion Warning"
-    IDS_H95                 "Are you sure you want to delete the LOCAL folder"
-    IDS_H96                 "Are you sure you want to delete the REMOTE folder"
-    IDS_H97                 "Unable to delete the local folder"
-    IDS_H98                 "Unable to delete the remote folder"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_H99                 "Unable to delete the folder"
-    IDS_I1                  "Error creating Daemon socket"
-    IDS_I2                  "Error binding Daemon socket"
-    IDS_I3                  "Error when Daemon listens"
-    IDS_J1                  "To exit from full-screen mode, use Ctrl-Esc Esc and then\r\nright-click on the UltraVNC Viewer taskbar icon to see the menu."
-    IDS_J2                  "UltraVNC Viewer full-screen mode"
-    IDS_K1                  "Invalid filename"
-    IDS_K2                  "Error saving file"
-    IDS_K3                  "Do you want to save the password in this file?\n\r Saving a password to a file is insecure."
     IDS_K4                  "Security warning"
     IDS_K5                  "Error reading host name from file"
     IDS_K6                  "Config file error"
     IDS_K7                  "Error reading port number from file"
     IDS_L1                  "unknown"
+    IDS_L2                  "Send Ctrl+Alt+Del to host"
+    IDS_L3                  "Toggle Full screen Mode (On/Off)"
+    IDS_L4                  "Show Connection Options..."
+    IDS_L5                  "Refresh Screen"
+    IDS_L6                  "Send 'Start' (Ctrl+Esc) to host"
+    IDS_L7                  "Send Custom Key"
+    IDS_L8                  "Show Status Window"
+    IDS_L9                  "Close Connection"
     IDS_L10                 "Hide Toolbar Buttons"
     IDS_L11                 "Toggle Remote Input and Remote Blank Monitor (On/Off)"
+    IDS_L12                 "Open File Transfer..."
 END
 
 STRINGTABLE
 BEGIN
-    IDS_L12                 "Open File Transfer..."
     IDS_L13                 "Screenshot"
     IDS_L14                 "Select Full Desktop / Switch monitor(driver only)"
     IDS_L15                 "Open Chat..."
@@ -1426,7 +1450,6 @@ BEGIN
     IDS_L17                 "Chat... \tCtrl+Alt+F8"
     IDS_L18                 "Show Toolbar \tCtrl+Alt+F9"
     IDS_L19                 "Disable Remote Input/Monitor"
-    IDS_L2                  "Send Ctrl+Alt+Del to host"
     IDS_L20                 "Enable Remote Input/Monitor "
     IDS_L21                 "Connection &options... \tCtrl+Alt+F6"
     IDS_L22                 "Connection &info..\tCtrl+Alt+Shift+I"
@@ -1434,14 +1457,13 @@ BEGIN
     IDS_L24                 "&Full screen \tCtrl+Alt+F12"
     IDS_L25                 "&Auto Scale screen \tCtrl+Alt+F10"
     IDS_L26                 "&Half Size Screen \tCtrl+Alt+F11"
+    IDS_L27                 "&Fuzzy screen"
+    IDS_L28                 "&Normal screen \tCtrl+F11"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_L27                 "&Fuzzy screen"
-    IDS_L28                 "&Normal screen \tCtrl+F11"
     IDS_L29                 "&Full colors"
-    IDS_L3                  "Toggle Full screen Mode (On/Off)"
     IDS_L30                 "&256 colors"
     IDS_L31                 "Send Ctrl+Alt+Del \tCtrl+Alt+F4"
     IDS_L32                 "Send Ctrl+Esc (Start menu)"
@@ -1452,38 +1474,35 @@ BEGIN
     IDS_L37                 "Ne&w connection...\tCtrl+Alt+Shift+N"
     IDS_L38                 "Save connection info &as... \tCtrl+Alt+F5"
     IDS_L39                 "&About UltraVNC Viewer..."
-    IDS_L4                  "Show Connection Options..."
     IDS_L40                 "Close listening &daemon"
-END
-
-STRINGTABLE
-BEGIN
     IDS_L41                 "DSMPlugin cannot be configured"
     IDS_L42                 "User Can celled"
     IDS_L43                 "Connecting..."
     IDS_L44                 "Error creating socket !"
+END
+
+STRINGTABLE
+BEGIN
     IDS_L45                 "Lookup server address..."
     IDS_L46                 "Failed to get server address !"
     IDS_L47                 "Connecting to server..."
     IDS_L48                 "Failed to connect to server !"
     IDS_L49                 "Connected"
-    IDS_L5                  "Refresh Screen"
     IDS_L50                 "Error disabling Nagle's algorithm"
     IDS_L51                 "Sorry - this server uses an older authentication scheme\n\rwhich is no longer supported."
     IDS_L52                 "Protocol Version error"
     IDS_L53                 "Empty password"
     IDS_L54                 "Authentication canceled"
     IDS_L55                 "Password accepted"
-END
-
-STRINGTABLE
-BEGIN
     IDS_L56                 "Wrong Password"
     IDS_L57                 "VNC authentication failed!"
     IDS_L58                 "VNC authentication failed - too many tries!"
     IDS_L59                 "Unknown VNC authentication result!"
-    IDS_L6                  "Send 'Start' (Ctrl+Esc) to host"
     IDS_L60                 "Unknown authentication scheme!"
+END
+
+STRINGTABLE
+BEGIN
     IDS_L61                 "Error creating local image of screen."
     IDS_L62                 "Please wait - Initial screen loading..."
     IDS_L63                 "Unhanded SetColormap message type received!\n"
@@ -1493,11 +1512,6 @@ BEGIN
     IDS_L67                 "Connection closed (1)"
     IDS_L68                 "WriteExact: DSMPlugin-TransformBuffer Error."
     IDS_L69                 "Server closed connection \n\r -Your connection has been rejected \n\r -Network disconnect \n\r -Firewall "
-    IDS_L7                  "Send Custom Key"
-END
-
-STRINGTABLE
-BEGIN
     IDS_L70                 "Insufficient memory to allocate network buffer."
     IDS_L71                 "Insufficient memory to allocate zlib buffer."
     IDS_L72                 "UltraVNC Viewer Status for"
@@ -1505,50 +1519,26 @@ BEGIN
     IDS_L74                 "No Connection"
     IDS_L75                 "Are you certain you wish to exit?"
     IDS_L76                 "This action will close the UltraVNC Viewer"
+END
+
+STRINGTABLE
+BEGIN
     IDS_L77                 "The connected VNC Server doesn't support UltraVNC File Transfer!"
     IDS_L78                 "UltraVNC Viewer - Unavailable Functionality"
     IDS_L79                 "The File Transfer Window is already open!"
-    IDS_L8                  "Show Status Window"
     IDS_L80                 "File Transfer Warning"
     IDS_L81                 "The connected VNC Server doesn't support UltraVNC Text Chat!"
     IDS_L82                 "UltraVNC Viewer - Unavailable Functionality"
     IDS_L83                 "The Text Chat Window is already open!"
     IDS_L84                 "Text Chat Warning"
-END
-
-STRINGTABLE
-BEGIN
     IDS_L85                 "Please close the File Transfer Window first"
     IDS_L86                 "Please close the Text Chat Window first"
     IDS_L87                 "Please close the Connection Options... Window first"
     IDS_L88                 "UltraVNC Viewer - Warning"
     IDS_L89                 "Negotiate Protocol Version..."
-    IDS_L9                  "Close Connection"
     IDS_L90                 "Password requested"
     IDS_L91                 "Connection failed"
     IDS_L92                 "No authentication needed"
-    IDS_L93                 "View Only... \tCtrl+Alt+F3"
-    IDS_L94                 "Server closed connection"
-    IDS_M1                  "One File or Directory can be renamed at a time"
-    IDS_M2                  "File & Directory Rename Warning"
-    IDS_M3                  "File & Directory Rename"
-    IDS_M4                  "Please enter the new name:"
-    IDS_M5                  "ERROR: Rename failed for "
-END
-
-STRINGTABLE
-BEGIN
-    IDS_M6                  "Renamed LOCAL"
-    IDS_M7                  "to"
-    IDS_M8                  "Renamed REMOTE"
-    IDS_STRING50275         "The server does not support encryption, despite the viewer's request for it."
-    IDS_STRING50276         "Do you want to continue?"
-    IDS_STRING50277         "Accept insecure connection"
-    IDS_STRING50278         "Refuse insecure connection"
-    IDS_STRING50279         "Don't ask anymore, always allow insecure connection."
-    IDS_STRING50280         "Accept incoming Connection"
-    IDS_STRING50281         "Refuse incoming connection"
-    IDS_STRING50282         "Incoming connection"
 END
 
 #endif    // English (United States) resources
