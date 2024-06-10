@@ -856,12 +856,21 @@ vncProperties::DialogProc(HWND hwnd,
 			break;
 		}
 
+		case IDC_CONNECT_HTTP:
+			EnableWindow(GetDlgItem(hwnd, IDC_PORTHTTP),
+				(SendDlgItemMessage(hwnd, IDC_CONNECT_HTTP,
+					BM_GETCHECK, 0, 0) == BST_CHECKED));
+			break;
+
 		case IDC_CONNECT_SOCK:
 			// TightVNC 1.2.7 method
 			// The user has clicked on the socket connect tickbox
 		{
 			BOOL bConnectSock =
 				(SendDlgItemMessage(hwnd, IDC_CONNECT_SOCK,
+					BM_GETCHECK, 0, 0) == BST_CHECKED);
+			BOOL bConnectHttp =
+				(SendDlgItemMessage(hwnd, IDC_CONNECT_HTTP,
 					BM_GETCHECK, 0, 0) == BST_CHECKED);
 
 			EnableWindow(GetDlgItem(hwnd, IDC_PASSWORD), bConnectSock);
@@ -878,7 +887,7 @@ vncProperties::DialogProc(HWND hwnd,
 			EnableWindow(GetDlgItem(hwnd, IDC_PORTRFB), bConnectSock &&
 				(SendMessage(hSpecPort, BM_GETCHECK, 0, 0) == BST_CHECKED));
 			EnableWindow(GetDlgItem(hwnd, IDC_PORTHTTP), bConnectSock &&
-				(SendMessage(hSpecPort, BM_GETCHECK, 0, 0) == BST_CHECKED));
+				(SendMessage(hSpecPort, BM_GETCHECK, 0, 0) == BST_CHECKED) && bConnectHttp);
 		}
 		return TRUE;
 
@@ -915,9 +924,13 @@ vncProperties::DialogProc(HWND hwnd,
 
 		case IDC_SPECPORT:
 		{
+			BOOL bConnectHttp =
+				(SendDlgItemMessage(hwnd, IDC_CONNECT_HTTP,
+					BM_GETCHECK, 0, 0) == BST_CHECKED);
+
 			EnableWindow(GetDlgItem(hwnd, IDC_DISPLAYNO), FALSE);
 			EnableWindow(GetDlgItem(hwnd, IDC_PORTRFB), TRUE);
-			EnableWindow(GetDlgItem(hwnd, IDC_PORTHTTP), TRUE);
+			EnableWindow(GetDlgItem(hwnd, IDC_PORTHTTP), bConnectHttp);
 
 			int d1 = PORT_TO_DISPLAY(settings->getPortNumber());
 			int d2 = HPORT_TO_DISPLAY(settings->getHttpPortNumber());
@@ -1084,6 +1097,7 @@ void
 vncProperties::InitPortSettings(HWND hwnd)
 {
 	BOOL bConnectSock = m_server->SockConnected();
+	BOOL bConnectHttp = settings->getHTTPConnect();
 	BOOL bAutoPort = settings->getAutoPortSelect();
 	UINT port_rfb = settings->getPortNumber();
 	UINT port_http = settings->getHttpPortNumber();
@@ -1116,7 +1130,7 @@ vncProperties::InitPortSettings(HWND hwnd)
 	EnableWindow(GetDlgItem(hwnd, IDC_PORTRFB),
 		bConnectSock && !bAutoPort && !bValidDisplay);
 	EnableWindow(GetDlgItem(hwnd, IDC_PORTHTTP),
-		bConnectSock && !bAutoPort && !bValidDisplay);
+		bConnectSock && !bAutoPort && !bValidDisplay && bConnectHttp);
 }
 
 // ********************************************************************
