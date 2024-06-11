@@ -460,10 +460,9 @@ BEGIN
     LTEXT           "BuildTime",IDC_BUILDTIME,78,18,98,10
     LTEXT           "Copyright © 2002 VNC QuickDesk\nCopyright © 1999-2002 Tridia Corporation - TridiaVNC\nCopyright © 1994-2001 AT&&T Laboratories Cambridge/Olivetti Research Ltd. - VNC",IDC_STATIC,44,74,271,25
     LTEXT           "Copyright © 1990-2002 Info-ZIP\nCopyright © 1996-2002 Markus Franz Xaver Johannes Oberhumer - Mini LZO library",IDC_STATIC,44,98,282,20
-    LTEXT           "uvnc.com",IDC_UVNCCOM,85,124,31,8
+    LTEXT           "https://uvnc.com",IDC_UVNCCOM,123,124,55,8
     LTEXT           "Copyright © 1999-2002 Const. Kaplinsky - TightVNC\nCopyright © 2002 RealVNC Ltd. - RealVNC\n",IDC_STATIC,44,58,203,16
-    LTEXT           "Please visit our website",IDC_STATIC,7,124,76,8
-    LTEXT           " further information.",IDC_STATIC,116,124,63,8
+    LTEXT           "For more informations, please visit: ",IDC_STATIC,7,124,113,8
 END
 
 IDD_FTCONFIRM_DLG DIALOGEX 0, 0, 227, 86
@@ -866,9 +865,9 @@ BEGIN
     BEGIN
         LEFTMARGIN, 7
         VERTGUIDE, 12
-        VERTGUIDE, 86
         VERTGUIDE, 94
         VERTGUIDE, 108
+        VERTGUIDE, 120
         VERTGUIDE, 247
         VERTGUIDE, 285
         VERTGUIDE, 306

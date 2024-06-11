@@ -24,7 +24,7 @@
 
 #include "stdhdrs.h"
 #include "vncviewer.h"
-#include "Hyperlinks.h"
+#include "../common/Hyperlinks.h"
 #include "UltraVNCHelperFunctions.h"
 
 char *infomsg2;
