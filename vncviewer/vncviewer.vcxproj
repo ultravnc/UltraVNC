@@ -1146,6 +1146,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\common\d3des.c" />
+    <ClCompile Include="..\common\Hyperlinks.cpp" />
     <ClCompile Include="..\common\mnemonic.c" />
     <ClCompile Include="..\common\mn_wordlist.c" />
     <ClCompile Include="..\common\UltraVncZ.cpp" />
@@ -1905,7 +1906,6 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='OldCPU|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="Hyperlinks.cpp" />
     <ClCompile Include="KeyMap.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -2343,6 +2343,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\d3des.h" />
+    <ClInclude Include="..\common\Hyperlinks.h" />
     <ClInclude Include="..\common\mnemonic.h" />
     <ClInclude Include="..\common\UltraVncZ.h" />
     <ClInclude Include="..\rfb\zrleDecode.h" />

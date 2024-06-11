@@ -30,7 +30,7 @@
 // Implementation of the About dialog!
 
 #include "stdhdrs.h"
-
+#include "../common/Hyperlinks.h"
 #include "winvnc.h"
 #include "vncabout.h"
 
@@ -226,7 +226,7 @@ vncAbout::DialogProc(HWND hwnd,
 			// Insert the build time information
 			extern char buildtime[];
 			SetDlgItemText(hwnd, IDC_BUILDTIME, buildtime);
-
+            ConvertStaticToHyperlink(hwnd, IDC_WWW);
 			// Show the dialog
 			SetForegroundWindow(hwnd);
 
@@ -252,6 +252,11 @@ vncAbout::DialogProc(HWND hwnd,
 
 			return TRUE;
 		}
+        case IDC_WWW:
+        {
+            ShellExecute(GetDesktopWindow(), "open", "https://uvnc.com/", "", 0, SW_SHOWNORMAL);
+            return TRUE;
+        }
 
 		break;
 
