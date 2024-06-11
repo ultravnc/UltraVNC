@@ -64,7 +64,14 @@ void HexStr2CharStr(const char* pszHexStr, unsigned char* pucCharStr, int iSize)
 
 SettingsManager::SettingsManager()
 {
-	ini = new TIniFile( ChangeFileExt( Application->ExeName, ".INI" ) );
+	TCHAR path[MAX_PATH];
+	SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, 0, path);
+	String appDataPath = path;
+	String iniFilePath = appDataPath + "\\UltraVNCManager\\config.ini";
+	if (!DirectoryExists(ExtractFilePath(iniFilePath))) {
+		ForceDirectories(ExtractFilePath(iniFilePath));
+	}
+	ini = new TIniFile( iniFilePath );
 	cardSetting = new CardSetting();
 }
 
