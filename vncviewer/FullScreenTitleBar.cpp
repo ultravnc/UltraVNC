@@ -79,6 +79,10 @@ CTitleBar::CTitleBar()
 	PhotoTip = nullptr;
 	SwitchMonitorTip = nullptr;
 	MonitorTop = 0;	
+	Chat = nullptr;
+	ChatTip = nullptr;
+	FT = nullptr;
+	FTTip = nullptr;
 }
 
 CTitleBar::CTitleBar(HINSTANCE hInst, HWND ParentWindow, bool Fit)
@@ -105,6 +109,12 @@ CTitleBar::~CTitleBar()
 	if (ScreenTip) DestroyWindow(ScreenTip);
 	if (PhotoTip) DestroyWindow(PhotoTip);
 	if (SwitchMonitorTip) DestroyWindow(SwitchMonitorTip);
+
+	if (Chat) DestroyWindow(Chat);
+	if (ChatTip) DestroyWindow(ChatTip);
+	if (FT) DestroyWindow(FT);
+	if (FTTip) DestroyWindow(FTTip);
+
 }
 
 //***************************************************************************************
@@ -286,6 +296,24 @@ void CTitleBar::CreateDisplay()
 				nullptr);
 	CreateToolTipForRect(SwitchMonitor, SwitchMonitorTip, "Switch monitor");
 
+	Chat = CreateWindow("STATIC",
+		"Chat",
+		WS_CHILD | WS_VISIBLE | SS_NOTIFY | SS_OWNERDRAW,
+		tbLeftSpace + (tbcxPicture * 4) + (tbButtonSpace * 4), tbTopSpace, tbcxPicture, tbcyPicture, m_hWnd,
+		(HMENU)tbIDC_CHAT,
+		hInstance,
+		nullptr);
+	CreateToolTipForRect(Chat, ChatTip, "Start Chat");
+
+	FT = CreateWindow("STATIC",
+		"FT",
+		WS_CHILD | WS_VISIBLE | SS_NOTIFY | SS_OWNERDRAW,
+		tbLeftSpace + (tbcxPicture * 5) + (tbButtonSpace * 5), tbTopSpace, tbcxPicture, tbcyPicture, m_hWnd,
+		(HMENU)tbIDC_FT,
+		hInstance,
+		nullptr);
+	CreateToolTipForRect(FT, FTTip, "File Transfer");
+
 	//Pin button
 	Pin=CreateWindow("STATIC",
 				"Pin",
@@ -382,6 +410,12 @@ LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg,
 			if(lpdis->CtlID==tbIDC_SWITCHMONITOR)
 					hbrOld=SelectObject(hdcMem, TitleBarThis->hSwitchMonitor); 
 
+			if (lpdis->CtlID == tbIDC_CHAT)
+				hbrOld = SelectObject(hdcMem, TitleBarThis->hChat);
+
+			if (lpdis->CtlID == tbIDC_FT)
+				hbrOld = SelectObject(hdcMem, TitleBarThis->hFT);
+
 			StretchBlt(lpdis->hDC,
 				lpdis->rcItem.left,
 				lpdis->rcItem.top,
@@ -465,6 +499,11 @@ LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg,
 						yesUVNCMessageBox(TitleBarThis->Parent, _T("Function only supported in 1:1 mode"), _T("UltraVNC Viewer - Snapshot"), MB_ICONINFORMATION);
 				if(LOWORD(wParam) == tbIDC_SWITCHMONITOR)
 					::SendMessage(TitleBarThis->Parent, tbWM_SWITCHMONITOR, 0, 0);
+
+				if (LOWORD(wParam) == tbIDC_CHAT)
+					::SendMessage(TitleBarThis->Parent, tbWM_CHAT, 0, 0);
+				if (LOWORD(wParam) == tbIDC_FT)
+					::SendMessage(TitleBarThis->Parent, tbWM_FT, 0, 0);
 			}
         }
 
@@ -667,6 +706,8 @@ void CTitleBar::LoadPictures()
 	hNoScaleScreen=LoadBitmap(hInstance, MAKEINTRESOURCE(IDB_NOSCALE));
 	hPhoto=LoadBitmap(hInstance, MAKEINTRESOURCE(IDB_PHOTO));
 	hSwitchMonitor=LoadBitmap(hInstance, MAKEINTRESOURCE(IDB_SWITCHMONITOR));
+	hChat = LoadBitmap(hInstance, MAKEINTRESOURCE(IDB_CHAT));
+	hFT = LoadBitmap(hInstance, MAKEINTRESOURCE(IDB_FT));
 }
 
 
@@ -681,6 +722,8 @@ void CTitleBar::FreePictures()
 	DeleteObject(hNoScaleScreen);
 	DeleteObject(hPhoto);
 	DeleteObject(hSwitchMonitor);
+	DeleteObject(hChat);
+	DeleteObject(hFT);
 }
 
 //***************************************************************************************
@@ -863,6 +906,8 @@ void CTitleBar::MoveToMonitor(HMONITOR hMonitor)
 	::SetWindowPos(Screen, 0, tbLeftSpace + (tbcxPicture * 1) + (tbButtonSpace * 1), tbTopSpace, tbcxPicture, tbcyPicture, SWP_NOACTIVATE | SWP_NOZORDER);
 	::SetWindowPos(Photo, 0, tbLeftSpace + (tbcxPicture * 2) + (tbButtonSpace * 2), tbTopSpace, tbcxPicture, tbcyPicture, SWP_NOACTIVATE | SWP_NOZORDER);
 	::SetWindowPos(SwitchMonitor, 0, tbLeftSpace + (tbcxPicture * 3) + (tbButtonSpace * 3), tbTopSpace, tbcxPicture, tbcyPicture, SWP_NOACTIVATE | SWP_NOZORDER);
+	::SetWindowPos(Chat, 0, tbLeftSpace + (tbcxPicture * 4) + (tbButtonSpace * 4), tbTopSpace, tbcxPicture, tbcyPicture, SWP_NOACTIVATE | SWP_NOZORDER);
+	::SetWindowPos(FT, 0, tbLeftSpace + (tbcxPicture * 5) + (tbButtonSpace * 5), tbTopSpace, tbcxPicture, tbcyPicture, SWP_NOACTIVATE | SWP_NOZORDER);
 	::SetWindowPos(Pin, 0, tbLeftSpace, tbTopSpace, tbcxPicture, tbcyPicture, SWP_NOACTIVATE | SWP_NOZORDER);
 
 	// after DPI change, Set region to window so it is non rectangular
