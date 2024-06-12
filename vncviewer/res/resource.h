@@ -86,6 +86,9 @@
 #define IDB_RED                         230
 #define IDB_BITMAP1                     231
 #define IDB_YELLOW                      231
+#define IDB_CHAT                        238
+#define IDB_BITMAP8                     240
+#define IDB_FT                          240
 #define IDD_USER_NAME                   604
 #define ID_VK_LWINDOWN                  605
 #define ID_VK_RWINDOWN                  606
@@ -660,7 +663,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        238
+#define _APS_NEXT_RESOURCE_VALUE        241
 #define _APS_NEXT_COMMAND_VALUE         50025
 #define _APS_NEXT_CONTROL_VALUE         2079
 #define _APS_NEXT_SYMED_VALUE           154

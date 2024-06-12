@@ -8920,6 +8920,24 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 					SendMessage(hwnd, WM_SYSCOMMAND,(WPARAM)ID_DESKTOP,(LPARAM)0);
 					return 0;
 
+				case tbWM_CHAT:
+					if (_this->m_pTextChat->m_fTextChatRunning)
+					{
+						_this->m_pTextChat->ShowChatWindow(true);
+					}
+					else
+						SendMessage(hwnd, WM_SYSCOMMAND, (WPARAM)ID_TEXTCHAT, (LPARAM)0);
+					return 0;
+
+				case tbWM_FT:
+					if (_this->m_pFileTransfer->m_fFileTransferRunning)
+					{
+						_this->m_pFileTransfer->ShowFileTransferWindow(true);
+					}
+					else
+						SendMessage(hwnd, WM_SYSCOMMAND, (WPARAM)ID_FILETRANSFER, (LPARAM)0);
+					return 0;
+
 				case tbWM_PHOTO:
 					{
 						Snapshot snapshot;
