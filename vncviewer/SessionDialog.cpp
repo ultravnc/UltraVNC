@@ -225,7 +225,8 @@ BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		SendMessage(hExitCheck, BM_SETCHECK, l_this->fExitCheck, 0); //PGM @ Advantig
 
 		_this->ExpandBox(hwnd, !_this->m_bExpanded);
-		SendMessage(GetDlgItem(hwnd, IDC_BUTTON_EXPAND), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)_this->hBmpExpand);
+		//SendMessage(GetDlgItem(hwnd, IDC_BUTTON_EXPAND), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)_this->hBmpExpand);
+		SetWindowText(GetDlgItem(hwnd, IDC_BUTTON_EXPAND), "Show Options");
 		return TRUE;
 	}
 
@@ -445,13 +446,13 @@ void SessionDialog::ExpandBox(HWND hDlg, BOOL fExpand)
 	HWND wndDefaultBox = NULL;
 
 	// get the window of the button
-	HWND  pCtrl = GetDlgItem(hDlg, IDC_SHOWOPTIONS);
+	HWND  pCtrl = GetDlgItem(hDlg, IDC_BUTTON_EXPAND);
 	if (pCtrl == NULL) return;
 
 	wndDefaultBox = GetDlgItem(hDlg, IDC_DEFAULTBOX);
 	if (wndDefaultBox == NULL) return;
-	if (!fExpand) SendMessage(GetDlgItem(hDlg, IDC_BUTTON_EXPAND), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)hBmpExpand);
-	else SendMessage(GetDlgItem(hDlg, IDC_BUTTON_EXPAND), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)hBmpCollaps);
+	if (!fExpand) SetWindowText(GetDlgItem(hDlg, IDC_BUTTON_EXPAND), "Show Options");
+	else SetWindowText(GetDlgItem(hDlg, IDC_BUTTON_EXPAND), "Hide Options");
 	// retrieve coordinates for the default child window
 	GetWindowRect(wndDefaultBox, &rcDefaultBox);
 	rcDefaultBox.left += 2;
