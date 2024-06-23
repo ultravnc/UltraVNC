@@ -215,9 +215,8 @@ void SettingsManager::setDefaults()
 	m_pref_Hook = TRUE;
 	m_pref_Virtual = FALSE;
 	m_pref_autocapt = 1;
-#ifdef IPV6V4
 	m_pref_ipv6_allowed = false;
-#endif // IPV6V4
+
 	m_pref_RunninAsAdministrator = false;
 
 	memset(reinterpret_cast<void*>(m_pref_group1), 0, sizeof(m_pref_group1));
@@ -246,9 +245,7 @@ void SettingsManager::load()
 	myIniFile.ReadString("admin", "DSMPlugin", m_pref_szDSMPlugin, 128);
 	m_pref_ReverseAuthRequired = myIniFile.ReadInt("admin", "ReverseAuthRequired", m_pref_ReverseAuthRequired);
 	myIniFile.ReadString("admin", "DSMPluginConfig", m_pref_DSMPluginConfig, 512);
-#ifdef IPV6V4
 	m_pref_ipv6_allowed = myIniFile.ReadInt("admin", "UseIpv6", m_pref_ipv6_allowed);
-#endif // IPV6V4
 	m_pref_AllowLoopback = myIniFile.ReadInt("admin", "AllowLoopback", m_pref_AllowLoopback);
 	m_pref_AuthRequired = myIniFile.ReadInt("admin", "AuthRequired", m_pref_AuthRequired);
 	m_pref_ConnectPriority = myIniFile.ReadInt("admin", "ConnectPriority", m_pref_ConnectPriority);
@@ -272,9 +269,7 @@ void SettingsManager::load()
 	myIniFile.ReadString("admin", "path", m_pref_DebugPath, 512);
 	m_pref_DebugLevel = myIniFile.ReadInt("admin", "DebugLevel", m_pref_DebugLevel);
 	m_pref_Avilog = myIniFile.ReadInt("admin", "Avilog", m_pref_Avilog);
-#ifdef IPV6V4
 	m_pref_UseIpv6 = myIniFile.ReadInt("admin", "UseIpv6", m_pref_UseIpv6);
-#endif // IPV6V4
 	m_pref_EnableFileTransfer = myIniFile.ReadInt("admin", "FileTransferEnabled", m_pref_EnableFileTransfer);
 	m_pref_FTUserImpersonation = myIniFile.ReadInt("admin", "FTUserImpersonation", m_pref_FTUserImpersonation); // sf@2005
 	m_pref_EnableBlankMonitor = myIniFile.ReadInt("admin", "BlankMonitorEnabled", m_pref_EnableBlankMonitor);
@@ -418,9 +413,7 @@ void SettingsManager::save()
 	myIniFile.WriteString("admin", "path", vnclog.GetPath());
 	myIniFile.WriteInt("admin", "DebugLevel", vnclog.GetLevel());
 	myIniFile.WriteInt("admin", "AllowLoopback", m_pref_AllowLoopback);
-#ifdef IPV6V4
 	myIniFile.WriteInt("admin", "UseIpv6", settings->getIPV6());
-#endif // IPV6V4
 	myIniFile.WriteInt("admin", "LoopbackOnly", m_pref_LoopbackOnly);
 	myIniFile.WriteInt("admin", "AllowShutdown", m_pref_allowshutdown);
 	myIniFile.WriteInt("admin", "AllowProperties", m_pref_allowproperties);

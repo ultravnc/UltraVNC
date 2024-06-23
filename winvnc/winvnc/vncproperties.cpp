@@ -257,14 +257,11 @@ vncProperties::DialogProc(HWND hwnd,
 		HWND hLoopback = GetDlgItem(hwnd, IDC_ALLOWLOOPBACK);
 		BOOL fLoopback = settings->getAllowLoopback();
 		SendMessage(hLoopback, BM_SETCHECK, fLoopback, 0);
-#ifdef IPV6V4
+
 		HWND hIPV6 = GetDlgItem(hwnd, IDC_IPV6);
 		BOOL fIPV6 = settings->getIPV6();
 		SendMessage(hIPV6, BM_SETCHECK, fIPV6, 0);
-#else
-		HWND hIPV6 = GetDlgItem(hwnd, IDC_IPV6);
-		EnableWindow(hIPV6, false);
-#endif
+
 		HWND hLoopbackonly = GetDlgItem(hwnd, IDC_LOOPBACKONLY);
 		BOOL fLoopbackonly = settings->getLoopbackOnly();
 		SendMessage(hLoopbackonly, BM_SETCHECK, fLoopbackonly, 0);
@@ -726,9 +723,7 @@ vncProperties::DialogProc(HWND hwnd,
 			settings->setBlankInputsOnly(SendMessage(hBlank2, BM_GETCHECK, 0, 0) == BST_CHECKED); //PGM
 
 			settings->setAllowLoopback(IsDlgButtonChecked(hwnd, IDC_ALLOWLOOPBACK));
-#ifdef IPV6V4
 			settings->setIPV6(IsDlgButtonChecked(hwnd, IDC_IPV6));
-#endif
 			_this->m_server->SetLoopbackOnly(IsDlgButtonChecked(hwnd, IDC_LOOPBACKONLY));
 
 			settings->setDisableTrayIcon(IsDlgButtonChecked(hwnd, IDC_DISABLETRAY));

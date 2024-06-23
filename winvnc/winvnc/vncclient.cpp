@@ -1948,57 +1948,28 @@ void GetIPString(char* buffer, int buflen)
 		strncpy_s(buffer, buflen, "Host name unavailable", buflen);
 		return;
 	}
-#ifdef IPV6V4
-	* buffer = '\0';
+	if (settings->getIPV6()) {
+		*buffer = '\0';
 
-	LPSOCKADDR sockaddr_ip;
-	struct addrinfo hint;
-	struct addrinfo* serverinfo = 0;
-	memset(&hint, 0, sizeof(hint));
-	hint.ai_family = AF_UNSPEC;
-	hint.ai_socktype = SOCK_STREAM;
-	hint.ai_protocol = IPPROTO_TCP;
-	struct sockaddr_in6* pIpv6Addr;
-	struct sockaddr_in* pIpv4Addr;
-	struct sockaddr_in6 Ipv6Addr;
-	struct sockaddr_in Ipv4Addr;
-	memset(&Ipv6Addr, 0, sizeof(Ipv6Addr));
-	memset(&Ipv4Addr, 0, sizeof(Ipv4Addr));
+		LPSOCKADDR sockaddr_ip;
+		struct addrinfo hint;
+		struct addrinfo* serverinfo = 0;
+		memset(&hint, 0, sizeof(hint));
+		hint.ai_family = AF_UNSPEC;
+		hint.ai_socktype = SOCK_STREAM;
+		hint.ai_protocol = IPPROTO_TCP;
+		struct sockaddr_in6* pIpv6Addr;
+		struct sockaddr_in* pIpv4Addr;
+		struct sockaddr_in6 Ipv6Addr;
+		struct sockaddr_in Ipv4Addr;
+		memset(&Ipv6Addr, 0, sizeof(Ipv6Addr));
+		memset(&Ipv4Addr, 0, sizeof(Ipv4Addr));
 
-	//make sure the buffer is not overwritten
+		//make sure the buffer is not overwritten
 
-	if (getaddrinfo(namebuf, 0, &hint, &serverinfo) == 0)
-	{
-		struct addrinfo* p;
-		if (!settings->getIPV6())
+		if (getaddrinfo(namebuf, 0, &hint, &serverinfo) == 0)
 		{
-			p = serverinfo;
-			for (p = serverinfo; p != NULL; p = p->ai_next) {
-				switch (p->ai_family) {
-				case AF_INET:
-				{
-					pIpv4Addr = (struct sockaddr_in*)p->ai_addr;
-					memcpy(&Ipv4Addr, pIpv4Addr, sizeof(Ipv4Addr));
-					Ipv4Addr.sin_family = AF_INET;
-					char			szText[256];
-					sprintf_s(szText, "%s-", inet_ntoa(Ipv4Addr.sin_addr));
-					int len = strlen(buffer);
-					int len2 = strlen(szText);
-					if (len + len2 < buflen) strcat_s(buffer, buflen, szText);
-					break;
-				}
-				case AF_INET6:
-				{
-					break;
-				}
-				default:
-					break;
-				}
-			}
-		}
-
-		if (settings->getIPV6())
-		{
+			struct addrinfo* p;
 			p = serverinfo;
 			for (p = serverinfo; p != NULL; p = p->ai_next) {
 				switch (p->ai_family) {
@@ -2033,32 +2004,33 @@ void GetIPString(char* buffer, int buflen)
 					break;
 				}
 			}
-		}
-	}
-	freeaddrinfo(serverinfo);
-#else
-	HOSTENT* ph = NULL;
-	ph = gethostbyname(namebuf);
-	if (!ph)
-	{
-		strncpy_s(buffer, buflen, "IP address unavailable", buflen);
-		return;
-	}
 
-	*buffer = '\0';
-	char digtxt[5];
-	for (int i = 0; ph->h_addr_list[i]; i++)
-	{
-		for (int j = 0; j < ph->h_length; j++)
-		{
-			sprintf_s(digtxt, "%d.", (unsigned char)ph->h_addr_list[i][j]);
-			strncat_s(buffer, buflen, digtxt, (buflen - 1) - strlen(buffer));
 		}
-		buffer[strlen(buffer) - 1] = '\0';
-		if (ph->h_addr_list[i + 1] != 0)
-			strncat_s(buffer, buflen, ", ", (buflen - 1) - strlen(buffer));
+		freeaddrinfo(serverinfo);
 	}
-#endif
+	else {
+		HOSTENT* ph = NULL;
+		ph = gethostbyname(namebuf);
+		if (!ph)
+		{
+			strncpy_s(buffer, buflen, "IP address unavailable", buflen);
+			return;
+		}
+
+		*buffer = '\0';
+		char digtxt[5];
+		for (int i = 0; ph->h_addr_list[i]; i++)
+		{
+			for (int j = 0; j < ph->h_length; j++)
+			{
+				sprintf_s(digtxt, "%d.", (unsigned char)ph->h_addr_list[i][j]);
+				strncat_s(buffer, buflen, digtxt, (buflen - 1) - strlen(buffer));
+			}
+			buffer[strlen(buffer) - 1] = '\0';
+			if (ph->h_addr_list[i + 1] != 0)
+				strncat_s(buffer, buflen, ", ", (buflen - 1) - strlen(buffer));
+		}
+	}
 }
 
 // adzm 2010-08
@@ -2156,13 +2128,14 @@ bool vncClientThread::TryReconnect()
 	// Connect out to the specified host on the UltraVNC Viewer listen port
 	// To be really good, we should allow a display number here but
 	// for now we'll just assume we're connecting to display zero
-#ifdef IPV6V4
-	if (m_socket->CreateConnect(m_client->GetHost(), m_client->GetHostPort()))
-#else
-	m_socket->Create();
-	if (m_socket->Connect(m_client->GetHost(), m_client->GetHostPort()))
-#endif
-	{
+	bool result;
+	if (settings->getIPV6())
+		result = m_socket->CreateConnect(m_client->GetHost(), m_client->GetHostPort());
+	else {
+		m_socket->Create();
+		result = m_socket->Connect(m_client->GetHost(), m_client->GetHostPort());
+	}
+	if (result) {
 		if (m_client->GetRepeaterID()) {
 			char finalidcode[_MAX_PATH];
 			//adzm 2010-08 - this was sending uninitialized data over the wire
@@ -2245,11 +2218,10 @@ vncClientThread::run(void* arg)
 			m_server->AutoReconnectPort(m_AutoReconnectPort);
 			m_server->AutoReconnectAdr(m_szAutoReconnectAdr);
 			m_server->AutoReconnectId(m_szAutoReconnectId);
-#ifdef IPV6V4
-			postHelper::PostAddNewClient4(1111, 1111);
-#else
-			postHelper::PostAddNewClient(1111, 1111);
-#endif
+			if (settings->getIPV6())
+				postHelper::PostAddNewClient4(1111, 1111);
+			else
+				postHelper::PostAddNewClient(1111, 1111);
 		}
 		m_server->RemoveClient(m_client->GetClientId());
 		return;
@@ -2269,11 +2241,10 @@ vncClientThread::run(void* arg)
 				m_server->AutoReconnectPort(m_AutoReconnectPort);
 				m_server->AutoReconnectAdr(m_szAutoReconnectAdr);
 				m_server->AutoReconnectId(m_szAutoReconnectId);
-#ifdef IPV6V4
-				postHelper::PostAddNewClient4(1111, 1111);
-#else
-				postHelper::PostAddNewClient(1111, 1111);
-#endif
+				if (settings->getIPV6())
+					postHelper::PostAddNewClient4(1111, 1111);
+				else
+					postHelper::PostAddNewClient(1111, 1111);
 			}
 		}
 		return;
@@ -4556,11 +4527,10 @@ vncClientThread::run(void* arg)
 			m_server->AutoReconnectPort(m_AutoReconnectPort);
 			m_server->AutoReconnectAdr(m_szAutoReconnectAdr);
 			m_server->AutoReconnectId(m_szAutoReconnectId);
-#ifdef IPV6V4
-			postHelper::PostAddNewClient4(1111, 1111);
-#else
-			postHelper::PostAddNewClient(1111, 1111);
-#endif
+			if (settings->getIPV6())
+				postHelper::PostAddNewClient4(1111, 1111);
+			else
+				postHelper::PostAddNewClient(1111, 1111);
 		}
 	}
 }

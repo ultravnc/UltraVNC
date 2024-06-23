@@ -268,12 +268,15 @@ BOOL CALLBACK vncConnDialog::vncConnDlgProc(HWND hwnd,
 				// Connect out to the specified host on the UltraVNC Viewer listen port
 				// To be really good, we should allow a display number here but
 				// for now we'll just assume we're connecting to display zero
-	#ifdef IPV6V4
-				if (tmpsock->CreateConnect(actualhostname, port)) {
-	#else
-				tmpsock->Create();
-				if (tmpsock->Connect(actualhostname, port)) {
-	#endif				
+				bool result;
+				if (settings->getIPV6()) {
+					result = tmpsock->CreateConnect(actualhostname, port);
+				}
+				else {
+					tmpsock->Create();
+					result = tmpsock->Connect(actualhostname, port);
+				}
+				if (result) {				
 					if (id) {												
 						tmpsock->Send(finalidcode,250);
 						tmpsock->SetTimeout(0);						

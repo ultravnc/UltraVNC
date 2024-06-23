@@ -1237,23 +1237,19 @@ vncServer::EnableConnections(BOOL On)
 
 					// Attempt to connect to the port
 					VSocket tempsock;
-#ifdef IPV6V4
-					if (!tempsock.CreateConnect("localhost", m_port))
-#else
-					if (tempsock.Create()) {
-						if (!tempsock.Connect("localhost", m_port))
-#endif
-						{
-							// Couldn't connect, so this port is probably usable!
-							if (m_socketConn->Init(this, m_port)) {
-								ok = TRUE;
-								break;
-							}
+					BOOL result;
+					if (settings->getIPV6())
+						result = !tempsock.CreateConnect("localhost", m_port);
+					else
+						result = tempsock.Create() && !tempsock.Connect("localhost", m_port);
+					if (result)	{
+						// Couldn't connect, so this port is probably usable!
+						if (m_socketConn->Init(this, m_port)) {
+							ok = TRUE;
+							break;
 						}
-#ifdef IPV6V4
-#else
 					}
-#endif
+
 				}
 				if (!ok) {
 					delete m_socketConn;
@@ -1967,12 +1963,15 @@ void vncServer::actualRetryThread()
 		retrysock = new VSocket;
 		if (retrysock) {
 			// Connect out to the specified host on the UltraVNC Viewer listen port
-#ifdef IPV6V4
-			if (retrysock->CreateConnect(m_szAutoReconnectAdr, m_AutoReconnectPort)) {
-#else
-			retrysock->Create();
-			if (retrysock->Connect(m_szAutoReconnectAdr, m_AutoReconnectPort)) {
-#endif
+			bool result;
+			if (settings->getIPV6())
+				result = retrysock->CreateConnect(m_szAutoReconnectAdr, m_AutoReconnectPort);
+			else {
+				retrysock->Create();
+				result = retrysock->Connect(m_szAutoReconnectAdr, m_AutoReconnectPort);
+			}
+
+			if (result) {
 				if (strlen(m_szAutoReconnectId) > 0) {
 					retrysock->Send(m_szAutoReconnectId, 250);
 					retrysock->SetTimeout(0);
