@@ -255,11 +255,10 @@ public:
 	TCHAR* getCloudServer() { return m_pref_cloudServer; };
 
 
-#ifdef IPV6V4
 	// Whether or not to allow connections from the local machine
 	void setIPV6(BOOL ok) { m_pref_ipv6_allowed = ok; };
 	BOOL getIPV6() { return m_pref_ipv6_allowed; };
-#endif
+
 	bool IsRunninAsAdministrator();
 
 private:

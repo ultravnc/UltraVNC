@@ -254,10 +254,8 @@ vncMenu::vncMenu(vncServer* server)
 		ChangeWindowMessageFilter(postHelper::MENU_ADD_CLIENT_MSG, MSGFLT_ADD);
 		ChangeWindowMessageFilter(postHelper::MENU_ADD_CLIENT_MSG_INIT, MSGFLT_ADD);
 		ChangeWindowMessageFilter(postHelper::MENU_ADD_CLOUD_MSG, MSGFLT_ADD);
-#ifdef IPV6V4
 		ChangeWindowMessageFilter(postHelper::MENU_ADD_CLIENT6_MSG, MSGFLT_ADD);
 		ChangeWindowMessageFilter(postHelper::MENU_ADD_CLIENT6_MSG_INIT, MSGFLT_ADD);
-#endif
 	}
 
 	SetTimer(m_hwnd, 1, 5000, NULL);
@@ -430,57 +428,28 @@ vncMenu::GetIPAddrString(char* buffer, int buflen) {
 		return;
 	};
 
-#ifdef IPV6V4
-	* buffer = '\0';
+	if (settings->getIPV6()) {
+		* buffer = '\0';
 
-	LPSOCKADDR sockaddr_ip;
-	struct addrinfo hint;
-	struct addrinfo* serverinfo = 0;
-	memset(&hint, 0, sizeof(hint));
-	hint.ai_family = AF_UNSPEC;
-	hint.ai_socktype = SOCK_STREAM;
-	hint.ai_protocol = IPPROTO_TCP;
-	struct sockaddr_in6* pIpv6Addr;
-	struct sockaddr_in* pIpv4Addr;
-	struct sockaddr_in6 Ipv6Addr;
-	struct sockaddr_in Ipv4Addr;
-	memset(&Ipv6Addr, 0, sizeof(Ipv6Addr));
-	memset(&Ipv4Addr, 0, sizeof(Ipv4Addr));
+		LPSOCKADDR sockaddr_ip;
+		struct addrinfo hint;
+		struct addrinfo* serverinfo = 0;
+		memset(&hint, 0, sizeof(hint));
+		hint.ai_family = AF_UNSPEC;
+		hint.ai_socktype = SOCK_STREAM;
+		hint.ai_protocol = IPPROTO_TCP;
+		struct sockaddr_in6* pIpv6Addr;
+		struct sockaddr_in* pIpv4Addr;
+		struct sockaddr_in6 Ipv6Addr;
+		struct sockaddr_in Ipv4Addr;
+		memset(&Ipv6Addr, 0, sizeof(Ipv6Addr));
+		memset(&Ipv4Addr, 0, sizeof(Ipv4Addr));
 
-	//make sure the buffer is not overwritten
+		//make sure the buffer is not overwritten
 
-	if (getaddrinfo(namebuf, 0, &hint, &serverinfo) == 0)
-	{
-		struct addrinfo* p;
-		if (!settings->getIPV6())
+		if (getaddrinfo(namebuf, 0, &hint, &serverinfo) == 0)
 		{
-			p = serverinfo;
-			for (p = serverinfo; p != NULL; p = p->ai_next) {
-				switch (p->ai_family) {
-				case AF_INET:
-				{
-					pIpv4Addr = (struct sockaddr_in*)p->ai_addr;
-					memcpy(&Ipv4Addr, pIpv4Addr, sizeof(Ipv4Addr));
-					Ipv4Addr.sin_family = AF_INET;
-					char			szText[256];
-					sprintf_s(szText, "%s-", inet_ntoa(Ipv4Addr.sin_addr));
-					int len = strlen(buffer);
-					int len2 = strlen(szText);
-					if (len + len2 < buflen) strcat_s(buffer, buflen, szText);
-					break;
-				}
-				case AF_INET6:
-				{
-					break;
-				}
-				default:
-					break;
-				}
-			}
-		}
-
-		if (settings->getIPV6())
-		{
+			struct addrinfo* p;
 			p = serverinfo;
 			for (p = serverinfo; p != NULL; p = p->ai_next) {
 				switch (p->ai_family) {
@@ -512,29 +481,29 @@ vncMenu::GetIPAddrString(char* buffer, int buflen) {
 					break;
 				}
 			}
-		}
-	}
-	freeaddrinfo(serverinfo);
-#else
-	HOSTENT* ph = gethostbyname(namebuf);
-	if (!ph) {
-		strncpy_s(buffer, buflen, "IP address unavailable", buflen);
-		return;
-	};
 
-	*buffer = '\0';
-	char digtxt[5];
-	for (int i = 0; ph->h_addr_list[i]; i++) {
-		for (int j = 0; j < ph->h_length; j++) {
-			sprintf_s(digtxt, "%d.", (unsigned char)ph->h_addr_list[i][j]);
-			strncat_s(buffer, buflen, digtxt, (buflen - 1) - strlen(buffer));
 		}
-		buffer[strlen(buffer) - 1] = '\0';
-		if (ph->h_addr_list[i + 1] != 0)
-			strncat_s(buffer, buflen, ", ", (buflen - 1) - strlen(buffer));
+		freeaddrinfo(serverinfo);
 	}
+	 else {
+		 HOSTENT* ph = gethostbyname(namebuf);
+		 if (!ph) {
+			 strncpy_s(buffer, buflen, "IP address unavailable", buflen);
+			 return;
+		 };
 
-#endif
+		 *buffer = '\0';
+		 char digtxt[5];
+		 for (int i = 0; ph->h_addr_list[i]; i++) {
+			 for (int j = 0; j < ph->h_length; j++) {
+				 sprintf_s(digtxt, "%d.", (unsigned char)ph->h_addr_list[i][j]);
+				 strncat_s(buffer, buflen, digtxt, (buflen - 1) - strlen(buffer));
+			 }
+			 buffer[strlen(buffer) - 1] = '\0';
+			 if (ph->h_addr_list[i + 1] != 0)
+				 strncat_s(buffer, buflen, ", ", (buflen - 1) - strlen(buffer));
+		 }
+	}
 }
 
 BOOL vncMenu::AddNotificationIcon()
@@ -916,7 +885,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			// adzm - 2010-07 - Disable more effects or font smoothing
 			if (IsUserDesktop()) {
 #ifdef SC_20
-				if (ScSelect::g_dis_uac) 
+				if (ScSelect::g_dis_uac)
 					ScSelect::Disbale_UAC_for_admin_run_elevated();
 #endif // SC_20
 				if (settings->getRemoveWallpaper())
@@ -933,7 +902,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		}
 		else {
 #ifdef SC_20
-			if (ScSelect::g_dis_uac) 
+			if (ScSelect::g_dis_uac)
 				ScSelect::Restore_UAC_for_admin_elevated();
 #endif // SC_20
 			if (settings->getRemoveWallpaper()) // Moved, redundant if //PGM @ Advantig
@@ -977,7 +946,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			break;
 
 
-		
+
 		case ID_OUTGOING_CONN:
 			// Connect out to a listening VNC Viewer
 		{
@@ -1008,7 +977,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
 		case ID_VISITUSONLINE_HOMEPAGE:
 			if (settings->RunningFromExternalService() && OpenWebpageFromService("cmd /c start https://uvnc.com/"));
-			else 
+			else
 				OpenWebpageFromApp(ID_VISITUSONLINE_HOMEPAGE);
 			break;
 
@@ -1020,7 +989,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
 		case ID_VISITUSONLINE_GITHUB:
 			if (settings->RunningFromExternalService() && OpenWebpageFromService("cmd /c start https://github.com/ultravnc"));
-			else 
+			else
 				OpenWebpageFromApp(ID_VISITUSONLINE_GITHUB);
 			break;
 
@@ -1032,7 +1001,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
 		case ID_VISITUSONLINE_FACEBOOK:
 			if (settings->RunningFromExternalService() && OpenWebpageFromService("cmd /c start https://www.facebook.com/ultravnc1"));
-			else 
+			else
 				OpenWebpageFromApp(ID_VISITUSONLINE_FACEBOOK);
 			break;
 
@@ -1044,7 +1013,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
 		case ID_VISITUSONLINE_REDDIT:
 			if (settings->RunningFromExternalService() && OpenWebpageFromService("cmd /c start https://www.reddit.com/r/ultravnc"));
-			else 
+			else
 				OpenWebpageFromApp(ID_VISITUSONLINE_REDDIT);
 			break;
 
@@ -1223,10 +1192,10 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				DWORD errorcode = 0;
 				STARTUPINFO          StartUPInfo;
 				PROCESS_INFORMATION  ProcessInfo;
-				HANDLE Token=NULL;
-				HANDLE process=NULL;
-				ZeroMemory(&StartUPInfo,sizeof(STARTUPINFO));
-				ZeroMemory(&ProcessInfo,sizeof(PROCESS_INFORMATION));
+				HANDLE Token = NULL;
+				HANDLE process = NULL;
+				ZeroMemory(&StartUPInfo, sizeof(STARTUPINFO));
+				ZeroMemory(&ProcessInfo, sizeof(PROCESS_INFORMATION));
 
 				hProcess = OpenProcess(MAXIMUM_ALLOWED, FALSE, id);
 				if (!hProcess) goto error7;
@@ -1556,296 +1525,288 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			return 0;
 		}
 
-#ifdef IPV6V4
+		if (settings->getIPV6()) {
 
-		if (iMsg == postHelper::MENU_ADD_CLIENT6_MSG || iMsg == postHelper::MENU_ADD_CLIENT6_MSG_INIT)
-		{
-			if (iMsg == postHelper::MENU_ADD_CLIENT6_MSG_INIT)
-				_this->m_server->AutoReconnectAdr("");
+			if (iMsg == postHelper::MENU_ADD_CLIENT6_MSG || iMsg == postHelper::MENU_ADD_CLIENT6_MSG_INIT)
+			{
+				if (iMsg == postHelper::MENU_ADD_CLIENT6_MSG_INIT)
+					_this->m_server->AutoReconnectAdr("");
 
-			// Add Client message. This message includes an IP address
-			// of a listening client, to which we should connect.
+				// Add Client message. This message includes an IP address
+				// of a listening client, to which we should connect.
 
-			//adzm 2009-06-20 - Check for special add repeater client message
-			if (wParam == 0xFFFFFFFF && (ULONG)lParam == 0xFFFFFFFF) {
-				auto newconn = std::make_unique<vncConnDialog>(_this->m_server);
-				if (newconn)
-				{
-					if (IDOK != newconn->DoDialog()) {
-						if (settings->getScPrompt() && _this->m_server->AuthClientCount() == 0 && _this->m_server->UnauthClientCount() == 0) {
-							PostMessage(hwnd, WM_COMMAND, ID_CLOSE, 0);
+				//adzm 2009-06-20 - Check for special add repeater client message
+				if (wParam == 0xFFFFFFFF && (ULONG)lParam == 0xFFFFFFFF) {
+					auto newconn = std::make_unique<vncConnDialog>(_this->m_server);
+					if (newconn)
+					{
+						if (IDOK != newconn->DoDialog()) {
+							if (settings->getScPrompt() && _this->m_server->AuthClientCount() == 0 && _this->m_server->UnauthClientCount() == 0) {
+								PostMessage(hwnd, WM_COMMAND, ID_CLOSE, 0);
+							}
 						}
 					}
-				}
-				return 0;
-			}
-
-			// If there is no IP address then show the connection dialog
-			if (!lParam) {
-				auto newconn = std::make_unique<vncConnDialog>(_this->m_server);
-				if (newconn)
-				{
-					newconn->DoDialog();
-					// winvnc -connect fixed
-					//CHECH memeory leak
-					//			delete newconn;
-				}
-				return 0;
-			}
-
-			unsigned short nport = 0;
-			char* nameDup = 0;
-			char szAdrName[64];
-			char szId[MAX_PATH] = { 0 };
-			// sf@2003 - Values are already converted
-
-			if (WaitForSingleObject(_this->m_server->retryThreadHandle, 0) == WAIT_OBJECT_0 && fShutdownOrdered)
-				Sleep(5000);
-
-			if ((_this->m_server->AutoReconnect() || _this->m_server->IdReconnect()) && strlen(_this->m_server->AutoReconnectAdr()) > 0)
-			{
-				struct in6_addr address;
-				memset(&address, 0, sizeof(address));
-				nport = _this->m_server->AutoReconnectPort();
-				VCard32 ipaddress = VSocket::Resolve6(_this->m_server->AutoReconnectAdr(), &address);
-				char straddr[INET6_ADDRSTRLEN];
-				memset(straddr, 0, INET6_ADDRSTRLEN);
-				PCSTR test = inet_ntop(AF_INET6, &address, straddr, sizeof(straddr));
-				if (strlen(straddr) == 0) return 0;
-				nameDup = _strdup(straddr);
-				if (nameDup == 0)
 					return 0;
-				strcpy_s(szAdrName, nameDup);
-				// Free the duplicate name
-				if (nameDup != 0) free(nameDup);
-			}
-			else
-			{
-				// Get the IP address stringified
-				struct in6_addr address;
-				memset(&address, 0, sizeof(address));
-				char straddr[INET6_ADDRSTRLEN];
-				memset(straddr, 0, INET6_ADDRSTRLEN);
-				memcpy(&address, &postHelper::G_LPARAM_IN6, sizeof(in6_addr));
-				PCSTR test = inet_ntop(AF_INET6, &address, straddr, sizeof(straddr));
-				if (strlen(straddr) == 0) return 0;
-				nameDup = _strdup(straddr);
-				if (nameDup == 0) return 0;
-				strcpy_s(szAdrName, nameDup);
-				// Free the duplicate name
-				if (nameDup != 0) free(nameDup);
-				// Get the port number
-				nport = (unsigned short)wParam;
-				if (nport == 0) nport = INCOMING_PORT_OFFSET;
-			}
-			// wa@2005 -- added support for the AutoReconnectId
-			// (but it's not required)
-			bool bId = (strlen(_this->m_server->AutoReconnectId()) > 0);
-			if (bId)
-				strcpy_s(szId, _this->m_server->AutoReconnectId());
+				}
 
-			// sf@2003
-			// Stores the client adr/ports the first time we try to connect
-			// This way we can call this message again later to reconnect with the same values
-			if ((_this->m_server->AutoReconnect() || _this->m_server->IdReconnect()) && strlen(_this->m_server->AutoReconnectAdr()) == 0)
-			{
-				if (strlen(dnsname) > 0) _this->m_server->AutoReconnectAdr(dnsname);
-				else
-					_this->m_server->AutoReconnectAdr(szAdrName);
-				strcpy_s(dnsname, "");
-
-				_this->m_server->AutoReconnectPort(nport);
-			}
-
-			if (_this->m_server->AutoReconnect())
-			{
-				_this->m_server->AutoConnectRetry();
-			}
-			else
-			{
-				// Attempt to create a new socket
-				VSocket* tmpsock;
-				tmpsock = new VSocket;
-				if (tmpsock) {
-					// Connect out to the specified host on the UltraVNC Viewer listen port
-#ifdef IPV6V4
-					if (tmpsock->CreateConnect(szAdrName, nport))
-#else
-					tmpsock->Create();
-					if (tmpsock->Connect(szAdrName, nport))
-#endif
+				// If there is no IP address then show the connection dialog
+				if (!lParam) {
+					auto newconn = std::make_unique<vncConnDialog>(_this->m_server);
+					if (newconn)
 					{
-						if (bId)
-						{
-							// wa@2005 -- added support for the AutoReconnectId
-							// Set the ID for this client -- code taken from vncconndialog.cpp (ln:142)
-							tmpsock->Send(szId, 250);
-							tmpsock->SetTimeout(0);
+						newconn->DoDialog();
+						// winvnc -connect fixed
+						//CHECH memeory leak
+						//			delete newconn;
+					}
+					return 0;
+				}
 
-							// adzm 2009-07-05 - repeater IDs
-							// Add the new client to this server
-							// adzm 2009-08-02
-							_this->m_server->AddClient(tmpsock, TRUE, TRUE, 0, NULL, szId, szAdrName, nport, true);
+				unsigned short nport = 0;
+				char* nameDup = 0;
+				char szAdrName[64];
+				char szId[MAX_PATH] = { 0 };
+				// sf@2003 - Values are already converted
+
+				if (WaitForSingleObject(_this->m_server->retryThreadHandle, 0) == WAIT_OBJECT_0 && fShutdownOrdered)
+					Sleep(5000);
+
+				if ((_this->m_server->AutoReconnect() || _this->m_server->IdReconnect()) && strlen(_this->m_server->AutoReconnectAdr()) > 0)
+				{
+					struct in6_addr address;
+					memset(&address, 0, sizeof(address));
+					nport = _this->m_server->AutoReconnectPort();
+					VCard32 ipaddress = VSocket::Resolve6(_this->m_server->AutoReconnectAdr(), &address);
+					char straddr[INET6_ADDRSTRLEN];
+					memset(straddr, 0, INET6_ADDRSTRLEN);
+					PCSTR test = inet_ntop(AF_INET6, &address, straddr, sizeof(straddr));
+					if (strlen(straddr) == 0) return 0;
+					nameDup = _strdup(straddr);
+					if (nameDup == 0)
+						return 0;
+					strcpy_s(szAdrName, nameDup);
+					// Free the duplicate name
+					if (nameDup != 0) free(nameDup);
+				}
+				else
+				{
+					// Get the IP address stringified
+					struct in6_addr address;
+					memset(&address, 0, sizeof(address));
+					char straddr[INET6_ADDRSTRLEN];
+					memset(straddr, 0, INET6_ADDRSTRLEN);
+					memcpy(&address, &postHelper::G_LPARAM_IN6, sizeof(in6_addr));
+					PCSTR test = inet_ntop(AF_INET6, &address, straddr, sizeof(straddr));
+					if (strlen(straddr) == 0) return 0;
+					nameDup = _strdup(straddr);
+					if (nameDup == 0) return 0;
+					strcpy_s(szAdrName, nameDup);
+					// Free the duplicate name
+					if (nameDup != 0) free(nameDup);
+					// Get the port number
+					nport = (unsigned short)wParam;
+					if (nport == 0) nport = INCOMING_PORT_OFFSET;
+				}
+				// wa@2005 -- added support for the AutoReconnectId
+				// (but it's not required)
+				bool bId = (strlen(_this->m_server->AutoReconnectId()) > 0);
+				if (bId)
+					strcpy_s(szId, _this->m_server->AutoReconnectId());
+
+				// sf@2003
+				// Stores the client adr/ports the first time we try to connect
+				// This way we can call this message again later to reconnect with the same values
+				if ((_this->m_server->AutoReconnect() || _this->m_server->IdReconnect()) && strlen(_this->m_server->AutoReconnectAdr()) == 0)
+				{
+					if (strlen(dnsname) > 0) _this->m_server->AutoReconnectAdr(dnsname);
+					else
+						_this->m_server->AutoReconnectAdr(szAdrName);
+					strcpy_s(dnsname, "");
+
+					_this->m_server->AutoReconnectPort(nport);
+				}
+
+				if (_this->m_server->AutoReconnect())
+				{
+					_this->m_server->AutoConnectRetry();
+				}
+				else
+				{
+					// Attempt to create a new socket
+					VSocket* tmpsock;
+					tmpsock = new VSocket;
+					if (tmpsock) {
+						// Connect out to the specified host on the UltraVNC Viewer listen port
+						if (tmpsock->CreateConnect(szAdrName, nport))
+						{
+							if (bId)
+							{
+								// wa@2005 -- added support for the AutoReconnectId
+								// Set the ID for this client -- code taken from vncconndialog.cpp (ln:142)
+								tmpsock->Send(szId, 250);
+								tmpsock->SetTimeout(0);
+
+								// adzm 2009-07-05 - repeater IDs
+								// Add the new client to this server
+								// adzm 2009-08-02
+								_this->m_server->AddClient(tmpsock, TRUE, TRUE, 0, NULL, szId, szAdrName, nport, true);
+							}
+							else {
+								// Add the new client to this server
+								// adzm 2009-08-02
+								_this->m_server->AddClient(tmpsock, TRUE, TRUE, 0, NULL, NULL, szAdrName, nport, true);
+							}
 						}
 						else {
-							// Add the new client to this server
-							// adzm 2009-08-02
-							_this->m_server->AddClient(tmpsock, TRUE, TRUE, 0, NULL, NULL, szAdrName, nport, true);
-						}
-					}
-					else {
-						delete tmpsock;
-					}
-				}
-			}
-
-			return 0;
-		}
-
-		if (iMsg == postHelper::MENU_ADD_CLIENT_MSG || iMsg == postHelper::MENU_ADD_CLIENT_MSG_INIT)
-		{
-			if (iMsg == postHelper::MENU_ADD_CLIENT_MSG_INIT)
-				_this->m_server->AutoReconnectAdr("");
-
-			// Add Client message. This message includes an IP address
-			// of a listening client, to which we should connect.
-
-			//adzm 2009-06-20 - Check for special add repeater client message
-			if (wParam == 0xFFFFFFFF && (ULONG)lParam == 0xFFFFFFFF) {
-				auto newconn = std::make_unique<vncConnDialog>(_this->m_server);
-				if (newconn)
-				{
-					if (IDOK != newconn->DoDialog()) {
-						if (settings->getScPrompt() && _this->m_server->AuthClientCount() == 0 && _this->m_server->UnauthClientCount() == 0) {
-							PostMessage(hwnd, WM_COMMAND, ID_CLOSE, 0);
+							delete tmpsock;
 						}
 					}
 				}
+
 				return 0;
 			}
 
-			// If there is no IP address then show the connection dialog
-			if (!lParam) {
-				auto newconn = std::make_unique<vncConnDialog>(_this->m_server);
-				if (newconn)
-				{
-					newconn->DoDialog();
-					// winvnc -connect fixed
-					//CHECH memeory leak
-					//			delete newconn;
-				}
-				return 0;
-			}
-
-			unsigned short nport = 0;
-			char* nameDup = 0;
-			char szAdrName[64];
-			char szId[MAX_PATH] = { 0 };
-			// sf@2003 - Values are already converted
-
-			if (WaitForSingleObject(_this->m_server->retryThreadHandle, 0) == WAIT_OBJECT_0 && fShutdownOrdered)
-				Sleep(5000);
-			if ((_this->m_server->AutoReconnect() || _this->m_server->IdReconnect()) && strlen(_this->m_server->AutoReconnectAdr()) > 0)
+			if (iMsg == postHelper::MENU_ADD_CLIENT_MSG || iMsg == postHelper::MENU_ADD_CLIENT_MSG_INIT)
 			{
-				struct in_addr address;
-				nport = _this->m_server->AutoReconnectPort();
-				VCard32 ipaddress = VSocket::Resolve4(_this->m_server->AutoReconnectAdr());
-				unsigned long ipaddress_long = ipaddress;
-				address.S_un.S_addr = ipaddress_long;
-				char* name = inet_ntoa(address);
-				if (name == 0)
-					return 0;
-				nameDup = _strdup(name);
-				if (nameDup == 0)
-					return 0;
-				strcpy_s(szAdrName, nameDup);
-				// Free the duplicate name
-				if (nameDup != 0) free(nameDup);
-			}
-			else
-			{
-				// Get the IP address stringified
-				struct in_addr address;
-				address.S_un.S_addr = lParam;
-				char* name = inet_ntoa(address);
-				if (name == 0)
-					return 0;
-				nameDup = _strdup(name);
-				if (nameDup == 0)
-					return 0;
-				strcpy_s(szAdrName, nameDup);
-				// Free the duplicate name
-				if (nameDup != 0) free(nameDup);
+				if (iMsg == postHelper::MENU_ADD_CLIENT_MSG_INIT)
+					_this->m_server->AutoReconnectAdr("");
 
-				// Get the port number
-				nport = (unsigned short)wParam;
-				if (nport == 0)
-					nport = INCOMING_PORT_OFFSET;
-			}
-			// wa@2005 -- added support for the AutoReconnectId
-			// (but it's not required)
-			bool bId = (strlen(_this->m_server->AutoReconnectId()) > 0);
-			if (bId)
-				strcpy_s(szId, _this->m_server->AutoReconnectId());
+				// Add Client message. This message includes an IP address
+				// of a listening client, to which we should connect.
 
-			// sf@2003
-			// Stores the client adr/ports the first time we try to connect
-			// This way we can call this message again later to reconnect with the same values
-			if ((_this->m_server->AutoReconnect() || _this->m_server->IdReconnect()) && strlen(_this->m_server->AutoReconnectAdr()) == 0)
-			{
-				if (strlen(dnsname) > 0) _this->m_server->AutoReconnectAdr(dnsname);
-				else
-					_this->m_server->AutoReconnectAdr(szAdrName);
-				strcpy_s(dnsname, "");
-
-				_this->m_server->AutoReconnectPort(nport);
-			}
-
-			if (_this->m_server->AutoReconnect())
-			{
-				_this->m_server->AutoConnectRetry();
-			}
-			else
-			{
-				// Attempt to create a new socket
-				VSocket* tmpsock;
-				tmpsock = new VSocket;
-				if (tmpsock) {
-					// Connect out to the specified host on the UltraVNC Viewer listen port
-#ifdef IPV6V4
-					if (tmpsock->CreateConnect(szAdrName, nport))
-#else
-					tmpsock->Create();
-					if (tmpsock->Connect(szAdrName, nport))
-#endif
+				//adzm 2009-06-20 - Check for special add repeater client message
+				if (wParam == 0xFFFFFFFF && (ULONG)lParam == 0xFFFFFFFF) {
+					auto newconn = std::make_unique<vncConnDialog>(_this->m_server);
+					if (newconn)
 					{
-						if (bId)
-						{
-							// wa@2005 -- added support for the AutoReconnectId
-							// Set the ID for this client -- code taken from vncconndialog.cpp (ln:142)
-							tmpsock->Send(szId, 250);
-							tmpsock->SetTimeout(0);
+						if (IDOK != newconn->DoDialog()) {
+							if (settings->getScPrompt() && _this->m_server->AuthClientCount() == 0 && _this->m_server->UnauthClientCount() == 0) {
+								PostMessage(hwnd, WM_COMMAND, ID_CLOSE, 0);
+							}
+						}
+					}
+					return 0;
+				}
 
-							// adzm 2009-07-05 - repeater IDs
-							// Add the new client to this server
-							// adzm 2009-08-02
-							_this->m_server->AddClient(tmpsock, TRUE, TRUE, 0, NULL, szId, szAdrName, nport, true);
+				// If there is no IP address then show the connection dialog
+				if (!lParam) {
+					auto newconn = std::make_unique<vncConnDialog>(_this->m_server);
+					if (newconn)
+					{
+						newconn->DoDialog();
+						// winvnc -connect fixed
+						//CHECH memeory leak
+						//			delete newconn;
+					}
+					return 0;
+				}
+
+				unsigned short nport = 0;
+				char* nameDup = 0;
+				char szAdrName[64];
+				char szId[MAX_PATH] = { 0 };
+				// sf@2003 - Values are already converted
+
+				if (WaitForSingleObject(_this->m_server->retryThreadHandle, 0) == WAIT_OBJECT_0 && fShutdownOrdered)
+					Sleep(5000);
+				if ((_this->m_server->AutoReconnect() || _this->m_server->IdReconnect()) && strlen(_this->m_server->AutoReconnectAdr()) > 0)
+				{
+					struct in_addr address;
+					nport = _this->m_server->AutoReconnectPort();
+					VCard32 ipaddress = VSocket::Resolve4(_this->m_server->AutoReconnectAdr());
+					unsigned long ipaddress_long = ipaddress;
+					address.S_un.S_addr = ipaddress_long;
+					char* name = inet_ntoa(address);
+					if (name == 0)
+						return 0;
+					nameDup = _strdup(name);
+					if (nameDup == 0)
+						return 0;
+					strcpy_s(szAdrName, nameDup);
+					// Free the duplicate name
+					if (nameDup != 0) free(nameDup);
+				}
+				else
+				{
+					// Get the IP address stringified
+					struct in_addr address;
+					address.S_un.S_addr = lParam;
+					char* name = inet_ntoa(address);
+					if (name == 0)
+						return 0;
+					nameDup = _strdup(name);
+					if (nameDup == 0)
+						return 0;
+					strcpy_s(szAdrName, nameDup);
+					// Free the duplicate name
+					if (nameDup != 0) free(nameDup);
+
+					// Get the port number
+					nport = (unsigned short)wParam;
+					if (nport == 0)
+						nport = INCOMING_PORT_OFFSET;
+				}
+				// wa@2005 -- added support for the AutoReconnectId
+				// (but it's not required)
+				bool bId = (strlen(_this->m_server->AutoReconnectId()) > 0);
+				if (bId)
+					strcpy_s(szId, _this->m_server->AutoReconnectId());
+
+				// sf@2003
+				// Stores the client adr/ports the first time we try to connect
+				// This way we can call this message again later to reconnect with the same values
+				if ((_this->m_server->AutoReconnect() || _this->m_server->IdReconnect()) && strlen(_this->m_server->AutoReconnectAdr()) == 0)
+				{
+					if (strlen(dnsname) > 0) _this->m_server->AutoReconnectAdr(dnsname);
+					else
+						_this->m_server->AutoReconnectAdr(szAdrName);
+					strcpy_s(dnsname, "");
+
+					_this->m_server->AutoReconnectPort(nport);
+				}
+
+				if (_this->m_server->AutoReconnect())
+				{
+					_this->m_server->AutoConnectRetry();
+				}
+				else
+				{
+					// Attempt to create a new socket
+					VSocket* tmpsock;
+					tmpsock = new VSocket;
+					if (tmpsock) {
+						// Connect out to the specified host on the UltraVNC Viewer listen port
+						if (tmpsock->CreateConnect(szAdrName, nport))
+						{
+							if (bId)
+							{
+								// wa@2005 -- added support for the AutoReconnectId
+								// Set the ID for this client -- code taken from vncconndialog.cpp (ln:142)
+								tmpsock->Send(szId, 250);
+								tmpsock->SetTimeout(0);
+
+								// adzm 2009-07-05 - repeater IDs
+								// Add the new client to this server
+								// adzm 2009-08-02
+								_this->m_server->AddClient(tmpsock, TRUE, TRUE, 0, NULL, szId, szAdrName, nport, true);
+							}
+							else {
+								// Add the new client to this server
+								// adzm 2009-08-02
+								_this->m_server->AddClient(tmpsock, TRUE, TRUE, 0, NULL, NULL, szAdrName, nport, true);
+							}
 						}
 						else {
-							// Add the new client to this server
-							// adzm 2009-08-02
-							_this->m_server->AddClient(tmpsock, TRUE, TRUE, 0, NULL, NULL, szAdrName, nport, true);
+							delete tmpsock;
 						}
 					}
-					else {
-						delete tmpsock;
-					}
 				}
-			}
 
-			return 0;
+				return 0;
+			}
 		}
-#else
+		//////////////////////////////////////////////////////////////
+		else {
 		if (iMsg == postHelper::MENU_ADD_CLIENT_MSG || iMsg == postHelper::MENU_ADD_CLIENT_MSG_INIT)
 		{
 			if (iMsg == postHelper::MENU_ADD_CLIENT_MSG_INIT)
@@ -1905,12 +1866,9 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 					tmpsock = new VSocket;
 					if (!tmpsock)
 						return TRUE;
-#ifdef IPV6V4
-					if (tmpsock->CreateConnect(actualhostname, port)) {
-#else
+
 					tmpsock->Create();
-					if (tmpsock->Connect(actualhostname, port)) {
-#endif				
+					if (tmpsock->Connect(actualhostname, port)) {				
 						tmpsock->Send(finalidcode, 250);
 						tmpsock->SetTimeout(0);
 						_this->m_server->AddClient(tmpsock, !settings->getReverseAuthRequired(), TRUE, 0, NULL, finalidcode, actualhostname, port, true);
@@ -2056,7 +2014,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
 			return 0;
 		}
-#endif
+	}
 
 		// Process File Transfer asynchronous Send Packet Message
 		if (iMsg == postHelper::FileTransferSendPacketMessage)

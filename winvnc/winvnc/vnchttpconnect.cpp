@@ -513,20 +513,21 @@ vncHTTPConnect::~vncHTTPConnect()
    m_socket.Shutdown();
 
     // Join with our lovely thread
-    if (m_thread != NULL)
-    {
-		// *** This is a hack to force the listen thread out of the accept call,
-		// because Winsock accept semantics are broken.
-		((vncHTTPConnectThread *)m_thread)->m_shutdown = TRUE;
+   if (m_thread != NULL)
+   {
+	   // *** This is a hack to force the listen thread out of the accept call,
+	   // because Winsock accept semantics are broken.
+	   ((vncHTTPConnectThread*)m_thread)->m_shutdown = TRUE;
 
-		VSocket socket;
-#ifdef IPV6V4
-		socket.CreateBindConnect("localhost", m_port);
-#else
-		socket.Create();
-		socket.Bind(0);
-		socket.Connect("localhost", m_port);
-#endif
+	   VSocket socket;
+	   if (settings->getIPV6()) {
+		   socket.CreateBindConnect("localhost", m_port);
+	   }
+	   else {
+		   socket.Create();
+		   socket.Bind(0);
+		   socket.Connect("localhost", m_port);
+		}
 		socket.Close();
 
 		void *returnval;
@@ -541,22 +542,23 @@ BOOL vncHTTPConnect::Init(vncServer *server, UINT port)
 {
 	// Save the port id
 	m_port = port;
-#ifdef IPV6V4
-	if (!m_socket.CreateBindListen(m_port, settings->getLoopbackOnly()))
-		return FALSE;
-#else
-	// Create the listening socket
-	if (!m_socket.Create())
-		return FALSE;
+	if (settings->getIPV6()) {
+		if (!m_socket.CreateBindListen(m_port, settings->getLoopbackOnly()))
+			return FALSE;
+	}
+	else {
+		// Create the listening socket
+		if (!m_socket.Create())
+			return FALSE;
 
-	// Bind it
-	if (!m_socket.Bind(m_port, settings->getLoopbackOnly()))
-		return FALSE;
+		// Bind it
+		if (!m_socket.Bind(m_port, settings->getLoopbackOnly()))
+			return FALSE;
 
-	// Set it to listen
-	if (!m_socket.Listen())
-		return FALSE;
-#endif
+		// Set it to listen
+		if (!m_socket.Listen())
+			return FALSE;
+	}
 	// Create the new thread
 	m_thread = new vncHTTPConnectThread;
 	if (m_thread == NULL)
