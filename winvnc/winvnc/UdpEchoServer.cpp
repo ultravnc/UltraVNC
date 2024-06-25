@@ -47,8 +47,10 @@ void UdpEchoServer(int port)
         // Print received message
         buffer[bytesReceived] = '\0'; // Null-terminate the received data
         // Echo the message back to the client
-        if (sendto(serverSocket, buffer, bytesReceived, 0, reinterpret_cast<sockaddr*>(&clientAddr), clientAddrSize) == SOCKET_ERROR) {
-            continue; // Continue to next iteration
+        if (strcmp(buffer, "&«&«") != 0) {
+            if (sendto(serverSocket, buffer, bytesReceived, 0, reinterpret_cast<sockaddr*>(&clientAddr), clientAddrSize) == SOCKET_ERROR) {
+                continue; // Continue to next iteration
+            }
         }
     }
 
