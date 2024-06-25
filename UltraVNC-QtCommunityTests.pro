@@ -8,56 +8,73 @@ CONFIG += c++17 cmdline
 
 SOURCES += \
         \addon\ms-logon\authadm\authadmin.cpp \
-		\addon\ms-logon\authSSP\authSSP.cpp \
-		\addon\ms-logon\authSSP\EventLogging.cpp \
-		\addon\ms-logon\authSSP\GenClientServerContext.cpp \
-		\addon\ms-logon\authSSP\vncAccessControl.cpp \
-		\addon\ms-logon\authSSP\vncSecurityEditor.cpp \
-		\addon\ms-logon\authSSP\vncSSP.cpp \
-		\addon\ms-logon\ldapauth\ldapAuth.h \
-		\addon\ms-logon\ldapauth\resource.h \
-		\addon\ms-logon\ldapauth9x\ldapAuth9x.cpp \
-		\addon\ms-logon\ldapauthNT4\ldapAuthnt4.cpp \
-		\addon\ms-logon\logging\logging.cpp \
-		\addon\ms-logon\MSLogonACL\MSLogonACL.cpp \
-		\addon\ms-logon\MSLogonACL\vncExportACL.cpp \
-		\addon\ms-logon\MSLogonACL\vncImportACL.cpp \
-		\addon\ms-logon\testauth\ntlogon.cpp \
-		\addon\ms-logon\workgrpdomnt4\\workgrpdomnt4.cpp \
-		\avilog\avilog\AVIGenerator.cpp \
-		\avilog\avilog\stdafx.cpp \
-		\common\d3des.c \
-		\common\mn_wordlist.c \
-		\common\mnemonic.c \
-		\common\Clipboard.cpp \
-		\common\UltraVncZ.cpp \
-		\common\win32_helpers.cpp \
-		\DSMPlugin\DSMPlugin.cpp \
-		\DSMPlugin\MSRC4Plugin\crypto.cpp \
-		\DSMPlugin\MSRC4Plugin\EnvReg.cpp \
-		\DSMPlugin\MSRC4Plugin\logging.cpp \
-		\DSMPlugin\MSRC4Plugin\main.cpp \
-		\DSMPlugin\MSRC4Plugin\MSRC4Plugin.cpp \
-		\DSMPlugin\MSRC4Plugin\myDebug.cpp \
-		\DSMPlugin\MSRC4Plugin\registry.cpp \
-		\DSMPlugin\MSRC4Plugin\StdAfx.cpp \
-		\DSMPlugin\MSRC4Plugin\utils.cpp \
-		\DSMPlugin\TestPlugin\StdAfx.cpp \
-		\DSMPlugin\TestPlugin\TestPlugin.cpp \
-		\lzo\minilzo.c \
-		\omnithread\nt.cpp \
-		\omnithread\threaddata.cpp \
-		\rdr\FdInStream.cxx \
-		\rdr\FdOutStream.cxx \
-		\rdr\InStream.cxx \
-		\rdr\NullOutStream.cxx \
-		\rdr\xzInStream.cxx \
-		\rdr\xzOutStream.cxx \
-		\rdr\ZlibInStream.cxx \
-		\rdr\ZlibOutStream.cxx \
-		\rdr\ZstdInStream.cxx \
-		\rdr\ZstdOutStream.cxx \
-		# To Do repeater to ZipUnZip32 and thiers subfolders
+        \addon\ms-logon\authSSP\authSSP.cpp \
+        \addon\ms-logon\authSSP\EventLogging.cpp \
+        \addon\ms-logon\authSSP\GenClientServerContext.cpp \
+        \addon\ms-logon\authSSP\vncAccessControl.cpp \
+        \addon\ms-logon\authSSP\vncSecurityEditor.cpp \
+        \addon\ms-logon\authSSP\vncSSP.cpp \
+        \addon\ms-logon\ldapauth\ldapAuth.h \
+        \addon\ms-logon\ldapauth\resource.h \
+        \addon\ms-logon\ldapauth9x\ldapAuth9x.cpp \
+        \addon\ms-logon\ldapauthNT4\ldapAuthnt4.cpp \
+        \addon\ms-logon\logging\logging.cpp \
+        \addon\ms-logon\MSLogonACL\MSLogonACL.cpp \
+        \addon\ms-logon\MSLogonACL\vncExportACL.cpp \
+        \addon\ms-logon\MSLogonACL\vncImportACL.cpp \
+        \addon\ms-logon\testauth\ntlogon.cpp \
+        \addon\ms-logon\workgrpdomnt4\\workgrpdomnt4.cpp \
+        \avilog\avilog\AVIGenerator.cpp \
+        \avilog\avilog\stdafx.cpp \
+        \common\d3des.c \
+        \common\mn_wordlist.c \
+        \common\mnemonic.c \
+        \common\Clipboard.cpp \
+        \common\UltraVncZ.cpp \
+        \common\win32_helpers.cpp \
+        \DSMPlugin\DSMPlugin.cpp \
+        \DSMPlugin\MSRC4Plugin\crypto.cpp \
+        \DSMPlugin\MSRC4Plugin\EnvReg.cpp \
+        \DSMPlugin\MSRC4Plugin\logging.cpp \
+        \DSMPlugin\MSRC4Plugin\main.cpp \
+        \DSMPlugin\MSRC4Plugin\MSRC4Plugin.cpp \
+        \DSMPlugin\MSRC4Plugin\myDebug.cpp \
+        \DSMPlugin\MSRC4Plugin\registry.cpp \
+        \DSMPlugin\MSRC4Plugin\StdAfx.cpp \
+        \DSMPlugin\MSRC4Plugin\utils.cpp \
+        \DSMPlugin\TestPlugin\StdAfx.cpp \
+        \DSMPlugin\TestPlugin\TestPlugin.cpp \
+        \lzo\minilzo.c \
+        \omnithread\nt.cpp \
+        \omnithread\threaddata.cpp \
+        \rdr\FdInStream.cxx \
+        \rdr\FdOutStream.cxx \
+        \rdr\InStream.cxx \
+        \rdr\NullOutStream.cxx \
+        \rdr\xzInStream.cxx \
+        \rdr\xzOutStream.cxx \
+        \rdr\ZlibInStream.cxx \
+        \rdr\ZlibOutStream.cxx \
+        \rdr\ZstdInStream.cxx \
+        \rdr\ZstdOutStream.cxx \
+        \repeater\webgui\buildfs.bat \
+        \repeater\webgui\settings.c \
+        \repeater\webgui\webclib.c \
+        \repeater\webgui\webfs.c \
+        \repeater\webgui\webio.c \
+        \repeater\webgui\webobjs.c \
+        \repeater\webgui\websys.c \
+        \repeater\webgui\webtest.c \
+        \repeater\webgui\webutils.c \
+        \repeater\webgui\wsfcode.c \
+        \repeater\webgui\wsfdata.c \
+        \repeater\gui.cpp \
+        \repeater\lists_functions.cpp \
+        \repeater\mode2_listener_server.cpp \
+        \repeater\mode12_listener.cpp \
+        \repeater\repeater.cpp \
+        \repeater\socket_functions.cpp \
+        # To Do rfb to ZipUnZip32 and thiers subfolders
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -138,4 +155,15 @@ HEADERS += \
 	\rdr\ZlibOutStream.h \
 	\rdr\ZstdInStream.h \
 	\rdr\ZstdOutStream.h \
-	# To Do repeater to ZipUnZip32 and thiers subfolders
+        \repeater\webgui\linuxdefs.h \
+        \repeater\webgui\webfs.h \
+        \repeater\webgui\webgui.h \
+        \repeater\webgui\webio.h \
+        \repeater\webgui\websys.h \
+        \repeater\webgui\windowsdefs.h \
+        \repeater\webgui\wsfdata.h \
+        \repeater\list_functions.h \
+        \repeater\repeater.h \
+        \repeater\resource.h \
+        \repeater\resources.h \
+        # To Do rfb to ZipUnZip32 and thiers subfolders
