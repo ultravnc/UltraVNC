@@ -96,6 +96,9 @@ CloudDialog::DialogProc(HWND hwnd,
 
 	case WM_INITDIALOG:
 	{
+		HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_WINVNC));
+		SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+		SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
 		// Retrieve the Dialog box parameter and use it as a pointer
 		// to the calling vncProperties object
 #ifndef _X64

@@ -197,6 +197,9 @@ BOOL CALLBACK Snapshot::DlgProc(  HWND hwnd,  UINT uMsg,
 			_this = (Snapshot *) lParam;
 			SetDlgItemText(hwnd, IDC_FOLDER, _this->m_folder);
 			SetDlgItemText(hwnd, IDC_PREFIX, _this->m_prefix);
+			HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDR_TRAY));
+			SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+			SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
 			return TRUE;
 		}
 	case WM_COMMAND:

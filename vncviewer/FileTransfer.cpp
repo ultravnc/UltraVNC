@@ -3371,6 +3371,9 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 
 	case WM_INITDIALOG:
 		{
+			HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDR_TRAY));
+			SendMessage(hWnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+			SendMessage(hWnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
             helper::SafeSetWindowUserData(hWnd, lParam);
 
             FileTransfer *l_this = (FileTransfer *) lParam;
@@ -4426,6 +4429,9 @@ BOOL CALLBACK FileTransfer::FTParamDlgProc(  HWND hwnd,  UINT uMsg, WPARAM wPara
 	{
 	case WM_INITDIALOG:
 		{
+			HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDR_TRAY));
+			SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+			SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
             helper::SafeSetWindowUserData(hwnd, lParam);
 			_this = (FileTransfer *) lParam;
 			//CentreWindow(hwnd);
@@ -4503,6 +4509,9 @@ BOOL CALLBACK FileTransfer::FTConfirmDlgProc(  HWND hwnd,  UINT uMsg, WPARAM wPa
 	{
 	case WM_INITDIALOG:
 		{
+			HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDR_TRAY));
+			SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+			SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
             helper::SafeSetWindowUserData(hwnd, lParam);
 			_this = (FileTransfer *) lParam;
 			//CentreWindow(hwnd);

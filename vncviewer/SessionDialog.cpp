@@ -200,6 +200,9 @@ BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	SessionDialog* _this;
 	if (uMsg == WM_INITDIALOG) {
+		HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDR_TRAY));
+		SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+		SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
 		_this = (SessionDialog*)lParam;
 		helper::SafeSetWindowUserData(hwnd, lParam);
 		char version[50]{};
@@ -213,6 +216,9 @@ BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	switch (uMsg) {
 	case WM_INITDIALOG:
 	{
+		HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDR_TRAY));
+		SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+		SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
 		helper::SafeSetWindowUserData(hwnd, lParam);
 		SessionDialog* l_this = (SessionDialog*)lParam;
 		SetForegroundWindow(hwnd);
@@ -803,7 +809,7 @@ void SessionDialog::ModeSwitch(HWND hwnd, WPARAM wParam)
 		EnableWindow(GetDlgItem(hwnd, IDC_PROXY_EDIT), false);
 		ShowWindow(GetDlgItem(hwnd, IDC_HOSTNAME_EDIT), true);
 		ShowWindow(GetDlgItem(hwnd, IDC_PROXY_EDIT), false);
-		SetDlgItemText(hwnd, IDC_LINE1, "server:port");
+		SetDlgItemText(hwnd, IDC_LINE1, "server[:port]");
 		SetDlgItemText(hwnd, IDC_LINE2, "");
 		ShowWindow(GetDlgItem(hwnd, IDC_GREEN), false);
 		ShowWindow(GetDlgItem(hwnd, IDC_RED), false);

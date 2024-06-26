@@ -200,6 +200,9 @@ vncProperties::DialogProc(HWND hwnd,
 	switch (uMsg) {
 	case WM_INITDIALOG:
 	{
+		HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_WINVNC));
+		SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+		SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
 		vnclog.Print(LL_INTINFO, VNCLOG("INITDIALOG properties\n"));
 		// Retrieve the Dialog box parameter and use it as a pointer
 		// to the calling vncProperties object

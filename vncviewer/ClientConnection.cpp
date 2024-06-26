@@ -7767,7 +7767,9 @@ LRESULT CALLBACK ClientConnection::GTGBS_StatusProc(HWND hwnd, UINT iMsg, WPARAM
 				HMENU hMenu = GetSystemMenu(hwnd,0);
 				EnableMenuItem(hMenu,SC_CLOSE,MF_BYCOMMAND | MF_GRAYED);
 			}
-
+			HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDR_TRAY));
+			SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+			SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
 			return TRUE;
 		}
 	case WM_CLOSE:
@@ -7840,6 +7842,9 @@ LRESULT CALLBACK ClientConnection::GTGBS_SendCustomKey_proc(HWND Dlg, UINT iMsg,
 				Rect.right - Rect.left,
 				Rect.bottom - Rect.top,
 				SWP_SHOWWINDOW);
+			HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDR_TRAY));
+			SendMessage(Dlg, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+			SendMessage(Dlg, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
 			return TRUE;
 		}
 	case WM_CLOSE:
@@ -10044,6 +10049,9 @@ BOOL CALLBACK DialogProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 		//================================================//
 		case WM_INITDIALOG:
 			{
+				HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDR_TRAY));
+				SendMessage(hWnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+				SendMessage(hWnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
 				//CentreWindow(hWnd);
 				ClientConnection *cc=(ClientConnection*)lParam;
 

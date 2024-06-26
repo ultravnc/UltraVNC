@@ -85,6 +85,9 @@ BOOL CALLBACK vncSetAuth::DialogProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lP
 
 	case WM_INITDIALOG:
 		{
+			HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_WINVNC));
+			SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+			SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
 			// Retrieve the Dialog box parameter and use it as a pointer
 			// to the calling vncProperties object
             helper::SafeSetWindowUserData(hwnd, lParam);

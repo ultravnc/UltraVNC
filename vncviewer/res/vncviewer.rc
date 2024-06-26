@@ -313,10 +313,10 @@ BEGIN
     PUSHBUTTON      "Delete",IDC_HOSTNAME_DEL,198,97,50,13
     CONTROL         "",IDC_TAB,"SysTabControl32",TCS_MULTILINE | WS_TABSTOP,5,115,243,172
     PUSHBUTTON      "Restore defaults",IDC_DELETE,188,291,60,14
-    LTEXT           "Computer",IDC_LINE1,11,23,46,8
+    LTEXT           "Computer",IDC_LINE1,33,23,46,8
     CONTROL         IDB_VNC32,IDC_STATIC,"Static",SS_BITMAP,11,5,13,12
     LTEXT           "UltraVNC Viewer",IDC_LOGO,77,7,150,8,SS_CENTERIMAGE
-    LTEXT           "Computer",IDC_LINE2,11,38,47,8
+    LTEXT           "Computer",IDC_LINE2,33,38,47,8
     CONTROL         "Direct",IDC_RADIODIRECT,"Button",BS_AUTORADIOBUTTON,76,55,47,10
     CONTROL         "Repeater",IDC_RADIOREPEATER,"Button",BS_AUTORADIOBUTTON,128,55,47,10
     CONTROL         "",IDC_DEFAULTBOX,"Static",SS_BLACKFRAME | SS_REALSIZEIMAGE,1,0,258,89
@@ -463,9 +463,9 @@ BEGIN
     LTEXT           "BuildTime",IDC_BUILDTIME,78,18,98,10
     LTEXT           "Copyright © 2002 VNC QuickDesk\nCopyright © 1999-2002 Tridia Corporation - TridiaVNC\nCopyright © 1994-2001 AT&&T Laboratories Cambridge/Olivetti Research Ltd. - VNC",IDC_STATIC,44,74,271,25
     LTEXT           "Copyright © 1990-2002 Info-ZIP\nCopyright © 1996-2002 Markus Franz Xaver Johannes Oberhumer - Mini LZO library",IDC_STATIC,44,98,282,20
-    LTEXT           "https://uvnc.com",IDC_UVNCCOM,123,124,55,8
+    LTEXT           "https://uvnc.com",IDC_UVNCCOM,39,124,55,8
     LTEXT           "Copyright © 1999-2002 Const. Kaplinsky - TightVNC\nCopyright © 2002 RealVNC Ltd. - RealVNC\n",IDC_STATIC,44,58,203,16
-    LTEXT           "For more informations, please visit: ",IDC_STATIC,7,124,113,8
+    LTEXT           "Website:",IDC_STATIC,7,124,29,8
 END
 
 IDD_FTCONFIRM_DLG DIALOGEX 0, 0, 227, 86
@@ -481,27 +481,25 @@ BEGIN
     PUSHBUTTON      "No for all",IDC_NOALL_B,166,65,53,14
 END
 
-IDD_APP_MESSAGE2 DIALOGEX 0, 0, 273, 123
+IDD_APP_MESSAGE2 DIALOGEX 0, 0, 273, 109
 STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "UltraVNC Viewer - Information"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    DEFPUSHBUTTON   "Close",IDOK,213,101,54,15
-    LTEXT           "Info Message",IDC_Message2,48,35,215,26
+    DEFPUSHBUTTON   "Close",IDOK,213,87,54,15
+    LTEXT           "Info Message",IDC_Message2,43,35,215,26
     CONTROL         IDB_VNC64,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE,5,7,34,29
-    LTEXT           "UltraVNC Viewer 1.4.4.0-dev",IDC_UVVERSION2,48,6,199,11
-    LTEXT           "Built",IDC_STATIC,48,17,15,10
+    LTEXT           "UltraVNC Viewer 1.4.4.0-dev",IDC_UVVERSION2,43,6,199,11
+    LTEXT           "Built",IDC_STATIC,43,17,15,10
     LTEXT           "BuildTime",IDC_BUILDTIME,68,17,98,10
-    LTEXT           "forum",IDC_FORUMHYPERLINK,44,80,19,8
-    LTEXT           "uVNC.com",IDC_WEBSITE,83,70,35,8
-    LTEXT           "Git.",IDC_GIT,95,90,12,8
-    LTEXT           "downloads.",IDC_WEBDOWNLOAD,53,100,37,8
-    LTEXT           "Please visit our website",IDC_STATIC,5,70,76,8
-    LTEXT           " further information.",IDC_STATIC,118,70,63,8
-    LTEXT           "Explore the",IDC_STATIC,5,80,37,8
-    LTEXT           "for potential solutions.",IDC_STATIC,64,80,71,8
-    LTEXT           "Explore the source code on",IDC_STATIC,5,90,88,8
-    LTEXT           "Find the latest",IDC_STATIC,5,100,46,8
+    LTEXT           "https://forum.uvnc.com",IDC_FORUMHYPERLINK,56,74,102,8
+    LTEXT           "https://uvnc.com",IDC_WEBSITE,56,64,94,8
+    LTEXT           "https://github.com/ultravnc/ultravnc",IDC_GIT,56,84,144,8
+    LTEXT           "https://uvnc.com/downloads/ultravnc.html",IDC_WEBDOWNLOAD,56,94,135,8
+    LTEXT           "Website:",IDC_STATIC,10,64,38,8
+    LTEXT           "Forum:",IDC_STATIC,10,74,38,8
+    LTEXT           "Git:",IDC_STATIC,10,84,38,8
+    LTEXT           "Downloads:",IDC_STATIC,10,94,38,8
 END
 
 IDD_AUTH_DIALOG3 DIALOGEX 101, 66, 234, 58
@@ -595,13 +593,13 @@ BEGIN
     CONTROL         "ZYWRLE",IDC_ZYWRLERADIO,"Button",BS_AUTORADIOBUTTON,14,97,38,10
     CONTROL         "XZ",IDC_XZRADIO,"Button",BS_AUTORADIOBUTTON,54,97,24,10
     CONTROL         "XZYW",IDC_XZYWRADIO,"Button",BS_AUTORADIOBUTTON,86,97,37,10
-    CONTROL         "Full colors",IDC_FULLCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,153,27,48,10
-    CONTROL         "256 colors",IDC_256COLORS_RADIO,"Button",BS_AUTORADIOBUTTON,153,37,49,10
-    CONTROL         "64 colors",IDC_64COLORS_RADIO,"Button",BS_AUTORADIOBUTTON,153,47,45,10
-    CONTROL         "8 colors",IDC_8COLORS_RADIO,"Button",BS_AUTORADIOBUTTON,153,57,41,10
-    CONTROL         "8 Dark colors",IDC_8GREYCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON,153,67,54,10
-    CONTROL         "4 Grey colors",IDC_4GREYCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON,153,77,58,10
-    CONTROL         "Black && White",IDC_2GREYCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON,153,87,57,10
+    CONTROL         "Full colors",IDC_FULLCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,142,21,48,10
+    CONTROL         "256 colors",IDC_256COLORS_RADIO,"Button",BS_AUTORADIOBUTTON,142,31,49,10
+    CONTROL         "64 colors",IDC_64COLORS_RADIO,"Button",BS_AUTORADIOBUTTON,142,41,45,10
+    CONTROL         "8 colors",IDC_8COLORS_RADIO,"Button",BS_AUTORADIOBUTTON,142,51,41,10
+    CONTROL         "8 Dark colors",IDC_8GREYCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON,142,61,54,10
+    CONTROL         "4 Grey colors",IDC_4GREYCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON,142,71,58,10
+    CONTROL         "Black && White",IDC_2GREYCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON,142,81,57,10
     CONTROL         "Zlib compression",IDC_ALLOW_COMPRESSLEVEL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,114,68,10
     EDITTEXT        IDC_COMPRESSLEVEL,87,113,14,12,ES_AUTOHSCROLL
     CONTROL         "JPEG Quality",IDC_ALLOW_JPEG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,127,54,10
@@ -614,7 +612,6 @@ BEGIN
     LTEXT           "Low CPU high bandwidth",IDC_STATIC,8,17,80,8
     LTEXT           "High CPU middle bandwidth (lossless)",IDC_STATIC,8,41,119,8
     LTEXT           "Middle CPU low bandwidth (lossy)",IDC_STATIC,8,64,108,8
-    LTEXT           "Less colors=less bandwidth",IDC_STATIC,142,17,90,10
 END
 
 IDD_DISPLAY DIALOGEX 0, 0, 240, 145
@@ -889,13 +886,15 @@ BEGIN
     BEGIN
         LEFTMARGIN, 5
         RIGHTMARGIN, 267
-        VERTGUIDE, 48
+        VERTGUIDE, 9
+        VERTGUIDE, 43
         VERTGUIDE, 86
         VERTGUIDE, 94
         VERTGUIDE, 108
         TOPMARGIN, 7
-        BOTTOMMARGIN, 116
+        BOTTOMMARGIN, 102
         HORZGUIDE, 35
+        HORZGUIDE, 60
         HORZGUIDE, 78
         HORZGUIDE, 86
     END

@@ -343,6 +343,9 @@ namespace ScSelect {
 			KillTimer(NULL, m_mytimerid);
 			break;
 		case WM_INITDIALOG: {
+			HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_WINVNC));
+			SendMessage(hWnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+			SendMessage(hWnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
 			SetFocus(hWnd);
 			hList = GetDlgItem(hWnd, IDC_LIST); // get the ID of the ListView
 			SendMessageW(hList, LVM_SETEXTENDEDLISTVIEWSTYLE, 0,   LVS_EX_FULLROWSELECT | LVS_EX_AUTOSIZECOLUMNS | LVS_EX_FLATSB | LVS_REPORT); // Set style
