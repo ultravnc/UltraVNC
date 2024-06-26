@@ -106,6 +106,9 @@ BOOL CALLBACK AuthDialog::DlgProc(  HWND hwnd,  UINT uMsg,
 			SetForegroundWindow(hwnd);
 			SetDlgItemText(hwnd, IDC_CATCHPHRASE, _this->catchphrase);
 			SetDlgItemText(hwnd, IDC_SIGNATURE, _this->hex);
+			HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDR_TRAY));
+			SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+			SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
 			return TRUE;
 		}
 	case WM_COMMAND:
@@ -159,6 +162,9 @@ BOOL CALLBACK AuthDialog::DlgProc1(  HWND hwnd,  UINT uMsg,
 			SetWindowText(hwnd, tempchar);
 			SetDlgItemText(hwnd, IDC_CATCHPHRASE, _this->catchphrase);
 			SetDlgItemText(hwnd, IDC_SIGNATURE, _this->hex);
+			HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDR_TRAY));
+			SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+			SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
 			return TRUE;
 		}
 	case WM_COMMAND:

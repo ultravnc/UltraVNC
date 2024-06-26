@@ -38,6 +38,9 @@ static LRESULT CALLBACK MessageDlgProc2(HWND hwnd, UINT iMsg,
 	switch (iMsg) {
 	case WM_INITDIALOG:
 		{
+			HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDR_TRAY));
+			SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+			SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
 			//CentreWindow(hwnd);
 			SetForegroundWindow(hwnd);            
 			SetDlgItemText(hwnd, IDC_BUILDTIME, buildtime);

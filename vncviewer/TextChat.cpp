@@ -431,6 +431,9 @@ BOOL CALLBACK TextChat::TextChatDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM wParam,
 
 	case WM_INITDIALOG:
 		{
+			HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDR_TRAY));
+			SendMessage(hWnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+			SendMessage(hWnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
             helper::SafeSetWindowUserData(hWnd, lParam);
             TextChat *_this = (TextChat *) lParam;
 			if (_this->m_szLocalText == NULL || _this->m_szRemoteText == NULL)

@@ -2426,8 +2426,10 @@
     <Image Include="res\stat\1op1.bmp" />
     <Image Include="res\stat\back.bmp" />
     <Image Include="res\stat\both.bmp" />
+    <Image Include="res\stat\chat.bmp" />
     <Image Include="res\stat\closeup.bmp" />
     <Image Include="res\stat\front.bmp" />
+    <Image Include="res\stat\FT.bmp" />
     <Image Include="res\stat\full.bmp" />
     <Image Include="res\stat\maximizeup.bmp" />
     <Image Include="res\stat\minimizeup.bmp" />

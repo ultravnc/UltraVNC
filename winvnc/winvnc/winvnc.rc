@@ -80,13 +80,13 @@ BEGIN
     CONTROL         IDB_LOGO64,IDC_VNCLOGO,"Static",SS_BITMAP | SS_CENTERIMAGE,7,5,39,25
     LTEXT           "UltraVNC Server 1.4.4.0-dev",IDC_VERSION,49,5,145,11
     LTEXT           "Copyright © 2002-2024 UltraVNC Team Members\nCopyright © 2001-2002 Sam - eSVNC\nCopyright © 1999-2002 Rudi D. V. - VdaccVNC",IDC_NAME,49,32,222,28
-    LTEXT           "For more informations, please visit: ",IDC_WWW2,17,128,123,11
+    LTEXT           "Website:",IDC_WWW2,17,128,39,11
     LTEXT           "Built",IDC_BUILDTEXT,49,16,20,10
     LTEXT           "BuildTime",IDC_BUILDTIME,72,16,92,10
     LTEXT           "Copyright © 2002 RealVNC Ltd. - RealVNC\nCopyright © 1999-2002 Tridia Corporation - TridiaVNC\nCopyright © 1994-2001 AT&&T Laboratories Cambridge/Olivetti Research Ltd. - VNC",IDC_STATIC,49,72,272,25
     LTEXT           "Copyright © 1990-2002 Info-ZIP\nCopyright © 1996-2002 Markus Franz Xaver Johannes Oberhumer - Mini LZO library",IDC_STATIC,49,96,279,20
     LTEXT           "Copyright © 2001 Harakan Software - PalmVNC\nCopyright © 1999-2002 Const. Kaplinsky - TightVNC\n",IDC_STATIC,49,56,261,16
-    LTEXT           "https://uvnc.com/",IDC_WWW,131,128,61,8
+    LTEXT           "https://uvnc.com/",IDC_WWW,60,128,61,8
 END
 
 IDD_OUTGOING_CONN DIALOGEX 0, 0, 223, 88

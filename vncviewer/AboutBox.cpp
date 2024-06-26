@@ -117,6 +117,11 @@ static LRESULT CALLBACK AboutDlgProc(HWND hwnd, UINT iMsg,
             strcpy_s(title, "UltraVNC Viewer - ");
             strcat_s(title, GetVersionFromResource(version));
             SetDlgItemText(hwnd, IDC_UVVERSION, title);
+
+            HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDR_TRAY));
+            SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+            SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+
 			return TRUE;
 		}
 	case WM_CLOSE:
