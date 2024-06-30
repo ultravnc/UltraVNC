@@ -254,6 +254,9 @@ VNCOptions::VNCOptions()
 	m_keepAliveInterval = KEEPALIVE_INTERVAL;
 	m_IdleInterval = 0;
 	m_throttleMouse = 0; // adzm 2010-10
+	
+	m_HideEndOfStreamError = false;
+	
 	setDefaultOptionsFileName(m_optionfile);
 	LoadOptions(getDefaultOptionsFileName());
 }
@@ -1140,6 +1143,7 @@ void VNCOptions::SaveOptions(char* fname)
 	saveInt("AllowUntrustedServers", m_AllowUntrustedServers, fname);
 	saveInt("viewonly", m_ViewOnly, fname);
 	saveInt("nostatus", m_NoStatus, fname);
+	saveInt("HideEOStreamError", m_HideEndOfStreamError, fname);
 	saveInt("nohotkeys", m_NoHotKeys, fname);
 	saveInt("showtoolbar", m_ShowToolbar, fname);
 	saveInt("fullscreen", m_FullScreen, fname);
@@ -1236,6 +1240,7 @@ void VNCOptions::LoadOptions(char* fname)
 	m_AllowUntrustedServers = readInt("AllowUntrustedServers", m_AllowUntrustedServers, fname) != 0;
 	m_ViewOnly = readInt("viewonly", m_ViewOnly, fname) != 0;
 	m_NoStatus = readInt("nostatus", m_NoStatus, fname) != 0;
+	m_HideEndOfStreamError = readInt("HideEOStreamError", m_HideEndOfStreamError, fname) != 0;
 	m_NoHotKeys = readInt("nohotkeys", m_NoHotKeys, fname) != 0;
 	m_ShowToolbar = readInt("showtoolbar", m_ShowToolbar, fname) != 0;
 	m_FullScreen = readInt("fullscreen", m_FullScreen, fname) != 0;
