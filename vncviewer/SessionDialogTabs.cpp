@@ -940,6 +940,8 @@ void SessionDialog::InitDlgProcMisc()
 	SetDlgItemText(hwnd, IDC_PREFIX, prefix);
 	HWND hNoStatus = GetDlgItem(hwnd, IDC_HIDESTATUS);
 	SendMessage(hNoStatus, BM_SETCHECK, NoStatus, 0);
+	HWND hHideEndOfStreamError = GetDlgItem(hwnd, IDC_HIDEENDOFSTREAMERROR);
+	SendMessage(hHideEndOfStreamError, BM_SETCHECK, HideEndOfStreamError, 0);
 	HWND hcomboscreen = GetDlgItem(hwnd, IDC_IMAGEFORMAT);
 	SendMessage(hcomboscreen, CB_RESETCONTENT, 0, 0);
 	SendMessage(hcomboscreen, CB_ADDSTRING, 0, (LPARAM)".jpeg");
@@ -1205,6 +1207,10 @@ void SessionDialog::ReadDlgProcMisc()
 
 	HWND hNoStatus = GetDlgItem(hwnd, IDC_HIDESTATUS);
 	NoStatus = (SendMessage(hNoStatus, BM_GETCHECK, 0, 0) == BST_CHECKED);
+	
+	HWND hHideEndOfStreamError = GetDlgItem(hwnd, IDC_HIDEENDOFSTREAMERROR);
+	HideEndOfStreamError = (SendMessage(hHideEndOfStreamError, BM_GETCHECK, 0, 0) == BST_CHECKED);
+
 	GetDlgItemText(hwnd, IDC_IMAGEFORMAT, imageFormat, 56);
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -1562,6 +1568,7 @@ void SessionDialog::StartListener()
 	m_pOpt->m_restricted = restricted;
 	m_pOpt->m_AllowUntrustedServers = AllowUntrustedServers;
 	m_pOpt->m_NoStatus = NoStatus;
+	m_pOpt->m_HideEndOfStreamError = HideEndOfStreamError;
 	m_pOpt->m_NoHotKeys = NoHotKeys;
 #ifdef _Gii
 	m_pOpt->m_giiEnable = giiEnable;

@@ -125,6 +125,7 @@ public:
 	bool restricted;
 	bool AllowUntrustedServers;
 	bool NoStatus;
+	bool HideEndOfStreamError;
 	bool NoHotKeys;
 	bool setdefaults;
 	bool connect(HWND hwnd);
