@@ -610,6 +610,9 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 		else if (SwitchMatch(args[j], _T("nostatus"))) {
 			m_NoStatus = true;
 		}
+		else if (SwitchMatch(args[j], _T("hideendofstreamerror"))) {
+			m_HideEndOfStreamError = true;
+		}
 		else if (SwitchMatch(args[j], _T("nohotkeys"))) {
 			m_NoHotKeys = true;
 		}
@@ -1355,7 +1358,7 @@ void VNCOptions::ShowUsage(LPTSTR info) {
 			"      [/encodings xz zrle ...]  (in order of priority)\r\n"
 			"      [/autoacceptincoming] [/autoacceptnodsm] [/disablesponsor][/InfoMsg \"Messages need quotes\"]\r\n" //adzm 2009-06-21, adzm 2009-07-19
 			"      [/requireencryption] [/enablecache] [/throttlemouse n] [/socketkeepalivetimeout n]\r\n" //adzm 2010-05-12
-			"      [/gnome]\r\n"
+			"      [/gnome] [/hideendofstreamerror]\r\n"
 			"For full details see documentation."),
 		tmpinf);
 	yesUVNCMessageBox(NULL, msg, sz_A2, MB_ICONINFORMATION);
