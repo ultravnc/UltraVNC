@@ -123,6 +123,7 @@ public:
 	bool fAutoAcceptNoDSM;
 	bool fRequireEncryption;
 	bool restricted;
+	bool ipv6;
 	bool AllowUntrustedServers;
 	bool NoStatus;
 	bool NoHotKeys;

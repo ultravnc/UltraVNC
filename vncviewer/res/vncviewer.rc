@@ -679,16 +679,17 @@ BEGIN
     PUSHBUTTON      "Config encryption plugins",IDC_PLUGIN_BUTTON,74,20,138,12
     CONTROL         "Only allow encrypted servers.",IDC_ONLYENCRYPTED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,35,112,10
     CONTROL         "Share the Server, allow other to connect.",IDC_SHARED,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,46,163,10
-    CONTROL         "Disable clipboard transfer",IDC_DISABLECLIPBOARD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,57,171,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,45,163,10
+    CONTROL         "Disable clipboard transfer",IDC_DISABLECLIPBOARD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,55,171,10
     CONTROL         "Auto accept incoming (listener mode)",IDC_AUTOACCEPT,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,68,178,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,65,178,10
     CONTROL         "Ignore no encryption warning (listener mode)",IDC_AUTOACCEPTNOWARN,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,79,201,10
-    CONTROL         "Hide menu",IDC_HIDEMENU,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,90,49,10
-    EDITTEXT        IDC_EDITCUSTOMMESSAGE,4,105,232,36,ES_MULTILINE
-    LTEXT           "Notification on connect",IDC_STATIC,90,97,75,8
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,75,201,10
+    CONTROL         "Hide menu",IDC_HIDEMENU,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,85,49,10
+    EDITTEXT        IDC_EDITCUSTOMMESSAGE,4,116,232,25,ES_MULTILINE
+    LTEXT           "Notification on connect",IDC_STATIC,4,108,75,8
     CONTROL         "Only servers with password",IDC_ONLYPASSWORD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,125,35,104,10
+    CONTROL         "Use IPv6",IDC_IPV6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,95,44,10
 END
 
 IDD_KEYBOARDMOUSE DIALOGEX 0, 0, 240, 145

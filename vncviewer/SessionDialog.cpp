@@ -147,6 +147,7 @@ SessionDialog::SessionDialog(VNCOptions* pOpt, ClientConnection* pCC, CDSMPlugin
 	fAutoAcceptNoDSM = m_pOpt->m_fAutoAcceptNoDSM;
 	fRequireEncryption = m_pOpt->m_fRequireEncryption;
 	restricted = m_pOpt->m_restricted;
+	ipv6 = m_pOpt->m_ipv6;
 	AllowUntrustedServers = m_pOpt->m_AllowUntrustedServers;
 	NoStatus = m_pOpt->m_NoStatus;
 	NoHotKeys = m_pOpt->m_NoHotKeys;
@@ -697,6 +698,7 @@ bool SessionDialog::connect(HWND hwnd)
 	m_pOpt->m_fAutoAcceptNoDSM = fAutoAcceptNoDSM;
 	m_pOpt->m_fRequireEncryption = fRequireEncryption;
 	m_pOpt->m_restricted = restricted;
+	m_pOpt->m_ipv6 = ipv6;
 	m_pOpt->m_AllowUntrustedServers = AllowUntrustedServers;
 	m_pOpt->m_NoStatus = NoStatus;
 	m_pOpt->m_NoHotKeys = NoHotKeys;

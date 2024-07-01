@@ -204,6 +204,7 @@ VNCOptions::VNCOptions()
 	m_listening = false;
 	m_listenPort = INCOMING_PORT_OFFSET;
 	m_restricted = false;
+	m_ipv6 = false;
 	m_AllowUntrustedServers = false;
 	// Tight specific
 	m_useCompressLevel = true;
@@ -413,6 +414,7 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
 	m_listening = s.m_listening;
 	m_listenPort = s.m_listenPort;
 	m_restricted = s.m_restricted;
+	m_ipv6 = s.m_ipv6;
 	m_AllowUntrustedServers = s.m_AllowUntrustedServers;
 
 	// Tight specific
@@ -597,6 +599,9 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 		}
 		else if (SwitchMatch(args[j], _T("restricted"))) {
 			m_restricted = true;
+		}
+		else if (SwitchMatch(args[j], _T("ipv6"))) {
+			m_ipv6 = true;
 		}
 		else if (SwitchMatch(args[j], _T("AllowUntrustedServers"))) {
 			m_AllowUntrustedServers = true;
@@ -1137,6 +1142,7 @@ void VNCOptions::SaveOptions(char* fname)
 		saveInt("preferred_encoding", m_PreferredEncodings[0], fname);
 	}
 	saveInt("restricted", m_restricted, fname);
+	saveInt("ipv6", m_ipv6, fname);
 	saveInt("AllowUntrustedServers", m_AllowUntrustedServers, fname);
 	saveInt("viewonly", m_ViewOnly, fname);
 	saveInt("nostatus", m_NoStatus, fname);
@@ -1233,6 +1239,7 @@ void VNCOptions::LoadOptions(char* fname)
 	m_PreferredEncodings.push_back(nPreferredEncoding);
 
 	m_restricted = readInt("restricted", m_restricted, fname) != 0;
+	m_ipv6 = readInt("ipv6", m_ipv6, fname) != 0;
 	m_AllowUntrustedServers = readInt("AllowUntrustedServers", m_AllowUntrustedServers, fname) != 0;
 	m_ViewOnly = readInt("viewonly", m_ViewOnly, fname) != 0;
 	m_NoStatus = readInt("nostatus", m_NoStatus, fname) != 0;

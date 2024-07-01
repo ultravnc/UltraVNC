@@ -35,7 +35,7 @@ bool GetListenMode();
 class Daemon  
 {
 public:
-	Daemon(int port);
+	Daemon(int port, bool ipv6);
 	virtual ~Daemon();
 	static LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam);
 protected:
@@ -43,12 +43,10 @@ protected:
 	void CheckTrayIcon();
 	void RemoveTrayIcon();
 	bool SendTrayMsg(DWORD msg);
-#ifdef IPV6V4
-	SOCKET m_deamon_sock6;
-	SOCKET m_deamon_sock4;
-#else
-	SOCKET m_deamon_sock;
-#endif
+	bool ipv6;
+	SOCKET m_deamon_sock6 = INVALID_SOCKET;
+	SOCKET m_deamon_sock4 = INVALID_SOCKET;
+	SOCKET m_deamon_sock = INVALID_SOCKET;
 
 	HWND m_hwnd;
 	HMENU m_hmenu;

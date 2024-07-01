@@ -271,60 +271,68 @@ ClientConnection::ClientConnection(VNCviewerApp *pApp, SOCKET sock)
 	//WE write port and ip in m_port and m_host
 	//Using IPv4 a.b.c.d  IPv6  xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx
 
-#ifdef IPV6V4
-	struct sockaddr_storage svraddr;
-	int sasize = sizeof(svraddr);
-	memset(&svraddr, 0, sizeof(svraddr));
-	if (getpeername(sock, (struct sockaddr *) &svraddr,&sasize) != SOCKET_ERROR) 
-	{
-		if (svraddr.ss_family == AF_INET) {
-			struct sockaddr_in *s = (struct sockaddr_in *)&svraddr;
-			m_port = ntohs(s->sin_port);
-			_snprintf_s(m_host, 250, _T("%d.%d.%d.%d"),
-				s->sin_addr.S_un.S_un_b.s_b1,
-				s->sin_addr.S_un.S_un_b.s_b2,
-				s->sin_addr.S_un.S_un_b.s_b3,
-				s->sin_addr.S_un.S_un_b.s_b4);
-		}
-		else
+	if (m_opts->m_ipv6) {
+		struct sockaddr_storage svraddr;
+		int sasize = sizeof(svraddr);
+		memset(&svraddr, 0, sizeof(svraddr));
+		if (getpeername(sock, (struct sockaddr*)&svraddr, &sasize) != SOCKET_ERROR)
 		{
+			if (svraddr.ss_family == AF_INET) {
+				struct sockaddr_in* s = (struct sockaddr_in*)&svraddr;
+				m_port = ntohs(s->sin_port);
+				_snprintf_s(m_host, 250, _T("%d.%d.%d.%d"),
+					s->sin_addr.S_un.S_un_b.s_b1,
+					s->sin_addr.S_un.S_un_b.s_b2,
+					s->sin_addr.S_un.S_un_b.s_b3,
+					s->sin_addr.S_un.S_un_b.s_b4);
+			}
+			else
+			{
 #undef Byte
-			struct sockaddr_in6 *s = (struct sockaddr_in6 *)&svraddr;
-			m_port = ntohs(s->sin6_port);
-			_snprintf_s(m_host, 250, _T("%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x"),
-				s->sin6_addr.u.Byte[0],
-				s->sin6_addr.u.Byte[1],
-				s->sin6_addr.u.Byte[2],
-				s->sin6_addr.u.Byte[3],
-				s->sin6_addr.u.Byte[4],
-				s->sin6_addr.u.Byte[5],
-				s->sin6_addr.u.Byte[6],
-				s->sin6_addr.u.Byte[7],
-				s->sin6_addr.u.Byte[8],
-				s->sin6_addr.u.Byte[9],
-				s->sin6_addr.u.Byte[10],
-				s->sin6_addr.u.Byte[11],
-				s->sin6_addr.u.Byte[12],
-				s->sin6_addr.u.Byte[13],
-				s->sin6_addr.u.Byte[14],
-				s->sin6_addr.u.Byte[15]);
+				struct sockaddr_in6* s = (struct sockaddr_in6*)&svraddr;
+				m_port = ntohs(s->sin6_port);
+				_snprintf_s(m_host, 250, _T("%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x"),
+					s->sin6_addr.u.Byte[0],
+					s->sin6_addr.u.Byte[1],
+					s->sin6_addr.u.Byte[2],
+					s->sin6_addr.u.Byte[3],
+					s->sin6_addr.u.Byte[4],
+					s->sin6_addr.u.Byte[5],
+					s->sin6_addr.u.Byte[6],
+					s->sin6_addr.u.Byte[7],
+					s->sin6_addr.u.Byte[8],
+					s->sin6_addr.u.Byte[9],
+					s->sin6_addr.u.Byte[10],
+					s->sin6_addr.u.Byte[11],
+					s->sin6_addr.u.Byte[12],
+					s->sin6_addr.u.Byte[13],
+					s->sin6_addr.u.Byte[14],
+					s->sin6_addr.u.Byte[15]);
+			}
 		}
-#else
-	struct sockaddr_in svraddr;
-	int sasize = sizeof(svraddr);
-	if (getpeername(sock, (struct sockaddr *) &svraddr,
-		&sasize) != SOCKET_ERROR) {
-		_snprintf_s(m_host, 250, _T("%d.%d.%d.%d"),
-			svraddr.sin_addr.S_un.S_un_b.s_b1,
-			svraddr.sin_addr.S_un.S_un_b.s_b2,
-			svraddr.sin_addr.S_un.S_un_b.s_b3,
-			svraddr.sin_addr.S_un.S_un_b.s_b4);
-		m_port = svraddr.sin_port;
-#endif
-	} else {
-		_tcscpy_s(m_host,sz_L1);
-		m_port = 0;
-	};
+		else {
+			_tcscpy_s(m_host, sz_L1);
+			m_port = 0;
+		};
+	}
+	else {
+		struct sockaddr_in svraddr;
+		int sasize = sizeof(svraddr);
+		if (getpeername(sock, (struct sockaddr*)&svraddr,
+			&sasize) != SOCKET_ERROR) {
+			_snprintf_s(m_host, 250, _T("%d.%d.%d.%d"),
+				svraddr.sin_addr.S_un.S_un_b.s_b1,
+				svraddr.sin_addr.S_un.S_un_b.s_b2,
+				svraddr.sin_addr.S_un.S_un_b.s_b3,
+				svraddr.sin_addr.S_un.S_un_b.s_b4);
+			m_port = svraddr.sin_port;
+		}
+		else {
+			_tcscpy_s(m_host, sz_L1);
+			m_port = 0;
+		};
+	}
+	
 }
 
 // adzm - 2010-07 - Extended clipboard
@@ -1892,143 +1900,194 @@ void ClientConnection::Connect(bool cloud)
 		m_port = 5953;
 	}
 
-#ifdef IPV6V4
-	bool IsIpv4 = false;
-	bool IsIpv6 = false;
-	struct sockaddr_in6 Ipv6Addr;
-	struct sockaddr_in Ipv4Addr;
-	memset(&Ipv6Addr, 0, sizeof(Ipv6Addr));
-	memset(&Ipv4Addr, 0, sizeof(Ipv4Addr));
-	struct addrinfo hint, *info = 0;
-	memset(&hint, 0, sizeof(hint));
-
-	LPSOCKADDR sockaddr_ip;
-	char ipstringbuffer[46];
-	DWORD ipbufferlength = 46;
-
-
-	//test if m_host is a IPv4 or IPv6 ip address
-	hint.ai_family = AF_UNSPEC;
-	hint.ai_flags = AI_NUMERICHOST;
-	if (getaddrinfo(m_host, 0, &hint, &info) == 0)
-	{
-		if (info->ai_family == AF_INET6)
-		{
-			IsIpv6 = true;
-			inet_pton(AF_INET6, m_host, &(Ipv6Addr.sin6_addr));
-			Ipv6Addr.sin6_family = AF_INET6;
-			Ipv6Addr.sin6_port = htons(m_port);
-		}
-		if (info->ai_family == AF_INET)
-		{
-			IsIpv4 = true;
-			inet_pton(AF_INET, m_host, &(Ipv4Addr.sin_addr));
-			Ipv4Addr.sin_family = AF_INET;
-			Ipv4Addr.sin_port = htons(m_port);
-		}
-	}
-	freeaddrinfo(info);
-	// Use dns to find the corresponding ip address
-	// It can be IPv4 IPv6 or both
-	if (!IsIpv4 && !IsIpv6)
-	{
-		struct addrinfo *serverinfo = 0;
+	if (m_opts->m_ipv6) {
+		bool IsIpv4 = false;
+		bool IsIpv6 = false;
+		struct sockaddr_in6 Ipv6Addr;
+		struct sockaddr_in Ipv4Addr;
+		memset(&Ipv6Addr, 0, sizeof(Ipv6Addr));
+		memset(&Ipv4Addr, 0, sizeof(Ipv4Addr));
+		struct addrinfo hint, * info = 0;
 		memset(&hint, 0, sizeof(hint));
+
+		LPSOCKADDR sockaddr_ip;
+		char ipstringbuffer[46];
+		DWORD ipbufferlength = 46;
+
+
+		//test if m_host is a IPv4 or IPv6 ip address
 		hint.ai_family = AF_UNSPEC;
-		hint.ai_socktype = SOCK_STREAM;
-		hint.ai_protocol = IPPROTO_TCP;
-		struct sockaddr_in6 *pIpv6Addr;
-		struct sockaddr_in *pIpv4Addr;
-		if (getaddrinfo(m_host, 0, &hint, &serverinfo) == 0)
+		hint.ai_flags = AI_NUMERICHOST;
+		if (getaddrinfo(m_host, 0, &hint, &info) == 0)
 		{
-			struct addrinfo *p;
-			for (p = serverinfo; p != NULL; p = p->ai_next) {
-				switch (p->ai_family) {
-				case AF_INET:
-					IsIpv4 = true;
-					pIpv4Addr = (struct sockaddr_in *) p->ai_addr;
-					memcpy(&Ipv4Addr, pIpv4Addr, sizeof(Ipv4Addr));
-					Ipv4Addr.sin_family = AF_INET;
-					Ipv4Addr.sin_port = htons(m_port);
-					break;
-				case AF_INET6:
-					IsIpv6 = true;
-					pIpv6Addr = (struct sockaddr_in6 *) p->ai_addr;
-					memcpy(&Ipv6Addr, pIpv6Addr, sizeof(Ipv6Addr));
-					Ipv6Addr.sin6_family = AF_INET6;
-					Ipv6Addr.sin6_port = htons(m_port);
+			if (info->ai_family == AF_INET6)
+			{
+				IsIpv6 = true;
+				inet_pton(AF_INET6, m_host, &(Ipv6Addr.sin6_addr));
+				Ipv6Addr.sin6_family = AF_INET6;
+				Ipv6Addr.sin6_port = htons(m_port);
+			}
+			if (info->ai_family == AF_INET)
+			{
+				IsIpv4 = true;
+				inet_pton(AF_INET, m_host, &(Ipv4Addr.sin_addr));
+				Ipv4Addr.sin_family = AF_INET;
+				Ipv4Addr.sin_port = htons(m_port);
+			}
+		}
+		freeaddrinfo(info);
+		// Use dns to find the corresponding ip address
+		// It can be IPv4 IPv6 or both
+		if (!IsIpv4 && !IsIpv6)
+		{
+			struct addrinfo* serverinfo = 0;
+			memset(&hint, 0, sizeof(hint));
+			hint.ai_family = AF_UNSPEC;
+			hint.ai_socktype = SOCK_STREAM;
+			hint.ai_protocol = IPPROTO_TCP;
+			struct sockaddr_in6* pIpv6Addr;
+			struct sockaddr_in* pIpv4Addr;
+			if (getaddrinfo(m_host, 0, &hint, &serverinfo) == 0)
+			{
+				struct addrinfo* p;
+				for (p = serverinfo; p != NULL; p = p->ai_next) {
+					switch (p->ai_family) {
+					case AF_INET:
+						IsIpv4 = true;
+						pIpv4Addr = (struct sockaddr_in*)p->ai_addr;
+						memcpy(&Ipv4Addr, pIpv4Addr, sizeof(Ipv4Addr));
+						Ipv4Addr.sin_family = AF_INET;
+						Ipv4Addr.sin_port = htons(m_port);
+						break;
+					case AF_INET6:
+						IsIpv6 = true;
+						pIpv6Addr = (struct sockaddr_in6*)p->ai_addr;
+						memcpy(&Ipv6Addr, pIpv6Addr, sizeof(Ipv6Addr));
+						Ipv6Addr.sin6_family = AF_INET6;
+						Ipv6Addr.sin6_port = htons(m_port);
 
-					sockaddr_ip = (LPSOCKADDR)p->ai_addr;
-					ipbufferlength = 46;
-					memset(ipstringbuffer, 0, 46);
-					WSAAddressToString(sockaddr_ip, (DWORD)p->ai_addrlen, NULL,ipstringbuffer, &ipbufferlength);
+						sockaddr_ip = (LPSOCKADDR)p->ai_addr;
+						ipbufferlength = 46;
+						memset(ipstringbuffer, 0, 46);
+						WSAAddressToString(sockaddr_ip, (DWORD)p->ai_addrlen, NULL, ipstringbuffer, &ipbufferlength);
 
-					break;
-				default:
-					break;
+						break;
+					default:
+						break;
+					}
+
+
 				}
 
+			}
+			freeaddrinfo(serverinfo);
+		}
+
+		if (!m_opts->m_NoStatus && !m_hwndStatus) GTGBS_ShowConnectWindow();
+		int escapecounter = 0;
+		while (!m_hwndStatus)
+		{
+			Sleep(100);
+			escapecounter++;
+			if (escapecounter > 50) break;
+		}
+		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L43); Sleep(200); }
+		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L45); Sleep(200); }
+		if (m_hwndStatus) UpdateWindow(m_hwndStatus);
+
+		if (!IsIpv4 && !IsIpv6)
+		{
+			SetEvent(KillEvent);
+			if (m_hwndStatus) SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L46);
+			throw WarningException(sz_L46, IDS_L46);
+		}
+		if (IsIpv6 && IsIpv4)
+		{
+			char			szText[256];
+			_snprintf_s(szText, 256, "IPv4: %s\nIPv6: %s \n", inet_ntoa(Ipv4Addr.sin_addr), ipstringbuffer);
+			if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500); }
+		}
+		else if (IsIpv6)
+		{
+			char			szText[256];
+			_snprintf_s(szText, 256, "IPv6: %s \n", ipstringbuffer);
+			if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500); }
+		}
+		else if (IsIpv4)
+		{
+			char			szText[256];
+			_snprintf_s(szText, 256, "IPv4: %s \n", inet_ntoa(Ipv4Addr.sin_addr));
+			if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500); }
+		}
+
+		if (IsIpv6)
+		{
+			if (m_sock != NULL && m_sock != INVALID_SOCKET) closesocket(m_sock);
+			m_sock = socket(PF_INET6, SOCK_STREAM, 0);
+			if (m_sock == INVALID_SOCKET && !IsIpv4) {
+				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L44);
+				throw WarningException(sz_L44);
+			}
+			if (m_sock != INVALID_SOCKET)
+			{
+				int res;
+				char			szText[256];
+				_snprintf_s(szText, 256, "IPv6: %s \n", sz_L47);
+				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, szText);
+				if (m_hwndStatus)ShowWindow(m_hwndStatus, SW_SHOW);
+				if (m_hwndStatus)UpdateWindow(m_hwndStatus);
+				if (m_hwndStatus)SetDlgItemInt(m_hwndStatus, IDC_PORT, m_port, FALSE);
+
+				DWORD				  threadID;
+				if (ThreadSocketTimeout)
+				{
+					havetobekilled = false; //force SocketTimeout thread to quit
+					WaitForSingleObject(ThreadSocketTimeout, 5000);
+					CloseHandle(ThreadSocketTimeout);
+					ThreadSocketTimeout = NULL;
+				}
+				ThreadSocketTimeout = CreateThread(NULL, 0, SocketTimeout, (LPVOID)&m_sock, 0, &threadID);
+				res = connect(m_sock, (LPSOCKADDR)&Ipv6Addr, sizeof(Ipv6Addr));
+				if (res == SOCKET_ERROR && !IsIpv4)
+				{
+					int a = WSAGetLastError();
+					vnclog.Print(0, _T("socket error %i\n"), a);
+					if (a == 6)
+						Sleep(5000);
+					if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L48);
+					SetEvent(KillEvent);
+					if (!Pressed_Cancel) throw WarningException(sz_L48, IDS_L48);
+					else throw QuietException(sz_L48);
+				}
+				if (res != SOCKET_ERROR)
+				{
+					vnclog.Print(0, _T("Connected to %s port %d\n"), m_host, m_port);
+					if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L49);
+					if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_VNCSERVER, m_host);
+					if (m_hwndStatus)ShowWindow(m_hwndStatus, SW_SHOW);
+					if (m_hwndStatus)UpdateWindow(m_hwndStatus);
+					return;
+				}
+				_snprintf_s(szText, 256, "IPv6: %s \n", sz_L48);
+				if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500); }
 
 			}
-
 		}
-		freeaddrinfo(serverinfo);
-	}
-
-	if (!m_opts->m_NoStatus && !m_hwndStatus) GTGBS_ShowConnectWindow();
-	int escapecounter = 0;
-	while (!m_hwndStatus)
-	{
-		Sleep(100);
-		escapecounter++;
-		if (escapecounter > 50) break;
-	}
-	if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L43); Sleep(200); }
-	if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L45); Sleep(200);}
-	if (m_hwndStatus) UpdateWindow(m_hwndStatus);
-
-	if (!IsIpv4 && !IsIpv6)
-	{
-		SetEvent(KillEvent);
-		if (m_hwndStatus) SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L46);
-		throw WarningException(sz_L46, IDS_L46);
-	}
-	if (IsIpv6 && IsIpv4)
-	{
-		char			szText[256];
-		_snprintf_s(szText, 256,  "IPv4: %s\nIPv6: %s \n", inet_ntoa(Ipv4Addr.sin_addr), ipstringbuffer);
-		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500); }
-	}
-	else if (IsIpv6)
-	{
-		char			szText[256];
-		_snprintf_s(szText, 256,  "IPv6: %s \n", ipstringbuffer);
-		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500); }
-	}
-	else if (IsIpv4)
-	{
-		char			szText[256];
-		_snprintf_s(szText, 256,  "IPv4: %s \n", inet_ntoa(Ipv4Addr.sin_addr));
-		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500); }
-	}
-
-	if (IsIpv6)
-	{
-		if (m_sock != NULL && m_sock != INVALID_SOCKET) closesocket(m_sock);
-		m_sock = socket(PF_INET6, SOCK_STREAM, 0);
-		if (m_sock == INVALID_SOCKET && !IsIpv4) {
-			if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L44); 
-			throw WarningException(sz_L44); 
-		}
-		if (m_sock != INVALID_SOCKET)
+		if (IsIpv4)
 		{
 			int res;
+			if (m_sock != NULL && m_sock != INVALID_SOCKET) closesocket(m_sock);
+			m_sock = socket(PF_INET, SOCK_STREAM, 0);
+			if (m_sock == INVALID_SOCKET) {
+				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L44);
+				throw WarningException(sz_L44);
+			}
 			char			szText[256];
-			_snprintf_s(szText, 256,  "IPv6: %s \n", sz_L47);
+			_snprintf_s(szText, 256, "IPv4: %s \n", sz_L47);
 			if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, szText);
 			if (m_hwndStatus)ShowWindow(m_hwndStatus, SW_SHOW);
 			if (m_hwndStatus)UpdateWindow(m_hwndStatus);
-			if (m_hwndStatus)SetDlgItemInt(m_hwndStatus, IDC_PORT, m_port, FALSE);			
+			if (m_hwndStatus)SetDlgItemInt(m_hwndStatus, IDC_PORT, m_port, FALSE);
 
 			DWORD				  threadID;
 			if (ThreadSocketTimeout)
@@ -2039,8 +2098,9 @@ void ClientConnection::Connect(bool cloud)
 				ThreadSocketTimeout = NULL;
 			}
 			ThreadSocketTimeout = CreateThread(NULL, 0, SocketTimeout, (LPVOID)&m_sock, 0, &threadID);
-			res = connect(m_sock, (LPSOCKADDR)&Ipv6Addr, sizeof(Ipv6Addr));
-			if (res == SOCKET_ERROR && !IsIpv4)
+			res = connect(m_sock, (LPSOCKADDR)&Ipv4Addr, sizeof(Ipv4Addr));
+
+			if (res == SOCKET_ERROR)
 			{
 				int a = WSAGetLastError();
 				vnclog.Print(0, _T("socket error %i\n"), a);
@@ -2051,285 +2111,276 @@ void ClientConnection::Connect(bool cloud)
 				if (!Pressed_Cancel) throw WarningException(sz_L48, IDS_L48);
 				else throw QuietException(sz_L48);
 			}
-			if (res != SOCKET_ERROR)
-			{
-				vnclog.Print(0, _T("Connected to %s port %d\n"), m_host, m_port);
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L49);
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_VNCSERVER, m_host);
-				if (m_hwndStatus)ShowWindow(m_hwndStatus, SW_SHOW);
-				if (m_hwndStatus)UpdateWindow(m_hwndStatus);
-				return;
-			}
-			_snprintf_s(szText, 256,  "IPv6: %s \n", sz_L48);
-			if (m_hwndStatus) {SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500);}
-
+			vnclog.Print(0, _T("Connected to %s port %d\n"), m_host, m_port);
+			if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L49);
+			if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_VNCSERVER, m_host);
+			if (m_hwndStatus)ShowWindow(m_hwndStatus, SW_SHOW);
+			if (m_hwndStatus)UpdateWindow(m_hwndStatus);
 		}
 	}
-	if (IsIpv4)
-	{
+	else {
+		struct sockaddr_in thataddr;
 		int res;
-		if (m_sock != NULL && m_sock != INVALID_SOCKET) closesocket(m_sock);
+		if (!m_opts->m_NoStatus && !m_hwndStatus)
+			GTGBS_ShowConnectWindow();
+		if (m_sock != 0 && m_sock != INVALID_SOCKET)
+			closesocket(m_sock);
 		m_sock = socket(PF_INET, SOCK_STREAM, 0);
+		if (m_hwndStatus)
+			SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L43);
 		if (m_sock == INVALID_SOCKET) {
-			if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L44); 
-			throw WarningException(sz_L44); 
+			if (m_hwndStatus)
+				SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L44);
+			throw WarningException(sz_L44);
 		}
-		char			szText[256];
-		_snprintf_s(szText, 256,  "IPv4: %s \n", sz_L47);
-		if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, szText);
-		if (m_hwndStatus)ShowWindow(m_hwndStatus,SW_SHOW);
-		if (m_hwndStatus)UpdateWindow(m_hwndStatus);
-		if (m_hwndStatus)SetDlgItemInt(m_hwndStatus,IDC_PORT,m_port,FALSE);
 
+
+		if (m_hwndStatus) {
+			SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L45);
+			UpdateWindow(m_hwndStatus);
+		}
+
+		// The host may be specified as a dotted address "a.b.c.d"
+		// Try that first
+		thataddr.sin_addr.s_addr = inet_addr(m_host);
+
+		// If it wasn't one of those, do gethostbyname
+		if (thataddr.sin_addr.s_addr == INADDR_NONE) {
+			LPHOSTENT lphost;
+			lphost = gethostbyname(m_host);
+
+			if (lphost == NULL)
+			{
+				SetEvent(KillEvent);
+				if (m_hwndStatus)
+					SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L46);
+				throw WarningException(sz_L46, IDS_L46);
+			};
+			thataddr.sin_addr.s_addr = ((LPIN_ADDR)lphost->h_addr)->s_addr;
+		};
+
+		if (m_hwndStatus) {
+			SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L47);
+			ShowWindow(m_hwndStatus, SW_SHOW);
+			UpdateWindow(m_hwndStatus);
+			SetDlgItemInt(m_hwndStatus, IDC_PORT, m_port, FALSE);
+		}
+		thataddr.sin_family = AF_INET;
+		thataddr.sin_port = htons(m_port);
+		///Force break after timeout
 		DWORD				  threadID;
-		if (ThreadSocketTimeout)
-		{
+		if (ThreadSocketTimeout) {
 			havetobekilled = false; //force SocketTimeout thread to quit
 			WaitForSingleObject(ThreadSocketTimeout, 5000);
 			CloseHandle(ThreadSocketTimeout);
 			ThreadSocketTimeout = NULL;
 		}
-		ThreadSocketTimeout = CreateThread(NULL,0,SocketTimeout,(LPVOID)&m_sock,0,&threadID);
-		res = connect(m_sock, (LPSOCKADDR) &Ipv4Addr, sizeof(Ipv4Addr));
+		ThreadSocketTimeout = CreateThread(NULL, 0, SocketTimeout, (LPVOID)&m_sock, 0, &threadID);
+		res = connect(m_sock, (LPSOCKADDR)&thataddr, sizeof(thataddr));
 
-		if (res == SOCKET_ERROR)
-		{
+		if (res == SOCKET_ERROR) {
 			int a = WSAGetLastError();
 			vnclog.Print(0, _T("socket error %i\n"), a);
 			if (a == 6)
 				Sleep(5000);
-			if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L48);
+			if (m_hwndStatus)
+				SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L48);
 			SetEvent(KillEvent);
-			if (!Pressed_Cancel) throw WarningException(sz_L48, IDS_L48);
-			else throw QuietException(sz_L48);
+			if (!Pressed_Cancel)
+				throw WarningException(sz_L48, IDS_L48);
+			else
+				throw QuietException(sz_L48);
 		}
 		vnclog.Print(0, _T("Connected to %s port %d\n"), m_host, m_port);
-		if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L49);
-		if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_VNCSERVER, m_host);
-		if (m_hwndStatus)ShowWindow(m_hwndStatus, SW_SHOW);
-		if (m_hwndStatus)UpdateWindow(m_hwndStatus);
+		if (m_hwndStatus) {
+			SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L49);
+			SetDlgItemText(m_hwndStatus, IDC_VNCSERVER, m_host);
+			ShowWindow(m_hwndStatus, SW_SHOW);
+			UpdateWindow(m_hwndStatus);
+		}
 	}
-
-	
-
-#else
-	struct sockaddr_in thataddr;
-	int res;
-	if (!m_opts->m_NoStatus && !m_hwndStatus) 
-		GTGBS_ShowConnectWindow();
-	if (m_sock != 0 && m_sock != INVALID_SOCKET)
-		closesocket(m_sock);
-	m_sock = socket(PF_INET, SOCK_STREAM, 0);
-	if (m_hwndStatus) 
-		SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L43);
-	if (m_sock == INVALID_SOCKET) { 
-		if (m_hwndStatus)
-			SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L44); 
-		throw WarningException(sz_L44); 
-	}
-
-
-	if (m_hwndStatus) {
-		SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L45);
-		UpdateWindow(m_hwndStatus);
-	}
-
-	// The host may be specified as a dotted address "a.b.c.d"
-	// Try that first
-	thataddr.sin_addr.s_addr = inet_addr(m_host);
-
-	// If it wasn't one of those, do gethostbyname
-	if (thataddr.sin_addr.s_addr == INADDR_NONE) {
-		LPHOSTENT lphost;
-		lphost = gethostbyname(m_host);
-
-		if (lphost == NULL)
-		{
-			SetEvent(KillEvent);
-			if (m_hwndStatus) 
-				SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L46);
-			throw WarningException(sz_L46, IDS_L46);
-		};
-		thataddr.sin_addr.s_addr = ((LPIN_ADDR)lphost->h_addr)->s_addr;
-	};
-
-	if (m_hwndStatus) {
-		SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L47);
-		ShowWindow(m_hwndStatus, SW_SHOW);
-		UpdateWindow(m_hwndStatus);
-		SetDlgItemInt(m_hwndStatus, IDC_PORT, m_port, FALSE);
-	}
-	thataddr.sin_family = AF_INET;
-	thataddr.sin_port = htons(m_port);
-	///Force break after timeout
-	DWORD				  threadID;
-	if (ThreadSocketTimeout){
-		havetobekilled = false; //force SocketTimeout thread to quit
-		WaitForSingleObject(ThreadSocketTimeout, 5000);
-		CloseHandle(ThreadSocketTimeout);
-		ThreadSocketTimeout = NULL;
-	}
-	ThreadSocketTimeout = CreateThread(NULL, 0, SocketTimeout, (LPVOID)&m_sock, 0, &threadID);
-	res = connect(m_sock, (LPSOCKADDR)&thataddr, sizeof(thataddr));
-
-	if (res == SOCKET_ERROR){
-		int a = WSAGetLastError();
-		vnclog.Print(0, _T("socket error %i\n"), a);
-		if (a == 6)
-			Sleep(5000);
-		if (m_hwndStatus)
-			SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L48);
-		SetEvent(KillEvent);
-		if (!Pressed_Cancel) 
-			throw WarningException(sz_L48, IDS_L48);
-		else 
-			throw QuietException(sz_L48);
-	}
-	vnclog.Print(0, _T("Connected to %s port %d\n"), m_host, m_port);
-	if (m_hwndStatus) {
-		SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L49);
-		SetDlgItemText(m_hwndStatus, IDC_VNCSERVER, m_host);
-		ShowWindow(m_hwndStatus, SW_SHOW);
-		UpdateWindow(m_hwndStatus);
-	}
-#endif
 }
 
 void ClientConnection::ConnectProxy()
 {
-#ifdef IPV6V4
-	bool IsIpv4 = false;
-	bool IsIpv6 = false;
-	struct sockaddr_in6 Ipv6Addr;
-	struct sockaddr_in Ipv4Addr;
-	memset(&Ipv6Addr, 0, sizeof(Ipv6Addr));
-	memset(&Ipv4Addr, 0, sizeof(Ipv4Addr));
-	struct addrinfo hint, *info = 0;
-	memset(&hint, 0, sizeof(hint));
-
-	LPSOCKADDR sockaddr_ip;
-	char ipstringbuffer[46];
-	DWORD ipbufferlength = 46;
-
-
-	//test if m_host is a IPv4 or IPv6 ip address
-	hint.ai_family = AF_UNSPEC;
-	hint.ai_flags = AI_NUMERICHOST;
-	if (getaddrinfo(m_proxyhost, 0, &hint, &info) == 0)
-	{
-		if (info->ai_family == AF_INET6)
-		{
-			IsIpv6 = true;
-			inet_pton(AF_INET6, m_proxyhost, &(Ipv6Addr.sin6_addr));
-			Ipv6Addr.sin6_family = AF_INET6;
-			Ipv6Addr.sin6_port = htons(m_proxyport);
-		}
-		if (info->ai_family == AF_INET)
-		{
-			IsIpv4 = true;
-			inet_pton(AF_INET, m_proxyhost, &(Ipv4Addr.sin_addr));
-			Ipv4Addr.sin_family = AF_INET;
-			Ipv4Addr.sin_port = htons(m_proxyport);
-		}
-	}
-	freeaddrinfo(info);
-	// Use dns to find the corresponding ip address
-	// It can be IPv4 IPv6 or both
-	if (!IsIpv4 && !IsIpv6)
-	{
-		struct addrinfo *serverinfo = 0;
+	if (m_opts->m_ipv6) {
+		bool IsIpv4 = false;
+		bool IsIpv6 = false;
+		struct sockaddr_in6 Ipv6Addr;
+		struct sockaddr_in Ipv4Addr;
+		memset(&Ipv6Addr, 0, sizeof(Ipv6Addr));
+		memset(&Ipv4Addr, 0, sizeof(Ipv4Addr));
+		struct addrinfo hint, * info = 0;
 		memset(&hint, 0, sizeof(hint));
+
+		LPSOCKADDR sockaddr_ip;
+		char ipstringbuffer[46];
+		DWORD ipbufferlength = 46;
+
+
+		//test if m_host is a IPv4 or IPv6 ip address
 		hint.ai_family = AF_UNSPEC;
-		hint.ai_socktype = SOCK_STREAM;
-		hint.ai_protocol = IPPROTO_TCP;
-		struct sockaddr_in6 *pIpv6Addr;
-		struct sockaddr_in *pIpv4Addr;
-		if (getaddrinfo(m_proxyhost, 0, &hint, &serverinfo) == 0)
+		hint.ai_flags = AI_NUMERICHOST;
+		if (getaddrinfo(m_proxyhost, 0, &hint, &info) == 0)
 		{
-			struct addrinfo *p;
-			for (p = serverinfo; p != NULL; p = p->ai_next) {
-				switch (p->ai_family) {
-				case AF_INET:
-					IsIpv4 = true;
-					pIpv4Addr = (struct sockaddr_in *) p->ai_addr;
-					memcpy(&Ipv4Addr, pIpv4Addr, sizeof(Ipv4Addr));
-					Ipv4Addr.sin_family = AF_INET;
-					Ipv4Addr.sin_port = htons(m_proxyport);
-					break;
-				case AF_INET6:
-					IsIpv6 = true;
-					pIpv6Addr = (struct sockaddr_in6 *) p->ai_addr;
-					memcpy(&Ipv6Addr, pIpv6Addr, sizeof(Ipv6Addr));
-					Ipv6Addr.sin6_family = AF_INET6;
-					Ipv6Addr.sin6_port = htons(m_proxyport);
+			if (info->ai_family == AF_INET6)
+			{
+				IsIpv6 = true;
+				inet_pton(AF_INET6, m_proxyhost, &(Ipv6Addr.sin6_addr));
+				Ipv6Addr.sin6_family = AF_INET6;
+				Ipv6Addr.sin6_port = htons(m_proxyport);
+			}
+			if (info->ai_family == AF_INET)
+			{
+				IsIpv4 = true;
+				inet_pton(AF_INET, m_proxyhost, &(Ipv4Addr.sin_addr));
+				Ipv4Addr.sin_family = AF_INET;
+				Ipv4Addr.sin_port = htons(m_proxyport);
+			}
+		}
+		freeaddrinfo(info);
+		// Use dns to find the corresponding ip address
+		// It can be IPv4 IPv6 or both
+		if (!IsIpv4 && !IsIpv6)
+		{
+			struct addrinfo* serverinfo = 0;
+			memset(&hint, 0, sizeof(hint));
+			hint.ai_family = AF_UNSPEC;
+			hint.ai_socktype = SOCK_STREAM;
+			hint.ai_protocol = IPPROTO_TCP;
+			struct sockaddr_in6* pIpv6Addr;
+			struct sockaddr_in* pIpv4Addr;
+			if (getaddrinfo(m_proxyhost, 0, &hint, &serverinfo) == 0)
+			{
+				struct addrinfo* p;
+				for (p = serverinfo; p != NULL; p = p->ai_next) {
+					switch (p->ai_family) {
+					case AF_INET:
+						IsIpv4 = true;
+						pIpv4Addr = (struct sockaddr_in*)p->ai_addr;
+						memcpy(&Ipv4Addr, pIpv4Addr, sizeof(Ipv4Addr));
+						Ipv4Addr.sin_family = AF_INET;
+						Ipv4Addr.sin_port = htons(m_proxyport);
+						break;
+					case AF_INET6:
+						IsIpv6 = true;
+						pIpv6Addr = (struct sockaddr_in6*)p->ai_addr;
+						memcpy(&Ipv6Addr, pIpv6Addr, sizeof(Ipv6Addr));
+						Ipv6Addr.sin6_family = AF_INET6;
+						Ipv6Addr.sin6_port = htons(m_proxyport);
 
-					sockaddr_ip = (LPSOCKADDR)p->ai_addr;
-					ipbufferlength = 46;
-					memset(ipstringbuffer, 0, 46);
-					WSAAddressToString(sockaddr_ip, (DWORD)p->ai_addrlen, NULL, ipstringbuffer, &ipbufferlength);
+						sockaddr_ip = (LPSOCKADDR)p->ai_addr;
+						ipbufferlength = 46;
+						memset(ipstringbuffer, 0, 46);
+						WSAAddressToString(sockaddr_ip, (DWORD)p->ai_addrlen, NULL, ipstringbuffer, &ipbufferlength);
 
-					break;
-				default:
-					break;
-}
+						break;
+					default:
+						break;
+					}
 
+
+				}
 
 			}
-
+			freeaddrinfo(serverinfo);
 		}
-		freeaddrinfo(serverinfo);
-	}
 
-	if (!m_opts->m_NoStatus && !m_hwndStatus) GTGBS_ShowConnectWindow();
-	int escapecounter = 0;
-	while (!m_hwndStatus)
-	{
-		Sleep(100);
-		escapecounter++;
-		if (escapecounter > 50) break;
-	}
-	if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L43); Sleep(200); }
-	if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L45); Sleep(200); }
-	if (m_hwndStatus) UpdateWindow(m_hwndStatus);
-
-	if (!IsIpv4 && !IsIpv6)
-	{
-		SetEvent(KillEvent);
-		if (m_hwndStatus) SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L46);
-		throw WarningException(sz_L46, IDS_L46);
-	}
-	if (IsIpv6 && IsIpv4)
-	{
-		char			szText[256];
-		_snprintf_s(szText, 256,  "IPv4: %s\nIPv6: %s \n", inet_ntoa(Ipv4Addr.sin_addr), ipstringbuffer);
-		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500); }
-	}
-	else if (IsIpv6)
-	{
-		char			szText[256];
-		_snprintf_s(szText, 256,  "IPv6: %s \n", ipstringbuffer);
-		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500); }
-	}
-	else if (IsIpv4)
-	{
-		char			szText[256];
-		_snprintf_s(szText, 256,  "IPv4: %s \n", inet_ntoa(Ipv4Addr.sin_addr));
-		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500); }
-	}
-
-	if (IsIpv6)
-	{
-		if (m_sock != NULL && m_sock != INVALID_SOCKET) closesocket(m_sock);
-		m_sock = socket(PF_INET6, SOCK_STREAM, 0);
-		if (m_sock == INVALID_SOCKET && !IsIpv4) {
-			if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L44);
-			throw WarningException(sz_L44);
+		if (!m_opts->m_NoStatus && !m_hwndStatus) GTGBS_ShowConnectWindow();
+		int escapecounter = 0;
+		while (!m_hwndStatus)
+		{
+			Sleep(100);
+			escapecounter++;
+			if (escapecounter > 50) break;
 		}
-		if (m_sock != INVALID_SOCKET)
+		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L43); Sleep(200); }
+		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L45); Sleep(200); }
+		if (m_hwndStatus) UpdateWindow(m_hwndStatus);
+
+		if (!IsIpv4 && !IsIpv6)
+		{
+			SetEvent(KillEvent);
+			if (m_hwndStatus) SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L46);
+			throw WarningException(sz_L46, IDS_L46);
+		}
+		if (IsIpv6 && IsIpv4)
+		{
+			char			szText[256];
+			_snprintf_s(szText, 256, "IPv4: %s\nIPv6: %s \n", inet_ntoa(Ipv4Addr.sin_addr), ipstringbuffer);
+			if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500); }
+		}
+		else if (IsIpv6)
+		{
+			char			szText[256];
+			_snprintf_s(szText, 256, "IPv6: %s \n", ipstringbuffer);
+			if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500); }
+		}
+		else if (IsIpv4)
+		{
+			char			szText[256];
+			_snprintf_s(szText, 256, "IPv4: %s \n", inet_ntoa(Ipv4Addr.sin_addr));
+			if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500); }
+		}
+
+		if (IsIpv6)
+		{
+			if (m_sock != NULL && m_sock != INVALID_SOCKET) closesocket(m_sock);
+			m_sock = socket(PF_INET6, SOCK_STREAM, 0);
+			if (m_sock == INVALID_SOCKET && !IsIpv4) {
+				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L44);
+				throw WarningException(sz_L44);
+			}
+			if (m_sock != INVALID_SOCKET)
+			{
+				int res;
+				char			szText[256];
+				_snprintf_s(szText, 256, "IPv6: %s \n", sz_L47);
+				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, szText);
+				if (m_hwndStatus)ShowWindow(m_hwndStatus, SW_SHOW);
+				if (m_hwndStatus)UpdateWindow(m_hwndStatus);
+				if (m_hwndStatus)SetDlgItemInt(m_hwndStatus, IDC_PORT, m_proxyport, FALSE);
+
+				DWORD				  threadID;
+				if (ThreadSocketTimeout)
+				{
+					havetobekilled = false; //force SocketTimeout thread to quit
+					WaitForSingleObject(ThreadSocketTimeout, 5000);
+					CloseHandle(ThreadSocketTimeout);
+					ThreadSocketTimeout = NULL;
+				}
+				ThreadSocketTimeout = CreateThread(NULL, 0, SocketTimeout, (LPVOID)&m_sock, 0, &threadID);
+				res = connect(m_sock, (LPSOCKADDR)&Ipv6Addr, sizeof(Ipv6Addr));
+				if (res == SOCKET_ERROR && !IsIpv4)
+				{
+					if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L48);
+					throw WarningException(sz_L48, IDS_L48);
+				}
+				if (res != SOCKET_ERROR)
+				{
+					vnclog.Print(0, _T("Connected to %s port %d\n"), m_proxyhost, m_proxyport);
+					if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L49);
+					if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_VNCSERVER, m_proxyhost);
+					if (m_hwndStatus)ShowWindow(m_hwndStatus, SW_SHOW);
+					if (m_hwndStatus)UpdateWindow(m_hwndStatus);
+					return;
+				}
+				_snprintf_s(szText, 256, "IPv6: %s \n", sz_L48);
+				if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500); }
+
+			}
+		}
+		if (IsIpv4)
 		{
 			int res;
+			if (m_sock != NULL && m_sock != INVALID_SOCKET) closesocket(m_sock);
+			m_sock = socket(PF_INET, SOCK_STREAM, 0);
+			if (m_sock == INVALID_SOCKET) {
+				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L44);
+				throw WarningException(sz_L44);
+			}
 			char			szText[256];
-			_snprintf_s(szText, 256,  "IPv6: %s \n", sz_L47);
+			_snprintf_s(szText, 256, "IPv4: %s \n", sz_L47);
 			if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, szText);
 			if (m_hwndStatus)ShowWindow(m_hwndStatus, SW_SHOW);
 			if (m_hwndStatus)UpdateWindow(m_hwndStatus);
@@ -2344,41 +2395,58 @@ void ClientConnection::ConnectProxy()
 				ThreadSocketTimeout = NULL;
 			}
 			ThreadSocketTimeout = CreateThread(NULL, 0, SocketTimeout, (LPVOID)&m_sock, 0, &threadID);
-			res = connect(m_sock, (LPSOCKADDR)&Ipv6Addr, sizeof(Ipv6Addr));
-			if (res == SOCKET_ERROR && !IsIpv4)
+			res = connect(m_sock, (LPSOCKADDR)&Ipv4Addr, sizeof(Ipv4Addr));
+
+			if (res == SOCKET_ERROR)
 			{
 				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L48);
 				throw WarningException(sz_L48, IDS_L48);
 			}
-			if (res != SOCKET_ERROR)
-			{
-				vnclog.Print(0, _T("Connected to %s port %d\n"), m_proxyhost, m_proxyport);
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L49);
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_VNCSERVER, m_proxyhost);
-				if (m_hwndStatus)ShowWindow(m_hwndStatus, SW_SHOW);
-				if (m_hwndStatus)UpdateWindow(m_hwndStatus);
-				return;
-			}
-			_snprintf_s(szText, 256,  "IPv6: %s \n", sz_L48);
-			if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500); }
 
+			vnclog.Print(0, _T("Connected to %s port %d\n"), m_proxyhost, m_proxyport);
+			if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L49);
+			if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_VNCSERVER, m_proxyhost);
+			if (m_hwndStatus)ShowWindow(m_hwndStatus, SW_SHOW);
+			if (m_hwndStatus)UpdateWindow(m_hwndStatus);
 		}
 	}
-	if (IsIpv4)
-	{
+	else {
+		struct sockaddr_in thataddr;
 		int res;
-		if (m_sock != NULL && m_sock != INVALID_SOCKET) closesocket(m_sock);
+		if (!m_opts->m_NoStatus && !m_hwndStatus) GTGBS_ShowConnectWindow();
+
 		m_sock = socket(PF_INET, SOCK_STREAM, 0);
-		if (m_sock == INVALID_SOCKET) {
-			if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L44);
-			throw WarningException(sz_L44);
-		}
-		char			szText[256];
-		_snprintf_s(szText, 256,  "IPv4: %s \n", sz_L47);
-		if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, szText);
+		if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L43);
+		if (m_sock == INVALID_SOCKET) { if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L44); throw WarningException(sz_L44); }
+
+
+		if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L45);
+		if (m_hwndStatus)UpdateWindow(m_hwndStatus);
+
+		// The host may be specified as a dotted address "a.b.c.d"
+		// Try that first
+		thataddr.sin_addr.s_addr = inet_addr(m_proxyhost);
+
+		// If it wasn't one of those, do gethostbyname
+		if (thataddr.sin_addr.s_addr == INADDR_NONE) {
+			LPHOSTENT lphost;
+			lphost = gethostbyname(m_proxyhost);
+
+			if (lphost == NULL) {
+				//if(myDialog!=0)DestroyWindow(myDialog);
+				SetEvent(KillEvent);
+				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L46);
+				throw WarningException(sz_L46);
+			};
+			thataddr.sin_addr.s_addr = ((LPIN_ADDR)lphost->h_addr)->s_addr;
+		};
+
+		if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L47);
 		if (m_hwndStatus)ShowWindow(m_hwndStatus, SW_SHOW);
 		if (m_hwndStatus)UpdateWindow(m_hwndStatus);
 		if (m_hwndStatus)SetDlgItemInt(m_hwndStatus, IDC_PORT, m_proxyport, FALSE);
+		thataddr.sin_family = AF_INET;
+		thataddr.sin_port = htons(m_proxyport);
 
 		DWORD				  threadID;
 		if (ThreadSocketTimeout)
@@ -2389,76 +2457,15 @@ void ClientConnection::ConnectProxy()
 			ThreadSocketTimeout = NULL;
 		}
 		ThreadSocketTimeout = CreateThread(NULL, 0, SocketTimeout, (LPVOID)&m_sock, 0, &threadID);
-		res = connect(m_sock, (LPSOCKADDR)&Ipv4Addr, sizeof(Ipv4Addr));
 
-		if (res == SOCKET_ERROR) 
-		{ 
-			if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L48); 
-			throw WarningException(sz_L48, IDS_L48); 
-		}
-
+		res = connect(m_sock, (LPSOCKADDR)&thataddr, sizeof(thataddr));
+		if (res == SOCKET_ERROR) { if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L48); throw WarningException(sz_L48, IDS_L48); }
 		vnclog.Print(0, _T("Connected to %s port %d\n"), m_proxyhost, m_proxyport);
 		if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L49);
 		if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_VNCSERVER, m_proxyhost);
 		if (m_hwndStatus)ShowWindow(m_hwndStatus, SW_SHOW);
 		if (m_hwndStatus)UpdateWindow(m_hwndStatus);
 	}
-#else
-	struct sockaddr_in thataddr;
-	int res;
-	if (!m_opts->m_NoStatus && !m_hwndStatus) GTGBS_ShowConnectWindow();
-
-	m_sock = socket(PF_INET, SOCK_STREAM, 0);
-	if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L43);
-	if (m_sock == INVALID_SOCKET) {if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L44);throw WarningException(sz_L44);}
-
-
-	if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L45);
-	if (m_hwndStatus)UpdateWindow(m_hwndStatus);
-
-	// The host may be specified as a dotted address "a.b.c.d"
-	// Try that first
-	thataddr.sin_addr.s_addr = inet_addr(m_proxyhost);
-
-	// If it wasn't one of those, do gethostbyname
-	if (thataddr.sin_addr.s_addr == INADDR_NONE) {
-		LPHOSTENT lphost;
-		lphost = gethostbyname(m_proxyhost);
-
-		if (lphost == NULL) {
-			//if(myDialog!=0)DestroyWindow(myDialog);
-			SetEvent(KillEvent);
-			if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L46);
-			throw WarningException(sz_L46);
-		};
-		thataddr.sin_addr.s_addr = ((LPIN_ADDR) lphost->h_addr)->s_addr;
-	};
-
-	if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L47);
-	if (m_hwndStatus)ShowWindow(m_hwndStatus,SW_SHOW);
-	if (m_hwndStatus)UpdateWindow(m_hwndStatus);
-	if (m_hwndStatus)SetDlgItemInt(m_hwndStatus,IDC_PORT,m_proxyport,FALSE);
-	thataddr.sin_family = AF_INET;
-	thataddr.sin_port = htons(m_proxyport);
-
-	DWORD				  threadID;
-	if (ThreadSocketTimeout)
-	{
-		havetobekilled = false; //force SocketTimeout thread to quit
-		WaitForSingleObject(ThreadSocketTimeout, 5000);
-		CloseHandle(ThreadSocketTimeout);
-		ThreadSocketTimeout = NULL;
-	}
-	ThreadSocketTimeout = CreateThread(NULL,0,SocketTimeout,(LPVOID)&m_sock,0,&threadID);
-
-	res = connect(m_sock, (LPSOCKADDR) &thataddr, sizeof(thataddr));
-	if (res == SOCKET_ERROR) {if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L48);throw WarningException(sz_L48,IDS_L48);}
-	vnclog.Print(0, _T("Connected to %s port %d\n"), m_proxyhost, m_proxyport);
-	if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L49);
-	if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_VNCSERVER,m_proxyhost);
-	if (m_hwndStatus)ShowWindow(m_hwndStatus,SW_SHOW);
-	if (m_hwndStatus)UpdateWindow(m_hwndStatus);
-#endif
 }
 
 void ClientConnection::SetSocketOptions()
