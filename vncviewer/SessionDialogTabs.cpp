@@ -981,6 +981,8 @@ void SessionDialog::InitDlgProcSecurity()
 	SendMessage(hfUseEncryption, BM_SETCHECK, fUseDSMPlugin, 0);
 	SendDlgItemMessage(hwnd, IDC_EDITCUSTOMMESSAGE, EM_SETLIMITTEXT, 244, 0);
 	SetDlgItemText(hwnd, IDC_EDITCUSTOMMESSAGE, InfoMsg);
+	HWND hipv6 = GetDlgItem(hwnd, IDC_IPV6);
+	SendMessage(hipv6, BM_SETCHECK, ipv6, 0);
 }
 ////////////////////////////////////////////////////////////////////////////////
 void SessionDialog::InitDlgProcListen()
@@ -1226,6 +1228,7 @@ void SessionDialog::ReadDlgProcSecurity()
 	fAutoAcceptIncoming = (SendMessage(GetDlgItem(hwnd, IDC_AUTOACCEPT), BM_GETCHECK, 0, 0) == BST_CHECKED);
 	fAutoAcceptNoDSM = (SendMessage(GetDlgItem(hwnd, IDC_AUTOACCEPTNOWARN), BM_GETCHECK, 0, 0) == BST_CHECKED);
 	restricted = (SendMessage(GetDlgItem(hwnd, IDC_HIDEMENU), BM_GETCHECK, 0, 0) == BST_CHECKED);
+	ipv6 = (SendMessage(GetDlgItem(hwnd, IDC_IPV6), BM_GETCHECK, 0, 0) == BST_CHECKED);
 	GetDlgItemText(hwnd, IDC_EDITCUSTOMMESSAGE, InfoMsg, 255);
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -1560,6 +1563,7 @@ void SessionDialog::StartListener()
 	m_pOpt->m_fAutoAcceptNoDSM = fAutoAcceptNoDSM;
 	m_pOpt->m_fRequireEncryption = fRequireEncryption;
 	m_pOpt->m_restricted = restricted;
+	m_pOpt->m_ipv6 = ipv6;
 	m_pOpt->m_AllowUntrustedServers = AllowUntrustedServers;
 	m_pOpt->m_NoStatus = NoStatus;
 	m_pOpt->m_NoHotKeys = NoHotKeys;
