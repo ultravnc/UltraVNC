@@ -662,6 +662,7 @@ BEGIN
     CONTROL         "Do not display the sponsor advertisement",IDC_CHECK1,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,100,164,10
     CONTROL         "Hide status window",IDC_HIDESTATUS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,112,128,10
+    CONTROL         "Hide End of Stream error", IDC_HIDEENDOFSTREAMERROR, "Button", BS_AUTOCHECKBOX | WS_TABSTOP,4,124,164,10
     LTEXT           "Folder",IDC_STATIC,4,18,36,9
     LTEXT           "Prefix",IDC_STATIC,4,36,36,8
     LTEXT           "Snapshot folder and prefix",IDC_STATIC,4,4,232,8
