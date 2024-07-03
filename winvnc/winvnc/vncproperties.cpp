@@ -494,7 +494,6 @@ vncProperties::DialogProc(HWND hwnd,
 		SetDlgItemText(hwnd, IDC_QUERYDISABLETIME, (const char*)disableTime);
 
 		_this->ExpandBox(hwnd, !_this->bExpanded);
-		SendMessage(GetDlgItem(hwnd, IDC_BUTTON_EXPAND), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)_this->hBmpExpand);
 
 		SetForegroundWindow(hwnd);		
 		return FALSE; // Because we've set the focus
@@ -1332,14 +1331,12 @@ void vncProperties::ExpandBox(HWND hDlg, BOOL fExpand)
 	HWND wndDefaultBox = NULL;
 
 	// get the window of the button
-	HWND  pCtrl = GetDlgItem(hDlg, IDC_SHOWOPTIONS);
+	HWND  pCtrl = GetDlgItem(hDlg, IDC_BUTTON_EXPAND);
 	if (pCtrl == NULL) return;
 
 	wndDefaultBox = GetDlgItem(hDlg, IDC_DEFAULTBOX);
 	if (wndDefaultBox == NULL) return;
 
-	if (!fExpand) SendMessage(GetDlgItem(hDlg, IDC_BUTTON_EXPAND), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)hBmpExpand);
-	else SendMessage(GetDlgItem(hDlg, IDC_BUTTON_EXPAND), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)hBmpCollaps);
 	// retrieve coordinates for the default child window
 	GetWindowRect(wndDefaultBox, &rcDefaultBox);
 
@@ -1385,10 +1382,6 @@ void vncProperties::ExpandBox(HWND hDlg, BOOL fExpand)
 			rcDefaultBox.bottom - rcWnd.top,
 			SWP_NOZORDER | SWP_NOMOVE);
 
-
-
-		SetWindowText(pCtrl, "Advanced options");
-
 		// record that the dialog is contracted.
 		bExpanded = FALSE;
 	}
@@ -1402,7 +1395,6 @@ void vncProperties::ExpandBox(HWND hDlg, BOOL fExpand)
 		// make sure that the entire dialog box is visible on the user's
 		// screen.
 		SendMessage(hDlg, DM_REPOSITION, 0, 0);
-		SetWindowText(pCtrl, "Hide");
 		bExpanded = TRUE;
 	}
 	SD_OnInitDialog(hDlg);
