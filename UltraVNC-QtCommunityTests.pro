@@ -74,7 +74,18 @@ SOURCES += \
         \repeater\mode12_listener.cpp \
         \repeater\repeater.cpp \
         \repeater\socket_functions.cpp \
-        # To Do rfb to ZipUnZip32 and thiers subfolders
+        \rfb\dh.cpp \
+        \rfb\vncauth.c \
+        \rfb\xzywtemplate.c \
+        \rfb\zywrletemplate.c \
+        \setcad\setcad\setcad.cpp \
+        \setcad\setcad\stdafx.cpp \
+        \setcad\setcad\setcad.rc \
+        \setpasswd\setpasswd\inifile.cpp \
+        \setpasswd\setpasswd\setpasswd.cpp \
+        \setpasswd\setpasswd\stdafx.cpp \
+        \setpasswd\setpasswd\setpasswd.rc \
+        # To Do udt4 to ZipUnZip32 and thiers subfolders
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -166,4 +177,19 @@ HEADERS += \
         \repeater\repeater.h \
         \repeater\resource.h \
         \repeater\resources.h \
-        # To Do rfb to ZipUnZip32 and thiers subfolders
+        \rfb\dh.h \
+        \rfb\gii.h \
+        \rfb\rfbproto.h \
+        \rfb\vncauth.h \
+        \rfb\xzDecode.h \
+        \rfb\xzEncode.h \
+        \rfb\zrleDecode.h \
+        \rfb\zrleEncode.h \
+        \setcad\setcad\resource.h \
+        \setcad\setcad\stdafx.h \
+        \setcad\setcad\targetver.h \
+        \setpasswd\setpasswd\inifile.h \
+        \setpasswd\setpasswd\resource.h \
+        \setpasswd\setpasswd\stdafx.h \
+        \setpasswd\setpasswd\targetver.h \
+        # To Do setpasswd to udt4 and thiers subfolders
