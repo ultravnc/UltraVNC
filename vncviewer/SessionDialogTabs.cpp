@@ -57,7 +57,7 @@ void SessionDialog::InitTab(HWND hwnd)
 	item.mask = TCIF_TEXT;
 	item.pszText = "Encoders";
 	TabCtrl_InsertItem(m_hTab, 0, &item);
-	item.pszText = "Mouse and keyboard";
+	item.pszText = "Input";
 	TabCtrl_InsertItem(m_hTab, 1, &item);
 	item.pszText = "Display";
 	TabCtrl_InsertItem(m_hTab, 2, &item);
@@ -67,7 +67,7 @@ void SessionDialog::InitTab(HWND hwnd)
 	TabCtrl_InsertItem(m_hTab, 4, &item);
 	item.pszText = "Quick encoder";
 	TabCtrl_InsertItem(m_hTab, 5, &item);
-	item.pszText = "Listen mode";
+	item.pszText = "Listen";
 	TabCtrl_InsertItem(m_hTab, 6, &item);
 	hTabEncoders = CreateDialogParam(pApp->m_instance,
 		MAKEINTRESOURCE(IDD_ENCODERS),

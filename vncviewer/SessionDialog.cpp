@@ -208,7 +208,7 @@ BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		helper::SafeSetWindowUserData(hwnd, lParam);
 		char version[50]{};
 		char title[256]{};
-		strcpy_s(title, "UltraVNC Viewer - ");
+		strcpy_s(title, "UltraVNC Viewer -");
 		strcat_s(title, GetVersionFromResource(version));
 		SetWindowText(hwnd, title);
 	}
@@ -233,7 +233,7 @@ BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		_this->ExpandBox(hwnd, !_this->m_bExpanded);
 		//SendMessage(GetDlgItem(hwnd, IDC_BUTTON_EXPAND), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)_this->hBmpExpand);
-		SetWindowText(GetDlgItem(hwnd, IDC_BUTTON_EXPAND), "Show Options");
+		//SetWindowText(GetDlgItem(hwnd, IDC_BUTTON_EXPAND), "Show Options");
 		return TRUE;
 	}
 
@@ -458,8 +458,8 @@ void SessionDialog::ExpandBox(HWND hDlg, BOOL fExpand)
 
 	wndDefaultBox = GetDlgItem(hDlg, IDC_DEFAULTBOX);
 	if (wndDefaultBox == NULL) return;
-	if (!fExpand) SetWindowText(GetDlgItem(hDlg, IDC_BUTTON_EXPAND), "Show Options");
-	else SetWindowText(GetDlgItem(hDlg, IDC_BUTTON_EXPAND), "Hide Options");
+	//if (!fExpand) SetWindowText(GetDlgItem(hDlg, IDC_BUTTON_EXPAND), "Show Options");
+	//else SetWindowText(GetDlgItem(hDlg, IDC_BUTTON_EXPAND), "Hide Options");
 	// retrieve coordinates for the default child window
 	GetWindowRect(wndDefaultBox, &rcDefaultBox);
 	rcDefaultBox.left += 2;
@@ -503,7 +503,7 @@ void SessionDialog::ExpandBox(HWND hDlg, BOOL fExpand)
 			rcDefaultBox.bottom - rcWnd.top,
 			SWP_NOZORDER | SWP_NOMOVE);
 
-		SetWindowText(pCtrl, "Show Options");
+		//SetWindowText(pCtrl, "Show Options");
 
 		// record that the dialog is contracted.
 		m_bExpanded = FALSE;
@@ -516,7 +516,7 @@ void SessionDialog::ExpandBox(HWND hDlg, BOOL fExpand)
 		// make sure that the entire dialog box is visible on the user's
 		// screen.
 		SendMessage(hDlg, DM_REPOSITION, 0, 0);
-		SetWindowText(pCtrl, "Hide Options");
+		//SetWindowText(pCtrl, "Hide Options");
 		m_bExpanded = TRUE;
 	}
 }
