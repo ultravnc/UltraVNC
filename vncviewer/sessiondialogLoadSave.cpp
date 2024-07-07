@@ -212,6 +212,7 @@ void SessionDialog::SaveToFile(char *fname, bool asDefault)
 	saveInt("ipv6",					ipv6, fname);  //hide menu
 	saveInt("AllowUntrustedServers", AllowUntrustedServers, fname);
 	saveInt("nostatus",				NoStatus,			fname); //hide status window
+	saveInt("HideEOStreamError",    HideEndOfStreamError, fname); // hide End of Stream error
 	saveInt("nohotkeys",			NoHotKeys,		fname); //disable hotkeys
 	saveInt("sponsor",				g_disable_sponsor,	fname);
 	saveInt("PreemptiveUpdates",	preemptiveUpdates, fname);

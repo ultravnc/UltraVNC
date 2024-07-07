@@ -150,6 +150,7 @@ SessionDialog::SessionDialog(VNCOptions* pOpt, ClientConnection* pCC, CDSMPlugin
 	ipv6 = m_pOpt->m_ipv6;
 	AllowUntrustedServers = m_pOpt->m_AllowUntrustedServers;
 	NoStatus = m_pOpt->m_NoStatus;
+	HideEndOfStreamError = m_pOpt->m_HideEndOfStreamError;
 	NoHotKeys = m_pOpt->m_NoHotKeys;
 	setdefaults = false;
 	/////////////////////////////////////////////////
@@ -701,6 +702,7 @@ bool SessionDialog::connect(HWND hwnd)
 	m_pOpt->m_ipv6 = ipv6;
 	m_pOpt->m_AllowUntrustedServers = AllowUntrustedServers;
 	m_pOpt->m_NoStatus = NoStatus;
+	m_pOpt->m_HideEndOfStreamError = HideEndOfStreamError;
 	m_pOpt->m_NoHotKeys = NoHotKeys;
 
 	if (fUseDSMPlugin) {
