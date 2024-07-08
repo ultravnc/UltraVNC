@@ -137,13 +137,14 @@ vncSockConnect::~vncSockConnect()
 	((vncSockConnectThread *)m_thread)->m_shutdown = TRUE;
 
 	VSocket socket;
-#ifdef IPV6V4
-	socket.CreateBindConnect("localhost", m_port);
-#else
-	socket.Create();
-	socket.Bind(0);
-	socket.Connect("localhost", m_port);
-#endif
+	if (settings->getIPV6()) {
+		socket.CreateBindConnect("localhost", m_port);
+	}
+	else {
+		socket.Create();
+		socket.Bind(0);
+		socket.Connect("localhost", m_port);
+	}
 	socket.Close();
 
 	void *returnval;
@@ -159,22 +160,23 @@ BOOL vncSockConnect::Init(vncServer *server, UINT port)
 	// Save the port id
 	m_port = port;
 
-#ifdef IPV6V4
-	if (!m_socket.CreateBindListen(m_port, settings->getLoopbackOnly()))
-		return FALSE;
-#else
-	// Create the listening socket
-	if (!m_socket.Create())
-		return FALSE;
+	if (settings->getIPV6()) {
+		if (!m_socket.CreateBindListen(m_port, settings->getLoopbackOnly()))
+			return FALSE;
+	}
+	else {
+		// Create the listening socket
+		if (!m_socket.Create())
+			return FALSE;
 
-	// Bind it
-	if (!m_socket.Bind(m_port, settings->getLoopbackOnly()))
-		return FALSE;
+		// Bind it
+		if (!m_socket.Bind(m_port, settings->getLoopbackOnly()))
+			return FALSE;
 
-	// Set it to listen
-	if (!m_socket.Listen())
-		return FALSE;
-#endif
+		// Set it to listen
+		if (!m_socket.Listen())
+			return FALSE;
+	}
 	//udpecho server
 	StartEchoServer(m_port);
 	// Create the new thread

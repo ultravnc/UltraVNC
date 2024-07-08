@@ -515,6 +515,9 @@ INT_PTR CALLBACK TextChat::TextChatDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM wPar
 	{
 	case WM_INITDIALOG:
 		{
+			HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_WINVNC));
+			SendMessage(hWnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+			SendMessage(hWnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
             helper::SafeSetWindowUserData(hWnd, lParam);
             TextChat *_this = (TextChat *) lParam;
 

@@ -200,6 +200,9 @@ vncProperties::DialogProc(HWND hwnd,
 	switch (uMsg) {
 	case WM_INITDIALOG:
 	{
+		HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_WINVNC));
+		SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+		SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
 		vnclog.Print(LL_INTINFO, VNCLOG("INITDIALOG properties\n"));
 		// Retrieve the Dialog box parameter and use it as a pointer
 		// to the calling vncProperties object
@@ -257,14 +260,11 @@ vncProperties::DialogProc(HWND hwnd,
 		HWND hLoopback = GetDlgItem(hwnd, IDC_ALLOWLOOPBACK);
 		BOOL fLoopback = settings->getAllowLoopback();
 		SendMessage(hLoopback, BM_SETCHECK, fLoopback, 0);
-#ifdef IPV6V4
+
 		HWND hIPV6 = GetDlgItem(hwnd, IDC_IPV6);
 		BOOL fIPV6 = settings->getIPV6();
 		SendMessage(hIPV6, BM_SETCHECK, fIPV6, 0);
-#else
-		HWND hIPV6 = GetDlgItem(hwnd, IDC_IPV6);
-		EnableWindow(hIPV6, false);
-#endif
+
 		HWND hLoopbackonly = GetDlgItem(hwnd, IDC_LOOPBACKONLY);
 		BOOL fLoopbackonly = settings->getLoopbackOnly();
 		SendMessage(hLoopbackonly, BM_SETCHECK, fLoopbackonly, 0);
@@ -494,7 +494,6 @@ vncProperties::DialogProc(HWND hwnd,
 		SetDlgItemText(hwnd, IDC_QUERYDISABLETIME, (const char*)disableTime);
 
 		_this->ExpandBox(hwnd, !_this->bExpanded);
-		SendMessage(GetDlgItem(hwnd, IDC_BUTTON_EXPAND), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)_this->hBmpExpand);
 
 		SetForegroundWindow(hwnd);		
 		return FALSE; // Because we've set the focus
@@ -726,9 +725,7 @@ vncProperties::DialogProc(HWND hwnd,
 			settings->setBlankInputsOnly(SendMessage(hBlank2, BM_GETCHECK, 0, 0) == BST_CHECKED); //PGM
 
 			settings->setAllowLoopback(IsDlgButtonChecked(hwnd, IDC_ALLOWLOOPBACK));
-#ifdef IPV6V4
 			settings->setIPV6(IsDlgButtonChecked(hwnd, IDC_IPV6));
-#endif
 			_this->m_server->SetLoopbackOnly(IsDlgButtonChecked(hwnd, IDC_LOOPBACKONLY));
 
 			settings->setDisableTrayIcon(IsDlgButtonChecked(hwnd, IDC_DISABLETRAY));
@@ -856,12 +853,21 @@ vncProperties::DialogProc(HWND hwnd,
 			break;
 		}
 
+		case IDC_CONNECT_HTTP:
+			EnableWindow(GetDlgItem(hwnd, IDC_PORTHTTP),
+				(SendDlgItemMessage(hwnd, IDC_CONNECT_HTTP,
+					BM_GETCHECK, 0, 0) == BST_CHECKED));
+			break;
+
 		case IDC_CONNECT_SOCK:
 			// TightVNC 1.2.7 method
 			// The user has clicked on the socket connect tickbox
 		{
 			BOOL bConnectSock =
 				(SendDlgItemMessage(hwnd, IDC_CONNECT_SOCK,
+					BM_GETCHECK, 0, 0) == BST_CHECKED);
+			BOOL bConnectHttp =
+				(SendDlgItemMessage(hwnd, IDC_CONNECT_HTTP,
 					BM_GETCHECK, 0, 0) == BST_CHECKED);
 
 			EnableWindow(GetDlgItem(hwnd, IDC_PASSWORD), bConnectSock);
@@ -878,7 +884,7 @@ vncProperties::DialogProc(HWND hwnd,
 			EnableWindow(GetDlgItem(hwnd, IDC_PORTRFB), bConnectSock &&
 				(SendMessage(hSpecPort, BM_GETCHECK, 0, 0) == BST_CHECKED));
 			EnableWindow(GetDlgItem(hwnd, IDC_PORTHTTP), bConnectSock &&
-				(SendMessage(hSpecPort, BM_GETCHECK, 0, 0) == BST_CHECKED));
+				(SendMessage(hSpecPort, BM_GETCHECK, 0, 0) == BST_CHECKED) && bConnectHttp);
 		}
 		return TRUE;
 
@@ -915,9 +921,13 @@ vncProperties::DialogProc(HWND hwnd,
 
 		case IDC_SPECPORT:
 		{
+			BOOL bConnectHttp =
+				(SendDlgItemMessage(hwnd, IDC_CONNECT_HTTP,
+					BM_GETCHECK, 0, 0) == BST_CHECKED);
+
 			EnableWindow(GetDlgItem(hwnd, IDC_DISPLAYNO), FALSE);
 			EnableWindow(GetDlgItem(hwnd, IDC_PORTRFB), TRUE);
-			EnableWindow(GetDlgItem(hwnd, IDC_PORTHTTP), TRUE);
+			EnableWindow(GetDlgItem(hwnd, IDC_PORTHTTP), bConnectHttp);
 
 			int d1 = PORT_TO_DISPLAY(settings->getPortNumber());
 			int d2 = HPORT_TO_DISPLAY(settings->getHttpPortNumber());
@@ -1084,6 +1094,7 @@ void
 vncProperties::InitPortSettings(HWND hwnd)
 {
 	BOOL bConnectSock = m_server->SockConnected();
+	BOOL bConnectHttp = settings->getHTTPConnect();
 	BOOL bAutoPort = settings->getAutoPortSelect();
 	UINT port_rfb = settings->getPortNumber();
 	UINT port_http = settings->getHttpPortNumber();
@@ -1116,7 +1127,7 @@ vncProperties::InitPortSettings(HWND hwnd)
 	EnableWindow(GetDlgItem(hwnd, IDC_PORTRFB),
 		bConnectSock && !bAutoPort && !bValidDisplay);
 	EnableWindow(GetDlgItem(hwnd, IDC_PORTHTTP),
-		bConnectSock && !bAutoPort && !bValidDisplay);
+		bConnectSock && !bAutoPort && !bValidDisplay && bConnectHttp);
 }
 
 // ********************************************************************
@@ -1320,14 +1331,12 @@ void vncProperties::ExpandBox(HWND hDlg, BOOL fExpand)
 	HWND wndDefaultBox = NULL;
 
 	// get the window of the button
-	HWND  pCtrl = GetDlgItem(hDlg, IDC_SHOWOPTIONS);
+	HWND  pCtrl = GetDlgItem(hDlg, IDC_BUTTON_EXPAND);
 	if (pCtrl == NULL) return;
 
 	wndDefaultBox = GetDlgItem(hDlg, IDC_DEFAULTBOX);
 	if (wndDefaultBox == NULL) return;
 
-	if (!fExpand) SendMessage(GetDlgItem(hDlg, IDC_BUTTON_EXPAND), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)hBmpExpand);
-	else SendMessage(GetDlgItem(hDlg, IDC_BUTTON_EXPAND), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)hBmpCollaps);
 	// retrieve coordinates for the default child window
 	GetWindowRect(wndDefaultBox, &rcDefaultBox);
 
@@ -1373,10 +1382,6 @@ void vncProperties::ExpandBox(HWND hDlg, BOOL fExpand)
 			rcDefaultBox.bottom - rcWnd.top,
 			SWP_NOZORDER | SWP_NOMOVE);
 
-
-
-		SetWindowText(pCtrl, "Advanced options");
-
 		// record that the dialog is contracted.
 		bExpanded = FALSE;
 	}
@@ -1390,7 +1395,6 @@ void vncProperties::ExpandBox(HWND hDlg, BOOL fExpand)
 		// make sure that the entire dialog box is visible on the user's
 		// screen.
 		SendMessage(hDlg, DM_REPOSITION, 0, 0);
-		SetWindowText(pCtrl, "Hide");
 		bExpanded = TRUE;
 	}
 	SD_OnInitDialog(hDlg);

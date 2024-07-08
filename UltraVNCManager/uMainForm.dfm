@@ -1,7 +1,7 @@
 object MainForm: TMainForm
   Left = 0
   Top = 0
-  Caption = 'UltraViewer'
+  Caption = 'UltraVNC  Manager'
   ClientHeight = 637
   ClientWidth = 1126
   Color = clBtnFace
@@ -804,9 +804,9 @@ object MainForm: TMainForm
       object VCLStylesCB: TComboBox
         AlignWithMargins = True
         Left = 24
-        Top = 39
+        Top = 43
         Width = 144
-        Height = 21
+        Height = 27
         Margins.Left = 24
         Margins.Top = 7
         Margins.Right = 24
@@ -814,7 +814,13 @@ object MainForm: TMainForm
         Align = alTop
         Style = csDropDownList
         DoubleBuffered = True
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -14
+        Font.Name = 'Segoe UI'
+        Font.Style = []
         ParentDoubleBuffered = False
+        ParentFont = False
         TabOrder = 0
         TextHint = 'VCL Style'
         StyleName = 'Windows'
@@ -822,21 +828,26 @@ object MainForm: TMainForm
         OnMouseEnter = VCLStylesCBMouseEnter
         OnMouseLeave = VCLStylesCBMouseLeave
       end
-      object GlobalPassword: TEdit
+      object btnPasword: TButton
         AlignWithMargins = True
         Left = 24
         Top = 7
         Width = 144
-        Height = 21
+        Height = 25
         Margins.Left = 24
         Margins.Top = 7
         Margins.Right = 24
         Margins.Bottom = 4
         Align = alTop
+        Caption = 'Set password'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -14
+        Font.Name = 'Segoe UI'
+        Font.Style = []
+        ParentFont = False
         TabOrder = 1
-        TextHint = 'Enter password '
-        StyleName = 'Windows'
-        OnChange = GlobalPasswordChange
+        OnClick = btnPaswordClick
       end
     end
   end
@@ -852,6 +863,8 @@ object MainForm: TMainForm
     TabHeight = 30
     TabOrder = 1
     TabWidth = 75
+    OnChange = PageControlChange
+    OnChanging = PageControlChanging
     OnDrawTab = PageControlDrawTab
     OnMouseDown = PageControlMouseDown
     object DashboardTab: TTabSheet

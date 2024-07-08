@@ -41,9 +41,9 @@ extern char sz_I1[64];
 extern char sz_I2[64];
 extern char sz_I3[64];
 
-Daemon::Daemon(int port)
+Daemon::Daemon(int port, bool ipv6)
 {
-
+	this->ipv6 = ipv6;
 	// Create a dummy window
 	WNDCLASSEX wndclass;
 
@@ -83,105 +83,108 @@ Daemon::Daemon(int port)
 	m_nPort = port;
 
 	// Create a listening socket
-#ifdef IPV6V4
-	struct sockaddr_in6 addr6;
-	memset(&addr6, 0, sizeof(addr6));
-	addr6.sin6_family = AF_INET6;
-	addr6.sin6_port = htons(port);
-	addr6.sin6_addr = in6addr_any;
-	m_deamon_sock6 = socket(AF_INET6, SOCK_STREAM, 0);
+	if (ipv6) {
+		struct sockaddr_in6 addr6;
+		memset(&addr6, 0, sizeof(addr6));
+		addr6.sin6_family = AF_INET6;
+		addr6.sin6_port = htons(port);
+		addr6.sin6_addr = in6addr_any;
+		m_deamon_sock6 = socket(AF_INET6, SOCK_STREAM, 0);
 
-	struct sockaddr_in addr4;
-	memset(&addr4, 0, sizeof(addr4));
-	addr4.sin_family = AF_INET;
-	addr4.sin_port = htons(port);
-	addr4.sin_addr.s_addr = INADDR_ANY;
-	m_deamon_sock4 = socket(AF_INET6, SOCK_STREAM, 0);
-	if (!m_deamon_sock6 && !m_deamon_sock4) throw WarningException(sz_I1);
+		struct sockaddr_in addr4;
+		memset(&addr4, 0, sizeof(addr4));
+		addr4.sin_family = AF_INET;
+		addr4.sin_port = htons(port);
+		addr4.sin_addr.s_addr = INADDR_ANY;
+		m_deamon_sock4 = socket(AF_INET6, SOCK_STREAM, 0);
+		if (!m_deamon_sock6 && !m_deamon_sock4) throw WarningException(sz_I1);
 
 
-	if (m_deamon_sock4 && !m_deamon_sock6)
-	try {
-		int res4 = 0;	
-		res4 = bind(m_deamon_sock4, (struct sockaddr *)&addr4, sizeof(addr4));
-		if (res4 == SOCKET_ERROR)
-			throw WarningException(sz_I2);
+		if (m_deamon_sock4 && !m_deamon_sock6)
+			try {
+			int res4 = 0;
+			res4 = bind(m_deamon_sock4, (struct sockaddr*)&addr4, sizeof(addr4));
+			if (res4 == SOCKET_ERROR)
+				throw WarningException(sz_I2);
 
-		res4 = listen(m_deamon_sock4, 5);
-		if (res4 == SOCKET_ERROR)
-			throw WarningException(sz_I3);
-	} catch (...) {
-		closesocket(m_deamon_sock4);
-		m_deamon_sock4 = INVALID_SOCKET;
-		throw;
-	}
-	if (m_deamon_sock4 && m_deamon_sock6)
-	try {
-		int res4 = 0;	
-		int res6 = 0;
-		res4 = bind(m_deamon_sock4, (struct sockaddr *)&addr4, sizeof(addr4));
-		res6 = bind(m_deamon_sock6, (struct sockaddr *)&addr6, sizeof(addr6));
-		if (res4 == SOCKET_ERROR && res6 == SOCKET_ERROR)
-			throw WarningException(sz_I2);
-
-		res4 = listen(m_deamon_sock4, 5);
-		res6 = listen(m_deamon_sock6, 5);
-		if (res4 == SOCKET_ERROR && res6 == SOCKET_ERROR)
-			throw WarningException(sz_I3);
-		if (res4 == SOCKET_ERROR)
-		{
+			res4 = listen(m_deamon_sock4, 5);
+			if (res4 == SOCKET_ERROR)
+				throw WarningException(sz_I3);
+		}
+		catch (...) {
 			closesocket(m_deamon_sock4);
 			m_deamon_sock4 = INVALID_SOCKET;
+			throw;
 		}
-		if (res6 == SOCKET_ERROR)
-		{
+		if (m_deamon_sock4 && m_deamon_sock6)
+			try {
+			int res4 = 0;
+			int res6 = 0;
+			res4 = bind(m_deamon_sock4, (struct sockaddr*)&addr4, sizeof(addr4));
+			res6 = bind(m_deamon_sock6, (struct sockaddr*)&addr6, sizeof(addr6));
+			if (res4 == SOCKET_ERROR && res6 == SOCKET_ERROR)
+				throw WarningException(sz_I2);
+
+			res4 = listen(m_deamon_sock4, 5);
+			res6 = listen(m_deamon_sock6, 5);
+			if (res4 == SOCKET_ERROR && res6 == SOCKET_ERROR)
+				throw WarningException(sz_I3);
+			if (res4 == SOCKET_ERROR)
+			{
+				closesocket(m_deamon_sock4);
+				m_deamon_sock4 = INVALID_SOCKET;
+			}
+			if (res6 == SOCKET_ERROR)
+			{
+				closesocket(m_deamon_sock6);
+				m_deamon_sock6 = INVALID_SOCKET;
+			}
+
+
+		}
+		catch (...) {
+			closesocket(m_deamon_sock4);
+			m_deamon_sock4 = INVALID_SOCKET;
 			closesocket(m_deamon_sock6);
 			m_deamon_sock6 = INVALID_SOCKET;
+			throw;
 		}
 
-
-	} catch (...) {
-		closesocket(m_deamon_sock4);
-		m_deamon_sock4 = INVALID_SOCKET;
-		closesocket(m_deamon_sock6);
-		m_deamon_sock6 = INVALID_SOCKET;
-		throw;
+		// Send a message to specified window on an incoming connection
+		WSAAsyncSelect(m_deamon_sock6, m_hwnd, WM_SOCKEVENT6, FD_ACCEPT);
+		// Send a message to specified window on an incoming connection
+		WSAAsyncSelect(m_deamon_sock4, m_hwnd, WM_SOCKEVENT4, FD_ACCEPT);
 	}
+	else {
+		struct sockaddr_in addr;
+		memset(&addr, 0, sizeof(addr));
+		addr.sin_family = AF_INET;
+		addr.sin_port = htons(port);
+		addr.sin_addr.s_addr = INADDR_ANY;
+		m_deamon_sock = socket(AF_INET, SOCK_STREAM, 0);
+		if (!m_deamon_sock) throw WarningException(sz_I1);
 
-	// Send a message to specified window on an incoming connection
-	WSAAsyncSelect (m_deamon_sock6,  m_hwnd,  WM_SOCKEVENT6, FD_ACCEPT);
-	// Send a message to specified window on an incoming connection
-	WSAAsyncSelect (m_deamon_sock4,  m_hwnd,  WM_SOCKEVENT4, FD_ACCEPT);
 
-#else
-    struct sockaddr_in addr;
-	memset(&addr, 0, sizeof(addr));
-    addr.sin_family = AF_INET;
-    addr.sin_port = htons(port);
-    addr.sin_addr.s_addr = INADDR_ANY;
-    m_deamon_sock = socket(AF_INET, SOCK_STREAM, 0);
-	if (!m_deamon_sock) throw WarningException(sz_I1);
 
-	
-    
-	try {
-		int res = 0;	
-		res = bind(m_deamon_sock, (struct sockaddr *)&addr, sizeof(addr));
-		if (res == SOCKET_ERROR)
-			throw WarningException(sz_I2);
-		
-		res = listen(m_deamon_sock, 5);
-		if (res == SOCKET_ERROR)
-			throw WarningException(sz_I3);
-	} catch (...) {
-		closesocket(m_deamon_sock);
-		m_deamon_sock = INVALID_SOCKET;
-		throw;
+		try {
+			int res = 0;
+			res = bind(m_deamon_sock, (struct sockaddr*)&addr, sizeof(addr));
+			if (res == SOCKET_ERROR)
+				throw WarningException(sz_I2);
+
+			res = listen(m_deamon_sock, 5);
+			if (res == SOCKET_ERROR)
+				throw WarningException(sz_I3);
+		}
+		catch (...) {
+			closesocket(m_deamon_sock);
+			m_deamon_sock = INVALID_SOCKET;
+			throw;
+		}
+
+		// Send a message to specified window on an incoming connection
+		WSAAsyncSelect(m_deamon_sock, m_hwnd, WM_SOCKEVENT, FD_ACCEPT);
 	}
-
-	// Send a message to specified window on an incoming connection
-	WSAAsyncSelect(m_deamon_sock, m_hwnd, WM_SOCKEVENT, FD_ACCEPT);
-#endif	
 	
 
 	// Create the Tray icon
@@ -252,8 +255,6 @@ LRESULT CALLBACK Daemon::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lPa
 		{
 			return 0;
 		}
-
-#ifdef IPV6V4
 	case WM_SOCKEVENT4:
 	{
 		assert(HIWORD(lParam) == 0);
@@ -353,7 +354,7 @@ LRESULT CALLBACK Daemon::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lPa
 
 		return 0;
 	}
-#else
+
 	case WM_SOCKEVENT:
 		{
 			assert(HIWORD(lParam) == 0);
@@ -403,7 +404,7 @@ LRESULT CALLBACK Daemon::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lPa
 			
 			return 0;
 		}
-#endif
+
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case ID_NEWCONN:
@@ -490,7 +491,7 @@ Daemon::~Daemon()
 	KillTimer(m_hwnd, m_timer);
 	RemoveTrayIcon();
 	DestroyMenu(m_hmenu);
-#ifdef IPV6V4
+
 	if (m_deamon_sock6!=INVALID_SOCKET) 
 		shutdown(m_deamon_sock6, SD_BOTH);
 	if (m_deamon_sock6!=INVALID_SOCKET) 
@@ -499,10 +500,12 @@ Daemon::~Daemon()
 		shutdown(m_deamon_sock4, SD_BOTH);
 	if (m_deamon_sock4 != INVALID_SOCKET) 
 		closesocket(m_deamon_sock4);
-#else
-	if (m_deamon_sock != INVALID_SOCKET) shutdown(m_deamon_sock, SD_BOTH);
-	if (m_deamon_sock != INVALID_SOCKET) closesocket(m_deamon_sock);
-#endif
+
+	if (m_deamon_sock != INVALID_SOCKET) 
+		shutdown(m_deamon_sock, SD_BOTH);
+	if (m_deamon_sock != INVALID_SOCKET) 
+closesocket(m_deamon_sock);
+
 }
 
 

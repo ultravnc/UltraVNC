@@ -10,10 +10,10 @@
 #pragma package(smart_init)
 #pragma resource "*.dfm"
 //---------------------------------------------------------------------------
-__fastcall TAddCard::TAddCard(TComponent* Owner)
+__fastcall TAddCard::TAddCard(TComponent* Owner, String globalPassword)
 	: TForm(Owner)
 {
-
+	this->globalPassword = globalPassword;
 	Encryptions->Enabled = UseEncryption->Checked;
 }
 //---------------------------------------------------------------------------
@@ -47,7 +47,7 @@ void __fastcall TAddCard::SaveClick( TObject* Sender )
 		setting->alternativeKeybaord =  AlternativeKeybaord->Checked;
 		setting->notification =  Notification->Text;
 		setting->customName = CustomName->Text.TrimRight();
-		sm.save(CustomName->Text);
+		sm.save(CustomName->Text, globalPassword);
 
 		if (cardSetting != NULL) {
 			cardSetting->customName = setting->customName.TrimRight();

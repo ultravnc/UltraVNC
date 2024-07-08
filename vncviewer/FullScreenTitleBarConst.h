@@ -98,6 +98,8 @@
 #define tbIDC_SCREEN		50
 #define tbIDC_PHOTO			60
 #define tbIDC_SWITCHMONITOR	70
+#define tbIDC_CHAT			80
+#define tbIDC_FT			90
 
 //=================================================
 // Windows Message part
@@ -115,6 +117,8 @@
 #define tbWM_NOSCALE		WM_USER+1004
 #define tbWM_PHOTO			WM_USER+1005
 #define tbWM_SWITCHMONITOR	WM_USER+1006
+#define tbWM_CHAT			WM_USER+1007
+#define tbWM_FT				WM_USER+1008
 
 //=================================================
 // Menus with ID's and messages

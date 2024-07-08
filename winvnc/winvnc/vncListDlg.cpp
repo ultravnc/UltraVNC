@@ -88,6 +88,9 @@ BOOL CALLBACK vncListDlg::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 
 	case WM_INITDIALOG:
 		{
+			HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_WINVNC));
+			SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+			SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
             helper::SafeSetWindowUserData(hwnd, lParam);
 			_this = (vncListDlg *) lParam;
 

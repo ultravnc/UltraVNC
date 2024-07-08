@@ -58,7 +58,7 @@ VNCviewerApp32::VNCviewerApp32(HINSTANCE hInstance, PSTR szCmdLine) :
 		vnclog.Print(3, _T("In listening mode - staring daemons\n"));
 		
 		try {
-			m_pdaemon = new Daemon(m_options.m_listenPort);
+			m_pdaemon = new Daemon(m_options.m_listenPort, m_options.m_ipv6);
 		} catch (WarningException &e) {
 			char msg[1024];
 			sprintf_s(msg,"%s (%s)\n\r%s",sz_A3,

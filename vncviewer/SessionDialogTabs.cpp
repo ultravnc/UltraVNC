@@ -57,7 +57,7 @@ void SessionDialog::InitTab(HWND hwnd)
 	item.mask = TCIF_TEXT;
 	item.pszText = "Encoders";
 	TabCtrl_InsertItem(m_hTab, 0, &item);
-	item.pszText = "Mouse and keyboard";
+	item.pszText = "Input";
 	TabCtrl_InsertItem(m_hTab, 1, &item);
 	item.pszText = "Display";
 	TabCtrl_InsertItem(m_hTab, 2, &item);
@@ -67,7 +67,7 @@ void SessionDialog::InitTab(HWND hwnd)
 	TabCtrl_InsertItem(m_hTab, 4, &item);
 	item.pszText = "Quick encoder";
 	TabCtrl_InsertItem(m_hTab, 5, &item);
-	item.pszText = "Listen mode";
+	item.pszText = "Listen";
 	TabCtrl_InsertItem(m_hTab, 6, &item);
 	hTabEncoders = CreateDialogParam(pApp->m_instance,
 		MAKEINTRESOURCE(IDD_ENCODERS),
@@ -940,6 +940,8 @@ void SessionDialog::InitDlgProcMisc()
 	SetDlgItemText(hwnd, IDC_PREFIX, prefix);
 	HWND hNoStatus = GetDlgItem(hwnd, IDC_HIDESTATUS);
 	SendMessage(hNoStatus, BM_SETCHECK, NoStatus, 0);
+	HWND hHideEndOfStreamError = GetDlgItem(hwnd, IDC_HIDEENDOFSTREAMERROR);
+	SendMessage(hHideEndOfStreamError, BM_SETCHECK, HideEndOfStreamError, 0);
 	HWND hcomboscreen = GetDlgItem(hwnd, IDC_IMAGEFORMAT);
 	SendMessage(hcomboscreen, CB_RESETCONTENT, 0, 0);
 	SendMessage(hcomboscreen, CB_ADDSTRING, 0, (LPARAM)".jpeg");
@@ -981,6 +983,8 @@ void SessionDialog::InitDlgProcSecurity()
 	SendMessage(hfUseEncryption, BM_SETCHECK, fUseDSMPlugin, 0);
 	SendDlgItemMessage(hwnd, IDC_EDITCUSTOMMESSAGE, EM_SETLIMITTEXT, 244, 0);
 	SetDlgItemText(hwnd, IDC_EDITCUSTOMMESSAGE, InfoMsg);
+	HWND hipv6 = GetDlgItem(hwnd, IDC_IPV6);
+	SendMessage(hipv6, BM_SETCHECK, ipv6, 0);
 }
 ////////////////////////////////////////////////////////////////////////////////
 void SessionDialog::InitDlgProcListen()
@@ -1205,6 +1209,10 @@ void SessionDialog::ReadDlgProcMisc()
 
 	HWND hNoStatus = GetDlgItem(hwnd, IDC_HIDESTATUS);
 	NoStatus = (SendMessage(hNoStatus, BM_GETCHECK, 0, 0) == BST_CHECKED);
+	
+	HWND hHideEndOfStreamError = GetDlgItem(hwnd, IDC_HIDEENDOFSTREAMERROR);
+	HideEndOfStreamError = (SendMessage(hHideEndOfStreamError, BM_GETCHECK, 0, 0) == BST_CHECKED);
+
 	GetDlgItemText(hwnd, IDC_IMAGEFORMAT, imageFormat, 56);
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -1226,6 +1234,7 @@ void SessionDialog::ReadDlgProcSecurity()
 	fAutoAcceptIncoming = (SendMessage(GetDlgItem(hwnd, IDC_AUTOACCEPT), BM_GETCHECK, 0, 0) == BST_CHECKED);
 	fAutoAcceptNoDSM = (SendMessage(GetDlgItem(hwnd, IDC_AUTOACCEPTNOWARN), BM_GETCHECK, 0, 0) == BST_CHECKED);
 	restricted = (SendMessage(GetDlgItem(hwnd, IDC_HIDEMENU), BM_GETCHECK, 0, 0) == BST_CHECKED);
+	ipv6 = (SendMessage(GetDlgItem(hwnd, IDC_IPV6), BM_GETCHECK, 0, 0) == BST_CHECKED);
 	GetDlgItemText(hwnd, IDC_EDITCUSTOMMESSAGE, InfoMsg, 255);
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -1560,8 +1569,10 @@ void SessionDialog::StartListener()
 	m_pOpt->m_fAutoAcceptNoDSM = fAutoAcceptNoDSM;
 	m_pOpt->m_fRequireEncryption = fRequireEncryption;
 	m_pOpt->m_restricted = restricted;
+	m_pOpt->m_ipv6 = ipv6;
 	m_pOpt->m_AllowUntrustedServers = AllowUntrustedServers;
 	m_pOpt->m_NoStatus = NoStatus;
+	m_pOpt->m_HideEndOfStreamError = HideEndOfStreamError;
 	m_pOpt->m_NoHotKeys = NoHotKeys;
 #ifdef _Gii
 	m_pOpt->m_giiEnable = giiEnable;

@@ -2,7 +2,7 @@ object fraTopPanel: TfraTopPanel
   Left = 0
   Top = 0
   Width = 1173
-  Height = 64
+  Height = 73
   Margins.Left = 8
   Margins.Top = 8
   Margins.Right = 8
@@ -22,6 +22,7 @@ object fraTopPanel: TfraTopPanel
     Width = 1167
     Height = 58
     Cursor = crHandPoint
+    Margins.Bottom = 12
     AutoSize = True
     ButtonHeight = 58
     ButtonWidth = 79

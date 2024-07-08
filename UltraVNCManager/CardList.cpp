@@ -60,4 +60,10 @@ void CardList::stopPoll()
 {
 	bstopPoll = true;
 }
+//---------------------------------------------------------------------------
+TfrmCard * CardList::getCard(String customName)
+{
+	return cardMap[customName];
+}
+//---------------------------------------------------------------------------
 

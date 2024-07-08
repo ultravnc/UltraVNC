@@ -50,6 +50,7 @@
 		hVNCWnd = FindWindowW(classname.c_str(), NULL);
 		Sleep(100); counter++;
 	}
+    ShowWindow(hVNCWnd, SW_HIDE);
 
 	if (hVNCWnd == NULL) {
 		tab->TabVisible = false;
@@ -88,7 +89,7 @@
 			fraTopPanel->Mon3->Visible = true;
 			break;
 	}
-    PanelResize(NULL);
+	PanelResize(NULL);
  }
 //---------------------------------------------------------------------------
  Tabsheet::~Tabsheet()
@@ -169,5 +170,11 @@ void __fastcall Tabsheet::LeftToolbar()
 	toppanel->Width = 120;
 	fraTopPanel->ToolBar1->AlignWithMargins = false;
 	toppanel->Visible = true;
+}
+//---------------------------------------------------------------------------
+void  Tabsheet::SetVNCParent()
+{
+	::SetParent(hVNCWnd, panel->Handle);
+	PanelResize(NULL);
 }
 

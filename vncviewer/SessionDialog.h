@@ -123,8 +123,10 @@ public:
 	bool fAutoAcceptNoDSM;
 	bool fRequireEncryption;
 	bool restricted;
+	bool ipv6;
 	bool AllowUntrustedServers;
 	bool NoStatus;
+	bool HideEndOfStreamError;
 	bool NoHotKeys;
 	bool setdefaults;
 	bool connect(HWND hwnd);

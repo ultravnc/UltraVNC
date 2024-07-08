@@ -178,7 +178,7 @@
     <ClCompile Include="InfoBox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Hyperlinks.cpp">
+    <ClCompile Include="..\common\Hyperlinks.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -310,6 +310,9 @@
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="UltraVNCHelperFunctions.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\Hyperlinks.h">
       <Filter>header</Filter>
     </ClInclude>
   </ItemGroup>
@@ -528,6 +531,12 @@
       <Filter>Resources</Filter>
     </Image>
     <Image Include="res\LedYellow.bmp">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="res\stat\chat.bmp">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="res\stat\FT.bmp">
       <Filter>Resources</Filter>
     </Image>
   </ItemGroup>

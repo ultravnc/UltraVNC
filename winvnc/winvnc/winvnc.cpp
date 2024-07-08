@@ -81,12 +81,9 @@ bool PostAddNewRepeaterClient_bool=false;
 bool PostAddNewCloudClient_bool = false;
 
 char pszId_char[20];
-#ifdef IPV6V4
 VCard32 address_vcard4;
 in6_addr address_in6;
-#else
 VCard32 address_vcard;
-#endif
 int port_int;
 
 
@@ -1045,9 +1042,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 						delete[] name2;
 						vnclog.Print(LL_STATE, VNCLOG("test... %s %d\n"), name, port);
 						strcpy_s(dnsname, name);
-	#ifdef IPV6V4
-						if (settings->getIPV6())
-						{
+						if (settings->getIPV6()) {
 							in6_addr address;
 							memset(&address, 0, sizeof(address));
 							if (VSocket::Resolve6(name, &address))
@@ -1070,38 +1065,38 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 								delete[] name;
 								return return2(0);
 							}
-						}
-						if (port_int == 0)
-						{
-							VCard32 address = VSocket::Resolve4(name);
-							if (address != 0) {
-								// Post the IP address to the server
-								// We can not contact a runnning service, permissions, so we must store the settings
-								// and process until the vncmenu has been started
-								vnclog.Print(LL_INTERR, VNCLOG("PostAddNewClient III \n"));
-								if (!postHelper::PostAddNewClientInit4(address, port))
+							if (port_int == 0)
+							{
+								VCard32 address = VSocket::Resolve4(name);
+								if (address != 0) {
+									// Post the IP address to the server
+									// We can not contact a runnning service, permissions, so we must store the settings
+									// and process until the vncmenu has been started
+									vnclog.Print(LL_INTERR, VNCLOG("PostAddNewClient III \n"));
+									if (!postHelper::PostAddNewClientInit4(address, port))
+									{
+										PostAddNewClient_bool = true;
+										port_int = port;
+										address_vcard4 = address;
+									}
+								}
+								else
 								{
+									//ask for host,port
 									PostAddNewClient_bool = true;
-									port_int = port;
-									address_vcard4 = address;
+									port_int = 0;
+									address_vcard4 = 0;
+									Sleep(2000);
+									delete[] name;
+									return return2(0);
 								}
 							}
-							else
-							{
-								//ask for host,port
-								PostAddNewClient_bool = true;
-								port_int = 0;
-								address_vcard4 = 0;
-								Sleep(2000);
-								delete[] name;
-								return return2(0);
-							}
-						}
 
-						delete[] name;
-	#else
+							delete[] name;
+					}
+					else {
 						VCard32 address = VSocket::Resolve(name);
-	#ifdef SC_20
+#ifdef SC_20
 						if (address == 0) {
 							char text[1024]{};
 							sprintf(text, " Hostnamee (%s) could not be resolved", name);
@@ -1109,7 +1104,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 							delete[] name;
 							return return2(0);
 						}
-	#endif // SC_20
+#endif // SC_20
 						delete[] name;
 						if (address != 0) {
 							// Post the IP address to the server
@@ -1133,7 +1128,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 							//Beep(200,1000);
 							return return2(0);
 						}
-	#endif
+					}
 					}
 					i = end;
 					continue;
@@ -1144,24 +1139,22 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 					// We can not contact a runnning service, permissions, so we must store the settings
 					// and process until the vncmenu has been started
 					vnclog.Print(LL_INTERR, VNCLOG("PostAddNewClient IIII\n"));
-	#ifdef IPV6V4
-					if (!postHelper::PostAddNewClient4(0, 0))
-					{
-						PostAddNewClient_bool = true;
-						port_int = 0;
-						if (settings->getIPV6())
+					if (settings->getIPV6()) {
+						if (!postHelper::PostAddNewClient4(0, 0))
+						{
+							PostAddNewClient_bool = true;
+							port_int = 0;
 							memset(&address_in6, 0, sizeof(address_in6));
-						else
-							address_vcard4 = 0;
+						}
+					} 
+					else {
+						if (!postHelper::PostAddNewClient(0, 0))
+						{
+							PostAddNewClient_bool = true;
+							port_int = 0;
+							address_vcard = 0;
+						}
 					}
-	#else
-					if (!postHelper::PostAddNewClient(0, 0))
-					{
-						PostAddNewClient_bool = true;
-						port_int = 0;
-						address_vcard = 0;
-					}
-	#endif
 				}
 				continue;
 			}
@@ -1199,12 +1192,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 						{
 							PostAddNewRepeaterClient_bool = true;
 							port_int = 0;
-	#ifdef IPV6V4
-							address_vcard4 = 0;
-							memset(&address_in6, 0, sizeof(address_in6));
-	#else
-							address_vcard = 0;
-	#endif
+							if (settings->getIPV6()) {
+								address_vcard4 = 0;
+								memset(&address_in6, 0, sizeof(address_in6));
+							}
+							else 
+								address_vcard = 0;
 						}
 					}
 					i = end;
@@ -1331,18 +1324,11 @@ DWORD WINAPI imp_desktop_thread(LPVOID lpParam)
 	{
 		PostAddNewClient_bool=false;
 		vnclog.Print(LL_INTERR, VNCLOG("PostAddNewClient IIIII\n"));
-#ifdef IPV6V4
-		if (settings->getIPV6())
-		{
+		if (settings->getIPV6()) 
 			postHelper::PostAddNewClient6(&address_in6, port_int);
-		}
 		else
-		{
-			postHelper::PostAddNewClient4(address_vcard4, port_int);
-		}
-#else
-		postHelper::PostAddNewClient(address_vcard, port_int);
-#endif
+			postHelper::PostAddNewClient(address_vcard, port_int);
+
 	}
 	//adzm 2009-06-20
 	if (PostAddNewRepeaterClient_bool)

@@ -1354,6 +1354,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
   <ItemGroup>
     <ClCompile Include="..\..\common\Clipboard.cpp" />
     <ClCompile Include="..\..\common\d3des.c" />
+    <ClCompile Include="..\..\common\Hyperlinks.cpp" />
     <ClCompile Include="..\..\common\UltraVncZ.cpp" />
     <ClCompile Include="..\loadmemory\loadDllFromMemory.cpp" />
     <ClCompile Include="..\loadmemory\MemoryModule.c" />
@@ -3237,6 +3238,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\common\d3des.h" />
+    <ClInclude Include="..\..\common\Hyperlinks.h" />
     <ClInclude Include="..\..\common\UltraVncZ.h" />
     <ClInclude Include="..\loadmemory\loadDllFromMemory.h" />
     <ClInclude Include="..\loadmemory\MemoryModule.h" />

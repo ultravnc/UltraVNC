@@ -152,3 +152,7 @@ LAuncher2.0/Win32/
 UltraViewer/__astcache/
 UltraViewer/__history/
 UltraViewer/Win32/
+UltraVNCManager/__astcache/
+*.~18~
+UltraVNCManager/__history/
+UltraVNCManager/Win32/

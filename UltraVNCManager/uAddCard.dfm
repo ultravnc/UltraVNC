@@ -2,8 +2,8 @@ object AddCard: TAddCard
   Left = 0
   Top = 0
   Caption = 'New session'
-  ClientHeight = 610
-  ClientWidth = 541
+  ClientHeight = 592
+  ClientWidth = 529
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -15,17 +15,19 @@ object AddCard: TAddCard
   object DraftCardPanel: TCardPanel
     Left = 0
     Top = 0
-    Width = 541
-    Height = 610
+    Width = 529
+    Height = 592
     Align = alClient
     ActiveCard = DraftCard
     BevelOuter = bvNone
     TabOrder = 0
+    ExplicitWidth = 541
+    ExplicitHeight = 610
     object DraftCard: TCard
       Left = 0
       Top = 0
-      Width = 547
-      Height = 619
+      Width = 535
+      Height = 601
       Caption = 'DraftCard'
       CardIndex = 0
       TabOrder = 0
@@ -35,7 +37,7 @@ object AddCard: TAddCard
         AlignWithMargins = True
         Left = 25
         Top = 3
-        Width = 519
+        Width = 507
         Height = 67
         Margins.Left = 25
         Align = alTop
@@ -127,8 +129,8 @@ object AddCard: TAddCard
       object NavPanel: TPanel
         AlignWithMargins = True
         Left = 25
-        Top = 570
-        Width = 497
+        Top = 552
+        Width = 485
         Height = 41
         Margins.Left = 25
         Margins.Right = 25
@@ -179,8 +181,8 @@ object AddCard: TAddCard
       object Panel1: TPanel
         Left = 113
         Top = 73
-        Width = 434
-        Height = 494
+        Width = 422
+        Height = 476
         Align = alClient
         BevelOuter = bvNone
         Caption = 'Panel1'
@@ -192,7 +194,7 @@ object AddCard: TAddCard
           AlignWithMargins = True
           Left = 3
           Top = 36
-          Width = 407
+          Width = 395
           Height = 27
           Hint = 'Enter the name or ip address of the server. /n Host[:port]'
           Margins.Right = 24
@@ -207,7 +209,7 @@ object AddCard: TAddCard
           AlignWithMargins = True
           Left = 3
           Top = 3
-          Width = 407
+          Width = 395
           Height = 27
           Hint = 'Enter a custom name for your session.'
           Margins.Right = 24
@@ -222,7 +224,7 @@ object AddCard: TAddCard
           AlignWithMargins = True
           Left = 3
           Top = 102
-          Width = 407
+          Width = 395
           Height = 27
           Hint = 'Enter the name or ip address of the repeater. /n Host[:port]'
           Margins.Right = 24
@@ -238,7 +240,7 @@ object AddCard: TAddCard
           AlignWithMargins = True
           Left = 3
           Top = 69
-          Width = 407
+          Width = 395
           Height = 27
           Hint = 'sample ID:123456789'
           Margins.Right = 24
@@ -254,7 +256,7 @@ object AddCard: TAddCard
           AlignWithMargins = True
           Left = 3
           Top = 255
-          Width = 407
+          Width = 395
           Height = 27
           Hint = 'Select encoder'
           Margins.Right = 24
@@ -278,7 +280,7 @@ object AddCard: TAddCard
           AlignWithMargins = True
           Left = 3
           Top = 321
-          Width = 401
+          Width = 389
           Height = 27
           Hint = 'Select how the cursor is handled'
           Margins.Right = 24
@@ -289,6 +291,7 @@ object AddCard: TAddCard
           ShowCaption = False
           ShowHint = True
           TabOrder = 5
+          ExplicitWidth = 401
           object rbLocalCursor: TRadioButton
             AlignWithMargins = True
             Left = 3
@@ -326,7 +329,7 @@ object AddCard: TAddCard
           AlignWithMargins = True
           Left = 3
           Top = 288
-          Width = 401
+          Width = 389
           Height = 27
           Margins.Right = 24
           Align = alTop
@@ -334,6 +337,7 @@ object AddCard: TAddCard
           Caption = 'Panel4'
           ShowCaption = False
           TabOrder = 6
+          ExplicitWidth = 401
           object ViewOnly: TCheckBox
             AlignWithMargins = True
             Left = 3
@@ -352,7 +356,7 @@ object AddCard: TAddCard
           AlignWithMargins = True
           Left = 3
           Top = 354
-          Width = 401
+          Width = 389
           Height = 27
           Hint = 'Disable the clipboard'
           Margins.Right = 24
@@ -361,6 +365,7 @@ object AddCard: TAddCard
           Caption = 'Panel5'
           ShowCaption = False
           TabOrder = 7
+          ExplicitWidth = 401
           object DisableClipboard: TCheckBox
             AlignWithMargins = True
             Left = 3
@@ -379,7 +384,7 @@ object AddCard: TAddCard
           AlignWithMargins = True
           Left = 3
           Top = 135
-          Width = 401
+          Width = 389
           Height = 27
           Margins.Right = 24
           Align = alTop
@@ -387,6 +392,7 @@ object AddCard: TAddCard
           Caption = 'Panel6'
           ShowCaption = False
           TabOrder = 8
+          ExplicitWidth = 401
           object UseEncryption: TCheckBox
             AlignWithMargins = True
             Left = 3
@@ -415,7 +421,7 @@ object AddCard: TAddCard
           AlignWithMargins = True
           Left = 3
           Top = 387
-          Width = 401
+          Width = 389
           Height = 27
           Margins.Right = 24
           Align = alTop
@@ -423,6 +429,7 @@ object AddCard: TAddCard
           Caption = 'Panel7'
           ShowCaption = False
           TabOrder = 9
+          ExplicitWidth = 401
           object AlternativeKeybaord: TCheckBox
             AlignWithMargins = True
             Left = 3
@@ -441,7 +448,7 @@ object AddCard: TAddCard
           AlignWithMargins = True
           Left = 3
           Top = 420
-          Width = 401
+          Width = 389
           Height = 23
           Margins.Right = 24
           Margins.Bottom = 0
@@ -454,7 +461,7 @@ object AddCard: TAddCard
           AlignWithMargins = True
           Left = 3
           Top = 168
-          Width = 401
+          Width = 389
           Height = 27
           Hint = 'Add a user naam if it'#39's required by server.'
           Margins.Right = 24
@@ -463,12 +470,13 @@ object AddCard: TAddCard
           ShowHint = True
           TabOrder = 11
           TextHint = 'Add a user naam if it'#39's required by server.'
+          ExplicitWidth = 401
         end
         object Password: TEdit
           AlignWithMargins = True
           Left = 3
           Top = 201
-          Width = 401
+          Width = 389
           Height = 27
           Hint = 'VNC or User password'
           Margins.Right = 24
@@ -478,29 +486,32 @@ object AddCard: TAddCard
           ShowHint = True
           TabOrder = 12
           TextHint = 'VNC or User password'
+          ExplicitWidth = 401
         end
         object Notification: TEdit
           AlignWithMargins = True
           Left = 3
           Top = 446
-          Width = 401
+          Width = 389
           Height = 27
           Margins.Right = 24
           Align = alTop
           TabOrder = 13
           Text = 'Notification'
+          ExplicitWidth = 401
         end
       end
       object Panel2: TPanel
         Left = 0
         Top = 73
         Width = 113
-        Height = 485
+        Height = 467
         Align = alLeft
         BevelOuter = bvNone
         Caption = 'Panel2'
         ShowCaption = False
         TabOrder = 3
+        ExplicitHeight = 485
         object rbDirect: TRadioButton
           Left = 25
           Top = 8

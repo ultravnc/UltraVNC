@@ -204,6 +204,7 @@ VNCOptions::VNCOptions()
 	m_listening = false;
 	m_listenPort = INCOMING_PORT_OFFSET;
 	m_restricted = false;
+	m_ipv6 = false;
 	m_AllowUntrustedServers = false;
 	// Tight specific
 	m_useCompressLevel = true;
@@ -254,6 +255,9 @@ VNCOptions::VNCOptions()
 	m_keepAliveInterval = KEEPALIVE_INTERVAL;
 	m_IdleInterval = 0;
 	m_throttleMouse = 0; // adzm 2010-10
+	
+	m_HideEndOfStreamError = false;
+	
 	setDefaultOptionsFileName(m_optionfile);
 	LoadOptions(getDefaultOptionsFileName());
 }
@@ -413,6 +417,7 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
 	m_listening = s.m_listening;
 	m_listenPort = s.m_listenPort;
 	m_restricted = s.m_restricted;
+	m_ipv6 = s.m_ipv6;
 	m_AllowUntrustedServers = s.m_AllowUntrustedServers;
 
 	// Tight specific
@@ -598,6 +603,9 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 		else if (SwitchMatch(args[j], _T("restricted"))) {
 			m_restricted = true;
 		}
+		else if (SwitchMatch(args[j], _T("ipv6"))) {
+			m_ipv6 = true;
+		}
 		else if (SwitchMatch(args[j], _T("AllowUntrustedServers"))) {
 			m_AllowUntrustedServers = true;
 		}		
@@ -606,6 +614,9 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 		}
 		else if (SwitchMatch(args[j], _T("nostatus"))) {
 			m_NoStatus = true;
+		}
+		else if (SwitchMatch(args[j], _T("hideendofstreamerror"))) {
+			m_HideEndOfStreamError = true;
 		}
 		else if (SwitchMatch(args[j], _T("nohotkeys"))) {
 			m_NoHotKeys = true;
@@ -1137,9 +1148,11 @@ void VNCOptions::SaveOptions(char* fname)
 		saveInt("preferred_encoding", m_PreferredEncodings[0], fname);
 	}
 	saveInt("restricted", m_restricted, fname);
+	saveInt("ipv6", m_ipv6, fname);
 	saveInt("AllowUntrustedServers", m_AllowUntrustedServers, fname);
 	saveInt("viewonly", m_ViewOnly, fname);
 	saveInt("nostatus", m_NoStatus, fname);
+	saveInt("HideEOStreamError", m_HideEndOfStreamError, fname);
 	saveInt("nohotkeys", m_NoHotKeys, fname);
 	saveInt("showtoolbar", m_ShowToolbar, fname);
 	saveInt("fullscreen", m_FullScreen, fname);
@@ -1233,9 +1246,11 @@ void VNCOptions::LoadOptions(char* fname)
 	m_PreferredEncodings.push_back(nPreferredEncoding);
 
 	m_restricted = readInt("restricted", m_restricted, fname) != 0;
+	m_ipv6 = readInt("ipv6", m_ipv6, fname) != 0;
 	m_AllowUntrustedServers = readInt("AllowUntrustedServers", m_AllowUntrustedServers, fname) != 0;
 	m_ViewOnly = readInt("viewonly", m_ViewOnly, fname) != 0;
 	m_NoStatus = readInt("nostatus", m_NoStatus, fname) != 0;
+	m_HideEndOfStreamError = readInt("HideEOStreamError", m_HideEndOfStreamError, fname) != 0;
 	m_NoHotKeys = readInt("nohotkeys", m_NoHotKeys, fname) != 0;
 	m_ShowToolbar = readInt("showtoolbar", m_ShowToolbar, fname) != 0;
 	m_FullScreen = readInt("fullscreen", m_FullScreen, fname) != 0;
@@ -1350,7 +1365,7 @@ void VNCOptions::ShowUsage(LPTSTR info) {
 			"      [/encodings xz zrle ...]  (in order of priority)\r\n"
 			"      [/autoacceptincoming] [/autoacceptnodsm] [/disablesponsor][/InfoMsg \"Messages need quotes\"]\r\n" //adzm 2009-06-21, adzm 2009-07-19
 			"      [/requireencryption] [/enablecache] [/throttlemouse n] [/socketkeepalivetimeout n]\r\n" //adzm 2010-05-12
-			"      [/gnome]\r\n"
+			"      [/gnome] [/hideendofstreamerror]\r\n"
 			"For full details see documentation."),
 		tmpinf);
 	yesUVNCMessageBox(NULL, msg, sz_A2, MB_ICONINFORMATION);
@@ -1380,6 +1395,9 @@ BOOL CALLBACK VNCOptions::OptDlgProc(HWND hwnd, UINT uMsg,
 	switch (uMsg) {
 	case WM_INITDIALOG:
 	{
+		HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDR_TRAY));
+		SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+		SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
 		helper::SafeSetWindowUserData(hwnd, lParam);
 		_this = (VNCOptions*)lParam;
 		// Initialise the controls

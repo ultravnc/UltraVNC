@@ -125,6 +125,8 @@ private:
 	HBITMAP hNoScaleScreen;
 	HBITMAP hPhoto;
 	HBITMAP hSwitchMonitor;
+	HBITMAP hChat;
+	HBITMAP hFT;
 
 	HWND Pin;
 	HWND Close;
@@ -134,10 +136,14 @@ private:
 	HWND Screen;
 	HWND Photo;
 	HWND SwitchMonitor;
+	HWND Chat;
+	HWND FT;
 
 	HWND ScreenTip;
 	HWND PhotoTip;
 	HWND SwitchMonitorTip;
+	HWND ChatTip;
+	HWND FTTip;
 
 
 	//Text to show on titlebar and it corespondent font! :)

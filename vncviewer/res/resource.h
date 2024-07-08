@@ -86,6 +86,9 @@
 #define IDB_RED                         230
 #define IDB_BITMAP1                     231
 #define IDB_YELLOW                      231
+#define IDB_CHAT                        238
+#define IDB_BITMAP8                     240
+#define IDB_FT                          240
 #define IDD_USER_NAME                   604
 #define ID_VK_LWINDOWN                  605
 #define ID_VK_RWINDOWN                  606
@@ -266,6 +269,7 @@
 #define IDC_PREFIX                      1184
 #define IDC_RADIO3                      1185
 #define IDC_RADIO_NOVIRT                1185
+#define IDC_HIDEENDOFSTREAMERROR        1186
 #define IDC_ENCODING_BASE               1199
 #define IDC_RAWRADIO                    2000
 #define IDC_RRERADIO                    2002
@@ -339,6 +343,7 @@
 #define IDC_UVNCCOM                     2076
 #define IDC_UVVERSION                   2077
 #define IDC_UVVERSION2                  2078
+#define IDC_IPV6                        2079
 #define IDC_STATIC_SPLIT                9000
 #define IDC_HOSTNAME_DEL                9001
 #define ID_SESSION_SET_CRECT            32777
@@ -660,9 +665,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        238
+#define _APS_NEXT_RESOURCE_VALUE        241
 #define _APS_NEXT_COMMAND_VALUE         50025
-#define _APS_NEXT_CONTROL_VALUE         2079
+#define _APS_NEXT_CONTROL_VALUE         2080
 #define _APS_NEXT_SYMED_VALUE           154
 #endif
 #endif

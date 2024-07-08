@@ -60,6 +60,7 @@ public:
 	int     m_quickoption; // Modif sf@2002 - v1.1.2
 	TCHAR   m_configFilename[_MAX_PATH];
 	bool	m_restricted;
+	bool	m_ipv6;
 	bool m_AllowUntrustedServers;
 
 	// default connection options - can be set through Dialog
@@ -168,6 +169,8 @@ public:
 	TCHAR* getDefaultOptionsFileName();
 	char m_InfoMsg[255]{ 0 };
 	char m_ClassName[255]{ 0 };
+
+	bool m_HideEndOfStreamError;
 
 private:
 	void ShowUsage(LPTSTR info = NULL);

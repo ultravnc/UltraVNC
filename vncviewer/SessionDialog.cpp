@@ -147,8 +147,10 @@ SessionDialog::SessionDialog(VNCOptions* pOpt, ClientConnection* pCC, CDSMPlugin
 	fAutoAcceptNoDSM = m_pOpt->m_fAutoAcceptNoDSM;
 	fRequireEncryption = m_pOpt->m_fRequireEncryption;
 	restricted = m_pOpt->m_restricted;
+	ipv6 = m_pOpt->m_ipv6;
 	AllowUntrustedServers = m_pOpt->m_AllowUntrustedServers;
 	NoStatus = m_pOpt->m_NoStatus;
+	HideEndOfStreamError = m_pOpt->m_HideEndOfStreamError;
 	NoHotKeys = m_pOpt->m_NoHotKeys;
 	setdefaults = false;
 	/////////////////////////////////////////////////
@@ -200,11 +202,14 @@ BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	SessionDialog* _this;
 	if (uMsg == WM_INITDIALOG) {
+		HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDR_TRAY));
+		SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+		SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
 		_this = (SessionDialog*)lParam;
 		helper::SafeSetWindowUserData(hwnd, lParam);
 		char version[50]{};
 		char title[256]{};
-		strcpy_s(title, "UltraVNC Viewer - ");
+		strcpy_s(title, "UltraVNC Viewer -");
 		strcat_s(title, GetVersionFromResource(version));
 		SetWindowText(hwnd, title);
 	}
@@ -213,6 +218,9 @@ BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	switch (uMsg) {
 	case WM_INITDIALOG:
 	{
+		HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDR_TRAY));
+		SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+		SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
 		helper::SafeSetWindowUserData(hwnd, lParam);
 		SessionDialog* l_this = (SessionDialog*)lParam;
 		SetForegroundWindow(hwnd);
@@ -225,7 +233,8 @@ BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		SendMessage(hExitCheck, BM_SETCHECK, l_this->fExitCheck, 0); //PGM @ Advantig
 
 		_this->ExpandBox(hwnd, !_this->m_bExpanded);
-		SendMessage(GetDlgItem(hwnd, IDC_BUTTON_EXPAND), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)_this->hBmpExpand);
+		//SendMessage(GetDlgItem(hwnd, IDC_BUTTON_EXPAND), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)_this->hBmpExpand);
+		//SetWindowText(GetDlgItem(hwnd, IDC_BUTTON_EXPAND), "Show Options");
 		return TRUE;
 	}
 
@@ -445,13 +454,13 @@ void SessionDialog::ExpandBox(HWND hDlg, BOOL fExpand)
 	HWND wndDefaultBox = NULL;
 
 	// get the window of the button
-	HWND  pCtrl = GetDlgItem(hDlg, IDC_SHOWOPTIONS);
+	HWND  pCtrl = GetDlgItem(hDlg, IDC_BUTTON_EXPAND);
 	if (pCtrl == NULL) return;
 
 	wndDefaultBox = GetDlgItem(hDlg, IDC_DEFAULTBOX);
 	if (wndDefaultBox == NULL) return;
-	if (!fExpand) SendMessage(GetDlgItem(hDlg, IDC_BUTTON_EXPAND), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)hBmpExpand);
-	else SendMessage(GetDlgItem(hDlg, IDC_BUTTON_EXPAND), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)hBmpCollaps);
+	//if (!fExpand) SetWindowText(GetDlgItem(hDlg, IDC_BUTTON_EXPAND), "Show Options");
+	//else SetWindowText(GetDlgItem(hDlg, IDC_BUTTON_EXPAND), "Hide Options");
 	// retrieve coordinates for the default child window
 	GetWindowRect(wndDefaultBox, &rcDefaultBox);
 	rcDefaultBox.left += 2;
@@ -495,7 +504,7 @@ void SessionDialog::ExpandBox(HWND hDlg, BOOL fExpand)
 			rcDefaultBox.bottom - rcWnd.top,
 			SWP_NOZORDER | SWP_NOMOVE);
 
-		SetWindowText(pCtrl, "Show Options");
+		//SetWindowText(pCtrl, "Show Options");
 
 		// record that the dialog is contracted.
 		m_bExpanded = FALSE;
@@ -508,7 +517,7 @@ void SessionDialog::ExpandBox(HWND hDlg, BOOL fExpand)
 		// make sure that the entire dialog box is visible on the user's
 		// screen.
 		SendMessage(hDlg, DM_REPOSITION, 0, 0);
-		SetWindowText(pCtrl, "Hide Options");
+		//SetWindowText(pCtrl, "Hide Options");
 		m_bExpanded = TRUE;
 	}
 }
@@ -690,8 +699,10 @@ bool SessionDialog::connect(HWND hwnd)
 	m_pOpt->m_fAutoAcceptNoDSM = fAutoAcceptNoDSM;
 	m_pOpt->m_fRequireEncryption = fRequireEncryption;
 	m_pOpt->m_restricted = restricted;
+	m_pOpt->m_ipv6 = ipv6;
 	m_pOpt->m_AllowUntrustedServers = AllowUntrustedServers;
 	m_pOpt->m_NoStatus = NoStatus;
+	m_pOpt->m_HideEndOfStreamError = HideEndOfStreamError;
 	m_pOpt->m_NoHotKeys = NoHotKeys;
 
 	if (fUseDSMPlugin) {
@@ -802,7 +813,7 @@ void SessionDialog::ModeSwitch(HWND hwnd, WPARAM wParam)
 		EnableWindow(GetDlgItem(hwnd, IDC_PROXY_EDIT), false);
 		ShowWindow(GetDlgItem(hwnd, IDC_HOSTNAME_EDIT), true);
 		ShowWindow(GetDlgItem(hwnd, IDC_PROXY_EDIT), false);
-		SetDlgItemText(hwnd, IDC_LINE1, "server:port");
+		SetDlgItemText(hwnd, IDC_LINE1, "server[:port]");
 		SetDlgItemText(hwnd, IDC_LINE2, "");
 		ShowWindow(GetDlgItem(hwnd, IDC_GREEN), false);
 		ShowWindow(GetDlgItem(hwnd, IDC_RED), false);
