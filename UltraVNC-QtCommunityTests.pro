@@ -274,7 +274,58 @@ SOURCES += \
         \winvnc\winvnc\vnctimedmsgbox.cpp \
         \winvnc\winvnc\vsocket.cpp \
         \winvnc\winvnc\winvnc.cpp \
-        # To Do zipunzip_src to ZipUnZip32 and thiers subfolders
+        \zipunzip_src\unzip\api.c \
+        \zipunzip_src\unzip\apihelp.c \
+        \zipunzip_src\unzip\crc32.c \
+        \zipunzip_src\unzip\crctab.c \
+        \zipunzip_src\unzip\crypt.c \
+        \zipunzip_src\unzip\envargs.c \
+        \zipunzip_src\unzip\explode.c \
+        \zipunzip_src\unzip\extract.c \
+        \zipunzip_src\unzip\fileio.c \
+        \zipunzip_src\unzip\funzip.c \
+        \zipunzip_src\unzip\gbloffs.c \
+        \zipunzip_src\unzip\globals.c \
+        \zipunzip_src\unzip\inflate.c \
+        \zipunzip_src\unzip\list.c \
+        \zipunzip_src\unzip\match.c \
+        \zipunzip_src\unzip\process.c \
+        \zipunzip_src\unzip\timezone.c \
+        \zipunzip_src\unzip\ttyio.c \
+        \zipunzip_src\unzip\unreduce.c \
+        \zipunzip_src\unzip\unshrink.c \
+        \zipunzip_src\unzip\unzip.c \
+        \zipunzip_src\unzip\unzipstb.c \
+        \zipunzip_src\unzip\zipinfo.c \
+        \zipunzip_src\unzip\win32\crc_i386.c \
+        \zipunzip_src\unzip\win32\nt.c \
+        \zipunzip_src\unzip\win32\win32.c \
+        \zipunzip_src\unzip\windll\uzexampl.c \
+        \zipunzip_src\unzip\windll\windll.c \
+        \zipunzip_src\zip20\api.c \
+        \zipunzip_src\zip20\crc32.c \
+        \zipunzip_src\zip20\crctab.c \
+        \zipunzip_src\zip20\crypt.c \
+        \zipunzip_src\zip20\deflate.c \
+        \zipunzip_src\zip20\fileio.c \
+        \zipunzip_src\zip20\globals.c \
+        \zipunzip_src\zip20\timezone.c \
+        \zipunzip_src\zip20\trees.c \
+        \zipunzip_src\zip20\ttyio.c \
+        \zipunzip_src\zip20\util.c \
+        \zipunzip_src\zip20\zip.c \
+        \zipunzip_src\zip20\zipcloak.c \
+        \zipunzip_src\zip20\zipfile.c \
+        \zipunzip_src\zip20\zipnote.c \
+        \zipunzip_src\zip20\zipsplit.c \
+        \zipunzip_src\zip20\zipup.c \
+        \zipunzip_src\zip20\win32\crc_i386.c \
+        \zipunzip_src\zip20\win32\nt.c \
+        \zipunzip_src\zip20\win32\win32.c \
+        \zipunzip_src\zip20\win32\win32zip.c \
+        \zipunzip_src\zip20\windll\example.c \
+        \zipunzip_src\zip20\windll\windll.c \
+        \ZipUnZip32\ZipUnzip32.cpp \
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -547,4 +598,42 @@ HEADERS += \
         \winvnc\winvnc\vsocket.h \
         \winvnc\winvnc\vtypes.h \
         \winvnc\winvnc\winvnc.h \
-        # To Do zipunzip_src to ZipUnZip32 and thiers subfolders
+        \zipunzip_src\unzip\consts.h \
+        \zipunzip_src\unzip\crypt.h \
+        \zipunzip_src\unzip\ebcdic.h \
+        \zipunzip_src\unzip\globals.h \
+        \zipunzip_src\unzip\inflate.h \
+        \zipunzip_src\unzip\tables.h \
+        \zipunzip_src\unzip\timezone.h \
+        \zipunzip_src\unzip\ttyio.h \
+        \zipunzip_src\unzip\unzip.h \
+        \zipunzip_src\unzip\unzpriv.h \
+        \zipunzip_src\unzip\unzvers.h \
+        \zipunzip_src\unzip\zip.h \
+        \zipunzip_src\unzip\win32\nt.h \
+        \zipunzip_src\unzip\win32\rsxntwin.h \
+        \zipunzip_src\unzip\win32\w32cfg.h \
+        \zipunzip_src\unzip\windll\decs.h \
+        \zipunzip_src\unzip\windll\structs.h \
+        \zipunzip_src\unzip\windll\uzexampl.h \
+        \zipunzip_src\unzip\windll\windll.h \
+        \zipunzip_src\zip20\api.h \
+        \zipunzip_src\zip20\crypt.h \
+        \zipunzip_src\zip20\ebcdic.h \
+        \zipunzip_src\zip20\revision.h \
+        \zipunzip_src\zip20\tailor.h \
+        \zipunzip_src\zip20\timezone.h \
+        \zipunzip_src\zip20\ttyio.h \
+        \zipunzip_src\zip20\zip.h \
+        \zipunzip_src\zip20\ziperr.h \
+        \zipunzip_src\zip20\win32\nt.h \
+        \zipunzip_src\zip20\win32\osdep.h \
+        \zipunzip_src\zip20\win32\rsxntwin.h \
+        \zipunzip_src\zip20\win32\win32zip.h \
+        \zipunzip_src\zip20\win32\zipup.h \
+        \zipunzip_src\zip20\windll\example.h \
+        \zipunzip_src\zip20\windll\resource.h \
+        \zipunzip_src\zip20\windll\structs.h \
+        \zipunzip_src\zip20\windll\windll.h \
+        \zipunzip_src\zip20\windll\zipver.h \
+        \ZipUnZip32\ZipUnZip32.h \
