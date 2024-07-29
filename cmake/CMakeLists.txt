@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.1.0)
 project(UltraVNC)
 
 add_subdirectory(libomnithread)
+add_subdirectory(librdr)
 add_subdirectory(libzstd)
 add_subdirectory(libjpeg)
 add_subdirectory(libudt4)

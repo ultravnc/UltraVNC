@@ -7,8 +7,6 @@ set(CMAKE_CXX_FLAGS "-g -O0 -Wno-write-strings -Wno-conversion-null")
 
 
 
-include(../CMakeLists_librdr.txt)
-
 include(../CMakeLists_libuvncsettings.txt)
 
 include(../CMakeLists_libz.txt)
@@ -119,7 +117,7 @@ endif()
 target_link_libraries(winvnc
     libjpeg
     libomnithread
-    librdr_${PROJECT_NAME}
+    librdr
     libuvncsettings_${PROJECT_NAME}
     libz_${PROJECT_NAME}
     libzip32_${PROJECT_NAME}

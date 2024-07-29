@@ -7,8 +7,6 @@ set(CMAKE_CXX_FLAGS "-g -O0 -Wno-write-strings -Wno-conversion-null")
 
 
 
-include(../CMakeLists_librdr.txt)
-
 include(../CMakeLists_libz.txt)
 
 include(../CMakeLists_libzip32.txt)
@@ -91,7 +89,7 @@ endif()
 target_link_libraries(vncviewer
     libjpeg
     libomnithread
-    librdr_${PROJECT_NAME}
+    librdr
     libz_${PROJECT_NAME}
     libzip32_${PROJECT_NAME}
     libzipunzip_${PROJECT_NAME}
