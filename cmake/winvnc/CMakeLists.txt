@@ -9,8 +9,6 @@ set(CMAKE_CXX_FLAGS "-g -O0 -Wno-write-strings -Wno-conversion-null")
 
 include(../CMakeLists_libz.txt)
 
-include(../CMakeLists_libzip32.txt)
-
 include(../CMakeLists_libzipunzip.txt)
 
 
@@ -117,11 +115,11 @@ target_link_libraries(winvnc
     libomnithread
     librdr
     libz_${PROJECT_NAME}
-    libzip32_${PROJECT_NAME}
     libzipunzip_${PROJECT_NAME}
     libzstd
     libudtcloud
     libuvncsettings
+    libzip32
     comctl32
     comdlg32
     dwmapi
