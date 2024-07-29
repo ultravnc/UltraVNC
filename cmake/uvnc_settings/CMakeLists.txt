@@ -30,7 +30,7 @@ set(VNCVIEWER_SOURCES
 )
 add_executable(uvnc_settings)
 target_include_directories(uvnc_settings PRIVATE "${CMAKE_SOURCE_DIR}/../DSMPlugin")
-target_include_directories(uvnc_settings PRIVATE "${CMAKE_SOURCE_DIR}/../vncviewer/omnithread")
+target_include_directories(uvnc_settings PRIVATE "${CMAKE_SOURCE_DIR}/../omnithread")
 foreach(file ${VNCVIEWER_SOURCES})
     target_sources(uvnc_settings PRIVATE "${CMAKE_SOURCE_DIR}/../uvnc_settings2/uvnc_settings/${file}")
 endforeach(file)
@@ -41,7 +41,7 @@ if( ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "x86_64" )
     target_compile_definitions(uvnc_settings PRIVATE _X64)
 endif()
 target_link_libraries(uvnc_settings
-    libomnithread_vncviewer
+    libomnithread
     comctl32
     version
 )

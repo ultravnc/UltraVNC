@@ -7,8 +7,6 @@ set(CMAKE_CXX_FLAGS "-g -O0 -Wno-write-strings -Wno-conversion-null")
 
 
 
-include(../CMakeLists_libomnithread.txt)
-
 include(../CMakeLists_librdr.txt)
 
 include(../CMakeLists_libz.txt)
@@ -78,7 +76,7 @@ set(VNCVIEWER_SOURCES
 )
 add_executable(vncviewer)
 target_include_directories(vncviewer PRIVATE "${CMAKE_SOURCE_DIR}/..")
-target_include_directories(vncviewer PRIVATE "${CMAKE_SOURCE_DIR}/../vncviewer/omnithread")
+target_include_directories(vncviewer PRIVATE "${CMAKE_SOURCE_DIR}/../omnithread")
 foreach(file ${VNCVIEWER_SOURCES})
     target_sources(vncviewer PRIVATE "${CMAKE_SOURCE_DIR}/../vncviewer/${file}")
 endforeach(file)
@@ -92,7 +90,7 @@ else()
 endif()
 target_link_libraries(vncviewer
     libjpeg
-    libomnithread_${PROJECT_NAME}
+    libomnithread
     librdr_${PROJECT_NAME}
     libz_${PROJECT_NAME}
     libzip32_${PROJECT_NAME}

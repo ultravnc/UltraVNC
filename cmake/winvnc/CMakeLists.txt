@@ -7,8 +7,6 @@ set(CMAKE_CXX_FLAGS "-g -O0 -Wno-write-strings -Wno-conversion-null")
 
 
 
-include(../CMakeLists_libomnithread.txt)
-
 include(../CMakeLists_librdr.txt)
 
 include(../CMakeLists_libuvncsettings.txt)
@@ -105,8 +103,8 @@ set(WINVNC_SOURCES
 add_executable(winvnc)
 target_include_directories(winvnc PRIVATE "${CMAKE_SOURCE_DIR}/..")
 target_include_directories(winvnc PRIVATE "${CMAKE_SOURCE_DIR}/../common")
+target_include_directories(winvnc PRIVATE "${CMAKE_SOURCE_DIR}/../omnithread")
 target_include_directories(winvnc PRIVATE "${CMAKE_SOURCE_DIR}/../winvnc")
-target_include_directories(winvnc PRIVATE "${CMAKE_SOURCE_DIR}/../winvnc/omnithread")
 foreach(file ${WINVNC_SOURCES})
     target_sources(winvnc PRIVATE "${CMAKE_SOURCE_DIR}/../winvnc/winvnc/${file}")
 endforeach(file)
@@ -120,7 +118,7 @@ else()
 endif()
 target_link_libraries(winvnc
     libjpeg
-    libomnithread_${PROJECT_NAME}
+    libomnithread
     librdr_${PROJECT_NAME}
     libuvncsettings_${PROJECT_NAME}
     libz_${PROJECT_NAME}
