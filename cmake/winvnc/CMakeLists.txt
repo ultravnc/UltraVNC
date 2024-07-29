@@ -9,9 +9,6 @@ set(CMAKE_CXX_FLAGS "-g -O0 -Wno-write-strings -Wno-conversion-null")
 
 include(../CMakeLists_libz.txt)
 
-include(../CMakeLists_libzipunzip.txt)
-
-
 
 set(WINVNC_SOURCES
     ../../DSMPlugin/DSMPlugin.cpp
@@ -115,11 +112,11 @@ target_link_libraries(winvnc
     libomnithread
     librdr
     libz_${PROJECT_NAME}
-    libzipunzip_${PROJECT_NAME}
     libzstd
     libudtcloud
     libuvncsettings
     libzip32
+    libzipunzip
     comctl32
     comdlg32
     dwmapi
