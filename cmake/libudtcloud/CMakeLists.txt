@@ -1,10 +1,3 @@
-cmake_minimum_required(VERSION 3.1.0)
-
-project(libudtcloud LANGUAGES CXX)
-
-set(CMAKE_CXX_FLAGS "-g -O0 -Wno-write-strings -Wno-conversion-null")
-
-
 
 set(LIBUDTCLOUD_SOURCES
     proxy/Cloudthread.cpp
