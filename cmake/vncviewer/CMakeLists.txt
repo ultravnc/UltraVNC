@@ -1,29 +1,19 @@
-cmake_minimum_required(VERSION 3.1.0)
-
 project(vncviewer LANGUAGES C CXX RC)
 
-set(CMAKE_C_FLAGS "-g -O0 -Wno-write-strings")
-set(CMAKE_CXX_FLAGS "-g -O0 -Wno-write-strings -Wno-conversion-null")
-
-
-
-include(../CMakeLists_libomnithread.txt)
-
-include(../CMakeLists_librdr.txt)
-
-include(../CMakeLists_libz.txt)
-
-include(../CMakeLists_libzip32.txt)
-
-include(../CMakeLists_libzipunzip.txt)
-
-
+find_package(JPEG REQUIRED)
+find_package(libjpeg-turbo CONFIG REQUIRED)
+find_package(ZLIB REQUIRED)
+find_package(zstd CONFIG REQUIRED)
 
 set(VNCVIEWER_SOURCES
     ../DSMPlugin/DSMPlugin.cpp
     ../ZipUnZip32/ZipUnzip32.cpp
     ../common/Clipboard.cpp
+    ../common/Hyperlinks.cpp
     ../common/UltraVncZ.cpp
+    ../common/mnemonic.c
+    ../common/mn_wordlist.c
+    ../common/d3des.c
     ../common/win32_helpers.cpp
     ../lzo/minilzo.c
     ../rfb/dh.cpp
@@ -40,7 +30,9 @@ set(VNCVIEWER_SOURCES
     ClientConnectionFullScreen.cpp
     ClientConnectionHextile.cpp
     ClientConnectionRRE.cpp
+    ClientConnectionRSAAES.cpp
     ClientConnectionRaw.cpp
+    ClientConnectionTLS.cpp
     ClientConnectionTight.cpp
     ClientConnectionUltra.cpp
     ClientConnectionUltra2.cpp
@@ -56,16 +48,16 @@ set(VNCVIEWER_SOURCES
     LowLevelHook.cpp
     MRU.cpp
     MessBox.cpp
-    MessBox2.cpp
+    InfoBox.cpp
     SessionDialog.cpp
     SessionDialogTabs.cpp
     Snapshot.cpp
     TextChat.cpp
+    UltraVNCHerperFunctions.cpp
     VNCOptions.cpp
     VNCviewerApp.cpp
     VNCviewerApp32.cpp
     buildtime.cpp
-    d3des.c
     directx/directxviewer.cpp
     display.cpp
     sessiondialogLoadSave.cpp
@@ -78,7 +70,7 @@ set(VNCVIEWER_SOURCES
 )
 add_executable(vncviewer)
 target_include_directories(vncviewer PRIVATE "${CMAKE_SOURCE_DIR}/..")
-target_include_directories(vncviewer PRIVATE "${CMAKE_SOURCE_DIR}/../vncviewer/omnithread")
+target_include_directories(vncviewer PRIVATE "${CMAKE_SOURCE_DIR}/../omnithread")
 foreach(file ${VNCVIEWER_SOURCES})
     target_sources(vncviewer PRIVATE "${CMAKE_SOURCE_DIR}/../vncviewer/${file}")
 endforeach(file)
@@ -86,24 +78,30 @@ target_sources(vncviewer PRIVATE "${CMAKE_SOURCE_DIR}/../vncviewer/res/vncviewer
 set_source_files_properties(${CMAKE_SOURCE_DIR}/../vncviewer/res/vncviewer.rc LANGUAGE RC)
 set_source_files_properties(${CMAKE_SOURCE_DIR}/../vncviewer/res/vncviewer.rc PROPERTIES COMPILE_FLAGS "-Ocoff")
 if( ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "x86_64" )
-    target_compile_definitions(vncviewer PRIVATE _X64 _VIEWER)
+    target_compile_definitions(vncviewer PRIVATE _X64 _VIEWER _VCPKG)
 else()
-    target_compile_definitions(vncviewer PRIVATE _VIEWER)
+    target_compile_definitions(vncviewer PRIVATE _VIEWER _VCPKG)
 endif()
 target_link_libraries(vncviewer
-    libjpeg
-    libomnithread_${PROJECT_NAME}
-    librdr_${PROJECT_NAME}
-    libz_${PROJECT_NAME}
-    libzip32_${PROJECT_NAME}
-    libzipunzip_${PROJECT_NAME}
-    libzstd
+    PRIVATE JPEG::JPEG
+    PRIVATE $<IF:$<TARGET_EXISTS:libjpeg-turbo::turbojpeg>,libjpeg-turbo::turbojpeg,libjpeg-turbo::turbojpeg-static>
+    PRIVATE ZLIB::ZLIB
+    PRIVATE zstd::libzstd
+    libomnithread
+    librdr
     libudtcloud
+    libzip32
+    libzipunzip
     comctl32
     comdlg32
+    crypt32
+    cryptui
     gdi32
     gdiplus
     imm32
+    secur32
+    shlwapi
+    version
     winmm
     ws2_32
 )

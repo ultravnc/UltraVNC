@@ -1,31 +1,17 @@
-cmake_minimum_required(VERSION 3.1.0)
-
 project(winvnc LANGUAGES C CXX RC)
 
-set(CMAKE_C_FLAGS "-g -O0 -Wno-write-strings")
-set(CMAKE_CXX_FLAGS "-g -O0 -Wno-write-strings -Wno-conversion-null")
-
-
-
-include(../CMakeLists_libomnithread.txt)
-
-include(../CMakeLists_librdr.txt)
-
-include(../CMakeLists_libuvncsettings.txt)
-
-include(../CMakeLists_libz.txt)
-
-include(../CMakeLists_libzip32.txt)
-
-include(../CMakeLists_libzipunzip.txt)
-
-
+find_package(JPEG REQUIRED)
+find_package(libjpeg-turbo CONFIG REQUIRED)
+find_package(ZLIB REQUIRED)
+find_package(zstd CONFIG REQUIRED)
 
 set(WINVNC_SOURCES
     ../../DSMPlugin/DSMPlugin.cpp
     ../../ZipUnZip32/ZipUnzip32.cpp
     ../../common/Clipboard.cpp
+    ../../common/Hyperlinks.cpp
     ../../common/UltraVncZ.cpp
+    ../../common/d3des.c
     ../../common/win32_helpers.cpp
     ../../lzo/minilzo.c
     ../../rfb/dh.cpp
@@ -41,13 +27,13 @@ set(WINVNC_SOURCES
     ScreenCapture.cpp
     SettingsManager.cpp
     TextChat.cpp
+    UdpEchoServer.cpp
     UltraVNCService.cpp
     VirtualDisplay.cpp
     benchmark.cpp
     buildtime.cpp
     cadthread.cpp
     credentials.cpp
-    d3des.c
     getinfo.cpp
     inifile.cpp
     initipp.cpp
@@ -105,8 +91,8 @@ set(WINVNC_SOURCES
 add_executable(winvnc)
 target_include_directories(winvnc PRIVATE "${CMAKE_SOURCE_DIR}/..")
 target_include_directories(winvnc PRIVATE "${CMAKE_SOURCE_DIR}/../common")
+target_include_directories(winvnc PRIVATE "${CMAKE_SOURCE_DIR}/../omnithread")
 target_include_directories(winvnc PRIVATE "${CMAKE_SOURCE_DIR}/../winvnc")
-target_include_directories(winvnc PRIVATE "${CMAKE_SOURCE_DIR}/../winvnc/omnithread")
 foreach(file ${WINVNC_SOURCES})
     target_sources(winvnc PRIVATE "${CMAKE_SOURCE_DIR}/../winvnc/winvnc/${file}")
 endforeach(file)
@@ -114,20 +100,21 @@ target_sources(winvnc PRIVATE "${CMAKE_SOURCE_DIR}/../winvnc/winvnc/winvnc.rc")
 set_source_files_properties(${CMAKE_SOURCE_DIR}/../winvnc/winvnc/winvnc.rc LANGUAGE RC)
 set_source_files_properties(${CMAKE_SOURCE_DIR}/../winvnc/winvnc/winvnc.rc PROPERTIES COMPILE_FLAGS "-Ocoff")
 if( ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "x86_64" )
-    target_compile_definitions(winvnc PRIVATE _X64 _WIN32_WINNT=0x601)
+    target_compile_definitions(winvnc PRIVATE _X64 _WIN32_WINNT=0x601 _VCPKG)
 else()
-    target_compile_definitions(winvnc PRIVATE _WIN32_WINNT=0x601)
+    target_compile_definitions(winvnc PRIVATE _WIN32_WINNT=0x601 _VCPKG)
 endif()
 target_link_libraries(winvnc
-    libjpeg
-    libomnithread_${PROJECT_NAME}
-    librdr_${PROJECT_NAME}
-    libuvncsettings_${PROJECT_NAME}
-    libz_${PROJECT_NAME}
-    libzip32_${PROJECT_NAME}
-    libzipunzip_${PROJECT_NAME}
-    libzstd
+    PRIVATE JPEG::JPEG
+    PRIVATE $<IF:$<TARGET_EXISTS:libjpeg-turbo::turbojpeg>,libjpeg-turbo::turbojpeg,libjpeg-turbo::turbojpeg-static>
+    PRIVATE ZLIB::ZLIB
+    PRIVATE zstd::libzstd
+    libomnithread
+    librdr
     libudtcloud
+    libuvncsettings
+    libzip32
+    libzipunzip
     comctl32
     comdlg32
     dwmapi
@@ -137,4 +124,5 @@ target_link_libraries(winvnc
     userenv
     version
     ws2_32
+    wtsapi32
 )
