@@ -17,6 +17,7 @@ if( ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "x86_64" OR ${CMAKE_SYSTEM_PROCESSOR} STR
     add_compile_definitions("_X64")
 endif()
 
+add_subdirectory(createpassword)
 add_subdirectory(libomnithread)
 add_subdirectory(librdr)
 add_subdirectory(libudt4)
