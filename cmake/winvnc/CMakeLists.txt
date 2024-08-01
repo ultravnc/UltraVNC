@@ -109,7 +109,6 @@ target_link_libraries(${PROJECT_NAME}
     libomnithread
     librdr
     libudtcloud
-    libuvncsettings
     libzip32
     libzipunzip
     comctl32
