@@ -18,6 +18,7 @@ if( ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "x86_64" OR ${CMAKE_SYSTEM_PROCESSOR} STR
 endif()
 
 add_subdirectory(authadmin)
+add_subdirectory(authSSP)
 add_subdirectory(createpassword)
 add_subdirectory(libomnithread)
 add_subdirectory(librdr)
