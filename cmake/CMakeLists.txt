@@ -17,6 +17,13 @@ if( ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "x86_64" OR ${CMAKE_SYSTEM_PROCESSOR} STR
     add_compile_definitions("_X64")
 endif()
 
+option(asan "Build with address sanitizer enabled.")
+if (asan)
+    add_compile_options(-fsanitize=address)
+    add_link_options(-fsanitize=address)
+    install(FILES "c:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.40.33807/bin/Hostx64/x64/clang_rt.asan_dynamic-x86_64.dll" DESTINATION ${CMAKE_BINARY_DIR}/ultravnc OPTIONAL)
+endif()
+
 add_subdirectory(authadmin)
 add_subdirectory(authSSP)
 add_subdirectory(createpassword)
