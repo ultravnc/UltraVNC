@@ -33,6 +33,7 @@ add_subdirectory(logging)
 add_subdirectory(logmessages)
 add_subdirectory(MSLogonACL)
 add_subdirectory(repeater)
+#add_subdirectory(SecureVNCPlugin) # Not publicly available.
 add_subdirectory(setcad)
 add_subdirectory(setpasswd)
 add_subdirectory(testauth)
