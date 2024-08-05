@@ -24,6 +24,11 @@ if (asan)
     install(FILES "c:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.40.33807/bin/Hostx64/x64/clang_rt.asan_dynamic-x86_64.dll" DESTINATION ${CMAKE_BINARY_DIR}/ultravnc OPTIONAL)
 endif()
 
+if (MINGW)
+    install(FILES /usr/lib/gcc/x86_64-w64-mingw32/13-win32/libstdc++-6.dll DESTINATION ${CMAKE_BINARY_DIR}/ultravnc OPTIONAL)
+    install(FILES /usr/lib/gcc/x86_64-w64-mingw32/13-win32/libgcc_s_seh-1.dll DESTINATION ${CMAKE_BINARY_DIR}/ultravnc OPTIONAL)
+endif()
+
 add_subdirectory(authadmin)
 add_subdirectory(authSSP)
 add_subdirectory(createpassword)
