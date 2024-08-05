@@ -1,11 +1,13 @@
+
 project(vncviewer LANGUAGES C CXX RC)
 
 find_package(JPEG REQUIRED)
 find_package(libjpeg-turbo CONFIG REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(zstd CONFIG REQUIRED)
+find_package(LibLZMA REQUIRED)
 
-set(VNCVIEWER_SOURCES
+set(${PROJECT_NAME}_SOURCES
     ../DSMPlugin/DSMPlugin.cpp
     ../ZipUnZip32/ZipUnzip32.cpp
     ../common/Clipboard.cpp
@@ -47,7 +49,6 @@ set(VNCVIEWER_SOURCES
     Log.cpp
     LowLevelHook.cpp
     MRU.cpp
-    MessBox.cpp
     InfoBox.cpp
     SessionDialog.cpp
     SessionDialogTabs.cpp
@@ -68,25 +69,21 @@ set(VNCVIEWER_SOURCES
     xz.cpp
     zrle.cpp
 )
-add_executable(vncviewer)
-target_include_directories(vncviewer PRIVATE "${CMAKE_SOURCE_DIR}/..")
-target_include_directories(vncviewer PRIVATE "${CMAKE_SOURCE_DIR}/../omnithread")
-foreach(file ${VNCVIEWER_SOURCES})
-    target_sources(vncviewer PRIVATE "${CMAKE_SOURCE_DIR}/../vncviewer/${file}")
+add_executable(${PROJECT_NAME} WIN32)
+target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/..")
+target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/../omnithread")
+foreach(file ${${PROJECT_NAME}_SOURCES})
+    target_sources(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/../vncviewer/${file}")
 endforeach(file)
-target_sources(vncviewer PRIVATE "${CMAKE_SOURCE_DIR}/../vncviewer/res/vncviewer.rc")
+target_sources(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/../vncviewer/res/vncviewer.rc")
 set_source_files_properties(${CMAKE_SOURCE_DIR}/../vncviewer/res/vncviewer.rc LANGUAGE RC)
-set_source_files_properties(${CMAKE_SOURCE_DIR}/../vncviewer/res/vncviewer.rc PROPERTIES COMPILE_FLAGS "-Ocoff")
-if( ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "x86_64" )
-    target_compile_definitions(vncviewer PRIVATE _X64 _VIEWER _VCPKG)
-else()
-    target_compile_definitions(vncviewer PRIVATE _VIEWER _VCPKG)
-endif()
-target_link_libraries(vncviewer
+target_compile_definitions(${PROJECT_NAME} PRIVATE NDEBUG WIN32 _WINDOWS __NT__ _WINSTATIC __WIN32__ _VIEWER _XZ _CLOUD _VCPKG NOMINMAX)
+target_link_libraries(${PROJECT_NAME}
     PRIVATE JPEG::JPEG
     PRIVATE $<IF:$<TARGET_EXISTS:libjpeg-turbo::turbojpeg>,libjpeg-turbo::turbojpeg,libjpeg-turbo::turbojpeg-static>
     PRIVATE ZLIB::ZLIB
     PRIVATE zstd::libzstd
+    PRIVATE LibLZMA::LibLZMA
     libomnithread
     librdr
     libudtcloud
@@ -105,3 +102,7 @@ target_link_libraries(vncviewer
     winmm
     ws2_32
 )
+install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${CMAKE_BINARY_DIR}/ultravnc)
+if (MSVC)
+    install(FILES $<TARGET_PDB_FILE:${PROJECT_NAME}> DESTINATION ${CMAKE_BINARY_DIR}/ultravnc OPTIONAL)
+endif()

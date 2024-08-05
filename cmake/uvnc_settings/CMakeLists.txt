@@ -1,5 +1,7 @@
 
-set(VNCVIEWER_SOURCES
+project(uvnc_settings LANGUAGES CXX RC)
+
+set(${PROJECT_NAME}_SOURCES
     capture.cpp
     connections.cpp
     createsfx2.cpp
@@ -20,20 +22,20 @@ set(VNCVIEWER_SOURCES
     vncOSVersion.cpp
     vncsetauth.cpp
 )
-add_executable(uvnc_settings)
-target_include_directories(uvnc_settings PRIVATE "${CMAKE_SOURCE_DIR}/../DSMPlugin")
-target_include_directories(uvnc_settings PRIVATE "${CMAKE_SOURCE_DIR}/../omnithread")
-foreach(file ${VNCVIEWER_SOURCES})
-    target_sources(uvnc_settings PRIVATE "${CMAKE_SOURCE_DIR}/../uvnc_settings/uvnc_settings/${file}")
+add_executable(${PROJECT_NAME} WIN32)
+target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/../DSMPlugin")
+target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/../omnithread")
+foreach(file ${${PROJECT_NAME}_SOURCES})
+    target_sources(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/../uvnc_settings/uvnc_settings/${file}")
 endforeach(file)
-target_sources(uvnc_settings PRIVATE "${CMAKE_SOURCE_DIR}/../uvnc_settings/uvnc_settings/uvnc_settings.rc")
+target_sources(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/../uvnc_settings/uvnc_settings/uvnc_settings.rc")
 set_source_files_properties(${CMAKE_SOURCE_DIR}/../uvnc_settings/uvnc_settings/uvnc_settings.rc LANGUAGE RC)
-set_source_files_properties(${CMAKE_SOURCE_DIR}/../uvnc_settings/uvnc_settings/uvnc_settings.rc PROPERTIES COMPILE_FLAGS "-Ocoff")
-if( ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "x86_64" )
-    target_compile_definitions(uvnc_settings PRIVATE _X64)
-endif()
-target_link_libraries(uvnc_settings
+target_link_libraries(${PROJECT_NAME}
     libomnithread
     comctl32
     version
 )
+install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${CMAKE_BINARY_DIR}/ultravnc)
+if (MSVC)
+    install(FILES $<TARGET_PDB_FILE:${PROJECT_NAME}> DESTINATION ${CMAKE_BINARY_DIR}/ultravnc OPTIONAL)
+endif()
