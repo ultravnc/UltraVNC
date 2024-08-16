@@ -1,5 +1,7 @@
 # Fix Error 'QMainWindow' file not found In Progress
-QT = Core gui
+
+QT += core gui #Patch try
+#QT = Core gui
 #QT = Core gui widgets  <- Bug
 #QT += widgets <- Bug
 #greaterThan(QT_MAJOR_VERSION, X): QT += widgets
@@ -8,6 +10,17 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 #CONFIG += c++17 cmdline
 CONFIG += c++17
 # End Fix Error 'QMainWindow' file not found
+
+# Try patch errors compile Stop
+# :-1: error: No rule to make target '/vncviewer/dialogapropos.ui', needed by 'ui_dialogapropos.h'.  Stop.
+# Same before adding dialogapropos.ui with '/vncviewer/mainwindow.ui', needed by 'ui_mainwindow.h'.  Stop.
+TARGET = UltraVNC-QtCommunityTests
+TEMPLATE = app
+# End Try patch errors compile Stop
+
+# Patch Warnings
+DEFINES += QT_DEPRECATED_WARNINGS
+# End Patch Warnings
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -21,8 +34,8 @@ SOURCES += \
     \addon\ms-logon\authSSP\vncAccessControl.cpp \
     \addon\ms-logon\authSSP\vncSecurityEditor.cpp \
     \addon\ms-logon\authSSP\vncSSP.cpp \
-    \addon\ms-logon\ldapauth\ldapAuth.h \
-    \addon\ms-logon\ldapauth\resource.h \
+    \addon\ms-logon\ldapauth\ldapAuth.cpp \
+    \addon\ms-logon\ldapauth\resource.cpp \
     \addon\ms-logon\ldapauth9x\ldapAuth9x.cpp \
     \addon\ms-logon\ldapauthNT4\ldapAuthnt4.cpp \
     \addon\ms-logon\logging\logging.cpp \
@@ -152,6 +165,7 @@ SOURCES += \
     \uvnckeyboardhelper\uvnckeyboardhelper\stdafx.cpp \
     \uvnckeyboardhelper\uvnckeyboardhelper\uvnckeyboardhelper.cpp \
     \vncviewer\AboutBox.cpp \
+    \vncviewer\AboutBoxQt.cpp \
     \vncviewer\AccelKeys.cpp \
     \vncviewer\AuthDialog.cpp \
     \vncviewer\buildtime.cpp \
@@ -174,8 +188,11 @@ SOURCES += \
     \vncviewer\ClientConnectionZlib.cpp \
     \vncviewer\ClientConnectionZlibHex.cpp \
     \vncviewer\Daemon.cpp \
+    \vncviewer\dialogapropos.cpp \
+    \vncviewer\directx\directxviewer.cpp \
     \vncviewer\display.cpp \
     \vncviewer\Exception.cpp \
+    \vncviewer\fenetreapropos.cpp \
     \vncviewer\FileTransfer.cpp \
     \vncviewer\FullScreenTitleBar.cpp \
     \vncviewer\InfoBox.cpp \
@@ -183,6 +200,8 @@ SOURCES += \
     \vncviewer\KeyMapjap.cpp \
     \vncviewer\Log.cpp \
     \vncviewer\LowLevelHook.cpp \
+    \vncviewer\main.cpp \
+    \vncviewer\mainwindow.cpp \
     \vncviewer\MessBox.cpp \
     \vncviewer\MRU.cpp \
     \vncviewer\SessionDialog.cpp \
@@ -200,7 +219,6 @@ SOURCES += \
     \vncviewer\VNCviewerApp32.cpp \
     \vncviewer\xz.cpp \
     \vncviewer\zrle.cpp \
-    \vncviewer\directx\directxviewer.cpp \
     \winvnc\createpassword\createpassword.cpp \
     \winvnc\loadmemory\loadDllFromMemory.cpp \
     \winvnc\loadmemory\MemoryModule.c \
@@ -335,7 +353,6 @@ SOURCES += \
     \zipunzip_src\zip20\windll\windll.c \
     \ZipUnZip32\ZipUnzip32.cpp \
 
-
 HEADERS += \
     \addon\versioninfo.h \
     \addon\ms-logon\authadm\authadmin.h \
@@ -349,7 +366,7 @@ HEADERS += \
     \addon\ms-logon\authSSP\vncSecurityEditor.h \
     \addon\ms-logon\authSSP\vncSecurityEditorProps.h \
     \addon\ms-logon\authSSP\vncSSP.h \
-    \addon\ms-logon\ldapauth\ldapAuth.cpp \
+    \addon\ms-logon\ldapauth\ldapAuth.h \
     \addon\ms-logon\ldapauth9x\ldapAuth9x.h \
     \addon\ms-logon\ldapauth9x\resource.h \
     \addon\ms-logon\ldapauthNT4\ldapAuthnt4.h \
@@ -490,12 +507,16 @@ HEADERS += \
     \uvnckeyboardhelper\uvnckeyboardhelper\targetver.h \
     \uvnckeyboardhelper\uvnckeyboardhelper\uvnckeyboardhelper.h \
     \vncviewer\AboutBox.h \
+    \vncviewer\AboutBoxQt.h \
     \vncviewer\AccelKeys.h \
     \vncviewer\AuthDialog.h \
     \vncviewer\ClientConnection.h \
     \vncviewer\Daemon.h \
+    \vncviewer\dialogapropos.h \
+    \vncviewer\directx\directxviewer.h \
     \vncviewer\display.h \
     \vncviewer\Exception.h \
+    \vncviewer\fenetreapropos.h \
     \vncviewer\FileTransfer.h \
     \vncviewer\FpsCounter.h \
     \vncviewer\FullScreenTitleBar.h \
@@ -507,6 +528,7 @@ HEADERS += \
     \vncviewer\keysymdefjap.h \
     \vncviewer\Log.h \
     \vncviewer\LowLevelHook.h \
+    \vncviewer\mainwindow.h \
     \vncviewer\MEssBox.h \
     \vncviewer\MRU.h \
     \vncviewer\multimon.h \
@@ -523,7 +545,6 @@ HEADERS += \
     \vncviewer\vncviewerQt.h \
     \vncviewer\VNCviewerApp.h \
     \vncviewer\VNCviewerApp32.h \
-    \vncviewer\directx\directxviewer.h \
     \winvnc\loadmemory\loadDllFromMemory.h \
     \winvnc\loadmemory\MemoryModule.h \
     \winvnc\vnchooks\resource.h \
@@ -644,7 +665,9 @@ HEADERS += \
     \ZipUnZip32\ZipUnZip32.h \
 
 FORMS += \
-    \vncviewer\vncviewerQt.ui \
+    \vncviewer\AboutBoxQt.ui \
+    \vncviewer\mainwindow.ui \
+    \vncviewer\vncviewerQt.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
