@@ -28,7 +28,6 @@ set(VNCVIEWER_SOURCES
     ../lzo/minilzo.c
     ../rfb/dh.cpp
     AboutBox.cpp
-	AboutBoxQt.cpp
     AccelKeys.cpp
     AuthDialog.cpp
     ClientConnection.cpp
@@ -55,8 +54,6 @@ set(VNCVIEWER_SOURCES
     KeyMapjap.cpp
     Log.cpp
     LowLevelHook.cpp
-	main.cpp
-	mainwindows.cpp
     MRU.cpp
     MessBox.cpp
     MessBox2.cpp
