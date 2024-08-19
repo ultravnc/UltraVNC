@@ -1,5 +1,7 @@
 
-set(LIBZIP32_SOURCES
+project(libzip32 LANGUAGES CXX RC)
+
+set(${PROJECT_NAME}_SOURCES
     api.c
     crypt.c
     deflate.c
@@ -15,8 +17,8 @@ set(LIBZIP32_SOURCES
     zipfile.c
     zipup.c
 )
-add_library(libzip32 STATIC)
-foreach(file ${LIBZIP32_SOURCES})
-    target_sources(libzip32 PRIVATE "${CMAKE_SOURCE_DIR}/../zipunzip_src/zip20/${file}")
+add_library(${PROJECT_NAME} STATIC)
+foreach(file ${${PROJECT_NAME}_SOURCES})
+    target_sources(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/../zipunzip_src/zip20/${file}")
 endforeach(file)
-target_compile_definitions(libzip32 PRIVATE NO_ASM WINDLL MSDOS USE_ZIPMAIN ZIPLIB USE_MINGW_GLOBBING)
+target_compile_definitions(${PROJECT_NAME} PRIVATE NDEBUG _WINDOWS WIN32 NO_ASM WINDLL MSDOS USE_ZIPMAIN ZIPLIB)

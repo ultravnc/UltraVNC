@@ -1,5 +1,7 @@
 
-set(LIBUDT4_SOURCES
+project(libudt4 LANGUAGES CXX RC)
+
+set(${PROJECT_NAME}_SOURCES
     src/api.cpp
     src/buffer.cpp
     src/cache.cpp
@@ -14,12 +16,12 @@ set(LIBUDT4_SOURCES
     src/queue.cpp
     src/window.cpp
 )
-add_library(libudt4 STATIC)
-target_include_directories(libudt4 PRIVATE "${CMAKE_SOURCE_DIR}/../udt4")
-foreach(file ${LIBUDT4_SOURCES})
-    target_sources(libudt4 PRIVATE "${CMAKE_SOURCE_DIR}/../udt4/${file}")
+add_library(${PROJECT_NAME} STATIC)
+target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/../udt4")
+foreach(file ${${PROJECT_NAME}_SOURCES})
+    target_sources(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/../udt4/${file}")
 endforeach(file)
-target_link_libraries(libudt4
+target_link_libraries(${PROJECT_NAME}
     ws2_32
     wsock32
 )

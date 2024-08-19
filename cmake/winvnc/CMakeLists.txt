@@ -1,11 +1,13 @@
+
 project(winvnc LANGUAGES C CXX RC)
 
 find_package(JPEG REQUIRED)
 find_package(libjpeg-turbo CONFIG REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(zstd CONFIG REQUIRED)
+find_package(LibLZMA REQUIRED)
 
-set(WINVNC_SOURCES
+set(${PROJECT_NAME}_SOURCES
     ../../DSMPlugin/DSMPlugin.cpp
     ../../ZipUnZip32/ZipUnzip32.cpp
     ../../common/Clipboard.cpp
@@ -41,7 +43,6 @@ set(WINVNC_SOURCES
     rfbRegion_X11.cxx
     rfbRegion_win32.cpp
     rfbUpdateTracker.cpp
-    service.cpp
     stdhdrs.cpp
     translate.cpp
     uvncUiAccess.cpp
@@ -88,31 +89,26 @@ set(WINVNC_SOURCES
     vsocket.cpp
     winvnc.cpp
 )
-add_executable(winvnc)
-target_include_directories(winvnc PRIVATE "${CMAKE_SOURCE_DIR}/..")
-target_include_directories(winvnc PRIVATE "${CMAKE_SOURCE_DIR}/../common")
-target_include_directories(winvnc PRIVATE "${CMAKE_SOURCE_DIR}/../omnithread")
-target_include_directories(winvnc PRIVATE "${CMAKE_SOURCE_DIR}/../winvnc")
-foreach(file ${WINVNC_SOURCES})
-    target_sources(winvnc PRIVATE "${CMAKE_SOURCE_DIR}/../winvnc/winvnc/${file}")
+add_executable(${PROJECT_NAME} WIN32)
+target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/..")
+target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/../common")
+target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/../omnithread")
+target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/../winvnc")
+foreach(file ${${PROJECT_NAME}_SOURCES})
+    target_sources(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/../winvnc/winvnc/${file}")
 endforeach(file)
-target_sources(winvnc PRIVATE "${CMAKE_SOURCE_DIR}/../winvnc/winvnc/winvnc.rc")
+target_sources(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/../winvnc/winvnc/winvnc.rc")
 set_source_files_properties(${CMAKE_SOURCE_DIR}/../winvnc/winvnc/winvnc.rc LANGUAGE RC)
-set_source_files_properties(${CMAKE_SOURCE_DIR}/../winvnc/winvnc/winvnc.rc PROPERTIES COMPILE_FLAGS "-Ocoff")
-if( ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "x86_64" )
-    target_compile_definitions(winvnc PRIVATE _X64 _WIN32_WINNT=0x601 _VCPKG)
-else()
-    target_compile_definitions(winvnc PRIVATE _WIN32_WINNT=0x601 _VCPKG)
-endif()
-target_link_libraries(winvnc
+target_compile_definitions(${PROJECT_NAME} PRIVATE NDEBUG __x86__ __WIN32__ WIN32 _WINDOWS XMD_H _WINSTATIC _RDPMODE _XZ _VCPKG)
+target_link_libraries(${PROJECT_NAME}
     PRIVATE JPEG::JPEG
     PRIVATE $<IF:$<TARGET_EXISTS:libjpeg-turbo::turbojpeg>,libjpeg-turbo::turbojpeg,libjpeg-turbo::turbojpeg-static>
     PRIVATE ZLIB::ZLIB
     PRIVATE zstd::libzstd
+    PRIVATE LibLZMA::LibLZMA
     libomnithread
     librdr
     libudtcloud
-    libuvncsettings
     libzip32
     libzipunzip
     comctl32
@@ -126,3 +122,7 @@ target_link_libraries(winvnc
     ws2_32
     wtsapi32
 )
+install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${CMAKE_BINARY_DIR}/ultravnc)
+if (MSVC)
+    install(FILES $<TARGET_PDB_FILE:${PROJECT_NAME}> DESTINATION ${CMAKE_BINARY_DIR}/ultravnc OPTIONAL)
+endif()
