@@ -17,8 +17,6 @@ include(../CMakeLists_libzip32.txt)
 
 include(../CMakeLists_libzipunzip.txt)
 
-
-
 set(VNCVIEWER_SOURCES
     ../DSMPlugin/DSMPlugin.cpp
     ../ZipUnZip32/ZipUnzip32.cpp
@@ -56,7 +54,7 @@ set(VNCVIEWER_SOURCES
     Log.cpp
     LowLevelHook.cpp
 	main.cpp
-	mainwindows.cpp
+	mainwindow.cpp [===[Error correction mainwindows.cpp -> mainwindow.cpp without an s]===]
     MRU.cpp
     MessBox.cpp
     MessBox2.cpp
@@ -110,3 +108,5 @@ target_link_libraries(vncviewer
     winmm
     ws2_32
 )
+
+

@@ -28,6 +28,9 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    \vncviewer\AboutBoxQt.cpp \
+    \vncviewer\main.cpp \
+    \vncviewer\mainwindow.cpp
 #    \addon\ms-logon\authadm\authadmin.cpp \
 #    \addon\ms-logon\authSSP\authSSP.cpp \
 #    \addon\ms-logon\authSSP\EventLogging.cpp \
@@ -166,7 +169,6 @@ SOURCES += \
 #    \uvnckeyboardhelper\uvnckeyboardhelper\stdafx.cpp \
 #    \uvnckeyboardhelper\uvnckeyboardhelper\uvnckeyboardhelper.cpp \
 #    \vncviewer\AboutBox.cpp \
-    \vncviewer\AboutBoxQt.cpp \
 #    \vncviewer\AccelKeys.cpp \
 #    \vncviewer\AuthDialog.cpp \
 #    \vncviewer\buildtime.cpp \
@@ -189,7 +191,6 @@ SOURCES += \
 #    \vncviewer\ClientConnectionZlib.cpp \
 #    \vncviewer\ClientConnectionZlibHex.cpp \
 #    \vncviewer\Daemon.cpp \
-    \vncviewer\dialogapropos.cpp \
 #    \vncviewer\directx\directxviewer.cpp \
 #    \vncviewer\display.cpp \
 #    \vncviewer\Exception.cpp \
@@ -201,8 +202,6 @@ SOURCES += \
 #    \vncviewer\KeyMapjap.cpp \
 #    \vncviewer\Log.cpp \
 #    \vncviewer\LowLevelHook.cpp \
-    \vncviewer\main.cpp \
-    \vncviewer\mainwindow.cpp \
 #    \vncviewer\MessBox.cpp \
 #    \vncviewer\MRU.cpp \
 #    \vncviewer\SessionDialog.cpp \
@@ -352,9 +351,11 @@ SOURCES += \
 #    \zipunzip_src\zip20\win32\win32zip.c \
 #    \zipunzip_src\zip20\windll\example.c \
 #    \zipunzip_src\zip20\windll\windll.c \
-#    \ZipUnZip32\ZipUnzip32.cpp \
+#    \ZipUnZip32\ZipUnzip32.cpp
 
 HEADERS += \
+    \vncviewer\AboutBoxQt.h \
+    \vncviewer\mainwindow.h
 #    \addon\versioninfo.h \
 #    \addon\ms-logon\authadm\authadmin.h \
 #    \addon\ms-logon\authadm\resource.h \
@@ -508,7 +509,6 @@ HEADERS += \
 #    \uvnckeyboardhelper\uvnckeyboardhelper\targetver.h \
 #    \uvnckeyboardhelper\uvnckeyboardhelper\uvnckeyboardhelper.h \
 #    \vncviewer\AboutBox.h \
-    \vncviewer\AboutBoxQt.h \
 #    \vncviewer\AccelKeys.h \
 #    \vncviewer\AuthDialog.h \
 #    \vncviewer\ClientConnection.h \
@@ -529,7 +529,6 @@ HEADERS += \
 #    \vncviewer\keysymdefjap.h \
 #    \vncviewer\Log.h \
 #    \vncviewer\LowLevelHook.h \
-    \vncviewer\mainwindow.h \
 #    \vncviewer\MEssBox.h \
 #    \vncviewer\MRU.h \
 #    \vncviewer\multimon.h \
@@ -663,12 +662,17 @@ HEADERS += \
 #    \zipunzip_src\zip20\windll\structs.h \
 #    \zipunzip_src\zip20\windll\windll.h \
 #    \zipunzip_src\zip20\windll\zipver.h \
-#    \ZipUnZip32\ZipUnZip32.h \
+#    \ZipUnZip32\ZipUnZip32.h
 
 FORMS += \
     \vncviewer\AboutBoxQt.ui \
-    \vncviewer\mainwindow.ui \
+    \vncviewer\mainwindow.ui
 #    \vncviewer\vncviewerQt.ui
+
+TRANSLATIONS += \
+    UltraVNC-QtCommunityTests_fr_FR.ts
+CONFIG += lrelease
+CONFIG += embed_translations
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
