@@ -1,5 +1,7 @@
 
-set(REPEATER_SOURCES
+project(repeater LANGUAGES CXX RC)
+
+set(${PROJECT_NAME}_SOURCES
     gui.cpp
     lists_functions.cpp
     mode12_listener.cpp
@@ -16,14 +18,17 @@ set(REPEATER_SOURCES
     webgui/webutils.c
     webgui/wsfdata.c
 )
-add_executable(repeater)
-foreach(file ${REPEATER_SOURCES})
-    target_sources(repeater PRIVATE "${CMAKE_SOURCE_DIR}/../repeater/${file}")
+add_executable(${PROJECT_NAME} WIN32)
+foreach(file ${${PROJECT_NAME}_SOURCES})
+    target_sources(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/../repeater/${file}")
 endforeach(file)
-target_sources(repeater PRIVATE "${CMAKE_SOURCE_DIR}/../repeater/resources.rc")
+target_sources(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/../repeater/resources.rc")
 set_source_files_properties(${CMAKE_SOURCE_DIR}/../repeater/resources.rc LANGUAGE RC)
-set_source_files_properties(${CMAKE_SOURCE_DIR}/../repeater/resources.rc PROPERTIES COMPILE_FLAGS "-Ocoff")
-target_link_libraries(repeater
+target_link_libraries(${PROJECT_NAME}
     winmm
     ws2_32
 )
+install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${CMAKE_BINARY_DIR}/ultravnc)
+if (MSVC)
+    install(FILES $<TARGET_PDB_FILE:${PROJECT_NAME}> DESTINATION ${CMAKE_BINARY_DIR}/ultravnc OPTIONAL)
+endif()
