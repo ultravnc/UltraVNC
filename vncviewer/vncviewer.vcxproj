@@ -1035,7 +1035,7 @@
     </ResourceCompile>
     <PreLinkEvent>
       <Message>Setting build time...</Message>
-      <Command>cl /nologo /MT /FoRelease\ /FdRelease\ /c buildtime.cpp</Command>
+      <Command>cl /nologo /MT /Fo.\x64\Release\ /Fd.\x64\Release\ /c buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
       <AdditionalDependencies>comctl32.lib;winmm.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -1086,7 +1086,7 @@
     </ResourceCompile>
     <PreLinkEvent>
       <Message>Setting build time...</Message>
-      <Command>cl /nologo /MT /FoRelease\ /FdRelease\ /c buildtime.cpp</Command>
+      <Command>cl /nologo /MT /Fo.\x64\Release\ /Fd.\x64\Release\ /c buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
       <AdditionalDependencies>comctl32.lib;winmm.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
