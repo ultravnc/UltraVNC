@@ -1,7 +1,7 @@
 # Fix Error 'QMainWindow' file not found In Progress
 
-QT += core gui #Patch try
-#QT = Core gui
+QT = Core gui
+
 #QT = Core gui widgets  <- Bug
 #QT += widgets <- Bug
 #greaterThan(QT_MAJOR_VERSION, X): QT += widgets

@@ -592,7 +592,7 @@
       <Culture>0x0809</Culture>
     </ResourceCompile>
     <PreLinkEvent>
-      <Command>cl /nologo /MTd /Fo..\Debug\ /Fd..\Debug\ /c buildtime.cpp</Command>
+      <Command>cl /nologo /MTd /Fo..\x64\Debug\ /Fd..\x64\Debug\ /c buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
       <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -639,7 +639,7 @@
       <Culture>0x0809</Culture>
     </ResourceCompile>
     <PreLinkEvent>
-      <Command>cl /nologo /MTd /Fo..\Debug\ /Fd..\Debug\ /c buildtime.cpp</Command>
+      <Command>cl /nologo /MTd /Fo..\x64\Debug\ /Fd..\x64\Debug\ /c buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
       <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -1044,7 +1044,7 @@
       <Culture>0x0809</Culture>
     </ResourceCompile>
     <PreLinkEvent>
-      <Command>cl /nologo /MT /Fo..\Release\ /Fd..\Release\ /c buildtime.cpp</Command>
+      <Command>cl /nologo /MT /Fo..\x64\Release\ /Fd..\x64\Release\ /c buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
       <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -1105,7 +1105,7 @@
       <Culture>0x0809</Culture>
     </ResourceCompile>
     <PreLinkEvent>
-      <Command>cl /nologo /MT /Fo..\Release\ /Fd..\Release\ /c buildtime.cpp</Command>
+      <Command>cl /nologo /MT /Fo..\x64\Release\ /Fd..\x64\Release\ /c buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
       <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -1161,7 +1161,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
       <Culture>0x0809</Culture>
     </ResourceCompile>
     <PreLinkEvent>
-      <Command>cl /nologo /MT /Fo..\Release\ /Fd..\Release\ /c buildtime.cpp</Command>
+      <Command>cl /nologo /MT /Fo..\x64\Release\ /Fd..\x64\Release\ /c buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
       <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -1217,7 +1217,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
       <Culture>0x0809</Culture>
     </ResourceCompile>
     <PreLinkEvent>
-      <Command>cl /nologo /MT /Fo..\Release\ /Fd..\Release\ /c buildtime.cpp</Command>
+      <Command>cl /nologo /MT /Fo..\x64\Release\ /Fd..\x64\Release\ /c buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
       <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -1273,7 +1273,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
       <Culture>0x0809</Culture>
     </ResourceCompile>
     <PreLinkEvent>
-      <Command>cl /nologo /MT /Fo..\Release\ /Fd..\Release\ /c buildtime.cpp</Command>
+      <Command>cl /nologo /MT /Fo..\x64\Release\ /Fd..\x64\Release\ /c buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
       <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -1331,7 +1331,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
       <Culture>0x0809</Culture>
     </ResourceCompile>
     <PreLinkEvent>
-      <Command>cl /nologo /MT /Fo..\Release\ /Fd..\Release\ /c buildtime.cpp</Command>
+      <Command>cl /nologo /MT /Fo..\x64\Release\ /Fd..\x64\Release\ /c buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
       <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
