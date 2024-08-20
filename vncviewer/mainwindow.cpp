@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-//#include "AboutBoxQt.h" //Optionnel si fait dans le .h
+//#include "AboutBoxQt.h" //Optional if done in .h
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
