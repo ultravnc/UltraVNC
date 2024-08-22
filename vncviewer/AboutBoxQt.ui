@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>DialogAbout</class>
+ <class>AboutBoxQt</class>
  <widget class="QDialog" name="AboutBoxQt">
   <property name="geometry">
    <rect>
@@ -16,9 +16,9 @@
   <widget class="QLabel" name="labelAboutBoxQt">
    <property name="geometry">
     <rect>
-     <x>60</x>
+     <x>40</x>
      <y>10</y>
-     <width>281</width>
+     <width>321</width>
      <height>41</height>
     </rect>
    </property>
@@ -29,7 +29,7 @@
     </font>
    </property>
    <property name="text">
-    <string>About UltraVNC Qt From Scratch</string>
+    <string>About UltraVNC Qt Community Tests</string>
    </property>
   </widget>
   <widget class="QTextBrowser" name="textBrowser">
@@ -59,7 +59,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Start Project UltraVNC Qt Creator &lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- Version Qt (Community) From Scratch&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;without UltraVNC legacy code&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- Version Qt Comnunity Test will use the project Qt From Scratch to resolve portability problems&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- Version Qt Comnunity Tests will use the project Qt From Scratch to resolve portability problems&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
   <widget class="QPushButton" name="pushButtonClose">
