@@ -1,14 +1,11 @@
 # Fix Error 'QMainWindow' file not found and "Project ERROR: Unknown module(s) in QT: Core" In Progress
 
-#QT = Core gui  <- Bug "Project ERROR: Unknown module(s) in QT: Core"
-#QT = Core gui widgets  <- Bug
-#QT += widgets <- Bug
-QT = core gui #Patch Bug "Project ERROR: Unknown module(s) in QT: Core" and again Error Stop below
+#QT += Core gui  <- Bug "Project ERROR: Unknown module(s) in QT: Core"
+QT += core gui #Patch Bug "Project ERROR: Unknown module(s) in QT: Core" and again Error Stop below
 
 #greaterThan(QT_MAJOR_VERSION, X): QT += widgets
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-#CONFIG += c++17 cmdline
 CONFIG += c++17
 # End Fix Error 'QMainWindow' file not found and "Project ERROR: Unknown module(s) in QT: Core"
 
