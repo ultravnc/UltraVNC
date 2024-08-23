@@ -79,9 +79,10 @@ vcpkg --version
 
 
 # If you get this message:
-#   vcpkg could not locate a manifest (vcpkg.json);
+#   vcpkg could not locate a manifest (vcpkg.json) (when you try to install zlib below);
 #   https://superuser.com/questions/1829880/vcpkg-could-not-locate-a-manifest-vcpkg-json
 doskey vcpkg=
+# End vcpkg could not locate a manifest 
 
 vcpkg install zlib:x64-windows-static
 vcpkg install zstd:x64-windows-static
@@ -168,3 +169,18 @@ set CL=/MP
 cd /d C:\source\UltraVNC
 msbuild %_P% winvnc\winvnc.sln
 msbuild %_P% vncviewer\vncviewer.sln
+
+
+
+
+######################
+
+# Windows with cmake, generate Qt project files (Qt Community Tests Specific)
+
+# Install git
+# Install Visual Studio Community 2022 (with MFC components to avoid errors about missing afxres.h)
+# Install Qt Creator Edition Community
+
+# Same steps before the cmake invocation as above (Section: # Windows with cmake, generate Visual Studio project files)
+
+# Steps specific Qt Creator Community Edition below (In Progress)
