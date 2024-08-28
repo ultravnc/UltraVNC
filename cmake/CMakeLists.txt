@@ -2,6 +2,11 @@ cmake_minimum_required(VERSION 3.5.0)
 
 project(UltraVNC LANGUAGES C CXX RC)
 
+
+# Original UltraVNC Source
+#if source file compile with msvc (or legacy compiler of UltraVNC)
+# To Do LegacyUltraVNC
+
 set(CMAKE_CXX_STANDARD 14)
 if (MINGW)
     set(CMAKE_C_FLAGS "-Wno-write-strings")
@@ -28,7 +33,18 @@ if (MINGW)
     install(FILES /usr/lib/gcc/x86_64-w64-mingw32/13-win32/libstdc++-6.dll DESTINATION ${CMAKE_BINARY_DIR}/ultravnc OPTIONAL)
     install(FILES /usr/lib/gcc/x86_64-w64-mingw32/13-win32/libgcc_s_seh-1.dll DESTINATION ${CMAKE_BINARY_DIR}/ultravnc OPTIONAL)
 endif()
+# End To Do LegacyUltraVNC
 
+
+# Qt Community Tests UltraVNC Source (In Progress)
+# elseif source file compile with Qt
+# To Do CuteUltraVNC
+#set(CMAKE_CXX_STANDARD 17)
+
+# End To Do CuteUltraVNC
+
+
+# Original UltraVNC Source
 add_subdirectory(authadmin)
 add_subdirectory(authSSP)
 add_subdirectory(createpassword)

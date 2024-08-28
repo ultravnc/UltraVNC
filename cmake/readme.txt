@@ -181,6 +181,22 @@ msbuild %_P% vncviewer\vncviewer.sln
 # Install Visual Studio Community 2022 (with MFC components to avoid errors about missing afxres.h)
 # Install Qt Creator Edition Community
 
+# Cross-platform Qt 6 CMake Project Setup (Windows)
+# System Variables and Path of Qt in Environnements Variables
+#
+# New Variable (if doesn't exist)
+# Variable name		: QTDIR
+# Variable value	: C:\Qt\6.7.2\msvc2019_64 (for msvc2019_64 or the path you put the compiler you want to use on your computer)
+#
+# Edit Path, add bin and lib
+# New (if doesn't exist)
+# %QTDIR%\bin
+# %QTDIR%\lib
+
+# Install cmake (Windows)
+# Download and install from https://cmake.org/download/
+# Windows x64 Installer: cmake-3.30.2-windows-x86_64.msi (or version more recent and for your computer OS Specific)
+
 # Same steps before the cmake invocation as above (Section: # Windows with cmake, generate Visual Studio project files)
 
 # Steps specific Qt Creator Community Edition below (In Progress)

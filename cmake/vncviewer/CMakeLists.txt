@@ -1,6 +1,11 @@
 
 project(vncviewer LANGUAGES C CXX RC)
 
+
+# Original vncviewer Source
+#if source file compile with msvc (or legacy compiler of vncviewer)
+# To Do LegacyVncViewer
+
 find_package(JPEG REQUIRED)
 find_package(libjpeg-turbo CONFIG REQUIRED)
 find_package(ZLIB REQUIRED)
@@ -106,3 +111,12 @@ install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${CMAKE_BINARY_DIR}/ultravnc
 if (MSVC)
     install(FILES $<TARGET_PDB_FILE:${PROJECT_NAME}> DESTINATION ${CMAKE_BINARY_DIR}/ultravnc OPTIONAL)
 endif()
+# End To Do LegacyVncViewer
+
+
+# Qt Community Tests VncViewer Source (In Progress)
+# elseif source file compile with Qt
+# To Do CuteVncViewer
+#set(CMAKE_CXX_STANDARD 17)
+
+# End To Do CuteVncViewer
