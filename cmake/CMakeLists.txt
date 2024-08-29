@@ -6,7 +6,7 @@ project(UltraVNC LANGUAGES C CXX RC)
 # Original UltraVNC Source
 #if source file compile with msvc (or legacy compiler of UltraVNC)
 # LegacyUltraVNC
-if (MINGW or "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+if (MINGW OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC"))
 	set(CMAKE_CXX_STANDARD 14)
 	if (MINGW)
 		set(CMAKE_C_FLAGS "-Wno-write-strings")
@@ -38,7 +38,7 @@ if (MINGW or "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 # Qt Community Tests UltraVNC Source (In Progress)
 # elseif source file compile with Qt
 # CuteUltraVNC
-else
+else ()
 	set(CMAKE_CXX_STANDARD 17)
 	
 	if (WIN32)
@@ -89,7 +89,7 @@ else
 	)
 	
 	# Add the forms directory to the AUTOUIC search
-	set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_AUTOUIC_SEARCH_PATHS} ${FORMS_DIR}
+	set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_AUTOUIC_SEARCH_PATHS} ${FORMS_DIR})
 	
 	# Add the executable
 	if (WIN32)

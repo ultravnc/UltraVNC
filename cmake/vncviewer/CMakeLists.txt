@@ -116,7 +116,7 @@ if (MINGW or "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 # Qt Community Tests VncViewer Source (In Progress)
 # elseif source file compile with Qt
 # CuteVncViewer
-else
+else ()
 	#
 	# Inclusion of Project Files
 	# 
