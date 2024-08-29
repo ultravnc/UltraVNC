@@ -834,6 +834,8 @@ HWND ClientConnection::GTGBS_ShowConnectWindow()
 	m_statusThread = NULL;
 	m_statusThread = CreateThread(NULL,0,(LPTHREAD_START_ROUTINE )ClientConnection::GTGBS_ShowStatusWindow,(LPVOID)this,0,&threadID);
 	if (m_statusThread) ResumeThread(m_statusThread);
+	while (!m_hwndStatus)
+		Sleep(100);
 	return (HWND)0;
 }
 
