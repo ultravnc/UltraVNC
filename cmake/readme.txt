@@ -196,6 +196,11 @@ msbuild %_P% vncviewer\vncviewer.sln
 # Install cmake (Windows)
 # Download and install from https://cmake.org/download/
 # Windows x64 Installer: cmake-3.30.2-windows-x86_64.msi (or version more recent and for your computer OS Specific)
+# On CMake (cmake-gui) use these
+#	Where is the the source code 	: C:/source/UltraVNC/cmake
+#	Where to build the binaries 	: C:/source/UltraVNC/build
+#	Click on Configure for choose compiler version (Don't miss clic you can't go back to choose another).
+#	(If Error ZLIB not find : try to update, see VCPKG_README.txt doesn't work for me actually. Note: same error with Visual Studio 2022)
 
 # Same steps before the cmake invocation as above (Section: # Windows with cmake, generate Visual Studio project files)
 
