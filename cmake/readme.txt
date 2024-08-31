@@ -183,25 +183,26 @@ msbuild %_P% vncviewer\vncviewer.sln
 
 # Cross-platform Qt 6 CMake Project Setup (Windows)
 # System Variables and Path of Qt in Environnements Variables
-#
-# New Variable (if doesn't exist)
-# Variable name		: QTDIR
-# Variable value	: C:\Qt\6.7.2\msvc2019_64 (for msvc2019_64 or the path you put the compiler you want to use on your computer)
-#
-# Edit Path, add bin and lib
+
+New Variable (if doesn't exist)
+Variable name		: QTDIR
+Variable value		: C:\Qt\6.7.2\msvc2019_64 (for msvc2019_64 or the path you put the compiler you want to use on your computer)
+
+Edit Path, add bin and lib
 # New (if doesn't exist)
-# %QTDIR%\bin
-# %QTDIR%\lib
+%QTDIR%\bin
+%QTDIR%\lib
+
+# Same steps before the cmake invocation as above (Section: # Windows with cmake, generate Visual Studio project files)
 
 # Install cmake (Windows)
 # Download and install from https://cmake.org/download/
 # Windows x64 Installer: cmake-3.30.2-windows-x86_64.msi (or version more recent and for your computer OS Specific)
-# On CMake (cmake-gui) use these
-#	Where is the the source code 	: C:/source/UltraVNC/cmake
-#	Where to build the binaries 	: C:/source/UltraVNC/build
-#	Click on Configure for choose compiler version (Don't miss clic you can't go back to choose another).
-#	(If Error ZLIB not find : try to update, see VCPKG_README.txt doesn't work for me actually. Note: same error with Visual Studio 2022)
 
-# Same steps before the cmake invocation as above (Section: # Windows with cmake, generate Visual Studio project files)
+# On CMake (cmake-gui) use these
+	Where is the the source code 	: C:/source/UltraVNC/cmake
+	Where to build the binaries 	: C:/source/UltraVNC/build
+	Click on Configure for choose compiler version (Don't miss clic you can't go back to choose another).
+	(If Error ZLIB not find : try to update environment and see VCPKG_README.txt doesn't work for me actually. Note: same error with Visual Studio 2022)
 
 # Steps specific Qt Creator Community Edition below (In Progress)

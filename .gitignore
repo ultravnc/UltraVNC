@@ -162,6 +162,7 @@ UltraVNCManager/Win32/
 # Customized ignore section
 build/
 UltraVNC-UltraVNC-QtComminunityTests.pro.user
+vcpkg-configuration.json
 # End Customized ignore section 
 # Comment the "Customized ignore section" upper if you want the original gitignore for Qt from GitHub
 

@@ -1,0 +1,35 @@
+**********************************************************************
+** Visual Studio 2022 Developer Command Prompt v17.11.2
+** Copyright (c) 2022 Microsoft Corporation
+**********************************************************************
+
+C:\source\UltraVNC>vcpkg
+'vcpkg' is not recognized as an internal or external command
+or external command, an executable program or a command file.
+
+C:\source\UltraVNC>cd ..
+
+C:\source>cd vcpkg
+
+C:\source\vcpkg>vcpkg list
+libjpeg-turbo:x64-windows                         3.0.3               libjpeg-turbo is a JPEG image codec that uses SI...
+libjpeg-turbo:x64-windows-static                  3.0.3               libjpeg-turbo is a JPEG image codec that uses SI...
+libjpeg-turbo:x86-windows                         3.0.3               libjpeg-turbo is a JPEG image codec that uses SI...
+libjpeg-turbo:x86-windows-static                  3.0.3               libjpeg-turbo is a JPEG image codec that uses SI...
+liblzma:x64-windows-static                        5.6.2               Compression library with an API similar to that ...
+liblzma:x86-windows                               5.6.2               Compression library with an API similar to that ...
+liblzma:x86-windows-static                        5.6.2               Compression library with an API similar to that ...
+openssl:x64-windows-static                        3.3.1#1             OpenSSL is an open source project that provides ...
+vcpkg-cmake-config:x64-windows                    2024-05-23
+vcpkg-cmake-get-vars:x64-windows                  2023-12-31
+vcpkg-cmake:x64-windows                           2024-04-23
+zlib:x64-windows                                  1.3.1               A compression library
+zlib:x64-windows-static                           1.3.1               A compression library
+zlib:x86-windows                                  1.3.1               A compression library
+zlib:x86-windows-static                           1.3.1               A compression library
+zstd:x64-windows                                  1.5.6               Zstandard - Fast real-time compression algorithm
+zstd:x64-windows-static                           1.5.6               Zstandard - Fast real-time compression algorithm
+zstd:x86-windows                                  1.5.6               Zstandard - Fast real-time compression algorithm
+zstd:x86-windows-static                           1.5.6               Zstandard - Fast real-time compression algorithm
+
+C:\source\vcpkg>
