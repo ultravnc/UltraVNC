@@ -156,7 +156,7 @@ cmake --build . --parallel --config=RelWithDebInfo
 
 # Windows with regular Visual Studio project files
 
-# Install Plattformtoolset matching to the project files, currently v142
+# Install Plattformtoolset matching to the project files, currently v143
 
 set _P=^
   /p:Platform=x64 ^
@@ -192,6 +192,17 @@ Edit Path, add bin and lib
 # New (if doesn't exist)
 %QTDIR%\bin
 %QTDIR%\lib
+
+# Uninstall the vcpkg optional package from your Visual Studio instance (see VCPKG_README.txt if you want knowing why).
+# Edit Windows system environment variable
+# New (if doesn't exist)
+Variable name	: VCPKG_ROOT
+Variable value	: C:\source\vcpkg
+
+# Adding to Path
+%VCPKG_ROOT%
+
+Restart your computer.
 
 # Same steps before the cmake invocation as above (Section: # Windows with cmake, generate Visual Studio project files)
 

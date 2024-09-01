@@ -5,7 +5,7 @@ project(vncviewer LANGUAGES C CXX RC)
 # Original vncviewer Source
 #if source file compile with msvc (or legacy compiler of vncviewer)
 # LegacyVncViewer
-if (MINGW or "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+#if (MINGW or "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC") # Bug CMake Error at vncviewer/CMakeLists.txt:8 (if): + if given arguments: + "MINGW" "or" "MSVC" "STREQUAL" "MSVC" +   Unknown arguments specified
 	find_package(JPEG REQUIRED)
 	find_package(libjpeg-turbo CONFIG REQUIRED)
 	find_package(ZLIB REQUIRED)
@@ -116,7 +116,7 @@ if (MINGW or "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 # Qt Community Tests VncViewer Source (In Progress)
 # elseif source file compile with Qt
 # CuteVncViewer
-else ()
+# else () #See # Bug CMake Error at vncviewer/CMakeLists.txt:8
 	#
 	# Inclusion of Project Files
 	# 
@@ -140,4 +140,4 @@ else ()
 	)
 	
 # End CuteVncViewer
-endif()
+# endif() #See # Bug CMake Error at vncviewer/CMakeLists.txt:8
