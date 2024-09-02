@@ -2,12 +2,14 @@ cmake_minimum_required(VERSION 3.5.0)
 
 project(UltraVNC LANGUAGES C CXX RC)
 
+# C Default language for CMAKE
+set(CMAKE_CXX_STANDARD 14)
 
 # Original UltraVNC Source
 #if source file compile with msvc (or legacy compiler of UltraVNC)
 # LegacyUltraVNC
 if (MINGW OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC"))
-	set(CMAKE_CXX_STANDARD 14)
+	# set(CMAKE_CXX_STANDARD 14)
 	if (MINGW)
 		set(CMAKE_C_FLAGS "-Wno-write-strings")
 		set(CMAKE_CXX_FLAGS "-Wno-write-strings -Wno-conversion-null")
@@ -39,6 +41,7 @@ if (MINGW OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC"))
 # elseif source file compile with Qt
 # CuteUltraVNC
 else ()
+	# C Alternate language for CMAKE use for Qt Community Tests
 	set(CMAKE_CXX_STANDARD 17)
 	
 	if (WIN32)
