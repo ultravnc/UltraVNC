@@ -59,6 +59,8 @@ cp -a /usr/lib/gcc/x86_64-w64-mingw32/13-win32/libgcc_s_seh-1.dll .
 
 # Install git
 # Install Visual Studio Community 2022 (with MFC components to avoid errors about missing afxres.h)
+#	If you have Visual Studio Build Tools 2019 with VSC 2022 (install on it MFC components too for same reason)
+#		and install Windows SDK Version 8.1 (for Errors errors MSB8036)
 
 # Open git bash
 
@@ -154,7 +156,10 @@ cmake --build . --parallel --config=RelWithDebInfo
 
 ######################
 
-# Windows with regular Visual Studio project files
+# Windows with regular Visual Studio project files (with MFC components to avoid errors about missing afxres.h)
+#	If you have Visual Studio Build Tools 2019 with VSC 2022 (install on it MFC components too for same reason)
+#		Download and install Windows SDK Version 8.1 (for Errors MSB8036)
+#		From VS 2022 installer and install "MSVC v140 - VS 2015 C++ Build Tools (v14.00)" (for fatal error C1083: Unable to open include file : 'ctype.h')
 
 # Install Plattformtoolset matching to the project files, currently v143
 
