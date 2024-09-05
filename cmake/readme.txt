@@ -103,6 +103,7 @@ git clone https://github.com/ultravnc/UltraVNC.git
 # End Common Steps cmake invocation
 
 
+# Steps specific using cmake, generate Visual Studio project files
 mkdir obj && cd obj
 cmake ^
     -DCMAKE_TOOLCHAIN_FILE=%VCPKG_ROOT%\scripts\buildsystems\vcpkg.cmake ^
