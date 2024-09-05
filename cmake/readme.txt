@@ -57,6 +57,8 @@ cp -a /usr/lib/gcc/x86_64-w64-mingw32/13-win32/libgcc_s_seh-1.dll .
 
 # Windows with cmake, generate Visual Studio project files
 
+# Common Steps cmake invocation
+
 # Install git
 # Install Visual Studio Community 2022 (with MFC components to avoid errors about missing afxres.h)
 #	If you have Visual Studio Build Tools 2019 with VSC 2022 (install on it MFC components too for same reason)
@@ -98,6 +100,9 @@ vcpkg integrate install
 cd /d c:\source
 git clone https://github.com/ultravnc/UltraVNC.git
 
+# End Common Steps cmake invocation
+
+
 mkdir obj && cd obj
 cmake ^
     -DCMAKE_TOOLCHAIN_FILE=%VCPKG_ROOT%\scripts\buildsystems\vcpkg.cmake ^
@@ -115,8 +120,9 @@ cmake --build . --parallel --config=RelWithDebInfo
 
 # x64 Native Tools Command Prompt for VS 2022
 
-# Same steps before the cmake invocation as above
+# Same steps before the cmake invocation as above (# Common Steps cmake invocation)
 
+# Steps specific using ninja build system, and address sanitizer enabled
 cd /d c:\source
 mkdir obj_ninja && cd obj_ninja
 cmake ^
@@ -139,8 +145,9 @@ copy "%VCToolsInstallDir%\bin\Hostx64\x64\clang_rt.asan_dynamic-x86_64.dll" ultr
 
 # x64 Native Tools Command Prompt for VS 2022
 
-# Same steps before the cmake invocation as above
+# Same steps before the cmake invocation as above (# Common Steps cmake invocation)
 
+# Steps specific using LLVM compiler
 cd /d c:\source
 mkdir obj_ninja_llvm && cd obj_ninja_llvm
 cmake ^
@@ -160,6 +167,8 @@ cmake --build . --parallel --config=RelWithDebInfo
 #	If you have Visual Studio Build Tools 2019 with VSC 2022 (install on it MFC components too for same reason)
 #		Download and install Windows SDK Version 8.1 (for Errors MSB8036)
 #		From VS 2022 installer and install "MSVC v140 - VS 2015 C++ Build Tools (v14.00)" (for fatal error C1083: Unable to open include file : 'ctype.h')
+
+# Same steps before the cmake invocation as above (# Common Steps cmake invocation)
 
 # Install Plattformtoolset matching to the project files, currently v143
 
