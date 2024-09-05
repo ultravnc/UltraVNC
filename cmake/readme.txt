@@ -111,7 +111,7 @@ cmake --build . --parallel --config=RelWithDebInfo
 
 ######################
 
-# Windows with cmake, using ninja build system, and address santitizer enabled
+# Windows with cmake, using ninja build system, and address sanitizer enabled
 
 # x64 Native Tools Command Prompt for VS 2022
 
