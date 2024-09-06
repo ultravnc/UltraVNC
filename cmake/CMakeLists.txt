@@ -2,14 +2,17 @@ cmake_minimum_required(VERSION 3.5.0)
 
 project(UltraVNC LANGUAGES C CXX RC)
 
-# C Default language for CMAKE
+# CXX Default language for CMAKE
+# Uncomment line 14 for MSVC and other legacy compiler code and comment line 17 use for Qt
+# Uncomment line 17 for Qt and actual code and comment line	14 use MSVC and other legacy compiler code
 set(CMAKE_CXX_STANDARD 14)
+#set(CMAKE_CXX_STANDARD 17)
 
 # Original UltraVNC Source
-#if source file compile with msvc (or legacy compiler of UltraVNC)
+#if CMAKE_CXX_STANDARD equal 14 #(sources files compile with msvc (or legacy compiler of UltraVNC))
 # LegacyUltraVNC
-if (MINGW OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC"))
-	# set(CMAKE_CXX_STANDARD 14)
+if (CMAKE_CXX_STANDARD STREQUAL 14)
+	# Use set(CMAKE_CXX_STANDARD 14)
 	if (MINGW)
 		set(CMAKE_C_FLAGS "-Wno-write-strings")
 		set(CMAKE_CXX_FLAGS "-Wno-write-strings -Wno-conversion-null")
@@ -36,13 +39,13 @@ if (MINGW OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC"))
 		install(FILES /usr/lib/gcc/x86_64-w64-mingw32/13-win32/libgcc_s_seh-1.dll DESTINATION ${CMAKE_BINARY_DIR}/ultravnc OPTIONAL)
 	endif()
 # End LegacyUltraVNC
- 
+
 # Qt Community Tests UltraVNC Source (In Progress)
-# elseif source file compile with Qt
+# elseif CMAKE_CXX_STANDARD equal 17 (sources files compile with Qt)
 # CuteUltraVNC
-else ()
+elseif (CMAKE_CXX_STANDARD STREQUAL 17)
 	# C Alternate language for CMAKE use for Qt Community Tests
-	set(CMAKE_CXX_STANDARD 17)
+	# Use set(CMAKE_CXX_STANDARD 17)
 	
 	if (WIN32)
 		project(ultravnc LANGUAGES CXX)
@@ -110,6 +113,9 @@ else ()
 	target_link_libraries(ultravnc Qt6::Widgets)
 	
 # End CuteUltraVNC
+else ()
+	# To Do Raise an error CMAKE_CXX_STANDARD isn't 14 or 17
+
 endif()
 
 # Original UltraVNC Source
