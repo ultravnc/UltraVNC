@@ -70,14 +70,22 @@ mkdir c:/source
 cd c:/source
 git clone https://github.com/microsoft/vcpkg.git
 cd vcpkg
+ls
+#^ For check install and if the file bootstrap-vcpkg.bat is here.
 
 
 # Developer Command Prompt for VS
+# (/!\ Don't Open Visual Studio until you have configure all, may be the environment crash your install! So open the prompt from explorer i.e. "Windows Studio 2022" the folder -and-> "Developer Command Prompt for VS 2022" shortcut)
 
 cd /d c:\source\vcpkg
 bootstrap-vcpkg.bat -disableMetrics
 set VCPKG_ROOT=c:\source\vcpkg
 set PATH=%VCPKG_ROOT%;%PATH%
+
+# If you have error ZLIB not find
+set VCPKG_DEFAULT_TRIPLET=x64-windows-static
+# See https://stackoverflow.com/questions/55496611/cmake-cannot-find-libraries-installed-with-vcpkg
+# Reinstall all vcpkg if you have install them before
 
 vcpkg --version
 
@@ -88,11 +96,19 @@ vcpkg --version
 doskey vcpkg=
 # End vcpkg could not locate a manifest 
 
+# If you have an error ZLIB not find don't do these see (# If you have error ZLIB not find) and below
 vcpkg install zlib:x64-windows-static
 vcpkg install zstd:x64-windows-static
 vcpkg install libjpeg-turbo:x64-windows-static
 vcpkg install liblzma:x64-windows-static
 vcpkg install openssl:x64-windows-static
+
+# Patch error ZLIB not find doing these see (# If you have error ZLIB not find)
+vcpkg install zlib
+vcpkg install zstd
+vcpkg install libjpeg-turbo
+vcpkg install liblzma
+vcpkg install openssl
 
 vcpkg integrate install
 
@@ -104,6 +120,7 @@ git clone https://github.com/ultravnc/UltraVNC.git
 
 
 # Steps specific using cmake, generate Visual Studio project files
+cd /d c:\source
 mkdir obj && cd obj
 cmake ^
     -DCMAKE_TOOLCHAIN_FILE=%VCPKG_ROOT%\scripts\buildsystems\vcpkg.cmake ^
@@ -207,6 +224,10 @@ Edit Path, add bin and lib
 # New (if doesn't exist)
 %QTDIR%\bin
 %QTDIR%\lib
+
+# New (Patch Error ZLIB not find see (Section: # Windows with cmake, generate Visual Studio project files))
+Variable name	: VCPKG_DEFAULT_TRIPLET
+Variable value	: x64-windows-static
 
 # Uninstall the vcpkg optional package from your Visual Studio instance (see VCPKG_README.txt if you want knowing why).
 # Edit Windows system environment variable
