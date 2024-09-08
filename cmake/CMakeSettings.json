@@ -9,7 +9,25 @@
       "installRoot": "${projectDir}\\out\\install\\${name}",
       "cmakeCommandArgs": "",
       "buildCommandArgs": "",
-      "ctestCommandArgs": ""
+      "ctestCommandArgs": "",
+      "variables": [
+        {
+          "name": "VCPKG_MANIFEST_MODE",
+          "value": "false",
+          "type": "BOOL"
+        },
+        {
+          "name": "Z_VCPKG_PWSH_PATH",
+          "value": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "JPEG_INCLUDE_DIR",
+          "value": "C:/source/vcpkg/packages/libjpeg-turbo_x64-windows-static/include",
+          "type": "PATH"
+        }
+      ],
+      "cmakeToolchain": "%VCPKG_ROOT%\\scripts\\buildsystems\\vcpkg.cmake"
     }
   ]
 }
