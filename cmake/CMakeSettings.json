@@ -7,24 +7,178 @@
       "inheritEnvironments": [ "msvc_x64_x64" ],
       "buildRoot": "${projectDir}\\out\\build\\${name}",
       "installRoot": "${projectDir}\\out\\install\\${name}",
-      "cmakeCommandArgs": "",
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
       "variables": [
         {
-          "name": "VCPKG_MANIFEST_MODE",
-          "value": "false",
+          "name": "JPEG_INCLUDE_DIR",
+          "value": "C:\\source\\vcpkg\\installed\\x64-windows-static\\include",
+          "type": "PATH"
+        },
+        {
+          "name": "JPEG_LIBRARY_DEBUG",
+          "value": "C:\\source\\vcpkg\\installed\\x64-windows-static\\debug\\lib\\jpeg.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "JPEG_LIBRARY_RELEASE",
+          "value": "C:\\source\\vcpkg\\installed\\x64-windows-static\\lib\\jpeg.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "LIBLZMA_INCLUDE_DIR",
+          "value": "C:\\source\\vcpkg\\installed\\x64-windows-static\\include",
+          "type": "PATH"
+        },
+        {
+          "name": "LIBLZMA_LIBRARY_DEBUG",
+          "value": "C:\\source\\vcpkg\\installed\\x64-windows-static\\debug\\lib\\lzma.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "LIBLZMA_LIBRARY_RELEASE",
+          "value": "C:\\source\\vcpkg\\installed\\x64-windows-static\\lib\\lzma.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "MSLogonACL_BINARY_DIR",
+          "value": "C:\\source\\obj\\MSLogonACL",
+          "type": "STATIC"
+        },
+        {
+          "name": "MSLogonACL_IS_TOP_LEVEL",
+          "value": "OFF",
+          "type": "STATIC"
+        },
+        {
+          "name": "MSLogonACL_SOURCE_DIR",
+          "value": "C:\\source\\UltraVNC\\cmake\\MSLogonACL",
+          "type": "STATIC"
+        },
+        {
+          "name": "UltraVNC_BINARY_DIR",
+          "value": "C:\\source\\obj",
+          "type": "STATIC"
+        },
+        {
+          "name": "UltraVNC_IS_TOP_LEVEL",
+          "value": "ON",
+          "type": "STATIC"
+        },
+        {
+          "name": "UltraVNC_SOURCE_DIR",
+          "value": "C:\\source\\UltraVNC\\cmake",
+          "type": "STATIC"
+        },
+        {
+          "name": "VCPKG_APPLOCAL_DEPS",
+          "value": "ON",
           "type": "BOOL"
+        },
+        {
+          "name": "VCPKG_INSTALLED_DIR",
+          "value": "C:\\source\\vcpkg\\installed",
+          "type": "PATH"
+        },
+        {
+          "name": "VCPKG_MANIFEST_DIR",
+          "value": "",
+          "type": "PATH"
+        },
+        {
+          "name": "VCPKG_MANIFEST_MODE",
+          "value": "OFF",
+          "type": "BOOL"
+        },
+        {
+          "name": "VCPKG_PREFER_SYSTEM_LIBS",
+          "value": "OFF",
+          "type": "BOOL"
+        },
+        {
+          "name": "VCPKG_SETUP_CMAKE_PROGRAM_PATH",
+          "value": "ON",
+          "type": "BOOL"
+        },
+        {
+          "name": "VCPKG_TARGET_TRIPLET",
+          "value": "x64-windows-static",
+          "type": "STRING"
+        },
+        {
+          "name": "VCPKG_TRACE_FIND_PACKAGE",
+          "value": "OFF",
+          "type": "BOOL"
+        },
+        {
+          "name": "VCPKG_VERBOSE",
+          "value": "OFF",
+          "type": "BOOL"
+        },
+        {
+          "name": "X_VCPKG_APPLOCAL_DEPS_INSTALL",
+          "value": "OFF",
+          "type": "BOOL"
+        },
+        {
+          "name": "X_VCPKG_APPLOCAL_DEPS_SERIALIZED",
+          "value": "OFF",
+          "type": "BOOL"
+        },
+        {
+          "name": "ZLIB_INCLUDE_DIR",
+          "value": "C:\\source\\vcpkg\\installed\\x64-windows-static\\include",
+          "type": "PATH"
+        },
+        {
+          "name": "ZLIB_LIBRARY_DEBUG",
+          "value": "C:\\source\\vcpkg\\installed\\x64-windows-static\\lib\\zlibd.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "ZLIB_LIBRARY_RELEASE",
+          "value": "C:\\source\\vcpkg\\installed\\x64-windows-static\\lib\\zlib.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "Z_VCPKG_BUILTIN_POWERSHELL_PATH",
+          "value": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+          "type": "FILEPATH"
         },
         {
           "name": "Z_VCPKG_PWSH_PATH",
           "value": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\",
-          "type": "FILEPATH"
+          "type": "PATH"
         },
         {
-          "name": "JPEG_INCLUDE_DIR",
-          "value": "C:/source/vcpkg/packages/libjpeg-turbo_x64-windows-static/include",
+          "name": "_VCPKG_INSTALLED_DIR",
+          "value": "C:\\source\\vcpkg\\installed",
           "type": "PATH"
+        },
+        {
+          "name": "asan",
+          "value": "OFF",
+          "type": "BOOL"
+        },
+        {
+          "name": "authSSP_BINARY_DIR",
+          "value": "C:\source\obj\authSSP",
+          "type": "STATIC"
+        },
+        {
+          "name": "authSSP_IS_TOP_LEVEL",
+          "value": "OFF",
+          "type": "STATIC"
+        },
+        {
+          "name": "authSSP_LIB_DEPENDS",
+          "value": "general;aclui;general;comctl32;"
+          "type": "STATIC"
+        },
+        {
+          "name": "To Do next and following",
+          "value": "authSSP_SOURCE_DIR:STATIC=C:/source/UltraVNC/cmake/authSSP",
+          "type": "STRING"
         }
       ],
       "cmakeToolchain": "%VCPKG_ROOT%\\scripts\\buildsystems\\vcpkg.cmake"
