@@ -162,7 +162,7 @@
         },
         {
           "name": "authSSP_BINARY_DIR",
-          "value": "C:\source\obj\authSSP",
+          "value": "C:\\source\\obj\\authSSP",
           "type": "STATIC"
         },
         {
@@ -172,13 +172,397 @@
         },
         {
           "name": "authSSP_LIB_DEPENDS",
-          "value": "general;aclui;general;comctl32;"
+          "value": "general;aclui;general;comctl32;",
           "type": "STATIC"
         },
         {
-          "name": "To Do next and following",
-          "value": "authSSP_SOURCE_DIR:STATIC=C:/source/UltraVNC/cmake/authSSP",
-          "type": "STRING"
+          "name": "authSSP_SOURCE_DIR",
+          "value": "C:\\source\\UltraVNC\\cmake\\authSSP",
+          "type": "STATIC"
+        },
+        {
+          "name": "authadmin_BINARY_DIR",
+          "value": "C:\\source\\obj\\authadmin",
+          "type": "STATIC"
+        },
+        {
+          "name": "authadmin_IS_TOP_LEVEL",
+          "value": "OFF",
+          "type": "STATIC"
+        },
+        {
+          "name": "authadmin_LIB_DEPENDS",
+          "value": "general;netapi32;",
+          "type": "STATIC"
+        },
+        {
+          "name": "authadmin_SOURCE_DIR",
+          "value": "C:\\source\\UltraVNC\\cmake\\authadmin",
+          "type": "STATIC"
+        },
+        {
+          "name": "createpassword_BINARY_DIR",
+          "value": "C:\\source\\obj\\createpassword",
+          "type": "STATIC"
+        },
+        {
+          "name": "createpassword_IS_TOP_LEVEL",
+          "value": "OFF",
+          "type": "STATIC"
+        },
+        {
+          "name": "createpassword_SOURCE_DIR",
+          "value": "C:\\source\\UltraVNC\\cmake\\createpassword",
+          "type": "STATIC"
+        },
+        {
+          "name": "ldapauth9x_BINARY_DIR",
+          "value": "C:\\source\\obj\\ldapauth9x",
+          "type": "STATIC"
+        },
+        {
+          "name": "ldapauth9x_IS_TOP_LEVEL",
+          "value": "OFF",
+          "type": "STATIC"
+        },
+        {
+          "name": "ldapauth9x_LIB_DEPENDS",
+          "value": "general;activeds;general;adsiid;",
+          "type": "STATIC"
+        },
+        {
+          "name": "ldapauth9x_SOURCE_DIR",
+          "value": "C:\\source\\UltraVNC\\cmake\\ldapauth9x",
+          "type": "STATIC"
+        },
+        {
+          "name": "ldapauth_BINARY_DIR",
+          "value": "C:\\source\\obj\\ldapauth",
+          "type": "STATIC"
+        },
+        {
+          "name": "ldapauth_IS_TOP_LEVEL",
+          "value": "OFF",
+          "type": "STATIC"
+        },
+        {
+          "name": "ldapauth_LIB_DEPENDS",
+          "value": "general;activeds;general;adsiid;",
+          "type": "STATIC"
+        },
+        {
+          "name": "ldapauth_SOURCE_DIR",
+          "value": "C:\\source\\UltraVNC\\cmake\\ldapauth",
+          "type": "STATIC"
+        },
+        {
+          "name": "ldapauthnt4_BINARY_DIR",
+          "value": "C:\\source\\obj\\ldapauthnt4",
+          "type": "STATIC"
+        },
+        {
+          "name": "ldapauthnt4_IS_TOP_LEVEL",
+          "value": "OFF",
+          "type": "STATIC"
+        },
+        {
+          "name": "ldapauthnt4_LIB_DEPENDS",
+          "value": "general;activeds;general;adsiid;general;netapi32;",
+          "type": "STATIC"
+        },
+        {
+          "name": "ldapauthnt4_SOURCE_DIR",
+          "value": "C:\\source\\UltraVNC\\cmake\\ldapauthnt4",
+          "type": "STATIC"
+        },
+        {
+          "name": "libjpeg-turbo_DIR",
+          "value": "C:\\source\\vcpkg\\installed\\x64-windows-static\\share\\libjpeg-turbo",
+          "type": "PATH"
+        },
+        {
+          "name": "libomnithread_BINARY_DIR",
+          "value": "C:\\source\\obj\\libomnithread",
+          "type": "STATIC"
+        },
+        {
+          "name": "libomnithread_IS_TOP_LEVEL",
+          "value": "OFF",
+          "type": "STATIC"
+        },
+        {
+          "name": "libomnithread_SOURCE_DIR",
+          "value": "C:\\source\\UltraVNC\\cmake\\libomnithread",
+          "type": "STATIC"
+        },
+        {
+          "name": "librdr_BINARY_DIR",
+          "value": "C:\\source\\obj\\librdr",
+          "type": "STATIC"
+        },
+        {
+          "name": "librdr_IS_TOP_LEVEL",
+          "value": "OFF",
+          "type": "STATIC"
+        },
+        {
+          "name": "librdr_LIB_DEPENDS",
+          "value": "general;ZLIB::ZLIB;general;LibLZMA::LibLZMA;",
+          "type": "STATIC"
+        },
+        {
+          "name": "librdr_SOURCE_DIR",
+          "value": "C:\\source\\UltraVNC\\cmake\\librdr"
+        },
+        {
+          "name": "libudt4_BINARY_DIR",
+          "value": "C:\\source\\obj\\libudt4",
+          "type": "STATIC"
+        },
+        {
+          "name": "libudt4_IS_TOP_LEVEL",
+          "value": "OFF",
+          "type": "STATIC"
+        },
+        {
+          "name": "libudt4_LIB_DEPENDS",
+          "value": "general;ws2_32;general;wsock32;",
+          "type": "STATIC"
+        },
+        {
+          "name": "libudt4_SOURCE_DIR",
+          "value": "C:\\source\\UltraVNC\\cmake\\libudt4",
+          "type": "STATIC"
+        },
+        {
+          "name": "libudtcloud_BINARY_DIR",
+          "value": "C:\\source\\obj\\libudtcloud",
+          "type": "STATIC"
+        },
+        {
+          "name": "libudtcloud_IS_TOP_LEVEL",
+          "value": "OFF",
+          "type": "STATIC"
+        },
+        {
+          "name": "libudtcloud_LIB_DEPENDS",
+          "value": "general;libudt4;",
+          "type": "STATIC"
+        },
+        {
+          "name": "libudtcloud_SOURCE_DIR",
+          "value": "C:\\source\\UltraVNC\\cmake\\libudtcloud",
+          "type": "STATIC"
+        },
+        {
+          "name": "libzip32_BINARY_DIR",
+          "value": "C:\\source\\obj\\libzip32",
+          "type": "STATIC"
+        },
+        {
+          "name": "libzip32_SOURCE_DIR",
+          "value": "C:\\source\\UltraVNC\\cmake\\libzip32",
+          "type": "STATIC"
+        },
+        {
+          "name": "libzipunzip_BINARY_DIR",
+          "value": "C:\\source\\obj\\libzipunzip",
+          "type": "STATIC"
+        },
+        {
+          "name": "libzipunzip_IS_TOP_LEVEL",
+          "value": "OFF",
+          "type": "STATIC"
+        },
+        {
+          "name": "libzipunzip_SOURCE_DIR",
+          "value": "C:\\source\\UltraVNC\\cmake\\libzipunzip",
+          "type": "STATIC"
+        },
+        {
+          "name": "logging_BINARY_DIR",
+          "value": "C:\\source\\obj\\logging",
+          "type": "STATIC"
+        },
+        {
+          "name": "logging_IS_TOP_LEVEL",
+          "value": "OFF",
+          "type": "STATIC"
+        },
+        {
+          "name": "logging_SOURCE_DIR",
+          "value": "C:\\source\\UltraVNC\\cmake\\logging",
+          "type": "STATIC"
+        },
+        {
+          "name": "logmessages_BINARY_DIR",
+          "value": "C:\\source\\obj\\logmessages",
+          "type": "STATIC"
+        },
+        {
+          "name": "logmessages_IS_TOP_LEVEL",
+          "value": "OFF",
+          "type": "STATIC"
+        },
+        {
+          "name": "logmessages_SOURCE_DIR",
+          "value": "C:\\source\\UltraVNC\\cmake\\logmessages",
+          "type": "STATIC"
+        },
+        {
+          "name": "repeater_BINARY_DIR",
+          "value": "C:\\source\\obj\\repeater",
+          "type": "STATIC"
+        },
+        {
+          "name": "repeater_IS_TOP_LEVEL",
+          "value": "OFF",
+          "type": "STATIC"
+        },
+        {
+          "name": "repeater_SOURCE_DIR",
+          "value": "C:\\source\\UltraVNC\\cmake\\repeater",
+          "type": "STATIC"
+        },
+        {
+          "name": "setcad_BINARY_DIR",
+          "value": "C:\\source\\obj\\setcad",
+          "type": "STATIC"
+        },
+        {
+          "name": "setcad_IS_TOP_LEVEL",
+          "value": "OFF",
+          "type": "STATIC"
+        },
+        {
+          "name": "setcad_SOURCE_DIR",
+          "value": "C:\\source\\UltraVNC\\cmake\\setcad",
+          "type": "STATIC"
+        },
+        {
+          "name": "setpasswd_BINARY_DIR",
+          "value": "C:\\source\\obj\\setpasswd",
+          "type": "STATIC"
+        },
+        {
+          "name": "setpasswd_IS_TOP_LEVEL",
+          "value": "OFF",
+          "type": "STATIC"
+        },
+        {
+          "name": "setpasswd_SOURCE_DIR",
+          "value": "C:\\source\\UltraVNC\\cmake\\setpasswd",
+          "type": "STATIC"
+        },
+        {
+          "name": "testauth_BINARY_DIR",
+          "value": "C:\\source\\obj\\testauth",
+          "type": "STATIC"
+        },
+        {
+          "name": "testauth_IS_TOP_LEVEL",
+          "value": "OFF",
+          "type": "STATIC"
+        },
+        {
+          "name": "testauth_SOURCE_DIR",
+          "value": "C:\\source\\UltraVNC\\cmake\\testauth",
+          "type": "STATIC"
+        },
+        {
+          "name": "uvnc_settings_BINARY_DIR",
+          "value": "C:\\source\\obj\\uvnc_settings",
+          "type": "STATIC"
+        },
+        {
+          "name": "uvnc_settings_IS_TOP_LEVEL",
+          "value": "OFF",
+          "type": "STATIC"
+        },
+        {
+          "name": "uvnc_settings_SOURCE_DIR",
+          "value": "C:\\source\\UltraVNC\\cmake\\uvnc_settings",
+          "type": "STATIC"
+        },
+        {
+          "name": "uvnckeyboardhelper_BINARY_DIR",
+          "value": "C:\\source\\obj\\uvnckeyboardhelper",
+          "type": "STATIC"
+        },
+        {
+          "name": "uvnckeyboardhelper_IS_TOP_LEVEL",
+          "value": "OFF",
+          "type": "STATIC"
+        },
+        {
+          "name": "uvnckeyboardhelper_SOURCE_DIR",
+          "value": "C:\\source\\UltraVNC\\cmake\\uvnckeyboardhelper",
+          "type": "STATIC"
+        },
+        {
+          "name": "vnchooks_BINARY_DIR",
+          "value": "C:\\source\\obj\\vnchooks",
+          "type": "STATIC"
+        },
+        {
+          "name": "vnchooks_IS_TOP_LEVEL",
+          "value": "OFF",
+          "type": "STATIC"
+        },
+        {
+          "name": "vnchooks_SOURCE_DIR",
+          "value": "C:\\source\\UltraVNC\\cmake\\vnchooks",
+          "type": "STATIC"
+        },
+        {
+          "name": "vncviewer_BINARY_DIR",
+          "value": "C:\\source\\obj\\vncviewer",
+          "type": "STATIC"
+        },
+        {
+          "name": "vncviewer_IS_TOP_LEVEL",
+          "value": "OFF",
+          "type": "STATIC"
+        },
+        {
+          "name": "vncviewer_SOURCE_DIR",
+          "value": "C:\\source\\UltraVNC\\cmake\\vncviewer",
+          "type": "STATIC"
+        },
+        {
+          "name": "winvnc_BINARY_DIR",
+          "value": "C:\\source\\obj\\winvnc",
+          "type": "STATIC"
+        },
+        {
+          "name": "winvnc_IS_TOP_LEVEL",
+          "value": "OFF",
+          "type": "STATIC"
+        },
+        {
+          "name": "winvnc_SOURCE_DIR",
+          "value": "C:\\source\\UltraVNC\\cmake\\winvnc",
+          "type": "STATIC"
+        },
+        {
+          "name": "workgrpdomnt4_BINARY_DIR",
+          "value": "STATIC=C:\\source\\obj\\workgrpdomnt4",
+          "type": "STATIC"
+        },
+        {
+          "name": "workgrpdomnt4_IS_TOP_LEVEL",
+          "value": "OFF",
+          "type": "STATIC"
+        },
+        {
+          "name": "workgrpdomnt4_SOURCE_DIR",
+          "value": "C:\\source\\UltraVNC\\cmake\\workgrpdomnt4",
+          "type": "STATIC"
+        },
+        {
+          "name": "zstd_DIR",
+          "value": "C:\\source\\vcpkg\\installed\\x64-windows-static\\share\\zstd",
+          "type": "PATH"
         }
       ],
       "cmakeToolchain": "%VCPKG_ROOT%\\scripts\\buildsystems\\vcpkg.cmake"
