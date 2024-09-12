@@ -157,6 +157,9 @@ UltraVNCManager/__astcache/
 UltraVNCManager/__history/
 UltraVNCManager/Win32/
 
+# CMakeSpecific Ignore configuration file  
+CMakeUserPresets.json
+
 
 # Qt Specific gitignore
 # Customized ignore section
