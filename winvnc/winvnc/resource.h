@@ -44,11 +44,10 @@
 #define IDD_PROPERTIES1                 136
 #define IDD_TEXTCHAT_DLG                137
 #define IDD_USER_NAME                   138
-#if defined(SC_20)
-	#define IDR_DLL1                    176
-	#define IDR_ENCRYPTIONDLL1          177
-#endif // SC_20
+#define IDD_FORM_AUTHENTICATION         139
+#define IDD_EDIT_IP_ACESS_CONTROL       140
 #define IDS_WARNING                     200
+#define IDD_PROPERTIESDIALOG            202
 #define IDC_ACCEPTLOGO                  1001
 #define IDC_ACCEPT_IP                   1002
 #define IDC_ACCEPT_TIMEOUT              1003
@@ -64,14 +63,17 @@
 #define IDC_BLANK                       1013
 #define IDC_BLANK2                      1014
 #define IDC_BLANKINGTXT                 1015
-#define IDC_BUILDTEXT                   1016
+#define IDC_BLANK4                      1016
 #define IDC_BUILDTIME                   1017
 #define IDC_BUTTON1                     1018
+#define IDC_CHECKIP                     1018
 #define IDC_BUTTON_EXPAND               1019
 #define IDC_CAPTION_STATIC              1020
 #define IDC_CHATAREA_EDIT               1021
 #define IDC_CHECK1                      1022
+#define IDC_PRIM                        1022
 #define IDC_CHECK2                      1023
+#define IDC_SEC                         1023
 #define IDC_CHECK3                      1024
 #define IDC_CHECK4                      1025
 #define IDC_CHECK5                      1026
@@ -274,6 +276,48 @@
 #define IDC_WWW2                        1223
 #define IDC_WWW3                        1224
 #define IDC_YELLOW                      1225
+#define IDC_PROPERTIESTAB               1226
+#define IDC_AUTHREQUIRED                1227
+#define IDC_IP_CHECK_RESULT_LABEL       1228
+#define IDC_BLANK3                      1229
+#define IDC_BUILDTEXT                   1230
+#define IDC_MAXVIEWERS2                 1231
+#define IDC_MAXREFUSE2                  1232
+#define IDC_MAXDISCONNECT2              1233
+#define IDC_NOSCREENSAVER2              1234
+#define IDC_IP_ACCESS_CONTROL_LIST      1235
+#define IDC_ALLOWEDITCLIENTS2           1236
+#define IDC_ALLOWSHUTDOWN2              1237
+#define IDC_ADD_BUTTON                  1238
+#define IDC_EDIT_BUTTON                 1239
+#define IDC_REMOVE_BUTTON               1240
+#define IDC_MOVE_UP_BUTTON              1241
+#define IDC_DRefuseOnly                 1242
+#define IDC_MOVE_DOWN_BUTTON            1243
+#define IDC_DENY                        1244
+#define IDC_QUERY                       1245
+#define IDC_ALLOW                       1246
+#define IDC_DISABLETRAY2                1247
+#define IDC_IP_FOR_CHECK_EDIT           1248
+#define IDC_FIRST_IP                    1249
+#define IDC_IDLETIME                    1250
+#define IDC_IDLETIMEINPUT               1252
+#define IDC_KINTERVAL                   1253
+#define IDC_REMOVE_WALLPAPER2           1254
+#define IDC_SCALE2                      1255
+#define IDD_FORM_NETWORK                1256
+#define IDD_FORM_Reverse                1257
+#define IDD_FORM_Clients                1258
+#define IDD_FORM_Misc                   1261
+#define IDD_FORM_input                  1262
+#define IDD_FORM_input_FT               1263
+#define IDD_FORM_Incoming               1264
+#define IDD_FORM_capture                1266
+#define IDC_QNOLOGON                    1267
+#define IDC_RDPMODE2                    1268
+#define IDD_FORM_Rules                  1269
+#define IDD_FORM_Notifications          1270
+#define IDC_ERROR_TEXT                  1271
 #define IDE_CUSTOM1                     4377
 #define ID_ABOUT                        32771
 #define ID_ADMIN_PROPERTIES             32772
@@ -368,9 +412,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        202
+#define _APS_NEXT_RESOURCE_VALUE        205
 #define _APS_NEXT_COMMAND_VALUE         32858
-#define _APS_NEXT_CONTROL_VALUE         1226
+#define _APS_NEXT_CONTROL_VALUE         1272
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

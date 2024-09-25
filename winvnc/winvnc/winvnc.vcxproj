@@ -1574,6 +1574,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
     </ClCompile>
     <ClCompile Include="LayeredWindows.cpp" />
     <ClCompile Include="MouseSimulator.cpp" />
+    <ClCompile Include="PropertiesDialog.cpp" />
     <ClCompile Include="read_write_ini.cpp" />
     <ClCompile Include="rfbRegion_win32.cpp" />
     <ClCompile Include="rfbRegion_X11.cxx">
@@ -1644,6 +1645,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='IPV6|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="RulesListView.cpp" />
     <ClCompile Include="ScreenCapture.cpp" />
     <ClCompile Include="ScSelect.cpp" />
     <ClCompile Include="credentials.cpp">
@@ -3258,6 +3260,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
     <ClInclude Include="keysymdef.h" />
     <ClInclude Include="LayeredWindows.h" />
     <ClInclude Include="MouseSimulator.h" />
+    <ClInclude Include="PropertiesDialog.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="rfb.h" />
     <ClInclude Include="rfbMisc.h" />
@@ -3267,6 +3270,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
     <ClInclude Include="rfbRegion_win32.h" />
     <ClInclude Include="rfbRegion_X11.h" />
     <ClInclude Include="rfbUpdateTracker.h" />
+    <ClInclude Include="RulesListView.h" />
     <ClInclude Include="ScreenCapture.h" />
     <ClInclude Include="ScSelect.h" />
     <ClInclude Include="credentials.h" />

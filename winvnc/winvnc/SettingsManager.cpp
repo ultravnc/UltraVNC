@@ -249,7 +249,8 @@ void SettingsManager::load()
 	m_pref_AllowLoopback = myIniFile.ReadInt("admin", "AllowLoopback", m_pref_AllowLoopback);
 	m_pref_AuthRequired = myIniFile.ReadInt("admin", "AuthRequired", m_pref_AuthRequired);
 	m_pref_ConnectPriority = myIniFile.ReadInt("admin", "ConnectPriority", m_pref_ConnectPriority);
-	myIniFile.ReadString("admin", "AuthHosts", m_pref_authhosts, 150);
+	myIniFile.ReadString("admin", "AuthHosts", m_pref_authhosts, 1280);
+	myIniFile.ReadString("admin", "AuthHosts", m_pref_authhosts2, 1280);
 	m_pref_allowshutdown = myIniFile.ReadInt("admin", "AllowShutdown", m_pref_allowshutdown);
 	m_pref_allowproperties = myIniFile.ReadInt("admin", "AllowProperties", m_pref_allowproperties);
 	m_pref_allowInjection = myIniFile.ReadInt("admin", "AllowInjection", m_pref_allowInjection);
@@ -374,6 +375,7 @@ void SettingsManager::save()
 	myIniFile.WriteInt("admin", "DefaultScale", m_pref_DefaultScale);
 	myIniFile.WriteInt("admin", "UseDSMPlugin", m_pref_UseDSMPlugin);
 	myIniFile.WriteString("admin", "DSMPlugin", m_pref_szDSMPlugin);
+	myIniFile.WriteString("admin", "AuthHosts", m_pref_authhosts);
 	myIniFile.WriteInt("admin", "primary", m_pref_Primary);
 	myIniFile.WriteInt("admin", "secondary", m_pref_Secondary);
 	myIniFile.WriteInt("admin", "SocketConnect", m_pref_EnableConnection);
@@ -430,6 +432,7 @@ void SettingsManager::save()
 	myIniFile.WriteInt("admin", "NewMSLogon", m_pref_NewMSLogon);
 	myIniFile.WriteInt("admin", "ReverseAuthRequired", m_pref_ReverseAuthRequired);
 	myIniFile.WriteInt("admin", "ConnectPriority", m_pref_ConnectPriority);
+	myIniFile.WriteInt("admin", "AuthRequired", m_pref_AuthRequired);
 	myIniFile.WriteString("admin", "service_commandline", m_pref_service_commandline);
 	myIniFile.WriteString("admin", "accept_reject_mesg", m_pref_accept_reject_mesg);
 	myIniFile.WriteInt("poll", "TurboMode", m_pref_TurboMode);
@@ -468,6 +471,13 @@ void SettingsManager::setkeepAliveInterval(int secs) {
 		m_pref_keepAliveInterval = m_pref_ftTimeout - KEEPALIVE_HEADROOM;
 }
 
+void SettingsManager::setIdleTimeout(int secs) {
+	m_pref_IdleTimeout = secs;
+}
+
+void SettingsManager::setIdleInputTimeout(int secs) {
+	m_pref_IdleInputTimeout= secs;
+}
 static bool notset = false;
 bool SettingsManager::IsRunninAsAdministrator()
 {

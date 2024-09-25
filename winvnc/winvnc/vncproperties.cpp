@@ -411,6 +411,9 @@ vncProperties::DialogProc(HWND hwnd,
 		case 1:
 			hQuerySetting = GetDlgItem(hwnd, IDC_DACCEPT);
 			break;
+		case 2:
+			hQuerySetting = GetDlgItem(hwnd, IDC_DRefuseOnly);
+			break;
 		default:
 			hQuerySetting = GetDlgItem(hwnd, IDC_DREFUSE);
 		};
@@ -1134,7 +1137,7 @@ void vncProperties::LoadFromIniFile()
 	if (settings->getLoopbackOnly())
 		settings->setAllowLoopback(true);
 
-	if (!settings->getAllowLoopback()) {
+	if (!settings->getLoopbackOnly()) {
 		if (settings->getAuthhosts() != 0) {
 			m_server->SetAuthHosts(settings->getAuthhosts());
 		}

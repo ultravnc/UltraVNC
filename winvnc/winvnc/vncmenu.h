@@ -36,8 +36,7 @@ class vncMenu;
 #include "stdhdrs.h"
 #include <lmcons.h>
 #include "vncserver.h"
-#include "vncproperties.h"
-#include "vncpropertiesPoll.h"
+#include "PropertiesDialog.h"
 #include "vncabout.h"
 #include "vncListDlg.h"
 #include "CloudDialog.h"
@@ -83,8 +82,7 @@ protected:
 	vncServer		*m_server;
 
 	// Properties object for this server
-	vncProperties	m_properties;
-	vncPropertiesPoll	m_propertiesPoll;
+	PropertiesDialog	m_properties;
 
 	// About dialog for this server
 	vncAbout		m_about;

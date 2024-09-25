@@ -54,6 +54,9 @@ void InitIpp();
 #include "UltraVNCService.h"
 #include "ScSelect.h"
 #include "SettingsManager.h"
+#include <commctrl.h>
+#include "shlwapi.h"
+#pragma comment (lib, "comctl32")
 
 // Application instance and name
 HINSTANCE	hAppInstance;
@@ -226,6 +229,12 @@ bool return2(bool value)
 // routine or, under NT, the main service routine.
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2, int iCmdShow)
 {
+	InitCommonControls();
+	INITCOMMONCONTROLSEX icex;
+	memset(&icex, 0x0, sizeof(INITCOMMONCONTROLSEX));
+	icex.dwSize = sizeof(INITCOMMONCONTROLSEX);
+	icex.dwICC = ICC_COOL_CLASSES;
+	InitCommonControlsEx(&icex);
 	try {
 		if (VNC_OSVersion::getInstance()->OS_XP == true)
 			MessageBoxSecure(NULL, "Windows XP requires special build", "Warning", MB_ICONERROR);

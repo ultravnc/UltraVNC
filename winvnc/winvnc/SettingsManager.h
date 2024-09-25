@@ -52,6 +52,8 @@ public:
 	BOOL getFTUserImpersonation() { return m_pref_FTUserImpersonation; };
 	BOOL getPrimary() { return m_pref_Primary; };
 	BOOL getSecondary() { return m_pref_Secondary; };
+	void setPrimary(BOOL value) { m_pref_Primary = value;};
+	void setSecondary(BOOL value) { m_pref_Secondary = value;};
 	BOOL getEnableBlankMonitor() { return m_pref_EnableBlankMonitor; };
 	BOOL getBlankInputsOnly() { return m_pref_BlankInputsOnly; };
 	int getDefaultScale() { return m_pref_DefaultScale; };
@@ -93,11 +95,14 @@ public:
 	void setService_commandline(char* value) { strcpy_s(m_pref_service_commandline, value); };
 	void setAccept_reject_mesg(char* value) { strcpy_s(m_pref_accept_reject_mesg, value); };
 	BOOL getDebugMode() { return m_pref_DebugMode; };
+	void setDebugMode(BOOL value) { m_pref_DebugMode = value; };
+
 	BOOL getDebugLevel() { return m_pref_DebugLevel; };
 	BOOL getAvilog() { return m_pref_Avilog; };
 	char* getDebugPath() { return m_pref_DebugPath; };
 	BOOL getAllowLoopback() { return m_pref_AllowLoopback; };
 	BOOL getAuthRequired() { return m_pref_AuthRequired; };
+	void setAuthRequired(BOOL value) { m_pref_AuthRequired = value; };
 	char* getAuthhosts() { return m_pref_authhosts; };
 	BOOL getDisableTrayIcon() { return m_pref_DisableTrayIcon; };
 	BOOL getRdpmode() { return m_pref_Rdpmode; };
@@ -134,12 +139,13 @@ public:
 	void setDisableLocalInputs(BOOL value) { m_pref_DisableLocalInputs = value; };
 	void setEnableJapInput(BOOL value) { m_pref_EnableJapInput = value; };
 	void setEnableUnicodeInput(BOOL value) { m_pref_EnableUnicodeInput = value; };
-	void setLoopbackOnly(BOOL value) { m_pref_LoopbackOnly = value; };
+	void setLoopbackOnly(BOOL value) { m_pref_LoopbackOnly = value; if (value) setAllowLoopback(true);};
 	void setAllowLoopback(BOOL value) { m_pref_AllowLoopback = value; };
 	void setQuerySetting(UINT value) { m_pref_QuerySetting = value; };
 	void setConnectPriority(int value) { m_pref_ConnectPriority = value; };
 	void setQueryDisableTime(UINT value) { m_pref_QueryDisableTime = value; };
 	void setQueryTimeout(UINT value) { m_pref_QueryTimeout = value; };
+	void setDebugPath(char* value) { strcpy_s(m_pref_DebugPath, value);};
 
 	void setMaxViewers(UINT value) { m_pref_MaxViewers = value; };
 	void setCollabo(BOOL value) { m_pref_Collabo = value; };
@@ -181,6 +187,8 @@ public:
 	void setDefaultScale(int value) { m_pref_DefaultScale = value; };
 
 	void setkeepAliveInterval(int secs);
+	void setIdleTimeout(int secs);
+	void setIdleInputTimeout(int secs);
 	void setftTimeout(int value) { m_pref_ftTimeout = value; };
 
 	void EnableServerStateUpdates(bool newstate) { m_pref_fEnableStateUpdates = newstate; }
@@ -329,7 +337,8 @@ private:
 	BOOL m_pref_AllowLoopback;
 	BOOL m_pref_AuthRequired;
 	int m_pref_ConnectPriority;
-	char m_pref_authhosts[150];
+	char m_pref_authhosts[1280];
+	char m_pref_authhosts2[1280];
 
 	BOOL m_pref_DebugMode;
 	char m_pref_DebugPath[512];
