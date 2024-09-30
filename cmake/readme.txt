@@ -79,11 +79,43 @@ ls
 
 cd /d c:\source\vcpkg
 bootstrap-vcpkg.bat -disableMetrics
+
+After the batch command
+
+On command line
+---------------
 set VCPKG_ROOT=c:\source\vcpkg
 set PATH=%VCPKG_ROOT%;%PATH%
 
+OR set on Windows environment variables
+---------------------------------------
+Create System environment variables :
+Name  : VCPKG_ROOT
+Value : C:\source\vcpkg
+Adding to the System Path
+c:\source\vcpkg
+%VCPKG_ROOT%
+
 # If you have error ZLIB not find
+On command line
+---------------
 set VCPKG_DEFAULT_TRIPLET=x64-windows-static
+
+OR set on Windows environment variables
+---------------------------------------
+Create System user variables :
+Name  : VCPKG_DEFAULT_TRIPLET
+Value : x64-windows-static
+(Nota : previously I test with these in Windows System environment variables)
+
+After If error Zlib still active try these
+On Visual Studio 2022 and open CMakeSettings.json
+Change these line
+"cmakeToolchain": "%VCPKG_ROOT%\\scripts\\buildsystems\\vcpkg.cmake"
+with
+"cmakeToolchain": "C:\\source\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake"
+KO ne fonctionne pas.
+
 # See https://stackoverflow.com/questions/55496611/cmake-cannot-find-libraries-installed-with-vcpkg
 # Reinstall all vcpkg if you have install them before
 

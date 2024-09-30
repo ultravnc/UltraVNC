@@ -1,21 +1,23 @@
 ﻿{
   "configurations": [
     {
-      "name": "x64-Debug",
-      "generator": "Ninja",
-      "configurationType": "Debug",
-      "inheritEnvironments": [ "msvc_x64_x64" ],
-      "buildRoot": "${projectDir}\\out\\build\\${name}",
-      "installRoot": "${projectDir}\\out\\install\\${name}",
       "buildCommandArgs": "",
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "cmakeCommandArgs": "-DZLIB_INCLUDE_DIR=\"C:\\source\\vcpkg\\packages\\zlib_x64-windows-static\\include\" -DZLIB_LIBRARY=\"C:\\source\\vcpkg\\packages\\zlib_x64-windows-static\\lib\\zlib.lib\"",
+      "cmakeToolchain": "%VCPKG_ROOT%\\scripts\\buildsystems\\vcpkg.cmake",
+      "configurationType": "Debug",
       "ctestCommandArgs": "",
+      "generator": "Ninja",
+      "inheritEnvironments": [ "msvc_x64_x64" ],
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "name": "x64-Debug",
       "variables": [
-        { // External Cache Values v
+        {
           "name": "JPEG_INCLUDE_DIR",
           "value": "C:\\source\\vcpkg\\installed\\x64-windows-static\\include",
           "type": "PATH"
         },
-        {
+        {git 
           "name": "JPEG_LIBRARY_DEBUG",
           "value": "C:\\source\\vcpkg\\installed\\x64-windows-static\\debug\\lib\\jpeg.lib",
           "type": "FILEPATH"
@@ -43,32 +45,32 @@
         {
           "name": "MSLogonACL_BINARY_DIR",
           "value": "C:\\source\\obj\\MSLogonACL",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "MSLogonACL_IS_TOP_LEVEL",
           "value": "OFF",
-          "type": "BOOL" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "BOOL"
+          "type": "BOOL"
         },
         {
           "name": "MSLogonACL_SOURCE_DIR",
           "value": "C:\\source\\UltraVNC\\cmake\\MSLogonACL",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "UltraVNC_BINARY_DIR",
           "value": "C:\\source\\obj",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "UltraVNC_IS_TOP_LEVEL",
           "value": "ON",
-          "type": "BOOL" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "BOOL"
+          "type": "BOOL"
         },
         {
           "name": "UltraVNC_SOURCE_DIR",
           "value": "C:\\source\\UltraVNC\\cmake",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "VCPKG_APPLOCAL_DEPS",
@@ -163,117 +165,117 @@
         {
           "name": "authSSP_BINARY_DIR",
           "value": "C:\\source\\obj\\authSSP",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "authSSP_IS_TOP_LEVEL",
           "value": "OFF",
-          "type": "BOOL" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "BOOL"
+          "type": "BOOL"
         },
         {
           "name": "authSSP_LIB_DEPENDS",
           "value": "general;aclui;general;comctl32;",
-          "type": "STRING" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "STRING"
+          "type": "STRING"
         },
         {
           "name": "authSSP_SOURCE_DIR",
           "value": "C:\\source\\UltraVNC\\cmake\\authSSP",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "authadmin_BINARY_DIR",
           "value": "C:\\source\\obj\\authadmin",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "authadmin_IS_TOP_LEVEL",
           "value": "OFF",
-          "type": "BOOL" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "BOOL"
+          "type": "BOOL"
         },
         {
           "name": "authadmin_LIB_DEPENDS",
           "value": "general;netapi32;",
-          "type": "STRING" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "STRING"
+          "type": "STRING"
         },
         {
           "name": "authadmin_SOURCE_DIR",
           "value": "C:\\source\\UltraVNC\\cmake\\authadmin",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "createpassword_BINARY_DIR",
           "value": "C:\\source\\obj\\createpassword",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "createpassword_IS_TOP_LEVEL",
           "value": "OFF",
-          "type": "BOOL" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "BOOL"
+          "type": "BOOL"
         },
         {
           "name": "createpassword_SOURCE_DIR",
           "value": "C:\\source\\UltraVNC\\cmake\\createpassword",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "ldapauth9x_BINARY_DIR",
           "value": "C:\\source\\obj\\ldapauth9x",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "ldapauth9x_IS_TOP_LEVEL",
           "value": "OFF",
-          "type": "BOOL" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "BOOL"
+          "type": "BOOL"
         },
         {
           "name": "ldapauth9x_LIB_DEPENDS",
           "value": "general;activeds;general;adsiid;",
-          "type": "STRING" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "STRING"
+          "type": "STRING"
         },
         {
           "name": "ldapauth9x_SOURCE_DIR",
           "value": "C:\\source\\UltraVNC\\cmake\\ldapauth9x",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "ldapauth_BINARY_DIR",
           "value": "C:\\source\\obj\\ldapauth",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "ldapauth_IS_TOP_LEVEL",
           "value": "OFF",
-          "type": "BOOL" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "BOOL"
+          "type": "BOOL"
         },
         {
           "name": "ldapauth_LIB_DEPENDS",
           "value": "general;activeds;general;adsiid;",
-          "type": "STRING" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "STRING"
+          "type": "STRING"
         },
         {
           "name": "ldapauth_SOURCE_DIR",
           "value": "C:\\source\\UltraVNC\\cmake\\ldapauth",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "ldapauthnt4_BINARY_DIR",
           "value": "C:\\source\\obj\\ldapauthnt4",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "ldapauthnt4_IS_TOP_LEVEL",
           "value": "OFF",
-          "type": "BOOL" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "BOOL"
+          "type": "BOOL"
         },
         {
           "name": "ldapauthnt4_LIB_DEPENDS",
           "value": "general;activeds;general;adsiid;general;netapi32;",
-          "type": "STRING" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "STRING"
+          "type": "STRING"
         },
         {
           "name": "ldapauthnt4_SOURCE_DIR",
           "value": "C:\\source\\UltraVNC\\cmake\\ldapauthnt4",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "libjpeg-turbo_DIR",
@@ -283,289 +285,289 @@
         {
           "name": "libomnithread_BINARY_DIR",
           "value": "C:\\source\\obj\\libomnithread",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "libomnithread_IS_TOP_LEVEL",
           "value": "OFF",
-          "type": "BOOL" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "BOOL"
+          "type": "BOOL"
         },
         {
           "name": "libomnithread_SOURCE_DIR",
           "value": "C:\\source\\UltraVNC\\cmake\\libomnithread",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "librdr_BINARY_DIR",
           "value": "C:\\source\\obj\\librdr",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "librdr_IS_TOP_LEVEL",
           "value": "OFF",
-          "type": "BOOL" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "BOOL"
+          "type": "BOOL"
         },
         {
           "name": "librdr_LIB_DEPENDS",
           "value": "general;ZLIB::ZLIB;general;LibLZMA::LibLZMA;",
-          "type": "STRING" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "STRING"
+          "type": "STRING"
         },
         {
           "name": "librdr_SOURCE_DIR",
           "value": "C:\\source\\UltraVNC\\cmake\\librdr",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "libudt4_BINARY_DIR",
           "value": "C:\\source\\obj\\libudt4",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "libudt4_IS_TOP_LEVEL",
           "value": "OFF",
-          "type": "BOOL" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "BOOL"
+          "type": "BOOL"
         },
         {
           "name": "libudt4_LIB_DEPENDS",
           "value": "general;ws2_32;general;wsock32;",
-          "type": "STRING" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "STRING"
+          "type": "STRING"
         },
         {
           "name": "libudt4_SOURCE_DIR",
           "value": "C:\\source\\UltraVNC\\cmake\\libudt4",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "libudtcloud_BINARY_DIR",
           "value": "C:\\source\\obj\\libudtcloud",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "libudtcloud_IS_TOP_LEVEL",
           "value": "OFF",
-          "type": "BOOL" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "BOOL"
+          "type": "BOOL"
         },
         {
           "name": "libudtcloud_LIB_DEPENDS",
           "value": "general;libudt4;",
-          "type": "STRING" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "STRING"
+          "type": "STRING"
         },
         {
           "name": "libudtcloud_SOURCE_DIR",
           "value": "C:\\source\\UltraVNC\\cmake\\libudtcloud",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "libzip32_BINARY_DIR",
           "value": "C:\\source\\obj\\libzip32",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "libzip32_SOURCE_DIR",
           "value": "C:\\source\\UltraVNC\\cmake\\libzip32",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "libzipunzip_BINARY_DIR",
           "value": "C:\\source\\obj\\libzipunzip",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "libzipunzip_IS_TOP_LEVEL",
           "value": "OFF",
-          "type": "BOOL" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "BOOL"
+          "type": "BOOL"
         },
         {
           "name": "libzipunzip_SOURCE_DIR",
           "value": "C:\\source\\UltraVNC\\cmake\\libzipunzip",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "logging_BINARY_DIR",
           "value": "C:\\source\\obj\\logging",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "logging_IS_TOP_LEVEL",
           "value": "OFF",
-          "type": "BOOL" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "BOOL"
+          "type": "BOOL"
         },
         {
           "name": "logging_SOURCE_DIR",
           "value": "C:\\source\\UltraVNC\\cmake\\logging",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "logmessages_BINARY_DIR",
           "value": "C:\\source\\obj\\logmessages",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "logmessages_IS_TOP_LEVEL",
           "value": "OFF",
-          "type": "BOOL" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "BOOL"
+          "type": "BOOL"
         },
         {
           "name": "logmessages_SOURCE_DIR",
           "value": "C:\\source\\UltraVNC\\cmake\\logmessages",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "repeater_BINARY_DIR",
           "value": "C:\\source\\obj\\repeater",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "repeater_IS_TOP_LEVEL",
           "value": "OFF",
-          "type": "BOOL" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "BOOL"
+          "type": "BOOL"
         },
         {
           "name": "repeater_SOURCE_DIR",
           "value": "C:\\source\\UltraVNC\\cmake\\repeater",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "setcad_BINARY_DIR",
           "value": "C:\\source\\obj\\setcad",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "setcad_IS_TOP_LEVEL",
           "value": "OFF",
-          "type": "BOOL" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "BOOL"
+          "type": "BOOL"
         },
         {
           "name": "setcad_SOURCE_DIR",
           "value": "C:\\source\\UltraVNC\\cmake\\setcad",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "setpasswd_BINARY_DIR",
           "value": "C:\\source\\obj\\setpasswd",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "setpasswd_IS_TOP_LEVEL",
           "value": "OFF",
-          "type": "BOOL" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "BOOL"
+          "type": "BOOL"
         },
         {
           "name": "setpasswd_SOURCE_DIR",
           "value": "C:\\source\\UltraVNC\\cmake\\setpasswd",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "testauth_BINARY_DIR",
           "value": "C:\\source\\obj\\testauth",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "testauth_IS_TOP_LEVEL",
           "value": "OFF",
-          "type": "BOOL" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "BOOL"
+          "type": "BOOL"
         },
         {
           "name": "testauth_SOURCE_DIR",
           "value": "C:\\source\\UltraVNC\\cmake\\testauth",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "uvnc_settings_BINARY_DIR",
           "value": "C:\\source\\obj\\uvnc_settings",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "uvnc_settings_IS_TOP_LEVEL",
           "value": "OFF",
-          "type": "BOOL" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "BOOL"
+          "type": "BOOL"
         },
         {
           "name": "uvnc_settings_SOURCE_DIR",
           "value": "C:\\source\\UltraVNC\\cmake\\uvnc_settings",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "uvnckeyboardhelper_BINARY_DIR",
           "value": "C:\\source\\obj\\uvnckeyboardhelper",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "uvnckeyboardhelper_IS_TOP_LEVEL",
           "value": "OFF",
-          "type": "BOOL" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "BOOL"
+          "type": "BOOL"
         },
         {
           "name": "uvnckeyboardhelper_SOURCE_DIR",
           "value": "C:\\source\\UltraVNC\\cmake\\uvnckeyboardhelper",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "vnchooks_BINARY_DIR",
           "value": "C:\\source\\obj\\vnchooks",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "vnchooks_IS_TOP_LEVEL",
           "value": "OFF",
-          "type": "BOOL" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "BOOL"
+          "type": "BOOL"
         },
         {
           "name": "vnchooks_SOURCE_DIR",
           "value": "C:\\source\\UltraVNC\\cmake\\vnchooks",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "vncviewer_BINARY_DIR",
           "value": "C:\\source\\obj\\vncviewer",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "vncviewer_IS_TOP_LEVEL",
           "value": "OFF",
-          "type": "BOOL" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "BOOL"
+          "type": "BOOL"
         },
         {
           "name": "vncviewer_SOURCE_DIR",
           "value": "C:\\source\\UltraVNC\\cmake\\vncviewer",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "winvnc_BINARY_DIR",
           "value": "C:\\source\\obj\\winvnc",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "winvnc_IS_TOP_LEVEL",
           "value": "OFF",
-          "type": "BOOL" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "BOOL"
+          "type": "BOOL"
         },
         {
           "name": "winvnc_SOURCE_DIR",
           "value": "C:\\source\\UltraVNC\\cmake\\winvnc",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "workgrpdomnt4_BINARY_DIR",
           "value": "STATIC=C:\\source\\obj\\workgrpdomnt4",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "workgrpdomnt4_IS_TOP_LEVEL",
           "value": "OFF",
-          "type": "BOOL" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "BOOL"
+          "type": "BOOL"
         },
         {
           "name": "workgrpdomnt4_SOURCE_DIR",
           "value": "C:\\source\\UltraVNC\\cmake\\workgrpdomnt4",
-          "type": "PATH" //Value must be one of the following values: "STRING", "BOOL", "PATH", "FILEPATH", "INTERNAL": "STATIC" -> "PATH"
+          "type": "PATH"
         },
         {
           "name": "zstd_DIR",
           "value": "C:\\source\\vcpkg\\installed\\x64-windows-static\\share\\zstd",
-          "type": "PATH" // Last External Cache Values ^
+          "type": "PATH"
         },
-        { // Internal Cache values v
+        {
           "name": "CMAKE_AR-ADVANCED",
           "value": "1",
           "type": "INTERNAL"
@@ -683,10 +685,9 @@
         {
           "name": "Z_VCPKG_ROOT_DIR",
           "value": "C:\\source\\vcpkg",
-          "type": "INTERNAL" // Last Internal Cache values ^
-        }        
-      ],
-      "cmakeToolchain": "%VCPKG_ROOT%\\scripts\\buildsystems\\vcpkg.cmake"
+          "type": "INTERNAL"
+        }
+      ]
     }
   ]
 }
