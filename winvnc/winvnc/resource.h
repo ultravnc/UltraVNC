@@ -40,8 +40,6 @@
 #define IDD_OUTGOING_CONN               132
 #define IDD_PASSWORD                    133
 #define IDD_PATHS                       134
-#define IDD_PROPERTIES                  135
-#define IDD_PROPERTIES1                 136
 #define IDD_TEXTCHAT_DLG                137
 #define IDD_USER_NAME                   138
 #define IDD_FORM_AUTHENTICATION         139
@@ -54,7 +52,6 @@
 #define IDC_ALLOWEDITCLIENTS            1004
 #define IDC_ALLOWLOOPBACK               1005
 #define IDC_ALLOWSHUTDOWN               1006
-#define IDC_APPLY                       1007
 #define IDC_ATT                         1008
 #define IDC_AUTOCAPT1                   1009
 #define IDC_AUTOCAPT2                   1010
@@ -63,11 +60,9 @@
 #define IDC_BLANK                       1013
 #define IDC_BLANK2                      1014
 #define IDC_BLANKINGTXT                 1015
-#define IDC_BLANK4                      1016
 #define IDC_BUILDTIME                   1017
 #define IDC_BUTTON1                     1018
 #define IDC_CHECKIP                     1018
-#define IDC_BUTTON_EXPAND               1019
 #define IDC_CAPTION_STATIC              1020
 #define IDC_CHATAREA_EDIT               1021
 #define IDC_CHECK1                      1022
@@ -119,7 +114,6 @@
 #define IDC_CURSOR9                     1066
 #define IDC_CURSORBLANK                 1067
 #define IDC_DACCEPT                     1068
-#define IDC_DEFAULTBOX                  1069
 #define IDC_DISABLETRAY                 1070
 #define IDC_DISABLE_INPUTS              1071
 #define IDC_DISABLE_LOCAL_INPUTS        1072
@@ -133,7 +127,6 @@
 #define IDC_EDIT3                       1080
 #define IDC_EDITQUERYTEXT               1081
 #define IDC_EDITQUERYYEXT               1082
-#define IDC_EDIT_PATH                   1083
 #define IDC_EMAIL                       1084
 #define IDC_EURO                        1085
 #define IDC_EXTERNALIPADDRESS           1086
@@ -164,7 +157,6 @@
 #define IDC_KILL_B                      1111
 #define IDC_LIST                        1112
 #define IDC_LOCALTEXT_EDIT              1113
-#define IDC_LOCKSETTINGS                1114
 #define IDC_LOCKSETTING_LOCK            1115
 #define IDC_LOCKSETTING_LOGOFF          1116
 #define IDC_LOCKSETTING_NOTHING         1117
@@ -279,15 +271,8 @@
 #define IDC_PROPERTIESTAB               1226
 #define IDC_AUTHREQUIRED                1227
 #define IDC_IP_CHECK_RESULT_LABEL       1228
-#define IDC_BLANK3                      1229
 #define IDC_BUILDTEXT                   1230
-#define IDC_MAXVIEWERS2                 1231
-#define IDC_MAXREFUSE2                  1232
-#define IDC_MAXDISCONNECT2              1233
-#define IDC_NOSCREENSAVER2              1234
 #define IDC_IP_ACCESS_CONTROL_LIST      1235
-#define IDC_ALLOWEDITCLIENTS2           1236
-#define IDC_ALLOWSHUTDOWN2              1237
 #define IDC_ADD_BUTTON                  1238
 #define IDC_EDIT_BUTTON                 1239
 #define IDC_REMOVE_BUTTON               1240
@@ -297,14 +282,11 @@
 #define IDC_DENY                        1244
 #define IDC_QUERY                       1245
 #define IDC_ALLOW                       1246
-#define IDC_DISABLETRAY2                1247
 #define IDC_IP_FOR_CHECK_EDIT           1248
 #define IDC_FIRST_IP                    1249
 #define IDC_IDLETIME                    1250
 #define IDC_IDLETIMEINPUT               1252
 #define IDC_KINTERVAL                   1253
-#define IDC_REMOVE_WALLPAPER2           1254
-#define IDC_SCALE2                      1255
 #define IDD_FORM_NETWORK                1256
 #define IDD_FORM_Reverse                1257
 #define IDD_FORM_Clients                1258
@@ -314,10 +296,10 @@
 #define IDD_FORM_Incoming               1264
 #define IDD_FORM_capture                1266
 #define IDC_QNOLOGON                    1267
-#define IDC_RDPMODE2                    1268
 #define IDD_FORM_Rules                  1269
 #define IDD_FORM_Notifications          1270
 #define IDC_ERROR_TEXT                  1271
+#define IDC_EDIT_PATH                   1272
 #define IDE_CUSTOM1                     4377
 #define ID_ABOUT                        32771
 #define ID_ADMIN_PROPERTIES             32772
@@ -414,7 +396,7 @@
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        205
 #define _APS_NEXT_COMMAND_VALUE         32858
-#define _APS_NEXT_CONTROL_VALUE         1272
+#define _APS_NEXT_CONTROL_VALUE         1273
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

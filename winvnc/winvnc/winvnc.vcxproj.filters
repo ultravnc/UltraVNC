@@ -61,8 +61,6 @@
     <ClCompile Include="vncMultiMonitor.cpp" />
     <ClCompile Include="vncntlm.cpp" />
     <ClCompile Include="vncOSVersion.cpp" />
-    <ClCompile Include="vncproperties.cpp" />
-    <ClCompile Include="vncpropertiesPoll.cpp" />
     <ClCompile Include="vncserver.cpp" />
     <ClCompile Include="vncsetauth.cpp" />
     <ClCompile Include="vncsockconnect.cpp" />
@@ -88,6 +86,9 @@
     <ClCompile Include="CloudDialog.cpp" />
     <ClCompile Include="..\..\common\d3des.c" />
     <ClCompile Include="UdpEchoServer.cpp" />
+    <ClCompile Include="..\..\common\Hyperlinks.cpp" />
+    <ClCompile Include="PropertiesDialog.cpp" />
+    <ClCompile Include="RulesListView.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\ZipUnZip32\ZipUnZip32.h">
@@ -115,12 +116,6 @@
       <Filter>headers</Filter>
     </ClInclude>
     <ClInclude Include="vncserver.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="vncpropertiesPoll.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="vncproperties.h">
       <Filter>headers</Filter>
     </ClInclude>
     <ClInclude Include="vncpasswd.h">
@@ -317,6 +312,9 @@
       <Filter>headers</Filter>
     </ClInclude>
     <ClInclude Include="UdpEchoServer.h" />
+    <ClInclude Include="..\..\common\Hyperlinks.h" />
+    <ClInclude Include="PropertiesDialog.h" />
+    <ClInclude Include="RulesListView.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\AuthPanel.class">
