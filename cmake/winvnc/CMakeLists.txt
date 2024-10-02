@@ -1,8 +1,16 @@
 
 project(winvnc LANGUAGES C CXX RC)
 
+# Patch JPEG Error for Visual Studio 2022
+set(JPEG_INCLUDE_DIR "C:/source/vcpkg/packages/libjpeg-turbo_x64-windows-static/include")
+#set(LIBJPEG-TURBO_DIR "C:/source/vcpkg/packages/libjpeg-turbo_x64-windows-static/include")                      #Try patch error libjpeg-turbo
+set(JPEG_LIBRARY "C:/source/vcpkg/packages/libjpeg-turbo_x64-windows-static/lib/jpeg.lib")
+#set(LIBJPEG-TURBO_LIBRARY "C:/source/vcpkg/packages/libjpeg-turbo_x64-windows-static/lib/turbojpeg.lib")        #Try patch error libjpeg-turbo
 find_package(JPEG REQUIRED)
 find_package(libjpeg-turbo CONFIG REQUIRED)
+# Patch Zlib Error for Visual Studio 2022
+set(ZLIB_INCLUDE_DIR "C:/source/vcpkg/packages/zlib_x64-windows-static/include")
+set(ZLIB_LIBRARY "C:/source/vcpkg/packages/zlib_x64-windows-static/lib/zlib.lib")
 find_package(ZLIB REQUIRED)
 find_package(zstd CONFIG REQUIRED)
 find_package(LibLZMA REQUIRED)
