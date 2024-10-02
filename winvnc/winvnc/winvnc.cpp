@@ -96,9 +96,6 @@ HINSTANCE	hInstResDLL;
 
 void Shellexecuteforuiaccess();
 
-void Secure_Plugin_elevated(char *szPlugin);
-void Secure_Plugin(char *szPlugin);
-
 //HACK to use name in autoreconnect from service with dyn dns
 char dnsname[255];
 extern bool PreConnect;
@@ -660,7 +657,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 				char mycommand[MAX_PATH];
 				i += strlen(dsmpluginhelper);
 				strcpy_s(mycommand, &(szCmdLine[i + 1]));
-				Secure_Plugin_elevated(mycommand);
+				PropertiesDialog::Secure_Plugin_elevated(mycommand);
 	#ifdef CRASHRPT
 				crUninstall();
 	#endif
@@ -672,7 +669,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 				char mycommand[MAX_PATH];
 				i += strlen(dsmplugininstance);
 				strcpy_s(mycommand, &(szCmdLine[i + 1]));
-				Secure_Plugin(mycommand);
+				PropertiesDialog::Secure_Plugin(mycommand);
 	#ifdef CRASHRPT
 				crUninstall();
 	#endif

@@ -16,9 +16,7 @@ private:
 	int ListPlugins(HWND hComboBox);
 	RulesListView *rulesListView;
 	vncServer* m_server = NULL;
-	vncSetAuth	m_vncauth;
-	void Secure_Save_Plugin_Config(char* szPlugin);
-	void Secure_Plugin(char* szPlugin);
+	vncSetAuth	m_vncauth;	
 	void onTabsOK(HWND hwnd);
 	void InitPortSettings(HWND hwnd);
 
@@ -39,5 +37,9 @@ public:
 	void onCancel(HWND hwnd);
 	bool DlgInitDialog(HWND hwnd);
 	bool onCommand(int command, HWND hwnd);
+
+	static void Secure_Plugin_elevated(char* szPlugin);
+	static void Secure_Save_Plugin_Config(char* szPlugin);
+	static void Secure_Plugin(char* szPlugin);
 };
 

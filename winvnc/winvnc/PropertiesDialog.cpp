@@ -1265,38 +1265,6 @@ void PropertiesDialog::Secure_Plugin(char* szPlugin)
 		if (desktop) CloseDesktop(desktop);
 	}
 }
-void PropertiesDialog::Secure_Save_Plugin_Config(char* szPlugin)
-{
-	DesktopUsersToken desktopUsersToken;
-	HANDLE hPToken = desktopUsersToken.getDesktopUsersToken();
-	if (!hPToken)
-		return;
-
-	char dir[MAX_PATH];
-	char exe_file_name[MAX_PATH];
-	GetModuleFileName(0, exe_file_name, MAX_PATH);
-	strcpy_s(dir, exe_file_name);
-	strcat_s(dir, " -dsmpluginhelper ");
-	strcat_s(dir, szPlugin);
-
-	STARTUPINFO          StartUPInfo{};
-	PROCESS_INFORMATION  ProcessInfo{};
-	ZeroMemory(&StartUPInfo, sizeof(STARTUPINFO));
-	ZeroMemory(&ProcessInfo, sizeof(PROCESS_INFORMATION));
-	StartUPInfo.wShowWindow = SW_SHOW;
-	StartUPInfo.lpDesktop = "Winsta0\\Default";
-	StartUPInfo.cb = sizeof(STARTUPINFO);
-
-	CreateProcessAsUser(hPToken, NULL, dir, NULL, NULL, FALSE, DETACHED_PROCESS, NULL, NULL, &StartUPInfo, &ProcessInfo);
-	DWORD errorcode = GetLastError();
-	if (ProcessInfo.hProcess)
-		CloseHandle(ProcessInfo.hProcess);
-	if (ProcessInfo.hThread)
-		CloseHandle(ProcessInfo.hThread);
-	if (errorcode == 1314)
-		Secure_Plugin(szPlugin);
-	return;
-}
 
 void PropertiesDialog::onTabsOK(HWND hwnd)
 {
@@ -1863,4 +1831,58 @@ void PropertiesDialog::onCancel(HWND hwnd)
 	DestroyWindow(hTabRules);
 	DestroyWindow(hTabCapture);
 	EndDialog(hwnd, FALSE);
+}
+
+void PropertiesDialog::Secure_Save_Plugin_Config(char* szPlugin)
+{
+	DesktopUsersToken desktopUsersToken;
+	HANDLE hPToken = desktopUsersToken.getDesktopUsersToken();
+	if (!hPToken)
+		return;
+
+	char dir[MAX_PATH];
+	char exe_file_name[MAX_PATH];
+	GetModuleFileName(0, exe_file_name, MAX_PATH);
+	strcpy_s(dir, exe_file_name);
+	strcat_s(dir, " -dsmpluginhelper ");
+	strcat_s(dir, szPlugin);
+
+	STARTUPINFO          StartUPInfo{};
+	PROCESS_INFORMATION  ProcessInfo{};
+	ZeroMemory(&StartUPInfo, sizeof(STARTUPINFO));
+	ZeroMemory(&ProcessInfo, sizeof(PROCESS_INFORMATION));
+	StartUPInfo.wShowWindow = SW_SHOW;
+	StartUPInfo.lpDesktop = "Winsta0\\Default";
+	StartUPInfo.cb = sizeof(STARTUPINFO);
+
+	CreateProcessAsUser(hPToken, NULL, dir, NULL, NULL, FALSE, DETACHED_PROCESS, NULL, NULL, &StartUPInfo, &ProcessInfo);
+	DWORD errorcode = GetLastError();
+	if (ProcessInfo.hProcess)
+		CloseHandle(ProcessInfo.hProcess);
+	if (ProcessInfo.hThread)
+		CloseHandle(ProcessInfo.hThread);
+	if (errorcode == 1314)
+		Secure_Plugin(szPlugin);
+	return;
+}
+
+void PropertiesDialog::Secure_Plugin_elevated(char* szPlugin)
+{
+	char dir[MAX_PATH];
+	char exe_file_name[MAX_PATH];
+	strcpy_s(dir, " -dsmplugininstance ");
+	strcat_s(dir, szPlugin);
+
+	GetModuleFileName(0, exe_file_name, MAX_PATH);
+	SHELLEXECUTEINFO shExecInfo;
+	shExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
+	shExecInfo.fMask = NULL;
+	shExecInfo.hwnd = GetForegroundWindow();
+	shExecInfo.lpVerb = "runas";
+	shExecInfo.lpFile = exe_file_name;
+	shExecInfo.lpParameters = dir;
+	shExecInfo.lpDirectory = NULL;
+	shExecInfo.nShow = SW_HIDE;
+	shExecInfo.hInstApp = NULL;
+	ShellExecuteEx(&shExecInfo);
 }
