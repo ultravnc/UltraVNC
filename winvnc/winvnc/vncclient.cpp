@@ -77,6 +77,7 @@
 #include <string>
 #include <iterator>
 #include <shlobj.h>
+#include <userenv.h>
 #include "vncOSVersion.h"
 #include "common/win32_helpers.h"
 #include "uvncUiAccess.h"

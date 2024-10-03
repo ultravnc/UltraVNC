@@ -36,6 +36,7 @@
 #include <lmcons.h>
 #include <wininet.h>
 #include <shlobj.h>
+#include <userenv.h>
 
 // Header
 
@@ -239,11 +240,6 @@ vncMenu::vncMenu(vncServer* server)
 
 	// Initialise the properties dialog object
 	if (!m_properties.Init(m_server))
-	{
-		PostQuitMessage(0);
-		return;
-	}
-	if (!m_propertiesPoll.Init(m_server))
 	{
 		PostQuitMessage(0);
 		return;
@@ -545,7 +541,7 @@ BOOL vncMenu::AddNotificationIcon()
 		// as the main program window
 		// sf@2007 - Do not display Properties pages when running in Application0 mode
 		if (!settings->RunningFromExternalService()) {
-			m_properties.ShowAdmin();
+			m_properties.ShowDialog();
 			PostQuitMessage(0);
 		}
 	}
@@ -561,9 +557,7 @@ BOOL vncMenu::AddNotificationIcon()
 void vncMenu::addMenus()
 {
 	EnableMenuItem(m_hmenu, ID_ADMIN_PROPERTIES,
-		settings->getAllowProperties() ? MF_ENABLED : MF_GRAYED);
-	EnableMenuItem(m_hmenu, ID_PROPERTIES,
-		settings->getAllowProperties() ? MF_ENABLED : MF_GRAYED);
+		settings->getAllowProperties() ? MF_ENABLED : MF_GRAYED);	
 	EnableMenuItem(m_hmenu, ID_CLOSE,
 		settings->getAllowShutdown() ? MF_ENABLED : MF_GRAYED);
 	EnableMenuItem(m_hmenu, ID_KILLCLIENTS,
@@ -929,19 +923,11 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
 	case WM_COMMAND:
 		// User has clicked an item on the tray menu
-		switch (LOWORD(wParam))
-		{
-		case ID_PROPERTIES:
-			// Show the properties dialog, unless it is already displayed
-			vnclog.Print(LL_INTINFO, VNCLOG("show user properties requested\n"));
-			_this->m_propertiesPoll.Show();
-			_this->FlashTrayIcon(_this->m_server->AuthClientCount() != 0);
-			break;
-
+		switch (LOWORD(wParam)) {
 		case ID_ADMIN_PROPERTIES:
 			// Show the properties dialog, unless it is already displayed
 			vnclog.Print(LL_INTINFO, VNCLOG("show user properties requested\n"));
-			_this->m_properties.ShowAdmin();
+			_this->m_properties.ShowDialog();
 			_this->FlashTrayIcon(_this->m_server->AuthClientCount() != 0);
 			break;
 
@@ -1466,8 +1452,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				_this->FlashTrayIcon(_this->m_server->AuthClientCount() != 0);
 				// We should load in the prefs for the new user
 
-				_this->m_properties.LoadFromIniFile();
-				_this->m_propertiesPoll.LoadFromIniFile();
+				_this->m_properties.UpdateServer();
 
 			}
 		}
