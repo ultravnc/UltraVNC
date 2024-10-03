@@ -160,7 +160,7 @@ cmake --build . --parallel --config=RelWithDebInfo
 
 # Same steps before the cmake invocation as above (# Common Steps cmake invocation)
 
-# Install PlatformToolset matching to the project files, currently v143
+# Install PlatformToolset matching to the project files, currently v143 for Visual Studio 2022 and v142 for Visual Studio 2019
 
 set _P=^
   /p:Platform=x64 ^
