@@ -54,6 +54,9 @@ void InitIpp();
 #include "UltraVNCService.h"
 #include "ScSelect.h"
 #include "SettingsManager.h"
+#include <commctrl.h>
+#include "shlwapi.h"
+#pragma comment (lib, "comctl32")
 
 // Application instance and name
 HINSTANCE	hAppInstance;
@@ -92,9 +95,6 @@ HINSTANCE	hInstResDLL;
 //BOOL G_HTTP;
 
 void Shellexecuteforuiaccess();
-
-void Secure_Plugin_elevated(char *szPlugin);
-void Secure_Plugin(char *szPlugin);
 
 //HACK to use name in autoreconnect from service with dyn dns
 char dnsname[255];
@@ -226,6 +226,12 @@ bool return2(bool value)
 // routine or, under NT, the main service routine.
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2, int iCmdShow)
 {
+	InitCommonControls();
+	INITCOMMONCONTROLSEX icex;
+	memset(&icex, 0x0, sizeof(INITCOMMONCONTROLSEX));
+	icex.dwSize = sizeof(INITCOMMONCONTROLSEX);
+	icex.dwICC = ICC_COOL_CLASSES;
+	InitCommonControlsEx(&icex);
 	try {
 		if (VNC_OSVersion::getInstance()->OS_XP == true)
 			MessageBoxSecure(NULL, "Windows XP requires special build", "Warning", MB_ICONERROR);
@@ -651,7 +657,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 				char mycommand[MAX_PATH];
 				i += strlen(dsmpluginhelper);
 				strcpy_s(mycommand, &(szCmdLine[i + 1]));
-				Secure_Plugin_elevated(mycommand);
+				PropertiesDialog::Secure_Plugin_elevated(mycommand);
 	#ifdef CRASHRPT
 				crUninstall();
 	#endif
@@ -663,7 +669,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 				char mycommand[MAX_PATH];
 				i += strlen(dsmplugininstance);
 				strcpy_s(mycommand, &(szCmdLine[i + 1]));
-				Secure_Plugin(mycommand);
+				PropertiesDialog::Secure_Plugin(mycommand);
 	#ifdef CRASHRPT
 				crUninstall();
 	#endif

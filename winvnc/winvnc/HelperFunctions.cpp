@@ -99,7 +99,7 @@ namespace settingsHelpers {
 		LONG ConnectPriority;
 
 		char DSMPlugin[128];
-		char* authhosts = new char[150];
+		char* authhosts = new char[1280];
 
 		LONG AllowShutdown = 1;
 		LONG AllowProperties = 1;
@@ -253,7 +253,7 @@ namespace settingsHelpers {
 		myIniFile_Out.WriteInt("admin", "ConnectPriority", ConnectPriority);
 
 		myIniFile_In.ReadString("admin", "DSMPlugin", DSMPlugin, 128);
-		myIniFile_In.ReadString("admin", "AuthHosts", authhosts, 150);
+		myIniFile_In.ReadString("admin", "AuthHosts", authhosts, 1280);
 
 		myIniFile_Out.WriteString("admin", "DSMPlugin", DSMPlugin);
 		myIniFile_Out.WriteString("admin", "AuthHosts", authhosts);

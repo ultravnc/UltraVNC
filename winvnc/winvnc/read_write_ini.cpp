@@ -200,7 +200,7 @@ bool do_copy(IniFile& myIniFile_In, IniFile& myIniFile_Out)
 	myIniFile_Out.WriteInt("admin", "ConnectPriority", ConnectPriority);
 
 	myIniFile_In.ReadString("admin", "DSMPlugin", DSMPlugin, 128);
-	myIniFile_In.ReadString("admin", "AuthHosts", authhosts, 150);
+	myIniFile_In.ReadString("admin", "AuthHosts", authhosts, 1280);
 
 	myIniFile_Out.WriteString("admin", "DSMPlugin", DSMPlugin);
 	myIniFile_Out.WriteString("admin", "AuthHosts", authhosts);
