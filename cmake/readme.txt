@@ -220,12 +220,12 @@ cmake --build . --parallel --config=RelWithDebInfo
 
 # Same steps before the cmake invocation as above (# Common Steps cmake invocation)
 
-# Install Plattformtoolset matching to the project files, currently v143
+# Install PlatformToolset matching to the project files, currently v143
 
 set _P=^
   /p:Platform=x64 ^
   /p:Configuration=Release ^
-  /p:Plattformtoolset=v143 ^
+  /p:PlatformToolset=v143 ^
   /p:BuildInParallel=true -maxcpucount:16 /p:CL_MPCount=16 ^
   /t:Clean;Build
 set CL=/MP
