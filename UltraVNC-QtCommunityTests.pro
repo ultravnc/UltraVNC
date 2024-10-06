@@ -151,6 +151,7 @@ SOURCES += \
     \uvnc_settings\uvnc_settings\vncsetauth.cpp \
     \uvnckeyboardhelper\uvnckeyboardhelper\stdafx.cpp \
     \uvnckeyboardhelper\uvnckeyboardhelper\uvnckeyboardhelper.cpp \
+    \vncviewer\directx\directxviewer.cpp \
     \vncviewer\AboutBox.cpp \
     \vncviewer\AccelKeys.cpp \
     \vncviewer\AuthDialog.cpp \
@@ -200,7 +201,6 @@ SOURCES += \
     \vncviewer\VNCviewerApp32.cpp \
     \vncviewer\xz.cpp \
     \vncviewer\zrle.cpp \
-    \vncviewer\directx\directxviewer.cpp \
     \winvnc\createpassword\createpassword.cpp \
     \winvnc\loadmemory\loadDllFromMemory.cpp \
     \winvnc\loadmemory\MemoryModule.c \
@@ -489,6 +489,7 @@ HEADERS += \
     \uvnckeyboardhelper\uvnckeyboardhelper\stdafx.h \
     \uvnckeyboardhelper\uvnckeyboardhelper\targetver.h \
     \uvnckeyboardhelper\uvnckeyboardhelper\uvnckeyboardhelper.h \
+    \vncviewer\directx\directxviewer.h \
     \vncviewer\AboutBox.h \
     \vncviewer\AccelKeys.h \
     \vncviewer\AuthDialog.h \
@@ -523,7 +524,6 @@ HEADERS += \
     \vncviewer\vncviewerQt.h \
     \vncviewer\VNCviewerApp.h \
     \vncviewer\VNCviewerApp32.h \
-    \vncviewer\directx\directxviewer.h \
     \winvnc\loadmemory\loadDllFromMemory.h \
     \winvnc\loadmemory\MemoryModule.h \
     \winvnc\vnchooks\resource.h \
