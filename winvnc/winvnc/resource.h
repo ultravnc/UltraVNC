@@ -299,6 +299,7 @@
 #define IDD_FORM_Rules                  1269
 #define IDD_FORM_Notifications          1270
 #define IDC_ERROR_TEXT                  1271
+#define IDC_EDIT_PATH                   1272
 #define IDE_CUSTOM1                     4377
 #define ID_ABOUT                        32771
 #define ID_ADMIN_PROPERTIES             32772
@@ -395,7 +396,7 @@
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        205
 #define _APS_NEXT_COMMAND_VALUE         32858
-#define _APS_NEXT_CONTROL_VALUE         1272
+#define _APS_NEXT_CONTROL_VALUE         1273
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
