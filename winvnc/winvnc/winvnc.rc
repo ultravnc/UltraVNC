@@ -600,9 +600,9 @@ BEGIN
     COMBOBOX        IDC_PLUGINS_COMBO,51,129,126,86,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "Configure encryption",IDC_PLUGIN_BUTTON,191,129,96,12
     GROUPBOX        "Encryption",IDC_STATIC,7,115,288,33
-    CONTROL         "Password required",IDC_AUTHREQUIRED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,165,68,9
+    CONTROL         "Password required",IDC_AUTHREQUIRED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,154,68,9
     LTEXT           "Admin account required",IDC_STATIC,200,76,77,8
-    LTEXT           "DISABLING THE PASSWORD IS \nNOT RECOMMENDED",IDC_STATIC,87,162,115,19
+    LTEXT           "DISABLING THE PASSWORD IS \nNOT RECOMMENDED",IDC_STATIC,87,151,115,19
 END
 
 IDD_FORM_Reverse DIALOGEX 0, 0, 302, 207
@@ -650,21 +650,16 @@ BEGIN
     CONTROL         "Secondary",IDC_SEC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,127,125,50,10
 END
 
-IDD_FORM_input_FT DIALOGEX 0, 0, 302, 209
+IDD_FORM_administration DIALOGEX 0, 0, 302, 209
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    GROUPBOX        "Keyboard && Mouse",IDC_STATIC,7,7,288,49,BS_LEFT
-    CONTROL         "Disable Viewers inputs",IDC_DISABLE_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,14,17,92,10
-    CONTROL         "Disable Local inputs",IDC_DISABLE_LOCAL_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,14,29,83,10
-    CONTROL         "Alternate keyboard",IDC_JAP_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,14,41,89,10
-    CONTROL         "Windows 8 keyboardhelper",IDC_WIN8_HELPER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,156,30,110,10
-    CONTROL         "International keys",IDC_UNICODE_INPUTS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,156,18,74,10
-    CONTROL         "Collaborative",IDC_COLLABO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,156,42,58,10
-    CONTROL         "Enable",IDC_FILETRANSFER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,67,36,10
-    CONTROL         "User impersonation (for Service only)",IDC_FTUSERIMPERSONATION_CHECK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,23,79,133,10
-    GROUPBOX        "File Transfer",IDC_STATIC,7,56,288,41
+    GROUPBOX        "Administration",IDC_STATIC,7,7,288,195,BS_LEFT
+    EDITTEXT        IDC_ADMINPASSWORD,95,41,83,14,ES_AUTOHSCROLL
+    LTEXT           "Administration password",IDC_STATIC,12,44,78,8
+    CONTROL         "Allow users to view and make property changes using this password",IDC_ALLOWUSERSSETTINGS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,63,232,10
+    LTEXT           "As admin you can set a password to allow non administrators to view and change the settings.",IDC_STATIC_ADMIN,12,20,199,20
 END
 
 IDD_FORM_Incoming DIALOGEX 0, 0, 302, 209
@@ -797,6 +792,34 @@ BEGIN
     GROUPBOX        "Notification",IDC_STATIC,7,7,288,78
 END
 
+IDD_FORM_input_FT DIALOGEX 0, 0, 302, 209
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
+FONT 11, "MS Shell Dlg", 400, 0, 0x0
+BEGIN
+    GROUPBOX        "Keyboard && Mouse",IDC_STATIC,7,7,288,49,BS_LEFT
+    CONTROL         "Disable Viewers inputs",IDC_DISABLE_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,14,17,92,10
+    CONTROL         "Disable Local inputs",IDC_DISABLE_LOCAL_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,14,29,83,10
+    CONTROL         "Alternate keyboard",IDC_JAP_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,14,41,89,10
+    CONTROL         "Windows 8 keyboardhelper",IDC_WIN8_HELPER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,156,30,110,10
+    CONTROL         "International keys",IDC_UNICODE_INPUTS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,156,18,74,10
+    CONTROL         "Collaborative",IDC_COLLABO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,156,42,58,10
+    CONTROL         "Enable",IDC_FILETRANSFER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,67,36,10
+    CONTROL         "User impersonation (for Service only)",IDC_FTUSERIMPERSONATION_CHECK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,23,79,133,10
+    GROUPBOX        "File Transfer",IDC_STATIC,7,56,288,41
+END
+
+IDD_ADMINPASSWORD DIALOGEX 0, 0, 256, 52
+STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Enter Admin passwprd"
+FONT 11, "Microsoft Sans Serif", 400, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,142,31,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,199,31,50,14
+    EDITTEXT        IDC_ADMINPASSWORD,71,7,178,14,ES_PASSWORD | ES_AUTOHSCROLL
+    LTEXT           "Admin password",IDC_STATIC,7,10,55,8
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -843,7 +866,7 @@ BEGIN
         BOTTOMMARGIN, 204
     END
 
-    IDD_FORM_input_FT, DIALOG
+    IDD_FORM_administration, DIALOG
     BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 295
@@ -896,6 +919,23 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 204
     END
+
+    IDD_FORM_input_FT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 295
+        VERTGUIDE, 12
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 202
+    END
+
+    IDD_ADMINPASSWORD, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 249
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 45
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -925,7 +965,7 @@ BEGIN
     0
 END
 
-IDD_FORM_input_FT AFX_DIALOG_LAYOUT
+IDD_FORM_administration AFX_DIALOG_LAYOUT
 BEGIN
     0
 END
@@ -951,6 +991,16 @@ BEGIN
 END
 
 IDD_EDIT_IP_ACESS_CONTROL AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_FORM_input_FT AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_ADMINPASSWORD AFX_DIALOG_LAYOUT
 BEGIN
     0
 END

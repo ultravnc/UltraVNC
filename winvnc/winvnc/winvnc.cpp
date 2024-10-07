@@ -388,38 +388,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 			if (szCmdLine[i] <= ' ')
 				continue;
 			argfound = TRUE;
-			if (strncmp(&szCmdLine[i], winvncinipath, strlen(winvncinipath)) == 0)
-			{
-				char filepath[MAX_PATH];
-				i += strlen(winvncinipath);
-				char Drv[_MAX_PATH];
-				char Path[_MAX_PATH];
-				char FileName[_MAX_PATH];
-				char FileExt[_MAX_PATH];
-				_splitpath_s(&(szCmdLine[i + 1]), Drv, Path, FileName, FileExt);
-				char* p = strchr(FileExt, ' ');
-				if (p) *p = 0;
-				_makepath_s(filepath, Drv, Path, FileName, FileExt);
-				g_szIniFile = _strdup(filepath);
-				i += strlen(filepath);
-	#ifdef CRASHRPT
-				crUninstall();
-	#endif
-				continue;
-			}
 
-			if (strncmp(&szCmdLine[i], winvncSettingshelper, strlen(winvncSettingshelper)) == 0)
-			{
-				Sleep(3000);
-				char mycommand[MAX_PATH];
-				i += strlen(winvncSettingshelper);
-				strcpy_s(mycommand, &(szCmdLine[i + 1]));
-				settingsHelpers::Set_settings_as_admin(mycommand);
-	#ifdef CRASHRPT
-				crUninstall();
-	#endif
-				return return2(0);
-			}
 	#ifndef SC_20
 			if (strncmp(&szCmdLine[i], winvncStopserviceHelper, strlen(winvncStopserviceHelper)) == 0)
 			{
@@ -640,18 +609,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 				return return2(0);
 			}
 
-			if (strncmp(&szCmdLine[i], winvncSettings, strlen(winvncSettings)) == 0)
-			{
-				char mycommand[MAX_PATH];
-				i += strlen(winvncSettings);
-				strcpy_s(mycommand, &(szCmdLine[i + 1]));
-				settingsHelpers::Real_settings(mycommand);
-	#ifdef CRASHRPT
-				crUninstall();
-	#endif
-				return return2(0);
-			}
-
 			if (strncmp(&szCmdLine[i], dsmpluginhelper, strlen(dsmpluginhelper)) == 0)
 			{
 				char mycommand[MAX_PATH];
@@ -827,7 +784,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 			{
 				//Run as service
 				if (!Myinit(hInstance)) return return2(0);
-				settings->RunningFromExternalService(true);
+				settings->setRunningFromExternalService(true);
 				int return2value = WinVNCAppMain();
 	#ifdef CRASHRPT
 				crUninstall();
@@ -839,8 +796,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 			{
 				//Run as service
 				if (!Myinit(hInstance)) return return2(0);
-				settings->RunningFromExternalService(true);
-				settings->RunningFromExternalServiceRdp(true);
+				settings->setRunningFromExternalService(true);
+				settings->setRunningFromExternalServiceRdp(true);
 				int return2value = WinVNCAppMain();
 	#ifdef CRASHRPT
 				crUninstall();

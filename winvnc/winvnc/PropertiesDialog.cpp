@@ -61,6 +61,18 @@ bool PropertiesDialog::InitDialog(HWND hwnd)
 	SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
 	SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
 
+	showAdminPanel = false;
+	if (settings->RunningFromExternalService()) {
+		if (settings->IsDesktopUserAdmin())
+			showAdminPanel = true;
+		else if (settings->getAllowUserSettingsWithPassword() && !settings->checkAdminPassword()) {
+				EndDialog(hwnd, IDCANCEL);
+				return true;
+		}
+	}
+
+	
+
 	hTabControl = GetDlgItem(hwnd, IDC_PROPERTIESTAB);
 	TCITEM item;
 	item.mask = TCIF_TEXT;
@@ -74,12 +86,20 @@ bool PropertiesDialog::InitDialog(HWND hwnd)
 	TabCtrl_InsertItem(hTabControl, 3, &item);
 	item.pszText = "Notifications";
 	TabCtrl_InsertItem(hTabControl, 4, &item);
-	item.pszText = "Reverse connection";
+	item.pszText = "Reverse";
 	TabCtrl_InsertItem(hTabControl, 5, &item);
 	item.pszText = "Rules";
 	TabCtrl_InsertItem(hTabControl, 6, &item);
 	item.pszText = "Capture";
-	TabCtrl_InsertItem(hTabControl, 7, &item);
+	TabCtrl_InsertItem(hTabControl, 7, &item);	
+
+
+	if (showAdminPanel)
+	{
+		item.pszText = "Administration";
+		TabCtrl_InsertItem(hTabControl, 8, &item);
+	}
+
 	hTabAuthentication = CreateDialogParam(hInstResDLL,
 		MAKEINTRESOURCE(IDD_FORM_AUTHENTICATION),
 		hwnd,
@@ -120,6 +140,11 @@ bool PropertiesDialog::InitDialog(HWND hwnd)
 		hwnd,
 		(DLGPROC)DlgProc,
 		(LONG_PTR)this);
+	hTabAdministration = CreateDialogParam(hInstResDLL,
+		MAKEINTRESOURCE(IDD_FORM_administration),
+		hwnd,
+		(DLGPROC)DlgProc,
+		(LONG_PTR)this);
 	RECT rc;
 	GetWindowRect(hTabControl, &rc);
 	MapWindowPoints(NULL, hwnd, (POINT*)&rc, 2);
@@ -146,6 +171,9 @@ bool PropertiesDialog::InitDialog(HWND hwnd)
 		rc.right - rc.left, rc.bottom - rc.top,
 		SWP_HIDEWINDOW);
 	SetWindowPos(hTabCapture, HWND_TOP, rc.left, rc.top,
+		rc.right - rc.left, rc.bottom - rc.top,
+		SWP_HIDEWINDOW);
+	SetWindowPos(hTabAdministration, HWND_TOP, rc.left, rc.top,
 		rc.right - rc.left, rc.bottom - rc.top,
 		SWP_HIDEWINDOW);
 	return TRUE;
@@ -196,6 +224,10 @@ int PropertiesDialog::HandleNotify(HWND hwndDlg, WPARAM wParam, LPARAM lParam)
 				ShowWindow(hTabCapture, SW_SHOW);
 				SetFocus(hTabCapture);
 				return 0;
+			case 8:
+				ShowWindow(hTabAdministration, SW_SHOW);
+				SetFocus(hTabAdministration);
+				return 0;				
 			}
 			return 0;
 		}
@@ -233,6 +265,9 @@ int PropertiesDialog::HandleNotify(HWND hwndDlg, WPARAM wParam, LPARAM lParam)
 				break;
 			case 7:
 				ShowWindow(hTabCapture, SW_HIDE);
+				break;
+			case 8:
+				ShowWindow(hTabAdministration, SW_HIDE);
 				break;
 			}
 			return 0;
@@ -697,6 +732,10 @@ bool PropertiesDialog::DlgInitDialog(HWND hwnd)
 
 	if (GetDlgItem(hwnd, IDC_AUTHREQUIRED))
 		CheckDlgButton(hwnd, IDC_AUTHREQUIRED, (settings->getAuthRequired() == 1) ? BST_CHECKED : BST_UNCHECKED);
+
+	if (GetDlgItem(hwnd, IDC_ALLOWUSERSSETTINGS)) {
+		CheckDlgButton(hwnd, IDC_ALLOWUSERSSETTINGS, (settings->getAllowUserSettingsWithPassword() == 1) ? BST_CHECKED : BST_UNCHECKED);
+	}
 
 	if (GetDlgItem(hwnd, IDC_QNOLOGON))
 		SendMessage(GetDlgItem(hwnd, IDC_QNOLOGON), BM_SETCHECK, settings->getQueryIfNoLogon(), 0);
@@ -1756,6 +1795,16 @@ void PropertiesDialog::onTabsOK(HWND hwnd)
 
 	settings->setAuthhosts(rulesListView->getAuthHost());
 
+	if (GetDlgItem(hwnd, IDC_ADMINPASSWORD)) {
+		char passwd[1024]{};
+		GetDlgItemText(hwnd, IDC_ADMINPASSWORD, (LPSTR)&passwd, 1024);
+		settings->setAdminPasswordHash(passwd);
+	}
+	if (GetDlgItem(hwnd, IDC_ALLOWUSERSSETTINGS)) {
+		settings->setAllowUserSettingsWithPassword(SendMessage(GetDlgItem(hwnd, IDC_ALLOWUSERSSETTINGS), BM_GETCHECK, 0, 0) == BST_CHECKED);
+	}
+	
+
 #ifndef SC_20
 	settings->save();
 #endif // SC_20	
@@ -1801,6 +1850,7 @@ void PropertiesDialog::onOK(HWND hwnd)
 	SendMessage(hTabReverse, WM_COMMAND, IDOK, 0);
 	SendMessage(hTabRules, WM_COMMAND, IDOK, 0);
 	SendMessage(hTabCapture, WM_COMMAND, IDOK, 0);
+	SendMessage(hTabAdministration, WM_COMMAND, IDOK, 0);
 	DestroyWindow(hTabAuthentication);
 	DestroyWindow(hTabIncoming);
 	DestroyWindow(hTabInput);
@@ -1809,6 +1859,7 @@ void PropertiesDialog::onOK(HWND hwnd)
 	DestroyWindow(hTabReverse);
 	DestroyWindow(hTabRules);
 	DestroyWindow(hTabCapture);
+	DestroyWindow(hTabAdministration);
 	//Save_settings();
 	EndDialog(hwnd, TRUE);
 }
@@ -1822,6 +1873,7 @@ void PropertiesDialog::onCancel(HWND hwnd)
 	SendMessage(hTabReverse, WM_COMMAND, IDCANCEL, 0);
 	SendMessage(hTabRules, WM_COMMAND, IDCANCEL, 0);
 	SendMessage(hTabCapture, WM_COMMAND, IDCANCEL, 0);
+	SendMessage(hTabAdministration, WM_COMMAND, IDCANCEL, 0);
 	DestroyWindow(hTabAuthentication);
 	DestroyWindow(hTabIncoming);
 	DestroyWindow(hTabInput);
@@ -1830,6 +1882,7 @@ void PropertiesDialog::onCancel(HWND hwnd)
 	DestroyWindow(hTabReverse);
 	DestroyWindow(hTabRules);
 	DestroyWindow(hTabCapture);
+	DestroyWindow(hTabAdministration);
 	EndDialog(hwnd, FALSE);
 }
 

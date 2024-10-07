@@ -35,8 +35,6 @@ bool Copy_to_Secure_from_temp(char *tempfile);
 	#define INIFILE_NAME "SC_20.ini"
 #endif // SC_20
 
-extern char *g_szIniFile;
-
 class IniFile
 {
 
@@ -58,12 +56,12 @@ public:
 	void ReadString(char *key1, char *key2,char *value,int valuesize);
 	void ReadPassword(char *value,int valuesize);
 	void ReadPassword2(char *value,int valuesize); //PGM
-	void IniFileSetSecure();
-	//void IniFileSetTemp();
-	void IniFileSetTemp(char *lpCmdLine);
-	void copy_to_secure();
+
+	void setIniFile(char* iniFile);
 
     bool IsWritable();
+	void ReadHash(char* value, int valuesize);
+	bool WriteHash(char* value, int valuesize);
 
 protected:
 		

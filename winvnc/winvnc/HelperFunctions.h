@@ -109,12 +109,6 @@ namespace serviceHelpers {
 }
 #endif // SC_20
 
-namespace settingsHelpers {
-	void Set_settings_as_admin(char* mycommand);
-	void Real_settings(char* mycommand);
-	void Copy_to_Secure_from_temp_helper(char* lpCmdLine);
-}
-
 DWORD MessageBoxSecure(HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT uType);
 
 #endif

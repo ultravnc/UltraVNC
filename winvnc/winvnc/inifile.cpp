@@ -26,105 +26,13 @@
 #include "stdhdrs.h"
 #include "inifile.h"
 
-char *g_szIniFile = 0;
-
 IniFile::IniFile()
 {
-	if(g_szIniFile)
-	{
-		strcpy_s(myInifile,g_szIniFile);
-	}
-	else
-	{
-     char WORKDIR[MAX_PATH];
-	if (GetModuleFileName(NULL, WORKDIR, MAX_PATH))
-		{
-		char* p = strrchr(WORKDIR, '\\');
-		if (p == NULL) return;
-		*p = '\0';
-		}
-	strcpy_s(myInifile,"");
-	strcat_s(myInifile,WORKDIR);//set the directory
-	strcat_s(myInifile,"\\");
-	strcat_s(myInifile,INIFILE_NAME);
-}
 }
 
-void
-IniFile::IniFileSetSecure()
+void IniFile::setIniFile(char* iniFile)
 {
-	if(g_szIniFile)
-	{
-		strcpy_s(myInifile,g_szIniFile);
-	}
-	else
-	{
-char WORKDIR[MAX_PATH];
-	if (GetModuleFileName(NULL, WORKDIR, MAX_PATH))
-		{
-		char* p = strrchr(WORKDIR, '\\');
-		if (p == NULL) return;
-		*p = '\0';
-		}
-	strcpy_s(myInifile,"");
-	strcat_s(myInifile,WORKDIR);//set the directory
-	strcat_s(myInifile,"\\");
-	strcat_s(myInifile,INIFILE_NAME);
-}
-}
-
-void
-IniFile::IniFileSetTemp(char *lpCmdLine)
-{
-	strcpy_s(myInifile,260,lpCmdLine);
-}
-
-void
-IniFile::copy_to_secure()
-{
-	{
-		char dir[MAX_PATH];
-
-		char exe_file_name[MAX_PATH];
-		GetModuleFileName(0, exe_file_name, MAX_PATH);
-
-		strcpy_s(dir, exe_file_name);
-		strcat_s(dir, " -settingshelper");
-		strcat_s(dir, ":");
-		strcat_s(dir, myInifile);
-
-		STARTUPINFO          StartUPInfo;
-		PROCESS_INFORMATION  ProcessInfo;
-		HANDLE Token=NULL;
-		HANDLE process=NULL;
-		ZeroMemory(&StartUPInfo,sizeof(STARTUPINFO));
-		ZeroMemory(&ProcessInfo,sizeof(PROCESS_INFORMATION));
-		StartUPInfo.wShowWindow = SW_SHOW;
-		StartUPInfo.lpDesktop = "Winsta0\\Default";
-		StartUPInfo.cb = sizeof(STARTUPINFO);
-		HWND tray = FindWindow(("Shell_TrayWnd"), 0);
-		if (!tray)
-			goto error;
-
-		DWORD processId = 0;
-			GetWindowThreadProcessId(tray, &processId);
-		if (!processId)
-			goto error;
-		process = OpenProcess(MAXIMUM_ALLOWED, FALSE, processId);
-		if (!process)
-			goto error;
-		OpenProcessToken(process, MAXIMUM_ALLOWED, &Token);
-		CreateProcessAsUser(Token,NULL,dir,NULL,NULL,FALSE,DETACHED_PROCESS,NULL,NULL,&StartUPInfo,&ProcessInfo);
-		DWORD error=GetLastError();
-		if (process) CloseHandle(process);
-		if (Token) CloseHandle(Token);
-		if (ProcessInfo.hThread) CloseHandle (ProcessInfo.hThread);
-		if (ProcessInfo.hProcess) CloseHandle (ProcessInfo.hProcess);
-		if (error == 1314) goto error;
-		return;
-	}
-		error:
-		settingsHelpers::Set_settings_as_admin(myInifile);
+	strcpy_s(myInifile, iniFile);
 }
 
 IniFile::~IniFile()
@@ -198,4 +106,16 @@ bool IniFile::IsWritable()
         WritePrivateProfileSection("Permissions", "", myInifile);
 
     return writable;
+}
+
+void
+IniFile::ReadHash(char* value, int valuesize)
+{
+	GetPrivateProfileStruct("UltraVNC", "hash", value, valuesize, myInifile);
+}
+
+bool
+IniFile::WriteHash(char* value, int valuesize)
+{
+	return (FALSE != WritePrivateProfileStruct("UltraVNC", "hash", value, valuesize, myInifile));
 }

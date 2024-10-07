@@ -73,8 +73,6 @@ const char winvnchttp[]	= "-httpproxy";
 const char winvncRepeater[]	= "-repeater"; // set default repeater host
 extern char* g_szRepeaterHost;
 
-const char winvncSettingshelper[]			= "-settingshelper";
-const char winvncSettings[]					= "-settings";
 const char winvncStopserviceHelper[]		= "-stopservicehelper";
 const char winvncStopservice[]				= "-stopservice";
 const char winvncStartserviceHelper[]		= "-startservicehelper";
@@ -113,7 +111,5 @@ const char winvncopenopenhub[]				= "-openopenhub";
 const char dsmpluginhelper[]				= "-dsmpluginhelper";
 const char dsmplugininstance[]				= "-dsmplugininstance";
 
-const char winvncinipath[]					= "-inifile";
-
 // Usage string
-const char winvncUsageText[]		= "winvnc [-sc_prompt] [-sc_exit] [-id:????] [-stopreconnect][-autoreconnect[ ID:????]] [-connect host[:display]] [-connect host[::port]] [-repeater host[:port]] [-inifile ????] [-run]\n";
+const char winvncUsageText[]		= "winvnc [-sc_prompt] [-sc_exit] [-id:????] [-stopreconnect][-autoreconnect[ ID:????]] [-connect host[:display]] [-connect host[::port]] [-repeater host[:port]][-run]\n";

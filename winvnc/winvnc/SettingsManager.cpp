@@ -30,14 +30,20 @@
 #include <userenv.h>
 #include "credentials.h"
 #include <tchar.h>
+#include <shlobj.h>
+#include <direct.h>
+#define SODIUM_STATIC
+#include <sodium.h>
+#pragma comment(lib, "libsodium.lib")
 
 SettingsManager* SettingsManager::s_instance = NULL;
 SettingsManager* settings = SettingsManager::getInstance();
 
 SettingsManager* SettingsManager::getInstance()
 {
-	if (!s_instance)
+	if (!s_instance) {
 		s_instance = new SettingsManager;
+	}
 	return s_instance;
 }
 
@@ -47,39 +53,100 @@ SettingsManager::SettingsManager()
 	HANDLE hPToken = desktopUsersToken.getDesktopUsersToken();
 	int iImpersonateResult = 0;
 
-	char WORKDIR[MAX_PATH];
-	if (!GetTempPath(MAX_PATH, WORKDIR)) {
-		//Function failed, just set something
-		if (GetModuleFileName(NULL, WORKDIR, MAX_PATH)) {
-			char* p = strrchr(WORKDIR, '\\');
-			if (p == NULL) return;
-			*p = '\0';
-		}
-		strcpy_s(m_Tempfile, "");
-		strcat_s(m_Tempfile, WORKDIR);//set the directory
-		strcat_s(m_Tempfile, "\\");
-		strcat_s(m_Tempfile, INIFILE_NAME);
-	}
-	else {
-		strcpy_s(m_Tempfile, "");
-		strcat_s(m_Tempfile, WORKDIR);//set the directory
-		strcat_s(m_Tempfile, INIFILE_NAME);
-	}
-
 	if (hPToken != NULL) {
 		if (!ImpersonateLoggedOnUser(hPToken))
 			iImpersonateResult = GetLastError();
-		if (iImpersonateResult == ERROR_SUCCESS) {
-			ExpandEnvironmentStringsForUser(hPToken, "%TEMP%", m_Tempfile, MAX_PATH);
-			strcat_s(m_Tempfile, "\\");
-			strcat_s(m_Tempfile, INIFILE_NAME);
+	}
+
+	sodium_init();
+	setDefaults();
+
+	char path[MAX_PATH];
+	if (RunningFromExternalService()) {
+		
+		HRESULT result = SHGetFolderPathA(NULL, CSIDL_COMMON_APPDATA, NULL, 0, path);
+		if (!SUCCEEDED(result)) {
+			exit(0); //you can't run without a path to the ini file
 		}
 	}
-	setDefaults();
+	else {
+		HRESULT result = SHGetFolderPathA(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, path);
+		if (!SUCCEEDED(result)) {
+			exit(0); //you can't run without a path to the ini file
+		}
+	}
+
+	strcpy_s(m_Inifile, "");
+	strcat_s(m_Inifile, path);//set the directory
+	strcat_s(m_Inifile, "\\UltraVNC");
+	_mkdir(m_Inifile);
+	strcat_s(m_Inifile, "\\");
+	strcat_s(m_Inifile, INIFILE_NAME);
+	myIniFile.setIniFile(m_Inifile);
 	load();
 	if (iImpersonateResult == ERROR_SUCCESS)
 		RevertToSelf();
 }
+
+void SettingsManager::setRunningFromExternalService(BOOL fEnabled) 
+{ 
+	m_pref_fRunningFromExternalService = fEnabled; 
+	char path[MAX_PATH];
+	if (RunningFromExternalService()) {
+
+		HRESULT result = SHGetFolderPathA(NULL, CSIDL_COMMON_APPDATA, NULL, 0, path);
+		if (!SUCCEEDED(result)) {
+			exit(0); //you can't run without a path to the ini file
+		}
+	}
+	else {
+		HRESULT result = SHGetFolderPathA(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, path);
+		if (!SUCCEEDED(result)) {
+			exit(0); //you can't run without a path to the ini file
+		}
+	}
+
+	strcpy_s(m_Inifile, "");
+	strcat_s(m_Inifile, path);//set the directory
+	strcat_s(m_Inifile, "\\UltraVNC");
+	_mkdir(m_Inifile);
+	strcat_s(m_Inifile, "\\");
+	strcat_s(m_Inifile, INIFILE_NAME);
+	myIniFile.setIniFile(m_Inifile);
+};
+
+#pragma comment(lib, "wtsapi32.lib")
+#pragma comment(lib, "advapi32.lib")
+
+#include <sddl.h>
+#include <wtsapi32.h>
+
+bool SettingsManager::IsDesktopUserAdmin()
+{
+	DesktopUsersToken desktopUsersToken;
+	HANDLE hPToken = desktopUsersToken.getDesktopUsersToken();
+	if (hPToken) {
+		if (!ImpersonateLoggedOnUser(hPToken)) {
+			return false;
+		}
+	}
+
+	bool isAdmin = myIniFile.IsWritable();
+
+	RevertToSelf();
+	return isAdmin;
+}
+
+bool SettingsManager::getAllowUserSettingsWithPassword()
+{
+	return m_pref_AllowUserSettingsWithPassword;
+}
+
+void  SettingsManager::setAllowUserSettingsWithPassword(bool value)
+{
+	m_pref_AllowUserSettingsWithPassword = value;
+}
+
 
 void SettingsManager::setDefaults()
 {
@@ -228,6 +295,8 @@ void SettingsManager::setDefaults()
 
 	memset(m_pref_cloudServer, 0, MAX_HOST_NAME_LEN);
 	m_pref_cloudEnabled = false;
+	m_pref_AllowUserSettingsWithPassword = false;
+
 };
 
 void SettingsManager::load()
@@ -235,6 +304,7 @@ void SettingsManager::load()
 #ifndef SC_20
 	// Disable Tray icon
 	m_pref_DisableTrayIcon = myIniFile.ReadInt("admin", "DisableTrayIcon", m_pref_DisableTrayIcon);
+	m_pref_AllowUserSettingsWithPassword = myIniFile.ReadInt("admin", "AllowUserSettingsWithPassword", m_pref_AllowUserSettingsWithPassword);
 	m_pref_Rdpmode = myIniFile.ReadInt("admin", "rdpmode", m_pref_Rdpmode);
 	m_pref_Noscreensaver = myIniFile.ReadInt("admin", "noscreensaver", m_pref_Noscreensaver);
 	m_pref_LoopbackOnly = myIniFile.ReadInt("admin", "LoopbackOnly", m_pref_LoopbackOnly);
@@ -350,24 +420,9 @@ void SettingsManager::save()
 	if (!getAllowProperties())
 		return;
 
-	// SAVE PER-USER PREFS IF ALLOWED
-	bool tempset = false;
-	if (!myIniFile.IsWritable() || settings->RunningFromExternalService())
-	{
-		//First check if temp file is writable
-		myIniFile.IniFileSetTemp(m_Tempfile);
-		if (!myIniFile.IsWritable()) {
-			vnclog.Print(LL_INTERR, VNCLOG("file %s not writable, error saving new settings\n"), m_Tempfile);
-			return;
-		}
-		if (!Copy_to_Temp(m_Tempfile)) {
-			vnclog.Print(LL_INTERR, VNCLOG("file %s not writable, error saving new settings\n"), m_Tempfile);
-			return;
-		}
-		tempset = true;
-	}
-
+	// SAVE PER-USER PREFS IF ALLOWED	
 	// Modif sf@2002
+	myIniFile.WriteInt("admin", "AllowUserSettingsWithPassword", m_pref_AllowUserSettingsWithPassword);
 	myIniFile.WriteInt("admin", "FileTransferEnabled", m_pref_EnableFileTransfer);
 	myIniFile.WriteInt("admin", "FTUserImpersonation", m_pref_FTUserImpersonation); // sf@2005
 	myIniFile.WriteInt("admin", "BlankMonitorEnabled", m_pref_EnableBlankMonitor);
@@ -457,12 +512,7 @@ void SettingsManager::save()
 
 	myIniFile.WriteInt("admin_auth", "locdom1", m_pref_locdom1);
 	myIniFile.WriteInt("admin_auth", "locdom2", m_pref_locdom2);
-	myIniFile.WriteInt("admin_auth", "locdom3", m_pref_locdom3);
-
-	if (tempset) {
-		myIniFile.copy_to_secure();
-		myIniFile.IniFileSetSecure();
-	}	
+	myIniFile.WriteInt("admin_auth", "locdom3", m_pref_locdom3);	
 }
 
 void SettingsManager::setkeepAliveInterval(int secs) {
@@ -486,3 +536,68 @@ bool SettingsManager::IsRunninAsAdministrator()
 	notset = true;
 	return m_pref_RunninAsAdministrator;
 };
+
+#include <windows.h>
+#include "resource.h"
+extern HINSTANCE	hInstResDLL;
+char password[1024] = "";
+
+INT_PTR CALLBACK PasswordDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam) {
+	switch (message) {
+	case WM_INITDIALOG:
+	{
+		HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_WINVNC));
+		SendMessage(hDlg, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+		SendMessage(hDlg, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+	}
+		return (INT_PTR)TRUE;
+
+	case WM_COMMAND:
+		if (LOWORD(wParam) == IDOK) {
+			// Get the password entered in the edit box
+			GetDlgItemText(hDlg, IDC_ADMINPASSWORD, password, 1024);
+
+			// Close the dialog with OK
+			EndDialog(hDlg, IDOK);
+			return (INT_PTR)TRUE;
+		}
+		else if (LOWORD(wParam) == IDCANCEL) {
+			// Close the dialog with Cancel
+			EndDialog(hDlg, IDCANCEL);
+			return (INT_PTR)TRUE;
+		}
+		break;
+	}
+	return (INT_PTR)FALSE;
+}
+
+bool SettingsManager::checkAdminPassword()
+{
+	memset(password, 0, 1024);
+	INT_PTR ret = DialogBox(hInstResDLL, MAKEINTRESOURCE(IDD_ADMINPASSWORD), NULL, PasswordDlgProc);
+	if (ret == IDOK) {
+		char hashed_password[crypto_pwhash_STRBYTES];
+		myIniFile.ReadHash(hashed_password, crypto_pwhash_STRBYTES);
+		if (crypto_pwhash_str_verify(hashed_password, password, strlen(password)) == 0) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	return false;
+}
+
+void SettingsManager::setAdminPasswordHash(char* password)
+{
+	char hashed_password[crypto_pwhash_STRBYTES];
+	crypto_pwhash_str(
+		hashed_password,
+		password,
+		strlen(password),
+		crypto_pwhash_OPSLIMIT_INTERACTIVE,
+		crypto_pwhash_MEMLIMIT_INTERACTIVE);
+
+	myIniFile.WriteHash(hashed_password, crypto_pwhash_STRBYTES);
+}
+

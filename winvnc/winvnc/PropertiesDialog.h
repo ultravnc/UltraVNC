@@ -10,7 +10,7 @@ class PropertiesDialog
 {
 private:
 	HWND hTabControl, hTabAuthentication, hTabIncoming, hTabInput, hTabMisc, hTabNotifications,
-		hTabReverse, hTabRules, hTabCapture;	
+		hTabReverse, hTabRules, hTabCapture, hTabAdministration;
 	BOOL		m_dlgvisible;
 	BOOL bConnectSock = true;
 	int ListPlugins(HWND hComboBox);
@@ -23,6 +23,7 @@ private:
 	
 	void ShowImpersonateDialog();
 	HWND PropertiesDialogHwnd = NULL;
+	bool showAdminPanel = false;
 
 public:
 	PropertiesDialog();

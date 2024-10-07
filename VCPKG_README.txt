@@ -15,6 +15,11 @@ liblzma:x86-windows                               5.4.3#1             Compressio
 liblzma:x86-windows-static                        5.4.3#1             Compression library with an API similar to that ...
 liblzma:x64-windows 
 
+libsodium:x86-windows-static
+libsodium:x86-windows
+libsodium:x64-windows-static
+libsodium:x64-windows
+
 vcpkg install zlib:x86-windows
 vcpkg install zstd:x86-windows-static
 ..

@@ -167,9 +167,6 @@ public:
 	void setEnableBlankMonitor(BOOL value) { m_pref_EnableBlankMonitor = value; };
 	void setBlankInputsOnly(BOOL value) { m_pref_BlankInputsOnly = value; };
 
-	void setTempFile(char* value) { strcpy_s(m_Tempfile, value); };
-	char* getTempFile() { return m_Tempfile; };
-
 	void setPasswd(const char* passwd)
 	{
 		memcpy(m_pref_passwd, passwd, MAXPWLEN);
@@ -196,9 +193,9 @@ public:
 	void EnableKeepAlives(bool newstate) { m_pref_fEnableKeepAlive = newstate; }
 	bool DoKeepAlives() { return m_pref_fEnableKeepAlive; }
 	BOOL RunningFromExternalService() { return m_pref_fRunningFromExternalService; };
-	void RunningFromExternalService(BOOL fEnabled) { m_pref_fRunningFromExternalService = fEnabled; };
+	void setRunningFromExternalService(BOOL fEnabled);
 	BOOL RunningFromExternalServiceRdp() { return m_pref_fRunningFromExternalServiceRdp; };
-	void RunningFromExternalServiceRdp(BOOL fEnabled) { m_pref_fRunningFromExternalServiceRdp = fEnabled; };
+	void setRunningFromExternalServiceRdp(BOOL fEnabled) { m_pref_fRunningFromExternalServiceRdp = fEnabled; };
 	void AutoRestartFlag(BOOL fOn) { m_pref_fAutoRestart = fOn; };
 	BOOL AutoRestartFlag() { return m_pref_fAutoRestart; };
 
@@ -268,6 +265,11 @@ public:
 	BOOL getIPV6() { return m_pref_ipv6_allowed; };
 
 	bool IsRunninAsAdministrator();
+	bool IsDesktopUserAdmin();
+	bool getAllowUserSettingsWithPassword();
+	void setAllowUserSettingsWithPassword(bool value);
+	bool checkAdminPassword();
+	void setAdminPasswordHash(char *password);
 
 private:
 	SettingsManager();
@@ -346,7 +348,7 @@ private:
 	BOOL m_pref_Avilog;
 	BOOL m_pref_UseIpv6;
 	unsigned int G_SENDBUFFER_EX;
-	char m_Tempfile[MAX_PATH];
+	char m_Inifile[MAX_PATH];
 	bool m_pref_fEnableStateUpdates;
 	bool m_pref_fEnableKeepAlive;
 	BOOL m_pref_fRunningFromExternalService;
@@ -382,6 +384,7 @@ private:
 
 	TCHAR m_pref_cloudServer[MAX_HOST_NAME_LEN];
 	bool m_pref_cloudEnabled;
+	bool m_pref_AllowUserSettingsWithPassword;
 };
 
 extern SettingsManager* settings;

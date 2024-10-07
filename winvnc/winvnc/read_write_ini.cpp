@@ -340,23 +340,3 @@ bool do_copy(IniFile& myIniFile_In, IniFile& myIniFile_Out)
 	myIniFile_Out.WriteString("poll", "SingleWindowName", SingleWindowName);
 	return true;
 }
-
-bool Copy_to_Temp(char* tempfile)
-{
-	IniFile myIniFile_In;
-	IniFile myIniFile_Out;
-	myIniFile_In.IniFileSetSecure();
-	myIniFile_Out.IniFileSetTemp(tempfile);
-
-	return do_copy(myIniFile_In, myIniFile_Out);
-}
-
-bool Copy_to_Secure_from_temp(char* tempfile)
-{
-	IniFile myIniFile_In;
-	IniFile myIniFile_Out;
-	myIniFile_Out.IniFileSetSecure();
-	myIniFile_In.IniFileSetTemp(tempfile);
-
-	return do_copy(myIniFile_In, myIniFile_Out);
-}
