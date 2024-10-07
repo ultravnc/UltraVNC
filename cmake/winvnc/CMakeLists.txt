@@ -80,7 +80,6 @@ set(${PROJECT_NAME}_SOURCES
     vnclog.cpp
     vncmenu.cpp
     vncntlm.cpp
-    vncproperties.cpp
     vncpropertiesPoll.cpp
     vncserver.cpp
     vncsetauth.cpp

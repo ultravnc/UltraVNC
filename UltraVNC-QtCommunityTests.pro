@@ -274,7 +274,6 @@ SOURCES += \
     \winvnc\winvnc\vncMultiMonitor.cpp \
     \winvnc\winvnc\vncntlm.cpp \
     \winvnc\winvnc\vncOSVersion.cpp \
-    \winvnc\winvnc\vncproperties.cpp \
     \winvnc\winvnc\vncpropertiesPoll.cpp \
     \winvnc\winvnc\vncserver.cpp \
     \winvnc\winvnc\vncsetauth.cpp \
@@ -333,7 +332,6 @@ SOURCES += \
     \zipunzip_src\zip20\win32\win32zip.c \
     \zipunzip_src\zip20\windll\example.c \
     \zipunzip_src\zip20\windll\windll.c \
-    \ZipUnZip32\ZipUnzip32.cpp \
 
 
 HEADERS += \
@@ -594,7 +592,6 @@ HEADERS += \
     \winvnc\winvnc\vncmenu.h \
     \winvnc\winvnc\vncOSVersion.h \
     \winvnc\winvnc\vncpasswd.h \
-    \winvnc\winvnc\vncproperties.h \
     \winvnc\winvnc\vncpropertiesPoll.h \
     \winvnc\winvnc\vncserver.h \
     \winvnc\winvnc\vncsetauth.h \
@@ -641,7 +638,6 @@ HEADERS += \
     \zipunzip_src\zip20\windll\structs.h \
     \zipunzip_src\zip20\windll\windll.h \
     \zipunzip_src\zip20\windll\zipver.h \
-    \ZipUnZip32\ZipUnZip32.h \
 
 FORMS += \
     \vncviewer\vncviewerQt.ui \
