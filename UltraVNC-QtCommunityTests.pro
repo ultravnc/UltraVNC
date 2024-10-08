@@ -151,6 +151,7 @@ SOURCES += \
     \uvnc_settings\uvnc_settings\vncsetauth.cpp \
     \uvnckeyboardhelper\uvnckeyboardhelper\stdafx.cpp \
     \uvnckeyboardhelper\uvnckeyboardhelper\uvnckeyboardhelper.cpp \
+    \vncviewer\directx\directxviewer.cpp \
     \vncviewer\AboutBox.cpp \
     \vncviewer\AccelKeys.cpp \
     \vncviewer\AuthDialog.cpp \
@@ -200,7 +201,6 @@ SOURCES += \
     \vncviewer\VNCviewerApp32.cpp \
     \vncviewer\xz.cpp \
     \vncviewer\zrle.cpp \
-    \vncviewer\directx\directxviewer.cpp \
     \winvnc\createpassword\createpassword.cpp \
     \winvnc\loadmemory\loadDllFromMemory.cpp \
     \winvnc\loadmemory\MemoryModule.c \
@@ -274,8 +274,6 @@ SOURCES += \
     \winvnc\winvnc\vncMultiMonitor.cpp \
     \winvnc\winvnc\vncntlm.cpp \
     \winvnc\winvnc\vncOSVersion.cpp \
-    \winvnc\winvnc\vncproperties.cpp \
-    \winvnc\winvnc\vncpropertiesPoll.cpp \
     \winvnc\winvnc\vncserver.cpp \
     \winvnc\winvnc\vncsetauth.cpp \
     \winvnc\winvnc\vncsockconnect.cpp \
@@ -333,7 +331,6 @@ SOURCES += \
     \zipunzip_src\zip20\win32\win32zip.c \
     \zipunzip_src\zip20\windll\example.c \
     \zipunzip_src\zip20\windll\windll.c \
-    \ZipUnZip32\ZipUnzip32.cpp \
 
 
 HEADERS += \
@@ -489,6 +486,7 @@ HEADERS += \
     \uvnckeyboardhelper\uvnckeyboardhelper\stdafx.h \
     \uvnckeyboardhelper\uvnckeyboardhelper\targetver.h \
     \uvnckeyboardhelper\uvnckeyboardhelper\uvnckeyboardhelper.h \
+    \vncviewer\directx\directxviewer.h \
     \vncviewer\AboutBox.h \
     \vncviewer\AccelKeys.h \
     \vncviewer\AuthDialog.h \
@@ -523,7 +521,6 @@ HEADERS += \
     \vncviewer\vncviewerQt.h \
     \vncviewer\VNCviewerApp.h \
     \vncviewer\VNCviewerApp32.h \
-    \vncviewer\directx\directxviewer.h \
     \winvnc\loadmemory\loadDllFromMemory.h \
     \winvnc\loadmemory\MemoryModule.h \
     \winvnc\vnchooks\resource.h \
@@ -594,8 +591,6 @@ HEADERS += \
     \winvnc\winvnc\vncmenu.h \
     \winvnc\winvnc\vncOSVersion.h \
     \winvnc\winvnc\vncpasswd.h \
-    \winvnc\winvnc\vncproperties.h \
-    \winvnc\winvnc\vncpropertiesPoll.h \
     \winvnc\winvnc\vncserver.h \
     \winvnc\winvnc\vncsetauth.h \
     \winvnc\winvnc\vncsockconnect.h \
@@ -641,7 +636,6 @@ HEADERS += \
     \zipunzip_src\zip20\windll\structs.h \
     \zipunzip_src\zip20\windll\windll.h \
     \zipunzip_src\zip20\windll\zipver.h \
-    \ZipUnZip32\ZipUnZip32.h \
 
 FORMS += \
     \vncviewer\vncviewerQt.ui \

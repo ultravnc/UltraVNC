@@ -930,10 +930,6 @@ winvnc/winvnc/vncmenu.cpp
 winvnc/winvnc/vncmenu.h
 winvnc/winvnc/vncntlm.cpp
 winvnc/winvnc/vncpasswd.h
-winvnc/winvnc/vncproperties.cpp
-winvnc/winvnc/vncproperties.h
-winvnc/winvnc/vncpropertiesPoll.cpp
-winvnc/winvnc/vncpropertiesPoll.h
 winvnc/winvnc/vncserver.cpp
 winvnc/winvnc/vncserver.h
 winvnc/winvnc/vncsetauth.cpp
