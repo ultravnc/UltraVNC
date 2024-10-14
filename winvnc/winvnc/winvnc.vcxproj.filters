@@ -15,7 +15,6 @@
     <ClCompile Include="initipp.cpp" />
     <ClCompile Include="IPC.cpp" />
     <ClCompile Include="..\..\lzo\minilzo.c" />
-    <ClCompile Include="read_write_ini.cpp" />
     <ClCompile Include="rfbRegion_win32.cpp" />
     <ClCompile Include="rfbRegion_X11.cxx" />
     <ClCompile Include="rfbUpdateTracker.cpp" />

@@ -1575,7 +1575,6 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
     <ClCompile Include="LayeredWindows.cpp" />
     <ClCompile Include="MouseSimulator.cpp" />
     <ClCompile Include="PropertiesDialog.cpp" />
-    <ClCompile Include="read_write_ini.cpp" />
     <ClCompile Include="rfbRegion_win32.cpp" />
     <ClCompile Include="rfbRegion_X11.cxx">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
