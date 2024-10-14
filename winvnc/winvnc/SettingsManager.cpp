@@ -213,7 +213,7 @@ void SettingsManager::setDefaults()
 #endif // SC_20
 	m_pref_OSD = FALSE;
 	m_pref_NotificationSelection = 0;
-	m_pref_RemoveWallpaper = FALSE;
+	m_pref_RemoveWallpaper = TRUE;
 	m_pref_RemoveEffects = FALSE;
 	m_pref_RemoveFontSmoothing = FALSE;
 	m_pref_alloweditclients = TRUE;
@@ -301,6 +301,9 @@ void SettingsManager::setDefaults()
 
 void SettingsManager::load()
 {
+	m_pref_RemoveWallpaper = myIniFile.ReadInt("admin", "RemoveWallpaper", m_pref_RemoveWallpaper);
+	m_pref_RemoveEffects = myIniFile.ReadInt("admin", "RemoveEffects", m_pref_RemoveEffects);
+	m_pref_RemoveFontSmoothing = myIniFile.ReadInt("admin", "RemoveFontSmoothing", m_pref_RemoveFontSmoothing);
 #ifndef SC_20
 	// Disable Tray icon
 	m_pref_DisableTrayIcon = myIniFile.ReadInt("admin", "DisableTrayIcon", m_pref_DisableTrayIcon);
@@ -357,9 +360,6 @@ void SettingsManager::load()
 	m_pref_PortNumber = myIniFile.ReadInt("admin", "PortNumber", m_pref_PortNumber);
 	m_pref_HttpPortNumber = myIniFile.ReadInt("admin", "HTTPPortNumber", DISPLAY_TO_HPORT(PORT_TO_DISPLAY(m_pref_PortNumber)));
 	m_pref_IdleTimeout = myIniFile.ReadInt("admin", "IdleTimeout", m_pref_IdleTimeout);
-	m_pref_RemoveWallpaper = myIniFile.ReadInt("admin", "RemoveWallpaper", m_pref_RemoveWallpaper);
-	m_pref_RemoveEffects = myIniFile.ReadInt("admin", "RemoveEffects", m_pref_RemoveEffects);
-	m_pref_RemoveFontSmoothing = myIniFile.ReadInt("admin", "RemoveFontSmoothing", m_pref_RemoveFontSmoothing);
 	m_pref_QuerySetting = myIniFile.ReadInt("admin", "QuerySetting", m_pref_QuerySetting);
 	m_pref_QueryTimeout = myIniFile.ReadInt("admin", "QueryTimeout", m_pref_QueryTimeout);
 	m_pref_QueryDisableTime = myIniFile.ReadInt("admin", "QueryDisableTime", m_pref_QueryDisableTime);
