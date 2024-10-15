@@ -538,6 +538,9 @@ bool PropertiesDialog::DlgInitDialog(HWND hwnd)
 		case 1:
 			hQuerySetting = GetDlgItem(hwnd, IDC_DACCEPT);
 			break;
+		case 2:
+			hQuerySetting = GetDlgItem(hwnd, IDC_DRefuseOnly);
+			break;
 		default:
 			hQuerySetting = GetDlgItem(hwnd, IDC_DREFUSE);
 		};
@@ -623,6 +626,8 @@ bool PropertiesDialog::DlgInitDialog(HWND hwnd)
 	}
 	if (GetDlgItem(hwnd, IDC_DREFUSE))
 		EnableWindow(GetDlgItem(hwnd, IDC_DREFUSE), queryEnabled);
+	if (GetDlgItem(hwnd, IDC_DRefuseOnly))
+		EnableWindow(GetDlgItem(hwnd, IDC_DRefuseOnly), queryEnabled);
 	if (GetDlgItem(hwnd, IDC_DACCEPT))
 		EnableWindow(GetDlgItem(hwnd, IDC_DACCEPT), queryEnabled);
 	if (GetDlgItem(hwnd, IDC_QNOLOGON))
@@ -1110,7 +1115,9 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd)
 			EnableWindow(GetDlgItem(hwnd, IDQUERYTIMEOUT), queryon);
 			EnableWindow(GetDlgItem(hwnd, IDC_QUERYDISABLETIME), queryon);
 			EnableWindow(GetDlgItem(hwnd, IDC_DREFUSE), queryon);
+			EnableWindow(GetDlgItem(hwnd, IDC_DRefuseOnly), queryon);
 			EnableWindow(GetDlgItem(hwnd, IDC_DACCEPT), queryon);
+			EnableWindow(GetDlgItem(hwnd, IDC_QNOLOGON), queryon);
 		}
 		return TRUE;
 
@@ -1571,14 +1578,18 @@ void PropertiesDialog::onTabsOK(HWND hwnd)
 
 	if (GetDlgItem(hwnd, IDC_DREFUSE) && GetDlgItem(hwnd, IDC_DACCEPT)) {
 		if (SendMessage(GetDlgItem(hwnd, IDC_DREFUSE), BM_GETCHECK, 0, 0) == BST_CHECKED) {
-			settings->getQueryIfNoLogon() == 0
-				? settings->setQueryAccept(2)
-				: settings->setQueryAccept(0);
+			settings->setQueryAccept(0);
 		}
 		else if (SendMessage(GetDlgItem(hwnd, IDC_DACCEPT), BM_GETCHECK, 0, 0) == BST_CHECKED) {
 			settings->setQueryAccept(1);
 		}
+		else if (SendMessage(GetDlgItem(hwnd, IDC_DRefuseOnly), BM_GETCHECK, 0, 0)
+			== BST_CHECKED) {
+			settings->setQueryAccept(2);
+		}
 	}
+	if (GetDlgItem(hwnd, IDC_QNOLOGON))
+		settings->setQueryIfNoLogon(SendDlgItemMessage(hwnd, IDC_QNOLOGON, BM_GETCHECK, 0, 0));
 
 	if (GetDlgItem(hwnd, IDC_MAXREFUSE) && GetDlgItem(hwnd, IDC_MAXDISCONNECT)) {
 		if (SendMessage(GetDlgItem(hwnd, IDC_MAXREFUSE), BM_GETCHECK, 0, 0) == BST_CHECKED) {

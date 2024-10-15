@@ -115,9 +115,10 @@ public:
 	int getftTimeout() { return m_pref_ftTimeout; };
 	int getkeepAliveInterval() { return m_pref_keepAliveInterval; };
 	int getIdleInputTimeout() { return m_pref_IdleInputTimeout; };
-	UINT getQueryIfNoLogon() { return m_pref_QueryIfNoLogon; };
+	BOOL getQueryIfNoLogon() { return m_pref_QueryIfNoLogon; };
 	UINT getSENDBUFFER_EX() { return G_SENDBUFFER_EX; };
 
+	void setQueryIfNoLogon(BOOL value) { m_pref_QueryIfNoLogon = value; };
 	void setAllowProperties(BOOL value) { m_pref_allowproperties = value; };
 	void setAllowInjection(BOOL value) { m_pref_allowInjection = value; };
 	void setAllowShutdown(BOOL value) { m_pref_allowshutdown = value; };

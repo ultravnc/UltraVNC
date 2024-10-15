@@ -457,6 +457,7 @@ void SettingsManager::save()
 	myIniFile.WriteInt("admin", "Notification", m_pref_Notification);
 	myIniFile.WriteInt("admin", "OSD", m_pref_OSD);
 	myIniFile.WriteInt("admin", "NotificationSelection", m_pref_NotificationSelection);
+	myIniFile.WriteInt("admin", "QueryIfNoLogon", m_pref_QueryIfNoLogon);
 	myIniFile.WriteInt("admin", "LockSetting", m_pref_LockSettings);
 	myIniFile.WriteInt("admin", "RemoveWallpaper", m_pref_RemoveWallpaper);
 	myIniFile.WriteInt("admin", "RemoveEffects", m_pref_RemoveEffects);
