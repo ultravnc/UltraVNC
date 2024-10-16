@@ -61,6 +61,7 @@ SettingsManager::SettingsManager()
 	sodium_init();
 	setDefaults();
 
+#ifndef SC_20
 	char path[MAX_PATH];
 	if (RunningFromExternalService()) {
 		
@@ -83,7 +84,20 @@ SettingsManager::SettingsManager()
 	strcat_s(m_Inifile, "\\");
 	strcat_s(m_Inifile, INIFILE_NAME);
 	myIniFile.setIniFile(m_Inifile);
+#else
+	char szCurrentDir[MAX_PATH];
+	if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
+	{
+		char* p = strrchr(szCurrentDir, '\\');
+		*p = '\0';
+	}
+	strcpy_s(m_Inifile, szCurrentDir);
+	strcat_s(m_Inifile, "\\");
+	strcat_s(m_Inifile, INIFILE_NAME);
+	myIniFile.setIniFile(m_Inifile);
+#endif
 	load();
+
 	if (iImpersonateResult == ERROR_SUCCESS)
 		RevertToSelf();
 }

@@ -42,6 +42,10 @@
 #define IDD_PATHS                       134
 #define IDD_TEXTCHAT_DLG                137
 #define IDD_USER_NAME                   138
+#if defined(SC_20)
+	#define IDR_DLL1                    176
+	#define IDR_ENCRYPTIONDLL1          177
+#endif // SC_20
 #define IDD_FORM_AUTHENTICATION         139
 #define IDD_EDIT_IP_ACESS_CONTROL       140
 #define IDS_WARNING                     200
