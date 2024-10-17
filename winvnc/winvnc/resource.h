@@ -52,6 +52,7 @@
 #define IDD_PROPERTIESDIALOG            202
 #define IDD_DIALOG1                     205
 #define IDD_ADMINPASSWORD               205
+#define IDD_CHANGE_PASSWORD             207
 #define IDC_ACCEPTLOGO                  1001
 #define IDC_ACCEPT_IP                   1002
 #define IDC_ACCEPT_TIMEOUT              1003
@@ -68,7 +69,8 @@
 #define IDC_BLANKINGTXT                 1015
 #define IDC_BUILDTIME                   1017
 #define IDC_BUTTON1                     1018
-#define IDC_CHECKIP                     1018
+#define IDC_CHANGEPASSWORD              1018
+#define IDC_CHECKIP                     1019
 #define IDC_CAPTION_STATIC              1020
 #define IDC_CHATAREA_EDIT               1021
 #define IDC_CHECK1                      1022
@@ -131,7 +133,9 @@
 #define IDC_DRIVER                      1077
 #define IDC_EDIT1                       1078
 #define IDC_ADMINPASSWORD               1078
+#define IDC_PASSWORD_1                  1078
 #define IDC_EDIT2                       1079
+#define IDC_PASSWORD_2                  1079
 #define IDC_EDIT3                       1080
 #define IDC_EDITQUERYTEXT               1081
 #define IDC_EDITQUERYYEXT               1082
@@ -310,6 +314,12 @@
 #define IDD_FORM_administration         1271
 #define IDC_EDIT_PATH                   1272
 #define IDC_STATIC_ADMIN                1275
+#define IDC_APPLY                       1276
+#define IDC_CLEARPASSWORD               1277
+#define IDC_CHANGEPASSWORDVO            1278
+#define IDC_BUTTON4                     1279
+#define IDC_CLEARPASSWORDVO             1279
+#define IDC_CHANGEPASSWORDADMIN         1280
 #define IDE_CUSTOM1                     4377
 #define ID_ABOUT                        32771
 #define ID_ADMIN_PROPERTIES             32772
@@ -404,9 +414,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        207
+#define _APS_NEXT_RESOURCE_VALUE        209
 #define _APS_NEXT_COMMAND_VALUE         32858
-#define _APS_NEXT_CONTROL_VALUE         1276
+#define _APS_NEXT_CONTROL_VALUE         1281
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

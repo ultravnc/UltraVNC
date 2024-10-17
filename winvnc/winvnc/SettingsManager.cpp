@@ -171,7 +171,7 @@ void SettingsManager::setDefaults()
 	memset(reinterpret_cast<void*>(m_pref_service_commandline), 0, sizeof(m_pref_service_commandline));
 	memset(reinterpret_cast<void*>(m_pref_accept_reject_mesg), 0, sizeof(m_pref_accept_reject_mesg));
 	memset(reinterpret_cast<void*>(m_pref_passwd), 0, sizeof(m_pref_passwd));
-	memset(reinterpret_cast<void*>(m_pref_passwd2), 0, sizeof(m_pref_passwd2));
+	memset(reinterpret_cast<void*>(m_pref_passwdViewOnly), 0, sizeof(m_pref_passwdViewOnly));
 #ifndef SC_20
 	memset(reinterpret_cast<void*>(m_pref_szDSMPlugin), 0, sizeof(m_pref_szDSMPlugin));
 #else
@@ -387,7 +387,7 @@ void SettingsManager::load()
 	m_pref_NotificationSelection = myIniFile.ReadInt("admin", "NotificationSelection", m_pref_NotificationSelection);
 	m_pref_QueryIfNoLogon = myIniFile.ReadInt("admin", "QueryIfNoLogon", m_pref_QueryIfNoLogon);
 	myIniFile.ReadPassword(m_pref_passwd, MAXPWLEN);
-	myIniFile.ReadPassword2(m_pref_passwd2, MAXPWLEN); //PGM
+	myIniFile.ReadPasswordViewOnly(m_pref_passwdViewOnly, MAXPWLEN); //PGM
 	m_pref_EnableRemoteInputs = myIniFile.ReadInt("admin", "InputsEnabled", m_pref_EnableRemoteInputs);
 	m_pref_LockSettings = myIniFile.ReadInt("admin", "LockSetting", m_pref_LockSettings);
 	m_pref_DisableLocalInputs = myIniFile.ReadInt("admin", "LocalInputsDisabled", m_pref_DisableLocalInputs);
@@ -427,6 +427,22 @@ void SettingsManager::load()
 	m_pref_Hook = myIniFile.ReadInt("poll", "EnableHook", m_pref_Hook);
 	m_pref_Virtual = myIniFile.ReadInt("poll", "EnableVirtual", m_pref_Virtual);
 	m_pref_autocapt = myIniFile.ReadInt("poll", "autocapt", m_pref_autocapt);
+}
+
+void SettingsManager::savePassword() {
+	if (strlen(m_pref_passwd) == 0) {
+		myIniFile.WriteString("admin", "passwd", m_pref_passwd);
+		return;
+	}
+	myIniFile.WritePassword(m_pref_passwd);
+}
+
+void SettingsManager::saveViewOnlyPassword() {
+	if (strlen(m_pref_passwdViewOnly) == 0) {
+		myIniFile.WriteString("admin", "passwd2", m_pref_passwdViewOnly);
+		return;
+	}	
+	myIniFile.WritePasswordViewOnly(m_pref_passwdViewOnly);
 }
 
 void SettingsManager::save()
@@ -476,10 +492,6 @@ void SettingsManager::save()
 	myIniFile.WriteInt("admin", "RemoveWallpaper", m_pref_RemoveWallpaper);
 	myIniFile.WriteInt("admin", "RemoveEffects", m_pref_RemoveEffects);
 	myIniFile.WriteInt("admin", "RemoveFontSmoothing", m_pref_RemoveFontSmoothing);
-
-	myIniFile.WritePassword(m_pref_passwd);
-	myIniFile.WritePassword2(m_pref_passwd2);
-
 	myIniFile.WriteInt("admin", "DebugMode", vnclog.GetMode());
 	myIniFile.WriteInt("admin", "Avilog", vnclog.GetVideo());
 	myIniFile.WriteString("admin", "path", vnclog.GetPath());

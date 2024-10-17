@@ -74,30 +74,30 @@ IniFile::ReadString(char *key1, char *key2,char *value,int valuesize)
 void
 IniFile::ReadPassword(char *value,int valuesize)
 {
-	//int size=ReadInt("UltraVNC", "passwdsize",0);
-	//vnclog.Print(LL_INTERR, VNCLOG("%s \n"),myInifilePasswd);
 	GetPrivateProfileStruct("UltraVNC","passwd",value,8,myInifile);
 }
 
-void //PGM
-IniFile::ReadPassword2(char *value,int valuesize) //PGM
-{ //PGM
+void
+IniFile::ReadPasswordViewOnly(char *value,int valuesize) //PGM
+{ 
 	GetPrivateProfileStruct("UltraVNC","passwd2",value,8,myInifile); //PGM
-} //PGM
+}
 
 bool
 IniFile::WritePassword(char *value)
 {
-		//WriteInt("UltraVNC", "passwdsize",sizeof(value));
-		//vnclog.Print(LL_INTERR, VNCLOG("%s \n"),myInifile);
-		return (FALSE != WritePrivateProfileStruct("UltraVNC","passwd", value,8,myInifile));
+	if (strlen(value) == 0)
+		return (FALSE != WritePrivateProfileStruct("UltraVNC", "passwd", NULL, 8, myInifile));
+	return (FALSE != WritePrivateProfileStruct("UltraVNC","passwd", value,8,myInifile));
 }
 
-bool //PGM
-IniFile::WritePassword2(char *value) //PGM
-{ //PGM
-		return (FALSE != WritePrivateProfileStruct("UltraVNC","passwd2", value,8,myInifile)); //PGM
-} //PGM
+bool 
+IniFile::WritePasswordViewOnly(char *value) 
+{ 
+	if (strlen(value) == 0)
+		return (FALSE != WritePrivateProfileStruct("UltraVNC", "passwd2", NULL, 8, myInifile));
+	return (FALSE != WritePrivateProfileStruct("UltraVNC","passwd2", value,8,myInifile));
+} 
 
 bool IniFile::IsWritable()
 {

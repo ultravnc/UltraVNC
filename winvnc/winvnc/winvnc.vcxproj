@@ -424,6 +424,8 @@
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <VcpkgUseStatic>true</VcpkgUseStatic>
+    <VcpkgUseMD>false</VcpkgUseMD>
+    <VcpkgConfiguration>Debug</VcpkgConfiguration>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='IPV6|Win32'">
     <VcpkgUseStatic>true</VcpkgUseStatic>
@@ -1394,6 +1396,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="cadthread.cpp" />
+    <ClCompile Include="DlgChangePassword.cpp" />
     <ClCompile Include="CloudDialog.cpp" />
     <ClCompile Include="CpuUsage.cpp" />
     <ClCompile Include="..\..\rfb\dh.cpp">
@@ -3176,6 +3179,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
     <ClInclude Include="..\loadmemory\loadDllFromMemory.h" />
     <ClInclude Include="..\loadmemory\MemoryModule.h" />
     <ClInclude Include="cadthread.h" />
+    <ClInclude Include="DlgChangePassword.h" />
     <ClInclude Include="CloudDialog.h" />
     <ClInclude Include="CpuUsage.h" />
     <ClInclude Include="DeskdupEngine.h" />

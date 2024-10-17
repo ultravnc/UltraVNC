@@ -39,7 +39,8 @@ public:
 
 	void load();
 	void save();
-
+	void savePassword();
+	void saveViewOnlyPassword();
 	BOOL getAllowProperties() { return m_pref_allowproperties; };
 	BOOL getAllowInjection() { return m_pref_allowInjection; };
 	BOOL getAllowShutdown() { return m_pref_allowshutdown; };
@@ -83,7 +84,7 @@ public:
 	BOOL getEnableWin8Helper() { return m_pref_EnableWin8Helper; };
 	BOOL getClearconsole() { return m_pref_clearconsole; };
 	char* getPasswd() { return m_pref_passwd; };
-	char* getPasswd2() { return m_pref_passwd2; };
+	char* getPasswdViewOnly() { return m_pref_passwdViewOnly; };
 	BOOL getAutoPortSelect() { return m_pref_AutoPortSelect; };
 	LONG getPortNumber() { return m_pref_PortNumber; };
 	LONG getHttpPortNumber() { return m_pref_HttpPortNumber; };
@@ -172,9 +173,9 @@ public:
 	{
 		memcpy(m_pref_passwd, passwd, MAXPWLEN);
 	}
-	void setPasswd2(const char* passwd)
+	void setPasswdViewOnly(const char* passwd)
 	{
-		memcpy(m_pref_passwd2, passwd, MAXPWLEN);
+		memcpy(m_pref_passwdViewOnly, passwd, MAXPWLEN);
 	}
 
 	void setDSMPluginConfig(char* value) { strncpy_s(m_pref_DSMPluginConfig, sizeof(m_pref_DSMPluginConfig) - 1, value, _TRUNCATE); };
@@ -295,7 +296,7 @@ private:
 	LONG m_pref_PortNumber;
 	LONG m_pref_HttpPortNumber;
 	char m_pref_passwd[MAXPWLEN];
-	char m_pref_passwd2[MAXPWLEN];
+	char m_pref_passwdViewOnly[MAXPWLEN];
 	UINT m_pref_QuerySetting;
 	UINT m_pref_QueryIfNoLogon;
 	UINT m_pref_QueryAccept;

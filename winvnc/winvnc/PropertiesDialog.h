@@ -18,6 +18,7 @@ private:
 	vncServer* m_server = NULL;
 	vncSetAuth	m_vncauth;	
 	void onTabsOK(HWND hwnd);
+	void onTabsAPPLY(HWND hwnd);
 	void InitPortSettings(HWND hwnd);
 
 	
@@ -35,6 +36,7 @@ public:
 	int HandleNotify(HWND hwndDlg, WPARAM wParam, LPARAM lParam);
 	bool InitDialog(HWND hwnd);
 	void onOK(HWND hwnd);
+	void onApply(HWND hwnd);
 	void onCancel(HWND hwnd);
 	bool DlgInitDialog(HWND hwnd);
 	bool onCommand(int command, HWND hwnd);

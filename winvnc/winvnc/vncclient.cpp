@@ -1820,7 +1820,7 @@ BOOL vncClientThread::AuthVnc(std::string& auth_message)
 			}
 			if (!auth_ok) //PGM
 			{ //PGM
-				vncPasswd::ToText plain2(settings->getPasswd2(), settings->getSecure()); //PGM
+				vncPasswd::ToText plain2(settings->getPasswdViewOnly(), settings->getSecure()); //PGM
 				if ((strlen(plain2) > 0)) //PGM
 				{ //PGM
 					vnclog.Print(LL_INTINFO, "View-only password authentication"); //PGM
