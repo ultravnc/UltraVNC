@@ -107,6 +107,39 @@ SUBDIRS += \
     winvnc \
     zipunzip_src\unzip\windll\vc6
 
+RESOURCES += \
+    \addon\eventMessageLogger\messages.rc \
+    \addon\ms-logon\authadm\authadmin.qrc \
+    \addon\ms-logon\authadm\authadmin.rc \
+    \addon\ms-logon\authSSP\authSSP.rc \
+    \addon\ms-logon\ldapauth\ldapAuth.rc \
+    \addon\ms-logon\ldapauth9x\ldapAuth9x.rc \
+    \addon\ms-logon\ldapauthNT4\ldapAuthnt4.rc \
+    \addon\ms-logon\logging\logging.rc \
+    \addon\ms-logon\MSLogonACL\MSLogonACL.rc \
+    \addon\ms-logon\testauth\testauth.rc \
+    \addon\ms-logon\workgrpdomnt4\workgrpdomnt4.rc \
+    \DSMPlugin\MSRC4Plugin\crypto.rc \
+    \DSMPlugin\MSRC4Plugin\MSRC4Plugin.rc \
+    \DSMPlugin\MSRC4Plugin\version.rc \
+    \DSMPlugin\TestPlugin\TestPlugin.rc \
+    \JavaViewer\mk.bat \
+    \JavaViewer\run.bat \
+    \JavaViewer\runapplet.bat \
+    \omnithread\build-bcc32.bat \
+    \repeater\resources.rc \
+    \repeater\webgui\buildfs.bat \
+    \setcad\setcad\setcad.rc \
+    \setpasswd\setpasswd\setpasswd.rc \
+    \uvnckeyboardhelper\uvnckeyboardhelper\uvnckeyboardhelper.rc \
+    \uvnc_settings\uvnc_settings\uvnc_settings.rc \
+    \vncviewer\res\build-bcc32.bat \
+    \vncviewer\res\vncviewer.rc \
+    \winvnc\vnchooks\vnchooks.rc \
+    \winvnc\winvnc\winvnc.rc \
+    \zipunzip_src\unzip\windll\windll.rc \
+    \zipunzip_src\zip20\windll\windll.rc \
+
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
