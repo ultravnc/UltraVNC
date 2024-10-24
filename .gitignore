@@ -146,3 +146,88 @@ zipunzip_src/zip20/windll/visualc/lib/Release/
 zipunzip_src/zip20/windll/visualc/lib/x64/
 vncviewer/vcpkg_installed/
 winvnc/winvnc/vcpkg_installed/
+
+
+# CMakeSpecific Ignore configuration file  
+CMakeUserPresets.json
+
+
+# Qt Specific gitignore
+
+# Customized ignore section ---------------------------
+.qtc_clangd/
+
+build/
+UltraVNC-UltraVNC-QtComminunityTests.pro.user
+
+addon/Debug/
+addon/eventMessageLogger/MSG00001.bin
+addon/ms-logon/MSLogonACL/buildtime.h
+addon/ms-logon/authSSP/buildtime.h
+
+cmake/CMakeUserPresets.json
+cmake/build/
+cmake/out/
+
+vcpkg-configuration.json
+
+# End Customized ignore section ----------------------
+
+# Comment the "Customized ignore section" upper if you want the original gitignore for Qt from GitHub
+
+# C++ objects and libs
+*.slo
+*.lo
+*.o
+*.a
+*.la
+*.lai
+*.so
+*.so.*
+*.dll
+*.dylib
+
+# Qt-es
+object_script.*.Release
+object_script.*.Debug
+*_plugin_import.cpp
+/.qmake.cache
+/.qmake.stash
+*.pro.user
+*.pro.user.*
+*.qbs.user
+*.qbs.user.*
+*.moc
+moc_*.cpp
+moc_*.h
+qrc_*.cpp
+ui_*.h
+*.qmlc
+*.jsc
+Makefile*
+*build-*
+*.qm
+*.prl
+
+# Qt unit tests
+target_wrapper.*
+
+# QtCreator
+*.autosave
+
+# QtCreator Qml
+*.qmlproject.user
+*.qmlproject.user.*
+
+# QtCreator CMake
+CMakeLists.txt.user*
+
+# QtCreator 4.8< compilation database
+compile_commands.json
+
+# QtCreator local machine specific files for imported projects
+*creator.user*
+
+*_qmlcache.qrc
+
+# End Qt Specific gitignore

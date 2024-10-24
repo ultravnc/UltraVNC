@@ -1,13 +1,9 @@
-# Fix Error 'QMainWindow' file not found In Progress
-QT = Core gui
-#QT = Core gui widgets  <- Bug
-#QT += widgets <- Bug
-#greaterThan(QT_MAJOR_VERSION, X): QT += widgets
+
+QT = core gui #Fix Error 'QMainWindow' file not found and "Project ERROR: Unknown module(s) in QT: Core" don't use "Core" use "core" respect case
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-#CONFIG += c++17 cmdline
 CONFIG += c++17
-# End Fix Error 'QMainWindow' file not found
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -21,8 +17,7 @@ SOURCES += \
     \addon\ms-logon\authSSP\vncAccessControl.cpp \
     \addon\ms-logon\authSSP\vncSecurityEditor.cpp \
     \addon\ms-logon\authSSP\vncSSP.cpp \
-    \addon\ms-logon\ldapauth\ldapAuth.h \
-    \addon\ms-logon\ldapauth\resource.h \
+    \addon\ms-logon\ldapauth\ldapAuth.cpp \
     \addon\ms-logon\ldapauth9x\ldapAuth9x.cpp \
     \addon\ms-logon\ldapauthNT4\ldapAuthnt4.cpp \
     \addon\ms-logon\logging\logging.cpp \
@@ -30,13 +25,14 @@ SOURCES += \
     \addon\ms-logon\MSLogonACL\vncExportACL.cpp \
     \addon\ms-logon\MSLogonACL\vncImportACL.cpp \
     \addon\ms-logon\testauth\ntlogon.cpp \
-    \addon\ms-logon\workgrpdomnt4\\workgrpdomnt4.cpp \
+    \addon\ms-logon\workgrpdomnt4\workgrpdomnt4.cpp \
     \avilog\avilog\AVIGenerator.cpp \
     \avilog\avilog\stdafx.cpp \
+    \common\Clipboard.cpp \
     \common\d3des.c \
+    \common\Hyperlinks.cpp \
     \common\mn_wordlist.c \
     \common\mnemonic.c \
-    \common\Clipboard.cpp \
     \common\UltraVncZ.cpp \
     \common\win32_helpers.cpp \
     \DSMPlugin\DSMPlugin.cpp \
@@ -64,7 +60,12 @@ SOURCES += \
     \rdr\ZlibOutStream.cxx \
     \rdr\ZstdInStream.cxx \
     \rdr\ZstdOutStream.cxx \
-    \repeater\webgui\buildfs.bat \
+    \repeater\gui.cpp \
+    \repeater\lists_functions.cpp \
+    \repeater\mode12_listener.cpp \
+    \repeater\mode2_listener_server.cpp \
+    \repeater\repeater.cpp \
+    \repeater\socket_functions.cpp \
     \repeater\webgui\settings.c \
     \repeater\webgui\webclib.c \
     \repeater\webgui\webfs.c \
@@ -75,23 +76,15 @@ SOURCES += \
     \repeater\webgui\webutils.c \
     \repeater\webgui\wsfcode.c \
     \repeater\webgui\wsfdata.c \
-    \repeater\gui.cpp \
-    \repeater\lists_functions.cpp \
-    \repeater\mode2_listener_server.cpp \
-    \repeater\mode12_listener.cpp \
-    \repeater\repeater.cpp \
-    \repeater\socket_functions.cpp \
     \rfb\dh.cpp \
     \rfb\vncauth.c \
     \rfb\xzywtemplate.c \
     \rfb\zywrletemplate.c \
     \setcad\setcad\setcad.cpp \
     \setcad\setcad\stdafx.cpp \
-    \setcad\setcad\setcad.rc \
     \setpasswd\setpasswd\inifile.cpp \
     \setpasswd\setpasswd\setpasswd.cpp \
     \setpasswd\setpasswd\stdafx.cpp \
-    \setpasswd\setpasswd\setpasswd.rc \
     \udt4\app\appclient.cpp \
     \udt4\app\appserver.cpp \
     \udt4\app\recvfile.cpp \
@@ -114,22 +107,25 @@ SOURCES += \
     \UdtCloudlib\proxy\Cloudthread.cpp \
     \UdtCloudlib\proxy\proxy.cpp \
     \UdtCloudlib\proxy\ringbuffer.cpp \
-    \UltraVNCManager\CardList.cpp \
-    \UltraVNCManager\DlgPasswordBox.cpp \
-    \UltraVNCManager\IPC.cpp \
-    \UltraVNCManager\PollThread.cpp \
-    \UltraVNCManager\Rijndael.cpp \
-    \UltraVNCManager\SettingsManager.cpp \
-    \UltraVNCManager\SizeChangedThread.cpp \
-    \UltraVNCManager\Tabsheet.cpp \
-    \UltraVNCManager\TabsheetList.cpp \
-    \UltraVNCManager\TopBarPanel.cpp \
-    \UltraVNCManager\uAddCard.cpp \
-    \UltraVNCManager\UdpPoll.cpp \
-    \UltraVNCManager\uFrmCard.cpp \
-    \UltraVNCManager\UltraVNC_Manager.cpp \
-    \UltraVNCManager\uMainForm.cpp \
-    \UltraVNCManager\uProposal.cpp \
+    \UltraViewer\CardList.cpp \
+    \UltraViewer\DlgPasswordBox.cpp \
+    \UltraViewer\IPC.cpp \
+    \UltraViewer\PollThread.cpp \
+    \UltraViewer\Rijndael.cpp \
+    \UltraViewer\SettingsManager.cpp \
+    \UltraViewer\SizeChangedThread.cpp \
+    \UltraViewer\Tabsheet.cpp \
+    \UltraViewer\TabsheetList.cpp \
+    \UltraViewer\TopBarPanel.cpp \
+    \UltraViewer\uAddCard.cpp \
+    \UltraViewer\UdpPoll.cpp \
+    \UltraViewer\uFrmCard.cpp \
+    \UltraViewer\UltraVNC_Manager.cpp \
+    \UltraViewer\UltraVNCManager.cpp \
+    \UltraViewer\uMainForm.cpp \
+    \UltraViewer\uProposal.cpp \
+    \uvnckeyboardhelper\uvnckeyboardhelper\stdafx.cpp \
+    \uvnckeyboardhelper\uvnckeyboardhelper\uvnckeyboardhelper.cpp \
     \uvnc_settings\uvnc_settings\capture.cpp \
     \uvnc_settings\uvnc_settings\connections.cpp \
     \uvnc_settings\uvnc_settings\createsfx2.cpp \
@@ -149,8 +145,6 @@ SOURCES += \
     \uvnc_settings\uvnc_settings\videodrivercheck.cpp \
     \uvnc_settings\uvnc_settings\vncOSVersion.cpp \
     \uvnc_settings\uvnc_settings\vncsetauth.cpp \
-    \uvnckeyboardhelper\uvnckeyboardhelper\stdafx.cpp \
-    \uvnckeyboardhelper\uvnckeyboardhelper\uvnckeyboardhelper.cpp \
     \vncviewer\AboutBox.cpp \
     \vncviewer\AccelKeys.cpp \
     \vncviewer\AuthDialog.cpp \
@@ -192,6 +186,7 @@ SOURCES += \
     \vncviewer\stdhdrs.cpp \
     \vncviewer\TextChat.cpp \
     \vncviewer\UltraVNCHerperFunctions.cpp \
+    \vncviewer\vncauth.c \
     \vncviewer\VNCOptions.cpp \
     \vncviewer\vnctouch.cpp \
     \vncviewer\vncviewer.cpp \
@@ -222,9 +217,11 @@ SOURCES += \
     \winvnc\winvnc\IPC.cpp \
     \winvnc\winvnc\LayeredWindows.cpp \
     \winvnc\winvnc\MouseSimulator.cpp \
-    \winvnc\winvnc\read_write_ini.cpp \
+    \winvnc\winvnc\PropertiesDialog.cpp \
     \winvnc\winvnc\rfbRegion_win32.cpp \
+    \winvnc\winvnc\rfbRegion_X11.cxx \
     \winvnc\winvnc\rfbUpdateTracker.cpp \
+    \winvnc\winvnc\RulesListView.cpp \
     \winvnc\winvnc\ScreenCapture.cpp \
     \winvnc\winvnc\ScSelect.cpp \
     \winvnc\winvnc\service.cpp \
@@ -245,6 +242,7 @@ SOURCES += \
     \winvnc\winvnc\vistahook.cpp \
     \winvnc\winvnc\vncabout.cpp \
     \winvnc\winvnc\vncacceptdialog.cpp \
+    \winvnc\winvnc\vncauth.c \
     \winvnc\winvnc\vncbuffer.cpp \
     \winvnc\winvnc\vncclient.cpp \
     \winvnc\winvnc\vncconndialog.cpp \
@@ -274,8 +272,6 @@ SOURCES += \
     \winvnc\winvnc\vncMultiMonitor.cpp \
     \winvnc\winvnc\vncntlm.cpp \
     \winvnc\winvnc\vncOSVersion.cpp \
-    \winvnc\winvnc\vncproperties.cpp \
-    \winvnc\winvnc\vncpropertiesPoll.cpp \
     \winvnc\winvnc\vncserver.cpp \
     \winvnc\winvnc\vncsetauth.cpp \
     \winvnc\winvnc\vncsockconnect.cpp \
@@ -335,13 +331,14 @@ SOURCES += \
     \zipunzip_src\zip20\windll\windll.c \
     \ZipUnZip32\ZipUnzip32.cpp \
 
-
 HEADERS += \
     \addon\versioninfo.h \
+    \addon\eventMessageLogger\messages.h \
     \addon\ms-logon\authadm\authadmin.h \
     \addon\ms-logon\authadm\resource.h \
     \addon\ms-logon\authSSP\Auth_Seq.h \
     \addon\ms-logon\authSSP\authSSP.h \
+    \addon\ms-logon\authSSP\buildtime.h \
     \addon\ms-logon\authSSP\EventLogging.h \
     \addon\ms-logon\authSSP\GenClientServerContext.h \
     \addon\ms-logon\authSSP\resource.h \
@@ -349,13 +346,15 @@ HEADERS += \
     \addon\ms-logon\authSSP\vncSecurityEditor.h \
     \addon\ms-logon\authSSP\vncSecurityEditorProps.h \
     \addon\ms-logon\authSSP\vncSSP.h \
-    \addon\ms-logon\ldapauth\ldapAuth.cpp \
+    \addon\ms-logon\ldapauth\ldapAuth.h \
+    \addon\ms-logon\ldapauth\resource.h \
     \addon\ms-logon\ldapauth9x\ldapAuth9x.h \
     \addon\ms-logon\ldapauth9x\resource.h \
     \addon\ms-logon\ldapauthNT4\ldapAuthnt4.h \
     \addon\ms-logon\ldapauthNT4\resource.h \
     \addon\ms-logon\logging\logging.h \
     \addon\ms-logon\logging\resource.h \
+    \addon\ms-logon\MSLogonACL\buildtime.h \
     \addon\ms-logon\MSLogonACL\MSLogonACL.h \
     \addon\ms-logon\MSLogonACL\resource.h \
     \addon\ms-logon\MSLogonACL\vncExportACL.h \
@@ -367,6 +366,7 @@ HEADERS += \
     \avilog\avilog\stdafx.h \
     \common\Clipboard.h \
     \common\d3des.h \
+    \common\Hyperlinks.h \
     \common\mnemonic.h \
     \common\rfb.h \
     \common\ScopeGuard.h \
@@ -410,6 +410,10 @@ HEADERS += \
     \rdr\ZlibOutStream.h \
     \rdr\ZstdInStream.h \
     \rdr\ZstdOutStream.h \
+    \repeater\list_functions.h \
+    \repeater\repeater.h \
+    \repeater\resource.h \
+    \repeater\resources.h \
     \repeater\webgui\linuxdefs.h \
     \repeater\webgui\webfs.h \
     \repeater\webgui\webgui.h \
@@ -417,10 +421,6 @@ HEADERS += \
     \repeater\webgui\websys.h \
     \repeater\webgui\windowsdefs.h \
     \repeater\webgui\wsfdata.h \
-    \repeater\list_functions.h \
-    \repeater\repeater.h \
-    \repeater\resource.h \
-    \repeater\resources.h \
     \rfb\dh.h \
     \rfb\gii.h \
     \rfb\rfbproto.h \
@@ -457,24 +457,29 @@ HEADERS += \
     \UdtCloudlib\proxy\Cloudthread.h \
     \UdtCloudlib\proxy\proxy.h \
     \UdtCloudlib\proxy\ringbuffer.h \
-    \UltraVNCManager\CardList.h \
-    \UltraVNCManager\CardSetting.h \
-    \UltraVNCManager\DlgPasswordBox.h \
-    \UltraVNCManager\IPC.h \
-    \UltraVNCManager\PollThread.h \
-    \UltraVNCManager\Rijndael.h \
-    \UltraVNCManager\SettingsManager.h \
-    \UltraVNCManager\SizeChangedThread.h \
-    \UltraVNCManager\Tabsheet.h \
-    \UltraVNCManager\TabsheetList.h \
-    \UltraVNCManager\TopBarPanel.h \
-    \UltraVNCManager\uAddCard.h \
-    \UltraVNCManager\UdpPoll.h \
-    \UltraVNCManager\uFrmCard.h \
-    \UltraVNCManager\UltraVNC_ManagerPCH1.h \
-    \UltraVNCManager\uMainForm.h \
-    \UltraVNCManager\Unit1.h \
-    \UltraVNCManager\uProposal.h \
+    \UltraViewer\CardList.h \
+    \UltraViewer\CardSetting.h \
+    \UltraViewer\DlgPasswordBox.h \
+    \UltraViewer\IPC.h \
+    \UltraViewer\PollThread.h \
+    \UltraViewer\Rijndael.h \
+    \UltraViewer\SettingsManager.h \
+    \UltraViewer\SizeChangedThread.h \
+    \UltraViewer\Tabsheet.h \
+    \UltraViewer\TabsheetList.h \
+    \UltraViewer\TopBarPanel.h \
+    \UltraViewer\uAddCard.h \
+    \UltraViewer\UdpPoll.h \
+    \UltraViewer\uFrmCard.h \
+    \UltraViewer\UltraVNC_ManagerPCH1.h \
+    \UltraViewer\UltraVNCManagerPCH1.h \
+    \UltraViewer\uMainForm.h \
+    \UltraViewer\Unit1.h \
+    \UltraViewer\uProposal.h \
+    \uvnckeyboardhelper\uvnckeyboardhelper\Resource.h \
+    \uvnckeyboardhelper\uvnckeyboardhelper\stdafx.h \
+    \uvnckeyboardhelper\uvnckeyboardhelper\targetver.h \
+    \uvnckeyboardhelper\uvnckeyboardhelper\uvnckeyboardhelper.h \
     \uvnc_settings\uvnc_settings\dsmplugin.h \
     \uvnc_settings\uvnc_settings\firewall.h \
     \uvnc_settings\uvnc_settings\inifile.h \
@@ -485,10 +490,6 @@ HEADERS += \
     \uvnc_settings\uvnc_settings\uvnc_settings.h \
     \uvnc_settings\uvnc_settings\vncOSVersion.h \
     \uvnc_settings\uvnc_settings\vncsetauth.h \
-    \uvnckeyboardhelper\uvnckeyboardhelper\Resource.h \
-    \uvnckeyboardhelper\uvnckeyboardhelper\stdafx.h \
-    \uvnckeyboardhelper\uvnckeyboardhelper\targetver.h \
-    \uvnckeyboardhelper\uvnckeyboardhelper\uvnckeyboardhelper.h \
     \vncviewer\AboutBox.h \
     \vncviewer\AccelKeys.h \
     \vncviewer\AuthDialog.h \
@@ -524,6 +525,7 @@ HEADERS += \
     \vncviewer\VNCviewerApp.h \
     \vncviewer\VNCviewerApp32.h \
     \vncviewer\directx\directxviewer.h \
+    \vncviewer\res\resource.h \
     \winvnc\loadmemory\loadDllFromMemory.h \
     \winvnc\loadmemory\MemoryModule.h \
     \winvnc\vnchooks\resource.h \
@@ -544,6 +546,7 @@ HEADERS += \
     \winvnc\winvnc\Localization.h \
     \winvnc\winvnc\minmax.h \
     \winvnc\winvnc\MouseSimulator.h \
+    \winvnc\winvnc\PropertiesDialog.h \
     \winvnc\winvnc\resource.h \
     \winvnc\winvnc\rfb.h \
     \winvnc\winvnc\rfbMisc.h \
@@ -552,6 +555,7 @@ HEADERS += \
     \winvnc\winvnc\rfbRegion_win32.h \
     \winvnc\winvnc\rfbRegion_X11.h \
     \winvnc\winvnc\rfbUpdateTracker.h \
+    \winvnc\winvnc\RulesListView.h \
     \winvnc\winvnc\ScreenCapture.h \
     \winvnc\winvnc\ScSelect.h \
     \winvnc\winvnc\SettingsManager.h \
@@ -594,8 +598,6 @@ HEADERS += \
     \winvnc\winvnc\vncmenu.h \
     \winvnc\winvnc\vncOSVersion.h \
     \winvnc\winvnc\vncpasswd.h \
-    \winvnc\winvnc\vncproperties.h \
-    \winvnc\winvnc\vncpropertiesPoll.h \
     \winvnc\winvnc\vncserver.h \
     \winvnc\winvnc\vncsetauth.h \
     \winvnc\winvnc\vncsockconnect.h \
@@ -646,7 +648,41 @@ HEADERS += \
 FORMS += \
     \vncviewer\vncviewerQt.ui \
 
+RESOURCES += \
+    \addon\eventMessageLogger\messages.rc \
+    \addon\ms-logon\authadm\authadmin.qrc \
+    \addon\ms-logon\authadm\authadmin.rc \
+    \addon\ms-logon\authSSP\authSSP.rc \
+    \addon\ms-logon\ldapauth\ldapAuth.rc \
+    \addon\ms-logon\ldapauth9x\ldapAuth9x.rc \
+    \addon\ms-logon\ldapauthNT4\ldapAuthnt4.rc \
+    \addon\ms-logon\logging\logging.rc \
+    \addon\ms-logon\MSLogonACL\MSLogonACL.rc \
+    \addon\ms-logon\testauth\testauth.rc \
+    \addon\ms-logon\workgrpdomnt4\workgrpdomnt4.rc \
+    \DSMPlugin\MSRC4Plugin\crypto.rc \
+    \DSMPlugin\MSRC4Plugin\MSRC4Plugin.rc \
+    \DSMPlugin\MSRC4Plugin\version.rc \
+    \DSMPlugin\TestPlugin\TestPlugin.rc \
+    \JavaViewer\mk.bat \
+    \JavaViewer\run.bat \
+    \JavaViewer\runapplet.bat \
+    \omnithread\build-bcc32.bat \
+    \repeater\resources.rc \
+    \repeater\webgui\buildfs.bat \
+    \setcad\setcad\setcad.rc \
+    \setpasswd\setpasswd\setpasswd.rc \
+    \uvnckeyboardhelper\uvnckeyboardhelper\uvnckeyboardhelper.rc \
+    \uvnc_settings\uvnc_settings\uvnc_settings.rc \
+    \vncviewer\res\build-bcc32.bat \
+    \vncviewer\res\vncviewer.rc \
+    \winvnc\vnchooks\vnchooks.rc \
+    \winvnc\winvnc\winvnc.rc \
+    \zipunzip_src\unzip\windll\windll.rc \
+    \zipunzip_src\zip20\windll\windll.rc \
+
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+

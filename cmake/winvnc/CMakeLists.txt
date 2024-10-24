@@ -39,7 +39,6 @@ set(${PROJECT_NAME}_SOURCES
     getinfo.cpp
     inifile.cpp
     initipp.cpp
-    read_write_ini.cpp
     rfbRegion_X11.cxx
     rfbRegion_win32.cpp
     rfbUpdateTracker.cpp
@@ -80,8 +79,6 @@ set(${PROJECT_NAME}_SOURCES
     vnclog.cpp
     vncmenu.cpp
     vncntlm.cpp
-    vncproperties.cpp
-    vncpropertiesPoll.cpp
     vncserver.cpp
     vncsetauth.cpp
     vncsockconnect.cpp
