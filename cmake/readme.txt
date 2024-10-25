@@ -26,6 +26,7 @@ vcpkg install zstd:x64-mingw-static
 vcpkg install libjpeg-turbo:x64-mingw-static
 vcpkg install liblzma:x64-mingw-static
 vcpkg install openssl:x64-mingw-static
+vcpkg install libsodium:x64-mingw-static
 
 
 
@@ -88,6 +89,7 @@ vcpkg install zstd:x64-windows-static
 vcpkg install libjpeg-turbo:x64-windows-static
 vcpkg install liblzma:x64-windows-static
 vcpkg install openssl:x64-windows-static
+vcpkg install libsodium:x64-windows-static
 
 vcpkg integrate install
 
