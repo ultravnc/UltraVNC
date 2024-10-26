@@ -1,9 +1,9 @@
 /*
- * mainwindows Qt Source vncviewerQt.cpp from vncviewer.cpp
+ * mainwindows Qt Source vncviewerqt.cpp from vncviewer.cpp
 */
 
-#include "vncviewerQt.h"
-#include "vncviewerQt.ui"
+#include "vncviewerqt.h"
+#include "ui_vncviewerqt.h"
 
 VNCViewerQt::VNCViewerQt(QWidget *parent)
     : QMainWindow(parent)

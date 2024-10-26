@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/QtUltraVNCFiles">
+        <file>authadmin.rc</file>
+    </qresource>
+</RCC>

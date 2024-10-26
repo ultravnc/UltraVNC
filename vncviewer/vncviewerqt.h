@@ -1,5 +1,5 @@
 /*
- * mainwindows Qt Headers vncviewerQt.h from vncviewer.h
+ * mainwindows Qt Headers vncviewerqt.h from vncviewer.h
 */
 
 
@@ -8,10 +8,11 @@
 
 #include <QMainWindow>
 
+QT_BEGIN_NAMESPACE
 namespace Ui {
-
 class VNCViewerQt;
 }
+QT_END_NAMESPACE
 
 class VNCViewerQt : public QMainWindow
 {
@@ -24,7 +25,6 @@ public:
 private:
     Ui::VNCViewerQt *ui;
 };
-
 #endif // VNCVIEWERQT_H
 
 /*
