@@ -6,7 +6,8 @@ find_package(libjpeg-turbo CONFIG REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(zstd CONFIG REQUIRED)
 find_package(LibLZMA REQUIRED)
-
+find_package(unofficial-sodium CONFIG REQUIRED)
+  
 set(${PROJECT_NAME}_SOURCES
     ../../DSMPlugin/DSMPlugin.cpp
     ../../ZipUnZip32/ZipUnzip32.cpp
@@ -103,6 +104,7 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE ZLIB::ZLIB
     PRIVATE zstd::libzstd
     PRIVATE LibLZMA::LibLZMA
+	PRIVATE unofficial-sodium::sodium
     libomnithread
     librdr
     libudtcloud
