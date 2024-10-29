@@ -69,7 +69,7 @@ git clone https://github.com/microsoft/vcpkg.git
 cd vcpkg
 
 
-# Developer Command Prompt for VS
+# x64 Native Tools Command Prompt for VS 2022
 
 cd /d c:\source\vcpkg
 bootstrap-vcpkg.bat -disableMetrics
