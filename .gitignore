@@ -158,7 +158,6 @@ CMakeUserPresets.json
 .qtc_clangd/
 
 build/
-UltraVNC-UltraVNC-QtComminunityTests.pro.user
 
 addon/Debug/
 addon/eventMessageLogger/MSG00001.bin
@@ -170,6 +169,9 @@ cmake/build/
 cmake/out/
 
 vcpkg-configuration.json
+
+zlib/
+zstd/
 
 # End Customized ignore section ----------------------
 
