@@ -27,6 +27,7 @@ set(${PROJECT_NAME}_SOURCES
     IPC.cpp
     LayeredWindows.cpp
     MouseSimulator.cpp
+	PropertiesDialog.cpp
     ScreenCapture.cpp
     SettingsManager.cpp
     TextChat.cpp
