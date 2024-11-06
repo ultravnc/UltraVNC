@@ -216,8 +216,8 @@ void RulesListView::moveDown()
 	lv2.cchTextMax = 256;
 	ListView_GetItem(hListView, &lv2);
 
-	updateItem(si, accessRule);
-	updateItem(si + 1, accessRule2);
+	updateItem(si, accessRule2);
+	updateItem(si + 1, accessRule);
 	selectItem(si + 1);
 }
 
