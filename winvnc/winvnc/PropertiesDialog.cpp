@@ -41,6 +41,7 @@ BOOL CALLBACK PropertiesDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 				return TRUE;
 			case IDC_APPLY:
 				_this->onApply(hwnd);
+				EnableWindow(GetDlgItem(hwnd, IDC_APPLY), false);
 				return TRUE;
 			case IDOK:
 				_this->onOK(hwnd);				
@@ -59,7 +60,7 @@ BOOL CALLBACK PropertiesDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 bool PropertiesDialog::InitDialog(HWND hwnd)
 {
 	PropertiesDialogHwnd = hwnd;
-
+	EnableWindow(GetDlgItem(hwnd, IDC_APPLY), false);
 	SetForegroundWindow(hwnd);
 	HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_WINVNC));
 	SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
@@ -308,7 +309,7 @@ BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		return (LONG)(INT_PTR)GetStockObject(WHITE_BRUSH);
 	}
 	case WM_COMMAND:
-		_this->onCommand(LOWORD(wParam), hwnd);
+		_this->onCommand(LOWORD(wParam), hwnd, HIWORD(wParam));
 	}
 	return (INT_PTR)FALSE;
 }
@@ -527,33 +528,6 @@ bool PropertiesDialog::DlgInitDialog(HWND hwnd)
 			0);
 	}
 
-	if (GetDlgItem(hwnd, IDC_DREFUSE)) {
-		HWND hQuerySetting{};
-		int QueryAccept = 0;
-		if (settings->getQuerySetting() == 2)
-			QueryAccept = 0;
-		else
-			QueryAccept = settings->getQueryAccept();
-
-		switch (QueryAccept) {
-		case 0:
-			hQuerySetting = GetDlgItem(hwnd, IDC_DREFUSE);
-			break;
-		case 1:
-			hQuerySetting = GetDlgItem(hwnd, IDC_DACCEPT);
-			break;
-		case 2:
-			hQuerySetting = GetDlgItem(hwnd, IDC_DRefuseOnly);
-			break;
-		default:
-			hQuerySetting = GetDlgItem(hwnd, IDC_DREFUSE);
-		};
-		SendMessage(hQuerySetting,
-			BM_SETCHECK,
-			TRUE,
-			0);
-	}
-
 	if (GetDlgItem(hwnd, IDC_MAXREFUSE)) {
 		HWND hMaxViewerSetting = NULL;
 		switch (settings->getMaxViewerSetting()) {
@@ -610,6 +584,33 @@ bool PropertiesDialog::DlgInitDialog(HWND hwnd)
 		SendMessage(GetDlgItem(hwnd, IDC_PLUGIN_CHECK), BM_SETCHECK, settings->getUseDSMPlugin(), 0);
 
 	// Query window option - Taken from TightVNC advanced properties
+	if (GetDlgItem(hwnd, IDC_DREFUSE)) {
+		HWND hQuerySetting{};
+		int QueryAccept = 0;
+		if (settings->getQuerySetting() == 2)
+			QueryAccept = 0;
+		else
+			QueryAccept = settings->getQueryAccept();
+
+		switch (QueryAccept) {
+		case 0:
+			hQuerySetting = GetDlgItem(hwnd, IDC_DREFUSE);
+			break;
+		case 1:
+			hQuerySetting = GetDlgItem(hwnd, IDC_DACCEPT);
+			break;
+		case 2:
+			hQuerySetting = GetDlgItem(hwnd, IDC_DRefuseOnly);
+			break;
+		default:
+			hQuerySetting = GetDlgItem(hwnd, IDC_DREFUSE);
+		};
+		SendMessage(hQuerySetting,
+			BM_SETCHECK,
+			TRUE,
+			0);
+	}
+
 	BOOL queryEnabled = (settings->getQuerySetting() == 4);
 
 	if (GetDlgItem(hwnd, IDQUERY))
@@ -636,6 +637,12 @@ bool PropertiesDialog::DlgInitDialog(HWND hwnd)
 		EnableWindow(GetDlgItem(hwnd, IDC_DACCEPT), queryEnabled);
 	if (GetDlgItem(hwnd, IDC_QNOLOGON))
 		EnableWindow(GetDlgItem(hwnd, IDC_QNOLOGON), queryEnabled);
+	if (GetDlgItem(hwnd, IDC_EDITQUERYTEXT))
+		EnableWindow(GetDlgItem(hwnd, IDC_EDITQUERYTEXT), queryEnabled);
+
+
+
+	//////////////////
 
 	if (GetDlgItem(hwnd, IDC_SERVICE_COMMANDLINE))
 		SetDlgItemText(hwnd, IDC_SERVICE_COMMANDLINE, settings->getService_commandline());
@@ -732,7 +739,7 @@ bool PropertiesDialog::DlgInitDialog(HWND hwnd)
 	}
 
 	if (GetDlgItem(hwnd, IDC_QNOLOGON))
-		SendMessage(GetDlgItem(hwnd, IDC_QNOLOGON), BM_SETCHECK, settings->getQueryIfNoLogon(), 0);
+		SendMessage(GetDlgItem(hwnd, IDC_QNOLOGON), BM_SETCHECK, !settings->getQueryIfNoLogon(), 0);
 
 	if (!settings->getLoopbackOnly() && GetDlgItem(hwnd, IDC_IP_ACCESS_CONTROL_LIST))
 		rulesListView->init(GetDlgItem(hwnd, IDC_IP_ACCESS_CONTROL_LIST));
@@ -743,7 +750,7 @@ bool PropertiesDialog::DlgInitDialog(HWND hwnd)
 		SendMessage(GetDlgItem(hwnd, IDC_SEC), BM_SETCHECK, settings->getSecondary(), 0);
 
 	SetForegroundWindow(hwnd);
-
+	EnableWindow(GetDlgItem(PropertiesDialogHwnd, IDC_APPLY), false);
 	return FALSE; // Because we've set the focus
 }
 
@@ -968,8 +975,12 @@ int PropertiesDialog::ListPlugins(HWND hComboBox)
 	return nFiles;
 }
 
-bool PropertiesDialog::onCommand( int command, HWND hwnd)
+bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 {
+	if ((command != IDC_SERVICE_COMMANDLINE && command != IDC_IDLETIMEINPUT &&
+		command != IDC_KINTERVAL && command != IDC_PORTRFB && command != IDC_PORTHTTP &&
+		command != IDC_SCALE)|| subcommand == 1024)
+	EnableWindow(GetDlgItem(PropertiesDialogHwnd, IDC_APPLY), true);
 	switch (command) {
 	case IDC_REMOVE_BUTTON:
 		rulesListView->removeSelectedItem();
@@ -1103,12 +1114,15 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd)
 		{
 			HWND hQuery = GetDlgItem(hwnd, IDQUERY);
 			BOOL queryon = (SendMessage(hQuery, BM_GETCHECK, 0, 0) == BST_CHECKED);
+			settings->setQuerySetting(queryon ? 4 : 2);
+
 			EnableWindow(GetDlgItem(hwnd, IDQUERYTIMEOUT), queryon);
 			EnableWindow(GetDlgItem(hwnd, IDC_QUERYDISABLETIME), queryon);
 			EnableWindow(GetDlgItem(hwnd, IDC_DREFUSE), queryon);
 			EnableWindow(GetDlgItem(hwnd, IDC_DRefuseOnly), queryon);
 			EnableWindow(GetDlgItem(hwnd, IDC_DACCEPT), queryon);
 			EnableWindow(GetDlgItem(hwnd, IDC_QNOLOGON), queryon);
+			EnableWindow(GetDlgItem(hwnd, IDC_EDITQUERYTEXT), queryon);
 		}
 		return TRUE;
 
@@ -1618,7 +1632,7 @@ void PropertiesDialog::onTabsAPPLY(HWND hwnd)
 		}
 	}
 	if (GetDlgItem(hwnd, IDC_QNOLOGON))
-		settings->setQueryIfNoLogon(SendDlgItemMessage(hwnd, IDC_QNOLOGON, BM_GETCHECK, 0, 0));
+		settings->setQueryIfNoLogon(!SendDlgItemMessage(hwnd, IDC_QNOLOGON, BM_GETCHECK, 0, 0));
 
 	if (GetDlgItem(hwnd, IDC_MAXREFUSE) && GetDlgItem(hwnd, IDC_MAXDISCONNECT)) {
 		if (SendMessage(GetDlgItem(hwnd, IDC_MAXREFUSE), BM_GETCHECK, 0, 0) == BST_CHECKED) {

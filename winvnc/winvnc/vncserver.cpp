@@ -1606,25 +1606,30 @@ vncServer::VerifyHost(const char* hostname) {
 		autoAccept = true;
 
 	// Based on the server's QuerySetting, adjust the verification result
+	//QuerySetting == 4 popup, 2 no poup
+
 	switch (verifiedHost) {
-	case vncServer::aqrAccept:
+	/*case vncServer::aqrAccept:
 		if (settings->getQuerySetting() >= 3)
 			verifiedHost = autoAccept
 			? vncServer::aqrAccept
 			: vncServer::aqrQuery;
-		break;
+		break;*/
 	case vncServer::aqrQuery:
-		if (settings->getQuerySetting() <= 1)
-			verifiedHost = vncServer::aqrAccept;
-		else if (settings->getQuerySetting() == 4)
+		if (settings->getQuerySetting() == 2)
 			verifiedHost = vncServer::aqrReject;
+		else {
+			verifiedHost = autoAccept
+				? vncServer::aqrAccept
+				: vncServer::aqrQuery;
+		}
 		break;
-	case vncServer::aqrReject:
+	/*case vncServer::aqrReject:
 		if (settings->getQuerySetting() == 0)
 			verifiedHost = autoAccept
 			? vncServer::aqrAccept
 			: vncServer::aqrQuery;
-		break;
+		break;*/
 	};
 	vnclog.Print(LL_INTINFO, VNCLOG("client %s verifiedHost %u after adjustment\n"), hostname, verifiedHost);
 	return verifiedHost;
