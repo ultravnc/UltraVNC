@@ -319,6 +319,14 @@ bool PropertiesDialog::DlgInitDialog(HWND hwnd)
 	vnclog.SetLevel(settings->getDebugLevel());
 	vnclog.SetVideo(settings->getAvilog());
 	vnclog.SetMode(settings->getDebugMode());
+	if (GetDlgItem(hwnd, IDC_CHANGEPASSWORD)) {
+		SetWindowText(GetDlgItem(hwnd, IDC_CHANGEPASSWORD), (strlen(settings->getPasswd()) == 0) ? "SET" : "CHANGE");
+	}
+	if (GetDlgItem(hwnd, IDC_CHANGEPASSWORDVO)) {
+		SetWindowText(GetDlgItem(hwnd, IDC_CHANGEPASSWORDVO), (strlen(settings->getPasswdViewOnly()) == 0) ? "SET" : "CHANGE");
+	}
+
+	else
 
 	m_dlgvisible = TRUE;
 	bConnectSock = settings->getEnableConnections();
@@ -336,6 +344,10 @@ bool PropertiesDialog::DlgInitDialog(HWND hwnd)
 	int d1 = PORT_TO_DISPLAY(port_rfb);
 	int d2 = HPORT_TO_DISPLAY(port_http);
 	BOOL bValidDisplay = (d1 == d2 && d1 >= 0 && d1 <= 99);
+
+	if (GetDlgItem(hwnd, IDC_CHANGEPASSWORDADMIN)) {
+		SetWindowText(GetDlgItem(hwnd, IDC_CHANGEPASSWORDADMIN), settings->isAdminPasswordSet() ? "CHANGE": "SET");
+	}
 
 	if (GetDlgItem(hwnd, IDC_SPECPORT)) {
 		CheckDlgButton(hwnd, IDC_SPECPORT,
@@ -1212,7 +1224,9 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 	case IDC_CHANGEPASSWORD:
 	{
 		DlgChangePassword* dlgChangePassword = new DlgChangePassword();
-		if (dlgChangePassword->ShowDlg(NULL, "Change/Set password", 8)) {
+		if (dlgChangePassword->ShowDlg(NULL, (strlen(settings->getPasswd()) == 0) 
+			? "Set password"
+			: "Change password", 8)) {
 			char password[1024];
 			strcpy_s(password, dlgChangePassword->getPassword());
 			if (strlen(password) == 0) {
@@ -1225,12 +1239,15 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 				settings->savePassword();
 			}
 		}
+		SetWindowText(GetDlgItem(hwnd, IDC_CHANGEPASSWORD), (strlen(settings->getPasswd()) == 0) ? "SET" : "CHANGE");
 		return true;
 	}
 	case IDC_CHANGEPASSWORDVO:
 	{
 		DlgChangePassword* dlgChangePassword = new DlgChangePassword();
-		if (dlgChangePassword->ShowDlg(NULL, "Change/Set View-only password", 8)) {
+		if (dlgChangePassword->ShowDlg(NULL, (strlen(settings->getPasswd()) == 0) 
+					? "Set View-only password"
+					: "Change View-only password", 8)) {
 			char password[1024];
 			strcpy_s(password, dlgChangePassword->getPassword());
 			if (strlen(password) == 0) {
@@ -1243,28 +1260,39 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 				settings->saveViewOnlyPassword();
 			}
 		}
+		SetWindowText(GetDlgItem(hwnd, IDC_CHANGEPASSWORDVO), (strlen(settings->getPasswdViewOnly()) == 0) ? "SET" : "CHANGE");
 		return true;
 	}
 	case IDC_CHANGEPASSWORDADMIN: {
 		DlgChangePassword* dlgChangePassword = new DlgChangePassword();
-		if (dlgChangePassword->ShowDlg(NULL, "Change/Set Admin password", 128)) {
+		if (dlgChangePassword->ShowDlg(NULL, settings->isAdminPasswordSet() 
+					? "Change Admin password" 
+					: "Set Admin password", 128)) {
 			char password[1024];
 			strcpy_s(password, dlgChangePassword->getPassword());
 			settings->setAdminPasswordHash(password);
+			SetWindowText(GetDlgItem(hwnd, IDC_CHANGEPASSWORDADMIN), "CHANGE");
 		}
 	}
 		return true;
+
+	case IDC_ADMINCLEAR: {
+		settings->setAdminPasswordHash("");
+		SetWindowText(GetDlgItem(hwnd, IDC_CHANGEPASSWORDADMIN), "SET");
+	}
 
 	case IDC_CLEARPASSWORD:
 	{
 		settings->setPasswd("");
 		settings->savePassword();
+		SetWindowText(GetDlgItem(hwnd, IDC_CHANGEPASSWORD), (strlen(settings->getPasswd()) == 0) ? "SET" : "CHANGE");
 		return true;
 	}
 	case IDC_CLEARPASSWORDVO:
 	{
 		settings->setPasswdViewOnly("");
 		settings->saveViewOnlyPassword();
+		SetWindowText(GetDlgItem(hwnd, IDC_CHANGEPASSWORDVO), (strlen(settings->getPasswdViewOnly()) == 0) ? "SET" : "CHANGE");
 		return true;
 	}
 	case IDC_PLUGIN_BUTTON:

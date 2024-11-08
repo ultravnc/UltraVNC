@@ -431,7 +431,7 @@ void SettingsManager::load()
 
 void SettingsManager::savePassword() {
 	if (strlen(m_pref_passwd) == 0) {
-		myIniFile.WriteString("admin", "passwd", m_pref_passwd);
+		myIniFile.WriteString("UltraVNC", "passwd", m_pref_passwd);
 		return;
 	}
 	myIniFile.WritePassword(m_pref_passwd);
@@ -439,7 +439,7 @@ void SettingsManager::savePassword() {
 
 void SettingsManager::saveViewOnlyPassword() {
 	if (strlen(m_pref_passwdViewOnly) == 0) {
-		myIniFile.WriteString("admin", "passwd2", m_pref_passwdViewOnly);
+		myIniFile.WriteString("UltraVNC", "passwd2", m_pref_passwdViewOnly);
 		return;
 	}	
 	myIniFile.WritePasswordViewOnly(m_pref_passwdViewOnly);
@@ -603,7 +603,7 @@ bool SettingsManager::checkAdminPassword()
 	memset(password, 0, 1024);
 	INT_PTR ret = DialogBox(hInstResDLL, MAKEINTRESOURCE(IDD_ADMINPASSWORD), NULL, PasswordDlgProc);
 	if (ret == IDOK) {
-		char hashed_password[crypto_pwhash_STRBYTES];
+		char hashed_password[crypto_pwhash_STRBYTES]{};
 		myIniFile.ReadHash(hashed_password, crypto_pwhash_STRBYTES);
 		if (crypto_pwhash_str_verify(hashed_password, password, strlen(password)) == 0) {
 			return true;
@@ -615,9 +615,23 @@ bool SettingsManager::checkAdminPassword()
 	return false;
 }
 
+bool SettingsManager::isAdminPasswordSet()
+{
+	char hashed_password[crypto_pwhash_STRBYTES]{};
+	myIniFile.ReadHash(hashed_password, crypto_pwhash_STRBYTES);
+	if (strlen(hashed_password) == 0)
+		return false;
+	return true;
+}
+
 void SettingsManager::setAdminPasswordHash(char* password)
 {
-	char hashed_password[crypto_pwhash_STRBYTES];
+	if (strlen(password) == 0) {
+		myIniFile.WriteString("UltraVNC", "hash", m_pref_passwd);
+		return;
+	}
+
+	char hashed_password[crypto_pwhash_STRBYTES]{};
 	crypto_pwhash_str(
 		hashed_password,
 		password,
