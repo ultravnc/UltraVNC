@@ -26,6 +26,7 @@
 #ifdef SC_20
 	#include "ScSelect.h"
 	#include "resource.h"
+	#include "common/win32_helpers.h"
 	#pragma comment (lib, "comctl32")
 
 namespace ScSelect {
@@ -168,7 +169,7 @@ namespace ScSelect {
 		int j = 0;
 		iSlected = SendMessageW(hList, LVM_GETNEXTITEM, -1, LVNI_FOCUSED);
 		if (iSlected == -1) {
-			MessageBox(hWnd, "No Items in ListView", "Error", MB_OK | MB_ICONINFORMATION);
+			helper::yesUVNCMessageBox(hWnd, "No Items in ListView", "Error", MB_ICONINFORMATION);
 			return;
 		}
 
@@ -297,7 +298,7 @@ namespace ScSelect {
 				if (((LPNMHDR)lParam)->code == NM_CLICK) {
 					iSelect = SendMessageW(hList, LVM_GETNEXTITEM, -1, LVNI_FOCUSED);
 					if (iSelect == -1) {
-						MessageBox(hWnd, "No VNC Server selected", "Error", MB_OK | MB_ICONINFORMATION);
+						helper::yesUVNCMessageBox(hWnd, "No VNC Server selected", "Error", MB_ICONINFORMATION);
 						break;
 					}
 					char temp1[255] = { 0 };

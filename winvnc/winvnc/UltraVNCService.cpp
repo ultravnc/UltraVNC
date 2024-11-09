@@ -220,8 +220,6 @@ int UltraVNCService::install_service(void) {
 		}
 		if (myerror==ERROR_SERVICE_EXISTS)
 		{
-			//MessageBoxSecure(NULL, "Failed: Already exist",
-            //"UltraVNC", MB_ICONERROR);
 			CloseServiceHandle(scm);
 			return 1;
 		}

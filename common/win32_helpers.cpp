@@ -24,6 +24,9 @@
 #include <winsock2.h>
 #include <windows.h>
 #include "win32_helpers.h"
+#include "../winvnc/winvnc/resource.h"
+
+extern HINSTANCE	hInstResDLL;
 
 namespace helper {
 
@@ -95,6 +98,90 @@ DynamicFnBase::DynamicFnBase(const TCHAR* dllName, const char* fnName) : fnPtr(0
 DynamicFnBase::~DynamicFnBase() {
   if (dllHandle)
     FreeLibrary(dllHandle);
+}
+
+bool yesnoUVNCMessageBox(HWND m_hWnd, char* szHeader, char* body, char* okStr, char* cancelStr, char* checkbox, BOOL& bCheckboxChecked)
+{
+    wchar_t w_header[128];
+    wchar_t w_body[1024];
+    wchar_t w_checkbox[1024];
+    wchar_t w_okStr[512];
+    wchar_t w_cancelStr[512];
+    size_t outSize;
+    mbstowcs_s(&outSize, w_header, szHeader, strlen(szHeader) + 1);
+    mbstowcs_s(&outSize, w_body, body, strlen(body) + 1);
+    if (strlen(checkbox) > 0)
+        mbstowcs_s(&outSize, w_checkbox, checkbox, strlen(checkbox) + 1);
+    mbstowcs_s(&outSize, w_okStr, okStr, strlen(okStr) + 1);
+    mbstowcs_s(&outSize, w_cancelStr, cancelStr, strlen(cancelStr) + 1);
+
+    HRESULT hr;
+    TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
+    int nClickedBtn;
+    LPCWSTR szTitle = L"UltraVNC Server";
+    TASKDIALOG_BUTTON aCustomButtons[] = {
+        { 1000, w_okStr},
+        { 1001, w_cancelStr}
+    };
+    tdc.cbSize = sizeof(tdc);
+    tdc.hwndParent = m_hWnd;
+    tdc.dwFlags = TDF_ALLOW_DIALOG_CANCELLATION | TDF_USE_COMMAND_LINKS;
+    tdc.pButtons = aCustomButtons;
+    tdc.cButtons = _countof(aCustomButtons);
+    tdc.pszWindowTitle = szTitle;
+    tdc.nDefaultButton = 1001;
+
+    tdc.hInstance = hInstResDLL;
+    tdc.pszMainIcon = MAKEINTRESOURCEW(IDI_WINVNC);// TD_INFORMATION_ICON;
+    tdc.pszMainInstruction = w_header;
+    tdc.pszContent = w_body;
+    if (strlen(checkbox) > 0)
+        tdc.pszVerificationText = w_checkbox;
+
+    hr = TaskDialogIndirect(&tdc, &nClickedBtn, NULL, &bCheckboxChecked);
+
+    if (SUCCEEDED(hr) && 1000 == nClickedBtn)
+        return true;
+    return false;
+}
+
+void yesUVNCMessageBox(HWND m_hWnd, char* body, char* szHeader, int icon)
+{
+    wchar_t w_header[128];
+    wchar_t w_body[1024];
+    size_t outSize;
+
+    mbstowcs_s(&outSize, w_header, szHeader, strlen(szHeader) + 1);
+    mbstowcs_s(&outSize, w_body, body, strlen(body) + 1);
+
+    HRESULT hr;
+    TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
+    int nClickedBtn;
+    LPCWSTR szTitle = L"UltraVNC Server";
+
+
+    tdc.hwndParent = m_hWnd;
+    tdc.dwCommonButtons = TDCBF_YES_BUTTON;
+    tdc.pszWindowTitle = szTitle;
+
+    switch (icon) {
+    case MB_ICONEXCLAMATION:
+        tdc.pszMainIcon = TD_WARNING_ICON;
+        break;
+    case MB_ICONINFORMATION:
+        tdc.pszMainIcon = TD_INFORMATION_ICON;
+        break;
+    case MB_ICONERROR:
+        tdc.pszMainIcon = TD_ERROR_ICON;
+        break;
+    default:
+        tdc.pszMainIcon = MAKEINTRESOURCEW(IDI_WINVNC);// TD_INFORMATION_ICON;
+        break;
+    }
+    tdc.pszMainInstruction = w_header;
+    tdc.pszContent = w_body;
+
+    hr = TaskDialogIndirect(&tdc, &nClickedBtn, NULL, NULL);
 }
 
 } // namespace helper

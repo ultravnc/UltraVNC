@@ -33,6 +33,7 @@
 #include "SettingsManager.h"
 #include <lmcons.h>
 #include "credentials.h"
+#include "common/win32_helpers.h"
 //  We first use shellexecute with "runas"
 //  This way we can use UAC and user/passwd
 //	Runas is standard OS, so no security risk
@@ -303,7 +304,7 @@ namespace serviceHelpers {
 
 DWORD MessageBoxSecure(HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT uType)
 {
-	DWORD retunvalue;
+	DWORD retunvalue = 0;
 	if (settings->RunningFromExternalService())
 	{
 		HDESK desktop = NULL;
@@ -313,7 +314,13 @@ DWORD MessageBoxSecure(HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT uType)
 		if (desktop && old_desktop && old_desktop != desktop)
 		{
 			SetThreadDesktop(desktop);
-			retunvalue = MessageBox(hWnd, lpText, lpCaption, uType);
+			if (uType & MB_SERVICE_NOTIFICATION) {
+				retunvalue = MessageBox(hWnd, lpText, lpCaption, uType);
+			}
+			if (uType & MB_OK)
+				uType &= ~MB_OK;
+			helper::yesUVNCMessageBox(hWnd, (char*)lpText, (char*)lpCaption, uType);
+
 			SetThreadDesktop(old_desktop);
 			CloseDesktop(desktop);
 		}
@@ -503,10 +510,6 @@ namespace postHelper {
 		// Post to the UltraVNC Server menu window
 		if (!PostToWinVNC(MENU_ADD_CLIENT_MSG_INIT, (WPARAM)port, (LPARAM)ipaddress))
 		{
-			//MessageBoxSecure(NULL, sz_ID_NO_EXIST_INST, szAppName, MB_ICONEXCLAMATION | MB_OK);
-			//Little hack, seems postmessage fail in some cases on some os.
-			//permission proble
-			//use G_var + WM_time to reconnect
 			vnclog.Print(LL_INTERR, VNCLOG("PostAddNewClient failed\n"));
 			if (port == 1111 && ipaddress == 1111) ClientTimerReconnect = true;
 			return FALSE;
@@ -519,10 +522,6 @@ namespace postHelper {
 		// Post to the UltraVNC Server menu window
 		if (!PostToWinVNC(MENU_ADD_CLIENT_MSG, (WPARAM)port, (LPARAM)ipaddress))
 		{
-			//MessageBoxSecure(NULL, sz_ID_NO_EXIST_INST, szAppName, MB_ICONEXCLAMATION | MB_OK);
-			//Little hack, seems postmessage fail in some cases on some os.
-			//permission proble
-			//use G_var + WM_time to reconnect
 			vnclog.Print(LL_INTERR, VNCLOG("PostAddNewClient failed\n"));
 			if (port == 1111 && ipaddress == 1111) ClientTimerReconnect = true;
 			return FALSE;
@@ -534,10 +533,6 @@ namespace postHelper {
 	BOOL PostAddNewClientInit4(unsigned long ipaddress, unsigned short port) {
 		// Post to the UltraVNC Server menu window
 		if (!PostToWinVNC(MENU_ADD_CLIENT_MSG_INIT, (WPARAM)port, (LPARAM)ipaddress)) {
-			//MessageBoxSecure(NULL, sz_ID_NO_EXIST_INST, szAppName, MB_ICONEXCLAMATION | MB_OK);
-			//Little hack, seems postmessage fail in some cases on some os.
-			//permission proble
-			//use G_var + WM_time to reconnect
 			vnclog.Print(LL_INTERR, VNCLOG("PostAddNewClient failed\n"));
 			if (port == 1111 && ipaddress == 1111) ClientTimerReconnect = true;
 			return FALSE;
@@ -566,10 +561,6 @@ namespace postHelper {
 		// Post to the UltraVNC Server menu window
 		if (!PostToWinVNC(MENU_ADD_CLIENT_MSG, (WPARAM)port, (LPARAM)ipaddress))
 		{
-			//MessageBoxSecure(NULL, sz_ID_NO_EXIST_INST, szAppName, MB_ICONEXCLAMATION | MB_OK);
-			//Little hack, seems postmessage fail in some cases on some os.
-			//permission proble
-			//use G_var + WM_time to reconnect
 			vnclog.Print(LL_INTERR, VNCLOG("PostAddNewClient failed\n"));
 			if (port == 1111 && ipaddress == 1111) ClientTimerReconnect = true;
 			return FALSE;
