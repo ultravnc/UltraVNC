@@ -41,7 +41,7 @@ public:
 	void Display();
 
 	vncServer* m_pServer;
-	BOOL m_dlgvisible;
+	BOOL m_dlgvisible;	
 };
 
 #endif

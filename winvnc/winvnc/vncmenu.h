@@ -52,6 +52,7 @@ public:
 
 	// adzm 2009-07-05 - Tray icon balloon tips
 	static void NotifyBalloon(wchar_t* szInfo, wchar_t* szTitle = NULL);
+	static void updateList();
 
 protected:
 	// Tray icon handling

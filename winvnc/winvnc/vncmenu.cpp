@@ -261,7 +261,7 @@ vncMenu::vncMenu(vncServer* server)
 	{
 		PostQuitMessage(0);
 		return;
-	}
+	}	
 
 	// Load the icons for the tray
 //	m_winvnc_icon = LoadIcon(hAppInstance, MAKEINTRESOURCE(IDI_WINVNC));
@@ -2052,4 +2052,9 @@ void  vncMenu::NotifyBalloon(wchar_t* szInfo, wchar_t* szTitle)
 		if (szTitleCopy)
 			free(szTitleCopy);
 	}
+}
+
+extern HWND listDlgHwnd;
+void vncMenu::updateList() {
+	PostMessage(listDlgHwnd, WM_UPDATEVIEWERS, 0, 0);
 }

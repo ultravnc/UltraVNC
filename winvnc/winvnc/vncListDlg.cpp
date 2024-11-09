@@ -34,6 +34,7 @@
 
 // [v1.0.2-jp1 fix] Load resouce from dll
 extern HINSTANCE	hInstResDLL;
+HWND listDlgHwnd = NULL;
 
 //
 //
@@ -66,9 +67,7 @@ void vncListDlg::Display()
 {
 	if (!m_dlgvisible)
 	{
-		// [v1.0.2-jp1 fix] Load resouce from dll
-		//DialogBoxParam(	hAppInstance,
-		DialogBoxParam(	hInstResDLL,
+		DialogBoxParam(hInstResDLL,
 						MAKEINTRESOURCE(IDD_LIST_DLG), 
 						NULL,
 						(DLGPROC) DialogProc,
@@ -92,8 +91,8 @@ BOOL CALLBACK vncListDlg::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 			SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
 			SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
             helper::SafeSetWindowUserData(hwnd, lParam);
-			_this = (vncListDlg *) lParam;
-
+			_this = (vncListDlg *) lParam;	
+			listDlgHwnd = hwnd;
 			//vncClientList::iterator i;
 			HWND hList = GetDlgItem(hwnd, IDC_VIEWERS_LISTBOX);
 
@@ -140,8 +139,8 @@ BOOL CALLBACK vncListDlg::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 				if (SendMessage(hList, LB_GETTEXT, nSelected, (LPARAM)szClient) > 0)
 					_this->m_pServer->KillClient(szClient);
 			}
-			EndDialog(hwnd, TRUE);
-			_this->m_dlgvisible = FALSE;
+			//EndDialog(hwnd, TRUE);
+			//_this->m_dlgvisible = FALSE;
 			return TRUE;
 			}
 			break;
@@ -156,14 +155,30 @@ BOOL CALLBACK vncListDlg::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 				if (SendMessage(hList, LB_GETTEXT, nSelected, (LPARAM)szClient) > 0)
 					_this->m_pServer->TextChatClient(szClient);
 			}
-			EndDialog(hwnd, TRUE);
-			_this->m_dlgvisible = FALSE;
+			//EndDialog(hwnd, TRUE);
+			//_this->m_dlgvisible = FALSE;
 			return TRUE;
 			}
-			break;
-
+			break;		
 		}
 		break;
+
+	case WM_UPDATEVIEWERS:
+	{
+		HWND hList = GetDlgItem(hwnd, IDC_VIEWERS_LISTBOX);
+		_this->m_pServer->ListAuthClients(hList);
+		SendMessage(hList, LB_SETCURSEL, -1, 0);
+		HWND hPendingList = GetDlgItem(hwnd, IDC_PENDING_LISTBOX);
+		_this->m_pServer->ListUnauthClients(hPendingList);
+
+		SetForegroundWindow(hwnd);
+		_this->m_dlgvisible = TRUE;
+		if (!settings->getAllowEditClients())
+			EnableWindow(GetDlgItem(hwnd, IDC_KILL_B), false);
+		else
+			EnableWindow(GetDlgItem(hwnd, IDC_KILL_B), true);
+		return TRUE;
+	}
 
 	case WM_DESTROY:
 		EndDialog(hwnd, FALSE);

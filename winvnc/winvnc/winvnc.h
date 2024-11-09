@@ -41,6 +41,7 @@
 #define WM_HOOKCHANGE				WM_APP+7
 #define WM_SHUTDOWN					WM_APP+8
 #define WM_REQUESTMOUSESHAPE		WM_APP+9
+#define WM_UPDATEVIEWERS			WM_APP+13
 
 
 // Export the application details
