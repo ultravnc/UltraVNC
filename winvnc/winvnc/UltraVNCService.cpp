@@ -281,8 +281,6 @@ int UltraVNCService::uninstall_service(void) {
         return 1;
     }
     if(serviceStatus.dwCurrentState!=SERVICE_STOPPED) {
-        //MessageBoxSecure(NULL, "The service is still running, disable it first",
-        //    "UltraVNC", MB_ICONERROR);
         CloseServiceHandle(service);
         CloseServiceHandle(scm);
 		Sleep(2500);uninstall_service();

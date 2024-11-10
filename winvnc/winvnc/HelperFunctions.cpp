@@ -317,9 +317,16 @@ DWORD MessageBoxSecure(HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT uType)
 			if (uType & MB_SERVICE_NOTIFICATION) {
 				retunvalue = MessageBox(hWnd, lpText, lpCaption, uType);
 			}
-			if (uType & MB_OK)
-				uType &= ~MB_OK;
-			helper::yesUVNCMessageBox(hWnd, (char*)lpText, (char*)lpCaption, uType);
+			else if (uType & MB_YESNO) {
+				BOOL bCheckboxChecked;
+				retunvalue = helper::yesnoUVNCMessageBox(hWnd, (char*)lpCaption, (char*)lpText, "YES", "NO", "", bCheckboxChecked);
+
+			}
+			else {
+				if (uType & MB_OK)
+					uType &= ~MB_OK;
+				helper::yesUVNCMessageBox(hWnd, (char*)lpText, (char*)lpCaption, uType);
+			}
 
 			SetThreadDesktop(old_desktop);
 			CloseDesktop(desktop);
@@ -328,7 +335,19 @@ DWORD MessageBoxSecure(HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT uType)
 	}
 	else
 	{
-		retunvalue = MessageBox(hWnd, lpText, lpCaption, uType);
+		if (uType & MB_SERVICE_NOTIFICATION) {
+			retunvalue = MessageBox(hWnd, lpText, lpCaption, uType);
+		}
+		else if (uType & MB_YESNO) {
+			BOOL bCheckboxChecked;
+			retunvalue = helper::yesnoUVNCMessageBox(hWnd, (char*)lpCaption, (char*)lpText, "YES", "NO", "", bCheckboxChecked);
+
+		}
+		else {
+			if (uType & MB_OK)
+				uType &= ~MB_OK;
+			helper::yesUVNCMessageBox(hWnd, (char*)lpText, (char*)lpCaption, uType);
+		}
 	}
 	return retunvalue;
 }
