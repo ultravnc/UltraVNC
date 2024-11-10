@@ -12,6 +12,7 @@
 #include "credentials.h"
 #include <shlwapi.h>
 #include "DlgChangePassword.h"
+#include "vncmenu.h"
 
 extern HINSTANCE	hInstResDLL;
 
@@ -1779,11 +1780,17 @@ void PropertiesDialog::onTabsAPPLY(HWND hwnd)
 			m_server->SetNoScreensaver(IsDlgButtonChecked(hwnd, IDC_NOSCREENSAVER));
 	}
 
-	if (GetDlgItem(hwnd, IDC_ALLOWSHUTDOWN))
+	if (GetDlgItem(hwnd, IDC_ALLOWSHUTDOWN)) {
 		settings->setAllowShutdown(!IsDlgButtonChecked(hwnd, IDC_ALLOWSHUTDOWN));
+		vncMenu::updateMenu();
+	}
 
-	if (GetDlgItem(hwnd, IDC_ALLOWEDITCLIENTS))
+	if (GetDlgItem(hwnd, IDC_ALLOWEDITCLIENTS)) {
 		settings->setAllowEditClients(!IsDlgButtonChecked(hwnd, IDC_ALLOWEDITCLIENTS));
+		vncMenu::updateMenu();
+	}
+
+
 
 	if (GetDlgItem(hwnd, IDC_LOG)) {
 		if (IsDlgButtonChecked(hwnd, IDC_LOG)) {

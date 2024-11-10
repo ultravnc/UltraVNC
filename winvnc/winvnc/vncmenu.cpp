@@ -84,6 +84,8 @@ void Open_openhub();
 //HACK to use name in autoreconnect from service with dyn dns
 extern char dnsname[255];
 
+HMENU vncMenu::m_hmenu = NULL;
+
 BOOL pfnDwmEnableCompositiond = FALSE;
 static inline VOID DisableAero(VOID)
 {
@@ -2073,4 +2075,23 @@ void  vncMenu::NotifyBalloon(wchar_t* szInfo, wchar_t* szTitle)
 extern HWND listDlgHwnd;
 void vncMenu::updateList() {
 	PostMessage(listDlgHwnd, WM_UPDATEVIEWERS, 0, 0);
+}
+
+void vncMenu::updateMenu()
+{
+	EnableMenuItem(m_hmenu, ID_ADMIN_PROPERTIES,
+		settings->getAllowProperties() ? MF_ENABLED : MF_GRAYED);
+	EnableMenuItem(m_hmenu, ID_CLOSE,
+		settings->getAllowShutdown() ? MF_ENABLED : MF_GRAYED);
+	EnableMenuItem(m_hmenu, ID_KILLCLIENTS,
+		settings->getAllowEditClients() ? MF_ENABLED : MF_GRAYED);
+	EnableMenuItem(m_hmenu, ID_OUTGOING_CONN,
+		settings->getAllowEditClients() ? MF_ENABLED : MF_GRAYED);
+	EnableMenuItem(m_hmenu, ID_CLOSE_SERVICE, (settings->RunningFromExternalService() && settings->getAllowShutdown()) ? MF_ENABLED : MF_GRAYED);
+	EnableMenuItem(m_hmenu, ID_START_SERVICE, (processHelper::IsServiceInstalled() && !settings->RunningFromExternalService() && settings->getAllowShutdown()) ? MF_ENABLED : MF_GRAYED);
+	EnableMenuItem(m_hmenu, ID_RUNASSERVICE, (!processHelper::IsServiceInstalled() && !settings->RunningFromExternalService() && settings->getAllowShutdown()) ? MF_ENABLED : MF_GRAYED);
+	EnableMenuItem(m_hmenu, ID_UNINSTALL_SERVICE, (processHelper::IsServiceInstalled() && settings->getAllowShutdown()) ? MF_ENABLED : MF_GRAYED);
+	EnableMenuItem(m_hmenu, ID_REBOOTSAFEMODE, (settings->RunningFromExternalService() && settings->getAllowShutdown()) ? MF_ENABLED : MF_GRAYED);
+	EnableMenuItem(m_hmenu, ID_REBOOT_FORCE, (settings->RunningFromExternalService() && settings->getAllowShutdown()) ? MF_ENABLED : MF_GRAYED);
+
 }

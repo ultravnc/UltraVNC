@@ -643,7 +643,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,23,41,142,10
     CONTROL         "DisableTrayIcon",IDC_DISABLETRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,65,67,10
     CONTROL         "Disable clients options in Tray icon menu",IDC_ALLOWEDITCLIENTS,
-                    "Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_DISABLED | WS_TABSTOP,13,101,141,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,101,141,10
     CONTROL         "Forbid the user to close down UltraVNC Server",IDC_ALLOWSHUTDOWN,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,13,77,194,10
     LTEXT           "Default Server Screen Scale",IDC_STATIC,14,116,100,8
