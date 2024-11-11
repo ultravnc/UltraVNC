@@ -5850,7 +5850,7 @@ inline void ClientConnection::ReadScreenUpdate()
 		{
 			m_pendingFormatChange = true;
 			ReadNewFBSize(&surh);
-			break;
+			continue;
 		}
 
 		if (surh.encoding == rfbEncodingExtViewSize)
@@ -5863,7 +5863,7 @@ inline void ClientConnection::ReadScreenUpdate()
 			extSDisplay = true;
 			SizeWindow();
 			ScrollScreen(offsetXExtSDisplay, offsetYExtSDisplay, true);
-			break;
+			continue;
 		}
 
 		if (surh.encoding == rfbEncodingExtDesktopSize)
@@ -5905,7 +5905,7 @@ inline void ClientConnection::ReadScreenUpdate()
 			}
 			if (!m_opts->m_GNOME)
 				SendMonitorSizes();
-			break;
+			continue;
 		}
 
 		// Tight cursor handling
