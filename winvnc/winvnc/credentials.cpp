@@ -135,11 +135,18 @@ DesktopUsersToken::DesktopUsersToken()
 	hProcess = NULL;
 	hPToken = NULL;
 	DWORD dwExplorerLogonPid = processHelper::GetExplorerLogonPid();
+	vnclog.Print(LL_INTWARN, VNCLOG("GetExplorerLogonPid %i\n"), dwExplorerLogonPid);
 	if (dwExplorerLogonPid != 0) {
 		hProcess = OpenProcess(MAXIMUM_ALLOWED, FALSE, dwExplorerLogonPid);
-		OpenProcessToken(hProcess, TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY
+		if (hProcess == NULL) {
+			vnclog.Print(LL_INTWARN, VNCLOG("DesktopUsersToken failed OpenProcess error %i\n"), GetLastError());
+			return;
+		}
+		if(!OpenProcessToken(hProcess, TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY
 			| TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY | TOKEN_ADJUST_SESSIONID
-			| TOKEN_READ | TOKEN_WRITE, &hPToken);
+			| TOKEN_READ | TOKEN_WRITE, &hPToken)) {
+			vnclog.Print(LL_INTWARN, VNCLOG("OpenProcessToken failed  %i\n"), GetLastError());
+		}
 	}
 }
 

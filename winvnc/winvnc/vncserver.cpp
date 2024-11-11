@@ -400,6 +400,7 @@ vncClientId vncServer::AddClient(VSocket* socket, BOOL auth, BOOL shared, int ca
 			vncMenu::NotifyBalloon(temp);
 		}
 	}
+	vncMenu::updateList();
 	return clientid;
 }
 

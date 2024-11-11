@@ -54,8 +54,10 @@ SettingsManager::SettingsManager()
 	int iImpersonateResult = 0;
 
 	if (hPToken != NULL) {
-		if (!ImpersonateLoggedOnUser(hPToken))
+		if (!ImpersonateLoggedOnUser(hPToken)) {
 			iImpersonateResult = GetLastError();
+			vnclog.Print(LL_INTWARN, VNCLOG("ImpersonateLoggedOnUser failed error %i\n"), iImpersonateResult);
+		}
 	}
 
 	sodium_init();

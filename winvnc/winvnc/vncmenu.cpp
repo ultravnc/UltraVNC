@@ -562,6 +562,10 @@ void vncMenu::addMenus()
 		settings->getAllowProperties() ? MF_ENABLED : MF_GRAYED);	
 	EnableMenuItem(m_hmenu, ID_CLOSE,
 		settings->getAllowShutdown() ? MF_ENABLED : MF_GRAYED);
+	if (settings->RunningFromExternalService())
+		ModifyMenu(m_hmenu, ID_CLOSE, MF_BYCOMMAND | MF_STRING, ID_CLOSE, "Restart UltraVNC Server");
+	else
+		ModifyMenu(m_hmenu, ID_CLOSE, MF_BYCOMMAND | MF_STRING, ID_CLOSE, "Shutdown UltraVNC Server");
 	EnableMenuItem(m_hmenu, ID_KILLCLIENTS,
 		settings->getAllowEditClients() ? MF_ENABLED : MF_GRAYED);
 	EnableMenuItem(m_hmenu, ID_OUTGOING_CONN,
@@ -1016,8 +1020,14 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
 
 		case ID_CLOSE: {
-			if (!MessageBoxSecure(NULL, "Do you want to close this UltraVNC session", "", MB_YESNO))
-				return 0;
+			if (settings->RunningFromExternalService()) {
+				if (!MessageBoxSecure(NULL, "Do you want to restart the UltraVNC Server", "", MB_YESNO))
+					return 0;
+			}
+			else {
+				if (!MessageBoxSecure(NULL, "Do you want to close Shutdown the UltraVNC Server", "", MB_YESNO))
+					return 0;
+			}
 			// User selected Close from the tray menu
 			fShutdownOrdered = TRUE;
 			//Sleep(1000);
@@ -1102,6 +1112,8 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
 		case ID_UNINSTALL_SERVICE:
 		{
+			if (!MessageBoxSecure(NULL, "Do you want to uninstall the UltraVNC service.", "Service", MB_YESNO))
+				return 0;
 			HWND hwnd = postHelper::FindWinVNCWindow(true);
 			if (hwnd) SendMessage(hwnd, WM_COMMAND, ID_CLOSE, 0);
 			DesktopUsersToken desktopUsersToken;
