@@ -1063,7 +1063,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 						if (address == 0) {
 							char text[1024]{};
 							sprintf(text, " Hostnamee (%s) could not be resolved", name);
-							MessageBox(NULL, text, szAppName, MB_ICONEXCLAMATION | MB_OK);
+							helper::yesUVNCMessageBox(NULL, text, (char *)szAppName, MB_ICONEXCLAMATION);
 							delete[] name;
 							return return2(0);
 						}

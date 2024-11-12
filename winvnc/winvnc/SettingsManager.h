@@ -272,6 +272,7 @@ public:
 	void setAllowUserSettingsWithPassword(bool value);
 	bool checkAdminPassword();
 	void setAdminPasswordHash(char *password);
+	bool isAdminPasswordSet();
 
 private:
 	SettingsManager();

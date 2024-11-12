@@ -77,13 +77,13 @@ CAPTION "UltraVNC Server - About"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,215,39,54,16
-    CONTROL         IDB_LOGO64,IDC_VNCLOGO,"Static",SS_BITMAP | SS_CENTERIMAGE,7,5,39,25
+    CONTROL         IDB_LOGO64,IDC_VNCLOGO,"Static",SS_BITMAP | SS_CENTERIMAGE,7,1,39,39
     LTEXT           "UltraVNC Server 1.4.4.0-dev",IDC_VERSION,49,5,145,11
     LTEXT           "Copyright © 2002-2024 UltraVNC Team Members",IDC_NAME,49,27,222,12
-    LTEXT           "Website:",IDC_WWW2,17,46,39,9
+    LTEXT           "Website:",IDC_WWW2,17,46,31,9
     LTEXT           "Built",IDC_BUILDTEXT,49,16,20,10
     LTEXT           "BuildTime",IDC_BUILDTIME,72,16,92,10
-    LTEXT           "https://uvnc.com/",IDC_WWW,60,46,61,8
+    LTEXT           "https://uvnc.com/",IDC_WWW,49,46,61,8
 END
 
 IDD_OUTGOING_CONN DIALOGEX 0, 0, 223, 88
@@ -365,6 +365,21 @@ IDR_VNCVIEWER_JAR       JAVAARCHIVE             "res/vncviewer.jar"
 
 IDR_JAVAARCHIVE1        JAVAARCHIVE             "res/mslogon/VncViewer.jar"
 
+#if defined(SC_20)
+/////////////////////////////////////////////////////////////////////////////
+//
+// DLL
+//
+
+IDR_DLL1                DLL                     "res/ddengine.dll"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// ENCRYPTIONDLL
+//
+IDR_ENCRYPTIONDLL1      ENCRYPTIONDLL           "res/SecureVNCPlugin.dsm"
+#endif
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -569,8 +584,8 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | 
 CAPTION "UltraVNC Server - settings"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,154,232,50,14
-    PUSHBUTTON      "CANCEL",IDCANCEL,213,232,50,14
+    DEFPUSHBUTTON   "OK",IDOK,185,232,50,14
+    PUSHBUTTON      "CANCEL",IDCANCEL,244,232,50,14
     CONTROL         "",IDC_PROPERTIESTAB,"SysTabControl32",TCS_RAGGEDRIGHT,7,7,346,220
     PUSHBUTTON      "APPLY",IDC_APPLY,303,232,50,14
 END
@@ -628,7 +643,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,23,41,142,10
     CONTROL         "DisableTrayIcon",IDC_DISABLETRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,65,67,10
     CONTROL         "Disable clients options in Tray icon menu",IDC_ALLOWEDITCLIENTS,
-                    "Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_DISABLED | WS_TABSTOP,13,101,141,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,101,141,10
     CONTROL         "Forbid the user to close down UltraVNC Server",IDC_ALLOWSHUTDOWN,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,13,77,194,10
     LTEXT           "Default Server Screen Scale",IDC_STATIC,14,116,100,8
@@ -656,6 +671,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,63,232,10
     LTEXT           "As admin you can set a password to allow non administrators to view and change the settings.",IDC_STATIC_ADMIN,12,20,199,20
     PUSHBUTTON      "SET/CHANGE...",IDC_CHANGEPASSWORDADMIN,96,41,64,14
+    PUSHBUTTON      "CLEAR",IDC_ADMINCLEAR,171,41,50,14
 END
 
 IDD_FORM_Incoming DIALOGEX 0, 0, 341, 209

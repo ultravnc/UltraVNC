@@ -78,12 +78,12 @@ void DlgChangePassword::onOK(HWND hwnd)
 	GetDlgItemText(hwnd, IDC_PASSWORD_1, (LPSTR)&passwd, 1024);
 	GetDlgItemText(hwnd, IDC_PASSWORD_2, (LPSTR)&passwd2, 1024);
 	if ((strlen(passwd) == 0 || strcmp(passwd, "~~~~~~~~") == 0) && settings->getAuthRequired() != false) {
-		MessageBox(hwnd, "Password can not be empty.", "UltraVNC warning", MB_OK | MB_ICONWARNING);
+		helper::yesUVNCMessageBox(hwnd, "Password can not be empty.", "UltraVNC warning", MB_ICONWARNING);
 		SetFocus(GetDlgItem(hwnd, IDC_PASSWORD_1));
 		return;
 	}
 	if ((strcmp(passwd, passwd2) != 0 || strcmp(passwd, "~~~~~~~~") == 0)) {
-		MessageBox(hwnd, "The verification passwords is not the same.", "UltraVNC warning", MB_OK | MB_ICONWARNING);
+		helper::yesUVNCMessageBox(hwnd, "The verification passwords is not the same.", "UltraVNC warning", MB_ICONWARNING);
 		SetFocus(GetDlgItem(hwnd, IDC_PASSWORD_2));
 		return;
 	}

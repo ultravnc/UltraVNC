@@ -69,7 +69,6 @@
 #define IDC_BLANKINGTXT                 1015
 #define IDC_BUILDTIME                   1017
 #define IDC_BUTTON1                     1018
-#define IDC_CHANGEPASSWORD              1018
 #define IDC_CHECKIP                     1019
 #define IDC_CAPTION_STATIC              1020
 #define IDC_CHATAREA_EDIT               1021
@@ -320,6 +319,8 @@
 #define IDC_BUTTON4                     1279
 #define IDC_CLEARPASSWORDVO             1279
 #define IDC_CHANGEPASSWORDADMIN         1280
+#define IDC_CHANGEPASSWORD              1281
+#define IDC_ADMINCLEAR                  1282
 #define IDE_CUSTOM1                     4377
 #define ID_ABOUT                        32771
 #define ID_ADMIN_PROPERTIES             32772
@@ -416,7 +417,7 @@
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        209
 #define _APS_NEXT_COMMAND_VALUE         32858
-#define _APS_NEXT_CONTROL_VALUE         1281
+#define _APS_NEXT_CONTROL_VALUE         1283
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

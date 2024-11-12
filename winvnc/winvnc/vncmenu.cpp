@@ -84,6 +84,8 @@ void Open_openhub();
 //HACK to use name in autoreconnect from service with dyn dns
 extern char dnsname[255];
 
+HMENU vncMenu::m_hmenu = NULL;
+
 BOOL pfnDwmEnableCompositiond = FALSE;
 static inline VOID DisableAero(VOID)
 {
@@ -261,7 +263,7 @@ vncMenu::vncMenu(vncServer* server)
 	{
 		PostQuitMessage(0);
 		return;
-	}
+	}	
 
 	// Load the icons for the tray
 //	m_winvnc_icon = LoadIcon(hAppInstance, MAKEINTRESOURCE(IDI_WINVNC));
@@ -560,6 +562,10 @@ void vncMenu::addMenus()
 		settings->getAllowProperties() ? MF_ENABLED : MF_GRAYED);	
 	EnableMenuItem(m_hmenu, ID_CLOSE,
 		settings->getAllowShutdown() ? MF_ENABLED : MF_GRAYED);
+	if (settings->RunningFromExternalService())
+		ModifyMenu(m_hmenu, ID_CLOSE, MF_BYCOMMAND | MF_STRING, ID_CLOSE, "Restart UltraVNC Server");
+	else
+		ModifyMenu(m_hmenu, ID_CLOSE, MF_BYCOMMAND | MF_STRING, ID_CLOSE, "Shutdown UltraVNC Server");
 	EnableMenuItem(m_hmenu, ID_KILLCLIENTS,
 		settings->getAllowEditClients() ? MF_ENABLED : MF_GRAYED);
 	EnableMenuItem(m_hmenu, ID_OUTGOING_CONN,
@@ -945,10 +951,13 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		}
 		break;
 
-		case ID_KILLCLIENTS:
+		case ID_KILLCLIENTS: {
+			if (!MessageBoxSecure(NULL, "Do you want to kill all connected viewers", "", MB_YESNO))
+				return 0;
 			// Disconnect all currently connected clients
 			vnclog.Print(LL_INTINFO, VNCLOG("KillAuthClients() ID_KILLCLIENTS \n"));
-			_this->m_server->KillAuthClients();
+			_this->m_server->KillAuthClients(); 
+		}
 			break;
 
 			// sf@2002
@@ -1010,17 +1019,28 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			break;
 
 
-		case ID_CLOSE:
+		case ID_CLOSE: {
+			if (settings->RunningFromExternalService()) {
+				if (!MessageBoxSecure(NULL, "Do you want to restart the UltraVNC Server", "", MB_YESNO))
+					return 0;
+			}
+			else {
+				if (!MessageBoxSecure(NULL, "Do you want to close Shutdown the UltraVNC Server", "", MB_YESNO))
+					return 0;
+			}
 			// User selected Close from the tray menu
 			fShutdownOrdered = TRUE;
 			//Sleep(1000);
 			vnclog.Print(LL_INTINFO, VNCLOG("KillAuthClients() ID_CLOSE \n"));
 			_this->m_server->KillAuthClients();
 			PostMessage(hwnd, WM_CLOSE, 0, 0);
+		}
 			break;
 #ifndef SC_20
 		case ID_REBOOTSAFEMODE:
 		{
+			if (!MessageBoxSecure(NULL, "Do you want to reboot the System", "System", MB_YESNO))
+				return 0;
 			DesktopUsersToken desktopUsersToken;
 			HANDLE hPToken = desktopUsersToken.getDesktopUsersToken();
 			if (!hPToken) {
@@ -1055,6 +1075,8 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
 		case ID_REBOOT_FORCE:
 		{
+			if (!MessageBoxSecure(NULL, "Do you want to force reboot the System", "System", MB_YESNO))
+				return 0;
 			DesktopUsersToken desktopUsersToken;
 			HANDLE hPToken = desktopUsersToken.getDesktopUsersToken();
 			if (!hPToken) {
@@ -1090,6 +1112,8 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
 		case ID_UNINSTALL_SERVICE:
 		{
+			if (!MessageBoxSecure(NULL, "Do you want to uninstall the UltraVNC service.", "Service", MB_YESNO))
+				return 0;
 			HWND hwnd = postHelper::FindWinVNCWindow(true);
 			if (hwnd) SendMessage(hwnd, WM_COMMAND, ID_CLOSE, 0);
 			DesktopUsersToken desktopUsersToken;
@@ -1125,6 +1149,8 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
 		case ID_RUNASSERVICE:
 		{
+			if (!MessageBoxSecure(NULL, "Do you want to install UltraVNC as service", "Service", MB_YESNO))
+				return 0;
 			DWORD errorcode = 0;
 			DesktopUsersToken desktopUsersToken;
 			HANDLE hPToken = desktopUsersToken.getDesktopUsersToken();
@@ -1175,6 +1201,8 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			DWORD id = processHelper::GetExplorerLogonPid();
 			if (id != 0)
 			{
+				if (!MessageBoxSecure(NULL, "Do you want to stop the UltravNC service.", "Service", MB_YESNO))
+					return 0;
 				DWORD errorcode = 0;
 				STARTUPINFO          StartUPInfo;
 				PROCESS_INFORMATION  ProcessInfo;
@@ -1219,6 +1247,8 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		break;
 		case ID_START_SERVICE:
 		{
+			if (!MessageBoxSecure(NULL, "Do you want to start the UltraVNC service.", "Service", MB_YESNO))
+				return 0;
 			HANDLE hProcess{}, hPToken{};
 			const DWORD id = processHelper::GetExplorerLogonPid();
 			if (id != 0)
@@ -2052,4 +2082,28 @@ void  vncMenu::NotifyBalloon(wchar_t* szInfo, wchar_t* szTitle)
 		if (szTitleCopy)
 			free(szTitleCopy);
 	}
+}
+
+extern HWND listDlgHwnd;
+void vncMenu::updateList() {
+	PostMessage(listDlgHwnd, WM_UPDATEVIEWERS, 0, 0);
+}
+
+void vncMenu::updateMenu()
+{
+	EnableMenuItem(m_hmenu, ID_ADMIN_PROPERTIES,
+		settings->getAllowProperties() ? MF_ENABLED : MF_GRAYED);
+	EnableMenuItem(m_hmenu, ID_CLOSE,
+		settings->getAllowShutdown() ? MF_ENABLED : MF_GRAYED);
+	EnableMenuItem(m_hmenu, ID_KILLCLIENTS,
+		settings->getAllowEditClients() ? MF_ENABLED : MF_GRAYED);
+	EnableMenuItem(m_hmenu, ID_OUTGOING_CONN,
+		settings->getAllowEditClients() ? MF_ENABLED : MF_GRAYED);
+	EnableMenuItem(m_hmenu, ID_CLOSE_SERVICE, (settings->RunningFromExternalService() && settings->getAllowShutdown()) ? MF_ENABLED : MF_GRAYED);
+	EnableMenuItem(m_hmenu, ID_START_SERVICE, (processHelper::IsServiceInstalled() && !settings->RunningFromExternalService() && settings->getAllowShutdown()) ? MF_ENABLED : MF_GRAYED);
+	EnableMenuItem(m_hmenu, ID_RUNASSERVICE, (!processHelper::IsServiceInstalled() && !settings->RunningFromExternalService() && settings->getAllowShutdown()) ? MF_ENABLED : MF_GRAYED);
+	EnableMenuItem(m_hmenu, ID_UNINSTALL_SERVICE, (processHelper::IsServiceInstalled() && settings->getAllowShutdown()) ? MF_ENABLED : MF_GRAYED);
+	EnableMenuItem(m_hmenu, ID_REBOOTSAFEMODE, (settings->RunningFromExternalService() && settings->getAllowShutdown()) ? MF_ENABLED : MF_GRAYED);
+	EnableMenuItem(m_hmenu, ID_REBOOT_FORCE, (settings->RunningFromExternalService() && settings->getAllowShutdown()) ? MF_ENABLED : MF_GRAYED);
+
 }

@@ -3763,7 +3763,6 @@ vncClientThread::run(void* arg)
 					// Read in the Name of the file to create
 					if (!m_socket->ReadExact(m_client->m_szFullDestName, length))
 					{
-						//MessageBoxSecure(NULL, "1. Abort!", "UltraVNC Server", MB_OK);
 						// vnclog.Print(LL_INTINFO, VNCLOG("*** File Transfer: Failed to receive FileName from Viewer. Abort!\n"));
 						break;
 					}
@@ -3774,7 +3773,6 @@ vncClientThread::run(void* arg)
 					CARD32 sizeHtmp = 0;
 					if (!m_socket->ReadExact((char*)&sizeHtmp, sizeof(CARD32)))
 					{
-						//MessageBoxSecure(NULL, "2. Abort!", "UltraVNC Server", MB_OK);
 						//vnclog.Print(LL_INTINFO, VNCLOG("*** File Transfer: Failed to receive SizeH from Viewer. Abort!\n"));
 						break;
 					}
@@ -3916,7 +3914,6 @@ vncClientThread::run(void* arg)
 							m_client->m_pBuff = NULL;
 						}
 
-						//MessageBoxSecure(NULL, "3. Abort!", "UltraVNC Server", MB_OK);
 						//vnclog.Print(LL_INTINFO, VNCLOG("*** File Transfer: Wrong Dest File size. Abort!\n"));
 						m_client->FTDownloadFailureHook();
 						break;
@@ -3956,7 +3953,6 @@ vncClientThread::run(void* arg)
 					{
 						helper::close_handle(m_client->m_hSrcFile);
 						m_client->FTUploadFailureHook();
-						// MessageBoxSecure(NULL, "7. Abort!", "UltraVNC Server", MB_OK);
 						//vnclog.Print(LL_INTINFO, VNCLOG("*** File Transfer: File not created on client side. Abort!\n"));
 						break;
 					}
@@ -3966,7 +3962,6 @@ vncClientThread::run(void* arg)
 					if (m_client->m_pBuff == NULL)
 					{
 						helper::close_handle(m_client->m_hSrcFile);
-						//MessageBoxSecure(NULL, "8. Abort!", "UltraVNC Server", MB_OK);
 						//vnclog.Print(LL_INTINFO, VNCLOG("*** File Transfer: rfbFileHeader - Unable to allocate buffer. Abort!\n"));
 						m_client->FTUploadFailureHook();
 						break;
@@ -3982,7 +3977,6 @@ vncClientThread::run(void* arg)
 							delete[] m_client->m_pBuff;
 							m_client->m_pBuff = NULL;
 						}
-						//MessageBoxSecure(NULL, "9. Abort!", "UltraVNC Server", MB_OK);
 						//vnclog.Print(LL_INTINFO, VNCLOG("*** File Transfer: rfbFileHeader - Unable to allocate comp. buffer. Abort!\n"));
 						m_client->FTUploadFailureHook();
 						break;
@@ -6741,7 +6735,6 @@ int  vncClient::filetransferrequestPart2(int nDirZipRet)
 	omni_mutex_lock ll(GetUpdateLock(), 90);
 	if (nDirZipRet == -1)
 	{
-		//MessageBoxSecure(NULL, "5. Abort!", "UltraVNC Server", MB_OK);
 		//vnclog.Print(LL_INTINFO, VNCLOG("*** File Transfer: Failed to zip requested dir. Abort!\n"));
 
 		//	[v1.0.2-jp1 fix] Empty directory receive problem
@@ -6859,7 +6852,6 @@ int  vncClient::filetransferrequestPart2(int nDirZipRet)
 	// delete [] szSrcFileName;
 	if (n2SrcSize.LowPart == 0xFFFFFFFF && n2SrcSize.HighPart == 0xFFFFFFFF)
 	{
-		//MessageBoxSecure(NULL, "6. Abort!", "UltraVNC Server", MB_OK);
 		//vnclog.Print(LL_INTINFO, VNCLOG("*** File Transfer: Wrong Src File size. Abort!\n"));
 		FTUploadFailureHook();
 		if (ThreadHandleCompressFolder)

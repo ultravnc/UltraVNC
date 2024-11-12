@@ -400,6 +400,7 @@ vncClientId vncServer::AddClient(VSocket* socket, BOOL auth, BOOL shared, int ca
 			vncMenu::NotifyBalloon(temp);
 		}
 	}
+	vncMenu::updateList();
 	return clientid;
 }
 
@@ -559,6 +560,7 @@ vncServer::Authenticated(vncClientId clientid)
 #endif // SC_20
 	}
 	vnclog.Print(LL_INTINFO, VNCLOG("Authenticated() done\n"));
+	vncMenu::updateList();
 	return authok;
 }
 
@@ -699,6 +701,7 @@ void vncServer::ListAuthClients(HWND hListBox)
 {
 	vncClientList::iterator i;
 	omni_mutex_lock l(m_clientsLock, 22);
+	SendMessage(hListBox, LB_RESETCONTENT, 0, 0);
 	for (i = m_authClients.begin(); i != m_authClients.end(); i++)
 	{
 		// adzm 2009-07-05
@@ -722,6 +725,7 @@ void vncServer::ListUnauthClients(HWND hListBox)
 	vncClientList::iterator i;
 	omni_mutex_lock l(m_clientsLock, 23);
 
+	SendMessage(hListBox, LB_RESETCONTENT, 0, 0);
 	for (i = m_unauthClients.begin(); i != m_unauthClients.end(); i++) {
 		// adzm 2009-07-05
 		vncClient* client = GetClient(*i);
@@ -1010,6 +1014,7 @@ vncServer::RemoveClient(vncClientId clientid)
 	// Notify anyone interested of the change
 	DoNotify(WM_SRV_CLIENT_DISCONNECT, 0, 0);
 	vnclog.Print(LL_INTINFO, VNCLOG("RemoveClient() done\n"));
+	vncMenu::updateList();
 }
 
 // NOTIFICATION HANDLING!

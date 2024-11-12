@@ -224,7 +224,6 @@ bool VideoDriver::mirror_driver_Vista(DWORD dwAttach, int x, int y, int w, int h
 		DWORD cyPrimary = 0xFFFFFFFF;
 		// First enumerate for Primary display device:
 		while (result = EnumDisplayDevicesA(NULL, devNum, &dispDevice, 0)) {
-			//          MessageBoxSecure(NULL, &dispDevice.DeviceString[0], NULL, MB_OK);
 			if (dispDevice.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE) {
 				// Primary device. Find out its dmPelsWidht and dmPelsHeight.
 				EnumDisplaySettings(dispDevice.DeviceName, ENUM_CURRENT_SETTINGS, &devmode);
@@ -289,7 +288,6 @@ bool VideoDriver::mirror_driver_Vista(DWORD dwAttach, int x, int y, int w, int h
 			// Attach and detach information is sent via the dmPelsWidth/Height
 			// of the devmode.
 			//
-//			MessageBoxSecure(NULL,"bED", NULL, MB_OK);
 			if (dwAttach == 0) {
 				devmode.dmPelsWidth = 0;
 				devmode.dmPelsHeight = 0;
