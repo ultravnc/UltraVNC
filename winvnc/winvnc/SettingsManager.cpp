@@ -49,8 +49,7 @@ SettingsManager* SettingsManager::getInstance()
 
 SettingsManager::SettingsManager()
 {
-	DesktopUsersToken desktopUsersToken;
-	HANDLE hPToken = desktopUsersToken.getDesktopUsersToken();
+	HANDLE hPToken = DesktopUsersToken::getInstance()->getDesktopUsersToken();
 	int iImpersonateResult = 0;
 
 	if (hPToken != NULL) {
@@ -139,8 +138,7 @@ void SettingsManager::setRunningFromExternalService(BOOL fEnabled)
 
 bool SettingsManager::IsDesktopUserAdmin()
 {
-	DesktopUsersToken desktopUsersToken;
-	HANDLE hPToken = desktopUsersToken.getDesktopUsersToken();
+	HANDLE hPToken = DesktopUsersToken::getInstance()->getDesktopUsersToken();
 	if (hPToken) {
 		if (!ImpersonateLoggedOnUser(hPToken)) {
 			return false;

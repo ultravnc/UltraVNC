@@ -707,8 +707,7 @@ namespace processHelper {
 
 	bool GetConsoleUser(char* buffer, UINT size)
 	{
-		DesktopUsersToken desktopUsersToken;
-		HANDLE hPToken = desktopUsersToken.getDesktopUsersToken();
+		HANDLE hPToken = DesktopUsersToken::getInstance()->getDesktopUsersToken();
 		if (hPToken == NULL) {
 			strcpy_s(buffer, UNLEN + 1, "");
 			return 0;

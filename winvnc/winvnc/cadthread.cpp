@@ -201,8 +201,7 @@ DWORD WINAPI vncCad::Cadthread(LPVOID lpParam)
 	if (OSversion.dwMajorVersion >= 6 && settings->RunningFromExternalService() && !IsSoftwareCadEnabled()) {
 		DWORD result = MessageBoxSecure(NULL, "UAC is Disable, make registry changes to allow cad", "Warning", MB_YESNO);
 		if (result == IDYES) {
-			DesktopUsersToken desktopUsersToken;
-			HANDLE hPToken = desktopUsersToken.getDesktopUsersToken();
+			HANDLE hPToken = DesktopUsersToken::getInstance()->getDesktopUsersToken();
 			if (hPToken) {
 				char dir[MAX_PATH];
 				char exe_file_name[MAX_PATH];

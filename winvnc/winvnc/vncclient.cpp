@@ -4667,7 +4667,6 @@ vncClient::vncClient() : m_clipboard(ClipboardSettings::defaultServerCaps), Send
 	ask_mouse = false;
 	simulateCursor = NULL;
 	forceBlacklist = false;
-	desktopUsersToken = NULL;
 }
 
 vncClient::~vncClient()
@@ -4772,9 +4771,6 @@ vncClient::~vncClient()
 	}
 	if (simulateCursor)
 		delete simulateCursor;
-	if (desktopUsersToken)
-		delete desktopUsersToken;
-	desktopUsersToken = NULL;
 }
 
 // Init
@@ -6543,8 +6539,7 @@ bool vncClient::DoFTUserImpersonation()
 	vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::DoFTUserImpersonation - currentUser = %s\n"), username);
 	if (strcmp(username, "") != 0)
 	{
-		desktopUsersToken = new DesktopUsersToken();
-		m_hPToken = desktopUsersToken->getDesktopUsersToken();
+		m_hPToken = DesktopUsersToken::getInstance()->getDesktopUsersToken();
 
 		if (!m_hPToken) {
 			vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::DoFTUserImpersonation - OpenProcessToken Error\n"));
@@ -6594,9 +6589,6 @@ void vncClient::UndoFTUserImpersonation()
 	vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::UNDoFTUserImpersonation - Impersonationtoken exists\n"));
 	RevertToSelf();
 	m_fFTUserImpersonatedOk = false;
-	if (desktopUsersToken)
-		delete desktopUsersToken;
-	desktopUsersToken = NULL;
 	m_hPToken = 0;
 }
 #endif // SC_20

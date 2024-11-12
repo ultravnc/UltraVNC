@@ -760,8 +760,7 @@ bool vncMenu::OpenWebpageFromService( char * cmdline)
 
 bool vncMenu::OpenWebpageFromApp(int iMsg)
 {
-	DesktopUsersToken desktopUsersToken;
-	HANDLE hPToken = desktopUsersToken.getDesktopUsersToken();
+	HANDLE hPToken = DesktopUsersToken::getInstance()->getDesktopUsersToken();
 	if (!hPToken)
 		return false;
 
@@ -838,32 +837,11 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				ClientTimerReconnect = false;
 				PostMessage(hwnd, postHelper::MENU_ADD_CLIENT_MSG, 1111, 1111);
 			}
-
-			if (settings->RunningFromExternalService()) {
-				strcpy_s(newuser, "");
-				if (processHelper::CurrentUser((char*)&newuser, sizeof(newuser))) {
-					// Check whether the user name has changed!
-					if (_stricmp(newuser, _this->m_username) != 0 || (_this->IconFaultCounter > 2)) {
-						Sleep(1000);
-						vnclog.Print(LL_INTINFO, VNCLOG("user name has changed\n"));
-						// User has changed!
-						strcpy_s(_this->m_username, newuser);
-						// Order impersonation thread killing
-						PostQuitMessage(0);
-						break;
-					}
-				}
+			_this->updateUser(hwnd);
+			if (_this->authClientCount != _this->m_server->AuthClientCount()) {
+				_this->FlashTrayIcon(_this->m_server->AuthClientCount() != 0);
+				_this->authClientCount = _this->m_server->AuthClientCount();
 			}
-
-			// *** HACK for running servicified
-			if (settings->RunningFromExternalService()) {
-				// Attempt to add the icon if it's not already there
-				_this->AddTrayIcon();
-				// Trigger a check of the current user
-				PostMessage(hwnd, WM_USERCHANGED, 0, 0);
-			}
-			// Update the icon
-			_this->FlashTrayIcon(_this->m_server->AuthClientCount() != 0);
 		}
 		else if (wParam == 2) {
 			if (settings->RunningFromExternalService() && settings->getRdpmode()) {
@@ -1041,8 +1019,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		{
 			if (!MessageBoxSecure(NULL, "Do you want to reboot the System", "System", MB_YESNO))
 				return 0;
-			DesktopUsersToken desktopUsersToken;
-			HANDLE hPToken = desktopUsersToken.getDesktopUsersToken();
+			HANDLE hPToken = DesktopUsersToken::getInstance()->getDesktopUsersToken();
 			if (!hPToken) {
 				UltraVNCService::Reboot_in_safemode_elevated();
 				break;
@@ -1077,8 +1054,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		{
 			if (!MessageBoxSecure(NULL, "Do you want to force reboot the System", "System", MB_YESNO))
 				return 0;
-			DesktopUsersToken desktopUsersToken;
-			HANDLE hPToken = desktopUsersToken.getDesktopUsersToken();
+			HANDLE hPToken = DesktopUsersToken::getInstance()->getDesktopUsersToken();
 			if (!hPToken) {
 				UltraVNCService::Reboot_with_force_reboot_elevated();
 				break;
@@ -1116,8 +1092,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				return 0;
 			HWND hwnd = postHelper::FindWinVNCWindow(true);
 			if (hwnd) SendMessage(hwnd, WM_COMMAND, ID_CLOSE, 0);
-			DesktopUsersToken desktopUsersToken;
-			HANDLE hPToken = desktopUsersToken.getDesktopUsersToken();
+			HANDLE hPToken = DesktopUsersToken::getInstance()->getDesktopUsersToken();
 			if (!hPToken) {
 				serviceHelpers::Set_uninstall_service_as_admin();
 				break;
@@ -1152,8 +1127,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			if (!MessageBoxSecure(NULL, "Do you want to install UltraVNC as service", "Service", MB_YESNO))
 				return 0;
 			DWORD errorcode = 0;
-			DesktopUsersToken desktopUsersToken;
-			HANDLE hPToken = desktopUsersToken.getDesktopUsersToken();
+			HANDLE hPToken = DesktopUsersToken::getInstance()->getDesktopUsersToken();
 			if (!hPToken)
 				goto error6;
 
@@ -2105,5 +2079,26 @@ void vncMenu::updateMenu()
 	EnableMenuItem(m_hmenu, ID_UNINSTALL_SERVICE, (processHelper::IsServiceInstalled() && settings->getAllowShutdown()) ? MF_ENABLED : MF_GRAYED);
 	EnableMenuItem(m_hmenu, ID_REBOOTSAFEMODE, (settings->RunningFromExternalService() && settings->getAllowShutdown()) ? MF_ENABLED : MF_GRAYED);
 	EnableMenuItem(m_hmenu, ID_REBOOT_FORCE, (settings->RunningFromExternalService() && settings->getAllowShutdown()) ? MF_ENABLED : MF_GRAYED);
+}
 
+void vncMenu::updateUser(HWND hwnd)
+{
+	if (settings->RunningFromExternalService()) {
+		strcpy_s(newuser, "");
+		if (processHelper::CurrentUser((char*)&newuser, sizeof(newuser))) {
+			// Check whether the user name has changed!
+			if (_stricmp(newuser, m_username) != 0 || (IconFaultCounter > 2)) {
+				Sleep(1000);
+				vnclog.Print(LL_INTINFO, VNCLOG("user name has changed\n"));
+				// User has changed!
+				strcpy_s(m_username, newuser);
+				// Order impersonation thread killing
+				PostQuitMessage(0);
+				return;
+			}
+		}
+		AddTrayIcon();
+		PostMessage(hwnd, WM_USERCHANGED, 0, 0);
+		FlashTrayIcon(m_server->AuthClientCount() != 0);
+	}
 }

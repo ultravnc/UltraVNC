@@ -54,6 +54,7 @@ public:
 	static void NotifyBalloon(wchar_t* szInfo, wchar_t* szTitle = NULL);
 	static void updateList();
 	static void updateMenu();
+	void updateUser(HWND hwnd);
 	static HMENU m_hmenu;
 
 protected:
@@ -116,6 +117,7 @@ protected:
 	int IconFaultCounter;
 	bool balloonset = false;
 	wchar_t m_tooltip[128]{};
+	int authClientCount = -1;
 };
 
 
