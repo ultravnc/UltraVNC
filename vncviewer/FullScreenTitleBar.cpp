@@ -57,6 +57,9 @@ extern Log vnclog;
 #include "VNCOptions.h"
 #include "UltraVNCHelperFunctions.h"
 
+using namespace helper;
+extern HINSTANCE m_hInstResDLL;
+
 //***************************************************************************************
 
 // CTitleBar *TitleBarThis=nullptr; // Added Jef Fix
@@ -496,7 +499,7 @@ LRESULT CALLBACK CTitleBar::WndProc(HWND hwnd, UINT iMsg,
 					if (TitleBarThis->Fit == TRUE)
 						::SendMessage(TitleBarThis->Parent, tbWM_PHOTO, 0, 0);
 					else
-						yesUVNCMessageBox(TitleBarThis->Parent, _T("Function only supported in 1:1 mode"), _T("UltraVNC Viewer - Snapshot"), MB_ICONINFORMATION);
+						yesUVNCMessageBox(m_hInstResDLL, TitleBarThis->Parent, _T("Function only supported in 1:1 mode"), _T("UltraVNC Viewer - Snapshot"), MB_ICONINFORMATION);
 				if(LOWORD(wParam) == tbIDC_SWITCHMONITOR)
 					::SendMessage(TitleBarThis->Parent, tbWM_SWITCHMONITOR, 0, 0);
 

@@ -62,6 +62,10 @@
 #include "common/win32_helpers.h"
 #include "shlwapi.h"
 #include "UltraVNCHelperFunctions.h"
+
+using namespace helper;
+extern HINSTANCE m_hInstResDLL;
+
 #pragma comment(lib, "Shlwapi.lib")
 
 // [v1.0.2-jp1 fix] yak!'s File transfer patch
@@ -312,7 +316,7 @@ FileTransfer::FileTransfer(VNCviewerApp *l_pApp, ClientConnection *pCC)
     m_hRichEdit = LoadLibrary( "RICHED32.DLL" );
 	if (!m_hRichEdit)
 	{
-		yesUVNCMessageBox( NULL, sz_E1, sz_E2, MB_ICONEXCLAMATION );
+		yesUVNCMessageBox(m_hInstResDLL, NULL, sz_E1, sz_E2, MB_ICONEXCLAMATION );
     }
 	InitializeCriticalSection(&crit);
 	rfbFileHeaderRequested = false;
@@ -3994,9 +3998,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 				int nCount = ListView_GetSelectedCount(hWndLocalList);
 				if (nCount == 0 || nCount > 1)
 				{
-					yesUVNCMessageBox(	_this->hWnd,
-								sz_M1, 
-								sz_M2, MB_ICONINFORMATION);
+					yesUVNCMessageBox(m_hInstResDLL, _this->hWnd, sz_M1, sz_M2, MB_ICONINFORMATION);
 					break; 
 				}
 
@@ -4067,9 +4069,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 				int nCount = ListView_GetSelectedCount(hWndRemoteList);
 				if (nCount == 0 || nCount > 1)
 				{
-					yesUVNCMessageBox(	_this->hWnd,
-								sz_M1, 
-								sz_M2, MB_ICONINFORMATION);
+					yesUVNCMessageBox(m_hInstResDLL, _this->hWnd, sz_M1, sz_M2, MB_ICONINFORMATION);
 					break; 
 				}
 

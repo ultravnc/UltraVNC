@@ -36,6 +36,8 @@
 #include <direct.h>
 #include "Snapshot.h"
 #include "UltraVNCHelperFunctions.h"
+using namespace helper;
+extern HINSTANCE m_hInstResDLL;
 
 extern char sz_A2[64];
 extern char sz_D1[64];
@@ -468,7 +470,7 @@ inline bool SwitchMatch(LPCTSTR arg, LPCTSTR swtch) {
 }
 
 static void ArgError(LPTSTR msg) {
-	yesUVNCMessageBox(NULL, msg, sz_D1, MB_ICONSTOP);
+	yesUVNCMessageBox(m_hInstResDLL, NULL, msg, sz_D1, MB_ICONSTOP);
 }
 
 // Greatest common denominator, by Euclid
@@ -482,7 +484,7 @@ void VNCOptions::FixScaling()
 {
 	if (m_scale_num < 1 || m_scale_den < 1 || m_scale_num > 400 || m_scale_den > 100)
 	{
-		yesUVNCMessageBox(NULL, sz_D2,sz_D1,  MB_ICONWARNING);
+		yesUVNCMessageBox(m_hInstResDLL, NULL, sz_D2,sz_D1,  MB_ICONWARNING);
 		m_scale_num = 1;
 		m_scale_den = 1;
 		m_scaling = false;
@@ -1368,7 +1370,7 @@ void VNCOptions::ShowUsage(LPTSTR info) {
 			"      [/gnome] [/hideendofstreamerror]\r\n"
 			"For full details see documentation."),
 		tmpinf);
-	yesUVNCMessageBox(NULL, msg, sz_A2, MB_ICONINFORMATION);
+	yesUVNCMessageBox(m_hInstResDLL, NULL, msg, sz_A2, MB_ICONINFORMATION);
 }
 
 // The dialog box allows you to change the session-specific parameters

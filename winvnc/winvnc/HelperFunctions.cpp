@@ -42,6 +42,7 @@ HWND G_MENU_HWND = NULL;
 char* MENU_CLASS_NAME = "WinVNC Tray Icon";
 bool ClientTimerReconnect = false;
 bool allowMultipleInstances = false;
+extern HINSTANCE	hInstResDLL;
 
 void Open_homepage()
 {
@@ -319,13 +320,13 @@ DWORD MessageBoxSecure(HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT uType)
 			}
 			else if (uType & MB_YESNO) {
 				BOOL bCheckboxChecked;
-				retunvalue = helper::yesnoUVNCMessageBox(hWnd, (char*)lpCaption, (char*)lpText, "YES", "NO", "", bCheckboxChecked);
+				retunvalue = helper::yesnoUVNCMessageBox(hInstResDLL, hWnd, (char*)lpCaption, (char*)lpText, "YES", "NO", "", bCheckboxChecked);
 
 			}
 			else {
 				if (uType & MB_OK)
 					uType &= ~MB_OK;
-				helper::yesUVNCMessageBox(hWnd, (char*)lpText, (char*)lpCaption, uType);
+				helper::yesUVNCMessageBox(hInstResDLL, hWnd, (char*)lpText, (char*)lpCaption, uType);
 			}
 
 			SetThreadDesktop(old_desktop);
@@ -340,13 +341,13 @@ DWORD MessageBoxSecure(HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT uType)
 		}
 		else if (uType & MB_YESNO) {
 			BOOL bCheckboxChecked;
-			retunvalue = helper::yesnoUVNCMessageBox(hWnd, (char*)lpCaption, (char*)lpText, "YES", "NO", "", bCheckboxChecked);
+			retunvalue = helper::yesnoUVNCMessageBox(hInstResDLL, hWnd, (char*)lpCaption, (char*)lpText, "YES", "NO", "", bCheckboxChecked);
 
 		}
 		else {
 			if (uType & MB_OK)
 				uType &= ~MB_OK;
-			helper::yesUVNCMessageBox(hWnd, (char*)lpText, (char*)lpCaption, uType);
+			helper::yesUVNCMessageBox(hInstResDLL, hWnd, (char*)lpText, (char*)lpCaption, uType);
 		}
 	}
 	return retunvalue;
@@ -737,13 +738,12 @@ namespace processHelper {
 
 	BOOL GetCurrentUser(char* buffer, UINT size) // RealVNC 336 change
 	{
-		BOOL	g_impersonating_user = 0;
-		if (settings->RunningFromExternalService())
-			g_impersonating_user = TRUE;
-
+		BOOL	g_impersonating_user = FALSE;
 		// How to obtain the name of the current user depends upon the OS being used
 		if (settings->RunningFromExternalService()) {
 			// Get the current Window station
+			g_impersonating_user = TRUE;
+
 			HWINSTA station = GetProcessWindowStation();
 			if (station == NULL)
 				return FALSE;

@@ -28,6 +28,10 @@
 #include <direct.h>
 #include <fstream>
 #include "UltraVNCHelperFunctions.h"
+#include "common/win32_helpers.h"
+using namespace helper;
+extern HINSTANCE m_hInstResDLL;
+
 extern char sz_K1[64];
 extern char sz_K2[64];
 extern bool g_disable_sponsor;
@@ -68,7 +72,7 @@ void SessionDialog::SaveConnection(HWND hwnd, bool saveAs)
 				break;
 			case FNERR_INVALIDFILENAME:
 				strcpy_s(msg, sz_K1);
-				yesUVNCMessageBox(hwnd, msg, sz_K2, MB_ICONERROR);
+				yesUVNCMessageBox(m_hInstResDLL, hwnd, msg, sz_K2, MB_ICONERROR);
 				break;
 			default:
 				vnclog.Print(0, "Error %d from GetSaveFileName\n", err);

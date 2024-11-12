@@ -39,6 +39,8 @@
 #endif
 #include "AboutBox.h"
 #include "UltraVNCHelperFunctions.h"
+using namespace helper;
+extern HINSTANCE m_hInstResDLL;
 
 #define SESSION_MRU_KEY_NAME _T("Software\\ORL\\VNCviewer\\MRU")
 #define NUM_MRU_ENTRIES 8
@@ -719,13 +721,13 @@ bool SessionDialog::connect(HWND hwnd)
 				}
 				else {
 					m_pDSMPlugin->SetEnabled(false);
-					yesUVNCMessageBox(hwnd, sz_F7, sz_F6,MB_ICONEXCLAMATION);
+					yesUVNCMessageBox(m_hInstResDLL, hwnd, sz_F7, sz_F6,MB_ICONEXCLAMATION);
 					return TRUE;
 				}
 			}
 			else {
 				m_pDSMPlugin->SetEnabled(false);
-				yesUVNCMessageBox(hwnd, sz_F5, sz_F6, MB_ICONEXCLAMATION);
+				yesUVNCMessageBox(m_hInstResDLL, hwnd, sz_F5, sz_F6, MB_ICONEXCLAMATION);
 				return TRUE;
 			}
 		}
@@ -752,13 +754,13 @@ bool SessionDialog::connect(HWND hwnd)
 				}
 				else {
 					m_pDSMPlugin->SetEnabled(false);
-					yesUVNCMessageBox(hwnd, sz_F7, sz_F6, MB_ICONEXCLAMATION);
+					yesUVNCMessageBox(m_hInstResDLL, hwnd, sz_F7, sz_F6, MB_ICONEXCLAMATION);
 					return TRUE;
 				}
 			}
 			else {
 				m_pDSMPlugin->SetEnabled(false);
-				yesUVNCMessageBox(hwnd, sz_F5, sz_F6,MB_ICONEXCLAMATION);
+				yesUVNCMessageBox(m_hInstResDLL, hwnd, sz_F5, sz_F6,MB_ICONEXCLAMATION);
 				return TRUE;
 			}
 		}
