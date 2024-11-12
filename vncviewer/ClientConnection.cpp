@@ -4368,9 +4368,6 @@ void ClientConnection::Createdib()
     bi.mask.green = (CARD32)m_myFormat.greenMax << m_myFormat.greenShift;
     bi.mask.blue = (CARD32)m_myFormat.blueMax << m_myFormat.blueShift;
 
-	if (bi.bmiHeader.biSizeImage > 625000000) // this crash
-		exit(0);
-
 	if (directx_used)
 		{
 			directx_output->DestroyD3D();
@@ -4380,6 +4377,10 @@ void ClientConnection::Createdib()
 	if (m_membitmap != NULL) {DeleteObject(m_membitmap);m_membitmap= NULL;}
 	m_hmemdc = CreateCompatibleDC(m_hBitmapDC);
 	m_membitmap = CreateDIBSection(m_hmemdc, (BITMAPINFO*)&bi.bmiHeader, iUsage, &m_DIBbits, NULL, 0);
+    if (!m_DIBbits) {
+        vnclog.Print(0, _T("CreateDIBSection failed\n"));
+        throw ErrorException(_T("CreateDIBSection failed"));
+    }
 	memset((char*)m_DIBbits,128,bi.bmiHeader.biSizeImage);
 
 	{
