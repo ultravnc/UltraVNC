@@ -119,6 +119,7 @@ const rfbPixelFormat vnc8bitFormat_4Grey	= {8,6,0,1,3,3,3,4,2,0, 1, 0} ;	// 4 co
 const rfbPixelFormat vnc8bitFormat_2Grey	= {8,3,0,1,1,1,1,2,1,0, 1, 0} ;	// 2 colors-Grey Scale
 
 const rfbPixelFormat vnc16bitFormat			= {16,16,0,1,63,31,31,0,6,11, 0, 0};
+const rfbPixelFormat vnc32bitFormat			= {32,24,0,1,255,255,255,0,8,16, 0, 0};
 
 #define KEYMAP_LALT_FLAG        (KEYMAP_LALT     << 28)
 #define KEYMAP_RALT_FLAG        (KEYMAP_RALT     << 28)
@@ -4136,6 +4137,11 @@ void ClientConnection::SetupPixelFormat() {
         vnclog.Print(2, _T("Requesting 16-bit truecolour\n"));
         m_myFormat = vnc16bitFormat;
     }
+    else if (m_si.format.bitsPerPixel != 8 && m_si.format.bitsPerPixel != 16 && m_si.format.bitsPerPixel != 32)
+    {
+        vnclog.Print(2, _T("Requesting 32-bit truecolour\n"));
+        m_myFormat = vnc32bitFormat;
+    }
 	else
 	{
 		// Normally we just use the sever's format suggestion
@@ -4362,9 +4368,6 @@ void ClientConnection::Createdib()
     bi.mask.green = (CARD32)m_myFormat.greenMax << m_myFormat.greenShift;
     bi.mask.blue = (CARD32)m_myFormat.blueMax << m_myFormat.blueShift;
 
-	if (bi.bmiHeader.biSizeImage > 625000000) // this crash
-		exit(0);
-
 	if (directx_used)
 		{
 			directx_output->DestroyD3D();
@@ -4374,6 +4377,10 @@ void ClientConnection::Createdib()
 	if (m_membitmap != NULL) {DeleteObject(m_membitmap);m_membitmap= NULL;}
 	m_hmemdc = CreateCompatibleDC(m_hBitmapDC);
 	m_membitmap = CreateDIBSection(m_hmemdc, (BITMAPINFO*)&bi.bmiHeader, iUsage, &m_DIBbits, NULL, 0);
+    if (!m_DIBbits) {
+        vnclog.Print(0, _T("CreateDIBSection failed\n"));
+        throw ErrorException(_T("CreateDIBSection failed"));
+    }
 	memset((char*)m_DIBbits,128,bi.bmiHeader.biSizeImage);
 
 	{
