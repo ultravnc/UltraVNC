@@ -32,7 +32,7 @@
 #include "winvnc.h"
 #include "resource.h"
 #include "common/win32_helpers.h"
-#include "inifile.h"
+#include "common/inifile.h"
 
 #include "Localization.h" // Act : add localization on messages
 

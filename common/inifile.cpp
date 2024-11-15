@@ -23,8 +23,9 @@
 ////////////////////////////////////////////////////////////////////////////
 
 
-#include "stdhdrs.h"
+//#include "stdhdrs.h"
 #include "inifile.h"
+#pragma warning( disable : 4100 )
 
 IniFile::IniFile()
 {
@@ -40,14 +41,14 @@ IniFile::~IniFile()
 }
 
 bool
-IniFile::WriteString(char *key1, char *key2,char *value)
+IniFile::WriteString(const char*key1, const char*key2,char *value)
 {
 	//vnclog.Print(LL_INTERR, VNCLOG("%s \n"),myInifile);
 	return (FALSE != WritePrivateProfileString(key1,key2, value,myInifile));
 }
 
 bool
-IniFile::WriteInt(char *key1, char *key2,int value)
+IniFile::WriteInt(const char*key1, const char*key2,int value)
 {
 	char       buf[32];
 	wsprintf(buf, "%d", value);
@@ -58,14 +59,14 @@ IniFile::WriteInt(char *key1, char *key2,int value)
 }
 
 int
-IniFile::ReadInt(char *key1, char *key2,int Defaultvalue)
+IniFile::ReadInt(const char*key1, const char*key2,int Defaultvalue)
 {
 	//vnclog.Print(LL_INTERR, VNCLOG("%s \n"),myInifile);
 	return GetPrivateProfileInt(key1, key2, Defaultvalue, myInifile);
 }
 
 void
-IniFile::ReadString(char *key1, char *key2,char *value,int valuesize)
+IniFile::ReadString(const char*key1, const char*key2,char *value,int valuesize)
 {
 	//vnclog.Print(LL_INTERR, VNCLOG("%s \n"),myInifile);
 	GetPrivateProfileString(key1,key2, "",value,valuesize,myInifile);
@@ -92,7 +93,7 @@ IniFile::WritePassword(char *value)
 }
 
 bool 
-IniFile::WritePasswordViewOnly(char *value) 
+IniFile::WritePasswordViewOnly(char*value)
 { 
 	if (strlen(value) == 0)
 		return (FALSE != WritePrivateProfileStruct("UltraVNC", "passwd2", NULL, 8, myInifile));

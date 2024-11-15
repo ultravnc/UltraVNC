@@ -26,9 +26,6 @@
 #if (!defined(_WINVNC_INIFILE))
 #define _WINVNC_INIFILE
 
-bool Copy_to_Temp(char *tempfile);
-bool Copy_to_Secure_from_temp(char *tempfile);
-
 #ifndef SC_20
 	#define INIFILE_NAME "ultravnc.ini"
 #else
@@ -48,12 +45,12 @@ public:
 
 	IniFile();
 	~IniFile();
-	bool WriteString(char *key1, char *key2,char *value);
-	bool WritePassword(char *value);
-	bool WritePasswordViewOnly(char *value); //PGM
-	bool WriteInt(char *key1, char *key2,int value);
-	int ReadInt(char *key1, char *key2,int Defaultvalue);
-	void ReadString(char *key1, char *key2,char *value,int valuesize);
+	bool WriteString(const char*key1, const char*key2,char *value);
+	bool WritePassword(char*value);
+	bool WritePasswordViewOnly(char*value); //PGM
+	bool WriteInt(const char*key1, const char*key2,int value);
+	int ReadInt(const char*key1, const char*key2,int Defaultvalue);
+	void ReadString(const char*key1, const char*key2,char *value,int valuesize);
 	void ReadPassword(char *value,int valuesize);
 	void ReadPasswordViewOnly(char *value,int valuesize); //PGM
 

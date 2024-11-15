@@ -33,7 +33,7 @@
 // Marscha@2004 - authSSP: from stdhdrs.h, required for logging
 #include "vnclog.h"
 extern VNCLog vnclog;
-#include "inifile.h"
+#include "common/inifile.h"
 
 // Marscha@2004 - authSSP: end of change
 
