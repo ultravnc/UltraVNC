@@ -25,7 +25,7 @@
 
 #include <algorithm>
 #include "stdhdrs.h"
-#include "inifile.h"
+#include "common/inifile.h"
 #include <cctype>
 #include <cassert>
 #include "UltraVNCService.h"

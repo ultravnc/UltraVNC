@@ -31,7 +31,7 @@
 #include "stdhdrs.h"
 #include <io.h>
 #include "vnclog.h"
-#include "inifile.h"
+#include "common/inifile.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

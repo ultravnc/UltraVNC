@@ -25,7 +25,7 @@
 
 #pragma once
 #include "stdhdrs.h"
-#include "inifile.h"
+#include "common/inifile.h"
 #include "rfb.h"
 
 #define MAXPWLEN 8
