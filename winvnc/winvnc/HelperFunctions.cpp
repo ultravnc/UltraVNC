@@ -792,32 +792,45 @@ namespace processHelper {
 
 	BOOL CurrentUser(char* buffer, UINT size)
 	{
+		// Attempt to get the current user
 		BOOL result = GetCurrentUser(buffer, size);
+
+		// If no user is logged in, and we're not running as an external service
 		if (result && (strcmp(buffer, "") == 0) && !settings->RunningFromExternalService()) {
-			strncpy_s(buffer, size, "Default", size);
+			// Ensure buffer has enough space for "Default" + null terminator
+			if (size >= sizeof("Default")) {
+				strncpy_s(buffer, size, "Default", _TRUNCATE);  // Set buffer to "Default" safely
+			}
 		}
+
 		return result;
 	}
 
 	bool IsServiceInstalled()
 	{
-		BOOL bResult = FALSE;
+		bool serviceInstalled = false;
+
 #ifndef SC_20
-		SC_HANDLE hSCM = ::OpenSCManager(NULL, // local machine
-			NULL, // ServicesActive database
-			SC_MANAGER_ENUMERATE_SERVICE); // full access
+		// Open the Service Control Manager with permission to enumerate services
+		SC_HANDLE hSCM = ::OpenSCManager(nullptr, nullptr, SC_MANAGER_ENUMERATE_SERVICE);
 		if (hSCM) {
-			SC_HANDLE hService = ::OpenService(hSCM,
-				UltraVNCService::service_name,
-				SERVICE_QUERY_CONFIG);
+			// Attempt to open the specified service with query configuration access
+			SC_HANDLE hService = ::OpenService(hSCM, UltraVNCService::service_name, SERVICE_QUERY_CONFIG);
 			if (hService) {
-				bResult = TRUE;
+				serviceInstalled = true;
 				::CloseServiceHandle(hService);
+			}
+			else {
+				vnclog.Print(LL_INTERR, "Service not found: %s\n", UltraVNCService::service_name);
 			}
 			::CloseServiceHandle(hSCM);
 		}
+		else {
+			vnclog.Print(LL_INTERR, "Failed to open Service Control Manager\n");
+		}
 #endif // SC_20
-		return (FALSE != bResult);
+
+		return serviceInstalled;
 	}
 
 	DWORD GetCurrentConsoleSessionID()
