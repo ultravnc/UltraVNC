@@ -27,6 +27,8 @@
 #include "VNCviewerApp.h"
 #include "Exception.h"
 #include "UltraVNCHelperFunctions.h"
+#include "common/win32_helpers.h"
+using namespace helper;
 extern char sz_A2[64];
 extern char sz_B1[64];
 extern char sz_B2[64];
@@ -72,7 +74,7 @@ VNCviewerApp::VNCviewerApp(HINSTANCE hInstance, LPTSTR szCmdLine) {
 	WORD wVersionRequested = MAKEWORD(2, 0);
 	WSADATA wsaData;
 	if (WSAStartup(wVersionRequested, &wsaData) != 0) {
-		yesUVNCMessageBox(NULL, sz_B1, sz_A2, MB_ICONSTOP);
+		yesUVNCMessageBox(m_hInstResDLL, NULL, sz_B1, sz_A2, MB_ICONSTOP);
 		PostQuitMessage(1);
 	}
 	vnclog.Print(3, _T("Started and Winsock (v %d) initialised\n"), wsaData.wVersion);
@@ -94,7 +96,7 @@ void VNCviewerApp::RegisterConnection(ClientConnection *pConn) {
 	}
 	// If we've got here, something is wrong.
 	vnclog.Print(-1, _T("Client list overflow!\n"));
-	yesUVNCMessageBox(NULL, sz_B2, sz_B3,MB_ICONSTOP);
+	yesUVNCMessageBox(m_hInstResDLL, NULL, sz_B2, sz_B3,MB_ICONSTOP);
 	PostQuitMessage(1);
 
 }

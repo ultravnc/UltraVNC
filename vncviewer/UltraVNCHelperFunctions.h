@@ -62,8 +62,6 @@ extern char str50295[128];
 extern char str50296[128];
 extern char str50297[128];
 
-bool yesnoUVNCMessageBox(HWND m_hWnd, char* szHeader, char* body, char* okStr, char* cancelStr, char* checkbox, BOOL &bCheckboxChecked);
-void yesUVNCMessageBox(HWND m_hWnd, char* body, char* szHeader, int icon);
 void loadStrings(HINSTANCE m_hInstResDLL);
 char* GetVersionFromResource(char* version);
 #endif

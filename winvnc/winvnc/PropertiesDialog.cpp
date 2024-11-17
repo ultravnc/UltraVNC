@@ -819,8 +819,7 @@ BOOL PropertiesDialog::Init(vncServer* server)
 // Dialog box handling functions
 void PropertiesDialog::ShowImpersonateDialog()
 {
-	DesktopUsersToken desktopUsersToken;
-	HANDLE hPToken = desktopUsersToken.getDesktopUsersToken();
+	HANDLE hPToken = DesktopUsersToken::getInstance()->getDesktopUsersToken();
 	int iImpersonateResult = 0;
 	if (hPToken) {
 		if (!ImpersonateLoggedOnUser(hPToken))
@@ -1181,8 +1180,7 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 		// else call "old" dialog.
 		BOOL bNewMSLogonChecked = (SendDlgItemMessage(hwnd, IDC_NEW_MSLOGON, BM_GETCHECK, 0, 0) == BST_CHECKED);
 		if (bNewMSLogonChecked) {
-			DesktopUsersToken desktopUsersToken;
-			HANDLE hPToken = desktopUsersToken.getDesktopUsersToken();
+			HANDLE hPToken = DesktopUsersToken::getInstance()->getDesktopUsersToken();
 			if (!hPToken)
 				break;
 
@@ -1985,8 +1983,7 @@ void PropertiesDialog::onCancel(HWND hwnd)
 
 void PropertiesDialog::Secure_Save_Plugin_Config(char* szPlugin)
 {
-	DesktopUsersToken desktopUsersToken;
-	HANDLE hPToken = desktopUsersToken.getDesktopUsersToken();
+	HANDLE hPToken = DesktopUsersToken::getInstance()->getDesktopUsersToken();
 	if (!hPToken)
 		return;
 

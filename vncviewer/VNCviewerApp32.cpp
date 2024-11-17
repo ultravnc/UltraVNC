@@ -27,6 +27,10 @@
 #include "vncviewer.h"
 #include "Exception.h"
 #include "UltraVNCHelperFunctions.h"
+#include "common/win32_helpers.h"
+using namespace helper;
+extern HINSTANCE m_hInstResDLL;
+
 extern char sz_A1[64];
 extern char sz_A2[64];
 extern char sz_A3[64];
@@ -46,8 +50,7 @@ VNCviewerApp32::VNCviewerApp32(HINSTANCE hInstance, PSTR szCmdLine) :
 		HKL hkl = LoadKeyboardLayout(  m_options.m_kbdname, 
 			KLF_ACTIVATE | KLF_REPLACELANG | KLF_REORDER  );
 		if (hkl == NULL) {
-			yesUVNCMessageBox(NULL, sz_A1, 
-				sz_A2, MB_ICONSTOP);
+			yesUVNCMessageBox(m_hInstResDLL, NULL, sz_A1, sz_A2, MB_ICONSTOP);
 			exit(1);
 		}
 	}
@@ -63,7 +66,7 @@ VNCviewerApp32::VNCviewerApp32(HINSTANCE hInstance, PSTR szCmdLine) :
 			char msg[1024];
 			sprintf_s(msg,"%s (%s)\n\r%s",sz_A3,
 				e.m_info, sz_A4);
-			yesUVNCMessageBox(NULL, msg, sz_A5, MB_ICONSTOP);
+			yesUVNCMessageBox(m_hInstResDLL, NULL, msg, sz_A5, MB_ICONSTOP);
 			exit(1);
 		}
 		

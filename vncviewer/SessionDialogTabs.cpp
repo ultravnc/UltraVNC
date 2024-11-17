@@ -28,6 +28,9 @@
 #include "common/win32_helpers.h"
 #include "UltraVNCHelperFunctions.h"
 
+using namespace helper;
+extern HINSTANCE m_hInstResDLL;
+
 BOOL CALLBACK DlgProcEncoders(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DlgProcKeyboardMouse(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DlgProcDisplay(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -538,7 +541,7 @@ BOOL CALLBACK DlgProcSecurity(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 				}
 				else
 				{
-					yesUVNCMessageBox(hwnd, sz_F1, sz_F3, MB_ICONEXCLAMATION);
+					yesUVNCMessageBox(m_hInstResDLL, hwnd, sz_F1, sz_F3, MB_ICONEXCLAMATION);
 				}
 			}
 			return TRUE;
@@ -1485,7 +1488,7 @@ void SessionDialog::FixScaling()
 {
 	if (scale_num < 1 || scale_den < 1 || scale_num > 400 || scale_den > 100)
 	{
-		yesUVNCMessageBox(NULL, sz_D2, sz_D1, MB_ICONWARNING);
+		yesUVNCMessageBox(m_hInstResDLL, NULL, sz_D2, sz_D1, MB_ICONWARNING);
 		scale_num = 1;
 		scale_den = 1;
 		scaling = false;

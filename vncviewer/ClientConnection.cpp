@@ -64,10 +64,14 @@ extern "C" {
 #include <lmaccess.h>
 #include <lmat.h>
 #include <lmalert.h>
+#include "common/win32_helpers.h"
+using namespace helper;
+
 #ifdef _CLOUD
 #include "../UdtCloudlib/proxy/Cloudthread.h"
 #endif
 #include "UltraVNCHelperFunctions.h"
+extern HINSTANCE m_hInstResDLL;
 
 // [v1.0.2-jp1 fix]
 #pragma comment(lib, "imm32.lib")
@@ -81,6 +85,7 @@ extern "C" {
 #define VWR_WND_CLASS_NAME _T("VNCviewer")
 #define VWR_WND_CLASS_NAME_VIEWER _T("VNCviewerwindow")
 #define SESSION_MRU_KEY_NAME _T("Software\\ORL\\VNCviewer\\MRU")
+
 
 const UINT FileTransferSendPacketMessage = RegisterWindowMessage("UltraVNC.Viewer.FileTransferSendPacketMessage");
 extern bool g_passwordfailed;
@@ -119,6 +124,7 @@ const rfbPixelFormat vnc8bitFormat_4Grey	= {8,6,0,1,3,3,3,4,2,0, 1, 0} ;	// 4 co
 const rfbPixelFormat vnc8bitFormat_2Grey	= {8,3,0,1,1,1,1,2,1,0, 1, 0} ;	// 2 colors-Grey Scale
 
 const rfbPixelFormat vnc16bitFormat			= {16,16,0,1,63,31,31,0,6,11, 0, 0};
+const rfbPixelFormat vnc32bitFormat			= {32,24,0,1,255,255,255,0,8,16, 0, 0};
 
 #define KEYMAP_LALT_FLAG        (KEYMAP_LALT     << 28)
 #define KEYMAP_RALT_FLAG        (KEYMAP_RALT     << 28)
@@ -1672,18 +1678,14 @@ void ClientConnection::LoadDSMPlugin(bool fForceReload)
 				else
 				{
 					m_pDSMPlugin->SetEnabled(false);
-					yesUVNCMessageBox(m_hwndMain,
-						sz_F1,
-						sz_F6, MB_ICONEXCLAMATION);
+					yesUVNCMessageBox(m_hInstResDLL, m_hwndMain, sz_F1, sz_F6, MB_ICONEXCLAMATION);
 					return;
 				}
 			}
 			else
 			{
 				m_pDSMPlugin->SetEnabled(false);
-				yesUVNCMessageBox(m_hwndMain,
-					sz_F5,
-					sz_F6,MB_ICONEXCLAMATION);
+				yesUVNCMessageBox(m_hInstResDLL, m_hwndMain, sz_F5, sz_F6,MB_ICONEXCLAMATION);
 				return;
 			}
 		}
@@ -2586,7 +2588,7 @@ void ClientConnection::NegotiateProtocolVersion()
 			{
 				//adzm 2009-07-19 - Auto-accept the connection if it is unencrypted if that option is specified
 				BOOL bCheckboxChecked;
-				bool  yes = yesnoUVNCMessageBox(m_hwndMain, str50275, str50276, str50277, str50278, str50279, bCheckboxChecked);
+				bool  yes = yesnoUVNCMessageBox(m_hInstResDLL, m_hwndMain, str50275, str50276, str50277, str50278, str50279, bCheckboxChecked);
 				if (!yes)
 				{
 					throw WarningException("You refused the insecure connection.");
@@ -2718,7 +2720,7 @@ void ClientConnection::NegotiateProtocolVersion()
 		//adzm 2009-06-21 - auto-accept if specified
 		if (!m_opts->m_fAutoAcceptIncoming) {
 			BOOL bCheckboxChecked;
-			int yes= yesnoUVNCMessageBox(m_hwndMain, str50282, mytext, str50280, str50281, "", bCheckboxChecked);
+			int yes= yesnoUVNCMessageBox(m_hInstResDLL, m_hwndMain, str50282, mytext, str50280, str50281, "", bCheckboxChecked);
 			if (!yes)
 			{
 				int nummer=0;
@@ -2979,7 +2981,7 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 			//adzm 2009-07-19 - Auto-accept the connection if it is unencrypted if that option is specified
 			if (!m_opts->m_fAutoAcceptNoDSM) {
 				BOOL bCheckboxChecked;
-				bool  yes = yesnoUVNCMessageBox(m_hwndMain, str50275, str50276, str50277, str50278, str50279, bCheckboxChecked);
+				bool  yes = yesnoUVNCMessageBox(m_hInstResDLL, m_hwndMain, str50275, str50276, str50277, str50278, str50279, bCheckboxChecked);
 				if (!yes)
 				{
 					throw WarningException("You refused the insecure connection.");
@@ -3045,7 +3047,7 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 		vnclog.Print(0, _T("No authentication needed\n"));
 		BOOL bCheckboxChecked;
 		if (!m_Is_Listening && !m_pApp->m_options.m_AllowUntrustedServers  && 
-			yesnoUVNCMessageBox(m_hwndMain, str50286, str50283, str50284, str50285, str50279, bCheckboxChecked) == false) 
+			yesnoUVNCMessageBox(m_hInstResDLL, m_hwndMain, str50286, str50283, str50284, str50285, str50279, bCheckboxChecked) == false)
 		{
 			throw WarningException("You refused a untrusted server.");
 		}
@@ -3584,7 +3586,7 @@ void ClientConnection::AuthVnc()
 	{
 		/* if server is 3.2 we can't use the new authentication */
 		vnclog.Print(0, _T("Can't use IDEA authentication\n"));
-		yesUVNCMessageBox(m_hwndMain,sz_L51, sz_L52, MB_ICONSTOP);
+		yesUVNCMessageBox(m_hInstResDLL, m_hwndMain,sz_L51, sz_L52, MB_ICONSTOP);
 		throw WarningException("Can't use IDEA authentication any more!");
 	}
 	// rdv@2002 - v1.1.x
@@ -3659,7 +3661,7 @@ void ClientConnection::AuthSCPrompt()
 	int accepted = 0;
 	BOOL bCheckboxChecked;
 	if (!m_opts->m_fAutoAcceptIncoming) {
-		int yes = yesnoUVNCMessageBox( m_hwndMain, str50282, mytext, str50280, str50281, "", bCheckboxChecked);
+		int yes = yesnoUVNCMessageBox(m_hInstResDLL, m_hwndMain, str50282, mytext, str50280, str50281, "", bCheckboxChecked);
 		if (!yes)
 		{
 			accepted = 1;
@@ -3736,7 +3738,7 @@ void ClientConnection::ReadServerInit(bool reconnect)
 	m_desktopName_viewonly = new TCHAR[2024];
 	if (m_si.nameLength > 2024) {
 		BOOL bCheckboxChecked;
-		bool yes = yesnoUVNCMessageBox(NULL, str50289, str50290, str50293, str50294, "", bCheckboxChecked);
+		bool yes = yesnoUVNCMessageBox(m_hInstResDLL, NULL, str50289, str50290, str50293, str50294, "", bCheckboxChecked);
 		if (!yes)
 			exit(0);
 		m_si.nameLength = 2024;
@@ -4136,6 +4138,11 @@ void ClientConnection::SetupPixelFormat() {
         vnclog.Print(2, _T("Requesting 16-bit truecolour\n"));
         m_myFormat = vnc16bitFormat;
     }
+    else if (m_si.format.bitsPerPixel != 8 && m_si.format.bitsPerPixel != 16 && m_si.format.bitsPerPixel != 32)
+    {
+        vnclog.Print(2, _T("Requesting 32-bit truecolour\n"));
+        m_myFormat = vnc32bitFormat;
+    }
 	else
 	{
 		// Normally we just use the sever's format suggestion
@@ -4362,9 +4369,6 @@ void ClientConnection::Createdib()
     bi.mask.green = (CARD32)m_myFormat.greenMax << m_myFormat.greenShift;
     bi.mask.blue = (CARD32)m_myFormat.blueMax << m_myFormat.blueShift;
 
-	if (bi.bmiHeader.biSizeImage > 625000000) // this crash
-		exit(0);
-
 	if (directx_used)
 		{
 			directx_output->DestroyD3D();
@@ -4374,6 +4378,10 @@ void ClientConnection::Createdib()
 	if (m_membitmap != NULL) {DeleteObject(m_membitmap);m_membitmap= NULL;}
 	m_hmemdc = CreateCompatibleDC(m_hBitmapDC);
 	m_membitmap = CreateDIBSection(m_hmemdc, (BITMAPINFO*)&bi.bmiHeader, iUsage, &m_DIBbits, NULL, 0);
+    if (!m_DIBbits) {
+        vnclog.Print(0, _T("CreateDIBSection failed\n"));
+        throw ErrorException(_T("CreateDIBSection failed"));
+    }
 	memset((char*)m_DIBbits,128,bi.bmiHeader.biSizeImage);
 
 	{
@@ -5282,7 +5290,7 @@ void ClientConnection::ShowConnInfo()
 		kbdname,
 		m_pDSMPlugin->IsEnabled() ? m_pDSMPlugin->GetPluginName() : "",
 		m_pDSMPlugin->IsEnabled() ? m_pDSMPlugin->GetPluginVersion() : "");
-	yesUVNCMessageBox(m_hwndMain, buf, _T("UltraVNC Viewer - Connection Informations"), MB_ICONINFORMATION);
+	yesUVNCMessageBox(m_hInstResDLL, m_hwndMain, buf, _T("UltraVNC Viewer - Connection Informations"), MB_ICONINFORMATION);
 }
 
 // ********************************************************************
@@ -5499,7 +5507,7 @@ void* ClientConnection::run_undetached(void* arg) {
 				m_pTextChat->m_fTextChatRunning = false;
 				m_pFileTransfer->m_fFileTransferRunning = false;
 				m_bKillThread = true;
-				yesUVNCMessageBox(m_hwndMain, str50295, str50296, MB_ICONEXCLAMATION);
+				yesUVNCMessageBox(m_hInstResDLL, m_hwndMain, str50295, str50296, MB_ICONEXCLAMATION);
 				PostMessage(m_hwndMain, WM_CLOSE, 0, 1);
 				return this;
 			}
@@ -5532,7 +5540,7 @@ void* ClientConnection::run_undetached(void* arg) {
 					m_pTextChat->m_fTextChatRunning = false;
 					m_pFileTransfer->m_fFileTransferRunning = false;
 					m_bKillThread = true;
-					yesUVNCMessageBox(m_hwndMain, str50295, str50296,  MB_ICONEXCLAMATION);
+					yesUVNCMessageBox(m_hInstResDLL, m_hwndMain, str50295, str50296,  MB_ICONEXCLAMATION);
 					PostMessage(m_hwndMain, WM_CLOSE, 0, 1);
 					return this;
 				}
@@ -7294,7 +7302,7 @@ void ClientConnection::ReadNewFBSize(rfbFramebufferUpdateRectHeader *pfburh)
 
 	if (m_si.framebufferWidth > 20000 || m_si.framebufferHeight > 20000) { // a screensize > 20 000 is not possible with current OS
 		BOOL somebool;
-		bool yes = yesnoUVNCMessageBox(NULL, str50297, str50290, str50293, str50294, "",somebool);
+		bool yes = yesnoUVNCMessageBox(m_hInstResDLL, NULL, str50297, str50290, str50293, str50294, "",somebool);
 		if (!yes)
 			exit(0);
 		m_si.framebufferWidth = 1024;
@@ -8264,8 +8272,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						// Check if the Server knows File Transfer
 						if (!_this->m_fServerKnowsFileTransfer)
 						{
-							yesUVNCMessageBox(hwnd, sz_L77,
-								sz_L78, MB_ICONINFORMATION);
+							yesUVNCMessageBox(m_hInstResDLL, hwnd, sz_L77, sz_L78, MB_ICONINFORMATION);
 							return 0;
 						}
 						// Don't call File Transfer GUI is already open!
@@ -8277,10 +8284,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						if (_this->m_pTextChat->m_fTextChatRunning)
 						{
 							_this->m_pTextChat->ShowChatWindow(true);
-							yesUVNCMessageBox(	hwnd,
-										sz_L86,
-										sz_L88,
-										MB_ICONSTOP);
+							yesUVNCMessageBox(m_hInstResDLL, hwnd, sz_L86, sz_L88, MB_ICONSTOP);
 							return 0;
 						}
 
@@ -8302,8 +8306,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						// Check if the Server knows File Transfer
 						if (!_this->m_fServerKnowsFileTransfer)
 						{
-							yesUVNCMessageBox(hwnd, sz_L81,
-								sz_L82,MB_ICONINFORMATION);
+							yesUVNCMessageBox(m_hInstResDLL, hwnd, sz_L81, sz_L82,MB_ICONINFORMATION);
 							return 0;
 						}
 						if (_this->m_pTextChat->m_fTextChatRunning)
@@ -8314,10 +8317,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						if (_this->m_pFileTransfer->m_fFileTransferRunning)
 						{
 							_this->m_pFileTransfer->ShowFileTransferWindow(true);
-							yesUVNCMessageBox(hwnd,
-										sz_L85,
-										sz_L88,
-										MB_ICONSTOP);
+							yesUVNCMessageBox(m_hInstResDLL, hwnd, sz_L85, sz_L88, MB_ICONSTOP);
 							return 0;
 						}
 						_this->m_pTextChat->m_fTextChatRunning = true;
@@ -8593,9 +8593,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
     							return 0;
                             }
 							_this->m_pFileTransfer->ShowFileTransferWindow(true);
-							yesUVNCMessageBox(hwnd, sz_L85,
-								sz_L88,
-								MB_ICONSTOP);
+							yesUVNCMessageBox(m_hInstResDLL, hwnd, sz_L85, sz_L88, MB_ICONSTOP);
 							return 0;
 						}
 
@@ -8609,17 +8607,13 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
                             }
 
 							_this->m_pTextChat->ShowChatWindow(true);
-							yesUVNCMessageBox(hwnd, sz_L86,
-								sz_L88,
-								MB_ICONSTOP);
+							yesUVNCMessageBox(m_hInstResDLL, hwnd, sz_L86, sz_L88, MB_ICONSTOP);
 							return 0;
 						}
 
 						if (_this->m_fOptionsOpen)
 						{
-							yesUVNCMessageBox(hwnd, sz_L87,
-								sz_L88,
-								MB_ICONSTOP);
+							yesUVNCMessageBox(m_hInstResDLL, hwnd, sz_L87, sz_L88, MB_ICONSTOP);
 							return 0;
 						}
 
@@ -9437,9 +9431,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 					if (_this->m_pFileTransfer->m_fFileTransferRunning)
 					{
 						_this->m_pFileTransfer->ShowFileTransferWindow(true);
-						yesUVNCMessageBox(hwnd, sz_L85,
-							sz_L88,
-							MB_ICONSTOP);
+						yesUVNCMessageBox(m_hInstResDLL, hwnd, sz_L85, sz_L88, MB_ICONSTOP);
 						return 0;
 					}
 
@@ -9447,17 +9439,13 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 					if (_this->m_pTextChat->m_fTextChatRunning)
 					{
 						_this->m_pTextChat->ShowChatWindow(true);
-						yesUVNCMessageBox(hwnd, sz_L86,
-							sz_L88,
-							MB_ICONSTOP);
+						yesUVNCMessageBox(m_hInstResDLL, hwnd, sz_L86, sz_L88, MB_ICONSTOP);
 						return 0;
 					}
 
 					if (_this->m_fOptionsOpen)
 					{
-						yesUVNCMessageBox(hwnd, sz_L87,
-							sz_L88,
-							MB_ICONSTOP);
+						yesUVNCMessageBox(m_hInstResDLL, hwnd, sz_L87, sz_L88, MB_ICONSTOP);
 						return 0;
 					}
 
@@ -10002,7 +9990,7 @@ BOOL CALLBACK DialogProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 
 				  if(iSlected==-1)
 				  {
-                   yesUVNCMessageBox(hWnd,"No Items in ListView","Error",MB_ICONINFORMATION);
+                   yesUVNCMessageBox(m_hInstResDLL, hWnd,"No Items in ListView","Error",MB_ICONINFORMATION);
 					break;
 				  }
 
@@ -10021,7 +10009,7 @@ BOOL CALLBACK DialogProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 
 					if(iSelect==-1)
 					{
-                      yesUVNCMessageBox(hWnd,"No VNC Server selected","Error",MB_ICONINFORMATION);
+                      yesUVNCMessageBox(m_hInstResDLL, hWnd,"No VNC Server selected","Error",MB_ICONINFORMATION);
 					  break;
 					}
 					flag=1;
@@ -10119,7 +10107,7 @@ BOOL CALLBACK DialogProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 						  iSlected=SendMessage(hList,LVM_GETNEXTITEM,-1,LVNI_FOCUSED);
 						  if(iSlected==-1)
 						  {
-							yesUVNCMessageBox(hWnd,"No Items in ListView","Error",MB_ICONINFORMATION);
+							yesUVNCMessageBox(m_hInstResDLL, hWnd,"No Items in ListView","Error",MB_ICONINFORMATION);
 							break;
 						  }
 						EndDialog(hWnd,iSlected+1); // kill dialog
@@ -10321,7 +10309,7 @@ void ClientConnection::checkParemeters()
 {
 	if (m_si.framebufferWidth > 20000 || m_si.framebufferHeight > 20000) { // a screensize > 20 000 is not possible with current OS
 		BOOL somebool;
-		bool yes = yesnoUVNCMessageBox(NULL, str50297, str50290, str50293, str50294, "", somebool);
+		bool yes = yesnoUVNCMessageBox(m_hInstResDLL, NULL, str50297, str50290, str50293, str50294, "", somebool);
 		if (!yes)
 			exit(0);
 		m_si.framebufferWidth = 1024;

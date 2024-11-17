@@ -36,8 +36,11 @@ public:
 class DesktopUsersToken {
 private:
 	HANDLE hProcess, hPToken;
-public:
 	DesktopUsersToken();
+	static DesktopUsersToken* instance;
+	DWORD dwExplorerLogonPid = 0;
+public:
+	static DesktopUsersToken* getInstance();
 	~DesktopUsersToken();
 	HANDLE getDesktopUsersToken();
 };

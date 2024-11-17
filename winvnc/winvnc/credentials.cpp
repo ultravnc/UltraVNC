@@ -30,6 +30,8 @@
 #include "SettingsManager.h"
 #include "credentials.h"
 
+DesktopUsersToken* DesktopUsersToken::instance = nullptr;
+
 DWORD Credentials::GetCurrentUserToken(HANDLE& process, HANDLE& Token)
 {
 	if (!settings->RunningFromExternalService()) {
@@ -130,24 +132,17 @@ bool Credentials::RunningAsAdministrator()
 	return (FALSE != fAdmin);
 }
 
+DesktopUsersToken* DesktopUsersToken::getInstance() {
+	if (instance == nullptr) {
+		instance = new DesktopUsersToken();
+	}
+	return instance;
+}
+
 DesktopUsersToken::DesktopUsersToken()
 {
 	hProcess = NULL;
 	hPToken = NULL;
-	DWORD dwExplorerLogonPid = processHelper::GetExplorerLogonPid();
-	vnclog.Print(LL_INTWARN, VNCLOG("GetExplorerLogonPid %i\n"), dwExplorerLogonPid);
-	if (dwExplorerLogonPid != 0) {
-		hProcess = OpenProcess(MAXIMUM_ALLOWED, FALSE, dwExplorerLogonPid);
-		if (hProcess == NULL) {
-			vnclog.Print(LL_INTWARN, VNCLOG("DesktopUsersToken failed OpenProcess error %i\n"), GetLastError());
-			return;
-		}
-		if(!OpenProcessToken(hProcess, TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY
-			| TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY | TOKEN_ADJUST_SESSIONID
-			| TOKEN_READ | TOKEN_WRITE, &hPToken)) {
-			vnclog.Print(LL_INTWARN, VNCLOG("OpenProcessToken failed  %i\n"), GetLastError());
-		}
-	}
 }
 
 DesktopUsersToken::~DesktopUsersToken()
@@ -160,5 +155,22 @@ DesktopUsersToken::~DesktopUsersToken()
 
 HANDLE DesktopUsersToken::getDesktopUsersToken()
 {
+	DWORD explorerLogonPid = processHelper::GetExplorerLogonPid();
+	
+	if (explorerLogonPid != 0 && dwExplorerLogonPid != explorerLogonPid) {
+		vnclog.Print(LL_INTWARN, VNCLOG("GetExplorerLogonPid %i\n"), explorerLogonPid);
+		hProcess = OpenProcess(MAXIMUM_ALLOWED, FALSE, explorerLogonPid);
+		if (hProcess == NULL) {
+			vnclog.Print(LL_INTWARN, VNCLOG("DesktopUsersToken failed OpenProcess error %i\n"), GetLastError());
+			return NULL;
+		}
+		if (!OpenProcessToken(hProcess, TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY
+			| TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY | TOKEN_ADJUST_SESSIONID
+			| TOKEN_READ | TOKEN_WRITE, &hPToken)) {
+			vnclog.Print(LL_INTWARN, VNCLOG("OpenProcessToken failed  %i\n"), GetLastError());
+			return NULL;
+		}
+	}
+	dwExplorerLogonPid = explorerLogonPid;
 	return hPToken;
 }

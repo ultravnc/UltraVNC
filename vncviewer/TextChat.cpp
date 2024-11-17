@@ -32,6 +32,8 @@
 #include <rdr/Exception.h>
 #include "UltraVNCHelperFunctions.h"
 
+using namespace helper;
+
 #define TEXTMAXSIZE 16384
 #define MAXNAMESIZE	128 // MAX_COMPUTERNAME_LENGTH+1 (32)
 #define CHAT_OPEN  -1 // Todo; put these codes in rfbproto.h
@@ -88,8 +90,7 @@ TextChat::TextChat(VNCviewerApp *pApp, ClientConnection *pCC)
 	m_hRichEdit = LoadLibrary( "RICHED32.DLL" );
 	if (!m_hRichEdit)
 	{  
-		yesUVNCMessageBox( NULL, sz_E1,
-					sz_E2, MB_ICONEXCLAMATION );
+		yesUVNCMessageBox(m_hInstResDLL, NULL, sz_E1, sz_E2, MB_ICONEXCLAMATION );
 		// Todo: do normal edit instead (no colors)
 	}
 
