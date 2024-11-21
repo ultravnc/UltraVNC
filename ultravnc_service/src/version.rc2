@@ -1,0 +1,49 @@
+﻿//
+// Version
+//
+
+#include "../../common/versionService.inc"
+
+#define STR(value) #value
+#define STRINGIZE(value) STR(value)
+#define APS_FULLVERSION_STR \
+  STRINGIZE(APS_MAJORNUMBER) "." \
+  STRINGIZE(APS_MINORNUMBER) "." \
+  STRINGIZE(APS_BUILDNUMBER) "." \
+  STRINGIZE(APS_MODIFICATIONNUMBER)
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION APS_MAJORNUMBER, APS_MINORNUMBER, APS_BUILDNUMBER, APS_MODIFICATIONNUMBER
+PRODUCTVERSION APS_MAJORNUMBER, APS_MINORNUMBER, APS_BUILDNUMBER, APS_MODIFICATIONNUMBER
+FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+FILEFLAGS 0x29L
+#else
+FILEFLAGS 0x28L
+#endif
+FILEOS 0x4L
+FILETYPE 0x1L
+FILESUBTYPE 0x0L
+
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "000004b0"
+        BEGIN
+            VALUE "Comments", "UltraVNC Server enables remote connectivity to this machine using the VNC/RFB protocol"
+            VALUE "CompanyName", "uvnc bvba"
+            VALUE "FileDescription", "UltraVNC Server - Service Manager"
+            VALUE "FileVersion", APS_FULLVERSION_STR
+            VALUE "InternalName", "ultravnc_service.exe"
+            VALUE "LegalCopyright", "Copyright © 2002-" STRINGIZE(APS_DATEYEAR) " UltraVNC Team Members. All Rights Reserved."
+            VALUE "OriginalFilename", "ultravnc_service.exe"
+            VALUE "ProductName", "UltraVNC Server - Service Manager"
+            VALUE "ProductVersion", APS_FULLVERSION_STR
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0, 1200
+    END
+END
+
