@@ -27,7 +27,7 @@
 // vncSetAuth
 
 // Object implementing the About dialog for UltraVNC Server.
-#include "inifile.h"
+#include "common/inifile.h"
 class vncSetAuth;
 
 #if (!defined(_WINVNC_VNCSETAUTH))

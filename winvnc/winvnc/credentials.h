@@ -39,8 +39,12 @@ private:
 	DesktopUsersToken();
 	static DesktopUsersToken* instance;
 	DWORD dwExplorerLogonPid = 0;
+	char username[257]{};
+	HANDLE save_hPtoken = 0;
+
 public:
 	static DesktopUsersToken* getInstance();
 	~DesktopUsersToken();
 	HANDLE getDesktopUsersToken();
+	bool GetConsoleUser(char* buffer, UINT size);
 };
