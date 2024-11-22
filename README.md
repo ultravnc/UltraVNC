@@ -25,9 +25,9 @@ VNC, the Remote Frame Buffer protocol (RFB) allows a desktop to be viewed and co
 
 ### Supported operating systems
 - 🔗 Windows 95**, 98**, Me**, NT4**: latest version: https://uvnc.eu/download/102/
-- 🔗 Windows 2000: latest w2k version: https://uvnc.eu/download/1215/Ultravnc_w2k_1215.zip
-- 🔗 Windows XP, 2003, Windows Server 2003, Vista, Server 2003 R2, Server 2008: latest version: https://uvnc.com/downloads/ultravnc/129-download-ultravnc-1231.html
-- 🔗 Windows 7, 8, 8.1, 10, 11, Server 2008 R2, Server 2012, Server 2012 R2, Server 2016, Server 2019, Server 2022 current version: https://uvnc.com/downloads/ultravnc.html
+- 🔗 Windows 2000: latest version: https://uvnc.eu/download/1215/Ultravnc_w2k_1215.zip
+- 🔗 Windows XP, Windows Server 2003, Vista, Server 2003 R2, Server 2008: latest version: https://uvnc.com/downloads/ultravnc/129-download-ultravnc-1231.html
+- 🔗 Windows 7, 8, 8.1, 10, 11, Server 2008 R2, Server 2012, Server 2012 R2, Server 2016, Server 2019, Server 2022, Server 2025: current version: https://uvnc.com/downloads/ultravnc.html
 
 Its embedded Java Viewer allows you to connect (and make File transfers) from a simple Web Browser on any system supporting Java (Linux, Mac OS, ...) to an UltraVNC Server.
 PcHelpWare and uvnc2me require XP or later.
@@ -100,10 +100,10 @@ Contact:
 ---
 
 ### Compile and build in Visual Studio
-- 🛠️ Visual Studio 2017 or 2019 or 2022
+- 🛠️ Visual Studio: 2017 | 2019 | 2022
 - 🛠️ Netwide Assembler (NASM): https://nasm.us/
-- ⚙️ vncviewer_VS2017.sln to build UltraVNC Viewer
-- ⚙️ winvnc_VS2017.sln to build UltraVNC Server
+- ⚙️ vncviewer.sln to build UltraVNC Viewer
+- ⚙️ winvnc.sln to build UltraVNC Server
 
 ---
 
