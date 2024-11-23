@@ -28,7 +28,6 @@
 #include "common/inifile.h"
 #include <cctype>
 #include <cassert>
-#include "UltraVNCService.h"
 #include <winvnc/winvnc.h>
 #include "SettingsManager.h"
 #include <lmcons.h>
@@ -86,89 +85,6 @@ void Open_openhub()
 
 #ifndef SC_20
 namespace serviceHelpers {
-	void Set_stop_service_as_admin() {
-		char exe_file_name[MAX_PATH];
-		GetModuleFileName(0, exe_file_name, MAX_PATH);
-
-		SHELLEXECUTEINFO shExecInfo{};
-
-		shExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
-		shExecInfo.fMask = NULL;
-		shExecInfo.hwnd = GetForegroundWindow();
-		shExecInfo.lpVerb = "runas";
-		shExecInfo.lpFile = exe_file_name;
-		shExecInfo.lpParameters = winvncStopservice;
-		shExecInfo.lpDirectory = NULL;
-		shExecInfo.nShow = SW_SHOWNORMAL;
-		shExecInfo.hInstApp = NULL;
-		ShellExecuteEx(&shExecInfo);
-	}
-
-	void Real_stop_service() {
-		char command[MAX_PATH + 32]; // 29 January 2008 jdp
-		_snprintf_s(command, sizeof command, "net stop \"%s\"", UltraVNCService::service_name);
-		WinExec(command, SW_HIDE);
-	}
-
-	void Set_start_service_as_admin() {
-		char exe_file_name[MAX_PATH];
-		GetModuleFileName(0, exe_file_name, MAX_PATH);
-
-		SHELLEXECUTEINFO shExecInfo{};
-
-		shExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
-		shExecInfo.fMask = NULL;
-		shExecInfo.hwnd = GetForegroundWindow();
-		shExecInfo.lpVerb = "runas";
-		shExecInfo.lpFile = exe_file_name;
-		shExecInfo.lpParameters = winvncStartservice;
-		shExecInfo.lpDirectory = NULL;
-		shExecInfo.nShow = SW_SHOWNORMAL;
-		shExecInfo.hInstApp = NULL;
-		ShellExecuteEx(&shExecInfo);
-	}
-
-	void Real_start_service() {
-		char command[MAX_PATH + 32]; // 29 January 2008 jdp
-		_snprintf_s(command, sizeof command, "net start \"%s\"", UltraVNCService::service_name);
-		WinExec(command, SW_HIDE);
-	}
-
-	void Set_install_service_as_admin() {
-		char exe_file_name[MAX_PATH];
-		GetModuleFileName(0, exe_file_name, MAX_PATH);
-
-		SHELLEXECUTEINFO shExecInfo{};
-
-		shExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
-		shExecInfo.fMask = NULL;
-		shExecInfo.hwnd = GetForegroundWindow();
-		shExecInfo.lpVerb = "runas";
-		shExecInfo.lpFile = exe_file_name;
-		shExecInfo.lpParameters = winvncInstallService;
-		shExecInfo.lpDirectory = NULL;
-		shExecInfo.nShow = SW_SHOWNORMAL;
-		shExecInfo.hInstApp = NULL;
-		ShellExecuteEx(&shExecInfo);
-	}
-
-	void Set_uninstall_service_as_admin() {
-		char exe_file_name[MAX_PATH];
-		GetModuleFileName(0, exe_file_name, MAX_PATH);
-
-		SHELLEXECUTEINFO shExecInfo{};
-
-		shExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
-		shExecInfo.fMask = NULL;
-		shExecInfo.hwnd = GetForegroundWindow();
-		shExecInfo.lpVerb = "runas";
-		shExecInfo.lpFile = exe_file_name;
-		shExecInfo.lpParameters = winvncUnInstallService;
-		shExecInfo.lpDirectory = NULL;
-		shExecInfo.nShow = SW_SHOWNORMAL;
-		shExecInfo.hInstApp = NULL;
-		ShellExecuteEx(&shExecInfo);
-	}
 
 	void winvncSecurityEditorHelper_as_admin() {
 		char exe_file_name[MAX_PATH];
@@ -804,33 +720,6 @@ namespace processHelper {
 		}
 
 		return result;
-	}
-
-	bool IsServiceInstalled()
-	{
-		bool serviceInstalled = false;
-
-#ifndef SC_20
-		// Open the Service Control Manager with permission to enumerate services
-		SC_HANDLE hSCM = ::OpenSCManager(nullptr, nullptr, SC_MANAGER_ENUMERATE_SERVICE);
-		if (hSCM) {
-			// Attempt to open the specified service with query configuration access
-			SC_HANDLE hService = ::OpenService(hSCM, UltraVNCService::service_name, SERVICE_QUERY_CONFIG);
-			if (hService) {
-				serviceInstalled = true;
-				::CloseServiceHandle(hService);
-			}
-			else {
-				vnclog.Print(LL_INTERR, "Service not found: %s\n", UltraVNCService::service_name);
-			}
-			::CloseServiceHandle(hSCM);
-		}
-		else {
-			vnclog.Print(LL_INTERR, "Failed to open Service Control Manager\n");
-		}
-#endif // SC_20
-
-		return serviceInstalled;
 	}
 
 	DWORD GetCurrentConsoleSessionID()
