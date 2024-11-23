@@ -57,7 +57,6 @@ extern int WinVNCAppMain();
 const char winvncRunService[]		= "-service_run";
 const char winvncRunServiceRdp[]		= "-service_rdp_run";
 const char winvncPreConnect[]		="-preconnect";
-const char winvncStartService[]		= "-service";
 const char winvncRunAsUserApp[]		= "-run";
 const char winvncConnect[]		= "-connect";
 const char winvncAutoReconnect[]	= "-autoreconnect";
@@ -74,16 +73,7 @@ const char winvnchttp[]	= "-httpproxy";
 const char winvncRepeater[]	= "-repeater"; // set default repeater host
 extern char* g_szRepeaterHost;
 
-const char winvncStopserviceHelper[]		= "-stopservicehelper";
-const char winvncStopservice[]				= "-stopservice";
-const char winvncStartserviceHelper[]		= "-startservicehelper";
-const char winvncStartservice[]				= "-startservice";
-
-const char winvncInstallService[]			= "-install";
 const char winvncInstallDriver[]			= "-installdriver";
-const char winvncUnInstallService[]			= "-uninstall";
-const char winvncInstallServiceHelper[]		= "-installhelper";
-const char winvncUnInstallServiceHelper[]	= "-uninstallhelper";
 
 const char winvncSoftwarecad[]				= "-softwarecad";
 const char winvncSoftwarecadHelper[]		= "-softwarecadhelper";

@@ -389,18 +389,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 				continue;
 			argfound = TRUE;
 
-	#ifndef SC_20
-			if (strncmp(&szCmdLine[i], winvncStopserviceHelper, strlen(winvncStopserviceHelper)) == 0)
-			{
-				Sleep(3000);
-				serviceHelpers::Set_stop_service_as_admin();
-	#ifdef CRASHRPT
-				crUninstall();
-	#endif
-				return return2(0);
-			}
-	#endif // SC_20
-
 			if (strncmp(&szCmdLine[i], winvncKill, strlen(winvncKill)) == 0)
 			{
 				static HANDLE		hShutdownEventTmp;
@@ -509,35 +497,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 			}
 	#endif // SC_20
 	#ifndef SC_20
-			if (strncmp(&szCmdLine[i], winvncStartserviceHelper, strlen(winvncStartserviceHelper)) == 0)
-			{
-				Sleep(3000);
-				serviceHelpers::Set_start_service_as_admin();
-	#ifdef CRASHRPT
-				crUninstall();
-	#endif
-				return return2(0);
-			}
-
-			if (strncmp(&szCmdLine[i], winvncInstallServiceHelper, strlen(winvncInstallServiceHelper)) == 0)
-			{
-				//Sleeps are realy needed, else runas fails...
-				Sleep(3000);
-				serviceHelpers::Set_install_service_as_admin();
-	#ifdef CRASHRPT
-				crUninstall();
-	#endif
-				return return2(0);
-			}
-			if (strncmp(&szCmdLine[i], winvncUnInstallServiceHelper, strlen(winvncUnInstallServiceHelper)) == 0)
-			{
-				Sleep(3000);
-				serviceHelpers::Set_uninstall_service_as_admin();
-	#ifdef CRASHRPT
-				crUninstall();
-	#endif
-				return return2(0);
-			}
 			if (strncmp(&szCmdLine[i], winvncSoftwarecadHelper, strlen(winvncSoftwarecadHelper)) == 0)
 			{
 				Sleep(3000);
@@ -670,107 +629,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 				return return2(0);
 			}
 
-			if (strncmp(&szCmdLine[i], winvncStopservice, strlen(winvncStopservice)) == 0)
-			{
-				serviceHelpers::Real_stop_service();
-	#ifdef CRASHRPT
-				crUninstall();
-	#endif
-				return return2(0);
-			}
-
-			if (strncmp(&szCmdLine[i], winvncStartservice, strlen(winvncStartservice)) == 0)
-			{
-				serviceHelpers::Real_start_service();
-	#ifdef CRASHRPT
-				crUninstall();
-	#endif
-				return return2(0);
-			}
-
 			if (strncmp(&szCmdLine[i], winvncInstallDriver, strlen(winvncInstallDriver)) == 0) {
 				VirtualDisplay::InstallDriver(true);
-				return return2(0);
-			}
-
-			if (strncmp(&szCmdLine[i], winvncInstallService, strlen(winvncInstallService)) == 0)
-			{
-				// rest of command line service name, if provided.
-				char* pServiceName = &szCmdLine[i];
-				// skip over command switch, find next whitepace
-				while (*pServiceName && !isspace(*(unsigned char*)pServiceName))
-					++pServiceName;
-
-				// skip past whitespace to service name
-				while (*pServiceName && isspace(*(unsigned char*)pServiceName))
-					++pServiceName;
-
-				// strip off any quotes
-				if (*pServiceName && *pServiceName == '\"')
-					++pServiceName;
-
-				if (*pServiceName)
-				{
-					// look for trailing quote, if found, terminate the string there.
-					char* pQuote = pServiceName;
-					pQuote = strrchr(pServiceName, '\"');
-					if (pQuote)
-						*pQuote = 0;
-				}
-				// if a service name is supplied, and it differs except in case from
-				// the default, use the supplied service name instead
-				if (*pServiceName && (_strcmpi(pServiceName, UltraVNCService::service_name) != 0))
-				{
-					strncpy_s(UltraVNCService::service_name, 256, pServiceName, 256);
-					UltraVNCService::service_name[255] = 0;
-				}
-				UltraVNCService::install_service();
-				Sleep(2000);
-				char command[MAX_PATH + 32]; // 29 January 2008 jdp
-				_snprintf_s(command, sizeof command, "net start \"%s\"", UltraVNCService::service_name);
-				WinExec(command, SW_HIDE);
-	#ifdef CRASHRPT
-				crUninstall();
-	#endif
-				return return2(0);
-			}
-			if (strncmp(&szCmdLine[i], winvncUnInstallService, strlen(winvncUnInstallService)) == 0)
-			{
-				char command[MAX_PATH + 32]; // 29 January 2008 jdp
-				// rest of command line service name, if provided.
-				char* pServiceName = &szCmdLine[i];
-				// skip over command switch, find next whitepace
-				while (*pServiceName && !isspace(*(unsigned char*)pServiceName))
-					++pServiceName;
-
-				// skip past whitespace to service name
-				while (*pServiceName && isspace(*(unsigned char*)pServiceName))
-					++pServiceName;
-
-				// strip off any quotes
-				if (*pServiceName && *pServiceName == '\"')
-					++pServiceName;
-
-				if (*pServiceName)
-				{
-					// look for trailing quote, if found, terminate the string there.
-					char* pQuote = pServiceName;
-					pQuote = strrchr(pServiceName, '\"');
-					if (pQuote)
-						*pQuote = 0;
-				}
-
-				if (*pServiceName && (_strcmpi(pServiceName, UltraVNCService::service_name) != 0))
-				{
-					strncpy_s(UltraVNCService::service_name, 256, pServiceName, 256);
-					UltraVNCService::service_name[255] = 0;
-				}
-				_snprintf_s(command, sizeof command, "net stop \"%s\"", UltraVNCService::service_name);
-				WinExec(command, SW_HIDE);
-				UltraVNCService::uninstall_service();
-	#ifdef CRASHRPT
-				crUninstall();
-	#endif
 				return return2(0);
 			}
 	#endif // SC_20
@@ -804,16 +664,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 	#endif
 				return return2(return2value);
 			}
-	#ifndef SC_20
-			if (strncmp(&szCmdLine[i], winvncStartService, strlen(winvncStartService)) == 0)
-			{
-				UltraVNCService::start_service(szCmdLine);
-	#ifdef CRASHRPT
-				crUninstall();
-	#endif
-				return return2(0);
-			}
-	#endif // SC_20
+
 			if (strncmp(&szCmdLine[i], winvncRunAsUserApp, strlen(winvncRunAsUserApp)) == 0)
 			{
 				// WinVNC is being run as a user-level program
@@ -1406,7 +1257,7 @@ int WinVNCAppMain()
 	fShutdownOrdered = true;
 
 	if (hShutdownEvent)CloseHandle(hShutdownEvent);
-	vnclog.Print(LL_STATE, VNCLOG("################## SHUTING DOWN SERVER ####################\n"));
+	getvnclog.Print(LL_STATE, VNCLOG("################## SHUTING DOWN SERVER ####################\n"));
 
 	//adzm 2009-06-20
 	if (g_szRepeaterHost) {

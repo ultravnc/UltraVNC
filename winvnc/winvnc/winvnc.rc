@@ -334,10 +334,6 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "&List All Clients",           ID_LISTCLIENTS
         MENUITEM SEPARATOR
-        MENUITEM "Install Service",             ID_RUNASSERVICE
-        MENUITEM "Uninstall Service",           ID_UNINSTALL_SERVICE
-        MENUITEM "Stop Service",                ID_CLOSE_SERVICE
-        MENUITEM "Start Service (must be installed first)", ID_START_SERVICE
         MENUITEM "Reboot in safe mode",         ID_REBOOTSAFEMODE
         MENUITEM "Force Reboot (unsafe)",       ID_REBOOT_FORCE
         MENUITEM SEPARATOR
