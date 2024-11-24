@@ -67,6 +67,13 @@ public:
 	VNCLog();
 
 	inline void Print(int level, const char* format, ...) {
+		if (level == -1) {
+			va_list ap;
+			va_start(ap, format);
+			ReallyPrintScreen(format, ap);
+			va_end(ap);
+			return;
+		}
 		if (level > m_level) return;
 		if (!m_todebug && !m_toconsole && !m_tofile) return;
 		va_list ap;
@@ -98,6 +105,7 @@ public:
 private:
 	void ReallyPrintLine(const char* line);
 	void ReallyPrint(const char* format, va_list ap);
+	void ReallyPrintScreen(const char* format, va_list ap);
 	void OpenFile();
 	void CloseFile();
 	bool m_tofile, m_todebug, m_toconsole;

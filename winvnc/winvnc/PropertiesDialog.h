@@ -10,7 +10,7 @@ class PropertiesDialog
 {
 private:
 	HWND hTabControl, hTabAuthentication, hTabIncoming, hTabInput, hTabMisc, hTabNotifications,
-		hTabReverse, hTabRules, hTabCapture, hTabAdministration;
+		hTabReverse, hTabRules, hTabCapture, hTabLog, hTabAdministration;
 	BOOL		m_dlgvisible;
 	BOOL bConnectSock = true;
 	int ListPlugins(HWND hComboBox);
@@ -24,7 +24,7 @@ private:
 	
 	void ShowImpersonateDialog();
 	HWND PropertiesDialogHwnd = NULL;
-	bool showAdminPanel = false;
+	bool showAdminPanel = false;	
 
 public:
 	PropertiesDialog();
@@ -44,5 +44,7 @@ public:
 	static void Secure_Plugin_elevated(char* szPlugin);
 	static void Secure_Save_Plugin_Config(char* szPlugin);
 	static void Secure_Plugin(char* szPlugin);
+	static void LogToEdit(const std::string& message);
+	static HWND hEditLog;
 };
 
