@@ -560,6 +560,7 @@ vncServer::Authenticated(vncClientId clientid)
 #endif // SC_20
 	}
 	vnclog.Print(LL_INTINFO, VNCLOG("Authenticated() done\n"));
+	vnclog.Print(LL_LOGSCREEN, "Viewer authenticated");
 	vncMenu::updateList();
 	return authok;
 }
@@ -1665,8 +1666,10 @@ vncServer::AddAuthHostsBlacklist(const char* machine) {
 			current->_lastRefTime.QuadPart = now.QuadPart + 10 * current->_failureCount;
 			current->_failureCount++;
 
-			if (current->_failureCount > 5)
+			if (current->_failureCount > 5) {
 				current->_blocked = TRUE;
+				vnclog.Print(LL_LOGSCREEN, "%s Blacklisten failed passwords %d \n", current->_machineName, current->_failureCount);
+			}
 			return;
 		}
 		current = current->_next;

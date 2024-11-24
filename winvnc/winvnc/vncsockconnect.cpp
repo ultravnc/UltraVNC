@@ -95,7 +95,7 @@ void *vncSockConnectThread::run_undetached(void * arg)
  					continue;
  				}
 			}
-
+			vnclog.Print(LL_LOGSCREEN, "connection from %s", new_socket->GetPeerName(true));
 			vnclog.Print(LL_CLIENTS, VNCLOG("accepted connection from %s\n"), new_socket->GetPeerName(true));
 			if (!m_shutdown && !fShutdownOrdered) 
 				m_server->AddClient(new_socket, FALSE, FALSE,NULL,false);

@@ -1257,7 +1257,7 @@ int WinVNCAppMain()
 	fShutdownOrdered = true;
 
 	if (hShutdownEvent)CloseHandle(hShutdownEvent);
-	getvnclog.Print(LL_STATE, VNCLOG("################## SHUTING DOWN SERVER ####################\n"));
+	vnclog.Print(LL_STATE, VNCLOG("################## SHUTING DOWN SERVER ####################\n"));
 
 	//adzm 2009-06-20
 	if (g_szRepeaterHost) {
