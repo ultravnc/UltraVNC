@@ -1090,7 +1090,8 @@ vncClientThread::InitAuthenticate()
 	// Split Filter in desktop in/depended
 	if (!FilterClients_Blacklist())
 	{
-		SendConnFailed("Your connection has been rejected.");
+		vnclog.Print(LL_LOGSCREEN, "Blacklisten: connection has been rejected");
+		SendConnFailed("Your connection has been rejected to many attempts.");
 		return FALSE;
 	}
 	if (!CheckEmptyPasswd()) return FALSE;
@@ -1311,10 +1312,12 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth, bool 
 	{
 	case rfbUltraVNC:
 		m_client->SetUltraViewer(true);
+		vnclog.Print(LL_LOGSCREEN, "UltraVNC Viewer");
 		auth_success = true;
 		break;
 	case rfbUltraVNC_SecureVNCPluginAuth_new:
 		auth_success = AuthSecureVNCPlugin(auth_message);
+		vnclog.Print(LL_LOGSCREEN, "AuthSecureVNCPlugin success = %d", auth_success);
 		break;
 	case rfbUltraVNC_SecureVNCPluginAuth:
 		auth_success = AuthSecureVNCPlugin_old(auth_message);
@@ -1323,12 +1326,14 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth, bool 
 		break;
 	case rfbUltraVNC_MsLogonIIAuth:
 		auth_success = AuthMsLogon(auth_message);
+		vnclog.Print(LL_LOGSCREEN, "MsLogonII success = %d", auth_success);
 		if (auth_success) {
 			auth_is_mslogon = TRUE;
 		}
 		break;
 	case rfbVncAuth:
 		auth_success = AuthVnc(auth_message);
+		vnclog.Print(LL_LOGSCREEN, "Vnc password success = %d", auth_success);
 		break;
 	case rfbNoAuth:
 		auth_success = TRUE;
@@ -1397,6 +1402,7 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth, bool 
 	// Send a failure reason
 	if (!auth_success && !version_warning) {
 		if (auth_message.empty()) {
+			vnclog.Print(LL_LOGSCREEN, "Authentication failed");
 			auth_message = "authentication rejected";
 		}
 		CARD32 auth_message_length = Swap32IfLE(auth_message.length());

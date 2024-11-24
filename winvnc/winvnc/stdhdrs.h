@@ -91,6 +91,8 @@ extern VNCLog vnclog;
 #define LL_STATE	0
 // Log connect/disconnect
 #define LL_CLIENTS	1
+// Show on Logscreen
+#define LL_LOGSCREEN -1
 // Log connection errors (wrong pixfmt, etc)
 #define LL_CONNERR	0
 // Log socket errors
