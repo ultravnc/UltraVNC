@@ -345,7 +345,6 @@ vncClientUpdateThread::~vncClientUpdateThread()
 {
 	if (m_signal) delete m_signal;
 	if (m_sync_sig) delete m_sync_sig;
-	vnclog.Print(LL_INTINFO, VNCLOG("update thread gone\n"));
 	m_client->m_updatethread = NULL;
 }
 
@@ -362,8 +361,6 @@ vncClientUpdateThread::Trigger()
 void
 vncClientUpdateThread::Kill()
 {
-	vnclog.Print(LL_INTINFO, VNCLOG("kill update thread\n"));
-
 	omni_mutex_lock l(m_client->GetUpdateLock(), 81);
 	m_active = FALSE;
 	m_signal->signal();
@@ -396,13 +393,6 @@ void
 vncClientUpdateThread::EnableUpdates(BOOL enable)
 {
 	// ALWAYS call this with the UpdateLock held!
-	if (enable) {
-		vnclog.Print(LL_INTINFO, VNCLOG("enable update thread\n"));
-	}
-	else {
-		vnclog.Print(LL_INTINFO, VNCLOG("disable update thread\n"));
-	}
-
 	m_enable = enable;
 	m_signal->signal();
 	//unsigned long now_sec, now_nsec;
@@ -417,7 +407,6 @@ vncClientUpdateThread::EnableUpdates(BOOL enable)
 //			m_signal->signal();
 			vnclog.Print(LL_INTINFO, VNCLOG("thread timeout\n"));
 		} */
-	vnclog.Print(LL_INTINFO, VNCLOG("enable/disable synced\n"));
 }
 
 extern bool g_DesktopThread_running;
@@ -693,7 +682,6 @@ vncClientUpdateThread::run_undetached(void* arg)
 		yield();
 	}
 
-	vnclog.Print(LL_INTINFO, VNCLOG("stopping update thread\n"));
 	return 0;
 }
 
@@ -766,16 +754,13 @@ vncClientThread::InitVersion()
 				// RDV 2010-6-10
 				int Send_OK = 0;
 				int Recv_OK = 0;
-				vnclog.Print(LL_STATE, VNCLOG("Send protocolMsg\n"));
 				Send_OK = m_socket->SendExact((char*)&protocolMsg, sz_rfbProtocolVersionMsg);
 				if (Send_OK == 1)
 				{
-					vnclog.Print(LL_STATE, VNCLOG("Send_OK\n"));
 					Recv_OK = m_socket->ReadExact((char*)&protocol_ver, sz_rfbProtocolVersionMsg);
 				}
 				// Send our protocol version, and get the client's protocol version
 				if (!Send_OK || !Recv_OK) {
-					if (!Recv_OK) vnclog.Print(LL_STATE, VNCLOG("!Send_OK || !Recv_OK\n"));
 					bReady = false;
 					// we need to reconnect!
 
@@ -821,7 +806,6 @@ vncClientThread::InitVersion()
 		return FALSE;
 
 	m_ms_logon = settings->getRequireMSLogon();
-	vnclog.Print(LL_INTINFO, VNCLOG("m_ms_logon set to %s"), m_ms_logon ? "true" : "false");
 	m_client->SetUltraViewer(false);
 	if ((m_minor >= 7) && m_socket->IsUsePluginEnabled() && m_server->GetDSMPluginPointer()->IsEnabled() && m_socket->GetIntegratedPlugin() != NULL) {
 		m_socket->SetPluginStreamingIn();
@@ -977,7 +961,6 @@ vncClientThread::CheckLoopBack()
 
 			if (!ok)
 			{
-				vnclog.Print(LL_CONNERR, VNCLOG("loopback connection attempted - client rejected\n"));
 				SendConnFailed("Local loop-back connections are disabled.");
 				return FALSE;
 			}
@@ -1001,7 +984,6 @@ vncClientThread::CheckLoopBack()
 
 			if (!ok)
 			{
-				vnclog.Print(LL_CONNERR, VNCLOG("loopback connection attempted - client accepted\n"));
 				m_client->m_IsLoopback = true;
 			}
 		}
@@ -1090,7 +1072,8 @@ vncClientThread::InitAuthenticate()
 	// Split Filter in desktop in/depended
 	if (!FilterClients_Blacklist())
 	{
-		SendConnFailed("Your connection has been rejected.");
+		vnclog.Print(LL_LOGSCREEN, "Blacklisten: connection has been rejected");
+		SendConnFailed("Your connection has been rejected to many attempts.");
 		return FALSE;
 	}
 	if (!CheckEmptyPasswd()) return FALSE;
@@ -1212,7 +1195,6 @@ vncClientThread::InitAuthenticate()
 		}
 	}
 
-	vnclog.Print(LL_CLIENTS, VNCLOG("Leaving InitAuthenticate\n"));
 	// Tell the server that this client is ok
 	return m_server->Authenticated(m_client->GetClientId());
 }
@@ -1311,10 +1293,12 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth, bool 
 	{
 	case rfbUltraVNC:
 		m_client->SetUltraViewer(true);
+		vnclog.Print(LL_LOGSCREEN, "UltraVNC Viewer");
 		auth_success = true;
 		break;
 	case rfbUltraVNC_SecureVNCPluginAuth_new:
 		auth_success = AuthSecureVNCPlugin(auth_message);
+		vnclog.Print(LL_LOGSCREEN, "AuthSecureVNCPlugin success = %d", auth_success);
 		break;
 	case rfbUltraVNC_SecureVNCPluginAuth:
 		auth_success = AuthSecureVNCPlugin_old(auth_message);
@@ -1323,12 +1307,14 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth, bool 
 		break;
 	case rfbUltraVNC_MsLogonIIAuth:
 		auth_success = AuthMsLogon(auth_message);
+		vnclog.Print(LL_LOGSCREEN, "MsLogonII success = %d", auth_success);
 		if (auth_success) {
 			auth_is_mslogon = TRUE;
 		}
 		break;
 	case rfbVncAuth:
 		auth_success = AuthVnc(auth_message);
+		vnclog.Print(LL_LOGSCREEN, "Vnc password success = %d", auth_success);
 		break;
 	case rfbNoAuth:
 		auth_success = TRUE;
@@ -1397,6 +1383,7 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth, bool 
 	// Send a failure reason
 	if (!auth_success && !version_warning) {
 		if (auth_message.empty()) {
+			vnclog.Print(LL_LOGSCREEN, "Authentication failed");
 			auth_message = "authentication rejected";
 		}
 		CARD32 auth_message_length = Swap32IfLE(auth_message.length());
@@ -1792,7 +1779,7 @@ BOOL vncClientThread::AuthVnc(std::string& auth_message)
 		memcpy(challenge2, challenge, 16); //PGM
 
 		{
-			vnclog.Print(LL_INTINFO, "password authentication");
+			vnclog.Print(LL_INTINFO, "password authentication\n");
 			if (!m_socket->SendExact(challenge, sizeof(challenge)))
 			{
 				vnclog.Print(LL_SOCKERR, VNCLOG("Failed to send challenge to client\n"));
@@ -1823,7 +1810,7 @@ BOOL vncClientThread::AuthVnc(std::string& auth_message)
 				vncPasswd::ToText plain2(settings->getPasswdViewOnly(), settings->getSecure()); //PGM
 				if ((strlen(plain2) > 0)) //PGM
 				{ //PGM
-					vnclog.Print(LL_INTINFO, "View-only password authentication"); //PGM
+					vnclog.Print(LL_INTINFO, "View-only password authentication\n"); //PGM
 					m_client->EnableKeyboard(false); //PGM
 					m_client->EnablePointer(false); //PGM
 					m_client->EnableGii(false);
@@ -2055,10 +2042,6 @@ bool vncClientThread::InitSocket()
 	if (m_server->GetDSMPluginPointer() != NULL)
 	{
 		m_socket->SetDSMPluginPointer(m_server->GetDSMPluginPointer());
-		vnclog.Print(LL_INTINFO, VNCLOG("DSMPlugin Pointer to socket OK\n"));
-
-		//adzm 2010-05-12 - dsmplugin config
-		//m_socket->SetDSMPluginConfig(m_server->GetDSMPluginConfig());
 	}
 	else
 	{

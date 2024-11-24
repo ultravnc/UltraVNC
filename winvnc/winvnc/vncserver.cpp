@@ -560,6 +560,7 @@ vncServer::Authenticated(vncClientId clientid)
 #endif // SC_20
 	}
 	vnclog.Print(LL_INTINFO, VNCLOG("Authenticated() done\n"));
+	vnclog.Print(LL_LOGSCREEN, "Viewer authenticated");
 	vncMenu::updateList();
 	return authok;
 }
@@ -964,8 +965,6 @@ vncServer::RemoveClient(vncClientId clientid)
 		for (i = m_authClients.begin(); i != m_authClients.end(); i++) {
 			// Is this the right client?
 			if ((*i) == clientid) {
-				vnclog.Print(LL_INTINFO, VNCLOG("removing authorised client\n"));
-
 				// Yes, so remove the client and kill it
 				m_authClients.erase(i);
 				if (clientid >= 0 && clientid < 512) m_clientmap[clientid] = NULL;
@@ -982,8 +981,6 @@ vncServer::RemoveClient(vncClientId clientid)
 
 	// Are there any authorised clients connected?
 	if (m_authClients.empty() && (m_desktop != NULL)) {
-		vnclog.Print(LL_STATE, VNCLOG("deleting desktop server\n"));
-
 		// sf@2007 - Do not lock/logoff even if required when UltraVNC Server autorestarts (on desktop change (Windows XP FUS / Windows Vista))
 		if (!settings->AutoRestartFlag() && !OS_Shutdown) {
 			// Are there locksettings set?
@@ -1221,7 +1218,6 @@ vncServer::EnableConnections(BOOL On)
 	return TRUE;
 #endif // SC_20
 	// Are we being asked to switch socket connects on or off?
-	vnclog.Print(LL_SOCKINFO, VNCLOG("SockConnect %d\n"), On);
 	if (On) {
 		// Is there a listening socket?
 		if (m_socketConn == NULL) {
@@ -1273,7 +1269,6 @@ vncServer::EnableConnections(BOOL On)
 
 			// Now let's start the HTTP connection stuff
 			EnableHTTPConnect(m_enableHttpConn);
-			vnclog.Print(LL_SOCKINFO, VNCLOG("SockConnect  Done %d\n"), On);
 		}
 	}
 	else {
@@ -1604,7 +1599,6 @@ vncServer::VerifyHost(const char* hostname) {
 			break;
 		authHostsPos++;
 	}
-	vnclog.Print(LL_INTINFO, VNCLOG("client %s verifiedHost %u prior to adjustment\n"), hostname, verifiedHost);
 	//
 	bool autoAccept = false;
 	if ((GetTickCount() - startTime) < settings->getQueryDisableTime() * 1000)
@@ -1636,7 +1630,6 @@ vncServer::VerifyHost(const char* hostname) {
 			: vncServer::aqrQuery;
 		break;*/
 	};
-	vnclog.Print(LL_INTINFO, VNCLOG("client %s verifiedHost %u after adjustment\n"), hostname, verifiedHost);
 	return verifiedHost;
 }
 
@@ -1665,8 +1658,10 @@ vncServer::AddAuthHostsBlacklist(const char* machine) {
 			current->_lastRefTime.QuadPart = now.QuadPart + 10 * current->_failureCount;
 			current->_failureCount++;
 
-			if (current->_failureCount > 5)
+			if (current->_failureCount > 5) {
 				current->_blocked = TRUE;
+				vnclog.Print(LL_LOGSCREEN, "%s Blacklisten failed passwords %d \n", current->_machineName, current->_failureCount);
+			}
 			return;
 		}
 		current = current->_next;

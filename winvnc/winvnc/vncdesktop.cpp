@@ -746,8 +746,7 @@ vncDesktop::Startup()
 		vnclog.Print(LL_INTINFO, VNCLOG("Driver option disabled \n"));
 
 
-	if (VideoBuffer())
-		vnclog.Print(LL_INTINFO, VNCLOG("Break log\n"));
+	VideoBuffer();
 	if ((status = InitBitmap()) != 0) {
 		vnclog.Print(LL_INTINFO, VNCLOG("InitBitmap Failed\n"));
 		return status;
@@ -1485,8 +1484,6 @@ vncDesktop::EnableOptimisedBlits()
 DWORD
 vncDesktop::Init(vncServer *server)
 {
-	vnclog.Print(LL_INTINFO, VNCLOG("initialising desktop handler\n"));
-
 	// Save the server pointer
 	m_server = server;
 	// Load in the arrow cursor
@@ -2311,7 +2308,6 @@ DWORD WINAPI Warningbox_non_locked(LPVOID lpParam)
 BOOL vncDesktop::InitVideoDriver()
 {
 	omni_mutex_lock l(m_screenCapture_lock, 79);
-	vnclog.Print(LL_INTERR, VNCLOG("Driver option is enabled\n"));
 	// If m_screenCapture exist, the driver was activated.
 	// This does not mean he is still active
 	// Screen switching disable the driver at kernel level

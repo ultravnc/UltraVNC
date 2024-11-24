@@ -1217,8 +1217,6 @@ DWORD WINAPI imp_desktop_thread(LPVOID lpParam)
 
 	if (desktop == NULL)
 		vnclog.Print(LL_INTERR, VNCLOG("OpenInputdesktop Error \n"));
-	else
-		vnclog.Print(LL_INTERR, VNCLOG("OpenInputdesktop OK\n"));
 
 	HDESK old_desktop = GetThreadDesktop(GetCurrentThreadId());
 	DWORD dummy;
