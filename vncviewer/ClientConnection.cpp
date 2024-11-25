@@ -3662,7 +3662,7 @@ void ClientConnection::AuthSCPrompt()
 	BOOL bCheckboxChecked;
 	if (!m_opts->m_fAutoAcceptIncoming) {
 		int yes = yesnoUVNCMessageBox(m_hInstResDLL, m_hwndMain, str50282, mytext, str50280, str50281, "", bCheckboxChecked);
-		if (!yes)
+		if (yes)
 		{
 			accepted = 1;
 		}
