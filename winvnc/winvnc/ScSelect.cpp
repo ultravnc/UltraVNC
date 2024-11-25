@@ -28,6 +28,8 @@
 	#include "resource.h"
 	#include "common/win32_helpers.h"
 	#pragma comment (lib, "comctl32")
+extern HINSTANCE	hInstResDLL;
+
 
 namespace ScSelect {
 	LONG old_pref = 99;
@@ -169,7 +171,7 @@ namespace ScSelect {
 		int j = 0;
 		iSlected = SendMessageW(hList, LVM_GETNEXTITEM, -1, LVNI_FOCUSED);
 		if (iSlected == -1) {
-			helper::yesUVNCMessageBox(hWnd, "No Items in ListView", "Error", MB_ICONINFORMATION);
+			helper::yesUVNCMessageBox(hInstResDLL, hWnd, "No Items in ListView", "Error", MB_ICONINFORMATION);
 			return;
 		}
 
@@ -298,7 +300,7 @@ namespace ScSelect {
 				if (((LPNMHDR)lParam)->code == NM_CLICK) {
 					iSelect = SendMessageW(hList, LVM_GETNEXTITEM, -1, LVNI_FOCUSED);
 					if (iSelect == -1) {
-						helper::yesUVNCMessageBox(hWnd, "No VNC Server selected", "Error", MB_ICONINFORMATION);
+						helper::yesUVNCMessageBox(hInstResDLL, hWnd, "No VNC Server selected", "Error", MB_ICONINFORMATION);
 						break;
 					}
 					char temp1[255] = { 0 };

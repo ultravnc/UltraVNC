@@ -1002,10 +1002,12 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				if (!MessageBoxSecure(NULL, "Do you want to restart the UltraVNC Server", "", MB_YESNO))
 					return 0;
 			}
+#ifndef SC_20
 			else {
-				if (!MessageBoxSecure(NULL, "Do you want to close Shutdown the UltraVNC Server", "", MB_YESNO))
+				if (!MessageBoxSecure(NULL, "Do you want to close  the UltraVNC Server", "", MB_YESNO))
 					return 0;
 			}
+#endif
 			// User selected Close from the tray menu
 			fShutdownOrdered = TRUE;
 			//Sleep(1000);
