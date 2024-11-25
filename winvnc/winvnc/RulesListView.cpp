@@ -63,7 +63,7 @@ void RulesListView::init(HWND hListView)
 					}
 				}
 				char restOfString[1024];
-				strcpy(restOfString, token + 1);
+				strcpy_s(restOfString, token + 1);
 				ListView_SetItemText(hListView, index, 1, const_cast<char*>(restOfString));
 				ListView_SetItemText(hListView, index, 2, const_cast<char*>(token));
 
@@ -99,7 +99,7 @@ void RulesListView::addItem(char* caption)
 		ListView_InsertItem(hListView, &lvItem);
 	}
 	char restOfString[1024];
-	strcpy(restOfString, caption + 1);
+	strcpy_s(restOfString, caption + 1);
 	ListView_SetItemText(hListView, index, 1, const_cast<char*>(restOfString));
 	ListView_SetItemText(hListView, index, 2, const_cast<char*>(caption));
 	index++;
@@ -130,7 +130,7 @@ void RulesListView::updateItem(int index, char* caption)
 		ListView_SetItemText(hListView, index, 0, "Refuse");
 	}
 	char restOfString[1024];
-	strcpy(restOfString, caption + 1);
+	strcpy_s(restOfString, caption + 1);
 	ListView_SetItemText(hListView, index, 1, const_cast<char*>(restOfString));
 	ListView_SetItemText(hListView, index, 2, const_cast<char*>(caption));
 }
@@ -282,7 +282,7 @@ bool RulesListView::onInitDialog(HWND hwnd)
 			
 		}
 		char restOfString[1024]{};
-		strcpy(restOfString, oldrule + 1);
+		strcpy_s(restOfString, oldrule + 1);
 		SetDlgItemText(hwnd, IDC_FIRST_IP, restOfString);
 	}
 	else {
@@ -318,7 +318,7 @@ void RulesListView::edit()
 	lv1.cchTextMax = 256;
 	ListView_GetItem(hListView, &lv1);
 
-	strcpy(oldrule, accessRule);
+	strcpy_s(oldrule, accessRule);
 	isEdit = true;
 	DialogBoxParam(hInstResDLL, MAKEINTRESOURCE(IDD_EDIT_IP_ACESS_CONTROL),
 		NULL, (DLGPROC)dialogProc, (LONG_PTR)this);
@@ -345,7 +345,7 @@ void RulesListView::onOkButtonClick(HWND hwnd)
 	}
 
 	
-	strcat(rule, first);
+	strcat_s(rule, first);
 
 	if (!isValidIPAddress(first)) {
 		SetDlgItemText(hwnd, IDC_ERROR_TEXT, "Ip address is invalid");
@@ -389,7 +389,7 @@ bool RulesListView::isValidNumber(const char* str) {
 
 bool RulesListView::isValidIPAddress(const char* ip) {
 	char ipCopy[20];
-	strncpy(ipCopy, ip, 19); 
+	strncpy_s(ipCopy, ip, 19);
 	ipCopy[19] = '\0';
 
 	char* token = std::strtok(ipCopy, ".");
@@ -425,8 +425,8 @@ char* RulesListView::getAuthHost()
 		lvItem.cchTextMax = sizeof(buffer);
 		ListView_GetItem(hListView, &lvItem);
 		if (i != 0)
-			strcat(result, ":");
-		strcat(result, lvItem.pszText);
+			strcat_s(result, ":");
+		strcat_s(result, lvItem.pszText);
 	}
 	return result;
 }
