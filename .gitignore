@@ -134,6 +134,11 @@ $RECYCLE.BIN/
 # =========================
 
 
+# No vcpkg folder on repository don't touch theses 3 lines
+vncviewer/vcpkg_installed/
+winvnc/winvnc/vcpkg_installed/
+
+
 # CMakeSpecific Ignore configuration file  
 CMakeUserPresets.json
 
