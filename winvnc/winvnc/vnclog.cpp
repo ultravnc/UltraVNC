@@ -212,7 +212,7 @@ void VNCLog::ReallyPrint(const char* format, va_list ap)
 	if (current != m_lastLogTime) {
 		m_lastLogTime = current;
         char isoTime[20]; // Buffer for ISO 8601 format: "YYYY-MM-DDTHH:MM:SS"
-        std::strftime(isoTime, sizeof(isoTime), "%Y-%m-%dT%H:%M:%S", std::localtime(&m_lastLogTime));
+        std::strftime(isoTime, sizeof(isoTime), "%Y-%m-%d %H:%M:%S", std::localtime(&m_lastLogTime));
 		ReallyPrintLine(isoTime);
 	}
 
@@ -240,7 +240,7 @@ void VNCLog::ReallyPrintScreen(const char* format, va_list ap)
 {
     time_t current = time(0);
     char isoTime[20]; // Buffer for ISO 8601 format: "YYYY-MM-DDTHH:MM:SS"
-    std::strftime(isoTime, sizeof(isoTime), "%Y-%m-%dT%H:%M:%S", std::localtime(&current));
+    std::strftime(isoTime, sizeof(isoTime), "%Y-%m-%d %H:%M:%S", std::localtime(&current));
     TCHAR line[(LINE_BUFFER_SIZE * 2) + 1];
     TCHAR line2[(LINE_BUFFER_SIZE * 2) + 1];
     _vsnprintf(line, LINE_BUFFER_SIZE, format, ap);
