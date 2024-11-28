@@ -20,6 +20,8 @@
 
 extern HINSTANCE	hInstResDLL;
 HWND PropertiesDialog::hEditLog = NULL;
+char PropertiesDialog::buffer[65536] = "";
+
 
 BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK PropertiesDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -785,6 +787,12 @@ bool PropertiesDialog::DlgInitDialog(HWND hwnd)
 
 	SetForegroundWindow(hwnd);
 	EnableWindow(GetDlgItem(PropertiesDialogHwnd, IDC_APPLY), false);
+
+	if (GetDlgItem(hwnd, IDC_EDIT_LOG)) {
+		hEditLog = GetDlgItem(hwnd, IDC_EDIT_LOG);
+		LogToEdit("");
+	}
+
 	return FALSE; // Because we've set the focus
 }
 
@@ -799,6 +807,7 @@ PropertiesDialog::PropertiesDialog()
 PropertiesDialog::~PropertiesDialog()
 {
 	delete rulesListView;
+	hEditLog = NULL;
 };
 
 BOOL PropertiesDialog::Init(vncServer* server)
@@ -1072,6 +1081,10 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 	}
 	break;
 
+	case IDC_STARTLOG:
+		settings->IsDesktopUserAdmin();
+	break;
+
 	case IDC_VIDEO:
 	{
 		if (IsDlgButtonChecked(hwnd, IDC_VIDEO))
@@ -1086,15 +1099,6 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 		vnclog.ClearAviConfig();
 		break;
 	}
-
-	case IDC_STARTLOG:
-		hEditLog = GetDlgItem(hwnd, IDC_EDIT_LOG);
-		vnclog.Print(LL_LOGSCREEN, "Start logging");
-		break;
-	case IDC_STOPLOG:
-		vnclog.Print(LL_LOGSCREEN, "Stop logging");
-		hEditLog = NULL;
-		break;
 
 	case IDC_CONNECT_HTTP:
 		EnableWindow(GetDlgItem(hwnd, IDC_PORTHTTP),
@@ -2071,11 +2075,9 @@ void PropertiesDialog::Secure_Plugin_elevated(char* szPlugin)
 const int MAX_LINES = 100;
 void PropertiesDialog::LogToEdit(const std::string & message) 
 {
-	if (hEditLog == NULL)
+	if (hEditLog == NULL || !IsWindow(hEditLog))
 		return;
-	// Get the current content of the edit control
-	char buffer[65536];
-	GetWindowText(hEditLog, buffer, sizeof(buffer));
+	// Get the current content of the edit control		
 	std::string content(buffer);
 
 	// Split the content into lines
@@ -2104,5 +2106,6 @@ void PropertiesDialog::LogToEdit(const std::string & message)
 	SetWindowText(hEditLog, oss.str().c_str());
 	SendMessage(hEditLog, EM_SETSEL, -1, -1);  // Move the caret to the end
 	SendMessage(hEditLog, EM_SCROLLCARET, 0, 0);  // Ensure the last line is visible
+	GetWindowText(hEditLog, buffer, sizeof(buffer));
 }
 
