@@ -141,11 +141,17 @@ bool SettingsManager::IsDesktopUserAdmin()
 	HANDLE hPToken = DesktopUsersToken::getInstance()->getDesktopUsersToken();
 	if (hPToken) {
 		if (!ImpersonateLoggedOnUser(hPToken)) {
+			vnclog.Print(LL_LOGSCREEN, "ImpersonateLoggedOnUser Failed");
 			return false;
 		}
 	}
-
+	vnclog.Print(LL_LOGSCREEN, "ImpersonateLoggedOnUser OK");
 	bool isAdmin = myIniFile.IsWritable();
+
+	if (isAdmin)
+		vnclog.Print(LL_LOGSCREEN, "IniFile Is Writable");
+	else
+		vnclog.Print(LL_LOGSCREEN, "IniFile no write access");
 
 	RevertToSelf();
 	return isAdmin;

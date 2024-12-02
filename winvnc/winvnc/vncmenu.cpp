@@ -570,19 +570,11 @@ void vncMenu::addMenus()
 		settings->getAllowEditClients() ? MF_ENABLED : MF_GRAYED);
 	EnableMenuItem(m_hmenu, ID_OUTGOING_CONN,
 		settings->getAllowEditClients() ? MF_ENABLED : MF_GRAYED);
-	EnableMenuItem(m_hmenu, ID_CLOSE_SERVICE, (settings->RunningFromExternalService() && settings->getAllowShutdown()) ? MF_ENABLED : MF_GRAYED);
-	EnableMenuItem(m_hmenu, ID_START_SERVICE, (processHelper::IsServiceInstalled() && !settings->RunningFromExternalService() && settings->getAllowShutdown()) ? MF_ENABLED : MF_GRAYED);
-	EnableMenuItem(m_hmenu, ID_RUNASSERVICE, (!processHelper::IsServiceInstalled() && !settings->RunningFromExternalService() && settings->getAllowShutdown()) ? MF_ENABLED : MF_GRAYED);
-	EnableMenuItem(m_hmenu, ID_UNINSTALL_SERVICE, (processHelper::IsServiceInstalled() && settings->getAllowShutdown()) ? MF_ENABLED : MF_GRAYED);
 	EnableMenuItem(m_hmenu, ID_REBOOTSAFEMODE, (settings->RunningFromExternalService() && settings->getAllowShutdown()) ? MF_ENABLED : MF_GRAYED);
 	EnableMenuItem(m_hmenu, ID_REBOOT_FORCE, (settings->RunningFromExternalService() && settings->getAllowShutdown()) ? MF_ENABLED : MF_GRAYED);
 	// adzm 2009-07-05
 	if (settings->getScPrompt()) {
-		RemoveMenu(m_hmenu, ID_ADMIN_PROPERTIES, MF_BYCOMMAND);
-		RemoveMenu(m_hmenu, ID_CLOSE_SERVICE, MF_BYCOMMAND);
-		RemoveMenu(m_hmenu, ID_START_SERVICE, MF_BYCOMMAND);
-		RemoveMenu(m_hmenu, ID_RUNASSERVICE, MF_BYCOMMAND);
-		RemoveMenu(m_hmenu, ID_UNINSTALL_SERVICE, MF_BYCOMMAND);
+		RemoveMenu(m_hmenu, ID_ADMIN_PROPERTIES, MF_BYCOMMAND);		
 		RemoveMenu(m_hmenu, ID_REBOOTSAFEMODE, MF_BYCOMMAND);
 		RemoveMenu(m_hmenu, ID_REBOOT_FORCE, MF_BYCOMMAND);
 	}
@@ -1002,10 +994,12 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				if (!MessageBoxSecure(NULL, "Do you want to restart the UltraVNC Server", "", MB_YESNO))
 					return 0;
 			}
+#ifndef SC_20
 			else {
-				if (!MessageBoxSecure(NULL, "Do you want to close Shutdown the UltraVNC Server", "", MB_YESNO))
+				if (!MessageBoxSecure(NULL, "Do you want to close  the UltraVNC Server", "", MB_YESNO))
 					return 0;
 			}
+#endif
 			// User selected Close from the tray menu
 			fShutdownOrdered = TRUE;
 			//Sleep(1000);
@@ -1083,208 +1077,6 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			if (errorcode == 1314)
 				UltraVNCService::Reboot_with_force_reboot_elevated();
 			break;
-		}
-		break;
-
-		case ID_UNINSTALL_SERVICE:
-		{
-			if (!MessageBoxSecure(NULL, "Do you want to uninstall the UltraVNC service.", "Service", MB_YESNO))
-				return 0;
-			HWND hwnd = postHelper::FindWinVNCWindow(true);
-			if (hwnd) SendMessage(hwnd, WM_COMMAND, ID_CLOSE, 0);
-			HANDLE hPToken = DesktopUsersToken::getInstance()->getDesktopUsersToken();
-			if (!hPToken) {
-				serviceHelpers::Set_uninstall_service_as_admin();
-				break;
-			}
-			char dir[MAX_PATH];
-			char exe_file_name[MAX_PATH];
-			GetModuleFileName(0, exe_file_name, MAX_PATH);
-			strcpy_s(dir, exe_file_name);
-			strcat_s(dir, " -uninstallhelper");
-
-			STARTUPINFO          StartUPInfo{};
-			PROCESS_INFORMATION  ProcessInfo{};
-			ZeroMemory(&StartUPInfo, sizeof(STARTUPINFO));
-			ZeroMemory(&ProcessInfo, sizeof(PROCESS_INFORMATION));
-			StartUPInfo.wShowWindow = SW_SHOW;
-			StartUPInfo.lpDesktop = "Winsta0\\Default";
-			StartUPInfo.cb = sizeof(STARTUPINFO);
-
-			CreateProcessAsUser(hPToken, NULL, dir, NULL, NULL, FALSE, DETACHED_PROCESS, NULL, NULL, &StartUPInfo, &ProcessInfo);
-			DWORD errorcode = GetLastError();
-			if (ProcessInfo.hProcess)
-				CloseHandle(ProcessInfo.hProcess);
-			if (ProcessInfo.hThread)
-				CloseHandle(ProcessInfo.hThread);
-			if (errorcode == 1314)
-				serviceHelpers::Set_uninstall_service_as_admin();
-		}
-		break;
-
-		case ID_RUNASSERVICE:
-		{
-			if (!MessageBoxSecure(NULL, "Do you want to install UltraVNC as service", "Service", MB_YESNO))
-				return 0;
-			DWORD errorcode = 0;
-			HANDLE hPToken = DesktopUsersToken::getInstance()->getDesktopUsersToken();
-			if (!hPToken)
-				goto error6;
-
-			char dir[MAX_PATH];
-			char exe_file_name[MAX_PATH];
-			GetModuleFileName(0, exe_file_name, MAX_PATH);
-			strcpy_s(dir, exe_file_name);
-			strcat_s(dir, " -installhelper");
-
-			STARTUPINFO          StartUPInfo;
-			PROCESS_INFORMATION  ProcessInfo;
-			ZeroMemory(&StartUPInfo, sizeof(STARTUPINFO));
-			ZeroMemory(&ProcessInfo, sizeof(PROCESS_INFORMATION));
-			StartUPInfo.wShowWindow = SW_SHOW;
-			StartUPInfo.lpDesktop = "Winsta0\\Default";
-			StartUPInfo.cb = sizeof(STARTUPINFO);
-
-			CreateProcessAsUser(hPToken, NULL, dir, NULL, NULL, FALSE, DETACHED_PROCESS, NULL, NULL, &StartUPInfo, &ProcessInfo);
-			errorcode = GetLastError();
-			if (ProcessInfo.hProcess)
-				CloseHandle(ProcessInfo.hProcess);
-			if (ProcessInfo.hThread)
-				CloseHandle(ProcessInfo.hThread);
-			if (errorcode == 1314)
-				goto error6;
-
-			fShutdownOrdered = TRUE;
-			Sleep(1000);
-			vnclog.Print(LL_INTINFO, VNCLOG("KillAuthClients() ID_CLOSE \n"));
-			_this->m_server->KillAuthClients();
-			PostMessage(hwnd, WM_CLOSE, 0, 0);
-			break;
-		error6:
-			serviceHelpers::Set_install_service_as_admin();
-			fShutdownOrdered = TRUE;
-			Sleep(1000);
-			vnclog.Print(LL_INTINFO, VNCLOG("KillAuthClients() ID_CLOSE \n"));
-			_this->m_server->KillAuthClients();
-			PostMessage(hwnd, WM_CLOSE, 0, 0);
-		}
-		break;
-		case ID_CLOSE_SERVICE:
-		{
-			HANDLE hProcess, hPToken;
-			DWORD id = processHelper::GetExplorerLogonPid();
-			if (id != 0)
-			{
-				if (!MessageBoxSecure(NULL, "Do you want to stop the UltravNC service.", "Service", MB_YESNO))
-					return 0;
-				DWORD errorcode = 0;
-				STARTUPINFO          StartUPInfo;
-				PROCESS_INFORMATION  ProcessInfo;
-				HANDLE Token = NULL;
-				HANDLE process = NULL;
-				ZeroMemory(&StartUPInfo, sizeof(STARTUPINFO));
-				ZeroMemory(&ProcessInfo, sizeof(PROCESS_INFORMATION));
-
-				hProcess = OpenProcess(MAXIMUM_ALLOWED, FALSE, id);
-				if (!hProcess) goto error7;
-				if (!OpenProcessToken(hProcess, TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY
-					| TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY | TOKEN_ADJUST_SESSIONID
-					| TOKEN_READ | TOKEN_WRITE, &hPToken))
-				{
-					CloseHandle(hProcess);
-					goto error7;
-				}
-
-				char dir[MAX_PATH];
-				char exe_file_name[MAX_PATH];
-				GetModuleFileName(0, exe_file_name, MAX_PATH);
-				strcpy_s(dir, exe_file_name);
-				strcat_s(dir, " -stopservicehelper");
-
-				StartUPInfo.wShowWindow = SW_SHOW;
-				StartUPInfo.lpDesktop = "Winsta0\\Default";
-				StartUPInfo.cb = sizeof(STARTUPINFO);
-
-				CreateProcessAsUser(hPToken, NULL, dir, NULL, NULL, FALSE, DETACHED_PROCESS, NULL, NULL, &StartUPInfo, &ProcessInfo);
-				errorcode = GetLastError();
-				if (process) CloseHandle(process);
-				if (Token) CloseHandle(Token);
-				if (hProcess) CloseHandle(hProcess);
-				if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
-				if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
-				if (errorcode == 1314) goto error7;
-				break;
-			error7:
-				serviceHelpers::Set_stop_service_as_admin();
-			}
-		}
-		break;
-		case ID_START_SERVICE:
-		{
-			if (!MessageBoxSecure(NULL, "Do you want to start the UltraVNC service.", "Service", MB_YESNO))
-				return 0;
-			HANDLE hProcess{}, hPToken{};
-			const DWORD id = processHelper::GetExplorerLogonPid();
-			if (id != 0)
-			{
-				DWORD errorcode = 0;
-				hProcess = OpenProcess(MAXIMUM_ALLOWED, FALSE, id);
-				if (!hProcess) {
-					serviceHelpers::Set_start_service_as_admin();
-					fShutdownOrdered = TRUE;
-					Sleep(1000);
-					vnclog.Print(LL_INTINFO, VNCLOG("KillAuthClients() ID_CLOSE \n"));
-					_this->m_server->KillAuthClients();
-					PostMessage(hwnd, WM_CLOSE, 0, 0);
-					break;
-				}
-				if (!OpenProcessToken(hProcess, TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY
-					| TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY | TOKEN_ADJUST_SESSIONID
-					| TOKEN_READ | TOKEN_WRITE, &hPToken))
-				{
-					CloseHandle(hProcess);
-					serviceHelpers::Set_start_service_as_admin();
-					fShutdownOrdered = TRUE;
-					Sleep(1000);
-					vnclog.Print(LL_INTINFO, VNCLOG("KillAuthClients() ID_CLOSE \n"));
-					_this->m_server->KillAuthClients();
-					PostMessage(hwnd, WM_CLOSE, 0, 0);
-					break;
-				}
-
-				char dir[MAX_PATH];
-				char exe_file_name[MAX_PATH];
-				GetModuleFileName(0, exe_file_name, MAX_PATH);
-				strcpy_s(dir, exe_file_name);
-				strcat_s(dir, " -startservicehelper");
-
-				STARTUPINFO          StartUPInfo{};
-				PROCESS_INFORMATION  ProcessInfo{};
-				HANDLE Token = NULL;
-				HANDLE process = NULL;
-				ZeroMemory(&StartUPInfo, sizeof(STARTUPINFO));
-				ZeroMemory(&ProcessInfo, sizeof(PROCESS_INFORMATION));
-				StartUPInfo.wShowWindow = SW_SHOW;
-				StartUPInfo.lpDesktop = "Winsta0\\Default";
-				StartUPInfo.cb = sizeof(STARTUPINFO);
-
-				CreateProcessAsUser(hPToken, NULL, dir, NULL, NULL, FALSE, DETACHED_PROCESS, NULL, NULL, &StartUPInfo, &ProcessInfo);
-				errorcode = GetLastError();
-				if (hPToken) CloseHandle(hPToken);
-				if (process) CloseHandle(process);
-				if (Token) CloseHandle(Token);
-				if (hProcess) CloseHandle(hProcess);
-				if (ProcessInfo.hProcess) CloseHandle(ProcessInfo.hProcess);
-				if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
-				if (errorcode == 1314)
-					serviceHelpers::Set_start_service_as_admin();
-				fShutdownOrdered = TRUE;
-				Sleep(1000);
-				vnclog.Print(LL_INTINFO, VNCLOG("KillAuthClients() ID_CLOSE \n"));
-				_this->m_server->KillAuthClients();
-				PostMessage(hwnd, WM_CLOSE, 0, 0);
-				break;
-			}
 		}
 		break;
 #endif // SC_20
@@ -2073,10 +1865,6 @@ void vncMenu::updateMenu()
 		settings->getAllowEditClients() ? MF_ENABLED : MF_GRAYED);
 	EnableMenuItem(m_hmenu, ID_OUTGOING_CONN,
 		settings->getAllowEditClients() ? MF_ENABLED : MF_GRAYED);
-	EnableMenuItem(m_hmenu, ID_CLOSE_SERVICE, (settings->RunningFromExternalService() && settings->getAllowShutdown()) ? MF_ENABLED : MF_GRAYED);
-	EnableMenuItem(m_hmenu, ID_START_SERVICE, (processHelper::IsServiceInstalled() && !settings->RunningFromExternalService() && settings->getAllowShutdown()) ? MF_ENABLED : MF_GRAYED);
-	EnableMenuItem(m_hmenu, ID_RUNASSERVICE, (!processHelper::IsServiceInstalled() && !settings->RunningFromExternalService() && settings->getAllowShutdown()) ? MF_ENABLED : MF_GRAYED);
-	EnableMenuItem(m_hmenu, ID_UNINSTALL_SERVICE, (processHelper::IsServiceInstalled() && settings->getAllowShutdown()) ? MF_ENABLED : MF_GRAYED);
 	EnableMenuItem(m_hmenu, ID_REBOOTSAFEMODE, (settings->RunningFromExternalService() && settings->getAllowShutdown()) ? MF_ENABLED : MF_GRAYED);
 	EnableMenuItem(m_hmenu, ID_REBOOT_FORCE, (settings->RunningFromExternalService() && settings->getAllowShutdown()) ? MF_ENABLED : MF_GRAYED);
 }
