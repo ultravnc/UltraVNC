@@ -2089,11 +2089,11 @@ void PropertiesDialog::LogToEdit(const std::string & message)
 	}
 
 	// Add the new message
-	lines.push_back(message);
+	lines.insert(lines.begin(), message);
 
 	// Remove excess lines if necessary
 	while (lines.size() > MAX_LINES) {
-		lines.erase(lines.begin());
+		lines.pop_back();
 	}
 
 	// Rebuild the content

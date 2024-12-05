@@ -56,69 +56,53 @@ DWORD Credentials::GetCurrentUserToken(HANDLE& process, HANDLE& Token)
 
 bool Credentials::RunningAsAdministrator()
 {
-	BOOL   fAdmin{};
-	TOKEN_GROUPS* ptg = NULL;
-	DWORD  cbTokenGroups{};
-	DWORD  dwGroup{};
-	PSID   psidAdmin{};
+	BOOL   fAdmin = FALSE;
+	TOKEN_GROUPS* ptg = nullptr;
+	DWORD  cbTokenGroups = 0;
+	DWORD  dwGroup = 0;
+	PSID   psidAdmin = nullptr;
 	SetLastError(0);
-	HANDLE process = 0;
-	HANDLE Token = NULL;
+	HANDLE process = nullptr;
+	HANDLE Token = nullptr;
 
-	if (GetCurrentUserToken(process, Token) == 1)
-		return true;
+	if (!GetCurrentUserToken(process, Token) == 1)
+		return false;
 
 	ON_BLOCK_EXIT(CloseHandle, process);
 	ON_BLOCK_EXIT(CloseHandle, Token);
 
 	SID_IDENTIFIER_AUTHORITY SystemSidAuthority = SECURITY_NT_AUTHORITY;
 
-	// Then we must query the size of the group information associated with
-	// the token. Note that we expect a FALSE result from GetTokenInformation
-	// because we've given it a NULL buffer. On exit cbTokenGroups will tell
-	// the size of the group information.
-
-	if (GetTokenInformation(Token, TokenGroups, NULL, 0, &cbTokenGroups))
-		return (FALSE);
-
-	// Here we verify that GetTokenInformation failed for lack of a large
-	// enough buffer.
-	DWORD errorcode = GetLastError();
-	if (errorcode != ERROR_INSUFFICIENT_BUFFER)
-		return (FALSE);
-
-	// Now we allocate a buffer for the group information.
-	// Since _alloca allocates on the stack, we don't have
-	// to explicitly deallocate it. That happens automatically
-	// when we exit this function.
-
-	if (!(ptg = (_TOKEN_GROUPS*)_malloca(cbTokenGroups)))
-		return (FALSE);
-
-	// Now we ask for the group information again.
-	// This may fail if an administrator has added this account
-	// to an additional group between our first call to
-	// GetTokenInformation and this one.
-
-	if (!GetTokenInformation(Token, TokenGroups, ptg, cbTokenGroups,
-		&cbTokenGroups)) {
-		_freea(ptg);
-		return (FALSE);
+	// Get size of the group information
+	if (!GetTokenInformation(Token, TokenGroups, nullptr, 0, &cbTokenGroups)) {
+		if (GetLastError() != ERROR_INSUFFICIENT_BUFFER) {
+			return false;
+		}
 	}
 
-	// Now we must create a System Identifier for the Admin group.
-
-	if (!AllocateAndInitializeSid(&SystemSidAuthority, 2, SECURITY_BUILTIN_DOMAIN_RID,
-		DOMAIN_ALIAS_RID_ADMINS, 0, 0, 0, 0, 0, 0, &psidAdmin)) {
-		_freea(ptg);
-		return (FALSE);
+	// Allocate memory for group information
+	ptg = (TOKEN_GROUPS*)_malloca(cbTokenGroups);
+	if (!ptg) {
+		return false;
 	}
 
-	// Finally we'll iterate through the list of groups for this access
-	// token looking for a match against the SID we created above.
+	// Retrieve group information
+	if (!GetTokenInformation(Token, TokenGroups, ptg, cbTokenGroups, &cbTokenGroups)) {
+		return false;
+	}
 
-	fAdmin = FALSE;
+	// Create SID for Administrators group
+	if (!AllocateAndInitializeSid(
+		&SystemSidAuthority,
+		2,
+		SECURITY_BUILTIN_DOMAIN_RID,
+		DOMAIN_ALIAS_RID_ADMINS,
+		0, 0, 0, 0, 0, 0,
+		&psidAdmin)) {
+		return false;
+	}
 
+	// Check group membership
 	for (dwGroup = 0; dwGroup < ptg->GroupCount; dwGroup++) {
 		if (EqualSid(ptg->Groups[dwGroup].Sid, psidAdmin)) {
 			fAdmin = TRUE;
@@ -126,10 +110,12 @@ bool Credentials::RunningAsAdministrator()
 		}
 	}
 
-	// Before we exit we must explicity deallocate the SID we created.
-	_freea(ptg);
-	FreeSid(psidAdmin);
-	return (FALSE != fAdmin);
+	/// Cleanup SID
+	if (psidAdmin) {
+		FreeSid(psidAdmin);
+	}
+
+	return fAdmin;
 }
 
 DesktopUsersToken* DesktopUsersToken::getInstance() {

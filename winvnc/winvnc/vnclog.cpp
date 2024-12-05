@@ -214,6 +214,7 @@ void VNCLog::ReallyPrint(const char* format, va_list ap)
         char isoTime[20]; // Buffer for ISO 8601 format: "YYYY-MM-DDTHH:MM:SS"
         std::strftime(isoTime, sizeof(isoTime), "%Y-%m-%d %H:%M:%S", std::localtime(&m_lastLogTime));
 		ReallyPrintLine(isoTime);
+        ReallyPrintLine("\n");
 	}
 
 	// - Write the log message, safely, limiting the output buffer size
@@ -245,7 +246,7 @@ void VNCLog::ReallyPrintScreen(const char* format, va_list ap)
     TCHAR line2[(LINE_BUFFER_SIZE * 2) + 1];
     _vsnprintf(line, LINE_BUFFER_SIZE, format, ap);
     strcpy_s(line2, isoTime);
-    strcat_s(line2, ": ");
+    strcat_s(line2, " ");
     strcat_s(line2, line);
     PropertiesDialog::LogToEdit(line2);
 }
