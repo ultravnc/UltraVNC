@@ -32,11 +32,11 @@ BEGIN
         BEGIN
             VALUE "Comments", "UltraVNC - Remote Control for all"
             VALUE "CompanyName", "uvnc bvba"
-            VALUE "FileDescription", "UltraVNC server"
+            VALUE "FileDescription", "UltraVNC Server"
             VALUE "FileVersion", APS_FULLVERSION_STR
-            VALUE "InternalName", "WinVNC.exe"
+            VALUE "InternalName", "ultravncServer.exe"
             VALUE "LegalCopyright", "Copyright © 2002-" STRINGIZE(APS_DATEYEAR) " UltraVNC Team Members. All Rights Reserved."
-            VALUE "OriginalFilename", "WinVNC.exe"
+            VALUE "OriginalFilename", "ultravncServer.exe"
             VALUE "ProductName", "UltraVNC server"
             VALUE "ProductVersion", APS_FULLVERSION_STR
         END
