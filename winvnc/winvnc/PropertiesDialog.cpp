@@ -75,8 +75,9 @@ bool PropertiesDialog::InitDialog(HWND hwnd)
 
 	showAdminPanel = false;
 	if (settings->RunningFromExternalService()) {
-		if (settings->IsDesktopUserAdmin())
+		if (settings->IsDesktopUserAdmin()) {
 			showAdminPanel = true;
+		}
 		else if (settings->getAllowUserSettingsWithPassword() && !settings->checkAdminPassword()) {
 				EndDialog(hwnd, IDCANCEL);
 				return true;
@@ -1402,8 +1403,6 @@ void PropertiesDialog::Secure_Plugin(char* szPlugin)
 
 		if (desktop == NULL)
 			vnclog.Print(LL_INTERR, VNCLOG("OpenInputdesktop Error \n"));
-		else
-			vnclog.Print(LL_INTERR, VNCLOG("OpenInputdesktop OK\n"));
 
 		HDESK old_desktop = GetThreadDesktop(GetCurrentThreadId());
 		DWORD dummy{};

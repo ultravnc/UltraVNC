@@ -75,7 +75,6 @@ BOOL vncSockConnectThread::Init(VSocket *socket, vncServer *server)
 // Code to be executed by the thread
 void *vncSockConnectThread::run_undetached(void * arg)
 {
-	vnclog.Print(LL_STATE, VNCLOG("started socket connection thread\n"));
 	// Go into a loop, listening for connections on the given socket
 	VSocket* new_socket = NULL;
 	while (!m_shutdown && !fShutdownOrdered)

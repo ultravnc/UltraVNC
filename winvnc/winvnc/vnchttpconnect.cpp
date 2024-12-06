@@ -204,7 +204,6 @@ BOOL vncHTTPConnectThread::Init(VSocket *socket, vncServer *server)
 // Code to be executed by the thread
 void *vncHTTPConnectThread::run_undetached(void * arg)
 {
-	vnclog.Print(LL_INTINFO, VNCLOG("started HTTP server thread\n"));
 
 	// Go into a loop, listening for connections on the given socket
 	VSocket* new_socket = NULL;
