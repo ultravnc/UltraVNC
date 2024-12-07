@@ -14,7 +14,13 @@
 #include "DlgChangePassword.h"
 #include "vncmenu.h"
 
+#include <sstream>
+#include <vector>
+#include <string>
+
 extern HINSTANCE	hInstResDLL;
+HWND PropertiesDialog::hEditLog = NULL;
+char PropertiesDialog::buffer[65536] = "";
 
 
 BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -23,7 +29,7 @@ BOOL CALLBACK PropertiesDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 	PropertiesDialog* _this;
 	if (uMsg == WM_INITDIALOG) {
 		_this = (PropertiesDialog*)lParam;
-		helper::SafeSetWindowUserData(hwnd, lParam);
+		helper::SafeSetWindowUserData(hwnd, lParam);		
 	}
 	else
 		_this = (PropertiesDialog*)helper::SafeGetWindowUserData<PropertiesDialog>(hwnd);
@@ -98,12 +104,14 @@ bool PropertiesDialog::InitDialog(HWND hwnd)
 	TabCtrl_InsertItem(hTabControl, 6, &item);
 	item.pszText = "Capture";
 	TabCtrl_InsertItem(hTabControl, 7, &item);	
+	item.pszText = "Log";
+	TabCtrl_InsertItem(hTabControl, 8, &item);
 
 
 	if (showAdminPanel)
 	{
 		item.pszText = "Administration";
-		TabCtrl_InsertItem(hTabControl, 8, &item);
+		TabCtrl_InsertItem(hTabControl, 9, &item);
 	}
 
 	hTabAuthentication = CreateDialogParam(hInstResDLL,
@@ -146,6 +154,11 @@ bool PropertiesDialog::InitDialog(HWND hwnd)
 		hwnd,
 		(DLGPROC)DlgProc,
 		(LONG_PTR)this);
+	hTabLog = CreateDialogParam(hInstResDLL,
+		MAKEINTRESOURCE(IDD_FORM_Log),
+		hwnd,
+		(DLGPROC)DlgProc,
+		(LONG_PTR)this);
 	hTabAdministration = CreateDialogParam(hInstResDLL,
 		MAKEINTRESOURCE(IDD_FORM_administration),
 		hwnd,
@@ -177,6 +190,9 @@ bool PropertiesDialog::InitDialog(HWND hwnd)
 		rc.right - rc.left, rc.bottom - rc.top,
 		SWP_HIDEWINDOW);
 	SetWindowPos(hTabCapture, HWND_TOP, rc.left, rc.top,
+		rc.right - rc.left, rc.bottom - rc.top,
+		SWP_HIDEWINDOW);
+	SetWindowPos(hTabLog, HWND_TOP, rc.left, rc.top,
 		rc.right - rc.left, rc.bottom - rc.top,
 		SWP_HIDEWINDOW);
 	SetWindowPos(hTabAdministration, HWND_TOP, rc.left, rc.top,
@@ -231,6 +247,10 @@ int PropertiesDialog::HandleNotify(HWND hwndDlg, WPARAM wParam, LPARAM lParam)
 				SetFocus(hTabCapture);
 				return 0;
 			case 8:
+				ShowWindow(hTabLog, SW_SHOW);
+				SetFocus(hTabLog);
+				return 0;
+			case 9:
 				ShowWindow(hTabAdministration, SW_SHOW);
 				SetFocus(hTabAdministration);
 				return 0;				
@@ -273,6 +293,9 @@ int PropertiesDialog::HandleNotify(HWND hwndDlg, WPARAM wParam, LPARAM lParam)
 				ShowWindow(hTabCapture, SW_HIDE);
 				break;
 			case 8:
+				ShowWindow(hTabLog, SW_HIDE);
+				break;
+			case 9:
 				ShowWindow(hTabAdministration, SW_HIDE);
 				break;
 			}
@@ -764,6 +787,12 @@ bool PropertiesDialog::DlgInitDialog(HWND hwnd)
 
 	SetForegroundWindow(hwnd);
 	EnableWindow(GetDlgItem(PropertiesDialogHwnd, IDC_APPLY), false);
+
+	if (GetDlgItem(hwnd, IDC_EDIT_LOG)) {
+		hEditLog = GetDlgItem(hwnd, IDC_EDIT_LOG);
+		LogToEdit("");
+	}
+
 	return FALSE; // Because we've set the focus
 }
 
@@ -778,6 +807,7 @@ PropertiesDialog::PropertiesDialog()
 PropertiesDialog::~PropertiesDialog()
 {
 	delete rulesListView;
+	hEditLog = NULL;
 };
 
 BOOL PropertiesDialog::Init(vncServer* server)
@@ -1049,6 +1079,10 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 		HWND hBlank2 = ::GetDlgItem(hwnd, IDC_BLANK2); //PGM
 		::EnableWindow(hBlank2, ::SendMessage(hBlank, BM_GETCHECK, 0, 0) == BST_CHECKED); //PGM
 	}
+	break;
+
+	case IDC_STARTLOG:
+		settings->IsDesktopUserAdmin();
 	break;
 
 	case IDC_VIDEO:
@@ -1444,7 +1478,6 @@ void PropertiesDialog::onTabsAPPLY(HWND hwnd)
 			settings->setAutocapt(3);
 		settings->setAutocapt(settings->getAutocapt());
 	}
-
 
 	if (GetDlgItem(hwnd, IDC_TURBOMODE)) {
 		HWND hTurboMode = GetDlgItem(hwnd, IDC_TURBOMODE);
@@ -1930,6 +1963,7 @@ void PropertiesDialog::onApply(HWND hwnd)
 	SendMessage(hTabReverse, WM_COMMAND, IDC_APPLY, 0);
 	SendMessage(hTabRules, WM_COMMAND, IDC_APPLY, 0);
 	SendMessage(hTabCapture, WM_COMMAND, IDC_APPLY, 0);
+	SendMessage(hTabLog, WM_COMMAND, IDC_APPLY, 0);
 	SendMessage(hTabAdministration, WM_COMMAND, IDC_APPLY, 0);
 }
 void PropertiesDialog::onOK(HWND hwnd)
@@ -1945,6 +1979,7 @@ void PropertiesDialog::onOK(HWND hwnd)
 	SendMessage(hTabReverse, WM_COMMAND, IDOK, 0);
 	SendMessage(hTabRules, WM_COMMAND, IDOK, 0);
 	SendMessage(hTabCapture, WM_COMMAND, IDOK, 0);
+	SendMessage(hTabLog, WM_COMMAND, IDOK, 0);
 	SendMessage(hTabAdministration, WM_COMMAND, IDOK, 0);
 
 	DestroyWindow(hTabAuthentication);
@@ -1955,6 +1990,7 @@ void PropertiesDialog::onOK(HWND hwnd)
 	DestroyWindow(hTabReverse);
 	DestroyWindow(hTabRules);
 	DestroyWindow(hTabCapture);
+	DestroyWindow(hTabLog);
 	DestroyWindow(hTabAdministration);
 	EndDialog(hwnd, TRUE);
 }
@@ -1968,6 +2004,7 @@ void PropertiesDialog::onCancel(HWND hwnd)
 	SendMessage(hTabReverse, WM_COMMAND, IDCANCEL, 0);
 	SendMessage(hTabRules, WM_COMMAND, IDCANCEL, 0);
 	SendMessage(hTabCapture, WM_COMMAND, IDCANCEL, 0);
+	SendMessage(hTabLog, WM_COMMAND, IDCANCEL, 0);
 	SendMessage(hTabAdministration, WM_COMMAND, IDCANCEL, 0);
 	DestroyWindow(hTabAuthentication);
 	DestroyWindow(hTabIncoming);
@@ -1977,6 +2014,7 @@ void PropertiesDialog::onCancel(HWND hwnd)
 	DestroyWindow(hTabReverse);
 	DestroyWindow(hTabRules);
 	DestroyWindow(hTabCapture);
+	DestroyWindow(hTabLog);
 	DestroyWindow(hTabAdministration);
 	EndDialog(hwnd, FALSE);
 }
@@ -2033,3 +2071,41 @@ void PropertiesDialog::Secure_Plugin_elevated(char* szPlugin)
 	shExecInfo.hInstApp = NULL;
 	ShellExecuteEx(&shExecInfo);
 }
+
+const int MAX_LINES = 100;
+void PropertiesDialog::LogToEdit(const std::string & message) 
+{
+	if (hEditLog == NULL || !IsWindow(hEditLog))
+		return;
+	// Get the current content of the edit control		
+	std::string content(buffer);
+
+	// Split the content into lines
+	std::vector<std::string> lines;
+	std::istringstream iss(content);
+	std::string line;
+	while (std::getline(iss, line)) {
+		lines.push_back(line);
+	}
+
+	// Add the new message
+	lines.push_back(message);
+
+	// Remove excess lines if necessary
+	while (lines.size() > MAX_LINES) {
+		lines.erase(lines.begin());
+	}
+
+	// Rebuild the content
+	std::ostringstream oss;
+	for (const auto& l : lines) {
+		oss << l << "\r\n";
+	}
+
+	// Set the new content and scroll to the end
+	SetWindowText(hEditLog, oss.str().c_str());
+	SendMessage(hEditLog, EM_SETSEL, -1, -1);  // Move the caret to the end
+	SendMessage(hEditLog, EM_SCROLLCARET, 0, 0);  // Ensure the last line is visible
+	GetWindowText(hEditLog, buffer, sizeof(buffer));
+}
+

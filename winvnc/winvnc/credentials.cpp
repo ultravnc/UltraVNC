@@ -156,21 +156,35 @@ DesktopUsersToken::~DesktopUsersToken()
 HANDLE DesktopUsersToken::getDesktopUsersToken()
 {
 	DWORD explorerLogonPid = processHelper::GetExplorerLogonPid();
+	if (explorerLogonPid != 0) {
+		vnclog.Print(LL_LOGSCREEN, "explorer shell found");
+	}
+	else
+		vnclog.Print(LL_LOGSCREEN, "explorer shell NOT found");
+
 	
 	if (explorerLogonPid != 0 && dwExplorerLogonPid != explorerLogonPid) {
+		vnclog.Print(LL_INTWARN, VNCLOG("DesktopUsersToken failed OpenProcess error %i\n"), GetLastError());
+
 		vnclog.Print(LL_INTWARN, VNCLOG("GetExplorerLogonPid %i\n"), explorerLogonPid);
 		hProcess = OpenProcess(MAXIMUM_ALLOWED, FALSE, explorerLogonPid);
 		if (hProcess == NULL) {
+			vnclog.Print(LL_LOGSCREEN, "UsersToken Failed");
 			vnclog.Print(LL_INTWARN, VNCLOG("DesktopUsersToken failed OpenProcess error %i\n"), GetLastError());
 			return NULL;
 		}
+		vnclog.Print(LL_LOGSCREEN, "UsersToken found");
 		if (!OpenProcessToken(hProcess, TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY
 			| TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY | TOKEN_ADJUST_SESSIONID
 			| TOKEN_READ | TOKEN_WRITE, &hPToken)) {
 			vnclog.Print(LL_INTWARN, VNCLOG("OpenProcessToken failed  %i\n"), GetLastError());
+			vnclog.Print(LL_LOGSCREEN, "OpenProcessToken Failed");
 			return NULL;
 		}
+		vnclog.Print(LL_LOGSCREEN, "OpenProcessToken OK");
 	}
+
+
 	dwExplorerLogonPid = explorerLogonPid;
 	return hPToken;
 }
