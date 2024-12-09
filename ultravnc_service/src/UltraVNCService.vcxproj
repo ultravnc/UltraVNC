@@ -24,7 +24,7 @@
     <ProjectGuid>{fbc71d73-1b22-4d09-b61e-da81cc8435b4}</ProjectGuid>
     <RootNamespace>UltraVNCService</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>ultravnc_service.exe</ProjectName>
+    <ProjectName>ultravnc_service</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

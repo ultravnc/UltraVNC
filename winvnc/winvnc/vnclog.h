@@ -65,22 +65,7 @@ public:
 	//    append   - if logging to a file, whether or not to append to any
 	//               existing log.
 	VNCLog();
-
-	inline void Print(int level, const char* format, ...) {
-		if (level == -1) {
-			va_list ap;
-			va_start(ap, format);
-			ReallyPrintScreen(format, ap);
-			va_end(ap);
-			return;
-		}
-		if (level > m_level) return;
-		if (!m_todebug && !m_toconsole && !m_tofile) return;
-		va_list ap;
-		va_start(ap, format);
-		ReallyPrint(format, ap);
-		va_end(ap);
-	}
+	void VNCLog::Print(int level, const char* format, ...);
 
 	// Change the log level
 	void SetLevel(int level);

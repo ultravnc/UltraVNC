@@ -37,7 +37,7 @@ char UltraVNCService::service_path[MAX_PATH]{};
 char UltraVNCService::service_name[256] = "ultravnc_server";
 char UltraVNCService::display_name[256] = "UltraVNC Server";
 char UltraVNCService::description[256] = "UltraVNC Server enables remote connectivity to this machine using the VNC/RFB protocol.";
-char UltraVNCService::ultravnc_server_ui[256] = "\\winvnc.exe";
+char UltraVNCService::ultravnc_server_ui[256] = "\\ultravnc_server.exe";
 char UltraVNCService::app_path[MAX_PATH]{};
 char UltraVNCService::app_path_UI[MAX_PATH]{};
 int UltraVNCService::kickrdp = 0;
@@ -139,23 +139,21 @@ wchar_t* GetVersionFromResource(wchar_t* version)
 
 void updateButtons(HWND hwnd)
 {
-	if (UltraVNCService::IsServiceInstalled()) {
-		SendMessage(hwnd, TDM_ENABLE_BUTTON, 1000, FALSE);
-		SendMessage(hwnd, TDM_ENABLE_BUTTON, 1001, TRUE);
-	}
-	else {
+	if (!UltraVNCService::IsServiceInstalled()) {
 		SendMessage(hwnd, TDM_ENABLE_BUTTON, 1000, TRUE);
 		SendMessage(hwnd, TDM_ENABLE_BUTTON, 1001, FALSE);
 		SendMessage(hwnd, TDM_ENABLE_BUTTON, 1002, FALSE);
 		SendMessage(hwnd, TDM_ENABLE_BUTTON, 1003, FALSE);
 	}
 
-	if (UltraVNCService::IsServiceInstalled() && UltraVNCService::IsServiceRunning()) {
+	else if (UltraVNCService::IsServiceInstalled() && UltraVNCService::IsServiceRunning()) {
+		SendMessage(hwnd, TDM_ENABLE_BUTTON, 1000, FALSE);
 		SendMessage(hwnd, TDM_ENABLE_BUTTON, 1001, FALSE);
 		SendMessage(hwnd, TDM_ENABLE_BUTTON, 1002, TRUE);
 		SendMessage(hwnd, TDM_ENABLE_BUTTON, 1003, FALSE);
 	}
 	else if (UltraVNCService::IsServiceInstalled() && !UltraVNCService::IsServiceRunning()) {
+		SendMessage(hwnd, TDM_ENABLE_BUTTON, 1000, FALSE);
 		SendMessage(hwnd, TDM_ENABLE_BUTTON, 1001, TRUE);
 		SendMessage(hwnd, TDM_ENABLE_BUTTON, 1002, FALSE);
 		SendMessage(hwnd, TDM_ENABLE_BUTTON, 1003, TRUE);
@@ -177,12 +175,7 @@ int  StartUVNCMessageBox(HWND m_hWnd, const char* body, const char* szHeader, in
 	HRESULT hr;
 	TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
 	int nClickedBtn = 0;
-	wchar_t szTitle[2048] = L"UltraVNC Server -";
-#ifdef _X64
-	wcscat_s(szTitle, L" 64-bit - Service Manager");
-#else
-	wcscat_s(szTitle, L" 32-bit - Service Manager");
-#endif
+	wchar_t szTitle[2048] = L"UltraVNC Server - Service Manager";
 
 	TASKDIALOG_BUTTON aCustomButtons[] = {
 	   { 1000, L"Install"},
@@ -205,6 +198,12 @@ int  StartUVNCMessageBox(HWND m_hWnd, const char* body, const char* szHeader, in
 	wchar_t footer[4000]{};
 	wcscpy_s(footer, L"UltraVNC Server - Service Manager -");
 	wcscat_s(footer, w_version);
+#ifdef _X64
+	wcscat_s(footer, L" - x64");
+#else
+	wcscat_s(footer, L" - x86");
+#endif
+
 	wcscat_s(footer, L"\nCopyright © 2002-2025 UltraVNC Team Members\n<a href=\"https://uvnc.com\">Website</a> | <a href=\"https://forum.uvnc.com\">Forum</a>");
 	tdc.pszFooter = footer;
 	tdc.pfCallback = [](HWND hwnd, UINT uNotification, WPARAM wParam, LPARAM lParam, LONG_PTR lpRefData) -> HRESULT {
@@ -946,6 +945,7 @@ bool UltraVNCService::MonitorConsoleSession(PROCESS_INFORMATION& procInfo, DWORD
 		if (ProcessInfo.hProcess == NULL) {
 			LaunchProcessWin(dwSessionId, false, false);
 			OlddwSessionId = dwSessionId;
+			return true;
 		}
 		else if (GetExitCodeProcess(ProcessInfo.hProcess, &dwCode)) {
 			if (dwCode != STILL_ACTIVE) {
@@ -980,7 +980,7 @@ bool UltraVNCService::MonitorConsoleSession(PROCESS_INFORMATION& procInfo, DWORD
 			return true;
 		}
 	}
-	return false;
+	return true;
 }
 
 bool UltraVNCService::MonitorAndLaunchRdpSession(PROCESS_INFORMATION& procInfo, DWORD& OlddwSessionId, bool& RDPMODE)

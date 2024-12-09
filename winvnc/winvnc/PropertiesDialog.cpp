@@ -74,15 +74,24 @@ bool PropertiesDialog::InitDialog(HWND hwnd)
 	SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
 
 	showAdminPanel = false;
+	vnclog.Print(LL_INTWARN, VNCLOG("showAdminPanel = false\n"));
 	if (settings->RunningFromExternalService()) {
+		vnclog.Print(LL_INTWARN, VNCLOG("RunningFromExternalService true \n"));
 		if (settings->IsDesktopUserAdmin()) {
+			vnclog.Print(LL_INTWARN, VNCLOG("IsDesktopUserAdmin true\n"));
 			showAdminPanel = true;
+			vnclog.Print(LL_INTWARN, VNCLOG("showAdminPanel = true\n"));
 		}
-		else if (settings->getAllowUserSettingsWithPassword() && !settings->checkAdminPassword()) {
+		else {
+			vnclog.Print(LL_INTWARN, VNCLOG("IsDesktopUserAdmin false\n"));
+			if (settings->getAllowUserSettingsWithPassword() && !settings->checkAdminPassword()) {
 				EndDialog(hwnd, IDCANCEL);
 				return true;
+			}
 		}
 	}
+	else
+		vnclog.Print(LL_INTWARN, VNCLOG("RunningFromExternalServic  false\n"));
 
 	
 
@@ -111,9 +120,12 @@ bool PropertiesDialog::InitDialog(HWND hwnd)
 
 	if (showAdminPanel)
 	{
+		vnclog.Print(LL_INTWARN, VNCLOG("showAdminPanel\n"));
 		item.pszText = "Administration";
 		TabCtrl_InsertItem(hTabControl, 9, &item);
 	}
+	else
+		vnclog.Print(LL_INTWARN, VNCLOG("Don't show showAdminPanel\n"));
 
 	hTabAuthentication = CreateDialogParam(hInstResDLL,
 		MAKEINTRESOURCE(IDD_FORM_AUTHENTICATION),
@@ -344,6 +356,7 @@ bool PropertiesDialog::DlgInitDialog(HWND hwnd)
 	vnclog.SetLevel(settings->getDebugLevel());
 	vnclog.SetVideo(settings->getAvilog());
 	vnclog.SetMode(settings->getDebugMode());
+	vnclog.SetFile();
 	if (GetDlgItem(hwnd, IDC_CHANGEPASSWORD)) {
 		SetWindowText(GetDlgItem(hwnd, IDC_CHANGEPASSWORD), (strlen(settings->getPasswd()) == 0) ? "SET" : "CHANGE");
 	}
@@ -1083,7 +1096,10 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 	break;
 
 	case IDC_STARTLOG:
-		settings->IsDesktopUserAdmin();
+		settings->setShowAllLogs(!settings->getShowAllLogs());
+		SetDlgItemText(hwnd, IDC_STARTLOG, settings->getShowAllLogs() 
+					?"HIDE ALL LOGS"
+					:"SHOW ALL LOGS");
 	break;
 
 	case IDC_VIDEO:
@@ -1547,6 +1563,7 @@ void PropertiesDialog::onTabsAPPLY(HWND hwnd)
 			vnclog.SetPath(path);
 		}
 		settings->setDebugPath(path);
+		vnclog.SetFile();
 	}
 
 	if (GetDlgItem(hwnd, IDC_SAVEPASSWORDSECURE)) {

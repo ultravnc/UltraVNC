@@ -649,14 +649,12 @@ vncDesktop::InitWindow()
 				{
 					if (can_be_hooked)
 					{
-					vnclog.Print(LL_INTERR, VNCLOG("RFB_MOUSE_UPDATE  \n"));
 					SetCursor((HCURSOR) msg.wParam);
 					SetEvent(trigger_events[2]);
 					}
 				}
 			else
 				{
-					if (msg.message==WM_USER+3 )vnclog.Print(LL_INTERR, VNCLOG("OOOOOOOOOOOO called wm_user+3\n"));
 					TranslateMessage(&msg);
 					DispatchMessage(&msg);
 				}
@@ -674,8 +672,6 @@ vncDesktop::InitWindow()
 		FreeLibrary(hSCModule);
 	SetThreadDesktop(old_desktop);
     CloseDesktop(desktop);
-	///////////////////////
-	vnclog.Print(LL_INTERR, VNCLOG("OOOOOOOOOOOO end dispatch\n"));
 	m_hwnd = NULL;
 	return TRUE;
 }

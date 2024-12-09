@@ -44,6 +44,37 @@ const int VNCLog::ToFile    =  2;
 const int VNCLog::ToConsole =  4;
 
 static const int LINE_BUFFER_SIZE = 1024;
+#include "SettingsManager.h"
+
+char* removeNewlineAndCopy(const char* str) {
+    size_t len = strlen(str); // Get the length of the string
+    bool hasNewline = (len > 0 && str[len - 1] == '\n');
+    size_t newLen = hasNewline ? len - 1 : len; // Adjust length if there's a newline
+
+    // Allocate a new char array for the result
+    char* result = new char[newLen + 1]; // +1 for null terminator
+    strncpy(result, str, newLen); // Copy up to newLen characters
+    result[newLen] = '\0'; // Add null terminator
+
+    return result; // Return the new char array
+}
+
+
+void VNCLog::Print(int level, const char* format, ...) {
+    if (level == -1 || (settings && settings->getShowAllLogs())) {
+        va_list ap;
+        va_start(ap, format);
+        ReallyPrintScreen(removeNewlineAndCopy(format), ap);
+        va_end(ap);
+        return;
+    }
+    if (level > m_level) return;
+    if (!m_todebug && !m_toconsole && !m_tofile) return;
+    va_list ap;
+    va_start(ap, format);
+    ReallyPrint(format, ap);
+    va_end(ap);
+}
 
 VNCLog::VNCLog()
     : m_tofile(false)
@@ -112,10 +143,10 @@ void VNCLog::SetFile()
 #ifdef SC_20
     return;
 #endif // SC_20
-	char temp[512];
+	/*char temp[512];
 	IniFile myIniFile;
 	myIniFile.ReadString("admin", "path", temp,512);
-	SetPath(temp);
+	SetPath(temp);*/
 	strcpy_s(m_filename,m_path);
 	strcat_s(m_filename,"\\");
 	strcat_s(m_filename,"WinVNC.log");

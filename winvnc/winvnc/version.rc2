@@ -34,9 +34,9 @@ BEGIN
             VALUE "CompanyName", "uvnc bvba"
             VALUE "FileDescription", "UltraVNC Server"
             VALUE "FileVersion", APS_FULLVERSION_STR
-            VALUE "InternalName", "ultravncServer.exe"
+            VALUE "InternalName", "ultravnc_server.exe"
             VALUE "LegalCopyright", "Copyright © 2002-" STRINGIZE(APS_DATEYEAR) " UltraVNC Team Members. All Rights Reserved."
-            VALUE "OriginalFilename", "ultravncServer.exe"
+            VALUE "OriginalFilename", "ultravnc_server.exe"
             VALUE "ProductName", "UltraVNC server"
             VALUE "ProductVersion", APS_FULLVERSION_STR
         END
