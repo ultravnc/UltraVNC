@@ -142,10 +142,7 @@ DesktopUsersToken::~DesktopUsersToken()
 HANDLE DesktopUsersToken::getDesktopUsersToken()
 {
 	DWORD explorerLogonPid = processHelper::GetExplorerLogonPid();
-	if (explorerLogonPid != 0) {
-		vnclog.Print(LL_LOGSCREEN, "explorer shell found");
-	}
-	else
+	if (explorerLogonPid == 0) 
 		vnclog.Print(LL_LOGSCREEN, "explorer shell NOT found");
 
 	

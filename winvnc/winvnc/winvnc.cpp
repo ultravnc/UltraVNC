@@ -157,9 +157,6 @@ Myinit(HINSTANCE hInstance)
 
     //Load all messages from ressource file
     Load_Localization(hInstResDLL) ;
-	vnclog.SetFile();
-	//vnclog.SetMode(4);
-	//vnclog.SetLevel(10);
 
 #ifdef _DEBUG
 	{
@@ -337,8 +334,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 		}
 		char progname[MAX_PATH];
 		strncpy_s(progname, WORKDIR, sizeof progname);
-		progname[MAX_PATH - 1] = 0;
-		vnclog.SetFile();
+		progname[MAX_PATH - 1] = 0;		
 
 
 	#ifdef _DEBUG

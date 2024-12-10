@@ -273,6 +273,8 @@ public:
 	bool checkAdminPassword();
 	void setAdminPasswordHash(char *password);
 	bool isAdminPasswordSet();
+	void setShowAllLogs(bool value) { showAllLogs = value; }
+	bool getShowAllLogs() { return showAllLogs; }
 
 private:
 	SettingsManager();
@@ -388,6 +390,7 @@ private:
 	TCHAR m_pref_cloudServer[MAX_HOST_NAME_LEN];
 	bool m_pref_cloudEnabled;
 	bool m_pref_AllowUserSettingsWithPassword;
+	bool showAllLogs = false;
 };
 
 extern SettingsManager* settings;

@@ -229,7 +229,7 @@ bool vncDesktop::FastDetectChanges(rfb::Region2D &rgn, rfb::Rect &rect, int nZon
 			if (pList != NULL)
 			{
 				m_lGridsList.push_back(pList);
-				vnclog.Print(LL_INTINFO, VNCLOG("### PixelsGrid %d created !\n"), i);
+
 			}
 		}
 
@@ -601,7 +601,6 @@ vncDesktop::~vncDesktop()
 			// we must be carefull to avoid memory leaks...
 			((RGBPixelList*)(*iGrid))->clear();
 			delete ((RGBPixelList*)(*iGrid));
-			vnclog.Print(LL_INTWARN, VNCLOG("delete ((RGBPixelList) \n"));
 		}
 	}
 	vnclog.Print(LL_INTINFO, VNCLOG("~vncDesktop m_lGridsList.clear\n"));
@@ -899,7 +898,6 @@ vncDesktop::Shutdown()
 			// we must be carefull to avoid memory leaks...
 			((RGBPixelList*)(*iGrid))->clear();
 			delete ((RGBPixelList*)(*iGrid));
-			vnclog.Print(LL_INTWARN, VNCLOG("delete ((RGBPixelList) \n"));
 		}
 	}
 	m_lGridsList.clear();
