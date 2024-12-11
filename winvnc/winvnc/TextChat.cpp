@@ -397,8 +397,6 @@ LRESULT CALLBACK TextChat::DoDialogThread(LPVOID lpParameter)
 
 	if (desktop == NULL)
 		vnclog.Print(LL_INTERR, VNCLOG("OpenInputdesktop Error \n"));
-	else 
-		vnclog.Print(LL_INTERR, VNCLOG("OpenInputdesktop OK\n"));
 
 	HDESK old_desktop = GetThreadDesktop(GetCurrentThreadId());
 	DWORD dummy;

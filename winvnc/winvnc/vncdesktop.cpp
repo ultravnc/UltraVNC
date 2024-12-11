@@ -229,7 +229,7 @@ bool vncDesktop::FastDetectChanges(rfb::Region2D &rgn, rfb::Rect &rect, int nZon
 			if (pList != NULL)
 			{
 				m_lGridsList.push_back(pList);
-				vnclog.Print(LL_INTINFO, VNCLOG("### PixelsGrid %d created !\n"), i);
+
 			}
 		}
 
@@ -601,7 +601,6 @@ vncDesktop::~vncDesktop()
 			// we must be carefull to avoid memory leaks...
 			((RGBPixelList*)(*iGrid))->clear();
 			delete ((RGBPixelList*)(*iGrid));
-			vnclog.Print(LL_INTWARN, VNCLOG("delete ((RGBPixelList) \n"));
 		}
 	}
 	vnclog.Print(LL_INTINFO, VNCLOG("~vncDesktop m_lGridsList.clear\n"));
@@ -746,8 +745,7 @@ vncDesktop::Startup()
 		vnclog.Print(LL_INTINFO, VNCLOG("Driver option disabled \n"));
 
 
-	if (VideoBuffer())
-		vnclog.Print(LL_INTINFO, VNCLOG("Break log\n"));
+	VideoBuffer();
 	if ((status = InitBitmap()) != 0) {
 		vnclog.Print(LL_INTINFO, VNCLOG("InitBitmap Failed\n"));
 		return status;
@@ -900,7 +898,6 @@ vncDesktop::Shutdown()
 			// we must be carefull to avoid memory leaks...
 			((RGBPixelList*)(*iGrid))->clear();
 			delete ((RGBPixelList*)(*iGrid));
-			vnclog.Print(LL_INTWARN, VNCLOG("delete ((RGBPixelList) \n"));
 		}
 	}
 	m_lGridsList.clear();
@@ -1485,8 +1482,6 @@ vncDesktop::EnableOptimisedBlits()
 DWORD
 vncDesktop::Init(vncServer *server)
 {
-	vnclog.Print(LL_INTINFO, VNCLOG("initialising desktop handler\n"));
-
 	// Save the server pointer
 	m_server = server;
 	// Load in the arrow cursor
@@ -2311,7 +2306,6 @@ DWORD WINAPI Warningbox_non_locked(LPVOID lpParam)
 BOOL vncDesktop::InitVideoDriver()
 {
 	omni_mutex_lock l(m_screenCapture_lock, 79);
-	vnclog.Print(LL_INTERR, VNCLOG("Driver option is enabled\n"));
 	// If m_screenCapture exist, the driver was activated.
 	// This does not mean he is still active
 	// Screen switching disable the driver at kernel level

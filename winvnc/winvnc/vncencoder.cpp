@@ -279,8 +279,6 @@ vncEncoder::GetRemotePalette(RGBQUAD *quadlist, UINT ncolours)
 BOOL
 vncEncoder::SetTranslateFunction()
 {
-	vnclog.Print(LL_INTINFO, VNCLOG("settranslatefunction called\n"));
-
 	// By default, the actual format translated to matches the client format
 	m_transformat = m_remoteformat;
 

@@ -34,6 +34,8 @@
 #include <direct.h>
 #define SODIUM_STATIC
 #include <sodium.h>
+#include "common/win32_helpers.h"
+
 #pragma comment(lib, "libsodium.lib")
 
 SettingsManager* SettingsManager::s_instance = NULL;
@@ -142,11 +144,24 @@ bool SettingsManager::IsDesktopUserAdmin()
 	if (hPToken) {
 		if (!ImpersonateLoggedOnUser(hPToken)) {
 			vnclog.Print(LL_LOGSCREEN, "ImpersonateLoggedOnUser Failed");
+			vnclog.Print(LL_INTWARN, VNCLOG("ImpersonateLoggedOnUser Failed\n"));
 			return false;
 		}
 	}
 	vnclog.Print(LL_LOGSCREEN, "ImpersonateLoggedOnUser OK");
-	bool isAdmin = myIniFile.IsWritable();
+	vnclog.Print(LL_INTWARN, VNCLOG("ImpersonateLoggedOnUser OK\n"));
+	//bool isAdmin = myIniFile.IsWritable();
+
+	bool isAdmin = Credentials::RunningAsAdministrator();
+
+	if (isAdmin) {
+		vnclog.Print(LL_LOGSCREEN, "Desktop user is Administrator");
+		vnclog.Print(LL_INTWARN, VNCLOG("Desktop user is Administrator\n"));
+	}
+	else {
+		vnclog.Print(LL_LOGSCREEN, "Desktop user is no Administrator");
+		vnclog.Print(LL_INTWARN, VNCLOG("Desktop user is no Administrator\n"));
+	}
 
 	if (isAdmin)
 		vnclog.Print(LL_LOGSCREEN, "IniFile Is Writable");
@@ -500,7 +515,7 @@ void SettingsManager::save()
 	myIniFile.WriteInt("admin", "RemoveFontSmoothing", m_pref_RemoveFontSmoothing);
 	myIniFile.WriteInt("admin", "DebugMode", vnclog.GetMode());
 	myIniFile.WriteInt("admin", "Avilog", vnclog.GetVideo());
-	myIniFile.WriteString("admin", "path", vnclog.GetPath());
+	myIniFile.WriteString("admin", "path", m_pref_DebugPath);
 	myIniFile.WriteInt("admin", "DebugLevel", vnclog.GetLevel());
 	myIniFile.WriteInt("admin", "AllowLoopback", m_pref_AllowLoopback);
 	myIniFile.WriteInt("admin", "UseIpv6", settings->getIPV6());
@@ -606,17 +621,24 @@ INT_PTR CALLBACK PasswordDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM 
 
 bool SettingsManager::checkAdminPassword()
 {
-	memset(password, 0, 1024);
-	INT_PTR ret = DialogBox(hInstResDLL, MAKEINTRESOURCE(IDD_ADMINPASSWORD), NULL, PasswordDlgProc);
-	if (ret == IDOK) {
-		char hashed_password[crypto_pwhash_STRBYTES]{};
-		myIniFile.ReadHash(hashed_password, crypto_pwhash_STRBYTES);
-		if (crypto_pwhash_str_verify(hashed_password, password, strlen(password)) == 0) {
-			return true;
+	while(true) {
+		memset(password, 0, 1024);
+		INT_PTR ret = DialogBox(hInstResDLL, MAKEINTRESOURCE(IDD_ADMINPASSWORD), NULL, PasswordDlgProc);
+		if (ret == IDOK) {
+			char hashed_password[crypto_pwhash_STRBYTES]{};
+			myIniFile.ReadHash(hashed_password, crypto_pwhash_STRBYTES);
+			if (crypto_pwhash_str_verify(hashed_password, password, strlen(password)) == 0) {
+				return true;
+			}
+			else {
+				DWORD result = MessageBoxSecure(NULL, "Wrong password, do you want to retry", "Error", MB_YESNO);
+				if (result == 1)
+					Sleep(2000);
+				else
+					return false;
+			}
 		}
-		else {
-			return false;
-		}
+		return false;
 	}
 	return false;
 }

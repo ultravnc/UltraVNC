@@ -737,10 +737,8 @@ vncDesktopThread::run_undetached(void *arg)
 
 	
 	capture=true;
-	vnclog.Print(LL_INTERR, VNCLOG("Hook changed 1\n"));
 	// Save the thread's "home" desktop, under NT (no effect under 9x)
 	m_desktop->m_home_desktop = GetThreadDesktop(GetCurrentThreadId());
-    vnclog.Print(LL_INTERR, VNCLOG("Hook changed 2\n"));
 	// Attempt to initialise and return success or failure
 	m_desktop->KillScreenSaver();
 	keybd_uni_event(VK_CONTROL, 0, 0, 0);
@@ -943,7 +941,6 @@ vncDesktopThread::run_undetached(void *arg)
 								// HOOKDLL START STOP need to be executed from the thread
 								//*******************************************************
 								if (m_desktop->Hookdll_Changed && !m_desktop->m_hookswitch) {
-									vnclog.Print(LL_INTERR, VNCLOG("Hook changed \n"));
 									m_desktop->StartStophookdll(m_desktop->On_Off_hookdll);
 									if (m_desktop->On_Off_hookdll)
 										m_desktop->m_hOldcursor = NULL; // Force mouse cursor grabbing if hookdll On
@@ -1303,16 +1300,13 @@ vncDesktopThread::run_undetached(void *arg)
 	}
 	
 	m_desktop->SetClipboardActive(FALSE);
-	vnclog.Print(LL_INTINFO, VNCLOG("quitting desktop server thread\n"));
 	
 	// Clear all the hooks and close windows, etc.
     m_desktop->SetBlockInputState(false);
 	m_desktop->PreventScreensaver(false);
-	vnclog.Print(LL_INTINFO, VNCLOG("quitting desktop server thread:SetBlockInputState\n"));
 	
 	// Clear the shift modifier keys, now that there are no remote clients
 	vncKeymap::ClearShiftKeys();
-	vnclog.Print(LL_INTINFO, VNCLOG("quitting desktop server thread:ClearShiftKeys\n"));
 	
 	// Switch back into our home desktop, under NT (no effect under 9x)
 	//TAG14
@@ -1320,9 +1314,7 @@ vncDesktopThread::run_undetached(void *arg)
 	if (mywin)
 		SendMessage(mywin,WM_CLOSE, 0, 0);
 	g_DesktopThread_running=false;
-	vnclog.Print(LL_INTINFO, VNCLOG("quitting desktop server thread:g_DesktopThread_running=false\n"));
 	m_desktop->Shutdown();
-	vnclog.Print(LL_INTINFO, VNCLOG("quitting desktop server thread:m_desktop->Shutdown\n"));
 	return NULL;
 }
 

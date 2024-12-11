@@ -59,7 +59,6 @@ vncDesktop::StopInitWindowthread()
 		can_be_hooked=true;
 		if (InitWindowThreadh)
 		{
-			vnclog.Print(LL_INTINFO, VNCLOG("~vncDesktop::Tell initwindowthread to close \n"));
 			PostThreadMessage(pumpID, WM_QUIT, 0, 0);
 			DWORD status=WaitForSingleObject(InitWindowThreadh,2000);
 			if (status==WAIT_TIMEOUT)
@@ -94,12 +93,10 @@ vncDesktop::StartInitWindowthread()
 	DWORD dummy;
 	char new_name[256];
 	can_be_hooked=false;
-	vnclog.Print(LL_INTINFO, VNCLOG("StartInitWindowthread \n"));
 	if (GetUserObjectInformation(desktop, UOI_NAME, &new_name, 256, &dummy))
 	{
 		if (strcmp(new_name,"Default")==0)
 		{
-			vnclog.Print(LL_INTINFO, VNCLOG("StartInitWindowthread default desk\n"));
 			if (InitWindowThreadh==NULL)
 			{
 				ResetEvent(restart_event);
@@ -121,7 +118,6 @@ vncDesktop::StartInitWindowthread()
 				}
 				else
 				{
-					vnclog.Print(LL_INTINFO, VNCLOG("StartInitWindowthread started\n"));
 					can_be_hooked=true;
 				}
 			}
@@ -129,13 +125,8 @@ vncDesktop::StartInitWindowthread()
 			{
 				// initwindowthread is still running
 				// make it back active
-				vnclog.Print(LL_INTINFO, VNCLOG("StartInitWindowthread reactivate\n"));
 				can_be_hooked=true;
 			}
-		}
-		else
-		{
-			vnclog.Print(LL_INTINFO, VNCLOG("StartInitWindowthread no default desk\n"));
 		}
 	}
 }
@@ -474,8 +465,6 @@ ATOM m_wndClass = INVALID_ATOM;
 BOOL
 vncDesktop::InitWindow()
 {
-	vnclog.Print(LL_INTERR, VNCLOG("InitWindow called\n"));
-
 	HDESK desktop;
 	desktop = OpenInputDesktop(0, FALSE,
 								DESKTOP_CREATEMENU | DESKTOP_CREATEWINDOW |
@@ -486,8 +475,6 @@ vncDesktop::InitWindow()
 
 	if (desktop == NULL)
 		vnclog.Print(LL_INTERR, VNCLOG("InitWindow:OpenInputdesktop Error \n"));
-	else
-		vnclog.Print(LL_INTERR, VNCLOG("InitWindow:OpenInputdesktop OK\n"));
 
 	HDESK old_desktop = GetThreadDesktop(GetCurrentThreadId());
 	DWORD dummy;
@@ -498,8 +485,6 @@ vncDesktop::InitWindow()
 	{
 		vnclog.Print(LL_INTERR, VNCLOG("InitWindow:!GetUserObjectInformation \n"));
 	}
-
-	vnclog.Print(LL_INTERR, VNCLOG("InitWindow:SelectHDESK to %s (%x) from %x\n"), new_name, desktop, old_desktop);
 
 	if (!SetThreadDesktop(desktop))
 	{
@@ -628,14 +613,12 @@ vncDesktop::InitWindow()
 
 			if (msg.message==WM_QUIT || fShutdownOrdered)
 				{
-					vnclog.Print(LL_INTERR, VNCLOG("OOOOOOOOOOOO called wm_quit\n"));
 					DestroyWindow(m_hwnd);
 					SetEvent(trigger_events[5]);
 					break;
 				}
 			else if (msg.message==WM_SHUTDOWN)
 				{
-					vnclog.Print(LL_INTERR, VNCLOG("OOOOOOOOOOOO called wm_user+4\n"));
 					DestroyWindow(m_hwnd);
 					break;
 				}
@@ -644,7 +627,6 @@ vncDesktop::InitWindow()
 					wcscpy_s(g_hookstring,L"vnchook");
 					if (can_be_hooked)
 					{
-					vnclog.Print(LL_INTERR, VNCLOG("RFB_SCREEN_UPDATE  \n"));
 					rfb::Rect rect;
 					rect.tl = rfb::Point((SHORT)LOWORD(msg.wParam), (SHORT)HIWORD(msg.wParam));
 					rect.br = rfb::Point((SHORT)LOWORD(msg.lParam), (SHORT)HIWORD(msg.lParam));
@@ -653,7 +635,6 @@ vncDesktop::InitWindow()
 					rect.br.x-=m_ScreenOffsetx;
 					rect.tl.y-=m_ScreenOffsety;
 					rect.br.y-=m_ScreenOffsety;
-					vnclog.Print(LL_INTERR, VNCLOG("REct3 %i %i %i %i  \n"),rect.tl.x,rect.br.x,rect.tl.y,rect.br.y);
 
 					rect = rect.intersect(m_Cliprect);
 					if (!rect.is_empty())
@@ -668,14 +649,12 @@ vncDesktop::InitWindow()
 				{
 					if (can_be_hooked)
 					{
-					vnclog.Print(LL_INTERR, VNCLOG("RFB_MOUSE_UPDATE  \n"));
 					SetCursor((HCURSOR) msg.wParam);
 					SetEvent(trigger_events[2]);
 					}
 				}
 			else
 				{
-					if (msg.message==WM_USER+3 )vnclog.Print(LL_INTERR, VNCLOG("OOOOOOOOOOOO called wm_user+3\n"));
 					TranslateMessage(&msg);
 					DispatchMessage(&msg);
 				}
@@ -693,8 +672,6 @@ vncDesktop::InitWindow()
 		FreeLibrary(hSCModule);
 	SetThreadDesktop(old_desktop);
     CloseDesktop(desktop);
-	///////////////////////
-	vnclog.Print(LL_INTERR, VNCLOG("OOOOOOOOOOOO end dispatch\n"));
 	m_hwnd = NULL;
 	return TRUE;
 }
