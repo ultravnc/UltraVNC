@@ -83,7 +83,7 @@ char* GetVersionFromResource(char* version)
             }
         }
     }
-    strcat(version, (char*)"-dev");
+    //strcat(version, (char*)"-dev");
     return version;
 }
 
@@ -238,6 +238,11 @@ vncAbout::DialogProc(HWND hwnd,
 			char title[256]{};
 			strcpy_s(title, "UltraVNC Server -");
 			strcat_s(title, GetVersionFromResource(version));
+#ifndef _X64
+            strcat_s(title, " - x86");
+#else
+            strcat_s(title, " - x64");
+#endif
 			SetDlgItemText(hwnd, IDC_VERSION, title);
 			return TRUE;
 		}
