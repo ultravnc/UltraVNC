@@ -35,6 +35,7 @@
 #define SODIUM_STATIC
 #include <sodium.h>
 #include "common/win32_helpers.h"
+#include <fstream>
 
 #pragma comment(lib, "libsodium.lib")
 
@@ -65,20 +66,29 @@ SettingsManager::SettingsManager()
 	setDefaults();
 
 #ifndef SC_20
-	char path[MAX_PATH];
-	if (RunningFromExternalService()) {
-		
-		HRESULT result = SHGetFolderPathA(NULL, CSIDL_COMMON_APPDATA, NULL, 0, path);
-		if (!SUCCEEDED(result)) {
-			exit(0); //you can't run without a path to the ini file
-		}
+	char appdataPath[MAX_PATH]{};
+	char programdataPath[MAX_PATH]{};
+	char path[MAX_PATH]{};
+
+	HRESULT result = SHGetFolderPathA(NULL, CSIDL_COMMON_APPDATA, NULL, 0, programdataPath);
+	HRESULT result1 = SHGetFolderPathA(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, appdataPath);
+	if (!SUCCEEDED(result) || !SUCCEEDED(result1)) {
+		exit(0); //you can't run without a path to the ini file
+	}
+
+	if (RunningFromExternalService()) {		
+		strcpy_s(path, programdataPath);
 	}
 	else {
-		HRESULT result = SHGetFolderPathA(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, path);
-		if (!SUCCEEDED(result)) {
-			exit(0); //you can't run without a path to the ini file
-		}
+		strcpy_s(path, appdataPath);
 	}
+	std::ifstream file(path);
+	if (!file.good()) {
+		strcpy_s(path, programdataPath);
+		if(!Credentials::RunningAsAdministrator(RunningFromExternalService()))
+			blockproperties = true;
+	}
+
 
 	strcpy_s(m_Inifile, "");
 	strcat_s(m_Inifile, path);//set the directory
@@ -108,19 +118,28 @@ SettingsManager::SettingsManager()
 void SettingsManager::setRunningFromExternalService(BOOL fEnabled) 
 { 
 	m_pref_fRunningFromExternalService = fEnabled; 
-	char path[MAX_PATH];
-	if (RunningFromExternalService()) {
 
-		HRESULT result = SHGetFolderPathA(NULL, CSIDL_COMMON_APPDATA, NULL, 0, path);
-		if (!SUCCEEDED(result)) {
-			exit(0); //you can't run without a path to the ini file
-		}
+	char appdataPath[MAX_PATH]{};
+	char programdataPath[MAX_PATH]{};
+	char path[MAX_PATH]{};
+
+	HRESULT result = SHGetFolderPathA(NULL, CSIDL_COMMON_APPDATA, NULL, 0, programdataPath);
+	HRESULT result1 = SHGetFolderPathA(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, appdataPath);
+	if (!SUCCEEDED(result) || !SUCCEEDED(result1)) {
+		exit(0); //you can't run without a path to the ini file
+	}
+
+	if (RunningFromExternalService()) {
+		strcpy_s(path, programdataPath);
 	}
 	else {
-		HRESULT result = SHGetFolderPathA(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, path);
-		if (!SUCCEEDED(result)) {
-			exit(0); //you can't run without a path to the ini file
-		}
+		strcpy_s(path, appdataPath);
+	}
+	std::ifstream file(path);
+	if (!file.good()) {
+		strcpy_s(path, programdataPath);
+		if (!Credentials::RunningAsAdministrator(RunningFromExternalService()))
+			blockproperties = true;
 	}
 
 	strcpy_s(m_Inifile, "");
@@ -152,7 +171,7 @@ bool SettingsManager::IsDesktopUserAdmin()
 	vnclog.Print(LL_INTWARN, VNCLOG("ImpersonateLoggedOnUser OK\n"));
 	//bool isAdmin = myIniFile.IsWritable();
 
-	bool isAdmin = Credentials::RunningAsAdministrator();
+	bool isAdmin = Credentials::RunningAsAdministrator(RunningFromExternalService());
 
 	if (isAdmin) {
 		vnclog.Print(LL_LOGSCREEN, "Desktop user is Administrator");
@@ -356,6 +375,8 @@ void SettingsManager::load()
 	myIniFile.ReadString("admin", "AuthHosts", m_pref_authhosts2, 1280);
 	m_pref_allowshutdown = myIniFile.ReadInt("admin", "AllowShutdown", m_pref_allowshutdown);
 	m_pref_allowproperties = myIniFile.ReadInt("admin", "AllowProperties", m_pref_allowproperties);
+	if (blockproperties)
+		m_pref_allowproperties = false;
 	m_pref_allowInjection = myIniFile.ReadInt("admin", "AllowInjection", m_pref_allowInjection);
 	m_pref_alloweditclients = myIniFile.ReadInt("admin", "AllowEditClients", m_pref_alloweditclients);
 	m_pref_ftTimeout = myIniFile.ReadInt("admin", "FileTransferTimeout", m_pref_ftTimeout);
@@ -575,7 +596,7 @@ static bool notset = false;
 bool SettingsManager::IsRunninAsAdministrator()
 {
 	if (!notset)
-		m_pref_RunninAsAdministrator = Credentials::RunningAsAdministrator();
+		m_pref_RunninAsAdministrator = Credentials::RunningAsAdministrator(RunningFromExternalService());
 	notset = true;
 	return m_pref_RunninAsAdministrator;
 };
@@ -626,14 +647,15 @@ bool SettingsManager::checkAdminPassword()
 				return true;
 			}
 			else {
-				DWORD result = MessageBoxSecure(NULL, "Wrong password, do you want to retry", "Error", MB_YESNO);
+				DWORD result = MessageBoxSecure(NULL, "Wrong password, do you want to retry", "Error", MB_OK);
 				if (result == 1)
 					Sleep(2000);
 				else
 					return false;
 			}
 		}
-		return false;
+		else
+			return false;
 	}
 	return false;
 }

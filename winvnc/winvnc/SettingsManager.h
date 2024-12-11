@@ -391,6 +391,7 @@ private:
 	bool m_pref_cloudEnabled;
 	bool m_pref_AllowUserSettingsWithPassword;
 	bool showAllLogs = false;
+	bool blockproperties = false;
 };
 
 extern SettingsManager* settings;

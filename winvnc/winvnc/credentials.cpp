@@ -32,9 +32,9 @@
 
 DesktopUsersToken* DesktopUsersToken::instance = nullptr;
 
-DWORD Credentials::GetCurrentUserToken(HANDLE& process, HANDLE& Token)
+DWORD Credentials::GetCurrentUserToken(HANDLE& process, HANDLE& Token, bool RunningFromExternalService)
 {
-	if (!settings->RunningFromExternalService()) {
+	if (!RunningFromExternalService) {
 		if (!OpenProcessToken(GetCurrentProcess(), TOKEN_ALL_ACCESS, &Token))
 			return 0;
 		return 2;
@@ -54,7 +54,7 @@ DWORD Credentials::GetCurrentUserToken(HANDLE& process, HANDLE& Token)
 	return 2;
 }
 
-bool Credentials::RunningAsAdministrator()
+bool Credentials::RunningAsAdministrator(bool RunningFromExternalService)
 {
 	BOOL   fAdmin = FALSE;
 	TOKEN_GROUPS* ptg = nullptr;
@@ -65,7 +65,7 @@ bool Credentials::RunningAsAdministrator()
 	HANDLE process = nullptr;
 	HANDLE Token = nullptr;
 
-	if (!GetCurrentUserToken(process, Token) == 1)
+	if (!GetCurrentUserToken(process, Token, RunningFromExternalService) == 1)
 		return false;
 
 	ON_BLOCK_EXIT(CloseHandle, process);

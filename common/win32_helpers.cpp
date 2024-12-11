@@ -154,7 +154,7 @@ bool yesnoUVNCMessageBox(HINSTANCE hInst, HWND m_hWnd, char* szHeader, char* bod
     return false;
 }
 
-void yesUVNCMessageBox(HINSTANCE hInst, HWND m_hWnd, char* body, char* szHeader, int icon)
+bool yesUVNCMessageBox(HINSTANCE hInst, HWND m_hWnd, char* body, char* szHeader, int icon)
 {
     wchar_t w_header[128];
     wchar_t w_body[1024];
@@ -175,7 +175,7 @@ void yesUVNCMessageBox(HINSTANCE hInst, HWND m_hWnd, char* body, char* szHeader,
     tdc.cbSize = sizeof(tdc);
     tdc.hInstance = hInst;
     tdc.hwndParent = m_hWnd;
-    tdc.dwCommonButtons = TDCBF_YES_BUTTON;
+    tdc.dwCommonButtons = TDCBF_OK_BUTTON;
     tdc.pszWindowTitle = szTitle;
     tdc.dwFlags = TDF_ALLOW_DIALOG_CANCELLATION;
 
@@ -201,6 +201,9 @@ void yesUVNCMessageBox(HINSTANCE hInst, HWND m_hWnd, char* body, char* szHeader,
     tdc.pszContent = w_body;
 
     hr = TaskDialogIndirect(&tdc, &nClickedBtn, NULL, NULL);
+    if (SUCCEEDED(hr) && TDCBF_OK_BUTTON == nClickedBtn)
+        return true;
+    return false;
 }
 
 } // namespace helper

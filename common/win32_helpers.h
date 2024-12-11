@@ -53,7 +53,7 @@ LONG SafeGetWindowProc(HWND hWnd);
 void SafeSetWindowProc(HWND hWnd, LONG_PTR pWndProc);
 
 bool yesnoUVNCMessageBox(HINSTANCE hInst, HWND m_hWnd, char* szHeader, char* body, char* okStr, char* cancelStr, char* checkbox, BOOL& bCheckboxChecked);
-void yesUVNCMessageBox(HINSTANCE hInst, HWND m_hWnd, char* body, char* szHeader, int icon);
+bool yesUVNCMessageBox(HINSTANCE hInst, HWND m_hWnd, char* body, char* szHeader, int icon);
 
 void close_handle(HANDLE& h);
 

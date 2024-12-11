@@ -28,9 +28,9 @@
 
 class Credentials {
 private:
-	static DWORD GetCurrentUserToken(HANDLE& process, HANDLE& Token);
+	static DWORD GetCurrentUserToken(HANDLE& process, HANDLE& Token, bool RunningFromExternalService);
 public:
-	static bool RunningAsAdministrator();
+	static bool RunningAsAdministrator(bool RunningFromExternalService);
 };
 
 class DesktopUsersToken {

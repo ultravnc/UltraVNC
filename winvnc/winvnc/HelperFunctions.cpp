@@ -326,7 +326,7 @@ DWORD MessageBoxSecure(HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT uType)
 			else {
 				if (uType & MB_OK)
 					uType &= ~MB_OK;
-				helper::yesUVNCMessageBox(hInstResDLL, hWnd, (char*)lpText, (char*)lpCaption, uType);
+				retunvalue = helper::yesUVNCMessageBox(hInstResDLL, hWnd, (char*)lpText, (char*)lpCaption, uType);
 			}
 
 			SetThreadDesktop(old_desktop);
@@ -347,7 +347,7 @@ DWORD MessageBoxSecure(HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT uType)
 		else {
 			if (uType & MB_OK)
 				uType &= ~MB_OK;
-			helper::yesUVNCMessageBox(hInstResDLL, hWnd, (char*)lpText, (char*)lpCaption, uType);
+			retunvalue = helper::yesUVNCMessageBox(hInstResDLL, hWnd, (char*)lpText, (char*)lpCaption, uType);
 		}
 	}
 	return retunvalue;
