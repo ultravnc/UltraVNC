@@ -80,6 +80,12 @@
 	#include "./winvnc/loadmemory/loadDllFromMemory.h"
 #endif // SC_20
 
+#ifndef _VIEWER
+#include "../winvnc/winvnc/vnclog.h"
+extern VNCLog vnclog;
+#define VNCLOG(s)	(__FUNCTION__ " : " s)
+#endif
+
 //
 // Utils
 //
@@ -106,7 +112,28 @@ BOOL MyStrToken(LPSTR szToken, LPSTR lpString, int nTokenNum, char cSep)
 	return FALSE;
 }
 
+#include <fstream>
+bool IsDll64Bit(const char* dllPath) {
+	std::ifstream file(dllPath, std::ios::binary | std::ios::in);
+	if (!file.is_open()) {
+		return false;
+	}
 
+	IMAGE_DOS_HEADER dosHeader;
+	file.read(reinterpret_cast<char*>(&dosHeader), sizeof(dosHeader));
+	if (dosHeader.e_magic != IMAGE_DOS_SIGNATURE) {
+		return false;
+	}
+
+	file.seekg(dosHeader.e_lfanew, std::ios::beg);
+	IMAGE_NT_HEADERS ntHeaders;
+	file.read(reinterpret_cast<char*>(&ntHeaders), sizeof(ntHeaders));
+	if (ntHeaders.Signature != IMAGE_NT_SIGNATURE) {
+		return false;
+	}
+
+	return ntHeaders.FileHeader.Machine == IMAGE_FILE_MACHINE_AMD64;
+}
 
 //
 //
@@ -335,7 +362,7 @@ bool CDSMPlugin::LoadPlugin(char* szPlugin, bool fAllowMulti)
 		char szCurrentDir_szDllCopyName[MAX_PATH];
 		while (!fDllCopyCreated)
 		{
-			strcpy_s(szDllCopyName, 260,szPlugin);
+			strcpy_s(szDllCopyName, 260, szPlugin);
 			szDllCopyName[strlen(szPlugin) - 4] = '\0'; //remove the ".dsm" extension
 			sprintf_s(szDllCopyName, "%s-tmp.d%d", szDllCopyName, i++);
 			//fDllCopyCreated = (FALSE != CopyFile(szPlugin, szDllCopyName, false));
@@ -347,35 +374,54 @@ bool CDSMPlugin::LoadPlugin(char* szPlugin, bool fAllowMulti)
 			//if (error==2)
 			{
 				if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
-					{
-						char* p = strrchr(szCurrentDir, '\\');
-						*p = '\0';
-					}
+				{
+					char* p = strrchr(szCurrentDir, '\\');
+					*p = '\0';
+				}
 				char lpPathBuffer[MAX_PATH];
-				DWORD dwBufSize=MAX_PATH;
+				DWORD dwBufSize = MAX_PATH;
 				DWORD dwRetVal;
-				dwRetVal = GetTempPath(dwBufSize,lpPathBuffer);
+				dwRetVal = GetTempPath(dwBufSize, lpPathBuffer);
 				if (dwRetVal > dwBufSize || (dwRetVal == 0))
 				{
-					strcpy_s(lpPathBuffer,szCurrentDir);
+					strcpy_s(lpPathBuffer, szCurrentDir);
 				}
 				else
 				{
-					
-				}
-				
-				strcpy_s(szCurrentDir_szPlugin,szCurrentDir);
-				strcat_s(szCurrentDir_szPlugin,"\\");
-				strcat_s(szCurrentDir_szPlugin,szPlugin);
 
-				strcpy_s(szCurrentDir_szDllCopyName,lpPathBuffer);
+				}
+
+				strcpy_s(szCurrentDir_szPlugin, szCurrentDir);
+				strcat_s(szCurrentDir_szPlugin, "\\");
+				strcat_s(szCurrentDir_szPlugin, szPlugin);
+
+				strcpy_s(szCurrentDir_szDllCopyName, lpPathBuffer);
 				//strcat_s(szCurrentDir_szDllCopyName,"\\");
-				strcat_s(szCurrentDir_szDllCopyName,szDllCopyName);
+				strcat_s(szCurrentDir_szDllCopyName, szDllCopyName);
 				fDllCopyCreated = (FALSE != CopyFile(szCurrentDir_szPlugin, szCurrentDir_szDllCopyName, false));
 			}
 			if (i > 99) break; // Just in case...
 		}
 		strcpy_s(m_szDllName, szCurrentDir_szDllCopyName);
+#ifdef _X64
+		if (!IsDll64Bit(m_szDllName)) {
+#ifdef _VIEWER
+			MessageBox(NULL, "plugin has wrong arch (x86)", "UltraVNC - Plugin", MB_ICONSTOP);
+#else
+			vnclog.Print(0, VNCLOG("The encryption plugin has wrong arch (x86) \n"));
+#endif
+			return false;
+		}
+#else
+		if (IsDll64Bit(m_szDllName)) {
+#ifdef _VIEWER
+			MessageBox(NULL, "plugin has wrong arch (x64)", "UltraVNC - Plugin", MB_ICONSTOP);
+#else
+			vnclog.Print(0, VNCLOG("The encryption plugin has wrong arch (x64) \n"));
+#endif
+			return false;
+		}
+#endif
 		m_hPDll = LoadLibrary(m_szDllName);
 	}
 	else // Use the original plugin dll
@@ -395,6 +441,25 @@ bool CDSMPlugin::LoadPlugin(char* szPlugin, bool fAllowMulti)
 			strcpy_s(szCurrentDir_szPlugin,szCurrentDir);
 			strcat_s(szCurrentDir_szPlugin,"\\");
 			strcat_s(szCurrentDir_szPlugin,szPlugin);
+#ifdef _X64
+			if (!IsDll64Bit(szCurrentDir_szPlugin)) {
+#ifdef _VIEWER
+				MessageBox(NULL, "The encryption plugin has wrong arch (x86)", "UltraVNC - Plugin", MB_ICONSTOP);
+#else
+				vnclog.Print(0, VNCLOG("The encryption plugin has wrong arch (x86) \n"));
+#endif
+				return false;
+			}
+#else
+			if (IsDll64Bit(szCurrentDir_szPlugin)) {
+#ifdef _VIEWER
+				MessageBox(NULL, "The encryption plugin has wrong arch (x64)", "UltraVNC - Plugin", MB_ICONSTOP);
+#else
+			vnclog.Print(0, VNCLOG("The encryption plugin has wrong arch (x64) \n"));
+#endif
+				return false;
+			}
+#endif
 			m_hPDll = LoadLibrary(szCurrentDir_szPlugin);
 		}
 	}
