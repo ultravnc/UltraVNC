@@ -41,8 +41,6 @@ public:
 	bool DlgInitDialog(HWND hwnd);
 	bool onCommand(int command, HWND hwnd, int subcommand);
 
-	static void Secure_Plugin_elevated(char* szPlugin);
-	static void Secure_Save_Plugin_Config(char* szPlugin);
 	static void Secure_Plugin(char* szPlugin);
 	static void LogToEdit(const std::string& message);
 	static char buffer[65536];

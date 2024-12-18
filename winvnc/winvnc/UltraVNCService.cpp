@@ -29,6 +29,7 @@
 #include "common/inifile.h"
 #include "UltraVNCService.h"
 #include <userenv.h>
+#include "SettingsManager.h"
 
 
 
@@ -786,10 +787,10 @@ int UltraVNCService::createWinvncExeCall(bool preconnect, bool rdpselect)
 		strcat_s(app_path, " -service_rdp_run");
 	else
 		strcat_s(app_path, " -service_run");
-	IniFile myIniFile;
-	kickrdp = myIniFile.ReadInt("admin", "kickrdp", kickrdp);
-	clear_console = myIniFile.ReadInt("admin", "clearconsole", clear_console);
-	myIniFile.ReadString("admin", "service_commandline", cmdline, 256);
+
+	kickrdp = settings->getKickRdp();
+	clear_console = settings->getClearconsole();
+	strcpy_s(cmdline, settings->getService_commandline());
 	if (strlen(cmdline) != 0) {
 		strcpy_s(app_path, exe_file_name);
 		if (preconnect)
@@ -807,8 +808,7 @@ int UltraVNCService::createWinvncExeCall(bool preconnect, bool rdpselect)
 
 void UltraVNCService::monitorSessions() {
 	BOOL  RDPMODE = false;
-	IniFile myIniFile;
-	RDPMODE = myIniFile.ReadInt("admin", "rdpmode", 0);
+	RDPMODE = settings->getRdpmode();
 	createWinvncExeCall(false, false);
 	DWORD requestedSessionID = 0;
 	DWORD dwSessionId = 0;
@@ -954,7 +954,7 @@ void UltraVNCService::monitorSessions() {
 					if (ProcessInfo.hThread) CloseHandle(ProcessInfo.hThread);
 					ProcessInfo.hProcess = NULL;
 					ProcessInfo.hThread = NULL;
-					RDPMODE = myIniFile.ReadInt("admin", "rdpmode", 0);
+					RDPMODE = settings->getRdpmode();
 					Sleep(1000);
 					goto whileloop;
 				}
@@ -969,7 +969,7 @@ void UltraVNCService::monitorSessions() {
 					CloseHandle(ProcessInfo.hThread);
 				ProcessInfo.hProcess = NULL;
 				ProcessInfo.hThread = NULL;
-				RDPMODE = myIniFile.ReadInt("admin", "rdpmode", 0);
+				RDPMODE = settings->getRdpmode();
 				Sleep(1000);
 				goto whileloop;
 			}//timeout
@@ -999,7 +999,7 @@ void UltraVNCService::monitorSessions() {
 								sessidcounter++;
 								if (sessidcounter > 10) break;
 							}
-							RDPMODE = myIniFile.ReadInt("admin", "rdpmode", 0);
+							RDPMODE = settings->getRdpmode();
 							goto whileloop;
 						}
 					}
@@ -1020,7 +1020,7 @@ void UltraVNCService::monitorSessions() {
 								break;
 						}
 
-						RDPMODE = myIniFile.ReadInt("admin", "rdpmode", 0);
+						RDPMODE = settings->getRdpmode();
 						goto whileloop;
 					}
 				}

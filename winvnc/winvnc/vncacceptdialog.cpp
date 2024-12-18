@@ -32,7 +32,7 @@
 #include "winvnc.h"
 #include "resource.h"
 #include "common/win32_helpers.h"
-#include "common/inifile.h"
+#include "SettingsManager.h"
 
 #include "Localization.h" // Act : add localization on messages
 
@@ -129,8 +129,7 @@ BOOL CALLBACK vncAcceptDialog::vncAcceptDlgProc(HWND hwnd,
 
 			// Set the IP-address string
 			char accept_reject_mesg[512];
-			IniFile myIniFile;
-			myIniFile.ReadString("admin", "accept_reject_mesg", accept_reject_mesg,512);
+			strcpy_s(accept_reject_mesg, settings->getAccept_reject_mesg());
 
 			if (strlen(accept_reject_mesg) == 0) 
 				strcpy_s(accept_reject_mesg,"UltraVNC Server has received an incoming connection from");
