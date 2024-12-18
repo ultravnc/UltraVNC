@@ -143,10 +143,6 @@ void VNCLog::SetFile()
 #ifdef SC_20
     return;
 #endif // SC_20
-	/*char temp[512];
-	IniFile myIniFile;
-	myIniFile.ReadString("admin", "path", temp,512);
-	SetPath(temp);*/
 	strcpy_s(m_filename,m_path);
 	strcat_s(m_filename,"\\");
 	strcat_s(m_filename,"WinVNC.log");

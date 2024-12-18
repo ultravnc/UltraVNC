@@ -276,6 +276,12 @@ public:
 	void setShowAllLogs(bool value) { showAllLogs = value; }
 	bool getShowAllLogs() { return showAllLogs; }
 
+	void setAlternateShell(char* value) { strcpy_s(m_pref_alternateShell, value); };
+	char* getAlternateShell() { return m_pref_alternateShell; };
+
+	BOOL getKickRdp() { return m_pref_KickRdp; };
+	void setKickRdp(BOOL value) { m_pref_KickRdp = value; };
+
 private:
 	SettingsManager();
 	static SettingsManager* s_instance;
@@ -329,6 +335,7 @@ private:
 	BOOL m_pref_NewMSLogon;
 	BOOL m_pref_ReverseAuthRequired;
 	BOOL m_pref_UseDSMPlugin;
+	BOOL m_pref_KickRdp;
 	char m_pref_szDSMPlugin[128];
 	char m_pref_DSMPluginConfig[512];
 	BOOL m_pref_Primary;
@@ -388,6 +395,7 @@ private:
 	BOOL m_pref_locdom3;
 
 	TCHAR m_pref_cloudServer[MAX_HOST_NAME_LEN];
+	char m_pref_alternateShell[1024];
 	bool m_pref_cloudEnabled;
 	bool m_pref_AllowUserSettingsWithPassword;
 	bool showAllLogs = false;

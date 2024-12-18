@@ -109,8 +109,5 @@ const char winvncopenxtwitter[]				= "-openxtwitter";
 const char winvncopenreddit[]				= "-openreddit";
 const char winvncopenopenhub[]				= "-openopenhub";
 
-const char dsmpluginhelper[]				= "-dsmpluginhelper";
-const char dsmplugininstance[]				= "-dsmplugininstance";
-
 // Usage string
 const char winvncUsageText[]		= "winvnc [-sc_prompt] [-sc_exit] [-id:????] [-stopreconnect][-autoreconnect[ ID:????]] [-connect host[:display]] [-connect host[::port]] [-repeater host[:port]][-run]\n";

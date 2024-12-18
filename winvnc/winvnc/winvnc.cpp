@@ -605,30 +605,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 				return return2(0);
 			}
 
-			if (strncmp(&szCmdLine[i], dsmpluginhelper, strlen(dsmpluginhelper)) == 0)
-			{
-				char mycommand[MAX_PATH];
-				i += strlen(dsmpluginhelper);
-				strcpy_s(mycommand, &(szCmdLine[i + 1]));
-				PropertiesDialog::Secure_Plugin_elevated(mycommand);
-	#ifdef CRASHRPT
-				crUninstall();
-	#endif
-				return return2(0);
-			}
-
-			if (strncmp(&szCmdLine[i], dsmplugininstance, strlen(dsmplugininstance)) == 0)
-			{
-				char mycommand[MAX_PATH];
-				i += strlen(dsmplugininstance);
-				strcpy_s(mycommand, &(szCmdLine[i + 1]));
-				PropertiesDialog::Secure_Plugin(mycommand);
-	#ifdef CRASHRPT
-				crUninstall();
-	#endif
-				return return2(0);
-			}
-
 	#ifndef SC_20
 			if (strncmp(&szCmdLine[i], winvncSoftwarecad, strlen(winvncSoftwarecad)) == 0)
 			{

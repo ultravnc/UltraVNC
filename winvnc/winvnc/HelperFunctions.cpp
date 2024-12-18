@@ -667,9 +667,8 @@ namespace processHelper {
 	DWORD GetExplorerLogonPid()
 	{
 		char alternate_shell[129];
-		IniFile myIniFile;
 		strcpy_s(alternate_shell, "");
-		myIniFile.ReadString("admin", "alternate_shell", alternate_shell, 256);
+		strcpy_s(alternate_shell, settings->getAlternateShell());
 		DWORD dwSessionId;
 		DWORD dwExplorerLogonPid = 0;
 		PROCESSENTRY32 procEntry{};

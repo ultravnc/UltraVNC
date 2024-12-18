@@ -52,16 +52,6 @@ SettingsManager* SettingsManager::getInstance()
 
 SettingsManager::SettingsManager()
 {
-	HANDLE hPToken = DesktopUsersToken::getInstance()->getDesktopUsersToken();
-	int iImpersonateResult = 0;
-
-	if (hPToken != NULL) {
-		if (!ImpersonateLoggedOnUser(hPToken)) {
-			iImpersonateResult = GetLastError();
-			vnclog.Print(LL_INTWARN, VNCLOG("ImpersonateLoggedOnUser failed error %i\n"), iImpersonateResult);
-		}
-	}
-
 	sodium_init();
 	setDefaults();
 
@@ -110,9 +100,6 @@ SettingsManager::SettingsManager()
 	myIniFile.setIniFile(m_Inifile);
 #endif
 	load();
-
-	if (iImpersonateResult == ERROR_SUCCESS)
-		RevertToSelf();
 }
 
 void SettingsManager::setRunningFromExternalService(BOOL fEnabled) 
@@ -169,8 +156,6 @@ bool SettingsManager::IsDesktopUserAdmin()
 	}
 	vnclog.Print(LL_LOGSCREEN, "ImpersonateLoggedOnUser OK");
 	vnclog.Print(LL_INTWARN, VNCLOG("ImpersonateLoggedOnUser OK\n"));
-	//bool isAdmin = myIniFile.IsWritable();
-
 	bool isAdmin = Credentials::RunningAsAdministrator(RunningFromExternalService());
 
 	if (isAdmin) {
@@ -270,6 +255,7 @@ void SettingsManager::setDefaults()
 	m_pref_allowproperties = TRUE;
 	m_pref_allowInjection = FALSE;
 	m_pref_UseDSMPlugin = FALSE;
+	m_pref_KickRdp = FALSE;
 	m_pref_EnableFileTransfer = TRUE;
 	m_pref_FTUserImpersonation = TRUE;
 	m_pref_EnableBlankMonitor = TRUE;
@@ -343,6 +329,7 @@ void SettingsManager::setDefaults()
 	m_pref_locdom3 = false;
 
 	memset(m_pref_cloudServer, 0, MAX_HOST_NAME_LEN);
+	memset(m_pref_alternateShell, 0, 129);
 	m_pref_cloudEnabled = false;
 	m_pref_AllowUserSettingsWithPassword = false;
 
@@ -401,6 +388,7 @@ void SettingsManager::load()
 	m_pref_BlankInputsOnly = myIniFile.ReadInt("admin", "BlankInputsOnly", m_pref_BlankInputsOnly); //PGM
 	m_pref_DefaultScale = myIniFile.ReadInt("admin", "DefaultScale", m_pref_DefaultScale);
 	m_pref_UseDSMPlugin = myIniFile.ReadInt("admin", "UseDSMPlugin", m_pref_UseDSMPlugin);
+	m_pref_KickRdp = myIniFile.ReadInt("admin", "kickrdp", m_pref_KickRdp);
 	myIniFile.ReadString("admin", "DSMPlugin", m_pref_szDSMPlugin, 128);
 	myIniFile.ReadString("admin", "DSMPluginConfig", m_pref_DSMPluginConfig, 512);
 	m_pref_Primary = myIniFile.ReadInt("admin", "primary", m_pref_Primary);
@@ -442,6 +430,8 @@ void SettingsManager::load()
 
 	myIniFile.ReadString("admin", "cloudServer", m_pref_cloudServer, MAX_HOST_NAME_LEN);
 	m_pref_cloudEnabled = myIniFile.ReadInt("admin", "cloudEnabled", m_pref_cloudEnabled);
+
+	myIniFile.ReadString("admin", "alternate_shell", m_pref_alternateShell, 1024);
 
 
 	m_pref_locdom1 = myIniFile.ReadInt("admin_auth", "locdom1", m_pref_locdom1);
@@ -569,6 +559,8 @@ void SettingsManager::save()
 
 	myIniFile.WriteString("admin", "cloudServer", m_pref_cloudServer);
 	myIniFile.WriteInt("admin", "cloudEnabled", m_pref_cloudEnabled);
+
+	//myIniFile.WriteString("admin", "alternate_shell", m_pref_alternateShell);
 
 	myIniFile.WriteString("admin_auth", "group1", m_pref_group1);
 	myIniFile.WriteString("admin_auth", "group2", m_pref_group2);
