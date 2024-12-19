@@ -401,7 +401,7 @@ BEGIN
     LTEXT           "Server Name",IDC_VNCSERVER,101,12,101,9
     LTEXT           "Status",IDC_STATIC,12,54,46,9
     LTEXT           "Connection closed",IDC_STATUS,101,54,105,9
-    RTEXT           "",IDC_PLUGIN_STATUS,14,68,46,9
+    RTEXT           "",IDC_PLUGIN_STATUS,14,68,192,9
     PUSHBUTTON      "Cancel",IDQUIT,7,180,50,14
     LTEXT           "Speed",IDC_STATIC,12,85,31,8
     LTEXT           "123",IDC_SPEED,101,85,26,8
@@ -662,7 +662,8 @@ BEGIN
     CONTROL         "Do not display the sponsor advertisement",IDC_CHECK1,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,100,164,10
     CONTROL         "Hide status window",IDC_HIDESTATUS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,112,128,10
-    CONTROL         "Hide End of Stream error", IDC_HIDEENDOFSTREAMERROR, "Button", BS_AUTOCHECKBOX | WS_TABSTOP,4,124,164,10
+    CONTROL         "Hide End of Stream error",IDC_HIDEENDOFSTREAMERROR,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,124,164,10
     LTEXT           "Folder",IDC_STATIC,4,18,36,9
     LTEXT           "Prefix",IDC_STATIC,4,36,36,8
     LTEXT           "Snapshot folder and prefix",IDC_STATIC,4,4,232,8

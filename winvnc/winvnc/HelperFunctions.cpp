@@ -819,13 +819,7 @@ namespace processHelper {
 				serviceInstalled = true;
 				::CloseServiceHandle(hService);
 			}
-			else {
-				vnclog.Print(LL_INTERR, "Service not found: %s\n", UltraVNCService::service_name);
-			}
 			::CloseServiceHandle(hSCM);
-		}
-		else {
-			vnclog.Print(LL_INTERR, "Failed to open Service Control Manager\n");
 		}
 #endif // SC_20
 
