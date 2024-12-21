@@ -199,6 +199,7 @@ void SettingsManager::setDefaults()
 #endif // SC_20
 	
 	memset(reinterpret_cast<void*>(m_pref_authhosts), 0, sizeof(m_pref_authhosts));
+	strcpy(m_pref_authhosts, "?");
 
 	m_pref_alloweditclients = TRUE;
 	m_pref_allowproperties = TRUE;
