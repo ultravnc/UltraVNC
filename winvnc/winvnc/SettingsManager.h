@@ -37,6 +37,7 @@ class SettingsManager
 public:
 	static SettingsManager* getInstance();
 
+	void Initialize(char* configFile);
 	void load();
 	void save();
 	void savePassword();
@@ -195,7 +196,7 @@ public:
 	void EnableKeepAlives(bool newstate) { m_pref_fEnableKeepAlive = newstate; }
 	bool DoKeepAlives() { return m_pref_fEnableKeepAlive; }
 	BOOL RunningFromExternalService() { return m_pref_fRunningFromExternalService; };
-	void setRunningFromExternalService(BOOL fEnabled);
+	void setRunningFromExternalService(BOOL fEnabled, bool allowEditConfigFile);
 	BOOL RunningFromExternalServiceRdp() { return m_pref_fRunningFromExternalServiceRdp; };
 	void setRunningFromExternalServiceRdp(BOOL fEnabled) { m_pref_fRunningFromExternalServiceRdp = fEnabled; };
 	void AutoRestartFlag(BOOL fOn) { m_pref_fAutoRestart = fOn; };
@@ -276,18 +277,14 @@ public:
 	void setShowAllLogs(bool value) { showAllLogs = value; }
 	bool getShowAllLogs() { return showAllLogs; }
 
-	void setAlternateShell(char* value) { strcpy_s(m_pref_alternateShell, value); };
 	char* getAlternateShell() { return m_pref_alternateShell; };
-
-	BOOL getKickRdp() { return m_pref_KickRdp; };
-	void setKickRdp(BOOL value) { m_pref_KickRdp = value; };
-
+	bool getBlockSetting();
 private:
 	SettingsManager();
 	static SettingsManager* s_instance;
 	void setDefaults();
 	void initTemp();
-	IniFile myIniFile;
+	IniFile iniFile;
 
 	BOOL	m_pref_allowproperties;
 	BOOL	m_pref_allowInjection;
@@ -335,7 +332,6 @@ private:
 	BOOL m_pref_NewMSLogon;
 	BOOL m_pref_ReverseAuthRequired;
 	BOOL m_pref_UseDSMPlugin;
-	BOOL m_pref_KickRdp;
 	char m_pref_szDSMPlugin[128];
 	char m_pref_DSMPluginConfig[512];
 	BOOL m_pref_Primary;
@@ -399,7 +395,7 @@ private:
 	bool m_pref_cloudEnabled;
 	bool m_pref_AllowUserSettingsWithPassword;
 	bool showAllLogs = false;
-	bool blockproperties = false;
+	bool allowEditConfigFile = false;
 };
 
 extern SettingsManager* settings;

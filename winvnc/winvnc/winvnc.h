@@ -54,6 +54,7 @@ extern DWORD		mainthreadId;
 extern int WinVNCAppMain();
 
 // Standard command-line flag definitions
+const char winvncConfig[] = "-config";
 const char winvncRunService[]		= "-service_run";
 const char winvncRunServiceRdp[]		= "-service_rdp_run";
 const char winvncPreConnect[]		="-preconnect";

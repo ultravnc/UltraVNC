@@ -64,6 +64,8 @@ BOOL CALLBACK PropertiesDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 	}
 	return 0;
 }
+
+extern char configFile[256];
 bool PropertiesDialog::InitDialog(HWND hwnd)
 {
 	PropertiesDialogHwnd = hwnd;
@@ -72,6 +74,12 @@ bool PropertiesDialog::InitDialog(HWND hwnd)
 	HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_WINVNC));
 	SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
 	SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+
+	const long lTitleBufSize = 256;
+	char szTitle[lTitleBufSize];
+
+	_snprintf_s(szTitle, lTitleBufSize - 1, "UltraVNC Server - settings - Config file: %s", configFile);
+	SetWindowText(hwnd, szTitle);
 
 	showAdminPanel = false;
 	vnclog.Print(LL_INTWARN, VNCLOG("showAdminPanel = false\n"));
@@ -2038,7 +2046,38 @@ const int MAX_LINES = 100;
 void PropertiesDialog::LogToEdit(const std::string & message) 
 {
 	if (hEditLog == NULL || !IsWindow(hEditLog))
+	{
+		// Convert buffer to a string
+		std::string content(buffer);
+
+		// Split the content into lines
+		std::vector<std::string> lines;
+		std::istringstream iss(content);
+		std::string line;
+		while (std::getline(iss, line)) {
+			lines.push_back(line);
+		}
+
+		// Add the new message
+		lines.insert(lines.begin(), message);
+
+		// Remove excess lines if necessary
+		while (lines.size() > MAX_LINES) {
+			lines.pop_back();
+		}
+
+		std::ostringstream oss;
+		for (const auto& ln : lines) {
+			oss << ln << '\n'; // Add newline between lines
+		}
+		std::string updatedContent = oss.str();
+
+		// Copy the updated content back to the buffer
+		if (updatedContent.size() < 65536) {
+			std::strcpy(buffer, updatedContent.c_str());
+		}
 		return;
+	}
 	// Get the current content of the edit control		
 	std::string content(buffer);
 

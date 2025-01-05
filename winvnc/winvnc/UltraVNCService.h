@@ -124,5 +124,8 @@ public:
 	static void Restore_after_reboot();
 
 	static char service_name[256];
+	static char configfilename[MAX_PATH];
+	static char inifile[MAX_PATH];
+	static IniFile iniFileService;
 };
 #endif
