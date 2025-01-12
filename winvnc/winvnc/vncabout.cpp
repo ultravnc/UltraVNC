@@ -33,6 +33,7 @@
 #include "../common/Hyperlinks.h"
 #include "winvnc.h"
 #include "vncabout.h"
+extern char configFile[256];
 
 //	[v1.0.2-jp1 fix] Load resouce from dll
 extern HINSTANCE	hInstResDLL;
@@ -244,6 +245,12 @@ vncAbout::DialogProc(HWND hwnd,
             strcat_s(title, " - x64");
 #endif
 			SetDlgItemText(hwnd, IDC_VERSION, title);
+
+            const long lszConfigFileSize = 256;
+            char szConfigFile[lszConfigFileSize];
+
+            _snprintf_s(szConfigFile, lszConfigFileSize - 1, "Config file: %s", configFile);
+            SetDlgItemText(hwnd, IDC_CONFIG_FILE, szConfigFile);
 			return TRUE;
 		}
 

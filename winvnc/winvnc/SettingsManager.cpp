@@ -75,15 +75,9 @@ void SettingsManager::Initialize(char *configFile)
 		RevertToSelf();*/
 }
 
-void SettingsManager::setRunningFromExternalService(BOOL fEnabled, bool allowEditConfigFile)
+void SettingsManager::setRunningFromExternalService(BOOL fEnabled)
 { 
 	m_pref_fRunningFromExternalService = fEnabled; 
-	this->allowEditConfigFile = allowEditConfigFile;
-};
-
-bool SettingsManager::getBlockSetting()
-{
-	return (m_pref_fRunningFromExternalService && !allowEditConfigFile && !Credentials::RunningAsAdministrator(true));
 };
 
 #pragma comment(lib, "wtsapi32.lib")
@@ -621,4 +615,9 @@ void SettingsManager::setAdminPasswordHash(char* password)
 
 	iniFile.WriteHash(hashed_password, crypto_pwhash_STRBYTES);
 }
+
+bool SettingsManager::getShowSettings()
+{ 
+	return showSettings; 
+};
 

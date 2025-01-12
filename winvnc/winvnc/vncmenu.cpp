@@ -559,7 +559,7 @@ BOOL vncMenu::AddNotificationIcon()
 void vncMenu::addMenus()
 {
 	EnableMenuItem(m_hmenu, ID_ADMIN_PROPERTIES,
-		(settings->getAllowProperties() && !settings->getBlockSetting()) ? MF_ENABLED : MF_GRAYED);
+		(settings->getAllowProperties() && settings->getShowSettings()) ? MF_ENABLED : MF_GRAYED);
 	EnableMenuItem(m_hmenu, ID_CLOSE,
 		settings->getAllowShutdown() ? MF_ENABLED : MF_GRAYED);
 	if (settings->RunningFromExternalService())
@@ -2068,7 +2068,7 @@ void vncMenu::updateList() {
 void vncMenu::updateMenu()
 {
 	EnableMenuItem(m_hmenu, ID_ADMIN_PROPERTIES,
-		(settings->getAllowProperties() && !settings->getBlockSetting()) ? MF_ENABLED : MF_GRAYED);
+		(settings->getAllowProperties() && settings->getShowSettings()) ? MF_ENABLED : MF_GRAYED);
 	EnableMenuItem(m_hmenu, ID_CLOSE,
 		settings->getAllowShutdown() ? MF_ENABLED : MF_GRAYED);
 	EnableMenuItem(m_hmenu, ID_KILLCLIENTS,

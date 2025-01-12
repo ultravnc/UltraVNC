@@ -374,7 +374,7 @@ bool PropertiesDialog::DlgInitDialog(HWND hwnd)
 
 	else
 
-	m_dlgvisible = TRUE;
+		m_dlgvisible = TRUE;
 	bConnectSock = settings->getEnableConnections();
 
 	if (GetDlgItem(hwnd, IDC_CONNECT_SOCK)) {
@@ -392,7 +392,7 @@ bool PropertiesDialog::DlgInitDialog(HWND hwnd)
 	BOOL bValidDisplay = (d1 == d2 && d1 >= 0 && d1 <= 99);
 
 	if (GetDlgItem(hwnd, IDC_CHANGEPASSWORDADMIN)) {
-		SetWindowText(GetDlgItem(hwnd, IDC_CHANGEPASSWORDADMIN), settings->isAdminPasswordSet() ? "CHANGE": "SET");
+		SetWindowText(GetDlgItem(hwnd, IDC_CHANGEPASSWORDADMIN), settings->isAdminPasswordSet() ? "CHANGE" : "SET");
 	}
 
 	if (GetDlgItem(hwnd, IDC_SPECPORT)) {
@@ -561,7 +561,7 @@ bool PropertiesDialog::DlgInitDialog(HWND hwnd)
 				IDC_RADIONOTIFICATIONON);
 			break;
 		};
-		SendMessage(hNotificationSelection,BM_SETCHECK,TRUE,0);
+		SendMessage(hNotificationSelection, BM_SETCHECK, TRUE, 0);
 	}
 
 	if (GetDlgItem(hwnd, IDC_MV1)) {
@@ -638,8 +638,12 @@ bool PropertiesDialog::DlgInitDialog(HWND hwnd)
 #endif // SC_20
 	}
 
-	if (GetDlgItem(hwnd, IDC_PLUGIN_CHECK))
+	if (GetDlgItem(hwnd, IDC_PLUGIN_CHECK)) {
 		SendMessage(GetDlgItem(hwnd, IDC_PLUGIN_CHECK), BM_SETCHECK, settings->getUseDSMPlugin(), 0);
+		EnableWindow(GetDlgItem(hwnd, IDC_PLUGIN_BUTTON), m_server->AuthClientCount() == 0
+			? SendMessage(GetDlgItem(hwnd, IDC_PLUGIN_CHECK), BM_GETCHECK, 0, 0) == BST_CHECKED
+			: BST_UNCHECKED);
+	}	
 
 	// Query window option - Taken from TightVNC advanced properties
 	if (GetDlgItem(hwnd, IDC_DREFUSE)) {
@@ -1041,9 +1045,9 @@ int PropertiesDialog::ListPlugins(HWND hComboBox)
 
 bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 {
-	if ((command != IDC_SERVICE_COMMANDLINE && command != IDC_IDLETIMEINPUT &&
+	if ((command != IDC_SERVICE_COMMANDLINE && command != IDC_IDLETIMEINPUT && command != IDC_STARTLOG &&
 		command != IDC_KINTERVAL && command != IDC_PORTRFB && command != IDC_PORTHTTP &&
-		command != IDC_SCALE)|| subcommand == 1024)
+		command != IDC_SCALE && command != IDC_CHECKIP && command != IDC_STARTREP)|| subcommand == 1024)
 	EnableWindow(GetDlgItem(PropertiesDialogHwnd, IDC_APPLY), true);
 	switch (command) {
 	case IDC_REMOVE_BUTTON:

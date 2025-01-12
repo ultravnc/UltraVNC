@@ -196,7 +196,7 @@ public:
 	void EnableKeepAlives(bool newstate) { m_pref_fEnableKeepAlive = newstate; }
 	bool DoKeepAlives() { return m_pref_fEnableKeepAlive; }
 	BOOL RunningFromExternalService() { return m_pref_fRunningFromExternalService; };
-	void setRunningFromExternalService(BOOL fEnabled, bool allowEditConfigFile);
+	void setRunningFromExternalService(BOOL fEnabled);
 	BOOL RunningFromExternalServiceRdp() { return m_pref_fRunningFromExternalServiceRdp; };
 	void setRunningFromExternalServiceRdp(BOOL fEnabled) { m_pref_fRunningFromExternalServiceRdp = fEnabled; };
 	void AutoRestartFlag(BOOL fOn) { m_pref_fAutoRestart = fOn; };
@@ -278,7 +278,9 @@ public:
 	bool getShowAllLogs() { return showAllLogs; }
 
 	char* getAlternateShell() { return m_pref_alternateShell; };
-	bool getBlockSetting();
+
+	bool getShowSettings();
+	void setShowSettings(bool value) { showSettings = value; };
 private:
 	SettingsManager();
 	static SettingsManager* s_instance;
@@ -395,7 +397,7 @@ private:
 	bool m_pref_cloudEnabled;
 	bool m_pref_AllowUserSettingsWithPassword;
 	bool showAllLogs = false;
-	bool allowEditConfigFile = false;
+	bool showSettings = false;
 };
 
 extern SettingsManager* settings;

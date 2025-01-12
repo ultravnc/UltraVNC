@@ -56,6 +56,7 @@
 #include <shlobj.h>
 #include <fstream>
 #include <direct.h>
+#include "credentials.h"
 
 #pragma comment (lib, "comctl32")
 
@@ -65,7 +66,7 @@ const char	*szAppName = "WinVNC";
 DWORD		mainthreadId;
 char configFile[256] = { 0 };
 int configfileskip = 0;
-bool allowEditConfigFile = false;
+bool showSettings = false;
 
 //adzm 2009-06-20
 char* g_szRepeaterHost = NULL;
@@ -290,7 +291,7 @@ void extractConfig(char* szCmdLine)
 		file.open(appdataPath);
 		if (file.good()) {
 			strcpy_s(configFile, appdataPath);
-			allowEditConfigFile = true;
+			showSettings = true;
 			vnclog.Print(LL_LOGSCREEN, "using config file %s", configFile);
 		}
 		else {
@@ -299,7 +300,8 @@ void extractConfig(char* szCmdLine)
 			file.open(programdataPath);
 			if (file.good()) {
 				strcpy_s(configFile, programdataPath);
-				allowEditConfigFile = false;
+				//only admins can edit programdata
+				showSettings = Credentials::RunningAsAdministrator(false);
 				vnclog.Print(LL_LOGSCREEN, "using config file %s", configFile);
 			}
 			else {
@@ -308,7 +310,7 @@ void extractConfig(char* szCmdLine)
 				file.open(szCurrentDir);
 				if (file.good()) {
 					strcpy_s(configFile, szCurrentDir);
-					allowEditConfigFile = true;
+					showSettings = true;
 					vnclog.Print(LL_LOGSCREEN, "using config file %s", configFile);
 				}
 				else {
@@ -317,7 +319,7 @@ void extractConfig(char* szCmdLine)
 					strcpy_s(configFile, appdataPath);
 					_mkdir(appdataFolder);
 					vnclog.Print(LL_LOGSCREEN, "creating config file %s", configFile);
-					allowEditConfigFile = true;
+					showSettings = true;
 				}
 			}
 		}
@@ -325,8 +327,11 @@ void extractConfig(char* szCmdLine)
 		strcpy_s(configFile, szCurrentDir);
 #endif
 	}
-	else
-		allowEditConfigFile = false; // service
+	else {
+		showSettings = true; // service
+	}
+
+	settings->setShowSettings(showSettings);
 }
 	
 
@@ -757,7 +762,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 			{
 				//Run as service
 				if (!Myinit(hInstance)) return return2(0);
-				settings->setRunningFromExternalService(true, allowEditConfigFile);
+				settings->setRunningFromExternalService(true);
 				int return2value = WinVNCAppMain();
 				return return2(return2value);
 			}
@@ -766,7 +771,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 			{
 				//Run as service
 				if (!Myinit(hInstance)) return return2(0);
-				settings->setRunningFromExternalService(true, allowEditConfigFile);
+				settings->setRunningFromExternalService(true);
 				settings->setRunningFromExternalServiceRdp(true);
 				int return2value = WinVNCAppMain();
 				return return2(return2value);
