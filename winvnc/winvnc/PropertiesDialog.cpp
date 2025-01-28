@@ -17,6 +17,7 @@
 #include <sstream>
 #include <vector>
 #include <string>
+#include <windowsx.h>
 
 extern HINSTANCE	hInstResDLL;
 HWND PropertiesDialog::hEditLog = NULL;
@@ -639,10 +640,16 @@ bool PropertiesDialog::DlgInitDialog(HWND hwnd)
 	}
 
 	if (GetDlgItem(hwnd, IDC_PLUGIN_CHECK)) {
+
+		TCHAR szPlugin[MAX_PATH];
+		TCHAR szPluginDefault[MAX_PATH] = "No Plugin detected...";
+		GetDlgItemText(hwnd, IDC_PLUGINS_COMBO, szPlugin, MAX_PATH);
+		bool pluginset = (strcmp(szPlugin, szPluginDefault) != 0) && strlen(szPlugin) > 0;
 		SendMessage(GetDlgItem(hwnd, IDC_PLUGIN_CHECK), BM_SETCHECK, settings->getUseDSMPlugin(), 0);
 		EnableWindow(GetDlgItem(hwnd, IDC_PLUGIN_BUTTON), m_server->AuthClientCount() == 0
-			? SendMessage(GetDlgItem(hwnd, IDC_PLUGIN_CHECK), BM_GETCHECK, 0, 0) == BST_CHECKED
+			? (SendMessage(GetDlgItem(hwnd, IDC_PLUGIN_CHECK), BM_GETCHECK, 0, 0) == BST_CHECKED) && pluginset
 			: BST_UNCHECKED);
+		EnableWindow(GetDlgItem(hwnd, IDC_PLUGINS_COMBO), SendMessage(GetDlgItem(hwnd, IDC_PLUGIN_CHECK), BM_GETCHECK, 0, 0) == BST_CHECKED);
 	}	
 
 	// Query window option - Taken from TightVNC advanced properties
@@ -1042,6 +1049,7 @@ int PropertiesDialog::ListPlugins(HWND hComboBox)
 
 	return nFiles;
 }
+static bool isRunning = false;
 
 bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 {
@@ -1050,20 +1058,66 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 		command != IDC_SCALE && command != IDC_CHECKIP && command != IDC_STARTREP)|| subcommand == 1024)
 	EnableWindow(GetDlgItem(PropertiesDialogHwnd, IDC_APPLY), true);
 	switch (command) {
+	case IDC_PLUGINS_COMBO: {
+			HWND hCombo = GetDlgItem(hwnd, IDC_PLUGINS_COMBO);
+			bool pluginset = false;
+			TCHAR szPlugin[MAX_PATH]{};
+			TCHAR szPluginDefault[MAX_PATH] = "No Plugin detected...";
+
+			if (subcommand == CBN_SELCHANGE) {
+				int selIndex = ComboBox_GetCurSel(hCombo); // Get selected index				
+				if (selIndex != CB_ERR) {
+					ComboBox_GetLBText(hCombo, selIndex, szPlugin); // Get text of selected item								
+					pluginset = (strcmp(szPlugin, szPluginDefault) != 0) && strlen(szPlugin) > 0;
+				}
+				if (m_server)
+					EnableWindow(GetDlgItem(hwnd, IDC_PLUGIN_BUTTON), m_server->AuthClientCount() == 0
+						? (SendMessage(GetDlgItem(hwnd, IDC_PLUGIN_CHECK), BM_GETCHECK, 0, 0) == BST_CHECKED) && pluginset
+						: BST_UNCHECKED);
+				EnableWindow(GetDlgItem(hwnd, IDC_PLUGINS_COMBO), SendMessage(GetDlgItem(hwnd, IDC_PLUGIN_CHECK), BM_GETCHECK, 0, 0) == BST_CHECKED);
+			}
+			if (subcommand == CBN_EDITCHANGE) {
+				EnableWindow(GetDlgItem(hwnd, IDC_PLUGIN_BUTTON), m_server->AuthClientCount() == 0
+					? (SendMessage(GetDlgItem(hwnd, IDC_PLUGIN_CHECK), BM_GETCHECK, 0, 0) == BST_CHECKED) && pluginset
+					: BST_UNCHECKED);
+				EnableWindow(GetDlgItem(hwnd, IDC_PLUGINS_COMBO), SendMessage(GetDlgItem(hwnd, IDC_PLUGIN_CHECK), BM_GETCHECK, 0, 0) == BST_CHECKED);
+			}
+		}
+		return TRUE;
 	case IDC_REMOVE_BUTTON:
+		if (isRunning)
+			break;
+		isRunning = true;
 		rulesListView->removeSelectedItem();
+		isRunning = false;
 		break;
 	case IDC_MOVE_DOWN_BUTTON:
+		if (isRunning)
+			break;
+		isRunning = true;
 		rulesListView->moveDown();
+		isRunning = false;
 		break;
 	case IDC_MOVE_UP_BUTTON:
+		if (isRunning)
+			break;
+		isRunning = true;
 		rulesListView->moveUp();
+		isRunning = false;
 		break;
 	case IDC_ADD_BUTTON:
+		if (isRunning)
+			break;
+		isRunning = true;
 		rulesListView->add();
+		isRunning = false;
 		break;
 	case IDC_EDIT_BUTTON:
+		if (isRunning)
+			break;
+		isRunning = true;
 		rulesListView->edit();
+		isRunning = false;
 		break;
 	case IDC_DRIVER:
 		if (m_server)
@@ -1209,12 +1263,17 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 		}
 		return TRUE;
 
-	// sf@2002 - DSM Plugin
-	case IDC_PLUGIN_CHECK:
+	case IDC_PLUGIN_CHECK: {
+		TCHAR szPlugin[MAX_PATH];
+		TCHAR szPluginDefault[MAX_PATH] = "No Plugin detected...";
+		GetDlgItemText(hwnd, IDC_PLUGINS_COMBO, szPlugin, MAX_PATH);
+		bool pluginset = (strcmp(szPlugin, szPluginDefault) != 0) && strlen(szPlugin) > 0;
 		if (m_server)
 			EnableWindow(GetDlgItem(hwnd, IDC_PLUGIN_BUTTON), m_server->AuthClientCount() == 0
-				? SendMessage(GetDlgItem(hwnd, IDC_PLUGIN_CHECK), BM_GETCHECK, 0, 0) == BST_CHECKED
+				? (SendMessage(GetDlgItem(hwnd, IDC_PLUGIN_CHECK), BM_GETCHECK, 0, 0) == BST_CHECKED) && pluginset
 				: BST_UNCHECKED);
+		EnableWindow(GetDlgItem(hwnd, IDC_PLUGINS_COMBO), SendMessage(GetDlgItem(hwnd, IDC_PLUGIN_CHECK), BM_GETCHECK, 0, 0) == BST_CHECKED);
+		}
 		return TRUE;
 
 	case IDC_MSLOGON_CHECKD:
@@ -1285,6 +1344,10 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 #endif // SC_20
 	case IDC_CHANGEPASSWORD:
 	{
+		static bool isRunningPw = false;
+		if (isRunningPw)
+			return true;
+		isRunningPw = true;
 		DlgChangePassword* dlgChangePassword = new DlgChangePassword();
 		if (dlgChangePassword->ShowDlg(NULL, (strlen(settings->getPasswd()) == 0) 
 			? "Set password"
@@ -1301,11 +1364,16 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 				settings->savePassword();
 			}
 		}
+		isRunningPw = false;
 		SetWindowText(GetDlgItem(hwnd, IDC_CHANGEPASSWORD), (strlen(settings->getPasswd()) == 0) ? "SET" : "CHANGE");
 		return true;
 	}
 	case IDC_CHANGEPASSWORDVO:
 	{
+		static bool isRunningPwVo = false;
+		if (isRunningPwVo)
+			return true;
+		isRunningPwVo = true;
 		DlgChangePassword* dlgChangePassword = new DlgChangePassword();
 		if (dlgChangePassword->ShowDlg(NULL, (strlen(settings->getPasswd()) == 0) 
 					? "Set View-only password"
@@ -1323,9 +1391,14 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 			}
 		}
 		SetWindowText(GetDlgItem(hwnd, IDC_CHANGEPASSWORDVO), (strlen(settings->getPasswdViewOnly()) == 0) ? "SET" : "CHANGE");
+		isRunningPwVo = false;
 		return true;
 	}
 	case IDC_CHANGEPASSWORDADMIN: {
+		static bool isRunningPwaAdm = false;
+		if (isRunningPwaAdm)
+			return true;
+		isRunningPwaAdm = true;
 		DlgChangePassword* dlgChangePassword = new DlgChangePassword();
 		if (dlgChangePassword->ShowDlg(NULL, settings->isAdminPasswordSet() 
 					? "Change Admin password" 
@@ -1335,6 +1408,7 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 			settings->setAdminPasswordHash(password);
 			SetWindowText(GetDlgItem(hwnd, IDC_CHANGEPASSWORDADMIN), "CHANGE");
 		}
+		isRunningPwaAdm = false;
 	}
 		return true;
 
