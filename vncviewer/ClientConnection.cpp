@@ -67,9 +67,9 @@ extern "C" {
 #include "common/win32_helpers.h"
 using namespace helper;
 
-#ifdef _CLOUD
-#include "../UdtCloudlib/proxy/Cloudthread.h"
-#endif
+//#ifdef _CLOUD
+//#include "../UdtCloudlib/proxy/Cloudthread.h"
+//#endif
 #include "UltraVNCHelperFunctions.h"
 extern HINSTANCE m_hInstResDLL;
 
@@ -359,11 +359,11 @@ ClientConnection::ClientConnection(VNCviewerApp *pApp, LPTSTR host, int port)
 
 void ClientConnection::Init(VNCviewerApp *pApp)
 {
-#ifdef _CLOUD
-	if (cloudThread)
-		delete cloudThread;
-	cloudThread = new CloudThread();
-#endif
+//#ifdef _CLOUD
+//	if (cloudThread)
+//		delete cloudThread;
+//	cloudThread = new CloudThread();
+//#endif
 	InitializeCriticalSection(&crit);
 	m_hSessionDialog = NULL;
 	new_ultra_server=false;
@@ -4655,10 +4655,10 @@ ClientConnection::~ClientConnection()
 	delete directx_output;
 	delete ultraVncZlib;
 	DeleteCriticalSection(&crit);
-#ifdef _CLOUD
-	if (cloudThread)
-		delete cloudThread;
-#endif
+//#ifdef _CLOUD
+//	if (cloudThread)
+//		delete cloudThread;
+//#endif
 }
 
 // You can specify a dx & dy outside the limits; the return value will

@@ -107,7 +107,7 @@ target_link_libraries(${PROJECT_NAME}
 	PRIVATE unofficial-sodium::sodium
     libomnithread
     librdr
-    libudtcloud
+    #libudtcloud	 #Patch deleting libudtcloud from project
     libzip32
     libzipunzip
     comctl32
