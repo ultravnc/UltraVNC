@@ -175,7 +175,7 @@ struct TLSSession
 		{
 			SCHANNEL_CRED cred = { 0 };
 			cred.dwVersion = SCHANNEL_CRED_VERSION;
-			cred.dwFlags = SCH_CRED_MANUAL_CRED_VALIDATION | SCH_CRED_NO_DEFAULT_CREDS | SCH_CRED_REVOCATION_CHECK_CHAIN_EXCLUDE_ROOT;
+			cred.dwFlags = SCH_CRED_MANUAL_CRED_VALIDATION;
 			if (pLocalCert)
 			{
 				cred.cCreds = 1;
@@ -299,16 +299,17 @@ struct TLSSession
 		outbuf.EnsureFree(tlsSizes.cbHeader * cnt + nDataLen + tlsSizes.cbTrailer * cnt);
 		for (int i = 0; i < nDataLen; i += tlsSizes.cbMaximumMessage)
 		{
-			BYTE *dst = outbuf.EnsureFree(tlsSizes.cbHeader + nDataLen + tlsSizes.cbTrailer);
+			int size = min(nDataLen - i, tlsSizes.cbMaximumMessage);
+			BYTE *dst = outbuf.EnsureFree(tlsSizes.cbHeader + size + tlsSizes.cbTrailer);
 			outBuffers[0].BufferType = SECBUFFER_STREAM_HEADER;
 			outBuffers[0].pvBuffer = dst;
 			outBuffers[0].cbBuffer = tlsSizes.cbHeader;
 			dst += tlsSizes.cbHeader;
 			outBuffers[1].BufferType = SECBUFFER_DATA;
 			outBuffers[1].pvBuffer = dst;
-			outBuffers[1].cbBuffer = nDataLen;
-			memcpy(dst, pDataBuffer, nDataLen);
-			dst += nDataLen;
+			outBuffers[1].cbBuffer = size;
+			memcpy(dst, pDataBuffer + i, size);
+			dst += size;
 			outBuffers[2].BufferType = SECBUFFER_STREAM_TRAILER;
 			outBuffers[2].pvBuffer = dst;
 			outBuffers[2].cbBuffer = tlsSizes.cbTrailer;
