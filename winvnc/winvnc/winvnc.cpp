@@ -272,7 +272,6 @@ void extractConfig(char* szCmdLine)
 			char* p = strrchr(szCurrentDir, '\\');
 			*p = '\0';
 		}
-		strcat_s(szCurrentDir, "\\UltraVNC");
 		strcat_s(szCurrentDir, "\\");
 		strcat_s(szCurrentDir, INIFILE_NAME);
 #ifndef SC_20
