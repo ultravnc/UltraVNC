@@ -29,6 +29,17 @@ if (MINGW)
     install(FILES /usr/lib/gcc/x86_64-w64-mingw32/13-win32/libgcc_s_seh-1.dll DESTINATION ${CMAKE_BINARY_DIR}/ultravnc OPTIONAL)
 endif()
 
+# Debug Macro section
+message(STATUS "Preprocessor definitions: ${CMAKE_CXX_FLAGS}")
+message(STATUS "CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
+message(STATUS "CXX_DEFINES: ${CMAKE_CXX_DEFINES}")
+# End Debug Macro section
+
+# Disable/Remove Macro _WINVNC_INIFILE "Active Preprocessor Block" on the 3 files inifile.h and Patch LNK2019 and LNK2001 Errors
+#add_definitions(-U_WINVNC_INIFILE)
+remove_definitions(-D_WINVNC_INIFILE)
+# End Disable/Remove Macro _WINVNC_INIFILE
+
 add_subdirectory(authadmin)
 add_subdirectory(authSSP)
 add_subdirectory(createpassword)
