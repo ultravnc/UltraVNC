@@ -261,7 +261,7 @@ VNCOptions::VNCOptions()
 	m_HideEndOfStreamError = false;
 	
 	setDefaultOptionsFileName(m_optionfile);
-	LoadOptions(getDefaultOptionsFileName());
+	//LoadOptions(getDefaultOptionsFileName());
 }
 
 void VNCOptions::setDefaultOptionsFileName(TCHAR * optionfile)

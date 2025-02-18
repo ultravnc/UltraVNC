@@ -37,6 +37,7 @@ class SettingsManager
 public:
 	static SettingsManager* getInstance();
 
+	void Initialize(char* configFile);
 	void load();
 	void save();
 	void savePassword();
@@ -276,12 +277,16 @@ public:
 	void setShowAllLogs(bool value) { showAllLogs = value; }
 	bool getShowAllLogs() { return showAllLogs; }
 
+	char* getAlternateShell() { return m_pref_alternateShell; };
+
+	bool getShowSettings();
+	void setShowSettings(bool value) { showSettings = value; };
 private:
 	SettingsManager();
 	static SettingsManager* s_instance;
 	void setDefaults();
 	void initTemp();
-	IniFile myIniFile;
+	IniFile iniFile;
 
 	BOOL	m_pref_allowproperties;
 	BOOL	m_pref_allowInjection;
@@ -388,9 +393,11 @@ private:
 	BOOL m_pref_locdom3;
 
 	TCHAR m_pref_cloudServer[MAX_HOST_NAME_LEN];
+	char m_pref_alternateShell[1024];
 	bool m_pref_cloudEnabled;
 	bool m_pref_AllowUserSettingsWithPassword;
 	bool showAllLogs = false;
+	bool showSettings = false;
 };
 
 extern SettingsManager* settings;

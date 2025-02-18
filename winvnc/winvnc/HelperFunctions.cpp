@@ -242,7 +242,7 @@ DWORD MessageBoxSecure(HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT uType)
 			else {
 				if (uType & MB_OK)
 					uType &= ~MB_OK;
-				helper::yesUVNCMessageBox(hInstResDLL, hWnd, (char*)lpText, (char*)lpCaption, uType);
+				retunvalue = helper::yesUVNCMessageBox(hInstResDLL, hWnd, (char*)lpText, (char*)lpCaption, uType);
 			}
 
 			SetThreadDesktop(old_desktop);
@@ -263,7 +263,7 @@ DWORD MessageBoxSecure(HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT uType)
 		else {
 			if (uType & MB_OK)
 				uType &= ~MB_OK;
-			helper::yesUVNCMessageBox(hInstResDLL, hWnd, (char*)lpText, (char*)lpCaption, uType);
+			retunvalue = helper::yesUVNCMessageBox(hInstResDLL, hWnd, (char*)lpText, (char*)lpCaption, uType);
 		}
 	}
 	return retunvalue;
@@ -582,98 +582,125 @@ namespace postHelper {
 namespace processHelper {
 	DWORD GetExplorerLogonPid()
 	{
-		// Initialize the alternate shell buffer and retrieve alternate shell name from INI
-		char alternate_shell[129] = "";
-		IniFile myIniFile;
-		myIniFile.ReadString("admin", "alternate_shell", alternate_shell, sizeof(alternate_shell) - 1);
-
-		DWORD dwSessionId = WTSGetActiveConsoleSessionId();
+		char alternate_shell[129];
+		strcpy_s(alternate_shell, "");
+		strcpy_s(alternate_shell, settings->getAlternateShell());
+		DWORD dwSessionId;
 		DWORD dwExplorerLogonPid = 0;
-
-		// Adjust session ID if in remote session
+		PROCESSENTRY32 procEntry{};
+		dwSessionId = WTSGetActiveConsoleSessionId();
 		if (GetSystemMetrics(SM_REMOTESESSION)) {
 			DWORD pSessionId = 0xFFFFFFFF;
-			if (ProcessIdToSessionId(GetCurrentProcessId(), &pSessionId)) {
-				dwSessionId = pSessionId;
-			}
+			ProcessIdToSessionId(dw, &pSessionId);
+			dwSessionId = pSessionId;
 		}
 
-		// Take a snapshot of all processes
 		HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 		if (hSnap == INVALID_HANDLE_VALUE) {
 			return 0;
 		}
-
-		// Initialize PROCESSENTRY32 structure
-		PROCESSENTRY32 procEntry{};
 		procEntry.dwSize = sizeof(PROCESSENTRY32);
-
-		// Iterate through processes
-		if (Process32First(hSnap, &procEntry)) {
-			do {
-				// Check if process is explorer.exe or alternate shell, and matches session ID
-				bool isTargetProcess = (_stricmp(procEntry.szExeFile, "explorer.exe") == 0) ||
-					(alternate_shell[0] != '\0' && _stricmp(procEntry.szExeFile, alternate_shell) == 0);
-				if (isTargetProcess) {
-					DWORD dwExplorerSessId = 0;
-					if (ProcessIdToSessionId(procEntry.th32ProcessID, &dwExplorerSessId) && dwExplorerSessId == dwSessionId) {
-						dwExplorerLogonPid = procEntry.th32ProcessID;
-						break;
-					}
-				}
-			} while (Process32Next(hSnap, &procEntry));
+		if (!Process32First(hSnap, &procEntry)) {
+			CloseHandle(hSnap);
+			return 0;
 		}
 
-		// Cleanup and return result
+		do {
+			if ((_stricmp(procEntry.szExeFile, "explorer.exe") == 0) || (strlen(alternate_shell) != 0 && (_stricmp(procEntry.szExeFile, alternate_shell) == 0))) {
+				DWORD dwExplorerSessId = 0;
+				if (ProcessIdToSessionId(procEntry.th32ProcessID, &dwExplorerSessId)
+					&& dwExplorerSessId == dwSessionId) {
+					dwExplorerLogonPid = procEntry.th32ProcessID;
+					break;
+				}
+			}
+		} while (Process32Next(hSnap, &procEntry));
 		CloseHandle(hSnap);
 		return dwExplorerLogonPid;
 	}
 
+	bool GetConsoleUser(char* buffer, UINT size)
+	{
+		HANDLE hPToken = DesktopUsersToken::getInstance()->getDesktopUsersToken();
+		if (hPToken == NULL) {
+			strcpy_s(buffer, UNLEN + 1, "");
+			return 0;
+		}
+
+		char aa[16384]{};
+		// token user
+		TOKEN_USER* ptu;
+		DWORD needed;
+		ptu = (TOKEN_USER*)aa;//malloc( 16384 );
+		if (GetTokenInformation(hPToken, TokenUser, ptu, 16384, &needed))
+		{
+			char  DomainName[64];
+			memset(DomainName, 0, sizeof(DomainName));
+			DWORD DomainSize;
+			DomainSize = sizeof(DomainName) - 1;
+			SID_NAME_USE SidType;
+			DWORD dwsize = size;
+			LookupAccountSid(NULL, ptu->User.Sid, buffer, &dwsize, DomainName, &DomainSize, &SidType);
+			//free(ptu);
+			return 1;
+		}
+		//free(ptu);
+		strcpy_s(buffer, UNLEN + 1, "");
+		return 0;
+	}
+
 	BOOL GetCurrentUser(char* buffer, UINT size) // RealVNC 336 change
 	{
-		BOOL g_impersonating_user = FALSE;
-
-		// Check if running as an external service
+		BOOL	g_impersonating_user = FALSE;
+		// How to obtain the name of the current user depends upon the OS being used
 		if (settings->RunningFromExternalService()) {
+			// Get the current Window station
 			g_impersonating_user = TRUE;
 
-			// Get the current window station
 			HWINSTA station = GetProcessWindowStation();
 			if (station == NULL)
 				return FALSE;
 
-			// Retrieve the required buffer size for the user SID
-			DWORD usersize = 0;
-			if (!GetUserObjectInformation(station, UOI_USER_SID, NULL, 0, &usersize))
-				return FALSE;
+			DWORD usersize;
+			GetUserObjectInformation(station, UOI_USER_SID, NULL, 0, &usersize);
 
-			// If no user is logged in
+			// Check the required buffer size isn't zero
 			if (usersize == 0) {
+				// No user is logged in - ensure we're not impersonating anyone
 				RevertToSelf();
 				g_impersonating_user = FALSE;
-				strcpy_s(buffer, size, ""); // Clear buffer safely with given size
+				if (strlen("") >= size)
+					return FALSE;
+				strcpy_s(buffer, UNLEN + 1, "");
+				return TRUE;
+			}
+
+			if (!g_impersonating_user) {
+				if (strlen("") >= size)
+					return FALSE;
+				strcpy_s(buffer, UNLEN + 1, "");
 				return TRUE;
 			}
 		}
 
-		// Attempt to get the username through the Console User Token
 		DWORD length = size;
-		if (DesktopUsersToken::getInstance()->GetConsoleUser(buffer, size) == 0) {
+		if (GetConsoleUser(buffer, size) == 0) {
 			if (GetUserName(buffer, &length) == 0) {
-				DWORD error = GetLastError();
+				UINT error = GetLastError();
 				if (error == ERROR_NOT_LOGGED_ON) {
-					// No user logged on, clear buffer and return success
-					strcpy_s(buffer, size, ""); // Safely clear buffer with given size
+					// No user logged on
+					if (strlen("") >= size)
+						return FALSE;
+					strcpy_s(buffer, UNLEN + 1, "");
 					return TRUE;
 				}
 				else {
-					// Log unexpected error and return failure
-					vnclog.Print(LL_INTERR, VNCLOG("GetUserName error %d\n"), error);
+					// Genuine error...
+					vnclog.Print(LL_INTERR, VNCLOG("getusername error %d\n"), GetLastError());
 					return FALSE;
 				}
 			}
 		}
-
 		return TRUE;
 	}
 
@@ -693,6 +720,27 @@ namespace processHelper {
 		return result;
 	}
 
+	bool IsServiceInstalled()
+	{
+		bool serviceInstalled = false;
+
+#ifndef SC_20
+		// Open the Service Control Manager with permission to enumerate services
+		SC_HANDLE hSCM = ::OpenSCManager(nullptr, nullptr, SC_MANAGER_ENUMERATE_SERVICE);
+		if (hSCM) {
+			// Attempt to open the specified service with query configuration access
+			SC_HANDLE hService = ::OpenService(hSCM, UltraVNCService::service_name, SERVICE_QUERY_CONFIG);
+			if (hService) {
+				serviceInstalled = true;
+				::CloseServiceHandle(hService);
+			}
+			::CloseServiceHandle(hSCM);
+		}
+#endif // SC_20
+
+		return serviceInstalled;
+	}
+
 	DWORD GetCurrentConsoleSessionID()
 	{
 		return WTSGetActiveConsoleSessionId();
@@ -700,32 +748,23 @@ namespace processHelper {
 
 	BOOL IsWSLocked()
 	{
-		bool isLocked = false;
+		bool bLocked = false;
 
-		// Take a snapshot of all running processes
+		// Original code does not work if running as a service... apparently no access to the desktop.
+		// Alternative is to check for a running LogonUI.exe (if present, system is either not logged in or locked)
 		HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-		if (hSnap == INVALID_HANDLE_VALUE) {
-			// Snapshot creation failed, return false
-			return false;
-		}
 
-		// Initialize PROCESSENTRY32W structure
 		PROCESSENTRY32W procentry{};
 		procentry.dwSize = sizeof(procentry);
 
-		// Check for the presence of "LogonUI.exe" to determine if the workstation is locked
 		if (Process32FirstW(hSnap, &procentry)) {
 			do {
-				if (_wcsicmp(procentry.szExeFile, L"LogonUI.exe") == 0) {
-					isLocked = true;
+				if (!_wcsicmp(procentry.szExeFile, L"LogonUI.exe")) {
+					bLocked = true;
 					break;
 				}
 			} while (Process32NextW(hSnap, &procentry));
 		}
-
-		// Clean up snapshot handle
-		CloseHandle(hSnap);
-
-		return isLocked;
+		return bLocked;
 	}
 }

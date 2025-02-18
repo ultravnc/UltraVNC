@@ -322,6 +322,7 @@
 #define IDC_ADMINCLEAR                  1282
 #define IDC_BUTTON2                     1283
 #define IDC_STOPLOG                     1283
+#define IDC_CONFIG_FILE                 1284
 #define IDE_CUSTOM1                     4377
 #define ID_ABOUT                        32771
 #define ID_ADMIN_PROPERTIES             32772
@@ -418,7 +419,7 @@
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        209
 #define _APS_NEXT_COMMAND_VALUE         32858
-#define _APS_NEXT_CONTROL_VALUE         1284
+#define _APS_NEXT_CONTROL_VALUE         1285
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

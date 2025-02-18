@@ -37,7 +37,7 @@ class IniFile
 
 // Fields
 public:
-	char myInifile[MAX_PATH];
+	char strIniFile[MAX_PATH];
 
 // Methods
 public:

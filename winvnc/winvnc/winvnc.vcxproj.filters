@@ -11,7 +11,6 @@
     <ClCompile Include="getinfo.cpp" />
     <ClCompile Include="HelperFunctions.cpp" />
     <ClCompile Include="HideDesktop.cpp" />
-    <ClCompile Include="initipp.cpp" />
     <ClCompile Include="IPC.cpp" />
     <ClCompile Include="..\..\lzo\minilzo.c" />
     <ClCompile Include="rfbRegion_win32.cpp" />

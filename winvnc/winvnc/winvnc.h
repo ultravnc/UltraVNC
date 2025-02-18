@@ -54,6 +54,7 @@ extern DWORD		mainthreadId;
 extern int WinVNCAppMain();
 
 // Standard command-line flag definitions
+const char winvncConfig[] = "-config";
 const char winvncRunService[]		= "-service_run";
 const char winvncRunServiceRdp[]		= "-service_rdp_run";
 const char winvncPreConnect[]		="-preconnect";
@@ -98,9 +99,6 @@ const char winvncopenfacebook[]				= "-openfacebook";
 const char winvncopenxtwitter[]				= "-openxtwitter";
 const char winvncopenreddit[]				= "-openreddit";
 const char winvncopenopenhub[]				= "-openopenhub";
-
-const char dsmpluginhelper[]				= "-dsmpluginhelper";
-const char dsmplugininstance[]				= "-dsmplugininstance";
 
 // Usage string
 const char winvncUsageText[]		= "winvnc [-sc_prompt] [-sc_exit] [-id:????] [-stopreconnect][-autoreconnect[ ID:????]] [-connect host[:display]] [-connect host[::port]] [-repeater host[:port]][-run]\n";

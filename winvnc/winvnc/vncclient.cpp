@@ -1539,6 +1539,7 @@ BOOL vncClientThread::AuthSecureVNCPlugin(std::string& auth_message)
 {
 	bool bPassphrase = false;
 	vncPasswd::ToText plain(settings->getPasswd(), settings->getSecure());
+	vncPasswd::ToText plainViewOnly(settings->getPasswdViewOnly(), settings->getSecure());
 	ConfigHelper ConfigHelpervar(settings->getDSMPluginConfig());
 	if (strlen(ConfigHelpervar.m_szPassphrase) > 0)
 	{
@@ -1554,6 +1555,7 @@ BOOL vncClientThread::AuthSecureVNCPlugin(std::string& auth_message)
 	BOOL auth_ok = FALSE;
 
 	const char* plainPassword = plain;
+	const char* plainPasswordViewOnly = plainViewOnly;
 	/*if (!m_ms_logon && plainPassword && strlen(plainPassword) > 0) {
 		m_socket->GetIntegratedPlugin()->SetPasswordData((const BYTE*)plainPassword, strlen(plainPassword));
 	}*/
@@ -1615,7 +1617,7 @@ BOOL vncClientThread::AuthSecureVNCPlugin(std::string& auth_message)
 
 		m_socket->GetIntegratedPlugin()->SetHandshakeComplete();
 
-		if (!m_ms_logon && strlen(plainPassword) != 0)
+		if (!m_ms_logon && (strlen(plainPassword) != 0 || strlen(plainPasswordViewOnly) != 0))
 		{
 			if (!m_socket->ReadExact((char*)&wResponseLength, sizeof(wResponseLength))) {
 				return FALSE;
@@ -1629,7 +1631,14 @@ BOOL vncClientThread::AuthSecureVNCPlugin(std::string& auth_message)
 			}
 			if (bPassphrase == false)
 			{
-				if (memcmp(plain, pResponseData, strlen(plain))) auth_ok = false;
+				if (memcmp(plain, pResponseData, strlen(plain))) 
+						auth_ok = false;
+				if (auth_ok == false && !memcmp(plainViewOnly, pResponseData, strlen(plainViewOnly))) {
+					m_client->EnableKeyboard(false); //PGM
+					m_client->EnablePointer(false); //PGM
+					m_client->EnableGii(false);
+					auth_ok = true;
+				}
 			}
 			else if (memcmp(ConfigHelpervar.m_szPassphrase, pResponseData, strlen(ConfigHelpervar.m_szPassphrase))) auth_ok = false;
 			delete[] pResponseData;
