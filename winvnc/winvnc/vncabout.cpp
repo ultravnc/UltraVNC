@@ -238,6 +238,11 @@ vncAbout::DialogProc(HWND hwnd,
             char version[50]{};
 			char title[256]{};
 			strcpy_s(title, "UltraVNC Server -");
+#ifdef _X64
+            strcat_s(title, " 64-bit -");
+#else
+            strcat_s(title, " 32-bit -");
+#endif
 			strcat_s(title, GetVersionFromResource(version));
 #ifndef _X64
             strcat_s(title, " - x86");

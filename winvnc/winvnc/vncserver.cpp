@@ -47,9 +47,9 @@
 #include "Localization.h" // ACT : Add localization on messages
 #include "ScSelect.h"
 
-#ifdef _CLOUD
-#include "./UdtCloudlib/proxy/Cloudthread.h"
-#endif
+//#ifdef _CLOUD
+//#include "./UdtCloudlib/proxy/Cloudthread.h"
+//#endif
 
 #pragma comment(lib, "iphlpapi.lib")
 
@@ -189,17 +189,17 @@ vncServer::vncServer()
 	char* generatedcode = generateCode();
 	strcpy_s(code, generatedcode);
 	free(generatedcode);
-#ifdef _CLOUD
-	cloudThread = new CloudThread();
-#endif
+//#ifdef _CLOUD
+//	cloudThread = new CloudThread();
+//#endif
 }
 
 vncServer::~vncServer()
 {
-#ifdef _CLOUD
-	cloudThread->stopThread();
-	delete cloudThread;
-#endif
+//#ifdef _CLOUD
+//	cloudThread->stopThread();
+//	delete cloudThread;
+//#endif
 	ShutdownServer();}
 
 void
@@ -2103,44 +2103,47 @@ void vncServer::SetAutoPortSelect(const BOOL autoport)
 
 void vncServer::cloudConnect(bool start, char *cloudServer)
 {
-#ifdef _CLOUD
-	if (start)
-		cloudThread->startThread(5352, cloudServer, code, ctSERVER);
-	else
-		cloudThread->stopThread();
-#endif
+//#ifdef _CLOUD
+//	if (start)
+//		cloudThread->startThread(5352, cloudServer, code, ctSERVER);
+//	else
+//		cloudThread->stopThread();
+//#endif
 }
 
 bool vncServer::isCloudThreadRunning()
 {
-#ifdef _CLOUD
-	return cloudThread->isThreadRunning();
-#else
 	return false;
-#endif
+//#ifdef _CLOUD
+//	return cloudThread->isThreadRunning();
+//#else
+//	return false;
+//#endif
 }
 
 char *vncServer::getExternalIpAddress()
 {
-#ifdef _CLOUD
-	return cloudThread->getExternalIpAddress();
-#else
 	return "";
-#endif
+//#ifdef _CLOUD
+//	return cloudThread->getExternalIpAddress();
+//#else
+//	return "";
+//#endif
 }
 
 int vncServer::getStatus()
 {
-#ifdef _CLOUD
-	return cloudThread->getStatus();
-#else
 	return 0;
-#endif
+//#ifdef _CLOUD
+//	return cloudThread->getStatus();
+//#else
+//	return 0;
+//#endif
 }
 
 void vncServer::setVNcPort()
 {
-#ifdef _CLOUD
-	cloudThread->setVNcPort(m_port);
-#endif
+//#ifdef _CLOUD
+//	cloudThread->setVNcPort(m_port);
+//#endif
 }

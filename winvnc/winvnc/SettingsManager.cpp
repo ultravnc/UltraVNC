@@ -109,6 +109,11 @@ bool SettingsManager::IsDesktopUserAdmin()
 		vnclog.Print(LL_INTWARN, VNCLOG("Desktop user is no Administrator\n"));
 	}
 
+	if (isAdmin)
+		vnclog.Print(LL_LOGSCREEN, "IniFile Is Writable");
+	else
+		vnclog.Print(LL_LOGSCREEN, "IniFile no write access");
+
 	RevertToSelf();
 	return isAdmin;
 }

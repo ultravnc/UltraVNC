@@ -336,10 +336,6 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "&List All Clients",           ID_LISTCLIENTS
         MENUITEM SEPARATOR
-        MENUITEM "Install Service",             ID_RUNASSERVICE
-        MENUITEM "Uninstall Service",           ID_UNINSTALL_SERVICE
-        MENUITEM "Stop Service",                ID_CLOSE_SERVICE
-        MENUITEM "Start Service (must be installed first)", ID_START_SERVICE
         MENUITEM "Reboot in safe mode",         ID_REBOOTSAFEMODE
         MENUITEM "Force Reboot (unsafe)",       ID_REBOOT_FORCE
         MENUITEM SEPARATOR
@@ -367,21 +363,6 @@ IDR_VNCVIEWER_JAR       JAVAARCHIVE             "res/vncviewer.jar"
 
 IDR_JAVAARCHIVE1        JAVAARCHIVE             "res/mslogon/VncViewer.jar"
 
-#if defined(SC_20)
-/////////////////////////////////////////////////////////////////////////////
-//
-// DLL
-//
-
-IDR_DLL1                DLL                     "res/ddengine.dll"
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// ENCRYPTIONDLL
-//
-IDR_ENCRYPTIONDLL1      ENCRYPTIONDLL           "res/SecureVNCPlugin.dsm"
-#endif
 
 /////////////////////////////////////////////////////////////////////////////
 //

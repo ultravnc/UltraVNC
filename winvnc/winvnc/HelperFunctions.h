@@ -84,7 +84,6 @@ namespace postHelper {
 namespace processHelper {
 	BOOL CurrentUser(char* buffer, UINT size);
 	DWORD GetExplorerLogonPid();
-	bool IsServiceInstalled();
 	DWORD GetCurrentConsoleSessionID();
 	BOOL IsWSLocked();
 }
@@ -100,12 +99,6 @@ namespace serviceHelpers {
 	//bool ExistServiceName(TCHAR* pszAppPath, TCHAR* pszServiceName);
 	void make_upper(std::string& str);
 	void winvncSecurityEditorHelper_as_admin();
-	void Set_uninstall_service_as_admin();
-	void Set_install_service_as_admin();
-	void Real_start_service();
-	void Set_start_service_as_admin();
-	void Real_stop_service();
-	void Set_stop_service_as_admin();
 }
 #endif // SC_20
 

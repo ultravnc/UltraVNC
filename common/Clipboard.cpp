@@ -749,7 +749,7 @@ bool Clipboard::UpdateClipTextEx(ClipboardData& clipboardData, CARD32 overrideFl
 
 				if (nFinalConvertedSize > 0) {
 					std::wstring wstrClipboard(clipStr);
-					m_strLastCutText.assign(wstrClipboard.begin(), wstrClipboard.end());
+					m_strLastCutText.assign(wstrClipboard.begin(), wstrClipboard.end()); // Why you do this? m_strLastCutText is a std::string in Clipboard.h !!! Not a std::wstring or std::u16string or std::u32string ISSUE #214
 				}
 
 				delete[] clipStr;

@@ -99,8 +99,6 @@ SUBDIRS += \
     repeater \
     setcad \
     setpasswd \
-    udt4\win \
-    UdtCloudlib \
     uvnc_settings \
     uvnckeyboardhelper \
     vncviewer \

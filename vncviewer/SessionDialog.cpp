@@ -34,9 +34,9 @@
 #include <sys/stat.h>
 #include <direct.h>
 #include "display.h"
-#ifdef _CLOUD
-#include "../UdtCloudlib/proxy/Cloudthread.h"
-#endif
+//#ifdef _CLOUD
+//#include "../UdtCloudlib/proxy/Cloudthread.h"
+//#endif
 #include "AboutBox.h"
 #include "UltraVNCHelperFunctions.h"
 using namespace helper;

@@ -219,6 +219,9 @@ compile_commands.json
 *_qmlcache.qrc
 
 # End Qt Specific gitignore
+
+
+# No vcpkg folder on repository don't touch theses 5 lines
 ultravnc_service/x64/
 ultravnc_service/src/.opencppcov/
 vncviewer/vcpkg_installed/
