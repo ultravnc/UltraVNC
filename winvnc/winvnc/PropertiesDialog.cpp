@@ -646,7 +646,7 @@ bool PropertiesDialog::DlgInitDialog(HWND hwnd)
 		GetDlgItemText(hwnd, IDC_PLUGINS_COMBO, szPlugin, MAX_PATH);
 		bool pluginset = (strcmp(szPlugin, szPluginDefault) != 0) && strlen(szPlugin) > 0;
 		SendMessage(GetDlgItem(hwnd, IDC_PLUGIN_CHECK), BM_SETCHECK, settings->getUseDSMPlugin(), 0);
-		EnableWindow(GetDlgItem(hwnd, IDC_PLUGIN_BUTTON), m_server->AuthClientCount() == 0
+		EnableWindow(GetDlgItem(hwnd, IDC_PLUGIN_BUTTON), (m_server == NULL || m_server->AuthClientCount() == 0)
 			? (SendMessage(GetDlgItem(hwnd, IDC_PLUGIN_CHECK), BM_GETCHECK, 0, 0) == BST_CHECKED) && pluginset
 			: BST_UNCHECKED);
 		EnableWindow(GetDlgItem(hwnd, IDC_PLUGINS_COMBO), SendMessage(GetDlgItem(hwnd, IDC_PLUGIN_CHECK), BM_GETCHECK, 0, 0) == BST_CHECKED);

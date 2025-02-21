@@ -810,13 +810,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 				i += strlen(winvncmulti);
 				continue;
 			}
-			/*
-			if (strncmp(&szCmdLine[i], winvnchttp, strlen(winvnchttp)) == 0)
+			
+			if (strncmp(&szCmdLine[i], winvncsettings, strlen(winvncsettings)) == 0)
 			{
-				G_HTTP=true;
-				i+=strlen(winvnchttp);
-				continue;
-			}*/
+				PropertiesDialog properties;
+				properties.ShowDialog();
+				PostQuitMessage(0);
+			}
 
 			if (strncmp(&szCmdLine[i], winvncStopReconnect, strlen(winvncStopReconnect)) == 0)
 			{
