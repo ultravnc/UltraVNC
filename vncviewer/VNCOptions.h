@@ -39,6 +39,11 @@
 #define DOTCURSOR 1
 #define NORMALCURSOR 2
 
+inline bool SwitchMatch(LPCTSTR arg, LPCTSTR swtch) {
+	return (arg[0] == '-' || arg[0] == '/') &&
+		(_tcsicmp(&arg[1], swtch) == 0);
+}
+
 class VNCOptions
 {
 public:
@@ -153,6 +158,7 @@ public:
 
 	int DoDialog(bool running = false, HWND hwnd = NULL);
 	void SetFromCommandLine(LPTSTR szCmdLine);
+	char szCmdLine[8191]{};
 
 	void CancelDialog();
 	void setDefaultDocumentPath();

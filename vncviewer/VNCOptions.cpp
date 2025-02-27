@@ -464,11 +464,6 @@ VNCOptions::~VNCOptions()
 {
 }
 
-inline bool SwitchMatch(LPCTSTR arg, LPCTSTR swtch) {
-	return (arg[0] == '-' || arg[0] == '/') &&
-		(_tcsicmp(&arg[1], swtch) == 0);
-}
-
 static void ArgError(LPTSTR msg) {
 	yesUVNCMessageBox(m_hInstResDLL, NULL, msg, sz_D1, MB_ICONSTOP);
 }
@@ -500,6 +495,7 @@ void VNCOptions::FixScaling()
 void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 	// We assume no quoting here.
 	// Copy the command line - we don't know what might happen to the original
+	strcpy_s(this->szCmdLine, szCmdLine);
 	config_specified = false;
 	int cmdlinelen = _tcslen(szCmdLine);
 	if (cmdlinelen == 0) return;

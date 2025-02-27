@@ -158,6 +158,7 @@ public:
 	void SaveToFile(char *fname, bool SaveToFile = false);
 	void saveInt(char *name, int value, char *fname); 
 	void LoadFromFile(char *fname);
+	void overwriteCommandLine();
 	int readInt(char *name, int defval, char *fname);
 	void getAppData(char * buffer);
 	void IfHostExistLoadSettings(char *filename);
