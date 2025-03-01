@@ -67,6 +67,7 @@ DWORD		mainthreadId;
 char configFile[256] = { 0 };
 int configfileskip = 0;
 bool showSettings = false;
+char winvncFolder[MAX_PATH];
 
 //adzm 2009-06-20
 char* g_szRepeaterHost = NULL;
@@ -140,14 +141,10 @@ Myinit(HINSTANCE hInstance)
 
 	hInstResDLL = NULL;
 
-	 //limit the vnclang.dll searchpath to avoid
-	char szCurrentDir[MAX_PATH];
+	 //limit the vnclang.dll searchpath to avoid	
 	char szCurrentDir_vnclangdll[MAX_PATH];
-	if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
-	{
-		char* p = strrchr(szCurrentDir, '\\');
-		*p = '\0';
-	}
+	char szCurrentDir[MAX_PATH];
+	strcpy_s(szCurrentDir, winvncFolder);
 	strcpy_s(szCurrentDir_vnclangdll,szCurrentDir);
 	strcat_s(szCurrentDir_vnclangdll,"\\");
 	strcat_s(szCurrentDir_vnclangdll,"vnclang_server.dll");
@@ -267,11 +264,7 @@ void extractConfig(char* szCmdLine)
 		char appdataFolder[MAX_PATH]{};
 		char programdataPath[MAX_PATH]{};
 		char szCurrentDir[MAX_PATH]{};
-		if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
-		{
-			char* p = strrchr(szCurrentDir, '\\');
-			*p = '\0';
-		}
+		strcpy_s(szCurrentDir, winvncFolder);		
 		strcat_s(szCurrentDir, "\\");
 		strcat_s(szCurrentDir, INIFILE_NAME);
 #ifndef SC_20
@@ -338,6 +331,11 @@ void extractConfig(char* szCmdLine)
 // routine or, under NT, the main service routine.
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2, int iCmdShow)
 {
+	if (GetModuleFileName(NULL, winvncFolder, MAX_PATH))
+	{
+		char* p = strrchr(winvncFolder, '\\');
+		*p = '\0';
+	}
 	extractConfig(szCmdLine2);
 	InitCommonControls();
 	INITCOMMONCONTROLSEX icex;
@@ -389,11 +387,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 		//limit the vnclang.dll searchpath to avoid
 		char szCurrentDir[MAX_PATH];
 		char szCurrentDir_vnclangdll[MAX_PATH];
-		if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
-		{
-			char* p = strrchr(szCurrentDir, '\\');
-			*p = '\0';
-		}
+		strcpy_s(szCurrentDir, winvncFolder);
 		strcpy_s(szCurrentDir_vnclangdll, szCurrentDir);
 		strcat_s(szCurrentDir_vnclangdll, "\\");
 		strcat_s(szCurrentDir_vnclangdll, "vnclang_server.dll");
@@ -408,18 +402,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 
 			//Load all messages from ressource file
 		Load_Localization(hInstResDLL);
-
-		char WORKDIR[MAX_PATH];
-		if (GetModuleFileName(NULL, WORKDIR, MAX_PATH))
-		{
-			char* p = strrchr(WORKDIR, '\\');
-			if (p == NULL) return return2(0);
-			*p = '\0';
-		}
-		char progname[MAX_PATH];
-		strncpy_s(progname, WORKDIR, sizeof progname);
-		progname[MAX_PATH - 1] = 0;		
-
 
 	#ifdef _DEBUG
 		{
@@ -618,13 +600,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 			{
 				typedef void (*vncEditSecurityFn) (HWND hwnd, HINSTANCE hInstance);
 				vncEditSecurityFn vncEditSecurity = 0;
-				char szCurrentDirl[MAX_PATH];
-				if (GetModuleFileName(NULL, szCurrentDirl, MAX_PATH)) {
-					char* p = strrchr(szCurrentDirl, '\\');
-					*p = '\0';
-					strcat_s(szCurrentDirl, "\\authSSP.dll");
-				}
-				HMODULE hModule = LoadLibrary(szCurrentDirl);
+				char szCurrentDir[MAX_PATH]{};
+				strcpy_s(szCurrentDir, winvncFolder);
+				strcat_s(szCurrentDir, "\\authSSP.dll");
+				HMODULE hModule = LoadLibrary(szCurrentDir);
 				if (hModule) {
 					vncEditSecurity = (vncEditSecurityFn)GetProcAddress(hModule, "vncEditSecurity");
 					CoInitialize(NULL);

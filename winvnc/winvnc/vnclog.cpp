@@ -34,6 +34,7 @@
 #include "common/inifile.h"
 #include "PropertiesDialog.h"
 #include <ctime>
+#include "winvnc.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -304,14 +305,7 @@ void VNCLog::SetPath(char path[512])
 {
 	if (strlen(path)==0)
 	{
-		char WORKDIR[MAX_PATH];
-	if (GetModuleFileName(NULL, WORKDIR, MAX_PATH))
-		{
-		char* p = strrchr(WORKDIR, '\\');
-		if (p == NULL) return;
-		*p = '\0';
-		}
-		strcpy_s(m_path,WORKDIR);
+		strcpy_s(m_path, winvncFolder);
 	}
 	else
 	strcpy_s(m_path,path);
@@ -320,14 +314,7 @@ char *VNCLog::GetPath()
 {
 	if (strlen(m_path)==0)
 	{
-		char WORKDIR[MAX_PATH];
-	if (GetModuleFileName(NULL, WORKDIR, MAX_PATH))
-		{
-		char* p = strrchr(WORKDIR, '\\');
-		if (p == NULL) return "";
-		*p = '\0';
-		}
-		strcpy_s(m_path,WORKDIR);
+		strcpy_s(m_path, winvncFolder);
 	}
 	
 	return m_path;

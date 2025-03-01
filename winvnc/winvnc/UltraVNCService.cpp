@@ -53,11 +53,13 @@ char UltraVNCService::inifile[MAX_PATH] = "";
 IniFile UltraVNCService::iniFileService;
 
 void GetServiceExecutablePath(char* path, size_t size) {
-	// Use GetModuleFileName to retrieve the executable path
-	DWORD result = GetModuleFileNameA(nullptr, path, static_cast<DWORD>(size));
-	if (result == 0) {
-		path[0] = '\0'; // Ensure the path is empty on failure
+	if (GetModuleFileName(NULL, path, static_cast<DWORD>(size)))
+	{
+		char* p = strrchr(path, '\\');
+		*p = '\0';
 	}
+	else
+		path = '\0';
 }
 
 UltraVNCService::UltraVNCService()
@@ -341,9 +343,9 @@ int UltraVNCService::uninstall_service(void) {
 ////////////////////////////////////////////////////////////////////////////////
 int UltraVNCService::pad()
 {
-	char exe_file_name[MAX_PATH], dir[MAX_PATH], *ptr;
-    GetModuleFileName(0, exe_file_name, MAX_PATH);
-
+	char dir[MAX_PATH], *ptr;
+	char exe_file_name[MAX_PATH];
+	GetModuleFileName(0, exe_file_name, MAX_PATH);
     /* set current directory */
     strcpy_s(dir, exe_file_name);
     ptr=strrchr(dir, '\\'); /* last backslash */
@@ -563,7 +565,6 @@ void UltraVNCService::Reboot_with_force_reboot()
 
 void UltraVNCService::Reboot_with_force_reboot_elevated()
 {
-
 	char exe_file_name[MAX_PATH];
 	GetModuleFileName(0, exe_file_name, MAX_PATH);
 	SHELLEXECUTEINFO shExecInfo;
@@ -591,7 +592,6 @@ void UltraVNCService::Reboot_in_safemode()
 
 void UltraVNCService::Reboot_in_safemode_elevated()
 {
-
 	char exe_file_name[MAX_PATH];
 	GetModuleFileName(0, exe_file_name, MAX_PATH);
 	SHELLEXECUTEINFO shExecInfo;
@@ -814,12 +814,12 @@ bool UltraVNCService::IsAnyRDPSessionActive()
 
 int UltraVNCService::createWinvncExeCall(bool preconnect, bool rdpselect)
 {
+	char exe_file_name[MAX_PATH];
+	GetModuleFileName(0, exe_file_name, MAX_PATH);
 	OSVERSIONINFO OSversion;
 	OSversion.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 	GetVersionEx(&OSversion);
-	char exe_file_name[MAX_PATH];
 	char cmdline[MAX_PATH];
-	GetModuleFileName(0, exe_file_name, MAX_PATH);
 	strcpy_s(app_path, exe_file_name);
 	strcat_s(app_path, " -config");
 	strcat_s(app_path, "\"");

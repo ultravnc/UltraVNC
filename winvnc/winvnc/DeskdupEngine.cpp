@@ -26,6 +26,7 @@
 #include "DeskdupEngine.h"
 #include <stdio.h>
 #include "stdhdrs.h"
+#include "winvnc.h"
 #ifdef SC_20
 	#include "../loadmemory/loadDllFromMemory.h"
 #endif // SC_20
@@ -56,13 +57,8 @@ DeskDupEngine::DeskDupEngine()
 	if (osVer == OSWIN10) {
 #ifdef _X64
 		char szCurrentDir[MAX_PATH];
-		if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
-		{
-			char* p = strrchr(szCurrentDir, '\\');
-			if (p == NULL) return;
-			*p = '\0';
-			strcat_s(szCurrentDir, "\\ddengine64.dll");
-		}
+		strcpy_s(szCurrentDir, winvncFolder);
+		strcat_s(szCurrentDir, "\\ddengine64.dll");
 #endif // _X64
 #ifdef SC_20
 		loadDllFromMemory = std::make_unique<LoadDllFromMemory>();
@@ -72,13 +68,8 @@ DeskDupEngine::DeskDupEngine()
 #else
 #ifndef _X64
 		char szCurrentDir[MAX_PATH];
-		if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
-		{
-			char* p = strrchr(szCurrentDir, '\\');
-			if (p == NULL) return;
-			*p = '\0';
-			strcat_s(szCurrentDir, "\\ddengine.dll");
-		}
+		strcpy_s(szCurrentDir, winvncFolder);
+		strcat_s(szCurrentDir, "\\ddengine.dll");
 		
 #endif // _X64
 		hModule = LoadLibrary(szCurrentDir);

@@ -104,7 +104,6 @@ private:
 	static void wait_for_existing_process();
 	static bool IsSessionStillActive(int ID);
 
-
 public:
 	UltraVNCService();
 	static int start_service(char* cmd);

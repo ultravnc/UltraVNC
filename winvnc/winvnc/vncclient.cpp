@@ -85,6 +85,7 @@
 #include<map>
 #include "SettingsManager.h"
 #include "credentials.h"
+#include "winvnc.h"
 using namespace std;
 
 #pragma comment(lib, "mpr.lib") //for getting full mapped drive
@@ -1024,12 +1025,8 @@ void vncClientThread::LogAuthResult(bool success, bool isconnected)
 		typedef BOOL(*LogeventFn)(char* machine);
 		LogeventFn Logevent = 0;
 		char szCurrentDir[MAX_PATH];
-		if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
-		{
-			char* p = strrchr(szCurrentDir, '\\');
-			*p = '\0';
-			strcat_s(szCurrentDir, "\\logging.dll");
-		}
+		strcpy_s(szCurrentDir, winvncFolder);
+		strcat_s(szCurrentDir, "\\logging.dll");
 		HMODULE hModule = LoadLibrary(szCurrentDir);
 		if (hModule)
 		{
@@ -1043,12 +1040,8 @@ void vncClientThread::LogAuthResult(bool success, bool isconnected)
 		typedef BOOL(*LogeventFn)(char* machine, int clientId, bool isinteractive);
 		LogeventFn Logevent = 0;
 		char szCurrentDir[MAX_PATH];
-		if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
-		{
-			char* p = strrchr(szCurrentDir, '\\');
-			*p = '\0';
-			strcat_s(szCurrentDir, "\\logging.dll");
-		}
+		strcpy_s(szCurrentDir, winvncFolder);
+		strcat_s(szCurrentDir, "\\logging.dll");
 		HMODULE hModule = LoadLibrary(szCurrentDir);
 		if (hModule)
 		{
@@ -1141,12 +1134,8 @@ vncClientThread::InitAuthenticate()
 		typedef BOOL(*LogeventFn)(char* info);
 		LogeventFn Logevent = NULL;
 		char szCurrentDir[MAX_PATH];
-		if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
-		{
-			char* p = strrchr(szCurrentDir, '\\');
-			*p = '\0';
-			strcat_s(szCurrentDir, "\\logging.dll");
-		}
+		strcpy_s(szCurrentDir, winvncFolder);
+		strcat_s(szCurrentDir, "\\logging.dll");
 		HMODULE hModule = LoadLibrary(szCurrentDir);
 		if (hModule)
 		{
@@ -4475,12 +4464,8 @@ vncClientThread::run(void* arg)
 	typedef BOOL(*LogeventFn)(char* machine, char* user, int clientId, bool isinteractive);
 	LogeventFn Logevent = 0;
 	char szCurrentDir[MAX_PATH];
-	if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
-	{
-		char* p = strrchr(szCurrentDir, '\\');
-		*p = '\0';
-		strcat_s(szCurrentDir, "\\logging.dll");
-	}
+	strcpy_s(szCurrentDir, winvncFolder);
+	strcat_s(szCurrentDir, "\\logging.dll");
 	HMODULE hModule = LoadLibrary(szCurrentDir);
 	if (hModule)
 	{

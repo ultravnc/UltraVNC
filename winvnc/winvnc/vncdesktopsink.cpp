@@ -553,26 +553,17 @@ vncDesktop::InitWindow()
 	////////////////////////
 	hModuleVNCHook =NULL;
 	char szCurrentDir[MAX_PATH];
-		if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
-		{
-			char* p = strrchr(szCurrentDir, '\\');
-			if (p == NULL) return 0;
-			*p = '\0';
-			strcat_s(szCurrentDir,"\\vnchooks.dll");
-		}
+	strcpy_s(szCurrentDir, winvncFolder);
+	strcat_s(szCurrentDir, "\\vnchooks.dll");
 	hSCModule=NULL;
 	char szCurrentDirSC[MAX_PATH];
-		if (GetModuleFileName(NULL, szCurrentDirSC, MAX_PATH))
-		{
-			char* p = strrchr(szCurrentDirSC, '\\');
-			if (p == NULL) return 0;
-			*p = '\0';
+	strcpy_s(szCurrentDirSC, winvncFolder);
 #ifdef _X64
 			strcat_s(szCurrentDirSC,"\\schook_legacy64.dll");
 #else
 			strcat_s(szCurrentDirSC,"\\schook_legacy.dll");
 #endif
-		}
+
 
 	UnSetHooks=NULL;
 	SetMouseFilterHook=NULL;

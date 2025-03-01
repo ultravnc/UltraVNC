@@ -86,6 +86,7 @@ void Open_openhub();
 extern char dnsname[255];
 
 HMENU vncMenu::m_hmenu = NULL;
+char vncMenu::exe_file_name[MAX_PATH]="";
 
 BOOL pfnDwmEnableCompositiond = FALSE;
 static inline VOID DisableAero(VOID)
@@ -173,7 +174,8 @@ static void RestoreFontSmoothing()
 // Implementation
 
 vncMenu::vncMenu(vncServer* server)
-{
+{	
+	GetModuleFileName(0, exe_file_name, MAX_PATH);
 	vnclog.Print(LL_INTERR, VNCLOG("vncmenu(server)\n"));
 	ports_set = false;
 	CoInitialize(0);
@@ -298,6 +300,7 @@ vncMenu::vncMenu(vncServer* server)
 	// Install the Tray icon!
 	AddTrayIcon();
 	CoUninitialize();
+
 }
 
 vncMenu::~vncMenu()
@@ -766,8 +769,6 @@ bool vncMenu::OpenWebpageFromApp(int iMsg)
 		return false;
 
 	char dir[MAX_PATH];
-	char exe_file_name[MAX_PATH];
-	GetModuleFileName(0, exe_file_name, MAX_PATH);
 	strcpy_s(dir, exe_file_name);
 	if (iMsg == ID_VISITUSONLINE_HOMEPAGE)
 		strcat_s(dir, " -openhomepage");
@@ -1036,9 +1037,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				break;
 			}
 
-			char dir[MAX_PATH];
-			char exe_file_name[MAX_PATH];
-			GetModuleFileName(0, exe_file_name, MAX_PATH);
+			char dir[MAX_PATH];			
 			strcpy_s(dir, exe_file_name);
 			strcat_s(dir, " -rebootsafemodehelper");
 
@@ -1072,8 +1071,6 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			}
 
 			char dir[MAX_PATH];
-			char exe_file_name[MAX_PATH];
-			GetModuleFileName(0, exe_file_name, MAX_PATH);
 			strcpy_s(dir, exe_file_name);
 			strcat_s(dir, " -rebootforcedehelper");
 
@@ -1109,8 +1106,6 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				break;
 			}
 			char dir[MAX_PATH];
-			char exe_file_name[MAX_PATH];
-			GetModuleFileName(0, exe_file_name, MAX_PATH);
 			strcpy_s(dir, exe_file_name);
 			strcat_s(dir, " -uninstallhelper");
 
@@ -1143,8 +1138,6 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				goto error6;
 
 			char dir[MAX_PATH];
-			char exe_file_name[MAX_PATH];
-			GetModuleFileName(0, exe_file_name, MAX_PATH);
 			strcpy_s(dir, exe_file_name);
 			strcat_s(dir, " -installhelper");
 
@@ -1207,8 +1200,6 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				}
 
 				char dir[MAX_PATH];
-				char exe_file_name[MAX_PATH];
-				GetModuleFileName(0, exe_file_name, MAX_PATH);
 				strcpy_s(dir, exe_file_name);
 				strcat_s(dir, " -stopservicehelper");
 
@@ -1264,8 +1255,6 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				}
 
 				char dir[MAX_PATH];
-				char exe_file_name[MAX_PATH];
-				GetModuleFileName(0, exe_file_name, MAX_PATH);
 				strcpy_s(dir, exe_file_name);
 				strcat_s(dir, " -startservicehelper");
 

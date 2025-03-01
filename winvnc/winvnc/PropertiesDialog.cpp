@@ -18,6 +18,7 @@
 #include <vector>
 #include <string>
 #include <windowsx.h>
+#include "winvnc.h"
 
 extern HINSTANCE	hInstResDLL;
 HWND PropertiesDialog::hEditLog = NULL;
@@ -93,7 +94,8 @@ bool PropertiesDialog::InitDialog(HWND hwnd)
 		}
 		else {
 			vnclog.Print(LL_INTWARN, VNCLOG("IsDesktopUserAdmin false\n"));
-			if (settings->getAllowUserSettingsWithPassword() && !settings->checkAdminPassword()) {
+			if (!settings->getAllowUserSettingsWithPassword() ||
+				(settings->getAllowUserSettingsWithPassword() && !settings->checkAdminPassword()) ) {
 				EndDialog(hwnd, IDCANCEL);
 				return true;
 			}
@@ -1017,17 +1019,7 @@ int PropertiesDialog::ListPlugins(HWND hComboBox)
 	int fRet = 1;
 	int nFiles = 0;
 	char szCurrentDir[MAX_PATH];
-
-	if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
-	{
-		char* p = strrchr(szCurrentDir, '\\');
-		if (p == NULL)
-			return 0;
-		*p = '\0';
-	}
-	else
-		return 0;
-
+	strcpy_s(szCurrentDir, winvncFolder);
 	if (szCurrentDir[strlen(szCurrentDir) - 1] != '\\') strcat_s(szCurrentDir, "\\");
 	strcat_s(szCurrentDir, "*.dsm"); // The DSMplugin dlls must have this extension
 

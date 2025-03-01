@@ -48,6 +48,7 @@
 extern HINSTANCE	hAppInstance;
 extern const char	*szAppName;
 extern DWORD		mainthreadId;
+extern char winvncFolder[MAX_PATH];
 
 // Main UltraVNC Server routine
 

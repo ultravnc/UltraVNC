@@ -2449,13 +2449,8 @@ void vncDesktop::StartStopddihook(BOOL enabled)
 		PROCESS_INFORMATION ppi;
 		m_hddihook = NULL;
 		char szCurrentDir[MAX_PATH];
-		if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
-		{
-			char* p = strrchr(szCurrentDir, '\\');
-			if (p == NULL) return;
-			*p = '\0';
-			strcat_s(szCurrentDir, "\\16bithlp.exe");
-		}
+		strcpy_s(szCurrentDir, winvncFolder);
+		strcat_s(szCurrentDir, "\\16bithlp.exe");		
 		// Add ddi hook
 		ZeroMemory(&ssi, sizeof(ssi));
 		ssi.cb = sizeof(ssi);
