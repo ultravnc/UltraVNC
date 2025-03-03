@@ -42,6 +42,7 @@ void Open_homepage();
 void Open_forum();
 void Open_github();
 void Open_mastodon();
+void Open_bluesky();
 void Open_facebook();
 void Open_xtwitter();
 void Open_reddit();

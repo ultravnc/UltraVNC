@@ -325,6 +325,7 @@ BEGIN
             MENUITEM "Forum",                       ID_VISITUSONLINE_FORUM
             MENUITEM "GitHub",                      ID_VISITUSONLINE_GITHUB
             MENUITEM "Mastodon",                    ID_VISITUSONLINE_MASTODON
+            MENUITEM "Bluesky",                     ID_VISITUSONLINE_BLUESKY
             MENUITEM "Facebook",                    ID_VISITUSONLINE_FACEBOOK
             MENUITEM "X/Twitter",                   ID_VISITUSONLINE_XTWITTER
             MENUITEM "Reddit",                      ID_VISITUSONLINE_REDDIT

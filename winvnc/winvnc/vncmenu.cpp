@@ -76,6 +76,7 @@ void Open_homepage();
 void Open_forum();
 void Open_github();
 void Open_mastodon();
+void Open_bluesky();
 void Open_facebook();
 void Open_xtwitter();
 void Open_reddit();
@@ -776,6 +777,8 @@ bool vncMenu::OpenWebpageFromApp(int iMsg)
 		strcat_s(dir, " -opengithub");
 	if (iMsg == ID_VISITUSONLINE_MASTODON)
 		strcat_s(dir, " -openmastodon");
+	if (iMsg == ID_VISITUSONLINE_BLUESKY)
+		strcat_s(dir, " -openbluesky");
 	if (iMsg == ID_VISITUSONLINE_FACEBOOK)
 		strcat_s(dir, " -openfacebook");
 	if (iMsg == ID_VISITUSONLINE_XTWITTER)
@@ -972,6 +975,12 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				OpenWebpageFromApp(ID_VISITUSONLINE_MASTODON);
 			break;
 
+		case ID_VISITUSONLINE_BLUESKY:
+			if (settings->RunningFromExternalService() && OpenWebpageFromService("cmd /c start https://bsky.app/profile/ultravnc.bsky.social"));
+			else
+				OpenWebpageFromApp(ID_VISITUSONLINE_BLUESKY);
+			break;
+
 		case ID_VISITUSONLINE_FACEBOOK:
 			if (settings->RunningFromExternalService() && OpenWebpageFromService("cmd /c start https://www.facebook.com/ultravnc1"));
 			else
@@ -979,7 +988,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			break;
 
 		case ID_VISITUSONLINE_XTWITTER:
-			if (settings->RunningFromExternalService() && OpenWebpageFromService("cmd /c start https://twitter.com/ultravnc1"));
+			if (settings->RunningFromExternalService() && OpenWebpageFromService("cmd /c start https://x.com/ultravnc1"));
 			else
 				OpenWebpageFromApp(ID_VISITUSONLINE_XTWITTER);
 			break;

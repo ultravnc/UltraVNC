@@ -64,6 +64,11 @@ void Open_mastodon()
 	ShellExecute(0, "open", "https://mastodon.social/@ultravnc", 0, 0, 1);
 }
 
+void Open_bluesky()
+{
+	ShellExecute(0, "open", "https://bsky.app/profile/ultravnc.bsky.social", 0, 0, 1);
+}
+
 void Open_facebook()
 {
 	ShellExecute(0, "open", "https://www.facebook.com/ultravnc1", 0, 0, 1);
@@ -71,7 +76,7 @@ void Open_facebook()
 
 void Open_xtwitter()
 {
-	ShellExecute(0, "open", "https://twitter.com/ultravnc1", 0, 0, 1);
+	ShellExecute(0, "open", "https://x.com/ultravnc1", 0, 0, 1);
 }
 
 void Open_reddit()

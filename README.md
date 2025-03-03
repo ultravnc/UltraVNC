@@ -24,12 +24,12 @@ VNC, the Remote Frame Buffer protocol (RFB) allows a desktop to be viewed and co
 ---
 
 ### Supported operating systems
-- 🔗 Windows 95**, 98**, Me**, NT4**: latest version: https://uvnc.eu/download/102/
-- 🔗 Windows 2000: latest version: https://uvnc.eu/download/1215/Ultravnc_w2k_1215.zip
-- 🔗 Windows XP, Windows Server 2003, Vista, Server 2003 R2, Server 2008: latest version: https://uvnc.com/downloads/ultravnc/129-download-ultravnc-1231.html
 - 🔗 Windows 7, 8, 8.1, 10, 11, Server 2008 R2, Server 2012, Server 2012 R2, Server 2016, Server 2019, Server 2022, Server 2025: current version: https://uvnc.com/downloads/ultravnc.html
+- 🔗 Windows XP, Windows Server 2003, Vista, Server 2003 R2, Server 2008: latest version: https://uvnc.com/downloads/ultravnc/129-download-ultravnc-1231.html
+- 🔗 Windows 2000: latest version: https://uvnc.eu/download/1215/Ultravnc_w2k_1215.zip
+- 🔗 Windows 95**, 98**, Me**, NT4**: latest version: https://uvnc.eu/download/102/
 
-Its embedded Java Viewer allows you to connect (and make File transfers) from a simple Web Browser on any system supporting Java (Linux, Mac OS, ...) to an UltraVNC Server.
+Its embedded JavaViewer allows you to connect (and make File transfers) from a simple Web Browser on any system supporting Java (Linux, Mac OS, ...) to an UltraVNC Server.
 PcHelpWare and uvnc2me require XP or later.
 
 <p align="center">
@@ -79,9 +79,17 @@ Our goal is to make the more powerful, user-friendly and no-brainer free Remote 
 
 <a href="https://uvnc.com/">UltraVNC</a> is Free and distributed under the terms of the <a href="https://github.com/ultravnc/UltraVNC/blob/main/LICENSE">GNU General Public License</a>.
 
+The UltraVNC project is born in 2002, the first UltraVNC version has been released 2002-12-05, following the merger of two projects:
+- Vdacc-VNC started by Rudi De Vos in 1999
+- eSVNC started by Sam in 2002
+
+The UltraVNC team is made up of two people:
+- Rudi De Vos
+- Ludovic Bocquet
+
 Contact:
 - 📫 uvnc@skynet.be
-- 💬 For technical questions, use the <a href="https://forum.uvnc.com/">FORUM</a> first.
+- 💬 For technical questions, use the <a href="https://forum.uvnc.com/">FORUM</a> or <a href="https://github.com/ultravnc/UltraVNC/issues">GitHub</a> first.
 
 ---
 
@@ -91,9 +99,10 @@ Contact:
 - 🚩 [GitHub](https://github.com/ultravnc)
 - 🚩 [GitHub Issues](https://github.com/ultravnc/UltraVNC/issues)
 - 🚩 [GitHub Pull requests](https://github.com/ultravnc/UltraVNC/pulls)
-- 🚩 [Mastodon](https://mastodon.social/@ultravnc)
+- 🚩 [Mastodon/Fediverse](https://mastodon.social/@ultravnc)
+- 🚩 [Bluesky/AT Protocol](https://bsky.app/profile/ultravnc.bsky.social)
 - 🚩 [Facebook](https://www.facebook.com/ultravnc1)
-- 🚩 [X/Twitter](https://twitter.com/ultravnc1)
+- 🚩 [X/Twitter](https://x.com/ultravnc1)
 - 🚩 [Reddit](https://www.reddit.com/r/ultravnc)
 - 🚩 [OpenHub](https://openhub.net/p/ultravnc)
 
@@ -108,15 +117,16 @@ Contact:
 ---
 
 <div align="center">
-  Copyright ©️ 2002-2024 <a href="https://uvnc.com/">UltraVNC</a> Team Members. All Rights Reserved.
+  Copyright ©️ 2002-2025 <a href="https://uvnc.com/">UltraVNC</a> Team Members. All Rights Reserved.
 </div>
 
 ---
 
 <p align="center">
-  <a href="https://github.com/ultravnc" target="_blank" rel="noopener"><img src="https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white" alt="UltraVNC GitHub"></a>
-  <a href="https://mastodon.social/@ultravnc" target="_blank" rel="noopener"><img src="https://img.shields.io/badge/-MASTODON-%232B90D9?style=for-the-badge&logo=mastodon&logoColor=white" alt="UltraVNC Mastodon"></a>
-  <a href="https://www.facebook.com/Ultravnc1" target="_blank" rel="noopener"><img src="https://img.shields.io/badge/Facebook-1877F2?style=for-the-badge&logo=facebook&logoColor=white" alt="UltraVNC Facebook"></a>
-  <a href="https://twitter.com/ultravnc1" target="_blank" rel="noopener"><img src="https://img.shields.io/badge/X-000?style=for-the-badge&logo=x" alt="UltraVNC X/Twitter"></a>
+  <a href="https://github.com/ultravnc" target="_blank" rel="noopener"><img src="https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white" alt="UltraVNC GitHub"></a>
+  <a href="https://mastodon.social/@ultravnc" target="_blank" rel="noopener"><img src="https://img.shields.io/badge/mastodon-black?style=for-the-badge&logo=mastodon" alt="UltraVNC Mastodon"></a>
+  <a href="https://bsky.app/profile/ultravnc.bsky.social" target="_blank" rel="noopener"><img src="https://img.shields.io/badge/Bluesky-0285FF?style=for-the-badge&logo=Bluesky&logoColor=white" alt="UltraVNC Bluesky"></a>
+  <a href="https://www.facebook.com/Ultravnc1" target="_blank" rel="noopener"><img src="https://img.shields.io/badge/Facebook-%231877F2.svg?style=for-the-badge&logo=Facebook&logoColor=white" alt="UltraVNC Facebook"></a>
+  <a href="https://x.com/ultravnc1" target="_blank" rel="noopener"><img src="https://img.shields.io/badge/X-%23000000.svg?style=for-the-badge&logo=X&logoColor=white" alt="UltraVNC X/Twitter"></a>
   <a href="https://www.reddit.com/r/ultravnc" target="_blank" rel="noopener"><img src="https://img.shields.io/badge/Reddit-000?style=for-the-badge&logo=reddit&logoColor=FF4500" alt="UltraVNC Reddit"></a>
 </p>
