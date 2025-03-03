@@ -402,19 +402,20 @@
 #define ID_UNABLE_INST                  32842
 #define ID_UNABLE_PROC_MSLOGON          32843
 #define ID_UNINSTALL_SERVICE            32844
-#define ID_VISITUSONLINE_FACEBOOK       32845
-#define ID_VISITUSONLINE_FORUM          32846
-#define ID_VISITUSONLINE_GITHUB         32847
-#define ID_VISITUSONLINE_HOMEPAGE       32848
-#define ID_VISITUSONLINE_MASTODON       32849
-#define ID_VISITUSONLINE_OPENHUB        32850
-#define ID_VISITUSONLINE_REDDIT         32851
-#define ID_VISITUSONLINE_XTWITTER       32852
-#define ID_WARNING                      32853
-#define ID_WINVNC_ERROR                 32854
-#define ID_WINVNC_USAGE                 32855
-#define ID_WINVNC_WARNIN                32856
-#define ID_WVNC                         32857
+#define ID_VISITUSONLINE_BLUESKY        32845
+#define ID_VISITUSONLINE_FACEBOOK       32846
+#define ID_VISITUSONLINE_FORUM          32847
+#define ID_VISITUSONLINE_GITHUB         32848
+#define ID_VISITUSONLINE_HOMEPAGE       32849
+#define ID_VISITUSONLINE_MASTODON       32850
+#define ID_VISITUSONLINE_OPENHUB        32851
+#define ID_VISITUSONLINE_REDDIT         32852
+#define ID_VISITUSONLINE_XTWITTER       32853
+#define ID_WARNING                      32854
+#define ID_WINVNC_ERROR                 32855
+#define ID_WINVNC_USAGE                 32856
+#define ID_WINVNC_WARNIN                32857
+#define ID_WVNC                         32858
 
 // Next default values for new objects
 // 
@@ -422,7 +423,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        209
-#define _APS_NEXT_COMMAND_VALUE         32858
+#define _APS_NEXT_COMMAND_VALUE         32859
 #define _APS_NEXT_CONTROL_VALUE         1285
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

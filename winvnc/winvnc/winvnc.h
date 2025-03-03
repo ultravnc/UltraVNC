@@ -106,6 +106,7 @@ const char winvncopenhomepage[]				= "-openhomepage";
 const char winvncopenforum[]				= "-openforum";
 const char winvncopengithub[]				= "-opengithub";
 const char winvncopenmastodon[]				= "-openmastodon";
+const char winvncopenbluesky[]				= "-openbluesky";
 const char winvncopenfacebook[]				= "-openfacebook";
 const char winvncopenxtwitter[]				= "-openxtwitter";
 const char winvncopenreddit[]				= "-openreddit";

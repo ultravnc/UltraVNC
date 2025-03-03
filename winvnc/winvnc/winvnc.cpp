@@ -518,6 +518,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 				return return2(0);
 			}
 
+			if (strncmp(&szCmdLine[i], winvncopenbluesky, strlen(winvncopenbluesky)) == 0)
+			{
+				Open_bluesky();
+				return return2(0);
+			}
+
 			if (strncmp(&szCmdLine[i], winvncopenfacebook, strlen(winvncopenfacebook)) == 0)
 			{
 				Open_facebook();
