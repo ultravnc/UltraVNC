@@ -2061,9 +2061,6 @@ void PropertiesDialog::onApply(HWND hwnd)
 }
 void PropertiesDialog::onOK(HWND hwnd)
 	{
-#ifndef SC_20
-	settings->save();
-#endif // SC_20	
 	SendMessage(hTabAuthentication, WM_COMMAND, IDOK, 0);
 	SendMessage(hTabIncoming, WM_COMMAND, IDOK, 0);
 	SendMessage(hTabInput, WM_COMMAND, IDOK, 0);
@@ -2074,6 +2071,10 @@ void PropertiesDialog::onOK(HWND hwnd)
 	SendMessage(hTabCapture, WM_COMMAND, IDOK, 0);
 	SendMessage(hTabLog, WM_COMMAND, IDOK, 0);
 	SendMessage(hTabAdministration, WM_COMMAND, IDOK, 0);
+
+#ifndef SC_20
+	settings->save();
+#endif // SC_20	
 
 	DestroyWindow(hTabAuthentication);
 	DestroyWindow(hTabIncoming);
