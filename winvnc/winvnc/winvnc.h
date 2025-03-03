@@ -49,7 +49,7 @@ extern HINSTANCE	hAppInstance;
 extern const char	*szAppName;
 extern DWORD		mainthreadId;
 
-// Main VNC server routine
+// Main UltraVNC Server routine
 
 extern int WinVNCAppMain();
 

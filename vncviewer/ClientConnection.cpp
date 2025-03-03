@@ -1711,7 +1711,7 @@ void ClientConnection::SetDSMPluginStuff()
 		vnclog.Print(0, _T("DSMPlugin enabled\n"));
 		char szParams[256+16];
 		//strcpy_s(szParams,m_pDSMPlugin->GetPluginParams());
-		// Does the plugin need the VNC password to do its job ?
+		// Does the plugin need the VNC password to do its job?
 		if (!_stricmp(m_pDSMPlugin->GetPluginParams(), "VNCPasswordNeeded"))
 		{
 			// Yes. The user must enter the VNC password
@@ -2642,7 +2642,7 @@ void ClientConnection::NegotiateProtocolVersion()
 		m_ms_logon_I_legacy = true;
 		m_fServerKnowsFileTransfer = true;
 	}
-	else if (m_minorVersion == 6) // 6 because 5 already used in TightVNC viewer for some reason
+	else if (m_minorVersion == 6) // 6 because 5 already used in TightVNC Viewer for some reason
 	{
 		m_fServerKnowsFileTransfer = true;
 	}
@@ -3498,7 +3498,7 @@ void ClientConnection::AuthMsLogonI()
 			memset(m_clearPasswd, 0, sizeof(m_clearPasswd));
 	}
 
-	// Was the password already specified in a config file or entered for DSMPlugin ?
+	// Was the password already specified in a config file or entered for DSMPlugin?
 	// Modif sf@2002 - A clear password can be transmitted via the UltraVNC Viewer command line
 	if (strlen(m_clearPasswd)>0)
 	{
@@ -3555,7 +3555,7 @@ void ClientConnection::AuthMsLogonI()
 	if (m_ms_logon_I_legacy) ReadExact((char *)challengems, CHALLENGESIZEMS);
 	ReadExact((char *)challenge, CHALLENGESIZE);
 
-	// MS logon
+	// MS-Logon
 	if (m_ms_logon_I_legacy)
 	{
 		int i=0;
@@ -3592,7 +3592,7 @@ void ClientConnection::AuthVnc()
 	// rdv@2002 - v1.1.x
 	char passwd[256];
 	memset(passwd, 0, sizeof(char)*256);
-	// Was the password already specified in a config file or entered for DSMPlugin ?
+	// Was the password already specified in a config file or entered for DSMPlugin?
 	// Modif sf@2002 - A clear password can be transmitted via the UltraVNC Viewer command line
 	if (strlen(m_clearPasswd)>0)
 	{
@@ -4480,8 +4480,8 @@ void ClientConnection::SuspendThread()
 	// Reinit DSM stuff
 	m_nTO = 1;
 	LoadDSMPlugin(true);
-	// WHat is this doing here ???
-	// m_fUseProxy = false;  << repeater block after reconnect+
+	// What is this doing here???
+	// m_fUseProxy = false; << repeater block after reconnect+
 
 	delete[] m_pNetRectBuf;
 	m_pNetRectBuf = NULL;

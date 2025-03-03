@@ -56,9 +56,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "setpasswd", "..\setpasswd\s
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testauth", "..\addon\ms-logon\testauth\testauth.vcxproj", "{C05BE60B-FBDF-430F-B041-5089262E8FB5}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "UltraVnc_x86", "UltraVnc\UltraVnc.vdproj", "{D20CB3B1-32B1-4FEA-8C10-5CED57035808}"
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "UltraVNC_x86", "UltraVnc\UltraVnc.vdproj", "{D20CB3B1-32B1-4FEA-8C10-5CED57035808}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "UltraVnc_x64", "UltraVnc\UltraVnc_X64.vdproj", "{9AA91151-DD71-4031-82CA-0F94A966AC17}"
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "UltraVNC_x64", "UltraVnc\UltraVnc_X64.vdproj", "{9AA91151-DD71-4031-82CA-0F94A966AC17}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "unz32lib", "..\zipunzip_src\unzip\windll\vc6\lib\unz32lib.vcxproj", "{F9321962-FBED-4581-BF7D-D0EBC303D891}"
 EndProject

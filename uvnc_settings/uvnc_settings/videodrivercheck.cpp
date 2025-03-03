@@ -157,7 +157,7 @@ CheckVideoDriver(bool Box)
 						}
 						else
 						{
-							strcat(buf2,"Driver verion is not 1.00.22 \n");
+							strcat(buf2,"Driver version is not 1.00.22 \n");
 							strcat(buf2,buf);
 							strcat(buf2," \n");
 						}
@@ -180,14 +180,14 @@ CheckVideoDriver(bool Box)
 						}
                         else
                         {
-                            strcat(buf2, "Driver Not Activated, is the viewer current connected ?\n");
-                            strcat(buf2, "A mirrior driver can only be started if UltraVNC Server is a service or running as admin\n");
+                            strcat(buf2, "Driver Not Activated, is the viewer current connected?\n");
+                            strcat(buf2, "A Mirrior Driver can only be started if UltraVNC Server is a service or running as admin\n");
                         }
                         MessageBox(NULL,buf2,buf,0);
 					}
 					return true;
 				}
-				else if(Box) MessageBox(NULL,"Driver not found: Perhaps you need to reboot after install","driver info: required version 1.00.22",0);
+				else if(Box) MessageBox(NULL,"Driver not found: Perhaps you need to reboot after install","Driver info: required version 1.00.22",0);
 			}
 	if (hUser32) FreeLibrary(hUser32);	
 	return false;

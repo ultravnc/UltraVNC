@@ -45,7 +45,7 @@ BEGIN
             VALUE "FileDescription", "VNC hooks DLL for Win32"
             VALUE "FileVersion", "1.1.0.2"
             VALUE "InternalName", "VNCHooks"
-            VALUE "LegalCopyright", "Copyright (C) 2016 UltraVNC, Copyright RealVNC Ltd.© 2002, AT&T Research Labs Cambridge© 1996-2001"
+            VALUE "LegalCopyright", "Copyright © 2002-2025 UltraVNC Team Members. All Rights Reserved. Copyright © 2002 RealVNC Ltd. © 1996-2001 AT&T Research Labs Cambridge"
             VALUE "OriginalFilename", "VNCHooks.dll"
             VALUE "ProductName", "UltraVNC - VNCHooks"
             VALUE "ProductVersion", "1.1.0.2"

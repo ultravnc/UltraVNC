@@ -42,7 +42,7 @@
 #include "rfbRegion.h"
 #include "rfbRect.h"
 #include "vncdesktop.h"
-// Modif rdv@2002 - v1.1.x - videodriver
+// Modif rdv@2002 - v1.1.x - VideoDriver
 #include "vncOSVersion.h"
 #include "DeskdupEngine.h"
 
@@ -489,7 +489,7 @@ vncDesktop::vncDesktop()
 	// m_fTextChatRunning = false;
 	// m_pCurrentTextChat = NULL;
 
-	// Modif rdv@2002 - v1.1.x - videodriver
+	// Modif rdv@2002 - v1.1.x - VideoDriver
 	m_screenCapture = NULL;
 	m_ScreenOffsetx = 0;
 	m_ScreenOffsety = 0;
@@ -716,8 +716,8 @@ vncDesktop::Startup()
 		return ERROR_DESKTOP_INIT_FAILED;
 	}
 
-	// Modif rdv@2002 - v1.1.x - videodriver
-	vnclog.Print(LL_INTINFO, VNCLOG("InitVideo driver Called\n"));
+	// Modif rdv@2002 - v1.1.x - VideoDriver
+	vnclog.Print(LL_INTINFO, VNCLOG("InitVideoDriver Called\n"));
 	if (FALSE != m_server->DriverWantedSet) {
 		m_server->Driver(m_server->DriverWanted);
 		m_server->Hook(m_server->HookWanted);
@@ -726,7 +726,7 @@ vncDesktop::Startup()
 	no_default_desktop = false;
 	if (settings->getDriver()) {
 		vnclog.Print(LL_INTINFO, VNCLOG("Driver option enabled \n"));
-		//Enable only the video driver for the Default desktop
+		//Enable only the Video Driver for the Default desktop
 		HDESK desktop = GetThreadDesktop(GetCurrentThreadId());
 		DWORD dummy;
 		char new_name[256];
@@ -875,7 +875,7 @@ vncDesktop::Shutdown()
 		DeleteObject(m_hdefcursor);
 		m_hdefcursor = NULL;
 	}
-	// Modif rdv@2002 - v1.1.x - videodriver
+	// Modif rdv@2002 - v1.1.x - VideoDriver
 	ShutdownVideoDriver();
 
 	if (m_home_desktop)
@@ -2282,7 +2282,7 @@ void vncDesktop::SetSW(int x, int y)
 *  m_hookdll: use software update mechanism
 ***************************************************************************/
 
-// Modif rdv@2002 - v1.1.x - videodriver
+// Modif rdv@2002 - v1.1.x - VideoDriver
 
 BOOL vncDesktop::VideoBuffer()
 {
@@ -2298,11 +2298,11 @@ BOOL vncDesktop::VideoBuffer()
 
 DWORD WINAPI Warningbox_non_locked(LPVOID lpParam)
 {
-	MessageBoxSecure(NULL, "Current driver too old for this version \nUpdate driver or disable Video hook driver\n in the server properties window", "", 0);
+	MessageBoxSecure(NULL, "Current driver is too old for this version\nUpdate driver or disable Video hook driver\n in the Server Settings", "", 0);
 	return 0;
 }
 
-// Modif rdv@2002 - v1.1.x - videodriver
+// Modif rdv@2002 - v1.1.x - VideoDriver
 BOOL vncDesktop::InitVideoDriver()
 {
 	omni_mutex_lock l(m_screenCapture_lock, 79);
@@ -2389,7 +2389,7 @@ BOOL vncDesktop::InitVideoDriver()
 }
 
 
-// Modif rdv@2002 - v1.1.x - videodriver
+// Modif rdv@2002 - v1.1.x - VideoDriver
 void vncDesktop::ShutdownVideoDriver()
 {
 	if (m_screenCapture == NULL)

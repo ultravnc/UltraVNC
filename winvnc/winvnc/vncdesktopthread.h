@@ -91,7 +91,7 @@ public:
 	virtual void *run_undetached(void *arg);
 	virtual void ReturnVal(DWORD result);
 	void PollWindow(rfb::Region2D &rgn, HWND hwnd);
-	// Modif rdv@2002 - v1.1.x - videodriver
+	// Modif rdv@2002 - v1.1.x - VideoDriver
 	virtual BOOL handle_driver_changes(rfb::Region2D &rgncache,rfb::UpdateTracker &tracker);
 	virtual void copy_bitmaps_to_buffer(ULONG i,rfb::Region2D &rgncache,rfb::UpdateTracker &tracker);
 	bool Handle_Ringbuffer(mystruct *ringbuffer,rfb::Region2D &rgncache);

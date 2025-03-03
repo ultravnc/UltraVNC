@@ -576,7 +576,7 @@ bool SettingsManager::checkAdminPassword()
 				return true;
 			}
 			else {
-				DWORD result = MessageBoxSecure(NULL, "Wrong password, do you want to retry", "Error", MB_OK);
+				DWORD result = MessageBoxSecure(NULL, "Wrong password, do you want to retry?", "Error", MB_OK);
 				if (result == 1)
 					Sleep(2000);
 				else

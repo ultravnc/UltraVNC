@@ -363,7 +363,7 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		// For a temp resolution we don't use the driver, to fix the Mirror Driver
 		// to the new change, a resolution switch is needed, preventing screensaver locking.
 
-		if (_this->m_screenCapture != NULL) //Video driver active
+		if (_this->m_screenCapture != NULL) // Video Driver active
 		{
 			if (!_this->m_screenCapture->getBlocked())
 			{

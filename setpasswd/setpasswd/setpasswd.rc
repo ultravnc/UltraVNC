@@ -45,7 +45,7 @@ BEGIN
             VALUE "FileDescription", "Add password to ultravnc.ini"
             VALUE "FileVersion", "1.0.0.1"
             VALUE "InternalName", "setpassw.exe"
-            VALUE "LegalCopyright", "Copyright © 2002-2024 UltraVNC Team Members. All Rights Reserved."
+            VALUE "LegalCopyright", "Copyright © 2002-2025 UltraVNC Team Members. All Rights Reserved."
             VALUE "OriginalFilename", "setpassw.exe"
             VALUE "ProductName", "setpassw"
             VALUE "ProductVersion", "1.0.0.1"

@@ -68,7 +68,7 @@ vncBuffer::~vncBuffer()
 {
 	if (m_freemainbuff) {
 		// We need to free the slow-blit buffer
-		// Modif rdv@2002 - v1.1.x - Videodriver
+		// Modif rdv@2002 - v1.1.x - VideoDriver
 	if (m_mainbuff != NULL)
 		{
 			delete [] m_mainbuff;
@@ -169,7 +169,7 @@ vncBuffer::CheckBuffer()
 		vnclog.Print(LL_INTINFO, VNCLOG("request local buffer[%d]\n"), m_desktop->ScreenBuffSize());
 		if (m_freemainbuff) {
 			// Slow blits were enabled - free the slow blit buffer
-			// Modif rdv@2002 - v1.1.x - Videodriver
+			// Modif rdv@2002 - v1.1.x - VideoDriver
 			if (m_mainbuff != NULL)
 			{
 				delete [] m_mainbuff;
@@ -185,7 +185,7 @@ vncBuffer::CheckBuffer()
 		}
 
 		// Check whether or not the vncDesktop is using fast blits
-		// Modif rdv@2002 - v1.1.x - Videodriver
+		// Modif rdv@2002 - v1.1.x - VideoDriver
 
 		m_mainbuff = (BYTE *)m_desktop->OptimisedBlitBuffer();
 		if (m_mainbuff) {
@@ -537,7 +537,7 @@ void vncBuffer::CheckRect(rfb::Region2D &dest, rfb::Region2D &cacheRgn, const rf
 	}
 }
 
-//rdv modif scaled and videodriver
+// rdv modif scaled and VideoDriver
 void
 vncBuffer::GrabRegion(rfb::Region2D &src,BOOL driver,BOOL capture)
 {
@@ -1003,7 +1003,7 @@ vncBuffer::ClearBack()
 {
 	if (m_freemainbuff) {
 		// Slow blits were enabled - free the slow blit buffer
-		// Modif rdv@2002 - v1.1.x - Videodriver
+		// Modif rdv@2002 - v1.1.x - VideoDriver
 		if (m_mainbuff != NULL)
 		{
 			delete [] m_mainbuff;
@@ -1089,7 +1089,7 @@ vncBuffer::GetMousePos(rfb::Rect &rect)
 // Verify that the fast blit buffer hasn't changed
 inline BOOL
 vncBuffer::FastCheckMainbuffer() {
-	// Modif rdv@2002 - v1.1.x - videodriver
+	// Modif rdv@2002 - v1.1.x - VideoDriver
 	VOID *tmp = m_desktop->OptimisedBlitBuffer();
 	if (tmp && (m_mainbuff != tmp))
 		{

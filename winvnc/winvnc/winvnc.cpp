@@ -1215,7 +1215,7 @@ DWORD WINAPI imp_desktop_thread(LPVOID lpParam)
 				UINT error = GetLastError();
 				if (error != ERROR_NOT_LOGGED_ON)
 				{
-					vnclog.Print(LL_INTERR, VNCLOG("getusername error %d\n"), GetLastError());
+					vnclog.Print(LL_INTERR, VNCLOG("GetUsername error %d\n"), GetLastError());
 					SetThreadDesktop(old_desktop);
                 	CloseDesktop(desktop);
 					Sleep(500);

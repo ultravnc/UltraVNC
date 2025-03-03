@@ -55,7 +55,7 @@ void set_service_description()
 	DWORD	dw;
 	HKEY hKey;
 	char tempName[256];
-    char desc[] = "Provides secure remote desktop sharing";
+    char desc[] = "UltraVNC Server provides secure remote desktop sharing";
 	_snprintf(tempName,  sizeof tempName, "SYSTEM\\CurrentControlSet\\Services\\%s", service_name);
 	RegCreateKeyEx(HKEY_LOCAL_MACHINE,
 						tempName,
@@ -135,7 +135,7 @@ int install_service(void) {
             app_name, MB_ICONERROR);
         return 1;
     }
-    //"Provides secure remote desktop sharing"
+    //"UltraVNC Server provides secure remote desktop sharing"
     service=CreateService(scm,service_name, service_name, SERVICE_ALL_ACCESS,
                           SERVICE_WIN32_OWN_PROCESS,
                           SERVICE_AUTO_START, SERVICE_ERROR_NORMAL, service_path,

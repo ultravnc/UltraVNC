@@ -79,7 +79,7 @@ bool PropertiesDialog::InitDialog(HWND hwnd)
 	const long lTitleBufSize = 256;
 	char szTitle[lTitleBufSize];
 
-	_snprintf_s(szTitle, lTitleBufSize - 1, "UltraVNC Server - settings - Config file: %s", configFile);
+	_snprintf_s(szTitle, lTitleBufSize - 1, "UltraVNC Server - Settings - Config file: %s", configFile);
 	SetWindowText(hwnd, szTitle);
 
 	showAdminPanel = false;
@@ -912,14 +912,14 @@ void PropertiesDialog::ShowImpersonateDialog()
 			if ((strlen(plain) != 0) || !settings->getAuthRequired())
 				return;
 		}
-		vnclog.Print(LL_INTERR, VNCLOG("warning - empty password\n"));
+		vnclog.Print(LL_INTERR, VNCLOG("Warning - Empty password\n"));
 		// If we reached here then OK was used & there is no password!
 		MessageBoxSecure(NULL, sz_ID_NO_PASSWORD_WARN, sz_ID_WINVNC_WARNIN, MB_OK | MB_ICONEXCLAMATION);
 
 		// The password is empty, so if OK was used then redisplay the box,
 		// otherwise, if CANCEL was used, close down UltraVNC Server
 		if (result == IDCANCEL) {
-			vnclog.Print(LL_INTERR, VNCLOG("no password - QUITTING\n"));
+			vnclog.Print(LL_INTERR, VNCLOG("No password - QUITTING\n"));
 			PostQuitMessage(0);
 			if (iImpersonateResult == ERROR_SUCCESS)
 				RevertToSelf();
@@ -1350,8 +1350,8 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 		isRunningPw = true;
 		DlgChangePassword* dlgChangePassword = new DlgChangePassword();
 		if (dlgChangePassword->ShowDlg(NULL, (strlen(settings->getPasswd()) == 0) 
-			? "Set password"
-			: "Change password", 8)) {
+			? "UltraVNC Server - Set Password"
+			: "UltraVNC Server - Change Password", 8)) {
 			char password[1024];
 			strcpy_s(password, dlgChangePassword->getPassword());
 			if (strlen(password) == 0) {
@@ -1376,8 +1376,8 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 		isRunningPwVo = true;
 		DlgChangePassword* dlgChangePassword = new DlgChangePassword();
 		if (dlgChangePassword->ShowDlg(NULL, (strlen(settings->getPasswd()) == 0) 
-					? "Set View-only password"
-					: "Change View-only password", 8)) {
+					? "UltraVNC Server - Set View-only Password"
+					: "UltraVNC Server - Change View-only Password", 8)) {
 			char password[1024];
 			strcpy_s(password, dlgChangePassword->getPassword());
 			if (strlen(password) == 0) {
@@ -1401,8 +1401,8 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 		isRunningPwaAdm = true;
 		DlgChangePassword* dlgChangePassword = new DlgChangePassword();
 		if (dlgChangePassword->ShowDlg(NULL, settings->isAdminPasswordSet() 
-					? "Change Admin password" 
-					: "Set Admin password", 128)) {
+					? "UltraVNC Server - Change Admin Password" 
+					: "UltraVNC Server - Set Admin Password", 128)) {
 			char password[1024];
 			strcpy_s(password, dlgChangePassword->getPassword());
 			settings->setAdminPasswordHash(password);
@@ -1657,8 +1657,8 @@ void PropertiesDialog::onTabsAPPLY(HWND hwnd)
 		settings->setSecure(SendMessage(hSecure, BM_GETCHECK, 0, 0) == BST_CHECKED);
 		bool bSecure = settings->getSecure();
 		if (Secure_old != bSecure) {
-			//We changed the method to save the password
-			//load passwords and encrypt the other method
+			// We changed the method to save the password
+			// load passwords and encrypt the other method
 			vncPasswd::ToText plain(settings->getPasswd(), Secure_old);
 			vncPasswd::ToText plainViewOnly(settings->getPasswdViewOnly(), Secure_old);
 			char passwd[MAXPWLEN + 1];

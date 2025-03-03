@@ -226,7 +226,7 @@ Release version, patched for HTML bug below.
 	will continue to operate based on ALL the WinVNC HKEY_LOCAL_MACHINE settings.
 
 	A new command-line option, -defaultsettings, has been added, which will cause the
-	running WinVNC server to show a Default Properties dialog, through which the default
+	running WinVNC Server to show a Default Properties dialog, through which the default
 	local properties can be editted.  (While the dialog is displayed, the properties used
 	will be the default ones.  When it dissappears, WinVNC reverts to the user's settings.)
 
@@ -408,7 +408,7 @@ Changes from revision 2:
 	If a client chose to send multiple update requests to the server without waiting for
 	the update data, then the server would only consider the last request.  This behaviour
 	was incorrect and has now been fixed.  As a result, WinVNC will now work properly with
-	the PalmVNC viewer.
+	the PalmVNC Viewer.
 
 	HTTP SERVER FIXED!
 	The HTTP server section of WinVNC could end up listening on the wrong port number when
@@ -481,7 +481,7 @@ Changes from base 3.3.2 release:
 	HKEY_LOCAL_MACHINE/Software/ORL/WinVNC3/AllowLoopback registry entry is set
 	to 1.  The default is 0.
 
-	Connections may now be made to WinVNC servers without requiring authentication
+	Connections may now be made to WinVNC Servers without requiring authentication
 	if the HKEY_LOCAL_MACHINE/Software/ORL/WinVNC3/AuthRequired registry entry is
 	set to 0.  The default is 1.
 
@@ -578,7 +578,7 @@ Changes from revision 16:
 		WinVNC_new -kill -run
 	which will stop the running copy & run the new version normally.
 
-	The Java viewer class files have been updated.  The new classes are slightly more
+	The JavaViewer class files have been updated.  The new classes are slightly more
 	compatible with borderline Java VMs.
 
 	Deferred update messages are no longer removed from the application's message queue
@@ -681,7 +681,7 @@ Changes from revision 9:
 Version 3.3.1 (VNC Version 3.3, revision 9)
 Changes from revision 8:
 
-	Local connections to WinVNC servers are now filtered out.
+	Local connections to WinVNC Servers are now filtered out.
 
 	The OMNIthread package is now included as part of the WinVNC source distribution.
 
@@ -729,7 +729,7 @@ Changes from version 3.05:
 
 	The new, DES-based authentication scheme is used. This results in incompatibility with VNC
 	clients using version 3.2 or lower of the protocol. To avoid this problem, connect via the
-	HTTP interface, which provides the correct version of the Java viewer. Version 3.3+ based
+	HTTP interface, which provides the correct version of the JavaViewer. Version 3.3+ based
 	clients will handle the new scheme correctly.
 
 	Shared VNC client connections are now fully supported.

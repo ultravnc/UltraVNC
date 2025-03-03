@@ -983,26 +983,26 @@ DWORD keyLen = 0;
 //            GetDlgItemText(hwnd, IDC_SERVER_USER, pPlugin->szHKCUServer, KEYFILENAME_SIZE );
 //            GetDlgItemText(hwnd, IDC_KEYLOCATION, pPlugin->szHKCUGenKey, KEYFILENAME_SIZE );
 //            GetDlgItemText(hwnd, IDC_SERVER_SERVICE, pPlugin->szHKLMServer, KEYFILENAME_SIZE );
-			
+
 #ifdef _WITH_REGISTRY
 			//HKLM/Server
 //            m_pREGISTRY = new REGISTRY(HKEY_LOCAL_MACHINE, MSRC4_KEY_NAME_SERVER, true);
 //            m_pREGISTRY->WriteItem(pPlugin->szHKLMServer ,INDEXVAL_KEYFILE);
 //            m_pREGISTRY->WriteItem(pPlugin->szHKCUGenKey ,INDEXVAL_KEYGEN);
 //            delete m_pREGISTRY;
-            
+
 			//HKCU/Server
 //            m_pREGISTRY = new REGISTRY(HKEY_CURRENT_USER, MSRC4_KEY_NAME_SERVER, true);
 //            m_pREGISTRY->WriteItem(pPlugin->szHKCUServer,INDEXVAL_KEYFILE);
 //            m_pREGISTRY->WriteItem(pPlugin->szHKCUGenKey ,INDEXVAL_KEYGEN);
 //            delete m_pREGISTRY;
-			
+
 			//HKCU/Viewer
 //            m_pREGISTRY = new REGISTRY(HKEY_CURRENT_USER, MSRC4_KEY_NAME_VIEWER, true);
 //            m_pREGISTRY->WriteItem(pPlugin->szHKCUViewer,INDEXVAL_KEYFILE);
 //            m_pREGISTRY->WriteItem(pPlugin->szHKCUGenKey ,INDEXVAL_KEYGEN);
 //            delete m_pREGISTRY;
-			
+
 #endif
 			
             EndDialog(hwnd, TRUE);
@@ -1018,12 +1018,12 @@ DWORD keyLen = 0;
 				else 
 					keyLen = KEYLEN_40BIT;
 			}
-			//Button Generate Key
-			//Generates a file in C:\Program Files\uvnc bvba\UltraVNC\new_rc4.key
-			//you will need to copy it to the client AND the server as 
-			//C:\Program Files\uvnc bvba\UltraVNC\rc4.key
-			
-			//save the path in case they changed it!
+			// Button Generate Key
+			// Generates a file in \UltraVNC\new_rc4.key
+			// You will need to copy it to the client AND the server as 
+			// UltraVNC\rc4.key
+
+			// Save the path in case they changed it!
 #ifdef _WITH_REGISTRY
             m_pREGISTRY = new REGISTRY(HKEY_CURRENT_USER, MSRC4_KEY_FILE, false);
             m_pREGISTRY->WriteItem(pPlugin->szHKCUGenKey, INDEXVAL_KEYGEN);
