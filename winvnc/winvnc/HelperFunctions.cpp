@@ -786,7 +786,7 @@ namespace processHelper {
 				}
 				else {
 					// Genuine error...
-					vnclog.Print(LL_INTERR, VNCLOG("getusername error %d\n"), GetLastError());
+					vnclog.Print(LL_INTERR, VNCLOG("GetUsername error %d\n"), GetLastError());
 					return FALSE;
 				}
 			}

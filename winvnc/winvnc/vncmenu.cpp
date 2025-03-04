@@ -933,7 +933,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		break;
 
 		case ID_KILLCLIENTS: {
-			if (!MessageBoxSecure(NULL, "Do you want to kill all connected viewers", "", MB_YESNO))
+			if (!MessageBoxSecure(NULL, "Do you want to kill all connected Viewers?", "", MB_YESNO))
 				return 0;
 			// Disconnect all currently connected clients
 			vnclog.Print(LL_INTINFO, VNCLOG("KillAuthClients() ID_KILLCLIENTS \n"));
@@ -1008,12 +1008,12 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
 		case ID_CLOSE: {
 			if (settings->RunningFromExternalService()) {
-				if (!MessageBoxSecure(NULL, "Do you want to restart the UltraVNC Server", "", MB_YESNO))
+				if (!MessageBoxSecure(NULL, "Do you want to restart the UltraVNC Server?", "", MB_YESNO))
 					return 0;
 			}
 #ifndef SC_20
 			else {
-				if (!MessageBoxSecure(NULL, "Do you want to close  the UltraVNC Server", "", MB_YESNO))
+				if (!MessageBoxSecure(NULL, "Do you want to close the UltraVNC Server?", "", MB_YESNO))
 					return 0;
 			}
 #endif
@@ -1028,7 +1028,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 #ifndef SC_20
 		case ID_REBOOTSAFEMODE:
 		{
-			if (!MessageBoxSecure(NULL, "Do you want to reboot the System", "System", MB_YESNO))
+			if (!MessageBoxSecure(NULL, "Do you want to reboot the System?", "System", MB_YESNO))
 				return 0;
 			HANDLE hPToken = DesktopUsersToken::getInstance()->getDesktopUsersToken();
 			if (!hPToken) {
@@ -1063,7 +1063,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
 		case ID_REBOOT_FORCE:
 		{
-			if (!MessageBoxSecure(NULL, "Do you want to force reboot the System", "System", MB_YESNO))
+			if (!MessageBoxSecure(NULL, "Do you want to force reboot the System?", "System", MB_YESNO))
 				return 0;
 			HANDLE hPToken = DesktopUsersToken::getInstance()->getDesktopUsersToken();
 			if (!hPToken) {
@@ -1099,7 +1099,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
 		case ID_UNINSTALL_SERVICE:
 		{
-			if (!MessageBoxSecure(NULL, "Do you want to uninstall the UltraVNC service.", "Service", MB_YESNO))
+			if (!MessageBoxSecure(NULL, "Do you want to uninstall the UltraVNC service?", "Service", MB_YESNO))
 				return 0;
 			HWND hwnd = postHelper::FindWinVNCWindow(true);
 			if (hwnd) SendMessage(hwnd, WM_COMMAND, ID_CLOSE, 0);
@@ -1135,7 +1135,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
 		case ID_RUNASSERVICE:
 		{
-			if (!MessageBoxSecure(NULL, "Do you want to install UltraVNC as service", "Service", MB_YESNO))
+			if (!MessageBoxSecure(NULL, "Do you want to install UltraVNC as service?", "Service", MB_YESNO))
 				return 0;
 			DWORD errorcode = 0;
 			HANDLE hPToken = DesktopUsersToken::getInstance()->getDesktopUsersToken();
@@ -1186,7 +1186,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			DWORD id = processHelper::GetExplorerLogonPid();
 			if (id != 0)
 			{
-				if (!MessageBoxSecure(NULL, "Do you want to stop the UltravNC service.", "Service", MB_YESNO))
+				if (!MessageBoxSecure(NULL, "Do you want to stop the UltravNC service?", "Service", MB_YESNO))
 					return 0;
 				DWORD errorcode = 0;
 				STARTUPINFO          StartUPInfo;
@@ -1232,7 +1232,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		break;
 		case ID_START_SERVICE:
 		{
-			if (!MessageBoxSecure(NULL, "Do you want to start the UltraVNC service.", "Service", MB_YESNO))
+			if (!MessageBoxSecure(NULL, "Do you want to start the UltraVNC service?", "Service", MB_YESNO))
 				return 0;
 			HANDLE hProcess{}, hPToken{};
 			const DWORD id = processHelper::GetExplorerLogonPid();

@@ -318,7 +318,7 @@ typedef char rfbProtocolVersionMsg[13];	/* allow extra byte for null */
 
 //adzm 2010-05-10 - for backwards compatibility with pre-3.8
 #define rfbLegacy_SecureVNCPlugin 17
-#define rfbLegacy_MsLogon 0xfffffffa // UltraVNC's MS-Logon with (hopefully) better security
+#define rfbLegacy_MsLogon 0xfffffffa // UltraVNC MS-Logon with (hopefully) better security
 
 // please see ABOVE these definitions for more discussion on authentication
 

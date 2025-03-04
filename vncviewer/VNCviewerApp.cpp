@@ -134,6 +134,6 @@ VNCviewerApp::~VNCviewerApp() {
 	// Clean up winsock
 	WSACleanup();
 	
-	vnclog.Print(2, _T("VNC viewer closing down\n"));
+	vnclog.Print(2, _T("VNC Viewer closing down\n"));
 
 }

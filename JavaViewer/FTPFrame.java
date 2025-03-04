@@ -456,7 +456,7 @@ public class FTPFrame extends JFrame implements ActionListener, MouseListener {
 			// sf@2004 - Delete prompt
 			if (remoteList.contains(sFileName))
 			{
-				int r = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete the file \n< " + sFileName + " >\n on Remote Machine ?", "File Transfer Warning", JOptionPane.YES_NO_OPTION);
+				int r = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete the file \n< " + sFileName + " >\n on Remote Machine?", "File Transfer Warning", JOptionPane.YES_NO_OPTION);
 				if (r == JOptionPane.NO_OPTION)
 					return;
 			}
@@ -477,7 +477,7 @@ public class FTPFrame extends JFrame implements ActionListener, MouseListener {
 			// sf@2004 - Delete prompt
 			if (localList.contains(sFileName))
 			{
-				int r = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete the file \n< " + sFileName + " >\n on Local Machine ?", "File Transfer Warning", JOptionPane.YES_NO_OPTION);
+				int r = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete the file \n< " + sFileName + " >\n on Local Machine?", "File Transfer Warning", JOptionPane.YES_NO_OPTION);
 				if (r == JOptionPane.NO_OPTION)
 					return;
 			}			
@@ -506,7 +506,7 @@ public class FTPFrame extends JFrame implements ActionListener, MouseListener {
 		// sf@2004 - Overwrite prompt
 		if (localList.contains(sFileName))
 		{
-			int r = JOptionPane.showConfirmDialog(null, "The file < " + sFileName + " >\n already exists on Local Machine\n Are you sure you want to overwrite it ?", "File Transfer Warning", JOptionPane.YES_NO_OPTION);
+			int r = JOptionPane.showConfirmDialog(null, "The file < " + sFileName + " >\n already exists on Local Machine\n Are you sure you want to overwrite it?", "File Transfer Warning", JOptionPane.YES_NO_OPTION);
 			if (r == JOptionPane.NO_OPTION)
 				return;
 		}
@@ -535,7 +535,7 @@ public class FTPFrame extends JFrame implements ActionListener, MouseListener {
 		// sf@2004 - Overwrite prompt
 		if (remoteList.contains(sFileName))
 		{
-			int r = JOptionPane.showConfirmDialog(null, "The file < " + sFileName + " >\n already exists on Remote Machine\n Are you sure you want to overwrite it ?", "File Transfer Warning", JOptionPane.YES_NO_OPTION);
+			int r = JOptionPane.showConfirmDialog(null, "The file < " + sFileName + " >\n already exists on Remote Machine\n Are you sure you want to overwrite it?", "File Transfer Warning", JOptionPane.YES_NO_OPTION);
 			if (r == JOptionPane.NO_OPTION)
 				return;
 		}

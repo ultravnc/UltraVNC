@@ -762,7 +762,7 @@ bool FileTransfer::RequestNextFile()
 		ListView_GetItem(hWndRemoteList, &Item);
 
 		GetDlgItemText(hWnd, IDC_CURR_REMOTE, szDstFile, sizeof(szDstFile));
-		if (!strlen(szDstFile)) return false; // no destination dir selected - msgbox ?
+		if (!strlen(szDstFile)) return false; // no destination dir selected - msgbox?
 		strcat_s(szDstFile, szSelectedFile);
 
 		RequestRemoteFile(szDstFile);
@@ -839,7 +839,7 @@ bool FileTransfer::OfferNextFile()
 		ListView_GetItem(hWndLocalList, &Item);
 
 		GetDlgItemText(hWnd, IDC_CURR_LOCAL, szSrcFile, sizeof(szSrcFile));
-		if (!strlen(szSrcFile)) return false; // no destination dir selected - msgbox ?
+		if (!strlen(szSrcFile)) return false; // no destination dir selected - msgbox?
 		strcat_s(szSrcFile, szSelectedFile);
 
 		if (!OfferLocalFile(szSrcFile))
@@ -2581,7 +2581,7 @@ bool FileTransfer::OfferLocalFile(LPSTR szSrcFileName)
 	memset(szDstFileName, 0, MAX_PATH + 32);
 
 	GetDlgItemText(hWnd, IDC_CURR_REMOTE, szDstFileName, sizeof(szDstFileName));
-	if (!strlen(szDstFileName)) return false; // no destination dir selected - msgbox ?
+	if (!strlen(szDstFileName)) return false; // no destination dir selected - msgbox?
 	strcat_s(szDstFileName, strrchr(m_szSrcFileName, '\\') + 1);
 
 	char szSrcFileTime[18];

@@ -185,8 +185,8 @@ CheckVideoDriver(bool Box)
 						}
                         else
                         {
-                            strcat_s(buf2, "Driver Not Activated, is the viewer current connected ?\n");
-                            strcat_s(buf2, "A mirrior driver can only be started if UltraVNC Server is a service or running as admin\n");
+                            strcat_s(buf2, "Driver Not Activated, is the viewer current connected?\n");
+                            strcat_s(buf2, "A Mirrior Driver can only be started if UltraVNC Server is a service or running as admin\n");
                         }
 						MessageBoxSecure(NULL,buf2,buf,0);
 					}
@@ -195,7 +195,7 @@ CheckVideoDriver(bool Box)
 				//m_hrootdc = CreateDC("DISPLAY",deviceName,NULL,NULL);	
 				//if (m_hrootdc) DeleteDC(m_hrootdc);
 				}
-				else if(Box) MessageBoxSecure(NULL,"Driver not found: Perhaps you need to reboot after install","driver info: required version 1.00.22",0);
+				else if(Box) MessageBoxSecure(NULL,"Driver not found: Perhaps you need to reboot after install","Driver Info: Required version 1.00.22",0);
 			}
 	if (hUser32) FreeLibrary(hUser32);	
 	return false;

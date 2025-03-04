@@ -158,7 +158,7 @@ BEGIN
             VALUE "FileDescription", "used to send special keys"
             VALUE "FileVersion", "1.0.0.1"
             VALUE "InternalName", "uvnckeyboardhelper.exe"
-            VALUE "LegalCopyright", "Copyright (C) 2024 Team UltraVNC"
+            VALUE "LegalCopyright", "Copyright © 2002-2025 UltraVNC Team Members. All Rights Reserved."
             VALUE "OriginalFilename", "uvnckeyboardhelper.exe"
             VALUE "ProductName", "uvnckeyboardhelper"
             VALUE "ProductVersion", "1.0.0.1"

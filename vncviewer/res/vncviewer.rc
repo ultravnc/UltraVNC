@@ -1377,12 +1377,12 @@ BEGIN
     IDS_H35                 "File Transfer with"
     IDS_H36                 "Connected"
     IDS_H37                 "Connecting. Please Wait..."
-    IDS_H38                 "already exists on REMOTE machine.\n\n Do you want to overwrite it or resume the transfer ?\n"
+    IDS_H38                 "already exists on REMOTE machine.\n\n Do you want to overwrite it or resume the transfer?\n"
     IDS_H39                 "File Transfer Warning"
     IDS_H40                 "File(s)/Folder(s) selected for transfer"
     IDS_H41                 "Starting Transfer. Sending"
     IDS_H42                 "File(s)/Folder(s) to Remote Machine"
-    IDS_H43                 "already exists on LOCAL machine.\n\n Do you want to overwrite it or resume the transfer ?\n"
+    IDS_H43                 "already exists on LOCAL machine.\n\n Do you want to overwrite it or resume the transfer?\n"
     IDS_H44                 "Starting Transfer. Receiving"
     IDS_H45                 "File(s)/Folder(s) from Remote Machine "
     IDS_H46                 "Please select a file to delete. \nOnly one file can be deleted at a time."
@@ -1427,7 +1427,7 @@ BEGIN
     IDS_H69                 "Transfer Aborted."
     IDS_H70                 "successfully SENT."
     IDS_H71                 "The REMOTE Folder"
-    IDS_H72                 "already exists.\n\n Are you sure you want to OVERWRITE it as well as ALL its Files and SubFolders ?"
+    IDS_H72                 "already exists.\n\n Are you sure you want to OVERWRITE it as well as ALL its Files and SubFolders?"
     IDS_H73                 "The LOCAL Folder"
 END
 

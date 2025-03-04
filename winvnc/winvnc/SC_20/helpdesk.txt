@@ -1,5 +1,5 @@
 [TITLE]
-           UltraVnc SC
+           UltraVNC SC
 
 [HOST]
 Internet support

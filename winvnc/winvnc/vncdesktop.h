@@ -225,7 +225,7 @@ public:
 	rfb::Rect		GetSize();
 	void		SetBitmapRectOffsetAndClipRect(int offesetx, int offsety, int width = 0 , int height = 0);
 
-	// Modif rdv@2002 - v1.1.x - videodriver
+	// Modif rdv@2002 - v1.1.x - VideoDriver
 	//BOOL IsVideoDriverEnabled();
 	BOOL VideoBuffer();
 	int m_ScreenOffsetx;
@@ -383,7 +383,7 @@ protected:
 
 	//DDIHOOK
 
-	// Modif rdv@2002 - v1.1.x - videodriver	
+	// Modif rdv@2002 - v1.1.x - VideoDriver	
 	BOOL InitVideoDriver();
  	void ShutdownVideoDriver();
 	omni_mutex		m_screenCapture_lock;

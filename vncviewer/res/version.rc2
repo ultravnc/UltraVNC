@@ -31,7 +31,7 @@ BEGIN
         BLOCK "000004b0"
         BEGIN
             VALUE "Comments", "UltraVNC Viewer"
-            VALUE "CompanyName", "uvnc bvba"
+            VALUE "CompanyName", "uvnc bv"
             VALUE "FileDescription", "UltraVNC Viewer"
             VALUE "FileVersion", APS_FULLVERSION_STR
             VALUE "InternalName", "UltraVNC Viewer"

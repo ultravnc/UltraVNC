@@ -141,13 +141,13 @@ void DeskDupEngine::videoDriver_start(int x, int y, int w, int h, bool onlyVirtu
 
 	if (StartW8V2) {
 		if (!StartW8V2(primonly, onlyVirtual, 1000/maxFPS)) {
-			vnclog.Print(LL_INTWARN, VNCLOG("DDengine V2 failed, not supported by video driver\n")); 
+			vnclog.Print(LL_INTWARN, VNCLOG("DDengine V2 failed, not supported by Video Driver\n")); 
 			return;
 		}
 	}
 	else if(StartW8) {
 		if (!StartW8(primonly)) {
-			vnclog.Print(LL_INTWARN, VNCLOG("DDengine failed, not supported by video driver\n"));
+			vnclog.Print(LL_INTWARN, VNCLOG("DDengine failed, not supported by Video Driver\n"));
 			return;
 		}
 	}
