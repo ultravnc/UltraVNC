@@ -18,10 +18,10 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (United States) resources
+// Neutral resources
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEU)
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -132,6 +132,7 @@ END
 #endif    // APSTUDIO_INVOKED
 
 
+#ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
 //
 // Version
@@ -154,14 +155,20 @@ BEGIN
     BEGIN
         BLOCK "040004b0"
         BEGIN
+            VALUE "Comments", "UltraVNC uvnckeyboardhelper"
             VALUE "CompanyName", "uvnc bv"
             VALUE "FileDescription", "used to send special keys"
             VALUE "FileVersion", "1.0.0.1"
-            VALUE "InternalName", "uvnckeyboardhelper.exe"
+            VALUE "InternalName", "uvnckeyboardhelper"
             VALUE "LegalCopyright", "Copyright © 2002-2025 UltraVNC Team Members. All Rights Reserved."
+            VALUE "LegalTrademarks", ""
             VALUE "OriginalFilename", "uvnckeyboardhelper.exe"
-            VALUE "ProductName", "uvnckeyboardhelper"
+            VALUE "PrivateBuild", ""
+            VALUE "ProductName", "UltraVNC uvnckeyboardhelper"
             VALUE "ProductVersion", "1.0.0.1"
+#if isRC == 1
+            VALUE "SpecialBuild", ""
+#endif
         END
     END
     BLOCK "VarFileInfo"
@@ -169,6 +176,8 @@ BEGIN
         VALUE "Translation", 0x400, 1200
     END
 END
+
+#endif    // !_MAC
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -182,7 +191,7 @@ BEGIN
     IDC_UVNCKEYBOARDHELPER  "UVNCKEYBOARDHELPER"
 END
 
-#endif    // English (United States) resources
+#endif    // Neutral resources
 /////////////////////////////////////////////////////////////////////////////
 
 

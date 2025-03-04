@@ -17,9 +17,9 @@
 /////////////////////////////////////////////////////////////////////////////
 // Dutch (Netherlands) resources
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NLD)
-LANGUAGE LANG_DUTCH, SUBLANG_DUTCH
-#pragma code_page(1252)
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEU)
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+#pragma code_page(65001)
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -430,11 +430,11 @@ END
 
 
 /////////////////////////////////////////////////////////////////////////////
-// Dutch (Belgium) resources
+// Neutral resources
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NLB)
-LANGUAGE LANG_DUTCH, SUBLANG_DUTCH_BELGIAN
-#pragma code_page(1252)
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEU)
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+#pragma code_page(65001)
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -446,6 +446,7 @@ LANGUAGE LANG_DUTCH, SUBLANG_DUTCH_BELGIAN
 IDI_ICON1               ICON                    "settings.ico"
 
 
+#ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
 //
 // Version
@@ -468,15 +469,20 @@ BEGIN
     BEGIN
         BLOCK "081304b0"
         BEGIN
-            VALUE "Comments", "Standalone UltraVNC.ini editor"
+            VALUE "Comments", "UltraVNC Standalone UltraVNC.ini editor"
             VALUE "CompanyName", "uvnc bv"
-            VALUE "FileDescription", "Standalone UltraVNC.ini editor"
+            VALUE "FileDescription", "UltraVNC Standalone UltraVNC.ini editor"
             VALUE "FileVersion", "1.2.0.5"
-            VALUE "InternalName", "uvnc_settings.exe"
-            VALUE "LegalCopyright", "Copyright © 2002-2025 UltraVNC Team Members. All Rights Reserved."
+            VALUE "InternalName", "uvnc_settings"
+            VALUE "LegalCopyright", "Copyright Â© 2002-2025 UltraVNC Team Members. All Rights Reserved."
+            VALUE "LegalTrademarks", ""
             VALUE "OriginalFilename", "uvnc_settings.exe"
-            VALUE "ProductName", "uvnc_set Application"
+            VALUE "PrivateBuild", ""
+            VALUE "ProductName", "UltraVNC uvnc_settings"
             VALUE "ProductVersion", "1.2.0.5"
+#if isRC == 1
+            VALUE "SpecialBuild", ""
+#endif
         END
     END
     BLOCK "VarFileInfo"
@@ -485,7 +491,9 @@ BEGIN
     END
 END
 
-#endif    // Dutch (Belgium) resources
+#endif    // !_MAC
+
+#endif    // Neutral resources
 /////////////////////////////////////////////////////////////////////////////
 
 

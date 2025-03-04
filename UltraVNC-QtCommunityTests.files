@@ -27,7 +27,7 @@ DSMPlugin/MSRC4Plugin/resource.h
 DSMPlugin/MSRC4Plugin/utils.cpp
 DSMPlugin/MSRC4Plugin/utils.h
 DSMPlugin/MSRC4Plugin/version.h
-DSMPlugin/MSRC4Plugin/version.rc
+DSMPlugin/MSRC4Plugin/version.rc2
 DSMPlugin/TestPlugin/ReadMe.txt
 DSMPlugin/TestPlugin/StdAfx.cpp
 DSMPlugin/TestPlugin/StdAfx.h
@@ -357,7 +357,6 @@ repeater/repeater.h
 repeater/repeater.sln
 repeater/repeater.vcxproj
 repeater/resource.h
-repeater/resources.h
 repeater/resources.rc
 repeater/socket_functions.cpp
 repeater/webgui/README.txt

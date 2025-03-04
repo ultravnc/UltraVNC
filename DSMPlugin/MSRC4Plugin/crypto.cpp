@@ -251,7 +251,7 @@ BOOL GenKey(char * sDefaultGenKey, DWORD keyLen)
 	CryptDestroyKey(hGKey);
 	CryptDestroyKey(hGExchangeKey);
 	
-	// We’re finished using the CSP handle, so we must release it. We close the input and output files, and we’re finished.
+	// We're finished using the CSP handle, so we must release it. We close the input and output files, and we're finished.
 	CryptReleaseContext(hGProvider, 0);
 	
     CloseHandle(hGKeyFile);

@@ -1,8 +1,4 @@
-﻿//
-// Version
-//
-
-#include "../../common/versionServerViewer.inc"
+﻿#include "../../common/versionServerViewer.inc"
 
 #define STR(value) #value
 #define STRINGIZE(value) STR(value)
@@ -11,6 +7,13 @@
   STRINGIZE(APS_MINORNUMBER) "." \
   STRINGIZE(APS_BUILDNUMBER) "." \
   STRINGIZE(APS_MODIFICATIONNUMBER)
+
+#ifndef _MAC
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
 
 VS_VERSION_INFO VERSIONINFO
 FILEVERSION APS_MAJORNUMBER, APS_MINORNUMBER, APS_BUILDNUMBER, APS_MODIFICATIONNUMBER
@@ -34,11 +37,16 @@ BEGIN
             VALUE "CompanyName", "uvnc bv"
             VALUE "FileDescription", "UltraVNC Viewer"
             VALUE "FileVersion", APS_FULLVERSION_STR
-            VALUE "InternalName", "UltraVNC Viewer"
+            VALUE "InternalName", "vncviewer"
             VALUE "LegalCopyright", "Copyright © 2002-" STRINGIZE(APS_DATEYEAR) " UltraVNC Team Members. All Rights Reserved."
-            VALUE "OriginalFilename", "UltraVNC Viewer.exe"
+            VALUE "LegalTrademarks", ""
+            VALUE "OriginalFilename", "vncviewer.exe"
+            VALUE "PrivateBuild", ""
             VALUE "ProductName", "UltraVNC Viewer"
             VALUE "ProductVersion", APS_FULLVERSION_STR
+#if isRC == 1
+            VALUE "SpecialBuild", "\0"
+#endif
         END
     END
     BLOCK "VarFileInfo"
@@ -46,4 +54,6 @@ BEGIN
         VALUE "Translation", 0x0, 1200
     END
 END
+
+#endif    // !_MAC
 

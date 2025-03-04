@@ -13,12 +13,13 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Neutral (Default) resources
+// Neutral resources
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEUD)
-LANGUAGE LANG_NEUTRAL, SUBLANG_DEFAULT
-#pragma code_page(1252)
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEU)
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+#pragma code_page(65001)
 
+#ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
 //
 // Version
@@ -41,14 +42,20 @@ BEGIN
     BEGIN
         BLOCK "081304b0"
         BEGIN
+            VALUE "Comments", "UltraVNC setpassw"
             VALUE "CompanyName", "uvnc bv"
             VALUE "FileDescription", "Add password to ultravnc.ini"
             VALUE "FileVersion", "1.0.0.1"
-            VALUE "InternalName", "setpassw.exe"
-            VALUE "LegalCopyright", "Copyright © 2002-2025 UltraVNC Team Members. All Rights Reserved."
+            VALUE "InternalName", "setpassw"
+            VALUE "LegalCopyright", "Copyright Â© 2002-2025 UltraVNC Team Members. All Rights Reserved."
+            VALUE "LegalTrademarks", ""
             VALUE "OriginalFilename", "setpassw.exe"
-            VALUE "ProductName", "setpassw"
+            VALUE "PrivateBuild", ""
+            VALUE "ProductName", "UltraVNC setpassw"
             VALUE "ProductVersion", "1.0.0.1"
+#if isRC == 1
+            VALUE "SpecialBuild", ""
+#endif
         END
     END
     BLOCK "VarFileInfo"
@@ -57,16 +64,18 @@ BEGIN
     END
 END
 
-#endif    // Neutral (Default) resources
+#endif    // !_MAC
+
+#endif    // Neutral resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// Dutch (Belgium) resources
+// Neutral resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NLB)
-LANGUAGE LANG_DUTCH, SUBLANG_DUTCH_BELGIAN
-#pragma code_page(1252)
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+#pragma code_page(65001)
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -93,7 +102,7 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-#endif    // Dutch (Belgium) resources
+#endif    // Neutral resources
 /////////////////////////////////////////////////////////////////////////////
 
 

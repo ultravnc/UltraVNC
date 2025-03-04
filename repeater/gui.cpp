@@ -28,7 +28,6 @@
 #include <windowsx.h>
 #include <shellapi.h>
 #include <string.h>
-#include "resources.h"
 #include "resource.h"
 #include "repeater.h"
 

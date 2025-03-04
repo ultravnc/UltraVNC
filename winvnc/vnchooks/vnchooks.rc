@@ -13,12 +13,13 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (United Kingdom) resources
+// Neutral resources
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENG)
-LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
-#pragma code_page(1252)
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEU)
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+#pragma code_page(65001)
 
+#ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
 //
 // Version
@@ -41,14 +42,20 @@ BEGIN
     BEGIN
         BLOCK "080904b0"
         BEGIN
-            VALUE "CompanyName", "UltraVNC"
-            VALUE "FileDescription", "VNC hooks DLL for Win32"
+            VALUE "Comments", "UltraVNC VNC hooks DLL for Windows"
+            VALUE "CompanyName", "uvnc bv"
+            VALUE "FileDescription", "UltraVNC VNC hooks DLL for Windows"
             VALUE "FileVersion", "1.1.0.2"
-            VALUE "InternalName", "VNCHooks"
-            VALUE "LegalCopyright", "Copyright © 2002-2025 UltraVNC Team Members. All Rights Reserved. Copyright © 2002 RealVNC Ltd. © 1996-2001 AT&T Research Labs Cambridge"
-            VALUE "OriginalFilename", "VNCHooks.dll"
-            VALUE "ProductName", "UltraVNC - VNCHooks"
+            VALUE "InternalName", "vnchooks"
+            VALUE "LegalCopyright", "Copyright Â© 2002-2025 UltraVNC Team Members. All Rights Reserved."
+            VALUE "LegalTrademarks", ""
+            VALUE "OriginalFilename", "vnchooks.dll"
+            VALUE "PrivateBuild", ""
+            VALUE "ProductName", "UltraVNC VNCHooks"
             VALUE "ProductVersion", "1.1.0.2"
+#if isRC == 1
+            VALUE "SpecialBuild", "\0"
+#endif
         END
     END
     BLOCK "VarFileInfo"
@@ -56,6 +63,8 @@ BEGIN
         VALUE "Translation", 0x809, 1200
     END
 END
+
+#endif    // !_MAC
 
 
 #ifdef APSTUDIO_INVOKED
@@ -83,7 +92,7 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-#endif    // English (United Kingdom) resources
+#endif    // Neutral resources
 /////////////////////////////////////////////////////////////////////////////
 
 
