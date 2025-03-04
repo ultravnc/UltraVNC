@@ -221,7 +221,7 @@ PLUGIN_API int Shutdown(void)
 		CryptDestroyKey(hExchangeKey2);
     }
 	
-	//We’re finished using the CSP handle, so we must release it.
+	//We're finished using the CSP handle, so we must release it.
 	if (hProvider) {
 		CryptReleaseContext(hProvider, 0);
 		CryptReleaseContext(hProvider2, 0);

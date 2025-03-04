@@ -85,7 +85,7 @@ CONFIG += embed_translations
 RESOURCES += \
     DSMPlugin/MSRC4Plugin/crypto.rc \
     DSMPlugin/MSRC4Plugin/MSRC4Plugin.rc \
-    DSMPlugin/MSRC4Plugin/version.rc \
+    DSMPlugin/MSRC4Plugin/version.rc2 \
     DSMPlugin/TestPlugin/TestPlugin.rc \
     JavaViewer/mk.bat \
     JavaViewer/run.bat \
