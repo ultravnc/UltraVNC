@@ -345,13 +345,13 @@ if(!CryptSetKeyParam(hKey, KP_SALT, pbIV, 0)) {
                          NULL);
           } while (!finished);
 
-   //And weíre finished
-   //almost. All we need to do now is clean up. Weíre finished with both keys at this point, so letís delete them.
+   //And we're finished
+   //almost. All we need to do now is clean up. We're finished with both keys at this point, so let's delete them.
 
    // Clean up: release handles, close files.
 	CleanupCryptoKey(hExchangeKey);
     CleanupCryptoKey(hKey);
-   //Weíre finished using the CSP handle, so we must release it. We close the input and output files, and weíre finished.
+   //We're finished using the CSP handle, so we must release it. We close the input and output files, and we're finished.
 
    CleanupCryptoContext(hProvider);
    CloseHandle(hInFile);
@@ -407,7 +407,7 @@ if(!CryptSetKeyParam(hKey, KP_SALT, pbIV, 0)) {
     return 1;
 }
 
-//Next, we read encrypted data in, decrypt it using CryptDecrypt, and write the decrypted data to our output file. Like the CryptEncrypt function, CryptDecrypt takes a ìfinishedî Boolean flag to tell it when weíre sending it the last buffer to decrypt.
+//Next, we read encrypted data in, decrypt it using CryptDecrypt, and write the decrypted data to our output file. Like the CryptEncrypt function, CryptDecrypt takes a ‚Äúfinished‚Äù Boolean flag to tell it when we're sending it the last buffer to decrypt.
 
      // Read data in, encrypt it, and write encrypted data to output file.
      do 
@@ -417,7 +417,7 @@ if(!CryptSetKeyParam(hKey, KP_SALT, pbIV, 0)) {
           CryptDecrypt(hKey, 0, finished, 0, pbBuffer, &dwByteCount);
           WriteFile(hOutFile, pbBuffer,dwByteCount,&dwBytesWritten,NULL);
      } while (!finished);
-//Weíre finished, so we now delete our key, release the CSP handle, and close the input and output files.
+//We're finished, so we now delete our key, release the CSP handle, and close the input and output files.
 
      // Clean up: release handles, close files.
 	 CleanupCryptoKey(hExchangeKey);
