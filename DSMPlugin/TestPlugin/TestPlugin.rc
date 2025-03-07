@@ -5,12 +5,12 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// French (France) resources
+// Neutral resources
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_FRA)
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEU)
 #ifdef _WIN32
-LANGUAGE LANG_FRENCH, SUBLANG_FRENCH
-#pragma code_page(1252)
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+#pragma code_page(65001)
 #endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
@@ -78,7 +78,7 @@ BEGIN
 END
 #endif    // APSTUDIO_INVOKED
 
-#endif    // French (France) resources
+#endif    // Neutral resources
 /////////////////////////////////////////////////////////////////////////////
 
 

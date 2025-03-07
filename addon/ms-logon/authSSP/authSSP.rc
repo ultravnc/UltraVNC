@@ -18,7 +18,7 @@
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEU)
 #ifdef _WIN32
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
-#pragma code_page(1252)
+#pragma code_page(65001)
 #endif //_WIN32
 
 #ifndef _MAC
@@ -51,19 +51,21 @@ BEGIN
 #include "buildtime.h" // Defines macro BUILDTIME
             VALUE "Buildtime", BUILDTIME
 #endif
-            VALUE "Comments", "Cross-domain Windows authentication for UltraVNC\0"
+            VALUE "Comments", "UltraVNC MS-Logon II Cross-domain Windows authentication\0"
             VALUE "CompanyName", STR_COMPANYNAME
-            VALUE "FileDescription", "MS-Logon II for UltraVNC\0"
+            VALUE "FileDescription", "UltraVNC MS-Logon II\0"
             VALUE "FileVersion", STR_FILEVERSION
             VALUE "InternalName", "authSSP\0"
             VALUE "LegalCopyright", STR_COPYRIGHT
+            VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "authSSP.dll\0"
+            VALUE "PrivateBuild", "\0"
             VALUE "ProductName", "UltraVNC authSSP\0"
             VALUE "ProductVersion", STR_PRODUCTVERSION
 #if isRC == 1
-			VALUE "SpecialBuild", STR_SPECIALBUILD
+            VALUE "SpecialBuild", STR_SPECIALBUILD
 #endif
-			END
+        END
     END
     BLOCK "VarFileInfo"
     BEGIN

@@ -30,7 +30,6 @@ HEADERS += \
     list_functions.h \
     repeater.h \
     resource.h \
-    resources.h \
     webgui/linuxdefs.h \
     webgui/webfs.h \
     webgui/webgui.h \
