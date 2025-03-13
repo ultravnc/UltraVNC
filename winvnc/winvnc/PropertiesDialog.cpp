@@ -2058,6 +2058,9 @@ void PropertiesDialog::onApply(HWND hwnd)
 	SendMessage(hTabCapture, WM_COMMAND, IDC_APPLY, 0);
 	SendMessage(hTabLog, WM_COMMAND, IDC_APPLY, 0);
 	SendMessage(hTabAdministration, WM_COMMAND, IDC_APPLY, 0);
+#ifndef SC_20
+	settings->save();
+#endif // SC_20	
 }
 void PropertiesDialog::onOK(HWND hwnd)
 	{

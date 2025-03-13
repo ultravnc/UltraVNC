@@ -426,6 +426,7 @@ void SettingsManager::save()
 	iniFile.WriteInt("admin", "DefaultScale", m_pref_DefaultScale);
 	iniFile.WriteInt("admin", "UseDSMPlugin", m_pref_UseDSMPlugin);
 	iniFile.WriteString("admin", "DSMPlugin", m_pref_szDSMPlugin);
+	iniFile.WriteString("admin", "DSMPluginConfig", m_pref_DSMPluginConfig);
 	iniFile.WriteString("admin", "AuthHosts", m_pref_authhosts);
 	iniFile.WriteInt("admin", "primary", m_pref_Primary);
 	iniFile.WriteInt("admin", "secondary", m_pref_Secondary);
