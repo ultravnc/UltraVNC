@@ -450,22 +450,19 @@ BEGIN
     DEFPUSHBUTTON   "",IDOK,299,0,8,6,NOT WS_VISIBLE
 END
 
-IDD_APP_ABOUT DIALOGEX 0, 0, 327, 136
+IDD_APP_ABOUT DIALOGEX 0, 0, 264, 66
 STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "UltraVNC Viewer - About"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,258,118,62,14
+    DEFPUSHBUTTON   "OK",IDOK,198,48,62,14
     CONTROL         IDB_VNC64,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE,8,1,34,29
     LTEXT           "UltraVNC Viewer 1.4.4.0-dev",IDC_UVVERSION,44,7,199,11
-    LTEXT           "Copyright © 2002-2024 UltraVNC Team Members\nCopyright © 2001-2002 Sam - eSVNC\nCopyright © 1999-2002 Rudi D. V. - VdaccVNC",IDC_STATIC,29,34,291,25
-    LTEXT           "Built",IDC_STATIC,45,18,15,10
-    LTEXT           "BuildTime",IDC_BUILDTIME,78,18,98,10
-    LTEXT           "Copyright © 2002 VNC QuickDesk\nCopyright © 1999-2002 Tridia Corporation - TridiaVNC\nCopyright © 1994-2001 AT&&T Laboratories Cambridge/Olivetti Research Ltd. - VNC",IDC_STATIC,29,74,291,25
-    LTEXT           "Copyright © 1990-2002 Info-ZIP\nCopyright © 1996-2002 Markus Franz Xaver Johannes Oberhumer - Mini LZO library",IDC_STATIC,29,98,291,20
-    LTEXT           "https://uvnc.com",IDC_UVNCCOM,39,124,55,8
-    LTEXT           "Copyright © 1999-2002 Const. Kaplinsky - TightVNC\nCopyright © 2002 RealVNC Ltd. - RealVNC\n",IDC_STATIC,29,58,291,16
-    LTEXT           "Website:",IDC_STATIC,7,124,29,8
+    LTEXT           "Copyright © 2002-2024 UltraVNC Team Members",IDC_STATIC,44,31,184,13
+    LTEXT           "Built",IDC_STATIC,44,18,15,11
+    LTEXT           "BuildTime",IDC_BUILDTIME,78,18,98,11
+    LTEXT           "https://uvnc.com",IDC_UVNCCOM,39,54,55,8
+    LTEXT           "Website:",IDC_STATIC,7,54,29,8
 END
 
 IDD_FTCONFIRM_DLG DIALOGEX 0, 0, 227, 86
@@ -872,16 +869,14 @@ BEGIN
     IDD_APP_ABOUT, DIALOG
     BEGIN
         LEFTMARGIN, 7
+        RIGHTMARGIN, 227
         VERTGUIDE, 12
         VERTGUIDE, 94
         VERTGUIDE, 108
         VERTGUIDE, 120
         VERTGUIDE, 247
-        VERTGUIDE, 285
-        VERTGUIDE, 306
-        VERTGUIDE, 320
         TOPMARGIN, 7
-        BOTTOMMARGIN, 132
+        BOTTOMMARGIN, 62
     END
 
     IDD_FTCONFIRM_DLG, DIALOG
