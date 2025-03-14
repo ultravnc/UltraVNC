@@ -7622,7 +7622,7 @@ void ClientConnection::GTGBS_CreateDisplay()
 	}
 
 	// Das eigendliche HauptFenster erstellen,
-	// welches das VNC-Fenster und die Toolbar enthält
+	// welches das VNC-Fenster und die Toolbar enthï¿½lt
 	WNDCLASS wndclass;
 
 	wndclass.style			= 0;
