@@ -1407,6 +1407,7 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 	case IDC_ADMINCLEAR: {
 		settings->setAdminPasswordHash("");
 		SetWindowText(GetDlgItem(hwnd, IDC_CHANGEPASSWORDADMIN), "SET");
+		return true;
 	}
 
 	case IDC_CLEARPASSWORD:

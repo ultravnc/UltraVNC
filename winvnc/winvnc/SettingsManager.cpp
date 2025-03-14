@@ -602,7 +602,7 @@ bool SettingsManager::isAdminPasswordSet()
 void SettingsManager::setAdminPasswordHash(char* password)
 {
 	if (strlen(password) == 0) {
-		iniFile.WriteString("UltraVNC", "hash", m_pref_passwd);
+		iniFile.WriteString("UltraVNC", "hash", "");
 		return;
 	}
 
