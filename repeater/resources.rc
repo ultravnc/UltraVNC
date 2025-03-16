@@ -10,17 +10,16 @@
 #define APSTUDIO_HIDDEN_SYMBOLS
 #include "windows.h"
 #undef APSTUDIO_HIDDEN_SYMBOLS
-#include "resources.h"
 
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Dutch (Belgium) resources
+// Neutral resources
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NLB)
-LANGUAGE LANG_DUTCH, SUBLANG_DUTCH_BELGIAN
-#pragma code_page(1252)
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEU)
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+#pragma code_page(65001)
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -127,7 +126,6 @@ BEGIN
     "#define APSTUDIO_HIDDEN_SYMBOLS\r\n"
     "#include ""windows.h""\r\n"
     "#undef APSTUDIO_HIDDEN_SYMBOLS\r\n"
-    "#include ""resources.h""\r\n"
     "\0"
 END
 
@@ -169,6 +167,7 @@ END
 #endif    // APSTUDIO_INVOKED
 
 
+#ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
 //
 // Version
@@ -191,14 +190,20 @@ BEGIN
     BEGIN
         BLOCK "081304b0"
         BEGIN
-            VALUE "CompanyName", " "
-            VALUE "FileDescription", "distributer"
+            VALUE "Comments", "UltraVNC Repeater"
+            VALUE "CompanyName", "uvnc bv"
+            VALUE "FileDescription", "UltraVNC Repeater"
             VALUE "FileVersion", "1.5.0.0"
-            VALUE "InternalName", "distributer"
+            VALUE "InternalName", "repeater"
             VALUE "LegalCopyright", "Copyright © 2002-2025 UltraVNC Team Members. All Rights Reserved."
-            VALUE "OriginalFilename", "distributer.exe"
-            VALUE "ProductName", "  distributer"
+            VALUE "LegalTrademarks", ""
+            VALUE "OriginalFilename", "repeater.exe"
+            VALUE "PrivateBuild", ""
+            VALUE "ProductName", "UltraVNC Repeater"
             VALUE "ProductVersion", "1.5.0.0"
+#if isRC == 1
+            VALUE "SpecialBuild", ""
+#endif
         END
     END
     BLOCK "VarFileInfo"
@@ -207,7 +212,9 @@ BEGIN
     END
 END
 
-#endif    // Dutch (Belgium) resources
+#endif    // !_MAC
+
+#endif    // Neutral resources
 /////////////////////////////////////////////////////////////////////////////
 
 

@@ -18,7 +18,7 @@
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEU)
 #ifdef _WIN32
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
-#pragma code_page(1252)
+#pragma code_page(65001)
 #endif //_WIN32
 
 #ifndef _MAC
@@ -47,19 +47,21 @@ BEGIN
     BEGIN
         BLOCK "000004b0"
         BEGIN
-            VALUE "Comments", "Logging for UltraVNC MS-Logon\0"
+            VALUE "Comments", "UltraVNC MS-Logon Logging\0"
             VALUE "CompanyName", STR_COMPANYNAME
-            VALUE "FileDescription", "Logging for UltraVNC MS-Logon\0"
+            VALUE "FileDescription", "UltraVNC MS-Logon Logging\0"
             VALUE "FileVersion", STR_FILEVERSION
             VALUE "InternalName", "logging\0"
             VALUE "LegalCopyright", STR_COPYRIGHT
+            VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "logging.dll\0"
+            VALUE "PrivateBuild", "\0"
             VALUE "ProductName", "UltraVNC logging\0"
             VALUE "ProductVersion", STR_PRODUCTVERSION
 #if isRC == 1
-			VALUE "SpecialBuild", STR_SPECIALBUILD
+            VALUE "SpecialBuild", STR_SPECIALBUILD
 #endif
-			END
+        END
     END
     BLOCK "VarFileInfo"
     BEGIN
