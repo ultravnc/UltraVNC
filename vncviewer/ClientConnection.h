@@ -137,7 +137,6 @@ struct BitmapInfo {
 };
 
 namespace rdr { class InStream; class FdInStream; class ZlibInStream; class xzInStream; class ZstdInStream; }
-typedef BOOL(WINAPI* PFN_GetDpiForMonitor) (HMONITOR, MONITOR_DPI_TYPE, UINT*,UINT*);
 typedef BOOL(WINAPI* PFN_AdjustWindowRectExForDpi) (LPRECT, DWORD, BOOL, DWORD, UINT);
 
 class ClientConnection  : public omni_thread
@@ -852,9 +851,7 @@ private:
 	UINT m_Dpi;
 	UINT m_DpiOld;
 	bool m_DpiMove;
-	HMODULE hShcore;
 	HMODULE hUser32;
-	PFN_GetDpiForMonitor getDpiForMonitor;
 	PFN_AdjustWindowRectExForDpi adjustWindowRectExForDpi;
 	short nbrMonitors = 0;
 
