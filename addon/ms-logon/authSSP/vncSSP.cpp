@@ -41,7 +41,7 @@ CheckUserPasswordSDFn CheckUserPasswordSD = 0;
 const TCHAR REGISTRY_KEY [] = _T("Software\\UltraVNC");
 
 AUTHSSP_API
-int CUPSD(const char * userin, const char *password, const char *machine)
+int CUPSD(const char * userin, const char *password, const char *machine, TCHAR* szMslogonLog)
 {
 	DWORD dwAccessGranted = 0;
 	BOOL isAccessOK = FALSE;
@@ -95,12 +95,12 @@ int CUPSD(const char * userin, const char *password, const char *machine)
 	//LookupAccountName(NULL, user2, Sid, cbSid, DomainName, cbDomainName, peUse);
 
 	if (isInteract)	{
-		LOG(0x00640001L, _T("MS-Logon authentication accepted from %s using %s account (Interactive)\n"), machine2, user2);
+		LOG(szMslogonLog, 0x00640001L, _T("MS-Logon authentication accepted from %s using %s account (Interactive)\n"), machine2, user2);
 	} else if (isViewOnly) {
-		LOG(0x00640001L, _T("MS-Logon authentication accepted from %s using %s account (ViewOnly)\n"), machine2, user2);
+		LOG(szMslogonLog, 0x00640001L, _T("MS-Logon authentication accepted from %s using %s account (ViewOnly)\n"), machine2, user2);
 		isAccessOK = 2;
 	} else {
-		LOG(0x00640002L, _T("MS-Logon authentication refused from %s using %s account (not %s)\n"), machine2, user2, 
+		LOG(szMslogonLog, 0x00640002L, _T("MS-Logon authentication refused from %s using %s account (not %s)\n"), machine2, user2,
 			isAuthenticated ? _T("authorized") : _T("authenticated"));
 	}
 	return isAccessOK;

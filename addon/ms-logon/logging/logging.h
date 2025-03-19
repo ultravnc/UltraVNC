@@ -48,7 +48,7 @@
 #pragma hdrstop
 typedef SHORT vncClientId;
 
-LOGGING_API void LOGEXIT(char *machine, char *user, int clientId, bool isinteractive);
+LOGGING_API void LOGEXIT(char *machine, char *user, int clientId, bool isinteractive, char* szMslogonLog);
 
 class EventLogging
 {

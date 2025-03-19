@@ -48,7 +48,7 @@ int CheckUserGroupPasswordUni2(char* userin, char* password, const char* machine
 // Marscha@2004 - authSSP: if "New MS-Logon" is checked, call CheckUserPasswordSDUni
 BOOL IsNewMSLogon();
 //char *AddToModuleDir(char *filename, int length);
-typedef int (*CheckUserPasswordSDUniFn)(const char* userin, const char* password, const char* machine);
+typedef int (*CheckUserPasswordSDUniFn)(const char* userin, const char* password, const char* machine, TCHAR* szMslogonLog);
 CheckUserPasswordSDUniFn CheckUserPasswordSDUni = 0;
 
 #define MAXSTRING 254
@@ -116,7 +116,7 @@ int CheckUserGroupPasswordUni(char* userin, char* password, const char* machine)
 			CheckUserPasswordSDUni = (CheckUserPasswordSDUniFn)GetProcAddress(hModuleAuthSSP, "CUPSD");
 			vnclog.Print(LL_INTINFO, VNCLOG("GetProcAddress"));
 			CoInitialize(NULL);
-			result = CheckUserPasswordSDUni(userin, password, machine);
+			result = CheckUserPasswordSDUni(userin, password, machine, settings->getLogFile());
 			vnclog.Print(LL_INTINFO, "CheckUserPasswordSDUni result=%i", result);
 			CoUninitialize();
 			FreeLibrary(hModuleAuthSSP);

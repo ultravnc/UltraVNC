@@ -281,6 +281,8 @@ public:
 
 	bool getShowSettings();
 	void setShowSettings(bool value) { showSettings = value; };
+	char *getLogFile() { return logfile; };
+	void setLogFile(char* value) { strcpy_s(logfile, value); };
 private:
 	SettingsManager();
 	static SettingsManager* s_instance;
@@ -358,7 +360,7 @@ private:
 	BOOL m_pref_Avilog;
 	BOOL m_pref_UseIpv6;
 	unsigned int G_SENDBUFFER_EX;
-	char m_Inifile[MAX_PATH];
+	char logfile[MAX_PATH];
 	bool m_pref_fEnableStateUpdates;
 	bool m_pref_fEnableKeepAlive;
 	BOOL m_pref_fRunningFromExternalService;

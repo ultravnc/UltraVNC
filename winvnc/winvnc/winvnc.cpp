@@ -208,6 +208,18 @@ bool return2(bool value)
 	return value;
 }
 
+void replaceFilename(char* path, const char* newFilename) {
+	char* lastSlash = strrchr(path, '\\'); // Find the last '/'
+	if (lastSlash) {
+		*(lastSlash + 1) = '\0'; // Truncate after the last '/'
+		strcat(path, newFilename); // Append the new filename
+	}
+	else {
+		// No '/' found, replace the whole string
+		strcpy(path, newFilename);
+	}
+}
+
 void extractConfig(char* szCmdLine)
 {
 	size_t i = 0;
@@ -322,7 +334,10 @@ void extractConfig(char* szCmdLine)
 	else {
 		showSettings = true; // service
 	}
-
+	char logFile[MAX_PATH];
+	strcpy(logFile, configFile);
+	replaceFilename(logFile, "mslogon.log");
+	settings->setLogFile(logFile);
 	settings->setShowSettings(showSettings);
 }
 	

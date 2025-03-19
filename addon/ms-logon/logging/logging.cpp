@@ -130,7 +130,7 @@ void EventLogging::AddEventSourceToRegistry(LPCTSTR lpszSourceName)
 /////////////////////////
 ///////////////////////
 LOGGING_API
-void LOGEXIT(char *machine, char *user, int clientId, bool isinteractive)
+void LOGEXIT(char *machine, char *user, int clientId, bool isinteractive, char * szMslogonLog)
 {
 	    FILE *file;
 		const char* ps[3];
@@ -157,16 +157,6 @@ void LOGEXIT(char *machine, char *user, int clientId, bool isinteractive)
 		log.AddEventSourceToRegistry(NULL);
 		log.LogIt(1,0x00640003L, ps,1,NULL,0);
 
-		char szMslogonLog[MAX_PATH];
-		if (GetModuleFileName(NULL, szMslogonLog, MAX_PATH))
-		{
-			char* p = strrchr(szMslogonLog, '\\');
-			if (p != NULL)
-			{
-				*p = '\0';
-				strcat_s(szMslogonLog,"\\mslogon.log");
-			}
-		}
 		file = fopen(szMslogonLog, "a");
 		if(file!=NULL) 
 			{
@@ -176,7 +166,7 @@ void LOGEXIT(char *machine, char *user, int clientId, bool isinteractive)
 }
 
 LOGGING_API
-void LOGLOGON(char *machine, int clientId, bool isinteractive)
+void LOGLOGON(char *machine, int clientId, bool isinteractive, char* szMslogonLog)
 {
 		FILE *file;
 		const char* ps[3];
@@ -196,16 +186,7 @@ void LOGLOGON(char *machine, int clientId, bool isinteractive)
 	    EventLogging log;
 		log.AddEventSourceToRegistry(NULL);
 		log.LogIt(1,0x00640001L, ps,1,NULL,0);
-		char szMslogonLog[MAX_PATH];
-		if (GetModuleFileName(NULL, szMslogonLog, MAX_PATH))
-		{
-			char* p = strrchr(szMslogonLog, '\\');
-			if (p != NULL)
-			{
-				*p = '\0';
-				strcat_s(szMslogonLog,"\\mslogon.log");
-			}
-		}
+		
 		file = fopen(szMslogonLog, "a");
 		if(file!=NULL) 
 			{
@@ -214,7 +195,7 @@ void LOGLOGON(char *machine, int clientId, bool isinteractive)
 			}
 }
 
-void LOGCONN(char* machine, int clientId, bool isinteractive)
+void LOGCONN(char* machine, int clientId, bool isinteractive, char* szMslogonLog)
 {
 	FILE* file;
 	const char* ps[3];
@@ -231,16 +212,7 @@ void LOGCONN(char* machine, int clientId, bool isinteractive)
 	EventLogging log;
 	log.AddEventSourceToRegistry(NULL);
 	log.LogIt(1, 0x00640001L, ps, 1, NULL, 0);
-	char szMslogonLog[MAX_PATH];
-	if (GetModuleFileName(NULL, szMslogonLog, MAX_PATH))
-	{
-		char* p = strrchr(szMslogonLog, '\\');
-		if (p != NULL)
-		{
-			*p = '\0';
-			strcat_s(szMslogonLog, "\\mslogon.log");
-		}
-	}
+	
 	file = fopen(szMslogonLog, "a");
 	if (file != NULL)
 	{
@@ -250,7 +222,7 @@ void LOGCONN(char* machine, int clientId, bool isinteractive)
 }
 
 LOGGING_API
-void LOGFAILED(char *machine)
+void LOGFAILED(char *machine, char* szMslogonLog)
 {
 		FILE *file;
 		const char* ps[3];
@@ -267,16 +239,7 @@ void LOGFAILED(char *machine)
 	    EventLogging log;
 		log.AddEventSourceToRegistry(NULL);
 		log.LogIt(1,0x00640002L, ps,1,NULL,0);
-		char szMslogonLog[MAX_PATH];
-		if (GetModuleFileName(NULL, szMslogonLog, MAX_PATH))
-		{
-			char* p = strrchr(szMslogonLog, '\\');
-			if (p != NULL)
-			{
-				*p = '\0';
-				strcat_s(szMslogonLog,"\\mslogon.log");
-			}
-		}
+		
 		file = fopen(szMslogonLog, "a");
 		if(file!=NULL) 
 			{
@@ -286,7 +249,7 @@ void LOGFAILED(char *machine)
 }
 
 LOGGING_API
-void LOGLOGONUSER(char *machine, char *user)
+void LOGLOGONUSER(char *machine, char *user, char* szMslogonLog)
 {
 		FILE *file;
 		const char* ps[3];
@@ -306,16 +269,7 @@ void LOGLOGONUSER(char *machine, char *user)
 	    EventLogging log;
 		log.AddEventSourceToRegistry(NULL);
 		log.LogIt(1,0x00640001L, ps,1,NULL,0);
-		char szMslogonLog[MAX_PATH];
-		if (GetModuleFileName(NULL, szMslogonLog, MAX_PATH))
-		{
-			char* p = strrchr(szMslogonLog, '\\');
-			if (p != NULL)
-			{
-				*p = '\0';
-				strcat_s(szMslogonLog,"\\mslogon.log");
-			}
-		}
+		
 		file = fopen(szMslogonLog, "a");
 		if(file!=NULL) 
 			{
@@ -325,7 +279,7 @@ void LOGLOGONUSER(char *machine, char *user)
 }
 
 LOGGING_API
-void LOGFAILEDUSER(char *machine, char *user)
+void LOGFAILEDUSER(char *machine, char *user, char* szMslogonLog)
 {
 		FILE *file;
 		const char* ps[3];
@@ -345,16 +299,7 @@ void LOGFAILEDUSER(char *machine, char *user)
 	    EventLogging log;
 		log.AddEventSourceToRegistry(NULL);
 		log.LogIt(1,0x00640002L, ps,1,NULL,0);
-		char szMslogonLog[MAX_PATH];
-		if (GetModuleFileName(NULL, szMslogonLog, MAX_PATH))
-		{
-			char* p = strrchr(szMslogonLog, '\\');
-			if (p != NULL)
-			{
-				*p = '\0';
-				strcat_s(szMslogonLog,"\\mslogon.log");
-			}
-		}
+		
 		file = fopen(szMslogonLog, "a");
 		if(file!=NULL) 
 			{
@@ -364,7 +309,7 @@ void LOGFAILEDUSER(char *machine, char *user)
 }
 
 LOGGING_API
-void LOGEXTRAINFO(char* info)
+void LOGEXTRAINFO(char* info, char* szMslogonLog)
 {
 	FILE* file;
 	const char* ps[3];
@@ -381,16 +326,7 @@ void LOGEXTRAINFO(char* info)
 	EventLogging log;
 	log.AddEventSourceToRegistry(NULL);
 	log.LogIt(1, 0x00640002L, ps, 1, NULL, 0);
-	char szMslogonLog[MAX_PATH];
-	if (GetModuleFileName(NULL, szMslogonLog, MAX_PATH))
-	{
-		char* p = strrchr(szMslogonLog, '\\');
-		if (p != NULL)
-		{
-			*p = '\0';
-			strcat_s(szMslogonLog, "\\mslogon.log");
-		}
-	}
+	
 	file = fopen(szMslogonLog, "a");
 	if (file != NULL)
 	{
