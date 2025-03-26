@@ -487,7 +487,7 @@ int CheckUserGroupPasswordUni2(char* userin, char* password, const char* machine
 	// If we reach this place auth failed
 	/////////////////////////////////////////////////
 	{
-		typedef BOOL(*LogeventFn)(char* machine, char* user);
+		typedef BOOL(*LogeventFn)(char* machine, char* user, char* szMslogonLog);
 		LogeventFn Logevent = 0;
 		char szCurrentDir[MAX_PATH];
 		strcpy_s(szCurrentDir, winvncFolder);
@@ -497,7 +497,7 @@ int CheckUserGroupPasswordUni2(char* userin, char* password, const char* machine
 		if (hModule)
 		{
 			Logevent = (LogeventFn)GetProcAddress(hModule, "LOGFAILEDUSER");
-			Logevent((char*)clientname, userin);
+			Logevent((char*)clientname, userin, settings->getLogFile());
 			FreeLibrary(hModule);
 		}
 		if (hModuleAdmin) FreeLibrary(hModuleAdmin);
@@ -515,7 +515,7 @@ int CheckUserGroupPasswordUni2(char* userin, char* password, const char* machine
 
 accessOK://full access
 	{
-		typedef BOOL(*LogeventFn)(char* machine, char* user);
+		typedef BOOL(*LogeventFn)(char* machine, char* user, char* szMslogonLog);
 		LogeventFn Logevent = 0;
 		char szCurrentDir[MAX_PATH];
 		strcpy_s(szCurrentDir, winvncFolder);
@@ -525,7 +525,7 @@ accessOK://full access
 		if (hModule)
 		{
 			Logevent = (LogeventFn)GetProcAddress(hModule, "LOGLOGONUSER");
-			Logevent((char*)clientname, userin);
+			Logevent((char*)clientname, userin, settings->getLogFile());
 			FreeLibrary(hModule);
 		}
 
@@ -546,7 +546,7 @@ accessOK://full access
 
 accessOK2://readonly
 	{
-		typedef BOOL(*LogeventFn)(char* machine, char* user);
+		typedef BOOL(*LogeventFn)(char* machine, char* user, char* szMslogonLog);
 		LogeventFn Logevent = 0;
 		char szCurrentDir[MAX_PATH];
 		strcpy_s(szCurrentDir, winvncFolder);
@@ -556,7 +556,7 @@ accessOK2://readonly
 		if (hModule)
 		{
 			Logevent = (LogeventFn)GetProcAddress(hModule, "LOGLOGONUSER");
-			Logevent((char*)clientname, userin);
+			Logevent((char*)clientname, userin, settings->getLogFile());
 			FreeLibrary(hModule);
 		}
 		if (hModuleAdmin) FreeLibrary(hModuleAdmin);

@@ -1022,7 +1022,7 @@ void vncClientThread::LogAuthResult(bool success, bool isconnected)
 	if (!success)
 	{
 		vnclog.Print(LL_CONNERR, VNCLOG("authentication failed\n"));
-		typedef BOOL(*LogeventFn)(char* machine);
+		typedef BOOL(*LogeventFn)(char* machine, char* szMslogonLog);
 		LogeventFn Logevent = 0;
 		char szCurrentDir[MAX_PATH];
 		strcpy_s(szCurrentDir, winvncFolder);
@@ -1031,7 +1031,7 @@ void vncClientThread::LogAuthResult(bool success, bool isconnected)
 		if (hModule)
 		{
 			Logevent = (LogeventFn)GetProcAddress(hModule, "LOGFAILED");
-			Logevent((char*)m_client->GetClientNameName());
+			Logevent((char*)m_client->GetClientNameName(), settings->getLogFile());
 			FreeLibrary(hModule);
 		}
 	}
@@ -1131,7 +1131,7 @@ vncClientThread::InitAuthenticate()
 	// Check the FilterClients thing after final auth
 	if (strlen(m_client->infoMsg) > 0)
 	{
-		typedef BOOL(*LogeventFn)(char* info);
+		typedef BOOL(*LogeventFn)(char* info, char* szMslogonLog);
 		LogeventFn Logevent = NULL;
 		char szCurrentDir[MAX_PATH];
 		strcpy_s(szCurrentDir, winvncFolder);
@@ -1142,7 +1142,7 @@ vncClientThread::InitAuthenticate()
 			Logevent = (LogeventFn)GetProcAddress(hModule, "LOGEXTRAINFO");
 			
 			if (Logevent)
-				Logevent((char*)m_client->infoMsg);
+				Logevent((char*)m_client->infoMsg, settings->getLogFile());
 			FreeLibrary(hModule);
 		}
 	}
