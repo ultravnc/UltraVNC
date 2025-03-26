@@ -356,6 +356,16 @@ BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		SetBkMode(hdcStatic, TRANSPARENT);
 		return (LONG)(INT_PTR)GetStockObject(WHITE_BRUSH);
 	}
+	case WM_NOTIFY:
+		{
+		int a = 0;
+		LPNMHDR nmhdr = (LPNMHDR)lParam;
+		if (nmhdr->idFrom == IDC_SLIDERFPS) {
+			if (SendMessage(GetDlgItem(hwnd, IDC_SLIDERFPS), TBM_GETPOS, 0, 0L) != settings->getMaxFPS())
+				EnableWindow(GetDlgItem(_this->PropertiesDialogHwnd, IDC_APPLY), true);
+			}
+		}
+		return true;
 	case WM_COMMAND:
 		_this->onCommand(LOWORD(wParam), hwnd, HIWORD(wParam));
 	}
@@ -1325,11 +1335,8 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 			serviceHelpers::winvncSecurityEditorHelper_as_admin();
 		}
 		else {
-			// Marscha@2004 - authSSP: end of change
-			if (m_server) {
-				m_vncauth.Init(m_server);
-				m_vncauth.Show(TRUE);
-			}
+			m_vncauth.Init();
+			m_vncauth.Show(TRUE);
 		}
 	}
 	return TRUE;
@@ -1356,6 +1363,7 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 				settings->savePassword();
 			}
 		}
+		delete dlgChangePassword;
 		isRunningPw = false;
 		SetWindowText(GetDlgItem(hwnd, IDC_CHANGEPASSWORD), (strlen(settings->getPasswd()) == 0) ? "SET" : "CHANGE");
 		return true;
@@ -1382,6 +1390,7 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 				settings->saveViewOnlyPassword();
 			}
 		}
+		delete dlgChangePassword;
 		SetWindowText(GetDlgItem(hwnd, IDC_CHANGEPASSWORDVO), (strlen(settings->getPasswdViewOnly()) == 0) ? "SET" : "CHANGE");
 		isRunningPwVo = false;
 		return true;
@@ -1401,6 +1410,7 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 			SetWindowText(GetDlgItem(hwnd, IDC_CHANGEPASSWORDADMIN), "CHANGE");
 		}
 		isRunningPwaAdm = false;
+		delete dlgChangePassword;
 	}
 		return true;
 
@@ -1426,13 +1436,12 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 	}
 	case IDC_PLUGIN_BUTTON:
 	{
-		if (m_server) {
-			HWND hPlugin = GetDlgItem(hwnd, IDC_PLUGIN_CHECK);
-			if (SendMessage(hPlugin, BM_GETCHECK, 0, 0) == BST_CHECKED) {
-				TCHAR szPlugin[MAX_PATH];
-				GetDlgItemText(hwnd, IDC_PLUGINS_COMBO, szPlugin, MAX_PATH);
-				PathStripPathA(szPlugin);
-
+		HWND hPlugin = GetDlgItem(hwnd, IDC_PLUGIN_CHECK);
+		if (SendMessage(hPlugin, BM_GETCHECK, 0, 0) == BST_CHECKED) {
+			TCHAR szPlugin[MAX_PATH];
+			GetDlgItemText(hwnd, IDC_PLUGINS_COMBO, szPlugin, MAX_PATH);
+			PathStripPathA(szPlugin);
+			if (m_server) {
 				if (!m_server->GetDSMPluginPointer()->IsLoaded())
 					m_server->GetDSMPluginPointer()->LoadPlugin(szPlugin, false);
 				else {
@@ -1450,6 +1459,8 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 				else
 					MessageBoxSecure(NULL, sz_ID_PLUGIN_NOT_LOAD, sz_ID_PLUGIN_LOADIN, MB_OK | MB_ICONEXCLAMATION);
 			}
+			else
+				PropertiesDialog::Secure_Plugin(szPlugin);
 		}
 		return TRUE;
 	}

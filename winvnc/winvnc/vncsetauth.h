@@ -45,7 +45,7 @@ public:
 	vncSetAuth();
 
 	// Initialisation
-	BOOL Init(vncServer *server);
+	BOOL Init();
 
 	// The dialog box window proc
 	static BOOL CALLBACK DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -55,7 +55,6 @@ public:
 
 	// Implementation
 	BOOL m_dlgvisible;
-	vncServer *			m_server;
 };
 
 #endif // _WINVNC_VNCPROPERTIES

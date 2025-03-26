@@ -22,14 +22,14 @@ private:
 	void InitPortSettings(HWND hwnd);
 
 	
-	void ShowImpersonateDialog();
-	HWND PropertiesDialogHwnd = NULL;
+	void ShowImpersonateDialog();	
 	bool showAdminPanel = false;	
 
 public:
 	PropertiesDialog();
 	~PropertiesDialog();
 
+	HWND PropertiesDialogHwnd = NULL;
 	BOOL Init(vncServer* server);
 	int ShowDialog();
 	void UpdateServer();
