@@ -62,6 +62,7 @@
 #include "common/win32_helpers.h"
 #include "shlwapi.h"
 #include "UltraVNCHelperFunctions.h"
+#include <limits>
 
 using namespace helper;
 extern HINSTANCE m_hInstResDLL;
@@ -1906,7 +1907,7 @@ void FileTransfer::SetStatus(LPSTR szStatus)
         DrawText(hdc, szHist, -1, &rc, DT_CALCRECT|DT_SINGLELINE);
         ReleaseDC(cbi.hwndList, hdc);
         int dx = rc.right - rc.left;
-        m_maxHistExtent = max(m_maxHistExtent, dx);
+        m_maxHistExtent = maximum(m_maxHistExtent, dx);
         SendDlgItemMessage(hWnd, IDC_HISTORY_CB, CB_SETHORIZONTALEXTENT, m_maxHistExtent, 0L);
     }
 	LRESULT Index = SendMessage(GetDlgItem(hWnd, IDC_HISTORY_CB), CB_ADDSTRING, 0, (LPARAM)szHist); 
@@ -2165,14 +2166,15 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, UINT nLen)
 		// if (dwFileSize != 0xFFFFFFFF)
 		if (bSizeOk)
 		{
-			unsigned long nCSBufferSize = (4 * (unsigned long)(n2FileSize.QuadPart / m_nBlockSize)) + 1024;
-			char* lpCSBuff = new char [nCSBufferSize];
-			if (lpCSBuff != NULL)
+			unsigned long long nCSBufferSize = (4 * (unsigned long long)(n2FileSize.QuadPart / m_nBlockSize)) + 1024;
+			if (nCSBufferSize > std::numeric_limits<size_t>::max())			
+				return false;
+			
+			std::unique_ptr<char[]> lpCSBuff = std::make_unique<char[]>(nCSBufferSize);
+			if (lpCSBuff)
 			{
-				int nCSBufferLen = GenerateFileChecksums(	m_hDestFile,
-															lpCSBuff,
-															nCSBufferSize
-														);
+				int nCSBufferLen = GenerateFileChecksums(m_hDestFile, lpCSBuff.get(), nCSBufferSize
+				);
 				if (nCSBufferLen != -1)
 				{
 					//sprintf_s(szStatus, " Sending %d bytes of file checksums to remote machine. Please Wait...", nCSBufferSize); 
@@ -2184,10 +2186,11 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, UINT nLen)
 					ftm.size = Swap32IfLE(nCSBufferSize);
 					ftm.length = Swap32IfLE(nCSBufferLen);
 					//adzm 2010-09
-					m_pCC->WriteExactQueue((char *)&ftm, sz_rfbFileTransferMsg, rfbFileTransfer);
-					m_pCC->WriteExactQueue((char *)lpCSBuff, nCSBufferLen);
+					m_pCC->WriteExactQueue((char*)&ftm, sz_rfbFileTransferMsg, rfbFileTransfer);
+					m_pCC->WriteExactQueue((char*)lpCSBuff.get(), nCSBufferLen);
 				}
 			}
+			
 		}
 	}
 
@@ -3221,35 +3224,45 @@ int FileTransfer::GenerateFileChecksums(HANDLE hFile, char* lpCSBuffer, int nCSB
 	DWORD dwNbBytesRead = 0;
 	int nCSBufferOffset = 0;
 
-	char* lpBuffer = new char [m_nBlockSize];
-	if (lpBuffer == NULL)
+	char* lpBuffer = new char[m_nBlockSize];
+	if (!lpBuffer)
 		return -1;
 
-	while ( !fEof )
+	while (!fEof)
 	{
-		int nRes = ReadFile(hFile, lpBuffer, m_nBlockSize, &dwNbBytesRead, NULL);
-		if (!nRes && dwNbBytesRead != 0)
+		if (!ReadFile(hFile, lpBuffer, m_nBlockSize, &dwNbBytesRead, NULL))
+		{
 			fError = true;
+			break;
+		}
 
-		if (nRes && dwNbBytesRead == 0)
+		if (dwNbBytesRead == 0)
+		{
 			fEof = true;
+		}
 		else
 		{
+			if (nCSBufferOffset + 4 > nCSBufferSize)
+			{
+				fError = true;
+				break;
+			}
+
 			unsigned long cs = adler32(0L, Z_NULL, 0);
 			cs = adler32(cs, (unsigned char*)lpBuffer, (int)dwNbBytesRead);
 			memcpy(lpCSBuffer + nCSBufferOffset, &cs, 4);
-			nCSBufferOffset += 4; 
+			nCSBufferOffset += 4;
 		}
 	}
 
-	SetFilePointer(hFile, 0L, NULL, FILE_BEGIN); 
-	delete [] lpBuffer;
+	if (SetFilePointer(hFile, 0L, NULL, FILE_BEGIN) == INVALID_SET_FILE_POINTER)
+	{
+		fError = true;
+	}
 
-	if (fError) 
-		return -1;
+	delete[] lpBuffer;
 
-	return nCSBufferOffset;
-
+	return fError ? -1 : nCSBufferOffset;
 }
 
 

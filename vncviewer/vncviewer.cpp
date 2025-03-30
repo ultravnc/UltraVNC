@@ -818,8 +818,8 @@ void CentreWindow(HWND hwnd)
 	int winwidth = winrect.right - winrect.left;
 	int winheight = winrect.bottom - winrect.top;
 	// Make sure it's not bigger than the work area
-	winwidth = min(winwidth, workwidth);
-	winheight = min(winheight, workheight);
+	winwidth = minimum(winwidth, workwidth);
+	winheight = minimum(winheight, workheight);
 
 	// Now centre it
 	SetWindowPos(hwnd, 

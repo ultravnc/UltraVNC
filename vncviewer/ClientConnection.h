@@ -80,12 +80,12 @@ class vnctouch;
 #endif
 extern const UINT FileTransferSendPacketMessage;
 
-#ifndef max
-#define max(a,b)            (((a) > (b)) ? (a) : (b))
+#ifndef maximum
+#define maximum(a,b)            (((a) > (b)) ? (a) : (b))
 #endif
 
-#ifndef min
-#define min(a,b)            (((a) < (b)) ? (a) : (b))
+#ifndef minimum
+#define minimum(a,b)            (((a) < (b)) ? (a) : (b))
 #endif
 
 //adzm 2010-09

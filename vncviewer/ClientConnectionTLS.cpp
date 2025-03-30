@@ -83,9 +83,9 @@ struct DynBuffer
 
 	inline BYTE *GetTail() { return buffer + size; }
 
-	inline int GetAvailable() { return max(size - pos, 0); }
+	inline int GetAvailable() { return maximum(size - pos, 0); }
 
-	inline int GetFree() { return max(capacity - size, 0); }
+	inline int GetFree() { return maximum(capacity - size, 0); }
 };
 
 // Schannel based TLS wrapper implemented as a "Sans I/O" protocol
@@ -299,7 +299,7 @@ struct TLSSession
 		outbuf.EnsureFree(tlsSizes.cbHeader * cnt + nDataLen + tlsSizes.cbTrailer * cnt);
 		for (int i = 0; i < nDataLen; i += tlsSizes.cbMaximumMessage)
 		{
-			int size = min(nDataLen - i, tlsSizes.cbMaximumMessage);
+			int size = minimum(nDataLen - i, tlsSizes.cbMaximumMessage);
 			BYTE *dst = outbuf.EnsureFree(tlsSizes.cbHeader + size + tlsSizes.cbTrailer);
 			outBuffers[0].BufferType = SECBUFFER_STREAM_HEADER;
 			outBuffers[0].pvBuffer = dst;

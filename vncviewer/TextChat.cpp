@@ -303,7 +303,7 @@ void TextChat::PrintMessage(const char* szMessage,const char* szSender,DWORD dwC
     si.cbSize = sizeof(SCROLLINFO);
     si.fMask = SIF_RANGE|SIF_PAGE;
     GetScrollInfo(GetDlgItem(m_hDlg, IDC_CHATAREA_EDIT), SB_VERT, &si);
-	si.nPos = si.nMax - max(si.nPage - 1, 0);
+	si.nPos = si.nMax - maximum(si.nPage - 1, 0);
 	SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT, WM_VSCROLL, MAKELONG(SB_THUMBPOSITION, si.nPos), 0L);	// Scroll down the ch
 
 	// This line does the bottom scrolling correctly under Windows NT4, Windows 2000, Windows XP...
@@ -506,7 +506,7 @@ BOOL CALLBACK TextChat::TextChatDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM wParam,
 			si.cbSize = sizeof(SCROLLINFO);
 			si.fMask = SIF_RANGE|SIF_PAGE;
 			GetScrollInfo(GetDlgItem(hWnd, IDC_CHATAREA_EDIT), SB_VERT, &si);
-			si.nPos = si.nMax - max(si.nPage - 1, 0);
+			si.nPos = si.nMax - maximum(si.nPage - 1, 0);
 			SendDlgItemMessage(hWnd, IDC_CHATAREA_EDIT, WM_VSCROLL, MAKELONG(SB_THUMBPOSITION, si.nPos), 0L);	
 			// This line does the bottom scrolling correctly under Windows NT4, Windows 2000, Windows XP...
 			// SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT, WM_VSCROLL, SB_BOTTOM, 0L);

@@ -96,7 +96,7 @@ struct AESCipher
 		keyBlob.hdr.bType = PLAINTEXTKEYBLOB;
 		keyBlob.hdr.bVersion = CUR_BLOB_VERSION;
 		keyBlob.hdr.aiKeyAlg = (keySize == 128 ? CALG_AES_128 : CALG_AES_256);
-		keyBlob.cbKeySize = min(keySize / 8, sizeof(keyBlob.key));
+		keyBlob.cbKeySize = minimum(keySize / 8, sizeof(keyBlob.key));
 		memcpy(keyBlob.key, key, keyBlob.cbKeySize);
 		if (!CryptImportKey(hProv, (BYTE *)&keyBlob, offsetof(SymKeyBlob, key) + keyBlob.cbKeySize, NULL, 0, &hKey))
 		{
@@ -356,7 +356,7 @@ struct AESEAXPlugin : IPlugin
 
 		inline BYTE *GetHead() { return buffer + pos; }
 
-		inline int GetAvailable() { return max(size - pos, 0); }
+		inline int GetAvailable() { return maximum(size - pos, 0); }
 	};
 
 	EAXMode		encAead, decAead;
@@ -401,7 +401,7 @@ struct AESEAXPlugin : IPlugin
 			else
 			{
 				int needed = AadSize + Swap16IfLE(*((CARD16 *)decBuffer.GetHead())) + MacSize;
-				*pnRestoredDataLen = max(needed - decBuffer.GetAvailable(), 0);
+				*pnRestoredDataLen = maximum(needed - decBuffer.GetAvailable(), 0);
 			}
 			BYTE *dst = decBuffer.EnsureFree(*pnRestoredDataLen);
 			decBuffer.size += *pnRestoredDataLen;

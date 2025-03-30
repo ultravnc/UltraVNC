@@ -3853,13 +3853,13 @@ vncClientThread::run(void* arg)
 						//if (dwFileSize != 0xFFFFFFFF)
 						if (bSize)
 						{
-							int nCSBufferSize = (4 * (int)(n2SrcSize.QuadPart / sz_rfbBlockSize)) + 1024;
-							char* lpCSBuff = new char[nCSBufferSize];
-							if (lpCSBuff != NULL)
+							unsigned long nCSBufferSize = (4 * (unsigned long)(n2SrcSize.QuadPart / sz_rfbBlockSize)) + 1024;
+							if (nCSBufferSize > std::numeric_limits<size_t>::max())
+								break;
+							std::unique_ptr<char[]> lpCSBuff = std::make_unique<char[]>(nCSBufferSize);
+							if (lpCSBuff)
 							{
-								int nCSBufferLen = m_client->GenerateFileChecksums(m_client->m_hDestFile,
-									lpCSBuff,
-									nCSBufferSize);
+								int nCSBufferLen = m_client->GenerateFileChecksums(m_client->m_hDestFile, lpCSBuff.get(), nCSBufferSize);
 								if (nCSBufferLen != -1)
 								{
 									ft.contentType = rfbFileChecksums;
@@ -3867,8 +3867,7 @@ vncClientThread::run(void* arg)
 									ft.length = Swap32IfLE(nCSBufferLen);
 									//adzm 2010-09 - minimize packets. SendExact flushes the queue.
 									m_socket->SendExactQueue((char*)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
-									m_socket->SendExactQueue((char*)lpCSBuff, nCSBufferLen);
-									delete[] lpCSBuff;
+									m_socket->SendExactQueue((char*)lpCSBuff.get(), nCSBufferLen);
 								}
 							}
 						}
@@ -5895,19 +5894,29 @@ int vncClient::GenerateFileChecksums(HANDLE hFile, char* lpCSBuffer, int nCSBuff
 	int nCSBufferOffset = 0;
 
 	char* lpBuffer = new char[sz_rfbBlockSize];
-	if (lpBuffer == NULL)
+	if (!lpBuffer)
 		return -1;
 
 	while (!fEof)
 	{
-		int nRes = ReadFile(hFile, lpBuffer, sz_rfbBlockSize, &dwNbBytesRead, NULL);
-		if (!nRes && dwNbBytesRead != 0)
+		if (!ReadFile(hFile, lpBuffer, sz_rfbBlockSize, &dwNbBytesRead, NULL))
+		{
 			fError = true;
+			break;
+		}
 
-		if (nRes && dwNbBytesRead == 0)
+		if (dwNbBytesRead == 0)
+		{
 			fEof = true;
+		}
 		else
 		{
+			if (nCSBufferOffset + 4 > nCSBufferSize)
+			{
+				fError = true;
+				break;
+			}
+
 			unsigned long cs = adler32(0L, Z_NULL, 0);
 			cs = adler32(cs, (unsigned char*)lpBuffer, (int)dwNbBytesRead);
 
@@ -5916,15 +5925,14 @@ int vncClient::GenerateFileChecksums(HANDLE hFile, char* lpCSBuffer, int nCSBuff
 		}
 	}
 
-	SetFilePointer(hFile, 0L, NULL, FILE_BEGIN);
-	delete[] lpBuffer;
-
-	if (fError)
+	if (SetFilePointer(hFile, 0L, NULL, FILE_BEGIN) == INVALID_SET_FILE_POINTER)
 	{
-		return -1;
+		fError = true;
 	}
 
-	return nCSBufferOffset;
+	delete[] lpBuffer;
+
+	return fError ? -1 : nCSBufferOffset;
 }
 
 //
