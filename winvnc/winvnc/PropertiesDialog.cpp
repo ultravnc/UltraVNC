@@ -19,6 +19,8 @@
 #include <string>
 #include <windowsx.h>
 #include "winvnc.h"
+#include "HelperFunctions.h"
+#include "UltraVNCService.h"
 
 extern HINSTANCE	hInstResDLL;
 HWND PropertiesDialog::hEditLog = NULL;
@@ -135,8 +137,11 @@ bool PropertiesDialog::InitDialog(HWND hwnd)
 		item.pszText = "Administration";
 		TabCtrl_InsertItem(hTabControl, 9, &item);
 	}
-	else
-		vnclog.Print(LL_INTWARN, VNCLOG("Don't show showAdminPanel\n"));
+	else if (standalone) 
+	{
+		item.pszText = "Service";
+		TabCtrl_InsertItem(hTabControl, 9, &item);
+	}
 
 	hTabAuthentication = CreateDialogParam(hInstResDLL,
 		MAKEINTRESOURCE(IDD_FORM_AUTHENTICATION),
@@ -188,6 +193,11 @@ bool PropertiesDialog::InitDialog(HWND hwnd)
 		hwnd,
 		(DLGPROC)DlgProc,
 		(LONG_PTR)this);
+	hTabService = CreateDialogParam(hInstResDLL,
+		MAKEINTRESOURCE(IDD_FORM_Service),
+		hwnd,
+		(DLGPROC)DlgProc,
+		(LONG_PTR)this);
 	RECT rc;
 	GetWindowRect(hTabControl, &rc);
 	MapWindowPoints(NULL, hwnd, (POINT*)&rc, 2);
@@ -222,6 +232,9 @@ bool PropertiesDialog::InitDialog(HWND hwnd)
 	SetWindowPos(hTabAdministration, HWND_TOP, rc.left, rc.top,
 		rc.right - rc.left, rc.bottom - rc.top,
 		SWP_HIDEWINDOW);
+	SetWindowPos(hTabService, HWND_TOP, rc.left, rc.top,
+		rc.right - rc.left, rc.bottom - rc.top,
+		SWP_HIDEWINDOW);	
 	return TRUE;
 };
 int PropertiesDialog::HandleNotify(HWND hwndDlg, WPARAM wParam, LPARAM lParam)
@@ -275,8 +288,14 @@ int PropertiesDialog::HandleNotify(HWND hwndDlg, WPARAM wParam, LPARAM lParam)
 				SetFocus(hTabLog);
 				return 0;
 			case 9:
-				ShowWindow(hTabAdministration, SW_SHOW);
-				SetFocus(hTabAdministration);
+				if (showAdminPanel) {
+					ShowWindow(hTabAdministration, SW_SHOW);
+					SetFocus(hTabAdministration);
+				}
+				else if (standalone) {
+					ShowWindow(hTabService, SW_SHOW);
+					SetFocus(hTabService);
+				}
 				return 0;				
 			}
 			return 0;
@@ -320,7 +339,12 @@ int PropertiesDialog::HandleNotify(HWND hwndDlg, WPARAM wParam, LPARAM lParam)
 				ShowWindow(hTabLog, SW_HIDE);
 				break;
 			case 9:
-				ShowWindow(hTabAdministration, SW_HIDE);
+				if (showAdminPanel) {
+					ShowWindow(hTabAdministration, SW_HIDE);
+				}
+				else if (standalone) {
+					ShowWindow(hTabService, SW_HIDE);
+				}
 				break;
 			}
 			return 0;
@@ -361,8 +385,12 @@ BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		int a = 0;
 		LPNMHDR nmhdr = (LPNMHDR)lParam;
 		if (nmhdr->idFrom == IDC_SLIDERFPS) {
-			if (SendMessage(GetDlgItem(hwnd, IDC_SLIDERFPS), TBM_GETPOS, 0, 0L) != settings->getMaxFPS())
+			int fps = SendMessage(GetDlgItem(hwnd, IDC_SLIDERFPS), TBM_GETPOS, 0, 0L);
+			if (fps != settings->getMaxFPS())
 				EnableWindow(GetDlgItem(_this->PropertiesDialogHwnd, IDC_APPLY), true);
+				CHAR temp[250];
+				sprintf_s(temp, "%d", fps);
+				SetDlgItemText(hwnd, IDC_STATICFPS, temp);
 			}
 		}
 		return true;
@@ -837,7 +865,7 @@ bool PropertiesDialog::DlgInitDialog(HWND hwnd)
 		hEditLog = GetDlgItem(hwnd, IDC_EDIT_LOG);
 		LogToEdit("");
 	}
-
+	setServiceStatusText(hwnd);
 	return FALSE; // Because we've set the focus
 }
 
@@ -952,8 +980,9 @@ void PropertiesDialog::ShowImpersonateDialog()
 		RevertToSelf();
 }
 
-int PropertiesDialog::ShowDialog()
+int PropertiesDialog::ShowDialog(bool standalone)
 {
+	this->standalone = standalone;
 	return DialogBoxParam(hInstResDLL, DIALOG_MAKEINTRESOURCE(IDD_PROPERTIESDIALOG),
 		NULL, (DLGPROC)PropertiesDlgProc, (LONG_PTR)this);
 };
@@ -1057,7 +1086,9 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 {
 	if ((command != IDC_SERVICE_COMMANDLINE && command != IDC_IDLETIMEINPUT && command != IDC_STARTLOG &&
 		command != IDC_KINTERVAL && command != IDC_PORTRFB && command != IDC_PORTHTTP &&
-		command != IDC_SCALE && command != IDC_CHECKIP && command != IDC_STARTREP)|| subcommand == 1024)
+		command != IDC_SCALE && command != IDC_CHECKIP && command != IDC_STARTREP && 
+		command != IDC_INSTALL_SERVICE && command != IDC_UNINSTALL_SERVICE  && command != IDC_START_SERVICE 
+		&& command != IDC_STOP_SERVICE )|| subcommand == 1024)
 	EnableWindow(GetDlgItem(PropertiesDialogHwnd, IDC_APPLY), true);
 	switch (command) {
 	case IDC_PLUGINS_COMBO: {
@@ -1154,6 +1185,36 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 	case IDC_CHECKDRIVER:
 		CheckVideoDriver(1);
 		return TRUE;
+
+	case IDC_INSTALL_SERVICE:
+		UltraVNCService::install_service();
+		Sleep(3000);
+		setServiceStatusText(hwnd);
+		break;
+	case IDC_UNINSTALL_SERVICE:
+		UltraVNCService::uninstall_service();
+		Sleep(3000);
+		setServiceStatusText(hwnd);
+		break;
+	case IDC_START_SERVICE:
+	{
+		char command[MAX_PATH + 32]; // 29 January 2008 jdp
+		_snprintf_s(command, sizeof command, "net start \"%s\"", UltraVNCService::service_name);
+		WinExec(command, SW_HIDE);
+		Sleep(3000);
+		setServiceStatusText(hwnd);
+	}
+		break;
+	case IDC_STOP_SERVICE:
+	{
+		char command[MAX_PATH + 32]; // 29 January 2008 jdp
+		_snprintf_s(command, sizeof command, "net stop \"%s\"", UltraVNCService::service_name);
+		WinExec(command, SW_HIDE);
+		Sleep(3000);
+		setServiceStatusText(hwnd);
+	}
+		break;
+
 	case IDC_BLANK:
 	{
 		// only enable alpha blanking if blanking is enabled
@@ -2070,6 +2131,7 @@ void PropertiesDialog::onApply(HWND hwnd)
 	SendMessage(hTabCapture, WM_COMMAND, IDC_APPLY, 0);
 	SendMessage(hTabLog, WM_COMMAND, IDC_APPLY, 0);
 	SendMessage(hTabAdministration, WM_COMMAND, IDC_APPLY, 0);
+	SendMessage(hTabService, WM_COMMAND, IDC_APPLY, 0);
 #ifndef SC_20
 	settings->save();
 #endif // SC_20	
@@ -2086,6 +2148,7 @@ void PropertiesDialog::onOK(HWND hwnd)
 	SendMessage(hTabCapture, WM_COMMAND, IDOK, 0);
 	SendMessage(hTabLog, WM_COMMAND, IDOK, 0);
 	SendMessage(hTabAdministration, WM_COMMAND, IDOK, 0);
+	SendMessage(hTabService, WM_COMMAND, IDOK, 0);
 
 #ifndef SC_20
 	settings->save();
@@ -2101,6 +2164,7 @@ void PropertiesDialog::onOK(HWND hwnd)
 	DestroyWindow(hTabCapture);
 	DestroyWindow(hTabLog);
 	DestroyWindow(hTabAdministration);
+	DestroyWindow(hTabService);
 	EndDialog(hwnd, TRUE);
 }
 void PropertiesDialog::onCancel(HWND hwnd)
@@ -2115,6 +2179,7 @@ void PropertiesDialog::onCancel(HWND hwnd)
 	SendMessage(hTabCapture, WM_COMMAND, IDCANCEL, 0);
 	SendMessage(hTabLog, WM_COMMAND, IDCANCEL, 0);
 	SendMessage(hTabAdministration, WM_COMMAND, IDCANCEL, 0);
+	SendMessage(hTabService, WM_COMMAND, IDCANCEL, 0);
 	DestroyWindow(hTabAuthentication);
 	DestroyWindow(hTabIncoming);
 	DestroyWindow(hTabInput);
@@ -2125,6 +2190,7 @@ void PropertiesDialog::onCancel(HWND hwnd)
 	DestroyWindow(hTabCapture);
 	DestroyWindow(hTabLog);
 	DestroyWindow(hTabAdministration);
+	DestroyWindow(hTabService);
 	EndDialog(hwnd, FALSE);
 }
 
@@ -2195,4 +2261,39 @@ void PropertiesDialog::LogToEdit(const std::string & message)
 	SendMessage(hEditLog, EM_SCROLLCARET, 0, 0);  // Ensure the last line is visible
 	GetWindowText(hEditLog, buffer, sizeof(buffer));
 }
+
+void PropertiesDialog::setServiceStatusText(HWND hwnd)
+{
+	if (GetDlgItem(hwnd, IDC_SERVICE_STATUS)) {
+		bool installed = processHelper::IsServiceInstalled();
+		bool running = processHelper::IsServiceRunning();
+		if (!installed) {
+			SetWindowText(GetDlgItem(hwnd, IDC_SERVICE_STATUS), "Service is not installed");
+			EnableWindow(GetDlgItem(hwnd, IDC_INSTALL_SERVICE), 1);
+			EnableWindow(GetDlgItem(hwnd, IDC_UNINSTALL_SERVICE), 0);
+			EnableWindow(GetDlgItem(hwnd, IDC_START_SERVICE), 0);
+			EnableWindow(GetDlgItem(hwnd, IDC_STOP_SERVICE), 0);
+		}
+		if (installed && running) {
+			SetWindowText(GetDlgItem(hwnd, IDC_SERVICE_STATUS), "Service installed and running");
+			EnableWindow(GetDlgItem(hwnd, IDC_INSTALL_SERVICE), 0);
+			EnableWindow(GetDlgItem(hwnd, IDC_UNINSTALL_SERVICE), 0);
+			EnableWindow(GetDlgItem(hwnd, IDC_START_SERVICE), 0);
+			EnableWindow(GetDlgItem(hwnd, IDC_STOP_SERVICE), 1);
+		}
+
+		if (installed && !running) {
+			SetWindowText(GetDlgItem(hwnd, IDC_SERVICE_STATUS), "Service installed and not running");
+			EnableWindow(GetDlgItem(hwnd, IDC_INSTALL_SERVICE), 0);
+			EnableWindow(GetDlgItem(hwnd, IDC_UNINSTALL_SERVICE), 1);
+			EnableWindow(GetDlgItem(hwnd, IDC_START_SERVICE), 1);
+			EnableWindow(GetDlgItem(hwnd, IDC_STOP_SERVICE), 0);
+		}
+
+
+		
+	}
+	
+}
+
 

@@ -810,6 +810,39 @@ namespace processHelper {
 		return result;
 	}
 
+	bool IsServiceRunning() {
+		bool isRunning = false;
+
+		// Open the Service Control Manager
+		SC_HANDLE hSCM = OpenSCManager(nullptr, nullptr, SC_MANAGER_CONNECT);
+		if (!hSCM) {
+			return false;
+		}
+
+		// Open the service
+		SC_HANDLE hService = OpenService(hSCM, UltraVNCService::service_name, SERVICE_QUERY_STATUS);
+		if (!hService) {
+			CloseServiceHandle(hSCM);
+			return false;
+		}
+
+		// Query the service status
+		SERVICE_STATUS_PROCESS serviceStatus;
+		DWORD bytesNeeded;
+		if (QueryServiceStatusEx(hService, SC_STATUS_PROCESS_INFO,
+			(LPBYTE)&serviceStatus, sizeof(SERVICE_STATUS_PROCESS), &bytesNeeded)) {
+			if (serviceStatus.dwCurrentState == SERVICE_RUNNING) {
+				isRunning = true;
+			}
+		}
+
+		// Cleanup
+		CloseServiceHandle(hService);
+		CloseServiceHandle(hSCM);
+
+		return isRunning;
+	}
+
 	bool IsServiceInstalled()
 	{
 		bool serviceInstalled = false;

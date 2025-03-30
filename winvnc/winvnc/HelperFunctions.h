@@ -86,6 +86,7 @@ namespace processHelper {
 	BOOL CurrentUser(char* buffer, UINT size);
 	DWORD GetExplorerLogonPid();
 	bool IsServiceInstalled();
+	bool IsServiceRunning();
 	DWORD GetCurrentConsoleSessionID();
 	BOOL IsWSLocked();
 }

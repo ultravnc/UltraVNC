@@ -814,7 +814,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 			if (strncmp(&szCmdLine[i], winvncsettings, strlen(winvncsettings)) == 0)
 			{
 				PropertiesDialog properties;
-				properties.ShowDialog();
+				properties.ShowDialog(true);
 				PostQuitMessage(0);
 			}
 

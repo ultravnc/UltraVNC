@@ -53,6 +53,7 @@
 #define IDD_DIALOG1                     205
 #define IDD_ADMINPASSWORD               205
 #define IDD_CHANGE_PASSWORD             207
+#define IDD_FORM_Service                209
 #define IDC_ACCEPTLOGO                  1001
 #define IDC_ACCEPT_IP                   1002
 #define IDC_ACCEPT_TIMEOUT              1003
@@ -81,10 +82,6 @@
 #define IDC_CHECK3                      1028
 #define IDC_CHECK4                      1029
 #define IDC_CHECK5                      1030
-//#define IDC_CHECK6                      1027
-//#define IDC_CHECK7                      1028
-//#define IDC_CHECK8                      1029
-//#define IDC_CHECK9                      1030
 #define IDC_CHECKCLOUD                  1031
 #define IDC_CHECKDRIVER                 1032
 #define IDC_CHECKG1D                    1033
@@ -312,21 +309,26 @@
 #define IDD_FORM_Rules                  1269
 #define IDD_FORM_Notifications          1270
 #define IDC_ERROR_TEXT                  1271
-#define IDD_FORM_administration         1271
-#define IDC_EDIT_PATH                   1272
-#define IDD_FORM_Log                    1272
+#define IDD_FORM_administration         1272
+#define IDC_EDIT_PATH                   1273
+#define IDD_FORM_Log                    1274
 #define IDC_STATIC_ADMIN                1275
 #define IDC_APPLY                       1276
 #define IDC_CLEARPASSWORD               1277
 #define IDC_CHANGEPASSWORDVO            1278
 #define IDC_BUTTON4                     1279
-#define IDC_CLEARPASSWORDVO             1279
-#define IDC_CHANGEPASSWORDADMIN         1280
-#define IDC_CHANGEPASSWORD              1281
-#define IDC_ADMINCLEAR                  1282
-#define IDC_BUTTON2                     1283
-#define IDC_STOPLOG                     1283
-#define IDC_CONFIG_FILE                 1284
+#define IDC_CLEARPASSWORDVO             1280
+#define IDC_CHANGEPASSWORDADMIN         1281
+#define IDC_CHANGEPASSWORD              1282
+#define IDC_ADMINCLEAR                  1283
+#define IDC_BUTTON2                     1284
+#define IDC_STOPLOG                     1285
+#define IDC_UNINSTALL_SERVICE           1286
+#define IDC_CONFIG_FILE                 1287
+#define IDC_START_SERVICE               1288
+#define IDC_SERVICE_STATUS              1289
+#define IDC_INSTALL_SERVICE             1290
+#define IDC_STOP_SERVICE                1291
 #define IDE_CUSTOM1                     4377
 #define ID_ABOUT                        32771
 #define ID_ADMIN_PROPERTIES             32772
@@ -422,9 +424,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        209
+#define _APS_NEXT_RESOURCE_VALUE        211
 #define _APS_NEXT_COMMAND_VALUE         32859
-#define _APS_NEXT_CONTROL_VALUE         1285
+#define _APS_NEXT_CONTROL_VALUE         1292
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

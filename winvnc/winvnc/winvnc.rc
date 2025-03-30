@@ -856,6 +856,17 @@ BEGIN
     CONTROL         "Secondary",IDC_SEC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,127,128,50,10
 END
 
+IDD_FORM_Service DIALOGEX 0, 0, 362, 209
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_SYSMENU
+FONT 11, "MS Shell Dlg", 400, 0, 0x0
+BEGIN
+    PUSHBUTTON      "Install service",IDC_INSTALL_SERVICE,17,7,84,14
+    PUSHBUTTON      "Uninstall service",IDC_UNINSTALL_SERVICE,17,28,84,14
+    PUSHBUTTON      "Start service",IDC_START_SERVICE,17,49,84,14
+    PUSHBUTTON      "Stop service",IDC_STOP_SERVICE,17,70,84,14
+    LTEXT           "Static",IDC_SERVICE_STATUS,17,100,217,31
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -945,6 +956,8 @@ BEGIN
         RIGHTMARGIN, 351
         VERTGUIDE, 12
         VERTGUIDE, 296
+        VERTGUIDE, 355
+        VERTGUIDE, 360
         TOPMARGIN, 7
         BOTTOMMARGIN, 202
     END
@@ -990,6 +1003,14 @@ BEGIN
         VERTGUIDE, 12
         TOPMARGIN, 7
         BOTTOMMARGIN, 204
+    END
+
+    IDD_FORM_Service, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 355
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 202
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -1066,6 +1087,11 @@ BEGIN
 END
 
 IDD_FORM_Misc AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_FORM_Service AFX_DIALOG_LAYOUT
 BEGIN
     0
 END

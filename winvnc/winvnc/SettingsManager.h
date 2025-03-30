@@ -235,10 +235,10 @@ public:
 	void setddEngine(BOOL value) { m_pref_ddEngine = value; };
 	BOOL getddEngine() { return m_pref_ddEngine; };
 
-	void setMaxCpu(BOOL value) { m_pref_MaxCpu = value; };
-	BOOL getMaxCpu() { return m_pref_MaxCpu; };
-	void setMaxFPS(BOOL value) { m_pref_MaxFPS = value; };
-	BOOL getMaxFPS() { return m_pref_MaxFPS; };
+	void setMaxCpu(int value) { m_pref_MaxCpu = value; };
+	int getMaxCpu() { return m_pref_MaxCpu; };
+	void setMaxFPS(int value) { m_pref_MaxFPS = value; };
+	int getMaxFPS() { return m_pref_MaxFPS; };
 	void setAutocapt(BOOL value) { m_pref_autocapt = value; };
 	BOOL getAutocapt() { return m_pref_autocapt; };
 
